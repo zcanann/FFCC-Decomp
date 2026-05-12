@@ -8,25 +8,39 @@
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void*);
 
-extern float FLOAT_80330498;
-extern float FLOAT_8033049c;
-extern float FLOAT_803304a0;
-extern float FLOAT_803304a4;
-extern float FLOAT_803304a8;
-extern float FLOAT_803304b4;
-extern float FLOAT_803304bc;
-extern float FLOAT_803304c0;
-extern float FLOAT_803304c4;
-extern float FLOAT_803304c8;
-extern float FLOAT_803304CC;
-extern float FLOAT_803304D0;
-extern double DOUBLE_803304E0;
-extern float FLOAT_803304E8;
+extern const float FLOAT_80330498;
+extern const float FLOAT_8033049c;
+extern const float FLOAT_803304a0;
+extern const float FLOAT_803304a4;
+extern const float FLOAT_803304a8;
+extern const float FLOAT_803304b4;
+extern const float FLOAT_803304bc;
+extern const float FLOAT_803304c0;
+extern const float FLOAT_803304c4;
+extern const float FLOAT_803304c8;
+extern const float FLOAT_803304CC;
+extern const float FLOAT_803304D0;
+extern const double DOUBLE_803304E0;
+extern const float FLOAT_803304E8[2];
 
 PARTICLE_WMAT g_matKeep;
 PARTICLE_WMAT g_matTmp;
 
 extern const char s_pppRyjMegaBirthModel_cpp_801d9c18[] = "pppRyjMegaBirthModel.cpp";
+
+extern const float FLOAT_803304a8 = 0.017453292f;
+extern const double DOUBLE_803304b0 = 4503601774854144.0;
+extern const double DOUBLE_803304B8 = 4503599627370496.0;
+extern const float FLOAT_803304c0 = 2.0f;
+extern const float FLOAT_803304c4 = 180.0f;
+extern const float FLOAT_803304c8 = 1.0f;
+extern const float FLOAT_803304CC = 0.7f;
+extern const float FLOAT_803304D0 = 0.5f;
+extern const double DOUBLE_803304D8 = 1.0;
+extern const double DOUBLE_803304E0 = 0.5;
+extern const float FLOAT_803304E8[2] = { -1.0f, 0.0f };
+extern const float FLOAT_803304F0[2] = { 0.0f, 0.0f };
+extern const float FLOAT_803304F8[2] = { 0.0f, 0.0f };
 
 static inline float* f32_at(void* base, s32 off)
 {
@@ -139,13 +153,13 @@ static void apply_signed_randomization(u8* particleBytes, s32 offset, u8 flags)
         for (int i = 0; i < 3; i++) {
             float* value = f32_at(particleBytes, offset + i * 4);
             if (DOUBLE_803304E0 < (double)Math.RandF()) {
-                *value = *value * FLOAT_803304E8;
+                *value = *value * FLOAT_803304E8[0];
             }
         }
     } else if ((flags & 2) != 0) {
         for (int i = 0; i < 3; i++) {
             float* value = f32_at(particleBytes, offset + i * 4);
-            *value = *value * FLOAT_803304E8;
+            *value = *value * FLOAT_803304E8[0];
         }
     }
 }
@@ -501,18 +515,18 @@ void birth(
 
             if ((payload[0x132] & 1) != 0 && (payload[0x132] & 2) != 0) {
                 if (DOUBLE_803304E0 < (double)Math.RandF()) {
-                    *f32_at(particleData, 0x74) = *f32_at(particleData, 0x74) * FLOAT_803304E8;
+                    *f32_at(particleData, 0x74) = *f32_at(particleData, 0x74) * FLOAT_803304E8[0];
                 }
                 if (DOUBLE_803304E0 < (double)Math.RandF()) {
-                    *f32_at(particleData, 0x78) = *f32_at(particleData, 0x78) * FLOAT_803304E8;
+                    *f32_at(particleData, 0x78) = *f32_at(particleData, 0x78) * FLOAT_803304E8[0];
                 }
                 if (DOUBLE_803304E0 < (double)Math.RandF()) {
-                    *f32_at(particleData, 0x7C) = *f32_at(particleData, 0x7C) * FLOAT_803304E8;
+                    *f32_at(particleData, 0x7C) = *f32_at(particleData, 0x7C) * FLOAT_803304E8[0];
                 }
             } else if ((payload[0x132] & 2) != 0) {
-                *f32_at(particleData, 0x74) = *f32_at(particleData, 0x74) * FLOAT_803304E8;
-                *f32_at(particleData, 0x78) = *f32_at(particleData, 0x78) * FLOAT_803304E8;
-                *f32_at(particleData, 0x7C) = *f32_at(particleData, 0x7C) * FLOAT_803304E8;
+                *f32_at(particleData, 0x74) = *f32_at(particleData, 0x74) * FLOAT_803304E8[0];
+                *f32_at(particleData, 0x78) = *f32_at(particleData, 0x78) * FLOAT_803304E8[0];
+                *f32_at(particleData, 0x7C) = *f32_at(particleData, 0x7C) * FLOAT_803304E8[0];
             }
         } else {
             float randomVelocity = *(float*)(payload + 0xC0) * Math.RandF();
@@ -523,14 +537,14 @@ void birth(
 
             if ((payload[0x132] & 1) != 0 && (payload[0x132] & 2) != 0) {
                 if (DOUBLE_803304E0 < (double)Math.RandF()) {
-                    *f32_at(particleData, 0x74) = *f32_at(particleData, 0x74) * FLOAT_803304E8;
-                    *f32_at(particleData, 0x78) = *f32_at(particleData, 0x78) * FLOAT_803304E8;
-                    *f32_at(particleData, 0x7C) = *f32_at(particleData, 0x7C) * FLOAT_803304E8;
+                    *f32_at(particleData, 0x74) = *f32_at(particleData, 0x74) * FLOAT_803304E8[0];
+                    *f32_at(particleData, 0x78) = *f32_at(particleData, 0x78) * FLOAT_803304E8[0];
+                    *f32_at(particleData, 0x7C) = *f32_at(particleData, 0x7C) * FLOAT_803304E8[0];
                 }
             } else if ((payload[0x132] & 2) != 0) {
-                *f32_at(particleData, 0x74) = *f32_at(particleData, 0x74) * FLOAT_803304E8;
-                *f32_at(particleData, 0x78) = *f32_at(particleData, 0x78) * FLOAT_803304E8;
-                *f32_at(particleData, 0x7C) = *f32_at(particleData, 0x7C) * FLOAT_803304E8;
+                *f32_at(particleData, 0x74) = *f32_at(particleData, 0x74) * FLOAT_803304E8[0];
+                *f32_at(particleData, 0x78) = *f32_at(particleData, 0x78) * FLOAT_803304E8[0];
+                *f32_at(particleData, 0x7C) = *f32_at(particleData, 0x7C) * FLOAT_803304E8[0];
             }
         }
 

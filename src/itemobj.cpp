@@ -189,13 +189,11 @@ struct ItemObjFlatData {
 
 struct CMapCylinderRaw {
 	Vec m_bottom;
-	Vec m_direction;
-	float m_radius;
-	float m_height;
 	Vec m_top;
-	Vec m_direction2;
-	float m_radius2;
-	float m_height2;
+	Vec m_axis;
+	float m_radius;
+	Vec m_boundsMin;
+	Vec m_boundsMax;
 };
 
 /*
@@ -1441,8 +1439,8 @@ void CGItemObj::ItemJump(int state, float jump)
 
 		if ((object->m_objectFlags & 0x10) == 0) {
 			unsigned int mapMask = *reinterpret_cast<unsigned int*>(&object->m_moveVec.x);
-			Vec move;
 			CMapCylinderRaw cylinder;
+			Vec move;
 
 			move.x = FLOAT_80331b20;
 			move.y = FLOAT_80331b24;
@@ -1450,19 +1448,19 @@ void CGItemObj::ItemJump(int state, float jump)
 
 			cylinder.m_bottom = object->m_worldPosition;
 			cylinder.m_bottom.y += FLOAT_80331b1c;
-			cylinder.m_direction.x = FLOAT_80331b20;
-			cylinder.m_direction.y = FLOAT_80331b20;
-			cylinder.m_direction.z = FLOAT_80331b20;
-			cylinder.m_radius = FLOAT_80331b20;
-			cylinder.m_height = FLOAT_80331b24;
 			cylinder.m_top.x = FLOAT_80331b20;
 			cylinder.m_top.y = FLOAT_80331b20;
-			cylinder.m_top.z = FLOAT_80331b28;
-			cylinder.m_direction2.x = FLOAT_80331b28;
-			cylinder.m_direction2.y = FLOAT_80331b28;
-			cylinder.m_direction2.z = FLOAT_80331b2c;
-			cylinder.m_radius2 = FLOAT_80331b2c;
-			cylinder.m_height2 = FLOAT_80331b2c;
+			cylinder.m_top.z = FLOAT_80331b20;
+			cylinder.m_axis.x = FLOAT_80331b20;
+			cylinder.m_axis.y = FLOAT_80331b24;
+			cylinder.m_axis.z = FLOAT_80331b20;
+			cylinder.m_radius = FLOAT_80331b20;
+			cylinder.m_boundsMin.x = FLOAT_80331b28;
+			cylinder.m_boundsMin.y = FLOAT_80331b28;
+			cylinder.m_boundsMin.z = FLOAT_80331b28;
+			cylinder.m_boundsMax.x = FLOAT_80331b2c;
+			cylinder.m_boundsMax.y = FLOAT_80331b2c;
+			cylinder.m_boundsMax.z = FLOAT_80331b2c;
 
 			if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
 			        &MapMng, reinterpret_cast<CMapCylinder*>(&cylinder), &move, mapMask) != 0 &&

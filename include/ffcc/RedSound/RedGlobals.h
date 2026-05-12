@@ -39,6 +39,7 @@ enum RedReverbDepthLayout {
 };
 
 enum RedSoundMode {
+	REDSOUND_SOUND_MODE_STEREO = 0,
 	REDSOUND_SOUND_MODE_MONO = 1,
 	REDSOUND_SOUND_MODE_SURROUND = 2,
 };

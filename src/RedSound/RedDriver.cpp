@@ -683,9 +683,9 @@ static void _SetSoundMode(int* command)
 {
     m_SoundMode = command[REDSOUND_SOUND_MODE_COMMAND_MODE];
     if (command[REDSOUND_SOUND_MODE_COMMAND_MODE] == REDSOUND_SOUND_MODE_MONO) {
-        OSGetSoundMode(0);
+        OSGetSoundMode(OS_SOUND_MODE_MONO);
     } else {
-        OSGetSoundMode(1);
+        OSGetSoundMode(OS_SOUND_MODE_STEREO);
     }
     m_SoundPlayMode = m_SoundMode;
     switch (m_SoundPlayMode) {
@@ -693,7 +693,7 @@ static void _SetSoundMode(int* command)
         AXSetMode(REDSOUND_SOUND_MODE_SURROUND);
         break;
     default:
-        AXSetMode(0);
+        AXSetMode(REDSOUND_SOUND_MODE_STEREO);
         break;
     }
 }
@@ -1993,10 +1993,10 @@ void CRedDriver::Init()
     m_ThreadExecute = REDSOUND_THREAD_FLAG_NONE;
     m_ThreadControl = REDSOUND_THREAD_CONTROL_RUN;
     m_ReportPrint = 1;
-    m_SoundMode = 0;
+    m_SoundMode = REDSOUND_SOUND_MODE_STEREO;
     GetSoundMode();
     if (m_SoundPlayMode != REDSOUND_SOUND_MODE_SURROUND) {
-        AXSetMode(0);
+        AXSetMode(REDSOUND_SOUND_MODE_STEREO);
     } else {
         AXSetMode(REDSOUND_SOUND_MODE_SURROUND);
     }

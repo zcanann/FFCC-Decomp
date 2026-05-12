@@ -618,9 +618,7 @@ int SeBlockPlay(int seId, int bank, int no, int pan, int volume)
 			int* entries = bankData->m_entries;
 
 			if (entries[seNo] != REDSOUND_SE_BLOCK_ENTRY_EMPTY) {
-				int infoOffset = bankData->m_seCount * REDSOUND_SE_BLOCK_ENTRY_SIZE;
-				infoOffset += (unsigned int)entries[seNo] & REDSOUND_SE_BLOCK_ENTRY_MASK;
-				RedSeINFO* seInfo = RedSeBlockGetInfoFromOffset(entries, infoOffset);
+				RedSeINFO* seInfo = RedSeBlockGetInfoFromEntries(bankData, entries, seNo);
 				RedSeINFO* playInfo = seInfo;
 
 				if (((unsigned int)entries[seNo] & REDSOUND_SE_BLOCK_DATA_FLAG) != 0) {

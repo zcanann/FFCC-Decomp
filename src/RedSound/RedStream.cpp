@@ -226,12 +226,12 @@ static void _StreamStop(RedStreamDATA* streamData)
 		streamData->m_voiceData->m_flags |= REDSOUND_VOICE_FLAGS_RELEASED;
 		streamData->m_track->m_note.m_allocFlags &= ~REDSOUND_NOTE_ALLOC_STREAM;
 		streamData->m_voiceData->m_stateFlags &= REDSOUND_VOICE_STATE_CLEAR_STREAM_MASK;
-		streamData->m_voiceData->m_active = 0;
+		streamData->m_voiceData->m_active = REDSOUND_VOICE_ACTIVE_OFF;
 		if (streamData->m_header.m_channelCount == REDSOUND_STREAM_STEREO_CHANNEL_COUNT) {
 			streamData->m_voiceData[REDSOUND_STREAM_RIGHT_CHANNEL].m_flags |= REDSOUND_VOICE_FLAGS_RELEASED;
 			streamData->m_track[REDSOUND_STREAM_RIGHT_CHANNEL].m_note.m_allocFlags &= ~REDSOUND_NOTE_ALLOC_STREAM;
 			streamData->m_voiceData[REDSOUND_STREAM_RIGHT_CHANNEL].m_stateFlags &= REDSOUND_VOICE_STATE_CLEAR_STREAM_MASK;
-			streamData->m_voiceData[REDSOUND_STREAM_RIGHT_CHANNEL].m_active = 0;
+			streamData->m_voiceData[REDSOUND_STREAM_RIGHT_CHANNEL].m_active = REDSOUND_VOICE_ACTIVE_OFF;
 		}
 	}
 }
@@ -831,12 +831,12 @@ void StreamControl()
 			streamData->m_state = REDSOUND_STREAM_STATE_PLAYING;
 			voiceData->m_flags |= REDSOUND_VOICE_FLAGS_STREAM_START;
 			voiceData->m_waveData = streamData->m_trackData;
-			voiceData->m_active = 1;
+			voiceData->m_active = REDSOUND_VOICE_ACTIVE_ON;
 			if (streamData->m_header.m_channelCount == REDSOUND_STREAM_STEREO_CHANNEL_COUNT) {
 				voiceData[REDSOUND_STREAM_RIGHT_CHANNEL].m_flags |= REDSOUND_VOICE_FLAGS_STREAM_START;
 				voiceData[REDSOUND_STREAM_RIGHT_CHANNEL].m_waveData =
 				    &streamData->m_trackData[REDSOUND_STREAM_RIGHT_CHANNEL];
-				voiceData[REDSOUND_STREAM_RIGHT_CHANNEL].m_active = 1;
+				voiceData[REDSOUND_STREAM_RIGHT_CHANNEL].m_active = REDSOUND_VOICE_ACTIVE_ON;
 			}
 		}
 

@@ -149,7 +149,7 @@ static void _EraseAttribute(int eraseTrack, int attrMask)
 			(p_VoiceData + trackNo)->m_voiceSwitch &= REDSOUND_VOICE_SWITCH_CLEAR_SE_MASK;
 			(p_VoiceData + trackNo)->m_flags &= REDSOUND_VOICE_FLAGS_CLEAR_ACTIVE_MASK;
 			(p_VoiceData + trackNo)->m_flags |= REDSOUND_VOICE_FLAGS_RELEASED;
-			(p_VoiceData + trackNo)->m_active = 0;
+			(p_VoiceData + trackNo)->m_active = REDSOUND_VOICE_ACTIVE_OFF;
 
 			c_RedEntry.SeSepHistoryManager(REDSOUND_HISTORY_MODE_RELEASE, track->m_seSepId);
 			if (track->m_waveBankData != 0) {
@@ -219,7 +219,7 @@ static int _EraseTime(int eraseTrack)
 			(p_VoiceData + trackNo)->m_voiceSwitch &= REDSOUND_VOICE_SWITCH_CLEAR_SE_MASK;
 			(p_VoiceData + trackNo)->m_flags &= REDSOUND_VOICE_FLAGS_CLEAR_ACTIVE_MASK;
 			(p_VoiceData + trackNo)->m_flags |= REDSOUND_VOICE_FLAGS_RELEASED;
-			(p_VoiceData + trackNo)->m_active = 0;
+			(p_VoiceData + trackNo)->m_active = REDSOUND_VOICE_ACTIVE_OFF;
 
 			if (track->m_waveBankData != 0) {
 				c_RedEntry.WaveHistoryManager(REDSOUND_HISTORY_MODE_RELEASE, track->m_waveBankData->m_waveNo);
@@ -320,7 +320,7 @@ int SeStopID(int seId)
 			(p_VoiceData + trackNo)->m_flags &= REDSOUND_VOICE_FLAGS_CLEAR_ACTIVE_MASK;
 			(p_VoiceData + trackNo)->m_flags |= REDSOUND_VOICE_FLAGS_RELEASED;
 			(p_VoiceData + trackNo)->m_track = 0;
-			(p_VoiceData + trackNo)->m_active = 0;
+			(p_VoiceData + trackNo)->m_active = REDSOUND_VOICE_ACTIVE_OFF;
 
 			if (track->m_waveBankData != 0) {
 				c_RedEntry.WaveHistoryManager(REDSOUND_HISTORY_MODE_RELEASE, track->m_waveBankData->m_waveNo);
@@ -366,7 +366,7 @@ int SeStopG(int group)
 			(p_VoiceData + trackNo)->m_flags &= REDSOUND_VOICE_FLAGS_CLEAR_ACTIVE_MASK;
 			(p_VoiceData + trackNo)->m_flags |= REDSOUND_VOICE_FLAGS_RELEASED;
 			(p_VoiceData + trackNo)->m_track = 0;
-			(p_VoiceData + trackNo)->m_active = 0;
+			(p_VoiceData + trackNo)->m_active = REDSOUND_VOICE_ACTIVE_OFF;
 
 			if (track->m_waveBankData != 0) {
 				c_RedEntry.WaveHistoryManager(REDSOUND_HISTORY_MODE_RELEASE, track->m_waveBankData->m_waveNo);
@@ -414,7 +414,7 @@ int SeStopMG(int bank, int sep, int group, int kind)
 				(p_VoiceData + trackNo)->m_flags &= REDSOUND_VOICE_FLAGS_CLEAR_ACTIVE_MASK;
 				(p_VoiceData + trackNo)->m_flags |= REDSOUND_VOICE_FLAGS_RELEASED;
 				(p_VoiceData + trackNo)->m_track = 0;
-				(p_VoiceData + trackNo)->m_active = 0;
+				(p_VoiceData + trackNo)->m_active = REDSOUND_VOICE_ACTIVE_OFF;
 
 				if (track->m_waveBankData != 0) {
 					c_RedEntry.WaveHistoryManager(REDSOUND_HISTORY_MODE_RELEASE, track->m_waveBankData->m_waveNo);
@@ -1009,7 +1009,7 @@ int MusicStop(int musicId)
 						voiceData->m_flags |= REDSOUND_VOICE_FLAGS_RELEASED;
 						voiceData->m_stateFlags &= ~REDSOUND_VOICE_STATE_SE;
 						voiceData->m_track = 0;
-						voiceData->m_active = 0;
+						voiceData->m_active = REDSOUND_VOICE_ACTIVE_OFF;
 					}
 					voiceData++;
 				} while (voiceData < p_VoiceData + REDSOUND_VOICE_COUNT);

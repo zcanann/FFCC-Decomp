@@ -1319,7 +1319,7 @@ static void _VoiceDataAsign(RedTrackDATA* track, RedVoiceDATA* voice, RedNoteDAT
 
     workValue = 0;
     voice->m_track = track;
-    voice->m_active = 1;
+    voice->m_active = REDSOUND_VOICE_ACTIVE_ON;
 
     if ((track->m_portamentTime != 0) &&
         (track->m_portamentPitch >= 0)) {
@@ -1780,7 +1780,7 @@ static void _VoiceDropedCallback(void* dropped)
     voiceData = p_VoiceData;
     do {
         if ((voiceData->m_axVoice != 0) && (voiceData->m_axVoice == dropped)) {
-            voiceData->m_active = 0;
+            voiceData->m_active = REDSOUND_VOICE_ACTIVE_OFF;
             voiceData->m_track = 0;
             voiceData->m_axVoice = 0;
         }
@@ -1802,7 +1802,7 @@ void EnvelopeKeyExecute()
     RedVoiceDATA* voiceData = p_VoiceData;
 
     while (true) {
-        if (voiceData->m_active != 0) {
+        if (voiceData->m_active != REDSOUND_VOICE_ACTIVE_OFF) {
             AXVPB* voice;
 
             if ((voiceData->m_flags & REDSOUND_VOICE_FLAGS_START) != 0) {
@@ -1827,7 +1827,7 @@ void EnvelopeKeyExecute()
             voice = voiceData->m_axVoice;
             if (voice == 0) {
                 voiceData->m_flags = 0;
-                voiceData->m_active = 0;
+                voiceData->m_active = REDSOUND_VOICE_ACTIVE_OFF;
                 return;
             }
 
@@ -1870,7 +1870,7 @@ void EnvelopeKeyExecute()
                 RedWaveDATA* waveData = voiceData->m_waveData;
                 RedTrackDATA* trackData = voiceData->m_track;
                 if ((waveData == 0) || (trackData == 0)) {
-                    voiceData->m_active = 0;
+                    voiceData->m_active = REDSOUND_VOICE_ACTIVE_OFF;
                 } else {
                     envChanged += 1;
                     int key = (trackData->m_waveBase + waveData->m_sampleStart + REDSOUND_AX_SAMPLE_START_BIAS) *
@@ -1931,7 +1931,7 @@ void EnvelopeKeyExecute()
 
             if (voiceData->m_envelopeLevel < 1) {
                 voiceData->m_flags &= REDSOUND_VOICE_FLAGS_CLEAR_RELEASE_ACTIVE_MASK;
-                voiceData->m_active = 0;
+                voiceData->m_active = REDSOUND_VOICE_ACTIVE_OFF;
                 voiceFlags |= AX_SYNC_FLAG_COPYVOL | AX_SYNC_FLAG_COPYSTATE;
                 voiceData->m_track = 0;
                 voice->pb.state = 0;
@@ -2066,7 +2066,7 @@ static void _KeyOnControl()
     {
         voice = p_VoiceData;
         do {
-            if ((voice->m_active != 0) && (voice->m_track != 0) &&
+            if ((voice->m_active != REDSOUND_VOICE_ACTIVE_OFF) && (voice->m_track != 0) &&
                 ((voice->m_track->m_voiceSwitch & REDSOUND_VOICE_SWITCH_SKIP_UPDATE) == 0)) {
                 if ((voice->m_updateFlags & REDSOUND_VOICE_UPDATE_VOLUME) != 0 ||
                     (voice->m_track->m_tremoloFunc != 0) ||

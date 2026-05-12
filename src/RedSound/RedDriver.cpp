@@ -3608,7 +3608,7 @@ int CRedDriver::PlayWaveItem(int waveNo, int itemNo, int key, int pan, int volum
     voice->m_envelopeLevel = REDSOUND_ENVELOPE_LEVEL_FULL;
     voice->m_flags = REDSOUND_VOICE_FLAGS_START | REDSOUND_VOICE_FLAGS_ADPCM_DIRTY |
                      REDSOUND_VOICE_FLAGS_PITCH_DIRTY | REDSOUND_VOICE_FLAGS_ADSR_START;
-    voice->m_active = 1;
+    voice->m_active = REDSOUND_VOICE_ACTIVE_ON;
     voice->m_updateFlags = REDSOUND_VOICE_UPDATE_ALL;
     SetVoiceVolumeMix(voice, pan, volume);
 
@@ -3631,7 +3631,7 @@ void CRedDriver::StopWaveItem()
     do {
         if (voice->m_track == p_EditorTrack) {
             voice->m_flags |= REDSOUND_VOICE_FLAGS_RELEASED;
-            voice->m_active = 0;
+            voice->m_active = REDSOUND_VOICE_ACTIVE_OFF;
             voice->m_track = 0;
         }
         voice++;

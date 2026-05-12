@@ -302,6 +302,11 @@ enum RedVoiceLayoutWord {
 	REDSOUND_VOICE_UPDATE_FLAGS_WORD = 0x2E,
 };
 
+enum RedVoiceActiveState {
+	REDSOUND_VOICE_ACTIVE_OFF = 0,
+	REDSOUND_VOICE_ACTIVE_ON = 1,
+};
+
 enum RedVoiceBufferWordOffset {
 	REDSOUND_VOICE_SECOND_MASK_WORD_OFFSET = 0x600,
 };

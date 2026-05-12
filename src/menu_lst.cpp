@@ -163,7 +163,7 @@ void CMenuPcs::MLstDraw()
 		font->GetWidth(text);
 
 		float textX = (float)(item->x + 0x28);
-		float textY = ((float)item->y + FLOAT_80333404) - FLOAT_803333F4;
+		float textY = (float)(item->y + 3) - FLOAT_803333F4;
 		if ((menuMode == 1) && (i == this->lstState->cursor)) {
 			textX = (float)(textX + DOUBLE_803333D8);
 		}
@@ -185,13 +185,17 @@ void CMenuPcs::MLstDraw()
 	}
 
 	DrawInit__8CMenuPcsFv(this);
+	int helpMessageId = this->lstState->cursor + 0x25c;
+	CFont* helpFont = this->helpFont;
 	CColor helpColor(0xff, 0xff, 0xff, (unsigned char)(FLOAT_803333D4 * this->lstData->entries[0].alpha));
+	float helpX = (float)-((FLOAT_803333E0 * (double)FLOAT_803333FC) - (double)FLOAT_803333F8);
+	float helpY = FLOAT_80333400;
 	DrawHelpMessage__8CMenuPcsFiP5CFontii8_GXColoriff(
 		this,
-		this->lstState->cursor + 0x25c,
-		this->helpFont,
-		(int)-((FLOAT_803333E0 * (double)FLOAT_803333FC) - (double)FLOAT_803333F8),
-		(int)FLOAT_80333400,
+		helpMessageId,
+		helpFont,
+		(int)helpX,
+		(int)helpY,
 		helpColor.color,
 		0x0a,
 		FLOAT_803333F0,

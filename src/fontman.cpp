@@ -299,7 +299,7 @@ found_fallback:
 	if (glyphInfo[0] == 0) {
 		u0 += 1.0f;
 	}
-	if (m_glyphWidth == static_cast<unsigned short>(glyphInfo[0] + glyphInfo[1])) {
+	if (m_glyphWidth == glyphInfo[0] + glyphInfo[1]) {
 		u1 -= 1.0f;
 	}
 
@@ -674,14 +674,18 @@ void CFont::Create(void* filePtr, CMemory::CStage* stage)
 
     CChunkFile chunkFile(filePtr);
     while (chunkFile.GetNextChunk(chunk)) {
-        if (chunk.m_id == 0x464F4E54) {
+        switch (chunk.m_id) {
+        case 'FONT':
             chunkFile.PushChunk();
+            const unsigned long infoChunkId = 'INFO';
             while (chunkFile.GetNextChunk(chunk)) {
-                if (chunk.m_id == 0x494E464F) {
+                switch (chunk.m_id) {
+                case infoChunkId:
                     m_glyphWidth = static_cast<unsigned short>(chunkFile.Get4());
                     m_glyphHeight = static_cast<unsigned short>(chunkFile.Get4());
                     m_glyphColumns = static_cast<unsigned short>(chunkFile.Get4());
-                } else if (chunk.m_id == 0x44415441) {
+                    break;
+                case 'DATA':
                     if (m_usesEmbeddedData != 0) {
                         m_glyphData = chunkFile.GetAddress();
                     } else {
@@ -718,12 +722,15 @@ void CFont::Create(void* filePtr, CMemory::CStage* stage)
                         bucket++;
                         bucketSlot += 8;
                     }
-                } else if (chunk.m_id == 0x54585452) {
+                    break;
+                case 'TXTR':
                     texturePtr = new (FontMan.m_stage, const_cast<char*>(s_fontman_cpp), 0xDF) CTexture;
                     texturePtr->Create(chunkFile, stage, 0, 0, m_usesEmbeddedData != 0);
+                    break;
                 }
             }
             chunkFile.PopChunk();
+            break;
         }
     }
 }

@@ -911,7 +911,7 @@ CGPrgObj* CGItemObj::CreateFromScript(
 
 	changeStat__8CGPrgObjFiii(newItem, 0x1B, 0, 0);
 
-	if ((createFlags & 1) != 0 && owner != 0) {
+	if ((createFlags & 1) != 0) {
 		float safePosDist;
 		Vec safePos;
 		float yRot = owner->m_rotBaseY + RandFPM__5CMathFf(FLOAT_80331b54, &Math);
@@ -930,7 +930,7 @@ CGPrgObj* CGItemObj::CreateFromScript(
 		SetPosBG__8CGObjectFP3Veci(newItem, &safePos, 1);
 	}
 
-	if ((createFlags & 4) != 0 && owner != 0) {
+	if ((createFlags & 4) != 0) {
 		newItem->m_worldPosition = owner->m_worldPosition;
 		SetPosBG__8CGObjectFP3Veci(newItem, &newItem->m_worldPosition, 1);
 
@@ -938,7 +938,7 @@ CGPrgObj* CGItemObj::CreateFromScript(
 		MoveVector__8CGObjectFP3Vecfiiii(newItem, (Vec*)&moveVec, FLOAT_80331b94, 1, 0, 1, 0);
 	}
 
-	if ((createFlags & 2) != 0 && owner != 0) {
+	if ((createFlags & 2) != 0) {
 		changeStat__8CGPrgObjFiii(newItem, 0x23, 0, 0);
 		newItem->m_worldPosition.x = owner->m_worldPosition.x;
 		newItem->m_worldPosition.y = owner->m_worldPosition.y + FLOAT_80331b98;

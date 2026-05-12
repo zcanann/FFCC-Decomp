@@ -512,10 +512,10 @@ int RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* verti
 					maxIndex = i;
 				}
 			}
-			projectedOffsetX = texScaleX * ((float)(left + width) - projected[maxIndex].x);
+			projectedOffsetX = texScaleX * (((float)left + (float)width) - projected[maxIndex].x);
 			texMtx[0][2] = texMtx[0][2] + (projectedObj[maxIndex].x + projectedOffsetX - FLOAT_803305f8);
 		}
-	} else if ((left + width) < 641) {
+	} else if ((left + width) <= 640) {
 		texMtx[0][2] = texMtx[0][2] + offsetX;
 	} else {
 		texMtx[0][2] = texMtx[0][2] + offsetX;
@@ -531,7 +531,7 @@ int RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* verti
 					maxIndex = i;
 				}
 			}
-			projectedOffsetY = texScaleY * ((float)(top + height) - projected[maxIndex].y);
+			projectedOffsetY = texScaleY * (((float)top + (float)height) - projected[maxIndex].y);
 			texMtx[1][2] = texMtx[1][2] + (projectedObj[maxIndex].y + projectedOffsetY - FLOAT_803305f8);
 		}
 	} else {

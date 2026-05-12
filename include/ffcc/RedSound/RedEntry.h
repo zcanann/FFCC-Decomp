@@ -208,6 +208,8 @@ enum RedSeSepHeadLayout {
 	REDSOUND_SESEP_FLAGS_MASK = 0x80000000,
 };
 
+#define RedSeSepGetInfo(seSepHead) reinterpret_cast<RedSeINFO*>(&(seSepHead)->m_seInfoFlags)
+
 struct RedSeInfoSequence
 {
 	unsigned char m_offsetLo;

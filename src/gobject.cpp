@@ -1076,7 +1076,7 @@ void CGObject::bgNormalCollision()
         return;
     }
 
-    const unsigned char mapGroup = reinterpret_cast<unsigned char*>(gMapHitFace)[0x47];
+    const unsigned char mapGroup = gMapHitFace->m_groupIndex;
     u8* mapGroupData = reinterpret_cast<u8*>(&MapMng) + 0x214E8 + (mapGroup * 0x14);
     if ((*reinterpret_cast<u32*>(mapGroupData) & 0x20) == 0) {
         m_stateFlags0 = (m_stateFlags0 & 0x7F) | 0x80;
@@ -1201,7 +1201,7 @@ void CGObject::bgWorldCollision()
     m_groundHitOffset.y = newOffset.y;
     m_groundHitOffset.z = newOffset.z;
 
-    const unsigned char mapGroup = reinterpret_cast<unsigned char*>(gMapHitFace)[0x47];
+    const unsigned char mapGroup = gMapHitFace->m_groupIndex;
     u8* mapGroupData = reinterpret_cast<u8*>(&MapMng) + 0x214E8 + (mapGroup * 0x14);
     if ((*reinterpret_cast<u32*>(mapGroupData) & 0x20) == 0) {
         m_stateFlags0 = (m_stateFlags0 & 0x7F) | 0x80;
@@ -1297,7 +1297,7 @@ void CGObject::bgAttribCollision()
                 if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
                         &MapMng, reinterpret_cast<CMapCylinder*>(&attrCylinder), reinterpret_cast<Vec*>(&probeMove),
                         0x78000000) != 0) {
-                    switch (reinterpret_cast<unsigned char*>(gMapHitFace)[0x47] - 0x28) {
+                    switch (gMapHitFace->m_groupIndex - 0x28) {
                     case 0:
                         m_bgAttrValue = sBgAttrSlow;
                         break;

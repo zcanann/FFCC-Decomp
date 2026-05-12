@@ -83,7 +83,7 @@ unsigned char CAStar::calcPolygonGroup(Vec* pos, int hitAttributeMask)
 		if (MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&cyl),
 		                                base, mask) != 0)
 		{
-			return reinterpret_cast<unsigned char*>(gMapHitFace)[0x47];
+			return gMapHitFace->m_groupIndex;
 		}
 	}
 	else
@@ -105,7 +105,7 @@ unsigned char CAStar::calcPolygonGroup(Vec* pos, int hitAttributeMask)
 		if (MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&cyl),
 		                                base, hitAttributeMask) != 0)
 		{
-			return reinterpret_cast<unsigned char*>(gMapHitFace)[0x47];
+			return gMapHitFace->m_groupIndex;
 		}
 	}
 
@@ -140,7 +140,7 @@ unsigned char CAStar::calcSpecialPolygonGroup(Vec* pos)
 	if (MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&cyl),
 	                                base, mask) != 0)
 	{
-		return reinterpret_cast<unsigned char*>(gMapHitFace)[0x47];
+		return gMapHitFace->m_groupIndex;
 	}
 
 	return 0;

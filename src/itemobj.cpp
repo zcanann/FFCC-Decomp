@@ -887,11 +887,13 @@ CGPrgObj* CGItemObj::CreateFromScript(
 	}
 
 	gItemObjCreateFlags = createFlags;
-	CFlatRuntime::CStack inStack[3];
+	CFlatRuntime::CStack inStack[5];
 	CFlatRuntime::CStack outStack;
 	inStack[0].m_word = createMode;
 	inStack[1].m_word = createFlags;
 	inStack[2].m_word = scriptArg;
+	inStack[3].m_word = owner != 0 ? static_cast<u32>(owner->m_particleId) : 0;
+	*reinterpret_cast<float*>(&inStack[4].m_word) = launchAngle;
 	SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
 	    &CFlat, 0, 1, 7, 5, inStack, &outStack);
 

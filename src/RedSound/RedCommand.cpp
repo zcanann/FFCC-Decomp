@@ -995,7 +995,8 @@ int MusicStop(int musicId)
 	RedSoundCONTROL* music = p_SoundControlBuffer;
 
 	do {
-		if ((musicId == REDSOUND_MUSIC_ID_NONE) || ((music->m_musicId >= 0) && (music->m_musicId == musicId))) {
+		if ((musicId == REDSOUND_MUSIC_ID_NONE) ||
+		    ((music->m_musicId >= REDSOUND_MUSIC_ID_MIN) && (music->m_musicId == musicId))) {
 			int stoppedMusicId = music->m_musicId;
 			music->m_updateFlags = 0;
 			music->m_musicId = REDSOUND_MUSIC_ID_NONE;
@@ -1035,7 +1036,8 @@ int MusicStop(int musicId)
 	} while (music < p_SoundControlBuffer + REDSOUND_CONTROL_MUSIC_SKIP);
 
 	music = p_SoundControlBuffer;
-	if ((music->m_musicId < 0) && (music[REDSOUND_CONTROL_MUSIC_SECONDARY].m_musicId >= 0)) {
+	if ((music->m_musicId < REDSOUND_MUSIC_ID_MIN) &&
+	    (music[REDSOUND_CONTROL_MUSIC_SECONDARY].m_musicId >= REDSOUND_MUSIC_ID_MIN)) {
 		memcpy(p_SoundControlBuffer, p_SoundControlBuffer + REDSOUND_CONTROL_MUSIC_SECONDARY, REDSOUND_CONTROL_SIZE);
 		music[REDSOUND_CONTROL_MUSIC_SECONDARY].m_activeTrackCount = 0;
 		music[REDSOUND_CONTROL_MUSIC_SECONDARY].m_trackCount = 0;
@@ -1104,7 +1106,8 @@ void SetMusicVolume(int musicId, int volume, int duration, int mode)
 
 	music = p_SoundControlBuffer;
 	do {
-		if ((musicId == REDSOUND_MUSIC_ID_NONE) || (musicId == music->m_musicId) || (music->m_musicId < 0)) {
+		if ((musicId == REDSOUND_MUSIC_ID_NONE) || (musicId == music->m_musicId) ||
+		    (music->m_musicId < REDSOUND_MUSIC_ID_MIN)) {
 			if (mode == REDSOUND_MUSIC_VOLUME_MODE_FADE_OUT) {
 				music->m_masterVolumeAdd = -music->m_masterVolume / duration;
 				music->m_masterVolumeDelta = duration;
@@ -1190,7 +1193,8 @@ void MusicPause(int musicId, int pause)
 
 	music = p_SoundControlBuffer;
 	do {
-		if ((musicId == REDSOUND_MUSIC_ID_NONE) || ((music->m_musicId >= 0) && (music->m_musicId == musicId))) {
+		if ((musicId == REDSOUND_MUSIC_ID_NONE) ||
+		    ((music->m_musicId >= REDSOUND_MUSIC_ID_MIN) && (music->m_musicId == musicId))) {
 			if (pause == REDSOUND_PAUSE_ON) {
 				if (music->m_activeTrackCount != 0) {
 					voice = p_VoiceData;

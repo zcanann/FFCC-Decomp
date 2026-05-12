@@ -451,7 +451,7 @@ int CRedEntry::SearchUseWave(int waveNo)
 	RedSoundCONTROL* control = p_SoundControlBuffer + REDSOUND_CONTROL_MUSIC_SECONDARY;
 
 	do {
-		if ((control->m_musicId >= 0) && (control->m_waveNo == waveNo)) {
+		if ((control->m_musicId >= REDSOUND_MUSIC_ID_MIN) && (control->m_waveNo == waveNo)) {
 			found = 1;
 			MusicStop(control->m_musicId);
 		}

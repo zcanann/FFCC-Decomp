@@ -2223,7 +2223,8 @@ static void _ExecuteExtraData()
             soundControl->m_volumeDelta--;
             soundControl->m_volume += soundControl->m_volumeAdd;
             if ((soundControl->m_flags & REDSOUND_CONTROL_FLAG_STOP_ON_VOLUME_ZERO) != 0) {
-                if ((soundControl->m_volumeDelta == 0) && (soundControl->m_musicId >= 0)) {
+                if ((soundControl->m_volumeDelta == 0) &&
+                    (soundControl->m_musicId >= REDSOUND_MUSIC_ID_MIN)) {
                     MusicStop(soundControl->m_musicId);
                 }
             } else {
@@ -2595,9 +2596,9 @@ static void _MusicNoteExecute()
         status = _MusicMidiNoteExecute(p_SoundControl, p_KeyOnData, 1);
     }
 
-    if ((p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_PRIMARY].m_musicId < 0) &&
-        (p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY].m_musicId < 0) &&
-        (p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SKIP].m_musicId < 0)) {
+    if ((p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_PRIMARY].m_musicId < REDSOUND_MUSIC_ID_MIN) &&
+        (p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY].m_musicId < REDSOUND_MUSIC_ID_MIN) &&
+        (p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SKIP].m_musicId < REDSOUND_MUSIC_ID_MIN)) {
         m_MusicPhraseStop = REDSOUND_MUSIC_PHRASE_STOP_OFF;
     }
 }
@@ -2670,7 +2671,7 @@ static void _SkipMusicEntry()
     RedControlRamp volume;
     int keyOnEntryCount = 0;
 
-    if (p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SKIP].m_musicId >= 0) {
+    if (p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SKIP].m_musicId >= REDSOUND_MUSIC_ID_MIN) {
         src = p_SkipKeyOn->m_fixed;
         dst = p_KeyOnData->m_fixed;
         do {

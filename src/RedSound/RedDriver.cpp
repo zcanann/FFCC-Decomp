@@ -793,7 +793,7 @@ static void _MusicStop(int* command)
         (p_MusicNextPlay->m_musicId == command[REDSOUND_MUSIC_COMMAND_ID])) {
         p_MusicNextPlay->m_musicId = REDSOUND_MUSIC_ID_NONE;
     }
-    if (p_MusicNextPlay->m_musicId < 0) {
+    if (p_MusicNextPlay->m_musicId < REDSOUND_MUSIC_ID_MIN) {
         m_MusicPhraseStop = REDSOUND_MUSIC_PHRASE_STOP_OFF;
     }
 }
@@ -1551,7 +1551,8 @@ static int _MainThread(void*)
             MainControl(elapsed);
             StreamControl();
             _ExecuteCommand();
-            if ((p_MusicNextPlay->m_musicId >= 0) && (control->m_musicId < 0)) {
+            if ((p_MusicNextPlay->m_musicId >= REDSOUND_MUSIC_ID_MIN) &&
+                (control->m_musicId < REDSOUND_MUSIC_ID_MIN)) {
                 _MusicPlaySequence((int*)p_MusicNextPlay);
                 p_MusicNextPlay->m_musicId = REDSOUND_MUSIC_ID_NONE;
                 m_MusicPhraseStop = REDSOUND_MUSIC_PHRASE_STOP_OFF;
@@ -2308,7 +2309,7 @@ int CRedDriver::MusicPlayState(int musicID)
     } else if ((musicID == REDSOUND_MUSIC_ID_NONE) ||
                (soundControl[REDSOUND_CONTROL_MUSIC_SKIP].m_musicId == musicID)) {
         result = 1;
-    } else if ((p_MusicNextPlay->m_musicId >= 0) &&
+    } else if ((p_MusicNextPlay->m_musicId >= REDSOUND_MUSIC_ID_MIN) &&
                ((musicID == REDSOUND_MUSIC_ID_NONE) || (p_MusicNextPlay->m_musicId == musicID))) {
         result = 1;
     }

@@ -1381,7 +1381,7 @@ pppMana2.cpp:
 	extab       start:0x8000912C end:0x8000918C
 	extabindex  start:0x8000FE8C end:0x8000FF1C
 	.text       start:0x8010617C end:0x801091D4
-	.rodata     start:0x801DC4E0 end:0x801DC4F0
+	.rodata     start:0x801DC4D0 end:0x801DC4F0
 	.sdata2     start:0x80331898 end:0x80331910
 
 pppConformBGNormal.cpp:

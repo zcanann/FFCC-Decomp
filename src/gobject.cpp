@@ -2439,6 +2439,10 @@ void CGObject::CCClassRot(int useBodyRadius, int classMask, float yOffset, float
  */
 void CGObject::Attach(CGObject* owner, char* nodeName, Vec* attachLocal)
 {
+    struct WeaponNodeFlagBits {
+        signed char m_unused : 7;
+        signed char m_attached : 1;
+    };
     bool hasModel = false;
     CCharaPcs::CHandle* handle = owner->m_charaModelHandle;
 
@@ -2449,10 +2453,7 @@ void CGObject::Attach(CGObject* owner, char* nodeName, Vec* attachLocal)
     if (hasModel) {
         int nodeIndex = SearchNode__Q26CChara6CModelFPc(handle->m_model, nodeName);
         if (nodeIndex >= 0) {
-            int weaponFlags = *reinterpret_cast<u8*>(&m_weaponNodeFlags);
-            int setFlag = 1;
-            weaponFlags = __rlwimi(weaponFlags, setFlag, 0, 31, 31);
-            *reinterpret_cast<u8*>(&m_weaponNodeFlags) = static_cast<u8>(weaponFlags);
+            reinterpret_cast<WeaponNodeFlagBits*>(&m_weaponNodeFlags)->m_attached = true;
 
             m_attachOwner = owner;
             m_attachNode = nodeIndex;

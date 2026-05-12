@@ -289,7 +289,6 @@ CRedEntry::CRedEntry()
 {
 	// TODO
 }
-
 /*
  * --INFO--
  * PAL Address: 0x801c05fc
@@ -302,7 +301,6 @@ CRedEntry::CRedEntry()
 CRedEntry::~CRedEntry()
 {
 }
-
 /*
  * --INFO--
  * PAL Address: 0x801c0644
@@ -343,7 +341,6 @@ void CRedEntry::Init()
 
 	m_waveLoadNo = REDSOUND_WAVE_NO_NONE;
 }
-
 /*
  * --INFO--
  * PAL Address: 0x801c0738
@@ -364,7 +361,6 @@ void CRedEntry::WaveHistoryAdd(int historyNo)
 		history += 1;
 	} while (history < m_waveBankBase + REDSOUND_WAVE_BANK_ENTRY_COUNT);
 }
-
 /*
  * --INFO--
  * PAL Address: 0x801c0780
@@ -386,32 +382,6 @@ void CRedEntry::WaveHistoryDelete(int historyNo)
 		} while (history < m_waveBankBase + REDSOUND_WAVE_BANK_ENTRY_COUNT);
 	}
 }
-
-/*
- * --INFO--
- * PAL Address: 0x801c07d8
- * PAL Size: 104b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CRedEntry::WaveHistoryChoice(RedHistoryBANK* bank)
-{
-	if (bank->m_historyNo != 0) {
-		RedHistoryBANK* history = m_waveBankBase;
-		do {
-			if ((history->m_historyNo != 0) &&
-			    (history->m_historyNo < bank->m_historyNo)) {
-				history->m_historyNo = history->m_historyNo + 1;
-			}
-			history += 1;
-		} while (history < m_waveBankBase + REDSOUND_WAVE_BANK_ENTRY_COUNT);
-
-		bank->m_historyNo = 1;
-	}
-}
-
 /*
  * --INFO--
  * PAL Address: 0x801c0840
@@ -434,7 +404,6 @@ int CRedEntry::SearchWaveSequence(int waveNo)
 
 	return REDSOUND_HISTORY_BANK_NOT_FOUND;
 }
-
 /*
  * --INFO--
  * PAL Address: 0x801c08a0
@@ -472,52 +441,6 @@ int CRedEntry::SearchUseWave(int waveNo)
 	OSRestoreInterrupts(interruptLevel);
 	return found;
 }
-
-/*
- * --INFO--
- * PAL Address: 0x801c0970
- * PAL Size: 356b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int CRedEntry::WaveDelete(RedHistoryBANK* bank)
-{
-	int sequenceNo = REDSOUND_HISTORY_BANK_NOT_FOUND;
-	int waveNo;
-
-	if (bank->m_id >= 0) {
-		WaveHistoryDelete(bank->m_historyNo);
-		waveNo = bank->m_id;
-
-		bank->m_id = REDSOUND_HISTORY_BANK_EMPTY_ID;
-		bank->m_size = 0;
-
-		sequenceNo = SearchWaveSequence(waveNo);
-		if (sequenceNo < 0) {
-			if ((SearchUseWave(waveNo) != 0) && (m_ReportPrint != REDSOUND_REPORT_PRINT_OFF)) {
-				OSReport(sRedEntryColoredBlankLineFmt, sRedEntryLogPrefix, sRedEntryErrorColor, sRedEntryResetColor);
-				fflush(__files + 1);
-				OSReport(sRedEntryErrorBannerFmt, sRedEntryLogPrefix, sRedEntryErrorColor, sRedEntryResetColor);
-				fflush(__files + 1);
-				OSReport(sRedEntryEraseUsingWaveDataFmt, sRedEntryLogPrefix, sRedEntryErrorColor, waveNo,
-				         sRedEntryResetColor);
-				fflush(__files + 1);
-				OSReport(sRedEntryColoredBlankLineFmt, sRedEntryLogPrefix, sRedEntryErrorColor, sRedEntryResetColor);
-				fflush(__files + 1);
-			}
-			RedDeleteA(bank->m_waveHead->m_aramAddress);
-			RedDelete(bank->m_address);
-		}
-
-		bank->m_data = 0;
-		bank->m_historyNo = 0;
-	}
-
-	return sequenceNo;
-}
-
 /*
  * --INFO--
  * PAL Address: 0x801c0ad4
@@ -553,7 +476,6 @@ int CRedEntry::WaveOldClear(int offset, int maxSize)
 
 	return maxBankSize;
 }
-
 /*
  * --INFO--
  * PAL Address: 0x801c0b80
@@ -662,7 +584,6 @@ int CRedEntry::WaveHeadAdd(int waveBankNo, RedWaveHeadWD* waveHead, int waveNo)
 
 	return REDSOUND_WAVE_ADD_FAILED;
 }
-
 /*
  * --INFO--
  * PAL Address: 0x801c0ec0
@@ -767,7 +688,6 @@ int CRedEntry::SetWaveData(int waveBankNo, void* waveData, int waveDataSize)
 
 	return m_waveLoadNo;
 }
-
 /*
  * --INFO--
  * PAL Address: 0x801c1190
@@ -811,7 +731,6 @@ void CRedEntry::ClearWaveData(int waveNo)
 		}
 	}
 }
-
 /*
  * --INFO--
  * PAL Address: 0x801c12cc
@@ -840,7 +759,6 @@ void CRedEntry::ClearWaveDataM(int waveNo0, int waveNo1, int waveNo2, int waveNo
 		}
 	}
 }
-
 /*
  * --INFO--
  * PAL Address: 0x801c1398
@@ -881,7 +799,6 @@ void CRedEntry::ClearWaveBank(int waveBankNo)
 		WaveDelete(&m_waveBankBase[waveBankNo]);
 	}
 }
-
 /*
  * --INFO--
  * PAL Address: 0x801c14d0
@@ -900,7 +817,6 @@ RedHistoryBANK* CRedEntry::GetWaveBank(int waveNo)
 
 	return 0;
 }
-
 /*
  * --INFO--
  * PAL Address: 0x801c14f8
@@ -923,7 +839,6 @@ RedWaveHeadWD* CRedEntry::SearchWaveBase(int waveNo)
 
 	return 0;
 }
-
 /*
  * --INFO--
  * PAL Address: 0x801c153c
@@ -941,7 +856,6 @@ int CRedEntry::ReentryWaveData(int waveNo)
 	}
 	return waveNo;
 }
-
 /*
  * --INFO--
  * PAL Address: 0x801c1594
@@ -995,7 +909,6 @@ void CRedEntry::WaveHistoryManager(int mode, int waveNo)
 		}
 	}
 }
-
 /*
  * --INFO--
  * PAL Address: 0x801c172c
@@ -1090,7 +1003,6 @@ void CRedEntry::DisplayWaveInfo()
 		fflush(__files + 1);
 	}
 }
-
 /*
  * --INFO--
  * PAL Address: 0x801c1a8c
@@ -1110,7 +1022,6 @@ void CRedEntry::SeSepHistoryAdd()
 		history += 1;
 	} while (history < m_seSepBankBase + REDSOUND_SESEP_BANK_ENTRY_COUNT);
 }
-
 /*
  * --INFO--
  * PAL Address: 0x801c1ad0
@@ -1132,30 +1043,6 @@ void CRedEntry::SeSepHistoryDelete(int historyNo)
 		} while (history < m_seSepBankBase + REDSOUND_SESEP_BANK_ENTRY_COUNT);
 	}
 }
-
-/*
- * --INFO--
- * PAL Address: 0x801c1b1c
- * PAL Size: 104b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CRedEntry::SeSepHistoryChoice(RedHistoryBANK* bank)
-{
-	if (bank->m_historyNo != 0) {
-		RedHistoryBANK* history = m_seSepBankBase;
-		do {
-			if ((history->m_historyNo != 0) && (history->m_historyNo < bank->m_historyNo)) {
-				history->m_historyNo = history->m_historyNo + 1;
-			}
-			history += 1;
-		} while (history < m_seSepBankBase + REDSOUND_SESEP_BANK_ENTRY_COUNT);
-		bank->m_historyNo = 1;
-	}
-}
-
 /*
  * --INFO--
  * PAL Address: 0x801c1b84
@@ -1187,33 +1074,6 @@ int CRedEntry::SearchSeSepSequence(int seNo)
 
 	return REDSOUND_HISTORY_BANK_NOT_FOUND;
 }
-
-/*
- * --INFO--
- * PAL Address: 0x801c1c20
- * PAL Size: 156b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int CRedEntry::SeSepMemoryFree(RedHistoryBANK* bank)
-{
-	int freedSize;
-	int waveNo = static_cast<unsigned int>(bank->m_seSepHead->m_waveNoLo) +
-	             static_cast<unsigned int>(bank->m_seSepHead->m_waveNoHi) * REDSOUND_SESEP_WAVE_NO_HIGH_SCALE;
-
-	RedDelete(bank->m_address);
-	SeSepHistoryDelete(bank->m_historyNo);
-
-	freedSize = bank->m_size;
-	bank->m_data = bank->m_size = 0;
-	bank->m_id = REDSOUND_HISTORY_BANK_EMPTY_ID;
-
-	WaveHistoryManager(REDSOUND_HISTORY_MODE_RELEASE, waveNo);
-	return freedSize;
-}
-
 /*
  * --INFO--
  * PAL Address: 0x801c1cbc
@@ -1243,84 +1103,6 @@ RedHistoryBANK* CRedEntry::SeSepOldDelete()
 
 	return selected;
 }
-
-/*
- * --INFO--
- * PAL Address: 0x801c1d54
- * PAL Size: 212b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-RedSeSepHEAD* CRedEntry::SeSepHeadAdd(RedSeSepHEAD* seSepHead)
-{
-	RedHistoryBANK* bank = m_seSepBankBase;
-	RedSeSepHEAD* result = 0;
-
-	while ((bank->m_size != 0) &&
-	       (bank < m_seSepBankBase + REDSOUND_SESEP_BANK_ENTRY_COUNT)) {
-		bank += 1;
-	}
-	if (bank < m_seSepBankBase + REDSOUND_SESEP_BANK_ENTRY_COUNT) {
-	} else {
-		bank = SeSepOldDelete();
-	}
-
-	if ((bank != 0) &&
-	    (bank < m_seSepBankBase + REDSOUND_SESEP_BANK_ENTRY_COUNT)) {
-		bank->m_seSepHead = seSepHead;
-		result = seSepHead;
-		bank->m_size = seSepHead->m_sizeAndFlags & REDSOUND_SESEP_SIZE_MASK;
-		bank->m_id = seSepHead->m_seNo;
-		SeSepHistoryAdd();
-		bank->m_historyNo = 1;
-	}
-
-	return result;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x801c1e28
- * PAL Size: 296b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-RedSeSepHEAD* CRedEntry::SetSeSepData(RedSeSepHEAD* seSepHead)
-{
-	int result;
-
-	if ((seSepHead->m_signature[0] != REDSOUND_SESEP_SIGNATURE_0) ||
-	    (seSepHead->m_signature[1] != REDSOUND_SESEP_SIGNATURE_1) ||
-	    (seSepHead->m_signature[2] != REDSOUND_SESEP_SIGNATURE_2) ||
-	    (seSepHead->m_signature[3] != REDSOUND_SESEP_SIGNATURE_3) ||
-	    (seSepHead->m_signature[4] != REDSOUND_SESEP_SIGNATURE_4)) {
-		RedDelete(seSepHead);
-		if (m_ReportPrint != REDSOUND_REPORT_PRINT_OFF) {
-			OSReport(sRedEntrySeSepHeaderBrokenFmt, sRedEntryLogPrefix, sRedEntryHeaderErrorColor, sRedEntryResetColor);
-			fflush(__files + 1);
-		}
-		return 0;
-	}
-
-	result = SearchSeSepSequence(seSepHead->m_seNo);
-	if (result >= 0) {
-		RedDelete(seSepHead);
-		SeSepHistoryChoice(&m_seSepBankBase[result]);
-		result = m_seSepBankBase[result].m_address;
-	} else {
-		result = reinterpret_cast<int>(SeSepHeadAdd(seSepHead));
-		if (result == 0) {
-			RedDelete(seSepHead);
-		}
-	}
-
-	return reinterpret_cast<RedSeSepHEAD*>(result);
-}
-
 /*
  * --INFO--
  * PAL Address: 0x801c1f50
@@ -1351,7 +1133,6 @@ int CRedEntry::ClearSeSepData(int seNo)
 
 	return result;
 }
-
 /*
  * --INFO--
  * PAL Address: 0x801c2004
@@ -1378,7 +1159,6 @@ int CRedEntry::ClearSeSepDataMG(int bankNo, int sepNo, int groupNo, int kindNo)
 
 	return result;
 }
-
 /*
  * --INFO--
  * PAL Address: 0x801c20d8
@@ -1400,7 +1180,6 @@ RedHistoryBANK* CRedEntry::SearchSeSepBank(int seNo)
 
 	return 0;
 }
-
 /*
  * --INFO--
  * PAL Address: 0x801c211c
@@ -1418,7 +1197,6 @@ int CRedEntry::ReentrySeSepData(int seNo)
 	}
 	return seNo;
 }
-
 /*
  * --INFO--
  * PAL Address: 0x801c2174
@@ -1460,7 +1238,6 @@ void CRedEntry::SeSepHistoryManager(int mode, int seNo)
 		}
 	}
 }
-
 /*
  * --INFO--
  * PAL Address: 0x801c22b4
@@ -1524,7 +1301,6 @@ void CRedEntry::DisplaySePlayInfo()
 		fflush(__files + 1);
 	}
 }
-
 /*
  * --INFO--
  * PAL Address: 0x801c2518
@@ -1545,7 +1321,6 @@ void CRedEntry::MusicHistoryAdd()
 		history += 1;
 	} while (history < m_musicBankBase + REDSOUND_MUSIC_BANK_ENTRY_COUNT);
 }
-
 /*
  * --INFO--
  * PAL Address: 0x801c255c
@@ -1567,30 +1342,6 @@ void CRedEntry::MusicHistoryDelete(int historyNo)
 		} while (history < m_musicBankBase + REDSOUND_MUSIC_BANK_ENTRY_COUNT);
 	}
 }
-
-/*
- * --INFO--
- * PAL Address: 0x801c25a8
- * PAL Size: 104b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CRedEntry::MusicHistoryChoice(RedHistoryBANK* bank)
-{
-	if (bank->m_historyNo != 0) {
-		RedHistoryBANK* history = m_musicBankBase;
-		do {
-			if ((history->m_historyNo != 0) && (history->m_historyNo < bank->m_historyNo)) {
-				history->m_historyNo = history->m_historyNo + 1;
-			}
-			history += 1;
-		} while (history < m_musicBankBase + REDSOUND_MUSIC_BANK_ENTRY_COUNT);
-		bank->m_historyNo = 1;
-	}
-}
-
 /*
  * --INFO--
  * PAL Address: 0x801c2610
@@ -1613,27 +1364,6 @@ int CRedEntry::SearchMusicSequence(int musicNo)
 
 	return REDSOUND_HISTORY_BANK_NOT_FOUND;
 }
-
-/*
- * --INFO--
- * PAL Address: 0x801c266c
- * PAL Size: 112b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int CRedEntry::MusicMemoryFree(RedHistoryBANK* bank)
-{
-	WaveHistoryManager(REDSOUND_HISTORY_MODE_RELEASE, bank->m_musicHead->m_waveNo);
-	RedDelete(bank->m_address);
-	int freedSize = bank->m_size;
-	bank->m_data = bank->m_size = 0;
-	bank->m_historyNo = 0;
-	bank->m_id = REDSOUND_HISTORY_BANK_EMPTY_ID;
-	return freedSize;
-}
-
 /*
  * --INFO--
  * PAL Address: 0x801c26dc
@@ -1663,7 +1393,6 @@ int CRedEntry::MusicOldClear()
 
 	return historyNo;
 }
-
 /*
  * --INFO--
  * PAL Address: 0x801c2768
@@ -1692,7 +1421,6 @@ RedHistoryBANK* CRedEntry::MusicOldChoice()
 
 	return selected;
 }
-
 /*
  * --INFO--
  * PAL Address: 0x801c27d8
@@ -1714,7 +1442,6 @@ RedHistoryBANK* CRedEntry::SearchMusicBank(int musicNo)
 
 	return 0;
 }
-
 /*
  * --INFO--
  * PAL Address: 0x801c281c
@@ -1732,7 +1459,6 @@ int CRedEntry::ReentryMusicData(int musicNo)
 	}
 	return musicNo;
 }
-
 /*
  * --INFO--
  * PAL Address: 0x801c2874
@@ -1776,7 +1502,6 @@ void CRedEntry::MusicHistoryManager(int mode, int musicNo)
 		}
 	}
 }
-
 /*
  * --INFO--
  * PAL Address: 0x801c29b8
@@ -1806,7 +1531,6 @@ RedMusicHEAD* CRedEntry::MusicHeadAdd(RedMusicHEAD* musicHead)
 
 	return result;
 }
-
 /*
  * --INFO--
  * PAL Address: 0x801c2a60
@@ -1845,91 +1569,6 @@ RedMusicHEAD* CRedEntry::SetMusicData(RedMusicHEAD* musicHead)
 
 	return reinterpret_cast<RedMusicHEAD*>(result);
 }
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 204b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int CRedEntry::ClearMusicData(int musicNo)
-{
-	int result = 0;
-
-	if (musicNo == REDSOUND_MUSIC_CLEAR_ALL) {
-		RedHistoryBANK* history = m_musicBankBase;
-		do {
-			if (history->m_size != 0) {
-				if (history->m_historyNo != 0) {
-					MusicHistoryDelete(history->m_historyNo);
-				}
-				result += MusicMemoryFree(history);
-			}
-			history += 1;
-		} while (history < m_musicBankBase + REDSOUND_MUSIC_BANK_ENTRY_COUNT);
-	} else {
-		result = SearchMusicSequence(musicNo);
-		if (result >= 0) {
-			result = MusicMemoryFree(&m_musicBankBase[result]);
-		}
-	}
-
-	return result;
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 428b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CRedEntry::DisplayMusicInfo()
-{
-	if (m_ReportPrint != REDSOUND_REPORT_PRINT_OFF) {
-		OSReport(sRedEntryNewline);
-		fflush(__files + 1);
-		OSReport(sRedEntryMusicInformationHeaderFmt, sRedEntryLogPrefix);
-		fflush(__files + 1);
-		OSReport(sRedEntryMusicInfoColumnFmt, sRedEntryLogPrefix);
-		fflush(__files + 1);
-
-		RedHistoryBANK* history = m_musicBankBase;
-		do {
-			if (history->m_size != 0) {
-				int playing = 0;
-				if ((p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_PRIMARY].m_activeTrackCount != 0) &&
-				    (p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_PRIMARY].m_musicId == history->m_id)) {
-					playing = 1;
-				}
-				if ((p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY].m_activeTrackCount != 0) &&
-				    (p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY].m_musicId == history->m_id)) {
-					playing = 1;
-				}
-
-				if (playing != 0) {
-					OSReport(sRedEntryMusicInfoPlayFmt, sRedEntryLogPrefix, history->m_id,
-					         history->m_musicHead->m_waveNo, history->m_size);
-					fflush(__files + 1);
-				} else {
-					OSReport(sRedEntryMusicInfoStopFmt, sRedEntryLogPrefix, history->m_id,
-					         history->m_musicHead->m_waveNo, history->m_size);
-					fflush(__files + 1);
-				}
-			}
-			history += 1;
-		} while (history < m_musicBankBase + REDSOUND_MUSIC_BANK_ENTRY_COUNT);
-
-		OSReport(sRedEntryNewline);
-		fflush(__files + 1);
-	}
-}
-
 /*
  * --INFO--
  * PAL Address: 0x801c2b70
@@ -2074,4 +1713,317 @@ void CRedEntry::DisplayMMemoryInfo()
 	fflush(__files + 1);
 	OSReport(sRedEntryNewline);
 	fflush(__files + 1);
+}
+/*
+ * --INFO--
+ * PAL Address: 0x801c07d8
+ * PAL Size: 104b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRedEntry::WaveHistoryChoice(RedHistoryBANK* bank)
+{
+	if (bank->m_historyNo != 0) {
+		RedHistoryBANK* history = m_waveBankBase;
+		do {
+			if ((history->m_historyNo != 0) &&
+			    (history->m_historyNo < bank->m_historyNo)) {
+				history->m_historyNo = history->m_historyNo + 1;
+			}
+			history += 1;
+		} while (history < m_waveBankBase + REDSOUND_WAVE_BANK_ENTRY_COUNT);
+
+		bank->m_historyNo = 1;
+	}
+}
+/*
+ * --INFO--
+ * PAL Address: 0x801c0970
+ * PAL Size: 356b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CRedEntry::WaveDelete(RedHistoryBANK* bank)
+{
+	int sequenceNo = REDSOUND_HISTORY_BANK_NOT_FOUND;
+	int waveNo;
+
+	if (bank->m_id >= 0) {
+		WaveHistoryDelete(bank->m_historyNo);
+		waveNo = bank->m_id;
+
+		bank->m_id = REDSOUND_HISTORY_BANK_EMPTY_ID;
+		bank->m_size = 0;
+
+		sequenceNo = SearchWaveSequence(waveNo);
+		if (sequenceNo < 0) {
+			if ((SearchUseWave(waveNo) != 0) && (m_ReportPrint != REDSOUND_REPORT_PRINT_OFF)) {
+				OSReport(sRedEntryColoredBlankLineFmt, sRedEntryLogPrefix, sRedEntryErrorColor, sRedEntryResetColor);
+				fflush(__files + 1);
+				OSReport(sRedEntryErrorBannerFmt, sRedEntryLogPrefix, sRedEntryErrorColor, sRedEntryResetColor);
+				fflush(__files + 1);
+				OSReport(sRedEntryEraseUsingWaveDataFmt, sRedEntryLogPrefix, sRedEntryErrorColor, waveNo,
+				         sRedEntryResetColor);
+				fflush(__files + 1);
+				OSReport(sRedEntryColoredBlankLineFmt, sRedEntryLogPrefix, sRedEntryErrorColor, sRedEntryResetColor);
+				fflush(__files + 1);
+			}
+			RedDeleteA(bank->m_waveHead->m_aramAddress);
+			RedDelete(bank->m_address);
+		}
+
+		bank->m_data = 0;
+		bank->m_historyNo = 0;
+	}
+
+	return sequenceNo;
+}
+/*
+ * --INFO--
+ * PAL Address: 0x801c1b1c
+ * PAL Size: 104b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRedEntry::SeSepHistoryChoice(RedHistoryBANK* bank)
+{
+	if (bank->m_historyNo != 0) {
+		RedHistoryBANK* history = m_seSepBankBase;
+		do {
+			if ((history->m_historyNo != 0) && (history->m_historyNo < bank->m_historyNo)) {
+				history->m_historyNo = history->m_historyNo + 1;
+			}
+			history += 1;
+		} while (history < m_seSepBankBase + REDSOUND_SESEP_BANK_ENTRY_COUNT);
+		bank->m_historyNo = 1;
+	}
+}
+/*
+ * --INFO--
+ * PAL Address: 0x801c1c20
+ * PAL Size: 156b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CRedEntry::SeSepMemoryFree(RedHistoryBANK* bank)
+{
+	int freedSize;
+	int waveNo = static_cast<unsigned int>(bank->m_seSepHead->m_waveNoLo) +
+	             static_cast<unsigned int>(bank->m_seSepHead->m_waveNoHi) * REDSOUND_SESEP_WAVE_NO_HIGH_SCALE;
+
+	RedDelete(bank->m_address);
+	SeSepHistoryDelete(bank->m_historyNo);
+
+	freedSize = bank->m_size;
+	bank->m_data = bank->m_size = 0;
+	bank->m_id = REDSOUND_HISTORY_BANK_EMPTY_ID;
+
+	WaveHistoryManager(REDSOUND_HISTORY_MODE_RELEASE, waveNo);
+	return freedSize;
+}
+/*
+ * --INFO--
+ * PAL Address: 0x801c1d54
+ * PAL Size: 212b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+RedSeSepHEAD* CRedEntry::SeSepHeadAdd(RedSeSepHEAD* seSepHead)
+{
+	RedHistoryBANK* bank = m_seSepBankBase;
+	RedSeSepHEAD* result = 0;
+
+	while ((bank->m_size != 0) &&
+	       (bank < m_seSepBankBase + REDSOUND_SESEP_BANK_ENTRY_COUNT)) {
+		bank += 1;
+	}
+	if (bank < m_seSepBankBase + REDSOUND_SESEP_BANK_ENTRY_COUNT) {
+	} else {
+		bank = SeSepOldDelete();
+	}
+
+	if ((bank != 0) &&
+	    (bank < m_seSepBankBase + REDSOUND_SESEP_BANK_ENTRY_COUNT)) {
+		bank->m_seSepHead = seSepHead;
+		result = seSepHead;
+		bank->m_size = seSepHead->m_sizeAndFlags & REDSOUND_SESEP_SIZE_MASK;
+		bank->m_id = seSepHead->m_seNo;
+		SeSepHistoryAdd();
+		bank->m_historyNo = 1;
+	}
+
+	return result;
+}
+/*
+ * --INFO--
+ * PAL Address: 0x801c1e28
+ * PAL Size: 296b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+RedSeSepHEAD* CRedEntry::SetSeSepData(RedSeSepHEAD* seSepHead)
+{
+	int result;
+
+	if ((seSepHead->m_signature[0] != REDSOUND_SESEP_SIGNATURE_0) ||
+	    (seSepHead->m_signature[1] != REDSOUND_SESEP_SIGNATURE_1) ||
+	    (seSepHead->m_signature[2] != REDSOUND_SESEP_SIGNATURE_2) ||
+	    (seSepHead->m_signature[3] != REDSOUND_SESEP_SIGNATURE_3) ||
+	    (seSepHead->m_signature[4] != REDSOUND_SESEP_SIGNATURE_4)) {
+		RedDelete(seSepHead);
+		if (m_ReportPrint != REDSOUND_REPORT_PRINT_OFF) {
+			OSReport(sRedEntrySeSepHeaderBrokenFmt, sRedEntryLogPrefix, sRedEntryHeaderErrorColor, sRedEntryResetColor);
+			fflush(__files + 1);
+		}
+		return 0;
+	}
+
+	result = SearchSeSepSequence(seSepHead->m_seNo);
+	if (result >= 0) {
+		RedDelete(seSepHead);
+		SeSepHistoryChoice(&m_seSepBankBase[result]);
+		result = m_seSepBankBase[result].m_address;
+	} else {
+		result = reinterpret_cast<int>(SeSepHeadAdd(seSepHead));
+		if (result == 0) {
+			RedDelete(seSepHead);
+		}
+	}
+
+	return reinterpret_cast<RedSeSepHEAD*>(result);
+}
+/*
+ * --INFO--
+ * PAL Address: 0x801c25a8
+ * PAL Size: 104b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRedEntry::MusicHistoryChoice(RedHistoryBANK* bank)
+{
+	if (bank->m_historyNo != 0) {
+		RedHistoryBANK* history = m_musicBankBase;
+		do {
+			if ((history->m_historyNo != 0) && (history->m_historyNo < bank->m_historyNo)) {
+				history->m_historyNo = history->m_historyNo + 1;
+			}
+			history += 1;
+		} while (history < m_musicBankBase + REDSOUND_MUSIC_BANK_ENTRY_COUNT);
+		bank->m_historyNo = 1;
+	}
+}
+/*
+ * --INFO--
+ * PAL Address: 0x801c266c
+ * PAL Size: 112b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CRedEntry::MusicMemoryFree(RedHistoryBANK* bank)
+{
+	WaveHistoryManager(REDSOUND_HISTORY_MODE_RELEASE, bank->m_musicHead->m_waveNo);
+	RedDelete(bank->m_address);
+	int freedSize = bank->m_size;
+	bank->m_data = bank->m_size = 0;
+	bank->m_historyNo = 0;
+	bank->m_id = REDSOUND_HISTORY_BANK_EMPTY_ID;
+	return freedSize;
+}
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 204b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CRedEntry::ClearMusicData(int musicNo)
+{
+	int result = 0;
+
+	if (musicNo == REDSOUND_MUSIC_CLEAR_ALL) {
+		RedHistoryBANK* history = m_musicBankBase;
+		do {
+			if (history->m_size != 0) {
+				if (history->m_historyNo != 0) {
+					MusicHistoryDelete(history->m_historyNo);
+				}
+				result += MusicMemoryFree(history);
+			}
+			history += 1;
+		} while (history < m_musicBankBase + REDSOUND_MUSIC_BANK_ENTRY_COUNT);
+	} else {
+		result = SearchMusicSequence(musicNo);
+		if (result >= 0) {
+			result = MusicMemoryFree(&m_musicBankBase[result]);
+		}
+	}
+
+	return result;
+}
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 428b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRedEntry::DisplayMusicInfo()
+{
+	if (m_ReportPrint != REDSOUND_REPORT_PRINT_OFF) {
+		OSReport(sRedEntryNewline);
+		fflush(__files + 1);
+		OSReport(sRedEntryMusicInformationHeaderFmt, sRedEntryLogPrefix);
+		fflush(__files + 1);
+		OSReport(sRedEntryMusicInfoColumnFmt, sRedEntryLogPrefix);
+		fflush(__files + 1);
+
+		RedHistoryBANK* history = m_musicBankBase;
+		do {
+			if (history->m_size != 0) {
+				int playing = 0;
+				if ((p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_PRIMARY].m_activeTrackCount != 0) &&
+				    (p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_PRIMARY].m_musicId == history->m_id)) {
+					playing = 1;
+				}
+				if ((p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY].m_activeTrackCount != 0) &&
+				    (p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY].m_musicId == history->m_id)) {
+					playing = 1;
+				}
+
+				if (playing != 0) {
+					OSReport(sRedEntryMusicInfoPlayFmt, sRedEntryLogPrefix, history->m_id,
+					         history->m_musicHead->m_waveNo, history->m_size);
+					fflush(__files + 1);
+				} else {
+					OSReport(sRedEntryMusicInfoStopFmt, sRedEntryLogPrefix, history->m_id,
+					         history->m_musicHead->m_waveNo, history->m_size);
+					fflush(__files + 1);
+				}
+			}
+			history += 1;
+		} while (history < m_musicBankBase + REDSOUND_MUSIC_BANK_ENTRY_COUNT);
+
+		OSReport(sRedEntryNewline);
+		fflush(__files + 1);
+	}
 }

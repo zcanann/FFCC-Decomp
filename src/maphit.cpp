@@ -6,6 +6,8 @@
 
 #include <math.h>
 
+extern "C" const float FLOAT_8032F8C4;
+extern "C" const float FLOAT_8032F8C8;
 extern "C" const float FLOAT_8032F8EC;
 extern "C" const float FLOAT_8032F8F0;
 extern "C" const char s_old_mid_format_801D7094[];
@@ -19,10 +21,6 @@ Vec g_hit_hpv_min;
 
 namespace {
 static const char s_maphit_cpp[] = "maphit.cpp";
-static const float s_large_pos = 3.4e38f;
-static const float s_large_neg = -3.4e38f;
-static const float s_epsilon = 0.0001f;
-static const float s_push = 0.01f;
 
 static inline unsigned char* Ptr(void* p, unsigned int offset)
 {
@@ -300,16 +298,10 @@ void CMapHit::ReadOtmHit(CChunkFile& chunkFile)
     chunkFile.PushChunk();
 
     while (chunkFile.GetNextChunk(chunk)) {
-        if (chunk.m_id == 'HITV') {
+        switch (chunk.m_id) {
+        case 'HITV':
             m_vertexCount = static_cast<unsigned short>(chunk.m_arg0);
             m_vertices = new (stage, const_cast<char*>(s_maphit_cpp), 0x143) Vec[m_vertexCount];
-
-            m_positionMin.x = s_large_pos;
-            m_positionMin.y = s_large_pos;
-            m_positionMin.z = s_large_pos;
-            m_positionMax.x = s_large_neg;
-            m_positionMax.y = s_large_neg;
-            m_positionMax.z = s_large_neg;
 
             for (unsigned int i = 0; i < m_vertexCount; i++) {
                 Vec& v = m_vertices[i];
@@ -317,13 +309,13 @@ void CMapHit::ReadOtmHit(CChunkFile& chunkFile)
                 v.y = chunkFile.GetF4();
                 v.z = chunkFile.GetF4();
 
-                if (v.x < m_positionMin.x) {
+                if (m_positionMin.x > v.x) {
                     m_positionMin.x = v.x;
                 }
-                if (v.y < m_positionMin.y) {
+                if (m_positionMin.y > v.y) {
                     m_positionMin.y = v.y;
                 }
-                if (v.z < m_positionMin.z) {
+                if (m_positionMin.z > v.z) {
                     m_positionMin.z = v.z;
                 }
 
@@ -344,7 +336,9 @@ void CMapHit::ReadOtmHit(CChunkFile& chunkFile)
             m_positionMax.x += 0.1f;
             m_positionMax.y += 0.1f;
             m_positionMax.z += 0.1f;
-        } else if (chunk.m_id == 'HITF') {
+            break;
+
+        case 'HITF':
             m_faceCount = static_cast<unsigned short>(chunk.m_arg0);
             m_faces = new (stage, const_cast<char*>(s_maphit_cpp), 0x159) CMapHitFace[m_faceCount];
 
@@ -396,25 +390,18 @@ void CMapHit::ReadOtmHit(CChunkFile& chunkFile)
                     }
                 }
 
-                face.m_boundsMin.x = s_large_pos;
-                face.m_boundsMin.y = s_large_pos;
-                face.m_boundsMin.z = s_large_pos;
-                face.m_boundsMax.x = s_large_neg;
-                face.m_boundsMax.y = s_large_neg;
-                face.m_boundsMax.z = s_large_neg;
-
                 for (unsigned int i = 0; i < vertexCount; i++) {
                     const unsigned short idx = chunkFile.Get2();
                     face.m_vertexIndices[i] = idx;
 
                     const Vec& v = m_vertices[idx];
-                    if (v.x < face.m_boundsMin.x) {
+                    if (face.m_boundsMin.x > v.x) {
                         face.m_boundsMin.x = v.x;
                     }
-                    if (v.y < face.m_boundsMin.y) {
+                    if (face.m_boundsMin.y > v.y) {
                         face.m_boundsMin.y = v.y;
                     }
-                    if (v.z < face.m_boundsMin.z) {
+                    if (face.m_boundsMin.z > v.z) {
                         face.m_boundsMin.z = v.z;
                     }
 
@@ -438,9 +425,13 @@ void CMapHit::ReadOtmHit(CChunkFile& chunkFile)
                 face.m_boundsMax.z += (0.1f + width);
                 face.m_radiusScale = 1.0f - width;
             }
-        } else if (chunk.m_id == 'NAME') {
+            break;
+
+        case 'NAME': {
             char* mapHitName = chunkFile.GetString();
             MapMng.AttachMapHit(this, mapHitName);
+            break;
+        }
         }
     }
 
@@ -695,8 +686,8 @@ int CMapHit::CalcHitSlide(Vec* out, float y)
 
             float side = PSVECDotProduct(&g_hit_cyl_min.m_axis, &slideDir);
             float slideLen = PSVECMag(&slideDir);
-            if (s_epsilon <= slideLen) {
-                PSVECScale(&slideDir, &slideDir, s_push / slideLen);
+            if (FLOAT_8032F8C4 <= slideLen) {
+                PSVECScale(&slideDir, &slideDir, FLOAT_8032F8C8 / slideLen);
                 if (side <= 0.0f) {
                     PSVECScale(&slideDir, &slideDir, 0.5f * g_hit_cyl_min.m_radius);
                 } else {
@@ -715,12 +706,12 @@ int CMapHit::CalcHitSlide(Vec* out, float y)
         }
 
         float len = PSVECMag(&g_hit_cyl_min.m_axis);
-        PSVECScale(&g_hit_cyl_min.m_axis, out, g_hit_t - (s_push / len));
+        PSVECScale(&g_hit_cyl_min.m_axis, out, g_hit_t - (FLOAT_8032F8C8 / len));
         return 0;
     }
 
     if (gMapHitFace->m_normal.y < y) {
-        if (g_hit_t <= s_epsilon) {
+        if (g_hit_t <= FLOAT_8032F8C4) {
             out->z = 0.0f;
             out->y = 0.0f;
             out->x = 0.0f;
@@ -729,7 +720,7 @@ int CMapHit::CalcHitSlide(Vec* out, float y)
             Vec push;
             float planeDot = PSVECDotProduct(&g_hit_cyl_min.m_top, &gMapHitFace->m_normal);
             float planeError = -(planeDot - (gMapHitFace->m_planeD + g_hit_cyl_min.m_radius));
-            PSVECScale(&gMapHitFace->m_normal, &push, s_push + planeError);
+            PSVECScale(&gMapHitFace->m_normal, &push, FLOAT_8032F8C8 + planeError);
             PSVECAdd(&g_hit_cyl_min.m_top, &push, &push);
             PSVECSubtract(&push, &g_hit_cyl_min.m_bottom, out);
             return 1;
@@ -737,7 +728,7 @@ int CMapHit::CalcHitSlide(Vec* out, float y)
     }
 
     float len = PSVECMag(&g_hit_cyl_min.m_axis);
-    PSVECScale(&g_hit_cyl_min.m_axis, out, g_hit_t - (s_push / len));
+    PSVECScale(&g_hit_cyl_min.m_axis, out, g_hit_t - (FLOAT_8032F8C8 / len));
     return 0;
 }
 
@@ -754,11 +745,11 @@ void CMapHit::CalcHitPosition(Vec* position)
 {
     if (g_hit_edge_idx_min != -1) {
         float len = PSVECMag(&g_hit_cyl_min.m_axis);
-        PSVECScale(&g_hit_cyl_min.m_axis, position, g_hit_t - (s_epsilon / len));
+        PSVECScale(&g_hit_cyl_min.m_axis, position, g_hit_t - (FLOAT_8032F8C4 / len));
         PSVECAdd(&g_hit_cyl_min.m_bottom, position, position);
     } else {
         float len = PSVECMag(&g_hit_cyl_min.m_axis);
-        PSVECScale(&g_hit_cyl_min.m_axis, position, g_hit_t - (s_push / len));
+        PSVECScale(&g_hit_cyl_min.m_axis, position, g_hit_t - (FLOAT_8032F8C8 / len));
         PSVECAdd(&g_hit_cyl_min.m_bottom, position, position);
     }
 }
@@ -781,7 +772,7 @@ int CMapHit::CheckHitCylinder(CMapCylinder* mapCylinder, Vec* position, unsigned
     int faceOffset = 0;
     while (faceIndex < static_cast<int>(m_faceCount)) {
         g_hit_lpface = reinterpret_cast<CMapHitFace*>(Ptr(m_faces, faceOffset));
-        g_hit_t_min = s_large_pos;
+        g_hit_t_min = FLOAT_8032F8EC;
         if (CheckHitFaceCylinder(mask) != 0) {
             return 1;
         }
@@ -808,7 +799,7 @@ int CMapHit::CheckHitCylinder(CMapCylinder* mapCylinder, Vec* position, unsigned
 
     while (faceIndex < endFace) {
         g_hit_lpface = reinterpret_cast<CMapHitFace*>(Ptr(m_faces, faceOffset));
-        g_hit_t_min = s_large_pos;
+        g_hit_t_min = FLOAT_8032F8EC;
 
         if (CheckHitFaceCylinder(mask) != 0) {
             return 1;

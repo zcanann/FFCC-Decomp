@@ -1111,10 +1111,12 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
  * Address:	TODO
  * Size:	TODO
  */
+#ifndef VERSION_GCCP01
 void MakeWave(Vec*, unsigned short*, float*, Vec, float, float)
 {
 	// TODO
 }
+#endif
 
 /*
  * --INFO--

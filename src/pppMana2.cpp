@@ -1098,10 +1098,12 @@ void CalcReflectionVector2(
  * Address:	TODO
  * Size:	TODO
  */
+#ifndef VERSION_GCCP01
 void MakeWave(Vec*, unsigned short*, float*, Vec, float, float)
 {
 	// TODO
 }
+#endif
 
 /*
  * --INFO--

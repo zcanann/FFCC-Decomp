@@ -111,10 +111,10 @@ STATIC_ASSERT(offsetof(RedTrackDATA, m_shakeRateDelta) ==
 STATIC_ASSERT(offsetof(RedTrackDATA, m_shakeDepthDelta) ==
               REDSOUND_TRACK_SHAKE_DEPTH_DELTA_HALFWORD * sizeof(unsigned short));
 STATIC_ASSERT(offsetof(RedTrackDATA, m_adsr) == REDSOUND_TRACK_ADSR_TIME_ATTACK_HALFWORD * sizeof(unsigned short));
-STATIC_ASSERT(offsetof(RedAdsrDATA, m_time) == 0);
-STATIC_ASSERT(offsetof(RedAdsrDATA, m_level) ==
-              REDSOUND_TRACK_ADSR_LEVEL_ATTACK_OFFSET -
-                  REDSOUND_TRACK_ADSR_TIME_ATTACK_HALFWORD * sizeof(unsigned short));
+STATIC_ASSERT(offsetof(RedAdsrDATA, m_time) == REDSOUND_ADSR_TIME_OFFSET);
+STATIC_ASSERT(offsetof(RedAdsrDATA, m_level) == REDSOUND_ADSR_LEVEL_OFFSET);
+STATIC_ASSERT(REDSOUND_ADSR_LEVEL_OFFSET == REDSOUND_TRACK_ADSR_LEVEL_ATTACK_OFFSET -
+                                          REDSOUND_TRACK_ADSR_TIME_ATTACK_HALFWORD * sizeof(unsigned short));
 STATIC_ASSERT(sizeof(RedAdsrDATA) == REDSOUND_TRACK_ADSR_SIZE);
 STATIC_ASSERT(offsetof(RedTrackDATA, m_fuzzyPitchDepth) ==
               REDSOUND_TRACK_FUZZY_PITCH_DEPTH_WORD_OFFSET * sizeof(int));

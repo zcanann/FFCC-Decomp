@@ -139,7 +139,7 @@ static void _EraseAttribute(int eraseTrack, int attrMask)
 			int trackNo;
 
 			KeyOnReserveClear(p_KeyOnData, track);
-			track->m_seId = 0;
+			track->m_seId = REDSOUND_SE_ID_NONE;
 			track->m_flags = 0;
 			track->m_command = 0;
 			track->m_mixVolumeMode = REDSOUND_SE_VOLUME_MODE_NORMAL;
@@ -209,7 +209,7 @@ static int _EraseTime(int eraseTrack)
 			int trackNo;
 
 			KeyOnReserveClear(p_KeyOnData, track);
-			track->m_seId = 0;
+			track->m_seId = REDSOUND_SE_ID_NONE;
 			track->m_flags = 0;
 			track->m_command = 0;
 			track->m_mixVolumeMode = REDSOUND_SE_VOLUME_MODE_NORMAL;
@@ -309,7 +309,7 @@ int SeStopID(int seId)
 			int trackNo;
 
 			KeyOnReserveClear(p_KeyOnData, track);
-			track->m_seId = 0;
+			track->m_seId = REDSOUND_SE_ID_NONE;
 			track->m_flags = 0;
 			track->m_command = 0;
 			track->m_mixVolumeMode = REDSOUND_SE_VOLUME_MODE_NORMAL;
@@ -355,7 +355,7 @@ int SeStopG(int group)
 			int trackNo;
 
 			KeyOnReserveClear(p_KeyOnData, track);
-			track->m_seId = 0;
+			track->m_seId = REDSOUND_SE_ID_NONE;
 			track->m_flags = 0;
 			track->m_command = 0;
 			track->m_mixVolumeMode = REDSOUND_SE_VOLUME_MODE_NORMAL;
@@ -403,7 +403,7 @@ int SeStopMG(int bank, int sep, int group, int kind)
 				int trackNo;
 
 				KeyOnReserveClear(p_KeyOnData, track);
-				track->m_seId = 0;
+				track->m_seId = REDSOUND_SE_ID_NONE;
 				track->m_flags = 0;
 				track->m_command = 0;
 				track->m_mixVolumeMode = REDSOUND_SE_VOLUME_MODE_NORMAL;
@@ -793,7 +793,7 @@ void SePause(int seId, int pause)
 	track = *trackBasePtr;
 	voice = p_VoiceData + REDSOUND_SE_VOICE_BASE_INDEX;
 	do {
-		if ((track->m_seId != 0) && ((seId == REDSOUND_SE_ID_ALL) || (seId == track->m_seId))) {
+		if ((track->m_seId != REDSOUND_SE_ID_NONE) && ((seId == REDSOUND_SE_ID_ALL) || (seId == track->m_seId))) {
 			if (pause == REDSOUND_PAUSE_ON) {
 				if (voice->m_axVoice != 0) {
 					voice->m_targetPitch = 0;

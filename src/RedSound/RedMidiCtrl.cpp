@@ -984,7 +984,7 @@ static void __MidiCtrl_Stop(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, R
             c_RedEntry.WaveHistoryManager(REDSOUND_HISTORY_MODE_RELEASE, track->m_waveBankData->m_waveNo);
         }
         c_RedEntry.SeSepHistoryManager(REDSOUND_HISTORY_MODE_RELEASE, track->m_seSepId);
-        track->m_seId = 0;
+        track->m_seId = REDSOUND_SE_ID_NONE;
     }
 }
 

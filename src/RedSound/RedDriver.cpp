@@ -778,7 +778,7 @@ static void _MusicStop(int* command)
         p_MusicNextPlay->m_musicId = REDSOUND_MUSIC_ID_NONE;
     }
     if (p_MusicNextPlay->m_musicId < 0) {
-        m_MusicPhraseStop = 0;
+        m_MusicPhraseStop = REDSOUND_MUSIC_PHRASE_STOP_OFF;
     }
 }
 
@@ -954,7 +954,7 @@ static void _MusicVolume(int* command)
 {
     if (command[REDSOUND_MUSIC_COMMAND_STOP_NEXT] == 1) {
         p_MusicNextPlay->m_musicId = REDSOUND_MUSIC_ID_NONE;
-        m_MusicPhraseStop = 0;
+        m_MusicPhraseStop = REDSOUND_MUSIC_PHRASE_STOP_OFF;
     }
     SetMusicVolume(command[REDSOUND_MUSIC_COMMAND_ID], command[REDSOUND_MUSIC_COMMAND_VOLUME],
                    command[REDSOUND_MUSIC_COMMAND_FADE_TIME], command[REDSOUND_MUSIC_COMMAND_STOP_NEXT]);
@@ -1538,7 +1538,7 @@ static int _MainThread(void*)
             if ((p_MusicNextPlay->m_musicId >= 0) && (control->m_musicId < 0)) {
                 _MusicPlaySequence((int*)p_MusicNextPlay);
                 p_MusicNextPlay->m_musicId = REDSOUND_MUSIC_ID_NONE;
-                m_MusicPhraseStop = 0;
+                m_MusicPhraseStop = REDSOUND_MUSIC_PHRASE_STOP_OFF;
             }
             while (OSTryWaitSemaphore(&m_MainSemaphore) > 0) {
             }
@@ -2057,7 +2057,7 @@ void CRedDriver::Init()
     m_Mute[REDSOUND_MUTE_LOW_WORD] = 0;
     p_MusicNextPlay = (RedMusicPlayCommand*)RedNew(REDSOUND_MUSIC_NEXT_PLAY_BUFFER_SIZE);
     p_MusicNextPlay->m_musicId = REDSOUND_MUSIC_ID_NONE;
-    m_MusicPhraseStop = 0;
+    m_MusicPhraseStop = REDSOUND_MUSIC_PHRASE_STOP_OFF;
     p_Stream = (RedStreamDATA*)RedNew(REDSOUND_STREAM_BUFFER_SIZE);
     memset(p_Stream, 0, REDSOUND_STREAM_BUFFER_SIZE);
     m_DMAMode = 0;

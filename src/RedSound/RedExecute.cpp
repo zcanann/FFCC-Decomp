@@ -2543,7 +2543,7 @@ static int _MusicMidiNoteExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnDa
     }
 
     control->m_skipFrames = 1;
-    if (m_MusicPhraseStop == 0) {
+    if (m_MusicPhraseStop == REDSOUND_MUSIC_PHRASE_STOP_OFF) {
         if ((control->m_flags & REDSOUND_CONTROL_FLAG_WHOLE_LOOP_END) != 0) {
             control->m_flags &= ~REDSOUND_CONTROL_FLAG_WHOLE_LOOP_END;
             if ((control->m_flags & REDSOUND_CONTROL_FLAG_WHOLE_LOOP_ACTIVE) != 0) {
@@ -2572,7 +2572,7 @@ static void _MusicNoteExecute()
     RedSavedTrackDATA* savedTrackData;
     int status = _MusicMidiNoteExecute(p_SoundControl, p_KeyOnData, 1);
 
-    while ((status == 0) && (m_MusicPhraseStop == 0) &&
+    while ((status == 0) && (m_MusicPhraseStop == REDSOUND_MUSIC_PHRASE_STOP_OFF) &&
            ((p_SoundControl->m_flags & REDSOUND_CONTROL_FLAG_WHOLE_LOOP_ACTIVE) != 0)) {
         p_SoundControl->m_activeTrackCount = p_SoundControl->m_savedActiveTrackCount;
         memcpy(&p_SoundControl->m_measure, &p_SoundControl->m_savedPosition, REDSOUND_CONTROL_SAVED_POSITION_SIZE);
@@ -2597,7 +2597,7 @@ static void _MusicNoteExecute()
     if ((p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_PRIMARY].m_musicId < 0) &&
         (p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY].m_musicId < 0) &&
         (p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SKIP].m_musicId < 0)) {
-        m_MusicPhraseStop = 0;
+        m_MusicPhraseStop = REDSOUND_MUSIC_PHRASE_STOP_OFF;
     }
 }
 

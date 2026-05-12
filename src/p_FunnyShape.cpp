@@ -75,7 +75,7 @@ extern char lbl_8032E660[];
 extern u8 ARRAY_8026D728[];
 
 extern "C" CUSBStreamData* __dt__14CUSBStreamDataFv(CUSBStreamData* self, short shouldDelete);
-extern "C" const char lbl_8032FD1C[] = "|/-\\";
+extern "C" const char lbl_8032FD1C[5];
 
 namespace {
 static inline u8* Ptr(CFunnyShapePcs* self, u32 offset)

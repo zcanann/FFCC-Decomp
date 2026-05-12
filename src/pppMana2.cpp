@@ -763,6 +763,7 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
     s32 i;
 
     work = (u32*)param_2;
+    baseParaboloidTexObjs = work[8];
     if (*(u8*)((char*)param_3 + 0x1C) == 0) {
         return;
     }
@@ -806,7 +807,6 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
                          LoadFloat(FLOAT_803318a0), LoadFloat(FLOAT_803318d0));
         GXSetProjection(projectionMtx, (_GXProjectionType)0);
 
-        baseParaboloidTexObjs = work[8];
         for (i = 0; i < 6; i++) {
             cameraPos.x = centerPos.x;
             cameraPos.y = centerPos.y;

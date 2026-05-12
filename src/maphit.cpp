@@ -295,21 +295,15 @@ CMapHit::~CMapHit()
 void CMapHit::ReadOtmHit(CChunkFile& chunkFile)
 {
     CChunkFile::CChunk chunk;
-    CMemory::CStage* const stage = *reinterpret_cast<CMemory::CStage**>(&MapMng);
 
     chunkFile.PushChunk();
 
     while (chunkFile.GetNextChunk(chunk)) {
         if (chunk.m_id == 'HITV') {
             m_vertexCount = static_cast<unsigned short>(chunk.m_arg0);
-            m_vertices = new (stage, const_cast<char*>(s_maphit_cpp), 0x143) Vec[m_vertexCount];
-
-            m_positionMin.x = s_large_pos;
-            m_positionMin.y = s_large_pos;
-            m_positionMin.z = s_large_pos;
-            m_positionMax.x = s_large_neg;
-            m_positionMax.y = s_large_neg;
-            m_positionMax.z = s_large_neg;
+            m_vertices =
+                new (*reinterpret_cast<CMemory::CStage**>(&MapMng), const_cast<char*>(s_maphit_cpp), 0x143)
+                    Vec[m_vertexCount];
 
             for (unsigned int i = 0; i < m_vertexCount; i++) {
                 Vec& v = m_vertices[i];
@@ -317,25 +311,13 @@ void CMapHit::ReadOtmHit(CChunkFile& chunkFile)
                 v.y = chunkFile.GetF4();
                 v.z = chunkFile.GetF4();
 
-                if (v.x < m_positionMin.x) {
-                    m_positionMin.x = v.x;
-                }
-                if (v.y < m_positionMin.y) {
-                    m_positionMin.y = v.y;
-                }
-                if (v.z < m_positionMin.z) {
-                    m_positionMin.z = v.z;
-                }
+                m_positionMin.x = (m_positionMin.x < v.x) ? m_positionMin.x : v.x;
+                m_positionMin.y = (m_positionMin.y < v.y) ? m_positionMin.y : v.y;
+                m_positionMin.z = (m_positionMin.z < v.z) ? m_positionMin.z : v.z;
 
-                if (m_positionMax.x < v.x) {
-                    m_positionMax.x = v.x;
-                }
-                if (m_positionMax.y < v.y) {
-                    m_positionMax.y = v.y;
-                }
-                if (m_positionMax.z < v.z) {
-                    m_positionMax.z = v.z;
-                }
+                m_positionMax.x = (m_positionMax.x < v.x) ? v.x : m_positionMax.x;
+                m_positionMax.y = (m_positionMax.y < v.y) ? v.y : m_positionMax.y;
+                m_positionMax.z = (m_positionMax.z < v.z) ? v.z : m_positionMax.z;
             }
 
             m_positionMin.x -= 0.1f;
@@ -346,7 +328,9 @@ void CMapHit::ReadOtmHit(CChunkFile& chunkFile)
             m_positionMax.z += 0.1f;
         } else if (chunk.m_id == 'HITF') {
             m_faceCount = static_cast<unsigned short>(chunk.m_arg0);
-            m_faces = new (stage, const_cast<char*>(s_maphit_cpp), 0x159) CMapHitFace[m_faceCount];
+            m_faces =
+                new (*reinterpret_cast<CMemory::CStage**>(&MapMng), const_cast<char*>(s_maphit_cpp), 0x159)
+                    CMapHitFace[m_faceCount];
 
             for (unsigned int faceIdx = 0; faceIdx < m_faceCount; faceIdx++) {
                 chunkFile.Align(4);
@@ -396,47 +380,28 @@ void CMapHit::ReadOtmHit(CChunkFile& chunkFile)
                     }
                 }
 
-                face.m_boundsMin.x = s_large_pos;
-                face.m_boundsMin.y = s_large_pos;
-                face.m_boundsMin.z = s_large_pos;
-                face.m_boundsMax.x = s_large_neg;
-                face.m_boundsMax.y = s_large_neg;
-                face.m_boundsMax.z = s_large_neg;
-
                 for (unsigned int i = 0; i < vertexCount; i++) {
                     const unsigned short idx = chunkFile.Get2();
                     face.m_vertexIndices[i] = idx;
 
                     const Vec& v = m_vertices[idx];
-                    if (v.x < face.m_boundsMin.x) {
-                        face.m_boundsMin.x = v.x;
-                    }
-                    if (v.y < face.m_boundsMin.y) {
-                        face.m_boundsMin.y = v.y;
-                    }
-                    if (v.z < face.m_boundsMin.z) {
-                        face.m_boundsMin.z = v.z;
-                    }
+                    face.m_boundsMin.x = (face.m_boundsMin.x < v.x) ? face.m_boundsMin.x : v.x;
+                    face.m_boundsMin.y = (face.m_boundsMin.y < v.y) ? face.m_boundsMin.y : v.y;
+                    face.m_boundsMin.z = (face.m_boundsMin.z < v.z) ? face.m_boundsMin.z : v.z;
 
-                    if (face.m_boundsMax.x < v.x) {
-                        face.m_boundsMax.x = v.x;
-                    }
-                    if (face.m_boundsMax.y < v.y) {
-                        face.m_boundsMax.y = v.y;
-                    }
-                    if (face.m_boundsMax.z < v.z) {
-                        face.m_boundsMax.z = v.z;
-                    }
+                    face.m_boundsMax.x = (face.m_boundsMax.x < v.x) ? v.x : face.m_boundsMax.x;
+                    face.m_boundsMax.y = (face.m_boundsMax.y < v.y) ? v.y : face.m_boundsMax.y;
+                    face.m_boundsMax.z = (face.m_boundsMax.z < v.z) ? v.z : face.m_boundsMax.z;
                 }
 
-                float width = face.m_radiusScale * 0.5f;
-                face.m_boundsMin.x -= (0.1f + width);
-                face.m_boundsMin.y -= (0.1f + width);
-                face.m_boundsMin.z -= (0.1f + width);
-                face.m_boundsMax.x += (0.1f + width);
-                face.m_boundsMax.y += (0.1f + width);
-                face.m_boundsMax.z += (0.1f + width);
-                face.m_radiusScale = 1.0f - width;
+                face.m_radiusScale *= 0.5f;
+                face.m_boundsMin.x -= (0.1f + face.m_radiusScale);
+                face.m_boundsMin.y -= (0.1f + face.m_radiusScale);
+                face.m_boundsMin.z -= (0.1f + face.m_radiusScale);
+                face.m_boundsMax.x += (0.1f + face.m_radiusScale);
+                face.m_boundsMax.y += (0.1f + face.m_radiusScale);
+                face.m_boundsMax.z += (0.1f + face.m_radiusScale);
+                face.m_radiusScale = 1.0f - face.m_radiusScale;
             }
         } else if (chunk.m_id == 'NAME') {
             char* mapHitName = chunkFile.GetString();

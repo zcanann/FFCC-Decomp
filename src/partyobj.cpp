@@ -2488,12 +2488,12 @@ void CGPartyObj::bonus(int kind, int value, CGPrgObj* source)
  */
 int CGPartyObj::canPlayerUseItem()
 {
-	unsigned char* weaponFlags = reinterpret_cast<unsigned char*>(&m_weaponNodeFlags);
+	signed char* weaponFlags = reinterpret_cast<signed char*>(&m_weaponNodeFlags);
 
-	if ((int)((unsigned int)weaponFlags[0] << 0x18) < 0) {
-		unsigned char* self = reinterpret_cast<unsigned char*>(this);
-		if (((int)((unsigned int)weaponFlags[1] << 0x18) < 0) &&
-		    ((int)((unsigned int)self[0x63C] << 0x18) < 0) &&
+	if (weaponFlags[0] < 0) {
+		signed char* self = reinterpret_cast<signed char*>(this);
+		if ((weaponFlags[1] < 0) &&
+		    (self[0x63C] < 0) &&
 		    (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0)) {
 			return 1;
 		}

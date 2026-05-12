@@ -627,11 +627,11 @@ void pppDestructYmDeformationShp(pppYmDeformationShp*, pppYmDeformationShpUnkC*)
  */
 void pppConstruct2YmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmDeformationShpUnkC* param_2)
 {
-	float value = kPppYmDeformationShpZero;
+	const float& value = kPppYmDeformationShpZero;
 	VYmDeformationShp* state =
 		(VYmDeformationShp*)((u8*)pppYmDeformationShp_ + 0x80 + param_2->m_serializedDataOffsets[2]);
 
-	state->m_values[1] = kPppYmDeformationShpZero;
+	state->m_values[1] = value;
 	state->m_values[0] = value;
 	state->m_scale = value;
 	state->m_values[4] = value;
@@ -650,7 +650,7 @@ void pppConstruct2YmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pp
  */
 void pppConstructYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmDeformationShpUnkC* param_2)
 {
-	float value = kPppYmDeformationShpZero;
+	const float& value = kPppYmDeformationShpZero;
 	VYmDeformationShp* state =
 		(VYmDeformationShp*)((u8*)pppYmDeformationShp_ + 0x80 + param_2->m_serializedDataOffsets[2]);
 

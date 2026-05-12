@@ -350,10 +350,13 @@ void CGMonObj::damagedFuncGolem()
  */
 void CGMonObj::changeStatFuncGolem(int stat)
 {
-	if (stat == 0x65) {
-		setActionParam__8CGMonObjFi(this, -9);
-	} else if (stat > 99 && stat < 0x65) {
+	switch (stat) {
+	case 100:
 		setActionParam__8CGMonObjFi(this, -10);
+		break;
+	case 101:
+		setActionParam__8CGMonObjFi(this, -9);
+		break;
 	}
 }
 
@@ -535,8 +538,10 @@ void CGMonObj::frameStatFuncArmstrong()
  */
 void CGMonObj::cancelStatFuncOrcKing()
 {
-	if (reinterpret_cast<CGPrgObj*>(this)->m_lastStateId == 100) {
+	switch (reinterpret_cast<CGPrgObj*>(this)->m_lastStateId) {
+	case 100:
 		reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0xC00);
+		break;
 	}
 }
 
@@ -726,8 +731,10 @@ int CGMonObj::calcBranchFuncOrcKing(int)
  */
 void CGMonObj::cancelStatFuncGoblinKing()
 {
-	if (reinterpret_cast<CGPrgObj*>(this)->m_lastStateId == 100) {
+	switch (reinterpret_cast<CGPrgObj*>(this)->m_lastStateId) {
+	case 100:
 		reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x400);
+		break;
 	}
 }
 
@@ -778,8 +785,10 @@ int CGMonObj::calcBranchFuncGoblinKing(int)
  */
 void CGMonObj::cancelStatFuncSaw()
 {
-	if (reinterpret_cast<CGPrgObj*>(this)->m_lastStateId == 100) {
+	switch (reinterpret_cast<CGPrgObj*>(this)->m_lastStateId) {
+	case 100:
 		reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(1);
+		break;
 	}
 }
 
@@ -1129,8 +1138,10 @@ int CGMonObj::attackCheckFuncLKShooter(int)
  */
 void CGMonObj::changeStatFuncDragonZombie(int stat)
 {
-	if (stat == 100) {
+	switch (stat) {
+	case 100:
 		setActionParam__8CGMonObjFi(this, -11);
+		break;
 	}
 }
 
@@ -1276,10 +1287,13 @@ void CGMonObj::frameStatFuncCaveWorm()
  */
 void CGMonObj::changeStatFuncLich(int stat)
 {
-	if (stat == 0x65) {
-		setActionParam__8CGMonObjFi(this, -14);
-	} else if (stat > 99 && stat < 0x65) {
+	switch (stat) {
+	case 100:
 		setActionParam__8CGMonObjFi(this, -10);
+		break;
+	case 101:
+		setActionParam__8CGMonObjFi(this, -14);
+		break;
 	}
 }
 
@@ -1294,8 +1308,10 @@ void CGMonObj::changeStatFuncLich(int stat)
  */
 void CGMonObj::cancelStatFuncLich()
 {
-	if (reinterpret_cast<CGPrgObj*>(this)->m_lastStateId == 100) {
+	switch (reinterpret_cast<CGPrgObj*>(this)->m_lastStateId) {
+	case 100:
 		reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x400);
+		break;
 	}
 }
 
@@ -1796,10 +1812,13 @@ void CGMonObj::damagedFuncWifeLamia()
  */
 void CGMonObj::changeStatFuncMolbol(int stat)
 {
-	if (stat == 0x65) {
-		setActionParam__8CGMonObjFi(this, -14);
-	} else if (stat > 99 && stat < 0x65) {
+	switch (stat) {
+	case 100:
 		setActionParam__8CGMonObjFi(this, -13);
+		break;
+	case 101:
+		setActionParam__8CGMonObjFi(this, -14);
+		break;
 	}
 }
 
@@ -1814,8 +1833,10 @@ void CGMonObj::changeStatFuncMolbol(int stat)
  */
 void CGMonObj::cancelStatFuncMolbol()
 {
-	if (reinterpret_cast<CGPrgObj*>(this)->m_lastStateId == 100) {
+	switch (reinterpret_cast<CGPrgObj*>(this)->m_lastStateId) {
+	case 100:
 		reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x400);
+		break;
 	}
 }
 

@@ -4336,8 +4336,12 @@ void CPartMng::pppShowSlot(int slot, unsigned char isVisible)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80057E94
+ * PAL Size: 84b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CPartMng::pppDeletePart(int index)
 {
@@ -4548,43 +4552,45 @@ void CPartMng::pppSetDeltaSlot(int slot, long color)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80057B2C
+ * PAL Size: 220b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CPartMng::pppSetLocSlot(int slot, Vec* position)
 {
     char* pppMngSt = reinterpret_cast<char*>(this);
-    int i = 0x60;
 
-    do {
-        if ((*reinterpret_cast<int*>(pppMngSt + 0x14 + (0x158 * 0)) != -0x1000) &&
-            (*reinterpret_cast<int*>(pppMngSt + 0x100 + (0x158 * 0)) == slot)) {
-            *reinterpret_cast<float*>(pppMngSt + 0x8 + (0x158 * 0)) = position->x;
-            *reinterpret_cast<float*>(pppMngSt + 0xc + (0x158 * 0)) = position->y;
-            *reinterpret_cast<float*>(pppMngSt + 0x10 + (0x158 * 0)) = position->z;
+    for (int i = 0; i < 0x60; i++) {
+        if ((*reinterpret_cast<int*>(pppMngSt + 0x2A2C + (0x158 * 0)) != -0x1000) &&
+            (*reinterpret_cast<int*>(pppMngSt + 0x2B18 + (0x158 * 0)) == slot)) {
+            *reinterpret_cast<float*>(pppMngSt + 0x2A20 + (0x158 * 0)) = position->x;
+            *reinterpret_cast<float*>(pppMngSt + 0x2A24 + (0x158 * 0)) = position->y;
+            *reinterpret_cast<float*>(pppMngSt + 0x2A28 + (0x158 * 0)) = position->z;
         }
-        if ((*reinterpret_cast<int*>(pppMngSt + 0x14 + (0x158 * 1)) != -0x1000) &&
-            (*reinterpret_cast<int*>(pppMngSt + 0x100 + (0x158 * 1)) == slot)) {
-            *reinterpret_cast<float*>(pppMngSt + 0x8 + (0x158 * 1)) = position->x;
-            *reinterpret_cast<float*>(pppMngSt + 0xc + (0x158 * 1)) = position->y;
-            *reinterpret_cast<float*>(pppMngSt + 0x10 + (0x158 * 1)) = position->z;
+        if ((*reinterpret_cast<int*>(pppMngSt + 0x2A2C + (0x158 * 1)) != -0x1000) &&
+            (*reinterpret_cast<int*>(pppMngSt + 0x2B18 + (0x158 * 1)) == slot)) {
+            *reinterpret_cast<float*>(pppMngSt + 0x2A20 + (0x158 * 1)) = position->x;
+            *reinterpret_cast<float*>(pppMngSt + 0x2A24 + (0x158 * 1)) = position->y;
+            *reinterpret_cast<float*>(pppMngSt + 0x2A28 + (0x158 * 1)) = position->z;
         }
-        if ((*reinterpret_cast<int*>(pppMngSt + 0x14 + (0x158 * 2)) != -0x1000) &&
-            (*reinterpret_cast<int*>(pppMngSt + 0x100 + (0x158 * 2)) == slot)) {
-            *reinterpret_cast<float*>(pppMngSt + 0x8 + (0x158 * 2)) = position->x;
-            *reinterpret_cast<float*>(pppMngSt + 0xc + (0x158 * 2)) = position->y;
-            *reinterpret_cast<float*>(pppMngSt + 0x10 + (0x158 * 2)) = position->z;
+        if ((*reinterpret_cast<int*>(pppMngSt + 0x2A2C + (0x158 * 2)) != -0x1000) &&
+            (*reinterpret_cast<int*>(pppMngSt + 0x2B18 + (0x158 * 2)) == slot)) {
+            *reinterpret_cast<float*>(pppMngSt + 0x2A20 + (0x158 * 2)) = position->x;
+            *reinterpret_cast<float*>(pppMngSt + 0x2A24 + (0x158 * 2)) = position->y;
+            *reinterpret_cast<float*>(pppMngSt + 0x2A28 + (0x158 * 2)) = position->z;
         }
-        if ((*reinterpret_cast<int*>(pppMngSt + 0x14 + (0x158 * 3)) != -0x1000) &&
-            (*reinterpret_cast<int*>(pppMngSt + 0x100 + (0x158 * 3)) == slot)) {
-            *reinterpret_cast<float*>(pppMngSt + 0x8 + (0x158 * 3)) = position->x;
-            *reinterpret_cast<float*>(pppMngSt + 0xc + (0x158 * 3)) = position->y;
-            *reinterpret_cast<float*>(pppMngSt + 0x10 + (0x158 * 3)) = position->z;
+        if ((*reinterpret_cast<int*>(pppMngSt + 0x2A2C + (0x158 * 3)) != -0x1000) &&
+            (*reinterpret_cast<int*>(pppMngSt + 0x2B18 + (0x158 * 3)) == slot)) {
+            *reinterpret_cast<float*>(pppMngSt + 0x2A20 + (0x158 * 3)) = position->x;
+            *reinterpret_cast<float*>(pppMngSt + 0x2A24 + (0x158 * 3)) = position->y;
+            *reinterpret_cast<float*>(pppMngSt + 0x2A28 + (0x158 * 3)) = position->z;
         }
 
         pppMngSt += 0x560;
-        i--;
-    } while (i != 0);
+    }
 }
 
 /*
@@ -4698,8 +4704,12 @@ void CPartMng::pppDeleteAll()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80057794
+ * PAL Size: 148b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CPartMng::pppDestroyAll()
 {
@@ -4708,7 +4718,7 @@ void CPartMng::pppDestroyAll()
     int mngIndex = 0;
     for (int i = 0; i < 0x180; i++) {
         _pppMngSt* pppMngSt = &m_pppMng[mngIndex];
-        if (m_pppMng[mngIndex].m_baseTime != -0x1000 && pppMngSt->m_pppResSet != 0) {
+        if (pppMngSt->m_baseTime != -0x1000 && pppMngSt->m_pppResSet != 0) {
             _pppAllFreePObject(pppMngSt);
         }
         mngIndex++;

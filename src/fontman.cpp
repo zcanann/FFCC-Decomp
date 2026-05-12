@@ -693,21 +693,29 @@ void CFont::Create(void* filePtr, CMemory::CStage* stage)
                     unsigned short** bucketSlot = m_glyphBuckets;
                     for (int i = 0; i < 32; i++) {
                         bucketSlot[0] = bucket;
-                        bucket = bucket + static_cast<unsigned int>(*bucket) * 4 + 1;
+                        bucket = bucket + static_cast<unsigned int>(*bucket) * 4;
+                        bucket++;
                         bucketSlot[1] = bucket;
-                        bucket = bucket + static_cast<unsigned int>(*bucket) * 4 + 1;
+                        bucket = bucket + static_cast<unsigned int>(*bucket) * 4;
+                        bucket++;
                         bucketSlot[2] = bucket;
-                        bucket = bucket + static_cast<unsigned int>(*bucket) * 4 + 1;
+                        bucket = bucket + static_cast<unsigned int>(*bucket) * 4;
+                        bucket++;
                         bucketSlot[3] = bucket;
-                        bucket = bucket + static_cast<unsigned int>(*bucket) * 4 + 1;
+                        bucket = bucket + static_cast<unsigned int>(*bucket) * 4;
+                        bucket++;
                         bucketSlot[4] = bucket;
-                        bucket = bucket + static_cast<unsigned int>(*bucket) * 4 + 1;
+                        bucket = bucket + static_cast<unsigned int>(*bucket) * 4;
+                        bucket++;
                         bucketSlot[5] = bucket;
-                        bucket = bucket + static_cast<unsigned int>(*bucket) * 4 + 1;
+                        bucket = bucket + static_cast<unsigned int>(*bucket) * 4;
+                        bucket++;
                         bucketSlot[6] = bucket;
-                        bucket = bucket + static_cast<unsigned int>(*bucket) * 4 + 1;
+                        bucket = bucket + static_cast<unsigned int>(*bucket) * 4;
+                        bucket++;
                         bucketSlot[7] = bucket;
-                        bucket = bucket + static_cast<unsigned int>(*bucket) * 4 + 1;
+                        bucket = bucket + static_cast<unsigned int>(*bucket) * 4;
+                        bucket++;
                         bucketSlot += 8;
                     }
                 } else if (chunk.m_id == 0x54585452) {

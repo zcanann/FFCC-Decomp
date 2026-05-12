@@ -25,11 +25,11 @@ extern const float FLOAT_80330c80;
 extern const float FLOAT_80330c84;
 extern const float FLOAT_80330C90;
 extern const float FLOAT_80330C94;
-extern const float FLOAT_80330C98;
-extern const float FLOAT_80330C9C;
-extern const float FLOAT_80330CA8;
 }
 extern const float FLOAT_80330c80;
+static const float FLOAT_80330C98 = 180.0f;
+static const float FLOAT_80330C9C = -180.0f;
+static const float FLOAT_80330CA8 = 2.0f;
 
 struct pppYmBreathUnkC {
     unsigned char _pad[0xC];
@@ -346,7 +346,7 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
             drawMtx[0][0] = particle->m_rotationX * pppMngStPtr->m_scale.x;
             drawMtx[1][1] = particle->m_rotationY * pppMngStPtr->m_scale.y;
             drawMtx[2][2] = drawMtx[0][0];
-            if (0.0f != particle->m_angle) {
+            if (FLOAT_80330c80 != particle->m_angle) {
                 PSMTXRotRad(rotMtx, 'z', FLOAT_80330c84 * particle->m_angle);
                 PSMTXConcat(drawMtx, rotMtx, drawMtx);
             }
@@ -583,9 +583,9 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
             }
         }
 
-        work->m_direction.x = 0.0f;
-        work->m_direction.y = 0.0f;
-        work->m_direction.z = -1.0f;
+        work->m_direction.x = FLOAT_80330c80;
+        work->m_direction.y = FLOAT_80330c80;
+        work->m_direction.z = FLOAT_80330C90;
         PSVECNormalize(&work->m_direction, &work->m_direction);
     }
 
@@ -623,9 +623,9 @@ group_ready:
             PSMTXConcat(*particleMtx, ymBreath->m_localMatrix.value, worldMtx);
             PSMTXMultVec(worldMtx, &groupData->position, &origin);
             pppCopyMatrix(rotMtx, *reinterpret_cast<pppFMATRIX*>(particleMtx));
-            rotMtx.value[0][3] = 0.0f;
-            rotMtx.value[1][3] = 0.0f;
-            rotMtx.value[2][3] = 0.0f;
+            rotMtx.value[0][3] = FLOAT_80330c80;
+            rotMtx.value[1][3] = FLOAT_80330c80;
+            rotMtx.value[2][3] = FLOAT_80330c80;
             groupData->scale = scaledOwner;
             pppCopyVector(dir, groupData->direction);
             PSMTXMultVec(rotMtx.value, &dir, &dir);
@@ -918,7 +918,7 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
     YmBreathParams* params = reinterpret_cast<YmBreathParams*>(pYmBreath);
     YmBreathParticleData* particle = reinterpret_cast<YmBreathParticleData*>(particleData);
     Vec baseDir;
-    int angle[4];
+    int angle[3];
     pppFMATRIX rotMtx;
     float spread;
     float range;
@@ -1065,9 +1065,6 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
     }
 }
 
-extern const float FLOAT_80330C98 = 180.0f;
-extern const float FLOAT_80330C9C = -180.0f;
-extern const float FLOAT_80330CA8 = 2.0f;
 extern "C" const char lbl_80330CB8[] = "FFCC";
 extern "C" const char lbl_80330CC0[] = "GDS";
 extern "C" const char lbl_80330CC4[] = "GC";

@@ -598,7 +598,7 @@ void CMaterialEditorPcs::drawViewer()
                 MaterialEditorPolygon* polygon = reinterpret_cast<MaterialEditorPolygon*>(polygons + polygonOffset);
 
                 if ((polygon->flags & 0x200) == 0) {
-                    GXSetCullMode(GX_CULL_FRONT);
+                    GXSetCullMode(GX_CULL_BACK);
                 } else {
                     GXSetCullMode(GX_CULL_NONE);
                 }

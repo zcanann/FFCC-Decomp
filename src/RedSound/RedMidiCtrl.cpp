@@ -363,7 +363,7 @@ enum RedMidiSwingConst {
     REDSOUND_SWING_SAW_PHASE_SHIFT = 2,
     REDSOUND_SWING_PHASE_SHIFT = 8,
     REDSOUND_SWING_PHASE_MASK = 0xFF,
-    REDSOUND_SWING_PHASE_INVERT_MASK = 0xffffffffU,
+    REDSOUND_SWING_PHASE_INVERT_MASK = -1,
     REDSOUND_SWING_QUADRANT_MASK = 3,
     REDSOUND_SWING_LEVEL_FULL = 0x10000,
     REDSOUND_SWING_RANDOM_REVERSE_PHASE = 0x40,
@@ -865,7 +865,7 @@ static int DutySwingR(int phase)
  */
 static int SawSwingR(int phase)
 {
-    int result = (int)(char)((int)((u32)phase ^ REDSOUND_SWING_PHASE_INVERT_MASK) >> REDSOUND_SWING_SAW_PHASE_SHIFT)
+    int result = (int)(char)((phase ^ REDSOUND_SWING_PHASE_INVERT_MASK) >> REDSOUND_SWING_SAW_PHASE_SHIFT)
                  << REDSOUND_SWING_PHASE_SHIFT;
 
     return result;
@@ -1029,28 +1029,29 @@ static void __MidiCtrl_WholeLoopStart(RedSoundCONTROL* control, RedKeyOnDATA* ke
         savedTrackData->m_delta[slot] = scan->m_deltaTime + delta + deltaAdjust;
         savedTrackData->m_flags[slot] = scan->m_flags;
         RedNoteCopy(&savedTrackData->m_note[slot], &scan->m_note);
+        slot++;
 
-        RedTrackDATA* nextTrack = scan + 1;
-        if ((nextTrack - control->m_tracks) < control->m_trackCount) {
-            for (; nextTrack < control->m_tracks + control->m_trackCount; nextTrack++) {
-                int currentDelta = deltaAdjust + (nextTrack->m_deltaTime - loopBase);
+        scan++;
+        if ((scan - control->m_tracks) < control->m_trackCount) {
+            for (; scan < control->m_tracks + control->m_trackCount; scan++) {
+                int currentDelta = deltaAdjust + (scan->m_deltaTime - loopBase);
 
-                while ((currentDelta < 1) && (nextTrack->m_command != 0)) {
-                    unsigned char* cmd = nextTrack->m_command;
-                    nextTrack->m_command = cmd + 1;
-                    p_MidiControl_Function[*cmd](control, keyOnData, nextTrack);
+                while ((currentDelta < 1) && (scan->m_command != 0)) {
+                    unsigned char* cmd = scan->m_command;
+                    scan->m_command = cmd + 1;
+                    p_MidiControl_Function[*cmd](control, keyOnData, scan);
 
-                    if (nextTrack->m_command != 0) {
-                        int step = DeltaTimeSumup((unsigned char**)&nextTrack->m_command);
-                        currentDelta += step;
-                        nextTrack->m_deltaTime += step;
+                    if (scan->m_command != 0) {
+                        delta = DeltaTimeSumup((unsigned char**)&scan->m_command);
+                        currentDelta += delta;
+                        scan->m_deltaTime += delta;
                     }
                 }
 
-                savedTrackData->m_command[slot + 1] = nextTrack->m_command;
-                savedTrackData->m_delta[slot + 1] = currentDelta;
-                savedTrackData->m_flags[slot + 1] = nextTrack->m_flags;
-                RedNoteCopy(&savedTrackData->m_note[slot + 1], &nextTrack->m_note);
+                savedTrackData->m_command[slot] = scan->m_command;
+                savedTrackData->m_delta[slot] = currentDelta;
+                savedTrackData->m_flags[slot] = scan->m_flags;
+                RedNoteCopy(&savedTrackData->m_note[slot], &scan->m_note);
                 slot++;
             }
         }

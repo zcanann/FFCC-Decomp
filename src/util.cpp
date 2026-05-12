@@ -12,6 +12,7 @@ extern const float kUtilQuadDepth;
 extern const float kUtilHermiteCoeff2;
 extern const float kUtilHermiteCoeff3;
 extern const float kUtilHermiteCoeffNeg2;
+extern Vec gUtilUpVector;
 static Vec s_zeroVector = {0.0f, 0.0f, 0.0f};
 
 static inline MtxPtr GetCameraMatrix()
@@ -63,7 +64,7 @@ void CUtil::InitConstantRegister()
  */
 void CUtil::GetDirectVector(Vec* param_2, Vec* param_3, Vec param_4)
 {
-    Vec local_vec = {0.0f, 1.0f, 0.0f};
+    Vec local_vec = gUtilUpVector;
 
     PSVECCrossProduct(&param_4, &local_vec, param_2);
     PSVECNormalize(param_2, param_2);

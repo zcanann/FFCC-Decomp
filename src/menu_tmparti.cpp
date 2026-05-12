@@ -84,24 +84,12 @@ struct TmpArtiEntry {
 };
 
 struct TmpArtiList {
-    unsigned short count;
+    short count;
     unsigned short pad_0002;
     unsigned int pad_0004;
     TmpArtiEntry entries[64];
 };
 
-struct MenuTmpArtiMembers {
-    unsigned char pad_0000[0x108];
-    CFont* m_tmpArtiFont;
-    unsigned char pad_010C[0x720];
-    short* m_tmpArtiState;
-    unsigned char pad_0830[0x20];
-    short* m_tmpArtiList;
-};
-
-STATIC_ASSERT(offsetof(MenuTmpArtiMembers, m_tmpArtiFont) == 0x108);
-STATIC_ASSERT(offsetof(MenuTmpArtiMembers, m_tmpArtiState) == 0x82C);
-STATIC_ASSERT(offsetof(MenuTmpArtiMembers, m_tmpArtiList) == 0x850);
 STATIC_ASSERT(offsetof(TmpArtiState, initialized) == 0xB);
 STATIC_ASSERT(offsetof(TmpArtiState, closeRequested) == 0xD);
 STATIC_ASSERT(offsetof(TmpArtiState, moveDirection) == 0x1E);
@@ -116,25 +104,21 @@ STATIC_ASSERT(offsetof(TmpArtiEntry, timer) == 0x20);
 STATIC_ASSERT(offsetof(TmpArtiEntry, startFrame) == 0x24);
 STATIC_ASSERT(offsetof(TmpArtiEntry, duration) == 0x28);
 STATIC_ASSERT(sizeof(TmpArtiEntry) == 0x40);
+STATIC_ASSERT(sizeof(TmpArtiList) == 0x1008);
 
-static inline MenuTmpArtiMembers& GetMenuTmpArtiMembers(CMenuPcs* menu)
+static inline TmpArtiList* GetTmpArtiList(CMenuPcs* menu)
 {
-    return *reinterpret_cast<MenuTmpArtiMembers*>(menu);
+    return reinterpret_cast<TmpArtiList*>(menu->m_tmpArtiList);
 }
 
-static inline short* GetTmpArtiList(CMenuPcs* menu)
+static inline TmpArtiEntry* GetTmpArtiEntries(CMenuPcs* menu)
 {
-    return GetMenuTmpArtiMembers(menu).m_tmpArtiList;
-}
-
-static inline int GetTmpArtiListBase(CMenuPcs* menu)
-{
-    return reinterpret_cast<int>(GetTmpArtiList(menu));
+    return GetTmpArtiList(menu)->entries;
 }
 
 static inline CFont* GetTmpArtiFont(CMenuPcs* menu)
 {
-    return GetMenuTmpArtiMembers(menu).m_tmpArtiFont;
+    return menu->m_tmpArtiFont;
 }
 } // namespace
 
@@ -164,10 +148,10 @@ void CMenuPcs::TmpArtiDraw()
 	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(&MenuPcs, 0);
 
 	unsigned int scriptFood = Game.m_scriptFoodBase[0];
-	short* entry = (short*)(GetTmpArtiListBase(this) + 8);
+	short* entry = reinterpret_cast<short*>(GetTmpArtiEntries(this));
 	unsigned int foodPtr = scriptFood;
 
-	for (int i = 0; i < *GetTmpArtiList(this); i++) {
+	for (int i = 0; i < GetTmpArtiList(this)->count; i++) {
 		int tex = *(int*)(entry + 0xE);
 		if (tex >= 0) {
 			float alpha = *(float*)(entry + 8);
@@ -199,7 +183,7 @@ void CMenuPcs::TmpArtiDraw()
 		entry += 0x20;
 	}
 
-	entry = GetTmpArtiList(this) + 4;
+	entry = reinterpret_cast<short*>(GetTmpArtiEntries(this));
 	foodPtr = scriptFood;
 	for (int i = 0; i < 4; i++) {
 		short icon = *(short*)(foodPtr + 0x1F6);
@@ -219,7 +203,7 @@ void CMenuPcs::TmpArtiDraw()
 	DrawInit__5CFontFv(font);
 
 	const TmpArtiFlatData* flatData = (const TmpArtiFlatData*)&Game.m_cFlatDataArr[1];
-	entry = (short*)(GetTmpArtiListBase(this) + 8);
+	entry = reinterpret_cast<short*>(GetTmpArtiEntries(this));
 	foodPtr = scriptFood;
 	for (int i = 0; i < 4; i++) {
 		short itemId = *(short*)(foodPtr + 0x1F6);
@@ -279,11 +263,10 @@ unsigned int CMenuPcs::TmpArtiClose()
 			else {
 				*(int *)(psVar4 + 0x10) = *(int *)(psVar4 + 0x10) + 1;
 				dVar3 = DOUBLE_80332f50;
+				double duration = TmpArtiIntToDouble(*(int *)(psVar4 + 0x14));
+				double timer = TmpArtiIntToDouble(*(int *)(psVar4 + 0x10));
 				*(float *)(psVar4 + 8) =
-				    (float)(DOUBLE_80332f48 -
-							(DOUBLE_80332f48 /
-							 TmpArtiIntToDouble(*(int *)(psVar4 + 0x14))) *
-								TmpArtiIntToDouble(*(int *)(psVar4 + 0x10)));
+				    (float)(DOUBLE_80332f48 - (DOUBLE_80332f48 / duration) * timer);
 				if ((double)*(float *)(psVar4 + 8) < dVar3) {
 					*(float *)(psVar4 + 8) = FLOAT_80332f2c;
 				}
@@ -548,9 +531,10 @@ unsigned int CMenuPcs::TmpArtiOpen()
 				}
 				else {
 					*(int *)(psVar7 + 0x10) = *(int *)(psVar7 + 0x10) + 1;
+					double duration = TmpArtiIntToDouble(*(int *)(psVar7 + 0x14));
+					double timer = TmpArtiIntToDouble(*(int *)(psVar7 + 0x10));
 					*(float *)(psVar7 + 8) =
-					    (float)((DOUBLE_80332f48 / (double)*(int *)(psVar7 + 0x14)) *
-					            (double)*(int *)(psVar7 + 0x10));
+					    (float)((DOUBLE_80332f48 / duration) * timer);
 				}
 			}
 			psVar7 = psVar7 + 0x20;

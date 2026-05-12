@@ -150,6 +150,11 @@ enum RedSoundPauseState {
 	REDSOUND_PAUSE_ON = 1,
 };
 
+enum RedSoundReportPrintState {
+	REDSOUND_REPORT_PRINT_OFF = 0,
+	REDSOUND_REPORT_PRINT_ON = 1,
+};
+
 enum RedMusicSkipCompleteState {
 	REDSOUND_MUSIC_SKIP_NOT_COMPLETE = 0,
 	REDSOUND_MUSIC_SKIP_COMPLETE = 1,

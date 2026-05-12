@@ -459,7 +459,7 @@ static int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volum
 	if (waveBase != 0) {
 		c_RedEntry.WaveHistoryManager(REDSOUND_HISTORY_MODE_USE, waveBase->m_waveNo);
 	} else {
-		if (m_ReportPrint != 0) {
+		if (m_ReportPrint != REDSOUND_REPORT_PRINT_OFF) {
 			OSReport(sRedCommandWaveNotEntryFmt, sRedCommandLogPrefix, sRedCommandLogWarnColor,
 			         deltaTime, sRedCommandLogReset);
 			fflush(__files + 1);
@@ -780,7 +780,7 @@ void SePause(int seId, int pause)
 	RedTrackDATA* track;
 	RedVoiceDATA* voice;
 
-	if (m_ReportPrint != 0) {
+	if (m_ReportPrint != REDSOUND_REPORT_PRINT_OFF) {
 		if (pause == REDSOUND_PAUSE_ON) {
 			OSReport(sRedCommandSePauseOnFmt, sRedCommandLogPrefix, seId);
 		} else {
@@ -852,7 +852,7 @@ static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* wav
 
 	RedTrackDATA* track = (RedTrackDATA*)RedNew(musicHead->m_trackCount * REDSOUND_TRACK_SIZE);
 	if (track == 0) {
-		if (m_ReportPrint != 0) {
+		if (m_ReportPrint != REDSOUND_REPORT_PRINT_OFF) {
 			OSReport(sRedCommandMusicTrackCreateErrorFmt,
 			         sRedCommandLogPrefix, sRedCommandLogErrorColor, sRedCommandLogReset);
 			fflush(__files + 1);
@@ -1179,7 +1179,7 @@ void MusicPause(int musicId, int pause)
 	RedSoundCONTROL* music;
 	RedVoiceDATA* voice;
 
-	if (m_ReportPrint != 0) {
+	if (m_ReportPrint != REDSOUND_REPORT_PRINT_OFF) {
 		if (pause == REDSOUND_PAUSE_ON) {
 			OSReport(sRedCommandMusicPauseOnFmt, sRedCommandLogPrefix, musicId);
 		} else {

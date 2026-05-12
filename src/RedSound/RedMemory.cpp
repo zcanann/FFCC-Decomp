@@ -139,7 +139,7 @@ int RedNew(int size)
 	do {
 		if ((slot->m_size == 0) || ((address + size) <= slot->m_address)) {
 			if (m_MemoryBank[REDSOUND_MEMORY_BANK_LAST_INDEX].m_size > 0) {
-				if (m_ReportPrint != 0) {
+				if (m_ReportPrint != REDSOUND_REPORT_PRINT_OFF) {
 					OSReport(s_redMemoryMainBankFullFmt, sRedMemoryLogPrefix, sRedMemoryLogSuffixA,
 					         sRedMemoryLogSuffixB);
 					fflush(__files + 1);
@@ -247,7 +247,7 @@ int RedNewA(int size, int offset, int maxSize)
 		return 0;
 	}
 	if (m_AMemoryBank[REDSOUND_MEMORY_BANK_LAST_INDEX].m_size > 0) {
-		if (m_ReportPrint != 0) {
+		if (m_ReportPrint != REDSOUND_REPORT_PRINT_OFF) {
 			OSReport(s_redMemoryAuxBankFullFmt, sRedMemoryLogPrefix, sRedMemoryLogSuffixA, sRedMemoryLogSuffixB);
 			fflush(__files + 1);
 		}

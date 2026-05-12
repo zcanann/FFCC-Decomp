@@ -1609,7 +1609,7 @@ static void _DMACheckProcess()
 {
     RedDmaRequest* dmaInfo;
 
-    if (m_ReportPrint != 0) {
+    if (m_ReportPrint != REDSOUND_REPORT_PRINT_OFF) {
         OSReport(s_redDriverDmaCheckHeaderFmt, sRedDriverLogPrefix);
         fflush(__files + 1);
 
@@ -1620,7 +1620,7 @@ static void _DMACheckProcess()
 
     dmaInfo = RedDriverMainDmaQueue();
     do {
-        if ((dmaInfo->m_id != 0) && (m_ReportPrint != 0)) {
+        if ((dmaInfo->m_id != 0) && (m_ReportPrint != REDSOUND_REPORT_PRINT_OFF)) {
             OSReport(sRedDriverDmaEntryFmt, sRedDriverLogPrefix,
                      dmaInfo->m_id, dmaInfo->m_mainMemory, dmaInfo->m_aramMemory,
                      dmaInfo->m_size, dmaInfo->m_callback);
@@ -1992,7 +1992,7 @@ void CRedDriver::Init()
 
     m_ThreadExecute = REDSOUND_THREAD_FLAG_NONE;
     m_ThreadControl = REDSOUND_THREAD_CONTROL_RUN;
-    m_ReportPrint = 1;
+    m_ReportPrint = REDSOUND_REPORT_PRINT_ON;
     m_SoundMode = REDSOUND_SOUND_MODE_STEREO;
     GetSoundMode();
     if (m_SoundPlayMode != REDSOUND_SOUND_MODE_SURROUND) {
@@ -2238,7 +2238,7 @@ int CRedDriver::SetMusicData(void* musicData)
             result = localHeader.m_musicNo;
             _EntryExecCommand(_SetMusicData, (int)copiedHeader, 0, 0, 0, 0, 0, 0);
         }
-    } else if (m_ReportPrint != 0) {
+    } else if (m_ReportPrint != REDSOUND_REPORT_PRINT_OFF) {
         OSReport(sRedDriverMusicHeaderErrorFmt, sRedDriverLogPrefix, sRedDriverLogWarnColor, sRedDriverLogReset);
         fflush(__files + 1);
     }
@@ -2708,7 +2708,7 @@ int CRedDriver::SetSeSepData(void* seSepData)
             result = copiedHeader->m_seNo;
             _EntryExecCommand(_SetSeSepData, (int)copiedHeader, 0, 0, 0, 0, 0, 0);
         }
-    } else if (m_ReportPrint != 0) {
+    } else if (m_ReportPrint != REDSOUND_REPORT_PRINT_OFF) {
         OSReport(sRedDriverSeSepHeaderErrorFmt, sRedDriverLogPrefix,
                  sRedDriverLogWarnColor, sRedDriverLogReset);
         fflush(__files + 1);
@@ -2921,7 +2921,7 @@ int CRedDriver::SePlay(void* seSepData, int autoID, int pan, int volume, int pit
         } else {
             result = REDSOUND_SESEP_ID_NONE;
         }
-    } else if (m_ReportPrint != 0) {
+    } else if (m_ReportPrint != REDSOUND_REPORT_PRINT_OFF) {
         OSReport(sRedDriverSeSepHeaderErrorFmt, sRedDriverLogPrefix,
                  sRedDriverLogWarnColor, sRedDriverLogReset);
     }

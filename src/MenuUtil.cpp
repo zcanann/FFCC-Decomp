@@ -3,6 +3,7 @@
 #include "ffcc/game.h"
 #include "ffcc/pad.h"
 #include "ffcc/sound.h"
+#include "ffcc/system.h"
 #include "ffcc/RedSound/RedSound.h"
 #include <string.h>
 #include "ffcc/fontman.h"
@@ -365,20 +366,21 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 	}
 
 	char* temp = reinterpret_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(0x200, stage, s_MenuUtil_cpp_801e37fc, 0x8C));
-	if (temp != nullptr) {
-		for (int i = 0; i < 3; i++) {
-			int msgId = GetMenuHelpMsgTable()[firstLine + i];
-			memset(temp, 0, 0x200);
-			MakeAgbString__4CMesFPcPcii(temp, reinterpret_cast<char*>(msgId), 0, 1);
-			if (strlen(temp) != 0) {
-				int width = drawTagString__4CMesFP5CFontPciii(font, msgId, 0, 0, 0);
-				if (width > maxWidth) {
-					maxWidth = width;
-				}
+	if ((temp == nullptr) && (System.m_execParam != 0)) {
+		System.Printf(s_MenuUtil_cpp_801e37fc + 0x10, s_MenuUtil_cpp_801e37fc, 0x8E);
+	}
+	for (int i = 0; i < 3; i++) {
+		int msgId = GetMenuHelpMsgTable()[firstLine + i];
+		memset(temp, 0, 0x200);
+		MakeAgbString__4CMesFPcPcii(temp, reinterpret_cast<char*>(msgId), 0, 1);
+		if (strlen(temp) != 0) {
+			int width = drawTagString__4CMesFP5CFontPciii(font, msgId, 0, 0, 0);
+			if (width > maxWidth) {
+				maxWidth = width;
 			}
 		}
-		__dla__FPv(temp);
 	}
+	__dla__FPv(temp);
 
 	if ((msgNo < 0x259) || (0x268 < msgNo)) {
 		if (msgNo == 0x209) {
@@ -422,20 +424,21 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 		}
 
 		temp = reinterpret_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(0x200, stage, s_MenuUtil_cpp_801e37fc, 0x23D));
-		if (temp != nullptr) {
-			for (int i = 0; i < 3; i++) {
-				int msgId = GetMenuHelpMsgTable()[firstLine + i];
-				memset(temp, 0, 0x200);
-				MakeAgbString__4CMesFPcPcii(temp, reinterpret_cast<char*>(msgId), 0, 1);
-				if (strlen(temp) == 0) {
-					lineCount--;
-					if (firstNonEmptyLine == firstLine + i) {
-						firstNonEmptyLine++;
-					}
+		if ((temp == nullptr) && (System.m_execParam != 0)) {
+			System.Printf(s_MenuUtil_cpp_801e37fc + 0x10, s_MenuUtil_cpp_801e37fc, 0x23F);
+		}
+		for (int i = 0; i < 3; i++) {
+			int msgId = GetMenuHelpMsgTable()[firstLine + i];
+			memset(temp, 0, 0x200);
+			MakeAgbString__4CMesFPcPcii(temp, reinterpret_cast<char*>(msgId), 0, 1);
+			if (strlen(temp) == 0) {
+				lineCount--;
+				if (firstNonEmptyLine == firstLine + i) {
+					firstNonEmptyLine++;
 				}
 			}
-			__dla__FPv(temp);
 		}
+		__dla__FPv(temp);
 
 		u32 y = lineBaseY[lineCount + drawPrefix - 1];
 		if (drawPrefix != 0) {
@@ -712,12 +715,10 @@ void CMenuPcs::GetOptionData()
 	stereoMode = static_cast<signed char>(static_cast<unsigned int>(__cntlzw(soundModeClz >> 5)) >> 5);
 
 	int value = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Sound) + 0x22B0);
-	value = value / 10 + (value >> 31);
-	bgmVolume = static_cast<signed char>(value - (value >> 31));
+	bgmVolume = static_cast<signed char>(value / 10);
 
 	value = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Sound) + 0x22B4);
-	value = value / 10 + (value >> 31);
-	seVolume = static_cast<signed char>(value - (value >> 31));
+	seVolume = static_cast<signed char>(value / 10);
 
 	unsigned int flag = Game.m_gameWork.m_spModeFlags[0];
 	specialModeFlags[0] = static_cast<signed char>((-flag | flag) >> 31);

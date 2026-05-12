@@ -34,9 +34,10 @@ int g_hit_edge_idx_min;
 float g_hit_t;
 float g_hit_t_min;
 float g_hit_t_slide_min;
-unsigned char g_hit_f;
+CMapHitFace* g_hit_f;
 CMapHitFace* g_hit_lpface;
 CMapHitFace* g_hit_lpface_min;
+int gMapHitFaceFlag;
 
 /*
  * --INFO--
@@ -591,14 +592,14 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
     g_hit_t_min = hitT;
     g_hit_t_slide_min = hitT;
     g_hit_edge_idx_min = edgeIndex;
-    g_hit_lpface_min = g_hit_lpface;
+    g_hit_f = g_hit_lpface;
     g_hit_cyl_min = g_hit_cyl;
     if (gMapHitDrawMode != 0) {
         g_hit_lpface->m_drawFlags = 1;
     }
     g_hit_mvec_min = g_hit_mvec;
     g_hit_hpv_min = g_hit_hpv;
-    g_hit_f = 1;
+    gMapHitFaceFlag = 1;
     return 1;
 }
 

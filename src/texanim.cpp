@@ -663,10 +663,10 @@ void CTexAnimSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
             }
             int* ref = *reinterpret_cast<int**>((int)texAnim + 8);
             if (ref != 0) {
-                int refCount = ref[1];
-                ref[1] = refCount - 1;
-                if ((refCount - 1 == 0) && (ref != 0)) {
-                    (*reinterpret_cast<void (**)(int*, int)>(*ref + 8))(ref, 1);
+                int nextRefCount = ref[1] - 1;
+                ref[1] = nextRefCount;
+                if ((nextRefCount == 0) && (ref != 0)) {
+                    reinterpret_cast<void (**)(int*, int)>(*ref)[2](ref, 1);
                 }
                 *reinterpret_cast<void**>((int)texAnim + 8) = 0;
             }

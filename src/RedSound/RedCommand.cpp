@@ -151,10 +151,9 @@ static void _EraseAttribute(int eraseTrack, int attrMask)
 			(p_VoiceData + trackNo)->m_flags |= REDSOUND_VOICE_FLAGS_RELEASED;
 			(p_VoiceData + trackNo)->m_active = 0;
 
-			c_RedEntry.SeSepHistoryManager(0, track->m_seSepId);
+			c_RedEntry.SeSepHistoryManager(REDSOUND_HISTORY_MODE_RELEASE, track->m_seSepId);
 			if (track->m_waveBankData != 0) {
-				c_RedEntry.WaveHistoryManager(
-				    0, track->m_waveBankData->m_waveNo);
+				c_RedEntry.WaveHistoryManager(REDSOUND_HISTORY_MODE_RELEASE, track->m_waveBankData->m_waveNo);
 			}
 		}
 		track++;
@@ -223,7 +222,7 @@ static int _EraseTime(int eraseTrack)
 			(p_VoiceData + trackNo)->m_active = 0;
 
 			if (track->m_waveBankData != 0) {
-				c_RedEntry.WaveHistoryManager(0, track->m_waveBankData->m_waveNo);
+				c_RedEntry.WaveHistoryManager(REDSOUND_HISTORY_MODE_RELEASE, track->m_waveBankData->m_waveNo);
 			}
 			erasedCount++;
 		}
@@ -231,7 +230,7 @@ static int _EraseTime(int eraseTrack)
 	} while (track < *trackBasePtr + REDSOUND_SE_TRACK_COUNT);
 
 	if (erasedCount != 0) {
-		c_RedEntry.SeSepHistoryManager(0, sepId);
+		c_RedEntry.SeSepHistoryManager(REDSOUND_HISTORY_MODE_RELEASE, sepId);
 	}
 
 	return erasedCount;
@@ -324,9 +323,9 @@ int SeStopID(int seId)
 			(p_VoiceData + trackNo)->m_active = 0;
 
 			if (track->m_waveBankData != 0) {
-				c_RedEntry.WaveHistoryManager(0, track->m_waveBankData->m_waveNo);
+				c_RedEntry.WaveHistoryManager(REDSOUND_HISTORY_MODE_RELEASE, track->m_waveBankData->m_waveNo);
 			}
-			c_RedEntry.SeSepHistoryManager(0, track->m_seSepId);
+			c_RedEntry.SeSepHistoryManager(REDSOUND_HISTORY_MODE_RELEASE, track->m_seSepId);
 		}
 		track++;
 	} while (track < soundControl->m_tracks + REDSOUND_SE_TRACK_COUNT);
@@ -370,9 +369,9 @@ int SeStopG(int group)
 			(p_VoiceData + trackNo)->m_active = 0;
 
 			if (track->m_waveBankData != 0) {
-				c_RedEntry.WaveHistoryManager(0, track->m_waveBankData->m_waveNo);
+				c_RedEntry.WaveHistoryManager(REDSOUND_HISTORY_MODE_RELEASE, track->m_waveBankData->m_waveNo);
 			}
-			c_RedEntry.SeSepHistoryManager(0, track->m_seSepId);
+			c_RedEntry.SeSepHistoryManager(REDSOUND_HISTORY_MODE_RELEASE, track->m_seSepId);
 		}
 		track++;
 	} while (track < soundControl->m_tracks + REDSOUND_SE_TRACK_COUNT);
@@ -418,9 +417,9 @@ int SeStopMG(int bank, int sep, int group, int kind)
 				(p_VoiceData + trackNo)->m_active = 0;
 
 				if (track->m_waveBankData != 0) {
-					c_RedEntry.WaveHistoryManager(0, track->m_waveBankData->m_waveNo);
+					c_RedEntry.WaveHistoryManager(REDSOUND_HISTORY_MODE_RELEASE, track->m_waveBankData->m_waveNo);
 				}
-				c_RedEntry.SeSepHistoryManager(0, track->m_seSepId);
+				c_RedEntry.SeSepHistoryManager(REDSOUND_HISTORY_MODE_RELEASE, track->m_seSepId);
 			}
 		}
 		track++;
@@ -458,7 +457,7 @@ static int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volum
 	            (unsigned int)info->m_waveNoHi * REDSOUND_SE_INFO_U16_HIGH_SCALE;
 	waveBase = c_RedEntry.SearchWaveBase(deltaTime);
 	if (waveBase != 0) {
-		c_RedEntry.WaveHistoryManager(1, waveBase->m_waveNo);
+		c_RedEntry.WaveHistoryManager(REDSOUND_HISTORY_MODE_USE, waveBase->m_waveNo);
 	} else {
 		if (m_ReportPrint != 0) {
 			OSReport(sRedCommandWaveNotEntryFmt, sRedCommandLogPrefix, sRedCommandLogWarnColor,
@@ -657,7 +656,7 @@ int SeSepPlay(int seId, int sepId, int pan, int volume)
 			sepInfo->m_flagsAndCount |= REDSOUND_SE_INFO_MULTI_FLAG;
 		}
 		if (_SePlayStart(sepInfo, seId, sepId, pan, volume) != 0) {
-			c_RedEntry.SeSepHistoryManager(1, sepId);
+			c_RedEntry.SeSepHistoryManager(REDSOUND_HISTORY_MODE_USE, sepId);
 			return sepId;
 		}
 	}
@@ -974,8 +973,8 @@ static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* wav
 		music->m_flags |= REDSOUND_MUSIC_PLAY_FLAG_RELEASE_NOTES;
 	}
 
-	c_RedEntry.WaveHistoryManager(1, music->m_waveNo);
-	c_RedEntry.MusicHistoryManager(1, musicId);
+	c_RedEntry.WaveHistoryManager(REDSOUND_HISTORY_MODE_USE, music->m_waveNo);
+	c_RedEntry.MusicHistoryManager(REDSOUND_HISTORY_MODE_USE, musicId);
 	if (m_MusicSkipLine != 0) {
 		OSSignalSemaphore(&m_MusicSkipSemaphore);
 	}
@@ -1028,8 +1027,8 @@ int MusicStop(int musicId)
 				music->m_trackCount = 0;
 				RedDelete(music->m_tracks);
 				music->m_tracks = 0;
-				c_RedEntry.WaveHistoryManager(0, music->m_waveNo);
-				c_RedEntry.MusicHistoryManager(0, stoppedMusicId);
+				c_RedEntry.WaveHistoryManager(REDSOUND_HISTORY_MODE_RELEASE, music->m_waveNo);
+				c_RedEntry.MusicHistoryManager(REDSOUND_HISTORY_MODE_RELEASE, stoppedMusicId);
 			}
 		}
 		music++;

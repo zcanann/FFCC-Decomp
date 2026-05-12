@@ -1210,7 +1210,7 @@ int CRedEntry::SeSepMemoryFree(RedHistoryBANK* bank)
 	bank->m_data = bank->m_size = 0;
 	bank->m_id = REDSOUND_HISTORY_BANK_EMPTY_ID;
 
-	WaveHistoryManager(0, waveNo);
+	WaveHistoryManager(REDSOUND_HISTORY_MODE_RELEASE, waveNo);
 	return freedSize;
 }
 
@@ -1625,7 +1625,7 @@ int CRedEntry::SearchMusicSequence(int musicNo)
  */
 int CRedEntry::MusicMemoryFree(RedHistoryBANK* bank)
 {
-	WaveHistoryManager(0, bank->m_musicHead->m_waveNo);
+	WaveHistoryManager(REDSOUND_HISTORY_MODE_RELEASE, bank->m_musicHead->m_waveNo);
 	RedDelete(bank->m_address);
 	int freedSize = bank->m_size;
 	bank->m_data = bank->m_size = 0;

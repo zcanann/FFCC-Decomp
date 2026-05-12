@@ -971,8 +971,8 @@ static void __MidiCtrl_Stop(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, R
                 voice++;
             } while (voice < p_VoiceData + REDSOUND_VOICE_COUNT);
 
-            c_RedEntry.MusicHistoryManager(0, control->m_musicId);
-            c_RedEntry.WaveHistoryManager(0, control->m_waveNo);
+            c_RedEntry.MusicHistoryManager(REDSOUND_HISTORY_MODE_RELEASE, control->m_musicId);
+            c_RedEntry.WaveHistoryManager(REDSOUND_HISTORY_MODE_RELEASE, control->m_waveNo);
             control->m_musicId = REDSOUND_MUSIC_ID_NONE;
             control->m_updateFlags = 0;
             RedDelete((int)control->m_tracks);
@@ -980,9 +980,9 @@ static void __MidiCtrl_Stop(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, R
         }
     } else {
         if (track->m_waveBankData != 0) {
-            c_RedEntry.WaveHistoryManager(0, track->m_waveBankData->m_waveNo);
+            c_RedEntry.WaveHistoryManager(REDSOUND_HISTORY_MODE_RELEASE, track->m_waveBankData->m_waveNo);
         }
-        c_RedEntry.SeSepHistoryManager(0, track->m_seSepId);
+        c_RedEntry.SeSepHistoryManager(REDSOUND_HISTORY_MODE_RELEASE, track->m_seSepId);
         track->m_seId = 0;
     }
 }

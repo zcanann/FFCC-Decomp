@@ -59,6 +59,11 @@ enum RedEntryBankLayoutSize {
 	REDSOUND_ENTRY_BANK_ARENA_ALLOC_SIZE = 0x1440,
 };
 
+enum RedHistoryMode {
+	REDSOUND_HISTORY_MODE_RELEASE = 0,
+	REDSOUND_HISTORY_MODE_USE = 1,
+};
+
 enum RedEntryFileLayoutSize {
 	REDSOUND_MUSIC_SIGNATURE_SIZE = 4,
 	REDSOUND_SESEP_SIGNATURE_SIZE = 8,
@@ -347,7 +352,7 @@ public:
 	RedHistoryBANK* GetWaveBank(int waveNo);
 	RedWaveHeadWD* SearchWaveBase(int waveNo);
 	int ReentryWaveData(int waveNo);
-	void WaveHistoryManager(int waveNo, int count);
+	void WaveHistoryManager(int mode, int waveNo);
 	void DisplayWaveInfo();
 
 	void SeSepHistoryAdd();
@@ -362,7 +367,7 @@ public:
 	int ClearSeSepDataMG(int bank, int sep, int group, int kind);
 	RedHistoryBANK* SearchSeSepBank(int seNo);
 	int ReentrySeSepData(int seNo);
-	void SeSepHistoryManager(int seNo, int count);
+	void SeSepHistoryManager(int mode, int seNo);
 	void DisplaySePlayInfo();
 
 	void MusicHistoryAdd();
@@ -374,7 +379,7 @@ public:
 	RedHistoryBANK* MusicOldChoice();
 	RedHistoryBANK* SearchMusicBank(int musicNo);
 	int ReentryMusicData(int musicNo);
-	void MusicHistoryManager(int musicNo, int count);
+	void MusicHistoryManager(int mode, int musicNo);
 	RedMusicHEAD* MusicHeadAdd(RedMusicHEAD* musicHead);
 	RedMusicHEAD* SetMusicData(RedMusicHEAD* musicHead);
 	int ClearMusicData(int musicNo);

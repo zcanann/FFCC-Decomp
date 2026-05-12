@@ -267,10 +267,10 @@ void CMaterialEditorPcs::Init()
  */
 void CMaterialEditorPcs::Quit()
 {
-    unsigned int i = 0;
+    unsigned int i;
     CMaterialEditorPcs* cursor = this;
 
-    *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(this) + 0x3BC) = 0;
+    *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(this) + 0x3BC) = static_cast<unsigned char>(i = 0);
 
     do {
         MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(

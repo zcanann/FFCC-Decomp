@@ -614,7 +614,7 @@ void SetStreamVolume(int streamID, int volume, int frameCount)
 	if (frameCount < 1) {
 		frameCount = 1;
 	} else {
-		frameCount *= REDSOUND_MUSIC_FADE_TICKS_PER_SECOND;
+		frameCount *= REDSOUND_STREAM_FADE_TICKS_PER_SECOND;
 		frameCount /= REDSOUND_FRAMES_PER_SECOND;
 	}
 
@@ -660,7 +660,7 @@ void SetStreamPan(int streamID, int pan, int frameCount)
 	if (frameCount < 1) {
 		frameCount = 1;
 	} else {
-		frameCount *= REDSOUND_MUSIC_FADE_TICKS_PER_SECOND;
+		frameCount *= REDSOUND_STREAM_FADE_TICKS_PER_SECOND;
 		frameCount /= REDSOUND_FRAMES_PER_SECOND;
 	}
 

@@ -106,6 +106,7 @@ enum RedStreamState {
 };
 
 enum RedStreamId {
+    REDSOUND_STREAM_ID_NONE = 0,
     REDSOUND_STREAM_ID_ALL = -1,
 };
 

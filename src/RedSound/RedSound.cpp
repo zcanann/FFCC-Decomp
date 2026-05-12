@@ -169,11 +169,11 @@ static RedSoundStreamBank* _SearchEmptyStreamBank()
 	RedSoundStreamBank* bankEnd = p_StreamBank + REDSOUND_STREAM_BANK_COUNT;
 
 	do {
-		if (bank->m_streamId == 0) {
+		if (bank->m_streamId == REDSOUND_STREAM_ID_NONE) {
 			return bank;
 		}
-		if (c_Driver.StreamPlayState(bank->m_streamId) == 0) {
-			bank->m_streamId = 0;
+		if (c_Driver.StreamPlayState(bank->m_streamId) == REDSOUND_STREAM_ID_NONE) {
+			bank->m_streamId = REDSOUND_STREAM_ID_NONE;
 			bank->m_streamData = 0;
 			bank->m_fileSize = 0;
 			bank->m_readPoint = 0;
@@ -200,7 +200,7 @@ static RedSoundStreamBank* _SearchStreamBank(int streamId)
 	RedSoundStreamBank* bankEnd = p_StreamBank + REDSOUND_STREAM_BANK_COUNT;
 
 	do {
-		if ((bank->m_streamId != 0) && (bank->m_streamId == streamId)) {
+		if ((bank->m_streamId != REDSOUND_STREAM_ID_NONE) && (bank->m_streamId == streamId)) {
 			return bank;
 		}
 		bank++;
@@ -1626,7 +1626,7 @@ void CRedSound::GetStreamReadPoint(int streamId, int* readPoint)
 				readPoint[0] = bank->m_fileSize - bank->m_readPoint;
 				readPoint[1] = bank->m_fileSize - bank->m_playPoint;
 			}
-			bank->m_streamId = 0;
+			bank->m_streamId = REDSOUND_STREAM_ID_NONE;
 			bank->m_streamData = 0;
 			bank->m_fileSize = 0;
 			bank->m_readPoint = 0;

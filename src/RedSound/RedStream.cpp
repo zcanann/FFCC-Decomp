@@ -188,7 +188,7 @@ static RedStreamDATA* _SearchEmptyStreamData()
 	RedStreamDATA* streamData = p_Stream;
 
 	for (;;) {
-		if (streamData->m_streamId == 0) {
+		if (streamData->m_streamId == REDSOUND_STREAM_ID_NONE) {
 			return streamData;
 		}
 
@@ -212,8 +212,8 @@ static RedStreamDATA* _SearchEmptyStreamData()
 static void _StreamStop(RedStreamDATA* streamData)
 {
 	fflush(__files + 1);
-	if (streamData->m_streamId != 0) {
-		streamData->m_streamId = 0;
+	if (streamData->m_streamId != REDSOUND_STREAM_ID_NONE) {
+		streamData->m_streamId = REDSOUND_STREAM_ID_NONE;
 		streamData->m_state = REDSOUND_STREAM_STATE_STOPPED;
 		if (streamData->m_buffer != 0) {
 			RedDelete(streamData->m_buffer);
@@ -434,7 +434,7 @@ void StreamStop(int streamID)
 	volatile RedStreamDATA* streamData = p_Stream;
 
 	do {
-		if ((streamData->m_streamId != 0) &&
+		if ((streamData->m_streamId != REDSOUND_STREAM_ID_NONE) &&
 		    ((streamID == REDSOUND_STREAM_ID_ALL) || (streamID == streamData->m_streamId))) {
 			_StreamStop((RedStreamDATA*)streamData);
 		}
@@ -629,7 +629,7 @@ void SetStreamVolume(int streamID, int volume, int frameCount)
 
 	streamData = p_Stream;
 	do {
-		if ((streamData->m_streamId != 0) &&
+		if ((streamData->m_streamId != REDSOUND_STREAM_ID_NONE) &&
 		    ((streamID == REDSOUND_STREAM_ID_ALL) || (streamID == streamData->m_streamId))) {
 			if (frameCount > 0) {
 				int delta = volume - streamData->m_volume.m_value;
@@ -669,7 +669,7 @@ void SetStreamPan(int streamID, int pan, int frameCount)
 	pan |= REDSOUND_FIXED_HALF;
 	streamData = p_Stream;
 	do {
-		if ((streamData->m_streamId != 0) &&
+		if ((streamData->m_streamId != REDSOUND_STREAM_ID_NONE) &&
 		    ((streamID == REDSOUND_STREAM_ID_ALL) || (streamID == streamData->m_streamId))) {
 			if (frameCount > 0) {
 				int delta = pan - streamData->m_pan.m_value;
@@ -710,7 +710,7 @@ void StreamPause(int streamID, int pause)
 	}
 	streamData = p_Stream;
 	do {
-		if ((streamData->m_streamId != 0) &&
+		if ((streamData->m_streamId != REDSOUND_STREAM_ID_NONE) &&
 		    ((streamID == REDSOUND_STREAM_ID_ALL) || (streamID == streamData->m_streamId))) {
 			voiceData = streamData->m_voiceData;
 			if (pause == REDSOUND_PAUSE_ON) {

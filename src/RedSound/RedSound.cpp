@@ -1157,7 +1157,8 @@ void CRedSound::StreamStop(int streamID)
 int CRedSound::StreamStandby(void* streamHeader, int fileSize)
 {
 	int streamId = 0;
-	RedStreamHEAD* header = (RedStreamHEAD*)streamHeader;
+	RedStreamFile* streamFile = reinterpret_cast<RedStreamFile*>(streamHeader);
+	RedStreamHEAD* header = &streamFile->m_header;
 
 	if (header->m_signature[0] == REDSOUND_STREAM_SIGNATURE_0 &&
 	    header->m_signature[1] == REDSOUND_STREAM_SIGNATURE_1 &&
@@ -1166,7 +1167,7 @@ int CRedSound::StreamStandby(void* streamHeader, int fileSize)
 		if (bank != 0) {
 			streamId = GetAutoID();
 			bank->m_streamId = streamId;
-			bank->m_streamData = reinterpret_cast<RedStreamFile*>(streamHeader);
+			bank->m_streamData = streamFile;
 			bank->m_fileSize = fileSize;
 			bank->m_readPoint = bank->m_playPoint = 0;
 			bank->m_reserved14 = 0;

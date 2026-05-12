@@ -295,14 +295,15 @@ CMapHit::~CMapHit()
 void CMapHit::ReadOtmHit(CChunkFile& chunkFile)
 {
     CChunkFile::CChunk chunk;
-    CMemory::CStage* const stage = *reinterpret_cast<CMemory::CStage**>(&MapMng);
 
     chunkFile.PushChunk();
 
     while (chunkFile.GetNextChunk(chunk)) {
         if (chunk.m_id == 'HITV') {
             m_vertexCount = static_cast<unsigned short>(chunk.m_arg0);
-            m_vertices = new (stage, const_cast<char*>(s_maphit_cpp), 0x143) Vec[m_vertexCount];
+            m_vertices =
+                new (*reinterpret_cast<CMemory::CStage**>(&MapMng), const_cast<char*>(s_maphit_cpp), 0x143)
+                    Vec[m_vertexCount];
 
             for (unsigned int i = 0; i < m_vertexCount; i++) {
                 Vec& v = m_vertices[i];
@@ -339,7 +340,9 @@ void CMapHit::ReadOtmHit(CChunkFile& chunkFile)
             m_positionMax.z += 0.1f;
         } else if (chunk.m_id == 'HITF') {
             m_faceCount = static_cast<unsigned short>(chunk.m_arg0);
-            m_faces = new (stage, const_cast<char*>(s_maphit_cpp), 0x159) CMapHitFace[m_faceCount];
+            m_faces =
+                new (*reinterpret_cast<CMemory::CStage**>(&MapMng), const_cast<char*>(s_maphit_cpp), 0x159)
+                    CMapHitFace[m_faceCount];
 
             for (unsigned int faceIdx = 0; faceIdx < m_faceCount; faceIdx++) {
                 chunkFile.Align(4);

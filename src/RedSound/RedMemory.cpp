@@ -94,7 +94,6 @@ STATIC_ASSERT(sizeof(m_DataBuffer) + sizeof(m_ADataBuffer) + sizeof(m_DataBuffer
  */
 CRedMemory::CRedMemory()
 {
-	// TODO
 }
 
 /*
@@ -221,6 +220,53 @@ void RedDelete(int address)
 void RedDelete(void* address)
 {
 	RedDelete((int)address);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 176b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int RedResize(int address, int size)
+{
+	RedMemoryBlock* blockPtr;
+
+	if ((address == 0) || (m_MemoryBank == 0)) {
+		return 0;
+	}
+
+	size += REDSOUND_MEMORY_BANK_ALIGN_MASK;
+	size &= ~REDSOUND_MEMORY_BANK_ALIGN_MASK;
+	blockPtr = m_MemoryBank;
+
+	while ((blockPtr->m_size != 0) && (blockPtr < m_MemoryBank + REDSOUND_MEMORY_BANK_BLOCK_COUNT)) {
+		if (blockPtr->m_address == address) {
+			blockPtr->m_size = size;
+			return address;
+		}
+
+		blockPtr++;
+	}
+
+	return 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 48b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void* RedResize(void* address, int size)
+{
+	return (void*)RedResize((int)address, size);
 }
 
 /*
@@ -369,6 +415,53 @@ void RedDeleteA(void* address)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 176b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int RedResizeA(int address, int size)
+{
+	RedMemoryBlock* blockPtr;
+
+	if ((address == 0) || (m_AMemoryBank == 0)) {
+		return 0;
+	}
+
+	size += REDSOUND_MEMORY_BANK_ALIGN_MASK;
+	size &= ~REDSOUND_MEMORY_BANK_ALIGN_MASK;
+	blockPtr = m_AMemoryBank;
+
+	while ((blockPtr->m_size != 0) && (blockPtr < m_AMemoryBank + REDSOUND_MEMORY_BANK_BLOCK_COUNT)) {
+		if (blockPtr->m_address == address) {
+			blockPtr->m_size = size;
+			return address;
+		}
+
+		blockPtr++;
+	}
+
+	return 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 48b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void* RedResizeA(void* address, int size)
+{
+	return (void*)RedResizeA((int)address, size);
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x801c0528
  * PAL Size: 160b
  * EN Address: TODO
@@ -384,8 +477,8 @@ void CRedMemory::Init(int mainBuffer, int mainBufferSize, int auxBuffer, int aux
 
 	m_MemoryBank = (RedMemoryBlock*)mainBuffer;
 	m_AMemoryBank = (RedMemoryBlock*)((int)m_MemoryBank + bankSize);
-	m_DataBufferSize = mainBufferSize - bankSize * REDSOUND_MEMORY_BANK_TABLE_COUNT;
 	m_DataBuffer = (int)m_AMemoryBank + bankSize;
+	m_DataBufferSize = mainBufferSize - bankSize * REDSOUND_MEMORY_BANK_TABLE_COUNT;
 	memset(m_MemoryBank, 0, bankSize);
 	memset(m_AMemoryBank, 0, bankSize);
 	m_ADataBuffer = auxBuffer;

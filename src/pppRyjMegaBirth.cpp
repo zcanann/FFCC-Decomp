@@ -670,7 +670,7 @@ void calc(
 		float angleWrap = FLOAT_80330458;
 		volatile float* angle = f32_at(particlePayload, 0x28);
 		angleMin = FLOAT_80330460;
-		while (*angle < angleMin)
+		while (angleMin > *angle)
 		{
 			*angle = *angle + angleWrap;
 		}
@@ -704,11 +704,11 @@ void calc(
 		}
 		else
 		{
-			float zero = kPppRyjMegaBirthZero;
-			if ((*f32_at(paramPayload, 0xC0) < zero) && (zero < *f32_at(paramPayload, 0xC4)) &&
-			    (zero < *f32_at(particlePayload, 0x4C)))
+			if ((*f32_at(paramPayload, 0xC0) < kPppRyjMegaBirthZero) &&
+			    (kPppRyjMegaBirthZero < *f32_at(paramPayload, 0xC4)) &&
+			    (kPppRyjMegaBirthZero < *f32_at(particlePayload, 0x4C)))
 			{
-				*f32_at(particlePayload, 0x4C) = zero;
+				*f32_at(particlePayload, 0x4C) = kPppRyjMegaBirthZero;
 			}
 		}
 	}
@@ -765,6 +765,8 @@ void birth(
 	payload = (u8*)param;
 	particlePayload = (u8*)particle;
 	mode = payload[0x2A];
+	float spread = (float)payload[0x2B];
+	float range = FLOAT_80330470 * spread;
 
 	memset(particle, 0, 0x60);
 	if (worldMat != NULL) {
@@ -777,30 +779,26 @@ void birth(
 	if (mode < 8) {
 		Vec baseDirection;
 		Vec* direction;
-		pppIVECTOR4 angle;
+		s32 angle[4];
 		pppFMATRIX rot;
-		float spread;
-		float range;
 
 		baseDirection.x = *f32_at(payload, 0xA0);
 		baseDirection.y = *f32_at(payload, 0xA4);
 		baseDirection.z = *f32_at(payload, 0xA8);
-		spread = (float)payload[0x2B];
-		range = FLOAT_80330470 * spread;
 
-		angle.x = (s16)(range * Math.RandF() - spread);
-		angle.y = (s16)(range * Math.RandF() - spread);
-		angle.z = (s16)(range * Math.RandF() - spread);
-		angle.w = 0;
+		angle[0] = (s32)((float)((s32)(range * Math.RandF() - spread) << 15) / FLOAT_8033045c);
+		angle[1] = (s32)((float)((s32)(range * Math.RandF() - spread) << 15) / FLOAT_8033045c);
+		angle[2] = (s32)((float)((s32)(range * Math.RandF() - spread) << 15) / FLOAT_8033045c);
+		angle[3] = 0;
 
 		if ((mode == 2) || (mode == 3)) {
-			angle.x = 0;
-			angle.y = 0;
-			angle.z = 0;
-			angle.w = 0;
+			angle[0] = 0;
+			angle[1] = 0;
+			angle[2] = 0;
+			angle[3] = 0;
 		}
 
-		pppGetRotMatrixXYZ(rot, &angle);
+		pppGetRotMatrixXYZ(rot, (pppIVECTOR4*)angle);
 		direction = (Vec*)(particlePayload + 0x10);
 		PSMTXMultVecSR(rot.value, &baseDirection, direction);
 		direction->x = direction->x * *f32_at(payload, 0xB0);

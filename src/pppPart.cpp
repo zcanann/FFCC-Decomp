@@ -1092,231 +1092,255 @@ void pppSetMatrix(_pppMngSt* pppMngSt)
 		break;
 	}
 
-	if (pppMngSt->m_matrixMode == 5) {
-		if (pppMngSt->m_bindNode == 0) {
-			goto LocalOnly;
-		}
-
-		if (pppMngSt->m_ownerFacing == 0) {
-			u8* ownerBytes = reinterpret_cast<u8*>(pppMngSt->m_owner);
-			pppMngSt->m_ownerFacing = static_cast<u8>(static_cast<int>(static_cast<u32>(ownerBytes[0x9A]) << 25) >> 31);
-		}
-
-		if (pppMngSt->m_ownerFlagsInitialized == 0) {
-			u8 visible = 0;
-			u32 flags = *reinterpret_cast<u32*>(reinterpret_cast<u8*>(pppMngSt->m_owner) + 0x60);
-			if ((flags & 1) != 0 && (flags & 0x400000) == 0) {
-				visible = 1;
-			}
-			pppMngSt->m_slotVisible = visible;
-		}
-
-		if (pppMngSt->m_nodeScaleInitialized == 0) {
-			u8* ownerBytes = reinterpret_cast<u8*>(pppMngSt->m_owner);
-			int ownerData = *reinterpret_cast<int*>(ownerBytes + 0xF8);
-			int hasModelScale = 0;
-			if (ownerData != 0 && *reinterpret_cast<int*>(reinterpret_cast<u8*>(ownerData) + 0x168) != 0) {
-				hasModelScale = 1;
-			}
-			if (hasModelScale != 0) {
-				pppMngSt->m_ownerScale = *reinterpret_cast<float*>(
-				    reinterpret_cast<u8*>(*reinterpret_cast<int*>(reinterpret_cast<u8*>(ownerData) + 0x168)) + 0x9C);
-			} else {
-				pppMngSt->m_ownerScale = *reinterpret_cast<float*>(ownerBytes + 0x4B0);
-			}
-			if (DOUBLE_8032fdf0 == static_cast<double>(pppMngSt->m_ownerScale)) {
-				pppMngSt->m_useOwnerScaleSign = 1;
-			} else if (DOUBLE_8032fe00 == static_cast<double>(pppMngSt->m_ownerScale)) {
-				pppMngSt->m_useOwnerScaleSign = 0;
-			} else {
-				pppMngSt->m_useOwnerScaleSign = 1;
-			}
-		}
-
-		CalcSafeNodeWorldMatrix__Q26CChara6CModelFPA4_fPQ26CChara5CNode(
-		    *reinterpret_cast<void**>(*reinterpret_cast<int*>(reinterpret_cast<u8*>(pppMngSt->m_owner) + 0xF8) + 0x168),
-		    nodeMtx, pppMngSt->m_bindNode);
-
-		nodeMtx[0][3] += pppMngStPtr->m_position.x;
-		nodeMtx[1][3] += pppMngStPtr->m_position.y;
-		nodeMtx[2][3] += pppMngStPtr->m_position.z;
-		PSMTXConcat(nodeMtx, pppMngStPtr->m_matrix.value, pppMngStPtr->m_matrix.value);
-	} else if (pppMngSt->m_matrixMode < 5) {
-		if (pppMngSt->m_matrixMode == 3) {
-			if (pppMngSt->m_bindNode == 0) {
-				goto LocalOnly;
-			}
-
-			if (pppMngSt->m_ownerFacing == 0) {
-				u8* ownerBytes = reinterpret_cast<u8*>(pppMngSt->m_owner);
-				pppMngSt->m_ownerFacing = static_cast<u8>(static_cast<int>(static_cast<u32>(ownerBytes[0x9A]) << 25) >> 31);
-			}
-
-			if (pppMngSt->m_ownerFlagsInitialized == 0) {
-				u8 visible = 0;
-				u32 flags = *reinterpret_cast<u32*>(reinterpret_cast<u8*>(pppMngSt->m_owner) + 0x60);
-				if ((flags & 1) != 0 && (flags & 0x400000) == 0) {
-					visible = 1;
-				}
-				pppMngSt->m_slotVisible = visible;
-			}
-
-			if (pppMngSt->m_nodeScaleInitialized == 0) {
-				u8* ownerBytes = reinterpret_cast<u8*>(pppMngSt->m_owner);
-				int ownerData = *reinterpret_cast<int*>(ownerBytes + 0xF8);
-				int hasModelScale = 0;
-				if (ownerData != 0 && *reinterpret_cast<int*>(reinterpret_cast<u8*>(ownerData) + 0x168) != 0) {
-					hasModelScale = 1;
-				}
-				if (hasModelScale != 0) {
-					pppMngSt->m_ownerScale = *reinterpret_cast<float*>(
-					    reinterpret_cast<u8*>(*reinterpret_cast<int*>(reinterpret_cast<u8*>(ownerData) + 0x168)) + 0x9C);
-				} else {
-					pppMngSt->m_ownerScale = *reinterpret_cast<float*>(ownerBytes + 0x4B0);
-				}
-				if (DOUBLE_8032fdf0 == static_cast<double>(pppMngSt->m_ownerScale)) {
-					pppMngSt->m_useOwnerScaleSign = 1;
-				} else if (DOUBLE_8032fe00 == static_cast<double>(pppMngSt->m_ownerScale)) {
-					pppMngSt->m_useOwnerScaleSign = 0;
-				} else {
-					pppMngSt->m_useOwnerScaleSign = 1;
-				}
-			}
-
-			CalcSafeNodeWorldMatrix__Q26CChara6CModelFPA4_fPQ26CChara5CNode(
-			    *reinterpret_cast<void**>(*reinterpret_cast<int*>(reinterpret_cast<u8*>(pppMngSt->m_owner) + 0xF8) + 0x168),
-			    nodeMtx, pppMngSt->m_bindNode);
-
-			PSMTXMultVecSR(nodeMtx, &pppMngStPtr->m_position, &tmpPos);
-			nodeMtx[0][3] += tmpPos.x;
-			nodeMtx[1][3] += tmpPos.y;
-			nodeMtx[2][3] += tmpPos.z;
-			PSMTXConcat(nodeMtx, pppMngStPtr->m_matrix.value, pppMngStPtr->m_matrix.value);
-		} else {
-			if (pppMngSt->m_matrixMode > 2) {
-				MapMng.GetMapObjWMtx(pppMngSt->m_mapObjIndex, nodeMtx);
-				nodeMtx[0][3] += pppMngStPtr->m_position.x;
-				nodeMtx[1][3] += pppMngStPtr->m_position.y;
-				nodeMtx[2][3] += pppMngStPtr->m_position.z;
-				PSMTXConcat(nodeMtx, pppMngStPtr->m_matrix.value, pppMngStPtr->m_matrix.value);
-			} else {
-				if (pppMngSt->m_matrixMode < 2 || pppMngSt->m_mapObjIndex == -1) {
-					goto LocalOnly;
-				}
-				MapMng.GetMapObjWMtx(pppMngSt->m_mapObjIndex, nodeMtx);
-				PSMTXMultVecSR(nodeMtx, &pppMngStPtr->m_position, &tmpPos);
-				nodeMtx[0][3] += tmpPos.x;
-				nodeMtx[1][3] += tmpPos.y;
-				nodeMtx[2][3] += tmpPos.z;
-				PSMTXConcat(nodeMtx, pppMngStPtr->m_matrix.value, pppMngStPtr->m_matrix.value);
-			}
-		}
-	} else {
-		if (pppMngSt->m_matrixMode == 7) {
-			if (pppMngSt->m_bindNode == 0) {
-				goto LocalOnly;
-			}
-
-			if (pppMngSt->m_ownerFacing == 0) {
-				u8* ownerBytes = reinterpret_cast<u8*>(pppMngSt->m_owner);
-				pppMngSt->m_ownerFacing = static_cast<u8>(static_cast<int>(static_cast<u32>(ownerBytes[0x9A]) << 25) >> 31);
-			}
-
-			if (pppMngSt->m_ownerFlagsInitialized == 0) {
-				u8 visible = 0;
-				u32 flags = *reinterpret_cast<u32*>(reinterpret_cast<u8*>(pppMngSt->m_owner) + 0x60);
-				if ((flags & 1) != 0 && (flags & 0x400000) == 0) {
-					visible = 1;
-				}
-				pppMngSt->m_slotVisible = visible;
-			}
-
-			if (pppMngSt->m_nodeScaleInitialized == 0) {
-				u8* ownerBytes = reinterpret_cast<u8*>(pppMngSt->m_owner);
-				int ownerData = *reinterpret_cast<int*>(ownerBytes + 0xF8);
-				int hasModelScale = 0;
-				if (ownerData != 0 && *reinterpret_cast<int*>(reinterpret_cast<u8*>(ownerData) + 0x168) != 0) {
-					hasModelScale = 1;
-				}
-				if (hasModelScale != 0) {
-					pppMngSt->m_ownerScale = *reinterpret_cast<float*>(
-					    reinterpret_cast<u8*>(*reinterpret_cast<int*>(reinterpret_cast<u8*>(ownerData) + 0x168)) + 0x9C);
-				} else {
-					pppMngSt->m_ownerScale = *reinterpret_cast<float*>(ownerBytes + 0x4B0);
-				}
-				if (DOUBLE_8032fdf0 == static_cast<double>(pppMngSt->m_ownerScale)) {
-					pppMngSt->m_useOwnerScaleSign = 1;
-				} else if (DOUBLE_8032fe00 == static_cast<double>(pppMngSt->m_ownerScale)) {
-					pppMngSt->m_useOwnerScaleSign = 0;
-				} else {
-					pppMngSt->m_useOwnerScaleSign = 1;
-				}
-			}
-
-			CalcSafeNodeWorldMatrix__Q26CChara6CModelFPA4_fPQ26CChara5CNode(
-			    *reinterpret_cast<void**>(*reinterpret_cast<int*>(reinterpret_cast<u8*>(pppMngSt->m_owner) + 0xF8) + 0x168),
-			    nodeMtx, pppMngSt->m_bindNode);
-
-			PSMTXMultVecSR(nodeMtx, &pppMngStPtr->m_position, &tmpPos);
-			pppMngStPtr->m_matrix.value[0][3] = nodeMtx[0][3] + tmpPos.x;
-			pppMngStPtr->m_matrix.value[1][3] = nodeMtx[1][3] + tmpPos.y;
-			pppMngStPtr->m_matrix.value[2][3] = nodeMtx[2][3] + tmpPos.z;
-			goto ScaleOnly;
-		}
-
-		if (pppMngSt->m_matrixMode > 6 || pppMngSt->m_bindNode == 0) {
-			goto LocalOnly;
-		}
-
-		if (pppMngSt->m_ownerFacing == 0) {
-			u8* ownerBytes = reinterpret_cast<u8*>(pppMngSt->m_owner);
-			pppMngSt->m_ownerFacing = static_cast<u8>(static_cast<int>(static_cast<u32>(ownerBytes[0x9A]) << 25) >> 31);
-		}
-
-		if (pppMngSt->m_ownerFlagsInitialized == 0) {
-			u8 visible = 0;
-			u32 flags = *reinterpret_cast<u32*>(reinterpret_cast<u8*>(pppMngSt->m_owner) + 0x60);
-			if ((flags & 1) != 0 && (flags & 0x400000) == 0) {
-				visible = 1;
-			}
-			pppMngSt->m_slotVisible = visible;
-		}
-
-		if (pppMngSt->m_nodeScaleInitialized == 0) {
-			u8* ownerBytes = reinterpret_cast<u8*>(pppMngSt->m_owner);
-			int ownerData = *reinterpret_cast<int*>(ownerBytes + 0xF8);
-			int hasModelScale = 0;
-			if (ownerData != 0 && *reinterpret_cast<int*>(reinterpret_cast<u8*>(ownerData) + 0x168) != 0) {
-				hasModelScale = 1;
-			}
-			if (hasModelScale != 0) {
-				pppMngSt->m_ownerScale = *reinterpret_cast<float*>(
-				    reinterpret_cast<u8*>(*reinterpret_cast<int*>(reinterpret_cast<u8*>(ownerData) + 0x168)) + 0x9C);
-			} else {
-				pppMngSt->m_ownerScale = *reinterpret_cast<float*>(ownerBytes + 0x4B0);
-			}
-			if (DOUBLE_8032fdf0 == static_cast<double>(pppMngSt->m_ownerScale)) {
-				pppMngSt->m_useOwnerScaleSign = 1;
-			} else if (DOUBLE_8032fe00 == static_cast<double>(pppMngSt->m_ownerScale)) {
-				pppMngSt->m_useOwnerScaleSign = 0;
-			} else {
-				pppMngSt->m_useOwnerScaleSign = 1;
-			}
-		}
-
-		CalcSafeNodeWorldMatrix__Q26CChara6CModelFPA4_fPQ26CChara5CNode(
-		    *reinterpret_cast<void**>(*reinterpret_cast<int*>(reinterpret_cast<u8*>(pppMngSt->m_owner) + 0xF8) + 0x168),
-		    nodeMtx, pppMngSt->m_bindNode);
-
-		PSVECNormalize(reinterpret_cast<Vec*>(nodeMtx[0]), reinterpret_cast<Vec*>(nodeMtx[0]));
-		PSVECNormalize(reinterpret_cast<Vec*>(nodeMtx[1]), reinterpret_cast<Vec*>(nodeMtx[1]));
-		PSVECNormalize(reinterpret_cast<Vec*>(nodeMtx[2]), reinterpret_cast<Vec*>(nodeMtx[2]));
-		PSMTXMultVecSR(nodeMtx, &pppMngStPtr->m_position, &tmpPos);
-		nodeMtx[0][3] += tmpPos.x;
-		nodeMtx[1][3] += tmpPos.y;
-		nodeMtx[2][3] += tmpPos.z;
-		PSMTXConcat(nodeMtx, pppMngStPtr->m_matrix.value, pppMngStPtr->m_matrix.value);
+	int matrixMode = pppMngSt->m_matrixMode;
+	if (matrixMode == 5) {
+		goto MatrixMode5;
 	}
+	if (matrixMode >= 5) {
+		goto MatrixModeHigh;
+	}
+	if (matrixMode == 3) {
+		goto MatrixMode3;
+	}
+	if (matrixMode >= 3) {
+		goto MatrixMode4;
+	}
+	if (matrixMode >= 2) {
+		goto MatrixMode2;
+	}
+	goto LocalOnly;
+
+MatrixMode2:
+	if (pppMngSt->m_mapObjIndex == -1) {
+		goto LocalOnly;
+	}
+	MapMng.GetMapObjWMtx(pppMngSt->m_mapObjIndex, nodeMtx);
+	PSMTXMultVecSR(nodeMtx, &pppMngStPtr->m_position, &tmpPos);
+	nodeMtx[0][3] += tmpPos.x;
+	nodeMtx[1][3] += tmpPos.y;
+	nodeMtx[2][3] += tmpPos.z;
+	PSMTXConcat(nodeMtx, pppMngStPtr->m_matrix.value, pppMngStPtr->m_matrix.value);
+	goto ScaleOnly;
+
+MatrixMode3:
+	if (pppMngSt->m_bindNode == 0) {
+		goto LocalOnly;
+	}
+
+	if (pppMngSt->m_ownerFacing == 0) {
+		u8* ownerBytes = reinterpret_cast<u8*>(pppMngSt->m_owner);
+		pppMngSt->m_ownerFacing = static_cast<u8>(static_cast<int>(static_cast<u32>(ownerBytes[0x9A]) << 25) >> 31);
+	}
+
+	if (pppMngSt->m_ownerFlagsInitialized == 0) {
+		u8 visible = 0;
+		u32 flags = *reinterpret_cast<u32*>(reinterpret_cast<u8*>(pppMngSt->m_owner) + 0x60);
+		if ((flags & 1) != 0 && (flags & 0x400000) == 0) {
+			visible = 1;
+		}
+		pppMngSt->m_slotVisible = visible;
+	}
+
+	if (pppMngSt->m_nodeScaleInitialized == 0) {
+		u8* ownerBytes = reinterpret_cast<u8*>(pppMngSt->m_owner);
+		int ownerData = *reinterpret_cast<int*>(ownerBytes + 0xF8);
+		int hasModelScale = 0;
+		if (ownerData != 0 && *reinterpret_cast<int*>(reinterpret_cast<u8*>(ownerData) + 0x168) != 0) {
+			hasModelScale = 1;
+		}
+		if (hasModelScale != 0) {
+			pppMngSt->m_ownerScale = *reinterpret_cast<float*>(
+			    reinterpret_cast<u8*>(*reinterpret_cast<int*>(reinterpret_cast<u8*>(ownerData) + 0x168)) + 0x9C);
+		} else {
+			pppMngSt->m_ownerScale = *reinterpret_cast<float*>(ownerBytes + 0x4B0);
+		}
+		if (DOUBLE_8032fdf0 == static_cast<double>(pppMngSt->m_ownerScale)) {
+			pppMngSt->m_useOwnerScaleSign = 1;
+		} else if (DOUBLE_8032fe00 == static_cast<double>(pppMngSt->m_ownerScale)) {
+			pppMngSt->m_useOwnerScaleSign = 0;
+		} else {
+			pppMngSt->m_useOwnerScaleSign = 1;
+		}
+	}
+
+	CalcSafeNodeWorldMatrix__Q26CChara6CModelFPA4_fPQ26CChara5CNode(
+	    *reinterpret_cast<void**>(*reinterpret_cast<int*>(reinterpret_cast<u8*>(pppMngSt->m_owner) + 0xF8) + 0x168),
+	    nodeMtx, pppMngSt->m_bindNode);
+
+	PSMTXMultVecSR(nodeMtx, &pppMngStPtr->m_position, &tmpPos);
+	nodeMtx[0][3] += tmpPos.x;
+	nodeMtx[1][3] += tmpPos.y;
+	nodeMtx[2][3] += tmpPos.z;
+	PSMTXConcat(nodeMtx, pppMngStPtr->m_matrix.value, pppMngStPtr->m_matrix.value);
+	goto ScaleOnly;
+
+MatrixMode4:
+	MapMng.GetMapObjWMtx(pppMngSt->m_mapObjIndex, nodeMtx);
+	nodeMtx[0][3] += pppMngStPtr->m_position.x;
+	nodeMtx[1][3] += pppMngStPtr->m_position.y;
+	nodeMtx[2][3] += pppMngStPtr->m_position.z;
+	PSMTXConcat(nodeMtx, pppMngStPtr->m_matrix.value, pppMngStPtr->m_matrix.value);
+	goto ScaleOnly;
+
+MatrixMode5:
+	if (pppMngSt->m_bindNode == 0) {
+		goto LocalOnly;
+	}
+
+	if (pppMngSt->m_ownerFacing == 0) {
+		u8* ownerBytes = reinterpret_cast<u8*>(pppMngSt->m_owner);
+		pppMngSt->m_ownerFacing = static_cast<u8>(static_cast<int>(static_cast<u32>(ownerBytes[0x9A]) << 25) >> 31);
+	}
+
+	if (pppMngSt->m_ownerFlagsInitialized == 0) {
+		u8 visible = 0;
+		u32 flags = *reinterpret_cast<u32*>(reinterpret_cast<u8*>(pppMngSt->m_owner) + 0x60);
+		if ((flags & 1) != 0 && (flags & 0x400000) == 0) {
+			visible = 1;
+		}
+		pppMngSt->m_slotVisible = visible;
+	}
+
+	if (pppMngSt->m_nodeScaleInitialized == 0) {
+		u8* ownerBytes = reinterpret_cast<u8*>(pppMngSt->m_owner);
+		int ownerData = *reinterpret_cast<int*>(ownerBytes + 0xF8);
+		int hasModelScale = 0;
+		if (ownerData != 0 && *reinterpret_cast<int*>(reinterpret_cast<u8*>(ownerData) + 0x168) != 0) {
+			hasModelScale = 1;
+		}
+		if (hasModelScale != 0) {
+			pppMngSt->m_ownerScale = *reinterpret_cast<float*>(
+			    reinterpret_cast<u8*>(*reinterpret_cast<int*>(reinterpret_cast<u8*>(ownerData) + 0x168)) + 0x9C);
+		} else {
+			pppMngSt->m_ownerScale = *reinterpret_cast<float*>(ownerBytes + 0x4B0);
+		}
+		if (DOUBLE_8032fdf0 == static_cast<double>(pppMngSt->m_ownerScale)) {
+			pppMngSt->m_useOwnerScaleSign = 1;
+		} else if (DOUBLE_8032fe00 == static_cast<double>(pppMngSt->m_ownerScale)) {
+			pppMngSt->m_useOwnerScaleSign = 0;
+		} else {
+			pppMngSt->m_useOwnerScaleSign = 1;
+		}
+	}
+
+	CalcSafeNodeWorldMatrix__Q26CChara6CModelFPA4_fPQ26CChara5CNode(
+	    *reinterpret_cast<void**>(*reinterpret_cast<int*>(reinterpret_cast<u8*>(pppMngSt->m_owner) + 0xF8) + 0x168),
+	    nodeMtx, pppMngSt->m_bindNode);
+
+	nodeMtx[0][3] += pppMngStPtr->m_position.x;
+	nodeMtx[1][3] += pppMngStPtr->m_position.y;
+	nodeMtx[2][3] += pppMngStPtr->m_position.z;
+	PSMTXConcat(nodeMtx, pppMngStPtr->m_matrix.value, pppMngStPtr->m_matrix.value);
+	goto ScaleOnly;
+
+MatrixModeHigh:
+	if (matrixMode == 7) {
+		goto MatrixMode7;
+	}
+	if (matrixMode >= 7 || pppMngSt->m_bindNode == 0) {
+		goto LocalOnly;
+	}
+
+	if (pppMngSt->m_ownerFacing == 0) {
+		u8* ownerBytes = reinterpret_cast<u8*>(pppMngSt->m_owner);
+		pppMngSt->m_ownerFacing = static_cast<u8>(static_cast<int>(static_cast<u32>(ownerBytes[0x9A]) << 25) >> 31);
+	}
+
+	if (pppMngSt->m_ownerFlagsInitialized == 0) {
+		u8 visible = 0;
+		u32 flags = *reinterpret_cast<u32*>(reinterpret_cast<u8*>(pppMngSt->m_owner) + 0x60);
+		if ((flags & 1) != 0 && (flags & 0x400000) == 0) {
+			visible = 1;
+		}
+		pppMngSt->m_slotVisible = visible;
+	}
+
+	if (pppMngSt->m_nodeScaleInitialized == 0) {
+		u8* ownerBytes = reinterpret_cast<u8*>(pppMngSt->m_owner);
+		int ownerData = *reinterpret_cast<int*>(ownerBytes + 0xF8);
+		int hasModelScale = 0;
+		if (ownerData != 0 && *reinterpret_cast<int*>(reinterpret_cast<u8*>(ownerData) + 0x168) != 0) {
+			hasModelScale = 1;
+		}
+		if (hasModelScale != 0) {
+			pppMngSt->m_ownerScale = *reinterpret_cast<float*>(
+			    reinterpret_cast<u8*>(*reinterpret_cast<int*>(reinterpret_cast<u8*>(ownerData) + 0x168)) + 0x9C);
+		} else {
+			pppMngSt->m_ownerScale = *reinterpret_cast<float*>(ownerBytes + 0x4B0);
+		}
+		if (DOUBLE_8032fdf0 == static_cast<double>(pppMngSt->m_ownerScale)) {
+			pppMngSt->m_useOwnerScaleSign = 1;
+		} else if (DOUBLE_8032fe00 == static_cast<double>(pppMngSt->m_ownerScale)) {
+			pppMngSt->m_useOwnerScaleSign = 0;
+		} else {
+			pppMngSt->m_useOwnerScaleSign = 1;
+		}
+	}
+
+	CalcSafeNodeWorldMatrix__Q26CChara6CModelFPA4_fPQ26CChara5CNode(
+	    *reinterpret_cast<void**>(*reinterpret_cast<int*>(reinterpret_cast<u8*>(pppMngSt->m_owner) + 0xF8) + 0x168),
+	    nodeMtx, pppMngSt->m_bindNode);
+
+	PSVECNormalize(reinterpret_cast<Vec*>(nodeMtx[0]), reinterpret_cast<Vec*>(nodeMtx[0]));
+	PSVECNormalize(reinterpret_cast<Vec*>(nodeMtx[1]), reinterpret_cast<Vec*>(nodeMtx[1]));
+	PSVECNormalize(reinterpret_cast<Vec*>(nodeMtx[2]), reinterpret_cast<Vec*>(nodeMtx[2]));
+	PSMTXMultVecSR(nodeMtx, &pppMngStPtr->m_position, &tmpPos);
+	nodeMtx[0][3] += tmpPos.x;
+	nodeMtx[1][3] += tmpPos.y;
+	nodeMtx[2][3] += tmpPos.z;
+	PSMTXConcat(nodeMtx, pppMngStPtr->m_matrix.value, pppMngStPtr->m_matrix.value);
+	goto ScaleOnly;
+
+MatrixMode7:
+	if (pppMngSt->m_bindNode == 0) {
+		goto LocalOnly;
+	}
+
+	if (pppMngSt->m_ownerFacing == 0) {
+		u8* ownerBytes = reinterpret_cast<u8*>(pppMngSt->m_owner);
+		pppMngSt->m_ownerFacing = static_cast<u8>(static_cast<int>(static_cast<u32>(ownerBytes[0x9A]) << 25) >> 31);
+	}
+
+	if (pppMngSt->m_ownerFlagsInitialized == 0) {
+		u8 visible = 0;
+		u32 flags = *reinterpret_cast<u32*>(reinterpret_cast<u8*>(pppMngSt->m_owner) + 0x60);
+		if ((flags & 1) != 0 && (flags & 0x400000) == 0) {
+			visible = 1;
+		}
+		pppMngSt->m_slotVisible = visible;
+	}
+
+	if (pppMngSt->m_nodeScaleInitialized == 0) {
+		u8* ownerBytes = reinterpret_cast<u8*>(pppMngSt->m_owner);
+		int ownerData = *reinterpret_cast<int*>(ownerBytes + 0xF8);
+		int hasModelScale = 0;
+		if (ownerData != 0 && *reinterpret_cast<int*>(reinterpret_cast<u8*>(ownerData) + 0x168) != 0) {
+			hasModelScale = 1;
+		}
+		if (hasModelScale != 0) {
+			pppMngSt->m_ownerScale = *reinterpret_cast<float*>(
+			    reinterpret_cast<u8*>(*reinterpret_cast<int*>(reinterpret_cast<u8*>(ownerData) + 0x168)) + 0x9C);
+		} else {
+			pppMngSt->m_ownerScale = *reinterpret_cast<float*>(ownerBytes + 0x4B0);
+		}
+		if (DOUBLE_8032fdf0 == static_cast<double>(pppMngSt->m_ownerScale)) {
+			pppMngSt->m_useOwnerScaleSign = 1;
+		} else if (DOUBLE_8032fe00 == static_cast<double>(pppMngSt->m_ownerScale)) {
+			pppMngSt->m_useOwnerScaleSign = 0;
+		} else {
+			pppMngSt->m_useOwnerScaleSign = 1;
+		}
+	}
+
+	CalcSafeNodeWorldMatrix__Q26CChara6CModelFPA4_fPQ26CChara5CNode(
+	    *reinterpret_cast<void**>(*reinterpret_cast<int*>(reinterpret_cast<u8*>(pppMngSt->m_owner) + 0xF8) + 0x168),
+	    nodeMtx, pppMngSt->m_bindNode);
+
+	PSMTXMultVecSR(nodeMtx, &pppMngStPtr->m_position, &tmpPos);
+	pppMngStPtr->m_matrix.value[0][3] = nodeMtx[0][3] + tmpPos.x;
+	pppMngStPtr->m_matrix.value[1][3] = nodeMtx[1][3] + tmpPos.y;
+	pppMngStPtr->m_matrix.value[2][3] = nodeMtx[2][3] + tmpPos.z;
+	goto ScaleOnly;
 
 ScaleOnly:
 	if (pppMngSt->m_scale.x != kPppOne) {

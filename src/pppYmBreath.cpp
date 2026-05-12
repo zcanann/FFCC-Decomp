@@ -498,8 +498,8 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
     YmBreathParams* params = reinterpret_cast<YmBreathParams*>(pYmBreath);
     _pppMngSt* mngSt;
     int* dataOffsets;
-    VYmBreath* work;
     VColor* color;
+    VYmBreath* work;
     Mtx* particleWMat;
     Mtx* particleMtx;
     int i;
@@ -526,8 +526,9 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
 
     dataOffsets = offsets->m_serializedDataOffsets;
     mngSt = pppMngStPtr;
+    int colorOffset = dataOffsets[1];
     work = reinterpret_cast<VYmBreath*>(reinterpret_cast<unsigned char*>(ymBreath) + 0x80 + dataOffsets[0]);
-    color = (VColor*)(reinterpret_cast<unsigned char*>(ymBreath) + 0x80 + dataOffsets[1]);
+    color = (VColor*)(reinterpret_cast<unsigned char*>(ymBreath) + 0x80 + colorOffset);
 
     if (work->m_particleData == NULL) {
         YmBreathParticleGroup* groupTable;

@@ -1,5 +1,6 @@
 #include "ffcc/sound.h"
 
+#include "ffcc/RedSound/RedGlobals.h"
 #include "ffcc/RedSound/RedSound.h"
 #include "ffcc/color.h"
 #include "ffcc/game.h"
@@ -807,8 +808,8 @@ void CSound::Frame()
                 } else {
                     int playing = redSound->ReportSeLoop(*reinterpret_cast<int*>(se + 8));
                     if ((playing != 0) &&
-                        (redSound->GetSeVolume(*reinterpret_cast<int*>(se + 8), 0) == 0) &&
-                        (redSound->GetSeVolume(*reinterpret_cast<int*>(se + 8), 1) == 0)) {
+                        (redSound->GetSeVolume(*reinterpret_cast<int*>(se + 8), REDSOUND_SE_VOLUME_QUERY_VALUE) == 0) &&
+                        (redSound->GetSeVolume(*reinterpret_cast<int*>(se + 8), REDSOUND_SE_VOLUME_QUERY_DELTA) == 0)) {
                         if ((*reinterpret_cast<unsigned int*>(CFlat + 0x129C) & 0x400000) != 0) {
                             Printf__7CSystemFPce(&System, s_soundEnvSeStopFmt, *reinterpret_cast<int*>(se + 0xC));
                         }

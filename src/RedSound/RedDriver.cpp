@@ -3013,7 +3013,7 @@ int CRedDriver::GetSeVolume(int seID, int mode)
     while (1) {
         if (((u32)track->m_command != 0) && ((seID == REDSOUND_SE_ID_ALL) || (seID == track->m_seId))) {
             if ((u32)track->m_command != 0) {
-                if (mode == 1) {
+                if (mode == REDSOUND_SE_VOLUME_QUERY_DELTA) {
                     return track->m_mixVolumeDelta;
                 }
                 return track->m_mixVolume >> REDSOUND_FIXED_SHIFT;

@@ -230,7 +230,7 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
         pppDrawShp__FPlsP12CMaterialSetUc(
             *shapeTable, work->m_shapeArg2, pppEnvStPtr->m_materialSetPtr, step->m_laser.m_blendMode);
 
-        count = (u32)step->m_laser.m_pointCount;
+        count = step->m_laser.m_pointCount;
         uvStep = FLOAT_8033342c / (float)count;
         if (step->m_initWOrk == 0xFFFF) {
             _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0xFF, 0xFF, 4);
@@ -250,10 +250,10 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
         color.a = alphaMax;
 
         GXBegin(GX_TRIANGLES, GX_VTXFMT7, (u16)((step->m_laser.m_pointCount - 1) * 3));
-        u8 alpha = 0;
+        int alpha = 0;
         for (i = 0; (int)i < (int)(step->m_laser.m_pointCount - 1); i++) {
-            u0 = (float)i * uvStep;
-            u1 = (float)(i + 1) * uvStep;
+            u0 = uvStep * (float)i;
+            u1 = uvStep * (float)(i + 1);
             _GXColor trailStartColor;
             trailStartColor.r = color.r;
             trailStartColor.g = color.g;
@@ -273,7 +273,7 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
             trailEndColor.r = color.r;
             trailEndColor.g = color.g;
             trailEndColor.b = color.b;
-            trailEndColor.a = alphaMax - (u8)(alphaStep * (i + 1));
+            trailEndColor.a = alphaMax - alphaStep * (i + 1);
             GXPosition3f32(work->m_points[i + 1].x, work->m_points[i + 1].y, work->m_points[i + 1].z);
             GXColor1u32(*(u32*)&trailEndColor);
             GXTexCoord2f32(u1, kPppLaserZero);

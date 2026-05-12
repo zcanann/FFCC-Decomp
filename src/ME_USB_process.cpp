@@ -338,9 +338,14 @@ extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialE
 
         materialEditorPcs->m_textureHeader[materialEditorPcs->m_loadedTextureCount] = static_cast<s16*>(headerDst);
         memcpy(headerBuffer, usb.m_data, size);
-        for (int i = 0; i < 8; i++) {
-            headerBuffer[i] = LoadSwapU16(headerBuffer[i]);
-        }
+        headerBuffer[0] = LoadSwapU16(headerBuffer[0]);
+        headerBuffer[1] = LoadSwapU16(headerBuffer[1]);
+        headerBuffer[2] = LoadSwapU16(headerBuffer[2]);
+        headerBuffer[3] = LoadSwapU16(headerBuffer[3]);
+        headerBuffer[4] = LoadSwapU16(headerBuffer[4]);
+        headerBuffer[5] = LoadSwapU16(headerBuffer[5]);
+        headerBuffer[6] = LoadSwapU16(headerBuffer[6]);
+        headerBuffer[7] = LoadSwapU16(headerBuffer[7]);
         DCFlushRange(headerBuffer, 0x10);
         memcpy(materialEditorPcs->m_textureHeader[materialEditorPcs->m_loadedTextureCount], headerBuffer, 0x10);
 

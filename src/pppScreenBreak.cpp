@@ -121,7 +121,6 @@ extern const float FLOAT_80331cd0 = 1.0f;
 extern const float FLOAT_80331cd4 = -1.0f;
 extern const float FLOAT_80331cd8 = 0.017453292f;
 extern const double DOUBLE_80331CE0 = 4503599627370496.0;
-extern const float FLOAT_80331ce8 = 30.0f;
 extern const float FLOAT_80331cec = 4.0f;
 extern const float FLOAT_80331cf0 = -3.0f;
 extern const float FLOAT_80331cf4 = 0.5f;
@@ -660,9 +659,9 @@ void SB_BeforeDrawCallback(CChara::CModel*, void*, void*, float (*) [4], int)
     const float& attnA = FLOAT_80331cec;
     const float& attnB = FLOAT_80331cf0;
 
-    lightDir.x = *(float*)(camera + 0xEC) - (FLOAT_80331ce8 + *(float*)(camera + 0xE0));
-    lightDir.y = *(float*)(camera + 0xF0) - (FLOAT_80331ce8 + *(float*)(camera + 0xE4));
-    lightDir.z = *(float*)(camera + 0xF4) - (FLOAT_80331ce8 + *(float*)(camera + 0xE8));
+    lightDir.x = *(float*)(camera + 0xEC) - (30.0f + *(float*)(camera + 0xE0));
+    lightDir.y = *(float*)(camera + 0xF0) - (30.0f + *(float*)(camera + 0xE4));
+    lightDir.z = *(float*)(camera + 0xF4) - (30.0f + *(float*)(camera + 0xE8));
     PSVECNormalize(&lightDir, &lightDir);
 
     GXInitSpecularDirHA(&lightObj, lightDir.x, lightDir.y, lightDir.z, zero, one, zero);

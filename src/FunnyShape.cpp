@@ -304,15 +304,15 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
             p0x = FLOAT_8032fd80;
             p0y = FLOAT_8032fd74;
             p0z = FLOAT_8032fd6c;
-            p1x = FLOAT_8032fd6c;
+            p1x = FLOAT_8032fd74;
             p1y = FLOAT_8032fd74;
             p1z = FLOAT_8032fd6c;
-            p2x = FLOAT_8032fd6c;
-            p2y = FLOAT_8032fd6c;
-            p2z = FLOAT_8032fd80;
+            p2x = FLOAT_8032fd74;
+            p2y = FLOAT_8032fd80;
+            p2z = FLOAT_8032fd6c;
             p3x = FLOAT_8032fd80;
-            p3y = FLOAT_8032fd6c;
-            p3z = FLOAT_8032fd80;
+            p3y = FLOAT_8032fd80;
+            p3z = FLOAT_8032fd6c;
             color = U32At(entry, 0x18);
         }
 

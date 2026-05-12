@@ -315,9 +315,9 @@ void CMapHit::ReadOtmHit(CChunkFile& chunkFile)
                 m_positionMin.y = (m_positionMin.y < v.y) ? m_positionMin.y : v.y;
                 m_positionMin.z = (m_positionMin.z < v.z) ? m_positionMin.z : v.z;
 
-                m_positionMax.x = (v.x < m_positionMax.x) ? m_positionMax.x : v.x;
-                m_positionMax.y = (v.y < m_positionMax.y) ? m_positionMax.y : v.y;
-                m_positionMax.z = (v.z < m_positionMax.z) ? m_positionMax.z : v.z;
+                m_positionMax.x = (m_positionMax.x < v.x) ? v.x : m_positionMax.x;
+                m_positionMax.y = (m_positionMax.y < v.y) ? v.y : m_positionMax.y;
+                m_positionMax.z = (m_positionMax.z < v.z) ? v.z : m_positionMax.z;
             }
 
             m_positionMin.x -= 0.1f;
@@ -389,9 +389,9 @@ void CMapHit::ReadOtmHit(CChunkFile& chunkFile)
                     face.m_boundsMin.y = (face.m_boundsMin.y < v.y) ? face.m_boundsMin.y : v.y;
                     face.m_boundsMin.z = (face.m_boundsMin.z < v.z) ? face.m_boundsMin.z : v.z;
 
-                    face.m_boundsMax.x = (v.x < face.m_boundsMax.x) ? face.m_boundsMax.x : v.x;
-                    face.m_boundsMax.y = (v.y < face.m_boundsMax.y) ? face.m_boundsMax.y : v.y;
-                    face.m_boundsMax.z = (v.z < face.m_boundsMax.z) ? face.m_boundsMax.z : v.z;
+                    face.m_boundsMax.x = (face.m_boundsMax.x < v.x) ? v.x : face.m_boundsMax.x;
+                    face.m_boundsMax.y = (face.m_boundsMax.y < v.y) ? v.y : face.m_boundsMax.y;
+                    face.m_boundsMax.z = (face.m_boundsMax.z < v.z) ? v.z : face.m_boundsMax.z;
                 }
 
                 face.m_radiusScale *= 0.5f;

@@ -31,13 +31,14 @@ static inline unsigned char* Ptr(void* p, unsigned int offset)
 }
 
 int g_hit_edge_idx_min;
-float g_hit_t;
+float g_hit_edge_t;
 float g_hit_t_min;
-float g_hit_t_slide_min;
-CMapHitFace* g_hit_f;
+float g_hit_t;
+unsigned char gMapHitFaceFlag;
 CMapHitFace* g_hit_lpface;
+CMapHitFace* g_hit_f;
+float g_hit_t_slide_min;
 CMapHitFace* g_hit_lpface_min;
-int gMapHitFaceFlag;
 
 /*
  * --INFO--
@@ -570,10 +571,9 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
                 edgeCylinder.m_axis = edge;
                 edgeCylinder.m_radius = g_hit_cyl.m_radius;
 
-                float edgeT;
-                if (FindIntersection(g_hit_cyl.m_bottom, *hitDirection, edgeCylinder, edgeT) != 0 &&
-                    edgeT < g_hit_t_min) {
-                    hitT = edgeT;
+                if (FindIntersection(g_hit_cyl.m_bottom, *hitDirection, edgeCylinder, g_hit_edge_t) != 0 &&
+                    g_hit_edge_t < g_hit_t_min) {
+                    hitT = g_hit_edge_t;
                     edgeIndex = i;
                     PSVECScale(hitDirection, &g_hit_hpv, hitT);
                     PSVECAdd(&g_hit_cyl.m_bottom, &g_hit_hpv, &g_hit_hpv);
@@ -590,7 +590,6 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
 
     g_hit_t = hitT;
     g_hit_t_min = hitT;
-    g_hit_t_slide_min = hitT;
     g_hit_edge_idx_min = edgeIndex;
     g_hit_f = g_hit_lpface;
     g_hit_cyl_min = g_hit_cyl;

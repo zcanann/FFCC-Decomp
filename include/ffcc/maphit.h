@@ -73,13 +73,14 @@ public:
 
 extern unsigned char gMapHitDrawMode;
 extern int g_hit_edge_idx_min;
+extern float g_hit_edge_t;
 extern float g_hit_t;
 extern float g_hit_t_min;
 extern float g_hit_t_slide_min;
 extern CMapHitFace* g_hit_f;
 extern CMapHitFace* g_hit_lpface;
 extern CMapHitFace* g_hit_lpface_min;
-extern int gMapHitFaceFlag;
+extern unsigned char gMapHitFaceFlag;
 
 #define gMapHitFace g_hit_f
 

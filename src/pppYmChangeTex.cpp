@@ -90,7 +90,6 @@ extern const char s_pppYmChangeTex_cpp_801db4c0[] = "pppYmChangeTex.cpp";
 extern const float FLOAT_80330df8;
 extern const float FLOAT_80330dfc;
 extern const float FLOAT_80330e00;
-extern const double DOUBLE_80330E08 = 4503601774854144.0;
 extern const float kPppYmChangeTexInitZero = 0.0f;
 
 STATIC_ASSERT(offsetof(ChangeTexModelRaw, m_data) == 0xA4);

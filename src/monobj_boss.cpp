@@ -82,6 +82,7 @@ extern double DOUBLE_80331d08 = 3.0;
 extern double DOUBLE_80331d10;
 extern double DOUBLE_80331d38;
 extern double DOUBLE_80331dc0;
+extern "C" char s_meteo_3_80331D64[8];
 extern char SoundBuffer[];
 extern char SoundBuffer_1260_[];
 extern "C" unsigned char m_boss__8CGMonObj[];
@@ -93,6 +94,20 @@ static const char s_to_b_obj_801dd4f4[] = "to_b_obj";
 static const char s_to_02d_obj_801dd500[] = "to_%02d_obj";
 
 typedef void (*MonObjSawCallback)(CGMonObj*, int, int, int);
+
+struct MeteoParasiteCBossWork {
+    u8 m_pad00[0x74];
+    CGMonObj* m_obj;
+    int m_index;
+    union {
+        u8 m_flags;
+        struct {
+            u8 m_bit80 : 1;
+            u8 m_meteo3 : 1;
+            u8 m_rest : 6;
+        } bits;
+    };
+};
 
 /*
  * --INFO--
@@ -1865,7 +1880,18 @@ void CGMonObj::frameStatFuncMolbol()
 void CGMonObj::initFinishedFuncMeteoParasiteC()
 {
 	initFinishedFuncDefault__8CGMonObjFv(this);
-	*reinterpret_cast<CGMonObj**>(SoundBuffer + 1344) = this;
+	*reinterpret_cast<CGMonObj**>(SoundBuffer_1260_ + 0x74) = this;
+
+	if (strcmp(Game.m_currentScriptName, s_meteo_3_80331D64) == 0) {
+		CGObject* object = reinterpret_cast<CGObject*>(this);
+		MeteoParasiteCBossWork* work = reinterpret_cast<MeteoParasiteCBossWork*>(SoundBuffer_1260_);
+		work->bits.m_meteo3 = 1;
+		work->m_index = 3;
+		*reinterpret_cast<u16*>(reinterpret_cast<u8*>(object->m_scriptHandle) + 0x1C) = 1;
+		object->SetAnimSlot(0x35, 0);
+		reqAnim__8CGPrgObjFiii(this, 0x35, 1, 0);
+		object->PlayAnim(0x35, 1, 0, -1, -1, 0);
+	}
 }
 
 /*

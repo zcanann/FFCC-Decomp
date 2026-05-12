@@ -304,13 +304,6 @@ void CMapHit::ReadOtmHit(CChunkFile& chunkFile)
             m_vertexCount = static_cast<unsigned short>(chunk.m_arg0);
             m_vertices = new (stage, const_cast<char*>(s_maphit_cpp), 0x143) Vec[m_vertexCount];
 
-            m_positionMin.x = s_large_pos;
-            m_positionMin.y = s_large_pos;
-            m_positionMin.z = s_large_pos;
-            m_positionMax.x = s_large_neg;
-            m_positionMax.y = s_large_neg;
-            m_positionMax.z = s_large_neg;
-
             for (unsigned int i = 0; i < m_vertexCount; i++) {
                 Vec& v = m_vertices[i];
                 v.x = chunkFile.GetF4();
@@ -395,13 +388,6 @@ void CMapHit::ReadOtmHit(CChunkFile& chunkFile)
                         face.m_vertexOffsets[i][1] = chunkFile.GetF4() * 0.01f;
                     }
                 }
-
-                face.m_boundsMin.x = s_large_pos;
-                face.m_boundsMin.y = s_large_pos;
-                face.m_boundsMin.z = s_large_pos;
-                face.m_boundsMax.x = s_large_neg;
-                face.m_boundsMax.y = s_large_neg;
-                face.m_boundsMax.z = s_large_neg;
 
                 for (unsigned int i = 0; i < vertexCount; i++) {
                     const unsigned short idx = chunkFile.Get2();

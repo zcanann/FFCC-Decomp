@@ -1234,7 +1234,7 @@ static void __MidiCtrl_ReverbDepthDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTra
 
     reverbDepth->m_step = 0;
     reverbDepth->m_count = 0;
-    SetVoiceAccess(track, 8);
+    SetVoiceAccess(track, REDSOUND_VOICE_FLAGS_ADPCM_DIRTY);
 }
 
 /*

@@ -12,8 +12,8 @@ public:
     CGObjWork();
     virtual ~CGObjWork();
 
-    void Init(int, CRomWork*, int);
-    virtual void CalcStatus();
+    virtual void Init(int, CRomWork*, int);
+    void CalcStatus();
 
     // void* vtable;                        // 0x0000
     int m_objType;                          // 0x0004
@@ -44,8 +44,8 @@ class CMonWork : public CGObjWork
 public:
     CMonWork();
 
-    void Init(int, CRomWork*, int);
-    virtual void CalcStatus();
+    virtual void Init(int, CRomWork*, int);
+    void CalcStatus();
     
     unsigned short unk_0xac[4];  // 0x00AC
     unsigned short unk_0xb4[14]; // 0x00B4
@@ -71,7 +71,7 @@ public:
     void LoadInit();
     void ClearEvtWork();
     void LoadFinished();
-    void Init(int, CRomWork*, int);
+    virtual void Init(int, CRomWork*, int);
     void SetBonusCondition(int);
     int IsOutOfShouki();
     void AddLetter(int, int, int, int, int, int, int, int, int);
@@ -102,7 +102,7 @@ public:
     void SafeDeleteTempItem();
     void ClampStatus(short&, unsigned short&);
     void CalcArtifactStatus(int, int, int&, int&, int&, int&, int&);
-    virtual void CalcStatus();
+    void CalcStatus();
     int CanPlayerUseItem();
     void ValidCmdList(int);
     int GetIdxCmdList();

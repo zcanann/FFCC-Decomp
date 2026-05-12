@@ -4,7 +4,7 @@
 #include "ffcc/joybus.h"
 #include "ffcc/partyobj.h"
 #include "ffcc/mes.h"
-#include "ffcc/p_game.h"
+#include "ffcc/game.h"
 #include "ffcc/p_menu.h"
 #include "ffcc/system.h"
 #include <string.h>

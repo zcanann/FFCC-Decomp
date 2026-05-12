@@ -8,7 +8,6 @@
 
 extern "C" const float FLOAT_8032F8EC;
 extern "C" const float FLOAT_8032F8F0;
-extern "C" const char s_old_mid_format_801D7094[];
 
 CMapCylinder g_hit_cyl;
 CMapCylinder g_hit_cyl_min;
@@ -30,6 +29,12 @@ static inline unsigned char* Ptr(void* p, unsigned int offset)
 }
 }
 
+extern "C" const char s_old_mid_format_801D7094[0x1C] = {
+    '\x8C', '\xC3', '\x82', '\xA2', ' ',    'M',    'I',    'D',    ' ',    '\x82',
+    '\xCC', '\x8C', '\x60', '\x8E', '\xAE', '\x82', '\xC5', '\x82', '\xB7', '\x81',
+    '\x42', '\n',   '\0',   '\0',   '\0',   '\0',   '\0',   '\0',
+};
+
 int g_hit_edge_idx_min;
 float g_hit_t;
 float g_hit_t_min;
@@ -37,6 +42,7 @@ float g_hit_t_slide_min;
 unsigned char g_hit_f;
 CMapHitFace* g_hit_lpface;
 CMapHitFace* g_hit_lpface_min;
+int g_hitTgt;
 
 /*
  * --INFO--

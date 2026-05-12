@@ -796,10 +796,9 @@ void CMapHit::CheckHitCylinderNear(CMapCylinder* mapCylinder, Vec* position, uns
     g_hit_cyl = *mapCylinder;
     g_hit_mvec = *position;
 
-    CMapHitFace* face = m_faces;
     int faceOffset = 0;
     for (int i = 0; i < m_faceCount; i++) {
-        g_hit_lpface = reinterpret_cast<CMapHitFace*>(Ptr(face, faceOffset));
+        g_hit_lpface = reinterpret_cast<CMapHitFace*>(Ptr(m_faces, faceOffset));
         CheckHitFaceCylinder(mask);
         faceOffset += 0x50;
     }
@@ -819,9 +818,9 @@ void CMapHit::CheckHitCylinderNear(CMapCylinder* mapCylinder, Vec* position, uns
     g_hit_cyl = *mapCylinder;
     g_hit_mvec = *position;
 
-    unsigned int faceIndex = startFace;
-    unsigned int endFace = static_cast<unsigned short>(startFace + faceCount);
-    int faceOffset = static_cast<int>(faceIndex) * 0x50;
+    int endFace = static_cast<unsigned short>(startFace + faceCount);
+    int faceIndex = static_cast<unsigned short>(startFace);
+    int faceOffset = faceIndex * 0x50;
 
     while (faceIndex < endFace) {
         g_hit_lpface = reinterpret_cast<CMapHitFace*>(Ptr(m_faces, faceOffset));

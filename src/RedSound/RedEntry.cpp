@@ -956,7 +956,7 @@ void CRedEntry::WaveHistoryManager(int mode, int waveNo)
 	int used;
 	RedTrackDATA* track;
 
-	if (mode == 0) {
+	if (mode == REDSOUND_HISTORY_MODE_RELEASE) {
 		used = 0;
 		if ((p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_PRIMARY].m_activeTrackCount != 0) &&
 		    (p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_PRIMARY].m_waveNo == waveNo)) {
@@ -1433,7 +1433,7 @@ void CRedEntry::SeSepHistoryManager(int mode, int seNo)
 	RedTrackDATA* track;
 	int sequenceNo;
 
-	if (mode == 0) {
+	if (mode == REDSOUND_HISTORY_MODE_RELEASE) {
 		sequenceNo = 0;
 		track = p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
 
@@ -1746,7 +1746,7 @@ void CRedEntry::MusicHistoryManager(int mode, int musicNo)
 {
 	int musicSeq;
 
-	if (mode == 0) {
+	if (mode == REDSOUND_HISTORY_MODE_RELEASE) {
 		musicSeq = 0;
 		if ((p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_PRIMARY].m_activeTrackCount != 0)
 		    && (p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_PRIMARY].m_musicId == musicNo)) {

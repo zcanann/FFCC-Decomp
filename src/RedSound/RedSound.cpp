@@ -73,7 +73,7 @@ struct RedSoundBssState {
 
 struct RedSoundStreamBank {
 	int m_streamId;
-	void* m_streamData;
+	RedStreamFile* m_streamData;
 	int m_fileSize;
 	int m_readPoint;
 	int m_playPoint;
@@ -1166,7 +1166,7 @@ int CRedSound::StreamStandby(void* streamHeader, int fileSize)
 		if (bank != 0) {
 			streamId = GetAutoID();
 			bank->m_streamId = streamId;
-			bank->m_streamData = streamHeader;
+			bank->m_streamData = reinterpret_cast<RedStreamFile*>(streamHeader);
 			bank->m_fileSize = fileSize;
 			bank->m_readPoint = bank->m_playPoint = 0;
 			bank->m_reserved14 = 0;

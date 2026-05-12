@@ -727,6 +727,20 @@ static void _ClearReverb(int bank)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+static int _CompFX(float a, float b)
+{
+    return 1;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x801c3718
  * PAL Size: 1324b
  * EN Address: TODO

@@ -311,25 +311,13 @@ void CMapHit::ReadOtmHit(CChunkFile& chunkFile)
                 v.y = chunkFile.GetF4();
                 v.z = chunkFile.GetF4();
 
-                if (v.x < m_positionMin.x) {
-                    m_positionMin.x = v.x;
-                }
-                if (v.y < m_positionMin.y) {
-                    m_positionMin.y = v.y;
-                }
-                if (v.z < m_positionMin.z) {
-                    m_positionMin.z = v.z;
-                }
+                m_positionMin.x = (m_positionMin.x < v.x) ? m_positionMin.x : v.x;
+                m_positionMin.y = (m_positionMin.y < v.y) ? m_positionMin.y : v.y;
+                m_positionMin.z = (m_positionMin.z < v.z) ? m_positionMin.z : v.z;
 
-                if (m_positionMax.x < v.x) {
-                    m_positionMax.x = v.x;
-                }
-                if (m_positionMax.y < v.y) {
-                    m_positionMax.y = v.y;
-                }
-                if (m_positionMax.z < v.z) {
-                    m_positionMax.z = v.z;
-                }
+                m_positionMax.x = (v.x < m_positionMax.x) ? m_positionMax.x : v.x;
+                m_positionMax.y = (v.y < m_positionMax.y) ? m_positionMax.y : v.y;
+                m_positionMax.z = (v.z < m_positionMax.z) ? m_positionMax.z : v.z;
             }
 
             m_positionMin.x -= 0.1f;
@@ -397,25 +385,13 @@ void CMapHit::ReadOtmHit(CChunkFile& chunkFile)
                     face.m_vertexIndices[i] = idx;
 
                     const Vec& v = m_vertices[idx];
-                    if (v.x < face.m_boundsMin.x) {
-                        face.m_boundsMin.x = v.x;
-                    }
-                    if (v.y < face.m_boundsMin.y) {
-                        face.m_boundsMin.y = v.y;
-                    }
-                    if (v.z < face.m_boundsMin.z) {
-                        face.m_boundsMin.z = v.z;
-                    }
+                    face.m_boundsMin.x = (face.m_boundsMin.x < v.x) ? face.m_boundsMin.x : v.x;
+                    face.m_boundsMin.y = (face.m_boundsMin.y < v.y) ? face.m_boundsMin.y : v.y;
+                    face.m_boundsMin.z = (face.m_boundsMin.z < v.z) ? face.m_boundsMin.z : v.z;
 
-                    if (face.m_boundsMax.x < v.x) {
-                        face.m_boundsMax.x = v.x;
-                    }
-                    if (face.m_boundsMax.y < v.y) {
-                        face.m_boundsMax.y = v.y;
-                    }
-                    if (face.m_boundsMax.z < v.z) {
-                        face.m_boundsMax.z = v.z;
-                    }
+                    face.m_boundsMax.x = (v.x < face.m_boundsMax.x) ? face.m_boundsMax.x : v.x;
+                    face.m_boundsMax.y = (v.y < face.m_boundsMax.y) ? face.m_boundsMax.y : v.y;
+                    face.m_boundsMax.z = (v.z < face.m_boundsMax.z) ? face.m_boundsMax.z : v.z;
                 }
 
                 face.m_radiusScale *= 0.5f;

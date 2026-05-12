@@ -606,7 +606,8 @@ CTexAnim* CPtrArray<CTexAnim*>::GetAt(unsigned long index)
  */
 CTexAnimSet::CTexAnimSet()
 {
-    reinterpret_cast<CTexAnimSetStorage*>(this)->unk24 = FLOAT_8032fb38;
+    const float& zero = FLOAT_8032fb38;
+    reinterpret_cast<CTexAnimSetStorage*>(this)->unk24 = zero;
 }
 
 /*

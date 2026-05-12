@@ -2174,24 +2174,28 @@ void CMemoryCardMan::CalcSaveDatHpMax(Mc::SaveDat* saveDat)
             short equippedItems[4];
             short* equippedItem = equippedItems;
 
-            for (int itemSlot = 0; itemSlot < 0x49; itemSlot++)
+            int itemSlot = 0;
+            int itemCount = 0x49;
+            do
             {
                 if (itemSlot >= 0x45)
                 {
                     const int word = itemSlot >> 5;
                     const int bit = itemSlot % 32;
-                    if ((*reinterpret_cast<u32*>(charData + 0xBC + word * 4) & (1 << bit)) == 0)
+                    if ((*reinterpret_cast<u32*>(charData + 0xBC + word * 4) & (1 << bit)) != 0)
                     {
-                        *equippedItem = -1;
+                        *equippedItem = static_cast<short>(itemSlot) + 0x9F;
                     }
                     else
                     {
-                        *equippedItem = (short)itemSlot + 0x9F;
+                        *equippedItem = -1;
                     }
                     equippedItem++;
                 }
 
+                itemSlot++;
             }
+            while (--itemCount != 0);
 
             int totalHpBonus = 0;
             int itemData = Game.unkCFlatData0[2];
@@ -2216,7 +2220,7 @@ void CMemoryCardMan::CalcSaveDatHpMax(Mc::SaveDat* saveDat)
             short finalHpMax = 0x10;
             if (totalHpBonus + 8 < 0x10)
             {
-                finalHpMax = totalHpBonus + 8;
+                finalHpMax = static_cast<short>(totalHpBonus + 8);
             }
 
             *reinterpret_cast<short*>(charData + 0x06) = finalHpMax;

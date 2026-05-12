@@ -1140,7 +1140,7 @@ void CSound::PlayBgm(int bgmId)
         Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
     } else {
         redSound->MusicStop(-1);
-        redSound->SetMusicPhraseStop(0);
+        redSound->SetMusicPhraseStop(REDSOUND_MUSIC_PHRASE_STOP_OFF);
         redSound->MusicPlay(bgmId, 0x7F, 0);
     }
 }
@@ -1161,7 +1161,7 @@ void CSound::CrossPlayBgm(int bgmId, int crossFrames)
     if (bgmId < 0) {
         Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
     } else {
-        redSound->SetMusicPhraseStop(0);
+        redSound->SetMusicPhraseStop(REDSOUND_MUSIC_PHRASE_STOP_OFF);
         redSound->MusicCrossPlay(bgmId, 0x7F, crossFrames);
     }
 }
@@ -1183,7 +1183,7 @@ void CSound::PlayNextBgm(int bgmId)
         Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
     } else {
         redSound->MusicNextPlay(bgmId, 0x7F, 0);
-        redSound->SetMusicPhraseStop(1);
+        redSound->SetMusicPhraseStop(REDSOUND_MUSIC_PHRASE_STOP_ON);
     }
 }
 

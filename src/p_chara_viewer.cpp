@@ -103,8 +103,6 @@ extern "C" void __ct__6CColorFv(void*);
 extern "C" void __ct__6CColorFR6CColor(void*, void*);
 extern "C" float FLOAT_80330BEC;
 extern "C" float FLOAT_80330BF0;
-extern "C" float FLOAT_80330BF4;
-extern "C" float FLOAT_80330BF8;
 extern "C" double fmod(double, double);
 
 struct CharaViewerSRT {
@@ -215,7 +213,7 @@ void CCharaPcs::drawViewer()
     if ((self->m_viewerBackTextureSet != 0) &&
         (reinterpret_cast<CPtrArray<CTexture*>*>(reinterpret_cast<unsigned char*>(self->m_viewerBackTextureSet) + 8)->GetSize() != 0)) {
         C_MTXOrtho(projMtx, kCharaViewerZero, FLOAT_80330BEC, kCharaViewerZero, FLOAT_80330BF0, kCharaViewerZero,
-                   FLOAT_80330BF4);
+                   kCharaViewerGridMax);
         GXSetProjection(projMtx, GX_ORTHOGRAPHIC);
         PSMTXIdentity(cameraMtx);
         GXLoadPosMtxImm(cameraMtx, 0);
@@ -232,8 +230,10 @@ void CCharaPcs::drawViewer()
         CTexture* texture =
             (*reinterpret_cast<CPtrArray<CTexture*>*>(reinterpret_cast<unsigned char*>(self->m_viewerBackTextureSet) + 8))[0];
         TextureMan.SetTexture(GX_TEXMAP0, texture);
-        PSMTXScale(texMtx, FLOAT_80330BF8 / static_cast<float>(texture->m_width),
-                   FLOAT_80330BF8 / static_cast<float>(texture->m_height), FLOAT_80330BF8);
+        unsigned int width = texture->m_width;
+        unsigned int height = texture->m_height;
+        PSMTXScale(texMtx, kCharaViewerUnitStep / static_cast<float>(width),
+                   kCharaViewerUnitStep / static_cast<float>(height), kCharaViewerUnitStep);
         GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX2x4);
         GXSetNumTexGens(1);
         GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
@@ -245,12 +245,12 @@ void CCharaPcs::drawViewer()
         GXBegin(GX_QUADS, GX_VTXFMT0, 4);
         GXPosition3s16(0, 0, 0);
         GXTexCoord2s16(0, 0);
-        GXPosition3s16(static_cast<short>(texture->m_width), 0, 0);
-        GXTexCoord2s16(static_cast<short>(texture->m_width * 2), 0);
-        GXPosition3s16(static_cast<short>(texture->m_width), static_cast<short>(texture->m_height), 0);
-        GXTexCoord2s16(static_cast<short>(texture->m_width * 2), static_cast<short>(texture->m_height * 2));
-        GXPosition3s16(0, static_cast<short>(texture->m_height), 0);
-        GXTexCoord2s16(0, static_cast<short>(texture->m_height * 2));
+        GXPosition3s16(static_cast<short>(width), 0, 0);
+        GXTexCoord2s16(static_cast<short>(width * 2), 0);
+        GXPosition3s16(static_cast<short>(width), static_cast<short>(height), 0);
+        GXTexCoord2s16(static_cast<short>(width * 2), static_cast<short>(height * 2));
+        GXPosition3s16(0, static_cast<short>(height), 0);
+        GXTexCoord2s16(0, static_cast<short>(height * 2));
         PSMTX44Copy(CameraPcs.m_screenMatrix, projMtx);
         GXSetProjection(projMtx, GX_PERSPECTIVE);
     }
@@ -269,14 +269,14 @@ void CCharaPcs::drawViewer()
         _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 4);
         _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0xFF, 0xFF, 4);
         GXSetNumChans(1);
-        GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, 0, GX_DF_NONE, GX_AF_NONE);
-        GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, 0, GX_DF_NONE, GX_AF_SPEC);
+        GXSetChanCtrl(GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, 0, GX_DF_CLAMP, GX_AF_SPOT);
+        GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, 0, GX_DF_CLAMP, GX_AF_NONE);
         GXClearVtxDesc();
         GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
         GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
         GXLoadPosMtxImm(cameraMtx, 0);
 
-        for (int i = -10; i < 11; i++) {
+        for (int i = -10; i <= 10; i++) {
             GXColor color = {0x80, 0x80, 0x80, static_cast<u8>((i == 0) ? 0x60 : 0x20)};
             GXSetChanMatColor(GX_COLOR0A0, color);
             float x = (float)i * kCharaViewerGridSpacing;
@@ -294,7 +294,7 @@ void CCharaPcs::drawViewer()
             if (*(int*)(model + 0xB0) == 0) {
                 Printf__8CGraphicFPce(&Graphic, s_no_texture);
             } else {
-                CStopWatch watch(reinterpret_cast<char*>(-1));
+                CStopWatch watch(const_cast<char*>(kCharaViewerNoName));
                 watch.Reset();
                 watch.Start();
                 Graphic.SetFog(0, 0);
@@ -660,7 +660,7 @@ void CCharaPcs::calcViewer()
         SRTToMatrix__5CMathFPA4_fP3SRT(&Math, modelMtx, &srt);
         SetMatrix__Q26CChara6CModelFPA4_f(model, modelMtx);
 
-        CStopWatch matrixWatch(reinterpret_cast<char*>(-1));
+        CStopWatch matrixWatch(const_cast<char*>(kCharaViewerNoName));
         matrixWatch.Reset();
         matrixWatch.Start();
         CalcMatrix__Q26CChara6CModelFv(model);
@@ -788,8 +788,7 @@ void CCharaPcs::createViewer()
     clearColor.g = 0x40;
     clearColor.b = 0x40;
     clearColor.a = 0xFF;
-    *(unsigned int*)(p + 0x0C) = *reinterpret_cast<unsigned int*>(&clearColor);
-    SetCopyClear__8CGraphicF8_GXColori(&Graphic, &clearColor, 0xFFFF);
+    SetCopyClear__8CGraphicF8_GXColori(&Graphic, &clearColor, 0xFFFFFF);
 
     self->m_viewerModel[0] = 0;
     self->m_viewerAnim[0] = 0;

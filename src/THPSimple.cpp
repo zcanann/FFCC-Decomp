@@ -1009,7 +1009,7 @@ s32 THPSimpleInit(s32 audioMixMode)
     u32 interruptState;
 
     File.CheckQueue();
-    memset(&SimpleControl, 0, sizeof(SimpleControl));
+    memset(&SimpleControl, 0, 0x174);
     LCEnable();
 
     if (THPInit() == FALSE) {

@@ -4555,7 +4555,8 @@ void GbaQueue::SetRadarMode(int channel, int mode)
 	OSWaitSemaphore(accessSemaphores + channel);
 	int radarMode = obj[0x2D41];
 	int mask = 1 << channel;
-	int newRadarMode = (radarMode & ~mask) | ((mode & 1) << channel);
+	int newRadarMode = radarMode & ~mask;
+	newRadarMode |= (mode & 1) << channel;
 	obj[0x2D41] = newRadarMode;
 	if (radarMode != obj[0x2D41]) {
 		obj[0x2D42] = obj[0x2D42] | mask;

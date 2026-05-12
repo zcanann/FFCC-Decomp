@@ -393,14 +393,15 @@ void pppFrameYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthShp
             break;
         }
 
-        spawnCount = 0;
+        i = 0;
         particleData = (u8*)work->m_particles;
         worldMat = work->m_wmats;
         particleColor = work->m_colors;
 
         if ((gPppCalcDisabled == 0) && (*(s32*)(paramPayload + 4) != 0xffff)) {
+            spawnCount = i;
             work->m_lifeLimit = work->m_lifeLimit + 1;
-            for (i = 0; i < work->m_maxParticles; i++) {
+            for (; i < work->m_maxParticles; i++) {
                 if (*(u16*)(particleData + 0x22) != 0) {
                     calc((_pppPObject*)object, work, param, (_PARTICLE_DATA*)particleData, colorWork, particleColor);
                 } else {
@@ -462,21 +463,15 @@ extern "C" void calc(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirth
     *tailScale = *tailScale + pYmMegaBirthShpTail3->m_sizeVal;
 
     {
-        Vec velocity = *(Vec*)(particleBytes + 0x10);
-        Vec scaledVelocity;
-        pppScaleVectorXYZ(scaledVelocity, velocity, *velocityScale);
-
-        Vec currentPos = *(Vec*)particleData;
-        pppAddVector(*(Vec*)particleData, currentPos, scaledVelocity);
+        Vec scaled;
+        pppScaleVectorXYZ(scaled, *(Vec*)(particleBytes + 0x10), *velocityScale);
+        pppAddVector(*(Vec*)particleData, *(Vec*)particleData, scaled);
     }
 
     {
-        Vec tailDirection = vYmMegaBirthShpTail3->m_tailScaleDirection;
-        Vec scaledTailDirection;
-        pppScaleVectorXYZ(scaledTailDirection, tailDirection, *tailScale);
-
-        Vec currentPosTail = *(Vec*)particleData;
-        pppAddVector(*(Vec*)particleData, currentPosTail, scaledTailDirection);
+        Vec scaled;
+        pppScaleVectorXYZ(scaled, vYmMegaBirthShpTail3->m_tailScaleDirection, *tailScale);
+        pppAddVector(*(Vec*)particleData, *(Vec*)particleData, scaled);
     }
 
     if (*(u16*)((u8*)&pYmMegaBirthShpTail3->m_matrix[1] + 0x4) != 0) {
@@ -494,8 +489,8 @@ extern "C" void calc(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirth
         }
     }
 
-    unsigned short fadeTime2 = (unsigned short)frameState[6];
-    if (fadeTime2 != 0 && *(u16*)(particleBytes + 0x22) <= fadeTime2) {
+    unsigned int fadeTime2 = frameState[6];
+    if (fadeTime2 != 0 && *(u16*)(particleBytes + 0x22) <= static_cast<int>(fadeTime2)) {
         unsigned char fadeInFrames = *((unsigned char*)&pYmMegaBirthShpTail3->m_matrix[1] + 7);
         *blend = *blend +
             (float)alpha / (float)fadeInFrames;

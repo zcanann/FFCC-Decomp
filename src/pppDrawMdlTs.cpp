@@ -14,7 +14,7 @@ void SetTexScroll__12CMaterialManFffff(CMaterialMan*, float, float, float, float
 }
 
 extern const float kPppKeShpTail2XZero = 0.0f;
-static const float FLOAT_803304F0 = 0.0f;
+extern const float FLOAT_803304F0;
 
 // Use simple forward declarations and casting approach
 

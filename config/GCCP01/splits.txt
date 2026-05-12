@@ -325,7 +325,7 @@ p_FunnyShape.cpp:
 	.ctors      start:0x801D5400 end:0x801D5404
 	.rodata     start:0x801D7DD0 end:0x801D7E80
 	.data       start:0x801EA778 end:0x801EA914
-	.data       start:0x801EA914 end:0x801EA948
+	.data       start:0x801EA914 end:0x801EA960
 	.bss        start:0x8026D728 end:0x80273928
 	.sbss       start:0x8032ED28 end:0x8032ED35
 

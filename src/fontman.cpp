@@ -3,7 +3,7 @@
 #include "ffcc/color.h"
 #include "ffcc/p_camera.h"
 extern "C" {
-unsigned char g_tFont22[0x10D40] ATTRIBUTE_ALIGN(32) = {
+unsigned char g_tFont22[0x10D40] = {
 #include "src/font_res_archive.inc"
 };
 }

@@ -2738,7 +2738,7 @@ static void _SkipMusicEntry()
     }
 
     RedDelete(p_SkipKeyOn);
-    m_MusicSkipComplete = 0;
+    m_MusicSkipComplete = REDSOUND_MUSIC_SKIP_NOT_COMPLETE;
 }
 
 
@@ -2789,7 +2789,7 @@ void MusicSkipFunction()
         } while (trackCount != 0);
         activeTrackCount = _MusicMidiNoteSkipExecute(control, p_SkipKeyOn, 1);
     }
-    m_MusicSkipComplete = 1;
+    m_MusicSkipComplete = REDSOUND_MUSIC_SKIP_COMPLETE;
 }
 
 

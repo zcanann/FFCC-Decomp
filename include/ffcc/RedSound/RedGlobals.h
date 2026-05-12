@@ -148,6 +148,11 @@ enum RedSoundPauseState {
 	REDSOUND_PAUSE_ON = 1,
 };
 
+enum RedMusicSkipCompleteState {
+	REDSOUND_MUSIC_SKIP_NOT_COMPLETE = 0,
+	REDSOUND_MUSIC_SKIP_COMPLETE = 1,
+};
+
 enum RedMusicPhraseStopState {
 	REDSOUND_MUSIC_PHRASE_STOP_OFF = 0,
 	REDSOUND_MUSIC_PHRASE_STOP_ON = 1,

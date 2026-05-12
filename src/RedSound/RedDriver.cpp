@@ -136,6 +136,21 @@ enum RedDriverDmaThreadStage {
     REDSOUND_DMA_THREAD_FINISH_ENTRY = 9,
 };
 
+enum RedDriverThreadControlState {
+    REDSOUND_THREAD_CONTROL_STOP = 0,
+    REDSOUND_THREAD_CONTROL_RUN = 1,
+};
+
+enum RedDriverDmaStatus {
+    REDSOUND_DMA_STATUS_IDLE = 0,
+    REDSOUND_DMA_STATUS_BUSY = 1,
+};
+
+enum RedDriverWorkerState {
+    REDSOUND_WORKER_IDLE = 0,
+    REDSOUND_WORKER_BUSY = 1,
+};
+
 struct RedDmaRequest {
     int m_id;
     int m_direction;
@@ -1518,9 +1533,9 @@ static int _MainThread(void*)
     unsigned int elapsed;
 
     m_ThreadExecute = m_ThreadExecute | REDSOUND_THREAD_FLAG_MAIN;
-    while (m_ThreadControl != 0) {
+    while (m_ThreadControl != REDSOUND_THREAD_CONTROL_STOP) {
         OSWaitSemaphore(&m_MainSemaphore);
-        if (m_ThreadControl != 0) {
+        if (m_ThreadControl != REDSOUND_THREAD_CONTROL_STOP) {
             startTick = OSGetTick();
             control = p_SoundControlBuffer;
             masterTime = m_RedMasterTime;
@@ -1563,17 +1578,17 @@ static int _MainThread(void*)
 static int _WaveSettingThread(void* threadArg)
 {
     m_ThreadExecute = m_ThreadExecute | REDSOUND_THREAD_FLAG_WAVE_SETTING;
-    m_WaveSettingStatus = 0;
-    while (m_ThreadControl != 0) {
+    m_WaveSettingStatus = REDSOUND_WORKER_IDLE;
+    while (m_ThreadControl != REDSOUND_THREAD_CONTROL_STOP) {
         OSWaitSemaphore(&m_WaveSettingSemaphore);
-        if (m_ThreadControl != 0) {
+        if (m_ThreadControl != REDSOUND_THREAD_CONTROL_STOP) {
             RedWaveSettingState* waveSetting = (RedWaveSettingState*)threadArg;
             m_WaveSettingStatus = m_WaveSettingStatus + 1;
             c_RedEntry.SetWaveData(waveSetting->m_waveId, waveSetting->m_waveData, waveSetting->m_waveSize);
             *waveSetting->m_slot = 0;
             do {
             } while (OSTryWaitSemaphore(&m_WaveSettingSemaphore) > 0);
-            m_WaveSettingStatus = 0;
+            m_WaveSettingStatus = REDSOUND_WORKER_IDLE;
         }
     }
     m_ThreadExecute = m_ThreadExecute & ~REDSOUND_THREAD_FLAG_WAVE_SETTING;
@@ -1627,7 +1642,7 @@ static void _DMACheckProcess()
  */
 static void _DmaCallback(unsigned long)
 {
-    m_DMAStatus = 0;
+    m_DMAStatus = REDSOUND_DMA_STATUS_IDLE;
 }
 
 /*
@@ -1812,7 +1827,7 @@ static void _DmaExecute()
         queueEntry = *oldQueuePtr;
         m_DMAInThread = REDSOUND_DMA_THREAD_LOAD_ENTRY;
         if (queueEntry->m_id != 0) {
-            m_DMAStatus = 1;
+            m_DMAStatus = REDSOUND_DMA_STATUS_BUSY;
             if (queueEntry->m_direction == REDSOUND_DMA_DIRECTION_TO_ARAM) {
                 DCFlushRange((void*)queueEntry->m_mainMemory, (u32)queueEntry->m_size);
                 srcAddress = queueEntry->m_mainMemory;
@@ -1843,7 +1858,7 @@ static void _DmaExecute()
 
         while (activeRequest != 0) {
             m_DMAInThread = REDSOUND_DMA_THREAD_POLL_STATUS;
-            if (m_DMAStatus == 0) {
+            if (m_DMAStatus == REDSOUND_DMA_STATUS_IDLE) {
                 m_DMAInThread = REDSOUND_DMA_THREAD_RUN_CALLBACK;
                 if ((u32)activeRequest->m_callback != 0) {
                     interrupt = OSDisableInterrupts();
@@ -1875,15 +1890,15 @@ static void _DmaExecute()
 static int _DmaExecuteThread(void*)
 {
     m_ThreadExecute |= REDSOUND_THREAD_FLAG_DMA;
-    m_DMAExecute = 0;
+    m_DMAExecute = REDSOUND_WORKER_IDLE;
     m_DMAInThread = 0;
-    while (m_ThreadControl != 0) {
+    while (m_ThreadControl != REDSOUND_THREAD_CONTROL_STOP) {
         OSWaitSemaphore(&m_DmaExecuteSemaphore);
-        m_DMAExecute = 1;
-        if (m_ThreadControl != 0) {
+        m_DMAExecute = REDSOUND_WORKER_BUSY;
+        if (m_ThreadControl != REDSOUND_THREAD_CONTROL_STOP) {
             _DmaExecute();
         }
-        m_DMAExecute = 0;
+        m_DMAExecute = REDSOUND_WORKER_IDLE;
     }
     m_ThreadExecute &= ~REDSOUND_THREAD_FLAG_DMA;
     return 0;
@@ -1901,10 +1916,10 @@ static int _DmaExecuteThread(void*)
 static int _MusicSkipThread(void*)
 {
     m_ThreadExecute |= REDSOUND_THREAD_FLAG_MUSIC_SKIP;
-    m_MusicSkipComplete = 0;
-    while (m_ThreadControl != 0) {
+    m_MusicSkipComplete = REDSOUND_MUSIC_SKIP_NOT_COMPLETE;
+    while (m_ThreadControl != REDSOUND_THREAD_CONTROL_STOP) {
         OSWaitSemaphore(&m_MusicSkipSemaphore);
-        if (m_ThreadControl != 0) {
+        if (m_ThreadControl != REDSOUND_THREAD_CONTROL_STOP) {
             MusicSkipFunction();
         }
         while (OSTryWaitSemaphore(&m_MusicSkipSemaphore) > 0) {
@@ -1975,7 +1990,7 @@ void CRedDriver::Init()
     int noMusicId;
 
     m_ThreadExecute = 0;
-    m_ThreadControl = 1;
+    m_ThreadControl = REDSOUND_THREAD_CONTROL_RUN;
     m_ReportPrint = 1;
     m_SoundMode = 0;
     GetSoundMode();
@@ -1991,7 +2006,7 @@ void CRedDriver::Init()
     m_SoundMasterControl = 0;
     m_MusicSkipLine = 0;
     m_MusicFastSpeed = 0;
-    m_DMAStatus = 0;
+    m_DMAStatus = REDSOUND_DMA_STATUS_IDLE;
     m_CrossTime = 0;
     m_MasterSEVolume = REDSOUND_MASTER_VOLUME_FULL;
     m_MasterMusicVolume = REDSOUND_MASTER_VOLUME_FULL;
@@ -2111,7 +2126,7 @@ void CRedDriver::End()
     RedDriverSyncState& sync = RedDriverSync();
 
     AXRegisterCallback(0);
-    m_ThreadControl = 0;
+    m_ThreadControl = REDSOUND_THREAD_CONTROL_STOP;
     OSSignalSemaphore(&sync.m_mainSemaphore);
     OSSignalSemaphore(&sync.m_waveSemaphore);
     OSSignalSemaphore(&sync.m_dmaSemaphore);
@@ -3346,7 +3361,7 @@ void CRedDriver::ClearWaveBank(int waveBank)
 void CRedDriver::SetWaveData(int slot, int waveID, void* waveData, int waveSize)
 {
     while (true) {
-        if (m_WaveSettingStatus == 0) {
+        if (m_WaveSettingStatus == REDSOUND_WORKER_IDLE) {
             break;
         }
 

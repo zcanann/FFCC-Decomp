@@ -6,9 +6,9 @@
 #include <dolphin/mtx.h>
 
 void pppSetFpMatrix(_pppMngSt*);
-static const float FLOAT_803320B8 = 1.0f;
-static const float FLOAT_803320BC = 25.0f;
-static const float FLOAT_803320C0 = 1.3333f;
+extern const float FLOAT_803320B8 = 1.0f;
+extern const float FLOAT_803320BC = 25.0f;
+extern const float FLOAT_803320C0 = 1.3333f;
 extern const float FLOAT_803320C4;
 
 /*

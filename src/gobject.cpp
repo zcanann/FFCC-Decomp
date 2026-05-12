@@ -3317,6 +3317,10 @@ void CGObject::SetPosBG(Vec* position, int useCapsuleOffset)
  */
 void CGObject::ResetDynamics()
 {
+    struct ModelFlagBits {
+        signed char m_dynamics : 1;
+        signed char m_unused : 7;
+    };
     bool hasModel = false;
     CCharaPcs::CHandle* handle = m_charaModelHandle;
 
@@ -3326,7 +3330,7 @@ void CGObject::ResetDynamics()
 
     if (hasModel) {
         u8* modelBytes = reinterpret_cast<u8*>(handle->m_model);
-        modelBytes[0x10C] = static_cast<u8>(__rlwimi(modelBytes[0x10C], 1, 7, 24, 24));
+        reinterpret_cast<ModelFlagBits*>(modelBytes + 0x10C)->m_dynamics = true;
     }
 }
 

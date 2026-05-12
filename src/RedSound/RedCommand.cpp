@@ -142,7 +142,7 @@ static void _EraseAttribute(int eraseTrack, int attrMask)
 			track->m_seId = 0;
 			track->m_flags = 0;
 			track->m_command = 0;
-			track->m_mixVolumeMode = 0;
+			track->m_mixVolumeMode = REDSOUND_SE_VOLUME_MODE_NORMAL;
 
 			trackNo = track->m_trackNo;
 			(p_VoiceData + trackNo)->m_stateFlags &= REDSOUND_VOICE_STATE_CLEAR_PLAYING_MASK;
@@ -212,7 +212,7 @@ static int _EraseTime(int eraseTrack)
 			track->m_seId = 0;
 			track->m_flags = 0;
 			track->m_command = 0;
-			track->m_mixVolumeMode = 0;
+			track->m_mixVolumeMode = REDSOUND_SE_VOLUME_MODE_NORMAL;
 
 			trackNo = track->m_trackNo;
 			(p_VoiceData + trackNo)->m_stateFlags &= REDSOUND_VOICE_STATE_CLEAR_PLAYING_MASK;
@@ -312,7 +312,7 @@ int SeStopID(int seId)
 			track->m_seId = 0;
 			track->m_flags = 0;
 			track->m_command = 0;
-			track->m_mixVolumeMode = 0;
+			track->m_mixVolumeMode = REDSOUND_SE_VOLUME_MODE_NORMAL;
 
 			trackNo = track->m_trackNo;
 			(p_VoiceData + trackNo)->m_stateFlags &= REDSOUND_VOICE_STATE_CLEAR_PLAYING_MASK;
@@ -358,7 +358,7 @@ int SeStopG(int group)
 			track->m_seId = 0;
 			track->m_flags = 0;
 			track->m_command = 0;
-			track->m_mixVolumeMode = 0;
+			track->m_mixVolumeMode = REDSOUND_SE_VOLUME_MODE_NORMAL;
 
 			trackNo = track->m_trackNo;
 			(p_VoiceData + trackNo)->m_stateFlags &= REDSOUND_VOICE_STATE_CLEAR_PLAYING_MASK;
@@ -406,7 +406,7 @@ int SeStopMG(int bank, int sep, int group, int kind)
 				track->m_seId = 0;
 				track->m_flags = 0;
 				track->m_command = 0;
-				track->m_mixVolumeMode = 0;
+				track->m_mixVolumeMode = REDSOUND_SE_VOLUME_MODE_NORMAL;
 
 				trackNo = track->m_trackNo;
 				(p_VoiceData + trackNo)->m_stateFlags &= REDSOUND_VOICE_STATE_CLEAR_PLAYING_MASK;
@@ -523,7 +523,7 @@ static int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volum
 				track->m_attrMask = info->m_attrMask;
 				track->m_mixVolume = volume << REDSOUND_FIXED_SHIFT;
 				track->m_mixVolumeDelta = 0;
-				track->m_mixVolumeMode = 0;
+				track->m_mixVolumeMode = REDSOUND_SE_VOLUME_MODE_NORMAL;
 				track->m_pitchDelta = 0;
 				track->m_pitch = 0;
 				track->m_loopReport = isMulti;

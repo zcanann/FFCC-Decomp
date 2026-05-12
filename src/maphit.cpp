@@ -418,14 +418,14 @@ void CMapHit::ReadOtmHit(CChunkFile& chunkFile)
                     }
                 }
 
-                float width = face.m_radiusScale * 0.5f;
-                face.m_boundsMin.x -= (0.1f + width);
-                face.m_boundsMin.y -= (0.1f + width);
-                face.m_boundsMin.z -= (0.1f + width);
-                face.m_boundsMax.x += (0.1f + width);
-                face.m_boundsMax.y += (0.1f + width);
-                face.m_boundsMax.z += (0.1f + width);
-                face.m_radiusScale = 1.0f - width;
+                face.m_radiusScale *= 0.5f;
+                face.m_boundsMin.x -= (0.1f + face.m_radiusScale);
+                face.m_boundsMin.y -= (0.1f + face.m_radiusScale);
+                face.m_boundsMin.z -= (0.1f + face.m_radiusScale);
+                face.m_boundsMax.x += (0.1f + face.m_radiusScale);
+                face.m_boundsMax.y += (0.1f + face.m_radiusScale);
+                face.m_boundsMax.z += (0.1f + face.m_radiusScale);
+                face.m_radiusScale = 1.0f - face.m_radiusScale;
             }
         } else if (chunk.m_id == 'NAME') {
             char* mapHitName = chunkFile.GetString();

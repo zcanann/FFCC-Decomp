@@ -2880,10 +2880,9 @@ void CMonWork::CalcStatus()
 	}
 
 	if (stageRank > 0) {
-		const int stageOffset = stageRank * 2;
-		m_strength = (unsigned short)((float)m_strength * GetStatusMultiplier(stageOffset + 0x48));
-		m_magic = (unsigned short)((float)m_magic * GetStatusMultiplier(stageOffset + 0x4C));
-		m_defense = (unsigned short)((float)m_defense * GetStatusMultiplier(stageOffset + 0x50));
+		m_strength = (unsigned short)((float)m_strength * GetStatusMultiplier(stageRank * 2 + 0x48));
+		m_magic = (unsigned short)((float)m_magic * GetStatusMultiplier(stageRank * 2 + 0x4C));
+		m_defense = (unsigned short)((float)m_defense * GetStatusMultiplier(stageRank * 2 + 0x50));
 	}
 
 	if (m_statusTimers[9] != 0) {

@@ -278,6 +278,11 @@ enum RedSeBlockEntryLayout {
 	                             (seBlock)->m_seCount * REDSOUND_SE_BLOCK_ENTRY_SIZE +             \
 	                             ((seBlock)->m_entries[(seIndex)] & REDSOUND_SE_BLOCK_ENTRY_MASK))
 
+#define RedSeBlockGetInfoFromEntries(seBlock, entries, seIndex)                                   \
+	reinterpret_cast<RedSeINFO*>(reinterpret_cast<unsigned char*>(entries) +                        \
+	                             (seBlock)->m_seCount * REDSOUND_SE_BLOCK_ENTRY_SIZE +             \
+	                             ((entries)[(seIndex)] & REDSOUND_SE_BLOCK_ENTRY_MASK))
+
 struct RedWaveHeadWD
 {
 	char m_signature[REDSOUND_WAVE_SIGNATURE_SIZE];

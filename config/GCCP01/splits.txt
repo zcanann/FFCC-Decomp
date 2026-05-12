@@ -325,7 +325,7 @@ p_FunnyShape.cpp:
 	.ctors      start:0x801D5400 end:0x801D5404
 	.rodata     start:0x801D7DD0 end:0x801D7E80
 	.data       start:0x801EA778 end:0x801EA914
-	.data       start:0x801EA914 end:0x801EA948
+	.data       start:0x801EA914 end:0x801EA960
 	.bss        start:0x8026D728 end:0x80273928
 	.sbss       start:0x8032ED28 end:0x8032ED35
 
@@ -1368,7 +1368,7 @@ THPSimple.cpp:
 	extabindex  start:0x8000FDD8 end:0x8000FE68
 	.text       start:0x801040C8 end:0x8010597C
 	.data       start:0x802111E8 end:0x802112E8
-	.bss        start:0x802FFA80 end:0x80300140
+	.bss        start:0x802FFA80 end:0x80300160
 	.sbss       start:0x8032EE48 end:0x8032EE60
 
 THPDraw.cpp:
@@ -1381,7 +1381,7 @@ pppMana2.cpp:
 	extab       start:0x8000912C end:0x8000918C
 	extabindex  start:0x8000FE8C end:0x8000FF1C
 	.text       start:0x8010617C end:0x801091D4
-	.rodata     start:0x801DC4E0 end:0x801DC4F0
+	.rodata     start:0x801DC4D0 end:0x801DC4F0
 	.sdata2     start:0x80331898 end:0x80331910
 
 pppConformBGNormal.cpp:
@@ -1457,7 +1457,7 @@ prgobj.cpp:
 	extabindex  start:0x8001069C end:0x8001075C
 	.text       start:0x80127008 end:0x80127B54
 	.data       start:0x802120D0 end:0x802121A8
-	.sdata2     start:0x80331BD0 end:0x80331C08
+	.sdata2     start:0x80331BD0 end:0x80331BF0
 
 pppBindOnlyPos.cpp:
 	.text       start:0x80127B54 end:0x80127B74
@@ -1471,12 +1471,14 @@ p_minigame.cpp:
 	.data       start:0x802121A8 end:0x80212398
 	.bss        start:0x80300268 end:0x80306708
 	.sbss       start:0x8032EEA0 end:0x8032EEA8
+	.sdata2     start:0x80331BF0 end:0x80331BF8
 
 pppLerpPos.cpp:
 	extab       start:0x8000976C end:0x8000977C
 	extabindex  start:0x800107EC end:0x80010804
 	.text       start:0x8012B24C end:0x8012B4A8
 	.rodata     start:0x801DD418 end:0x801DD428
+	.sdata2     start:0x80331BF8 end:0x80331C08
 
 pppScaleLoopAuto.cpp:
 	extab       start:0x8000977C end:0x80009784

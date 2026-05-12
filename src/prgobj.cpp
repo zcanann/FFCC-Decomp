@@ -23,10 +23,6 @@ extern const float FLOAT_80331BD4 = 0.0f;
 extern const float FLOAT_80331BD8 = 3.1415927f;
 extern const double DOUBLE_80331BE0 = 4503601774854144.0;
 extern const float FLOAT_80331BE8 = -1.0f;
-extern const char DAT_80331bf0[] = "GMGR";
-extern const float FLOAT_80331bf8;
-extern const float FLOAT_80331bfc;
-extern const double DOUBLE_80331C00;
 
 static inline float LoadFloat(const float& value)
 {
@@ -629,7 +625,3 @@ void CGPrgObj::onCreate()
 	m_animFlagBits.bits.m_animDirect = 0;
 	m_reqAnimId = -1;
 }
-
-extern const float FLOAT_80331bf8 = 0.0f;
-extern const float FLOAT_80331bfc = 1.0f;
-extern const double DOUBLE_80331C00 = 4503599627370496.0;

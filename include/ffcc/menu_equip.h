@@ -4,8 +4,6 @@
 class CMenuPcs
 {
 public:
-    void EquipInit();
-    void EquipInit0();
     void EquipInit1();
     int EquipOpen();
     void EquipCtrl();
@@ -14,7 +12,6 @@ public:
     int EquipCtrlCur();
     bool EquipOpen0();
     bool EquipClose0();
-    void GetEquipItem();
     int ChkEquipActive(int);
 };
 

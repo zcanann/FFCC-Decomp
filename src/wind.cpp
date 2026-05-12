@@ -8,10 +8,25 @@
 #include "ffcc/linkage.h"
 #include "ffcc/math.h"
 #include "ffcc/game.h"
+#include "ffcc/p_menu.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/system.h"
 
 CWind Wind;
+
+/*
+ * --INFO--
+ * PAL Address: TODO
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CMenuPcs::GetMenuMode()
+{
+    return m_mode;
+}
 
 extern int __float_nan[];
 extern "C" double cos(double);
@@ -380,7 +395,7 @@ void CWind::Calc(Vec* out, const Vec* pos, int randomize)
     out->y = zero;
     out->x = zero;
 
-    if ((*(s32*)((u8*)&MenuPcs + 0x740) == 2) || (Game.m_gameWork.m_gamePaused != 0)) {
+    if ((MenuPcs.GetMenuMode() == 2) || (Game.m_gameWork.m_gamePaused != 0)) {
         return;
     }
 

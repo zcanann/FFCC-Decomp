@@ -2439,6 +2439,10 @@ void CGObject::CCClassRot(int useBodyRadius, int classMask, float yOffset, float
  */
 void CGObject::Attach(CGObject* owner, char* nodeName, Vec* attachLocal)
 {
+    struct WeaponNodeFlagBits {
+        signed char m_unused : 7;
+        signed char m_attached : 1;
+    };
     bool hasModel = false;
     CCharaPcs::CHandle* handle = owner->m_charaModelHandle;
 
@@ -2449,10 +2453,7 @@ void CGObject::Attach(CGObject* owner, char* nodeName, Vec* attachLocal)
     if (hasModel) {
         int nodeIndex = SearchNode__Q26CChara6CModelFPc(handle->m_model, nodeName);
         if (nodeIndex >= 0) {
-            int weaponFlags = *reinterpret_cast<u8*>(&m_weaponNodeFlags);
-            int setFlag = 1;
-            weaponFlags = __rlwimi(weaponFlags, setFlag, 0, 31, 31);
-            *reinterpret_cast<u8*>(&m_weaponNodeFlags) = static_cast<u8>(weaponFlags);
+            reinterpret_cast<WeaponNodeFlagBits*>(&m_weaponNodeFlags)->m_attached = true;
 
             m_attachOwner = owner;
             m_attachNode = nodeIndex;
@@ -2482,14 +2483,18 @@ void CGObject::Attach(CGObject* owner, char* nodeName, Vec* attachLocal)
  */
 void CGObject::Detach()
 {
-    if ((m_weaponNodeFlags & 1) != 0) {
-        u8* modelBytes = reinterpret_cast<u8*>(m_attachOwner->m_charaModelHandle->m_model);
-        u8* modelNodes = *reinterpret_cast<u8**>(modelBytes + 0xA8);
-        float (*nodeMtx)[4] = reinterpret_cast<float (*)[4]>(modelNodes + m_attachNode * 0xC0 + 0xC);
+    struct WeaponNodeFlagBits {
+        signed char m_unused : 7;
+        signed char m_attached : 1;
+    };
+    WeaponNodeFlagBits* weaponNodeFlags = reinterpret_cast<WeaponNodeFlagBits*>(&m_weaponNodeFlags);
 
-        m_worldPosition.x = nodeMtx[0][3];
-        m_worldPosition.y = nodeMtx[1][3];
-        m_worldPosition.z = nodeMtx[2][3];
+    if (weaponNodeFlags->m_attached != 0) {
+        CChara::CNode* node = &m_attachOwner->m_charaModelHandle->m_model->m_nodes[m_attachNode];
+
+        m_worldPosition.x = node->m_mtx[0][3];
+        m_worldPosition.y = node->m_mtx[1][3];
+        m_worldPosition.z = node->m_mtx[2][3];
         PSVECAdd(&m_worldPosition, &m_attachOwner->m_worldPosition, &m_worldPosition);
 
         float rotY = m_rotBaseY + m_attachOwner->m_rotBaseY;
@@ -2497,7 +2502,7 @@ void CGObject::Detach()
         m_rotBaseY = rotY;
     }
 
-    m_weaponNodeFlags &= 0xFFFE;
+    weaponNodeFlags->m_attached = false;
 }
 
 /*
@@ -3317,6 +3322,10 @@ void CGObject::SetPosBG(Vec* position, int useCapsuleOffset)
  */
 void CGObject::ResetDynamics()
 {
+    struct ModelFlagBits {
+        signed char m_dynamics : 1;
+        signed char m_unused : 7;
+    };
     bool hasModel = false;
     CCharaPcs::CHandle* handle = m_charaModelHandle;
 
@@ -3326,7 +3335,7 @@ void CGObject::ResetDynamics()
 
     if (hasModel) {
         u8* modelBytes = reinterpret_cast<u8*>(handle->m_model);
-        modelBytes[0x10C] = static_cast<u8>(__rlwimi(modelBytes[0x10C], 1, 7, 24, 24));
+        reinterpret_cast<ModelFlagBits*>(modelBytes + 0x10C)->m_dynamics = true;
     }
 }
 
@@ -3374,15 +3383,22 @@ void CGObject::CalcSphereNearPos(float scale, float angleOffset, Vec& outPos)
  */
 void CGObject::ResetAnimPoint(int slot)
 {
-    if ((m_charaModelHandle == 0) || (m_charaModelHandle->m_model == 0)) {
+    bool hasModel = false;
+    CCharaPcs::CHandle* handle = m_charaModelHandle;
+
+    if ((handle != 0) && (handle->m_model != 0)) {
+        hasModel = true;
+    }
+
+    if (!hasModel) {
         return;
     }
 
-    if (m_charaModelHandle->m_animSlot[slot] == 0) {
+    if (handle->m_animSlot[slot] == 0) {
         return;
     }
 
-    *reinterpret_cast<u16*>(reinterpret_cast<u8*>(m_charaModelHandle->m_animSlot[slot]) + 0x2C) = 0;
+    *reinterpret_cast<u16*>(reinterpret_cast<u8*>(handle->m_animSlot[slot]) + 0x2C) = 0;
 }
 
 /*

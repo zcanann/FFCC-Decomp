@@ -44,7 +44,7 @@ struct THPSimpleControl {
     THPAudioBuffer audioBuffer[3]; // 0x144
     s32 audioDecodeIndex;          // 0x168
     s32 audioPlayIndex;            // 0x16C
-    u8 pad170[4];                  // 0x170
+    u8 pad170[0x1C];               // 0x170
 };
 
 THPSimpleControl SimpleControl;

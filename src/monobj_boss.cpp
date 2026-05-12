@@ -82,6 +82,7 @@ extern double DOUBLE_80331d08 = 3.0;
 extern double DOUBLE_80331d10;
 extern double DOUBLE_80331d38;
 extern double DOUBLE_80331dc0;
+extern "C" char s_meteo_3_80331D64[8];
 extern char SoundBuffer[];
 extern char SoundBuffer_1260_[];
 extern "C" unsigned char m_boss__8CGMonObj[];
@@ -93,6 +94,22 @@ static const char s_to_b_obj_801dd4f4[] = "to_b_obj";
 static const char s_to_02d_obj_801dd500[] = "to_%02d_obj";
 
 typedef void (*MonObjSawCallback)(CGMonObj*, int, int, int);
+
+struct MeteoParasiteCBossWork {
+    u8 m_pad00[0x74];
+    CGMonObj* m_obj;
+    int m_index;
+    union {
+        u8 m_flags;
+        struct {
+            u8 m_bit80 : 1;
+            s8 m_meteo3 : 1;
+            u8 m_rest : 6;
+        } bits;
+    };
+    u8 m_pad7D[7];
+    int m_wait;
+};
 
 /*
  * --INFO--
@@ -350,10 +367,13 @@ void CGMonObj::damagedFuncGolem()
  */
 void CGMonObj::changeStatFuncGolem(int stat)
 {
-	if (stat == 0x65) {
-		setActionParam__8CGMonObjFi(this, -9);
-	} else if (stat > 99 && stat < 0x65) {
+	switch (stat) {
+	case 100:
 		setActionParam__8CGMonObjFi(this, -10);
+		break;
+	case 101:
+		setActionParam__8CGMonObjFi(this, -9);
+		break;
 	}
 }
 
@@ -535,8 +555,10 @@ void CGMonObj::frameStatFuncArmstrong()
  */
 void CGMonObj::cancelStatFuncOrcKing()
 {
-	if (reinterpret_cast<CGPrgObj*>(this)->m_lastStateId == 100) {
+	switch (reinterpret_cast<CGPrgObj*>(this)->m_lastStateId) {
+	case 100:
 		reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0xC00);
+		break;
 	}
 }
 
@@ -726,8 +748,10 @@ int CGMonObj::calcBranchFuncOrcKing(int)
  */
 void CGMonObj::cancelStatFuncGoblinKing()
 {
-	if (reinterpret_cast<CGPrgObj*>(this)->m_lastStateId == 100) {
+	switch (reinterpret_cast<CGPrgObj*>(this)->m_lastStateId) {
+	case 100:
 		reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x400);
+		break;
 	}
 }
 
@@ -778,8 +802,10 @@ int CGMonObj::calcBranchFuncGoblinKing(int)
  */
 void CGMonObj::cancelStatFuncSaw()
 {
-	if (reinterpret_cast<CGPrgObj*>(this)->m_lastStateId == 100) {
+	switch (reinterpret_cast<CGPrgObj*>(this)->m_lastStateId) {
+	case 100:
 		reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(1);
+		break;
 	}
 }
 
@@ -1129,8 +1155,10 @@ int CGMonObj::attackCheckFuncLKShooter(int)
  */
 void CGMonObj::changeStatFuncDragonZombie(int stat)
 {
-	if (stat == 100) {
+	switch (stat) {
+	case 100:
 		setActionParam__8CGMonObjFi(this, -11);
+		break;
 	}
 }
 
@@ -1276,10 +1304,13 @@ void CGMonObj::frameStatFuncCaveWorm()
  */
 void CGMonObj::changeStatFuncLich(int stat)
 {
-	if (stat == 0x65) {
-		setActionParam__8CGMonObjFi(this, -14);
-	} else if (stat > 99 && stat < 0x65) {
+	switch (stat) {
+	case 100:
 		setActionParam__8CGMonObjFi(this, -10);
+		break;
+	case 101:
+		setActionParam__8CGMonObjFi(this, -14);
+		break;
 	}
 }
 
@@ -1294,8 +1325,10 @@ void CGMonObj::changeStatFuncLich(int stat)
  */
 void CGMonObj::cancelStatFuncLich()
 {
-	if (reinterpret_cast<CGPrgObj*>(this)->m_lastStateId == 100) {
+	switch (reinterpret_cast<CGPrgObj*>(this)->m_lastStateId) {
+	case 100:
 		reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x400);
+		break;
 	}
 }
 
@@ -1796,10 +1829,13 @@ void CGMonObj::damagedFuncWifeLamia()
  */
 void CGMonObj::changeStatFuncMolbol(int stat)
 {
-	if (stat == 0x65) {
-		setActionParam__8CGMonObjFi(this, -14);
-	} else if (stat > 99 && stat < 0x65) {
+	switch (stat) {
+	case 100:
 		setActionParam__8CGMonObjFi(this, -13);
+		break;
+	case 101:
+		setActionParam__8CGMonObjFi(this, -14);
+		break;
 	}
 }
 
@@ -1814,8 +1850,10 @@ void CGMonObj::changeStatFuncMolbol(int stat)
  */
 void CGMonObj::cancelStatFuncMolbol()
 {
-	if (reinterpret_cast<CGPrgObj*>(this)->m_lastStateId == 100) {
+	switch (reinterpret_cast<CGPrgObj*>(this)->m_lastStateId) {
+	case 100:
 		reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x400);
+		break;
 	}
 }
 
@@ -1865,7 +1903,18 @@ void CGMonObj::frameStatFuncMolbol()
 void CGMonObj::initFinishedFuncMeteoParasiteC()
 {
 	initFinishedFuncDefault__8CGMonObjFv(this);
-	*reinterpret_cast<CGMonObj**>(SoundBuffer + 1344) = this;
+	*reinterpret_cast<CGMonObj**>(SoundBuffer_1260_ + 0x74) = this;
+
+	if (strcmp(Game.m_currentScriptName, s_meteo_3_80331D64) == 0) {
+		CGObject* object = reinterpret_cast<CGObject*>(this);
+		MeteoParasiteCBossWork* work = reinterpret_cast<MeteoParasiteCBossWork*>(SoundBuffer_1260_);
+		work->bits.m_meteo3 = 1;
+		work->m_index = 3;
+		*reinterpret_cast<u16*>(reinterpret_cast<u8*>(object->m_scriptHandle) + 0x1C) = 1;
+		object->SetAnimSlot(0x35, 0);
+		reqAnim__8CGPrgObjFiii(this, 0x35, 1, 0);
+		object->PlayAnim(0x35, 1, 0, -1, -1, 0);
+	}
 }
 
 /*
@@ -2135,22 +2184,22 @@ void CGMonObj::logicFuncMeteoParasiteC()
 {
 	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
 	int nextState = -1;
-	int& timer = *reinterpret_cast<int*>(SoundBuffer + 1360);
-	if (*reinterpret_cast<unsigned char*>(SoundBuffer + 1356) & 0x80) {
+	MeteoParasiteCBossWork* work = reinterpret_cast<MeteoParasiteCBossWork*>(SoundBuffer_1260_);
+	if (work->bits.m_meteo3 != 0) {
 		nextState = 0x68;
 	} else {
-		timer = (timer - 1) & ~((timer - 1) >> 31);
-		if (*reinterpret_cast<int*>(mon + 0x6B4) == 0) {
-			if (timer != 0) {
+		work->m_wait = (work->m_wait - 1) & ~((work->m_wait - 1) >> 31);
+		if (*reinterpret_cast<int*>(mon + 0x6D0) == 0) {
+			if (work->m_wait != 0) {
 				return;
 			}
 			nextState = 0x65;
 		}
 	}
-	if (nextState == -1) {
-		logicFuncDefault__8CGMonObjFv(this);
-	} else {
+	if (nextState != -1) {
 		changeStat__8CGPrgObjFiii(reinterpret_cast<CGPrgObj*>(this), nextState, 0, 0);
+	} else {
+		logicFuncDefault__8CGMonObjFv(this);
 	}
 }
 

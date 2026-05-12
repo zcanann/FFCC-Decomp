@@ -2488,32 +2488,27 @@ void pppSetBlendMode(unsigned char blendMode)
 	if ((blendMode != 0xFF) && (gPppBlendModeState != blendMode))
 	{
 		gPppBlendModeState = blendMode;
-		if (blendMode == 2)
-		{
+		switch (blendMode) {
+		case 0:
+			_GXSetBlendMode((_GXBlendMode)1, (_GXBlendFactor)4, (_GXBlendFactor)5, (_GXLogicOp)5);
+			_GXSetAlphaCompare((_GXCompare)7, 0, (_GXAlphaOp)0, (_GXCompare)7, 0xFF);
+			GXSetZCompLoc((GXBool)1);
+			break;
+		case 1:
+			_GXSetBlendMode((_GXBlendMode)1, (_GXBlendFactor)4, (_GXBlendFactor)1, (_GXLogicOp)5);
+			_GXSetAlphaCompare((_GXCompare)7, 0, (_GXAlphaOp)0, (_GXCompare)7, 0xFF);
+			GXSetZCompLoc((GXBool)1);
+			break;
+		case 2:
 			_GXSetBlendMode((_GXBlendMode)3, (_GXBlendFactor)4, (_GXBlendFactor)1, (_GXLogicOp)5);
 			_GXSetAlphaCompare((_GXCompare)7, 0, (_GXAlphaOp)0, (_GXCompare)7, 0xFF);
 			GXSetZCompLoc((GXBool)1);
-		}
-		else if (blendMode < 2)
-		{
-			if (blendMode == 0)
-			{
-				_GXSetBlendMode((_GXBlendMode)1, (_GXBlendFactor)4, (_GXBlendFactor)5, (_GXLogicOp)5);
-				_GXSetAlphaCompare((_GXCompare)7, 0, (_GXAlphaOp)0, (_GXCompare)7, 0xFF);
-				GXSetZCompLoc((GXBool)1);
-			}
-			else
-			{
-				_GXSetBlendMode((_GXBlendMode)1, (_GXBlendFactor)4, (_GXBlendFactor)1, (_GXLogicOp)5);
-				_GXSetAlphaCompare((_GXCompare)7, 0, (_GXAlphaOp)0, (_GXCompare)7, 0xFF);
-				GXSetZCompLoc((GXBool)1);
-			}
-		}
-		else if (blendMode < 4)
-		{
+			break;
+		case 3:
 			_GXSetBlendMode((_GXBlendMode)0, (_GXBlendFactor)6, (_GXBlendFactor)5, (_GXLogicOp)5);
 			_GXSetAlphaCompare((_GXCompare)7, 0, (_GXAlphaOp)0, (_GXCompare)7, 0xFF);
 			GXSetZCompLoc((GXBool)1);
+			break;
 		}
 	}
 }

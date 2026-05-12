@@ -40,15 +40,15 @@ const float FLOAT_8033303C = 72.0f;
 extern "C" const char s_pcts_pctd_family_cnt_error_pctd_801DEDC8[] = "%s(%d):family cnt error!!(%d)\n";
 extern "C" const char s_menu_compa_cpp_801DEDE8[] = "menu_compa.cpp";
 
-static const char s_compa_mono_upper[] = "MONO";
-static const char s_compa_normal[] = "Normal";
-static const char s_compa_forza[] = "Forza";
-static const char s_compa_difesa[] = "Difesa";
-static const char s_compa_sonoro[] = "Sonoro";
-static const char s_compa_musica[] = "Musica";
-static const char s_compa_mono[] = "Mono";
-static const char s_compa_contr[] = "Contr.";
-static const char s_compa_norm[] = "Norm.";
+extern "C" const char lbl_803334A8[] = "MONO";
+extern "C" const char lbl_803334B0[] = "Normal";
+extern "C" const char lbl_803334B8[] = "Forza";
+extern "C" const char lbl_803334C0[] = "Difesa";
+extern "C" const char lbl_803334C8[] = "Sonoro";
+extern "C" const char lbl_803334D0[] = "Musica";
+extern "C" const char lbl_803334D8[] = "Mono";
+extern "C" const char lbl_803334E0[] = "Contr.";
+extern "C" const char lbl_803334E8[] = "Norm.";
 
 struct CompaFlatTableEntry
 {
@@ -97,12 +97,11 @@ void CMenuPcs::CompaDraw()
 				SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(&MenuPcs, 1);
 				SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, tex);
 
-				GXColor colors[4] = {
-					{0xFF, 0xFF, 0xFF, 0xFF},
-					{0xFF, 0xFF, 0xFF, 0xFF},
-					{0xFF, 0xFF, 0xFF, 0xFF},
-					{0xFF, 0xFF, 0xFF, 0xFF},
-				};
+				GXColor colors[4];
+				reinterpret_cast<unsigned int*>(colors)[0] = 0xFFFFFFFF;
+				reinterpret_cast<unsigned int*>(colors)[1] = 0xFFFFFFFF;
+				reinterpret_cast<unsigned int*>(colors)[2] = 0xFFFFFFFF;
+				reinterpret_cast<unsigned int*>(colors)[3] = 0xFFFFFFFF;
 				GXSetChanMatColor(GX_COLOR0A0, colors[0]);
 
 				float fillW = alpha * w;
@@ -132,12 +131,11 @@ void CMenuPcs::CompaDraw()
 				}
 
 				if (fillW > FLOAT_80332FF8 && fillW < w) {
-					GXColor fadeColors[4] = {
-						{0xFF, 0xFF, 0xFF, 0x00},
-						{0xFF, 0xFF, 0xFF, 0x00},
-						{0xFF, 0xFF, 0xFF, 0x00},
-						{0xFF, 0xFF, 0xFF, 0x00},
-					};
+					GXColor fadeColors[4];
+					reinterpret_cast<unsigned int*>(fadeColors)[0] = 0xFFFFFF00;
+					reinterpret_cast<unsigned int*>(fadeColors)[1] = 0xFFFFFF00;
+					reinterpret_cast<unsigned int*>(fadeColors)[2] = 0xFFFFFF00;
+					reinterpret_cast<unsigned int*>(fadeColors)[3] = 0xFFFFFF00;
 					float remainW = (static_cast<float>(DOUBLE_80333008) / static_cast<float>(entry->duration)) * w;
 					if (tex == 0x51) {
 						int yStep = static_cast<int>(y);

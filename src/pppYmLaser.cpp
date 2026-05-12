@@ -245,16 +245,16 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 
 		GXLoadPosMtxImm(ppvCameraMatrix, GX_PNMTX0);
 		alphaMax = step->m_payload[0x2b];
-		alphaStep = (u8)(alphaMax / step->m_payload[0x1e]);
+		alphaStep = (u8)((s32)(u8)alphaMax / (s32)step->m_payload[0x1e]);
 		color.r = step->m_payload[0x28];
 		color.g = step->m_payload[0x29];
 		color.b = step->m_payload[0x2a];
 		color.a = alphaMax;
 		GXBegin(GX_TRIANGLES, GX_VTXFMT7, (u16)((step->m_laser.m_pointCount - 1) * 3));
-		u8 alpha = 0;
+		int alpha = 0;
 		for (i = 0; (int)i < (int)(step->m_laser.m_pointCount - 1); i++) {
-			u0 = (float)i * uvStep;
-			u1 = (float)(i + 1) * uvStep;
+			u0 = uvStep * (float)i;
+			u1 = uvStep * (float)(i + 1);
 			_GXColor trailStartColor;
 			trailStartColor.r = color.r;
 			trailStartColor.g = color.g;
@@ -274,7 +274,7 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 			trailEndColor.r = color.r;
 			trailEndColor.g = color.g;
 			trailEndColor.b = color.b;
-			trailEndColor.a = alphaMax - alpha;
+			trailEndColor.a = alphaMax - alphaStep * (i + 1);
 			GXPosition3f32(work->m_points[i + 1].x, work->m_points[i + 1].y, work->m_points[i + 1].z);
 			GXColor1u32(*(u32*)&trailEndColor);
 			GXTexCoord2f32(u1, kPppYmLaserOne);

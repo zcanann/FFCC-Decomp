@@ -515,6 +515,8 @@ int RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* verti
 			projectedOffsetX = texScaleX * ((float)(left + width) - projected[maxIndex].x);
 			texMtx[0][2] = texMtx[0][2] + (projectedObj[maxIndex].x + projectedOffsetX - FLOAT_803305f8);
 		}
+	} else if ((left + width) < 641) {
+		texMtx[0][2] = texMtx[0][2] + offsetX;
 	} else {
 		texMtx[0][2] = texMtx[0][2] + offsetX;
 	}
@@ -625,11 +627,11 @@ void pppDestructYmDeformationShp(pppYmDeformationShp*, pppYmDeformationShpUnkC*)
  */
 void pppConstruct2YmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmDeformationShpUnkC* param_2)
 {
-	float value = kPppYmDeformationShpZero;
+	const float& value = kPppYmDeformationShpZero;
 	VYmDeformationShp* state =
 		(VYmDeformationShp*)((u8*)pppYmDeformationShp_ + 0x80 + param_2->m_serializedDataOffsets[2]);
 
-	state->m_values[1] = kPppYmDeformationShpZero;
+	state->m_values[1] = value;
 	state->m_values[0] = value;
 	state->m_scale = value;
 	state->m_values[4] = value;
@@ -648,7 +650,7 @@ void pppConstruct2YmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pp
  */
 void pppConstructYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmDeformationShpUnkC* param_2)
 {
-	float value = kPppYmDeformationShpZero;
+	const float& value = kPppYmDeformationShpZero;
 	VYmDeformationShp* state =
 		(VYmDeformationShp*)((u8*)pppYmDeformationShp_ + 0x80 + param_2->m_serializedDataOffsets[2]);
 

@@ -412,8 +412,8 @@ void CCameraPcs::onScriptChanged(char*, int fromScript)
     PSMTXInverse(mathMtx, reinterpret_cast<MtxPtr>(self + 0x64));
 
     float refValue = FLOAT_8032fa88;
-    float zero = FLOAT_8032fa34;
-    *reinterpret_cast<float*>(self + 0xDC) = zero;
+    float zero;
+    *reinterpret_cast<float*>(self + 0xDC) = zero = FLOAT_8032fa34;
     *reinterpret_cast<float*>(self + 0xD8) = zero;
     *reinterpret_cast<float*>(self + 0xD4) = zero;
     *reinterpret_cast<float*>(self + 0xE0) = zero;
@@ -939,12 +939,12 @@ void CCameraPcs::SetViewerSRT(const SRT* srt)
 void CCameraPcs::createChara()
 {
     u8* self;
-    float fVar1;
-    float fVar2;
-    float fVar3;
-    float fVar4;
-    float fVar5;
     float fVar6;
+    float fVar5;
+    float fVar4;
+    float fVar3;
+    float fVar2;
+    float fVar1;
     float fVar7;
 
     self = reinterpret_cast<u8*>(this);
@@ -1097,12 +1097,12 @@ void CCameraPcs::calcChara()
 void CCameraPcs::createMap()
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
-    float fVar1;
-    float fVar2;
-    float fVar3;
-    float fVar4;
-    float fVar5;
     float fVar6;
+    float fVar5;
+    float fVar4;
+    float fVar3;
+    float fVar2;
+    float fVar1;
 
     fVar1 = FLOAT_8032fa34;
     fVar2 = FLOAT_8032fa5c;
@@ -1906,12 +1906,15 @@ void CCameraPcs::drawShadowEndAll()
  */
 void CCameraPcs::createMaterialEditor()
 {
+    float fVar3;
+    float fVar1;
+    float fVar2;
     u8* self = reinterpret_cast<u8*>(this);
-    float fVar2 = FLOAT_8032fa34;
+    fVar2 = FLOAT_8032fa34;
     *reinterpret_cast<int*>(self + 0x46C) = 0;
-    float fVar1 = FLOAT_8032fa1c;
+    fVar1 = FLOAT_8032fa1c;
     *reinterpret_cast<float*>(self + 0x450) = fVar2;
-    float fVar3 = FLOAT_8032fa50;
+    fVar3 = FLOAT_8032fa50;
     *reinterpret_cast<float*>(self + 0x44C) = fVar2;
     *reinterpret_cast<float*>(self + 0x448) = fVar2;
     *reinterpret_cast<float*>(self + 0x45C) = fVar2;
@@ -2033,12 +2036,15 @@ void CCameraPcs::calcMaterialEditor()
  */
 void CCameraPcs::createFunnyShape()
 {
+    float fVar3;
+    float fVar1;
+    float fVar2;
     u8* self = reinterpret_cast<u8*>(this);
-    float fVar2 = FLOAT_8032fa34;
+    fVar2 = FLOAT_8032fa34;
     *reinterpret_cast<int*>(self + 0x46C) = 0;
-    float fVar1 = FLOAT_8032fa1c;
+    fVar1 = FLOAT_8032fa1c;
     *reinterpret_cast<float*>(self + 0x450) = fVar2;
-    float fVar3 = FLOAT_8032fa50;
+    fVar3 = FLOAT_8032fa50;
     *reinterpret_cast<float*>(self + 0x44C) = fVar2;
     *reinterpret_cast<float*>(self + 0x448) = fVar2;
     *reinterpret_cast<float*>(self + 0x45C) = fVar2;

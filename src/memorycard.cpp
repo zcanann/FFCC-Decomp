@@ -2172,21 +2172,23 @@ void CMemoryCardMan::CalcSaveDatHpMax(Mc::SaveDat* saveDat)
         if (*reinterpret_cast<int*>(charData + 0x5B4) != 0)
         {
             short equippedItems[4];
+            short* equippedItem = equippedItems;
 
             for (int itemSlot = 0; itemSlot < 0x49; itemSlot++)
             {
                 if (itemSlot >= 0x45)
                 {
-                    int bitShift = itemSlot >> 0x1F;
-                    if ((*reinterpret_cast<unsigned int*>(charData + (itemSlot >> 5) * 4 + 0xBC) &
-                         1 << ((bitShift * 0x20 | (unsigned int)(itemSlot * 0x8000000 + bitShift) >> 0x1B) - bitShift)) == 0)
+                    const int word = itemSlot >> 5;
+                    const int bit = itemSlot % 32;
+                    if ((*reinterpret_cast<u32*>(charData + 0xBC + word * 4) & (1 << bit)) == 0)
                     {
-                        equippedItems[itemSlot - 0x45] = -1;
+                        *equippedItem = -1;
                     }
                     else
                     {
-                        equippedItems[itemSlot - 0x45] = (short)itemSlot + 0x9F;
+                        *equippedItem = (short)itemSlot + 0x9F;
                     }
+                    equippedItem++;
                 }
 
             }

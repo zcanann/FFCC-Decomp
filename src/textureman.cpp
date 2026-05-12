@@ -580,24 +580,25 @@ void CTexture::CacheLoadTexture(CAmemCacheSet* amemCacheSet)
 
             unsigned int format = m_format;
             if ((format == 9) || (format == 8)) {
-                int tlutData = reinterpret_cast<int>(m_tlutData);
                 GXInitTexObjCI(&m_texObj, m_imageData, static_cast<u16>(m_width), static_cast<u16>(m_height),
                                static_cast<GXCITexFmt>(format), static_cast<GXTexWrapMode>(m_wrapMode),
                                static_cast<GXTexWrapMode>(m_wrapMode), 0, 0);
+                int tlutData = reinterpret_cast<int>(m_tlutData);
                 GXInitTlutObj(&m_tlutObj0, reinterpret_cast<void*>(tlutData), GX_TL_IA8,
                               m_format == 9 ? 0x100 : 0x10);
                 GXInitTlutObj(&m_tlutObj1,
                               reinterpret_cast<void*>(tlutData + (m_format == 9 ? 0x100 : 0x10) * 2),
                               GX_TL_IA8, m_format == 9 ? 0x100 : 0x10);
             } else {
+                unsigned int mipmap = (1 - m_maxLod) >> 31;
                 GXInitTexObj(&m_texObj, m_imageData, static_cast<u16>(m_width), static_cast<u16>(m_height),
                              static_cast<GXTexFmt>(format), static_cast<GXTexWrapMode>(m_wrapMode),
-                             static_cast<GXTexWrapMode>(m_wrapMode), (1U - m_maxLod) >> 31);
+                             static_cast<GXTexWrapMode>(m_wrapMode), mipmap);
             }
 
             if (1 < m_maxLod) {
-                GXInitTexObjLOD(&m_texObj, GX_LIN_MIP_LIN, GX_LINEAR, FLOAT_8032faf4, static_cast<float>(m_maxLod) - FLOAT_8032faf0,
-                                FLOAT_8032faf4, GX_TRUE, GX_FALSE, GX_ANISO_1);
+                GXInitTexObjLOD(&m_texObj, GX_LIN_MIP_LIN, GX_LINEAR, 0.0f, static_cast<float>(m_maxLod) - 1.0f,
+                                0.0f, GX_TRUE, GX_FALSE, GX_ANISO_1);
             }
         }
         AddRef__13CAmemCacheSetFs(amemCacheSet, m_cacheId);
@@ -748,29 +749,30 @@ void CTexture::Create(CChunkFile& chunkFile, CMemory::CStage* stage, CAmemCacheS
 
     format = *reinterpret_cast<unsigned int*>(texture + 0x60);
     if ((format == 9) || (format == 8)) {
-        int tlutData = reinterpret_cast<int>(*reinterpret_cast<void**>(texture + 0x7C));
         GXInitTexObjCI(reinterpret_cast<GXTexObj*>(texture + 0x28), *reinterpret_cast<void**>(texture + 0x78),
                        static_cast<u16>(*reinterpret_cast<unsigned int*>(texture + 0x64)),
                        static_cast<u16>(*reinterpret_cast<unsigned int*>(texture + 0x68)),
                        static_cast<GXCITexFmt>(format), static_cast<GXTexWrapMode>(*reinterpret_cast<unsigned int*>(texture + 0x6C)),
                        static_cast<GXTexWrapMode>(*reinterpret_cast<unsigned int*>(texture + 0x6C)), 0, 0);
+        int tlutData = reinterpret_cast<int>(*reinterpret_cast<void**>(texture + 0x7C));
         GXInitTlutObj(reinterpret_cast<GXTlutObj*>(texture + 0x48), reinterpret_cast<void*>(tlutData), GX_TL_IA8,
                       *reinterpret_cast<unsigned int*>(texture + 0x60) == 9 ? 0x100 : 0x10);
         GXInitTlutObj(reinterpret_cast<GXTlutObj*>(texture + 0x54),
                       reinterpret_cast<void*>(tlutData + (*reinterpret_cast<unsigned int*>(texture + 0x60) == 9 ? 0x100 : 0x10) * 2),
                       GX_TL_IA8, *reinterpret_cast<unsigned int*>(texture + 0x60) == 9 ? 0x100 : 0x10);
     } else {
+        unsigned int mipmap = (1 - texture[0x74]) >> 31;
         GXInitTexObj(reinterpret_cast<GXTexObj*>(texture + 0x28), *reinterpret_cast<void**>(texture + 0x78),
                      static_cast<u16>(*reinterpret_cast<unsigned int*>(texture + 0x64)),
                      static_cast<u16>(*reinterpret_cast<unsigned int*>(texture + 0x68)),
                      static_cast<GXTexFmt>(format), static_cast<GXTexWrapMode>(*reinterpret_cast<unsigned int*>(texture + 0x6C)),
                      static_cast<GXTexWrapMode>(*reinterpret_cast<unsigned int*>(texture + 0x6C)),
-                     (1U - texture[0x74]) >> 31);
+                     mipmap);
     }
 
     if (1 < texture[0x74]) {
-        GXInitTexObjLOD(reinterpret_cast<GXTexObj*>(texture + 0x28), GX_LIN_MIP_LIN, GX_LINEAR, FLOAT_8032faf4,
-                        static_cast<float>(texture[0x74]) - FLOAT_8032faf0, FLOAT_8032faf4, GX_TRUE, GX_FALSE, GX_ANISO_1);
+        GXInitTexObjLOD(reinterpret_cast<GXTexObj*>(texture + 0x28), GX_LIN_MIP_LIN, GX_LINEAR, 0.0f,
+                        static_cast<float>(texture[0x74]) - 1.0f, 0.0f, GX_TRUE, GX_FALSE, GX_ANISO_1);
     }
 }
 
@@ -787,23 +789,24 @@ void CTexture::InitTexObj()
 {
     unsigned int format = m_format;
     if ((format == 9) || (format == 8)) {
-        int tlutData = reinterpret_cast<int>(m_tlutData);
         GXInitTexObjCI(&m_texObj, m_imageData, static_cast<u16>(m_width), static_cast<u16>(m_height),
                        static_cast<GXCITexFmt>(format), static_cast<GXTexWrapMode>(m_wrapMode),
                        static_cast<GXTexWrapMode>(m_wrapMode), 0, 0);
+        int tlutData = reinterpret_cast<int>(m_tlutData);
         GXInitTlutObj(&m_tlutObj0, reinterpret_cast<void*>(tlutData), GX_TL_IA8, m_format == 9 ? 0x100 : 0x10);
         GXInitTlutObj(&m_tlutObj1,
                       reinterpret_cast<void*>(tlutData + (m_format == 9 ? 0x100 : 0x10) * 2),
                       GX_TL_IA8, m_format == 9 ? 0x100 : 0x10);
     } else {
+        unsigned int mipmap = (1 - m_maxLod) >> 31;
         GXInitTexObj(&m_texObj, m_imageData, static_cast<u16>(m_width), static_cast<u16>(m_height),
                      static_cast<GXTexFmt>(format), static_cast<GXTexWrapMode>(m_wrapMode),
-                     static_cast<GXTexWrapMode>(m_wrapMode), (1U - m_maxLod) >> 31);
+                     static_cast<GXTexWrapMode>(m_wrapMode), mipmap);
     }
 
     if (1 < m_maxLod) {
-        GXInitTexObjLOD(&m_texObj, GX_LIN_MIP_LIN, GX_LINEAR, FLOAT_8032faf4, static_cast<float>(m_maxLod) - FLOAT_8032faf0,
-                        FLOAT_8032faf4, GX_TRUE, GX_FALSE, GX_ANISO_1);
+        GXInitTexObjLOD(&m_texObj, GX_LIN_MIP_LIN, GX_LINEAR, 0.0f, static_cast<float>(m_maxLod) - 1.0f,
+                        0.0f, GX_TRUE, GX_FALSE, GX_ANISO_1);
     }
 }
 

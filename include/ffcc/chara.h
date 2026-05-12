@@ -81,7 +81,9 @@ public:
 		void Duplicate(CChara::CNode*, CMemory::CStage*);
 		void CalcBind(CChara::CModel*);
 
-		u8 _pad0[0xBC];
+		u8 _pad0[0x6C];
+		Mtx m_mtx;
+		u8 _pad9C[0x20];
 		u8 m_flags;
 		u8 _padBD[3];
 	};

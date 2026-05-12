@@ -130,3 +130,7 @@ void pppConstructLerpPos(struct pppLerpPos* pppLerpPos, struct pppLerpPosUnkC* p
     Vec** work = (Vec**)((u8*)pppLerpPos + 0x80 + dataOffset);
     *work = 0;
 }
+
+extern const float FLOAT_80331bf8 = 0.0f;
+extern const float FLOAT_80331bfc = 1.0f;
+extern const double DOUBLE_80331C00 = 4503599627370496.0;

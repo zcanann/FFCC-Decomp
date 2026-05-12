@@ -145,6 +145,12 @@ static const char DAT_801d81d4[] = {
     (char)0x00, (char)0x00, (char)0x00, (char)0x00,
 };
 extern char lbl_8032E69C[];
+extern "C" {
+const char* g_MaxDataSize;
+signed char g_MaxHeapSize[4];
+int lbl_8032ED48;
+signed char lbl_8032ED4C;
+}
 unsigned int m_table_desc0__8CPartPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__8CPartPcsFv)};
 unsigned int m_table_desc1__8CPartPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__8CPartPcsFv)};
 unsigned int m_table_desc2__8CPartPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcInit__8CPartPcsFv)};
@@ -1222,12 +1228,18 @@ void CPartPcs::drawAfterViewer()
 	PartMng.pppGet2Dpos();
 	pppClearDrawEnv();
 
-	static const char* pFan = sDebugSpinnerText;
-	static int alive = 0;
+	if (g_MaxHeapSize[0] == 0) {
+		g_MaxDataSize = sDebugSpinnerText;
+		g_MaxHeapSize[0] = 1;
+	}
+	if (lbl_8032ED4C == 0) {
+		lbl_8032ED48 = 0;
+		lbl_8032ED4C = 1;
+	}
 
-	alive++;
+	lbl_8032ED48++;
 	Graphic.Printf(
-		stringBase + 0x134, pFan[(alive >> 4) % 4]);
+		stringBase + 0x134, g_MaxDataSize[(lbl_8032ED48 >> 4) % 4]);
 
 	g_par_calc_prof.ProfEnd();
 	g_par_draw_prof.ProfEnd();

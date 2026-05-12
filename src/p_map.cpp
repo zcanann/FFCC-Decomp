@@ -440,8 +440,9 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
 
         CPtrArray<CMapLightHolder*>& mapLightHolderArr =
             *reinterpret_cast<CPtrArray<CMapLightHolder*>*>(reinterpret_cast<char*>(&MapMng) + 0x2146C);
-        if (static_cast<unsigned int>(mapLightHolderArr.GetSize()) > 0) {
-            mapLightHolderArr[0]->GetLightHolder(
+        unsigned int mapLightHolderIndex = 0;
+        if (static_cast<unsigned int>(mapLightHolderArr.GetSize()) > mapLightHolderIndex) {
+            mapLightHolderArr[mapLightHolderIndex]->GetLightHolder(
                 reinterpret_cast<_GXColor*>(reinterpret_cast<char*>(&MapMng) + 0x2298C), static_cast<Vec*>(0));
         }
     }
@@ -619,9 +620,10 @@ void CMapPcs::calc()
 
         CPtrArray<CMapLightHolder*>* mapLightHolderArr =
             reinterpret_cast<CPtrArray<CMapLightHolder*>*>(reinterpret_cast<char*>(&MapMng) + 0x2146C);
-        if (static_cast<unsigned int>(mapLightHolderArr->GetSize()) > 0) {
-            (*mapLightHolderArr)[0]->GetLightHolder(reinterpret_cast<_GXColor*>(reinterpret_cast<char*>(&MapMng) + 0x2298C),
-                                                    static_cast<Vec*>(0));
+        unsigned int mapLightHolderIndex = 0;
+        if (static_cast<unsigned int>(mapLightHolderArr->GetSize()) > mapLightHolderIndex) {
+            (*mapLightHolderArr)[mapLightHolderIndex]->GetLightHolder(
+                reinterpret_cast<_GXColor*>(reinterpret_cast<char*>(&MapMng) + 0x2298C), static_cast<Vec*>(0));
         }
 
         m_forceMapReload = 0;

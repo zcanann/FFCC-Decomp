@@ -20,9 +20,8 @@ struct Vec2d {
     float y;
 };
 
+extern "C" const char s_Render_Mana2___801dc4d0[] = "Render Mana2!!";
 extern "C" const char s_pppMana2_cpp_801DC4E0[] = "pppMana2.cpp";
-
-extern char s_Render_Mana2___801dc4d0[];
 extern const float FLOAT_80331898 = 0.0f;
 extern const float FLOAT_8033189c = -1.0f;
 extern const float FLOAT_803318a0 = 1.0f;
@@ -721,7 +720,7 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* para
  */
 void pppRenderMana2(pppMana2*, pppMana2UnkB*, pppMana2UnkC*)
 {
-    Graphic.Printf(s_Render_Mana2___801dc4d0);
+    Graphic.Printf(const_cast<char*>(s_Render_Mana2___801dc4d0));
     GXSetNumTevStages(1);
     GXSetNumTexGens(1);
     GXSetNumChans(1);
@@ -763,6 +762,7 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
     s32 i;
 
     work = (u32*)param_2;
+    baseParaboloidTexObjs = work[8];
     if (*(u8*)((char*)param_3 + 0x1C) == 0) {
         return;
     }
@@ -806,7 +806,6 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
                          LoadFloat(FLOAT_803318a0), LoadFloat(FLOAT_803318d0));
         GXSetProjection(projectionMtx, (_GXProjectionType)0);
 
-        baseParaboloidTexObjs = work[8];
         for (i = 0; i < 6; i++) {
             cameraPos.x = centerPos.x;
             cameraPos.y = centerPos.y;

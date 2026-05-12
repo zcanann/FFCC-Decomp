@@ -24,18 +24,12 @@ void pppPObjPoint(_pppPObject* pObject, pppPObjPointStep* step, _pppCtrlTable* c
     pppPObjPointWork* objPtr = (pppPObjPointWork*)(pObject->m_workArea + objOffset);
 
     if (step->m_graphId == pObject->m_graphId) {
-        u8* vecPtr;
+        Vec* source = (step->m_createProgramIndex == -1)
+                          ? (Vec*)gPppDefaultValueBuffer
+                          : (Vec*)((u8*)pppMngStPtr->m_pppPDataVals[step->m_createProgramIndex].m_pppPObjLink
+                                  + step->m_sourceOffset + 0x80);
 
-        if (step->m_createProgramIndex == -1) {
-            vecPtr = gPppDefaultValueBuffer;
-        } else {
-            u32 sourceOffset = step->m_sourceOffset;
-            _pppPDataVal* pDataVal = pppMngStPtr->m_pppPDataVals;
-            pDataVal = &pDataVal[step->m_createProgramIndex];
-            vecPtr = (u8*)pDataVal->m_pppPObjLink + sourceOffset + 0x80;
-        }
-
-        objPtr->m_source = (Vec*)vecPtr;
+        objPtr->m_source = source;
     }
 
     objPtr->m_x = objPtr->m_source->x;

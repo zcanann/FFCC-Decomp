@@ -103,10 +103,12 @@ struct MeteoParasiteCBossWork {
         u8 m_flags;
         struct {
             u8 m_bit80 : 1;
-            u8 m_meteo3 : 1;
+            s8 m_meteo3 : 1;
             u8 m_rest : 6;
         } bits;
     };
+    u8 m_pad7D[7];
+    int m_wait;
 };
 
 /*
@@ -2161,22 +2163,22 @@ void CGMonObj::logicFuncMeteoParasiteC()
 {
 	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
 	int nextState = -1;
-	int& timer = *reinterpret_cast<int*>(SoundBuffer + 1360);
-	if (*reinterpret_cast<unsigned char*>(SoundBuffer + 1356) & 0x80) {
+	MeteoParasiteCBossWork* work = reinterpret_cast<MeteoParasiteCBossWork*>(SoundBuffer_1260_);
+	if (work->bits.m_meteo3 != 0) {
 		nextState = 0x68;
 	} else {
-		timer = (timer - 1) & ~((timer - 1) >> 31);
-		if (*reinterpret_cast<int*>(mon + 0x6B4) == 0) {
-			if (timer != 0) {
+		work->m_wait = (work->m_wait - 1) & ~((work->m_wait - 1) >> 31);
+		if (*reinterpret_cast<int*>(mon + 0x6D0) == 0) {
+			if (work->m_wait != 0) {
 				return;
 			}
 			nextState = 0x65;
 		}
 	}
-	if (nextState == -1) {
-		logicFuncDefault__8CGMonObjFv(this);
-	} else {
+	if (nextState != -1) {
 		changeStat__8CGPrgObjFiii(reinterpret_cast<CGPrgObj*>(this), nextState, 0, 0);
+	} else {
+		logicFuncDefault__8CGMonObjFv(this);
 	}
 }
 

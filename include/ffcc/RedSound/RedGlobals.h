@@ -143,6 +143,7 @@ enum RedSoundFixedPoint {
 };
 
 enum RedSoundPauseState {
+	REDSOUND_PAUSE_OFF = 0,
 	REDSOUND_PAUSE_ON = 1,
 };
 

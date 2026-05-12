@@ -106,8 +106,10 @@ STATIC_ASSERT(sizeof(((RedStreamADPCMHeader*)0)->m_loop) == REDSOUND_STREAM_ADPC
 STATIC_ASSERT(sizeof(RedStreamADPCMHeader) == REDSOUND_STREAM_ADPCM_HEADER_SIZE);
 STATIC_ASSERT(offsetof(RedStreamFile, m_header) == REDSOUND_STREAM_FILE_HEAD_OFFSET);
 STATIC_ASSERT(offsetof(RedStreamFile, m_adpcm) == REDSOUND_STREAM_FILE_ADPCM_OFFSET);
-STATIC_ASSERT(sizeof(((RedStreamFile*)0)->m_adpcm) == REDSOUND_STREAM_ADPCM_HEADER_SIZE);
-STATIC_ASSERT(offsetof(RedStreamFile, m_adpcm) + sizeof(RedStreamADPCMHeader) == REDSOUND_STREAM_FILE_ADPCM_END);
+STATIC_ASSERT(sizeof(((RedStreamFile*)0)->m_adpcm) ==
+              REDSOUND_STREAM_ADPCM_HEADER_SIZE * REDSOUND_STREAM_FILE_ADPCM_COUNT);
+STATIC_ASSERT(offsetof(RedStreamFile, m_adpcm) + sizeof(((RedStreamFile*)0)->m_adpcm) ==
+              REDSOUND_STREAM_FILE_ADPCM_END);
 STATIC_ASSERT(offsetof(RedStreamFile, m_trailingPadding) == REDSOUND_STREAM_FILE_TRAILING_PAD_OFFSET);
 STATIC_ASSERT(sizeof(((RedStreamFile*)0)->m_trailingPadding) == REDSOUND_STREAM_FILE_TRAILING_PAD_SIZE);
 STATIC_ASSERT(sizeof(RedStreamFile) == REDSOUND_STREAM_FILE_SIZE);

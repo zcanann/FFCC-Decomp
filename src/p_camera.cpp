@@ -412,8 +412,8 @@ void CCameraPcs::onScriptChanged(char*, int fromScript)
     PSMTXInverse(mathMtx, reinterpret_cast<MtxPtr>(self + 0x64));
 
     float refValue = FLOAT_8032fa88;
-    float zero = FLOAT_8032fa34;
-    *reinterpret_cast<float*>(self + 0xDC) = zero;
+    float zero;
+    *reinterpret_cast<float*>(self + 0xDC) = zero = FLOAT_8032fa34;
     *reinterpret_cast<float*>(self + 0xD8) = zero;
     *reinterpret_cast<float*>(self + 0xD4) = zero;
     *reinterpret_cast<float*>(self + 0xE0) = zero;

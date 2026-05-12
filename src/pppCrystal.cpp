@@ -272,11 +272,12 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param
 	}
 
 	work = (CrystalWork*)((u8*)pppCrystal + param_3->m_serializedDataOffsets[2] + 0x80);
-	if (param_2->m_dataValIndex == 0xFFFF) {
+	s32 dataValIndex = param_2->m_dataValIndex;
+	if (dataValIndex == 0xFFFF) {
 		return;
 	}
 
-	mapMesh = pppEnvStPtr->m_mapMeshPtr[param_2->m_dataValIndex];
+	mapMesh = pppEnvStPtr->m_mapMeshPtr[dataValIndex];
 	textureIndex = 0;
 	GetTexture__8CMapMeshFP12CMaterialSetRi(mapMesh, pppEnvStPtr->m_materialSetPtr, textureIndex);
 

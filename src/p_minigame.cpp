@@ -27,7 +27,7 @@ extern const char s_CMiniGamePcs_GAME_801DD098[];
 unsigned int m_table__12CMiniGamePcs[0x148 / sizeof(unsigned int)] = {
     reinterpret_cast<unsigned int>(const_cast<char*>(s_CMiniGamePcs_GAME_801DD098)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x24
 };
-static const char s_miniGameDefaultTag[4] = {'n', 'o', '_', 'n'};
+extern const char s_miniGameManagerTag[] = "GMGR";
 static const char s_miniGameEnd0000Text[] = "MiniGameEnd 0000\n";
 static const char s_miniGameEnd1111Text[] = "MiniGameEnd 1111\n";
 static const char s_miniGameEnd2222Text[] = "MiniGameEnd 2222\n";
@@ -366,7 +366,7 @@ void CMiniGamePcs::MiniGameGo(char* managerFilePath, char* managerSpFilePath)
     *reinterpret_cast<unsigned int*>(*reinterpret_cast<unsigned int*>(self + 0x135C) + 200) =
         *reinterpret_cast<unsigned int*>(self + 0x1364);
 
-    strncpy(reinterpret_cast<char*>(self + 0x1344), s_miniGameDefaultTag, 4);
+    strncpy(reinterpret_cast<char*>(self + 0x1344), s_miniGameManagerTag, 4);
 
     void* managerImage = *reinterpret_cast<void**>(self + 0x1354);
     CFile::CHandle* fileHandle = File.Open(managerFilePath, 0, CFile::PRI_LOW);

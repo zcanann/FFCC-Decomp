@@ -903,14 +903,15 @@ RedVoiceDATA* EntryVoiceSearch(RedTrackDATA* track)
             voice = p_VoiceData + track->m_trackNo;
         }
     } else {
+        RedVoiceDATA* voiceData = p_VoiceData;
         if ((track->m_note.m_allocFlags & REDSOUND_NOTE_ALLOC_PRIORITY) != 0) {
-            voice = p_VoiceData;
+            voice = voiceData;
         } else {
-            voice = p_VoiceData + (s8)p_SoundControl->m_channelAlloc;
+            voice = voiceData + (s8)p_SoundControl->m_channelAlloc;
         }
 
         bestEnvelope = REDSOUND_ENVELOPE_LEVEL_FULL;
-        voiceEnd = p_VoiceData + REDSOUND_VOICE_COUNT;
+        voiceEnd = voiceData + REDSOUND_VOICE_COUNT;
         do {
             if ((voice->m_stateFlags & REDSOUND_VOICE_STATE_PLAYING_MASK) == 0) {
                 if (voice->m_envelopeLevel < 1) {

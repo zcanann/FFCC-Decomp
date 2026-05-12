@@ -194,7 +194,7 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 			short size = param_2->m_size;
 			short split = param_2->m_splitSize;
 			float uvSplit = (FLOAT_803305f8 / (float)(size + size)) * (float)(size - split);
-			float uvRemainder = FLOAT_803305f8 - uvSplit;
+			float uvRemainder;
 
 			if (((s8)param_2->m_orientation) == 0) {
 				vertices[0].x = -size;
@@ -224,6 +224,7 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 				vertices[3].z = split;
 			}
 
+			uvRemainder = FLOAT_803305f8 - uvSplit;
 			uvs[0].x = kPppYmDeformationShpZero;
 			uvs[0].y = kPppYmDeformationShpZero;
 			uvs[1].x = uvSplit;
@@ -456,6 +457,15 @@ int RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* verti
 	}
 
 	PSMTXIdentity(texMtx);
+	texMtx[0][0] = ppvScreenMatrix[0][0];
+	texMtx[0][1] = ppvScreenMatrix[0][1];
+	texMtx[0][2] = ppvScreenMatrix[0][2];
+	texMtx[1][0] = ppvScreenMatrix[1][0];
+	texMtx[1][1] = ppvScreenMatrix[1][1];
+	texMtx[1][2] = ppvScreenMatrix[1][2];
+	texMtx[2][0] = ppvScreenMatrix[2][0];
+	texMtx[2][1] = ppvScreenMatrix[2][1];
+	texMtx[2][2] = ppvScreenMatrix[2][2];
 	texMtx[0][0] = ppvScreenMatrix[0][0] * (FLOAT_80330610 / (float)width);
 	texMtx[1][1] = ppvScreenMatrix[1][1] * -(FLOAT_80330618 / (float)height);
 	texMtx[1][0] = ppvScreenMatrix[1][0];

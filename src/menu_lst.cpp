@@ -27,21 +27,21 @@ extern "C" void Draw__5CFontFPc(CFont*, const char*);
 
 extern "C" const char* GetMenuStr__8CMenuPcsFi(CMenuPcs*, int);
 
-extern const float FLOAT_803333D0 = 0.0f;
-extern const float FLOAT_803333D4 = 255.0f;
-extern const double DOUBLE_803333D8 = 20.0;
-extern const float FLOAT_803333E0 = 40.0f;
-extern const double DOUBLE_803333E8 = 0.5;
-extern const float FLOAT_803333F0 = 1.0f;
-extern const float FLOAT_803333F4 = 4.0f;
-extern const float FLOAT_803333F8 = 320.0f;
-extern const float FLOAT_803333FC = 0.5f;
-extern const float FLOAT_80333400 = 352.0f;
-extern const float FLOAT_80333404 = 3.0f;
-extern const double DOUBLE_80333408 = 4503601774854144.0;
-extern const double DOUBLE_80333410 = 1.0;
-extern const double DOUBLE_80333418 = 0.0;
-extern const double DOUBLE_80333420 = 216.0;
+extern const float FLOAT_803333D0;
+extern const float FLOAT_803333D4;
+extern const double DOUBLE_803333D8;
+extern const float FLOAT_803333E0;
+extern const double DOUBLE_803333E8;
+extern const float FLOAT_803333F0;
+extern const float FLOAT_803333F4;
+extern const float FLOAT_803333F8;
+extern const float FLOAT_803333FC;
+extern const float FLOAT_80333400;
+extern const float FLOAT_80333404;
+extern const double DOUBLE_80333408;
+extern const double DOUBLE_80333410;
+extern const double DOUBLE_80333418;
+extern const double DOUBLE_80333420;
 
 extern "C" const float FLOAT_80333614 = 196.0f;
 extern "C" const float FLOAT_80333618 = 168.0f;

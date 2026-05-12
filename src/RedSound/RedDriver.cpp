@@ -508,6 +508,7 @@ enum RedDriverEditorVoiceIndex {
 };
 
 enum RedDriverThreadFlag {
+    REDSOUND_THREAD_FLAG_NONE = 0,
     REDSOUND_THREAD_FLAG_MAIN = 1,
     REDSOUND_THREAD_FLAG_DMA = 2,
     REDSOUND_THREAD_FLAG_WAVE_SETTING = 4,
@@ -1989,7 +1990,7 @@ void CRedDriver::Init()
     int fullVolume;
     int noMusicId;
 
-    m_ThreadExecute = 0;
+    m_ThreadExecute = REDSOUND_THREAD_FLAG_NONE;
     m_ThreadControl = REDSOUND_THREAD_CONTROL_RUN;
     m_ReportPrint = 1;
     m_SoundMode = 0;
@@ -2131,7 +2132,7 @@ void CRedDriver::End()
     OSSignalSemaphore(&sync.m_waveSemaphore);
     OSSignalSemaphore(&sync.m_dmaSemaphore);
     OSSignalSemaphore(&sync.m_musicSemaphore);
-    while (m_ThreadExecute != 0) {
+    while (m_ThreadExecute != REDSOUND_THREAD_FLAG_NONE) {
         RedSleep(REDSOUND_THREAD_YIELD_SLEEP_US);
     }
     AXRegisterAuxACallback(0, 0);

@@ -545,7 +545,7 @@ void CMenuPcs::destroy()
     m_fonts[0] = 0;
 
     Memory.DestroyStage(m_menuStage);
-    if (*(self + 0x859) != 0) {
+    if (*reinterpret_cast<s8*>(self + 0x859) != 0) {
         m_stageF0 = 0;
         *(self + 0x859) = 0;
     }

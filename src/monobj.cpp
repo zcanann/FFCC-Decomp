@@ -3240,34 +3240,94 @@ extern "C" void CGMonObj_ResetActionState(CGMonObj* monObj)
 extern "C" void MonObjRelated(CGMonObj* monObj, int* targetIndex)
 {
 	unsigned char* mon = reinterpret_cast<unsigned char*>(monObj);
+	CGObject* object = reinterpret_cast<CGObject*>(monObj);
+	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(monObj);
 	int* chaseState = reinterpret_cast<int*>(mon + 0x6D8);
 	int* chaseTimer = reinterpret_cast<int*>(mon + 0x6DC);
 	int* targetPartyIdx = reinterpret_cast<int*>(mon + 0x6C4);
 
-	switch (*chaseState) {
-	case 1:
+	int state = *chaseState;
+	if (state == 3) {
+		monObj->isValidTarget();
+		goto updateTimer;
+	}
+	if (state > 2) {
+		if (state == 5) {
+			if (*targetPartyIdx < 0) {
+				*reinterpret_cast<int*>(SoundBuffer_1248_ + 4) = 0;
+				memset(mon + 0x70C, 0, 0x34);
+				*chaseState = 0;
+				*chaseTimer = 0;
+				mon[0x6BB] = 1;
+			} else {
+				*reinterpret_cast<int*>(SoundBuffer_1248_ + 4) = 0x21;
+				CGPartyObj* partyObj = Game.m_partyObjArr[*targetPartyIdx];
+				if (*reinterpret_cast<int*>(mon + 0x734) != 4) {
+					memset(mon + 0x70C, 0, 0x34);
+					*reinterpret_cast<unsigned int*>(mon + 0x70C) = 0x855;
+					unsigned char* script = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
+					if ((*reinterpret_cast<unsigned short*>(script + 0xFE) & 4) != 0) {
+						*reinterpret_cast<unsigned int*>(mon + 0x70C) |= 0x400;
+					}
+					unsigned char* aiData;
+					if (*reinterpret_cast<short*>(mon + 0x6E4) == 0) {
+						aiData = script;
+					} else {
+						aiData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
+							(*reinterpret_cast<short*>(mon + 0x6E4) +
+							 *reinterpret_cast<unsigned short*>(script + 0x100)) *
+								0x1D0 +
+							0x10;
+					}
+					if ((*reinterpret_cast<unsigned short*>(aiData + 0x102) & 0x80) != 0) {
+						*reinterpret_cast<unsigned int*>(mon + 0x70C) |= 0x20000;
+					}
+					*reinterpret_cast<int*>(mon + 0x734) = 4;
+					*reinterpret_cast<float*>(mon + 0x728) =
+						static_cast<float>(static_cast<double>(*reinterpret_cast<unsigned short*>(script + 0xCE)) -
+										  DOUBLE_803319E0);
+					*reinterpret_cast<unsigned int*>(mon + 0x72C) =
+						*reinterpret_cast<unsigned short*>(script + 0x1B6);
+				}
+				*reinterpret_cast<CGPartyObj**>(mon + 0x714) = partyObj;
+				if (((*reinterpret_cast<unsigned int*>(mon + 0x710) & 1) != 0) ||
+					((object->m_stateFlags0 & 0x40) != 0)) {
+					*reinterpret_cast<int*>(SoundBuffer_1248_ + 4) = 0;
+					memset(mon + 0x70C, 0, 0x34);
+					if (*targetPartyIdx >= 0) {
+						object->m_rotTargetY = prgObj->getTargetRot(reinterpret_cast<CGPrgObj*>(Game.m_partyObjArr[*targetPartyIdx]));
+					}
+					*chaseState = 1;
+					*chaseTimer = 0;
+					mon[0x6BB] = 1;
+				}
+			}
+		} else if (state < 5) {
+			monObj->seKiduki();
+		}
+		goto updateTimer;
+	}
+
+	if (state == 1) {
+		CGMonObj_TickActionState(monObj);
 		if (targetIndex != NULL) {
 			*targetIndex = *targetPartyIdx;
 		}
-		break;
-
-	case 2:
+		goto updateTimer;
+	}
+	if (state > 0) {
+		CGMonObj_UpdateActionStateFromTarget(monObj);
 		if (targetIndex != NULL) {
 			*targetIndex = *targetPartyIdx;
 		}
 		*reinterpret_cast<unsigned char*>(mon + 0x6B8) = 1;
-		break;
-
-	case 5:
-		if (*targetPartyIdx < 0) {
-			memset(mon + 0x70C, 0, 0x34);
-			*chaseState = 0;
-			*chaseTimer = 0;
-			*reinterpret_cast<unsigned char*>(mon + 0x6BB) = 1;
-		}
-		break;
+		goto updateTimer;
+	}
+	if (state < 0) {
+		goto updateTimer;
 	}
 
+updateTimer:
 	if (*reinterpret_cast<unsigned char*>(mon + 0x6BB) == 0) {
 		*chaseTimer += 1;
 	} else {

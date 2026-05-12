@@ -528,9 +528,9 @@ void CRedSound::SetReverb(int bank, int kind)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CRedSound::SetReverbDepth(int bank, int sep, int depth)
+void CRedSound::SetReverbDepth(int bank, int depth, int frameCount)
 {
-	c_Driver.SetReverbDepth(bank, sep, depth);
+	c_Driver.SetReverbDepth(bank, depth, frameCount);
 }
 
 /*
@@ -1127,9 +1127,9 @@ int CRedSound::StreamPlayState(int streamID)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CRedSound::GetStreamPlayPoint(int streamID, int* point1, int* point2)
+void CRedSound::GetStreamPlayPoint(int streamID, int* playPoint, int* readPoint)
 {
-	c_Driver.GetStreamPlayPoint(streamID, point1, point2);
+	c_Driver.GetStreamPlayPoint(streamID, playPoint, readPoint);
 }
 
 /*

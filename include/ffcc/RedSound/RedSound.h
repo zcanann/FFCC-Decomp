@@ -46,7 +46,7 @@ public:
 	void SetReverb(int kind, int mode, int* params);
 	RedReverbSize* GetReverbInfo();
 	RedReverbDepth* GetReverbDepth();
-	void SetReverbDepth(int type, int depth, int frameCount);
+	void SetReverbDepth(int bank, int depth, int frameCount);
 	void SetMute(unsigned int voiceNo, unsigned int mute);
 	RedReverbModeData* GetReverbModeTable(int mode);
 
@@ -101,7 +101,7 @@ public:
 	RedTrackDATA* GetSePlayTrack();
 
 	int StreamPlayState(int streamId);
-	void GetStreamPlayPoint(int streamId, int* current, int* total);
+	void GetStreamPlayPoint(int streamId, int* playPoint, int* readPoint);
 	RedStreamDATA* GetStreamPlayBlock(int streamId);
 	int StreamStandby(void* streamHeader, int fileSize);
 	void GetStreamReadPoint(int streamId, int* readPoint);

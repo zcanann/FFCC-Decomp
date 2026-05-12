@@ -3171,26 +3171,26 @@ int CRedDriver::StreamPlayState(int streamID)
  * JP Address: TODO
  * JP Size: TODO
  */
-int CRedDriver::GetStreamPlayPoint(int streamID, int* outPoint1, int* outPoint2)
+int CRedDriver::GetStreamPlayPoint(int streamID, int* playPoint, int* readPoint)
 {
 	RedStreamDATA* streamData;
 	int found;
 
 	found = 0;
-	if (outPoint1 != 0) {
-		*outPoint1 = 0;
+	if (playPoint != 0) {
+		*playPoint = 0;
 	}
-	if (outPoint2 != 0) {
-		*outPoint2 = 0;
+	if (readPoint != 0) {
+		*readPoint = 0;
 	}
 	streamData = p_Stream;
 	do {
 		if ((streamData->m_streamId != 0) && (streamData->m_streamId == streamID)) {
-			if (outPoint1 != 0) {
-				*outPoint1 = streamData->m_fileCursor;
+			if (playPoint != 0) {
+				*playPoint = streamData->m_fileCursor;
 			}
-			if (outPoint2 != 0) {
-				*outPoint2 = streamData->m_readOffset;
+			if (readPoint != 0) {
+				*readPoint = streamData->m_readOffset;
 			}
 			found = 1;
 			break;
@@ -3754,9 +3754,9 @@ RedReverbModeData* CRedDriver::GetReverbModeTable(int mode)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CRedDriver::SetReverbDepth(int bank, int mode, int depth)
+void CRedDriver::SetReverbDepth(int bank, int depth, int frameCount)
 {
-    _EntryExecCommand(_SetReverbDepth, bank, mode, depth, 0, 0, 0, 0);
+    _EntryExecCommand(_SetReverbDepth, bank, depth, frameCount, 0, 0, 0, 0);
 }
 
 /*

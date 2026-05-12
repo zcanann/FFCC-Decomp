@@ -2937,7 +2937,7 @@ void CRedDriver::SeMasterVolume(int volume)
  */
 void CRedDriver::SeFadeOut(int seID, int fadeTime)
 {
-    _EntryExecCommand(_SeVolume, seID, 0, fadeTime, 1, 0, 0, 0);
+    _EntryExecCommand(_SeVolume, seID, 0, fadeTime, REDSOUND_SE_VOLUME_MODE_FADE_OUT, 0, 0, 0);
 }
 
 /*
@@ -2951,7 +2951,7 @@ void CRedDriver::SeFadeOut(int seID, int fadeTime)
  */
 void CRedDriver::SeVolume(int seID, int volume, int frameCount)
 {
-    _EntryExecCommand(_SeVolume, seID, volume, frameCount, 0, 0, 0, 0);
+    _EntryExecCommand(_SeVolume, seID, volume, frameCount, REDSOUND_SE_VOLUME_MODE_NORMAL, 0, 0, 0);
 }
 
 /*

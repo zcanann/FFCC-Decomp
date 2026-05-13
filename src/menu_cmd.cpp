@@ -76,8 +76,7 @@ static const double DOUBLE_80332b20 = 16.0;
 s32 DAT_8032eec8;
 s32 s_UniteTop[3];
 
-namespace {
-static const s16 s_UnitePatternData[] = {
+extern "C" const s16 s_Unite[] = {
     0x0000, 0x022A, 0x0003, 0x0107, 0x0105, 0x0105,
     0x0001, 0x0207, 0x0002, 0x0100, 0x03E7, 0x0000,
     0x0001, 0x020B, 0x0002, 0x0101, 0x03E7, 0x0000,
@@ -109,8 +108,6 @@ static const s16 s_UnitePatternData[] = {
     static_cast<s16>(0xFFFF), static_cast<s16>(0xFFFF), static_cast<s16>(0xFFFF),
     static_cast<s16>(0xFFFF), static_cast<s16>(0xFFFF), static_cast<s16>(0xFFFF),
 };
-
-} // namespace
 
 const char* s_SkillStr_us[] = {
     "Flamestrike",
@@ -1958,7 +1955,7 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 	if (itemKinds[selected] > 0) {
 		if ((itemKinds[selected] == 999) && (selected > 2)) {
 			int patIdx = 0;
-			for (const s16* pat = s_UnitePatternData; pat[1] >= 0; pat += 6, patIdx++) {
+			for (const s16* pat = s_Unite; pat[1] >= 0; pat += 6, patIdx++) {
 				if ((pat[0] == 0) || ((pat[2] == 2) && (static_cast<s32>(selectedNegMask) < 0))) {
 					continue;
 				}
@@ -1979,7 +1976,7 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 				}
 			}
 		} else if (static_cast<s32>(selectedNegMask) >= 0) {
-			const int baseLen = static_cast<int>(s_UnitePatternData[2]);
+			const int baseLen = static_cast<int>(s_Unite[2]);
 			int start = selected - (baseLen - 1);
 			for (int i = 0; i < baseLen; i++, start++) {
 				int ok = 0;
@@ -1988,7 +1985,7 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 					if (candidates[slot] != 0) {
 						break;
 					}
-					if (s_UnitePatternData[3 + k] == itemKinds[slot]) {
+					if (s_Unite[3 + k] == itemKinds[slot]) {
 						ok++;
 					}
 				}
@@ -2002,7 +1999,7 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 
 		int group = 1;
 		int* matchWrite = matches + matchCount * 2;
-		for (const s16* pat = s_UnitePatternData + 6; pat[1] >= 0; pat += 6, group++) {
+		for (const s16* pat = s_Unite + 6; pat[1] >= 0; pat += 6, group++) {
 			if (((pat[0] != 0) && (itemKinds[selected] == 999) && (selected >= 3)) ||
 			    ((pat[2] == 2) && (static_cast<s32>(selectedNegMask) < 0))) {
 				continue;
@@ -2040,7 +2037,7 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 			int (*dst)[2] = comboOut;
 			for (int i = 0; i < matchCount; i++) {
 				const int* m = &matches[i * 2];
-				if (rank + 2 == s_UnitePatternData[2 + m[0] * 6]) {
+				if (rank + 2 == s_Unite[2 + m[0] * 6]) {
 					dst[0][0] = m[0];
 					dst[0][1] = m[1];
 					dst++;

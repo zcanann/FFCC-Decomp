@@ -524,9 +524,16 @@ void CMenuPcs::destroy()
     CMenuPcs* textureCursor = this;
     int i = 0;
     do {
-        void** slot = reinterpret_cast<void**>(reinterpret_cast<u8*>(textureCursor) + 0x18C);
-        ReleaseRefObject(*slot);
-        *slot = nullptr;
+        int** slot = reinterpret_cast<int**>(reinterpret_cast<u8*>(textureCursor) + 0x18C);
+        int* refObject = *slot;
+        if (refObject != nullptr) {
+            int refCount = refObject[1] - 1;
+            refObject[1] = refCount;
+            if ((refCount == 0) && (refObject != nullptr)) {
+                reinterpret_cast<void (**)(void*, int)>(refObject[0])[2](refObject, 1);
+            }
+            *slot = 0;
+        }
         i++;
         textureCursor = reinterpret_cast<CMenuPcs*>(reinterpret_cast<u8*>(textureCursor) + 4);
     } while (i < 0x16);
@@ -534,15 +541,29 @@ void CMenuPcs::destroy()
     textureCursor = this;
     i = 0;
     do {
-        void** slot = reinterpret_cast<void**>(reinterpret_cast<u8*>(textureCursor) + 0x14C);
-        ReleaseRefObject(*slot);
-        *slot = nullptr;
+        int** slot = reinterpret_cast<int**>(reinterpret_cast<u8*>(textureCursor) + 0x14C);
+        int* refObject = *slot;
+        if (refObject != nullptr) {
+            int refCount = refObject[1] - 1;
+            refObject[1] = refCount;
+            if ((refCount == 0) && (refObject != nullptr)) {
+                reinterpret_cast<void (**)(void*, int)>(refObject[0])[2](refObject, 1);
+            }
+            *slot = 0;
+        }
         i++;
         textureCursor = reinterpret_cast<CMenuPcs*>(reinterpret_cast<u8*>(textureCursor) + 4);
     } while (i < 2);
 
-    ReleaseRefObject(m_fonts[0]);
-    m_fonts[0] = 0;
+    int* refObject = reinterpret_cast<int*>(m_fonts[0]);
+    if (refObject != nullptr) {
+        int refCount = refObject[1] - 1;
+        refObject[1] = refCount;
+        if ((refCount == 0) && (refObject != nullptr)) {
+            reinterpret_cast<void (**)(void*, int)>(refObject[0])[2](refObject, 1);
+        }
+        m_fonts[0] = 0;
+    }
 
     Memory.DestroyStage(m_menuStage);
     if (*reinterpret_cast<s8*>(self + 0x859) != 0) {

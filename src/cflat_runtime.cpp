@@ -16,23 +16,13 @@ void* __vt__Q212CFlatRuntime7CObject[];
 int __cntlzw(unsigned int);
 void Printf__7CSystemFPce(CSystem*, char*, ...);
 int sprintf(char*, const char*, ...);
+char* strcat(char*, const char*);
 double fmod(double, double);
 void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
     CFlatRuntime*, CFlatRuntime::CObject*, int, int, int, CFlatRuntime::CStack*, CFlatRuntime::CStack*);
 }
 
 static const char s_cflat_runtime_cpp_801d8ef8[] = "cflat_runtime.cpp";
-
-static void appendString(char* dst, const char* src)
-{
-	while (*dst != '\0') {
-		dst++;
-	}
-	while ((*src) != '\0') {
-		*dst++ = *src++;
-	}
-	*dst = '\0';
-}
 
 struct CFlatRuntimeLifecycleProxy
 {
@@ -323,12 +313,12 @@ void CFlatRuntime::Create(void* filePtr)
 
 		chunkFile.PushChunk();
 		while (chunkFile.GetNextChunk(chunk)) {
-			if (chunk.m_id == 'NAME') {
+			switch (chunk.m_id) {
+			case 'NAME':
 				strcpy(reinterpret_cast<char*>(self + 0x00), chunkFile.GetString());
-				continue;
-			}
+				break;
 
-			if (chunk.m_id == 'CLAS') {
+			case 'CLAS': {
 				const int classCount = chunk.m_arg0;
 				*reinterpret_cast<int*>(self + 0x14) = classCount;
 
@@ -351,16 +341,23 @@ void CFlatRuntime::Create(void* filePtr)
 					classBase[0] = classIndex;
 					chunkFile.PushChunk();
 					while (chunkFile.GetNextChunk(chunk)) {
-						if (chunk.m_id == 'VAL ') {
+						switch (chunk.m_id) {
+						case 'VAL ':
 							classBase[0x89] = chunk.m_arg0;
-						} else if (chunk.m_id == 'NAME') {
+							break;
+						case 'NAME':
 							strcpy(reinterpret_cast<char*>(classBase + 1), chunkFile.GetString());
-						} else if (chunk.m_id == 'INFO') {
+							break;
+						case 'INFO':
 							classBase[0x8A] = chunkFile.Get4();
-						} else if (chunk.m_id == 'VTBL') {
+							break;
+						case 'VTBL':
 							for (int i = 0; i < 0x80; i++) {
 								classBase[9 + i] = chunkFile.Get4();
 							}
+							break;
+						default:
+							break;
 						}
 					}
 					chunkFile.PopChunk();
@@ -369,10 +366,10 @@ void CFlatRuntime::Create(void* filePtr)
 					classIndex++;
 				}
 				chunkFile.PopChunk();
-				continue;
+				break;
 			}
 
-			if (chunk.m_id == 'FUNC') {
+			case 'FUNC': {
 				const int funcCount = chunk.m_arg0;
 				*reinterpret_cast<int*>(self + 0x1C) = funcCount;
 				*reinterpret_cast<void**>(self + 0x20) = __nwa__FUlPQ27CMemory6CStagePci(
@@ -390,15 +387,18 @@ void CFlatRuntime::Create(void* filePtr)
 					funcBase[0] = funcIndex;
 					chunkFile.PushChunk();
 					while (chunkFile.GetNextChunk(chunk)) {
-						if (chunk.m_id == 'NAME') {
+						switch (chunk.m_id) {
+						case 'NAME':
 							strcpy(reinterpret_cast<char*>(funcBase + 1), chunkFile.GetString());
-						} else if (chunk.m_id == 'INFO') {
+							break;
+						case 'INFO':
 							funcBase[9] = chunkFile.Get4();
 							funcBase[0x10] = chunkFile.Get4();
 							funcBase[0x11] = chunkFile.Get4();
 							funcBase[0x12] = chunkFile.Get4();
 							funcBase[0x13] = chunkFile.Get4();
-						} else if (chunk.m_id == 'CODE') {
+							break;
+						case 'CODE':
 							funcBase[0xC] = chunk.m_size;
 							funcBase[0xF] = 0;
 							funcBase[0xE] = 0;
@@ -410,12 +410,17 @@ void CFlatRuntime::Create(void* filePtr)
 								memcpy(reinterpret_cast<void*>(funcBase[0xD]), chunkFile.GetAddress(),
 								       chunk.m_size);
 							}
-						} else if (chunk.m_id == 'VAL ') {
+							break;
+						case 'VAL ':
 							funcBase[10] = chunk.m_arg0;
-						} else if (chunk.m_id == 'RET ') {
+							break;
+						case 'RET ':
 							*reinterpret_cast<u8*>(funcBase + 0xB) = chunkFile.Get1();
 							*reinterpret_cast<u8*>(reinterpret_cast<u8*>(funcBase) + 0x2D) = chunkFile.Get1();
 							*reinterpret_cast<u16*>(reinterpret_cast<u8*>(funcBase) + 0x2E) = chunkFile.Get2();
+							break;
+						default:
+							break;
 						}
 					}
 					chunkFile.PopChunk();
@@ -424,10 +429,10 @@ void CFlatRuntime::Create(void* filePtr)
 					funcIndex++;
 				}
 				chunkFile.PopChunk();
-				continue;
+				break;
 			}
 
-			if (chunk.m_id == 'VAL ') {
+			case 'VAL ': {
 				const int variableCount = chunk.m_arg0;
 				*reinterpret_cast<int*>(self + 0x24) = variableCount;
 				*reinterpret_cast<void**>(self + 0x28) = __nwa__FUlPQ27CMemory6CStagePci(
@@ -440,10 +445,10 @@ void CFlatRuntime::Create(void* filePtr)
 					*reinterpret_cast<u16*>(variableDef + 2) = chunkFile.Get2();
 					variableDef += 4;
 				}
-				continue;
+				break;
 			}
 
-			if (chunk.m_id == 'STR ') {
+			case 'STR ': {
 				const int strCount = chunk.m_arg0;
 				*reinterpret_cast<int*>(self + 0x30) = strCount;
 				*reinterpret_cast<void**>(self + 0x34) = __nwa__FUlPQ27CMemory6CStagePci(
@@ -460,10 +465,10 @@ void CFlatRuntime::Create(void* filePtr)
 					chunkFile.GetString();
 					offset += 2;
 				}
-				continue;
+				break;
 			}
 
-			if (chunk.m_id == 'FSTR') {
+			case 'FSTR': {
 				const int fstrCount = chunk.m_arg0;
 				*reinterpret_cast<int*>(self + 0x3C) = fstrCount;
 				*reinterpret_cast<void**>(self + 0x40) = __nwa__FUlPQ27CMemory6CStagePci(
@@ -480,6 +485,31 @@ void CFlatRuntime::Create(void* filePtr)
 					chunkFile.GetString();
 					offset += 2;
 				}
+				break;
+			}
+
+			case 'VSTR': {
+				const int vstrCount = chunk.m_arg0;
+				*reinterpret_cast<int*>(self + 0x48) = vstrCount;
+				*reinterpret_cast<void**>(self + 0x4C) = __nwa__FUlPQ27CMemory6CStagePci(
+				    vstrCount << 1, getStage(this), const_cast<char*>(s_cflat_runtime_cpp_801d8ef8), 0x13D);
+				*reinterpret_cast<void**>(self + 0x50) = __nwa__FUlPQ27CMemory6CStagePci(
+				    chunk.m_size, getStage(this), const_cast<char*>(s_cflat_runtime_cpp_801d8ef8), 0x13E);
+
+				memcpy(*reinterpret_cast<void**>(self + 0x50), chunkFile.GetAddress(), chunk.m_size);
+				const short base = *reinterpret_cast<short*>(chunkFile.GetAddress());
+				int offset = 0;
+				for (int i = 0; i < vstrCount; i++) {
+					const short cur = *reinterpret_cast<short*>(chunkFile.GetAddress());
+					*reinterpret_cast<short*>(*reinterpret_cast<u8**>(self + 0x4C) + offset) = cur - base;
+					chunkFile.GetString();
+					offset += 2;
+				}
+				break;
+			}
+
+			default:
+				break;
 			}
 		}
 		chunkFile.PopChunk();
@@ -1793,7 +1823,7 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 							if (spec[0] == '%') {
 								break;
 							}
-							appendString(line, spec);
+							strcat(line, spec);
 						}
 
 						const int argIndex = i + 1;
@@ -1823,7 +1853,7 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 									}
 								}
 								rendered[outLen] = '\0';
-								appendString(rendered, spec + fmtIndex + 1);
+								strcat(rendered, spec + fmtIndex + 1);
 							} else {
 								while (*scan != '\0') {
 									switch (*scan) {
@@ -1854,7 +1884,7 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 							}
 						}
 
-						appendString(line, rendered);
+						strcat(line, rendered);
 					}
 
 					Printf__7CSystemFPce(&System, line);

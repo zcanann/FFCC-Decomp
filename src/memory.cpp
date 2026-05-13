@@ -77,19 +77,12 @@ extern char DAT_8032f7e8[];
 extern char DAT_8032f808[];
 extern const char* lbl_801E8470[];
 extern const char* lbl_8032E410[];
-static const char s_amemTypeTexture[] = "TEXTURE";
-static const char s_amemTypeModel[] = "MODEL  ";
-static const char s_amemTypePdt[] = "PDT    ";
-static const char* amem_typeName[] = {s_amemTypeTexture, s_amemTypeModel, s_amemTypePdt};
-static const char s_amemStateUse[] = "USE  ";
-static const char s_amemStateNoUse[] = "NOUSE";
-static const char* amem_stateName[] = {s_amemStateUse, s_amemStateNoUse};
-static const char s_stopwatchNoName[] = "no name";
-extern float FLOAT_8032f7d8;
-extern float FLOAT_8032f7dc;
+extern const float FLOAT_8032f7d8 = 9000.0f;
+extern const float FLOAT_8032f7dc = 0.0f;
 extern float FLOAT_8032f7fc;
 extern float FLOAT_8032f800;
 extern float FLOAT_8032f804;
+extern const double DOUBLE_8032F7E0 = 4503601774854144.0;
 extern unsigned int s_heapBarColors_801D64A8[];
 long long DAT_8032ec58;
 extern char DAT_8032f7e8[];
@@ -135,12 +128,12 @@ static inline const CAmemCache& cacheEntryAt(const CAmemCacheSet* cacheSet, int 
 
 static inline const char* cacheStateName(const CAmemCache& entry)
 {
-    return amem_stateName[entry.m_inUse == 0];
+    return lbl_8032E410[entry.m_inUse == 0];
 }
 
 static inline const char* cacheTypeName(const CAmemCache& entry)
 {
-    return amem_typeName[entry.m_type];
+    return lbl_801E8470[entry.m_type];
 }
 
 static inline CRedSound* RedSound(CSound* sound)
@@ -958,7 +951,7 @@ void CMemory::CopyToAMemorySync(void* source, void* dest, unsigned long size)
 {
     int dmaId = RedSound(&Sound)->DMAEntry(0, 0, reinterpret_cast<int>(source), reinterpret_cast<int>(dest),
                                            static_cast<int>(size), 0, 0);
-    CStopWatch watch(const_cast<char*>(s_stopwatchNoName));
+    CStopWatch watch((char*)0);
     watch.Start();
     while (RedSound(&Sound)->DMACheck(dmaId) != 0) {
         watch.Stop();
@@ -978,7 +971,7 @@ void CMemory::CopyToAMemorySync(void* source, void* dest, unsigned long size)
  */
 void CMemory::CopyFromAMemorySync(void* source, void* dest, unsigned long size)
 {
-    CStopWatch watch(const_cast<char*>(s_stopwatchNoName));
+    CStopWatch watch((char*)0);
     int dmaId = RedSound(&Sound)->DMAEntry(0, 1, reinterpret_cast<int>(source), reinterpret_cast<int>(dest),
                                            static_cast<int>(size), 0, 0);
     watch.Start();
@@ -1788,7 +1781,7 @@ int CAmemCacheSet::GetData(short index, char* source, int line)
                 if (data != 0) {
                     int dmaId = RedSound(&Sound)->DMAEntry(0, 1, reinterpret_cast<int>(entry.m_cacheData),
                                                            reinterpret_cast<int>(entry.m_workData), entry.m_size, 0, 0);
-                    CStopWatch watch(const_cast<char*>(s_stopwatchNoName));
+                    CStopWatch watch((char*)0);
                     watch.Start();
                     float timeout = FLOAT_8032f7d8;
                     while (RedSound(&Sound)->DMACheck(dmaId) != 0) {
@@ -1898,7 +1891,7 @@ int CAmemCacheSet::SetData(void* src, int size, CAmemCache::TYPE type, int dmaCo
         } else {
             int dmaId = RedSound(&Sound)->DMAEntry(0, 0, reinterpret_cast<int>(src),
                                                    reinterpret_cast<int>(entry.m_workData), entry.m_size, 0, 0);
-            CStopWatch watch(const_cast<char*>(s_stopwatchNoName));
+            CStopWatch watch((char*)0);
             watch.Start();
             while (RedSound(&Sound)->DMACheck(dmaId) != 0) {
                 watch.Stop();
@@ -1950,7 +1943,7 @@ checksum_done_dma:
     } else {
         int dmaId = RedSound(&Sound)->DMAEntry(0, 0, reinterpret_cast<int>(src),
                                                reinterpret_cast<int>(entry.m_workData), entry.m_size, 0, 0);
-        CStopWatch watch(const_cast<char*>(s_stopwatchNoName));
+        CStopWatch watch((char*)0);
         watch.Start();
         while (RedSound(&Sound)->DMACheck(dmaId) != 0) {
             watch.Stop();

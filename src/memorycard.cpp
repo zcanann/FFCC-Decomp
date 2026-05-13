@@ -331,111 +331,99 @@ void CMemoryCardMan::Quit()
  */
 void CMemoryCardMan::DebugReadWrite(int isWrite, char* filename, void* buffer, int length)
 {
-    bool success = false;
-    bool abort   = false;
-    int  result;
+    int success = 0;
+    int result;
+    unsigned long sectorSize;
+    CARDFileInfo fileInfo;
+    CARDStat stat;
 
-    // Mount card
     result = CARDMount(1, m_mountWorkArea, 0);
-
-    bool canUseCard = false;
-	
-    if (result != 0 && result != -6)
+    if (((result != 0) && (result != -6)) || (result = CARDCheckAsync(1, 0), result >= 0))
     {
-        canUseCard = true;
-    }
-    else if (CARDCheckAsync(1, 0) >= 0)
-    {
-        canUseCard = true;
-    }
-
-    if (canUseCard)
-    {
-        // Wait until card is ready; optionally format if needed.
-        while (true)
+checkResult:
+        result = CARDGetResultCode(1);
+        if (result != 0)
         {
-            result = CARDGetResultCode(1);
-			
-            if (result == 0)
-                break; // card ready
-
-            if ((result == -6 || result == -13) && isWrite == 0)
+            if (((result != -6) && (result != -13)) || (isWrite != 0))
             {
-                System.Printf("%s", const_cast<char*>(DAT_801db044));
+                goto done;
+            }
 
-                if (CARDFormat(1) < 0)
+            System.Printf(const_cast<char*>(DAT_801db044));
+            result = CARDFormat(1);
+            if (result < 0)
+            {
+                goto done;
+            }
+
+            goto checkResult;
+        }
+
+        result = CARDGetSectorSize(1, &sectorSize);
+        if (result >= 0)
+        {
+            if (isWrite != 0)
+            {
+                result = CARDOpen(1, filename, &fileInfo);
+                if (result >= 0)
                 {
-                    abort = true;
-                    break;
+                    goto readFile;
+                }
+
+                result = 0;
+                while (result < 0x7F)
+                {
+                    if (CARDGetStatus(1, result, &stat) < 0)
+                    {
+                        goto nextFile;
+                    }
+                    if (strcmp(filename, reinterpret_cast<char*>(&stat)) != 0)
+                    {
+                        goto nextFile;
+                    }
+                    goto foundFile;
+
+nextFile:
+                    result++;
+                }
+
+                result = -1;
+
+foundFile:
+                if ((result >= 0) && (CARDFastOpen(1, result, &fileInfo) >= 0))
+                {
+readFile:
+                    if (CARDRead(&fileInfo, buffer, length, 0) >= 0)
+                    {
+                        success = 1;
+                    }
+                    CARDClose(&fileInfo);
                 }
             }
             else
             {
-                abort = true;
-                break;
-            }
-        }
-
-        if (!abort)
-        {
-            unsigned long sectorSizeTmp;
-            if (CARDGetSectorSize(1, &sectorSizeTmp) >= 0)
-            {
-                if (isWrite != 0)
+                CARDDelete(1, filename);
+                result = CARDCreate(1, filename, length, &fileInfo);
+                if (result >= 0)
                 {
-                    CARDFileInfo fileInfo;
-                    result = CARDOpen(1, filename, &fileInfo);
-
-                    if (result < 0)
+                    result = CARDWrite(&fileInfo, buffer, length, 0);
+                    if (result >= 0)
                     {
-                        int      fileNo;
-                        CARDStat stat;
-
-                        for (fileNo = 0; fileNo < 0x7F; ++fileNo)
-                        {
-                            if (CARDGetStatus(1, fileNo, &stat) >= 0 &&
-                                strcmp(filename, (char*)&stat) == 0)
-                            {
-                                break;
-                            }
-                        }
-
-                        if (fileNo >= 0x7F ||
-                            CARDFastOpen(1, fileNo, &fileInfo) < 0)
-                        {
-                            abort = true;
-                        }
+                        success = 1;
                     }
-
-                    if (!abort)
-                    {
-                        if (CARDRead(&fileInfo, buffer, length, 0) >= 0)
-                            success = true;
-
-                        CARDClose(&fileInfo);
-                    }
-                }
-                else
-                {
-                    CARDDelete(1, filename);
-
-                    CARDFileInfo fileInfo;
-                    if (CARDCreate(1, filename, length, &fileInfo) >= 0)
-                    {
-                        if (CARDWrite(&fileInfo, buffer, length, 0) >= 0)
-                            success = true;
-
-                        CARDClose(&fileInfo);
-                    }
+                    CARDClose(&fileInfo);
                 }
             }
         }
     }
 
+done:
     CARDUnmount(1);
 
-    if (!success)
-        System.Printf("%s", const_cast<char*>(DAT_801db07c));
+    if (success == 0)
+    {
+        System.Printf(const_cast<char*>(DAT_801db07c));
+    }
 }
 
 

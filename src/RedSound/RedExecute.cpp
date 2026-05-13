@@ -1660,7 +1660,7 @@ static void _AdsrStart(RedVoiceDATA* voice)
         *stage = *stage + 1;
     } while (*stage < REDSOUND_VOICE_ADSR_STAGE_COUNT);
 
-    voice->m_adsrStepFrames = stepFrames;
+    stage[1] = stepFrames;
     if (nextLevel != 0) {
         nextLevel += 1;
         nextLevel <<= 8;

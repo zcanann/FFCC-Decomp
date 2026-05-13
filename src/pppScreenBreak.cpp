@@ -686,6 +686,7 @@ int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void* para
 {
     ScreenBreakModelView* modelView = (ScreenBreakModelView*)model;
     float zero = 0.0f;
+    float* pieceData = *(float**)((u8*)param_2 + 0xC);
     Vec translation;
     Vec cameraForward;
     Vec cameraPos;
@@ -693,7 +694,7 @@ int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void* para
     Vec4d clipOutput;
     Vec screenOffset;
     Vec cameraOffset;
-    Vec basis = DAT_801dd4b0;
+    Vec basis = { 0.0f, 1.0f, 0.0f };
     Vec gravityAdd;
     Vec axis;
     Quaternion meshQuat;
@@ -742,7 +743,6 @@ int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void* para
     modelView->m_drawMtx[2][3] = translation.z;
 
     mesh = modelView->m_meshes;
-    float* pieceData = *(float**)((u8*)param_2 + 0xC);
     if (*(float*)((u8*)param_3 + 0x30) != zero) {
         PSVECScale((Vec*)((u8*)param_3 + 0x20), &gravityAdd, *(float*)((u8*)param_3 + 0x30));
     }

@@ -67,6 +67,21 @@ static inline u8* u8_at(void* base, s32 off)
     return (u8*)base + off;
 }
 
+static inline float MegaBirthSpeedFalloff()
+{
+    return *reinterpret_cast<const float*>(&FLOAT_803304CC);
+}
+
+static inline float MegaBirthHalf()
+{
+    return *reinterpret_cast<const float*>(&FLOAT_803304D0);
+}
+
+static inline double MegaBirthHalfDouble()
+{
+    return *reinterpret_cast<const double*>(&DOUBLE_803304E0);
+}
+
 static inline unsigned char clamp_u8(float value)
 {
     int ivalue = (int)value;
@@ -81,7 +96,7 @@ static inline unsigned char clamp_u8(float value)
 
 static float calc_spawn_speed(float speedMag, u8 speedMode)
 {
-    const float halfSpeed = FLOAT_803304D0 * speedMag;
+    const float halfSpeed = MegaBirthHalf() * speedMag;
 
     switch (speedMode) {
     case 0:
@@ -92,11 +107,11 @@ static float calc_spawn_speed(float speedMag, u8 speedMode)
     case 2:
         return Math.RandF() * Math.RandF() * speedMag - halfSpeed;
     case 3:
-        return -(FLOAT_803304CC * (Math.RandF() * Math.RandF() * speedMag) - speedMag) - halfSpeed;
+        return -(MegaBirthSpeedFalloff() * (Math.RandF() * Math.RandF() * speedMag) - speedMag) - halfSpeed;
     case 4:
         return Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF() * speedMag - halfSpeed;
     case 5:
-        return -(FLOAT_803304D0 * (Math.RandF() * Math.RandF() * Math.RandF() * speedMag) - speedMag) - halfSpeed;
+        return -(MegaBirthHalf() * (Math.RandF() * Math.RandF() * Math.RandF() * speedMag) - speedMag) - halfSpeed;
     default:
         return Math.RandF() * speedMag - halfSpeed;
     }
@@ -152,7 +167,7 @@ static void apply_signed_randomization(u8* particleBytes, s32 offset, u8 flags)
     if (((flags & 1) != 0) && ((flags & 2) != 0)) {
         for (int i = 0; i < 3; i++) {
             float* value = f32_at(particleBytes, offset + i * 4);
-            if (DOUBLE_803304E0 < (double)Math.RandF()) {
+            if (MegaBirthHalfDouble() < (double)Math.RandF()) {
                 *value = *value * FLOAT_803304E8[0];
             }
         }
@@ -514,13 +529,13 @@ void birth(
             *f32_at(particleData, 0x7C) = *(float*)(payload + 0xC8) * Math.RandF();
 
             if ((payload[0x132] & 1) != 0 && (payload[0x132] & 2) != 0) {
-                if (DOUBLE_803304E0 < (double)Math.RandF()) {
+                if (MegaBirthHalfDouble() < (double)Math.RandF()) {
                     *f32_at(particleData, 0x74) = *f32_at(particleData, 0x74) * FLOAT_803304E8[0];
                 }
-                if (DOUBLE_803304E0 < (double)Math.RandF()) {
+                if (MegaBirthHalfDouble() < (double)Math.RandF()) {
                     *f32_at(particleData, 0x78) = *f32_at(particleData, 0x78) * FLOAT_803304E8[0];
                 }
-                if (DOUBLE_803304E0 < (double)Math.RandF()) {
+                if (MegaBirthHalfDouble() < (double)Math.RandF()) {
                     *f32_at(particleData, 0x7C) = *f32_at(particleData, 0x7C) * FLOAT_803304E8[0];
                 }
             } else if ((payload[0x132] & 2) != 0) {
@@ -536,7 +551,7 @@ void birth(
             *f32_at(particleData, 0x7C) = randomVelocity;
 
             if ((payload[0x132] & 1) != 0 && (payload[0x132] & 2) != 0) {
-                if (DOUBLE_803304E0 < (double)Math.RandF()) {
+                if (MegaBirthHalfDouble() < (double)Math.RandF()) {
                     *f32_at(particleData, 0x74) = *f32_at(particleData, 0x74) * FLOAT_803304E8[0];
                     *f32_at(particleData, 0x78) = *f32_at(particleData, 0x78) * FLOAT_803304E8[0];
                     *f32_at(particleData, 0x7C) = *f32_at(particleData, 0x7C) * FLOAT_803304E8[0];

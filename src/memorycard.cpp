@@ -1044,7 +1044,6 @@ void CMemoryCardMan::MakeSaveData()
     {
         u8* dst = save + 0x14D0 + c * 0x9C0;
         CCaravanWork* caravanWork = &Game.m_caravanWorkArr[c];
-        u8* cv = reinterpret_cast<u8*>(caravanWork);
 
         if (caravanWork->m_shopState == 0)
         {
@@ -1077,18 +1076,18 @@ void CMemoryCardMan::MakeSaveData()
         *reinterpret_cast<u16*>(dst + 0x2E) = caravanWork->m_genderFlag;
         *reinterpret_cast<u16*>(dst + 0x30) = caravanWork->m_appearanceVariant;
         *reinterpret_cast<u16*>(dst + 0x32) = caravanWork->unk_0x3e6;
-        *reinterpret_cast<int*>(dst + 0x34) = caravanWork->unk_0x3ac;
-        *reinterpret_cast<u32*>(dst + 0x38) = caravanWork->m_equipEffectFlags;
+        *reinterpret_cast<s16*>(dst + 0x34) = caravanWork->m_equipment[0];
+        *reinterpret_cast<s16*>(dst + 0x36) = caravanWork->m_equipment[1];
+        *reinterpret_cast<s16*>(dst + 0x38) = caravanWork->m_equipment[2];
+        *reinterpret_cast<s16*>(dst + 0x3A) = caravanWork->m_equipment[3];
         for (int i = 0; i < 64; i++)
         {
             *reinterpret_cast<s16*>(dst + 0x3C + i * 2) = caravanWork->m_inventoryItems[i];
         }
-        *reinterpret_cast<u32*>(dst + 0xB8) = caravanWork->m_joybusCaravanId;
-        *reinterpret_cast<u32*>(dst + 0xBC) = 0;
-        *reinterpret_cast<u32*>(dst + 0xC0) = 0;
-        *reinterpret_cast<u32*>(dst + 0xC4) = 0;
-        memcpy(dst + 0xC8, caravanWork->unk_0x3ca_0x3dd, 0x10);
-        *reinterpret_cast<u32*>(dst + 0xD8) = caravanWork->m_letterCount;
+        *reinterpret_cast<u32*>(dst + 0xE8) = caravanWork->m_joybusCaravanId;
+        *reinterpret_cast<u32*>(dst + 0xEC) = caravanWork->m_gil;
+        memcpy(dst + 0xF0, caravanWork->unk_0x3ca_0x3dd, 0x10);
+        *reinterpret_cast<u32*>(dst + 0x100) = caravanWork->m_letterCount;
         for (int i = 0; i < 100; i++)
         {
             u8* dstLetter = dst + 0x104 + i * 0x0C;
@@ -1134,27 +1133,25 @@ void CMemoryCardMan::MakeSaveData()
             }
         }
 
-        memcpy(dst + 0x0C8 + 0x100, cv + 0x4CA, 0x2B0);
-
         for (int i = 0; i < 8; i++)
         {
-            *reinterpret_cast<s16*>(dst + 0x598 + i * 2) = caravanWork->m_commandListInventorySlotRef[i];
-            *reinterpret_cast<s16*>(dst + 0x5A8 + i * 2) = caravanWork->m_commandListExtra[i];
+            *reinterpret_cast<s16*>(dst + 0xC8 + i * 2) = caravanWork->m_commandListInventorySlotRef[i];
+            *reinterpret_cast<s16*>(dst + 0xD8 + i * 2) = caravanWork->m_commandListExtra[i];
         }
 
-        *reinterpret_cast<int*>(dst + 0x1A84) = caravanWork->m_shopState;
-        memcpy(dst + 0x1A88, caravanWork->m_evtWorkArr, 0x100);
-        memcpy(dst + 0x1B88, caravanWork->m_evtWordArr, 0x200);
-        *reinterpret_cast<int*>(dst + 0x1D88) = caravanWork->unk_0x3a8;
-        *reinterpret_cast<int*>(dst + 0x1D8C) = caravanWork->unk_0x3ac;
-        dst[0x1D90] = caravanWork->m_shopBusyFlag;
-        dst[0x1D91] = caravanWork->m_caravanLocalFlags;
-        dst[0x1D92] = caravanWork->unk_0xc1e;
-        *reinterpret_cast<int*>(dst + 0x1D94) = caravanWork->m_shopRandSeed;
-        *reinterpret_cast<int*>(dst + 0x1DA0) = caravanWork->m_shopData0;
-        *reinterpret_cast<int*>(dst + 0x1D9C) = caravanWork->m_shopData2;
-        *reinterpret_cast<int*>(dst + 0x1D98) = caravanWork->m_shopData1;
-        *reinterpret_cast<int*>(dst + 0x1DA4) = caravanWork->m_baseDataIndex;
+        *reinterpret_cast<int*>(dst + 0x5B4) = caravanWork->m_shopState;
+        memcpy(dst + 0x5B8, caravanWork->m_evtWorkArr, 0x100);
+        memcpy(dst + 0x6B8, caravanWork->m_evtWordArr, 0x200);
+        *reinterpret_cast<int*>(dst + 0x8B8) = caravanWork->unk_0x3a8;
+        *reinterpret_cast<int*>(dst + 0x8BC) = caravanWork->unk_0x3ac;
+        dst[0x8C0] = caravanWork->m_shopBusyFlag;
+        dst[0x8C1] = caravanWork->m_caravanLocalFlags;
+        dst[0x8C2] = caravanWork->unk_0xc1e;
+        *reinterpret_cast<int*>(dst + 0x8C4) = caravanWork->m_shopRandSeed;
+        *reinterpret_cast<int*>(dst + 0x8D0) = caravanWork->m_shopData0;
+        *reinterpret_cast<int*>(dst + 0x8CC) = caravanWork->m_shopData2;
+        *reinterpret_cast<int*>(dst + 0x8C8) = caravanWork->m_shopData1;
+        *reinterpret_cast<int*>(dst + 0x8D4) = caravanWork->m_baseDataIndex;
     }
 
     Game.SaveScript(reinterpret_cast<char*>(save + 0x62D0));
@@ -1251,7 +1248,6 @@ void CMemoryCardMan::SetLoadData()
     {
         u8* src = save + 0x14D0 + c * 0x9C0;
         CCaravanWork* caravanWork = &Game.m_caravanWorkArr[c];
-        u8* cv = reinterpret_cast<u8*>(caravanWork);
 
         int itemCount = 0;
         int inventoryCount = 64;
@@ -1294,16 +1290,18 @@ void CMemoryCardMan::SetLoadData()
         caravanWork->m_genderFlag = *reinterpret_cast<u16*>(src + 0x2E);
         caravanWork->m_appearanceVariant = *reinterpret_cast<u16*>(src + 0x30);
         caravanWork->unk_0x3e6 = *reinterpret_cast<u16*>(src + 0x32);
-        caravanWork->unk_0x3ac = *reinterpret_cast<int*>(src + 0x34);
-        caravanWork->m_equipEffectFlags = *reinterpret_cast<u32*>(src + 0x38);
+        caravanWork->m_equipment[0] = *reinterpret_cast<s16*>(src + 0x34);
+        caravanWork->m_equipment[1] = *reinterpret_cast<s16*>(src + 0x36);
+        caravanWork->m_equipment[2] = *reinterpret_cast<s16*>(src + 0x38);
+        caravanWork->m_equipment[3] = *reinterpret_cast<s16*>(src + 0x3A);
         for (int i = 0; i < 64; i++)
         {
             caravanWork->m_inventoryItems[i] = *reinterpret_cast<s16*>(src + 0x3C + i * 2);
         }
-        caravanWork->m_joybusCaravanId = *reinterpret_cast<int*>(src + 0xB8);
-        caravanWork->m_gil = *reinterpret_cast<int*>(src + 0xBC);
-        memcpy(caravanWork->unk_0x3ca_0x3dd, src + 0xC8, 0x10);
-        caravanWork->m_letterCount = *reinterpret_cast<int*>(src + 0xD8);
+        caravanWork->m_joybusCaravanId = *reinterpret_cast<int*>(src + 0xE8);
+        caravanWork->m_gil = *reinterpret_cast<int*>(src + 0xEC);
+        memcpy(caravanWork->unk_0x3ca_0x3dd, src + 0xF0, 0x10);
+        caravanWork->m_letterCount = *reinterpret_cast<int*>(src + 0x100);
         for (int i = 0; i < 100; i++)
         {
             u8* dstLetter = caravanWork->m_letter0 + i * 0x0C;
@@ -1351,23 +1349,23 @@ void CMemoryCardMan::SetLoadData()
 
         for (int i = 0; i < 8; i++)
         {
-            caravanWork->m_commandListInventorySlotRef[i] = *reinterpret_cast<s16*>(src + 0x598 + i * 2);
-            caravanWork->m_commandListExtra[i] = *reinterpret_cast<s16*>(src + 0x5A8 + i * 2);
+            caravanWork->m_commandListInventorySlotRef[i] = *reinterpret_cast<s16*>(src + 0xC8 + i * 2);
+            caravanWork->m_commandListExtra[i] = *reinterpret_cast<s16*>(src + 0xD8 + i * 2);
         }
 
-        caravanWork->m_shopState = *reinterpret_cast<int*>(src + 0x1A84);
-        memcpy(caravanWork->m_evtWorkArr, src + 0x1A88, 0x100);
-        memcpy(caravanWork->m_evtWordArr, src + 0x1B88, 0x200);
-        caravanWork->unk_0x3a8 = *reinterpret_cast<int*>(src + 0x1D88);
-        caravanWork->unk_0x3ac = *reinterpret_cast<int*>(src + 0x1D8C);
-        caravanWork->m_shopBusyFlag = src[0x1D90];
-        caravanWork->m_caravanLocalFlags = src[0x1D91];
-        caravanWork->unk_0xc1e = src[0x1D92];
-        caravanWork->m_shopRandSeed = *reinterpret_cast<int*>(src + 0x1D94);
-        caravanWork->m_shopData0 = *reinterpret_cast<int*>(src + 0x1DA0);
-        caravanWork->m_shopData2 = *reinterpret_cast<int*>(src + 0x1D9C);
-        caravanWork->m_shopData1 = *reinterpret_cast<int*>(src + 0x1D98);
-        caravanWork->m_baseDataIndex = *reinterpret_cast<int*>(src + 0x1DA4);
+        caravanWork->m_shopState = *reinterpret_cast<int*>(src + 0x5B4);
+        memcpy(caravanWork->m_evtWorkArr, src + 0x5B8, 0x100);
+        memcpy(caravanWork->m_evtWordArr, src + 0x6B8, 0x200);
+        caravanWork->unk_0x3a8 = *reinterpret_cast<int*>(src + 0x8B8);
+        caravanWork->unk_0x3ac = *reinterpret_cast<int*>(src + 0x8BC);
+        caravanWork->m_shopBusyFlag = src[0x8C0];
+        caravanWork->m_caravanLocalFlags = src[0x8C1];
+        caravanWork->unk_0xc1e = src[0x8C2];
+        caravanWork->m_shopRandSeed = *reinterpret_cast<int*>(src + 0x8C4);
+        caravanWork->m_shopData0 = *reinterpret_cast<int*>(src + 0x8D0);
+        caravanWork->m_shopData2 = *reinterpret_cast<int*>(src + 0x8CC);
+        caravanWork->m_shopData1 = *reinterpret_cast<int*>(src + 0x8C8);
+        caravanWork->m_baseDataIndex = *reinterpret_cast<int*>(src + 0x8D4);
         caravanWork->m_maxHp = caravanWork->GetArtifactIncludeHpMax();
 
     }

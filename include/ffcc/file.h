@@ -72,7 +72,7 @@ public:
 	void UnlockBuffer();
 	void ReadASync(CHandle* handle);
 	void Close(CHandle* handle);
-	bool IsCompleted(CHandle* handle);
+	int IsCompleted(CHandle* handle);
 	int IsDiskError();
 	void SyncCompleted(CHandle* handle);
 

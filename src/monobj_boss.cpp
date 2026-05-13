@@ -2468,9 +2468,8 @@ int CGMonObj::attackCheckFuncMeteoParasite(int)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGMonObj::aiAddDuct(int&)
+void CGMonObj::aiAddDuct(int& seq)
 {
-	int seq = 0;
 	if (Rand__5CMathFUl(&Math, 300) == 0) {
 		aiTarget__8CGMonObjFv(this);
 		_aiSeq__8CGMonObjFiiiiii(this, -14, seq, 0, 1, 100, -1);
@@ -2494,9 +2493,7 @@ void CGMonObj::initFinishedFuncDuct()
 	CGObject* object = reinterpret_cast<CGObject*>(this);
 	initFinishedFuncDefault__8CGMonObjFv(this);
 	const int slot = static_cast<int>(reinterpret_cast<long>(object->m_scriptHandle[4])) - 0x8E;
-	if (slot >= 0 && slot < 8) {
-		reinterpret_cast<CGMonObj**>(SoundBuffer + 1400)[slot] = this;
-	}
+	reinterpret_cast<CGMonObj**>(m_boss__8CGMonObj + 0x18)[slot] = this;
 }
 
 /*

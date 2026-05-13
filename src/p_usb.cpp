@@ -9,6 +9,9 @@
 extern const char lbl_801DA074[];
 int s_usbReadPollFrameCounter;
 char s_usbReadPollInitialized;
+char s_usbReadPollPadding0;
+char s_usbReadPollPadding1;
+char s_usbReadPollPadding2;
 extern "C" void create__7CUSBPcsFv(CUSBPcs*);
 extern "C" void destroy__7CUSBPcsFv(CUSBPcs*);
 extern "C" void func__7CUSBPcsFv(CUSBPcs*);

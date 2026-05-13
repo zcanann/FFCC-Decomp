@@ -524,9 +524,15 @@ void CMenuPcs::destroy()
     CMenuPcs* textureCursor = this;
     int i = 0;
     do {
-        void** slot = reinterpret_cast<void**>(reinterpret_cast<u8*>(textureCursor) + 0x18C);
-        ReleaseRefObject(*slot);
-        *slot = nullptr;
+        int* refObject = *reinterpret_cast<int**>(reinterpret_cast<u8*>(textureCursor) + 0x18C);
+        if (refObject != nullptr) {
+            int refCount = refObject[1] - 1;
+            refObject[1] = refCount;
+            if ((refCount == 0) && (refObject != nullptr)) {
+                reinterpret_cast<void (**)(void*, int)>(refObject[0])[2](refObject, 1);
+            }
+            *reinterpret_cast<void**>(reinterpret_cast<u8*>(textureCursor) + 0x18C) = nullptr;
+        }
         i++;
         textureCursor = reinterpret_cast<CMenuPcs*>(reinterpret_cast<u8*>(textureCursor) + 4);
     } while (i < 0x16);
@@ -534,15 +540,28 @@ void CMenuPcs::destroy()
     textureCursor = this;
     i = 0;
     do {
-        void** slot = reinterpret_cast<void**>(reinterpret_cast<u8*>(textureCursor) + 0x14C);
-        ReleaseRefObject(*slot);
-        *slot = nullptr;
+        int* refObject = *reinterpret_cast<int**>(reinterpret_cast<u8*>(textureCursor) + 0x14C);
+        if (refObject != nullptr) {
+            int refCount = refObject[1] - 1;
+            refObject[1] = refCount;
+            if ((refCount == 0) && (refObject != nullptr)) {
+                reinterpret_cast<void (**)(void*, int)>(refObject[0])[2](refObject, 1);
+            }
+            *reinterpret_cast<void**>(reinterpret_cast<u8*>(textureCursor) + 0x14C) = nullptr;
+        }
         i++;
         textureCursor = reinterpret_cast<CMenuPcs*>(reinterpret_cast<u8*>(textureCursor) + 4);
     } while (i < 2);
 
-    ReleaseRefObject(m_fonts[0]);
-    m_fonts[0] = 0;
+    int* refObject = reinterpret_cast<int*>(m_fonts[0]);
+    if (refObject != nullptr) {
+        int refCount = refObject[1] - 1;
+        refObject[1] = refCount;
+        if ((refCount == 0) && (refObject != nullptr)) {
+            reinterpret_cast<void (**)(void*, int)>(refObject[0])[2](refObject, 1);
+        }
+        m_fonts[0] = 0;
+    }
 
     Memory.DestroyStage(m_menuStage);
     if (*reinterpret_cast<s8*>(self + 0x859) != 0) {
@@ -703,15 +722,29 @@ void CMenuPcs::freeTexture(int textureSetStart, int textureSetCount, int texture
     u8* self = reinterpret_cast<u8*>(this);
 
     for (int i = 0; i < textureCount; i++) {
-        void** slot = reinterpret_cast<void**>(self + 0x18C + (textureStart + i) * 4);
-        ReleaseRefObject(*slot);
-        *slot = nullptr;
+        int offset = (textureStart + i) * 4;
+        int* refObject = *reinterpret_cast<int**>(self + 0x18C + offset);
+        if (refObject != nullptr) {
+            int refCount = refObject[1] - 1;
+            refObject[1] = refCount;
+            if ((refCount == 0) && (refObject != nullptr)) {
+                reinterpret_cast<void (**)(void*, int)>(refObject[0])[2](refObject, 1);
+            }
+            *reinterpret_cast<void**>(self + 0x18C + offset) = nullptr;
+        }
     }
 
     for (int i = 0; i < textureSetCount; i++) {
-        void** slot = reinterpret_cast<void**>(self + 0x14C + (textureSetStart + i) * 4);
-        ReleaseRefObject(*slot);
-        *slot = nullptr;
+        int offset = (textureSetStart + i) * 4;
+        int* refObject = *reinterpret_cast<int**>(self + 0x14C + offset);
+        if (refObject != nullptr) {
+            int refCount = refObject[1] - 1;
+            refObject[1] = refCount;
+            if ((refCount == 0) && (refObject != nullptr)) {
+                reinterpret_cast<void (**)(void*, int)>(refObject[0])[2](refObject, 1);
+            }
+            *reinterpret_cast<void**>(self + 0x14C + offset) = nullptr;
+        }
     }
 }
 

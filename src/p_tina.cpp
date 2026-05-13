@@ -575,10 +575,12 @@ unsigned int pppAmemRefCntError(unsigned long)
  * Address:	TODO
  * Size:	TODO
  */
+#ifndef VERSION_GCCP01
 void CPartPcs::create0()
 {
 	// TODO
 }
+#endif
 
 /*
  * --INFO--
@@ -751,20 +753,24 @@ void CPartPcs::destroy()
  * Address:	TODO
  * Size:	TODO
  */
+#ifndef VERSION_GCCP01
 void CPartPcs::ChangeDataStage(CMemory::CStage*)
 {
 	// TODO
 }
+#endif
 
 /*
  * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
+#ifndef VERSION_GCCP01
 void CPartPcs::ResetDataStage()
 {
 	// TODO
 }
+#endif
 
 /*
  * --INFO--
@@ -1370,10 +1376,12 @@ void CPartPcs::LoadFieldPdt(int mapId, int floorId, void* amemBase, unsigned lon
  * Address:	TODO
  * Size:	TODO
  */
+#ifndef VERSION_GCCP01
 void loadPdtPtx(char*, void*, int, void*, int, int)
 {
 	// TODO
 }
+#endif
 
 /*
  * --INFO--
@@ -1570,7 +1578,9 @@ void CPartPcs::EndMiruraEvent()
  * Address:	TODO
  * Size:	TODO
  */
+#ifndef VERSION_GCCP01
 void CPartPcs::SetUSBData()
 {
 	// TODO
 }
+#endif

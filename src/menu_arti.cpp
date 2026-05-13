@@ -186,13 +186,14 @@ static inline double IntToF64(unsigned int value)
  */
 int CMenuPcs::ArtiCtrlCur()
 {
-	short sVar1;
+	int sVar1;
 	bool bVar2;
 	unsigned short uVar3;
 	unsigned short uVar4;
 	int iVar5;
 	int iVar6;
 	int padLock;
+	int selection;
 
 	bVar2 = false;
 	padLock = Pad._452_4_;
@@ -224,8 +225,9 @@ int CMenuPcs::ArtiCtrlCur()
 	}
 
 	iVar5 = GetArtiStateBase(this);
+	selection = *(short*)(iVar5 + 0x30);
 	if ((uVar4 & 8) != 0) {
-		iVar6 = iVar5 + *(short*)(iVar5 + 0x30) * 2;
+		iVar6 = iVar5 + selection * 2;
 		sVar1 = *(short*)(iVar6 + 0x26);
 		if (sVar1 != 0) {
 			*(short*)(iVar6 + 0x26) = sVar1 + -1;
@@ -237,7 +239,7 @@ int CMenuPcs::ArtiCtrlCur()
 			Sound.PlaySe(4, 0x40, 0x7f, 0);
 		}
 	} else if ((uVar4 & 4) != 0) {
-		iVar6 = iVar5 + *(short*)(iVar5 + 0x30) * 2;
+		iVar6 = iVar5 + selection * 2;
 		sVar1 = *(short*)(iVar6 + 0x26);
 		if (sVar1 < 7) {
 			*(short*)(iVar6 + 0x26) = sVar1 + 1;

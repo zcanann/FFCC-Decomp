@@ -17,6 +17,7 @@
 CPad Pad;
 
 void* operator new[](unsigned long, CMemory::CStage*, char*, int);
+extern "C" void* __RTTI__8CManager[];
 
 extern const char s_CPad[] = "CPad";
 static const float FLOAT_8032f820 = 0.0f;
@@ -210,7 +211,7 @@ void CPad::Frame()
 			{
 				_1a8_4_ = _1a8_4_ | uVar15;
 			}
-			else if (cVar9 > -4)
+			else if (cVar9 >= -3)
 			{
 				_1a8_4_ = _1a8_4_ & ~uVar15;
 			}
@@ -307,9 +308,9 @@ void CPad::Frame()
 						if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x100) != 0)
 						{
 							uVar16 = static_cast<int>(*reinterpret_cast<s8*>(iVar6 + 0x18)) >> 0x1F;
-							if ((_1c8_4_ <= static_cast<int>((uVar16 ^ static_cast<int>(*reinterpret_cast<s8*>(iVar6 + 0x18))) - uVar16)) ||
+							if ((static_cast<int>((uVar16 ^ static_cast<int>(*reinterpret_cast<s8*>(iVar6 + 0x18))) - uVar16) >= _1c8_4_) ||
 								((uVar16 = static_cast<int>(*reinterpret_cast<s8*>(iVar6 + 0x19)) >> 0x1F),
-								 (_1c8_4_ <= static_cast<int>((uVar16 ^ static_cast<int>(*reinterpret_cast<s8*>(iVar6 + 0x19))) - uVar16))))
+								 (static_cast<int>((uVar16 ^ static_cast<int>(*reinterpret_cast<s8*>(iVar6 + 0x19))) - uVar16) >= _1c8_4_)))
 							{
 								*puVar12 = static_cast<u16>(*puVar12 & 0xFFF0);
 								*reinterpret_cast<u32*>(iVar6 + 0x40) = 1;

@@ -206,20 +206,20 @@ void CMenuPcs::TmpArtiDraw()
 	entry = reinterpret_cast<short*>(GetTmpArtiEntries(this));
 	foodPtr = scriptFood;
 	for (int i = 0; i < 4; i++) {
-		short itemId = *(short*)(foodPtr + 0x1F6);
-		if (itemId >= 0) {
+		if (*(short*)(foodPtr + 0x1F6) >= 0) {
 			float alpha = *(float*)(entry + 8);
 			CColor textColor(0xFF, 0xFF, 0xFF, (unsigned char)(int)(FLOAT_80332F28 * alpha));
-			SetColor__5CFontF8_GXColor(font, &textColor.color);
+			GXColor color = textColor.color;
+			SetColor__5CFontF8_GXColor(font, &color);
 
-			const char* text = flatData->table[0].strings[itemId * 5 + 4];
+			const char* text = flatData->table[0].strings[*(short*)(foodPtr + 0x1F6) * 5 + 4];
 			float width = GetWidth__5CFontFPc(font, text);
 			float posX = (float)(((TmpArtiIntToDouble(entry[2]) - width) * DOUBLE_80332f20) +
 			                       TmpArtiIntToDouble(entry[0]));
-			float posY = (float)TmpArtiIntToDouble(entry[1] + 11) - FLOAT_80332F38;
+			double posY = TmpArtiIntToDouble(entry[1] + 11);
 
 			SetPosX__5CFontFf(posX, font);
-			SetPosY__5CFontFf(posY, font);
+			SetPosY__5CFontFf((float)posY - FLOAT_80332F38, font);
 			Draw__5CFontFPc(font, text);
 		}
 		entry += 0x20;
@@ -399,30 +399,37 @@ void CMenuPcs::TmpArtiCtrl()
 				do {
 					iVar8 = reinterpret_cast<int>(this->m_tmpArtiList) + iVar6 + 8;
 					*(int *)(iVar8 + 0x24) = iVar7;
+					iVar7 = iVar7 + 1;
 					*(unsigned int *)(iVar8 + 0x28) = 3;
 					iVar8 = reinterpret_cast<int>(this->m_tmpArtiList) + iVar6 + -0x38;
-					*(int *)(iVar8 + 0x24) = iVar7 + 1;
+					*(int *)(iVar8 + 0x24) = iVar7;
+					iVar7 = iVar7 + 1;
 					*(unsigned int *)(iVar8 + 0x28) = 3;
 					iVar8 = reinterpret_cast<int>(this->m_tmpArtiList) + iVar6 + -0x78;
-					*(int *)(iVar8 + 0x24) = iVar7 + 2;
+					*(int *)(iVar8 + 0x24) = iVar7;
+					iVar7 = iVar7 + 1;
 					*(unsigned int *)(iVar8 + 0x28) = 3;
 					iVar8 = reinterpret_cast<int>(this->m_tmpArtiList) + iVar6 + -0xb8;
-					*(int *)(iVar8 + 0x24) = iVar7 + 3;
+					*(int *)(iVar8 + 0x24) = iVar7;
+					iVar7 = iVar7 + 1;
 					*(unsigned int *)(iVar8 + 0x28) = 3;
 					iVar8 = reinterpret_cast<int>(this->m_tmpArtiList) + iVar6 + -0xf8;
-					*(int *)(iVar8 + 0x24) = iVar7 + 4;
+					*(int *)(iVar8 + 0x24) = iVar7;
+					iVar7 = iVar7 + 1;
 					*(unsigned int *)(iVar8 + 0x28) = 3;
 					iVar8 = reinterpret_cast<int>(this->m_tmpArtiList) + iVar6 + -0x138;
-					*(int *)(iVar8 + 0x24) = iVar7 + 5;
+					*(int *)(iVar8 + 0x24) = iVar7;
+					iVar7 = iVar7 + 1;
 					*(unsigned int *)(iVar8 + 0x28) = 3;
 					iVar8 = reinterpret_cast<int>(this->m_tmpArtiList) + iVar6 + -0x178;
-					*(int *)(iVar8 + 0x24) = iVar7 + 6;
+					*(int *)(iVar8 + 0x24) = iVar7;
+					iVar7 = iVar7 + 1;
 					*(unsigned int *)(iVar8 + 0x28) = 3;
 					iVar8 = iVar6 + -0x1b8;
 					iVar6 = iVar6 + -0x200;
 					iVar8 = reinterpret_cast<int>(this->m_tmpArtiList) + iVar8;
-					*(int *)(iVar8 + 0x24) = iVar7 + 7;
-					iVar7 = iVar7 + 8;
+					*(int *)(iVar8 + 0x24) = iVar7;
+					iVar7 = iVar7 + 1;
 					*(unsigned int *)(iVar8 + 0x28) = 3;
 					uVar9 = uVar9 - 1;
 				} while (uVar9 != 0);
@@ -492,7 +499,7 @@ unsigned int CMenuPcs::TmpArtiOpen()
 			*(int *)(psVar7 + 0xe) = 0x37;
 			psVar7[2] = 200;
 			psVar7[3] = 0x28;
-			psVar7[0] = (short)(int)-(((double)psVar7[2] * dVar1) - dVar5);
+			psVar7[0] = (short)(int)-((TmpArtiIntToDouble(psVar7[2]) * dVar1) - dVar5);
 			psVar7[1] = (short)iVar6 * (psVar7[3] + -8) + 0x60;
 			*(float *)(psVar7 + 4) = fVar2;
 			*(float *)(psVar7 + 6) = fVar2;
@@ -501,7 +508,7 @@ unsigned int CMenuPcs::TmpArtiOpen()
 			*(int *)(psVar7 + 0x2e) = 0x37;
 			psVar7[0x22] = 200;
 			psVar7[0x23] = 0x28;
-			psVar7[0x20] = (short)(int)-(((double)psVar7[0x22] * dVar1) - dVar5);
+			psVar7[0x20] = (short)(int)-((TmpArtiIntToDouble(psVar7[0x22]) * dVar1) - dVar5);
 			psVar7[0x21] = (short)(iVar6 + 1) * (psVar7[0x23] + -8) + 0x60;
 			*(float *)(psVar7 + 0x24) = fVar2;
 			*(float *)(psVar7 + 0x26) = fVar2;

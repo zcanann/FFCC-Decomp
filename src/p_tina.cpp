@@ -368,8 +368,9 @@ struct CPartMngState {
     unsigned int m_partChunkIndex;
     unsigned int m_asyncHandleCount;
     int m_partLoadMode;
-    unsigned char unk2370C[0x80];
-    unsigned int m_partAsyncBusy[16];
+    unsigned int m_partChunkSize[16];
+    unsigned int m_partChunkChecksum[16];
+    CFile::CHandle* m_partAsyncBusy[16];
 };
 
 struct PppPdtSlotRaw {

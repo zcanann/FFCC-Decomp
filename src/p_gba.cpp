@@ -11,6 +11,8 @@ extern "C" void calc__7CGbaPcsFv(CGbaPcs*);
 extern "C" void draw__7CGbaPcsFv(CGbaPcs*);
 extern const char s_CGbaPcs_80330870[];
 extern const char s_JoyBus__LoadBin___error_801d9de0[];
+extern const char __RTTI__8CManager_8032E7C0[];
+extern const char __RTTI__8CProcess_8032E7C8[];
 
 const char s_CGbaPcs_80330870[] = "CGbaPcs";
 const char s_JoyBus__LoadBin___error_801d9de0[] = "JoyBus::LoadBin() error\n";
@@ -68,8 +70,15 @@ CGbaPcsTable CGbaPcs::m_table = {
     },
 };
 
-unsigned int s_CGbaPcsTablePad0[3] = {0, 0, 0};
-unsigned int s_CGbaPcsTablePad1[5] = {0, 0, 0, 0, 0};
+unsigned int s_CGbaPcsTablePad0[3] = {
+    reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CManager_8032E7C0)), 0, 0};
+unsigned int s_CGbaPcsTablePad1[5] = {
+    reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CManager_8032E7C0)),
+    0,
+    reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CProcess_8032E7C8)),
+    0,
+    0,
+};
 CGbaPcs GbaPcs;
 
 /*

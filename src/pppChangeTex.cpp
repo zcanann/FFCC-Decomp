@@ -295,21 +295,19 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 		return;
 	}
 
-	union {
-		double d;
-		u32 u[2];
-	} scale;
 	float currentValue = work->m_value0 * (work->m_bboxMax.y - work->m_bboxMin.y) + work->m_bboxMin.y;
 
-	scale.u[0] = 0x43300000;
-	scale.u[1] = (1 << model0Raw->m_data->m_frameShift) ^ 0x80000000;
-	short splitY = (short)(int)(currentValue * (scale.d - LoadDouble(DOUBLE_80332030)));
+	short splitY = (short)(int)(currentValue * (float)(1 << model0Raw->m_data->m_frameShift));
 	if (work->m_cachedValue == currentValue) {
 		return;
 	}
 
 	work->m_cachedValue = currentValue;
 
+	union {
+		double d;
+		u32 u[2];
+	} scale;
 	scale.u[0] = 0x43300000;
 	scale.u[1] = colorData[0xB];
 	double alphaBase = (double)(LoadFloat(FLOAT_80332028) * ((float)(scale.d - LoadDouble(DOUBLE_80332038)) / LoadFloat(FLOAT_80332028)));

@@ -2793,7 +2793,7 @@ void CGMonObj::moveFrame()
 		in_f29 = PSVECDistance(&local_68, &object->m_worldPosition);
 
 		if (((moveFlags & 0x30000) != 0) && (*reinterpret_cast<unsigned int*>(ARRAY_8030918c) != 0)) {
-			int polygonGroup = AStar.calcPolygonGroup(&local_68, static_cast<int>(object->m_moveVec.x));
+			int polygonGroup = AStar.calcPolygonGroup(&local_68, static_cast<int>(object->m_bgHitMask));
 			moveAStar(aStarGroupId, polygonGroup, local_68);
 		}
 	} else if ((moveFlags & 0x2000) != 0) {

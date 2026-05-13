@@ -44,12 +44,12 @@ extern "C" int __cntlzw(unsigned int);
 
 extern CMenuPcs MenuPcs;
 
-static const float FLOAT_80332e60 = 0.0f;
+extern const float FLOAT_80332e60;
 extern float FLOAT_80332e64;
 extern const double DOUBLE_80332e68;
 extern float FLOAT_80332e70;
 extern float FLOAT_80332e74;
-static const double DOUBLE_80332e78 = 0.5;
+extern const double DOUBLE_80332e78;
 extern float FLOAT_80332e80;
 extern float FLOAT_80332e84;
 extern float FLOAT_80332e88;
@@ -58,9 +58,14 @@ extern float FLOAT_80332e90;
 extern float FLOAT_80332e94;
 extern float FLOAT_80332E98;
 extern const double DOUBLE_80332ea0;
-static const float FLOAT_80332EA8 = 128.0f;
-static const float FLOAT_80332EAC = 8.0f;
-static const float FLOAT_80332EB0 = 0.75f;
+extern const float FLOAT_80332EA8;
+extern const float FLOAT_80332EAC;
+extern const float FLOAT_80332EB0;
+extern const double DOUBLE_80333388 = 373.0;
+extern const float FLOAT_80333390 = 214.0f;
+extern const float FLOAT_80333394 = 112.0f;
+extern const float FLOAT_80333398 = 474.0f;
+extern const double DOUBLE_803333a0 = 32.0;
 
 struct MenuItemOpenAnim {
     s16 x;

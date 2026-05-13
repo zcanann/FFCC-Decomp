@@ -52,7 +52,6 @@ extern const float kYmDeformationMdlTexMtxOffset;
 extern const float kYmDeformationMdlTexMtxDepth;
 extern const float kYmDeformationMdlDegToRad;
 extern const float kYmDeformationMdlZero = 0.0f;
-extern const double kPppYmSharedDoubleBias = 4503601774854144.0;
 
 static inline Mtx& CameraMatrix()
 {
@@ -339,3 +338,5 @@ void pppConstructYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl_, str
     state->m_values[3] = zero;
     state->m_values[2] = zero;
 }
+
+extern const double kPppYmSharedDoubleBias = 4503601774854144.0;

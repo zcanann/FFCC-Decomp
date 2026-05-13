@@ -298,8 +298,8 @@ void CMapAnimNode::Interp(int frame)
             out->y = keys[0].value.y;
             out->z = keys[0].value.z;
         } else {
-            unsigned int i = 0;
             CMapAnimNodeTrackKey* current = keys;
+            unsigned int i = 0;
             unsigned int keyCount = static_cast<unsigned int>(trackCount);
 
             for (; i < keyCount; i++) {
@@ -348,8 +348,8 @@ void CMapAnimNode::Interp(int frame)
             out->y = keys[0].value.y;
             out->z = keys[0].value.z;
         } else {
-            unsigned int i = 0;
             CMapAnimNodeTrackKey* current = keys;
+            unsigned int i = 0;
             unsigned int keyCount = static_cast<unsigned int>(trackCount);
 
             for (; i < keyCount; i++) {
@@ -399,8 +399,8 @@ void CMapAnimNode::Interp(int frame)
             out->y = keys[0].value.y;
             out->z = keys[0].value.z;
         } else {
-            unsigned int i = 0;
             CMapAnimNodeTrackKey* current = keys;
+            unsigned int i = 0;
             unsigned int keyCount = static_cast<unsigned int>(trackCount);
 
             for (; i < keyCount; i++) {

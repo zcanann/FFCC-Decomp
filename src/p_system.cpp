@@ -25,6 +25,9 @@ unsigned int m_table__10CSystemPcs[0x15C / sizeof(unsigned int)] = {
     0x8
 };
 
+static unsigned int s_CSystemPcsTablePad0[3] = {0, 0, 0};
+static unsigned int s_CSystemPcsTablePad1[5] = {0, 0, 0, 0, 0};
+
 /*
  * --INFO--
  * PAL Address: 0x80047c9c

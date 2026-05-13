@@ -648,14 +648,22 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* work, PYmMegaBirthShpT
         pppCopyMatrix(*(pppFMATRIX*)particleWMat, work->m_emitterMatrix);
     }
 
-    particleData->m_colorDeltaAdd[0] = 0.0f;
-    particleData->m_colorDeltaAdd[1] = 0.0f;
-    particleData->m_colorDeltaAdd[2] = 0.0f;
-    particleData->m_colorDeltaAdd[3] = 0.0f;
-    *(((u8*)&particleData->m_directionTail.z) + 2) = 0;
-    *((u8*)&particleData->m_directionTail.z) = 0;
-    *(((u8*)&particleData->m_directionTail.y) + 3) = 0x1f;
-    *((u8*)&particleData->m_directionTail.z) = *(((u8*)&particleData->m_directionTail.y) + 3) - 1;
+    *(u16*)(particleBytes + 0x3a) = 0;
+    *(u16*)(particleBytes + 0x3c) = 0;
+    *(u16*)(particleBytes + 0x3e) = 0;
+    particleBytes[0x38] = 0;
+    particleBytes[0x37] = 0x1f;
+
+    Vec zeroVec;
+    zeroVec.x = 0.0f;
+    zeroVec.y = 0.0f;
+    zeroVec.z = 0.0f;
+    Vec* history = (Vec*)(particleBytes + 0x40);
+    for (int i = 0; i < 0x1f; i++) {
+        pppCopyVector(history[i], zeroVec);
+    }
+
+    particleBytes[0x38] = particleBytes[0x37] - 1;
 }
 
 /*

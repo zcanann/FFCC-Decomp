@@ -513,8 +513,7 @@ void CCaravanWork::AddLetter(int letterType, int senderId, int moneyValue, int h
 	letterWords32[0] = (letterWords32[0] & 0xFFFC01FF) | ((senderId & 0x1FF) << 9);
 	letterFlags->hasMoney = hasMoneyFlag;
 	if (letterFlags->hasMoney != 0) {
-		int divValue = (moneyValue / 100) + (moneyValue >> 31);
-		moneyValue = divValue - (divValue >> 31);
+		moneyValue /= 100;
 	}
 	letterWords16[1] = (unsigned short)((letterWords16[1] & 0xFE00) | (moneyValue & 0x1FF));
 	letterFlags->opened = 0;

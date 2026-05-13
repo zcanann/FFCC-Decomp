@@ -34,6 +34,7 @@ extern float FLOAT_80332064;
 extern float FLOAT_80332078;
 extern double DOUBLE_80332068;
 extern double DOUBLE_80332070;
+extern const char sPppCharaBreakObjMeshName[4];
 extern int DAT_801dd684;
 extern int DAT_801dd688;
 extern int DAT_801dd68c;
@@ -355,7 +356,7 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
             {
                 CharaBreakMeshData* meshData = reinterpret_cast<CharaBreakMeshRef*>(mesh)->m_data;
 
-                if (strcmp(meshData->m_name, "obj") == 0) {
+                if (strcmp(meshData->m_name, sPppCharaBreakObjMeshName) == 0) {
                     CalcBoundaryBoxQuantized__5CUtilFP3VecP3VecP6S16VecUlUl(
                         &gUtil,
                         &work->m_bboxMin,

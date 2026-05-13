@@ -38,6 +38,9 @@ extern "C" void SetParticleWorkBind__13CFlatRuntime2FPQ212CFlatRuntime7CObject(v
 extern "C" void PutParticleWork__13CFlatRuntime2Fv(void*);
 extern const char lbl_801DCB1C[];
 extern const char lbl_801DCB38[];
+extern "C" int DAT_8032EE70;
+extern "C" char lbl_8032EE74;
+extern int __float_huge[];
 
 static const char s_partyObjStateFmt[] = "mode:%d stat:%d sub:%d frame:%d alive:%d tgt:%d ghost:%d";
 static const char s_partyBonusCountFmt[] = "SetBonusCondition num:%d";
@@ -104,7 +107,13 @@ struct BossGhostPartyCounters {
 
 struct PartyObjFlags {
 	unsigned char commandActive : 1;
-	unsigned char reserved : 7;
+	unsigned char flag40 : 1;
+	unsigned char flag20 : 1;
+	unsigned char flag10 : 1;
+	unsigned char flag08 : 1;
+	unsigned char flag04 : 1;
+	unsigned char flag02 : 1;
+	unsigned char flag01 : 1;
 };
 
 struct PartyObjOverlay {
@@ -139,6 +148,7 @@ struct PartyObjOverlay {
 	union {
 		int unk6EC;
 		int _legacy6EC;
+		float legacyTargetSearchDistance;
 	};
 	CGObject* carryObject;
 	short commandMode;
@@ -301,18 +311,32 @@ void CGPartyObj::onCreate()
 	party.attackSel = 0;
 	party.unk6CC = 0;
 	party.unk6BC = 0;
+	party.target = 0;
+	party.targetOverride = 0;
+	party.legacyTargetSearchDistance = *(float*)__float_huge;
+	party.carryObject = 0;
 	party.unk6C0 = -1;
+	party.weaponItem = 0;
+	party.pendingWeaponItem = 0;
 	party.unk6D2 = 0;
 
-	party.partyFlags &= 0x7F;
-	party.partyFlags &= 0xF7;
-	party.partyFlags &= 0xBF;
-	party.partyFlags &= 0xDF;
-	party.partyFlags &= 0xEF;
-	party.partyFlags &= 0xFB;
-	party.partyFlags &= 0xFD;
+	party.flags.commandActive = 0;
+	party.flags.flag08 = 0;
+	party.flags.flag40 = 0;
+	party.flags.flag20 = 0;
+	party.flags.flag10 = 0;
+	party.flags.flag04 = 0;
+	party.flags.flag02 = 0;
 
 	m_targetDist = FLOAT_80331a78;
+
+	if (lbl_8032EE74 == 0) {
+		DAT_8032EE70 = 0;
+		lbl_8032EE74 = 1;
+	}
+	if (DAT_8032EE70 == 0) {
+		DAT_8032EE70 = 1;
+	}
 }
 
 /*

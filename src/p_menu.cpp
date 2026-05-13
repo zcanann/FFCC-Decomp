@@ -858,16 +858,16 @@ void CMenuPcs::calc()
         }
 
         if (mode >= 0) {
-            CMenuPcs* menu = this;
             int i = 0;
+            CMenuPcs* menu = this;
             do {
                 Calc__5CMenuFv(*reinterpret_cast<CMenu**>(reinterpret_cast<u8*>(menu) + 0x13c));
                 i++;
                 menu = reinterpret_cast<CMenuPcs*>(reinterpret_cast<u8*>(menu) + 4);
             } while (i < 4);
 
-            menu = this;
             i = 0;
+            menu = this;
             do {
                 Calc__5CMenuFv(*reinterpret_cast<CMenu**>(reinterpret_cast<u8*>(menu) + 0x10c));
                 i++;

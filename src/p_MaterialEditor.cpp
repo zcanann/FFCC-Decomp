@@ -149,26 +149,21 @@ CMaterialEditorPcs::~CMaterialEditorPcs()
  */
 void CMaterialEditorPcs::Init()
 {
-    u32 clz0;
-    u32 clz1;
-    u32 level;
     unsigned char* self;
     int remaining;
 
     self = reinterpret_cast<unsigned char*>(this);
     self[0x8] = 0x7f;
-    clz0 = static_cast<u32>(__cntlzw(0));
     self[0x9] = 0x7f;
     self[0xa] = 0x7f;
-    clz1 = static_cast<u32>(__cntlzw(1));
-    level = -clz0;
+    unsigned char level = static_cast<unsigned char>(-((__cntlzw(0) >> 5) & 1));
     level &= 0x3f;
     self[0xb] = 0xff;
     self[0xc] = level;
-    clz0 = static_cast<u32>(__cntlzw(2));
     self[0xd] = level;
     self[0xe] = level;
-    level = -((clz1 >> 5) & 1) & 0x3f;
+    level = static_cast<unsigned char>(-((__cntlzw(1) >> 5) & 1));
+    level &= 0x3f;
     self[0xf] = 0xff;
     *reinterpret_cast<float*>(self + 0x18) = 0.0f;
     *reinterpret_cast<float*>(self + 0x1c) = 0.0f;
@@ -176,7 +171,8 @@ void CMaterialEditorPcs::Init()
     self[0x10] = level;
     self[0x11] = level;
     self[0x12] = level;
-    level = -((clz0 >> 5) & 1) & 0x3f;
+    level = static_cast<unsigned char>(-((__cntlzw(2) >> 5) & 1));
+    level &= 0x3f;
     self[0x13] = 0xff;
     *reinterpret_cast<float*>(self + 0x24) = 0.0f;
     *reinterpret_cast<float*>(self + 0x28) = 0.0f;

@@ -178,8 +178,8 @@ static int _ArrangeStreamDataLoop(RedStreamDATA* stream, int bufferIndex, int by
  * --INFO--
  * PAL Address: 0x801cbfc4
  * PAL Size: 112b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020dee8
+ * EN Size: 112b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -199,8 +199,8 @@ void StreamStop(int streamID)
  * --INFO--
  * PAL Address: 0x801cc034
  * PAL Size: 1280b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020df58
+ * EN Size: 1280b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -354,8 +354,8 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
  * --INFO--
  * PAL Address: 0x801cc534
  * PAL Size: 204b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020e458
+ * EN Size: 204b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -399,8 +399,8 @@ void SetStreamVolume(int streamID, int volume, int frameCount)
  * --INFO--
  * PAL Address: 0x801cc600
  * PAL Size: 392b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020e524
+ * EN Size: 392b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -456,8 +456,8 @@ void StreamPause(int streamID, int pause)
  * --INFO--
  * PAL Address: 0x801cc788
  * PAL Size: 684b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020e6ac
+ * EN Size: 684b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -557,8 +557,8 @@ void StreamControl()
  * --INFO--
  * PAL Address: 0x801cb93c
  * PAL Size: 68b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020d860
+ * EN Size: 68b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -582,8 +582,8 @@ static RedStreamDATA* _SearchEmptyStreamData()
  * --INFO--
  * PAL Address: 0x801cb980
  * PAL Size: 272b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020d8a4
+ * EN Size: 272b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -617,8 +617,8 @@ static void _StreamStop(RedStreamDATA* streamData)
  * --INFO--
  * PAL Address: 0x801cba90
  * PAL Size: 476b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020d9b4
+ * EN Size: 476b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -681,8 +681,8 @@ static int _ArrangeStreamDataNoLoop(RedStreamDATA* stream, int bufferIndex, int 
  * --INFO--
  * PAL Address: 0x801cbc6c
  * PAL Size: 856b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020db90
+ * EN Size: 856b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -799,8 +799,8 @@ static int _ArrangeStreamDataLoop(RedStreamDATA* stream, int bufferIndex, int by
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 184b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: UNUSED
+ * EN Size: 184b
  * JP Address: TODO
  * JP Size: TODO
  */

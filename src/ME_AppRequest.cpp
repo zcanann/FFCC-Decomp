@@ -9,7 +9,7 @@ void __dla__FPv(void*);
 void* memset(void*, int, unsigned int);
 }
 
-static const char s_ME_AppRequest_cpp_801d7da8[] = "ME_AppRequest.cpp";
+static const char s_ME_AppRequest_cpp_801d7da8[24] = "ME_AppRequest.cpp";
 
 struct ZCANMGRP {
     void* ptr;

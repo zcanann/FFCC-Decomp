@@ -123,8 +123,8 @@ static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* wav
  * --INFO--
  * PAL Address: 0x801ca3bc
  * PAL Size: 252b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020c2e0
+ * EN Size: 252b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -173,8 +173,8 @@ RedTrackDATA* SearchSeEmptyTrack(int trackCount, int eraseTrack, int attrMask)
  * --INFO--
  * PAL Address: 0x801ca4b8
  * PAL Size: 384b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020c3dc
+ * EN Size: 384b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -218,8 +218,8 @@ int SeStopID(int seId)
  * --INFO--
  * PAL Address: 0x801ca638
  * PAL Size: 464b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020c55c
+ * EN Size: 464b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -266,8 +266,8 @@ int SeStopMG(int bank, int sep, int group, int kind)
  * --INFO--
  * PAL Address: 0x801cabb0
  * PAL Size: 264b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020cad4
+ * EN Size: 264b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -286,7 +286,10 @@ int SeBlockPlay(int seId, int bank, int no, int pan, int volume)
 			int* entries = bankData->m_entries;
 
 			if (entries[seNo] != REDSOUND_SE_BLOCK_ENTRY_EMPTY) {
-				RedSeINFO* seInfo = RedSeBlockGetInfoFromEntries(bankData, entries, seNo);
+				RedSeINFO* seInfo = reinterpret_cast<RedSeINFO*>(
+				    reinterpret_cast<unsigned char*>(entries) +
+				    (entries[seNo] & REDSOUND_SE_BLOCK_ENTRY_MASK) +
+				    bankData->m_seCount * REDSOUND_SE_BLOCK_ENTRY_SIZE);
 				RedSeINFO* playInfo = seInfo;
 
 				if (((unsigned int)entries[seNo] & REDSOUND_SE_BLOCK_DATA_FLAG) != 0) {
@@ -305,8 +308,8 @@ int SeBlockPlay(int seId, int bank, int no, int pan, int volume)
  * --INFO--
  * PAL Address: 0x801cacb8
  * PAL Size: 192b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020cbdc
+ * EN Size: 192b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -334,8 +337,8 @@ int SeSepPlay(int seId, int sepId, int pan, int volume)
  * --INFO--
  * PAL Address: 0x801cad78
  * PAL Size: 168b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020cc9c
+ * EN Size: 168b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -368,8 +371,8 @@ void SetSeVolume(int seId, int volume, int frameCount, int mode)
  * --INFO--
  * PAL Address: 0x801cae20
  * PAL Size: 164b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020cd44
+ * EN Size: 164b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -401,8 +404,8 @@ void SetSePan(int seId, int pan, int frameCount)
  * --INFO--
  * PAL Address: 0x801caec4
  * PAL Size: 164b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020cde8
+ * EN Size: 164b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -433,8 +436,8 @@ void SetSePitch(int seId, int pitch, int frameCount)
  * --INFO--
  * PAL Address: 0x801caf68
  * PAL Size: 312b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020ce8c
+ * EN Size: 312b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -479,8 +482,8 @@ void SePause(int seId, int pause)
  * --INFO--
  * PAL Address: 0x801cb5f0
  * PAL Size: 480b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020d514
+ * EN Size: 480b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -545,8 +548,8 @@ int MusicStop(int musicId)
  * --INFO--
  * PAL Address: 0x801cb7d0
  * PAL Size: 160b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020d6f4
+ * EN Size: 160b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -572,8 +575,8 @@ int MusicPlay(int musicId, int volume, int mode)
  * --INFO--
  * PAL Address: 0x801cb870
  * PAL Size: 204b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020d794
+ * EN Size: 204b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -615,8 +618,8 @@ void SetMusicVolume(int musicId, int volume, int duration, int mode)
  * --INFO--
  * PAL Address: 0x801ca038
  * PAL Size: 364b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020bf5c
+ * EN Size: 364b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -655,15 +658,14 @@ static void _EraseAttribute(int eraseTrack, int attrMask)
  * --INFO--
  * PAL Address: 0x801ca1a4
  * PAL Size: 536b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020c0c8
+ * EN Size: 536b
  * JP Address: TODO
  * JP Size: TODO
  */
 static int _EraseTime(int eraseTrack)
 {
 	int minEraseTrack = REDSOUND_ERASE_TRACK_SENTINEL;
-	int maxPlayTime;
 	RedTrackDATA** trackBasePtr = &p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
 	RedTrackDATA* track = *trackBasePtr;
 	int sepId;
@@ -681,12 +683,12 @@ static int _EraseTime(int eraseTrack)
 	}
 
 	track = *trackBasePtr;
-	maxPlayTime = 0;
+	minEraseTrack = 0;
 	sepId = 0;
 	do {
 		if ((track->m_command != 0) && (track->m_attrMask == 0) && (track->m_eraseTrack <= eraseTrack) &&
-		    (track->m_playTime > maxPlayTime)) {
-			maxPlayTime = track->m_playTime;
+		    (track->m_playTime > minEraseTrack)) {
+			minEraseTrack = track->m_playTime;
 			sepId = track->m_seSepId;
 		}
 		track++;
@@ -696,7 +698,7 @@ static int _EraseTime(int eraseTrack)
 	erasedCount = 0;
 	do {
 		if ((track->m_command != 0) && (track->m_attrMask == 0) && (track->m_eraseTrack <= eraseTrack) &&
-		    (track->m_playTime == maxPlayTime)) {
+		    (track->m_playTime == minEraseTrack)) {
 			int trackNo;
 
 			KeyOnReserveClear(p_KeyOnData, track);
@@ -730,8 +732,8 @@ static int _EraseTime(int eraseTrack)
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 408b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: UNUSED
+ * EN Size: 408b
  * JP Address: TODO
  */
 int SeStopG(int group)
@@ -775,8 +777,8 @@ int SeStopG(int group)
  * --INFO--
  * PAL Address: 0x801ca808
  * PAL Size: 936b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020c72c
+ * EN Size: 936b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -817,7 +819,7 @@ static int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volum
 	}
 	seq = info->m_sequence;
 	attrMask = info->m_attrMask;
-	count = info->m_flagsAndCount & REDSOUND_SE_INFO_COUNT_MASK;
+	count = info->m_flagsAndCount & ~REDSOUND_SE_INFO_MULTI_FLAG;
 	current = reinterpret_cast<unsigned char*>(seq + count);
 	do {
 		remaining = count;
@@ -861,7 +863,7 @@ static int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volum
 			}
 			track->m_playTime = state;
 
-			if (*track->m_command != '\0') {
+			if (*track->m_command != 0U) {
 				track->m_eraseTrack = info->m_eraseTrack;
 				track->m_attrMask = info->m_attrMask;
 				track->m_mixVolume = volume << REDSOUND_FIXED_SHIFT;
@@ -912,8 +914,8 @@ static int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volum
 				voiceData->m_track = track;
 				voiceData->m_stateFlags = REDSOUND_VOICE_STATE_PLAYING | REDSOUND_VOICE_STATE_SE;
 				voiceData->m_flags = REDSOUND_VOICE_FLAGS_RELEASED;
-				voiceData->m_volumeModPhase = 0;
-				voiceData->m_pitchModPhase = 0;
+				voiceData->m_volumeModFrames = 0;
+				voiceData->m_pitchModFrames = 0;
 				voiceData->m_updateFlags = 0;
 			}
 
@@ -939,8 +941,8 @@ static int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volum
  * --INFO--
  * PAL Address: 0x801cb0a0
  * PAL Size: 1360b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020cfc4
+ * EN Size: 1360b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1007,7 +1009,7 @@ static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* wav
 	RedMusicTrackBlock* current = reinterpret_cast<RedMusicTrackBlock*>(musicHead + 1);
 	int count = musicHead->m_trackCount;
 	char trackNo = 0;
-	while (count != 0) {
+	do {
 		unsigned int blockSize = ((unsigned int)current->m_sizeHi2 << 24) |
 		                         ((unsigned int)current->m_sizeHi1 << 16) |
 		                         ((unsigned int)current->m_sizeHi0 << 8) |
@@ -1019,11 +1021,13 @@ static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* wav
 		current = (RedMusicTrackBlock*)((unsigned char*)current + blockSize);
 		track->m_deltaTime = DeltaTimeSumup((unsigned char**)&track->m_command) + 1;
 		track->m_seSepId = 0;
+		signed char* keySignatureData;
 		if (m_MusicKeySignature != 0) {
-			track->m_keySignatureData = t_KeySignatureData + REDSOUND_KEY_SIGNATURE_DEFAULT_OFFSET;
+			keySignatureData = t_KeySignatureData + REDSOUND_KEY_SIGNATURE_DEFAULT_OFFSET;
 		} else {
-			track->m_keySignatureData = 0;
+			keySignatureData = 0;
 		}
+		track->m_keySignatureData = keySignatureData;
 		track->m_mixVolume = REDSOUND_VOLUME_DEFAULT;
 		track->m_mixVolumeDelta = 0;
 		track->m_volume = REDSOUND_VOLUME_FULL;
@@ -1052,7 +1056,7 @@ static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* wav
 		track->m_tremoloDelayDepth = 0;
 		track->m_vibrateDelayDepth = 0;
 		track->m_waveData = 0;
-		track->m_flags = ((musicHead->m_playFlags & REDSOUND_MUSIC_PLAY_FLAG_RELEASE_NOTES) == 0) ? REDSOUND_TRACK_FLAG_TENUTO : 0;
+		track->m_flags = ((musicHead->m_playFlags & REDSOUND_MUSIC_PLAY_FLAG_RELEASE_NOTES) != 0) ? 0 : REDSOUND_TRACK_FLAG_TENUTO;
 		track->m_step2 = 0;
 		track->m_step = 0;
 		track->m_fuzzyAdsrDepth = 0;
@@ -1070,7 +1074,7 @@ static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* wav
 		if (count != 0) {
 			track++;
 		}
-	}
+	} while (count != 0);
 
 	music->m_skipFrames = 1;
 	music->m_channelAlloc = 0;
@@ -1107,8 +1111,8 @@ static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* wav
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 104b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: UNUSED
+ * EN Size: 104b
  * JP Address: TODO
  */
 void SetMusicTempo(int tempo, int frameCount)
@@ -1131,8 +1135,8 @@ void SetMusicTempo(int tempo, int frameCount)
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 92b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: UNUSED
+ * EN Size: 92b
  * JP Address: TODO
  */
 void SetMusicPitch(int pitch, int frameCount)
@@ -1154,8 +1158,8 @@ void SetMusicPitch(int pitch, int frameCount)
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 476b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: UNUSED
+ * EN Size: 476b
  * JP Address: TODO
  */
 void MusicPause(int musicId, int pause)

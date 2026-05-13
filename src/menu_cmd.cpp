@@ -39,45 +39,53 @@ extern "C" void DrawInit__8CMenuPcsFv(CMenuPcs*);
 extern "C" void DrawHelpMessage__8CMenuPcsFiP5CFontii8_GXColoriff(CMenuPcs*, int, CFont*, int, int, GXColor, int, float, float);
 extern "C" void DrawEquipMark__8CMenuPcsFiif(CMenuPcs*, int, int, float);
 extern "C" const char* GetMenuStr__8CMenuPcsFi(CMenuPcs*, int);
+extern "C" const char lbl_80332A50[];
+extern "C" const char s_Pyro_Frappe_801DEAE4[];
+extern "C" const char s_Cryo_Frappe_801DEAF0[];
+extern "C" const char lbl_801DEAFC[];
+extern "C" const char s_Efecto_Fuego_801DEB08[];
+extern "C" const char s_Efecto_Hielo_801DEB18[];
+extern "C" const char s_Efecto_Electro_801DEB28[];
+extern "C" const char* jumptable_80214D24[];
+extern "C" const char* s_pcts_pctd_item_pctd_m_equip_pct08x_80214D34[];
 
 
-static const double DOUBLE_80332a58 = 1.0;
-static const double DOUBLE_80332a60 = 0.5;
-static const double DOUBLE_80332a68 = 0.1;
-static const double DOUBLE_80332a78 = 5.0;
-static const double DOUBLE_80332a80 = 4503601774854144.0;
-static const double DOUBLE_80332a90 = 0.2;
-static const double DOUBLE_80332a98 = 24.0;
-static const double DOUBLE_80332aa0 = 1.5;
-static const double DOUBLE_80332aa8 = 3.0;
-static const double DOUBLE_80332ab8 = 12.8;
-static const double DOUBLE_80332ac0 = 64.0;
-static const float FLOAT_80332ad0 = 8.0f;
-static const float FLOAT_80332ac8 = 64.0f;
-static const float FLOAT_80332a70 = 1.0f;
-static const float FLOAT_80332ab0 = 0.0f;
-static const float FLOAT_80332a88 = 0.5f;
-static const float FLOAT_80332b38 = 128.0f;
-static const float FLOAT_80332b3c = 0.75f;
-static const float FLOAT_80332acc = 255.0f;
-static const float FLOAT_80332ad8 = 0.8999999761581421f;
-static const float FLOAT_80332ae8 = 4.0f;
-static const float FLOAT_80332aec = 96.0f;
-static const float FLOAT_80332af0 = 8.0f;
-static const float FLOAT_80332b08 = 320.0f;
-static const float FLOAT_80332b10 = 72.0f;
-static const float FLOAT_80332b14 = 12.0f;
-static const float FLOAT_80332b18 = 24.0f;
-static const float FLOAT_80332b28 = 352.0f;
-static const double DOUBLE_80332ae0 = 0.125;
-static const double DOUBLE_80332af8 = 19.8;
-static const double DOUBLE_80332b00 = 16.0;
-static const double DOUBLE_80332b20 = 16.0;
+extern "C" const double DOUBLE_80332a58;
+extern "C" const double DOUBLE_80332a60;
+extern "C" const double DOUBLE_80332a68;
+extern "C" const double DOUBLE_80332a78;
+extern "C" const double DOUBLE_80332a80;
+extern "C" const double DOUBLE_80332a90;
+extern "C" const double DOUBLE_80332a98;
+extern "C" const double DOUBLE_80332aa0;
+extern "C" const double DOUBLE_80332aa8;
+extern "C" const double DOUBLE_80332ab8;
+extern "C" const double DOUBLE_80332ac0;
+extern "C" const float FLOAT_80332ad0;
+extern "C" const float FLOAT_80332ac8;
+extern "C" const float FLOAT_80332a70;
+extern "C" const float FLOAT_80332ab0;
+extern "C" const float FLOAT_80332a88;
+extern "C" const float FLOAT_80332b38;
+extern "C" const float FLOAT_80332b3c;
+extern "C" const float FLOAT_80332acc;
+extern "C" const float FLOAT_80332ad8;
+extern "C" const float FLOAT_80332ae8;
+extern "C" const float FLOAT_80332AEC;
+extern "C" const float FLOAT_80332AF0;
+extern "C" const float FLOAT_80332b08;
+extern "C" const float FLOAT_80332b10;
+extern "C" const float FLOAT_80332b14;
+extern "C" const float FLOAT_80332b18;
+extern "C" const float FLOAT_80332b28;
+extern "C" const double DOUBLE_80332AE0;
+extern "C" const double DOUBLE_80332af8;
+extern "C" const double DOUBLE_80332B00;
+extern "C" const double DOUBLE_80332b20;
 s32 DAT_8032eec8;
 s32 s_UniteTop[3];
 
-namespace {
-static const s16 s_UnitePatternData[] = {
+extern "C" const s16 DAT_801de910[] = {
     0x0000, 0x022A, 0x0003, 0x0107, 0x0105, 0x0105,
     0x0001, 0x0207, 0x0002, 0x0100, 0x03E7, 0x0000,
     0x0001, 0x020B, 0x0002, 0x0101, 0x03E7, 0x0000,
@@ -110,46 +118,30 @@ static const s16 s_UnitePatternData[] = {
     static_cast<s16>(0xFFFF), static_cast<s16>(0xFFFF), static_cast<s16>(0xFFFF),
 };
 
-} // namespace
+extern "C" const char s_Flamestrike_801DEA6C[] = "Flamestrike";
+extern "C" const char s_Icestrike_801DEA78[] = "Icestrike";
+extern "C" const char s_Thunderstrike_801DEA84[] = "Thunderstrike";
+extern "C" const char s_Feuer_Hieb_801DEA94[] = "Feuer-Hieb";
+extern "C" const char s_Eis_Hieb_801DEAA0[] = "Eis-Hieb";
+extern "C" const char s_Blitz_Hieb_801DEAAC[] = "Blitz-Hieb";
+extern "C" const char s_Colpo_Fire_801DEAB8[] = "Colpo Fire";
+extern "C" const char s_Colpo_Blizzard_801DEAC4[] = "Colpo Blizzard";
 
-static const char* s_SkillStr_us[] = {
-    "Flamestrike",
-    "Icestrike",
-    "Thunderstrike",
-    "",
-    "",
+extern "C" const char* PTR_s_Pyro_Frappe[] = {
+    s_Pyro_Frappe_801DEAE4,
+    s_Cryo_Frappe_801DEAF0,
+    lbl_801DEAFC,
+    lbl_80332A50,
+    lbl_80332A50,
 };
 
-static const char* s_SkillStr_ge[] = {
-    "Feuer-Hieb",
-    "Eis-Hieb",
-    "Blitz-Hieb",
-    "",
-    "",
-};
-
-static const char* s_SkillStr_it[] = {
-    "Colpo Fire",
-    "Colpo Blizzard",
-    "Colpo Thunder",
-    "",
-    "",
-};
-
-static const char* s_SkillStr_fr[] = {
-    "Pyro-Frappe",
-    "Cryo-Frappe",
-    "\x52\x68\xE9\x6F-Frappe",
-    "",
-    "",
-};
-
-static const char* s_SkillStr_sp[] = {
-    "Efecto Fuego",
-    "Efecto Hielo",
-    "Efecto Electro",
-    "",
-    "",
+extern "C" const char* PTR_s_Efecto_Fuego[] = {
+    s_Efecto_Fuego_801DEB08,
+    s_Efecto_Hielo_801DEB18,
+    s_Efecto_Electro_801DEB28,
+    lbl_80332A50,
+    lbl_80332A50,
+    0,
 };
 
 namespace {
@@ -173,19 +165,19 @@ static const char* GetLocalizedStrikeName(int itemId)
 		return 0;
 	}
 
-	const char** names = s_SkillStr_us;
+	const char** names = jumptable_80214D24 + 1;
 	switch (Game.m_gameWork.m_languageId) {
 	case 2:
-		names = s_SkillStr_ge;
+		names = s_pcts_pctd_item_pctd_m_equip_pct08x_80214D34 + 2;
 		break;
 	case 3:
-		names = s_SkillStr_it;
+		names = s_pcts_pctd_item_pctd_m_equip_pct08x_80214D34 + 7;
 		break;
 	case 4:
-		names = s_SkillStr_fr;
+		names = PTR_s_Pyro_Frappe;
 		break;
 	case 5:
-		names = s_SkillStr_sp;
+		names = PTR_s_Efecto_Fuego;
 		break;
 	default:
 		break;
@@ -1958,7 +1950,7 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 	if (itemKinds[selected] > 0) {
 		if ((itemKinds[selected] == 999) && (selected > 2)) {
 			int patIdx = 0;
-			for (const s16* pat = s_UnitePatternData; pat[1] >= 0; pat += 6, patIdx++) {
+			for (const s16* pat = DAT_801de910; pat[1] >= 0; pat += 6, patIdx++) {
 				if ((pat[0] == 0) || ((pat[2] == 2) && (static_cast<s32>(selectedNegMask) < 0))) {
 					continue;
 				}
@@ -1979,7 +1971,7 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 				}
 			}
 		} else if (static_cast<s32>(selectedNegMask) >= 0) {
-			const int baseLen = static_cast<int>(s_UnitePatternData[2]);
+			const int baseLen = static_cast<int>(DAT_801de910[2]);
 			int start = selected - (baseLen - 1);
 			for (int i = 0; i < baseLen; i++, start++) {
 				int ok = 0;
@@ -1988,7 +1980,7 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 					if (candidates[slot] != 0) {
 						break;
 					}
-					if (s_UnitePatternData[3 + k] == itemKinds[slot]) {
+					if (DAT_801de910[3 + k] == itemKinds[slot]) {
 						ok++;
 					}
 				}
@@ -2002,7 +1994,7 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 
 		int group = 1;
 		int* matchWrite = matches + matchCount * 2;
-		for (const s16* pat = s_UnitePatternData + 6; pat[1] >= 0; pat += 6, group++) {
+		for (const s16* pat = DAT_801de910 + 6; pat[1] >= 0; pat += 6, group++) {
 			if (((pat[0] != 0) && (itemKinds[selected] == 999) && (selected >= 3)) ||
 			    ((pat[2] == 2) && (static_cast<s32>(selectedNegMask) < 0))) {
 				continue;
@@ -2040,7 +2032,7 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 			int (*dst)[2] = comboOut;
 			for (int i = 0; i < matchCount; i++) {
 				const int* m = &matches[i * 2];
-				if (rank + 2 == s_UnitePatternData[2 + m[0] * 6]) {
+				if (rank + 2 == DAT_801de910[2 + m[0] * 6]) {
 					dst[0][0] = m[0];
 					dst[0][1] = m[1];
 					dst++;
@@ -2254,7 +2246,7 @@ void CMenuPcs::DrawUniteList()
 			panelAlpha = *reinterpret_cast<float*>(startEntry + 8);
 		} else {
 			panelAlpha = static_cast<float>(
-				fabs(static_cast<double>(panelX - static_cast<float>(topX))) * DOUBLE_80332ae0);
+				fabs(static_cast<double>(panelX - static_cast<float>(topX))) * DOUBLE_80332AE0);
 		}
 
 		GXColor color;
@@ -2267,7 +2259,7 @@ void CMenuPcs::DrawUniteList()
 		s16* const panel = unitePanels + DAT_8032eec8 * 0x20;
 		panel[0] = static_cast<s16>(panelX);
 		panel[1] = static_cast<s16>(panelY);
-		panel[2] = static_cast<s16>(FLOAT_80332aec);
+		panel[2] = static_cast<s16>(FLOAT_80332AEC);
 		panel[3] = static_cast<s16>(FLOAT_80332ac8);
 		*reinterpret_cast<float*>(panel + 4) = FLOAT_80332ab0;
 		*reinterpret_cast<float*>(panel + 6) = panelTone;
@@ -2278,10 +2270,10 @@ void CMenuPcs::DrawUniteList()
 		SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x38);
 		DrawRect__8CMenuPcsFUlfffffffff(this, 0,
 			panelX,
-			panelY - FLOAT_80332af0,
-			FLOAT_80332aec,
+			panelY - FLOAT_80332AF0,
+			FLOAT_80332AEC,
 			FLOAT_80332ac8,
-			FLOAT_80332af0,
+			FLOAT_80332AF0,
 			panelTone,
 			FLOAT_80332a70,
 			FLOAT_80332a70,
@@ -2313,7 +2305,7 @@ void CMenuPcs::DrawUniteList()
 		font->SetPosY(((static_cast<float>(panel[3]) - static_cast<float>(DOUBLE_80332af8)) *
 		                   static_cast<float>(DOUBLE_80332a60) +
 		               static_cast<float>(panel[1])) -
-		              FLOAT_80332ae8 - static_cast<float>(DOUBLE_80332b00));
+		              FLOAT_80332ae8 - static_cast<float>(DOUBLE_80332B00));
 		font->Draw(text);
 	}
 
@@ -2333,7 +2325,7 @@ void CMenuPcs::DrawUniteList()
 		color.a = static_cast<u8>(FLOAT_80332acc * alpha);
 		DrawHelpMessage__8CMenuPcsFiP5CFontii8_GXColoriff(
 			this, helpId, font, 0,
-			static_cast<int>(-(FLOAT_80332aec * FLOAT_80332a88 - FLOAT_80332b08)),
+			static_cast<int>(-(FLOAT_80332AEC * FLOAT_80332a88 - FLOAT_80332b08)),
 			color, 0, FLOAT_80332a88, FLOAT_80332b08);
 	}
 }
@@ -2849,21 +2841,21 @@ const char* CMenuPcs::GetSkillStr(int index)
 	const int languageId = static_cast<signed char>(Game.m_gameWork.m_languageId);
 
 	if (languageId == '\x03') {
-		return s_SkillStr_it[index];
+		return (s_pcts_pctd_item_pctd_m_equip_pct08x_80214D34 + 7)[index];
 	}
 	if (languageId < 3) {
 		if ((languageId != '\x01') && (languageId != '\0')) {
-			return s_SkillStr_ge[index];
+			return (s_pcts_pctd_item_pctd_m_equip_pct08x_80214D34 + 2)[index];
 		}
 	} else {
 		if (languageId == '\x05') {
-			return s_SkillStr_sp[index];
+			return PTR_s_Efecto_Fuego[index];
 		}
 		if (languageId < 5) {
-			return s_SkillStr_fr[index];
+			return PTR_s_Pyro_Frappe[index];
 		}
 	}
-	return s_SkillStr_us[index];
+	return (jumptable_80214D24 + 1)[index];
 }
 
 /*

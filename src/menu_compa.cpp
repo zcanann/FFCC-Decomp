@@ -381,8 +381,7 @@ void CMenuPcs::CompaCtrl()
 	} else {
 		int padIndex = activeInput;
 		padIndex &= ~-((__cntlzw((unsigned int)Pad._448_4_) & 0x20) >> 5);
-		unsigned short holdRaw = *reinterpret_cast<unsigned short*>(reinterpret_cast<u8*>(&Pad) + padIndex * 0x54 + 0x14);
-		hold = holdRaw;
+		hold = *reinterpret_cast<unsigned short*>(reinterpret_cast<u8*>(&Pad) + padIndex * 0x54 + 0x14);
 	}
 
 	if (hold == 0) {
@@ -407,22 +406,23 @@ void CMenuPcs::CompaCtrl()
 	}
 
 	if (doReset) {
-		this->compaList->entries[0].startFrame = 2;
-		this->compaList->entries[0].duration = 5;
-		this->compaList->entries[1].startFrame = 2;
-		this->compaList->entries[1].duration = 5;
-		this->compaList->entries[2].startFrame = 2;
-		this->compaList->entries[2].duration = 5;
-		this->compaList->entries[3].startFrame = 7;
-		this->compaList->entries[3].duration = 5;
-		this->compaList->entries[4].startFrame = 7;
-		this->compaList->entries[4].duration = 5;
-		this->compaList->entries[5].flags = 2;
-		this->compaList->entries[5].startFrame = 7;
-		this->compaList->entries[5].duration = 5;
+		CompaOpenAnim* entries = this->compaList->entries;
+		entries[0].startFrame = 2;
+		entries[0].duration = 5;
+		entries[1].startFrame = 2;
+		entries[1].duration = 5;
+		entries[2].startFrame = 2;
+		entries[2].duration = 5;
+		entries[3].startFrame = 7;
+		entries[3].duration = 5;
+		entries[4].startFrame = 7;
+		entries[4].duration = 5;
+		entries[5].flags = 2;
+		entries[5].startFrame = 7;
+		entries[5].duration = 5;
 
 		unsigned int entryCount = this->compaList->count;
-		CompaOpenAnim* entry = this->compaList->entries;
+		CompaOpenAnim* entry = entries;
 		while (entryCount != 0) {
 			entry->frame = 0;
 			entry->alpha = 1.0f;

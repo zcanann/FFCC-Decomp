@@ -693,8 +693,8 @@ void CFont::Create(void* filePtr, CMemory::CStage* stage)
                         chunkFile.Get(m_glyphData, chunk.m_size);
                     }
 
-                    unsigned short* bucket = static_cast<unsigned short*>(m_glyphData);
                     unsigned short** bucketSlot = m_glyphBuckets;
+                    unsigned short* bucket = static_cast<unsigned short*>(m_glyphData);
                     for (int i = 0; i < 32; i++) {
                         bucketSlot[0] = bucket;
                         bucket = bucket + static_cast<unsigned int>(*bucket) * 4;

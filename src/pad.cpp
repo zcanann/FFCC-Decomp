@@ -93,13 +93,14 @@ void CPad::Frame()
 	{
 		CPad::Gba* gba = &local_98[uVar17];
 		iVar6 = SIProbe(uVar17);
+		int padIndex = uVar17;
 		gba->connected = (0x40000 - iVar6) == 0;
 		gba->ctrlMode = Joybus.GetCtrlMode(uVar17);
 		gba->noController = gba->connected && (gba->ctrlMode == 0);
 		gba->button = 0;
 		if (gba->connected)
 		{
-			gba->button = Joybus.GetPadData(uVar17);
+			gba->button = Joybus.GetPadData(padIndex);
 		}
 		uVar17 = uVar17 + 1;
 	} while (uVar17 < 4);

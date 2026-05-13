@@ -8,6 +8,9 @@
 
 extern "C" const float FLOAT_8032F8EC;
 extern "C" const float FLOAT_8032F8F0;
+extern "C" const float FLOAT_8032F8C0;
+extern "C" const float FLOAT_8032F8C4;
+extern "C" const float FLOAT_8032F8C8;
 extern "C" const char s_old_mid_format_801D7094[];
 
 CMapCylinder g_hit_cyl;
@@ -19,10 +22,6 @@ Vec g_hit_hpv_min;
 
 namespace {
 static const char s_maphit_cpp[] = "maphit.cpp";
-static const float s_large_pos = 3.4e38f;
-static const float s_large_neg = -3.4e38f;
-static const float s_epsilon = 0.0001f;
-static const float s_push = 0.01f;
 
 static inline unsigned char* Ptr(void* p, unsigned int offset)
 {
@@ -660,8 +659,8 @@ int CMapHit::CalcHitSlide(Vec* out, float y)
 
             float side = PSVECDotProduct(&g_hit_cyl_min.m_axis, &slideDir);
             float slideLen = PSVECMag(&slideDir);
-            if (s_epsilon <= slideLen) {
-                PSVECScale(&slideDir, &slideDir, s_push / slideLen);
+            if (FLOAT_8032F8C4 <= slideLen) {
+                PSVECScale(&slideDir, &slideDir, FLOAT_8032F8C8 / slideLen);
                 if (side <= 0.0f) {
                     PSVECScale(&slideDir, &slideDir, 0.5f * g_hit_cyl_min.m_radius);
                 } else {
@@ -680,12 +679,12 @@ int CMapHit::CalcHitSlide(Vec* out, float y)
         }
 
         float len = PSVECMag(&g_hit_cyl_min.m_axis);
-        PSVECScale(&g_hit_cyl_min.m_axis, out, g_hit_t - (s_push / len));
+        PSVECScale(&g_hit_cyl_min.m_axis, out, g_hit_t - (FLOAT_8032F8C8 / len));
         return 0;
     }
 
     if (gMapHitFace->m_normal.y < y) {
-        if (g_hit_t <= s_epsilon) {
+        if (g_hit_t <= FLOAT_8032F8C4) {
             out->z = 0.0f;
             out->y = 0.0f;
             out->x = 0.0f;
@@ -694,7 +693,7 @@ int CMapHit::CalcHitSlide(Vec* out, float y)
             Vec push;
             float planeDot = PSVECDotProduct(&g_hit_cyl_min.m_top, &gMapHitFace->m_normal);
             float planeError = -(planeDot - (gMapHitFace->m_planeD + g_hit_cyl_min.m_radius));
-            PSVECScale(&gMapHitFace->m_normal, &push, s_push + planeError);
+            PSVECScale(&gMapHitFace->m_normal, &push, FLOAT_8032F8C8 + planeError);
             PSVECAdd(&g_hit_cyl_min.m_top, &push, &push);
             PSVECSubtract(&push, &g_hit_cyl_min.m_bottom, out);
             return 1;
@@ -702,7 +701,7 @@ int CMapHit::CalcHitSlide(Vec* out, float y)
     }
 
     float len = PSVECMag(&g_hit_cyl_min.m_axis);
-    PSVECScale(&g_hit_cyl_min.m_axis, out, g_hit_t - (s_push / len));
+    PSVECScale(&g_hit_cyl_min.m_axis, out, g_hit_t - (FLOAT_8032F8C8 / len));
     return 0;
 }
 
@@ -719,11 +718,11 @@ void CMapHit::CalcHitPosition(Vec* position)
 {
     if (g_hit_edge_idx_min != -1) {
         float len = PSVECMag(&g_hit_cyl_min.m_axis);
-        PSVECScale(&g_hit_cyl_min.m_axis, position, g_hit_t - (s_epsilon / len));
+        PSVECScale(&g_hit_cyl_min.m_axis, position, g_hit_t - (FLOAT_8032F8C4 / len));
         PSVECAdd(&g_hit_cyl_min.m_bottom, position, position);
     } else {
         float len = PSVECMag(&g_hit_cyl_min.m_axis);
-        PSVECScale(&g_hit_cyl_min.m_axis, position, g_hit_t - (s_push / len));
+        PSVECScale(&g_hit_cyl_min.m_axis, position, g_hit_t - (FLOAT_8032F8C8 / len));
         PSVECAdd(&g_hit_cyl_min.m_bottom, position, position);
     }
 }
@@ -746,7 +745,7 @@ int CMapHit::CheckHitCylinder(CMapCylinder* mapCylinder, Vec* position, unsigned
     int faceOffset = 0;
     while (faceIndex < static_cast<int>(m_faceCount)) {
         g_hit_lpface = reinterpret_cast<CMapHitFace*>(Ptr(m_faces, faceOffset));
-        g_hit_t_min = s_large_pos;
+        g_hit_t_min = FLOAT_8032F8C0;
         if (CheckHitFaceCylinder(mask) != 0) {
             return 1;
         }
@@ -773,7 +772,7 @@ int CMapHit::CheckHitCylinder(CMapCylinder* mapCylinder, Vec* position, unsigned
 
     while (faceIndex < endFace) {
         g_hit_lpface = reinterpret_cast<CMapHitFace*>(Ptr(m_faces, faceOffset));
-        g_hit_t_min = s_large_pos;
+        g_hit_t_min = FLOAT_8032F8C0;
 
         if (CheckHitFaceCylinder(mask) != 0) {
             return 1;

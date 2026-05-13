@@ -33,6 +33,11 @@ extern const double DOUBLE_80330CA0 = 4503599627370496.0;
 extern const float FLOAT_80330CA8 = 2.0f;
 extern const double DOUBLE_80330CB0 = 0.5;
 
+static inline float LoadFloat(const float& value)
+{
+    return value;
+}
+
 struct pppYmBreathUnkC {
     unsigned char _pad[0xC];
     int* m_serializedDataOffsets;
@@ -854,10 +859,10 @@ void UpdateParticle(VYmBreath* vYmBreath, PYmBreath* pYmBreath, PARTICLE_DATA* p
         particle->m_angleVelocity += params->m_angleAccel;
     }
 
-    while (FLOAT_80330C98 <= particle->m_angle) {
+    while (LoadFloat(FLOAT_80330C98) <= particle->m_angle) {
         particle->m_angle -= FLOAT_80330C94;
     }
-    while (particle->m_angle < FLOAT_80330C9C) {
+    while (particle->m_angle < LoadFloat(FLOAT_80330C9C)) {
         particle->m_angle += FLOAT_80330C94;
     }
 

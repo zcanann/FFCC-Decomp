@@ -8,6 +8,12 @@
 
 extern "C" const float FLOAT_8032F8EC;
 extern "C" const float FLOAT_8032F8F0;
+extern "C" const float FLOAT_8032F8C4;
+extern "C" const float FLOAT_8032F8C8;
+extern "C" const float FLOAT_8032F8CC;
+extern "C" const float FLOAT_8032F8D0;
+extern "C" const float FLOAT_8032F8D4;
+extern "C" const float FLOAT_8032F8D8;
 extern "C" const char s_old_mid_format_801D7094[];
 
 CMapCylinder g_hit_cyl;
@@ -18,17 +24,16 @@ Vec g_hit_hpv;
 Vec g_hit_hpv_min;
 
 namespace {
-static const char s_maphit_cpp[] = "maphit.cpp";
 static const float s_large_pos = 3.4e38f;
 static const float s_large_neg = -3.4e38f;
-static const float s_epsilon = 0.0001f;
-static const float s_push = 0.01f;
 
 static inline unsigned char* Ptr(void* p, unsigned int offset)
 {
     return reinterpret_cast<unsigned char*>(p) + offset;
 }
 }
+
+extern const char s_maphit_cpp_801D7088[] = "maphit.cpp";
 
 int g_hit_edge_idx_min;
 float g_hit_edge_t;
@@ -304,7 +309,7 @@ void CMapHit::ReadOtmHit(CChunkFile& chunkFile)
         if (chunk.m_id == 'HITV') {
             m_vertexCount = static_cast<unsigned short>(chunk.m_arg0);
             m_vertices =
-                new (*reinterpret_cast<CMemory::CStage**>(&MapMng), const_cast<char*>(s_maphit_cpp), 0x143)
+                new (*reinterpret_cast<CMemory::CStage**>(&MapMng), const_cast<char*>(s_maphit_cpp_801D7088), 0x143)
                     Vec[m_vertexCount];
 
             for (unsigned int i = 0; i < m_vertexCount; i++) {
@@ -331,7 +336,7 @@ void CMapHit::ReadOtmHit(CChunkFile& chunkFile)
         } else if (chunk.m_id == 'HITF') {
             m_faceCount = static_cast<unsigned short>(chunk.m_arg0);
             m_faces =
-                new (*reinterpret_cast<CMemory::CStage**>(&MapMng), const_cast<char*>(s_maphit_cpp), 0x159)
+                new (*reinterpret_cast<CMemory::CStage**>(&MapMng), const_cast<char*>(s_maphit_cpp_801D7088), 0x159)
                     CMapHitFace[m_faceCount];
 
             for (unsigned int faceIdx = 0; faceIdx < m_faceCount; faceIdx++) {
@@ -660,41 +665,41 @@ int CMapHit::CalcHitSlide(Vec* out, float y)
 
             float side = PSVECDotProduct(&g_hit_cyl_min.m_axis, &slideDir);
             float slideLen = PSVECMag(&slideDir);
-            if (s_epsilon <= slideLen) {
-                PSVECScale(&slideDir, &slideDir, s_push / slideLen);
-                if (side <= 0.0f) {
-                    PSVECScale(&slideDir, &slideDir, 0.5f * g_hit_cyl_min.m_radius);
+            if (slideLen >= FLOAT_8032F8C4) {
+                PSVECScale(&slideDir, &slideDir, FLOAT_8032F8CC / slideLen);
+                if (side <= FLOAT_8032F8D0) {
+                    PSVECScale(&slideDir, &slideDir, FLOAT_8032F8D4 * g_hit_cyl_min.m_radius);
                 } else {
-                    PSVECScale(&slideDir, &slideDir, 0.5f * -g_hit_cyl_min.m_radius);
+                    PSVECScale(&slideDir, &slideDir, FLOAT_8032F8D4 * -g_hit_cyl_min.m_radius);
                 }
 
                 PSVECAdd(&nearestPoint, &slideDir, &nearestPoint);
                 PSVECSubtract(&nearestPoint, &g_hit_cyl_min.m_bottom, out);
             } else {
-                out->z = 0.0f;
-                out->y = 0.0f;
-                out->x = 0.0f;
+                out->z = FLOAT_8032F8D0;
+                out->y = FLOAT_8032F8D0;
+                out->x = FLOAT_8032F8D0;
             }
 
             return 1;
         }
 
         float len = PSVECMag(&g_hit_cyl_min.m_axis);
-        PSVECScale(&g_hit_cyl_min.m_axis, out, g_hit_t - (s_push / len));
+        PSVECScale(&g_hit_cyl_min.m_axis, out, g_hit_t - (FLOAT_8032F8C8 / len));
         return 0;
     }
 
     if (gMapHitFace->m_normal.y < y) {
-        if (g_hit_t <= s_epsilon) {
-            out->z = 0.0f;
-            out->y = 0.0f;
-            out->x = 0.0f;
+        if (g_hit_t <= FLOAT_8032F8D8) {
+            out->z = FLOAT_8032F8D0;
+            out->y = FLOAT_8032F8D0;
+            out->x = FLOAT_8032F8D0;
             return 1;
         } else {
             Vec push;
             float planeDot = PSVECDotProduct(&g_hit_cyl_min.m_top, &gMapHitFace->m_normal);
             float planeError = -(planeDot - (gMapHitFace->m_planeD + g_hit_cyl_min.m_radius));
-            PSVECScale(&gMapHitFace->m_normal, &push, s_push + planeError);
+            PSVECScale(&gMapHitFace->m_normal, &push, FLOAT_8032F8C8 + planeError);
             PSVECAdd(&g_hit_cyl_min.m_top, &push, &push);
             PSVECSubtract(&push, &g_hit_cyl_min.m_bottom, out);
             return 1;
@@ -702,7 +707,7 @@ int CMapHit::CalcHitSlide(Vec* out, float y)
     }
 
     float len = PSVECMag(&g_hit_cyl_min.m_axis);
-    PSVECScale(&g_hit_cyl_min.m_axis, out, g_hit_t - (s_push / len));
+    PSVECScale(&g_hit_cyl_min.m_axis, out, g_hit_t - (FLOAT_8032F8C8 / len));
     return 0;
 }
 
@@ -719,11 +724,11 @@ void CMapHit::CalcHitPosition(Vec* position)
 {
     if (g_hit_edge_idx_min != -1) {
         float len = PSVECMag(&g_hit_cyl_min.m_axis);
-        PSVECScale(&g_hit_cyl_min.m_axis, position, g_hit_t - (s_epsilon / len));
+        PSVECScale(&g_hit_cyl_min.m_axis, position, g_hit_t - (FLOAT_8032F8C4 / len));
         PSVECAdd(&g_hit_cyl_min.m_bottom, position, position);
     } else {
         float len = PSVECMag(&g_hit_cyl_min.m_axis);
-        PSVECScale(&g_hit_cyl_min.m_axis, position, g_hit_t - (s_push / len));
+        PSVECScale(&g_hit_cyl_min.m_axis, position, g_hit_t - (FLOAT_8032F8C8 / len));
         PSVECAdd(&g_hit_cyl_min.m_bottom, position, position);
     }
 }

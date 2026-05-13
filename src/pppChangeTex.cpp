@@ -394,11 +394,11 @@ void pppDestructChangeTex(pppChangeTex* changeTex, pppChangeTexUnkC* data)
 	void** meshArray;
 	if ((stageArray != 0) && ((meshArray = (void**)work->m_meshColorArrays), meshArray != 0)) {
 		int meshList = (int)model->m_meshes;
-		void** curStageArray = stageArray;
-		void** curMeshArray = meshArray;
-		for (unsigned int i = 0; i < model->m_data->m_meshCount; i++) {
+		void** meshArrayOrig = meshArray;
+		void** stageArrayOrig = stageArray;
+		for (unsigned int i = 0; i < model->m_data->m_meshCount; i++, meshList += 0x14) {
 			int meshData = *(int*)(meshList + 8);
-			void** dlEntries = (void**)*curStageArray;
+			void** dlEntries = (void**)*stageArray;
 			for (unsigned int j = 0; j < *(unsigned int*)(meshData + 0x4c); j++) {
 				if (*(void**)*dlEntries != 0) {
 					pppHeapUseRate__FPQ27CMemory6CStage(*(void**)*dlEntries);
@@ -411,25 +411,24 @@ void pppDestructChangeTex(pppChangeTex* changeTex, pppChangeTexUnkC* data)
 				dlEntries++;
 			}
 
-			if (*curStageArray != 0) {
-				pppHeapUseRate__FPQ27CMemory6CStage(*curStageArray);
-				*curStageArray = 0;
+			if (*stageArray != 0) {
+				pppHeapUseRate__FPQ27CMemory6CStage(*stageArray);
+				*stageArray = 0;
 			}
-			if (*curMeshArray != 0) {
-				pppHeapUseRate__FPQ27CMemory6CStage(*curMeshArray);
-				*curMeshArray = 0;
+			if (*meshArray != 0) {
+				pppHeapUseRate__FPQ27CMemory6CStage(*meshArray);
+				*meshArray = 0;
 			}
 
-			curStageArray++;
-			curMeshArray++;
-			meshList += 0x14;
+			stageArray++;
+			meshArray++;
 		}
 
-		if (stageArray != 0) {
-			pppHeapUseRate__FPQ27CMemory6CStage(stageArray);
+		if (stageArrayOrig != 0) {
+			pppHeapUseRate__FPQ27CMemory6CStage(stageArrayOrig);
 		}
-		if (meshArray != 0) {
-			pppHeapUseRate__FPQ27CMemory6CStage(meshArray);
+		if (meshArrayOrig != 0) {
+			pppHeapUseRate__FPQ27CMemory6CStage(meshArrayOrig);
 		}
 	}
 }

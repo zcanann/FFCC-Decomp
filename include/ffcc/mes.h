@@ -40,7 +40,7 @@ private:
     int mFlags;
     
     // Large data structure to account for high memory offsets seen in objdiff
-    char mData[0x3D4C];  // Provides space up to offset 0x3D50
+    char mData[0x3D40];  // Provides space up to offset 0x3D50
 };
 
 #endif // _FFCC_MES_H_

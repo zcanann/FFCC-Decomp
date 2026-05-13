@@ -15,9 +15,9 @@ extern "C" CMapTexAnim* __dt__11CMapTexAnimFv(CMapTexAnim*, short);
 extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void __dl__FPv(void*);
-extern "C" void* lbl_8032E690;
+extern "C" void* __RTTI__11CMapTexAnim;
 extern "C" void* PTR_PTR_s_CMapTexAnim[] = {
-    &lbl_8032E690,
+    &__RTTI__11CMapTexAnim,
     0,
     reinterpret_cast<void*>(__dt__11CMapTexAnimFv),
 };
@@ -80,8 +80,7 @@ static inline void ReplaceRef(void** slot, void* ref)
         int refCount = current[1] - 1;
         current[1] = refCount;
         if ((refCount == 0) && (current != 0)) {
-            void** vtable = *reinterpret_cast<void***>(current);
-            reinterpret_cast<void (*)(void*, int)>(vtable[2])(current, 1);
+            (*reinterpret_cast<void (**)(int*, int)>(*current + 8))(current, 1);
         }
         *slot = 0;
     }

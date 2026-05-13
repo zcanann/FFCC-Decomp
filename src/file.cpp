@@ -464,14 +464,10 @@ void CFile::SyncCompleted(CFile::CHandle* fileHandle)
  * Address:	TODO
  * Size:	TODO
  */
-bool CFile::IsCompleted(CFile::CHandle* fileHandle)
+int CFile::IsCompleted(CFile::CHandle* fileHandle)
 {
-	if (fileHandle->m_completionStatus == 3)
-	{
-		return true;
-	}
-
-	return false;
+	unsigned char completed = fileHandle->m_completionStatus == 3;
+	return completed;
 }
 
 /*

@@ -228,16 +228,14 @@ void pppFrameYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, PYmMegaBirthShp
     s8 hasRequiredMemory;
     u32 i;
     u8* paramPayload;
-    u8* particleData;
     int colorOffset;
     _PARTICLE_WMAT* worldMat;
     _PARTICLE_COLOR* particleColor;
-    VYmMegaBirthShpTail2* work;
-    VColor* colorWork;
 
     colorOffset = offsets->m_serializedDataOffsets[1];
-    work = (VYmMegaBirthShpTail2*)((u8*)object + 0x80 + offsets->m_serializedDataOffsets[2]);
-    colorWork = (VColor*)((u8*)object + 0x80 + colorOffset);
+    VYmMegaBirthShpTail2* const work =
+        (VYmMegaBirthShpTail2*)((u8*)object + 0x80 + offsets->m_serializedDataOffsets[2]);
+    VColor* const colorWork = (VColor*)((u8*)object + 0x80 + colorOffset);
     paramPayload = (u8*)param;
 
     if (work->m_particles == 0) {
@@ -325,7 +323,7 @@ void pppFrameYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, PYmMegaBirthShp
 
         worldMat = work->m_wmats;
         particleColor = work->m_colors;
-        particleData = (u8*)work->m_particles;
+        u8* particleData = (u8*)work->m_particles;
         int spawnCount = 0;
 
         if ((gPppCalcDisabled == 0) && (*(s32*)((u8*)&param->m_matrix + 4) != 0xFFFF)) {

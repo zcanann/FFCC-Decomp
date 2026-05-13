@@ -34,6 +34,8 @@ extern char* gSingMenuAttrTableEs[];
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
+extern "C" char* strcat(char*, const char*);
+
 typedef signed short s16;
 typedef unsigned char u8;
 
@@ -3152,7 +3154,7 @@ void CMenuPcs::GetRaceStr(int itemNo, char* outText)
 
         strcpy(outText, text);
         if (Game.m_gameWork.m_languageId == 2) {
-            strcat(outText, DAT_80332958, 0x80);
+            strcat(outText, DAT_80332958);
         }
     }
 
@@ -3180,7 +3182,7 @@ void CMenuPcs::GetRaceStr(int itemNo, char* outText)
     if (suffix == 0) {
         suffix = PTR_DAT_80214224[raceType];
     }
-    strcat(outText, suffix, 0x80);
+    strcat(outText, suffix);
 }
 
 /*

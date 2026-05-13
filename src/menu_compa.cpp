@@ -316,7 +316,12 @@ bool CMenuPcs::CompaClose()
     for (int i = 0; i < count; i++) {
         float step = FLOAT_80332FF8;
         if (frame >= entry->startFrame) {
-            if (entry->startFrame + entry->duration > frame) {
+            if (entry->startFrame + entry->duration <= frame) {
+                finishedCount = finishedCount + 1;
+                entry->alpha = FLOAT_80332FF8;
+                entry->dx = step;
+                entry->dy = step;
+            } else {
                 entry->frame = entry->frame + 1;
                 entry->alpha =
                     (float)-((DOUBLE_80333008 / (double)entry->duration) * (double)entry->frame - DOUBLE_80333008);
@@ -326,11 +331,6 @@ bool CMenuPcs::CompaClose()
                     entry->dx = (entry->targetX - (float)entry->x) * step;
                     entry->dy = (entry->targetY - (float)entry->y) * step;
                 }
-            } else {
-                finishedCount = finishedCount + 1;
-                entry->alpha = FLOAT_80332FF8;
-                entry->dx = step;
-                entry->dy = step;
             }
         }
         entry++;
@@ -460,7 +460,12 @@ bool CMenuPcs::CompaOpen()
     for (int i = 0; i < count; i++) {
         float step = FLOAT_80332FF8;
         if (frame >= entry->startFrame) {
-            if (entry->startFrame + entry->duration > frame) {
+            if (entry->startFrame + entry->duration <= frame) {
+                finishedCount = finishedCount + 1;
+                entry->alpha = FLOAT_80333000;
+                entry->dx = step;
+                entry->dy = step;
+            } else {
                 entry->frame = entry->frame + 1;
                 entry->alpha = (float)((DOUBLE_80333008 / (double)entry->duration) * (double)entry->frame);
                 if ((entry->flags & 2) == 0) {
@@ -468,11 +473,6 @@ bool CMenuPcs::CompaOpen()
                     entry->dx = (entry->targetX - (float)entry->x) * step;
                     entry->dy = (entry->targetY - (float)entry->y) * step;
                 }
-            } else {
-                finishedCount = finishedCount + 1;
-                entry->alpha = FLOAT_80333000;
-                entry->dx = step;
-                entry->dy = step;
             }
         }
         entry++;

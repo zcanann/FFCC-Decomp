@@ -250,12 +250,12 @@ void pppFrameYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthShp
     s8 hasRequiredMemory;
     int colorOffset;
     u8* paramPayload;
-    u8* particleData;
-    u32 i;
-    _PARTICLE_WMAT* worldMat;
-    _PARTICLE_COLOR* particleColor;
     VYmMegaBirthShpTail3* work;
     VColor* colorWork;
+    u8* particleData;
+    u32 i;
+    _PARTICLE_COLOR* particleColor;
+    _PARTICLE_WMAT* worldMat;
 
     colorOffset = offsets->m_serializedDataOffsets[1];
     work = (VYmMegaBirthShpTail3*)((u8*)object + 0x80 + offsets->m_serializedDataOffsets[2]);

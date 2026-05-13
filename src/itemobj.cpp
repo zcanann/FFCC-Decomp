@@ -99,7 +99,6 @@ extern double DOUBLE_80331b60;
 extern double DOUBLE_80331b70;
 u32 gItemObjCreateFlags;
 extern char SoundBuffer[];
-extern char SoundBuffer_1260_[];
 extern const char DAT_80331b7c[];
 extern const char DAT_80331b84[];
 extern char DAT_80331bc8[];
@@ -357,7 +356,7 @@ void CGItemObj::onFrame()
 
 			CGObject* owner = m_owner;
 			int ownerScriptSlot = *(int*)(*(int*)((unsigned char*)owner + 0x58) + 0x3B4);
-			int soundEntry = *(int*)(*(int*)(*(int*)SoundBuffer_1260_ + 0xF8) + 0x178);
+			int soundEntry = *(int*)(*(int*)(*(int*)(SoundBuffer + 0x4EC) + 0xF8) + 0x178);
 			if (soundEntry != 0) {
 				soundEntry = *(int*)(soundEntry + 0x14);
 			} else {
@@ -431,7 +430,7 @@ void CGItemObj::onFrameStat()
 	}
 	case 9:
 		if (*(int*)(self + 0x528) == 8) {
-			self[0x38] = (self[0x38] & 0x7f) | 0x80;
+			self[0x38] = static_cast<unsigned char>(__rlwimi(self[0x38], 1, 7, 24, 24));
 		}
 		break;
 	case 0xB:
@@ -551,7 +550,7 @@ void CGItemObj::onFrameStat()
 			prgObj->m_stepSlopeLimit = zero;
 			EndParticle__13CFlatRuntime2FPQ29CCharaPcs7CHandle(CFlat, prgObj->m_charaModelHandle);
 		} else if (*(int*)(self + 0x528) == 0xC) {
-			self[0x38] = (self[0x38] & 0x7F) | 0x80;
+			self[0x38] = static_cast<unsigned char>(__rlwimi(self[0x38], 1, 7, 24, 24));
 		}
 
 		if (7 < *(int*)(self + 0x528)) {
@@ -623,7 +622,7 @@ void CGItemObj::onFrameStat()
 			CCharaPcs::CHandle* handle = prgObj->m_charaModelHandle;
 			if (handle != 0 && handle->m_model != 0) {
 				unsigned char* model = reinterpret_cast<unsigned char*>(handle->m_model);
-				model[0x10C] = (model[0x10C] & 0x7F) | 0x80;
+				model[0x10C] = static_cast<unsigned char>(__rlwimi(model[0x10C], 1, 7, 24, 24));
 			}
 
 			if (*(int*)(self + 0x530) < 9) {
@@ -714,7 +713,7 @@ void CGItemObj::onFrameStat()
 			prgObj->m_stepSlopeLimit = zero;
 			EndParticleSlot__13CFlatRuntime2Fii(CFlat, *(int*)(self + 0x55C), 0);
 
-			int soundEntry = *(int*)(*(int*)(*(int*)SoundBuffer_1260_ + 0xF8) + 0x178);
+			int soundEntry = *(int*)(*(int*)(*(int*)(SoundBuffer + 0x4EC) + 0xF8) + 0x178);
 			if (soundEntry != 0) {
 				pdtNo = *(int*)(soundEntry + 0x14);
 			}
@@ -761,7 +760,7 @@ void CGItemObj::onFrameStat()
 				    &CFlat, *(int*)(self + 0x550), 2, 0x16, 1, &stack, 0);
 			}
 
-			self[0x38] = (self[0x38] & 0x7F) | 0x80;
+			self[0x38] = static_cast<unsigned char>(__rlwimi(self[0x38], 1, 7, 24, 24));
 		}
 		break;
 	}
@@ -809,6 +808,10 @@ int CGItemObj::DeleteOld(int deleteMask, int maxDeleteCount, CFlatRuntime::CObje
 		}
 
 		deletedCount++;
+	}
+
+	if ((unsigned int)System.m_execParam >= 3) {
+		Printf__7CSystemFPce(&System, const_cast<char*>(DAT_801dced4));
 	}
 
 	return deletedCount;
@@ -1488,7 +1491,7 @@ void CGItemObj::DeleteAllFieldItem()
 		if (itemObj->m_owner == 0 &&
 		    static_cast<signed char>(
 		        static_cast<int>((static_cast<unsigned int>(itemObj->m_stateFlags0) << 28) & 0xC0000000) >> 31) != 0) {
-			itemObj->m_flags |= 0x80;
+			itemObj->m_flags = static_cast<unsigned char>(__rlwimi(itemObj->m_flags, 1, 7, 24, 24));
 		}
 	}
 }

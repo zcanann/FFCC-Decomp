@@ -407,8 +407,8 @@ void CFont::DrawInit()
 
     _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
 
-    signed char zCompareFlag = renderFlagBits.zCompare;
-    signed char zUpdateFlag = renderFlagBits.zUpdate;
+    int zCompareFlag = renderFlagBits.zCompare;
+    int zUpdateFlag = renderFlagBits.zUpdate;
     int zFunction = 7;
     int zUpdate = (zCompareFlag != 0) ? 1 : 0;
     if (zUpdateFlag != 0) {
@@ -693,8 +693,8 @@ void CFont::Create(void* filePtr, CMemory::CStage* stage)
                         chunkFile.Get(m_glyphData, chunk.m_size);
                     }
 
-                    unsigned short* bucket = static_cast<unsigned short*>(m_glyphData);
                     unsigned short** bucketSlot = m_glyphBuckets;
+                    unsigned short* bucket = static_cast<unsigned short*>(m_glyphData);
                     for (int i = 0; i < 32; i++) {
                         bucketSlot[0] = bucket;
                         bucket = bucket + static_cast<unsigned int>(*bucket) * 4;

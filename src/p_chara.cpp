@@ -2320,7 +2320,7 @@ CCharaPcs::CHandle::CHandle()
 
 	m_fogBlend = 0.0f;
 	m_unk0x158 = 0;
-	m_drawListFlags |= 0x80;
+	m_drawListFlags = static_cast<unsigned char>(__rlwimi(m_drawListFlags, 1, 7, 24, 24));
 }
 
 /*

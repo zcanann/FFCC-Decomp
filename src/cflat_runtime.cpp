@@ -74,9 +74,9 @@ CFlatRuntime::CFlatRuntime()
 
 	*reinterpret_cast<void***>(self) = __vt__12CFlatRuntime;
 	*reinterpret_cast<void***>(self + 0x914) = __vt__Q212CFlatRuntime7CObject;
-	self[0x904] = static_cast<u8>((self[0x904] & 0xEF) | (clearBit << 4));
+	self[0x904] = static_cast<u8>(__rlwimi(self[0x904], clearBit, 4, 27, 27));
 	*reinterpret_cast<void***>(self + 0x960) = __vt__Q212CFlatRuntime7CObject;
-	self[0x950] = static_cast<u8>((self[0x950] & 0xEF) | (clearBit << 4));
+	self[0x950] = static_cast<u8>(__rlwimi(self[0x950], clearBit, 4, 27, 27));
 	*reinterpret_cast<u32*>(self + 0x970) = clearBit;
 	*reinterpret_cast<u32*>(self + 0x1298) = 1;
 

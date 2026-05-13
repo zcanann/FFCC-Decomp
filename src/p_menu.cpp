@@ -525,8 +525,11 @@ void CMenuPcs::destroy()
     int i = 0;
     do {
         void** slot = reinterpret_cast<void**>(reinterpret_cast<u8*>(textureCursor) + 0x18C);
-        ReleaseRefObject(*slot);
-        *slot = nullptr;
+        void* object = *slot;
+        if (object != nullptr) {
+            ReleaseRefObject(object);
+            *slot = nullptr;
+        }
         i++;
         textureCursor = reinterpret_cast<CMenuPcs*>(reinterpret_cast<u8*>(textureCursor) + 4);
     } while (i < 0x16);
@@ -535,14 +538,20 @@ void CMenuPcs::destroy()
     i = 0;
     do {
         void** slot = reinterpret_cast<void**>(reinterpret_cast<u8*>(textureCursor) + 0x14C);
-        ReleaseRefObject(*slot);
-        *slot = nullptr;
+        void* object = *slot;
+        if (object != nullptr) {
+            ReleaseRefObject(object);
+            *slot = nullptr;
+        }
         i++;
         textureCursor = reinterpret_cast<CMenuPcs*>(reinterpret_cast<u8*>(textureCursor) + 4);
     } while (i < 2);
 
-    ReleaseRefObject(m_fonts[0]);
-    m_fonts[0] = 0;
+    void* font = m_fonts[0];
+    if (font != nullptr) {
+        ReleaseRefObject(font);
+        m_fonts[0] = 0;
+    }
 
     Memory.DestroyStage(m_menuStage);
     if (*reinterpret_cast<s8*>(self + 0x859) != 0) {

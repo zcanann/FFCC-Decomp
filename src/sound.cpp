@@ -740,22 +740,25 @@ void CSound::PauseDiscError(int pause)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800c789c
+ * PAL Size: 136b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CSound::CheckDriver(int mode)
 {
     u8* self = reinterpret_cast<u8*>(this);
     CSoundLayout& sound = *reinterpret_cast<CSoundLayout*>(self);
-    CRedSound* redSound = RedSound(this);
     unsigned int oldPrint = sound.m_debugPrint;
     sound.m_debugPrint = 1;
-    redSound->ReportPrint(1);
-    redSound->TestProcess(mode);
-    redSound->DisplayWaveInfo();
-    redSound->DisplaySePlayInfo();
+    sound.m_redSound.ReportPrint(1);
+    sound.m_redSound.TestProcess(mode);
+    sound.m_redSound.DisplayWaveInfo();
+    sound.m_redSound.DisplaySePlayInfo();
     sound.m_debugPrint = oldPrint;
-    redSound->ReportPrint((-oldPrint | oldPrint) >> 0x1F);
+    sound.m_redSound.ReportPrint((-oldPrint | oldPrint) >> 0x1F);
 }
 
 /*

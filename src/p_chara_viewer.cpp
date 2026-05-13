@@ -703,6 +703,84 @@ void CCharaPcs::calcViewer()
 
 /*
  * --INFO--
+ * PAL Address: 0x800BEE50
+ * PAL Size: 580b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CCharaPcs::destroyViewer()
+{
+    unsigned char* p = reinterpret_cast<unsigned char*>(this);
+    int* ref;
+    unsigned int i;
+
+    Destroy__6CCharaFv(&Chara);
+    DestroyBumpLightAll__9CLightPcsFQ29CLightPcs6TARGET(&LightPcs, 0);
+    gCharaPartWorkPtr = 0;
+
+    ref = *(int**)(p + 0x1A0);
+    if (ref != 0) {
+        if ((--ref[1] == 0) && (ref != 0)) {
+            destroyRef(ref);
+        }
+        *(void**)(p + 0x1A0) = 0;
+    }
+
+    i = 0;
+    do {
+        ref = *(int**)(p + 0x190 + i * 4);
+        if (ref != 0) {
+            if ((--ref[1] == 0) && (ref != 0)) {
+                destroyRef(ref);
+            }
+            *(void**)(p + 0x190 + i * 4) = 0;
+        }
+        ref = *(int**)(p + 0x198 + i * 4);
+        if (ref != 0) {
+            if ((--ref[1] == 0) && (ref != 0)) {
+                destroyRef(ref);
+            }
+            *(void**)(p + 0x198 + i * 4) = 0;
+        }
+        ref = *(int**)(p + 0x2B0 + i * 4);
+        if (ref != 0) {
+            if ((--ref[1] == 0) && (ref != 0)) {
+                destroyRef(ref);
+            }
+            *(void**)(p + 0x2B0 + i * 4) = 0;
+        }
+        i++;
+    } while (i < 2);
+
+    ref = *(int**)(p + 0x2B8);
+    if (ref != 0) {
+        if ((--ref[1] == 0) && (ref != 0)) {
+            destroyRef(ref);
+        }
+        *(void**)(p + 0x2B8) = 0;
+    }
+
+    i = 0;
+    do {
+        ref = *(int**)(p + 0x1B0 + i * 4);
+        if (ref != 0) {
+            if ((--ref[1] == 0) && (ref != 0)) {
+                destroyRef(ref);
+            }
+            *(void**)(p + 0x1B0 + i * 4) = 0;
+        }
+        i++;
+    } while (i < 0x40);
+
+    DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, *(void**)(p + 0xCC));
+    DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, *(void**)(p + 0xD0));
+    DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, *(void**)(p + 0xD4));
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x800BF094
  * PAL Size: 1420b
  * EN Address: TODO
@@ -859,82 +937,4 @@ void CCharaPcs::createViewer()
         &LightPcs, bumpLight, 0, *(void**)(reinterpret_cast<unsigned char*>(&Chara) + 0x2058), 4));
 
     Create__6CCharaFv(&Chara);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800BEE50
- * PAL Size: 580b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CCharaPcs::destroyViewer()
-{
-    unsigned char* p = reinterpret_cast<unsigned char*>(this);
-    int* ref;
-    unsigned int i;
-
-    Destroy__6CCharaFv(&Chara);
-    DestroyBumpLightAll__9CLightPcsFQ29CLightPcs6TARGET(&LightPcs, 0);
-    gCharaPartWorkPtr = 0;
-
-    ref = *(int**)(p + 0x1A0);
-    if (ref != 0) {
-        if ((--ref[1] == 0) && (ref != 0)) {
-            destroyRef(ref);
-        }
-        *(void**)(p + 0x1A0) = 0;
-    }
-
-    i = 0;
-    do {
-        ref = *(int**)(p + 0x190 + i * 4);
-        if (ref != 0) {
-            if ((--ref[1] == 0) && (ref != 0)) {
-                destroyRef(ref);
-            }
-            *(void**)(p + 0x190 + i * 4) = 0;
-        }
-        ref = *(int**)(p + 0x198 + i * 4);
-        if (ref != 0) {
-            if ((--ref[1] == 0) && (ref != 0)) {
-                destroyRef(ref);
-            }
-            *(void**)(p + 0x198 + i * 4) = 0;
-        }
-        ref = *(int**)(p + 0x2B0 + i * 4);
-        if (ref != 0) {
-            if ((--ref[1] == 0) && (ref != 0)) {
-                destroyRef(ref);
-            }
-            *(void**)(p + 0x2B0 + i * 4) = 0;
-        }
-        i++;
-    } while (i < 2);
-
-    ref = *(int**)(p + 0x2B8);
-    if (ref != 0) {
-        if ((--ref[1] == 0) && (ref != 0)) {
-            destroyRef(ref);
-        }
-        *(void**)(p + 0x2B8) = 0;
-    }
-
-    i = 0;
-    do {
-        ref = *(int**)(p + 0x1B0 + i * 4);
-        if (ref != 0) {
-            if ((--ref[1] == 0) && (ref != 0)) {
-                destroyRef(ref);
-            }
-            *(void**)(p + 0x1B0 + i * 4) = 0;
-        }
-        i++;
-    } while (i < 0x40);
-
-    DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, *(void**)(p + 0xCC));
-    DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, *(void**)(p + 0xD0));
-    DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, *(void**)(p + 0xD4));
 }

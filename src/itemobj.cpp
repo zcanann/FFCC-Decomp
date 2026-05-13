@@ -784,8 +784,8 @@ int CGItemObj::DeleteOld(int deleteMask, int maxDeleteCount, CFlatRuntime::CObje
 	int deletedCount = 0;
 
 	while (deletedCount < maxDeleteCount) {
-		int bestScriptObjectPos = 0x00989680;
 		unsigned char* bestItemObj = 0;
+		int bestScriptObjectPos = 0x00989680;
 
 		for (unsigned char* itemObj = (unsigned char*)FindGItemObjFirst__13CFlatRuntime2Fv(CFlat);
 			 itemObj != 0;
@@ -799,19 +799,18 @@ int CGItemObj::DeleteOld(int deleteMask, int maxDeleteCount, CFlatRuntime::CObje
 			}
 		}
 
-		if (bestItemObj == 0) {
+		if (bestItemObj != 0) {
+			deleteObject__12CFlatRuntimeFPQ212CFlatRuntime7CObject(CFlat, bestItemObj);
+		} else {
+			if ((unsigned int)System.m_execParam >= 3) {
+				Printf__7CSystemFPce(&System, const_cast<char*>(DAT_801dced4));
+			}
 			break;
 		}
 
-		deleteObject__12CFlatRuntimeFPQ212CFlatRuntime7CObject(CFlat, bestItemObj);
 		deletedCount++;
 	}
 
-	if ((unsigned int)System.m_execParam < 3) {
-		return deletedCount;
-	}
-
-	Printf__7CSystemFPce(&System, const_cast<char*>(DAT_801dced4));
 	return deletedCount;
 }
 

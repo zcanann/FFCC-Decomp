@@ -874,35 +874,36 @@ void CMesMenu::onDraw()
  */
 void CMesMenu::onCalc()
 {
-    int menuIndex = *(int*)((char*)this + 0x18);
-    if ((Game.m_gameWork.m_menuStageMode != 0) && (menuIndex > 0) && (menuIndex < 4)) {
-        return;
+    if (Game.m_gameWork.m_menuStageMode != 0) {
+        if ((m_menuIndex >= 1) && (m_menuIndex < 4)) {
+            return;
+        }
     }
 
     unsigned int stageBit = 0;
-    if (menuIndex < 4) {
+    if (m_menuIndex < 4) {
         stageBit = *(unsigned int*)(CFlat + 0x12A0) & *(unsigned int*)(CFlat + 0x12A4) & 1;
     } else {
         stageBit = *(unsigned int*)(CFlat + 0x12A0) & *(unsigned int*)(CFlat + 0x12A4) & 2;
     }
 
-    unsigned int currentStageFlag = *(unsigned int*)((char*)this + 0x3DF8);
-    unsigned int desiredStageFlag = (unsigned int)(-(int)stageBit) >> 0x1F;
-    if (currentStageFlag != desiredStageFlag) {
+    unsigned int desiredStageFlag = stageBit != 0;
+    if (*(unsigned int*)((char*)this + 0x3DF8) != desiredStageFlag) {
         Printf__7CSystemFPce(&System, DAT_801d9e9c);
-        *(unsigned int*)((char*)this + 0x3DF8) = ((unsigned int)__cntlzw(currentStageFlag) >> 5) & 0xFF;
+        *(unsigned int*)((char*)this + 0x3DF8) =
+            ((unsigned int)__cntlzw(*(unsigned int*)((char*)this + 0x3DF8)) >> 5) & 0xFF;
         *(int*)((char*)this + 0x3DF4) = 0x10 - *(int*)((char*)this + 0x3DF4);
     }
 
     unsigned int timer = *(int*)((char*)this + 0x3DF4) - 1;
     *(unsigned int*)((char*)this + 0x3DF4) = timer & ~((int)timer >> 0x1F);
 
-    if ((menuIndex > 3) && (*(int*)((char*)this + 8) == 0)) {
+    if ((m_menuIndex >= 4) && (*(int*)((char*)this + 8) == 0)) {
         return;
     }
 
-    if (menuIndex < 4) {
-        unsigned int scriptFood = Game.m_scriptFoodBase[menuIndex];
+    if (m_menuIndex < 4) {
+        unsigned int scriptFood = Game.m_scriptFoodBase[m_menuIndex];
         if (scriptFood != 0) {
             unsigned int foodCount = (unsigned int)*(unsigned short*)(scriptFood + 0x1C);
             int targetValue = (int)(foodCount * 6);
@@ -1227,7 +1228,6 @@ void CMesMenu::Create()
 CMesMenu::~CMesMenu()
 {
     Destroy();
-    __dt__4CMesFv((char*)this + 0x1C, -1);
 }
 
 /*
@@ -1241,5 +1241,4 @@ CMesMenu::~CMesMenu()
  */
 CMesMenu::CMesMenu()
 {
-    __ct__4CMesFv((char*)this + 0x1C);
 }

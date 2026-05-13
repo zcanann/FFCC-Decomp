@@ -1915,8 +1915,8 @@ void CGraphic::CreateSmallBackTexture(void* src, _GXTexObj* texObj, long width, 
     quadMin.x = 0.0f;
     quadMin.y = 0.0f;
     quadMin.z = 0.0f;
-    quadMax.x = 1.0f;
-    quadMax.y = 1.0f;
+    quadMax.x = FLOAT_8032F6F0;
+    quadMax.y = FLOAT_8032F6F4;
     quadMax.z = 0.0f;
     gUtil.RenderQuad(quadMin, quadMax, white, 0, 0);
 

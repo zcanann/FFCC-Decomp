@@ -21,6 +21,8 @@ extern const float FLOAT_8032F6D0;
 extern const double kGraphicHalfF64;
 extern const float FLOAT_8032F6E0;
 extern const double DOUBLE_8032F6E8;
+extern const float FLOAT_8032F6F0;
+extern const float FLOAT_8032F6F4;
 extern const float FLOAT_8032F700;
 extern const float FLOAT_8032F704;
 extern const float kGraphicBlurAlphaScale;

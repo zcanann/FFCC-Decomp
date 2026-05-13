@@ -478,28 +478,30 @@ CFunnyShapePcs::~CFunnyShapePcs()
     __dt__14CUSBStreamDataFv(reinterpret_cast<CUSBStreamData*>(reinterpret_cast<u8*>(this) + 0x3C), -1);
 }
 
-template <>
-CPtrArray<_GXTexObj*>::CPtrArray()
+extern "C" void __ct__22CPtrArray_P9_GXTexObj_Fv(void* ptrArray_)
 {
-    vtable = gVtable_CPtrArray_GXTexObj;
-    numItems = 0;
-    size = 0;
-    defaultSize = 0x10;
-    items = 0;
-    stage = 0;
-    growCapacity = 1;
+    CPtrArray<_GXTexObj*>* ptrArray = reinterpret_cast<CPtrArray<_GXTexObj*>*>(ptrArray_);
+
+    ptrArray->vtable = gVtable_CPtrArray_GXTexObj;
+    ptrArray->numItems = 0;
+    ptrArray->size = 0;
+    ptrArray->defaultSize = 0x10;
+    ptrArray->items = 0;
+    ptrArray->stage = 0;
+    ptrArray->growCapacity = 1;
 }
 
-template <>
-CPtrArray<OSFS_TEXTURE_ST*>::CPtrArray()
+extern "C" void __ct__29CPtrArray_P15OSFS_TEXTURE_ST_Fv(void* ptrArray_)
 {
-    vtable = gVtable_CPtrArray_OSFSTexture;
-    numItems = 0;
-    size = 0;
-    defaultSize = 0x10;
-    items = 0;
-    stage = 0;
-    growCapacity = 1;
+    CPtrArray<OSFS_TEXTURE_ST*>* ptrArray = reinterpret_cast<CPtrArray<OSFS_TEXTURE_ST*>*>(ptrArray_);
+
+    ptrArray->vtable = gVtable_CPtrArray_OSFSTexture;
+    ptrArray->numItems = 0;
+    ptrArray->size = 0;
+    ptrArray->defaultSize = 0x10;
+    ptrArray->items = 0;
+    ptrArray->stage = 0;
+    ptrArray->growCapacity = 1;
 }
 
 template <>

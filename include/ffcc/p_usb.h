@@ -5,23 +5,33 @@
 #include "ffcc/system.h"
 #include "ffcc/usb.h"
 
-struct CUSBPcsTable
-{
-    char* m_name;
-    unsigned int m_words[0x46];
-};
-
 extern unsigned int m_table_desc0__7CUSBPcs[];
 extern unsigned int m_table_desc1__7CUSBPcs[];
 extern unsigned int m_table_desc2__7CUSBPcs[];
-extern CUSBPcsTable m_table__7CUSBPcs;
+extern unsigned int m_table__7CUSBPcs[];
 
 class CUSBPcs : public CProcess
 {
 public:
     class CDataHeader;
 
-    CUSBPcs();
+    CUSBPcs()
+    {
+        unsigned int* table = reinterpret_cast<unsigned int*>(m_table__7CUSBPcs);
+        const unsigned int* desc0 = m_table_desc0__7CUSBPcs;
+        const unsigned int* desc1 = m_table_desc1__7CUSBPcs;
+        const unsigned int* desc2 = m_table_desc2__7CUSBPcs;
+
+        table[1] = desc0[0];
+        table[2] = desc0[1];
+        table[3] = desc0[2];
+        table[4] = desc1[0];
+        table[5] = desc1[1];
+        table[6] = desc1[2];
+        table[7] = desc2[0];
+        table[8] = desc2[1];
+        table[9] = desc2[2];
+    }
 
     void Init();
     void Quit();

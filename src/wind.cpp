@@ -278,14 +278,35 @@ int CWind::AddDiffuse(const Vec* pos, float radius, float dir, float speed)
 
 	for (int blocks = 4; blocks != 0; blocks--) {
 		WindObject* scan = obj;
-		if ((GetWindActiveFlag(scan) == 0) ||
-		    ((scan++, GetWindActiveFlag(scan) == 0)) ||
-		    ((scan++, GetWindActiveFlag(scan) == 0)) ||
-		    ((scan++, GetWindActiveFlag(scan) == 0)) ||
-		    ((scan++, GetWindActiveFlag(scan) == 0)) ||
-		    ((scan++, GetWindActiveFlag(scan) == 0)) ||
-		    ((scan++, GetWindActiveFlag(scan) == 0)) ||
-		    ((scan++, GetWindActiveFlag(scan) == 0))) {
+		if (GetWindActiveFlag(scan) == 0) {
+			obj = scan;
+			goto found;
+		}
+		if (GetWindActiveFlag(++scan) == 0) {
+			obj = scan;
+			goto found;
+		}
+		if (GetWindActiveFlag(++scan) == 0) {
+			obj = scan;
+			goto found;
+		}
+		if (GetWindActiveFlag(++scan) == 0) {
+			obj = scan;
+			goto found;
+		}
+		if (GetWindActiveFlag(++scan) == 0) {
+			obj = scan;
+			goto found;
+		}
+		if (GetWindActiveFlag(++scan) == 0) {
+			obj = scan;
+			goto found;
+		}
+		if (GetWindActiveFlag(++scan) == 0) {
+			obj = scan;
+			goto found;
+		}
+		if (GetWindActiveFlag(++scan) == 0) {
 			obj = scan;
 			goto found;
 		}
@@ -348,14 +369,35 @@ int CWind::AddAmbient(float dir, float speed)
 
 	for (int blocks = 4; blocks != 0; blocks--) {
 		WindObject* scan = obj;
-		if ((GetWindActiveFlag(scan) == 0) ||
-		    ((scan++, GetWindActiveFlag(scan) == 0)) ||
-		    ((scan++, GetWindActiveFlag(scan) == 0)) ||
-		    ((scan++, GetWindActiveFlag(scan) == 0)) ||
-		    ((scan++, GetWindActiveFlag(scan) == 0)) ||
-		    ((scan++, GetWindActiveFlag(scan) == 0)) ||
-		    ((scan++, GetWindActiveFlag(scan) == 0)) ||
-		    ((scan++, GetWindActiveFlag(scan) == 0))) {
+		if (GetWindActiveFlag(scan) == 0) {
+			obj = scan;
+			goto found;
+		}
+		if (GetWindActiveFlag(++scan) == 0) {
+			obj = scan;
+			goto found;
+		}
+		if (GetWindActiveFlag(++scan) == 0) {
+			obj = scan;
+			goto found;
+		}
+		if (GetWindActiveFlag(++scan) == 0) {
+			obj = scan;
+			goto found;
+		}
+		if (GetWindActiveFlag(++scan) == 0) {
+			obj = scan;
+			goto found;
+		}
+		if (GetWindActiveFlag(++scan) == 0) {
+			obj = scan;
+			goto found;
+		}
+		if (GetWindActiveFlag(++scan) == 0) {
+			obj = scan;
+			goto found;
+		}
+		if (GetWindActiveFlag(++scan) == 0) {
 			obj = scan;
 			goto found;
 		}

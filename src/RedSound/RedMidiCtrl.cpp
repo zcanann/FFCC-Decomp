@@ -560,8 +560,8 @@ STATIC_ASSERT(sizeof(m_SignDataTable) + sizeof(SwingEntryFunction) + sizeof(p_Mi
  * --INFO--
  * PAL Address: 0x801C7478
  * PAL Size: 80b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020939c
+ * EN Size: 80b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -582,8 +582,8 @@ int DataAddCompute(int* current, int target, int* delta)
  * --INFO--
  * PAL Address: 0x801C74C8
  * PAL Size: 60b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x802093ec
+ * EN Size: 60b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -648,8 +648,8 @@ void KeyOnReserve(RedKeyOnDATA* keyOnData, RedTrackDATA* track)
  * --INFO--
  * PAL Address: 0x801C75F4
  * PAL Size: 220b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80209518
+ * EN Size: 220b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -685,8 +685,8 @@ void KeyOffSet(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* 
  * --INFO--
  * PAL Address: 0x801C76D0
  * PAL Size: 60b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x802095f4
+ * EN Size: 60b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -704,8 +704,8 @@ static int SineSwing(int phase)
  * --INFO--
  * PAL Address: 0x801C770C
  * PAL Size: 92b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80209630
+ * EN Size: 92b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -731,8 +731,8 @@ static int TriangleSwing(int phase)
  * --INFO--
  * PAL Address: 0x801C7768
  * PAL Size: 36b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020968c
+ * EN Size: 36b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -746,8 +746,8 @@ static int SawSwing(int phase)
  * --INFO--
  * PAL Address: 0x801C778C
  * PAL Size: 56b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x802096b0
+ * EN Size: 56b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -768,8 +768,8 @@ static int DutySwing(int phase)
  * --INFO--
  * PAL Address: 0x801C77C4
  * PAL Size: 56b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x802096e8
+ * EN Size: 56b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -785,8 +785,8 @@ static int RandomSwing(int phase)
  * --INFO--
  * PAL Address: 0x801C77FC
  * PAL Size: 64b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80209720
+ * EN Size: 64b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -804,8 +804,8 @@ static int SineSwingR(int phase)
  * --INFO--
  * PAL Address: 0x801C783C
  * PAL Size: 96b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80209760
+ * EN Size: 96b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -834,8 +834,8 @@ static int TriangleSwingR(int phase)
  * --INFO--
  * PAL Address: 0x801C789C
  * PAL Size: 60b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x802097c0
+ * EN Size: 60b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -858,8 +858,8 @@ static int DutySwingR(int phase)
  * --INFO--
  * PAL Address: 0x801C78D8
  * PAL Size: 44b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x802097fc
+ * EN Size: 44b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -874,8 +874,8 @@ static int SawSwingR(int phase)
  * --INFO--
  * PAL Address: 0x801C7904
  * PAL Size: 60b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80209828
+ * EN Size: 60b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -892,8 +892,8 @@ static int RandomSwingR(int phase)
  * --INFO--
  * PAL Address: 0x801C7940
  * PAL Size: 56b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80209864
+ * EN Size: 56b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -905,8 +905,8 @@ static void __MidiCtrl_NoSupport(RedSoundCONTROL* control, RedKeyOnDATA* keyOnDa
  * --INFO--
  * PAL Address: 0x801c7978
  * PAL Size: 4b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020989c
+ * EN Size: 4b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -918,8 +918,8 @@ static void __MidiCtrl_Pass(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
  * --INFO--
  * PAL Address: 0x801C797C
  * PAL Size: 456b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x802098a0
+ * EN Size: 456b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -975,8 +975,8 @@ static void __MidiCtrl_Stop(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, R
  * --INFO--
  * PAL Address: 0x801C7B44
  * PAL Size: 136b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80209a68
+ * EN Size: 136b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -996,8 +996,8 @@ static void __MidiCtrl_Sleep(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, 
  * --INFO--
  * PAL Address: 0x801C7BCC
  * PAL Size: 628b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80209af0
+ * EN Size: 628b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1032,7 +1032,7 @@ static void __MidiCtrl_WholeLoopStart(RedSoundCONTROL* control, RedKeyOnDATA* ke
         slot++;
 
         scan++;
-        if ((scan - control->m_tracks) < control->m_trackCount) {
+        if (control->m_trackCount > scan - control->m_tracks) {
             for (; scan < control->m_tracks + control->m_trackCount; scan++) {
                 int currentDelta = deltaAdjust + (scan->m_deltaTime - loopBase);
 
@@ -1074,8 +1074,8 @@ static void __MidiCtrl_WholeLoopStart(RedSoundCONTROL* control, RedKeyOnDATA* ke
  * --INFO--
  * PAL Address: 0x801C7E40
  * PAL Size: 148b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80209d64
+ * EN Size: 148b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1096,8 +1096,8 @@ static void __MidiCtrl_WholeLoopEnd(RedSoundCONTROL* control, RedKeyOnDATA* keyO
  * --INFO--
  * PAL Address: 0x801C7ED4
  * PAL Size: 88b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80209df8
+ * EN Size: 88b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1113,8 +1113,8 @@ static void __MidiCtrl_LoopStart(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* 
  * --INFO--
  * PAL Address: 0x801C7F2C
  * PAL Size: 164b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80209e50
+ * EN Size: 164b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1140,8 +1140,8 @@ static void __MidiCtrl_LoopEnd(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* tr
  * --INFO--
  * PAL Address: 0x801C7FD0
  * PAL Size: 44b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80209ef4
+ * EN Size: 44b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1154,8 +1154,8 @@ static void __MidiCtrl_LoopRepeat(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*
  * --INFO--
  * PAL Address: 0x801C7FFC
  * PAL Size: 44b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80209f20
+ * EN Size: 44b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1169,8 +1169,8 @@ static void __MidiCtrl_TempoDirect(RedSoundCONTROL* control, RedKeyOnDATA*, RedT
  * --INFO--
  * PAL Address: 0x801C8028
  * PAL Size: 140b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80209f4c
+ * EN Size: 140b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1191,8 +1191,8 @@ static void __MidiCtrl_TempoChange(RedSoundCONTROL* control, RedKeyOnDATA*, RedT
  * --INFO--
  * PAL Address: 0x801C80B4
  * PAL Size: 164b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80209fd8
+ * EN Size: 164b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1217,8 +1217,8 @@ static void __MidiCtrl_ReverbDepthDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTra
  * --INFO--
  * PAL Address: 0x801C8158
  * PAL Size: 180b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020a07c
+ * EN Size: 180b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1245,8 +1245,8 @@ static void __MidiCtrl_ReverbDepthChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTra
  * --INFO--
  * PAL Address: 0x801C820C
  * PAL Size: 64b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020a130
+ * EN Size: 64b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1262,8 +1262,8 @@ static void __MidiCtrl_TimeSignature(RedSoundCONTROL* control, RedKeyOnDATA*, Re
  * --INFO--
  * PAL Address: 0x801C824C
  * PAL Size: 140b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020a170
+ * EN Size: 140b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1290,8 +1290,8 @@ static void __MidiCtrl_KeySignature(RedSoundCONTROL* control, RedKeyOnDATA*, Red
  * --INFO--
  * PAL Address: 0x801C82D8
  * PAL Size: 32b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020a1fc
+ * EN Size: 32b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1303,8 +1303,8 @@ static void __MidiCtrl_PhraseSignature(RedSoundCONTROL*, RedKeyOnDATA*, RedTrack
  * --INFO--
  * PAL Address: 0x801C82F8
  * PAL Size: 48b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020a21c
+ * EN Size: 48b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1316,8 +1316,8 @@ static void __MidiCtrl_KeyOnSame(RedSoundCONTROL*, RedKeyOnDATA* keyOnData, RedT
  * --INFO--
  * PAL Address: 0x801C8328
  * PAL Size: 104b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020a24c
+ * EN Size: 104b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1332,8 +1332,8 @@ static void __MidiCtrl_KeyOnNoteVelocity(RedSoundCONTROL*, RedKeyOnDATA* keyOnDa
  * --INFO--
  * PAL Address: 0x801C8390
  * PAL Size: 80b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020a2b4
+ * EN Size: 80b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1347,8 +1347,8 @@ static void __MidiCtrl_KeyOnNote(RedSoundCONTROL*, RedKeyOnDATA* keyOnData, RedT
  * --INFO--
  * PAL Address: 0x801C83E0
  * PAL Size: 80b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020a304
+ * EN Size: 80b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1362,8 +1362,8 @@ static void __MidiCtrl_KeyOnVelocity(RedSoundCONTROL*, RedKeyOnDATA* keyOnData, 
  * --INFO--
  * PAL Address: 0x801C8430
  * PAL Size: 56b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020a354
+ * EN Size: 56b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1375,8 +1375,8 @@ static void __MidiCtrl_KeyOffSame(RedSoundCONTROL* control, RedKeyOnDATA* keyOnD
  * --INFO--
  * PAL Address: 0x801C8468
  * PAL Size: 96b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020a38c
+ * EN Size: 96b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1391,8 +1391,8 @@ static void __MidiCtrl_KeyOffNoteVelocity(RedSoundCONTROL* control, RedKeyOnDATA
  * --INFO--
  * PAL Address: 0x801C84C8
  * PAL Size: 84b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020a3ec
+ * EN Size: 84b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1406,8 +1406,8 @@ static void __MidiCtrl_KeyOffNote(RedSoundCONTROL* control, RedKeyOnDATA* keyOnD
  * --INFO--
  * PAL Address: 0x801C851C
  * PAL Size: 72b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020a440
+ * EN Size: 72b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1421,8 +1421,8 @@ static void __MidiCtrl_KeyOffVelocity(RedSoundCONTROL* control, RedKeyOnDATA* ke
  * --INFO--
  * PAL Address: 0x801C8564
  * PAL Size: 184b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020a488
+ * EN Size: 184b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1447,8 +1447,8 @@ static void __MidiCtrl_Wave(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track
  * --INFO--
  * PAL Address: 0x801C861C
  * PAL Size: 168b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020a540
+ * EN Size: 168b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1479,8 +1479,8 @@ static void __MidiCtrl_WaveWithBank(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDAT
  * --INFO--
  * PAL Address: 0x801C86C4
  * PAL Size: 92b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020a5e8
+ * EN Size: 92b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1505,8 +1505,8 @@ static void __MidiCtrl_VolumeDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDAT
  * --INFO--
  * PAL Address: 0x801C8720
  * PAL Size: 148b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020a644
+ * EN Size: 148b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1534,8 +1534,8 @@ static void __MidiCtrl_VolumeChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDAT
  * --INFO--
  * PAL Address: 0x801C87B4
  * PAL Size: 76b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020a6d8
+ * EN Size: 76b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1552,8 +1552,8 @@ static void __MidiCtrl_ExpressionDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrac
  * --INFO--
  * PAL Address: 0x801C8800
  * PAL Size: 132b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020a724
+ * EN Size: 132b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1575,8 +1575,8 @@ static void __MidiCtrl_ExpressionChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrac
  * --INFO--
  * PAL Address: 0x801C8884
  * PAL Size: 92b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020a7a8
+ * EN Size: 92b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1597,8 +1597,8 @@ static void __MidiCtrl_PanDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* 
  * --INFO--
  * PAL Address: 0x801C88E0
  * PAL Size: 164b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020a804
+ * EN Size: 164b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1623,8 +1623,8 @@ static void __MidiCtrl_PanChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* 
  * --INFO--
  * PAL Address: 0x801C8984
  * PAL Size: 52b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020a8a8
+ * EN Size: 52b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1636,8 +1636,8 @@ static void __MidiCtrl_PortamentOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA
  * --INFO--
  * PAL Address: 0x801C89B8
  * PAL Size: 20b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020a8dc
+ * EN Size: 20b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1650,8 +1650,8 @@ static void __MidiCtrl_PortamentOff(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDAT
  * --INFO--
  * PAL Address: 0x801C89CC
  * PAL Size: 28b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020a8f0
+ * EN Size: 28b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1664,8 +1664,8 @@ static void __MidiCtrl_SlurOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* tra
  * --INFO--
  * PAL Address: 0x801C89E8
  * PAL Size: 16b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020a90c
+ * EN Size: 16b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1677,8 +1677,8 @@ static void __MidiCtrl_SlurOff(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* tr
  * --INFO--
  * PAL Address: 0x801C89F8
  * PAL Size: 212b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020a91c
+ * EN Size: 212b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1713,8 +1713,8 @@ static void __MidiCtrl_Sweep(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* trac
  * --INFO--
  * PAL Address: 0x801c8acc
  * PAL Size: 16b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020a9f0
+ * EN Size: 16b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1726,8 +1726,8 @@ static void __MidiCtrl_TenutoOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* t
  * --INFO--
  * PAL Address: 0x801c8adc
  * PAL Size: 16b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020aa00
+ * EN Size: 16b
  * JP Address: TODO
  * JP Size: TODO
  */

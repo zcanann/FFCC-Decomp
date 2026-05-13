@@ -34,7 +34,7 @@ union PackedMiasmaColor {
     u8 bytes[4];
 };
 
-static inline float CalcSphereRadius(Vec* vertices, u16 count)
+static float CalcSphereRadius(Vec* vertices, u16 count)
 {
     float radius = FLOAT_80331930;
 
@@ -167,6 +167,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
     Vec quadB;
     Vec cameraPos;
     Vec managerPos;
+    float yStep;
     float radius;
     float maxRadius;
     float scaledRadius;
@@ -249,9 +250,10 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
     texWidth = (int)FLOAT_80331928;
     scissorHeight = (u32)FLOAT_8033192c;
     scissorWidth = (u32)FLOAT_80331928;
+    yStep = FLOAT_8033192c;
 
     for (slice = 0; slice < 2; slice++) {
-        yPos = (float)slice * FLOAT_8033192c;
+        yPos = (float)slice * yStep;
         yOffset = (int)yPos;
 
         Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &backI4Tex, 0, yOffset, texWidth, texHeight, 0, GX_LINEAR,

@@ -100,8 +100,8 @@ extern double DOUBLE_80331b70;
 u32 gItemObjCreateFlags;
 extern char SoundBuffer[];
 extern char SoundBuffer_1260_[];
-extern char DAT_80331b7c[];
-extern char DAT_80331b84[];
+extern const char DAT_80331b7c[];
+extern const char DAT_80331b84[];
 extern char DAT_80331bc8[];
 static const char DAT_801dcec0[] = "num free item = %d\n";
 static const char DAT_801dced4[] = {
@@ -465,11 +465,11 @@ void CGItemObj::onFrameStat()
 				}
 			}
 
-			char* attachName = DAT_80331b84;
+			const char* attachName = DAT_80331b84;
 			if (useBossAttachName) {
 				attachName = DAT_80331b7c;
 			}
-			Attach__8CGObjectFP8CGObjectPcP3Vec(this, *(void**)(self + 0x550), attachName,
+			Attach__8CGObjectFP8CGObjectPcP3Vec(this, *(void**)(self + 0x550), const_cast<char*>(attachName),
 			                                    reinterpret_cast<Vec*>(&attachOffset));
 			changeStat__8CGPrgObjFiii(this, 0, 0, 0);
 			*(float*)(self + 0x144) = FLOAT_80331b20;
@@ -993,6 +993,7 @@ void CGItemObj::safeDetach(int, float)
 void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 {
 	unsigned char* self = (unsigned char*)this;
+	CFlatRuntime::CStack stack[3];
 	int canSystemCall = 0;
 
 	if (carryState == 0) {
@@ -1045,11 +1046,12 @@ void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 				}
 			}
 
-			char* attachName = DAT_80331b84;
+			const char* attachName = DAT_80331b84;
 			if (useBossAttachName) {
 				attachName = DAT_80331b7c;
 			}
-			Attach__8CGObjectFP8CGObjectPcP3Vec(this, partyObj, attachName, reinterpret_cast<Vec*>(&attachOffset));
+			Attach__8CGObjectFP8CGObjectPcP3Vec(this, partyObj, const_cast<char*>(attachName),
+			                                    reinterpret_cast<Vec*>(&attachOffset));
 			changeStat__8CGPrgObjFiii(this, 0, 0, 0);
 			*(float*)(self + 0x144) = FLOAT_80331b20;
 		} else {
@@ -1078,10 +1080,11 @@ void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 		*(int*)(self + 0x554) = carryMode;
 
 		if (carryMode == 0) {
-			CGPartyObj* carryObj = *(CGPartyObj**)(self + 0x550);
 			Vec safePos;
-			float safeDist = CalcSafePos__8CGObjectFiP8CGObjectP3Vec(this, 0x41, carryObj, &safePos);
+			float safeDist = CalcSafePos__8CGObjectFiP8CGObjectP3Vec(
+				this, 0x41, *(CGPartyObj**)(self + 0x550), &safePos);
 			if (FLOAT_80331b20 < safeDist) {
+				CGPartyObj* carryObj = *(CGPartyObj**)(self + 0x550);
 				moveVectorHRot__8CGObjectFfffi(
 					carryObj,
 					FLOAT_80331b8c + *(float*)((unsigned char*)carryObj + 0x1A8),
@@ -1103,7 +1106,6 @@ void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 	}
 
 	if ((*(unsigned int*)(self + 0x5C) & 0x10) != 0 && canSystemCall != 0) {
-		CFlatRuntime::CStack stack[3];
 		stack[0].m_word = 3;
 		stack[1].m_word = static_cast<unsigned int>((-carryState | carryState) >> 0x1F);
 		stack[2].m_word = 0;
@@ -1438,7 +1440,7 @@ void CGItemObj::ItemJump(int state, float jump)
 		CGObject* object = reinterpret_cast<CGObject*>(itemObj);
 
 		if ((object->m_objectFlags & 0x10) == 0) {
-			unsigned int mapMask = *reinterpret_cast<unsigned int*>(&object->m_moveVec.x);
+			unsigned int mapMask = object->m_bgHitMask;
 			CMapCylinderRaw cylinder;
 			Vec move;
 
@@ -1464,7 +1466,7 @@ void CGItemObj::ItemJump(int state, float jump)
 
 			if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
 			        &MapMng, reinterpret_cast<CMapCylinder*>(&cylinder), &move, mapMask) != 0 &&
-			    g_hit_lpface_min->m_groupIndex == state) {
+			    g_hit_f->m_groupIndex == state) {
 				object->m_groundHitOffset.y += jump;
 			}
 		}

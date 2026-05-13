@@ -331,7 +331,7 @@ void CGObject::onCreate()
 
     unk_0x184 = 0.0f;
     unk_0x188 = 0.0f;
-    *reinterpret_cast<s32*>(&m_moveVec.x) = -1;
+    m_bgHitMask = -1;
     *((u8*)&m_weaponNodeFlags) &= 0xFE;
     *((u8*)&m_weaponNodeFlags) = (*((u8*)&m_weaponNodeFlags) & 0xDF) | 0x20;
     *((u8*)&m_weaponNodeFlags) &= 0xBF;
@@ -539,11 +539,9 @@ void CGObject::move()
     if (static_cast<int>((static_cast<u32>(weaponFlagsHi) << 0x1A) | (weaponFlagsHi >> 6)) < 0) {
         int scriptMoveEnd = 0;
         if (static_cast<int>((static_cast<u32>(weaponFlagsHi) << 0x1B) | (weaponFlagsHi >> 5)) < 0) {
-            moveVec.x = m_moveVec.y;
-            moveVec.y = m_moveVec.z;
-            moveVec.z = m_moveSpeed;
+            moveVec = m_moveTarget;
         } else {
-            PSVECSubtract(reinterpret_cast<Vec*>(&m_moveVec.y), &m_worldPosition, &moveVec);
+            PSVECSubtract(&m_moveTarget, &m_worldPosition, &moveVec);
         }
 
         if ((Game.m_currentMapId != 0x21)
@@ -1005,7 +1003,7 @@ void CGObject::bgNormalCollision()
     move.y = sZeroFloat;
     Vec pos = m_worldPosition;
     pos.y += sStepProbeHeight + m_capsuleHalfHeight;
-    const u32 hitMask = *reinterpret_cast<u32*>(&m_moveVec.x);
+    const u32 hitMask = m_bgHitMask;
 
     int retry = 4;
     while (retry != 0) {
@@ -1187,7 +1185,7 @@ void CGObject::bgWorldCollision()
     bodyCylinder.m_radius2 = sZeroFloat;
     bodyCylinder.m_height2 = sZeroFloat;
 
-    const u32 hitMask = *reinterpret_cast<u32*>(&m_moveVec.x);
+    const u32 hitMask = m_bgHitMask;
     if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
             &MapMng, reinterpret_cast<CMapCylinder*>(&bodyCylinder), &hitMove, hitMask) == 0) {
         return;
@@ -2175,9 +2173,7 @@ void CGObject::Move(Vec* moveVec, float moveTimer, int turnFrames, int moveMode,
     *((u8*)&m_weaponNodeFlags + 1) = (*((u8*)&m_weaponNodeFlags + 1) & 0xDF) | 0x20;
     *((u8*)&m_weaponNodeFlags + 1) &= 0xEF;
     m_turnFrames = static_cast<u32>(turnFrames);
-    m_moveVec.y = moveVec->x;
-    m_moveVec.z = moveVec->y;
-    m_moveSpeed = moveVec->z;
+    m_moveTarget = *moveVec;
     m_moveTimer = moveTimer;
     *((u8*)&m_weaponNodeFlags) = (static_cast<u8>(moveMode << 1) & 2) | (*((u8*)&m_weaponNodeFlags) & 0xFD);
     *((u8*)&m_weaponNodeFlags + 1) =
@@ -2202,9 +2198,7 @@ void CGObject::MoveVector(Vec* moveVec, float moveTimer, int turnFrames, int use
     *((u8*)&m_weaponNodeFlags + 1) = (*((u8*)&m_weaponNodeFlags + 1) & 0xDF) | 0x20;
     *((u8*)&m_weaponNodeFlags + 1) = (*((u8*)&m_weaponNodeFlags + 1) & 0xEF) | 0x10;
     m_turnFrames = static_cast<u32>(turnFrames);
-    m_moveVec.y = moveVec->x;
-    m_moveVec.z = moveVec->y;
-    m_moveSpeed = moveVec->z;
+    m_moveTarget = *moveVec;
     m_moveTimer = moveTimer;
     *((u8*)&m_weaponNodeFlags + 1) =
         (static_cast<u8>(useFacing << 3) & 8) | (*((u8*)&m_weaponNodeFlags + 1) & 0xF7);
@@ -2238,9 +2232,7 @@ void CGObject::moveVector(Vec* moveVec, float moveTimer, int turnFrames)
     *((u8*)&m_weaponNodeFlags + 1) = (*((u8*)&m_weaponNodeFlags + 1) & 0xDF) | 0x20;
     *((u8*)&m_weaponNodeFlags + 1) = (*((u8*)&m_weaponNodeFlags + 1) & 0xEF) | 0x10;
     m_turnFrames = static_cast<u32>(turnFrames);
-    m_moveVec.y = unitVec.x;
-    m_moveVec.z = unitVec.y;
-    m_moveSpeed = unitVec.z;
+    m_moveTarget = unitVec;
     m_moveTimer = moveTimer;
     *((u8*)&m_weaponNodeFlags + 1) = (*((u8*)&m_weaponNodeFlags + 1) & 0xF7) | 8;
     *((u8*)&m_weaponNodeFlags + 1) &= 0xFD;
@@ -2271,9 +2263,7 @@ void CGObject::moveVectorH(Vec* moveVec, float moveTimer, int turnFrames)
     *((u8*)&m_weaponNodeFlags + 1) = (*((u8*)&m_weaponNodeFlags + 1) & 0xDF) | 0x20;
     *((u8*)&m_weaponNodeFlags + 1) = (*((u8*)&m_weaponNodeFlags + 1) & 0xEF) | 0x10;
     m_turnFrames = static_cast<u32>(turnFrames);
-    m_moveVec.y = unitVec.x;
-    m_moveVec.z = unitVec.y;
-    m_moveSpeed = unitVec.z;
+    m_moveTarget = unitVec;
     m_moveTimer = moveTimer;
     *((u8*)&m_weaponNodeFlags + 1) &= 0xF7;
     *((u8*)&m_weaponNodeFlags + 1) &= 0xFD;
@@ -2300,9 +2290,9 @@ void CGObject::moveVectorRot(float rotX, float rotY, float moveTimer, int turnFr
     *((u8*)&m_weaponNodeFlags + 1) = (*((u8*)&m_weaponNodeFlags + 1) & 0xDF) | 0x20;
     *((u8*)&m_weaponNodeFlags + 1) = (*((u8*)&m_weaponNodeFlags + 1) & 0xEF) | 0x10;
     m_turnFrames = static_cast<u32>(turnFrames);
-    m_moveVec.y = static_cast<float>(sinX * cosY0);
-    m_moveVec.z = static_cast<float>(sinY);
-    m_moveSpeed = static_cast<float>(cosX * cosY1);
+    m_moveTarget.x = static_cast<float>(sinX * cosY0);
+    m_moveTarget.y = static_cast<float>(sinY);
+    m_moveTarget.z = static_cast<float>(cosX * cosY1);
     m_moveTimer = moveTimer;
     *((u8*)&m_weaponNodeFlags + 1) = (*((u8*)&m_weaponNodeFlags + 1) & 0xF7) | 8;
     *((u8*)&m_weaponNodeFlags + 1) &= 0xFD;
@@ -2329,9 +2319,9 @@ void CGObject::moveVectorHRot(float rotX, float rotY, float moveTimer, int turnF
     *((u8*)&m_weaponNodeFlags + 1) = (*((u8*)&m_weaponNodeFlags + 1) & 0xDF) | 0x20;
     *((u8*)&m_weaponNodeFlags + 1) = (*((u8*)&m_weaponNodeFlags + 1) & 0xEF) | 0x10;
     m_turnFrames = static_cast<u32>(turnFrames);
-    m_moveVec.y = static_cast<float>(sinX * cosY0);
-    m_moveVec.z = static_cast<float>(sinY);
-    m_moveSpeed = static_cast<float>(cosX * cosY1);
+    m_moveTarget.x = static_cast<float>(sinX * cosY0);
+    m_moveTarget.y = static_cast<float>(sinY);
+    m_moveTarget.z = static_cast<float>(cosX * cosY1);
     m_moveTimer = moveTimer;
     *((u8*)&m_weaponNodeFlags + 1) &= 0xF7;
     *((u8*)&m_weaponNodeFlags + 1) &= 0xFD;
@@ -3259,7 +3249,7 @@ void CGObject::SetPosBG(Vec* position, int useCapsuleOffset)
             bodyCylinder.m_radius2 = 0.6f;
             bodyCylinder.m_height2 = 0.0f;
 
-            u32 hitMask = *reinterpret_cast<u32*>(&m_moveVec.x);
+            u32 hitMask = m_bgHitMask;
             if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
                     &MapMng, reinterpret_cast<CMapCylinder*>(&bodyCylinder), &bodyCylinder.m_direction, hitMask) != 0) {
                 CalcHitPosition__7CMapObjFP3Vec(

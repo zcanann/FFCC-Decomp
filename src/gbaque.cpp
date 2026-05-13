@@ -738,27 +738,49 @@ void GbaQueue::ExecutQueue()
 			} else if (cmd == 0x0C) {
 				const unsigned char request = static_cast<unsigned char>(cmdWord >> 8);
 				if (caravanWork != 0) {
-					if ((request == 2) || (request == 3) || (request == 6) || (request == 7) || (request == 8) || (request == 9)) {
+					if (request == 3) {
 						OSWaitSemaphore(accessSemaphores + channel);
 						obj[0x2CCA] = static_cast<char>(obj[0x2CCA] & ~static_cast<unsigned char>(playerBit));
 						OSSignalSemaphore(accessSemaphores + channel);
 						Joybus.SetLetterSize(channel, 0);
-
 						char* letterBuf = Joybus.GetLetterBuffer(channel);
-						if (request == 3) {
-							MakeLetterList(channel, letterBuf);
-						} else if (request == 2) {
-							caravanWork->FGLetterOpen(static_cast<unsigned char>(cmdWord));
-							MakeLetterData(channel, letterBuf, static_cast<unsigned char>(cmdWord));
-						} else if (request == 6) {
-							MakeSellData(channel, letterBuf);
-						} else if (request == 7) {
-							MakeBuyData(channel, letterBuf);
-						} else if (request == 8) {
-							MakeSmithData(channel, letterBuf);
-						} else if (request == 9) {
-							MakeArtiData(channel, letterBuf);
-						}
+						MakeLetterList(channel, letterBuf);
+					} else if (request == 2) {
+						OSWaitSemaphore(accessSemaphores + channel);
+						obj[0x2CCA] = static_cast<char>(obj[0x2CCA] & ~static_cast<unsigned char>(playerBit));
+						OSSignalSemaphore(accessSemaphores + channel);
+						Joybus.SetLetterSize(channel, 0);
+						caravanWork->FGLetterOpen(static_cast<unsigned char>(cmdWord));
+						char* letterBuf = Joybus.GetLetterBuffer(channel);
+						MakeLetterData(channel, letterBuf, static_cast<unsigned char>(cmdWord));
+					} else if (request == 6) {
+						OSWaitSemaphore(accessSemaphores + channel);
+						obj[0x2CCA] = static_cast<char>(obj[0x2CCA] & ~static_cast<unsigned char>(playerBit));
+						OSSignalSemaphore(accessSemaphores + channel);
+						Joybus.SetLetterSize(channel, 0);
+						char* letterBuf = Joybus.GetLetterBuffer(channel);
+						MakeSellData(channel, letterBuf);
+					} else if (request == 7) {
+						OSWaitSemaphore(accessSemaphores + channel);
+						obj[0x2CCA] = static_cast<char>(obj[0x2CCA] & ~static_cast<unsigned char>(playerBit));
+						OSSignalSemaphore(accessSemaphores + channel);
+						Joybus.SetLetterSize(channel, 0);
+						char* letterBuf = Joybus.GetLetterBuffer(channel);
+						MakeBuyData(channel, letterBuf);
+					} else if (request == 8) {
+						OSWaitSemaphore(accessSemaphores + channel);
+						obj[0x2CCA] = static_cast<char>(obj[0x2CCA] & ~static_cast<unsigned char>(playerBit));
+						OSSignalSemaphore(accessSemaphores + channel);
+						Joybus.SetLetterSize(channel, 0);
+						char* letterBuf = Joybus.GetLetterBuffer(channel);
+						MakeSmithData(channel, letterBuf);
+					} else if (request == 9) {
+						OSWaitSemaphore(accessSemaphores + channel);
+						obj[0x2CCA] = static_cast<char>(obj[0x2CCA] & ~static_cast<unsigned char>(playerBit));
+						OSSignalSemaphore(accessSemaphores + channel);
+						Joybus.SetLetterSize(channel, 0);
+						char* letterBuf = Joybus.GetLetterBuffer(channel);
+						MakeArtiData(channel, letterBuf);
 					}
 				}
 			} else if (cmd == 0x14) {
@@ -2342,6 +2364,7 @@ Printf__7CSystemFPce(&System, const_cast<char*>(s_letter_data_error), const_cast
 	}
 
 	unsigned int header[4];
+	memset(header, 0, 0x10);
 	header[0] = (letterCount << 24) | ((letterCount >> 8) & 0xFF) << 16 |
 		((letterCount >> 16) & 0xFF) << 8 | (letterCount >> 24);
 	header[1] = (subjectCount << 24) | ((subjectCount >> 8) & 0xFF) << 16 |

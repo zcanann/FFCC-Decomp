@@ -120,8 +120,8 @@ public:
     char m_ownerType;                 // 0x51
     unsigned char m_classWorkIndex;   // 0x52
     unsigned char m_ownerSlot;        // 0x53
-    unsigned char m_moveMode;         // 0x54
-    unsigned char m_moveModePrevious; // 0x55
+    signed char m_moveMode;           // 0x54
+    signed char m_moveModePrevious;   // 0x55
     unsigned char m_field_0x56;       // 0x56
     unsigned char m_field_0x57;       // 0x57
     void** m_scriptHandle;            // 0x58
@@ -207,8 +207,8 @@ public:
     float m_rotTargetZ;               // 0x1B8
     unsigned int m_bgFlags;           // 0x1BC
     unsigned int m_bgColMask;         // 0x1C0
-    Vec m_moveVec;                    // 0x1C4
-    float m_moveSpeed;                // 0x1D0
+    u32 m_bgHitMask;                  // 0x1C4
+    Vec m_moveTarget;                 // 0x1C8
     float m_moveTimer;                // 0x1D4
     unsigned int m_turnFrames;        // 0x1D8
     AttackCol m_attackColliders[8];   // 0x1DC

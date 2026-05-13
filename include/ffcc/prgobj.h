@@ -12,6 +12,7 @@ public:
     void onCreate();
     void onDestroy();
     void onFrame();
+    virtual int GetCID();
     virtual void ClassControl(int, int);
     virtual int GetClassControl(int);
     virtual void bonus(int, int, CGPrgObj*);
@@ -40,8 +41,6 @@ public:
     float getTargetRot(CGPrgObj*);
     void rotTarget(CGPrgObj*);
     void dstTargetRot(CGPrgObj*);
-    int GetCID();
-
     int m_stateFrameGate;      // 0x518
     int m_subFrameGate;        // 0x51C
     int m_lastStateId;         // 0x520

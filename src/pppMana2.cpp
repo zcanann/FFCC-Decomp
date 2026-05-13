@@ -1216,19 +1216,33 @@ static int UpdateWaterMesh(VMana2* mana2)
         return 0;
     }
 
-    currentScale = LoadFloat(FLOAT_80331898);
-    neighborScale = LoadFloat(FLOAT_803318a4);
     for (int row = 1; row < 0x10; row++) {
+        currentScale = LoadFloat(FLOAT_80331898);
+        neighborScale = LoadFloat(FLOAT_803318a4);
         int rowBase = row * 0x11;
         for (int colBlock = 0; colBlock < 3; colBlock++) {
-            float* src = &waterHeightA[rowBase + colBlock * 5 + 1];
-            float* dst = &waterHeightB[rowBase + colBlock * 5 + 1];
+            int index = rowBase + colBlock * 5 + 1;
 
-            dst[0] = currentScale * src[0] + neighborScale * (src[1] + src[-1] + src[-0x11] + src[0x11]) - dst[0];
-            dst[1] = currentScale * src[1] + neighborScale * (src[2] + src[0] + src[-0x10] + src[0x12]) - dst[1];
-            dst[2] = currentScale * src[2] + neighborScale * (src[3] + src[1] + src[-0x0F] + src[0x13]) - dst[2];
-            dst[3] = currentScale * src[3] + neighborScale * (src[4] + src[2] + src[-0x0E] + src[0x14]) - dst[3];
-            dst[4] = currentScale * src[4] + neighborScale * (src[5] + src[3] + src[-0x0D] + src[0x15]) - dst[4];
+            waterHeightB[index] = currentScale * waterHeightA[index] +
+                                  neighborScale * (waterHeightA[index + 1] + waterHeightA[index - 1] +
+                                                   waterHeightA[index - 0x11] + waterHeightA[index + 0x11]) -
+                                  waterHeightB[index];
+            waterHeightB[index + 1] = currentScale * waterHeightA[index + 1] +
+                                      neighborScale * (waterHeightA[index + 2] + waterHeightA[index] +
+                                                       waterHeightA[index - 0x10] + waterHeightA[index + 0x12]) -
+                                      waterHeightB[index + 1];
+            waterHeightB[index + 2] = currentScale * waterHeightA[index + 2] +
+                                      neighborScale * (waterHeightA[index + 3] + waterHeightA[index + 1] +
+                                                       waterHeightA[index - 0x0F] + waterHeightA[index + 0x13]) -
+                                      waterHeightB[index + 2];
+            waterHeightB[index + 3] = currentScale * waterHeightA[index + 3] +
+                                      neighborScale * (waterHeightA[index + 4] + waterHeightA[index + 2] +
+                                                       waterHeightA[index - 0x0E] + waterHeightA[index + 0x14]) -
+                                      waterHeightB[index + 3];
+            waterHeightB[index + 4] = currentScale * waterHeightA[index + 4] +
+                                      neighborScale * (waterHeightA[index + 5] + waterHeightA[index + 3] +
+                                                       waterHeightA[index - 0x0D] + waterHeightA[index + 0x15]) -
+                                      waterHeightB[index + 4];
         }
     }
 

@@ -3437,28 +3437,23 @@ void* CPartMng::pppFileRead(char* filePath, unsigned long& fileSize, void* readB
  */
 void CPartMng::LoadPartNoSyncCalc()
 {
-    char* base = reinterpret_cast<char*>(this);
-    char* slotBase = base;
     for (int i = 0; i < 0x10; i++) {
-        CFile::CHandle** handleSlot = reinterpret_cast<CFile::CHandle**>(slotBase + 0x2378c);
-        CFile::CHandle* handle = *handleSlot;
-        if (handle != 0) {
-            if (File.IsCompleted(handle)) {
+        if (m_partAsyncBusy[i] != 0) {
+            if (File.IsCompleted(m_partAsyncBusy[i])) {
                 void* readBuffer = File.m_readBuffer;
-                int len = File.GetLength(handle);
-                void* amemCursor = *reinterpret_cast<void**>(base + 0x236f8);
+                int len = File.GetLength(m_partAsyncBusy[i]);
+                void* amemCursor = reinterpret_cast<void*>(m_partAMemCursor);
 
                 Memory.CopyToAMemorySync(readBuffer, amemCursor, (len + 0x1f) & ~0x1f);
-                *reinterpret_cast<int*>(slotBase + 0x2370c) = len;
-                *reinterpret_cast<unsigned int*>(slotBase + 0x2374c) = CheckSum__FPvi(readBuffer, len);
-                (*reinterpret_cast<int*>(base + 0x23700))++;
-                *reinterpret_cast<char**>(base + 0x236f8) += len;
+                m_partChunkSize[i] = len;
+                m_partChunkChecksum[i] = CheckSum__FPvi(readBuffer, len);
+                m_partChunkIndex++;
+                m_partAMemCursor += len;
 
-                File.Close(handle);
-                *handleSlot = 0;
+                File.Close(m_partAsyncBusy[i]);
+                m_partAsyncBusy[i] = 0;
             }
         }
-        slotBase += 4;
     }
 }
 

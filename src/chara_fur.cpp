@@ -22,8 +22,8 @@ extern const float FLOAT_80331064 = 0.0078125f;
 extern const float FLOAT_80331068 = -1.0f;
 extern const float FLOAT_8033106C = 16777215.0f;
 extern const double DOUBLE_80331070 = 4503601774854144.0;
-unsigned long long g_chara_fur_1;
-unsigned long long g_chara_fur_2;
+__declspec(section ".sdata2") unsigned long long g_chara_fur_1;
+__declspec(section ".sdata2") unsigned long long g_chara_fur_2;
 
 struct Vec4d
 {

@@ -462,8 +462,9 @@ public:
     unsigned int m_partChunkIndex;        // 0x23700
     unsigned int m_asyncHandleCount;      // 0x23704
     int m_partLoadMode;                   // 0x23708
-    unsigned char m_unk2370C[0x80];       // 0x2370C
-    unsigned int m_partAsyncBusy[16];     // 0x2378C
+    unsigned int m_partChunkSize[16];     // 0x2370C
+    unsigned int m_partChunkChecksum[16]; // 0x2374C
+    CFile::CHandle* m_partAsyncBusy[16];  // 0x2378C
     unsigned char m_unk237CC[0x80C];      // 0x237CC
 };
 

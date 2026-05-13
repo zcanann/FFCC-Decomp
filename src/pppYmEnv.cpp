@@ -122,7 +122,7 @@ void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displa
 
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
 
-    const int modeOffset = mode * 5;
+    const unsigned int modeOffset = mode * 5;
 
     _GXColor clearColor;
     clearColor.r = 0;

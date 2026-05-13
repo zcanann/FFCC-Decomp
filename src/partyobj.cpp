@@ -38,6 +38,9 @@ extern "C" void SetParticleWorkBind__13CFlatRuntime2FPQ212CFlatRuntime7CObject(v
 extern "C" void PutParticleWork__13CFlatRuntime2Fv(void*);
 extern const char lbl_801DCB1C[];
 extern const char lbl_801DCB38[];
+extern "C" int DAT_8032EE70;
+extern "C" char lbl_8032EE74;
+extern int __float_huge[];
 
 static const char s_partyObjStateFmt[] = "mode:%d stat:%d sub:%d frame:%d alive:%d tgt:%d ghost:%d";
 static const char s_partyBonusCountFmt[] = "SetBonusCondition num:%d";
@@ -147,6 +150,7 @@ struct PartyObjOverlay {
 	union {
 		int unk6EC;
 		int _legacy6EC;
+		float legacyTargetSearchDistance;
 	};
 	CGObject* carryObject;
 	short commandMode;

@@ -112,7 +112,7 @@ static const s16 s_UnitePatternData[] = {
 
 } // namespace
 
-const char* s_SkillStr_us[] = {
+static const char* s_SkillStr_us[] = {
     "Flamestrike",
     "Icestrike",
     "Thunderstrike",
@@ -120,7 +120,7 @@ const char* s_SkillStr_us[] = {
     "",
 };
 
-const char* s_SkillStr_ge[] = {
+static const char* s_SkillStr_ge[] = {
     "Feuer-Hieb",
     "Eis-Hieb",
     "Blitz-Hieb",
@@ -128,7 +128,7 @@ const char* s_SkillStr_ge[] = {
     "",
 };
 
-const char* s_SkillStr_it[] = {
+static const char* s_SkillStr_it[] = {
     "Colpo Fire",
     "Colpo Blizzard",
     "Colpo Thunder",
@@ -136,7 +136,7 @@ const char* s_SkillStr_it[] = {
     "",
 };
 
-const char* s_SkillStr_fr[] = {
+static const char* s_SkillStr_fr[] = {
     "Pyro-Frappe",
     "Cryo-Frappe",
     "\x52\x68\xE9\x6F-Frappe",
@@ -144,7 +144,7 @@ const char* s_SkillStr_fr[] = {
     "",
 };
 
-const char* s_SkillStr_sp[] = {
+static const char* s_SkillStr_sp[] = {
     "Efecto Fuego",
     "Efecto Hielo",
     "Efecto Electro",
@@ -2357,7 +2357,31 @@ int CMenuPcs::UniteOpenAnim(int topIdx)
 	float baseX = static_cast<float>(*reinterpret_cast<s16*>(listBase + 8));
 	int caravanWork = Game.m_scriptFoodBase[0];
 
-	if (topIdx <= 0) {
+	if (topIdx > 0) {
+		int i = 0;
+		int k = 3;
+		do {
+			int idx = i + s_UniteTop[topIdx];
+			int entryBase = GetCmdListBase(this);
+			int entryOffset = idx * 0x40 + 8;
+			if ((i != 0) && (*reinterpret_cast<s16*>(caravanWork + idx * 2 + 0x214) != -1)) {
+				break;
+			}
+
+			*reinterpret_cast<s16*>(entryBase + entryOffset) =
+			    static_cast<s16>(static_cast<double>(*reinterpret_cast<s16*>(entryBase + entryOffset)) +
+			                     DOUBLE_80332ab8);
+			if (fabs(static_cast<double>(
+			        static_cast<float>(*reinterpret_cast<s16*>(entryBase + entryOffset)) - baseX)) >
+			    DOUBLE_80332ac0) {
+				*reinterpret_cast<s16*>(entryBase + entryOffset) = static_cast<s16>(FLOAT_80332ac8 + baseX);
+				return 1;
+			}
+
+			i++;
+			k--;
+		} while (k != 0);
+	} else {
 		int finished = 0;
 		float targetX = FLOAT_80332ac8 + baseX;
 		s32* top = s_UniteTop;
@@ -2366,18 +2390,19 @@ int CMenuPcs::UniteOpenAnim(int topIdx)
 			int k = 3;
 			do {
 				int idx = j + *top;
+				int entryBase = GetCmdListBase(this);
 				int entryOffset = idx * 0x40 + 8;
 				if ((j != 0) && (*reinterpret_cast<s16*>(caravanWork + idx * 2 + 0x214) != -1)) {
 					break;
 				}
 
-				*reinterpret_cast<s16*>(listBase + entryOffset) =
-				    static_cast<s16>(static_cast<double>(*reinterpret_cast<s16*>(listBase + entryOffset)) +
+				*reinterpret_cast<s16*>(entryBase + entryOffset) =
+				    static_cast<s16>(static_cast<double>(*reinterpret_cast<s16*>(entryBase + entryOffset)) +
 				                     DOUBLE_80332ab8);
 				if (fabs(static_cast<double>(
-				        static_cast<float>(*reinterpret_cast<s16*>(listBase + entryOffset)) - baseX)) >
+				        static_cast<float>(*reinterpret_cast<s16*>(entryBase + entryOffset)) - baseX)) >
 				    DOUBLE_80332ac0) {
-					*reinterpret_cast<s16*>(listBase + entryOffset) = static_cast<s16>(targetX);
+					*reinterpret_cast<s16*>(entryBase + entryOffset) = static_cast<s16>(targetX);
 					if (j == 0) {
 						finished++;
 					}
@@ -2391,29 +2416,6 @@ int CMenuPcs::UniteOpenAnim(int topIdx)
 		if (finished == DAT_8032eec8) {
 			return 1;
 		}
-	} else {
-		int i = 0;
-		int k = 3;
-		do {
-			int idx = i + s_UniteTop[topIdx];
-			int entryOffset = idx * 0x40 + 8;
-			if ((i != 0) && (*reinterpret_cast<s16*>(caravanWork + idx * 2 + 0x214) != -1)) {
-				break;
-			}
-
-			*reinterpret_cast<s16*>(listBase + entryOffset) =
-			    static_cast<s16>(static_cast<double>(*reinterpret_cast<s16*>(listBase + entryOffset)) +
-			                     DOUBLE_80332ab8);
-			if (fabs(static_cast<double>(
-			        static_cast<float>(*reinterpret_cast<s16*>(listBase + entryOffset)) - baseX)) >
-			    DOUBLE_80332ac0) {
-				*reinterpret_cast<s16*>(listBase + entryOffset) = static_cast<s16>(FLOAT_80332ac8 + baseX);
-				return 1;
-			}
-
-			i++;
-			k--;
-		} while (k != 0);
 	}
 
 	return 0;
@@ -2438,7 +2440,28 @@ int CMenuPcs::UniteCloseAnim(int topIdx)
 	float baseX = static_cast<float>(*reinterpret_cast<s16*>(listBase + 8));
 	int caravanWork = Game.m_scriptFoodBase[0];
 
-	if (topIdx < 0) {
+	if (topIdx >= 0) {
+		int finished = 0;
+		for (int i = 0; i < 3; i++) {
+			int idx = i + s_UniteTop[topIdx];
+			int entryOffset = idx * 0x40 + 8;
+			if ((i != 0) && (*reinterpret_cast<s16*>(caravanWork + idx * 2 + 0x214) != -1)) {
+				break;
+			}
+
+			int entryBase = GetCmdListBase(this);
+			*reinterpret_cast<s16*>(entryBase + entryOffset) =
+			    static_cast<s16>(static_cast<double>(*reinterpret_cast<s16*>(entryBase + entryOffset)) -
+			                     DOUBLE_80332ab8);
+			if (static_cast<float>(*reinterpret_cast<s16*>(entryBase + entryOffset)) <= baseX) {
+				finished = 1;
+				*reinterpret_cast<s16*>(entryBase + entryOffset) = static_cast<s16>(baseX);
+			}
+		}
+		if (finished != 0) {
+			return 1;
+		}
+	} else {
 		int finished = 0;
 		s32* top = s_UniteTop;
 		for (int i = 0; i < DAT_8032eec8; i++) {
@@ -2463,27 +2486,6 @@ int CMenuPcs::UniteCloseAnim(int topIdx)
 			top++;
 		}
 		if (finished == DAT_8032eec8) {
-			return 1;
-		}
-	} else {
-		bool finished = false;
-		for (int i = 0; i < 3; i++) {
-			int idx = i + s_UniteTop[topIdx];
-			int entryOffset = idx * 0x40 + 8;
-			if ((i != 0) && (*reinterpret_cast<s16*>(caravanWork + idx * 2 + 0x214) != -1)) {
-				break;
-			}
-
-			int entryBase = GetCmdListBase(this);
-			*reinterpret_cast<s16*>(entryBase + entryOffset) =
-			    static_cast<s16>(static_cast<double>(*reinterpret_cast<s16*>(entryBase + entryOffset)) -
-			                     DOUBLE_80332ab8);
-			if (static_cast<float>(*reinterpret_cast<s16*>(entryBase + entryOffset)) <= baseX) {
-				finished = true;
-				*reinterpret_cast<s16*>(entryBase + entryOffset) = static_cast<s16>(baseX);
-			}
-		}
-		if (finished) {
 			return 1;
 		}
 	}

@@ -107,7 +107,8 @@ enum RedDriverSmallDataLayout {
     REDSOUND_DRIVER_SBSS_RED_MEMORY_PAD_SIZE = 0x03,
     REDSOUND_DRIVER_SBSS_DMA_EXECUTE_OFFSET = 0xCC,
     REDSOUND_DRIVER_SBSS_DMA_IN_THREAD_OFFSET = 0xD0,
-    REDSOUND_DRIVER_SBSS_TRAILING_PAD_SIZE = 0x04,
+    REDSOUND_DRIVER_SBSS_UNUSED_SILENT_WAVE_OFFSET = 0xD4,
+    REDSOUND_DRIVER_SBSS_UNUSED_SILENT_WAVE_SIZE = 0x04,
 };
 
 enum RedDriverStringLayout {
@@ -196,7 +197,7 @@ struct RedDriverSmallDataTailState {
     u8 m_redMemoryAlignPadding[REDSOUND_DRIVER_SBSS_RED_MEMORY_PAD_SIZE];
     volatile int m_dmaExecute;
     volatile int m_dmaInThread;
-    u8 m_trailingPadding[REDSOUND_DRIVER_SBSS_TRAILING_PAD_SIZE];
+    int m_unusedSilentWave;
 };
 
 STATIC_ASSERT(offsetof(RedDmaRequest, m_id) == REDSOUND_DMA_REQUEST_ID_OFFSET);
@@ -466,8 +467,10 @@ STATIC_ASSERT(sizeof(((RedDriverSmallDataTailState*)0)->m_redMemoryAlignPadding)
               REDSOUND_DRIVER_SBSS_RED_MEMORY_PAD_SIZE);
 STATIC_ASSERT(offsetof(RedDriverSmallDataTailState, m_dmaExecute) == REDSOUND_DRIVER_SBSS_DMA_EXECUTE_OFFSET);
 STATIC_ASSERT(offsetof(RedDriverSmallDataTailState, m_dmaInThread) == REDSOUND_DRIVER_SBSS_DMA_IN_THREAD_OFFSET);
-STATIC_ASSERT(sizeof(((RedDriverSmallDataTailState*)0)->m_trailingPadding) ==
-              REDSOUND_DRIVER_SBSS_TRAILING_PAD_SIZE);
+STATIC_ASSERT(offsetof(RedDriverSmallDataTailState, m_unusedSilentWave) ==
+              REDSOUND_DRIVER_SBSS_UNUSED_SILENT_WAVE_OFFSET);
+STATIC_ASSERT(sizeof(((RedDriverSmallDataTailState*)0)->m_unusedSilentWave) ==
+              REDSOUND_DRIVER_SBSS_UNUSED_SILENT_WAVE_SIZE);
 STATIC_ASSERT(sizeof(RedDriverSmallDataTailState) == REDSOUND_DRIVER_SBSS_SIZE);
 
 enum RedDriverBufferSize {
@@ -619,8 +622,9 @@ STATIC_ASSERT(sizeof(m_RedMasterTime) + sizeof(m_SequencialID) + sizeof(m_Thread
               REDSOUND_DRIVER_SBSS_BEFORE_RED_MEMORY_SIZE);
 STATIC_ASSERT(REDSOUND_DRIVER_SBSS_BEFORE_RED_MEMORY_SIZE + sizeof(c_RedMemory) +
                   REDSOUND_DRIVER_SBSS_RED_MEMORY_PAD_SIZE + sizeof(m_DMAExecute) +
-                  sizeof(m_DMAInThread) + REDSOUND_DRIVER_SBSS_TRAILING_PAD_SIZE ==
+                  sizeof(m_DMAInThread) + REDSOUND_DRIVER_SBSS_UNUSED_SILENT_WAVE_SIZE ==
               REDSOUND_DRIVER_SBSS_SIZE);
+STATIC_ASSERT(sizeof(m_SilentWave) == sizeof(int));
 
 static inline RedDriverSyncState& RedDriverSync()
 {
@@ -2250,8 +2254,8 @@ int CRedDriver::SetMusicData(void* musicData)
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 72b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: UNUSED
+ * EN Size: 72b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -2283,8 +2287,8 @@ int CRedDriver::ReentryMusicData(int musicID)
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 372b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: UNUSED
+ * EN Size: 372b
  * JP Address: TODO
  */
 int CRedDriver::MusicPlayState(int musicID)

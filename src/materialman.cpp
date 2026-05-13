@@ -3247,29 +3247,26 @@ void CMaterialSet::CacheLoadTexture(int materialIndex, CAmemCacheSet* amemCacheS
  */
 unsigned short CMaterialSet::FindTexName(char* textureName, long* textureIndexOut)
 {
-    unsigned long materialIndex = 0;
+    unsigned int materialIndex = 0;
 
     while (true) {
         if (UnkMaterialSetGetter(Ptr(this, 8)) <= materialIndex) {
             return 0xFFFF;
         }
 
-        int material = reinterpret_cast<int>(
-            (*reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(this, 8)))[materialIndex]);
+        CMaterial* material = (*reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(this, 8)))[materialIndex];
         if (material != 0) {
-            int numTexture = static_cast<int>(*reinterpret_cast<unsigned short*>(Ptr(reinterpret_cast<void*>(material), 0x18)));
-            int slot = 0;
+            CMaterial* textureSlot = material;
 
-            while (slot < numTexture) {
-                if (CheckName__8CTextureFPc(*reinterpret_cast<CTexture**>(Ptr(reinterpret_cast<void*>(material), 0x3C)),
-                                            textureName)) {
-                    if (textureIndexOut != 0) {
-                        *textureIndexOut = slot;
+            for (int slot = 0; slot < static_cast<int>(static_cast<unsigned int>(*reinterpret_cast<unsigned short*>(Ptr(material, 0x18)))); slot++) {
+                if (CheckName__8CTextureFPc(*reinterpret_cast<CTexture**>(Ptr(textureSlot, 0x3C)), textureName)) {
+                    if (textureIndexOut == 0) {
+                        return materialIndex;
                     }
-                    return static_cast<unsigned short>(materialIndex);
+                    *textureIndexOut = slot;
+                    return materialIndex;
                 }
-                slot++;
-                material += 4;
+                textureSlot = reinterpret_cast<CMaterial*>(Ptr(textureSlot, 4));
             }
         }
         materialIndex++;

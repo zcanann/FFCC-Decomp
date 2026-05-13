@@ -206,13 +206,13 @@ void CMenuPcs::TmpArtiDraw()
 	entry = reinterpret_cast<short*>(GetTmpArtiEntries(this));
 	foodPtr = scriptFood;
 	for (int i = 0; i < 4; i++) {
-		short itemId = *(short*)(foodPtr + 0x1F6);
-		if (itemId >= 0) {
+		if (*(short*)(foodPtr + 0x1F6) >= 0) {
 			float alpha = *(float*)(entry + 8);
 			CColor textColor(0xFF, 0xFF, 0xFF, (unsigned char)(int)(FLOAT_80332F28 * alpha));
-			SetColor__5CFontF8_GXColor(font, &textColor.color);
+			GXColor textGXColor = textColor.color;
+			SetColor__5CFontF8_GXColor(font, &textGXColor);
 
-			const char* text = flatData->table[0].strings[itemId * 5 + 4];
+			const char* text = flatData->table[0].strings[*(short*)(foodPtr + 0x1F6) * 5 + 4];
 			float width = GetWidth__5CFontFPc(font, text);
 			float posX = (float)(((TmpArtiIntToDouble(entry[2]) - width) * DOUBLE_80332f20) +
 			                       TmpArtiIntToDouble(entry[0]));

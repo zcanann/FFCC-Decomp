@@ -1234,14 +1234,28 @@ static int UpdateWaterMesh(VYmMana* mana)
         neighborScale = FLOAT_80330e5c;
         int rowBase = row * 0x11;
         for (int colBlock = 0; colBlock < 3; colBlock++) {
-            float* src = &waterHeightA[rowBase + colBlock * 5 + 1];
-            float* dst = &waterHeightB[rowBase + colBlock * 5 + 1];
+            int index = rowBase + colBlock * 5 + 1;
 
-            dst[0] = currentScale * src[0] + neighborScale * (src[1] + src[-1] + src[-0x11] + src[0x11]) - dst[0];
-            dst[1] = currentScale * src[1] + neighborScale * (src[2] + src[0] + src[-0x10] + src[0x12]) - dst[1];
-            dst[2] = currentScale * src[2] + neighborScale * (src[3] + src[1] + src[-0x0F] + src[0x13]) - dst[2];
-            dst[3] = currentScale * src[3] + neighborScale * (src[4] + src[2] + src[-0x0E] + src[0x14]) - dst[3];
-            dst[4] = currentScale * src[4] + neighborScale * (src[5] + src[3] + src[-0x0D] + src[0x15]) - dst[4];
+            waterHeightB[index] = currentScale * waterHeightA[index] +
+                                  neighborScale * (waterHeightA[index + 1] + waterHeightA[index - 1] +
+                                                   waterHeightA[index - 0x11] + waterHeightA[index + 0x11]) -
+                                  waterHeightB[index];
+            waterHeightB[index + 1] = currentScale * waterHeightA[index + 1] +
+                                      neighborScale * (waterHeightA[index + 2] + waterHeightA[index] +
+                                                       waterHeightA[index - 0x10] + waterHeightA[index + 0x12]) -
+                                      waterHeightB[index + 1];
+            waterHeightB[index + 2] = currentScale * waterHeightA[index + 2] +
+                                      neighborScale * (waterHeightA[index + 3] + waterHeightA[index + 1] +
+                                                       waterHeightA[index - 0x0F] + waterHeightA[index + 0x13]) -
+                                      waterHeightB[index + 2];
+            waterHeightB[index + 3] = currentScale * waterHeightA[index + 3] +
+                                      neighborScale * (waterHeightA[index + 4] + waterHeightA[index + 2] +
+                                                       waterHeightA[index - 0x0E] + waterHeightA[index + 0x14]) -
+                                      waterHeightB[index + 3];
+            waterHeightB[index + 4] = currentScale * waterHeightA[index + 4] +
+                                      neighborScale * (waterHeightA[index + 5] + waterHeightA[index + 3] +
+                                                       waterHeightA[index - 0x0D] + waterHeightA[index + 0x15]) -
+                                      waterHeightB[index + 4];
         }
     }
 
@@ -1408,134 +1422,48 @@ static int RenderWaterMesh(VYmMana* mana)
  */
 static void CalculateNormal(VYmMana* mana)
 {
-    Vec* positions = *(Vec**)((u8*)mana + 0x3C);
-    Vec* normals = *(Vec**)((u8*)mana + 0x40);
-    u16* indices = *(u16**)((u8*)mana + 0x50);
-    float zero;
-    float tailZero;
-    int cleared;
-    int chunkCount;
-    Vec* normalIt;
+    Vec* positions;
+    Vec* normals;
+    u16* indices;
     Vec edgeA;
     Vec edgeB;
     Vec faceNormal;
 
-    zero = FLOAT_80330e4c;
-    cleared = 0;
-    chunkCount = 0x12;
-    normalIt = normals;
+    positions = *(Vec**)((u8*)mana + 0x3C);
+    normals = *(Vec**)((u8*)mana + 0x40);
+    indices = *(u16**)((u8*)mana + 0x50);
 
-    do {
-        normalIt[0].z = zero;
-        normalIt[0].y = zero;
-        normalIt[0].x = zero;
-        normalIt[1].z = zero;
-        normalIt[1].y = zero;
-        normalIt[1].x = zero;
-        normalIt[2].z = zero;
-        normalIt[2].y = zero;
-        normalIt[2].x = zero;
-        normalIt[3].z = zero;
-        normalIt[3].y = zero;
-        normalIt[3].x = zero;
-        normalIt[4].z = zero;
-        normalIt[4].y = zero;
-        normalIt[4].x = zero;
-        normalIt[5].z = zero;
-        normalIt[5].y = zero;
-        normalIt[5].x = zero;
-        normalIt[6].z = zero;
-        normalIt[6].y = zero;
-        normalIt[6].x = zero;
-        normalIt[7].z = zero;
-        normalIt[7].y = zero;
-        normalIt[7].x = zero;
-        normalIt[8].z = zero;
-        normalIt[8].y = zero;
-        normalIt[8].x = zero;
-        normalIt[9].z = zero;
-        normalIt[9].y = zero;
-        normalIt[9].x = zero;
-        normalIt[10].z = zero;
-        normalIt[10].y = zero;
-        normalIt[10].x = zero;
-        normalIt[11].z = zero;
-        normalIt[11].y = zero;
-        normalIt[11].x = zero;
-        normalIt[12].z = zero;
-        normalIt[12].y = zero;
-        normalIt[12].x = zero;
-        normalIt[13].z = zero;
-        normalIt[13].y = zero;
-        normalIt[13].x = zero;
-        normalIt[14].z = zero;
-        normalIt[14].y = zero;
-        normalIt[14].x = zero;
-        normalIt[15].z = zero;
-        normalIt[15].y = zero;
-        normalIt[15].x = zero;
-        tailZero = FLOAT_80330e4c;
-        cleared += 0x10;
-        normalIt += 0x10;
-        chunkCount--;
-    } while (chunkCount != 0);
-
-    chunkCount = 0x121 - cleared;
-    normalIt = normals + cleared;
-    if (cleared < 0x121) {
-        do {
-            normalIt->z = tailZero;
-            normalIt->y = tailZero;
-            normalIt->x = tailZero;
-            normalIt++;
-            chunkCount--;
-        } while (chunkCount != 0);
+    float zero = FLOAT_80330e4c;
+    for (s32 i = 0; i < 0x121; i++) {
+        normals[i].z = zero;
+        normals[i].y = zero;
+        normals[i].x = zero;
     }
 
-    {
-        int tri = 0;
-        int indexOffset = 0;
+    s32 indicesOffset = 0;
+    for (s32 i = 0; i < 0x200; i++, indicesOffset += 3) {
+        u16 i0 = indices[indicesOffset];
+        u16 i1 = indices[indicesOffset + 1];
+        u16 i2 = indices[indicesOffset + 2];
 
-        do {
-            u16 idx0;
-            u32 idx1;
-            u32 idx2;
-            Vec* pos0;
-            Vec* pos1;
-            Vec* pos2;
+        edgeA.x = positions[i1].x - positions[i0].x;
+        edgeA.y = positions[i1].y - positions[i0].y;
+        edgeA.z = positions[i1].z - positions[i0].z;
 
-            idx0 = *(u16*)((u8*)indices + indexOffset);
-            idx1 = *(u16*)((u8*)indices + indexOffset + 2);
-            idx2 = *(u16*)((u8*)indices + indexOffset + 4);
-            pos0 = &positions[idx0];
-            indexOffset += 6;
-            pos1 = &positions[idx1];
-            edgeA.x = pos1->x - pos0->x;
-            pos2 = &positions[idx2];
-            edgeA.y = pos1->y - pos0->y;
-            edgeA.z = pos1->z - pos0->z;
-            edgeB.x = pos2->x - pos0->x;
-            edgeB.y = pos2->y - pos0->y;
-            edgeB.z = pos2->z - pos0->z;
+        edgeB.x = positions[i2].x - positions[i0].x;
+        edgeB.y = positions[i2].y - positions[i0].y;
+        edgeB.z = positions[i2].z - positions[i0].z;
 
-            PSVECCrossProduct(&edgeA, &edgeB, &faceNormal);
-            PSVECNormalize(&faceNormal, &faceNormal);
-            PSVECAdd(&normals[idx0], &faceNormal, &normals[idx0]);
-            PSVECAdd(&normals[idx1], &faceNormal, &normals[idx1]);
-            PSVECAdd(&normals[idx2], &faceNormal, &normals[idx2]);
-            tri++;
-        } while (tri < 0x200);
+        PSVECCrossProduct(&edgeA, &edgeB, &faceNormal);
+        PSVECNormalize(&faceNormal, &faceNormal);
+
+        PSVECAdd(&normals[i0], &faceNormal, &normals[i0]);
+        PSVECAdd(&normals[i1], &faceNormal, &normals[i1]);
+        PSVECAdd(&normals[i2], &faceNormal, &normals[i2]);
     }
 
-    {
-        int i = 0;
-        Vec* normal = normals;
-
-        do {
-            PSVECNormalize(normal, normal);
-            i++;
-            normal++;
-        } while (i < 0x121);
+    for (s32 i = 0; i < 0x121; i++) {
+        PSVECNormalize(&normals[i], &normals[i]);
     }
 
     DCFlushRange(normals, 0xD8C);

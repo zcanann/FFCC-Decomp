@@ -747,15 +747,14 @@ void CSound::CheckDriver(int mode)
 {
     u8* self = reinterpret_cast<u8*>(this);
     CSoundLayout& sound = *reinterpret_cast<CSoundLayout*>(self);
-    CRedSound* redSound = RedSound(this);
     unsigned int oldPrint = sound.m_debugPrint;
     sound.m_debugPrint = 1;
-    redSound->ReportPrint(1);
-    redSound->TestProcess(mode);
-    redSound->DisplayWaveInfo();
-    redSound->DisplaySePlayInfo();
+    reinterpret_cast<CRedSound*>(self + 8)->ReportPrint(1);
+    reinterpret_cast<CRedSound*>(self + 8)->TestProcess(mode);
+    reinterpret_cast<CRedSound*>(self + 8)->DisplayWaveInfo();
+    reinterpret_cast<CRedSound*>(self + 8)->DisplaySePlayInfo();
     sound.m_debugPrint = oldPrint;
-    redSound->ReportPrint((-oldPrint | oldPrint) >> 0x1F);
+    reinterpret_cast<CRedSound*>(self + 8)->ReportPrint((-oldPrint | oldPrint) >> 0x1F);
 }
 
 /*
@@ -1302,12 +1301,12 @@ void CSound::LoadBlock()
  */
 void CSound::FreeBlock()
 {
-    CRedSound* redSound = RedSound(this);
+    u8* self = reinterpret_cast<u8*>(this);
 
-    redSound->ClearWaveBank(500);
-    redSound->ClearWaveBank(0);
+    reinterpret_cast<CRedSound*>(self + 8)->ClearWaveBank(500);
+    reinterpret_cast<CRedSound*>(self + 8)->ClearWaveBank(0);
     for (int i = 0; i < 4; i++) {
-        redSound->SetSeBlockData(i, 0);
+        reinterpret_cast<CRedSound*>(self + 8)->SetSeBlockData(i, 0);
     }
 }
 
@@ -2479,11 +2478,11 @@ void CSound::IsDebugPrint(int)
  */
 void CSound::PauseAllSe(int pause)
 {
-    CRedSound* redSound = RedSound(this);
+    u8* self = reinterpret_cast<u8*>(this);
 
-    redSound->SePause(-1, static_cast<u32>(-pause | pause) >> 31);
-    redSound->StreamPause(-1, (-static_cast<u32>(pause) | static_cast<u32>(pause)) >> 31);
-    SoundData(this).m_pauseAllSe = pause;
+    reinterpret_cast<CRedSound*>(self + 8)->SePause(-1, static_cast<u32>(-pause | pause) >> 31);
+    reinterpret_cast<CRedSound*>(self + 8)->StreamPause(-1, (-static_cast<u32>(pause) | static_cast<u32>(pause)) >> 31);
+    reinterpret_cast<CSoundLayout*>(self)->m_pauseAllSe = pause;
 }
 
 /*

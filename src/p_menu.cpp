@@ -724,15 +724,29 @@ void CMenuPcs::freeTexture(int textureSetStart, int textureSetCount, int texture
     u8* self = reinterpret_cast<u8*>(this);
 
     for (int i = 0; i < textureCount; i++) {
-        void** slot = reinterpret_cast<void**>(self + 0x18C + (textureStart + i) * 4);
-        ReleaseRefObject(*slot);
-        *slot = nullptr;
+        int offset = (textureStart + i) * 4;
+        int* refObject = *reinterpret_cast<int**>(self + 0x18C + offset);
+        if (refObject != nullptr) {
+            int refCount = refObject[1] - 1;
+            refObject[1] = refCount;
+            if ((refCount == 0) && (refObject != nullptr)) {
+                reinterpret_cast<void (**)(void*, int)>(refObject[0])[2](refObject, 1);
+            }
+            *reinterpret_cast<void**>(self + 0x18C + offset) = nullptr;
+        }
     }
 
     for (int i = 0; i < textureSetCount; i++) {
-        void** slot = reinterpret_cast<void**>(self + 0x14C + (textureSetStart + i) * 4);
-        ReleaseRefObject(*slot);
-        *slot = nullptr;
+        int offset = (textureSetStart + i) * 4;
+        int* refObject = *reinterpret_cast<int**>(self + 0x14C + offset);
+        if (refObject != nullptr) {
+            int refCount = refObject[1] - 1;
+            refObject[1] = refCount;
+            if ((refCount == 0) && (refObject != nullptr)) {
+                reinterpret_cast<void (**)(void*, int)>(refObject[0])[2](refObject, 1);
+            }
+            *reinterpret_cast<void**>(self + 0x14C + offset) = nullptr;
+        }
     }
 }
 

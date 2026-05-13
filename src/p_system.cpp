@@ -25,6 +25,15 @@ unsigned int m_table__10CSystemPcs[0x15C / sizeof(unsigned int)] = {
     0x8
 };
 
+static unsigned int s_CSystemPcsTablePad0[3] = {reinterpret_cast<unsigned int>(const_cast<char*>(s_CManager_801D7C54)), 0, 0};
+static unsigned int s_CSystemPcsTablePad1[5] = {
+    reinterpret_cast<unsigned int>(const_cast<char*>(s_CManager_801D7C54)),
+    0,
+    reinterpret_cast<unsigned int>(const_cast<char*>(s_CProcess_801D7C60)),
+    0,
+    0,
+};
+
 /*
  * --INFO--
  * PAL Address: 0x80047c9c

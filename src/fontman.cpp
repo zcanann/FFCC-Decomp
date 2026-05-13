@@ -407,8 +407,8 @@ void CFont::DrawInit()
 
     _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
 
-    signed char zCompareFlag = renderFlagBits.zCompare;
-    signed char zUpdateFlag = renderFlagBits.zUpdate;
+    int zCompareFlag = renderFlagBits.zCompare;
+    int zUpdateFlag = renderFlagBits.zUpdate;
     int zFunction = 7;
     int zUpdate = (zCompareFlag != 0) ? 1 : 0;
     if (zUpdateFlag != 0) {

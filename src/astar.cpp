@@ -1089,17 +1089,15 @@ void CAStar::CATemp::operator= (const CAStar::CATemp& other)
  */
 void CAStar::addAstar(float x, float y, float z, int groupA, int groupB)
 {
-	Vec* pos = reinterpret_cast<Vec*>(&CVector(x, y, z));
 	int groupLow = groupA;
-	int groupHigh = groupB;
+	Vec* pos = reinterpret_cast<Vec*>(&CVector(x, y, z));
 
 	if (groupB < groupA)
 	{
 		groupLow = groupB;
-		groupHigh = groupA;
+		groupB = groupA;
 	}
 	groupA = groupLow;
-	groupB = groupHigh;
 
 	int index = 0;
 

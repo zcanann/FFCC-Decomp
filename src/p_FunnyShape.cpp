@@ -488,13 +488,6 @@ CPtrArray<_GXTexObj*>::CPtrArray()
 }
 
 template <>
-CPtrArray<_GXTexObj*>::~CPtrArray()
-{
-    SetPtrArrayDtorVtable(this);
-    RemoveAll();
-}
-
-template <>
 CPtrArray<OSFS_TEXTURE_ST*>::CPtrArray()
 {
     vtable = gVtable_CPtrArray_OSFSTexture;
@@ -508,6 +501,13 @@ CPtrArray<OSFS_TEXTURE_ST*>::CPtrArray()
 
 template <>
 CPtrArray<OSFS_TEXTURE_ST*>::~CPtrArray()
+{
+    SetPtrArrayDtorVtable(this);
+    RemoveAll();
+}
+
+template <>
+CPtrArray<_GXTexObj*>::~CPtrArray()
 {
     SetPtrArrayDtorVtable(this);
     RemoveAll();

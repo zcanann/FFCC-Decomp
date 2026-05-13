@@ -2566,15 +2566,14 @@ void pppClearDrawEnv()
  */
 void pppSetDrawEnv(pppCVECTOR* pppColor, pppFMATRIX* pppMtx, float depth, unsigned char lightTarget, unsigned char fogIndex, unsigned char fogParam, unsigned char cullMode, unsigned char zEnable, unsigned char colorUpdate, unsigned char zWrite)
 {
-	double depthOffset = (double)depth;
-	if (DOUBLE_8032fdf0 != depthOffset) {
+	if (DOUBLE_8032fdf0 != (double)depth) {
 		float sortDepth = *(float*)((u8*)pppMngStPtr + 0x114);
-		depthOffset = (double)((float)(depthOffset * (double)FLOAT_8032fdf8) / -sortDepth);
+		depth = (depth * FLOAT_8032fdf8) / -sortDepth;
 	}
 
-	if ((double)FLOAT_8032ed8c != depthOffset) {
-		FLOAT_8032ed8c = (float)depthOffset;
-		ppvScreenMatrix[2][3] = gPartScreenMatrixRow2W + (float)depthOffset;
+	if ((double)FLOAT_8032ed8c != (double)depth) {
+		FLOAT_8032ed8c = depth;
+		ppvScreenMatrix[2][3] = gPartScreenMatrixRow2W + depth;
 		GXSetProjection(ppvScreenMatrix, GX_PERSPECTIVE);
 	}
 
@@ -2645,8 +2644,8 @@ void pppSetDrawEnv(pppCVECTOR* pppColor, pppFMATRIX* pppMtx, float depth, unsign
 	}
 
 	if ((DAT_8032ed89 != zEnable) || (DAT_8032ed8b != zWrite)) {
-		DAT_8032ed8b = zWrite;
 		DAT_8032ed89 = zEnable;
+		DAT_8032ed8b = zWrite;
 		GXSetZMode((GXBool)zEnable, GX_LEQUAL, (GXBool)zWrite);
 	}
 

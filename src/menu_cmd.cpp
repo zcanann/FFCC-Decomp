@@ -112,7 +112,7 @@ static const s16 s_UnitePatternData[] = {
 
 } // namespace
 
-const char* s_SkillStr_us[] = {
+static const char* s_SkillStr_us[] = {
     "Flamestrike",
     "Icestrike",
     "Thunderstrike",
@@ -120,7 +120,7 @@ const char* s_SkillStr_us[] = {
     "",
 };
 
-const char* s_SkillStr_ge[] = {
+static const char* s_SkillStr_ge[] = {
     "Feuer-Hieb",
     "Eis-Hieb",
     "Blitz-Hieb",
@@ -128,7 +128,7 @@ const char* s_SkillStr_ge[] = {
     "",
 };
 
-const char* s_SkillStr_it[] = {
+static const char* s_SkillStr_it[] = {
     "Colpo Fire",
     "Colpo Blizzard",
     "Colpo Thunder",
@@ -136,7 +136,7 @@ const char* s_SkillStr_it[] = {
     "",
 };
 
-const char* s_SkillStr_fr[] = {
+static const char* s_SkillStr_fr[] = {
     "Pyro-Frappe",
     "Cryo-Frappe",
     "\x52\x68\xE9\x6F-Frappe",
@@ -144,7 +144,7 @@ const char* s_SkillStr_fr[] = {
     "",
 };
 
-const char* s_SkillStr_sp[] = {
+static const char* s_SkillStr_sp[] = {
     "Efecto Fuego",
     "Efecto Hielo",
     "Efecto Electro",

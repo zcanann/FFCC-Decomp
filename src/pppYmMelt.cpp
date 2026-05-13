@@ -168,8 +168,8 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
     GXBegin((GXPrimitive)0x80, GX_VTXFMT7, (u16)((grid * grid * 4) & 0xFFFC));
 
     for (int z = 0; z < ctrl->m_gridSize; z++) {
-        float v0 = (f32)z * vStep;
         float v1 = (f32)(z + 1) * vStep;
+        float v0 = (f32)z * vStep;
         for (int x = 0; x < ctrl->m_gridSize; x++) {
             int gridWork = ctrl->m_gridSize;
             int idx0 = x + z * (gridWork + 1);

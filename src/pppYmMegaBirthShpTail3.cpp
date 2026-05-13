@@ -248,7 +248,6 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
 void pppFrameYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthShpTail3* param, pppYmMegaBirthShpTail3UnkC* offsets)
 {
     s8 hasRequiredMemory;
-    int spawnCount;
     int colorOffset;
     u8* paramPayload;
     u8* particleData;
@@ -393,15 +392,14 @@ void pppFrameYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthShp
             break;
         }
 
-        i = 0;
         particleData = (u8*)work->m_particles;
-        worldMat = work->m_wmats;
         particleColor = work->m_colors;
+        worldMat = work->m_wmats;
+        int spawnCount = 0;
 
         if ((gPppCalcDisabled == 0) && (*(s32*)(paramPayload + 4) != 0xffff)) {
-            spawnCount = i;
             work->m_lifeLimit = work->m_lifeLimit + 1;
-            for (; i < work->m_maxParticles; i++) {
+            for (i = 0; i < work->m_maxParticles; i++) {
                 if (*(u16*)(particleData + 0x22) != 0) {
                     calc((_pppPObject*)object, work, param, (_PARTICLE_DATA*)particleData, colorWork, particleColor);
                 } else {
@@ -462,17 +460,12 @@ extern "C" void calc(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirth
     *velocityScale = *velocityScale + pYmMegaBirthShpTail3->m_colorDeltaAdd[2];
     *tailScale = *tailScale + pYmMegaBirthShpTail3->m_sizeVal;
 
-    {
-        Vec scaled;
-        pppScaleVectorXYZ(scaled, *(Vec*)(particleBytes + 0x10), *velocityScale);
-        pppAddVector(*(Vec*)particleData, *(Vec*)particleData, scaled);
-    }
+    Vec scaled;
+    pppScaleVectorXYZ(scaled, *(Vec*)(particleBytes + 0x10), *velocityScale);
+    pppAddVector(*(Vec*)particleData, *(Vec*)particleData, scaled);
 
-    {
-        Vec scaled;
-        pppScaleVectorXYZ(scaled, vYmMegaBirthShpTail3->m_tailScaleDirection, *tailScale);
-        pppAddVector(*(Vec*)particleData, *(Vec*)particleData, scaled);
-    }
+    pppScaleVectorXYZ(scaled, vYmMegaBirthShpTail3->m_tailScaleDirection, *tailScale);
+    pppAddVector(*(Vec*)particleData, *(Vec*)particleData, scaled);
 
     if (*(u16*)((u8*)&pYmMegaBirthShpTail3->m_matrix[1] + 0x4) != 0) {
         *(u16*)(particleBytes + 0x22) = *(u16*)(particleBytes + 0x22) - 1;

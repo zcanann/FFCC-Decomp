@@ -99,7 +99,6 @@ extern double DOUBLE_80331b60;
 extern double DOUBLE_80331b70;
 u32 gItemObjCreateFlags;
 extern char SoundBuffer[];
-extern char SoundBuffer_1260_[];
 extern const char DAT_80331b7c[];
 extern const char DAT_80331b84[];
 extern char DAT_80331bc8[];
@@ -357,7 +356,7 @@ void CGItemObj::onFrame()
 
 			CGObject* owner = m_owner;
 			int ownerScriptSlot = *(int*)(*(int*)((unsigned char*)owner + 0x58) + 0x3B4);
-			int soundEntry = *(int*)(*(int*)(*(int*)SoundBuffer_1260_ + 0xF8) + 0x178);
+			int soundEntry = *(int*)(*(int*)(*(int*)(SoundBuffer + 0x4EC) + 0xF8) + 0x178);
 			if (soundEntry != 0) {
 				soundEntry = *(int*)(soundEntry + 0x14);
 			} else {
@@ -714,7 +713,7 @@ void CGItemObj::onFrameStat()
 			prgObj->m_stepSlopeLimit = zero;
 			EndParticleSlot__13CFlatRuntime2Fii(CFlat, *(int*)(self + 0x55C), 0);
 
-			int soundEntry = *(int*)(*(int*)(*(int*)SoundBuffer_1260_ + 0xF8) + 0x178);
+			int soundEntry = *(int*)(*(int*)(*(int*)(SoundBuffer + 0x4EC) + 0xF8) + 0x178);
 			if (soundEntry != 0) {
 				pdtNo = *(int*)(soundEntry + 0x14);
 			}

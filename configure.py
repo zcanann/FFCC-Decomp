@@ -631,7 +631,7 @@ config.libs = [
             Object(NonMatching, "pppKeShpTail2X.cpp"),
             Object(NonMatching, "pppKeShpTail3X.cpp"),
             Object(NonMatching, "pppKeZCrctShp.cpp"),
-            Object(NonMatching, "pppLaser.cpp"),
+            Object(NonMatching, "pppLaser.cpp", extra_cflags=["-inline auto,deferred"]),
             Object(NonMatching, "pppLensFlare.cpp"),
             Object(NonMatching, "pppLerpPos.cpp"),
             Object(Matching, "pppLight.cpp"),

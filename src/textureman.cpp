@@ -66,9 +66,9 @@ static const char s_Error_width_pctd_height_pctd_801D7984[] = "Error width=%d he
 static const char s_CTexture_texture_801D79A0[] = "CTexture.texture";
 extern const char s_ptrarray_grow_error_801D79D8[];
 extern const char s_collection_ptrarray_h_801D79F4[];
-extern const char s_CRef_8032FAE8[] = "CRef";
-extern const float FLOAT_8032faf0 = 1.0f;
-extern const float FLOAT_8032faf4 = 0.0f;
+extern const char s_CRef_8032FAE8[];
+extern const float FLOAT_8032faf0;
+extern const float FLOAT_8032faf4;
 
 namespace {
 static inline unsigned char* Ptr(void* p, unsigned int offset)
@@ -580,10 +580,10 @@ void CTexture::CacheLoadTexture(CAmemCacheSet* amemCacheSet)
 
             unsigned int format = m_format;
             if ((format == 9) || (format == 8)) {
+                int tlutData = reinterpret_cast<int>(m_tlutData);
                 GXInitTexObjCI(&m_texObj, m_imageData, static_cast<u16>(m_width), static_cast<u16>(m_height),
                                static_cast<GXCITexFmt>(format), static_cast<GXTexWrapMode>(m_wrapMode),
                                static_cast<GXTexWrapMode>(m_wrapMode), 0, 0);
-                int tlutData = reinterpret_cast<int>(m_tlutData);
                 GXInitTlutObj(&m_tlutObj0, reinterpret_cast<void*>(tlutData), GX_TL_IA8,
                               m_format == 9 ? 0x100 : 0x10);
                 GXInitTlutObj(&m_tlutObj1,
@@ -749,12 +749,12 @@ void CTexture::Create(CChunkFile& chunkFile, CMemory::CStage* stage, CAmemCacheS
 
     format = *reinterpret_cast<unsigned int*>(texture + 0x60);
     if ((format == 9) || (format == 8)) {
+        int tlutData = reinterpret_cast<int>(*reinterpret_cast<void**>(texture + 0x7C));
         GXInitTexObjCI(reinterpret_cast<GXTexObj*>(texture + 0x28), *reinterpret_cast<void**>(texture + 0x78),
                        static_cast<u16>(*reinterpret_cast<unsigned int*>(texture + 0x64)),
                        static_cast<u16>(*reinterpret_cast<unsigned int*>(texture + 0x68)),
                        static_cast<GXCITexFmt>(format), static_cast<GXTexWrapMode>(*reinterpret_cast<unsigned int*>(texture + 0x6C)),
                        static_cast<GXTexWrapMode>(*reinterpret_cast<unsigned int*>(texture + 0x6C)), 0, 0);
-        int tlutData = reinterpret_cast<int>(*reinterpret_cast<void**>(texture + 0x7C));
         GXInitTlutObj(reinterpret_cast<GXTlutObj*>(texture + 0x48), reinterpret_cast<void*>(tlutData), GX_TL_IA8,
                       *reinterpret_cast<unsigned int*>(texture + 0x60) == 9 ? 0x100 : 0x10);
         GXInitTlutObj(reinterpret_cast<GXTlutObj*>(texture + 0x54),
@@ -789,10 +789,10 @@ void CTexture::InitTexObj()
 {
     unsigned int format = m_format;
     if ((format == 9) || (format == 8)) {
+        int tlutData = reinterpret_cast<int>(m_tlutData);
         GXInitTexObjCI(&m_texObj, m_imageData, static_cast<u16>(m_width), static_cast<u16>(m_height),
                        static_cast<GXCITexFmt>(format), static_cast<GXTexWrapMode>(m_wrapMode),
                        static_cast<GXTexWrapMode>(m_wrapMode), 0, 0);
-        int tlutData = reinterpret_cast<int>(m_tlutData);
         GXInitTlutObj(&m_tlutObj0, reinterpret_cast<void*>(tlutData), GX_TL_IA8, m_format == 9 ? 0x100 : 0x10);
         GXInitTlutObj(&m_tlutObj1,
                       reinterpret_cast<void*>(tlutData + (m_format == 9 ? 0x100 : 0x10) * 2),
@@ -809,6 +809,10 @@ void CTexture::InitTexObj()
                         0.0f, GX_TRUE, GX_FALSE, GX_ANISO_1);
     }
 }
+
+extern const char s_CRef_8032FAE8[] = "CRef";
+extern const float FLOAT_8032faf0 = 1.0f;
+extern const float FLOAT_8032faf4 = 0.0f;
 
 /*
  * --INFO--

@@ -1508,7 +1508,7 @@ skipModSetup:
         memset(&voice->m_adsr, 0, REDSOUND_TRACK_ADSR_SIZE);
     }
 
-    workValue = ((int)voice - (int)p_VoiceData) / REDSOUND_VOICE_SIZE;
+    workValue = voice - p_VoiceData;
     if (REDSOUND_VOICE_INDEX_MASK < workValue) {
         voiceMask += 1;
     }

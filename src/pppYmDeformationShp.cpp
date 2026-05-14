@@ -368,8 +368,6 @@ int RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* verti
 {
 	pppYmDeformationShpLayout* layout = (pppYmDeformationShpLayout*)obj;
 	Vec4d projected[4];
-	Vec4d clipPos;
-	Vec worldPos;
 	float minY;
 	float maxY;
 	float minX;
@@ -400,6 +398,8 @@ int RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* verti
 
 	for (i = 0; i < 4; i++) {
 		Vec localVertex = vertices[i];
+		Vec4d clipPos;
+		Vec worldPos;
 		PSMTXMultVec(layout->m_modelMatrix.value, &localVertex, &worldPos);
 		clipPos.x = worldPos.x;
 		clipPos.y = worldPos.y;
@@ -413,10 +413,10 @@ int RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* verti
 		projected[i].y = screenCenterY - projected[i].y / screenScaleY;
 	}
 
-	maxX = FLOAT_80330624;
-	maxY = FLOAT_80330624;
-	minX = FLOAT_80330620;
 	minY = FLOAT_80330620;
+	maxY = FLOAT_80330624;
+	minX = minY;
+	maxX = maxY;
 	for (i = 0; i < 4; i++) {
 		if (projected[i].x > maxX) {
 			maxX = projected[i].x;

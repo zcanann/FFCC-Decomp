@@ -9,12 +9,23 @@ class CMapHit;
 class CBound;
 
 int FindIntersection(const Vec&, const Vec&, const CMapCylinder&, float&);
-void CheckLineCylinder(const Vec&, const Vec&, const CMapCylinder&, float&);
+
+extern "C" const float FLOAT_8032F8EC;
+extern "C" const float FLOAT_8032F8F0;
 
 class CMapCylinder
 {
 public:
-    CMapCylinder();
+    CMapCylinder()
+    {
+        m_boundsMin.z = FLOAT_8032F8EC;
+        m_boundsMin.y = FLOAT_8032F8EC;
+        m_boundsMin.x = FLOAT_8032F8EC;
+
+        m_boundsMax.z = FLOAT_8032F8F0;
+        m_boundsMax.y = FLOAT_8032F8F0;
+        m_boundsMax.x = FLOAT_8032F8F0;
+    }
 
     Vec m_bottom;    // 0x00
     Vec m_top;       // 0x0c

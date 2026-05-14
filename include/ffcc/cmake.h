@@ -44,7 +44,7 @@ class CMenuPcs
 	void CmakeSexDraw();
 
 	void CmakeTribeOpen();
-	void CmakeTribeCtrl();
+	unsigned short CmakeTribeCtrl();
 	void CmakeTribeClose();
 	void CmakeTribeDraw();
 

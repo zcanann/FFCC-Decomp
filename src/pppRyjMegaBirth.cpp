@@ -80,6 +80,25 @@ static inline unsigned char clamp_alpha_7f(int value)
 	return (unsigned char)value;
 }
 
+static inline float calc_mesh_sample_t(u8 mode)
+{
+	switch (mode) {
+	case 1:
+		(void)Math.RandF();
+		return Math.RandF();
+	case 2:
+		return Math.RandF() * Math.RandF();
+	case 3:
+		return 1.0f - (Math.RandF() * Math.RandF() * Math.RandF());
+	case 4:
+		return Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF();
+	case 5:
+		return 1.0f - (Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF());
+	default:
+		return Math.RandF();
+	}
+}
+
 static inline float calc_spawn_speed(float speed, u8 mode)
 {
 	float halfSpeed = FLOAT_80330478 * speed;
@@ -794,31 +813,60 @@ void birth(
 		if ((mode == 2) || (mode == 3)) {
 			angle[0] = 0;
 			angle[1] = 0;
-			angle[2] = 0;
-			angle[3] = 0;
 		}
 
 		pppGetRotMatrixXYZ(rot, (pppIVECTOR4*)angle);
 		direction = (Vec*)(particlePayload + 0x10);
 		PSMTXMultVecSR(rot.value, &baseDirection, direction);
-		direction->x = direction->x * *f32_at(payload, 0xB0);
-		direction->y = direction->y * *f32_at(payload, 0xB4);
-		direction->z = direction->z * *f32_at(payload, 0xB8);
+		direction->x = direction->x * *f32_at(payload, 0xD8);
+		direction->y = direction->y * *f32_at(payload, 0xDC);
+		direction->z = direction->z * *f32_at(payload, 0xE0);
 		PSVECNormalize(direction, direction);
 	}
 
-	speed = *f32_at(payload, 0xBC);
+	speed = *f32_at(payload, 0xD4);
 	if (speed != kPppRyjMegaBirthZero) {
 		u8 speedMode = payload[0xE8];
 
-		if (mode < 6) {
-			*f32_at(particlePayload, 0x00) = calc_spawn_speed(speed, speedMode) * *f32_at(payload, 0xB0);
-			*f32_at(particlePayload, 0x04) = calc_spawn_speed(speed, speedMode) * *f32_at(payload, 0xB4);
-			*f32_at(particlePayload, 0x08) = calc_spawn_speed(speed, speedMode) * *f32_at(payload, 0xB8);
-		} else if (mode >= 10) {
+		if ((mode < 4) || (mode >= 10)) {
 			Vec* direction = (Vec*)(particlePayload + 0x10);
 			Vec* position = (Vec*)particlePayload;
 			PSVECScale(direction, position, calc_spawn_speed(speed, speedMode));
+		} else if (mode < 6) {
+			*f32_at(particlePayload, 0x00) = calc_spawn_speed(speed, speedMode) * *f32_at(payload, 0xD8);
+			*f32_at(particlePayload, 0x04) = calc_spawn_speed(speed, speedMode) * *f32_at(payload, 0xDC);
+			*f32_at(particlePayload, 0x08) = calc_spawn_speed(speed, speedMode) * *f32_at(payload, 0xE0);
+		} else if (mode < 10) {
+			s16 pathIndex = *s16_at(payload, 0xF0);
+			Vec* pathBase = *(Vec**)((u8*)pObject + 0x70);
+
+			if (pathIndex >= 0) {
+				s16* pathInfo = (s16*)(*(int*)&pppEnvStPtr->m_particleColors[1] + pathIndex * 8);
+
+				if (pathBase == NULL) {
+					pathBase = (Vec*)pppEnvStPtr->m_mapMeshPtr[pathInfo[0]]->m_vertices;
+				}
+
+				if (pathBase != NULL) {
+					u16 sampleIndex;
+
+					if ((u16)work->m_meshEmitIndex >= (u16)pathInfo[1]) {
+						work->m_meshEmitIndex = 0;
+					}
+
+					if ((speedMode == 0) || (speedMode >= 6)) {
+						sampleIndex = work->m_meshEmitIndex;
+						work->m_meshEmitIndex = sampleIndex + 1;
+					} else {
+						sampleIndex = (u16)((int)(calc_mesh_sample_t(speedMode) * (float)pathInfo[1]));
+					}
+
+					Vec* pathVec = pathBase + ((u16*)*(int*)(pathInfo + 2))[sampleIndex];
+					*f32_at(particlePayload, 0x00) = pathVec->x * *f32_at(payload, 0xD8);
+					*f32_at(particlePayload, 0x04) = pathVec->y * *f32_at(payload, 0xDC);
+					*f32_at(particlePayload, 0x08) = pathVec->z * *f32_at(payload, 0xE0);
+				}
+			}
 		}
 	}
 

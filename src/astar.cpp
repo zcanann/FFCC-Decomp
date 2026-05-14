@@ -829,8 +829,7 @@ void CAStar::check(int startGroup, int goalGroup, CATemp& temp)
 								level2.m_pathLength = pathLen1;
 								level2.m_cost = cost1;
 								level2.m_cost += PSVECDistance(&pos1->m_position, &m_portals[other1].m_position);
-								level2.m_path[level2.m_pathLength] = static_cast<unsigned char>(idx1);
-								++level2.m_pathLength;
+								level2.m_path[level2.m_pathLength++] = static_cast<unsigned char>(idx1);
 								level2.m_visited[other1] = 1;
 
 								if (other1 == goalGroup)
@@ -854,8 +853,7 @@ void CAStar::check(int startGroup, int goalGroup, CATemp& temp)
 											{
 												CATemp deeper(level2);
 												deeper.m_cost += edge->CalcLength(m_portals[nextGroup]);
-												deeper.m_path[deeper.m_pathLength] = static_cast<unsigned char>(idx2);
-												++deeper.m_pathLength;
+												deeper.m_path[deeper.m_pathLength++] = static_cast<unsigned char>(idx2);
 												check(nextGroup, goalGroup, deeper);
 											}
 										}
@@ -965,7 +963,7 @@ CAStar::CATemp::CATemp(const CAStar::CATemp& other)
 	dst[32] = v0;
 	m_cost = cost;
 }
-unsigned char CAStar::CAPos::GetOthers(int group)
+unsigned int CAStar::CAPos::GetOthers(int group)
 {
 	unsigned char others = m_groupA;
 
@@ -974,7 +972,7 @@ unsigned char CAStar::CAPos::GetOthers(int group)
 		others = m_groupB;
 	}
 
-	return (unsigned char)others;
+	return others;
 }
 /*
  * --INFO--

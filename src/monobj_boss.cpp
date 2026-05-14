@@ -2287,8 +2287,16 @@ void CGMonObj::initFinishedFuncMeteoParasite()
 void CGMonObj::changeStatFuncMeteoParasite(int stat)
 {
 	CGObject* object = reinterpret_cast<CGObject*>(this);
-	if (object->m_scriptHandle[4] == reinterpret_cast<void*>(0x87) && stat == 0x67) {
-		setActionParam__8CGMonObjFi(this, -13);
+	int scriptKind = reinterpret_cast<int>(object->m_scriptHandle[4]);
+	if (scriptKind == 0x87) {
+		if (stat == 0x67) {
+			CGMonObj* meteoC = *reinterpret_cast<CGMonObj**>(SoundBuffer_1260_ + 0x74);
+			if (*reinterpret_cast<int*>(reinterpret_cast<u8*>(meteoC) + 0x6D0) == 1) {
+				setActionParam__8CGMonObjFi(this, -13);
+			} else {
+				setActionParam__8CGMonObjFi(this, -14);
+			}
+		}
 	}
 }
 

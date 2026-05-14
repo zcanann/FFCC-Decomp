@@ -208,7 +208,6 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 {
 	int amemSize;
 	int arOffset;
-	int arOffsetArg;
 	int pitch;
 	int channel;
 	int sampleOffset;
@@ -229,11 +228,10 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 	} else {
 		arOffset = REDSOUND_STREAM_ARAM_HIGH_OFFSET;
 	}
-	arOffsetArg = arOffset;
-	streamData->m_aramBuffer = RedNewA(amemSize, 0, arOffsetArg);
+	streamData->m_aramBuffer = RedNewA(amemSize, 0, arOffset);
 	if (streamData->m_aramBuffer == 0) {
-		c_RedEntry.WaveOldClear(0, arOffsetArg);
-		streamData->m_aramBuffer = RedNewA(amemSize, 0, arOffsetArg);
+		c_RedEntry.WaveOldClear(0, arOffset);
+		streamData->m_aramBuffer = RedNewA(amemSize, 0, arOffset);
 	}
 
 	if ((streamData->m_track != 0) && (streamData->m_buffer != 0) && (streamData->m_aramBuffer != 0)) {

@@ -1103,19 +1103,6 @@ void CMenuPcs::SetAttrFmt(CMenuPcs::FMT fmt)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMenuPcs::DrawQuit()
-{
-	Mtx44 screenMtx;
-
-	PSMTX44Copy(reinterpret_cast<Mtx44Ptr>(reinterpret_cast<u8*>(&CameraPcs) + 0x94), screenMtx);
-	GXSetProjection(screenMtx, GX_PERSPECTIVE);
-}
-
-/*
- * --INFO--
  * PAL Address: 0x80095EE4
  * PAL Size: 116b
  * EN Address: TODO
@@ -1507,42 +1494,6 @@ void CMenuPcs::DrawRect(unsigned long attr, float x, float y, float w, float h, 
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::DrawBar(float x, float y, float width, CMenuPcs::TEX texBase, float alpha)
-{
-    if (width <= 0.0f) {
-        return;
-    }
-
-    const float capW = 8.0f;
-    const float barH = 8.0f;
-    float midW = width - (capW * 2.0f);
-    if (midW < 0.0f) {
-        midW = 0.0f;
-    }
-
-    GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_SET);
-    SetAttrFmt(FMT(0));
-
-    const u8 alphaU8 = static_cast<u8>(255.0f * alpha);
-    const CColor color(0xFF, 0xFF, 0xFF, alphaU8);
-    GXSetChanMatColor(GX_COLOR0A0, color.color);
-
-    const int tex = static_cast<int>(texBase);
-    SetTexture(static_cast<TEX>(tex));
-    DrawRect(0, x, y, capW, barH, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-
-    SetTexture(static_cast<TEX>(tex + 1));
-    DrawRect(0, x + capW, y, midW, barH, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-
-    SetTexture(static_cast<TEX>(tex + 2));
-    DrawRect(8, x + width - capW, y, capW, barH, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
 void CMenuPcs::DrawWindow(float x, float y, float width, float height, CMenuPcs::TEX texBase, float corner)
 {
 	if (width <= 0.0f || height <= 0.0f) {
@@ -1690,38 +1641,6 @@ void CMenuPcs::SetExtraFontTlut(int fontNo, _GXColor color)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMenuPcs::drawPause()
-{
-    if (((*reinterpret_cast<unsigned int*>(CFlat + 0x12A0) & 0x10) == 0) || (System.m_scenegraphStepMode != 2)) {
-        return;
-    }
-
-    CTexture* texture = m_textures[1];
-    TextureMan.SetTexture(GX_TEXMAP0, texture);
-
-    if (texture != nullptr) {
-        Mtx texMtx;
-        float width = static_cast<float>(texture->m_width);
-        float height = static_cast<float>(texture->m_height);
-        PSMTXScale(texMtx, 1.0f / width, 1.0f / height, 1.0f);
-        GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX2x4);
-        GXSetNumTexGens(1);
-        GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
-    }
-
-    TextureMan.SetTextureTev(texture);
-
-    int alpha = static_cast<int>(127.5f * (1.0f + sinf(System.m_frameCounter * FLOAT_80330848)));
-    CColor color(0xFF, 0xFF, 0xFF, static_cast<u8>(alpha));
-    GXSetChanMatColor(GX_COLOR0A0, color.color);
-    DrawRect(3, 0.0f, 0.0f, 640.0f, 480.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-}
-
-/*
- * --INFO--
  * PAL Address: 0x8009460c
  * PAL Size: 880b
  * EN Address: TODO
@@ -1808,76 +1727,6 @@ void CMenuPcs::createBattle()
 
     fontTexture->FlushExternalTlut(m_externalFontTlut);
     m_battleStateFlag = 0;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMenuPcs::destroyBattle()
-{
-    u8* self = reinterpret_cast<u8*>(this);
-    void** slot = reinterpret_cast<void**>(self + 0x1E4);
-    for (int i = 0; i < 10; i++, slot++) {
-        ReleaseRefObject(*slot);
-        *slot = nullptr;
-    }
-
-    slot = reinterpret_cast<void**>(self + 0x154);
-    for (int i = 0; i < 2; i++, slot++) {
-        ReleaseRefObject(*slot);
-        *slot = nullptr;
-    }
-
-    slot = reinterpret_cast<void**>(self + 0x13C);
-    for (int i = 0; i < 4; i++, slot++) {
-        ReleaseRefObject(*slot);
-        *slot = nullptr;
-    }
-
-    slot = reinterpret_cast<void**>(self + 0x10C);
-    for (int i = 0; i < 12; i++, slot++) {
-        ReleaseRefObject(*slot);
-        *slot = nullptr;
-    }
-
-    destroySingleMenu__8CMenuPcsFv(this);
-    destroyVillageMenu__8CMenuPcsFv(this);
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMenuPcs::calcBattle()
-{
-    for (int i = 0; i < 4; i++) {
-        Calc__5CMenuFv(m_battleRingMenus[i]);
-    }
-
-    for (int i = 0; i < 0xC; i++) {
-        Calc__5CMenuFv(reinterpret_cast<CMenu*>(m_battleMesMenus[i]));
-    }
-
-    int limit = m_battleHud.m_gaugeMax;
-    int value = m_battleHud.m_gaugeValue - 1;
-    if (value <= limit) {
-        int alt = m_battleHud.m_gaugeValue + 1;
-        value = limit;
-        if (alt < limit) {
-            value = alt;
-        }
-    }
-    m_battleHud.m_gaugeValue = value;
-
-    u32 counter = m_battleHud.m_fadeCounter - 1;
-    m_battleHud.m_fadeCounter = counter & ~((int)counter >> 31);
-    counter = m_battleHud.m_gaugeCounter - 1;
-    m_battleHud.m_gaugeCounter = counter & ~((int)counter >> 31);
-
-    calcVillageMenu__8CMenuPcsFv(this);
 }
 
 /*

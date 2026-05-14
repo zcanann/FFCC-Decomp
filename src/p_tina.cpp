@@ -570,16 +570,6 @@ unsigned int pppAmemRefCntError(unsigned long)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPartPcs::create0()
-{
-	// TODO
-}
-
-/*
- * --INFO--
  * PAL Address: 0x8005357c
  * PAL Size: 328b
  * EN Address: TODO
@@ -742,26 +732,6 @@ void CPartPcs::destroy()
     if (usb->m_stageExtra != 0) {
         DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, usb->m_stageExtra);
     }
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPartPcs::ChangeDataStage(CMemory::CStage*)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPartPcs::ResetDataStage()
-{
-	// TODO
 }
 
 /*
@@ -1368,16 +1338,6 @@ void CPartPcs::LoadFieldPdt(int mapId, int floorId, void* amemBase, unsigned lon
  * Address:	TODO
  * Size:	TODO
  */
-void loadPdtPtx(char*, void*, int, void*, int, int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
 int CPartPcs::LoadMonsterPdt(int monsterId, int variant, void* pdtData, int pdtCount, void* ptxData, int ptxCount)
 {
     int pdtSlotIndex;
@@ -1561,14 +1521,4 @@ void CPartPcs::EndMiruraEvent()
 {
     pppReleasePdt__8CPartMngFi(&PartMng, 7);
     m_usbStreamData.m_miruraEventActive = 0;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPartPcs::SetUSBData()
-{
-	// TODO
 }

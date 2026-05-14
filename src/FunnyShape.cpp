@@ -809,13 +809,3 @@ CFunnyShape::CFunnyShape()
     m_textureCount = 0;
 }
 
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CFunnyShape::SetDefaultStage()
-{
-	// TODO
-}

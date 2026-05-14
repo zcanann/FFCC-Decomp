@@ -931,46 +931,6 @@ CFlatRuntime::CObject* CFlatRuntime::createObject(int classIndex)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-int CFlatRuntime::getTopBit(unsigned int value)
-{
-	int bitBase = 0x1F;
-	int scanCount = 4;
-
-	do {
-		int bit = bitBase;
-		if ((((((value & 0x80000000) != 0) || ((bit = bitBase - 1), (value & 0x40000000) != 0))
-		      || ((bit = bitBase - 2), (value & 0x20000000) != 0))
-		     || (((bit = bitBase - 3), (value & 0x10000000) != 0)
-		         || ((bit = bitBase - 4), (value & 0x08000000) != 0)))
-		    || (((bit = bitBase - 5), (value & 0x04000000) != 0)
-		        || (((bit = bitBase - 6), (value & 0x02000000) != 0)
-		            || ((bit = bitBase - 7), (value & 0x01000000) != 0)))) {
-			return bit;
-		}
-
-		value <<= 8;
-		bitBase -= 8;
-		scanCount--;
-	} while (scanCount != 0);
-
-	return -1;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CFlatRuntime::searchFunc(int, int, int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
  * PAL Address: 0x800680b4
  * PAL Size: 1044b
  * EN Address: TODO
@@ -1385,16 +1345,6 @@ void CFlatRuntime::pop(CFlatRuntime::CObject*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CFlatRuntime::PrintCodeInfo()
-{
-	// TODO
-}
-
-/*
- * --INFO--
  * PAL Address: 0x800679DC
  * PAL Size: 516b
  * EN Address: TODO
@@ -1495,16 +1445,6 @@ void CFlatRuntime::GetCodeInfo(char* codeInfo)
 
 	*object->m_sp = result.u;
 	object->m_sp++;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CFlatRuntime::checkWB(void*)
-{
-	// TODO
 }
 
 /*
@@ -2038,16 +1978,6 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 void CFlatRuntime::ResetPerformance()
 {
 	memset(m_performanceBlock, 0, sizeof(m_performanceBlock));
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CFlatRuntime::PrintPerformance()
-{
-	// TODO
 }
 
 /*

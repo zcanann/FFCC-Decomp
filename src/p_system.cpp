@@ -5,6 +5,9 @@
 extern "C" void create__10CSystemPcsFv(CSystemPcs*);
 extern "C" void destroy__10CSystemPcsFv(CSystemPcs*);
 extern "C" void calc__10CSystemPcsFv(CSystemPcs*);
+extern const char __RTTI__8CManager_8032E608[];
+extern const char __RTTI__8CProcess_8032E610[];
+
 CSystemPcs SystemPcs;
 unsigned int m_table__10CSystemPcs[0x15C / sizeof(unsigned int)] = {
     reinterpret_cast<unsigned int>("CSystemPcs"),
@@ -19,6 +22,15 @@ unsigned int m_table__10CSystemPcs[0x15C / sizeof(unsigned int)] = {
     0,
     0x16,
     0x8
+};
+static unsigned int s_CSystemPcsTablePad0[3] = {
+    reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CManager_8032E608)), 0, 0};
+static unsigned int s_CSystemPcsTablePad1[5] = {
+    reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CManager_8032E608)),
+    0,
+    reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CProcess_8032E610)),
+    0,
+    0,
 };
 
 /*

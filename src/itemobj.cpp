@@ -64,44 +64,45 @@ extern "C" int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, C
 extern "C" void putParticle__8CGPrgObjFiiP3Vecfi(void*, int, int, Vec*, float, int);
 extern "C" void playSe3D__8CGPrgObjFiiiiP3Vec(void*, int, int, int, int, Vec*);
 extern "C" void pppSetLocSlot__8CPartMngFiP3Vec(void*, int, Vec*);
-extern float FLOAT_80331b20;
 extern float FLOAT_80331b1c;
-extern float FLOAT_80331b24;
-extern float FLOAT_80331b28;
-extern float FLOAT_80331b2c;
 extern const float FLOAT_80331b18;
-extern float FLOAT_80331b30;
-extern float FLOAT_80331b34;
-extern float FLOAT_80331b38;
-extern float FLOAT_80331b3c;
-extern float FLOAT_80331b40;
-extern float FLOAT_80331b4c;
-extern float FLOAT_80331b50;
-extern float FLOAT_80331b54;
-extern float FLOAT_80331b58;
-extern float FLOAT_80331b8c;
-extern float FLOAT_80331b90;
-extern float FLOAT_80331b94;
-extern float FLOAT_80331b98;
-extern float FLOAT_80331bb8;
-extern float FLOAT_80331bb0;
-extern float FLOAT_80331b9c;
-extern float FLOAT_80331bbc;
-extern float FLOAT_80331b78;
-extern float FLOAT_80331ba8;
-extern float FLOAT_80331bac;
-extern float FLOAT_80331bb4;
-extern float FLOAT_80331bc0;
-extern float FLOAT_80331bc4;
-extern float FLOAT_80331b68;
-extern double DOUBLE_80331ba0;
-extern double DOUBLE_80331b60;
-extern double DOUBLE_80331b70;
+extern const float FLOAT_80331b20 = 0.0f;
+extern const float FLOAT_80331b24 = -2000.0f;
+extern const float FLOAT_80331b28 = 10000000000.0f;
+extern const float FLOAT_80331b2c = -10000000000.0f;
+extern const float FLOAT_80331b30 = 255.0f;
+extern const float FLOAT_80331b34 = 224.0f;
+extern const float FLOAT_80331b38 = 320.0f;
+extern const float FLOAT_80331b3c = 0.5f;
+extern const float FLOAT_80331b40 = 11.0f;
+extern const char s_stand_80331B44[] = "stand";
+extern const float FLOAT_80331b4c = 1.0e-7f;
+extern const float FLOAT_80331b50 = 0.01f;
+extern const float FLOAT_80331b54 = 0.1f;
+extern const float FLOAT_80331b58 = 0.05f;
+extern const double DOUBLE_80331B60 = 4503599627370496.0;
+extern const float FLOAT_80331b68 = 0.125f;
+extern const double DOUBLE_80331B70 = 4503601774854144.0;
+extern const float FLOAT_80331B78 = 15.0f;
+extern const char DAT_80331b7c[] = "c_item3";
+extern const char DAT_80331b84[] = "l_item";
+extern const float FLOAT_80331b8c = 3.1415927410125732f;
+extern const float FLOAT_80331b90 = 3.0f;
+extern const float FLOAT_80331b94 = 8.0f;
+extern const float FLOAT_80331b98 = 50.0f;
+extern const float FLOAT_80331b9c = 1.5707963705062866f;
+extern const double DOUBLE_80331ba0 = 300.0;
+extern const float FLOAT_80331BA8 = 2.0f;
+extern const float FLOAT_80331BAC = 0.75f;
+extern const float FLOAT_80331bb0 = 0.8999999761581421f;
+extern const float FLOAT_80331BB4 = 0.20000000298023224f;
+extern const float FLOAT_80331bb8 = 20.0f;
+extern const float FLOAT_80331bbc = 0.25f;
+extern const float FLOAT_80331BC0 = 0.019999999552965164f;
+extern const float FLOAT_80331BC4 = 1.5f;
+extern const char DAT_80331bc8[] = "hip";
 u32 gItemObjCreateFlags;
 extern char SoundBuffer[];
-extern const char DAT_80331b7c[];
-extern const char DAT_80331b84[];
-extern char DAT_80331bc8[];
 static const char DAT_801dcec0[] = "num free item = %d\n";
 static const char DAT_801dced4[] = {
     (char)0x8F, (char)0xC1, (char)0x82, (char)0xB9, (char)0x82, (char)0xE9, (char)0x83, 0x49,
@@ -172,7 +173,6 @@ static const char DAT_801dcfec[] = {
     (char)0x81, 0x42, (char)0x0A, (char)0x00,
 };
 static const char s_f051_root_801dceb4[] = "f051_root";
-static const char s_stand_80331B44[] = "stand";
 extern "C" char m_aiWork__8CGMonObj[];
 
 struct ItemObjFlatTableEntry {
@@ -371,7 +371,7 @@ void CGItemObj::onFrame()
 
 			CVector zero(FLOAT_80331b20, FLOAT_80331b20, FLOAT_80331b20);
 			SetDamageCol__8CGObjectFiPcffP3Vec(
-			    this, 0, DAT_80331bc8, FLOAT_80331bb8, FLOAT_80331bb8, reinterpret_cast<Vec*>(&zero));
+			    this, 0, const_cast<char*>(DAT_80331bc8), FLOAT_80331bb8, FLOAT_80331bb8, reinterpret_cast<Vec*>(&zero));
 			*reinterpret_cast<unsigned int*>(&m_damageColliders[1].m_localPosition.x) = 8;
 			addSubStat__8CGPrgObjFv(this);
 		}
@@ -500,7 +500,7 @@ void CGItemObj::onFrameStat()
 					    1 < *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(carryObj->m_scriptHandle) + 0x3E0)) {
 						launchSpeed = FLOAT_80331b18;
 					} else {
-						launchSpeed = FLOAT_80331ba8;
+						launchSpeed = FLOAT_80331BA8;
 					}
 				} else {
 					launchSpeed = FLOAT_80331b90;
@@ -564,9 +564,9 @@ void CGItemObj::onFrameStat()
 			    prgObj->m_worldPosition.y;
 			prgObj->m_worldPosition.z =
 			    FLOAT_80331b54 * (carryObj->m_worldPosition.z - prgObj->m_worldPosition.z) + prgObj->m_worldPosition.z;
-			prgObj->m_rotationX = prgObj->m_rotationX * FLOAT_80331bac;
-			prgObj->m_rotationY = prgObj->m_rotationY * FLOAT_80331bac;
-			prgObj->m_rotationZ = prgObj->m_rotationZ * FLOAT_80331bac;
+			prgObj->m_rotationX = prgObj->m_rotationX * FLOAT_80331BAC;
+			prgObj->m_rotationY = prgObj->m_rotationY * FLOAT_80331BAC;
+			prgObj->m_rotationZ = prgObj->m_rotationZ * FLOAT_80331BAC;
 		}
 		break;
 	case 0x1b:
@@ -612,7 +612,7 @@ void CGItemObj::onFrameStat()
 			prgObj->m_bgColMask |= 0x80000;
 
 			CVector damageOffset(zero, zero, zero);
-			SetDamageCol__8CGObjectFiPcffP3Vec(this, 0, const_cast<char*>(s_f051_root_801dceb4), FLOAT_80331b78, FLOAT_80331b78,
+			SetDamageCol__8CGObjectFiPcffP3Vec(this, 0, const_cast<char*>(s_f051_root_801dceb4), FLOAT_80331B78, FLOAT_80331B78,
 			                                  reinterpret_cast<Vec*>(&damageOffset));
 			prgObj->m_damageColliders[1].m_localPosition.x = 9.0f;
 		}
@@ -646,15 +646,15 @@ void CGItemObj::onFrameStat()
 		prgObj->m_rotTargetY = prgObj->m_rotTargetY + FLOAT_80331b50;
 
 		if (prgObj->m_worldPosition.y < FLOAT_80331b1c) {
-			prgObj->m_groundHitOffset.y += FLOAT_80331bb4 * prgObj->m_moveTimer;
+			prgObj->m_groundHitOffset.y += FLOAT_80331BB4 * prgObj->m_moveTimer;
 		} else if (FLOAT_80331bb8 < prgObj->m_worldPosition.y) {
-			prgObj->m_groundHitOffset.y = -(FLOAT_80331bb4 * prgObj->m_moveTimer - prgObj->m_groundHitOffset.y);
+			prgObj->m_groundHitOffset.y = -(FLOAT_80331BB4 * prgObj->m_moveTimer - prgObj->m_groundHitOffset.y);
 		}
 
 		{
 			float timer = prgObj->m_moveTimer;
-			float minClamp = FLOAT_80331ba8 * -timer;
-			float maxClamp = FLOAT_80331ba8 * timer;
+			float minClamp = FLOAT_80331BA8 * -timer;
+			float maxClamp = FLOAT_80331BA8 * timer;
 			float current = prgObj->m_groundHitOffset.y;
 
 			if (minClamp <= current && current <= maxClamp) {
@@ -691,11 +691,11 @@ void CGItemObj::onFrameStat()
 			prgObj->m_groundHitOffset.y = zero;
 			prgObj->m_groundHitOffset.x = zero;
 		} else {
-			float moveScale = FLOAT_80331bc0 * prgObj->m_moveTimer;
+			float moveScale = FLOAT_80331BC0 * prgObj->m_moveTimer;
 
-			prgObj->m_groundHitOffset.x += FLOAT_80331bc4 * monTarget.x * moveScale;
-			prgObj->m_groundHitOffset.y += FLOAT_80331bc4 * monTarget.y * moveScale;
-			prgObj->m_groundHitOffset.z += FLOAT_80331bc4 * monTarget.z * moveScale;
+			prgObj->m_groundHitOffset.x += FLOAT_80331BC4 * monTarget.x * moveScale;
+			prgObj->m_groundHitOffset.y += FLOAT_80331BC4 * monTarget.y * moveScale;
+			prgObj->m_groundHitOffset.z += FLOAT_80331BC4 * monTarget.z * moveScale;
 		}
 		break;
 	}

@@ -805,6 +805,9 @@ int CGItemObj::DeleteOld(int deleteMask, int maxDeleteCount, CFlatRuntime::CObje
 		if (bestItemObj != 0) {
 			deleteObject__12CFlatRuntimeFPQ212CFlatRuntime7CObject(CFlat, bestItemObj);
 		} else {
+			if (System.m_execParam >= 3) {
+				Printf__7CSystemFPce(&System, const_cast<char*>(DAT_801dced4));
+			}
 			break;
 		}
 

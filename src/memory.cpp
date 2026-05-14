@@ -843,7 +843,7 @@ void CMemory::DestroyStage(CMemory::CStage* stage)
  */
 void* CMemory::_Alloc(unsigned long size, CMemory::CStage* stage, char* source, int line, int noError)
 {
-    return stage->alloc(size, source == (char*)nullptr ? DAT_8032f7d4 : source, line, noError);
+    return stage->alloc(size, source != (char*)nullptr ? source : DAT_8032f7d4, line, noError);
 }
 
 /*

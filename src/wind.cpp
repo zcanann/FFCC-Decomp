@@ -129,10 +129,10 @@ static inline float WindSqrtf(float x)
  */
 void CWind::ChangePower(int id, float power)
 {
-    WindObject* obj = m_objects;
+    WindObject* obj;
+    WindObject* scan = m_objects;
 
     for (int blocks = 8; blocks != 0; blocks--) {
-        WindObject* scan = obj;
         if (GetWindActiveFlag(scan) != 0) {
             if (id == scan->id) {
                 obj = scan;
@@ -157,7 +157,7 @@ void CWind::ChangePower(int id, float power)
                 goto found;
             }
         }
-        obj = scan + 1;
+        scan++;
     }
 
     obj = 0;

@@ -56,10 +56,16 @@ struct LocationTitle2AnimRaw {
     u16 m_frameCount;
 };
 
+struct LocationTitle2NodeRaw {
+    u8 m_pad0[0x14];
+    Mtx m_matrix;
+    u8 m_pad44[0x7C];
+};
+
 struct LocationTitle2ModelRaw {
     u8 m_pad0[0xA8];
-    u8* m_nodes;
-    u8 m_padA8[0x24];
+    LocationTitle2NodeRaw* m_nodes;
+    u8 m_padAC[0x24];
     LocationTitle2AnimRaw* m_anim;
 };
 
@@ -221,7 +227,7 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
     CChara::CModel* model;
     LocationTitle2Particle* particles;
     LocationTitle2ModelRaw* modelRaw;
-    u8* node;
+    LocationTitle2NodeRaw* node;
     float zOffset;
     Vec interp[21];
     int nodeIndex;
@@ -275,14 +281,14 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
 
         modelRaw = (LocationTitle2ModelRaw*)model;
         nodeIndex = SearchNode__Q26CChara6CModelFPc(model, const_cast<char*>(s_locationNodeName));
-        node = modelRaw->m_nodes + nodeIndex * 0xC0;
+        node = &modelRaw->m_nodes[nodeIndex];
         zOffset = 1.0f;
 
         for (u32 frameIndex = 0; frameIndex < modelRaw->m_anim->m_frameCount; frameIndex++) {
             CalcBind__Q26CChara5CNodeFPQ26CChara6CModel(node, model);
             SetFrame__Q26CChara6CModelFf((float)(s32)frameIndex, model);
             CalcMatrix__Q26CChara6CModelFv(model);
-            PSMTXCopy((float(*)[4])(node + 0x14), nodeMtx);
+            PSMTXCopy(node->m_matrix, nodeMtx);
 
             particles[work->m_count].m_pos.x = nodeMtx[0][3];
             particles[work->m_count].m_pos.y = nodeMtx[1][3];

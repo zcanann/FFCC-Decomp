@@ -226,8 +226,8 @@ void RedDelete(void* address)
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 176b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: UNUSED
+ * EN Size: 176b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -259,8 +259,8 @@ inline int RedResize(int address, int size)
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 48b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: UNUSED
+ * EN Size: 48b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -417,8 +417,8 @@ void RedDeleteA(void* address)
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 176b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: UNUSED
+ * EN Size: 176b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -450,8 +450,8 @@ inline int RedResizeA(int address, int size)
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 48b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: UNUSED
+ * EN Size: 48b
  * JP Address: TODO
  * JP Size: TODO
  */

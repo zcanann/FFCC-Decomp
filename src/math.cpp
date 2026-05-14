@@ -9,8 +9,8 @@ extern "C" double acos(double);
 
 extern "C" int rand(void);
 CMath Math;
-static Vec s_f_vpos;
-static Mtx s_f_lvmtx;
+Vec s_f_vpos;
+Mtx s_f_lvmtx;
 
 struct Vec4d {
     float x;

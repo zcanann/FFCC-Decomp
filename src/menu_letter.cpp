@@ -746,13 +746,17 @@ bool CMenuPcs::LetterClose()
 			if (frame < *reinterpret_cast<int*>(entry + 0x12) + *reinterpret_cast<int*>(entry + 0x14)) {
 				*reinterpret_cast<int*>(entry + 0x10) = *reinterpret_cast<int*>(entry + 0x10) + 1;
 				*reinterpret_cast<float*>(entry + 8) =
-					1.0f - static_cast<float>(*reinterpret_cast<int*>(entry + 0x10)) / static_cast<float>(*reinterpret_cast<int*>(entry + 0x14));
+				    static_cast<float>(DOUBLE_803330e8 -
+				                       (DOUBLE_803330e8 / static_cast<double>(static_cast<float>(*reinterpret_cast<int*>(entry + 0x14)))) *
+				                           static_cast<double>(static_cast<float>(*reinterpret_cast<int*>(entry + 0x10))));
 				if ((*reinterpret_cast<unsigned int*>(entry + 0x16) & 2) == 0) {
-					f = 1.0f - static_cast<float>(*reinterpret_cast<int*>(entry + 0x10)) / static_cast<float>(*reinterpret_cast<int*>(entry + 0x14));
+					f = static_cast<float>(DOUBLE_803330e8 -
+					                       (DOUBLE_803330e8 / static_cast<double>(static_cast<float>(*reinterpret_cast<int*>(entry + 0x14)))) *
+					                           static_cast<double>(static_cast<float>(*reinterpret_cast<int*>(entry + 0x10))));
 					*reinterpret_cast<float*>(entry + 0x18) =
-						(*reinterpret_cast<float*>(entry + 0x1C) - static_cast<float>(entry[0])) * f;
+					    (*reinterpret_cast<float*>(entry + 0x1C) - static_cast<float>(entry[0])) * f;
 					*reinterpret_cast<float*>(entry + 0x1A) =
-						(*reinterpret_cast<float*>(entry + 0x1E) - static_cast<float>(entry[1])) * f;
+					    (*reinterpret_cast<float*>(entry + 0x1E) - static_cast<float>(entry[1])) * f;
 				}
 			} else {
 				++finished;
@@ -837,9 +841,13 @@ void CMenuPcs::LetterLstClose()
 			if (frame < *reinterpret_cast<int*>(panel + 0x12) + *reinterpret_cast<int*>(panel + 0x14)) {
 				*reinterpret_cast<int*>(panel + 0x10) = *reinterpret_cast<int*>(panel + 0x10) + 1;
 				*reinterpret_cast<float*>(panel + 8) =
-				    1.0f - static_cast<float>(*reinterpret_cast<int*>(panel + 0x10)) / static_cast<float>(*reinterpret_cast<int*>(panel + 0x14));
+				    static_cast<float>(DOUBLE_803330e8 -
+				                       (DOUBLE_803330e8 / static_cast<double>(static_cast<float>(*reinterpret_cast<int*>(panel + 0x14)))) *
+				                           static_cast<double>(static_cast<float>(*reinterpret_cast<int*>(panel + 0x10))));
 				if ((*reinterpret_cast<unsigned int*>(panel + 0x16) & 2) == 0) {
-					f = 1.0f - static_cast<float>(*reinterpret_cast<int*>(panel + 0x10)) / static_cast<float>(*reinterpret_cast<int*>(panel + 0x14));
+					f = static_cast<float>(DOUBLE_803330e8 -
+					                       (DOUBLE_803330e8 / static_cast<double>(static_cast<float>(*reinterpret_cast<int*>(panel + 0x14)))) *
+					                           static_cast<double>(static_cast<float>(*reinterpret_cast<int*>(panel + 0x10))));
 					*reinterpret_cast<float*>(panel + 0x18) =
 					    (*reinterpret_cast<float*>(panel + 0x1C) - static_cast<float>(panel[0])) * f;
 					*reinterpret_cast<float*>(panel + 0x1A) =
@@ -947,9 +955,13 @@ int CMenuPcs::LetterMessClose()
 				if (frame < *reinterpret_cast<int*>(panel + 0x12) + *reinterpret_cast<int*>(panel + 0x14)) {
 					*reinterpret_cast<int*>(panel + 0x10) = *reinterpret_cast<int*>(panel + 0x10) + 1;
 					*reinterpret_cast<float*>(panel + 8) =
-					    1.0f - static_cast<float>(*reinterpret_cast<int*>(panel + 0x10)) / static_cast<float>(*reinterpret_cast<int*>(panel + 0x14));
+					    static_cast<float>(DOUBLE_803330e8 -
+					                       (DOUBLE_803330e8 / static_cast<double>(static_cast<float>(*reinterpret_cast<int*>(panel + 0x14)))) *
+					                           static_cast<double>(static_cast<float>(*reinterpret_cast<int*>(panel + 0x10))));
 					if ((*reinterpret_cast<unsigned int*>(panel + 0x16) & 2) == 0) {
-						f = 1.0f - static_cast<float>(*reinterpret_cast<int*>(panel + 0x10)) / static_cast<float>(*reinterpret_cast<int*>(panel + 0x14));
+						f = static_cast<float>(DOUBLE_803330e8 -
+						                       (DOUBLE_803330e8 / static_cast<double>(static_cast<float>(*reinterpret_cast<int*>(panel + 0x14)))) *
+						                           static_cast<double>(static_cast<float>(*reinterpret_cast<int*>(panel + 0x10))));
 						*reinterpret_cast<float*>(panel + 0x18) =
 						    (*reinterpret_cast<float*>(panel + 0x1C) - static_cast<float>(panel[0])) * f;
 						*reinterpret_cast<float*>(panel + 0x1A) =

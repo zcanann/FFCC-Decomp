@@ -2747,7 +2747,8 @@ int CRedDriver::SetSeSepData(void* seSepData)
           (header->m_signature[2] == REDSOUND_SESEP_SIGNATURE_2)) &&
          ((header->m_signature[3] == REDSOUND_SESEP_SIGNATURE_3 &&
            (header->m_signature[4] == REDSOUND_SESEP_SIGNATURE_4))))) {
-        headerSize = header->m_sizeAndFlags & REDSOUND_SESEP_SIZE_MASK;
+        headerSize = ((RedSeSepHEAD*)seSepData)->m_sizeAndFlags;
+        headerSize &= REDSOUND_SESEP_SIZE_MASK;
         header = (RedSeSepHEAD*)RedNew(headerSize);
         if (header != 0) {
             memcpy(header, seSepData, headerSize);

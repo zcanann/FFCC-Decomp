@@ -2256,23 +2256,22 @@ int CRedDriver::GetSoundMode()
  */
 int CRedDriver::SetMusicData(void* musicData)
 {
-    int result;
-    RedMusicHEAD localHeader;
-    RedMusicHEAD* const header = (RedMusicHEAD*)musicData;
-    RedMusicHEAD* copiedHeader;
     int headerSize;
+    int result;
+    RedMusicHEAD* header = (RedMusicHEAD*)musicData;
+    RedMusicHEAD localHeader;
 
     result = REDSOUND_MUSIC_ID_NONE;
     if (((header->m_signature[0] == REDSOUND_MUSIC_SIGNATURE_0) &&
          (header->m_signature[1] == REDSOUND_MUSIC_SIGNATURE_1)) &&
         (header->m_signature[2] == REDSOUND_MUSIC_SIGNATURE_2)) {
-        memcpy(&localHeader, header, REDSOUND_MUSIC_HEADER_SIZE);
+        memcpy(&localHeader, musicData, REDSOUND_MUSIC_HEADER_SIZE);
         headerSize = localHeader.m_size;
-        copiedHeader = (RedMusicHEAD*)RedNew(headerSize);
-        if (copiedHeader != 0) {
-            memcpy(copiedHeader, header, headerSize);
+        header = (RedMusicHEAD*)RedNew(headerSize);
+        if (header != 0) {
+            memcpy(header, musicData, headerSize);
             result = localHeader.m_musicNo;
-            _EntryExecCommand(_SetMusicData, (int)copiedHeader, 0, 0, 0, 0, 0, 0);
+            _EntryExecCommand(_SetMusicData, (int)header, 0, 0, 0, 0, 0, 0);
         }
     } else if (m_ReportPrint != REDSOUND_REPORT_PRINT_OFF) {
         OSReport(sRedDriverMusicHeaderErrorFmt, sRedDriverLogPrefix, sRedDriverLogWarnColor, sRedDriverLogReset);
@@ -2727,10 +2726,9 @@ void* CRedDriver::SetSeBlockData(int blockIndex, void* seBlockData)
  */
 int CRedDriver::SetSeSepData(void* seSepData)
 {
-    int result = REDSOUND_SESEP_ID_NONE;
-    RedSeSepHEAD* const header = (RedSeSepHEAD*)seSepData;
-    RedSeSepHEAD* copiedHeader;
     int headerSize;
+    int result = REDSOUND_SESEP_ID_NONE;
+    RedSeSepHEAD* header = (RedSeSepHEAD*)seSepData;
 
     if (((((header->m_signature[0] == REDSOUND_SESEP_SIGNATURE_0) &&
            (header->m_signature[1] == REDSOUND_SESEP_SIGNATURE_1)) &&
@@ -2738,11 +2736,11 @@ int CRedDriver::SetSeSepData(void* seSepData)
          ((header->m_signature[3] == REDSOUND_SESEP_SIGNATURE_3 &&
            (header->m_signature[4] == REDSOUND_SESEP_SIGNATURE_4))))) {
         headerSize = header->m_sizeAndFlags & REDSOUND_SESEP_SIZE_MASK;
-        copiedHeader = (RedSeSepHEAD*)RedNew(headerSize);
-        if (copiedHeader != 0) {
-            memcpy(copiedHeader, header, headerSize);
-            result = copiedHeader->m_seNo;
-            _EntryExecCommand(_SetSeSepData, (int)copiedHeader, 0, 0, 0, 0, 0, 0);
+        header = (RedSeSepHEAD*)RedNew(headerSize);
+        if (header != 0) {
+            memcpy(header, seSepData, headerSize);
+            result = header->m_seNo;
+            _EntryExecCommand(_SetSeSepData, (int)header, 0, 0, 0, 0, 0, 0);
         }
     } else if (m_ReportPrint != REDSOUND_REPORT_PRINT_OFF) {
         OSReport(sRedDriverSeSepHeaderErrorFmt, sRedDriverLogPrefix,

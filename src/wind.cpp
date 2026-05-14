@@ -14,20 +14,6 @@
 
 CWind Wind;
 
-/*
- * --INFO--
- * PAL Address: TODO
- * PAL Size: 8b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int CMenuPcs::GetMenuMode()
-{
-    return m_mode;
-}
-
 extern int __float_nan[];
 extern "C" double cos(double);
 extern "C" double sin(double);
@@ -447,7 +433,7 @@ void CWind::Calc(Vec* out, const Vec* pos, int randomize)
     out->y = zero;
     out->x = zero;
 
-    if ((MenuPcs.GetMenuMode() == 2) || (Game.m_gameWork.m_gamePaused != 0)) {
+    if ((MenuPcs.m_mode == 2) || (Game.m_gameWork.m_gamePaused != 0)) {
         return;
     }
 

@@ -2021,6 +2021,10 @@ CRedDriver::~CRedDriver()
 void CRedDriver::Init()
 {
     RedTrackDATA* seTrackArena;
+    RedDmaRequest* dmaControl;
+    unsigned int* mute;
+    int* editorVoice;
+    int allocSize;
     int nextIndex;
     int index;
     int fullVolume;
@@ -2031,10 +2035,13 @@ void CRedDriver::Init()
     m_ReportPrint = REDSOUND_REPORT_PRINT_ON;
     m_SoundMode = REDSOUND_SOUND_MODE_STEREO;
     GetSoundMode();
-    if (m_SoundPlayMode != REDSOUND_SOUND_MODE_SURROUND) {
-        AXSetMode(REDSOUND_SOUND_MODE_STEREO);
-    } else {
+    switch (m_SoundPlayMode) {
+    case REDSOUND_SOUND_MODE_SURROUND:
         AXSetMode(REDSOUND_SOUND_MODE_SURROUND);
+        break;
+    default:
+        AXSetMode(REDSOUND_SOUND_MODE_STEREO);
+        break;
     }
     p_Tick = (RedTickHistory*)RedNew(REDSOUND_TICK_HISTORY_SIZE);
     memset(p_Tick, 0, REDSOUND_TICK_HISTORY_SIZE);
@@ -2061,13 +2068,15 @@ void CRedDriver::Init()
     memset(p_MusicTempoControl, 0, REDSOUND_CONTROL_RAMP_SIZE);
     p_MusicPitchControl = (RedControlRamp*)RedNew(REDSOUND_CONTROL_RAMP_SIZE);
     memset(p_MusicPitchControl, 0, REDSOUND_CONTROL_RAMP_SIZE);
-    p_ExecCommand = (RedExecCommand*)RedNew(REDSOUND_EXEC_COMMAND_BUFFER_SIZE);
+    allocSize = REDSOUND_EXEC_COMMAND_BUFFER_SIZE;
+    p_ExecCommand = (RedExecCommand*)RedNew(allocSize);
     p_ExecCommandNow = p_ExecCommand;
     p_ExecCommandOld = p_ExecCommand;
-    memset(p_ExecCommand, 0, REDSOUND_EXEC_COMMAND_BUFFER_SIZE);
-    p_SoundControlBuffer = (RedSoundCONTROL*)RedNew(REDSOUND_SOUND_CONTROL_ALLOC_SIZE);
+    memset(p_ExecCommand, 0, allocSize);
+    allocSize = REDSOUND_SOUND_CONTROL_ALLOC_SIZE;
+    p_SoundControlBuffer = (RedSoundCONTROL*)RedNew(allocSize);
     p_SoundControl = p_SoundControlBuffer;
-    memset(p_SoundControlBuffer, 0, REDSOUND_SOUND_CONTROL_ALLOC_SIZE);
+    memset(p_SoundControlBuffer, 0, allocSize);
     fullVolume = REDSOUND_MASTER_VOLUME_FULL_FIXED;
     noMusicId = REDSOUND_MUSIC_ID_NONE;
     p_SoundControl[REDSOUND_CONTROL_SE].m_volume = fullVolume;
@@ -2091,8 +2100,9 @@ void CRedDriver::Init()
         p_VoiceData[index].m_voiceIndex = nextIndex;
         index = index + 1;
     } while (index < REDSOUND_VOICE_COUNT);
-    p_EditorVoice[REDSOUND_EDITOR_VOICE_RIGHT] = 0;
-    p_EditorVoice[REDSOUND_EDITOR_VOICE_LEFT] = 0;
+    editorVoice = p_EditorVoice;
+    editorVoice[REDSOUND_EDITOR_VOICE_RIGHT] = 0;
+    editorVoice[REDSOUND_EDITOR_VOICE_LEFT] = 0;
     seTrackArena = (RedTrackDATA*)RedNew(REDSOUND_SE_TRACK_ARENA_SIZE);
     p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks = seTrackArena;
     memset(seTrackArena, 0, REDSOUND_SE_TRACK_ARENA_SIZE);
@@ -2105,19 +2115,21 @@ void CRedDriver::Init()
     memset(p_EditorTrack, 0, REDSOUND_TRACK_SIZE);
     p_ReverbDepth = (RedReverbDepth*)RedNew(REDSOUND_REVERB_DEPTH_BUFFER_SIZE);
     memset(p_ReverbDepth, 0, REDSOUND_REVERB_DEPTH_BUFFER_SIZE);
-    m_Mute[REDSOUND_MUTE_HIGH_WORD] = 0;
-    m_Mute[REDSOUND_MUTE_LOW_WORD] = 0;
+    mute = m_Mute;
+    mute[REDSOUND_MUTE_HIGH_WORD] = 0;
+    mute[REDSOUND_MUTE_LOW_WORD] = 0;
     p_MusicNextPlay = (RedMusicPlayCommand*)RedNew(REDSOUND_MUSIC_NEXT_PLAY_BUFFER_SIZE);
     p_MusicNextPlay->m_musicId = REDSOUND_MUSIC_ID_NONE;
     m_MusicPhraseStop = REDSOUND_MUSIC_PHRASE_STOP_OFF;
     p_Stream = (RedStreamDATA*)RedNew(REDSOUND_STREAM_BUFFER_SIZE);
     memset(p_Stream, 0, REDSOUND_STREAM_BUFFER_SIZE);
     m_DMAMode = 0;
-    memset(m_DmaControl, 0, REDSOUND_DMA_CONTROL_SIZE);
-    p_DmaControlNow[REDSOUND_DMA_MAIN_QUEUE_INDEX] = RedDriverMainDmaQueue();
-    p_DmaControlOld[REDSOUND_DMA_MAIN_QUEUE_INDEX] = RedDriverMainDmaQueue();
-    p_DmaControlNow[REDSOUND_DMA_STREAM_QUEUE_INDEX] = RedDriverStreamDmaQueue();
-    p_DmaControlOld[REDSOUND_DMA_STREAM_QUEUE_INDEX] = RedDriverStreamDmaQueue();
+    dmaControl = RedDriverMainDmaQueue();
+    memset(dmaControl, 0, REDSOUND_DMA_CONTROL_SIZE);
+    p_DmaControlNow[REDSOUND_DMA_MAIN_QUEUE_INDEX] = dmaControl;
+    p_DmaControlOld[REDSOUND_DMA_MAIN_QUEUE_INDEX] = dmaControl;
+    p_DmaControlNow[REDSOUND_DMA_STREAM_QUEUE_INDEX] = dmaControl + REDSOUND_DMA_QUEUE_ENTRY_COUNT;
+    p_DmaControlOld[REDSOUND_DMA_STREAM_QUEUE_INDEX] = dmaControl + REDSOUND_DMA_QUEUE_ENTRY_COUNT;
     m_RedMasterTime = 0;
     AXRegisterCallback(_RedAXCallback);
     AXFXSetHooks(ReverbAreaAlloc, ReverbAreaFree);

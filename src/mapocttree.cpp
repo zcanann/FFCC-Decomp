@@ -1045,8 +1045,8 @@ void COctTree::ClearLight()
 void InsertLight_r(COctNode* node)
 {
 	float boundMinX = node->m_boundMinX;
-	int overlap = false;
-	int xyOverlap = false;
+	bool overlap = false;
+	bool xyOverlap = false;
 	int xOverlap = false;
 
 	if (boundMinX < s_bound.m_min.x) {
@@ -1078,15 +1078,15 @@ void InsertLight_r(COctNode* node)
 	if (xyOverlap) {
 		float boundMinZ = node->m_boundMinZ;
 		if (boundMinZ < s_bound.m_min.z) {
-			xyOverlap = s_bound.m_min.z <= node->m_boundMaxZ;
+			xOverlap = s_bound.m_min.z <= node->m_boundMaxZ;
 		} else {
 			if (boundMinZ > s_bound.m_min.z) {
-				xyOverlap = boundMinZ <= s_bound.m_max.z;
+				xOverlap = boundMinZ <= s_bound.m_max.z;
 			} else {
-				xyOverlap = true;
+				xOverlap = true;
 			}
 		}
-		if (xyOverlap) {
+		if (xOverlap) {
 			overlap = true;
 		}
 	}
@@ -1109,8 +1109,8 @@ void InsertLight_r(COctNode* node)
 		}
 
 		float childBoundMinX = child->m_boundMinX;
-		int childOverlap = false;
-		int childXYOverlap = false;
+		bool childOverlap = false;
+		bool childXYOverlap = false;
 		int childXOverlap = false;
 		if (childBoundMinX < s_bound.m_min.x) {
 			childXOverlap = s_bound.m_min.x <= child->m_boundMaxX;
@@ -1141,15 +1141,15 @@ void InsertLight_r(COctNode* node)
 		if (childXYOverlap) {
 			float childBoundMinZ = child->m_boundMinZ;
 			if (childBoundMinZ < s_bound.m_min.z) {
-				childXYOverlap = s_bound.m_min.z <= child->m_boundMaxZ;
+				childXOverlap = s_bound.m_min.z <= child->m_boundMaxZ;
 			} else {
 				if (childBoundMinZ > s_bound.m_min.z) {
-					childXYOverlap = childBoundMinZ <= s_bound.m_max.z;
+					childXOverlap = childBoundMinZ <= s_bound.m_max.z;
 				} else {
-					childXYOverlap = true;
+					childXOverlap = true;
 				}
 			}
-			if (childXYOverlap) {
+			if (childXOverlap) {
 				childOverlap = true;
 			}
 		}
@@ -1353,8 +1353,8 @@ void COctTree::ClearShadow()
 void InsertShadow_r(COctNode* node)
 {
 	float boundMinX = node->m_boundMinX;
-	int overlap = false;
-	int xyOverlap = false;
+	bool overlap = false;
+	bool xyOverlap = false;
 	int xOverlap = false;
 
 	if (boundMinX < s_bound.m_min.x) {
@@ -1386,15 +1386,15 @@ void InsertShadow_r(COctNode* node)
 	if (xyOverlap) {
 		float boundMinZ = node->m_boundMinZ;
 		if (boundMinZ < s_bound.m_min.z) {
-			xyOverlap = s_bound.m_min.z <= node->m_boundMaxZ;
+			xOverlap = s_bound.m_min.z <= node->m_boundMaxZ;
 		} else {
 			if (boundMinZ > s_bound.m_min.z) {
-				xyOverlap = boundMinZ <= s_bound.m_max.z;
+				xOverlap = boundMinZ <= s_bound.m_max.z;
 			} else {
-				xyOverlap = true;
+				xOverlap = true;
 			}
 		}
-		if (xyOverlap) {
+		if (xOverlap) {
 			overlap = true;
 		}
 	}
@@ -1419,8 +1419,8 @@ void InsertShadow_r(COctNode* node)
 		s_light_no++;
 
 		float childBoundMinX = child->m_boundMinX;
-		int childOverlap = false;
-		int childXYOverlap = false;
+		bool childOverlap = false;
+		bool childXYOverlap = false;
 		int childXOverlap = false;
 		if (childBoundMinX < s_bound.m_min.x) {
 			childXOverlap = s_bound.m_min.x <= child->m_boundMaxX;
@@ -1451,15 +1451,15 @@ void InsertShadow_r(COctNode* node)
 		if (childXYOverlap) {
 			float childBoundMinZ = child->m_boundMinZ;
 			if (childBoundMinZ < s_bound.m_min.z) {
-				childXYOverlap = s_bound.m_min.z <= child->m_boundMaxZ;
+				childXOverlap = s_bound.m_min.z <= child->m_boundMaxZ;
 			} else {
 				if (childBoundMinZ > s_bound.m_min.z) {
-					childXYOverlap = childBoundMinZ <= s_bound.m_max.z;
+					childXOverlap = childBoundMinZ <= s_bound.m_max.z;
 				} else {
-					childXYOverlap = true;
+					childXOverlap = true;
 				}
 			}
-			if (childXYOverlap) {
+			if (childXOverlap) {
 				childOverlap = true;
 			}
 		}
@@ -1725,15 +1725,15 @@ int COctTree::CheckHitCylinder_r(COctNode* node)
 	if (xyOverlap) {
 		float boundMinZ = node->m_boundMinZ;
 		if (boundMinZ < *reinterpret_cast<float*>(Ptr(&s_cyl, 0x30))) {
-			xyOverlap = *reinterpret_cast<float*>(Ptr(&s_cyl, 0x30)) <= node->m_boundMaxZ;
+			xOverlap = *reinterpret_cast<float*>(Ptr(&s_cyl, 0x30)) <= node->m_boundMaxZ;
 		} else {
 			if (boundMinZ > *reinterpret_cast<float*>(Ptr(&s_cyl, 0x30))) {
-				xyOverlap = boundMinZ <= *reinterpret_cast<float*>(Ptr(&s_cyl, 0x3C));
+				xOverlap = boundMinZ <= *reinterpret_cast<float*>(Ptr(&s_cyl, 0x3C));
 			} else {
-				xyOverlap = true;
+				xOverlap = true;
 			}
 		}
-		if (xyOverlap) {
+		if (xOverlap) {
 			overlap = true;
 		}
 	}
@@ -1756,8 +1756,8 @@ int COctTree::CheckHitCylinder_r(COctNode* node)
 			}
 
 			float childBoundMinX = child->m_boundMinX;
-			int childOverlap = false;
-			int childXYOverlap = false;
+			bool childOverlap = false;
+			bool childXYOverlap = false;
 			int childXOverlap = false;
 			if (childBoundMinX < *reinterpret_cast<float*>(Ptr(&s_cyl, 0x28))) {
 				childXOverlap = *reinterpret_cast<float*>(Ptr(&s_cyl, 0x28)) <= child->m_boundMaxX;
@@ -1788,15 +1788,15 @@ int COctTree::CheckHitCylinder_r(COctNode* node)
 			if (childXYOverlap) {
 				float childBoundMinZ = child->m_boundMinZ;
 				if (childBoundMinZ < *reinterpret_cast<float*>(Ptr(&s_cyl, 0x30))) {
-					childXYOverlap = *reinterpret_cast<float*>(Ptr(&s_cyl, 0x30)) <= child->m_boundMaxZ;
+					childXOverlap = *reinterpret_cast<float*>(Ptr(&s_cyl, 0x30)) <= child->m_boundMaxZ;
 				} else {
 					if (childBoundMinZ > *reinterpret_cast<float*>(Ptr(&s_cyl, 0x30))) {
-						childXYOverlap = childBoundMinZ <= *reinterpret_cast<float*>(Ptr(&s_cyl, 0x3C));
+						childXOverlap = childBoundMinZ <= *reinterpret_cast<float*>(Ptr(&s_cyl, 0x3C));
 					} else {
-						childXYOverlap = true;
+						childXOverlap = true;
 					}
 				}
-				if (childXYOverlap) {
+				if (childXOverlap) {
 					childOverlap = true;
 				}
 			}
@@ -1930,8 +1930,8 @@ int COctTree::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long 
 void COctTree::CheckHitCylinderNear_r(COctNode* octNode)
 {
 	float boundMinX = octNode->m_boundMinX;
-	int overlap = false;
-	int xyOverlap = false;
+	bool overlap = false;
+	bool xyOverlap = false;
 	int xOverlap = false;
 
 	if (boundMinX < *reinterpret_cast<float*>(Ptr(&s_cyl, 0x28))) {
@@ -1963,15 +1963,15 @@ void COctTree::CheckHitCylinderNear_r(COctNode* octNode)
 	if (xyOverlap) {
 		float boundMinZ = octNode->m_boundMinZ;
 		if (boundMinZ < *reinterpret_cast<float*>(Ptr(&s_cyl, 0x30))) {
-			xyOverlap = *reinterpret_cast<float*>(Ptr(&s_cyl, 0x30)) <= octNode->m_boundMaxZ;
+			xOverlap = *reinterpret_cast<float*>(Ptr(&s_cyl, 0x30)) <= octNode->m_boundMaxZ;
 		} else {
 			if (boundMinZ > *reinterpret_cast<float*>(Ptr(&s_cyl, 0x30))) {
-				xyOverlap = boundMinZ <= *reinterpret_cast<float*>(Ptr(&s_cyl, 0x3C));
+				xOverlap = boundMinZ <= *reinterpret_cast<float*>(Ptr(&s_cyl, 0x3C));
 			} else {
-				xyOverlap = true;
+				xOverlap = true;
 			}
 		}
-		if (xyOverlap) {
+		if (xOverlap) {
 			overlap = true;
 		}
 	}
@@ -1995,8 +1995,8 @@ void COctTree::CheckHitCylinderNear_r(COctNode* octNode)
 		}
 
 		float childBoundMinX = child->m_boundMinX;
-		int childOverlap = false;
-		int childXYOverlap = false;
+		bool childOverlap = false;
+		bool childXYOverlap = false;
 		int childXOverlap = false;
 		if (childBoundMinX < *reinterpret_cast<float*>(Ptr(&s_cyl, 0x28))) {
 			childXOverlap = *reinterpret_cast<float*>(Ptr(&s_cyl, 0x28)) <= child->m_boundMaxX;
@@ -2027,15 +2027,15 @@ void COctTree::CheckHitCylinderNear_r(COctNode* octNode)
 		if (childXYOverlap) {
 			float childBoundMinZ = child->m_boundMinZ;
 			if (childBoundMinZ < *reinterpret_cast<float*>(Ptr(&s_cyl, 0x30))) {
-				childXYOverlap = *reinterpret_cast<float*>(Ptr(&s_cyl, 0x30)) <= child->m_boundMaxZ;
+				childXOverlap = *reinterpret_cast<float*>(Ptr(&s_cyl, 0x30)) <= child->m_boundMaxZ;
 			} else {
 				if (childBoundMinZ > *reinterpret_cast<float*>(Ptr(&s_cyl, 0x30))) {
-					childXYOverlap = childBoundMinZ <= *reinterpret_cast<float*>(Ptr(&s_cyl, 0x3C));
+					childXOverlap = childBoundMinZ <= *reinterpret_cast<float*>(Ptr(&s_cyl, 0x3C));
 				} else {
-					childXYOverlap = true;
+					childXOverlap = true;
 				}
 			}
-			if (childXYOverlap) {
+			if (childXOverlap) {
 				childOverlap = true;
 			}
 		}
@@ -2186,7 +2186,7 @@ int CBound::CheckCross(CBound& other)
 {
 	bool overlap;
 	bool xyOverlap;
-	bool xOverlap;
+	int xOverlap;
 
 	overlap = false;
 	xyOverlap = false;
@@ -2218,16 +2218,16 @@ int CBound::CheckCross(CBound& other)
 
 	if (xyOverlap) {
 		if (m_min.z < other.m_min.z) {
-			xyOverlap = other.m_min.z <= m_max.z;
+			xOverlap = other.m_min.z <= m_max.z;
 		} else {
 			if (m_min.z > other.m_min.z) {
-				xyOverlap = m_min.z <= other.m_max.z;
+				xOverlap = m_min.z <= other.m_max.z;
 			} else {
-				xyOverlap = true;
+				xOverlap = true;
 			}
 		}
 
-		if (xyOverlap) {
+		if (xOverlap) {
 			overlap = true;
 		}
 	}

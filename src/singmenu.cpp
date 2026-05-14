@@ -139,7 +139,6 @@ extern "C" char* PTR_s_Masculin_802144c4[];
 extern "C" char* PTR_DAT_80214224[];
 extern "C" char DAT_80332958[];
 extern "C" char DAT_8033295c[];
-extern "C" int DAT_802381a7;
 extern "C" char* PTR_s_Blacksmith[];
 extern "C" char* PTR_s_Schmied[];
 extern "C" char* PTR_s_Fabbri[];
@@ -1063,8 +1062,7 @@ void CMenuPcs::destroySingleMenu()
         *reinterpret_cast<void**>(self + 0x848) = 0;
     }
 
-    _GXColor clearColor = *reinterpret_cast<_GXColor*>(&DAT_802381a7);
-    GXSetCopyClear(clearColor, 0xFFFFFF);
+    GXSetCopyClear(Graphic.m_defaultCopyClearColor, 0xFFFFFF);
 }
 
 /*

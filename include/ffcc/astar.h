@@ -17,7 +17,7 @@ public:
 	{
 	public:
 		float CalcLength(CAPos&);
-		unsigned char GetOthers(int group);
+		unsigned int GetOthers(int group);
 		int IsExist(int group);
 
 		Vec m_position;         // 0x0

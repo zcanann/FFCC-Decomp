@@ -125,25 +125,34 @@ extern char DAT_80332d40[];
 extern char DAT_80332d44[];
 extern char DAT_80332d4c[];
 extern char DAT_80332d50[];
-extern char* PTR_DAT_80214d90[];
-extern char* PTR_DAT_80214d94[];
-extern char* PTR_s_Cancel_80214d98[];
-extern char* PTR_DAT_80214d9c[];
-extern char* PTR_s_Blacksmith_80214da0[];
-extern char* PTR_DAT_80214da4[];
-extern char* PTR_s_Price_80214dc4[];
-extern char* PTR_s_Money_80214db0[];
-extern char* PTR_DAT_80214da8[];
-extern char* PTR_s_Materials_80214db4[];
-extern char* PTR_s_Stock_80214db8[];
-extern char* PTR_s_Craft_80214dbc[];
-extern char* PTR_s_Equip_80214dc0[];
-extern char* PTR_s_Cannot_buy_80214dc8[];
-extern char* PTR_s_Cannot_sell_80214dcc[];
-extern char* PTR_s_Cannot_be_crafted_here__80214de0[];
-extern char* PTR_s_Quantity_80214dd0[];
-extern char* PTR_s_Strength_80214dd4[];
-extern char* PTR_s_Defence_80214dd8[];
+extern "C" char* g_strShopMenuMes[];
+
+enum ShopMenuTextIndex {
+    SHOP_MENU_TEXT_BUY = 0,
+    SHOP_MENU_TEXT_SELL = 1,
+    SHOP_MENU_TEXT_CANCEL = 2,
+    SHOP_MENU_TEXT_TITLE = 3,
+    SHOP_MENU_TEXT_BLACKSMITH = 4,
+    SHOP_MENU_TEXT_RACE = 5,
+    SHOP_MENU_TEXT_GIL = 6,
+    SHOP_MENU_TEXT_MONEY = 8,
+    SHOP_MENU_TEXT_MATERIALS = 9,
+    SHOP_MENU_TEXT_STOCK = 10,
+    SHOP_MENU_TEXT_CRAFT = 11,
+    SHOP_MENU_TEXT_EQUIP = 12,
+    SHOP_MENU_TEXT_PRICE = 13,
+    SHOP_MENU_TEXT_CANNOT_BUY = 14,
+    SHOP_MENU_TEXT_CANNOT_SELL = 15,
+    SHOP_MENU_TEXT_QUANTITY = 16,
+    SHOP_MENU_TEXT_STRENGTH = 17,
+    SHOP_MENU_TEXT_DEFENCE = 18,
+    SHOP_MENU_TEXT_CANNOT_CRAFT_HERE = 20,
+};
+
+static inline char* ShopMenuMes(int languageIndex, int textIndex)
+{
+    return g_strShopMenuMes[languageIndex * 0x15 + textIndex];
+}
 
 static inline void* MenuPcsVoid()
 {
@@ -227,28 +236,6 @@ static unsigned short GetShopMenuListButtons()
 static inline int ShopMenuCaravan(CShopMenu* shopMenu)
 {
     return ShopMenuInt(shopMenu, 0x20);
-}
-
-static unsigned char s_shopMenuTabCacheLanguage = 0xFF;
-static const char* s_shopMenuTabLabels[3];
-static const int s_shopMenuTabLayout[3][2] = {
-    {0x88, 0x92},
-    {0x88, 0xB6},
-    {0x88, 0xDA},
-};
-
-static void RefreshShopMenuTabLabels()
-{
-    unsigned char languageId = Game.m_gameWork.m_languageId;
-    if (s_shopMenuTabCacheLanguage == languageId) {
-        return;
-    }
-
-    int languageIndex = static_cast<int>(languageId) - 1;
-    s_shopMenuTabLabels[0] = PTR_DAT_80214d90[languageIndex];
-    s_shopMenuTabLabels[1] = PTR_DAT_80214d94[languageIndex];
-    s_shopMenuTabLabels[2] = PTR_s_Cancel_80214d98[languageIndex];
-    s_shopMenuTabCacheLanguage = languageId;
 }
 
 static float CalcCenteredShopMenuX(CFont* font, const char* text)
@@ -963,7 +950,7 @@ void CShopMenu::DrawItemHelp(int index, int centerX, int y)
     if (CanTradeShopMenuItem(this, index, itemNo)) {
         sourceText = reinterpret_cast<const char*>(GetShopMenuHelpMsgTable()[itemNo]);
     } else {
-        sourceText = PTR_s_Cannot_be_crafted_here__80214de0[languageId];
+        sourceText = ShopMenuMes(languageId, SHOP_MENU_TEXT_CANNOT_CRAFT_HERE);
     }
     if (sourceText == 0) {
         return;
@@ -1032,14 +1019,14 @@ void CShopMenu::DrawItemInfo(int itemNo, int x, int y, int unused0, int attrY, i
     char* label = 0;
     if (equipType == 0) {
         statType = 0;
-        label = PTR_s_Strength_80214dd4[(languageId - 1) * 0x15];
+        label = ShopMenuMes(languageId - 1, SHOP_MENU_TEXT_STRENGTH);
     } else {
         equipType = GetEquipType__8CMenuPcsFi(MenuPcsVoid(), itemNo);
         if (equipType == 3) {
             statType = 2;
         } else {
             statType = 1;
-            label = PTR_s_Defence_80214dd8[(languageId - 1) * 0x15];
+            label = ShopMenuMes(languageId - 1, SHOP_MENU_TEXT_DEFENCE);
         }
     }
 
@@ -1209,7 +1196,7 @@ void CShopMenu::DrawItemInfo0()
 
     if (canTrade) {
         SetupShopMenuUnitFont(font);
-        char* unitText = PTR_DAT_80214da8[languageId];
+        char* unitText = ShopMenuMes(languageId, SHOP_MENU_TEXT_GIL);
         float unitWidth = GetWidth__5CFontFPc(font, unitText);
         float rightX = FLOAT_80332d3c - unitWidth;
         float amountRightX = rightX - FLOAT_80332d5c;
@@ -1246,7 +1233,8 @@ void CShopMenu::DrawItemInfo0()
         DrawInit__8CMenuPcsFv(MenuPcsVoid());
     } else {
         SetupShopMenuUnitFont(font);
-        const char* message = (listType == 0) ? PTR_s_Cannot_buy_80214dc8[languageId] : PTR_s_Cannot_sell_80214dcc[languageId];
+        const char* message = (listType == 0) ? ShopMenuMes(languageId, SHOP_MENU_TEXT_CANNOT_BUY) :
+                                                ShopMenuMes(languageId, SHOP_MENU_TEXT_CANNOT_SELL);
         DrawInit__5CFontFv(font);
         DrawShopMenuRightAlignedText(font, message, FLOAT_80332d3c, FLOAT_80332d68, 0x19);
     }
@@ -1270,7 +1258,7 @@ void CShopMenu::DrawItemInfo0()
         DrawInit__8CMenuPcsFv(MenuPcsVoid());
 
         SetupShopMenuInfoFont(font, &white);
-        const char* quantityText = PTR_s_Quantity_80214dd0[languageId];
+        const char* quantityText = ShopMenuMes(languageId, SHOP_MENU_TEXT_QUANTITY);
         DrawInit__5CFontFv(font);
         DrawShopMenuRightAlignedText(font, quantityText, countRightX - FLOAT_80332d5c, FLOAT_80332d6c, 0x18);
 
@@ -1297,7 +1285,7 @@ void CShopMenu::DrawBuySellInfo()
     _GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
     SetupShopMenuInfoFont(font, &white);
 
-    char* priceText = PTR_s_Price_80214dc4[languageId];
+    char* priceText = ShopMenuMes(languageId, SHOP_MENU_TEXT_PRICE);
     float priceWidth = GetWidth__5CFontFPc(font, priceText);
     DrawInit__5CFontFv(font);
     DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(
@@ -1309,7 +1297,7 @@ void CShopMenu::DrawBuySellInfo()
         MenuPcsVoid(), font, DAT_80332d84, FLOAT_80332d7c, FLOAT_80332d80, 0x18, 0x12);
     DrawInit__8CMenuPcsFv(MenuPcsVoid());
 
-    char* moneyText = PTR_s_Money_80214db0[languageId];
+    char* moneyText = ShopMenuMes(languageId, SHOP_MENU_TEXT_MONEY);
     float separatorWidth = GetWidth__5CFontFPc(font, DAT_80332d84);
     DrawInit__5CFontFv(font);
     DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(
@@ -1317,7 +1305,7 @@ void CShopMenu::DrawBuySellInfo()
     DrawInit__8CMenuPcsFv(MenuPcsVoid());
 
     SetupShopMenuUnitFont(font);
-    char* unitText = PTR_DAT_80214da8[languageId];
+    char* unitText = ShopMenuMes(languageId, SHOP_MENU_TEXT_GIL);
     float unitWidth = GetWidth__5CFontFPc(font, unitText);
 
     int itemNo = -1;
@@ -1732,7 +1720,8 @@ void CShopMenu::DrawShopBase()
         SetScaleY__5CFontFf(FLOAT_80332d28, font);
         SetColor__5CFontF8_GXColor(font, &white);
 
-        char* confirmText = (ShopMenuInt(this, 0x14) == 0) ? PTR_DAT_80214d90[languageId] : PTR_DAT_80214d94[languageId];
+        char* confirmText = (ShopMenuInt(this, 0x14) == 0) ? ShopMenuMes(languageId, SHOP_MENU_TEXT_BUY) :
+                                                             ShopMenuMes(languageId, SHOP_MENU_TEXT_SELL);
         float confirmTextX = CalcCenteredShopMenuX(font, confirmText);
         DrawInit__5CFontFv(font);
         SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x10);
@@ -1741,11 +1730,11 @@ void CShopMenu::DrawShopBase()
         Draw__5CFontFPc(font, confirmText);
         SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x11);
 
-        float cancelTextX = CalcCenteredShopMenuX(font, PTR_s_Cancel_80214d98[languageId]);
+        float cancelTextX = CalcCenteredShopMenuX(font, ShopMenuMes(languageId, SHOP_MENU_TEXT_CANCEL));
         DrawInit__5CFontFv(font);
         SetPosX__5CFontFf(cancelTextX, font);
         SetPosY__5CFontFf(346.0f, font);
-        Draw__5CFontFPc(font, PTR_s_Cancel_80214d98[languageId]);
+        Draw__5CFontFPc(font, ShopMenuMes(languageId, SHOP_MENU_TEXT_CANCEL));
         SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x12);
         DrawInit__8CMenuPcsFv(MenuPcsVoid());
         SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x13);
@@ -1889,14 +1878,14 @@ void CShopMenu::DrawSoubi()
     SetScaleY__5CFontFf(FLOAT_80332d28, labelFont);
     SetColor__5CFontF8_GXColor(labelFont, &white);
 
-    char* equipText = PTR_s_Equip_80214dc0[languageId];
+    char* equipText = ShopMenuMes(languageId, SHOP_MENU_TEXT_EQUIP);
     float equipTextX = CalcCenteredShopMenuX(labelFont, equipText);
     DrawInit__5CFontFv(labelFont);
     SetPosX__5CFontFf(equipTextX, labelFont);
     SetPosY__5CFontFf(312.0f, labelFont);
     Draw__5CFontFPc(labelFont, equipText);
 
-    char* cancelText = PTR_s_Cancel_80214d98[languageId];
+    char* cancelText = ShopMenuMes(languageId, SHOP_MENU_TEXT_CANCEL);
     float cancelTextX = CalcCenteredShopMenuX(labelFont, cancelText);
     DrawInit__5CFontFv(labelFont);
     SetPosX__5CFontFf(cancelTextX, labelFont);
@@ -1965,7 +1954,7 @@ void CShopMenu::DrawMake()
     char raceBuffer[64];
     GetRaceStr__8CMenuPcsFiPc(MenuPcsVoid(), resultItem, raceBuffer);
     const int raceColor = (ChkEquipPossible__8CMenuPcsFi(MenuPcsVoid(), resultItem) != 0) ? 0x18 : 2;
-    const char* raceText = PTR_DAT_80214da4[languageId];
+    const char* raceText = ShopMenuMes(languageId, SHOP_MENU_TEXT_RACE);
 
     DrawInit__5CFontFv(font);
     DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(
@@ -1977,7 +1966,7 @@ void CShopMenu::DrawMake()
     DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(MenuPcsVoid(), font, raceBuffer, raceX, 120.0f, raceColor, 0x12);
     DrawInit__8CMenuPcsFv(MenuPcsVoid());
 
-    const char* gilUnitText = PTR_DAT_80214da8[languageId];
+    const char* gilUnitText = ShopMenuMes(languageId, SHOP_MENU_TEXT_GIL);
     SetupShopMenuUnitFont(font);
     float gilUnitWidth = GetWidth__5CFontFPc(font, gilUnitText);
 
@@ -2009,8 +1998,8 @@ void CShopMenu::DrawMake()
 
     CFont* labelFont = *reinterpret_cast<CFont**>(MenuPcsRaw() + 0x264);
     SetupShopMenuLabelFont(labelFont, &white);
-    DrawShopMenuCenteredText(labelFont, PTR_s_Price_80214dc4[languageId], FLOAT_80332e28, FLOAT_80332e24);
-    DrawShopMenuCenteredText(labelFont, PTR_s_Money_80214db0[languageId], FLOAT_80332d68, FLOAT_80332e2c);
+    DrawShopMenuCenteredText(labelFont, ShopMenuMes(languageId, SHOP_MENU_TEXT_PRICE), FLOAT_80332e28, FLOAT_80332e24);
+    DrawShopMenuCenteredText(labelFont, ShopMenuMes(languageId, SHOP_MENU_TEXT_MONEY), FLOAT_80332d68, FLOAT_80332e2c);
     DrawInit__8CMenuPcsFv(MenuPcsVoid());
 
     DrawObi(0);
@@ -2020,12 +2009,12 @@ void CShopMenu::DrawMake()
     SetScale__5CFontFf(FLOAT_80332d28, font);
     SetColor__5CFontF8_GXColor(font, &white);
     DrawInit__5CFontFv(font);
-    const char* materialsText = PTR_s_Materials_80214db4[languageId];
+    const char* materialsText = ShopMenuMes(languageId, SHOP_MENU_TEXT_MATERIALS);
     float materialsX = FLOAT_80332e30 - GetWidth__5CFontFPc(font, materialsText) * FLOAT_80332d78;
     DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(
         MenuPcsVoid(), font, const_cast<char*>(materialsText), materialsX, FLOAT_80332e34, 4, 0x12);
     DrawInit__8CMenuPcsFv(MenuPcsVoid());
-    const char* stockText = PTR_s_Stock_80214db8[languageId];
+    const char* stockText = ShopMenuMes(languageId, SHOP_MENU_TEXT_STOCK);
     float stockX = FLOAT_80332e38 - GetWidth__5CFontFPc(font, stockText) * FLOAT_80332d78;
     DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(
         MenuPcsVoid(), font, const_cast<char*>(stockText), stockX, FLOAT_80332e34, 9, 0x12);
@@ -2120,8 +2109,8 @@ void CShopMenu::DrawMake()
     drawShapeSeq(1, 1, 0x36, 0x18C, 0xFF, 0, 0, 0.0f, 0);
 
     SetupShopMenuLabelFont(labelFont, &white);
-    DrawShopMenuCenteredText(labelFont, PTR_s_Craft_80214dbc[languageId], 148.0f, 332.0f);
-    DrawShopMenuCenteredText(labelFont, PTR_s_Cancel_80214d98[languageId], 148.0f, FLOAT_80332e44);
+    DrawShopMenuCenteredText(labelFont, ShopMenuMes(languageId, SHOP_MENU_TEXT_CRAFT), 148.0f, 332.0f);
+    DrawShopMenuCenteredText(labelFont, ShopMenuMes(languageId, SHOP_MENU_TEXT_CANCEL), 148.0f, FLOAT_80332e44);
     DrawInit__8CMenuPcsFv(MenuPcsVoid());
 
     DrawItemInfo(resultItem, 0x98, 0x7E, 0, 0x9C, 0, 0, 0);
@@ -2155,7 +2144,7 @@ void CShopMenu::DrawSmith0()
 
     int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
     int caravan = ShopMenuInt(this, 0x20);
-    const char* title = PTR_s_Blacksmith_80214da0[languageId];
+    const char* title = ShopMenuMes(languageId, SHOP_MENU_TEXT_BLACKSMITH);
     if (*reinterpret_cast<char*>(caravan + 0xBE1) != '\0') {
         title = GetJobStr__8CMenuPcsFi(reinterpret_cast<CMenuPcs*>(MenuPcsVoid()), 1);
     }
@@ -2178,7 +2167,6 @@ void CShopMenu::DrawShop0()
     DrawShopBase();
 
     int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
-    RefreshShopMenuTabLabels();
     int selected = ShopMenuInt(this, 0x48);
 
     CFont* font = *reinterpret_cast<CFont**>(MenuPcsRaw() + 0x248);
@@ -2190,8 +2178,8 @@ void CShopMenu::DrawShop0()
     SetColor__5CFontF8_GXColor(font, &white);
 
     for (int i = 0; i < 3; i++) {
-        int x = s_shopMenuTabLayout[i][0];
-        int y = s_shopMenuTabLayout[i][1];
+        int x = 0x88;
+        int y = i * 0x24 + 0x92;
         int highlight = (i == selected) ? 1 : 0;
 
         SetDrawDoneDebugData__8CGraphicFSc(&Graphic, static_cast<signed char>(0x1E + i));
@@ -2201,7 +2189,7 @@ void CShopMenu::DrawShop0()
 
         DrawInit__5CFontFv(font);
         DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(
-            MenuPcsVoid(), font, const_cast<char*>(s_shopMenuTabLabels[i]),
+            MenuPcsVoid(), font, ShopMenuMes(languageId, i),
             static_cast<float>(x + 0x48), static_cast<float>(y - 0x0B),
             highlight != 0 ? 0x18 : 9, 0x12);
         DrawInit__8CMenuPcsFv(MenuPcsVoid());
@@ -2210,7 +2198,7 @@ void CShopMenu::DrawShop0()
     SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x24);
     DrawInit__5CFontFv(font);
     DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(
-        MenuPcsVoid(), font, PTR_DAT_80214d9c[languageId], FLOAT_80332d54, 88.0f, 9, 0x12);
+        MenuPcsVoid(), font, ShopMenuMes(languageId, SHOP_MENU_TEXT_TITLE), FLOAT_80332d54, 88.0f, 9, 0x12);
     DrawInit__8CMenuPcsFv(MenuPcsVoid());
 
     SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x28);

@@ -16,30 +16,30 @@ unsigned int pppFreeMngStPrioForData();
 unsigned char pppAmemDeletePmng(unsigned long);
 unsigned int pppAmemRefCntError(unsigned long);
 
-extern unsigned int m_table_desc0__8CPartPcs[];
-extern unsigned int m_table_desc1__8CPartPcs[];
-extern unsigned int m_table_desc2__8CPartPcs[];
-extern unsigned int m_table_desc3__8CPartPcs[];
-extern unsigned int m_table_desc4__8CPartPcs[];
-extern unsigned int m_table_desc5__8CPartPcs[];
-extern unsigned int m_table_desc6__8CPartPcs[];
-extern unsigned int m_table_desc7__8CPartPcs[];
-extern unsigned int m_table_desc8__8CPartPcs[];
-extern unsigned int m_table_desc9__8CPartPcs[];
-extern unsigned int m_table_desc10__8CPartPcs[];
-extern unsigned int m_table_desc11__8CPartPcs[];
-extern unsigned int m_table_desc12__8CPartPcs[];
-extern unsigned int m_table_desc13__8CPartPcs[];
-extern unsigned int m_table_desc14__8CPartPcs[];
-extern unsigned int m_table_desc15__8CPartPcs[];
-extern unsigned int m_table_desc16__8CPartPcs[];
-extern unsigned int m_table_desc17__8CPartPcs[];
-extern unsigned int m_table_desc18__8CPartPcs[];
-extern unsigned int m_table__8CPartPcs[][0x15C / sizeof(unsigned int)];
-
 class CPartPcs : public CProcess
 {
 public:
+    static unsigned int m_table_desc0[3];
+    static unsigned int m_table_desc1[3];
+    static unsigned int m_table_desc2[3];
+    static unsigned int m_table_desc3[3];
+    static unsigned int m_table_desc4[3];
+    static unsigned int m_table_desc5[3];
+    static unsigned int m_table_desc6[3];
+    static unsigned int m_table_desc7[3];
+    static unsigned int m_table_desc8[3];
+    static unsigned int m_table_desc9[3];
+    static unsigned int m_table_desc10[3];
+    static unsigned int m_table_desc11[3];
+    static unsigned int m_table_desc12[3];
+    static unsigned int m_table_desc13[3];
+    static unsigned int m_table_desc14[3];
+    static unsigned int m_table_desc15[3];
+    static unsigned int m_table_desc16[3];
+    static unsigned int m_table_desc17[3];
+    static unsigned int m_table_desc18[3];
+    static unsigned int m_table[2][0x15C / sizeof(unsigned int)];
+
     CUSBStreamData m_usbStreamData; // 0x04
 
     CPartPcs();

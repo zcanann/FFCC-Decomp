@@ -89,7 +89,7 @@ extern "C" void pppRenderLocationTitle2(struct pppLocationTitle2* locationTitle,
     LocationTitle2Work* work;
 
     serializedOffset = *unkC->m_serializedDataOffsets;
-    work = (LocationTitle2Work*)((u8*)locationTitle + 0x80 + serializedOffset);
+    work = (LocationTitle2Work*)(locationTitle->m_workArea + serializedOffset);
 
     if (unkB->m_dataValIndex == 0xFFFF) {
         return;
@@ -203,33 +203,11 @@ extern const char s_locationNodeName[] = "loc";
  */
 extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, struct pppLocationTitle2UnkB* unkB, struct pppLocationTitle2UnkC* unkC)
 {
-    Mtx nodeMtx;
-    Vec stepDir;
-    Vec scaled;
-    Vec* startPos;
-    Vec* nextPos;
-    Vec* interpRead;
-    Vec* interpWrite;
-    LocationTitle2Particle* dst;
     int serializedOffset;
     int colorOffset;
-    s32* serializedOffsets;
+    int* serializedOffsets;
     LocationTitle2Work* work;
     LocationTitle2ColorBlock* colorData;
-    CGObject* owner;
-    CCharaPcs::CHandle* handle;
-    CChara::CModel* model;
-    LocationTitle2Particle* particles;
-    LocationTitle2ModelRaw* modelRaw;
-    u8* node;
-    float zOffset;
-    Vec interp[21];
-    int nodeIndex;
-    int startIndex;
-    int inserted;
-    int nextCount;
-    float stepScale;
-    float t;
 
     if (gPppCalcDisabled != 0) {
         return;
@@ -238,8 +216,8 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
     serializedOffsets = unkC->m_serializedDataOffsets;
     serializedOffset = serializedOffsets[0];
     colorOffset = serializedOffsets[1];
-    work = (LocationTitle2Work*)((u8*)locationTitle + 0x80 + serializedOffset);
-    colorData = (LocationTitle2ColorBlock*)((u8*)locationTitle + 0x80 + colorOffset);
+    work = (LocationTitle2Work*)(locationTitle->m_workArea + serializedOffset);
+    colorData = (LocationTitle2ColorBlock*)(locationTitle->m_workArea + colorOffset);
     rand();
 
     if (unkB->m_dataValIndex == 0xFFFF) {
@@ -256,6 +234,15 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
     }
 
     if (work->m_particles == 0) {
+        LocationTitle2Particle* particles;
+        CGObject* owner;
+        CCharaPcs::CHandle* handle;
+        CChara::CModel* model;
+        LocationTitle2ModelRaw* modelRaw;
+        int nodeIndex;
+        u8* node;
+        float zOffset;
+
         work->m_particles = pppMemAlloc__FUlPQ27CMemory6CStagePci(
             unkB->m_maxCount * sizeof(LocationTitle2Particle), pppEnvStPtr->m_stagePtr, s_LocationTitle2_cpp,
             0x70);
@@ -279,6 +266,8 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
         zOffset = 1.0f;
 
         for (u32 frameIndex = 0; frameIndex < modelRaw->m_anim->m_frameCount; frameIndex++) {
+            Mtx nodeMtx;
+
             CalcBind__Q26CChara5CNodeFPQ26CChara6CModel(node, model);
             SetFrame__Q26CChara6CModelFf((float)(s32)frameIndex, model);
             CalcMatrix__Q26CChara6CModelFv(model);
@@ -299,7 +288,7 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
             work->m_count++;
 
             {
-                nextCount = (int)work->m_count + 1;
+                int nextCount = (int)work->m_count + 1;
 
                 if (nextCount >= unkB->m_maxCount) {
                     return;
@@ -307,24 +296,35 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
             }
 
             if (work->m_count > 1) {
+                Vec stepDir;
+                Vec scaled;
+                Vec interp[21];
+                Vec* startPos;
+                Vec* interpRead;
+                Vec* interpWrite;
+                LocationTitle2Particle* dst;
+                int startIndex;
+                int inserted;
+                float stepScale;
+
                 startIndex = (int)work->m_count - 2;
                 inserted = 0;
                 startPos = &particles[startIndex].m_pos;
-                nextPos = &particles[startIndex + 1].m_pos;
                 stepScale = 1.0f / (float)(unkB->m_stepCount + 1);
-                PSVECSubtract(nextPos, startPos, &stepDir);
+                PSVECSubtract(&particles[startIndex + 1].m_pos, startPos, &stepDir);
                 interpRead = interp;
                 interpWrite = interpRead;
 
                 for (int i = 0; i < unkB->m_stepCount; i++) {
-                    t = stepScale * (float)(i + 1);
+                    float t = stepScale * (float)(i + 1);
+
                     PSVECScale(&stepDir, &scaled, t);
                     PSVECAdd(startPos, &scaled, interpWrite);
                     inserted++;
                     work->m_count++;
 
                     {
-                        nextCount = (int)work->m_count + 1;
+                        int nextCount = (int)work->m_count + 1;
 
                         if (nextCount >= unkB->m_maxCount) {
                             break;
@@ -372,7 +372,7 @@ extern "C" void pppDestructLocationTitle2(struct pppLocationTitle2* locationTitl
     CMemory::CStage** stagePtr;
 
     serializedOffset = *unkC->m_serializedDataOffsets;
-    stagePtr = (CMemory::CStage**)((char*)locationTitle + 0x80 + serializedOffset);
+    stagePtr = (CMemory::CStage**)(locationTitle->m_workArea + serializedOffset);
 
     if (*stagePtr != 0) {
         pppHeapUseRate(*stagePtr);
@@ -396,7 +396,7 @@ extern "C" void pppConstructLocationTitle2(struct pppLocationTitle2* locationTit
     f32 value;
 
     value = FLOAT_80330f48;
-    work = (LocationTitle2Work*)((char*)locationTitle + 0x80 + *unkC->m_serializedDataOffsets);
+    work = (LocationTitle2Work*)(locationTitle->m_workArea + *unkC->m_serializedDataOffsets);
     work->m_particles = 0;
     work->m_count = 0;
     work->m_acc = value;

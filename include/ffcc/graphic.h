@@ -108,7 +108,8 @@ public:
     u8 m_blurDelayCounter;
     u8 m_blurBufferIndex;
     u8 m_blurTextureCount;
-    u8 _pad_0x735F_to_0x7373[0x15];
+    _GXColor m_defaultCopyClearColor;
+    u8 _pad_0x7363_to_0x7373[0x11];
 };
 
 extern CGraphic Graphic;

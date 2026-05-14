@@ -188,8 +188,8 @@ int CMenuPcs::ArtiCtrlCur()
 {
 	int sVar1;
 	bool bVar2;
-	unsigned short uVar3;
-	unsigned short uVar4;
+	int uVar4;
+	int uVar3;
 	int iVar5;
 	int iVar6;
 	int padLock;

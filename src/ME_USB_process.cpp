@@ -19,8 +19,8 @@ extern "C" int AddRsdList__18CMaterialEditorPcsFP5ZLIST(CMaterialEditorPcs* mate
 extern "C" void SetRsdIndex__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialEditorPcs);
 extern "C" void SetRsdFlag__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialEditorPcs);
 
-static const char s_ME_USB_process_cpp_801d7d78[] = "ME_USB_process.cpp";
-static const char s_MemAlloc_Error____size__d_801d7d8c[] = "MemAlloc Error!!! size=%d\n";
+extern "C" const char s_ME_USB_process_cpp_801d7d78[] = "ME_USB_process.cpp";
+extern "C" const char s_MemAlloc_Error____size__d_801d7d8c[] = "MemAlloc Error!!! size=%d\n";
 
 namespace {
 struct ViewerSRT {

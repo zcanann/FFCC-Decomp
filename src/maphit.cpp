@@ -48,383 +48,385 @@ CMapHitFace* g_hit_lpface_min;
 
 /*
  * --INFO--
- * PAL Address: 0x80026e24
- * PAL Size: 2308b
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CMapHit::DrawNormal()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80024e64
+ * PAL Size: 268b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-int FindIntersection(const Vec& start, const Vec& direction, const CMapCylinder& cyl, float& outT)
+void CMapHit::DrawWire()
 {
-    Vec axis = cyl.m_axis;
-    const f32 axisLen = PSVECMag(&axis);
-    PSVECScale(&axis, &axis, 1.0f / axisLen);
+    static const u32 kFaceStride = 0x50;
 
-    Vec orthogonal;
-    if (fabsf(axis.x) < fabsf(axis.y) || fabsf(axis.x) < fabsf(axis.z)) {
-        orthogonal.x = 0.0f;
-        orthogonal.y = axis.z;
-        orthogonal.z = -axis.y;
-    } else {
-        orthogonal.x = -axis.y;
-        orthogonal.y = axis.x;
-        orthogonal.z = 0.0f;
-    }
-    PSVECNormalize(&orthogonal, &orthogonal);
+    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+    GXClearVtxDesc();
+    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
 
-    Vec bitangent;
-    PSVECCrossProduct(&axis, &orthogonal, &bitangent);
+    unsigned char* face = reinterpret_cast<unsigned char*>(m_faces);
+    int faceIndex = 0;
+    while (faceIndex < static_cast<int>(m_faceCount)) {
+        GXBegin(static_cast<GXPrimitive>(0xB0), GX_VTXFMT7, static_cast<u16>(4));
 
-    Vec localDirection;
-    localDirection.x = PSVECDotProduct(&orthogonal, &direction);
-    localDirection.y = PSVECDotProduct(&bitangent, &direction);
-    localDirection.z = PSVECDotProduct(&axis, &direction);
-
-    const f32 directionLen = PSVECMag(&localDirection);
-    const f32 tScale = 1.0f / directionLen;
-    PSVECScale(&localDirection, &localDirection, tScale);
-
-    Vec relStart;
-    PSVECSubtract(&start, &cyl.m_bottom, &relStart);
-
-    const f32 px = PSVECDotProduct(&orthogonal, &relStart);
-    const f32 py = PSVECDotProduct(&bitangent, &relStart);
-    const f32 pz = PSVECDotProduct(&axis, &relStart);
-
-    const f32 vx = localDirection.x;
-    const f32 vy = localDirection.y;
-    const f32 vz = localDirection.z;
-    const f32 radius = cyl.m_radius;
-    const f32 radiusSq = radius * radius;
-
-    if (fabsf(vz) < 1.0f) {
-        const f32 radialC = (px * px + py * py) - radiusSq;
-        const f32 radialB = px * vx + py * vy;
-        const f32 radialA = vx * vx + vy * vy;
-        f32 disc = radialB * radialB - radialA * radialC;
-        if (disc < 0.0f) {
-            return 0;
+        unsigned char* index = face;
+        int i = 0;
+        while (i < static_cast<int>(face[0x46])) {
+            Vec* vertex = m_vertices + *reinterpret_cast<unsigned short*>(index + 0x48);
+            GXPosition3f32(vertex->x, vertex->y, vertex->z);
+            i++;
+            index += sizeof(unsigned short);
         }
 
-        if (disc == 0.0f) {
-            const f32 t = -radialB / radialA;
-            const f32 z = (t * vz) + pz;
-            if (0.0f <= z && z <= axisLen) {
-                outT = t * tScale;
-                if (0.0f <= outT && outT <= 1.0f) {
-                    return 1;
-                }
-                return 0;
+        const unsigned short firstIndex = *reinterpret_cast<unsigned short*>(face + 0x48);
+        face += kFaceStride;
+        faceIndex++;
+
+        Vec* firstVertex = m_vertices + firstIndex;
+        GXPosition3f32(firstVertex->x, firstVertex->y, firstVertex->z);
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800273f4
+ * PAL Size: 1376b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMapHit::Draw()
+{
+    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_NRM, GX_NRM_XYZ, GX_F32, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
+    GXClearVtxDesc();
+    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_NRM, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
+
+    unsigned char* face = reinterpret_cast<unsigned char*>(m_faces);
+    int faceIndex = 0;
+    while (faceIndex < m_faceCount) {
+        if ((reinterpret_cast<CMapHitFace*>(face)->m_drawFlags & 1) == 0) {
+            const unsigned char groupIndex = face[0x47];
+            unsigned char* mapMngBytes = reinterpret_cast<unsigned char*>(&MapMng);
+            const u32 colorA = *reinterpret_cast<u32*>(mapMngBytes + 0x214E8 + groupIndex * 0x14 + 0x4);
+            const u32 colorB = *reinterpret_cast<u32*>(mapMngBytes + 0x214E8 + groupIndex * 0x14 + 0x8);
+            const GXColor* colorABytes = reinterpret_cast<const GXColor*>(&colorA);
+            const GXColor* colorBBytes = reinterpret_cast<const GXColor*>(&colorB);
+
+            GXBegin(GX_TRIANGLES, GX_VTXFMT7, 3);
+            unsigned char* index = face + 0x48;
+            int i = 0;
+            while (i < static_cast<int>(face[0x46])) {
+                Vec* vertex = m_vertices + *reinterpret_cast<unsigned short*>(index);
+                GXPosition3f32(vertex->x, vertex->y, vertex->z);
+                GXNormal3f32(*reinterpret_cast<float*>(face + 0x00), *reinterpret_cast<float*>(face + 0x04),
+                             *reinterpret_cast<float*>(face + 0x08));
+                GXColor4u8(colorABytes->r, colorABytes->g, colorABytes->b, colorABytes->a);
+                i++;
+                index += 2;
             }
+
+            GXBegin(GX_TRIANGLES, GX_VTXFMT7, 3);
+            i = static_cast<int>(face[0x46]) - 1;
+            while (i >= 0) {
+                Vec* vertex = m_vertices + *reinterpret_cast<unsigned short*>(face + 0x48 + i * 2);
+                GXPosition3f32(vertex->x, vertex->y, vertex->z);
+                GXNormal3f32(*reinterpret_cast<float*>(face + 0x00), *reinterpret_cast<float*>(face + 0x04),
+                             *reinterpret_cast<float*>(face + 0x08));
+                GXColor4u8(colorBBytes->r, colorBBytes->g, colorBBytes->b, colorBBytes->a);
+                i--;
+            }
+        }
+
+        face += 0x50;
+        faceIndex++;
+    }
+
+    GXClearVtxDesc();
+    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
+    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
+
+    face = reinterpret_cast<unsigned char*>(m_faces);
+    faceIndex = 0;
+    while (true) {
+        if (static_cast<int>(m_faceCount) <= faceIndex) {
+            return;
+        }
+
+        CMapHitFace* hitFace = reinterpret_cast<CMapHitFace*>(face);
+        if ((hitFace->m_drawFlags & 1) == 0) {
+            hitFace->m_drawFlags = 0;
         } else {
-            disc = sqrtf(disc);
-            const f32 t = (-radialB - disc) / radialA;
-            const f32 z = (t * vz) + pz;
-            if (0.0f <= z && z <= axisLen) {
-                outT = t * tScale;
-                if (0.0f <= outT && outT <= 1.0f) {
-                    return 1;
-                }
-                return 0;
+            hitFace->m_drawFlags = 0;
+            hitFace->m_drawFlags = 0;
+
+            GXBegin(GX_TRIANGLES, GX_VTXFMT7, 3);
+            unsigned char* index = face + 0x48;
+            int i = 0;
+            while (i < static_cast<int>(face[0x46])) {
+                Vec* vertex = m_vertices + *reinterpret_cast<unsigned short*>(index);
+                GXPosition3f32(vertex->x, vertex->y, vertex->z);
+                GXColor4u8(0x40, 0xFF, 0x40, 0xFF);
+                i++;
+                index += 2;
+            }
+
+            GXBegin(GX_TRIANGLES, GX_VTXFMT7, 3);
+            i = static_cast<int>(face[0x46]) - 1;
+            while (i >= 0) {
+                Vec* vertex = m_vertices + *reinterpret_cast<unsigned short*>(face + 0x48 + i * 2);
+                GXPosition3f32(vertex->x, vertex->y, vertex->z);
+                GXColor4u8(0x40, 0xFF, 0x40, 0xFF);
+                i--;
             }
         }
 
-        if (g_hit_lpface->m_projectionAxis == 1) {
-            f32 capC = (pz * pz) + radialC;
-            f32 capB = (pz * vz) + radialB;
-            disc = capB * capB - capC;
-            if (disc == 0.0f) {
-                const f32 t = -capB;
-                if ((t * vz) + pz <= 0.0f) {
-                    outT = t * tScale;
-                    if (0.0f <= outT && outT <= 1.0f) {
-                        return 1;
-                    }
-                    return 0;
-                }
-            } else if (disc > 0.0f) {
-                disc = sqrtf(disc);
-                f32 t = -capB - disc;
-                if ((t * vz) + pz <= 0.0f) {
-                    outT = t * tScale;
-                    if (0.0f <= outT && outT <= 1.0f) {
-                        return 1;
-                    }
-                    return 0;
-                }
+        face += 0x50;
+        faceIndex++;
+    }
+}
 
-                t = -capB + disc;
-                if ((t * vz) + pz <= 0.0f) {
-                    outT = t * tScale;
-                    if (0.0f <= outT && outT <= 1.0f) {
-                        return 1;
-                    }
-                    return 0;
-                }
-            }
+/*
+ * --INFO--
+ * PAL Address: 0x800254d0
+ * PAL Size: 268b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMapHit::CheckHitCylinderNear(CMapCylinder* mapCylinder, Vec* position, unsigned short startFace, unsigned short faceCount, unsigned long mask)
+{
+    int endFace = static_cast<unsigned short>(startFace + faceCount);
+    int faceIndex = static_cast<unsigned short>(startFace);
+    int faceOffset = faceIndex * 0x50;
 
-            capB = -((vz * axisLen) - capB);
-            disc = capB * capB - (axisLen * -((2.0f * pz) - axisLen) + capC);
-            if (disc == 0.0f) {
-                const f32 t = -capB;
-                if (axisLen <= (t * vz) + pz) {
-                    outT = t * tScale;
-                    if (0.0f <= outT && outT <= 1.0f) {
-                        return 1;
-                    }
-                    return 0;
-                }
-            } else if (disc > 0.0f) {
-                disc = sqrtf(disc);
-                f32 t = -capB - disc;
-                if (axisLen <= (t * vz) + pz) {
-                    outT = t * tScale;
-                    if (0.0f <= outT && outT <= 1.0f) {
-                        return 1;
-                    }
-                    return 0;
-                }
+    g_hit_cyl = *mapCylinder;
+    g_hit_mvec = *position;
 
-                t = -capB + disc;
-                if (axisLen <= (t * vz) + pz) {
-                    outT = t * tScale;
-                    if (0.0f <= outT && outT <= 1.0f) {
-                        return 1;
-                    }
-                    return 0;
-                }
-            }
+    while (faceIndex < endFace) {
+        g_hit_lpface = reinterpret_cast<CMapHitFace*>(Ptr(m_faces, faceOffset));
+        CheckHitFaceCylinder(mask);
+        faceOffset += 0x50;
+        faceIndex++;
+    }
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CMapHit::CheckHitCylinderNear(CMapCylinder* mapCylinder, Vec* position, unsigned long mask)
+{
+    g_hit_cyl = *mapCylinder;
+    g_hit_mvec = *position;
+
+    int faceOffset = 0;
+    for (int i = 0; i < m_faceCount; i++) {
+        g_hit_lpface = reinterpret_cast<CMapHitFace*>(Ptr(m_faces, faceOffset));
+        CheckHitFaceCylinder(mask);
+        faceOffset += 0x50;
+    }
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+int CMapHit::CheckHitCylinder(CMapCylinder* mapCylinder, Vec* position, unsigned short startFace, unsigned short faceCount, unsigned long mask)
+{
+    int faceIndex = static_cast<unsigned short>(startFace);
+    int endFace = static_cast<unsigned short>(startFace + faceCount);
+    int faceOffset = faceIndex * 0x50;
+
+    g_hit_cyl = *mapCylinder;
+    g_hit_mvec = *position;
+
+    while (faceIndex < endFace) {
+        g_hit_lpface = reinterpret_cast<CMapHitFace*>(Ptr(m_faces, faceOffset));
+        g_hit_t_min = FLOAT_8032F8C0;
+
+        if (CheckHitFaceCylinder(mask) != 0) {
+            return 1;
         }
 
-        return 0;
+        faceOffset += 0x50;
+        faceIndex++;
     }
 
-    f32 disc = radiusSq - (px * px + py * py);
-    if (disc < 0.0f) {
-        return 0;
-    }
-
-    disc = sqrtf(disc);
-    outT = (-(pz + disc)) * tScale;
-    return 1;
+    return 0;
 }
 
 /*
  * --INFO--
- * Address: TODO
- * Size: TODO
- */
-void CheckLineCylinder(const Vec& start, const Vec& end, const CMapCylinder& cyl, float& outT)
-{
-    Vec line;
-    PSVECSubtract(&end, &start, &line);
-    FindIntersection(start, line, cyl, outT);
-}
-
-/*
- * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
- * EN Address: 0x8002fed0
- * EN Size: 52b
- * JP Address: TODO
- * JP Size: TODO
- */
-CMapCylinder::CMapCylinder()
-{
-    m_boundsMin.z = 0.0f;
-    m_boundsMin.y = 0.0f;
-    m_boundsMin.x = 0.0f;
-    m_boundsMax.z = 1.0f;
-    m_boundsMax.y = 1.0f;
-    m_boundsMax.x = 1.0f;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80026dec
- * PAL Size: 56b
+ * PAL Address: 0x80025838
+ * PAL Size: 332b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-CMapHit::CMapHit()
+int CMapHit::CheckHitCylinder(CMapCylinder* mapCylinder, Vec* position, unsigned long mask)
 {
-    m_positionMin.z = FLOAT_8032F8EC;
-    m_positionMin.y = FLOAT_8032F8EC;
-    m_positionMin.x = FLOAT_8032F8EC;
+    g_hit_cyl = *mapCylinder;
+    g_hit_mvec = *position;
 
-    m_positionMax.z = FLOAT_8032F8F0;
-    m_positionMax.y = FLOAT_8032F8F0;
-    m_positionMax.x = FLOAT_8032F8F0;
+    int faceIndex = 0;
+    int faceOffset = 0;
+    while (faceIndex < static_cast<int>(m_faceCount)) {
+        g_hit_lpface = reinterpret_cast<CMapHitFace*>(Ptr(m_faces, faceOffset));
+        g_hit_t_min = FLOAT_8032F8C0;
+        if (CheckHitFaceCylinder(mask) != 0) {
+            return 1;
+        }
+        faceOffset += 0x50;
+        faceIndex++;
+    }
 
-    m_vertexCount = 0;
-    m_faceCount = 0;
-    m_vertices = 0;
-    m_faces = 0;
+    return 0;
 }
 
 /*
  * --INFO--
- * PAL Address: 0x80026d5c
- * PAL Size: 144b
+ * PAL Address: 0x80025984
+ * PAL Size: 200b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-CMapHit::~CMapHit()
+void CMapHit::CalcHitPosition(Vec* position)
 {
-    if (m_vertices != 0) {
-        delete m_vertices;
-        m_vertices = 0;
+    if (g_hit_edge_idx_min != -1) {
+        float len = PSVECMag(&g_hit_cyl_min.m_axis);
+        PSVECScale(&g_hit_cyl_min.m_axis, position, g_hit_t - (FLOAT_8032F8C4 / len));
+        PSVECAdd(&g_hit_cyl_min.m_bottom, position, position);
+    } else {
+        float len = PSVECMag(&g_hit_cyl_min.m_axis);
+        PSVECScale(&g_hit_cyl_min.m_axis, position, g_hit_t - (FLOAT_8032F8C8 / len));
+        PSVECAdd(&g_hit_cyl_min.m_bottom, position, position);
     }
-
-    if (m_faces != 0) {
-        delete[] m_faces;
-        m_faces = 0;
-    }
-
-    m_vertexCount = 0;
-    m_faceCount = 0;
 }
 
 /*
  * --INFO--
- * PAL Address: 0x800266f0
- * PAL Size: 1608b
+ * PAL Address: 0x80025a4c
+ * PAL Size: 904b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-int CMapHit::ReadOtmHit(CChunkFile& chunkFile)
+int CMapHit::CalcHitSlide(Vec* out, float y)
 {
-    CChunkFile::CChunk chunk;
-
-    chunkFile.PushChunk();
-
-    while (chunkFile.GetNextChunk(chunk)) {
-        if (chunk.m_id == 'HITV') {
-            m_vertexCount = static_cast<unsigned short>(chunk.m_arg0);
-            m_vertices =
-                new (*reinterpret_cast<CMemory::CStage**>(&MapMng), const_cast<char*>(s_maphit_cpp_801D7088), 0x143)
-                    Vec[m_vertexCount];
-
-            for (unsigned int i = 0; i < m_vertexCount; i++) {
-                Vec& v = m_vertices[i];
-                v.x = chunkFile.GetF4();
-                v.y = chunkFile.GetF4();
-                v.z = chunkFile.GetF4();
-
-                m_positionMin.x = (m_positionMin.x < v.x) ? m_positionMin.x : v.x;
-                m_positionMin.y = (m_positionMin.y < v.y) ? m_positionMin.y : v.y;
-                m_positionMin.z = (m_positionMin.z < v.z) ? m_positionMin.z : v.z;
-
-                m_positionMax.x = (m_positionMax.x < v.x) ? v.x : m_positionMax.x;
-                m_positionMax.y = (m_positionMax.y < v.y) ? v.y : m_positionMax.y;
-                m_positionMax.z = (m_positionMax.z < v.z) ? v.z : m_positionMax.z;
+    if (g_hit_edge_idx_min != -1) {
+        if (gMapHitFace->m_normal.y < y) {
+            Vec previous;
+            Vec current;
+            if (g_hit_edge_idx_min == 0) {
+                previous = m_vertices[gMapHitFace->m_vertexIndices[gMapHitFace->m_vertexCount - 1]];
+                current = m_vertices[gMapHitFace->m_vertexIndices[0]];
+            } else {
+                previous = m_vertices[gMapHitFace->m_vertexIndices[g_hit_edge_idx_min - 1]];
+                current = m_vertices[gMapHitFace->m_vertexIndices[g_hit_edge_idx_min]];
             }
 
-            m_positionMin.x -= FLOAT_8032F8CC;
-            m_positionMin.y -= FLOAT_8032F8CC;
-            m_positionMin.z -= FLOAT_8032F8CC;
-            m_positionMax.x += FLOAT_8032F8CC;
-            m_positionMax.y += FLOAT_8032F8CC;
-            m_positionMax.z += FLOAT_8032F8CC;
-        } else if (chunk.m_id == 'HITF') {
-            m_faceCount = static_cast<unsigned short>(chunk.m_arg0);
-            m_faces =
-                new (*reinterpret_cast<CMemory::CStage**>(&MapMng), const_cast<char*>(s_maphit_cpp_801D7088), 0x159)
-                    CMapHitFace[m_faceCount];
+            Vec edge;
+            Vec edgeToCenter;
+            PSVECSubtract(&current, &previous, &edge);
+            PSVECSubtract(&current, &g_hit_cyl_min.m_top, &edgeToCenter);
 
-            const float offsetScale = FLOAT_8032F8F4;
-            const float radiusScale = FLOAT_8032F8F8;
-            const float zero = FLOAT_8032F8D0;
-            const double radiusBase = DOUBLE_8032F900;
+            float edgeDot = PSVECDotProduct(&edge, &edgeToCenter);
+            float edgeLenSq = PSVECDotProduct(&edge, &edge);
 
-            for (unsigned int faceIdx = 0; faceIdx < m_faceCount; faceIdx++) {
-                chunkFile.Align(4);
+            Vec edgeProjection;
+            Vec nearestPoint;
+            PSVECScale(&edge, &edgeProjection, edgeDot / edgeLenSq);
+            PSVECSubtract(&current, &edgeProjection, &nearestPoint);
 
-                CMapHitFace& face = m_faces[faceIdx];
+            Vec slideDir;
+            PSVECSubtract(&g_hit_cyl_min.m_top, &nearestPoint, &slideDir);
 
-                face.m_normal.x = chunkFile.GetF4();
-                face.m_normal.y = chunkFile.GetF4();
-                face.m_normal.z = chunkFile.GetF4();
-                face.m_planeD = chunkFile.GetF4();
-
-                face.m_edgeFlags = chunkFile.Get1();
-                face.m_projectionAxis = chunkFile.Get1();
-                face.m_vertexCount = chunkFile.Get1();
-                face.m_groupIndex = chunkFile.Get1();
-                face.m_flags = 0;
-                face.m_drawFlags = 0;
-
-                const unsigned int vertexCount = face.m_vertexCount;
-                for (unsigned int i = 0; i < vertexCount; i++) {
-                    face.m_vertexOffsets[i][0] = zero;
-                    face.m_vertexOffsets[i][1] = zero;
-                }
-
-                if (chunk.m_version == 0) {
-                    if (System.m_execParam != 0) {
-                        System.Printf(const_cast<char*>(s_old_mid_format_801D7094));
-                    }
-                    chunkFile.Align(4);
-                    for (unsigned int i = 0; i < vertexCount; i++) {
-                        (void)chunkFile.GetF4();
-                        (void)chunkFile.GetF4();
-                    }
-                    face.m_radiusScale = zero;
-                } else if (chunk.m_version == 1) {
-                    if (System.m_execParam != 0) {
-                        System.Printf(const_cast<char*>(s_old_mid_format_801D7094));
-                    }
-                    face.m_radiusScale = chunkFile.GetF4();
-                    chunkFile.Align(4);
+            float side = PSVECDotProduct(&g_hit_cyl_min.m_axis, &slideDir);
+            float slideLen = PSVECMag(&slideDir);
+            if (slideLen >= FLOAT_8032F8C4) {
+                PSVECScale(&slideDir, &slideDir, FLOAT_8032F8CC / slideLen);
+                if (side <= FLOAT_8032F8D0) {
+                    PSVECScale(&slideDir, &slideDir, FLOAT_8032F8D4 * g_hit_cyl_min.m_radius);
                 } else {
-                    face.m_radiusScale = chunkFile.GetF4();
-                    chunkFile.Align(4);
-                    const float vertexOffsetScale = FLOAT_8032F8F4;
-                    for (unsigned int i = 0; i < vertexCount; i++) {
-                        face.m_vertexOffsets[i][0] = chunkFile.GetF4() * vertexOffsetScale;
-                        face.m_vertexOffsets[i][1] = chunkFile.GetF4() * vertexOffsetScale;
-                    }
+                    PSVECScale(&slideDir, &slideDir, FLOAT_8032F8D4 * -g_hit_cyl_min.m_radius);
                 }
 
-                for (unsigned int i = 0; i < vertexCount; i++) {
-                    const unsigned short idx = chunkFile.Get2();
-                    face.m_vertexIndices[i] = idx;
-
-                    const Vec& v = m_vertices[idx];
-                    face.m_boundsMin.x = (face.m_boundsMin.x < v.x) ? face.m_boundsMin.x : v.x;
-                    face.m_boundsMin.y = (face.m_boundsMin.y < v.y) ? face.m_boundsMin.y : v.y;
-                    face.m_boundsMin.z = (face.m_boundsMin.z < v.z) ? face.m_boundsMin.z : v.z;
-
-                    face.m_boundsMax.x = (face.m_boundsMax.x < v.x) ? v.x : face.m_boundsMax.x;
-                    face.m_boundsMax.y = (face.m_boundsMax.y < v.y) ? v.y : face.m_boundsMax.y;
-                    face.m_boundsMax.z = (face.m_boundsMax.z < v.z) ? v.z : face.m_boundsMax.z;
-                }
-
-                face.m_radiusScale *= radiusScale;
-                face.m_boundsMin.x -= (offsetScale + face.m_radiusScale);
-                face.m_boundsMin.y -= (offsetScale + face.m_radiusScale);
-                face.m_boundsMin.z -= (offsetScale + face.m_radiusScale);
-                face.m_boundsMax.x += (offsetScale + face.m_radiusScale);
-                face.m_boundsMax.y += (offsetScale + face.m_radiusScale);
-                face.m_boundsMax.z += (offsetScale + face.m_radiusScale);
-                face.m_radiusScale = static_cast<float>(radiusBase - face.m_radiusScale);
+                PSVECAdd(&nearestPoint, &slideDir, &nearestPoint);
+                PSVECSubtract(&nearestPoint, &g_hit_cyl_min.m_bottom, out);
+            } else {
+                out->z = FLOAT_8032F8D0;
+                out->y = FLOAT_8032F8D0;
+                out->x = FLOAT_8032F8D0;
             }
-        } else if (chunk.m_id == 'NAME') {
-            char* mapHitName = chunkFile.GetString();
-            MapMng.AttachMapHit(this, mapHitName);
+
+            return 1;
+        }
+
+        float len = PSVECMag(&g_hit_cyl_min.m_axis);
+        PSVECScale(&g_hit_cyl_min.m_axis, out, g_hit_t - (FLOAT_8032F8C8 / len));
+        return 0;
+    }
+
+    if (gMapHitFace->m_normal.y < y) {
+        if (g_hit_t <= FLOAT_8032F8D8) {
+            out->z = FLOAT_8032F8D0;
+            out->y = FLOAT_8032F8D0;
+            out->x = FLOAT_8032F8D0;
+            return 1;
+        } else {
+            Vec push;
+            float planeDot = PSVECDotProduct(&g_hit_cyl_min.m_top, &gMapHitFace->m_normal);
+            float planeError = -(planeDot - (gMapHitFace->m_planeD + g_hit_cyl_min.m_radius));
+            PSVECScale(&gMapHitFace->m_normal, &push, FLOAT_8032F8C8 + planeError);
+            PSVECAdd(&g_hit_cyl_min.m_top, &push, &push);
+            PSVECSubtract(&push, &g_hit_cyl_min.m_bottom, out);
+            return 1;
         }
     }
 
-    chunkFile.PopChunk();
-    return 1;
+    float len = PSVECMag(&g_hit_cyl_min.m_axis);
+    PSVECScale(&g_hit_cyl_min.m_axis, out, g_hit_t - (FLOAT_8032F8C8 / len));
+    return 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80025dd4
+ * PAL Size: 32b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMapHit::GetHitFaceNormal(Vec* out)
+{
+    float* const normal = reinterpret_cast<float*>(gMapHitFace);
+    out->x = normal[0];
+    out->y = normal[1];
+    out->z = normal[2];
 }
 
 /*
@@ -784,218 +786,176 @@ int CMapHit::CheckHitCylinder(CMapCylinder* mapCylinder, Vec* position, unsigned
     g_hit_cyl = *mapCylinder;
     g_hit_mvec = *position;
 
-    while (faceIndex < endFace) {
-        g_hit_lpface = reinterpret_cast<CMapHitFace*>(Ptr(m_faces, faceOffset));
-        g_hit_t_min = FLOAT_8032F8C0;
+                CMapCylinder edgeCylinder;
+                edgeCylinder.m_bottom = previous;
+                edgeCylinder.m_axis = edge;
+                edgeCylinder.m_radius = g_hit_cyl.m_radius;
 
-        if (CheckHitFaceCylinder(mask) != 0) {
-            return 1;
+                if (FindIntersection(g_hit_cyl.m_bottom, *hitDirection, edgeCylinder, g_hit_edge_t) != 0 &&
+                    g_hit_edge_t < g_hit_t_min) {
+                    hitT = g_hit_edge_t;
+                    edgeIndex = i;
+                    PSVECScale(hitDirection, &g_hit_hpv, hitT);
+                    PSVECAdd(&g_hit_cyl.m_bottom, &g_hit_hpv, &g_hit_hpv);
+                    break;
+                }
+            }
+            previous = current;
         }
 
-        faceOffset += 0x50;
-        faceIndex++;
+        if (edgeIndex == -1 || g_hit_t_min <= hitT) {
+            return 0;
+        }
     }
 
-    return 0;
+    g_hit_t = hitT;
+    g_hit_t_min = hitT;
+    g_hit_edge_idx_min = edgeIndex;
+    g_hit_f = g_hit_lpface;
+    g_hit_cyl_min = g_hit_cyl;
+    if (gMapHitDrawMode != 0) {
+        g_hit_lpface->m_drawFlags = 1;
+    }
+    g_hit_mvec_min = g_hit_mvec;
+    g_hit_hpv_min = g_hit_hpv;
+    gMapHitFaceFlag = 1;
+    return 1;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMapHit::CheckHitCylinderNear(CMapCylinder* mapCylinder, Vec* position, unsigned long mask)
-{
-    g_hit_cyl = *mapCylinder;
-    g_hit_mvec = *position;
-
-    int faceOffset = 0;
-    for (int i = 0; i < m_faceCount; i++) {
-        g_hit_lpface = reinterpret_cast<CMapHitFace*>(Ptr(m_faces, faceOffset));
-        CheckHitFaceCylinder(mask);
-        faceOffset += 0x50;
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800254d0
- * PAL Size: 268b
+ * PAL Address: 0x800266f0
+ * PAL Size: 1608b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMapHit::CheckHitCylinderNear(CMapCylinder* mapCylinder, Vec* position, unsigned short startFace, unsigned short faceCount, unsigned long mask)
+int CMapHit::ReadOtmHit(CChunkFile& chunkFile)
 {
-    int endFace = static_cast<unsigned short>(startFace + faceCount);
-    int faceIndex = static_cast<unsigned short>(startFace);
-    int faceOffset = faceIndex * 0x50;
+    CChunkFile::CChunk chunk;
 
-    g_hit_cyl = *mapCylinder;
-    g_hit_mvec = *position;
+    chunkFile.PushChunk();
 
-    while (faceIndex < endFace) {
-        g_hit_lpface = reinterpret_cast<CMapHitFace*>(Ptr(m_faces, faceOffset));
-        CheckHitFaceCylinder(mask);
-        faceOffset += 0x50;
-        faceIndex++;
-    }
-}
+    while (chunkFile.GetNextChunk(chunk)) {
+        if (chunk.m_id == 'HITV') {
+            m_vertexCount = static_cast<unsigned short>(chunk.m_arg0);
+            m_vertices =
+                new (*reinterpret_cast<CMemory::CStage**>(&MapMng), const_cast<char*>(s_maphit_cpp_801D7088), 0x143)
+                    Vec[m_vertexCount];
 
-/*
- * --INFO--
- * PAL Address: 0x800273f4
- * PAL Size: 1376b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMapHit::Draw()
-{
-    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
-    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_NRM, GX_NRM_XYZ, GX_F32, 0);
-    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
-    GXClearVtxDesc();
-    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
-    GXSetVtxDesc(GX_VA_NRM, GX_DIRECT);
-    GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
+            for (unsigned int i = 0; i < m_vertexCount; i++) {
+                Vec& v = m_vertices[i];
+                v.x = chunkFile.GetF4();
+                v.y = chunkFile.GetF4();
+                v.z = chunkFile.GetF4();
 
-    unsigned char* face = reinterpret_cast<unsigned char*>(m_faces);
-    int faceIndex = 0;
-    while (faceIndex < m_faceCount) {
-        if ((reinterpret_cast<CMapHitFace*>(face)->m_drawFlags & 1) == 0) {
-            const unsigned char groupIndex = face[0x47];
-            unsigned char* mapMngBytes = reinterpret_cast<unsigned char*>(&MapMng);
-            const u32 colorA = *reinterpret_cast<u32*>(mapMngBytes + 0x214E8 + groupIndex * 0x14 + 0x4);
-            const u32 colorB = *reinterpret_cast<u32*>(mapMngBytes + 0x214E8 + groupIndex * 0x14 + 0x8);
-            const GXColor* colorABytes = reinterpret_cast<const GXColor*>(&colorA);
-            const GXColor* colorBBytes = reinterpret_cast<const GXColor*>(&colorB);
+                m_positionMin.x = (m_positionMin.x < v.x) ? m_positionMin.x : v.x;
+                m_positionMin.y = (m_positionMin.y < v.y) ? m_positionMin.y : v.y;
+                m_positionMin.z = (m_positionMin.z < v.z) ? m_positionMin.z : v.z;
 
-            GXBegin(GX_TRIANGLES, GX_VTXFMT7, 3);
-            unsigned char* index = face + 0x48;
-            int i = 0;
-            while (i < static_cast<int>(face[0x46])) {
-                Vec* vertex = m_vertices + *reinterpret_cast<unsigned short*>(index);
-                GXPosition3f32(vertex->x, vertex->y, vertex->z);
-                GXNormal3f32(*reinterpret_cast<float*>(face + 0x00), *reinterpret_cast<float*>(face + 0x04),
-                             *reinterpret_cast<float*>(face + 0x08));
-                GXColor4u8(colorABytes->r, colorABytes->g, colorABytes->b, colorABytes->a);
-                i++;
-                index += 2;
+                m_positionMax.x = (m_positionMax.x < v.x) ? v.x : m_positionMax.x;
+                m_positionMax.y = (m_positionMax.y < v.y) ? v.y : m_positionMax.y;
+                m_positionMax.z = (m_positionMax.z < v.z) ? v.z : m_positionMax.z;
             }
 
-            GXBegin(GX_TRIANGLES, GX_VTXFMT7, 3);
-            i = static_cast<int>(face[0x46]) - 1;
-            while (i >= 0) {
-                Vec* vertex = m_vertices + *reinterpret_cast<unsigned short*>(face + 0x48 + i * 2);
-                GXPosition3f32(vertex->x, vertex->y, vertex->z);
-                GXNormal3f32(*reinterpret_cast<float*>(face + 0x00), *reinterpret_cast<float*>(face + 0x04),
-                             *reinterpret_cast<float*>(face + 0x08));
-                GXColor4u8(colorBBytes->r, colorBBytes->g, colorBBytes->b, colorBBytes->a);
-                i--;
-            }
-        }
+            m_positionMin.x -= FLOAT_8032F8CC;
+            m_positionMin.y -= FLOAT_8032F8CC;
+            m_positionMin.z -= FLOAT_8032F8CC;
+            m_positionMax.x += FLOAT_8032F8CC;
+            m_positionMax.y += FLOAT_8032F8CC;
+            m_positionMax.z += FLOAT_8032F8CC;
+        } else if (chunk.m_id == 'HITF') {
+            m_faceCount = static_cast<unsigned short>(chunk.m_arg0);
+            m_faces =
+                new (*reinterpret_cast<CMemory::CStage**>(&MapMng), const_cast<char*>(s_maphit_cpp_801D7088), 0x159)
+                    CMapHitFace[m_faceCount];
 
-        face += 0x50;
-        faceIndex++;
+            const float offsetScale = FLOAT_8032F8F4;
+            const float radiusScale = FLOAT_8032F8F8;
+            const float zero = FLOAT_8032F8D0;
+            const double radiusBase = DOUBLE_8032F900;
+
+            for (unsigned int faceIdx = 0; faceIdx < m_faceCount; faceIdx++) {
+                chunkFile.Align(4);
+
+                CMapHitFace& face = m_faces[faceIdx];
+
+                face.m_normal.x = chunkFile.GetF4();
+                face.m_normal.y = chunkFile.GetF4();
+                face.m_normal.z = chunkFile.GetF4();
+                face.m_planeD = chunkFile.GetF4();
+
+                face.m_edgeFlags = chunkFile.Get1();
+                face.m_projectionAxis = chunkFile.Get1();
+                face.m_vertexCount = chunkFile.Get1();
+                face.m_groupIndex = chunkFile.Get1();
+                face.m_flags = 0;
+                face.m_drawFlags = 0;
+
+                const unsigned int vertexCount = face.m_vertexCount;
+                for (unsigned int i = 0; i < vertexCount; i++) {
+                    face.m_vertexOffsets[i][0] = zero;
+                    face.m_vertexOffsets[i][1] = zero;
+                }
+
+                if (chunk.m_version == 0) {
+                    if (System.m_execParam != 0) {
+                        System.Printf(const_cast<char*>(s_old_mid_format_801D7094));
+                    }
+                    chunkFile.Align(4);
+                    for (unsigned int i = 0; i < vertexCount; i++) {
+                        (void)chunkFile.GetF4();
+                        (void)chunkFile.GetF4();
+                    }
+                    face.m_radiusScale = zero;
+                } else if (chunk.m_version == 1) {
+                    if (System.m_execParam != 0) {
+                        System.Printf(const_cast<char*>(s_old_mid_format_801D7094));
+                    }
+                    face.m_radiusScale = chunkFile.GetF4();
+                    chunkFile.Align(4);
+                } else {
+                    face.m_radiusScale = chunkFile.GetF4();
+                    chunkFile.Align(4);
+                    const float vertexOffsetScale = FLOAT_8032F8F4;
+                    for (unsigned int i = 0; i < vertexCount; i++) {
+                        face.m_vertexOffsets[i][0] = chunkFile.GetF4() * vertexOffsetScale;
+                        face.m_vertexOffsets[i][1] = chunkFile.GetF4() * vertexOffsetScale;
+                    }
+                }
+
+                for (unsigned int i = 0; i < vertexCount; i++) {
+                    const unsigned short idx = chunkFile.Get2();
+                    face.m_vertexIndices[i] = idx;
+
+                    const Vec& v = m_vertices[idx];
+                    face.m_boundsMin.x = (face.m_boundsMin.x < v.x) ? face.m_boundsMin.x : v.x;
+                    face.m_boundsMin.y = (face.m_boundsMin.y < v.y) ? face.m_boundsMin.y : v.y;
+                    face.m_boundsMin.z = (face.m_boundsMin.z < v.z) ? face.m_boundsMin.z : v.z;
+
+                    face.m_boundsMax.x = (face.m_boundsMax.x < v.x) ? v.x : face.m_boundsMax.x;
+                    face.m_boundsMax.y = (face.m_boundsMax.y < v.y) ? v.y : face.m_boundsMax.y;
+                    face.m_boundsMax.z = (face.m_boundsMax.z < v.z) ? v.z : face.m_boundsMax.z;
+                }
+
+                face.m_radiusScale *= radiusScale;
+                face.m_boundsMin.x -= (offsetScale + face.m_radiusScale);
+                face.m_boundsMin.y -= (offsetScale + face.m_radiusScale);
+                face.m_boundsMin.z -= (offsetScale + face.m_radiusScale);
+                face.m_boundsMax.x += (offsetScale + face.m_radiusScale);
+                face.m_boundsMax.y += (offsetScale + face.m_radiusScale);
+                face.m_boundsMax.z += (offsetScale + face.m_radiusScale);
+                face.m_radiusScale = static_cast<float>(radiusBase - face.m_radiusScale);
+            }
+        } else if (chunk.m_id == 'NAME') {
+            char* mapHitName = chunkFile.GetString();
+            MapMng.AttachMapHit(this, mapHitName);
+        }
     }
 
-    GXClearVtxDesc();
-    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
-    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
-    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
-    GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
-
-    face = reinterpret_cast<unsigned char*>(m_faces);
-    faceIndex = 0;
-    while (true) {
-        if (static_cast<int>(m_faceCount) <= faceIndex) {
-            return;
-        }
-
-        CMapHitFace* hitFace = reinterpret_cast<CMapHitFace*>(face);
-        if ((hitFace->m_drawFlags & 1) == 0) {
-            hitFace->m_drawFlags = 0;
-        } else {
-            hitFace->m_drawFlags = 0;
-            hitFace->m_drawFlags = 0;
-
-            GXBegin(GX_TRIANGLES, GX_VTXFMT7, 3);
-            unsigned char* index = face + 0x48;
-            int i = 0;
-            while (i < static_cast<int>(face[0x46])) {
-                Vec* vertex = m_vertices + *reinterpret_cast<unsigned short*>(index);
-                GXPosition3f32(vertex->x, vertex->y, vertex->z);
-                GXColor4u8(0x40, 0xFF, 0x40, 0xFF);
-                i++;
-                index += 2;
-            }
-
-            GXBegin(GX_TRIANGLES, GX_VTXFMT7, 3);
-            i = static_cast<int>(face[0x46]) - 1;
-            while (i >= 0) {
-                Vec* vertex = m_vertices + *reinterpret_cast<unsigned short*>(face + 0x48 + i * 2);
-                GXPosition3f32(vertex->x, vertex->y, vertex->z);
-                GXColor4u8(0x40, 0xFF, 0x40, 0xFF);
-                i--;
-            }
-        }
-
-        face += 0x50;
-        faceIndex++;
-    }
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80024e64
- * PAL Size: 268b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMapHit::DrawWire()
-{
-    static const u32 kFaceStride = 0x50;
-
-    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
-    GXClearVtxDesc();
-    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
-
-    unsigned char* face = reinterpret_cast<unsigned char*>(m_faces);
-    int faceIndex = 0;
-    while (faceIndex < static_cast<int>(m_faceCount)) {
-        GXBegin(static_cast<GXPrimitive>(0xB0), GX_VTXFMT7, static_cast<u16>(4));
-
-        unsigned char* index = face;
-        int i = 0;
-        while (i < static_cast<int>(face[0x46])) {
-            Vec* vertex = m_vertices + *reinterpret_cast<unsigned short*>(index + 0x48);
-            GXPosition3f32(vertex->x, vertex->y, vertex->z);
-            i++;
-            index += sizeof(unsigned short);
-        }
-
-        const unsigned short firstIndex = *reinterpret_cast<unsigned short*>(face + 0x48);
-        face += kFaceStride;
-        faceIndex++;
-
-        Vec* firstVertex = m_vertices + firstIndex;
-        GXPosition3f32(firstVertex->x, firstVertex->y, firstVertex->z);
-    }
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMapHit::DrawNormal()
-{
-	// TODO
+    chunkFile.PopChunk();
+    return 1;
 }
 
 /*
@@ -1016,4 +976,218 @@ CMapHitFace::CMapHitFace()
     m_boundsMax.z = FLOAT_8032F8F0;
     m_boundsMax.y = FLOAT_8032F8F0;
     m_boundsMax.x = FLOAT_8032F8F0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80026d5c
+ * PAL Size: 144b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+CMapHit::~CMapHit()
+{
+    if (m_vertices != 0) {
+        delete m_vertices;
+        m_vertices = 0;
+    }
+
+    if (m_faces != 0) {
+        delete[] m_faces;
+        m_faces = 0;
+    }
+
+    m_vertexCount = 0;
+    m_faceCount = 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80026dec
+ * PAL Size: 56b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+CMapHit::CMapHit()
+{
+    m_positionMin.z = FLOAT_8032F8EC;
+    m_positionMin.y = FLOAT_8032F8EC;
+    m_positionMin.x = FLOAT_8032F8EC;
+
+    m_positionMax.z = FLOAT_8032F8F0;
+    m_positionMax.y = FLOAT_8032F8F0;
+    m_positionMax.x = FLOAT_8032F8F0;
+
+    m_vertexCount = 0;
+    m_faceCount = 0;
+    m_vertices = 0;
+    m_faces = 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80026e24
+ * PAL Size: 2308b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int FindIntersection(const Vec& start, const Vec& direction, const CMapCylinder& cyl, float& outT)
+{
+    Vec axis = cyl.m_axis;
+    const f32 axisLen = PSVECMag(&axis);
+    PSVECScale(&axis, &axis, 1.0f / axisLen);
+
+    Vec orthogonal;
+    if (fabsf(axis.x) < fabsf(axis.y) || fabsf(axis.x) < fabsf(axis.z)) {
+        orthogonal.x = 0.0f;
+        orthogonal.y = axis.z;
+        orthogonal.z = -axis.y;
+    } else {
+        orthogonal.x = -axis.y;
+        orthogonal.y = axis.x;
+        orthogonal.z = 0.0f;
+    }
+    PSVECNormalize(&orthogonal, &orthogonal);
+
+    Vec bitangent;
+    PSVECCrossProduct(&axis, &orthogonal, &bitangent);
+
+    Vec localDirection;
+    localDirection.x = PSVECDotProduct(&orthogonal, &direction);
+    localDirection.y = PSVECDotProduct(&bitangent, &direction);
+    localDirection.z = PSVECDotProduct(&axis, &direction);
+
+    const f32 directionLen = PSVECMag(&localDirection);
+    const f32 tScale = 1.0f / directionLen;
+    PSVECScale(&localDirection, &localDirection, tScale);
+
+    Vec relStart;
+    PSVECSubtract(&start, &cyl.m_bottom, &relStart);
+
+    const f32 px = PSVECDotProduct(&orthogonal, &relStart);
+    const f32 py = PSVECDotProduct(&bitangent, &relStart);
+    const f32 pz = PSVECDotProduct(&axis, &relStart);
+
+    const f32 vx = localDirection.x;
+    const f32 vy = localDirection.y;
+    const f32 vz = localDirection.z;
+    const f32 radius = cyl.m_radius;
+    const f32 radiusSq = radius * radius;
+
+    if (fabsf(vz) < 1.0f) {
+        const f32 radialC = (px * px + py * py) - radiusSq;
+        const f32 radialB = px * vx + py * vy;
+        const f32 radialA = vx * vx + vy * vy;
+        f32 disc = radialB * radialB - radialA * radialC;
+        if (disc < 0.0f) {
+            return 0;
+        }
+
+        if (disc == 0.0f) {
+            const f32 t = -radialB / radialA;
+            const f32 z = (t * vz) + pz;
+            if (0.0f <= z && z <= axisLen) {
+                outT = t * tScale;
+                if (0.0f <= outT && outT <= 1.0f) {
+                    return 1;
+                }
+                return 0;
+            }
+        } else {
+            disc = sqrtf(disc);
+            const f32 t = (-radialB - disc) / radialA;
+            const f32 z = (t * vz) + pz;
+            if (0.0f <= z && z <= axisLen) {
+                outT = t * tScale;
+                if (0.0f <= outT && outT <= 1.0f) {
+                    return 1;
+                }
+                return 0;
+            }
+        }
+
+        if (g_hit_lpface->m_projectionAxis == 1) {
+            f32 capC = (pz * pz) + radialC;
+            f32 capB = (pz * vz) + radialB;
+            disc = capB * capB - capC;
+            if (disc == 0.0f) {
+                const f32 t = -capB;
+                if ((t * vz) + pz <= 0.0f) {
+                    outT = t * tScale;
+                    if (0.0f <= outT && outT <= 1.0f) {
+                        return 1;
+                    }
+                    return 0;
+                }
+            } else if (disc > 0.0f) {
+                disc = sqrtf(disc);
+                f32 t = -capB - disc;
+                if ((t * vz) + pz <= 0.0f) {
+                    outT = t * tScale;
+                    if (0.0f <= outT && outT <= 1.0f) {
+                        return 1;
+                    }
+                    return 0;
+                }
+
+                t = -capB + disc;
+                if ((t * vz) + pz <= 0.0f) {
+                    outT = t * tScale;
+                    if (0.0f <= outT && outT <= 1.0f) {
+                        return 1;
+                    }
+                    return 0;
+                }
+            }
+
+            capB = -((vz * axisLen) - capB);
+            disc = capB * capB - (axisLen * -((2.0f * pz) - axisLen) + capC);
+            if (disc == 0.0f) {
+                const f32 t = -capB;
+                if (axisLen <= (t * vz) + pz) {
+                    outT = t * tScale;
+                    if (0.0f <= outT && outT <= 1.0f) {
+                        return 1;
+                    }
+                    return 0;
+                }
+            } else if (disc > 0.0f) {
+                disc = sqrtf(disc);
+                f32 t = -capB - disc;
+                if (axisLen <= (t * vz) + pz) {
+                    outT = t * tScale;
+                    if (0.0f <= outT && outT <= 1.0f) {
+                        return 1;
+                    }
+                    return 0;
+                }
+
+                t = -capB + disc;
+                if (axisLen <= (t * vz) + pz) {
+                    outT = t * tScale;
+                    if (0.0f <= outT && outT <= 1.0f) {
+                        return 1;
+                    }
+                    return 0;
+                }
+            }
+        }
+
+        return 0;
+    }
+
+    f32 disc = radiusSq - (px * px + py * py);
+    if (disc < 0.0f) {
+        return 0;
+    }
+
+    disc = sqrtf(disc);
+    outT = (-(pz + disc)) * tScale;
+    return 1;
 }

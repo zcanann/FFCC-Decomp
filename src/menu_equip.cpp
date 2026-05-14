@@ -322,7 +322,9 @@ int CMenuPcs::EquipCtrlCur()
 	if (blocked) {
 		press = 0;
 	} else {
-		press = Pad._8_2_;
+		int padIndex = blocked;
+		padIndex &= ~-((__cntlzw((unsigned int)Pad._448_4_) & 0x20) >> 5);
+		press = *(u16*)((u8*)&Pad + padIndex * 0x54 + 8);
 	}
 
 	blocked = false;
@@ -332,7 +334,9 @@ int CMenuPcs::EquipCtrlCur()
 	if (blocked) {
 		hold = 0;
 	} else {
-		hold = Pad._20_2_;
+		int padIndex = blocked;
+		padIndex &= ~-((__cntlzw((unsigned int)Pad._448_4_) & 0x20) >> 5);
+		hold = *(u16*)((u8*)&Pad + padIndex * 0x54 + 0x14);
 	}
 
 	if (hold == 0) {
@@ -524,7 +528,7 @@ void CMenuPcs::EquipDraw()
 	item = menuData + 4;
 	for (int i = 0; i < 4; i++) {
 		if (*(s16*)(caravanWork + 0xac + i * 2) >= 0) {
-			int iconY = item[1] + 6;
+			int iconY = (int)((float)(item[1] + 6) - FLOAT_80332ee0);
 			int iconX = item[0] + item[2] - 0x10;
 			int itemIdx = *(s16*)(caravanWork + *(s16*)(caravanWork + 0xac + i * 2) * 2 + 0xb6);
 			DrawSingleIcon__8CMenuPcsFiiifif((double)*(float*)(item + 8), this, itemIdx, iconX, iconY, 0.0f);
@@ -824,13 +828,50 @@ void CMenuPcs::EquipCtrl()
 		index = 0;
 		offset = (equipCount - 1) * 0x40;
 		if (-1 < (int)(equipCount - 1)) {
+			u32 blockCount = equipCount >> 3;
+			if (blockCount != 0) {
+				do {
+					item = GetEquipListBase(this) + offset + 8;
+					*reinterpret_cast<int*>(item + 0x24) = index;
+					*reinterpret_cast<int*>(item + 0x28) = 3;
+					item = GetEquipListBase(this) + offset + -0x38;
+					*reinterpret_cast<int*>(item + 0x24) = index + 1;
+					*reinterpret_cast<int*>(item + 0x28) = 3;
+					item = GetEquipListBase(this) + offset + -0x78;
+					*reinterpret_cast<int*>(item + 0x24) = index + 2;
+					*reinterpret_cast<int*>(item + 0x28) = 3;
+					item = GetEquipListBase(this) + offset + -0xb8;
+					*reinterpret_cast<int*>(item + 0x24) = index + 3;
+					*reinterpret_cast<int*>(item + 0x28) = 3;
+					item = GetEquipListBase(this) + offset + -0xf8;
+					*reinterpret_cast<int*>(item + 0x24) = index + 4;
+					*reinterpret_cast<int*>(item + 0x28) = 3;
+					item = GetEquipListBase(this) + offset + -0x138;
+					*reinterpret_cast<int*>(item + 0x24) = index + 5;
+					*reinterpret_cast<int*>(item + 0x28) = 3;
+					item = GetEquipListBase(this) + offset + -0x178;
+					*reinterpret_cast<int*>(item + 0x24) = index + 6;
+					*reinterpret_cast<int*>(item + 0x28) = 3;
+					item = GetEquipListBase(this) + offset + -0x1b8;
+					offset = offset + -0x200;
+					*reinterpret_cast<int*>(item + 0x24) = index + 7;
+					index = index + 8;
+					*reinterpret_cast<int*>(item + 0x28) = 3;
+					blockCount = blockCount - 1;
+				} while (blockCount != 0);
+				equipCount = equipCount & 7;
+				if (equipCount == 0) {
+					return;
+				}
+			}
 			do {
 				item = GetEquipListBase(this) + offset + 8;
 				*reinterpret_cast<int*>(item + 0x24) = index;
 				index = index + 1;
 				*reinterpret_cast<int*>(item + 0x28) = 3;
 				offset = offset + -0x40;
-			} while (index < (int)equipCount);
+				equipCount = equipCount - 1;
+			} while (equipCount != 0);
 		}
 	}
 }

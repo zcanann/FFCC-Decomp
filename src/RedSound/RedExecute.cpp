@@ -889,19 +889,18 @@ RedReverbSize* GetReverbInfo()
  */
 RedVoiceDATA* EntryVoiceSearch(RedTrackDATA* track)
 {
-    RedVoiceDATA* bestVoice = 0;
     RedVoiceDATA* voice;
     int bestEnvelope;
     RedVoiceDATA* voiceEnd;
+    RedVoiceDATA* bestVoice = 0;
 
     if ((static_cast<s8>(track->m_note.m_allocFlags) & REDSOUND_NOTE_ALLOC_DIRECT_MASK) != 0) {
-        if (((track->m_note.m_allocFlags & REDSOUND_NOTE_ALLOC_DIRECT) == 0) &&
-            ((p_VoiceData + track->m_trackNo)->m_track != 0) &&
-            ((p_VoiceData + track->m_trackNo)->m_track != track)) {
-            voice = 0;
-        }
-        else {
+        if (((track->m_note.m_allocFlags & REDSOUND_NOTE_ALLOC_DIRECT) != 0) ||
+            ((p_VoiceData + track->m_trackNo)->m_track == 0) ||
+            ((p_VoiceData + track->m_trackNo)->m_track == track)) {
             voice = p_VoiceData + track->m_trackNo;
+        } else {
+            voice = 0;
         }
     } else {
         if ((track->m_note.m_allocFlags & REDSOUND_NOTE_ALLOC_PRIORITY) != 0) {
@@ -931,8 +930,7 @@ RedVoiceDATA* EntryVoiceSearch(RedTrackDATA* track)
 
         if (voice == voiceEnd) {
             RedVoiceDATA* selectedVoice;
-            RedSoundCONTROL* soundControl = p_SoundControl;
-            soundControl->m_updateFlags = soundControl->m_updateFlags | 2;
+            p_SoundControl->m_updateFlags |= 2;
             if (bestEnvelope == REDSOUND_ENVELOPE_LEVEL_FULL) {
                 selectedVoice = 0;
             } else {

@@ -559,7 +559,6 @@ void CWind::Frame()
     float f0;
     float f1;
     float f2;
-    double d0;
 
     obj = m_objects;
     i = 0;
@@ -625,18 +624,19 @@ void CWind::Frame()
                 obj->maxZ = obj->centerZ + obj->radius;
             }
 
-            obj->curPower = FLOAT_80330f38 * (obj->targetPower - obj->curPower) + obj->curPower;
+            f0 = obj->targetPower;
+            f1 = obj->curPower;
+            f2 = FLOAT_80330f38;
+            obj->curPower = f2 * (f0 - f1) + f1;
             f0 = Math.RandF();
-            obj->curDir = obj->curDir +
-                          (FLOAT_80330f2c * f0 +
-                           (FLOAT_80330f38 * (obj->targetDir - obj->curDir) - FLOAT_80330f28));
+            f1 = obj->targetDir;
+            f2 = obj->curDir;
+            obj->curDir = f2 + (FLOAT_80330f2c * f0 + (FLOAT_80330f38 * (f1 - f2) - FLOAT_80330f28));
 
             if ((obj->type == 0) || (obj->type == 1)) {
-                d0 = (double)sin((double)obj->curDir);
-                obj->force.x = obj->curPower * (float)d0;
+                obj->force.x = obj->curPower * (float)sin((double)obj->curDir);
                 obj->force.y = obj->curPower * (FLOAT_80330f20 * Math.RandF() + FLOAT_80330f24);
-                d0 = (double)cos((double)obj->curDir);
-                obj->force.z = obj->curPower * (float)d0;
+                obj->force.z = obj->curPower * (float)cos((double)obj->curDir);
             }
         }
 

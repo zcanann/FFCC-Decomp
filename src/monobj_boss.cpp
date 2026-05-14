@@ -111,6 +111,11 @@ struct MeteoParasiteCBossWork {
     int m_wait;
 };
 
+struct DuctBossWork {
+    u8 m_pad00[0x38];
+    CGMonObj* m_objs[3];
+};
+
 /*
  * --INFO--
  * PAL Address: 0x80132f68

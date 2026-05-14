@@ -945,92 +945,86 @@ void CMapObj::SetLink()
     CMapObj* search4Start = mapStart;
     CMapObj* search5Start = mapStart;
     CMapObj* search6Start = mapStart;
-    CMapObj* search7Start = mapStart;
-    CMapObj* search8Start = mapStart;
-    CMapObj* child0;
-    CMapObj* child1;
-    CMapObj* child2;
-    CMapObj* child3;
-    CMapObj* child4;
-    CMapObj* child5;
-    CMapObj* child6;
-    CMapObj* child7;
-    CMapObj* child8;
+    CMapObj* child;
+    CMapObj* cursor;
+    CMapObj* head;
 
-    while ((child0 = MapMng.SearchChildMapObj(search0, this)) != 0) {
+    while ((child = MapMng.SearchChildMapObj(search0, this)) != 0) {
         CMapObj* search1 = mapStart;
         CMapObj* head1 = 0;
 
-        child0->m_next = head0;
-        while ((child1 = MapMng.SearchChildMapObj(search1, child0)) != 0) {
-            CMapObj* search2 = search2Start;
+        child->m_next = head0;
+        CMapObj* child0 = child;
+        while ((child = MapMng.SearchChildMapObj(search1, child0)) != 0) {
             CMapObj* head2 = 0;
 
-            child1->m_next = head1;
-            while ((child2 = MapMng.SearchChildMapObj(search2, child1)) != 0) {
-                CMapObj* search3 = search3Start;
-                CMapObj* head3 = 0;
-
-                child2->m_next = head2;
-                while ((child3 = MapMng.SearchChildMapObj(search3, child2)) != 0) {
-                    CMapObj* search4 = search4Start;
-                    CMapObj* head4 = 0;
-
-                    child3->m_next = head3;
-                    while ((child4 = MapMng.SearchChildMapObj(search4, child3)) != 0) {
-                        CMapObj* search5 = search5Start;
-                        CMapObj* head5 = 0;
-
-                        child4->m_next = head4;
-                        while ((child5 = MapMng.SearchChildMapObj(search5, child4)) != 0) {
-                            CMapObj* search6 = search6Start;
-                            CMapObj* head6 = 0;
-
-                            child5->m_next = head5;
-                            while ((child6 = MapMng.SearchChildMapObj(search6, child5)) != 0) {
-                                CMapObj* search7 = search7Start;
-                                CMapObj* head7 = 0;
-
-                                child6->m_next = head6;
-                                while ((child7 = MapMng.SearchChildMapObj(search7, child6)) != 0) {
-                                    CMapObj* search8 = search8Start;
-                                    CMapObj* head8 = 0;
-
-                                    child7->m_next = head7;
-                                    while ((child8 = MapMng.SearchChildMapObj(search8, child7)) != 0) {
-                                        child8->m_next = head8;
-                                        child8->SetLink();
-                                        search8 = NextSlot(child8);
-                                        head8 = child8;
+            child->m_next = head1;
+            CMapObj* child1 = child;
+            cursor = search2Start;
+            while ((child = MapMng.SearchChildMapObj(cursor, child1)) != 0) {
+                child->m_next = head2;
+                CMapObj* child2 = child;
+                cursor = search3Start;
+                head = 0;
+                while ((child = MapMng.SearchChildMapObj(cursor, child2)) != 0) {
+                    child->m_next = head;
+                    CMapObj* child3 = child;
+                    cursor = search4Start;
+                    head = 0;
+                    while ((child = MapMng.SearchChildMapObj(cursor, child3)) != 0) {
+                        child->m_next = head;
+                        CMapObj* child4 = child;
+                        cursor = search5Start;
+                        head = 0;
+                        while ((child = MapMng.SearchChildMapObj(cursor, child4)) != 0) {
+                            child->m_next = head;
+                            CMapObj* child5 = child;
+                            cursor = search6Start;
+                            head = 0;
+                            while ((child = MapMng.SearchChildMapObj(cursor, child5)) != 0) {
+                                child->m_next = head;
+                                CMapObj* child6 = child;
+                                cursor = mapStart;
+                                head = 0;
+                                while ((child = MapMng.SearchChildMapObj(cursor, child6)) != 0) {
+                                    child->m_next = head;
+                                    CMapObj* child7 = child;
+                                    cursor = mapStart;
+                                    head = 0;
+                                    while ((child = MapMng.SearchChildMapObj(cursor, child7)) != 0) {
+                                        child->m_next = head;
+                                        child->SetLink();
+                                        cursor = NextSlot(child);
+                                        head = child;
                                     }
 
-                                    child7->m_child = head8;
-                                    search7 = NextSlot(child7);
-                                    head7 = child7;
+                                    child7->m_child = head;
+                                    cursor = NextSlot(child7);
+                                    head = child7;
                                 }
 
-                                child6->m_child = head7;
-                                search6 = NextSlot(child6);
-                                head6 = child6;
+                                child6->m_child = head;
+                                cursor = NextSlot(child6);
+                                head = child6;
                             }
 
-                            child5->m_child = head6;
-                            search5 = NextSlot(child5);
-                            head5 = child5;
+                            child5->m_child = head;
+                            cursor = NextSlot(child5);
+                            head = child5;
                         }
 
-                        child4->m_child = head5;
-                        search4 = NextSlot(child4);
-                        head4 = child4;
+                        child4->m_child = head;
+                        cursor = NextSlot(child4);
+                        head = child4;
                     }
 
-                    child3->m_child = head4;
-                    search3 = NextSlot(child3);
-                    head3 = child3;
+                    child3->m_child = head;
+                    cursor = NextSlot(child3);
+                    head = child3;
                 }
 
-                child2->m_child = head3;
-                search2 = NextSlot(child2);
+                child2->m_child = head;
+                cursor = NextSlot(child2);
                 head2 = child2;
             }
 

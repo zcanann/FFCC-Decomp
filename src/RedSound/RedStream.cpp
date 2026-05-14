@@ -686,8 +686,8 @@ static int _ArrangeStreamDataNoLoop(RedStreamDATA* stream, int bufferIndex, int 
 static int _ArrangeStreamDataLoop(RedStreamDATA* stream, int bufferIndex, int byteCount)
 {
 	RedStreamStereoFrame* srcEnd;
-	RedStreamChannelFrame* rightDst;
 	RedStreamChannelFrame* leftDst;
+	RedStreamChannelFrame* rightDst;
 	unsigned char* dstBase;
 	RedStreamStereoFrame* srcFrame;
 	RedVoiceDATA* voiceData;

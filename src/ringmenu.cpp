@@ -61,7 +61,7 @@ static const char DAT_801da01c[] = {
 	(char)0xBD, (char)0x81, (char)0x42, 0x25, 0x64, 0x2D, 0x25, 0x64,
 	0x0A, 0x00, 0x00, 0x00
 };
-extern float FLOAT_803309c0;
+extern const float FLOAT_803309c0;
 extern float FLOAT_803309c4;
 extern float FLOAT_803309c8;
 extern float FLOAT_803309cc;
@@ -234,14 +234,14 @@ void CRingMenu::Create()
 	m_buttonTimers[8] = 0;
 	m_ringRotation = -1;
 	m_rotationPhase = -1;
-	m_spinPhase = 0.0f;
+	m_spinPhase = FLOAT_803309c0;
 	m_gbaConnectedFlag = 0;
 	m_gbaAnimCounter = 0;
 	m_commonFrameCounter = 0;
 	m_unk4f8 = 0;
 	m_timerB = 0;
 	m_currentCommandIndex = 0;
-	m_spinAccumulator = 0.0f;
+	m_spinAccumulator = FLOAT_803309c0;
 }
 
 /*

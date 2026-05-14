@@ -1233,8 +1233,188 @@ void CGoOutMenu::CalcGoOut()
         }
         SetGoOutMode(0xE);
         break;
+    case 0xC:
+        if (field_0x4 != 0) {
+            if (SetMemCardError() != 0) {
+                return;
+            }
+
+            MenuPcs.GetMcAccessPos(&field_0xc, &field_0x10);
+            if (field_0xc == -1) {
+                int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
+                SetMenuStr(0, 5,
+                           GetGoOutMessageLine(languageId, 0),
+                           GetGoOutMessageLine(languageId, 1),
+                           GetGoOutMessageLine(languageId, 2),
+                           GetGoOutMessageLine(languageId, 3),
+                           GetGoOutMessageLine(languageId, 4));
+                field_0x19 = -1;
+                SetGoOutMode(0);
+            } else {
+                field_0xc = 0;
+                mcCtrl.m_cardChannel = field_0xc;
+                field_0x2 = static_cast<char>(mcCtrl.m_cardChannel);
+                field_0x3 = static_cast<char>(field_0x10);
+                SetGoOutMode(10);
+            }
+        }
+        break;
+    case 0x10:
+        if (field_0x45 == 0) {
+            break;
+        }
+
+        input = GetGoOutInputMask();
+        if ((input & 0x200) != 0) {
+            Sound.PlaySe(3, 0x40, 0x7f, 0);
+            SetGoOutMode(0xf);
+            break;
+        }
+
+        field_0x47 = 1;
+        if (field_0x1e == 0) {
+            field74_0x4a = 0xb1;
+        } else {
+            field74_0x4a = 0x8b;
+        }
+        field75_0x4c = 0xdc;
+        field_0x49 = 0;
+        next = 0;
+
+        if (MenuMcWinState(menuPcsLayout).m_mode == 1) {
+            input = GetGoOutInputMask();
+            if ((input & 3) == 0) {
+                input = GetGoOutInputMask();
+                if ((input & 0x100) != 0) {
+                    if (field_0x46 == 0) {
+                        Sound.PlaySe(2, 0x40, 0x7f, 0);
+                    } else if (field_0x46 == 1) {
+                        Sound.PlaySe(3, 0x40, 0x7f, 0);
+                    }
+                    next = static_cast<unsigned char>(field_0x46 + 1);
+                }
+            } else {
+                field_0x46 ^= 1;
+                Sound.PlaySe(1, 0x40, 0x7f, 0);
+            }
+        }
+
+        if (next == 2) {
+            SetGoOutMode(0xf);
+        } else if (next == 1) {
+            SetGoOutMode(0x11);
+        }
+        break;
+    case 0x11:
+        if (field_0x45 == 0) {
+            break;
+        }
+
+        input = GetGoOutInputMask();
+        if ((input & 0x200) != 0) {
+            Sound.PlaySe(3, 0x40, 0x7f, 0);
+            SetGoOutMode(0xf);
+            break;
+        }
+
+        field_0x47 = 1;
+        field74_0x4a = 0xd3;
+        field75_0x4c = 0xe9;
+        field_0x49 = 0;
+        next = 0;
+
+        if (MenuMcWinState(menuPcsLayout).m_mode == 1) {
+            input = GetGoOutInputMask();
+            if ((input & 3) == 0) {
+                input = GetGoOutInputMask();
+                if ((input & 0x100) != 0) {
+                    if (field_0x46 == 0) {
+                        Sound.PlaySe(2, 0x40, 0x7f, 0);
+                    } else if (field_0x46 == 1) {
+                        Sound.PlaySe(3, 0x40, 0x7f, 0);
+                    }
+                    next = static_cast<unsigned char>(field_0x46 + 1);
+                }
+            } else {
+                field_0x46 ^= 1;
+                Sound.PlaySe(1, 0x40, 0x7f, 0);
+            }
+        }
+
+        if (next == 2) {
+            SetGoOutMode(0xf);
+        } else if (next == 1) {
+            SetGoOutMode(0x12);
+        }
+        break;
+    case 0x12:
+        if (field_0x45 != 0 && field_0x4 != 0) {
+            if (SetMemCardError() != 0) {
+                return;
+            }
+            SetGoOutMode(0x13);
+        }
+        break;
+    case 0x13:
+        if (field_0x45 != 0 && field_0x4 != 0) {
+            if (SetMemCardError() != 0) {
+                return;
+            }
+            SetGoOutMode(0x14);
+        }
+        break;
+    case 0x14:
+        if (field_0x45 != 0) {
+            input = GetGoOutInputMask();
+            if ((input & 0x100) != 0) {
+                Sound.PlaySe(2, 0x40, 0x7f, 0);
+                MenuPcs.SetCaravanWork(menuPcsLayout.m_transferSaveData);
+                MenuPcs.ChgAllModel();
+                SetGoOutMode(1);
+            }
+        }
+        break;
     default:
         break;
+    }
+
+    if (field_0x1 == 2) {
+        mcCtrl.SaveDataBuffer(reinterpret_cast<char*>(field_0x8));
+        field_0x4 = mcCtrl.m_lastResult;
+        if (field_0x4 != 0) {
+            field_0x0 = field_0x1;
+            field_0x1 = 0;
+        }
+    } else if (field_0x1 < 2) {
+        if (field_0x1 != 0) {
+            field_0x4 = mcCtrl.ChkNowData();
+            if (field_0x4 != 0) {
+                field_0x0 = field_0x1;
+                field_0x1 = 0;
+            }
+        }
+    } else if (field_0x1 < 4) {
+        mcCtrl.Format(1);
+        int formatResult = mcCtrl.m_lastResult;
+        if (formatResult < 0) {
+            MemoryCardMan.m_opDoneFlag = 1;
+            MemoryCardMan.m_currentSlot = static_cast<char>(0xff);
+        }
+
+        if (formatResult == 0) {
+            field_0x4 = 0;
+        } else if (formatResult == 1) {
+            field_0x4 = 1;
+        } else if (formatResult == -2) {
+            field_0x4 = -5;
+        } else {
+            field_0x4 = -999;
+        }
+
+        if (field_0x4 != 0) {
+            field_0x0 = field_0x1;
+            field_0x1 = 0;
+        }
     }
 }
 

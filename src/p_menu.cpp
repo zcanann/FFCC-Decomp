@@ -1731,12 +1731,8 @@ void CMenuPcs::drawPause()
  */
 void CMenuPcs::createBattle()
 {
-    static const int kBattleTextureSetStart = 2;
-    static const int kBattleTextureStart = 0x16;
-
     char path[0x104];
     char fontPath[0x80];
-    int* textureInfo = sMenuTextureInfoTable;
 
     for (int i = 0; i < 2; i++) {
         const char* language = Game.GetLangString();
@@ -1750,44 +1746,44 @@ void CMenuPcs::createBattle()
             void* stage = m_mode == 1 ? *reinterpret_cast<void**>(&MapMng) : m_menuStage;
 
             CTextureSet* textureSet = new (MenuPcs.m_menuStage, const_cast<char*>(s_p_menu_cpp_801d9d80), 0x182) CTextureSet;
-            m_textureSets[kBattleTextureSetStart + i] = textureSet;
-            textureSet->Create(File.m_readBuffer, reinterpret_cast<CMemory::CStage*>(stage), 0, 0, 0, 0);
+            m_textureSets[i + 2] = textureSet;
+            m_textureSets[i + 2]->Create(File.m_readBuffer, reinterpret_cast<CMemory::CStage*>(stage), 0, 0, 0, 0);
 
             File.Close(fileHandle);
         }
     }
 
+    int* textureInfo = sMenuTextureInfoTable;
     for (int i = 0; i < 10; i++) {
         CTextureSet* textureSet = m_textureSets[textureInfo[0]];
         const unsigned long textureIndex = static_cast<unsigned long>(textureSet->Find(reinterpret_cast<char*>(textureInfo[1])));
         CTexture* texture = (*reinterpret_cast<CPtrArray<CTexture*>*>(reinterpret_cast<u8*>(textureSet) + 8))[textureIndex];
         *reinterpret_cast<int*>(reinterpret_cast<u8*>(texture) + 4) =
             *reinterpret_cast<int*>(reinterpret_cast<u8*>(texture) + 4) + 1;
-        m_textures[kBattleTextureStart + i] = texture;
+        m_textures[i + 0x16] = texture;
         textureInfo += 2;
     }
 
     for (int i = 0; i < 12; i++) {
         CMesMenu* menu = new (MenuPcs.m_menuStage, const_cast<char*>(s_p_menu_cpp_801d9d80), 0x48B) CMesMenu;
         m_battleMesMenus[i] = menu;
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(menu) + 0x18) = i;
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(menu) + 0x1C) = i;
-        menu->Create();
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(m_battleMesMenus[i]) + 0x18) = i;
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(m_battleMesMenus[i]) + 0x1C) = i;
+        m_battleMesMenus[i]->Create();
     }
 
     for (int i = 0; i < 4; i++) {
         CRingMenu* menu = new (MenuPcs.m_menuStage, const_cast<char*>(s_p_menu_cpp_801d9d80), 0x492) CRingMenu;
         m_battleRingMenus[i] = menu;
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(menu) + 8) = i;
-        menu->Create();
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(m_battleRingMenus[i]) + 8) = i;
+        m_battleRingMenus[i]->Create();
     }
 
     sprintf(fontPath, const_cast<char*>(s_dvd__smenu_gc23_fnt_801d9d8c), Game.GetLangString());
     loadFont(0, fontPath, 1, 1);
 
-    CTexture* fontTexture = m_textures[0x18];
     for (int i = 0; i < 0x100; i++) {
-        _GXColor color = fontTexture->GetTlutColor(i);
+        _GXColor color = m_textures[0x18]->GetTlutColor(i);
         const int avg2 = (((int)color.r + (int)color.g + (int)color.b) / 3) * 2;
         _GXColor outColor;
         outColor.r = static_cast<u8>(((int)color.r + avg2) / 3);
@@ -1795,7 +1791,7 @@ void CMenuPcs::createBattle()
         outColor.b = static_cast<u8>(((int)color.b + avg2) / 3);
         outColor.a = color.a;
 
-        const int tlutFmt = *reinterpret_cast<int*>(reinterpret_cast<u8*>(fontTexture) + 0x60);
+        const unsigned long tlutFmt = *reinterpret_cast<unsigned long*>(reinterpret_cast<u8*>(m_textures[0x18]) + 0x60);
         int tlutOffset = 0;
         if (tlutFmt == 9) {
             tlutOffset = 0x100;
@@ -1803,10 +1799,10 @@ void CMenuPcs::createBattle()
             tlutOffset = 0x10;
         }
 
-        fontTexture->SetExternalTlutColor(m_externalFontTlut, tlutOffset, i, outColor);
+        CTexture::SetExternalTlutColor(m_externalFontTlut, tlutOffset, i, outColor);
     }
 
-    fontTexture->FlushExternalTlut(m_externalFontTlut);
+    m_textures[0x18]->FlushExternalTlut(m_externalFontTlut);
     m_battleStateFlag = 0;
 }
 
@@ -1861,7 +1857,7 @@ void CMenuPcs::calcBattle()
         Calc__5CMenuFv(reinterpret_cast<CMenu*>(m_battleMesMenus[i]));
     }
 
-    int limit = m_battleHud.m_gaugeMax;
+    int limit = m_battleHud.m_gaugeTarget;
     int value = m_battleHud.m_gaugeValue - 1;
     if (value <= limit) {
         int alt = m_battleHud.m_gaugeValue + 1;
@@ -1893,7 +1889,10 @@ void CMenuPcs::drawBattle()
 {
     if (m_battleHud.m_visible != 0) {
         const float frame = static_cast<float>(m_battleHud.m_fadeCounter);
-        float fade = LoadFloat(FLOAT_80330808) - (frame * LoadFloat(FLOAT_80330804));
+        float fade = frame * LoadFloat(FLOAT_80330804);
+        if (m_battleHud.m_visible != 0) {
+            fade = LoadFloat(FLOAT_80330808) - fade;
+        }
 
         Mtx cameraMtx;
         Mtx44 viewMtx;
@@ -1909,7 +1908,7 @@ void CMenuPcs::drawBattle()
         PSMTX44Concat(screenMtx, viewMtx, screenMtx);
         Math.MTX44MultVec4(screenMtx, reinterpret_cast<Vec*>(m_battleHud.m_worldPos), &projected);
 
-        if (projected.w > LoadFloat(kMenuInitOne)) {
+        if (LoadFloat(kMenuInitOne) < projected.w) {
             const int totalWidth = static_cast<int>(static_cast<float>(m_battleHud.m_width) * fade);
             const int halfWidth = totalWidth / 2;
             float screenX = LoadFloat(FLOAT_80330810) + (LoadFloat(FLOAT_80330810) * projected.x) / projected.w;
@@ -1918,7 +1917,7 @@ void CMenuPcs::drawBattle()
             if (screenX < static_cast<float>(halfWidth)) {
                 screenX = static_cast<float>(halfWidth);
             } else {
-                const float right = LoadFloat(kMenuOrthoRight) - static_cast<float>(halfWidth);
+                const float right = static_cast<float>(0x280 - halfWidth);
                 if (screenX > right) {
                     screenX = right;
                 }
@@ -1939,7 +1938,7 @@ void CMenuPcs::drawBattle()
             const CColor frameColor(0xFF, 0xFF, 0xFF, alpha);
             GXSetChanMatColor(GX_COLOR0A0, frameColor.color);
 
-            if (totalWidth > 0) {
+            if (LoadFloat(kMenuInitOne) < static_cast<float>(totalWidth)) {
                 CTexture* tex = MenuPcs.m_textures[0xDD];
                 TextureMan.SetTexture(GX_TEXMAP0, tex);
                 u32 width = tex->m_width;

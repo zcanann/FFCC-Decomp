@@ -32,6 +32,8 @@ extern "C" void calcViewer__7CMapPcsFv(CMapPcs*);
 extern "C" void drawBeforeViewer__7CMapPcsFv(CMapPcs*);
 extern "C" void drawViewer__7CMapPcsFv(CMapPcs*);
 extern "C" void drawAfterViewer__7CMapPcsFv(CMapPcs*);
+extern const char __RTTI__8CManager_8032E508[];
+extern const char __RTTI__8CProcess_8032E510[];
 
 class CRelProfile
 {
@@ -133,6 +135,14 @@ extern const float DrawRangeDefault;
 extern const float kPMapBoundMinInit;
 extern const float kPMapBoundMaxInit;
 char s_lastLoadedMapPath__7CMapPcs[0x100] = "";
+static unsigned int s_CMapPcsRttiBase0[3] = {reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CManager_8032E508)), 0, 0};
+static unsigned int s_CMapPcsRttiBase1[5] = {
+    reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CManager_8032E508)),
+    0,
+    reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CProcess_8032E510)),
+    0,
+    0,
+};
 extern "C" void _WaitDrawDone__8CGraphicFPci(CGraphic*, const char*, int);
 static const char s_p_map_cpp_801d7728[] = "p_map.cpp";
 static const char s_map_load_ok_fmt[] =

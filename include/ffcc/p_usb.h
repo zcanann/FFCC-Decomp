@@ -5,10 +5,12 @@
 #include "ffcc/system.h"
 #include "ffcc/usb.h"
 
-extern unsigned int m_table_desc0__7CUSBPcs[];
-extern unsigned int m_table_desc1__7CUSBPcs[];
-extern unsigned int m_table_desc2__7CUSBPcs[];
 extern unsigned int m_table__7CUSBPcs[];
+class CUSBPcs;
+
+extern "C" void create__7CUSBPcsFv(CUSBPcs*);
+extern "C" void destroy__7CUSBPcsFv(CUSBPcs*);
+extern "C" void func__7CUSBPcsFv(CUSBPcs*);
 
 class CUSBPcs : public CProcess
 {
@@ -17,10 +19,10 @@ public:
 
     CUSBPcs()
     {
+        static unsigned int desc0[] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__7CUSBPcsFv)};
+        static unsigned int desc1[] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__7CUSBPcsFv)};
+        static unsigned int desc2[] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(func__7CUSBPcsFv)};
         unsigned int* table = reinterpret_cast<unsigned int*>(m_table__7CUSBPcs);
-        const unsigned int* desc0 = m_table_desc0__7CUSBPcs;
-        const unsigned int* desc1 = m_table_desc1__7CUSBPcs;
-        const unsigned int* desc2 = m_table_desc2__7CUSBPcs;
 
         table[1] = desc0[0];
         table[2] = desc0[1];

@@ -184,52 +184,45 @@ int CWind::AddSphere(const Vec* pos, float radius, float speed, int life)
 {
 	int checked = 0;
 	int blocks = 4;
-	WindObject* obj = m_objects;
-	s8 active;
+	WindObject* scan = m_objects;
+	WindObject* obj;
 
 	do {
-		active = GetWindActiveFlag(obj);
-		if (active == 0) {
+		if (GetWindActiveFlag(scan) == 0) {
+			obj = scan;
 			goto found;
 		}
-		obj++;
-		active = GetWindActiveFlag(obj);
-		if (active == 0) {
+		if (GetWindActiveFlag(++scan) == 0) {
+			obj = scan;
 			goto found;
 		}
-		obj++;
-		active = GetWindActiveFlag(obj);
-		if (active == 0) {
+		if (GetWindActiveFlag(++scan) == 0) {
+			obj = scan;
 			goto found;
 		}
-		obj++;
-		active = GetWindActiveFlag(obj);
-		if (active == 0) {
+		if (GetWindActiveFlag(++scan) == 0) {
+			obj = scan;
 			goto found;
 		}
-		obj++;
-		active = GetWindActiveFlag(obj);
-		if (active == 0) {
+		if (GetWindActiveFlag(++scan) == 0) {
+			obj = scan;
 			goto found;
 		}
-		obj++;
-		active = GetWindActiveFlag(obj);
-		if (active == 0) {
+		if (GetWindActiveFlag(++scan) == 0) {
+			obj = scan;
 			goto found;
 		}
-		obj++;
-		active = GetWindActiveFlag(obj);
-		if (active == 0) {
+		if (GetWindActiveFlag(++scan) == 0) {
+			obj = scan;
 			goto found;
 		}
-		obj++;
-		active = GetWindActiveFlag(obj);
-		if (active == 0) {
+		if (GetWindActiveFlag(++scan) == 0) {
+			obj = scan;
 			goto found;
 		}
 
 		checked += 7;
-		obj++;
+		scan++;
 	} while (--blocks != 0);
 
 	obj = 0;
@@ -274,24 +267,45 @@ found:
 int CWind::AddDiffuse(const Vec* pos, float radius, float dir, float speed)
 {
 	int checked = 0;
-	WindObject* obj = m_objects;
+	WindObject* scan = m_objects;
+	WindObject* obj;
 
 	for (int blocks = 4; blocks != 0; blocks--) {
-		WindObject* scan = obj;
-		if ((GetWindActiveFlag(scan) == 0) ||
-		    ((scan++, GetWindActiveFlag(scan) == 0)) ||
-		    ((scan++, GetWindActiveFlag(scan) == 0)) ||
-		    ((scan++, GetWindActiveFlag(scan) == 0)) ||
-		    ((scan++, GetWindActiveFlag(scan) == 0)) ||
-		    ((scan++, GetWindActiveFlag(scan) == 0)) ||
-		    ((scan++, GetWindActiveFlag(scan) == 0)) ||
-		    ((scan++, GetWindActiveFlag(scan) == 0))) {
+		if (GetWindActiveFlag(scan) == 0) {
+			obj = scan;
+			goto found;
+		}
+		if (GetWindActiveFlag(++scan) == 0) {
+			obj = scan;
+			goto found;
+		}
+		if (GetWindActiveFlag(++scan) == 0) {
+			obj = scan;
+			goto found;
+		}
+		if (GetWindActiveFlag(++scan) == 0) {
+			obj = scan;
+			goto found;
+		}
+		if (GetWindActiveFlag(++scan) == 0) {
+			obj = scan;
+			goto found;
+		}
+		if (GetWindActiveFlag(++scan) == 0) {
+			obj = scan;
+			goto found;
+		}
+		if (GetWindActiveFlag(++scan) == 0) {
+			obj = scan;
+			goto found;
+		}
+		if (GetWindActiveFlag(++scan) == 0) {
 			obj = scan;
 			goto found;
 		}
 
 		checked += 7;
-		obj = scan + 1;
+		scan++;
 	}
 
 	obj = 0;
@@ -343,25 +357,46 @@ found:
  */
 int CWind::AddAmbient(float dir, float speed)
 {
-	WindObject* obj = m_objects;
 	int checked = 0;
+	WindObject* scan = m_objects;
+	WindObject* obj;
 
 	for (int blocks = 4; blocks != 0; blocks--) {
-		WindObject* scan = obj;
-		if ((GetWindActiveFlag(scan) == 0) ||
-		    ((scan++, GetWindActiveFlag(scan) == 0)) ||
-		    ((scan++, GetWindActiveFlag(scan) == 0)) ||
-		    ((scan++, GetWindActiveFlag(scan) == 0)) ||
-		    ((scan++, GetWindActiveFlag(scan) == 0)) ||
-		    ((scan++, GetWindActiveFlag(scan) == 0)) ||
-		    ((scan++, GetWindActiveFlag(scan) == 0)) ||
-		    ((scan++, GetWindActiveFlag(scan) == 0))) {
+		if (GetWindActiveFlag(scan) == 0) {
+			obj = scan;
+			goto found;
+		}
+		if (GetWindActiveFlag(++scan) == 0) {
+			obj = scan;
+			goto found;
+		}
+		if (GetWindActiveFlag(++scan) == 0) {
+			obj = scan;
+			goto found;
+		}
+		if (GetWindActiveFlag(++scan) == 0) {
+			obj = scan;
+			goto found;
+		}
+		if (GetWindActiveFlag(++scan) == 0) {
+			obj = scan;
+			goto found;
+		}
+		if (GetWindActiveFlag(++scan) == 0) {
+			obj = scan;
+			goto found;
+		}
+		if (GetWindActiveFlag(++scan) == 0) {
+			obj = scan;
+			goto found;
+		}
+		if (GetWindActiveFlag(++scan) == 0) {
 			obj = scan;
 			goto found;
 		}
 
 		checked += 7;
-		obj = scan + 1;
+		scan++;
 	}
 
 	obj = 0;

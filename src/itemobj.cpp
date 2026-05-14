@@ -782,7 +782,11 @@ int CGItemObj::DeleteOld(int deleteMask, int maxDeleteCount, CFlatRuntime::CObje
 {
 	int deletedCount = 0;
 
-	while (deletedCount < maxDeleteCount) {
+	while (true) {
+		if (maxDeleteCount <= deletedCount) {
+			return deletedCount;
+		}
+
 		unsigned char* bestItemObj = 0;
 		int bestScriptObjectPos = 0x00989680;
 
@@ -801,17 +805,10 @@ int CGItemObj::DeleteOld(int deleteMask, int maxDeleteCount, CFlatRuntime::CObje
 		if (bestItemObj != 0) {
 			deleteObject__12CFlatRuntimeFPQ212CFlatRuntime7CObject(CFlat, bestItemObj);
 		} else {
-			if ((unsigned int)System.m_execParam >= 3) {
-				Printf__7CSystemFPce(&System, const_cast<char*>(DAT_801dced4));
-			}
 			break;
 		}
 
 		deletedCount++;
-	}
-
-	if ((unsigned int)System.m_execParam >= 3) {
-		Printf__7CSystemFPce(&System, const_cast<char*>(DAT_801dced4));
 	}
 
 	return deletedCount;

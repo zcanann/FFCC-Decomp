@@ -21,8 +21,6 @@ extern "C" void PutParticleWork__13CFlatRuntime2Fv(void*);
 extern const float FLOAT_80331BD0 = 1.0f;
 extern const float FLOAT_80331BD4 = 0.0f;
 extern const float FLOAT_80331BD8 = 3.1415927f;
-extern const double DOUBLE_80331BE0 = 4503601774854144.0;
-extern const float FLOAT_80331BE8 = -1.0f;
 
 static inline float LoadFloat(const float& value)
 {
@@ -417,6 +415,8 @@ int CGPrgObj::playSe3D(int seNo, int volume, int dist, int pitch, Vec* pos)
 
 	return handle;
 }
+
+extern const float FLOAT_80331BE8 = -1.0f;
 
 /*
  * --INFO--

@@ -439,6 +439,7 @@ void CMaterialEditorPcs::calcViewer()
     ViewerSRT srt;
     Mtx scaleMatrix;
     float rotationValue;
+    float one;
 
     USBPcs.mccReadData();
 
@@ -455,9 +456,10 @@ void CMaterialEditorPcs::calcViewer()
     srt.rotZ = rotationValue;
     srt.rotY = rotationValue;
     srt.rotX = rotationValue;
-    srt.scaleZ = FLOAT_8032FCC8;
-    srt.scaleY = FLOAT_8032FCC8;
-    srt.scaleX = FLOAT_8032FCC8;
+    one = LoadFloat(FLOAT_8032FCC8);
+    srt.scaleZ = one;
+    srt.scaleY = one;
+    srt.scaleX = one;
     srt.transX = field268_0x15c.x;
     srt.transY = field268_0x15c.y;
     srt.transZ = -field268_0x15c.z;

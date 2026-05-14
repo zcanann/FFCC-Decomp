@@ -1335,7 +1335,7 @@ void CSound::LoadSe(int seId)
             File.SyncCompleted(handle);
             reinterpret_cast<CRedSound*>(self + 8)->SetSeSepData(File.m_readBuffer);
             File.Close(handle);
-            if (System.m_execParam != 0) {
+            if (static_cast<unsigned int>(System.m_execParam) >= 1U) {
                 Printf__7CSystemFPce(&System, s_soundLoadSeMergeFmt, seId);
             }
         }
@@ -1405,7 +1405,7 @@ void CSound::LoadWave(int waveId)
                 }
             }
 
-            if (System.m_execParam != 0) {
+            if (static_cast<unsigned int>(System.m_execParam) >= 1U) {
                 Printf__7CSystemFPce(&System, s_soundLoadWaveMergeFmt, waveId);
             }
         }

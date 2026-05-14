@@ -32,10 +32,10 @@ extern const float FLOAT_80330d00 = 100.0f;
 extern const double DOUBLE_80330d08 = 4503599627370496.0;
 extern const float kLineBoundsInitMin = 10000000.0f;
 extern const double DOUBLE_80330d18 = 0.5;
-static const char s_soundNoFreeWaveWarn[] =
+static const char s_soundNoFreeWaveWarn[40] =
     "\x82\xb1\x82\xea\x88\xc8\x8f\xe3noFreeWaev\x82\xf0\x92\xc7\x89\xc1\x82\xc5"
     "\x82\xab\x82\xdc\x82\xb9\x82\xf1\x81\x42\n";
-static const char s_soundNoFreeSeGroupWarn[] =
+static const char s_soundNoFreeSeGroupWarn[44] =
     "\x82\xb1\x82\xea\x88\xc8\x8f\xe3noFreeSeGroup\x82\xf0\x92\xc7\x89\xc1\x82\xc5"
     "\x82\xab\x82\xdc\x82\xb9\x82\xf1\x81\x42\n";
 static const char s_soundStreamPathFmt[] = "dvd/sound/stream/str%04d.str";

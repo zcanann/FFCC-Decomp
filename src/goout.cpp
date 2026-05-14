@@ -1913,6 +1913,92 @@ void CGoOutMenu::Calc()
                 field74_0x4a = 200;
                 field75_0x4c = 0xB0;
                 field_0x49 = 1;
+
+                unsigned char nextMode = 0;
+                if (MenuMcWinState(menuPcsLayout).m_mode == 1) {
+                    input = GetGoOutInputMask();
+                    if ((input & 0xC) == 0) {
+                        input = GetGoOutInputMask();
+                        if ((input & 0x100) != 0) {
+                            Sound.PlaySe(2, 0x40, 0x7f, 0);
+                            nextMode = static_cast<unsigned char>(field_0x46 + 1);
+                        }
+                    } else {
+                        field_0x46 ^= 1;
+                        Sound.PlaySe(1, 0x40, 0x7f, 0);
+                    }
+                }
+
+                if (nextMode == 2) {
+                    int activeCount = 0;
+                    for (int i = 0; i < 8; i++) {
+                        CCaravanWork& caravanWork = Game.m_caravanWorkArr[i];
+                        if (caravanWork.m_shopState != 0) {
+                            activeCount++;
+                            if (caravanWork.m_caravanLocalFlags != 0) {
+                                activeCount++;
+                            }
+                        }
+                    }
+
+                    if (activeCount < 2) {
+                        int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
+                        SetMenuStr(0, 2,
+                                   GetGoOutMessageLine(languageId, 108),
+                                   GetGoOutMessageLine(languageId, 109));
+                        field_0x2d = 1;
+                        SetMainMode(0);
+                    } else {
+                        SetMainMode(3);
+                        if (field_0x36 >= 0) {
+                            MenuMcWinState(menuPcsLayout).m_mode = 2;
+                            MenuGoOutState(menuPcsLayout).m_animFrame = 0;
+                        }
+                        field_0x45 = 0;
+                        field_0x34 = -1;
+                        field_0x48 = 0;
+                        field_0x3c = 0;
+                    }
+                } else if (nextMode == 1) {
+                    int characterCount = 0;
+                    int transferableCount = 0;
+                    for (int i = 0; i < 8; i++) {
+                        CCaravanWork& caravanWork = Game.m_caravanWorkArr[i];
+                        if (caravanWork.m_shopState != 0) {
+                            characterCount++;
+                            if (caravanWork.m_caravanLocalFlags == 0) {
+                                transferableCount++;
+                            }
+                        }
+                    }
+
+                    if (characterCount == 0) {
+                        int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
+                        SetMenuStr(0, 7,
+                                   GetGoOutMessageLine(languageId, 101),
+                                   GetGoOutMessageLine(languageId, 102),
+                                   GetGoOutMessageLine(languageId, 103),
+                                   GetGoOutMessageLine(languageId, 104),
+                                   GetGoOutMessageLine(languageId, 105),
+                                   GetGoOutMessageLine(languageId, 106),
+                                   GetGoOutMessageLine(languageId, 107));
+                        field_0x2d = 1;
+                        SetMainMode(0);
+                    } else if (transferableCount < 8) {
+                        SetMainMode(2);
+                    } else {
+                        int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
+                        SetMenuStr(0, 6,
+                                   GetGoOutMessageLine(languageId, 62),
+                                   GetGoOutMessageLine(languageId, 63),
+                                   GetGoOutMessageLine(languageId, 64),
+                                   GetGoOutMessageLine(languageId, 65),
+                                   GetGoOutMessageLine(languageId, 66),
+                                   GetGoOutMessageLine(languageId, 67));
+                        field_0x2d = 1;
+                        SetMainMode(0);
+                    }
+                }
             }
         } else if (mode < 4) {
             CalcDel();

@@ -45,16 +45,11 @@ extern char* PTR_s_bonus_802128c0[];
 extern char DAT_802128e4[];
 extern char s_dvd__smenu_subfont_fnt_801e3020[];
 extern const double DOUBLE_80331FC0;
-#pragma force_active on
-extern "C" {
-int gBonusMenuWork0 = 0;
-unsigned char gBonusMenuFlag0 = 0;
-unsigned char gBonusMenuFlag1 = 0;
-unsigned char gBonusMenuFlag2 = 0;
-unsigned char gBonusMenuFlagPad = 0;
-float* gBonusCheckMarkPosBuffer = 0;
-}
-#pragma force_active reset
+static int s_Rinfo;
+static unsigned char s_CntTop;
+static unsigned char s_ArtiTop;
+static unsigned char s_PlayerTop;
+static float* s_Base;
 extern "C" const char s_draw_Bonus_pctd_801DD5C0[16] = {
     'd', 'r', 'a', 'w', ' ', 'B', 'o', 'n', 'u', 's', ' ', '(', '%', 'd', ')', '\n',
 };
@@ -398,8 +393,8 @@ static void FillBonusArtiBasePositions(float* out, const BonusAnimSprite* boardS
 
 static float* GetBonusArtiBasePositions(const BonusAnimSprite* sprite)
 {
-	FillBonusArtiBasePositions(gBonusCheckMarkPosBuffer, sprite, sprite);
-	return gBonusCheckMarkPosBuffer;
+	FillBonusArtiBasePositions(s_Base, sprite, sprite);
+	return s_Base;
 }
 
 static void InitSelectOpenPartyIcon(BonusAnimSprite* sprite, int slotIndex, short y)
@@ -628,7 +623,7 @@ static void DrawBonusActiveMarks(CMenuPcs* menu, int statePtr, float alpha)
 	GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(alpha * 255.0f)};
 	GXSetChanMatColor(GX_COLOR0A0, color);
 
-	float* markPos = gBonusCheckMarkPosBuffer;
+	float* markPos = s_Base;
 	if (markPos == 0) {
 		return;
 	}
@@ -792,7 +787,7 @@ static void UpdateSelectCursorSprite(int statePtr, BonusAnimHeader* header, Bonu
 
 	int slot = (*(short*)(statePtr + 0x26)) & 7;
 	float pulse = (float)(frame & 0x1f) / 31.0f;
-	float* markPos = gBonusCheckMarkPosBuffer;
+	float* markPos = s_Base;
 
 	if (markPos != 0) {
 		cursor->x = (short)(markPos[slot * 2 + 0] - 4.0f);
@@ -1086,9 +1081,9 @@ static unsigned short GetBonusAdvanceButtons(CMenuPcs* menu)
  */
 void CMenuPcs::BonusInit()
 {
-	gBonusMenuWork0 = 0;
+	s_Rinfo = 0;
 	GetBonusMenuMembers(this).m_bonusAnimPtr = 0;
-	gBonusCheckMarkPosBuffer = 0;
+	s_Base = 0;
 }
 
 /*
@@ -1125,8 +1120,8 @@ void CMenuPcs::createBonus()
 	if (s_bonusBoardState == 0) {
 		s_bonusBoardState = new unsigned char[0x48];
 	}
-	if (gBonusCheckMarkPosBuffer == 0) {
-		gBonusCheckMarkPosBuffer = new float[18];
+	if (s_Base == 0) {
+		s_Base = new float[18];
 	}
 
 	if (statePtr == 0) {
@@ -1188,8 +1183,8 @@ void CMenuPcs::createBonus()
 	if (s_bonusBoardState != 0) {
 		memset(s_bonusBoardState, 0, 0x48);
 	}
-	if (gBonusCheckMarkPosBuffer != 0) {
-		memset(gBonusCheckMarkPosBuffer, 0, sizeof(float) * 18);
+	if (s_Base != 0) {
+		memset(s_Base, 0, sizeof(float) * 18);
 	}
 
 	memset(reinterpret_cast<unsigned char*>(this) + 0x774, 0, 0x60);
@@ -1486,9 +1481,9 @@ void CMenuPcs::destroyBonus()
 		delete[] s_bonusBoardState;
 		s_bonusBoardState = 0;
 	}
-	if (gBonusCheckMarkPosBuffer != 0) {
-		delete[] gBonusCheckMarkPosBuffer;
-		gBonusCheckMarkPosBuffer = 0;
+	if (s_Base != 0) {
+		delete[] s_Base;
+		s_Base = 0;
 	}
 
 	freeTexture__8CMenuPcsFiiii(this, 2, 1, 0x16, 0x12);
@@ -3216,7 +3211,7 @@ void CMenuPcs::DrawArtiBase(CMenuPcs::Sprt2* sprt, float alpha)
 	}
 
 	BonusAnimSprite* sprite = reinterpret_cast<BonusAnimSprite*>(sprt);
-	float* pos = gBonusCheckMarkPosBuffer;
+	float* pos = s_Base;
 	int statePtr = GetBonusMenuMembers(this).m_bonusStatePtr;
 	int selectedSlot = -1;
 	unsigned char activeMask = 0;
@@ -3263,7 +3258,7 @@ void CMenuPcs::DrawBonusChkMark(float alpha)
 {
 	int animPtr = GetBonusMenuMembers(this).m_bonusAnimPtr;
 	int statePtr = GetBonusMenuMembers(this).m_bonusStatePtr;
-	float* currentPos = gBonusCheckMarkPosBuffer;
+	float* currentPos = s_Base;
 	float a = alpha;
 	float strongest = a;
 	float pulse = 0.0f;
@@ -3344,7 +3339,7 @@ void CMenuPcs::ArtiBaseInfoInit(CMenuPcs::Sprt2* a, CMenuPcs::Sprt2* b)
 {
 	short* board = reinterpret_cast<short*>(a);
 	short* icon = reinterpret_cast<short*>(b);
-	float* pos = gBonusCheckMarkPosBuffer;
+	float* pos = s_Base;
 
 	float x = (float)board[0];
 	float y = (float)board[1];

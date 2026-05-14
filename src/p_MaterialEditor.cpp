@@ -541,9 +541,15 @@ void CMaterialEditorPcs::drawViewer()
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
 
-    static char* q = const_cast<char*>(sMaterialEditorSpinnerText);
-    static int pFan = 0;
+    static char* q;
+    static int color;
 
+    if (*reinterpret_cast<char*>(&color) == 0) {
+        q = const_cast<char*>(sMaterialEditorSpinnerText);
+        *reinterpret_cast<char*>(&color) = 1;
+    }
+
+    static int pFan = 0;
     pFan++;
     char fan = q[(pFan >> 4) % 4];
     Printf__8CGraphicFPce(&Graphic, s_MaterialEditor_pctc_801D7D60, (int)fan);

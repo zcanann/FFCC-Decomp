@@ -256,25 +256,25 @@ found_fallback:
 	unsigned char flags = renderFlags;
 	CFontRenderFlagBits& renderFlagBits = GetRenderFlagBits(renderFlags);
 	signed char sign = static_cast<signed char>(flags) >> 7;
+	int drawWidth;
 	unsigned char* glyphInfo = reinterpret_cast<unsigned char*>(glyph) +
 	                           ((static_cast<unsigned int>(-static_cast<int>(sign) | static_cast<int>(sign)) >> 30 & 2) + 3);
-	int drawWidth;
 	int glyphIndex;
 	int row;
 	float u0;
 	float v0;
 
-	if (renderFlagBits.fixedWidth != 0) {
-		drawWidth = static_cast<int>(m_glyphWidth);
-		glyphIndex = static_cast<int>(*glyph);
-		row = glyphIndex / m_glyphColumns;
-		u0 = static_cast<float>(drawWidth * (glyphIndex - row * m_glyphColumns) * 2);
-		v0 = static_cast<float>(m_glyphHeight * row * 2);
-	} else {
+	if (renderFlagBits.fixedWidth == 0) {
 		glyphIndex = static_cast<int>(*glyph);
 		row = glyphIndex / m_glyphColumns;
 		drawWidth = static_cast<int>(glyphInfo[1]);
 		u0 = static_cast<float>((static_cast<int>(glyphInfo[0]) + m_glyphWidth * (glyphIndex - row * m_glyphColumns)) * 2);
+		v0 = static_cast<float>(m_glyphHeight * row * 2);
+	} else {
+		drawWidth = static_cast<int>(m_glyphWidth);
+		glyphIndex = static_cast<int>(*glyph);
+		row = glyphIndex / m_glyphColumns;
+		u0 = static_cast<float>(drawWidth * (glyphIndex - row * m_glyphColumns) * 2);
 		v0 = static_cast<float>(m_glyphHeight * row * 2);
 	}
 
@@ -286,10 +286,10 @@ found_fallback:
 	}
 
 	float advance = scaleX * (margin + static_cast<float>(drawWidth));
-	float x1 = x0 + static_cast<float>(drawWidth) * scaleX;
-	float y1 = y0 + static_cast<float>(m_glyphHeight) * scaleY;
 	float u1 = u0 + static_cast<float>(drawWidth * 2);
 	float v1 = v0 + static_cast<float>(m_glyphHeight * 2);
+	float x1 = x0 + static_cast<float>(drawWidth) * scaleX;
+	float y1 = y0 + static_cast<float>(m_glyphHeight) * scaleY;
 
 	if (renderFlagBits.snapPosition != 0) {
 		advance = static_cast<float>(floor(advance));

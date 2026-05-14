@@ -340,9 +340,9 @@ int CMapHit::ReadOtmHit(CChunkFile& chunkFile)
                 new (*reinterpret_cast<CMemory::CStage**>(&MapMng), const_cast<char*>(s_maphit_cpp_801D7088), 0x159)
                     CMapHitFace[m_faceCount];
 
-            const float zero = FLOAT_8032F8D0;
             const float offsetScale = FLOAT_8032F8F4;
             const float radiusScale = FLOAT_8032F8F8;
+            const float zero = FLOAT_8032F8D0;
             const double radiusBase = DOUBLE_8032F900;
 
             for (unsigned int faceIdx = 0; faceIdx < m_faceCount; faceIdx++) {
@@ -387,9 +387,10 @@ int CMapHit::ReadOtmHit(CChunkFile& chunkFile)
                 } else {
                     face.m_radiusScale = chunkFile.GetF4();
                     chunkFile.Align(4);
+                    const float vertexOffsetScale = FLOAT_8032F8F4;
                     for (unsigned int i = 0; i < vertexCount; i++) {
-                        face.m_vertexOffsets[i][0] = chunkFile.GetF4() * offsetScale;
-                        face.m_vertexOffsets[i][1] = chunkFile.GetF4() * offsetScale;
+                        face.m_vertexOffsets[i][0] = chunkFile.GetF4() * vertexOffsetScale;
+                        face.m_vertexOffsets[i][1] = chunkFile.GetF4() * vertexOffsetScale;
                     }
                 }
 

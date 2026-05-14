@@ -956,7 +956,7 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
     handle = (CCharaPcs::CHandle*)GetCharaHandlePtr__FP8CGObjectl(gObject, 0);
     model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
 
-    if (Game.m_currentSceneId == 7) {
+    if ((int)Game.m_currentSceneId == 7) {
         centerPos.x = FLOAT_80330e4c;
         centerPos.y = FLOAT_80330e4c;
         centerPos.z = FLOAT_80330e4c;
@@ -1482,33 +1482,35 @@ static void CalcWaterReflectionVector(
     Vec* reflectionVec, Vec* positions, Vec* normals, long count, Vec waterOrigin, float (*matrix)[4], _GXColor* color, Vec2d* texCoord)
 {
     Vec cameraPos;
-    Vec objPos;
     Vec transformedCameraPos;
+    Vec objPos;
     Vec reflected;
-    Mtx inverseMtx;
     Mtx matrixNoTranslate;
+    Mtx inverseMtx;
     Vec* reflectionIt;
-    float* texCoordFloat;
+    Vec* normalIt;
     unsigned char* colorBytes;
-    double zero;
-    double half;
+    float* texCoordFloat;
+    float zero;
+    float half;
+    float denomBase;
     long i;
 
     (void)waterOrigin;
 
-    if (Game.m_currentSceneId == 7) {
-        cameraPos.x = ppvCameraMatrix0[0][3];
-        cameraPos.y = ppvCameraMatrix0[1][3];
-        cameraPos.z = ppvCameraMatrix0[2][3];
+    if ((int)Game.m_currentSceneId == 7) {
+        cameraPos.x = ppvCameraMatrix[0][3];
+        cameraPos.y = ppvCameraMatrix[1][3];
+        cameraPos.z = ppvCameraMatrix[2][3];
     } else {
         cameraPos.x = CameraWorldX();
         cameraPos.y = CameraWorldY();
         cameraPos.z = CameraWorldZ();
     }
 
-    transformedCameraPos.x = FLOAT_80330e4c;
-    transformedCameraPos.y = FLOAT_80330e4c;
-    transformedCameraPos.z = FLOAT_80330e4c;
+    transformedCameraPos.x = LoadFloat(FLOAT_80330e4c);
+    transformedCameraPos.y = LoadFloat(FLOAT_80330e4c);
+    transformedCameraPos.z = LoadFloat(FLOAT_80330e4c);
 
     PSMTXCopy(matrix, matrixNoTranslate);
     objPos.x = matrixNoTranslate[0][3];
@@ -1520,50 +1522,52 @@ static void CalcWaterReflectionVector(
     PSMTXInverse(matrixNoTranslate, inverseMtx);
 
     PSVECSubtract(&objPos, &cameraPos, &cameraPos);
-    PSVECScale(&cameraPos, &cameraPos, FLOAT_80330e68);
+    PSVECScale(&cameraPos, &cameraPos, LoadFloat(FLOAT_80330e68));
     PSMTXMultVec(inverseMtx, &cameraPos, &transformedCameraPos);
 
-    texCoordFloat = (float*)texCoord;
     colorBytes = (unsigned char*)color;
+    texCoordFloat = (float*)texCoord;
     reflectionIt = reflectionVec;
-    zero = (double)FLOAT_80330e4c;
-    half = (double)FLOAT_80330e5c;
+    normalIt = normals;
+    zero = LoadFloat(FLOAT_80330e4c);
+    half = LoadFloat(FLOAT_80330e5c);
 
     for (i = 0; i < count; i++) {
         PSVECSubtract(positions, &transformedCameraPos, &reflected);
-        C_VECReflect(&reflected, normals, reflectionIt);
+        C_VECReflect(&reflected, normalIt, reflectionIt);
         PSMTXMultVec(matrixNoTranslate, reflectionIt, reflectionIt);
         PSVECNormalize(reflectionIt, reflectionIt);
+        denomBase = LoadFloat(FLOAT_80330e58);
 
-        if (zero <= (double)reflectionIt->z) {
+        if (reflectionIt->z >= zero) {
             colorBytes[0] = 0x80;
             colorBytes[1] = 0x80;
             colorBytes[2] = 0xff;
             colorBytes[3] = 0xbc;
-            *texCoordFloat = -reflectionIt->x / (FLOAT_80330e58 + reflectionIt->z);
-            texCoordFloat[1] = -reflectionIt->y / (FLOAT_80330e58 + reflectionIt->z);
+            *texCoordFloat = -reflectionIt->x / (denomBase + reflectionIt->z);
+            texCoordFloat[1] = -reflectionIt->y / (denomBase + reflectionIt->z);
         } else {
             colorBytes[0] = 0x80;
             colorBytes[1] = 0xff;
             colorBytes[2] = 0x80;
             colorBytes[3] = 0x7f;
-            *texCoordFloat = -reflectionIt->x / (FLOAT_80330e58 - reflectionIt->z);
-            texCoordFloat[1] = -reflectionIt->y / (FLOAT_80330e58 - reflectionIt->z);
+            *texCoordFloat = -reflectionIt->x / (denomBase - reflectionIt->z);
+            texCoordFloat[1] = -reflectionIt->y / (denomBase - reflectionIt->z);
         }
 
         positions++;
         reflectionIt++;
-        normals++;
+        normalIt++;
         colorBytes += 4;
-        *texCoordFloat = (float)((double)*texCoordFloat * half);
-        *texCoordFloat = (float)((double)*texCoordFloat + half);
-        texCoordFloat[1] = (float)((double)texCoordFloat[1] * half);
-        texCoordFloat[1] = (float)((double)texCoordFloat[1] + half);
+        *texCoordFloat = *texCoordFloat * half;
+        *texCoordFloat = *texCoordFloat + half;
+        texCoordFloat[1] = texCoordFloat[1] * half;
+        texCoordFloat[1] = texCoordFloat[1] + half;
         texCoordFloat += 2;
     }
 
     DCFlushRange(reflectionVec, count * sizeof(Vec));
-    DCFlushRange(texCoord, count * sizeof(Vec2d));
+    DCFlushRange(texCoord, count << 3);
 }
 
 /*

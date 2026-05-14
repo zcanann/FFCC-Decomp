@@ -2833,29 +2833,35 @@ unsigned int CMenuPcs::CmdClose2()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8016233c
+ * PAL Size: 156b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 const char* CMenuPcs::GetSkillStr(int index)
 {
-	const int languageId = static_cast<signed char>(Game.m_gameWork.m_languageId);
+	const int languageId = Game.m_gameWork.m_languageId;
 
-	if (languageId == '\x03') {
-		return (s_pcts_pctd_item_pctd_m_equip_pct08x_80214D34 + 7)[index];
+	switch (languageId) {
+	case 2: {
+		const char** names = s_pcts_pctd_item_pctd_m_equip_pct08x_80214D34 + 2;
+		return names[index];
 	}
-	if (languageId < 3) {
-		if ((languageId != '\x01') && (languageId != '\0')) {
-			return (s_pcts_pctd_item_pctd_m_equip_pct08x_80214D34 + 2)[index];
-		}
-	} else {
-		if (languageId == '\x05') {
-			return PTR_s_Efecto_Fuego[index];
-		}
-		if (languageId < 5) {
-			return PTR_s_Pyro_Frappe[index];
-		}
+	case 3: {
+		const char** names = s_pcts_pctd_item_pctd_m_equip_pct08x_80214D34 + 7;
+		return names[index];
 	}
-	return (jumptable_80214D24 + 1)[index];
+	case 4:
+		return PTR_s_Pyro_Frappe[index];
+	case 5:
+		return PTR_s_Efecto_Fuego[index];
+	default: {
+		const char** names = jumptable_80214D24 + 1;
+		return names[index];
+	}
+	}
 }
 
 /*

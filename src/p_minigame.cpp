@@ -24,7 +24,7 @@ unsigned int m_table_desc0__12CMiniGamePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast
 unsigned int m_table_desc1__12CMiniGamePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__12CMiniGamePcsFv)};
 unsigned int m_table_desc2__12CMiniGamePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__12CMiniGamePcsFv)};
 extern const char s_CMiniGamePcs_GAME_801DD098[];
-unsigned int m_table__12CMiniGamePcs[0x148 / sizeof(unsigned int)] = {
+unsigned int m_table__12CMiniGamePcs[0x15C / sizeof(unsigned int)] = {
     reinterpret_cast<unsigned int>(const_cast<char*>(s_CMiniGamePcs_GAME_801DD098)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x24
 };
 extern const char s_miniGameManagerTag[] = "GMGR";
@@ -382,7 +382,7 @@ void CMiniGamePcs::MiniGameGo(char* managerFilePath, char* managerSpFilePath)
 
     int offset = 0xA0;
     int managerBase = *reinterpret_cast<int*>(self + 0x1354);
-    char checksum = static_cast<char>(-0x19);
+    int checksum = -0x19;
 
     *reinterpret_cast<unsigned char*>(managerBase + 0xAC) = self[0x1344];
     *reinterpret_cast<unsigned char*>(managerBase + 0xAD) = self[0x1345];
@@ -392,23 +392,34 @@ void CMiniGamePcs::MiniGameGo(char* managerFilePath, char* managerSpFilePath)
     int checksumBlockCount = 2;
     do
     {
-        char* bytes = reinterpret_cast<char*>(managerBase + offset);
-        char* bytes2 = reinterpret_cast<char*>(managerBase + offset + 7);
+        signed char* bytes = reinterpret_cast<signed char*>(managerBase + offset);
+        signed char* bytes2 = reinterpret_cast<signed char*>(managerBase + offset + 7);
 
-        checksum = (((((((((((((checksum - bytes[0]) - bytes[1]) - bytes[2]) - bytes[3]) - bytes[4]) -
-                        bytes[5]) - bytes[6]) - bytes2[0]) - bytes2[1]) - bytes2[2]) - bytes2[3]) -
-                     bytes2[4]) - bytes2[5]) - bytes2[6];
+        checksum -= bytes[0];
+        checksum -= bytes[1];
+        checksum -= bytes[2];
+        checksum -= bytes[3];
+        checksum -= bytes[4];
+        checksum -= bytes[5];
+        checksum -= bytes[6];
+        checksum -= bytes2[0];
+        checksum -= bytes2[1];
+        checksum -= bytes2[2];
+        checksum -= bytes2[3];
+        checksum -= bytes2[4];
+        checksum -= bytes2[5];
+        checksum -= bytes2[6];
         offset += 0xE;
         checksumBlockCount--;
     } while (checksumBlockCount != 0);
 
     int remaining = 0xBD - offset;
-    char* checksumBytes = reinterpret_cast<char*>(managerBase + offset);
+    signed char* checksumBytes = reinterpret_cast<signed char*>(managerBase + offset);
     if (offset < 0xBD)
     {
         do
         {
-            char value = *checksumBytes;
+            signed char value = *checksumBytes;
             offset++;
             checksumBytes++;
             checksum -= value;
@@ -431,7 +442,7 @@ void CMiniGamePcs::MiniGameGo(char* managerFilePath, char* managerSpFilePath)
 
     offset = 0xA0;
     managerBase = *reinterpret_cast<int*>(self + 0x135C);
-    checksum = static_cast<char>(-0x19);
+    checksum = -0x19;
 
     *reinterpret_cast<unsigned char*>(managerBase + 0xAC) = self[0x1344];
     *reinterpret_cast<unsigned char*>(managerBase + 0xAD) = self[0x1345];
@@ -441,23 +452,34 @@ void CMiniGamePcs::MiniGameGo(char* managerFilePath, char* managerSpFilePath)
     checksumBlockCount = 2;
     do
     {
-        char* bytes = reinterpret_cast<char*>(managerBase + offset);
-        char* bytes2 = reinterpret_cast<char*>(managerBase + offset + 7);
+        signed char* bytes = reinterpret_cast<signed char*>(managerBase + offset);
+        signed char* bytes2 = reinterpret_cast<signed char*>(managerBase + offset + 7);
 
-        checksum = (((((((((((((checksum - bytes[0]) - bytes[1]) - bytes[2]) - bytes[3]) - bytes[4]) -
-                        bytes[5]) - bytes[6]) - bytes2[0]) - bytes2[1]) - bytes2[2]) - bytes2[3]) -
-                     bytes2[4]) - bytes2[5]) - bytes2[6];
+        checksum -= bytes[0];
+        checksum -= bytes[1];
+        checksum -= bytes[2];
+        checksum -= bytes[3];
+        checksum -= bytes[4];
+        checksum -= bytes[5];
+        checksum -= bytes[6];
+        checksum -= bytes2[0];
+        checksum -= bytes2[1];
+        checksum -= bytes2[2];
+        checksum -= bytes2[3];
+        checksum -= bytes2[4];
+        checksum -= bytes2[5];
+        checksum -= bytes2[6];
         offset += 0xE;
         checksumBlockCount--;
     } while (checksumBlockCount != 0);
 
     remaining = 0xBD - offset;
-    checksumBytes = reinterpret_cast<char*>(managerBase + offset);
+    checksumBytes = reinterpret_cast<signed char*>(managerBase + offset);
     if (offset < 0xBD)
     {
         do
         {
-            char value = *checksumBytes;
+            signed char value = *checksumBytes;
             offset++;
             checksumBytes++;
             checksum -= value;

@@ -16,8 +16,9 @@ typedef struct pppConstrainCameraDirUnkB {
     float m_dataValIndex;
     float m_initWOrk;
     float m_stepValue;
-    char m_arg3;
-    char pad[3];
+    u8 m_applyPosition;
+    u8 m_applyCameraInverse;
+    u8 _pad12[2];
 } pppConstrainCameraDirUnkB;
 
 #ifdef __cplusplus

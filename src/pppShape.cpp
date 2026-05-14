@@ -5,7 +5,7 @@
 
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h>
 
-extern float FLOAT_80330108;
+extern const float FLOAT_80330108;
 
 void pppSetBlendMode(unsigned char);
 
@@ -79,12 +79,11 @@ void pppGetShapeUV(long* animData, short frameIndex, Vec2d& minUv, Vec2d& maxUv,
     int shapeEntry = *(int*)((int)animData + shapeBase + 0xc + shapeIndex * 8);
     float* minUvF = (float*)&minUv;
     float* maxUvF = (float*)&maxUv;
-    const float uvScale = FLOAT_80330108;
 
-    minUvF[0] = (float)*(short*)(shapeEntry + 0x13) * uvScale;
-    minUvF[1] = (float)*(short*)(shapeEntry + 0x15) * uvScale;
-    maxUvF[0] = (float)*(short*)(shapeEntry + 0x3b) * uvScale;
-    maxUvF[1] = (float)*(short*)(shapeEntry + 0x3d) * uvScale;
+    minUvF[0] = (float)*(short*)(shapeEntry + 0x13) * FLOAT_80330108;
+    minUvF[1] = (float)*(short*)(shapeEntry + 0x15) * FLOAT_80330108;
+    maxUvF[0] = (float)*(short*)(shapeEntry + 0x3b) * FLOAT_80330108;
+    maxUvF[1] = (float)*(short*)(shapeEntry + 0x3d) * FLOAT_80330108;
 }
 
 /*

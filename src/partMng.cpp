@@ -4494,55 +4494,35 @@ void CPartMng::pppSetDeltaIdx(short index, long color)
 void CPartMng::pppSetDeltaSlot(int slot, long color)
 {
     char* pppMngSt = reinterpret_cast<char*>(this);
-    int i = 0x40;
 
-    do {
-        if ((*reinterpret_cast<int*>(pppMngSt + 0x14 + (0x158 * 0)) != -0x1000) &&
-            (*reinterpret_cast<int*>(pppMngSt + 0x100 + (0x158 * 0)) == slot)) {
-            *reinterpret_cast<unsigned char*>(pppMngSt + 0xa8 + (0x158 * 0)) = static_cast<unsigned char>((color >> 24) & 0xff);
-            *reinterpret_cast<unsigned char*>(pppMngSt + 0xa9 + (0x158 * 0)) = static_cast<unsigned char>((color >> 16) & 0xff);
-            *reinterpret_cast<unsigned char*>(pppMngSt + 0xaa + (0x158 * 0)) = static_cast<unsigned char>((color >> 8) & 0xff);
-            *reinterpret_cast<unsigned char*>(pppMngSt + 0xab + (0x158 * 0)) = static_cast<unsigned char>(color & 0xff);
+    for (int i = 0; i < 0x140; i += 5) {
+        if ((*reinterpret_cast<int*>(pppMngSt + 0x2A2C + (0x158 * 0)) != -0x1000) &&
+            (*reinterpret_cast<int*>(pppMngSt + 0x2B18 + (0x158 * 0)) == slot)) {
+            *reinterpret_cast<long*>(pppMngSt + 0x2AC0 + (0x158 * 0)) = color;
         }
-        if ((*reinterpret_cast<int*>(pppMngSt + 0x14 + (0x158 * 1)) != -0x1000) &&
-            (*reinterpret_cast<int*>(pppMngSt + 0x100 + (0x158 * 1)) == slot)) {
-            *reinterpret_cast<unsigned char*>(pppMngSt + 0xa8 + (0x158 * 1)) = static_cast<unsigned char>((color >> 24) & 0xff);
-            *reinterpret_cast<unsigned char*>(pppMngSt + 0xa9 + (0x158 * 1)) = static_cast<unsigned char>((color >> 16) & 0xff);
-            *reinterpret_cast<unsigned char*>(pppMngSt + 0xaa + (0x158 * 1)) = static_cast<unsigned char>((color >> 8) & 0xff);
-            *reinterpret_cast<unsigned char*>(pppMngSt + 0xab + (0x158 * 1)) = static_cast<unsigned char>(color & 0xff);
+        if ((*reinterpret_cast<int*>(pppMngSt + 0x2A2C + (0x158 * 1)) != -0x1000) &&
+            (*reinterpret_cast<int*>(pppMngSt + 0x2B18 + (0x158 * 1)) == slot)) {
+            *reinterpret_cast<long*>(pppMngSt + 0x2AC0 + (0x158 * 1)) = color;
         }
-        if ((*reinterpret_cast<int*>(pppMngSt + 0x14 + (0x158 * 2)) != -0x1000) &&
-            (*reinterpret_cast<int*>(pppMngSt + 0x100 + (0x158 * 2)) == slot)) {
-            *reinterpret_cast<unsigned char*>(pppMngSt + 0xa8 + (0x158 * 2)) = static_cast<unsigned char>((color >> 24) & 0xff);
-            *reinterpret_cast<unsigned char*>(pppMngSt + 0xa9 + (0x158 * 2)) = static_cast<unsigned char>((color >> 16) & 0xff);
-            *reinterpret_cast<unsigned char*>(pppMngSt + 0xaa + (0x158 * 2)) = static_cast<unsigned char>((color >> 8) & 0xff);
-            *reinterpret_cast<unsigned char*>(pppMngSt + 0xab + (0x158 * 2)) = static_cast<unsigned char>(color & 0xff);
+        if ((*reinterpret_cast<int*>(pppMngSt + 0x2A2C + (0x158 * 2)) != -0x1000) &&
+            (*reinterpret_cast<int*>(pppMngSt + 0x2B18 + (0x158 * 2)) == slot)) {
+            *reinterpret_cast<long*>(pppMngSt + 0x2AC0 + (0x158 * 2)) = color;
         }
-        if ((*reinterpret_cast<int*>(pppMngSt + 0x14 + (0x158 * 3)) != -0x1000) &&
-            (*reinterpret_cast<int*>(pppMngSt + 0x100 + (0x158 * 3)) == slot)) {
-            *reinterpret_cast<unsigned char*>(pppMngSt + 0xa8 + (0x158 * 3)) = static_cast<unsigned char>((color >> 24) & 0xff);
-            *reinterpret_cast<unsigned char*>(pppMngSt + 0xa9 + (0x158 * 3)) = static_cast<unsigned char>((color >> 16) & 0xff);
-            *reinterpret_cast<unsigned char*>(pppMngSt + 0xaa + (0x158 * 3)) = static_cast<unsigned char>((color >> 8) & 0xff);
-            *reinterpret_cast<unsigned char*>(pppMngSt + 0xab + (0x158 * 3)) = static_cast<unsigned char>(color & 0xff);
+        if ((*reinterpret_cast<int*>(pppMngSt + 0x2A2C + (0x158 * 3)) != -0x1000) &&
+            (*reinterpret_cast<int*>(pppMngSt + 0x2B18 + (0x158 * 3)) == slot)) {
+            *reinterpret_cast<long*>(pppMngSt + 0x2AC0 + (0x158 * 3)) = color;
         }
-        if ((*reinterpret_cast<int*>(pppMngSt + 0x14 + (0x158 * 4)) != -0x1000) &&
-            (*reinterpret_cast<int*>(pppMngSt + 0x100 + (0x158 * 4)) == slot)) {
-            *reinterpret_cast<unsigned char*>(pppMngSt + 0xa8 + (0x158 * 4)) = static_cast<unsigned char>((color >> 24) & 0xff);
-            *reinterpret_cast<unsigned char*>(pppMngSt + 0xa9 + (0x158 * 4)) = static_cast<unsigned char>((color >> 16) & 0xff);
-            *reinterpret_cast<unsigned char*>(pppMngSt + 0xaa + (0x158 * 4)) = static_cast<unsigned char>((color >> 8) & 0xff);
-            *reinterpret_cast<unsigned char*>(pppMngSt + 0xab + (0x158 * 4)) = static_cast<unsigned char>(color & 0xff);
+        if ((*reinterpret_cast<int*>(pppMngSt + 0x2A2C + (0x158 * 4)) != -0x1000) &&
+            (*reinterpret_cast<int*>(pppMngSt + 0x2B18 + (0x158 * 4)) == slot)) {
+            *reinterpret_cast<long*>(pppMngSt + 0x2AC0 + (0x158 * 4)) = color;
         }
-        if ((*reinterpret_cast<int*>(pppMngSt + 0x14 + (0x158 * 5)) != -0x1000) &&
-            (*reinterpret_cast<int*>(pppMngSt + 0x100 + (0x158 * 5)) == slot)) {
-            *reinterpret_cast<unsigned char*>(pppMngSt + 0xa8 + (0x158 * 5)) = static_cast<unsigned char>((color >> 24) & 0xff);
-            *reinterpret_cast<unsigned char*>(pppMngSt + 0xa9 + (0x158 * 5)) = static_cast<unsigned char>((color >> 16) & 0xff);
-            *reinterpret_cast<unsigned char*>(pppMngSt + 0xaa + (0x158 * 5)) = static_cast<unsigned char>((color >> 8) & 0xff);
-            *reinterpret_cast<unsigned char*>(pppMngSt + 0xab + (0x158 * 5)) = static_cast<unsigned char>(color & 0xff);
+        if ((*reinterpret_cast<int*>(pppMngSt + 0x2A2C + (0x158 * 5)) != -0x1000) &&
+            (*reinterpret_cast<int*>(pppMngSt + 0x2B18 + (0x158 * 5)) == slot)) {
+            *reinterpret_cast<long*>(pppMngSt + 0x2AC0 + (0x158 * 5)) = color;
         }
 
         pppMngSt += 0x810;
-        i--;
-    } while (i != 0);
+    }
 }
 
 /*

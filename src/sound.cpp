@@ -22,6 +22,7 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
 extern const char s_CSound_80330ce0[] = "CSound";
+extern const char s_CManager_801DB0B0[] = "CManager";
 extern const float FLOAT_80330ce8 = 127.0f;
 extern const float kLineSegmentMinT = 0.0f;
 extern const float kLineSegmentMaxT = 1.0f;
@@ -36,16 +37,16 @@ extern const char s_CManager_801DB0B0[] = "CManager";
 static const char s_soundNoFreeWaveWarn[] =
     "\x82\xb1\x82\xea\x88\xc8\x8f\xe3noFreeWaev\x82\xf0\x92\xc7\x89\xc1\x82\xc5"
     "\x82\xab\x82\xdc\x82\xb9\x82\xf1\x81\x42\n";
-static const char s_soundNoFreeSeGroupWarn[] =
+extern const char s_soundNoFreeSeGroupWarn_801DB0E4[] =
     "\x82\xb1\x82\xea\x88\xc8\x8f\xe3noFreeSeGroup\x82\xf0\x92\xc7\x89\xc1\x82\xc5"
     "\x82\xab\x82\xdc\x82\xb9\x82\xf1\x81\x42\n";
-static const char s_soundStreamPathFmt[] = "dvd/sound/stream/str%04d.str";
-static const char s_soundMinusOneFmt[28] =
+extern const char s_dvd_sound_stream_strpct04d_str_801DB110[] = "dvd/sound/stream/str%04d.str";
+extern const char s_soundMinusOneFmt[28] =
     "Sound: -1\x82\xaa\x93\x6E\x82\xb3\x82\xea\x82\xdc\x82\xb5\x82\xbd\x81\x42\n";
-static const char s_soundLineTableFullFmt[] =
+extern const char s_soundLineTableFullFmt[] =
     "CSound: \x83\x89\x83\x43\x83\x93\x82\xcc\x92\xb8\x93\x5F\x82\xaa\x91\xbd\x82\xb7"
     "\x82\xac\x82\xdc\x82\xb7\x81\x42\n";
-static const char s_soundLineOutOfRangeFmt[32] =
+extern const char s_soundLineOutOfRangeFmt[32] =
     "CSound: \x83\x89\x83\x43\x83\x93\x82\xaa\x91\xbd\x82\xb7\x82\xac\x82\xdc\x82\xb7"
     "\x81\x42\n";
 static const char s_soundLoadWaveErrorFmt[] =
@@ -64,7 +65,7 @@ static const char s_soundSeBlockPathFmt[] = "dvd/sound/se/block/se%03d.seb";
 static const char s_soundMusicPathFmt[] = "dvd/sound/music/music%03d.bgm";
 static const char s_soundEnvSePlayFmt[] = "\x1B[32mEnvSePlay: %06d\n\x1B[0m";
 static const char s_soundEnvSeStopFmt[] = "\x1B[32mEnvSeStop: %06d\n\x1B[0m";
-static const char s_soundSourceName[] = "sound.cpp";
+extern const char s_sound_cpp_801db2d4[] = "sound.cpp";
 
 extern double DOUBLE_80330d20;
 extern double DOUBLE_80330d28;
@@ -388,9 +389,9 @@ void CSound::Init()
     SoundData(this).m_stage = CreateStage__7CMemoryFUlPci(&Memory, 0xA4000, const_cast<char*>(s_CSound_80330ce0), 0);
 
     SoundData(this).m_aramBuffer = static_cast<u8*>(__nwa__FUlPQ27CMemory6CStagePci(
-        0x80000, SoundData(this).m_stage, const_cast<char*>(s_soundSourceName), 0x2E));
+        0x80000, SoundData(this).m_stage, const_cast<char*>(s_sound_cpp_801db2d4), 0x2E));
     SoundData(this).m_streamBuffer = static_cast<u8*>(__nwa__FUlPQ27CMemory6CStagePci(
-        0x20000, SoundData(this).m_stage, const_cast<char*>(s_soundSourceName), 0x2F));
+        0x20000, SoundData(this).m_stage, const_cast<char*>(s_sound_cpp_801db2d4), 0x2F));
 
     SoundData(this).m_bgmMasterVolume = 0x7F;
     SoundData(this).m_seMasterVolume = 0x7F;
@@ -2319,7 +2320,7 @@ void CSound::LoadStream(int streamID)
         sound.m_streamPlaying = 0;
 
         char streamPath[252];
-        sprintf(streamPath, s_soundStreamPathFmt, streamID);
+        sprintf(streamPath, s_dvd_sound_stream_strpct04d_str_801DB110, streamID);
         sound.m_streamFile = File.Open(streamPath, 0, CFile::PRI_LOW);
         if (sound.m_streamFile != 0) {
             CFile::CHandle* streamFile = sound.m_streamFile;
@@ -2352,7 +2353,7 @@ void CSound::PlayStreamASync()
 {
     char streamPath[252];
     CSoundLayout& sound = SoundData(this);
-    sprintf(streamPath, s_soundStreamPathFmt, sound.m_streamWaveID);
+    sprintf(streamPath, s_dvd_sound_stream_strpct04d_str_801DB110, sound.m_streamWaveID);
 
     sound.m_streamFile = File.Open(streamPath, 0, CFile::PRI_LOW);
     if (sound.m_streamFile == 0) {
@@ -2507,7 +2508,7 @@ void CSound::AddNoFreeSeGroup(int group)
         return;
     }
 
-    Printf__7CSystemFPce(&System, s_soundNoFreeSeGroupWarn);
+    Printf__7CSystemFPce(&System, s_soundNoFreeSeGroupWarn_801DB0E4);
 }
 
 /*
@@ -2532,7 +2533,7 @@ void CSound::AddNoFreeWave(int wave)
         return;
     }
 
-    Printf__7CSystemFPce(&System, s_soundNoFreeWaveWarn);
+    Printf__7CSystemFPce(&System, s_soundNoFreeWaveWarn_801DB0BC);
 }
 
 /*

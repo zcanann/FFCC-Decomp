@@ -41,6 +41,21 @@ extern const double DOUBLE_80333420 = 216.0;
 static inline double TmpArtiIntToDouble(int value)
 {
     union {
+        struct {
+            unsigned int hi;
+            unsigned int lo;
+        } words;
+        double value;
+    } conv;
+
+    conv.words.hi = 0x43300000;
+    conv.words.lo = value ^ 0x80000000U;
+    return conv.value - DOUBLE_80332f40;
+}
+
+static inline double TmpArtiIntToDouble64(int value)
+{
+    union {
         unsigned long long bits;
         double value;
     } conv;
@@ -155,10 +170,10 @@ void CMenuPcs::TmpArtiDraw()
 		int tex = *(int*)(entry + 0xE);
 		if (tex >= 0) {
 			float alpha = *(float*)(entry + 8);
-			float left = (float)entry[0];
-			float top = (float)entry[1];
-			float width = (float)entry[2];
-			float height = (float)entry[3];
+			float left = (float)TmpArtiIntToDouble(entry[0]);
+			float top = (float)TmpArtiIntToDouble(entry[1]);
+			float width = (float)TmpArtiIntToDouble(entry[2]);
+			float height = (float)TmpArtiIntToDouble(entry[3]);
 			float s = *(float*)(entry + 4);
 			float t = *(float*)(entry + 6);
 
@@ -263,8 +278,8 @@ unsigned int CMenuPcs::TmpArtiClose()
 			else {
 				*(int *)(psVar4 + 0x10) = *(int *)(psVar4 + 0x10) + 1;
 				dVar3 = DOUBLE_80332f50;
-				double duration = TmpArtiIntToDouble(*(int *)(psVar4 + 0x14));
-				double timer = TmpArtiIntToDouble(*(int *)(psVar4 + 0x10));
+				double duration = TmpArtiIntToDouble64(*(int *)(psVar4 + 0x14));
+				double timer = TmpArtiIntToDouble64(*(int *)(psVar4 + 0x10));
 				*(float *)(psVar4 + 8) =
 				    (float)(DOUBLE_80332f48 - (DOUBLE_80332f48 / duration) * timer);
 				if ((double)*(float *)(psVar4 + 8) < dVar3) {
@@ -499,7 +514,7 @@ unsigned int CMenuPcs::TmpArtiOpen()
 			*(int *)(psVar7 + 0xe) = 0x37;
 			psVar7[2] = 200;
 			psVar7[3] = 0x28;
-			psVar7[0] = (short)(int)-((TmpArtiIntToDouble(psVar7[2]) * dVar1) - dVar5);
+			psVar7[0] = (short)(int)-((TmpArtiIntToDouble64(psVar7[2]) * dVar1) - dVar5);
 			psVar7[1] = (short)iVar6 * (psVar7[3] + -8) + 0x60;
 			*(float *)(psVar7 + 4) = fVar2;
 			*(float *)(psVar7 + 6) = fVar2;
@@ -508,7 +523,7 @@ unsigned int CMenuPcs::TmpArtiOpen()
 			*(int *)(psVar7 + 0x2e) = 0x37;
 			psVar7[0x22] = 200;
 			psVar7[0x23] = 0x28;
-			psVar7[0x20] = (short)(int)-((TmpArtiIntToDouble(psVar7[0x22]) * dVar1) - dVar5);
+			psVar7[0x20] = (short)(int)-((TmpArtiIntToDouble64(psVar7[0x22]) * dVar1) - dVar5);
 			psVar7[0x21] = (short)(iVar6 + 1) * (psVar7[0x23] + -8) + 0x60;
 			*(float *)(psVar7 + 0x24) = fVar2;
 			*(float *)(psVar7 + 0x26) = fVar2;
@@ -538,8 +553,8 @@ unsigned int CMenuPcs::TmpArtiOpen()
 				}
 				else {
 					*(int *)(psVar7 + 0x10) = *(int *)(psVar7 + 0x10) + 1;
-					double duration = TmpArtiIntToDouble(*(int *)(psVar7 + 0x14));
-					double timer = TmpArtiIntToDouble(*(int *)(psVar7 + 0x10));
+					double duration = TmpArtiIntToDouble64(*(int *)(psVar7 + 0x14));
+					double timer = TmpArtiIntToDouble64(*(int *)(psVar7 + 0x10));
 					*(float *)(psVar7 + 8) =
 					    (float)((DOUBLE_80332f48 / duration) * timer);
 				}

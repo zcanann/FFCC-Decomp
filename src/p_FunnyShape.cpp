@@ -457,12 +457,14 @@ unsigned int m_table__14CFunnyShapePcs[0x15C / sizeof(unsigned int)] = {
     reinterpret_cast<unsigned int>(const_cast<char*>(lbl_801D7DD0)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x21, 0, 0, 0, 0,
     0x42, 1
 };
-unsigned int lbl_801EA904[4] = {
-    reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CManager_8032E660)), 0, 0,
-    reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CManager_8032E660))
-};
-unsigned int lbl_801EA914[4] = {
-    0, reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CProcess_8032E668)), 0, 0
+unsigned int lbl_801EA904[3] = {
+    reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CManager_8032E660)), 0, 0};
+unsigned int lbl_801EA910[5] = {
+    reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CManager_8032E660)),
+    0,
+    reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CProcess_8032E668)),
+    0,
+    0,
 };
 u8 ARRAY_8026D728[0xC];
 u8 FunnyShapePcs[sizeof(CFunnyShapePcs)];

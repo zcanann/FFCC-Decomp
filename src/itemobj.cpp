@@ -726,7 +726,7 @@ void CGItemObj::onFrameStat()
 		} else if (*(int*)(self + 0x528) == 0xD) {
 			ownerSlot = *(int*)(*(unsigned char**)(*(unsigned char**)(self + 0x550) + 0x58) + 0x3B4);
 
-			if ((unsigned int)System.m_execParam > 2U) {
+			if ((unsigned int)System.m_execParam >= 3U) {
 				Printf__7CSystemFPce(
 				    &System, const_cast<char*>((stateId == 0x26) ? DAT_801dcfc8 : DAT_801dcfa4), ownerSlot);
 			}
@@ -801,7 +801,7 @@ int CGItemObj::DeleteOld(int deleteMask, int maxDeleteCount, CFlatRuntime::CObje
 		if (bestItemObj != 0) {
 			deleteObject__12CFlatRuntimeFPQ212CFlatRuntime7CObject(CFlat, bestItemObj);
 		} else {
-			if ((unsigned int)System.m_execParam > 2U) {
+			if ((unsigned int)System.m_execParam >= 3U) {
 				Printf__7CSystemFPce(&System, const_cast<char*>(DAT_801dced4));
 			}
 			return deletedCount;
@@ -940,7 +940,7 @@ CGPrgObj* CGItemObj::CreateFromScript(
 			*(CGObject**)(itemSelf + 0x550) = owner;
 
 			void* ownerScriptSlot = owner->m_scriptHandle[0xED];
-			if ((unsigned int)System.m_execParam > 2U) {
+			if ((unsigned int)System.m_execParam >= 3U) {
 				Printf__7CSystemFPce(&System, const_cast<char*>(DAT_801dcf34), ownerScriptSlot);
 			}
 			*(CGPrgObj**)(SoundBuffer + (int)ownerScriptSlot * 4 + 0x4F4) = newItem;
@@ -956,7 +956,7 @@ CGPrgObj* CGItemObj::CreateFromScript(
 			unsigned int* ccfsData = (unsigned int*)ccfs;
 			LoadModelASync__Q29CCharaPcs7CHandleFiUlUl(*(void**)(itemSelf + 0x564), 2, ccfsData[1], ccfsData[2]);
 
-			if ((unsigned int)System.m_execParam > 2U) {
+			if ((unsigned int)System.m_execParam >= 3U) {
 				Printf__7CSystemFPce(&System, const_cast<char*>(DAT_801dcf64));
 			}
 

@@ -594,38 +594,6 @@ static inline _GXColor ModulateColor(const _GXColor& src, const _GXColor& shade)
     return out;
 }
 
-static inline bool HasLoadedMergeFile(CCharaPcs* self, int mergeFileId)
-{
-    for (int i = 0; i < LoadModelArray(self)->GetSize(); i++) {
-        CCharaPcs::CLoadModel* loadModel = (*LoadModelArray(self))[static_cast<unsigned long>(i)];
-        if (loadModel != 0 && loadModel->m_mergeFileId == mergeFileId) {
-            return true;
-        }
-    }
-
-    for (int i = 0; i < LoadTextureArray(self)->GetSize(); i++) {
-        CCharaPcs::CLoadTexture* loadTexture = (*LoadTextureArray(self))[static_cast<unsigned long>(i)];
-        if (loadTexture != 0 && loadTexture->m_mergeFileId == mergeFileId) {
-            return true;
-        }
-    }
-
-    for (int i = 0; i < LoadPdtArray(self)->GetSize(); i++) {
-        CCharaPcs::CLoadPdt* loadPdt = (*LoadPdtArray(self))[static_cast<unsigned long>(i)];
-        if (loadPdt != 0 && loadPdt->m_mergeFileId == mergeFileId) {
-            return true;
-        }
-    }
-
-    for (int i = 0; i < LoadAnimArray(self)->GetSize(); i++) {
-        CCharaPcs::CLoadAnim* loadAnim = (*LoadAnimArray(self))[static_cast<unsigned long>(i)];
-        if (loadAnim != 0 && loadAnim->m_mergeFileId == mergeFileId) {
-            return true;
-        }
-    }
-
-    return false;
-}
 }
 
 /*
@@ -1852,7 +1820,47 @@ void CCharaPcs::LoadCam(int index, char* fileName)
  */
 void CCharaPcs::LoadMergeFile(int mergeFileId, int mergeFlags, int streamToAmem)
 {
-    if (HasLoadedMergeFile(this, mergeFileId)) {
+    bool hasLoaded = false;
+
+    for (unsigned int i = 0; i < LoadModelArray(this)->GetSize(); i++) {
+        CLoadModel* loadModel = (*LoadModelArray(this))[i];
+        if (loadModel->m_mergeFileId == mergeFileId) {
+            hasLoaded = true;
+            break;
+        }
+    }
+
+    if (!hasLoaded) {
+        for (unsigned int i = 0; i < LoadTextureArray(this)->GetSize(); i++) {
+            CLoadTexture* loadTexture = (*LoadTextureArray(this))[i];
+            if (loadTexture->m_mergeFileId == mergeFileId) {
+                hasLoaded = true;
+                break;
+            }
+        }
+    }
+
+    if (!hasLoaded) {
+        for (unsigned int i = 0; i < LoadPdtArray(this)->GetSize(); i++) {
+            CLoadPdt* loadPdt = (*LoadPdtArray(this))[i];
+            if (loadPdt->m_mergeFileId == mergeFileId) {
+                hasLoaded = true;
+                break;
+            }
+        }
+    }
+
+    if (!hasLoaded) {
+        for (unsigned int i = 0; i < LoadAnimArray(this)->GetSize(); i++) {
+            CLoadAnim* loadAnim = (*LoadAnimArray(this))[i];
+            if (loadAnim->m_mergeFileId == mergeFileId) {
+                hasLoaded = true;
+                break;
+            }
+        }
+    }
+
+    if (hasLoaded) {
         Printf__7CSystemFPce(&System, s_charaMergeDupFmt, mergeFileId);
         return;
     }

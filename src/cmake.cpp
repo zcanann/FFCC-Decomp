@@ -612,9 +612,7 @@ void CMenuPcs::CalcSingCMake()
             }
             result = (frame >= 10) ? 1 : 0;
         } else if (openMode == 1) {
-            resultFlag = 0;
-            CmakeTribeCtrl();
-            result = static_cast<unsigned short>(resultFlag);
+            result = CmakeTribeCtrl();
         } else if (frame < 10) {
             frame = frame + 1;
         } else {
@@ -2182,7 +2180,7 @@ void CMenuPcs::CmakeTribeOpen()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::CmakeTribeCtrl()
+unsigned short CMenuPcs::CmakeTribeCtrl()
 {
     int state = MenuS32(this, 0x82C);
     int mcWork = MenuS32(this, 0x848);
@@ -2196,7 +2194,7 @@ void CMenuPcs::CmakeTribeCtrl()
     unsigned short down = GetButtonDown__8CMenuPcsFi(this, 0);
 
     if (repeat == 0) {
-        return;
+        return 0;
     }
 
     if (mcState == 3) {
@@ -2211,7 +2209,7 @@ void CMenuPcs::CmakeTribeCtrl()
         }
 
         if ((repeat & 0xC) != 0) {
-            return;
+            return 0;
         }
 
         if ((down & 0x200) != 0) {
@@ -2219,18 +2217,18 @@ void CMenuPcs::CmakeTribeCtrl()
             if (selectField == 0) {
                 resultDir = -1;
                 resultFlag = 1;
-                return;
+                return 1;
             }
 
             selectField = static_cast<short>(selectField - 1);
-            return;
+            return 0;
         }
 
         if ((down & 0x100) != 0) {
             Sound.PlaySe(2, 0x40, 0x7F, 0);
             if (selectField == 0) {
                 selectField = static_cast<short>(selectField + 1);
-                return;
+                return 0;
             }
 
             bool duplicate = false;
@@ -2272,7 +2270,7 @@ void CMenuPcs::CmakeTribeCtrl()
                     static_cast<int>(s_CmakeInfo.m_gender));
                 resultDir = 1;
                 resultFlag = 1;
-                return;
+                return 1;
             }
 
             Sound.PlaySe(4, 0x40, 0x7F, 0);
@@ -2283,13 +2281,15 @@ void CMenuPcs::CmakeTribeCtrl()
             mcState = 0;
         }
 
-        return;
+        return 0;
     }
 
     if (mcState == 1 && (down & 0x300) != 0) {
         Sound.PlaySe(2, 0x40, 0x7F, 0);
         mcState = 2;
     }
+
+    return 0;
 }
 
 /*

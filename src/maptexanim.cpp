@@ -8,6 +8,18 @@
 
 class CMaterial;
 
+class CMaterialSet : public CRef
+{
+public:
+    CPtrArray<CMaterial*> m_materials;
+};
+
+class CTextureSet : public CRef
+{
+public:
+    CPtrArray<CTexture*> m_textures;
+};
+
 extern "C" void Calc__11CMapTexAnimFP12CMaterialSetP11CTextureSet(CMapTexAnim*, CMaterialSet*, CTextureSet*);
 extern "C" void __ct__4CRefFv(void*);
 extern "C" void __dt__4CRefFv(void*, int);
@@ -65,12 +77,12 @@ static inline unsigned char& U8At(void* p, unsigned int offset)
 
 static inline void* MaterialAt(CMaterialSet* materialSet, unsigned long index)
 {
-    return (*reinterpret_cast<CPtrArray<CMaterial*>*>(materialSet))[index];
+    return materialSet->m_materials[index];
 }
 
 static inline void* TextureAt(CTextureSet* textureSet, unsigned long index)
 {
-    return (*reinterpret_cast<CPtrArray<CTexture*>*>(textureSet))[index];
+    return textureSet->m_textures[index];
 }
 
 static inline void ReplaceRef(void** slot, void* ref)

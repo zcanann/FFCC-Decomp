@@ -1412,9 +1412,11 @@ void CFlatRuntime::GetCodeInfo(char* codeInfo)
 
 	CObject* object = reinterpret_cast<CObject*>(codeInfo);
 	register int op;
+	CodeWord lhsFloat;
+	CodeWord rhsFloat;
+	CodeWord result;
 	CodeWord rhs;
 	CodeWord lhs;
-	CodeWord result;
 
 #ifdef __MWERKS__
 	asm { mr op, r5 };
@@ -1424,25 +1426,27 @@ void CFlatRuntime::GetCodeInfo(char* codeInfo)
 
 	object->m_sp--;
 	rhs.u = *object->m_sp;
+	rhsFloat.u = rhs.u;
 
 	if ((op == 0x20) || (op == 0x23) || (op == 0x25) || (op == 0x2B)) {
 		switch (op) {
 		case 0x20:
-			result.s = -rhs.s;
+			result.s = -rhsFloat.s;
 			break;
 		case 0x23:
-			result.u = static_cast<u32>((__cntlzw(rhs.u) >> 5) & 0xFF);
+			result.u = static_cast<u32>((__cntlzw(rhsFloat.u) >> 5) & 0xFF);
 			break;
 		case 0x25:
-			result.u = ~rhs.u;
+			result.u = ~rhsFloat.u;
 			break;
 		case 0x2B:
-			result.f = -rhs.f;
+			result.f = -rhsFloat.f;
 			break;
 		}
 	} else {
 		object->m_sp--;
 		lhs.u = *object->m_sp;
+		lhsFloat.u = lhs.u;
 
 		switch (op) {
 		case 0x19:
@@ -1458,8 +1462,11 @@ void CFlatRuntime::GetCodeInfo(char* codeInfo)
 			result.s = lhs.s / rhs.s;
 			break;
 		case 0x1D:
-			result.s = lhs.s - ((lhs.s / rhs.s) * rhs.s);
+		{
+			int quotient = lhs.s / rhs.s;
+			result.s = lhs.s - (quotient * rhs.s);
 			break;
+		}
 		case 0x1E:
 			result.u = lhs.u | rhs.u;
 			break;
@@ -1467,7 +1474,7 @@ void CFlatRuntime::GetCodeInfo(char* codeInfo)
 			result.u = lhs.u & rhs.u;
 			break;
 		case 0x21:
-			result.s = lhs.s >> (rhs.u & 0x3F);
+			result.s = lhs.s >> rhs.u;
 			break;
 		case 0x22:
 			result.s = lhs.s << rhs.s;
@@ -1476,19 +1483,19 @@ void CFlatRuntime::GetCodeInfo(char* codeInfo)
 			result.u = lhs.u ^ rhs.u;
 			break;
 		case 0x26:
-			result.f = lhs.f + rhs.f;
+			result.f = lhsFloat.f + rhsFloat.f;
 			break;
 		case 0x27:
-			result.f = lhs.f - rhs.f;
+			result.f = lhsFloat.f - rhsFloat.f;
 			break;
 		case 0x28:
-			result.f = lhs.f * rhs.f;
+			result.f = lhsFloat.f * rhsFloat.f;
 			break;
 		case 0x29:
-			result.f = lhs.f / rhs.f;
+			result.f = lhsFloat.f / rhsFloat.f;
 			break;
 		case 0x2A:
-			result.f = static_cast<float>(fmod(static_cast<double>(lhs.f), static_cast<double>(rhs.f)));
+			result.f = static_cast<float>(fmod(static_cast<double>(lhsFloat.f), static_cast<double>(rhsFloat.f)));
 			break;
 		}
 	}

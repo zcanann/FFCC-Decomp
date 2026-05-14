@@ -563,7 +563,7 @@ int CMenuPcs::ArtiCtrl()
  * JP Address: TODO
  * JP Size: TODO
  */
-bool CMenuPcs::ArtiOpen()
+int CMenuPcs::ArtiOpen()
 {
 	int finished;
 	int count;
@@ -602,7 +602,11 @@ bool CMenuPcs::ArtiOpen()
 		}
 	}
 
-	return count == finished;
+	int result = 0;
+	if (count == finished) {
+		result = 1;
+	}
+	return result;
 }
 
 /*

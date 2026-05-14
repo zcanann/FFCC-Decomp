@@ -213,7 +213,7 @@ public:
     void GetOptionData();
     void ArtiInit();
     void ArtiInit1();
-    bool ArtiOpen();
+    int ArtiOpen();
     int ArtiCtrl();
     int ArtiClose();
     void ArtiDraw();

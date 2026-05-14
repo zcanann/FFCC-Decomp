@@ -165,20 +165,19 @@ void CGMonObj::onFramePreCalc()
 	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
 	CGObject* object = reinterpret_cast<CGObject*>(this);
 	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
-	unsigned char* scriptBase = reinterpret_cast<unsigned char*>(object->m_scriptHandle);
-	unsigned char* script9 = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
 
 	onFramePreCalc__10CGCharaObjFv(reinterpret_cast<CGCharaObj*>(this));
 	*reinterpret_cast<unsigned int*>(mon + 0x6F4) += 1;
 
-	if (*reinterpret_cast<short*>(script9 + 0x10C) == 1) {
-		unsigned char* aiData = script9;
+	if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x10C) == 1) {
+		unsigned char* aiData = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
 		short& aiState = *reinterpret_cast<short*>(mon + 0x6E4);
 		short& aiStatePrev = *reinterpret_cast<short*>(mon + 0x6E6);
 
 		if (aiState != 0) {
 			aiData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
-				(aiState + *reinterpret_cast<unsigned short*>(script9 + 0x100)) * 0x1D0 + 0x10;
+				(aiState + *reinterpret_cast<unsigned short*>(
+					reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x100)) * 0x1D0 + 0x10;
 		}
 
 		typedef int (*PtmfScallRet)(CGMonObj*, int, void*);
@@ -191,14 +190,15 @@ void CGMonObj::onFramePreCalc()
 		}
 	}
 
-	if ((*reinterpret_cast<short*>(scriptBase + 0x3E) == 0) &&
-		(*reinterpret_cast<short*>(scriptBase + 0x50) == 0) &&
-		(*reinterpret_cast<short*>(scriptBase + 0x44) == 0) &&
-		(*reinterpret_cast<short*>(scriptBase + 0x46) == 0) &&
+	if ((*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + 0x3E) == 0) &&
+		(*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + 0x50) == 0) &&
+		(*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + 0x44) == 0) &&
+		(*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + 0x46) == 0) &&
 		(static_cast<int>(static_cast<unsigned int>(mon[0x63C]) << 24) < 0) &&
 		(mon[0x6B9] == 0) &&
 		(mon[0x6C1] == 0)) {
-		*reinterpret_cast<int*>(mon + 0x6D8) = (*reinterpret_cast<short*>(script9 + 0x10C) == 1) ? -1 : 0;
+		*reinterpret_cast<int*>(mon + 0x6D8) =
+			(*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x10C) == 1) ? -1 : 0;
 		*reinterpret_cast<int*>(mon + 0x6DC) = *reinterpret_cast<int*>(mon + 0x6C4);
 		*reinterpret_cast<int*>(mon + 0x6D0) = -1;
 
@@ -211,7 +211,7 @@ void CGMonObj::onFramePreCalc()
 		}
 
 		int nextState = *reinterpret_cast<int*>(mon + 0x6D8);
-		if (*reinterpret_cast<short*>(script9 + 0x10C) == 1) {
+		if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x10C) == 1) {
 			if ((nextState != -1) && (nextState != prgObj->m_lastStateId)) {
 				prgObj->changeStat(nextState, 0, 0);
 			}

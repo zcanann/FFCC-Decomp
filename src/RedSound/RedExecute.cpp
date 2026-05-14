@@ -2230,8 +2230,8 @@ static void _ExecuteExtraData()
             } else {
                 track = soundControl->m_tracks;
                 do {
-                    voice = p_VoiceData;
                     if (track->m_command != 0) {
+                        voice = p_VoiceData;
                         do {
                             if (voice->m_track == track) {
                                 voice->m_updateFlags |= REDSOUND_VOICE_UPDATE_VOLUME;

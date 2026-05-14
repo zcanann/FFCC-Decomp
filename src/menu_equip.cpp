@@ -322,7 +322,9 @@ int CMenuPcs::EquipCtrlCur()
 	if (blocked) {
 		press = 0;
 	} else {
-		press = Pad._8_2_;
+		int padIndex = blocked;
+		padIndex &= ~-((__cntlzw((unsigned int)Pad._448_4_) & 0x20) >> 5);
+		press = *(u16*)((u8*)&Pad + padIndex * 0x54 + 8);
 	}
 
 	blocked = false;
@@ -332,7 +334,9 @@ int CMenuPcs::EquipCtrlCur()
 	if (blocked) {
 		hold = 0;
 	} else {
-		hold = Pad._20_2_;
+		int padIndex = blocked;
+		padIndex &= ~-((__cntlzw((unsigned int)Pad._448_4_) & 0x20) >> 5);
+		hold = *(u16*)((u8*)&Pad + padIndex * 0x54 + 0x14);
 	}
 
 	if (hold == 0) {
@@ -524,7 +528,7 @@ void CMenuPcs::EquipDraw()
 	item = menuData + 4;
 	for (int i = 0; i < 4; i++) {
 		if (*(s16*)(caravanWork + 0xac + i * 2) >= 0) {
-			int iconY = item[1] + 6;
+			int iconY = (int)((float)(item[1] + 6) - FLOAT_80332ee0);
 			int iconX = item[0] + item[2] - 0x10;
 			int itemIdx = *(s16*)(caravanWork + *(s16*)(caravanWork + 0xac + i * 2) * 2 + 0xb6);
 			DrawSingleIcon__8CMenuPcsFiiifif((double)*(float*)(item + 8), this, itemIdx, iconX, iconY, 0.0f);

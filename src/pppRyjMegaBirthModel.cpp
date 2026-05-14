@@ -821,19 +821,31 @@ void calc(_pppPObject* pppPObject, VRyjMegaBirthModel* vRyjMegaBirthModel,
 void pppRyjDrawMegaBirthModel(_pppPObject* obj, void* stepData, _pppCtrlTable* ctrlTable)
 {
     PRyjMegaBirthModel* params = (PRyjMegaBirthModel*)stepData;
+    u8* payload = (u8*)params;
     VRyjMegaBirthModel* work =
         (VRyjMegaBirthModel*)(obj->m_workArea + ctrlTable->m_serializedDataOffsets[2]);
-    int modelIndex = *(int*)((u8*)params + 4);
+    _PARTICLE_DATA* particleBlock = work->m_particleBlock;
+    PARTICLE_WMAT* particleWorldMatrixBlock = work->m_worldMatrixBlock;
+    _PARTICLE_COLOR* colorBlock = work->m_colorBlock;
+    s32 numParticles = work->m_numParticles;
+    s8 hasRequiredMemory;
 
-    if (modelIndex == 0xFFFF || work->m_particleBlock == NULL) {
+    if (particleBlock == NULL) {
+        hasRequiredMemory = 0;
+    } else if ((payload[0x136] != 0) && (particleWorldMatrixBlock == NULL)) {
+        hasRequiredMemory = 0;
+    } else if ((payload[0x131] != 0) && (colorBlock == NULL)) {
+        hasRequiredMemory = 0;
+    } else {
+        hasRequiredMemory = 1;
+    }
+
+    if (!hasRequiredMemory) {
         return;
     }
 
-    if ((*(u8*)((u8*)params + 0x136) != 0) && (work->m_worldMatrixBlock == NULL)) {
-        return;
-    }
-
-    if ((*(u8*)((u8*)params + 0x131) != 0) && (work->m_colorBlock == NULL)) {
+    int modelIndex = *(int*)(payload + 4);
+    if (modelIndex == 0xFFFF) {
         return;
     }
 
@@ -850,8 +862,8 @@ void pppRyjDrawMegaBirthModel(_pppPObject* obj, void* stepData, _pppCtrlTable* c
     pppInitBlendMode();
     pppSetBlendMode(0);
 
-    for (int i = 0; i < work->m_numParticles; i++) {
-        _PARTICLE_DATA* particle = (_PARTICLE_DATA*)((u8*)work->m_particleBlock + i * 0xA0);
+    for (int i = 0; i < numParticles; i++) {
+        _PARTICLE_DATA* particle = (_PARTICLE_DATA*)((u8*)particleBlock + i * 0xA0);
         _PARTICLE_WMAT* particleWorldMatrix = 0;
         _PARTICLE_COLOR* particleColor = 0;
 
@@ -859,11 +871,11 @@ void pppRyjDrawMegaBirthModel(_pppPObject* obj, void* stepData, _pppCtrlTable* c
             continue;
         }
 
-        if (work->m_worldMatrixBlock != NULL) {
-            particleWorldMatrix = (_PARTICLE_WMAT*)(work->m_worldMatrixBlock + i);
+        if (particleWorldMatrixBlock != NULL) {
+            particleWorldMatrix = (_PARTICLE_WMAT*)(particleWorldMatrixBlock + i);
         }
-        if (work->m_colorBlock != NULL) {
-            particleColor = work->m_colorBlock + i;
+        if (colorBlock != NULL) {
+            particleColor = colorBlock + i;
         }
 
         pppFMATRIX drawMatrix;

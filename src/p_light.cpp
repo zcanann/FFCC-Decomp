@@ -1066,8 +1066,8 @@ void CLightPcs::MakeLightMap()
     C_MTXOrtho(projection, FLOAT_8032fc2c, FLOAT_8032fc1c, FLOAT_8032fc2c, FLOAT_8032fc1c, FLOAT_8032fc1c,
                FLOAT_8032fc30);
     GXSetProjection(projection, GX_ORTHOGRAPHIC);
-    GXSetChanCtrl(GX_COLOR0A0, GX_TRUE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT0, GX_DF_CLAMP, GX_AF_NONE);
-    GXSetChanCtrl(GX_COLOR1A1, GX_TRUE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT0, GX_DF_NONE, GX_AF_SPEC);
+    GXSetChanCtrl(GX_COLOR0, GX_TRUE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT0, GX_DF_CLAMP, GX_AF_NONE);
+    GXSetChanCtrl(GX_ALPHA0, GX_TRUE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT0, GX_DF_NONE, GX_AF_SPEC);
     GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
     GXSetTevDirect(GX_TEVSTAGE0);
     GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
@@ -1096,10 +1096,12 @@ void CLightPcs::MakeLightMap()
 
     Graphic.SetStdPixelFmt();
     setViewport__11CGraphicPcsFv(&GraphicPcs);
+    PSMTX44Copy(CameraPcs.m_screenMatrix, projection);
+    GXSetProjection(projection, GX_PERSPECTIVE);
     GXSetCullMode(GX_CULL_FRONT);
     GXSetAlphaUpdate(GX_FALSE);
     GXSetTexCopySrc(0, 0, 0x40, 0x40);
-    GXSetTexCopyDst((u16)0x40, (u16)0x40, GX_TF_I8, GX_FALSE);
+    GXSetTexCopyDst((u16)0x40, (u16)0x40, GX_TF_IA8, GX_FALSE);
     GXCopyTex(gRenderScratchTextureBuffer, GX_TRUE);
 }
 

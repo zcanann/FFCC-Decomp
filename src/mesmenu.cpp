@@ -330,7 +330,7 @@ void CMesMenu::DrawHeart(float x, float y, float z, float alpha)
         return;
     }
 
-    if (FLOAT_803308d8 >= alpha) {
+    if (alpha <= FLOAT_803308d8) {
         return;
     }
 
@@ -339,9 +339,8 @@ void CMesMenu::DrawHeart(float x, float y, float z, float alpha)
         &MenuPcs, __ct__6CColorFUcUcUcUc(colorStorage, 0xFF, 0xFF, 0xFF, (int)(FLOAT_80330908 * alpha)));
     SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x17);
 
-    int menuIndex = *(int*)((char*)this + 0x18);
     int offset = 0x4C;
-    if ((menuIndex & 1) != 0) {
+    if ((*(int*)((char*)this + 0x18) & 1) != 0) {
         offset = 0x30;
     }
 
@@ -391,7 +390,7 @@ void CMesMenu::DrawHeart(float x, float y, float z, float alpha)
                 FLOAT_803308d8);
         }
 
-        baseX += ((menuIndex & 1) != 0) ? FLOAT_80330924 : FLOAT_80330928;
+        baseX += ((*(int*)((char*)this + 0x18) & 1) != 0) ? FLOAT_80330924 : FLOAT_80330928;
         valueOffset += 0x0C;
         timerOffset += 4;
     }
@@ -542,6 +541,9 @@ void CMesMenu::onDraw()
     float stageBlend = (float)*(int*)((char*)this + 0x3DF4) * FLOAT_80330918;
     if (*(int*)((char*)this + 0x3DF8) != 0) {
         stageBlend = FLOAT_80330914 - stageBlend;
+    }
+    if (stageBlend == FLOAT_803308d8) {
+        return;
     }
 
     float stateBlend = FLOAT_803308d8;

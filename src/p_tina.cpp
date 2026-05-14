@@ -209,6 +209,10 @@ int DAT_8032ed3c;
 #pragma inline_max_size(10000)
 inline CPartPcs::CPartPcs()
 {
+}
+
+static inline char* InitCPartPcsTable(char* profileName)
+{
 	unsigned int* table = reinterpret_cast<unsigned int*>(m_table__8CPartPcs);
 
 	table[1] = m_table_desc0__8CPartPcs[0];
@@ -268,10 +272,12 @@ inline CPartPcs::CPartPcs()
 	table[124] = m_table_desc18__8CPartPcs[0];
 	table[125] = m_table_desc18__8CPartPcs[1];
 	table[126] = m_table_desc18__8CPartPcs[2];
+
+	return profileName;
 }
 
 CPartPcs PartPcs;
-CProfile g_par_calc_prof(const_cast<char*>(s_no_name_8032fdcc));
+CProfile g_par_calc_prof(InitCPartPcsTable(const_cast<char*>(s_no_name_8032fdcc)));
 CProfile g_par_draw_prof(const_cast<char*>(s_no_name_8032fdcc));
 
 static int GetMngStBaseTime(const _pppMngSt* pppMngSt)

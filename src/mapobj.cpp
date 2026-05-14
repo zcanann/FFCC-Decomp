@@ -1084,20 +1084,20 @@ void CMapObj::Calc()
 {
     if (S16At(this, 0x2C) != 0) {
         S16At(this, 0x28) = static_cast<short>(S16At(this, 0x28) + S16At(this, 0x2C));
-        if (S16At(this, 0x2C) < 1) {
+        if (S16At(this, 0x2C) <= 0) {
             if (S16At(this, 0x28) <= S16At(this, 0x2A)) {
                 S16At(this, 0x28) = S16At(this, 0x2A);
                 U16At(this, 0x2C) = 0;
             }
-        } else if (S16At(this, 0x2A) <= S16At(this, 0x28)) {
+        } else if (S16At(this, 0x28) >= S16At(this, 0x2A)) {
             S16At(this, 0x28) = S16At(this, 0x2A);
             U16At(this, 0x2C) = 0;
         }
 
-        if (S16At(this, 0x28) == 0) {
-            U8At(this, 0x15) = U8At(this, 0x14);
-        } else {
+        if (S16At(this, 0x28) != 0) {
             U8At(this, 0x15) = 2;
+        } else {
+            U8At(this, 0x15) = U8At(this, 0x14);
         }
     }
 

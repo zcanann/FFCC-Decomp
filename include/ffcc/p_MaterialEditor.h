@@ -28,12 +28,6 @@ struct RSDLISTITEM {
     int flag;
 };
 
-extern unsigned int m_table_desc0__18CMaterialEditorPcs[];
-extern unsigned int m_table_desc1__18CMaterialEditorPcs[];
-extern unsigned int m_table_desc2__18CMaterialEditorPcs[];
-extern unsigned int m_table_desc3__18CMaterialEditorPcs[];
-extern unsigned int m_table__18CMaterialEditorPcs[];
-
 struct pppFMATRIX {
     float value[3][4];
 };
@@ -41,6 +35,12 @@ struct pppFMATRIX {
 class CMaterialEditorPcs : public CSamplePcs
 {
 public:
+    static unsigned int m_table_desc0[3];
+    static unsigned int m_table_desc1[3];
+    static unsigned int m_table_desc2[3];
+    static unsigned int m_table_desc3[3];
+    static unsigned int m_table[0x15C / sizeof(unsigned int)];
+
     CMaterialEditorPcs() {}
     ~CMaterialEditorPcs();
 

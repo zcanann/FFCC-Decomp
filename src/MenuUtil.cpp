@@ -224,26 +224,6 @@ static inline unsigned short GetMenuPress()
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::CalcHelpLine(int, int&, int&)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMenuPcs::GetLongHelpString(CFont*, int, int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
 float CMenuPcs::CalcCenteringPos2(char* text, float scale, float margin)
 {
 	CFont* font = menuFont;
@@ -286,16 +266,6 @@ void CMenuPcs::DrawFont(int posX, int posY, _GXColor color, int tlut, char* text
 	font->SetPosX((float)posX);
 	font->SetPosY((float)posY);
 	font->Draw(text);
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMenuPcs::GetFontWidth(char*, float, float)
-{
-	// TODO
 }
 
 /*
@@ -611,16 +581,6 @@ void CMenuPcs::DrawHelpMessage(int msgNo, CFont* font, int posX, int posY, _GXCo
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMenuPcs::IsItemEquip(int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
  * PAL Address: 0x80179e9c
  * PAL Size: 244b
  * EN Address: TODO
@@ -728,16 +688,6 @@ void CMenuPcs::GetOptionData()
 	specialModeFlags[2] = static_cast<signed char>((-flag | flag) >> 31);
 	flag = Game.m_gameWork.m_spModeFlags[3];
 	specialModeFlags[3] = static_cast<signed char>((-flag | flag) >> 31);
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMenuPcs::InitOptionMenuParam()
-{
-	// TODO
 }
 
 /*
@@ -1033,9 +983,8 @@ void CMenuPcs::DrawOptionMenu()
 void CMenuPcs::BindMcObj(int slotNo)
 {
 	unsigned char* const self = reinterpret_cast<unsigned char*>(this);
-	int slot = 0;
 
-	do {
+	for (int slot = 0; slot < 4; slot++) {
 		if (slotNo == slot) {
 			int* obj = reinterpret_cast<int*>(
 				*reinterpret_cast<unsigned char**>(self + 0x840) + (slot + 0x11) * 0x524);
@@ -1054,13 +1003,9 @@ void CMenuPcs::BindMcObj(int slotNo)
 				obj[0x524] = -1;
 			}
 		}
+	}
 
-		slot++;
-	} while (slot < 4);
-
-	int entryOffset = 0;
-	slot = 0;
-	do {
+	for (int slot = 0, entryOffset = 0; slot < 4; slot++, entryOffset += 0x48) {
 		if (slotNo == slot) {
 			unsigned char* entry = *reinterpret_cast<unsigned char**>(self + 0x838) + entryOffset;
 			int iconType = *reinterpret_cast<int*>(entry + 0xC);
@@ -1085,8 +1030,5 @@ void CMenuPcs::BindMcObj(int slotNo)
 
 			BindEffect__8CMenuPcsFiii(this, slot + 0x11, iconType + 0x1A, -1);
 		}
-
-		slot++;
-		entryOffset += 0x48;
-	} while (slot < 4);
+	}
 }

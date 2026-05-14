@@ -22,7 +22,7 @@ void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CS
     CFlatRuntime*, CFlatRuntime::CObject*, int, int, int, CFlatRuntime::CStack*, CFlatRuntime::CStack*);
 }
 
-static const char s_cflat_runtime_cpp_801d8ef8[] = "cflat_runtime.cpp";
+extern "C" const char s_cflat_runtime_cpp_801d8ef8[] = "cflat_runtime.cpp";
 
 struct CFlatRuntimeLifecycleProxy
 {

@@ -23,12 +23,11 @@ void pppFrameConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir, pp
     if (gPppCalcDisabled == 0) {
         _pppMngSt* pppMngSt = pppMngStPtr;
         float* value = (float*)((char*)pppConstrainCameraDir + *param_3->m_serializedDataOffsets + 0x80);
-        unsigned char* flags = (unsigned char*)&param_2->m_arg3;
 
         CalcGraphValue((_pppPObject*)pppConstrainCameraDir, param_2->m_graphId, value[0], value[1], value[2],
                        param_2->m_dataValIndex, param_2->m_initWOrk, param_2->m_stepValue);
 
-        if ((gPppInConstructor != 1) && ((flags[1] != 0 || flags[0] != 0))) {
+        if ((gPppInConstructor != 1) && ((param_2->m_applyCameraInverse != 0 || param_2->m_applyPosition != 0))) {
             float cameraDirX = CameraPcs._236_4_;
             float cameraDirY = CameraPcs._240_4_;
             float cameraDirZ = CameraPcs._244_4_;
@@ -50,13 +49,13 @@ void pppFrameConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir, pp
             Mtx scaleMtx;
             PSMTXScale(scaleMtx, pppMngSt->m_scale.x, pppMngSt->m_scale.y, pppMngSt->m_scale.z);
 
-            if (flags[1] != 0) {
+            if (param_2->m_applyCameraInverse != 0) {
                 PSMTXInverse(cameraMtx, pppMngStPtr->m_matrix.value);
             }
 
             PSMTXConcat(scaleMtx, pppMngStPtr->m_matrix.value, pppMngStPtr->m_matrix.value);
 
-            if (flags[0] != 0) {
+            if (param_2->m_applyPosition != 0) {
                 float resultZ = cameraDirZ * *value + cameraPosZ;
                 float resultY = cameraDirY * *value + cameraPosY;
                 float resultX = cameraDirX * *value + cameraPosX;

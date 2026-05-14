@@ -35,7 +35,7 @@ struct MoneyMenuAnimList
 struct MoneyMenuState
 {
     char pad_00[0x09];
-    unsigned char messageMask;
+    signed char messageMask;
     char pad_0a;
     char initialized;
     char pad_0c;

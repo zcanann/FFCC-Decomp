@@ -90,15 +90,15 @@ inline void U8ToF32(pppFVECTOR4* dest, u8* src)
  */
 void pppKeShpTail2XDes(void* obj, void* param_2)
 {
-	u32 serializedOffset = **(u32**)((u8*)param_2 + 0xc);
-	u8* tail = (u8*)obj + serializedOffset + 0x80;
+    KeShpTail2XOffsets* offsets = (KeShpTail2XOffsets*)param_2;
+    KeShpTail2XWork* work = (KeShpTail2XWork*)((u8*)obj + offsets->m_serializedDataOffsets[0] + 0x80);
 
-	*(u16*)(tail + 2) = 0;
-	*(u16*)(tail + 4) = 0;
-	*(u16*)(tail + 6) = 0;
-	tail[1] = 0;
-	tail[0] = 0x1f;
-	memset(tail + 8, 0, 0x174);
+    work->m_frameAcc = 0;
+    work->m_shapeFrame = 0;
+    work->m_shapePrevFrame = 0;
+    work->m_head = 0;
+    work->m_count = 0x1f;
+    memset(work->m_posHistory, 0, sizeof(work->m_posHistory));
 }
 
 /*
@@ -112,15 +112,15 @@ void pppKeShpTail2XDes(void* obj, void* param_2)
  */
 void pppKeShpTail2XCon(void* obj, void* param_2)
 {
-	u32 serializedOffset = **(u32**)((u8*)param_2 + 0xc);
-	u8* tail = (u8*)obj + serializedOffset + 0x80;
+    KeShpTail2XOffsets* offsets = (KeShpTail2XOffsets*)param_2;
+    KeShpTail2XWork* work = (KeShpTail2XWork*)((u8*)obj + offsets->m_serializedDataOffsets[0] + 0x80);
 
-	*(u16*)(tail + 2) = 0;
-	*(u16*)(tail + 4) = 0;
-	*(u16*)(tail + 6) = 0;
-	tail[1] = 0;
-	tail[0] = 0x1f;
-	memset(tail + 8, 0, 0x174);
+    work->m_frameAcc = 0;
+    work->m_shapeFrame = 0;
+    work->m_shapePrevFrame = 0;
+    work->m_head = 0;
+    work->m_count = 0x1f;
+    memset(work->m_posHistory, 0, sizeof(work->m_posHistory));
 }
 
 /*

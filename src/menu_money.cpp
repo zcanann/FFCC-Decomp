@@ -35,7 +35,8 @@ static const float FLOAT_80332f60 = 255.0f;
 static const float FLOAT_80332f64 = 0.0f;
 static const float FLOAT_80332f68 = 32.0f;
 static const float FLOAT_80332f6c = 24.0f;
-static const float FLOAT_80332f70 = 1.0f;
+extern const float FLOAT_80332f70;
+static const float FLOAT_80332f70_LOCAL = 1.0f;
 static const float FLOAT_80332f74 = 18.0f;
 static const float FLOAT_80332f78 = 16.0f;
 static const float FLOAT_80332f7c = 0.9f;
@@ -436,7 +437,7 @@ void CMenuPcs::MoneyDraw()
 			if (digit >= 0) {
 				DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 0, x, y, FLOAT_80332f6c, FLOAT_80332f68,
 				                                FLOAT_80332f6c * (float)digit, FLOAT_80332f68 * (float)i,
-				                                FLOAT_80332f70, FLOAT_80332f70, FLOAT_80332f64);
+				                                FLOAT_80332f70_LOCAL, FLOAT_80332f70_LOCAL, FLOAT_80332f64);
 			}
 			x += FLOAT_80332f74;
 		}
@@ -455,11 +456,11 @@ void CMenuPcs::MoneyDraw()
 
 		DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 0, (float)(drawBase[0] + (7 - this->moneyState->selectedIndex) * 0x12 + 0x24),
 		                                (float)(drawBase[1] + 0x5C), FLOAT_80332f78, FLOAT_80332f6c, FLOAT_80332f64,
-		                                FLOAT_80332f64, FLOAT_80332f70, FLOAT_80332f70, FLOAT_80332f64);
+		                                FLOAT_80332f64, FLOAT_80332f70_LOCAL, FLOAT_80332f70_LOCAL, FLOAT_80332f64);
 	}
 
 	CFont* font = this->moneyFont;
-	font->SetMargin(FLOAT_80332f70);
+	font->SetMargin(FLOAT_80332f70_LOCAL);
 	font->SetShadow(0);
 	font->SetScale(FLOAT_80332f7c);
 	font->DrawInit();
@@ -493,7 +494,7 @@ void CMenuPcs::MoneyDraw()
 		int frame = (int)System.m_frameCounter;
 		int frameSign = frame >> 31;
 		int anim = ((frameSign * 8) | ((frame * 0x20000000 + frameSign) >> 29)) - frameSign;
-		DrawCursor__8CMenuPcsFiif(this, (int)((float)singWindow[0] + (float)anim), (int)cursorY, FLOAT_80332f70);
+		DrawCursor__8CMenuPcsFiif(this, (int)((float)singWindow[0] + (float)anim), (int)cursorY, FLOAT_80332f70_LOCAL);
 	}
 }
 
@@ -621,7 +622,7 @@ bool CMenuPcs::MoneyOpen()
 	if (this->moneyState->initialized == '\0') {
 		memset(this->moneyPanel, 0, 0x1008);
 
-		fVar1 = FLOAT_80332f70;
+		fVar1 = FLOAT_80332f70_LOCAL;
 		iVar8 = (int)this->moneyPanel + 8;
 		iVar15 = 8;
 		do {
@@ -646,7 +647,7 @@ bool CMenuPcs::MoneyOpen()
 			static_cast<short>(static_cast<int>(DOUBLE_80332F98 - (double)firstAnim->w * DOUBLE_80332FA0));
 		firstAnim->alpha = FLOAT_80332f64;
 		firstAnim->scale = FLOAT_80332f64;
-		firstAnim->uvScale = FLOAT_80332f70;
+		firstAnim->uvScale = FLOAT_80332f70_LOCAL;
 		firstAnim->flags = 0;
 		firstAnim->duration = 10;
 		this->moneyPanel->count = 1;
@@ -717,7 +718,7 @@ bool CMenuPcs::MoneyOpen()
 					}
 				} else {
 					iVar15 = iVar15 + 1;
-					*(float *)(psVar11 + 8) = FLOAT_80332f70;
+					*(float *)(psVar11 + 8) = FLOAT_80332f70_LOCAL;
 					*(float *)(psVar11 + 0x18) = FLOAT_80332f64;
 					*(float *)(psVar11 + 0x1a) = FLOAT_80332f64;
 				}

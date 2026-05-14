@@ -316,7 +316,7 @@ bool CMenuPcs::CompaClose()
     for (int i = 0; i < count; i++) {
         float step = FLOAT_80332FF8;
         if (frame >= entry->startFrame) {
-            if (entry->startFrame + entry->duration <= frame) {
+            if (frame >= entry->startFrame + entry->duration) {
                 finishedCount = finishedCount + 1;
                 entry->alpha = FLOAT_80332FF8;
                 entry->dx = step;
@@ -462,7 +462,7 @@ bool CMenuPcs::CompaOpen()
     for (int i = 0; i < count; i++) {
         float step = FLOAT_80332FF8;
         if (frame >= entry->startFrame) {
-            if (entry->startFrame + entry->duration <= frame) {
+            if (frame >= entry->startFrame + entry->duration) {
                 finishedCount = finishedCount + 1;
                 entry->alpha = FLOAT_80333000;
                 entry->dx = step;

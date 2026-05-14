@@ -24,6 +24,7 @@ extern "C" char DAT_803319ec[];
 extern "C" char DAT_80331a4c[];
 
 extern "C" void __ptmf_scall(...);
+extern "C" int __cntlzw(unsigned int);
 extern "C" int calcCastTime__10CGCharaObjFi(CGCharaObj*, int);
 extern "C" void aiAddDuct__8CGMonObjFRi(CGMonObj*, int&);
 extern "C" CGMonObj* FindGMonObjFirst__13CFlatRuntime2Fv(void*);
@@ -262,8 +263,14 @@ void CGMonObj::undeadOff()
 
 	*reinterpret_cast<float*>(mon + 0x694) = 0.0f;
 
-	int weaponMode = static_cast<int>((static_cast<unsigned int>(object->m_weaponNodeFlags) << 24) >> 31);
-	if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xFC) != 0xB) {
+	unsigned char weaponFlags = *reinterpret_cast<unsigned char*>(&object->m_weaponNodeFlags);
+	int weaponMode = static_cast<int>((static_cast<unsigned int>(weaponFlags) << 24) >> 31);
+	unsigned int isUndead =
+		(static_cast<unsigned int>(
+			 __cntlzw(0xB - *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xFC))) >>
+		 5) &
+		0xFF;
+	if (isUndead == 0) {
 		weaponMode = 1;
 	}
 
@@ -274,16 +281,13 @@ void CGMonObj::undeadOff()
 		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1AC);
 	int particleBase = (weaponMode == 0) ? 0x3C : 0x46;
 
-	if ((mon[0x6BA] != 0) && (count != 0)) {
-		void* pdtLoadRef = nullptr;
-		if (object->m_charaModelHandle != nullptr) {
-			pdtLoadRef = object->m_charaModelHandle->m_pdtLoadRef;
-		}
+	if ((isUndead != 0) && (count != 0)) {
+		void* pdtLoadRef = object->m_charaModelHandle->m_pdtLoadRef;
 		int dataNo = (pdtLoadRef != nullptr) ? reinterpret_cast<int*>(pdtLoadRef)[5] : -1;
 		prgObj->putParticleBindTrace((particleBase + 9) | (dataNo << 8), *reinterpret_cast<int*>(mon + 0x594), object, 0.0f, 0);
 	}
 
-	if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xFC) == 0xB) {
+	if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xFC) == 0xB) {
 		object->SetTexAnim(DAT_80331a4c);
 	}
 

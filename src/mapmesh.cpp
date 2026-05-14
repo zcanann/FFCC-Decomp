@@ -78,20 +78,6 @@ static inline unsigned short& U16At(CMapMesh* self, unsigned int offset)
     return *reinterpret_cast<unsigned short*>(Ptr(self, offset));
 }
 
-struct MeshDrawEntry
-{
-    unsigned int size;
-    void* displayList;
-    unsigned short materialIdx;
-    unsigned short _padA;
-    int displayListOffset;
-};
-
-static inline MeshDrawEntry* DrawEntries(CMapMesh* self)
-{
-    return reinterpret_cast<MeshDrawEntry*>(PtrAt(self, 0x40));
-}
-
 static inline CMaterialSet* DefaultMaterialSet()
 {
     return *reinterpret_cast<CMaterialSet**>(reinterpret_cast<unsigned char*>(&MapMng) + 0x213D4);
@@ -119,14 +105,14 @@ static inline CMemory::CStage*& MapMeshAllocStage()
  */
 void CMapMesh::pppCacheDumpModelTexture(CMaterialSet* materialSet, CAmemCacheSet* cacheSet)
 {
-    int remaining = static_cast<int>(U16At(this, 0xA));
-    MeshDrawEntry* entry = DrawEntries(this);
+    int remaining = static_cast<int>(m_displayListCount);
+    CMapMeshDrawEntry* entry = m_drawEntries;
     while (remaining-- != 0) {
-        if (entry->size != 0) {
-            if (entry->materialIdx == 0xFFFF) {
-                entry->materialIdx = 0;
+        if (entry->m_size != 0) {
+            if (entry->m_materialIdx == 0xFFFF) {
+                entry->m_materialIdx = 0;
             } else {
-                CacheDumpTexture__12CMaterialSetFiP13CAmemCacheSet(materialSet, (unsigned int)entry->materialIdx, cacheSet);
+                CacheDumpTexture__12CMaterialSetFiP13CAmemCacheSet(materialSet, (unsigned int)entry->m_materialIdx, cacheSet);
             }
         }
         entry++;
@@ -144,14 +130,14 @@ void CMapMesh::pppCacheDumpModelTexture(CMaterialSet* materialSet, CAmemCacheSet
  */
 void CMapMesh::pppCacheLoadModelTexture(CMaterialSet* materialSet, CAmemCacheSet* cacheSet)
 {
-    int remaining = static_cast<int>(U16At(this, 0xA));
-    MeshDrawEntry* entry = DrawEntries(this);
+    int remaining = static_cast<int>(m_displayListCount);
+    CMapMeshDrawEntry* entry = m_drawEntries;
     while (remaining-- != 0) {
-        if (entry->size != 0) {
-            if (entry->materialIdx == 0xFFFF) {
-                entry->materialIdx = 0;
+        if (entry->m_size != 0) {
+            if (entry->m_materialIdx == 0xFFFF) {
+                entry->m_materialIdx = 0;
             } else {
-                CacheLoadTexture__12CMaterialSetFiP13CAmemCacheSet(materialSet, (unsigned int)entry->materialIdx, cacheSet);
+                CacheLoadTexture__12CMaterialSetFiP13CAmemCacheSet(materialSet, (unsigned int)entry->m_materialIdx, cacheSet);
             }
         }
         entry++;
@@ -169,15 +155,15 @@ void CMapMesh::pppCacheLoadModelTexture(CMaterialSet* materialSet, CAmemCacheSet
  */
 void CMapMesh::SetDisplayListMaterial(CMaterialSet* materialSet, char** textureNames, CAmemCacheSet*)
 {
-    int remaining = static_cast<int>(U16At(this, 0xA));
-    MeshDrawEntry* entry = DrawEntries(this);
+    int remaining = static_cast<int>(m_displayListCount);
+    CMapMeshDrawEntry* entry = m_drawEntries;
 
     while (remaining-- != 0) {
-        if (entry->size != 0) {
-            if (entry->materialIdx == 0xFFFF) {
-                entry->materialIdx = 0;
+        if (entry->m_size != 0) {
+            if (entry->m_materialIdx == 0xFFFF) {
+                entry->m_materialIdx = 0;
             } else {
-                entry->materialIdx = FindTexName__12CMaterialSetFPcPl(materialSet, textureNames[entry->materialIdx], 0);
+                entry->m_materialIdx = FindTexName__12CMaterialSetFPcPl(materialSet, textureNames[entry->m_materialIdx], 0);
             }
         }
         entry++;
@@ -197,8 +183,8 @@ void* CMapMesh::GetTexture(CMaterialSet* materialSet, int& textureIndex)
 {
     unsigned int* drawEntry;
 
-    if (U16At(this, 0xA) != 0) {
-        drawEntry = reinterpret_cast<unsigned int*>(PtrAt(this, 0x40));
+    if (m_displayListCount != 0) {
+        drawEntry = reinterpret_cast<unsigned int*>(m_drawEntries);
         if (*drawEntry != 0) {
             textureIndex = (unsigned int)*reinterpret_cast<unsigned short*>(drawEntry + 2);
             CMaterial* material = (*reinterpret_cast<CPtrArray<CMaterial*>*>(
@@ -221,15 +207,15 @@ void* CMapMesh::GetTexture(CMaterialSet* materialSet, int& textureIndex)
  */
 void CMapMesh::DrawPart(CMaterialSet* materialSet, int drawMaterialPart)
 {
-    int remaining = static_cast<int>(U16At(this, 0xA));
-    MeshDrawEntry* entry = DrawEntries(this);
+    int remaining = static_cast<int>(m_displayListCount);
+    CMapMeshDrawEntry* entry = m_drawEntries;
 
     while (remaining-- != 0) {
-        if (entry->size != 0) {
+        if (entry->m_size != 0) {
             if (drawMaterialPart != 0) {
-                SetMaterialPart__12CMaterialManFP12CMaterialSetii(&MaterialMan, materialSet, entry->materialIdx, 1);
+                SetMaterialPart__12CMaterialManFP12CMaterialSetii(&MaterialMan, materialSet, entry->m_materialIdx, 1);
             }
-            GXCallDisplayList(entry->displayList, entry->size);
+            GXCallDisplayList(entry->m_displayList, entry->m_size);
         }
         entry++;
     }
@@ -250,15 +236,15 @@ void CMapMesh::Draw(CMaterialSet* materialSet)
         materialSet = *reinterpret_cast<CMaterialSet**>(reinterpret_cast<unsigned char*>(&MapMng) + 0x213D4);
     }
 
-    int remaining = static_cast<int>(U16At(this, 0xA));
-    MeshDrawEntry* entry = DrawEntries(this);
+    int remaining = static_cast<int>(m_displayListCount);
+    CMapMeshDrawEntry* entry = m_drawEntries;
 
     while (remaining-- != 0) {
-        if (entry->size != 0) {
-            SetBlendMode__12CMaterialManFP12CMaterialSeti(&MaterialMan, materialSet, entry->materialIdx);
-            SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(&MaterialMan, materialSet, entry->materialIdx, 0,
+        if (entry->m_size != 0) {
+            SetBlendMode__12CMaterialManFP12CMaterialSeti(&MaterialMan, materialSet, entry->m_materialIdx);
+            SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(&MaterialMan, materialSet, entry->m_materialIdx, 0,
                                                                        1);
-            GXCallDisplayList(entry->displayList, entry->size);
+            GXCallDisplayList(entry->m_displayList, entry->m_size);
         }
         entry++;
     }
@@ -277,19 +263,19 @@ void CMapMesh::DrawMeshCharaShadow(unsigned short startIdx, unsigned short count
 {
     unsigned char* mapMng = reinterpret_cast<unsigned char*>(&MapMng);
     int remaining = count;
-    MeshDrawEntry* entry = DrawEntries(this) + startIdx;
+    CMapMeshDrawEntry* entry = m_drawEntries + startIdx;
 
     while (remaining-- != 0) {
-        if (entry->size != 0) {
+        if (entry->m_size != 0) {
             CMaterial* material =
                 (*reinterpret_cast<CPtrArray<CMaterial*>*>(
                     reinterpret_cast<unsigned char*>(*reinterpret_cast<CMaterialSet**>(mapMng + 0x213D4)) + 8))[
-                    entry->materialIdx];
+                    entry->m_materialIdx];
 
             if ((*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(material) + 0x24) &
                  0x100000) != 0) {
                 SetMaterialCharaShadow__12CMaterialManFP9CMaterial(&MaterialMan, material);
-                GXCallDisplayList(entry->displayList, entry->size);
+                GXCallDisplayList(entry->m_displayList, entry->m_size);
             }
         }
         entry++;
@@ -309,16 +295,16 @@ void CMapMesh::DrawMesh(unsigned short startIdx, unsigned short count)
 {
     int remaining = count;
     unsigned char* mapMng = reinterpret_cast<unsigned char*>(&MapMng);
-    MeshDrawEntry* entry = DrawEntries(this) + startIdx;
+    CMapMeshDrawEntry* entry = m_drawEntries + startIdx;
 
     while (remaining-- != 0) {
-        if (entry->size != 0) {
+        if (entry->m_size != 0) {
             SetBlendMode__12CMaterialManFP12CMaterialSeti(
-                &MaterialMan, *reinterpret_cast<CMaterialSet**>(mapMng + 0x213D4), entry->materialIdx);
+                &MaterialMan, *reinterpret_cast<CMaterialSet**>(mapMng + 0x213D4), entry->m_materialIdx);
             SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
                 &MaterialMan, *reinterpret_cast<CMaterialSet**>(mapMng + 0x213D4),
-                                                                       entry->materialIdx, 0, 1);
-            GXCallDisplayList(entry->displayList, entry->size);
+                                                                       entry->m_materialIdx, 0, 1);
+            GXCallDisplayList(entry->m_displayList, entry->m_size);
         }
         entry++;
     }
@@ -504,7 +490,7 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
             } else {
                 cursor = reinterpret_cast<unsigned char*>(Align32(reinterpret_cast<unsigned int>(cursor)));
             }
-            m_drawEntries = cursor;
+            m_drawEntries = reinterpret_cast<CMapMeshDrawEntry*>(cursor);
 
             cursor += static_cast<unsigned int>(m_displayListCount) * 0x10U;
             offset = 0;
@@ -519,28 +505,29 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
             while (reader.GetNextChunk(chunk)) {
                 switch (chunk.m_id) {
                 case 0x444C5354: {
-                    MeshDrawEntry* entry = reinterpret_cast<MeshDrawEntry*>(reinterpret_cast<unsigned int>(m_drawEntries) + dlOffset);
+                    CMapMeshDrawEntry* entry =
+                        reinterpret_cast<CMapMeshDrawEntry*>(reinterpret_cast<unsigned int>(m_drawEntries) + dlOffset);
                     dlOffset += 0x10;
-                    entry->materialIdx = reader.Get2();
-                    entry->size = chunk.m_arg0;
+                    entry->m_materialIdx = reader.Get2();
+                    entry->m_size = chunk.m_arg0;
 
                     reader.Align(0x20);
-                    entry->displayList = 0;
-                    if (entry->size != 0) {
+                    entry->m_displayList = 0;
+                    if (entry->m_size != 0) {
                         cursor = reinterpret_cast<unsigned char*>(Align32(reinterpret_cast<unsigned int>(cursor)));
-                        entry->displayList = cursor;
+                        entry->m_displayList = cursor;
                         if (usePreallocated != 0) {
-                            entry->displayListOffset = reinterpret_cast<unsigned int>(entry->displayList) -
-                                                       reinterpret_cast<unsigned int>(m_displayListData);
+                            entry->m_displayListOffset = reinterpret_cast<unsigned int>(entry->m_displayList) -
+                                                         reinterpret_cast<unsigned int>(m_displayListData);
                         } else {
-                            entry->displayListOffset = reinterpret_cast<unsigned int>(entry->displayList) -
-                                                       reinterpret_cast<unsigned int>(m_meshData);
+                            entry->m_displayListOffset = reinterpret_cast<unsigned int>(entry->m_displayList) -
+                                                         reinterpret_cast<unsigned int>(m_meshData);
                         }
 
                         cursor += Align32(chunk.m_arg0);
-                        memset(entry->displayList, 0, Align32(entry->size));
-                        reader.Get(entry->displayList, entry->size);
-                        DCFlushRange(entry->displayList, Align32(entry->size));
+                        memset(entry->m_displayList, 0, Align32(entry->m_size));
+                        reader.Get(entry->m_displayList, entry->m_size);
+                        DCFlushRange(entry->m_displayList, Align32(entry->m_size));
                     }
                     reader.Align(0x20);
                     break;
@@ -588,18 +575,18 @@ void CMapMesh::Off2Ptr()
     int iVar2;
     int iVar3;
 
-    S32At(this, 0x2C) += S32At(this, 0x24);
-    S32At(this, 0x30) += S32At(this, 0x24);
-    S32At(this, 0x34) += S32At(this, 0x24);
-    S32At(this, 0x38) += S32At(this, 0x24);
-    S32At(this, 0x3C) += S32At(this, 0x24);
-    S32At(this, 0x40) += S32At(this, 0x24);
+    S32At(this, 0x2C) += reinterpret_cast<int>(m_meshData);
+    S32At(this, 0x30) += reinterpret_cast<int>(m_meshData);
+    S32At(this, 0x34) += reinterpret_cast<int>(m_meshData);
+    S32At(this, 0x38) += reinterpret_cast<int>(m_meshData);
+    S32At(this, 0x3C) += reinterpret_cast<int>(m_meshData);
+    S32At(this, 0x40) += reinterpret_cast<int>(m_meshData);
 
     iVar3 = 0;
     iVar1 = 0;
-    while (iVar3 < (int)(unsigned int)U16At(this, 0xA)) {
-        int base = S32At(this, 0x24);
-        int drawEntriesBase = S32At(this, 0x40);
+    while (iVar3 < (int)(unsigned int)m_displayListCount) {
+        int base = reinterpret_cast<int>(m_meshData);
+        int drawEntriesBase = reinterpret_cast<int>(m_drawEntries);
         iVar2 = drawEntriesBase + iVar1;
         iVar1 = iVar1 + 0x10;
         *reinterpret_cast<int*>(iVar2 + 4) = base + *reinterpret_cast<int*>(iVar2 + 0xC);
@@ -618,16 +605,16 @@ void CMapMesh::Off2Ptr()
  */
 void CMapMesh::Ptr2Off()
 {
-    if (PtrAt(this, 0x24) == 0) {
+    if (m_meshData == 0) {
         return;
     }
 
-    S32At(this, 0x2C) -= S32At(this, 0x24);
-    S32At(this, 0x30) -= S32At(this, 0x24);
-    S32At(this, 0x34) -= S32At(this, 0x24);
-    S32At(this, 0x38) -= S32At(this, 0x24);
-    S32At(this, 0x3C) -= S32At(this, 0x24);
-    S32At(this, 0x40) -= S32At(this, 0x24);
+    S32At(this, 0x2C) -= reinterpret_cast<int>(m_meshData);
+    S32At(this, 0x30) -= reinterpret_cast<int>(m_meshData);
+    S32At(this, 0x34) -= reinterpret_cast<int>(m_meshData);
+    S32At(this, 0x38) -= reinterpret_cast<int>(m_meshData);
+    S32At(this, 0x3C) -= reinterpret_cast<int>(m_meshData);
+    S32At(this, 0x40) -= reinterpret_cast<int>(m_meshData);
 }
 
 /*
@@ -641,22 +628,22 @@ void CMapMesh::Ptr2Off()
  */
 CMapMesh::~CMapMesh()
 {
-    if (PtrAt(this, 0x24) != 0) {
-        __dla__FPv(PtrAt(this, 0x24));
-        PtrAt(this, 0x24) = 0;
+    if (m_meshData != 0) {
+        __dla__FPv(m_meshData);
+        m_meshData = 0;
     }
 
-    if (PtrAt(this, 0x28) != 0) {
-        __dla__FPv(PtrAt(this, 0x28));
-        PtrAt(this, 0x28) = 0;
+    if (m_displayListData != 0) {
+        __dla__FPv(m_displayListData);
+        m_displayListData = 0;
     }
 
-    U16At(this, 0x0) = 0;
-    U16At(this, 0x2) = 0;
-    U16At(this, 0x4) = 0;
-    U16At(this, 0x8) = 0;
-    U16At(this, 0x6) = 0;
-    U16At(this, 0xA) = 0;
+    m_vertexCount = 0;
+    m_normalCount = 0;
+    m_nbtCount = 0;
+    m_colorCount = 0;
+    m_uvCount = 0;
+    m_displayListCount = 0;
 }
 
 /*
@@ -670,22 +657,22 @@ CMapMesh::~CMapMesh()
  */
 void CMapMesh::Destroy()
 {
-    if (PtrAt(this, 0x24) != 0) {
-        __dla__FPv(PtrAt(this, 0x24));
-        PtrAt(this, 0x24) = 0;
+    if (m_meshData != 0) {
+        __dla__FPv(m_meshData);
+        m_meshData = 0;
     }
 
-    if (PtrAt(this, 0x28) != 0) {
-        __dla__FPv(PtrAt(this, 0x28));
-        PtrAt(this, 0x28) = 0;
+    if (m_displayListData != 0) {
+        __dla__FPv(m_displayListData);
+        m_displayListData = 0;
     }
 
-    U16At(this, 0x0) = 0;
-    U16At(this, 0x2) = 0;
-    U16At(this, 0x4) = 0;
-    U16At(this, 0x8) = 0;
-    U16At(this, 0x6) = 0;
-    U16At(this, 0xA) = 0;
+    m_vertexCount = 0;
+    m_normalCount = 0;
+    m_nbtCount = 0;
+    m_colorCount = 0;
+    m_uvCount = 0;
+    m_displayListCount = 0;
 }
 
 /*
@@ -702,22 +689,22 @@ CMapMesh::CMapMesh()
     const float minInit = 10000000000.0f;
     const float maxInit = -10000000000.0f;
 
-    F32At(this, 0x14) = minInit;
-    F32At(this, 0x10) = minInit;
-    F32At(this, 0xC) = minInit;
-    F32At(this, 0x20) = maxInit;
-    F32At(this, 0x1C) = maxInit;
-    F32At(this, 0x18) = maxInit;
+    m_bboxMinZ = minInit;
+    m_bboxMinY = minInit;
+    m_bboxMinX = minInit;
+    m_bboxMaxZ = maxInit;
+    m_bboxMaxY = maxInit;
+    m_bboxMaxX = maxInit;
 
-    S32At(this, 0x24) = 0;
-    S32At(this, 0x28) = 0;
-    S32At(this, 0x2C) = 0;
-    S32At(this, 0x30) = 0;
-    S32At(this, 0x34) = 0;
-    S32At(this, 0x3C) = 0;
-    S32At(this, 0x38) = 0;
-    S32At(this, 0x40) = 0;
-    U16At(this, 0xA) = 0;
+    m_meshData = 0;
+    m_displayListData = 0;
+    m_vertices = 0;
+    m_normals = 0;
+    m_nbt = 0;
+    m_colors = 0;
+    m_uvPairs = 0;
+    m_drawEntries = 0;
+    m_displayListCount = 0;
 }
 
 /*

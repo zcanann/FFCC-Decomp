@@ -11,6 +11,15 @@ class CMaterialMan;
 class CMaterial;
 class CAmemCacheSet;
 
+struct CMapMeshDrawEntry
+{
+    unsigned int m_size;              // 0x00
+    void* m_displayList;              // 0x04
+    unsigned short m_materialIdx;     // 0x08
+    unsigned short m_padding;         // 0x0A
+    int m_displayListOffset;          // 0x0C
+};
+
 class CMapMesh
 {
 public:
@@ -52,7 +61,7 @@ public:
     void* m_nbt;                       // 0x34
     void* m_uvPairs;                   // 0x38
     void* m_colors;                    // 0x3C
-    void* m_drawEntries;               // 0x40
+    CMapMeshDrawEntry* m_drawEntries;  // 0x40
 };
 
 #endif // _FFCC_MAPMESH_H_

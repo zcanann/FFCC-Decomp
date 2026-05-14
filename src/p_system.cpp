@@ -6,7 +6,7 @@ extern "C" void create__10CSystemPcsFv(CSystemPcs*);
 extern "C" void destroy__10CSystemPcsFv(CSystemPcs*);
 extern "C" void calc__10CSystemPcsFv(CSystemPcs*);
 CSystemPcs SystemPcs;
-unsigned int m_table__10CSystemPcs[0x15C / sizeof(unsigned int)] = {
+unsigned int CSystemPcs::m_table[0x15C / sizeof(unsigned int)] = {
     reinterpret_cast<unsigned int>("CSystemPcs"),
     0,
     0,
@@ -94,7 +94,7 @@ void CSystemPcs::create()
  */
 int CSystemPcs::GetTable(unsigned long index)
 {
-	unsigned char* table = reinterpret_cast<unsigned char*>(m_table__10CSystemPcs);
+	unsigned char* table = reinterpret_cast<unsigned char*>(CSystemPcs::m_table);
 	unsigned long offset = index * 0x15c;
 	return (int)(table + offset);
 }

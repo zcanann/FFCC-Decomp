@@ -33,13 +33,13 @@ extern "C" const char s_CMaterialEditorPcs_801D7D34[] = "CMaterialEditorPcs";
 extern "C" const char s_CManager_801D7D48[] = "CManager";
 extern "C" const char s_CProcess_801D7D54[] = "CProcess";
 extern "C" const char s_MaterialEditor_pctc_801D7D60[] = "MaterialEditor [%c]";
-unsigned int m_table_desc0__18CMaterialEditorPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createViewer__18CMaterialEditorPcsFv)};
-unsigned int m_table_desc1__18CMaterialEditorPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroyViewer__18CMaterialEditorPcsFv)};
-unsigned int m_table_desc2__18CMaterialEditorPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__18CMaterialEditorPcsFv)};
-unsigned int m_table_desc3__18CMaterialEditorPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__18CMaterialEditorPcsFv)};
+unsigned int CMaterialEditorPcs::m_table_desc0[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createViewer__18CMaterialEditorPcsFv)};
+unsigned int CMaterialEditorPcs::m_table_desc1[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroyViewer__18CMaterialEditorPcsFv)};
+unsigned int CMaterialEditorPcs::m_table_desc2[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__18CMaterialEditorPcsFv)};
+unsigned int CMaterialEditorPcs::m_table_desc3[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__18CMaterialEditorPcsFv)};
 
 extern "C" void* __vt__18CMaterialEditorPcs[];
-unsigned int m_table__18CMaterialEditorPcs[0x15C / sizeof(unsigned int)] = {
+unsigned int CMaterialEditorPcs::m_table[0x15C / sizeof(unsigned int)] = {
     reinterpret_cast<unsigned int>(const_cast<char*>(s_CMaterialEditorPcs_VIEWER_801D7D18)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x20, 0, 0, 0, 0, 0x41, 1
 };
 unsigned int lbl_801EA624[3] = {reinterpret_cast<unsigned int>(lbl_8032E648), 0, 0};
@@ -59,11 +59,11 @@ u8 lbl_8026D338[0xC];
 extern "C" void __sinit_p_MaterialEditor_cpp(void)
 {
     u8* self = reinterpret_cast<u8*>(&MaterialEditorPcs);
-    unsigned int* dst = m_table__18CMaterialEditorPcs;
-    unsigned int* desc0 = m_table_desc0__18CMaterialEditorPcs;
-    unsigned int* desc1 = m_table_desc1__18CMaterialEditorPcs;
-    unsigned int* desc2 = m_table_desc2__18CMaterialEditorPcs;
-    unsigned int* desc3 = m_table_desc3__18CMaterialEditorPcs;
+    unsigned int* dst = CMaterialEditorPcs::m_table;
+    unsigned int* desc0 = CMaterialEditorPcs::m_table_desc0;
+    unsigned int* desc1 = CMaterialEditorPcs::m_table_desc1;
+    unsigned int* desc2 = CMaterialEditorPcs::m_table_desc2;
+    unsigned int* desc3 = CMaterialEditorPcs::m_table_desc3;
 
     *reinterpret_cast<void**>(self) = __vt__8CManager;
     *reinterpret_cast<void**>(self) = __vt__8CProcess;
@@ -299,7 +299,7 @@ void CMaterialEditorPcs::Quit()
  */
 int CMaterialEditorPcs::GetTable(unsigned long index)
 {
-    return reinterpret_cast<int>(reinterpret_cast<unsigned char*>(m_table__18CMaterialEditorPcs) + index * 0x15C);
+    return reinterpret_cast<int>(reinterpret_cast<unsigned char*>(CMaterialEditorPcs::m_table) + index * 0x15C);
 }
 
 /*

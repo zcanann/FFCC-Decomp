@@ -404,8 +404,7 @@ read_slot:
     if (shouldZero) {
         result = 0;
     } else {
-        int diffMask = ~((_448_4_ - padIndex) | (padIndex - _448_4_));
-        unsigned int resolvedIndex = padIndex & ~(diffMask >> 31);
+        unsigned int resolvedIndex = (_448_4_ == padIndex) ? 0 : static_cast<unsigned int>(padIndex);
         result = GetPadInputs()[resolvedIndex].buttonDown[0];
     }
 

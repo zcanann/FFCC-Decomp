@@ -668,8 +668,7 @@ done_check:
     if (isInvalidPad) {
         result = 0;
     } else {
-        int activePad = self->_448_4_;
-        int slot = padIndex & ~((int)~(activePad - padIndex | padIndex - activePad) >> 31);
+        int slot = (self->_448_4_ == padIndex) ? 0 : static_cast<int>(padIndex);
         result = self->GetPadInputs()[slot].buttonDown[1];
     }
 
@@ -705,8 +704,8 @@ done_check:
         return 0.0f;
     }
 
-    return self->GetPadInputs()[padIndex & ~((int)~(self->_448_4_ - padIndex | padIndex - self->_448_4_) >> 31)]
-        .substickYF;
+    int slot = (self->_448_4_ == padIndex) ? 0 : static_cast<int>(padIndex);
+    return self->GetPadInputs()[slot].substickYF;
 }
 
 /*
@@ -738,8 +737,8 @@ done_check:
         return 0.0f;
     }
 
-    return self->GetPadInputs()[padIndex & ~((int)~(self->_448_4_ - padIndex | padIndex - self->_448_4_) >> 31)]
-        .substickXF;
+    int slot = (self->_448_4_ == padIndex) ? 0 : static_cast<int>(padIndex);
+    return self->GetPadInputs()[slot].substickXF;
 }
 
 /*
@@ -771,8 +770,8 @@ done_check:
         return 0.0f;
     }
 
-    return self->GetPadInputs()[padIndex & ~((int)~(self->_448_4_ - padIndex | padIndex - self->_448_4_) >> 31)]
-        .stickYF;
+    int slot = (self->_448_4_ == padIndex) ? 0 : static_cast<int>(padIndex);
+    return self->GetPadInputs()[slot].stickYF;
 }
 
 /*
@@ -804,8 +803,8 @@ done_check:
         return 0.0f;
     }
 
-    return self->GetPadInputs()[padIndex & ~((int)~(self->_448_4_ - padIndex | padIndex - self->_448_4_) >> 31)]
-        .stickXF;
+    int slot = (self->_448_4_ == padIndex) ? 0 : static_cast<int>(padIndex);
+    return self->GetPadInputs()[slot].stickXF;
 }
 
 /*
@@ -837,8 +836,7 @@ done_check:
     if (isInvalidPad) {
         result = 0;
     } else {
-        int activePad = self->_448_4_;
-        int slot = padIndex & ~((int)~(activePad - padIndex | padIndex - activePad) >> 31);
+        int slot = (self->_448_4_ == padIndex) ? 0 : static_cast<int>(padIndex);
         result = self->GetPadInputs()[slot].repeatButton;
     }
 
@@ -874,8 +872,7 @@ done_check:
     if (isInvalidPad) {
         result = 0;
     } else {
-        int activePad = self->_448_4_;
-        int slot = padIndex & ~((int)~(activePad - padIndex | padIndex - activePad) >> 31);
+        int slot = (self->_448_4_ == padIndex) ? 0 : static_cast<int>(padIndex);
         result = self->GetPadInputs()[slot].button[0];
     }
 

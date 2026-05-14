@@ -54,10 +54,10 @@ void pppRandUpFV(_pppPObject* basePtr, RandUpFVParams* in, _pppCtrlTable* ctrl)
     }
 
     f32* target = (in->sourceOffset == -1) ? (f32*)gPppDefaultValueBuffer : (f32*)((u8*)basePtr + in->sourceOffset + 0x80);
-    f32 delta = randf(in->blend[0], *valuePtr);
+    f32 delta = in->blend[0] * *valuePtr;
     f32 value = *valuePtr;
 
-    target[0] = delta + target[0];
+    target[0] = target[0] + delta;
     target[1] += randf(in->blend[1], value);
     target[2] += randf(in->blend[2], value);
 }

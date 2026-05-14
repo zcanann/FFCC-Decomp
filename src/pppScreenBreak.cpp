@@ -125,7 +125,7 @@ extern const float FLOAT_80331cec = 4.0f;
 extern const float FLOAT_80331cf0 = -3.0f;
 extern const float FLOAT_80331cf4 = 0.5f;
 
-extern const Vec DAT_801dd4b0;
+extern const Vec DAT_801dd4b0 = { 0.0f, 1.0f, 0.0f };
 extern const Vec DAT_801dd4bc = { 0.0f, 1.0f, 0.0f };
 extern const char s_f999_root_801dd4c8[] = "f999_root";
 extern const char s_pppScreenBreak_cpp_801dd4d4[] = "pppScreenBreak.cpp";

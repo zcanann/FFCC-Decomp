@@ -1008,6 +1008,7 @@ static void __MidiCtrl_WholeLoopStart(RedSoundCONTROL* control, RedKeyOnDATA* ke
 
     control->m_flags |= REDSOUND_CONTROL_FLAG_WHOLE_LOOP_ACTIVE;
 
+    int delta;
     int deltaAdjust = -track->m_deltaTime + 1;
     int slot = 0;
     RedTrackDATA* scan;
@@ -1023,7 +1024,7 @@ static void __MidiCtrl_WholeLoopStart(RedSoundCONTROL* control, RedKeyOnDATA* ke
     {
         unsigned char* command;
         command = scan->m_command;
-        int delta = DeltaTimeSumup(&command);
+        delta = DeltaTimeSumup(&command);
 
         savedTrackData->m_command[slot] = command;
         savedTrackData->m_delta[slot] = scan->m_deltaTime + delta + deltaAdjust;
@@ -1037,9 +1038,8 @@ static void __MidiCtrl_WholeLoopStart(RedSoundCONTROL* control, RedKeyOnDATA* ke
                 int currentDelta = deltaAdjust + (scan->m_deltaTime - loopBase);
 
                 while ((currentDelta < 1) && (scan->m_command != 0)) {
-                    unsigned char* cmd = scan->m_command;
-                    scan->m_command = cmd + 1;
-                    p_MidiControl_Function[*cmd](control, keyOnData, scan);
+                    int cmd = *scan->m_command++;
+                    p_MidiControl_Function[cmd](control, keyOnData, scan);
 
                     if (scan->m_command != 0) {
                         delta = DeltaTimeSumup((unsigned char**)&scan->m_command);

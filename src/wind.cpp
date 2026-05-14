@@ -575,7 +575,7 @@ void CWind::Frame()
                     f2 = FLOAT_80330f24;
                 }
 
-                obj->targetPower = obj->basePower * f2 + obj->targetPower;
+                obj->targetPower = f2 * obj->basePower + obj->targetPower;
                 f0 = obj->targetPower;
                 f1 = FLOAT_80330ef0;
                 if (!(f0 < f1)) {
@@ -596,7 +596,7 @@ void CWind::Frame()
                     f2 = FLOAT_80330f30;
                 }
 
-                obj->targetDir = obj->baseDir * f2 + obj->targetDir;
+                obj->targetDir = f2 * obj->baseDir + obj->targetDir;
                 f0 = obj->targetDir;
                 f1 = obj->baseDir;
                 if (!(f0 < f1)) {

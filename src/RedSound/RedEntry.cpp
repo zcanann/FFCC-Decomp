@@ -955,9 +955,8 @@ void CRedEntry::DisplayWaveInfo()
 
 				if (history < m_waveBankBase + REDSOUND_WAVE_BANK_ENTRY_COUNT) {
 					if (history < m_waveBankBase + REDSOUND_WAVE_PRIMARY_BANK_ENTRY_COUNT) {
-						int index = reinterpret_cast<int>(history) - reinterpret_cast<int>(m_waveBankBase);
 						OSReport(sRedEntryAMemoryWaveBankInfoFmt, sRedEntryLogPrefix,
-						         index / REDSOUND_HISTORY_BANK_ENTRY_SIZE,
+						         history - m_waveBankBase,
 						         (int)history->m_waveHead->m_waveNo, history->m_waveHead->m_aramAddress, bank->m_size,
 						         freeSize, history->m_historyNo);
 						fflush(__files + 1);
@@ -969,9 +968,8 @@ void CRedEntry::DisplayWaveInfo()
 					}
 					entryWave += 1;
 				} else {
-					int bankIndex = (int)bank - (int)aBankAddress;
 					OSReport(sRedEntryAMemoryFreeBlockInfoFmt, sRedEntryLogPrefix, bank->m_address, bank->m_size, freeSize,
-					         bankIndex / REDSOUND_MEMORY_BLOCK_SIZE);
+					         bank - aBankAddress);
 					fflush(__files + 1);
 				}
 

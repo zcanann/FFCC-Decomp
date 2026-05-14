@@ -1073,7 +1073,7 @@ static void _SetMusicPhraseStop(int* command)
 static void _SetSeBlockData(int* command)
 {
     u32 index = (u32)command[REDSOUND_SE_BLOCK_DATA_COMMAND_BANK] & REDSOUND_SE_BLOCK_BANK_MASK;
-    char* seBlockData;
+    RedSeBlockHEAD* seBlockData;
 
     if (p_SeBlockData[index] != 0) {
         RedDelete(p_SeBlockData[index]);
@@ -1081,12 +1081,15 @@ static void _SetSeBlockData(int* command)
     }
 
     if (command[REDSOUND_SE_BLOCK_DATA_COMMAND_BUFFER] != 0) {
-        seBlockData = (char*)command[REDSOUND_SE_BLOCK_DATA_COMMAND_BUFFER];
-        if ((*seBlockData = REDSOUND_SE_BLOCK_SIGNATURE_0) && (seBlockData[1] = REDSOUND_SE_BLOCK_SIGNATURE_1) &&
-            (seBlockData[2] = REDSOUND_SE_BLOCK_SIGNATURE_2) && (seBlockData[3] = REDSOUND_SE_BLOCK_SIGNATURE_3) &&
-            (seBlockData[4] = REDSOUND_SE_BLOCK_SIGNATURE_4) && (seBlockData[5] = REDSOUND_SE_BLOCK_SIGNATURE_5) &&
-            (seBlockData[6] = REDSOUND_SE_BLOCK_SIGNATURE_6)) {
-            p_SeBlockData[index] = (RedSeBlockHEAD*)seBlockData;
+        seBlockData = (RedSeBlockHEAD*)command[REDSOUND_SE_BLOCK_DATA_COMMAND_BUFFER];
+        if ((seBlockData->m_signature[0] = REDSOUND_SE_BLOCK_SIGNATURE_0) &&
+            (seBlockData->m_signature[1] = REDSOUND_SE_BLOCK_SIGNATURE_1) &&
+            (seBlockData->m_signature[2] = REDSOUND_SE_BLOCK_SIGNATURE_2) &&
+            (seBlockData->m_signature[3] = REDSOUND_SE_BLOCK_SIGNATURE_3) &&
+            (seBlockData->m_signature[4] = REDSOUND_SE_BLOCK_SIGNATURE_4) &&
+            (seBlockData->m_signature[5] = REDSOUND_SE_BLOCK_SIGNATURE_5) &&
+            (seBlockData->m_signature[6] = REDSOUND_SE_BLOCK_SIGNATURE_6)) {
+            p_SeBlockData[index] = seBlockData;
         } else {
             RedDelete(seBlockData);
         }

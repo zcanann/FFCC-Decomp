@@ -483,8 +483,8 @@ STATIC_ASSERT(offsetof(AXVPB, pb) + offsetof(AXPB, type) == REDSOUND_AX_VOICE_TY
  * --INFO--
  * PAL Address: 0x801c2fc4
  * PAL Size: 56b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80204ee8
+ * EN Size: 56b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -499,8 +499,8 @@ u8 GetRandomData()
  * --INFO--
  * PAL Address: 0x801C2FFC
  * PAL Size: 256b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80204f20
+ * EN Size: 256b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -543,8 +543,8 @@ int PitchCompute(int basePitch, int pitchOffset, int wavePitch, int fineTune)
  * --INFO--
  * PAL Address: 0x801c30fc
  * PAL Size: 88b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80205020
+ * EN Size: 88b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -559,8 +559,8 @@ static void _ReverbNullCallback(AXFX_BUFFERUPDATE* update, void*)
  * --INFO--
  * PAL Address: 0x801C3154
  * PAL Size: 88b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80205078
+ * EN Size: 88b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -575,8 +575,8 @@ void* ReverbAreaAlloc(unsigned long size)
  * --INFO--
  * PAL Address: 0x801c31ac
  * PAL Size: 40b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x802050d0
+ * EN Size: 40b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -589,8 +589,8 @@ void ReverbAreaFree(void* area)
  * --INFO--
  * PAL Address: 0x801c31d4
  * PAL Size: 68b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x802050f8
+ * EN Size: 68b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -605,8 +605,8 @@ void InitReverb()
  * --INFO--
  * PAL Address: 0x801c3218
  * PAL Size: 1040b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020513c
+ * EN Size: 1040b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -686,8 +686,8 @@ static void _SetReverbData(RedReverbDATA* reverb, int* params)
  * --INFO--
  * PAL Address: 0x801c3628
  * PAL Size: 240b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020554c
+ * EN Size: 240b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -744,8 +744,8 @@ static int _CompFX(float a, float b)
  * --INFO--
  * PAL Address: 0x801c3718
  * PAL Size: 1324b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020563c
+ * EN Size: 1324b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -882,8 +882,8 @@ RedReverbSize* GetReverbInfo()
  * --INFO--
  * PAL Address: 0x801c3c44
  * PAL Size: 368b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80205b68
+ * EN Size: 368b
  * JP Address: TODO
  * JP Size: TODO
  */

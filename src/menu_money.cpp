@@ -268,9 +268,9 @@ int CMenuPcs::MoneyCtrlCur()
 					}
 					s16 winW;
 					s16 winH;
-					*(u8*)(menuState + 9) = 2;
+					this->moneyState->messageMask = 2;
 					if (CanPlayerPutItem__12CCaravanWorkFv((void*)caravanWork) != 0) {
-						*(u8*)(menuState + 9) = *(u8*)(menuState + 9) | 1;
+						this->moneyState->messageMask = this->moneyState->messageMask | 1;
 					}
 					GetSingWinSize__8CMenuPcsFiPsPsi(this, 1, &winW, &winH, 0);
 					SetSingWinInfo__8CMenuPcsFiiii(this, 0xF0, 0xD0, winW, winH);
@@ -304,7 +304,7 @@ int CMenuPcs::MoneyCtrlCur()
 
 		if ((hold & 0xC) == 0) {
 			if ((press & 0x100) != 0) {
-				if (((int)*(u8*)(menuState + 9) & (1 << *(s16*)(optBase + 0x26))) == 0) {
+				if (((int)this->moneyState->messageMask & (1 << *(s16*)(optBase + 0x26))) == 0) {
 					Sound.PlaySe(4, 0x40, 0x7F, 0);
 					return 0;
 				}

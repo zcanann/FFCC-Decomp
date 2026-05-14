@@ -144,7 +144,6 @@ static const char DAT_801d81d4[] = {
     (char)0x82, (char)0xDC, (char)0x82, (char)0xB7, (char)0x81, (char)0x42, (char)0x0A, (char)0x00,
     (char)0x00, (char)0x00, (char)0x00, (char)0x00,
 };
-extern char lbl_8032E69C[];
 extern "C" {
 const char* g_MaxDataSize;
 signed char g_MaxHeapSize[4];
@@ -199,8 +198,6 @@ char g_MsgFlashy[0x36] =
     "\x81\x9A\x81\x99\x81\x9A\x81\x99\x81\x9A\x81\x99\x81\x9A\x81\x99"
     "\x81\x9A\x81\x99\x81\x9A\x81\x99\x81\x9A\x81\x99\x81\x9A\x81\x99"
     "\x81\x9A\x81\x99\x0A";
-unsigned int lbl_801EAD84[3] = {reinterpret_cast<unsigned int>(lbl_8032E69C), 0x00000000, 0x00000000};
-unsigned int lbl_801EAD90 = reinterpret_cast<unsigned int>(lbl_8032E69C);
 int DAT_8032ed38;
 int DAT_8032ed3c;
 

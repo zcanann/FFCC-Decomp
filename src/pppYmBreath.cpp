@@ -155,8 +155,8 @@ struct YmBreathParticleData {
     unsigned char _pad18[0x08];
     s16 m_life;
     unsigned char _pad22[0x02];
-    s8 m_fadeOutFrames;
-    s8 m_fadeInFrames;
+    char m_fadeOutFrames;
+    char m_fadeInFrames;
     unsigned char _pad26[0x02];
     float m_angle;
     float m_angleVelocity;
@@ -898,9 +898,9 @@ void UpdateParticle(VYmBreath* vYmBreath, PYmBreath* pYmBreath, PARTICLE_DATA* p
     }
     particle->m_age = particle->m_age + 1;
 
-    if ((particle->m_fadeOutFrames != '\0') &&
-        ((int)(unsigned int)particle->m_age <= (int)particle->m_fadeOutFrames)) {
-        particle->m_alpha -= (float)alpha / (float)(int)particle->m_fadeOutFrames;
+    char fadeOutFrames = particle->m_fadeOutFrames;
+    if ((fadeOutFrames != 0) && (particle->m_age <= fadeOutFrames)) {
+        particle->m_alpha -= (float)alpha / (float)fadeOutFrames;
     }
 
     if ((particle->m_fadeInFrames != '\0') && ((int)particle->m_life <= (int)particle->m_fadeInFrames)) {

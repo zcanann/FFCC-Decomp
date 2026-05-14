@@ -159,7 +159,7 @@ static void stageReleaseMode2Buffer(CMemory::CStage* stage)
     int ptr = stageGetHeapHead(stage);
     if (ptr != 0) {
         if (ptr != 0x10) {
-            operator delete(reinterpret_cast<void*>(ptr));
+            operator delete[](reinterpret_cast<void*>(ptr - 0x10));
         }
         stageSetHeapHead(stage, 0);
     }
@@ -461,7 +461,7 @@ void CMemory::Quit()
 
     for (int pass = 0; pass < 3; pass++) {
         if ((pass != 1) || (OSGetConsoleSimulatedMemSize() == 0x3000000)) {
-            unsigned char* listHeadBytes = reinterpret_cast<unsigned char*>(this) + 4 + pass * 0x110;
+            unsigned char* listHeadBytes = reinterpret_cast<unsigned char*>(this) + 4 + pass * 0x27D8;
             CStage* listHead = reinterpret_cast<CStage*>(listHeadBytes);
             CStage* stage = *reinterpret_cast<CStage**>(listHeadBytes + 4);
 
@@ -1295,7 +1295,7 @@ void CMemory::CStage::drawHeapBar(int y)
     colors[15] = s_heapBarColors_801D64A8[15];
 
     int node;
-    if (m_unknown11C == 2) {
+    if (m_allocationMode == 2) {
         node = stageGetHeapHead(this);
     } else {
         node = *reinterpret_cast<int*>(stageGetHeapHead(this) + 8);
@@ -1477,7 +1477,7 @@ void CMemory::CStage::drawHeapTitle(int y)
  */
 int CMemory::CStage::GetHeapUnuse()
 {
-    int node = (m_unknown11C == 2) ? stageGetHeapHead(this) : *reinterpret_cast<int*>(stageGetHeapHead(this) + 8);
+    int node = (m_allocationMode == 2) ? stageGetHeapHead(this) : *reinterpret_cast<int*>(stageGetHeapHead(this) + 8);
     int total = 0;
 
     while ((*reinterpret_cast<unsigned char*>(node + 2) & 2) == 0) {
@@ -2118,8 +2118,8 @@ void CAmemCacheSet::AmemFreeLowPrio(int size)
             continue;
         }
 
-        if (m_releaseCheck == 0 || m_releaseCheck(m_releaseCheckArg) == 0) {
-            m_releaseAction(m_releaseActionArg);
+        if (m_releaseAction == 0 || m_releaseAction(m_releaseActionArg) == 0) {
+            m_releaseCheck(m_releaseCheckArg);
             if (2 < (unsigned int)System.m_execParam) {
                 Printf__7CSystemFPce(&System, s_amemCacheAddRefFmt);
             }

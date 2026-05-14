@@ -250,8 +250,8 @@ void pppFrameYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthShp
     s8 hasRequiredMemory;
     int colorOffset;
     u8* paramPayload;
-    VYmMegaBirthShpTail3* work;
     VColor* colorWork;
+    VYmMegaBirthShpTail3* work;
     u8* particleData;
     u32 i;
     _PARTICLE_COLOR* particleColor;

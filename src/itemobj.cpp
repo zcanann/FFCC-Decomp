@@ -804,7 +804,7 @@ int CGItemObj::DeleteOld(int deleteMask, int maxDeleteCount, CFlatRuntime::CObje
 			if ((unsigned int)System.m_execParam >= 3U) {
 				Printf__7CSystemFPce(&System, const_cast<char*>(DAT_801dced4));
 			}
-			return deletedCount;
+			break;
 		}
 
 		deletedCount++;

@@ -1805,7 +1805,7 @@ void CSound::calcVolumePan(CSound::CSe3D* se3D, int& outVolume, int& outPan)
     if (se3D->m_lineIndex >= 0) {
         iVar4 = Calc__9CLine(
             (double)se3D->m_farDistance, &SoundData(this).m_lines[se3D->m_lineIndex], &nearestPoint, &nearestDistance,
-            (u32*)0, &nearestT, reinterpret_cast<const Vec*>(&CameraPcs._236_4_));
+            (u32*)0, &nearestT, reinterpret_cast<const Vec*>(&CameraPcs._212_4_));
         if (iVar4 != 0) {
             PSMTXMultVec(CameraPcs.m_cameraMatrix, &nearestPoint, &nearestPoint);
             fVar3 = se3D->m_nearDistance;
@@ -2279,11 +2279,8 @@ void CSound::Add3DLine(int lineIndex, Vec* position)
  */
 void CSound::SetReverb(int reverb, int depth)
 {
-    CRedSound* redSound = RedSound(this);
-    int depthValue = depth;
-
-    redSound->SetReverb(1, reverb);
-    redSound->SetReverbDepth(1, depthValue, 0xF);
+    RedSound(this)->SetReverb(1, reverb);
+    RedSound(this)->SetReverbDepth(1, depth, 0xF);
 }
 
 /*

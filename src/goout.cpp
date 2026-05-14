@@ -458,9 +458,9 @@ void CGoOutMenu::SetMenuStr(long timer, int lineCount, ...)
     winMessage = (int*)GetWinMess__8CMenuPcsFi(&MenuPcs, field_0x38 + 0x22);
     *winMessage = lineCount;
 
-    va_start(args, lineCount);
     leadingZeros = (unsigned int)__cntlzw((unsigned int)field_0x38);
     indexBase = static_cast<int>(~-(leadingZeros >> 5 & 1U) & 10U);
+    va_start(args, lineCount);
     winMessageBuffer = (const char**)GetMcWinMessBuff__8CMenuPcsFi(&MenuPcs, 2);
     for (i = 0; i < lineCount; i++) {
         winMessageBuffer[indexBase + i] = va_arg(args, const char*);

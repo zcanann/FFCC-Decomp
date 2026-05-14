@@ -1736,7 +1736,6 @@ void CMenuPcs::createBattle()
 
     char path[0x104];
     char fontPath[0x80];
-    int* textureInfo = sMenuTextureInfoTable;
 
     for (int i = 0; i < 2; i++) {
         const char* language = Game.GetLangString();
@@ -1751,16 +1750,16 @@ void CMenuPcs::createBattle()
 
             CTextureSet* textureSet = new (MenuPcs.m_menuStage, const_cast<char*>(s_p_menu_cpp_801d9d80), 0x182) CTextureSet;
             m_textureSets[kBattleTextureSetStart + i] = textureSet;
-            textureSet->Create(File.m_readBuffer, reinterpret_cast<CMemory::CStage*>(stage), 0, 0, 0, 0);
+            m_textureSets[kBattleTextureSetStart + i]->Create(File.m_readBuffer, reinterpret_cast<CMemory::CStage*>(stage), 0, 0, 0, 0);
 
             File.Close(fileHandle);
         }
     }
 
+    int* textureInfo = sMenuTextureInfoTable;
     for (int i = 0; i < 10; i++) {
-        CTextureSet* textureSet = m_textureSets[textureInfo[0]];
-        const unsigned long textureIndex = static_cast<unsigned long>(textureSet->Find(reinterpret_cast<char*>(textureInfo[1])));
-        CTexture* texture = (*reinterpret_cast<CPtrArray<CTexture*>*>(reinterpret_cast<u8*>(textureSet) + 8))[textureIndex];
+        const unsigned long textureIndex = static_cast<unsigned long>(m_textureSets[textureInfo[0]]->Find(reinterpret_cast<char*>(textureInfo[1])));
+        CTexture* texture = (*reinterpret_cast<CPtrArray<CTexture*>*>(reinterpret_cast<u8*>(m_textureSets[textureInfo[0]]) + 8))[textureIndex];
         *reinterpret_cast<int*>(reinterpret_cast<u8*>(texture) + 4) =
             *reinterpret_cast<int*>(reinterpret_cast<u8*>(texture) + 4) + 1;
         m_textures[kBattleTextureStart + i] = texture;
@@ -1770,32 +1769,29 @@ void CMenuPcs::createBattle()
     for (int i = 0; i < 12; i++) {
         CMesMenu* menu = new (MenuPcs.m_menuStage, const_cast<char*>(s_p_menu_cpp_801d9d80), 0x48B) CMesMenu;
         m_battleMesMenus[i] = menu;
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(menu) + 0x18) = i;
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(menu) + 0x1C) = i;
-        menu->Create();
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(m_battleMesMenus[i]) + 0x18) = i;
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(m_battleMesMenus[i]) + 0x1C) = i;
+        m_battleMesMenus[i]->Create();
     }
 
     for (int i = 0; i < 4; i++) {
         CRingMenu* menu = new (MenuPcs.m_menuStage, const_cast<char*>(s_p_menu_cpp_801d9d80), 0x492) CRingMenu;
         m_battleRingMenus[i] = menu;
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(menu) + 8) = i;
-        menu->Create();
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(m_battleRingMenus[i]) + 8) = i;
+        m_battleRingMenus[i]->Create();
     }
 
     sprintf(fontPath, const_cast<char*>(s_dvd__smenu_gc23_fnt_801d9d8c), Game.GetLangString());
     loadFont(0, fontPath, 1, 1);
 
-    CTexture* fontTexture = m_textures[0x18];
     for (int i = 0; i < 0x100; i++) {
-        _GXColor color = fontTexture->GetTlutColor(i);
+        _GXColor color = m_textures[0x18]->GetTlutColor(i);
         const int avg2 = (((int)color.r + (int)color.g + (int)color.b) / 3) * 2;
-        _GXColor outColor;
-        outColor.r = static_cast<u8>(((int)color.r + avg2) / 3);
-        outColor.g = static_cast<u8>(((int)color.g + avg2) / 3);
-        outColor.b = static_cast<u8>(((int)color.b + avg2) / 3);
-        outColor.a = color.a;
+        color.r = static_cast<u8>(((int)color.r + avg2) / 3);
+        color.g = static_cast<u8>(((int)color.g + avg2) / 3);
+        color.b = static_cast<u8>(((int)color.b + avg2) / 3);
 
-        const int tlutFmt = *reinterpret_cast<int*>(reinterpret_cast<u8*>(fontTexture) + 0x60);
+        const u32 tlutFmt = *reinterpret_cast<u32*>(reinterpret_cast<u8*>(m_textures[0x18]) + 0x60);
         int tlutOffset = 0;
         if (tlutFmt == 9) {
             tlutOffset = 0x100;
@@ -1803,10 +1799,10 @@ void CMenuPcs::createBattle()
             tlutOffset = 0x10;
         }
 
-        fontTexture->SetExternalTlutColor(m_externalFontTlut, tlutOffset, i, outColor);
+        m_textures[0x18]->SetExternalTlutColor(m_externalFontTlut, tlutOffset, i, color);
     }
 
-    fontTexture->FlushExternalTlut(m_externalFontTlut);
+    m_textures[0x18]->FlushExternalTlut(m_externalFontTlut);
     m_battleStateFlag = 0;
 }
 

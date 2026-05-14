@@ -601,6 +601,7 @@ int CRedEntry::SetWaveData(int waveBankNo, void* waveData, int waveDataSize)
 	int waveSize;
 	u8* waveDataTop;
 
+	waveNo = 0;
 	if (waveDataSize == 0) {
 		if ((m_waveLoadNo >= 0) && ((waveNo = SearchWaveSequence(m_waveLoadNo)) >= 0)) {
 			WaveDelete(&m_waveBankBase[waveNo]);

@@ -25,6 +25,14 @@ extern "C" char DAT_80331a4c[];
 
 extern "C" void __ptmf_scall(...);
 extern "C" int __cntlzw(unsigned int);
+extern "C" void onCreate__10CGCharaObjFv(CGCharaObj*);
+extern "C" void onChangePrg__10CGCharaObjFi(CGCharaObj*, int);
+extern "C" void onFramePreCalc__10CGCharaObjFv(CGCharaObj*);
+extern "C" void onChangeStat__10CGCharaObjFi(CGCharaObj*, int);
+extern "C" void onCancelStat__10CGCharaObjFi(CGCharaObj*, int);
+extern "C" void onAnimPoint__10CGCharaObjFii(CGCharaObj*, int, int);
+extern "C" void onFrameStat__10CGCharaObjFv(CGCharaObj*);
+extern "C" void putParticleFromItem__10CGCharaObjFiiiP3Vec(CGCharaObj*, int, int, int, Vec*);
 extern "C" int calcCastTime__10CGCharaObjFi(CGCharaObj*, int);
 extern "C" void aiAddDuct__8CGMonObjFRi(CGMonObj*, int&);
 extern "C" CGMonObj* FindGMonObjFirst__13CFlatRuntime2Fv(void*);
@@ -89,7 +97,7 @@ static const char s_monObjDistanceFmt[] = "%d %d %d";
 void CGMonObj::onCreate()
 {
 	CGCharaObj* charaObj = reinterpret_cast<CGCharaObj*>(this);
-	charaObj->onCreate();
+	onCreate__10CGCharaObjFv(charaObj);
 
 	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
 	*reinterpret_cast<unsigned int*>(mon + 0x6C4) = static_cast<unsigned int>(-1);
@@ -97,7 +105,7 @@ void CGMonObj::onCreate()
 	*reinterpret_cast<unsigned short*>(mon + 0x6E6) = 0;
 	*reinterpret_cast<unsigned int*>(mon + 0x6C8) = 0;
 	*reinterpret_cast<unsigned int*>(mon + 0x6CC) = 0;
-	mon[0x6B4] = 0;
+	*reinterpret_cast<unsigned int*>(mon + 0x6D0) = 0;
 	mon[0x6B8] = 0;
 	mon[0x6B9] = 0;
 	mon[0x6BA] = 0;
@@ -160,7 +168,7 @@ void CGMonObj::onFramePreCalc()
 	unsigned char* scriptBase = reinterpret_cast<unsigned char*>(object->m_scriptHandle);
 	unsigned char* script9 = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
 
-	reinterpret_cast<CGCharaObj*>(this)->onFramePreCalc();
+	onFramePreCalc__10CGCharaObjFv(reinterpret_cast<CGCharaObj*>(this));
 	*reinterpret_cast<unsigned int*>(mon + 0x6F4) += 1;
 
 	if (*reinterpret_cast<short*>(script9 + 0x10C) == 1) {
@@ -173,7 +181,9 @@ void CGMonObj::onFramePreCalc()
 				(aiState + *reinterpret_cast<unsigned short*>(script9 + 0x100)) * 0x1D0 + 0x10;
 		}
 
-		__ptmf_scall(this, *reinterpret_cast<unsigned short*>(aiData + 0x102) & 3, mon + 0x708);
+		typedef int (*PtmfScallRet)(CGMonObj*, int, void*);
+		aiState = reinterpret_cast<PtmfScallRet>(__ptmf_scall)(
+			this, *reinterpret_cast<unsigned short*>(aiData + 0x102) & 3, mon + 0x708);
 
 		if (aiState != aiStatePrev) {
 			aiStatePrev = aiState;
@@ -630,7 +640,7 @@ void CGMonObj::onChangeStat(int state)
 		}
 	}
 
-	reinterpret_cast<CGCharaObj*>(this)->onChangeStat(state);
+	onChangeStat__10CGCharaObjFi(reinterpret_cast<CGCharaObj*>(this), state);
 }
 
 /*
@@ -725,7 +735,7 @@ void CGMonObj::onCancelStat(int state)
 		break;
 	}
 
-	reinterpret_cast<CGCharaObj*>(this)->onCancelStat(state);
+	onCancelStat__10CGCharaObjFi(reinterpret_cast<CGCharaObj*>(this), state);
 }
 
 /*
@@ -1119,7 +1129,7 @@ void CGMonObj::onFrameStat()
 		break;
 	}
 
-	reinterpret_cast<CGCharaObj*>(this)->onFrameStat();
+	onFrameStat__10CGCharaObjFv(reinterpret_cast<CGCharaObj*>(this));
 }
 
 /*
@@ -1163,10 +1173,12 @@ void CGMonObj::onStatMagic()
 				targetPrg->bonus(0x17, *reinterpret_cast<int*>(mon + 0x560), targetPrg);
 			}
 
-			reinterpret_cast<CGCharaObj*>(this)->putParticleFromItem(
-				*reinterpret_cast<int*>(mon + 0x560), 0, *reinterpret_cast<int*>(mon + 0x570), (Vec*)0);
-			reinterpret_cast<CGCharaObj*>(this)->putParticleFromItem(
-				*reinterpret_cast<int*>(mon + 0x560), 1, *reinterpret_cast<int*>(mon + 0x570), (Vec*)0);
+			putParticleFromItem__10CGCharaObjFiiiP3Vec(
+				reinterpret_cast<CGCharaObj*>(this), *reinterpret_cast<int*>(mon + 0x560), 0,
+				*reinterpret_cast<int*>(mon + 0x570), (Vec*)0);
+			putParticleFromItem__10CGCharaObjFiiiP3Vec(
+				reinterpret_cast<CGCharaObj*>(this), *reinterpret_cast<int*>(mon + 0x560), 1,
+				*reinterpret_cast<int*>(mon + 0x570), (Vec*)0);
 		}
 		return;
 	}
@@ -1226,7 +1238,7 @@ void CGMonObj::onAnimPoint(int param2, int param3)
 		);
 	}
 
-	reinterpret_cast<CGCharaObj*>(this)->onAnimPoint(param2, param3);
+	onAnimPoint__10CGCharaObjFii(reinterpret_cast<CGCharaObj*>(this), param2, param3);
 }
 
 /*
@@ -1408,10 +1420,14 @@ void CGMonObj::onStatDie()
 				}
 
 				*reinterpret_cast<int*>(mon + 0x560) = particleId;
-				reinterpret_cast<CGCharaObj*>(this)->putParticleFromItem(particleId, 0, *reinterpret_cast<int*>(mon + 0x564), (Vec*)0);
-				reinterpret_cast<CGCharaObj*>(this)->putParticleFromItem(particleId, 1, *reinterpret_cast<int*>(mon + 0x564), (Vec*)0);
-				reinterpret_cast<CGCharaObj*>(this)->putParticleFromItem(particleId, 2, *reinterpret_cast<int*>(mon + 0x564), (Vec*)0);
-				reinterpret_cast<CGCharaObj*>(this)->putParticleFromItem(particleId, 3, *reinterpret_cast<int*>(mon + 0x564), (Vec*)0);
+				putParticleFromItem__10CGCharaObjFiiiP3Vec(
+					reinterpret_cast<CGCharaObj*>(this), particleId, 0, *reinterpret_cast<int*>(mon + 0x564), (Vec*)0);
+				putParticleFromItem__10CGCharaObjFiiiP3Vec(
+					reinterpret_cast<CGCharaObj*>(this), particleId, 1, *reinterpret_cast<int*>(mon + 0x564), (Vec*)0);
+				putParticleFromItem__10CGCharaObjFiiiP3Vec(
+					reinterpret_cast<CGCharaObj*>(this), particleId, 2, *reinterpret_cast<int*>(mon + 0x564), (Vec*)0);
+				putParticleFromItem__10CGCharaObjFiiiP3Vec(
+					reinterpret_cast<CGCharaObj*>(this), particleId, 3, *reinterpret_cast<int*>(mon + 0x564), (Vec*)0);
 				return;
 			}
 			if (subFrame != 0x19) {
@@ -3502,7 +3518,7 @@ void CGMonObj::onChangePrg(int value)
 		}
 	}
 
-	reinterpret_cast<CGCharaObj*>(this)->onChangePrg(value);
+	onChangePrg__10CGCharaObjFi(reinterpret_cast<CGCharaObj*>(this), value);
 }
 
 /*

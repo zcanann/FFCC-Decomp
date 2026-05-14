@@ -87,8 +87,8 @@ STATIC_ASSERT(sizeof(m_DataBuffer) + sizeof(m_ADataBuffer) + sizeof(m_DataBuffer
  * --INFO--
  * PAL Address: 0x801bff34
  * PAL Size: 4b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80201e58
+ * EN Size: 4b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -100,8 +100,8 @@ CRedMemory::CRedMemory()
  * --INFO--
  * PAL Address: 0x801bff38
  * PAL Size: 72b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80201e5c
+ * EN Size: 72b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -113,8 +113,8 @@ CRedMemory::~CRedMemory()
  * --INFO--
  * PAL Address: 0x801bff80
  * PAL Size: 360b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80201ea4
+ * EN Size: 360b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -174,8 +174,8 @@ int RedNew(int size)
  * --INFO--
  * PAL Address: 0x801c00e8
  * PAL Size: 216b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020200c
+ * EN Size: 216b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -212,8 +212,8 @@ void RedDelete(int address)
  * --INFO--
  * PAL Address: 0x801c01c0
  * PAL Size: 40b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x802020e4
+ * EN Size: 40b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -226,8 +226,8 @@ void RedDelete(void* address)
  * --INFO--
  * PAL Address: 0x801c01e8
  * PAL Size: 576b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020210c
+ * EN Size: 576b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -318,8 +318,8 @@ int RedNewA(int size, int offset, int maxSize)
  * --INFO--
  * PAL Address: 0x801c0428
  * PAL Size: 216b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020234c
+ * EN Size: 216b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -356,8 +356,8 @@ void RedDeleteA(int address)
  * --INFO--
  * PAL Address: 0x801c0500
  * PAL Size: 40b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80202424
+ * EN Size: 40b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -370,8 +370,8 @@ void RedDeleteA(void* address)
  * --INFO--
  * PAL Address: 0x801c0528
  * PAL Size: 160b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020244c
+ * EN Size: 160b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -395,8 +395,8 @@ void CRedMemory::Init(int mainBuffer, int mainBufferSize, int auxBuffer, int aux
  * --INFO--
  * PAL Address: 0x801c05c8
  * PAL Size: 8b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x802024ec
+ * EN Size: 8b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -409,8 +409,8 @@ int CRedMemory::GetMainBufferAddress()
  * --INFO--
  * PAL Address: 0x801c05d0
  * PAL Size: 8b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x802024f4
+ * EN Size: 8b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -423,8 +423,8 @@ int CRedMemory::GetMainBufferSize()
  * --INFO--
  * PAL Address: 0x801c05d8
  * PAL Size: 8b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x802024fc
+ * EN Size: 8b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -437,8 +437,8 @@ RedMemoryBlock* CRedMemory::GetMainBankAddress()
  * --INFO--
  * PAL Address: 0x801c05e0
  * PAL Size: 8b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80202504
+ * EN Size: 8b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -451,8 +451,8 @@ int CRedMemory::GetABufferAddress()
  * --INFO--
  * PAL Address: 0x801c05e8
  * PAL Size: 8b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020250c
+ * EN Size: 8b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -465,8 +465,8 @@ int CRedMemory::GetABufferSize()
  * --INFO--
  * PAL Address: 0x801c05f0
  * PAL Size: 8b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80202514
+ * EN Size: 8b
  * JP Address: TODO
  * JP Size: TODO
  */

@@ -71,7 +71,8 @@ static const char s_CProcess_801D7E28[] = "CProcess";
 static const char s_funnyShapeFmt[] = "FunnyShape [%c]";
 static const char s_CPtrArray_OSFS_TEXTURE_ST_801D7E44[] = "CPtrArray<OSFS_TEXTURE_ST *>";
 static const char s_CPtrArray_GXTexObj[] = "CPtrArray<_GXTexObj *>";
-extern char lbl_8032E660[];
+extern const char __RTTI__8CManager_8032E660[];
+extern const char __RTTI__8CProcess_8032E668[];
 extern u8 ARRAY_8026D728[];
 
 extern "C" CUSBStreamData* __dt__14CUSBStreamDataFv(CUSBStreamData* self, short shouldDelete);
@@ -457,10 +458,11 @@ unsigned int m_table__14CFunnyShapePcs[0x15C / sizeof(unsigned int)] = {
     0x42, 1
 };
 unsigned int lbl_801EA904[4] = {
-    reinterpret_cast<unsigned int>(lbl_8032E660), 0, 0, reinterpret_cast<unsigned int>(lbl_8032E660)
+    reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CManager_8032E660)), 0, 0,
+    reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CManager_8032E660))
 };
 unsigned int lbl_801EA914[4] = {
-    0, 0, 0, 0
+    0, reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CProcess_8032E668)), 0, 0
 };
 u8 ARRAY_8026D728[0xC];
 u8 FunnyShapePcs[sizeof(CFunnyShapePcs)];

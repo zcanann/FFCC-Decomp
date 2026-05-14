@@ -678,8 +678,8 @@ STATIC_ASSERT(sizeof(sRedDriverLogWarnColor) + sizeof(sRedDriverLogReset) == RED
  * --INFO--
  * PAL Address: 0x801bcf0c
  * PAL Size: 124b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x801fee30
+ * EN Size: 124b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -706,8 +706,8 @@ static void _SetSoundMode(int* command)
  * --INFO--
  * PAL Address: 0x801bcf88
  * PAL Size: 192b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x801feeac
+ * EN Size: 192b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -753,8 +753,8 @@ static void _SetReverbDepth(int* command)
  * --INFO--
  * PAL Address: 0x801bd048
  * PAL Size: 56b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x801fef6c
+ * EN Size: 56b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -767,8 +767,8 @@ static void _SetMusicData(int* command)
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 56b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: UNUSED
+ * EN Size: 56b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -785,8 +785,8 @@ static void _MusicNextPlaySequence(int* command);
  * --INFO--
  * PAL Address: 0x801bd080
  * PAL Size: 116b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x801fefa4
+ * EN Size: 116b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -806,8 +806,8 @@ static void _MusicStop(int* command)
  * --INFO--
  * PAL Address: 0x801bd0f4
  * PAL Size: 264b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x801ff018
+ * EN Size: 264b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -845,8 +845,8 @@ static void _MusicPlaySequence(int* command)
  * --INFO--
  * PAL Address: 0x801bd1fc
  * PAL Size: 520b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x801ff120
+ * EN Size: 520b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -913,8 +913,8 @@ static void _MusicCrossPlaySequence(int* command)
  * --INFO--
  * PAL Address: 0x801bd404
  * PAL Size: 164b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x801ff328
+ * EN Size: 164b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -939,8 +939,8 @@ static void _MusicNextPlaySequence(int* command)
  * --INFO--
  * PAL Address: 0x801bd4a8
  * PAL Size: 116b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x801ff3cc
+ * EN Size: 116b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -965,8 +965,8 @@ static void _MusicMasterVolume(int* command)
  * --INFO--
  * PAL Address: 0x801bd51c
  * PAL Size: 92b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x801ff440
+ * EN Size: 92b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -984,8 +984,8 @@ static void _MusicVolume(int* command)
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 52b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: UNUSED
+ * EN Size: 52b
  * JP Address: TODO
  */
 static void _MusicTempo(int* command)
@@ -997,8 +997,8 @@ static void _MusicTempo(int* command)
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 52b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: UNUSED
+ * EN Size: 52b
  * JP Address: TODO
  */
 static void _MusicPitch(int* command)
@@ -1010,8 +1010,8 @@ static void _MusicPitch(int* command)
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 52b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: UNUSED
+ * EN Size: 52b
  * JP Address: TODO
  */
 static void _MusicPause(int* command)
@@ -1023,8 +1023,8 @@ static void _MusicPause(int* command)
  * --INFO--
  * PAL Address: 0x801bd578
  * PAL Size: 12b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x801ff49c
+ * EN Size: 12b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1037,8 +1037,8 @@ static void _SetMusicPhraseStop(int* command)
  * --INFO--
  * PAL Address: 0x801bd584
  * PAL Size: 300b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x801ff4a8
+ * EN Size: 300b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1069,8 +1069,8 @@ static void _SetSeBlockData(int* command)
  * --INFO--
  * PAL Address: 0x801bd6b0
  * PAL Size: 56b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x801ff5d4
+ * EN Size: 56b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1083,8 +1083,8 @@ static void _SetSeSepData(int* command)
  * --INFO--
  * PAL Address: 0x801bd6e8
  * PAL Size: 56b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x801ff60c
+ * EN Size: 56b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1097,8 +1097,8 @@ static void _ClearSeSepData(int* command)
  * --INFO--
  * PAL Address: 0x801bd720
  * PAL Size: 68b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x801ff644
+ * EN Size: 68b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1112,8 +1112,8 @@ static void _ClearSeSepDataMG(int* command)
  * --INFO--
  * PAL Address: 0x801bd764
  * PAL Size: 48b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x801ff688
+ * EN Size: 48b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1126,8 +1126,8 @@ static void _SeStop(int* command)
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 48b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: UNUSED
+ * EN Size: 48b
  * JP Address: TODO
  */
 static void _SeStopG(int* command)
@@ -1139,8 +1139,8 @@ static void _SeStopG(int* command)
  * --INFO--
  * PAL Address: 0x801bd794
  * PAL Size: 60b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x801ff6b8
+ * EN Size: 60b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1154,8 +1154,8 @@ static void _SeStopMG(int* command)
  * --INFO--
  * PAL Address: 0x801bd7d0
  * PAL Size: 72b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x801ff6f4
+ * EN Size: 72b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1171,8 +1171,8 @@ static void _SeBlockPlay(int* command)
  * --INFO--
  * PAL Address: 0x801bd818
  * PAL Size: 108b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x801ff73c
+ * EN Size: 108b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1193,8 +1193,8 @@ static void _SeSepPlay(int* command)
  * --INFO--
  * PAL Address: 0x801bd884
  * PAL Size: 92b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x801ff7a8
+ * EN Size: 92b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1211,8 +1211,8 @@ static void _SeSepPlaySequence(int* command)
  * --INFO--
  * PAL Address: 0x801bd8e0
  * PAL Size: 116b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x801ff804
+ * EN Size: 116b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1237,8 +1237,8 @@ static void _SeMasterVolume(int* command)
  * --INFO--
  * PAL Address: 0x801bd954
  * PAL Size: 60b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x801ff878
+ * EN Size: 60b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1252,8 +1252,8 @@ static void _SeVolume(int* command)
  * --INFO--
  * PAL Address: 0x801bd990
  * PAL Size: 56b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x801ff8b4
+ * EN Size: 56b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1267,8 +1267,8 @@ static void _SePan(int* command)
  * --INFO--
  * PAL Address: 0x801bd9c8
  * PAL Size: 56b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x801ff8ec
+ * EN Size: 56b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1282,8 +1282,8 @@ static void _SePitch(int* command)
  * --INFO--
  * PAL Address: 0x801bda00
  * PAL Size: 52b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x801ff924
+ * EN Size: 52b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1296,8 +1296,8 @@ static void _SePause(int* command)
  * --INFO--
  * PAL Address: 0x801bda34
  * PAL Size: 48b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x801ff958
+ * EN Size: 48b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1310,8 +1310,8 @@ static void _StreamStop(int* command)
  * --INFO--
  * PAL Address: 0x801bda64
  * PAL Size: 64b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x801ff988
+ * EN Size: 64b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1326,8 +1326,8 @@ static void _StreamPlay(int* command)
  * --INFO--
  * PAL Address: 0x801bdaa4
  * PAL Size: 56b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x801ff9c8
+ * EN Size: 56b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1341,8 +1341,8 @@ static void _StreamVolume(int* command)
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 56b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: UNUSED
+ * EN Size: 56b
  * JP Address: TODO
  */
 static void _StreamPan(int* command)
@@ -1355,8 +1355,8 @@ static void _StreamPan(int* command)
  * --INFO--
  * PAL Address: 0x801bdadc
  * PAL Size: 52b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x801ffa00
+ * EN Size: 52b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1369,8 +1369,8 @@ static void _StreamPause(int* command)
  * --INFO--
  * PAL Address: 0x801bdb10
  * PAL Size: 192b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x801ffa34
+ * EN Size: 192b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1403,8 +1403,8 @@ static RedExecCommand* _EntryExecCommand(RedExecCommandFunc func, int arg1, int 
  * --INFO--
  * PAL Address: 0x801bdbd0
  * PAL Size: 120b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x801ffaf4
+ * EN Size: 120b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1433,8 +1433,8 @@ static void _ExecuteCommand()
  * --INFO--
  * PAL Address: 0x801bdc48
  * PAL Size: 112b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x801ffb6c
+ * EN Size: 112b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1459,8 +1459,8 @@ unsigned int DeltaTimeSumup(unsigned char** buffer)
  * --INFO--
  * PAL Address: 0x801bdcb8
  * PAL Size: 56b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x801ffbdc
+ * EN Size: 56b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1483,8 +1483,8 @@ struct RedSleepAlarm {
  * --INFO--
  * PAL Address: 0x801bdcf0
  * PAL Size: 44b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x801ffc14
+ * EN Size: 44b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1497,8 +1497,8 @@ static void _MyAlarmHandler(OSAlarm* alarm, OSContext*)
  * --INFO--
  * PAL Address: 0x801bdd1c
  * PAL Size: 160b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x801ffc40
+ * EN Size: 160b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1524,8 +1524,8 @@ void RedSleep(int microseconds)
  * --INFO--
  * PAL Address: 0x801bddbc
  * PAL Size: 300b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x801ffce0
+ * EN Size: 300b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1576,8 +1576,8 @@ static int _MainThread(void*)
  * --INFO--
  * PAL Address: 0x801bdee8
  * PAL Size: 196b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x801ffe0c
+ * EN Size: 196b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1605,8 +1605,8 @@ static int _WaveSettingThread(void* threadArg)
  * --INFO--
  * PAL Address: 0x801bdfac
  * PAL Size: 280b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x801ffed0
+ * EN Size: 280b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1641,8 +1641,8 @@ static void _DMACheckProcess()
  * --INFO--
  * PAL Address: 0x801be0c4
  * PAL Size: 12b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x801fffe8
+ * EN Size: 12b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1655,8 +1655,8 @@ static void _DmaCallback(unsigned long)
  * --INFO--
  * PAL Address: 0x801be0d0
  * PAL Size: 356b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x801ffff4
+ * EN Size: 356b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1734,8 +1734,8 @@ int RedDmaEntry(int flags, int direction, int mainMemory, int aramMemory, int si
  * --INFO--
  * PAL Address: 0x801be234
  * PAL Size: 168b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80200158
+ * EN Size: 168b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1765,8 +1765,8 @@ int RedDmaSearchID(int id)
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 96b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: UNUSED
+ * EN Size: 96b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1790,8 +1790,8 @@ void RedDmaClearID(int id)
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 8b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: UNUSED
+ * EN Size: 8b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1804,8 +1804,8 @@ void RedSetDMAMode(int mode)
  * --INFO--
  * PAL Address: 0x801be2dc
  * PAL Size: 496b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80200200
+ * EN Size: 496b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1888,8 +1888,8 @@ static void _DmaExecute()
  * --INFO--
  * PAL Address: 0x801be4cc
  * PAL Size: 132b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x802003f0
+ * EN Size: 132b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1914,8 +1914,8 @@ static int _DmaExecuteThread(void*)
  * --INFO--
  * PAL Address: 0x801be550
  * PAL Size: 128b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80200474
+ * EN Size: 128b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1939,8 +1939,8 @@ static int _MusicSkipThread(void*)
  * --INFO--
  * PAL Address: 0x801be5d0
  * PAL Size: 56b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x802004f4
+ * EN Size: 56b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1955,8 +1955,8 @@ static void _RedAXCallback()
  * --INFO--
  * PAL Address: 0x801be608
  * PAL Size: 4b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020052c
+ * EN Size: 4b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1969,8 +1969,8 @@ CRedDriver::CRedDriver()
  * --INFO--
  * PAL Address: 0x801be60c
  * PAL Size: 72b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80200530
+ * EN Size: 72b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1982,8 +1982,8 @@ CRedDriver::~CRedDriver()
  * --INFO--
  * PAL Address: 0x801be654
  * PAL Size: 1316b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80200578
+ * EN Size: 1316b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -2122,8 +2122,8 @@ void CRedDriver::Init()
  * --INFO--
  * PAL Address: 0x801beb78
  * PAL Size: 140b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80200a9c
+ * EN Size: 140b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -2148,8 +2148,8 @@ void CRedDriver::End()
  * --INFO--
  * PAL Address: 0x801bec04
  * PAL Size: 68b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80200b28
+ * EN Size: 68b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -2169,8 +2169,8 @@ int CRedDriver::GetProgramTime()
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 8b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: UNUSED
+ * EN Size: 8b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -2183,8 +2183,8 @@ int CRedDriver::GetMasterTime()
  * --INFO--
  * PAL Address: 0x801bec48
  * PAL Size: 72b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80200b6c
+ * EN Size: 72b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -2197,8 +2197,8 @@ void CRedDriver::SetSoundMode(int soundMode)
  * --INFO--
  * PAL Address: 0x801bec90
  * PAL Size: 72b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80200bb4
+ * EN Size: 72b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -2218,8 +2218,8 @@ int CRedDriver::GetSoundMode()
  * --INFO--
  * PAL Address: 0x801becd8
  * PAL Size: 276b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80200bfc
+ * EN Size: 276b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -2268,8 +2268,8 @@ void CRedDriver::ClearMusicData(int musicID)
  * --INFO--
  * PAL Address: 0x801bedec
  * PAL Size: 92b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80200d10
+ * EN Size: 92b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -2346,8 +2346,8 @@ int CRedDriver::MusicPlayState(int musicID)
  * --INFO--
  * PAL Address: 0x801bee48
  * PAL Size: 72b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80200d6c
+ * EN Size: 72b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -2360,8 +2360,8 @@ void CRedDriver::MusicStop(int musicID)
  * --INFO--
  * PAL Address: 0x801BEE90
  * PAL Size: 88b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80200db4
+ * EN Size: 88b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -2375,8 +2375,8 @@ int CRedDriver::MusicPlay(int musicID, int volume, int mode)
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 272b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: UNUSED
+ * EN Size: 272b
  * JP Address: TODO
  */
 int CRedDriver::MusicPlay(void* musicData, int volume, int mode)
@@ -2409,8 +2409,8 @@ int CRedDriver::MusicPlay(void* musicData, int volume, int mode)
  * --INFO--
  * PAL Address: 0x801beee8
  * PAL Size: 88b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80200e0c
+ * EN Size: 88b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -2424,8 +2424,8 @@ int CRedDriver::MusicCrossPlay(int musicID, int volume, int mode)
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 272b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: UNUSED
+ * EN Size: 272b
  * JP Address: TODO
  */
 int CRedDriver::MusicCrossPlay(void* musicData, int volume, int mode)
@@ -2458,8 +2458,8 @@ int CRedDriver::MusicCrossPlay(void* musicData, int volume, int mode)
  * --INFO--
  * PAL Address: 0x801bef40
  * PAL Size: 88b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80200e64
+ * EN Size: 88b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -2473,8 +2473,8 @@ int CRedDriver::MusicNextPlay(int musicID, int volume, int mode)
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 272b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: UNUSED
+ * EN Size: 272b
  * JP Address: TODO
  */
 int CRedDriver::MusicNextPlay(void* musicData, int volume, int mode)
@@ -2507,8 +2507,8 @@ int CRedDriver::MusicNextPlay(void* musicData, int volume, int mode)
  * --INFO--
  * PAL Address: 0x801bef98
  * PAL Size: 72b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80200ebc
+ * EN Size: 72b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -2521,8 +2521,8 @@ void CRedDriver::MusicMasterVolume(int volume)
  * --INFO--
  * PAL Address: 0x801befe0
  * PAL Size: 76b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80200f04
+ * EN Size: 76b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -2535,8 +2535,8 @@ void CRedDriver::MusicFadeOut(int musicID, int fadeTime)
  * --INFO--
  * PAL Address: 0x801bf02c
  * PAL Size: 80b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80200f50
+ * EN Size: 80b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -2549,8 +2549,8 @@ void CRedDriver::MusicVolume(int musicID, int volume, int frameCount)
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 76b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: UNUSED
+ * EN Size: 76b
  * JP Address: TODO
  */
 void CRedDriver::MusicTempo(int tempo, int frameCount)
@@ -2562,8 +2562,8 @@ void CRedDriver::MusicTempo(int tempo, int frameCount)
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 76b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: UNUSED
+ * EN Size: 76b
  * JP Address: TODO
  */
 void CRedDriver::MusicPitch(int pitch, int frameCount)
@@ -2575,8 +2575,8 @@ void CRedDriver::MusicPitch(int pitch, int frameCount)
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 76b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: UNUSED
+ * EN Size: 76b
  * JP Address: TODO
  */
 void CRedDriver::MusicPause(int musicID, int pause)
@@ -2588,8 +2588,8 @@ void CRedDriver::MusicPause(int musicID, int pause)
  * --INFO--
  * PAL Address: 0x801bf07c
  * PAL Size: 72b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80200fa0
+ * EN Size: 72b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -2602,8 +2602,8 @@ void CRedDriver::SetMusicPhraseStop(int stop)
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 48b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: UNUSED
+ * EN Size: 48b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -2616,8 +2616,8 @@ int CRedDriver::CheckMusicEntry(int musicID)
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 8b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: UNUSED
+ * EN Size: 8b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -2630,8 +2630,8 @@ void CRedDriver::SetMusicFastSpeed(int speed)
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 8b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: UNUSED
+ * EN Size: 8b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -2644,8 +2644,8 @@ int CRedDriver::CheckMusicPhraseStop()
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 40b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: UNUSED
+ * EN Size: 40b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -2658,8 +2658,8 @@ void CRedDriver::DisplayMusicInfo()
  * --INFO--
  * PAL Address: 0x801bf0c4
  * PAL Size: 168b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80200fe8
+ * EN Size: 168b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -2689,8 +2689,8 @@ void* CRedDriver::SetSeBlockData(int blockIndex, void* seBlockData)
  * --INFO--
  * PAL Address: 0x801bf16c
  * PAL Size: 288b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80201090
+ * EN Size: 288b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -2725,8 +2725,8 @@ int CRedDriver::SetSeSepData(void* seSepData)
  * --INFO--
  * PAL Address: 0x801bf28c
  * PAL Size: 72b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x802011b0
+ * EN Size: 72b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -2739,8 +2739,8 @@ void CRedDriver::ClearSeSepData(int id)
  * --INFO--
  * PAL Address: 0x801bf2d4
  * PAL Size: 84b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x802011f8
+ * EN Size: 84b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -2753,8 +2753,8 @@ void CRedDriver::ClearSeSepDataMG(int id1, int id2, int id3, int id4)
  * --INFO--
  * PAL Address: 0x801bf328
  * PAL Size: 92b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020124c
+ * EN Size: 92b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -2772,8 +2772,8 @@ int CRedDriver::ReentrySeSepData(int id)
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 48b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: UNUSED
+ * EN Size: 48b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -2786,8 +2786,8 @@ int CRedDriver::CheckSeSepEntry(int id)
  * --INFO--
  * PAL Address: 0x801bf384
  * PAL Size: 288b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x802012a8
+ * EN Size: 288b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -2837,8 +2837,8 @@ int CRedDriver::SePlayState(int seID)
  * --INFO--
  * PAL Address: 0x801bf4a4
  * PAL Size: 72b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x802013c8
+ * EN Size: 72b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -2851,8 +2851,8 @@ void CRedDriver::SeStop(int id)
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 72b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: UNUSED
+ * EN Size: 72b
  * JP Address: TODO
  */
 void CRedDriver::SeStopG(int group)
@@ -2864,8 +2864,8 @@ void CRedDriver::SeStopG(int group)
  * --INFO--
  * PAL Address: 0x801bf4ec
  * PAL Size: 84b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80201410
+ * EN Size: 84b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -2878,8 +2878,8 @@ void CRedDriver::SeStopMG(int id1, int id2, int id3, int id4)
  * --INFO--
  * PAL Address: 0x801bf540
  * PAL Size: 196b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80201464
+ * EN Size: 196b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -2900,8 +2900,8 @@ int CRedDriver::SePlay(int bank, int sep, int autoID, int pan, int volume, int p
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 312b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: UNUSED
+ * EN Size: 312b
  * JP Address: TODO
  */
 int CRedDriver::SePlay(void* seSepData, int autoID, int pan, int volume, int pitch)
@@ -2937,8 +2937,8 @@ int CRedDriver::SePlay(void* seSepData, int autoID, int pan, int volume, int pit
  * --INFO--
  * PAL Address: 0x801bf604
  * PAL Size: 72b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80201528
+ * EN Size: 72b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -2951,8 +2951,8 @@ void CRedDriver::SeMasterVolume(int volume)
  * --INFO--
  * PAL Address: 0x801bf64c
  * PAL Size: 76b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80201570
+ * EN Size: 76b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -2965,8 +2965,8 @@ void CRedDriver::SeFadeOut(int seID, int fadeTime)
  * --INFO--
  * PAL Address: 0x801bf698
  * PAL Size: 80b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x802015bc
+ * EN Size: 80b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -2979,8 +2979,8 @@ void CRedDriver::SeVolume(int seID, int volume, int frameCount)
  * --INFO--
  * PAL Address: 0x801bf6e8
  * PAL Size: 80b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020160c
+ * EN Size: 80b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -2993,8 +2993,8 @@ void CRedDriver::SePan(int seID, int pan, int frameCount)
  * --INFO--
  * PAL Address: 0x801bf738
  * PAL Size: 80b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020165c
+ * EN Size: 80b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -3007,8 +3007,8 @@ void CRedDriver::SePitch(int seID, int pitch, int frameCount)
  * --INFO--
  * PAL Address: 0x801bf788
  * PAL Size: 76b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x802016ac
+ * EN Size: 76b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -3021,8 +3021,8 @@ void CRedDriver::SePause(int seID, int pause)
  * --INFO--
  * PAL Address: 0x801bf7d4
  * PAL Size: 128b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x802016f8
+ * EN Size: 128b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -3052,8 +3052,8 @@ int CRedDriver::GetSeVolume(int seID, int mode)
  * --INFO--
  * PAL Address: 0x801bf854
  * PAL Size: 108b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80201778
+ * EN Size: 108b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -3080,8 +3080,8 @@ int CRedDriver::ReportSeLoop(int seID)
  * --INFO--
  * PAL Address: 0x801bf8c0
  * PAL Size: 40b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x802017e4
+ * EN Size: 40b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -3094,8 +3094,8 @@ void CRedDriver::DisplaySePlayInfo()
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 68b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: UNUSED
+ * EN Size: 68b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -3114,8 +3114,8 @@ void CRedDriver::ClearSePlayLine()
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 80b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: UNUSED
+ * EN Size: 80b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -3138,8 +3138,8 @@ RedTrackDATA* CRedDriver::GetSePlayTrack()
  * --INFO--
  * PAL Address: 0x801bf8e8
  * PAL Size: 240b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020180c
+ * EN Size: 240b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -3187,8 +3187,8 @@ int CRedDriver::StreamPlayState(int streamID)
  * --INFO--
  * PAL Address: 0x801bf9d8
  * PAL Size: 156b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x802018fc
+ * EN Size: 156b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -3225,8 +3225,8 @@ int CRedDriver::GetStreamPlayPoint(int streamID, int* playPoint, int* readPoint)
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 80b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: UNUSED
+ * EN Size: 80b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -3247,8 +3247,8 @@ RedStreamDATA* CRedDriver::GetStreamPlayBlock(int streamID)
  * --INFO--
  * PAL Address: 0x801bfa74
  * PAL Size: 72b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80201998
+ * EN Size: 72b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -3261,8 +3261,8 @@ void CRedDriver::StreamStop(int streamID)
  * --INFO--
  * PAL Address: 0x801bfabc
  * PAL Size: 96b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x802019e0
+ * EN Size: 96b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -3276,8 +3276,8 @@ int CRedDriver::StreamPlay(int streamID, void* streamData, int fileSize, int pan
  * --INFO--
  * PAL Address: 0x801bfb1c
  * PAL Size: 80b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80201a40
+ * EN Size: 80b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -3290,8 +3290,8 @@ void CRedDriver::StreamVolume(int streamID, int volume, int frameCount)
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 80b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: UNUSED
+ * EN Size: 80b
  * JP Address: TODO
  */
 void CRedDriver::StreamPan(int streamID, int pan, int frameCount)
@@ -3303,8 +3303,8 @@ void CRedDriver::StreamPan(int streamID, int pan, int frameCount)
  * --INFO--
  * PAL Address: 0x801bfb6c
  * PAL Size: 76b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80201a90
+ * EN Size: 76b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -3317,8 +3317,8 @@ void CRedDriver::StreamPause(int streamID, int pause)
  * --INFO--
  * PAL Address: 0x801bfbb8
  * PAL Size: 48b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80201adc
+ * EN Size: 48b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -3331,8 +3331,8 @@ void CRedDriver::ClearWaveData(int waveID)
  * --INFO--
  * PAL Address: 0x801bfbe8
  * PAL Size: 72b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80201b0c
+ * EN Size: 72b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -3345,8 +3345,8 @@ void CRedDriver::ClearWaveDataM(int waveNo0, int waveNo1, int waveNo2, int waveN
  * --INFO--
  * PAL Address: 0x801bfc30
  * PAL Size: 48b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80201b54
+ * EN Size: 48b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -3359,8 +3359,8 @@ void CRedDriver::ClearWaveBank(int waveBank)
  * --INFO--
  * PAL Address: 0x801bfc60
  * PAL Size: 276b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80201b84
+ * EN Size: 276b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -3402,8 +3402,8 @@ void CRedDriver::SetWaveData(int slot, int waveID, void* waveData, int waveSize)
  * --INFO--
  * PAL Address: 0x801bfd74
  * PAL Size: 92b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80201c98
+ * EN Size: 92b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -3421,8 +3421,8 @@ int CRedDriver::ReentryWaveData(int id)
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 48b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: UNUSED
+ * EN Size: 48b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -3435,8 +3435,8 @@ RedWaveHeadWD* CRedDriver::GetWaveInfo(int waveID)
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 48b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: UNUSED
+ * EN Size: 48b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -3449,8 +3449,8 @@ int CRedDriver::CheckWaveEntry(int waveID)
  * --INFO--
  * PAL Address: 0x801bfdd0
  * PAL Size: 40b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80201cf4
+ * EN Size: 40b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -3463,8 +3463,8 @@ void CRedDriver::DisplayWaveInfo()
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 40b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: UNUSED
+ * EN Size: 40b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -3477,8 +3477,8 @@ void CRedDriver::DisplayMMemoryInfo()
  * --INFO--
  * PAL Address: 0x801BFDF8
  * PAL Size: 92b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80201d1c
+ * EN Size: 92b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -3491,8 +3491,8 @@ void CRedDriver::SetReverb(int bank, int kind)
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 56b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: UNUSED
+ * EN Size: 56b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -3505,8 +3505,8 @@ void CRedDriver::SetReverb(int bank, int kind, int* params)
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 32b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: UNUSED
+ * EN Size: 32b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -3519,8 +3519,8 @@ RedReverbSize* CRedDriver::GetReverbInfo()
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 8b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: UNUSED
+ * EN Size: 8b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -3533,8 +3533,8 @@ RedReverbDepth* CRedDriver::GetReverbDepth()
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 76b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: UNUSED
+ * EN Size: 76b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -3551,8 +3551,8 @@ void CRedDriver::SetMute(unsigned int voiceNo, unsigned int mute)
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 624b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: UNUSED
+ * EN Size: 624b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -3624,8 +3624,8 @@ int CRedDriver::PlayWaveItem(int waveNo, int itemNo, int key, int pan, int volum
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 96b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: UNUSED
+ * EN Size: 96b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -3649,8 +3649,8 @@ void CRedDriver::StopWaveItem()
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 96b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: UNUSED
+ * EN Size: 96b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -3673,8 +3673,8 @@ void CRedDriver::SetWavePitch(int pitch)
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 152b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: UNUSED
+ * EN Size: 152b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -3702,8 +3702,8 @@ void CRedDriver::SetWaveTune(int key, int fineTune)
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 160b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: UNUSED
+ * EN Size: 160b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -3728,8 +3728,8 @@ void CRedDriver::SetWaveAdsr(int attack, RedAdsrDATA* adsr)
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 176b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: UNUSED
+ * EN Size: 176b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -3755,8 +3755,8 @@ int CRedDriver::WavePitchCompute(int key, int pitch)
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 24b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: UNUSED
+ * EN Size: 24b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -3770,8 +3770,8 @@ RedReverbModeData* CRedDriver::GetReverbModeTable(int mode)
  * --INFO--
  * PAL Address: 0x801bfe54
  * PAL Size: 80b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80201d78
+ * EN Size: 80b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -3784,8 +3784,8 @@ void CRedDriver::SetReverbDepth(int bank, int depth, int frameCount)
  * --INFO--
  * PAL Address: 0x801bfea4
  * PAL Size: 52b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80201dc8
+ * EN Size: 52b
  * JP Address: TODO
  * JP Size: TODO
  */

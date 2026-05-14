@@ -8,12 +8,16 @@
 
 extern "C" const float FLOAT_8032F8EC;
 extern "C" const float FLOAT_8032F8F0;
+extern "C" const float FLOAT_8032F8C0;
 extern "C" const float FLOAT_8032F8C4;
 extern "C" const float FLOAT_8032F8C8;
 extern "C" const float FLOAT_8032F8CC;
 extern "C" const float FLOAT_8032F8D0;
 extern "C" const float FLOAT_8032F8D4;
 extern "C" const float FLOAT_8032F8D8;
+extern "C" const float FLOAT_8032F8F4;
+extern "C" const float FLOAT_8032F8F8;
+extern "C" const double DOUBLE_8032F900;
 extern "C" const char s_old_mid_format_801D7094[];
 
 CMapCylinder g_hit_cyl;
@@ -24,9 +28,6 @@ Vec g_hit_hpv;
 Vec g_hit_hpv_min;
 
 namespace {
-static const float s_large_pos = 3.4e38f;
-static const float s_large_neg = -3.4e38f;
-
 static inline unsigned char* Ptr(void* p, unsigned int offset)
 {
     return reinterpret_cast<unsigned char*>(p) + offset;
@@ -299,7 +300,7 @@ CMapHit::~CMapHit()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMapHit::ReadOtmHit(CChunkFile& chunkFile)
+int CMapHit::ReadOtmHit(CChunkFile& chunkFile)
 {
     CChunkFile::CChunk chunk;
 
@@ -327,17 +328,22 @@ void CMapHit::ReadOtmHit(CChunkFile& chunkFile)
                 m_positionMax.z = (m_positionMax.z < v.z) ? v.z : m_positionMax.z;
             }
 
-            m_positionMin.x -= 0.1f;
-            m_positionMin.y -= 0.1f;
-            m_positionMin.z -= 0.1f;
-            m_positionMax.x += 0.1f;
-            m_positionMax.y += 0.1f;
-            m_positionMax.z += 0.1f;
+            m_positionMin.x -= FLOAT_8032F8CC;
+            m_positionMin.y -= FLOAT_8032F8CC;
+            m_positionMin.z -= FLOAT_8032F8CC;
+            m_positionMax.x += FLOAT_8032F8CC;
+            m_positionMax.y += FLOAT_8032F8CC;
+            m_positionMax.z += FLOAT_8032F8CC;
         } else if (chunk.m_id == 'HITF') {
             m_faceCount = static_cast<unsigned short>(chunk.m_arg0);
             m_faces =
                 new (*reinterpret_cast<CMemory::CStage**>(&MapMng), const_cast<char*>(s_maphit_cpp_801D7088), 0x159)
                     CMapHitFace[m_faceCount];
+
+            const float zero = FLOAT_8032F8D0;
+            const float offsetScale = FLOAT_8032F8F4;
+            const float radiusScale = FLOAT_8032F8F8;
+            const double radiusBase = DOUBLE_8032F900;
 
             for (unsigned int faceIdx = 0; faceIdx < m_faceCount; faceIdx++) {
                 chunkFile.Align(4);
@@ -358,8 +364,8 @@ void CMapHit::ReadOtmHit(CChunkFile& chunkFile)
 
                 const unsigned int vertexCount = face.m_vertexCount;
                 for (unsigned int i = 0; i < vertexCount; i++) {
-                    face.m_vertexOffsets[i][0] = 0.0f;
-                    face.m_vertexOffsets[i][1] = 0.0f;
+                    face.m_vertexOffsets[i][0] = zero;
+                    face.m_vertexOffsets[i][1] = zero;
                 }
 
                 if (chunk.m_version == 0) {
@@ -371,7 +377,7 @@ void CMapHit::ReadOtmHit(CChunkFile& chunkFile)
                         (void)chunkFile.GetF4();
                         (void)chunkFile.GetF4();
                     }
-                    face.m_radiusScale = 0.0f;
+                    face.m_radiusScale = zero;
                 } else if (chunk.m_version == 1) {
                     if (System.m_execParam != 0) {
                         System.Printf(const_cast<char*>(s_old_mid_format_801D7094));
@@ -382,8 +388,8 @@ void CMapHit::ReadOtmHit(CChunkFile& chunkFile)
                     face.m_radiusScale = chunkFile.GetF4();
                     chunkFile.Align(4);
                     for (unsigned int i = 0; i < vertexCount; i++) {
-                        face.m_vertexOffsets[i][0] = chunkFile.GetF4() * 0.01f;
-                        face.m_vertexOffsets[i][1] = chunkFile.GetF4() * 0.01f;
+                        face.m_vertexOffsets[i][0] = chunkFile.GetF4() * offsetScale;
+                        face.m_vertexOffsets[i][1] = chunkFile.GetF4() * offsetScale;
                     }
                 }
 
@@ -401,14 +407,14 @@ void CMapHit::ReadOtmHit(CChunkFile& chunkFile)
                     face.m_boundsMax.z = (face.m_boundsMax.z < v.z) ? v.z : face.m_boundsMax.z;
                 }
 
-                face.m_radiusScale *= 0.5f;
-                face.m_boundsMin.x -= (0.1f + face.m_radiusScale);
-                face.m_boundsMin.y -= (0.1f + face.m_radiusScale);
-                face.m_boundsMin.z -= (0.1f + face.m_radiusScale);
-                face.m_boundsMax.x += (0.1f + face.m_radiusScale);
-                face.m_boundsMax.y += (0.1f + face.m_radiusScale);
-                face.m_boundsMax.z += (0.1f + face.m_radiusScale);
-                face.m_radiusScale = 1.0f - face.m_radiusScale;
+                face.m_radiusScale *= radiusScale;
+                face.m_boundsMin.x -= (offsetScale + face.m_radiusScale);
+                face.m_boundsMin.y -= (offsetScale + face.m_radiusScale);
+                face.m_boundsMin.z -= (offsetScale + face.m_radiusScale);
+                face.m_boundsMax.x += (offsetScale + face.m_radiusScale);
+                face.m_boundsMax.y += (offsetScale + face.m_radiusScale);
+                face.m_boundsMax.z += (offsetScale + face.m_radiusScale);
+                face.m_radiusScale = static_cast<float>(radiusBase - face.m_radiusScale);
             }
         } else if (chunk.m_id == 'NAME') {
             char* mapHitName = chunkFile.GetString();
@@ -417,6 +423,7 @@ void CMapHit::ReadOtmHit(CChunkFile& chunkFile)
     }
 
     chunkFile.PopChunk();
+    return 1;
 }
 
 /*
@@ -751,7 +758,7 @@ int CMapHit::CheckHitCylinder(CMapCylinder* mapCylinder, Vec* position, unsigned
     int faceOffset = 0;
     while (faceIndex < static_cast<int>(m_faceCount)) {
         g_hit_lpface = reinterpret_cast<CMapHitFace*>(Ptr(m_faces, faceOffset));
-        g_hit_t_min = s_large_pos;
+        g_hit_t_min = FLOAT_8032F8C0;
         if (CheckHitFaceCylinder(mask) != 0) {
             return 1;
         }
@@ -769,16 +776,16 @@ int CMapHit::CheckHitCylinder(CMapCylinder* mapCylinder, Vec* position, unsigned
  */
 int CMapHit::CheckHitCylinder(CMapCylinder* mapCylinder, Vec* position, unsigned short startFace, unsigned short faceCount, unsigned long mask)
 {
+    int faceIndex = static_cast<unsigned short>(startFace);
+    int endFace = static_cast<unsigned short>(startFace + faceCount);
+    int faceOffset = faceIndex * 0x50;
+
     g_hit_cyl = *mapCylinder;
     g_hit_mvec = *position;
 
-    unsigned int faceIndex = static_cast<unsigned short>(startFace);
-    unsigned int endFace = static_cast<unsigned short>(startFace + faceCount);
-    int faceOffset = static_cast<int>(faceIndex) * 0x50;
-
     while (faceIndex < endFace) {
         g_hit_lpface = reinterpret_cast<CMapHitFace*>(Ptr(m_faces, faceOffset));
-        g_hit_t_min = s_large_pos;
+        g_hit_t_min = FLOAT_8032F8C0;
 
         if (CheckHitFaceCylinder(mask) != 0) {
             return 1;
@@ -820,12 +827,12 @@ void CMapHit::CheckHitCylinderNear(CMapCylinder* mapCylinder, Vec* position, uns
  */
 void CMapHit::CheckHitCylinderNear(CMapCylinder* mapCylinder, Vec* position, unsigned short startFace, unsigned short faceCount, unsigned long mask)
 {
-    g_hit_cyl = *mapCylinder;
-    g_hit_mvec = *position;
-
     int endFace = static_cast<unsigned short>(startFace + faceCount);
     int faceIndex = static_cast<unsigned short>(startFace);
     int faceOffset = faceIndex * 0x50;
+
+    g_hit_cyl = *mapCylinder;
+    g_hit_mvec = *position;
 
     while (faceIndex < endFace) {
         g_hit_lpface = reinterpret_cast<CMapHitFace*>(Ptr(m_faces, faceOffset));

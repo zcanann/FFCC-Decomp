@@ -280,8 +280,8 @@ STATIC_ASSERT(sizeof(sRedEntryErrorColor) + sizeof(sRedEntryResetColor) + sizeof
  * --INFO--
  * PAL Address: 0x801c05f8
  * PAL Size: 4b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020251c
+ * EN Size: 4b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -293,8 +293,8 @@ CRedEntry::CRedEntry()
  * --INFO--
  * PAL Address: 0x801c05fc
  * PAL Size: 72b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80202520
+ * EN Size: 72b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -305,8 +305,8 @@ CRedEntry::~CRedEntry()
  * --INFO--
  * PAL Address: 0x801c0644
  * PAL Size: 244b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80202568
+ * EN Size: 244b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -345,8 +345,8 @@ void CRedEntry::Init()
  * --INFO--
  * PAL Address: 0x801c0738
  * PAL Size: 72b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020265c
+ * EN Size: 72b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -365,8 +365,8 @@ void CRedEntry::WaveHistoryAdd(int historyNo)
  * --INFO--
  * PAL Address: 0x801c0780
  * PAL Size: 88b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x802026a4
+ * EN Size: 88b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -386,8 +386,8 @@ void CRedEntry::WaveHistoryDelete(int historyNo)
  * --INFO--
  * PAL Address: 0x801c0840
  * PAL Size: 96b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80202764
+ * EN Size: 96b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -408,8 +408,8 @@ int CRedEntry::SearchWaveSequence(int waveNo)
  * --INFO--
  * PAL Address: 0x801c08a0
  * PAL Size: 208b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x802027c4
+ * EN Size: 208b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -445,8 +445,8 @@ int CRedEntry::SearchUseWave(int waveNo)
  * --INFO--
  * PAL Address: 0x801c0ad4
  * PAL Size: 172b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x802029f8
+ * EN Size: 172b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -480,8 +480,8 @@ int CRedEntry::WaveOldClear(int offset, int maxSize)
  * --INFO--
  * PAL Address: 0x801c0b80
  * PAL Size: 832b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80202aa4
+ * EN Size: 832b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -588,8 +588,8 @@ int CRedEntry::WaveHeadAdd(int waveBankNo, RedWaveHeadWD* waveHead, int waveNo)
  * --INFO--
  * PAL Address: 0x801c0ec0
  * PAL Size: 720b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80202de4
+ * EN Size: 720b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -693,8 +693,8 @@ int CRedEntry::SetWaveData(int waveBankNo, void* waveData, int waveDataSize)
  * --INFO--
  * PAL Address: 0x801c1190
  * PAL Size: 316b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x802030b4
+ * EN Size: 316b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -736,8 +736,8 @@ void CRedEntry::ClearWaveData(int waveNo)
  * --INFO--
  * PAL Address: 0x801c12cc
  * PAL Size: 204b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x802031f0
+ * EN Size: 204b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -764,8 +764,8 @@ void CRedEntry::ClearWaveDataM(int waveNo0, int waveNo1, int waveNo2, int waveNo
  * --INFO--
  * PAL Address: 0x801c1398
  * PAL Size: 312b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x802032bc
+ * EN Size: 312b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -804,8 +804,8 @@ void CRedEntry::ClearWaveBank(int waveBankNo)
  * --INFO--
  * PAL Address: 0x801c14d0
  * PAL Size: 40b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x802033f4
+ * EN Size: 40b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -822,8 +822,8 @@ RedHistoryBANK* CRedEntry::GetWaveBank(int waveNo)
  * --INFO--
  * PAL Address: 0x801c14f8
  * PAL Size: 68b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020341c
+ * EN Size: 68b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -844,8 +844,8 @@ RedWaveHeadWD* CRedEntry::SearchWaveBase(int waveNo)
  * --INFO--
  * PAL Address: 0x801c153c
  * PAL Size: 88b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80203460
+ * EN Size: 88b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -861,8 +861,8 @@ int CRedEntry::ReentryWaveData(int waveNo)
  * --INFO--
  * PAL Address: 0x801c1594
  * PAL Size: 408b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x802034b8
+ * EN Size: 408b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -914,8 +914,8 @@ void CRedEntry::WaveHistoryManager(int mode, int waveNo)
  * --INFO--
  * PAL Address: 0x801c172c
  * PAL Size: 864b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80203650
+ * EN Size: 864b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1007,8 +1007,8 @@ void CRedEntry::DisplayWaveInfo()
  * --INFO--
  * PAL Address: 0x801c1a8c
  * PAL Size: 68b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x802039b0
+ * EN Size: 68b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1026,8 +1026,8 @@ void CRedEntry::SeSepHistoryAdd()
  * --INFO--
  * PAL Address: 0x801c1ad0
  * PAL Size: 76b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x802039f4
+ * EN Size: 76b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1047,8 +1047,8 @@ void CRedEntry::SeSepHistoryDelete(int historyNo)
  * --INFO--
  * PAL Address: 0x801c1b84
  * PAL Size: 156b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80203aa8
+ * EN Size: 156b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1078,8 +1078,8 @@ int CRedEntry::SearchSeSepSequence(int seNo)
  * --INFO--
  * PAL Address: 0x801c1cbc
  * PAL Size: 152b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80203be0
+ * EN Size: 152b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1107,8 +1107,8 @@ RedHistoryBANK* CRedEntry::SeSepOldDelete()
  * --INFO--
  * PAL Address: 0x801c1f50
  * PAL Size: 180b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80203e74
+ * EN Size: 180b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1137,8 +1137,8 @@ int CRedEntry::ClearSeSepData(int seNo)
  * --INFO--
  * PAL Address: 0x801c2004
  * PAL Size: 212b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80203f28
+ * EN Size: 212b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1163,8 +1163,8 @@ int CRedEntry::ClearSeSepDataMG(int bankNo, int sepNo, int groupNo, int kindNo)
  * --INFO--
  * PAL Address: 0x801c20d8
  * PAL Size: 68b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80203ffc
+ * EN Size: 68b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1184,8 +1184,8 @@ RedHistoryBANK* CRedEntry::SearchSeSepBank(int seNo)
  * --INFO--
  * PAL Address: 0x801c211c
  * PAL Size: 88b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80204040
+ * EN Size: 88b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1201,8 +1201,8 @@ int CRedEntry::ReentrySeSepData(int seNo)
  * --INFO--
  * PAL Address: 0x801c2174
  * PAL Size: 320b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80204098
+ * EN Size: 320b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1242,8 +1242,8 @@ void CRedEntry::SeSepHistoryManager(int mode, int seNo)
  * --INFO--
  * PAL Address: 0x801c22b4
  * PAL Size: 612b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x802041d8
+ * EN Size: 612b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1305,8 +1305,8 @@ void CRedEntry::DisplaySePlayInfo()
  * --INFO--
  * PAL Address: 0x801c2518
  * PAL Size: 68b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020443c
+ * EN Size: 68b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1325,8 +1325,8 @@ void CRedEntry::MusicHistoryAdd()
  * --INFO--
  * PAL Address: 0x801c255c
  * PAL Size: 76b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80204480
+ * EN Size: 76b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1346,8 +1346,8 @@ void CRedEntry::MusicHistoryDelete(int historyNo)
  * --INFO--
  * PAL Address: 0x801c2610
  * PAL Size: 92b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80204534
+ * EN Size: 92b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1368,8 +1368,8 @@ int CRedEntry::SearchMusicSequence(int musicNo)
  * --INFO--
  * PAL Address: 0x801c26dc
  * PAL Size: 140b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80204600
+ * EN Size: 140b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1397,8 +1397,8 @@ int CRedEntry::MusicOldClear()
  * --INFO--
  * PAL Address: 0x801c2768
  * PAL Size: 112b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x8020468c
+ * EN Size: 112b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1425,8 +1425,8 @@ RedHistoryBANK* CRedEntry::MusicOldChoice()
  * --INFO--
  * PAL Address: 0x801c27d8
  * PAL Size: 68b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x802046fc
+ * EN Size: 68b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1446,8 +1446,8 @@ RedHistoryBANK* CRedEntry::SearchMusicBank(int musicNo)
  * --INFO--
  * PAL Address: 0x801c281c
  * PAL Size: 88b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80204740
+ * EN Size: 88b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1463,8 +1463,8 @@ int CRedEntry::ReentryMusicData(int musicNo)
  * --INFO--
  * PAL Address: 0x801c2874
  * PAL Size: 324b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80204798
+ * EN Size: 324b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1506,8 +1506,8 @@ void CRedEntry::MusicHistoryManager(int mode, int musicNo)
  * --INFO--
  * PAL Address: 0x801c29b8
  * PAL Size: 168b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x802048dc
+ * EN Size: 168b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1535,8 +1535,8 @@ RedMusicHEAD* CRedEntry::MusicHeadAdd(RedMusicHEAD* musicHead)
  * --INFO--
  * PAL Address: 0x801c2a60
  * PAL Size: 272b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80204984
+ * EN Size: 272b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1573,8 +1573,8 @@ RedMusicHEAD* CRedEntry::SetMusicData(RedMusicHEAD* musicHead)
  * --INFO--
  * PAL Address: 0x801c2b70
  * PAL Size: 1108b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80204a94
+ * EN Size: 1108b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1718,8 +1718,8 @@ void CRedEntry::DisplayMMemoryInfo()
  * --INFO--
  * PAL Address: 0x801c07d8
  * PAL Size: 104b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x802026fc
+ * EN Size: 104b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1742,8 +1742,8 @@ void CRedEntry::WaveHistoryChoice(RedHistoryBANK* bank)
  * --INFO--
  * PAL Address: 0x801c0970
  * PAL Size: 356b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80202894
+ * EN Size: 356b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1786,8 +1786,8 @@ int CRedEntry::WaveDelete(RedHistoryBANK* bank)
  * --INFO--
  * PAL Address: 0x801c1b1c
  * PAL Size: 104b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80203a40
+ * EN Size: 104b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1808,8 +1808,8 @@ void CRedEntry::SeSepHistoryChoice(RedHistoryBANK* bank)
  * --INFO--
  * PAL Address: 0x801c1c20
  * PAL Size: 156b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80203b44
+ * EN Size: 156b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1833,8 +1833,8 @@ int CRedEntry::SeSepMemoryFree(RedHistoryBANK* bank)
  * --INFO--
  * PAL Address: 0x801c1d54
  * PAL Size: 212b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80203c78
+ * EN Size: 212b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1868,8 +1868,8 @@ RedSeSepHEAD* CRedEntry::SeSepHeadAdd(RedSeSepHEAD* seSepHead)
  * --INFO--
  * PAL Address: 0x801c1e28
  * PAL Size: 296b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80203d4c
+ * EN Size: 296b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1908,8 +1908,8 @@ RedSeSepHEAD* CRedEntry::SetSeSepData(RedSeSepHEAD* seSepHead)
  * --INFO--
  * PAL Address: 0x801c25a8
  * PAL Size: 104b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x802044cc
+ * EN Size: 104b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1930,8 +1930,8 @@ void CRedEntry::MusicHistoryChoice(RedHistoryBANK* bank)
  * --INFO--
  * PAL Address: 0x801c266c
  * PAL Size: 112b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: 0x80204590
+ * EN Size: 112b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1949,8 +1949,8 @@ int CRedEntry::MusicMemoryFree(RedHistoryBANK* bank)
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 204b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: UNUSED
+ * EN Size: 204b
  * JP Address: TODO
  * JP Size: TODO
  */
@@ -1982,8 +1982,8 @@ int CRedEntry::ClearMusicData(int musicNo)
  * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 428b
- * EN Address: TODO
- * EN Size: TODO
+ * EN Address: UNUSED
+ * EN Size: 428b
  * JP Address: TODO
  * JP Size: TODO
  */

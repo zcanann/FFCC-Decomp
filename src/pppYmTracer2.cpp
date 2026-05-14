@@ -244,23 +244,17 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
     work = (TracerWork*)(pppYmTracer2->m_serializedData + *param_3->m_serializedDataOffsets);
     colorData = pppYmTracer2->m_serializedData + param_3->m_serializedDataOffsets[1];
 
-    if (param_2->m_initWOrk == 0xffffffff) {
-        pfVar6 = gPppDefaultValueBuffer;
-    } else {
-        pfVar6 = reinterpret_cast<float*>(
-            reinterpret_cast<TracerMngRaw*>(pppMngStPtr)->dataValues[param_2->m_initWOrk].workBase + 0x80 +
-            param_2->m_stepValue);
-    }
-    work->initWork = pfVar6;
+    work->initWork = (param_2->m_initWOrk == 0xffffffff)
+                         ? gPppDefaultValueBuffer
+                         : reinterpret_cast<float*>(
+                               reinterpret_cast<TracerMngRaw*>(pppMngStPtr)->dataValues[param_2->m_initWOrk].workBase +
+                               0x80 + param_2->m_stepValue);
 
-    if (param_2->m_arg3 == 0xffffffff) {
-        pfVar6 = gPppDefaultValueBuffer;
-    } else {
-        pfVar6 = reinterpret_cast<float*>(
-            reinterpret_cast<TracerMngRaw*>(pppMngStPtr)->dataValues[param_2->m_arg3].workBase + 0x80 +
-            param_2->m_tracer.m_arg3WorkOffset);
-    }
-    work->arg3Work = pfVar6;
+    work->arg3Work = (param_2->m_arg3 == 0xffffffff)
+                         ? gPppDefaultValueBuffer
+                         : reinterpret_cast<float*>(
+                               reinterpret_cast<TracerMngRaw*>(pppMngStPtr)->dataValues[param_2->m_arg3].workBase +
+                               0x80 + param_2->m_tracer.m_arg3WorkOffset);
 
     if (work->entries == nullptr) {
         useFallback = 1;

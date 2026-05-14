@@ -328,8 +328,10 @@ bool CMenuPcs::CompaClose()
                 if ((entry->flags & 2) == 0) {
                     step =
                         (float)-((DOUBLE_80333008 / (double)entry->duration) * (double)entry->frame - DOUBLE_80333008);
-                    entry->dx = (entry->targetX - (float)entry->x) * step;
-                    entry->dy = (entry->targetY - (float)entry->y) * step;
+                    float dx = entry->targetX - (float)entry->x;
+                    float dy = entry->targetY - (float)entry->y;
+                    entry->dx = dx * step;
+                    entry->dy = dy * step;
                 }
             }
         }
@@ -470,8 +472,10 @@ bool CMenuPcs::CompaOpen()
                 entry->alpha = (float)((DOUBLE_80333008 / (double)entry->duration) * (double)entry->frame);
                 if ((entry->flags & 2) == 0) {
                     step = (float)((DOUBLE_80333008 / (double)entry->duration) * (double)entry->frame);
-                    entry->dx = (entry->targetX - (float)entry->x) * step;
-                    entry->dy = (entry->targetY - (float)entry->y) * step;
+                    float dx = entry->targetX - (float)entry->x;
+                    float dy = entry->targetY - (float)entry->y;
+                    entry->dx = dx * step;
+                    entry->dy = dy * step;
                 }
             }
         }

@@ -85,6 +85,8 @@ unsigned char CAStar::calcPolygonGroup(Vec* pos, int hitAttributeMask)
 		{
 			return gMapHitFace->m_groupIndex;
 		}
+
+		return 0;
 	}
 	else
 	{
@@ -107,9 +109,9 @@ unsigned char CAStar::calcPolygonGroup(Vec* pos, int hitAttributeMask)
 		{
 			return gMapHitFace->m_groupIndex;
 		}
-	}
 
-	return 0;
+		return 0;
+	}
 }
 /*
  * --INFO--

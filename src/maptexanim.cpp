@@ -154,8 +154,6 @@ void CMapTexAnimSet::Calc()
 void CMapTexAnim::Calc(CMaterialSet* materialSet, CTextureSet* textureSet)
 {
     float frame;
-    materialSet = reinterpret_cast<CMaterialSet*>(Ptr(materialSet, 8));
-    textureSet = reinterpret_cast<CTextureSet*>(Ptr(textureSet, 8));
 
     if (m_usesKeyFrame != 0) {
         if (m_keyFrame.IsRun() != 0) {

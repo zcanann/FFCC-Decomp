@@ -666,11 +666,13 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
     int found;
     int spawnCount;
     int i;
-    int j;
     int k;
+    int j;
     int group;
     YmBreathParticleGroup* groupCursor;
     YmBreathParticleGroup* groupData;
+    short groupIndex;
+    short slotIndex;
     short foundSlot;
     short foundGroup;
     Vec unitVelocity;
@@ -700,8 +702,8 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
                 groupCursor = vYmBreath->m_groups;
                 foundGroup = -1;
                 foundSlot = -1;
-                for (short groupIndex = 0; groupIndex < (int)params->m_groupCount; groupIndex++) {
-                    for (short slotIndex = 0; slotIndex < (int)params->m_slotCount; slotIndex++) {
+                for (groupIndex = 0; groupIndex < (int)params->m_groupCount; groupIndex++) {
+                    for (slotIndex = 0; slotIndex < (int)params->m_slotCount; slotIndex++) {
                         signed char* particleIndices = groupCursor->particleIndices;
                         if ((short)i == *(signed char*)(particleIndices + (short)slotIndex)) {
                             foundGroup = groupIndex;
@@ -791,7 +793,7 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
         }
 
         groupData = groupTable;
-        for (i = 0; i < (int)params->m_groupCount; i++) {
+        for (j = 0; j < (int)params->m_groupCount; j++) {
             if ((groupData->active != 1) && (*groupData->particleIndices != -1) && (*groupData->particleStates == 1)) {
                 groupData->speed = params->m_groupSpeed;
                 unitVelocity.x = 0.0f;
@@ -808,7 +810,7 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
         }
 
         groupData = groupTable;
-        for (i = 0; i < (int)params->m_groupCount; i++) {
+        for (j = 0; j < (int)params->m_groupCount; j++) {
             if (groupData->active != 0) {
                 PSVECScale(&groupData->direction, &stepVelocity, groupData->speed);
                 PSVECAdd(&stepVelocity, &groupData->position, &groupData->position);

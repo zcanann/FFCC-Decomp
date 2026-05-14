@@ -2900,3 +2900,41 @@ static void __MidiCtrl_FuzzyOff(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* t
         return;
     }
 }
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 4b
+ * EN Address: UNUSED
+ * EN Size: 4b
+ * JP Address: TODO
+ */
+CRedMidiCtrl::CRedMidiCtrl()
+{
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 72b
+ * EN Address: UNUSED
+ * EN Size: 72b
+ * JP Address: TODO
+ */
+CRedMidiCtrl::~CRedMidiCtrl()
+{
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 28b
+ * EN Address: UNUSED
+ * EN Size: 28b
+ * JP Address: TODO
+ */
+void CRedMidiCtrl::Init()
+{
+    m_status[0] = 0;
+    m_status[1] = 0;
+    m_status[2] = 0;
+}

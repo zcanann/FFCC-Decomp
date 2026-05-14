@@ -357,7 +357,6 @@ found:
  */
 int CWind::AddAmbient(float dir, float speed)
 {
-	int checked = 0;
 	WindObject* scan = m_objects;
 	WindObject* obj;
 
@@ -395,7 +394,6 @@ int CWind::AddAmbient(float dir, float speed)
 			goto found;
 		}
 
-		checked += 7;
 		scan++;
 	}
 
@@ -403,7 +401,7 @@ int CWind::AddAmbient(float dir, float speed)
 
 found:
 	if (obj == 0) {
-		System.Printf(const_cast<char*>(DAT_801db568), checked);
+		System.Printf(const_cast<char*>(DAT_801db568));
 		return -1;
 	}
 

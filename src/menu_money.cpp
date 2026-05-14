@@ -31,14 +31,16 @@ extern "C" void GetSingWinSize__8CMenuPcsFiPsPsi(CMenuPcs*, int, s16*, s16*, int
 extern "C" void SetSingWinInfo__8CMenuPcsFiiii(CMenuPcs*, int, int, int, int);
 
 
-static const float FLOAT_80332f60 = 255.0f;
-static const float FLOAT_80332f64 = 0.0f;
-static const float FLOAT_80332f68 = 32.0f;
-static const float FLOAT_80332f6c = 24.0f;
-static const float FLOAT_80332f70 = 1.0f;
-static const float FLOAT_80332f74 = 18.0f;
-static const float FLOAT_80332f78 = 16.0f;
-static const float FLOAT_80332f7c = 0.9f;
+static const float LOCAL_FLOAT_80332f60 = 255.0f;
+extern const float FLOAT_80332f64;
+static const float LOCAL_FLOAT_80332f64 = 0.0f;
+static const float LOCAL_FLOAT_80332f68 = 32.0f;
+static const float LOCAL_FLOAT_80332f6c = 24.0f;
+extern const float FLOAT_80332f70;
+static const float LOCAL_FLOAT_80332f70 = 1.0f;
+static const float LOCAL_FLOAT_80332f74 = 18.0f;
+static const float LOCAL_FLOAT_80332f78 = 16.0f;
+static const float LOCAL_FLOAT_80332f7c = 0.9f;
 extern const float FLOAT_80332f80;
 extern const float FLOAT_80332f84;
 extern const double DOUBLE_80332F90;
@@ -268,9 +270,9 @@ int CMenuPcs::MoneyCtrlCur()
 					}
 					s16 winW;
 					s16 winH;
-					*(u8*)(menuState + 9) = 2;
+					this->moneyState->messageMask = 2;
 					if (CanPlayerPutItem__12CCaravanWorkFv((void*)caravanWork) != 0) {
-						*(u8*)(menuState + 9) = *(u8*)(menuState + 9) | 1;
+						this->moneyState->messageMask = this->moneyState->messageMask | 1;
 					}
 					GetSingWinSize__8CMenuPcsFiPsPsi(this, 1, &winW, &winH, 0);
 					SetSingWinInfo__8CMenuPcsFiiii(this, 0xF0, 0xD0, winW, winH);
@@ -304,7 +306,7 @@ int CMenuPcs::MoneyCtrlCur()
 
 		if ((hold & 0xC) == 0) {
 			if ((press & 0x100) != 0) {
-				if (((int)*(u8*)(menuState + 9) & (1 << *(s16*)(optBase + 0x26))) == 0) {
+				if (((int)this->moneyState->messageMask & (1 << *(s16*)(optBase + 0x26))) == 0) {
 					Sound.PlaySe(4, 0x40, 0x7F, 0);
 					return 0;
 				}
@@ -411,10 +413,10 @@ void CMenuPcs::MoneyDraw()
 		color.r = 0xFF;
 		color.g = 0xFF;
 		color.b = 0xFF;
-		color.a = (u8)(FLOAT_80332f60 * *(float*)(entry + 8));
+		color.a = (u8)(LOCAL_FLOAT_80332f60 * *(float*)(entry + 8));
 		GXSetChanMatColor(GX_COLOR0A0, color);
 		float uvScale = *(float*)(entry + 10);
-		DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 0, x, y, w, h, u, v, uvScale, uvScale, FLOAT_80332f64);
+		DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 0, x, y, w, h, u, v, uvScale, uvScale, LOCAL_FLOAT_80332f64);
 	}
 
 	s16* drawBase = reinterpret_cast<s16*>(this->moneyPanel->anims);
@@ -424,21 +426,21 @@ void CMenuPcs::MoneyDraw()
 		color.r = 0xFF;
 		color.g = 0xFF;
 		color.b = 0xFF;
-		color.a = (u8)(FLOAT_80332f60 * *(float*)(drawBase + 8));
+		color.a = (u8)(LOCAL_FLOAT_80332f60 * *(float*)(drawBase + 8));
 		GXSetChanMatColor(GX_COLOR0A0, color);
 	}
 
 	for (int i = 0; i < 2; i++) {
-		float y = (float)(drawBase[1] + 0x18) + FLOAT_80332f68 * (float)i;
+		float y = (float)(drawBase[1] + 0x18) + LOCAL_FLOAT_80332f68 * (float)i;
 		float x = (float)(drawBase[0] + 0x20);
 		for (int j = 0; j < 8; j++) {
 			signed char digit = s_place[i * 8 + j];
 			if (digit >= 0) {
-				DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 0, x, y, FLOAT_80332f6c, FLOAT_80332f68,
-				                                FLOAT_80332f6c * (float)digit, FLOAT_80332f68 * (float)i,
-				                                FLOAT_80332f70, FLOAT_80332f70, FLOAT_80332f64);
+				DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 0, x, y, LOCAL_FLOAT_80332f6c, LOCAL_FLOAT_80332f68,
+				                                LOCAL_FLOAT_80332f6c * (float)digit, LOCAL_FLOAT_80332f68 * (float)i,
+				                                LOCAL_FLOAT_80332f70, LOCAL_FLOAT_80332f70, LOCAL_FLOAT_80332f64);
 			}
-			x += FLOAT_80332f74;
+			x += LOCAL_FLOAT_80332f74;
 		}
 	}
 
@@ -449,31 +451,32 @@ void CMenuPcs::MoneyDraw()
 			color.r = 0xFF;
 			color.g = 0xFF;
 			color.b = 0xFF;
-			color.a = (u8)(FLOAT_80332f60 * *(float*)(drawBase + 8));
+			color.a = (u8)(LOCAL_FLOAT_80332f60 * *(float*)(drawBase + 8));
 			GXSetChanMatColor(GX_COLOR0A0, color);
 		}
 
 		DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 0, (float)(drawBase[0] + (7 - this->moneyState->selectedIndex) * 0x12 + 0x24),
-		                                (float)(drawBase[1] + 0x5C), FLOAT_80332f78, FLOAT_80332f6c, FLOAT_80332f64,
-		                                FLOAT_80332f64, FLOAT_80332f70, FLOAT_80332f70, FLOAT_80332f64);
+		                                (float)(drawBase[1] + 0x5C), LOCAL_FLOAT_80332f78, LOCAL_FLOAT_80332f6c,
+		                                LOCAL_FLOAT_80332f64, LOCAL_FLOAT_80332f64, LOCAL_FLOAT_80332f70,
+		                                LOCAL_FLOAT_80332f70, LOCAL_FLOAT_80332f64);
 	}
 
 	CFont* font = this->moneyFont;
-	font->SetMargin(FLOAT_80332f70);
+	font->SetMargin(LOCAL_FLOAT_80332f70);
 	font->SetShadow(0);
-	font->SetScale(FLOAT_80332f7c);
+	font->SetScale(LOCAL_FLOAT_80332f7c);
 	font->DrawInit();
 
 	{
-		CColor color(0xFF, 0xFF, 0xFF, (u8)(FLOAT_80332f60 * *(float*)(drawBase + 8)));
+		CColor color(0xFF, 0xFF, 0xFF, (u8)(LOCAL_FLOAT_80332f60 * *(float*)(drawBase + 8)));
 		font->SetColor(color.color);
 	}
 
 	const char* label = GetMenuStr__8CMenuPcsFi(this, 0x15);
 	for (int i = 0; i < 2; i++) {
 		font->SetPosX((float)(drawBase[0] + 0xB6));
-		font->SetPosY((FLOAT_80332f68 + ((float)(drawBase[1] + 0x18) + FLOAT_80332f68 * (float)i)) - FLOAT_80332f80 -
-		              FLOAT_80332f84);
+		font->SetPosY((LOCAL_FLOAT_80332f68 + ((float)(drawBase[1] + 0x18) + LOCAL_FLOAT_80332f68 * (float)i)) -
+		              FLOAT_80332f80 - FLOAT_80332f84);
 		font->Draw(label);
 	}
 
@@ -493,7 +496,8 @@ void CMenuPcs::MoneyDraw()
 		int frame = (int)System.m_frameCounter;
 		int frameSign = frame >> 31;
 		int anim = ((frameSign * 8) | ((frame * 0x20000000 + frameSign) >> 29)) - frameSign;
-		DrawCursor__8CMenuPcsFiif(this, (int)((float)singWindow[0] + (float)anim), (int)cursorY, FLOAT_80332f70);
+		DrawCursor__8CMenuPcsFiif(this, (int)((float)singWindow[0] + (float)anim), (int)cursorY,
+		                           LOCAL_FLOAT_80332f70);
 	}
 }
 

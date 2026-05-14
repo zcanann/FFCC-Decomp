@@ -150,26 +150,26 @@ signed char g_MaxHeapSize[4];
 int lbl_8032ED48;
 signed char lbl_8032ED4C;
 }
-unsigned int m_table_desc0__8CPartPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__8CPartPcsFv)};
-unsigned int m_table_desc1__8CPartPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__8CPartPcsFv)};
-unsigned int m_table_desc2__8CPartPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcInit__8CPartPcsFv)};
-unsigned int m_table_desc3__8CPartPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__8CPartPcsFv)};
-unsigned int m_table_desc4__8CPartPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcDead__8CPartPcsFv)};
-unsigned int m_table_desc5__8CPartPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(ClearOt__8CPartPcsFv)};
-unsigned int m_table_desc6__8CPartPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawShadow__8CPartPcsFv)};
-unsigned int m_table_desc7__8CPartPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawCharaBefore__8CPartPcsFv)};
-unsigned int m_table_desc8__8CPartPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(draw__8CPartPcsFv)};
-unsigned int m_table_desc9__8CPartPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawAfter__8CPartPcsFv)};
-unsigned int m_table_desc10__8CPartPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createViewer__8CPartPcsFv)};
-unsigned int m_table_desc11__8CPartPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__8CPartPcsFv)};
-unsigned int m_table_desc12__8CPartPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcInit__8CPartPcsFv)};
-unsigned int m_table_desc13__8CPartPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__8CPartPcsFv)};
-unsigned int m_table_desc14__8CPartPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcDead__8CPartPcsFv)};
-unsigned int m_table_desc15__8CPartPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(ClearOt__8CPartPcsFv)};
-unsigned int m_table_desc16__8CPartPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawShadowViewer__8CPartPcsFv)};
-unsigned int m_table_desc17__8CPartPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__8CPartPcsFv)};
-unsigned int m_table_desc18__8CPartPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawAfterViewer__8CPartPcsFv)};
-unsigned int m_table__8CPartPcs[2][0x15C / sizeof(unsigned int)] = {
+unsigned int CPartPcs::m_table_desc0[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__8CPartPcsFv)};
+unsigned int CPartPcs::m_table_desc1[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__8CPartPcsFv)};
+unsigned int CPartPcs::m_table_desc2[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcInit__8CPartPcsFv)};
+unsigned int CPartPcs::m_table_desc3[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__8CPartPcsFv)};
+unsigned int CPartPcs::m_table_desc4[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcDead__8CPartPcsFv)};
+unsigned int CPartPcs::m_table_desc5[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(ClearOt__8CPartPcsFv)};
+unsigned int CPartPcs::m_table_desc6[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawShadow__8CPartPcsFv)};
+unsigned int CPartPcs::m_table_desc7[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawCharaBefore__8CPartPcsFv)};
+unsigned int CPartPcs::m_table_desc8[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(draw__8CPartPcsFv)};
+unsigned int CPartPcs::m_table_desc9[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawAfter__8CPartPcsFv)};
+unsigned int CPartPcs::m_table_desc10[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createViewer__8CPartPcsFv)};
+unsigned int CPartPcs::m_table_desc11[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__8CPartPcsFv)};
+unsigned int CPartPcs::m_table_desc12[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcInit__8CPartPcsFv)};
+unsigned int CPartPcs::m_table_desc13[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__8CPartPcsFv)};
+unsigned int CPartPcs::m_table_desc14[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcDead__8CPartPcsFv)};
+unsigned int CPartPcs::m_table_desc15[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(ClearOt__8CPartPcsFv)};
+unsigned int CPartPcs::m_table_desc16[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawShadowViewer__8CPartPcsFv)};
+unsigned int CPartPcs::m_table_desc17[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__8CPartPcsFv)};
+unsigned int CPartPcs::m_table_desc18[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawAfterViewer__8CPartPcsFv)};
+unsigned int CPartPcs::m_table[2][0x15C / sizeof(unsigned int)] = {
     {
         reinterpret_cast<unsigned int>(const_cast<char*>(s_CPartPcs_GAME_801D7F2C)), 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
         0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000015, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x0000001D,
@@ -213,65 +213,65 @@ inline CPartPcs::CPartPcs()
 
 static inline char* InitCPartPcsTable(char* profileName)
 {
-	unsigned int* table = reinterpret_cast<unsigned int*>(m_table__8CPartPcs);
+	unsigned int* table = reinterpret_cast<unsigned int*>(CPartPcs::m_table);
 
-	table[33] = m_table_desc7__8CPartPcs[1];
-	table[37] = m_table_desc8__8CPartPcs[0];
-	table[38] = m_table_desc8__8CPartPcs[1];
-	table[1] = m_table_desc0__8CPartPcs[0];
-	table[2] = m_table_desc0__8CPartPcs[1];
-	table[3] = m_table_desc0__8CPartPcs[2];
-	table[4] = m_table_desc1__8CPartPcs[0];
-	table[5] = m_table_desc1__8CPartPcs[1];
-	table[6] = m_table_desc1__8CPartPcs[2];
-	table[7] = m_table_desc2__8CPartPcs[0];
-	table[8] = m_table_desc2__8CPartPcs[1];
-	table[9] = m_table_desc2__8CPartPcs[2];
-	table[12] = m_table_desc3__8CPartPcs[0];
-	table[13] = m_table_desc3__8CPartPcs[1];
-	table[14] = m_table_desc3__8CPartPcs[2];
-	table[17] = m_table_desc4__8CPartPcs[0];
-	table[18] = m_table_desc4__8CPartPcs[1];
-	table[19] = m_table_desc4__8CPartPcs[2];
-	table[22] = m_table_desc5__8CPartPcs[0];
-	table[23] = m_table_desc5__8CPartPcs[1];
-	table[24] = m_table_desc5__8CPartPcs[2];
-	table[27] = m_table_desc6__8CPartPcs[0];
-	table[28] = m_table_desc6__8CPartPcs[1];
-	table[29] = m_table_desc6__8CPartPcs[2];
-	table[32] = m_table_desc7__8CPartPcs[0];
-	table[35] = m_table_desc7__8CPartPcs[2];
-	table[39] = m_table_desc8__8CPartPcs[2];
-	table[44] = m_table_desc9__8CPartPcs[0];
-	table[45] = m_table_desc9__8CPartPcs[1];
-	table[46] = m_table_desc9__8CPartPcs[2];
-	table[88] = m_table_desc10__8CPartPcs[0];
-	table[89] = m_table_desc10__8CPartPcs[1];
-	table[90] = m_table_desc10__8CPartPcs[2];
-	table[91] = m_table_desc11__8CPartPcs[0];
-	table[92] = m_table_desc11__8CPartPcs[1];
-	table[93] = m_table_desc11__8CPartPcs[2];
-	table[94] = m_table_desc12__8CPartPcs[0];
-	table[95] = m_table_desc12__8CPartPcs[1];
-	table[96] = m_table_desc12__8CPartPcs[2];
-	table[99] = m_table_desc13__8CPartPcs[0];
-	table[100] = m_table_desc13__8CPartPcs[1];
-	table[101] = m_table_desc13__8CPartPcs[2];
-	table[104] = m_table_desc14__8CPartPcs[0];
-	table[105] = m_table_desc14__8CPartPcs[1];
-	table[106] = m_table_desc14__8CPartPcs[2];
-	table[109] = m_table_desc15__8CPartPcs[0];
-	table[110] = m_table_desc15__8CPartPcs[1];
-	table[111] = m_table_desc15__8CPartPcs[2];
-	table[114] = m_table_desc16__8CPartPcs[0];
-	table[115] = m_table_desc16__8CPartPcs[1];
-	table[116] = m_table_desc16__8CPartPcs[2];
-	table[119] = m_table_desc17__8CPartPcs[0];
-	table[120] = m_table_desc17__8CPartPcs[1];
-	table[121] = m_table_desc17__8CPartPcs[2];
-	table[124] = m_table_desc18__8CPartPcs[0];
-	table[125] = m_table_desc18__8CPartPcs[1];
-	table[126] = m_table_desc18__8CPartPcs[2];
+	table[33] = CPartPcs::m_table_desc7[1];
+	table[37] = CPartPcs::m_table_desc8[0];
+	table[38] = CPartPcs::m_table_desc8[1];
+	table[1] = CPartPcs::m_table_desc0[0];
+	table[2] = CPartPcs::m_table_desc0[1];
+	table[3] = CPartPcs::m_table_desc0[2];
+	table[4] = CPartPcs::m_table_desc1[0];
+	table[5] = CPartPcs::m_table_desc1[1];
+	table[6] = CPartPcs::m_table_desc1[2];
+	table[7] = CPartPcs::m_table_desc2[0];
+	table[8] = CPartPcs::m_table_desc2[1];
+	table[9] = CPartPcs::m_table_desc2[2];
+	table[12] = CPartPcs::m_table_desc3[0];
+	table[13] = CPartPcs::m_table_desc3[1];
+	table[14] = CPartPcs::m_table_desc3[2];
+	table[17] = CPartPcs::m_table_desc4[0];
+	table[18] = CPartPcs::m_table_desc4[1];
+	table[19] = CPartPcs::m_table_desc4[2];
+	table[22] = CPartPcs::m_table_desc5[0];
+	table[23] = CPartPcs::m_table_desc5[1];
+	table[24] = CPartPcs::m_table_desc5[2];
+	table[27] = CPartPcs::m_table_desc6[0];
+	table[28] = CPartPcs::m_table_desc6[1];
+	table[29] = CPartPcs::m_table_desc6[2];
+	table[32] = CPartPcs::m_table_desc7[0];
+	table[35] = CPartPcs::m_table_desc7[2];
+	table[39] = CPartPcs::m_table_desc8[2];
+	table[44] = CPartPcs::m_table_desc9[0];
+	table[45] = CPartPcs::m_table_desc9[1];
+	table[46] = CPartPcs::m_table_desc9[2];
+	table[88] = CPartPcs::m_table_desc10[0];
+	table[89] = CPartPcs::m_table_desc10[1];
+	table[90] = CPartPcs::m_table_desc10[2];
+	table[91] = CPartPcs::m_table_desc11[0];
+	table[92] = CPartPcs::m_table_desc11[1];
+	table[93] = CPartPcs::m_table_desc11[2];
+	table[94] = CPartPcs::m_table_desc12[0];
+	table[95] = CPartPcs::m_table_desc12[1];
+	table[96] = CPartPcs::m_table_desc12[2];
+	table[99] = CPartPcs::m_table_desc13[0];
+	table[100] = CPartPcs::m_table_desc13[1];
+	table[101] = CPartPcs::m_table_desc13[2];
+	table[104] = CPartPcs::m_table_desc14[0];
+	table[105] = CPartPcs::m_table_desc14[1];
+	table[106] = CPartPcs::m_table_desc14[2];
+	table[109] = CPartPcs::m_table_desc15[0];
+	table[110] = CPartPcs::m_table_desc15[1];
+	table[111] = CPartPcs::m_table_desc15[2];
+	table[114] = CPartPcs::m_table_desc16[0];
+	table[115] = CPartPcs::m_table_desc16[1];
+	table[116] = CPartPcs::m_table_desc16[2];
+	table[119] = CPartPcs::m_table_desc17[0];
+	table[120] = CPartPcs::m_table_desc17[1];
+	table[121] = CPartPcs::m_table_desc17[2];
+	table[124] = CPartPcs::m_table_desc18[0];
+	table[125] = CPartPcs::m_table_desc18[1];
+	table[126] = CPartPcs::m_table_desc18[2];
 
 	return profileName;
 }
@@ -447,7 +447,7 @@ void CPartPcs::onScriptChanging(char*)
  */
 int CPartPcs::GetTable(unsigned long index)
 {
-	return reinterpret_cast<int>(m_table__8CPartPcs[index]);
+	return reinterpret_cast<int>(CPartPcs::m_table[index]);
 }
 
 /*

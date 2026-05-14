@@ -27,7 +27,7 @@ void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 void DrawSphere__8CGraphicFPA4_f8_GXColor(void*, Mtx, _GXColor);
 }
 
-extern "C" const char s_pppBreathModel_cpp_801DB5A0[] = "pppBreathModel.cpp";
+extern "C" const char s_pppBreathModel_cpp_801DB5A0[24] = "pppBreathModel.cpp";
 
 struct pppBreathModelUnkC {
     unsigned char _pad[0xC];
@@ -644,11 +644,13 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
     int found;
     int spawnCount;
     int i;
-    int j;
     int k;
+    int j;
     int group;
     BreathParticleGroup* groupCursor;
     BreathParticleGroup* groupData;
+    short groupIndex;
+    short slotIndex;
     short foundSlot;
     short foundGroup;
     Vec unitVelocity;
@@ -675,8 +677,8 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
                 groupCursor = vBreathModel->m_groups;
                 foundGroup = -1;
                 foundSlot = -1;
-                for (short groupIndex = 0; groupIndex < (int)params->m_groupCount; groupIndex++) {
-                    for (short slotIndex = 0; slotIndex < (int)params->m_slotCount; slotIndex++) {
+                for (groupIndex = 0; groupIndex < (int)params->m_groupCount; groupIndex++) {
+                    for (slotIndex = 0; slotIndex < (int)params->m_slotCount; slotIndex++) {
                         signed char* particleIndices = groupCursor->particleIndices;
                         if ((short)i == particleIndices[(short)slotIndex]) {
                             foundGroup = groupIndex;
@@ -767,7 +769,7 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
         }
 
         groupData = groupTable;
-        for (i = 0; i < (int)params->m_groupCount; i++) {
+        for (j = 0; j < (int)params->m_groupCount; j++) {
             if ((groupData->active != 1) && (*groupData->particleIndices != -1) && (*groupData->particleStates == 1)) {
                 groupData->speed = params->m_groupSpeed;
                 unitVelocity.x = 0.0f;
@@ -784,7 +786,7 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
         }
 
         groupData = groupTable;
-        for (i = 0; i < (int)params->m_groupCount; i++) {
+        for (j = 0; j < (int)params->m_groupCount; j++) {
             if (groupData->active != 0) {
                 PSVECScale(&groupData->direction, &stepVelocity, groupData->speed);
                 PSVECAdd(&stepVelocity, &groupData->position, &groupData->position);

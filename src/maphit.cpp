@@ -649,22 +649,22 @@ int CMapHit::CalcHitSlide(Vec* out, float y)
             Vec current;
             if (g_hit_edge_idx_min == 0) {
                 previous = m_vertices[gMapHitFace->m_vertexIndices[gMapHitFace->m_vertexCount - 1]];
-                current = m_vertices[gMapHitFace->m_vertexIndices[0]];
+                current = m_vertices[gMapHitFace->m_vertexIndices[g_hit_edge_idx_min]];
             } else {
                 previous = m_vertices[gMapHitFace->m_vertexIndices[g_hit_edge_idx_min - 1]];
                 current = m_vertices[gMapHitFace->m_vertexIndices[g_hit_edge_idx_min]];
             }
 
             Vec edge;
+            Vec nearestPoint;
             Vec edgeToCenter;
+            Vec edgeProjection;
             PSVECSubtract(&current, &previous, &edge);
             PSVECSubtract(&current, &g_hit_cyl_min.m_top, &edgeToCenter);
 
             float edgeDot = PSVECDotProduct(&edge, &edgeToCenter);
             float edgeLenSq = PSVECDotProduct(&edge, &edge);
 
-            Vec edgeProjection;
-            Vec nearestPoint;
             PSVECScale(&edge, &edgeProjection, edgeDot / edgeLenSq);
             PSVECSubtract(&current, &edgeProjection, &nearestPoint);
 

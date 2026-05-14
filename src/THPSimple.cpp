@@ -75,7 +75,7 @@ static u16 VolumeTable[0x80] = {
     0x638C, 0x6555, 0x6722, 0x68F4, 0x6AC9, 0x6CA2, 0x6E80, 0x7061,
     0x7247, 0x7430, 0x761E, 0x7810, 0x7A06, 0x7C00, 0x7DFE, 0x8000,
 };
-static s16 SoundBuffer[0x280] ATTRIBUTE_ALIGN(32);
+static s16 SoundBuffer_802FFC60[0x280] ATTRIBUTE_ALIGN(32);
 
 extern const char sTHPMagic[4];
 extern const float kTHPSimpleDefaultVolume;
@@ -105,11 +105,11 @@ void THPAudioMixCallback()
 
 	if (AudioSystem == 0) {
 		SoundBufferIndex ^= 1;
-		AIInitDMA((u32)(reinterpret_cast<u8*>(SoundBuffer) + SoundBufferIndex * 0x280), 0x280);
+		AIInitDMA((u32)(reinterpret_cast<u8*>(SoundBuffer_802FFC60) + SoundBufferIndex * 0x280), 0x280);
 		interruptState = OSEnableInterrupts();
-		MixAudio(reinterpret_cast<s16*>(reinterpret_cast<u8*>(SoundBuffer) + SoundBufferIndex * 0x280),
+		MixAudio(reinterpret_cast<s16*>(reinterpret_cast<u8*>(SoundBuffer_802FFC60) + SoundBufferIndex * 0x280),
 		         (short*)0, 0xA0);
-		DCFlushRange(reinterpret_cast<u8*>(SoundBuffer) + SoundBufferIndex * 0x280, 0x280);
+		DCFlushRange(reinterpret_cast<u8*>(SoundBuffer_802FFC60) + SoundBufferIndex * 0x280, 0x280);
 		OSRestoreInterrupts(interruptState);
 		return;
 	}
@@ -126,14 +126,14 @@ void THPAudioMixCallback()
 	}
 
 	SoundBufferIndex ^= 1;
-	AIInitDMA((u32)(reinterpret_cast<u8*>(SoundBuffer) + SoundBufferIndex * 0x280), 0x280);
+	AIInitDMA((u32)(reinterpret_cast<u8*>(SoundBuffer_802FFC60) + SoundBufferIndex * 0x280), 0x280);
 	interruptState = OSEnableInterrupts();
 	if (CurAudioBuffer != NULL) {
 		DCInvalidateRange(CurAudioBuffer, 0x280);
 	}
-	MixAudio(reinterpret_cast<s16*>(reinterpret_cast<u8*>(SoundBuffer) + SoundBufferIndex * 0x280),
+	MixAudio(reinterpret_cast<s16*>(reinterpret_cast<u8*>(SoundBuffer_802FFC60) + SoundBufferIndex * 0x280),
 	         CurAudioBuffer, 0xA0);
-	DCFlushRange(reinterpret_cast<u8*>(SoundBuffer) + SoundBufferIndex * 0x280, 0x280);
+	DCFlushRange(reinterpret_cast<u8*>(SoundBuffer_802FFC60) + SoundBufferIndex * 0x280, 0x280);
 	OSRestoreInterrupts(interruptState);
 }
 
@@ -1034,9 +1034,9 @@ s32 THPSimpleInit(s32 audioMixMode)
     OSRestoreInterrupts(interruptState);
 
     if (AudioSystem == 0) {
-        memset(SoundBuffer, 0, 0x500);
-        DCFlushRange(SoundBuffer, 0x500);
-        AIInitDMA((u32)(reinterpret_cast<u8*>(SoundBuffer) + SoundBufferIndex * 0x280), 0x280);
+        memset(SoundBuffer_802FFC60, 0, 0x500);
+        DCFlushRange(SoundBuffer_802FFC60, 0x500);
+        AIInitDMA((u32)(reinterpret_cast<u8*>(SoundBuffer_802FFC60) + SoundBufferIndex * 0x280), 0x280);
         AIStartDMA();
     }
 

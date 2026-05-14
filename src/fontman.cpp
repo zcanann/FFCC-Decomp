@@ -173,10 +173,7 @@ use_glyph:
 		if (GetRenderFlagBits(renderFlags).snapPosition != 0) {
 			charWidth = static_cast<float>(floor(charWidth));
 		}
-
-add_width:
-		width += charWidth;
-		goto read_char;
+		goto add_width;
 
 find_fallback:
 		unsigned short* glyphBucket = m_glyphBuckets[63];
@@ -196,7 +193,10 @@ use_fallback_glyph:
 			goto found_glyph;
 		}
 		charWidth = FLOAT_803306B8;
-		goto add_width;
+
+add_width:
+		width += charWidth;
+		goto read_char;
 
 read_char:
 		if (static_cast<unsigned char>(*textPtr) == 0) {

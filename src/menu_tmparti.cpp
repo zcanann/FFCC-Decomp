@@ -41,11 +41,12 @@ extern const double DOUBLE_80333420 = 216.0;
 static inline double TmpArtiIntToDouble(int value)
 {
     union {
-        unsigned long long bits;
         double value;
+        u32 words[2];
     } conv;
 
-    conv.bits = 0x4330000000000000ULL | (unsigned int)(value ^ 0x80000000U);
+    conv.words[0] = 0x43300000;
+    conv.words[1] = value ^ 0x80000000U;
     return conv.value - DOUBLE_80332f40;
 }
 

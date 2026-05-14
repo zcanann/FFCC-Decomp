@@ -141,10 +141,15 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XUnkB* param_2,
     long* shapeEntry;
     s32 count;
     float alphaMul;
-    pppFVECTOR4 color;
-    pppFVECTOR4 endColor;
     float zero;
-    pppFVECTOR4 colorStep;
+    float colorR;
+    float colorG;
+    float colorB;
+    float colorA;
+    float colorStepR;
+    float colorStepG;
+    float colorStepB;
+    float colorStepA;
     float invCountMinusOne;
     pppFMATRIX localBase;
     pppFMATRIX drawMtx;
@@ -182,20 +187,20 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XUnkB* param_2,
     count = step->m_drawCount;
     invCountMinusOne = (float)(count - 1);
     alphaMul = (float)*(s16*)((u8*)obj + 0x86 + offsets->m_serializedDataOffsets[1]) / kPppKeShpTail2XAlphaScale;
-    U8ToF32(&color, &step->m_colorStartR);
-    color.w *= alphaMul;
-    U8ToF32(&endColor, &step->m_colorEndR);
-    endColor.w *= alphaMul;
+    colorR = step->m_colorStartR;
+    colorG = step->m_colorStartG;
+    colorB = step->m_colorStartB;
+    colorA = (float)step->m_colorStartA * alphaMul;
     if (invCountMinusOne != zero) {
-        colorStep.x = (color.x - endColor.x) / invCountMinusOne;
-        colorStep.y = (color.y - endColor.y) / invCountMinusOne;
-        colorStep.z = (color.z - endColor.z) / invCountMinusOne;
-        colorStep.w = (color.w - endColor.w) / invCountMinusOne;
+        colorStepR = (colorR - (float)step->m_colorEndR) / invCountMinusOne;
+        colorStepG = (colorG - (float)step->m_colorEndG) / invCountMinusOne;
+        colorStepB = (colorB - (float)step->m_colorEndB) / invCountMinusOne;
+        colorStepA = (colorA - ((float)step->m_colorEndA * alphaMul)) / invCountMinusOne;
     } else {
-        colorStep.x = FLOAT_80330508;
-        colorStep.y = FLOAT_80330508;
-        colorStep.z = FLOAT_80330508;
-        colorStep.w = FLOAT_80330508;
+        colorStepR = FLOAT_80330508;
+        colorStepG = FLOAT_80330508;
+        colorStepB = FLOAT_80330508;
+        colorStepA = FLOAT_80330508;
     }
 
     work = (KeShpTail2XWork*)((u8*)obj + 0x80 + offsets->m_serializedDataOffsets[0]);
@@ -270,10 +275,10 @@ draw_loop:
 
     {
         GXColor amb;
-        amb.r = (u8)color.x;
-        amb.g = (u8)color.y;
-        amb.b = (u8)color.z;
-        amb.a = (u8)color.w;
+        amb.r = (u8)colorR;
+        amb.g = (u8)colorG;
+        amb.b = (u8)colorB;
+        amb.a = (u8)colorA;
         GXSetChanAmbColor(GX_COLOR0A0, amb);
     }
 
@@ -286,10 +291,10 @@ update_step:
         return;
     }
 
-    color.x -= colorStep.x;
-    color.y -= colorStep.y;
-    color.z -= colorStep.z;
-    color.w -= colorStep.w;
+    colorR -= colorStepR;
+    colorG -= colorStepG;
+    colorB -= colorStepB;
+    colorA -= colorStepA;
     drawScale -= scaleStepDelta;
     if (trailStep <= zero) {
         return;

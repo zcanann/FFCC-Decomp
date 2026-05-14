@@ -216,7 +216,7 @@ CGame Game;
 
 // Uninitialized
 static float FLOAT_8032ec40;
-static bool BOOL_8032ec44;
+static s8 BOOL_8032ec44;
 
 /*
  * --INFO--
@@ -1033,47 +1033,29 @@ void CGame::Calc()
 
         if (partyObj != 0) {
             position = partyObj->m_worldPosition.x;
-            if (m_partyMinX < position) {
-                position = m_partyMinX;
-            }
-            m_partyMinX = position;
+            m_partyMinX = (m_partyMinX < position) ? m_partyMinX : position;
 
             position = partyObj->m_worldPosition.y;
-            if (m_partyMinY < position) {
-                position = m_partyMinY;
-            }
-            m_partyMinY = position;
+            m_partyMinY = (m_partyMinY < position) ? m_partyMinY : position;
 
             position = partyObj->m_worldPosition.z;
-            if (m_partyMinZ < position) {
-                position = m_partyMinZ;
-            }
-            m_partyMinZ = position;
+            m_partyMinZ = (m_partyMinZ < position) ? m_partyMinZ : position;
 
             position = partyObj->m_worldPosition.x;
-            if (position < m_partyMaxX) {
-                position = m_partyMaxX;
-            }
-            m_partyMaxX = position;
+            m_partyMaxX = (position < m_partyMaxX) ? m_partyMaxX : position;
 
             position = partyObj->m_worldPosition.y;
-            if (position < m_partyMaxY) {
-                position = m_partyMaxY;
-            }
-            m_partyMaxY = position;
+            m_partyMaxY = (position < m_partyMaxY) ? m_partyMaxY : position;
 
             position = partyObj->m_worldPosition.z;
-            if (position < m_partyMaxZ) {
-                position = m_partyMaxZ;
-            }
-            m_partyMaxZ = position;
+            m_partyMaxZ = (position < m_partyMaxZ) ? m_partyMaxZ : position;
         }
     }
 
     Wind.Frame();
-    gCFlatRuntime2.Calc();
+    reinterpret_cast<CFlatRuntime2*>(CFlat)->Calc();
     reinterpret_cast<CFlatRuntime*>(CFlat)->ResetPerformance();
-    gCFlatRuntime2.Frame(1, 0);
+    reinterpret_cast<CFlatRuntime2*>(CFlat)->Frame(1, 0);
 
     if ((m_currentMapId == 0x21) && ((mapObjIdx = GetMapObjIdx__7CMapMngFUs(&MapMng, 0)) >= 0)) {
             if (!BOOL_8032ec44) {

@@ -110,6 +110,13 @@ struct CTexScrollStorage
     float v1;
 };
 
+struct CMaterialSetStorage
+{
+    void* vtable;
+    int refCount;
+    CPtrArray<CMaterial*> materials;
+};
+
 static inline unsigned char* Ptr(void* p, unsigned int offset)
 {
     return reinterpret_cast<unsigned char*>(p) + offset;
@@ -800,9 +807,10 @@ CTexAnimSet* CTexAnimSet::Duplicate(CMemory::CStage* stage)
 void CTexAnimSet::AttachMaterialSet(CMaterialSet* materialSet)
 {
     CTexAnimSetStorage* self = reinterpret_cast<CTexAnimSetStorage*>(this);
-    CPtrArray<CMaterial*>* materials = reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(materialSet, 8));
+    CMaterialSetStorage* materialSetStorage = reinterpret_cast<CMaterialSetStorage*>(materialSet);
     unsigned int texAnimIndex;
     unsigned int texAnimCount;
+    int materialIndex;
 
     for (texAnimIndex = 0;
          ((texAnimCount = static_cast<unsigned int>(self->texAnims.GetSize())), texAnimIndex < texAnimCount);
@@ -819,12 +827,9 @@ void CTexAnimSet::AttachMaterialSet(CMaterialSet* materialSet)
             *reinterpret_cast<int*>((int)texAnim->refData + 0x108) = 0;
         }
 
-        if (materialSet != 0) {
-            unsigned long materialIndex = materialSet->Find(reinterpret_cast<char*>((int)texAnim->refData + 8));
-            if (static_cast<int>(materialIndex) < 0) {
-                continue;
-            }
-            void* foundMaterial = (*materials)[materialIndex];
+        if ((materialSet != 0) &&
+            ((materialIndex = materialSet->Find(reinterpret_cast<char*>((int)texAnim->refData + 8))), materialIndex >= 0)) {
+            CMaterial* foundMaterial = materialSetStorage->materials[materialIndex];
             *reinterpret_cast<void**>((int)texAnim->refData + 0x108) = foundMaterial;
             material = reinterpret_cast<int*>(*reinterpret_cast<void**>((int)texAnim->refData + 0x108));
             material[1] = material[1] + 1;

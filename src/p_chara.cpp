@@ -1815,8 +1815,12 @@ void CCharaPcs::LoadCam(int index, char* fileName)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800778dc
+ * PAL Size: 2804b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CCharaPcs::LoadMergeFile(int mergeFileId, int mergeFlags, int streamToAmem)
 {
@@ -1865,6 +1869,7 @@ void CCharaPcs::LoadMergeFile(int mergeFileId, int mergeFlags, int streamToAmem)
         return;
     }
 
+    CCharaPcs* pcs = &CharaPcs;
     int mergePartCount = 1;
     for (int mergePartIndex = 0; mergePartIndex < mergePartCount; mergePartIndex++) {
         char path[0x100];
@@ -1926,8 +1931,8 @@ void CCharaPcs::LoadMergeFile(int mergeFileId, int mergeFlags, int streamToAmem)
 
                     if (dataType == 0) {
                         CLoadModel* loadModel = 0;
-                        for (int i = 0; i < LoadModelArray(this)->GetSize(); i++) {
-                            CLoadModel* it = (*LoadModelArray(this))[static_cast<unsigned long>(i)];
+                        for (int i = 0; i < LoadModelArray(pcs)->GetSize(); i++) {
+                            CLoadModel* it = (*LoadModelArray(pcs))[static_cast<unsigned long>(i)];
                             if (it != 0 && it->m_keyTag == keyTag && it->m_keyId == keyId) {
                                 loadModel = it;
                                 break;
@@ -1935,7 +1940,7 @@ void CCharaPcs::LoadMergeFile(int mergeFileId, int mergeFlags, int streamToAmem)
                         }
 
                         if (loadModel == 0) {
-                            loadModel = new (StageAt(this, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x5E8) CLoadModel;
+                            loadModel = new (StageAt(pcs, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x5E8) CLoadModel;
                             if (loadModel != 0) {
                                 loadModel->m_keyTag = keyTag;
                                 loadModel->m_keyId = keyId;
@@ -1945,15 +1950,15 @@ void CCharaPcs::LoadMergeFile(int mergeFileId, int mergeFlags, int streamToAmem)
                                 loadModel->m_streamMode = 0;
                                 loadModel->m_streamOffset = 0;
                                 loadModel->m_streamSize = 0;
-                                LoadModelArray(this)->Add(loadModel);
+                                LoadModelArray(pcs)->Add(loadModel);
 
                                 if (streamToAmem == 0) {
                                     loadModel->m_model = reinterpret_cast<CChara::CModel*>(
-                                        __nw__FUlPQ27CMemory6CStagePci(0x124, StageAt(this, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x5F1));
+                                        __nw__FUlPQ27CMemory6CStagePci(0x124, StageAt(pcs, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x5F1));
                                     if (loadModel->m_model != 0) {
                                         loadModel->m_model = reinterpret_cast<CChara::CModel*>(__ct__Q26CChara6CModelFv(loadModel->m_model));
                                         Create__Q26CChara6CModelFPvPQ27CMemory6CStage(
-                                            loadModel->m_model, rawData, SelectLoadStage(this, StageAt(this, 0xCC)));
+                                            loadModel->m_model, rawData, SelectLoadStage(pcs, StageAt(pcs, 0xCC)));
                                     }
                                 } else {
                                     loadModel->m_streamMode = 1;
@@ -1970,12 +1975,12 @@ void CCharaPcs::LoadMergeFile(int mergeFileId, int mergeFlags, int streamToAmem)
 
                         if (hasDynamics != 0 && loadModel != 0 && loadModel->m_model != 0 && chunkFile.GetNextChunk(chunk)) {
                             CreateDynamics__Q26CChara6CModelFPvPQ27CMemory6CStage(
-                                loadModel->m_model, chunkFile.GetAddress(), SelectLoadStage(this, StageAt(this, 0xCC)));
+                                loadModel->m_model, chunkFile.GetAddress(), SelectLoadStage(pcs, StageAt(pcs, 0xCC)));
                         }
                     } else if (dataType == 1) {
                         CLoadTexture* loadTexture = 0;
-                        for (int i = 0; i < LoadTextureArray(this)->GetSize(); i++) {
-                            CLoadTexture* it = (*LoadTextureArray(this))[static_cast<unsigned long>(i)];
+                        for (int i = 0; i < LoadTextureArray(pcs)->GetSize(); i++) {
+                            CLoadTexture* it = (*LoadTextureArray(pcs))[static_cast<unsigned long>(i)];
                             if (it != 0 && it->m_keyTag == keyTag && it->m_keyId == keyId && it->m_variantTag == variantTag) {
                                 loadTexture = it;
                                 break;
@@ -1983,7 +1988,7 @@ void CCharaPcs::LoadMergeFile(int mergeFileId, int mergeFlags, int streamToAmem)
                         }
 
                         if (loadTexture == 0) {
-                            loadTexture = new (StageAt(this, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x609) CLoadTexture;
+                            loadTexture = new (StageAt(pcs, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x609) CLoadTexture;
                             if (loadTexture != 0) {
                                 loadTexture->m_keyTag = keyTag;
                                 loadTexture->m_keyId = keyId;
@@ -1994,16 +1999,16 @@ void CCharaPcs::LoadMergeFile(int mergeFileId, int mergeFlags, int streamToAmem)
                                 loadTexture->m_streamMode = 0;
                                 loadTexture->m_streamOffset = 0;
                                 loadTexture->m_streamSize = 0;
-                                LoadTextureArray(this)->Add(loadTexture);
+                                LoadTextureArray(pcs)->Add(loadTexture);
 
                                 if (streamToAmem == 0) {
                                     loadTexture->m_textureSet =
-                                        new (StageAt(this, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x397) CTextureSet;
+                                        new (StageAt(pcs, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x397) CTextureSet;
                                     if (loadTexture->m_textureSet != 0) {
                                         loadTexture->m_textureSet->Create(
                                             rawData,
                                             SelectLoadStage(
-                                                this, StageAt(this, variantTag == reinterpret_cast<void*>(4) ? 0xD8 : 0xD0)),
+                                                pcs, StageAt(pcs, variantTag == reinterpret_cast<void*>(4) ? 0xD8 : 0xD0)),
                                             0, 0, 0, 0);
                                     }
                                 } else {
@@ -2020,8 +2025,8 @@ void CCharaPcs::LoadMergeFile(int mergeFileId, int mergeFlags, int streamToAmem)
                         }
                     } else if (dataType == 2) {
                         CLoadAnim* loadAnim = 0;
-                        for (int i = 0; i < LoadAnimArray(this)->GetSize(); i++) {
-                            CLoadAnim* it = (*LoadAnimArray(this))[static_cast<unsigned long>(i)];
+                        for (int i = 0; i < LoadAnimArray(pcs)->GetSize(); i++) {
+                            CLoadAnim* it = (*LoadAnimArray(pcs))[static_cast<unsigned long>(i)];
                             if (it != 0 && it->m_keyTag == keyTag && it->m_keyId == keyId &&
                                 animName != 0 && strcmp(it->m_name, animName) == 0) {
                                 loadAnim = it;
@@ -2031,13 +2036,13 @@ void CCharaPcs::LoadMergeFile(int mergeFileId, int mergeFlags, int streamToAmem)
 
                         if (loadAnim == 0) {
                             CChara::CAnim* anim = reinterpret_cast<CChara::CAnim*>(
-                                __nw__FUlPQ27CMemory6CStagePci(0x30, StageAt(this, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x62A));
+                                __nw__FUlPQ27CMemory6CStagePci(0x30, StageAt(pcs, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x62A));
                             if (anim != 0) {
                                 anim = reinterpret_cast<CChara::CAnim*>(__ct__Q26CChara5CAnimFv(anim));
-                                Create__Q26CChara5CAnimFPvPQ27CMemory6CStage(anim, rawData, StageAt(this, 0xD4));
+                                Create__Q26CChara5CAnimFPvPQ27CMemory6CStage(anim, rawData, StageAt(pcs, 0xD4));
                             }
 
-                            loadAnim = new (StageAt(this, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x62D) CLoadAnim;
+                            loadAnim = new (StageAt(pcs, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x62D) CLoadAnim;
                             if (loadAnim != 0) {
                                 loadAnim->m_keyTag = keyTag;
                                 loadAnim->m_keyId = keyId;
@@ -2045,7 +2050,7 @@ void CCharaPcs::LoadMergeFile(int mergeFileId, int mergeFlags, int streamToAmem)
                                 loadAnim->m_mergeFlags = mergeFlags;
                                 strcpy(loadAnim->m_name, animName != 0 ? animName : "");
                                 loadAnim->m_anim = anim;
-                                LoadAnimArray(this)->Add(loadAnim);
+                                LoadAnimArray(pcs)->Add(loadAnim);
                             }
                         }
                     } else if (dataType == 3) {
@@ -2054,8 +2059,8 @@ void CCharaPcs::LoadMergeFile(int mergeFileId, int mergeFlags, int streamToAmem)
                         LoadWave__6CSoundFPv(&Sound, rawData);
                     } else if (dataType == 5) {
                         CLoadPdt* loadPdt = 0;
-                        for (int i = 0; i < LoadPdtArray(this)->GetSize(); i++) {
-                            CLoadPdt* it = (*LoadPdtArray(this))[static_cast<unsigned long>(i)];
+                        for (int i = 0; i < LoadPdtArray(pcs)->GetSize(); i++) {
+                            CLoadPdt* it = (*LoadPdtArray(pcs))[static_cast<unsigned long>(i)];
                             if (it != 0 && it->m_keyTag == keyTag && it->m_keyId == keyId && it->m_variantTag == variantTag) {
                                 loadPdt = it;
                                 break;
@@ -2063,7 +2068,7 @@ void CCharaPcs::LoadMergeFile(int mergeFileId, int mergeFlags, int streamToAmem)
                         }
 
                         if (loadPdt == 0 && chunkFile.GetNextChunk(chunk)) {
-                            loadPdt = new (StageAt(this, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x572) CLoadPdt;
+                            loadPdt = new (StageAt(pcs, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x572) CLoadPdt;
                             if (loadPdt != 0) {
                                 loadPdt->m_keyTag = keyTag;
                                 loadPdt->m_keyId = keyId;
@@ -2073,7 +2078,7 @@ void CCharaPcs::LoadMergeFile(int mergeFileId, int mergeFlags, int streamToAmem)
                                     static_cast<int>(chunk.m_size));
                                 loadPdt->m_mergeFileId = mergeFileId;
                                 loadPdt->m_mergeFlags = mergeFlags;
-                                LoadPdtArray(this)->Add(loadPdt);
+                                LoadPdtArray(pcs)->Add(loadPdt);
                             }
                         }
                     }

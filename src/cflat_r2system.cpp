@@ -60,7 +60,6 @@ unsigned short GetButtonDown__4CPadFl(void*, long);
 void Printf__7CSystemFPce(CSystem*, const char*, ...);
 int sprintf(char*, const char*, ...);
 unsigned char gMapHitDrawMode;
-extern unsigned char s_bitMask;
 }
 extern unsigned char CFlat[0x10440];
 extern int gWmMenuWorkA;
@@ -1252,7 +1251,7 @@ void CCameraPcs::GetWorldMapMatrix(float (*matrix)[4])
  */
 extern "C" void IsHitDrawMode__7CMapPcsFc(CMapPcs*, unsigned char drawMode)
 {
-    s_bitMask = drawMode;
+    gMapHitDrawMode = drawMode;
 }
 
 /*

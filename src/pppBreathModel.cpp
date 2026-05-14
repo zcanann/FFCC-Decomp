@@ -27,7 +27,7 @@ void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 void DrawSphere__8CGraphicFPA4_f8_GXColor(void*, Mtx, _GXColor);
 }
 
-extern "C" const char s_pppBreathModel_cpp_801DB5A0[] = "pppBreathModel.cpp";
+extern "C" const char s_pppBreathModel_cpp_801DB5A0[24] = "pppBreathModel.cpp";
 
 struct pppBreathModelUnkC {
     unsigned char _pad[0xC];

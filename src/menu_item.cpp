@@ -344,8 +344,7 @@ int CMenuPcs::ItemCtrlCur()
  */
 void CMenuPcs::ItemDraw()
 {
-    bool hasSelectedItem = false;
-    int selectedItemId;
+    int selectedItemId = -1;
 
     _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
     SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(&MenuPcs, 0);
@@ -501,7 +500,6 @@ void CMenuPcs::ItemDraw()
                 selectedIndex -= 0x40;
             }
             if (menuIndex == selectedIndex) {
-                hasSelectedItem = true;
                 selectedItemId = itemId;
             }
 
@@ -566,10 +564,6 @@ void CMenuPcs::ItemDraw()
 
     DrawInit__8CMenuPcsFv(this);
     DrawSingLife__8CMenuPcsFv(this);
-
-    if (!hasSelectedItem) {
-        selectedItemId = -1;
-    }
 
     CFont* helpFont = this->helpFont;
     CColor helpColor(0xFF, 0xFF, 0xFF, (u8)(FLOAT_80332e80 * *(float*)(cursorEntry + 8)));

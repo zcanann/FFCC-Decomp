@@ -435,9 +435,8 @@ void StreamPause(int streamID, int pause)
 				}
 			} else if (voiceData->m_axVoice != 0) {
 				unsigned int pitch = PitchCompute(REDSOUND_STREAM_BASE_PITCH, 0, streamData->m_header.m_pitch, 0);
-				short channelCount = streamData->m_header.m_channelCount;
 				volume = streamData->m_volume.m_value >> REDSOUND_FIXED_SHIFT;
-				if (channelCount == REDSOUND_STREAM_STEREO_CHANNEL_COUNT) {
+				if (streamData->m_header.m_channelCount == REDSOUND_STREAM_STEREO_CHANNEL_COUNT) {
 					voiceData->m_targetPitch = pitch;
 					voiceData->m_flags |= REDSOUND_VOICE_FLAGS_PITCH_DIRTY;
 					voiceData[REDSOUND_STREAM_RIGHT_CHANNEL].m_targetPitch = pitch;

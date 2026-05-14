@@ -248,18 +248,18 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
 void pppFrameYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthShpTail3* param, pppYmMegaBirthShpTail3UnkC* offsets)
 {
     s8 hasRequiredMemory;
-    int colorOffset;
-    u8* paramPayload;
-    VYmMegaBirthShpTail3* work;
-    VColor* colorWork;
-    u8* particleData;
     u32 i;
-    _PARTICLE_COLOR* particleColor;
+    u8* paramPayload;
+    int colorOffset;
+    u8* particleData;
     _PARTICLE_WMAT* worldMat;
+    _PARTICLE_COLOR* particleColor;
+    int spawnCount;
 
     colorOffset = offsets->m_serializedDataOffsets[1];
-    work = (VYmMegaBirthShpTail3*)((u8*)object + 0x80 + offsets->m_serializedDataOffsets[2]);
-    colorWork = (VColor*)((u8*)object + 0x80 + colorOffset);
+    VYmMegaBirthShpTail3* const work =
+        (VYmMegaBirthShpTail3*)((u8*)object + 0x80 + offsets->m_serializedDataOffsets[2]);
+    VColor* const colorWork = (VColor*)((u8*)object + 0x80 + colorOffset);
     paramPayload = (u8*)param;
 
     if (work->m_particles == 0) {
@@ -392,10 +392,10 @@ void pppFrameYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthShp
             break;
         }
 
+        spawnCount = 0;
         particleData = (u8*)work->m_particles;
         particleColor = work->m_colors;
         worldMat = work->m_wmats;
-        int spawnCount = 0;
 
         if ((gPppCalcDisabled == 0) && (*(s32*)(paramPayload + 4) != 0xffff)) {
             work->m_lifeLimit = work->m_lifeLimit + 1;

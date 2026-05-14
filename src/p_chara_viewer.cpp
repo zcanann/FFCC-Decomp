@@ -119,6 +119,32 @@ struct CharaViewerSRT {
 
 typedef char CharaViewerSRT_size_check[(sizeof(CharaViewerSRT) == 0x24) ? 1 : -1];
 
+struct CharaViewerModelData {
+    u8 _pad00[0x08];
+    u16 nodeCount;
+    u16 meshCount;
+    u8 _pad0C[0x28];
+    int frameShift;
+};
+
+struct CharaViewerModel {
+    u8 _pad00[0xA4];
+    CharaViewerModelData* data;
+    u8 _padA8[0x08];
+    CTextureSet* textureSet;
+    float currentFrame;
+    u8 _padB8[0x18];
+    CChara::CAnim* anim;
+    CTexAnimSet* texAnimSet;
+};
+
+typedef char CharaViewerModel_size_check[(sizeof(CharaViewerModel) == 0xD8) ? 1 : -1];
+
+static inline CharaViewerModel* ViewerModel(CChara::CModel* model)
+{
+    return reinterpret_cast<CharaViewerModel*>(model);
+}
+
 static inline void destroyRef(int* ref)
 {
     (*reinterpret_cast<void (***)(void*, int)>(ref))[2](ref, 1);
@@ -145,31 +171,34 @@ static inline void AddSharedRef(T* ptr)
     }
 }
 
-static inline float& ViewerModelTime(void* model)
+static inline float& ViewerModelTime(CChara::CModel* model)
 {
-    return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(model) + 0xB4);
+    return ViewerModel(model)->currentFrame;
 }
 
-static inline CChara::CAnim*& ViewerModelAnim(void* model)
+static inline CChara::CAnim*& ViewerModelAnim(CChara::CModel* model)
 {
-    return *reinterpret_cast<CChara::CAnim**>(reinterpret_cast<unsigned char*>(model) + 0xD0);
+    return ViewerModel(model)->anim;
 }
 
-static inline CTexAnimSet*& ViewerModelTexAnimSet(void* model)
+static inline CTexAnimSet*& ViewerModelTexAnimSet(CChara::CModel* model)
 {
-    return *reinterpret_cast<CTexAnimSet**>(reinterpret_cast<unsigned char*>(model) + 0xD4);
+    return ViewerModel(model)->texAnimSet;
 }
 
-static inline int ViewerModelNodeCount(void* model)
+static inline CTextureSet*& ViewerModelTextureSet(CChara::CModel* model)
 {
-    unsigned char* modelData = *reinterpret_cast<unsigned char**>(reinterpret_cast<unsigned char*>(model) + 0xA4);
-    return *reinterpret_cast<int*>(modelData + 8);
+    return ViewerModel(model)->textureSet;
 }
 
-static inline int ViewerModelFrameShift(void* model)
+static inline int ViewerModelNodeCount(CChara::CModel* model)
 {
-    unsigned char* modelData = *reinterpret_cast<unsigned char**>(reinterpret_cast<unsigned char*>(model) + 0xA4);
-    return *reinterpret_cast<int*>(modelData + 0x34);
+    return ViewerModel(model)->data->nodeCount;
+}
+
+static inline int ViewerModelFrameShift(CChara::CModel* model)
+{
+    return ViewerModel(model)->data->frameShift;
 }
 
 extern "C" const char s_no_texture____801da7e8[];
@@ -289,9 +318,9 @@ void CCharaPcs::drawViewer()
     }
 
     for (unsigned int i = 0; i < 2; i++) {
-        unsigned char* model = reinterpret_cast<unsigned char*>(self->m_viewerModel[i]);
+        CChara::CModel* model = self->m_viewerModel[i];
         if (model != 0) {
-            if (*(int*)(model + 0xB0) == 0) {
+            if (ViewerModelTextureSet(model) == 0) {
                 Printf__8CGraphicFPce(&Graphic, s_no_texture);
             } else {
                 CStopWatch watch(const_cast<char*>(kCharaViewerNoName));
@@ -307,7 +336,7 @@ void CCharaPcs::drawViewer()
                 }
 
                 Vec lightPos;
-                PSMTXCopy((const float(*)[4])(model + 8), scratchMtx);
+                PSMTXCopy((const float(*)[4])(reinterpret_cast<unsigned char*>(model) + 8), scratchMtx);
                 lightPos.x = scratchMtx[0][3];
                 lightPos.y = scratchMtx[1][3];
                 lightPos.z = scratchMtx[2][3];
@@ -566,7 +595,7 @@ void CCharaPcs::calcViewer()
     }
 
     for (unsigned int i = 0; i < 2; i++) {
-        unsigned char* model = reinterpret_cast<unsigned char*>(self->m_viewerModel[i]);
+        CChara::CModel* model = self->m_viewerModel[i];
         if (model == 0) {
             continue;
         }
@@ -595,7 +624,7 @@ void CCharaPcs::calcViewer()
         unsigned char* anim = reinterpret_cast<unsigned char*>(self->m_viewerAnim[i]);
         if (anim != 0) {
             if ((i == 0) && (self->m_viewerAnimLoadedCount != 0)) {
-                SetFrame__Q26CChara6CModelFf(*(float*)(model + 0xB4) + frameAdvance, model);
+                SetFrame__Q26CChara6CModelFf(ViewerModelTime(model) + frameAdvance, model);
                 float animFrames = (float)*(unsigned short*)(anim + 0x10);
                 if (animFrames <= ViewerModelTime(self->m_viewerModel[0])) {
                     int nextIndex = self->m_viewerAnimLoopIndex + 1;
@@ -611,21 +640,21 @@ void CCharaPcs::calcViewer()
                 float animFrames = static_cast<float>(*reinterpret_cast<unsigned short*>(
                     reinterpret_cast<unsigned char*>(self->m_viewerAnim[0]) + 0x10));
                 if (self->m_viewerSavedAnimState == 0) {
-                    if (self->m_viewerSavedFrame + animFrames <= *(float*)(model + 0xB4)) {
+                    if (self->m_viewerSavedFrame + animFrames <= ViewerModelTime(model)) {
                         self->m_viewerSavedAnimState = 1;
                         AttachAnim__Q26CChara6CModelFPQ26CChara5CAnimiii(
                             model, self->m_viewerSavedAnim, -1, -1, -1);
                     }
                 } else {
-                    if (animFrames <= *(float*)(model + 0xB4)) {
+                    if (animFrames <= ViewerModelTime(model)) {
                         self->m_viewerSavedAnimState = 0;
                         AttachAnim__Q26CChara6CModelFPQ26CChara5CAnimiii(
                             model, self->m_viewerAnim[0], -1, -1, 0);
                     }
                 }
-                SetFrame__Q26CChara6CModelFf(*(float*)(model + 0xB4) + frameAdvance, model);
+                SetFrame__Q26CChara6CModelFf(ViewerModelTime(model) + frameAdvance, model);
             } else {
-                SetFrame__Q26CChara6CModelFf(*(float*)(model + 0xB4) + frameAdvance, model);
+                SetFrame__Q26CChara6CModelFf(ViewerModelTime(model) + frameAdvance, model);
             }
         }
 
@@ -722,7 +751,6 @@ void CCharaPcs::createViewer()
     unsigned char white[4];
     char pathBuf[256];
     CFile::CHandle* fileHandle;
-    unsigned char bumpLight[0x138];
     Vec lightPos;
     Vec lightTarget;
     Vec lightDir;
@@ -839,8 +867,8 @@ void CCharaPcs::createViewer()
         File.Close(fileHandle);
     }
 
-    __ct__Q29CLightPcs10CBumpLightFv(bumpLight);
-    *(int*)(bumpLight + 0x00) = 1;
+    CLightPcs::CBumpLight bumpLight;
+    bumpLight.m_type = 1;
     lightPos.x = kCharaViewerLightPosX;
     lightPos.y = kCharaViewerLightPosY;
     lightPos.z = kCharaViewerLightPosZ;
@@ -849,14 +877,14 @@ void CCharaPcs::createViewer()
     lightTarget.z = kCharaViewerLightTargetZ;
     PSVECSubtract(&lightTarget, &lightPos, &lightDir);
     PSVECNormalize(&lightDir, &lightDir);
-    *(unsigned char*)(bumpLight + 0x68) = 0x80;
-    *(unsigned char*)(bumpLight + 0x69) = 0x80;
-    *(unsigned char*)(bumpLight + 0x6A) = 0;
-    *(unsigned char*)(bumpLight + 0x6B) = 0xFF;
-    *(float*)(bumpLight + 0x2C) = kCharaViewerZero;
-    *(float*)(bumpLight + 0x30) = kCharaViewerZero;
+    bumpLight.m_bumpShade[0] = 0x80;
+    bumpLight.m_bumpShade[1] = 0x80;
+    bumpLight.m_bumpShade[2] = 0;
+    bumpLight.m_bumpShade[3] = 0xFF;
+    bumpLight.m_offsetX = kCharaViewerZero;
+    bumpLight.m_offsetZ = kCharaViewerZero;
     gCharaPartWorkPtr = reinterpret_cast<u8*>(AddBump__9CLightPcsFPQ29CLightPcs6CLightQ29CLightPcs6TARGETPQ27CMemory6CStagei(
-        &LightPcs, bumpLight, 0, *(void**)(reinterpret_cast<unsigned char*>(&Chara) + 0x2058), 4));
+        &LightPcs, &bumpLight, 0, *(void**)(reinterpret_cast<unsigned char*>(&Chara) + 0x2058), 4));
 
     Create__6CCharaFv(&Chara);
 }

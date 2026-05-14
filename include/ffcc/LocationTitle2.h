@@ -4,15 +4,7 @@
 #include "ffcc/partMng.h"
 #include <dolphin/types.h>
 
-struct pppLocationTitle2 {
-    u32 m_unk0;
-    u32 m_unk4;
-    u32 m_unk8;
-    s32 m_graphId;
-    pppFMATRIX m_localMatrix;
-    char m_pad[0x54];
-    void* field_0x88;
-};
+typedef _pppPObject pppLocationTitle2;
 
 struct pppLocationTitle2UnkB {
     s32 m_graphId;
@@ -33,10 +25,7 @@ struct pppLocationTitle2UnkB {
     u8 _pad0x23;
 };
 
-struct pppLocationTitle2UnkC {
-    char pad[0xC];
-    s32* m_serializedDataOffsets;
-};
+typedef _pppCtrlTable pppLocationTitle2UnkC;
 
 #ifdef __cplusplus
 extern "C" {

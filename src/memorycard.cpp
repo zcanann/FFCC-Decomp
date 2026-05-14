@@ -1510,7 +1510,7 @@ int CMemoryCardMan::DummySave()
     m_result = result;
 
     // Busy-wait for async completion
-    while ((-((int)m_opDoneFlag) | (int)m_opDoneFlag) >= 0)
+    while ((((u32)(-((int)m_opDoneFlag) | (int)m_opDoneFlag)) >> 31) != 1)
     {
     }
 
@@ -1526,7 +1526,7 @@ int CMemoryCardMan::DummySave()
         }
         m_result = result;
 
-        while ((-((int)m_opDoneFlag) | (int)m_opDoneFlag) >= 0)
+        while ((((u32)(-((int)m_opDoneFlag) | (int)m_opDoneFlag)) >> 31) != 1)
         {
         }
 
@@ -1590,7 +1590,7 @@ int CMemoryCardMan::DummySave()
         }
         m_result = result;
 
-        while ((-((int)m_opDoneFlag) | (int)m_opDoneFlag) >= 0)
+        while ((((u32)(-((int)m_opDoneFlag) | (int)m_opDoneFlag)) >> 31) != 1)
         {
         }
 
@@ -1665,7 +1665,7 @@ int CMemoryCardMan::DummySave()
         }
         m_result = result;
 
-        while ((-((int)m_opDoneFlag) | (int)m_opDoneFlag) >= 0)
+        while ((((u32)(-((int)m_opDoneFlag) | (int)m_opDoneFlag)) >> 31) != 1)
         {
         }
 
@@ -1753,7 +1753,7 @@ int CMemoryCardMan::DummySave()
     }
     m_result = result;
 
-    while ((-((int)m_opDoneFlag) | (int)m_opDoneFlag) >= 0)
+    while ((((u32)(-((int)m_opDoneFlag) | (int)m_opDoneFlag)) >> 31) != 1)
     {
     }
 
@@ -1848,7 +1848,7 @@ int CMemoryCardMan::DummyLoad()
     m_result = result;
 
     // Busy wait for async completion
-    while ( ((-(int)m_opDoneFlag) | (int)m_opDoneFlag) >= 0 )
+    while ((((u32)(-((int)m_opDoneFlag) | (int)m_opDoneFlag)) >> 31) != 1)
     {
     }
 
@@ -1924,7 +1924,7 @@ int CMemoryCardMan::DummyLoad()
     m_result = result;
 
     // Wait for read to finish
-    while ( ((-(int)m_opDoneFlag) | (int)m_opDoneFlag) >= 0 )
+    while ((((u32)(-((int)m_opDoneFlag) | (int)m_opDoneFlag)) >> 31) != 1)
     {
     }
 

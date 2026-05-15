@@ -330,14 +330,18 @@ enum RedSeBlockEntryLayout {
 
 #define REDSOUND_SE_BLOCK_DATA_NONE 0
 
+#define RedSeBlockGetInfoBase(seBlock) RedSeBlockGetInfoBaseFromEntries(seBlock, (seBlock)->m_entries)
+
+#define RedSeBlockGetInfoBaseFromEntries(seBlock, entries)                                       \
+	(reinterpret_cast<unsigned char*>(entries) +                                                  \
+	 (seBlock)->m_seCount * REDSOUND_SE_BLOCK_ENTRY_SIZE)
+
 #define RedSeBlockGetInfo(seBlock, seIndex)                                                       \
-	reinterpret_cast<RedSeINFO*>(reinterpret_cast<unsigned char*>((seBlock)->m_entries) +          \
-	                             (seBlock)->m_seCount * REDSOUND_SE_BLOCK_ENTRY_SIZE +             \
+	reinterpret_cast<RedSeINFO*>(RedSeBlockGetInfoBase(seBlock) +                                  \
 	                             ((seBlock)->m_entries[(seIndex)] & REDSOUND_SE_BLOCK_ENTRY_MASK))
 
 #define RedSeBlockGetInfoFromEntries(seBlock, entries, seIndex)                                   \
-	reinterpret_cast<RedSeINFO*>(reinterpret_cast<unsigned char*>(entries) +                        \
-	                             (seBlock)->m_seCount * REDSOUND_SE_BLOCK_ENTRY_SIZE +             \
+	reinterpret_cast<RedSeINFO*>(RedSeBlockGetInfoBaseFromEntries(seBlock, entries) +              \
 	                             ((entries)[(seIndex)] & REDSOUND_SE_BLOCK_ENTRY_MASK))
 
 #define RedSeBlockGetInfoFromOffset(entries, infoOffset)                                          \

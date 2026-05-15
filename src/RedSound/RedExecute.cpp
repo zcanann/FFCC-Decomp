@@ -504,7 +504,7 @@ u8 GetRandomData()
  * JP Address: TODO
  * JP Size: TODO
  */
-int PitchCompute(int basePitch, int pitchOffset, int wavePitch, unsigned int fineTune)
+int PitchCompute(int basePitch, int pitchOffset, int wavePitch, int fineTune)
 {
     int value;
     int pitch;

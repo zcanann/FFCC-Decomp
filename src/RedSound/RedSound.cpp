@@ -1250,7 +1250,7 @@ int CRedSound::GetSeUsedWave(void* seSepData)
  * EN Size: 244b
  * JP Address: TODO
  */
-int CRedSound::StreamStandby(void* streamHeader, int fileSize)
+inline int CRedSound::StreamStandby(void* streamHeader, int fileSize)
 {
 	int streamId = REDSOUND_STREAM_ID_NONE;
 	RedStreamHEAD* header = reinterpret_cast<RedStreamHEAD*>(streamHeader);
@@ -1284,7 +1284,7 @@ int CRedSound::StreamStandby(void* streamHeader, int fileSize)
  * EN Size: 112b
  * JP Address: TODO
  */
-int CRedSound::StreamPlay(int streamId, int pan, int volume)
+inline int CRedSound::StreamPlay(int streamId, int pan, int volume)
 {
 	RedSoundStreamBank* bank = _SearchStreamBank(streamId);
 
@@ -1498,7 +1498,7 @@ void CRedSound::ClearSePlayLine()
  * JP Address: TODO
  * JP Size: TODO
  */
-RedStreamDATA* CRedSound::GetStreamPlayBlock(int streamId)
+inline RedStreamDATA* CRedSound::GetStreamPlayBlock(int streamId)
 {
 	return c_Driver.GetStreamPlayBlock(streamId);
 }
@@ -1511,7 +1511,7 @@ RedStreamDATA* CRedSound::GetStreamPlayBlock(int streamId)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CRedSound::GetStreamReadPoint(int streamId, int* readPoint)
+inline void CRedSound::GetStreamReadPoint(int streamId, int* readPoint)
 {
 	RedSoundStreamBank* bank = _SearchStreamBank(streamId);
 

@@ -1303,7 +1303,7 @@ int CRedSound::StreamPlay(int streamId, int pan, int volume)
  * EN Size: 60b
  * JP Address: TODO
  */
-void CRedSound::StreamPan(int streamID, int pan, int frameCount)
+inline void CRedSound::StreamPan(int streamID, int pan, int frameCount)
 {
 	c_Driver.StreamPan(streamID, pan, frameCount);
 }

@@ -123,7 +123,7 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 	u32 count;
 	s32 i;
 	u8 alphaStep;
-	u8 alphaMax;
+	int alphaMax;
 	float negHalfWidth;
 	float length;
 	float halfWidth;

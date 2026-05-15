@@ -30,6 +30,7 @@ typedef int (*RedSwingFunc)(int phase);
 #define REDSOUND_TRACK_ATTR_NONE 0
 #define REDSOUND_TRACK_FLAGS_NONE 0
 #define REDSOUND_SWING_FUNC_NONE ((RedSwingFunc)0)
+#define REDSOUND_WAVE_BANK_DATA_NONE 0
 #define REDSOUND_WAVE_BASE_NONE 0
 
 struct RedTrackDATA {

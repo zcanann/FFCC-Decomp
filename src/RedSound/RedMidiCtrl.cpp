@@ -980,7 +980,7 @@ static void __MidiCtrl_Stop(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, R
             control->m_tracks = REDSOUND_TRACK_NONE;
         }
     } else {
-        if (track->m_waveBankData != 0) {
+        if (track->m_waveBankData != REDSOUND_WAVE_BANK_DATA_NONE) {
             c_RedEntry.WaveHistoryManager(REDSOUND_HISTORY_MODE_RELEASE, track->m_waveBankData->m_waveNo);
         }
         c_RedEntry.SeSepHistoryManager(REDSOUND_HISTORY_MODE_RELEASE, track->m_seSepId);
@@ -1450,7 +1450,7 @@ static void __MidiCtrl_Wave(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track
     track->m_waveData = REDSOUND_WAVE_DATA_NONE;
     track->m_waveBase = REDSOUND_WAVE_BASE_NONE;
     waveNo = *track->m_command++;
-    if ((track->m_waveBankData != 0) && (waveNo < track->m_waveBankData->m_tableCount)) {
+    if ((track->m_waveBankData != REDSOUND_WAVE_BANK_DATA_NONE) && (waveNo < track->m_waveBankData->m_tableCount)) {
         waveTable = track->m_waveBankData->m_waveOffsets;
         track->m_waveData = (RedWaveDATA*)((int)track->m_waveBankData + waveTable[waveNo]);
         track->m_waveBase = track->m_waveBankData->m_aramAddress;

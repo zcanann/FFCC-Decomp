@@ -1401,7 +1401,7 @@ static void _VoiceDataAsign(RedTrackDATA* track, RedVoiceDATA* voice, RedNoteDAT
         pitchWork[0] = REDSOUND_MOD_DELAY_PHASE_SCALE;
         if ((track->m_vibrateRate >> REDSOUND_FIXED_SHIFT) != 0) {
             pitchWork[0] =
-                REDSOUND_MOD_DELAY_PHASE_SCALE / (track->m_vibrateRate >> REDSOUND_FIXED_SHIFT);
+                pitchWork[0] / (track->m_vibrateRate >> REDSOUND_FIXED_SHIFT);
         }
         if (track->m_vibrateDelayDepth != 0) {
             workValue = track->m_vibrateDelayDepth * (pitchWork[0] * REDSOUND_MOD_DELAY_FRAME_SCALE);
@@ -1418,7 +1418,7 @@ static void _VoiceDataAsign(RedTrackDATA* track, RedVoiceDATA* voice, RedNoteDAT
         pitchWork[0] = REDSOUND_MOD_DELAY_PHASE_SCALE;
         if ((track->m_tremoloRate >> REDSOUND_FIXED_SHIFT) != 0) {
             pitchWork[0] =
-                REDSOUND_MOD_DELAY_PHASE_SCALE / (track->m_tremoloRate >> REDSOUND_FIXED_SHIFT);
+                pitchWork[0] / (track->m_tremoloRate >> REDSOUND_FIXED_SHIFT);
         }
         if (track->m_tremoloDelayDepth != 0) {
             workValue = track->m_tremoloDelayDepth * (pitchWork[0] * REDSOUND_MOD_DELAY_FRAME_SCALE);
@@ -1434,10 +1434,13 @@ skipModSetup:
 
     if ((voice->m_voiceSwitch & REDSOUND_VOICE_SWITCH_FUZZY_PITCH) != 0) {
         unsigned int random = GetRandomData();
-        workValue = voice->m_pitch * voice->m_track->m_fuzzyPitchDepth;
-        workValue *= (int)(random & REDSOUND_RANDOM_BYTE_MASK) + 1;
+        unsigned int randomSign = random & REDSOUND_RANDOM_BYTE_SIGN_BIT;
+        int randomScale = (int)(random & REDSOUND_RANDOM_BYTE_MASK) + 1;
+        workValue = voice->m_track->m_fuzzyPitchDepth;
+        workValue = voice->m_pitch * workValue;
+        workValue *= randomScale;
         pitchWork[0] = workValue >> REDSOUND_RANDOM_FUZZY_PITCH_SHIFT;
-        if ((random & REDSOUND_RANDOM_BYTE_SIGN_BIT) != 0) {
+        if (randomSign != 0) {
             voice->m_randomPitch = -(pitchWork[0] >> 1);
         } else {
             voice->m_randomPitch = pitchWork[0];

@@ -214,6 +214,8 @@ enum RedSeSepHeadLayout {
 };
 
 #define RedSeSepGetInfo(seSepHead) reinterpret_cast<RedSeINFO*>(&(seSepHead)->m_seInfoFlags)
+#define RedSeSepGetWaveNo(seSepHead)                                                                  \
+	(((seSepHead)->m_waveNoHi * REDSOUND_SESEP_WAVE_NO_HIGH_SCALE) | (seSepHead)->m_waveNoLo)
 
 struct RedSeInfoSequence
 {
@@ -292,6 +294,9 @@ enum RedSeBlockEntryLayout {
 
 #define RedSeBlockGetInfoFromOffset(entries, infoOffset)                                          \
 	reinterpret_cast<RedSeINFO*>(reinterpret_cast<unsigned char*>(entries) + (infoOffset))
+
+#define RedSeInfoGetWaveNo(info)                                                                  \
+	(((info)->m_waveNoHi * REDSOUND_SE_INFO_U16_HIGH_SCALE) | (info)->m_waveNoLo)
 
 struct RedWaveHeadWD
 {

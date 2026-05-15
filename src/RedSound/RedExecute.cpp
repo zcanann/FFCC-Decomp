@@ -1995,81 +1995,82 @@ void EnvelopeKeyExecute()
  */
 static void _KeyOnControl()
 {
-    u32 voiceStartMask[2];
+    int voiceStartMask[2];
     RedKeyOnSlot* reserve;
     RedVoiceDATA* voiceData;
     RedSwingFunc waveFunc;
     int shakeDepth;
-    int shakeValue;
     RedSoundCONTROL* soundControl;
     RedTrackDATA* track;
-    RedTrackDATA* trackBase;
     RedTrackDATA* trackData;
     RedVoiceDATA* voice;
     int volume;
     int idx;
-    u32 bit;
+    int bit;
 
     _VoiceEnvelopeCheck();
-    voiceStartMask[REDSOUND_VOICE_START_MASK_LOW] = 0;
     voiceStartMask[REDSOUND_VOICE_START_MASK_HIGH] = 0;
+    voiceStartMask[REDSOUND_VOICE_START_MASK_LOW] = 0;
 
     if (m_KeyOnEntry != 0) {
         reserve = p_KeyOnData->m_fixed;
         voiceData = p_VoiceData;
         do {
             if ((reserve->m_track != 0) && (reserve->m_track->m_waveData != 0)) {
-                voiceData = _VoiceDataSelect(reserve->m_track, &reserve->m_note, (int*)voiceStartMask);
+                voiceData = _VoiceDataSelect(reserve->m_track, &reserve->m_note, voiceStartMask);
             }
             reserve++;
         } while ((voiceData != 0) && (reserve < p_KeyOnData->m_normal + REDSOUND_KEY_ON_SLOT_COUNT));
     }
 
-    if ((p_SoundControlBuffer->m_activeTrackCount != 0) &&
-        ((p_SoundControlBuffer->m_flags & REDSOUND_CONTROL_FLAG_PAUSE) == 0)) {
-        track = p_SoundControlBuffer->m_tracks;
+    soundControl = p_SoundControlBuffer;
+    if ((soundControl->m_activeTrackCount != 0) &&
+        ((soundControl->m_flags & REDSOUND_CONTROL_FLAG_PAUSE) == 0)) {
+        track = soundControl->m_tracks;
         do {
             if ((track->m_command != 0) && (track->m_shakeFunc != 0)) {
                 waveFunc = track->m_shakeFunc;
                 shakeDepth = (track->m_shakeDepth >> REDSOUND_FIXED_SHIFT) + 1;
-                shakeValue = waveFunc((u32)track->m_shakeOutput >> REDSOUND_FIXED_SHIFT);
-                track->m_shakePan = (shakeDepth * shakeValue) >> REDSOUND_SHAKE_PAN_SCALE_SHIFT;
+                track->m_shakePan =
+                    (shakeDepth * waveFunc((u32)track->m_shakeOutput >> REDSOUND_FIXED_SHIFT)) >>
+                    REDSOUND_SHAKE_PAN_SCALE_SHIFT;
                 track->m_shakeOutput += track->m_shakeRate;
             }
             track++;
-        } while (track <
-                 p_SoundControlBuffer->m_tracks + p_SoundControlBuffer->m_trackCount);
+        } while (track < soundControl->m_tracks + soundControl->m_trackCount);
     }
 
-    if ((p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY].m_activeTrackCount != 0) &&
-        ((p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY].m_flags &
-          REDSOUND_CONTROL_FLAG_PAUSE) == 0)) {
-        track = p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY].m_tracks;
-        trackBase = p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY].m_tracks;
+    soundControl = p_SoundControlBuffer + REDSOUND_CONTROL_MUSIC_SECONDARY;
+    if ((soundControl->m_activeTrackCount != 0) &&
+        ((soundControl->m_flags & REDSOUND_CONTROL_FLAG_PAUSE) == 0)) {
+        track = soundControl->m_tracks;
         do {
             if ((track->m_command != 0) && (track->m_shakeFunc != 0)) {
                 waveFunc = track->m_shakeFunc;
                 shakeDepth = (track->m_shakeDepth >> REDSOUND_FIXED_SHIFT) + 1;
-                shakeValue = waveFunc((u32)track->m_shakeOutput >> REDSOUND_FIXED_SHIFT);
-                track->m_shakePan = (shakeDepth * shakeValue) >> REDSOUND_SHAKE_PAN_SCALE_SHIFT;
+                track->m_shakePan =
+                    (shakeDepth * waveFunc((u32)track->m_shakeOutput >> REDSOUND_FIXED_SHIFT)) >>
+                    REDSOUND_SHAKE_PAN_SCALE_SHIFT;
                 track->m_shakeOutput += track->m_shakeRate;
             }
             track++;
-        } while (track < trackBase + p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY].m_trackCount);
+        } while (track < soundControl->m_tracks + soundControl->m_trackCount);
     }
 
     {
-        track = p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
+        soundControl = p_SoundControlBuffer + REDSOUND_CONTROL_SE;
+        track = soundControl->m_tracks;
         do {
             if ((track->m_command != 0) && (track->m_shakeFunc != 0)) {
                 waveFunc = track->m_shakeFunc;
                 shakeDepth = (track->m_shakeDepth >> REDSOUND_FIXED_SHIFT) + 1;
-                shakeValue = waveFunc((u32)track->m_shakeOutput >> REDSOUND_FIXED_SHIFT);
-                track->m_shakePan = (shakeDepth * shakeValue) >> REDSOUND_SHAKE_PAN_SCALE_SHIFT;
+                track->m_shakePan =
+                    (shakeDepth * waveFunc((u32)track->m_shakeOutput >> REDSOUND_FIXED_SHIFT)) >>
+                    REDSOUND_SHAKE_PAN_SCALE_SHIFT;
                 track->m_shakeOutput += track->m_shakeRate;
             }
             track++;
-        } while (track < p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks + REDSOUND_SE_TRACK_COUNT);
+        } while (track < soundControl->m_tracks + REDSOUND_SE_TRACK_COUNT);
     }
 
     {

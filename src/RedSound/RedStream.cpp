@@ -44,11 +44,14 @@ enum RedStreamLayoutSize {
 	REDSOUND_STREAM_INITIAL_LOOP_END = 0x3fff,
 	REDSOUND_STREAM_BASE_PITCH = 0x3c00000,
 	REDSOUND_STREAM_ARAM_HIGH_THRESHOLD = 0x800000,
+	REDSOUND_STREAM_ARAM_LOW_OFFSET = 0,
 	REDSOUND_STREAM_ARAM_HIGH_OFFSET = 0x300000,
 	REDSOUND_STREAM_ARAM_TO_AX_ADDRESS_SCALE = 2,
 	REDSOUND_STREAM_ERASE_TRACK = 0xff,
 	REDSOUND_STREAM_STEREO_CHANNEL_COUNT = 2,
 	REDSOUND_STREAM_STEREO_FRAME_WORD_COUNT = 2,
+	REDSOUND_STREAM_MIN_FRAME_COUNT = 1,
+	REDSOUND_STREAM_SILENT_PAN = 0,
 	REDSOUND_STREAM_BUFFER_SIDE_A = 0,
 	REDSOUND_STREAM_BUFFER_SIDE_B = 1,
 	REDSOUND_STREAM_BUFFER_SIDE_MASK = 1,
@@ -224,7 +227,7 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 	streamData->m_buffer = (u8*)RedNew(REDSOUND_STREAM_TRANSFER_BUFFER_SIZE);
 	amemSize = streamData->m_header.m_channelCount * REDSOUND_STREAM_STEREO_PLANE_SIZE;
 	if (c_RedMemory.GetABufferSize() < REDSOUND_STREAM_ARAM_HIGH_THRESHOLD) {
-		arOffset = 0;
+		arOffset = REDSOUND_STREAM_ARAM_LOW_OFFSET;
 	} else {
 		arOffset = REDSOUND_STREAM_ARAM_HIGH_OFFSET;
 	}
@@ -282,7 +285,7 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 			voice->m_track->m_reverbDepthDelta = 0;
 			if (streamData->m_header.m_channelCount == REDSOUND_STREAM_STEREO_CHANNEL_COUNT) {
 				if (channel == REDSOUND_STREAM_LEFT_CHANNEL) {
-					streamData->m_pan.m_value = 0;
+					streamData->m_pan.m_value = REDSOUND_STREAM_SILENT_PAN;
 					streamData->m_pan.m_stepCount = 0;
 				} else {
 					streamData->m_pan.m_value = REDSOUND_VOLUME_DEFAULT;
@@ -311,9 +314,9 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 
 		int dmaID;
 		if (streamData->m_header.m_loopStart < REDSOUND_STREAM_LOOP_ENABLED_MIN) {
-			dmaID = _ArrangeStreamDataNoLoop(streamData, 0, REDSOUND_STREAM_STEREO_PLANE_SIZE);
+			dmaID = _ArrangeStreamDataNoLoop(streamData, REDSOUND_STREAM_BUFFER_SIDE_A, REDSOUND_STREAM_STEREO_PLANE_SIZE);
 		} else {
-			dmaID = _ArrangeStreamDataLoop(streamData, 0, REDSOUND_STREAM_STEREO_PLANE_SIZE);
+			dmaID = _ArrangeStreamDataLoop(streamData, REDSOUND_STREAM_BUFFER_SIDE_A, REDSOUND_STREAM_STEREO_PLANE_SIZE);
 		}
 		streamData->m_dmaId = dmaID;
 		streamData->m_streamCursorBase = REDSOUND_STREAM_PAGE_SIZE;
@@ -361,8 +364,8 @@ void SetStreamVolume(int streamID, int volume, int frameCount)
 {
 	volatile RedStreamDATA* streamData;
 
-	if (frameCount < 1) {
-		frameCount = 1;
+	if (frameCount < REDSOUND_STREAM_MIN_FRAME_COUNT) {
+		frameCount = REDSOUND_STREAM_MIN_FRAME_COUNT;
 	} else {
 		frameCount *= REDSOUND_STREAM_FADE_TICKS_PER_SECOND;
 		frameCount /= REDSOUND_FRAMES_PER_SECOND;
@@ -522,7 +525,8 @@ void StreamControl()
 					}
 					if (changed != 0) {
 						if (streamData->m_header.m_channelCount == REDSOUND_STREAM_STEREO_CHANNEL_COUNT) {
-							SetVoiceVolumeMix(voiceData, 0, streamData->m_volume.m_value >> REDSOUND_FIXED_SHIFT);
+							SetVoiceVolumeMix(voiceData, REDSOUND_STREAM_SILENT_PAN,
+							                  streamData->m_volume.m_value >> REDSOUND_FIXED_SHIFT);
 							voiceData += 1;
 							SetVoiceVolumeMix(voiceData, REDSOUND_VOLUME_MAX,
 							                  streamData->m_volume.m_value >> REDSOUND_FIXED_SHIFT);
@@ -805,8 +809,8 @@ void SetStreamPan(int streamID, int pan, int frameCount)
 {
 	volatile RedStreamDATA* streamData;
 
-	if (frameCount < 1) {
-		frameCount = 1;
+	if (frameCount < REDSOUND_STREAM_MIN_FRAME_COUNT) {
+		frameCount = REDSOUND_STREAM_MIN_FRAME_COUNT;
 	} else {
 		frameCount *= REDSOUND_STREAM_FADE_TICKS_PER_SECOND;
 		frameCount /= REDSOUND_FRAMES_PER_SECOND;

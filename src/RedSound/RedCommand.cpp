@@ -549,7 +549,7 @@ int MusicStop(int musicId)
 		music[REDSOUND_CONTROL_MUSIC_SECONDARY].m_activeTrackCount = 0;
 		music[REDSOUND_CONTROL_MUSIC_SECONDARY].m_trackCount = 0;
 		music[REDSOUND_CONTROL_MUSIC_SECONDARY].m_musicId = REDSOUND_MUSIC_ID_NONE;
-		music[REDSOUND_CONTROL_MUSIC_SECONDARY].m_tracks = 0;
+		music[REDSOUND_CONTROL_MUSIC_SECONDARY].m_tracks = REDSOUND_TRACK_NONE;
 	}
 
 	return musicId;

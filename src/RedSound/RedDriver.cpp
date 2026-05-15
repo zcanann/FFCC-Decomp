@@ -2129,8 +2129,8 @@ void CRedDriver::Init()
         seTrackArena[nextIndex].m_trackNo = (char)(nextIndex + REDSOUND_SE_VOICE_BASE_INDEX);
         nextIndex = nextIndex + 1;
     } while (nextIndex < REDSOUND_SE_TRACK_COUNT);
-    p_EditorTrack = (RedTrackDATA*)RedNew(sizeof(*p_EditorTrack));
-    memset(p_EditorTrack, 0, sizeof(*p_EditorTrack));
+    p_EditorTrack = (RedTrackDATA*)RedNew(REDSOUND_TRACK_SIZE);
+    memset(p_EditorTrack, 0, REDSOUND_TRACK_SIZE);
     p_ReverbDepth = (RedReverbDepth*)RedNew(sizeof(*p_ReverbDepth) * REDSOUND_REVERB_DEPTH_COUNT);
     memset(p_ReverbDepth, 0, sizeof(*p_ReverbDepth) * REDSOUND_REVERB_DEPTH_COUNT);
     mute = m_Mute;

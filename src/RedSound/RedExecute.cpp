@@ -1090,7 +1090,7 @@ static void _VolumeExecute(RedVoiceDATA* voice, int volume)
 {
     int modVolume;
     int tremoloValue;
-    unsigned int pan;
+    int pan;
     int voiceMix;
     int envelopeMul;
 

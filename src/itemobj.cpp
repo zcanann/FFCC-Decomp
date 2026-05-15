@@ -1396,26 +1396,27 @@ void CGItemObj::DrawOmoideName(CFont* font)
 			hasModel = true;
 		}
 
-		if (hasModel && *(int*)(self + 0x500) == 0xCB && FLOAT_80331b20 < *(float*)(self + 0x74) &&
-		    FLOAT_80331b20 != *(float*)(self + 0x4B0)) {
+		if (hasModel && *(int*)(self + 0x500) == 0xCB && 0.0f < *(float*)(self + 0x74) &&
+		    0.0f != *(float*)(self + 0x4B0)) {
 			font->SetTlut(7);
 
-			int alphaInt = (int)(FLOAT_80331b30 * *(float*)(self + 0x4B0));
+			int alphaInt = (int)(255.0f * *(float*)(self + 0x4B0));
+			u32 textColor;
 			GXColor constructedColor;
-			GXColor textColor = *(GXColor*)__ct__6CColorFUcUcUcUc(&constructedColor, 0xFF, 0xFF, 0xFF, alphaInt);
-			SetColor__5CFontF8_GXColor(font, &textColor);
+			textColor = *(u32*)__ct__6CColorFUcUcUcUc(&constructedColor, 0xFF, 0xFF, 0xFF, alphaInt);
+			SetColor__5CFontF8_GXColor(font, reinterpret_cast<GXColor*>(&textColor));
 
 			const ItemObjFlatData* flatData = reinterpret_cast<const ItemObjFlatData*>(&Game.m_cFlatDataArr[1]);
 			const char* name = flatData->table[2].index[*(int*)(self + 0x570)];
 			float width = font->GetWidth(name);
 			float depthScale = FLOAT_80331b18 / (*(float*)(self + 0x74) - FLOAT_80331b1c);
-			float posY = FLOAT_80331b34 - FLOAT_80331b34 * *(float*)(self + 0x6C) * depthScale;
+			float posY = 224.0f - 224.0f * *(float*)(self + 0x6C) * depthScale;
 			float posZ = *(float*)(self + 0x70) * depthScale;
 			float posX =
-			    -(FLOAT_80331b3c * width - (FLOAT_80331b38 * *(float*)(self + 0x68) * depthScale + FLOAT_80331b38));
+			    -(0.5f * width - (320.0f * *(float*)(self + 0x68) * depthScale + 320.0f));
 
 			font->SetPosX(posX);
-			font->SetPosY(posY - FLOAT_80331b40);
+			font->SetPosY(posY - 11.0f);
 			font->SetPosZ(posZ);
 			font->Draw(name);
 		}

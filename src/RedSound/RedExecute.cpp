@@ -253,6 +253,7 @@ enum RedExecuteAxVoiceLayout {
     REDSOUND_AX_SAMPLE_START_BIAS = 1,
     REDSOUND_AX_HIGH_WORD_SHIFT = 0x10,
     REDSOUND_AX_SRC_RATIO_HI_MASK = 3,
+    REDSOUND_AX_PRIORITY_HALF_SHIFT = 1,
 };
 
 enum RedExecutePitchModConst {
@@ -262,6 +263,7 @@ enum RedExecutePitchModConst {
     REDSOUND_PITCH_MOD_SHALLOW_SCALE = 2,
     REDSOUND_PITCH_MOD_DEEP_SCALE = 0x18,
     REDSOUND_PITCH_MOD_WAVE_SHIFT = 4,
+    REDSOUND_PITCH_MOD_NEGATIVE_HALF_SHIFT = 1,
 };
 
 enum RedExecuteVolumeModConst {
@@ -1259,7 +1261,7 @@ static void _PitchExecute(RedVoiceDATA* voice)
         }
 
         if (pitchDelta < 0) {
-            targetPitchDelta = pitchDelta >> 1;
+            targetPitchDelta = pitchDelta >> REDSOUND_PITCH_MOD_NEGATIVE_HALF_SHIFT;
         } else {
             targetPitchDelta = pitchDelta;
         }
@@ -1834,7 +1836,7 @@ void EnvelopeKeyExecute()
                     voiceData->m_axVoice = AXAcquireVoice(REDSOUND_VOICE_INDEX_MASK, _VoiceDropedCallback, 0);
                 } else {
                     int prio = voiceData - p_VoiceData;
-                    prio = (REDSOUND_VOICE_COUNT - prio >> 1) - 1;
+                    prio = (REDSOUND_VOICE_COUNT - prio >> REDSOUND_AX_PRIORITY_HALF_SHIFT) - 1;
                     if (prio < 1) {
                         prio = 1;
                     }

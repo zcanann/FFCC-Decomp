@@ -875,7 +875,7 @@ static void _MusicPlaySequence(int* command)
                 p_MusicReplayPoint[command[REDSOUND_MUSIC_COMMAND_ID]] = 0;
             }
             if (replayPoint == 0) {
-                memcpy(&soundControl[REDSOUND_CONTROL_MUSIC_SECONDARY], soundControl, sizeof(*soundControl));
+                memcpy(&soundControl[REDSOUND_CONTROL_MUSIC_SECONDARY], soundControl, REDSOUND_CONTROL_SIZE);
                 soundControl[REDSOUND_CONTROL_MUSIC_PRIMARY].m_musicId = REDSOUND_MUSIC_ID_NONE;
             }
         }
@@ -921,11 +921,11 @@ static void _MusicCrossPlaySequence(int* command)
              control->m_masterVolume) /
             command[REDSOUND_MUSIC_COMMAND_FADE_TIME];
         control->m_masterVolumeDelta = command[REDSOUND_MUSIC_COMMAND_FADE_TIME];
-        swapControl = (RedSoundCONTROL*)RedNew(sizeof(*swapControl));
-        memcpy(swapControl, &p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY], sizeof(*swapControl));
+        swapControl = (RedSoundCONTROL*)RedNew(REDSOUND_CONTROL_SIZE);
+        memcpy(swapControl, &p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY], REDSOUND_CONTROL_SIZE);
         memcpy(&p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY], p_SoundControlBuffer,
-               sizeof(*p_SoundControlBuffer));
-        memcpy(p_SoundControlBuffer, swapControl, sizeof(*p_SoundControlBuffer));
+               REDSOUND_CONTROL_SIZE);
+        memcpy(p_SoundControlBuffer, swapControl, REDSOUND_CONTROL_SIZE);
         RedDelete(swapControl);
     } else {
         if (c_RedEntry.SearchMusicSequence(command[REDSOUND_MUSIC_COMMAND_ID]) >= 0) {
@@ -942,7 +942,7 @@ static void _MusicCrossPlaySequence(int* command)
                 replayPoint = p_MusicReplayPoint[command[REDSOUND_MUSIC_COMMAND_ID]];
                 p_MusicReplayPoint[command[REDSOUND_MUSIC_COMMAND_ID]] = 0;
                 if (replayPoint == 0) {
-                    memcpy(&control[REDSOUND_CONTROL_MUSIC_SECONDARY], control, sizeof(*control));
+                    memcpy(&control[REDSOUND_CONTROL_MUSIC_SECONDARY], control, REDSOUND_CONTROL_SIZE);
                     control[REDSOUND_CONTROL_MUSIC_PRIMARY].m_musicId = REDSOUND_MUSIC_ID_NONE;
                 }
             }
@@ -2088,7 +2088,7 @@ void CRedDriver::Init()
     p_ExecCommandNow = p_ExecCommand;
     p_ExecCommandOld = p_ExecCommand;
     memset(p_ExecCommand, 0, allocSize);
-    allocSize = sizeof(*p_SoundControlBuffer) * REDSOUND_CONTROL_COUNT;
+    allocSize = REDSOUND_CONTROL_BUFFER_SIZE;
     p_SoundControlBuffer = (RedSoundCONTROL*)RedNew(allocSize);
     p_SoundControl = p_SoundControlBuffer;
     memset(p_SoundControlBuffer, 0, allocSize);

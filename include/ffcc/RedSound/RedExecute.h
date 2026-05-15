@@ -378,7 +378,7 @@ enum RedVoiceUpdateFlag {
 };
 
 u8 GetRandomData();
-int PitchCompute(int basePitch, int pitchOffset, int wavePitch, int fineTune);
+int PitchCompute(int basePitch, int pitchOffset, int wavePitch, unsigned int fineTune);
 void* ReverbAreaAlloc(unsigned long size);
 void ReverbAreaFree(void* area);
 void InitReverb();

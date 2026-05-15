@@ -504,7 +504,7 @@ u8 GetRandomData()
  * JP Address: TODO
  * JP Size: TODO
  */
-int PitchCompute(int basePitch, int pitchOffset, int wavePitch, int fineTune)
+int PitchCompute(int basePitch, int pitchOffset, int wavePitch, unsigned int fineTune)
 {
     int value;
     int pitch;
@@ -528,7 +528,7 @@ int PitchCompute(int basePitch, int pitchOffset, int wavePitch, int fineTune)
     value >>= REDSOUND_FIXED_SHIFT;
 
     if (fineTune != 0) {
-        if (fineTune > 0) {
+        if ((int)fineTune > 0) {
             value = value + ((int)(value * (fineTune + 1)) >> REDSOUND_PITCH_FINE_TUNE_POSITIVE_SHIFT);
         } else {
             value *= fineTune & REDSOUND_PITCH_FINE_MASK;

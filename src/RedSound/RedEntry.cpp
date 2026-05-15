@@ -563,10 +563,10 @@ int CRedEntry::WaveHeadAdd(int waveBankNo, RedWaveHeadWD* waveHead, int waveNo)
 				historyBank->m_id = waveNo;
 				waveHead->m_waveNo = (short)waveNo;
 				if (waveBankNo < 0) {
-					WaveHistoryAdd(1);
-					historyBank->m_historyNo = 1;
+					WaveHistoryAdd(REDSOUND_HISTORY_MOST_RECENT);
+					historyBank->m_historyNo = REDSOUND_HISTORY_MOST_RECENT;
 				} else {
-					historyBank->m_historyNo = 0;
+					historyBank->m_historyNo = REDSOUND_HISTORY_UNUSED;
 				}
 				memcpy(copied, waveHead, copySize);
 				return arAddress;
@@ -1017,7 +1017,7 @@ void CRedEntry::SeSepHistoryAdd()
 {
 	RedHistoryBANK* history = m_seSepBankBase;
 	do {
-		if (history->m_historyNo != 0) {
+		if (history->m_historyNo != REDSOUND_HISTORY_UNUSED) {
 			history->m_historyNo = history->m_historyNo + 1;
 		}
 		history += 1;
@@ -1313,7 +1313,7 @@ void CRedEntry::MusicHistoryAdd()
 	RedHistoryBANK* history = m_musicBankBase;
 
 	do {
-		if (history->m_historyNo != 0) {
+		if (history->m_historyNo != REDSOUND_HISTORY_UNUSED) {
 			history->m_historyNo = history->m_historyNo + 1;
 		}
 		history += 1;
@@ -1524,7 +1524,7 @@ RedMusicHEAD* CRedEntry::MusicHeadAdd(RedMusicHEAD* musicHead)
 		bank->m_size = musicHead->m_size;
 		bank->m_id = static_cast<int>(musicHead->m_musicNo);
 		MusicHistoryAdd();
-		bank->m_historyNo = 1;
+		bank->m_historyNo = REDSOUND_HISTORY_MOST_RECENT;
 	}
 
 	return result;

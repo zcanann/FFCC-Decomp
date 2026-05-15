@@ -1078,18 +1078,17 @@ void CMenuPcs::EquipInit1()
 	short* psVar13;
 	int iVar14;
 	unsigned int uVar15;
-	int* workPtr;
+	s16* equipList;
 
-	workPtr = (int*)GetEquipListBase(this);
+	equipList = GetEquipList(this);
 	fVar5 = FLOAT_80332f14;
 	fVar4 = FLOAT_80332f10;
 	fVar3 = FLOAT_80332ee0;
 	fVar2 = FLOAT_80332eb8;
 	sVar7 = 0;
-	iVar8 = (int)**(short**)workPtr;
-	psVar10 = *(short**)workPtr + iVar8 * 0x20 + 4;
-	psVar10[0xe] = 0;
-	psVar10[0xf] = 0x2e;
+	iVar8 = (int)equipList[0];
+	psVar10 = equipList + iVar8 * 0x20 + 4;
+	*(int*)(psVar10 + 0xe) = 0x2e;
 	*psVar10 = 0xb8;
 	psVar10[1] = 0x28;
 	iVar9 = iVar8 + 4;
@@ -1100,12 +1099,10 @@ void CMenuPcs::EquipInit1()
 	fVar4 = FLOAT_80332f18;
 	*(float*)(psVar10 + 6) = fVar5;
 	*(float*)(psVar10 + 10) = fVar3;
-	psVar10[0x12] = 0;
-	psVar10[0x13] = 5;
-	psVar10[0x14] = 0;
-	psVar10[0x15] = 5;
+	*(int*)(psVar10 + 0x12) = 5;
+	*(int*)(psVar10 + 0x14) = 5;
 
-	puVar12 = (short*)(*workPtr + (iVar8 + 1) * 0x40 + 8);
+	puVar12 = equipList + (iVar8 + 1) * 0x20 + 4;
 	*(int*)(puVar12 + 0xe) = 0x2f;
 	*puVar12 = 0xa0;
 	puVar12[1] = 0xe;
@@ -1117,7 +1114,7 @@ void CMenuPcs::EquipInit1()
 	*(int*)(puVar12 + 0x12) = 0;
 	*(int*)(puVar12 + 0x14) = 5;
 
-	puVar12 = (short*)(*workPtr + (iVar8 + 2) * 0x40 + 8);
+	puVar12 = equipList + (iVar8 + 2) * 0x20 + 4;
 	*(int*)(puVar12 + 0xe) = 0x2f;
 	puVar12[2] = 0x30;
 	puVar12[3] = 0x30;
@@ -1129,7 +1126,7 @@ void CMenuPcs::EquipInit1()
 	*(int*)(puVar12 + 0x12) = 0;
 	*(int*)(puVar12 + 0x14) = 5;
 
-	puVar12 = (short*)(*workPtr + (iVar8 + 3) * 0x40 + 8);
+	puVar12 = equipList + (iVar8 + 3) * 0x20 + 4;
 	*(int*)(puVar12 + 0x16) = 2;
 	*(int*)(puVar12 + 0xe) = 0x2e;
 	*puVar12 = 0xa0;
@@ -1141,14 +1138,12 @@ void CMenuPcs::EquipInit1()
 	*(int*)(puVar12 + 0x12) = 0;
 	*(int*)(puVar12 + 0x14) = 5;
 
-	psVar10 = *(short**)workPtr + **(short**)workPtr * 0x20 + 4;
+	psVar10 = equipList + equipList[0] * 0x20 + 4;
 	iVar8 = 4;
 	do {
-		psVar13 = (short*)(*workPtr + iVar11 + 8);
-		psVar13[0x16] = 0;
-		psVar13[0x17] = 2;
-		psVar13[0xe] = 0;
-		psVar13[0xf] = 0x37;
+		psVar13 = (short*)((char*)equipList + iVar11 + 8);
+		*(int*)(psVar13 + 0x16) = 2;
+		*(int*)(psVar13 + 0xe) = 0x37;
 		iVar9 = iVar9 + 2;
 		*psVar13 = *psVar10 + 0x24;
 		sVar1 = sVar7 + 0x20;
@@ -1157,18 +1152,14 @@ void CMenuPcs::EquipInit1()
 		psVar13[3] = 0x28;
 		*(float*)(psVar13 + 4) = fVar2;
 		*(float*)(psVar13 + 6) = fVar2;
-		psVar13[0x12] = 0;
-		psVar13[0x13] = 7;
-		psVar13[0x14] = 0;
-		psVar13[0x15] = 5;
+		*(int*)(psVar13 + 0x12) = 7;
+		*(int*)(psVar13 + 0x14) = 5;
 
 		iVar14 = iVar11 + 0x48;
 		iVar11 = iVar11 + 0x80;
-		psVar13 = (short*)(*workPtr + iVar14);
-		psVar13[0x16] = 0;
-		psVar13[0x17] = 2;
-		psVar13[0xe] = 0;
-		psVar13[0xf] = 0x37;
+		psVar13 = (short*)((char*)equipList + iVar14);
+		*(int*)(psVar13 + 0x16) = 2;
+		*(int*)(psVar13 + 0xe) = 0x37;
 		*psVar13 = *psVar10 + 0x24;
 		sVar7 = sVar7 + 0x40;
 		psVar13[1] = psVar10[1] + sVar1;
@@ -1176,45 +1167,35 @@ void CMenuPcs::EquipInit1()
 		psVar13[3] = 0x28;
 		*(float*)(psVar13 + 4) = fVar2;
 		*(float*)(psVar13 + 6) = fVar2;
-		psVar13[0x12] = 0;
-		psVar13[0x13] = 7;
-		psVar13[0x14] = 0;
+		*(int*)(psVar13 + 0x12) = 7;
 		fVar3 = FLOAT_80332eb8;
-		psVar13[0x15] = 5;
+		*(int*)(psVar13 + 0x14) = 5;
 		iVar8 = iVar8 - 1;
 	} while (iVar8 != 0);
 
-	*(short*)(*workPtr + 2) = (short)iVar9;
-	psVar10 = *(short**)workPtr;
+	equipList[1] = (short)iVar9;
+	psVar10 = equipList;
 	uVar6 = (unsigned int)((int)psVar10[1] - (int)*psVar10);
 	psVar10 = psVar10 + *psVar10 * 0x20 + 4;
 	if (0 < (int)uVar6) {
 		uVar15 = uVar6 >> 3;
 		if (uVar15 != 0) {
 			do {
-				psVar10[0x10] = 0;
-				psVar10[0x11] = 0;
+				*(int*)(psVar10 + 0x10) = 0;
 				*(float*)(psVar10 + 8) = fVar3;
-				psVar10[0x30] = 0;
-				psVar10[0x31] = 0;
+				*(int*)(psVar10 + 0x30) = 0;
 				*(float*)(psVar10 + 0x28) = fVar3;
-				psVar10[0x50] = 0;
-				psVar10[0x51] = 0;
+				*(int*)(psVar10 + 0x50) = 0;
 				*(float*)(psVar10 + 0x48) = fVar3;
-				psVar10[0x70] = 0;
-				psVar10[0x71] = 0;
+				*(int*)(psVar10 + 0x70) = 0;
 				*(float*)(psVar10 + 0x68) = fVar3;
-				psVar10[0x90] = 0;
-				psVar10[0x91] = 0;
+				*(int*)(psVar10 + 0x90) = 0;
 				*(float*)(psVar10 + 0x88) = fVar3;
-				psVar10[0xb0] = 0;
-				psVar10[0xb1] = 0;
+				*(int*)(psVar10 + 0xb0) = 0;
 				*(float*)(psVar10 + 0xa8) = fVar3;
-				psVar10[0xd0] = 0;
-				psVar10[0xd1] = 0;
+				*(int*)(psVar10 + 0xd0) = 0;
 				*(float*)(psVar10 + 200) = fVar3;
-				psVar10[0xf0] = 0;
-				psVar10[0xf1] = 0;
+				*(int*)(psVar10 + 0xf0) = 0;
 				*(float*)(psVar10 + 0xe8) = fVar3;
 				psVar10 = psVar10 + 0x100;
 				uVar15 = uVar15 - 1;
@@ -1225,8 +1206,7 @@ void CMenuPcs::EquipInit1()
 			}
 		}
 		do {
-			psVar10[0x10] = 0;
-			psVar10[0x11] = 0;
+			*(int*)(psVar10 + 0x10) = 0;
 			*(float*)(psVar10 + 8) = fVar3;
 			psVar10 = psVar10 + 0x20;
 			uVar6 = uVar6 - 1;

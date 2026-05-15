@@ -153,6 +153,10 @@ enum RedDriverDmaStatus {
     REDSOUND_DMA_STATUS_BUSY = 1,
 };
 
+enum RedDriverDmaMode {
+    REDSOUND_DMA_MODE_NORMAL = 0,
+};
+
 enum RedDriverWorkerState {
     REDSOUND_WORKER_IDLE = 0,
     REDSOUND_WORKER_BUSY = 1,
@@ -1722,7 +1726,7 @@ int RedDmaEntry(int flags, int direction, int mainMemory, int aramMemory, int si
     entryID = GetMyEntryID();
     sizeBytes += REDSOUND_DMA_TRANSFER_ALIGN - 1;
     sizeBytes &= REDSOUND_DMA_TRANSFER_ALIGN_MASK;
-    if ((m_DMAMode != 0) || ((flags & REDSOUND_DMA_FLAG_CHUNKED_TRANSFER) != 0)) {
+    if ((m_DMAMode != REDSOUND_DMA_MODE_NORMAL) || ((flags & REDSOUND_DMA_FLAG_CHUNKED_TRANSFER) != 0)) {
         do {
             if (sizeBytes > REDSOUND_DMA_MAX_CHUNK_SIZE) {
                 chunkSize = REDSOUND_DMA_MAX_CHUNK_SIZE;
@@ -2131,7 +2135,7 @@ void CRedDriver::Init()
     m_MusicPhraseStop = REDSOUND_MUSIC_PHRASE_STOP_OFF;
     p_Stream = (RedStreamDATA*)RedNew(REDSOUND_STREAM_BUFFER_SIZE);
     memset(p_Stream, 0, REDSOUND_STREAM_BUFFER_SIZE);
-    m_DMAMode = 0;
+    m_DMAMode = REDSOUND_DMA_MODE_NORMAL;
     dmaControl = RedDriverMainDmaQueue();
     memset(dmaControl, 0, REDSOUND_DMA_CONTROL_SIZE);
     p_DmaControlNow[REDSOUND_DMA_MAIN_QUEUE_INDEX] = dmaControl;

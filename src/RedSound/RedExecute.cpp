@@ -1436,8 +1436,8 @@ skipModSetup:
         unsigned int random = GetRandomData();
         unsigned int randomSign = random & REDSOUND_RANDOM_BYTE_SIGN_BIT;
         int randomScale = (int)(random & REDSOUND_RANDOM_BYTE_MASK) + 1;
-        workValue = voice->m_track->m_fuzzyPitchDepth;
-        workValue = voice->m_pitch * workValue;
+        pitchWork[0] = voice->m_track->m_fuzzyPitchDepth;
+        workValue = voice->m_pitch * pitchWork[0];
         workValue *= randomScale;
         pitchWork[0] = workValue >> REDSOUND_RANDOM_FUZZY_PITCH_SHIFT;
         if (randomSign != 0) {
@@ -1450,17 +1450,15 @@ skipModSetup:
     }
 
     if ((voice->m_voiceSwitch & REDSOUND_VOICE_SWITCH_FUZZY_VOLUME) != 0) {
-        s8 random = (s8)GetRandomData();
         voice->m_randomVolume =
-            (track->m_fuzzyVolumeDepth * random) >> REDSOUND_RANDOM_FUZZY_DEPTH_SHIFT;
+            (track->m_fuzzyVolumeDepth * (s8)GetRandomData()) >> REDSOUND_RANDOM_FUZZY_DEPTH_SHIFT;
     } else {
         voice->m_randomVolume = 0;
     }
 
     if ((voice->m_voiceSwitch & REDSOUND_VOICE_SWITCH_FUZZY_PAN) != 0) {
-        s8 random = (s8)GetRandomData();
         voice->m_randomPan =
-            (track->m_fuzzyPanDepth * random) >> REDSOUND_RANDOM_FUZZY_DEPTH_SHIFT;
+            (track->m_fuzzyPanDepth * (s8)GetRandomData()) >> REDSOUND_RANDOM_FUZZY_DEPTH_SHIFT;
     } else {
         voice->m_randomPan = 0;
     }
@@ -1502,8 +1500,8 @@ skipModSetup:
                 track->m_adsr.m_time[REDSOUND_VOICE_ADSR_RELEASE];
         }
         if ((voice->m_voiceSwitch & REDSOUND_VOICE_SWITCH_FUZZY_ADSR) != 0) {
-            voice->m_adsr.m_time[REDSOUND_VOICE_ADSR_ATTACK] =
-                (u16)(track->m_fuzzyAdsrDepth * (GetRandomData() & REDSOUND_RANDOM_BYTE_MASK));
+            pitchWork[0] = track->m_fuzzyAdsrDepth * (GetRandomData() & REDSOUND_RANDOM_BYTE_MASK);
+            voice->m_adsr.m_time[REDSOUND_VOICE_ADSR_ATTACK] = (u16)pitchWork[0];
         }
     } else {
         memset(&voice->m_adsr, 0, REDSOUND_TRACK_ADSR_SIZE);

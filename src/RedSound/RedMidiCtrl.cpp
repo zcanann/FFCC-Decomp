@@ -953,7 +953,7 @@ static void __MidiCtrl_Stop(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, R
         voice++;
     } while (voice < p_VoiceData + REDSOUND_VOICE_COUNT);
 
-    track->m_command = 0;
+    track->m_command = REDSOUND_TRACK_COMMAND_NONE;
     if (control < p_SoundControlBuffer + REDSOUND_CONTROL_SE) {
         control->m_activeTrackCount--;
         if ((control->m_activeTrackCount == 0) &&
@@ -1000,7 +1000,7 @@ static void __MidiCtrl_Sleep(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, 
     if ((m_MusicPhraseStop == REDSOUND_MUSIC_PHRASE_STOP_ON) && (control == p_SoundControlBuffer)) {
         RedTrackDATA* track = control->m_tracks;
         do {
-            if (track->m_command != 0) {
+            if (track->m_command != REDSOUND_TRACK_COMMAND_NONE) {
                 __MidiCtrl_Stop(control, keyOnData, track);
             }
             track++;
@@ -1052,11 +1052,11 @@ static void __MidiCtrl_WholeLoopStart(RedSoundCONTROL* control, RedKeyOnDATA* ke
             for (; scan < control->m_tracks + control->m_trackCount; scan++) {
                 int currentDelta = deltaAdjust + (scan->m_deltaTime - loopBase);
 
-                while ((currentDelta < 1) && (scan->m_command != 0)) {
+                while ((currentDelta < 1) && (scan->m_command != REDSOUND_TRACK_COMMAND_NONE)) {
                     int cmd = *scan->m_command++;
                     p_MidiControl_Function[cmd](control, keyOnData, scan);
 
-                    if (scan->m_command != 0) {
+                    if (scan->m_command != REDSOUND_TRACK_COMMAND_NONE) {
                         delta = DeltaTimeSumup((unsigned char**)&scan->m_command);
                         currentDelta += delta;
                         scan->m_deltaTime += delta;
@@ -1100,7 +1100,7 @@ static void __MidiCtrl_WholeLoopEnd(RedSoundCONTROL* control, RedKeyOnDATA* keyO
     if ((m_MusicPhraseStop == REDSOUND_MUSIC_PHRASE_STOP_ON) && (control == p_SoundControlBuffer)) {
         RedTrackDATA* track = control->m_tracks;
         do {
-            if (track->m_command != 0) {
+            if (track->m_command != REDSOUND_TRACK_COMMAND_NONE) {
                 __MidiCtrl_Stop(control, keyOnData, track);
             }
             track++;

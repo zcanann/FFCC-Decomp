@@ -71,6 +71,11 @@ enum RedSoundSmallDataLayout {
 	REDSOUND_SBSS_SIZE = 0x0c,
 };
 
+enum RedStreamReadPointIndex {
+	REDSOUND_STREAM_READ_POINT_READ = 0,
+	REDSOUND_STREAM_READ_POINT_PLAY = 1,
+};
+
 struct RedSoundBssState {
 	u8 m_globalInitWork[REDSOUND_GLOBAL_INIT_WORK_SIZE];
 	int m_standbyStatus[REDSOUND_STANDBY_STATUS_COUNT];
@@ -1511,8 +1516,8 @@ void CRedSound::GetStreamReadPoint(int streamId, int* readPoint)
 	RedSoundStreamBank* bank = _SearchStreamBank(streamId);
 
 	if (readPoint != 0) {
-		readPoint[0] = 0;
-		readPoint[1] = 0;
+		readPoint[REDSOUND_STREAM_READ_POINT_READ] = 0;
+		readPoint[REDSOUND_STREAM_READ_POINT_PLAY] = 0;
 	}
 
 	if (bank != 0) {
@@ -1527,17 +1532,17 @@ void CRedSound::GetStreamReadPoint(int streamId, int* readPoint)
 				} else {
 					delta = bank->m_fileSize - bank->m_readPoint + currentReadPoint;
 				}
-				readPoint[0] = delta;
+				readPoint[REDSOUND_STREAM_READ_POINT_READ] = delta;
 				if (playPoint >= bank->m_playPoint) {
-					readPoint[1] = playPoint - bank->m_playPoint;
+					readPoint[REDSOUND_STREAM_READ_POINT_PLAY] = playPoint - bank->m_playPoint;
 				}
 			}
 			bank->m_readPoint = currentReadPoint;
 			bank->m_playPoint = playPoint;
 		} else {
 			if (readPoint != 0) {
-				readPoint[0] = bank->m_fileSize - bank->m_readPoint;
-				readPoint[1] = bank->m_fileSize - bank->m_playPoint;
+				readPoint[REDSOUND_STREAM_READ_POINT_READ] = bank->m_fileSize - bank->m_readPoint;
+				readPoint[REDSOUND_STREAM_READ_POINT_PLAY] = bank->m_fileSize - bank->m_playPoint;
 			}
 			bank->m_streamId = REDSOUND_STREAM_ID_NONE;
 			bank->m_streamData = REDSOUND_STREAM_BANK_DATA_NONE;

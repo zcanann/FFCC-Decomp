@@ -62,6 +62,11 @@ enum RedStreamChannelIndex {
 	REDSOUND_STREAM_RIGHT_CHANNEL = 1,
 };
 
+enum RedStreamFrameWordIndex {
+	REDSOUND_STREAM_FRAME_WORD_0 = 0,
+	REDSOUND_STREAM_FRAME_WORD_1 = 1,
+};
+
 struct RedStreamStereoFrame {
 	unsigned int m_left[REDSOUND_STREAM_STEREO_FRAME_WORD_COUNT];
 	unsigned int m_right[REDSOUND_STREAM_STEREO_FRAME_WORD_COUNT];
@@ -718,11 +723,11 @@ static int _ArrangeStreamDataLoop(RedStreamDATA* stream, int bufferIndex, int by
 			leftDst = (RedStreamChannelFrame*)dstBase;
 			
 			do {
-				leftDst->m_word[0] = srcFrame->m_left[0];
-				leftDst->m_word[1] = srcFrame->m_left[1];
+				leftDst->m_word[REDSOUND_STREAM_FRAME_WORD_0] = srcFrame->m_left[REDSOUND_STREAM_FRAME_WORD_0];
+				leftDst->m_word[REDSOUND_STREAM_FRAME_WORD_1] = srcFrame->m_left[REDSOUND_STREAM_FRAME_WORD_1];
 				leftDst++;
-				rightDst->m_word[0] = srcFrame->m_right[0];
-				rightDst->m_word[1] = srcFrame->m_right[1];
+				rightDst->m_word[REDSOUND_STREAM_FRAME_WORD_0] = srcFrame->m_right[REDSOUND_STREAM_FRAME_WORD_0];
+				rightDst->m_word[REDSOUND_STREAM_FRAME_WORD_1] = srcFrame->m_right[REDSOUND_STREAM_FRAME_WORD_1];
 				srcFrame = srcFrame + 1;
 				rightDst++;
 			} while (srcFrame < srcEnd);
@@ -736,11 +741,11 @@ static int _ArrangeStreamDataLoop(RedStreamDATA* stream, int bufferIndex, int by
 			srcEnd = srcFrame + REDSOUND_STREAM_STEREO_FRAMES_PER_PAGE;
 			
 			do {
-				leftDst->m_word[0] = srcFrame->m_left[0];
-				leftDst->m_word[1] = srcFrame->m_left[1];
+				leftDst->m_word[REDSOUND_STREAM_FRAME_WORD_0] = srcFrame->m_left[REDSOUND_STREAM_FRAME_WORD_0];
+				leftDst->m_word[REDSOUND_STREAM_FRAME_WORD_1] = srcFrame->m_left[REDSOUND_STREAM_FRAME_WORD_1];
 				leftDst++;
-				rightDst->m_word[0] = srcFrame->m_right[0];
-				rightDst->m_word[1] = srcFrame->m_right[1];
+				rightDst->m_word[REDSOUND_STREAM_FRAME_WORD_0] = srcFrame->m_right[REDSOUND_STREAM_FRAME_WORD_0];
+				rightDst->m_word[REDSOUND_STREAM_FRAME_WORD_1] = srcFrame->m_right[REDSOUND_STREAM_FRAME_WORD_1];
 				srcFrame = srcFrame + 1;
 				rightDst++;
 			} while (srcFrame < srcEnd);

@@ -722,7 +722,7 @@ void CRedEntry::ClearWaveData(int waveNo)
 		} else if (waveNo == REDSOUND_WAVE_CLEAR_UNBANKED_USED) {
 			for (historyBank = &m_waveBankBase[REDSOUND_WAVE_PRIMARY_BANK_ENTRY_COUNT];
 			     historyBank < m_waveBankBase + REDSOUND_WAVE_BANK_ENTRY_COUNT; historyBank += 1) {
-				if ((historyBank->m_id >= 0) && (0 < historyBank->m_historyNo)) {
+				if ((historyBank->m_id >= 0) && (REDSOUND_HISTORY_UNUSED < historyBank->m_historyNo)) {
 					WaveDelete(historyBank);
 				}
 			}
@@ -755,7 +755,7 @@ void CRedEntry::ClearWaveDataM(int waveNo0, int waveNo1, int waveNo2, int waveNo
 
 	for (historyBank = &m_waveBankBase[REDSOUND_WAVE_PRIMARY_BANK_ENTRY_COUNT];
 	     historyBank < m_waveBankBase + REDSOUND_WAVE_BANK_ENTRY_COUNT; historyBank += 1) {
-		if (((historyBank->m_id >= 0) && (0 < historyBank->m_historyNo)) &&
+		if (((historyBank->m_id >= 0) && (REDSOUND_HISTORY_UNUSED < historyBank->m_historyNo)) &&
 		    (historyBank->m_id != waveNo0) && (historyBank->m_id != waveNo1) &&
 		    (historyBank->m_id != waveNo2) && (historyBank->m_id != waveNo3)) {
 			WaveDelete(historyBank);
@@ -793,7 +793,7 @@ void CRedEntry::ClearWaveBank(int waveBankNo)
 		} else if (waveBankNo == REDSOUND_WAVE_CLEAR_UNBANKED_USED) {
 			for (historyBank = &m_waveBankBase[REDSOUND_WAVE_PRIMARY_BANK_ENTRY_COUNT];
 			     historyBank < m_waveBankBase + REDSOUND_WAVE_BANK_ENTRY_COUNT; historyBank += 1) {
-				if (!(historyBank->m_id < 0) && (0 < historyBank->m_historyNo)) {
+				if (!(historyBank->m_id < 0) && (REDSOUND_HISTORY_UNUSED < historyBank->m_historyNo)) {
 					WaveDelete(historyBank);
 				}
 			}
@@ -1035,7 +1035,7 @@ void CRedEntry::SeSepHistoryAdd()
  */
 void CRedEntry::SeSepHistoryDelete(int historyNo)
 {
-	if (historyNo != 0) {
+	if (historyNo != REDSOUND_HISTORY_UNUSED) {
 		RedHistoryBANK* history = m_seSepBankBase;
 		do {
 			if (history->m_historyNo > historyNo) {
@@ -1331,7 +1331,7 @@ void CRedEntry::MusicHistoryAdd()
  */
 void CRedEntry::MusicHistoryDelete(int historyNo)
 {
-	if (historyNo != 0) {
+	if (historyNo != REDSOUND_HISTORY_UNUSED) {
 		RedHistoryBANK* history = m_musicBankBase;
 		do {
 			if (history->m_historyNo > historyNo) {
@@ -1386,7 +1386,7 @@ int CRedEntry::MusicOldClear()
 		history += 1;
 	} while (history < m_musicBankBase + REDSOUND_MUSIC_BANK_ENTRY_COUNT);
 
-	if (historyNo != 0) {
+	if (historyNo != REDSOUND_HISTORY_UNUSED) {
 		MusicMemoryFree(selected);
 	}
 
@@ -1964,7 +1964,7 @@ int CRedEntry::ClearMusicData(int musicNo)
 		RedHistoryBANK* history = m_musicBankBase;
 		do {
 			if (history->m_size != REDSOUND_HISTORY_BANK_EMPTY_SIZE) {
-				if (history->m_historyNo != 0) {
+				if (history->m_historyNo != REDSOUND_HISTORY_UNUSED) {
 					MusicHistoryDelete(history->m_historyNo);
 				}
 				result += MusicMemoryFree(history);

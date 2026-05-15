@@ -135,6 +135,8 @@ struct RedStreamDATA {
     int m_aramBuffer;
 };
 
+#define REDSOUND_STREAM_ARAM_BUFFER_NONE 0
+
 enum RedStreamDataLayoutOffset {
     REDSOUND_STREAM_TRACK_OFFSET = 0x00,
     REDSOUND_STREAM_VOICE_DATA_OFFSET = 0x04,

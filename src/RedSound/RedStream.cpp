@@ -232,12 +232,13 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 		arOffset = REDSOUND_STREAM_ARAM_HIGH_OFFSET;
 	}
 	streamData->m_aramBuffer = RedNewA(amemSize, 0, arOffset);
-	if (streamData->m_aramBuffer == 0) {
+	if (streamData->m_aramBuffer == REDSOUND_STREAM_ARAM_BUFFER_NONE) {
 		c_RedEntry.WaveOldClear(0, arOffset);
 		streamData->m_aramBuffer = RedNewA(amemSize, 0, arOffset);
 	}
 
-	if ((streamData->m_track != 0) && (streamData->m_buffer != 0) && (streamData->m_aramBuffer != 0)) {
+	if ((streamData->m_track != 0) && (streamData->m_buffer != 0) &&
+	    (streamData->m_aramBuffer != REDSOUND_STREAM_ARAM_BUFFER_NONE)) {
 		sampleOffset = REDSOUND_STREAM_LEFT_PRED_SCALE_OFFSET;
 		streamFile = reinterpret_cast<RedStreamFile*>(streamHeader);
 		headerData = streamFile->m_adpcm;
@@ -336,7 +337,7 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 				fflush(__files + 1);
 			}
 		}
-		if (streamData->m_aramBuffer != 0) {
+		if (streamData->m_aramBuffer != REDSOUND_STREAM_ARAM_BUFFER_NONE) {
 			RedDeleteA(streamData->m_aramBuffer);
 		} else {
 			if (m_ReportPrint != REDSOUND_REPORT_PRINT_OFF) {
@@ -599,9 +600,9 @@ static void _StreamStop(RedStreamDATA* streamData)
 			RedDelete(streamData->m_buffer);
 			streamData->m_buffer = 0;
 		}
-		if (streamData->m_aramBuffer != 0) {
+		if (streamData->m_aramBuffer != REDSOUND_STREAM_ARAM_BUFFER_NONE) {
 			RedDeleteA(streamData->m_aramBuffer);
-			streamData->m_aramBuffer = 0;
+			streamData->m_aramBuffer = REDSOUND_STREAM_ARAM_BUFFER_NONE;
 		}
 		streamData->m_voiceData->m_flags |= REDSOUND_VOICE_FLAGS_RELEASED;
 		streamData->m_track->m_note.m_allocFlags &= ~REDSOUND_NOTE_ALLOC_STREAM;

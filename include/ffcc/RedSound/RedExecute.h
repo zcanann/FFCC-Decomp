@@ -243,9 +243,7 @@ enum RedVoiceAdsrLayout {
 	REDSOUND_VOICE_ADSR_STAGE_COUNT = 3,
 };
 
-#define RedAdsrGetStageLevel(adsrData, stage)                                                       \
-	(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(adsrData) + (stage) +     \
-	                                   REDSOUND_VOICE_ADSR_LEVEL_BASE))
+#define RedAdsrGetStageLevel(adsrData, stage) ((adsrData)->m_level[(stage)])
 
 enum RedVoiceLayoutOffset {
 	REDSOUND_VOICE_TRACK_OFFSET = 0x00,

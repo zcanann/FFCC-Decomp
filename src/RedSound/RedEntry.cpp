@@ -1120,7 +1120,7 @@ int CRedEntry::ClearSeSepData(int seNo)
 	if (seNo == REDSOUND_SESEP_CLEAR_ALL) {
 		RedHistoryBANK* history = m_seSepBankBase;
 		do {
-			if (history->m_size != 0) {
+			if (history->m_size != REDSOUND_HISTORY_BANK_EMPTY_SIZE) {
 				SeSepMemoryFree(history);
 			}
 			history += 1;
@@ -1149,7 +1149,7 @@ int CRedEntry::ClearSeSepDataMG(int bankNo, int sepNo, int groupNo, int kindNo)
 	RedHistoryBANK* bank = m_seSepBankBase;
 
 	do {
-		if (bank->m_size != 0) {
+		if (bank->m_size != REDSOUND_HISTORY_BANK_EMPTY_SIZE) {
 			int seNo = bank->m_id / REDSOUND_SE_MG_ID_DIVISOR;
 			if ((bankNo != seNo) && (sepNo != seNo) && (groupNo != seNo) && (kindNo != seNo)) {
 				SeSepMemoryFree(bank);
@@ -1513,7 +1513,7 @@ RedMusicHEAD* CRedEntry::MusicHeadAdd(RedMusicHEAD* musicHead)
 {
 	RedMusicHEAD* result = 0;
 	RedHistoryBANK* bank = MusicOldChoice();
-	if ((bank != 0) && (bank->m_size != 0)) {
+	if ((bank != 0) && (bank->m_size != REDSOUND_HISTORY_BANK_EMPTY_SIZE)) {
 		MusicOldClear();
 		bank = MusicOldChoice();
 	}

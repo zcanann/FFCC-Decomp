@@ -428,7 +428,7 @@ void StreamPause(int streamID, int pause)
 		    ((streamID == REDSOUND_STREAM_ID_ALL) || (streamID == streamData->m_streamId))) {
 			voiceData = streamData->m_voiceData;
 			if (pause == REDSOUND_PAUSE_ON) {
-				if (voiceData->m_axVoice != 0) {
+				if (voiceData->m_axVoice != REDSOUND_AX_VOICE_NONE) {
 					voiceData->m_targetPitch = 0;
 					voiceData->m_flags |= REDSOUND_VOICE_FLAGS_PITCH_DIRTY;
 					if (streamData->m_header.m_channelCount == REDSOUND_STREAM_STEREO_CHANNEL_COUNT) {
@@ -436,7 +436,7 @@ void StreamPause(int streamID, int pause)
 						voiceData[REDSOUND_STREAM_RIGHT_CHANNEL].m_flags |= REDSOUND_VOICE_FLAGS_PITCH_DIRTY;
 					}
 				}
-			} else if (voiceData->m_axVoice != 0) {
+			} else if (voiceData->m_axVoice != REDSOUND_AX_VOICE_NONE) {
 				unsigned int pitch = PitchCompute(REDSOUND_STREAM_BASE_PITCH, 0, streamData->m_header.m_pitch, 0);
 				volume = streamData->m_volume.m_value >> REDSOUND_FIXED_SHIFT;
 				if (streamData->m_header.m_channelCount == REDSOUND_STREAM_STEREO_CHANNEL_COUNT) {
@@ -470,7 +470,7 @@ void StreamControl()
 		RedVoiceDATA* voiceData;
 		if (streamData->m_state == REDSOUND_STREAM_STATE_PLAYING) {
 			voiceData = streamData->m_voiceData;
-			if (voiceData->m_axVoice != 0) {
+			if (voiceData->m_axVoice != REDSOUND_AX_VOICE_NONE) {
 				if (voiceData->m_axVoice->priority == 0) {
 					_StreamStop(streamData);
 				} else {
@@ -658,7 +658,7 @@ static int _ArrangeStreamDataNoLoop(RedStreamDATA* stream, int bufferIndex, int 
 		                    (int)dstBuffer, dmaDstOffset, REDSOUND_STREAM_PAGE_SIZE, REDSOUND_DMA_CALLBACK_NONE,
 		                    REDSOUND_DMA_CALLBACK_DATA_NONE);
 
-		if ((bufferIndex == REDSOUND_STREAM_BUFFER_SIDE_A) && (voiceData->m_axVoice != 0)) {
+		if ((bufferIndex == REDSOUND_STREAM_BUFFER_SIDE_A) && (voiceData->m_axVoice != REDSOUND_AX_VOICE_NONE)) {
 			voiceData->m_axVoice->pb.adpcmLoop.loop_pred_scale = (unsigned short)*dstBuffer;
 			voiceData->m_axVoice->pb.adpcmLoop.loop_yn1 = voiceData->m_axVoice->pb.adpcmLoop.loop_yn2 = 0;
 			voiceData->m_axVoice->sync |= AX_SYNC_FLAG_COPYADPCMLOOP;
@@ -671,7 +671,7 @@ static int _ArrangeStreamDataNoLoop(RedStreamDATA* stream, int bufferIndex, int 
 			dmaID = RedDmaEntry(REDSOUND_DMA_FLAGS_STREAM_LOAD, REDSOUND_DMA_DIRECTION_TO_ARAM,
 			                    (int)dstBuffer, dmaDstOffset, REDSOUND_STREAM_PAGE_SIZE,
 			                    REDSOUND_DMA_CALLBACK_NONE, REDSOUND_DMA_CALLBACK_DATA_NONE);
-			if ((bufferIndex == REDSOUND_STREAM_BUFFER_SIDE_A) && (voiceData->m_axVoice != 0)) {
+			if ((bufferIndex == REDSOUND_STREAM_BUFFER_SIDE_A) && (voiceData->m_axVoice != REDSOUND_AX_VOICE_NONE)) {
 				voiceData->m_axVoice->pb.adpcmLoop.loop_pred_scale = (unsigned short)*dstBuffer;
 				voiceData->m_axVoice->pb.adpcmLoop.loop_yn1 = voiceData->m_axVoice->pb.adpcmLoop.loop_yn2 = 0;
 				voiceData->m_axVoice->sync |= AX_SYNC_FLAG_COPYADPCMLOOP;
@@ -758,7 +758,7 @@ static int _ArrangeStreamDataLoop(RedStreamDATA* stream, int bufferIndex, int by
 			                    REDSOUND_STREAM_PAGE_SIZE, REDSOUND_DMA_CALLBACK_NONE,
 			                    REDSOUND_DMA_CALLBACK_DATA_NONE);
 			
-			if ((bufferIndex == REDSOUND_STREAM_BUFFER_SIDE_A) && (voiceData->m_axVoice != 0)) {
+			if ((bufferIndex == REDSOUND_STREAM_BUFFER_SIDE_A) && (voiceData->m_axVoice != REDSOUND_AX_VOICE_NONE)) {
 				voiceData->m_axVoice->pb.adpcmLoop.loop_pred_scale = (unsigned short)*dstBase;
 				voiceData->m_axVoice->pb.adpcmLoop.loop_yn1 = voiceData->m_axVoice->pb.adpcmLoop.loop_yn2 = 0;
 				voiceData->m_axVoice->sync |= AX_SYNC_FLAG_COPYADPCMLOOP;
@@ -794,7 +794,7 @@ static int _ArrangeStreamDataLoop(RedStreamDATA* stream, int bufferIndex, int by
 			                    REDSOUND_STREAM_PAGE_SIZE, REDSOUND_DMA_CALLBACK_NONE,
 			                    REDSOUND_DMA_CALLBACK_DATA_NONE);
 			
-			if ((bufferIndex == REDSOUND_STREAM_BUFFER_SIDE_A) && (voiceData->m_axVoice != 0)) {
+			if ((bufferIndex == REDSOUND_STREAM_BUFFER_SIDE_A) && (voiceData->m_axVoice != REDSOUND_AX_VOICE_NONE)) {
 				voiceData->m_axVoice->pb.adpcmLoop.loop_pred_scale = (unsigned short)*dstBase;
 				voiceData->m_axVoice->pb.adpcmLoop.loop_yn1 = voiceData->m_axVoice->pb.adpcmLoop.loop_yn2 = 0;
 				voiceData->m_axVoice->sync |= AX_SYNC_FLAG_COPYADPCMLOOP;

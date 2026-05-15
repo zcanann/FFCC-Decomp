@@ -1748,8 +1748,7 @@ static void __MidiCtrl_ADSR_Default(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDAT
 {
     RedVoiceDATA* voice;
 
-    *(int*)&track->m_adsr.m_time[REDSOUND_VOICE_ADSR_ATTACK] = REDSOUND_TRACK_ADSR_DEFAULT_WORD;
-    *(int*)&track->m_adsr.m_time[REDSOUND_VOICE_ADSR_SUSTAIN] = REDSOUND_TRACK_ADSR_DEFAULT_WORD;
+    RedTrackAdsrSetDefaultWords(&track->m_adsr);
     memset(&track->m_adsr, REDSOUND_TRACK_ADSR_DEFAULT_WORD, REDSOUND_TRACK_ADSR_SIZE);
 
     voice = p_VoiceData;

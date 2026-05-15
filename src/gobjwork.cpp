@@ -2419,12 +2419,12 @@ void CCaravanWork::GetCurrentWeaponItem(int& weaponItem, int& weaponRef)
 {
 	short weaponIdx = m_weaponIdx;
 	if (weaponIdx == 0) {
-		int activeWeapon = 0;
-		weaponItem = 0;
-		int ownerWorkAddr = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_ownerObj) + 0x58);
-		int equippedSlot = *reinterpret_cast<short*>(ownerWorkAddr + 0xAC);
+		int activeWeapon;
+		weaponItem = activeWeapon = 0;
+		CCaravanWork* ownerWork = *reinterpret_cast<CCaravanWork**>(reinterpret_cast<unsigned char*>(m_ownerObj) + 0x58);
+		int equippedSlot = ownerWork->m_equipment[0];
 		if (equippedSlot >= 0) {
-			activeWeapon = *reinterpret_cast<short*>(ownerWorkAddr + equippedSlot * 2 + 0xB6);
+			activeWeapon = ownerWork->m_inventoryItems[equippedSlot];
 		}
 		weaponRef = activeWeapon;
 		return;
@@ -2433,7 +2433,7 @@ void CCaravanWork::GetCurrentWeaponItem(int& weaponItem, int& weaponRef)
 	if (weaponIdx != 1) {
 		weaponItem = weaponIdx;
 		CCaravanWork* ownerWork = *reinterpret_cast<CCaravanWork**>(reinterpret_cast<unsigned char*>(m_ownerObj) + 0x58);
-		weaponRef = ownerWork->DelCmdListAndItem(weaponIdx);
+		weaponRef = ownerWork->DelCmdListAndItem(m_weaponIdx);
 	}
 }
 
@@ -2706,7 +2706,7 @@ int CCaravanWork::GetArtifactIncludeHpMax()
 	}
 
 	hpMax += baseData[3];
-	if (hpMax > 0xF) {
+	if (hpMax >= 0x10) {
 		return 0x10;
 	}
 	return hpMax;

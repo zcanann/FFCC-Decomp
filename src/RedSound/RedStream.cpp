@@ -537,7 +537,8 @@ void StreamControl()
 					}
 				}
 			}
-		} else if ((streamData->m_state == REDSOUND_STREAM_STATE_LOADING) && (RedDmaSearchID(streamData->m_dmaId) == 0)) {
+		} else if ((streamData->m_state == REDSOUND_STREAM_STATE_LOADING) &&
+		           (RedDmaSearchID(streamData->m_dmaId) == REDSOUND_DMA_SEARCH_NOT_FOUND)) {
 			voiceData = streamData->m_voiceData;
 			streamData->m_state = REDSOUND_STREAM_STATE_PLAYING;
 			voiceData->m_flags |= REDSOUND_VOICE_FLAGS_STREAM_START;

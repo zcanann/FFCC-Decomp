@@ -674,7 +674,7 @@ int CRedEntry::SetWaveData(int waveBankNo, void* waveData, int waveDataSize)
 		m_waveLoadSize = waveSize;
 		m_waveLoadAddress = waveAddress;
 
-		while (RedDmaSearchID(dmaID) > 0) {
+		while (RedDmaSearchID(dmaID) > REDSOUND_DMA_SEARCH_NOT_FOUND) {
 			RedSleep(REDSOUND_WAVE_LOAD_DMA_POLL_SLEEP_US);
 		}
 

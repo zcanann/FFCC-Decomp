@@ -34,6 +34,11 @@ enum RedDmaId {
 	REDSOUND_DMA_ID_NONE = 0,
 };
 
+enum RedDmaSearchResult {
+	REDSOUND_DMA_SEARCH_NOT_FOUND = 0,
+	REDSOUND_DMA_SEARCH_FOUND = 1,
+};
+
 unsigned int DeltaTimeSumup(unsigned char** buffer);
 unsigned int GetMyEntryID();
 void RedSleep(int microseconds);

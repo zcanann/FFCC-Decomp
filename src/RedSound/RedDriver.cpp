@@ -1786,14 +1786,14 @@ int RedDmaSearchID(int id)
     int found;
     RedDmaRequest* queueEntry;
 
-    found = 0;
+    found = REDSOUND_DMA_SEARCH_NOT_FOUND;
     interruptLevel = OSDisableInterrupts();
     if (id != REDSOUND_DMA_ID_NONE) {
         queueEntry = RedDriverMainDmaQueue();
         do {
             if ((queueEntry->m_id != REDSOUND_DMA_ID_NONE) &&
                 ((id == REDSOUND_DMA_ID_NONE) || (queueEntry->m_id == id))) {
-                found = 1;
+                found = REDSOUND_DMA_SEARCH_FOUND;
                 break;
             }
             queueEntry++;

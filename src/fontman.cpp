@@ -19,6 +19,8 @@ extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(in
 extern "C" void* __vt__5CFont[];
 extern "C" const float FLOAT_803306B8;
 extern "C" const float FLOAT_803306C8;
+extern "C" const float FLOAT_803306D8;
+extern "C" const float FLOAT_803306DC;
 
 static const char s_fontman_cpp[] = "fontman.cpp";
 static const char s_CFontMan[] = "CFontMan";
@@ -392,11 +394,11 @@ void CFont::DrawInit()
 
     CFontRenderFlagBits& renderFlagBits = GetRenderFlagBits(renderFlags);
     if (renderFlagBits.zCompare != 0 || renderFlagBits.zUpdate != 0) {
-        C_MTXOrtho(projMtx, 0.0f, 480.0f, 0.0f, 640.0f, 0.0f, 1.0f);
-        projMtx[2][2] = 1.0f;
-        projMtx[2][3] = 0.0f;
+        C_MTXOrtho(projMtx, FLOAT_803306B8, FLOAT_803306D8, FLOAT_803306B8, FLOAT_803306DC, FLOAT_803306B8, FLOAT_803306C8);
+        projMtx[2][2] = FLOAT_803306C8;
+        projMtx[2][3] = FLOAT_803306B8;
     } else {
-        C_MTXOrtho(projMtx, 0.0f, 480.0f, 0.0f, 640.0f, 0.0f, 1.0f);
+        C_MTXOrtho(projMtx, FLOAT_803306B8, FLOAT_803306D8, FLOAT_803306B8, FLOAT_803306DC, FLOAT_803306B8, FLOAT_803306C8);
     }
     GXSetProjection(projMtx, GX_ORTHOGRAPHIC);
 
@@ -426,7 +428,7 @@ void CFont::DrawInit()
 
     float texWidth = static_cast<float>(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(texturePtr) + 0x64));
     float texHeight = static_cast<float>(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(texturePtr) + 0x68));
-    PSMTXScale(texMtx, 1.0f / texWidth, 1.0f / texHeight, 1.0f);
+    PSMTXScale(texMtx, FLOAT_803306C8 / texWidth, FLOAT_803306C8 / texHeight, FLOAT_803306C8);
     GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX2x4);
 
     GXSetNumTexGens(1);

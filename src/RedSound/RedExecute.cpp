@@ -1593,7 +1593,7 @@ void SetAllVoiceAccess(RedSoundCONTROL* control, int mask)
     RedTrackDATA* track = control->m_tracks;
     RedTrackDATA* trackEnd = track + control->m_trackCount;
     do {
-        if (track->m_command != 0) {
+        if (track->m_command != REDSOUND_TRACK_COMMAND_NONE) {
             SetVoiceAccess(track, mask);
         }
         track++;
@@ -2248,7 +2248,7 @@ static void _ExecuteExtraData()
             } else {
                 track = soundControl->m_tracks;
                 do {
-                    if (track->m_command != 0) {
+                    if (track->m_command != REDSOUND_TRACK_COMMAND_NONE) {
                         voice = p_VoiceData;
                         do {
                             if (voice->m_track == track) {
@@ -2467,7 +2467,7 @@ static void _MidiTrackExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData,
 {
     RedTrackDATA* track = control->m_tracks;
     do {
-        if (track->m_command != 0) {
+        if (track->m_command != REDSOUND_TRACK_COMMAND_NONE) {
             int step;
             m_ChangeStatus = 0;
             if (track->m_deltaTime < frames) {
@@ -2481,13 +2481,13 @@ static void _MidiTrackExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData,
             if (((track->m_flags & REDSOUND_TRACK_FLAG_TENUTO) == 0) && (track->m_deltaTime == 1)) {
                 KeyOffSet(control, keyOnData, track);
             }
-            while ((track->m_command != 0) && (track->m_deltaTime < 1)) {
+            while ((track->m_command != REDSOUND_TRACK_COMMAND_NONE) && (track->m_deltaTime < 1)) {
                 unsigned char* cmd = track->m_command;
                 int delta;
                 track->m_command = cmd + 1;
                 RedMidiControlFunc func = p_MidiControl_Function[*cmd];
                 func(control, keyOnData, track);
-                if (track->m_command != 0) {
+                if (track->m_command != REDSOUND_TRACK_COMMAND_NONE) {
                     if (track->m_deltaTime < 1) {
                         delta = DeltaTimeSumup((unsigned char**)&track->m_command);
                     } else {
@@ -3037,7 +3037,7 @@ static int _SeMidiNoteExecute(
     RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* track, int frames, int tickStep)
 {
     do {
-        if ((track->m_command != 0) && ((track->m_voiceSwitch & REDSOUND_VOICE_SWITCH_PAUSE) == 0)) {
+        if ((track->m_command != REDSOUND_TRACK_COMMAND_NONE) && ((track->m_voiceSwitch & REDSOUND_VOICE_SWITCH_PAUSE) == 0)) {
             track->m_seTickCounter -= tickStep * REDSOUND_SE_TICK_STEP;
             while (track->m_seTickCounter < 1) {
                 int step;
@@ -3055,7 +3055,7 @@ static int _SeMidiNoteExecute(
                 }
 
                 m_ChangeStatus = 0;
-                while ((track->m_command != 0) && (track->m_deltaTime < 1)) {
+                while ((track->m_command != REDSOUND_TRACK_COMMAND_NONE) && (track->m_deltaTime < 1)) {
                     int delta;
                     unsigned char* cmd;
                     track->m_loopStepCurrent += 1;
@@ -3063,7 +3063,7 @@ static int _SeMidiNoteExecute(
                     track->m_command = cmd + 1;
                     RedMidiControlFunc func = p_MidiControl_Function[*cmd];
                     func(control, keyOnData, track);
-                    if (track->m_command != 0) {
+                    if (track->m_command != REDSOUND_TRACK_COMMAND_NONE) {
                         delta = DeltaTimeSumup((unsigned char**)&track->m_command);
                         if (delta != 0) {
                             delta += track->m_step;

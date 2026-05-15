@@ -220,7 +220,7 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 	RedVoiceDATA* voice;
 
 	streamData = _SearchEmptyStreamData();
-	if (streamData != 0) {
+	if (streamData != REDSOUND_STREAM_DATA_NONE) {
 
 	memcpy(&streamData->m_header, streamHeader, REDSOUND_STREAM_FILE_HEADER_SIZE);
 	streamData->m_track = SearchSeEmptyTrack(streamData->m_header.m_channelCount, REDSOUND_STREAM_ERASE_TRACK, 0);
@@ -237,7 +237,8 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 		streamData->m_aramBuffer = RedNewA(amemSize, 0, arOffset);
 	}
 
-	if ((streamData->m_track != 0) && (streamData->m_buffer != 0) &&
+	if ((streamData->m_track != REDSOUND_STREAM_TRACK_NONE) &&
+	    (streamData->m_buffer != REDSOUND_STREAM_BUFFER_NONE) &&
 	    (streamData->m_aramBuffer != REDSOUND_STREAM_ARAM_BUFFER_NONE)) {
 		sampleOffset = REDSOUND_STREAM_LEFT_PRED_SCALE_OFFSET;
 		streamFile = reinterpret_cast<RedStreamFile*>(streamHeader);
@@ -327,7 +328,7 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 			OSReport(sRedStreamBufferDidntSecureFmt, sRedStreamLogPrefix, sRedStreamLogErrorColor, sRedStreamLogReset);
 			fflush(__files + 1);
 		}
-		if (streamData->m_buffer != 0) {
+		if (streamData->m_buffer != REDSOUND_STREAM_BUFFER_NONE) {
 			RedDelete(streamData->m_buffer);
 		} else {
 			if (m_ReportPrint != REDSOUND_REPORT_PRINT_OFF) {
@@ -596,9 +597,9 @@ static void _StreamStop(RedStreamDATA* streamData)
 	if (streamData->m_streamId != REDSOUND_STREAM_ID_NONE) {
 		streamData->m_streamId = REDSOUND_STREAM_ID_NONE;
 		streamData->m_state = REDSOUND_STREAM_STATE_STOPPED;
-		if (streamData->m_buffer != 0) {
+		if (streamData->m_buffer != REDSOUND_STREAM_BUFFER_NONE) {
 			RedDelete(streamData->m_buffer);
-			streamData->m_buffer = 0;
+			streamData->m_buffer = REDSOUND_STREAM_BUFFER_NONE;
 		}
 		if (streamData->m_aramBuffer != REDSOUND_STREAM_ARAM_BUFFER_NONE) {
 			RedDeleteA(streamData->m_aramBuffer);

@@ -509,9 +509,8 @@ int CRedEntry::WaveHeadAdd(int waveBankNo, RedWaveHeadWD* waveHead, int waveNo)
 		}
 	} else if ((waveNo >= REDSOUND_WAVE_STAGE_RANGE_BEGIN) && (waveNo < REDSOUND_WAVE_STAGE_RANGE_END)) {
 		waveHead->m_loadSize += REDSOUND_WAVE_STAGE_LOAD_BLOCK_ROUND;
-		int blocks = waveHead->m_loadSize / REDSOUND_WAVE_STAGE_LOAD_BLOCK_SIZE;
-		waveHead->m_loadSize =
-		    (blocks - (blocks >> REDSOUND_SIGN_SHIFT)) * REDSOUND_WAVE_STAGE_LOAD_BLOCK_SIZE;
+		waveHead->m_loadSize /= REDSOUND_WAVE_STAGE_LOAD_BLOCK_SIZE;
+		waveHead->m_loadSize *= REDSOUND_WAVE_STAGE_LOAD_BLOCK_SIZE;
 	} else if (((waveNo >= REDSOUND_WAVE_FIXED_RANGE0_BEGIN) && (waveNo < REDSOUND_WAVE_FIXED_RANGE0_END)) ||
 	           ((waveNo >= REDSOUND_WAVE_FIXED_RANGE1_BEGIN) && (waveNo < REDSOUND_WAVE_FIXED_RANGE1_END)) ||
 	           (waveNo == REDSOUND_WAVE_FIXED_SINGLE)) {

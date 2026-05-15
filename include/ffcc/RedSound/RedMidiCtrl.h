@@ -453,6 +453,12 @@ enum RedSoundControlSaveSize {
 
 typedef void (*RedMidiControlFunc)(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* track);
 
+enum RedMidiCtrlStatusIndex {
+	REDSOUND_MIDI_CTRL_STATUS_0 = 0,
+	REDSOUND_MIDI_CTRL_STATUS_1 = 1,
+	REDSOUND_MIDI_CTRL_STATUS_2 = 2,
+};
+
 class CRedMidiCtrl
 {
 public:

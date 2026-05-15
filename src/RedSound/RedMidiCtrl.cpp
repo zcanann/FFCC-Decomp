@@ -2949,7 +2949,7 @@ CRedMidiCtrl::~CRedMidiCtrl()
  */
 void CRedMidiCtrl::Init()
 {
-    m_status[0] = 0;
-    m_status[1] = 0;
-    m_status[2] = 0;
+    m_status[REDSOUND_MIDI_CTRL_STATUS_0] = 0;
+    m_status[REDSOUND_MIDI_CTRL_STATUS_1] = 0;
+    m_status[REDSOUND_MIDI_CTRL_STATUS_2] = 0;
 }

@@ -1721,17 +1721,17 @@ void CRedEntry::DisplayMMemoryInfo()
  */
 void CRedEntry::WaveHistoryChoice(RedHistoryBANK* bank)
 {
-	if (bank->m_historyNo != 0) {
+	if (bank->m_historyNo != REDSOUND_HISTORY_UNUSED) {
 		RedHistoryBANK* history = m_waveBankBase;
 		do {
-			if ((history->m_historyNo != 0) &&
+			if ((history->m_historyNo != REDSOUND_HISTORY_UNUSED) &&
 			    (history->m_historyNo < bank->m_historyNo)) {
 				history->m_historyNo = history->m_historyNo + 1;
 			}
 			history += 1;
 		} while (history < m_waveBankBase + REDSOUND_WAVE_BANK_ENTRY_COUNT);
 
-		bank->m_historyNo = 1;
+		bank->m_historyNo = REDSOUND_HISTORY_MOST_RECENT;
 	}
 }
 /*
@@ -1773,7 +1773,7 @@ int CRedEntry::WaveDelete(RedHistoryBANK* bank)
 		}
 
 		bank->m_data = 0;
-		bank->m_historyNo = 0;
+		bank->m_historyNo = REDSOUND_HISTORY_UNUSED;
 	}
 
 	return sequenceNo;
@@ -1789,15 +1789,15 @@ int CRedEntry::WaveDelete(RedHistoryBANK* bank)
  */
 void CRedEntry::SeSepHistoryChoice(RedHistoryBANK* bank)
 {
-	if (bank->m_historyNo != 0) {
+	if (bank->m_historyNo != REDSOUND_HISTORY_UNUSED) {
 		RedHistoryBANK* history = m_seSepBankBase;
 		do {
-			if ((history->m_historyNo != 0) && (history->m_historyNo < bank->m_historyNo)) {
+			if ((history->m_historyNo != REDSOUND_HISTORY_UNUSED) && (history->m_historyNo < bank->m_historyNo)) {
 				history->m_historyNo = history->m_historyNo + 1;
 			}
 			history += 1;
 		} while (history < m_seSepBankBase + REDSOUND_SESEP_BANK_ENTRY_COUNT);
-		bank->m_historyNo = 1;
+		bank->m_historyNo = REDSOUND_HISTORY_MOST_RECENT;
 	}
 }
 /*
@@ -1855,7 +1855,7 @@ RedSeSepHEAD* CRedEntry::SeSepHeadAdd(RedSeSepHEAD* seSepHead)
 		bank->m_size = seSepHead->m_sizeAndFlags & REDSOUND_SESEP_SIZE_MASK;
 		bank->m_id = seSepHead->m_seNo;
 		SeSepHistoryAdd();
-		bank->m_historyNo = 1;
+		bank->m_historyNo = REDSOUND_HISTORY_MOST_RECENT;
 	}
 
 	return result;
@@ -1911,15 +1911,15 @@ RedSeSepHEAD* CRedEntry::SetSeSepData(RedSeSepHEAD* seSepHead)
  */
 void CRedEntry::MusicHistoryChoice(RedHistoryBANK* bank)
 {
-	if (bank->m_historyNo != 0) {
+	if (bank->m_historyNo != REDSOUND_HISTORY_UNUSED) {
 		RedHistoryBANK* history = m_musicBankBase;
 		do {
-			if ((history->m_historyNo != 0) && (history->m_historyNo < bank->m_historyNo)) {
+			if ((history->m_historyNo != REDSOUND_HISTORY_UNUSED) && (history->m_historyNo < bank->m_historyNo)) {
 				history->m_historyNo = history->m_historyNo + 1;
 			}
 			history += 1;
 		} while (history < m_musicBankBase + REDSOUND_MUSIC_BANK_ENTRY_COUNT);
-		bank->m_historyNo = 1;
+		bank->m_historyNo = REDSOUND_HISTORY_MOST_RECENT;
 	}
 }
 /*
@@ -1937,7 +1937,7 @@ int CRedEntry::MusicMemoryFree(RedHistoryBANK* bank)
 	RedDelete(bank->m_address);
 	int freedSize = bank->m_size;
 	bank->m_data = bank->m_size = 0;
-	bank->m_historyNo = 0;
+	bank->m_historyNo = REDSOUND_HISTORY_UNUSED;
 	bank->m_id = REDSOUND_HISTORY_BANK_EMPTY_ID;
 	return freedSize;
 }

@@ -841,7 +841,8 @@ static int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volum
 			remaining = 0;
 			do {
 				remaining = remaining + 1;
-				if ((reinterpret_cast<unsigned char*>(seq)[remaining * sizeof(RedSeInfoSequence) + 1] &
+				if ((reinterpret_cast<unsigned char*>(seq)[remaining * sizeof(RedSeInfoSequence) +
+				                                             REDSOUND_SE_INFO_SEQUENCE_OFFSET_HI] &
 				     REDSOUND_SE_INFO_SEQUENCE_CONTINUE_FLAG) == 0) {
 					break;
 				}

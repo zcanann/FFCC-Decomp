@@ -297,7 +297,7 @@ int SeBlockPlay(int seId, int bank, int no, int pan, int volume)
 				RedSeINFO* seInfo = reinterpret_cast<RedSeINFO*>(
 				    reinterpret_cast<unsigned char*>(entries) +
 				    (entries[seNo] & REDSOUND_SE_BLOCK_ENTRY_MASK) +
-				    bankData->m_seCount * sizeof(*entries));
+				    bankData->m_seCount * REDSOUND_SE_BLOCK_ENTRY_SIZE);
 				RedSeINFO* playInfo = seInfo;
 
 				if (((unsigned int)entries[seNo] & REDSOUND_SE_BLOCK_DATA_FLAG) != 0) {

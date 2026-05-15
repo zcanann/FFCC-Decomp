@@ -372,10 +372,10 @@ void CRedEntry::WaveHistoryAdd(int historyNo)
  */
 void CRedEntry::WaveHistoryDelete(int historyNo)
 {
-	if (historyNo != 0) {
+	if (historyNo != REDSOUND_HISTORY_UNUSED) {
 		RedHistoryBANK* history = m_waveBankBase;
 		do {
-			if ((history->m_historyNo != 0) && (history->m_historyNo > historyNo)) {
+			if ((history->m_historyNo != REDSOUND_HISTORY_UNUSED) && (history->m_historyNo > historyNo)) {
 				history->m_historyNo = history->m_historyNo - 1;
 			}
 			history += 1;
@@ -416,12 +416,12 @@ int CRedEntry::SearchWaveSequence(int waveNo)
 int CRedEntry::SearchUseWave(int waveNo)
 {
 	unsigned int interruptLevel = OSDisableInterrupts();
-	int found = 0;
+	int found = REDSOUND_ENTRY_SEARCH_NOT_FOUND;
 	RedSoundCONTROL* control = p_SoundControlBuffer + REDSOUND_CONTROL_MUSIC_SECONDARY;
 
 	do {
 		if ((control->m_musicId >= REDSOUND_MUSIC_ID_MIN) && (control->m_waveNo == waveNo)) {
-			found = 1;
+			found = REDSOUND_ENTRY_SEARCH_FOUND;
 			MusicStop(control->m_musicId);
 		}
 		control--;
@@ -432,7 +432,7 @@ int CRedEntry::SearchUseWave(int waveNo)
 	do {
 		if (((u32)track->m_command != 0) && (track->m_waveBankData != 0) &&
 		    (track->m_waveBankData->m_waveNo == waveNo)) {
-			found = 1;
+			found = REDSOUND_ENTRY_SEARCH_FOUND;
 			SeStopID(track->m_seId);
 		}
 		track += 1;
@@ -470,7 +470,7 @@ int CRedEntry::WaveOldClear(int offset, int maxSize)
 		history += 1;
 	} while (history < m_waveBankBase + REDSOUND_WAVE_BANK_ENTRY_COUNT);
 
-	if (maxBankSize != 0) {
+	if (maxBankSize != REDSOUND_HISTORY_UNUSED) {
 		WaveDelete(selected);
 	}
 

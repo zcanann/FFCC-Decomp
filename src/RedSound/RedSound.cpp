@@ -1211,8 +1211,7 @@ int CRedSound::GetSeUsedWave(int bank, int seNo)
 			int* entries = block->m_entries;
 			if (entries[seNo] != REDSOUND_SE_BLOCK_ENTRY_EMPTY) {
 				RedSeINFO* info = RedSeBlockGetInfoFromEntries(block, entries, seNo);
-				waveNo = info->m_waveNoHi;
-				waveNo = info->m_waveNoLo | waveNo * REDSOUND_SE_INFO_U16_HIGH_SCALE;
+				waveNo = RedSeInfoGetWaveNo(info);
 			}
 		}
 	}
@@ -1230,10 +1229,8 @@ int CRedSound::GetSeUsedWave(int bank, int seNo)
 int CRedSound::GetSeUsedWave(void* seSepData)
 {
 	RedSeSepHEAD* seSepHead = (RedSeSepHEAD*)seSepData;
-	int waveNo;
 
-	waveNo = seSepHead->m_waveNoHi;
-	return seSepHead->m_waveNoLo | waveNo * REDSOUND_SESEP_WAVE_NO_HIGH_SCALE;
+	return RedSeSepGetWaveNo(seSepHead);
 }
 /*
  * --INFO--

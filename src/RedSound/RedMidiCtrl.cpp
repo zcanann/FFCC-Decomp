@@ -607,7 +607,7 @@ void KeyOnReserveClear(RedKeyOnDATA* keyOnData, RedTrackDATA* track)
     RedKeyOnSlot* slot = keyOnData->m_fixed;
     do {
         if (slot->m_track == track) {
-            slot->m_track = 0;
+            slot->m_track = REDSOUND_TRACK_NONE;
         }
         slot++;
     } while (slot < keyOnData->m_normal + REDSOUND_KEY_ON_SLOT_COUNT);
@@ -627,7 +627,7 @@ void KeyOnReserve(RedKeyOnDATA* keyOnData, RedTrackDATA* track)
 
     if (((signed char)track->m_note.m_allocFlags & REDSOUND_NOTE_ALLOC_DIRECT_MASK) != 0) {
         slot = &keyOnData->m_fixed[track->m_trackNo];
-        if ((slot->m_track == 0) || (slot->m_track == track)) {
+        if ((slot->m_track == REDSOUND_TRACK_NONE) || (slot->m_track == track)) {
             slot->m_track = track;
             RedNoteCopy(&slot->m_note, &track->m_note);
             m_KeyOnEntry++;
@@ -638,7 +638,7 @@ void KeyOnReserve(RedKeyOnDATA* keyOnData, RedTrackDATA* track)
     if ((track->m_note.m_allocFlags & REDSOUND_NOTE_ALLOC_PRIORITY) != 0) {
         slot = keyOnData->m_priority;
         do {
-            if (slot->m_track == 0) {
+            if (slot->m_track == REDSOUND_TRACK_NONE) {
                 slot->m_track = track;
                 RedNoteCopy(&slot->m_note, &track->m_note);
                 m_KeyOnEntry++;
@@ -649,7 +649,7 @@ void KeyOnReserve(RedKeyOnDATA* keyOnData, RedTrackDATA* track)
     } else {
         slot = keyOnData->m_normal;
         do {
-            if (slot->m_track == 0) {
+            if (slot->m_track == REDSOUND_TRACK_NONE) {
                 slot->m_track = track;
                 RedNoteCopy(&slot->m_note, &track->m_note);
                 m_KeyOnEntry++;
@@ -680,7 +680,7 @@ void KeyOffSet(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* 
         slot = keyOnData->m_fixed;
         do {
             if ((slot->m_track == track) && (slot->m_note.m_key == key)) {
-                slot->m_track = 0;
+                slot->m_track = REDSOUND_TRACK_NONE;
             }
             slot++;
         } while (slot < keyOnData->m_normal + REDSOUND_KEY_ON_SLOT_COUNT);
@@ -966,7 +966,7 @@ static void __MidiCtrl_Stop(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, R
                     voice->m_voiceSwitch &= REDSOUND_VOICE_SWITCH_CLEAR_SUSTAIN_PAUSE_MASK;
                     voice->m_flags &= REDSOUND_VOICE_FLAGS_CLEAR_ACTIVE_MASK;
                     voice->m_flags |= REDSOUND_VOICE_FLAGS_RELEASED;
-                    voice->m_track = 0;
+                    voice->m_track = REDSOUND_VOICE_TRACK_NONE;
                 }
                 voice++;
             } while (voice < p_VoiceData + REDSOUND_VOICE_COUNT);
@@ -976,7 +976,7 @@ static void __MidiCtrl_Stop(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, R
             control->m_musicId = REDSOUND_MUSIC_ID_NONE;
             control->m_updateFlags = 0;
             RedDelete((int)control->m_tracks);
-            control->m_tracks = 0;
+            control->m_tracks = REDSOUND_TRACK_NONE;
         }
     } else {
         if (track->m_waveBankData != 0) {

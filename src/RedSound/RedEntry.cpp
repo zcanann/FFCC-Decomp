@@ -396,7 +396,7 @@ int CRedEntry::SearchWaveSequence(int waveNo)
 	RedHistoryBANK* waveBank = m_waveBankBase;
 
 	while (waveBank < m_waveBankBase + REDSOUND_WAVE_BANK_ENTRY_COUNT) {
-		if ((waveBank->m_size != 0) && (waveBank->m_id == waveNo)) {
+		if ((waveBank->m_size != REDSOUND_HISTORY_BANK_EMPTY_SIZE) && (waveBank->m_id == waveNo)) {
 			return waveBank - m_waveBankBase;
 		}
 		waveBank += 1;
@@ -1059,14 +1059,14 @@ int CRedEntry::SearchSeSepSequence(int seNo)
 
 	if (seNo == REDSOUND_SESEP_SEARCH_FIRST) {
 		do {
-			if (seSepBank->m_size != 0) {
+			if (seSepBank->m_size != REDSOUND_HISTORY_BANK_EMPTY_SIZE) {
 				return seSepBank - m_seSepBankBase;
 			}
 			seSepBank += 1;
 		} while (seSepBank < m_seSepBankBase + REDSOUND_SESEP_BANK_ENTRY_COUNT);
 	} else {
 		do {
-			if ((seSepBank->m_size != 0) && (seSepBank->m_id == seNo)) {
+			if ((seSepBank->m_size != REDSOUND_HISTORY_BANK_EMPTY_SIZE) && (seSepBank->m_id == seNo)) {
 				return seSepBank - m_seSepBankBase;
 			}
 			seSepBank += 1;
@@ -1091,7 +1091,7 @@ RedHistoryBANK* CRedEntry::SeSepOldDelete()
 	RedHistoryBANK* history = m_seSepBankBase;
 
 	do {
-		if ((history->m_size != 0) && (historyNo < history->m_historyNo)) {
+		if ((history->m_size != REDSOUND_HISTORY_BANK_EMPTY_SIZE) && (historyNo < history->m_historyNo)) {
 			historyNo = history->m_historyNo;
 			selected = history;
 		}
@@ -1354,7 +1354,7 @@ int CRedEntry::SearchMusicSequence(int musicNo)
 	RedHistoryBANK* musicBank = m_musicBankBase;
 
 	do {
-		if ((musicBank->m_size != 0) && (musicBank->m_id == musicNo)) {
+		if ((musicBank->m_size != REDSOUND_HISTORY_BANK_EMPTY_SIZE) && (musicBank->m_id == musicNo)) {
 			return musicBank - m_musicBankBase;
 		}
 		musicBank += 1;
@@ -1407,7 +1407,7 @@ RedHistoryBANK* CRedEntry::MusicOldChoice()
 	RedHistoryBANK* history = m_musicBankBase;
 
 	do {
-		if (history->m_size == 0) {
+		if (history->m_size == REDSOUND_HISTORY_BANK_EMPTY_SIZE) {
 			return history;
 		}
 		if (history->m_historyNo > historyNo) {

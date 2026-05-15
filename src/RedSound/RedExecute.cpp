@@ -1825,7 +1825,7 @@ void EnvelopeKeyExecute()
                 if ((voiceData->m_stateFlags & REDSOUND_VOICE_STATE_PLAYING_MASK) != 0) {
                     voiceData->m_axVoice = AXAcquireVoice(REDSOUND_VOICE_INDEX_MASK, _VoiceDropedCallback, 0);
                 } else {
-                    int prio = ((int)voiceData - (int)p_VoiceData) / REDSOUND_VOICE_SIZE;
+                    int prio = voiceData - p_VoiceData;
                     prio = (REDSOUND_VOICE_COUNT - prio >> 1) - 1;
                     if (prio < 1) {
                         prio = 1;

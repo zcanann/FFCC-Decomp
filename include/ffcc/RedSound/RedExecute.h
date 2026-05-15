@@ -377,6 +377,17 @@ enum RedVoiceUpdateFlag {
 	REDSOUND_VOICE_UPDATE_ALL = REDSOUND_VOICE_UPDATE_PITCH | REDSOUND_VOICE_UPDATE_VOLUME,
 };
 
+enum RedAxVoicePlayback {
+	REDSOUND_AX_VOICE_STOP = 0,
+	REDSOUND_AX_VOICE_PLAY = 1,
+	REDSOUND_AX_VOICE_LOOP_OFF = 0,
+	REDSOUND_AX_VOICE_LOOP_ON = 1,
+	REDSOUND_AX_VOICE_TYPE_ONE_SHOT = 0,
+	REDSOUND_AX_VOICE_TYPE_LOOP = 1,
+	REDSOUND_AX_SRC_SELECT_ADPCM = 1,
+	REDSOUND_AX_ADDR_FORMAT_ADPCM = 0,
+};
+
 u8 GetRandomData();
 int PitchCompute(int basePitch, int pitchOffset, int wavePitch, int fineTune);
 void* ReverbAreaAlloc(unsigned long size);

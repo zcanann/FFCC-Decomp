@@ -1876,18 +1876,18 @@ void EnvelopeKeyExecute()
                     envChanged += 1;
                     u16 loopFlag;
                     if ((voiceData->m_voiceSwitch & REDSOUND_VOICE_SWITCH_LOOP) != 0) {
-                        loopFlag = 1;
+                        loopFlag = REDSOUND_AX_VOICE_TYPE_LOOP;
                     } else {
-                        loopFlag = 0;
+                        loopFlag = REDSOUND_AX_VOICE_TYPE_ONE_SHOT;
                     }
                     voice->pb.type = loopFlag;
-                    voice->pb.srcSelect = 1;
-                    voice->pb.state = 1;
+                    voice->pb.srcSelect = REDSOUND_AX_SRC_SELECT_ADPCM;
+                    voice->pb.state = REDSOUND_AX_VOICE_PLAY;
 
                     memcpy(&voice->pb.adpcm, &waveData->m_adpcm.m_data, REDSOUND_WAVE_ADPCM_DATA_SIZE);
                     memcpy(&voice->pb.adpcmLoop, &waveData->m_adpcm.m_loop, REDSOUND_WAVE_ADPCM_LOOP_SIZE);
                     memset(voice->pb.src.last_samples, 0, sizeof(voice->pb.src.last_samples));
-                    voice->pb.addr.format = 0;
+                    voice->pb.addr.format = REDSOUND_AX_ADDR_FORMAT_ADPCM;
                     int key = trackData->m_waveBase + waveData->m_sampleStart;
                     key += REDSOUND_AX_SAMPLE_START_BIAS;
                     key *= REDSOUND_AX_SAMPLE_ADDR_SCALE;
@@ -1896,10 +1896,10 @@ void EnvelopeKeyExecute()
                     int keyBase = key - REDSOUND_AX_SAMPLE_ADDR_SCALE;
 
                     if (waveData->m_loopStart < 0) {
-                        voice->pb.addr.loopFlag = 0;
+                        voice->pb.addr.loopFlag = REDSOUND_AX_VOICE_LOOP_OFF;
                         key = keyBase;
                     } else {
-                        voice->pb.addr.loopFlag = 1;
+                        voice->pb.addr.loopFlag = REDSOUND_AX_VOICE_LOOP_ON;
                         key = keyBase + waveData->m_loopStart;
                     }
 
@@ -1946,7 +1946,7 @@ void EnvelopeKeyExecute()
                 voiceData->m_active = REDSOUND_VOICE_ACTIVE_OFF;
                 voiceFlags |= AX_SYNC_FLAG_COPYVOL;
                 voiceData->m_track = 0;
-                voice->pb.state = 0;
+                voice->pb.state = REDSOUND_AX_VOICE_STOP;
                 voiceData->m_adsrCurrentLevel = 0;
                 voiceData->m_envelopeLevel = 0;
                 voice->pb.ve.currentVolume = 0;
@@ -1966,8 +1966,8 @@ void EnvelopeKeyExecute()
             voiceData->m_waveData = 0;
             AXVPB* voice = voiceData->m_axVoice;
             if (voice != 0) {
-                if (voice->pb.state != 0) {
-                    voice->pb.state = 0;
+                if (voice->pb.state != REDSOUND_AX_VOICE_STOP) {
+                    voice->pb.state = REDSOUND_AX_VOICE_STOP;
                     voice->pb.ve.currentVolume = 0;
                     voice->sync |= AX_SYNC_FLAG_COPYVOL | AX_SYNC_FLAG_COPYSTATE;
                 } else {

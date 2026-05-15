@@ -676,7 +676,8 @@ static int _EraseTime(int eraseTrack)
 	int erasedCount;
 
 	do {
-		if ((track->m_command != 0) && (track->m_attrMask == 0) && (track->m_eraseTrack < minEraseTrack)) {
+		if ((track->m_command != REDSOUND_TRACK_COMMAND_NONE) && (track->m_attrMask == REDSOUND_TRACK_ATTR_NONE) &&
+		    (track->m_eraseTrack < minEraseTrack)) {
 			minEraseTrack = track->m_eraseTrack;
 		}
 		track++;
@@ -690,7 +691,8 @@ static int _EraseTime(int eraseTrack)
 	minEraseTrack = 0;
 	sepId = 0;
 	do {
-		if ((track->m_command != 0) && (track->m_attrMask == 0) && (track->m_eraseTrack <= eraseTrack) &&
+		if ((track->m_command != REDSOUND_TRACK_COMMAND_NONE) && (track->m_attrMask == REDSOUND_TRACK_ATTR_NONE) &&
+		    (track->m_eraseTrack <= eraseTrack) &&
 		    (track->m_playTime > minEraseTrack)) {
 			minEraseTrack = track->m_playTime;
 			sepId = track->m_seSepId;
@@ -701,14 +703,15 @@ static int _EraseTime(int eraseTrack)
 	track = *trackBasePtr;
 	erasedCount = 0;
 	do {
-		if ((track->m_command != 0) && (track->m_attrMask == 0) && (track->m_eraseTrack <= eraseTrack) &&
+		if ((track->m_command != REDSOUND_TRACK_COMMAND_NONE) && (track->m_attrMask == REDSOUND_TRACK_ATTR_NONE) &&
+		    (track->m_eraseTrack <= eraseTrack) &&
 		    (track->m_playTime == minEraseTrack)) {
 			int trackNo;
 
 			KeyOnReserveClear(p_KeyOnData, track);
 			track->m_seId = REDSOUND_SE_ID_NONE;
 			track->m_flags = 0;
-			track->m_command = 0;
+			track->m_command = REDSOUND_TRACK_COMMAND_NONE;
 			track->m_mixVolumeMode = REDSOUND_SE_VOLUME_MODE_NORMAL;
 
 			trackNo = track->m_trackNo;

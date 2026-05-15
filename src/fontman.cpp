@@ -693,34 +693,34 @@ void CFont::Create(void* filePtr, CMemory::CStage* stage)
                         chunkFile.Get(m_glyphData, chunk.m_size);
                     }
 
-                    unsigned short** bucketSlot = m_glyphBuckets;
+                    CFont* font = this;
                     unsigned short* bucket = static_cast<unsigned short*>(m_glyphData);
                     for (int i = 0; i < 32; i++) {
-                        bucketSlot[0] = bucket;
+                        font->m_glyphBuckets[0] = bucket;
                         bucket = bucket + static_cast<unsigned int>(*bucket) * 4;
                         bucket++;
-                        bucketSlot[1] = bucket;
+                        font->m_glyphBuckets[1] = bucket;
                         bucket = bucket + static_cast<unsigned int>(*bucket) * 4;
                         bucket++;
-                        bucketSlot[2] = bucket;
+                        font->m_glyphBuckets[2] = bucket;
                         bucket = bucket + static_cast<unsigned int>(*bucket) * 4;
                         bucket++;
-                        bucketSlot[3] = bucket;
+                        font->m_glyphBuckets[3] = bucket;
                         bucket = bucket + static_cast<unsigned int>(*bucket) * 4;
                         bucket++;
-                        bucketSlot[4] = bucket;
+                        font->m_glyphBuckets[4] = bucket;
                         bucket = bucket + static_cast<unsigned int>(*bucket) * 4;
                         bucket++;
-                        bucketSlot[5] = bucket;
+                        font->m_glyphBuckets[5] = bucket;
                         bucket = bucket + static_cast<unsigned int>(*bucket) * 4;
                         bucket++;
-                        bucketSlot[6] = bucket;
+                        font->m_glyphBuckets[6] = bucket;
                         bucket = bucket + static_cast<unsigned int>(*bucket) * 4;
                         bucket++;
-                        bucketSlot[7] = bucket;
+                        font->m_glyphBuckets[7] = bucket;
                         bucket = bucket + static_cast<unsigned int>(*bucket) * 4;
                         bucket++;
-                        bucketSlot += 8;
+                        font = reinterpret_cast<CFont*>(&font->margin);
                     }
                     break;
                 case 'TXTR':

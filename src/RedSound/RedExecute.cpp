@@ -1207,7 +1207,7 @@ static void _VolumeExecute(RedVoiceDATA* voice, int volume)
 static void _PitchExecute(RedVoiceDATA* voice)
 {
     int pitchDelta = 0;
-    int targetPitchDelta;
+    int targetPitchDelta = 0;
 
     if ((voice->m_track->m_vibrateFunc != 0) && (voice->m_pitchModDelay == 0)) {
         u32 pitchLfo = voice->m_track->m_vibrateDepth >> REDSOUND_FIXED_SHIFT;
@@ -1241,9 +1241,10 @@ static void _PitchExecute(RedVoiceDATA* voice)
             }
         }
 
-        targetPitchDelta = pitchDelta;
         if (pitchDelta < 0) {
             targetPitchDelta = pitchDelta >> 1;
+        } else {
+            targetPitchDelta = pitchDelta;
         }
 
         voice->m_pitchModPhase += voice->m_track->m_vibrateRate;

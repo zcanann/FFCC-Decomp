@@ -231,8 +231,7 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 
 	memcpy(&streamData->m_header, streamHeader, sizeof(streamData->m_header));
 	streamData->m_track = SearchSeEmptyTrack(streamData->m_header.m_channelCount, REDSOUND_STREAM_ERASE_TRACK, 0);
-	streamData->m_buffer = (u8*)RedNew(REDSOUND_STREAM_PAGE_SIZE * REDSOUND_STREAM_STEREO_PLANE_PAGE_COUNT *
-	                                   REDSOUND_STREAM_STEREO_CHANNEL_COUNT);
+	streamData->m_buffer = (u8*)RedNew(REDSOUND_STREAM_TRANSFER_BUFFER_SIZE);
 	amemSize = streamData->m_header.m_channelCount * REDSOUND_STREAM_STEREO_PLANE_SIZE;
 	if (c_RedMemory.GetABufferSize() < REDSOUND_STREAM_ARAM_HIGH_THRESHOLD) {
 		arOffset = REDSOUND_STREAM_ARAM_LOW_OFFSET;

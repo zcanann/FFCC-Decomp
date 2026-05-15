@@ -740,7 +740,7 @@ void CMenuPcs::ArtiInit()
 	float fVar3;
 	float fVar4;
 	int iVar5;
-	short sVar6;
+	int sVar6;
 	short sVar7;
 	short* psVar8;
 	int iVar9;
@@ -823,10 +823,8 @@ void CMenuPcs::ArtiInit()
 	iVar11 = 4;
 	do {
 		psVar8 = (short*)(GetArtiListBase(this) + iVar5 + 8);
-		psVar8[0x16] = 0;
-		psVar8[0x17] = 2;
-		psVar8[0xe] = 0;
-		psVar8[0xf] = 0x37;
+		*(int*)(psVar8 + 0x16) = 2;
+		*(int*)(psVar8 + 0xe) = 0x37;
 		sVar7 = sVar7 + 2;
 		*psVar8 = *(short*)(iVar10 + 8) + 0x24;
 		sVar1 = sVar6 + 0x20;
@@ -842,10 +840,8 @@ void CMenuPcs::ArtiInit()
 		iVar9 = iVar5 + 0x48;
 		iVar5 = iVar5 + 0x80;
 		psVar8 = (short*)(GetArtiListBase(this) + iVar9);
-		psVar8[0x16] = 0;
-		psVar8[0x17] = 2;
-		psVar8[0xe] = 0;
-		psVar8[0xf] = 0x37;
+		*(int*)(psVar8 + 0x16) = 2;
+		*(int*)(psVar8 + 0xe) = 0x37;
 		*psVar8 = *(short*)(iVar10 + 8) + 0x24;
 		sVar6 = sVar6 + 0x40;
 		psVar8[1] = *(short*)(iVar10 + 10) + sVar1;

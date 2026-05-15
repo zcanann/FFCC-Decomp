@@ -223,6 +223,10 @@ struct RedSeInfoSequence
 	unsigned char m_offsetHiAndFlags;
 };
 
+#define RedSeInfoSequenceGetOffset(sequence)                                                       \
+	(((sequence)->m_offsetHiAndFlags * REDSOUND_SE_INFO_U16_HIGH_SCALE + (sequence)->m_offsetLo) & \
+	 REDSOUND_SE_INFO_SEQUENCE_OFFSET_MASK)
+
 enum RedSeInfoSequenceLayout {
 	REDSOUND_SE_INFO_SEQUENCE_OFFSET_LO_OFFSET = 0,
 	REDSOUND_SE_INFO_SEQUENCE_OFFSET_HI_AND_FLAGS_OFFSET = 1,

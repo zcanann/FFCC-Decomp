@@ -844,10 +844,7 @@ static int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volum
 		while (true) {
 			track->m_waveBankData = waveBase;
 			track->m_command = current;
-			current = current +
-			          (((unsigned int)seq->m_offsetHiAndFlags * REDSOUND_SE_INFO_U16_HIGH_SCALE +
-			            (unsigned int)seq->m_offsetLo) &
-			           REDSOUND_SE_INFO_SEQUENCE_OFFSET_MASK);
+			current = current + RedSeInfoSequenceGetOffset(seq);
 			track->m_deltaTime = (int)DeltaTimeSumup((unsigned char**)&track->m_command) + 1;
 			if (m_SeSkipStep != 0) {
 				track->m_deltaTime = track->m_deltaTime - m_SeSkipStep;

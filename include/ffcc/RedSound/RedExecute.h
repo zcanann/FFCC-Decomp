@@ -118,6 +118,8 @@ struct RedWaveDATA {
 	unsigned char m_reserved5C[REDSOUND_WAVE_RESERVED5C_SIZE];
 };
 
+#define REDSOUND_WAVE_DATA_NONE ((RedWaveDATA*)0)
+
 enum RedWaveLayoutSize {
 	REDSOUND_WAVE_DATA_SIZE = sizeof(RedWaveDATA),
 };

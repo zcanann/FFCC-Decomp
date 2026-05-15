@@ -25,6 +25,8 @@ enum RedMidiLayoutSize {
 
 typedef int (*RedSwingFunc)(int phase);
 
+#define REDSOUND_SWING_FUNC_NONE ((RedSwingFunc)0)
+
 struct RedTrackDATA {
 	unsigned char* m_command;
 	unsigned char m_reserved04[REDSOUND_TRACK_RESERVED04_SIZE];

@@ -2490,10 +2490,13 @@ static void _MidiTrackExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData,
                     }
 
                     if (track->m_deltaTime < -1) {
-                        int execStep = delta;
-                        if (track->m_deltaTime + execStep > 0) {
-                            execStep = -track->m_deltaTime;
+                        int clampedStep;
+                        if (track->m_deltaTime + delta > 0) {
+                            clampedStep = -track->m_deltaTime;
+                        } else {
+                            clampedStep = delta;
                         }
+                        int execStep = clampedStep;
                         _MusicTrackDataExecute(track, execStep);
                     }
                     track->m_deltaTime += delta;
@@ -3057,10 +3060,13 @@ static int _SeMidiNoteExecute(
                         }
 
                         if (track->m_deltaTime < -1) {
-                            int execStep = delta;
-                            if (track->m_deltaTime + execStep > 0) {
-                                execStep = -track->m_deltaTime;
+                            int clampedStep;
+                            if (track->m_deltaTime + delta > 0) {
+                                clampedStep = -track->m_deltaTime;
+                            } else {
+                                clampedStep = delta;
                             }
+                            int execStep = clampedStep;
                             _SeTrackDataExecute(track, execStep);
                         }
                         track->m_deltaTime += delta;

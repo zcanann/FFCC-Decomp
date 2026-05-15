@@ -528,7 +528,7 @@ int CRedEntry::WaveHeadAdd(int waveBankNo, RedWaveHeadWD* waveHead, int waveNo)
 		minOffset = REDSOUND_WAVE_FIXED_REGION_OFFSET;
 		maxOffset = minOffset + REDSOUND_WAVE_FIXED_REGION_SIZE;
 	} else {
-		minOffset = 0;
+		minOffset = REDSOUND_WAVE_DEFAULT_REGION_OFFSET;
 		maxOffset = minOffset + REDSOUND_WAVE_DEFAULT_REGION_SIZE;
 	}
 

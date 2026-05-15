@@ -487,8 +487,8 @@ int CRedEntry::WaveOldClear(int offset, int maxSize)
  */
 int CRedEntry::WaveHeadAdd(int waveBankNo, RedWaveHeadWD* waveHead, int waveNo)
 {
-	if ((waveHead->m_signature[0] != REDSOUND_WAVE_SIGNATURE_MAGIC0) ||
-	    (waveHead->m_signature[1] != REDSOUND_WAVE_SIGNATURE_MAGIC1)) {
+	if ((waveHead->m_signature[REDSOUND_WAVE_SIGNATURE_MAGIC0_INDEX] != REDSOUND_WAVE_SIGNATURE_MAGIC0) ||
+	    (waveHead->m_signature[REDSOUND_WAVE_SIGNATURE_MAGIC1_INDEX] != REDSOUND_WAVE_SIGNATURE_MAGIC1)) {
 		if (m_ReportPrint != REDSOUND_REPORT_PRINT_OFF) {
 			OSReport(sRedEntryWaveHeaderBrokenFmt, sRedEntryLogPrefix, sRedEntryHeaderErrorColor, sRedEntryResetColor);
 			fflush(__files + 1);
@@ -1543,9 +1543,9 @@ RedMusicHEAD* CRedEntry::SetMusicData(RedMusicHEAD* musicHead)
 {
 	int result;
 
-	if ((musicHead->m_signature[0] != REDSOUND_MUSIC_SIGNATURE_0) ||
-	    (musicHead->m_signature[1] != REDSOUND_MUSIC_SIGNATURE_1) ||
-	    (musicHead->m_signature[2] != REDSOUND_MUSIC_SIGNATURE_2)) {
+	if ((musicHead->m_signature[REDSOUND_MUSIC_SIGNATURE_0_INDEX] != REDSOUND_MUSIC_SIGNATURE_0) ||
+	    (musicHead->m_signature[REDSOUND_MUSIC_SIGNATURE_1_INDEX] != REDSOUND_MUSIC_SIGNATURE_1) ||
+	    (musicHead->m_signature[REDSOUND_MUSIC_SIGNATURE_2_INDEX] != REDSOUND_MUSIC_SIGNATURE_2)) {
 		RedDelete(musicHead);
 		if (m_ReportPrint != REDSOUND_REPORT_PRINT_OFF) {
 			OSReport(sRedEntryMusicHeaderBrokenFmt, sRedEntryLogPrefix, sRedEntryHeaderErrorColor, sRedEntryResetColor);
@@ -1880,11 +1880,11 @@ RedSeSepHEAD* CRedEntry::SetSeSepData(RedSeSepHEAD* seSepHead)
 {
 	int result;
 
-	if ((seSepHead->m_signature[0] != REDSOUND_SESEP_SIGNATURE_0) ||
-	    (seSepHead->m_signature[1] != REDSOUND_SESEP_SIGNATURE_1) ||
-	    (seSepHead->m_signature[2] != REDSOUND_SESEP_SIGNATURE_2) ||
-	    (seSepHead->m_signature[3] != REDSOUND_SESEP_SIGNATURE_3) ||
-	    (seSepHead->m_signature[4] != REDSOUND_SESEP_SIGNATURE_4)) {
+	if ((seSepHead->m_signature[REDSOUND_SESEP_SIGNATURE_0_INDEX] != REDSOUND_SESEP_SIGNATURE_0) ||
+	    (seSepHead->m_signature[REDSOUND_SESEP_SIGNATURE_1_INDEX] != REDSOUND_SESEP_SIGNATURE_1) ||
+	    (seSepHead->m_signature[REDSOUND_SESEP_SIGNATURE_2_INDEX] != REDSOUND_SESEP_SIGNATURE_2) ||
+	    (seSepHead->m_signature[REDSOUND_SESEP_SIGNATURE_3_INDEX] != REDSOUND_SESEP_SIGNATURE_3) ||
+	    (seSepHead->m_signature[REDSOUND_SESEP_SIGNATURE_4_INDEX] != REDSOUND_SESEP_SIGNATURE_4)) {
 		RedDelete(seSepHead);
 		if (m_ReportPrint != REDSOUND_REPORT_PRINT_OFF) {
 			OSReport(sRedEntrySeSepHeaderBrokenFmt, sRedEntryLogPrefix, sRedEntryHeaderErrorColor, sRedEntryResetColor);

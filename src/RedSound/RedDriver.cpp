@@ -1092,13 +1092,13 @@ static void _SetSeBlockData(int* command)
 
     if (command[REDSOUND_SE_BLOCK_DATA_COMMAND_BUFFER] != 0) {
         seBlockData = (RedSeBlockHEAD*)command[REDSOUND_SE_BLOCK_DATA_COMMAND_BUFFER];
-        if ((seBlockData->m_signature[0] = REDSOUND_SE_BLOCK_SIGNATURE_0) &&
-            (seBlockData->m_signature[1] = REDSOUND_SE_BLOCK_SIGNATURE_1) &&
-            (seBlockData->m_signature[2] = REDSOUND_SE_BLOCK_SIGNATURE_2) &&
-            (seBlockData->m_signature[3] = REDSOUND_SE_BLOCK_SIGNATURE_3) &&
-            (seBlockData->m_signature[4] = REDSOUND_SE_BLOCK_SIGNATURE_4) &&
-            (seBlockData->m_signature[5] = REDSOUND_SE_BLOCK_SIGNATURE_5) &&
-            (seBlockData->m_signature[6] = REDSOUND_SE_BLOCK_SIGNATURE_6)) {
+        if ((seBlockData->m_signature[REDSOUND_SE_BLOCK_SIGNATURE_0_INDEX] = REDSOUND_SE_BLOCK_SIGNATURE_0) &&
+            (seBlockData->m_signature[REDSOUND_SE_BLOCK_SIGNATURE_1_INDEX] = REDSOUND_SE_BLOCK_SIGNATURE_1) &&
+            (seBlockData->m_signature[REDSOUND_SE_BLOCK_SIGNATURE_2_INDEX] = REDSOUND_SE_BLOCK_SIGNATURE_2) &&
+            (seBlockData->m_signature[REDSOUND_SE_BLOCK_SIGNATURE_3_INDEX] = REDSOUND_SE_BLOCK_SIGNATURE_3) &&
+            (seBlockData->m_signature[REDSOUND_SE_BLOCK_SIGNATURE_4_INDEX] = REDSOUND_SE_BLOCK_SIGNATURE_4) &&
+            (seBlockData->m_signature[REDSOUND_SE_BLOCK_SIGNATURE_5_INDEX] = REDSOUND_SE_BLOCK_SIGNATURE_5) &&
+            (seBlockData->m_signature[REDSOUND_SE_BLOCK_SIGNATURE_6_INDEX] = REDSOUND_SE_BLOCK_SIGNATURE_6)) {
             p_SeBlockData[index] = seBlockData;
         } else {
             RedDelete(seBlockData);
@@ -2288,9 +2288,9 @@ int CRedDriver::SetMusicData(void* musicData)
     RedMusicHEAD localHeader;
 
     result = REDSOUND_MUSIC_ID_NONE;
-    if (((header->m_signature[0] == REDSOUND_MUSIC_SIGNATURE_0) &&
-         (header->m_signature[1] == REDSOUND_MUSIC_SIGNATURE_1)) &&
-        (header->m_signature[2] == REDSOUND_MUSIC_SIGNATURE_2)) {
+    if (((header->m_signature[REDSOUND_MUSIC_SIGNATURE_0_INDEX] == REDSOUND_MUSIC_SIGNATURE_0) &&
+         (header->m_signature[REDSOUND_MUSIC_SIGNATURE_1_INDEX] == REDSOUND_MUSIC_SIGNATURE_1)) &&
+        (header->m_signature[REDSOUND_MUSIC_SIGNATURE_2_INDEX] == REDSOUND_MUSIC_SIGNATURE_2)) {
         memcpy(&localHeader, musicData, sizeof(localHeader));
         headerSize = localHeader.m_size;
         header = (RedMusicHEAD*)RedNew(headerSize);
@@ -2444,9 +2444,9 @@ int CRedDriver::MusicPlay(void* musicData, int volume, int mode)
     int headerSize;
 
     result = REDSOUND_MUSIC_ID_NONE;
-    if (((header->m_signature[0] == REDSOUND_MUSIC_SIGNATURE_0) &&
-         (header->m_signature[1] == REDSOUND_MUSIC_SIGNATURE_1)) &&
-        (header->m_signature[2] == REDSOUND_MUSIC_SIGNATURE_2)) {
+    if (((header->m_signature[REDSOUND_MUSIC_SIGNATURE_0_INDEX] == REDSOUND_MUSIC_SIGNATURE_0) &&
+         (header->m_signature[REDSOUND_MUSIC_SIGNATURE_1_INDEX] == REDSOUND_MUSIC_SIGNATURE_1)) &&
+        (header->m_signature[REDSOUND_MUSIC_SIGNATURE_2_INDEX] == REDSOUND_MUSIC_SIGNATURE_2)) {
         memcpy(&localHeader, header, sizeof(localHeader));
         headerSize = localHeader.m_size;
         copiedHeader = (RedMusicHEAD*)RedNew(headerSize);
@@ -2493,9 +2493,9 @@ int CRedDriver::MusicCrossPlay(void* musicData, int volume, int mode)
     int headerSize;
 
     result = REDSOUND_MUSIC_ID_NONE;
-    if (((header->m_signature[0] == REDSOUND_MUSIC_SIGNATURE_0) &&
-         (header->m_signature[1] == REDSOUND_MUSIC_SIGNATURE_1)) &&
-        (header->m_signature[2] == REDSOUND_MUSIC_SIGNATURE_2)) {
+    if (((header->m_signature[REDSOUND_MUSIC_SIGNATURE_0_INDEX] == REDSOUND_MUSIC_SIGNATURE_0) &&
+         (header->m_signature[REDSOUND_MUSIC_SIGNATURE_1_INDEX] == REDSOUND_MUSIC_SIGNATURE_1)) &&
+        (header->m_signature[REDSOUND_MUSIC_SIGNATURE_2_INDEX] == REDSOUND_MUSIC_SIGNATURE_2)) {
         memcpy(&localHeader, header, sizeof(localHeader));
         headerSize = localHeader.m_size;
         copiedHeader = (RedMusicHEAD*)RedNew(headerSize);
@@ -2542,9 +2542,9 @@ int CRedDriver::MusicNextPlay(void* musicData, int volume, int mode)
     int headerSize;
 
     result = REDSOUND_MUSIC_ID_NONE;
-    if (((header->m_signature[0] == REDSOUND_MUSIC_SIGNATURE_0) &&
-         (header->m_signature[1] == REDSOUND_MUSIC_SIGNATURE_1)) &&
-        (header->m_signature[2] == REDSOUND_MUSIC_SIGNATURE_2)) {
+    if (((header->m_signature[REDSOUND_MUSIC_SIGNATURE_0_INDEX] == REDSOUND_MUSIC_SIGNATURE_0) &&
+         (header->m_signature[REDSOUND_MUSIC_SIGNATURE_1_INDEX] == REDSOUND_MUSIC_SIGNATURE_1)) &&
+        (header->m_signature[REDSOUND_MUSIC_SIGNATURE_2_INDEX] == REDSOUND_MUSIC_SIGNATURE_2)) {
         memcpy(&localHeader, header, sizeof(localHeader));
         headerSize = localHeader.m_size;
         copiedHeader = (RedMusicHEAD*)RedNew(headerSize);
@@ -2756,11 +2756,11 @@ int CRedDriver::SetSeSepData(void* seSepData)
     int result = REDSOUND_SESEP_ID_NONE;
     RedSeSepHEAD* header = (RedSeSepHEAD*)seSepData;
 
-    if (((((header->m_signature[0] == REDSOUND_SESEP_SIGNATURE_0) &&
-           (header->m_signature[1] == REDSOUND_SESEP_SIGNATURE_1)) &&
-          (header->m_signature[2] == REDSOUND_SESEP_SIGNATURE_2)) &&
-         ((header->m_signature[3] == REDSOUND_SESEP_SIGNATURE_3 &&
-           (header->m_signature[4] == REDSOUND_SESEP_SIGNATURE_4))))) {
+    if (((((header->m_signature[REDSOUND_SESEP_SIGNATURE_0_INDEX] == REDSOUND_SESEP_SIGNATURE_0) &&
+           (header->m_signature[REDSOUND_SESEP_SIGNATURE_1_INDEX] == REDSOUND_SESEP_SIGNATURE_1)) &&
+          (header->m_signature[REDSOUND_SESEP_SIGNATURE_2_INDEX] == REDSOUND_SESEP_SIGNATURE_2)) &&
+         ((header->m_signature[REDSOUND_SESEP_SIGNATURE_3_INDEX] == REDSOUND_SESEP_SIGNATURE_3 &&
+           (header->m_signature[REDSOUND_SESEP_SIGNATURE_4_INDEX] == REDSOUND_SESEP_SIGNATURE_4))))) {
         headerSize = ((RedSeSepHEAD*)seSepData)->m_sizeAndFlags;
         headerSize &= REDSOUND_SESEP_SIZE_MASK;
         header = (RedSeSepHEAD*)RedNew(headerSize);
@@ -2967,11 +2967,11 @@ int CRedDriver::SePlay(void* seSepData, int autoID, int pan, int volume, int pit
     RedSeSepHEAD* copiedHeader;
     int headerSize;
 
-    if (((((header->m_signature[0] == REDSOUND_SESEP_SIGNATURE_0) &&
-           (header->m_signature[1] == REDSOUND_SESEP_SIGNATURE_1)) &&
-          (header->m_signature[2] == REDSOUND_SESEP_SIGNATURE_2)) &&
-         ((header->m_signature[3] == REDSOUND_SESEP_SIGNATURE_3 &&
-           (header->m_signature[4] == REDSOUND_SESEP_SIGNATURE_4))))) {
+    if (((((header->m_signature[REDSOUND_SESEP_SIGNATURE_0_INDEX] == REDSOUND_SESEP_SIGNATURE_0) &&
+           (header->m_signature[REDSOUND_SESEP_SIGNATURE_1_INDEX] == REDSOUND_SESEP_SIGNATURE_1)) &&
+          (header->m_signature[REDSOUND_SESEP_SIGNATURE_2_INDEX] == REDSOUND_SESEP_SIGNATURE_2)) &&
+         ((header->m_signature[REDSOUND_SESEP_SIGNATURE_3_INDEX] == REDSOUND_SESEP_SIGNATURE_3 &&
+           (header->m_signature[REDSOUND_SESEP_SIGNATURE_4_INDEX] == REDSOUND_SESEP_SIGNATURE_4))))) {
         headerSize = header->m_sizeAndFlags & REDSOUND_SESEP_SIZE_MASK;
         copiedHeader = (RedSeSepHEAD*)RedNew(headerSize);
         if (copiedHeader != 0) {
@@ -3437,8 +3437,8 @@ void CRedDriver::SetWaveData(int slot, int waveID, void* waveData, int waveSize)
     if (waveSize == REDSOUND_WAVE_SIZE_AUTO) {
         RedWaveHeadWD* const waveHeader = (RedWaveHeadWD*)waveData;
 
-        if ((waveHeader->m_signature[0] == REDSOUND_WAVE_SIGNATURE_MAGIC0) &&
-            (waveHeader->m_signature[1] == REDSOUND_WAVE_SIGNATURE_MAGIC1)) {
+        if ((waveHeader->m_signature[REDSOUND_WAVE_SIGNATURE_MAGIC0_INDEX] == REDSOUND_WAVE_SIGNATURE_MAGIC0) &&
+            (waveHeader->m_signature[REDSOUND_WAVE_SIGNATURE_MAGIC1_INDEX] == REDSOUND_WAVE_SIGNATURE_MAGIC1)) {
             int dataSize = waveHeader->m_tableCount * REDSOUND_WAVE_TABLE_ENTRY_SIZE;
             dataSize = (dataSize += REDSOUND_WAVE_SETTING_TABLE_ALIGN - 1) & REDSOUND_WAVE_SETTING_TABLE_ALIGN_MASK;
             dataSize += waveHeader->m_toneCount * REDSOUND_WAVE_TONE_ENTRY_SIZE;

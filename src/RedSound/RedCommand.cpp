@@ -681,7 +681,6 @@ static int _EraseTime(int eraseTrack)
 	RedTrackDATA* track = *trackBasePtr;
 	int sepId;
 	int erasedCount;
-	int trackNo;
 
 	do {
 		if ((track->m_command != REDSOUND_TRACK_COMMAND_NONE) && (track->m_attrMask == REDSOUND_TRACK_ATTR_NONE) &&
@@ -720,7 +719,7 @@ static int _EraseTime(int eraseTrack)
 			track->m_command = REDSOUND_TRACK_COMMAND_NONE;
 			track->m_mixVolumeMode = REDSOUND_SE_VOLUME_MODE_NORMAL;
 
-			trackNo = track->m_trackNo;
+			int trackNo = track->m_trackNo;
 			(p_VoiceData + trackNo)->m_stateFlags &= REDSOUND_VOICE_STATE_CLEAR_PLAYING_MASK;
 			(p_VoiceData + trackNo)->m_voiceSwitch &= REDSOUND_VOICE_SWITCH_CLEAR_SE_MASK;
 			(p_VoiceData + trackNo)->m_flags &= REDSOUND_VOICE_FLAGS_CLEAR_ACTIVE_MASK;

@@ -1087,9 +1087,9 @@ static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* wav
 		}
 	} while (count != 0);
 
-	music->m_skipFrames = 1;
-	music->m_channelAlloc = 0;
-	music->m_keySignature = 0;
+	music->m_skipFrames = REDSOUND_CONTROL_INITIAL_SKIP_FRAMES;
+	music->m_channelAlloc = REDSOUND_CONTROL_CHANNEL_ALLOC_NONE;
+	music->m_keySignature = REDSOUND_CONTROL_KEY_SIGNATURE_NONE;
 	music->m_keySignatureData = t_KeySignatureData + REDSOUND_KEY_SIGNATURE_DEFAULT_OFFSET;
 	music->m_trackCount = musicHead->m_trackCount;
 	music->m_activeTrackCount = (short)musicHead->m_trackCount;
@@ -1099,13 +1099,13 @@ static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* wav
 	music->m_ticksPerMeasure = REDSOUND_CONTROL_DEFAULT_TICKS_PER_MEASURE;
 	music->m_tick = REDSOUND_CONTROL_INITIAL_TICK;
 	music->m_measure = REDSOUND_CONTROL_INITIAL_MEASURE;
-	music->m_elapsedTime = 0;
+	music->m_elapsedTime = REDSOUND_CONTROL_ELAPSED_TIME_NONE;
 	if (volume != 0) {
 		volume = (((volume + 1) * REDSOUND_MASTER_VOLUME_SCALE) - 1) * REDSOUND_FIXED_ONE;
 	}
 	music->m_volume = volume;
-	music->m_volumeDelta = 0;
-	music->m_updateFlags = 0;
+	music->m_volumeDelta = REDSOUND_CONTROL_VOLUME_DELTA_NONE;
+	music->m_updateFlags = REDSOUND_CONTROL_UPDATE_FLAGS_NONE;
 	music->m_flags &= REDSOUND_CONTROL_FLAG_PAUSE;
 	if ((musicHead->m_playFlags & REDSOUND_MUSIC_PLAY_FLAG_RELEASE_NOTES) != 0) {
 		music->m_flags |= REDSOUND_MUSIC_PLAY_FLAG_RELEASE_NOTES;

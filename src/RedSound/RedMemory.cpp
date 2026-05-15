@@ -301,20 +301,21 @@ int RedNewA(int size, int offset, int maxSize)
 	RedMemoryBlock* bestBlock;
 	RedMemoryBlock* blockPtr;
 
-	if ((size < 1) || (m_AMemoryBank == 0) || ((unsigned int)m_ADataBuffer == 0)) {
-		return 0;
+	if ((size < REDSOUND_MEMORY_ALLOC_MIN_SIZE) || (m_AMemoryBank == 0) ||
+	    ((unsigned int)m_ADataBuffer == REDSOUND_MEMORY_ADDRESS_NONE)) {
+		return REDSOUND_MEMORY_ADDRESS_NONE;
 	}
-	if (m_AMemoryBank[REDSOUND_MEMORY_BANK_LAST_INDEX].m_size > 0) {
+	if (m_AMemoryBank[REDSOUND_MEMORY_BANK_LAST_INDEX].m_size > REDSOUND_MEMORY_BLOCK_SIZE_EMPTY) {
 		if (m_ReportPrint != REDSOUND_REPORT_PRINT_OFF) {
 			OSReport(s_redMemoryAuxBankFullFmt, sRedMemoryLogPrefix, sRedMemoryLogSuffixA, sRedMemoryLogSuffixB);
 			fflush(__files + 1);
 		}
-		return 0;
+		return REDSOUND_MEMORY_ADDRESS_NONE;
 	}
 
 	interrupts = OSDisableInterrupts();
 	rangeStart = m_ADataBuffer + offset;
-	if (maxSize == 0) {
+	if (maxSize == REDSOUND_MEMORY_MAX_SIZE_ALL) {
 		maxSize = m_ADataBufferSize;
 	}
 	maxSize -= offset;
@@ -325,14 +326,17 @@ int RedNewA(int size, int offset, int maxSize)
 	maxGap = maxSize;
 	bestBlock = 0;
 
-	for (blockPtr = m_AMemoryBank; (blockPtr->m_size != 0) && (blockPtr->m_address < rangeStart); blockPtr++) {
+	for (blockPtr = m_AMemoryBank;
+	     (blockPtr->m_size != REDSOUND_MEMORY_BLOCK_SIZE_EMPTY) && (blockPtr->m_address < rangeStart);
+	     blockPtr++) {
 	}
 
-	if (blockPtr->m_size == 0) {
+	if (blockPtr->m_size == REDSOUND_MEMORY_BLOCK_SIZE_EMPTY) {
 		result = currentAddress;
 		bestBlock = blockPtr;
 	} else {
-		for (; (blockPtr->m_size != 0) && (blockPtr < m_AMemoryBank + REDSOUND_MEMORY_BANK_BLOCK_COUNT); blockPtr++) {
+		for (; (blockPtr->m_size != REDSOUND_MEMORY_BLOCK_SIZE_EMPTY) &&
+		       (blockPtr < m_AMemoryBank + REDSOUND_MEMORY_BANK_BLOCK_COUNT); blockPtr++) {
 			if (currentAddress < rangeStart + maxSize) {
 				if ((currentAddress + size) <= blockPtr->m_address) {
 					gap = blockPtr->m_address - currentAddress;
@@ -348,7 +352,8 @@ int RedNewA(int size, int offset, int maxSize)
 			currentAddress = blockPtr->m_address + blockPtr->m_size;
 		}
 
-		if ((blockPtr->m_size == 0) && (blockPtr < m_AMemoryBank + REDSOUND_MEMORY_BANK_BLOCK_COUNT)) {
+		if ((blockPtr->m_size == REDSOUND_MEMORY_BLOCK_SIZE_EMPTY) &&
+		    (blockPtr < m_AMemoryBank + REDSOUND_MEMORY_BANK_BLOCK_COUNT)) {
 			gap = (rangeStart + maxSize) - currentAddress;
 			if ((size <= gap) && (maxGap > gap)) {
 				result = currentAddress;
@@ -358,9 +363,9 @@ int RedNewA(int size, int offset, int maxSize)
 	}
 
 	if ((bestBlock != 0) && ((u32)(result + size) <= (u32)(rangeStart + maxSize))) {
-		if (bestBlock->m_size > 0) {
+		if (bestBlock->m_size > REDSOUND_MEMORY_BLOCK_SIZE_EMPTY) {
 			gap = (m_AMemoryBank + REDSOUND_MEMORY_BANK_BLOCK_COUNT) - (bestBlock + 1);
-			if (gap > 0) {
+			if (gap > REDSOUND_MEMORY_BLOCK_COUNT_NONE) {
 				memmove(bestBlock + 1, bestBlock, gap * REDSOUND_MEMORY_BLOCK_SIZE);
 			}
 		}
@@ -371,7 +376,7 @@ int RedNewA(int size, int offset, int maxSize)
 	}
 
 	OSRestoreInterrupts(interrupts);
-	return 0;
+	return REDSOUND_MEMORY_ADDRESS_NONE;
 }
 /*
  * --INFO--

@@ -19,9 +19,6 @@ extern const float kPppHeapUseRateDivisor;
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
 extern "C" const char s_no_name_8032fdcc[];
-extern "C" {
-const char s_no_name_8032fdcc[] = "no name";
-}
 
 extern "C" CProfile* __ct__8CProfileFPc(CProfile*, char*);
 extern "C" CProfile* __dt__8CProfileFv(CProfile*, short);
@@ -1205,6 +1202,10 @@ void CPartPcs::GetParColIdx(int index, pppFVECTOR4& color)
 	color.y = pppMngSt->g;
 	color.z = pppMngSt->b;
 	color.w = pppMngSt->a;
+}
+
+extern "C" {
+const char s_no_name_8032fdcc[] = "no name";
 }
 
 /*

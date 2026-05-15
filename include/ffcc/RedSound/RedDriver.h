@@ -22,6 +22,11 @@ enum RedDmaEntryFlag {
 	REDSOUND_DMA_FLAGS_STREAM_LOAD = REDSOUND_DMA_FLAG_CHUNKED_TRANSFER | REDSOUND_DMA_FLAG_MAIN_QUEUE,
 };
 
+enum RedDmaDirection {
+	REDSOUND_DMA_DIRECTION_TO_ARAM = 0,
+	REDSOUND_DMA_DIRECTION_FROM_ARAM = 1,
+};
+
 unsigned int DeltaTimeSumup(unsigned char** buffer);
 unsigned int GetMyEntryID();
 void RedSleep(int microseconds);

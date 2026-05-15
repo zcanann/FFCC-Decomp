@@ -240,10 +240,12 @@ enum RedVoiceAdsrLayout {
 	    REDSOUND_VOICE_ADSR_RELEASE * REDSOUND_VOICE_ADSR_TIME_BYTE_STRIDE,
 	REDSOUND_VOICE_ADSR_TIME_RELEASE_BYTE_OFFSET = REDSOUND_VOICE_ADSR_TIME_RELEASE_HALFWORD * sizeof(u16),
 	REDSOUND_VOICE_ADSR_LEVEL_BASE = 9,
+	REDSOUND_VOICE_ADSR_NEXT_LEVEL_OFFSET = 1,
 	REDSOUND_VOICE_ADSR_STAGE_COUNT = 3,
 };
 
-#define RedAdsrGetStageLevel(adsrData, stage) (&(adsrData)->m_level[1])[(stage)]
+#define RedAdsrGetStageLevel(adsrData, stage)                                                      \
+	(&(adsrData)->m_level[REDSOUND_VOICE_ADSR_NEXT_LEVEL_OFFSET])[(stage)]
 
 enum RedVoiceLayoutOffset {
 	REDSOUND_VOICE_TRACK_OFFSET = 0x00,

@@ -1873,10 +1873,6 @@ void EnvelopeKeyExecute()
                     voiceData->m_active = REDSOUND_VOICE_ACTIVE_OFF;
                 } else {
                     envChanged += 1;
-                    int key = (trackData->m_waveBase + waveData->m_sampleStart + REDSOUND_AX_SAMPLE_START_BIAS) *
-                              REDSOUND_AX_SAMPLE_ADDR_SCALE;
-                    int keyBase = key - REDSOUND_AX_SAMPLE_ADDR_SCALE;
-
                     voice->pb.type = (u16)((voiceData->m_voiceSwitch & REDSOUND_VOICE_SWITCH_LOOP) != 0);
                     voice->pb.srcSelect = 1;
                     voice->pb.state = 1;
@@ -1885,7 +1881,12 @@ void EnvelopeKeyExecute()
                     memcpy(&voice->pb.adpcmLoop, &waveData->m_adpcm.m_loop, REDSOUND_WAVE_ADPCM_LOOP_SIZE);
                     memset(voice->pb.src.last_samples, 0, sizeof(voice->pb.src.last_samples));
                     voice->pb.addr.format = 0;
-                    *(u32*)&voice->pb.addr.currentAddressHi = key;
+                    int key = trackData->m_waveBase + waveData->m_sampleStart;
+                    key += REDSOUND_AX_SAMPLE_START_BIAS;
+                    key *= REDSOUND_AX_SAMPLE_ADDR_SCALE;
+                    voice->pb.addr.currentAddressHi = (u16)(key >> 0x10);
+                    voice->pb.addr.currentAddressLo = (u16)key;
+                    int keyBase = key - REDSOUND_AX_SAMPLE_ADDR_SCALE;
 
                     if (waveData->m_loopStart < 0) {
                         voice->pb.addr.loopFlag = 0;
@@ -1895,9 +1896,11 @@ void EnvelopeKeyExecute()
                         key = keyBase + waveData->m_loopStart;
                     }
 
-                    voice->pb.addr.loopAddressHi = (u16)((u32)key >> 0x10);
+                    voice->pb.addr.loopAddressHi = (u16)(key >> 0x10);
                     voice->pb.addr.loopAddressLo = (u16)key;
-                    *(u32*)&voice->pb.addr.endAddressHi = keyBase + waveData->m_loopEnd;
+                    key = keyBase + waveData->m_loopEnd;
+                    voice->pb.addr.endAddressHi = (u16)(key >> 0x10);
+                    voice->pb.addr.endAddressLo = (u16)key;
 
                     voiceFlags |= AX_SYNC_FLAG_COPYADPCMLOOP | AX_SYNC_FLAG_COPYSRC | AX_SYNC_FLAG_COPYADPCM |
                                   AX_SYNC_FLAG_COPYCURADDR | AX_SYNC_FLAG_COPYADDR | AX_SYNC_FLAG_COPYTYPE |

@@ -6,6 +6,7 @@
 #include <dolphin/mtx.h>
 
 void pppSetFpMatrix(_pppMngSt*);
+extern const float FLOAT_803320C0;
 extern const float FLOAT_803320C4;
 
 /*
@@ -42,7 +43,7 @@ void pppFrameConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir, pp
 
             PSMTXIdentity(pppMngStPtr->m_matrix.value);
 
-            pppMngSt->m_scale.x = 1.3333f * scale;
+            pppMngSt->m_scale.x = FLOAT_803320C0 * scale;
             pppMngSt->m_scale.y = scale;
             pppMngSt->m_scale.z = 1.0f;
 
@@ -119,4 +120,5 @@ void pppConstructConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir
     puVar2[0] = uVar1;
 }
 
+extern const float kConstrainCameraDirAspectScale = 1.3333f;
 extern const float FLOAT_803331ec = 0.0f;

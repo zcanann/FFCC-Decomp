@@ -1869,11 +1869,15 @@ void EnvelopeKeyExecute()
                 voiceData->m_flags &= REDSOUND_VOICE_FLAGS_CLEAR_RELEASE_ACTIVE_MASK;
                 RedWaveDATA* waveData = voiceData->m_waveData;
                 RedTrackDATA* trackData = voiceData->m_track;
-                if ((waveData == 0) || (trackData == 0)) {
-                    voiceData->m_active = REDSOUND_VOICE_ACTIVE_OFF;
-                } else {
+                if ((waveData != 0) && (trackData != 0)) {
                     envChanged += 1;
-                    voice->pb.type = (u16)((voiceData->m_voiceSwitch & REDSOUND_VOICE_SWITCH_LOOP) != 0);
+                    u16 loopFlag;
+                    if ((voiceData->m_voiceSwitch & REDSOUND_VOICE_SWITCH_LOOP) != 0) {
+                        loopFlag = 1;
+                    } else {
+                        loopFlag = 0;
+                    }
+                    voice->pb.type = loopFlag;
                     voice->pb.srcSelect = 1;
                     voice->pb.state = 1;
 
@@ -1908,6 +1912,8 @@ void EnvelopeKeyExecute()
                     voiceData->m_flags |= REDSOUND_VOICE_FLAGS_ADSR_START;
                     voiceData->m_envelopeLevel = REDSOUND_ENVELOPE_LEVEL_FULL;
                     voiceData->m_adsrCurrentLevel = 0;
+                } else {
+                    voiceData->m_active = REDSOUND_VOICE_ACTIVE_OFF;
                 }
             } else {
                 if ((voiceData->m_flags & REDSOUND_VOICE_FLAGS_RELEASED) != 0) {

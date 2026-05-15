@@ -703,14 +703,14 @@ static void _SetReverbData(RedReverbDATA* reverb, int* params)
 static void _ClearReverb(int bank)
 {
     RedReverbDATA* reverb = p_ReverbData + (bank & REDSOUND_REVERB_BANK_MASK);
-    if (reverb->m_callback == 0) {
+    if (reverb->m_callback == REDSOUND_REVERB_CALLBACK_NONE) {
         return;
     }
 
     if (bank == REDSOUND_REVERB_AUX_A) {
-        AXRegisterAuxACallback((void (*)(void*, void*))_ReverbNullCallback, 0);
+        AXRegisterAuxACallback((void (*)(void*, void*))_ReverbNullCallback, REDSOUND_REVERB_CONTEXT_NONE);
     } else {
-        AXRegisterAuxBCallback((void (*)(void*, void*))_ReverbNullCallback, 0);
+        AXRegisterAuxBCallback((void (*)(void*, void*))_ReverbNullCallback, REDSOUND_REVERB_CONTEXT_NONE);
     }
 
     switch (reverb->m_kind) {
@@ -731,7 +731,7 @@ static void _ClearReverb(int bank)
         break;
     }
 
-    reverb->m_callback = 0;
+    reverb->m_callback = REDSOUND_REVERB_CALLBACK_NONE;
     RedDelete((int)reverb->m_context);
 }
 
@@ -775,7 +775,7 @@ RedReverbSize* SetReverb(int bank, int kind, int* params)
     }
 
     reverb = p_ReverbData + (bank & REDSOUND_REVERB_BANK_MASK);
-    if ((reverb->m_callback != 0) && (reverb->m_kind == kind)) {
+    if ((reverb->m_callback != REDSOUND_REVERB_CALLBACK_NONE) && (reverb->m_kind == kind)) {
         _SetReverbData(reverb, params);
         return p_ReverbSize;
     }

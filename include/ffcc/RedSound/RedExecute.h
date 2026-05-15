@@ -24,6 +24,12 @@ struct RedReverbDATA {
 	RedReverbKind m_kind;
 };
 
+#define REDSOUND_REVERB_CONTEXT_NONE ((void*)0)
+
+enum RedReverbCallbackValue {
+	REDSOUND_REVERB_CALLBACK_NONE = 0,
+};
+
 enum RedReverbLayoutOffset {
 	REDSOUND_REVERB_CALLBACK_OFFSET = 0x00,
 	REDSOUND_REVERB_CONTEXT_OFFSET = 0x04,

@@ -291,6 +291,7 @@ enum RedExecuteAdsrStateIndex {
 enum RedVoiceStartMaskIndex {
     REDSOUND_VOICE_START_MASK_LOW = 0,
     REDSOUND_VOICE_START_MASK_HIGH = 1,
+    REDSOUND_VOICE_START_MASK_COUNT = 2,
 };
 
 STATIC_ASSERT(sizeof(t_TonePitch) == REDSOUND_TONE_PITCH_TABLE_SIZE);
@@ -2004,7 +2005,7 @@ void EnvelopeKeyExecute()
  */
 static void _KeyOnControl()
 {
-    int voiceStartMask[2];
+    int voiceStartMask[REDSOUND_VOICE_START_MASK_COUNT];
     RedKeyOnSlot* reserve;
     RedVoiceDATA* voiceData;
     RedSwingFunc waveFunc;

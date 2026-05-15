@@ -19,7 +19,7 @@ extern "C" void SetGroup__7CMemoryFPvi(CMemory*, void*, int);
 extern "C" void CopyFromAMemorySync__7CMemoryFPvPvUl(CMemory*, void*, void*, unsigned long);
 extern "C" int TryReleaseAnimBank__9CCharaPcsFi(void*, int);
 class CCharaPcs;
-extern unsigned char Chara[];
+extern CChara Chara;
 extern CCharaPcs CharaPcs;
 extern const float kCharaSharedZeroF;
 extern const float kCharaSharedOneF;
@@ -60,11 +60,6 @@ static inline unsigned int FourCC(char a, char b, char c, char d)
 {
 	return (static_cast<unsigned int>(a) << 24) | (static_cast<unsigned int>(b) << 16) |
 	       (static_cast<unsigned int>(c) << 8) | static_cast<unsigned int>(d);
-}
-
-static inline int& CharaS32(unsigned int offset)
-{
-	return S32At(Chara, offset);
 }
 
 static inline void i2f_5(float* out, register const unsigned short* in)
@@ -268,7 +263,7 @@ void CChara::CAnim::Create(void* data, CMemory::CStage* stage)
 							break;
 						case 0x44415441: {
 							int i = 0;
-							int shift = i;
+							int shift = 0;
 							do {
 								int type = chunkFile.Get4();
 								int mode;
@@ -311,12 +306,11 @@ void CChara::CAnim::Create(void* data, CMemory::CStage* stage)
 
 					Memory.CopyToAMemorySync(
 					    m_bank,
-					    reinterpret_cast<void*>(
-					        CharaS32(8308) + S32At(reinterpret_cast<void*>(CharaS32(8284)), 8)),
+					    reinterpret_cast<void*>(Chara.m_animBankAddress + S32At(Chara.m_animAmemBase, 8)),
 					    m_bankSize);
 
-					m_bankAddress = CharaS32(8308);
-					CharaS32(8308) += m_bankSize;
+					m_bankAddress = Chara.m_animBankAddress;
+					Chara.m_animBankAddress += m_bankSize;
 					if (m_bank != 0) {
 						__dl__FPv(m_bank);
 						m_bank = 0;
@@ -345,7 +339,7 @@ void CChara::CAnim::InitQuantize()
 	unsigned long qy = ((unsigned long)m_quantizeY << 0x18) | 0x70000 | ((unsigned long)m_quantizeY << 8) | 7;
 	unsigned long qz = ((unsigned long)m_quantizeZ << 0x18) | 0x70000 | ((unsigned long)m_quantizeZ << 8) | 7;
 
-	gqrInit__6CCharaFUlUlUl(Chara, qx, qy, qz);
+	gqrInit__6CCharaFUlUlUl(&Chara, qx, qy, qz);
 }
 
 /*
@@ -397,8 +391,7 @@ void CChara::CAnimNode::Interp(CChara::CAnim* anim, SRT* srt, float frame)
 		SetGroup__7CMemoryFPvi(&Memory, anim->m_bank, 1);
 		CopyFromAMemorySync__7CMemoryFPvPvUl(
 		    &Memory, anim->m_bank,
-		    reinterpret_cast<void*>(
-		        anim->m_bankAddress + S32At(reinterpret_cast<void*>(CharaS32(8284)), 8)),
+		    reinterpret_cast<void*>(anim->m_bankAddress + S32At(Chara.m_animAmemBase, 8)),
 		    anim->m_bankSize);
 	}
 

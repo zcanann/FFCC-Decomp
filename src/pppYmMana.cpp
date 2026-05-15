@@ -42,27 +42,27 @@ extern const float FLOAT_80330ec0 = 255.0f;
 
 static inline float CameraWorldX()
 {
-    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0xE0);
+    return CameraPcs._224_4_;
 }
 
 static inline float CameraWorldY()
 {
-    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0xE4);
+    return CameraPcs._228_4_;
 }
 
 static inline float CameraWorldZ()
 {
-    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0xE8);
+    return CameraPcs._232_4_;
 }
 
 static inline Mtx& CameraMatrix()
 {
-    return *reinterpret_cast<Mtx*>(reinterpret_cast<u8*>(&CameraPcs) + 0x4);
+    return CameraPcs.m_cameraMatrix;
 }
 
 static inline Mtx44& CameraScreenMatrix()
 {
-    return *reinterpret_cast<Mtx44*>(reinterpret_cast<u8*>(&CameraPcs) + 0x94);
+    return CameraPcs.m_screenMatrix;
 }
 
 struct Vec2d {

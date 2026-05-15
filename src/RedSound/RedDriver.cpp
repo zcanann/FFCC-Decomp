@@ -2858,7 +2858,7 @@ int CRedDriver::SePlayState(int seID)
     seInfoBase = &p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
     seInfo = *seInfoBase;
     do {
-        if (((u32)seInfo->m_command != 0) && ((seID == REDSOUND_SE_ID_ALL || (seInfo->m_seId == seID)))) {
+        if (((u32)seInfo->m_command != REDSOUND_TRACK_COMMAND_NONE) && ((seID == REDSOUND_SE_ID_ALL || (seInfo->m_seId == seID)))) {
             result = (int)seInfo;
             break;
         }
@@ -3085,8 +3085,8 @@ int CRedDriver::GetSeVolume(int seID, int mode)
 
     track = p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
     while (1) {
-        if (((u32)track->m_command != 0) && ((seID == REDSOUND_SE_ID_ALL) || (seID == track->m_seId))) {
-            if ((u32)track->m_command != 0) {
+        if (((u32)track->m_command != REDSOUND_TRACK_COMMAND_NONE) && ((seID == REDSOUND_SE_ID_ALL) || (seID == track->m_seId))) {
+            if ((u32)track->m_command != REDSOUND_TRACK_COMMAND_NONE) {
                 if (mode == REDSOUND_SE_VOLUME_QUERY_DELTA) {
                     return track->m_mixVolumeDelta;
                 }
@@ -3116,7 +3116,7 @@ int CRedDriver::ReportSeLoop(int seID)
 
     track = p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
     while (1) {
-        if ((track->m_command != 0) &&
+        if ((track->m_command != REDSOUND_TRACK_COMMAND_NONE) &&
             (((seID == REDSOUND_SE_ID_ALL) || (seID == track->m_seId)) &&
              ((track->m_loopReport & REDSOUND_TRACK_LOOP_REPORT_ACTIVE) != 0))) {
             return 1;
@@ -3158,7 +3158,7 @@ void CRedDriver::ClearSePlayLine()
 	RedTrackDATA* track = control->m_tracks;
 
 	do {
-		track->m_command = 0;
+		track->m_command = REDSOUND_TRACK_COMMAND_NONE;
 		track++;
 	} while (track < control->m_tracks + REDSOUND_SE_TRACK_COUNT);
 }
@@ -3179,7 +3179,7 @@ RedTrackDATA* CRedDriver::GetSePlayTrack()
 	trackEnd += REDSOUND_SE_TRACK_COUNT;
 
 	do {
-		if (track->m_command != 0) {
+		if (track->m_command != REDSOUND_TRACK_COMMAND_NONE) {
 			return track;
 		}
 		track++;

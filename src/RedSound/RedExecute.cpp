@@ -295,6 +295,7 @@ enum RedExecuteAdsrStateIndex {
     REDSOUND_ADSR_STATE_STAGE = 0,
     REDSOUND_ADSR_STATE_STEP_FRAMES = 1,
     REDSOUND_ADSR_STATE_STEP_ADD = 2,
+    REDSOUND_ADSR_LEVEL_BYTE_SHIFT = 8,
 };
 
 enum RedVoiceStartMaskIndex {
@@ -1683,7 +1684,7 @@ static void _AdsrStart(RedVoiceDATA* voice)
     stage[REDSOUND_ADSR_STATE_STEP_FRAMES] = stepFrames;
     if (nextLevel != 0) {
         nextLevel += 1;
-        nextLevel <<= 8;
+        nextLevel <<= REDSOUND_ADSR_LEVEL_BYTE_SHIFT;
         nextLevel -= 1;
         nextLevel <<= REDSOUND_FIXED_SHIFT;
     }
@@ -1691,7 +1692,7 @@ static void _AdsrStart(RedVoiceDATA* voice)
     if (stepFrames != 0) {
         if (prevLevel != 0) {
             prevLevel += 1;
-            prevLevel <<= 8;
+            prevLevel <<= REDSOUND_ADSR_LEVEL_BYTE_SHIFT;
             prevLevel -= 1;
             prevLevel <<= REDSOUND_FIXED_SHIFT;
         }
@@ -1728,7 +1729,7 @@ static void _AdsrDataCompute(RedVoiceDATA* voice)
         stepCount = adsrData->m_time[*stage];
         if (level != 0) {
             level += 1;
-            level <<= 8;
+            level <<= REDSOUND_ADSR_LEVEL_BYTE_SHIFT;
             level -= 1;
             level <<= REDSOUND_FIXED_SHIFT;
         }

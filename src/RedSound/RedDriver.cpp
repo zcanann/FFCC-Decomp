@@ -525,6 +525,10 @@ enum RedDriverBufferSize {
     REDSOUND_STREAM_ALLOC_SIZE = 0x4C0,
 };
 
+enum RedDriverReverbScale {
+    REDSOUND_REVERB_DEPTH_INPUT_SCALE_SHIFT = 8,
+};
+
 STATIC_ASSERT(sizeof(int) * REDSOUND_MUSIC_REPLAY_POINT_COUNT == REDSOUND_MUSIC_REPLAY_POINT_ALLOC_SIZE);
 STATIC_ASSERT(sizeof(RedExecCommand) * REDSOUND_EXEC_COMMAND_COUNT == REDSOUND_EXEC_COMMAND_ALLOC_SIZE);
 STATIC_ASSERT(sizeof(RedSoundCONTROL) * REDSOUND_CONTROL_COUNT == REDSOUND_SOUND_CONTROL_ALLOC_SIZE);
@@ -762,9 +766,9 @@ static void _SetReverbDepth(int* command)
     fadeStep = command[REDSOUND_REVERB_COMMAND_FADE_TIME];
     if (reverbDepth != 0) {
         reverbDepth += 1;
-        reverbDepth <<= 8;
+        reverbDepth <<= REDSOUND_REVERB_DEPTH_INPUT_SCALE_SHIFT;
         reverbDepth -= 1;
-        reverbDepth <<= 12;
+        reverbDepth <<= REDSOUND_FIXED_SHIFT;
     }
     p_ReverbDepth[reverbBank].m_depth = reverbDepth;
     if (reverbBank != 0) {

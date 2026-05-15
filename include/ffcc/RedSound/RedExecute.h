@@ -224,6 +224,7 @@ struct RedVoiceDATA {
 };
 
 #define REDSOUND_VOICE_TRACK_NONE 0
+#define REDSOUND_VOICE_DATA_NONE 0
 #define REDSOUND_AX_VOICE_NONE 0
 
 enum RedVoiceAdsrIndex {

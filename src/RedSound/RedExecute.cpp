@@ -901,15 +901,15 @@ RedVoiceDATA* EntryVoiceSearch(RedTrackDATA* track)
     RedVoiceDATA* voice;
     int bestEnvelope;
     RedVoiceDATA* voiceEnd;
-    RedVoiceDATA* bestVoice = 0;
+    RedVoiceDATA* bestVoice = REDSOUND_VOICE_DATA_NONE;
 
     if ((static_cast<s8>(track->m_note.m_allocFlags) & REDSOUND_NOTE_ALLOC_DIRECT_MASK) != 0) {
         if (((track->m_note.m_allocFlags & REDSOUND_NOTE_ALLOC_DIRECT) != 0) ||
-            ((p_VoiceData + track->m_trackNo)->m_track == 0) ||
+            ((p_VoiceData + track->m_trackNo)->m_track == REDSOUND_VOICE_TRACK_NONE) ||
             ((p_VoiceData + track->m_trackNo)->m_track == track)) {
             voice = p_VoiceData + track->m_trackNo;
         } else {
-            voice = 0;
+            voice = REDSOUND_VOICE_DATA_NONE;
         }
     } else {
         if ((track->m_note.m_allocFlags & REDSOUND_NOTE_ALLOC_PRIORITY) != 0) {
@@ -923,8 +923,8 @@ RedVoiceDATA* EntryVoiceSearch(RedTrackDATA* track)
         do {
             if ((voice->m_stateFlags & REDSOUND_VOICE_STATE_PLAYING_MASK) == 0) {
                 if (voice->m_envelopeLevel < 1) {
-                    if (voice->m_track != 0) {
-                        voice->m_track = 0;
+                    if (voice->m_track != REDSOUND_VOICE_TRACK_NONE) {
+                        voice->m_track = REDSOUND_VOICE_TRACK_NONE;
                     }
                     break;
                 }
@@ -941,7 +941,7 @@ RedVoiceDATA* EntryVoiceSearch(RedTrackDATA* track)
             RedVoiceDATA* selectedVoice;
             p_SoundControl->m_updateFlags |= REDSOUND_CONTROL_UPDATE_VOICE_STEAL;
             if (bestEnvelope == REDSOUND_ENVELOPE_LEVEL_FULL) {
-                selectedVoice = 0;
+                selectedVoice = REDSOUND_VOICE_DATA_NONE;
             } else {
                 selectedVoice = bestVoice;
             }
@@ -949,7 +949,7 @@ RedVoiceDATA* EntryVoiceSearch(RedTrackDATA* track)
         }
     }
 
-    if (voice != 0) {
+    if (voice != REDSOUND_VOICE_DATA_NONE) {
         voice->m_flags &= ~REDSOUND_VOICE_FLAGS_RELEASED;
         voice->m_envelopeLevel = REDSOUND_ENVELOPE_LEVEL_FULL;
     }

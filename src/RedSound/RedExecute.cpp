@@ -1364,9 +1364,9 @@ static void _VoiceDataAsign(RedTrackDATA* track, RedVoiceDATA* voice, RedNoteDAT
     if (voice->m_waveData != 0) {
         memcpy(&voice->m_adsr,
                track->m_waveData->m_adsr,
-               REDSOUND_TRACK_ADSR_SIZE);
+               sizeof(voice->m_adsr));
     } else {
-        memset(&voice->m_adsr, 0, REDSOUND_TRACK_ADSR_SIZE);
+        memset(&voice->m_adsr, 0, sizeof(voice->m_adsr));
     }
 
     voice->m_voiceSwitch = track->m_voiceSwitch;
@@ -1476,7 +1476,7 @@ skipModSetup:
     if (voice->m_waveData != 0) {
         memcpy(&voice->m_adsr,
                voice->m_waveData->m_adsr,
-               REDSOUND_TRACK_ADSR_SIZE);
+               sizeof(voice->m_adsr));
         if ((s8)track->m_adsr.m_level[REDSOUND_VOICE_ADSR_ATTACK] != (s8)REDSOUND_TRACK_ADSR_DEFAULT_BYTE) {
             voice->m_adsr.m_level[REDSOUND_VOICE_ADSR_ATTACK] =
                 track->m_adsr.m_level[REDSOUND_VOICE_ADSR_ATTACK];
@@ -1514,7 +1514,7 @@ skipModSetup:
             voice->m_adsr.m_time[REDSOUND_VOICE_ADSR_ATTACK] = (u16)pitchWork[0];
         }
     } else {
-        memset(&voice->m_adsr, 0, REDSOUND_TRACK_ADSR_SIZE);
+        memset(&voice->m_adsr, 0, sizeof(voice->m_adsr));
     }
 
     workValue = voice - p_VoiceData;

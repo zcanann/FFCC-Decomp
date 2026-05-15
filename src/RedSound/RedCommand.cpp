@@ -152,14 +152,15 @@ RedTrackDATA* SearchSeEmptyTrack(int trackCount, int eraseTrack, int attrMask)
 			track = scan;
 			remaining = trackCount - 1;
 			while (remaining != 0) {
-				if ((track->m_command != 0) ||
+				if ((track->m_command != REDSOUND_TRACK_COMMAND_NONE) ||
 				    ((track->m_note.m_allocFlags & REDSOUND_NOTE_ALLOC_STREAM) != 0)) {
 					break;
 				}
 				track--;
 				remaining--;
 			}
-			if ((track->m_command != 0) || ((track->m_note.m_allocFlags & REDSOUND_NOTE_ALLOC_STREAM) != 0)) {
+			if ((track->m_command != REDSOUND_TRACK_COMMAND_NONE) ||
+			    ((track->m_note.m_allocFlags & REDSOUND_NOTE_ALLOC_STREAM) != 0)) {
 				scan = track;
 				remaining = 1;
 			}
@@ -171,7 +172,7 @@ RedTrackDATA* SearchSeEmptyTrack(int trackCount, int eraseTrack, int attrMask)
 		return track;
 	}
 
-	return 0;
+	return REDSOUND_TRACK_NONE;
 }
 /*
  * --INFO--
@@ -191,13 +192,14 @@ int SeStopID(int seId)
 	soundControl->m_updateFlags = 0;
 	track = soundControl->m_tracks;
 	do {
-		if ((track->m_command != 0) && ((seId == REDSOUND_SE_ID_ALL) || (track->m_seId == seId))) {
+		if ((track->m_command != REDSOUND_TRACK_COMMAND_NONE) &&
+		    ((seId == REDSOUND_SE_ID_ALL) || (track->m_seId == seId))) {
 			int trackNo;
 
 			KeyOnReserveClear(p_KeyOnData, track);
 			track->m_seId = REDSOUND_SE_ID_NONE;
-			track->m_flags = 0;
-			track->m_command = 0;
+			track->m_flags = REDSOUND_TRACK_FLAGS_NONE;
+			track->m_command = REDSOUND_TRACK_COMMAND_NONE;
 			track->m_mixVolumeMode = REDSOUND_SE_VOLUME_MODE_NORMAL;
 
 			trackNo = track->m_trackNo;
@@ -205,7 +207,7 @@ int SeStopID(int seId)
 			(p_VoiceData + trackNo)->m_voiceSwitch &= REDSOUND_VOICE_SWITCH_CLEAR_SE_MASK;
 			(p_VoiceData + trackNo)->m_flags &= REDSOUND_VOICE_FLAGS_CLEAR_ACTIVE_MASK;
 			(p_VoiceData + trackNo)->m_flags |= REDSOUND_VOICE_FLAGS_RELEASED;
-			(p_VoiceData + trackNo)->m_track = 0;
+			(p_VoiceData + trackNo)->m_track = REDSOUND_VOICE_TRACK_NONE;
 			(p_VoiceData + trackNo)->m_active = REDSOUND_VOICE_ACTIVE_OFF;
 
 			if (track->m_waveBankData != 0) {
@@ -236,15 +238,16 @@ int SeStopMG(int bank, int sep, int group, int kind)
 	soundControl->m_updateFlags = 0;
 	track = soundControl->m_tracks;
 	do {
-		if ((track->m_command != 0) && ((track->m_seSepId & REDSOUND_SE_BLOCK_DATA_FLAG) == 0)) {
+		if ((track->m_command != REDSOUND_TRACK_COMMAND_NONE) &&
+		    ((track->m_seSepId & REDSOUND_SE_BLOCK_DATA_FLAG) == 0)) {
 			int id = track->m_seSepId / REDSOUND_SE_MG_ID_DIVISOR;
 			if ((bank != id) && (sep != id) && (group != id) && (kind != id)) {
 				int trackNo;
 
 				KeyOnReserveClear(p_KeyOnData, track);
 				track->m_seId = REDSOUND_SE_ID_NONE;
-				track->m_flags = 0;
-				track->m_command = 0;
+				track->m_flags = REDSOUND_TRACK_FLAGS_NONE;
+				track->m_command = REDSOUND_TRACK_COMMAND_NONE;
 				track->m_mixVolumeMode = REDSOUND_SE_VOLUME_MODE_NORMAL;
 
 				trackNo = track->m_trackNo;
@@ -252,7 +255,7 @@ int SeStopMG(int bank, int sep, int group, int kind)
 				(p_VoiceData + trackNo)->m_voiceSwitch &= REDSOUND_VOICE_SWITCH_CLEAR_SE_MASK;
 				(p_VoiceData + trackNo)->m_flags &= REDSOUND_VOICE_FLAGS_CLEAR_ACTIVE_MASK;
 				(p_VoiceData + trackNo)->m_flags |= REDSOUND_VOICE_FLAGS_RELEASED;
-				(p_VoiceData + trackNo)->m_track = 0;
+				(p_VoiceData + trackNo)->m_track = REDSOUND_VOICE_TRACK_NONE;
 				(p_VoiceData + trackNo)->m_active = REDSOUND_VOICE_ACTIVE_OFF;
 
 				if (track->m_waveBankData != 0) {

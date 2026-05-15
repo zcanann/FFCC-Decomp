@@ -223,6 +223,8 @@ struct RedVoiceDATA {
 	unsigned char m_reservedBC[REDSOUND_VOICE_RESERVEDBC_SIZE];
 };
 
+#define REDSOUND_VOICE_TRACK_NONE 0
+
 enum RedVoiceAdsrIndex {
 	REDSOUND_VOICE_ADSR_ATTACK = 0,
 	REDSOUND_VOICE_ADSR_DECAY = 1,

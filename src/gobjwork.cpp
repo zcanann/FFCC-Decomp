@@ -2146,7 +2146,8 @@ extern "C" int GetCmdListItemName__12CCaravanWorkFi(CCaravanWork* caravanWork, i
 			for (int i = 0; i < groupedCount; i++) {
 				short invSlot = (short)caravanWork->m_commandListInventorySlotRef[cmdListIdx + i];
 				short itemId = (short)caravanWork->m_inventoryItems[invSlot];
-				if (*(short*)(Game.unkCFlatData0[2] + itemId * 0x48) == 1) {
+				int itemType = GetItemDataPtr(itemId)[0];
+				if (itemType == 1) {
 					*itemCmdListIdx = cmdListIdx + i;
 					return 1;
 				}

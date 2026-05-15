@@ -558,6 +558,14 @@ enum RedDriverSleepTimer {
     REDSOUND_SLEEP_TIMER_SHIFT = 3,
 };
 
+enum RedDriverTestProcess {
+    REDSOUND_TEST_PROCESS_DMA_CHECK = 1,
+};
+
+enum RedAxCompressorState {
+    REDSOUND_AX_COMPRESSOR_OFF = 0,
+};
+
 enum RedDriverCommandParse {
     REDSOUND_DELTA_TIME_VALUE_MASK = 0x7F,
     REDSOUND_DELTA_TIME_CONTINUE_FLAG = 0x80,
@@ -2045,7 +2053,7 @@ void CRedDriver::Init()
     }
     p_Tick = (RedTickHistory*)RedNew(REDSOUND_TICK_HISTORY_SIZE);
     memset(p_Tick, 0, REDSOUND_TICK_HISTORY_SIZE);
-    AXSetCompressor(0);
+    AXSetCompressor(REDSOUND_AX_COMPRESSOR_OFF);
     m_MusicKeySignature = 0;
     m_SoundMasterControl = 0;
     m_MusicSkipLine = 0;
@@ -3834,7 +3842,7 @@ void CRedDriver::SetReverbDepth(int bank, int depth, int frameCount)
 void CRedDriver::TestProcess(int processType)
 {
     switch (processType) {
-    case 1:
+    case REDSOUND_TEST_PROCESS_DMA_CHECK:
         _DMACheckProcess();
         break;
     }

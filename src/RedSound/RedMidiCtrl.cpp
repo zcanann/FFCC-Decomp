@@ -377,12 +377,22 @@ enum RedMidiCommandConst {
     REDSOUND_MIDI_MOD_DELAY_SCALE = 4,
     REDSOUND_MIDI_SWING_FUNC_MASK = 0xF,
     REDSOUND_MIDI_FUZZY_DEFAULT_DEPTH = 0x100,
+    REDSOUND_MIDI_FUZZY_DEPTH_BIAS = 1,
     REDSOUND_MIDI_PITCH_BEND_HIGH_SCALE = 0x80,
     REDSOUND_MIDI_PITCH_BEND_CENTER = 0x2000,
+    REDSOUND_MIDI_PITCH_BEND_RANGE_SHIFT = 5,
     REDSOUND_MIDI_KEY_TRANSPOSE_SHIFT = 8,
     REDSOUND_MIDI_DELTA_BUFFER_WORD_COUNT = 4,
     REDSOUND_MIDI_SINGLE_DELTA_WORD_COUNT = 1,
     REDSOUND_MIDI_WAVE_BANK_DIRECT = 0x10,
+    REDSOUND_MIDI_STEP_MIN = -9999,
+    REDSOUND_MIDI_STEP_MAX = 9999,
+    REDSOUND_MIDI_REVERB_MIX_REVERB_ONLY = 1,
+    REDSOUND_MIDI_REVERB_MIX_REVERB_AND_DRY = 2,
+    REDSOUND_MIDI_FUZZY_MODE_VOLUME = 1,
+    REDSOUND_MIDI_FUZZY_MODE_PAN = 2,
+    REDSOUND_MIDI_FUZZY_MODE_DELTA_TIME = 3,
+    REDSOUND_MIDI_FUZZY_MODE_ADSR = 4,
 };
 
 enum RedMidiModCommandByte {
@@ -2672,7 +2682,7 @@ static void __MidiCtrl_PitchBend(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* 
 
     track->m_pitchBendRaw = bend;
     bend *= track->m_pitchBendRange;
-    bend >>= 5;
+    bend >>= REDSOUND_MIDI_PITCH_BEND_RANGE_SHIFT;
     track->m_pitchBend = bend;
     track->m_command += 2;
     _PitchBendCompute(track, track->m_pitchBend);
@@ -2692,7 +2702,7 @@ static void __MidiCtrl_PitchBendRange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackD
 
     track->m_pitchBendRange = *track->m_command++;
     bend = track->m_pitchBendRaw * track->m_pitchBendRange;
-    bend >>= 5;
+    bend >>= REDSOUND_MIDI_PITCH_BEND_RANGE_SHIFT;
     track->m_pitchBend = bend;
     _PitchBendCompute(track, track->m_pitchBend);
 }
@@ -2741,10 +2751,10 @@ static void __MidiCtrl_ReverbMix(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* 
     track->m_voiceSwitch &= REDSOUND_VOICE_SWITCH_CLEAR_MIX_MASK;
 
     switch (track->m_command[REDSOUND_MIDI_REVERB_MIX_LEFT]) {
-    case 1:
+    case REDSOUND_MIDI_REVERB_MIX_REVERB_ONLY:
         track->m_voiceSwitch |= REDSOUND_VOICE_SWITCH_REVERB_LEFT;
         break;
-    case 2:
+    case REDSOUND_MIDI_REVERB_MIX_REVERB_AND_DRY:
         track->m_voiceSwitch |= REDSOUND_VOICE_SWITCH_REVERB_LEFT;
     default:
         track->m_voiceSwitch |= REDSOUND_VOICE_SWITCH_DRY_LEFT;
@@ -2752,10 +2762,10 @@ static void __MidiCtrl_ReverbMix(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* 
     }
 
     switch (track->m_command[REDSOUND_MIDI_REVERB_MIX_RIGHT]) {
-    case 1:
+    case REDSOUND_MIDI_REVERB_MIX_REVERB_ONLY:
         track->m_voiceSwitch |= REDSOUND_VOICE_SWITCH_REVERB_RIGHT;
         break;
-    case 2:
+    case REDSOUND_MIDI_REVERB_MIX_REVERB_AND_DRY:
         track->m_voiceSwitch |= REDSOUND_VOICE_SWITCH_REVERB_RIGHT;
     default:
         track->m_voiceSwitch |= REDSOUND_VOICE_SWITCH_DRY_RIGHT;
@@ -2788,10 +2798,10 @@ static void __MidiCtrl_StepRelative(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDAT
     track->m_step = step;
     track->m_step2 = 0;
 
-    if (track->m_step < -9999) {
-        track->m_step = -9999;
-    } else if (track->m_step > 9999) {
-        track->m_step = 9999;
+    if (track->m_step < REDSOUND_MIDI_STEP_MIN) {
+        track->m_step = REDSOUND_MIDI_STEP_MIN;
+    } else if (track->m_step > REDSOUND_MIDI_STEP_MAX) {
+        track->m_step = REDSOUND_MIDI_STEP_MAX;
     }
 }
 /*
@@ -2818,10 +2828,10 @@ static void __MidiCtrl_StepRelative2(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDA
     }
     track->m_step2 = step;
 
-    if (track->m_step2 < -9999) {
-        track->m_step2 = -9999;
-    } else if (track->m_step2 > 9999) {
-        track->m_step2 = 9999;
+    if (track->m_step2 < REDSOUND_MIDI_STEP_MIN) {
+        track->m_step2 = REDSOUND_MIDI_STEP_MIN;
+    } else if (track->m_step2 > REDSOUND_MIDI_STEP_MAX) {
+        track->m_step2 = REDSOUND_MIDI_STEP_MAX;
     }
 }
 /*
@@ -2842,26 +2852,26 @@ static void __MidiCtrl_FuzzyOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* tr
     mode = *track->m_command++;
     value = *track->m_command++;
     if (value != 0) {
-        fuzzyValue = value + 1;
+        fuzzyValue = value + REDSOUND_MIDI_FUZZY_DEPTH_BIAS;
     } else {
         fuzzyValue = REDSOUND_MIDI_FUZZY_DEFAULT_DEPTH;
     }
     value = fuzzyValue;
 
     switch (mode) {
-    case 1:
+    case REDSOUND_MIDI_FUZZY_MODE_VOLUME:
         track->m_fuzzyVolumeDepth = value;
         track->m_voiceSwitch |= REDSOUND_VOICE_SWITCH_FUZZY_VOLUME;
         return;
-    case 2:
+    case REDSOUND_MIDI_FUZZY_MODE_PAN:
         track->m_fuzzyPanDepth = value;
         track->m_voiceSwitch |= REDSOUND_VOICE_SWITCH_FUZZY_PAN;
         return;
-    case 3:
+    case REDSOUND_MIDI_FUZZY_MODE_DELTA_TIME:
         track->m_fuzzyDeltaTimeDepth = value;
         track->m_voiceSwitch |= REDSOUND_VOICE_SWITCH_FUZZY_DELTA_TIME;
         return;
-    case 4:
+    case REDSOUND_MIDI_FUZZY_MODE_ADSR:
         track->m_fuzzyAdsrDepth = value;
         track->m_voiceSwitch |= REDSOUND_VOICE_SWITCH_FUZZY_ADSR;
         return;
@@ -2887,16 +2897,16 @@ static void __MidiCtrl_FuzzyOff(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* t
     mode = *track->m_command++;
 
     switch (mode) {
-    case 1:
+    case REDSOUND_MIDI_FUZZY_MODE_VOLUME:
         track->m_voiceSwitch &= ~REDSOUND_VOICE_SWITCH_FUZZY_VOLUME;
         return;
-    case 2:
+    case REDSOUND_MIDI_FUZZY_MODE_PAN:
         track->m_voiceSwitch &= ~REDSOUND_VOICE_SWITCH_FUZZY_PAN;
         return;
-    case 3:
+    case REDSOUND_MIDI_FUZZY_MODE_DELTA_TIME:
         track->m_voiceSwitch &= ~REDSOUND_VOICE_SWITCH_FUZZY_DELTA_TIME;
         return;
-    case 4:
+    case REDSOUND_MIDI_FUZZY_MODE_ADSR:
         track->m_voiceSwitch &= ~REDSOUND_VOICE_SWITCH_FUZZY_ADSR;
         return;
     default:

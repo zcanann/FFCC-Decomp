@@ -58,6 +58,7 @@ extern "C" void CalcFurColor__Q26CChara6CModelFv(CChara::CModel*);
 extern "C" void MogFurFrame__Q26CChara6CModelFP8CGObject(CChara::CModel*, CGObject*);
 extern double DOUBLE_803303e8;
 extern double DOUBLE_80330400;
+extern const float FLOAT_80330350;
 
 struct Vec4d {
     float x;
@@ -3107,7 +3108,7 @@ void CGObject::CancelAnim(int keepFacing)
 	*((u8*)&m_shieldNodeFlags) =
 	    static_cast<u8>(__rlwimi(*((u8*)&m_shieldNodeFlags), 0, 6, 25, 25));
 
-	m_turnSpeed = sZeroFloat;
+	m_turnSpeed = FLOAT_80330350;
 
 	if (keepFacing != 0)
 	{
@@ -3164,7 +3165,7 @@ void CGObject::PlayAnim(int slot, int param2, int param3, int param4, int param5
     flags = *reinterpret_cast<u8*>(&m_shieldNodeFlags);
     flags = static_cast<u8>(__rlwimi(flags, 1, 3, 28, 28));
     *reinterpret_cast<u8*>(&m_shieldNodeFlags) = flags;
-    m_turnSpeed = sZeroFloat;
+    m_turnSpeed = FLOAT_80330350;
 }
 
 /*

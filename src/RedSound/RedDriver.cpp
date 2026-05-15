@@ -3660,7 +3660,7 @@ int CRedDriver::PlayWaveItem(int waveNo, int itemNo, int key, int pan, int volum
     if ((wave->m_reverbMix != 0) && (wave->m_reverbMix != 1)) {
         voice->m_voiceSwitch |= REDSOUND_VOICE_SWITCH_REVERB_STEREO;
     }
-    memcpy(&voice->m_adsr, wave->m_adsr, sizeof(voice->m_adsr));
+    memcpy(&voice->m_adsr, wave->m_adsr, REDSOUND_ADSR_DATA_SIZE);
     voice->m_basePitch = key << REDSOUND_PITCH_BASE_NOTE_SHIFT;
     if ((wave->m_flags & REDSOUND_WAVE_FLAG_USE_WAVE_KEY) != 0) {
         voice->m_basePitch = wave->m_splitKey << REDSOUND_PITCH_BASE_NOTE_SHIFT;
@@ -3768,13 +3768,13 @@ void CRedDriver::SetWaveAdsr(int attack, RedAdsrDATA* adsr)
 {
     int* voiceNo;
 
-    memcpy(&p_EditorTrack->m_adsr, adsr, sizeof(p_EditorTrack->m_adsr));
+    memcpy(&p_EditorTrack->m_adsr, adsr, REDSOUND_TRACK_ADSR_SIZE);
     voiceNo = p_EditorVoice;
     do {
         int voiceIndex = *voiceNo;
         if (voiceIndex != 0) {
             RedVoiceDATA* voice = p_VoiceData + voiceIndex;
-            memcpy(&voice->m_adsr, adsr, sizeof(voice->m_adsr));
+            memcpy(&voice->m_adsr, adsr, REDSOUND_ADSR_DATA_SIZE);
             voice->m_flags |= REDSOUND_VOICE_FLAGS_ADSR_START;
         }
         voiceNo++;

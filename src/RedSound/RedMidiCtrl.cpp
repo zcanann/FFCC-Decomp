@@ -516,7 +516,7 @@ static void __MidiCtrl_FuzzyOff(RedSoundCONTROL* control, RedKeyOnDATA* keyOnDat
 
 static inline void RedTrackAdsrFillDefault(RedAdsrDATA* adsr)
 {
-	memset(adsr, REDSOUND_TRACK_ADSR_DEFAULT_WORD, sizeof(*adsr));
+	memset(adsr, REDSOUND_TRACK_ADSR_DEFAULT_WORD, REDSOUND_TRACK_ADSR_SIZE);
 }
 
 RedMidiControlFunc p_MidiControl_Function[REDSOUND_MIDI_CONTROL_FUNCTION_COUNT] = {
@@ -1770,7 +1770,7 @@ static void __MidiCtrl_ADSR_Default(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDAT
     voice = p_VoiceData;
     do {
         if ((voice->m_track == track) && (voice->m_waveData != 0)) {
-            memcpy(&voice->m_adsr, voice->m_waveData->m_adsr, sizeof(voice->m_adsr));
+            memcpy(&voice->m_adsr, voice->m_waveData->m_adsr, REDSOUND_ADSR_DATA_SIZE);
             voice->m_flags |= REDSOUND_VOICE_FLAGS_ADSR_DIRTY;
         }
         voice++;

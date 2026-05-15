@@ -1970,7 +1970,7 @@ void EnvelopeKeyExecute()
             voice->sync |= voiceFlags;
         } else {
             voiceData->m_envelopeLevel = 0;
-            voiceData->m_waveData = 0;
+            voiceData->m_waveData = REDSOUND_WAVE_DATA_NONE;
             AXVPB* voice = voiceData->m_axVoice;
             if (voice != 0) {
                 if (voice->pb.state != REDSOUND_AX_VOICE_STOP) {

@@ -1446,8 +1446,8 @@ static void __MidiCtrl_Wave(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track
     int waveNo;
     int* waveTable;
 
-    track->m_waveData = 0;
-    track->m_waveBase = 0;
+    track->m_waveData = REDSOUND_WAVE_DATA_NONE;
+    track->m_waveBase = REDSOUND_WAVE_BASE_NONE;
     waveNo = *track->m_command++;
     if ((track->m_waveBankData != 0) && (waveNo < track->m_waveBankData->m_tableCount)) {
         waveTable = track->m_waveBankData->m_waveOffsets;
@@ -1477,8 +1477,8 @@ static void __MidiCtrl_WaveWithBank(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDAT
 
 	bankNo = *track->m_command++;
 	waveNo = *track->m_command++;
-	track->m_waveData = 0;
-	track->m_waveBase = 0;
+	track->m_waveData = REDSOUND_WAVE_DATA_NONE;
+	track->m_waveBase = REDSOUND_WAVE_BASE_NONE;
 	waveBank = c_RedEntry.GetWaveBank(bankNo);
 	if (waveBank != 0) {
 		waveBankData = waveBank->m_waveHead;
@@ -2132,7 +2132,7 @@ static void __MidiCtrl_VibrateOn(RedSoundCONTROL* control, RedKeyOnDATA* keyOn, 
  */
 static void __MidiCtrl_VibrateOff(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    track->m_vibrateFunc = 0;
+    track->m_vibrateFunc = REDSOUND_SWING_FUNC_NONE;
 }
 /*
  * --INFO--
@@ -2313,7 +2313,7 @@ static void __MidiCtrl_TremoloOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* 
  */
 static void __MidiCtrl_TremoloOff(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	track->m_tremoloFunc = 0;
+	track->m_tremoloFunc = REDSOUND_SWING_FUNC_NONE;
 }
 /*
  * --INFO--
@@ -2472,7 +2472,7 @@ static void __MidiCtrl_ShakeOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* tr
  */
 static void __MidiCtrl_ShakeOff(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    track->m_shakeFunc = 0;
+    track->m_shakeFunc = REDSOUND_SWING_FUNC_NONE;
 }
 /*
  * --INFO--

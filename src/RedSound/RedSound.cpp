@@ -36,7 +36,11 @@ enum RedSoundLocalSize {
 	REDSOUND_STREAM_BANK_RESERVED18_OFFSET = 0x18,
 	REDSOUND_STREAM_BANK_RESERVED18_SIZE = REDSOUND_STREAM_BANK_ENTRY_SIZE - REDSOUND_STREAM_BANK_RESERVED18_OFFSET,
 	REDSOUND_AUTO_ID_MASK = 0x7FFFFFFF,
+	REDSOUND_STREAM_BANK_FILE_SIZE_NONE = 0,
+	REDSOUND_STREAM_BANK_POINT_NONE = 0,
 };
+
+#define REDSOUND_STREAM_BANK_DATA_NONE ((RedStreamFile*)0)
 
 enum RedSoundStringLayout {
 	REDSOUND_MEMORY_SETTING_ERROR_SIZE = 0x33,
@@ -174,10 +178,10 @@ static RedSoundStreamBank* _SearchEmptyStreamBank()
 		}
 		if (c_Driver.StreamPlayState(bank->m_streamId) == REDSOUND_STREAM_ID_NONE) {
 			bank->m_streamId = REDSOUND_STREAM_ID_NONE;
-			bank->m_streamData = 0;
-			bank->m_fileSize = 0;
-			bank->m_readPoint = 0;
-			bank->m_playPoint = 0;
+			bank->m_streamData = REDSOUND_STREAM_BANK_DATA_NONE;
+			bank->m_fileSize = REDSOUND_STREAM_BANK_FILE_SIZE_NONE;
+			bank->m_readPoint = REDSOUND_STREAM_BANK_POINT_NONE;
+			bank->m_playPoint = REDSOUND_STREAM_BANK_POINT_NONE;
 			return bank;
 		}
 		bank++;

@@ -542,7 +542,7 @@ void CRingMenu::onDraw()
 	sin(static_cast<double>(FLOAT_80330a0c * static_cast<float>(m_gbaAnimCounter)) / static_cast<double>(FLOAT_80330a10));
 	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(MenuPcsVoid(), 0);
 
-	float cycle = static_cast<float>(fmod(static_cast<double>(FLOAT_80330a18 * static_cast<float>(m_gbaAnimCounter)),
+	float cycle = static_cast<float>(fmod(static_cast<double>(FLOAT_80330a18 * static_cast<float>(m_commonFrameCounter)),
 	                                      DOUBLE_80330a20));
 	if (cycle > FLOAT_803309cc) {
 		cycle = FLOAT_80330a28 - cycle;
@@ -872,7 +872,7 @@ void CRingMenu::drawGBA()
 
 	const double sizePulse = static_cast<double>(FLOAT_80330a14 * static_cast<float>(static_cast<double>(FLOAT_803309cc) - gbaAnim) +
 	                                             FLOAT_803309cc);
-	float cycle = static_cast<float>(fmod(static_cast<double>(FLOAT_80330a18 * static_cast<float>(m_gbaAnimCounter)),
+	float cycle = static_cast<float>(fmod(static_cast<double>(FLOAT_80330a18 * static_cast<float>(m_commonFrameCounter)),
 	                                      DOUBLE_80330a20));
 	if (cycle > FLOAT_803309cc) {
 		cycle = FLOAT_80330a28 - cycle;
@@ -911,7 +911,7 @@ void CRingMenu::drawGBA()
 	if (((flatFlags & 8) != 0) && (GetGBAStart__6JoyBusFi(&Joybus, menuIndex) == 0)) {
 		if (IsInitSend__6JoyBusFi(&Joybus, menuIndex) == 0) {
 			SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcsVoid(), 0x1D);
-			const double blink = static_cast<double>(sin(static_cast<double>(FLOAT_80330a54 * static_cast<float>(m_gbaAnimCounter))));
+			const double blink = static_cast<double>(sin(static_cast<double>(FLOAT_80330a54 * static_cast<float>(m_commonFrameCounter))));
 			const unsigned int sendAlpha = static_cast<unsigned int>(
 			    static_cast<int>(static_cast<double>(FLOAT_803309c4) * (alphaLit * static_cast<double>(FLOAT_803309cc + static_cast<float>(blink)))));
 			unsigned int sendColor[1];

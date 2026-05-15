@@ -1985,13 +1985,11 @@ void CSound::StopSe3D(int se3dHandle)
     if (se3dHandle < 0) {
         Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
     } else {
-        char* se = reinterpret_cast<char*>(this) + 0x2C;
-        char* found;
+        char* found = reinterpret_cast<char*>(this) + 0x2C;
         int idx = 0;
         int count;
 
         for (count = 0x20; count != 0; count--) {
-            found = se;
             if ((*found & 0x80) != 0) {
                 if (*reinterpret_cast<int*>(found + 4) == se3dHandle) {
                     goto found_entry;
@@ -2020,7 +2018,7 @@ void CSound::StopSe3D(int se3dHandle)
             }
 
             idx += 3;
-            se = found + 0x28;
+            found += 0x28;
         }
         found = 0;
 
@@ -2053,13 +2051,11 @@ _pppMngSt* CSound::FadeOutSe3D(int se3dHandle, int fadeFrames)
         return 0;
     }
 
-    char* se = reinterpret_cast<char*>(this) + 0x2C;
-    char* found;
+    char* found = reinterpret_cast<char*>(this) + 0x2C;
     int ret = 0;
     int count;
 
     for (count = 0x20; count != 0; count--) {
-        found = se;
         if ((*found & 0x80) != 0) {
             if (*reinterpret_cast<int*>(found + 4) == se3dHandle) {
                 goto found_entry;
@@ -2088,7 +2084,7 @@ _pppMngSt* CSound::FadeOutSe3D(int se3dHandle, int fadeFrames)
         }
 
         ret += 3;
-        se = found + 0x28;
+        found += 0x28;
     }
     found = 0;
 

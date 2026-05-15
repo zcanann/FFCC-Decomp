@@ -578,7 +578,7 @@ static RedStreamDATA* _SearchEmptyStreamData()
 		streamData++;
 
 		if (!(streamData < p_Stream + REDSOUND_STREAM_COUNT)) {
-			return 0;
+			return REDSOUND_STREAM_DATA_NONE;
 		}
 	}
 }

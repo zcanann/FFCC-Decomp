@@ -898,7 +898,7 @@ void CRedEntry::WaveHistoryManager(int mode, int waveNo)
 		if (used == 0) {
 			used = SearchWaveSequence(waveNo);
 			if ((used >= REDSOUND_WAVE_PRIMARY_BANK_ENTRY_COUNT) &&
-			    (m_waveBankBase[used].m_historyNo == 0)) {
+			    (m_waveBankBase[used].m_historyNo == REDSOUND_HISTORY_UNUSED)) {
 				WaveHistoryAdd(REDSOUND_WAVE_RELEASE_HISTORY_NO);
 				m_waveBankBase[used].m_historyNo = REDSOUND_WAVE_RELEASE_HISTORY_NO;
 			}
@@ -906,9 +906,9 @@ void CRedEntry::WaveHistoryManager(int mode, int waveNo)
 	} else {
 		used = SearchWaveSequence(waveNo);
 		if ((used >= REDSOUND_WAVE_PRIMARY_BANK_ENTRY_COUNT) &&
-		    (m_waveBankBase[used].m_historyNo != 0)) {
+		    (m_waveBankBase[used].m_historyNo != REDSOUND_HISTORY_UNUSED)) {
 			WaveHistoryDelete(m_waveBankBase[used].m_historyNo);
-			m_waveBankBase[used].m_historyNo = 0;
+			m_waveBankBase[used].m_historyNo = REDSOUND_HISTORY_UNUSED;
 		}
 	}
 }
@@ -1226,16 +1226,16 @@ void CRedEntry::SeSepHistoryManager(int mode, int seNo)
 
 		if (sequenceNo == 0) {
 			sequenceNo = SearchSeSepSequence(seNo);
-			if ((sequenceNo >= 0) && (m_seSepBankBase[sequenceNo].m_historyNo == 0)) {
+			if ((sequenceNo >= 0) && (m_seSepBankBase[sequenceNo].m_historyNo == REDSOUND_HISTORY_UNUSED)) {
 				SeSepHistoryAdd();
-				m_seSepBankBase[sequenceNo].m_historyNo = 1;
+				m_seSepBankBase[sequenceNo].m_historyNo = REDSOUND_HISTORY_MOST_RECENT;
 			}
 		}
 	} else {
 		sequenceNo = SearchSeSepSequence(seNo);
-		if (m_seSepBankBase[sequenceNo].m_historyNo != 0) {
+		if (m_seSepBankBase[sequenceNo].m_historyNo != REDSOUND_HISTORY_UNUSED) {
 			SeSepHistoryDelete(m_seSepBankBase[sequenceNo].m_historyNo);
-			m_seSepBankBase[sequenceNo].m_historyNo = 0;
+			m_seSepBankBase[sequenceNo].m_historyNo = REDSOUND_HISTORY_UNUSED;
 		}
 	}
 }
@@ -1484,18 +1484,18 @@ void CRedEntry::MusicHistoryManager(int mode, int musicNo)
 		if (musicSeq == 0) {
 			musicSeq = SearchMusicSequence(musicNo);
 			if (musicSeq >= 0) {
-				if (m_musicBankBase[musicSeq].m_historyNo == 0) {
+				if (m_musicBankBase[musicSeq].m_historyNo == REDSOUND_HISTORY_UNUSED) {
 					MusicHistoryAdd();
-					m_musicBankBase[musicSeq].m_historyNo = 1;
+					m_musicBankBase[musicSeq].m_historyNo = REDSOUND_HISTORY_MOST_RECENT;
 				}
 			}
 		}
 	} else {
 		musicSeq = SearchMusicSequence(musicNo);
 		if (musicSeq >= 0) {
-			if (m_musicBankBase[musicSeq].m_historyNo != 0) {
+			if (m_musicBankBase[musicSeq].m_historyNo != REDSOUND_HISTORY_UNUSED) {
 				MusicHistoryDelete(m_musicBankBase[musicSeq].m_historyNo);
-				m_musicBankBase[musicSeq].m_historyNo = 0;
+				m_musicBankBase[musicSeq].m_historyNo = REDSOUND_HISTORY_UNUSED;
 			}
 		}
 	}

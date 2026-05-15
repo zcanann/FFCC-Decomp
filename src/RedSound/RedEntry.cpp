@@ -314,25 +314,25 @@ void CRedEntry::Init()
 {
 	int bankIndex;
 
-	m_waveBankBase = (RedHistoryBANK*)RedNew(sizeof(*m_waveBankBase) * REDSOUND_WAVE_BANK_ENTRY_COUNT);
-	m_seSepBankBase = (RedHistoryBANK*)RedNew(sizeof(*m_seSepBankBase) * REDSOUND_SESEP_BANK_ENTRY_COUNT);
-	m_musicBankBase = (RedHistoryBANK*)RedNew(sizeof(*m_musicBankBase) * REDSOUND_MUSIC_BANK_ENTRY_COUNT);
+	m_waveBankBase = (RedHistoryBANK*)RedNew(REDSOUND_WAVE_BANK_SIZE);
+	m_seSepBankBase = (RedHistoryBANK*)RedNew(REDSOUND_SESEP_BANK_SIZE);
+	m_musicBankBase = (RedHistoryBANK*)RedNew(REDSOUND_MUSIC_BANK_SIZE);
 
-	memset(m_waveBankBase, 0, sizeof(*m_waveBankBase) * REDSOUND_WAVE_BANK_ENTRY_COUNT);
+	memset(m_waveBankBase, 0, REDSOUND_WAVE_BANK_SIZE);
 	bankIndex = 0;
 	do {
 		m_waveBankBase[bankIndex].m_id = REDSOUND_HISTORY_BANK_EMPTY_ID;
 		bankIndex = bankIndex + 1;
 	} while (bankIndex < REDSOUND_WAVE_BANK_ENTRY_COUNT);
 
-	memset(m_seSepBankBase, 0, sizeof(*m_seSepBankBase) * REDSOUND_SESEP_BANK_ENTRY_COUNT);
+	memset(m_seSepBankBase, 0, REDSOUND_SESEP_BANK_SIZE);
 	bankIndex = 0;
 	do {
 		m_seSepBankBase[bankIndex].m_id = REDSOUND_HISTORY_BANK_EMPTY_ID;
 		bankIndex = bankIndex + 1;
 	} while (bankIndex < REDSOUND_SESEP_BANK_ENTRY_COUNT);
 
-	memset(m_musicBankBase, 0, sizeof(*m_musicBankBase) * REDSOUND_MUSIC_BANK_ENTRY_COUNT);
+	memset(m_musicBankBase, 0, REDSOUND_MUSIC_BANK_SIZE);
 	bankIndex = 0;
 	do {
 		m_musicBankBase[bankIndex].m_id = REDSOUND_HISTORY_BANK_EMPTY_ID;

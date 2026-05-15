@@ -1666,7 +1666,7 @@ static void _DMACheckProcess()
 
     dmaInfo = RedDriverMainDmaQueue();
     do {
-        if ((dmaInfo->m_id != 0) && (m_ReportPrint != REDSOUND_REPORT_PRINT_OFF)) {
+        if ((dmaInfo->m_id != REDSOUND_DMA_ID_NONE) && (m_ReportPrint != REDSOUND_REPORT_PRINT_OFF)) {
             OSReport(sRedDriverDmaEntryFmt, sRedDriverLogPrefix,
                      dmaInfo->m_id, dmaInfo->m_mainMemory, dmaInfo->m_aramMemory,
                      dmaInfo->m_size, dmaInfo->m_callback);
@@ -1744,7 +1744,7 @@ int RedDmaEntry(int flags, int direction, int mainMemory, int aramMemory, int si
             if (sizeBytes < 1) {
                 queueEntry->m_callback = callback;
             } else {
-                queueEntry->m_callback = 0;
+                queueEntry->m_callback = REDSOUND_DMA_CALLBACK_NONE;
             }
             queueEntry++;
             if (!(queueEntry < queueBase + REDSOUND_DMA_QUEUE_ENTRY_COUNT)) {
@@ -1788,10 +1788,11 @@ int RedDmaSearchID(int id)
 
     found = 0;
     interruptLevel = OSDisableInterrupts();
-    if (id != 0) {
+    if (id != REDSOUND_DMA_ID_NONE) {
         queueEntry = RedDriverMainDmaQueue();
         do {
-            if ((queueEntry->m_id != 0) && ((id == 0) || (queueEntry->m_id == id))) {
+            if ((queueEntry->m_id != REDSOUND_DMA_ID_NONE) &&
+                ((id == REDSOUND_DMA_ID_NONE) || (queueEntry->m_id == id))) {
                 found = 1;
                 break;
             }
@@ -1819,8 +1820,8 @@ void RedDmaClearID(int id)
     interruptLevel = OSDisableInterrupts();
     queueEntry = RedDriverMainDmaQueue();
     do {
-        if ((id == 0) || (queueEntry->m_id == id)) {
-            queueEntry->m_id = 0;
+        if ((id == REDSOUND_DMA_ID_NONE) || (queueEntry->m_id == id)) {
+            queueEntry->m_id = REDSOUND_DMA_ID_NONE;
         }
         queueEntry++;
     } while (queueEntry < RedDriverStreamDmaQueueEnd());
@@ -1873,7 +1874,7 @@ static void _DmaExecute()
         }
         queueEntry = *oldQueuePtr;
         m_DMAInThread = REDSOUND_DMA_THREAD_LOAD_ENTRY;
-        if (queueEntry->m_id != 0) {
+        if (queueEntry->m_id != REDSOUND_DMA_ID_NONE) {
             m_DMAStatus = REDSOUND_DMA_STATUS_BUSY;
             if (queueEntry->m_direction == REDSOUND_DMA_DIRECTION_TO_ARAM) {
                 DCFlushRange((void*)queueEntry->m_mainMemory, (u32)queueEntry->m_size);
@@ -1916,7 +1917,7 @@ static void _DmaExecute()
                 if (activeRequest->m_direction == REDSOUND_DMA_DIRECTION_FROM_ARAM) {
                     DCFlushRange((void*)activeRequest->m_mainMemory, (u32)activeRequest->m_size);
                 }
-                activeRequest->m_id = 0;
+                activeRequest->m_id = REDSOUND_DMA_ID_NONE;
                 break;
             }
             RedSleep(REDSOUND_THREAD_YIELD_SLEEP_US);

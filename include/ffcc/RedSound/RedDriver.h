@@ -6,6 +6,9 @@
 typedef void (*RedDmaCallback)(void* callbackData);
 #endif
 
+#define REDSOUND_DMA_CALLBACK_NONE ((RedDmaCallback)0)
+#define REDSOUND_DMA_CALLBACK_DATA_NONE ((void*)0)
+
 struct RedReverbDepth;
 struct RedReverbModeData;
 struct RedReverbSize;
@@ -25,6 +28,10 @@ enum RedDmaEntryFlag {
 enum RedDmaDirection {
 	REDSOUND_DMA_DIRECTION_TO_ARAM = 0,
 	REDSOUND_DMA_DIRECTION_FROM_ARAM = 1,
+};
+
+enum RedDmaId {
+	REDSOUND_DMA_ID_NONE = 0,
 };
 
 unsigned int DeltaTimeSumup(unsigned char** buffer);

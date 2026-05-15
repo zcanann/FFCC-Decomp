@@ -2149,9 +2149,8 @@ void CGObject::onDraw()
  */
 void CGObject::CancelMove(int moveType)
 {
-    u8 flags = *((u8*)&m_weaponNodeFlags + 1);
-    flags = static_cast<u8>(__rlwimi(flags, 0, 5, 26, 26));
-    *((u8*)&m_weaponNodeFlags + 1) = flags;
+    *((u8*)&m_weaponNodeFlags + 1) =
+        static_cast<u8>(__rlwimi(*((u8*)&m_weaponNodeFlags + 1), 0, 5, 26, 26));
 
     CFlatRuntime::CStack arg;
     arg.m_word = static_cast<u32>(moveType);
@@ -3105,9 +3104,8 @@ void CGObject::CancelAnim(int keepFacing)
 {
 	m_currentAnimSlot = -1;
 
-	u8 flags = *((u8*)&m_shieldNodeFlags);
-	flags = static_cast<u8>(__rlwimi(flags, 0, 6, 25, 25));
-	*((u8*)&m_shieldNodeFlags) = flags;
+	*((u8*)&m_shieldNodeFlags) =
+	    static_cast<u8>(__rlwimi(*((u8*)&m_shieldNodeFlags), 0, 6, 25, 25));
 
 	m_turnSpeed = sZeroFloat;
 
@@ -3116,13 +3114,11 @@ void CGObject::CancelAnim(int keepFacing)
 		m_rotTargetY = m_rotBaseY;
 	}
 
-	flags = *((u8*)&m_shieldNodeFlags);
-	flags = static_cast<u8>(__rlwimi(flags, 0, 3, 28, 28));
-	*((u8*)&m_shieldNodeFlags) = flags;
+	*((u8*)&m_shieldNodeFlags) =
+	    static_cast<u8>(__rlwimi(*((u8*)&m_shieldNodeFlags), 0, 3, 28, 28));
 
-	flags = *((u8*)&m_shieldNodeFlags);
-	flags = static_cast<u8>(__rlwimi(flags, 0, 7, 24, 24));
-	*((u8*)&m_shieldNodeFlags) = flags;
+	*((u8*)&m_shieldNodeFlags) =
+	    static_cast<u8>(__rlwimi(*((u8*)&m_shieldNodeFlags), 0, 7, 24, 24));
 }
 
 /*

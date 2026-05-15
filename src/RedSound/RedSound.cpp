@@ -288,7 +288,7 @@ int* CRedSound::EntryStandbyID(int id)
  */
 int CRedSound::Init(void* mainBuffer, int mainBufferSize, int aramBuffer, int aramBufferSize)
 {
-	memset(m_StandbyStatus, 0, REDSOUND_STANDBY_STATUS_SIZE);
+	memset(m_StandbyStatus, 0, sizeof(m_StandbyStatus));
 
 	if (mainBufferSize > 0 && aramBufferSize > 0) {
 		if ((((u32)mainBuffer & REDSOUND_MEMORY_BANK_ALIGN_MASK) != 0) ||

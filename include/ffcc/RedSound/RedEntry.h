@@ -297,6 +297,8 @@ enum RedSeBlockEntryLayout {
 	REDSOUND_SE_BLOCK_SEQUENCE_COUNT = REDSOUND_SE_BLOCK_SEQUENCE_MASK + 1,
 };
 
+#define REDSOUND_SE_BLOCK_DATA_NONE 0
+
 #define RedSeBlockGetInfo(seBlock, seIndex)                                                       \
 	reinterpret_cast<RedSeINFO*>(reinterpret_cast<unsigned char*>((seBlock)->m_entries) +          \
 	                             (seBlock)->m_seCount * REDSOUND_SE_BLOCK_ENTRY_SIZE +             \

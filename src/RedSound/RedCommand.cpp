@@ -280,7 +280,7 @@ int SeBlockPlay(int seId, int bank, int no, int pan, int volume)
 	bank = bank & REDSOUND_SE_BLOCK_BANK_MASK;
 	no = no & REDSOUND_SE_BLOCK_SEQUENCE_MASK;
 
-	if (p_SeBlockData[bank] != 0) {
+	if (p_SeBlockData[bank] != REDSOUND_SE_BLOCK_DATA_NONE) {
 		RedSeBlockHEAD* bankData = reinterpret_cast<RedSeBlockHEAD*>(p_SeBlockData[bank]);
 		int seNo = no;
 

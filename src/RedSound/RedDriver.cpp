@@ -1085,9 +1085,9 @@ static void _SetSeBlockData(int* command)
     u32 index = (u32)command[REDSOUND_SE_BLOCK_DATA_COMMAND_BANK] & REDSOUND_SE_BLOCK_BANK_MASK;
     RedSeBlockHEAD* seBlockData;
 
-    if (p_SeBlockData[index] != 0) {
+    if (p_SeBlockData[index] != REDSOUND_SE_BLOCK_DATA_NONE) {
         RedDelete(p_SeBlockData[index]);
-        p_SeBlockData[index] = 0;
+        p_SeBlockData[index] = REDSOUND_SE_BLOCK_DATA_NONE;
     }
 
     if (command[REDSOUND_SE_BLOCK_DATA_COMMAND_BUFFER] != 0) {
@@ -2068,7 +2068,7 @@ void CRedDriver::Init()
     index = 0;
     do {
         nextIndex = index + 1;
-        p_SeBlockData[index] = 0;
+        p_SeBlockData[index] = REDSOUND_SE_BLOCK_DATA_NONE;
         index = nextIndex;
     } while (nextIndex < REDSOUND_SE_BLOCK_BANK_COUNT);
     p_ZeroData = (u8*)RedNew(REDSOUND_ZERO_BUFFER_SIZE);

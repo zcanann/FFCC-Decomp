@@ -1755,7 +1755,7 @@ int CRedEntry::WaveDelete(RedHistoryBANK* bank)
 		waveNo = bank->m_id;
 
 		bank->m_id = REDSOUND_HISTORY_BANK_EMPTY_ID;
-		bank->m_size = 0;
+		bank->m_size = REDSOUND_HISTORY_BANK_EMPTY_SIZE;
 
 		sequenceNo = SearchWaveSequence(waveNo);
 		if (sequenceNo < 0) {
@@ -1821,7 +1821,7 @@ int CRedEntry::SeSepMemoryFree(RedHistoryBANK* bank)
 	SeSepHistoryDelete(bank->m_historyNo);
 
 	freedSize = bank->m_size;
-	bank->m_data = bank->m_size = 0;
+	bank->m_data = bank->m_size = REDSOUND_HISTORY_BANK_EMPTY_SIZE;
 	bank->m_id = REDSOUND_HISTORY_BANK_EMPTY_ID;
 
 	WaveHistoryManager(REDSOUND_HISTORY_MODE_RELEASE, waveNo);
@@ -1841,7 +1841,7 @@ RedSeSepHEAD* CRedEntry::SeSepHeadAdd(RedSeSepHEAD* seSepHead)
 	RedHistoryBANK* bank = m_seSepBankBase;
 	RedSeSepHEAD* result = 0;
 
-	while ((bank->m_size != 0) &&
+	while ((bank->m_size != REDSOUND_HISTORY_BANK_EMPTY_SIZE) &&
 	       (bank < m_seSepBankBase + REDSOUND_SESEP_BANK_ENTRY_COUNT)) {
 		bank += 1;
 	}
@@ -1938,7 +1938,7 @@ int CRedEntry::MusicMemoryFree(RedHistoryBANK* bank)
 	WaveHistoryManager(REDSOUND_HISTORY_MODE_RELEASE, bank->m_musicHead->m_waveNo);
 	RedDelete(bank->m_address);
 	int freedSize = bank->m_size;
-	bank->m_data = bank->m_size = 0;
+	bank->m_data = bank->m_size = REDSOUND_HISTORY_BANK_EMPTY_SIZE;
 	bank->m_historyNo = REDSOUND_HISTORY_UNUSED;
 	bank->m_id = REDSOUND_HISTORY_BANK_EMPTY_ID;
 	return freedSize;

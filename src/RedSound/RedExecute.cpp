@@ -616,8 +616,8 @@ void ReverbAreaFree(void* area)
  */
 void InitReverb()
 {
-    p_ReverbData = (RedReverbDATA*)RedNew(sizeof(*p_ReverbData) * REDSOUND_REVERB_DATA_COUNT);
-    memset(p_ReverbData, 0, sizeof(*p_ReverbData) * REDSOUND_REVERB_DATA_COUNT);
+    p_ReverbData = (RedReverbDATA*)RedNew(REDSOUND_REVERB_DATA_BUFFER_SIZE);
+    memset(p_ReverbData, 0, REDSOUND_REVERB_DATA_BUFFER_SIZE);
     p_ReverbSize = (RedReverbSize*)RedNew(REDSOUND_REVERB_SIZE_ALLOC_SIZE);
 }
 
@@ -2799,14 +2799,14 @@ void MusicSkipFunction()
     RedTrackDATA* track;
 
     do {
-        p_SkipKeyOn = (RedKeyOnDATA*)RedNew(sizeof(*p_SkipKeyOn));
+        p_SkipKeyOn = (RedKeyOnDATA*)RedNew(REDSOUND_KEY_ON_BUFFER_SIZE);
         if (p_SkipKeyOn == 0) {
             RedSleep(REDSOUND_MUSIC_SKIP_RETRY_SLEEP_US);
         }
     } while (p_SkipKeyOn == 0);
 
     control = p_SoundControlBuffer + REDSOUND_CONTROL_MUSIC_SKIP;
-    memset(p_SkipKeyOn, 0, sizeof(*p_SkipKeyOn));
+    memset(p_SkipKeyOn, 0, REDSOUND_KEY_ON_BUFFER_SIZE);
     activeTrackCount = _MusicMidiNoteSkipExecute(control, p_SkipKeyOn, 1);
     while ((activeTrackCount == 0) && ((control->m_flags & REDSOUND_CONTROL_FLAG_WHOLE_LOOP_ACTIVE) != 0)) {
         control->m_activeTrackCount = control->m_savedActiveTrackCount;
@@ -3135,7 +3135,7 @@ void MainControl(int frames)
 
     _KeyOnControl();
     m_KeyOnEntry = 0;
-    memset(p_KeyOnData, 0, sizeof(*p_KeyOnData));
+    memset(p_KeyOnData, 0, REDSOUND_KEY_ON_BUFFER_SIZE);
 
     p_SoundControl = p_SoundControlBuffer + REDSOUND_CONTROL_SE;
     _SeMidiNoteExecute(p_SoundControl, p_KeyOnData,

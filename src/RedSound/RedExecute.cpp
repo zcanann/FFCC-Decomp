@@ -244,6 +244,8 @@ enum RedExecuteAxVoiceLayout {
     REDSOUND_AX_MIX_CTRL_AUX_B_STEREO = 0x600,
     REDSOUND_AX_SAMPLE_ADDR_SCALE = 2,
     REDSOUND_AX_SAMPLE_START_BIAS = 1,
+    REDSOUND_AX_HIGH_WORD_SHIFT = 0x10,
+    REDSOUND_AX_SRC_RATIO_HI_MASK = 3,
 };
 
 enum RedExecutePitchModConst {
@@ -1838,7 +1840,7 @@ void EnvelopeKeyExecute()
             if ((voiceData->m_flags & REDSOUND_VOICE_FLAGS_PITCH_DIRTY) != 0) {
                 int pitch = voiceData->m_targetPitch;
                 voiceFlags = AX_SYNC_FLAG_COPYRATIO;
-                voice->pb.src.ratioHi = (u16)(((u32)pitch >> 0x10) & 3);
+                voice->pb.src.ratioHi = (u16)(((u32)pitch >> REDSOUND_AX_HIGH_WORD_SHIFT) & REDSOUND_AX_SRC_RATIO_HI_MASK);
                 voice->pb.src.ratioLo = (u16)pitch;
             }
 
@@ -1889,7 +1891,7 @@ void EnvelopeKeyExecute()
                     int key = trackData->m_waveBase + waveData->m_sampleStart;
                     key += REDSOUND_AX_SAMPLE_START_BIAS;
                     key *= REDSOUND_AX_SAMPLE_ADDR_SCALE;
-                    voice->pb.addr.currentAddressHi = (u16)(key >> 0x10);
+                    voice->pb.addr.currentAddressHi = (u16)(key >> REDSOUND_AX_HIGH_WORD_SHIFT);
                     voice->pb.addr.currentAddressLo = (u16)key;
                     int keyBase = key - REDSOUND_AX_SAMPLE_ADDR_SCALE;
 
@@ -1901,10 +1903,10 @@ void EnvelopeKeyExecute()
                         key = keyBase + waveData->m_loopStart;
                     }
 
-                    voice->pb.addr.loopAddressHi = (u16)(key >> 0x10);
+                    voice->pb.addr.loopAddressHi = (u16)(key >> REDSOUND_AX_HIGH_WORD_SHIFT);
                     voice->pb.addr.loopAddressLo = (u16)key;
                     key = keyBase + waveData->m_loopEnd;
-                    voice->pb.addr.endAddressHi = (u16)(key >> 0x10);
+                    voice->pb.addr.endAddressHi = (u16)(key >> REDSOUND_AX_HIGH_WORD_SHIFT);
                     voice->pb.addr.endAddressLo = (u16)key;
 
                     voiceFlags |= AX_SYNC_FLAG_COPYADPCMLOOP | AX_SYNC_FLAG_COPYSRC | AX_SYNC_FLAG_COPYADPCM |

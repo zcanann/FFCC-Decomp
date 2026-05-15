@@ -776,7 +776,7 @@ static void _SetReverbDepth(int* command)
         reverbDepth |= REDSOUND_FIXED_HALF;
         track = p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
         do {
-            if ((u32)track->m_command != 0) {
+            if ((u32)track->m_command != REDSOUND_TRACK_COMMAND_NONE) {
                 fadeDepth = track->m_reverbDepth & REDSOUND_FIXED_WHOLE_MASK;
                 fadeDepth = reverbDepth - fadeDepth;
                 track->m_reverbDepthAdd = fadeDepth / fadeStep;

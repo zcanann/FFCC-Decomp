@@ -3690,7 +3690,7 @@ void CRedDriver::StopWaveItem()
         if (voice->m_track == p_EditorTrack) {
             voice->m_flags |= REDSOUND_VOICE_FLAGS_RELEASED;
             voice->m_active = REDSOUND_VOICE_ACTIVE_OFF;
-            voice->m_track = 0;
+            voice->m_track = REDSOUND_VOICE_TRACK_NONE;
         }
         voice++;
     } while (voice < p_VoiceData + REDSOUND_VOICE_COUNT);

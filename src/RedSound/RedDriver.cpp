@@ -2292,7 +2292,7 @@ int CRedDriver::SetMusicData(void* musicData)
     if (((header->m_signature[REDSOUND_MUSIC_SIGNATURE_0_INDEX] == REDSOUND_MUSIC_SIGNATURE_0) &&
          (header->m_signature[REDSOUND_MUSIC_SIGNATURE_1_INDEX] == REDSOUND_MUSIC_SIGNATURE_1)) &&
         (header->m_signature[REDSOUND_MUSIC_SIGNATURE_2_INDEX] == REDSOUND_MUSIC_SIGNATURE_2)) {
-        memcpy(&localHeader, musicData, sizeof(localHeader));
+        memcpy(&localHeader, musicData, REDSOUND_MUSIC_HEADER_SIZE);
         headerSize = localHeader.m_size;
         header = (RedMusicHEAD*)RedNew(headerSize);
         if (header != 0) {
@@ -2448,7 +2448,7 @@ int CRedDriver::MusicPlay(void* musicData, int volume, int mode)
     if (((header->m_signature[REDSOUND_MUSIC_SIGNATURE_0_INDEX] == REDSOUND_MUSIC_SIGNATURE_0) &&
          (header->m_signature[REDSOUND_MUSIC_SIGNATURE_1_INDEX] == REDSOUND_MUSIC_SIGNATURE_1)) &&
         (header->m_signature[REDSOUND_MUSIC_SIGNATURE_2_INDEX] == REDSOUND_MUSIC_SIGNATURE_2)) {
-        memcpy(&localHeader, header, sizeof(localHeader));
+        memcpy(&localHeader, header, REDSOUND_MUSIC_HEADER_SIZE);
         headerSize = localHeader.m_size;
         copiedHeader = (RedMusicHEAD*)RedNew(headerSize);
         if (copiedHeader == 0) {
@@ -2497,7 +2497,7 @@ int CRedDriver::MusicCrossPlay(void* musicData, int volume, int mode)
     if (((header->m_signature[REDSOUND_MUSIC_SIGNATURE_0_INDEX] == REDSOUND_MUSIC_SIGNATURE_0) &&
          (header->m_signature[REDSOUND_MUSIC_SIGNATURE_1_INDEX] == REDSOUND_MUSIC_SIGNATURE_1)) &&
         (header->m_signature[REDSOUND_MUSIC_SIGNATURE_2_INDEX] == REDSOUND_MUSIC_SIGNATURE_2)) {
-        memcpy(&localHeader, header, sizeof(localHeader));
+        memcpy(&localHeader, header, REDSOUND_MUSIC_HEADER_SIZE);
         headerSize = localHeader.m_size;
         copiedHeader = (RedMusicHEAD*)RedNew(headerSize);
         if (copiedHeader == 0) {
@@ -2546,7 +2546,7 @@ int CRedDriver::MusicNextPlay(void* musicData, int volume, int mode)
     if (((header->m_signature[REDSOUND_MUSIC_SIGNATURE_0_INDEX] == REDSOUND_MUSIC_SIGNATURE_0) &&
          (header->m_signature[REDSOUND_MUSIC_SIGNATURE_1_INDEX] == REDSOUND_MUSIC_SIGNATURE_1)) &&
         (header->m_signature[REDSOUND_MUSIC_SIGNATURE_2_INDEX] == REDSOUND_MUSIC_SIGNATURE_2)) {
-        memcpy(&localHeader, header, sizeof(localHeader));
+        memcpy(&localHeader, header, REDSOUND_MUSIC_HEADER_SIZE);
         headerSize = localHeader.m_size;
         copiedHeader = (RedMusicHEAD*)RedNew(headerSize);
         if (copiedHeader == 0) {

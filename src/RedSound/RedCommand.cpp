@@ -297,7 +297,7 @@ int SeBlockPlay(int seId, int bank, int no, int pan, int volume)
 				RedSeINFO* seInfo = reinterpret_cast<RedSeINFO*>(
 				    reinterpret_cast<unsigned char*>(entries) +
 				    (entries[seNo] & REDSOUND_SE_BLOCK_ENTRY_MASK) +
-				    bankData->m_seCount * REDSOUND_SE_BLOCK_ENTRY_SIZE);
+				    bankData->m_seCount * sizeof(*entries));
 				RedSeINFO* playInfo = seInfo;
 
 				if (((unsigned int)entries[seNo] & REDSOUND_SE_BLOCK_DATA_FLAG) != 0) {
@@ -985,7 +985,7 @@ static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* wav
 		music->m_masterVolumeDelta = 0;
 	}
 
-	RedTrackDATA* track = (RedTrackDATA*)RedNew(musicHead->m_trackCount * REDSOUND_TRACK_SIZE);
+	RedTrackDATA* track = (RedTrackDATA*)RedNew(musicHead->m_trackCount * sizeof(*track));
 	if (track == 0) {
 		if (m_ReportPrint != REDSOUND_REPORT_PRINT_OFF) {
 			OSReport(sRedCommandMusicTrackCreateErrorFmt,
@@ -993,7 +993,7 @@ static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* wav
 			fflush(__files + 1);
 			OSReport(sRedCommandMusicNeedMemoryFmt,
 			         sRedCommandLogPrefix, sRedCommandLogErrorColor,
-			         (int)musicHead->m_musicNo, musicHead->m_trackCount * REDSOUND_TRACK_SIZE, sRedCommandLogReset);
+			         (int)musicHead->m_musicNo, musicHead->m_trackCount * sizeof(*track), sRedCommandLogReset);
 			fflush(__files + 1);
 		}
 		c_RedEntry.DisplayMMemoryInfo();

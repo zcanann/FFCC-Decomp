@@ -1800,8 +1800,9 @@ static void _VoiceDropedCallback(void* dropped)
 void EnvelopeKeyExecute()
 {
     RedVoiceDATA* voiceData = p_VoiceData;
+    int voiceIndex = 0;
 
-    while (true) {
+    do {
         if (voiceData->m_active != REDSOUND_VOICE_ACTIVE_OFF) {
             AXVPB* voice;
 
@@ -1978,11 +1979,9 @@ void EnvelopeKeyExecute()
         }
 
         voiceData->m_flags &= REDSOUND_VOICE_FLAGS_EXECUTE_KEEP_MASK;
+        voiceIndex++;
         voiceData++;
-        if (p_VoiceData + REDSOUND_VOICE_COUNT <= voiceData) {
-            return;
-        }
-    }
+    } while (voiceData < p_VoiceData + REDSOUND_VOICE_COUNT);
 }
 
 /*

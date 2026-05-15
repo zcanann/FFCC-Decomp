@@ -1267,7 +1267,8 @@ void CRedEntry::DisplaySePlayInfo()
 					int sequence = seBlockId & REDSOUND_SE_BLOCK_SEQUENCE_MASK;
 					int bank = (int)seBlockId / REDSOUND_SE_BLOCK_SEQUENCE_COUNT;
 					RedSeBlockHEAD* seBlock = p_SeBlockData[bank];
-					RedSeINFO* seqInfo = RedSeBlockGetInfo(seBlock, sequence);
+					int* entries = seBlock->m_entries;
+					RedSeINFO* seqInfo = RedSeBlockGetInfoFromEntries(seBlock, entries, sequence);
 					waveNo = (seqInfo->m_waveNoHi * REDSOUND_SE_INFO_U16_HIGH_SCALE) | seqInfo->m_waveNoLo;
 
 					OSReport(sRedEntrySeBlockPlayInfoFmt, sRedEntryLogPrefix,

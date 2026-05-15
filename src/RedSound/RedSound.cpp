@@ -1258,7 +1258,7 @@ int CRedSound::StreamStandby(void* streamHeader, int fileSize)
 			bank->m_streamId = streamId;
 			bank->m_streamData = reinterpret_cast<RedStreamFile*>(streamHeader);
 			bank->m_fileSize = fileSize;
-			bank->m_readPoint = bank->m_playPoint = 0;
+			bank->m_readPoint = bank->m_playPoint = REDSOUND_STREAM_BANK_POINT_NONE;
 			bank->m_reserved14 = 0;
 		}
 	} else if (m_ReportPrint != REDSOUND_REPORT_PRINT_OFF) {
@@ -1539,10 +1539,10 @@ void CRedSound::GetStreamReadPoint(int streamId, int* readPoint)
 				readPoint[1] = bank->m_fileSize - bank->m_playPoint;
 			}
 			bank->m_streamId = REDSOUND_STREAM_ID_NONE;
-			bank->m_streamData = 0;
-			bank->m_fileSize = 0;
-			bank->m_readPoint = 0;
-			bank->m_playPoint = 0;
+			bank->m_streamData = REDSOUND_STREAM_BANK_DATA_NONE;
+			bank->m_fileSize = REDSOUND_STREAM_BANK_FILE_SIZE_NONE;
+			bank->m_readPoint = REDSOUND_STREAM_BANK_POINT_NONE;
+			bank->m_playPoint = REDSOUND_STREAM_BANK_POINT_NONE;
 		}
 	}
 }

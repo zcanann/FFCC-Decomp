@@ -22,12 +22,12 @@ public:
         unsigned long m_heapTop;
         unsigned long m_heapBottom;
         char m_allocationSourceStr[0xF8];
-        unsigned long m_group;
-        int m_allocationMode;
+        unsigned long m_unknown108;
+        int m_unknown10C;
         int m_heapHead;
         int m_heapTail;
         int m_unknown118;
-        int m_unknown11C;
+        int m_allocationMode;
         int m_blockCount;
         int m_allocCount;
         unsigned long m_defaultParam;

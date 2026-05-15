@@ -272,6 +272,8 @@ enum RedExecuteVolumeModConst {
     REDSOUND_CONTROL_VOLUME_SCALE_SHIFT = 7,
     REDSOUND_CONTROL_MASTER_VOLUME_SCALE_SHIFT = 9,
     REDSOUND_PAN_MIX_SHIFT = 8,
+    REDSOUND_FUZZY_DELTA_DEPTH_SHIFT = 8,
+    REDSOUND_FUZZY_DELTA_RANDOM_SHIFT = 7,
     REDSOUND_SHAKE_PAN_SCALE_SHIFT = 0x10,
 };
 
@@ -2508,9 +2510,9 @@ static void _MidiTrackExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData,
                         if (delta < 1) {
                             delta = 1;
                         } else if ((track->m_voiceSwitch & REDSOUND_VOICE_SWITCH_FUZZY_DELTA_TIME) != 0) {
-                            int fuzzyDelta = delta * track->m_fuzzyDeltaTimeDepth >> 8;
+                            int fuzzyDelta = delta * track->m_fuzzyDeltaTimeDepth >> REDSOUND_FUZZY_DELTA_DEPTH_SHIFT;
                             s8 random = (s8)GetRandomData();
-                            delta += fuzzyDelta * random >> 7;
+                            delta += fuzzyDelta * random >> REDSOUND_FUZZY_DELTA_RANDOM_SHIFT;
                             if (delta < 1) {
                                 delta = 1;
                             }
@@ -3078,9 +3080,9 @@ static int _SeMidiNoteExecute(
                             if (delta < 1) {
                                 delta = 1;
                             } else if ((track->m_voiceSwitch & REDSOUND_VOICE_SWITCH_FUZZY_DELTA_TIME) != 0) {
-                                int fuzzyDelta = delta * track->m_fuzzyDeltaTimeDepth >> 8;
+                                int fuzzyDelta = delta * track->m_fuzzyDeltaTimeDepth >> REDSOUND_FUZZY_DELTA_DEPTH_SHIFT;
                                 s8 random = (s8)GetRandomData();
-                                delta += fuzzyDelta * random >> 7;
+                                delta += fuzzyDelta * random >> REDSOUND_FUZZY_DELTA_RANDOM_SHIFT;
                                 if (delta < 1) {
                                     delta = 1;
                                 }

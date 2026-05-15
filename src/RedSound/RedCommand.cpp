@@ -64,6 +64,10 @@ enum RedCommandReverbPresetParam {
 	REDSOUND_REVERB_CROSSTALK_NONE = 0,
 };
 
+enum RedCommandVolumeParam {
+	REDSOUND_MUSIC_VOLUME_INPUT_SCALE_SHIFT = 2,
+};
+
 enum RedCommandEraseTrack {
 	REDSOUND_ERASE_TRACK_SENTINEL = 0x100,
 	REDSOUND_SEP_DIRECT_PLAY_ID = 1000000,
@@ -641,7 +645,7 @@ void SetMusicVolume(int musicId, int volume, int duration, int mode)
 
 	if (volume != 0) {
 		volume++;
-		volume <<= 2;
+		volume <<= REDSOUND_MUSIC_VOLUME_INPUT_SCALE_SHIFT;
 		volume--;
 		volume <<= REDSOUND_FIXED_SHIFT;
 	}

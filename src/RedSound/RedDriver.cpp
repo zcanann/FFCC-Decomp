@@ -2291,7 +2291,7 @@ int CRedDriver::SetMusicData(void* musicData)
     if (((header->m_signature[0] == REDSOUND_MUSIC_SIGNATURE_0) &&
          (header->m_signature[1] == REDSOUND_MUSIC_SIGNATURE_1)) &&
         (header->m_signature[2] == REDSOUND_MUSIC_SIGNATURE_2)) {
-        memcpy(&localHeader, musicData, REDSOUND_MUSIC_HEADER_SIZE);
+        memcpy(&localHeader, musicData, sizeof(localHeader));
         headerSize = localHeader.m_size;
         header = (RedMusicHEAD*)RedNew(headerSize);
         if (header != 0) {
@@ -2447,7 +2447,7 @@ int CRedDriver::MusicPlay(void* musicData, int volume, int mode)
     if (((header->m_signature[0] == REDSOUND_MUSIC_SIGNATURE_0) &&
          (header->m_signature[1] == REDSOUND_MUSIC_SIGNATURE_1)) &&
         (header->m_signature[2] == REDSOUND_MUSIC_SIGNATURE_2)) {
-        memcpy(&localHeader, header, REDSOUND_MUSIC_HEADER_SIZE);
+        memcpy(&localHeader, header, sizeof(localHeader));
         headerSize = localHeader.m_size;
         copiedHeader = (RedMusicHEAD*)RedNew(headerSize);
         if (copiedHeader == 0) {
@@ -2496,7 +2496,7 @@ int CRedDriver::MusicCrossPlay(void* musicData, int volume, int mode)
     if (((header->m_signature[0] == REDSOUND_MUSIC_SIGNATURE_0) &&
          (header->m_signature[1] == REDSOUND_MUSIC_SIGNATURE_1)) &&
         (header->m_signature[2] == REDSOUND_MUSIC_SIGNATURE_2)) {
-        memcpy(&localHeader, header, REDSOUND_MUSIC_HEADER_SIZE);
+        memcpy(&localHeader, header, sizeof(localHeader));
         headerSize = localHeader.m_size;
         copiedHeader = (RedMusicHEAD*)RedNew(headerSize);
         if (copiedHeader == 0) {
@@ -2545,7 +2545,7 @@ int CRedDriver::MusicNextPlay(void* musicData, int volume, int mode)
     if (((header->m_signature[0] == REDSOUND_MUSIC_SIGNATURE_0) &&
          (header->m_signature[1] == REDSOUND_MUSIC_SIGNATURE_1)) &&
         (header->m_signature[2] == REDSOUND_MUSIC_SIGNATURE_2)) {
-        memcpy(&localHeader, header, REDSOUND_MUSIC_HEADER_SIZE);
+        memcpy(&localHeader, header, sizeof(localHeader));
         headerSize = localHeader.m_size;
         copiedHeader = (RedMusicHEAD*)RedNew(headerSize);
         if (copiedHeader == 0) {

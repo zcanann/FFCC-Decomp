@@ -939,7 +939,7 @@ void CRedEntry::DisplayWaveInfo()
 		RedMemoryBlock* bank = aBankAddress;
         int aBufferEnd = aBufferAddress + c_RedMemory.GetABufferSize();
 		do {
-			if (bank->m_size != 0) {
+			if (bank->m_size != REDSOUND_MEMORY_BLOCK_SIZE_EMPTY) {
 				int freeSize = bank->m_address + bank->m_size;
 				if (bank[REDSOUND_MEMORY_NEXT_BLOCK_INDEX].m_size > 0) {
 					freeSize = bank[REDSOUND_MEMORY_NEXT_BLOCK_INDEX].m_address - freeSize;
@@ -1610,7 +1610,7 @@ void CRedEntry::DisplayMMemoryInfo()
     bufferTop = nextAddress + c_RedMemory.GetMainBufferSize();
 
 	do {
-		if (bankEntry->m_size != 0) {
+		if (bankEntry->m_size != REDSOUND_MEMORY_BLOCK_SIZE_EMPTY) {
 			int matched = REDSOUND_ENTRY_SEARCH_NOT_FOUND;
 			int blockEnd = bankEntry->m_address + bankEntry->m_size;
 
@@ -1779,7 +1779,7 @@ int CRedEntry::WaveDelete(RedHistoryBANK* bank)
 			RedDelete(bank->m_address);
 		}
 
-		bank->m_data = 0;
+		bank->m_data = REDSOUND_MEMORY_ADDRESS_NONE;
 		bank->m_historyNo = REDSOUND_HISTORY_UNUSED;
 	}
 

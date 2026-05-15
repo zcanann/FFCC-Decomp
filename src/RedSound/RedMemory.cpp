@@ -53,14 +53,6 @@ enum RedMemorySmallDataLayout {
 	REDSOUND_MEMORY_SBSS_SIZE = 0x18,
 };
 
-enum RedMemorySentinel {
-	REDSOUND_MEMORY_ADDRESS_NONE = 0,
-	REDSOUND_MEMORY_BLOCK_SIZE_EMPTY = 0,
-	REDSOUND_MEMORY_BLOCK_COUNT_NONE = 0,
-	REDSOUND_MEMORY_MAX_SIZE_ALL = 0,
-	REDSOUND_MEMORY_ALLOC_MIN_SIZE = 1,
-};
-
 struct RedMemorySmallDataState {
 	int m_dataBuffer;
 	int m_auxDataBuffer;

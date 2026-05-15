@@ -2929,7 +2929,7 @@ static void _SeTrackDataExecute(RedTrackDATA* track, int frames)
 		voice->m_pitch =
 			PitchCompute(voice->m_basePitch + track->m_pitch,
 			             (int)(s16)track->m_keyTranspose + (int)(s16)track->m_pitchBend,
-			             voice->m_waveData->m_pitch, (int)(s8)track->m_fineTune);
+			             voice->m_waveData->m_pitch, track->m_fineTune);
 	}
 
 	if (track->m_vibrateFunc != 0) {

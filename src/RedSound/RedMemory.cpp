@@ -53,6 +53,14 @@ enum RedMemorySmallDataLayout {
 	REDSOUND_MEMORY_SBSS_SIZE = 0x18,
 };
 
+enum RedMemorySentinel {
+	REDSOUND_MEMORY_ADDRESS_NONE = 0,
+	REDSOUND_MEMORY_BLOCK_SIZE_EMPTY = 0,
+	REDSOUND_MEMORY_BLOCK_COUNT_NONE = 0,
+	REDSOUND_MEMORY_MAX_SIZE_ALL = 0,
+	REDSOUND_MEMORY_ALLOC_MIN_SIZE = 1,
+};
+
 struct RedMemorySmallDataState {
 	int m_dataBuffer;
 	int m_auxDataBuffer;
@@ -125,8 +133,9 @@ int RedNew(int size)
 	RedMemoryBlock* slot;
 	int address;
 
-	if ((size < 1) || (m_MemoryBank == 0) || ((unsigned int)m_DataBuffer == 0)) {
-		return 0;
+	if ((size < REDSOUND_MEMORY_ALLOC_MIN_SIZE) || (m_MemoryBank == 0) ||
+	    ((unsigned int)m_DataBuffer == REDSOUND_MEMORY_ADDRESS_NONE)) {
+		return REDSOUND_MEMORY_ADDRESS_NONE;
 	}
 
 	interrupts = OSDisableInterrupts();
@@ -136,8 +145,8 @@ int RedNew(int size)
 	address = m_DataBuffer;
 
 	do {
-		if ((slot->m_size == 0) || ((address + size) <= slot->m_address)) {
-			if (m_MemoryBank[REDSOUND_MEMORY_BANK_LAST_INDEX].m_size > 0) {
+		if ((slot->m_size == REDSOUND_MEMORY_BLOCK_SIZE_EMPTY) || ((address + size) <= slot->m_address)) {
+			if (m_MemoryBank[REDSOUND_MEMORY_BANK_LAST_INDEX].m_size > REDSOUND_MEMORY_BLOCK_SIZE_EMPTY) {
 				if (m_ReportPrint != REDSOUND_REPORT_PRINT_OFF) {
 					OSReport(s_redMemoryMainBankFullFmt, sRedMemoryLogPrefix, sRedMemoryLogSuffixA,
 					         sRedMemoryLogSuffixB);
@@ -147,9 +156,9 @@ int RedNew(int size)
 			}
 
 			if ((u32)(address + size) <= (u32)(m_DataBuffer + m_DataBufferSize)) {
-				if (slot->m_size > 0) {
+				if (slot->m_size > REDSOUND_MEMORY_BLOCK_SIZE_EMPTY) {
 					entryCount = (m_MemoryBank + REDSOUND_MEMORY_BANK_BLOCK_COUNT) - (slot + 1);
-					if (entryCount > 0) {
+					if (entryCount > REDSOUND_MEMORY_BLOCK_COUNT_NONE) {
 						memmove(slot + 1, slot, entryCount * REDSOUND_MEMORY_BLOCK_SIZE);
 					}
 				}
@@ -168,7 +177,7 @@ int RedNew(int size)
 	} while (slot < m_MemoryBank + REDSOUND_MEMORY_BANK_BLOCK_COUNT);
 
 	OSRestoreInterrupts(interrupts);
-	return 0;
+	return REDSOUND_MEMORY_ADDRESS_NONE;
 }
 /*
  * --INFO--

@@ -536,14 +536,14 @@ int CRedEntry::WaveHeadAdd(int waveBankNo, RedWaveHeadWD* waveHead, int waveNo)
 		RedHistoryBANK* historyBank;
 		if (waveBankNo < 0) {
 			historyBank = &m_waveBankBase[REDSOUND_WAVE_PRIMARY_BANK_ENTRY_COUNT];
-			while ((historyBank->m_size != 0) &&
+			while ((historyBank->m_size != REDSOUND_HISTORY_BANK_EMPTY_SIZE) &&
 			       (historyBank < m_waveBankBase + REDSOUND_WAVE_BANK_ENTRY_COUNT)) {
 				historyBank += 1;
 			}
 		} else {
 			waveBankNo &= REDSOUND_WAVE_PRIMARY_BANK_MASK;
 			historyBank = &m_waveBankBase[waveBankNo];
-			if (historyBank->m_size != 0) {
+			if (historyBank->m_size != REDSOUND_HISTORY_BANK_EMPTY_SIZE) {
 				WaveDelete(historyBank);
 			}
 		}
@@ -949,7 +949,8 @@ void CRedEntry::DisplayWaveInfo()
 
 				RedHistoryBANK* history = m_waveBankBase;
 				do {
-					if ((history->m_size != 0) && (history->m_waveHead->m_aramAddress == bank->m_address)) {
+					if ((history->m_size != REDSOUND_HISTORY_BANK_EMPTY_SIZE) &&
+					    (history->m_waveHead->m_aramAddress == bank->m_address)) {
 						break;
 					}
 					history += 1;
@@ -1621,7 +1622,8 @@ void CRedEntry::DisplayMMemoryInfo()
 
 			history = m_musicBankBase;
 			do {
-				if ((history->m_size != 0) && (history->m_address == bankEntry->m_address)) {
+				if ((history->m_size != REDSOUND_HISTORY_BANK_EMPTY_SIZE) &&
+				    (history->m_address == bankEntry->m_address)) {
 					OSReport(sRedEntryMMemoryMusicInfoFmt, sRedEntryLogPrefix,
 					         reinterpret_cast<RedMusicHEAD*>(bankEntry->m_address)->m_musicNo, bankEntry->m_address,
 					         bankEntry->m_size, freeSize);
@@ -1649,7 +1651,8 @@ void CRedEntry::DisplayMMemoryInfo()
 			if (matched == REDSOUND_ENTRY_SEARCH_NOT_FOUND) {
 				history = m_waveBankBase;
 				do {
-					if ((history->m_size != 0) && (history->m_address == bankEntry->m_address)) {
+					if ((history->m_size != REDSOUND_HISTORY_BANK_EMPTY_SIZE) &&
+					    (history->m_address == bankEntry->m_address)) {
 						OSReport(sRedEntryMMemoryWaveInfoFmt, sRedEntryLogPrefix,
 						         reinterpret_cast<RedWaveHeadWD*>(bankEntry->m_address)->m_waveNo, bankEntry->m_address,
 						         bankEntry->m_size, freeSize);
@@ -1664,7 +1667,8 @@ void CRedEntry::DisplayMMemoryInfo()
 			if (matched == REDSOUND_ENTRY_SEARCH_NOT_FOUND) {
 				history = m_seSepBankBase;
 				do {
-					if ((history->m_size != 0) && (history->m_address == bankEntry->m_address)) {
+					if ((history->m_size != REDSOUND_HISTORY_BANK_EMPTY_SIZE) &&
+					    (history->m_address == bankEntry->m_address)) {
 						OSReport(sRedEntryMMemorySeInfoFmt, sRedEntryLogPrefix,
 						         reinterpret_cast<RedSeSepHEAD*>(bankEntry->m_address)->m_seNo, bankEntry->m_address,
 						         bankEntry->m_size, freeSize);
@@ -1959,7 +1963,7 @@ int CRedEntry::ClearMusicData(int musicNo)
 	if (musicNo == REDSOUND_MUSIC_CLEAR_ALL) {
 		RedHistoryBANK* history = m_musicBankBase;
 		do {
-			if (history->m_size != 0) {
+			if (history->m_size != REDSOUND_HISTORY_BANK_EMPTY_SIZE) {
 				if (history->m_historyNo != 0) {
 					MusicHistoryDelete(history->m_historyNo);
 				}
@@ -1997,7 +2001,7 @@ void CRedEntry::DisplayMusicInfo()
 
 		RedHistoryBANK* history = m_musicBankBase;
 		do {
-			if (history->m_size != 0) {
+			if (history->m_size != REDSOUND_HISTORY_BANK_EMPTY_SIZE) {
 				int playing = REDSOUND_ENTRY_SEARCH_NOT_FOUND;
 				if ((p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_PRIMARY].m_activeTrackCount != 0) &&
 				    (p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_PRIMARY].m_musicId == history->m_id)) {

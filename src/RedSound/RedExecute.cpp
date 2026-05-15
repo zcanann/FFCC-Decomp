@@ -1613,7 +1613,7 @@ void SetVoiceAccess(RedTrackDATA* track, int mask)
 {
     RedVoiceDATA* voiceData = p_VoiceData;
     do {
-        if ((voiceData->m_track != 0) && (voiceData->m_track == track)) {
+        if ((voiceData->m_track != REDSOUND_VOICE_TRACK_NONE) && (voiceData->m_track == track)) {
             voiceData->m_flags |= mask;
         }
         voiceData++;
@@ -1633,7 +1633,7 @@ void SetVoiceSwitch(RedTrackDATA* track, int voiceSwitch)
 {
     RedVoiceDATA* voiceData = p_VoiceData;
     do {
-        if ((voiceData->m_track != 0) && (voiceData->m_track == track)) {
+        if ((voiceData->m_track != REDSOUND_VOICE_TRACK_NONE) && (voiceData->m_track == track)) {
             voiceData->m_voiceSwitch = voiceSwitch;
         }
         voiceData++;

@@ -1788,10 +1788,10 @@ static void _VoiceDropedCallback(void* dropped)
     
     voiceData = p_VoiceData;
     do {
-        if ((voiceData->m_axVoice != 0) && (voiceData->m_axVoice == dropped)) {
+        if ((voiceData->m_axVoice != REDSOUND_AX_VOICE_NONE) && (voiceData->m_axVoice == dropped)) {
             voiceData->m_active = REDSOUND_VOICE_ACTIVE_OFF;
-            voiceData->m_track = 0;
-            voiceData->m_axVoice = 0;
+            voiceData->m_track = REDSOUND_VOICE_TRACK_NONE;
+            voiceData->m_axVoice = REDSOUND_AX_VOICE_NONE;
         }
         voiceData++;
     } while (voiceData < p_VoiceData + REDSOUND_VOICE_COUNT);
@@ -1817,9 +1817,9 @@ void EnvelopeKeyExecute()
 
             if ((voiceData->m_flags & REDSOUND_VOICE_FLAGS_START) != 0) {
                 voice = voiceData->m_axVoice;
-                if ((voice != 0) && (voice->priority != 0)) {
+                if ((voice != REDSOUND_AX_VOICE_NONE) && (voice->priority != 0)) {
                     AXFreeVoice(voice);
-                    voiceData->m_axVoice = 0;
+                    voiceData->m_axVoice = REDSOUND_AX_VOICE_NONE;
                 }
 
                 if ((voiceData->m_stateFlags & REDSOUND_VOICE_STATE_PLAYING_MASK) != 0) {
@@ -1835,7 +1835,7 @@ void EnvelopeKeyExecute()
             }
 
             voice = voiceData->m_axVoice;
-            if (voice == 0) {
+            if (voice == REDSOUND_AX_VOICE_NONE) {
                 voiceData->m_flags = 0;
                 voiceData->m_active = REDSOUND_VOICE_ACTIVE_OFF;
                 return;
@@ -1952,7 +1952,7 @@ void EnvelopeKeyExecute()
                 voiceData->m_flags &= REDSOUND_VOICE_FLAGS_CLEAR_RELEASE_ACTIVE_MASK;
                 voiceData->m_active = REDSOUND_VOICE_ACTIVE_OFF;
                 voiceFlags |= AX_SYNC_FLAG_COPYVOL;
-                voiceData->m_track = 0;
+                voiceData->m_track = REDSOUND_VOICE_TRACK_NONE;
                 voice->pb.state = REDSOUND_AX_VOICE_STOP;
                 voiceData->m_adsrCurrentLevel = 0;
                 voiceData->m_envelopeLevel = 0;
@@ -1972,7 +1972,7 @@ void EnvelopeKeyExecute()
             voiceData->m_envelopeLevel = 0;
             voiceData->m_waveData = REDSOUND_WAVE_DATA_NONE;
             AXVPB* voice = voiceData->m_axVoice;
-            if (voice != 0) {
+            if (voice != REDSOUND_AX_VOICE_NONE) {
                 if (voice->pb.state != REDSOUND_AX_VOICE_STOP) {
                     voice->pb.state = REDSOUND_AX_VOICE_STOP;
                     voice->pb.ve.currentVolume = 0;
@@ -1981,8 +1981,8 @@ void EnvelopeKeyExecute()
                     if (voice->priority != 0) {
                         AXFreeVoice(voice);
                     }
-                    voiceData->m_axVoice = 0;
-                    voiceData->m_track = 0;
+                    voiceData->m_axVoice = REDSOUND_AX_VOICE_NONE;
+                    voiceData->m_track = REDSOUND_VOICE_TRACK_NONE;
                 }
             }
         }

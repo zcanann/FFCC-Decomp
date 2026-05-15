@@ -364,7 +364,8 @@ void SetSeVolume(int seId, int volume, int frameCount, int mode)
 	track = p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
 
 	do {
-		if ((track->m_command != 0) && ((seId < REDSOUND_SE_ID_MIN) || (track->m_seId == seId))) {
+		if ((track->m_command != REDSOUND_TRACK_COMMAND_NONE) &&
+		    ((seId < REDSOUND_SE_ID_MIN) || (track->m_seId == seId))) {
 			int delta = volume - track->m_mixVolume;
 			delta /= frameCount;
 			track->m_mixVolumeAdd = delta;
@@ -398,7 +399,8 @@ void SetSePan(int seId, int pan, int frameCount)
 	track = p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
 
 	do {
-		if ((track->m_command != 0) && ((seId < REDSOUND_SE_ID_MIN) || (track->m_seId == seId))) {
+		if ((track->m_command != REDSOUND_TRACK_COMMAND_NONE) &&
+		    ((seId < REDSOUND_SE_ID_MIN) || (track->m_seId == seId))) {
 			int delta = pan - track->m_pan;
 			delta /= frameCount;
 			track->m_panAdd = delta;
@@ -431,7 +433,8 @@ void SetSePitch(int seId, int pitch, int frameCount)
 	track = p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
 
 	do {
-		if ((track->m_command != 0) && ((seId < REDSOUND_SE_ID_MIN) || (track->m_seId == seId))) {
+		if ((track->m_command != REDSOUND_TRACK_COMMAND_NONE) &&
+		    ((seId < REDSOUND_SE_ID_MIN) || (track->m_seId == seId))) {
 			int delta = pitch - track->m_pitch;
 			track->m_pitchAdd = delta / frameCount;
 			track->m_pitchDelta = frameCount;

@@ -457,6 +457,7 @@ enum RedMidiCtrlStatusIndex {
 	REDSOUND_MIDI_CTRL_STATUS_0 = 0,
 	REDSOUND_MIDI_CTRL_STATUS_1 = 1,
 	REDSOUND_MIDI_CTRL_STATUS_2 = 2,
+	REDSOUND_MIDI_CTRL_STATUS_COUNT = 3,
 };
 
 class CRedMidiCtrl
@@ -468,7 +469,7 @@ public:
 	void Init();
 
 private:
-	int m_status[3];
+	int m_status[REDSOUND_MIDI_CTRL_STATUS_COUNT];
 };
 
 int DataAddCompute(int* current, int target, int* delta);

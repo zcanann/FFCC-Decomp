@@ -77,6 +77,7 @@ enum RedEntrySearchResult {
 
 enum RedEntryFileLayoutSize {
 	REDSOUND_MUSIC_SIGNATURE_SIZE = 4,
+	REDSOUND_MUSIC_TRACK_BLOCK_COMMAND_MIN_COUNT = 1,
 	REDSOUND_SESEP_SIGNATURE_SIZE = 8,
 	REDSOUND_SESEP_RESERVED13_SIZE = 0x01,
 	REDSOUND_SE_INFO_SEQUENCE_MIN_COUNT = 1,
@@ -190,7 +191,7 @@ struct RedMusicTrackBlock
 	unsigned char m_sizeHi0;
 	unsigned char m_sizeHi1;
 	unsigned char m_sizeHi2;
-	unsigned char m_command[1];
+	unsigned char m_command[REDSOUND_MUSIC_TRACK_BLOCK_COMMAND_MIN_COUNT];
 };
 
 enum RedMusicTrackBlockLayout {

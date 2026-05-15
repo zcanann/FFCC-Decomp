@@ -474,10 +474,10 @@ void StreamControl()
 				if (voiceData->m_axVoice->priority == 0) {
 					_StreamStop(streamData);
 				} else {
-					int samplePos = voiceData->m_axVoice->pb.addr.currentAddressHi;
 					int sampleStart =
 					    (streamData->m_aramBuffer + streamData->m_streamCursorBase) *
 					    REDSOUND_STREAM_ARAM_TO_AX_ADDRESS_SCALE;
+					int samplePos = voiceData->m_axVoice->pb.addr.currentAddressHi;
 					samplePos <<= 16;
 					samplePos |= voiceData->m_axVoice->pb.addr.currentAddressLo;
 					if ((samplePos >= sampleStart) && (samplePos < sampleStart + REDSOUND_STREAM_STEREO_PLANE_SIZE)) {

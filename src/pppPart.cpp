@@ -1588,22 +1588,55 @@ void pppCacheRefCnt0UpShape(short*, _pppDataHead*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 8005a280
+ * PAL Size: 172b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppCacheDumpModel(short*, _pppDataHead*)
+void pppCacheDumpModel(short* modelList, _pppDataHead*)
 {
-	// TODO
+	short modelCount = *modelList;
+	short i = 0;
+	modelList = modelList + 1;
+	u32 pppResSet = *reinterpret_cast<u32*>(pppMngStPtr->m_pppResSet);
+
+	while (i < modelCount) {
+		short modelIndex = *modelList;
+		modelList = modelList + 1;
+		CMapMesh* mapMesh = *(CMapMesh**)(*(u32*)(pppResSet + 0x14) + modelIndex * 4);
+		short cacheIndex = *reinterpret_cast<short*>(reinterpret_cast<u8*>(mapMesh) + 0x46);
+
+		ppvAmemCacheSet.Release(cacheIndex);
+		mapMesh->pppCacheDumpModelTexture(pppEnvStPtr->m_materialSetPtr, &ppvAmemCacheSet);
+		++i;
+	}
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 8005a214
+ * PAL Size: 108b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppCacheDumpShape(short*, _pppDataHead*)
+void pppCacheDumpShape(short* shapeList, _pppDataHead* pppDataHead)
 {
-	// TODO
+	short shapeCount = *shapeList;
+	short i = 0;
+	shapeList = shapeList + 1;
+
+	while (i < shapeCount) {
+		short shapeIndex = *shapeList;
+		shapeList = shapeList + 1;
+		pppCacheDumpShapeTexture(
+		    *(pppShapeSt**)(pppDataHead->m_shapeNames + shapeIndex * 4),
+		    *reinterpret_cast<CMaterialSet**>(reinterpret_cast<u8*>(&PartMng) + 0x7E4));
+		++i;
+	}
 }
 
 /*

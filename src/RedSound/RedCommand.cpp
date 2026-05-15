@@ -513,7 +513,7 @@ int MusicStop(int musicId)
 						voiceData->m_flags &= REDSOUND_VOICE_FLAGS_CLEAR_ACTIVE_MASK;
 						voiceData->m_flags |= REDSOUND_VOICE_FLAGS_RELEASED;
 						voiceData->m_stateFlags &= ~REDSOUND_VOICE_STATE_SE;
-						voiceData->m_track = 0;
+						voiceData->m_track = REDSOUND_VOICE_TRACK_NONE;
 						voiceData->m_active = REDSOUND_VOICE_ACTIVE_OFF;
 					}
 					voiceData++;
@@ -521,9 +521,9 @@ int MusicStop(int musicId)
 
 				RedTrackDATA* track = music->m_tracks;
 				do {
-					if (track->m_command != 0) {
+					if (track->m_command != REDSOUND_TRACK_COMMAND_NONE) {
 						KeyOnReserveClear(p_KeyOnData, track);
-						track->m_command = 0;
+						track->m_command = REDSOUND_TRACK_COMMAND_NONE;
 					}
 					track++;
 				} while (track < music->m_tracks + music->m_trackCount);
@@ -531,7 +531,7 @@ int MusicStop(int musicId)
 				music->m_activeTrackCount = 0;
 				music->m_trackCount = 0;
 				RedDelete(music->m_tracks);
-				music->m_tracks = 0;
+				music->m_tracks = REDSOUND_TRACK_NONE;
 				c_RedEntry.WaveHistoryManager(REDSOUND_HISTORY_MODE_RELEASE, music->m_waveNo);
 				c_RedEntry.MusicHistoryManager(REDSOUND_HISTORY_MODE_RELEASE, stoppedMusicId);
 			}
@@ -755,14 +755,15 @@ int SeStopG(int group)
 	soundControl->m_updateFlags = 0;
 	track = soundControl->m_tracks;
 	do {
-		if ((track->m_command != 0) && ((track->m_seSepId & REDSOUND_SE_BLOCK_DATA_FLAG) == 0) &&
+		if ((track->m_command != REDSOUND_TRACK_COMMAND_NONE) &&
+		    ((track->m_seSepId & REDSOUND_SE_BLOCK_DATA_FLAG) == 0) &&
 		    (track->m_seSepId / REDSOUND_SE_MG_ID_DIVISOR == group)) {
 			int trackNo;
 
 			KeyOnReserveClear(p_KeyOnData, track);
 			track->m_seId = REDSOUND_SE_ID_NONE;
-			track->m_flags = 0;
-			track->m_command = 0;
+			track->m_flags = REDSOUND_TRACK_FLAGS_NONE;
+			track->m_command = REDSOUND_TRACK_COMMAND_NONE;
 			track->m_mixVolumeMode = REDSOUND_SE_VOLUME_MODE_NORMAL;
 
 			trackNo = track->m_trackNo;
@@ -770,7 +771,7 @@ int SeStopG(int group)
 			(p_VoiceData + trackNo)->m_voiceSwitch &= REDSOUND_VOICE_SWITCH_CLEAR_SE_MASK;
 			(p_VoiceData + trackNo)->m_flags &= REDSOUND_VOICE_FLAGS_CLEAR_ACTIVE_MASK;
 			(p_VoiceData + trackNo)->m_flags |= REDSOUND_VOICE_FLAGS_RELEASED;
-			(p_VoiceData + trackNo)->m_track = 0;
+			(p_VoiceData + trackNo)->m_track = REDSOUND_VOICE_TRACK_NONE;
 			(p_VoiceData + trackNo)->m_active = REDSOUND_VOICE_ACTIVE_OFF;
 
 			if (track->m_waveBankData != 0) {

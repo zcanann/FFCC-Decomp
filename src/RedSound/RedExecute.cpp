@@ -605,8 +605,8 @@ void ReverbAreaFree(void* area)
  */
 void InitReverb()
 {
-    p_ReverbData = (RedReverbDATA*)RedNew(REDSOUND_REVERB_DATA_BUFFER_SIZE);
-    memset(p_ReverbData, 0, REDSOUND_REVERB_DATA_BUFFER_SIZE);
+    p_ReverbData = (RedReverbDATA*)RedNew(sizeof(*p_ReverbData) * REDSOUND_REVERB_DATA_COUNT);
+    memset(p_ReverbData, 0, sizeof(*p_ReverbData) * REDSOUND_REVERB_DATA_COUNT);
     p_ReverbSize = (RedReverbSize*)RedNew(REDSOUND_REVERB_SIZE_ALLOC_SIZE);
 }
 
@@ -788,7 +788,7 @@ RedReverbSize* SetReverb(int bank, int kind, int* params)
     reverb->m_kind = (RedReverbKind)kind;
     switch (kind) {
     case REDSOUND_REVERB_KIND_STD: {
-        reverb->m_context = (void*)RedNew(REDSOUND_AXFX_REVERB_STD_SIZE);
+        reverb->m_context = (void*)RedNew(sizeof(AXFX_REVERBSTD));
         reverb->m_callback = (int)AXFXReverbStdCallback;
         AXFX_REVERBSTD* std = (AXFX_REVERBSTD*)reverb->m_context;
         std->tempDisableFX = REDSOUND_REVERB_FX_ENABLE;
@@ -801,7 +801,7 @@ RedReverbSize* SetReverb(int bank, int kind, int* params)
         break;
     }
     case REDSOUND_REVERB_KIND_HI: {
-        reverb->m_context = (void*)RedNew(REDSOUND_AXFX_REVERB_HI_SIZE);
+        reverb->m_context = (void*)RedNew(sizeof(AXFX_REVERBHI));
         reverb->m_callback = (int)AXFXReverbHiCallback;
         AXFX_REVERBHI* hi = (AXFX_REVERBHI*)reverb->m_context;
         hi->tempDisableFX = REDSOUND_REVERB_FX_ENABLE;
@@ -815,7 +815,7 @@ RedReverbSize* SetReverb(int bank, int kind, int* params)
         break;
     }
     case REDSOUND_REVERB_KIND_DELAY: {
-        reverb->m_context = (void*)RedNew(REDSOUND_AXFX_DELAY_SIZE);
+        reverb->m_context = (void*)RedNew(sizeof(AXFX_DELAY));
         reverb->m_callback = (int)AXFXDelayCallback;
         AXFX_DELAY* delay = (AXFX_DELAY*)reverb->m_context;
         u32 delayValue = (u32)params[REDSOUND_REVERB_PARAM_DELAY];
@@ -834,7 +834,7 @@ RedReverbSize* SetReverb(int bank, int kind, int* params)
         break;
     }
     case REDSOUND_REVERB_KIND_CHORUS: {
-        reverb->m_context = (void*)RedNew(REDSOUND_AXFX_CHORUS_SIZE);
+        reverb->m_context = (void*)RedNew(sizeof(AXFX_CHORUS));
         reverb->m_callback = (int)AXFXChorusCallback;
         AXFX_CHORUS* chorus = (AXFX_CHORUS*)reverb->m_context;
         chorus->baseDelay = (u32)params[REDSOUND_REVERB_PARAM_CHORUS_BASE_DELAY];
@@ -844,7 +844,7 @@ RedReverbSize* SetReverb(int bank, int kind, int* params)
         break;
     }
     case REDSOUND_REVERB_KIND_HI_DPL2: {
-        reverb->m_context = (void*)RedNew(REDSOUND_AXFX_REVERB_HI_DPL2_SIZE);
+        reverb->m_context = (void*)RedNew(sizeof(AXFX_REVERBHI_DPL2));
         reverb->m_callback = (int)AXFXReverbHiCallbackDpl2;
         AXFX_REVERBHI_DPL2* hiDpl2 = (AXFX_REVERBHI_DPL2*)reverb->m_context;
         hiDpl2->tempDisableFX = REDSOUND_REVERB_FX_ENABLE;
@@ -1891,8 +1891,8 @@ void EnvelopeKeyExecute()
                     voice->pb.srcSelect = REDSOUND_AX_SRC_SELECT_ADPCM;
                     voice->pb.state = REDSOUND_AX_VOICE_PLAY;
 
-                    memcpy(&voice->pb.adpcm, &waveData->m_adpcm.m_data, REDSOUND_WAVE_ADPCM_DATA_SIZE);
-                    memcpy(&voice->pb.adpcmLoop, &waveData->m_adpcm.m_loop, REDSOUND_WAVE_ADPCM_LOOP_SIZE);
+                    memcpy(&voice->pb.adpcm, &waveData->m_adpcm.m_data, sizeof(voice->pb.adpcm));
+                    memcpy(&voice->pb.adpcmLoop, &waveData->m_adpcm.m_loop, sizeof(voice->pb.adpcmLoop));
                     memset(voice->pb.src.last_samples, 0, sizeof(voice->pb.src.last_samples));
                     voice->pb.addr.format = REDSOUND_AX_ADDR_FORMAT_ADPCM;
                     int key = trackData->m_waveBase + waveData->m_sampleStart;
@@ -2784,14 +2784,14 @@ void MusicSkipFunction()
     RedTrackDATA* track;
 
     do {
-        p_SkipKeyOn = (RedKeyOnDATA*)RedNew(REDSOUND_KEY_ON_BUFFER_SIZE);
+        p_SkipKeyOn = (RedKeyOnDATA*)RedNew(sizeof(*p_SkipKeyOn));
         if (p_SkipKeyOn == 0) {
             RedSleep(REDSOUND_MUSIC_SKIP_RETRY_SLEEP_US);
         }
     } while (p_SkipKeyOn == 0);
 
     control = p_SoundControlBuffer + REDSOUND_CONTROL_MUSIC_SKIP;
-    memset(p_SkipKeyOn, 0, REDSOUND_KEY_ON_BUFFER_SIZE);
+    memset(p_SkipKeyOn, 0, sizeof(*p_SkipKeyOn));
     activeTrackCount = _MusicMidiNoteSkipExecute(control, p_SkipKeyOn, 1);
     while ((activeTrackCount == 0) && ((control->m_flags & REDSOUND_CONTROL_FLAG_WHOLE_LOOP_ACTIVE) != 0)) {
         control->m_activeTrackCount = control->m_savedActiveTrackCount;
@@ -3120,7 +3120,7 @@ void MainControl(int frames)
 
     _KeyOnControl();
     m_KeyOnEntry = 0;
-    memset(p_KeyOnData, 0, REDSOUND_KEY_ON_BUFFER_SIZE);
+    memset(p_KeyOnData, 0, sizeof(*p_KeyOnData));
 
     p_SoundControl = p_SoundControlBuffer + REDSOUND_CONTROL_SE;
     _SeMidiNoteExecute(p_SoundControl, p_KeyOnData,

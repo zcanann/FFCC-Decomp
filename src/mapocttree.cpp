@@ -1411,12 +1411,12 @@ void InsertShadow_r(COctNode* node)
 
 	COctNode* nodeIter = node;
 	for (int i = 0; i < 8; i++) {
-		COctNode* child = nodeIter->m_children[0];
-		if (child == 0) {
+		if (nodeIter->m_children[0] == 0) {
 			return;
 		}
 
 		s_light_no++;
+		COctNode* child = nodeIter->m_children[0];
 
 		float childBoundMinX = child->m_boundMinX;
 		bool childOverlap = false;
@@ -1473,12 +1473,12 @@ void InsertShadow_r(COctNode* node)
 
 			COctNode* childIter = child;
 			for (int j = 0; j < 8; j++) {
-				COctNode* grandChild = childIter->m_children[0];
-				if (grandChild == 0) {
+				if (childIter->m_children[0] == 0) {
 					break;
 				}
 
 				s_light_no++;
+				COctNode* grandChild = childIter->m_children[0];
 
 				if ((reinterpret_cast<CBound*>(&s_bound)->CheckCross(*reinterpret_cast<CBound*>(grandChild))) != 0) {
 					if ((s_light_no >= 3) && (grandChild->m_meshCount != 0)) {
@@ -1487,11 +1487,11 @@ void InsertShadow_r(COctNode* node)
 
 					COctNode* grandChildIter = grandChild;
 					for (int k = 0; k < 8; k++) {
-						COctNode* greatGrandChild = grandChildIter->m_children[0];
-						if (greatGrandChild == 0) {
+						if (grandChildIter->m_children[0] == 0) {
 							break;
 						}
 						s_light_no++;
+						COctNode* greatGrandChild = grandChildIter->m_children[0];
 						InsertShadow_r(greatGrandChild);
 						grandChildIter = reinterpret_cast<COctNode*>(Ptr(grandChildIter, 4));
 						s_light_no--;

@@ -266,6 +266,7 @@ enum RedExecutePitchModConst {
 
 enum RedExecuteVolumeModConst {
     REDSOUND_VOLUME_MOD_SCALE_SHIFT = 7,
+    REDSOUND_VOLUME_TREMOLO_DEPTH_SHIFT = 8,
     REDSOUND_VOLUME_TRACK_SCALE_SHIFT = 9,
     REDSOUND_VOLUME_MOD_WAVE_SHIFT = 4,
     REDSOUND_SHAKE_PAN_SCALE_SHIFT = 0x10,
@@ -1117,7 +1118,7 @@ static void _VolumeExecute(RedVoiceDATA* voice, int volume)
         } else {
             envelopeMul = 0;
         }
-        voiceMix = voiceMix * envelopeMul >> 7;
+        voiceMix = voiceMix * envelopeMul >> REDSOUND_VOLUME_MOD_SCALE_SHIFT;
     }
 
     envelopeMul = voice->m_track->m_mixVolume >> REDSOUND_FIXED_SHIFT;
@@ -1140,7 +1141,7 @@ static void _VolumeExecute(RedVoiceDATA* voice, int volume)
                 envelopeMul = envelopeMul + 1;
             }
 
-            modVolume = voiceMix * envelopeMul >> 8;
+            modVolume = voiceMix * envelopeMul >> REDSOUND_VOLUME_TREMOLO_DEPTH_SHIFT;
             tremoloValue = voice->m_volumeModFrames;
             envelopeMul = voice->m_track->m_tremoloFunc((unsigned int)voice->m_volumeModPhase >> REDSOUND_FIXED_SHIFT);
             modVolume = modVolume * (envelopeMul >> REDSOUND_VOLUME_MOD_WAVE_SHIFT) >> REDSOUND_FIXED_SHIFT;

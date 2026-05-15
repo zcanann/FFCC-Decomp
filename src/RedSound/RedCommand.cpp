@@ -546,7 +546,8 @@ int MusicStop(int musicId)
 	music = p_SoundControlBuffer;
 	if ((music->m_musicId < REDSOUND_MUSIC_ID_MIN) &&
 	    (music[REDSOUND_CONTROL_MUSIC_SECONDARY].m_musicId >= REDSOUND_MUSIC_ID_MIN)) {
-		memcpy(p_SoundControlBuffer, p_SoundControlBuffer + REDSOUND_CONTROL_MUSIC_SECONDARY, REDSOUND_CONTROL_SIZE);
+		memcpy(p_SoundControlBuffer, p_SoundControlBuffer + REDSOUND_CONTROL_MUSIC_SECONDARY,
+		       sizeof(*p_SoundControlBuffer));
 		music[REDSOUND_CONTROL_MUSIC_SECONDARY].m_activeTrackCount = 0;
 		music[REDSOUND_CONTROL_MUSIC_SECONDARY].m_trackCount = 0;
 		music[REDSOUND_CONTROL_MUSIC_SECONDARY].m_musicId = REDSOUND_MUSIC_ID_NONE;

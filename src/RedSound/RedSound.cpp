@@ -361,8 +361,8 @@ int CRedSound::Init(void* mainBuffer, int mainBufferSize, int aramBuffer, int ar
 void CRedSound::Start()
 {
 #define redSoundStreamBank (*(RedSoundStreamBank* volatile*)&p_StreamBank)
-	redSoundStreamBank = (RedSoundStreamBank*)RedNew(REDSOUND_STREAM_BANK_SIZE);
-	memset((void*)redSoundStreamBank, 0, REDSOUND_STREAM_BANK_SIZE);
+	redSoundStreamBank = (RedSoundStreamBank*)RedNew(sizeof(*redSoundStreamBank) * REDSOUND_STREAM_BANK_COUNT);
+	memset((void*)redSoundStreamBank, 0, sizeof(*redSoundStreamBank) * REDSOUND_STREAM_BANK_COUNT);
 #undef redSoundStreamBank
 }
 /*

@@ -1751,38 +1751,42 @@ void GbaQueue::GetPlayerPos(int channel, unsigned int* outData)
 	packet[4] = 0x51;
 	packet[8] = 0x91;
 
-	const int baseX = localPlayerData[channel].m_posX;
-	const int baseZ = localPlayerData[channel].m_posZ;
+	const GbaQueuePlayerPosView* basePlayer = &localPlayerData[channel];
 
 	nearbyMask = 0;
 	const GbaQueuePlayerPosView* player = localPlayerData;
 	for (i = 0; i < 4;) {
-		int px = player[0].m_posX;
-		int pz = player[0].m_posZ;
-
 		if (i == channel) {
-			nearbyMask |= (1 << i) & 0xFF;
+			nearbyMask = (nearbyMask | (1 << i)) & 0xFF;
 		} else if (player[0].m_active != 0) {
-			const int dx = px - baseX;
-			const int dz = pz - baseZ;
+			int px = player[0].m_posX;
+			const int dx = px - basePlayer->m_posX;
 
-			if ((dx >= -0x50 && dx <= 0x50) && (dz >= -0x40 && dz <= 0x40)) {
-				nearbyMask |= (1 << i) & 0xFF;
+			if (dx >= -0x50 && dx <= 0x50) {
+				int pz = player[0].m_posZ;
+				const int dz = pz - basePlayer->m_posZ;
+
+				if (dz >= -0x40 && dz <= 0x40) {
+					nearbyMask = (nearbyMask | (1 << i)) & 0xFF;
+				}
 			}
 		}
 
 		i++;
-		px = player[1].m_posX;
-		pz = player[1].m_posZ;
 
 		if (i == channel) {
-			nearbyMask |= (1 << i) & 0xFF;
+			nearbyMask = (nearbyMask | (1 << i)) & 0xFF;
 		} else if (player[1].m_active != 0) {
-			const int dx = px - baseX;
-			const int dz = pz - baseZ;
+			int px = player[1].m_posX;
+			const int dx = px - basePlayer->m_posX;
 
-			if ((dx >= -0x50 && dx <= 0x50) && (dz >= -0x40 && dz <= 0x40)) {
-				nearbyMask |= (1 << i) & 0xFF;
+			if (dx >= -0x50 && dx <= 0x50) {
+				int pz = player[1].m_posZ;
+				const int dz = pz - basePlayer->m_posZ;
+
+				if (dz >= -0x40 && dz <= 0x40) {
+					nearbyMask = (nearbyMask | (1 << i)) & 0xFF;
+				}
 			}
 		}
 
@@ -1791,22 +1795,14 @@ void GbaQueue::GetPlayerPos(int channel, unsigned int* outData)
 	}
 
 	packet[1] = static_cast<unsigned char>(nearbyMask);
-	packet[2] = static_cast<unsigned char>(
-		static_cast<char>(localPlayerData[0].m_posX) - static_cast<char>(baseX));
-	packet[3] = static_cast<unsigned char>(
-		static_cast<char>(localPlayerData[0].m_posZ) - static_cast<char>(baseZ));
-	packet[5] = static_cast<unsigned char>(
-		static_cast<char>(localPlayerData[1].m_posX) - static_cast<char>(baseX));
-	packet[6] = static_cast<unsigned char>(
-		static_cast<char>(localPlayerData[1].m_posZ) - static_cast<char>(baseZ));
-	packet[7] = static_cast<unsigned char>(
-		static_cast<char>(localPlayerData[2].m_posX) - static_cast<char>(baseX));
-	packet[9] = static_cast<unsigned char>(
-		static_cast<char>(localPlayerData[2].m_posZ) - static_cast<char>(baseZ));
-	packet[10] = static_cast<unsigned char>(
-		static_cast<char>(localPlayerData[3].m_posX) - static_cast<char>(baseX));
-	packet[11] = static_cast<unsigned char>(
-		static_cast<char>(localPlayerData[3].m_posZ) - static_cast<char>(baseZ));
+	packet[2] = static_cast<unsigned char>(localPlayerData[0].m_posX - basePlayer->m_posX);
+	packet[3] = static_cast<unsigned char>(localPlayerData[0].m_posZ - basePlayer->m_posZ);
+	packet[5] = static_cast<unsigned char>(localPlayerData[1].m_posX - basePlayer->m_posX);
+	packet[6] = static_cast<unsigned char>(localPlayerData[1].m_posZ - basePlayer->m_posZ);
+	packet[7] = static_cast<unsigned char>(localPlayerData[2].m_posX - basePlayer->m_posX);
+	packet[9] = static_cast<unsigned char>(localPlayerData[2].m_posZ - basePlayer->m_posZ);
+	packet[10] = static_cast<unsigned char>(localPlayerData[3].m_posX - basePlayer->m_posX);
+	packet[11] = static_cast<unsigned char>(localPlayerData[3].m_posZ - basePlayer->m_posZ);
 
 	memcpy(outData, packet, sizeof(packet));
 }

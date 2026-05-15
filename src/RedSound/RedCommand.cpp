@@ -472,7 +472,7 @@ void SePause(int seId, int pause)
 	do {
 		if ((track->m_seId != REDSOUND_SE_ID_NONE) && ((seId == REDSOUND_SE_ID_ALL) || (seId == track->m_seId))) {
 			if (pause == REDSOUND_PAUSE_ON) {
-				if (voice->m_axVoice != 0) {
+				if (voice->m_axVoice != REDSOUND_AX_VOICE_NONE) {
 					voice->m_targetPitch = 0;
 					voice->m_flags |= REDSOUND_VOICE_FLAGS_PAUSE_DIRTY;
 				}
@@ -1197,7 +1197,7 @@ void MusicPause(int musicId, int pause)
 					do {
 						if ((voice->m_track >= music->m_tracks) &&
 						    (voice->m_track < music->m_tracks + music->m_trackCount)) {
-							if (voice->m_axVoice != 0) {
+							if (voice->m_axVoice != REDSOUND_AX_VOICE_NONE) {
 								voice->m_targetPitch = 0;
 								voice->m_flags |= REDSOUND_VOICE_FLAGS_PAUSE_DIRTY;
 							}

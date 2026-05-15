@@ -27,6 +27,7 @@ typedef int (*RedSwingFunc)(int phase);
 
 #define REDSOUND_TRACK_COMMAND_NONE 0
 #define REDSOUND_TRACK_NONE 0
+#define REDSOUND_TRACK_SESEP_ID_NONE 0
 #define REDSOUND_TRACK_ATTR_NONE 0
 #define REDSOUND_TRACK_FLAGS_NONE 0
 #define REDSOUND_SWING_FUNC_NONE ((RedSwingFunc)0)

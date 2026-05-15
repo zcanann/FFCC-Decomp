@@ -646,7 +646,7 @@ static void _EraseAttribute(int eraseTrack, int attrMask)
 
 			KeyOnReserveClear(p_KeyOnData, track);
 			track->m_seId = REDSOUND_SE_ID_NONE;
-			track->m_flags = 0;
+			track->m_flags = REDSOUND_TRACK_FLAGS_NONE;
 			track->m_command = REDSOUND_TRACK_COMMAND_NONE;
 			track->m_mixVolumeMode = REDSOUND_SE_VOLUME_MODE_NORMAL;
 
@@ -716,7 +716,7 @@ static int _EraseTime(int eraseTrack)
 		    (track->m_playTime == minEraseTrack)) {
 			KeyOnReserveClear(p_KeyOnData, track);
 			track->m_seId = REDSOUND_SE_ID_NONE;
-			track->m_flags = 0;
+			track->m_flags = REDSOUND_TRACK_FLAGS_NONE;
 			track->m_command = REDSOUND_TRACK_COMMAND_NONE;
 			track->m_mixVolumeMode = REDSOUND_SE_VOLUME_MODE_NORMAL;
 
@@ -909,7 +909,7 @@ static int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volum
 				track->m_tremoloDelayDepth = 0;
 				track->m_vibrateDelayDepth = 0;
 				track->m_waveData = REDSOUND_WAVE_DATA_NONE;
-				track->m_flags = 0;
+				track->m_flags = REDSOUND_TRACK_FLAGS_NONE;
 				track->m_step2 = 0;
 				track->m_step = 0;
 				track->m_fuzzyAdsrDepth = 0;
@@ -1031,7 +1031,7 @@ static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* wav
 		track->m_command = (unsigned char*)current;
 		current = (RedMusicTrackBlock*)((unsigned char*)current + blockSize);
 		track->m_deltaTime = DeltaTimeSumup((unsigned char**)&track->m_command) + 1;
-		track->m_seSepId = 0;
+		track->m_seSepId = REDSOUND_TRACK_SESEP_ID_NONE;
 		signed char* keySignatureData;
 		if (m_MusicKeySignature != 0) {
 			keySignatureData = t_KeySignatureData + REDSOUND_KEY_SIGNATURE_DEFAULT_OFFSET;
@@ -1067,7 +1067,7 @@ static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* wav
 		track->m_tremoloDelayDepth = 0;
 		track->m_vibrateDelayDepth = 0;
 		track->m_waveData = REDSOUND_WAVE_DATA_NONE;
-		track->m_flags = ((musicHead->m_playFlags & REDSOUND_MUSIC_PLAY_FLAG_RELEASE_NOTES) != 0) ? 0 : REDSOUND_TRACK_FLAG_TENUTO;
+		track->m_flags = ((musicHead->m_playFlags & REDSOUND_MUSIC_PLAY_FLAG_RELEASE_NOTES) != 0) ? REDSOUND_TRACK_FLAGS_NONE : REDSOUND_TRACK_FLAG_TENUTO;
 		track->m_step2 = 0;
 		track->m_step = 0;
 		track->m_fuzzyAdsrDepth = 0;
@@ -1076,7 +1076,7 @@ static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* wav
 		track->m_fuzzyVolumeDepth = 0;
 		track->m_fuzzyPitchDepth = 0;
 		track->m_portamentPitch = REDSOUND_TRACK_PORTAMENT_PITCH_NONE;
-		track->m_note.m_allocFlags = 0;
+		track->m_note.m_allocFlags = REDSOUND_NOTE_ALLOC_NONE;
 		track->m_voiceSwitch = REDSOUND_VOICE_SWITCH_MUSIC_DEFAULT;
 		RedTrackAdsrFillDefault(&track->m_adsr);
 

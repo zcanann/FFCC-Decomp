@@ -59,6 +59,7 @@ enum RedMusicTrackBlockSizeByte {
 };
 
 enum RedSeInfoSequenceByte {
+	REDSOUND_SE_COMMAND_NONE = 0,
 	REDSOUND_SE_INFO_SEQUENCE_OFFSET_LO = 0,
 	REDSOUND_SE_INFO_SEQUENCE_OFFSET_HI = 1,
 };
@@ -874,7 +875,7 @@ static int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volum
 			}
 			track->m_playTime = state;
 
-			if (*track->m_command != 0U) {
+			if (*track->m_command != REDSOUND_SE_COMMAND_NONE) {
 				track->m_eraseTrack = info->m_eraseTrack;
 				track->m_attrMask = info->m_attrMask;
 				track->m_mixVolume = volume << REDSOUND_FIXED_SHIFT;

@@ -1528,12 +1528,12 @@ static void __MidiCtrl_VolumeDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDAT
  */
 static void __MidiCtrl_VolumeChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    int delta[REDSOUND_MIDI_DELTA_BUFFER_WORD_COUNT];
+    int delta;
     int volume;
 
-    delta[0] = DeltaTimeSumup((unsigned char**)&track->m_command);
-    if (delta[0] == 0) {
-        delta[0]++;
+    delta = DeltaTimeSumup((unsigned char**)&track->m_command);
+    if (delta == 0) {
+        delta++;
     }
 
     volume = *track->m_command++;
@@ -1543,8 +1543,8 @@ static void __MidiCtrl_VolumeChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDAT
         volume--;
     }
 
-    track->m_volumeAdd = DataAddCompute(&track->m_volume, volume, delta);
-    track->m_volumeDelta = delta[0];
+    track->m_volumeAdd = DataAddCompute(&track->m_volume, volume, &delta);
+    track->m_volumeDelta = delta;
 }
 /*
  * --INFO--
@@ -1575,17 +1575,17 @@ static void __MidiCtrl_ExpressionDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrac
  */
 static void __MidiCtrl_ExpressionChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    int delta[REDSOUND_MIDI_DELTA_BUFFER_WORD_COUNT];
+    int delta;
     int expression;
 
-    delta[0] = DeltaTimeSumup((unsigned char**)&track->m_command);
-    if (delta[0] == 0) {
-        delta[0]++;
+    delta = DeltaTimeSumup((unsigned char**)&track->m_command);
+    if (delta == 0) {
+        delta++;
     }
 
     expression = (char)*track->m_command++;
-    track->m_expressionAdd = DataAddCompute(&track->m_expression, expression, delta);
-    track->m_expressionDelta = delta[0];
+    track->m_expressionAdd = DataAddCompute(&track->m_expression, expression, &delta);
+    track->m_expressionDelta = delta;
 }
 /*
  * --INFO--
@@ -1620,20 +1620,20 @@ static void __MidiCtrl_PanDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* 
  */
 static void __MidiCtrl_PanChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	int delta[REDSOUND_MIDI_DELTA_BUFFER_WORD_COUNT];
+	int delta;
 	u32 pan;
 
-	delta[0] = DeltaTimeSumup((unsigned char**)&track->m_command);
-	if (delta[0] == 0) {
-		delta[0]++;
+	delta = DeltaTimeSumup((unsigned char**)&track->m_command);
+	if (delta == 0) {
+		delta++;
 	}
 	if (track->m_shakeFunc == 0) {
 		track->m_pan += track->m_shakePan * REDSOUND_FIXED_ONE;
 		track->m_shakePan = 0;
 	}
 	pan = *track->m_command++;
-	track->m_panAdd = DataAddCompute(&track->m_pan, pan, delta);
-	track->m_panDelta = delta[0];
+	track->m_panAdd = DataAddCompute(&track->m_pan, pan, &delta);
+	track->m_panDelta = delta;
 }
 /*
  * --INFO--
@@ -1700,21 +1700,21 @@ static void __MidiCtrl_SlurOff(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* tr
  */
 static void __MidiCtrl_Sweep(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    int delta[REDSOUND_MIDI_SINGLE_DELTA_WORD_COUNT];
+    int delta;
     int command;
     int value;
     RedVoiceDATA* voiceData;
 
-    delta[0] = DeltaTimeSumup((unsigned char**)&track->m_command);
-    if (delta[0] == 0) {
-        delta[0] += 1;
+    delta = DeltaTimeSumup((unsigned char**)&track->m_command);
+    if (delta == 0) {
+        delta += 1;
     }
 
     command = (s8)*track->m_command++;
     command <<= 8;
     value = 0;
-    track->m_sweepAdd = DataAddCompute(&value, command, delta);
-    track->m_sweepDelta = delta[0];
+    track->m_sweepAdd = DataAddCompute(&value, command, &delta);
+    track->m_sweepDelta = delta;
     track->m_portamentPitch &= REDSOUND_FIXED_WHOLE_MASK;
 
     voiceData = p_VoiceData;
@@ -2160,14 +2160,14 @@ static void __MidiCtrl_VibrateDepthDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTr
  */
 static void __MidiCtrl_VibrateDepthChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	int delta[REDSOUND_MIDI_SINGLE_DELTA_WORD_COUNT];
+	int delta;
 
-	delta[0] = DeltaTimeSumup((unsigned char**)&track->m_command);
-	if (delta[0] == 0) {
-		delta[0] += 1;
+	delta = DeltaTimeSumup((unsigned char**)&track->m_command);
+	if (delta == 0) {
+		delta += 1;
 	}
-	track->m_vibrateDepthAdd = DataAddCompute(&track->m_vibrateDepth, *track->m_command, delta);
-	track->m_vibrateDepthDelta = (short)delta[0];
+	track->m_vibrateDepthAdd = DataAddCompute(&track->m_vibrateDepth, *track->m_command, &delta);
+	track->m_vibrateDepthDelta = (short)delta;
 	track->m_command += 1;
 }
 /*
@@ -2204,13 +2204,13 @@ static void __MidiCtrl_VibrateRateDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTra
  */
 static void __MidiCtrl_VibrateRateChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    int trackDelta[REDSOUND_MIDI_SINGLE_DELTA_WORD_COUNT];
+    int trackDelta;
     int rate;
     int divisor;
 
-    trackDelta[0] = DeltaTimeSumup((unsigned char**)&track->m_command);
-    if (trackDelta[0] == 0) {
-        trackDelta[0] += 1;
+    trackDelta = DeltaTimeSumup((unsigned char**)&track->m_command);
+    if (trackDelta == 0) {
+        trackDelta += 1;
     }
 
     if (*track->m_command != REDSOUND_MIDI_COMMAND_NONE) {
@@ -2221,8 +2221,8 @@ static void __MidiCtrl_VibrateRateChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTra
 
     rate = divisor;
     rate = REDSOUND_MIDI_DEFAULT_RATE_DIVISOR / rate;
-    track->m_vibrateRateAdd = DataAddCompute(&track->m_vibrateRate, rate, trackDelta);
-    track->m_vibrateRateDelta = (short)trackDelta[0];
+    track->m_vibrateRateAdd = DataAddCompute(&track->m_vibrateRate, rate, &trackDelta);
+    track->m_vibrateRateDelta = (short)trackDelta;
     track->m_command += 1;
 }
 /*
@@ -2341,14 +2341,14 @@ static void __MidiCtrl_TremoloDepthDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTr
  */
 static void __MidiCtrl_TremoloDepthChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	int delta[REDSOUND_MIDI_SINGLE_DELTA_WORD_COUNT];
+	int delta;
 
-	delta[0] = DeltaTimeSumup((unsigned char**)&track->m_command);
-	if (delta[0] == 0) {
-		delta[0] += 1;
+	delta = DeltaTimeSumup((unsigned char**)&track->m_command);
+	if (delta == 0) {
+		delta += 1;
 	}
-	track->m_tremoloDepthAdd = DataAddCompute(&track->m_tremoloDepth, *track->m_command, delta);
-	track->m_tremoloDepthDelta = (short)delta[0];
+	track->m_tremoloDepthAdd = DataAddCompute(&track->m_tremoloDepth, *track->m_command, &delta);
+	track->m_tremoloDepthDelta = (short)delta;
 	track->m_command += 1;
 }
 /*
@@ -2385,13 +2385,13 @@ static void __MidiCtrl_TremoloRateDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTra
  */
 static void __MidiCtrl_TremoloRateChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	int delta[REDSOUND_MIDI_SINGLE_DELTA_WORD_COUNT];
+	int delta;
 	int rate;
 	int divisor;
 
-	delta[0] = DeltaTimeSumup((unsigned char**)&track->m_command);
-	if (delta[0] == 0) {
-		delta[0] += 1;
+	delta = DeltaTimeSumup((unsigned char**)&track->m_command);
+	if (delta == 0) {
+		delta += 1;
 	}
 	if (*track->m_command != REDSOUND_MIDI_COMMAND_NONE) {
 		divisor = *track->m_command;
@@ -2400,8 +2400,8 @@ static void __MidiCtrl_TremoloRateChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTra
 	}
 	rate = divisor;
 	rate = REDSOUND_MIDI_DEFAULT_RATE_DIVISOR / rate;
-	track->m_tremoloRateAdd = DataAddCompute(&track->m_tremoloRate, rate, delta);
-	track->m_tremoloRateDelta = (short)delta[0];
+	track->m_tremoloRateAdd = DataAddCompute(&track->m_tremoloRate, rate, &delta);
+	track->m_tremoloRateDelta = (short)delta;
 	track->m_command += 1;
 }
 /*
@@ -2500,14 +2500,14 @@ static void __MidiCtrl_ShakeDepthDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrac
  */
 static void __MidiCtrl_ShakeDepthChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	int delta[REDSOUND_MIDI_SINGLE_DELTA_WORD_COUNT];
+	int delta;
 
-	delta[0] = DeltaTimeSumup((unsigned char**)&track->m_command);
-	if (delta[0] == 0) {
-		delta[0] += 1;
+	delta = DeltaTimeSumup((unsigned char**)&track->m_command);
+	if (delta == 0) {
+		delta += 1;
 	}
-	track->m_shakeDepthAdd = DataAddCompute(&track->m_shakeDepth, *track->m_command, delta);
-	track->m_shakeDepthDelta = (short)delta[0];
+	track->m_shakeDepthAdd = DataAddCompute(&track->m_shakeDepth, *track->m_command, &delta);
+	track->m_shakeDepthDelta = (short)delta;
 	track->m_command += 1;
 }
 /*
@@ -2544,13 +2544,13 @@ static void __MidiCtrl_ShakeRateDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrack
  */
 static void __MidiCtrl_ShakeRateChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	int delta[REDSOUND_MIDI_SINGLE_DELTA_WORD_COUNT];
+	int delta;
 	int rate;
 	int divisor;
 
-	delta[0] = DeltaTimeSumup((unsigned char**)&track->m_command);
-	if (delta[0] == 0) {
-		delta[0] += 1;
+	delta = DeltaTimeSumup((unsigned char**)&track->m_command);
+	if (delta == 0) {
+		delta += 1;
 	}
 	if (*track->m_command != REDSOUND_MIDI_COMMAND_NONE) {
 		divisor = *track->m_command;
@@ -2559,8 +2559,8 @@ static void __MidiCtrl_ShakeRateChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrack
 	}
 	rate = divisor;
 	rate = REDSOUND_MIDI_DEFAULT_RATE_DIVISOR / rate;
-	track->m_shakeRateAdd = DataAddCompute(&track->m_shakeRate, rate, delta);
-	track->m_shakeRateDelta = (short)delta[0];
+	track->m_shakeRateAdd = DataAddCompute(&track->m_shakeRate, rate, &delta);
+	track->m_shakeRateDelta = (short)delta;
 	track->m_command += 1;
 }
 /*

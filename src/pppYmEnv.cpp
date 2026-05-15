@@ -612,7 +612,7 @@ int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)
     Vec local100;
     Vec local10C;
     Vec local118;
-    pppFMATRIX localMatrix;
+    pppFMATRIX localMatrix ATTRIBUTE_ALIGN(8);
 
     owner = (CGObject*)mngSt->m_owner;
     if ((s32)Game.m_currentSceneId == 7) {

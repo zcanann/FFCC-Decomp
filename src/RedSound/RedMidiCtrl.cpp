@@ -370,6 +370,7 @@ enum RedMidiSwingConst {
 };
 
 enum RedMidiCommandConst {
+    REDSOUND_MIDI_COMMAND_NONE = 0,
     REDSOUND_MIDI_DEFAULT_STEP_COUNT = 0x100,
     REDSOUND_MIDI_DEFAULT_RATE_DIVISOR = 0x100,
     REDSOUND_MIDI_RATE_FIXED_NUMERATOR = 0x100000,
@@ -1193,7 +1194,7 @@ static void __MidiCtrl_TempoChange(RedSoundCONTROL* control, RedKeyOnDATA*, RedT
 {
     unsigned int delta;
 
-    delta = (track->m_command[REDSOUND_MIDI_TEMPO_CHANGE_STEP] != 0)
+    delta = (track->m_command[REDSOUND_MIDI_TEMPO_CHANGE_STEP] != REDSOUND_MIDI_COMMAND_NONE)
                 ? track->m_command[REDSOUND_MIDI_TEMPO_CHANGE_STEP]
                 : REDSOUND_MIDI_DEFAULT_STEP_COUNT;
 
@@ -1243,7 +1244,7 @@ static void __MidiCtrl_ReverbDepthChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTra
     int targetDepth;
     unsigned int stepCount;
 
-    stepCount = (*track->m_command != 0) ? *track->m_command : REDSOUND_MIDI_DEFAULT_STEP_COUNT;
+    stepCount = (*track->m_command != REDSOUND_MIDI_COMMAND_NONE) ? *track->m_command : REDSOUND_MIDI_DEFAULT_STEP_COUNT;
 
     targetDepth = (s8)*track->m_command++;
     if (targetDepth != 0) {
@@ -1996,7 +1997,7 @@ static void __MidiCtrl_SustainPedal(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDAT
 {
     RedVoiceDATA* voice;
 
-    if (*track->m_command != 0) {
+    if (*track->m_command != REDSOUND_MIDI_COMMAND_NONE) {
         track->m_voiceSwitch |= REDSOUND_VOICE_SWITCH_SUSTAIN;
         voice = p_VoiceData;
         do {
@@ -2089,7 +2090,7 @@ static void __MidiCtrl_VibrateOn(RedSoundCONTROL* control, RedKeyOnDATA* keyOn, 
     RedVoiceDATA* entry;
 
     track->m_vibrateDepth = (unsigned int)track->m_command[REDSOUND_MIDI_MOD_DEPTH] << REDSOUND_FIXED_SHIFT;
-    if (track->m_command[REDSOUND_MIDI_MOD_RATE] != 0) {
+    if (track->m_command[REDSOUND_MIDI_MOD_RATE] != REDSOUND_MIDI_COMMAND_NONE) {
         depth = (unsigned int)track->m_command[REDSOUND_MIDI_MOD_RATE];
     } else {
         depth = REDSOUND_MIDI_DEFAULT_RATE_DIVISOR;
@@ -2182,7 +2183,7 @@ static void __MidiCtrl_VibrateRateDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTra
 {
 	int rate;
 
-	if (*track->m_command != 0) {
+	if (*track->m_command != REDSOUND_MIDI_COMMAND_NONE) {
 		rate = *track->m_command;
 	} else {
 		rate = REDSOUND_MIDI_DEFAULT_RATE_DIVISOR;
@@ -2212,7 +2213,7 @@ static void __MidiCtrl_VibrateRateChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTra
         trackDelta[0] += 1;
     }
 
-    if (*track->m_command != 0) {
+    if (*track->m_command != REDSOUND_MIDI_COMMAND_NONE) {
         divisor = *track->m_command;
     } else {
         divisor = REDSOUND_MIDI_DEFAULT_RATE_DIVISOR;
@@ -2271,7 +2272,7 @@ static void __MidiCtrl_TremoloOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* 
 	RedVoiceDATA* voice;
 
 	track->m_tremoloDepth = (unsigned int)track->m_command[REDSOUND_MIDI_MOD_DEPTH] << REDSOUND_FIXED_SHIFT;
-	if (track->m_command[REDSOUND_MIDI_MOD_RATE] != 0) {
+	if (track->m_command[REDSOUND_MIDI_MOD_RATE] != REDSOUND_MIDI_COMMAND_NONE) {
 		rateDivisor = (unsigned int)track->m_command[REDSOUND_MIDI_MOD_RATE];
 	} else {
 		rateDivisor = REDSOUND_MIDI_DEFAULT_RATE_DIVISOR;
@@ -2363,7 +2364,7 @@ static void __MidiCtrl_TremoloRateDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTra
 {
 	int rate;
 
-	if (*track->m_command != 0) {
+	if (*track->m_command != REDSOUND_MIDI_COMMAND_NONE) {
 		rate = *track->m_command;
 	} else {
 		rate = REDSOUND_MIDI_DEFAULT_RATE_DIVISOR;
@@ -2392,7 +2393,7 @@ static void __MidiCtrl_TremoloRateChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTra
 	if (delta[0] == 0) {
 		delta[0] += 1;
 	}
-	if (*track->m_command != 0) {
+	if (*track->m_command != REDSOUND_MIDI_COMMAND_NONE) {
 		divisor = *track->m_command;
 	} else {
 		divisor = REDSOUND_MIDI_DEFAULT_RATE_DIVISOR;
@@ -2448,7 +2449,7 @@ static void __MidiCtrl_ShakeOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* tr
 	int divisor;
 
 	track->m_shakeDepth = (unsigned int)track->m_command[REDSOUND_MIDI_MOD_DEPTH] << REDSOUND_FIXED_SHIFT;
-	if (track->m_command[REDSOUND_MIDI_MOD_RATE] != 0) {
+	if (track->m_command[REDSOUND_MIDI_MOD_RATE] != REDSOUND_MIDI_COMMAND_NONE) {
 		rate = (unsigned int)track->m_command[REDSOUND_MIDI_MOD_RATE];
 	} else {
 		rate = REDSOUND_MIDI_DEFAULT_RATE_DIVISOR;
@@ -2522,7 +2523,7 @@ static void __MidiCtrl_ShakeRateDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrack
 {
 	int rate;
 
-	if (*track->m_command != 0) {
+	if (*track->m_command != REDSOUND_MIDI_COMMAND_NONE) {
 		rate = *track->m_command;
 	} else {
 		rate = REDSOUND_MIDI_DEFAULT_RATE_DIVISOR;
@@ -2551,7 +2552,7 @@ static void __MidiCtrl_ShakeRateChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrack
 	if (delta[0] == 0) {
 		delta[0] += 1;
 	}
-	if (*track->m_command != 0) {
+	if (*track->m_command != REDSOUND_MIDI_COMMAND_NONE) {
 		divisor = *track->m_command;
 	} else {
 		divisor = REDSOUND_MIDI_DEFAULT_RATE_DIVISOR;

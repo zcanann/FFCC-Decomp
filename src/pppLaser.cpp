@@ -413,7 +413,7 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
     pppFMATRIX unitMtx;
     Mtx shapeMtx;
     Mtx rotateMtx;
-    Mtx debugMtx;
+    Mtx debugMtx ATTRIBUTE_ALIGN(8);
     Mtx pointMtx;
     Mtx sphereMtx;
     pppFMATRIX managerMtx;

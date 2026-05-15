@@ -38,6 +38,7 @@ enum RedSoundLocalSize {
 	REDSOUND_AUTO_ID_MASK = 0x7FFFFFFF,
 	REDSOUND_STREAM_BANK_FILE_SIZE_NONE = 0,
 	REDSOUND_STREAM_BANK_POINT_NONE = 0,
+	REDSOUND_STREAM_BANK_RESERVED_NONE = 0,
 };
 
 #define REDSOUND_STREAM_BANK_DATA_NONE ((RedStreamFile*)0)
@@ -1246,7 +1247,7 @@ int CRedSound::GetSeUsedWave(void* seSepData)
  */
 int CRedSound::StreamStandby(void* streamHeader, int fileSize)
 {
-	int streamId = 0;
+	int streamId = REDSOUND_STREAM_ID_NONE;
 	RedStreamHEAD* header = reinterpret_cast<RedStreamHEAD*>(streamHeader);
 
 	if (header->m_signature[0] == REDSOUND_STREAM_SIGNATURE_0 &&
@@ -1259,7 +1260,7 @@ int CRedSound::StreamStandby(void* streamHeader, int fileSize)
 			bank->m_streamData = reinterpret_cast<RedStreamFile*>(streamHeader);
 			bank->m_fileSize = fileSize;
 			bank->m_readPoint = bank->m_playPoint = REDSOUND_STREAM_BANK_POINT_NONE;
-			bank->m_reserved14 = 0;
+			bank->m_reserved14 = REDSOUND_STREAM_BANK_RESERVED_NONE;
 		}
 	} else if (m_ReportPrint != REDSOUND_REPORT_PRINT_OFF) {
 		OSReport(sRedSoundInvalidStreamData,
@@ -1287,7 +1288,7 @@ int CRedSound::StreamPlay(int streamId, int pan, int volume)
 		return streamId;
 	}
 
-	return 0;
+	return REDSOUND_STREAM_ID_NONE;
 }
 /*
  * --INFO--

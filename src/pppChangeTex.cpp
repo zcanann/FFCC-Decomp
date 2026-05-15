@@ -112,18 +112,11 @@ STATIC_ASSERT(offsetof(ChangeTexModelData, m_frameShift) == 0x34);
 extern const float FLOAT_80332020 = -10000.0f;
 extern const char sPppChangeTexMeshObjectName[] = "obj";
 extern const float FLOAT_80332028 = 255.0f;
-extern const double DOUBLE_80332030 = 4503601774854144.0;
-extern const double DOUBLE_80332038 = 4503599627370496.0;
 extern const char s_pppChangeTex_cpp_801dd660[] = "pppChangeTex.cpp";
 
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
 
 static inline float LoadFloat(const float& value)
-{
-	return value;
-}
-
-static inline double LoadDouble(const double& value)
 {
 	return value;
 }
@@ -304,13 +297,7 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 
 	work->m_cachedValue = currentValue;
 
-	union {
-		double d;
-		u32 u[2];
-	} scale;
-	scale.u[0] = 0x43300000;
-	scale.u[1] = colorData[0xB];
-	double alphaBase = (double)(LoadFloat(FLOAT_80332028) * ((float)(scale.d - LoadDouble(DOUBLE_80332038)) / LoadFloat(FLOAT_80332028)));
+	double alphaBase = (double)(LoadFloat(FLOAT_80332028) * ((float)colorData[0xB] / LoadFloat(FLOAT_80332028)));
 
 	int arrayOffset = 0;
 	meshList = (int)model0Raw->m_meshes;

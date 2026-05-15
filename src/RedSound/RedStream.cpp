@@ -84,6 +84,7 @@ enum RedStreamFrameLayoutSize {
 	REDSOUND_STREAM_STEREO_FRAME_SIZE = sizeof(RedStreamStereoFrame),
 	REDSOUND_STREAM_STEREO_FRAMES_PER_PAGE = REDSOUND_STREAM_PAGE_SIZE / REDSOUND_STREAM_STEREO_FRAME_SIZE,
 	REDSOUND_STREAM_LEFT_PRED_SCALE_OFFSET = REDSOUND_STREAM_PAGE_SIZE,
+	REDSOUND_STREAM_AX_CURRENT_ADDRESS_HI_SHIFT = 16,
 	REDSOUND_STREAM_LOOP_START_SAMPLE = 2,
 	REDSOUND_STREAM_LOOP_ENABLED_MIN = 0,
 	REDSOUND_STREAM_ADSR_RELEASE_TIME = 10,
@@ -480,13 +481,13 @@ void StreamControl()
 			if (voiceData->m_axVoice != REDSOUND_AX_VOICE_NONE) {
 				if (voiceData->m_axVoice->priority == 0) {
 					_StreamStop(streamData);
-				} else {
-					int sampleStart =
-					    (streamData->m_aramBuffer + streamData->m_streamCursorBase) *
-					    REDSOUND_STREAM_ARAM_TO_AX_ADDRESS_SCALE;
-					int samplePos = voiceData->m_axVoice->pb.addr.currentAddressHi;
-					samplePos <<= 16;
-					samplePos |= voiceData->m_axVoice->pb.addr.currentAddressLo;
+					} else {
+						int sampleStart =
+						    (streamData->m_aramBuffer + streamData->m_streamCursorBase) *
+						    REDSOUND_STREAM_ARAM_TO_AX_ADDRESS_SCALE;
+						int samplePos = voiceData->m_axVoice->pb.addr.currentAddressHi;
+						samplePos <<= REDSOUND_STREAM_AX_CURRENT_ADDRESS_HI_SHIFT;
+						samplePos |= voiceData->m_axVoice->pb.addr.currentAddressLo;
 					if ((samplePos >= sampleStart) && (samplePos < sampleStart + REDSOUND_STREAM_STEREO_PLANE_SIZE)) {
 						int stopped = 0;
 						if (streamData->m_header.m_loopStart < REDSOUND_STREAM_LOOP_ENABLED_MIN) {
@@ -536,7 +537,7 @@ void StreamControl()
 						if (streamData->m_header.m_channelCount == REDSOUND_STREAM_STEREO_CHANNEL_COUNT) {
 							SetVoiceVolumeMix(voiceData, REDSOUND_STREAM_SILENT_PAN,
 							                  streamData->m_volume.m_value >> REDSOUND_FIXED_SHIFT);
-							voiceData += 1;
+							voiceData += REDSOUND_STREAM_RIGHT_CHANNEL;
 							SetVoiceVolumeMix(voiceData, REDSOUND_VOLUME_MAX,
 							                  streamData->m_volume.m_value >> REDSOUND_FIXED_SHIFT);
 						} else {

@@ -264,6 +264,7 @@ enum RedExecutePitchModConst {
     REDSOUND_PITCH_MOD_DEEP_SCALE = 0x18,
     REDSOUND_PITCH_MOD_WAVE_SHIFT = 4,
     REDSOUND_PITCH_MOD_NEGATIVE_HALF_SHIFT = 1,
+    REDSOUND_RANDOM_PITCH_NEGATIVE_HALF_SHIFT = 1,
 };
 
 enum RedExecuteVolumeModConst {
@@ -1461,7 +1462,7 @@ skipModSetup:
         workValue *= randomScale;
         pitchWork = workValue >> REDSOUND_RANDOM_FUZZY_PITCH_SHIFT;
         if (randomSign != 0) {
-            voice->m_randomPitch = -(pitchWork >> 1);
+            voice->m_randomPitch = -(pitchWork >> REDSOUND_RANDOM_PITCH_NEGATIVE_HALF_SHIFT);
         } else {
             voice->m_randomPitch = pitchWork;
         }

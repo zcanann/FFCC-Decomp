@@ -269,6 +269,8 @@ enum RedExecuteVolumeModConst {
     REDSOUND_VOLUME_TREMOLO_DEPTH_SHIFT = 8,
     REDSOUND_VOLUME_TRACK_SCALE_SHIFT = 9,
     REDSOUND_VOLUME_MOD_WAVE_SHIFT = 4,
+    REDSOUND_CONTROL_VOLUME_SCALE_SHIFT = 7,
+    REDSOUND_CONTROL_MASTER_VOLUME_SCALE_SHIFT = 9,
     REDSOUND_SHAKE_PAN_SCALE_SHIFT = 0x10,
 };
 
@@ -2101,11 +2103,12 @@ static void _KeyOnControl()
                              m_Mute[idx / REDSOUND_MUTE_BITS_PER_WORD]) == 0) {
                             volume = ((soundControl->m_volumeScale + 1) *
                                       (soundControl->m_volume >> REDSOUND_FIXED_SHIFT)) >>
-                                     7;
+                                     REDSOUND_CONTROL_VOLUME_SCALE_SHIFT;
                             if (soundControl->m_masterVolumeDelta != 0) {
-                                volume = (volume * (soundControl->m_masterVolume >> REDSOUND_FIXED_SHIFT)) >> 9;
+                                volume = (volume * (soundControl->m_masterVolume >> REDSOUND_FIXED_SHIFT)) >>
+                                         REDSOUND_CONTROL_MASTER_VOLUME_SCALE_SHIFT;
                             }
-                            volume = (volume * m_MasterMusicVolume) >> 9;
+                            volume = (volume * m_MasterMusicVolume) >> REDSOUND_CONTROL_MASTER_VOLUME_SCALE_SHIFT;
                         } else {
                             volume = 0;
                         }
@@ -2122,14 +2125,15 @@ static void _KeyOnControl()
                                 volume = ((soundControl[REDSOUND_CONTROL_MUSIC_SECONDARY].m_volumeScale + 1) *
                                           (soundControl[REDSOUND_CONTROL_MUSIC_SECONDARY].m_volume >>
                                            REDSOUND_FIXED_SHIFT)) >>
-                                         7;
+                                         REDSOUND_CONTROL_VOLUME_SCALE_SHIFT;
                                 if (soundControl[REDSOUND_CONTROL_MUSIC_SECONDARY].m_masterVolumeDelta != 0) {
                                     volume = (volume *
                                               (soundControl[REDSOUND_CONTROL_MUSIC_SECONDARY].m_masterVolume >>
                                                REDSOUND_FIXED_SHIFT)) >>
-                                             9;
+                                             REDSOUND_CONTROL_MASTER_VOLUME_SCALE_SHIFT;
                                 }
-                                volume = (volume * m_MasterMusicVolume) >> 9;
+                                volume = (volume * m_MasterMusicVolume) >>
+                                         REDSOUND_CONTROL_MASTER_VOLUME_SCALE_SHIFT;
                             } else {
                                 volume = 0;
                             }

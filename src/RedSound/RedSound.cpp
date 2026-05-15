@@ -944,9 +944,9 @@ int CRedSound::StreamPlay(void* data, int fileSize, int pan, int volume)
 	int id = 0;
 	RedStreamHEAD* streamHeader = (RedStreamHEAD*)data;
 
-	if (streamHeader->m_signature[0] == REDSOUND_STREAM_SIGNATURE_0 &&
-	    streamHeader->m_signature[1] == REDSOUND_STREAM_SIGNATURE_1 &&
-	    streamHeader->m_signature[2] == REDSOUND_STREAM_SIGNATURE_2) {
+	if (streamHeader->m_signature[REDSOUND_STREAM_SIGNATURE_0_INDEX] == REDSOUND_STREAM_SIGNATURE_0 &&
+	    streamHeader->m_signature[REDSOUND_STREAM_SIGNATURE_1_INDEX] == REDSOUND_STREAM_SIGNATURE_1 &&
+	    streamHeader->m_signature[REDSOUND_STREAM_SIGNATURE_2_INDEX] == REDSOUND_STREAM_SIGNATURE_2) {
 		id = GetAutoID();
 		c_Driver.StreamPlay(id, data, fileSize, pan, volume);
 	} else if (m_ReportPrint != REDSOUND_REPORT_PRINT_OFF) {
@@ -1255,9 +1255,9 @@ int CRedSound::StreamStandby(void* streamHeader, int fileSize)
 	int streamId = REDSOUND_STREAM_ID_NONE;
 	RedStreamHEAD* header = reinterpret_cast<RedStreamHEAD*>(streamHeader);
 
-	if (header->m_signature[0] == REDSOUND_STREAM_SIGNATURE_0 &&
-	    header->m_signature[1] == REDSOUND_STREAM_SIGNATURE_1 &&
-	    header->m_signature[2] == REDSOUND_STREAM_SIGNATURE_2) {
+	if (header->m_signature[REDSOUND_STREAM_SIGNATURE_0_INDEX] == REDSOUND_STREAM_SIGNATURE_0 &&
+	    header->m_signature[REDSOUND_STREAM_SIGNATURE_1_INDEX] == REDSOUND_STREAM_SIGNATURE_1 &&
+	    header->m_signature[REDSOUND_STREAM_SIGNATURE_2_INDEX] == REDSOUND_STREAM_SIGNATURE_2) {
 		RedSoundStreamBank* bank = _SearchEmptyStreamBank();
 		if (bank != 0) {
 			streamId = GetAutoID();

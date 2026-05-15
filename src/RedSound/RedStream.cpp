@@ -55,6 +55,7 @@ enum RedStreamLayoutSize {
 	REDSOUND_STREAM_BUFFER_SIDE_A = 0,
 	REDSOUND_STREAM_BUFFER_SIDE_B = 1,
 	REDSOUND_STREAM_BUFFER_SIDE_MASK = 1,
+	REDSOUND_STREAM_VOLUME_INPUT_SCALE_SHIFT = 8,
 };
 
 enum RedStreamChannelIndex {
@@ -384,7 +385,7 @@ void SetStreamVolume(int streamID, int volume, int frameCount)
 	volume &= REDSOUND_VOLUME_MAX;
 	if (volume != 0) {
 		volume++;
-		volume <<= 8;
+		volume <<= REDSOUND_STREAM_VOLUME_INPUT_SCALE_SHIFT;
 		volume--;
 		volume <<= REDSOUND_FIXED_SHIFT;
 		volume |= REDSOUND_FIXED_HALF;

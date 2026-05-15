@@ -639,14 +639,14 @@ static void _EraseAttribute(int eraseTrack, int attrMask)
 	RedTrackDATA* track = *trackBasePtr;
 
 	do {
-		if ((track->m_command != 0) && (track->m_eraseTrack <= eraseTrack) &&
+		if ((track->m_command != REDSOUND_TRACK_COMMAND_NONE) && (track->m_eraseTrack <= eraseTrack) &&
 		    ((((unsigned int)track->m_attrMask) & (unsigned int)attrMask) != 0)) {
 			int trackNo;
 
 			KeyOnReserveClear(p_KeyOnData, track);
 			track->m_seId = REDSOUND_SE_ID_NONE;
 			track->m_flags = 0;
-			track->m_command = 0;
+			track->m_command = REDSOUND_TRACK_COMMAND_NONE;
 			track->m_mixVolumeMode = REDSOUND_SE_VOLUME_MODE_NORMAL;
 
 			trackNo = track->m_trackNo;

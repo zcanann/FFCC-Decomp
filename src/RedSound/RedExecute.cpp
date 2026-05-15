@@ -930,7 +930,7 @@ RedVoiceDATA* EntryVoiceSearch(RedTrackDATA* track)
 
         if (voice == voiceEnd) {
             RedVoiceDATA* selectedVoice;
-            p_SoundControl->m_updateFlags |= 2;
+            p_SoundControl->m_updateFlags |= REDSOUND_CONTROL_UPDATE_VOICE_STEAL;
             if (bestEnvelope == REDSOUND_ENVELOPE_LEVEL_FULL) {
                 selectedVoice = 0;
             } else {

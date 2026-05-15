@@ -293,7 +293,7 @@ int* CRedSound::EntryStandbyID(int id)
  */
 int CRedSound::Init(void* mainBuffer, int mainBufferSize, int aramBuffer, int aramBufferSize)
 {
-	memset(m_StandbyStatus, 0, sizeof(m_StandbyStatus));
+	memset(m_StandbyStatus, 0, REDSOUND_STANDBY_STATUS_SIZE);
 
 	if (mainBufferSize > 0 && aramBufferSize > 0) {
 		if ((((u32)mainBuffer & REDSOUND_MEMORY_BANK_ALIGN_MASK) != 0) ||
@@ -366,8 +366,8 @@ int CRedSound::Init(void* mainBuffer, int mainBufferSize, int aramBuffer, int ar
 void CRedSound::Start()
 {
 #define redSoundStreamBank (*(RedSoundStreamBank* volatile*)&p_StreamBank)
-	redSoundStreamBank = (RedSoundStreamBank*)RedNew(sizeof(*redSoundStreamBank) * REDSOUND_STREAM_BANK_COUNT);
-	memset((void*)redSoundStreamBank, 0, sizeof(*redSoundStreamBank) * REDSOUND_STREAM_BANK_COUNT);
+	redSoundStreamBank = (RedSoundStreamBank*)RedNew(REDSOUND_STREAM_BANK_SIZE);
+	memset((void*)redSoundStreamBank, 0, REDSOUND_STREAM_BANK_SIZE);
 #undef redSoundStreamBank
 }
 /*

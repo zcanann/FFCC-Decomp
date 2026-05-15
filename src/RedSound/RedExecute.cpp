@@ -1920,11 +1920,11 @@ void EnvelopeKeyExecute()
                     voiceData->m_flags |= REDSOUND_VOICE_FLAGS_RELEASE_ACTIVE;
                     voiceData->m_adsrStage = REDSOUND_VOICE_ADSR_RELEASE;
                     voiceData->m_adsrStepFrames = voiceData->m_adsr.m_time[REDSOUND_VOICE_ADSR_RELEASE];
-                    if (voiceData->m_adsrStepFrames == 0) {
-                        voiceData->m_adsrCurrentLevel = 0;
-                    } else {
+                    if (voiceData->m_adsrStepFrames != 0) {
                         voiceData->m_adsrStepAdd = -voiceData->m_adsrCurrentLevel;
                         voiceData->m_adsrStepAdd = voiceData->m_adsrStepAdd / voiceData->m_adsrStepFrames;
+                    } else {
+                        voiceData->m_adsrCurrentLevel = 0;
                     }
                     voiceData->m_envelopeLevel = voiceData->m_adsrCurrentLevel >> REDSOUND_FIXED_SHIFT;
                 } else {
@@ -1941,13 +1941,14 @@ void EnvelopeKeyExecute()
             if (voiceData->m_envelopeLevel < 1) {
                 voiceData->m_flags &= REDSOUND_VOICE_FLAGS_CLEAR_RELEASE_ACTIVE_MASK;
                 voiceData->m_active = REDSOUND_VOICE_ACTIVE_OFF;
-                voiceFlags |= AX_SYNC_FLAG_COPYVOL | AX_SYNC_FLAG_COPYSTATE;
+                voiceFlags |= AX_SYNC_FLAG_COPYVOL;
                 voiceData->m_track = 0;
                 voice->pb.state = 0;
                 voiceData->m_adsrCurrentLevel = 0;
                 voiceData->m_envelopeLevel = 0;
                 voice->pb.ve.currentVolume = 0;
                 voice->pb.ve.currentDelta = 0;
+                voiceFlags |= AX_SYNC_FLAG_COPYSTATE;
             } else if ((envChanged != 0) &&
                        ((u32)voice->pb.ve.currentVolume !=
                         ((voiceData->m_adsrCurrentLevel >> REDSOUND_FIXED_SHIFT) & 0xFFFFU))) {

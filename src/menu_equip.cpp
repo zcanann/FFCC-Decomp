@@ -142,24 +142,26 @@ int CMenuPcs::ChkEquipActive(int index)
 	int entryCount = entries[0];
 	s16* itemEntries = entries + 1;
 	int equipIndex = GetEquipState(this)[0x13];
-	unsigned int active;
 
 	if ((index < 0) || (entryCount <= index)) {
-		active = 0;
-	} else if (index == 0) {
-		if (equipIndex < 3) {
-			active = 0;
-		} else {
-			active = (unsigned int)(int)caravanWork->m_equipment[equipIndex] >> 0x1f ^ 1;
-		}
-	} else {
-		int item = caravanWork->m_inventoryItems[itemEntries[index - 1]];
-		active = ChkEquipPossible__8CMenuPcsFi(this, item);
-
-		if (((active & 0xff) != 0) && (GetEquipType__8CMenuPcsFi(this, item) != equipIndex)) {
-			active = 0;
-		}
+		return 0;
 	}
+
+	if (index == 0) {
+		if (equipIndex < 3) {
+			return 0;
+		}
+
+		return (unsigned int)(int)caravanWork->m_equipment[equipIndex] >> 0x1f ^ 1;
+	}
+
+	int item = caravanWork->m_inventoryItems[itemEntries[index - 1]];
+	unsigned int active = ChkEquipPossible__8CMenuPcsFi(this, item);
+
+	if (((active & 0xff) != 0) && (GetEquipType__8CMenuPcsFi(this, item) != equipIndex)) {
+		active = 0;
+	}
+
 	return active;
 }
 

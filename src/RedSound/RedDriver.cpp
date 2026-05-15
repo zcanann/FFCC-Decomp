@@ -2103,9 +2103,9 @@ void CRedDriver::Init()
     editorVoice = p_EditorVoice;
     editorVoice[REDSOUND_EDITOR_VOICE_RIGHT] = 0;
     editorVoice[REDSOUND_EDITOR_VOICE_LEFT] = 0;
-    seTrackArena = (RedTrackDATA*)RedNew(REDSOUND_SE_TRACK_ARENA_SIZE);
-    p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks = seTrackArena;
-    memset(seTrackArena, 0, REDSOUND_SE_TRACK_ARENA_SIZE);
+    p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks = (RedTrackDATA*)RedNew(REDSOUND_SE_TRACK_ARENA_SIZE);
+    memset(p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks, 0, REDSOUND_SE_TRACK_ARENA_SIZE);
+    seTrackArena = p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
     nextIndex = 0;
     do {
         seTrackArena[nextIndex].m_trackNo = (char)(nextIndex + REDSOUND_SE_VOICE_BASE_INDEX);

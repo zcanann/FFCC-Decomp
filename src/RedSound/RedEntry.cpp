@@ -1610,7 +1610,7 @@ void CRedEntry::DisplayMMemoryInfo()
 
 	do {
 		if (bankEntry->m_size != 0) {
-			int matched = 0;
+			int matched = REDSOUND_ENTRY_SEARCH_NOT_FOUND;
 			int blockEnd = bankEntry->m_address + bankEntry->m_size;
 
 			if (bankEntry[REDSOUND_MEMORY_NEXT_BLOCK_INDEX].m_size > 0) {
@@ -1626,27 +1626,27 @@ void CRedEntry::DisplayMMemoryInfo()
 					         reinterpret_cast<RedMusicHEAD*>(bankEntry->m_address)->m_musicNo, bankEntry->m_address,
 					         bankEntry->m_size, freeSize);
 					fflush(__files + 1);
-					matched = 1;
+					matched = REDSOUND_ENTRY_SEARCH_FOUND;
 					break;
 				}
 				history += 1;
 			} while (history < m_musicBankBase + REDSOUND_MUSIC_BANK_ENTRY_COUNT);
 
-			if (matched == 0) {
+			if (matched == REDSOUND_ENTRY_SEARCH_NOT_FOUND) {
 				i = 0;
 				do {
 					if ((p_SeBlockData[i] != 0) && (bankEntry->m_address == reinterpret_cast<int>(p_SeBlockData[i]))) {
 						OSReport(sRedEntryMMemorySeBlockInfoFmt, sRedEntryLogPrefix, bankEntry->m_address,
 						         bankEntry->m_size, freeSize);
 						fflush(__files + 1);
-						matched = 1;
+						matched = REDSOUND_ENTRY_SEARCH_FOUND;
 						break;
 					}
 					i++;
 				} while (i < REDSOUND_SE_BLOCK_BANK_COUNT);
 			}
 
-			if (matched == 0) {
+			if (matched == REDSOUND_ENTRY_SEARCH_NOT_FOUND) {
 				history = m_waveBankBase;
 				do {
 					if ((history->m_size != 0) && (history->m_address == bankEntry->m_address)) {
@@ -1654,14 +1654,14 @@ void CRedEntry::DisplayMMemoryInfo()
 						         reinterpret_cast<RedWaveHeadWD*>(bankEntry->m_address)->m_waveNo, bankEntry->m_address,
 						         bankEntry->m_size, freeSize);
 						fflush(__files + 1);
-						matched = 1;
+						matched = REDSOUND_ENTRY_SEARCH_FOUND;
 						break;
 					}
 					history += 1;
 				} while (history < m_waveBankBase + REDSOUND_WAVE_BANK_ENTRY_COUNT);
 			}
 
-			if (matched == 0) {
+			if (matched == REDSOUND_ENTRY_SEARCH_NOT_FOUND) {
 				history = m_seSepBankBase;
 				do {
 					if ((history->m_size != 0) && (history->m_address == bankEntry->m_address)) {
@@ -1669,14 +1669,14 @@ void CRedEntry::DisplayMMemoryInfo()
 						         reinterpret_cast<RedSeSepHEAD*>(bankEntry->m_address)->m_seNo, bankEntry->m_address,
 						         bankEntry->m_size, freeSize);
 						fflush(__files + 1);
-						matched = 1;
+						matched = REDSOUND_ENTRY_SEARCH_FOUND;
 						break;
 					}
 					history += 1;
 				} while (history < m_seSepBankBase + REDSOUND_SESEP_BANK_ENTRY_COUNT);
 			}
 
-			if (matched == 0) {
+			if (matched == REDSOUND_ENTRY_SEARCH_NOT_FOUND) {
 				OSReport(sRedEntryMMemoryFreeBlockInfoFmt, sRedEntryLogPrefix, bankEntry->m_address, bankEntry->m_size,
 				         freeSize);
 				fflush(__files + 1);
@@ -1998,17 +1998,17 @@ void CRedEntry::DisplayMusicInfo()
 		RedHistoryBANK* history = m_musicBankBase;
 		do {
 			if (history->m_size != 0) {
-				int playing = 0;
+				int playing = REDSOUND_ENTRY_SEARCH_NOT_FOUND;
 				if ((p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_PRIMARY].m_activeTrackCount != 0) &&
 				    (p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_PRIMARY].m_musicId == history->m_id)) {
-					playing = 1;
+					playing = REDSOUND_ENTRY_SEARCH_FOUND;
 				}
 				if ((p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY].m_activeTrackCount != 0) &&
 				    (p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY].m_musicId == history->m_id)) {
-					playing = 1;
+					playing = REDSOUND_ENTRY_SEARCH_FOUND;
 				}
 
-				if (playing != 0) {
+				if (playing != REDSOUND_ENTRY_SEARCH_NOT_FOUND) {
 					OSReport(sRedEntryMusicInfoPlayFmt, sRedEntryLogPrefix, history->m_id,
 					         history->m_musicHead->m_waveNo, history->m_size);
 					fflush(__files + 1);

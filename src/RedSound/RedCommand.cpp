@@ -49,6 +49,7 @@ enum RedCommandEraseTrack {
 
 enum RedCommandMusicTrackBlock {
 	REDSOUND_MUSIC_TRACK_BLOCK_SIZE_FIELD_SIZE = sizeof(u32),
+	REDSOUND_REVERB_DEPTH_BYTE_SHIFT = 8,
 };
 
 enum RedMusicTrackBlockSizeByte {
@@ -56,6 +57,9 @@ enum RedMusicTrackBlockSizeByte {
 	REDSOUND_MUSIC_TRACK_BLOCK_SIZE_BYTE1 = 1,
 	REDSOUND_MUSIC_TRACK_BLOCK_SIZE_BYTE2 = 2,
 	REDSOUND_MUSIC_TRACK_BLOCK_SIZE_BYTE3 = 3,
+	REDSOUND_MUSIC_TRACK_BLOCK_SIZE_BYTE1_SHIFT = 8,
+	REDSOUND_MUSIC_TRACK_BLOCK_SIZE_BYTE2_SHIFT = 16,
+	REDSOUND_MUSIC_TRACK_BLOCK_SIZE_BYTE3_SHIFT = 24,
 };
 
 enum RedSeInfoSequenceByte {
@@ -1011,7 +1015,8 @@ static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* wav
 
 	p_ReverbDepth[REDSOUND_REVERB_DEPTH_MUSIC].m_depth = (int)musicHead->m_reverbDepth;
 	if (p_ReverbDepth[REDSOUND_REVERB_DEPTH_MUSIC].m_depth != 0) {
-		p_ReverbDepth[REDSOUND_REVERB_DEPTH_MUSIC].m_depth = (p_ReverbDepth[REDSOUND_REVERB_DEPTH_MUSIC].m_depth + 1) << 8;
+		p_ReverbDepth[REDSOUND_REVERB_DEPTH_MUSIC].m_depth =
+		    (p_ReverbDepth[REDSOUND_REVERB_DEPTH_MUSIC].m_depth + 1) << REDSOUND_REVERB_DEPTH_BYTE_SHIFT;
 		p_ReverbDepth[REDSOUND_REVERB_DEPTH_MUSIC].m_depth = (p_ReverbDepth[REDSOUND_REVERB_DEPTH_MUSIC].m_depth - 1) << REDSOUND_FIXED_SHIFT;
 	}
 	p_ReverbDepth[REDSOUND_REVERB_DEPTH_MUSIC].m_step = 0;
@@ -1022,9 +1027,9 @@ static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* wav
 	int count = musicHead->m_trackCount;
 	char trackNo = 0;
 	do {
-		unsigned int blockSize = ((unsigned int)current->m_sizeHi2 << 24) |
-		                         ((unsigned int)current->m_sizeHi1 << 16) |
-		                         ((unsigned int)current->m_sizeHi0 << 8) |
+		unsigned int blockSize = ((unsigned int)current->m_sizeHi2 << REDSOUND_MUSIC_TRACK_BLOCK_SIZE_BYTE3_SHIFT) |
+		                         ((unsigned int)current->m_sizeHi1 << REDSOUND_MUSIC_TRACK_BLOCK_SIZE_BYTE2_SHIFT) |
+		                         ((unsigned int)current->m_sizeHi0 << REDSOUND_MUSIC_TRACK_BLOCK_SIZE_BYTE1_SHIFT) |
 		                         (unsigned int)current->m_sizeLo;
 		track->m_trackNo = trackNo - 1;
 		track->m_waveBankData = waveHead;

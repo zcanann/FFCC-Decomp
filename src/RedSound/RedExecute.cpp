@@ -2026,10 +2026,11 @@ static void _KeyOnControl()
     int bit;
 
     _VoiceEnvelopeCheck();
+    int keyOnEntry = m_KeyOnEntry;
     voiceStartMask[REDSOUND_VOICE_START_MASK_HIGH] = 0;
     voiceStartMask[REDSOUND_VOICE_START_MASK_LOW] = 0;
 
-    if (m_KeyOnEntry != 0) {
+    if (keyOnEntry != 0) {
         reserve = p_KeyOnData->m_fixed;
         voiceData = p_VoiceData;
         do {

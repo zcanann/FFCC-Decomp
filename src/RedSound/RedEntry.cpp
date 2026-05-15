@@ -430,7 +430,7 @@ int CRedEntry::SearchUseWave(int waveNo)
 	control = p_SoundControlBuffer + REDSOUND_CONTROL_SE;
 	RedTrackDATA* track = control->m_tracks;
 	do {
-		if (((u32)track->m_command != 0) && (track->m_waveBankData != 0) &&
+		if (((u32)track->m_command != REDSOUND_TRACK_COMMAND_NONE) && (track->m_waveBankData != 0) &&
 		    (track->m_waveBankData->m_waveNo == waveNo)) {
 			found = REDSOUND_ENTRY_SEARCH_FOUND;
 			SeStopID(track->m_seId);
@@ -887,7 +887,7 @@ void CRedEntry::WaveHistoryManager(int mode, int waveNo)
 			RedTrackDATA** trackHead = &p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
 			track = *trackHead;
 			do {
-				if (((u32)track->m_command != 0) && (track->m_waveBankData != 0) &&
+				if (((u32)track->m_command != REDSOUND_TRACK_COMMAND_NONE) && (track->m_waveBankData != 0) &&
 				    (track->m_waveBankData->m_waveNo == waveNo)) {
 					used++;
 					break;
@@ -1218,7 +1218,7 @@ void CRedEntry::SeSepHistoryManager(int mode, int seNo)
 		track = p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
 
 		do {
-			if (((unsigned int)track->m_command != 0) && (track->m_seSepId == seNo)) {
+			if (((unsigned int)track->m_command != REDSOUND_TRACK_COMMAND_NONE) && (track->m_seSepId == seNo)) {
 				sequenceNo |= 1;
 				break;
 			}
@@ -1263,7 +1263,7 @@ void CRedEntry::DisplaySePlayInfo()
 		RedTrackDATA* track = *trackHead;
 		int waveNo;
 		do {
-			if (track->m_command != 0) {
+			if (track->m_command != REDSOUND_TRACK_COMMAND_NONE) {
 				if ((track->m_seSepId & REDSOUND_SE_BLOCK_DATA_FLAG) != 0) {
 					unsigned int seBlockId = (unsigned int)track->m_seSepId;
 					seBlockId &= REDSOUND_SE_BLOCK_ENTRY_MASK;

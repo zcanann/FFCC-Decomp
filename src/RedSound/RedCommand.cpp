@@ -787,13 +787,13 @@ static int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volum
 	unsigned char flag;
 	RedWaveHeadWD* waveBase;
 	RedTrackDATA* track;
-	unsigned int state;
-	unsigned char attrMask;
+	int state;
+	int attrMask;
 	RedSeInfoSequence* seq;
 	int deltaTime;
-	unsigned int count;
+	int count;
 	unsigned char* current;
-	unsigned int remaining;
+	int remaining;
 	RedVoiceDATA* voiceData;
 	int isMulti;
 
@@ -827,7 +827,8 @@ static int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volum
 			remaining = 0;
 			do {
 				remaining = remaining + 1;
-				if ((seq[remaining].m_offsetHiAndFlags & REDSOUND_SE_INFO_SEQUENCE_CONTINUE_FLAG) == 0) {
+				if ((reinterpret_cast<unsigned char*>(seq)[remaining * sizeof(RedSeInfoSequence) + 1] &
+				     REDSOUND_SE_INFO_SEQUENCE_CONTINUE_FLAG) == 0) {
 					break;
 				}
 			} while ((int)remaining < (int)count);
@@ -844,11 +845,10 @@ static int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volum
 			track->m_waveBankData = waveBase;
 			track->m_command = current;
 			current = current +
-			          (((unsigned int)seq->m_offsetLo +
-			            (unsigned int)seq->m_offsetHiAndFlags * REDSOUND_SE_INFO_U16_HIGH_SCALE) &
+			          (((unsigned int)seq->m_offsetHiAndFlags * REDSOUND_SE_INFO_U16_HIGH_SCALE +
+			            (unsigned int)seq->m_offsetLo) &
 			           REDSOUND_SE_INFO_SEQUENCE_OFFSET_MASK);
-			deltaTime = (int)DeltaTimeSumup((unsigned char**)&track->m_command);
-			track->m_deltaTime = deltaTime + 1;
+			track->m_deltaTime = (int)DeltaTimeSumup((unsigned char**)&track->m_command) + 1;
 			if (m_SeSkipStep != 0) {
 				track->m_deltaTime = track->m_deltaTime - m_SeSkipStep;
 			}

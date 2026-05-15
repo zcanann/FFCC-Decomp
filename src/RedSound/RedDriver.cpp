@@ -3624,7 +3624,7 @@ int CRedDriver::PlayWaveItem(int waveNo, int itemNo, int key, int pan, int volum
     p_EditorTrack->m_pan = pan << REDSOUND_FIXED_SHIFT;
     p_EditorTrack->m_reverbDepth = p_ReverbDepth[REDSOUND_REVERB_DEPTH_SE].m_depth;
     p_EditorTrack->m_portamentPitch = key << REDSOUND_PITCH_BASE_NOTE_SHIFT;
-    p_EditorTrack->m_pitchBendRange = 2;
+    p_EditorTrack->m_pitchBendRange = REDSOUND_SE_DEFAULT_PITCH_BEND_RANGE;
     p_EditorTrack->m_voiceSwitch = REDSOUND_VOICE_SWITCH_DRY_STEREO;
 
     voice = EntryVoiceSearch(p_EditorTrack);

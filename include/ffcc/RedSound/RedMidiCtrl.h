@@ -265,6 +265,10 @@ enum RedTrackFlag {
 	REDSOUND_TRACK_FLAG_TENUTO = 0x200000,
 };
 
+enum RedTrackDefault {
+	REDSOUND_SE_DEFAULT_PITCH_BEND_RANGE = 2,
+};
+
 struct RedKeyOnSlot {
 	RedTrackDATA* m_track;
 	RedNoteDATA m_note;

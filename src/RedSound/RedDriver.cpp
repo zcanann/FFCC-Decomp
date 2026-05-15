@@ -747,7 +747,7 @@ static void _SetReverbDepth(int* command)
     int fadeStep;
     RedTrackDATA* track;
 
-    reverbBank = command[REDSOUND_REVERB_COMMAND_BANK] & 1;
+    reverbBank = command[REDSOUND_REVERB_COMMAND_BANK] & REDSOUND_REVERB_BANK_MASK;
     reverbDepth = command[REDSOUND_REVERB_COMMAND_DEPTH] & REDSOUND_COMMAND_VALUE_MASK;
     fadeStep = command[REDSOUND_REVERB_COMMAND_FADE_TIME];
     if (reverbDepth != 0) {

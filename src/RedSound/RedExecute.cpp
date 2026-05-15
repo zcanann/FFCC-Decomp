@@ -162,7 +162,7 @@ static const float s_ReverbTimeScale = 1000.0f;
 static const float s_ReverbEffectScale = 100.0f;
 
 enum RedExecuteLayoutSize {
-    REDSOUND_REVERB_DATA_COUNT = 2,
+    REDSOUND_REVERB_DATA_COUNT = REDSOUND_REVERB_DEPTH_COUNT,
     REDSOUND_REVERB_DATA_BUFFER_SIZE = sizeof(RedReverbDATA) * REDSOUND_REVERB_DATA_COUNT,
     REDSOUND_REVERB_DATA_ALLOC_SIZE = 0x18,
     REDSOUND_REVERB_SIZE_ALLOC_SIZE = sizeof(u32),
@@ -693,7 +693,7 @@ static void _SetReverbData(RedReverbDATA* reverb, int* params)
  */
 static void _ClearReverb(int bank)
 {
-    RedReverbDATA* reverb = p_ReverbData + (bank & 1);
+    RedReverbDATA* reverb = p_ReverbData + (bank & REDSOUND_REVERB_BANK_MASK);
     if (reverb->m_callback == 0) {
         return;
     }
@@ -765,7 +765,7 @@ RedReverbSize* SetReverb(int bank, int kind, int* params)
         return 0;
     }
 
-    reverb = p_ReverbData + (bank & 1);
+    reverb = p_ReverbData + (bank & REDSOUND_REVERB_BANK_MASK);
     if ((reverb->m_callback != 0) && (reverb->m_kind == kind)) {
         _SetReverbData(reverb, params);
         return p_ReverbSize;

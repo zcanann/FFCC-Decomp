@@ -83,6 +83,7 @@ enum RedSoundLayoutSize {
 enum RedReverbDepthIndex {
 	REDSOUND_REVERB_DEPTH_MUSIC = 0,
 	REDSOUND_REVERB_DEPTH_SE = 1,
+	REDSOUND_REVERB_BANK_MASK = REDSOUND_REVERB_DEPTH_SE,
 };
 
 enum RedMuteWordIndex {

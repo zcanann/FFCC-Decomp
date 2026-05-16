@@ -226,6 +226,8 @@ extern RedSeBlockHEAD* volatile p_SeBlockData[REDSOUND_SE_BLOCK_BANK_COUNT];
 extern u8* volatile p_ZeroData;
 extern RedSoundCONTROL* volatile p_SoundControlBuffer;
 #define RedSoundControlGet(index) (p_SoundControlBuffer + (index))
+#define RedSoundControlGetMusicPlayEnd() RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PLAY_END)
+#define RedSoundControlGetMusicAllEnd() RedSoundControlGet(REDSOUND_CONTROL_MUSIC_ALL_END)
 extern RedSoundCONTROL* volatile p_SoundControl;
 extern volatile int m_KeyOnEntry;
 extern RedKeyOnDATA* volatile p_KeyOnData;

@@ -572,7 +572,7 @@ int MusicStop(int musicId)
 			}
 		}
 		music++;
-	} while (music < p_SoundControlBuffer + REDSOUND_CONTROL_MUSIC_PLAY_END);
+	} while (music < RedSoundControlGetMusicPlayEnd());
 
 	music = p_SoundControlBuffer;
 	if ((music->m_musicId < REDSOUND_MUSIC_ID_MIN) &&
@@ -655,7 +655,7 @@ void SetMusicVolume(int musicId, int volume, int duration, int mode)
 			}
 		}
 		music++;
-	} while (music < p_SoundControlBuffer + REDSOUND_CONTROL_MUSIC_ALL_END);
+	} while (music < RedSoundControlGetMusicAllEnd());
 }
 /*
  * --INFO--
@@ -1251,5 +1251,5 @@ inline void MusicPause(int musicId, int pause)
 			}
 		}
 		music++;
-	} while (music < p_SoundControlBuffer + REDSOUND_CONTROL_MUSIC_ALL_END);
+	} while (music < RedSoundControlGetMusicAllEnd());
 }

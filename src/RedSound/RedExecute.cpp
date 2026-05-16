@@ -2044,14 +2044,14 @@ static void _KeyOnControl()
     voiceStartMask[REDSOUND_VOICE_START_MASK_LOW] = 0;
 
     if (keyOnEntry != 0) {
-        reserve = RedKeyOnGetFixedBegin(p_KeyOnData);
+        reserve = RedKeyOnGetFixedBegin(RedKeyOnDataGet());
         voiceData = RedVoiceDataGetBegin();
         do {
             if ((reserve->m_track != 0) && (reserve->m_track->m_waveData != 0)) {
                 voiceData = _VoiceDataSelect(reserve->m_track, &reserve->m_note, voiceStartMask);
             }
             reserve++;
-        } while ((voiceData != 0) && (reserve < RedKeyOnGetEnd(p_KeyOnData)));
+        } while ((voiceData != 0) && (reserve < RedKeyOnGetEnd(RedKeyOnDataGet())));
     }
 
     soundControl = RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY);
@@ -2615,7 +2615,7 @@ static void _MusicNoteExecute()
     u32 trackCount;
     RedTrackDATA* track;
     RedSavedTrackDATA* savedTrackData;
-    int status = _MusicMidiNoteExecute(p_SoundControl, p_KeyOnData, 1);
+    int status = _MusicMidiNoteExecute(p_SoundControl, RedKeyOnDataGet(), 1);
 
     while ((status == 0) && (m_MusicPhraseStop == REDSOUND_MUSIC_PHRASE_STOP_OFF) &&
            ((p_SoundControl->m_flags & REDSOUND_CONTROL_FLAG_WHOLE_LOOP_ACTIVE) != 0)) {
@@ -2636,7 +2636,7 @@ static void _MusicNoteExecute()
             i++;
         } while (--trackCount != 0);
 
-        status = _MusicMidiNoteExecute(p_SoundControl, p_KeyOnData, 1);
+        status = _MusicMidiNoteExecute(p_SoundControl, RedKeyOnDataGet(), 1);
     }
 
     if ((RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY)->m_musicId < REDSOUND_MUSIC_ID_MIN) &&
@@ -2716,7 +2716,7 @@ static void _SkipMusicEntry()
 
     if (RedSoundControlGet(REDSOUND_CONTROL_MUSIC_SKIP)->m_musicId >= REDSOUND_MUSIC_ID_MIN) {
         src = RedKeyOnGetFixedBegin(p_SkipKeyOn);
-        dst = RedKeyOnGetFixedBegin(p_KeyOnData);
+        dst = RedKeyOnGetFixedBegin(RedKeyOnDataGet());
         do {
             if ((src->m_track != REDSOUND_TRACK_NONE) && (dst->m_track == REDSOUND_TRACK_NONE)) {
                 dst->m_track = src->m_track;
@@ -2729,14 +2729,14 @@ static void _SkipMusicEntry()
         } while (src < RedKeyOnGetPriorityBegin(p_SkipKeyOn));
 
         src = RedKeyOnGetPriorityBegin(p_SkipKeyOn);
-        dst = RedKeyOnGetPriorityBegin(p_KeyOnData);
-        while (dst < RedKeyOnGetNormalBegin(p_KeyOnData)) {
+        dst = RedKeyOnGetPriorityBegin(RedKeyOnDataGet());
+        while (dst < RedKeyOnGetNormalBegin(RedKeyOnDataGet())) {
             if (dst->m_track == REDSOUND_TRACK_NONE) {
                 break;
             }
             dst++;
         }
-        while ((dst < RedKeyOnGetNormalBegin(p_KeyOnData)) &&
+        while ((dst < RedKeyOnGetNormalBegin(RedKeyOnDataGet())) &&
                (src < RedKeyOnGetNormalBegin(p_SkipKeyOn))) {
             if (src->m_track != REDSOUND_TRACK_NONE) {
                 dst->m_track = src->m_track;
@@ -2749,14 +2749,14 @@ static void _SkipMusicEntry()
         }
 
         src = RedKeyOnGetNormalBegin(p_SkipKeyOn);
-        dst = RedKeyOnGetNormalBegin(p_KeyOnData);
-        while (dst < RedKeyOnGetEnd(p_KeyOnData)) {
+        dst = RedKeyOnGetNormalBegin(RedKeyOnDataGet());
+        while (dst < RedKeyOnGetEnd(RedKeyOnDataGet())) {
             if (dst->m_track == REDSOUND_TRACK_NONE) {
                 break;
             }
             dst++;
         }
-        while ((dst < RedKeyOnGetEnd(p_KeyOnData)) &&
+        while ((dst < RedKeyOnGetEnd(RedKeyOnDataGet())) &&
                (src < RedKeyOnGetEnd(p_SkipKeyOn))) {
             if (src->m_track != REDSOUND_TRACK_NONE) {
                 dst->m_track = src->m_track;
@@ -3143,10 +3143,10 @@ void MainControl(int frames)
 
     _KeyOnControl();
     m_KeyOnEntry = 0;
-    memset(p_KeyOnData, 0, REDSOUND_KEY_ON_BUFFER_SIZE);
+    memset(RedKeyOnDataGet(), 0, REDSOUND_KEY_ON_BUFFER_SIZE);
 
     p_SoundControl = RedSoundControlGet(REDSOUND_CONTROL_SE);
-    _SeMidiNoteExecute(p_SoundControl, p_KeyOnData,
+    _SeMidiNoteExecute(p_SoundControl, RedKeyOnDataGet(),
                        p_SoundControl->m_tracks, p_SoundControl->m_skipFrames, frames);
     p_SoundControl = RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY);
 

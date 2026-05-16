@@ -241,6 +241,7 @@ extern RedSoundCONTROL* volatile p_SoundControlBuffer;
 extern RedSoundCONTROL* volatile p_SoundControl;
 extern volatile int m_KeyOnEntry;
 extern RedKeyOnDATA* volatile p_KeyOnData;
+#define RedKeyOnDataGet() (p_KeyOnData)
 extern int m_SoundPlayMode;
 extern int m_SoundMasterControl;
 extern volatile int m_ReportPrint;

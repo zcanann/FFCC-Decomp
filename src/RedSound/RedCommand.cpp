@@ -231,7 +231,7 @@ int SeStopID(int seId)
 		    ((seId == REDSOUND_SE_ID_ALL) || (track->m_seId == seId))) {
 			int trackNo;
 
-			KeyOnReserveClear(p_KeyOnData, track);
+			KeyOnReserveClear(RedKeyOnDataGet(), track);
 			track->m_seId = REDSOUND_SE_ID_NONE;
 			track->m_flags = REDSOUND_TRACK_FLAGS_NONE;
 			track->m_command = REDSOUND_TRACK_COMMAND_NONE;
@@ -279,7 +279,7 @@ int SeStopMG(int bank, int sep, int group, int kind)
 			if ((bank != id) && (sep != id) && (group != id) && (kind != id)) {
 				int trackNo;
 
-				KeyOnReserveClear(p_KeyOnData, track);
+				KeyOnReserveClear(RedKeyOnDataGet(), track);
 				track->m_seId = REDSOUND_SE_ID_NONE;
 				track->m_flags = REDSOUND_TRACK_FLAGS_NONE;
 				track->m_command = REDSOUND_TRACK_COMMAND_NONE;
@@ -557,7 +557,7 @@ int MusicStop(int musicId)
 				RedTrackDATA* track = music->m_tracks;
 				do {
 					if (track->m_command != REDSOUND_TRACK_COMMAND_NONE) {
-						KeyOnReserveClear(p_KeyOnData, track);
+						KeyOnReserveClear(RedKeyOnDataGet(), track);
 						track->m_command = REDSOUND_TRACK_COMMAND_NONE;
 					}
 					track++;
@@ -676,7 +676,7 @@ static void _EraseAttribute(int eraseTrack, int attrMask)
 		    ((((unsigned int)track->m_attrMask) & (unsigned int)attrMask) != 0)) {
 			int trackNo;
 
-			KeyOnReserveClear(p_KeyOnData, track);
+			KeyOnReserveClear(RedKeyOnDataGet(), track);
 			track->m_seId = REDSOUND_SE_ID_NONE;
 			track->m_flags = REDSOUND_TRACK_FLAGS_NONE;
 			track->m_command = REDSOUND_TRACK_COMMAND_NONE;
@@ -745,7 +745,7 @@ static int _EraseTime(int eraseTrack)
 		if ((track->m_command != REDSOUND_TRACK_COMMAND_NONE) && (track->m_attrMask == REDSOUND_TRACK_ATTR_NONE) &&
 		    (track->m_eraseTrack <= eraseTrack) &&
 		    (track->m_playTime == minEraseTrack)) {
-			KeyOnReserveClear(p_KeyOnData, track);
+			KeyOnReserveClear(RedKeyOnDataGet(), track);
 			track->m_seId = REDSOUND_SE_ID_NONE;
 			track->m_flags = REDSOUND_TRACK_FLAGS_NONE;
 			track->m_command = REDSOUND_TRACK_COMMAND_NONE;
@@ -794,7 +794,7 @@ inline int SeStopG(int group)
 		    (track->m_seSepId / REDSOUND_SE_MG_ID_DIVISOR == group)) {
 			int trackNo;
 
-			KeyOnReserveClear(p_KeyOnData, track);
+			KeyOnReserveClear(RedKeyOnDataGet(), track);
 			track->m_seId = REDSOUND_SE_ID_NONE;
 			track->m_flags = REDSOUND_TRACK_FLAGS_NONE;
 			track->m_command = REDSOUND_TRACK_COMMAND_NONE;

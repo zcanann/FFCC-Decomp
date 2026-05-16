@@ -1061,7 +1061,7 @@ static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* wav
 		track->m_seSepId = REDSOUND_TRACK_SESEP_ID_NONE;
 		signed char* keySignatureData;
 		if (m_MusicKeySignature != 0) {
-			keySignatureData = t_KeySignatureData + REDSOUND_KEY_SIGNATURE_DEFAULT_DATA_OFFSET;
+			keySignatureData = RedKeySignatureGetDefaultData();
 		} else {
 			keySignatureData = 0;
 		}
@@ -1117,7 +1117,7 @@ static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* wav
 	music->m_skipFrames = REDSOUND_CONTROL_INITIAL_SKIP_FRAMES;
 	music->m_channelAlloc = REDSOUND_CONTROL_CHANNEL_ALLOC_NONE;
 	music->m_keySignature = REDSOUND_CONTROL_KEY_SIGNATURE_NONE;
-	music->m_keySignatureData = t_KeySignatureData + REDSOUND_KEY_SIGNATURE_DEFAULT_DATA_OFFSET;
+	music->m_keySignatureData = RedKeySignatureGetDefaultData();
 	music->m_trackCount = musicHead->m_trackCount;
 	music->m_activeTrackCount = (short)musicHead->m_trackCount;
 	music->m_volumeScale = (unsigned char)(musicHead->m_flags & REDSOUND_MUSIC_HEADER_VOLUME_SCALE_MASK);

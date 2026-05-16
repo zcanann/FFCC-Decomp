@@ -1296,7 +1296,7 @@ void CMenuPcs::drawSingleMenu()
                     if (i == 0) {
                         float alpha = entry->alpha;
                         DrawInit__8CMenuPcsFv(this);
-                        GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_SET);
+                        _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
                         SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(&MenuPcs, 0);
 
                         _GXColor color = {0xFF, 0xFF, 0xFF, static_cast<u8>(FLOAT_80332940 * alpha)};
@@ -1324,7 +1324,7 @@ void CMenuPcs::drawSingleMenu()
                     } else if (i == 1) {
                         float alpha = entry->alpha;
                         DrawInit__8CMenuPcsFv(this);
-                        GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_SET);
+                        _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
                         SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(&MenuPcs, 0);
 
                         _GXColor color = {0xFF, 0xFF, 0xFF, 0xFF};
@@ -1353,7 +1353,7 @@ void CMenuPcs::drawSingleMenu()
                     if (i == 0) {
                         float alpha = entry->alpha;
                         DrawInit__8CMenuPcsFv(this);
-                        GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_SET);
+                        _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
                         SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(&MenuPcs, 0);
 
                         _GXColor color = {0xFF, 0xFF, 0xFF, static_cast<u8>(FLOAT_80332940 * alpha)};
@@ -1381,7 +1381,7 @@ void CMenuPcs::drawSingleMenu()
                     } else if (i == 1) {
                         float alpha = entry->alpha;
                         DrawInit__8CMenuPcsFv(this);
-                        GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_SET);
+                        _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
                         SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(&MenuPcs, 0);
 
                         _GXColor color = {0xFF, 0xFF, 0xFF, 0xFF};
@@ -1584,7 +1584,7 @@ void CMenuPcs::SingCalcChara(float frameStep)
 void CMenuPcs::DrawSingleBase(float alpha)
 {
     DrawInit__8CMenuPcsFv(this);
-    GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_SET);
+    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
     SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(&MenuPcs, 0);
 
     _GXColor color = {0xFF, 0xFF, 0xFF, static_cast<u8>(FLOAT_80332940 * alpha)};
@@ -1625,7 +1625,7 @@ void CMenuPcs::DrawSingleStat(float alpha)
     u8 languageId = Game.m_gameWork.m_languageId;
 
     DrawInit__8CMenuPcsFv(this);
-    GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_SET);
+    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
     SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
 
     _GXColor color = {0xFF, 0xFF, 0xFF, static_cast<u8>(FLOAT_80332940 * alpha)};
@@ -1672,7 +1672,7 @@ void CMenuPcs::DrawSingleStat(float alpha)
     RestoreProjection__8CMenuPcsFv(this);
 
     DrawInit__8CMenuPcsFv(this);
-    GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_SET);
+    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
     SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
     color.a = static_cast<u8>(FLOAT_80332940 * alpha);
     GXSetChanMatColor(GX_COLOR0A0, color);
@@ -1783,7 +1783,7 @@ void CMenuPcs::DrawSingleStat(float alpha)
 void CMenuPcs::DrawSingleHelpWim(float alpha)
 {
     DrawInit__8CMenuPcsFv(this);
-    GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_SET);
+    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
     SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
 
     int alphaInt = static_cast<int>(FLOAT_80332940 * alpha);
@@ -2187,7 +2187,7 @@ void CMenuPcs::SingleDrawCtrl()
     u8* self = reinterpret_cast<u8*>(this);
 
     DrawInit__8CMenuPcsFv(this);
-    GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_SET);
+    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
     SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
     _GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
     GXSetChanMatColor(GX_COLOR0A0, white);
@@ -2211,7 +2211,7 @@ void CMenuPcs::SingleDrawCtrl()
 
     if (*reinterpret_cast<s16*>(self + 0x864) != 8) {
         DrawInit__8CMenuPcsFv(this);
-        GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_SET);
+        _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
         SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
         GXSetChanMatColor(GX_COLOR0A0, white);
         SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x21);
@@ -2321,7 +2321,7 @@ void CMenuPcs::SingleDrawCtrl()
  */
 void CMenuPcs::DrawSingleIcon(int iconNo, int posX, int posY, float alpha, int rawIcon, float uvScale)
 {
-    GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_SET);
+    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
     SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
 
     _GXColor color = {0xFF, 0xFF, 0xFF, static_cast<u8>(FLOAT_80332940 * alpha)};
@@ -3199,7 +3199,7 @@ void CMenuPcs::GetRaceStr(int itemNo, char* outText)
  */
 void CMenuPcs::DrawSingBar(int x, int y, int value, float alpha)
 {
-    GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_SET);
+    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
     SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
 
     unsigned char alphaU8 = static_cast<unsigned char>(FLOAT_80332940 * alpha);

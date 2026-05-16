@@ -60,6 +60,8 @@ inline void RedNoteCopy(RedNoteDATA* dst, const RedNoteDATA* src)
 	*(int*)&dst->m_key = *(int*)&src->m_key;
 }
 
+#define RedNoteGetKey(note) (*(char*)&(note)->m_key)
+
 enum RedNoteLayoutOffset {
 	REDSOUND_NOTE_KEY_OFFSET = (unsigned int)&(((RedNoteDATA*)0)->m_key),
 	REDSOUND_NOTE_VELOCITY_OFFSET = (unsigned int)&(((RedNoteDATA*)0)->m_velocity),

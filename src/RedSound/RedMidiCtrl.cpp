@@ -687,7 +687,7 @@ void KeyOffSet(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* 
 
     if ((control == p_SoundControlBuffer + REDSOUND_CONTROL_MUSIC_SKIP) || ((track->m_flags & REDSOUND_TRACK_FLAG_SLUR) == 0)) {
         track->m_sweepDelta = 0;
-        key = *(char*)&track->m_note.m_key;
+        key = RedNoteGetKey(&track->m_note);
         slot = keyOnData->m_fixed;
         do {
             if ((slot->m_track == track) && (slot->m_note.m_key == key)) {
@@ -696,7 +696,7 @@ void KeyOffSet(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* 
             slot++;
         } while (slot < keyOnData->m_normal + REDSOUND_KEY_ON_SLOT_COUNT);
 
-        key = *(char*)&track->m_note.m_key;
+        key = RedNoteGetKey(&track->m_note);
         voice = p_VoiceData;
         do {
             if ((voice->m_track == track) && (voice->m_key == key)) {

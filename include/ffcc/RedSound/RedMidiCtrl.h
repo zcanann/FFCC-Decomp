@@ -409,7 +409,10 @@ struct RedSoundCONTROL {
 };
 
 #define RedSoundControlGetTrackEnd(control) ((control)->m_tracks + (control)->m_trackCount)
-#define RedSoundControlGetSeTrackEnd(control) ((control)->m_tracks + REDSOUND_SE_TRACK_COUNT)
+#define RedSeTrackGetEnd(track) ((track) + REDSOUND_SE_TRACK_COUNT)
+#define RedSeTrackGetLast(track) ((track) + REDSOUND_SE_TRACK_LAST_INDEX)
+#define RedSoundControlGetSeTrackEnd(control) RedSeTrackGetEnd((control)->m_tracks)
+#define RedSoundControlGetSeTrackLast(control) RedSeTrackGetLast((control)->m_tracks)
 
 enum RedSoundControlFlag {
 	REDSOUND_CONTROL_FLAG_WHOLE_LOOP_ACTIVE = 1,

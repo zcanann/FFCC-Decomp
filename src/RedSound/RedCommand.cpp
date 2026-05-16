@@ -182,7 +182,7 @@ RedTrackDATA* SearchSeEmptyTrack(int trackCount, int eraseTrack, int attrMask)
 	erasedCount = 0;
 
 	do {
-		scan = *trackBasePtr + REDSOUND_SE_TRACK_LAST_INDEX;
+		scan = RedSeTrackGetLast(*trackBasePtr);
 		do {
 			track = scan;
 			remaining = trackCount - 1;
@@ -518,7 +518,7 @@ void SePause(int seId, int pause)
 		}
 		track++;
 		voice++;
-	} while (track < *trackBasePtr + REDSOUND_SE_TRACK_COUNT);
+	} while (track < RedSeTrackGetEnd(*trackBasePtr));
 }
 /*
  * --INFO--
@@ -694,7 +694,7 @@ static void _EraseAttribute(int eraseTrack, int attrMask)
 			}
 		}
 		track++;
-	} while (track < *trackBasePtr + REDSOUND_SE_TRACK_COUNT);
+	} while (track < RedSeTrackGetEnd(*trackBasePtr));
 }
 /*
  * --INFO--
@@ -719,7 +719,7 @@ static int _EraseTime(int eraseTrack)
 			minEraseTrack = track->m_eraseTrack;
 		}
 		track++;
-	} while (track < *trackBasePtr + REDSOUND_SE_TRACK_COUNT);
+	} while (track < RedSeTrackGetEnd(*trackBasePtr));
 
 	if (eraseTrack > minEraseTrack) {
 		eraseTrack = minEraseTrack;
@@ -736,7 +736,7 @@ static int _EraseTime(int eraseTrack)
 			sepId = track->m_seSepId;
 		}
 		track++;
-	} while (track < *trackBasePtr + REDSOUND_SE_TRACK_COUNT);
+	} while (track < RedSeTrackGetEnd(*trackBasePtr));
 
 	track = *trackBasePtr;
 	erasedCount = 0;
@@ -763,7 +763,7 @@ static int _EraseTime(int eraseTrack)
 			erasedCount++;
 		}
 		track++;
-	} while (track < *trackBasePtr + REDSOUND_SE_TRACK_COUNT);
+	} while (track < RedSeTrackGetEnd(*trackBasePtr));
 
 	if (erasedCount != 0) {
 		c_RedEntry.SeSepHistoryManager(REDSOUND_HISTORY_MODE_RELEASE, sepId);

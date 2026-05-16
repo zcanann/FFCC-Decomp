@@ -753,6 +753,7 @@ static OSSemaphore m_MainSemaphore;
 static OSThread m_WaveSettingThread;
 static OSSemaphore m_WaveSettingSemaphore;
 static RedWaveSettingState m_WaveSettingData;
+#define RedWaveSettingDataGet() (&m_WaveSettingData)
 static OSThread m_DmaExecuteThread;
 static OSSemaphore m_DmaExecuteSemaphore;
 static ARQRequest m_DMARequest;
@@ -3557,9 +3558,9 @@ void CRedDriver::SetWaveData(int slot, int waveID, void* waveData, int waveSize)
         RedSleep(REDSOUND_THREAD_YIELD_SLEEP_US);
     }
 
-    m_WaveSettingData.m_slot = reinterpret_cast<int*>(slot);
-    m_WaveSettingData.m_waveId = waveID;
-    m_WaveSettingData.m_waveData = waveData;
+    RedWaveSettingDataGet()->m_slot = reinterpret_cast<int*>(slot);
+    RedWaveSettingDataGet()->m_waveId = waveID;
+    RedWaveSettingDataGet()->m_waveData = waveData;
 
     if (waveSize == REDSOUND_WAVE_SIZE_AUTO) {
         RedWaveHeadWD* const waveHeader = (RedWaveHeadWD*)waveData;
@@ -3571,12 +3572,12 @@ void CRedDriver::SetWaveData(int slot, int waveID, void* waveData, int waveSize)
             dataSize += waveHeader->m_toneCount * REDSOUND_WAVE_TONE_ENTRY_SIZE;
             dataSize = waveHeader->m_waveSize + dataSize;
             dataSize += REDSOUND_WAVE_HEADER_COPY_BASE_SIZE;
-            m_WaveSettingData.m_waveSize = dataSize;
+            RedWaveSettingDataGet()->m_waveSize = dataSize;
         } else {
-            m_WaveSettingData.m_waveSize = 0;
+            RedWaveSettingDataGet()->m_waveSize = 0;
         }
     } else {
-        m_WaveSettingData.m_waveSize = waveSize;
+        RedWaveSettingDataGet()->m_waveSize = waveSize;
     }
     OSSignalSemaphore(&m_WaveSettingSemaphore);
 }

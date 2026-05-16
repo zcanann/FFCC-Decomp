@@ -84,7 +84,6 @@ enum RedStreamFrameLayoutSize {
 	REDSOUND_STREAM_STEREO_CHANNEL_FRAME_BYTES = sizeof(RedStreamChannelFrame),
 	REDSOUND_STREAM_STEREO_FRAME_SIZE = sizeof(RedStreamStereoFrame),
 	REDSOUND_STREAM_STEREO_FRAMES_PER_PAGE = REDSOUND_STREAM_PAGE_SIZE / REDSOUND_STREAM_STEREO_FRAME_SIZE,
-	REDSOUND_STREAM_LEFT_PRED_SCALE_OFFSET = REDSOUND_STREAM_PAGE_SIZE,
 	REDSOUND_STREAM_AX_CURRENT_ADDRESS_HI_SHIFT = 16,
 	REDSOUND_STREAM_LOOP_START_SAMPLE = 2,
 	REDSOUND_STREAM_LOOP_ENABLED_MIN = 0,
@@ -247,7 +246,7 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 	if ((streamData->m_track != REDSOUND_STREAM_TRACK_NONE) &&
 	    (streamData->m_buffer != REDSOUND_STREAM_BUFFER_NONE) &&
 	    (streamData->m_aramBuffer != REDSOUND_STREAM_ARAM_BUFFER_NONE)) {
-		sampleOffset = REDSOUND_STREAM_LEFT_PRED_SCALE_OFFSET;
+		sampleOffset = REDSOUND_STREAM_FILE_AUDIO_OFFSET;
 		streamFile = reinterpret_cast<RedStreamFile*>(streamHeader);
 		headerData = streamFile->m_adpcm;
 		headerData->m_data.pred_scale = (short)((s8*)streamFile)[sampleOffset];

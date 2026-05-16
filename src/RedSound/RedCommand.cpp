@@ -552,7 +552,7 @@ int MusicStop(int musicId)
 						voiceData->m_active = REDSOUND_VOICE_ACTIVE_OFF;
 					}
 					voiceData++;
-				} while (voiceData < p_VoiceData + REDSOUND_VOICE_COUNT);
+				} while (voiceData < RedVoiceDataGetEnd());
 
 				RedTrackDATA* track = music->m_tracks;
 				do {
@@ -1233,7 +1233,7 @@ inline void MusicPause(int musicId, int pause)
 							voice->m_voiceSwitch |= REDSOUND_VOICE_SWITCH_PAUSE;
 						}
 						voice++;
-					} while (voice < p_VoiceData + REDSOUND_VOICE_COUNT);
+					} while (voice < RedVoiceDataGetEnd());
 				}
 				music->m_flags |= REDSOUND_CONTROL_FLAG_PAUSE;
 			} else {
@@ -1246,7 +1246,7 @@ inline void MusicPause(int musicId, int pause)
 						voice->m_voiceSwitch &= REDSOUND_VOICE_SWITCH_CLEAR_PAUSE_MASK;
 					}
 					voice++;
-				} while (voice < p_VoiceData + REDSOUND_VOICE_COUNT);
+				} while (voice < RedVoiceDataGetEnd());
 				music->m_flags &= ~REDSOUND_CONTROL_FLAG_PAUSE;
 			}
 		}

@@ -244,6 +244,7 @@ extern volatile int m_MasterSEVolume;
 extern RedStreamDATA* volatile p_Stream;
 extern volatile int m_SeSkipStep;
 extern RedVoiceDATA* volatile p_VoiceData;
+#define RedVoiceDataGetEnd() (p_VoiceData + REDSOUND_VOICE_COUNT)
 extern int p_EditorVoice[REDSOUND_EDITOR_VOICE_COUNT];
 extern RedTrackDATA* p_EditorTrack;
 extern OSThread m_MusicSkipThread;

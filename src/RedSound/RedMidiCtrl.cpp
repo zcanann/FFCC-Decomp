@@ -704,7 +704,7 @@ void KeyOffSet(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* 
                 voice->m_flags |= REDSOUND_VOICE_FLAGS_RELEASED;
             }
             voice++;
-        } while (voice < p_VoiceData + REDSOUND_VOICE_COUNT);
+        } while (voice < RedVoiceDataGetEnd());
     }
 }
 /*
@@ -962,7 +962,7 @@ static void __MidiCtrl_Stop(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, R
             voice->m_stateFlags &= REDSOUND_VOICE_STATE_CLEAR_PLAYING_MASK;
         }
         voice++;
-    } while (voice < p_VoiceData + REDSOUND_VOICE_COUNT);
+    } while (voice < RedVoiceDataGetEnd());
 
     track->m_command = REDSOUND_TRACK_COMMAND_NONE;
     if (control < p_SoundControlBuffer + REDSOUND_CONTROL_SE) {
@@ -980,7 +980,7 @@ static void __MidiCtrl_Stop(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, R
                     voice->m_track = REDSOUND_VOICE_TRACK_NONE;
                 }
                 voice++;
-            } while (voice < p_VoiceData + REDSOUND_VOICE_COUNT);
+            } while (voice < RedVoiceDataGetEnd());
 
             c_RedEntry.MusicHistoryManager(REDSOUND_HISTORY_MODE_RELEASE, control->m_musicId);
             c_RedEntry.WaveHistoryManager(REDSOUND_HISTORY_MODE_RELEASE, control->m_waveNo);
@@ -1733,7 +1733,7 @@ static void __MidiCtrl_Sweep(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* trac
             voiceData->m_basePitch &= REDSOUND_FIXED_WHOLE_MASK;
         }
         voiceData++;
-    } while (voiceData < p_VoiceData + REDSOUND_VOICE_COUNT);
+    } while (voiceData < RedVoiceDataGetEnd());
 }
 /*
  * --INFO--
@@ -1784,7 +1784,7 @@ static void __MidiCtrl_ADSR_Default(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDAT
             voice->m_flags |= REDSOUND_VOICE_FLAGS_ADSR_DIRTY;
         }
         voice++;
-    } while (voice < p_VoiceData + REDSOUND_VOICE_COUNT);
+    } while (voice < RedVoiceDataGetEnd());
 }
 /*
  * --INFO--
@@ -1810,7 +1810,7 @@ static void __MidiCtrl_ADSR_AL(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* tr
             voice->m_flags |= REDSOUND_VOICE_FLAGS_ADSR_DIRTY;
         }
         voice++;
-    } while (voice < p_VoiceData + REDSOUND_VOICE_COUNT);
+    } while (voice < RedVoiceDataGetEnd());
 }
 /*
  * --INFO--
@@ -1836,7 +1836,7 @@ static void __MidiCtrl_ADSR_AR(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* tr
             voice->m_flags |= REDSOUND_VOICE_FLAGS_ADSR_DIRTY;
         }
         voice++;
-    } while (voice < p_VoiceData + REDSOUND_VOICE_COUNT);
+    } while (voice < RedVoiceDataGetEnd());
 }
 /*
  * --INFO--
@@ -1862,7 +1862,7 @@ static void __MidiCtrl_ADSR_DL(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* tr
             voice->m_flags |= REDSOUND_VOICE_FLAGS_ADSR_DIRTY;
         }
         voice++;
-    } while (voice < p_VoiceData + REDSOUND_VOICE_COUNT);
+    } while (voice < RedVoiceDataGetEnd());
 }
 /*
  * --INFO--
@@ -1888,7 +1888,7 @@ static void __MidiCtrl_ADSR_DR(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* tr
             voice->m_flags |= REDSOUND_VOICE_FLAGS_ADSR_DIRTY;
         }
         voice++;
-    } while (voice < p_VoiceData + REDSOUND_VOICE_COUNT);
+    } while (voice < RedVoiceDataGetEnd());
 }
 /*
  * --INFO--
@@ -1914,7 +1914,7 @@ static void __MidiCtrl_ADSR_SL(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* tr
             voice->m_flags |= REDSOUND_VOICE_FLAGS_ADSR_DIRTY;
         }
         voice++;
-    } while (voice < p_VoiceData + REDSOUND_VOICE_COUNT);
+    } while (voice < RedVoiceDataGetEnd());
 }
 /*
  * --INFO--
@@ -1940,7 +1940,7 @@ static void __MidiCtrl_ADSR_SR(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* tr
             voice->m_flags |= REDSOUND_VOICE_FLAGS_ADSR_DIRTY;
         }
         voice++;
-    } while (voice < p_VoiceData + REDSOUND_VOICE_COUNT);
+    } while (voice < RedVoiceDataGetEnd());
 }
 /*
  * --INFO--
@@ -1966,7 +1966,7 @@ static void __MidiCtrl_ADSR_RL(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* tr
             voice->m_flags |= REDSOUND_VOICE_FLAGS_ADSR_DIRTY;
         }
         voice++;
-    } while (voice < p_VoiceData + REDSOUND_VOICE_COUNT);
+    } while (voice < RedVoiceDataGetEnd());
 }
 /*
  * --INFO--
@@ -1992,7 +1992,7 @@ static void __MidiCtrl_ADSR_RR(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* tr
 			voice->m_flags |= REDSOUND_VOICE_FLAGS_ADSR_DIRTY;
 		}
 		voice++;
-	} while (voice < p_VoiceData + REDSOUND_VOICE_COUNT);
+	} while (voice < RedVoiceDataGetEnd());
 }
 /*
  * --INFO--
@@ -2015,7 +2015,7 @@ static void __MidiCtrl_SustainPedal(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDAT
                 voice->m_voiceSwitch |= REDSOUND_VOICE_SWITCH_SUSTAIN;
             }
             voice++;
-        } while (voice < p_VoiceData + REDSOUND_VOICE_COUNT);
+        } while (voice < RedVoiceDataGetEnd());
     } else {
         track->m_voiceSwitch &= ~REDSOUND_VOICE_SWITCH_SUSTAIN;
         voice = p_VoiceData;
@@ -2024,7 +2024,7 @@ static void __MidiCtrl_SustainPedal(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDAT
                 voice->m_voiceSwitch &= ~REDSOUND_VOICE_SWITCH_SUSTAIN;
             }
             voice++;
-        } while (voice < p_VoiceData + REDSOUND_VOICE_COUNT);
+        } while (voice < RedVoiceDataGetEnd());
     }
 
     track->m_command += 1;
@@ -2130,7 +2130,7 @@ static void __MidiCtrl_VibrateOn(RedSoundCONTROL* control, RedKeyOnDATA* keyOn, 
             entry->m_pitchModPhase = 0;
         }
         entry++;
-    } while (entry < p_VoiceData + REDSOUND_VOICE_COUNT);
+    } while (entry < RedVoiceDataGetEnd());
 }
 /*
  * --INFO--
@@ -2311,7 +2311,7 @@ static void __MidiCtrl_TremoloOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* 
 			voice->m_volumeModPhase = 0;
 		}
 		voice++;
-	} while (voice < p_VoiceData + REDSOUND_VOICE_COUNT);
+	} while (voice < RedVoiceDataGetEnd());
 }
 /*
  * --INFO--
@@ -2674,7 +2674,7 @@ static void _PitchBendCompute(RedTrackDATA* track, int bend)
             }
         }
         voiceData++;
-    } while (voiceData < p_VoiceData + REDSOUND_VOICE_COUNT);
+    } while (voiceData < RedVoiceDataGetEnd());
 }
 /*
  * --INFO--

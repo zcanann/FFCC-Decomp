@@ -431,7 +431,7 @@ int CRedEntry::SearchUseWave(int waveNo)
 			MusicStop(control->m_musicId);
 		}
 		control--;
-	} while ((u32)control >= (u32)p_SoundControlBuffer);
+	} while ((u32)control >= (u32)RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY));
 
 	control = RedSoundControlGet(REDSOUND_CONTROL_SE);
 	RedTrackDATA* track = control->m_tracks;

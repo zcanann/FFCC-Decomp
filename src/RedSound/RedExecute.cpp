@@ -2049,7 +2049,7 @@ static void _KeyOnControl()
                 voiceData = _VoiceDataSelect(reserve->m_track, &reserve->m_note, voiceStartMask);
             }
             reserve++;
-        } while ((voiceData != 0) && (reserve < p_KeyOnData->m_normal + REDSOUND_KEY_ON_SLOT_COUNT));
+        } while ((voiceData != 0) && (reserve < RedKeyOnGetEnd(p_KeyOnData)));
     }
 
     soundControl = p_SoundControlBuffer;
@@ -2747,14 +2747,14 @@ static void _SkipMusicEntry()
 
         src = p_SkipKeyOn->m_normal;
         dst = p_KeyOnData->m_normal;
-        while (dst < p_KeyOnData->m_normal + REDSOUND_KEY_ON_SLOT_COUNT) {
+        while (dst < RedKeyOnGetEnd(p_KeyOnData)) {
             if (dst->m_track == REDSOUND_TRACK_NONE) {
                 break;
             }
             dst++;
         }
-        while ((dst < p_KeyOnData->m_normal + REDSOUND_KEY_ON_SLOT_COUNT) &&
-               (src < p_SkipKeyOn->m_normal + REDSOUND_KEY_ON_SLOT_COUNT)) {
+        while ((dst < RedKeyOnGetEnd(p_KeyOnData)) &&
+               (src < RedKeyOnGetEnd(p_SkipKeyOn))) {
             if (src->m_track != REDSOUND_TRACK_NONE) {
                 dst->m_track = src->m_track;
                 *(int*)&dst->m_note = *(int*)&src->m_note;

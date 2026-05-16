@@ -327,21 +327,21 @@ void CRedEntry::Init()
 	memset(m_waveBankBase, 0, REDSOUND_WAVE_BANK_SIZE);
 	bankIndex = 0;
 	do {
-		m_waveBankBase[bankIndex].m_id = REDSOUND_HISTORY_BANK_EMPTY_ID;
+		RedEntryWaveBankGet(this, bankIndex)->m_id = REDSOUND_HISTORY_BANK_EMPTY_ID;
 		bankIndex = bankIndex + 1;
 	} while (bankIndex < REDSOUND_WAVE_BANK_ENTRY_COUNT);
 
 	memset(m_seSepBankBase, 0, REDSOUND_SESEP_BANK_SIZE);
 	bankIndex = 0;
 	do {
-		m_seSepBankBase[bankIndex].m_id = REDSOUND_HISTORY_BANK_EMPTY_ID;
+		RedEntrySeSepBankGet(this, bankIndex)->m_id = REDSOUND_HISTORY_BANK_EMPTY_ID;
 		bankIndex = bankIndex + 1;
 	} while (bankIndex < REDSOUND_SESEP_BANK_ENTRY_COUNT);
 
 	memset(m_musicBankBase, 0, REDSOUND_MUSIC_BANK_SIZE);
 	bankIndex = 0;
 	do {
-		m_musicBankBase[bankIndex].m_id = REDSOUND_HISTORY_BANK_EMPTY_ID;
+		RedEntryMusicBankGet(this, bankIndex)->m_id = REDSOUND_HISTORY_BANK_EMPTY_ID;
 		bankIndex = bankIndex + 1;
 	} while (bankIndex < REDSOUND_MUSIC_BANK_ENTRY_COUNT);
 

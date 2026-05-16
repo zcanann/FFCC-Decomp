@@ -531,7 +531,7 @@ void SePause(int seId, int pause)
  */
 int MusicStop(int musicId)
 {
-	RedSoundCONTROL* music = p_SoundControlBuffer;
+	RedSoundCONTROL* music = RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY);
 
 	do {
 		if ((musicId == REDSOUND_MUSIC_ID_NONE) ||
@@ -574,10 +574,11 @@ int MusicStop(int musicId)
 		music++;
 	} while (music < RedSoundControlGetMusicPlayEnd());
 
-	music = p_SoundControlBuffer;
+	music = RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY);
 	if ((music->m_musicId < REDSOUND_MUSIC_ID_MIN) &&
 	    (music[REDSOUND_CONTROL_MUSIC_SECONDARY].m_musicId >= REDSOUND_MUSIC_ID_MIN)) {
-		memcpy(p_SoundControlBuffer, RedSoundControlGet(REDSOUND_CONTROL_MUSIC_SECONDARY), REDSOUND_CONTROL_SIZE);
+		memcpy(RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY),
+		       RedSoundControlGet(REDSOUND_CONTROL_MUSIC_SECONDARY), REDSOUND_CONTROL_SIZE);
 		music[REDSOUND_CONTROL_MUSIC_SECONDARY].m_activeTrackCount = 0;
 		music[REDSOUND_CONTROL_MUSIC_SECONDARY].m_trackCount = 0;
 		music[REDSOUND_CONTROL_MUSIC_SECONDARY].m_musicId = REDSOUND_MUSIC_ID_NONE;
@@ -641,7 +642,7 @@ void SetMusicVolume(int musicId, int volume, int duration, int mode)
 		duration /= REDSOUND_FRAMES_PER_SECOND;
 	}
 
-	music = p_SoundControlBuffer;
+	music = RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY);
 	do {
 		if ((musicId == REDSOUND_MUSIC_ID_NONE) || (musicId == music->m_musicId) ||
 		    (music->m_musicId < REDSOUND_MUSIC_ID_MIN)) {
@@ -997,7 +998,7 @@ static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* wav
 	if (m_MusicSkipLine != 0) {
 		music = RedSoundControlGet(REDSOUND_CONTROL_MUSIC_SKIP);
 	} else {
-		music = p_SoundControlBuffer;
+		music = RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY);
 	}
 
 	music->m_musicId = musicId;
@@ -1214,7 +1215,7 @@ inline void MusicPause(int musicId, int pause)
 		fflush(__files + 1);
 	}
 
-	music = p_SoundControlBuffer;
+	music = RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY);
 	do {
 		if ((musicId == REDSOUND_MUSIC_ID_NONE) ||
 		    ((music->m_musicId >= REDSOUND_MUSIC_ID_MIN) && (music->m_musicId == musicId))) {

@@ -1005,12 +1005,12 @@ static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* wav
 	music->m_flags &= REDSOUND_CONTROL_FLAG_CLEAR_STOP_ON_VOLUME_ZERO_MASK;
 	music->m_updateFlags = 0;
 
-	if (m_CrossTime != 0) {
+	if (RedCrossTimeIsActive()) {
 		music->m_masterVolume = 0;
 		music->m_masterVolumeAdd = REDSOUND_MASTER_VOLUME_FULL_FIXED_HALF;
-		music->m_masterVolumeAdd = music->m_masterVolumeAdd / m_CrossTime;
-		music->m_masterVolumeDelta = m_CrossTime;
-		m_CrossTime = 0;
+		music->m_masterVolumeAdd = music->m_masterVolumeAdd / RedCrossTimeGet();
+		music->m_masterVolumeDelta = RedCrossTimeGet();
+		RedCrossTimeClear();
 	} else {
 		music->m_masterVolume = REDSOUND_MASTER_VOLUME_FULL_FIXED;
 		music->m_masterVolumeDelta = 0;

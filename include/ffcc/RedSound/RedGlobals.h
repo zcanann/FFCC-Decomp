@@ -277,6 +277,10 @@ extern RedControlRamp* volatile p_MusicPitchControl;
 #define RedMusicPitchControlGet() (p_MusicPitchControl)
 extern int m_MusicPhraseStop;
 extern int m_CrossTime;
+#define RedCrossTimeGet() (m_CrossTime)
+#define RedCrossTimeSet(time) (m_CrossTime = (time))
+#define RedCrossTimeClear() RedCrossTimeSet(0)
+#define RedCrossTimeIsActive() (RedCrossTimeGet() != 0)
 extern volatile int m_MasterMusicVolume;
 extern volatile int m_MasterSEVolume;
 extern RedStreamDATA* volatile p_Stream;

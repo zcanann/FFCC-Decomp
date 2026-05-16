@@ -1017,7 +1017,7 @@ static void _MusicCrossPlaySequence(int* command)
         RedDelete(swapControl);
     } else {
         if (c_RedEntry.SearchMusicSequence(command[REDSOUND_MUSIC_COMMAND_ID]) >= 0) {
-            m_CrossTime = command[REDSOUND_MUSIC_COMMAND_FADE_TIME];
+            RedCrossTimeSet(command[REDSOUND_MUSIC_COMMAND_FADE_TIME]);
             replayPoint = 0;
             if (control[REDSOUND_CONTROL_MUSIC_PRIMARY].m_musicId != REDSOUND_MUSIC_ID_NONE) {
                 if (control[REDSOUND_CONTROL_MUSIC_SECONDARY].m_musicId != REDSOUND_MUSIC_ID_NONE) {
@@ -2156,7 +2156,7 @@ void CRedDriver::Init()
     RedMusicSkipLineSet(0);
     RedMusicFastSpeedSet(0);
     m_DMAStatus = REDSOUND_DMA_STATUS_IDLE;
-    m_CrossTime = 0;
+    RedCrossTimeClear();
     m_MasterSEVolume = REDSOUND_MASTER_VOLUME_FULL;
     m_MasterMusicVolume = REDSOUND_MASTER_VOLUME_FULL;
     index = 0;

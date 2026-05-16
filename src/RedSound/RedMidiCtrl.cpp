@@ -803,7 +803,7 @@ static int RandomSwing(int phase)
 {
     phase >>= REDSOUND_SWING_PHASE_SHIFT;
     phase &= REDSOUND_SWING_PHASE_MASK;
-    int result = (int)t_RandomData[phase] << REDSOUND_SWING_PHASE_SHIFT;
+    int result = (int)RedRandomDataGet(phase) << REDSOUND_SWING_PHASE_SHIFT;
 
     return result;
 }
@@ -910,7 +910,7 @@ static int RandomSwingR(int phase)
     phase >>= REDSOUND_SWING_PHASE_SHIFT;
     phase &= REDSOUND_SWING_PHASE_MASK;
     phase ^= REDSOUND_SWING_RANDOM_REVERSE_PHASE;
-    int result = (int)t_RandomData[phase] << REDSOUND_SWING_PHASE_SHIFT;
+    int result = (int)RedRandomDataGet(phase) << REDSOUND_SWING_PHASE_SHIFT;
 
     return result;
 }
@@ -1301,8 +1301,8 @@ static void __MidiCtrl_KeySignature(RedSoundCONTROL* control, RedKeyOnDATA*, Red
     value = *track->m_command++;
     value &= REDSOUND_KEY_SIGNATURE_INDEX_MASK;
     control->m_keySignature = value;
-    value = t_KeySignatureIndex[value];
-    control->m_keySignatureData = value + t_KeySignatureData;
+    value = RedKeySignatureIndexGet(value);
+    control->m_keySignatureData = RedKeySignatureDataGet(value);
 
     if (m_MusicKeySignature != 0) {
         scan = control->m_tracks;

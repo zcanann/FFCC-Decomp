@@ -655,6 +655,9 @@ enum RedDriverCommandParse {
 
 // RedDriver-owned linkage (sbss/sdata tracked symbols)
 static int m_RedMasterTime;
+#define RedMasterTimeGet() (m_RedMasterTime)
+#define RedMasterTimeSet(time) (m_RedMasterTime = (time))
+#define RedMasterTimeInc() (m_RedMasterTime = m_RedMasterTime + 1)
 static volatile int m_SequencialID;
 static volatile int m_ThreadControl;
 static volatile int m_ThreadExecute;
@@ -706,6 +709,8 @@ RedTrackDATA* p_EditorTrack;
 static u8* volatile p_MainThreadStack;
 #define RedMainThreadStackGet() (p_MainThreadStack)
 static int m_MainThreadTime;
+#define RedMainThreadTimeGet() (m_MainThreadTime)
+#define RedMainThreadTimeSet(time) (m_MainThreadTime = (time))
 static u8* volatile p_WaveSettingThreadStack;
 #define RedWaveSettingThreadStackGet() (p_WaveSettingThreadStack)
 static int m_WaveSettingStatus;
@@ -1691,12 +1696,12 @@ static int _MainThread(void*)
         if (m_ThreadControl != REDSOUND_THREAD_CONTROL_STOP) {
             startTick = OSGetTick();
             control = RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY);
-            masterTime = m_RedMasterTime;
-            elapsed = (unsigned int)(masterTime - m_MainThreadTime);
+            masterTime = RedMasterTimeGet();
+            elapsed = (unsigned int)(masterTime - RedMainThreadTimeGet());
             if (control->m_activeTrackCount != 0) {
                 control->m_elapsedTime += elapsed;
             }
-            m_MainThreadTime = masterTime;
+            RedMainThreadTimeSet(masterTime);
             if (4 < elapsed) {
                 elapsed = 4;
             }
@@ -2095,7 +2100,7 @@ static int _MusicSkipThread(void*)
  */
 static void _RedAXCallback()
 {
-    m_RedMasterTime = m_RedMasterTime + 1;
+    RedMasterTimeInc();
     EnvelopeKeyExecute();
     OSSignalSemaphore(&m_MainSemaphore);
 }
@@ -2250,7 +2255,7 @@ void CRedDriver::Init()
     p_DmaControlOld[REDSOUND_DMA_MAIN_QUEUE_INDEX] = dmaControl;
     p_DmaControlNow[REDSOUND_DMA_STREAM_QUEUE_INDEX] = dmaControl + REDSOUND_DMA_QUEUE_ENTRY_COUNT;
     p_DmaControlOld[REDSOUND_DMA_STREAM_QUEUE_INDEX] = dmaControl + REDSOUND_DMA_QUEUE_ENTRY_COUNT;
-    m_RedMasterTime = 0;
+    RedMasterTimeSet(0);
     AXRegisterCallback(_RedAXCallback);
     AXFXSetHooks(ReverbAreaAlloc, ReverbAreaFree);
     InitReverb();
@@ -2273,7 +2278,7 @@ void CRedDriver::Init()
                    REDSOUND_WORKER_THREAD_PRIORITY, REDSOUND_THREAD_DETACHED);
     OSResumeThread(&sync.m_musicThread);
     OSInitSemaphore(&sync.m_mainSemaphore, 0);
-    m_MainThreadTime = 0;
+    RedMainThreadTimeSet(0);
     p_MainThreadStack = (u8*)RedNew(REDSOUND_THREAD_STACK_SIZE);
     OSCreateThread(&sync.m_mainThread, (void* (*)(void*))_MainThread, 0,
                    RedMainThreadStackGet() + REDSOUND_THREAD_STACK_SIZE, REDSOUND_THREAD_STACK_SIZE,
@@ -2339,7 +2344,7 @@ int CRedDriver::GetProgramTime()
  */
 inline int CRedDriver::GetMasterTime()
 {
-    return m_RedMasterTime;
+    return RedMasterTimeGet();
 }
 
 /*

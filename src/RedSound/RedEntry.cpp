@@ -1023,7 +1023,7 @@ void CRedEntry::SeSepHistoryAdd()
 			history->m_historyNo = history->m_historyNo + 1;
 		}
 		history += 1;
-	} while (history < m_seSepBankBase + REDSOUND_SESEP_BANK_ENTRY_COUNT);
+	} while (history < RedEntrySeSepBankGetEnd(this));
 }
 /*
  * --INFO--
@@ -1043,7 +1043,7 @@ void CRedEntry::SeSepHistoryDelete(int historyNo)
 				history->m_historyNo = history->m_historyNo - 1;
 			}
 			history += 1;
-		} while (history < m_seSepBankBase + REDSOUND_SESEP_BANK_ENTRY_COUNT);
+		} while (history < RedEntrySeSepBankGetEnd(this));
 	}
 }
 /*
@@ -1065,14 +1065,14 @@ int CRedEntry::SearchSeSepSequence(int seNo)
 				return seSepBank - m_seSepBankBase;
 			}
 			seSepBank += 1;
-		} while (seSepBank < m_seSepBankBase + REDSOUND_SESEP_BANK_ENTRY_COUNT);
+		} while (seSepBank < RedEntrySeSepBankGetEnd(this));
 	} else {
 		do {
 			if ((seSepBank->m_size != REDSOUND_HISTORY_BANK_EMPTY_SIZE) && (seSepBank->m_id == seNo)) {
 				return seSepBank - m_seSepBankBase;
 			}
 			seSepBank += 1;
-		} while (seSepBank < m_seSepBankBase + REDSOUND_SESEP_BANK_ENTRY_COUNT);
+		} while (seSepBank < RedEntrySeSepBankGetEnd(this));
 	}
 
 	return REDSOUND_HISTORY_BANK_NOT_FOUND;
@@ -1098,7 +1098,7 @@ RedHistoryBANK* CRedEntry::SeSepOldDelete()
 			selected = history;
 		}
 		history++;
-	} while (history < m_seSepBankBase + REDSOUND_SESEP_BANK_ENTRY_COUNT);
+	} while (history < RedEntrySeSepBankGetEnd(this));
 
 	if (selected != 0) {
 		SeSepMemoryFree(selected);
@@ -1319,7 +1319,7 @@ void CRedEntry::MusicHistoryAdd()
 			history->m_historyNo = history->m_historyNo + 1;
 		}
 		history += 1;
-	} while (history < m_musicBankBase + REDSOUND_MUSIC_BANK_ENTRY_COUNT);
+	} while (history < RedEntryMusicBankGetEnd(this));
 }
 /*
  * --INFO--
@@ -1339,7 +1339,7 @@ void CRedEntry::MusicHistoryDelete(int historyNo)
 				history->m_historyNo = history->m_historyNo - 1;
 			}
 			history += 1;
-		} while (history < m_musicBankBase + REDSOUND_MUSIC_BANK_ENTRY_COUNT);
+		} while (history < RedEntryMusicBankGetEnd(this));
 	}
 }
 /*
@@ -1360,7 +1360,7 @@ int CRedEntry::SearchMusicSequence(int musicNo)
 			return musicBank - m_musicBankBase;
 		}
 		musicBank += 1;
-	} while (musicBank < m_musicBankBase + REDSOUND_MUSIC_BANK_ENTRY_COUNT);
+	} while (musicBank < RedEntryMusicBankGetEnd(this));
 
 	return REDSOUND_HISTORY_BANK_NOT_FOUND;
 }
@@ -1385,7 +1385,7 @@ int CRedEntry::MusicOldClear()
 			selected = history;
 		}
 		history += 1;
-	} while (history < m_musicBankBase + REDSOUND_MUSIC_BANK_ENTRY_COUNT);
+	} while (history < RedEntryMusicBankGetEnd(this));
 
 	if (historyNo != REDSOUND_HISTORY_UNUSED) {
 		MusicMemoryFree(selected);

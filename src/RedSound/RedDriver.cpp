@@ -2223,7 +2223,7 @@ void CRedDriver::Init()
     RedMusicNextPlayGet()->m_musicId = REDSOUND_MUSIC_ID_NONE;
     m_MusicPhraseStop = REDSOUND_MUSIC_PHRASE_STOP_OFF;
     p_Stream = (RedStreamDATA*)RedNew(REDSOUND_STREAM_BUFFER_SIZE);
-    memset(p_Stream, 0, REDSOUND_STREAM_BUFFER_SIZE);
+    memset(RedStreamDataGetBegin(), 0, REDSOUND_STREAM_BUFFER_SIZE);
     m_DMAMode = REDSOUND_DMA_MODE_NORMAL;
     dmaControl = sync.m_dmaQueue;
     memset(dmaControl, 0, REDSOUND_DMA_CONTROL_SIZE);

@@ -111,9 +111,9 @@ static inline float Crystal2SqrtPositive(float value)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCrystal2UnkC* param_3)
+void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, _pppCtrlTable* param_3)
 {
-    s32* serializedDataOffsets = param_3->m_serializedDataOffsets;
+    int* serializedDataOffsets = param_3->m_serializedDataOffsets;
     s32 dataValIndex = param_2->m_dataValIndex;
     Crystal2Work* work = (Crystal2Work*)((u8*)pppCrystal2 + serializedDataOffsets[2] + 0x80);
     pppCrystal2ColorBlock* colorBlock = (pppCrystal2ColorBlock*)((u8*)pppCrystal2 + serializedDataOffsets[1] + 0x80);
@@ -224,7 +224,7 @@ void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCr
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCrystal2UnkC* param_3)
+void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, _pppCtrlTable* param_3)
 {
     u32 x;
     u32 y;
@@ -316,7 +316,7 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCry
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDestructCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkC* param_2)
+void pppDestructCrystal2(pppCrystal2* pppCrystal2, _pppCtrlTable* param_2)
 {
     u32* puVar1;
     CMemory::CStage* stage;
@@ -348,7 +348,7 @@ void pppDestructCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkC* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkC* param_2)
+void pppConstructCrystal2(pppCrystal2* pppCrystal2, _pppCtrlTable* param_2)
 {
     s32 iVar1 = param_2->m_serializedDataOffsets[2];
     u32* data = (u32*)((char*)pppCrystal2 + iVar1 + 0x80);

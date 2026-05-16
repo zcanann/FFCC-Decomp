@@ -237,8 +237,10 @@ extern RedSeBlockHEAD* volatile p_SeBlockData[REDSOUND_SE_BLOCK_BANK_COUNT];
 #define RedSeBlockDataGet(index) (p_SeBlockData[(index)])
 extern u8* volatile p_ZeroData;
 #define RedZeroDataGet() (p_ZeroData)
+#define RedZeroDataSet(data) (p_ZeroData = (data))
 extern RedSoundCONTROL* volatile p_SoundControlBuffer;
 #define RedSoundControlGetBegin() (p_SoundControlBuffer)
+#define RedSoundControlSetBegin(control) (p_SoundControlBuffer = (control))
 #define RedSoundControlGet(index) (p_SoundControlBuffer + (index))
 #define RedSoundControlGetMusicPlayEnd() RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PLAY_END)
 #define RedSoundControlGetMusicAllEnd() RedSoundControlGet(REDSOUND_CONTROL_MUSIC_ALL_END)
@@ -251,6 +253,7 @@ extern volatile int m_KeyOnEntry;
 #define RedKeyOnEntryInc() (m_KeyOnEntry++)
 extern RedKeyOnDATA* volatile p_KeyOnData;
 #define RedKeyOnDataGet() (p_KeyOnData)
+#define RedKeyOnDataSet(data) (p_KeyOnData = (data))
 extern int m_SoundPlayMode;
 #define RedSoundPlayModeGet() (m_SoundPlayMode)
 #define RedSoundPlayModeSet(mode) (m_SoundPlayMode = (mode))
@@ -277,11 +280,14 @@ extern int m_MusicKeySignature;
 #define RedMusicKeySignatureIsEnabled() (RedMusicKeySignatureGet() != 0)
 extern int* volatile p_MusicReplayPoint;
 #define RedMusicReplayPointGetBegin() (p_MusicReplayPoint)
+#define RedMusicReplayPointSetBegin(point) (p_MusicReplayPoint = (point))
 #define RedMusicReplayPointGet(index) (p_MusicReplayPoint + (index))
 extern RedControlRamp* volatile p_MusicTempoControl;
 #define RedMusicTempoControlGet() (p_MusicTempoControl)
+#define RedMusicTempoControlSet(control) (p_MusicTempoControl = (control))
 extern RedControlRamp* volatile p_MusicPitchControl;
 #define RedMusicPitchControlGet() (p_MusicPitchControl)
+#define RedMusicPitchControlSet(control) (p_MusicPitchControl = (control))
 extern int m_MusicPhraseStop;
 #define RedMusicPhraseStopGet() (m_MusicPhraseStop)
 #define RedMusicPhraseStopSet(status) (m_MusicPhraseStop = (status))
@@ -301,6 +307,7 @@ extern volatile int m_MasterSEVolume;
 #define RedMasterSEVolumeSet(volume) (m_MasterSEVolume = (volume))
 extern RedStreamDATA* volatile p_Stream;
 #define RedStreamDataGetBegin() (p_Stream)
+#define RedStreamDataSetBegin(stream) (p_Stream = (stream))
 #define RedStreamDataGetEnd() (p_Stream + REDSOUND_STREAM_COUNT)
 extern volatile int m_SeSkipStep;
 #define RedSeSkipStepGet() (m_SeSkipStep)
@@ -308,6 +315,7 @@ extern volatile int m_SeSkipStep;
 #define RedSeSkipStepIsActive() (RedSeSkipStepGet() != 0)
 extern RedVoiceDATA* volatile p_VoiceData;
 #define RedVoiceDataGetBegin() (p_VoiceData)
+#define RedVoiceDataSetBegin(voice) (p_VoiceData = (voice))
 #define RedVoiceDataGet(index) (p_VoiceData + (index))
 #define RedVoiceDataGetEnd() (p_VoiceData + REDSOUND_VOICE_COUNT)
 #define RedVoiceDataGetIndex(voice) ((voice) - p_VoiceData)
@@ -317,6 +325,7 @@ extern int p_EditorVoice[REDSOUND_EDITOR_VOICE_COUNT];
 #define RedEditorVoiceGetEnd() (p_EditorVoice + REDSOUND_EDITOR_VOICE_COUNT)
 extern RedTrackDATA* p_EditorTrack;
 #define RedEditorTrackGet() (p_EditorTrack)
+#define RedEditorTrackSet(track) (p_EditorTrack = (track))
 extern OSThread m_MusicSkipThread;
 extern u8* volatile p_MusicSkipThreadStack;
 extern volatile int m_MusicSkipComplete;
@@ -325,8 +334,10 @@ extern volatile int m_MusicSkipComplete;
 #define RedMusicSkipIsComplete() (RedMusicSkipCompleteGet() != REDSOUND_MUSIC_SKIP_NOT_COMPLETE)
 extern RedReverbDepth* volatile p_ReverbDepth;
 #define RedReverbDepthGetBegin() (p_ReverbDepth)
+#define RedReverbDepthSetBegin(depth) (p_ReverbDepth = (depth))
 #define RedReverbDepthGet(index) (p_ReverbDepth + (index))
 extern unsigned int m_Mute[REDSOUND_MUTE_WORD_COUNT];
+#define RedMuteGetBegin() (m_Mute)
 #define RedMuteGetWord(voiceNo) (m_Mute[(voiceNo) / REDSOUND_MUTE_BITS_PER_WORD])
 #define RedMuteGetMask(voiceNo) (1U << ((voiceNo) % REDSOUND_MUTE_BITS_PER_WORD))
 extern CRedMemory c_RedMemory;

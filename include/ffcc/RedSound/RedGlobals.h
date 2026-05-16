@@ -232,6 +232,7 @@ extern volatile unsigned int m_AutoID;
 extern CRedEntry c_RedEntry;
 extern OSSemaphore m_MusicSkipSemaphore;
 extern RedSeBlockHEAD* volatile p_SeBlockData[REDSOUND_SE_BLOCK_BANK_COUNT];
+#define RedSeBlockDataGet(index) (p_SeBlockData[(index)])
 extern u8* volatile p_ZeroData;
 extern RedSoundCONTROL* volatile p_SoundControlBuffer;
 #define RedSoundControlGet(index) (p_SoundControlBuffer + (index))

@@ -1270,7 +1270,7 @@ void CRedEntry::DisplaySePlayInfo()
 					seBlockId &= REDSOUND_SE_BLOCK_ENTRY_MASK;
 					int bank = (int)seBlockId / REDSOUND_SE_BLOCK_SEQUENCE_COUNT;
 					int sequence = seBlockId & REDSOUND_SE_BLOCK_SEQUENCE_MASK;
-					RedSeBlockHEAD* seBlock = p_SeBlockData[bank];
+					RedSeBlockHEAD* seBlock = RedSeBlockDataGet(bank);
 					int* entries = seBlock->m_entries;
 					RedSeINFO* seqInfo = RedSeBlockGetInfoFromEntries(seBlock, entries, sequence);
 					waveNo = RedSeInfoGetWaveNo(seqInfo);
@@ -1638,8 +1638,8 @@ void CRedEntry::DisplayMMemoryInfo()
 			if (matched == REDSOUND_ENTRY_SEARCH_NOT_FOUND) {
 				i = 0;
 				do {
-					if ((p_SeBlockData[i] != REDSOUND_SE_BLOCK_DATA_NONE) &&
-					    (bankEntry->m_address == reinterpret_cast<int>(p_SeBlockData[i]))) {
+					if ((RedSeBlockDataGet(i) != REDSOUND_SE_BLOCK_DATA_NONE) &&
+					    (bankEntry->m_address == reinterpret_cast<int>(RedSeBlockDataGet(i)))) {
 						OSReport(sRedEntryMMemorySeBlockInfoFmt, sRedEntryLogPrefix, bankEntry->m_address,
 						         bankEntry->m_size, freeSize);
 						fflush(__files + 1);

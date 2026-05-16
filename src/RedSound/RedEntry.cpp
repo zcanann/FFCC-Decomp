@@ -899,17 +899,17 @@ void CRedEntry::WaveHistoryManager(int mode, int waveNo)
 		if (used == 0) {
 			used = SearchWaveSequence(waveNo);
 			if ((used >= REDSOUND_WAVE_PRIMARY_BANK_ENTRY_COUNT) &&
-			    (m_waveBankBase[used].m_historyNo == REDSOUND_HISTORY_UNUSED)) {
+			    (RedEntryWaveBankGet(this, used)->m_historyNo == REDSOUND_HISTORY_UNUSED)) {
 				WaveHistoryAdd(REDSOUND_WAVE_RELEASE_HISTORY_NO);
-				m_waveBankBase[used].m_historyNo = REDSOUND_WAVE_RELEASE_HISTORY_NO;
+				RedEntryWaveBankGet(this, used)->m_historyNo = REDSOUND_WAVE_RELEASE_HISTORY_NO;
 			}
 		}
 	} else {
 		used = SearchWaveSequence(waveNo);
 		if ((used >= REDSOUND_WAVE_PRIMARY_BANK_ENTRY_COUNT) &&
-		    (m_waveBankBase[used].m_historyNo != REDSOUND_HISTORY_UNUSED)) {
-			WaveHistoryDelete(m_waveBankBase[used].m_historyNo);
-			m_waveBankBase[used].m_historyNo = REDSOUND_HISTORY_UNUSED;
+		    (RedEntryWaveBankGet(this, used)->m_historyNo != REDSOUND_HISTORY_UNUSED)) {
+			WaveHistoryDelete(RedEntryWaveBankGet(this, used)->m_historyNo);
+			RedEntryWaveBankGet(this, used)->m_historyNo = REDSOUND_HISTORY_UNUSED;
 		}
 	}
 }
@@ -1228,16 +1228,16 @@ void CRedEntry::SeSepHistoryManager(int mode, int seNo)
 
 		if (sequenceNo == 0) {
 			sequenceNo = SearchSeSepSequence(seNo);
-			if ((sequenceNo >= 0) && (m_seSepBankBase[sequenceNo].m_historyNo == REDSOUND_HISTORY_UNUSED)) {
+			if ((sequenceNo >= 0) && (RedEntrySeSepBankGet(this, sequenceNo)->m_historyNo == REDSOUND_HISTORY_UNUSED)) {
 				SeSepHistoryAdd();
-				m_seSepBankBase[sequenceNo].m_historyNo = REDSOUND_HISTORY_MOST_RECENT;
+				RedEntrySeSepBankGet(this, sequenceNo)->m_historyNo = REDSOUND_HISTORY_MOST_RECENT;
 			}
 		}
 	} else {
 		sequenceNo = SearchSeSepSequence(seNo);
-		if (m_seSepBankBase[sequenceNo].m_historyNo != REDSOUND_HISTORY_UNUSED) {
-			SeSepHistoryDelete(m_seSepBankBase[sequenceNo].m_historyNo);
-			m_seSepBankBase[sequenceNo].m_historyNo = REDSOUND_HISTORY_UNUSED;
+		if (RedEntrySeSepBankGet(this, sequenceNo)->m_historyNo != REDSOUND_HISTORY_UNUSED) {
+			SeSepHistoryDelete(RedEntrySeSepBankGet(this, sequenceNo)->m_historyNo);
+			RedEntrySeSepBankGet(this, sequenceNo)->m_historyNo = REDSOUND_HISTORY_UNUSED;
 		}
 	}
 }
@@ -1486,18 +1486,18 @@ void CRedEntry::MusicHistoryManager(int mode, int musicNo)
 		if (musicSeq == 0) {
 			musicSeq = SearchMusicSequence(musicNo);
 			if (musicSeq >= 0) {
-				if (m_musicBankBase[musicSeq].m_historyNo == REDSOUND_HISTORY_UNUSED) {
+				if (RedEntryMusicBankGet(this, musicSeq)->m_historyNo == REDSOUND_HISTORY_UNUSED) {
 					MusicHistoryAdd();
-					m_musicBankBase[musicSeq].m_historyNo = REDSOUND_HISTORY_MOST_RECENT;
+					RedEntryMusicBankGet(this, musicSeq)->m_historyNo = REDSOUND_HISTORY_MOST_RECENT;
 				}
 			}
 		}
 	} else {
 		musicSeq = SearchMusicSequence(musicNo);
 		if (musicSeq >= 0) {
-			if (m_musicBankBase[musicSeq].m_historyNo != REDSOUND_HISTORY_UNUSED) {
-				MusicHistoryDelete(m_musicBankBase[musicSeq].m_historyNo);
-				m_musicBankBase[musicSeq].m_historyNo = REDSOUND_HISTORY_UNUSED;
+			if (RedEntryMusicBankGet(this, musicSeq)->m_historyNo != REDSOUND_HISTORY_UNUSED) {
+				MusicHistoryDelete(RedEntryMusicBankGet(this, musicSeq)->m_historyNo);
+				RedEntryMusicBankGet(this, musicSeq)->m_historyNo = REDSOUND_HISTORY_UNUSED;
 			}
 		}
 	}
@@ -1559,7 +1559,7 @@ RedMusicHEAD* CRedEntry::SetMusicData(RedMusicHEAD* musicHead)
 	if (result >= 0) {
 		RedDelete(musicHead);
 		MusicHistoryChoice(RedEntryMusicBankGet(this, result));
-		result = m_musicBankBase[result].m_address;
+		result = RedEntryMusicBankGet(this, result)->m_address;
 	} else {
 		result = reinterpret_cast<int>(MusicHeadAdd(musicHead));
 		if (result == 0) {
@@ -1898,7 +1898,7 @@ RedSeSepHEAD* CRedEntry::SetSeSepData(RedSeSepHEAD* seSepHead)
 	if (result >= 0) {
 		RedDelete(seSepHead);
 		SeSepHistoryChoice(RedEntrySeSepBankGet(this, result));
-		result = m_seSepBankBase[result].m_address;
+		result = RedEntrySeSepBankGet(this, result)->m_address;
 	} else {
 		result = reinterpret_cast<int>(SeSepHeadAdd(seSepHead));
 		if (result == 0) {

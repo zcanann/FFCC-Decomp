@@ -2177,7 +2177,7 @@ void CRedDriver::Init()
     p_ExecCommand = (RedExecCommand*)RedNew(allocSize);
     RedExecCommandSetNow(RedExecCommandGetBegin());
     RedExecCommandSetOld(RedExecCommandGetBegin());
-    memset(p_ExecCommand, 0, allocSize);
+    memset(RedExecCommandGetBegin(), 0, allocSize);
     allocSize = REDSOUND_CONTROL_BUFFER_SIZE;
     p_SoundControlBuffer = (RedSoundCONTROL*)RedNew(allocSize);
     RedCurrentSoundControlSet(RedSoundControlGetBegin());

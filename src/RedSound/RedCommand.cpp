@@ -890,14 +890,14 @@ static int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volum
 			track->m_command = current;
 			current = RedSeInfoCommandGetNext(current, seq);
 			track->m_deltaTime = (int)DeltaTimeSumup((unsigned char**)&track->m_command) + 1;
-			if (m_SeSkipStep != 0) {
-				track->m_deltaTime = track->m_deltaTime - m_SeSkipStep;
+			if (RedSeSkipStepIsActive()) {
+				track->m_deltaTime = track->m_deltaTime - RedSeSkipStepGet();
 			}
 
 			track->m_seSepId = sepId;
 			track->m_seId = seId;
 			track->m_loopStepCurrent = 0;
-			if (m_SeSkipStep != 0) {
+			if (RedSeSkipStepIsActive()) {
 				state = 0;
 			} else {
 				state = REDSOUND_TRACK_PLAY_TIME_SENTINEL;

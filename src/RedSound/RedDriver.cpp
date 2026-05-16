@@ -1294,7 +1294,7 @@ static void _SeStopMG(int* command)
  */
 static void _SeBlockPlay(int* command)
 {
-    m_SeSkipStep = command[REDSOUND_SE_BLOCK_COMMAND_PITCH];
+    RedSeSkipStepSet(command[REDSOUND_SE_BLOCK_COMMAND_PITCH]);
     SeBlockPlay(command[REDSOUND_SE_COMMAND_ID], command[REDSOUND_SE_BLOCK_COMMAND_BANK],
                 command[REDSOUND_SE_BLOCK_COMMAND_NO], command[REDSOUND_SE_BLOCK_COMMAND_PAN],
                 command[REDSOUND_SE_BLOCK_COMMAND_VOLUME]);
@@ -1315,7 +1315,7 @@ static void _SeSepPlay(int* command)
 
     seSepHead = c_RedEntry.SetSeSepData((RedSeSepHEAD*)command[REDSOUND_SE_SEP_COMMAND_DATA]);
     if (seSepHead != 0) {
-        m_SeSkipStep = command[REDSOUND_SE_SEP_COMMAND_PITCH];
+        RedSeSkipStepSet(command[REDSOUND_SE_SEP_COMMAND_PITCH]);
         int seID = command[REDSOUND_SE_COMMAND_ID];
         SeSepPlay(seID, seSepHead->m_seNo, command[REDSOUND_SE_SEP_COMMAND_PAN],
                   command[REDSOUND_SE_SEP_COMMAND_VOLUME]);
@@ -1334,7 +1334,7 @@ static void _SeSepPlay(int* command)
 static void _SeSepPlaySequence(int* command)
 {
     if (c_RedEntry.SearchSeSepSequence(command[REDSOUND_SE_SEP_COMMAND_ID]) >= 0) {
-        m_SeSkipStep = command[REDSOUND_SE_SEP_COMMAND_PITCH];
+        RedSeSkipStepSet(command[REDSOUND_SE_SEP_COMMAND_PITCH]);
         SeSepPlay(command[REDSOUND_SE_COMMAND_ID], command[REDSOUND_SE_SEP_COMMAND_ID],
                   command[REDSOUND_SE_SEP_COMMAND_PAN], command[REDSOUND_SE_SEP_COMMAND_VOLUME]);
     }

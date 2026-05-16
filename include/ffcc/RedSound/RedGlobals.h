@@ -292,6 +292,9 @@ extern RedStreamDATA* volatile p_Stream;
 #define RedStreamDataGetBegin() (p_Stream)
 #define RedStreamDataGetEnd() (p_Stream + REDSOUND_STREAM_COUNT)
 extern volatile int m_SeSkipStep;
+#define RedSeSkipStepGet() (m_SeSkipStep)
+#define RedSeSkipStepSet(step) (m_SeSkipStep = (step))
+#define RedSeSkipStepIsActive() (RedSeSkipStepGet() != 0)
 extern RedVoiceDATA* volatile p_VoiceData;
 #define RedVoiceDataGetBegin() (p_VoiceData)
 #define RedVoiceDataGet(index) (p_VoiceData + (index))

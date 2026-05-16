@@ -2639,9 +2639,9 @@ static void _MusicNoteExecute()
         status = _MusicMidiNoteExecute(p_SoundControl, p_KeyOnData, 1);
     }
 
-    if ((p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_PRIMARY].m_musicId < REDSOUND_MUSIC_ID_MIN) &&
-        (p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY].m_musicId < REDSOUND_MUSIC_ID_MIN) &&
-        (p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SKIP].m_musicId < REDSOUND_MUSIC_ID_MIN)) {
+    if ((RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY)->m_musicId < REDSOUND_MUSIC_ID_MIN) &&
+        (RedSoundControlGet(REDSOUND_CONTROL_MUSIC_SECONDARY)->m_musicId < REDSOUND_MUSIC_ID_MIN) &&
+        (RedSoundControlGet(REDSOUND_CONTROL_MUSIC_SKIP)->m_musicId < REDSOUND_MUSIC_ID_MIN)) {
         m_MusicPhraseStop = REDSOUND_MUSIC_PHRASE_STOP_OFF;
     }
 }
@@ -2714,7 +2714,7 @@ static void _SkipMusicEntry()
     RedControlRamp volume;
     int keyOnEntryCount = 0;
 
-    if (p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SKIP].m_musicId >= REDSOUND_MUSIC_ID_MIN) {
+    if (RedSoundControlGet(REDSOUND_CONTROL_MUSIC_SKIP)->m_musicId >= REDSOUND_MUSIC_ID_MIN) {
         src = p_SkipKeyOn->m_fixed;
         dst = p_KeyOnData->m_fixed;
         do {
@@ -3171,7 +3171,7 @@ void MainControl(int frames)
         }
     }
 
-    if (p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY].m_activeTrackCount != 0) {
+    if (RedSoundControlGet(REDSOUND_CONTROL_MUSIC_SECONDARY)->m_activeTrackCount != 0) {
         p_SoundControl = RedSoundControlGet(REDSOUND_CONTROL_MUSIC_SECONDARY);
         step = p_SoundControl->m_tempo >> REDSOUND_FIXED_SHIFT;
         p_SoundControl->m_tickCounter -= step * frames;
@@ -3179,7 +3179,7 @@ void MainControl(int frames)
             p_SoundControl->m_tickCounter += REDSOUND_CONTROL_TICK_PERIOD;
             _MusicNoteExecute();
         }
-        if (p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_PRIMARY].m_activeTrackCount == 0) {
+        if (RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY)->m_activeTrackCount == 0) {
             memcpy(p_SoundControlBuffer, RedSoundControlGet(REDSOUND_CONTROL_MUSIC_SECONDARY),
                    REDSOUND_CONTROL_SIZE);
             p_SoundControl->m_activeTrackCount = 0;

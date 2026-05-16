@@ -28,10 +28,10 @@ struct RedWaveSettingState {
 };
 
 enum RedWaveSettingLayoutOffset {
-    REDSOUND_WAVE_SETTING_SLOT_OFFSET = 0,
-    REDSOUND_WAVE_SETTING_WAVE_ID_OFFSET = REDSOUND_WAVE_SETTING_SLOT_OFFSET + sizeof(int*),
-    REDSOUND_WAVE_SETTING_WAVE_DATA_OFFSET = REDSOUND_WAVE_SETTING_WAVE_ID_OFFSET + sizeof(int),
-    REDSOUND_WAVE_SETTING_WAVE_SIZE_OFFSET = REDSOUND_WAVE_SETTING_WAVE_DATA_OFFSET + sizeof(void*),
+    REDSOUND_WAVE_SETTING_SLOT_OFFSET = (unsigned int)&(((RedWaveSettingState*)0)->m_slot),
+    REDSOUND_WAVE_SETTING_WAVE_ID_OFFSET = (unsigned int)&(((RedWaveSettingState*)0)->m_waveId),
+    REDSOUND_WAVE_SETTING_WAVE_DATA_OFFSET = (unsigned int)&(((RedWaveSettingState*)0)->m_waveData),
+    REDSOUND_WAVE_SETTING_WAVE_SIZE_OFFSET = (unsigned int)&(((RedWaveSettingState*)0)->m_waveSize),
     REDSOUND_WAVE_SETTING_SIZE = sizeof(RedWaveSettingState),
 };
 
@@ -326,21 +326,20 @@ struct RedExecCommand {
     int m_args[REDSOUND_EXEC_COMMAND_ARG_COUNT];
 };
 
-enum RedMusicPlayCommandLayout {
-    REDSOUND_MUSIC_PLAY_COMMAND_ID_OFFSET = 0,
-    REDSOUND_MUSIC_PLAY_COMMAND_VOLUME_OFFSET = REDSOUND_MUSIC_PLAY_COMMAND_ID_OFFSET + sizeof(int),
-    REDSOUND_MUSIC_PLAY_COMMAND_MODE_OFFSET = REDSOUND_MUSIC_PLAY_COMMAND_VOLUME_OFFSET + sizeof(int),
-    REDSOUND_MUSIC_PLAY_COMMAND_RESERVED_OFFSET = REDSOUND_MUSIC_PLAY_COMMAND_MODE_OFFSET + sizeof(int),
-    REDSOUND_MUSIC_PLAY_COMMAND_SIZE = REDSOUND_MUSIC_PLAY_COMMAND_RESERVED_OFFSET + sizeof(int),
-    REDSOUND_MUSIC_PLAY_COMMAND_RESERVED_SIZE =
-        REDSOUND_MUSIC_PLAY_COMMAND_SIZE - REDSOUND_MUSIC_PLAY_COMMAND_RESERVED_OFFSET,
-};
-
 struct RedMusicPlayCommand {
     int m_musicId;
     int m_volume;
     int m_mode;
     int m_reserved;
+};
+
+enum RedMusicPlayCommandLayout {
+    REDSOUND_MUSIC_PLAY_COMMAND_ID_OFFSET = (unsigned int)&(((RedMusicPlayCommand*)0)->m_musicId),
+    REDSOUND_MUSIC_PLAY_COMMAND_VOLUME_OFFSET = (unsigned int)&(((RedMusicPlayCommand*)0)->m_volume),
+    REDSOUND_MUSIC_PLAY_COMMAND_MODE_OFFSET = (unsigned int)&(((RedMusicPlayCommand*)0)->m_mode),
+    REDSOUND_MUSIC_PLAY_COMMAND_RESERVED_OFFSET = (unsigned int)&(((RedMusicPlayCommand*)0)->m_reserved),
+    REDSOUND_MUSIC_PLAY_COMMAND_SIZE = sizeof(RedMusicPlayCommand),
+    REDSOUND_MUSIC_PLAY_COMMAND_RESERVED_SIZE = sizeof(((RedMusicPlayCommand*)0)->m_reserved),
 };
 
 enum RedMusicCommandWord {

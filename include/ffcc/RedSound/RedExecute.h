@@ -255,6 +255,10 @@ enum RedVoiceAdsrLayout {
 	REDSOUND_VOICE_ADSR_LEVEL_BASE = 9,
 	REDSOUND_VOICE_ADSR_NEXT_LEVEL_OFFSET = 1,
 	REDSOUND_VOICE_ADSR_STAGE_COUNT = 3,
+	REDSOUND_ADSR_STATE_STAGE = 0,
+	REDSOUND_ADSR_STATE_STEP_FRAMES = 1,
+	REDSOUND_ADSR_STATE_STEP_ADD = 2,
+	REDSOUND_ADSR_LEVEL_BYTE_SHIFT = 8,
 };
 
 #define RedAdsrGetStageLevel(adsrData, stage)                                                      \

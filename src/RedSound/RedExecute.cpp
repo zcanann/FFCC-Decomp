@@ -2052,7 +2052,7 @@ static void _KeyOnControl()
         } while ((voiceData != 0) && (reserve < RedKeyOnGetEnd(p_KeyOnData)));
     }
 
-    soundControl = p_SoundControlBuffer;
+    soundControl = RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY);
     if ((soundControl->m_activeTrackCount != 0) &&
         ((soundControl->m_flags & REDSOUND_CONTROL_FLAG_PAUSE) == 0)) {
         track = soundControl->m_tracks;
@@ -2110,7 +2110,7 @@ static void _KeyOnControl()
                 if ((voice->m_updateFlags & REDSOUND_VOICE_UPDATE_VOLUME) != 0 ||
                     (voice->m_track->m_tremoloFunc != 0) ||
                     (voice->m_track->m_shakeFunc != 0)) {
-                    soundControl = p_SoundControlBuffer;
+                    soundControl = RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY);
                     trackData = voice->m_track;
                     if ((soundControl->m_tracks <= trackData) &&
                         (trackData < soundControl->m_tracks + soundControl->m_trackCount)) {
@@ -2209,7 +2209,7 @@ static void _ExecuteExtraData()
     RedTrackDATA* track;
     RedTrackDATA* musicBase;
 
-    soundControl = p_SoundControlBuffer;
+    soundControl = RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY);
     do {
         if ((soundControl->m_masterVolumeDelta != 0) && (soundControl->m_tracks != 0)) {
             soundControl->m_masterVolumeDelta--;
@@ -2233,7 +2233,7 @@ static void _ExecuteExtraData()
         soundControl++;
     } while (soundControl < RedSoundControlGet(REDSOUND_CONTROL_MUSIC_SKIP));
 
-    soundControl = p_SoundControlBuffer;
+    soundControl = RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY);
 
     if (p_MusicTempoControl->m_count != 0) {
         p_MusicTempoControl->m_count--;

@@ -1720,7 +1720,7 @@ inline RedMemoryBlock* CRedSound::GetABankAddress()
  */
 inline RedSoundCONTROL* CRedSound::GetControlAddress()
 {
-	return p_SoundControlBuffer;
+	return RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY);
 }
 /*
  * --INFO--
@@ -1733,7 +1733,7 @@ inline RedSoundCONTROL* CRedSound::GetControlAddress()
  */
 inline RedVoiceDATA* CRedSound::GetVoiceAddress()
 {
-	return p_VoiceData;
+	return RedVoiceDataGetBegin();
 }
 /*
  * --INFO--

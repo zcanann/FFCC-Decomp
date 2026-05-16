@@ -3287,7 +3287,7 @@ int CRedDriver::StreamPlayState(int streamID)
 
 	interrupts = OSDisableInterrupts();
 	result = 0;
-	streamData = p_Stream;
+	streamData = RedStreamDataGetBegin();
 	do {
 		if ((streamData->m_streamId != REDSOUND_STREAM_ID_NONE) &&
 		    ((streamID == REDSOUND_STREAM_ID_ALL) || (streamData->m_streamId == streamID))) {
@@ -3338,7 +3338,7 @@ int CRedDriver::GetStreamPlayPoint(int streamID, int* playPoint, int* readPoint)
 	if (readPoint != 0) {
 		*readPoint = 0;
 	}
-	streamData = p_Stream;
+	streamData = RedStreamDataGetBegin();
 	do {
 		if ((streamData->m_streamId != REDSOUND_STREAM_ID_NONE) && (streamData->m_streamId == streamID)) {
 			if (playPoint != 0) {
@@ -3366,7 +3366,7 @@ int CRedDriver::GetStreamPlayPoint(int streamID, int* playPoint, int* readPoint)
  */
 inline RedStreamDATA* CRedDriver::GetStreamPlayBlock(int streamID)
 {
-	RedStreamDATA* streamData = p_Stream;
+	RedStreamDATA* streamData = RedStreamDataGetBegin();
 
 	do {
 		if ((streamData->m_streamId != REDSOUND_STREAM_ID_NONE) && (streamData->m_streamId == streamID)) {

@@ -159,7 +159,7 @@ static int _ArrangeStreamDataLoop(RedStreamDATA* stream, int bufferIndex, int by
  */
 void StreamStop(int streamID)
 {
-	volatile RedStreamDATA* streamData = p_Stream;
+	volatile RedStreamDATA* streamData = RedStreamDataGetBegin();
 
 	do {
 		if ((streamData->m_streamId != REDSOUND_STREAM_ID_NONE) &&
@@ -356,7 +356,7 @@ void SetStreamVolume(int streamID, int volume, int frameCount)
 		volume |= REDSOUND_FIXED_HALF;
 	}
 
-	streamData = p_Stream;
+	streamData = RedStreamDataGetBegin();
 	do {
 		if ((streamData->m_streamId != REDSOUND_STREAM_ID_NONE) &&
 		    ((streamID == REDSOUND_STREAM_ID_ALL) || (streamID == streamData->m_streamId))) {
@@ -396,7 +396,7 @@ void StreamPause(int streamID, int pause)
 		}
 		fflush(__files + 1);
 	}
-	streamData = p_Stream;
+	streamData = RedStreamDataGetBegin();
 	do {
 		if ((streamData->m_streamId != REDSOUND_STREAM_ID_NONE) &&
 		    ((streamID == REDSOUND_STREAM_ID_ALL) || (streamID == streamData->m_streamId))) {
@@ -439,7 +439,7 @@ void StreamPause(int streamID, int pause)
  */
 void StreamControl()
 {
-	RedStreamDATA* streamData = p_Stream;
+	RedStreamDATA* streamData = RedStreamDataGetBegin();
 	do {
 		RedVoiceDATA* voiceData;
 		if (streamData->m_state == REDSOUND_STREAM_STATE_PLAYING) {
@@ -542,7 +542,7 @@ void StreamControl()
  */
 static RedStreamDATA* _SearchEmptyStreamData()
 {
-	RedStreamDATA* streamData = p_Stream;
+	RedStreamDATA* streamData = RedStreamDataGetBegin();
 
 	for (;;) {
 		if (streamData->m_streamId == REDSOUND_STREAM_ID_NONE) {
@@ -819,7 +819,7 @@ void SetStreamPan(int streamID, int pan, int frameCount)
 	pan &= REDSOUND_PAN_BYTE_MASK;
 	pan <<= REDSOUND_FIXED_SHIFT;
 	pan |= REDSOUND_FIXED_HALF;
-	streamData = p_Stream;
+	streamData = RedStreamDataGetBegin();
 	do {
 		if ((streamData->m_streamId != REDSOUND_STREAM_ID_NONE) &&
 		    ((streamID == REDSOUND_STREAM_ID_ALL) || (streamID == streamData->m_streamId))) {

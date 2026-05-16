@@ -20,8 +20,8 @@ struct RedReverbModeData {
 };
 
 enum RedReverbModeLayout {
-	REDSOUND_REVERB_MODE_KIND_OFFSET = 0,
-	REDSOUND_REVERB_MODE_PARAMS_OFFSET = REDSOUND_REVERB_MODE_KIND_OFFSET + sizeof(RedReverbKind),
+	REDSOUND_REVERB_MODE_KIND_OFFSET = (unsigned int)&(((RedReverbModeData*)0)->m_kind),
+	REDSOUND_REVERB_MODE_PARAMS_OFFSET = (unsigned int)&(((RedReverbModeData*)0)->m_params),
 	REDSOUND_REVERB_MODE_PARAMS_SIZE = sizeof(((RedReverbModeData*)0)->m_params),
 	REDSOUND_REVERB_MODE_PARAMS_ALLOC_SIZE = REDSOUND_REVERB_MODE_PARAMS_SIZE,
 	REDSOUND_REVERB_MODE_SIZE = sizeof(RedReverbModeData),

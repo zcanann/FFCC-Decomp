@@ -392,16 +392,6 @@ enum RedWaveHeadLayout {
 	REDSOUND_WAVE_HEAD_OFFSETS_OFFSET = REDSOUND_WAVE_HEAD_RESERVED18_OFFSET + REDSOUND_WAVE_HEAD_RESERVED18_SIZE,
 };
 
-enum RedEntryLayout {
-	REDSOUND_ENTRY_WAVE_BANK_BASE_OFFSET = 0x00,
-	REDSOUND_ENTRY_SESEP_BANK_BASE_OFFSET = 0x04,
-	REDSOUND_ENTRY_MUSIC_BANK_BASE_OFFSET = 0x08,
-	REDSOUND_ENTRY_WAVE_LOAD_NO_OFFSET = 0x0C,
-	REDSOUND_ENTRY_WAVE_LOAD_SIZE_OFFSET = 0x10,
-	REDSOUND_ENTRY_WAVE_LOAD_ADDRESS_OFFSET = 0x14,
-	REDSOUND_ENTRY_SIZE = REDSOUND_ENTRY_WAVE_LOAD_ADDRESS_OFFSET + sizeof(int),
-};
-
 class CRedEntry
 {
 public:
@@ -465,6 +455,16 @@ public:
 	int m_waveLoadNo;
 	int m_waveLoadSize;
 	int m_waveLoadAddress;
+};
+
+enum RedEntryLayout {
+	REDSOUND_ENTRY_WAVE_BANK_BASE_OFFSET = (unsigned int)&(((CRedEntry*)0)->m_waveBankBase),
+	REDSOUND_ENTRY_SESEP_BANK_BASE_OFFSET = (unsigned int)&(((CRedEntry*)0)->m_seSepBankBase),
+	REDSOUND_ENTRY_MUSIC_BANK_BASE_OFFSET = (unsigned int)&(((CRedEntry*)0)->m_musicBankBase),
+	REDSOUND_ENTRY_WAVE_LOAD_NO_OFFSET = (unsigned int)&(((CRedEntry*)0)->m_waveLoadNo),
+	REDSOUND_ENTRY_WAVE_LOAD_SIZE_OFFSET = (unsigned int)&(((CRedEntry*)0)->m_waveLoadSize),
+	REDSOUND_ENTRY_WAVE_LOAD_ADDRESS_OFFSET = (unsigned int)&(((CRedEntry*)0)->m_waveLoadAddress),
+	REDSOUND_ENTRY_SIZE = sizeof(CRedEntry),
 };
 
 #endif // _FFCC_REDSOUND_REDENTRY_H

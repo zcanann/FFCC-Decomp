@@ -3,6 +3,7 @@
 
 struct RedMusicHEAD;
 struct RedSeSepHEAD;
+struct RedWaveDATA;
 struct RedWaveHeadWD;
 
 struct RedHistoryBANK
@@ -415,6 +416,9 @@ enum RedWaveHeadLayout {
 	 REDSOUND_WAVE_TABLE_ALIGN_MASK)
 
 #define RedWaveHeadGetToneSize(waveHead) ((waveHead)->m_toneCount * REDSOUND_WAVE_TONE_ENTRY_SIZE)
+
+#define RedWaveHeadGetWaveData(waveHead, waveIndex)                                               \
+	((RedWaveDATA*)((unsigned char*)(waveHead) + (waveHead)->m_waveOffsets[(waveIndex)]))
 
 class CRedEntry
 {

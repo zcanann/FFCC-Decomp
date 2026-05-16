@@ -3699,7 +3699,7 @@ int CRedDriver::PlayWaveItem(int waveNo, int itemNo, int key, int pan, int volum
         return 0;
     }
 
-    wave = (RedWaveDATA*)((u8*)waveHead + waveHead->m_waveOffsets[itemNo]);
+    wave = RedWaveHeadGetWaveData(waveHead, itemNo);
     p_EditorTrack->m_waveBankData = waveHead;
     p_EditorTrack->m_waveData = wave;
     p_EditorTrack->m_waveBase = waveHead->m_aramAddress;

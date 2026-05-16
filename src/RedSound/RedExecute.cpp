@@ -1536,7 +1536,7 @@ skipModSetup:
         memset(&voice->m_adsr, 0, REDSOUND_ADSR_DATA_SIZE);
     }
 
-    workValue = voice - p_VoiceData;
+    workValue = RedVoiceDataGetIndex(voice);
     if (REDSOUND_VOICE_INDEX_MASK < workValue) {
         voiceMask += 1;
     }
@@ -1844,7 +1844,7 @@ void EnvelopeKeyExecute()
                 if ((voiceData->m_stateFlags & REDSOUND_VOICE_STATE_PLAYING_MASK) != 0) {
                     voiceData->m_axVoice = AXAcquireVoice(REDSOUND_VOICE_INDEX_MASK, _VoiceDropedCallback, 0);
                 } else {
-                    int prio = voiceData - p_VoiceData;
+                    int prio = RedVoiceDataGetIndex(voiceData);
                     prio = (REDSOUND_VOICE_COUNT - prio >> REDSOUND_AX_PRIORITY_HALF_SHIFT) - 1;
                     if (prio < 1) {
                         prio = 1;

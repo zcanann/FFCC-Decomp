@@ -3723,7 +3723,7 @@ int CRedDriver::PlayWaveItem(int waveNo, int itemNo, int key, int pan, int volum
         return 0;
     }
 
-    voiceIndex = voice - p_VoiceData;
+    voiceIndex = RedVoiceDataGetIndex(voice);
     *RedEditorVoiceGet(REDSOUND_EDITOR_VOICE_LEFT) = voiceIndex;
     *RedEditorVoiceGet(REDSOUND_EDITOR_VOICE_RIGHT) = 0;
     voice->m_track = p_EditorTrack;

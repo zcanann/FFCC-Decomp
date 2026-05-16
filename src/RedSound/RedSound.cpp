@@ -314,7 +314,7 @@ int CRedSound::Init(void* mainBuffer, int mainBufferSize, int aramBuffer, int ar
 	if (mainBufferSize > 0 && aramBufferSize > 0) {
 		if ((((u32)mainBuffer & REDSOUND_MEMORY_BANK_ALIGN_MASK) != 0) ||
 		    (((u32)mainBufferSize & REDSOUND_MEMORY_BANK_ALIGN_MASK) != 0)) {
-			if (m_ReportPrint != REDSOUND_REPORT_PRINT_OFF) {
+			if (RedReportPrintIsEnabled()) {
 				OSReport(sRedSoundMemorySettingError, sRedSoundLogPrefix, sRedSoundLogErrorColor, (u32)mainBuffer,
 				         mainBufferSize, sRedSoundLogReset);
 				fflush(__files + 1);
@@ -324,7 +324,7 @@ int CRedSound::Init(void* mainBuffer, int mainBufferSize, int aramBuffer, int ar
 
 		if ((((u32)aramBuffer & REDSOUND_MEMORY_BANK_ALIGN_MASK) != 0) ||
 		    (((u32)aramBufferSize & REDSOUND_MEMORY_BANK_ALIGN_MASK) != 0)) {
-			if (m_ReportPrint != REDSOUND_REPORT_PRINT_OFF) {
+			if (RedReportPrintIsEnabled()) {
 				OSReport(sRedSoundAMemorySettingError,
 				         sRedSoundLogPrefix, sRedSoundLogErrorColor, aramBuffer,
 				         aramBufferSize, sRedSoundLogReset);
@@ -334,7 +334,7 @@ int CRedSound::Init(void* mainBuffer, int mainBufferSize, int aramBuffer, int ar
 		}
 
 		if (ARCheckInit() == 0) {
-			if (m_ReportPrint != REDSOUND_REPORT_PRINT_OFF) {
+			if (RedReportPrintIsEnabled()) {
 				OSReport(sRedSoundARNotInitialized,
 				         sRedSoundLogPrefix, sRedSoundLogErrorColor,
 				         sRedSoundLogReset);
@@ -352,7 +352,7 @@ int CRedSound::Init(void* mainBuffer, int mainBufferSize, int aramBuffer, int ar
 		Start();
 		c_Driver.Init();
 
-		if (m_ReportPrint != REDSOUND_REPORT_PRINT_OFF) {
+		if (RedReportPrintIsEnabled()) {
 			OSReport(sRedSoundInitOk,
 			         sRedSoundLogPrefix, sRedSoundLogInfoColor, sRedSoundLogReset);
 			fflush(__files + 1);
@@ -360,7 +360,7 @@ int CRedSound::Init(void* mainBuffer, int mainBufferSize, int aramBuffer, int ar
 	} else {
 		mainBufferSize = 0;
 
-		if (m_ReportPrint != REDSOUND_REPORT_PRINT_OFF) {
+		if (RedReportPrintIsEnabled()) {
 			OSReport(sRedSoundInitError,
 			         sRedSoundLogPrefix, sRedSoundLogErrorColor,
 			         sRedSoundLogReset);
@@ -423,7 +423,7 @@ int CRedSound::GetProgramTime()
  */
 void CRedSound::ReportPrint(int debugFlag)
 {
-	m_ReportPrint = debugFlag;
+	RedReportPrintSet(debugFlag);
 }
 /*
  * --INFO--
@@ -963,7 +963,7 @@ int CRedSound::StreamPlay(void* data, int fileSize, int pan, int volume)
 	    streamHeader->m_signature[REDSOUND_STREAM_SIGNATURE_2_INDEX] == REDSOUND_STREAM_SIGNATURE_2) {
 		id = GetAutoID();
 		c_Driver.StreamPlay(id, data, fileSize, pan, volume);
-	} else if (m_ReportPrint != REDSOUND_REPORT_PRINT_OFF) {
+	} else if (RedReportPrintIsEnabled()) {
 		OSReport(sRedSoundInvalidStreamData,
 		         sRedSoundLogPrefix, sRedSoundLogErrorColor,
 		         sRedSoundLogReset);
@@ -1281,7 +1281,7 @@ inline int CRedSound::StreamStandby(void* streamHeader, int fileSize)
 			bank->m_readPoint = bank->m_playPoint = REDSOUND_STREAM_BANK_POINT_NONE;
 			bank->m_reserved14 = REDSOUND_STREAM_BANK_RESERVED_NONE;
 		}
-	} else if (m_ReportPrint != REDSOUND_REPORT_PRINT_OFF) {
+	} else if (RedReportPrintIsEnabled()) {
 		OSReport(sRedSoundInvalidStreamData,
 		         sRedSoundLogPrefix, sRedSoundLogErrorColor,
 		         sRedSoundLogReset);

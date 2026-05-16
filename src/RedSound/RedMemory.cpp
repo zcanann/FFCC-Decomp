@@ -145,7 +145,7 @@ int RedNew(int size)
 	do {
 		if ((slot->m_size == REDSOUND_MEMORY_BLOCK_SIZE_EMPTY) || ((address + size) <= slot->m_address)) {
 			if (RedMemoryBankGetLast(m_MemoryBank)->m_size > REDSOUND_MEMORY_BLOCK_SIZE_EMPTY) {
-				if (m_ReportPrint != REDSOUND_REPORT_PRINT_OFF) {
+				if (RedReportPrintIsEnabled()) {
 					OSReport(s_redMemoryMainBankFullFmt, sRedMemoryLogPrefix, sRedMemoryLogSuffixA,
 					         sRedMemoryLogSuffixB);
 					fflush(__files + 1);
@@ -304,7 +304,7 @@ int RedNewA(int size, int offset, int maxSize)
 		return REDSOUND_MEMORY_ADDRESS_NONE;
 	}
 	if (RedMemoryBankGetLast(m_AMemoryBank)->m_size > REDSOUND_MEMORY_BLOCK_SIZE_EMPTY) {
-		if (m_ReportPrint != REDSOUND_REPORT_PRINT_OFF) {
+		if (RedReportPrintIsEnabled()) {
 			OSReport(s_redMemoryAuxBankFullFmt, sRedMemoryLogPrefix, sRedMemoryLogSuffixA, sRedMemoryLogSuffixB);
 			fflush(__files + 1);
 		}

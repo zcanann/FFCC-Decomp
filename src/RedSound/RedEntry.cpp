@@ -495,7 +495,7 @@ int CRedEntry::WaveHeadAdd(int waveBankNo, RedWaveHeadWD* waveHead, int waveNo)
 {
 	if ((waveHead->m_signature[REDSOUND_WAVE_SIGNATURE_MAGIC0_INDEX] != REDSOUND_WAVE_SIGNATURE_MAGIC0) ||
 	    (waveHead->m_signature[REDSOUND_WAVE_SIGNATURE_MAGIC1_INDEX] != REDSOUND_WAVE_SIGNATURE_MAGIC1)) {
-		if (m_ReportPrint != REDSOUND_REPORT_PRINT_OFF) {
+		if (RedReportPrintIsEnabled()) {
 			OSReport(sRedEntryWaveHeaderBrokenFmt, sRedEntryLogPrefix, sRedEntryHeaderErrorColor, sRedEntryResetColor);
 			fflush(__files + 1);
 		}
@@ -579,7 +579,7 @@ int CRedEntry::WaveHeadAdd(int waveBankNo, RedWaveHeadWD* waveHead, int waveNo)
 		}
 	} while (WaveOldClear(minOffset, maxOffset) != 0);
 
-	if (m_ReportPrint != REDSOUND_REPORT_PRINT_OFF) {
+	if (RedReportPrintIsEnabled()) {
 		OSReport(sRedEntryNoWaveMemoryFreeAreaFmt, sRedEntryLogPrefix, sRedEntryErrorColor, (int)waveHead->m_waveNo,
 		         waveHead->m_waveSize, sRedEntryResetColor);
 		fflush(__files + 1);
@@ -680,7 +680,7 @@ int CRedEntry::SetWaveData(int waveBankNo, void* waveData, int waveDataSize)
 		}
 
 		if (m_waveLoadSize < 1) {
-			if (m_ReportPrint != REDSOUND_REPORT_PRINT_OFF) {
+			if (RedReportPrintIsEnabled()) {
 				OSReport(sRedEntryWaveEntryFmt, sRedEntryLogPrefix, sRedEntryInfoColor, m_waveLoadNo, sRedEntryResetColor);
 				fflush(__files + 1);
 			}
@@ -924,7 +924,7 @@ void CRedEntry::WaveHistoryManager(int mode, int waveNo)
  */
 void CRedEntry::DisplayWaveInfo()
 {
-	if (m_ReportPrint != REDSOUND_REPORT_PRINT_OFF) {
+	if (RedReportPrintIsEnabled()) {
 		OSReport(sRedEntryNewline);
 		fflush(__files + 1);
 		OSReport(sRedEntryAMemoryInfoHeaderFmt, sRedEntryLogPrefix);
@@ -1252,7 +1252,7 @@ void CRedEntry::SeSepHistoryManager(int mode, int seNo)
  */
 void CRedEntry::DisplaySePlayInfo()
 {
-	if (m_ReportPrint != REDSOUND_REPORT_PRINT_OFF) {
+	if (RedReportPrintIsEnabled()) {
 		OSReport(sRedEntryNewline);
 		fflush(__files + 1);
 		OSReport(sRedEntrySePlayInfoHeaderFmt, sRedEntryLogPrefix);
@@ -1548,7 +1548,7 @@ RedMusicHEAD* CRedEntry::SetMusicData(RedMusicHEAD* musicHead)
 	    (musicHead->m_signature[REDSOUND_MUSIC_SIGNATURE_1_INDEX] != REDSOUND_MUSIC_SIGNATURE_1) ||
 	    (musicHead->m_signature[REDSOUND_MUSIC_SIGNATURE_2_INDEX] != REDSOUND_MUSIC_SIGNATURE_2)) {
 		RedDelete(musicHead);
-		if (m_ReportPrint != REDSOUND_REPORT_PRINT_OFF) {
+		if (RedReportPrintIsEnabled()) {
 			OSReport(sRedEntryMusicHeaderBrokenFmt, sRedEntryLogPrefix, sRedEntryHeaderErrorColor, sRedEntryResetColor);
 			fflush(__files + 1);
 		}
@@ -1591,7 +1591,7 @@ void CRedEntry::DisplayMMemoryInfo()
 	RedMemoryBlock* bankEntry;
 	RedHistoryBANK* history;
 
-	if (m_ReportPrint == REDSOUND_REPORT_PRINT_OFF) {
+	if (RedReportPrintIsDisabled()) {
 		return;
 	}
 
@@ -1765,7 +1765,7 @@ int CRedEntry::WaveDelete(RedHistoryBANK* bank)
 
 		sequenceNo = SearchWaveSequence(waveNo);
 		if (sequenceNo < 0) {
-			if ((SearchUseWave(waveNo) != 0) && (m_ReportPrint != REDSOUND_REPORT_PRINT_OFF)) {
+			if ((SearchUseWave(waveNo) != 0) && (RedReportPrintIsEnabled())) {
 				OSReport(sRedEntryColoredBlankLineFmt, sRedEntryLogPrefix, sRedEntryErrorColor, sRedEntryResetColor);
 				fflush(__files + 1);
 				OSReport(sRedEntryErrorBannerFmt, sRedEntryLogPrefix, sRedEntryErrorColor, sRedEntryResetColor);
@@ -1887,7 +1887,7 @@ RedSeSepHEAD* CRedEntry::SetSeSepData(RedSeSepHEAD* seSepHead)
 	    (seSepHead->m_signature[REDSOUND_SESEP_SIGNATURE_3_INDEX] != REDSOUND_SESEP_SIGNATURE_3) ||
 	    (seSepHead->m_signature[REDSOUND_SESEP_SIGNATURE_4_INDEX] != REDSOUND_SESEP_SIGNATURE_4)) {
 		RedDelete(seSepHead);
-		if (m_ReportPrint != REDSOUND_REPORT_PRINT_OFF) {
+		if (RedReportPrintIsEnabled()) {
 			OSReport(sRedEntrySeSepHeaderBrokenFmt, sRedEntryLogPrefix, sRedEntryHeaderErrorColor, sRedEntryResetColor);
 			fflush(__files + 1);
 		}
@@ -1993,7 +1993,7 @@ inline int CRedEntry::ClearMusicData(int musicNo)
  */
 inline void CRedEntry::DisplayMusicInfo()
 {
-	if (m_ReportPrint != REDSOUND_REPORT_PRINT_OFF) {
+	if (RedReportPrintIsEnabled()) {
 		OSReport(sRedEntryNewline);
 		fflush(__files + 1);
 		OSReport(sRedEntryMusicInformationHeaderFmt, sRedEntryLogPrefix);

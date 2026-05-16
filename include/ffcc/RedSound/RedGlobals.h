@@ -251,6 +251,10 @@ extern RedKeyOnDATA* volatile p_KeyOnData;
 extern int m_SoundPlayMode;
 extern int m_SoundMasterControl;
 extern volatile int m_ReportPrint;
+#define RedReportPrintGet() (m_ReportPrint)
+#define RedReportPrintSet(value) (m_ReportPrint = (value))
+#define RedReportPrintIsEnabled() (RedReportPrintGet() != REDSOUND_REPORT_PRINT_OFF)
+#define RedReportPrintIsDisabled() (RedReportPrintGet() == REDSOUND_REPORT_PRINT_OFF)
 extern int m_MusicFastSpeed;
 extern volatile int m_MusicSkipLine;
 extern int m_MusicKeySignature;

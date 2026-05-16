@@ -298,14 +298,14 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 		streamData->m_streamCursorBase = REDSOUND_STREAM_PAGE_SIZE;
 		streamData->m_state = REDSOUND_STREAM_STATE_LOADING;
 	} else {
-		if (m_ReportPrint != REDSOUND_REPORT_PRINT_OFF) {
+		if (RedReportPrintIsEnabled()) {
 			OSReport(sRedStreamBufferDidntSecureFmt, sRedStreamLogPrefix, sRedStreamLogErrorColor, sRedStreamLogReset);
 			fflush(__files + 1);
 		}
 		if (streamData->m_buffer != REDSOUND_STREAM_BUFFER_NONE) {
 			RedDelete(streamData->m_buffer);
 		} else {
-			if (m_ReportPrint != REDSOUND_REPORT_PRINT_OFF) {
+			if (RedReportPrintIsEnabled()) {
 				OSReport(sRedStreamMainMemoryDidntCreateFmt,
 				         sRedStreamLogPrefix, sRedStreamLogWarnColor, REDSOUND_STREAM_TRANSFER_BUFFER_SIZE,
 				         sRedStreamLogReset);
@@ -315,7 +315,7 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 		if (streamData->m_aramBuffer != REDSOUND_STREAM_ARAM_BUFFER_NONE) {
 			RedDeleteA(streamData->m_aramBuffer);
 		} else {
-			if (m_ReportPrint != REDSOUND_REPORT_PRINT_OFF) {
+			if (RedReportPrintIsEnabled()) {
 				OSReport(sRedStreamAramMemoryDidntCreateFmt,
 				         sRedStreamLogPrefix, sRedStreamLogWarnColor,
 				         streamData->m_header.m_channelCount * REDSOUND_STREAM_STEREO_PLANE_SIZE,
@@ -388,7 +388,7 @@ void StreamPause(int streamID, int pause)
 	int volume;
 	int pan;
 
-	if (m_ReportPrint != REDSOUND_REPORT_PRINT_OFF) {
+	if (RedReportPrintIsEnabled()) {
 		if (pause == REDSOUND_PAUSE_ON) {
 			OSReport(sRedStreamPauseOnFmt, sRedStreamLogPrefix, streamID);
 		} else {

@@ -348,6 +348,7 @@ static int m_SignDataTable[REDSOUND_SIGN_DATA_TABLE_COUNT] = {
     6424, 6023, 5623, 5222, 4821, 4420, 4019, 3617,
     3216, 2814, 2412, 2010, 1608, 1206, 804, 402,
 };
+#define RedSignDataGet(index) (m_SignDataTable[(index)])
 STATIC_ASSERT(sizeof(m_SignDataTable) == REDSOUND_SIGN_DATA_TABLE_SIZE);
 STATIC_ASSERT(offsetof(RedMidiDataTable, m_signDataTable) == REDSOUND_SIGN_DATA_TABLE_OFFSET);
 STATIC_ASSERT(sizeof(((RedMidiDataTable*)0)->m_signDataTable) == REDSOUND_SIGN_DATA_TABLE_SIZE);
@@ -719,7 +720,7 @@ void KeyOffSet(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* 
 static int SineSwing(int phase)
 {
     int value = phase & REDSOUND_SWING_SINE_MASK;
-    value = m_SignDataTable[value];
+    value = RedSignDataGet(value);
 
     if (((u32)phase & REDSOUND_SWING_PHASE_SIGN) != 0) {
         value = -value;
@@ -820,7 +821,7 @@ static int SineSwingR(int phase)
 {
     phase ^= REDSOUND_SWING_PHASE_SIGN;
     int value = phase & REDSOUND_SWING_SINE_MASK;
-    value = m_SignDataTable[value];
+    value = RedSignDataGet(value);
     if ((phase & REDSOUND_SWING_PHASE_SIGN) != 0) {
         value = -value;
     }

@@ -201,6 +201,11 @@ struct RedStreamDATA {
 #define REDSOUND_STREAM_BUFFER_NONE 0
 #define REDSOUND_STREAM_ARAM_BUFFER_NONE 0
 
+#define RedStreamGetTrack(stream, channel) ((stream)->m_track + (channel))
+#define RedStreamGetVoiceData(stream, channel) ((stream)->m_voiceData + (channel))
+#define RedStreamGetTrackData(stream, channel) (&(stream)->m_trackData[(channel)])
+#define RedStreamVoiceDataGetChannel(voiceData, channel) ((voiceData) + (channel))
+
 enum RedStreamDataLayoutOffset {
     REDSOUND_STREAM_TRACK_OFFSET = (unsigned int)&(((RedStreamDATA*)0)->m_track),
     REDSOUND_STREAM_VOICE_DATA_OFFSET = (unsigned int)&(((RedStreamDATA*)0)->m_voiceData),

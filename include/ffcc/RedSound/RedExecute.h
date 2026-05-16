@@ -168,15 +168,15 @@ enum RedVoiceLayoutCount {
 	REDSOUND_TERMINATE_NOTE_WORD_COUNT = 1,
 };
 
-enum RedAdsrDataLayout {
-	REDSOUND_ADSR_TIME_OFFSET = 0,
-	REDSOUND_ADSR_LEVEL_OFFSET = REDSOUND_VOICE_ADSR_TIME_COUNT * sizeof(unsigned short),
-	REDSOUND_ADSR_DATA_SIZE = REDSOUND_ADSR_LEVEL_OFFSET + REDSOUND_VOICE_ADSR_LEVEL_COUNT,
-};
-
 struct RedAdsrDATA {
 	unsigned short m_time[REDSOUND_VOICE_ADSR_TIME_COUNT];
 	unsigned char m_level[REDSOUND_VOICE_ADSR_LEVEL_COUNT];
+};
+
+enum RedAdsrDataLayout {
+	REDSOUND_ADSR_TIME_OFFSET = (unsigned int)&(((RedAdsrDATA*)0)->m_time),
+	REDSOUND_ADSR_LEVEL_OFFSET = (unsigned int)&(((RedAdsrDATA*)0)->m_level),
+	REDSOUND_ADSR_DATA_SIZE = sizeof(RedAdsrDATA),
 };
 
 struct RedVoiceDATA {

@@ -442,7 +442,7 @@ int CRedEntry::SearchUseWave(int waveNo)
 			SeStopID(track->m_seId);
 		}
 		track += 1;
-	} while (track < control->m_tracks + REDSOUND_SE_TRACK_COUNT);
+	} while (track < RedSoundControlGetSeTrackEnd(control));
 
 	OSRestoreInterrupts(interruptLevel);
 	return found;
@@ -1224,7 +1224,7 @@ void CRedEntry::SeSepHistoryManager(int mode, int seNo)
 				break;
 			}
 			track += 1;
-		} while (track < p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks + REDSOUND_SE_TRACK_COUNT);
+		} while (track < RedSoundControlGetSeTrackEnd(&p_SoundControlBuffer[REDSOUND_CONTROL_SE]));
 
 		if (sequenceNo == 0) {
 			sequenceNo = SearchSeSepSequence(seNo);

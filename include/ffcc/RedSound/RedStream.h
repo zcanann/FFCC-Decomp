@@ -91,6 +91,8 @@ struct RedStreamFile {
 
 #define RedStreamFileGetSampleByte(streamFile, offset) ((s8*)(streamFile))[(offset)]
 
+#define RedStreamBufferGetRightPlane(buffer) ((buffer) + REDSOUND_STREAM_STEREO_PLANE_SIZE)
+
 enum RedStreamFileLayoutOffset {
     REDSOUND_STREAM_FILE_HEAD_OFFSET = (unsigned int)&(((RedStreamFile*)0)->m_header),
     REDSOUND_STREAM_FILE_ADPCM_OFFSET = (unsigned int)&(((RedStreamFile*)0)->m_adpcm),

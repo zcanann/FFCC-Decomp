@@ -684,7 +684,7 @@ static int _ArrangeStreamDataLoop(RedStreamDATA* stream, int bufferIndex, int by
 			dstBase = stream->m_buffer + bufferIndex * REDSOUND_STREAM_PAGE_SIZE;
 			voiceData = stream->m_voiceData;
 			srcFrame = (RedStreamStereoFrame*)(stream->m_fileData + stream->m_readOffset);
-			rightDst = (RedStreamChannelFrame*)(dstBase + REDSOUND_STREAM_STEREO_PLANE_SIZE);
+			rightDst = (RedStreamChannelFrame*)RedStreamBufferGetRightPlane(dstBase);
 			srcEnd = srcFrame + REDSOUND_STREAM_STEREO_FRAMES_PER_PAGE;
 			leftDst = (RedStreamChannelFrame*)dstBase;
 			
@@ -726,7 +726,7 @@ static int _ArrangeStreamDataLoop(RedStreamDATA* stream, int bufferIndex, int by
 			                    REDSOUND_STREAM_PAGE_SIZE, REDSOUND_DMA_CALLBACK_NONE,
 			                    REDSOUND_DMA_CALLBACK_DATA_NONE);
 			dmaID = RedDmaEntry(REDSOUND_DMA_FLAGS_STREAM_LOAD, REDSOUND_DMA_DIRECTION_TO_ARAM,
-			                    (int)(dstBase + REDSOUND_STREAM_STEREO_PLANE_SIZE),
+			                    (int)RedStreamBufferGetRightPlane(dstBase),
 			                    stream->m_aramBuffer + (bufferIndex + REDSOUND_STREAM_STEREO_PLANE_PAGE_COUNT) * REDSOUND_STREAM_PAGE_SIZE,
 			                    REDSOUND_STREAM_PAGE_SIZE, REDSOUND_DMA_CALLBACK_NONE,
 			                    REDSOUND_DMA_CALLBACK_DATA_NONE);
@@ -736,7 +736,7 @@ static int _ArrangeStreamDataLoop(RedStreamDATA* stream, int bufferIndex, int by
 				voiceData->m_axVoice->pb.adpcmLoop.loop_yn1 = voiceData->m_axVoice->pb.adpcmLoop.loop_yn2 = 0;
 				voiceData->m_axVoice->sync |= AX_SYNC_FLAG_COPYADPCMLOOP;
 				voiceData[REDSOUND_STREAM_RIGHT_CHANNEL].m_axVoice->pb.adpcmLoop.loop_pred_scale =
-				    (unsigned short)dstBase[REDSOUND_STREAM_STEREO_PLANE_SIZE];
+				    (unsigned short)*RedStreamBufferGetRightPlane(dstBase);
 				voiceData[REDSOUND_STREAM_RIGHT_CHANNEL].m_axVoice->pb.adpcmLoop.loop_yn1 =
 				    voiceData[REDSOUND_STREAM_RIGHT_CHANNEL].m_axVoice->pb.adpcmLoop.loop_yn2 = 0;
 				voiceData[REDSOUND_STREAM_RIGHT_CHANNEL].m_axVoice->sync |= AX_SYNC_FLAG_COPYADPCMLOOP;

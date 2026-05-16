@@ -3776,7 +3776,7 @@ inline void CRedDriver::StopWaveItem()
     RedVoiceDATA* voice = RedVoiceDataGetBegin();
 
     do {
-        if (voice->m_track == p_EditorTrack) {
+        if (voice->m_track == RedEditorTrackGet()) {
             voice->m_flags |= REDSOUND_VOICE_FLAGS_RELEASED;
             voice->m_active = REDSOUND_VOICE_ACTIVE_OFF;
             voice->m_track = REDSOUND_VOICE_TRACK_NONE;
@@ -3800,7 +3800,7 @@ void CRedDriver::SetWavePitch(int pitch)
 {
     int* voiceNo;
 
-    p_EditorTrack->m_pitch = pitch;
+    RedEditorTrackGet()->m_pitch = pitch;
     voiceNo = RedEditorVoiceGetBegin();
     do {
         int voiceIndex = *voiceNo;
@@ -3824,10 +3824,10 @@ void CRedDriver::SetWaveTune(int key, int fineTune)
 {
     int* voiceNo;
 
-    p_EditorTrack->m_keyTranspose = key;
-    p_EditorTrack->m_note.m_key = key;
-    p_EditorTrack->m_fineTune = fineTune;
-    p_EditorTrack->m_portamentPitch = key << REDSOUND_PITCH_BASE_NOTE_SHIFT;
+    RedEditorTrackGet()->m_keyTranspose = key;
+    RedEditorTrackGet()->m_note.m_key = key;
+    RedEditorTrackGet()->m_fineTune = fineTune;
+    RedEditorTrackGet()->m_portamentPitch = key << REDSOUND_PITCH_BASE_NOTE_SHIFT;
     voiceNo = RedEditorVoiceGetBegin();
     do {
         int voiceIndex = *voiceNo;
@@ -3853,7 +3853,7 @@ void CRedDriver::SetWaveAdsr(int attack, RedAdsrDATA* adsr)
 {
     int* voiceNo;
 
-    memcpy(&p_EditorTrack->m_adsr, adsr, REDSOUND_TRACK_ADSR_SIZE);
+    memcpy(&RedEditorTrackGet()->m_adsr, adsr, REDSOUND_TRACK_ADSR_SIZE);
     voiceNo = RedEditorVoiceGetBegin();
     do {
         int voiceIndex = *voiceNo;
@@ -3879,15 +3879,15 @@ inline int CRedDriver::WavePitchCompute(int key, int pitch)
 {
     int basePitch = key << REDSOUND_PITCH_BASE_NOTE_SHIFT;
     int pitchOffset;
-    RedWaveDATA* wave = p_EditorTrack->m_waveData;
+    RedWaveDATA* wave = RedEditorTrackGet()->m_waveData;
 
     if (wave != 0) {
         if ((wave->m_flags & REDSOUND_WAVE_FLAG_USE_WAVE_KEY) != 0) {
             basePitch = wave->m_splitKey << REDSOUND_PITCH_BASE_NOTE_SHIFT;
         }
-        pitchOffset = p_EditorTrack->m_keyTranspose + pitch;
-        basePitch += p_EditorTrack->m_pitch;
-        return PitchCompute(basePitch, pitchOffset, wave->m_pitch, p_EditorTrack->m_fineTune);
+        pitchOffset = RedEditorTrackGet()->m_keyTranspose + pitch;
+        basePitch += RedEditorTrackGet()->m_pitch;
+        return PitchCompute(basePitch, pitchOffset, wave->m_pitch, RedEditorTrackGet()->m_fineTune);
     }
 
     return 0;

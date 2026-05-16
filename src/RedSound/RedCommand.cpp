@@ -888,7 +888,7 @@ static int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volum
 		while (true) {
 			track->m_waveBankData = waveBase;
 			track->m_command = current;
-			current = current + RedSeInfoSequenceGetOffset(seq);
+			current = RedSeInfoCommandGetNext(current, seq);
 			track->m_deltaTime = (int)DeltaTimeSumup((unsigned char**)&track->m_command) + 1;
 			if (m_SeSkipStep != 0) {
 				track->m_deltaTime = track->m_deltaTime - m_SeSkipStep;

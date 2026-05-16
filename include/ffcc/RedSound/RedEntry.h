@@ -295,6 +295,7 @@ struct RedSeInfoSequence
 	 REDSOUND_SE_INFO_SEQUENCE_OFFSET_MASK)
 
 #define RedSeInfoGetCommandData(sequence, count) reinterpret_cast<unsigned char*>((sequence) + (count))
+#define RedSeInfoCommandGetNext(command, sequence) ((command) + RedSeInfoSequenceGetOffset(sequence))
 
 #define RedSeInfoSequenceHasContinue(sequence, index)                                               \
 	((reinterpret_cast<unsigned char*>(sequence)[(index) * sizeof(RedSeInfoSequence) +             \

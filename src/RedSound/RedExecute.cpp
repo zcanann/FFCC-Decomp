@@ -2930,7 +2930,7 @@ static void _SeTrackDataExecute(RedTrackDATA* track, int frames)
 		}
 		track->m_mixVolumeDelta -= mixStep;
 		if ((track->m_mixVolumeDelta == 0) && (track->m_mixVolumeMode == REDSOUND_SE_VOLUME_MODE_FADE_OUT)) {
-			track->m_command = (u8*)m_TerminateNote;
+			track->m_command = (u8*)RedTerminateNoteGet();
 			track->m_deltaTime = 1;
 		}
 		track->m_mixVolume += track->m_mixVolumeAdd * mixStep;

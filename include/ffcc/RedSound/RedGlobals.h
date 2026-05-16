@@ -228,6 +228,7 @@ extern s16 t_PanningData[REDSOUND_PAN_TABLE_COUNT];
 extern s16 t_PanningDataR[REDSOUND_PAN_TABLE_COUNT];
 #define RedPanningDataRGet(index) (t_PanningDataR[(index)])
 extern u32 m_TerminateNote[];
+#define RedTerminateNoteGet() (m_TerminateNote)
 extern volatile unsigned int m_AutoID;
 extern CRedEntry c_RedEntry;
 extern OSSemaphore m_MusicSkipSemaphore;

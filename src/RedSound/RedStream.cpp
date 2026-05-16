@@ -243,8 +243,8 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 		pitch = PitchCompute(REDSOUND_STREAM_BASE_PITCH, 0, streamData->m_header.m_pitch, 0);
 		channel = 0;
 		do {
-			voice = streamData->m_voiceData + channel;
-			voice->m_track = streamData->m_track + channel;
+			voice = RedStreamGetVoiceData(streamData, channel);
+			voice->m_track = RedStreamGetTrack(streamData, channel);
 			voice->m_track->m_note.m_allocFlags |= REDSOUND_NOTE_ALLOC_STREAM;
 			voice->m_stateFlags |= REDSOUND_VOICE_STATE_STREAM;
 			voice->m_voiceSwitch = REDSOUND_VOICE_SWITCH_STREAM_DEFAULT;
@@ -269,9 +269,9 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 				streamData->m_pan.m_value = pan << REDSOUND_FIXED_SHIFT;
 				streamData->m_pan.m_stepCount = 0;
 			}
-			SetVoiceVolumeMix(streamData->m_voiceData + channel, streamData->m_pan.m_value >> REDSOUND_FIXED_SHIFT,
+			SetVoiceVolumeMix(RedStreamGetVoiceData(streamData, channel), streamData->m_pan.m_value >> REDSOUND_FIXED_SHIFT,
 			                  streamData->m_volume.m_value >> REDSOUND_FIXED_SHIFT);
-			(streamData->m_track + channel)->m_waveBase =
+			RedStreamGetTrack(streamData, channel)->m_waveBase =
 			    RedStreamAramGetChannelPlane(streamData->m_aramBuffer, channel);
 			memset(RedStreamGetTrackData(streamData, channel), 0, REDSOUND_WAVE_DATA_SIZE);
 			memcpy(&RedStreamGetTrackData(streamData, channel)->m_adpcm, RedStreamAdpcmHeaderGetChannel(headerData, channel),
@@ -518,7 +518,7 @@ void StreamControl()
 			voiceData = streamData->m_voiceData;
 			streamData->m_state = REDSOUND_STREAM_STATE_PLAYING;
 			voiceData->m_flags |= REDSOUND_VOICE_FLAGS_STREAM_START;
-			voiceData->m_waveData = streamData->m_trackData;
+			voiceData->m_waveData = RedStreamGetTrackData(streamData, REDSOUND_STREAM_LEFT_CHANNEL);
 			voiceData->m_active = REDSOUND_VOICE_ACTIVE_ON;
 			if (streamData->m_header.m_channelCount == REDSOUND_STREAM_STEREO_CHANNEL_COUNT) {
 				RedStreamVoiceDataGetChannel(voiceData, REDSOUND_STREAM_RIGHT_CHANNEL)->m_flags |= REDSOUND_VOICE_FLAGS_STREAM_START;

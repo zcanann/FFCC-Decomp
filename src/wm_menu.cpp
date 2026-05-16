@@ -383,9 +383,9 @@ CMenuPcs::EffectInfo::EffectInfo()
  */
 void CMenuPcs::WmInit()
 {
+	float initValue = FLOAT_803313dc;
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 
-	FLOAT_8032ee18 = FLOAT_803313dc;
 	reinterpret_cast<unsigned int*>(bytes + 0x814)[0] = 0;
 	reinterpret_cast<unsigned int*>(bytes + 0x818)[0] = 0;
 	reinterpret_cast<unsigned int*>(bytes + 0x81C)[0] = 0;
@@ -397,6 +397,7 @@ void CMenuPcs::WmInit()
 	reinterpret_cast<unsigned int*>(bytes + 0x83C)[0] = 0;
 	reinterpret_cast<unsigned int*>(bytes + 0x840)[0] = 0;
 	reinterpret_cast<unsigned int*>(bytes + 0x854)[0] = 0;
+	FLOAT_8032ee18 = initValue;
 	bytes[0x858] = 0;
 	bytes[0x86E] = 0;
 	memset(bytes + 4, 0, 0x1C);
@@ -412,8 +413,9 @@ void CMenuPcs::WmInit()
 	gWmMenuCursorY[1] = 0xFF;
 	gWmMenuWorkB = -1;
 	gWmMenuWorkA = -1;
-	gWmMenuScriptValueCache = Game.m_gameWork.m_scriptSysVal0;
-	if (Game.m_gameWork.m_scriptSysVal0 > 99) {
+	int scriptValue = *reinterpret_cast<int*>(&Game.m_gameWork.m_scriptSysVal0);
+	gWmMenuScriptValueCache = scriptValue;
+	if (scriptValue > 99) {
 		gWmMenuScriptValueCache = 100;
 	}
 }

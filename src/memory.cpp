@@ -2092,10 +2092,7 @@ void CAmemCacheSet::AmemFreeLowPrio(int size)
         }
 
         if (bestEntry != 0) {
-            int cachedData = reinterpret_cast<int>(bestEntry->m_cacheData);
-            if (cachedData != 0) {
-                operator delete(reinterpret_cast<void*>(cachedData));
-            }
+            operator delete(bestEntry->m_cacheData);
             bestEntry->m_cacheData = 0;
         }
 

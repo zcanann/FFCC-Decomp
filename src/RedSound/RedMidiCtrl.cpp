@@ -698,7 +698,7 @@ void KeyOffSet(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* 
         } while (slot < RedKeyOnGetEnd(keyOnData));
 
         key = RedNoteGetKey(&track->m_note);
-        voice = p_VoiceData;
+        voice = RedVoiceDataGetBegin();
         do {
             if ((voice->m_track == track) && (voice->m_key == key)) {
                 voice->m_flags &= REDSOUND_VOICE_FLAGS_CLEAR_ACTIVE_MASK;
@@ -957,7 +957,7 @@ static void __MidiCtrl_Stop(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, R
     track->m_flags = 0;
     KeyOffSet(control, keyOnData, track);
 
-    voice = p_VoiceData;
+    voice = RedVoiceDataGetBegin();
     do {
         if (voice->m_track == track) {
             voice->m_stateFlags &= REDSOUND_VOICE_STATE_CLEAR_PLAYING_MASK;
@@ -971,7 +971,7 @@ static void __MidiCtrl_Stop(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, R
         if ((control->m_activeTrackCount == 0) &&
             ((m_MusicPhraseStop == REDSOUND_MUSIC_PHRASE_STOP_ON) ||
              ((control->m_flags & REDSOUND_CONTROL_FLAG_WHOLE_LOOP_ACTIVE) == 0))) {
-            voice = p_VoiceData;
+            voice = RedVoiceDataGetBegin();
             do {
                 if ((voice->m_track >= control->m_tracks) &&
                     (voice->m_track < RedSoundControlGetTrackEnd(control))) {
@@ -1728,7 +1728,7 @@ static void __MidiCtrl_Sweep(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* trac
     track->m_sweepDelta = delta;
     track->m_portamentPitch &= REDSOUND_FIXED_WHOLE_MASK;
 
-    voiceData = p_VoiceData;
+    voiceData = RedVoiceDataGetBegin();
     do {
         if (voiceData->m_track == track) {
             voiceData->m_basePitch &= REDSOUND_FIXED_WHOLE_MASK;

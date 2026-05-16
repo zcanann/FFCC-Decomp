@@ -234,6 +234,7 @@ extern OSSemaphore m_MusicSkipSemaphore;
 extern RedSeBlockHEAD* volatile p_SeBlockData[REDSOUND_SE_BLOCK_BANK_COUNT];
 #define RedSeBlockDataGet(index) (p_SeBlockData[(index)])
 extern u8* volatile p_ZeroData;
+#define RedZeroDataGet() (p_ZeroData)
 extern RedSoundCONTROL* volatile p_SoundControlBuffer;
 #define RedSoundControlGet(index) (p_SoundControlBuffer + (index))
 #define RedSoundControlGetMusicPlayEnd() RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PLAY_END)
@@ -251,6 +252,7 @@ extern int m_MusicFastSpeed;
 extern volatile int m_MusicSkipLine;
 extern int m_MusicKeySignature;
 extern int* volatile p_MusicReplayPoint;
+#define RedMusicReplayPointGetBegin() (p_MusicReplayPoint)
 #define RedMusicReplayPointGet(index) (p_MusicReplayPoint + (index))
 extern RedControlRamp* volatile p_MusicTempoControl;
 #define RedMusicTempoControlGet() (p_MusicTempoControl)
@@ -278,6 +280,7 @@ extern OSThread m_MusicSkipThread;
 extern u8* volatile p_MusicSkipThreadStack;
 extern volatile int m_MusicSkipComplete;
 extern RedReverbDepth* volatile p_ReverbDepth;
+#define RedReverbDepthGetBegin() (p_ReverbDepth)
 #define RedReverbDepthGet(index) (p_ReverbDepth + (index))
 extern unsigned int m_Mute[REDSOUND_MUTE_WORD_COUNT];
 #define RedMuteGetWord(voiceNo) (m_Mute[(voiceNo) / REDSOUND_MUTE_BITS_PER_WORD])

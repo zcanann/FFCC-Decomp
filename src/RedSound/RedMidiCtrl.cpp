@@ -621,7 +621,7 @@ void KeyOnReserveClear(RedKeyOnDATA* keyOnData, RedTrackDATA* track)
             slot->m_track = REDSOUND_TRACK_NONE;
         }
         slot++;
-    } while (slot < keyOnData->m_normal + REDSOUND_KEY_ON_SLOT_COUNT);
+    } while (slot < RedKeyOnGetEnd(keyOnData));
 }
 /*
  * --INFO--
@@ -656,7 +656,7 @@ void KeyOnReserve(RedKeyOnDATA* keyOnData, RedTrackDATA* track)
                 break;
             }
             slot++;
-        } while (slot < keyOnData->m_normal);
+        } while (slot < RedKeyOnGetPriorityEnd(keyOnData));
     } else {
         slot = keyOnData->m_normal;
         do {
@@ -667,7 +667,7 @@ void KeyOnReserve(RedKeyOnDATA* keyOnData, RedTrackDATA* track)
                 break;
             }
             slot++;
-        } while (slot < keyOnData->m_normal + REDSOUND_KEY_ON_SLOT_COUNT);
+        } while (slot < RedKeyOnGetEnd(keyOnData));
     }
 }
 /*
@@ -694,7 +694,7 @@ void KeyOffSet(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* 
                 slot->m_track = REDSOUND_TRACK_NONE;
             }
             slot++;
-        } while (slot < keyOnData->m_normal + REDSOUND_KEY_ON_SLOT_COUNT);
+        } while (slot < RedKeyOnGetEnd(keyOnData));
 
         key = RedNoteGetKey(&track->m_note);
         voice = p_VoiceData;

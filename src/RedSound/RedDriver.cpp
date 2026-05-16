@@ -1073,7 +1073,7 @@ static void _MusicMasterVolume(int* command)
     do {
         voice->m_updateFlags = voice->m_updateFlags | REDSOUND_VOICE_UPDATE_VOLUME;
         voice++;
-    } while (voice < p_VoiceData + REDSOUND_VOICE_COUNT);
+    } while (voice < RedVoiceDataGetEnd());
 }
 
 /*
@@ -1348,7 +1348,7 @@ static void _SeMasterVolume(int* command)
     do {
         voice->m_updateFlags = voice->m_updateFlags | REDSOUND_VOICE_UPDATE_VOLUME;
         voice++;
-    } while (voice < p_VoiceData + REDSOUND_VOICE_COUNT);
+    } while (voice < RedVoiceDataGetEnd());
 }
 
 /*
@@ -2187,7 +2187,7 @@ void CRedDriver::Init()
     index = 0;
     do {
         nextIndex = index % REDSOUND_SE_VOICE_BASE_INDEX;
-        p_VoiceData[index].m_voiceIndex = nextIndex;
+        RedVoiceDataGet(index)->m_voiceIndex = nextIndex;
         index = index + 1;
     } while (index < REDSOUND_VOICE_COUNT);
     editorVoice = p_EditorVoice;
@@ -3771,7 +3771,7 @@ inline void CRedDriver::StopWaveItem()
             voice->m_track = REDSOUND_VOICE_TRACK_NONE;
         }
         voice++;
-    } while (voice < p_VoiceData + REDSOUND_VOICE_COUNT);
+    } while (voice < RedVoiceDataGetEnd());
 
     p_EditorVoice[REDSOUND_EDITOR_VOICE_LEFT] = 0;
 }
@@ -3794,7 +3794,7 @@ void CRedDriver::SetWavePitch(int pitch)
     do {
         int voiceIndex = *voiceNo;
         if (voiceIndex != 0) {
-            (p_VoiceData + voiceIndex)->m_updateFlags |= REDSOUND_VOICE_UPDATE_PITCH;
+            RedVoiceDataGet(voiceIndex)->m_updateFlags |= REDSOUND_VOICE_UPDATE_PITCH;
         }
         voiceNo++;
     } while (voiceNo <= p_EditorVoice + REDSOUND_EDITOR_VOICE_RIGHT);
@@ -3821,7 +3821,7 @@ void CRedDriver::SetWaveTune(int key, int fineTune)
     do {
         int voiceIndex = *voiceNo;
         if (voiceIndex != 0) {
-            RedVoiceDATA* voice = p_VoiceData + voiceIndex;
+            RedVoiceDATA* voice = RedVoiceDataGet(voiceIndex);
             voice->m_basePitch = key << REDSOUND_PITCH_BASE_NOTE_SHIFT;
             voice->m_updateFlags |= REDSOUND_VOICE_UPDATE_PITCH;
         }
@@ -3847,7 +3847,7 @@ void CRedDriver::SetWaveAdsr(int attack, RedAdsrDATA* adsr)
     do {
         int voiceIndex = *voiceNo;
         if (voiceIndex != 0) {
-            RedVoiceDATA* voice = p_VoiceData + voiceIndex;
+            RedVoiceDATA* voice = RedVoiceDataGet(voiceIndex);
             memcpy(&voice->m_adsr, adsr, REDSOUND_ADSR_DATA_SIZE);
             voice->m_flags |= REDSOUND_VOICE_FLAGS_ADSR_START;
         }

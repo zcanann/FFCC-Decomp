@@ -659,6 +659,8 @@ static volatile int m_SequencialID;
 static volatile int m_ThreadControl;
 static volatile int m_ThreadExecute;
 static int m_SoundMode;
+#define RedSoundModeGet() (m_SoundMode)
+#define RedSoundModeSet(mode) (m_SoundMode = (mode))
 static RedTickHistory* volatile p_Tick;
 #define RedTickHistoryGet() (p_Tick)
 #define RedTickHistoryGetTicks() (RedTickHistoryGet()->m_ticks)
@@ -827,13 +829,13 @@ STATIC_ASSERT(sizeof(sRedDriverLogWarnColor) + sizeof(sRedDriverLogReset) == RED
  */
 static void _SetSoundMode(int* command)
 {
-    m_SoundMode = command[REDSOUND_SOUND_MODE_COMMAND_MODE];
+    RedSoundModeSet(command[REDSOUND_SOUND_MODE_COMMAND_MODE]);
     if (command[REDSOUND_SOUND_MODE_COMMAND_MODE] == REDSOUND_SOUND_MODE_MONO) {
         OSGetSoundMode(OS_SOUND_MODE_MONO);
     } else {
         OSGetSoundMode(OS_SOUND_MODE_STEREO);
     }
-    RedSoundPlayModeSet(m_SoundMode);
+    RedSoundPlayModeSet(RedSoundModeGet());
     switch (RedSoundPlayModeGet()) {
     case REDSOUND_SOUND_MODE_SURROUND:
         AXSetMode(REDSOUND_SOUND_MODE_SURROUND);
@@ -2151,7 +2153,7 @@ void CRedDriver::Init()
     m_ThreadExecute = REDSOUND_THREAD_FLAG_NONE;
     m_ThreadControl = REDSOUND_THREAD_CONTROL_RUN;
     RedReportPrintSet(REDSOUND_REPORT_PRINT_ON);
-    m_SoundMode = REDSOUND_SOUND_MODE_STEREO;
+    RedSoundModeSet(REDSOUND_SOUND_MODE_STEREO);
     GetSoundMode();
     switch (RedSoundPlayModeGet()) {
     case REDSOUND_SOUND_MODE_SURROUND:
@@ -2370,7 +2372,7 @@ int CRedDriver::GetSoundMode()
     if (soundMode == 0) {
         RedSoundPlayModeSet(REDSOUND_SOUND_MODE_MONO);
     } else {
-        RedSoundPlayModeSet(m_SoundMode);
+        RedSoundPlayModeSet(RedSoundModeGet());
     }
     return RedSoundPlayModeGet();
 }

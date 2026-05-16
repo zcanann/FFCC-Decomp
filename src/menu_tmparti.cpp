@@ -53,47 +53,6 @@ static inline double TmpArtiIntToDouble(int value)
     return conv.value - DOUBLE_80332f40;
 }
 
-namespace {
-struct TmpArtiState {
-    unsigned char pad_0000[0xB];
-    char initialized;
-    unsigned char pad_000C;
-    unsigned char closeRequested;
-    unsigned char pad_000E[0x10];
-    short moveDirection;
-    unsigned char pad_0020[2];
-    short frame;
-    unsigned char pad_0024[2];
-    short unk_26;
-    unsigned char pad_0028[8];
-    short prevSelection;
-    short selection;
-};
-
-struct TmpArtiEntry {
-    short x;
-    short y;
-    short width;
-    short height;
-    float s;
-    float t;
-    float alpha;
-    float z;
-    int unk_18;
-    int tex;
-    int timer;
-    int startFrame;
-    int duration;
-    unsigned char pad_002C[0x14];
-};
-
-struct TmpArtiList {
-    short count;
-    unsigned short pad_0002;
-    unsigned int pad_0004;
-    TmpArtiEntry entries[64];
-};
-
 STATIC_ASSERT(offsetof(TmpArtiState, initialized) == 0xB);
 STATIC_ASSERT(offsetof(TmpArtiState, closeRequested) == 0xD);
 STATIC_ASSERT(offsetof(TmpArtiState, moveDirection) == 0x1E);
@@ -110,9 +69,10 @@ STATIC_ASSERT(offsetof(TmpArtiEntry, duration) == 0x28);
 STATIC_ASSERT(sizeof(TmpArtiEntry) == 0x40);
 STATIC_ASSERT(sizeof(TmpArtiList) == 0x1008);
 
+namespace {
 static inline TmpArtiList* GetTmpArtiList(CMenuPcs* menu)
 {
-    return reinterpret_cast<TmpArtiList*>(menu->m_tmpArtiList);
+    return menu->m_tmpArtiList;
 }
 
 static inline TmpArtiEntry* GetTmpArtiEntries(CMenuPcs* menu)
@@ -244,88 +204,83 @@ void CMenuPcs::TmpArtiDraw()
  */
 unsigned int CMenuPcs::TmpArtiClose()
 {
-	float fVar1;
-	double dVar3;
-	short *psVar4;
-	int iVar5;
-	unsigned int uVar6;
-	int iVar7;
-	int iVar8;
+	float zero;
+	int completedItems;
+	TmpArtiEntry* entry;
+	unsigned int itemCount;
+	int currentFrame;
+	unsigned int count;
 
-	iVar5 = 0;
-	*(short *)(reinterpret_cast<int>(this->m_tmpArtiState) + 0x22) = *(short *)(reinterpret_cast<int>(this->m_tmpArtiState) + 0x22) + 1;
-	uVar6 = (unsigned int)*this->m_tmpArtiList;
-	psVar4 = this->m_tmpArtiList + 4;
-	iVar7 = (int)*(short *)(reinterpret_cast<int>(this->m_tmpArtiState) + 0x22);
-
-	for (iVar8 = (int)uVar6; iVar8 > 0; iVar8--) {
-		if (*(int *)(psVar4 + 0x12) <= iVar7) {
-			if (*(int *)(psVar4 + 0x12) + *(int *)(psVar4 + 0x14) <= iVar7) {
-				iVar5 = iVar5 + 1;
-				*(float *)(psVar4 + 8) = FLOAT_80332f2c;
-			}
-			else {
-				*(int *)(psVar4 + 0x10) = *(int *)(psVar4 + 0x10) + 1;
-				dVar3 = DOUBLE_80332f50;
-				double duration = TmpArtiIntToDouble(*(int *)(psVar4 + 0x14));
-				double timer = TmpArtiIntToDouble(*(int *)(psVar4 + 0x10));
-				*(float *)(psVar4 + 8) =
-				    (float)(DOUBLE_80332f48 - (DOUBLE_80332f48 / duration) * timer);
-				if ((double)*(float *)(psVar4 + 8) < dVar3) {
-					*(float *)(psVar4 + 8) = FLOAT_80332f2c;
+	completedItems = 0;
+	this->m_tmpArtiState->frame = this->m_tmpArtiState->frame + 1;
+	itemCount = (unsigned int)this->m_tmpArtiList->count;
+	entry = this->m_tmpArtiList->entries;
+	currentFrame = (int)this->m_tmpArtiState->frame;
+	if ((int)itemCount > 0) {
+		for (unsigned int remaining = itemCount; remaining != 0; remaining--) {
+			if (entry->startFrame <= currentFrame) {
+				if (entry->startFrame + entry->duration <= currentFrame) {
+					completedItems++;
+					entry->alpha = FLOAT_80332f2c;
+				} else {
+					entry->timer = entry->timer + 1;
+					double ratio = DOUBLE_80332f48 / (double)entry->duration;
+					entry->alpha = (float)(DOUBLE_80332f48 - ratio * (double)entry->timer);
+					if ((double)entry->alpha < DOUBLE_80332f50) {
+						entry->alpha = FLOAT_80332f2c;
+					}
 				}
 			}
+			entry++;
 		}
-		psVar4 = psVar4 + 0x20;
 	}
 
-	if (*this->m_tmpArtiList == iVar5) {
-		fVar1 = FLOAT_80332f2c;
-		psVar4 = this->m_tmpArtiList + 4;
-		if (0 < (int)uVar6) {
-			unsigned int groups = uVar6 >> 3;
-			if (groups != 0) {
-				for (; groups != 0; groups--) {
-					*(int *)(psVar4 + 0x12) = 0;
-					*(int *)(psVar4 + 0x14) = 1;
-					*(float *)(psVar4 + 8) = fVar1;
-					*(int *)(psVar4 + 0x32) = 0;
-					*(int *)(psVar4 + 0x34) = 1;
-					*(float *)(psVar4 + 0x28) = fVar1;
-					*(int *)(psVar4 + 0x52) = 0;
-					*(int *)(psVar4 + 0x54) = 1;
-					*(float *)(psVar4 + 0x48) = fVar1;
-					*(int *)(psVar4 + 0x72) = 0;
-					*(int *)(psVar4 + 0x74) = 1;
-					*(float *)(psVar4 + 0x68) = fVar1;
-					*(int *)(psVar4 + 0x92) = 0;
-					*(int *)(psVar4 + 0x94) = 1;
-					*(float *)(psVar4 + 0x88) = fVar1;
-					*(int *)(psVar4 + 0xb2) = 0;
-					*(int *)(psVar4 + 0xb4) = 1;
-					*(float *)(psVar4 + 0xa8) = fVar1;
-					*(int *)(psVar4 + 0xd2) = 0;
-					*(int *)(psVar4 + 0xd4) = 1;
-					*(float *)(psVar4 + 200) = fVar1;
-					*(int *)(psVar4 + 0xf2) = 0;
-					*(int *)(psVar4 + 0xf4) = 1;
-					*(float *)(psVar4 + 0xe8) = fVar1;
-					psVar4 = psVar4 + 0x100;
-				}
-				uVar6 = uVar6 & 7;
+	zero = FLOAT_80332f2c;
+	if (this->m_tmpArtiList->count == completedItems) {
+		entry = this->m_tmpArtiList->entries;
+		if ((int)itemCount > 0) {
+			count = itemCount >> 3;
+			for (; count != 0; count--) {
+				entry[0].startFrame = 0;
+				entry[0].duration = 1;
+				entry[0].alpha = zero;
+				entry[1].startFrame = 0;
+				entry[1].duration = 1;
+				entry[1].alpha = zero;
+				entry[2].startFrame = 0;
+				entry[2].duration = 1;
+				entry[2].alpha = zero;
+				entry[3].startFrame = 0;
+				entry[3].duration = 1;
+				entry[3].alpha = zero;
+				entry[4].startFrame = 0;
+				entry[4].duration = 1;
+				entry[4].alpha = zero;
+				entry[5].startFrame = 0;
+				entry[5].duration = 1;
+				entry[5].alpha = zero;
+				entry[6].startFrame = 0;
+				entry[6].duration = 1;
+				entry[6].alpha = zero;
+				entry[7].startFrame = 0;
+				entry[7].duration = 1;
+				entry[7].alpha = zero;
+				entry += 8;
 			}
-			if (uVar6 != 0) {
+			itemCount &= 7;
+			if (itemCount != 0) {
 				do {
-					*(int *)(psVar4 + 0x12) = 0;
-					*(int *)(psVar4 + 0x14) = 1;
-					*(float *)(psVar4 + 8) = fVar1;
-					psVar4 = psVar4 + 0x20;
-					uVar6 = uVar6 - 1;
-				} while (uVar6 != 0);
+					entry->startFrame = 0;
+					entry->duration = 1;
+					entry->alpha = zero;
+					entry++;
+					itemCount--;
+				} while (itemCount != 0);
 			}
 		}
 		return 1;
 	}
+
 	return 0;
 }
 
@@ -349,7 +304,7 @@ void CMenuPcs::TmpArtiCtrl()
 	unsigned int uVar9;
 
 	hasInput = false;
-	*(short *)(reinterpret_cast<int>(this->m_tmpArtiState) + 0x32) = *(short *)(reinterpret_cast<int>(this->m_tmpArtiState) + 0x30);
+	this->m_tmpArtiState->selection = this->m_tmpArtiState->prevSelection;
 	if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
 		hasInput = true;
 	}
@@ -365,18 +320,18 @@ void CMenuPcs::TmpArtiCtrl()
 	if (uVar3 == 0) {
 		hasInput = false;
 	} else if ((uVar3 & 0x20) != 0) {
-		*(short *)(reinterpret_cast<int>(this->m_tmpArtiState) + 0x1e) = 1;
+		this->m_tmpArtiState->moveDirection = 1;
 		Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
 		hasInput = true;
 	} else if ((uVar3 & 0x40) != 0) {
-		*(short *)(reinterpret_cast<int>(this->m_tmpArtiState) + 0x1e) = -1;
+		this->m_tmpArtiState->moveDirection = -1;
 		Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
 		hasInput = true;
 	} else if ((uVar3 & 0x100) != 0) {
 		Sound.PlaySe(4, 0x40, 0x7f, 0);
 		hasInput = false;
 	} else if ((uVar3 & 0x200) != 0) {
-		*(unsigned char *)(reinterpret_cast<int>(this->m_tmpArtiState) + 0xd) = 1;
+		this->m_tmpArtiState->closeRequested = 1;
 		Sound.PlaySe(3, 0x40, 0x7f, 0);
 		hasInput = true;
 	} else {
@@ -388,7 +343,7 @@ void CMenuPcs::TmpArtiCtrl()
 		unsigned int uVar4 = Game.m_scriptFoodBase[0];
 
 		iVar6 = reinterpret_cast<int>(this->m_tmpArtiList) + 8;
-		for (iVar7 = 0; iVar7 < *this->m_tmpArtiList; iVar7 = iVar7 + 1) {
+		for (iVar7 = 0; iVar7 < this->m_tmpArtiList->count; iVar7 = iVar7 + 1) {
 			*(float *)(iVar6 + 0x10) = fVar2;
 			*(float *)(iVar6 + 0x14) = fVar2;
 			iVar6 = iVar6 + 0x40;
@@ -466,138 +421,134 @@ void CMenuPcs::TmpArtiCtrl()
  */
 unsigned int CMenuPcs::TmpArtiOpen()
 {
-	double dVar1;
-	float fVar2;
-	float fVar3;
-	double dVar5;
-	int iVar6;
-	short* psVar7;
-	unsigned int uVar8;
-	int iVar10;
-	unsigned int uVar11;
+	double half;
+	float zero;
+	float one;
+	double center;
+	int completedItems;
+	TmpArtiEntry* entry;
+	unsigned int itemCount;
+	int currentFrame;
+	unsigned int count;
 
-	if (*(char *)(reinterpret_cast<int>(this->m_tmpArtiState) + 0xb) == '\0') {
+	if (this->m_tmpArtiState->initialized == '\0') {
 		memset(this->m_tmpArtiList, 0, sizeof(TmpArtiList));
-		fVar3 = FLOAT_80332f30;
-		iVar6 = reinterpret_cast<int>(this->m_tmpArtiList) + 8;
-		iVar10 = 8;
+		one = FLOAT_80332f30;
+		entry = this->m_tmpArtiList->entries;
+		int i = 8;
 		do {
-			*(float *)(iVar6 + 0x14) = fVar3;
-			*(float *)(iVar6 + 0x54) = fVar3;
-			*(float *)(iVar6 + 0x94) = fVar3;
-			*(float *)(iVar6 + 0xd4) = fVar3;
-			*(float *)(iVar6 + 0x114) = fVar3;
-			*(float *)(iVar6 + 0x154) = fVar3;
-			*(float *)(iVar6 + 0x194) = fVar3;
-			*(float *)(iVar6 + 0x1d4) = fVar3;
-			iVar6 = iVar6 + 0x200;
-			iVar10 = iVar10 - 1;
-		} while (iVar10 != 0);
-		dVar5 = DOUBLE_80332f58;
-		fVar2 = FLOAT_80332f2c;
-		dVar1 = DOUBLE_80332f20;
-		iVar6 = 0;
-		psVar7 = this->m_tmpArtiList + 4;
-		iVar10 = 2;
+			entry[0].z = one;
+			entry[1].z = one;
+			entry[2].z = one;
+			entry[3].z = one;
+			entry[4].z = one;
+			entry[5].z = one;
+			entry[6].z = one;
+			entry[7].z = one;
+			entry += 8;
+			i--;
+		} while (i != 0);
+
+		center = DOUBLE_80332f58;
+		zero = FLOAT_80332f2c;
+		half = DOUBLE_80332f20;
+		int row = 0;
+		entry = this->m_tmpArtiList->entries;
+		int pairCount = 2;
 		do {
-			*(int *)(psVar7 + 0xe) = 0x37;
-			psVar7[2] = 200;
-			psVar7[3] = 0x28;
-			psVar7[0] = (short)(int)-((TmpArtiIntToDouble(psVar7[2]) * dVar1) - dVar5);
-			psVar7[1] = (short)iVar6 * (psVar7[3] + -8) + 0x60;
-			*(float *)(psVar7 + 4) = fVar2;
-			*(float *)(psVar7 + 6) = fVar2;
-			*(int *)(psVar7 + 0x12) = iVar6;
-			*(int *)(psVar7 + 0x14) = 3;
-			*(int *)(psVar7 + 0x2e) = 0x37;
-			psVar7[0x22] = 200;
-			psVar7[0x23] = 0x28;
-			psVar7[0x20] = (short)(int)-((TmpArtiIntToDouble(psVar7[0x22]) * dVar1) - dVar5);
-			psVar7[0x21] = (short)(iVar6 + 1) * (psVar7[0x23] + -8) + 0x60;
-			*(float *)(psVar7 + 0x24) = fVar2;
-			*(float *)(psVar7 + 0x26) = fVar2;
-			*(int *)(psVar7 + 0x32) = iVar6 + 1;
-			iVar6 = iVar6 + 2;
-			*(int *)(psVar7 + 0x34) = 3;
-			psVar7 = psVar7 + 0x40;
-			iVar10 = iVar10 - 1;
-		} while (iVar10 != 0);
-		*this->m_tmpArtiList = 4;
-		*(short *)(reinterpret_cast<int>(this->m_tmpArtiState) + 0x26) = 0;
-		*(char *)(reinterpret_cast<int>(this->m_tmpArtiState) + 0xb) = 1;
+			entry[0].tex = 0x37;
+			entry[0].width = 200;
+			entry[0].height = 0x28;
+			entry[0].x = (short)(int)-(((double)entry[0].width * half) - center);
+			entry[0].y = (short)row * (entry[0].height - 8) + 0x60;
+			entry[0].s = zero;
+			entry[0].t = zero;
+			entry[0].startFrame = row;
+			entry[0].duration = 3;
+			entry[1].tex = 0x37;
+			entry[1].width = 200;
+			entry[1].height = 0x28;
+			entry[1].x = (short)(int)-(((double)entry[1].width * half) - center);
+			entry[1].y = (short)(row + 1) * (entry[1].height - 8) + 0x60;
+			entry[1].s = zero;
+			entry[1].t = zero;
+			entry[1].startFrame = row + 1;
+			row = row + 2;
+			entry[1].duration = 3;
+			entry += 2;
+			pairCount--;
+		} while (pairCount != 0);
+		this->m_tmpArtiList->count = 4;
+		this->m_tmpArtiState->unk_26 = 0;
+		this->m_tmpArtiState->initialized = 1;
 	}
-	iVar6 = 0;
-	*(short *)(reinterpret_cast<int>(this->m_tmpArtiState) + 0x22) = *(short *)(reinterpret_cast<int>(this->m_tmpArtiState) + 0x22) + 1;
-	uVar8 = (unsigned int)*this->m_tmpArtiList;
-	psVar7 = this->m_tmpArtiList + 4;
-	iVar10 = (int)*(short *)(reinterpret_cast<int>(this->m_tmpArtiState) + 0x22);
-	uVar11 = uVar8;
-	if (0 < (int)uVar8) {
-		do {
-			dVar1 = DOUBLE_80332f40;
-			if (*(int *)(psVar7 + 0x12) <= iVar10) {
-				if (*(int *)(psVar7 + 0x12) + *(int *)(psVar7 + 0x14) <= iVar10) {
-					iVar6 = iVar6 + 1;
-					*(float *)(psVar7 + 8) = FLOAT_80332f30;
-				}
-				else {
-					*(int *)(psVar7 + 0x10) = *(int *)(psVar7 + 0x10) + 1;
-					double duration = TmpArtiIntToDouble(*(int *)(psVar7 + 0x14));
-					double timer = TmpArtiIntToDouble(*(int *)(psVar7 + 0x10));
-					*(float *)(psVar7 + 8) =
-					    (float)((DOUBLE_80332f48 / duration) * timer);
+
+	completedItems = 0;
+	this->m_tmpArtiState->frame = this->m_tmpArtiState->frame + 1;
+	itemCount = (unsigned int)this->m_tmpArtiList->count;
+	entry = this->m_tmpArtiList->entries;
+	currentFrame = (int)this->m_tmpArtiState->frame;
+	if ((int)itemCount > 0) {
+		for (unsigned int remaining = itemCount; remaining != 0; remaining--) {
+			if (entry->startFrame <= currentFrame) {
+				if (entry->startFrame + entry->duration <= currentFrame) {
+					completedItems++;
+					entry->alpha = FLOAT_80332f30;
+				} else {
+					entry->timer = entry->timer + 1;
+					double ratio = DOUBLE_80332f48 / (double)entry->duration;
+					entry->alpha = (float)(ratio * (double)entry->timer);
 				}
 			}
-			psVar7 = psVar7 + 0x20;
-			uVar11 = uVar11 - 1;
-		} while (uVar11 != 0);
+			entry++;
+		}
 	}
-	fVar3 = FLOAT_80332f30;
-	if (*this->m_tmpArtiList == iVar6) {
-		psVar7 = this->m_tmpArtiList + 4;
-		if (0 < (int)uVar8) {
-			unsigned int groups = uVar8 >> 3;
-			if (groups != 0) {
-				for (; groups != 0; groups--) {
-					*(int *)(psVar7 + 0x12) = 0;
-					*(int *)(psVar7 + 0x14) = 1;
-					*(float *)(psVar7 + 8) = fVar3;
-					*(int *)(psVar7 + 0x32) = 0;
-					*(int *)(psVar7 + 0x34) = 1;
-					*(float *)(psVar7 + 0x28) = fVar3;
-					*(int *)(psVar7 + 0x52) = 0;
-					*(int *)(psVar7 + 0x54) = 1;
-					*(float *)(psVar7 + 0x48) = fVar3;
-					*(int *)(psVar7 + 0x72) = 0;
-					*(int *)(psVar7 + 0x74) = 1;
-					*(float *)(psVar7 + 0x68) = fVar3;
-					*(int *)(psVar7 + 0x92) = 0;
-					*(int *)(psVar7 + 0x94) = 1;
-					*(float *)(psVar7 + 0x88) = fVar3;
-					*(int *)(psVar7 + 0xb2) = 0;
-					*(int *)(psVar7 + 0xb4) = 1;
-					*(float *)(psVar7 + 0xa8) = fVar3;
-					*(int *)(psVar7 + 0xd2) = 0;
-					*(int *)(psVar7 + 0xd4) = 1;
-					*(float *)(psVar7 + 200) = fVar3;
-					*(int *)(psVar7 + 0xf2) = 0;
-					*(int *)(psVar7 + 0xf4) = 1;
-					*(float *)(psVar7 + 0xe8) = fVar3;
-					psVar7 = psVar7 + 0x100;
-				}
-				uVar8 = uVar8 & 7;
+
+	one = FLOAT_80332f30;
+	if (this->m_tmpArtiList->count == completedItems) {
+		entry = this->m_tmpArtiList->entries;
+		if ((int)itemCount > 0) {
+			count = itemCount >> 3;
+			for (; count != 0; count--) {
+				entry[0].startFrame = 0;
+				entry[0].duration = 1;
+				entry[0].alpha = one;
+				entry[1].startFrame = 0;
+				entry[1].duration = 1;
+				entry[1].alpha = one;
+				entry[2].startFrame = 0;
+				entry[2].duration = 1;
+				entry[2].alpha = one;
+				entry[3].startFrame = 0;
+				entry[3].duration = 1;
+				entry[3].alpha = one;
+				entry[4].startFrame = 0;
+				entry[4].duration = 1;
+				entry[4].alpha = one;
+				entry[5].startFrame = 0;
+				entry[5].duration = 1;
+				entry[5].alpha = one;
+				entry[6].startFrame = 0;
+				entry[6].duration = 1;
+				entry[6].alpha = one;
+				entry[7].startFrame = 0;
+				entry[7].duration = 1;
+				entry[7].alpha = one;
+				entry += 8;
 			}
-			if (uVar8 != 0) {
+			itemCount &= 7;
+			if (itemCount != 0) {
 				do {
-					*(int *)(psVar7 + 0x12) = 0;
-					*(int *)(psVar7 + 0x14) = 1;
-					*(float *)(psVar7 + 8) = fVar3;
-					psVar7 = psVar7 + 0x20;
-					uVar8 = uVar8 - 1;
-				} while (uVar8 != 0);
+					entry->startFrame = 0;
+					entry->duration = 1;
+					entry->alpha = one;
+					entry++;
+					itemCount--;
+				} while (itemCount != 0);
 			}
 		}
 		return 1;
 	}
+
 	return 0;
 }

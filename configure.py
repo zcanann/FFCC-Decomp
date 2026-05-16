@@ -741,7 +741,7 @@ config.libs = [
             Object(NonMatching, "ringmenu.cpp"),
             Object(NonMatching, "shopmenu.cpp"),
             Object(NonMatching, "singmenu.cpp"),
-            Object(NonMatching, "sound.cpp"),
+            Object(NonMatching, "sound.cpp", extra_cflags=["-RTTI on"]),
             Object(NonMatching, "stopwatch.cpp"),
             Object(NonMatching, "system.cpp", extra_cflags=["-RTTI on"]),
             Object(NonMatching, "texanim.cpp"),

@@ -387,6 +387,7 @@ enum RedSeBlockEntryLayout {
 
 #define RedSeInfoGetWaveNo(info)                                                                  \
 	(((info)->m_waveNoHi * REDSOUND_SE_INFO_U16_HIGH_SCALE) | (info)->m_waveNoLo)
+#define RedSeInfoGetSequences(info) ((info)->m_sequence)
 
 struct RedWaveHeadWD
 {

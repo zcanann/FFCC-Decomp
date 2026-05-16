@@ -862,7 +862,7 @@ static int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volum
 	} else {
 		isMulti = 0;
 	}
-	seq = info->m_sequence;
+	seq = RedSeInfoGetSequences(info);
 	attrMask = info->m_attrMask;
 	count = info->m_flagsAndCount & ~REDSOUND_SE_INFO_MULTI_FLAG;
 	current = RedSeInfoGetCommandData(seq, count);

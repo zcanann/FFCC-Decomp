@@ -851,7 +851,7 @@ static void _SetReverbDepth(int* command)
             fadeStep++;
         }
         reverbDepth |= REDSOUND_FIXED_HALF;
-        track = p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
+        track = RedSoundControlGet(REDSOUND_CONTROL_SE)->m_tracks;
         do {
             if ((u32)track->m_command != REDSOUND_TRACK_COMMAND_NONE) {
                 fadeDepth = track->m_reverbDepth & REDSOUND_FIXED_WHOLE_MASK;
@@ -860,7 +860,7 @@ static void _SetReverbDepth(int* command)
                 track->m_reverbDepthDelta = fadeStep;
             }
             track++;
-        } while (track < p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks + REDSOUND_SE_TRACK_COUNT);
+        } while (track < RedSoundControlGetSeTrackEnd(RedSoundControlGet(REDSOUND_CONTROL_SE)));
     }
 }
 
@@ -2934,7 +2934,7 @@ int CRedDriver::SePlayState(int seID)
 
     interruptLevel = OSDisableInterrupts();
     result = 0;
-    seInfoBase = &p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
+    seInfoBase = &RedSoundControlGet(REDSOUND_CONTROL_SE)->m_tracks;
     seInfo = *seInfoBase;
     do {
         if (((u32)seInfo->m_command != REDSOUND_TRACK_COMMAND_NONE) && ((seID == REDSOUND_SE_ID_ALL || (seInfo->m_seId == seID)))) {
@@ -3162,7 +3162,7 @@ int CRedDriver::GetSeVolume(int seID, int mode)
 {
     RedTrackDATA* track;
 
-    track = p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
+    track = RedSoundControlGet(REDSOUND_CONTROL_SE)->m_tracks;
     while (1) {
         if (((u32)track->m_command != REDSOUND_TRACK_COMMAND_NONE) && ((seID == REDSOUND_SE_ID_ALL) || (seID == track->m_seId))) {
             if ((u32)track->m_command != REDSOUND_TRACK_COMMAND_NONE) {
@@ -3173,7 +3173,7 @@ int CRedDriver::GetSeVolume(int seID, int mode)
             }
         }
         track++;
-        if (track < p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks + REDSOUND_SE_TRACK_COUNT) {
+        if (track < RedSoundControlGetSeTrackEnd(RedSoundControlGet(REDSOUND_CONTROL_SE))) {
             continue;
         }
         return 0;
@@ -3193,7 +3193,7 @@ int CRedDriver::ReportSeLoop(int seID)
 {
     RedTrackDATA* track;
 
-    track = p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
+    track = RedSoundControlGet(REDSOUND_CONTROL_SE)->m_tracks;
     while (1) {
         if ((track->m_command != REDSOUND_TRACK_COMMAND_NONE) &&
             (((seID == REDSOUND_SE_ID_ALL) || (seID == track->m_seId)) &&
@@ -3201,7 +3201,7 @@ int CRedDriver::ReportSeLoop(int seID)
             return 1;
         }
         track++;
-        if (track < p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks + REDSOUND_SE_TRACK_COUNT) {
+        if (track < RedSoundControlGetSeTrackEnd(RedSoundControlGet(REDSOUND_CONTROL_SE))) {
             continue;
         }
         return 0;
@@ -3253,9 +3253,8 @@ inline void CRedDriver::ClearSePlayLine()
  */
 inline RedTrackDATA* CRedDriver::GetSePlayTrack()
 {
-	RedTrackDATA* track = p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
-	RedTrackDATA* trackEnd = track;
-	trackEnd += REDSOUND_SE_TRACK_COUNT;
+	RedTrackDATA* track = RedSoundControlGet(REDSOUND_CONTROL_SE)->m_tracks;
+	RedTrackDATA* trackEnd = RedSoundControlGetSeTrackEnd(RedSoundControlGet(REDSOUND_CONTROL_SE));
 
 	do {
 		if (track->m_command != REDSOUND_TRACK_COMMAND_NONE) {

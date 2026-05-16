@@ -2575,7 +2575,7 @@ static int _MusicMidiNoteExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnDa
 {
     int* tick = &control->m_measure;
 
-    frames <<= m_MusicFastSpeed;
+    frames <<= RedMusicFastSpeedGet();
     control->m_loopBase = frames;
 
     tick[REDSOUND_CONTROL_TICK_CURRENT] += frames;

@@ -2154,7 +2154,7 @@ void CRedDriver::Init()
     m_MusicKeySignature = 0;
     m_SoundMasterControl = 0;
     m_MusicSkipLine = 0;
-    m_MusicFastSpeed = 0;
+    RedMusicFastSpeedSet(0);
     m_DMAStatus = REDSOUND_DMA_STATUS_IDLE;
     m_CrossTime = 0;
     m_MasterSEVolume = REDSOUND_MASTER_VOLUME_FULL;
@@ -2770,7 +2770,7 @@ inline int CRedDriver::CheckMusicEntry(int musicID)
  */
 inline void CRedDriver::SetMusicFastSpeed(int speed)
 {
-    m_MusicFastSpeed = speed;
+    RedMusicFastSpeedSet(speed);
 }
 
 /*

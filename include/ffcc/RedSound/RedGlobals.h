@@ -256,6 +256,8 @@ extern volatile int m_ReportPrint;
 #define RedReportPrintIsEnabled() (RedReportPrintGet() != REDSOUND_REPORT_PRINT_OFF)
 #define RedReportPrintIsDisabled() (RedReportPrintGet() == REDSOUND_REPORT_PRINT_OFF)
 extern int m_MusicFastSpeed;
+#define RedMusicFastSpeedGet() (m_MusicFastSpeed)
+#define RedMusicFastSpeedSet(speed) (m_MusicFastSpeed = (speed))
 extern volatile int m_MusicSkipLine;
 extern int m_MusicKeySignature;
 extern int* volatile p_MusicReplayPoint;

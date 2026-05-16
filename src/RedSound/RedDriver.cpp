@@ -663,7 +663,14 @@ static volatile int m_SequencialID;
 #define RedSequencialIDSet(id) (m_SequencialID = (id))
 #define RedSequencialIDInc() (m_SequencialID++)
 static volatile int m_ThreadControl;
+#define RedThreadControlGet() (m_ThreadControl)
+#define RedThreadControlSet(control) (m_ThreadControl = (control))
+#define RedThreadControlIsRunning() (RedThreadControlGet() != REDSOUND_THREAD_CONTROL_STOP)
 static volatile int m_ThreadExecute;
+#define RedThreadExecuteGet() (m_ThreadExecute)
+#define RedThreadExecuteSet(flags) (m_ThreadExecute = (flags))
+#define RedThreadExecuteAdd(flags) (m_ThreadExecute = m_ThreadExecute | (flags))
+#define RedThreadExecuteRemove(flags) (m_ThreadExecute = m_ThreadExecute & ~(flags))
 static int m_SoundMode;
 #define RedSoundModeGet() (m_SoundMode)
 #define RedSoundModeSet(mode) (m_SoundMode = (mode))
@@ -1693,10 +1700,10 @@ static int _MainThread(void*)
     int masterTime;
     unsigned int elapsed;
 
-    m_ThreadExecute = m_ThreadExecute | REDSOUND_THREAD_FLAG_MAIN;
-    while (m_ThreadControl != REDSOUND_THREAD_CONTROL_STOP) {
+    RedThreadExecuteAdd(REDSOUND_THREAD_FLAG_MAIN);
+    while (RedThreadControlIsRunning()) {
         OSWaitSemaphore(&m_MainSemaphore);
-        if (m_ThreadControl != REDSOUND_THREAD_CONTROL_STOP) {
+        if (RedThreadControlIsRunning()) {
             startTick = OSGetTick();
             control = RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY);
             masterTime = RedMasterTimeGet();
@@ -1724,7 +1731,7 @@ static int _MainThread(void*)
             RedTickHistoryGetTicks()[REDSOUND_TICK_HISTORY_LATEST] = endTick - startTick;
         }
     }
-    m_ThreadExecute = m_ThreadExecute & ~REDSOUND_THREAD_FLAG_MAIN;
+    RedThreadExecuteRemove(REDSOUND_THREAD_FLAG_MAIN);
     return 0;
 }
 
@@ -1739,11 +1746,11 @@ static int _MainThread(void*)
  */
 static int _WaveSettingThread(void* threadArg)
 {
-    m_ThreadExecute = m_ThreadExecute | REDSOUND_THREAD_FLAG_WAVE_SETTING;
+    RedThreadExecuteAdd(REDSOUND_THREAD_FLAG_WAVE_SETTING);
     RedWaveSettingStatusSet(REDSOUND_WORKER_IDLE);
-    while (m_ThreadControl != REDSOUND_THREAD_CONTROL_STOP) {
+    while (RedThreadControlIsRunning()) {
         OSWaitSemaphore(&m_WaveSettingSemaphore);
-        if (m_ThreadControl != REDSOUND_THREAD_CONTROL_STOP) {
+        if (RedThreadControlIsRunning()) {
             RedWaveSettingState* waveSetting = (RedWaveSettingState*)threadArg;
             RedWaveSettingStatusInc();
             c_RedEntry.SetWaveData(waveSetting->m_waveId, waveSetting->m_waveData, waveSetting->m_waveSize);
@@ -1753,7 +1760,7 @@ static int _WaveSettingThread(void* threadArg)
             RedWaveSettingStatusSet(REDSOUND_WORKER_IDLE);
         }
     }
-    m_ThreadExecute = m_ThreadExecute & ~REDSOUND_THREAD_FLAG_WAVE_SETTING;
+    RedThreadExecuteRemove(REDSOUND_THREAD_FLAG_WAVE_SETTING);
     return 0;
 }
 
@@ -2052,18 +2059,18 @@ static void _DmaExecute()
  */
 static int _DmaExecuteThread(void*)
 {
-    m_ThreadExecute |= REDSOUND_THREAD_FLAG_DMA;
+    RedThreadExecuteAdd(REDSOUND_THREAD_FLAG_DMA);
     RedDmaExecuteSet(REDSOUND_WORKER_IDLE);
     RedDmaThreadStateSet(REDSOUND_DMA_THREAD_IDLE);
-    while (m_ThreadControl != REDSOUND_THREAD_CONTROL_STOP) {
+    while (RedThreadControlIsRunning()) {
         OSWaitSemaphore(&m_DmaExecuteSemaphore);
         RedDmaExecuteSet(REDSOUND_WORKER_BUSY);
-        if (m_ThreadControl != REDSOUND_THREAD_CONTROL_STOP) {
+        if (RedThreadControlIsRunning()) {
             _DmaExecute();
         }
         RedDmaExecuteSet(REDSOUND_WORKER_IDLE);
     }
-    m_ThreadExecute &= ~REDSOUND_THREAD_FLAG_DMA;
+    RedThreadExecuteRemove(REDSOUND_THREAD_FLAG_DMA);
     return 0;
 }
 
@@ -2078,17 +2085,17 @@ static int _DmaExecuteThread(void*)
  */
 static int _MusicSkipThread(void*)
 {
-    m_ThreadExecute |= REDSOUND_THREAD_FLAG_MUSIC_SKIP;
+    RedThreadExecuteAdd(REDSOUND_THREAD_FLAG_MUSIC_SKIP);
     RedMusicSkipCompleteSet(REDSOUND_MUSIC_SKIP_NOT_COMPLETE);
-    while (m_ThreadControl != REDSOUND_THREAD_CONTROL_STOP) {
+    while (RedThreadControlIsRunning()) {
         OSWaitSemaphore(&m_MusicSkipSemaphore);
-        if (m_ThreadControl != REDSOUND_THREAD_CONTROL_STOP) {
+        if (RedThreadControlIsRunning()) {
             MusicSkipFunction();
         }
         while (OSTryWaitSemaphore(&m_MusicSkipSemaphore) > 0) {
         }
     }
-    m_ThreadExecute &= ~REDSOUND_THREAD_FLAG_MUSIC_SKIP;
+    RedThreadExecuteRemove(REDSOUND_THREAD_FLAG_MUSIC_SKIP);
     return 0;
 }
 
@@ -2158,8 +2165,8 @@ void CRedDriver::Init()
     int fullVolume;
     int noMusicId;
 
-    m_ThreadExecute = REDSOUND_THREAD_FLAG_NONE;
-    m_ThreadControl = REDSOUND_THREAD_CONTROL_RUN;
+    RedThreadExecuteSet(REDSOUND_THREAD_FLAG_NONE);
+    RedThreadControlSet(REDSOUND_THREAD_CONTROL_RUN);
     RedReportPrintSet(REDSOUND_REPORT_PRINT_ON);
     RedSoundModeSet(REDSOUND_SOUND_MODE_STEREO);
     GetSoundMode();
@@ -2303,12 +2310,12 @@ void CRedDriver::End()
     RedDriverSyncState& sync = RedDriverSync();
 
     AXRegisterCallback(0);
-    m_ThreadControl = REDSOUND_THREAD_CONTROL_STOP;
+    RedThreadControlSet(REDSOUND_THREAD_CONTROL_STOP);
     OSSignalSemaphore(&sync.m_mainSemaphore);
     OSSignalSemaphore(&sync.m_waveSemaphore);
     OSSignalSemaphore(&sync.m_dmaSemaphore);
     OSSignalSemaphore(&sync.m_musicSemaphore);
-    while (m_ThreadExecute != REDSOUND_THREAD_FLAG_NONE) {
+    while (RedThreadExecuteGet() != REDSOUND_THREAD_FLAG_NONE) {
         RedSleep(REDSOUND_THREAD_YIELD_SLEEP_US);
     }
     AXRegisterAuxACallback(0, 0);

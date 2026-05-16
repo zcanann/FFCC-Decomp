@@ -4008,34 +4008,34 @@ Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocat
 				const int recipeBase = itemBase + j * 4;
 
 				const unsigned short materialA = *reinterpret_cast<unsigned short*>(recipeBase + 0x38);
-				reinterpret_cast<unsigned short*>(itemBuf)[8 + j] = SwapU16(materialA);
+				reinterpret_cast<unsigned short*>(itemBuf)[8 + j * 2] = SwapU16(materialA);
 				if (materialA == 0) {
-					reinterpret_cast<unsigned short*>(itemBuf)[12 + j * 2] = 0;
-					reinterpret_cast<unsigned short*>(itemBuf)[13 + j * 2] = 0;
-					reinterpret_cast<unsigned short*>(itemBuf)[14 + j * 2] = 0;
+					reinterpret_cast<unsigned short*>(itemBuf)[12 + j * 8] = 0;
+					reinterpret_cast<unsigned short*>(itemBuf)[13 + j * 8] = 0;
+					reinterpret_cast<unsigned short*>(itemBuf)[14 + j * 8] = 0;
 				} else {
 					const int materialBase = flatBase + materialA * 0x48;
-					reinterpret_cast<unsigned short*>(itemBuf)[12 + j * 2] =
+					reinterpret_cast<unsigned short*>(itemBuf)[12 + j * 8] =
 						SwapU16(*reinterpret_cast<unsigned short*>(materialBase + 4));
-					reinterpret_cast<unsigned short*>(itemBuf)[13 + j * 2] =
+					reinterpret_cast<unsigned short*>(itemBuf)[13 + j * 8] =
 						SwapU16(*reinterpret_cast<unsigned short*>(materialBase + 6));
-					reinterpret_cast<unsigned short*>(itemBuf)[14 + j * 2] =
+					reinterpret_cast<unsigned short*>(itemBuf)[14 + j * 8] =
 						SwapU16(*reinterpret_cast<unsigned short*>(materialBase + 8));
 				}
 
 				const unsigned short materialB = *reinterpret_cast<unsigned short*>(recipeBase + 0x3A);
-				reinterpret_cast<unsigned short*>(itemBuf)[17 + j] = SwapU16(materialB);
+				reinterpret_cast<unsigned short*>(itemBuf)[9 + j * 2] = SwapU16(materialB);
 				if (materialB == 0) {
-					reinterpret_cast<unsigned short*>(itemBuf)[16 + j * 2] = 0;
-					reinterpret_cast<unsigned short*>(itemBuf)[17 + j * 2 + 2] = 0;
-					reinterpret_cast<unsigned short*>(itemBuf)[18 + j * 2 + 2] = 0;
+					reinterpret_cast<unsigned short*>(itemBuf)[16 + j * 8] = 0;
+					reinterpret_cast<unsigned short*>(itemBuf)[17 + j * 8] = 0;
+					reinterpret_cast<unsigned short*>(itemBuf)[18 + j * 8] = 0;
 				} else {
 					const int materialBase = flatBase + materialB * 0x48;
-					reinterpret_cast<unsigned short*>(itemBuf)[16 + j * 2] =
+					reinterpret_cast<unsigned short*>(itemBuf)[16 + j * 8] =
 						SwapU16(*reinterpret_cast<unsigned short*>(materialBase + 4));
-					reinterpret_cast<unsigned short*>(itemBuf)[17 + j * 2 + 2] =
+					reinterpret_cast<unsigned short*>(itemBuf)[17 + j * 8] =
 						SwapU16(*reinterpret_cast<unsigned short*>(materialBase + 6));
-					reinterpret_cast<unsigned short*>(itemBuf)[18 + j * 2 + 2] =
+					reinterpret_cast<unsigned short*>(itemBuf)[18 + j * 8] =
 						SwapU16(*reinterpret_cast<unsigned short*>(materialBase + 8));
 				}
 			}

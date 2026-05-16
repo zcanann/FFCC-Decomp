@@ -218,6 +218,8 @@ extern signed char t_KeySignatureData[REDSOUND_KEY_SIGNATURE_DATA_COUNT];
 extern signed char t_RandomData[REDSOUND_RANDOM_DATA_COUNT];
 extern s16 t_PanningData[REDSOUND_PAN_TABLE_COUNT];
 extern s16 t_PanningDataR[REDSOUND_PAN_TABLE_COUNT];
+extern u32 m_TerminateNote[];
+extern volatile unsigned int m_AutoID;
 extern CRedEntry c_RedEntry;
 extern OSSemaphore m_MusicSkipSemaphore;
 extern RedSeBlockHEAD* volatile p_SeBlockData[REDSOUND_SE_BLOCK_BANK_COUNT];

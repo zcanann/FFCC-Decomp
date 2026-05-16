@@ -331,7 +331,10 @@ struct RedKeyOnDATA {
 	RedKeyOnSlot m_normal[REDSOUND_KEY_ON_SLOT_COUNT];
 };
 
+#define RedKeyOnGetFixedBegin(keyOnData) ((keyOnData)->m_fixed)
+#define RedKeyOnGetPriorityBegin(keyOnData) ((keyOnData)->m_priority)
 #define RedKeyOnGetPriorityEnd(keyOnData) ((keyOnData)->m_normal)
+#define RedKeyOnGetNormalBegin(keyOnData) ((keyOnData)->m_normal)
 #define RedKeyOnGetEnd(keyOnData) ((keyOnData)->m_normal + REDSOUND_KEY_ON_SLOT_COUNT)
 
 enum RedKeyOnWordOffset {

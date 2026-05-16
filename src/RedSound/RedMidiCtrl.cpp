@@ -616,7 +616,7 @@ int DataAddCompute(int* current, int target, int* delta)
  */
 void KeyOnReserveClear(RedKeyOnDATA* keyOnData, RedTrackDATA* track)
 {
-    RedKeyOnSlot* slot = keyOnData->m_fixed;
+    RedKeyOnSlot* slot = RedKeyOnGetFixedBegin(keyOnData);
     do {
         if (slot->m_track == track) {
             slot->m_track = REDSOUND_TRACK_NONE;
@@ -638,7 +638,7 @@ void KeyOnReserve(RedKeyOnDATA* keyOnData, RedTrackDATA* track)
     RedKeyOnSlot* slot;
 
     if (((signed char)track->m_note.m_allocFlags & REDSOUND_NOTE_ALLOC_DIRECT_MASK) != 0) {
-        slot = &keyOnData->m_fixed[track->m_trackNo];
+        slot = RedKeyOnGetFixedBegin(keyOnData) + track->m_trackNo;
         if ((slot->m_track == REDSOUND_TRACK_NONE) || (slot->m_track == track)) {
             slot->m_track = track;
             RedNoteCopy(&slot->m_note, &track->m_note);
@@ -648,7 +648,7 @@ void KeyOnReserve(RedKeyOnDATA* keyOnData, RedTrackDATA* track)
     }
 
     if ((track->m_note.m_allocFlags & REDSOUND_NOTE_ALLOC_PRIORITY) != 0) {
-        slot = keyOnData->m_priority;
+        slot = RedKeyOnGetPriorityBegin(keyOnData);
         do {
             if (slot->m_track == REDSOUND_TRACK_NONE) {
                 slot->m_track = track;
@@ -659,7 +659,7 @@ void KeyOnReserve(RedKeyOnDATA* keyOnData, RedTrackDATA* track)
             slot++;
         } while (slot < RedKeyOnGetPriorityEnd(keyOnData));
     } else {
-        slot = keyOnData->m_normal;
+        slot = RedKeyOnGetNormalBegin(keyOnData);
         do {
             if (slot->m_track == REDSOUND_TRACK_NONE) {
                 slot->m_track = track;
@@ -689,7 +689,7 @@ void KeyOffSet(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* 
     if ((control == RedSoundControlGet(REDSOUND_CONTROL_MUSIC_SKIP)) || ((track->m_flags & REDSOUND_TRACK_FLAG_SLUR) == 0)) {
         track->m_sweepDelta = 0;
         key = RedNoteGetKey(&track->m_note);
-        slot = keyOnData->m_fixed;
+        slot = RedKeyOnGetFixedBegin(keyOnData);
         do {
             if ((slot->m_track == track) && (slot->m_note.m_key == key)) {
                 slot->m_track = REDSOUND_TRACK_NONE;

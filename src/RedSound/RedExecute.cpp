@@ -2042,7 +2042,7 @@ static void _KeyOnControl()
     voiceStartMask[REDSOUND_VOICE_START_MASK_LOW] = 0;
 
     if (keyOnEntry != 0) {
-        reserve = p_KeyOnData->m_fixed;
+        reserve = RedKeyOnGetFixedBegin(p_KeyOnData);
         voiceData = RedVoiceDataGetBegin();
         do {
             if ((reserve->m_track != 0) && (reserve->m_track->m_waveData != 0)) {
@@ -2713,8 +2713,8 @@ static void _SkipMusicEntry()
     int keyOnEntryCount = 0;
 
     if (RedSoundControlGet(REDSOUND_CONTROL_MUSIC_SKIP)->m_musicId >= REDSOUND_MUSIC_ID_MIN) {
-        src = p_SkipKeyOn->m_fixed;
-        dst = p_KeyOnData->m_fixed;
+        src = RedKeyOnGetFixedBegin(p_SkipKeyOn);
+        dst = RedKeyOnGetFixedBegin(p_KeyOnData);
         do {
             if ((src->m_track != REDSOUND_TRACK_NONE) && (dst->m_track == REDSOUND_TRACK_NONE)) {
                 dst->m_track = src->m_track;
@@ -2724,17 +2724,18 @@ static void _SkipMusicEntry()
             }
             src++;
             dst++;
-        } while (src < p_SkipKeyOn->m_priority);
+        } while (src < RedKeyOnGetPriorityBegin(p_SkipKeyOn));
 
-        src = p_SkipKeyOn->m_priority;
-        dst = p_KeyOnData->m_priority;
-        while (dst < p_KeyOnData->m_normal) {
+        src = RedKeyOnGetPriorityBegin(p_SkipKeyOn);
+        dst = RedKeyOnGetPriorityBegin(p_KeyOnData);
+        while (dst < RedKeyOnGetNormalBegin(p_KeyOnData)) {
             if (dst->m_track == REDSOUND_TRACK_NONE) {
                 break;
             }
             dst++;
         }
-        while ((dst < p_KeyOnData->m_normal) && (src < p_SkipKeyOn->m_normal)) {
+        while ((dst < RedKeyOnGetNormalBegin(p_KeyOnData)) &&
+               (src < RedKeyOnGetNormalBegin(p_SkipKeyOn))) {
             if (src->m_track != REDSOUND_TRACK_NONE) {
                 dst->m_track = src->m_track;
                 *(int*)&dst->m_note = *(int*)&src->m_note;
@@ -2745,8 +2746,8 @@ static void _SkipMusicEntry()
             src++;
         }
 
-        src = p_SkipKeyOn->m_normal;
-        dst = p_KeyOnData->m_normal;
+        src = RedKeyOnGetNormalBegin(p_SkipKeyOn);
+        dst = RedKeyOnGetNormalBegin(p_KeyOnData);
         while (dst < RedKeyOnGetEnd(p_KeyOnData)) {
             if (dst->m_track == REDSOUND_TRACK_NONE) {
                 break;

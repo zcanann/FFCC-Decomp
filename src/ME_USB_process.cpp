@@ -94,7 +94,7 @@ static inline u16 LoadSwapU16(u16 value)
 
 /*
  * --INFO--
- * PAL Address: 80050a7c
+ * PAL Address: 0x8004CA08
  * PAL Size: 4784b
  * EN Address: TODO
  * EN Size: TODO
@@ -140,22 +140,23 @@ extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialE
         }
 
         rsdItem->countA = size;
-        rsdItem->ptr10 = _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
+        void* allocData = _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
             &Memory, dataSize, MaterialEditorStage(), s_ME_USB_process_cpp_801d7d78, 0x31, 0);
-        if (rsdItem->ptr10 == 0) {
+        if (allocData == 0) {
             Printf__7CSystemFPce(&System, s_MemAlloc_Error____size__d_801d7d8c, dataSize);
         }
+        rsdItem->ptr10 = allocData;
 
         memcpy(rsdItem->ptr10, usb.m_data, dataSize);
 
         xyzData = reinterpret_cast<u32*>(rsdItem->ptr10);
-        for (u32 i = 0, offset = 0; i < size; i++, offset += 0xC) {
+        for (u32 i = 0, offset = 0; i < usb.m_sizeBytes; i++, offset += 0xC) {
             u32* item = reinterpret_cast<u32*>(reinterpret_cast<u8*>(xyzData) + offset);
             StoreSwap32(item + 0);
             StoreSwapNegFloat(reinterpret_cast<f32*>(item + 1));
             StoreSwapNegFloat(reinterpret_cast<f32*>(item + 2));
         }
-        DCStoreRange(rsdItem->ptr10, dataSize);
+        DCStoreRange(rsdItem->ptr10, usb.m_sizeBytes * 0xC);
 
         materialEditorPcs->CreateBoundaryBox(minPos, maxPos, rsdItem->countA, reinterpret_cast<const Vec*>(rsdItem->ptr10));
 
@@ -182,16 +183,17 @@ extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialE
         }
 
         rsdItem->countC = size;
-        rsdItem->ptr18 = _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
+        void* allocData = _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
             &Memory, dataSize, MaterialEditorStage(), s_ME_USB_process_cpp_801d7d78, 0x31, 0);
-        if (rsdItem->ptr18 == 0) {
+        if (allocData == 0) {
             Printf__7CSystemFPce(&System, s_MemAlloc_Error____size__d_801d7d8c, dataSize);
         }
+        rsdItem->ptr18 = allocData;
 
         memset(rsdItem->ptr18, 0, dataSize);
         memcpy(rsdItem->ptr18, usb.m_data, dataSize);
 
-        for (u32 i = 0; i < size; i++) {
+        for (u32 i = 0; i < usb.m_sizeBytes; i++) {
             u8* data = reinterpret_cast<u8*>(rsdItem->ptr18) + i * 0x70;
 
             *reinterpret_cast<u16*>(data + 0x00) = LoadSwapU16(*reinterpret_cast<u16*>(data + 0x00));
@@ -216,7 +218,7 @@ extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialE
             *reinterpret_cast<u16*>(data + 0x2C) = LoadSwapU16(*reinterpret_cast<u16*>(data + 0x2C));
             *reinterpret_cast<u16*>(data + 0x2E) = LoadSwapU16(*reinterpret_cast<u16*>(data + 0x2E));
         }
-        DCStoreRange(rsdItem->ptr18, dataSize);
+        DCStoreRange(rsdItem->ptr18, usb.m_sizeBytes * 0x70);
         break;
     }
     case 0x42:
@@ -243,22 +245,23 @@ extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialE
         }
 
         rsdItem->countB = size;
-        rsdItem->ptr14 = _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
+        void* allocData = _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
             &Memory, dataSize, MaterialEditorStage(), s_ME_USB_process_cpp_801d7d78, 0x31, 0);
-        if (rsdItem->ptr14 == 0) {
+        if (allocData == 0) {
             Printf__7CSystemFPce(&System, s_MemAlloc_Error____size__d_801d7d8c, dataSize);
         }
+        rsdItem->ptr14 = allocData;
 
         memcpy(rsdItem->ptr14, usb.m_data, dataSize);
 
         xyzData = reinterpret_cast<u32*>(rsdItem->ptr14);
-        for (u32 i = 0, offset = 0; i < size; i++, offset += 0xC) {
+        for (u32 i = 0, offset = 0; i < usb.m_sizeBytes; i++, offset += 0xC) {
             u32* item = reinterpret_cast<u32*>(reinterpret_cast<u8*>(xyzData) + offset);
             StoreSwap32(item + 0);
             StoreSwapNegFloat(reinterpret_cast<f32*>(item + 1));
             StoreSwapNegFloat(reinterpret_cast<f32*>(item + 2));
         }
-        DCStoreRange(rsdItem->ptr14, dataSize);
+        DCStoreRange(rsdItem->ptr14, usb.m_sizeBytes * 0xC);
         break;
     }
     case 1: {
@@ -300,7 +303,6 @@ extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialE
         break;
     }
     case 0x31: {
-        RSDITEM* rsdItem = materialEditorPcs->GetRsdItem()->rsdItem;
         u32 size = usb.m_sizeBytes;
         u8* dstBuffer = reinterpret_cast<u8*>(_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
             &Memory, size, MaterialEditorStage(), s_ME_USB_process_cpp_801d7d78, 0x31, 0));
@@ -309,10 +311,11 @@ extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialE
             Printf__7CSystemFPce(&System, s_MemAlloc_Error____size__d_801d7d8c, size);
         }
 
+        RSDITEM* rsdItem = materialEditorPcs->GetRsdItem()->rsdItem;
         memcpy(dstBuffer, usb.m_data, size);
 
         u8* target = reinterpret_cast<u8*>(rsdItem->ptr18);
-        for (u32 i = 0; i < size; i++) {
+        for (u32 i = 0; i < usb.m_sizeBytes; i++) {
             target[i * 0x70 + 0x1A] = dstBuffer[i];
         }
 
@@ -416,7 +419,7 @@ extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialE
         while ((heightFactor & 1) == 0) {
             heightFactor >>= 1;
         }
-        if ((widthFactor != 1) || (heightFactor != 1)) {
+        if ((heightFactor != 1) || (heightFactor != 1)) {
             isPowerOfTwo = GX_FALSE;
         }
 
@@ -435,7 +438,7 @@ extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialE
             GXLoadTlut(materialEditorPcs->m_tlutObj1[materialEditorPcs->m_loadedTextureCount], GX_TLUT1);
             GXInitTexObjCI(materialEditorPcs->m_texObj[materialEditorPcs->m_loadedTextureCount],
                 materialEditorPcs->m_textureData[materialEditorPcs->m_loadedTextureCount], headerBuffer[2], headerBuffer[3],
-                static_cast<GXCITexFmt>(format == 4 ? GX_CTF_R4 : GX_CTF_RA4),
+                static_cast<GXCITexFmt>(format == 4 ? GX_TF_C4 : GX_TF_C8),
                 static_cast<GXTexWrapMode>(isPowerOfTwo), static_cast<GXTexWrapMode>(isPowerOfTwo),
                 GX_FALSE, static_cast<u32>(GX_TLUT0));
         }
@@ -451,7 +454,7 @@ extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialE
 
 /*
  * --INFO--
- * PAL Address: 80051d2c
+ * PAL Address: 0x8004DCB8
  * PAL Size: 48b
  * EN Address: TODO
  * EN Size: TODO

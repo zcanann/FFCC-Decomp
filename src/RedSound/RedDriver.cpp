@@ -933,7 +933,7 @@ static void _MusicPlaySequence(int* command)
     int replayPoint;
     RedSoundCONTROL* soundControl;
 
-    soundControl = p_SoundControlBuffer;
+    soundControl = RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY);
     if ((command[REDSOUND_MUSIC_COMMAND_ID] == soundControl[REDSOUND_CONTROL_MUSIC_PRIMARY].m_musicId) ||
         (command[REDSOUND_MUSIC_COMMAND_ID] == soundControl[REDSOUND_CONTROL_MUSIC_SECONDARY].m_musicId) ||
         (command[REDSOUND_MUSIC_COMMAND_ID] == soundControl[REDSOUND_CONTROL_MUSIC_SKIP].m_musicId)) {
@@ -980,7 +980,7 @@ static void _MusicCrossPlaySequence(int* command)
     if (command[REDSOUND_MUSIC_COMMAND_FADE_TIME] == 0) {
         command[REDSOUND_MUSIC_COMMAND_FADE_TIME] = command[REDSOUND_MUSIC_COMMAND_FADE_TIME] + 1;
     }
-    control = p_SoundControlBuffer;
+    control = RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY);
     if ((command[REDSOUND_MUSIC_COMMAND_ID] == control[REDSOUND_CONTROL_MUSIC_PRIMARY].m_musicId) ||
         (command[REDSOUND_MUSIC_COMMAND_ID] == control[REDSOUND_CONTROL_MUSIC_SKIP].m_musicId)) {
         return;
@@ -998,9 +998,10 @@ static void _MusicCrossPlaySequence(int* command)
         control->m_masterVolumeDelta = command[REDSOUND_MUSIC_COMMAND_FADE_TIME];
         swapControl = (RedSoundCONTROL*)RedNew(REDSOUND_CONTROL_SIZE);
         memcpy(swapControl, RedSoundControlGet(REDSOUND_CONTROL_MUSIC_SECONDARY), REDSOUND_CONTROL_SIZE);
-        memcpy(RedSoundControlGet(REDSOUND_CONTROL_MUSIC_SECONDARY), p_SoundControlBuffer,
+        memcpy(RedSoundControlGet(REDSOUND_CONTROL_MUSIC_SECONDARY),
+               RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY),
                REDSOUND_CONTROL_SIZE);
-        memcpy(p_SoundControlBuffer, swapControl, REDSOUND_CONTROL_SIZE);
+        memcpy(RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY), swapControl, REDSOUND_CONTROL_SIZE);
         RedDelete(swapControl);
     } else {
         if (c_RedEntry.SearchMusicSequence(command[REDSOUND_MUSIC_COMMAND_ID]) >= 0) {
@@ -1039,7 +1040,7 @@ static void _MusicNextPlaySequence(int* command)
 {
     RedSoundCONTROL* soundControl;
 
-    soundControl = p_SoundControlBuffer;
+    soundControl = RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY);
     if ((command[REDSOUND_MUSIC_COMMAND_ID] == soundControl[REDSOUND_CONTROL_MUSIC_PRIMARY].m_musicId) ||
         (command[REDSOUND_MUSIC_COMMAND_ID] == soundControl[REDSOUND_CONTROL_MUSIC_SECONDARY].m_musicId) ||
         (command[REDSOUND_MUSIC_COMMAND_ID] == soundControl[REDSOUND_CONTROL_MUSIC_SKIP].m_musicId)) {
@@ -1662,7 +1663,7 @@ static int _MainThread(void*)
         OSWaitSemaphore(&m_MainSemaphore);
         if (m_ThreadControl != REDSOUND_THREAD_CONTROL_STOP) {
             startTick = OSGetTick();
-            control = p_SoundControlBuffer;
+            control = RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY);
             masterTime = m_RedMasterTime;
             elapsed = (unsigned int)(masterTime - m_MainThreadTime);
             if (control->m_activeTrackCount != 0) {
@@ -2435,7 +2436,7 @@ inline int CRedDriver::MusicPlayState(int musicID)
 
     interruptLevel = OSDisableInterrupts();
     result = 0;
-    soundControl = p_SoundControlBuffer;
+    soundControl = RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY);
     if (((musicID == REDSOUND_MUSIC_ID_NONE) ||
          (soundControl[REDSOUND_CONTROL_MUSIC_PRIMARY].m_musicId == musicID)) &&
         (soundControl[REDSOUND_CONTROL_MUSIC_PRIMARY].m_activeTrackCount != 0)) {

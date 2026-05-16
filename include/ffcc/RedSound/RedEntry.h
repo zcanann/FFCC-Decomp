@@ -396,6 +396,12 @@ enum RedWaveHeadLayout {
 	REDSOUND_WAVE_HEAD_OFFSETS_OFFSET = (unsigned int)&(((RedWaveHeadWD*)0)->m_waveOffsets),
 };
 
+#define RedWaveHeadGetTableSize(waveHead)                                                         \
+	((((waveHead)->m_tableCount * REDSOUND_WAVE_TABLE_ENTRY_SIZE) + (REDSOUND_WAVE_TABLE_ALIGN - 1)) & \
+	 REDSOUND_WAVE_TABLE_ALIGN_MASK)
+
+#define RedWaveHeadGetToneSize(waveHead) ((waveHead)->m_toneCount * REDSOUND_WAVE_TONE_ENTRY_SIZE)
+
 class CRedEntry
 {
 public:

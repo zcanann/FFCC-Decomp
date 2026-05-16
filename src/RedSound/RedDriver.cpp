@@ -1841,7 +1841,7 @@ void RedDmaClearID(int id)
  * JP Address: TODO
  * JP Size: TODO
  */
-void RedSetDMAMode(int mode)
+inline void RedSetDMAMode(int mode)
 {
     m_DMAMode = mode;
 }
@@ -2232,7 +2232,7 @@ int CRedDriver::GetProgramTime()
  * JP Address: TODO
  * JP Size: TODO
  */
-int CRedDriver::GetMasterTime()
+inline int CRedDriver::GetMasterTime()
 {
     return m_RedMasterTime;
 }
@@ -2678,7 +2678,7 @@ inline int CRedDriver::CheckMusicEntry(int musicID)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CRedDriver::SetMusicFastSpeed(int speed)
+inline void CRedDriver::SetMusicFastSpeed(int speed)
 {
     m_MusicFastSpeed = speed;
 }
@@ -2692,7 +2692,7 @@ void CRedDriver::SetMusicFastSpeed(int speed)
  * JP Address: TODO
  * JP Size: TODO
  */
-int CRedDriver::CheckMusicPhraseStop()
+inline int CRedDriver::CheckMusicPhraseStop()
 {
     return m_MusicPhraseStop;
 }

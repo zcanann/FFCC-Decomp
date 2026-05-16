@@ -894,7 +894,7 @@ void CRedEntry::WaveHistoryManager(int mode, int waveNo)
 					break;
 				}
 				track++;
-			} while (track < *trackHead + REDSOUND_SE_TRACK_COUNT);
+			} while (track < RedSeTrackGetEnd(*trackHead));
 		}
 		if (used == 0) {
 			used = SearchWaveSequence(waveNo);
@@ -1293,7 +1293,7 @@ void CRedEntry::DisplaySePlayInfo()
 				fflush(__files + 1);
 			}
 			track += 1;
-		} while (track < *trackHead + REDSOUND_SE_TRACK_COUNT);
+		} while (track < RedSeTrackGetEnd(*trackHead));
 
 		OSReport(sRedEntryPrefixedNewlineFmt, sRedEntryLogPrefix);
 		fflush(__files + 1);

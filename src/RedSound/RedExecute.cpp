@@ -923,9 +923,9 @@ RedVoiceDATA* EntryVoiceSearch(RedTrackDATA* track)
 
     if ((static_cast<s8>(track->m_note.m_allocFlags) & REDSOUND_NOTE_ALLOC_DIRECT_MASK) != 0) {
         if (((track->m_note.m_allocFlags & REDSOUND_NOTE_ALLOC_DIRECT) != 0) ||
-            ((p_VoiceData + track->m_trackNo)->m_track == REDSOUND_VOICE_TRACK_NONE) ||
-            ((p_VoiceData + track->m_trackNo)->m_track == track)) {
-            voice = p_VoiceData + track->m_trackNo;
+            (RedVoiceDataGet(track->m_trackNo)->m_track == REDSOUND_VOICE_TRACK_NONE) ||
+            (RedVoiceDataGet(track->m_trackNo)->m_track == track)) {
+            voice = RedVoiceDataGet(track->m_trackNo);
         } else {
             voice = REDSOUND_VOICE_DATA_NONE;
         }
@@ -2870,7 +2870,7 @@ static void _SeTrackDataExecute(RedTrackDATA* track, int frames)
 		return;
 	}
 
-	voice = p_VoiceData + track->m_trackNo;
+	voice = RedVoiceDataGet(track->m_trackNo);
 	if (0 < frames) {
 		track->m_playTime += frames;
 	}
@@ -3116,7 +3116,7 @@ static int _SeMidiNoteExecute(
                 }
 
                 if (m_ChangeStatus != 0) {
-                    (p_VoiceData + track->m_trackNo)->m_updateFlags = m_ChangeStatus;
+                    RedVoiceDataGet(track->m_trackNo)->m_updateFlags = m_ChangeStatus;
                 }
             }
         }

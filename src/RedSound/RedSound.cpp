@@ -114,6 +114,7 @@ static int m_StandbyStatus[REDSOUND_STANDBY_STATUS_COUNT];
 #define RedStandbyStatusGet(index) (m_StandbyStatus[(index)])
 #define RedStandbyStatusGetEnd() (m_StandbyStatus + REDSOUND_STANDBY_STATUS_COUNT)
 volatile unsigned int m_AutoID;
+#define RedAutoIDGet() (m_AutoID)
 static RedSoundStreamBank* p_StreamBank;
 #define RedSoundStreamBankGetBegin() (p_StreamBank)
 #define RedSoundStreamBankSetBegin(bank) (p_StreamBank = (bank))
@@ -269,11 +270,11 @@ CRedSound::~CRedSound()
 unsigned int CRedSound::GetAutoID()
 {
 	do {
-		m_AutoID++;
-		m_AutoID &= REDSOUND_AUTO_ID_MASK;
-	} while ((int)m_AutoID == 0);
+		RedAutoIDGet()++;
+		RedAutoIDGet() &= REDSOUND_AUTO_ID_MASK;
+	} while ((int)RedAutoIDGet() == 0);
 
-	return m_AutoID;
+	return RedAutoIDGet();
 }
 /*
  * --INFO--

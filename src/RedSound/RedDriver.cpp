@@ -310,20 +310,20 @@ enum RedExecCommandArgIndex {
     REDSOUND_EXEC_COMMAND_ARG4 = 4,
     REDSOUND_EXEC_COMMAND_ARG5 = 5,
     REDSOUND_EXEC_COMMAND_ARG6 = 6,
+    REDSOUND_EXEC_COMMAND_ARG_COUNT = REDSOUND_EXEC_COMMAND_ARG6 + 1,
 };
 
 typedef void (*RedExecCommandFunc)(int* command);
 
-enum RedExecCommandLayout {
-    REDSOUND_EXEC_COMMAND_FUNC_OFFSET = 0,
-    REDSOUND_EXEC_COMMAND_ARGS_OFFSET = REDSOUND_EXEC_COMMAND_FUNC_OFFSET + sizeof(RedExecCommandFunc),
-    REDSOUND_EXEC_COMMAND_ARG_COUNT = 7,
-    REDSOUND_EXEC_COMMAND_SIZE = REDSOUND_EXEC_COMMAND_ARGS_OFFSET + sizeof(int) * REDSOUND_EXEC_COMMAND_ARG_COUNT,
-};
-
 struct RedExecCommand {
     RedExecCommandFunc m_func;
     int m_args[REDSOUND_EXEC_COMMAND_ARG_COUNT];
+};
+
+enum RedExecCommandLayout {
+    REDSOUND_EXEC_COMMAND_FUNC_OFFSET = (unsigned int)&(((RedExecCommand*)0)->m_func),
+    REDSOUND_EXEC_COMMAND_ARGS_OFFSET = (unsigned int)&(((RedExecCommand*)0)->m_args),
+    REDSOUND_EXEC_COMMAND_SIZE = sizeof(RedExecCommand),
 };
 
 struct RedMusicPlayCommand {

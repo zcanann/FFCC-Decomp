@@ -3736,9 +3736,9 @@ inline RedReverbDepth* CRedDriver::GetReverbDepth()
 inline void CRedDriver::SetMute(unsigned int voiceNo, unsigned int mute)
 {
     if (mute != 0) {
-        RedMuteGetWord(voiceNo) |= RedMuteGetMask(voiceNo);
+        RedMuteSet(voiceNo);
     } else {
-        RedMuteGetWord(voiceNo) &= ~RedMuteGetMask(voiceNo);
+        RedMuteClear(voiceNo);
     }
 }
 

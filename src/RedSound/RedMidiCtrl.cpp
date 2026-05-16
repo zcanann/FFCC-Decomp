@@ -2108,7 +2108,7 @@ static void __MidiCtrl_VibrateOn(RedSoundCONTROL* control, RedKeyOnDATA* keyOn, 
 
     divisor = depth;
     track->m_vibrateRate = REDSOUND_MIDI_RATE_FIXED_NUMERATOR / divisor;
-    track->m_vibrateFunc = SwingEntryFunction[track->m_command[REDSOUND_MIDI_MOD_FUNCTION] & REDSOUND_MIDI_SWING_FUNC_MASK];
+    track->m_vibrateFunc = RedSwingFunctionGet(track->m_command[REDSOUND_MIDI_MOD_FUNCTION] & REDSOUND_MIDI_SWING_FUNC_MASK);
     track->m_vibrateRateDelta = track->m_vibrateDepthDelta = 0;
     track->m_command += 3;
 
@@ -2248,7 +2248,7 @@ static void __MidiCtrl_VibrateType(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA
 {
 	u32 type = *track->m_command++;
 
-	track->m_vibrateFunc = SwingEntryFunction[type & REDSOUND_MIDI_SWING_FUNC_MASK];
+	track->m_vibrateFunc = RedSwingFunctionGet(type & REDSOUND_MIDI_SWING_FUNC_MASK);
 }
 /*
  * --INFO--
@@ -2289,7 +2289,7 @@ static void __MidiCtrl_TremoloOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* 
 	}
 	divisor = rateDivisor;
 	track->m_tremoloRate = REDSOUND_MIDI_RATE_FIXED_NUMERATOR / divisor;
-	track->m_tremoloFunc = SwingEntryFunction[track->m_command[REDSOUND_MIDI_MOD_FUNCTION] & REDSOUND_MIDI_SWING_FUNC_MASK];
+	track->m_tremoloFunc = RedSwingFunctionGet(track->m_command[REDSOUND_MIDI_MOD_FUNCTION] & REDSOUND_MIDI_SWING_FUNC_MASK);
 	track->m_tremoloRateDelta = track->m_tremoloDepthDelta = 0;
 	track->m_command += 3;
 
@@ -2427,7 +2427,7 @@ static void __MidiCtrl_TremoloType(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA
 {
 	u32 type = *track->m_command++;
 
-	track->m_tremoloFunc = SwingEntryFunction[type & REDSOUND_MIDI_SWING_FUNC_MASK];
+	track->m_tremoloFunc = RedSwingFunctionGet(type & REDSOUND_MIDI_SWING_FUNC_MASK);
 }
 /*
  * --INFO--
@@ -2466,7 +2466,7 @@ static void __MidiCtrl_ShakeOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* tr
 	}
 	divisor = rate;
 	track->m_shakeRate = REDSOUND_MIDI_RATE_FIXED_NUMERATOR / divisor;
-	track->m_shakeFunc = SwingEntryFunction[track->m_command[REDSOUND_MIDI_MOD_FUNCTION] & REDSOUND_MIDI_SWING_FUNC_MASK];
+	track->m_shakeFunc = RedSwingFunctionGet(track->m_command[REDSOUND_MIDI_MOD_FUNCTION] & REDSOUND_MIDI_SWING_FUNC_MASK);
 	track->m_shakeRateDelta = track->m_shakeDepthDelta = 0;
 	track->m_shakeOutput = 0;
 	track->m_shakePan = 0;
@@ -2586,7 +2586,7 @@ static void __MidiCtrl_ShakeType(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* 
 {
 	u32 type = *track->m_command++;
 
-	track->m_shakeFunc = SwingEntryFunction[type & REDSOUND_MIDI_SWING_FUNC_MASK];
+	track->m_shakeFunc = RedSwingFunctionGet(type & REDSOUND_MIDI_SWING_FUNC_MASK);
 }
 /*
  * --INFO--

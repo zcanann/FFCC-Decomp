@@ -690,7 +690,13 @@ static RedExecCommand* volatile p_ExecCommandOld;
 #define RedExecCommandGetOld() (p_ExecCommandOld)
 #define RedExecCommandSetOld(command) (p_ExecCommandOld = (command))
 static RedDmaRequest* volatile p_DmaControlNow[REDSOUND_DMA_QUEUE_COUNT];
+#define RedDmaQueueNowGet(queue) (p_DmaControlNow[(queue)])
+#define RedDmaQueueNowSet(queue, request) (p_DmaControlNow[(queue)] = (request))
+#define RedDmaQueueNowRef(queue) (&p_DmaControlNow[(queue)])
 static RedDmaRequest* volatile p_DmaControlOld[REDSOUND_DMA_QUEUE_COUNT];
+#define RedDmaQueueOldGet(queue) (p_DmaControlOld[(queue)])
+#define RedDmaQueueOldSet(queue, request) (p_DmaControlOld[(queue)] = (request))
+#define RedDmaQueueOldRef(queue) (&p_DmaControlOld[(queue)])
 RedSoundCONTROL* volatile p_SoundControlBuffer;
 RedSoundCONTROL* volatile p_SoundControl;
 volatile int m_KeyOnEntry;
@@ -1849,11 +1855,11 @@ int RedDmaEntry(int flags, int direction, int mainMemory, int aramMemory, int si
 
     interrupt = OSDisableInterrupts();
     if ((flags & REDSOUND_DMA_FLAG_QUEUE_MASK) != 0) {
-        queuePtr = &p_DmaControlNow[REDSOUND_DMA_MAIN_QUEUE_INDEX];
+        queuePtr = RedDmaQueueNowRef(REDSOUND_DMA_MAIN_QUEUE_INDEX);
         queueBase = RedDriverMainDmaQueue();
     } else {
         queueBase = RedDriverStreamDmaQueue();
-        queuePtr = &p_DmaControlNow[REDSOUND_DMA_STREAM_QUEUE_INDEX];
+        queuePtr = RedDmaQueueNowRef(REDSOUND_DMA_STREAM_QUEUE_INDEX);
     }
     queueEntry = *queuePtr;
     entryID = GetMyEntryID();
@@ -1996,15 +2002,15 @@ static void _DmaExecute()
     RedDmaRequest* activeRequest;
     RedDmaRequest* queueEntry;
 
-    while ((p_DmaControlNow[REDSOUND_DMA_MAIN_QUEUE_INDEX] != p_DmaControlOld[REDSOUND_DMA_MAIN_QUEUE_INDEX]) ||
-           (p_DmaControlNow[REDSOUND_DMA_STREAM_QUEUE_INDEX] != p_DmaControlOld[REDSOUND_DMA_STREAM_QUEUE_INDEX])) {
+    while ((RedDmaQueueNowGet(REDSOUND_DMA_MAIN_QUEUE_INDEX) != RedDmaQueueOldGet(REDSOUND_DMA_MAIN_QUEUE_INDEX)) ||
+           (RedDmaQueueNowGet(REDSOUND_DMA_STREAM_QUEUE_INDEX) != RedDmaQueueOldGet(REDSOUND_DMA_STREAM_QUEUE_INDEX))) {
         activeRequest = 0;
         RedDmaThreadStateSet(REDSOUND_DMA_THREAD_SELECT_QUEUE);
-        if (p_DmaControlNow[REDSOUND_DMA_MAIN_QUEUE_INDEX] != p_DmaControlOld[REDSOUND_DMA_MAIN_QUEUE_INDEX]) {
-            oldQueuePtr = &p_DmaControlOld[REDSOUND_DMA_MAIN_QUEUE_INDEX];
+        if (RedDmaQueueNowGet(REDSOUND_DMA_MAIN_QUEUE_INDEX) != RedDmaQueueOldGet(REDSOUND_DMA_MAIN_QUEUE_INDEX)) {
+            oldQueuePtr = RedDmaQueueOldRef(REDSOUND_DMA_MAIN_QUEUE_INDEX);
             queueBase = RedDriverMainDmaQueue();
         } else {
-            oldQueuePtr = &p_DmaControlOld[REDSOUND_DMA_STREAM_QUEUE_INDEX];
+            oldQueuePtr = RedDmaQueueOldRef(REDSOUND_DMA_STREAM_QUEUE_INDEX);
             queueBase = RedDriverStreamDmaQueue();
         }
         queueEntry = *oldQueuePtr;
@@ -2274,10 +2280,10 @@ void CRedDriver::Init()
     RedDmaModeSet(REDSOUND_DMA_MODE_NORMAL);
     dmaControl = sync.m_dmaQueue;
     memset(dmaControl, 0, REDSOUND_DMA_CONTROL_SIZE);
-    p_DmaControlNow[REDSOUND_DMA_MAIN_QUEUE_INDEX] = dmaControl;
-    p_DmaControlOld[REDSOUND_DMA_MAIN_QUEUE_INDEX] = dmaControl;
-    p_DmaControlNow[REDSOUND_DMA_STREAM_QUEUE_INDEX] = dmaControl + REDSOUND_DMA_QUEUE_ENTRY_COUNT;
-    p_DmaControlOld[REDSOUND_DMA_STREAM_QUEUE_INDEX] = dmaControl + REDSOUND_DMA_QUEUE_ENTRY_COUNT;
+    RedDmaQueueNowSet(REDSOUND_DMA_MAIN_QUEUE_INDEX, dmaControl);
+    RedDmaQueueOldSet(REDSOUND_DMA_MAIN_QUEUE_INDEX, dmaControl);
+    RedDmaQueueNowSet(REDSOUND_DMA_STREAM_QUEUE_INDEX, dmaControl + REDSOUND_DMA_QUEUE_ENTRY_COUNT);
+    RedDmaQueueOldSet(REDSOUND_DMA_STREAM_QUEUE_INDEX, dmaControl + REDSOUND_DMA_QUEUE_ENTRY_COUNT);
     RedMasterTimeSet(0);
     AXRegisterCallback(_RedAXCallback);
     AXFXSetHooks(ReverbAreaAlloc, ReverbAreaFree);

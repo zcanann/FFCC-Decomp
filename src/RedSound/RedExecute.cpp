@@ -160,6 +160,10 @@ static RedReverbDATA* volatile p_ReverbData;
 static RedReverbSize* p_ReverbSize;
 #define RedReverbSizeGet() (p_ReverbSize)
 #define RedReverbSizeSet(size) (p_ReverbSize = (size))
+#define RedReverbSizeAddRequested(size) (RedReverbSizeGet()->m_requested += (size))
+#define RedReverbSizeAddAligned(size) (RedReverbSizeGet()->m_aligned += (size))
+#define RedReverbSizeClear()                                                                           \
+    (RedReverbSizeGet()->m_requested = RedReverbSizeGet()->m_aligned = 0)
 volatile u32 m_ChangeStatus;
 u32 m_TerminateNote[REDSOUND_TERMINATE_NOTE_WORD_COUNT] = { 0 };
 static RedKeyOnDATA* volatile p_SkipKeyOn;
@@ -600,8 +604,8 @@ static void _ReverbNullCallback(AXFX_BUFFERUPDATE* update, void*)
  */
 void* ReverbAreaAlloc(unsigned long size)
 {
-    RedReverbSizeGet()->m_requested += (u32)size;
-    RedReverbSizeGet()->m_aligned += ((u32)size + REDSOUND_REVERB_ALLOC_ALIGN_MASK) & ~REDSOUND_REVERB_ALLOC_ALIGN_MASK;
+    RedReverbSizeAddRequested((u32)size);
+    RedReverbSizeAddAligned(((u32)size + REDSOUND_REVERB_ALLOC_ALIGN_MASK) & ~REDSOUND_REVERB_ALLOC_ALIGN_MASK);
     return (void*)RedNew((int)size);
 }
 
@@ -711,8 +715,7 @@ static void _SetReverbData(RedReverbDATA* reverb, int* params)
     }
 
     if (result != REDSOUND_REVERB_INIT_SUCCESS) {
-        RedReverbSizeGet()->m_aligned = 0;
-        RedReverbSizeGet()->m_requested = 0;
+        RedReverbSizeClear();
     }
 }
 
@@ -788,7 +791,7 @@ RedReverbSize* SetReverb(int bank, int kind, int* params)
     RedReverbDATA* reverb;
     int result;
 
-    RedReverbSizeGet()->m_requested = RedReverbSizeGet()->m_aligned = 0;
+    RedReverbSizeClear();
 
     if (kind == REDSOUND_REVERB_KIND_NONE) {
         _ClearReverb(bank);
@@ -892,7 +895,7 @@ RedReverbSize* SetReverb(int bank, int kind, int* params)
         }
     }
     else {
-        RedReverbSizeGet()->m_requested = RedReverbSizeGet()->m_aligned = 0;
+        RedReverbSizeClear();
     }
 
     return RedReverbSizeGet();

@@ -420,6 +420,12 @@ enum RedWaveHeadLayout {
 #define RedWaveHeadGetWaveData(waveHead, waveIndex)                                               \
 	((RedWaveDATA*)((unsigned char*)(waveHead) + (waveHead)->m_waveOffsets[(waveIndex)]))
 
+#define RedMusicHeadFromBankAddress(address) reinterpret_cast<RedMusicHEAD*>(address)
+
+#define RedWaveHeadFromBankAddress(address) reinterpret_cast<RedWaveHeadWD*>(address)
+
+#define RedSeSepHeadFromBankAddress(address) reinterpret_cast<RedSeSepHEAD*>(address)
+
 class CRedEntry
 {
 public:

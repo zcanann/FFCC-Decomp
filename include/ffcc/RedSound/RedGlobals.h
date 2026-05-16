@@ -284,6 +284,7 @@ extern int* volatile p_MusicReplayPoint;
 #define RedMusicReplayPointGetBegin() (p_MusicReplayPoint)
 #define RedMusicReplayPointSetBegin(point) (p_MusicReplayPoint = (point))
 #define RedMusicReplayPointGet(index) (p_MusicReplayPoint + (index))
+#define RedMusicReplayPointSet(index, point) (p_MusicReplayPoint[(index)] = (point))
 extern RedControlRamp* volatile p_MusicTempoControl;
 #define RedMusicTempoControlGet() (p_MusicTempoControl)
 #define RedMusicTempoControlSet(control) (p_MusicTempoControl = (control))

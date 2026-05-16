@@ -2316,7 +2316,7 @@ int CRedDriver::SetMusicData(void* musicData)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CRedDriver::ClearMusicData(int musicID)
+inline void CRedDriver::ClearMusicData(int musicID)
 {
     _EntryExecCommand(_ClearMusicData, musicID, 0, 0, 0, 0, 0, 0);
 }
@@ -2348,7 +2348,7 @@ int CRedDriver::ReentryMusicData(int musicID)
  * EN Size: 372b
  * JP Address: TODO
  */
-int CRedDriver::MusicPlayState(int musicID)
+inline int CRedDriver::MusicPlayState(int musicID)
 {
     RedExecCommand* commandNow;
     unsigned int interruptLevel;
@@ -2436,7 +2436,7 @@ int CRedDriver::MusicPlay(int musicID, int volume, int mode)
  * EN Size: 272b
  * JP Address: TODO
  */
-int CRedDriver::MusicPlay(void* musicData, int volume, int mode)
+inline int CRedDriver::MusicPlay(void* musicData, int volume, int mode)
 {
     int result;
     RedMusicHEAD localHeader;
@@ -2485,7 +2485,7 @@ int CRedDriver::MusicCrossPlay(int musicID, int volume, int mode)
  * EN Size: 272b
  * JP Address: TODO
  */
-int CRedDriver::MusicCrossPlay(void* musicData, int volume, int mode)
+inline int CRedDriver::MusicCrossPlay(void* musicData, int volume, int mode)
 {
     int result;
     RedMusicHEAD localHeader;
@@ -2534,7 +2534,7 @@ int CRedDriver::MusicNextPlay(int musicID, int volume, int mode)
  * EN Size: 272b
  * JP Address: TODO
  */
-int CRedDriver::MusicNextPlay(void* musicData, int volume, int mode)
+inline int CRedDriver::MusicNextPlay(void* musicData, int volume, int mode)
 {
     int result;
     RedMusicHEAD localHeader;
@@ -2610,7 +2610,7 @@ void CRedDriver::MusicVolume(int musicID, int volume, int frameCount)
  * EN Size: 76b
  * JP Address: TODO
  */
-void CRedDriver::MusicTempo(int tempo, int frameCount)
+inline void CRedDriver::MusicTempo(int tempo, int frameCount)
 {
     _EntryExecCommand(_MusicTempo, 0, tempo, frameCount, 0, 0, 0, 0);
 }
@@ -2623,7 +2623,7 @@ void CRedDriver::MusicTempo(int tempo, int frameCount)
  * EN Size: 76b
  * JP Address: TODO
  */
-void CRedDriver::MusicPitch(int pitch, int frameCount)
+inline void CRedDriver::MusicPitch(int pitch, int frameCount)
 {
     _EntryExecCommand(_MusicPitch, 0, pitch, frameCount, 0, 0, 0, 0);
 }
@@ -2636,7 +2636,7 @@ void CRedDriver::MusicPitch(int pitch, int frameCount)
  * EN Size: 76b
  * JP Address: TODO
  */
-void CRedDriver::MusicPause(int musicID, int pause)
+inline void CRedDriver::MusicPause(int musicID, int pause)
 {
     _EntryExecCommand(_MusicPause, musicID, pause, 0, 0, 0, 0, 0);
 }
@@ -2664,7 +2664,7 @@ void CRedDriver::SetMusicPhraseStop(int stop)
  * JP Address: TODO
  * JP Size: TODO
  */
-int CRedDriver::CheckMusicEntry(int musicID)
+inline int CRedDriver::CheckMusicEntry(int musicID)
 {
     return c_RedEntry.SearchMusicSequence(musicID);
 }
@@ -2706,7 +2706,7 @@ int CRedDriver::CheckMusicPhraseStop()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CRedDriver::DisplayMusicInfo()
+inline void CRedDriver::DisplayMusicInfo()
 {
     c_RedEntry.DisplayMusicInfo();
 }
@@ -2834,7 +2834,7 @@ int CRedDriver::ReentrySeSepData(int id)
  * JP Address: TODO
  * JP Size: TODO
  */
-int CRedDriver::CheckSeSepEntry(int id)
+inline int CRedDriver::CheckSeSepEntry(int id)
 {
     return c_RedEntry.SearchSeSepSequence(id);
 }
@@ -2912,7 +2912,7 @@ void CRedDriver::SeStop(int id)
  * EN Size: 72b
  * JP Address: TODO
  */
-void CRedDriver::SeStopG(int group)
+inline void CRedDriver::SeStopG(int group)
 {
     _EntryExecCommand(_SeStopG, group, 0, 0, 0, 0, 0, 0);
 }
@@ -2961,7 +2961,7 @@ int CRedDriver::SePlay(int bank, int sep, int autoID, int pan, int volume, int p
  * EN Size: 312b
  * JP Address: TODO
  */
-int CRedDriver::SePlay(void* seSepData, int autoID, int pan, int volume, int pitch)
+inline int CRedDriver::SePlay(void* seSepData, int autoID, int pan, int volume, int pitch)
 {
     int result = REDSOUND_SESEP_ID_NONE;
     RedSeSepHEAD* const header = (RedSeSepHEAD*)seSepData;
@@ -3156,7 +3156,7 @@ void CRedDriver::DisplaySePlayInfo()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CRedDriver::ClearSePlayLine()
+inline void CRedDriver::ClearSePlayLine()
 {
 	RedSoundCONTROL* control = p_SoundControlBuffer + REDSOUND_CONTROL_SE;
 	RedTrackDATA* track = control->m_tracks;
@@ -3176,7 +3176,7 @@ void CRedDriver::ClearSePlayLine()
  * JP Address: TODO
  * JP Size: TODO
  */
-RedTrackDATA* CRedDriver::GetSePlayTrack()
+inline RedTrackDATA* CRedDriver::GetSePlayTrack()
 {
 	RedTrackDATA* track = p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
 	RedTrackDATA* trackEnd = track;
@@ -3287,7 +3287,7 @@ int CRedDriver::GetStreamPlayPoint(int streamID, int* playPoint, int* readPoint)
  * JP Address: TODO
  * JP Size: TODO
  */
-RedStreamDATA* CRedDriver::GetStreamPlayBlock(int streamID)
+inline RedStreamDATA* CRedDriver::GetStreamPlayBlock(int streamID)
 {
 	RedStreamDATA* streamData = p_Stream;
 
@@ -3351,7 +3351,7 @@ void CRedDriver::StreamVolume(int streamID, int volume, int frameCount)
  * EN Size: 80b
  * JP Address: TODO
  */
-void CRedDriver::StreamPan(int streamID, int pan, int frameCount)
+inline void CRedDriver::StreamPan(int streamID, int pan, int frameCount)
 {
     _EntryExecCommand(_StreamPan, streamID, pan, frameCount, 0, 0, 0, 0);
 }

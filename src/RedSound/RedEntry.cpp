@@ -607,7 +607,7 @@ int CRedEntry::SetWaveData(int waveBankNo, void* waveData, int waveDataSize)
 	waveNo = 0;
 	if (waveDataSize == 0) {
 		if ((m_waveLoadNo >= 0) && ((waveNo = SearchWaveSequence(m_waveLoadNo)) >= 0)) {
-			WaveDelete(&m_waveBankBase[waveNo]);
+			WaveDelete(RedEntryWaveBankGet(this, waveNo));
 		}
 
 		m_waveLoadNo = REDSOUND_WAVE_NO_NONE;
@@ -618,25 +618,25 @@ int CRedEntry::SetWaveData(int waveBankNo, void* waveData, int waveDataSize)
 	if (m_waveLoadNo < 0) {
 		waveNo = ((RedWaveHeadWD*)waveData)->m_waveNo;
 
-		if ((waveBankNo >= 0) && (waveNo != m_waveBankBase[waveBankNo].m_id)) {
-			WaveDelete(&m_waveBankBase[waveBankNo]);
+		if ((waveBankNo >= 0) && (waveNo != RedEntryWaveBankGet(this, waveBankNo)->m_id)) {
+			WaveDelete(RedEntryWaveBankGet(this, waveBankNo));
 		}
 
 		historyNo = SearchWaveSequence(waveNo);
 		if (historyNo >= 0) {
 			if ((waveBankNo >= 0) && (historyNo != waveBankNo)) {
-				m_waveBankBase[waveBankNo].m_id =
-				    m_waveBankBase[historyNo].m_id;
-				m_waveBankBase[waveBankNo].m_historyNo =
-				    m_waveBankBase[historyNo].m_historyNo;
-				m_waveBankBase[waveBankNo].m_address =
-				    m_waveBankBase[historyNo].m_address;
-				m_waveBankBase[waveBankNo].m_size =
-				    m_waveBankBase[historyNo].m_size;
+				RedEntryWaveBankGet(this, waveBankNo)->m_id =
+				    RedEntryWaveBankGet(this, historyNo)->m_id;
+				RedEntryWaveBankGet(this, waveBankNo)->m_historyNo =
+				    RedEntryWaveBankGet(this, historyNo)->m_historyNo;
+				RedEntryWaveBankGet(this, waveBankNo)->m_address =
+				    RedEntryWaveBankGet(this, historyNo)->m_address;
+				RedEntryWaveBankGet(this, waveBankNo)->m_size =
+				    RedEntryWaveBankGet(this, historyNo)->m_size;
 				historyNo = waveBankNo;
 			}
 
-			WaveHistoryChoice(&m_waveBankBase[historyNo]);
+			WaveHistoryChoice(RedEntryWaveBankGet(this, historyNo));
 		} else {
 			m_waveLoadNo = ((RedWaveHeadWD*)waveData)->m_waveNo;
 			waveAddress = WaveHeadAdd(waveBankNo, (RedWaveHeadWD*)waveData, waveNo);
@@ -731,7 +731,7 @@ void CRedEntry::ClearWaveData(int waveNo)
 	} else {
 		waveNo = SearchWaveSequence(waveNo);
 		if (waveNo >= 0) {
-			WaveDelete(&m_waveBankBase[waveNo]);
+			WaveDelete(RedEntryWaveBankGet(this, waveNo));
 		}
 	}
 }
@@ -800,7 +800,7 @@ void CRedEntry::ClearWaveBank(int waveBankNo)
 			}
 		}
 	} else if ((waveBankNo >= 0) && (waveBankNo < REDSOUND_WAVE_PRIMARY_BANK_ENTRY_COUNT)) {
-		WaveDelete(&m_waveBankBase[waveBankNo]);
+		WaveDelete(RedEntryWaveBankGet(this, waveBankNo));
 	}
 }
 /*
@@ -816,7 +816,7 @@ RedHistoryBANK* CRedEntry::GetWaveBank(int waveNo)
 {
 	if ((waveNo >= 0) && (waveNo < REDSOUND_WAVE_PRIMARY_BANK_ENTRY_COUNT))
 	{
-		return &m_waveBankBase[waveNo];
+		return RedEntryWaveBankGet(this, waveNo);
 	}
 
 	return 0;
@@ -856,7 +856,7 @@ int CRedEntry::ReentryWaveData(int waveNo)
 {
 	waveNo = SearchWaveSequence(waveNo);
 	if (waveNo >= 0) {
-		WaveHistoryChoice(&m_waveBankBase[waveNo]);
+		WaveHistoryChoice(RedEntryWaveBankGet(this, waveNo));
 	}
 	return waveNo;
 }

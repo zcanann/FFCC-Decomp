@@ -3617,7 +3617,7 @@ inline void CRedDriver::DisplayMMemoryInfo()
  */
 void CRedDriver::SetReverb(int bank, int kind)
 {
-    ::SetReverb(bank, t_ReverbModeData[kind].m_kind, t_ReverbModeData[kind].m_params);
+    ::SetReverb(bank, RedReverbModeDataGet(kind)->m_kind, RedReverbModeDataGet(kind)->m_params);
 }
 
 /*
@@ -3896,7 +3896,7 @@ inline int CRedDriver::WavePitchCompute(int key, int pitch)
 inline RedReverbModeData* CRedDriver::GetReverbModeTable(int mode)
 {
     mode &= REDSOUND_REVERB_MODE_INDEX_MASK;
-    return t_ReverbModeData + mode;
+    return RedReverbModeDataGet(mode);
 }
 
 /*

@@ -1960,7 +1960,7 @@ static void __MidiCtrl_ADSR_RL(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* tr
     value = *track->m_command++;
     track->m_adsr.m_level[REDSOUND_VOICE_ADSR_RELEASE] = value;
 
-    voice = p_VoiceData;
+    voice = RedVoiceDataGetBegin();
     do {
         if (voice->m_track == track) {
             voice->m_adsr.m_level[REDSOUND_VOICE_ADSR_RELEASE] = value;
@@ -2010,7 +2010,7 @@ static void __MidiCtrl_SustainPedal(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDAT
 
     if (*track->m_command != REDSOUND_MIDI_COMMAND_NONE) {
         track->m_voiceSwitch |= REDSOUND_VOICE_SWITCH_SUSTAIN;
-        voice = p_VoiceData;
+        voice = RedVoiceDataGetBegin();
         do {
             if (voice->m_track == track) {
                 voice->m_voiceSwitch |= REDSOUND_VOICE_SWITCH_SUSTAIN;
@@ -2019,7 +2019,7 @@ static void __MidiCtrl_SustainPedal(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDAT
         } while (voice < RedVoiceDataGetEnd());
     } else {
         track->m_voiceSwitch &= ~REDSOUND_VOICE_SWITCH_SUSTAIN;
-        voice = p_VoiceData;
+        voice = RedVoiceDataGetBegin();
         do {
             if (voice->m_track == track) {
                 voice->m_voiceSwitch &= ~REDSOUND_VOICE_SWITCH_SUSTAIN;
@@ -2113,7 +2113,7 @@ static void __MidiCtrl_VibrateOn(RedSoundCONTROL* control, RedKeyOnDATA* keyOn, 
     track->m_vibrateRateDelta = track->m_vibrateDepthDelta = 0;
     track->m_command += 3;
 
-    entry = p_VoiceData;
+    entry = RedVoiceDataGetBegin();
     do {
         if (entry->m_track == track) {
             divisor = REDSOUND_MIDI_DEFAULT_RATE_DIVISOR;

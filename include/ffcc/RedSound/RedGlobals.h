@@ -278,6 +278,7 @@ extern int p_EditorVoice[REDSOUND_EDITOR_VOICE_COUNT];
 #define RedEditorVoiceGet(index) (p_EditorVoice + (index))
 #define RedEditorVoiceGetEnd() (p_EditorVoice + REDSOUND_EDITOR_VOICE_COUNT)
 extern RedTrackDATA* p_EditorTrack;
+#define RedEditorTrackGet() (p_EditorTrack)
 extern OSThread m_MusicSkipThread;
 extern u8* volatile p_MusicSkipThreadStack;
 extern volatile int m_MusicSkipComplete;

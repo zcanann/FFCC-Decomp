@@ -2213,7 +2213,7 @@ void CRedDriver::Init()
         nextIndex = nextIndex + 1;
     } while (nextIndex < REDSOUND_SE_TRACK_COUNT);
     p_EditorTrack = (RedTrackDATA*)RedNew(REDSOUND_TRACK_SIZE);
-    memset(p_EditorTrack, 0, REDSOUND_TRACK_SIZE);
+    memset(RedEditorTrackGet(), 0, REDSOUND_TRACK_SIZE);
     p_ReverbDepth = (RedReverbDepth*)RedNew(REDSOUND_REVERB_DEPTH_BUFFER_SIZE);
     memset(RedReverbDepthGetBegin(), 0, REDSOUND_REVERB_DEPTH_BUFFER_SIZE);
     mute = m_Mute;

@@ -893,7 +893,7 @@ RedReverbSize* SetReverb(int bank, int kind, int* params)
  * JP Address: TODO
  * JP Size: TODO
  */
-RedReverbSize* GetReverbInfo()
+inline RedReverbSize* GetReverbInfo()
 {
     return p_ReverbSize;
 }
@@ -1600,7 +1600,7 @@ static RedVoiceDATA* _VoiceDataSelect(RedTrackDATA* track, RedNoteDATA* note, in
  * JP Address: TODO
  * JP Size: TODO
  */
-void SetAllVoiceAccess(RedSoundCONTROL* control, int mask)
+inline void SetAllVoiceAccess(RedSoundCONTROL* control, int mask)
 {
     RedTrackDATA* track = control->m_tracks;
     RedTrackDATA* trackEnd = track + control->m_trackCount;

@@ -2766,7 +2766,7 @@ static void _SkipMusicEntry()
             src++;
         }
 
-        soundControl = p_SoundControlBuffer;
+        soundControl = RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY);
         if (soundControl[REDSOUND_CONTROL_MUSIC_PRIMARY].m_musicId != REDSOUND_MUSIC_ID_NONE) {
             if (soundControl[REDSOUND_CONTROL_MUSIC_SECONDARY].m_musicId != REDSOUND_MUSIC_ID_NONE) {
                 MusicStop(soundControl[REDSOUND_CONTROL_MUSIC_SECONDARY].m_musicId);
@@ -3146,7 +3146,7 @@ void MainControl(int frames)
     p_SoundControl = RedSoundControlGet(REDSOUND_CONTROL_SE);
     _SeMidiNoteExecute(p_SoundControl, p_KeyOnData,
                        p_SoundControl->m_tracks, p_SoundControl->m_skipFrames, frames);
-    p_SoundControl = p_SoundControlBuffer;
+    p_SoundControl = RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY);
 
     if (p_SoundControl->m_activeTrackCount != 0) {
         if ((p_SoundControl->m_flags & REDSOUND_CONTROL_FLAG_PAUSE) == 0) {
@@ -3179,13 +3179,14 @@ void MainControl(int frames)
             _MusicNoteExecute();
         }
         if (RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY)->m_activeTrackCount == 0) {
-            memcpy(p_SoundControlBuffer, RedSoundControlGet(REDSOUND_CONTROL_MUSIC_SECONDARY),
+            memcpy(RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY),
+                   RedSoundControlGet(REDSOUND_CONTROL_MUSIC_SECONDARY),
                    REDSOUND_CONTROL_SIZE);
             p_SoundControl->m_activeTrackCount = 0;
             p_SoundControl->m_trackCount = 0;
             p_SoundControl->m_musicId = REDSOUND_MUSIC_ID_NONE;
         }
-        p_SoundControl = p_SoundControlBuffer;
+        p_SoundControl = RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY);
     }
 
     _ExecuteExtraData();

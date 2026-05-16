@@ -157,6 +157,12 @@ static RedReverbDATA* volatile p_ReverbData;
 #define RedReverbDataGetBegin() (p_ReverbData)
 #define RedReverbDataSetBegin(data) (p_ReverbData = (data))
 #define RedReverbDataGet(bank) (p_ReverbData + ((bank) & REDSOUND_REVERB_BANK_MASK))
+#define RedReverbGetKind(reverb) ((reverb)->m_kind)
+#define RedReverbSetKind(reverb, kind) ((reverb)->m_kind = (RedReverbKind)(kind))
+#define RedReverbGetContext(reverb) ((reverb)->m_context)
+#define RedReverbSetContext(reverb, context) ((reverb)->m_context = (context))
+#define RedReverbGetCallback(reverb) ((reverb)->m_callback)
+#define RedReverbSetCallback(reverb, callback) ((reverb)->m_callback = (callback))
 static RedReverbSize* p_ReverbSize;
 #define RedReverbSizeGet() (p_ReverbSize)
 #define RedReverbSizeSet(size) (p_ReverbSize = (size))
@@ -652,9 +658,9 @@ static void _SetReverbData(RedReverbDATA* reverb, int* params)
 {
     int result = 0;
 
-    switch (reverb->m_kind) {
+    switch (RedReverbGetKind(reverb)) {
     case REDSOUND_REVERB_KIND_STD: {
-        AXFX_REVERBSTD* std = (AXFX_REVERBSTD*)reverb->m_context;
+        AXFX_REVERBSTD* std = (AXFX_REVERBSTD*)RedReverbGetContext(reverb);
         std->tempDisableFX = REDSOUND_REVERB_FX_ENABLE;
         std->preDelay = (float)params[REDSOUND_REVERB_PARAM_PRE_DELAY] / s_ReverbTimeScale;
         std->time = (float)params[REDSOUND_REVERB_PARAM_TIME] / s_ReverbTimeScale;
@@ -665,7 +671,7 @@ static void _SetReverbData(RedReverbDATA* reverb, int* params)
         break;
     }
     case REDSOUND_REVERB_KIND_HI: {
-        AXFX_REVERBHI* hi = (AXFX_REVERBHI*)reverb->m_context;
+        AXFX_REVERBHI* hi = (AXFX_REVERBHI*)RedReverbGetContext(reverb);
         hi->tempDisableFX = REDSOUND_REVERB_FX_ENABLE;
         hi->preDelay = (float)params[REDSOUND_REVERB_PARAM_PRE_DELAY] / s_ReverbTimeScale;
         hi->time = (float)params[REDSOUND_REVERB_PARAM_TIME] / s_ReverbTimeScale;
@@ -677,7 +683,7 @@ static void _SetReverbData(RedReverbDATA* reverb, int* params)
         break;
     }
     case REDSOUND_REVERB_KIND_DELAY: {
-        AXFX_DELAY* delay = (AXFX_DELAY*)reverb->m_context;
+        AXFX_DELAY* delay = (AXFX_DELAY*)RedReverbGetContext(reverb);
         u32 delayValue = (u32)params[REDSOUND_REVERB_PARAM_DELAY];
         delay->delay[REDSOUND_REVERB_DELAY_SURROUND] = delayValue;
         delay->delay[REDSOUND_REVERB_DELAY_RIGHT] = delayValue;
@@ -694,7 +700,7 @@ static void _SetReverbData(RedReverbDATA* reverb, int* params)
         break;
     }
     case REDSOUND_REVERB_KIND_CHORUS: {
-        AXFX_CHORUS* chorus = (AXFX_CHORUS*)reverb->m_context;
+        AXFX_CHORUS* chorus = (AXFX_CHORUS*)RedReverbGetContext(reverb);
         chorus->baseDelay = (u32)params[REDSOUND_REVERB_PARAM_CHORUS_BASE_DELAY];
         chorus->variation = (u32)params[REDSOUND_REVERB_PARAM_CHORUS_VARIATION];
         chorus->period = (u32)params[REDSOUND_REVERB_PARAM_CHORUS_PERIOD];
@@ -702,7 +708,7 @@ static void _SetReverbData(RedReverbDATA* reverb, int* params)
         break;
     }
     case REDSOUND_REVERB_KIND_HI_DPL2: {
-        AXFX_REVERBHI_DPL2* hiDpl2 = (AXFX_REVERBHI_DPL2*)reverb->m_context;
+        AXFX_REVERBHI_DPL2* hiDpl2 = (AXFX_REVERBHI_DPL2*)RedReverbGetContext(reverb);
         hiDpl2->tempDisableFX = REDSOUND_REVERB_FX_ENABLE;
         hiDpl2->preDelay = (float)params[REDSOUND_REVERB_PARAM_PRE_DELAY] / s_ReverbTimeScale;
         hiDpl2->time = (float)params[REDSOUND_REVERB_PARAM_TIME] / s_ReverbTimeScale;
@@ -731,7 +737,7 @@ static void _SetReverbData(RedReverbDATA* reverb, int* params)
 static void _ClearReverb(int bank)
 {
     RedReverbDATA* reverb = RedReverbDataGet(bank);
-    if (reverb->m_callback == REDSOUND_REVERB_CALLBACK_NONE) {
+    if (RedReverbGetCallback(reverb) == REDSOUND_REVERB_CALLBACK_NONE) {
         return;
     }
 
@@ -741,26 +747,26 @@ static void _ClearReverb(int bank)
         AXRegisterAuxBCallback((void (*)(void*, void*))_ReverbNullCallback, REDSOUND_REVERB_CONTEXT_NONE);
     }
 
-    switch (reverb->m_kind) {
+    switch (RedReverbGetKind(reverb)) {
     case REDSOUND_REVERB_KIND_STD:
-        AXFXReverbStdShutdown((AXFX_REVERBSTD*)reverb->m_context);
+        AXFXReverbStdShutdown((AXFX_REVERBSTD*)RedReverbGetContext(reverb));
         break;
     case REDSOUND_REVERB_KIND_HI:
-        AXFXReverbHiShutdown((AXFX_REVERBHI*)reverb->m_context);
+        AXFXReverbHiShutdown((AXFX_REVERBHI*)RedReverbGetContext(reverb));
         break;
     case REDSOUND_REVERB_KIND_DELAY:
-        AXFXDelayShutdown((AXFX_DELAY*)reverb->m_context);
+        AXFXDelayShutdown((AXFX_DELAY*)RedReverbGetContext(reverb));
         break;
     case REDSOUND_REVERB_KIND_CHORUS:
-        AXFXChorusShutdown((AXFX_CHORUS*)reverb->m_context);
+        AXFXChorusShutdown((AXFX_CHORUS*)RedReverbGetContext(reverb));
         break;
     case REDSOUND_REVERB_KIND_HI_DPL2:
-        AXFXReverbHiShutdownDpl2((AXFX_REVERBHI_DPL2*)reverb->m_context);
+        AXFXReverbHiShutdownDpl2((AXFX_REVERBHI_DPL2*)RedReverbGetContext(reverb));
         break;
     }
 
-    reverb->m_callback = REDSOUND_REVERB_CALLBACK_NONE;
-    RedDelete((int)reverb->m_context);
+    RedReverbSetCallback(reverb, REDSOUND_REVERB_CALLBACK_NONE);
+    RedDelete((int)RedReverbGetContext(reverb));
 }
 
 /*
@@ -803,7 +809,7 @@ RedReverbSize* SetReverb(int bank, int kind, int* params)
     }
 
     reverb = RedReverbDataGet(bank);
-    if ((reverb->m_callback != REDSOUND_REVERB_CALLBACK_NONE) && (reverb->m_kind == kind)) {
+    if ((RedReverbGetCallback(reverb) != REDSOUND_REVERB_CALLBACK_NONE) && (RedReverbGetKind(reverb) == kind)) {
         _SetReverbData(reverb, params);
         return RedReverbSizeGet();
     }
@@ -813,12 +819,12 @@ RedReverbSize* SetReverb(int bank, int kind, int* params)
         _ClearReverb(REDSOUND_REVERB_AUX_B);
     }
 
-    reverb->m_kind = (RedReverbKind)kind;
+    RedReverbSetKind(reverb, kind);
     switch (kind) {
     case REDSOUND_REVERB_KIND_STD: {
-        reverb->m_context = (void*)RedNew(REDSOUND_AXFX_REVERB_STD_SIZE);
-        reverb->m_callback = (int)AXFXReverbStdCallback;
-        AXFX_REVERBSTD* std = (AXFX_REVERBSTD*)reverb->m_context;
+        RedReverbSetContext(reverb, (void*)RedNew(REDSOUND_AXFX_REVERB_STD_SIZE));
+        RedReverbSetCallback(reverb, (int)AXFXReverbStdCallback);
+        AXFX_REVERBSTD* std = (AXFX_REVERBSTD*)RedReverbGetContext(reverb);
         std->tempDisableFX = REDSOUND_REVERB_FX_ENABLE;
         std->preDelay = (float)params[REDSOUND_REVERB_PARAM_PRE_DELAY] / s_ReverbTimeScale;
         std->time = (float)params[REDSOUND_REVERB_PARAM_TIME] / s_ReverbTimeScale;
@@ -829,9 +835,9 @@ RedReverbSize* SetReverb(int bank, int kind, int* params)
         break;
     }
     case REDSOUND_REVERB_KIND_HI: {
-        reverb->m_context = (void*)RedNew(REDSOUND_AXFX_REVERB_HI_SIZE);
-        reverb->m_callback = (int)AXFXReverbHiCallback;
-        AXFX_REVERBHI* hi = (AXFX_REVERBHI*)reverb->m_context;
+        RedReverbSetContext(reverb, (void*)RedNew(REDSOUND_AXFX_REVERB_HI_SIZE));
+        RedReverbSetCallback(reverb, (int)AXFXReverbHiCallback);
+        AXFX_REVERBHI* hi = (AXFX_REVERBHI*)RedReverbGetContext(reverb);
         hi->tempDisableFX = REDSOUND_REVERB_FX_ENABLE;
         hi->preDelay = (float)params[REDSOUND_REVERB_PARAM_PRE_DELAY] / s_ReverbTimeScale;
         hi->time = (float)params[REDSOUND_REVERB_PARAM_TIME] / s_ReverbTimeScale;
@@ -843,9 +849,9 @@ RedReverbSize* SetReverb(int bank, int kind, int* params)
         break;
     }
     case REDSOUND_REVERB_KIND_DELAY: {
-        reverb->m_context = (void*)RedNew(REDSOUND_AXFX_DELAY_SIZE);
-        reverb->m_callback = (int)AXFXDelayCallback;
-        AXFX_DELAY* delay = (AXFX_DELAY*)reverb->m_context;
+        RedReverbSetContext(reverb, (void*)RedNew(REDSOUND_AXFX_DELAY_SIZE));
+        RedReverbSetCallback(reverb, (int)AXFXDelayCallback);
+        AXFX_DELAY* delay = (AXFX_DELAY*)RedReverbGetContext(reverb);
         u32 delayValue = (u32)params[REDSOUND_REVERB_PARAM_DELAY];
         delay->delay[REDSOUND_REVERB_DELAY_SURROUND] = delayValue;
         delay->delay[REDSOUND_REVERB_DELAY_RIGHT] = delayValue;
@@ -862,9 +868,9 @@ RedReverbSize* SetReverb(int bank, int kind, int* params)
         break;
     }
     case REDSOUND_REVERB_KIND_CHORUS: {
-        reverb->m_context = (void*)RedNew(REDSOUND_AXFX_CHORUS_SIZE);
-        reverb->m_callback = (int)AXFXChorusCallback;
-        AXFX_CHORUS* chorus = (AXFX_CHORUS*)reverb->m_context;
+        RedReverbSetContext(reverb, (void*)RedNew(REDSOUND_AXFX_CHORUS_SIZE));
+        RedReverbSetCallback(reverb, (int)AXFXChorusCallback);
+        AXFX_CHORUS* chorus = (AXFX_CHORUS*)RedReverbGetContext(reverb);
         chorus->baseDelay = (u32)params[REDSOUND_REVERB_PARAM_CHORUS_BASE_DELAY];
         chorus->variation = (u32)params[REDSOUND_REVERB_PARAM_CHORUS_VARIATION];
         chorus->period = (u32)params[REDSOUND_REVERB_PARAM_CHORUS_PERIOD];
@@ -872,9 +878,9 @@ RedReverbSize* SetReverb(int bank, int kind, int* params)
         break;
     }
     case REDSOUND_REVERB_KIND_HI_DPL2: {
-        reverb->m_context = (void*)RedNew(REDSOUND_AXFX_REVERB_HI_DPL2_SIZE);
-        reverb->m_callback = (int)AXFXReverbHiCallbackDpl2;
-        AXFX_REVERBHI_DPL2* hiDpl2 = (AXFX_REVERBHI_DPL2*)reverb->m_context;
+        RedReverbSetContext(reverb, (void*)RedNew(REDSOUND_AXFX_REVERB_HI_DPL2_SIZE));
+        RedReverbSetCallback(reverb, (int)AXFXReverbHiCallbackDpl2);
+        AXFX_REVERBHI_DPL2* hiDpl2 = (AXFX_REVERBHI_DPL2*)RedReverbGetContext(reverb);
         hiDpl2->tempDisableFX = REDSOUND_REVERB_FX_ENABLE;
         hiDpl2->preDelay = (float)params[REDSOUND_REVERB_PARAM_PRE_DELAY] / s_ReverbTimeScale;
         hiDpl2->time = (float)params[REDSOUND_REVERB_PARAM_TIME] / s_ReverbTimeScale;
@@ -888,10 +894,10 @@ RedReverbSize* SetReverb(int bank, int kind, int* params)
 
     if (result == REDSOUND_REVERB_INIT_SUCCESS) {
         if (bank == REDSOUND_REVERB_AUX_A) {
-            AXRegisterAuxACallback((void (*)(void*, void*))reverb->m_callback, reverb->m_context);
+            AXRegisterAuxACallback((void (*)(void*, void*))RedReverbGetCallback(reverb), RedReverbGetContext(reverb));
         }
         else {
-            AXRegisterAuxBCallback((void (*)(void*, void*))reverb->m_callback, reverb->m_context);
+            AXRegisterAuxBCallback((void (*)(void*, void*))RedReverbGetCallback(reverb), RedReverbGetContext(reverb));
         }
     }
     else {

@@ -32,7 +32,7 @@ enum RedWaveSettingLayoutOffset {
     REDSOUND_WAVE_SETTING_WAVE_ID_OFFSET = 0x04,
     REDSOUND_WAVE_SETTING_WAVE_DATA_OFFSET = 0x08,
     REDSOUND_WAVE_SETTING_WAVE_SIZE_OFFSET = 0x0C,
-    REDSOUND_WAVE_SETTING_SIZE = 0x10,
+    REDSOUND_WAVE_SETTING_SIZE = sizeof(RedWaveSettingState),
 };
 
 enum RedDriverSyncLayoutOffset {
@@ -59,9 +59,9 @@ enum RedDriverSyncLayoutOffset {
 };
 
 enum RedDriverGlobalObjectSize {
-    REDSOUND_SE_BLOCK_DATA_TABLE_SIZE = 0x10,
-    REDSOUND_RED_MEMORY_SIZE = 0x01,
-    REDSOUND_RED_ENTRY_SIZE = 0x18,
+    REDSOUND_SE_BLOCK_DATA_TABLE_SIZE = REDSOUND_SE_BLOCK_BANK_COUNT * sizeof(RedSeBlockHEAD*),
+    REDSOUND_RED_MEMORY_SIZE = sizeof(CRedMemory),
+    REDSOUND_RED_ENTRY_SIZE = sizeof(CRedEntry),
 };
 
 enum RedDriverSmallDataLayout {

@@ -707,6 +707,10 @@ static int m_MainThreadTime;
 static u8* volatile p_WaveSettingThreadStack;
 #define RedWaveSettingThreadStackGet() (p_WaveSettingThreadStack)
 static int m_WaveSettingStatus;
+#define RedWaveSettingStatusGet() (m_WaveSettingStatus)
+#define RedWaveSettingStatusSet(status) (m_WaveSettingStatus = (status))
+#define RedWaveSettingStatusInc() (m_WaveSettingStatus = m_WaveSettingStatus + 1)
+#define RedWaveSettingStatusIsIdle() (RedWaveSettingStatusGet() == REDSOUND_WORKER_IDLE)
 static u8* volatile p_DmaExecuteThreadStack;
 #define RedDmaExecuteThreadStackGet() (p_DmaExecuteThreadStack)
 static volatile int m_DMAStatus;
@@ -1726,17 +1730,17 @@ static int _MainThread(void*)
 static int _WaveSettingThread(void* threadArg)
 {
     m_ThreadExecute = m_ThreadExecute | REDSOUND_THREAD_FLAG_WAVE_SETTING;
-    m_WaveSettingStatus = REDSOUND_WORKER_IDLE;
+    RedWaveSettingStatusSet(REDSOUND_WORKER_IDLE);
     while (m_ThreadControl != REDSOUND_THREAD_CONTROL_STOP) {
         OSWaitSemaphore(&m_WaveSettingSemaphore);
         if (m_ThreadControl != REDSOUND_THREAD_CONTROL_STOP) {
             RedWaveSettingState* waveSetting = (RedWaveSettingState*)threadArg;
-            m_WaveSettingStatus = m_WaveSettingStatus + 1;
+            RedWaveSettingStatusInc();
             c_RedEntry.SetWaveData(waveSetting->m_waveId, waveSetting->m_waveData, waveSetting->m_waveSize);
             *waveSetting->m_slot = 0;
             do {
             } while (OSTryWaitSemaphore(&m_WaveSettingSemaphore) > 0);
-            m_WaveSettingStatus = REDSOUND_WORKER_IDLE;
+            RedWaveSettingStatusSet(REDSOUND_WORKER_IDLE);
         }
     }
     m_ThreadExecute = m_ThreadExecute & ~REDSOUND_THREAD_FLAG_WAVE_SETTING;
@@ -3522,7 +3526,7 @@ void CRedDriver::ClearWaveBank(int waveBank)
 void CRedDriver::SetWaveData(int slot, int waveID, void* waveData, int waveSize)
 {
     while (true) {
-        if (m_WaveSettingStatus == REDSOUND_WORKER_IDLE) {
+        if (RedWaveSettingStatusIsIdle()) {
             break;
         }
 

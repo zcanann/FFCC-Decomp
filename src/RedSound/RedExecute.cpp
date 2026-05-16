@@ -155,13 +155,16 @@ s16 t_PanningDataR[REDSOUND_PAN_TABLE_COUNT] = {
 static volatile u8 m_RandomIndex;
 static RedReverbDATA* volatile p_ReverbData;
 #define RedReverbDataGetBegin() (p_ReverbData)
+#define RedReverbDataSetBegin(data) (p_ReverbData = (data))
 #define RedReverbDataGet(bank) (p_ReverbData + ((bank) & REDSOUND_REVERB_BANK_MASK))
 static RedReverbSize* p_ReverbSize;
 #define RedReverbSizeGet() (p_ReverbSize)
+#define RedReverbSizeSet(size) (p_ReverbSize = (size))
 volatile u32 m_ChangeStatus;
 u32 m_TerminateNote[REDSOUND_TERMINATE_NOTE_WORD_COUNT] = { 0 };
 static RedKeyOnDATA* volatile p_SkipKeyOn;
 #define RedSkipKeyOnDataGet() (p_SkipKeyOn)
+#define RedSkipKeyOnDataSet(data) (p_SkipKeyOn = (data))
 static const float s_ReverbTimeScale = 1000.0f;
 static const float s_ReverbEffectScale = 100.0f;
 
@@ -627,9 +630,9 @@ void ReverbAreaFree(void* area)
  */
 void InitReverb()
 {
-    p_ReverbData = (RedReverbDATA*)RedNew(REDSOUND_REVERB_DATA_BUFFER_SIZE);
+    RedReverbDataSetBegin((RedReverbDATA*)RedNew(REDSOUND_REVERB_DATA_BUFFER_SIZE));
     memset(RedReverbDataGetBegin(), 0, REDSOUND_REVERB_DATA_BUFFER_SIZE);
-    p_ReverbSize = (RedReverbSize*)RedNew(REDSOUND_REVERB_SIZE_ALLOC_SIZE);
+    RedReverbSizeSet((RedReverbSize*)RedNew(REDSOUND_REVERB_SIZE_ALLOC_SIZE));
 }
 
 /*
@@ -2809,7 +2812,7 @@ void MusicSkipFunction()
     RedTrackDATA* track;
 
     do {
-        p_SkipKeyOn = (RedKeyOnDATA*)RedNew(REDSOUND_KEY_ON_BUFFER_SIZE);
+        RedSkipKeyOnDataSet((RedKeyOnDATA*)RedNew(REDSOUND_KEY_ON_BUFFER_SIZE));
         if (RedSkipKeyOnDataGet() == 0) {
             RedSleep(REDSOUND_MUSIC_SKIP_RETRY_SLEEP_US);
         }

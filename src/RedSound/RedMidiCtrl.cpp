@@ -973,7 +973,7 @@ static void __MidiCtrl_Stop(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, R
             voice = p_VoiceData;
             do {
                 if ((voice->m_track >= control->m_tracks) &&
-                    (voice->m_track < control->m_tracks + control->m_trackCount)) {
+                    (voice->m_track < RedSoundControlGetTrackEnd(control))) {
                     voice->m_voiceSwitch &= REDSOUND_VOICE_SWITCH_CLEAR_SUSTAIN_PAUSE_MASK;
                     voice->m_flags &= REDSOUND_VOICE_FLAGS_CLEAR_ACTIVE_MASK;
                     voice->m_flags |= REDSOUND_VOICE_FLAGS_RELEASED;
@@ -1015,7 +1015,7 @@ static void __MidiCtrl_Sleep(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, 
                 __MidiCtrl_Stop(control, keyOnData, track);
             }
             track++;
-        } while (track < control->m_tracks + control->m_trackCount);
+        } while (track < RedSoundControlGetTrackEnd(control));
     }
 }
 /*
@@ -1060,7 +1060,7 @@ static void __MidiCtrl_WholeLoopStart(RedSoundCONTROL* control, RedKeyOnDATA* ke
 
         scan++;
         if (control->m_trackCount > scan - control->m_tracks) {
-            for (; scan < control->m_tracks + control->m_trackCount; scan++) {
+            for (; scan < RedSoundControlGetTrackEnd(control); scan++) {
                 int currentDelta = deltaAdjust + (scan->m_deltaTime - loopBase);
 
                 while ((currentDelta < 1) && (scan->m_command != REDSOUND_TRACK_COMMAND_NONE)) {
@@ -1115,7 +1115,7 @@ static void __MidiCtrl_WholeLoopEnd(RedSoundCONTROL* control, RedKeyOnDATA* keyO
                 __MidiCtrl_Stop(control, keyOnData, track);
             }
             track++;
-        } while (track < control->m_tracks + control->m_trackCount);
+        } while (track < RedSoundControlGetTrackEnd(control));
     }
 }
 /*
@@ -1309,7 +1309,7 @@ static void __MidiCtrl_KeySignature(RedSoundCONTROL* control, RedKeyOnDATA*, Red
         do {
             scan->m_keySignatureData = control->m_keySignatureData;
             scan++;
-        } while (scan < control->m_tracks + control->m_trackCount);
+        } while (scan < RedSoundControlGetTrackEnd(control));
     }
 }
 /*

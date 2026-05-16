@@ -405,6 +405,9 @@ struct RedSoundCONTROL {
 	unsigned char m_reserved493;
 };
 
+#define RedSoundControlGetTrackEnd(control) ((control)->m_tracks + (control)->m_trackCount)
+#define RedSoundControlGetSeTrackEnd(control) ((control)->m_tracks + REDSOUND_SE_TRACK_COUNT)
+
 enum RedSoundControlFlag {
 	REDSOUND_CONTROL_FLAG_WHOLE_LOOP_ACTIVE = 1,
 	REDSOUND_CONTROL_FLAG_WHOLE_LOOP_END = 2,

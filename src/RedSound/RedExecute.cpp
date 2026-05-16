@@ -2786,7 +2786,7 @@ static void _SkipMusicEntry()
     }
 
     RedDelete(RedSkipKeyOnDataGet());
-    m_MusicSkipComplete = REDSOUND_MUSIC_SKIP_NOT_COMPLETE;
+    RedMusicSkipCompleteSet(REDSOUND_MUSIC_SKIP_NOT_COMPLETE);
 }
 
 
@@ -2837,7 +2837,7 @@ void MusicSkipFunction()
         } while (trackCount != 0);
         activeTrackCount = _MusicMidiNoteSkipExecute(control, RedSkipKeyOnDataGet(), 1);
     }
-    m_MusicSkipComplete = REDSOUND_MUSIC_SKIP_COMPLETE;
+    RedMusicSkipCompleteSet(REDSOUND_MUSIC_SKIP_COMPLETE);
 }
 
 
@@ -3194,7 +3194,7 @@ void MainControl(int frames)
     }
 
     _ExecuteExtraData();
-    if (m_MusicSkipComplete != 0) {
+    if (RedMusicSkipIsComplete()) {
         _SkipMusicEntry();
     }
 }

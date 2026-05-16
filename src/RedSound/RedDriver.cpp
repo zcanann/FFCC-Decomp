@@ -2056,7 +2056,7 @@ static int _DmaExecuteThread(void*)
 static int _MusicSkipThread(void*)
 {
     m_ThreadExecute |= REDSOUND_THREAD_FLAG_MUSIC_SKIP;
-    m_MusicSkipComplete = REDSOUND_MUSIC_SKIP_NOT_COMPLETE;
+    RedMusicSkipCompleteSet(REDSOUND_MUSIC_SKIP_NOT_COMPLETE);
     while (m_ThreadControl != REDSOUND_THREAD_CONTROL_STOP) {
         OSWaitSemaphore(&m_MusicSkipSemaphore);
         if (m_ThreadControl != REDSOUND_THREAD_CONTROL_STOP) {

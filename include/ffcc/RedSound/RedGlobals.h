@@ -320,6 +320,9 @@ extern RedTrackDATA* p_EditorTrack;
 extern OSThread m_MusicSkipThread;
 extern u8* volatile p_MusicSkipThreadStack;
 extern volatile int m_MusicSkipComplete;
+#define RedMusicSkipCompleteGet() (m_MusicSkipComplete)
+#define RedMusicSkipCompleteSet(status) (m_MusicSkipComplete = (status))
+#define RedMusicSkipIsComplete() (RedMusicSkipCompleteGet() != REDSOUND_MUSIC_SKIP_NOT_COMPLETE)
 extern RedReverbDepth* volatile p_ReverbDepth;
 #define RedReverbDepthGetBegin() (p_ReverbDepth)
 #define RedReverbDepthGet(index) (p_ReverbDepth + (index))

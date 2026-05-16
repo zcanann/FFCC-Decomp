@@ -1228,7 +1228,7 @@ static void _SetSeBlockData(int* command)
 
     if (RedSeBlockDataGet(index) != REDSOUND_SE_BLOCK_DATA_NONE) {
         RedDelete(RedSeBlockDataGet(index));
-        RedSeBlockDataGet(index) = REDSOUND_SE_BLOCK_DATA_NONE;
+        RedSeBlockDataSet(index, REDSOUND_SE_BLOCK_DATA_NONE);
     }
 
     if (command[REDSOUND_SE_BLOCK_DATA_COMMAND_BUFFER] != 0) {
@@ -1240,7 +1240,7 @@ static void _SetSeBlockData(int* command)
             (seBlockData->m_signature[REDSOUND_SE_BLOCK_SIGNATURE_4_INDEX] = REDSOUND_SE_BLOCK_SIGNATURE_4) &&
             (seBlockData->m_signature[REDSOUND_SE_BLOCK_SIGNATURE_5_INDEX] = REDSOUND_SE_BLOCK_SIGNATURE_5) &&
             (seBlockData->m_signature[REDSOUND_SE_BLOCK_SIGNATURE_6_INDEX] = REDSOUND_SE_BLOCK_SIGNATURE_6)) {
-            RedSeBlockDataGet(index) = seBlockData;
+            RedSeBlockDataSet(index, seBlockData);
         } else {
             RedDelete(seBlockData);
         }

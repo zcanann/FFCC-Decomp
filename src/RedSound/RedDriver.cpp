@@ -666,6 +666,7 @@ u8* volatile p_ZeroData;
 static RedExecCommand* volatile p_ExecCommand;
 static RedExecCommand* volatile p_ExecCommandNow;
 static RedExecCommand* volatile p_ExecCommandOld;
+#define RedExecCommandGetBegin() (p_ExecCommand)
 #define RedExecCommandGetEnd() (p_ExecCommand + REDSOUND_EXEC_COMMAND_COUNT)
 static RedDmaRequest* volatile p_DmaControlNow[REDSOUND_DMA_QUEUE_COUNT];
 static RedDmaRequest* volatile p_DmaControlOld[REDSOUND_DMA_QUEUE_COUNT];
@@ -1516,7 +1517,7 @@ static RedExecCommand* _EntryExecCommand(RedExecCommandFunc func, int arg1, int 
     RedExecCommandGetArg(writePos, REDSOUND_EXEC_COMMAND_ARG6) = arg7;
     writePos++;
     if (writePos == RedExecCommandGetEnd()) {
-        writePos = p_ExecCommand;
+        writePos = RedExecCommandGetBegin();
     }
     p_ExecCommandNow = writePos;
     OSRestoreInterrupts(interruptLevel);
@@ -1546,7 +1547,7 @@ static void _ExecuteCommand()
 		}
 		readPos++;
 		if (readPos == RedExecCommandGetEnd()) {
-			readPos = p_ExecCommand;
+			readPos = RedExecCommandGetBegin();
 		}
 	}
 
@@ -2471,7 +2472,7 @@ inline int CRedDriver::MusicPlayState(int musicID)
             }
             command++;
             if (command == RedExecCommandGetEnd()) {
-                command = p_ExecCommand;
+                command = RedExecCommandGetBegin();
             }
         }
     }
@@ -2963,7 +2964,7 @@ int CRedDriver::SePlayState(int seID)
             }
             command++;
             if (command == RedExecCommandGetEnd()) {
-                command = p_ExecCommand;
+                command = RedExecCommandGetBegin();
             }
         }
     }
@@ -3312,7 +3313,7 @@ int CRedDriver::StreamPlayState(int streamID)
 			}
 			command++;
 			if (command == RedExecCommandGetEnd()) {
-				command = p_ExecCommand;
+				command = RedExecCommandGetBegin();
 			}
 		}
 	}

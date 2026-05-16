@@ -252,6 +252,8 @@ extern int m_SoundPlayMode;
 #define RedSoundPlayModeGet() (m_SoundPlayMode)
 #define RedSoundPlayModeSet(mode) (m_SoundPlayMode = (mode))
 extern int m_SoundMasterControl;
+#define RedSoundMasterControlGet() (m_SoundMasterControl)
+#define RedSoundMasterControlSet(control) (m_SoundMasterControl = (control))
 extern volatile int m_ReportPrint;
 #define RedReportPrintGet() (m_ReportPrint)
 #define RedReportPrintSet(value) (m_ReportPrint = (value))

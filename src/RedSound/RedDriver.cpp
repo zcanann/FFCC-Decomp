@@ -2152,7 +2152,7 @@ void CRedDriver::Init()
     memset(RedTickHistoryGet(), 0, REDSOUND_TICK_HISTORY_SIZE);
     AXSetCompressor(REDSOUND_AX_COMPRESSOR_OFF);
     RedMusicKeySignatureSet(0);
-    m_SoundMasterControl = 0;
+    RedSoundMasterControlSet(0);
     RedMusicSkipLineSet(0);
     RedMusicFastSpeedSet(0);
     m_DMAStatus = REDSOUND_DMA_STATUS_IDLE;

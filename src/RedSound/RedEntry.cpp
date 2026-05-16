@@ -423,7 +423,7 @@ int CRedEntry::SearchUseWave(int waveNo)
 {
 	unsigned int interruptLevel = OSDisableInterrupts();
 	int found = REDSOUND_ENTRY_SEARCH_NOT_FOUND;
-	RedSoundCONTROL* control = p_SoundControlBuffer + REDSOUND_CONTROL_MUSIC_SECONDARY;
+	RedSoundCONTROL* control = RedSoundControlGet(REDSOUND_CONTROL_MUSIC_SECONDARY);
 
 	do {
 		if ((control->m_musicId >= REDSOUND_MUSIC_ID_MIN) && (control->m_waveNo == waveNo)) {
@@ -433,7 +433,7 @@ int CRedEntry::SearchUseWave(int waveNo)
 		control--;
 	} while ((u32)control >= (u32)p_SoundControlBuffer);
 
-	control = p_SoundControlBuffer + REDSOUND_CONTROL_SE;
+	control = RedSoundControlGet(REDSOUND_CONTROL_SE);
 	RedTrackDATA* track = control->m_tracks;
 	do {
 		if (((u32)track->m_command != REDSOUND_TRACK_COMMAND_NONE) && (track->m_waveBankData != REDSOUND_WAVE_BANK_DATA_NONE) &&
@@ -885,7 +885,7 @@ void CRedEntry::WaveHistoryManager(int mode, int waveNo)
 			used |= 1;
 		}
 		if (used == 0) {
-			RedTrackDATA** trackHead = &p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
+			RedTrackDATA** trackHead = &RedSoundControlGet(REDSOUND_CONTROL_SE)->m_tracks;
 			track = *trackHead;
 			do {
 				if (((u32)track->m_command != REDSOUND_TRACK_COMMAND_NONE) && (track->m_waveBankData != REDSOUND_WAVE_BANK_DATA_NONE) &&
@@ -1216,7 +1216,7 @@ void CRedEntry::SeSepHistoryManager(int mode, int seNo)
 
 	if (mode == REDSOUND_HISTORY_MODE_RELEASE) {
 		sequenceNo = 0;
-		track = p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
+		track = RedSoundControlGet(REDSOUND_CONTROL_SE)->m_tracks;
 
 		do {
 			if (((unsigned int)track->m_command != REDSOUND_TRACK_COMMAND_NONE) && (track->m_seSepId == seNo)) {
@@ -1224,7 +1224,7 @@ void CRedEntry::SeSepHistoryManager(int mode, int seNo)
 				break;
 			}
 			track += 1;
-		} while (track < RedSoundControlGetSeTrackEnd(&p_SoundControlBuffer[REDSOUND_CONTROL_SE]));
+		} while (track < RedSoundControlGetSeTrackEnd(RedSoundControlGet(REDSOUND_CONTROL_SE)));
 
 		if (sequenceNo == 0) {
 			sequenceNo = SearchSeSepSequence(seNo);
@@ -1260,7 +1260,7 @@ void CRedEntry::DisplaySePlayInfo()
 		OSReport(sRedEntrySePlayInfoColumnFmt, sRedEntryLogPrefix);
 		fflush(__files + 1);
 
-		RedTrackDATA** trackHead = &p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
+		RedTrackDATA** trackHead = &RedSoundControlGet(REDSOUND_CONTROL_SE)->m_tracks;
 		RedTrackDATA* track = *trackHead;
 		int waveNo;
 		do {

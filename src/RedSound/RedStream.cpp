@@ -271,7 +271,8 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 			}
 			SetVoiceVolumeMix(streamData->m_voiceData + channel, streamData->m_pan.m_value >> REDSOUND_FIXED_SHIFT,
 			                  streamData->m_volume.m_value >> REDSOUND_FIXED_SHIFT);
-			(streamData->m_track + channel)->m_waveBase = streamData->m_aramBuffer + channel * REDSOUND_STREAM_STEREO_PLANE_SIZE;
+			(streamData->m_track + channel)->m_waveBase =
+			    RedStreamAramGetChannelPlane(streamData->m_aramBuffer, channel);
 			memset(&streamData->m_trackData[channel], 0, REDSOUND_WAVE_DATA_SIZE);
 			memcpy(&streamData->m_trackData[channel].m_adpcm, &headerData[channel],
 			       REDSOUND_STREAM_ADPCM_HEADER_SIZE);

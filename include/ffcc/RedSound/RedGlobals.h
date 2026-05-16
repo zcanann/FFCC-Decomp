@@ -242,6 +242,7 @@ extern int m_CrossTime;
 extern volatile int m_MasterMusicVolume;
 extern volatile int m_MasterSEVolume;
 extern RedStreamDATA* volatile p_Stream;
+#define RedStreamDataGetEnd() (p_Stream + REDSOUND_STREAM_COUNT)
 extern volatile int m_SeSkipStep;
 extern RedVoiceDATA* volatile p_VoiceData;
 #define RedVoiceDataGetEnd() (p_VoiceData + REDSOUND_VOICE_COUNT)

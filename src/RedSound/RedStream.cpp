@@ -167,7 +167,7 @@ void StreamStop(int streamID)
 			_StreamStop((RedStreamDATA*)streamData);
 		}
 		streamData++;
-	} while (streamData < p_Stream + REDSOUND_STREAM_COUNT);
+	} while (streamData < RedStreamDataGetEnd());
 }
 /*
  * --INFO--
@@ -370,7 +370,7 @@ void SetStreamVolume(int streamID, int volume, int frameCount)
 			}
 		}
 		streamData++;
-	} while (streamData < p_Stream + REDSOUND_STREAM_COUNT);
+	} while (streamData < RedStreamDataGetEnd());
 }
 /*
  * --INFO--
@@ -426,7 +426,7 @@ void StreamPause(int streamID, int pause)
 			}
 		}
 		streamData++;
-	} while (streamData < p_Stream + REDSOUND_STREAM_COUNT);
+	} while (streamData < RedStreamDataGetEnd());
 }
 /*
  * --INFO--
@@ -529,7 +529,7 @@ void StreamControl()
 		}
 
 		streamData++;
-	} while (streamData < p_Stream + REDSOUND_STREAM_COUNT);
+	} while (streamData < RedStreamDataGetEnd());
 }
 /*
  * --INFO--
@@ -551,7 +551,7 @@ static RedStreamDATA* _SearchEmptyStreamData()
 
 		streamData++;
 
-		if (!(streamData < p_Stream + REDSOUND_STREAM_COUNT)) {
+		if (!(streamData < RedStreamDataGetEnd())) {
 			return REDSOUND_STREAM_DATA_NONE;
 		}
 	}
@@ -825,5 +825,5 @@ void SetStreamPan(int streamID, int pan, int frameCount)
 			}
 		}
 		streamData++;
-	} while (streamData < p_Stream + REDSOUND_STREAM_COUNT);
+	} while (streamData < RedStreamDataGetEnd());
 }

@@ -3292,7 +3292,7 @@ int CRedDriver::StreamPlayState(int streamID)
 			break;
 		}
 		streamData++;
-	} while (streamData < p_Stream + REDSOUND_STREAM_COUNT);
+	} while (streamData < RedStreamDataGetEnd());
 
 	if (result == 0) {
 		commandNow = p_ExecCommandNow;
@@ -3348,7 +3348,7 @@ int CRedDriver::GetStreamPlayPoint(int streamID, int* playPoint, int* readPoint)
 			break;
 		}
 		streamData++;
-	} while (streamData < p_Stream + REDSOUND_STREAM_COUNT);
+	} while (streamData < RedStreamDataGetEnd());
 	return found;
 }
 
@@ -3370,7 +3370,7 @@ inline RedStreamDATA* CRedDriver::GetStreamPlayBlock(int streamID)
 			return streamData;
 		}
 		streamData++;
-	} while (streamData < p_Stream + REDSOUND_STREAM_COUNT);
+	} while (streamData < RedStreamDataGetEnd());
 	return 0;
 }
 

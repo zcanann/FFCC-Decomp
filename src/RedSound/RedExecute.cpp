@@ -161,6 +161,7 @@ static RedReverbSize* p_ReverbSize;
 volatile u32 m_ChangeStatus;
 u32 m_TerminateNote[REDSOUND_TERMINATE_NOTE_WORD_COUNT] = { 0 };
 static RedKeyOnDATA* volatile p_SkipKeyOn;
+#define RedSkipKeyOnDataGet() (p_SkipKeyOn)
 static const float s_ReverbTimeScale = 1000.0f;
 static const float s_ReverbEffectScale = 100.0f;
 
@@ -2716,7 +2717,7 @@ static void _SkipMusicEntry()
     int keyOnEntryCount = 0;
 
     if (RedSoundControlGet(REDSOUND_CONTROL_MUSIC_SKIP)->m_musicId >= REDSOUND_MUSIC_ID_MIN) {
-        src = RedKeyOnGetFixedBegin(p_SkipKeyOn);
+        src = RedKeyOnGetFixedBegin(RedSkipKeyOnDataGet());
         dst = RedKeyOnGetFixedBegin(RedKeyOnDataGet());
         do {
             if ((src->m_track != REDSOUND_TRACK_NONE) && (dst->m_track == REDSOUND_TRACK_NONE)) {
@@ -2727,9 +2728,9 @@ static void _SkipMusicEntry()
             }
             src++;
             dst++;
-        } while (src < RedKeyOnGetPriorityBegin(p_SkipKeyOn));
+        } while (src < RedKeyOnGetPriorityBegin(RedSkipKeyOnDataGet()));
 
-        src = RedKeyOnGetPriorityBegin(p_SkipKeyOn);
+        src = RedKeyOnGetPriorityBegin(RedSkipKeyOnDataGet());
         dst = RedKeyOnGetPriorityBegin(RedKeyOnDataGet());
         while (dst < RedKeyOnGetNormalBegin(RedKeyOnDataGet())) {
             if (dst->m_track == REDSOUND_TRACK_NONE) {
@@ -2738,7 +2739,7 @@ static void _SkipMusicEntry()
             dst++;
         }
         while ((dst < RedKeyOnGetNormalBegin(RedKeyOnDataGet())) &&
-               (src < RedKeyOnGetNormalBegin(p_SkipKeyOn))) {
+               (src < RedKeyOnGetNormalBegin(RedSkipKeyOnDataGet()))) {
             if (src->m_track != REDSOUND_TRACK_NONE) {
                 dst->m_track = src->m_track;
                 *(int*)&dst->m_note = *(int*)&src->m_note;
@@ -2749,7 +2750,7 @@ static void _SkipMusicEntry()
             src++;
         }
 
-        src = RedKeyOnGetNormalBegin(p_SkipKeyOn);
+        src = RedKeyOnGetNormalBegin(RedSkipKeyOnDataGet());
         dst = RedKeyOnGetNormalBegin(RedKeyOnDataGet());
         while (dst < RedKeyOnGetEnd(RedKeyOnDataGet())) {
             if (dst->m_track == REDSOUND_TRACK_NONE) {
@@ -2758,7 +2759,7 @@ static void _SkipMusicEntry()
             dst++;
         }
         while ((dst < RedKeyOnGetEnd(RedKeyOnDataGet())) &&
-               (src < RedKeyOnGetEnd(p_SkipKeyOn))) {
+               (src < RedKeyOnGetEnd(RedSkipKeyOnDataGet()))) {
             if (src->m_track != REDSOUND_TRACK_NONE) {
                 dst->m_track = src->m_track;
                 *(int*)&dst->m_note = *(int*)&src->m_note;
@@ -2784,7 +2785,7 @@ static void _SkipMusicEntry()
         soundControl[REDSOUND_CONTROL_MUSIC_SKIP].m_musicId = REDSOUND_MUSIC_ID_NONE;
     }
 
-    RedDelete(p_SkipKeyOn);
+    RedDelete(RedSkipKeyOnDataGet());
     m_MusicSkipComplete = REDSOUND_MUSIC_SKIP_NOT_COMPLETE;
 }
 
@@ -2809,14 +2810,14 @@ void MusicSkipFunction()
 
     do {
         p_SkipKeyOn = (RedKeyOnDATA*)RedNew(REDSOUND_KEY_ON_BUFFER_SIZE);
-        if (p_SkipKeyOn == 0) {
+        if (RedSkipKeyOnDataGet() == 0) {
             RedSleep(REDSOUND_MUSIC_SKIP_RETRY_SLEEP_US);
         }
-    } while (p_SkipKeyOn == 0);
+    } while (RedSkipKeyOnDataGet() == 0);
 
     control = RedSoundControlGet(REDSOUND_CONTROL_MUSIC_SKIP);
-    memset(p_SkipKeyOn, 0, REDSOUND_KEY_ON_BUFFER_SIZE);
-    activeTrackCount = _MusicMidiNoteSkipExecute(control, p_SkipKeyOn, 1);
+    memset(RedSkipKeyOnDataGet(), 0, REDSOUND_KEY_ON_BUFFER_SIZE);
+    activeTrackCount = _MusicMidiNoteSkipExecute(control, RedSkipKeyOnDataGet(), 1);
     while ((activeTrackCount == 0) && ((control->m_flags & REDSOUND_CONTROL_FLAG_WHOLE_LOOP_ACTIVE) != 0)) {
         control->m_activeTrackCount = control->m_savedActiveTrackCount;
         memcpy(&control->m_measure, &control->m_savedPosition, REDSOUND_CONTROL_SAVED_POSITION_SIZE);
@@ -2834,7 +2835,7 @@ void MusicSkipFunction()
             trackIndex += 1;
             track += 1;
         } while (trackCount != 0);
-        activeTrackCount = _MusicMidiNoteSkipExecute(control, p_SkipKeyOn, 1);
+        activeTrackCount = _MusicMidiNoteSkipExecute(control, RedSkipKeyOnDataGet(), 1);
     }
     m_MusicSkipComplete = REDSOUND_MUSIC_SKIP_COMPLETE;
 }

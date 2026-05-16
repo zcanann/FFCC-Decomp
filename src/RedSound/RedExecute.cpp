@@ -1022,7 +1022,7 @@ void SetVoiceVolumeMix(RedVoiceDATA* voice, int pan, int volume)
     mixData = &voice->m_axMix;
     memset(mixData, 0, sizeof(*mixData));
 
-    switch (m_SoundPlayMode) {
+    switch (RedSoundPlayModeGet()) {
     case REDSOUND_SOUND_MODE_MONO:
         auxLeftMix = (volume * RedPanningDataGet(REDSOUND_PAN_BYTE_CENTER)) >> REDSOUND_PAN_MIX_SHIFT;
 
@@ -1187,7 +1187,7 @@ static void _VolumeExecute(RedVoiceDATA* voice, int volume)
         }
     }
 
-    if (m_SoundPlayMode == REDSOUND_SOUND_MODE_MONO) {
+    if (RedSoundPlayModeGet() == REDSOUND_SOUND_MODE_MONO) {
         pan = REDSOUND_PAN_BYTE_CENTER;
     } else if ((voice->m_voiceSwitch & REDSOUND_VOICE_SWITCH_PAIRED_PAN) != 0) {
         if ((voice->m_voiceSwitch & REDSOUND_VOICE_SWITCH_PAIRED_LEFT) != 0) {

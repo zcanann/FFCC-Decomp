@@ -820,8 +820,8 @@ static void _SetSoundMode(int* command)
     } else {
         OSGetSoundMode(OS_SOUND_MODE_STEREO);
     }
-    m_SoundPlayMode = m_SoundMode;
-    switch (m_SoundPlayMode) {
+    RedSoundPlayModeSet(m_SoundMode);
+    switch (RedSoundPlayModeGet()) {
     case REDSOUND_SOUND_MODE_SURROUND:
         AXSetMode(REDSOUND_SOUND_MODE_SURROUND);
         break;
@@ -2140,7 +2140,7 @@ void CRedDriver::Init()
     RedReportPrintSet(REDSOUND_REPORT_PRINT_ON);
     m_SoundMode = REDSOUND_SOUND_MODE_STEREO;
     GetSoundMode();
-    switch (m_SoundPlayMode) {
+    switch (RedSoundPlayModeGet()) {
     case REDSOUND_SOUND_MODE_SURROUND:
         AXSetMode(REDSOUND_SOUND_MODE_SURROUND);
         break;
@@ -2355,11 +2355,11 @@ int CRedDriver::GetSoundMode()
     int soundMode = __OSReadROM();
 
     if (soundMode == 0) {
-        m_SoundPlayMode = REDSOUND_SOUND_MODE_MONO;
+        RedSoundPlayModeSet(REDSOUND_SOUND_MODE_MONO);
     } else {
-        m_SoundPlayMode = m_SoundMode;
+        RedSoundPlayModeSet(m_SoundMode);
     }
-    return m_SoundPlayMode;
+    return RedSoundPlayModeGet();
 }
 
 /*

@@ -249,7 +249,7 @@ enum RedExecuteAxfxReverbLayout {
 };
 
 enum RedExecuteAxVoiceLayout {
-    REDSOUND_AX_VOICE_TYPE_OFFSET = 0x148,
+    REDSOUND_AX_VOICE_TYPE_OFFSET = offsetof(AXVPB, pb) + offsetof(AXPB, type),
     REDSOUND_AX_MIX_CTRL_DRY_STEREO = 0x3,
     REDSOUND_AX_MIX_CTRL_AUX_A_STEREO = 0x30,
     REDSOUND_AX_MIX_CTRL_AUX_B_STEREO = 0x600,

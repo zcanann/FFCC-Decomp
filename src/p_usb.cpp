@@ -17,9 +17,9 @@ extern "C" void destroy__7CUSBPcsFv(CUSBPcs*);
 extern "C" void func__7CUSBPcsFv(CUSBPcs*);
 
 extern const char s_CUSBPcs_8032f810[] = "CUSBPcs";
-static unsigned int m_table_desc0__7CUSBPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__7CUSBPcsFv)};
-static unsigned int m_table_desc1__7CUSBPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__7CUSBPcsFv)};
-static unsigned int m_table_desc2__7CUSBPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(func__7CUSBPcsFv)};
+unsigned int m_table_desc0__7CUSBPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__7CUSBPcsFv)};
+unsigned int m_table_desc1__7CUSBPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__7CUSBPcsFv)};
+unsigned int m_table_desc2__7CUSBPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(func__7CUSBPcsFv)};
 unsigned int m_table__7CUSBPcs[0x11C / sizeof(unsigned int)] = {
     reinterpret_cast<unsigned int>(const_cast<char*>(s_CUSBPcs_8032f810)),
     0,

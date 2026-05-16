@@ -6,6 +6,9 @@
 #include "ffcc/usb.h"
 
 extern unsigned int m_table__7CUSBPcs[];
+extern unsigned int m_table_desc0__7CUSBPcs[];
+extern unsigned int m_table_desc1__7CUSBPcs[];
+extern unsigned int m_table_desc2__7CUSBPcs[];
 
 class CUSBPcs : public CProcess
 {

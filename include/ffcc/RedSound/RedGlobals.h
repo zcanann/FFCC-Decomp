@@ -232,6 +232,7 @@ extern u32 m_TerminateNote[];
 extern volatile unsigned int m_AutoID;
 extern CRedEntry c_RedEntry;
 extern OSSemaphore m_MusicSkipSemaphore;
+#define RedMusicSkipSemaphoreGet() (&m_MusicSkipSemaphore)
 extern RedSeBlockHEAD* volatile p_SeBlockData[REDSOUND_SE_BLOCK_BANK_COUNT];
 #define RedSeBlockDataGetBegin() (p_SeBlockData)
 #define RedSeBlockDataGet(index) (p_SeBlockData[(index)])

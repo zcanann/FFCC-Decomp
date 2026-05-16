@@ -1142,7 +1142,7 @@ static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* wav
 	c_RedEntry.WaveHistoryManager(REDSOUND_HISTORY_MODE_USE, music->m_waveNo);
 	c_RedEntry.MusicHistoryManager(REDSOUND_HISTORY_MODE_USE, musicId);
 	if (RedMusicSkipLineIsActive()) {
-		OSSignalSemaphore(&m_MusicSkipSemaphore);
+		OSSignalSemaphore(RedMusicSkipSemaphoreGet());
 	}
 	return track;
 }

@@ -769,7 +769,6 @@ static ARQRequest m_DMARequest;
 #define RedDmaArqRequestGet() (&m_DMARequest)
 OSThread m_MusicSkipThread;
 OSSemaphore m_MusicSkipSemaphore;
-#define RedMusicSkipSemaphoreGet() (&m_MusicSkipSemaphore)
 RedSeBlockHEAD* volatile p_SeBlockData[REDSOUND_SE_BLOCK_BANK_COUNT];
 CRedMemory c_RedMemory;
 static volatile int m_DMAExecute;

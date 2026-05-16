@@ -101,6 +101,8 @@ struct RedStreamFile {
 
 #define RedStreamAramGetChannelPlane(buffer, channel) ((buffer) + (channel) * REDSOUND_STREAM_STEREO_PLANE_SIZE)
 
+#define RedStreamGetReadCursor(stream) ((stream)->m_fileData + (stream)->m_readOffset)
+
 enum RedStreamFileLayoutOffset {
     REDSOUND_STREAM_FILE_HEAD_OFFSET = (unsigned int)&(((RedStreamFile*)0)->m_header),
     REDSOUND_STREAM_FILE_ADPCM_OFFSET = (unsigned int)&(((RedStreamFile*)0)->m_adpcm),

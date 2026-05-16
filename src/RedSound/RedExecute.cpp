@@ -181,18 +181,7 @@ enum RedReverbControlConstant {
 
 enum RedExecuteSmallDataLayout {
     REDSOUND_EXECUTE_SDATA_SIZE = sizeof(u32) * REDSOUND_TERMINATE_NOTE_WORD_COUNT,
-    REDSOUND_EXECUTE_SBSS_RANDOM_INDEX_OFFSET = 0,
-    REDSOUND_EXECUTE_SBSS_RANDOM_PAD_OFFSET = REDSOUND_EXECUTE_SBSS_RANDOM_INDEX_OFFSET + sizeof(u8),
-    REDSOUND_EXECUTE_SBSS_REVERB_DATA_OFFSET =
-        REDSOUND_EXECUTE_SBSS_RANDOM_PAD_OFFSET + (sizeof(u32) - sizeof(u8)),
-    REDSOUND_EXECUTE_SBSS_RANDOM_PAD_SIZE =
-        REDSOUND_EXECUTE_SBSS_REVERB_DATA_OFFSET - REDSOUND_EXECUTE_SBSS_RANDOM_PAD_OFFSET,
-    REDSOUND_EXECUTE_SBSS_REVERB_SIZE_OFFSET =
-        REDSOUND_EXECUTE_SBSS_REVERB_DATA_OFFSET + sizeof(RedReverbDATA*),
-    REDSOUND_EXECUTE_SBSS_CHANGE_STATUS_OFFSET =
-        REDSOUND_EXECUTE_SBSS_REVERB_SIZE_OFFSET + sizeof(RedReverbSize*),
-    REDSOUND_EXECUTE_SBSS_SKIP_KEY_ON_OFFSET = REDSOUND_EXECUTE_SBSS_CHANGE_STATUS_OFFSET + sizeof(u32),
-    REDSOUND_EXECUTE_SBSS_SIZE = REDSOUND_EXECUTE_SBSS_SKIP_KEY_ON_OFFSET + sizeof(RedKeyOnDATA*),
+    REDSOUND_EXECUTE_SBSS_RANDOM_PAD_SIZE = sizeof(u32) - sizeof(u8),
 };
 
 struct RedExecuteSmallDataState {
@@ -202,6 +191,22 @@ struct RedExecuteSmallDataState {
     RedReverbSize* m_reverbSize;
     volatile u32 m_changeStatus;
     RedKeyOnDATA* volatile m_skipKeyOn;
+};
+
+enum RedExecuteSmallDataOffset {
+    REDSOUND_EXECUTE_SBSS_RANDOM_INDEX_OFFSET =
+        (unsigned int)&(((RedExecuteSmallDataState*)0)->m_randomIndex),
+    REDSOUND_EXECUTE_SBSS_RANDOM_PAD_OFFSET =
+        (unsigned int)&(((RedExecuteSmallDataState*)0)->m_randomIndexAlignPadding),
+    REDSOUND_EXECUTE_SBSS_REVERB_DATA_OFFSET =
+        (unsigned int)&(((RedExecuteSmallDataState*)0)->m_reverbData),
+    REDSOUND_EXECUTE_SBSS_REVERB_SIZE_OFFSET =
+        (unsigned int)&(((RedExecuteSmallDataState*)0)->m_reverbSize),
+    REDSOUND_EXECUTE_SBSS_CHANGE_STATUS_OFFSET =
+        (unsigned int)&(((RedExecuteSmallDataState*)0)->m_changeStatus),
+    REDSOUND_EXECUTE_SBSS_SKIP_KEY_ON_OFFSET =
+        (unsigned int)&(((RedExecuteSmallDataState*)0)->m_skipKeyOn),
+    REDSOUND_EXECUTE_SBSS_SIZE = sizeof(RedExecuteSmallDataState),
 };
 
 enum RedReverbDelayChannelIndex {

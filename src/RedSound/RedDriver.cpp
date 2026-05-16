@@ -1071,7 +1071,7 @@ static void _MusicMasterVolume(int* command)
         m_MasterMusicVolume = m_MasterMusicVolume * REDSOUND_MASTER_VOLUME_SCALE;
         m_MasterMusicVolume = m_MasterMusicVolume - 1;
     }
-    voice = p_VoiceData;
+    voice = RedVoiceDataGetBegin();
     do {
         voice->m_updateFlags = voice->m_updateFlags | REDSOUND_VOICE_UPDATE_VOLUME;
         voice++;
@@ -1346,7 +1346,7 @@ static void _SeMasterVolume(int* command)
         m_MasterSEVolume = m_MasterSEVolume * REDSOUND_MASTER_VOLUME_SCALE;
         m_MasterSEVolume = m_MasterSEVolume - 1;
     }
-    voice = p_VoiceData;
+    voice = RedVoiceDataGetBegin();
     do {
         voice->m_updateFlags = voice->m_updateFlags | REDSOUND_VOICE_UPDATE_VOLUME;
         voice++;
@@ -3764,7 +3764,7 @@ int CRedDriver::PlayWaveItem(int waveNo, int itemNo, int key, int pan, int volum
  */
 inline void CRedDriver::StopWaveItem()
 {
-    RedVoiceDATA* voice = p_VoiceData;
+    RedVoiceDATA* voice = RedVoiceDataGetBegin();
 
     do {
         if (voice->m_track == p_EditorTrack) {

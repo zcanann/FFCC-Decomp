@@ -292,6 +292,11 @@ struct RedSeInfoSequence
 
 #define RedSeInfoGetCommandData(sequence, count) reinterpret_cast<unsigned char*>((sequence) + (count))
 
+#define RedSeInfoSequenceHasContinue(sequence, index)                                               \
+	((reinterpret_cast<unsigned char*>(sequence)[(index) * sizeof(RedSeInfoSequence) +             \
+	                                             REDSOUND_SE_INFO_SEQUENCE_OFFSET_HI_AND_FLAGS_OFFSET] & \
+	  REDSOUND_SE_INFO_SEQUENCE_CONTINUE_FLAG) != 0)
+
 enum RedSeInfoSequenceLayout {
 	REDSOUND_SE_INFO_SEQUENCE_OFFSET_LO_OFFSET = (unsigned int)&(((RedSeInfoSequence*)0)->m_offsetLo),
 	REDSOUND_SE_INFO_SEQUENCE_OFFSET_HI_AND_FLAGS_OFFSET =

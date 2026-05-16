@@ -133,6 +133,10 @@ struct RedStreamChannelFrame {
     unsigned int m_word[REDSOUND_STREAM_STEREO_FRAME_WORD_COUNT];
 };
 
+#define RedStreamStereoFrameGetLeftWord(frame, index) ((frame)->m_left[(index)])
+#define RedStreamStereoFrameGetRightWord(frame, index) ((frame)->m_right[(index)])
+#define RedStreamChannelFrameGetWord(frame, index) ((frame)->m_word[(index)])
+
 enum RedStreamFrameLayoutSize {
     REDSOUND_STREAM_STEREO_LEFT_FRAME_OFFSET = (unsigned int)&(((RedStreamStereoFrame*)0)->m_left),
     REDSOUND_STREAM_STEREO_RIGHT_FRAME_OFFSET = (unsigned int)&(((RedStreamStereoFrame*)0)->m_right),

@@ -690,11 +690,15 @@ static int _ArrangeStreamDataLoop(RedStreamDATA* stream, int bufferIndex, int by
 			leftDst = (RedStreamChannelFrame*)dstBase;
 			
 			do {
-				leftDst->m_word[REDSOUND_STREAM_FRAME_WORD_0] = srcFrame->m_left[REDSOUND_STREAM_FRAME_WORD_0];
-				leftDst->m_word[REDSOUND_STREAM_FRAME_WORD_1] = srcFrame->m_left[REDSOUND_STREAM_FRAME_WORD_1];
+				RedStreamChannelFrameGetWord(leftDst, REDSOUND_STREAM_FRAME_WORD_0) =
+				    RedStreamStereoFrameGetLeftWord(srcFrame, REDSOUND_STREAM_FRAME_WORD_0);
+				RedStreamChannelFrameGetWord(leftDst, REDSOUND_STREAM_FRAME_WORD_1) =
+				    RedStreamStereoFrameGetLeftWord(srcFrame, REDSOUND_STREAM_FRAME_WORD_1);
 				leftDst++;
-				rightDst->m_word[REDSOUND_STREAM_FRAME_WORD_0] = srcFrame->m_right[REDSOUND_STREAM_FRAME_WORD_0];
-				rightDst->m_word[REDSOUND_STREAM_FRAME_WORD_1] = srcFrame->m_right[REDSOUND_STREAM_FRAME_WORD_1];
+				RedStreamChannelFrameGetWord(rightDst, REDSOUND_STREAM_FRAME_WORD_0) =
+				    RedStreamStereoFrameGetRightWord(srcFrame, REDSOUND_STREAM_FRAME_WORD_0);
+				RedStreamChannelFrameGetWord(rightDst, REDSOUND_STREAM_FRAME_WORD_1) =
+				    RedStreamStereoFrameGetRightWord(srcFrame, REDSOUND_STREAM_FRAME_WORD_1);
 				srcFrame = srcFrame + 1;
 				rightDst++;
 			} while (srcFrame < srcEnd);
@@ -708,11 +712,15 @@ static int _ArrangeStreamDataLoop(RedStreamDATA* stream, int bufferIndex, int by
 			srcEnd = srcFrame + REDSOUND_STREAM_STEREO_FRAMES_PER_PAGE;
 			
 			do {
-				leftDst->m_word[REDSOUND_STREAM_FRAME_WORD_0] = srcFrame->m_left[REDSOUND_STREAM_FRAME_WORD_0];
-				leftDst->m_word[REDSOUND_STREAM_FRAME_WORD_1] = srcFrame->m_left[REDSOUND_STREAM_FRAME_WORD_1];
+				RedStreamChannelFrameGetWord(leftDst, REDSOUND_STREAM_FRAME_WORD_0) =
+				    RedStreamStereoFrameGetLeftWord(srcFrame, REDSOUND_STREAM_FRAME_WORD_0);
+				RedStreamChannelFrameGetWord(leftDst, REDSOUND_STREAM_FRAME_WORD_1) =
+				    RedStreamStereoFrameGetLeftWord(srcFrame, REDSOUND_STREAM_FRAME_WORD_1);
 				leftDst++;
-				rightDst->m_word[REDSOUND_STREAM_FRAME_WORD_0] = srcFrame->m_right[REDSOUND_STREAM_FRAME_WORD_0];
-				rightDst->m_word[REDSOUND_STREAM_FRAME_WORD_1] = srcFrame->m_right[REDSOUND_STREAM_FRAME_WORD_1];
+				RedStreamChannelFrameGetWord(rightDst, REDSOUND_STREAM_FRAME_WORD_0) =
+				    RedStreamStereoFrameGetRightWord(srcFrame, REDSOUND_STREAM_FRAME_WORD_0);
+				RedStreamChannelFrameGetWord(rightDst, REDSOUND_STREAM_FRAME_WORD_1) =
+				    RedStreamStereoFrameGetRightWord(srcFrame, REDSOUND_STREAM_FRAME_WORD_1);
 				srcFrame = srcFrame + 1;
 				rightDst++;
 			} while (srcFrame < srcEnd);

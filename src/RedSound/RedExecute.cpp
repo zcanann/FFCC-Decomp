@@ -2183,7 +2183,7 @@ static void _KeyOnControl()
 
     {
         bit = 1;
-        voice = p_VoiceData + REDSOUND_MUTE_BITS_PER_WORD;
+        voice = RedVoiceDataGet(REDSOUND_MUTE_BITS_PER_WORD);
         do {
             if ((voiceStartMask[REDSOUND_VOICE_START_MASK_HIGH] & bit) != 0) {
                 voiceStartMask[REDSOUND_VOICE_START_MASK_HIGH] &= ~bit;

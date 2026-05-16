@@ -264,6 +264,7 @@ extern RedVoiceDATA* volatile p_VoiceData;
 #define RedVoiceDataGetEnd() (p_VoiceData + REDSOUND_VOICE_COUNT)
 #define RedVoiceDataGetIndex(voice) ((voice) - p_VoiceData)
 extern int p_EditorVoice[REDSOUND_EDITOR_VOICE_COUNT];
+#define RedEditorVoiceGetBegin() (p_EditorVoice)
 #define RedEditorVoiceGet(index) (p_EditorVoice + (index))
 #define RedEditorVoiceGetEnd() (p_EditorVoice + REDSOUND_EDITOR_VOICE_COUNT)
 extern RedTrackDATA* p_EditorTrack;

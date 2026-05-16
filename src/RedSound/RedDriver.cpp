@@ -2193,7 +2193,7 @@ void CRedDriver::Init()
         RedVoiceDataGet(index)->m_voiceIndex = nextIndex;
         index = index + 1;
     } while (index < REDSOUND_VOICE_COUNT);
-    editorVoice = p_EditorVoice;
+    editorVoice = RedEditorVoiceGetBegin();
     editorVoice[REDSOUND_EDITOR_VOICE_RIGHT] = 0;
     editorVoice[REDSOUND_EDITOR_VOICE_LEFT] = 0;
     RedSoundControlGet(REDSOUND_CONTROL_SE)->m_tracks = (RedTrackDATA*)RedNew(REDSOUND_SE_TRACK_ARENA_SIZE);
@@ -3793,7 +3793,7 @@ void CRedDriver::SetWavePitch(int pitch)
     int* voiceNo;
 
     p_EditorTrack->m_pitch = pitch;
-    voiceNo = p_EditorVoice;
+    voiceNo = RedEditorVoiceGetBegin();
     do {
         int voiceIndex = *voiceNo;
         if (voiceIndex != 0) {
@@ -3820,7 +3820,7 @@ void CRedDriver::SetWaveTune(int key, int fineTune)
     p_EditorTrack->m_note.m_key = key;
     p_EditorTrack->m_fineTune = fineTune;
     p_EditorTrack->m_portamentPitch = key << REDSOUND_PITCH_BASE_NOTE_SHIFT;
-    voiceNo = p_EditorVoice;
+    voiceNo = RedEditorVoiceGetBegin();
     do {
         int voiceIndex = *voiceNo;
         if (voiceIndex != 0) {
@@ -3846,7 +3846,7 @@ void CRedDriver::SetWaveAdsr(int attack, RedAdsrDATA* adsr)
     int* voiceNo;
 
     memcpy(&p_EditorTrack->m_adsr, adsr, REDSOUND_TRACK_ADSR_SIZE);
-    voiceNo = p_EditorVoice;
+    voiceNo = RedEditorVoiceGetBegin();
     do {
         int voiceIndex = *voiceNo;
         if (voiceIndex != 0) {

@@ -108,8 +108,10 @@ enum RedSoundSmallDataOffset {
 // RedSound global linkage that is shared across Red* units.
 CRedDriver c_Driver;
 static int m_StandbyStatus[REDSOUND_STANDBY_STATUS_COUNT];
+#define RedStandbyStatusGetEnd() (m_StandbyStatus + REDSOUND_STANDBY_STATUS_COUNT)
 volatile unsigned int m_AutoID;
 static RedSoundStreamBank* p_StreamBank;
+#define RedSoundStreamBankGetEnd() (p_StreamBank + REDSOUND_STREAM_BANK_COUNT)
 static const char sRedSoundMemorySettingError[] = "%s%s  Memory Setting Error !! (0x%8.8X:0x%8.8X)%s\n";
 static const char sRedSoundLogPrefix[] = "\x1B[7;34mSound\x1B[0m:";
 static const char sRedSoundAMemorySettingError[] = "%s%sA-Memory Setting Error !! (0x%8.8X:0x%8.8X)%s\n";
@@ -183,7 +185,7 @@ STATIC_ASSERT(sizeof(sRedSoundLogErrorColor) + sizeof(sRedSoundLogReset) + sizeo
 static RedSoundStreamBank* _SearchEmptyStreamBank()
 {
 	RedSoundStreamBank* bank = p_StreamBank;
-	RedSoundStreamBank* bankEnd = p_StreamBank + REDSOUND_STREAM_BANK_COUNT;
+	RedSoundStreamBank* bankEnd = RedSoundStreamBankGetEnd();
 
 	do {
 		if (bank->m_streamId == REDSOUND_STREAM_ID_NONE) {
@@ -213,7 +215,7 @@ static RedSoundStreamBank* _SearchEmptyStreamBank()
 static RedSoundStreamBank* _SearchStreamBank(int streamId)
 {
 	RedSoundStreamBank* bank = p_StreamBank;
-	RedSoundStreamBank* bankEnd = p_StreamBank + REDSOUND_STREAM_BANK_COUNT;
+	RedSoundStreamBank* bankEnd = RedSoundStreamBankGetEnd();
 
 	do {
 		if ((bank->m_streamId != REDSOUND_STREAM_ID_NONE) && (bank->m_streamId == streamId)) {
@@ -285,7 +287,7 @@ int* CRedSound::EntryStandbyID(int id)
 			return slot;
 		}
 		slot++;
-	} while (slot < (m_StandbyStatus + REDSOUND_STANDBY_STATUS_COUNT));
+	} while (slot < RedStandbyStatusGetEnd());
 
 	return 0;
 }

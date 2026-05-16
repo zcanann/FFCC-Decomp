@@ -169,7 +169,7 @@ static inline void RedTrackAdsrFillDefault(RedAdsrDATA* adsr)
  */
 RedTrackDATA* SearchSeEmptyTrack(int trackCount, int eraseTrack, int attrMask)
 {
-	RedTrackDATA** trackBasePtr = &p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
+	RedTrackDATA** trackBasePtr = &RedSoundControlGet(REDSOUND_CONTROL_SE)->m_tracks;
 	RedTrackDATA* scan;
 	RedTrackDATA* track;
 	int remaining;
@@ -223,7 +223,7 @@ int SeStopID(int seId)
 	RedSoundCONTROL* soundControl;
 	RedTrackDATA* track;
 
-	soundControl = &p_SoundControlBuffer[REDSOUND_CONTROL_SE];
+	soundControl = RedSoundControlGet(REDSOUND_CONTROL_SE);
 	soundControl->m_updateFlags = 0;
 	track = soundControl->m_tracks;
 	do {
@@ -269,7 +269,7 @@ int SeStopMG(int bank, int sep, int group, int kind)
 	RedSoundCONTROL* soundControl;
 	RedTrackDATA* track;
 
-	soundControl = &p_SoundControlBuffer[REDSOUND_CONTROL_SE];
+	soundControl = RedSoundControlGet(REDSOUND_CONTROL_SE);
 	soundControl->m_updateFlags = 0;
 	track = soundControl->m_tracks;
 	do {
@@ -393,7 +393,7 @@ void SetSeVolume(int seId, int volume, int frameCount, int mode)
 
 	frameCount *= REDSOUND_SE_FADE_TICKS_PER_SECOND;
 	frameCount /= REDSOUND_FRAMES_PER_SECOND;
-	track = p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
+	track = RedSoundControlGet(REDSOUND_CONTROL_SE)->m_tracks;
 
 	do {
 		if ((track->m_command != REDSOUND_TRACK_COMMAND_NONE) &&
@@ -405,7 +405,7 @@ void SetSeVolume(int seId, int volume, int frameCount, int mode)
 			track->m_mixVolumeMode = mode;
 		}
 		track++;
-	} while (track < RedSoundControlGetSeTrackEnd(&p_SoundControlBuffer[REDSOUND_CONTROL_SE]));
+	} while (track < RedSoundControlGetSeTrackEnd(RedSoundControlGet(REDSOUND_CONTROL_SE)));
 }
 /*
  * --INFO--
@@ -428,7 +428,7 @@ void SetSePan(int seId, int pan, int frameCount)
 
 	frameCount *= REDSOUND_SE_FADE_TICKS_PER_SECOND;
 	frameCount /= REDSOUND_FRAMES_PER_SECOND;
-	track = p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
+	track = RedSoundControlGet(REDSOUND_CONTROL_SE)->m_tracks;
 
 	do {
 		if ((track->m_command != REDSOUND_TRACK_COMMAND_NONE) &&
@@ -439,7 +439,7 @@ void SetSePan(int seId, int pan, int frameCount)
 			track->m_panDelta = frameCount;
 		}
 		track++;
-	} while (track < RedSoundControlGetSeTrackEnd(&p_SoundControlBuffer[REDSOUND_CONTROL_SE]));
+	} while (track < RedSoundControlGetSeTrackEnd(RedSoundControlGet(REDSOUND_CONTROL_SE)));
 }
 /*
  * --INFO--
@@ -462,7 +462,7 @@ void SetSePitch(int seId, int pitch, int frameCount)
 
 	frameCount *= REDSOUND_SE_FADE_TICKS_PER_SECOND;
 	frameCount /= REDSOUND_FRAMES_PER_SECOND;
-	track = p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
+	track = RedSoundControlGet(REDSOUND_CONTROL_SE)->m_tracks;
 
 	do {
 		if ((track->m_command != REDSOUND_TRACK_COMMAND_NONE) &&
@@ -472,7 +472,7 @@ void SetSePitch(int seId, int pitch, int frameCount)
 			track->m_pitchDelta = frameCount;
 		}
 		track++;
-	} while (track < RedSoundControlGetSeTrackEnd(&p_SoundControlBuffer[REDSOUND_CONTROL_SE]));
+	} while (track < RedSoundControlGetSeTrackEnd(RedSoundControlGet(REDSOUND_CONTROL_SE)));
 }
 /*
  * --INFO--
@@ -498,7 +498,7 @@ void SePause(int seId, int pause)
 		fflush(__files + 1);
 	}
 
-	trackBasePtr = &p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
+	trackBasePtr = &RedSoundControlGet(REDSOUND_CONTROL_SE)->m_tracks;
 	track = *trackBasePtr;
 	voice = p_VoiceData + REDSOUND_SE_VOICE_BASE_INDEX;
 	do {
@@ -668,7 +668,7 @@ void SetMusicVolume(int musicId, int volume, int duration, int mode)
  */
 static void _EraseAttribute(int eraseTrack, int attrMask)
 {
-	RedTrackDATA** trackBasePtr = &p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
+	RedTrackDATA** trackBasePtr = &RedSoundControlGet(REDSOUND_CONTROL_SE)->m_tracks;
 	RedTrackDATA* track = *trackBasePtr;
 
 	do {
@@ -709,7 +709,7 @@ static void _EraseAttribute(int eraseTrack, int attrMask)
 static int _EraseTime(int eraseTrack)
 {
 	int minEraseTrack = REDSOUND_ERASE_TRACK_SENTINEL;
-	RedTrackDATA** trackBasePtr = &p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
+	RedTrackDATA** trackBasePtr = &RedSoundControlGet(REDSOUND_CONTROL_SE)->m_tracks;
 	RedTrackDATA* track = *trackBasePtr;
 	int sepId;
 	int erasedCount;
@@ -785,7 +785,7 @@ inline int SeStopG(int group)
 	RedSoundCONTROL* soundControl;
 	RedTrackDATA* track;
 
-	soundControl = &p_SoundControlBuffer[REDSOUND_CONTROL_SE];
+	soundControl = RedSoundControlGet(REDSOUND_CONTROL_SE);
 	soundControl->m_updateFlags = 0;
 	track = soundControl->m_tracks;
 	do {
@@ -842,7 +842,7 @@ static int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volum
 	RedVoiceDATA* voiceData;
 	int isMulti;
 
-	p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_updateFlags = 0;
+	RedSoundControlGet(REDSOUND_CONTROL_SE)->m_updateFlags = 0;
 	deltaTime = (unsigned int)info->m_waveNoLo +
 	            (unsigned int)info->m_waveNoHi * REDSOUND_SE_INFO_U16_HIGH_SCALE;
 	waveBase = c_RedEntry.SearchWaveBase(deltaTime);
@@ -996,7 +996,7 @@ static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* wav
 	m_MusicSkipLine = mode;
 	RedSoundCONTROL* music;
 	if (m_MusicSkipLine != 0) {
-		music = p_SoundControlBuffer + REDSOUND_CONTROL_MUSIC_SKIP;
+		music = RedSoundControlGet(REDSOUND_CONTROL_MUSIC_SKIP);
 	} else {
 		music = p_SoundControlBuffer;
 	}

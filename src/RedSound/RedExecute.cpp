@@ -154,7 +154,9 @@ s16 t_PanningDataR[REDSOUND_PAN_TABLE_COUNT] = {
 
 static volatile u8 m_RandomIndex;
 static RedReverbDATA* volatile p_ReverbData;
+#define RedReverbDataGet(bank) (p_ReverbData + ((bank) & REDSOUND_REVERB_BANK_MASK))
 static RedReverbSize* p_ReverbSize;
+#define RedReverbSizeGet() (p_ReverbSize)
 volatile u32 m_ChangeStatus;
 u32 m_TerminateNote[REDSOUND_TERMINATE_NOTE_WORD_COUNT] = { 0 };
 static RedKeyOnDATA* volatile p_SkipKeyOn;
@@ -593,8 +595,8 @@ static void _ReverbNullCallback(AXFX_BUFFERUPDATE* update, void*)
  */
 void* ReverbAreaAlloc(unsigned long size)
 {
-    p_ReverbSize->m_requested += (u32)size;
-    p_ReverbSize->m_aligned += ((u32)size + REDSOUND_REVERB_ALLOC_ALIGN_MASK) & ~REDSOUND_REVERB_ALLOC_ALIGN_MASK;
+    RedReverbSizeGet()->m_requested += (u32)size;
+    RedReverbSizeGet()->m_aligned += ((u32)size + REDSOUND_REVERB_ALLOC_ALIGN_MASK) & ~REDSOUND_REVERB_ALLOC_ALIGN_MASK;
     return (void*)RedNew((int)size);
 }
 
@@ -704,8 +706,8 @@ static void _SetReverbData(RedReverbDATA* reverb, int* params)
     }
 
     if (result != REDSOUND_REVERB_INIT_SUCCESS) {
-        p_ReverbSize->m_aligned = 0;
-        p_ReverbSize->m_requested = 0;
+        RedReverbSizeGet()->m_aligned = 0;
+        RedReverbSizeGet()->m_requested = 0;
     }
 }
 
@@ -720,7 +722,7 @@ static void _SetReverbData(RedReverbDATA* reverb, int* params)
  */
 static void _ClearReverb(int bank)
 {
-    RedReverbDATA* reverb = p_ReverbData + (bank & REDSOUND_REVERB_BANK_MASK);
+    RedReverbDATA* reverb = RedReverbDataGet(bank);
     if (reverb->m_callback == REDSOUND_REVERB_CALLBACK_NONE) {
         return;
     }
@@ -781,21 +783,21 @@ RedReverbSize* SetReverb(int bank, int kind, int* params)
     RedReverbDATA* reverb;
     int result;
 
-    p_ReverbSize->m_requested = p_ReverbSize->m_aligned = 0;
+    RedReverbSizeGet()->m_requested = RedReverbSizeGet()->m_aligned = 0;
 
     if (kind == REDSOUND_REVERB_KIND_NONE) {
         _ClearReverb(bank);
-        return p_ReverbSize;
+        return RedReverbSizeGet();
     }
 
     if (kind == REDSOUND_REVERB_KIND_HI_DPL2) {
         return 0;
     }
 
-    reverb = p_ReverbData + (bank & REDSOUND_REVERB_BANK_MASK);
+    reverb = RedReverbDataGet(bank);
     if ((reverb->m_callback != REDSOUND_REVERB_CALLBACK_NONE) && (reverb->m_kind == kind)) {
         _SetReverbData(reverb, params);
-        return p_ReverbSize;
+        return RedReverbSizeGet();
     }
 
     _ClearReverb(bank);
@@ -885,10 +887,10 @@ RedReverbSize* SetReverb(int bank, int kind, int* params)
         }
     }
     else {
-        p_ReverbSize->m_requested = p_ReverbSize->m_aligned = 0;
+        RedReverbSizeGet()->m_requested = RedReverbSizeGet()->m_aligned = 0;
     }
 
-    return p_ReverbSize;
+    return RedReverbSizeGet();
 }
 
 /*
@@ -902,7 +904,7 @@ RedReverbSize* SetReverb(int bank, int kind, int* params)
  */
 inline RedReverbSize* GetReverbInfo()
 {
-    return p_ReverbSize;
+    return RedReverbSizeGet();
 }
 
 /*

@@ -710,6 +710,9 @@ static int m_WaveSettingStatus;
 static u8* volatile p_DmaExecuteThreadStack;
 #define RedDmaExecuteThreadStackGet() (p_DmaExecuteThreadStack)
 static volatile int m_DMAStatus;
+#define RedDmaStatusGet() (m_DMAStatus)
+#define RedDmaStatusSet(status) (m_DMAStatus = (status))
+#define RedDmaStatusIsIdle() (RedDmaStatusGet() == REDSOUND_DMA_STATUS_IDLE)
 u8* volatile p_MusicSkipThreadStack;
 #define RedMusicSkipThreadStackGet() (p_MusicSkipThreadStack)
 volatile int m_MusicSkipComplete;
@@ -1753,7 +1756,7 @@ static void _DMACheckProcess()
         OSReport(s_redDriverDmaCheckHeaderFmt, sRedDriverLogPrefix);
         fflush(__files + 1);
 
-        OSReport(sRedDriverDmaStatusFmt, sRedDriverLogPrefix, m_DMAStatus,
+        OSReport(sRedDriverDmaStatusFmt, sRedDriverLogPrefix, RedDmaStatusGet(),
                  OSGetSemaphoreCount(&m_DmaExecuteSemaphore), m_DMAExecute, m_DMAInThread);
         fflush(__files + 1);
     }
@@ -1783,7 +1786,7 @@ static void _DMACheckProcess()
  */
 static void _DmaCallback(unsigned long)
 {
-    m_DMAStatus = REDSOUND_DMA_STATUS_IDLE;
+    RedDmaStatusSet(REDSOUND_DMA_STATUS_IDLE);
 }
 
 /*
@@ -1969,7 +1972,7 @@ static void _DmaExecute()
         queueEntry = *oldQueuePtr;
         m_DMAInThread = REDSOUND_DMA_THREAD_LOAD_ENTRY;
         if (queueEntry->m_id != REDSOUND_DMA_ID_NONE) {
-            m_DMAStatus = REDSOUND_DMA_STATUS_BUSY;
+            RedDmaStatusSet(REDSOUND_DMA_STATUS_BUSY);
             if (queueEntry->m_direction == REDSOUND_DMA_DIRECTION_TO_ARAM) {
                 DCFlushRange((void*)queueEntry->m_mainMemory, (u32)queueEntry->m_size);
                 srcAddress = queueEntry->m_mainMemory;
@@ -2000,7 +2003,7 @@ static void _DmaExecute()
 
         while (activeRequest != 0) {
             m_DMAInThread = REDSOUND_DMA_THREAD_POLL_STATUS;
-            if (m_DMAStatus == REDSOUND_DMA_STATUS_IDLE) {
+            if (RedDmaStatusIsIdle()) {
                 m_DMAInThread = REDSOUND_DMA_THREAD_RUN_CALLBACK;
                 if ((u32)activeRequest->m_callback != 0) {
                     interrupt = OSDisableInterrupts();
@@ -2157,7 +2160,7 @@ void CRedDriver::Init()
     RedSoundMasterControlSet(0);
     RedMusicSkipLineSet(0);
     RedMusicFastSpeedSet(0);
-    m_DMAStatus = REDSOUND_DMA_STATUS_IDLE;
+    RedDmaStatusSet(REDSOUND_DMA_STATUS_IDLE);
     RedCrossTimeClear();
     RedMasterSEVolumeSet(REDSOUND_MASTER_VOLUME_FULL);
     RedMasterMusicVolumeSet(REDSOUND_MASTER_VOLUME_FULL);

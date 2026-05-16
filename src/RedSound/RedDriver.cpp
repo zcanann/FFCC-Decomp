@@ -36,6 +36,10 @@ enum RedWaveSettingLayoutOffset {
 };
 
 enum RedDriverSyncLayoutSize {
+    REDSOUND_DRIVER_SYNC_THREAD_SIZE = sizeof(OSThread),
+    REDSOUND_DRIVER_SYNC_SEMAPHORE_SIZE = sizeof(OSSemaphore),
+    REDSOUND_DRIVER_SYNC_WAVE_DATA_SIZE = sizeof(RedWaveSettingState),
+    REDSOUND_DRIVER_SYNC_DMA_REQUEST_SIZE = sizeof(ARQRequest),
     REDSOUND_DRIVER_SYNC_THREAD_ALIGN_PAD_SIZE = sizeof(u32),
 };
 
@@ -58,6 +62,9 @@ struct RedDriverSyncState {
 };
 
 enum RedDriverSyncLayoutOffset {
+    REDSOUND_DRIVER_SYNC_DMA_QUEUE_OFFSET = (unsigned int)&(((RedDriverSyncState*)0)->m_dmaQueue),
+    REDSOUND_DRIVER_SYNC_STREAM_DMA_QUEUE_OFFSET =
+        (unsigned int)&(((RedDriverSyncState*)0)->m_streamDmaQueue),
     REDSOUND_DRIVER_SYNC_MAIN_THREAD_OFFSET = (unsigned int)&(((RedDriverSyncState*)0)->m_mainThread),
     REDSOUND_DRIVER_SYNC_MAIN_SEMAPHORE_OFFSET = (unsigned int)&(((RedDriverSyncState*)0)->m_mainSemaphore),
     REDSOUND_DRIVER_SYNC_MAIN_THREAD_PAD_OFFSET =
@@ -322,8 +329,14 @@ STATIC_ASSERT(offsetof(RedDmaRequest, m_size) == REDSOUND_DMA_REQUEST_SIZE_OFFSE
 STATIC_ASSERT(offsetof(RedDmaRequest, m_callback) == REDSOUND_DMA_REQUEST_CALLBACK_OFFSET);
 STATIC_ASSERT(offsetof(RedDmaRequest, m_callbackData) == REDSOUND_DMA_REQUEST_CALLBACK_DATA_OFFSET);
 STATIC_ASSERT(sizeof(RedDmaRequest) == REDSOUND_DMA_REQUEST_SIZE);
+STATIC_ASSERT(offsetof(RedDriverSyncState, m_dmaQueue) == REDSOUND_DRIVER_SYNC_DMA_QUEUE_OFFSET);
+STATIC_ASSERT(offsetof(RedDriverSyncState, m_streamDmaQueue) == REDSOUND_DRIVER_SYNC_STREAM_DMA_QUEUE_OFFSET);
 STATIC_ASSERT(sizeof(((RedDriverSyncState*)0)->m_dmaQueue) == REDSOUND_DMA_QUEUE_SIZE);
 STATIC_ASSERT(sizeof(((RedDriverSyncState*)0)->m_streamDmaQueue) == REDSOUND_DMA_QUEUE_SIZE);
+STATIC_ASSERT(REDSOUND_DRIVER_SYNC_STREAM_DMA_QUEUE_OFFSET == REDSOUND_DRIVER_SYNC_DMA_QUEUE_OFFSET +
+                                                            REDSOUND_DMA_QUEUE_SIZE);
+STATIC_ASSERT(REDSOUND_DRIVER_SYNC_MAIN_THREAD_OFFSET == REDSOUND_DRIVER_SYNC_STREAM_DMA_QUEUE_OFFSET +
+                                                       REDSOUND_DMA_QUEUE_SIZE);
 STATIC_ASSERT(REDSOUND_DMA_QUEUE_SIZE == REDSOUND_DMA_QUEUE_WORD_COUNT * sizeof(int));
 STATIC_ASSERT(REDSOUND_DMA_CONTROL_SIZE == REDSOUND_DMA_CONTROL_WORD_COUNT * sizeof(int));
 STATIC_ASSERT(sizeof(RedDmaRequest) * REDSOUND_DMA_CONTROL_ENTRY_COUNT == REDSOUND_DMA_CONTROL_SIZE);
@@ -334,27 +347,37 @@ STATIC_ASSERT(offsetof(RedWaveSettingState, m_waveData) == REDSOUND_WAVE_SETTING
 STATIC_ASSERT(offsetof(RedWaveSettingState, m_waveSize) == REDSOUND_WAVE_SETTING_WAVE_SIZE_OFFSET);
 STATIC_ASSERT(sizeof(RedWaveSettingState) == REDSOUND_WAVE_SETTING_SIZE);
 STATIC_ASSERT(offsetof(RedDriverSyncState, m_mainThread) == REDSOUND_DRIVER_SYNC_MAIN_THREAD_OFFSET);
+STATIC_ASSERT(sizeof(((RedDriverSyncState*)0)->m_mainThread) == REDSOUND_DRIVER_SYNC_THREAD_SIZE);
 STATIC_ASSERT(offsetof(RedDriverSyncState, m_mainSemaphore) == REDSOUND_DRIVER_SYNC_MAIN_SEMAPHORE_OFFSET);
+STATIC_ASSERT(sizeof(((RedDriverSyncState*)0)->m_mainSemaphore) == REDSOUND_DRIVER_SYNC_SEMAPHORE_SIZE);
 STATIC_ASSERT(offsetof(RedDriverSyncState, m_mainThreadAlignPadding) ==
               REDSOUND_DRIVER_SYNC_MAIN_THREAD_PAD_OFFSET);
 STATIC_ASSERT(sizeof(((RedDriverSyncState*)0)->m_mainThreadAlignPadding) ==
               REDSOUND_DRIVER_SYNC_WAVE_THREAD_OFFSET - REDSOUND_DRIVER_SYNC_MAIN_THREAD_PAD_OFFSET);
 STATIC_ASSERT(offsetof(RedDriverSyncState, m_waveThread) == REDSOUND_DRIVER_SYNC_WAVE_THREAD_OFFSET);
+STATIC_ASSERT(sizeof(((RedDriverSyncState*)0)->m_waveThread) == REDSOUND_DRIVER_SYNC_THREAD_SIZE);
 STATIC_ASSERT(offsetof(RedDriverSyncState, m_waveSemaphore) == REDSOUND_DRIVER_SYNC_WAVE_SEMAPHORE_OFFSET);
+STATIC_ASSERT(sizeof(((RedDriverSyncState*)0)->m_waveSemaphore) == REDSOUND_DRIVER_SYNC_SEMAPHORE_SIZE);
 STATIC_ASSERT(offsetof(RedDriverSyncState, m_waveSettingData) == REDSOUND_DRIVER_SYNC_WAVE_DATA_OFFSET);
+STATIC_ASSERT(sizeof(((RedDriverSyncState*)0)->m_waveSettingData) == REDSOUND_DRIVER_SYNC_WAVE_DATA_SIZE);
 STATIC_ASSERT(offsetof(RedDriverSyncState, m_waveThreadAlignPadding) ==
               REDSOUND_DRIVER_SYNC_WAVE_THREAD_PAD_OFFSET);
 STATIC_ASSERT(sizeof(((RedDriverSyncState*)0)->m_waveThreadAlignPadding) ==
               REDSOUND_DRIVER_SYNC_DMA_THREAD_OFFSET - REDSOUND_DRIVER_SYNC_WAVE_THREAD_PAD_OFFSET);
 STATIC_ASSERT(offsetof(RedDriverSyncState, m_dmaThread) == REDSOUND_DRIVER_SYNC_DMA_THREAD_OFFSET);
+STATIC_ASSERT(sizeof(((RedDriverSyncState*)0)->m_dmaThread) == REDSOUND_DRIVER_SYNC_THREAD_SIZE);
 STATIC_ASSERT(offsetof(RedDriverSyncState, m_dmaSemaphore) == REDSOUND_DRIVER_SYNC_DMA_SEMAPHORE_OFFSET);
+STATIC_ASSERT(sizeof(((RedDriverSyncState*)0)->m_dmaSemaphore) == REDSOUND_DRIVER_SYNC_SEMAPHORE_SIZE);
 STATIC_ASSERT(offsetof(RedDriverSyncState, m_dmaRequest) == REDSOUND_DRIVER_SYNC_DMA_REQUEST_OFFSET);
+STATIC_ASSERT(sizeof(((RedDriverSyncState*)0)->m_dmaRequest) == REDSOUND_DRIVER_SYNC_DMA_REQUEST_SIZE);
 STATIC_ASSERT(offsetof(RedDriverSyncState, m_dmaThreadAlignPadding) ==
               REDSOUND_DRIVER_SYNC_DMA_THREAD_PAD_OFFSET);
 STATIC_ASSERT(sizeof(((RedDriverSyncState*)0)->m_dmaThreadAlignPadding) ==
               REDSOUND_DRIVER_SYNC_MUSIC_THREAD_OFFSET - REDSOUND_DRIVER_SYNC_DMA_THREAD_PAD_OFFSET);
 STATIC_ASSERT(offsetof(RedDriverSyncState, m_musicThread) == REDSOUND_DRIVER_SYNC_MUSIC_THREAD_OFFSET);
+STATIC_ASSERT(sizeof(((RedDriverSyncState*)0)->m_musicThread) == REDSOUND_DRIVER_SYNC_THREAD_SIZE);
 STATIC_ASSERT(offsetof(RedDriverSyncState, m_musicSemaphore) == REDSOUND_DRIVER_SYNC_MUSIC_SEMAPHORE_OFFSET);
+STATIC_ASSERT(sizeof(((RedDriverSyncState*)0)->m_musicSemaphore) == REDSOUND_DRIVER_SYNC_SEMAPHORE_SIZE);
 STATIC_ASSERT(sizeof(RedDriverSyncState) == REDSOUND_DRIVER_SYNC_SIZE);
 STATIC_ASSERT(REDSOUND_DRIVER_SYNC_SIZE == REDSOUND_DRIVER_BSS_SE_BLOCK_DATA_OFFSET);
 STATIC_ASSERT(sizeof(((RedDriverBssState*)0)->m_seBlockData) == REDSOUND_SE_BLOCK_DATA_TABLE_SIZE);

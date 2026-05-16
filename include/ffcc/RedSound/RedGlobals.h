@@ -348,6 +348,9 @@ extern unsigned int m_Mute[REDSOUND_MUTE_WORD_COUNT];
 #define RedMuteClear(voiceNo) (RedMuteGetWord(voiceNo) &= ~RedMuteGetMask(voiceNo))
 extern CRedMemory c_RedMemory;
 extern volatile u32 m_ChangeStatus;
+#define RedChangeStatusGet() (m_ChangeStatus)
+#define RedChangeStatusSet(status) (m_ChangeStatus = (status))
+#define RedChangeStatusAdd(status) (m_ChangeStatus |= (status))
 extern CRedDriver c_Driver;
 
 #endif

@@ -2496,7 +2496,7 @@ static void _MidiTrackExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData,
     do {
         if (track->m_command != REDSOUND_TRACK_COMMAND_NONE) {
             int step;
-            m_ChangeStatus = 0;
+            RedChangeStatusSet(0);
             if (track->m_deltaTime < frames) {
                 step = track->m_deltaTime;
             } else {
@@ -2550,11 +2550,11 @@ static void _MidiTrackExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData,
                 }
             }
 
-            if (m_ChangeStatus != 0) {
+            if (RedChangeStatusGet() != 0) {
                 RedVoiceDATA* voice = RedVoiceDataGetBegin();
                 do {
                     if (voice->m_track == track) {
-                        voice->m_updateFlags = m_ChangeStatus;
+                        voice->m_updateFlags = RedChangeStatusGet();
                     }
                     voice++;
                 } while (voice < RedVoiceDataGetEnd());
@@ -3082,7 +3082,7 @@ static int _SeMidiNoteExecute(
                     KeyOffSet(control, keyOnData, track);
                 }
 
-                m_ChangeStatus = 0;
+                RedChangeStatusSet(0);
                 while ((track->m_command != REDSOUND_TRACK_COMMAND_NONE) && (track->m_deltaTime < 1)) {
                     int delta;
                     unsigned char* cmd;
@@ -3121,8 +3121,8 @@ static int _SeMidiNoteExecute(
                     }
                 }
 
-                if (m_ChangeStatus != 0) {
-                    RedVoiceDataGet(track->m_trackNo)->m_updateFlags = m_ChangeStatus;
+                if (RedChangeStatusGet() != 0) {
+                    RedVoiceDataGet(track->m_trackNo)->m_updateFlags = RedChangeStatusGet();
                 }
             }
         }

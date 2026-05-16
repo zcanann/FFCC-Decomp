@@ -659,6 +659,9 @@ static int m_RedMasterTime;
 #define RedMasterTimeSet(time) (m_RedMasterTime = (time))
 #define RedMasterTimeInc() (m_RedMasterTime = m_RedMasterTime + 1)
 static volatile int m_SequencialID;
+#define RedSequencialIDGet() (m_SequencialID)
+#define RedSequencialIDSet(id) (m_SequencialID = (id))
+#define RedSequencialIDInc() (m_SequencialID++)
 static volatile int m_ThreadControl;
 static volatile int m_ThreadExecute;
 static int m_SoundMode;
@@ -1619,12 +1622,12 @@ unsigned int DeltaTimeSumup(unsigned char** buffer)
  */
 unsigned int GetMyEntryID()
 {
-    m_SequencialID++;
-    m_SequencialID &= REDSOUND_ENTRY_ID_MASK;
-    if (m_SequencialID == 0) {
-        m_SequencialID++;
+    RedSequencialIDInc();
+    RedSequencialIDSet(RedSequencialIDGet() & REDSOUND_ENTRY_ID_MASK);
+    if (RedSequencialIDGet() == 0) {
+        RedSequencialIDInc();
     }
-    return m_SequencialID;
+    return RedSequencialIDGet();
 }
 
 struct RedSleepAlarm {

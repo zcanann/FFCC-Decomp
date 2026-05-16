@@ -986,7 +986,7 @@ RedVoiceDATA* EntryVoiceSearch(RedTrackDATA* track)
  */
 static void _VoiceEnvelopeCheck()
 {
-    RedVoiceDATA* voiceData = p_VoiceData;
+    RedVoiceDATA* voiceData = RedVoiceDataGetBegin();
     do {
         if ((voiceData->m_stateFlags & REDSOUND_VOICE_STATE_ANY_MASK) != 0) {
             voiceData->m_envelopeLevel = REDSOUND_ENVELOPE_LEVEL_FULL;
@@ -1563,7 +1563,7 @@ static RedVoiceDATA* _VoiceDataSelect(RedTrackDATA* track, RedNoteDATA* note, in
     RedVoiceDATA* voiceData;
 
     if ((track->m_flags & REDSOUND_TRACK_FLAG_SLUR) != 0) {
-        voiceData = p_VoiceData;
+        voiceData = RedVoiceDataGetBegin();
         do {
             if (voiceData->m_track == track) {
                 break;
@@ -1630,7 +1630,7 @@ inline void SetAllVoiceAccess(RedSoundCONTROL* control, int mask)
  */
 void SetVoiceAccess(RedTrackDATA* track, int mask)
 {
-    RedVoiceDATA* voiceData = p_VoiceData;
+    RedVoiceDATA* voiceData = RedVoiceDataGetBegin();
     do {
         if ((voiceData->m_track != REDSOUND_VOICE_TRACK_NONE) && (voiceData->m_track == track)) {
             voiceData->m_flags |= mask;
@@ -1650,7 +1650,7 @@ void SetVoiceAccess(RedTrackDATA* track, int mask)
  */
 void SetVoiceSwitch(RedTrackDATA* track, int voiceSwitch)
 {
-    RedVoiceDATA* voiceData = p_VoiceData;
+    RedVoiceDATA* voiceData = RedVoiceDataGetBegin();
     do {
         if ((voiceData->m_track != REDSOUND_VOICE_TRACK_NONE) && (voiceData->m_track == track)) {
             voiceData->m_voiceSwitch = voiceSwitch;

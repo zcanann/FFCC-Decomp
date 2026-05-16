@@ -1166,9 +1166,9 @@ inline void SetMusicTempo(int tempo, int frameCount)
 		frameCount /= REDSOUND_FRAMES_PER_SECOND;
 	}
 
-	RedControlRamp* tempoControl = p_MusicTempoControl;
+	RedControlRamp* tempoControl = RedMusicTempoControlGet();
 	tempoControl->m_step = (tempo - tempoControl->m_value) / frameCount;
-	p_MusicTempoControl->m_count = frameCount;
+	RedMusicTempoControlGet()->m_count = frameCount;
 }
 /*
  * --INFO--
@@ -1190,8 +1190,8 @@ inline void SetMusicPitch(int pitch, int frameCount)
 		frameCount /= REDSOUND_FRAMES_PER_SECOND;
 	}
 
-	p_MusicPitchControl->m_step = (pitch - p_MusicPitchControl->m_value) / frameCount;
-	p_MusicPitchControl->m_count = frameCount;
+	RedMusicPitchControlGet()->m_step = (pitch - RedMusicPitchControlGet()->m_value) / frameCount;
+	RedMusicPitchControlGet()->m_count = frameCount;
 }
 /*
  * --INFO--

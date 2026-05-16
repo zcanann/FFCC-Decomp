@@ -1250,7 +1250,7 @@ static void _PitchExecute(RedVoiceDATA* voice)
         if ((voice->m_stateFlags & REDSOUND_VOICE_STATE_PLAYING_MASK) != 0) {
             basePitch = voice->m_basePitch + voice->m_track->m_pitch;
         } else {
-            basePitch = voice->m_basePitch + p_MusicPitchControl->m_value;
+            basePitch = voice->m_basePitch + RedMusicPitchControlGet()->m_value;
         }
         pitchDelta = PitchCompute(basePitch, pitchBend, voice->m_waveData->m_pitch, voice->m_track->m_fineTune);
 
@@ -1405,7 +1405,7 @@ static void _VoiceDataAsign(RedTrackDATA* track, RedVoiceDATA* voice, RedNoteDAT
     if ((voice->m_stateFlags & REDSOUND_VOICE_STATE_PLAYING_MASK) != 0) {
         workValue = voice->m_basePitch + track->m_pitch;
     } else {
-        workValue = voice->m_basePitch + p_MusicPitchControl->m_value;
+        workValue = voice->m_basePitch + RedMusicPitchControlGet()->m_value;
     }
 
     if (voice->m_waveData != 0) {
@@ -2235,19 +2235,19 @@ static void _ExecuteExtraData()
 
     soundControl = RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY);
 
-    if (p_MusicTempoControl->m_count != 0) {
-        p_MusicTempoControl->m_count--;
-        p_MusicTempoControl->m_value += p_MusicTempoControl->m_step;
+    if (RedMusicTempoControlGet()->m_count != 0) {
+        RedMusicTempoControlGet()->m_count--;
+        RedMusicTempoControlGet()->m_value += RedMusicTempoControlGet()->m_step;
     }
 
-    if (p_MusicPitchControl->m_count != 0) {
-        p_MusicPitchControl->m_count--;
-        p_MusicPitchControl->m_value += p_MusicPitchControl->m_step;
+    if (RedMusicPitchControlGet()->m_count != 0) {
+        RedMusicPitchControlGet()->m_count--;
+        RedMusicPitchControlGet()->m_value += RedMusicPitchControlGet()->m_step;
         voice = RedVoiceDataGetBegin();
         do {
             if ((voice->m_stateFlags & REDSOUND_VOICE_STATE_PLAYING_MASK) == 0) {
                 int pitchOffset = (int)voice->m_track->m_keyTranspose + (int)voice->m_track->m_pitchBend;
-                voice->m_pitch = PitchCompute(voice->m_basePitch + p_MusicPitchControl->m_value, pitchOffset,
+                voice->m_pitch = PitchCompute(voice->m_basePitch + RedMusicPitchControlGet()->m_value, pitchOffset,
                                                voice->m_waveData->m_pitch,
                                                voice->m_track->m_fineTune);
                 voice->m_updateFlags |= REDSOUND_VOICE_UPDATE_PITCH;
@@ -2369,7 +2369,7 @@ static void _MusicTrackDataExecute(RedTrackDATA* track, int frames)
                 voiceData->m_basePitch += addPitch;
                 if (voiceData->m_waveData != 0) {
                     voiceData->m_pitch =
-                        PitchCompute(voiceData->m_basePitch + p_MusicPitchControl->m_value,
+                        PitchCompute(voiceData->m_basePitch + RedMusicPitchControlGet()->m_value,
                                      (int)(s16)track->m_keyTranspose + (int)(s16)track->m_pitchBend,
                                      voiceData->m_waveData->m_pitch, (s8)track->m_fineTune);
                 }
@@ -3150,10 +3150,10 @@ void MainControl(int frames)
 
     if (p_SoundControl->m_activeTrackCount != 0) {
         if ((p_SoundControl->m_flags & REDSOUND_CONTROL_FLAG_PAUSE) == 0) {
-            mul = ((u32)p_MusicTempoControl->m_value >> REDSOUND_FIXED_SHIFT) & REDSOUND_TEMPO_SCALE_MASK;
+            mul = ((u32)RedMusicTempoControlGet()->m_value >> REDSOUND_FIXED_SHIFT) & REDSOUND_TEMPO_SCALE_MASK;
             step = p_SoundControl->m_tempo >> REDSOUND_FIXED_SHIFT;
             if (mul != 0) {
-                if (p_MusicTempoControl->m_value < 0) {
+                if (RedMusicTempoControlGet()->m_value < 0) {
                     step *= (int)mul;
                     step >>= REDSOUND_TEMPO_SCALE_SHIFT;
                 } else {

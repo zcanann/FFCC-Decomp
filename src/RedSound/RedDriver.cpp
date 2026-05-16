@@ -760,6 +760,7 @@ static OSThread m_DmaExecuteThread;
 static OSSemaphore m_DmaExecuteSemaphore;
 #define RedDmaExecuteSemaphoreGet() (&m_DmaExecuteSemaphore)
 static ARQRequest m_DMARequest;
+#define RedDmaArqRequestGet() (&m_DMARequest)
 OSThread m_MusicSkipThread;
 OSSemaphore m_MusicSkipSemaphore;
 #define RedMusicSkipSemaphoreGet() (&m_MusicSkipSemaphore)
@@ -2021,7 +2022,7 @@ static void _DmaExecute()
             }
             RedDmaThreadStateSet(REDSOUND_DMA_THREAD_POST_REQUEST);
             ARQSetChunkSize((u32)queueEntry->m_size);
-            ARQPostRequest(&m_DMARequest, REDSOUND_DMA_ARQ_OWNER_ID, (u32)queueEntry->m_direction, REDSOUND_DMA_ARQ_PRIORITY, (u32)srcAddress, (u32)dstAddress,
+            ARQPostRequest(RedDmaArqRequestGet(), REDSOUND_DMA_ARQ_OWNER_ID, (u32)queueEntry->m_direction, REDSOUND_DMA_ARQ_PRIORITY, (u32)srcAddress, (u32)dstAddress,
                            (u32)queueEntry->m_size, _DmaCallback);
             RedDmaThreadStateSet(REDSOUND_DMA_THREAD_WAIT_REQUEST);
             activeRequest = queueEntry;

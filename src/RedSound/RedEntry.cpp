@@ -941,9 +941,9 @@ void CRedEntry::DisplayWaveInfo()
         int aBufferEnd = aBufferAddress + c_RedMemory.GetABufferSize();
 		do {
 			if (bank->m_size != REDSOUND_MEMORY_BLOCK_SIZE_EMPTY) {
-				int freeSize = bank->m_address + bank->m_size;
-				if (bank[REDSOUND_MEMORY_NEXT_BLOCK_INDEX].m_size > 0) {
-					freeSize = bank[REDSOUND_MEMORY_NEXT_BLOCK_INDEX].m_address - freeSize;
+				int freeSize = RedMemoryBlockGetEndAddress(bank);
+				if (RedMemoryBlockGetNext(bank)->m_size > 0) {
+					freeSize = RedMemoryBlockGetNext(bank)->m_address - freeSize;
 				} else {
 					freeSize = aBufferEnd - freeSize;
 				}
@@ -982,7 +982,7 @@ void CRedEntry::DisplayWaveInfo()
 					maxFreeSize = bank->m_address - aBufferAddress;
 				}
 				totalSize += bank->m_size;
-				aBufferAddress = bank->m_address + bank->m_size;
+				aBufferAddress = RedMemoryBlockGetEndAddress(bank);
 			}
 			bank++;
 		} while (bank < aBankAddress + REDSOUND_MEMORY_BANK_BLOCK_COUNT);
@@ -1613,10 +1613,10 @@ void CRedEntry::DisplayMMemoryInfo()
 	do {
 		if (bankEntry->m_size != REDSOUND_MEMORY_BLOCK_SIZE_EMPTY) {
 			int matched = REDSOUND_ENTRY_SEARCH_NOT_FOUND;
-			int blockEnd = bankEntry->m_address + bankEntry->m_size;
+			int blockEnd = RedMemoryBlockGetEndAddress(bankEntry);
 
-			if (bankEntry[REDSOUND_MEMORY_NEXT_BLOCK_INDEX].m_size > 0) {
-				freeSize = bankEntry[REDSOUND_MEMORY_NEXT_BLOCK_INDEX].m_address - blockEnd;
+			if (RedMemoryBlockGetNext(bankEntry)->m_size > 0) {
+				freeSize = RedMemoryBlockGetNext(bankEntry)->m_address - blockEnd;
 			} else {
 				freeSize = bufferTop - blockEnd;
 			}
@@ -1694,7 +1694,7 @@ void CRedEntry::DisplayMMemoryInfo()
 
 			entryCount++;
 			totalSize += bankEntry->m_size;
-			nextAddress = bankEntry->m_address + bankEntry->m_size;
+			nextAddress = RedMemoryBlockGetEndAddress(bankEntry);
 		}
 
 		bankEntry++;

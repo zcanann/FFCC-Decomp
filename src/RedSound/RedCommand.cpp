@@ -1057,7 +1057,7 @@ static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* wav
 	int count = musicHead->m_trackCount;
 	char trackNo = 0;
 	do {
-		unsigned int blockSize = RedMusicTrackBlockGetSize(current);
+		int blockSize = RedMusicTrackBlockGetSize(current);
 		track->m_trackNo = trackNo - 1;
 		track->m_waveBankData = waveHead;
 		current = (RedMusicTrackBlock*)current->m_command;

@@ -238,12 +238,12 @@ int SeStopID(int seId)
 			track->m_mixVolumeMode = REDSOUND_SE_VOLUME_MODE_NORMAL;
 
 			trackNo = track->m_trackNo;
-			(p_VoiceData + trackNo)->m_stateFlags &= REDSOUND_VOICE_STATE_CLEAR_PLAYING_MASK;
-			(p_VoiceData + trackNo)->m_voiceSwitch &= REDSOUND_VOICE_SWITCH_CLEAR_SE_MASK;
-			(p_VoiceData + trackNo)->m_flags &= REDSOUND_VOICE_FLAGS_CLEAR_ACTIVE_MASK;
-			(p_VoiceData + trackNo)->m_flags |= REDSOUND_VOICE_FLAGS_RELEASED;
-			(p_VoiceData + trackNo)->m_track = REDSOUND_VOICE_TRACK_NONE;
-			(p_VoiceData + trackNo)->m_active = REDSOUND_VOICE_ACTIVE_OFF;
+			RedVoiceDataGet(trackNo)->m_stateFlags &= REDSOUND_VOICE_STATE_CLEAR_PLAYING_MASK;
+			RedVoiceDataGet(trackNo)->m_voiceSwitch &= REDSOUND_VOICE_SWITCH_CLEAR_SE_MASK;
+			RedVoiceDataGet(trackNo)->m_flags &= REDSOUND_VOICE_FLAGS_CLEAR_ACTIVE_MASK;
+			RedVoiceDataGet(trackNo)->m_flags |= REDSOUND_VOICE_FLAGS_RELEASED;
+			RedVoiceDataGet(trackNo)->m_track = REDSOUND_VOICE_TRACK_NONE;
+			RedVoiceDataGet(trackNo)->m_active = REDSOUND_VOICE_ACTIVE_OFF;
 
 			if (track->m_waveBankData != REDSOUND_WAVE_BANK_DATA_NONE) {
 				c_RedEntry.WaveHistoryManager(REDSOUND_HISTORY_MODE_RELEASE, track->m_waveBankData->m_waveNo);
@@ -286,12 +286,12 @@ int SeStopMG(int bank, int sep, int group, int kind)
 				track->m_mixVolumeMode = REDSOUND_SE_VOLUME_MODE_NORMAL;
 
 				trackNo = track->m_trackNo;
-				(p_VoiceData + trackNo)->m_stateFlags &= REDSOUND_VOICE_STATE_CLEAR_PLAYING_MASK;
-				(p_VoiceData + trackNo)->m_voiceSwitch &= REDSOUND_VOICE_SWITCH_CLEAR_SE_MASK;
-				(p_VoiceData + trackNo)->m_flags &= REDSOUND_VOICE_FLAGS_CLEAR_ACTIVE_MASK;
-				(p_VoiceData + trackNo)->m_flags |= REDSOUND_VOICE_FLAGS_RELEASED;
-				(p_VoiceData + trackNo)->m_track = REDSOUND_VOICE_TRACK_NONE;
-				(p_VoiceData + trackNo)->m_active = REDSOUND_VOICE_ACTIVE_OFF;
+				RedVoiceDataGet(trackNo)->m_stateFlags &= REDSOUND_VOICE_STATE_CLEAR_PLAYING_MASK;
+				RedVoiceDataGet(trackNo)->m_voiceSwitch &= REDSOUND_VOICE_SWITCH_CLEAR_SE_MASK;
+				RedVoiceDataGet(trackNo)->m_flags &= REDSOUND_VOICE_FLAGS_CLEAR_ACTIVE_MASK;
+				RedVoiceDataGet(trackNo)->m_flags |= REDSOUND_VOICE_FLAGS_RELEASED;
+				RedVoiceDataGet(trackNo)->m_track = REDSOUND_VOICE_TRACK_NONE;
+				RedVoiceDataGet(trackNo)->m_active = REDSOUND_VOICE_ACTIVE_OFF;
 
 				if (track->m_waveBankData != REDSOUND_WAVE_BANK_DATA_NONE) {
 					c_RedEntry.WaveHistoryManager(REDSOUND_HISTORY_MODE_RELEASE, track->m_waveBankData->m_waveNo);
@@ -500,7 +500,7 @@ void SePause(int seId, int pause)
 
 	trackBasePtr = &RedSoundControlGet(REDSOUND_CONTROL_SE)->m_tracks;
 	track = *trackBasePtr;
-	voice = p_VoiceData + REDSOUND_SE_VOICE_BASE_INDEX;
+	voice = RedVoiceDataGet(REDSOUND_SE_VOICE_BASE_INDEX);
 	do {
 		if ((track->m_seId != REDSOUND_SE_ID_NONE) && ((seId == REDSOUND_SE_ID_ALL) || (seId == track->m_seId))) {
 			if (pause == REDSOUND_PAUSE_ON) {
@@ -682,11 +682,11 @@ static void _EraseAttribute(int eraseTrack, int attrMask)
 			track->m_mixVolumeMode = REDSOUND_SE_VOLUME_MODE_NORMAL;
 
 			trackNo = track->m_trackNo;
-			(p_VoiceData + trackNo)->m_stateFlags &= REDSOUND_VOICE_STATE_CLEAR_PLAYING_MASK;
-			(p_VoiceData + trackNo)->m_voiceSwitch &= REDSOUND_VOICE_SWITCH_CLEAR_SE_MASK;
-			(p_VoiceData + trackNo)->m_flags &= REDSOUND_VOICE_FLAGS_CLEAR_ACTIVE_MASK;
-			(p_VoiceData + trackNo)->m_flags |= REDSOUND_VOICE_FLAGS_RELEASED;
-			(p_VoiceData + trackNo)->m_active = REDSOUND_VOICE_ACTIVE_OFF;
+			RedVoiceDataGet(trackNo)->m_stateFlags &= REDSOUND_VOICE_STATE_CLEAR_PLAYING_MASK;
+			RedVoiceDataGet(trackNo)->m_voiceSwitch &= REDSOUND_VOICE_SWITCH_CLEAR_SE_MASK;
+			RedVoiceDataGet(trackNo)->m_flags &= REDSOUND_VOICE_FLAGS_CLEAR_ACTIVE_MASK;
+			RedVoiceDataGet(trackNo)->m_flags |= REDSOUND_VOICE_FLAGS_RELEASED;
+			RedVoiceDataGet(trackNo)->m_active = REDSOUND_VOICE_ACTIVE_OFF;
 
 			c_RedEntry.SeSepHistoryManager(REDSOUND_HISTORY_MODE_RELEASE, track->m_seSepId);
 			if (track->m_waveBankData != REDSOUND_WAVE_BANK_DATA_NONE) {
@@ -751,11 +751,11 @@ static int _EraseTime(int eraseTrack)
 			track->m_mixVolumeMode = REDSOUND_SE_VOLUME_MODE_NORMAL;
 
 			int trackNo = track->m_trackNo;
-			(p_VoiceData + trackNo)->m_stateFlags &= REDSOUND_VOICE_STATE_CLEAR_PLAYING_MASK;
-			(p_VoiceData + trackNo)->m_voiceSwitch &= REDSOUND_VOICE_SWITCH_CLEAR_SE_MASK;
-			(p_VoiceData + trackNo)->m_flags &= REDSOUND_VOICE_FLAGS_CLEAR_ACTIVE_MASK;
-			(p_VoiceData + trackNo)->m_flags |= REDSOUND_VOICE_FLAGS_RELEASED;
-			(p_VoiceData + trackNo)->m_active = REDSOUND_VOICE_ACTIVE_OFF;
+			RedVoiceDataGet(trackNo)->m_stateFlags &= REDSOUND_VOICE_STATE_CLEAR_PLAYING_MASK;
+			RedVoiceDataGet(trackNo)->m_voiceSwitch &= REDSOUND_VOICE_SWITCH_CLEAR_SE_MASK;
+			RedVoiceDataGet(trackNo)->m_flags &= REDSOUND_VOICE_FLAGS_CLEAR_ACTIVE_MASK;
+			RedVoiceDataGet(trackNo)->m_flags |= REDSOUND_VOICE_FLAGS_RELEASED;
+			RedVoiceDataGet(trackNo)->m_active = REDSOUND_VOICE_ACTIVE_OFF;
 
 			if (track->m_waveBankData != REDSOUND_WAVE_BANK_DATA_NONE) {
 				c_RedEntry.WaveHistoryManager(REDSOUND_HISTORY_MODE_RELEASE, track->m_waveBankData->m_waveNo);
@@ -800,12 +800,12 @@ inline int SeStopG(int group)
 			track->m_mixVolumeMode = REDSOUND_SE_VOLUME_MODE_NORMAL;
 
 			trackNo = track->m_trackNo;
-			(p_VoiceData + trackNo)->m_stateFlags &= REDSOUND_VOICE_STATE_CLEAR_PLAYING_MASK;
-			(p_VoiceData + trackNo)->m_voiceSwitch &= REDSOUND_VOICE_SWITCH_CLEAR_SE_MASK;
-			(p_VoiceData + trackNo)->m_flags &= REDSOUND_VOICE_FLAGS_CLEAR_ACTIVE_MASK;
-			(p_VoiceData + trackNo)->m_flags |= REDSOUND_VOICE_FLAGS_RELEASED;
-			(p_VoiceData + trackNo)->m_track = REDSOUND_VOICE_TRACK_NONE;
-			(p_VoiceData + trackNo)->m_active = REDSOUND_VOICE_ACTIVE_OFF;
+			RedVoiceDataGet(trackNo)->m_stateFlags &= REDSOUND_VOICE_STATE_CLEAR_PLAYING_MASK;
+			RedVoiceDataGet(trackNo)->m_voiceSwitch &= REDSOUND_VOICE_SWITCH_CLEAR_SE_MASK;
+			RedVoiceDataGet(trackNo)->m_flags &= REDSOUND_VOICE_FLAGS_CLEAR_ACTIVE_MASK;
+			RedVoiceDataGet(trackNo)->m_flags |= REDSOUND_VOICE_FLAGS_RELEASED;
+			RedVoiceDataGet(trackNo)->m_track = REDSOUND_VOICE_TRACK_NONE;
+			RedVoiceDataGet(trackNo)->m_active = REDSOUND_VOICE_ACTIVE_OFF;
 
 			if (track->m_waveBankData != REDSOUND_WAVE_BANK_DATA_NONE) {
 				c_RedEntry.WaveHistoryManager(REDSOUND_HISTORY_MODE_RELEASE, track->m_waveBankData->m_waveNo);
@@ -883,7 +883,7 @@ static int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volum
 			break;
 		}
 
-		voiceData = p_VoiceData + track->m_trackNo;
+		voiceData = RedVoiceDataGet(track->m_trackNo);
 		while (true) {
 			track->m_waveBankData = waveBase;
 			track->m_command = current;

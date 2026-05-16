@@ -1957,7 +1957,7 @@ int CRedEntry::MusicMemoryFree(RedHistoryBANK* bank)
  * JP Address: TODO
  * JP Size: TODO
  */
-int CRedEntry::ClearMusicData(int musicNo)
+inline int CRedEntry::ClearMusicData(int musicNo)
 {
 	int result = 0;
 
@@ -1990,7 +1990,7 @@ int CRedEntry::ClearMusicData(int musicNo)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CRedEntry::DisplayMusicInfo()
+inline void CRedEntry::DisplayMusicInfo()
 {
 	if (m_ReportPrint != REDSOUND_REPORT_PRINT_OFF) {
 		OSReport(sRedEntryNewline);

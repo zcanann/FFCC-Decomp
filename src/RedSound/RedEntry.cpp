@@ -985,7 +985,7 @@ void CRedEntry::DisplayWaveInfo()
 				aBufferAddress = RedMemoryBlockGetEndAddress(bank);
 			}
 			bank++;
-		} while (bank < aBankAddress + REDSOUND_MEMORY_BANK_BLOCK_COUNT);
+		} while (bank < RedMemoryBankGetEnd(aBankAddress));
 
         int aBase = c_RedMemory.GetABufferAddress();
 		if (maxFreeSize < (aBase + c_RedMemory.GetABufferSize()) - aBufferAddress) {
@@ -1698,7 +1698,7 @@ void CRedEntry::DisplayMMemoryInfo()
 		}
 
 		bankEntry++;
-	} while (bankEntry < memoryBank + REDSOUND_MEMORY_BANK_BLOCK_COUNT);
+	} while (bankEntry < RedMemoryBankGetEnd(memoryBank));
 
     freeSize = (c_RedMemory.GetMainBufferAddress() + c_RedMemory.GetMainBufferSize()) - nextAddress;
 	if (maxFreeSize < freeSize) {

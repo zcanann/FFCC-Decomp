@@ -244,6 +244,7 @@ extern volatile int m_SeSkipStep;
 extern RedVoiceDATA* volatile p_VoiceData;
 extern int p_EditorVoice[REDSOUND_EDITOR_VOICE_COUNT];
 extern RedTrackDATA* p_EditorTrack;
+extern OSThread m_MusicSkipThread;
 extern u8* volatile p_MusicSkipThreadStack;
 extern volatile int m_MusicSkipComplete;
 extern RedReverbDepth* volatile p_ReverbDepth;

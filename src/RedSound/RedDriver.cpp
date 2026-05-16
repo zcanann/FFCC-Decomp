@@ -411,6 +411,8 @@ struct RedExecCommand {
     int m_args[REDSOUND_EXEC_COMMAND_ARG_COUNT];
 };
 
+#define RedExecCommandGetArg(command, index) ((command)->m_args[(index)])
+
 enum RedExecCommandLayout {
     REDSOUND_EXEC_COMMAND_FUNC_OFFSET = (unsigned int)&(((RedExecCommand*)0)->m_func),
     REDSOUND_EXEC_COMMAND_ARGS_OFFSET = (unsigned int)&(((RedExecCommand*)0)->m_args),
@@ -1501,13 +1503,13 @@ static RedExecCommand* _EntryExecCommand(RedExecCommandFunc func, int arg1, int 
     interruptLevel = OSDisableInterrupts();
     writePos = p_ExecCommandNow;
     writePos->m_func = func;
-    writePos->m_args[REDSOUND_EXEC_COMMAND_ARG0] = arg1;
-    writePos->m_args[REDSOUND_EXEC_COMMAND_ARG1] = arg2;
-    writePos->m_args[REDSOUND_EXEC_COMMAND_ARG2] = arg3;
-    writePos->m_args[REDSOUND_EXEC_COMMAND_ARG3] = arg4;
-    writePos->m_args[REDSOUND_EXEC_COMMAND_ARG4] = arg5;
-    writePos->m_args[REDSOUND_EXEC_COMMAND_ARG5] = arg6;
-    writePos->m_args[REDSOUND_EXEC_COMMAND_ARG6] = arg7;
+    RedExecCommandGetArg(writePos, REDSOUND_EXEC_COMMAND_ARG0) = arg1;
+    RedExecCommandGetArg(writePos, REDSOUND_EXEC_COMMAND_ARG1) = arg2;
+    RedExecCommandGetArg(writePos, REDSOUND_EXEC_COMMAND_ARG2) = arg3;
+    RedExecCommandGetArg(writePos, REDSOUND_EXEC_COMMAND_ARG3) = arg4;
+    RedExecCommandGetArg(writePos, REDSOUND_EXEC_COMMAND_ARG4) = arg5;
+    RedExecCommandGetArg(writePos, REDSOUND_EXEC_COMMAND_ARG5) = arg6;
+    RedExecCommandGetArg(writePos, REDSOUND_EXEC_COMMAND_ARG6) = arg7;
     writePos++;
     if (writePos == RedExecCommandGetEnd()) {
         writePos = p_ExecCommand;
@@ -2459,7 +2461,7 @@ inline int CRedDriver::MusicPlayState(int musicID)
                  (command->m_func == _MusicCrossPlaySequence) ||
                  (command->m_func == _MusicNextPlaySequence)) &&
                 ((musicID == REDSOUND_MUSIC_ID_NONE) ||
-                 (musicID == command->m_args[REDSOUND_EXEC_COMMAND_ARG0]))) {
+                 (musicID == RedExecCommandGetArg(command, REDSOUND_EXEC_COMMAND_ARG0)))) {
                 result = 1;
                 break;
             }
@@ -2951,7 +2953,7 @@ int CRedDriver::SePlayState(int seID)
                 (((command->m_func == _SeBlockPlay) ||
                   (command->m_func == _SeSepPlay)) ||
                  (command->m_func == _SeSepPlaySequence))) &&
-                ((seID == REDSOUND_SE_ID_ALL || (seID == command->m_args[REDSOUND_EXEC_COMMAND_ARG0])))) {
+                ((seID == REDSOUND_SE_ID_ALL || (seID == RedExecCommandGetArg(command, REDSOUND_EXEC_COMMAND_ARG0))))) {
                 result = 1;
                 break;
             }
@@ -3300,7 +3302,7 @@ int CRedDriver::StreamPlayState(int streamID)
 		while (commandNow != command) {
 			if ((command->m_func != 0) && (command->m_func == _StreamPlay) &&
 			    ((streamID == REDSOUND_STREAM_ID_ALL) ||
-			     (streamID == command->m_args[REDSOUND_EXEC_COMMAND_ARG0]))) {
+			     (streamID == RedExecCommandGetArg(command, REDSOUND_EXEC_COMMAND_ARG0)))) {
 				result = 1;
 				break;
 			}

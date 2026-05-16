@@ -668,6 +668,10 @@ static RedExecCommand* volatile p_ExecCommandNow;
 static RedExecCommand* volatile p_ExecCommandOld;
 #define RedExecCommandGetBegin() (p_ExecCommand)
 #define RedExecCommandGetEnd() (p_ExecCommand + REDSOUND_EXEC_COMMAND_COUNT)
+#define RedExecCommandGetNow() (p_ExecCommandNow)
+#define RedExecCommandSetNow(command) (p_ExecCommandNow = (command))
+#define RedExecCommandGetOld() (p_ExecCommandOld)
+#define RedExecCommandSetOld(command) (p_ExecCommandOld = (command))
 static RedDmaRequest* volatile p_DmaControlNow[REDSOUND_DMA_QUEUE_COUNT];
 static RedDmaRequest* volatile p_DmaControlOld[REDSOUND_DMA_QUEUE_COUNT];
 RedSoundCONTROL* volatile p_SoundControlBuffer;
@@ -1506,7 +1510,7 @@ static RedExecCommand* _EntryExecCommand(RedExecCommandFunc func, int arg1, int 
     RedExecCommand* writePos;
 
     interruptLevel = OSDisableInterrupts();
-    writePos = p_ExecCommandNow;
+    writePos = RedExecCommandGetNow();
     writePos->m_func = func;
     RedExecCommandGetArg(writePos, REDSOUND_EXEC_COMMAND_ARG0) = arg1;
     RedExecCommandGetArg(writePos, REDSOUND_EXEC_COMMAND_ARG1) = arg2;
@@ -1519,7 +1523,7 @@ static RedExecCommand* _EntryExecCommand(RedExecCommandFunc func, int arg1, int 
     if (writePos == RedExecCommandGetEnd()) {
         writePos = RedExecCommandGetBegin();
     }
-    p_ExecCommandNow = writePos;
+    RedExecCommandSetNow(writePos);
     OSRestoreInterrupts(interruptLevel);
     return writePos;
 }
@@ -1538,8 +1542,8 @@ static void _ExecuteCommand()
 	volatile RedExecCommand* readPos;
 	volatile RedExecCommand* executePos;
 
-	executePos = p_ExecCommandNow;
-	readPos = p_ExecCommandOld;
+	executePos = RedExecCommandGetNow();
+	readPos = RedExecCommandGetOld();
 
 	while (executePos != readPos) {
 		if (readPos->m_func != 0) {
@@ -1551,7 +1555,7 @@ static void _ExecuteCommand()
 		}
 	}
 
-	p_ExecCommandOld = (RedExecCommand*)readPos;
+	RedExecCommandSetOld((RedExecCommand*)readPos);
 }
 
 /*
@@ -2167,8 +2171,8 @@ void CRedDriver::Init()
     memset(p_MusicPitchControl, 0, REDSOUND_CONTROL_RAMP_SIZE);
     allocSize = REDSOUND_EXEC_COMMAND_BUFFER_SIZE;
     p_ExecCommand = (RedExecCommand*)RedNew(allocSize);
-    p_ExecCommandNow = p_ExecCommand;
-    p_ExecCommandOld = p_ExecCommand;
+    RedExecCommandSetNow(RedExecCommandGetBegin());
+    RedExecCommandSetOld(RedExecCommandGetBegin());
     memset(p_ExecCommand, 0, allocSize);
     allocSize = REDSOUND_CONTROL_BUFFER_SIZE;
     p_SoundControlBuffer = (RedSoundCONTROL*)RedNew(allocSize);
@@ -2458,8 +2462,8 @@ inline int CRedDriver::MusicPlayState(int musicID)
     }
 
     if (result == 0) {
-        commandNow = p_ExecCommandNow;
-        command = p_ExecCommandOld;
+        commandNow = RedExecCommandGetNow();
+        command = RedExecCommandGetOld();
         while (commandNow != command) {
             if ((command->m_func != 0) &&
                 ((command->m_func == _MusicPlaySequence) ||
@@ -2951,8 +2955,8 @@ int CRedDriver::SePlayState(int seID)
         seInfo++;
     } while (seInfo < RedSeTrackGetEnd(*seInfoBase));
     if (result == 0) {
-        commandNow = p_ExecCommandNow;
-        command = p_ExecCommandOld;
+        commandNow = RedExecCommandGetNow();
+        command = RedExecCommandGetOld();
         while (commandNow != command) {
             if (((command->m_func != 0) &&
                 (((command->m_func == _SeBlockPlay) ||
@@ -3302,8 +3306,8 @@ int CRedDriver::StreamPlayState(int streamID)
 	} while (streamData < RedStreamDataGetEnd());
 
 	if (result == 0) {
-		commandNow = p_ExecCommandNow;
-		command = p_ExecCommandOld;
+		commandNow = RedExecCommandGetNow();
+		command = RedExecCommandGetOld();
 		while (commandNow != command) {
 			if ((command->m_func != 0) && (command->m_func == _StreamPlay) &&
 			    ((streamID == REDSOUND_STREAM_ID_ALL) ||

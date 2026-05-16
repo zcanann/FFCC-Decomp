@@ -276,6 +276,11 @@ extern RedControlRamp* volatile p_MusicTempoControl;
 extern RedControlRamp* volatile p_MusicPitchControl;
 #define RedMusicPitchControlGet() (p_MusicPitchControl)
 extern int m_MusicPhraseStop;
+#define RedMusicPhraseStopGet() (m_MusicPhraseStop)
+#define RedMusicPhraseStopSet(status) (m_MusicPhraseStop = (status))
+#define RedMusicPhraseStopClear() RedMusicPhraseStopSet(REDSOUND_MUSIC_PHRASE_STOP_OFF)
+#define RedMusicPhraseStopIsOn() (RedMusicPhraseStopGet() == REDSOUND_MUSIC_PHRASE_STOP_ON)
+#define RedMusicPhraseStopIsOff() (RedMusicPhraseStopGet() == REDSOUND_MUSIC_PHRASE_STOP_OFF)
 extern int m_CrossTime;
 #define RedCrossTimeGet() (m_CrossTime)
 #define RedCrossTimeSet(time) (m_CrossTime = (time))

@@ -969,7 +969,7 @@ static void __MidiCtrl_Stop(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, R
     if (control < RedSoundControlGet(REDSOUND_CONTROL_SE)) {
         control->m_activeTrackCount--;
         if ((control->m_activeTrackCount == 0) &&
-            ((m_MusicPhraseStop == REDSOUND_MUSIC_PHRASE_STOP_ON) ||
+            ((RedMusicPhraseStopIsOn()) ||
              ((control->m_flags & REDSOUND_CONTROL_FLAG_WHOLE_LOOP_ACTIVE) == 0))) {
             voice = RedVoiceDataGetBegin();
             do {
@@ -1009,7 +1009,7 @@ static void __MidiCtrl_Stop(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, R
  */
 static void __MidiCtrl_Sleep(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA*)
 {
-    if ((m_MusicPhraseStop == REDSOUND_MUSIC_PHRASE_STOP_ON) &&
+    if ((RedMusicPhraseStopIsOn()) &&
         (control == RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY))) {
         RedTrackDATA* track = control->m_tracks;
         do {
@@ -1110,7 +1110,7 @@ static void __MidiCtrl_WholeLoopStart(RedSoundCONTROL* control, RedKeyOnDATA* ke
 static void __MidiCtrl_WholeLoopEnd(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA*)
 {
     control->m_flags |= REDSOUND_CONTROL_FLAG_WHOLE_LOOP_END;
-    if ((m_MusicPhraseStop == REDSOUND_MUSIC_PHRASE_STOP_ON) &&
+    if ((RedMusicPhraseStopIsOn()) &&
         (control == RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY))) {
         RedTrackDATA* track = control->m_tracks;
         do {

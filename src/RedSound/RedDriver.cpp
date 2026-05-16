@@ -927,7 +927,7 @@ static void _MusicStop(int* command)
         RedMusicNextPlayGet()->m_musicId = REDSOUND_MUSIC_ID_NONE;
     }
     if (RedMusicNextPlayGet()->m_musicId < REDSOUND_MUSIC_ID_MIN) {
-        m_MusicPhraseStop = REDSOUND_MUSIC_PHRASE_STOP_OFF;
+        RedMusicPhraseStopClear();
     }
 }
 
@@ -1104,7 +1104,7 @@ static void _MusicVolume(int* command)
 {
     if (command[REDSOUND_MUSIC_COMMAND_STOP_NEXT] == REDSOUND_MUSIC_VOLUME_MODE_FADE_OUT) {
         RedMusicNextPlayGet()->m_musicId = REDSOUND_MUSIC_ID_NONE;
-        m_MusicPhraseStop = REDSOUND_MUSIC_PHRASE_STOP_OFF;
+        RedMusicPhraseStopClear();
     }
     SetMusicVolume(command[REDSOUND_MUSIC_COMMAND_ID], command[REDSOUND_MUSIC_COMMAND_VOLUME],
                    command[REDSOUND_MUSIC_COMMAND_FADE_TIME], command[REDSOUND_MUSIC_COMMAND_STOP_NEXT]);
@@ -1160,7 +1160,7 @@ static void _MusicPause(int* command)
  */
 static void _SetMusicPhraseStop(int* command)
 {
-    m_MusicPhraseStop = command[REDSOUND_MUSIC_COMMAND_ID];
+    RedMusicPhraseStopSet(command[REDSOUND_MUSIC_COMMAND_ID]);
 }
 
 /*
@@ -1692,7 +1692,7 @@ static int _MainThread(void*)
                 (control->m_musicId < REDSOUND_MUSIC_ID_MIN)) {
                 _MusicPlaySequence((int*)RedMusicNextPlayGet());
                 RedMusicNextPlayGet()->m_musicId = REDSOUND_MUSIC_ID_NONE;
-                m_MusicPhraseStop = REDSOUND_MUSIC_PHRASE_STOP_OFF;
+                RedMusicPhraseStopClear();
             }
             while (OSTryWaitSemaphore(&m_MainSemaphore) > 0) {
             }
@@ -2225,7 +2225,7 @@ void CRedDriver::Init()
     mute[REDSOUND_MUTE_LOW_WORD] = 0;
     p_MusicNextPlay = (RedMusicPlayCommand*)RedNew(REDSOUND_MUSIC_NEXT_PLAY_BUFFER_SIZE);
     RedMusicNextPlayGet()->m_musicId = REDSOUND_MUSIC_ID_NONE;
-    m_MusicPhraseStop = REDSOUND_MUSIC_PHRASE_STOP_OFF;
+    RedMusicPhraseStopClear();
     p_Stream = (RedStreamDATA*)RedNew(REDSOUND_STREAM_BUFFER_SIZE);
     memset(RedStreamDataGetBegin(), 0, REDSOUND_STREAM_BUFFER_SIZE);
     m_DMAMode = REDSOUND_DMA_MODE_NORMAL;
@@ -2784,7 +2784,7 @@ inline void CRedDriver::SetMusicFastSpeed(int speed)
  */
 inline int CRedDriver::CheckMusicPhraseStop()
 {
-    return m_MusicPhraseStop;
+    return RedMusicPhraseStopGet();
 }
 
 /*

@@ -2176,8 +2176,8 @@ void CRedDriver::Init()
     memset(p_ExecCommand, 0, allocSize);
     allocSize = REDSOUND_CONTROL_BUFFER_SIZE;
     p_SoundControlBuffer = (RedSoundCONTROL*)RedNew(allocSize);
-    p_SoundControl = p_SoundControlBuffer;
-    memset(p_SoundControlBuffer, 0, allocSize);
+    RedCurrentSoundControlSet(RedSoundControlGetBegin());
+    memset(RedSoundControlGetBegin(), 0, allocSize);
     fullVolume = REDSOUND_MASTER_VOLUME_FULL_FIXED;
     noMusicId = REDSOUND_MUSIC_ID_NONE;
     p_SoundControl[REDSOUND_CONTROL_SE].m_volume = fullVolume;
@@ -2194,7 +2194,7 @@ void CRedDriver::Init()
     p_KeyOnData = (RedKeyOnDATA*)RedNew(REDSOUND_KEY_ON_BUFFER_SIZE);
     memset(RedKeyOnDataGet(), 0, REDSOUND_KEY_ON_BUFFER_SIZE);
     p_VoiceData = (RedVoiceDATA*)RedNew(REDSOUND_VOICE_BUFFER_SIZE);
-    memset(p_VoiceData, 0, REDSOUND_VOICE_BUFFER_SIZE);
+    memset(RedVoiceDataGetBegin(), 0, REDSOUND_VOICE_BUFFER_SIZE);
     index = 0;
     do {
         nextIndex = index % REDSOUND_SE_VOICE_BASE_INDEX;

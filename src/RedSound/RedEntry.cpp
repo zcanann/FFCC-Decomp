@@ -876,12 +876,12 @@ void CRedEntry::WaveHistoryManager(int mode, int waveNo)
 
 	if (mode == REDSOUND_HISTORY_MODE_RELEASE) {
 		used = 0;
-		if ((p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_PRIMARY].m_activeTrackCount != 0) &&
-		    (p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_PRIMARY].m_waveNo == waveNo)) {
+		if ((RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY)->m_activeTrackCount != 0) &&
+		    (RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY)->m_waveNo == waveNo)) {
 			used |= 1;
 		}
-		if ((p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY].m_activeTrackCount != 0) &&
-		    (p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY].m_waveNo == waveNo)) {
+		if ((RedSoundControlGet(REDSOUND_CONTROL_MUSIC_SECONDARY)->m_activeTrackCount != 0) &&
+		    (RedSoundControlGet(REDSOUND_CONTROL_MUSIC_SECONDARY)->m_waveNo == waveNo)) {
 			used |= 1;
 		}
 		if (used == 0) {
@@ -1474,12 +1474,12 @@ void CRedEntry::MusicHistoryManager(int mode, int musicNo)
 
 	if (mode == REDSOUND_HISTORY_MODE_RELEASE) {
 		musicSeq = 0;
-		if ((p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_PRIMARY].m_activeTrackCount != 0)
-		    && (p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_PRIMARY].m_musicId == musicNo)) {
+		if ((RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY)->m_activeTrackCount != 0)
+		    && (RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY)->m_musicId == musicNo)) {
 			musicSeq |= 1;
 		}
-		if ((p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY].m_activeTrackCount != 0)
-		    && (p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY].m_musicId == musicNo)) {
+		if ((RedSoundControlGet(REDSOUND_CONTROL_MUSIC_SECONDARY)->m_activeTrackCount != 0)
+		    && (RedSoundControlGet(REDSOUND_CONTROL_MUSIC_SECONDARY)->m_musicId == musicNo)) {
 			musicSeq |= 1;
 		}
 
@@ -2005,12 +2005,12 @@ inline void CRedEntry::DisplayMusicInfo()
 		do {
 			if (history->m_size != REDSOUND_HISTORY_BANK_EMPTY_SIZE) {
 				int playing = REDSOUND_ENTRY_SEARCH_NOT_FOUND;
-				if ((p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_PRIMARY].m_activeTrackCount != 0) &&
-				    (p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_PRIMARY].m_musicId == history->m_id)) {
+				if ((RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY)->m_activeTrackCount != 0) &&
+				    (RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY)->m_musicId == history->m_id)) {
 					playing = REDSOUND_ENTRY_SEARCH_FOUND;
 				}
-				if ((p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY].m_activeTrackCount != 0) &&
-				    (p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY].m_musicId == history->m_id)) {
+				if ((RedSoundControlGet(REDSOUND_CONTROL_MUSIC_SECONDARY)->m_activeTrackCount != 0) &&
+				    (RedSoundControlGet(REDSOUND_CONTROL_MUSIC_SECONDARY)->m_musicId == history->m_id)) {
 					playing = REDSOUND_ENTRY_SEARCH_FOUND;
 				}
 

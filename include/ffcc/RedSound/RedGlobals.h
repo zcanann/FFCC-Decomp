@@ -270,6 +270,8 @@ extern volatile int m_MusicSkipComplete;
 extern RedReverbDepth* volatile p_ReverbDepth;
 #define RedReverbDepthGet(index) (p_ReverbDepth + (index))
 extern unsigned int m_Mute[REDSOUND_MUTE_WORD_COUNT];
+#define RedMuteGetWord(voiceNo) (m_Mute[(voiceNo) / REDSOUND_MUTE_BITS_PER_WORD])
+#define RedMuteGetMask(voiceNo) (1U << ((voiceNo) % REDSOUND_MUTE_BITS_PER_WORD))
 extern CRedMemory c_RedMemory;
 extern volatile u32 m_ChangeStatus;
 extern CRedDriver c_Driver;

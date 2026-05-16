@@ -2193,9 +2193,9 @@ void CRedDriver::Init()
     editorVoice = p_EditorVoice;
     editorVoice[REDSOUND_EDITOR_VOICE_RIGHT] = 0;
     editorVoice[REDSOUND_EDITOR_VOICE_LEFT] = 0;
-    p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks = (RedTrackDATA*)RedNew(REDSOUND_SE_TRACK_ARENA_SIZE);
-    memset(p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks, 0, REDSOUND_SE_TRACK_ARENA_SIZE);
-    seTrackArena = p_SoundControlBuffer[REDSOUND_CONTROL_SE].m_tracks;
+    RedSoundControlGet(REDSOUND_CONTROL_SE)->m_tracks = (RedTrackDATA*)RedNew(REDSOUND_SE_TRACK_ARENA_SIZE);
+    memset(RedSoundControlGet(REDSOUND_CONTROL_SE)->m_tracks, 0, REDSOUND_SE_TRACK_ARENA_SIZE);
+    seTrackArena = RedSoundControlGet(REDSOUND_CONTROL_SE)->m_tracks;
     nextIndex = 0;
     do {
         seTrackArena[nextIndex].m_trackNo = (char)(nextIndex + REDSOUND_SE_VOICE_BASE_INDEX);
@@ -3233,13 +3233,13 @@ void CRedDriver::DisplaySePlayInfo()
  */
 inline void CRedDriver::ClearSePlayLine()
 {
-	RedSoundCONTROL* control = p_SoundControlBuffer + REDSOUND_CONTROL_SE;
+	RedSoundCONTROL* control = RedSoundControlGet(REDSOUND_CONTROL_SE);
 	RedTrackDATA* track = control->m_tracks;
 
 	do {
 		track->m_command = REDSOUND_TRACK_COMMAND_NONE;
 		track++;
-	} while (track < control->m_tracks + REDSOUND_SE_TRACK_COUNT);
+	} while (track < RedSoundControlGetSeTrackEnd(control));
 }
 
 /*

@@ -172,8 +172,8 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 	CAPos* behindBest = (CAPos*)0;
 	CAPos* aheadBest = (CAPos*)0;
 	float aheadBestDist = behindBestDist;
-	int i = 0;
 	CAPos* portal = m_portals;
+	int i = 0;
 
 	do
 	{

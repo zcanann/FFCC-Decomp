@@ -993,9 +993,9 @@ static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* wav
 		return (RedTrackDATA*)-1;
 	}
 
-	m_MusicSkipLine = mode;
+	RedMusicSkipLineSet(mode);
 	RedSoundCONTROL* music;
-	if (m_MusicSkipLine != 0) {
+	if (RedMusicSkipLineIsActive()) {
 		music = RedSoundControlGet(REDSOUND_CONTROL_MUSIC_SKIP);
 	} else {
 		music = RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY);
@@ -1141,7 +1141,7 @@ static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* wav
 
 	c_RedEntry.WaveHistoryManager(REDSOUND_HISTORY_MODE_USE, music->m_waveNo);
 	c_RedEntry.MusicHistoryManager(REDSOUND_HISTORY_MODE_USE, musicId);
-	if (m_MusicSkipLine != 0) {
+	if (RedMusicSkipLineIsActive()) {
 		OSSignalSemaphore(&m_MusicSkipSemaphore);
 	}
 	return track;

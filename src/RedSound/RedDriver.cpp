@@ -2153,7 +2153,7 @@ void CRedDriver::Init()
     AXSetCompressor(REDSOUND_AX_COMPRESSOR_OFF);
     m_MusicKeySignature = 0;
     m_SoundMasterControl = 0;
-    m_MusicSkipLine = 0;
+    RedMusicSkipLineSet(0);
     RedMusicFastSpeedSet(0);
     m_DMAStatus = REDSOUND_DMA_STATUS_IDLE;
     m_CrossTime = 0;

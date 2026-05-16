@@ -2675,15 +2675,15 @@ static int _MusicMidiNoteSkipExecute(RedSoundCONTROL* control, RedKeyOnDATA* key
             _MidiTrackExecute(control, keyOnData, frames);
         }
 
-        if (m_MusicSkipLine != 0) {
+        if (RedMusicSkipLineIsActive()) {
             if ((control->m_activeTrackCount != 0) && ((control->m_flags & REDSOUND_CONTROL_FLAG_WHOLE_LOOP_END) == 0)) {
-                m_MusicSkipLine--;
+                RedMusicSkipLineDec();
                 frames = tick[REDSOUND_CONTROL_TICK_PER_MEASURE];
                 RedSleep(REDSOUND_MUSIC_SKIP_LOOP_SLEEP_US);
             }
         }
 
-        if (m_MusicSkipLine <= 0) {
+        if (RedMusicSkipLineIsComplete()) {
             break;
         }
     } while (control->m_activeTrackCount != 0);

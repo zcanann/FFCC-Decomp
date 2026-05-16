@@ -259,6 +259,11 @@ extern int m_MusicFastSpeed;
 #define RedMusicFastSpeedGet() (m_MusicFastSpeed)
 #define RedMusicFastSpeedSet(speed) (m_MusicFastSpeed = (speed))
 extern volatile int m_MusicSkipLine;
+#define RedMusicSkipLineGet() (m_MusicSkipLine)
+#define RedMusicSkipLineSet(line) (m_MusicSkipLine = (line))
+#define RedMusicSkipLineDec() (m_MusicSkipLine--)
+#define RedMusicSkipLineIsActive() (RedMusicSkipLineGet() != 0)
+#define RedMusicSkipLineIsComplete() (RedMusicSkipLineGet() <= 0)
 extern int m_MusicKeySignature;
 extern int* volatile p_MusicReplayPoint;
 #define RedMusicReplayPointGetBegin() (p_MusicReplayPoint)

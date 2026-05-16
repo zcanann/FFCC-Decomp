@@ -619,7 +619,7 @@ static int _ArrangeStreamDataNoLoop(RedStreamDATA* stream, int bufferIndex, int 
 		}
 
 		if (stream->m_header.m_channelCount == REDSOUND_STREAM_STEREO_CHANNEL_COUNT) {
-			memcpy(dstBuffer + REDSOUND_STREAM_STEREO_PLANE_SIZE, stream->m_fileData + stream->m_readOffset, REDSOUND_STREAM_PAGE_SIZE);
+			memcpy(RedStreamBufferGetRightPlane(dstBuffer), stream->m_fileData + stream->m_readOffset, REDSOUND_STREAM_PAGE_SIZE);
 			stream->m_readOffset += REDSOUND_STREAM_PAGE_SIZE;
 			if (stream->m_readOffset >= stream->m_fileSize) {
 				stream->m_readOffset = 0;
@@ -638,7 +638,7 @@ static int _ArrangeStreamDataNoLoop(RedStreamDATA* stream, int bufferIndex, int 
 		}
 
 		if (stream->m_header.m_channelCount == REDSOUND_STREAM_STEREO_CHANNEL_COUNT) {
-			dstBuffer += REDSOUND_STREAM_STEREO_PLANE_SIZE;
+			dstBuffer = RedStreamBufferGetRightPlane(dstBuffer);
 			dmaDstOffset += REDSOUND_STREAM_STEREO_PLANE_SIZE;
 			voiceData += 1;
 			dmaID = RedDmaEntry(REDSOUND_DMA_FLAGS_STREAM_LOAD, REDSOUND_DMA_DIRECTION_TO_ARAM,

@@ -53,6 +53,21 @@ static inline double TmpArtiIntToDouble(int value)
     return conv.value - DOUBLE_80332f40;
 }
 
+static inline float TmpArtiIntToFloat(int value)
+{
+    union {
+        struct {
+            unsigned int hi;
+            unsigned int lo;
+        } words;
+        double value;
+    } conv;
+
+    conv.words.hi = 0x43300000;
+    conv.words.lo = (unsigned int)value ^ 0x80000000U;
+    return (float)conv.value - (float)DOUBLE_80332f40;
+}
+
 namespace {
 struct TmpArtiState {
     unsigned char pad_0000[0xB];
@@ -159,10 +174,10 @@ void CMenuPcs::TmpArtiDraw()
 		int tex = *(int*)(entry + 0xE);
 		if (tex >= 0) {
 			float alpha = *(float*)(entry + 8);
-			float left = (float)entry[0];
-			float top = (float)entry[1];
-			float width = (float)entry[2];
-			float height = (float)entry[3];
+			float left = TmpArtiIntToFloat(entry[0]);
+			float top = TmpArtiIntToFloat(entry[1]);
+			float width = TmpArtiIntToFloat(entry[2]);
+			float height = TmpArtiIntToFloat(entry[3]);
 			float s = *(float*)(entry + 4);
 			float t = *(float*)(entry + 6);
 

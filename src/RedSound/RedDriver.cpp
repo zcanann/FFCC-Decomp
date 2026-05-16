@@ -714,6 +714,10 @@ int m_MusicPhraseStop;
 static RedMusicPlayCommand* volatile p_MusicNextPlay;
 #define RedMusicNextPlayGet() (p_MusicNextPlay)
 #define RedMusicNextPlaySet(command) (p_MusicNextPlay = (command))
+#define RedMusicNextPlayIdGet() (RedMusicNextPlayGet()->m_musicId)
+#define RedMusicNextPlayIdSet(id) (RedMusicNextPlayGet()->m_musicId = (id))
+#define RedMusicNextPlayVolumeSet(volume) (RedMusicNextPlayGet()->m_volume = (volume))
+#define RedMusicNextPlayModeSet(mode) (RedMusicNextPlayGet()->m_mode = (mode))
 int m_CrossTime;
 volatile int m_MasterMusicVolume;
 volatile int m_MasterSEVolume;
@@ -971,10 +975,10 @@ static void _MusicStop(int* command)
 {
     MusicStop(command[REDSOUND_MUSIC_COMMAND_ID]);
     if ((command[REDSOUND_MUSIC_COMMAND_ID] == REDSOUND_MUSIC_ID_NONE) ||
-        (RedMusicNextPlayGet()->m_musicId == command[REDSOUND_MUSIC_COMMAND_ID])) {
-        RedMusicNextPlayGet()->m_musicId = REDSOUND_MUSIC_ID_NONE;
+        (RedMusicNextPlayIdGet() == command[REDSOUND_MUSIC_COMMAND_ID])) {
+        RedMusicNextPlayIdSet(REDSOUND_MUSIC_ID_NONE);
     }
-    if (RedMusicNextPlayGet()->m_musicId < REDSOUND_MUSIC_ID_MIN) {
+    if (RedMusicNextPlayIdGet() < REDSOUND_MUSIC_ID_MIN) {
         RedMusicPhraseStopClear();
     }
 }
@@ -1107,9 +1111,9 @@ static void _MusicNextPlaySequence(int* command)
         return;
     }
     if (c_RedEntry.SearchMusicSequence(command[REDSOUND_MUSIC_COMMAND_ID]) >= 0) {
-        RedMusicNextPlayGet()->m_musicId = command[REDSOUND_MUSIC_COMMAND_ID];
-        RedMusicNextPlayGet()->m_volume = command[REDSOUND_MUSIC_COMMAND_VOLUME];
-        RedMusicNextPlayGet()->m_mode = command[REDSOUND_MUSIC_COMMAND_MODE];
+        RedMusicNextPlayIdSet(command[REDSOUND_MUSIC_COMMAND_ID]);
+        RedMusicNextPlayVolumeSet(command[REDSOUND_MUSIC_COMMAND_VOLUME]);
+        RedMusicNextPlayModeSet(command[REDSOUND_MUSIC_COMMAND_MODE]);
     }
 }
 
@@ -1151,7 +1155,7 @@ static void _MusicMasterVolume(int* command)
 static void _MusicVolume(int* command)
 {
     if (command[REDSOUND_MUSIC_COMMAND_STOP_NEXT] == REDSOUND_MUSIC_VOLUME_MODE_FADE_OUT) {
-        RedMusicNextPlayGet()->m_musicId = REDSOUND_MUSIC_ID_NONE;
+        RedMusicNextPlayIdSet(REDSOUND_MUSIC_ID_NONE);
         RedMusicPhraseStopClear();
     }
     SetMusicVolume(command[REDSOUND_MUSIC_COMMAND_ID], command[REDSOUND_MUSIC_COMMAND_VOLUME],
@@ -1736,10 +1740,10 @@ static int _MainThread(void*)
             MainControl(elapsed);
             StreamControl();
             _ExecuteCommand();
-            if ((RedMusicNextPlayGet()->m_musicId >= REDSOUND_MUSIC_ID_MIN) &&
+            if ((RedMusicNextPlayIdGet() >= REDSOUND_MUSIC_ID_MIN) &&
                 (control->m_musicId < REDSOUND_MUSIC_ID_MIN)) {
                 _MusicPlaySequence((int*)RedMusicNextPlayGet());
-                RedMusicNextPlayGet()->m_musicId = REDSOUND_MUSIC_ID_NONE;
+                RedMusicNextPlayIdSet(REDSOUND_MUSIC_ID_NONE);
                 RedMusicPhraseStopClear();
             }
             while (OSTryWaitSemaphore(RedMainSemaphoreGet()) > 0) {
@@ -2272,7 +2276,7 @@ void CRedDriver::Init()
     mute[REDSOUND_MUTE_HIGH_WORD] = 0;
     mute[REDSOUND_MUTE_LOW_WORD] = 0;
     RedMusicNextPlaySet((RedMusicPlayCommand*)RedNew(REDSOUND_MUSIC_NEXT_PLAY_BUFFER_SIZE));
-    RedMusicNextPlayGet()->m_musicId = REDSOUND_MUSIC_ID_NONE;
+    RedMusicNextPlayIdSet(REDSOUND_MUSIC_ID_NONE);
     RedMusicPhraseStopClear();
     RedStreamDataSetBegin((RedStreamDATA*)RedNew(REDSOUND_STREAM_BUFFER_SIZE));
     memset(RedStreamDataGetBegin(), 0, REDSOUND_STREAM_BUFFER_SIZE);
@@ -2508,8 +2512,8 @@ inline int CRedDriver::MusicPlayState(int musicID)
     } else if ((musicID == REDSOUND_MUSIC_ID_NONE) ||
                (soundControl[REDSOUND_CONTROL_MUSIC_SKIP].m_musicId == musicID)) {
         result = 1;
-    } else if ((RedMusicNextPlayGet()->m_musicId >= REDSOUND_MUSIC_ID_MIN) &&
-               ((musicID == REDSOUND_MUSIC_ID_NONE) || (RedMusicNextPlayGet()->m_musicId == musicID))) {
+    } else if ((RedMusicNextPlayIdGet() >= REDSOUND_MUSIC_ID_MIN) &&
+               ((musicID == REDSOUND_MUSIC_ID_NONE) || (RedMusicNextPlayIdGet() == musicID))) {
         result = 1;
     }
 

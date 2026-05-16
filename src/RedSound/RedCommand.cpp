@@ -1034,7 +1034,7 @@ static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* wav
 
 	if (musicHead->m_reverbKind != 0) {
 		unsigned int reverbKind = ((int)musicHead->m_reverbKind - 1U) & REDSOUND_REVERB_MODE_INDEX_MASK;
-		SetReverb(0, t_ReverbModeData[reverbKind].m_kind, t_ReverbModeData[reverbKind].m_params);
+		SetReverb(0, RedReverbModeDataGet(reverbKind)->m_kind, RedReverbModeDataGet(reverbKind)->m_params);
 	}
 
 	RedReverbDepthGet(REDSOUND_REVERB_DEPTH_MUSIC)->m_depth = (int)musicHead->m_reverbDepth;

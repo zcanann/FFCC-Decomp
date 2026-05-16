@@ -72,5 +72,6 @@ void SetMusicPitch(int pitch, int frameCount);
 void MusicPause(int musicId, int pause);
 
 extern RedReverbModeData t_ReverbModeData[REDSOUND_REVERB_MODE_COUNT];
+#define RedReverbModeDataGet(index) (t_ReverbModeData + (index))
 
 #endif // _FFCC_REDSOUND_REDCOMMAND_H

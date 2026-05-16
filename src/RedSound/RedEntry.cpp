@@ -358,14 +358,14 @@ void CRedEntry::Init()
  */
 void CRedEntry::WaveHistoryAdd(int historyNo)
 {
-	RedHistoryBANK* history = &m_waveBankBase[REDSOUND_WAVE_PRIMARY_BANK_ENTRY_COUNT];
+	RedHistoryBANK* history = RedEntryWaveHistoryGetBegin(this);
 
 	do {
 		if (history->m_historyNo >= historyNo) {
 			history->m_historyNo = history->m_historyNo + 1;
 		}
 		history += 1;
-	} while (history < m_waveBankBase + REDSOUND_WAVE_BANK_ENTRY_COUNT);
+	} while (history < RedEntryWaveBankGetEnd(this));
 }
 /*
  * --INFO--
@@ -385,7 +385,7 @@ void CRedEntry::WaveHistoryDelete(int historyNo)
 				history->m_historyNo = history->m_historyNo - 1;
 			}
 			history += 1;
-		} while (history < m_waveBankBase + REDSOUND_WAVE_BANK_ENTRY_COUNT);
+		} while (history < RedEntryWaveBankGetEnd(this));
 	}
 }
 /*
@@ -401,7 +401,7 @@ int CRedEntry::SearchWaveSequence(int waveNo)
 {
 	RedHistoryBANK* waveBank = m_waveBankBase;
 
-	while (waveBank < m_waveBankBase + REDSOUND_WAVE_BANK_ENTRY_COUNT) {
+	while (waveBank < RedEntryWaveBankGetEnd(this)) {
 		if ((waveBank->m_size != REDSOUND_HISTORY_BANK_EMPTY_SIZE) && (waveBank->m_id == waveNo)) {
 			return waveBank - m_waveBankBase;
 		}
@@ -463,7 +463,7 @@ int CRedEntry::WaveOldClear(int offset, int maxSize)
 	int maxBankSize = 0;
 	offset += arAddress;
 	maxSize += arAddress;
-	RedHistoryBANK* history = &m_waveBankBase[REDSOUND_WAVE_PRIMARY_BANK_ENTRY_COUNT];
+	RedHistoryBANK* history = RedEntryWaveHistoryGetBegin(this);
 
 	do {
 		if (history->m_historyNo > maxBankSize) {

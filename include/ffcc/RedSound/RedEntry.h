@@ -498,6 +498,14 @@ public:
 	int m_waveLoadAddress;
 };
 
+#define RedEntryWaveBankGet(entry, index) ((entry)->m_waveBankBase + (index))
+#define RedEntryWaveBankGetEnd(entry) RedEntryWaveBankGet(entry, REDSOUND_WAVE_BANK_ENTRY_COUNT)
+#define RedEntryWaveHistoryGetBegin(entry) RedEntryWaveBankGet(entry, REDSOUND_WAVE_PRIMARY_BANK_ENTRY_COUNT)
+#define RedEntrySeSepBankGet(entry, index) ((entry)->m_seSepBankBase + (index))
+#define RedEntrySeSepBankGetEnd(entry) RedEntrySeSepBankGet(entry, REDSOUND_SESEP_BANK_ENTRY_COUNT)
+#define RedEntryMusicBankGet(entry, index) ((entry)->m_musicBankBase + (index))
+#define RedEntryMusicBankGetEnd(entry) RedEntryMusicBankGet(entry, REDSOUND_MUSIC_BANK_ENTRY_COUNT)
+
 enum RedEntryLayout {
 	REDSOUND_ENTRY_WAVE_BANK_BASE_OFFSET = (unsigned int)&(((CRedEntry*)0)->m_waveBankBase),
 	REDSOUND_ENTRY_SESEP_BANK_BASE_OFFSET = (unsigned int)&(((CRedEntry*)0)->m_seSepBankBase),

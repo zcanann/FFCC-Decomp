@@ -1065,7 +1065,7 @@ static void __MidiCtrl_WholeLoopStart(RedSoundCONTROL* control, RedKeyOnDATA* ke
 
                 while ((currentDelta < 1) && (scan->m_command != REDSOUND_TRACK_COMMAND_NONE)) {
                     int cmd = *scan->m_command++;
-                    p_MidiControl_Function[cmd](control, keyOnData, scan);
+                    RedMidiControlFunctionGet(cmd)(control, keyOnData, scan);
 
                     if (scan->m_command != REDSOUND_TRACK_COMMAND_NONE) {
                         delta = DeltaTimeSumup((unsigned char**)&scan->m_command);

@@ -536,6 +536,7 @@ void KeyOnReserve(RedKeyOnDATA* keyOnData, RedTrackDATA* track);
 void KeyOffSet(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* track);
 
 extern RedMidiControlFunc p_MidiControl_Function[REDSOUND_MIDI_CONTROL_FUNCTION_COUNT];
+#define RedMidiControlFunctionGet(index) (p_MidiControl_Function[(index)])
 extern RedSwingFunc SwingEntryFunction[REDSOUND_SWING_FUNCTION_COUNT];
 #define RedSwingFunctionGet(index) (SwingEntryFunction[(index)])
 

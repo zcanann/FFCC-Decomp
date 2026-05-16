@@ -114,6 +114,7 @@ static int m_StandbyStatus[REDSOUND_STANDBY_STATUS_COUNT];
 #define RedStandbyStatusGetEnd() (m_StandbyStatus + REDSOUND_STANDBY_STATUS_COUNT)
 volatile unsigned int m_AutoID;
 static RedSoundStreamBank* p_StreamBank;
+#define RedSoundStreamBankGetBegin() (p_StreamBank)
 #define RedSoundStreamBankGetEnd() (p_StreamBank + REDSOUND_STREAM_BANK_COUNT)
 static const char sRedSoundMemorySettingError[] = "%s%s  Memory Setting Error !! (0x%8.8X:0x%8.8X)%s\n";
 static const char sRedSoundLogPrefix[] = "\x1B[7;34mSound\x1B[0m:";
@@ -187,7 +188,7 @@ STATIC_ASSERT(sizeof(sRedSoundLogErrorColor) + sizeof(sRedSoundLogReset) + sizeo
  */
 static RedSoundStreamBank* _SearchEmptyStreamBank()
 {
-	RedSoundStreamBank* bank = p_StreamBank;
+	RedSoundStreamBank* bank = RedSoundStreamBankGetBegin();
 	RedSoundStreamBank* bankEnd = RedSoundStreamBankGetEnd();
 
 	do {
@@ -217,7 +218,7 @@ static RedSoundStreamBank* _SearchEmptyStreamBank()
  */
 static RedSoundStreamBank* _SearchStreamBank(int streamId)
 {
-	RedSoundStreamBank* bank = p_StreamBank;
+	RedSoundStreamBank* bank = RedSoundStreamBankGetBegin();
 	RedSoundStreamBank* bankEnd = RedSoundStreamBankGetEnd();
 
 	do {

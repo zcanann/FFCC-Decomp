@@ -115,6 +115,7 @@ static int m_StandbyStatus[REDSOUND_STANDBY_STATUS_COUNT];
 volatile unsigned int m_AutoID;
 static RedSoundStreamBank* p_StreamBank;
 #define RedSoundStreamBankGetBegin() (p_StreamBank)
+#define RedSoundStreamBankSetBegin(bank) (p_StreamBank = (bank))
 #define RedSoundStreamBankGetEnd() (p_StreamBank + REDSOUND_STREAM_BANK_COUNT)
 static const char sRedSoundMemorySettingError[] = "%s%s  Memory Setting Error !! (0x%8.8X:0x%8.8X)%s\n";
 static const char sRedSoundLogPrefix[] = "\x1B[7;34mSound\x1B[0m:";
@@ -378,10 +379,8 @@ int CRedSound::Init(void* mainBuffer, int mainBufferSize, int aramBuffer, int ar
  */
 void CRedSound::Start()
 {
-#define redSoundStreamBank (*(RedSoundStreamBank* volatile*)&p_StreamBank)
-	redSoundStreamBank = (RedSoundStreamBank*)RedNew(REDSOUND_STREAM_BANK_SIZE);
-	memset((void*)redSoundStreamBank, 0, REDSOUND_STREAM_BANK_SIZE);
-#undef redSoundStreamBank
+	RedSoundStreamBankSetBegin((RedSoundStreamBank*)RedNew(REDSOUND_STREAM_BANK_SIZE));
+	memset(RedSoundStreamBankGetBegin(), 0, REDSOUND_STREAM_BANK_SIZE);
 }
 /*
  * --INFO--

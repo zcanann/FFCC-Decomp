@@ -2120,7 +2120,7 @@ CRedDriver::~CRedDriver()
 void CRedDriver::Init()
 {
     RedDriverSyncState& sync = RedDriverSync();
-    RedSeBlockHEAD* volatile* seBlockData = p_SeBlockData;
+    RedSeBlockHEAD* volatile* seBlockData = RedSeBlockDataGetBegin();
     RedTrackDATA* seTrackArena;
     RedDmaRequest* dmaControl;
     unsigned int* mute;

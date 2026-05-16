@@ -540,7 +540,7 @@ int MusicStop(int musicId)
 			music->m_updateFlags = 0;
 			music->m_musicId = REDSOUND_MUSIC_ID_NONE;
 			if (music->m_activeTrackCount != 0) {
-				RedVoiceDATA* voiceData = p_VoiceData;
+				RedVoiceDATA* voiceData = RedVoiceDataGetBegin();
 				do {
 					if ((voiceData->m_track >= music->m_tracks) &&
 					    (voiceData->m_track < music->m_tracks + music->m_trackCount)) {
@@ -1220,7 +1220,7 @@ inline void MusicPause(int musicId, int pause)
 		    ((music->m_musicId >= REDSOUND_MUSIC_ID_MIN) && (music->m_musicId == musicId))) {
 			if (pause == REDSOUND_PAUSE_ON) {
 				if (music->m_activeTrackCount != 0) {
-					voice = p_VoiceData;
+					voice = RedVoiceDataGetBegin();
 					do {
 						if ((voice->m_track >= music->m_tracks) &&
 						    (voice->m_track < music->m_tracks + music->m_trackCount)) {
@@ -1236,7 +1236,7 @@ inline void MusicPause(int musicId, int pause)
 				}
 				music->m_flags |= REDSOUND_CONTROL_FLAG_PAUSE;
 			} else {
-				voice = p_VoiceData;
+				voice = RedVoiceDataGetBegin();
 				do {
 					if ((voice->m_track >= music->m_tracks) &&
 					    (voice->m_track < music->m_tracks + music->m_trackCount)) {

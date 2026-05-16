@@ -224,7 +224,9 @@ extern signed char t_RandomData[REDSOUND_RANDOM_DATA_COUNT];
 #define RedRandomDataGetAddress(index) (t_RandomData + (index))
 #define RedRandomDataGet(index) (t_RandomData[(index)])
 extern s16 t_PanningData[REDSOUND_PAN_TABLE_COUNT];
+#define RedPanningDataGet(index) (t_PanningData[(index)])
 extern s16 t_PanningDataR[REDSOUND_PAN_TABLE_COUNT];
+#define RedPanningDataRGet(index) (t_PanningDataR[(index)])
 extern u32 m_TerminateNote[];
 extern volatile unsigned int m_AutoID;
 extern CRedEntry c_RedEntry;

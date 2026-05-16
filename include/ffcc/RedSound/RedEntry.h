@@ -218,10 +218,10 @@ enum RedMusicTrackBlockLayout {
 };
 
 #define RedMusicTrackBlockGetSize(block)                                                          \
-	(((unsigned int)(block)->m_sizeHi2 << REDSOUND_MUSIC_TRACK_BLOCK_SIZE_HI2_SHIFT) |             \
-	 ((unsigned int)(block)->m_sizeHi1 << REDSOUND_MUSIC_TRACK_BLOCK_SIZE_HI1_SHIFT) |             \
+	((unsigned int)(block)->m_sizeLo |                                                             \
 	 ((unsigned int)(block)->m_sizeHi0 << REDSOUND_MUSIC_TRACK_BLOCK_SIZE_HI0_SHIFT) |             \
-	 (unsigned int)(block)->m_sizeLo)
+	 ((unsigned int)(block)->m_sizeHi1 << REDSOUND_MUSIC_TRACK_BLOCK_SIZE_HI1_SHIFT) |             \
+	 ((unsigned int)(block)->m_sizeHi2 << REDSOUND_MUSIC_TRACK_BLOCK_SIZE_HI2_SHIFT))
 
 enum RedMusicHeaderFlag {
 	REDSOUND_MUSIC_HEADER_SIZE = sizeof(RedMusicHEAD),

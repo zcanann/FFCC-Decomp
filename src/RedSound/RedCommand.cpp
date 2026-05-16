@@ -1111,7 +1111,7 @@ static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* wav
 		track->m_portamentPitch = REDSOUND_TRACK_PORTAMENT_PITCH_NONE;
 		track->m_note.m_allocFlags = REDSOUND_NOTE_ALLOC_NONE;
 		track->m_voiceSwitch = REDSOUND_VOICE_SWITCH_MUSIC_DEFAULT;
-		RedTrackAdsrFillDefault(&track->m_adsr);
+		memset(&track->m_adsr, REDSOUND_TRACK_ADSR_DEFAULT_WORD, REDSOUND_TRACK_ADSR_SIZE);
 
 		count--;
 		trackNo++;

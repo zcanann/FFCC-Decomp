@@ -121,6 +121,11 @@ static void CalcWaterReflectionVector(
 void SetEnvMap(PYmMana*, VYmMana* vYmMana)
 {
     unsigned char* vYmManaBytes = (unsigned char*)vYmMana;
+
+    GXSetNumChans(1);
+    GXSetChanCtrl((GXChannelID)4, (GXBool)0, (GXColorSrc)0, (GXColorSrc)1, 0, (GXDiffuseFn)0, (GXAttnFn)2);
+    GXSetBlendMode((GXBlendMode)1, (GXBlendFactor)4, (GXBlendFactor)5, (GXLogicOp)0xf);
+
     GXTexObj* texObjA = *(GXTexObj**)(vYmManaBytes + 0x2c);
     GXTexObj* texObjB = *(GXTexObj**)(vYmManaBytes + 0x28);
     void* texObjCData = *(void**)(vYmManaBytes + 0x80);
@@ -128,12 +133,8 @@ void SetEnvMap(PYmMana*, VYmMana* vYmMana)
     unsigned char alpha = *(unsigned char*)(vYmManaBytes + 0xe8);
 
     _GXColor white = {0xff, 0xff, 0xff, 0xff};
-    _GXColor whiteAlpha = {0xff, 0xff, 0xff, alpha};
     _GXColor alphaOnly = {0x00, 0x00, 0x00, alpha};
-
-    GXSetNumChans(1);
-    GXSetChanCtrl((GXChannelID)4, (GXBool)0, (GXColorSrc)0, (GXColorSrc)1, 0, (GXDiffuseFn)0, (GXAttnFn)2);
-    GXSetBlendMode((GXBlendMode)1, (GXBlendFactor)4, (GXBlendFactor)5, (GXLogicOp)0xf);
+    _GXColor whiteAlpha = {0xff, 0xff, 0xff, alpha};
     GXSetChanAmbColor((GXChannelID)4, white);
     GXSetChanMatColor((GXChannelID)4, white);
     GXSetTevKColor((GXTevKColorID)0, alphaOnly);

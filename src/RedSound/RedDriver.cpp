@@ -2108,6 +2108,7 @@ CRedDriver::~CRedDriver()
 void CRedDriver::Init()
 {
     RedDriverSyncState& sync = RedDriverSync();
+    RedSeBlockHEAD* volatile* seBlockData = p_SeBlockData;
     RedTrackDATA* seTrackArena;
     RedDmaRequest* dmaControl;
     unsigned int* mute;
@@ -2145,7 +2146,7 @@ void CRedDriver::Init()
     index = 0;
     do {
         nextIndex = index + 1;
-        p_SeBlockData[index] = REDSOUND_SE_BLOCK_DATA_NONE;
+        seBlockData[index] = REDSOUND_SE_BLOCK_DATA_NONE;
         index = nextIndex;
     } while (nextIndex < REDSOUND_SE_BLOCK_BANK_COUNT);
     p_ZeroData = (u8*)RedNew(REDSOUND_ZERO_BUFFER_SIZE);

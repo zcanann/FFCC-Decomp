@@ -238,6 +238,7 @@ extern int m_MusicFastSpeed;
 extern volatile int m_MusicSkipLine;
 extern int m_MusicKeySignature;
 extern int* volatile p_MusicReplayPoint;
+#define RedMusicReplayPointGet(index) (p_MusicReplayPoint + (index))
 extern RedControlRamp* volatile p_MusicTempoControl;
 extern RedControlRamp* volatile p_MusicPitchControl;
 extern int m_MusicPhraseStop;

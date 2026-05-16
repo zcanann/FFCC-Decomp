@@ -1078,11 +1078,11 @@ static void _MusicMasterVolume(int* command)
 {
     RedVoiceDATA* voice;
 
-    m_MasterMusicVolume = command[REDSOUND_MASTER_VOLUME_COMMAND_VOLUME] & REDSOUND_COMMAND_VALUE_MASK;
-    if (m_MasterMusicVolume != 0) {
-        m_MasterMusicVolume = m_MasterMusicVolume + 1;
-        m_MasterMusicVolume = m_MasterMusicVolume * REDSOUND_MASTER_VOLUME_SCALE;
-        m_MasterMusicVolume = m_MasterMusicVolume - 1;
+    RedMasterMusicVolumeSet(command[REDSOUND_MASTER_VOLUME_COMMAND_VOLUME] & REDSOUND_COMMAND_VALUE_MASK);
+    if (RedMasterMusicVolumeGet() != 0) {
+        RedMasterMusicVolumeSet(RedMasterMusicVolumeGet() + 1);
+        RedMasterMusicVolumeSet(RedMasterMusicVolumeGet() * REDSOUND_MASTER_VOLUME_SCALE);
+        RedMasterMusicVolumeSet(RedMasterMusicVolumeGet() - 1);
     }
     voice = RedVoiceDataGetBegin();
     do {
@@ -1353,11 +1353,11 @@ static void _SeMasterVolume(int* command)
 {
     RedVoiceDATA* voice;
 
-    m_MasterSEVolume = command[REDSOUND_MASTER_VOLUME_COMMAND_VOLUME] & REDSOUND_COMMAND_VALUE_MASK;
-    if (m_MasterSEVolume != 0) {
-        m_MasterSEVolume = m_MasterSEVolume + 1;
-        m_MasterSEVolume = m_MasterSEVolume * REDSOUND_MASTER_VOLUME_SCALE;
-        m_MasterSEVolume = m_MasterSEVolume - 1;
+    RedMasterSEVolumeSet(command[REDSOUND_MASTER_VOLUME_COMMAND_VOLUME] & REDSOUND_COMMAND_VALUE_MASK);
+    if (RedMasterSEVolumeGet() != 0) {
+        RedMasterSEVolumeSet(RedMasterSEVolumeGet() + 1);
+        RedMasterSEVolumeSet(RedMasterSEVolumeGet() * REDSOUND_MASTER_VOLUME_SCALE);
+        RedMasterSEVolumeSet(RedMasterSEVolumeGet() - 1);
     }
     voice = RedVoiceDataGetBegin();
     do {
@@ -2157,8 +2157,8 @@ void CRedDriver::Init()
     RedMusicFastSpeedSet(0);
     m_DMAStatus = REDSOUND_DMA_STATUS_IDLE;
     RedCrossTimeClear();
-    m_MasterSEVolume = REDSOUND_MASTER_VOLUME_FULL;
-    m_MasterMusicVolume = REDSOUND_MASTER_VOLUME_FULL;
+    RedMasterSEVolumeSet(REDSOUND_MASTER_VOLUME_FULL);
+    RedMasterMusicVolumeSet(REDSOUND_MASTER_VOLUME_FULL);
     index = 0;
     do {
         nextIndex = index + 1;

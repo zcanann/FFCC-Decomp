@@ -287,7 +287,11 @@ extern int m_CrossTime;
 #define RedCrossTimeClear() RedCrossTimeSet(0)
 #define RedCrossTimeIsActive() (RedCrossTimeGet() != 0)
 extern volatile int m_MasterMusicVolume;
+#define RedMasterMusicVolumeGet() (m_MasterMusicVolume)
+#define RedMasterMusicVolumeSet(volume) (m_MasterMusicVolume = (volume))
 extern volatile int m_MasterSEVolume;
+#define RedMasterSEVolumeGet() (m_MasterSEVolume)
+#define RedMasterSEVolumeSet(volume) (m_MasterSEVolume = (volume))
 extern RedStreamDATA* volatile p_Stream;
 #define RedStreamDataGetBegin() (p_Stream)
 #define RedStreamDataGetEnd() (p_Stream + REDSOUND_STREAM_COUNT)

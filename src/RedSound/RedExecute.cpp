@@ -2127,12 +2127,12 @@ static void _KeyOnControl()
                                 volume = (volume * (soundControl->m_masterVolume >> REDSOUND_FIXED_SHIFT)) >>
                                          REDSOUND_CONTROL_MASTER_VOLUME_SCALE_SHIFT;
                             }
-                            volume = (volume * m_MasterMusicVolume) >> REDSOUND_CONTROL_MASTER_VOLUME_SCALE_SHIFT;
+                            volume = (volume * RedMasterMusicVolumeGet()) >> REDSOUND_CONTROL_MASTER_VOLUME_SCALE_SHIFT;
                         } else {
                             volume = 0;
                         }
                     } else {
-                        volume = m_MasterSEVolume;
+                        volume = RedMasterSEVolumeGet();
                         if ((soundControl[REDSOUND_CONTROL_MUSIC_SECONDARY].m_tracks <= trackData) &&
                             (trackData <
                              soundControl[REDSOUND_CONTROL_MUSIC_SECONDARY].m_tracks +
@@ -2150,7 +2150,7 @@ static void _KeyOnControl()
                                                REDSOUND_FIXED_SHIFT)) >>
                                              REDSOUND_CONTROL_MASTER_VOLUME_SCALE_SHIFT;
                                 }
-                                volume = (volume * m_MasterMusicVolume) >>
+                                volume = (volume * RedMasterMusicVolumeGet()) >>
                                          REDSOUND_CONTROL_MASTER_VOLUME_SCALE_SHIFT;
                             } else {
                                 volume = 0;

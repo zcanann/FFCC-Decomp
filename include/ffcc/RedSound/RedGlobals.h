@@ -265,6 +265,9 @@ extern volatile int m_MusicSkipLine;
 #define RedMusicSkipLineIsActive() (RedMusicSkipLineGet() != 0)
 #define RedMusicSkipLineIsComplete() (RedMusicSkipLineGet() <= 0)
 extern int m_MusicKeySignature;
+#define RedMusicKeySignatureGet() (m_MusicKeySignature)
+#define RedMusicKeySignatureSet(enabled) (m_MusicKeySignature = (enabled))
+#define RedMusicKeySignatureIsEnabled() (RedMusicKeySignatureGet() != 0)
 extern int* volatile p_MusicReplayPoint;
 #define RedMusicReplayPointGetBegin() (p_MusicReplayPoint)
 #define RedMusicReplayPointGet(index) (p_MusicReplayPoint + (index))

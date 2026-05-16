@@ -1061,7 +1061,7 @@ static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* wav
 		track->m_deltaTime = DeltaTimeSumup((unsigned char**)&track->m_command) + 1;
 		track->m_seSepId = REDSOUND_TRACK_SESEP_ID_NONE;
 		signed char* keySignatureData;
-		if (m_MusicKeySignature != 0) {
+		if (RedMusicKeySignatureIsEnabled()) {
 			keySignatureData = RedKeySignatureGetDefaultData();
 		} else {
 			keySignatureData = 0;

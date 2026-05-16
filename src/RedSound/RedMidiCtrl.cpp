@@ -1307,7 +1307,7 @@ static void __MidiCtrl_KeySignature(RedSoundCONTROL* control, RedKeyOnDATA*, Red
     value = RedKeySignatureIndexGet(value);
     control->m_keySignatureData = RedKeySignatureDataGet(value);
 
-    if (m_MusicKeySignature != 0) {
+    if (RedMusicKeySignatureIsEnabled()) {
         scan = control->m_tracks;
         do {
             scan->m_keySignatureData = control->m_keySignatureData;

@@ -25,6 +25,27 @@ static const float FLOAT_80332fe8 = 128.0f;
 static const float FLOAT_80332fec = 8.0f;
 static const float FLOAT_80332ff0 = 0.75f;
 
+extern "C" {
+extern const float FLOAT_80333448 = -1.0f;
+extern const float FLOAT_8033344c = 1.2f;
+extern const float FLOAT_80333450 = 10000000000.0f;
+extern const float FLOAT_80333454 = -10000000000.0f;
+extern const float FLOAT_80333458 = 15.5f;
+extern const float FLOAT_8033345c = 6.2831855f;
+const char s_MenuOptionMusic[] = "Music";
+const char s_MenuOptionOn[] = "On";
+const char s_MenuOptionOff[] = "Off";
+const char s_MenuOptionStereo[] = "Stereo";
+const char s_MenuOptionMin[] = "Min";
+const char s_MenuOptionMax[] = "Max";
+const char s_MenuOptionStrengthDe[] = {'S', 't', '\xe4', 'r', 'k', 'e', '\0', '\0'};
+const char s_MenuOptionDefenceDe[] = "Abwehr";
+const char s_MenuOptionMusicDe[] = "Musik";
+const char s_MenuOptionOnDe[] = "AN";
+const char s_MenuOptionOffDe[] = "AUS";
+const char s_MenuOptionStereoDe[] = "STEREO";
+}
+
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 extern "C" void SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(CMenuPcs*, int);
 extern "C" void SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(CMenuPcs*, int);

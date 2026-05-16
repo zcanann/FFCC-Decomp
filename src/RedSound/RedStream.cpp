@@ -255,7 +255,7 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 			voice->m_envelopeLevel = REDSOUND_ENVELOPE_LEVEL_FULL;
 			voice->m_waveData = &streamData->m_trackData[channel];
 			voice->m_targetPitch = pitch;
-			voice->m_track->m_reverbDepth = p_ReverbDepth[REDSOUND_REVERB_DEPTH_SE].m_depth;
+			voice->m_track->m_reverbDepth = RedReverbDepthGet(REDSOUND_REVERB_DEPTH_SE)->m_depth;
 			voice->m_track->m_reverbDepthDelta = 0;
 			if (streamData->m_header.m_channelCount == REDSOUND_STREAM_STEREO_CHANNEL_COUNT) {
 				if (channel == REDSOUND_STREAM_LEFT_CHANNEL) {

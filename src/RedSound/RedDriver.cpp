@@ -843,7 +843,7 @@ static void _SetReverbDepth(int* command)
         reverbDepth -= 1;
         reverbDepth <<= REDSOUND_FIXED_SHIFT;
     }
-    p_ReverbDepth[reverbBank].m_depth = reverbDepth;
+    RedReverbDepthGet(reverbBank)->m_depth = reverbDepth;
     if (reverbBank != 0) {
         fadeStep = fadeStep * REDSOUND_SE_FADE_TICKS_PER_SECOND;
         fadeStep = fadeStep / REDSOUND_FRAMES_PER_SECOND;
@@ -3711,7 +3711,7 @@ int CRedDriver::PlayWaveItem(int waveNo, int itemNo, int key, int pan, int volum
     p_EditorTrack->m_expression = REDSOUND_VOLUME_DEFAULT;
     p_EditorTrack->m_mixVolume = volume << REDSOUND_FIXED_SHIFT;
     p_EditorTrack->m_pan = pan << REDSOUND_FIXED_SHIFT;
-    p_EditorTrack->m_reverbDepth = p_ReverbDepth[REDSOUND_REVERB_DEPTH_SE].m_depth;
+    p_EditorTrack->m_reverbDepth = RedReverbDepthGet(REDSOUND_REVERB_DEPTH_SE)->m_depth;
     p_EditorTrack->m_portamentPitch = key << REDSOUND_PITCH_BASE_NOTE_SHIFT;
     p_EditorTrack->m_pitchBendRange = REDSOUND_SE_DEFAULT_PITCH_BEND_RANGE;
     p_EditorTrack->m_voiceSwitch = REDSOUND_VOICE_SWITCH_DRY_STEREO;

@@ -108,6 +108,7 @@ enum RedSoundSmallDataOffset {
 // RedSound global linkage that is shared across Red* units.
 CRedDriver c_Driver;
 static int m_StandbyStatus[REDSOUND_STANDBY_STATUS_COUNT];
+#define RedStandbyStatusGet(index) (m_StandbyStatus[(index)])
 #define RedStandbyStatusGetEnd() (m_StandbyStatus + REDSOUND_STANDBY_STATUS_COUNT)
 volatile unsigned int m_AutoID;
 static RedSoundStreamBank* p_StreamBank;
@@ -437,7 +438,7 @@ int CRedSound::ReportStandby(int id)
 	if (id == 0) {
 		i = 0;
 		do {
-			if (m_StandbyStatus[i] != 0) {
+			if (RedStandbyStatusGet(i) != 0) {
 				result++;
 				break;
 			}
@@ -446,7 +447,7 @@ int CRedSound::ReportStandby(int id)
 	} else {
 		i = 0;
 		do {
-			if (id == m_StandbyStatus[i]) {
+			if (id == RedStandbyStatusGet(i)) {
 				result++;
 				break;
 			}

@@ -3483,7 +3483,7 @@ int CRedDriver::ReentryWaveData(int id)
  * JP Address: TODO
  * JP Size: TODO
  */
-RedWaveHeadWD* CRedDriver::GetWaveInfo(int waveID)
+inline RedWaveHeadWD* CRedDriver::GetWaveInfo(int waveID)
 {
     return c_RedEntry.SearchWaveBase(waveID);
 }
@@ -3497,7 +3497,7 @@ RedWaveHeadWD* CRedDriver::GetWaveInfo(int waveID)
  * JP Address: TODO
  * JP Size: TODO
  */
-int CRedDriver::CheckWaveEntry(int waveID)
+inline int CRedDriver::CheckWaveEntry(int waveID)
 {
     return c_RedEntry.SearchWaveSequence(waveID);
 }
@@ -3525,7 +3525,7 @@ void CRedDriver::DisplayWaveInfo()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CRedDriver::DisplayMMemoryInfo()
+inline void CRedDriver::DisplayMMemoryInfo()
 {
     c_RedEntry.DisplayMMemoryInfo();
 }
@@ -3553,7 +3553,7 @@ void CRedDriver::SetReverb(int bank, int kind)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CRedDriver::SetReverb(int bank, int kind, int* params)
+inline void CRedDriver::SetReverb(int bank, int kind, int* params)
 {
     ::SetReverb(bank, kind, params);
 }
@@ -3567,7 +3567,7 @@ void CRedDriver::SetReverb(int bank, int kind, int* params)
  * JP Address: TODO
  * JP Size: TODO
  */
-RedReverbSize* CRedDriver::GetReverbInfo()
+inline RedReverbSize* CRedDriver::GetReverbInfo()
 {
     return ::GetReverbInfo();
 }
@@ -3581,7 +3581,7 @@ RedReverbSize* CRedDriver::GetReverbInfo()
  * JP Address: TODO
  * JP Size: TODO
  */
-RedReverbDepth* CRedDriver::GetReverbDepth()
+inline RedReverbDepth* CRedDriver::GetReverbDepth()
 {
     return p_ReverbDepth;
 }
@@ -3595,7 +3595,7 @@ RedReverbDepth* CRedDriver::GetReverbDepth()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CRedDriver::SetMute(unsigned int voiceNo, unsigned int mute)
+inline void CRedDriver::SetMute(unsigned int voiceNo, unsigned int mute)
 {
     if (mute != 0) {
         m_Mute[voiceNo / REDSOUND_MUTE_BITS_PER_WORD] |= 1 << (voiceNo % REDSOUND_MUTE_BITS_PER_WORD);
@@ -3817,7 +3817,7 @@ int CRedDriver::WavePitchCompute(int key, int pitch)
  * JP Address: TODO
  * JP Size: TODO
  */
-RedReverbModeData* CRedDriver::GetReverbModeTable(int mode)
+inline RedReverbModeData* CRedDriver::GetReverbModeTable(int mode)
 {
     mode &= REDSOUND_REVERB_MODE_INDEX_MASK;
     return t_ReverbModeData + mode;

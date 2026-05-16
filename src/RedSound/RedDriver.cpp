@@ -695,6 +695,8 @@ volatile int m_MasterMusicVolume;
 volatile int m_MasterSEVolume;
 RedStreamDATA* volatile p_Stream;
 static int m_DMAMode;
+#define RedDmaModeGet() (m_DMAMode)
+#define RedDmaModeSet(mode) (m_DMAMode = (mode))
 volatile int m_SeSkipStep;
 RedVoiceDATA* volatile p_VoiceData;
 int p_EditorVoice[REDSOUND_EDITOR_VOICE_COUNT];
@@ -1816,7 +1818,7 @@ int RedDmaEntry(int flags, int direction, int mainMemory, int aramMemory, int si
     entryID = GetMyEntryID();
     sizeBytes += REDSOUND_DMA_TRANSFER_ALIGN - 1;
     sizeBytes &= REDSOUND_DMA_TRANSFER_ALIGN_MASK;
-    if ((m_DMAMode != REDSOUND_DMA_MODE_NORMAL) || ((flags & REDSOUND_DMA_FLAG_CHUNKED_TRANSFER) != 0)) {
+    if ((RedDmaModeGet() != REDSOUND_DMA_MODE_NORMAL) || ((flags & REDSOUND_DMA_FLAG_CHUNKED_TRANSFER) != 0)) {
         do {
             if (sizeBytes > REDSOUND_DMA_MAX_CHUNK_SIZE) {
                 chunkSize = REDSOUND_DMA_MAX_CHUNK_SIZE;
@@ -1931,7 +1933,7 @@ void RedDmaClearID(int id)
  */
 inline void RedSetDMAMode(int mode)
 {
-    m_DMAMode = mode;
+    RedDmaModeSet(mode);
 }
 
 /*
@@ -2228,7 +2230,7 @@ void CRedDriver::Init()
     RedMusicPhraseStopClear();
     p_Stream = (RedStreamDATA*)RedNew(REDSOUND_STREAM_BUFFER_SIZE);
     memset(RedStreamDataGetBegin(), 0, REDSOUND_STREAM_BUFFER_SIZE);
-    m_DMAMode = REDSOUND_DMA_MODE_NORMAL;
+    RedDmaModeSet(REDSOUND_DMA_MODE_NORMAL);
     dmaControl = sync.m_dmaQueue;
     memset(dmaControl, 0, REDSOUND_DMA_CONTROL_SIZE);
     p_DmaControlNow[REDSOUND_DMA_MAIN_QUEUE_INDEX] = dmaControl;

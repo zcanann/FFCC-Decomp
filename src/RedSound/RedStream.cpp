@@ -609,7 +609,7 @@ static int _ArrangeStreamDataNoLoop(RedStreamDATA* stream, int bufferIndex, int 
 	bufferIndex &= REDSOUND_STREAM_BUFFER_SIDE_MASK;
 
 	do {
-		dstBuffer = stream->m_buffer + bufferIndex * REDSOUND_STREAM_PAGE_SIZE;
+		dstBuffer = RedStreamBufferGetPage(stream->m_buffer, bufferIndex);
 		voiceData = stream->m_voiceData;
 
 		memcpy(dstBuffer, stream->m_fileData + stream->m_readOffset, REDSOUND_STREAM_PAGE_SIZE);
@@ -681,7 +681,7 @@ static int _ArrangeStreamDataLoop(RedStreamDATA* stream, int bufferIndex, int by
 	
 	if (stream->m_header.m_channelCount == REDSOUND_STREAM_STEREO_CHANNEL_COUNT) {
 		do {
-			dstBase = stream->m_buffer + bufferIndex * REDSOUND_STREAM_PAGE_SIZE;
+			dstBase = RedStreamBufferGetPage(stream->m_buffer, bufferIndex);
 			voiceData = stream->m_voiceData;
 			srcFrame = (RedStreamStereoFrame*)(stream->m_fileData + stream->m_readOffset);
 			rightDst = (RedStreamChannelFrame*)RedStreamBufferGetRightPlane(dstBase);
@@ -753,7 +753,7 @@ static int _ArrangeStreamDataLoop(RedStreamDATA* stream, int bufferIndex, int by
 		} while (0 < byteCount);
 	} else {
 		do {
-			dstBase = stream->m_buffer + bufferIndex * REDSOUND_STREAM_PAGE_SIZE;
+			dstBase = RedStreamBufferGetPage(stream->m_buffer, bufferIndex);
 			voiceData = stream->m_voiceData;
 			memcpy(dstBase, stream->m_fileData + stream->m_readOffset, REDSOUND_STREAM_PAGE_SIZE);
 			stream->m_readOffset = stream->m_readOffset + REDSOUND_STREAM_PAGE_SIZE;

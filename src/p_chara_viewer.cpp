@@ -741,71 +741,33 @@ void CCharaPcs::calcViewer()
  */
 void CCharaPcs::destroyViewer()
 {
-    unsigned char* p = reinterpret_cast<unsigned char*>(this);
-    int* ref;
     unsigned int i;
 
     Destroy__6CCharaFv(&Chara);
     DestroyBumpLightAll__9CLightPcsFQ29CLightPcs6TARGET(&LightPcs, 0);
     gCharaPartWorkPtr = 0;
 
-    ref = *(int**)(p + 0x1A0);
-    if (ref != 0) {
-        if ((--ref[1] == 0) && (ref != 0)) {
-            destroyRef(ref);
-        }
-        *(void**)(p + 0x1A0) = 0;
-    }
+    ReleaseShared(m_viewerSavedAnim);
 
     i = 0;
     do {
-        ref = *(int**)(p + 0x190 + i * 4);
-        if (ref != 0) {
-            if ((--ref[1] == 0) && (ref != 0)) {
-                destroyRef(ref);
-            }
-            *(void**)(p + 0x190 + i * 4) = 0;
-        }
-        ref = *(int**)(p + 0x198 + i * 4);
-        if (ref != 0) {
-            if ((--ref[1] == 0) && (ref != 0)) {
-                destroyRef(ref);
-            }
-            *(void**)(p + 0x198 + i * 4) = 0;
-        }
-        ref = *(int**)(p + 0x2B0 + i * 4);
-        if (ref != 0) {
-            if ((--ref[1] == 0) && (ref != 0)) {
-                destroyRef(ref);
-            }
-            *(void**)(p + 0x2B0 + i * 4) = 0;
-        }
+        ReleaseShared(m_viewerModel[i]);
+        ReleaseShared(m_viewerAnim[i]);
+        ReleaseShared(m_viewerTextureSet[i]);
         i++;
     } while (i < 2);
 
-    ref = *(int**)(p + 0x2B8);
-    if (ref != 0) {
-        if ((--ref[1] == 0) && (ref != 0)) {
-            destroyRef(ref);
-        }
-        *(void**)(p + 0x2B8) = 0;
-    }
+    ReleaseShared(m_viewerBackTextureSet);
 
     i = 0;
     do {
-        ref = *(int**)(p + 0x1B0 + i * 4);
-        if (ref != 0) {
-            if ((--ref[1] == 0) && (ref != 0)) {
-                destroyRef(ref);
-            }
-            *(void**)(p + 0x1B0 + i * 4) = 0;
-        }
+        ReleaseShared(m_viewerAnimBank[i]);
         i++;
     } while (i < 0x40);
 
-    DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, *(void**)(p + 0xCC));
-    DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, *(void**)(p + 0xD0));
-    DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, *(void**)(p + 0xD4));
+    DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, m_viewerModelStage);
+    DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, m_viewerTextureStage);
+    DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, m_viewerAnimStage);
 }
 
 /*

@@ -54,6 +54,11 @@ enum RedMemorySentinel {
 	REDSOUND_MEMORY_ALLOC_MIN_SIZE = 1,
 };
 
+#define RedMemoryBankGetEnd(bank) ((bank) + REDSOUND_MEMORY_BANK_BLOCK_COUNT)
+#define RedMemoryBankGetLast(bank) ((bank) + REDSOUND_MEMORY_BANK_LAST_INDEX)
+#define RedMemoryBankGetTailCount(bank, block)                                                     \
+	(RedMemoryBankGetEnd(bank) - ((block) + REDSOUND_MEMORY_NEXT_BLOCK_INDEX))
+
 class CRedMemory
 {
 public:

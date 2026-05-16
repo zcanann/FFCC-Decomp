@@ -721,11 +721,13 @@ int p_EditorVoice[REDSOUND_EDITOR_VOICE_COUNT];
 RedTrackDATA* p_EditorTrack;
 static u8* volatile p_MainThreadStack;
 #define RedMainThreadStackGet() (p_MainThreadStack)
+#define RedMainThreadStackSet(stack) (p_MainThreadStack = (stack))
 static int m_MainThreadTime;
 #define RedMainThreadTimeGet() (m_MainThreadTime)
 #define RedMainThreadTimeSet(time) (m_MainThreadTime = (time))
 static u8* volatile p_WaveSettingThreadStack;
 #define RedWaveSettingThreadStackGet() (p_WaveSettingThreadStack)
+#define RedWaveSettingThreadStackSet(stack) (p_WaveSettingThreadStack = (stack))
 static int m_WaveSettingStatus;
 #define RedWaveSettingStatusGet() (m_WaveSettingStatus)
 #define RedWaveSettingStatusSet(status) (m_WaveSettingStatus = (status))
@@ -733,12 +735,14 @@ static int m_WaveSettingStatus;
 #define RedWaveSettingStatusIsIdle() (RedWaveSettingStatusGet() == REDSOUND_WORKER_IDLE)
 static u8* volatile p_DmaExecuteThreadStack;
 #define RedDmaExecuteThreadStackGet() (p_DmaExecuteThreadStack)
+#define RedDmaExecuteThreadStackSet(stack) (p_DmaExecuteThreadStack = (stack))
 static volatile int m_DMAStatus;
 #define RedDmaStatusGet() (m_DMAStatus)
 #define RedDmaStatusSet(status) (m_DMAStatus = (status))
 #define RedDmaStatusIsIdle() (RedDmaStatusGet() == REDSOUND_DMA_STATUS_IDLE)
 u8* volatile p_MusicSkipThreadStack;
 #define RedMusicSkipThreadStackGet() (p_MusicSkipThreadStack)
+#define RedMusicSkipThreadStackSet(stack) (p_MusicSkipThreadStack = (stack))
 volatile int m_MusicSkipComplete;
 RedReverbDepth* volatile p_ReverbDepth;
 unsigned int m_Mute[REDSOUND_MUTE_WORD_COUNT];
@@ -2273,26 +2277,26 @@ void CRedDriver::Init()
     AXFXSetHooks(ReverbAreaAlloc, ReverbAreaFree);
     InitReverb();
     OSInitSemaphore(&sync.m_dmaSemaphore, 0);
-    p_DmaExecuteThreadStack = (u8*)RedNew(REDSOUND_THREAD_STACK_SIZE);
+    RedDmaExecuteThreadStackSet((u8*)RedNew(REDSOUND_THREAD_STACK_SIZE));
     OSCreateThread(&sync.m_dmaThread, (void* (*)(void*))_DmaExecuteThread, 0,
                    RedDmaExecuteThreadStackGet() + REDSOUND_THREAD_STACK_SIZE, REDSOUND_THREAD_STACK_SIZE,
                    REDSOUND_DMA_THREAD_PRIORITY, REDSOUND_THREAD_DETACHED);
     OSResumeThread(&sync.m_dmaThread);
     OSInitSemaphore(&sync.m_waveSemaphore, 0);
-    p_WaveSettingThreadStack = (u8*)RedNew(REDSOUND_THREAD_STACK_SIZE);
+    RedWaveSettingThreadStackSet((u8*)RedNew(REDSOUND_THREAD_STACK_SIZE));
     OSCreateThread(&sync.m_waveThread, (void* (*)(void*))_WaveSettingThread, &sync.m_waveSettingData,
                    RedWaveSettingThreadStackGet() + REDSOUND_THREAD_STACK_SIZE, REDSOUND_THREAD_STACK_SIZE,
                    REDSOUND_WORKER_THREAD_PRIORITY, REDSOUND_THREAD_DETACHED);
     OSResumeThread(&sync.m_waveThread);
     OSInitSemaphore(&sync.m_musicSemaphore, 0);
-    p_MusicSkipThreadStack = (u8*)RedNew(REDSOUND_THREAD_STACK_SIZE);
+    RedMusicSkipThreadStackSet((u8*)RedNew(REDSOUND_THREAD_STACK_SIZE));
     OSCreateThread(&sync.m_musicThread, (void* (*)(void*))_MusicSkipThread, 0,
                    RedMusicSkipThreadStackGet() + REDSOUND_THREAD_STACK_SIZE, REDSOUND_THREAD_STACK_SIZE,
                    REDSOUND_WORKER_THREAD_PRIORITY, REDSOUND_THREAD_DETACHED);
     OSResumeThread(&sync.m_musicThread);
     OSInitSemaphore(&sync.m_mainSemaphore, 0);
     RedMainThreadTimeSet(0);
-    p_MainThreadStack = (u8*)RedNew(REDSOUND_THREAD_STACK_SIZE);
+    RedMainThreadStackSet((u8*)RedNew(REDSOUND_THREAD_STACK_SIZE));
     OSCreateThread(&sync.m_mainThread, (void* (*)(void*))_MainThread, 0,
                    RedMainThreadStackGet() + REDSOUND_THREAD_STACK_SIZE, REDSOUND_THREAD_STACK_SIZE,
                    REDSOUND_WORKER_THREAD_PRIORITY, REDSOUND_THREAD_DETACHED);

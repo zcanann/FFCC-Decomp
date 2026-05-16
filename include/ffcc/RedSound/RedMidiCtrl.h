@@ -426,28 +426,25 @@ enum RedSoundControlDefault {
 };
 
 enum RedSoundControlWordOffset {
-	REDSOUND_CONTROL_MEASURE_WORD_OFFSET =
-	    (sizeof(RedTrackDATA*) + REDSOUND_CONTROL_RESERVED04_SIZE + sizeof(signed char*)) / sizeof(int),
+	REDSOUND_CONTROL_MEASURE_WORD_OFFSET = (unsigned int)&(((RedSoundCONTROL*)0)->m_measure) / sizeof(int),
 	REDSOUND_CONTROL_SAVED_COMMAND_WORD_OFFSET =
-	    (REDSOUND_CONTROL_MEASURE_WORD_OFFSET * sizeof(int) + sizeof(RedSoundControlPosition) +
-	     3 * sizeof(int)) /
-	    sizeof(int),
+	    (unsigned int)&(((RedSoundCONTROL*)0)->m_savedTracks.m_command) / sizeof(int),
 	REDSOUND_CONTROL_SAVED_DELTA_WORD_OFFSET =
-	    REDSOUND_CONTROL_SAVED_COMMAND_WORD_OFFSET +
-	    REDSOUND_MUSIC_TRACK_SAVE_COUNT * sizeof(unsigned char*) / sizeof(int),
+	    (unsigned int)&(((RedSoundCONTROL*)0)->m_savedTracks.m_delta) / sizeof(int),
 	REDSOUND_CONTROL_SAVED_FLAGS_WORD_OFFSET =
-	    REDSOUND_CONTROL_SAVED_DELTA_WORD_OFFSET + REDSOUND_MUSIC_TRACK_SAVE_COUNT,
-	REDSOUND_CONTROL_SAVED_NOTE_WORD_OFFSET =
-	    REDSOUND_CONTROL_SAVED_FLAGS_WORD_OFFSET + REDSOUND_MUSIC_TRACK_SAVE_COUNT,
+	    (unsigned int)&(((RedSoundCONTROL*)0)->m_savedTracks.m_flags) / sizeof(int),
+	REDSOUND_CONTROL_SAVED_NOTE_WORD_OFFSET = (unsigned int)&(((RedSoundCONTROL*)0)->m_savedTracks.m_note) / sizeof(int),
 	REDSOUND_CONTROL_SAVED_TEMPO_WORD_OFFSET =
-	    REDSOUND_CONTROL_SAVED_NOTE_WORD_OFFSET + REDSOUND_MUSIC_TRACK_SAVE_COUNT * sizeof(RedNoteDATA) / sizeof(int),
+	    (unsigned int)&(((RedSoundCONTROL*)0)->m_savedTempo) / sizeof(int),
 	REDSOUND_CONTROL_SAVED_ACTIVE_TRACK_COUNT_WORD_OFFSET =
-	    REDSOUND_CONTROL_SAVED_TEMPO_WORD_OFFSET + sizeof(RedSoundControlTempo) / sizeof(int),
-	REDSOUND_CONTROL_SAVED_MEASURE_WORD_OFFSET = REDSOUND_CONTROL_SAVED_ACTIVE_TRACK_COUNT_WORD_OFFSET + 1,
-	REDSOUND_CONTROL_SAVED_TICK_WORD_OFFSET = REDSOUND_CONTROL_SAVED_MEASURE_WORD_OFFSET + 1,
-	REDSOUND_CONTROL_SAVED_TICKS_PER_MEASURE_WORD_OFFSET = REDSOUND_CONTROL_SAVED_TICK_WORD_OFFSET + 1,
-	REDSOUND_CONTROL_TEMPO_WORD_OFFSET =
-	    REDSOUND_CONTROL_SAVED_MEASURE_WORD_OFFSET + sizeof(RedSoundControlPosition) / sizeof(int),
+	    (unsigned int)&(((RedSoundCONTROL*)0)->m_savedActiveTrackCount) / sizeof(int),
+	REDSOUND_CONTROL_SAVED_MEASURE_WORD_OFFSET =
+	    (unsigned int)&(((RedSoundCONTROL*)0)->m_savedPosition.m_measure) / sizeof(int),
+	REDSOUND_CONTROL_SAVED_TICK_WORD_OFFSET =
+	    (unsigned int)&(((RedSoundCONTROL*)0)->m_savedPosition.m_tick) / sizeof(int),
+	REDSOUND_CONTROL_SAVED_TICKS_PER_MEASURE_WORD_OFFSET =
+	    (unsigned int)&(((RedSoundCONTROL*)0)->m_savedPosition.m_ticksPerMeasure) / sizeof(int),
+	REDSOUND_CONTROL_TEMPO_WORD_OFFSET = (unsigned int)&(((RedSoundCONTROL*)0)->m_tempo) / sizeof(int),
 };
 
 enum RedSoundControlByteOffset {

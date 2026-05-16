@@ -212,13 +212,16 @@ struct RedSeBlockHEAD;
 
 extern RedMidiControlFunc p_MidiControl_Function[REDSOUND_MIDI_CONTROL_FUNCTION_COUNT];
 extern u32 t_TonePitch[REDSOUND_NOTES_PER_OCTAVE];
+#define RedTonePitchGet(index) (t_TonePitch[(index)])
 extern int t_FinePitch[REDSOUND_PITCH_FINE_COUNT];
+#define RedFinePitchGet(index) (t_FinePitch[(index)])
 extern int t_KeySignatureIndex[REDSOUND_KEY_SIGNATURE_INDEX_COUNT];
 #define RedKeySignatureIndexGet(index) (t_KeySignatureIndex[(index)])
 extern signed char t_KeySignatureData[REDSOUND_KEY_SIGNATURE_DATA_COUNT];
 #define RedKeySignatureDataGet(offset) (t_KeySignatureData + (offset))
 #define RedKeySignatureGetDefaultData() (t_KeySignatureData + REDSOUND_KEY_SIGNATURE_DEFAULT_DATA_OFFSET)
 extern signed char t_RandomData[REDSOUND_RANDOM_DATA_COUNT];
+#define RedRandomDataGetAddress(index) (t_RandomData + (index))
 #define RedRandomDataGet(index) (t_RandomData[(index)])
 extern s16 t_PanningData[REDSOUND_PAN_TABLE_COUNT];
 extern s16 t_PanningDataR[REDSOUND_PAN_TABLE_COUNT];

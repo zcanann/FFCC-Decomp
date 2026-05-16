@@ -517,7 +517,7 @@ STATIC_ASSERT(offsetof(AXVPB, pb) + offsetof(AXPB, type) == REDSOUND_AX_VOICE_TY
  */
 u8 GetRandomData()
 {
-	s8* random = &t_RandomData[m_RandomIndex];
+	s8* random = RedRandomDataGetAddress(m_RandomIndex);
 	m_RandomIndex++;
 	return *random;
 }
@@ -550,8 +550,8 @@ int PitchCompute(int basePitch, int pitchOffset, int wavePitch, int fineTune)
     noteBand = (pitch >> REDSOUND_PITCH_NOTE_SHIFT) & REDSOUND_PITCH_NOTE_MASK;
     octaveAdjust += noteBand / REDSOUND_NOTES_PER_OCTAVE;
     noteBand %= REDSOUND_NOTES_PER_OCTAVE;
-    value = t_TonePitch[noteBand] >> (REDSOUND_PITCH_TONE_SHIFT - octaveAdjust);
-    value *= t_FinePitch[pitch & REDSOUND_PITCH_FINE_MASK];
+    value = RedTonePitchGet(noteBand) >> (REDSOUND_PITCH_TONE_SHIFT - octaveAdjust);
+    value *= RedFinePitchGet(pitch & REDSOUND_PITCH_FINE_MASK);
     value >>= REDSOUND_FIXED_SHIFT;
 
     if (fineTune != 0) {

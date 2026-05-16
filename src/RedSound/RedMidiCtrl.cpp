@@ -2294,7 +2294,7 @@ static void __MidiCtrl_TremoloOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* 
 	track->m_tremoloRateDelta = track->m_tremoloDepthDelta = 0;
 	track->m_command += 3;
 
-	voice = p_VoiceData;
+	voice = RedVoiceDataGetBegin();
 	do {
 		if (voice->m_track == track) {
 			divisor = REDSOUND_MIDI_DEFAULT_RATE_DIVISOR;
@@ -2656,7 +2656,7 @@ static void __MidiCtrl_KeyTransposeRelative(RedSoundCONTROL*, RedKeyOnDATA*, Red
  */
 static void _PitchBendCompute(RedTrackDATA* track, int bend)
 {
-    RedVoiceDATA* voiceData = p_VoiceData;
+    RedVoiceDATA* voiceData = RedVoiceDataGetBegin();
 
     do {
         if (voiceData->m_track == track) {

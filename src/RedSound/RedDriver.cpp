@@ -662,6 +662,7 @@ u8* volatile p_ZeroData;
 static RedExecCommand* volatile p_ExecCommand;
 static RedExecCommand* volatile p_ExecCommandNow;
 static RedExecCommand* volatile p_ExecCommandOld;
+#define RedExecCommandGetEnd() (p_ExecCommand + REDSOUND_EXEC_COMMAND_COUNT)
 static RedDmaRequest* volatile p_DmaControlNow[REDSOUND_DMA_QUEUE_COUNT];
 static RedDmaRequest* volatile p_DmaControlOld[REDSOUND_DMA_QUEUE_COUNT];
 RedSoundCONTROL* volatile p_SoundControlBuffer;
@@ -1508,7 +1509,7 @@ static RedExecCommand* _EntryExecCommand(RedExecCommandFunc func, int arg1, int 
     writePos->m_args[REDSOUND_EXEC_COMMAND_ARG5] = arg6;
     writePos->m_args[REDSOUND_EXEC_COMMAND_ARG6] = arg7;
     writePos++;
-    if (writePos == p_ExecCommand + REDSOUND_EXEC_COMMAND_COUNT) {
+    if (writePos == RedExecCommandGetEnd()) {
         writePos = p_ExecCommand;
     }
     p_ExecCommandNow = writePos;
@@ -1538,7 +1539,7 @@ static void _ExecuteCommand()
 			readPos->m_func((int*)readPos->m_args);
 		}
 		readPos++;
-		if (readPos == p_ExecCommand + REDSOUND_EXEC_COMMAND_COUNT) {
+		if (readPos == RedExecCommandGetEnd()) {
 			readPos = p_ExecCommand;
 		}
 	}
@@ -2463,7 +2464,7 @@ inline int CRedDriver::MusicPlayState(int musicID)
                 break;
             }
             command++;
-            if (command == p_ExecCommand + REDSOUND_EXEC_COMMAND_COUNT) {
+            if (command == RedExecCommandGetEnd()) {
                 command = p_ExecCommand;
             }
         }
@@ -2955,7 +2956,7 @@ int CRedDriver::SePlayState(int seID)
                 break;
             }
             command++;
-            if (command == p_ExecCommand + REDSOUND_EXEC_COMMAND_COUNT) {
+            if (command == RedExecCommandGetEnd()) {
                 command = p_ExecCommand;
             }
         }
@@ -3305,7 +3306,7 @@ int CRedDriver::StreamPlayState(int streamID)
 				break;
 			}
 			command++;
-			if (command == p_ExecCommand + REDSOUND_EXEC_COMMAND_COUNT) {
+			if (command == RedExecCommandGetEnd()) {
 				command = p_ExecCommand;
 			}
 		}

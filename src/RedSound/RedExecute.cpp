@@ -154,6 +154,7 @@ s16 t_PanningDataR[REDSOUND_PAN_TABLE_COUNT] = {
 
 static volatile u8 m_RandomIndex;
 static RedReverbDATA* volatile p_ReverbData;
+#define RedReverbDataGetBegin() (p_ReverbData)
 #define RedReverbDataGet(bank) (p_ReverbData + ((bank) & REDSOUND_REVERB_BANK_MASK))
 static RedReverbSize* p_ReverbSize;
 #define RedReverbSizeGet() (p_ReverbSize)
@@ -626,7 +627,7 @@ void ReverbAreaFree(void* area)
 void InitReverb()
 {
     p_ReverbData = (RedReverbDATA*)RedNew(REDSOUND_REVERB_DATA_BUFFER_SIZE);
-    memset(p_ReverbData, 0, REDSOUND_REVERB_DATA_BUFFER_SIZE);
+    memset(RedReverbDataGetBegin(), 0, REDSOUND_REVERB_DATA_BUFFER_SIZE);
     p_ReverbSize = (RedReverbSize*)RedNew(REDSOUND_REVERB_SIZE_ALLOC_SIZE);
 }
 

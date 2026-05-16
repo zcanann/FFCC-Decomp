@@ -110,6 +110,7 @@ enum RedSoundSmallDataOffset {
 // RedSound global linkage that is shared across Red* units.
 CRedDriver c_Driver;
 static int m_StandbyStatus[REDSOUND_STANDBY_STATUS_COUNT];
+#define RedStandbyStatusGetBegin() (m_StandbyStatus)
 #define RedStandbyStatusGet(index) (m_StandbyStatus[(index)])
 #define RedStandbyStatusGetEnd() (m_StandbyStatus + REDSOUND_STANDBY_STATUS_COUNT)
 volatile unsigned int m_AutoID;
@@ -285,7 +286,7 @@ unsigned int CRedSound::GetAutoID()
  */
 int* CRedSound::EntryStandbyID(int id)
 {
-	int* slot = m_StandbyStatus;
+	int* slot = RedStandbyStatusGetBegin();
 	do {
 		if (*slot == 0) {
 			*slot = id;
@@ -307,7 +308,7 @@ int* CRedSound::EntryStandbyID(int id)
  */
 int CRedSound::Init(void* mainBuffer, int mainBufferSize, int aramBuffer, int aramBufferSize)
 {
-	memset(m_StandbyStatus, 0, REDSOUND_STANDBY_STATUS_SIZE);
+	memset(RedStandbyStatusGetBegin(), 0, REDSOUND_STANDBY_STATUS_SIZE);
 
 	if (mainBufferSize > 0 && aramBufferSize > 0) {
 		if ((((u32)mainBuffer & REDSOUND_MEMORY_BANK_ALIGN_MASK) != 0) ||

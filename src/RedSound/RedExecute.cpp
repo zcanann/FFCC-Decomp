@@ -937,7 +937,7 @@ RedVoiceDATA* EntryVoiceSearch(RedTrackDATA* track)
         }
 
         bestEnvelope = REDSOUND_ENVELOPE_LEVEL_FULL;
-        voiceEnd = p_VoiceData + REDSOUND_VOICE_COUNT;
+        voiceEnd = RedVoiceDataGetEnd();
         do {
             if ((voice->m_stateFlags & REDSOUND_VOICE_STATE_PLAYING_MASK) == 0) {
                 if (voice->m_envelopeLevel < 1) {
@@ -992,7 +992,7 @@ static void _VoiceEnvelopeCheck()
             voiceData->m_envelopeLevel = REDSOUND_ENVELOPE_LEVEL_FULL;
         }
         voiceData++;
-    } while (voiceData < p_VoiceData + REDSOUND_VOICE_COUNT);
+    } while (voiceData < RedVoiceDataGetEnd());
 }
 
 /*
@@ -1569,9 +1569,9 @@ static RedVoiceDATA* _VoiceDataSelect(RedTrackDATA* track, RedNoteDATA* note, in
                 break;
             }
             voiceData++;
-        } while (voiceData < p_VoiceData + REDSOUND_VOICE_COUNT);
+        } while (voiceData < RedVoiceDataGetEnd());
 
-        if (!(voiceData < p_VoiceData + REDSOUND_VOICE_COUNT)) {
+        if (!(voiceData < RedVoiceDataGetEnd())) {
             voiceData = EntryVoiceSearch(track);
         }
     } else {
@@ -1636,7 +1636,7 @@ void SetVoiceAccess(RedTrackDATA* track, int mask)
             voiceData->m_flags |= mask;
         }
         voiceData++;
-    } while (voiceData < p_VoiceData + REDSOUND_VOICE_COUNT);
+    } while (voiceData < RedVoiceDataGetEnd());
 }
 
 /*
@@ -1656,7 +1656,7 @@ void SetVoiceSwitch(RedTrackDATA* track, int voiceSwitch)
             voiceData->m_voiceSwitch = voiceSwitch;
         }
         voiceData++;
-    } while (voiceData < p_VoiceData + REDSOUND_VOICE_COUNT);
+    } while (voiceData < RedVoiceDataGetEnd());
 }
 
 /*
@@ -1813,7 +1813,7 @@ static void _VoiceDropedCallback(void* dropped)
             voiceData->m_axVoice = REDSOUND_AX_VOICE_NONE;
         }
         voiceData++;
-    } while (voiceData < p_VoiceData + REDSOUND_VOICE_COUNT);
+    } while (voiceData < RedVoiceDataGetEnd());
 }
 
 /*
@@ -2009,7 +2009,7 @@ void EnvelopeKeyExecute()
         voiceData->m_flags &= REDSOUND_VOICE_FLAGS_EXECUTE_KEEP_MASK;
         voiceIndex++;
         voiceData++;
-    } while (voiceData < p_VoiceData + REDSOUND_VOICE_COUNT);
+    } while (voiceData < RedVoiceDataGetEnd());
 }
 
 /*
@@ -2165,7 +2165,7 @@ static void _KeyOnControl()
                 voice->m_updateFlags = 0;
             }
             voice++;
-        } while (voice < p_VoiceData + REDSOUND_VOICE_COUNT);
+        } while (voice < RedVoiceDataGetEnd());
     }
 
     {
@@ -2229,7 +2229,7 @@ static void _ExecuteExtraData()
                         voice->m_updateFlags |= REDSOUND_VOICE_UPDATE_VOLUME;
                     }
                     voice++;
-                } while (voice < p_VoiceData + REDSOUND_VOICE_COUNT);
+                } while (voice < RedVoiceDataGetEnd());
             }
         }
         soundControl++;
@@ -2255,7 +2255,7 @@ static void _ExecuteExtraData()
                 voice->m_updateFlags |= REDSOUND_VOICE_UPDATE_PITCH;
             }
             voice++;
-        } while (voice < p_VoiceData + REDSOUND_VOICE_COUNT);
+        } while (voice < RedVoiceDataGetEnd());
     }
 
     do {
@@ -2277,7 +2277,7 @@ static void _ExecuteExtraData()
                                 voice->m_updateFlags |= REDSOUND_VOICE_UPDATE_VOLUME;
                             }
                             voice++;
-                        } while (voice < p_VoiceData + REDSOUND_VOICE_COUNT);
+                        } while (voice < RedVoiceDataGetEnd());
                     }
                     track++;
                 } while (track < soundControl->m_tracks + soundControl->m_trackCount);
@@ -2377,7 +2377,7 @@ static void _MusicTrackDataExecute(RedTrackDATA* track, int frames)
                 }
             }
             voiceData++;
-        } while (voiceData < p_VoiceData + REDSOUND_VOICE_COUNT);
+        } while (voiceData < RedVoiceDataGetEnd());
     }
 
     if (track->m_vibrateFunc != 0) {
@@ -2473,7 +2473,7 @@ static void _MusicTrackDataExecute(RedTrackDATA* track, int frames)
             voiceData->m_updateFlags |= updateFlags;
         }
         voiceData++;
-    } while (voiceData < p_VoiceData + REDSOUND_VOICE_COUNT);
+    } while (voiceData < RedVoiceDataGetEnd());
 }
 
 /*
@@ -2552,7 +2552,7 @@ static void _MidiTrackExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData,
                         voice->m_updateFlags = m_ChangeStatus;
                     }
                     voice++;
-                } while (voice < p_VoiceData + REDSOUND_VOICE_COUNT);
+                } while (voice < RedVoiceDataGetEnd());
             }
         }
         track++;

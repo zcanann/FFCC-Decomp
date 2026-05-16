@@ -123,7 +123,7 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 	u32 count;
 	s32 i;
 	u8 alphaStep;
-	int alphaMax;
+	u8 alphaMax;
 	float negHalfWidth;
 	float length;
 	float halfWidth;
@@ -244,11 +244,11 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 		}
 
 		GXLoadPosMtxImm(ppvCameraMatrix, GX_PNMTX0);
-		alphaMax = step->m_payload[0x2b];
-		alphaStep = (u8)((s32)(u8)alphaMax / (s32)step->m_payload[0x1e]);
-		color.r = step->m_payload[0x28];
-		color.g = step->m_payload[0x29];
-		color.b = step->m_payload[0x2a];
+		alphaMax = step->m_laser.m_trailAlpha;
+		alphaStep = (u8)((s32)alphaMax / (s32)step->m_laser.m_pointCount);
+		color.r = step->m_laser.m_trailColorR;
+		color.g = step->m_laser.m_trailColorG;
+		color.b = step->m_laser.m_trailColorB;
 		color.a = alphaMax;
 		GXBegin(GX_TRIANGLES, GX_VTXFMT7, (u16)((step->m_laser.m_pointCount - 1) * 3));
 		int alpha = 0;

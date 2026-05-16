@@ -682,6 +682,7 @@ RedControlRamp* volatile p_MusicTempoControl;
 RedControlRamp* volatile p_MusicPitchControl;
 int m_MusicPhraseStop;
 static RedMusicPlayCommand* volatile p_MusicNextPlay;
+#define RedMusicNextPlayGet() (p_MusicNextPlay)
 int m_CrossTime;
 volatile int m_MasterMusicVolume;
 volatile int m_MasterSEVolume;
@@ -911,10 +912,10 @@ static void _MusicStop(int* command)
 {
     MusicStop(command[REDSOUND_MUSIC_COMMAND_ID]);
     if ((command[REDSOUND_MUSIC_COMMAND_ID] == REDSOUND_MUSIC_ID_NONE) ||
-        (p_MusicNextPlay->m_musicId == command[REDSOUND_MUSIC_COMMAND_ID])) {
-        p_MusicNextPlay->m_musicId = REDSOUND_MUSIC_ID_NONE;
+        (RedMusicNextPlayGet()->m_musicId == command[REDSOUND_MUSIC_COMMAND_ID])) {
+        RedMusicNextPlayGet()->m_musicId = REDSOUND_MUSIC_ID_NONE;
     }
-    if (p_MusicNextPlay->m_musicId < REDSOUND_MUSIC_ID_MIN) {
+    if (RedMusicNextPlayGet()->m_musicId < REDSOUND_MUSIC_ID_MIN) {
         m_MusicPhraseStop = REDSOUND_MUSIC_PHRASE_STOP_OFF;
     }
 }
@@ -1047,9 +1048,9 @@ static void _MusicNextPlaySequence(int* command)
         return;
     }
     if (c_RedEntry.SearchMusicSequence(command[REDSOUND_MUSIC_COMMAND_ID]) >= 0) {
-        p_MusicNextPlay->m_musicId = command[REDSOUND_MUSIC_COMMAND_ID];
-        p_MusicNextPlay->m_volume = command[REDSOUND_MUSIC_COMMAND_VOLUME];
-        p_MusicNextPlay->m_mode = command[REDSOUND_MUSIC_COMMAND_MODE];
+        RedMusicNextPlayGet()->m_musicId = command[REDSOUND_MUSIC_COMMAND_ID];
+        RedMusicNextPlayGet()->m_volume = command[REDSOUND_MUSIC_COMMAND_VOLUME];
+        RedMusicNextPlayGet()->m_mode = command[REDSOUND_MUSIC_COMMAND_MODE];
     }
 }
 
@@ -1091,7 +1092,7 @@ static void _MusicMasterVolume(int* command)
 static void _MusicVolume(int* command)
 {
     if (command[REDSOUND_MUSIC_COMMAND_STOP_NEXT] == REDSOUND_MUSIC_VOLUME_MODE_FADE_OUT) {
-        p_MusicNextPlay->m_musicId = REDSOUND_MUSIC_ID_NONE;
+        RedMusicNextPlayGet()->m_musicId = REDSOUND_MUSIC_ID_NONE;
         m_MusicPhraseStop = REDSOUND_MUSIC_PHRASE_STOP_OFF;
     }
     SetMusicVolume(command[REDSOUND_MUSIC_COMMAND_ID], command[REDSOUND_MUSIC_COMMAND_VOLUME],
@@ -1676,10 +1677,10 @@ static int _MainThread(void*)
             MainControl(elapsed);
             StreamControl();
             _ExecuteCommand();
-            if ((p_MusicNextPlay->m_musicId >= REDSOUND_MUSIC_ID_MIN) &&
+            if ((RedMusicNextPlayGet()->m_musicId >= REDSOUND_MUSIC_ID_MIN) &&
                 (control->m_musicId < REDSOUND_MUSIC_ID_MIN)) {
-                _MusicPlaySequence((int*)p_MusicNextPlay);
-                p_MusicNextPlay->m_musicId = REDSOUND_MUSIC_ID_NONE;
+                _MusicPlaySequence((int*)RedMusicNextPlayGet());
+                RedMusicNextPlayGet()->m_musicId = REDSOUND_MUSIC_ID_NONE;
                 m_MusicPhraseStop = REDSOUND_MUSIC_PHRASE_STOP_OFF;
             }
             while (OSTryWaitSemaphore(&m_MainSemaphore) > 0) {
@@ -2212,7 +2213,7 @@ void CRedDriver::Init()
     mute[REDSOUND_MUTE_HIGH_WORD] = 0;
     mute[REDSOUND_MUTE_LOW_WORD] = 0;
     p_MusicNextPlay = (RedMusicPlayCommand*)RedNew(REDSOUND_MUSIC_NEXT_PLAY_BUFFER_SIZE);
-    p_MusicNextPlay->m_musicId = REDSOUND_MUSIC_ID_NONE;
+    RedMusicNextPlayGet()->m_musicId = REDSOUND_MUSIC_ID_NONE;
     m_MusicPhraseStop = REDSOUND_MUSIC_PHRASE_STOP_OFF;
     p_Stream = (RedStreamDATA*)RedNew(REDSOUND_STREAM_BUFFER_SIZE);
     memset(p_Stream, 0, REDSOUND_STREAM_BUFFER_SIZE);
@@ -2448,8 +2449,8 @@ inline int CRedDriver::MusicPlayState(int musicID)
     } else if ((musicID == REDSOUND_MUSIC_ID_NONE) ||
                (soundControl[REDSOUND_CONTROL_MUSIC_SKIP].m_musicId == musicID)) {
         result = 1;
-    } else if ((p_MusicNextPlay->m_musicId >= REDSOUND_MUSIC_ID_MIN) &&
-               ((musicID == REDSOUND_MUSIC_ID_NONE) || (p_MusicNextPlay->m_musicId == musicID))) {
+    } else if ((RedMusicNextPlayGet()->m_musicId >= REDSOUND_MUSIC_ID_MIN) &&
+               ((musicID == REDSOUND_MUSIC_ID_NONE) || (RedMusicNextPlayGet()->m_musicId == musicID))) {
         result = 1;
     }
 

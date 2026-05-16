@@ -67,6 +67,7 @@ enum RedStreamReadPointIndex {
 };
 
 #define RedStreamReadPointGet(readPoint, index) ((readPoint)[(index)])
+#define RedStreamReadPointSet(readPoint, index, point) ((readPoint)[(index)] = (point))
 
 struct RedSoundBssState {
 	u8 m_globalInitWork[REDSOUND_GLOBAL_INIT_WORK_SIZE];
@@ -1530,8 +1531,8 @@ inline void CRedSound::GetStreamReadPoint(int streamId, int* readPoint)
 	RedSoundStreamBank* bank = _SearchStreamBank(streamId);
 
 	if (readPoint != 0) {
-		RedStreamReadPointGet(readPoint, REDSOUND_STREAM_READ_POINT_READ) = 0;
-		RedStreamReadPointGet(readPoint, REDSOUND_STREAM_READ_POINT_PLAY) = 0;
+		RedStreamReadPointSet(readPoint, REDSOUND_STREAM_READ_POINT_READ, 0);
+		RedStreamReadPointSet(readPoint, REDSOUND_STREAM_READ_POINT_PLAY, 0);
 	}
 
 	if (bank != 0) {
@@ -1546,17 +1547,17 @@ inline void CRedSound::GetStreamReadPoint(int streamId, int* readPoint)
 				} else {
 					delta = bank->m_fileSize - bank->m_readPoint + currentReadPoint;
 				}
-				RedStreamReadPointGet(readPoint, REDSOUND_STREAM_READ_POINT_READ) = delta;
+				RedStreamReadPointSet(readPoint, REDSOUND_STREAM_READ_POINT_READ, delta);
 				if (playPoint >= bank->m_playPoint) {
-					RedStreamReadPointGet(readPoint, REDSOUND_STREAM_READ_POINT_PLAY) = playPoint - bank->m_playPoint;
+					RedStreamReadPointSet(readPoint, REDSOUND_STREAM_READ_POINT_PLAY, playPoint - bank->m_playPoint);
 				}
 			}
 			bank->m_readPoint = currentReadPoint;
 			bank->m_playPoint = playPoint;
 		} else {
 			if (readPoint != 0) {
-				RedStreamReadPointGet(readPoint, REDSOUND_STREAM_READ_POINT_READ) = bank->m_fileSize - bank->m_readPoint;
-				RedStreamReadPointGet(readPoint, REDSOUND_STREAM_READ_POINT_PLAY) = bank->m_fileSize - bank->m_playPoint;
+				RedStreamReadPointSet(readPoint, REDSOUND_STREAM_READ_POINT_READ, bank->m_fileSize - bank->m_readPoint);
+				RedStreamReadPointSet(readPoint, REDSOUND_STREAM_READ_POINT_PLAY, bank->m_fileSize - bank->m_playPoint);
 			}
 			bank->m_streamId = REDSOUND_STREAM_ID_NONE;
 			bank->m_streamData = REDSOUND_STREAM_BANK_DATA_NONE;

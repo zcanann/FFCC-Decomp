@@ -660,6 +660,8 @@ static volatile int m_ThreadControl;
 static volatile int m_ThreadExecute;
 static int m_SoundMode;
 static RedTickHistory* volatile p_Tick;
+#define RedTickHistoryGet() (p_Tick)
+#define RedTickHistoryGetTicks() (RedTickHistoryGet()->m_ticks)
 u8* volatile p_ZeroData;
 static RedExecCommand* volatile p_ExecCommand;
 static RedExecCommand* volatile p_ExecCommandNow;
@@ -1685,9 +1687,9 @@ static int _MainThread(void*)
             }
             while (OSTryWaitSemaphore(&m_MainSemaphore) > 0) {
             }
-            memmove(p_Tick->m_ticks + 1, p_Tick->m_ticks, REDSOUND_TICK_HISTORY_SHIFT_SIZE);
+            memmove(RedTickHistoryGetTicks() + 1, RedTickHistoryGetTicks(), REDSOUND_TICK_HISTORY_SHIFT_SIZE);
             endTick = OSGetTick();
-            p_Tick->m_ticks[REDSOUND_TICK_HISTORY_LATEST] = endTick - startTick;
+            RedTickHistoryGetTicks()[REDSOUND_TICK_HISTORY_LATEST] = endTick - startTick;
         }
     }
     m_ThreadExecute = m_ThreadExecute & ~REDSOUND_THREAD_FLAG_MAIN;
@@ -2293,12 +2295,12 @@ void CRedDriver::End()
 int CRedDriver::GetProgramTime()
 {
     int sum = 0;
-    int* p = p_Tick->m_ticks;
+    int* p = RedTickHistoryGetTicks();
 
     do {
         sum += *p;
         p++;
-    } while (p < p_Tick->m_ticks + REDSOUND_TICK_HISTORY_COUNT);
+    } while (p < RedTickHistoryGetTicks() + REDSOUND_TICK_HISTORY_COUNT);
     return sum;
 }
 

@@ -2168,7 +2168,7 @@ static void _KeyOnControl()
 
     {
         bit = 1;
-        voice = p_VoiceData;
+        voice = RedVoiceDataGetBegin();
         do {
             if ((voiceStartMask[REDSOUND_VOICE_START_MASK_LOW] & bit) != 0) {
                 voiceStartMask[REDSOUND_VOICE_START_MASK_LOW] &= ~bit;
@@ -2220,7 +2220,7 @@ static void _ExecuteExtraData()
 
             if (soundControl->m_tracks != 0) {
                 musicBase = soundControl->m_tracks;
-                voice = p_VoiceData;
+                voice = RedVoiceDataGetBegin();
                 do {
                     if ((voice->m_track >= musicBase) &&
                         (voice->m_track < musicBase + soundControl->m_trackCount)) {
@@ -2243,7 +2243,7 @@ static void _ExecuteExtraData()
     if (p_MusicPitchControl->m_count != 0) {
         p_MusicPitchControl->m_count--;
         p_MusicPitchControl->m_value += p_MusicPitchControl->m_step;
-        voice = p_VoiceData;
+        voice = RedVoiceDataGetBegin();
         do {
             if ((voice->m_stateFlags & REDSOUND_VOICE_STATE_PLAYING_MASK) == 0) {
                 int pitchOffset = (int)voice->m_track->m_keyTranspose + (int)voice->m_track->m_pitchBend;
@@ -2269,7 +2269,7 @@ static void _ExecuteExtraData()
                 track = soundControl->m_tracks;
                 do {
                     if (track->m_command != REDSOUND_TRACK_COMMAND_NONE) {
-                        voice = p_VoiceData;
+                        voice = RedVoiceDataGetBegin();
                         do {
                             if (voice->m_track == track) {
                                 voice->m_updateFlags |= REDSOUND_VOICE_UPDATE_VOLUME;
@@ -2363,7 +2363,7 @@ static void _MusicTrackDataExecute(RedTrackDATA* track, int frames)
         addPitch = step * track->m_sweepAdd;
         track->m_portamentPitch += addPitch;
 
-        voiceData = p_VoiceData;
+        voiceData = RedVoiceDataGetBegin();
         do {
             if (voiceData->m_track == track) {
                 voiceData->m_basePitch += addPitch;
@@ -2424,7 +2424,7 @@ static void _MusicTrackDataExecute(RedTrackDATA* track, int frames)
         }
     }
 
-    voiceData = p_VoiceData;
+    voiceData = RedVoiceDataGetBegin();
     if (track->m_shakeFunc != 0) {
         if (track->m_shakeRateDelta != 0) {
             int step;
@@ -2544,7 +2544,7 @@ static void _MidiTrackExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData,
             }
 
             if (m_ChangeStatus != 0) {
-                RedVoiceDATA* voice = p_VoiceData;
+                RedVoiceDATA* voice = RedVoiceDataGetBegin();
                 do {
                     if (voice->m_track == track) {
                         voice->m_updateFlags = m_ChangeStatus;

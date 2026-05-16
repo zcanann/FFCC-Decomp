@@ -214,7 +214,7 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 		sampleOffset = REDSOUND_STREAM_FILE_AUDIO_OFFSET;
 		streamFile = reinterpret_cast<RedStreamFile*>(streamHeader);
 		headerData = streamFile->m_adpcm;
-		headerData->m_data.pred_scale = (short)((s8*)streamFile)[sampleOffset];
+		headerData->m_data.pred_scale = (short)RedStreamFileGetSampleByte(streamFile, sampleOffset);
 		headerData->m_data.yn1 = headerData->m_data.yn2 = 0;
 		if (streamData->m_header.m_channelCount == REDSOUND_STREAM_STEREO_CHANNEL_COUNT) {
 			if (streamData->m_header.m_loopStart < REDSOUND_STREAM_LOOP_ENABLED_MIN) {
@@ -222,7 +222,8 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 			} else {
 				sampleOffset += REDSOUND_STREAM_STEREO_RIGHT_FRAME_OFFSET;
 			}
-			headerData[REDSOUND_STREAM_RIGHT_CHANNEL].m_data.pred_scale = (short)((s8*)streamFile)[sampleOffset];
+			headerData[REDSOUND_STREAM_RIGHT_CHANNEL].m_data.pred_scale =
+			    (short)RedStreamFileGetSampleByte(streamFile, sampleOffset);
 			headerData[REDSOUND_STREAM_RIGHT_CHANNEL].m_data.yn1 =
 			    headerData[REDSOUND_STREAM_RIGHT_CHANNEL].m_data.yn2 = 0;
 		}

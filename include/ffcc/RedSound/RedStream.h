@@ -89,6 +89,8 @@ struct RedStreamFile {
     u8 m_trailingPadding[REDSOUND_STREAM_FILE_TRAILING_PAD_SIZE];
 };
 
+#define RedStreamFileGetSampleByte(streamFile, offset) ((s8*)(streamFile))[(offset)]
+
 enum RedStreamFileLayoutOffset {
     REDSOUND_STREAM_FILE_HEAD_OFFSET = (unsigned int)&(((RedStreamFile*)0)->m_header),
     REDSOUND_STREAM_FILE_ADPCM_OFFSET = (unsigned int)&(((RedStreamFile*)0)->m_adpcm),

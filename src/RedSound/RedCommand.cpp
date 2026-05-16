@@ -1053,7 +1053,7 @@ static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* wav
 	p_ReverbDepth[REDSOUND_REVERB_DEPTH_MUSIC].m_count = 0;
 	music->m_waveNo = musicHead->m_waveNo;
 
-	RedMusicTrackBlock* current = reinterpret_cast<RedMusicTrackBlock*>(musicHead + 1);
+	RedMusicTrackBlock* current = RedMusicGetTrackBlocks(musicHead);
 	int count = musicHead->m_trackCount;
 	char trackNo = 0;
 	do {

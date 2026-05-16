@@ -223,6 +223,8 @@ enum RedMusicTrackBlockLayout {
 	 ((unsigned int)(block)->m_sizeHi1 << REDSOUND_MUSIC_TRACK_BLOCK_SIZE_HI1_SHIFT) |             \
 	 ((unsigned int)(block)->m_sizeHi2 << REDSOUND_MUSIC_TRACK_BLOCK_SIZE_HI2_SHIFT))
 
+#define RedMusicGetTrackBlocks(musicHead) reinterpret_cast<RedMusicTrackBlock*>((musicHead) + 1)
+
 enum RedMusicHeaderFlag {
 	REDSOUND_MUSIC_HEADER_SIZE = sizeof(RedMusicHEAD),
 	REDSOUND_MUSIC_HEADER_SIGNATURE_OFFSET = (unsigned int)&(((RedMusicHEAD*)0)->m_signature),

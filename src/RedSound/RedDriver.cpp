@@ -3686,7 +3686,7 @@ int CRedDriver::PlayWaveItem(int waveNo, int itemNo, int key, int pan, int volum
  * JP Address: TODO
  * JP Size: TODO
  */
-void CRedDriver::StopWaveItem()
+inline void CRedDriver::StopWaveItem()
 {
     RedVoiceDATA* voice = p_VoiceData;
 

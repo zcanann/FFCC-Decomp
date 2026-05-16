@@ -2041,7 +2041,7 @@ static void _KeyOnControl()
     int bit;
 
     _VoiceEnvelopeCheck();
-    int keyOnEntry = m_KeyOnEntry;
+    int keyOnEntry = RedKeyOnEntryGet();
     voiceStartMask[REDSOUND_VOICE_START_MASK_HIGH] = 0;
     voiceStartMask[REDSOUND_VOICE_START_MASK_LOW] = 0;
 
@@ -2724,7 +2724,7 @@ static void _SkipMusicEntry()
                 dst->m_track = src->m_track;
                 *(int*)&dst->m_note = *(int*)&src->m_note;
                 keyOnEntryCount++;
-                m_KeyOnEntry++;
+                RedKeyOnEntryInc();
             }
             src++;
             dst++;
@@ -2745,7 +2745,7 @@ static void _SkipMusicEntry()
                 *(int*)&dst->m_note = *(int*)&src->m_note;
                 dst++;
                 keyOnEntryCount++;
-                m_KeyOnEntry++;
+                RedKeyOnEntryInc();
             }
             src++;
         }
@@ -2765,7 +2765,7 @@ static void _SkipMusicEntry()
                 *(int*)&dst->m_note = *(int*)&src->m_note;
                 dst++;
                 keyOnEntryCount++;
-                m_KeyOnEntry++;
+                RedKeyOnEntryInc();
             }
             src++;
         }
@@ -3144,7 +3144,7 @@ void MainControl(int frames)
     int step;
 
     _KeyOnControl();
-    m_KeyOnEntry = 0;
+    RedKeyOnEntrySet(0);
     memset(RedKeyOnDataGet(), 0, REDSOUND_KEY_ON_BUFFER_SIZE);
 
     RedCurrentSoundControlSet(RedSoundControlGet(REDSOUND_CONTROL_SE));

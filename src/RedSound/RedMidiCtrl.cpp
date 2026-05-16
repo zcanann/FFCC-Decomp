@@ -642,7 +642,7 @@ void KeyOnReserve(RedKeyOnDATA* keyOnData, RedTrackDATA* track)
         if ((slot->m_track == REDSOUND_TRACK_NONE) || (slot->m_track == track)) {
             slot->m_track = track;
             RedNoteCopy(&slot->m_note, &track->m_note);
-            m_KeyOnEntry++;
+            RedKeyOnEntryInc();
         }
         return;
     }
@@ -653,7 +653,7 @@ void KeyOnReserve(RedKeyOnDATA* keyOnData, RedTrackDATA* track)
             if (slot->m_track == REDSOUND_TRACK_NONE) {
                 slot->m_track = track;
                 RedNoteCopy(&slot->m_note, &track->m_note);
-                m_KeyOnEntry++;
+                RedKeyOnEntryInc();
                 break;
             }
             slot++;
@@ -664,7 +664,7 @@ void KeyOnReserve(RedKeyOnDATA* keyOnData, RedTrackDATA* track)
             if (slot->m_track == REDSOUND_TRACK_NONE) {
                 slot->m_track = track;
                 RedNoteCopy(&slot->m_note, &track->m_note);
-                m_KeyOnEntry++;
+                RedKeyOnEntryInc();
                 break;
             }
             slot++;

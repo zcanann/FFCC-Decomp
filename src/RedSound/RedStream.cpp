@@ -213,7 +213,7 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 	    (streamData->m_aramBuffer != REDSOUND_STREAM_ARAM_BUFFER_NONE)) {
 		sampleOffset = REDSOUND_STREAM_FILE_AUDIO_OFFSET;
 		streamFile = reinterpret_cast<RedStreamFile*>(streamHeader);
-		headerData = streamFile->m_adpcm;
+		headerData = RedStreamFileGetAdpcm(streamFile, REDSOUND_STREAM_LEFT_CHANNEL);
 		headerData->m_data.pred_scale = (short)RedStreamFileGetSampleByte(streamFile, sampleOffset);
 		headerData->m_data.yn1 = headerData->m_data.yn2 = 0;
 		if (streamData->m_header.m_channelCount == REDSOUND_STREAM_STEREO_CHANNEL_COUNT) {
@@ -222,10 +222,10 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 			} else {
 				sampleOffset += REDSOUND_STREAM_STEREO_RIGHT_FRAME_OFFSET;
 			}
-			headerData[REDSOUND_STREAM_RIGHT_CHANNEL].m_data.pred_scale =
+			RedStreamAdpcmHeaderGetChannel(headerData, REDSOUND_STREAM_RIGHT_CHANNEL)->m_data.pred_scale =
 			    (short)RedStreamFileGetSampleByte(streamFile, sampleOffset);
-			headerData[REDSOUND_STREAM_RIGHT_CHANNEL].m_data.yn1 =
-			    headerData[REDSOUND_STREAM_RIGHT_CHANNEL].m_data.yn2 = 0;
+			RedStreamAdpcmHeaderGetChannel(headerData, REDSOUND_STREAM_RIGHT_CHANNEL)->m_data.yn1 =
+			    RedStreamAdpcmHeaderGetChannel(headerData, REDSOUND_STREAM_RIGHT_CHANNEL)->m_data.yn2 = 0;
 		}
 
 		streamData->m_streamId = streamID;
@@ -274,7 +274,7 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 			(streamData->m_track + channel)->m_waveBase =
 			    RedStreamAramGetChannelPlane(streamData->m_aramBuffer, channel);
 			memset(RedStreamGetTrackData(streamData, channel), 0, REDSOUND_WAVE_DATA_SIZE);
-			memcpy(&RedStreamGetTrackData(streamData, channel)->m_adpcm, &headerData[channel],
+			memcpy(&RedStreamGetTrackData(streamData, channel)->m_adpcm, RedStreamAdpcmHeaderGetChannel(headerData, channel),
 			       REDSOUND_STREAM_ADPCM_HEADER_SIZE);
 			voice->m_adsr.m_level[REDSOUND_VOICE_ADSR_ATTACK] = voice->m_adsr.m_level[REDSOUND_VOICE_ADSR_DECAY] =
 			    voice->m_adsr.m_level[REDSOUND_VOICE_ADSR_SUSTAIN] = 0;

@@ -89,6 +89,8 @@ struct RedStreamFile {
     u8 m_trailingPadding[REDSOUND_STREAM_FILE_TRAILING_PAD_SIZE];
 };
 
+#define RedStreamFileGetAdpcm(streamFile, channel) (&(streamFile)->m_adpcm[(channel)])
+#define RedStreamAdpcmHeaderGetChannel(headerData, channel) ((headerData) + (channel))
 #define RedStreamFileGetSampleByte(streamFile, offset) ((s8*)(streamFile))[(offset)]
 
 #define RedStreamBufferGetPage(buffer, pageIndex) ((buffer) + (pageIndex) * REDSOUND_STREAM_PAGE_SIZE)

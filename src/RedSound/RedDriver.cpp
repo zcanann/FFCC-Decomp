@@ -2944,7 +2944,7 @@ int CRedDriver::SePlayState(int seID)
             break;
         }
         seInfo++;
-    } while (seInfo < *seInfoBase + REDSOUND_SE_TRACK_COUNT);
+    } while (seInfo < RedSeTrackGetEnd(*seInfoBase));
     if (result == 0) {
         commandNow = p_ExecCommandNow;
         command = p_ExecCommandOld;

@@ -931,7 +931,7 @@ RedVoiceDATA* EntryVoiceSearch(RedTrackDATA* track)
         }
     } else {
         if ((track->m_note.m_allocFlags & REDSOUND_NOTE_ALLOC_PRIORITY) != 0) {
-            voice = p_VoiceData;
+            voice = RedVoiceDataGetBegin();
         } else {
             voice = RedVoiceDataGet((s8)p_SoundControl->m_channelAlloc);
         }
@@ -1805,7 +1805,7 @@ static void _VoiceDropedCallback(void* dropped)
 {
     RedVoiceDATA* voiceData;
     
-    voiceData = p_VoiceData;
+    voiceData = RedVoiceDataGetBegin();
     do {
         if ((voiceData->m_axVoice != REDSOUND_AX_VOICE_NONE) && (voiceData->m_axVoice == dropped)) {
             voiceData->m_active = REDSOUND_VOICE_ACTIVE_OFF;
@@ -1827,7 +1827,7 @@ static void _VoiceDropedCallback(void* dropped)
  */
 void EnvelopeKeyExecute()
 {
-    RedVoiceDATA* voiceData = p_VoiceData;
+    RedVoiceDATA* voiceData = RedVoiceDataGetBegin();
     int voiceIndex = 0;
 
     do {
@@ -2043,7 +2043,7 @@ static void _KeyOnControl()
 
     if (keyOnEntry != 0) {
         reserve = p_KeyOnData->m_fixed;
-        voiceData = p_VoiceData;
+        voiceData = RedVoiceDataGetBegin();
         do {
             if ((reserve->m_track != 0) && (reserve->m_track->m_waveData != 0)) {
                 voiceData = _VoiceDataSelect(reserve->m_track, &reserve->m_note, voiceStartMask);
@@ -2103,7 +2103,7 @@ static void _KeyOnControl()
     }
 
     {
-        voice = p_VoiceData;
+        voice = RedVoiceDataGetBegin();
         do {
             if ((voice->m_active != REDSOUND_VOICE_ACTIVE_OFF) && (voice->m_track != 0) &&
                 ((voice->m_track->m_voiceSwitch & REDSOUND_VOICE_SWITCH_SKIP_UPDATE) == 0)) {

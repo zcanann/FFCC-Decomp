@@ -2069,7 +2069,7 @@ static void _KeyOnControl()
         } while (track < soundControl->m_tracks + soundControl->m_trackCount);
     }
 
-    soundControl = p_SoundControlBuffer + REDSOUND_CONTROL_MUSIC_SECONDARY;
+    soundControl = RedSoundControlGet(REDSOUND_CONTROL_MUSIC_SECONDARY);
     if ((soundControl->m_activeTrackCount != 0) &&
         ((soundControl->m_flags & REDSOUND_CONTROL_FLAG_PAUSE) == 0)) {
         track = soundControl->m_tracks;
@@ -2087,7 +2087,7 @@ static void _KeyOnControl()
     }
 
     {
-        soundControl = p_SoundControlBuffer + REDSOUND_CONTROL_SE;
+        soundControl = RedSoundControlGet(REDSOUND_CONTROL_SE);
         track = soundControl->m_tracks;
         do {
             if ((track->m_command != 0) && (track->m_shakeFunc != 0)) {
@@ -2233,7 +2233,7 @@ static void _ExecuteExtraData()
             }
         }
         soundControl++;
-    } while (soundControl < p_SoundControlBuffer + REDSOUND_CONTROL_MUSIC_SKIP);
+    } while (soundControl < RedSoundControlGet(REDSOUND_CONTROL_MUSIC_SKIP));
 
     soundControl = p_SoundControlBuffer;
 
@@ -2284,7 +2284,7 @@ static void _ExecuteExtraData()
             }
         }
         soundControl++;
-    } while (soundControl < p_SoundControlBuffer + REDSOUND_CONTROL_SE);
+    } while (soundControl < RedSoundControlGet(REDSOUND_CONTROL_SE));
 }
 
 /*
@@ -2812,7 +2812,7 @@ void MusicSkipFunction()
         }
     } while (p_SkipKeyOn == 0);
 
-    control = p_SoundControlBuffer + REDSOUND_CONTROL_MUSIC_SKIP;
+    control = RedSoundControlGet(REDSOUND_CONTROL_MUSIC_SKIP);
     memset(p_SkipKeyOn, 0, REDSOUND_KEY_ON_BUFFER_SIZE);
     activeTrackCount = _MusicMidiNoteSkipExecute(control, p_SkipKeyOn, 1);
     while ((activeTrackCount == 0) && ((control->m_flags & REDSOUND_CONTROL_FLAG_WHOLE_LOOP_ACTIVE) != 0)) {
@@ -3144,7 +3144,7 @@ void MainControl(int frames)
     m_KeyOnEntry = 0;
     memset(p_KeyOnData, 0, REDSOUND_KEY_ON_BUFFER_SIZE);
 
-    p_SoundControl = p_SoundControlBuffer + REDSOUND_CONTROL_SE;
+    p_SoundControl = RedSoundControlGet(REDSOUND_CONTROL_SE);
     _SeMidiNoteExecute(p_SoundControl, p_KeyOnData,
                        p_SoundControl->m_tracks, p_SoundControl->m_skipFrames, frames);
     p_SoundControl = p_SoundControlBuffer;
@@ -3172,7 +3172,7 @@ void MainControl(int frames)
     }
 
     if (p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_SECONDARY].m_activeTrackCount != 0) {
-        p_SoundControl = p_SoundControlBuffer + REDSOUND_CONTROL_MUSIC_SECONDARY;
+        p_SoundControl = RedSoundControlGet(REDSOUND_CONTROL_MUSIC_SECONDARY);
         step = p_SoundControl->m_tempo >> REDSOUND_FIXED_SHIFT;
         p_SoundControl->m_tickCounter -= step * frames;
         while (p_SoundControl->m_tickCounter < 1) {
@@ -3180,7 +3180,7 @@ void MainControl(int frames)
             _MusicNoteExecute();
         }
         if (p_SoundControlBuffer[REDSOUND_CONTROL_MUSIC_PRIMARY].m_activeTrackCount == 0) {
-            memcpy(p_SoundControlBuffer, p_SoundControlBuffer + REDSOUND_CONTROL_MUSIC_SECONDARY,
+            memcpy(p_SoundControlBuffer, RedSoundControlGet(REDSOUND_CONTROL_MUSIC_SECONDARY),
                    REDSOUND_CONTROL_SIZE);
             p_SoundControl->m_activeTrackCount = 0;
             p_SoundControl->m_trackCount = 0;

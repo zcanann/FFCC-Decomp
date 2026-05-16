@@ -3786,8 +3786,8 @@ int CRedDriver::PlayWaveItem(int waveNo, int itemNo, int key, int pan, int volum
     }
 
     voiceIndex = RedVoiceDataGetIndex(voice);
-    *RedEditorVoiceGet(REDSOUND_EDITOR_VOICE_LEFT) = voiceIndex;
-    *RedEditorVoiceGet(REDSOUND_EDITOR_VOICE_RIGHT) = 0;
+    RedEditorVoiceSet(REDSOUND_EDITOR_VOICE_LEFT, voiceIndex);
+    RedEditorVoiceSet(REDSOUND_EDITOR_VOICE_RIGHT, 0);
     voice->m_track = RedEditorTrackGet();
     voice->m_waveData = wave;
     voice->m_trackVolume = &RedEditorTrackGet()->m_volume;
@@ -3837,7 +3837,7 @@ inline void CRedDriver::StopWaveItem()
         voice++;
     } while (voice < RedVoiceDataGetEnd());
 
-    *RedEditorVoiceGet(REDSOUND_EDITOR_VOICE_LEFT) = 0;
+    RedEditorVoiceSet(REDSOUND_EDITOR_VOICE_LEFT, 0);
 }
 
 /*

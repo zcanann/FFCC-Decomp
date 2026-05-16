@@ -1055,9 +1055,9 @@ static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* wav
 		int blockSize = RedMusicTrackBlockGetSize(current);
 		track->m_trackNo = trackNo - 1;
 		track->m_waveBankData = waveHead;
-		current = (RedMusicTrackBlock*)current->m_command;
+		current = RedMusicTrackBlockGetCommandBlock(current);
 		track->m_command = (unsigned char*)current;
-		current = (RedMusicTrackBlock*)((unsigned char*)current + blockSize);
+		current = RedMusicTrackBlockGetNext(current, blockSize);
 		track->m_deltaTime = DeltaTimeSumup((unsigned char**)&track->m_command) + 1;
 		track->m_seSepId = REDSOUND_TRACK_SESEP_ID_NONE;
 		signed char* keySignatureData;

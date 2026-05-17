@@ -595,7 +595,7 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* para
                         (u32)pppMemAlloc(*(s32*)(meshShape + 0x14) * 0xC, pppEnvStPtr->m_stagePtr,
                                          const_cast<char*>(s_pppMana2_cpp_801DC4E0), 0x232);
                     Vec* reflectionVec = (Vec*)work[0x19];
-                    float zero = LoadFloat(FLOAT_80331898);
+                    float zero = FLOAT_80331898;
                     for (vertexIndex = 0; vertexIndex < *(u32*)(meshShape + 0x14); vertexIndex++) {
                         reflectionVec->z = zero;
                         reflectionVec->y = zero;
@@ -661,7 +661,7 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* para
 
                 float* waterHeightA = (float*)work[0x12];
                 float* waterHeightB = (float*)work[0x13];
-                float zero = LoadFloat(FLOAT_80331898);
+                float zero = FLOAT_80331898;
                 for (vertexIndex = 0; vertexIndex < 0x121; vertexIndex++) {
                     waterHeightA[vertexIndex] = zero;
                     waterHeightB[vertexIndex] = zero;
@@ -1217,8 +1217,8 @@ static int UpdateWaterMesh(VMana2* mana2)
     }
 
     for (int row = 1; row < 0x10; row++) {
-        currentScale = LoadFloat(FLOAT_80331898);
-        neighborScale = LoadFloat(FLOAT_803318a4);
+        currentScale = FLOAT_80331898;
+        neighborScale = FLOAT_803318a4;
         int rowBase = row * 0x11;
         for (int colBlock = 0; colBlock < 3; colBlock++) {
             int index = rowBase + colBlock * 5 + 1;
@@ -1424,7 +1424,7 @@ static void CalculateNormal(VMana2* mana2)
     normals = *(Vec**)((u8*)mana2 + 0x40);
     indices = *(u16**)((u8*)mana2 + 0x50);
 
-    float zero = LoadFloat(FLOAT_80331898);
+    float zero = FLOAT_80331898;
     for (s32 i = 0; i < 0x121; i++) {
         normals[i].z = zero;
         normals[i].y = zero;

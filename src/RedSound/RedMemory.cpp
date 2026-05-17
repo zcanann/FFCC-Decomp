@@ -50,21 +50,21 @@ enum RedMemoryStringLayout {
 
 struct RedMemorySmallDataState {
 	int m_dataBuffer;
-	int m_auxDataBuffer;
+	int m_ADataBuffer;
 	int m_dataBufferSize;
-	int m_auxDataBufferSize;
+	int m_ADataBufferSize;
 	RedMemoryBlock* m_memoryBank;
-	RedMemoryBlock* m_auxMemoryBank;
+	RedMemoryBlock* m_AMemoryBank;
 };
 
 enum RedMemorySmallDataLayout {
 	REDSOUND_MEMORY_SBSS_DATA_BUFFER_OFFSET = (unsigned int)&(((RedMemorySmallDataState*)0)->m_dataBuffer),
-	REDSOUND_MEMORY_SBSS_AUX_DATA_BUFFER_OFFSET = (unsigned int)&(((RedMemorySmallDataState*)0)->m_auxDataBuffer),
+	REDSOUND_MEMORY_SBSS_A_DATA_BUFFER_OFFSET = (unsigned int)&(((RedMemorySmallDataState*)0)->m_ADataBuffer),
 	REDSOUND_MEMORY_SBSS_DATA_BUFFER_SIZE_OFFSET = (unsigned int)&(((RedMemorySmallDataState*)0)->m_dataBufferSize),
-	REDSOUND_MEMORY_SBSS_AUX_DATA_BUFFER_SIZE_OFFSET =
-	    (unsigned int)&(((RedMemorySmallDataState*)0)->m_auxDataBufferSize),
+	REDSOUND_MEMORY_SBSS_A_DATA_BUFFER_SIZE_OFFSET =
+	    (unsigned int)&(((RedMemorySmallDataState*)0)->m_ADataBufferSize),
 	REDSOUND_MEMORY_SBSS_BANK_TABLE_OFFSET = (unsigned int)&(((RedMemorySmallDataState*)0)->m_memoryBank),
-	REDSOUND_MEMORY_SBSS_AUX_BANK_TABLE_OFFSET = (unsigned int)&(((RedMemorySmallDataState*)0)->m_auxMemoryBank),
+	REDSOUND_MEMORY_SBSS_A_BANK_TABLE_OFFSET = (unsigned int)&(((RedMemorySmallDataState*)0)->m_AMemoryBank),
 	REDSOUND_MEMORY_SBSS_SIZE = sizeof(RedMemorySmallDataState),
 };
 
@@ -78,12 +78,12 @@ STATIC_ASSERT(sizeof(s_redMemoryMainBankFullFmt) + sizeof(sRedMemoryLogPrefix) +
               REDSOUND_MEMORY_RODATA_STRING_SIZE);
 STATIC_ASSERT(sizeof(sRedMemoryLogSuffixA) + sizeof(sRedMemoryLogSuffixB) == REDSOUND_MEMORY_SDATA2_STRING_SIZE);
 STATIC_ASSERT(offsetof(RedMemorySmallDataState, m_dataBuffer) == REDSOUND_MEMORY_SBSS_DATA_BUFFER_OFFSET);
-STATIC_ASSERT(offsetof(RedMemorySmallDataState, m_auxDataBuffer) == REDSOUND_MEMORY_SBSS_AUX_DATA_BUFFER_OFFSET);
+STATIC_ASSERT(offsetof(RedMemorySmallDataState, m_ADataBuffer) == REDSOUND_MEMORY_SBSS_A_DATA_BUFFER_OFFSET);
 STATIC_ASSERT(offsetof(RedMemorySmallDataState, m_dataBufferSize) == REDSOUND_MEMORY_SBSS_DATA_BUFFER_SIZE_OFFSET);
-STATIC_ASSERT(offsetof(RedMemorySmallDataState, m_auxDataBufferSize) ==
-              REDSOUND_MEMORY_SBSS_AUX_DATA_BUFFER_SIZE_OFFSET);
+STATIC_ASSERT(offsetof(RedMemorySmallDataState, m_ADataBufferSize) ==
+              REDSOUND_MEMORY_SBSS_A_DATA_BUFFER_SIZE_OFFSET);
 STATIC_ASSERT(offsetof(RedMemorySmallDataState, m_memoryBank) == REDSOUND_MEMORY_SBSS_BANK_TABLE_OFFSET);
-STATIC_ASSERT(offsetof(RedMemorySmallDataState, m_auxMemoryBank) == REDSOUND_MEMORY_SBSS_AUX_BANK_TABLE_OFFSET);
+STATIC_ASSERT(offsetof(RedMemorySmallDataState, m_AMemoryBank) == REDSOUND_MEMORY_SBSS_A_BANK_TABLE_OFFSET);
 STATIC_ASSERT(sizeof(RedMemorySmallDataState) == REDSOUND_MEMORY_SBSS_SIZE);
 STATIC_ASSERT(sizeof(m_DataBuffer) + sizeof(m_ADataBuffer) + sizeof(m_DataBufferSize) + sizeof(m_ADataBufferSize) +
                   sizeof(m_MemoryBank) + sizeof(m_AMemoryBank) ==

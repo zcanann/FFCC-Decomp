@@ -105,6 +105,7 @@ extern "C" void _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTe
     int, int, int, int, int);
 extern "C" const double DOUBLE_8032FCC0 = 1.0;
 extern "C" const float FLOAT_8032FCC8 = 1.0f;
+extern "C" const float FLOAT_8032FCD8 = 0.0f;
 extern "C" float FLOAT_8032FCDC;
 
 static inline void WriteU8(void* base, unsigned int offset, unsigned char value) {
@@ -446,14 +447,14 @@ void CMaterialEditorPcs::calcViewer()
         m_usbStream.SetUSBStreamDataDone();
     }
 
-    rotationValue = 0.0f;
-    srt.transZ = 0.0f;
-    srt.transY = 0.0f;
-    srt.transX = 0.0f;
+    one = LoadFloat(FLOAT_8032FCC8);
+    rotationValue = LoadFloat(FLOAT_8032FCD8);
+    srt.transZ = rotationValue;
+    srt.transY = rotationValue;
+    srt.transX = rotationValue;
     srt.rotZ = rotationValue;
     srt.rotY = rotationValue;
     srt.rotX = rotationValue;
-    one = LoadFloat(FLOAT_8032FCC8);
     srt.scaleZ = one;
     srt.scaleY = one;
     srt.scaleX = one;

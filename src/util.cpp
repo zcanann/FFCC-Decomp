@@ -86,16 +86,16 @@ void CUtil::GetDirectVector(Vec* param_2, Vec* param_3, Vec param_4)
 int CUtil::GetNumPolygonFromDL(void* dlData, unsigned long)
 {
     u8* data = static_cast<u8*>(dlData);
-    bool running = true;
+    int running = true;
     int polygonCount = 0;
 
     while (running) {
-        u8 opcode = *data;
+        u32 opcode = *data;
         u16 vertexCount = *(u16*)(data + 1);
         int count = vertexCount;
-        u8 vertexFormat = opcode & 7;
-        u8 primitive = opcode & 0xF8;
-        bool isPrimitive;
+        u32 vertexFormat = opcode & 7;
+        u32 primitive = opcode & 0xF8;
+        int isPrimitive;
 
         data += 3;
 

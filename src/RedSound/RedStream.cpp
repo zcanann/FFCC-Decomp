@@ -361,8 +361,8 @@ void SetStreamVolume(int streamID, int volume, int frameCount)
 		if ((streamData->m_streamId != REDSOUND_STREAM_ID_NONE) &&
 		    ((streamID == REDSOUND_STREAM_ID_ALL) || (streamID == streamData->m_streamId))) {
 			if (frameCount > 0) {
-				int delta = volume - streamData->m_volume.m_value;
-				streamData->m_volume.m_step = delta / frameCount;
+				int volumeDelta = volume - streamData->m_volume.m_value;
+				streamData->m_volume.m_step = volumeDelta / frameCount;
 				streamData->m_volume.m_stepCount = frameCount;
 			} else {
 				streamData->m_volume.m_value = volume;
@@ -411,16 +411,16 @@ void StreamPause(int streamID, int pause)
 					}
 				}
 			} else if (voiceData->m_axVoice != REDSOUND_AX_VOICE_NONE) {
-				unsigned int pitch = PitchCompute(REDSOUND_STREAM_BASE_PITCH, 0, streamData->m_header.m_pitch, 0);
+				unsigned int resumePitch = PitchCompute(REDSOUND_STREAM_BASE_PITCH, 0, streamData->m_header.m_pitch, 0);
 				volume = streamData->m_volume.m_value >> REDSOUND_FIXED_SHIFT;
 				if (streamData->m_header.m_channelCount == REDSOUND_STREAM_STEREO_CHANNEL_COUNT) {
-					voiceData->m_targetPitch = pitch;
+					voiceData->m_targetPitch = resumePitch;
 					voiceData->m_flags |= REDSOUND_VOICE_FLAGS_PITCH_DIRTY;
-					RedStreamVoiceDataGetChannel(voiceData, REDSOUND_STREAM_RIGHT_CHANNEL)->m_targetPitch = pitch;
+					RedStreamVoiceDataGetChannel(voiceData, REDSOUND_STREAM_RIGHT_CHANNEL)->m_targetPitch = resumePitch;
 					RedStreamVoiceDataGetChannel(voiceData, REDSOUND_STREAM_RIGHT_CHANNEL)->m_flags |= REDSOUND_VOICE_FLAGS_PITCH_DIRTY;
 				} else {
 					pan = streamData->m_pan.m_value >> REDSOUND_FIXED_SHIFT;
-					voiceData->m_targetPitch = pitch;
+					voiceData->m_targetPitch = resumePitch;
 					voiceData->m_flags |= REDSOUND_VOICE_FLAGS_PITCH_DIRTY;
 				}
 			}
@@ -824,8 +824,8 @@ void SetStreamPan(int streamID, int pan, int frameCount)
 		if ((streamData->m_streamId != REDSOUND_STREAM_ID_NONE) &&
 		    ((streamID == REDSOUND_STREAM_ID_ALL) || (streamID == streamData->m_streamId))) {
 			if (frameCount > 0) {
-				int delta = pan - streamData->m_pan.m_value;
-				streamData->m_pan.m_step = delta / frameCount;
+				int panDelta = pan - streamData->m_pan.m_value;
+				streamData->m_pan.m_step = panDelta / frameCount;
 				streamData->m_pan.m_stepCount = frameCount;
 			} else {
 				streamData->m_pan.m_value = pan;

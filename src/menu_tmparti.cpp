@@ -205,8 +205,8 @@ void CMenuPcs::TmpArtiDraw()
 unsigned int CMenuPcs::TmpArtiClose()
 {
 	float zero;
-	int completedItems;
 	TmpArtiEntry* entry;
+	int completedItems;
 	unsigned int itemCount;
 	int currentFrame;
 	unsigned int count;
@@ -356,39 +356,33 @@ void CMenuPcs::TmpArtiCtrl()
 			uVar9 = uVar5 >> 3;
 			if (uVar9 != 0) {
 				do {
+					int baseFrame = iVar7;
 					iVar8 = reinterpret_cast<int>(this->m_tmpArtiList) + iVar6 + 8;
-					*(int *)(iVar8 + 0x24) = iVar7;
-					iVar7 = iVar7 + 1;
+					*(int *)(iVar8 + 0x24) = baseFrame;
 					*(unsigned int *)(iVar8 + 0x28) = 3;
 					iVar8 = reinterpret_cast<int>(this->m_tmpArtiList) + iVar6 + -0x38;
-					*(int *)(iVar8 + 0x24) = iVar7;
-					iVar7 = iVar7 + 1;
+					*(int *)(iVar8 + 0x24) = baseFrame + 1;
 					*(unsigned int *)(iVar8 + 0x28) = 3;
 					iVar8 = reinterpret_cast<int>(this->m_tmpArtiList) + iVar6 + -0x78;
-					*(int *)(iVar8 + 0x24) = iVar7;
-					iVar7 = iVar7 + 1;
+					*(int *)(iVar8 + 0x24) = baseFrame + 2;
 					*(unsigned int *)(iVar8 + 0x28) = 3;
 					iVar8 = reinterpret_cast<int>(this->m_tmpArtiList) + iVar6 + -0xb8;
-					*(int *)(iVar8 + 0x24) = iVar7;
-					iVar7 = iVar7 + 1;
+					*(int *)(iVar8 + 0x24) = baseFrame + 3;
 					*(unsigned int *)(iVar8 + 0x28) = 3;
 					iVar8 = reinterpret_cast<int>(this->m_tmpArtiList) + iVar6 + -0xf8;
-					*(int *)(iVar8 + 0x24) = iVar7;
-					iVar7 = iVar7 + 1;
+					*(int *)(iVar8 + 0x24) = baseFrame + 4;
 					*(unsigned int *)(iVar8 + 0x28) = 3;
 					iVar8 = reinterpret_cast<int>(this->m_tmpArtiList) + iVar6 + -0x138;
-					*(int *)(iVar8 + 0x24) = iVar7;
-					iVar7 = iVar7 + 1;
+					*(int *)(iVar8 + 0x24) = baseFrame + 5;
 					*(unsigned int *)(iVar8 + 0x28) = 3;
 					iVar8 = reinterpret_cast<int>(this->m_tmpArtiList) + iVar6 + -0x178;
-					*(int *)(iVar8 + 0x24) = iVar7;
-					iVar7 = iVar7 + 1;
+					*(int *)(iVar8 + 0x24) = baseFrame + 6;
 					*(unsigned int *)(iVar8 + 0x28) = 3;
 					iVar8 = iVar6 + -0x1b8;
 					iVar6 = iVar6 + -0x200;
 					iVar8 = reinterpret_cast<int>(this->m_tmpArtiList) + iVar8;
-					*(int *)(iVar8 + 0x24) = iVar7;
-					iVar7 = iVar7 + 1;
+					*(int *)(iVar8 + 0x24) = baseFrame + 7;
+					iVar7 = baseFrame + 8;
 					*(unsigned int *)(iVar8 + 0x28) = 3;
 					uVar9 = uVar9 - 1;
 				} while (uVar9 != 0);

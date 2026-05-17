@@ -22,6 +22,10 @@
 extern unsigned char ARRAY_8030918c[];
 extern "C" char DAT_803319ec[];
 extern "C" char DAT_80331a4c[];
+extern "C" {
+u8 m_aiWork__8CGMonObj[0xC];
+u8 m_boss__8CGMonObj[0x8C];
+}
 
 extern "C" void __ptmf_scall(...);
 extern "C" int __cntlzw(unsigned int);

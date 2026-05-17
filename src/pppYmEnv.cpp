@@ -111,9 +111,9 @@ void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displa
                        _GXTexObj* blendTexObj, unsigned char mode)
 {
     const unsigned char s_texObjIndices[] = {5, 2, 1, 0, 4, 5, 0, 0, 0, 0};
-    const unsigned char s_xAxisRotIndices[] = {1, 1, 0, 0, 2, 0, 1, 3, 4, 2};
-    const unsigned char s_yAxisRotIndices[] = {1, 0, 4, 3, 0, 0, 0, 0, 0, 0};
-    const float s_xAxisAngles[] = {90.0f, 180.0f, 270.0f, 180.0f, -90.0f, 90.0f};
+    const unsigned char s_xAxisRotIndices[] = {0, 0, 0, 0, 1, 1, 0, 0, 2, 0};
+    const unsigned char s_yAxisRotIndices[] = {4, 2, 1, 0, 4, 3, 0, 0, 0x42, 0xB4};
+    const float s_xAxisAngles[] = {180.0f, 270.0f, 180.0f, -90.0f, 90.0f, 0.0f};
     const unsigned char s_xAxisIds[] = {'y', 'y', 'y', 'y', 'x', 'x'};
     const float s_yAxisAngles[] = {0.0f, 180.0f};
 
@@ -129,8 +129,8 @@ void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displa
     clearColor.g = 0;
     clearColor.b = 0;
     clearColor.a = 0xFF;
-    const Vec s_cameraPos = {0.0f, 0.0f, 6.0f};
-    const Vec s_cameraUp = {0.0f, 1.0f, 0.0f};
+    const Vec s_cameraPos = {0.0f, 6.0f, 0.0f};
+    const Vec s_cameraUp = {1.0f, 0.0f, 0.0f};
     const Vec s_cameraLook = {0.0f, 0.0f, 0.0f};
 
     gUtil.RenderColorQuad(0.0f, 0.0f, texWidth, texHeight, clearColor);

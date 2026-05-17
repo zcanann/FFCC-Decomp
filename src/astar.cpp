@@ -149,15 +149,19 @@ unsigned char CAStar::calcSpecialPolygonGroup(Vec* pos)
 }
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80141820
+ * PAL Size: 584b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int forbiddenGroup)
 {
+	Vec escapeDir;
 	CVector baseVec(base);
 	CVector fromVec(from);
 	CVector escapeDirSource;
-	Vec escapeDir;
 
 	PSVECSubtract(reinterpret_cast<Vec*>(&fromVec),
 	              reinterpret_cast<Vec*>(&baseVec),

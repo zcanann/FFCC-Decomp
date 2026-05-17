@@ -300,8 +300,8 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
 
     if (stepData->m_graphId == charaBreak->m_graphId) {
         f32 zero = FLOAT_80332048;
-        if (stepData->m_direction.x == zero && stepData->m_direction.y == zero &&
-            stepData->m_direction.z == zero) {
+        if (zero == stepData->m_direction.x && zero == stepData->m_direction.y &&
+            zero == stepData->m_direction.z) {
             stepData->m_direction.x = FLOAT_8033204c;
             stepData->m_direction.y = zero;
             stepData->m_direction.z = zero;

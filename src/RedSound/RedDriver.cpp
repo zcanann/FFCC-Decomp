@@ -104,129 +104,129 @@ struct RedMusicPlayCommand;
 struct RedTickHistory;
 
 struct RedDriverSmallDataPrefixState {
-    int m_redMasterTime;
-    volatile int m_sequencialID;
-    volatile int m_threadControl;
-    volatile int m_threadExecute;
-    int m_soundMode;
-    RedTickHistory* volatile m_tick;
-    u8* volatile m_zeroData;
-    RedExecCommand* volatile m_execCommand;
-    RedExecCommand* volatile m_execCommandNow;
-    RedExecCommand* volatile m_execCommandOld;
-    RedDmaRequest* volatile m_dmaControlNow[REDSOUND_DMA_QUEUE_COUNT];
-    RedDmaRequest* volatile m_dmaControlOld[REDSOUND_DMA_QUEUE_COUNT];
-    RedSoundCONTROL* volatile m_soundControlBuffer;
-    RedSoundCONTROL* volatile m_soundControl;
-    volatile int m_keyOnEntry;
-    RedKeyOnDATA* volatile m_keyOnData;
-    int m_soundPlayMode;
-    int m_soundMasterControl;
-    volatile int m_reportPrint;
-    int m_musicFastSpeed;
-    volatile int m_musicSkipLine;
-    int m_musicKeySignature;
-    int* volatile m_musicReplayPoint;
-    RedControlRamp* volatile m_musicTempoControl;
-    RedControlRamp* volatile m_musicPitchControl;
-    int m_musicPhraseStop;
-    RedMusicPlayCommand* volatile m_musicNextPlay;
-    int m_crossTime;
-    volatile int m_masterMusicVolume;
-    volatile int m_masterSEVolume;
-    RedStreamDATA* volatile m_stream;
-    int m_dmaMode;
-    volatile int m_seSkipStep;
-    RedVoiceDATA* volatile m_voiceData;
-    int m_editorVoice[REDSOUND_EDITOR_VOICE_COUNT];
-    RedTrackDATA* m_editorTrack;
-    u8* volatile m_mainThreadStack;
-    int m_mainThreadTime;
-    u8* volatile m_waveSettingThreadStack;
-    int m_waveSettingStatus;
-    u8* volatile m_dmaExecuteThreadStack;
-    volatile int m_dmaStatus;
-    u8* volatile m_musicSkipThreadStack;
-    volatile int m_musicSkipComplete;
-    RedReverbDepth* volatile m_reverbDepth;
-    int m_mute[REDSOUND_MUTE_WORD_COUNT];
+    int m_RedMasterTime;
+    volatile int m_SequencialID;
+    volatile int m_ThreadControl;
+    volatile int m_ThreadExecute;
+    int m_SoundMode;
+    RedTickHistory* volatile p_Tick;
+    u8* volatile p_ZeroData;
+    RedExecCommand* volatile p_ExecCommand;
+    RedExecCommand* volatile p_ExecCommandNow;
+    RedExecCommand* volatile p_ExecCommandOld;
+    RedDmaRequest* volatile p_DmaControlNow[REDSOUND_DMA_QUEUE_COUNT];
+    RedDmaRequest* volatile p_DmaControlOld[REDSOUND_DMA_QUEUE_COUNT];
+    RedSoundCONTROL* volatile p_SoundControlBuffer;
+    RedSoundCONTROL* volatile p_SoundControl;
+    volatile int m_KeyOnEntry;
+    RedKeyOnDATA* volatile p_KeyOnData;
+    int m_SoundPlayMode;
+    int m_SoundMasterControl;
+    volatile int m_ReportPrint;
+    int m_MusicFastSpeed;
+    volatile int m_MusicSkipLine;
+    int m_MusicKeySignature;
+    int* volatile p_MusicReplayPoint;
+    RedControlRamp* volatile p_MusicTempoControl;
+    RedControlRamp* volatile p_MusicPitchControl;
+    int m_MusicPhraseStop;
+    RedMusicPlayCommand* volatile p_MusicNextPlay;
+    int m_CrossTime;
+    volatile int m_MasterMusicVolume;
+    volatile int m_MasterSEVolume;
+    RedStreamDATA* volatile p_Stream;
+    int m_DMAMode;
+    volatile int m_SeSkipStep;
+    RedVoiceDATA* volatile p_VoiceData;
+    int p_EditorVoice[REDSOUND_EDITOR_VOICE_COUNT];
+    RedTrackDATA* p_EditorTrack;
+    u8* volatile p_MainThreadStack;
+    int m_MainThreadTime;
+    u8* volatile p_WaveSettingThreadStack;
+    int m_WaveSettingStatus;
+    u8* volatile p_DmaExecuteThreadStack;
+    volatile int m_DMAStatus;
+    u8* volatile p_MusicSkipThreadStack;
+    volatile int m_MusicSkipComplete;
+    RedReverbDepth* volatile p_ReverbDepth;
+    int m_Mute[REDSOUND_MUTE_WORD_COUNT];
 };
 
 enum RedDriverSmallDataLayout {
-    REDSOUND_DRIVER_SBSS_MASTER_TIME_OFFSET = (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->m_redMasterTime),
+    REDSOUND_DRIVER_SBSS_MASTER_TIME_OFFSET = (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->m_RedMasterTime),
     REDSOUND_DRIVER_SBSS_SEQUENCIAL_ID_OFFSET =
-        (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->m_sequencialID),
+        (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->m_SequencialID),
     REDSOUND_DRIVER_SBSS_THREAD_CONTROL_OFFSET =
-        (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->m_threadControl),
+        (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->m_ThreadControl),
     REDSOUND_DRIVER_SBSS_THREAD_EXECUTE_OFFSET =
-        (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->m_threadExecute),
-    REDSOUND_DRIVER_SBSS_SOUND_MODE_OFFSET = (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->m_soundMode),
-    REDSOUND_DRIVER_SBSS_TICK_OFFSET = (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->m_tick),
-    REDSOUND_DRIVER_SBSS_ZERO_DATA_OFFSET = (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->m_zeroData),
+        (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->m_ThreadExecute),
+    REDSOUND_DRIVER_SBSS_SOUND_MODE_OFFSET = (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->m_SoundMode),
+    REDSOUND_DRIVER_SBSS_TICK_OFFSET = (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->p_Tick),
+    REDSOUND_DRIVER_SBSS_ZERO_DATA_OFFSET = (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->p_ZeroData),
     REDSOUND_DRIVER_SBSS_EXEC_COMMAND_OFFSET =
-        (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->m_execCommand),
+        (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->p_ExecCommand),
     REDSOUND_DRIVER_SBSS_EXEC_COMMAND_NOW_OFFSET =
-        (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->m_execCommandNow),
+        (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->p_ExecCommandNow),
     REDSOUND_DRIVER_SBSS_EXEC_COMMAND_OLD_OFFSET =
-        (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->m_execCommandOld),
-    REDSOUND_DRIVER_SBSS_DMA_NOW_OFFSET = (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->m_dmaControlNow),
-    REDSOUND_DRIVER_SBSS_DMA_OLD_OFFSET = (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->m_dmaControlOld),
+        (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->p_ExecCommandOld),
+    REDSOUND_DRIVER_SBSS_DMA_NOW_OFFSET = (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->p_DmaControlNow),
+    REDSOUND_DRIVER_SBSS_DMA_OLD_OFFSET = (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->p_DmaControlOld),
     REDSOUND_DRIVER_SBSS_SOUND_CONTROL_BUFFER_OFFSET =
-        (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->m_soundControlBuffer),
+        (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->p_SoundControlBuffer),
     REDSOUND_DRIVER_SBSS_SOUND_CONTROL_OFFSET =
-        (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->m_soundControl),
-    REDSOUND_DRIVER_SBSS_KEY_ON_ENTRY_OFFSET = (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->m_keyOnEntry),
-    REDSOUND_DRIVER_SBSS_KEY_ON_DATA_OFFSET = (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->m_keyOnData),
+        (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->p_SoundControl),
+    REDSOUND_DRIVER_SBSS_KEY_ON_ENTRY_OFFSET = (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->m_KeyOnEntry),
+    REDSOUND_DRIVER_SBSS_KEY_ON_DATA_OFFSET = (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->p_KeyOnData),
     REDSOUND_DRIVER_SBSS_SOUND_PLAY_MODE_OFFSET =
-        (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->m_soundPlayMode),
+        (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->m_SoundPlayMode),
     REDSOUND_DRIVER_SBSS_SOUND_MASTER_CONTROL_OFFSET =
-        (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->m_soundMasterControl),
-    REDSOUND_DRIVER_SBSS_REPORT_PRINT_OFFSET = (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->m_reportPrint),
+        (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->m_SoundMasterControl),
+    REDSOUND_DRIVER_SBSS_REPORT_PRINT_OFFSET = (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->m_ReportPrint),
     REDSOUND_DRIVER_SBSS_MUSIC_FAST_SPEED_OFFSET =
-        (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->m_musicFastSpeed),
+        (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->m_MusicFastSpeed),
     REDSOUND_DRIVER_SBSS_MUSIC_SKIP_LINE_OFFSET =
-        (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->m_musicSkipLine),
+        (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->m_MusicSkipLine),
     REDSOUND_DRIVER_SBSS_MUSIC_KEY_SIGNATURE_OFFSET =
-        (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->m_musicKeySignature),
+        (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->m_MusicKeySignature),
     REDSOUND_DRIVER_SBSS_MUSIC_REPLAY_POINT_OFFSET =
-        (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->m_musicReplayPoint),
+        (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->p_MusicReplayPoint),
     REDSOUND_DRIVER_SBSS_MUSIC_TEMPO_CONTROL_OFFSET =
-        (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->m_musicTempoControl),
+        (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->p_MusicTempoControl),
     REDSOUND_DRIVER_SBSS_MUSIC_PITCH_CONTROL_OFFSET =
-        (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->m_musicPitchControl),
+        (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->p_MusicPitchControl),
     REDSOUND_DRIVER_SBSS_MUSIC_PHRASE_STOP_OFFSET =
-        (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->m_musicPhraseStop),
+        (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->m_MusicPhraseStop),
     REDSOUND_DRIVER_SBSS_MUSIC_NEXT_PLAY_OFFSET =
-        (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->m_musicNextPlay),
-    REDSOUND_DRIVER_SBSS_CROSS_TIME_OFFSET = (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->m_crossTime),
+        (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->p_MusicNextPlay),
+    REDSOUND_DRIVER_SBSS_CROSS_TIME_OFFSET = (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->m_CrossTime),
     REDSOUND_DRIVER_SBSS_MASTER_MUSIC_VOLUME_OFFSET =
-        (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->m_masterMusicVolume),
+        (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->m_MasterMusicVolume),
     REDSOUND_DRIVER_SBSS_MASTER_SE_VOLUME_OFFSET =
-        (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->m_masterSEVolume),
-    REDSOUND_DRIVER_SBSS_STREAM_OFFSET = (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->m_stream),
-    REDSOUND_DRIVER_SBSS_DMA_MODE_OFFSET = (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->m_dmaMode),
-    REDSOUND_DRIVER_SBSS_SE_SKIP_STEP_OFFSET = (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->m_seSkipStep),
-    REDSOUND_DRIVER_SBSS_VOICE_DATA_OFFSET = (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->m_voiceData),
-    REDSOUND_DRIVER_SBSS_EDITOR_VOICE_OFFSET = (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->m_editorVoice),
-    REDSOUND_DRIVER_SBSS_EDITOR_TRACK_OFFSET = (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->m_editorTrack),
+        (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->m_MasterSEVolume),
+    REDSOUND_DRIVER_SBSS_STREAM_OFFSET = (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->p_Stream),
+    REDSOUND_DRIVER_SBSS_DMA_MODE_OFFSET = (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->m_DMAMode),
+    REDSOUND_DRIVER_SBSS_SE_SKIP_STEP_OFFSET = (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->m_SeSkipStep),
+    REDSOUND_DRIVER_SBSS_VOICE_DATA_OFFSET = (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->p_VoiceData),
+    REDSOUND_DRIVER_SBSS_EDITOR_VOICE_OFFSET = (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->p_EditorVoice),
+    REDSOUND_DRIVER_SBSS_EDITOR_TRACK_OFFSET = (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->p_EditorTrack),
     REDSOUND_DRIVER_SBSS_MAIN_THREAD_STACK_OFFSET =
-        (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->m_mainThreadStack),
+        (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->p_MainThreadStack),
     REDSOUND_DRIVER_SBSS_MAIN_THREAD_TIME_OFFSET =
-        (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->m_mainThreadTime),
+        (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->m_MainThreadTime),
     REDSOUND_DRIVER_SBSS_WAVE_THREAD_STACK_OFFSET =
-        (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->m_waveSettingThreadStack),
+        (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->p_WaveSettingThreadStack),
     REDSOUND_DRIVER_SBSS_WAVE_SETTING_STATUS_OFFSET =
-        (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->m_waveSettingStatus),
+        (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->m_WaveSettingStatus),
     REDSOUND_DRIVER_SBSS_DMA_THREAD_STACK_OFFSET =
-        (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->m_dmaExecuteThreadStack),
-    REDSOUND_DRIVER_SBSS_DMA_STATUS_OFFSET = (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->m_dmaStatus),
+        (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->p_DmaExecuteThreadStack),
+    REDSOUND_DRIVER_SBSS_DMA_STATUS_OFFSET = (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->m_DMAStatus),
     REDSOUND_DRIVER_SBSS_MUSIC_THREAD_STACK_OFFSET =
-        (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->m_musicSkipThreadStack),
+        (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->p_MusicSkipThreadStack),
     REDSOUND_DRIVER_SBSS_MUSIC_SKIP_COMPLETE_OFFSET =
-        (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->m_musicSkipComplete),
+        (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->m_MusicSkipComplete),
     REDSOUND_DRIVER_SBSS_REVERB_DEPTH_OFFSET =
-        (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->m_reverbDepth),
-    REDSOUND_DRIVER_SBSS_MUTE_OFFSET = (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->m_mute),
+        (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->p_ReverbDepth),
+    REDSOUND_DRIVER_SBSS_MUTE_OFFSET = (unsigned int)&(((RedDriverSmallDataPrefixState*)0)->m_Mute),
     REDSOUND_DRIVER_SBSS_BEFORE_RED_MEMORY_SIZE = sizeof(RedDriverSmallDataPrefixState),
     REDSOUND_DRIVER_SBSS_RED_MEMORY_OFFSET = REDSOUND_DRIVER_SBSS_BEFORE_RED_MEMORY_SIZE,
     REDSOUND_DRIVER_SBSS_RED_MEMORY_PAD_OFFSET = REDSOUND_DRIVER_SBSS_RED_MEMORY_OFFSET + REDSOUND_RED_MEMORY_SIZE,
@@ -551,23 +551,23 @@ STATIC_ASSERT(offsetof(RedReverbDepth, m_depth) == REDSOUND_REVERB_DEPTH_DEPTH_O
 STATIC_ASSERT(offsetof(RedReverbDepth, m_step) == REDSOUND_REVERB_DEPTH_STEP_OFFSET);
 STATIC_ASSERT(offsetof(RedReverbDepth, m_count) == REDSOUND_REVERB_DEPTH_COUNT_OFFSET);
 STATIC_ASSERT(sizeof(RedReverbDepth) == REDSOUND_REVERB_DEPTH_SIZE);
-STATIC_ASSERT(offsetof(RedDriverSmallDataPrefixState, m_redMasterTime) == REDSOUND_DRIVER_SBSS_MASTER_TIME_OFFSET);
-STATIC_ASSERT(offsetof(RedDriverSmallDataPrefixState, m_dmaControlNow) == REDSOUND_DRIVER_SBSS_DMA_NOW_OFFSET);
-STATIC_ASSERT(sizeof(((RedDriverSmallDataPrefixState*)0)->m_dmaControlNow) ==
+STATIC_ASSERT(offsetof(RedDriverSmallDataPrefixState, m_RedMasterTime) == REDSOUND_DRIVER_SBSS_MASTER_TIME_OFFSET);
+STATIC_ASSERT(offsetof(RedDriverSmallDataPrefixState, p_DmaControlNow) == REDSOUND_DRIVER_SBSS_DMA_NOW_OFFSET);
+STATIC_ASSERT(sizeof(((RedDriverSmallDataPrefixState*)0)->p_DmaControlNow) ==
               REDSOUND_DMA_QUEUE_COUNT * sizeof(RedDmaRequest*));
-STATIC_ASSERT(sizeof(((RedDriverSmallDataPrefixState*)0)->m_dmaControlOld) ==
+STATIC_ASSERT(sizeof(((RedDriverSmallDataPrefixState*)0)->p_DmaControlOld) ==
               REDSOUND_DMA_QUEUE_COUNT * sizeof(RedDmaRequest*));
-STATIC_ASSERT(offsetof(RedDriverSmallDataPrefixState, m_soundControlBuffer) ==
+STATIC_ASSERT(offsetof(RedDriverSmallDataPrefixState, p_SoundControlBuffer) ==
               REDSOUND_DRIVER_SBSS_SOUND_CONTROL_BUFFER_OFFSET);
-STATIC_ASSERT(offsetof(RedDriverSmallDataPrefixState, m_musicReplayPoint) ==
+STATIC_ASSERT(offsetof(RedDriverSmallDataPrefixState, p_MusicReplayPoint) ==
               REDSOUND_DRIVER_SBSS_MUSIC_REPLAY_POINT_OFFSET);
-STATIC_ASSERT(offsetof(RedDriverSmallDataPrefixState, m_stream) == REDSOUND_DRIVER_SBSS_STREAM_OFFSET);
-STATIC_ASSERT(offsetof(RedDriverSmallDataPrefixState, m_voiceData) == REDSOUND_DRIVER_SBSS_VOICE_DATA_OFFSET);
-STATIC_ASSERT(offsetof(RedDriverSmallDataPrefixState, m_editorVoice) == REDSOUND_DRIVER_SBSS_EDITOR_VOICE_OFFSET);
-STATIC_ASSERT(sizeof(((RedDriverSmallDataPrefixState*)0)->m_editorVoice) ==
+STATIC_ASSERT(offsetof(RedDriverSmallDataPrefixState, p_Stream) == REDSOUND_DRIVER_SBSS_STREAM_OFFSET);
+STATIC_ASSERT(offsetof(RedDriverSmallDataPrefixState, p_VoiceData) == REDSOUND_DRIVER_SBSS_VOICE_DATA_OFFSET);
+STATIC_ASSERT(offsetof(RedDriverSmallDataPrefixState, p_EditorVoice) == REDSOUND_DRIVER_SBSS_EDITOR_VOICE_OFFSET);
+STATIC_ASSERT(sizeof(((RedDriverSmallDataPrefixState*)0)->p_EditorVoice) ==
               REDSOUND_EDITOR_VOICE_COUNT * sizeof(int));
-STATIC_ASSERT(offsetof(RedDriverSmallDataPrefixState, m_mute) == REDSOUND_DRIVER_SBSS_MUTE_OFFSET);
-STATIC_ASSERT(sizeof(((RedDriverSmallDataPrefixState*)0)->m_mute) == REDSOUND_MUTE_WORD_COUNT * sizeof(int));
+STATIC_ASSERT(offsetof(RedDriverSmallDataPrefixState, m_Mute) == REDSOUND_DRIVER_SBSS_MUTE_OFFSET);
+STATIC_ASSERT(sizeof(((RedDriverSmallDataPrefixState*)0)->m_Mute) == REDSOUND_MUTE_WORD_COUNT * sizeof(int));
 STATIC_ASSERT(sizeof(RedDriverSmallDataPrefixState) == REDSOUND_DRIVER_SBSS_BEFORE_RED_MEMORY_SIZE);
 STATIC_ASSERT(sizeof(CRedMemory) == REDSOUND_RED_MEMORY_SIZE);
 STATIC_ASSERT(sizeof(CRedEntry) == REDSOUND_RED_ENTRY_SIZE);

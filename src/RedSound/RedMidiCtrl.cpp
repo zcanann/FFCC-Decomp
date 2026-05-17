@@ -1800,16 +1800,16 @@ static void __MidiCtrl_ADSR_Default(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDAT
  */
 static void __MidiCtrl_ADSR_AL(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    int value;
+    int level;
     RedVoiceDATA* voice;
 
-    value = *track->m_command++;
-    track->m_adsr.m_level[REDSOUND_VOICE_ADSR_ATTACK] = value;
+    level = *track->m_command++;
+    track->m_adsr.m_level[REDSOUND_VOICE_ADSR_ATTACK] = level;
 
     voice = RedVoiceDataGetBegin();
     do {
         if (voice->m_track == track) {
-            voice->m_adsr.m_level[REDSOUND_VOICE_ADSR_ATTACK] = value;
+            voice->m_adsr.m_level[REDSOUND_VOICE_ADSR_ATTACK] = level;
             voice->m_flags |= REDSOUND_VOICE_FLAGS_ADSR_DIRTY;
         }
         voice++;
@@ -1852,16 +1852,16 @@ static void __MidiCtrl_ADSR_AR(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* tr
  */
 static void __MidiCtrl_ADSR_DL(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    int value;
+    int level;
     RedVoiceDATA* voice;
 
-    value = *track->m_command++;
-    track->m_adsr.m_level[REDSOUND_VOICE_ADSR_DECAY] = value;
+    level = *track->m_command++;
+    track->m_adsr.m_level[REDSOUND_VOICE_ADSR_DECAY] = level;
 
     voice = RedVoiceDataGetBegin();
     do {
         if (voice->m_track == track) {
-            voice->m_adsr.m_level[REDSOUND_VOICE_ADSR_DECAY] = value;
+            voice->m_adsr.m_level[REDSOUND_VOICE_ADSR_DECAY] = level;
             voice->m_flags |= REDSOUND_VOICE_FLAGS_ADSR_DIRTY;
         }
         voice++;
@@ -1904,16 +1904,16 @@ static void __MidiCtrl_ADSR_DR(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* tr
  */
 static void __MidiCtrl_ADSR_SL(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    int value;
+    int level;
     RedVoiceDATA* voice;
 
-    value = *track->m_command++;
-    track->m_adsr.m_level[REDSOUND_VOICE_ADSR_SUSTAIN] = value;
+    level = *track->m_command++;
+    track->m_adsr.m_level[REDSOUND_VOICE_ADSR_SUSTAIN] = level;
 
     voice = RedVoiceDataGetBegin();
     do {
         if (voice->m_track == track) {
-            voice->m_adsr.m_level[REDSOUND_VOICE_ADSR_SUSTAIN] = value;
+            voice->m_adsr.m_level[REDSOUND_VOICE_ADSR_SUSTAIN] = level;
             voice->m_flags |= REDSOUND_VOICE_FLAGS_ADSR_DIRTY;
         }
         voice++;
@@ -1956,16 +1956,16 @@ static void __MidiCtrl_ADSR_SR(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* tr
  */
 static void __MidiCtrl_ADSR_RL(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    int value;
+    int level;
     RedVoiceDATA* voice;
 
-    value = *track->m_command++;
-    track->m_adsr.m_level[REDSOUND_VOICE_ADSR_RELEASE] = value;
+    level = *track->m_command++;
+    track->m_adsr.m_level[REDSOUND_VOICE_ADSR_RELEASE] = level;
 
     voice = RedVoiceDataGetBegin();
     do {
         if (voice->m_track == track) {
-            voice->m_adsr.m_level[REDSOUND_VOICE_ADSR_RELEASE] = value;
+            voice->m_adsr.m_level[REDSOUND_VOICE_ADSR_RELEASE] = level;
             voice->m_flags |= REDSOUND_VOICE_FLAGS_ADSR_DIRTY;
         }
         voice++;

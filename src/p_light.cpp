@@ -599,12 +599,10 @@ void CLightPcs::EnableLight(int param_1, int param_2)
         light_mask = 0;
     }
 
-    GXSetChanCtrl((GXChannelID)0, (u8)(((unsigned int)(-enabled | enabled)) >> 0x1f), (GXColorSrc)0,
-                  (GXColorSrc)(__cntlzw((unsigned int)colorSrcParam) >> 5), light_mask, (GXDiffuseFn)2,
-                  (GXAttnFn)1);
-    GXSetChanCtrl((GXChannelID)2, (u8)(((unsigned int)(-enabled | enabled)) >> 0x1f), (GXColorSrc)0,
-                  (GXColorSrc)(__cntlzw((unsigned int)colorSrcParam) >> 5), 0, (GXDiffuseFn)0,
-                  (GXAttnFn)2);
+    GXSetChanCtrl((GXChannelID)0, enabled ? GX_TRUE : GX_FALSE, (GXColorSrc)0,
+                  colorSrcParam ? GX_SRC_REG : GX_SRC_VTX, light_mask, (GXDiffuseFn)2, (GXAttnFn)1);
+    GXSetChanCtrl((GXChannelID)2, enabled ? GX_TRUE : GX_FALSE, (GXColorSrc)0,
+                  colorSrcParam ? GX_SRC_REG : GX_SRC_VTX, 0, (GXDiffuseFn)0, (GXAttnFn)2);
 }
 
 /*

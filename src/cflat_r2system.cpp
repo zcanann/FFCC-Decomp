@@ -425,16 +425,21 @@ void CMiniGamePcs::SetMiniGameParam(int id, int value)
         Printf__7CSystemFPce(&System, s_setMiniGameParamFmt, id, value);
     }
 
-    if (id == 0x1202) {
-        *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(this) + 0x134B) |= 1 << value;
-    } else if (id < 0x1202) {
-        if (id == 0x1102) {
-            *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(this) + 0x1348) = 1;
-        } else if (id < 0x1102 && id >= 0x1101) {
-            *reinterpret_cast<char*>(reinterpret_cast<char*>(this) + 0x1350) = static_cast<char>(value);
+    if (id != 0x1202) {
+        if (id < 0x1202) {
+            if (id != 0x1102) {
+                if (id < 0x1102 && id >= 0x1101) {
+                    *reinterpret_cast<char*>(reinterpret_cast<char*>(this) + 0x1350) =
+                        static_cast<char>(value);
+                }
+            } else {
+                *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(this) + 0x1348) = 1;
+            }
+        } else if (id < 0x1204) {
+            *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(this) + 0x134B) &= ~(1 << value);
         }
-    } else if (id < 0x1204) {
-        *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(this) + 0x134B) &= ~(1 << value);
+    } else {
+        *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(this) + 0x134B) |= 1 << value;
     }
 }
 

@@ -1423,7 +1423,7 @@ CVector CVector::operator+(const CVector& other) const
     CVector out;
 
     PSVECAdd((const Vec*)this, (const Vec*)&other, (Vec*)&out);
-    return out;
+    return CVector(out.x, out.y, out.z);
 }
 
 /*

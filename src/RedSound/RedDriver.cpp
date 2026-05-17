@@ -331,6 +331,7 @@ STATIC_ASSERT(offsetof(RedDmaRequest, m_callbackData) == REDSOUND_DMA_REQUEST_CA
 STATIC_ASSERT(sizeof(RedDmaRequest) == REDSOUND_DMA_REQUEST_SIZE);
 
 #define RedDmaRequestSetId(request, id) ((request)->m_id = (id))
+#define RedDmaRequestClearId(request) RedDmaRequestSetId((request), REDSOUND_DMA_ID_NONE)
 #define RedDmaRequestSetDirection(request, direction) ((request)->m_direction = (direction))
 #define RedDmaRequestSetMainMemory(request, memory) ((request)->m_mainMemory = (memory))
 #define RedDmaRequestSetAramMemory(request, memory) ((request)->m_aramMemory = (memory))
@@ -1981,7 +1982,7 @@ void RedDmaClearID(int id)
     queueEntry = RedDriverMainDmaQueue();
     do {
         if ((id == REDSOUND_DMA_ID_NONE) || (queueEntry->m_id == id)) {
-            queueEntry->m_id = REDSOUND_DMA_ID_NONE;
+            RedDmaRequestClearId(queueEntry);
         }
         queueEntry++;
     } while (queueEntry < RedDriverStreamDmaQueueEnd());
@@ -2077,7 +2078,7 @@ static void _DmaExecute()
                 if (activeRequest->m_direction == REDSOUND_DMA_DIRECTION_FROM_ARAM) {
                     DCFlushRange((void*)activeRequest->m_mainMemory, (u32)activeRequest->m_size);
                 }
-                activeRequest->m_id = REDSOUND_DMA_ID_NONE;
+                RedDmaRequestClearId(activeRequest);
                 break;
             }
             RedSleep(REDSOUND_THREAD_YIELD_SLEEP_US);

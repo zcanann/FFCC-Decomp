@@ -2279,8 +2279,6 @@ Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocat
 	unsigned int* entryWrite = letterEntryBuf;
 
 	GbaFlatDataView* flatData = reinterpret_cast<GbaFlatDataView*>(&Game.m_cFlatDataArr[1]);
-	char** npcTable = flatData->m_tabl[2].m_strings;
-	char** subjectTable = flatData->m_tabl[5].m_strings;
 	char tempName[0x20];
 
 	for (int i = 0; i < static_cast<int>(letterCount); i++) {
@@ -2310,7 +2308,7 @@ Printf__7CSystemFPce(&System, const_cast<char*>(s_npc_max_over), const_cast<char
 			}
 
 			memset(tempName, 0, 0x20);
-			strcpy(tempName, npcTable[(curWord >> 9) & 0x1FF]);
+			strcpy(tempName, flatData->m_tabl[2].m_strings[(curWord >> 9) & 0x1FF]);
 			memcpy(npcWrite, tempName, 0x10);
 			npcWrite += 0x10;
 			(reinterpret_cast<unsigned char*>(entryWrite))[5] = static_cast<unsigned char>(npcCount);
@@ -2326,7 +2324,7 @@ Printf__7CSystemFPce(&System, const_cast<char*>(s_subject_max_over), const_cast<
 			}
 
 			memset(tempName, 0, 0x20);
-			strcpy(tempName, subjectTable[(curHalf >> 2) & 0x1FF]);
+			strcpy(tempName, flatData->m_tabl[5].m_strings[(curHalf >> 2) & 0x1FF]);
 			memcpy(subjectWrite, tempName, 0x18);
 			subjectWrite += 0x18;
 			(reinterpret_cast<unsigned char*>(entryWrite))[4] = static_cast<unsigned char>(subjectCount);

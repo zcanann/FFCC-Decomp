@@ -2290,8 +2290,8 @@ static void _ExecuteExtraData()
         do {
             if ((voice->m_stateFlags & REDSOUND_VOICE_STATE_PLAYING_MASK) == 0) {
                 int pitchOffset = (int)voice->m_track->m_keyTranspose + (int)voice->m_track->m_pitchBend;
-                voice->m_pitch = PitchCompute(voice->m_basePitch + RedMusicPitchControlGetValue(), pitchOffset,
-                                               voice->m_waveData->m_pitch,
+                int basePitch = voice->m_basePitch + RedMusicPitchControlGetValue();
+                voice->m_pitch = PitchCompute(basePitch, pitchOffset, voice->m_waveData->m_pitch,
                                                voice->m_track->m_fineTune);
                 voice->m_updateFlags |= REDSOUND_VOICE_UPDATE_PITCH;
             }

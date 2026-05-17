@@ -336,7 +336,7 @@ void CMesMenu::DrawHeart(float x, float y, float z, float alpha)
         return;
     }
 
-    if (alpha <= FLOAT_803308d8) {
+    if (FLOAT_803308d8 >= alpha) {
         return;
     }
 
@@ -360,23 +360,27 @@ void CMesMenu::DrawHeart(float x, float y, float z, float alpha)
     float pulseMul = FLOAT_80330920;
     int timerOffset = (int)this;
 
-    for (int i = 0; i < (int)(unsigned int)(*(unsigned short*)(scriptFood + 0x1A) >> 1); i++) {
+    for (unsigned int i = 0; i < (*(unsigned short*)(scriptFood + 0x1A) >> 1); i++) {
         int heartValue = *(int*)((char*)this + 0x3DA8) - valueOffset;
         float timer = (float)*(unsigned int*)(timerOffset + 0x3DB0);
         float pulse = (pulseScale * (float)sin(stepScale * -(timer * timerScale - one)) + one) * pulseMul;
 
         unsigned int subTimer = *(unsigned int*)(timerOffset + 0x3DD0);
-        int shakeX = 0;
-        if (subTimer != 0) {
+        int shakeX;
+        if (subTimer == 0) {
+            shakeX = 0;
+        } else {
             shakeX = ((int)subTimer >> 2) * DAT_8020f998[((subTimer + 1) * 4 & 0xC) / 4];
         }
 
-        int shakeY = 0;
-        if (subTimer != 0) {
+        float drawX = baseX + (float)shakeX;
+        int shakeY;
+        if (subTimer == 0) {
+            shakeY = 0;
+        } else {
             shakeY = ((int)subTimer >> 2) * DAT_8020f998[subTimer & 3];
         }
 
-        float drawX = baseX + (float)shakeX;
         float drawY = baseY + (float)shakeY;
 
         DrawRect__8CMenuPcsFUlfffffffff(

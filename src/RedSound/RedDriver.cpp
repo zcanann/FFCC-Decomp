@@ -432,6 +432,7 @@ struct RedExecCommand {
 #define RedExecCommandGetFunc(command) ((command)->m_func)
 #define RedExecCommandSetFunc(command, func) ((command)->m_func = (func))
 #define RedExecCommandSetArg(command, index, arg) (RedExecCommandGetArg((command), (index)) = (arg))
+#define RedExecCommandArgGet(args, index) ((args)[(index)])
 
 enum RedExecCommandLayout {
     REDSOUND_EXEC_COMMAND_FUNC_OFFSET = (unsigned int)&(((RedExecCommand*)0)->m_func),
@@ -1455,8 +1456,8 @@ static void _SeMasterVolume(int* command)
  */
 static void _SeVolume(int* command)
 {
-    SetSeVolume(command[REDSOUND_SE_COMMAND_ID], command[REDSOUND_SE_COMMAND_VALUE],
-                command[REDSOUND_SE_COMMAND_FADE_TIME], command[REDSOUND_SE_COMMAND_MODE]);
+    SetSeVolume(RedExecCommandArgGet(command, REDSOUND_SE_COMMAND_ID), RedExecCommandArgGet(command, REDSOUND_SE_COMMAND_VALUE),
+                RedExecCommandArgGet(command, REDSOUND_SE_COMMAND_FADE_TIME), RedExecCommandArgGet(command, REDSOUND_SE_COMMAND_MODE));
 }
 
 /*
@@ -1470,8 +1471,8 @@ static void _SeVolume(int* command)
  */
 static void _SePan(int* command)
 {
-    SetSePan(command[REDSOUND_SE_COMMAND_ID], command[REDSOUND_SE_COMMAND_VALUE],
-             command[REDSOUND_SE_COMMAND_FADE_TIME]);
+    SetSePan(RedExecCommandArgGet(command, REDSOUND_SE_COMMAND_ID), RedExecCommandArgGet(command, REDSOUND_SE_COMMAND_VALUE),
+             RedExecCommandArgGet(command, REDSOUND_SE_COMMAND_FADE_TIME));
 }
 
 /*
@@ -1485,8 +1486,8 @@ static void _SePan(int* command)
  */
 static void _SePitch(int* command)
 {
-    SetSePitch(command[REDSOUND_SE_COMMAND_ID], command[REDSOUND_SE_COMMAND_VALUE],
-               command[REDSOUND_SE_COMMAND_FADE_TIME]);
+    SetSePitch(RedExecCommandArgGet(command, REDSOUND_SE_COMMAND_ID), RedExecCommandArgGet(command, REDSOUND_SE_COMMAND_VALUE),
+               RedExecCommandArgGet(command, REDSOUND_SE_COMMAND_FADE_TIME));
 }
 
 /*
@@ -1500,7 +1501,7 @@ static void _SePitch(int* command)
  */
 static void _SePause(int* command)
 {
-    SePause(command[REDSOUND_SE_COMMAND_ID], command[REDSOUND_SE_COMMAND_PAUSE]);
+    SePause(RedExecCommandArgGet(command, REDSOUND_SE_COMMAND_ID), RedExecCommandArgGet(command, REDSOUND_SE_COMMAND_PAUSE));
 }
 
 /*
@@ -1514,7 +1515,7 @@ static void _SePause(int* command)
  */
 static void _StreamStop(int* command)
 {
-	StreamStop(command[REDSOUND_STREAM_COMMAND_ID]);
+	StreamStop(RedExecCommandArgGet(command, REDSOUND_STREAM_COMMAND_ID));
 }
 
 /*
@@ -1528,9 +1529,9 @@ static void _StreamStop(int* command)
  */
 static void _StreamPlay(int* command)
 {
-	StreamPlay(command[REDSOUND_STREAM_COMMAND_ID], (void*)command[REDSOUND_STREAM_COMMAND_DATA],
-	           command[REDSOUND_STREAM_COMMAND_FILE_SIZE], command[REDSOUND_STREAM_COMMAND_PAN],
-	           command[REDSOUND_STREAM_COMMAND_PLAY_VOLUME]);
+	StreamPlay(RedExecCommandArgGet(command, REDSOUND_STREAM_COMMAND_ID), (void*)RedExecCommandArgGet(command, REDSOUND_STREAM_COMMAND_DATA),
+	           RedExecCommandArgGet(command, REDSOUND_STREAM_COMMAND_FILE_SIZE), RedExecCommandArgGet(command, REDSOUND_STREAM_COMMAND_PAN),
+	           RedExecCommandArgGet(command, REDSOUND_STREAM_COMMAND_PLAY_VOLUME));
 }
 
 /*
@@ -1544,8 +1545,8 @@ static void _StreamPlay(int* command)
  */
 static void _StreamVolume(int* command)
 {
-	SetStreamVolume(command[REDSOUND_STREAM_COMMAND_ID], command[REDSOUND_STREAM_COMMAND_VOLUME],
-	                command[REDSOUND_STREAM_COMMAND_FADE_TIME]);
+	SetStreamVolume(RedExecCommandArgGet(command, REDSOUND_STREAM_COMMAND_ID), RedExecCommandArgGet(command, REDSOUND_STREAM_COMMAND_VOLUME),
+	                RedExecCommandArgGet(command, REDSOUND_STREAM_COMMAND_FADE_TIME));
 }
 
 /*
@@ -1558,8 +1559,8 @@ static void _StreamVolume(int* command)
  */
 static void _StreamPan(int* command)
 {
-	SetStreamPan(command[REDSOUND_STREAM_COMMAND_ID], command[REDSOUND_STREAM_COMMAND_PAN],
-	             command[REDSOUND_STREAM_COMMAND_FADE_TIME]);
+	SetStreamPan(RedExecCommandArgGet(command, REDSOUND_STREAM_COMMAND_ID), RedExecCommandArgGet(command, REDSOUND_STREAM_COMMAND_PAN),
+	             RedExecCommandArgGet(command, REDSOUND_STREAM_COMMAND_FADE_TIME));
 }
 
 /*
@@ -1573,7 +1574,7 @@ static void _StreamPan(int* command)
  */
 static void _StreamPause(int* command)
 {
-	StreamPause(command[REDSOUND_STREAM_COMMAND_ID], command[REDSOUND_STREAM_COMMAND_PAUSE]);
+	StreamPause(RedExecCommandArgGet(command, REDSOUND_STREAM_COMMAND_ID), RedExecCommandArgGet(command, REDSOUND_STREAM_COMMAND_PAUSE));
 }
 
 /*

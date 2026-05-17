@@ -3023,21 +3023,21 @@ int CRedDriver::SePlayState(int seID)
     unsigned int interruptLevel;
     RedTrackDATA* seInfo;
     RedTrackDATA** seInfoBase;
-    int result;
+    int playState;
     RedExecCommand* command;
 
     interruptLevel = OSDisableInterrupts();
-    result = 0;
+    playState = 0;
     seInfoBase = &RedSoundControlGet(REDSOUND_CONTROL_SE)->m_tracks;
     seInfo = *seInfoBase;
     do {
         if (((u32)seInfo->m_command != REDSOUND_TRACK_COMMAND_NONE) && ((seID == REDSOUND_SE_ID_ALL || (seInfo->m_seId == seID)))) {
-            result = (int)seInfo;
+            playState = (int)seInfo;
             break;
         }
         seInfo++;
     } while (seInfo < RedSeTrackGetEnd(*seInfoBase));
-    if (result == 0) {
+    if (playState == 0) {
         commandNow = RedExecCommandGetNow();
         command = RedExecCommandGetOld();
         while (commandNow != command) {
@@ -3046,7 +3046,7 @@ int CRedDriver::SePlayState(int seID)
                   (RedExecCommandGetFunc(command) == _SeSepPlay)) ||
                  (RedExecCommandGetFunc(command) == _SeSepPlaySequence))) &&
                 ((seID == REDSOUND_SE_ID_ALL || (seID == RedExecCommandGetArg(command, REDSOUND_EXEC_COMMAND_ARG0))))) {
-                result = 1;
+                playState = 1;
                 break;
             }
             command++;
@@ -3056,7 +3056,7 @@ int CRedDriver::SePlayState(int seID)
         }
     }
     OSRestoreInterrupts(interruptLevel);
-    return result;
+    return playState;
 }
 
 /*
@@ -3373,29 +3373,29 @@ int CRedDriver::StreamPlayState(int streamID)
 	RedExecCommand* commandNow;
 	unsigned int interrupts;
 	RedStreamDATA* streamData;
-	int result;
+	int playState;
 	RedExecCommand* command;
 
 	interrupts = OSDisableInterrupts();
-	result = 0;
+	playState = 0;
 	streamData = RedStreamDataGetBegin();
 	do {
 		if ((streamData->m_streamId != REDSOUND_STREAM_ID_NONE) &&
 		    ((streamID == REDSOUND_STREAM_ID_ALL) || (streamData->m_streamId == streamID))) {
-			result = 1;
+			playState = 1;
 			break;
 		}
 		streamData++;
 	} while (streamData < RedStreamDataGetEnd());
 
-	if (result == 0) {
+	if (playState == 0) {
 		commandNow = RedExecCommandGetNow();
 		command = RedExecCommandGetOld();
 		while (commandNow != command) {
 			if ((RedExecCommandGetFunc(command) != 0) && (RedExecCommandGetFunc(command) == _StreamPlay) &&
 			    ((streamID == REDSOUND_STREAM_ID_ALL) ||
 			     (streamID == RedExecCommandGetArg(command, REDSOUND_EXEC_COMMAND_ARG0)))) {
-				result = 1;
+				playState = 1;
 				break;
 			}
 			command++;
@@ -3405,7 +3405,7 @@ int CRedDriver::StreamPlayState(int streamID)
 		}
 	}
 	OSRestoreInterrupts(interrupts);
-	return result;
+	return playState;
 }
 
 /*

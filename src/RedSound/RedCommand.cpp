@@ -837,7 +837,7 @@ static int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volum
 	RedSeInfoSequence* seq;
 	int waveNo;
 	int deltaTime;
-	int count;
+	int sequenceCount;
 	unsigned char* current;
 	int remaining;
 	RedVoiceDATA* voiceData;
@@ -865,10 +865,10 @@ static int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volum
 	}
 	seq = RedSeInfoGetSequences(info);
 	attrMask = info->m_attrMask;
-	count = RedSeInfoGetSequenceCount(info);
-	current = RedSeInfoGetCommandData(seq, count);
+	sequenceCount = RedSeInfoGetSequenceCount(info);
+	current = RedSeInfoGetCommandData(seq, sequenceCount);
 	do {
-		remaining = count;
+		remaining = sequenceCount;
 		if (sepId != REDSOUND_SEP_DIRECT_PLAY_ID) {
 			remaining = 0;
 			do {
@@ -876,7 +876,7 @@ static int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volum
 				if (!RedSeInfoSequenceHasContinue(seq, remaining)) {
 					break;
 				}
-			} while ((int)remaining < (int)count);
+			} while ((int)remaining < (int)sequenceCount);
 		}
 
 		track = SearchSeEmptyTrack((int)remaining, info->m_eraseTrack, attrMask);
@@ -963,7 +963,7 @@ static int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volum
 
 			remaining = remaining - 1;
 			seq++;
-			count = count - 1;
+			sequenceCount = sequenceCount - 1;
 			if (remaining == 0) {
 				break;
 			}
@@ -971,7 +971,7 @@ static int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volum
 			voiceData++;
 		}
 
-		if (count == 0) {
+		if (sequenceCount == 0) {
 			return seId;
 		}
 	} while (true);

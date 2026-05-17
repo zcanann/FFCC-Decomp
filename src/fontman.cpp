@@ -409,14 +409,14 @@ void CFont::DrawInit()
 
     _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
 
-    int zCompareFlag = renderFlagBits.zCompare;
-    int zUpdateFlag = renderFlagBits.zUpdate;
+    signed char zCompareFlag = renderFlagBits.zCompare;
     int zFunction = 7;
     int zUpdate = (zCompareFlag != 0) ? 1 : 0;
+    signed char zUpdateFlag = renderFlagBits.zUpdate;
     if (zUpdateFlag != 0) {
         zFunction = 3;
     }
-    int zEnable = (zCompareFlag != 0 || zUpdateFlag != 0) ? 1 : 0;
+    signed char zEnable = (zCompareFlag != 0 || zUpdateFlag != 0) ? 1 : 0;
     GXSetZMode(zEnable, (GXCompare)zFunction, zUpdate);
 
     _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(6, 1, 0, 7, 0);

@@ -586,21 +586,27 @@ static int _SePlayStart(RedSeINFO* seInfo, int seId, int sepId, int pan, int vol
  */
 int SeBlockPlay(int seId, int bank, int sequenceNo, int pan, int volume)
 {
+	RedSeBlockHEAD* seBlock;
+	int blockSequence;
+	int* entries;
+	RedSeINFO* seInfo;
+	RedSeINFO* playInfo;
+
 	bank = bank & REDSOUND_SE_BLOCK_BANK_MASK;
 	sequenceNo = sequenceNo & REDSOUND_SE_BLOCK_SEQUENCE_MASK;
 
 	if (RedSeBlockDataGet(bank) != REDSOUND_SE_BLOCK_DATA_NONE) {
-		RedSeBlockHEAD* seBlock = RedSeBlockDataGet(bank);
-		int blockSequence = sequenceNo;
+		seBlock = RedSeBlockDataGet(bank);
+		blockSequence = sequenceNo;
 
 		sequenceNo += bank << REDSOUND_SE_BLOCK_BANK_SHIFT;
 		sequenceNo |= REDSOUND_SE_BLOCK_DATA_FLAG;
 		if (blockSequence < seBlock->m_seCount) {
-			int* entries = seBlock->m_entries;
+			entries = seBlock->m_entries;
 
 			if (entries[blockSequence] != REDSOUND_SE_BLOCK_ENTRY_EMPTY) {
-				RedSeINFO* seInfo = RedSeBlockGetInfoFromEntry(seBlock, entries, blockSequence);
-				RedSeINFO* playInfo = seInfo;
+				seInfo = RedSeBlockGetInfoFromEntry(seBlock, entries, blockSequence);
+				playInfo = seInfo;
 
 				if (((unsigned int)entries[blockSequence] & REDSOUND_SE_BLOCK_DATA_FLAG) != 0) {
 					playInfo->m_flagsAndCount |= REDSOUND_SE_INFO_MULTI_FLAG;

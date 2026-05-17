@@ -2453,11 +2453,11 @@ int CRedDriver::GetSoundMode()
 int CRedDriver::SetMusicData(void* musicData)
 {
     int headerSize;
-    int result;
+    int musicNo;
     RedMusicHEAD* header = (RedMusicHEAD*)musicData;
     RedMusicHEAD localHeader;
 
-    result = REDSOUND_MUSIC_ID_NONE;
+    musicNo = REDSOUND_MUSIC_ID_NONE;
     if (((header->m_signature[REDSOUND_MUSIC_SIGNATURE_0_INDEX] == REDSOUND_MUSIC_SIGNATURE_0) &&
          (header->m_signature[REDSOUND_MUSIC_SIGNATURE_1_INDEX] == REDSOUND_MUSIC_SIGNATURE_1)) &&
         (header->m_signature[REDSOUND_MUSIC_SIGNATURE_2_INDEX] == REDSOUND_MUSIC_SIGNATURE_2)) {
@@ -2466,14 +2466,14 @@ int CRedDriver::SetMusicData(void* musicData)
         header = (RedMusicHEAD*)RedNew(headerSize);
         if (header != 0) {
             memcpy(header, musicData, headerSize);
-            result = localHeader.m_musicNo;
+            musicNo = localHeader.m_musicNo;
             _EntryExecCommand(_SetMusicData, (int)header, 0, 0, 0, 0, 0, 0);
         }
     } else if (RedReportPrintIsEnabled()) {
         OSReport(sRedDriverMusicHeaderErrorFmt, sRedDriverLogPrefix, sRedDriverLogWarnColor, sRedDriverLogReset);
         fflush(__files + 1);
     }
-    return result;
+    return musicNo;
 }
 
 /*
@@ -2607,13 +2607,13 @@ int CRedDriver::MusicPlay(int musicID, int volume, int mode)
  */
 inline int CRedDriver::MusicPlay(void* musicData, int volume, int mode)
 {
-    int result;
+    int musicNo;
     RedMusicHEAD localHeader;
     RedMusicHEAD* const header = (RedMusicHEAD*)musicData;
     RedMusicHEAD* copiedHeader;
     int headerSize;
 
-    result = REDSOUND_MUSIC_ID_NONE;
+    musicNo = REDSOUND_MUSIC_ID_NONE;
     if (((header->m_signature[REDSOUND_MUSIC_SIGNATURE_0_INDEX] == REDSOUND_MUSIC_SIGNATURE_0) &&
          (header->m_signature[REDSOUND_MUSIC_SIGNATURE_1_INDEX] == REDSOUND_MUSIC_SIGNATURE_1)) &&
         (header->m_signature[REDSOUND_MUSIC_SIGNATURE_2_INDEX] == REDSOUND_MUSIC_SIGNATURE_2)) {
@@ -2621,14 +2621,14 @@ inline int CRedDriver::MusicPlay(void* musicData, int volume, int mode)
         headerSize = localHeader.m_size;
         copiedHeader = (RedMusicHEAD*)RedNew(headerSize);
         if (copiedHeader == 0) {
-            return result;
+            return musicNo;
         }
         memcpy(copiedHeader, header, headerSize);
-        result = copiedHeader->m_musicNo;
+        musicNo = copiedHeader->m_musicNo;
         _EntryExecCommand(_SetMusicData, (int)copiedHeader, 0, 0, 0, 0, 0, 0);
-        _EntryExecCommand(_MusicPlaySequence, result, volume, mode, 0, 0, 0, 0);
+        _EntryExecCommand(_MusicPlaySequence, musicNo, volume, mode, 0, 0, 0, 0);
     }
-    return result;
+    return musicNo;
 }
 
 /*
@@ -2656,13 +2656,13 @@ int CRedDriver::MusicCrossPlay(int musicID, int volume, int mode)
  */
 inline int CRedDriver::MusicCrossPlay(void* musicData, int volume, int mode)
 {
-    int result;
+    int musicNo;
     RedMusicHEAD localHeader;
     RedMusicHEAD* const header = (RedMusicHEAD*)musicData;
     RedMusicHEAD* copiedHeader;
     int headerSize;
 
-    result = REDSOUND_MUSIC_ID_NONE;
+    musicNo = REDSOUND_MUSIC_ID_NONE;
     if (((header->m_signature[REDSOUND_MUSIC_SIGNATURE_0_INDEX] == REDSOUND_MUSIC_SIGNATURE_0) &&
          (header->m_signature[REDSOUND_MUSIC_SIGNATURE_1_INDEX] == REDSOUND_MUSIC_SIGNATURE_1)) &&
         (header->m_signature[REDSOUND_MUSIC_SIGNATURE_2_INDEX] == REDSOUND_MUSIC_SIGNATURE_2)) {
@@ -2670,14 +2670,14 @@ inline int CRedDriver::MusicCrossPlay(void* musicData, int volume, int mode)
         headerSize = localHeader.m_size;
         copiedHeader = (RedMusicHEAD*)RedNew(headerSize);
         if (copiedHeader == 0) {
-            return result;
+            return musicNo;
         }
         memcpy(copiedHeader, header, headerSize);
-        result = copiedHeader->m_musicNo;
+        musicNo = copiedHeader->m_musicNo;
         _EntryExecCommand(_SetMusicData, (int)copiedHeader, 0, 0, 0, 0, 0, 0);
-        _EntryExecCommand(_MusicCrossPlaySequence, result, volume, mode, 0, 0, 0, 0);
+        _EntryExecCommand(_MusicCrossPlaySequence, musicNo, volume, mode, 0, 0, 0, 0);
     }
-    return result;
+    return musicNo;
 }
 
 /*
@@ -2705,13 +2705,13 @@ int CRedDriver::MusicNextPlay(int musicID, int volume, int mode)
  */
 inline int CRedDriver::MusicNextPlay(void* musicData, int volume, int mode)
 {
-    int result;
+    int musicNo;
     RedMusicHEAD localHeader;
     RedMusicHEAD* const header = (RedMusicHEAD*)musicData;
     RedMusicHEAD* copiedHeader;
     int headerSize;
 
-    result = REDSOUND_MUSIC_ID_NONE;
+    musicNo = REDSOUND_MUSIC_ID_NONE;
     if (((header->m_signature[REDSOUND_MUSIC_SIGNATURE_0_INDEX] == REDSOUND_MUSIC_SIGNATURE_0) &&
          (header->m_signature[REDSOUND_MUSIC_SIGNATURE_1_INDEX] == REDSOUND_MUSIC_SIGNATURE_1)) &&
         (header->m_signature[REDSOUND_MUSIC_SIGNATURE_2_INDEX] == REDSOUND_MUSIC_SIGNATURE_2)) {
@@ -2719,14 +2719,14 @@ inline int CRedDriver::MusicNextPlay(void* musicData, int volume, int mode)
         headerSize = localHeader.m_size;
         copiedHeader = (RedMusicHEAD*)RedNew(headerSize);
         if (copiedHeader == 0) {
-            return result;
+            return musicNo;
         }
         memcpy(copiedHeader, header, headerSize);
-        result = copiedHeader->m_musicNo;
+        musicNo = copiedHeader->m_musicNo;
         _EntryExecCommand(_SetMusicData, (int)copiedHeader, 0, 0, 0, 0, 0, 0);
-        _EntryExecCommand(_MusicNextPlaySequence, result, volume, mode, 0, 0, 0, 0);
+        _EntryExecCommand(_MusicNextPlaySequence, musicNo, volume, mode, 0, 0, 0, 0);
     }
-    return result;
+    return musicNo;
 }
 
 /*

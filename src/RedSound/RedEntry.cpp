@@ -1260,40 +1260,40 @@ void CRedEntry::DisplaySePlayInfo()
 		OSReport(sRedEntrySePlayInfoColumnFmt, sRedEntryLogPrefix);
 		fflush(__files + 1);
 
-		RedTrackDATA** seTrackHead = &RedSoundControlGet(REDSOUND_CONTROL_SE)->m_tracks;
-		RedTrackDATA* track = *seTrackHead;
+		RedTrackDATA** seTrackBasePtr = &RedSoundControlGet(REDSOUND_CONTROL_SE)->m_tracks;
+		RedTrackDATA* seTrack = *seTrackBasePtr;
 		int waveNo;
 		do {
-			if (track->m_command != REDSOUND_TRACK_COMMAND_NONE) {
-				if ((track->m_seSepId & REDSOUND_SE_BLOCK_DATA_FLAG) != 0) {
-					unsigned int seBlockId = (unsigned int)track->m_seSepId;
+			if (seTrack->m_command != REDSOUND_TRACK_COMMAND_NONE) {
+				if ((seTrack->m_seSepId & REDSOUND_SE_BLOCK_DATA_FLAG) != 0) {
+					unsigned int seBlockId = (unsigned int)seTrack->m_seSepId;
 					seBlockId &= REDSOUND_SE_BLOCK_ENTRY_MASK;
-					int blockBank = (int)seBlockId / REDSOUND_SE_BLOCK_SEQUENCE_COUNT;
-					int blockSequence = seBlockId & REDSOUND_SE_BLOCK_SEQUENCE_MASK;
-					RedSeBlockHEAD* seBlock = RedSeBlockDataGet(blockBank);
-					int* entries = seBlock->m_entries;
-					RedSeINFO* seInfo = RedSeBlockGetInfoFromEntries(seBlock, entries, blockSequence);
-					waveNo = RedSeInfoGetWaveNo(seInfo);
+					int seBlockBankNo = (int)seBlockId / REDSOUND_SE_BLOCK_SEQUENCE_COUNT;
+					int seBlockIndex = seBlockId & REDSOUND_SE_BLOCK_SEQUENCE_MASK;
+					RedSeBlockHEAD* seBlockHead = RedSeBlockDataGet(seBlockBankNo);
+					int* seBlockEntries = seBlockHead->m_entries;
+					RedSeINFO* blockSeInfo = RedSeBlockGetInfoFromEntries(seBlockHead, seBlockEntries, seBlockIndex);
+					waveNo = RedSeInfoGetWaveNo(blockSeInfo);
 
 					OSReport(sRedEntrySeBlockPlayInfoFmt, sRedEntryLogPrefix,
-					         (track - *seTrackHead) + REDSOUND_SE_VOICE_BASE_INDEX, blockBank,
-					         blockSequence, waveNo);
+					         (seTrack - *seTrackBasePtr) + REDSOUND_SE_VOICE_BASE_INDEX, seBlockBankNo,
+					         seBlockIndex, waveNo);
 					fflush(__files + 1);
 				} else {
-					RedHistoryBANK* seSepBank = SearchSeSepBank(track->m_seSepId);
+					RedHistoryBANK* seSepBank = SearchSeSepBank(seTrack->m_seSepId);
 					RedSeSepHEAD* seSepHead = seSepBank->m_seSepHead;
 					waveNo = RedSeSepGetWaveNo(seSepHead);
 					OSReport(sRedEntrySeSepPlayInfoFmt, sRedEntryLogPrefix,
-					         (track - *seTrackHead) + REDSOUND_SE_VOICE_BASE_INDEX, track->m_seSepId, waveNo);
+					         (seTrack - *seTrackBasePtr) + REDSOUND_SE_VOICE_BASE_INDEX, seTrack->m_seSepId, waveNo);
 					fflush(__files + 1);
 				}
 			} else {
 				OSReport(sRedEntrySeEmptyPlayInfoFmt, sRedEntryLogPrefix,
-				         (track - *seTrackHead) + REDSOUND_SE_VOICE_BASE_INDEX);
+				         (seTrack - *seTrackBasePtr) + REDSOUND_SE_VOICE_BASE_INDEX);
 				fflush(__files + 1);
 			}
-			track += 1;
-		} while (track < RedSeTrackGetEnd(*seTrackHead));
+			seTrack += 1;
+		} while (seTrack < RedSeTrackGetEnd(*seTrackBasePtr));
 
 		OSReport(sRedEntryPrefixedNewlineFmt, sRedEntryLogPrefix);
 		fflush(__files + 1);

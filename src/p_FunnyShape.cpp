@@ -73,10 +73,14 @@ static const char s_CPtrArray_OSFS_TEXTURE_ST_801D7E44[] = "CPtrArray<OSFS_TEXTU
 static const char s_CPtrArray_GXTexObj[] = "CPtrArray<_GXTexObj *>";
 extern const char __RTTI__8CManager_8032E660[];
 extern const char __RTTI__8CProcess_8032E668[];
+extern const char __RTTI__29CPtrArray_P15OSFS_TEXTURE_ST_8032E678[];
+extern const char __RTTI__22CPtrArray_P9_GXTexObj_8032E680[];
 extern u8 ARRAY_8026D728[];
 
 extern "C" CUSBStreamData* __dt__14CUSBStreamDataFv(CUSBStreamData* self, short shouldDelete);
 extern "C" const char lbl_8032FD1C[5];
+extern "C" void dtor_CPtrArray_OSFS_TEXTURE_ST();
+extern "C" void dtor_CPtrArray_GXTexObj();
 
 namespace {
 static inline u8* Ptr(CFunnyShapePcs* self, u32 offset)
@@ -519,6 +523,17 @@ CPtrArray<_GXTexObj*>::~CPtrArray()
     SetPtrArrayDtorVtable(this);
     RemoveAll();
 }
+
+void* gVtable_CPtrArray_OSFSTexture[3] = {
+    const_cast<char*>(__RTTI__29CPtrArray_P15OSFS_TEXTURE_ST_8032E678),
+    0,
+    reinterpret_cast<void*>(dtor_CPtrArray_OSFS_TEXTURE_ST),
+};
+void* gVtable_CPtrArray_GXTexObj[3] = {
+    const_cast<char*>(__RTTI__22CPtrArray_P9_GXTexObj_8032E680),
+    0,
+    reinterpret_cast<void*>(dtor_CPtrArray_GXTexObj),
+};
 
 /*
  * --INFO--

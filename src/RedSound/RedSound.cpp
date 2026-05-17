@@ -1410,9 +1410,9 @@ inline RedReverbDepth* CRedSound::GetReverbDepth()
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CRedSound::SetReverb(int bank, int kind, int* params)
+inline void CRedSound::SetReverb(int bank, int kind, int* reverbParams)
 {
-	c_Driver.SetReverb(bank, kind, params);
+	c_Driver.SetReverb(bank, kind, reverbParams);
 }
 /*
  * --INFO--

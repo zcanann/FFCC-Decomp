@@ -3721,9 +3721,9 @@ void CRedDriver::SetReverb(int bank, int kind)
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CRedDriver::SetReverb(int bank, int kind, int* params)
+inline void CRedDriver::SetReverb(int bank, int kind, int* reverbParams)
 {
-    ::SetReverb(bank, kind, params);
+    ::SetReverb(bank, kind, reverbParams);
 }
 
 /*

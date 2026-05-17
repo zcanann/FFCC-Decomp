@@ -428,6 +428,8 @@ struct RedExecCommand {
 };
 
 #define RedExecCommandGetArg(command, index) ((command)->m_args[(index)])
+#define RedExecCommandGetArgs(command) ((command)->m_args)
+#define RedExecCommandGetFunc(command) ((command)->m_func)
 #define RedExecCommandSetFunc(command, func) ((command)->m_func = (func))
 #define RedExecCommandSetArg(command, index, arg) (RedExecCommandGetArg((command), (index)) = (arg))
 
@@ -1626,8 +1628,8 @@ static void _ExecuteCommand()
 	readPos = RedExecCommandGetOld();
 
 	while (executePos != readPos) {
-		if (readPos->m_func != 0) {
-			readPos->m_func((int*)readPos->m_args);
+		if (RedExecCommandGetFunc(readPos) != 0) {
+			RedExecCommandGetFunc(readPos)((int*)RedExecCommandGetArgs(readPos));
 		}
 		readPos++;
 		if (readPos == RedExecCommandGetEnd()) {
@@ -2545,10 +2547,10 @@ inline int CRedDriver::MusicPlayState(int musicID)
         commandNow = RedExecCommandGetNow();
         command = RedExecCommandGetOld();
         while (commandNow != command) {
-            if ((command->m_func != 0) &&
-                ((command->m_func == _MusicPlaySequence) ||
-                 (command->m_func == _MusicCrossPlaySequence) ||
-                 (command->m_func == _MusicNextPlaySequence)) &&
+            if ((RedExecCommandGetFunc(command) != 0) &&
+                ((RedExecCommandGetFunc(command) == _MusicPlaySequence) ||
+                 (RedExecCommandGetFunc(command) == _MusicCrossPlaySequence) ||
+                 (RedExecCommandGetFunc(command) == _MusicNextPlaySequence)) &&
                 ((musicID == REDSOUND_MUSIC_ID_NONE) ||
                  (musicID == RedExecCommandGetArg(command, REDSOUND_EXEC_COMMAND_ARG0)))) {
                 result = 1;
@@ -3038,10 +3040,10 @@ int CRedDriver::SePlayState(int seID)
         commandNow = RedExecCommandGetNow();
         command = RedExecCommandGetOld();
         while (commandNow != command) {
-            if (((command->m_func != 0) &&
-                (((command->m_func == _SeBlockPlay) ||
-                  (command->m_func == _SeSepPlay)) ||
-                 (command->m_func == _SeSepPlaySequence))) &&
+            if (((RedExecCommandGetFunc(command) != 0) &&
+                (((RedExecCommandGetFunc(command) == _SeBlockPlay) ||
+                  (RedExecCommandGetFunc(command) == _SeSepPlay)) ||
+                 (RedExecCommandGetFunc(command) == _SeSepPlaySequence))) &&
                 ((seID == REDSOUND_SE_ID_ALL || (seID == RedExecCommandGetArg(command, REDSOUND_EXEC_COMMAND_ARG0))))) {
                 result = 1;
                 break;
@@ -3389,7 +3391,7 @@ int CRedDriver::StreamPlayState(int streamID)
 		commandNow = RedExecCommandGetNow();
 		command = RedExecCommandGetOld();
 		while (commandNow != command) {
-			if ((command->m_func != 0) && (command->m_func == _StreamPlay) &&
+			if ((RedExecCommandGetFunc(command) != 0) && (RedExecCommandGetFunc(command) == _StreamPlay) &&
 			    ((streamID == REDSOUND_STREAM_ID_ALL) ||
 			     (streamID == RedExecCommandGetArg(command, REDSOUND_EXEC_COMMAND_ARG0)))) {
 				result = 1;

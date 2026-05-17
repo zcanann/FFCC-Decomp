@@ -743,7 +743,7 @@ int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)
             outMatrix[2][3] += pppMngStPtr->m_position.z;
             PSMTXConcat(outMatrix, localMatrix.value, localMatrix.value);
 
-            if (mngSt->m_scale.x != 1.0f) {
+            if (FLOAT_80331184 != mngSt->m_scale.x) {
                 localB8.x = localMatrix.value[0][0];
                 localB8.y = localMatrix.value[1][0];
                 localB8.z = localMatrix.value[2][0];
@@ -752,7 +752,7 @@ int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)
                 localMatrix.value[1][0] = localB8.y;
                 localMatrix.value[2][0] = localB8.z;
             }
-            if (mngSt->m_scale.y != 1.0f) {
+            if (FLOAT_80331184 != mngSt->m_scale.y) {
                 localC4.x = localMatrix.value[0][1];
                 localC4.y = localMatrix.value[1][1];
                 localC4.z = localMatrix.value[2][1];
@@ -761,7 +761,7 @@ int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)
                 localMatrix.value[1][1] = localC4.y;
                 localMatrix.value[2][1] = localC4.z;
             }
-            if (mngSt->m_scale.z != 1.0f) {
+            if (FLOAT_80331184 != mngSt->m_scale.z) {
                 localD0.x = localMatrix.value[0][2];
                 localD0.y = localMatrix.value[1][2];
                 localD0.z = localMatrix.value[2][2];
@@ -781,7 +781,7 @@ int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)
             PSMTXMultVecSR(outMatrix, &pppMngStPtr->m_position, &local88);
             PSMTXConcat(outMatrix, localMatrix.value, localMatrix.value);
 
-            if (mngSt->m_scale.x != 1.0f) {
+            if (FLOAT_80331184 != mngSt->m_scale.x) {
                 localDC.x = localMatrix.value[0][0];
                 localDC.y = localMatrix.value[1][0];
                 localDC.z = localMatrix.value[2][0];
@@ -790,7 +790,7 @@ int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)
                 localMatrix.value[1][0] = localDC.y;
                 localMatrix.value[2][0] = localDC.z;
             }
-            if (mngSt->m_scale.y != 1.0f) {
+            if (FLOAT_80331184 != mngSt->m_scale.y) {
                 localE8.x = localMatrix.value[0][1];
                 localE8.y = localMatrix.value[1][1];
                 localE8.z = localMatrix.value[2][1];
@@ -799,7 +799,7 @@ int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)
                 localMatrix.value[1][1] = localE8.y;
                 localMatrix.value[2][1] = localE8.z;
             }
-            if (mngSt->m_scale.z != 1.0f) {
+            if (FLOAT_80331184 != mngSt->m_scale.z) {
                 localF4.x = localMatrix.value[0][2];
                 localF4.y = localMatrix.value[1][2];
                 localF4.z = localMatrix.value[2][2];
@@ -814,7 +814,7 @@ int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)
         break;
     }
 
-    if (mngSt->m_scale.x != 1.0f) {
+    if (FLOAT_80331184 != mngSt->m_scale.x) {
         local100.x = localMatrix.value[0][0];
         local100.y = localMatrix.value[1][0];
         local100.z = localMatrix.value[2][0];
@@ -823,7 +823,7 @@ int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)
         localMatrix.value[1][0] = local100.y;
         localMatrix.value[2][0] = local100.z;
     }
-    if (mngSt->m_scale.y != 1.0f) {
+    if (FLOAT_80331184 != mngSt->m_scale.y) {
         local10C.x = localMatrix.value[0][1];
         local10C.y = localMatrix.value[1][1];
         local10C.z = localMatrix.value[2][1];
@@ -832,7 +832,7 @@ int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)
         localMatrix.value[1][1] = local10C.y;
         localMatrix.value[2][1] = local10C.z;
     }
-    if (mngSt->m_scale.z != 1.0f) {
+    if (FLOAT_80331184 != mngSt->m_scale.z) {
         local118.x = localMatrix.value[0][2];
         local118.y = localMatrix.value[1][2];
         local118.z = localMatrix.value[2][2];

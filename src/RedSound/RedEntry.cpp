@@ -1117,7 +1117,7 @@ RedHistoryBANK* CRedEntry::SeSepOldDelete()
  */
 int CRedEntry::ClearSeSepData(int seNo)
 {
-	int result = 0;
+	int clearResult = 0;
 
 	if (seNo == REDSOUND_SESEP_CLEAR_ALL) {
 		RedHistoryBANK* history = m_seSepBankBase;
@@ -1128,13 +1128,13 @@ int CRedEntry::ClearSeSepData(int seNo)
 			history += 1;
 		} while (history < RedEntrySeSepBankGetEnd(this));
 	} else {
-		result = SearchSeSepSequence(seNo);
-		if (result >= 0) {
-			result = SeSepMemoryFree(RedEntrySeSepBankGet(this, result));
+		clearResult = SearchSeSepSequence(seNo);
+		if (clearResult >= 0) {
+			clearResult = SeSepMemoryFree(RedEntrySeSepBankGet(this, clearResult));
 		}
 	}
 
-	return result;
+	return clearResult;
 }
 /*
  * --INFO--
@@ -1147,7 +1147,7 @@ int CRedEntry::ClearSeSepData(int seNo)
  */
 int CRedEntry::ClearSeSepDataMG(int bankNo, int sepNo, int groupNo, int kindNo)
 {
-	int result = 0;
+	int clearResult = 0;
 	RedHistoryBANK* bank = m_seSepBankBase;
 
 	do {
@@ -1160,7 +1160,7 @@ int CRedEntry::ClearSeSepDataMG(int bankNo, int sepNo, int groupNo, int kindNo)
 		bank += 1;
 	} while (bank < RedEntrySeSepBankGetEnd(this));
 
-	return result;
+	return clearResult;
 }
 /*
  * --INFO--
@@ -1960,7 +1960,7 @@ int CRedEntry::MusicMemoryFree(RedHistoryBANK* bank)
  */
 inline int CRedEntry::ClearMusicData(int musicNo)
 {
-	int result = 0;
+	int clearResult = 0;
 
 	if (musicNo == REDSOUND_MUSIC_CLEAR_ALL) {
 		RedHistoryBANK* history = m_musicBankBase;
@@ -1969,18 +1969,18 @@ inline int CRedEntry::ClearMusicData(int musicNo)
 				if (history->m_historyNo != REDSOUND_HISTORY_UNUSED) {
 					MusicHistoryDelete(history->m_historyNo);
 				}
-				result += MusicMemoryFree(history);
+				clearResult += MusicMemoryFree(history);
 			}
 			history += 1;
 		} while (history < RedEntryMusicBankGetEnd(this));
 	} else {
-		result = SearchMusicSequence(musicNo);
-		if (result >= 0) {
-			result = MusicMemoryFree(RedEntryMusicBankGet(this, result));
+		clearResult = SearchMusicSequence(musicNo);
+		if (clearResult >= 0) {
+			clearResult = MusicMemoryFree(RedEntryMusicBankGet(this, clearResult));
 		}
 	}
 
-	return result;
+	return clearResult;
 }
 /*
  * --INFO--

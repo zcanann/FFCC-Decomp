@@ -474,8 +474,9 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
             m_uvPairs = cursor;
             cursor += chunk.m_size;
 
+            int i = 0;
             offset = 0;
-            for (int i = 0; i < static_cast<int>(m_uvCount); i++, offset += 4) {
+            for (; i < static_cast<int>(m_uvCount); i++, offset += 4) {
                 *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned int>(m_uvPairs) + offset) = reader.Get2();
                 *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned int>(m_uvPairs) + offset + 2) =
                     reader.Get2();

@@ -1445,11 +1445,13 @@ static void _VoiceDataAsign(RedTrackDATA* track, RedVoiceDATA* voice, RedNoteDAT
     }
 
     pitchWork = track->m_keyTranspose + track->m_pitchBend;
+    int basePitch;
     if ((voice->m_stateFlags & REDSOUND_VOICE_STATE_PLAYING_MASK) != 0) {
-        workValue = voice->m_basePitch + track->m_pitch;
+        basePitch = voice->m_basePitch + track->m_pitch;
     } else {
-        workValue = voice->m_basePitch + RedMusicPitchControlGetValue();
+        basePitch = voice->m_basePitch + RedMusicPitchControlGetValue();
     }
+    workValue = basePitch;
 
     if (voice->m_waveData != 0) {
         workValue = PitchCompute(workValue, pitchWork, voice->m_waveData->m_pitch, track->m_fineTune);

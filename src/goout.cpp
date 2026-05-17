@@ -87,7 +87,7 @@ static inline CMenuMcWinState& MenuMcWinState(CMenuPcsGoOutLayout& layout)
     return *reinterpret_cast<CMenuMcWinState*>(layout.m_mcWinStatePtr);
 }
 
-static unsigned short GetGoOutInputMask()
+static inline unsigned short GetGoOutInputMask()
 {
     bool hasPendingInput = false;
     if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
@@ -108,23 +108,12 @@ static inline const char* GetGoOutMessageLine(int languageId, int line)
 
 static const char s_gooutCpp[] = "goout.cpp";
 
-static void InitGoOutWinMessage(int message, short startIndex)
-{
-    short* winMessage = reinterpret_cast<short*>(GetWinMess__8CMenuPcsFi(&MenuPcs, message));
-
-    winMessage[0] = 0;
-    winMessage[1] = 0;
-    for (int i = 0; i < 8; i++) {
-        winMessage[i + 2] = startIndex + i;
-    }
-}
-
 static inline CGoOutSaveDatLayout& GoOutSaveDat(Mc::SaveDat* saveData)
 {
     return *reinterpret_cast<CGoOutSaveDatLayout*>(saveData);
 }
 
-static int FindFreeCaravanIdx(Mc::SaveDat* saveData)
+static inline int FindFreeCaravanIdx(Mc::SaveDat* saveData)
 {
     for (int i = 0; i < 8; i++) {
         if (GoOutSaveDat(saveData).m_caravan[i].m_dataPresent == 0) {
@@ -289,7 +278,6 @@ void CGoOutMenu::CalcMemCardProc()
 int CGoOutMenu::SetMemCardError()
 {
     CMenuPcsGoOutLayout& menuPcsLayout = *reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs);
-    int result = 1;
 
     if (field_0x4 == -5) {
         MenuMcWinState(menuPcsLayout).m_mode = 3;
@@ -411,11 +399,11 @@ int CGoOutMenu::SetMemCardError()
                        GetGoOutMessageLine(languageId, 4));
         }
     } else if (field_0x4 == 1) {
-        result = 0;
+        return 0;
     }
 
     field_0x18 = 2;
-    return result;
+    return 1;
 }
 
 /*
@@ -448,8 +436,9 @@ void CGoOutMenu::SetMenuStr(long timer, int lineCount, ...)
 {
     va_list args;
     unsigned int leadingZeros;
-    int indexBase;
     int i;
+    int indexBase;
+    int mask;
     int* winMessage;
     const char** winMessageBuffer;
     short messageIndex;
@@ -459,7 +448,9 @@ void CGoOutMenu::SetMenuStr(long timer, int lineCount, ...)
     *winMessage = lineCount;
 
     leadingZeros = (unsigned int)__cntlzw((unsigned int)field_0x38);
-    indexBase = static_cast<int>(~-(leadingZeros >> 5 & 1U) & 10U);
+    mask = -static_cast<int>(leadingZeros >> 5 & 1U);
+    indexBase = 10;
+    indexBase &= ~mask;
     va_start(args, lineCount);
     winMessageBuffer = (const char**)GetMcWinMessBuff__8CMenuPcsFi(&MenuPcs, 2);
     for (i = 0; i < lineCount; i++) {
@@ -467,14 +458,14 @@ void CGoOutMenu::SetMenuStr(long timer, int lineCount, ...)
     }
     va_end(args);
 
-    messageIndex = field_0x38;
+    messageIndex = field_0x38 + 0x22;
     if (field_0x36 >= 0) {
         MenuMcWinState(*reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs)).m_mode = 2;
         MenuGoOutState(*reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs)).m_animFrame = 0;
     }
 
     field_0x45 = 0;
-    field_0x34 = messageIndex + 0x22;
+    field_0x34 = messageIndex;
     field_0x48 = 0;
     field_0x3c = timer;
 }
@@ -1865,8 +1856,28 @@ void CGoOutMenu::Calc()
         menuPcsLayout.m_unknown_888 = 0;
         menuPcsLayout.m_saveLoadMode = 0;
         menuPcsLayout.m_unknown_88A = 0;
-        InitGoOutWinMessage(0x22, 0);
-        InitGoOutWinMessage(0x23, 10);
+        short* winMessage = reinterpret_cast<short*>(GetWinMess__8CMenuPcsFi(&MenuPcs, 0x22));
+        winMessage[0] = 0;
+        winMessage[1] = 0;
+        winMessage[2] = 0;
+        winMessage[3] = 1;
+        winMessage[4] = 2;
+        winMessage[5] = 3;
+        winMessage[6] = 4;
+        winMessage[7] = 5;
+        winMessage[8] = 6;
+        winMessage[9] = 7;
+        winMessage = reinterpret_cast<short*>(GetWinMess__8CMenuPcsFi(&MenuPcs, 0x23));
+        winMessage[0] = 0;
+        winMessage[1] = 0;
+        winMessage[2] = 10;
+        winMessage[3] = 11;
+        winMessage[4] = 12;
+        winMessage[5] = 13;
+        winMessage[6] = 14;
+        winMessage[7] = 15;
+        winMessage[8] = 16;
+        winMessage[9] = 17;
         MenuMcWinState(menuPcsLayout).m_mode = 3;
         field_0x44 = 1;
     }

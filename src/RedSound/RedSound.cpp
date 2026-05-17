@@ -113,9 +113,12 @@ CRedDriver c_Driver;
 static int m_StandbyStatus[REDSOUND_STANDBY_STATUS_COUNT];
 #define RedStandbyStatusGetBegin() (m_StandbyStatus)
 #define RedStandbyStatusGet(index) (m_StandbyStatus[(index)])
+#define RedStandbyStatusSet(slot, id) (*(slot) = (id))
 #define RedStandbyStatusGetEnd() (m_StandbyStatus + REDSOUND_STANDBY_STATUS_COUNT)
 volatile unsigned int m_AutoID;
 #define RedAutoIDGet() (m_AutoID)
+#define RedAutoIDInc() (m_AutoID++)
+#define RedAutoIDApplyMask() (m_AutoID &= REDSOUND_AUTO_ID_MASK)
 static RedSoundStreamBank* p_StreamBank;
 #define RedSoundStreamBankGetBegin() (p_StreamBank)
 #define RedSoundStreamBankSetBegin(bank) (p_StreamBank = (bank))
@@ -271,8 +274,8 @@ CRedSound::~CRedSound()
 unsigned int CRedSound::GetAutoID()
 {
 	do {
-		RedAutoIDGet()++;
-		RedAutoIDGet() &= REDSOUND_AUTO_ID_MASK;
+		RedAutoIDInc();
+		RedAutoIDApplyMask();
 	} while ((int)RedAutoIDGet() == 0);
 
 	return RedAutoIDGet();
@@ -291,7 +294,7 @@ int* CRedSound::EntryStandbyID(int id)
 	int* slot = RedStandbyStatusGetBegin();
 	do {
 		if (*slot == 0) {
-			*slot = id;
+			RedStandbyStatusSet(slot, id);
 			return slot;
 		}
 		slot++;

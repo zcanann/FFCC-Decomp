@@ -3077,16 +3077,16 @@ static int _SeMidiNoteExecute(
         if ((track->m_command != REDSOUND_TRACK_COMMAND_NONE) && ((track->m_voiceSwitch & REDSOUND_VOICE_SWITCH_PAUSE) == 0)) {
             track->m_seTickCounter -= tickStep * REDSOUND_SE_TICK_STEP;
             while (track->m_seTickCounter < 1) {
-                int trackStep;
+                int clampedStep;
                 track->m_seTickCounter += REDSOUND_CONTROL_TICK_PERIOD;
                 if (track->m_deltaTime < frames) {
-                    trackStep = track->m_deltaTime;
+                    clampedStep = track->m_deltaTime;
                 } else {
-                    trackStep = frames;
+                    clampedStep = frames;
                 }
-                int execStep = trackStep;
+                int executeStep = clampedStep;
                 track->m_deltaTime -= frames;
-                _SeTrackDataExecute(track, execStep);
+                _SeTrackDataExecute(track, executeStep);
                 if (((track->m_flags & REDSOUND_TRACK_FLAG_TENUTO) == 0) && (track->m_deltaTime == 1)) {
                     KeyOffSet(control, keyOnData, track);
                 }
@@ -3094,12 +3094,12 @@ static int _SeMidiNoteExecute(
                 RedChangeStatusSet(0);
                 while ((track->m_command != REDSOUND_TRACK_COMMAND_NONE) && (track->m_deltaTime < 1)) {
                     int deltaTime;
-                    unsigned char* command;
+                    unsigned char* commandPtr;
                     track->m_loopStepCurrent += 1;
-                    command = track->m_command;
-                    track->m_command = command + 1;
-                    RedMidiControlFunc func = RedMidiControlFunctionGet(*command);
-                    func(control, keyOnData, track);
+                    commandPtr = track->m_command;
+                    track->m_command = commandPtr + 1;
+                    RedMidiControlFunc midiControlFunc = RedMidiControlFunctionGet(*commandPtr);
+                    midiControlFunc(control, keyOnData, track);
                     if (track->m_command != REDSOUND_TRACK_COMMAND_NONE) {
                         deltaTime = DeltaTimeSumup((unsigned char**)&track->m_command);
                         if (deltaTime != 0) {
@@ -3123,8 +3123,8 @@ static int _SeMidiNoteExecute(
                             } else {
                                 catchupStep = deltaTime;
                             }
-                            int execStep = catchupStep;
-                            _SeTrackDataExecute(track, execStep);
+                            int executeStep = catchupStep;
+                            _SeTrackDataExecute(track, executeStep);
                         }
                         track->m_deltaTime += deltaTime;
                     }

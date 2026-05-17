@@ -494,8 +494,8 @@ void CRedMemory::Init(int mainBuffer, int mainBufferSize, int auxBuffer, int aux
 	bankSize &= ~REDSOUND_MEMORY_BANK_ALIGN_MASK;
 
 	m_MemoryBank = (RedMemoryBlock*)mainBuffer;
-	m_AMemoryBank = (RedMemoryBlock*)((int)m_MemoryBank + bankSize);
-	m_DataBuffer = (int)m_AMemoryBank + bankSize;
+	m_AMemoryBank = (RedMemoryBlock*)((u8*)m_MemoryBank + bankSize);
+	m_DataBuffer = (int)((u8*)m_AMemoryBank + bankSize);
 	m_DataBufferSize = mainBufferSize - bankSize * REDSOUND_MEMORY_BANK_TABLE_COUNT;
 	memset(m_MemoryBank, 0, bankSize);
 	memset(m_AMemoryBank, 0, bankSize);

@@ -434,7 +434,6 @@ static int _SePlayStart(RedSeINFO* seInfo, int seId, int sepId, int pan, int vol
 	unsigned char seFlagsAndSequenceCount;
 	RedWaveHeadWD* waveHead;
 	RedTrackDATA* seTrack;
-	int initialPlayTime;
 	int eraseAttrMask;
 	RedSeInfoSequence* sequence;
 	int waveNo;
@@ -499,12 +498,7 @@ static int _SePlayStart(RedSeINFO* seInfo, int seId, int sepId, int pan, int vol
 			seTrack->m_seSepId = sepId;
 			seTrack->m_seId = seId;
 			seTrack->m_loopStepCurrent = 0;
-			if (RedSeSkipStepIsActive()) {
-				initialPlayTime = 0;
-			} else {
-				initialPlayTime = REDSOUND_TRACK_PLAY_TIME_SENTINEL;
-			}
-			seTrack->m_playTime = initialPlayTime;
+			seTrack->m_playTime = RedSeSkipStepIsActive() ? 0 : REDSOUND_TRACK_PLAY_TIME_SENTINEL;
 
 			if (*seTrack->m_command != REDSOUND_SE_COMMAND_NONE) {
 				seTrack->m_eraseTrack = seInfo->m_eraseTrack;

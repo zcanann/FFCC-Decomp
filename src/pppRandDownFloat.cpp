@@ -31,7 +31,7 @@ void pppRandDownFloat(_pppPObject* basePtr, RandDownFloatParam* in, _pppCtrlTabl
     u8* base = (u8*)basePtr;
     f32* valuePtr;
 
-    s32 id = *(s32*)(base + 0xC);
+    s32 id = basePtr->m_graphId;
     if (id == 0) {
         f32 value = -Math.RandF();
         if (in->useNormalDistribution != 0) {

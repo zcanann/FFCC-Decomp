@@ -38,7 +38,7 @@ void pppRandCV(_pppPObject* basePtr, RandCVParams* in, _pppCtrlTable* ctrl)
         return;
     }
 
-    if (in->index == *(s32*)(base + 0xC)) {
+    if (in->index == basePtr->m_graphId) {
         f32 value = Math.RandF();
         if (in->flag != 0) {
             value += Math.RandF();
@@ -48,7 +48,7 @@ void pppRandCV(_pppPObject* basePtr, RandCVParams* in, _pppCtrlTable* ctrl)
 
         valuePtr = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
         *valuePtr = value;
-    } else if (in->index != *(s32*)(base + 0xC)) {
+    } else if (in->index != basePtr->m_graphId) {
         return;
     } else {
         valuePtr = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);

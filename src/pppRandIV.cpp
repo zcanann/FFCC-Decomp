@@ -38,7 +38,7 @@ void pppRandIV(_pppPObject* basePtr, RandIVParams* in, _pppCtrlTable* ctrl)
         return;
     }
 
-    if (in->targetId == *(s32*)(base + 0xC)) {
+    if (in->targetId == basePtr->m_graphId) {
         value = Math.RandF();
         if (in->useNormalDistribution != 0) {
             value += Math.RandF();
@@ -49,7 +49,7 @@ void pppRandIV(_pppPObject* basePtr, RandIVParams* in, _pppCtrlTable* ctrl)
         valuePtr = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
         *valuePtr = value;
     } else {
-        if (in->targetId != *(s32*)(base + 0xC)) {
+        if (in->targetId != basePtr->m_graphId) {
             return;
         }
         valuePtr = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);

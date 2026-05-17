@@ -539,38 +539,38 @@ int CRedEntry::WaveHeadAdd(int waveBankNo, RedWaveHeadWD* waveHead, int waveNo)
 	}
 
 	do {
-		RedHistoryBANK* waveBank;
+		RedHistoryBANK* allocatedWaveBank;
 		if (waveBankNo < 0) {
-			waveBank = RedEntryWaveHistoryGetBegin(this);
-			while ((waveBank->m_size != REDSOUND_HISTORY_BANK_EMPTY_SIZE) &&
-			       (waveBank < RedEntryWaveBankGetEnd(this))) {
-				waveBank += 1;
+			allocatedWaveBank = RedEntryWaveHistoryGetBegin(this);
+			while ((allocatedWaveBank->m_size != REDSOUND_HISTORY_BANK_EMPTY_SIZE) &&
+			       (allocatedWaveBank < RedEntryWaveBankGetEnd(this))) {
+				allocatedWaveBank += 1;
 			}
 		} else {
 			waveBankNo &= REDSOUND_WAVE_PRIMARY_BANK_MASK;
-			waveBank = RedEntryWaveBankGet(this, waveBankNo);
-			if (waveBank->m_size != REDSOUND_HISTORY_BANK_EMPTY_SIZE) {
-				WaveDelete(waveBank);
+			allocatedWaveBank = RedEntryWaveBankGet(this, waveBankNo);
+			if (allocatedWaveBank->m_size != REDSOUND_HISTORY_BANK_EMPTY_SIZE) {
+				WaveDelete(allocatedWaveBank);
 			}
 		}
 
 		int aramAddress;
-		if ((waveBank < RedEntryWaveBankGetEnd(this)) &&
+		if ((allocatedWaveBank < RedEntryWaveBankGetEnd(this)) &&
 		    ((aramAddress = RedNewA(waveHead->m_loadSize, aramRangeStart, aramRangeEnd)) != 0)) {
 			int waveCopySize = RedWaveHeadGetTableSize(waveHead);
 			waveCopySize += RedWaveHeadGetToneSize(waveHead) + REDSOUND_WAVE_HEADER_COPY_BASE_SIZE;
 			RedWaveHeadWD* copiedWaveHead = (RedWaveHeadWD*)RedNew(waveCopySize);
 			if (copiedWaveHead != 0) {
-				waveBank->m_waveHead = copiedWaveHead;
-				waveBank->m_size = waveCopySize;
+				allocatedWaveBank->m_waveHead = copiedWaveHead;
+				allocatedWaveBank->m_size = waveCopySize;
 				waveHead->m_aramAddress = aramAddress;
-				waveBank->m_id = waveNo;
+				allocatedWaveBank->m_id = waveNo;
 				waveHead->m_waveNo = (short)waveNo;
 				if (waveBankNo < 0) {
 					WaveHistoryAdd(REDSOUND_HISTORY_MOST_RECENT);
-					waveBank->m_historyNo = REDSOUND_HISTORY_MOST_RECENT;
+					allocatedWaveBank->m_historyNo = REDSOUND_HISTORY_MOST_RECENT;
 				} else {
-					waveBank->m_historyNo = REDSOUND_HISTORY_UNUSED;
+					allocatedWaveBank->m_historyNo = REDSOUND_HISTORY_UNUSED;
 				}
 				memcpy(copiedWaveHead, waveHead, waveCopySize);
 				return aramAddress;

@@ -719,13 +719,13 @@ void KeyOffSet(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* 
  */
 static int SineSwing(int phase)
 {
-    int value = phase & REDSOUND_SWING_SINE_MASK;
-    value = RedSignDataGet(value);
+    int level = phase & REDSOUND_SWING_SINE_MASK;
+    level = RedSignDataGet(level);
 
     if (((u32)phase & REDSOUND_SWING_PHASE_SIGN) != 0) {
-        value = -value;
+        level = -level;
     }
-    return value;
+    return level;
 }
 /*
  * --INFO--
@@ -738,21 +738,21 @@ static int SineSwing(int phase)
  */
 static int TriangleSwing(int phase)
 {
-    int result = (phase & REDSOUND_SWING_PHASE_MASK) << REDSOUND_SWING_PHASE_SHIFT;
+    int level = (phase & REDSOUND_SWING_PHASE_MASK) << REDSOUND_SWING_PHASE_SHIFT;
 
     switch (((u32)phase >> REDSOUND_SWING_PHASE_SHIFT) & REDSOUND_SWING_QUADRANT_MASK) {
     case 3:
-        result -= REDSOUND_SWING_LEVEL_FULL;
+        level -= REDSOUND_SWING_LEVEL_FULL;
         break;
     case 2:
-        result = -result;
+        level = -level;
         break;
     case 1:
-        result = REDSOUND_SWING_LEVEL_FULL - result;
+        level = REDSOUND_SWING_LEVEL_FULL - level;
         break;
     }
 
-    return result;
+    return level;
 }
 /*
  * --INFO--
@@ -765,9 +765,9 @@ static int TriangleSwing(int phase)
  */
 static int SawSwing(int phase)
 {
-    int result = (int)(char)(phase >> REDSOUND_SWING_SAW_PHASE_SHIFT) << REDSOUND_SWING_PHASE_SHIFT;
+    int level = (int)(char)(phase >> REDSOUND_SWING_SAW_PHASE_SHIFT) << REDSOUND_SWING_PHASE_SHIFT;
 
-    return result;
+    return level;
 }
 /*
  * --INFO--
@@ -780,15 +780,15 @@ static int SawSwing(int phase)
  */
 static int DutySwing(int phase)
 {
-    int value;
+    int level;
     int result;
 
     if ((phase & REDSOUND_SWING_PHASE_SIGN) != 0) {
-        value = -REDSOUND_SWING_LEVEL_FULL;
+        level = -REDSOUND_SWING_LEVEL_FULL;
     } else {
-        value = REDSOUND_SWING_LEVEL_FULL;
+        level = REDSOUND_SWING_LEVEL_FULL;
     }
-    result = value;
+    result = level;
     return result;
 }
 /*
@@ -804,9 +804,9 @@ static int RandomSwing(int phase)
 {
     phase >>= REDSOUND_SWING_PHASE_SHIFT;
     phase &= REDSOUND_SWING_PHASE_MASK;
-    int result = (int)RedRandomDataGet(phase) << REDSOUND_SWING_PHASE_SHIFT;
+    int level = (int)RedRandomDataGet(phase) << REDSOUND_SWING_PHASE_SHIFT;
 
-    return result;
+    return level;
 }
 /*
  * --INFO--
@@ -820,12 +820,12 @@ static int RandomSwing(int phase)
 static int SineSwingR(int phase)
 {
     phase ^= REDSOUND_SWING_PHASE_SIGN;
-    int value = phase & REDSOUND_SWING_SINE_MASK;
-    value = RedSignDataGet(value);
+    int level = phase & REDSOUND_SWING_SINE_MASK;
+    level = RedSignDataGet(level);
     if ((phase & REDSOUND_SWING_PHASE_SIGN) != 0) {
-        value = -value;
+        level = -level;
     }
-    return value;
+    return level;
 }
 /*
  * --INFO--
@@ -838,24 +838,24 @@ static int SineSwingR(int phase)
  */
 static int TriangleSwingR(int phase)
 {
-    int result;
+    int level;
 
     phase ^= REDSOUND_SWING_PHASE_SIGN;
-    result = (phase & REDSOUND_SWING_PHASE_MASK) << REDSOUND_SWING_PHASE_SHIFT;
+    level = (phase & REDSOUND_SWING_PHASE_MASK) << REDSOUND_SWING_PHASE_SHIFT;
 
     switch (((u32)phase >> REDSOUND_SWING_PHASE_SHIFT) & REDSOUND_SWING_QUADRANT_MASK) {
     case 3:
-        result -= REDSOUND_SWING_LEVEL_FULL;
+        level -= REDSOUND_SWING_LEVEL_FULL;
         break;
     case 2:
-        result = -result;
+        level = -level;
         break;
     case 1:
-        result = REDSOUND_SWING_LEVEL_FULL - result;
+        level = REDSOUND_SWING_LEVEL_FULL - level;
         break;
     }
 
-    return result;
+    return level;
 }
 /*
  * --INFO--
@@ -868,17 +868,17 @@ static int TriangleSwingR(int phase)
  */
 static int DutySwingR(int phase)
 {
-    int value;
+    int level;
     int result;
 
     phase ^= REDSOUND_SWING_PHASE_SIGN;
     if ((phase & REDSOUND_SWING_PHASE_SIGN) != 0) {
-        value = -REDSOUND_SWING_LEVEL_FULL;
+        level = -REDSOUND_SWING_LEVEL_FULL;
     } else {
-        value = REDSOUND_SWING_LEVEL_FULL;
+        level = REDSOUND_SWING_LEVEL_FULL;
     }
 
-    result = value;
+    result = level;
     return result;
 }
 /*
@@ -892,10 +892,10 @@ static int DutySwingR(int phase)
  */
 static int SawSwingR(int phase)
 {
-    int result = (int)(char)((phase ^ REDSOUND_SWING_PHASE_INVERT_MASK) >> REDSOUND_SWING_SAW_PHASE_SHIFT)
-                 << REDSOUND_SWING_PHASE_SHIFT;
+    int level = (int)(char)((phase ^ REDSOUND_SWING_PHASE_INVERT_MASK) >> REDSOUND_SWING_SAW_PHASE_SHIFT)
+                << REDSOUND_SWING_PHASE_SHIFT;
 
-    return result;
+    return level;
 }
 /*
  * --INFO--
@@ -911,9 +911,9 @@ static int RandomSwingR(int phase)
     phase >>= REDSOUND_SWING_PHASE_SHIFT;
     phase &= REDSOUND_SWING_PHASE_MASK;
     phase ^= REDSOUND_SWING_RANDOM_REVERSE_PHASE;
-    int result = (int)RedRandomDataGet(phase) << REDSOUND_SWING_PHASE_SHIFT;
+    int level = (int)RedRandomDataGet(phase) << REDSOUND_SWING_PHASE_SHIFT;
 
-    return result;
+    return level;
 }
 /*
  * --INFO--

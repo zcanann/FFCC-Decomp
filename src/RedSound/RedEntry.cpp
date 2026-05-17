@@ -1002,10 +1002,15 @@ void CRedEntry::DisplayWaveInfo()
 		int maxFreeSize = 0;
 		int totalAllocatedSize = 0;
 		int entryWaveCount = 0;
-		int previousBlockEnd = c_RedMemory.GetABufferAddress();
-		RedMemoryBlock* aMemoryBlocks = c_RedMemory.GetABankAddress();
-		RedMemoryBlock* aMemoryBlock = aMemoryBlocks;
-		int aBufferEnd = previousBlockEnd + c_RedMemory.GetABufferSize();
+		int previousBlockEnd;
+		int aBufferEnd;
+		RedMemoryBlock* aMemoryBlocks;
+		RedMemoryBlock* aMemoryBlock;
+
+		previousBlockEnd = c_RedMemory.GetABufferAddress();
+		aMemoryBlocks = c_RedMemory.GetABankAddress();
+		aMemoryBlock = aMemoryBlocks;
+		aBufferEnd = previousBlockEnd + c_RedMemory.GetABufferSize();
 		do {
 			if (aMemoryBlock->m_size != REDSOUND_MEMORY_BLOCK_SIZE_EMPTY) {
 				int nextFreeSize = RedMemoryBlockGetEndAddress(aMemoryBlock);

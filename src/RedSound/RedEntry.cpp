@@ -1580,7 +1580,7 @@ RedMusicHEAD* CRedEntry::SetMusicData(RedMusicHEAD* musicHead)
  */
 void CRedEntry::DisplayMMemoryInfo()
 {
-	int i;
+	int seBlockBank;
 	int totalSize;
 	int entryCount;
 	int maxFreeSize;
@@ -1636,18 +1636,18 @@ void CRedEntry::DisplayMMemoryInfo()
 			} while (history < RedEntryMusicBankGetEnd(this));
 
 			if (matched == REDSOUND_ENTRY_SEARCH_NOT_FOUND) {
-				i = 0;
+				seBlockBank = 0;
 				do {
-					if ((RedSeBlockDataGet(i) != REDSOUND_SE_BLOCK_DATA_NONE) &&
-					    (bankEntry->m_address == reinterpret_cast<int>(RedSeBlockDataGet(i)))) {
+					if ((RedSeBlockDataGet(seBlockBank) != REDSOUND_SE_BLOCK_DATA_NONE) &&
+					    (bankEntry->m_address == reinterpret_cast<int>(RedSeBlockDataGet(seBlockBank)))) {
 						OSReport(sRedEntryMMemorySeBlockInfoFmt, sRedEntryLogPrefix, bankEntry->m_address,
 						         bankEntry->m_size, freeSize);
 						fflush(__files + 1);
 						matched = REDSOUND_ENTRY_SEARCH_FOUND;
 						break;
 					}
-					i++;
-				} while (i < REDSOUND_SE_BLOCK_BANK_COUNT);
+					seBlockBank++;
+				} while (seBlockBank < REDSOUND_SE_BLOCK_BANK_COUNT);
 			}
 
 			if (matched == REDSOUND_ENTRY_SEARCH_NOT_FOUND) {

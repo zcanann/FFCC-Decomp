@@ -451,13 +451,13 @@ void CRedSound::ReportPrint(int debugFlag)
 int CRedSound::ReportStandby(int id)
 {
 	int statusIndex;
-	int result = 0;
+	int standbyCount = 0;
 
 	if (id == 0) {
 		statusIndex = 0;
 		do {
 			if (RedStandbyStatusGet(statusIndex) != 0) {
-				result++;
+				standbyCount++;
 				break;
 			}
 			statusIndex++;
@@ -466,14 +466,14 @@ int CRedSound::ReportStandby(int id)
 		statusIndex = 0;
 		do {
 			if (id == RedStandbyStatusGet(statusIndex)) {
-				result++;
+				standbyCount++;
 				break;
 			}
 			statusIndex++;
 		} while (statusIndex < REDSOUND_STANDBY_STATUS_COUNT);
 	}
 
-	return result;
+	return standbyCount;
 }
 /*
  * --INFO--

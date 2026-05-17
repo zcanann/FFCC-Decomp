@@ -2522,29 +2522,29 @@ inline int CRedDriver::MusicPlayState(int musicID)
     RedExecCommand* commandNow;
     unsigned int interruptLevel;
     RedSoundCONTROL* soundControl;
-    int result;
+    int playState;
     RedExecCommand* command;
 
     interruptLevel = OSDisableInterrupts();
-    result = 0;
+    playState = 0;
     soundControl = RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY);
     if (((musicID == REDSOUND_MUSIC_ID_NONE) ||
          (soundControl[REDSOUND_CONTROL_MUSIC_PRIMARY].m_musicId == musicID)) &&
         (soundControl[REDSOUND_CONTROL_MUSIC_PRIMARY].m_activeTrackCount != 0)) {
-        result = 1;
+        playState = 1;
     } else if (((musicID == REDSOUND_MUSIC_ID_NONE) ||
                 (soundControl[REDSOUND_CONTROL_MUSIC_SECONDARY].m_musicId == musicID)) &&
                (soundControl[REDSOUND_CONTROL_MUSIC_SECONDARY].m_activeTrackCount != 0)) {
-        result = 1;
+        playState = 1;
     } else if ((musicID == REDSOUND_MUSIC_ID_NONE) ||
                (soundControl[REDSOUND_CONTROL_MUSIC_SKIP].m_musicId == musicID)) {
-        result = 1;
+        playState = 1;
     } else if ((RedMusicNextPlayIdGet() >= REDSOUND_MUSIC_ID_MIN) &&
                ((musicID == REDSOUND_MUSIC_ID_NONE) || (RedMusicNextPlayIdGet() == musicID))) {
-        result = 1;
+        playState = 1;
     }
 
-    if (result == 0) {
+    if (playState == 0) {
         commandNow = RedExecCommandGetNow();
         command = RedExecCommandGetOld();
         while (commandNow != command) {
@@ -2554,7 +2554,7 @@ inline int CRedDriver::MusicPlayState(int musicID)
                  (RedExecCommandGetFunc(command) == _MusicNextPlaySequence)) &&
                 ((musicID == REDSOUND_MUSIC_ID_NONE) ||
                  (musicID == RedExecCommandGetArg(command, REDSOUND_EXEC_COMMAND_ARG0)))) {
-                result = 1;
+                playState = 1;
                 break;
             }
             command++;
@@ -2565,7 +2565,7 @@ inline int CRedDriver::MusicPlayState(int musicID)
     }
 
     OSRestoreInterrupts(interruptLevel);
-    return result;
+    return playState;
 }
 
 /*
@@ -2923,7 +2923,7 @@ void* CRedDriver::SetSeBlockData(int blockIndex, void* seBlockData)
 int CRedDriver::SetSeSepData(void* seSepData)
 {
     int headerSize;
-    int result = REDSOUND_SESEP_ID_NONE;
+    int seNo = REDSOUND_SESEP_ID_NONE;
     RedSeSepHEAD* header = (RedSeSepHEAD*)seSepData;
 
     if (((((header->m_signature[REDSOUND_SESEP_SIGNATURE_0_INDEX] == REDSOUND_SESEP_SIGNATURE_0) &&
@@ -2936,7 +2936,7 @@ int CRedDriver::SetSeSepData(void* seSepData)
         header = (RedSeSepHEAD*)RedNew(headerSize);
         if (header != 0) {
             memcpy(header, seSepData, headerSize);
-            result = header->m_seNo;
+            seNo = header->m_seNo;
             _EntryExecCommand(_SetSeSepData, (int)header, 0, 0, 0, 0, 0, 0);
         }
     } else if (RedReportPrintIsEnabled()) {
@@ -2944,7 +2944,7 @@ int CRedDriver::SetSeSepData(void* seSepData)
                  sRedDriverLogWarnColor, sRedDriverLogReset);
         fflush(__files + 1);
     }
-    return result;
+    return seNo;
 }
 
 /*
@@ -3132,7 +3132,7 @@ int CRedDriver::SePlay(int bank, int sep, int autoID, int pan, int volume, int p
  */
 inline int CRedDriver::SePlay(void* seSepData, int autoID, int pan, int volume, int pitch)
 {
-    int result = REDSOUND_SESEP_ID_NONE;
+    int seNo = REDSOUND_SESEP_ID_NONE;
     RedSeSepHEAD* const header = (RedSeSepHEAD*)seSepData;
     RedSeSepHEAD* copiedHeader;
     int headerSize;
@@ -3146,11 +3146,11 @@ inline int CRedDriver::SePlay(void* seSepData, int autoID, int pan, int volume, 
         copiedHeader = (RedSeSepHEAD*)RedNew(headerSize);
         if (copiedHeader != 0) {
             memcpy(copiedHeader, header, headerSize);
-            result = copiedHeader->m_seNo;
+            seNo = copiedHeader->m_seNo;
             _EntryExecCommand(_SetSeSepData, (int)copiedHeader, 0, 0, 0, 0, 0, 0);
-            _EntryExecCommand(_SeSepPlaySequence, autoID, result, pan, volume, pitch, 0, 0);
+            _EntryExecCommand(_SeSepPlaySequence, autoID, seNo, pan, volume, pitch, 0, 0);
         } else {
-            result = REDSOUND_SESEP_ID_NONE;
+            seNo = REDSOUND_SESEP_ID_NONE;
         }
     } else if (RedReportPrintIsEnabled()) {
         OSReport(sRedDriverSeSepHeaderErrorFmt, sRedDriverLogPrefix,

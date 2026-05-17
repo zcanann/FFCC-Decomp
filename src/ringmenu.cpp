@@ -19,9 +19,6 @@ extern "C" double sin(double);
 
 #include <math.h>
 
-extern "C" int _GetIdxCmdList__12CCaravanWorkFv(CCaravanWork*);
-extern "C" int _GetWeaponAttrib__12CCaravanWorkFi(CCaravanWork*, int);
-extern "C" int GetNextCmdListIdx__12CCaravanWorkFii(CCaravanWork*, int, int);
 extern "C" void SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(void*, int);
 extern "C" void SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(void*, int);
 extern "C" void DrawInit__8CMenuPcsFv(void*);
@@ -29,14 +26,6 @@ extern "C" void DrawRect__8CMenuPcsFUlfffffffff(void*, unsigned long, float, flo
 extern "C" void SetColor__8CMenuPcsFR6CColor(void*, void*);
 extern "C" void* __ct__6CColorFUcUcUcUc(void*, unsigned char, unsigned char, unsigned char, unsigned char);
 extern "C" void SetExternalTlut__8CTextureFPvi(void*, void*, int);
-extern "C" void SetTlut__5CFontFi(CFont*, int);
-extern "C" void SetScale__5CFontFf(float, CFont*);
-extern "C" void SetColor__5CFontF8_GXColor(CFont*, GXColor*);
-extern "C" float GetWidth__5CFontFPc(CFont*, const char*);
-extern "C" void SetPosX__5CFontFf(float, CFont*);
-extern "C" void SetPosY__5CFontFf(float, CFont*);
-extern "C" void SetPosZ__5CFontFf(float, CFont*);
-extern "C" void Draw__5CFontFPc(CFont*, const char*);
 extern "C" void _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(
     int, int, int, int, int);
 extern "C" void _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg(
@@ -49,8 +38,6 @@ extern "C" void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSe
 extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
 extern "C" asm void MTX44MultVec4__5CMathFPA4_fP3VecP5Vec4d(register void*, register float (*)[4], register Vec*,
                                                             register void*);
-extern "C" int GetGBAStart__6JoyBusFi(void*, int);
-extern "C" int IsInitSend__6JoyBusFi(void*, int);
 
 extern unsigned char DAT_8020fab8[];
 static const char DAT_801da01c[] = {
@@ -343,7 +330,7 @@ void CRingMenu::onCalc()
 			int currentCmd = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Chara) + 0x2004);
 
 			if (Game.m_gameWork.m_bossArtifactStageIndex != 0x19) {
-				currentCmd = _GetIdxCmdList__12CCaravanWorkFv(caravanWork);
+				currentCmd = caravanWork->GetIdxCmdList();
 			}
 
 			int* trackedCmd = &m_currentCommandIndex;
@@ -360,8 +347,8 @@ void CRingMenu::onCalc()
 					int prevCandidate = (currentCmd + 5 - step) % 5;
 
 					if (Game.m_gameWork.m_bossArtifactStageIndex != 0x19) {
-						nextCandidate = GetNextCmdListIdx__12CCaravanWorkFii(caravanWork, next, 1);
-						prevCandidate = GetNextCmdListIdx__12CCaravanWorkFii(caravanWork, prev, -1);
+						nextCandidate = caravanWork->GetNextCmdListIdx(next, 1);
+						prevCandidate = caravanWork->GetNextCmdListIdx(prev, -1);
 					}
 
 					prev = prevCandidate;
@@ -436,7 +423,7 @@ void drawCommand(int state, CFont* font, float posX, float posY, CCaravanWork* c
 		}
 		commandLabel = cmdNameTable[tlut];
 	} else {
-		commandLabel = _GetWeaponAttrib__12CCaravanWorkFi(caravanWork, cmdIndex);
+		commandLabel = caravanWork->GetWeaponAttrib(cmdIndex);
 	}
 
 	if (Game.m_gameWork.m_bossArtifactStageIndex == 0x19) {
@@ -454,11 +441,11 @@ void drawCommand(int state, CFont* font, float posX, float posY, CCaravanWork* c
 		} else if (cmdIndex < 4) {
 			tlut = 6;
 		}
-		SetTlut__5CFontFi(font, tlut);
+		font->SetTlut(tlut);
 	} else if (cmdIndex == 0) {
-		SetTlut__5CFontFi(font, 7);
+		font->SetTlut(7);
 	} else {
-		SetTlut__5CFontFi(font, 4);
+		font->SetTlut(4);
 	}
 
 	waveX = static_cast<double>(FLOAT_80330ac4 * static_cast<float>(sin(static_cast<double>(angle))));
@@ -476,8 +463,8 @@ void drawCommand(int state, CFont* font, float posX, float posY, CCaravanWork* c
 		waveY = static_cast<double>(static_cast<float>(waveY + static_cast<double>(FLOAT_80330a28)));
 	}
 
-	SetScale__5CFontFf(static_cast<float>(-(DOUBLE_80330ad0 * fabs(static_cast<double>(angle)) - DOUBLE_80330ac8)), font);
-	textWidth = static_cast<double>(GetWidth__5CFontFPc(font, reinterpret_cast<const char*>(commandLabel)));
+	font->SetScale(static_cast<float>(-(DOUBLE_80330ad0 * fabs(static_cast<double>(angle)) - DOUBLE_80330ac8)));
+	textWidth = static_cast<double>(font->GetWidth(reinterpret_cast<const char*>(commandLabel)));
 	fVar1 = static_cast<float>(-(DOUBLE_80330ad8 * fabs(static_cast<double>(angle)) - DOUBLE_80330a98));
 	textHeight = static_cast<double>(static_cast<float>(font->m_glyphWidth) * font->scaleY);
 
@@ -488,18 +475,17 @@ void drawCommand(int state, CFont* font, float posX, float posY, CCaravanWork* c
 
 	int alpha = static_cast<int>((FLOAT_80330a34 * alphaScale) * clampedAlpha);
 	GXColor* color = static_cast<GXColor*>(__ct__6CColorFUcUcUcUc(colorStorage, 0xFF, 0xFF, 0xFF, alpha));
-	SetColor__5CFontF8_GXColor(font, color);
-	SetPosX__5CFontFf(static_cast<float>(waveX + -(static_cast<double>(static_cast<float>(
+	font->SetColor(*color);
+	font->SetPosX(static_cast<float>(waveX + -(static_cast<double>(static_cast<float>(
 		textWidth * static_cast<double>(FLOAT_803309c4) -
-		static_cast<double>(static_cast<float>(static_cast<double>(FLOAT_80330aa8) + static_cast<double>(posX))))))), font);
-	SetPosY__5CFontFf(
+		static_cast<double>(static_cast<float>(static_cast<double>(FLOAT_80330aa8) + static_cast<double>(posX))))))));
+	font->SetPosY(
 		FLOAT_80330a40 +
 			static_cast<float>(waveY + -(static_cast<double>(static_cast<float>(
 				textHeight * static_cast<double>(FLOAT_803309c4) -
-				static_cast<double>(static_cast<float>(static_cast<double>(FLOAT_803309ec) + static_cast<double>(posY))))))),
-		font);
-	SetPosZ__5CFontFf(FLOAT_803309c0, font);
-	Draw__5CFontFPc(font, reinterpret_cast<const char*>(commandLabel));
+				static_cast<double>(static_cast<float>(static_cast<double>(FLOAT_803309ec) + static_cast<double>(posY))))))));
+	font->SetPosZ(FLOAT_803309c0);
+	font->Draw(reinterpret_cast<const char*>(commandLabel));
 }
 
 /*
@@ -642,7 +628,7 @@ void CRingMenu::onDraw()
 				CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(partyObj->m_scriptHandle);
 				int cmdIndex = (Game.m_gameWork.m_bossArtifactStageIndex == 0x19)
 				                   ? *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Chara) + 0x2004)
-				                   : _GetIdxCmdList__12CCaravanWorkFv(caravanWork);
+				                   : caravanWork->GetIdxCmdList();
 
 				CFont* font = MenuPcs.m_fonts[0];
 				font->DrawInit();
@@ -655,7 +641,7 @@ void CRingMenu::onDraw()
 					if (Game.m_gameWork.m_bossArtifactStageIndex == 0x19) {
 						cmdIndex = (cmdIndex + 1) % 5;
 					} else {
-						cmdIndex = GetNextCmdListIdx__12CCaravanWorkFii(caravanWork, cmdIndex, -1);
+						cmdIndex = caravanWork->GetNextCmdListIdx(cmdIndex, -1);
 					}
 					scroll -= static_cast<double>(FLOAT_803309cc);
 				}
@@ -663,7 +649,7 @@ void CRingMenu::onDraw()
 					if (Game.m_gameWork.m_bossArtifactStageIndex == 0x19) {
 						cmdIndex = (cmdIndex + 4) % 5;
 					} else {
-						cmdIndex = GetNextCmdListIdx__12CCaravanWorkFii(caravanWork, cmdIndex, 1);
+						cmdIndex = caravanWork->GetNextCmdListIdx(cmdIndex, 1);
 					}
 					scroll += static_cast<double>(FLOAT_803309cc);
 				}
@@ -676,16 +662,16 @@ void CRingMenu::onDraw()
 
 				int prev1 = (Game.m_gameWork.m_bossArtifactStageIndex == 0x19)
 				                ? (cmdIndex + 4) % 5
-				                : GetNextCmdListIdx__12CCaravanWorkFii(caravanWork, cmdIndex, -1);
+				                : caravanWork->GetNextCmdListIdx(cmdIndex, -1);
 				int prev2 = (Game.m_gameWork.m_bossArtifactStageIndex == 0x19)
 				                ? (prev1 + 4) % 5
-				                : GetNextCmdListIdx__12CCaravanWorkFii(caravanWork, prev1, -1);
+				                : caravanWork->GetNextCmdListIdx(prev1, -1);
 				int next1 = (Game.m_gameWork.m_bossArtifactStageIndex == 0x19)
 				                ? (cmdIndex + 1) % 5
-				                : GetNextCmdListIdx__12CCaravanWorkFii(caravanWork, cmdIndex, 1);
+				                : caravanWork->GetNextCmdListIdx(cmdIndex, 1);
 				int next2 = (Game.m_gameWork.m_bossArtifactStageIndex == 0x19)
 				                ? (next1 + 1) % 5
-				                : GetNextCmdListIdx__12CCaravanWorkFii(caravanWork, next1, 1);
+				                : caravanWork->GetNextCmdListIdx(next1, 1);
 
 				drawCommand(menuIndex, font, posX, posY, caravanWork, prev2, static_cast<float>(scroll - FLOAT_80330a28),
 				            static_cast<float>(labelAlphaScale));
@@ -911,8 +897,8 @@ void CRingMenu::drawGBA()
 	                                 FLOAT_80330a4c * static_cast<float>(sizePulse), FLOAT_80330a4c * static_cast<float>(sizePulse), 0.0f);
 
 	const unsigned int flatFlags = *reinterpret_cast<unsigned int*>(CFlat + 0x12A0) & *reinterpret_cast<unsigned int*>(CFlat + 0x12A4);
-	if (((flatFlags & 8) != 0) && (GetGBAStart__6JoyBusFi(&Joybus, menuIndex) == 0)) {
-		if (IsInitSend__6JoyBusFi(&Joybus, menuIndex) == 0) {
+	if (((flatFlags & 8) != 0) && (Joybus.GetGBAStart(menuIndex) == 0)) {
+		if (Joybus.IsInitSend(menuIndex) == 0) {
 			SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcsVoid(), 0x1D);
 			const double blink = static_cast<double>(sin(static_cast<double>(FLOAT_80330a54 * static_cast<float>(m_commonFrameCounter))));
 			const unsigned int sendAlpha = static_cast<unsigned int>(

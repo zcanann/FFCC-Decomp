@@ -224,15 +224,15 @@ void CUtil::CalcBoundaryBoxQuantized(Vec* minOut, Vec* maxOut, S16Vec* vecs, uns
 void CUtil::ReWriteDisplayList(void* dlData, unsigned long dlSize, unsigned long copyFlags)
 {
 	u8* data = (u8*)dlData;
-	u8* current = data;
 	u8* end = data + dlSize;
+	u8* current = data;
 
 	while (current < end) {
 		u8 cmd = *current;
-		u32 count = *(u16*)(current + 1);
+		int count = *(u16*)(current + 1);
 		u8 primitive = cmd & 0xF8;
 		u8 indexFormat = cmd & 7;
-		bool isPrimitive;
+		int isPrimitive;
 		current += 3;
 
 		switch (primitive) {
@@ -254,25 +254,30 @@ void CUtil::ReWriteDisplayList(void* dlData, unsigned long dlSize, unsigned long
 			break;
 		}
 
-		while (count != 0) {
+		while (count > 0) {
 			u16 value = *(u16*)current;
 
 			if ((copyFlags & 1) != 0) {
 				*(u16*)(current + 4) = value;
+				current += 6;
+			} else {
+				current += 6;
 			}
 			if ((copyFlags & 2) != 0) {
-				*(u16*)(current + 6) = value;
+				*(u16*)current = value;
+				current += 2;
+			} else {
+				current += 2;
 			}
-
-			u8* next = current + 8;
 			if (indexFormat == 2) {
 				if ((copyFlags & 2) != 0) {
-					*(u16*)next = value;
+					*(u16*)current = value;
+					current += 2;
+				} else {
+					current += 2;
 				}
-				next = current + 10;
 			}
 
-			current = next;
 			count--;
 		}
 	}

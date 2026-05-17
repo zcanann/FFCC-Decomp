@@ -963,10 +963,9 @@ RedVoiceDATA* EntryVoiceSearch(RedTrackDATA* track)
                     break;
                 }
 
-                int envelope = voice->m_envelopeLevel;
-                if (envelope < bestEnvelope) {
-                    bestEnvelope = envelope;
+                if (voice->m_envelopeLevel < bestEnvelope) {
                     bestVoice = voice;
+                    bestEnvelope = voice->m_envelopeLevel;
                 }
             }
             voice++;

@@ -3773,6 +3773,7 @@ inline void CRedDriver::SetMute(unsigned int voiceNo, unsigned int mute)
  */
 int CRedDriver::PlayWaveItem(int waveNo, int itemNo, int key, int pan, int volume)
 {
+    RedTrackDATA* editorTrack;
     RedVoiceDATA* voice;
     RedWaveDATA* wave;
     RedWaveHeadWD* waveHead;
@@ -3784,23 +3785,24 @@ int CRedDriver::PlayWaveItem(int waveNo, int itemNo, int key, int pan, int volum
     }
 
     wave = RedWaveHeadGetWaveData(waveHead, itemNo);
-    RedEditorTrackGet()->m_waveBankData = waveHead;
-    RedEditorTrackGet()->m_waveData = wave;
-    RedEditorTrackGet()->m_waveBase = waveHead->m_aramAddress;
-    RedEditorTrackGet()->m_note.m_key = key;
-    RedEditorTrackGet()->m_note.m_velocity = REDSOUND_VOLUME_MAX;
-    RedEditorTrackGet()->m_note.m_allocFlags = REDSOUND_NOTE_ALLOC_DIRECT_MASK;
-    RedEditorTrackGet()->m_trackNo = REDSOUND_EDITOR_VOICE_LEFT + 1;
-    RedEditorTrackGet()->m_volume = REDSOUND_VOLUME_FULL;
-    RedEditorTrackGet()->m_expression = REDSOUND_VOLUME_DEFAULT;
-    RedEditorTrackGet()->m_mixVolume = volume << REDSOUND_FIXED_SHIFT;
-    RedEditorTrackGet()->m_pan = pan << REDSOUND_FIXED_SHIFT;
-    RedEditorTrackGet()->m_reverbDepth = RedReverbDepthGetDepth(REDSOUND_REVERB_DEPTH_SE);
-    RedEditorTrackGet()->m_portamentPitch = key << REDSOUND_PITCH_BASE_NOTE_SHIFT;
-    RedEditorTrackGet()->m_pitchBendRange = REDSOUND_SE_DEFAULT_PITCH_BEND_RANGE;
-    RedEditorTrackGet()->m_voiceSwitch = REDSOUND_VOICE_SWITCH_DRY_STEREO;
+    editorTrack = RedEditorTrackGet();
+    editorTrack->m_waveBankData = waveHead;
+    editorTrack->m_waveData = wave;
+    editorTrack->m_waveBase = waveHead->m_aramAddress;
+    editorTrack->m_note.m_key = key;
+    editorTrack->m_note.m_velocity = REDSOUND_VOLUME_MAX;
+    editorTrack->m_note.m_allocFlags = REDSOUND_NOTE_ALLOC_DIRECT_MASK;
+    editorTrack->m_trackNo = REDSOUND_EDITOR_VOICE_LEFT + 1;
+    editorTrack->m_volume = REDSOUND_VOLUME_FULL;
+    editorTrack->m_expression = REDSOUND_VOLUME_DEFAULT;
+    editorTrack->m_mixVolume = volume << REDSOUND_FIXED_SHIFT;
+    editorTrack->m_pan = pan << REDSOUND_FIXED_SHIFT;
+    editorTrack->m_reverbDepth = RedReverbDepthGetDepth(REDSOUND_REVERB_DEPTH_SE);
+    editorTrack->m_portamentPitch = key << REDSOUND_PITCH_BASE_NOTE_SHIFT;
+    editorTrack->m_pitchBendRange = REDSOUND_SE_DEFAULT_PITCH_BEND_RANGE;
+    editorTrack->m_voiceSwitch = REDSOUND_VOICE_SWITCH_DRY_STEREO;
 
-    voice = EntryVoiceSearch(RedEditorTrackGet());
+    voice = EntryVoiceSearch(editorTrack);
     if (voice == 0) {
         return 0;
     }
@@ -3808,13 +3810,13 @@ int CRedDriver::PlayWaveItem(int waveNo, int itemNo, int key, int pan, int volum
     voiceIndex = RedVoiceDataGetIndex(voice);
     RedEditorVoiceSet(REDSOUND_EDITOR_VOICE_LEFT, voiceIndex);
     RedEditorVoiceSet(REDSOUND_EDITOR_VOICE_RIGHT, 0);
-    voice->m_track = RedEditorTrackGet();
+    voice->m_track = editorTrack;
     voice->m_waveData = wave;
-    voice->m_trackVolume = &RedEditorTrackGet()->m_volume;
-    voice->m_trackExpression = &RedEditorTrackGet()->m_expression;
-    voice->m_trackPan = &RedEditorTrackGet()->m_pan;
+    voice->m_trackVolume = &editorTrack->m_volume;
+    voice->m_trackExpression = &editorTrack->m_expression;
+    voice->m_trackPan = &editorTrack->m_pan;
     voice->m_stateFlags = REDSOUND_VOICE_STATE_PLAYING;
-    voice->m_voiceSwitch = RedEditorTrackGet()->m_voiceSwitch;
+    voice->m_voiceSwitch = editorTrack->m_voiceSwitch;
     if ((wave->m_reverbMix != 0) && (wave->m_reverbMix != 1)) {
         voice->m_voiceSwitch |= REDSOUND_VOICE_SWITCH_REVERB_STEREO;
     }

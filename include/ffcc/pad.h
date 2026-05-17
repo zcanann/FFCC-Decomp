@@ -57,7 +57,7 @@ public:
 
     void Init();
     void Quit();
-    void Frame();
+    virtual void Frame();
     unsigned short GetButtonDown(long);
     PadInput* GetPadInputs() { return reinterpret_cast<PadInput*>(&_4_2_); }
     const PadInput* GetPadInputs() const { return reinterpret_cast<const PadInput*>(&_4_2_); }

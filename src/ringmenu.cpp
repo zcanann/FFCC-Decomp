@@ -598,8 +598,9 @@ void CRingMenu::onDraw()
 		if (group == 2) {
 			CGPartyObj* partyObj = Game.m_partyObjArr[menuIndex];
 			if (partyObj != 0) {
-				buttonAlpha = static_cast<double>((-static_cast<int>(*reinterpret_cast<unsigned short*>(
-					reinterpret_cast<unsigned char*>(partyObj) + 0x6F4)) & 9) >> 31);
+				buttonAlpha = static_cast<double>(-static_cast<int>(
+					*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(partyObj) + 0x6F4) & 9) >>
+				                                  31);
 			}
 		}
 

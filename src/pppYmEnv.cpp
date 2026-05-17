@@ -53,6 +53,7 @@ extern const float FLOAT_803311B4;
 extern const float FLOAT_803311B8;
 extern const double DOUBLE_803311C0;
 extern const float FLOAT_803311C8;
+extern const char s_Exiting_803311CC[] = "Exiting";
 
 struct _pppEnvStYmEnv {
     void* m_stagePtr;
@@ -310,7 +311,6 @@ void genParaboloidMap(void* displayListBuffer, unsigned long* outDisplayListSize
 {
     static const char s_display_list_alloc_error[] = "Error allocating display list (%d, %d)\n";
     static const char s_pppYmEnv_cpp[] = "pppYmEnv.cpp";
-    static const char s_exiting[] = "Exiting";
     const int ringVertexCount = detail + 1;
     unsigned long displayListSize =
         ((ringVertexCount + (detail - 2) * ringVertexCount * 2) * 6 * sizeof(float) + 0x1F) & ~0x1F;
@@ -385,7 +385,7 @@ void genParaboloidMap(void* displayListBuffer, unsigned long* outDisplayListSize
     *outDisplayListSize = GXEndDisplayList();
     if (*outDisplayListSize > displayListSize) {
         OSReport(s_display_list_alloc_error, displayListSize, *outDisplayListSize);
-        OSPanic(s_pppYmEnv_cpp, 0x19f, s_exiting);
+        OSPanic(s_pppYmEnv_cpp, 0x19f, s_Exiting_803311CC);
     }
 
     DCFlushRange(displayListBuffer, *outDisplayListSize);

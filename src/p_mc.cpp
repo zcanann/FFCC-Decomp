@@ -1,6 +1,7 @@
 #include "ffcc/p_mc.h"
 #include "ffcc/linkage.h"
 #include "ffcc/math.h"
+#include "ffcc/wm_menu.h"
 
 extern const float FLOAT_80331b18 = 1.0f;
 extern const float FLOAT_80331b1c = 10.0f;
@@ -24,28 +25,9 @@ static unsigned int s_CMcPcsTablePad1[5] = {
 
 CMcPcs McPcs;
 
-class McCtrl;
-
 extern "C" int Format__6McCtrlFi(McCtrl* mcCtrl, int slot);
 extern "C" int Rand__5CMathFUl(CMath* instance, unsigned long max);
 extern "C" void CallWorldParam__8CMenuPcsFiii(void* menu, int mode, int param, int unused);
-
-class McCtrl
-{
-public:
-    int ChkEmpty(int);
-
-    int m_previousState;
-    int m_state;
-    int m_cardChannel;
-    int m_lastResult;
-    int m_saveIndex;
-    int m_iteration;
-    int m_createFlag;
-    void* m_userBuffer;
-    unsigned int m_serialLo;
-    unsigned int m_serialHi;
-};
 
 struct MenuPcsMcLayout
 {

@@ -32,7 +32,7 @@ void pppRandUpShort(_pppPObject* basePtr, RandUpShortParam* in, _pppCtrlTable* c
         return;
     }
 
-    s32 state = *(s32*)(base + 0xC);
+    s32 state = basePtr->m_graphId;
     if (state == 0) {
         f32 value = Math.RandF();
         if (in->useNormalDistribution != 0) {

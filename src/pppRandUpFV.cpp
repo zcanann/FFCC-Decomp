@@ -35,7 +35,7 @@ void pppRandUpFV(_pppPObject* basePtr, RandUpFVParams* in, _pppCtrlTable* ctrl)
     }
 
     f32* valuePtr;
-    s32 currentIndex = *(s32*)((u8*)basePtr + 0xC);
+    s32 currentIndex = basePtr->m_graphId;
     if (currentIndex == 0) {
         f32 value = Math.RandF();
         if (in->useNormalDistribution != 0) {

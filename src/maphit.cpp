@@ -497,11 +497,11 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
     }
 
     float hitDot = PSVECDotProduct(&g_hit_cyl.m_bottom, normal);
-    float hitT = -((hitDot - (g_hit_lpface->m_planeD + g_hit_cyl.m_radius)) / dot);
+    g_hit_edge_t = -((hitDot - (g_hit_lpface->m_planeD + g_hit_cyl.m_radius)) / dot);
     int edgeIndex = -1;
 
-    if (0.0f < hitT && hitT < g_hit_t_min) {
-        PSVECScale(hitDirection, &g_hit_hpv, hitT);
+    if (0.0f < g_hit_edge_t && g_hit_edge_t < g_hit_t_min) {
+        PSVECScale(hitDirection, &g_hit_hpv, g_hit_edge_t);
         PSVECAdd(&g_hit_cyl.m_bottom, &g_hit_hpv, &g_hit_hpv);
 
         Vec pushedHit;
@@ -573,7 +573,7 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
         }
     }
 
-    if (edgeIndex != -1 || hitT <= 0.0f || g_hit_t_min <= hitT) {
+    if (edgeIndex != -1 || g_hit_edge_t <= 0.0f || g_hit_t_min <= g_hit_edge_t) {
         Vec previous = m_vertices[g_hit_lpface->m_vertexIndices[g_hit_lpface->m_vertexCount - 1]];
         for (int i = 0; i < static_cast<int>(g_hit_lpface->m_vertexCount); i++) {
             Vec current = m_vertices[g_hit_lpface->m_vertexIndices[i]];
@@ -586,11 +586,12 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
                 edgeCylinder.m_axis = edge;
                 edgeCylinder.m_radius = g_hit_cyl.m_radius;
 
-                if (FindIntersection(g_hit_cyl.m_bottom, *hitDirection, edgeCylinder, g_hit_edge_t) != 0 &&
-                    g_hit_edge_t < g_hit_t_min) {
-                    hitT = g_hit_edge_t;
+                float edgeT;
+                if (FindIntersection(g_hit_cyl.m_bottom, *hitDirection, edgeCylinder, edgeT) != 0 &&
+                    edgeT < g_hit_t_min) {
+                    g_hit_edge_t = edgeT;
                     edgeIndex = i;
-                    PSVECScale(hitDirection, &g_hit_hpv, hitT);
+                    PSVECScale(hitDirection, &g_hit_hpv, g_hit_edge_t);
                     PSVECAdd(&g_hit_cyl.m_bottom, &g_hit_hpv, &g_hit_hpv);
                     break;
                 }
@@ -598,13 +599,13 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
             previous = current;
         }
 
-        if (edgeIndex == -1 || g_hit_t_min <= hitT) {
+        if (edgeIndex == -1 || g_hit_t_min <= g_hit_edge_t) {
             return 0;
         }
     }
 
-    g_hit_t = hitT;
-    g_hit_t_min = hitT;
+    g_hit_t = g_hit_edge_t;
+    g_hit_t_min = g_hit_edge_t;
     g_hit_edge_idx_min = edgeIndex;
     g_hit_f = g_hit_lpface;
     g_hit_cyl_min = g_hit_cyl;

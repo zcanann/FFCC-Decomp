@@ -858,15 +858,17 @@ void CRingMenu::drawGBA()
 		gbaAnim = static_cast<double>(FLOAT_803309cc) - gbaAnim;
 	}
 
-	float posX = 0x30;
+	int posXInt = 0x30;
 	if ((menuIndex & 1) != 0) {
-		posX = 0x250;
+		posXInt = 0x250;
 	}
+	float posX = static_cast<float>(posXInt);
 
-	float posY = 0x30;
+	int posYInt = 0x30;
 	if ((menuIndex & 2) != 0) {
-		posY = 400.0f;
+		posYInt = 400;
 	}
+	float posY = static_cast<float>(posYInt);
 
 	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(MenuPcsVoid(), 0);
 
@@ -1077,9 +1079,7 @@ void CRingMenu::DrawIcon()
 	viewPos.y = worldPos.y;
 	viewPos.z = worldPos.z;
 	PSMTXMultVec(cameraMtx, &viewPos, &viewPos);
-	if (FLOAT_803309c8 < viewPos.z) {
-		viewPos.z = FLOAT_803309c8;
-	}
+	viewPos.z = (FLOAT_803309c8 < viewPos.z) ? FLOAT_803309c8 : viewPos.z;
 
 	Mtx44 screenMtx;
 	PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);

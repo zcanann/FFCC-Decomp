@@ -377,7 +377,6 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 	}
 }
 
-extern const f64 DOUBLE_80330dd8 = 4503601774854144.0;
 extern const f32 FLOAT_80330de0 = -1.0f;
 extern const f32 FLOAT_80330de4 = 1.2f;
 extern const f32 FLOAT_80330de8 = 10000000000.0f;

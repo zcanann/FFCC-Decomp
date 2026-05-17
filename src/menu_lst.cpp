@@ -301,7 +301,7 @@ int CMenuPcs::MLstClose()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::MLstCtrl()
+int CMenuPcs::MLstCtrl()
 {
 	bool blocked;
 	float one;
@@ -313,6 +313,7 @@ void CMenuPcs::MLstCtrl()
 	int startFrame;
 	int duration;
 	int padLock;
+	int result;
 
 	blocked = false;
 	padLock = Pad._452_4_;
@@ -340,7 +341,7 @@ void CMenuPcs::MLstCtrl()
 	}
 
 	if (hold == 0) {
-		blocked = false;
+		result = 0;
 	} else {
 		if ((hold & 0x48) != 0) {
 			if (this->lstState->cursor != 0) {
@@ -361,41 +362,40 @@ void CMenuPcs::MLstCtrl()
 		if ((hold & 0x6c) == 0) {
 			if ((press & 0x100) != 0) {
 				Sound.PlaySe(2, 0x40, 0x7f, 0);
-				blocked = true;
+				result = 1;
 			} else if ((press & 0x200) != 0) {
 				this->lstState->closeRequested = (char)0xFF;
 				Sound.PlaySe(3, 0x40, 0x7f, 0);
-				blocked = true;
+				result = 1;
 			} else {
-				blocked = false;
+				result = 0;
 			}
 		} else {
-			blocked = false;
+			result = 0;
 		}
 	}
 
-	if (!blocked) {
-		return;
-	}
+	if (result != 0) {
+		one = FLOAT_803333F0;
+		MenuLstEntry* entry = this->lstData->entries;
+		for (i = 0; (itemCount = (unsigned int)this->lstData->count), i < (int)itemCount; i++) {
+			entry->alpha = one;
+			entry->z = one;
+			entry++;
+		}
 
-	one = FLOAT_803333F0;
-	MenuLstEntry* entry = this->lstData->entries;
-	for (i = 0; (itemCount = (unsigned int)this->lstData->count), i < (int)itemCount; i++) {
-		entry->alpha = one;
-		entry->z = one;
-		entry++;
-	}
+		startFrame = 0;
+		duration = 4;
+		MenuLstEntry* closeEntry = &this->lstData->entries[this->lstData->count - 1];
+		for (int idx = this->lstData->count - 1; idx >= 0; idx--) {
+			closeEntry->startFrame = startFrame++;
+			closeEntry->duration = duration;
+			closeEntry--;
+		}
 
-	startFrame = 0;
-	duration = 4;
-	MenuLstEntry* closeEntry = &this->lstData->entries[this->lstData->count - 1];
-	for (int idx = this->lstData->count - 1; idx >= 0; idx--) {
-		closeEntry->startFrame = startFrame++;
-		closeEntry->duration = duration;
-		closeEntry--;
+		this->lstState->frame = 0;
 	}
-
-	this->lstState->frame = 0;
+	return result;
 }
 
 /*

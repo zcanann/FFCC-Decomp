@@ -39,13 +39,6 @@ extern "C" void LoadModel__Q29CCharaPcs7CHandleFiUlUlUliii(void*, int, unsigned 
 extern "C" CGQuadObj* FindGQuadObjNext__13CFlatRuntime2FP9CGQuadObj(void*, CGQuadObj*);
 extern "C" int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, CMapCylinder*, Vec*, u32);
 extern "C" int CalcHitSlide__7CMapObjFP3Vecf(void*, Vec*);
-
-static int CrossCheckSphereVectorRaw(Vec* outPos, float* outT, Vec* origin, Vec* vector, Vec* ellipseScale,
-                                     float scale, float innerRadius, float outerRadius)
-{
-    return CrossCheckSphereVector__5CMathFP3VecPfP3VecP3VecP3Vecf(&Math, outPos, outT, origin, vector, ellipseScale,
-                                                                  scale, innerRadius, outerRadius);
-}
 extern "C" void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
 extern "C" void GetHitFaceNormal__7CMapObjFP3Vec(void*, Vec*);
 extern "C" void* CreateFromScript__9CGItemObjFiiiP8CGObjectfPQ29CGItemObj4CCFS(
@@ -69,11 +62,12 @@ struct Vec4d {
 
 struct CModelAnimState {
     u8 _padB4[0xB4];
-    float m_curFrame;
-    CChara::CAnim* m_anim;
     float m_time;
+    u8 _padB8[4];
     float m_animStart;
     float m_animEnd;
+    u8 _padC4[0xC];
+    CChara::CAnim* m_anim;
 };
 
 struct CMapCylinderRaw {
@@ -140,17 +134,17 @@ static inline CChara::CAnim*& ModelAnim(CChara::CModel* model)
 
 static inline float& ModelTime(CChara::CModel* model)
 {
-    return *reinterpret_cast<float*>(ModelBytes(model) + 0xD4);
+    return *reinterpret_cast<float*>(ModelBytes(model) + 0xB4);
 }
 
 static inline float& ModelAnimStart(CChara::CModel* model)
 {
-    return *reinterpret_cast<float*>(ModelBytes(model) + 0xD8);
+    return *reinterpret_cast<float*>(ModelBytes(model) + 0xBC);
 }
 
 static inline float& ModelAnimEnd(CChara::CModel* model)
 {
-    return *reinterpret_cast<float*>(ModelBytes(model) + 0xDC);
+    return *reinterpret_cast<float*>(ModelBytes(model) + 0xC0);
 }
 
 static inline unsigned char& ModelFlagsA0(CChara::CModel* model)
@@ -1402,10 +1396,10 @@ void CGObject::hit()
                 Vec attackVec;
                 Vec hitPos;
                 PSVECSubtract(&attack->m_worldPosition, &attack->m_localEnd, &attackVec);
-                if (CrossCheckSphereVectorRaw(&hitPos, 0, &attack->m_localEnd, &attackVec,
-                                              reinterpret_cast<Vec*>(&damage->m_worldPosition.y),
-                                              attack->m_radius2, damage->m_innerRadius,
-                                              damage->m_outerRadius) == 0) {
+                if (CrossCheckSphereVector__5CMathFP3VecPfP3VecP3VecP3Vecf(
+                        &Math, &hitPos, 0, &attack->m_localEnd, &attackVec,
+                        reinterpret_cast<Vec*>(&damage->m_worldPosition.y),
+                        attack->m_radius2, damage->m_innerRadius, damage->m_outerRadius) == 0) {
                     continue;
                 }
 
@@ -2945,63 +2939,49 @@ void CGObject::FreeAnim(int animSlot)
  */
 int CGObject::IsLoopAnim(int mode)
 {
-    // m_charaModelHandle is treated as an array; element 0x5A holds an animation controller.
-    CCharaPcs::CHandle* handles = m_charaModelHandle;
-
+    CCharaPcs::CHandle* handle = m_charaModelHandle;
     bool hasAnimCtrl = false;
 
-    if (handles != nullptr) // && handles[0x5A] != nullptr
-    {
+    if ((handle != 0) && (handle->m_model != 0)) {
         hasAnimCtrl = true;
     }
 
-    if (!hasAnimCtrl || m_currentAnimSlot == -1)
-    {
-        return 1;
-    }
-	
-    if (mode) // handles->m_someFlag == 0 // TODO
-    {
+    if ((!hasAnimCtrl) || (m_currentAnimSlot == -1)) {
         return 1;
     }
 
-    const float span = *(float*)handles; // sAnimFrameOffset + (anim->m_endFrame - anim->m_startFrame); // TODO
+    CModelAnimState& model = ModelAnimState(handle->m_model);
+    if (model.m_anim == 0) {
+        return 1;
+    }
 
-    if (span == sAnimFrameOffset)
-    {
+    const float span = sAnimFrameOffset + (model.m_animEnd - model.m_animStart);
+
+    if (span == sAnimFrameOffset) {
         return 1;
     }
 
     float base;
-	
-    if (mode == 0)
-    {
-        base = *(float*)handles; // TODO
-    }
-    else
-    {
+    if (mode == 0) {
+        base = model.m_time;
+    } else {
         base = m_turnSpeed;
     }
 
     double threshold = static_cast<double>(base);
 
-    // mode == 2 adds the 1.2 bias
-    if (mode == 2)
-    {
+    if (mode == 2) {
         threshold = static_cast<double>(static_cast<float>(threshold + sLoopBias));
     }
 
     const float lastAttr = m_lastBgAttr;
 
-    if (static_cast<double>(lastAttr) < static_cast<double>(sZeroFloat))
-    {
+    if (static_cast<double>(lastAttr) < static_cast<double>(sZeroFloat)) {
         return (threshold <= static_cast<double>(sZeroFloat)) ? 1 : 0;
     }
-    else
-    {
-        const double diff = static_cast<double>(span - sAnimFrameOffset);
-        return (diff < threshold) ? 1 : 0;
-    }
+
+    const double diff = static_cast<double>(span - sAnimFrameOffset);
+    return (diff < threshold) ? 1 : 0;
 }
 
 /*

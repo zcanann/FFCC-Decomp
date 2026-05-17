@@ -208,7 +208,7 @@ STATIC_ASSERT(sizeof(sRedSoundLogErrorColor) + sizeof(sRedSoundLogReset) + sizeo
  * EN Size: 160b
  * JP Address: TODO
  */
-static RedSoundStreamBank* _SearchEmptyStreamBank()
+static inline RedSoundStreamBank* _SearchEmptyStreamBank()
 {
 	RedSoundStreamBank* bank = RedSoundStreamBankGetBegin();
 	RedSoundStreamBank* bankEnd = RedSoundStreamBankGetEnd();
@@ -234,7 +234,7 @@ static RedSoundStreamBank* _SearchEmptyStreamBank()
  * EN Size: 88b
  * JP Address: TODO
  */
-static RedSoundStreamBank* _SearchStreamBank(int streamId)
+static inline RedSoundStreamBank* _SearchStreamBank(int streamId)
 {
 	RedSoundStreamBank* bank = RedSoundStreamBankGetBegin();
 	RedSoundStreamBank* bankEnd = RedSoundStreamBankGetEnd();

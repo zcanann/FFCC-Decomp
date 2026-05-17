@@ -523,61 +523,61 @@ int CRedEntry::WaveHeadAdd(int waveBankNo, RedWaveHeadWD* waveHead, int waveNo)
 		waveHead->m_loadSize = REDSOUND_WAVE_FIXED_REGION_SIZE;
 	}
 
-	int minOffset;
-	int maxOffset;
+	int aramRangeStart;
+	int aramRangeEnd;
 	if ((waveNo >= REDSOUND_WAVE_LARGE_RANGE_BEGIN) && (waveNo < REDSOUND_WAVE_LARGE_RANGE_END)) {
-		minOffset = REDSOUND_WAVE_LARGE_REGION_OFFSET;
-		maxOffset = minOffset + REDSOUND_WAVE_LARGE_REGION_SIZE;
+		aramRangeStart = REDSOUND_WAVE_LARGE_REGION_OFFSET;
+		aramRangeEnd = aramRangeStart + REDSOUND_WAVE_LARGE_REGION_SIZE;
 	} else if (((waveNo >= REDSOUND_WAVE_FIXED_RANGE0_BEGIN) && (waveNo < REDSOUND_WAVE_FIXED_RANGE0_END)) ||
 	           ((waveNo >= REDSOUND_WAVE_FIXED_RANGE1_BEGIN) && (waveNo < REDSOUND_WAVE_FIXED_RANGE1_END)) ||
 	           (waveNo == REDSOUND_WAVE_FIXED_SINGLE)) {
-		minOffset = REDSOUND_WAVE_FIXED_REGION_OFFSET;
-		maxOffset = minOffset + REDSOUND_WAVE_FIXED_REGION_SIZE;
+		aramRangeStart = REDSOUND_WAVE_FIXED_REGION_OFFSET;
+		aramRangeEnd = aramRangeStart + REDSOUND_WAVE_FIXED_REGION_SIZE;
 	} else {
-		minOffset = REDSOUND_WAVE_DEFAULT_REGION_OFFSET;
-		maxOffset = minOffset + REDSOUND_WAVE_DEFAULT_REGION_SIZE;
+		aramRangeStart = REDSOUND_WAVE_DEFAULT_REGION_OFFSET;
+		aramRangeEnd = aramRangeStart + REDSOUND_WAVE_DEFAULT_REGION_SIZE;
 	}
 
 	do {
-		RedHistoryBANK* historyBank;
+		RedHistoryBANK* waveBank;
 		if (waveBankNo < 0) {
-			historyBank = RedEntryWaveHistoryGetBegin(this);
-			while ((historyBank->m_size != REDSOUND_HISTORY_BANK_EMPTY_SIZE) &&
-			       (historyBank < RedEntryWaveBankGetEnd(this))) {
-				historyBank += 1;
+			waveBank = RedEntryWaveHistoryGetBegin(this);
+			while ((waveBank->m_size != REDSOUND_HISTORY_BANK_EMPTY_SIZE) &&
+			       (waveBank < RedEntryWaveBankGetEnd(this))) {
+				waveBank += 1;
 			}
 		} else {
 			waveBankNo &= REDSOUND_WAVE_PRIMARY_BANK_MASK;
-			historyBank = RedEntryWaveBankGet(this, waveBankNo);
-			if (historyBank->m_size != REDSOUND_HISTORY_BANK_EMPTY_SIZE) {
-				WaveDelete(historyBank);
+			waveBank = RedEntryWaveBankGet(this, waveBankNo);
+			if (waveBank->m_size != REDSOUND_HISTORY_BANK_EMPTY_SIZE) {
+				WaveDelete(waveBank);
 			}
 		}
 
-		int arAddress;
-		if ((historyBank < RedEntryWaveBankGetEnd(this)) &&
-		    ((arAddress = RedNewA(waveHead->m_loadSize, minOffset, maxOffset)) != 0)) {
-			int copySize = RedWaveHeadGetTableSize(waveHead);
-			copySize += RedWaveHeadGetToneSize(waveHead) + REDSOUND_WAVE_HEADER_COPY_BASE_SIZE;
-			RedWaveHeadWD* copied = (RedWaveHeadWD*)RedNew(copySize);
-			if (copied != 0) {
-				historyBank->m_waveHead = copied;
-				historyBank->m_size = copySize;
-				waveHead->m_aramAddress = arAddress;
-				historyBank->m_id = waveNo;
+		int aramAddress;
+		if ((waveBank < RedEntryWaveBankGetEnd(this)) &&
+		    ((aramAddress = RedNewA(waveHead->m_loadSize, aramRangeStart, aramRangeEnd)) != 0)) {
+			int waveCopySize = RedWaveHeadGetTableSize(waveHead);
+			waveCopySize += RedWaveHeadGetToneSize(waveHead) + REDSOUND_WAVE_HEADER_COPY_BASE_SIZE;
+			RedWaveHeadWD* copiedWaveHead = (RedWaveHeadWD*)RedNew(waveCopySize);
+			if (copiedWaveHead != 0) {
+				waveBank->m_waveHead = copiedWaveHead;
+				waveBank->m_size = waveCopySize;
+				waveHead->m_aramAddress = aramAddress;
+				waveBank->m_id = waveNo;
 				waveHead->m_waveNo = (short)waveNo;
 				if (waveBankNo < 0) {
 					WaveHistoryAdd(REDSOUND_HISTORY_MOST_RECENT);
-					historyBank->m_historyNo = REDSOUND_HISTORY_MOST_RECENT;
+					waveBank->m_historyNo = REDSOUND_HISTORY_MOST_RECENT;
 				} else {
-					historyBank->m_historyNo = REDSOUND_HISTORY_UNUSED;
+					waveBank->m_historyNo = REDSOUND_HISTORY_UNUSED;
 				}
-				memcpy(copied, waveHead, copySize);
-				return arAddress;
+				memcpy(copiedWaveHead, waveHead, waveCopySize);
+				return aramAddress;
 			}
-			RedDeleteA((void*)arAddress);
+			RedDeleteA((void*)aramAddress);
 		}
-	} while (WaveOldClear(minOffset, maxOffset) != 0);
+	} while (WaveOldClear(aramRangeStart, aramRangeEnd) != 0);
 
 	if (RedReportPrintIsEnabled()) {
 		OSReport(sRedEntryNoWaveMemoryFreeAreaFmt, sRedEntryLogPrefix, sRedEntryErrorColor, (int)waveHead->m_waveNo,

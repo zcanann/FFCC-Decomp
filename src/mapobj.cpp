@@ -1,5 +1,13 @@
 #include "ffcc/mapobj.h"
+
+extern const char s_CPtrArrayGrowError[] = "CPtrArray grow error";
+extern const char s_CPtrArrayFile[] = "collection_ptrarray.h";
+#define FFCC_PTRARRAY_GROW_ERROR s_CPtrArrayGrowError
+#define FFCC_PTRARRAY_FILE s_CPtrArrayFile
 #include "ffcc/ptrarray.h"
+#undef FFCC_PTRARRAY_GROW_ERROR
+#undef FFCC_PTRARRAY_FILE
+
 #include "ffcc/map.h"
 #include "ffcc/chunkfile.h"
 #include "ffcc/maphit.h"

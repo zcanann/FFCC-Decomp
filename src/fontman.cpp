@@ -76,23 +76,21 @@ found_glyph:
 	}
 
 found_fallback:
-	unsigned char flags = renderFlags;
 	int drawWidth;
-	float localMargin = margin;
 	float localScaleX = scaleX;
+	float localMargin = margin;
+	CFontRenderFlagBits& renderFlagBits = GetRenderFlagBits(renderFlags);
 
-	if (GetRenderFlagBits(renderFlags).fixedWidth != 0) {
+	if (renderFlagBits.fixedWidth != 0) {
 		drawWidth = static_cast<int>(m_glyphWidth);
 	} else {
-		signed char sign = static_cast<signed char>(flags);
-		sign >>= 7;
-		unsigned int extra =
-		    static_cast<unsigned int>((-static_cast<int>(sign) | static_cast<int>(sign))) >> 30 & 2;
+		signed char sign = renderFlagBits.shadow;
+		unsigned int extra = static_cast<unsigned int>(-static_cast<int>(sign) | static_cast<int>(sign)) >> 30 & 2;
 		drawWidth = static_cast<int>(*(reinterpret_cast<unsigned char*>(glyph) + extra + 4));
 	}
 
 	double width = static_cast<double>(localScaleX * (localMargin + static_cast<float>(drawWidth)));
-	if (GetRenderFlagBits(renderFlags).snapPosition != 0) {
+	if (renderFlagBits.snapPosition != 0) {
 		width = floor(width);
 	}
 
@@ -102,7 +100,7 @@ find_fallback:
 	glyphBucket = m_glyphBuckets[63];
 	unsigned short* fallbackGlyph = glyphBucket + 1;
 	for (count = static_cast<int>(*glyphBucket); count > 0; count--) {
-		if (*reinterpret_cast<unsigned char*>(fallbackGlyph + 1) != '\0') {
+		if (static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(fallbackGlyph + 1)) != 0) {
 			fallbackGlyph += 4;
 		} else {
 			goto found_fallback_glyph;

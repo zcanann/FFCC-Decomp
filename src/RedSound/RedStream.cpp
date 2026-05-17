@@ -448,19 +448,20 @@ void StreamControl()
 				if (voiceData->m_axVoice->priority == 0) {
 					_StreamStop(streamData);
 					} else {
-						int sampleStart =
+						int currentBufferSampleStart =
 						    (streamData->m_aramBuffer + streamData->m_streamCursorBase) *
 						    REDSOUND_STREAM_ARAM_TO_AX_ADDRESS_SCALE;
-						int samplePos = voiceData->m_axVoice->pb.addr.currentAddressHi;
-						samplePos <<= REDSOUND_STREAM_AX_CURRENT_ADDRESS_HI_SHIFT;
-						samplePos |= voiceData->m_axVoice->pb.addr.currentAddressLo;
-					if ((samplePos >= sampleStart) && (samplePos < sampleStart + REDSOUND_STREAM_STEREO_PLANE_SIZE)) {
-						int stopped = 0;
+						int axSamplePosition = voiceData->m_axVoice->pb.addr.currentAddressHi;
+						axSamplePosition <<= REDSOUND_STREAM_AX_CURRENT_ADDRESS_HI_SHIFT;
+						axSamplePosition |= voiceData->m_axVoice->pb.addr.currentAddressLo;
+					if ((axSamplePosition >= currentBufferSampleStart) &&
+					    (axSamplePosition < currentBufferSampleStart + REDSOUND_STREAM_STEREO_PLANE_SIZE)) {
+						int streamStopped = 0;
 						if (streamData->m_header.m_loopStart < REDSOUND_STREAM_LOOP_ENABLED_MIN) {
 							streamData->m_header.m_loopEnd = streamData->m_header.m_loopEnd - REDSOUND_STREAM_SAMPLE_ADVANCE;
 							if (streamData->m_header.m_loopEnd < 1) {
 								_StreamStop(streamData);
-								stopped = 1;
+								streamStopped = 1;
 							}
 						}
 						streamData->m_fileCursor += streamData->m_header.m_channelCount * REDSOUND_STREAM_PAGE_SIZE;
@@ -468,38 +469,38 @@ void StreamControl()
 							streamData->m_fileCursor -= streamData->m_fileSize;
 						}
 
-						if (!stopped) {
-							int side;
-							int dmaID;
+						if (!streamStopped) {
+							int streamBufferSide;
+							int streamDmaId;
 							if (streamData->m_streamCursorBase != 0) {
-								side = REDSOUND_STREAM_BUFFER_SIDE_A;
+								streamBufferSide = REDSOUND_STREAM_BUFFER_SIDE_A;
 								streamData->m_streamCursorBase = 0;
 							} else {
-								side = REDSOUND_STREAM_BUFFER_SIDE_B;
+								streamBufferSide = REDSOUND_STREAM_BUFFER_SIDE_B;
 								streamData->m_streamCursorBase = REDSOUND_STREAM_PAGE_SIZE;
 							}
 
 							if (streamData->m_header.m_loopStart < REDSOUND_STREAM_LOOP_ENABLED_MIN) {
-								dmaID = _ArrangeStreamDataNoLoop(streamData, side, REDSOUND_STREAM_PAGE_SIZE);
+								streamDmaId = _ArrangeStreamDataNoLoop(streamData, streamBufferSide, REDSOUND_STREAM_PAGE_SIZE);
 							} else {
-								dmaID = _ArrangeStreamDataLoop(streamData, side, REDSOUND_STREAM_PAGE_SIZE);
+								streamDmaId = _ArrangeStreamDataLoop(streamData, streamBufferSide, REDSOUND_STREAM_PAGE_SIZE);
 							}
-							streamData->m_dmaId = dmaID;
+							streamData->m_dmaId = streamDmaId;
 						}
 					}
 
-					int changed = 0;
+					int mixChanged = 0;
 					if (streamData->m_pan.m_stepCount != 0) {
-						changed += 1;
+						mixChanged += 1;
 						streamData->m_pan.m_stepCount -= 1;
 						streamData->m_pan.m_value += streamData->m_pan.m_step;
 					}
 					if (streamData->m_volume.m_stepCount != 0) {
-						changed += 1;
+						mixChanged += 1;
 						streamData->m_volume.m_stepCount -= 1;
 						streamData->m_volume.m_value += streamData->m_volume.m_step;
 					}
-					if (changed != 0) {
+					if (mixChanged != 0) {
 						if (streamData->m_header.m_channelCount == REDSOUND_STREAM_STEREO_CHANNEL_COUNT) {
 							SetVoiceVolumeMix(voiceData, REDSOUND_STREAM_SILENT_PAN,
 							                  streamData->m_volume.m_value >> REDSOUND_FIXED_SHIFT);

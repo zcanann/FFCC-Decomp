@@ -699,9 +699,9 @@ void COctTree::DrawTypeMesh_r(COctNode* octNode)
 	float localX = m_localPosX;
 	float localY = m_localPosY;
 	float localZ = m_localPosZ;
-	unsigned int andMask;
+	unsigned char andMask;
+	unsigned char orMask;
 	int farCount;
-	unsigned int orMask;
 
 	if ((localX <= octNode->m_boundMaxX) && (localY <= octNode->m_boundMaxY) &&
 	    (localZ <= octNode->m_boundMaxZ) && (octNode->m_boundMinX <= localX) &&
@@ -722,7 +722,7 @@ void COctTree::DrawTypeMesh_r(COctNode* octNode)
 			for (int y = 0; y < 2; y++) {
 				localCorner.y = (y == 0) ? octNode->m_boundMinY : octNode->m_boundMaxY;
 				for (int z = 0; z < 2; z++) {
-					unsigned int clipFlags;
+					unsigned char clipFlags;
 					double depth;
 
 					localCorner.z = (z == 0) ? octNode->m_boundMinZ : octNode->m_boundMaxZ;
@@ -770,7 +770,7 @@ void COctTree::DrawTypeMesh_r(COctNode* octNode)
 			}
 		}
 
-		if (farCount > 7) {
+		if (farCount >= 8) {
 			return;
 		}
 		if (maxDepth < *reinterpret_cast<float*>(Ptr(&MapMng, 0x22A70))) {

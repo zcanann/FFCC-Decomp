@@ -932,13 +932,13 @@ void CRedEntry::DisplayWaveInfo()
 		OSReport(sRedEntryAMemoryInfoColumnFmt, sRedEntryLogPrefix);
 		fflush(__files + 1);
 
-		int maxFreeSize = 0;
+		int maxGapSize = 0;
 		int totalSize = 0;
-		int entryWave = 0;
-		int previousBlockEnd = c_RedMemory.GetABufferAddress();
+		int entryWaveCount = 0;
+		int previousAllocEnd = c_RedMemory.GetABufferAddress();
 		RedMemoryBlock* aMemoryBank = c_RedMemory.GetABankAddress();
 		RedMemoryBlock* memoryBlock = aMemoryBank;
-		int aBufferEnd = previousBlockEnd + c_RedMemory.GetABufferSize();
+		int aBufferEnd = previousAllocEnd + c_RedMemory.GetABufferSize();
 		do {
 			if (memoryBlock->m_size != REDSOUND_MEMORY_BLOCK_SIZE_EMPTY) {
 				int freeSize = RedMemoryBlockGetEndAddress(memoryBlock);
@@ -970,7 +970,7 @@ void CRedEntry::DisplayWaveInfo()
 						         freeSize, history->m_historyNo);
 						fflush(__files + 1);
 					}
-					entryWave += 1;
+					entryWaveCount += 1;
 				} else {
 					int bankIndex = (int)memoryBlock - (int)aMemoryBank;
 					OSReport(sRedEntryAMemoryFreeBlockInfoFmt, sRedEntryLogPrefix, memoryBlock->m_address,
@@ -978,27 +978,27 @@ void CRedEntry::DisplayWaveInfo()
 					fflush(__files + 1);
 				}
 
-				if (maxFreeSize < memoryBlock->m_address - previousBlockEnd) {
-					maxFreeSize = memoryBlock->m_address - previousBlockEnd;
+				if (maxGapSize < memoryBlock->m_address - previousAllocEnd) {
+					maxGapSize = memoryBlock->m_address - previousAllocEnd;
 				}
 				totalSize += memoryBlock->m_size;
-				previousBlockEnd = RedMemoryBlockGetEndAddress(memoryBlock);
+				previousAllocEnd = RedMemoryBlockGetEndAddress(memoryBlock);
 			}
 			memoryBlock++;
 		} while (memoryBlock < RedMemoryBankGetEnd(aMemoryBank));
 
 		int aBufferBase = c_RedMemory.GetABufferAddress();
-		if (maxFreeSize < (aBufferBase + c_RedMemory.GetABufferSize()) - previousBlockEnd) {
-			maxFreeSize = (aBufferBase + c_RedMemory.GetABufferSize()) - previousBlockEnd;
+		if (maxGapSize < (aBufferBase + c_RedMemory.GetABufferSize()) - previousAllocEnd) {
+			maxGapSize = (aBufferBase + c_RedMemory.GetABufferSize()) - previousAllocEnd;
 		}
 
 		OSReport(sRedEntryPrefixedNewlineFmt, sRedEntryLogPrefix);
 		fflush(__files + 1);
-		OSReport(sRedEntryEntryWaveCountFmt, sRedEntryLogPrefix, entryWave);
+		OSReport(sRedEntryEntryWaveCountFmt, sRedEntryLogPrefix, entryWaveCount);
 		fflush(__files + 1);
 		OSReport(sRedEntryTotalSizeFmt, sRedEntryLogPrefix, totalSize);
 		fflush(__files + 1);
-		OSReport(sRedEntryMaxFreeSizeFmt, sRedEntryLogPrefix, maxFreeSize);
+		OSReport(sRedEntryMaxFreeSizeFmt, sRedEntryLogPrefix, maxGapSize);
 		fflush(__files + 1);
 		OSReport(sRedEntryPrefixedNewlineFmt, sRedEntryLogPrefix);
 		fflush(__files + 1);

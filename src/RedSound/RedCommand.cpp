@@ -313,17 +313,17 @@ int SeStopMG(int bank, int sep, int group, int kind)
  * JP Address: TODO
  * JP Size: TODO
  */
-int SeBlockPlay(int seId, int bank, int no, int pan, int volume)
+int SeBlockPlay(int seId, int bank, int sepNo, int pan, int volume)
 {
 	bank = bank & REDSOUND_SE_BLOCK_BANK_MASK;
-	no = no & REDSOUND_SE_BLOCK_SEQUENCE_MASK;
+	sepNo = sepNo & REDSOUND_SE_BLOCK_SEQUENCE_MASK;
 
 	if (RedSeBlockDataGet(bank) != REDSOUND_SE_BLOCK_DATA_NONE) {
 		RedSeBlockHEAD* bankData = RedSeBlockDataGet(bank);
-		int seNo = no;
+		int seNo = sepNo;
 
-		no += bank << REDSOUND_SE_BLOCK_BANK_SHIFT;
-		no |= REDSOUND_SE_BLOCK_DATA_FLAG;
+		sepNo += bank << REDSOUND_SE_BLOCK_BANK_SHIFT;
+		sepNo |= REDSOUND_SE_BLOCK_DATA_FLAG;
 		if (seNo < bankData->m_seCount) {
 			int* entries = bankData->m_entries;
 
@@ -334,7 +334,7 @@ int SeBlockPlay(int seId, int bank, int no, int pan, int volume)
 				if (((unsigned int)entries[seNo] & REDSOUND_SE_BLOCK_DATA_FLAG) != 0) {
 					playInfo->m_flagsAndCount |= REDSOUND_SE_INFO_MULTI_FLAG;
 				}
-				if (_SePlayStart(playInfo, seId, no, pan, volume) != 0) {
+				if (_SePlayStart(playInfo, seId, sepNo, pan, volume) != 0) {
 					return seNo;
 				}
 			}

@@ -721,12 +721,12 @@ void StreamControl()
 						axSamplePosition |= voiceData->m_axVoice->pb.addr.currentAddressLo;
 					if ((axSamplePosition >= currentBufferSampleStart) &&
 					    (axSamplePosition < currentBufferSampleStart + REDSOUND_STREAM_STEREO_PLANE_SIZE)) {
-						int streamStopped = 0;
+						int streamResult = 0;
 						if (streamData->m_header.m_loopStart < REDSOUND_STREAM_LOOP_ENABLED_MIN) {
 							streamData->m_header.m_loopEnd = streamData->m_header.m_loopEnd - REDSOUND_STREAM_SAMPLE_ADVANCE;
 							if (streamData->m_header.m_loopEnd < 1) {
 								_StreamStop(streamData);
-								streamStopped = 1;
+								streamResult = 1;
 							}
 						}
 						streamData->m_fileCursor += streamData->m_header.m_channelCount * REDSOUND_STREAM_PAGE_SIZE;
@@ -734,23 +734,21 @@ void StreamControl()
 							streamData->m_fileCursor -= streamData->m_fileSize;
 						}
 
-						if (!streamStopped) {
-							int streamBufferSide;
-							int streamDmaId;
+						if (streamResult == 0) {
 							if (streamData->m_streamCursorBase != 0) {
-								streamBufferSide = REDSOUND_STREAM_BUFFER_SIDE_A;
+								streamResult = REDSOUND_STREAM_BUFFER_SIDE_A;
 								streamData->m_streamCursorBase = 0;
 							} else {
-								streamBufferSide = REDSOUND_STREAM_BUFFER_SIDE_B;
+								streamResult = REDSOUND_STREAM_BUFFER_SIDE_B;
 								streamData->m_streamCursorBase = REDSOUND_STREAM_PAGE_SIZE;
 							}
 
 							if (streamData->m_header.m_loopStart < REDSOUND_STREAM_LOOP_ENABLED_MIN) {
-								streamDmaId = _ArrangeStreamDataNoLoop(streamData, streamBufferSide, REDSOUND_STREAM_PAGE_SIZE);
+								streamResult = _ArrangeStreamDataNoLoop(streamData, streamResult, REDSOUND_STREAM_PAGE_SIZE);
 							} else {
-								streamDmaId = _ArrangeStreamDataLoop(streamData, streamBufferSide, REDSOUND_STREAM_PAGE_SIZE);
+								streamResult = _ArrangeStreamDataLoop(streamData, streamResult, REDSOUND_STREAM_PAGE_SIZE);
 							}
-							streamData->m_dmaId = streamDmaId;
+							streamData->m_dmaId = streamResult;
 						}
 					}
 

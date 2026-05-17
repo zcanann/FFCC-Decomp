@@ -941,7 +941,7 @@ void CMemoryCardMan::MakeSaveData()
     {
         m_saveBuffer = reinterpret_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
             0xA000, reinterpret_cast<CMemory::CStage*>(m_stage), const_cast<char*>(sMemoryCardSourceFile), 0x2AB));
-        if (m_saveBuffer == (char*)nullptr && System.m_execParam != 0)
+        if (m_saveBuffer == (char*)nullptr && static_cast<unsigned int>(System.m_execParam) >= 1)
         {
             System.Printf(const_cast<char*>(sMemoryAllocationError), const_cast<char*>(sMemoryCardSourceFile), 0x2AD);
         }
@@ -1162,12 +1162,10 @@ void CMemoryCardMan::MakeSaveData()
 void CMemoryCardMan::SetLoadData()
 {
     u8* save = reinterpret_cast<u8*>(m_saveBuffer);
-    u8* game = reinterpret_cast<u8*>(&Game);
-    u8* gameWork = game + 0x08;
 
     if (memcmp(save + 0x00, CardConst::MCDAT_MAKER, strlen(CardConst::MCDAT_MAKER)) != 0)
     {
-        if (System.m_execParam != 0)
+        if (static_cast<unsigned int>(System.m_execParam) >= 1)
         {
             System.Printf(const_cast<char*>(sBrokenLoadData));
         }
@@ -1175,7 +1173,7 @@ void CMemoryCardMan::SetLoadData()
     }
     if (memcmp(save + 0x04, CardConst::MCDAT_TITLE, strlen(CardConst::MCDAT_TITLE)) != 0)
     {
-        if (System.m_execParam != 0)
+        if (static_cast<unsigned int>(System.m_execParam) >= 1)
         {
             System.Printf(const_cast<char*>(sBrokenLoadData));
         }
@@ -1183,7 +1181,7 @@ void CMemoryCardMan::SetLoadData()
     }
     if (memcmp(save + 0x08, CardConst::MCDAT_MACHINE, strlen(CardConst::MCDAT_MACHINE)) != 0)
     {
-        if (System.m_execParam != 0)
+        if (static_cast<unsigned int>(System.m_execParam) >= 1)
         {
             System.Printf(const_cast<char*>(sBrokenLoadData));
         }
@@ -1191,7 +1189,7 @@ void CMemoryCardMan::SetLoadData()
     }
     if (memcmp(save + 0x0C, CardConst::MCDAT_VERSION, strlen(CardConst::MCDAT_VERSION)) != 0)
     {
-        if (System.m_execParam != 0)
+        if (static_cast<unsigned int>(System.m_execParam) >= 1)
         {
             System.Printf(const_cast<char*>(sLoadDataVersionDifferent));
         }
@@ -1199,40 +1197,41 @@ void CMemoryCardMan::SetLoadData()
     }
     if (save[0x10] != 'E')
     {
-        if (System.m_execParam != 0)
+        if (static_cast<unsigned int>(System.m_execParam) >= 1)
         {
             System.Printf(const_cast<char*>(sBrokenLoadData));
         }
         return;
     }
 
-    gameWork[0x08] = save[0x20];
-    gameWork[0x09] = save[0x21];
-    gameWork[0x0A] = save[0x22];
-    gameWork[0x0B] = save[0x23];
-    *reinterpret_cast<int*>(gameWork + 0x0C) = *reinterpret_cast<int*>(save + 0x24);
-    *reinterpret_cast<int*>(gameWork + 0x10) = *reinterpret_cast<int*>(save + 0x28);
-    *reinterpret_cast<int*>(gameWork + 0x14) = *reinterpret_cast<int*>(save + 0x2C);
-    memcpy(gameWork + 0x18, save + 0x30, 0x10);
-    memcpy(gameWork + 0x28, save + 0x40, 0x3C);
-    memcpy(gameWork + 0x64, save + 0x7C, 0x3C);
-    *reinterpret_cast<int*>(gameWork + 0x10B4) = *reinterpret_cast<int*>(save + 0xB8);
-    memcpy(gameWork + 0xA0, save + 0xC0, 0x1000);
-    memcpy(gameWork + 0x10A0, save + 0x10C0, 0x10);
-    memcpy(gameWork + 0x10CC, save + 0x10D0, 0x100);
-    memcpy(gameWork + 0x11CC, save + 0x11D0, 0x200);
-    *reinterpret_cast<u32*>(gameWork + 0x13E0) = *reinterpret_cast<u32*>(save + 0x13D0);
-    *reinterpret_cast<u32*>(gameWork + 0x13E4) = *reinterpret_cast<u32*>(save + 0x13D4);
-    *reinterpret_cast<u32*>(gameWork + 0x13D8) = *reinterpret_cast<u32*>(save + 0x13D8);
-    gameWork[0x13D6] = save[0x13DC];
+    CGame::CGameWork* gameWork = &Game.m_gameWork;
+    gameWork->m_scriptSysVal0 = save[0x20];
+    gameWork->m_scriptSysVal1 = save[0x21];
+    gameWork->m_scriptSysVal2 = save[0x22];
+    gameWork->m_scriptSysVal3 = save[0x23];
+    gameWork->m_timerA = *reinterpret_cast<int*>(save + 0x24);
+    gameWork->m_scriptGlobalTime = *reinterpret_cast<int*>(save + 0x28);
+    gameWork->m_frameCounter = *reinterpret_cast<int*>(save + 0x2C);
+    memcpy(gameWork->m_wmBackupParams, save + 0x30, 0x10);
+    memcpy(gameWork->m_bossArtifactStageTable, save + 0x40, 0x3C);
+    memcpy(gameWork->m_unkStageTable, save + 0x7C, 0x3C);
+    gameWork->m_chaliceElement = *reinterpret_cast<int*>(save + 0xB8);
+    memcpy(gameWork->m_linkTable, save + 0xC0, 0x1000);
+    memcpy(gameWork->m_townName, save + 0x10C0, 0x10);
+    memcpy(gameWork->m_eventFlags, save + 0x10D0, 0x100);
+    memcpy(gameWork->m_eventWork, save + 0x11D0, 0x200);
+    gameWork->m_mcSerial0 = *reinterpret_cast<u32*>(save + 0x13D0);
+    gameWork->m_mcSerial1 = *reinterpret_cast<u32*>(save + 0x13D4);
+    gameWork->m_mcRandom = *reinterpret_cast<u32*>(save + 0x13D8);
+    gameWork->m_mcHasSerial = save[0x13DC];
     Sound.SetBgmMasterVolume(static_cast<s8>(save[0x13DD]));
     Sound.SetSeMasterVolume(static_cast<s8>(save[0x13DE]));
     Sound.SetStereo(static_cast<u32>(__cntlzw(GetRedSoundGlobal()->GetSoundMode())) >> 5);
-    gameWork[0x01] = MakeSaveBool(save[0x13E0]);
-    gameWork[0x02] = MakeSaveBool(save[0x13E1]);
-    gameWork[0x03] = MakeSaveBool(save[0x13E2]);
-    gameWork[0x04] = MakeSaveBool(save[0x13E3]);
-    gameWork[0x05] = MakeSaveBool(save[0x13E4]);
+    gameWork->m_gameInitFlag = MakeSaveBool(save[0x13E0]);
+    gameWork->m_spModeFlags[0] = MakeSaveBool(save[0x13E1]);
+    gameWork->m_spModeFlags[1] = MakeSaveBool(save[0x13E2]);
+    gameWork->m_spModeFlags[2] = MakeSaveBool(save[0x13E3]);
+    gameWork->m_spModeFlags[3] = MakeSaveBool(save[0x13E4]);
 
     for (int c = 0; c < 8; c++)
     {
@@ -1253,7 +1252,7 @@ void CMemoryCardMan::SetLoadData()
         } while (inventoryCount != 0);
         if (itemCount != *reinterpret_cast<u16*>(src + 0x28))
         {
-            if (System.m_execParam != 0)
+            if (static_cast<unsigned int>(System.m_execParam) >= 1)
             {
                 System.Printf(const_cast<char*>(sLoadDataItemCountError), c);
             }
@@ -1360,41 +1359,41 @@ void CMemoryCardMan::SetLoadData()
 
     }
 
-    int wm0 = Game.m_gameWork.m_wmBackupParams[0];
-    int wm1 = Game.m_gameWork.m_wmBackupParams[1];
-    int wm2 = Game.m_gameWork.m_wmBackupParams[2];
-    int wm3 = Game.m_gameWork.m_wmBackupParams[3];
-    if (Game.m_caravanWorkArr[Game.m_gameWork.m_wmBackupParams[0]].m_shopState == 0)
+    int wm0 = gameWork->m_wmBackupParams[0];
+    int wm1 = gameWork->m_wmBackupParams[1];
+    int wm2 = gameWork->m_wmBackupParams[2];
+    int wm3 = gameWork->m_wmBackupParams[3];
+    if (Game.m_caravanWorkArr[gameWork->m_wmBackupParams[0]].m_shopState == 0)
     {
-        Game.m_gameWork.m_wmBackupParams[0] = -1;
+        gameWork->m_wmBackupParams[0] = -1;
     }
     if (Game.m_caravanWorkArr[wm0].m_shopBusyFlag != 0)
     {
-        Game.m_gameWork.m_wmBackupParams[0] = -1;
+        gameWork->m_wmBackupParams[0] = -1;
     }
-    if (Game.m_caravanWorkArr[Game.m_gameWork.m_wmBackupParams[1]].m_shopState == 0)
+    if (Game.m_caravanWorkArr[gameWork->m_wmBackupParams[1]].m_shopState == 0)
     {
-        Game.m_gameWork.m_wmBackupParams[1] = -1;
+        gameWork->m_wmBackupParams[1] = -1;
     }
     if (Game.m_caravanWorkArr[wm1].m_shopBusyFlag != 0)
     {
-        Game.m_gameWork.m_wmBackupParams[1] = -1;
+        gameWork->m_wmBackupParams[1] = -1;
     }
-    if (Game.m_caravanWorkArr[Game.m_gameWork.m_wmBackupParams[2]].m_shopState == 0)
+    if (Game.m_caravanWorkArr[gameWork->m_wmBackupParams[2]].m_shopState == 0)
     {
-        Game.m_gameWork.m_wmBackupParams[2] = -1;
+        gameWork->m_wmBackupParams[2] = -1;
     }
     if (Game.m_caravanWorkArr[wm2].m_shopBusyFlag != 0)
     {
-        Game.m_gameWork.m_wmBackupParams[2] = -1;
+        gameWork->m_wmBackupParams[2] = -1;
     }
-    if (Game.m_caravanWorkArr[Game.m_gameWork.m_wmBackupParams[3]].m_shopState == 0)
+    if (Game.m_caravanWorkArr[gameWork->m_wmBackupParams[3]].m_shopState == 0)
     {
-        Game.m_gameWork.m_wmBackupParams[3] = -1;
+        gameWork->m_wmBackupParams[3] = -1;
     }
     if (Game.m_caravanWorkArr[wm3].m_shopBusyFlag != 0)
     {
-        Game.m_gameWork.m_wmBackupParams[3] = -1;
+        gameWork->m_wmBackupParams[3] = -1;
     }
 
     Game.LoadScript(reinterpret_cast<char*>(save + 0x62D0));
@@ -1534,10 +1533,10 @@ int CMemoryCardMan::DummySave()
 
         if (m_result != 0)
         {
-            if (System.m_execParam != 0)
+            if (static_cast<unsigned int>(System.m_execParam) >= 1)
             {
                 // "%s(%d) McFormat(%d) error(%d)"
-                System.Printf("%s", const_cast<char*>(sMemoryAllocationError + 0x40));
+                System.Printf(const_cast<char*>(sMemoryAllocationError + 0x40), 0);
             }
 
             result = CARDUnmount(0);
@@ -1553,10 +1552,10 @@ int CMemoryCardMan::DummySave()
     // Handle general mount error
     if (m_result != 0)
     {
-        if (System.m_execParam != 0)
+        if (static_cast<unsigned int>(System.m_execParam) >= 1)
         {
             // "%s(%d) McMount(%d) error(%d)"
-            System.Printf("%s", const_cast<char*>(sMcMountErrorFmt));
+            System.Printf(const_cast<char*>(sMcMountErrorFmt), 0);
         }
 
         result = CARDUnmount(0);
@@ -1598,10 +1597,10 @@ int CMemoryCardMan::DummySave()
 
         if (m_result != 0)
         {
-            if (System.m_execParam != 0)
+            if (static_cast<unsigned int>(System.m_execParam) >= 1)
             {
                 // "McCreate(%d) error(%d)"
-                System.Printf("%s", const_cast<char*>(sMemoryAllocationError + 0x58));
+                System.Printf(const_cast<char*>(sMemoryAllocationError + 0x58), 0);
             }
 
             result = CARDUnmount(0);
@@ -1620,10 +1619,10 @@ int CMemoryCardMan::DummySave()
 
         if (m_result != 0)
         {
-            if (System.m_execParam != 0)
+            if (static_cast<unsigned int>(System.m_execParam) >= 1)
             {
                 // "McGetStat(%d) error(%d)"
-                System.Printf("%s", const_cast<char*>(sMcGetStatErrorFmt));
+                System.Printf(const_cast<char*>(sMcGetStatErrorFmt), 0);
             }
 
             result = CARDUnmount(0);
@@ -1640,7 +1639,7 @@ int CMemoryCardMan::DummySave()
             m_saveBuffer = reinterpret_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
                 0xA000, reinterpret_cast<CMemory::CStage*>(m_stage), const_cast<char*>(sMemoryCardSourceFile), 0x2AB));
 
-            if (m_saveBuffer == 0 && System.m_execParam != 0)
+            if (m_saveBuffer == 0 && static_cast<unsigned int>(System.m_execParam) >= 1)
             {
                 System.Printf(const_cast<char*>(sMemoryAllocationError), const_cast<char*>(sMemoryCardSourceFile), 0x2AD);
             }
@@ -1673,9 +1672,9 @@ int CMemoryCardMan::DummySave()
 
         if (m_result != 0)
         {
-            if (System.m_execParam != 0)
+            if (static_cast<unsigned int>(System.m_execParam) >= 1)
             {
-                System.Printf("%s", const_cast<char*>(sMcWriteErrorFmt));
+                System.Printf(const_cast<char*>(sMcWriteErrorFmt), 0);
             }
 
             result = CARDUnmount(0);
@@ -1700,9 +1699,9 @@ int CMemoryCardMan::DummySave()
 
         if (m_result != 0)
         {
-            if (System.m_execParam != 0)
+            if (static_cast<unsigned int>(System.m_execParam) >= 1)
             {
-                System.Printf("%s", const_cast<char*>(sMcSetStatErrorFmt));
+                System.Printf(const_cast<char*>(sMcSetStatErrorFmt), 0);
             }
 
             result = CARDUnmount(0);
@@ -1727,7 +1726,7 @@ int CMemoryCardMan::DummySave()
             m_saveBuffer = reinterpret_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
                 0xA000, reinterpret_cast<CMemory::CStage*>(m_stage), const_cast<char*>(sMemoryCardSourceFile), 0x2AB));
 
-            if (m_saveBuffer == 0 && System.m_execParam != 0)
+            if (m_saveBuffer == 0 && static_cast<unsigned int>(System.m_execParam) >= 1)
             {
                 System.Printf(const_cast<char*>(sMemoryAllocationError), const_cast<char*>(sMemoryCardSourceFile), 0x2AD);
             }
@@ -1793,9 +1792,9 @@ int CMemoryCardMan::DummySave()
         return 0;
     }
 
-    if (System.m_execParam != 0)
+    if (static_cast<unsigned int>(System.m_execParam) >= 1)
     {
-        System.Printf("%s", const_cast<char*>(sMcWriteErrorFmt));
+        System.Printf(const_cast<char*>(sMcWriteErrorFmt), 0);
     }
 
     int chan = m_fileInfo.chan;
@@ -1857,10 +1856,10 @@ int CMemoryCardMan::DummyLoad()
     // If mount failed
     if (m_result != 0)
     {
-        if (System.m_execParam != 0)
+        if (static_cast<unsigned int>(System.m_execParam) >= 1)
         {
             // "McMount(%d) error(%d)"
-            System.Printf("%s", const_cast<char*>(sMcMountErrorFmt));
+            System.Printf(const_cast<char*>(sMcMountErrorFmt), 0);
         }
 
         result = CARDUnmount(0);
@@ -1880,10 +1879,10 @@ int CMemoryCardMan::DummyLoad()
     if (m_result != 0)
     {
         // Open failed
-        if (System.m_execParam != 0)
+        if (static_cast<unsigned int>(System.m_execParam) >= 1)
         {
             // "McOpen(%d) error(%d)"
-            System.Printf("%s", const_cast<char*>(sMcOpenErrorFmt));
+            System.Printf(const_cast<char*>(sMcOpenErrorFmt), 0);
         }
 
         result = CARDUnmount(0);
@@ -1900,7 +1899,7 @@ int CMemoryCardMan::DummyLoad()
         m_saveBuffer = reinterpret_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
             0xA000, reinterpret_cast<CMemory::CStage*>(m_stage), const_cast<char*>(sMemoryCardSourceFile), 0x2AB));
 
-        if (m_saveBuffer == 0 && System.m_execParam != 0)
+        if (m_saveBuffer == 0 && static_cast<unsigned int>(System.m_execParam) >= 1)
         {
             System.Printf(const_cast<char*>(sMemoryAllocationError), const_cast<char*>(sMemoryCardSourceFile), 0x2AD);
         }
@@ -1967,10 +1966,10 @@ int CMemoryCardMan::DummyLoad()
         return 0;
     }
 
-    if (System.m_execParam != 0)
+    if (static_cast<unsigned int>(System.m_execParam) >= 1)
     {
         // "McRead(%d) error(%d)"
-        System.Printf("%s", const_cast<char*>(sMemoryAllocationError + 0x28));
+        System.Printf(const_cast<char*>(sMemoryAllocationError + 0x28), 0);
     }
 
     int chan = m_fileInfo.chan;

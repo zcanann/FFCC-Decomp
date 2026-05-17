@@ -149,7 +149,7 @@ RedReverbModeData t_ReverbModeData[REDSOUND_REVERB_MODE_COUNT] = {
 
 static void _EraseAttribute(int eraseTrack, int attrMask);
 static int _EraseTime(int eraseTrack);
-static int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume);
+static int _SePlayStart(RedSeINFO* seInfo, int seId, int sepId, int pan, int volume);
 static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int musicId, int volume,
                                      int mode);
 
@@ -827,25 +827,25 @@ inline int SeStopG(int group)
  * JP Address: TODO
  * JP Size: TODO
  */
-static int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume)
+static int _SePlayStart(RedSeINFO* seInfo, int seId, int sepId, int pan, int volume)
 {
-	unsigned char flag;
+	unsigned char flagsAndCount;
 	RedWaveHeadWD* waveBase;
 	RedTrackDATA* track;
-	int state;
+	int playTime;
 	int attrMask;
-	RedSeInfoSequence* seq;
+	RedSeInfoSequence* sequence;
 	int waveNo;
 	int deltaTime;
 	int sequenceCount;
-	unsigned char* current;
-	int remaining;
+	unsigned char* command;
+	int sequenceRunCount;
 	RedVoiceDATA* voiceData;
-	int isMulti;
+	int loopReport;
 
 	RedSoundControlGet(REDSOUND_CONTROL_SE)->m_updateFlags = 0;
-	waveNo = (unsigned int)info->m_waveNoHi * REDSOUND_SE_INFO_U16_HIGH_SCALE +
-	         (unsigned int)info->m_waveNoLo;
+	waveNo = (unsigned int)seInfo->m_waveNoHi * REDSOUND_SE_INFO_U16_HIGH_SCALE +
+	         (unsigned int)seInfo->m_waveNoLo;
 	waveBase = c_RedEntry.SearchWaveBase(waveNo);
 	if (waveBase != 0) {
 		c_RedEntry.WaveHistoryManager(REDSOUND_HISTORY_MODE_USE, waveBase->m_waveNo);
@@ -857,29 +857,29 @@ static int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volum
 		}
 	}
 
-	flag = info->m_flagsAndCount;
-	if (RedSeInfoFlagsHasMulti(flag)) {
-		isMulti = 1;
+	flagsAndCount = seInfo->m_flagsAndCount;
+	if (RedSeInfoFlagsHasMulti(flagsAndCount)) {
+		loopReport = 1;
 	} else {
-		isMulti = 0;
+		loopReport = 0;
 	}
-	seq = RedSeInfoGetSequences(info);
-	attrMask = info->m_attrMask;
-	sequenceCount = RedSeInfoGetSequenceCount(info);
-	current = RedSeInfoGetCommandData(seq, sequenceCount);
+	sequence = RedSeInfoGetSequences(seInfo);
+	attrMask = seInfo->m_attrMask;
+	sequenceCount = RedSeInfoGetSequenceCount(seInfo);
+	command = RedSeInfoGetCommandData(sequence, sequenceCount);
 	do {
-		remaining = sequenceCount;
+		sequenceRunCount = sequenceCount;
 		if (sepId != REDSOUND_SEP_DIRECT_PLAY_ID) {
-			remaining = 0;
+			sequenceRunCount = 0;
 			do {
-				remaining = remaining + 1;
-				if (!RedSeInfoSequenceHasContinue(seq, remaining)) {
+				sequenceRunCount = sequenceRunCount + 1;
+				if (!RedSeInfoSequenceHasContinue(sequence, sequenceRunCount)) {
 					break;
 				}
-			} while ((int)remaining < (int)sequenceCount);
+			} while ((int)sequenceRunCount < (int)sequenceCount);
 		}
 
-		track = SearchSeEmptyTrack((int)remaining, info->m_eraseTrack, attrMask);
+		track = SearchSeEmptyTrack((int)sequenceRunCount, seInfo->m_eraseTrack, attrMask);
 		attrMask = 0;
 		if (track == 0) {
 			break;
@@ -888,8 +888,8 @@ static int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volum
 		voiceData = RedVoiceDataGet(track->m_trackNo);
 		while (true) {
 			track->m_waveBankData = waveBase;
-			track->m_command = current;
-			current = RedSeInfoCommandGetNext(current, seq);
+			track->m_command = command;
+			command = RedSeInfoCommandGetNext(command, sequence);
 			track->m_deltaTime = (int)DeltaTimeSumup((unsigned char**)&track->m_command) + 1;
 			if (RedSeSkipStepIsActive()) {
 				track->m_deltaTime = track->m_deltaTime - RedSeSkipStepGet();
@@ -899,21 +899,21 @@ static int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volum
 			track->m_seId = seId;
 			track->m_loopStepCurrent = 0;
 			if (RedSeSkipStepIsActive()) {
-				state = 0;
+				playTime = 0;
 			} else {
-				state = REDSOUND_TRACK_PLAY_TIME_SENTINEL;
+				playTime = REDSOUND_TRACK_PLAY_TIME_SENTINEL;
 			}
-			track->m_playTime = state;
+			track->m_playTime = playTime;
 
 			if (*track->m_command != REDSOUND_SE_COMMAND_NONE) {
-				track->m_eraseTrack = info->m_eraseTrack;
-				track->m_attrMask = info->m_attrMask;
+				track->m_eraseTrack = seInfo->m_eraseTrack;
+				track->m_attrMask = seInfo->m_attrMask;
 				track->m_mixVolume = volume << REDSOUND_FIXED_SHIFT;
 				track->m_mixVolumeDelta = 0;
 				track->m_mixVolumeMode = REDSOUND_SE_VOLUME_MODE_NORMAL;
 				track->m_pitchDelta = 0;
 				track->m_pitch = 0;
-				track->m_loopReport = isMulti;
+				track->m_loopReport = loopReport;
 				track->m_volume = REDSOUND_VOLUME_FULL;
 				track->m_expression = REDSOUND_VOLUME_DEFAULT;
 				track->m_pan = pan << REDSOUND_FIXED_SHIFT;
@@ -961,10 +961,10 @@ static int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volum
 				voiceData->m_updateFlags = 0;
 			}
 
-			remaining = remaining - 1;
-			seq++;
+			sequenceRunCount = sequenceRunCount - 1;
+			sequence++;
 			sequenceCount = sequenceCount - 1;
-			if (remaining == 0) {
+			if (sequenceRunCount == 0) {
 				break;
 			}
 			track++;

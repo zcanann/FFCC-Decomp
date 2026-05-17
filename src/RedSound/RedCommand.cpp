@@ -1050,16 +1050,16 @@ static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* wav
 	RedReverbDepthSetCount(REDSOUND_REVERB_DEPTH_MUSIC, 0);
 	music->m_waveNo = musicHead->m_waveNo;
 
-	RedMusicTrackBlock* current = RedMusicGetTrackBlocks(musicHead);
+	RedMusicTrackBlock* trackBlock = RedMusicGetTrackBlocks(musicHead);
 	int remainingTracks = musicHead->m_trackCount;
 	char trackNo = 0;
 	do {
-		int blockSize = RedMusicTrackBlockGetSize(current);
+		int blockSize = RedMusicTrackBlockGetSize(trackBlock);
 		track->m_trackNo = trackNo - 1;
 		track->m_waveBankData = waveHead;
-		current = RedMusicTrackBlockGetCommandBlock(current);
-		track->m_command = (unsigned char*)current;
-		current = RedMusicTrackBlockGetNext(current, blockSize);
+		trackBlock = RedMusicTrackBlockGetCommandBlock(trackBlock);
+		track->m_command = (unsigned char*)trackBlock;
+		trackBlock = RedMusicTrackBlockGetNext(trackBlock, blockSize);
 		track->m_deltaTime = DeltaTimeSumup((unsigned char**)&track->m_command) + 1;
 		track->m_seSepId = REDSOUND_TRACK_SESEP_ID_NONE;
 		signed char* keySignatureData;

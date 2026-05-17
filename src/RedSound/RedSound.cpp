@@ -123,6 +123,20 @@ static RedSoundStreamBank* p_StreamBank;
 #define RedSoundStreamBankGetBegin() (p_StreamBank)
 #define RedSoundStreamBankSetBegin(bank) (p_StreamBank = (bank))
 #define RedSoundStreamBankGetEnd() (p_StreamBank + REDSOUND_STREAM_BANK_COUNT)
+#define RedSoundStreamBankSetId(bank, id) ((bank)->m_streamId = (id))
+#define RedSoundStreamBankSetData(bank, data) ((bank)->m_streamData = (data))
+#define RedSoundStreamBankSetFileSize(bank, size) ((bank)->m_fileSize = (size))
+#define RedSoundStreamBankSetReadPoint(bank, point) ((bank)->m_readPoint = (point))
+#define RedSoundStreamBankSetPlayPoint(bank, point) ((bank)->m_playPoint = (point))
+#define RedSoundStreamBankSetReserved(bank, value) ((bank)->m_reserved14 = (value))
+#define RedSoundStreamBankClear(bank)                                                                 \
+	do {                                                                                            \
+		RedSoundStreamBankSetId((bank), REDSOUND_STREAM_ID_NONE);                                  \
+		RedSoundStreamBankSetData((bank), REDSOUND_STREAM_BANK_DATA_NONE);                         \
+		RedSoundStreamBankSetFileSize((bank), REDSOUND_STREAM_BANK_FILE_SIZE_NONE);                 \
+		RedSoundStreamBankSetReadPoint((bank), REDSOUND_STREAM_BANK_POINT_NONE);                    \
+		RedSoundStreamBankSetPlayPoint((bank), REDSOUND_STREAM_BANK_POINT_NONE);                    \
+	} while (0)
 static const char sRedSoundMemorySettingError[] = "%s%s  Memory Setting Error !! (0x%8.8X:0x%8.8X)%s\n";
 static const char sRedSoundLogPrefix[] = "\x1B[7;34mSound\x1B[0m:";
 static const char sRedSoundAMemorySettingError[] = "%s%sA-Memory Setting Error !! (0x%8.8X:0x%8.8X)%s\n";
@@ -203,11 +217,7 @@ static RedSoundStreamBank* _SearchEmptyStreamBank()
 			return bank;
 		}
 		if (c_Driver.StreamPlayState(bank->m_streamId) == REDSOUND_STREAM_ID_NONE) {
-			bank->m_streamId = REDSOUND_STREAM_ID_NONE;
-			bank->m_streamData = REDSOUND_STREAM_BANK_DATA_NONE;
-			bank->m_fileSize = REDSOUND_STREAM_BANK_FILE_SIZE_NONE;
-			bank->m_readPoint = REDSOUND_STREAM_BANK_POINT_NONE;
-			bank->m_playPoint = REDSOUND_STREAM_BANK_POINT_NONE;
+			RedSoundStreamBankClear(bank);
 			return bank;
 		}
 		bank++;
@@ -1279,11 +1289,12 @@ inline int CRedSound::StreamStandby(void* streamHeader, int fileSize)
 		RedSoundStreamBank* bank = _SearchEmptyStreamBank();
 		if (bank != 0) {
 			streamId = GetAutoID();
-			bank->m_streamId = streamId;
-			bank->m_streamData = reinterpret_cast<RedStreamFile*>(streamHeader);
-			bank->m_fileSize = fileSize;
-			bank->m_readPoint = bank->m_playPoint = REDSOUND_STREAM_BANK_POINT_NONE;
-			bank->m_reserved14 = REDSOUND_STREAM_BANK_RESERVED_NONE;
+			RedSoundStreamBankSetId(bank, streamId);
+			RedSoundStreamBankSetData(bank, reinterpret_cast<RedStreamFile*>(streamHeader));
+			RedSoundStreamBankSetFileSize(bank, fileSize);
+			RedSoundStreamBankSetReadPoint(bank, REDSOUND_STREAM_BANK_POINT_NONE);
+			RedSoundStreamBankSetPlayPoint(bank, REDSOUND_STREAM_BANK_POINT_NONE);
+			RedSoundStreamBankSetReserved(bank, REDSOUND_STREAM_BANK_RESERVED_NONE);
 		}
 	} else if (RedReportPrintIsEnabled()) {
 		OSReport(sRedSoundInvalidStreamData,
@@ -1555,18 +1566,14 @@ inline void CRedSound::GetStreamReadPoint(int streamId, int* readPoint)
 					RedStreamReadPointSet(readPoint, REDSOUND_STREAM_READ_POINT_PLAY, playPoint - bank->m_playPoint);
 				}
 			}
-			bank->m_readPoint = currentReadPoint;
-			bank->m_playPoint = playPoint;
+			RedSoundStreamBankSetReadPoint(bank, currentReadPoint);
+			RedSoundStreamBankSetPlayPoint(bank, playPoint);
 		} else {
 			if (readPoint != 0) {
 				RedStreamReadPointSet(readPoint, REDSOUND_STREAM_READ_POINT_READ, bank->m_fileSize - bank->m_readPoint);
 				RedStreamReadPointSet(readPoint, REDSOUND_STREAM_READ_POINT_PLAY, bank->m_fileSize - bank->m_playPoint);
 			}
-			bank->m_streamId = REDSOUND_STREAM_ID_NONE;
-			bank->m_streamData = REDSOUND_STREAM_BANK_DATA_NONE;
-			bank->m_fileSize = REDSOUND_STREAM_BANK_FILE_SIZE_NONE;
-			bank->m_readPoint = REDSOUND_STREAM_BANK_POINT_NONE;
-			bank->m_playPoint = REDSOUND_STREAM_BANK_POINT_NONE;
+			RedSoundStreamBankClear(bank);
 		}
 	}
 }

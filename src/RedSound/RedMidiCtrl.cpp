@@ -892,7 +892,7 @@ static int DutySwingR(int phase)
  */
 static int SawSwingR(int phase)
 {
-    int level = (int)(char)((phase ^ REDSOUND_SWING_PHASE_INVERT_MASK) >> REDSOUND_SWING_SAW_PHASE_SHIFT)
+    int level = (int)(char)((int)(phase ^ REDSOUND_SWING_PHASE_INVERT_MASK) >> REDSOUND_SWING_SAW_PHASE_SHIFT)
                 << REDSOUND_SWING_PHASE_SHIFT;
 
     return level;

@@ -599,10 +599,10 @@ int CRedEntry::WaveHeadAdd(int waveBankNo, RedWaveHeadWD* waveHead, int waveNo)
 int CRedEntry::SetWaveData(int waveBankNo, void* waveData, int waveDataSize)
 {
 	int waveNo;
-	int historyNo;
+	int waveBankIndex;
 	int waveAddress;
 	int waveSize;
-	u8* waveDataTop;
+	u8* waveDataBody;
 
 	waveNo = 0;
 	if (waveDataSize == 0) {
@@ -622,21 +622,21 @@ int CRedEntry::SetWaveData(int waveBankNo, void* waveData, int waveDataSize)
 			WaveDelete(RedEntryWaveBankGet(this, waveBankNo));
 		}
 
-		historyNo = SearchWaveSequence(waveNo);
-		if (historyNo >= 0) {
-			if ((waveBankNo >= 0) && (historyNo != waveBankNo)) {
+		waveBankIndex = SearchWaveSequence(waveNo);
+		if (waveBankIndex >= 0) {
+			if ((waveBankNo >= 0) && (waveBankIndex != waveBankNo)) {
 				RedEntryWaveBankGet(this, waveBankNo)->m_id =
-				    RedEntryWaveBankGet(this, historyNo)->m_id;
+				    RedEntryWaveBankGet(this, waveBankIndex)->m_id;
 				RedEntryWaveBankGet(this, waveBankNo)->m_historyNo =
-				    RedEntryWaveBankGet(this, historyNo)->m_historyNo;
+				    RedEntryWaveBankGet(this, waveBankIndex)->m_historyNo;
 				RedEntryWaveBankGet(this, waveBankNo)->m_address =
-				    RedEntryWaveBankGet(this, historyNo)->m_address;
+				    RedEntryWaveBankGet(this, waveBankIndex)->m_address;
 				RedEntryWaveBankGet(this, waveBankNo)->m_size =
-				    RedEntryWaveBankGet(this, historyNo)->m_size;
-				historyNo = waveBankNo;
+				    RedEntryWaveBankGet(this, waveBankIndex)->m_size;
+				waveBankIndex = waveBankNo;
 			}
 
-			WaveHistoryChoice(RedEntryWaveBankGet(this, historyNo));
+			WaveHistoryChoice(RedEntryWaveBankGet(this, waveBankIndex));
 		} else {
 			m_waveLoadNo = ((RedWaveHeadWD*)waveData)->m_waveNo;
 			waveAddress = WaveHeadAdd(waveBankNo, (RedWaveHeadWD*)waveData, waveNo);
@@ -646,16 +646,16 @@ int CRedEntry::SetWaveData(int waveBankNo, void* waveData, int waveDataSize)
 				return REDSOUND_WAVE_NO_NONE;
 			}
 
-			int waveHeadSize = RedWaveHeadGetToneSize((RedWaveHeadWD*)waveData);
-			waveHeadSize +=
+			int waveHeaderSize = RedWaveHeadGetToneSize((RedWaveHeadWD*)waveData);
+			waveHeaderSize +=
 			    RedWaveHeadGetTableSize((RedWaveHeadWD*)waveData) + REDSOUND_WAVE_HEADER_COPY_BASE_SIZE;
 			waveSize = ((RedWaveHeadWD*)waveData)->m_waveSize;
-			waveDataSize -= waveHeadSize;
-			waveDataTop = (u8*)waveData + waveHeadSize;
+			waveDataSize -= waveHeaderSize;
+			waveDataBody = (u8*)waveData + waveHeaderSize;
 		}
 	} else {
 		waveAddress = m_waveLoadAddress;
-		waveDataTop = (u8*)waveData;
+		waveDataBody = (u8*)waveData;
 		waveSize = m_waveLoadSize;
 	}
 
@@ -668,7 +668,7 @@ int CRedEntry::SetWaveData(int waveBankNo, void* waveData, int waveDataSize)
 		}
 
 		int dmaID = RedDmaEntry(REDSOUND_DMA_FLAGS_WAVE_LOAD, REDSOUND_DMA_DIRECTION_TO_ARAM,
-		                        (int)waveDataTop, waveAddress, transferSize, REDSOUND_DMA_CALLBACK_NONE,
+		                        (int)waveDataBody, waveAddress, transferSize, REDSOUND_DMA_CALLBACK_NONE,
 		                        REDSOUND_DMA_CALLBACK_DATA_NONE);
 		waveSize -= transferSize;
 		waveAddress += transferSize;

@@ -2504,58 +2504,58 @@ static void _MidiTrackExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData,
     RedTrackDATA* track = control->m_tracks;
     do {
         if (track->m_command != REDSOUND_TRACK_COMMAND_NONE) {
-            int step;
+            int trackStep;
             RedChangeStatusSet(0);
             if (track->m_deltaTime < frames) {
-                step = track->m_deltaTime;
+                trackStep = track->m_deltaTime;
             } else {
-                step = frames;
+                trackStep = frames;
             }
-            int execStep = step;
+            int execStep = trackStep;
             track->m_deltaTime -= frames;
             _MusicTrackDataExecute(track, execStep);
             if (((track->m_flags & REDSOUND_TRACK_FLAG_TENUTO) == 0) && (track->m_deltaTime == 1)) {
                 KeyOffSet(control, keyOnData, track);
             }
             while ((track->m_command != REDSOUND_TRACK_COMMAND_NONE) && (track->m_deltaTime < 1)) {
-                unsigned char* cmd = track->m_command;
-                int delta;
-                track->m_command = cmd + 1;
-                RedMidiControlFunc func = RedMidiControlFunctionGet(*cmd);
+                unsigned char* command = track->m_command;
+                int deltaTime;
+                track->m_command = command + 1;
+                RedMidiControlFunc func = RedMidiControlFunctionGet(*command);
                 func(control, keyOnData, track);
                 if (track->m_command != REDSOUND_TRACK_COMMAND_NONE) {
                     if (track->m_deltaTime < 1) {
-                        delta = DeltaTimeSumup((unsigned char**)&track->m_command);
+                        deltaTime = DeltaTimeSumup((unsigned char**)&track->m_command);
                     } else {
-                        delta = track->m_deltaTime;
+                        deltaTime = track->m_deltaTime;
                         track->m_deltaTime = 0;
                     }
 
-                    if (delta != 0) {
-                        delta += track->m_step;
-                        if (delta < 1) {
-                            delta = 1;
+                    if (deltaTime != 0) {
+                        deltaTime += track->m_step;
+                        if (deltaTime < 1) {
+                            deltaTime = 1;
                         } else if ((track->m_voiceSwitch & REDSOUND_VOICE_SWITCH_FUZZY_DELTA_TIME) != 0) {
-                            int fuzzyDelta = delta * track->m_fuzzyDeltaTimeDepth >> REDSOUND_FUZZY_DELTA_DEPTH_SHIFT;
+                            int fuzzyDelta = deltaTime * track->m_fuzzyDeltaTimeDepth >> REDSOUND_FUZZY_DELTA_DEPTH_SHIFT;
                             s8 random = (s8)GetRandomData();
-                            delta += fuzzyDelta * random >> REDSOUND_FUZZY_DELTA_RANDOM_SHIFT;
-                            if (delta < 1) {
-                                delta = 1;
+                            deltaTime += fuzzyDelta * random >> REDSOUND_FUZZY_DELTA_RANDOM_SHIFT;
+                            if (deltaTime < 1) {
+                                deltaTime = 1;
                             }
                         }
                     }
 
                     if (track->m_deltaTime < -1) {
-                        int clampedStep;
-                        if (track->m_deltaTime + delta > 0) {
-                            clampedStep = -track->m_deltaTime;
+                        int catchupStep;
+                        if (track->m_deltaTime + deltaTime > 0) {
+                            catchupStep = -track->m_deltaTime;
                         } else {
-                            clampedStep = delta;
+                            catchupStep = deltaTime;
                         }
-                        int execStep = clampedStep;
+                        int execStep = catchupStep;
                         _MusicTrackDataExecute(track, execStep);
                     }
-                    track->m_deltaTime += delta;
+                    track->m_deltaTime += deltaTime;
                 }
             }
 
@@ -3077,14 +3077,14 @@ static int _SeMidiNoteExecute(
         if ((track->m_command != REDSOUND_TRACK_COMMAND_NONE) && ((track->m_voiceSwitch & REDSOUND_VOICE_SWITCH_PAUSE) == 0)) {
             track->m_seTickCounter -= tickStep * REDSOUND_SE_TICK_STEP;
             while (track->m_seTickCounter < 1) {
-                int step;
+                int trackStep;
                 track->m_seTickCounter += REDSOUND_CONTROL_TICK_PERIOD;
                 if (track->m_deltaTime < frames) {
-                    step = track->m_deltaTime;
+                    trackStep = track->m_deltaTime;
                 } else {
-                    step = frames;
+                    trackStep = frames;
                 }
-                int execStep = step;
+                int execStep = trackStep;
                 track->m_deltaTime -= frames;
                 _SeTrackDataExecute(track, execStep);
                 if (((track->m_flags & REDSOUND_TRACK_FLAG_TENUTO) == 0) && (track->m_deltaTime == 1)) {
@@ -3093,40 +3093,40 @@ static int _SeMidiNoteExecute(
 
                 RedChangeStatusSet(0);
                 while ((track->m_command != REDSOUND_TRACK_COMMAND_NONE) && (track->m_deltaTime < 1)) {
-                    int delta;
-                    unsigned char* cmd;
+                    int deltaTime;
+                    unsigned char* command;
                     track->m_loopStepCurrent += 1;
-                    cmd = track->m_command;
-                    track->m_command = cmd + 1;
-                    RedMidiControlFunc func = RedMidiControlFunctionGet(*cmd);
+                    command = track->m_command;
+                    track->m_command = command + 1;
+                    RedMidiControlFunc func = RedMidiControlFunctionGet(*command);
                     func(control, keyOnData, track);
                     if (track->m_command != REDSOUND_TRACK_COMMAND_NONE) {
-                        delta = DeltaTimeSumup((unsigned char**)&track->m_command);
-                        if (delta != 0) {
-                            delta += track->m_step;
-                            if (delta < 1) {
-                                delta = 1;
+                        deltaTime = DeltaTimeSumup((unsigned char**)&track->m_command);
+                        if (deltaTime != 0) {
+                            deltaTime += track->m_step;
+                            if (deltaTime < 1) {
+                                deltaTime = 1;
                             } else if ((track->m_voiceSwitch & REDSOUND_VOICE_SWITCH_FUZZY_DELTA_TIME) != 0) {
-                                int fuzzyDelta = delta * track->m_fuzzyDeltaTimeDepth >> REDSOUND_FUZZY_DELTA_DEPTH_SHIFT;
+                                int fuzzyDelta = deltaTime * track->m_fuzzyDeltaTimeDepth >> REDSOUND_FUZZY_DELTA_DEPTH_SHIFT;
                                 s8 random = (s8)GetRandomData();
-                                delta += fuzzyDelta * random >> REDSOUND_FUZZY_DELTA_RANDOM_SHIFT;
-                                if (delta < 1) {
-                                    delta = 1;
+                                deltaTime += fuzzyDelta * random >> REDSOUND_FUZZY_DELTA_RANDOM_SHIFT;
+                                if (deltaTime < 1) {
+                                    deltaTime = 1;
                                 }
                             }
                         }
 
                         if (track->m_deltaTime < -1) {
-                            int clampedStep;
-                            if (track->m_deltaTime + delta > 0) {
-                                clampedStep = -track->m_deltaTime;
+                            int catchupStep;
+                            if (track->m_deltaTime + deltaTime > 0) {
+                                catchupStep = -track->m_deltaTime;
                             } else {
-                                clampedStep = delta;
+                                catchupStep = deltaTime;
                             }
-                            int execStep = clampedStep;
+                            int execStep = catchupStep;
                             _SeTrackDataExecute(track, execStep);
                         }
-                        track->m_deltaTime += delta;
+                        track->m_deltaTime += deltaTime;
                     }
                 }
 

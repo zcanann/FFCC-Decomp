@@ -77,24 +77,24 @@ found_glyph:
 
 found_fallback:
 	int drawWidth;
-	float localScaleX = scaleX;
 	float localMargin = margin;
+	float localScaleX = scaleX;
 	CFontRenderFlagBits& renderFlagBits = GetRenderFlagBits(renderFlags);
 
 	if (renderFlagBits.fixedWidth != 0) {
 		drawWidth = static_cast<int>(m_glyphWidth);
 	} else {
-		signed char sign = renderFlagBits.shadow;
+		signed char sign = static_cast<signed char>(renderFlagBits.shadow);
 		unsigned int extra = static_cast<unsigned int>(-static_cast<int>(sign) | static_cast<int>(sign)) >> 30 & 2;
 		drawWidth = static_cast<int>(*(reinterpret_cast<unsigned char*>(glyph) + extra + 4));
 	}
 
-	double width = static_cast<double>(localScaleX * (localMargin + static_cast<float>(drawWidth)));
+	float width = localScaleX * (localMargin + static_cast<float>(drawWidth));
 	if (renderFlagBits.snapPosition != 0) {
-		width = floor(width);
+		width = static_cast<float>(floor(width));
 	}
 
-	return static_cast<float>(width);
+	return width;
 
 find_fallback:
 	glyphBucket = m_glyphBuckets[63];

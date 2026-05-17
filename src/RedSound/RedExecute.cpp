@@ -1202,8 +1202,8 @@ static void _VolumeExecute(RedVoiceDATA* voice, int volume)
             }
 
             tremoloVolume = voiceMixVolume * volumeScaleValue >> REDSOUND_VOLUME_TREMOLO_DEPTH_SHIFT;
-            tremoloRampFrames = voice->m_volumeModFrames;
             volumeScaleValue = voice->m_track->m_tremoloFunc((unsigned int)voice->m_volumeModPhase >> REDSOUND_FIXED_SHIFT);
+            tremoloRampFrames = voice->m_volumeModFrames;
             tremoloVolume = tremoloVolume * (volumeScaleValue >> REDSOUND_VOLUME_MOD_WAVE_SHIFT) >> REDSOUND_FIXED_SHIFT;
 
             if (tremoloRampFrames != 0) {

@@ -436,26 +436,30 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
     Vec* inVec;
     s32 iVar16;
     float dVar17;
-    const float dVar19 = FLOAT_80331cc8;
-    const float dVar18 = -dVar19;
-    const float dVar20 = FLOAT_80331cd0;
-    const float dVar21 = FLOAT_80331cd4;
-    const float dVar22 = FLOAT_80331cc4;
-    const float dVar24 = FLOAT_80331cc0;
-    const float dVar25 = FLOAT_80331cd8;
+    float dVar19;
+    float dVar18;
+    float dVar20;
+    float dVar21;
+    float dVar22;
+    float dVar24;
+    float dVar25;
     S16Vec globalMax;
     u32 uStack_b4;
-    s16 sVar8;
-    s16 sVar10;
-    s16 sVar13;
     u8* modelData = *(u8**)((u8*)model + 0xA4);
 
     memset(*(void**)((u8*)work + 0xC), 0, *(s32*)(modelData + 0xC) * 0x3C);
+    dVar19 = FLOAT_80331cc8;
     iVar16 = *(s32*)((u8*)model + 0xAC);
+    dVar18 = -dVar19;
     inVec = *(Vec**)((u8*)work + 0xC);
+    dVar20 = FLOAT_80331cd0;
     globalMax.x = -0x7FFF;
     globalMax.y = -0x7FFF;
+    dVar21 = FLOAT_80331cd4;
     globalMax.z = -0x7FFF;
+    dVar22 = FLOAT_80331cc4;
+    dVar24 = FLOAT_80331cc0;
+    dVar25 = FLOAT_80331cd8;
 
     for (uVar15 = 0; uVar15 < *(u32*)(modelData + 0xC); uVar15++) {
         iVar14 = *(s32*)(iVar16 + 8);
@@ -493,21 +497,21 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
             psVar11 = (s16*)(*(s32*)(iVar14 + 0x18) + iVar6);
             sVar1 = *psVar11;
             sVar7 = sVar1;
-            sVar8 = sVar1;
+            s16 sVar8 = sVar1;
             if (sVar12 < sVar1) {
                 sVar7 = sVar2;
                 sVar8 = sVar12;
             }
 
             sVar12 = psVar11[1];
-            sVar13 = sVar12;
+            s16 sVar13 = sVar12;
             if (sVar9 < sVar12) {
                 sVar12 = sVar3;
                 sVar13 = sVar9;
             }
 
             sVar9 = psVar11[2];
-            sVar10 = sVar9;
+            s16 sVar10 = sVar9;
             if (sVar4 < sVar9) {
                 sVar9 = minZ;
                 sVar10 = sVar4;

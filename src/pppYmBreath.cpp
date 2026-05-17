@@ -3,6 +3,7 @@
 #include "ffcc/graphic.h"
 #include "ffcc/linkage.h"
 #include "ffcc/math.h"
+#include "ffcc/pppGetRotMatrixXYZ.h"
 #include "dolphin/mtx.h"
 
 #include <string.h>
@@ -10,16 +11,8 @@
 #include "ffcc/pppPart.h"
 #include "ffcc/pppShape.h"
 
-extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void* stage);
-extern "C" void pppGetRotMatrixXYZ__FR10pppFMATRIXP11pppIVECTOR4(void* outMatrix, void* angle);
-extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
-extern "C" void pppSetBlendMode(unsigned char);
-extern "C" void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-    void*, void*, float, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char);
 extern "C" void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
 extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
-extern "C" void pppDrawShp__FPlsP12CMaterialSetUc(long*, short, CMaterialSet*, unsigned char);
-extern "C" void pppNormalize__FR3Vec3Vec(float*, Vec*);
 extern "C" {
 extern const float FLOAT_80330c80;
 extern const float FLOAT_80330c84;
@@ -194,17 +187,17 @@ extern "C" void pppDestructYmBreath(pppYmBreath* ymBreath, pppYmBreathUnkC* data
     VYmBreath* state = (VYmBreath*)((unsigned char*)ymBreath + 0x80 + *dataOffsets->m_serializedDataOffsets);
 
     if (state->m_particleData != NULL) {
-        pppHeapUseRate__FPQ27CMemory6CStage(state->m_particleData);
+        pppHeapUseRate((CMemory::CStage*)state->m_particleData);
         state->m_particleData = 0;
     }
 
     if (state->m_particleWmats != NULL) {
-        pppHeapUseRate__FPQ27CMemory6CStage(state->m_particleWmats);
+        pppHeapUseRate((CMemory::CStage*)state->m_particleWmats);
         state->m_particleWmats = 0;
     }
 
     if (state->m_particleColors != NULL) {
-        pppHeapUseRate__FPQ27CMemory6CStage(state->m_particleColors);
+        pppHeapUseRate((CMemory::CStage*)state->m_particleColors);
         state->m_particleColors = 0;
     }
 
@@ -214,19 +207,19 @@ extern "C" void pppDestructYmBreath(pppYmBreath* ymBreath, pppYmBreathUnkC* data
 
         for (i = 0; i < state->m_groupCount; i++) {
             if (group->particleIndices != NULL) {
-                pppHeapUseRate__FPQ27CMemory6CStage(group->particleIndices);
+                pppHeapUseRate((CMemory::CStage*)group->particleIndices);
                 group->particleIndices = 0;
             }
 
             if (group->particleStates != NULL) {
-                pppHeapUseRate__FPQ27CMemory6CStage(group->particleStates);
+                pppHeapUseRate((CMemory::CStage*)group->particleStates);
                 group->particleStates = 0;
             }
 
             group = (YmBreathParticleGroup*)((unsigned char*)group + 0x5C);
         }
 
-        pppHeapUseRate__FPQ27CMemory6CStage(state->m_groups);
+        pppHeapUseRate((CMemory::CStage*)state->m_groups);
         state->m_groups = 0;
     }
 }
@@ -333,7 +326,7 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
                        params->m_shapeStepValue * 4);
     pppSetBlendMode(params->m_blendMode);
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
-    pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
+    pppSetDrawEnv(
         0, 0, params->m_drawEnvScale, params->m_drawEnvColor1, params->m_drawEnvColor0,
         params->m_blendMode, 0, 1, 1, 0);
 
@@ -404,8 +397,7 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
             drawColor.b = (unsigned char)b;
             drawColor.a = (unsigned char)a;
             GXSetChanAmbColor(GX_COLOR0A0, drawColor);
-            pppDrawShp__FPlsP12CMaterialSetUc(*shape, particle->m_shapeFrame2, pppEnvStPtr->m_materialSetPtr,
-                                              params->m_blendMode);
+            pppDrawShp(*shape, particle->m_shapeFrame2, pppEnvStPtr->m_materialSetPtr, params->m_blendMode);
         }
 
         if (matrixList != 0) {
@@ -543,31 +535,31 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
         work->m_groupCount = params->m_groupCount;
 
         work->m_particleData =
-            (PARTICLE_DATA*)pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(work->m_particleCount * 0x60),
-                                                                 pppEnvStPtr->m_stagePtr,
-                                                                 const_cast<char*>(s_pppYmBreath_cpp_801DA9B0), 0x243);
+            (PARTICLE_DATA*)pppMemAlloc((unsigned long)(work->m_particleCount * 0x60),
+                                        pppEnvStPtr->m_stagePtr,
+                                        const_cast<char*>(s_pppYmBreath_cpp_801DA9B0), 0x243);
         if (work->m_particleData != NULL) {
             memset(work->m_particleData, 0, (unsigned long)(work->m_particleCount * 0x60));
         }
 
         work->m_particleWmats =
-            (PARTICLE_WMAT*)pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(work->m_particleCount * 0x30),
-                                                                  pppEnvStPtr->m_stagePtr,
-                                                                  const_cast<char*>(s_pppYmBreath_cpp_801DA9B0), 0x249);
+            (PARTICLE_WMAT*)pppMemAlloc((unsigned long)(work->m_particleCount * 0x30),
+                                        pppEnvStPtr->m_stagePtr,
+                                        const_cast<char*>(s_pppYmBreath_cpp_801DA9B0), 0x249);
         if (work->m_particleWmats != NULL) {
             memset(work->m_particleWmats, 0, (unsigned long)(work->m_particleCount * 0x30));
         }
 
         work->m_particleColors =
-            (PARTICLE_COLOR*)pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(work->m_particleCount << 5),
-                                                                  pppEnvStPtr->m_stagePtr,
-                                                                  const_cast<char*>(s_pppYmBreath_cpp_801DA9B0), 0x24F);
+            (PARTICLE_COLOR*)pppMemAlloc((unsigned long)(work->m_particleCount << 5),
+                                         pppEnvStPtr->m_stagePtr,
+                                         const_cast<char*>(s_pppYmBreath_cpp_801DA9B0), 0x24F);
         if (work->m_particleColors != NULL) {
             memset(work->m_particleColors, 0, (unsigned long)(work->m_particleCount << 5));
         }
 
         work->m_groups =
-            (YmBreathParticleGroup*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+            (YmBreathParticleGroup*)pppMemAlloc(
                 (unsigned long)((int)params->m_groupCount * 0x5C), pppEnvStPtr->m_stagePtr,
                 const_cast<char*>(s_pppYmBreath_cpp_801DA9B0), 0x255);
         if (work->m_groups != NULL) {
@@ -575,12 +567,12 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
 
             groupTable = work->m_groups;
             for (i = 0; i < (int)params->m_groupCount; i++) {
-                groupTable->particleIndices = (signed char*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+                groupTable->particleIndices = (signed char*)pppMemAlloc(
                     (unsigned long)params->m_slotCount, pppEnvStPtr->m_stagePtr,
                     const_cast<char*>(s_pppYmBreath_cpp_801DA9B0), 0x260);
                 memset(groupTable->particleIndices, -1, (unsigned long)params->m_slotCount);
 
-                groupTable->particleStates = (signed char*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+                groupTable->particleStates = (signed char*)pppMemAlloc(
                     (unsigned long)params->m_slotCount, pppEnvStPtr->m_stagePtr,
                     const_cast<char*>(s_pppYmBreath_cpp_801DA9B0), 0x263);
                 memset(groupTable->particleStates, -1, (unsigned long)params->m_slotCount);
@@ -953,7 +945,7 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
     angle[2] = (int)(range * Math.RandF() - spread);
     angle[2] = (int)((float)(angle[2] << 15) / FLOAT_80330C98);
 
-    pppGetRotMatrixXYZ__FR10pppFMATRIXP11pppIVECTOR4(&rotMtx, &angle);
+    pppGetRotMatrixXYZ(rotMtx, (pppIVECTOR4*)angle);
     PSMTXMultVecSR(rotMtx.value, &baseDir, &particle->m_direction);
 
     particle->m_direction.x *= params->m_directionScaleX;
@@ -961,7 +953,7 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
     particle->m_direction.z *= params->m_directionScaleZ;
 
     Vec directionNorm = particle->m_direction;
-    pppNormalize__FR3Vec3Vec(reinterpret_cast<float*>(&particle->m_direction), &directionNorm);
+    pppNormalize(particle->m_direction, directionNorm);
 
     if (FLOAT_80330c80 != params->m_spawnOffset) {
         PSVECScale(&particle->m_direction, &particle->m_position, params->m_spawnOffset);

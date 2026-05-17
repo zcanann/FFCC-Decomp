@@ -647,9 +647,9 @@ void CGraphicPcs::drawBar()
     float x = 0.0f;
     int hue = 0;
     u32 y = 0x10;
-    for (int i = 0; i < orderCount && order != NULL; i++) {
+    for (int i = 0; i < orderCount; i++) {
         const float width = (100.0f * order->m_lastTime) / 16.666666f;
-        const u32 rgb = Math.Hsb2Rgb(orderCount > 0 ? (hue / orderCount) : 0, 100, 100);
+        const u32 rgb = Math.Hsb2Rgb(hue / orderCount, 100, 100);
         const float y0 = drawText ? static_cast<float>(y) : ((order->m_priority == 0x26) ? 456.0f : 464.0f);
         const float y1 = drawText ? static_cast<float>(y + 8) : ((order->m_priority == 0x26) ? 464.0f : 456.0f);
 
@@ -745,7 +745,7 @@ void CGraphicPcs::drawBar()
         order = System.GetFirstOrder();
         x = 0.0f;
         y = 0x10;
-        for (int i = 0; i < orderCount && order != NULL; i++) {
+        for (int i = 0; i < orderCount; i++) {
             const float width = (100.0f * order->m_lastTime) / 16.666666f;
 
             if (order->m_priority != 0x27) {

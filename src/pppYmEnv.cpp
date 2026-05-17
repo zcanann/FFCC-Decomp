@@ -129,8 +129,8 @@ void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displa
     clearColor.g = 0;
     clearColor.b = 0;
     clearColor.a = 0xFF;
-    const Vec s_cameraPos = {0.0f, 0.0f, 6.0f};
-    const Vec s_cameraUp = {0.0f, 1.0f, 0.0f};
+    const Vec s_cameraPos = {0.0f, 6.0f, 0.0f};
+    const Vec s_cameraUp = {1.0f, 0.0f, 0.0f};
     const Vec s_cameraLook = {0.0f, 0.0f, 0.0f};
 
     gUtil.RenderColorQuad(0.0f, 0.0f, texWidth, texHeight, clearColor);

@@ -935,15 +935,15 @@ void CRedEntry::DisplayWaveInfo()
 		int maxFreeSize = 0;
 		int totalSize = 0;
 		int entryWave = 0;
-        int aBufferAddress = c_RedMemory.GetABufferAddress();
-        RedMemoryBlock* aBankAddress = c_RedMemory.GetABankAddress();
-		RedMemoryBlock* bank = aBankAddress;
-        int aBufferEnd = aBufferAddress + c_RedMemory.GetABufferSize();
+		int previousBlockEnd = c_RedMemory.GetABufferAddress();
+		RedMemoryBlock* aMemoryBank = c_RedMemory.GetABankAddress();
+		RedMemoryBlock* memoryBlock = aMemoryBank;
+		int aBufferEnd = previousBlockEnd + c_RedMemory.GetABufferSize();
 		do {
-			if (bank->m_size != REDSOUND_MEMORY_BLOCK_SIZE_EMPTY) {
-				int freeSize = RedMemoryBlockGetEndAddress(bank);
-				if (RedMemoryBlockGetNext(bank)->m_size > 0) {
-					freeSize = RedMemoryBlockGetNext(bank)->m_address - freeSize;
+			if (memoryBlock->m_size != REDSOUND_MEMORY_BLOCK_SIZE_EMPTY) {
+				int freeSize = RedMemoryBlockGetEndAddress(memoryBlock);
+				if (RedMemoryBlockGetNext(memoryBlock)->m_size > 0) {
+					freeSize = RedMemoryBlockGetNext(memoryBlock)->m_address - freeSize;
 				} else {
 					freeSize = aBufferEnd - freeSize;
 				}
@@ -951,7 +951,7 @@ void CRedEntry::DisplayWaveInfo()
 				RedHistoryBANK* history = m_waveBankBase;
 				do {
 					if ((history->m_size != REDSOUND_HISTORY_BANK_EMPTY_SIZE) &&
-					    (history->m_waveHead->m_aramAddress == bank->m_address)) {
+					    (history->m_waveHead->m_aramAddress == memoryBlock->m_address)) {
 						break;
 					}
 					history += 1;
@@ -961,35 +961,35 @@ void CRedEntry::DisplayWaveInfo()
 					if (history < m_waveBankBase + REDSOUND_WAVE_PRIMARY_BANK_ENTRY_COUNT) {
 						OSReport(sRedEntryAMemoryWaveBankInfoFmt, sRedEntryLogPrefix,
 						         history - m_waveBankBase,
-						         (int)history->m_waveHead->m_waveNo, history->m_waveHead->m_aramAddress, bank->m_size,
+						         (int)history->m_waveHead->m_waveNo, history->m_waveHead->m_aramAddress, memoryBlock->m_size,
 						         freeSize, history->m_historyNo);
 						fflush(__files + 1);
 					} else {
 						OSReport(sRedEntryAMemoryUnbankedWaveInfoFmt, sRedEntryLogPrefix,
-						         (int)history->m_waveHead->m_waveNo, history->m_waveHead->m_aramAddress, bank->m_size,
+						         (int)history->m_waveHead->m_waveNo, history->m_waveHead->m_aramAddress, memoryBlock->m_size,
 						         freeSize, history->m_historyNo);
 						fflush(__files + 1);
 					}
 					entryWave += 1;
 				} else {
-					int bankIndex = (int)bank - (int)aBankAddress;
-					OSReport(sRedEntryAMemoryFreeBlockInfoFmt, sRedEntryLogPrefix, bank->m_address, bank->m_size, freeSize,
-					         bankIndex / REDSOUND_MEMORY_BLOCK_SIZE);
+					int bankIndex = (int)memoryBlock - (int)aMemoryBank;
+					OSReport(sRedEntryAMemoryFreeBlockInfoFmt, sRedEntryLogPrefix, memoryBlock->m_address,
+					         memoryBlock->m_size, freeSize, bankIndex / REDSOUND_MEMORY_BLOCK_SIZE);
 					fflush(__files + 1);
 				}
 
-				if (maxFreeSize < bank->m_address - aBufferAddress) {
-					maxFreeSize = bank->m_address - aBufferAddress;
+				if (maxFreeSize < memoryBlock->m_address - previousBlockEnd) {
+					maxFreeSize = memoryBlock->m_address - previousBlockEnd;
 				}
-				totalSize += bank->m_size;
-				aBufferAddress = RedMemoryBlockGetEndAddress(bank);
+				totalSize += memoryBlock->m_size;
+				previousBlockEnd = RedMemoryBlockGetEndAddress(memoryBlock);
 			}
-			bank++;
-		} while (bank < RedMemoryBankGetEnd(aBankAddress));
+			memoryBlock++;
+		} while (memoryBlock < RedMemoryBankGetEnd(aMemoryBank));
 
-        int aBase = c_RedMemory.GetABufferAddress();
-		if (maxFreeSize < (aBase + c_RedMemory.GetABufferSize()) - aBufferAddress) {
-            maxFreeSize = (aBase + c_RedMemory.GetABufferSize()) - aBufferAddress;
+		int aBufferBase = c_RedMemory.GetABufferAddress();
+		if (maxFreeSize < (aBufferBase + c_RedMemory.GetABufferSize()) - previousBlockEnd) {
+			maxFreeSize = (aBufferBase + c_RedMemory.GetABufferSize()) - previousBlockEnd;
 		}
 
 		OSReport(sRedEntryPrefixedNewlineFmt, sRedEntryLogPrefix);
@@ -1260,40 +1260,40 @@ void CRedEntry::DisplaySePlayInfo()
 		OSReport(sRedEntrySePlayInfoColumnFmt, sRedEntryLogPrefix);
 		fflush(__files + 1);
 
-		RedTrackDATA** trackHead = &RedSoundControlGet(REDSOUND_CONTROL_SE)->m_tracks;
-		RedTrackDATA* track = *trackHead;
+		RedTrackDATA** seTrackHead = &RedSoundControlGet(REDSOUND_CONTROL_SE)->m_tracks;
+		RedTrackDATA* track = *seTrackHead;
 		int waveNo;
 		do {
 			if (track->m_command != REDSOUND_TRACK_COMMAND_NONE) {
 				if ((track->m_seSepId & REDSOUND_SE_BLOCK_DATA_FLAG) != 0) {
 					unsigned int seBlockId = (unsigned int)track->m_seSepId;
 					seBlockId &= REDSOUND_SE_BLOCK_ENTRY_MASK;
-					int bank = (int)seBlockId / REDSOUND_SE_BLOCK_SEQUENCE_COUNT;
-					int sequence = seBlockId & REDSOUND_SE_BLOCK_SEQUENCE_MASK;
-					RedSeBlockHEAD* seBlock = RedSeBlockDataGet(bank);
+					int blockBank = (int)seBlockId / REDSOUND_SE_BLOCK_SEQUENCE_COUNT;
+					int blockSequence = seBlockId & REDSOUND_SE_BLOCK_SEQUENCE_MASK;
+					RedSeBlockHEAD* seBlock = RedSeBlockDataGet(blockBank);
 					int* entries = seBlock->m_entries;
-					RedSeINFO* seqInfo = RedSeBlockGetInfoFromEntries(seBlock, entries, sequence);
-					waveNo = RedSeInfoGetWaveNo(seqInfo);
+					RedSeINFO* seInfo = RedSeBlockGetInfoFromEntries(seBlock, entries, blockSequence);
+					waveNo = RedSeInfoGetWaveNo(seInfo);
 
 					OSReport(sRedEntrySeBlockPlayInfoFmt, sRedEntryLogPrefix,
-					         (track - *trackHead) + REDSOUND_SE_VOICE_BASE_INDEX, bank,
-					         sequence, waveNo);
+					         (track - *seTrackHead) + REDSOUND_SE_VOICE_BASE_INDEX, blockBank,
+					         blockSequence, waveNo);
 					fflush(__files + 1);
 				} else {
 					RedHistoryBANK* seSepBank = SearchSeSepBank(track->m_seSepId);
 					RedSeSepHEAD* seSepHead = seSepBank->m_seSepHead;
 					waveNo = RedSeSepGetWaveNo(seSepHead);
 					OSReport(sRedEntrySeSepPlayInfoFmt, sRedEntryLogPrefix,
-					         (track - *trackHead) + REDSOUND_SE_VOICE_BASE_INDEX, track->m_seSepId, waveNo);
+					         (track - *seTrackHead) + REDSOUND_SE_VOICE_BASE_INDEX, track->m_seSepId, waveNo);
 					fflush(__files + 1);
 				}
 			} else {
 				OSReport(sRedEntrySeEmptyPlayInfoFmt, sRedEntryLogPrefix,
-				         (track - *trackHead) + REDSOUND_SE_VOICE_BASE_INDEX);
+				         (track - *seTrackHead) + REDSOUND_SE_VOICE_BASE_INDEX);
 				fflush(__files + 1);
 			}
 			track += 1;
-		} while (track < RedSeTrackGetEnd(*trackHead));
+		} while (track < RedSeTrackGetEnd(*seTrackHead));
 
 		OSReport(sRedEntryPrefixedNewlineFmt, sRedEntryLogPrefix);
 		fflush(__files + 1);

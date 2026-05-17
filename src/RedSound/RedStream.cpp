@@ -553,13 +553,12 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 			channelIndex += 1;
 		} while (channelIndex < streamData->m_header.m_channelCount);
 
-		int dmaID;
 		if (streamData->m_header.m_loopStart < REDSOUND_STREAM_LOOP_ENABLED_MIN) {
-			dmaID = _ArrangeStreamDataNoLoop(streamData, REDSOUND_STREAM_BUFFER_SIDE_A, REDSOUND_STREAM_STEREO_PLANE_SIZE);
+			channelIndex = _ArrangeStreamDataNoLoop(streamData, REDSOUND_STREAM_BUFFER_SIDE_A, REDSOUND_STREAM_STEREO_PLANE_SIZE);
 		} else {
-			dmaID = _ArrangeStreamDataLoop(streamData, REDSOUND_STREAM_BUFFER_SIDE_A, REDSOUND_STREAM_STEREO_PLANE_SIZE);
+			channelIndex = _ArrangeStreamDataLoop(streamData, REDSOUND_STREAM_BUFFER_SIDE_A, REDSOUND_STREAM_STEREO_PLANE_SIZE);
 		}
-		streamData->m_dmaId = dmaID;
+		streamData->m_dmaId = channelIndex;
 		streamData->m_streamCursorBase = REDSOUND_STREAM_PAGE_SIZE;
 		streamData->m_state = REDSOUND_STREAM_STATE_LOADING;
 	} else {

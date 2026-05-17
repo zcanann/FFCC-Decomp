@@ -2504,16 +2504,16 @@ static void _MidiTrackExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData,
     RedTrackDATA* track = control->m_tracks;
     do {
         if (track->m_command != REDSOUND_TRACK_COMMAND_NONE) {
-            int trackStep;
+            int clampedStep;
             RedChangeStatusSet(0);
             if (track->m_deltaTime < frames) {
-                trackStep = track->m_deltaTime;
+                clampedStep = track->m_deltaTime;
             } else {
-                trackStep = frames;
+                clampedStep = frames;
             }
-            int execStep = trackStep;
+            int executeStep = clampedStep;
             track->m_deltaTime -= frames;
-            _MusicTrackDataExecute(track, execStep);
+            _MusicTrackDataExecute(track, executeStep);
             if (((track->m_flags & REDSOUND_TRACK_FLAG_TENUTO) == 0) && (track->m_deltaTime == 1)) {
                 KeyOffSet(control, keyOnData, track);
             }
@@ -2552,8 +2552,8 @@ static void _MidiTrackExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData,
                         } else {
                             catchupStep = deltaTime;
                         }
-                        int execStep = catchupStep;
-                        _MusicTrackDataExecute(track, execStep);
+                        int executeStep = catchupStep;
+                        _MusicTrackDataExecute(track, executeStep);
                     }
                     track->m_deltaTime += deltaTime;
                 }

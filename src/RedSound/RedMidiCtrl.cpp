@@ -1570,9 +1570,9 @@ static void __MidiCtrl_VolumeChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDAT
  */
 static void __MidiCtrl_ExpressionDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    int value = ((int)(char)*track->m_command++) << REDSOUND_FIXED_SHIFT;
+    int expression = ((int)(char)*track->m_command++) << REDSOUND_FIXED_SHIFT;
 
-    track->m_expression = value;
+    track->m_expression = expression;
     track->m_expressionAdd = 0;
     track->m_expressionDelta = 0;
     RedChangeStatusAdd(REDSOUND_VOICE_UPDATE_VOLUME);
@@ -1714,8 +1714,8 @@ static void __MidiCtrl_SlurOff(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* tr
 static void __MidiCtrl_Sweep(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
     int delta;
-    int command;
-    int value;
+    int targetPitch;
+    int currentPitch;
     RedVoiceDATA* voiceData;
 
     delta = DeltaTimeSumup((unsigned char**)&track->m_command);
@@ -1723,10 +1723,10 @@ static void __MidiCtrl_Sweep(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* trac
         delta += 1;
     }
 
-    command = (s8)*track->m_command++;
-    command <<= 8;
-    value = 0;
-    track->m_sweepAdd = DataAddCompute(&value, command, &delta);
+    targetPitch = (s8)*track->m_command++;
+    targetPitch <<= 8;
+    currentPitch = 0;
+    track->m_sweepAdd = DataAddCompute(&currentPitch, targetPitch, &delta);
     track->m_sweepDelta = delta;
     track->m_portamentPitch &= REDSOUND_FIXED_WHOLE_MASK;
 

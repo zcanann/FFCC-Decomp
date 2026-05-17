@@ -1080,18 +1080,19 @@ void CUtil::RenderQuadTex2(Vec pos1, Vec pos2, _GXColor color, Vec2d* uv1, Vec2d
     f32 x1 = pos1.x;
     f32 y1 = pos1.y;
     f32 z1 = pos1.z;
-    f32 x2 = pos2.x;
-    f32 y2 = pos2.y;
-    u32 rgba = *colorPtr;
 
     GXWGFifo.f32 = x1;
     GXWGFifo.f32 = y1;
+    u32 rgba = *colorPtr;
     GXWGFifo.f32 = z1;
     GXWGFifo.u32 = rgba;
     GXWGFifo.f32 = u1;
     GXWGFifo.f32 = v1;
     GXWGFifo.f32 = u1;
     GXWGFifo.f32 = v1;
+
+    f32 x2 = pos2.x;
+    f32 y2 = pos2.y;
 
     GXWGFifo.f32 = x2;
     GXWGFifo.f32 = y1;
@@ -1154,16 +1155,17 @@ void CUtil::RenderQuad(Vec pos1, Vec pos2, _GXColor color, Vec2d* uv1, Vec2d* uv
     f32 x1 = pos1.x;
     f32 y1 = pos1.y;
     f32 z1 = pos1.z;
-    f32 x2 = pos2.x;
-    f32 y2 = pos2.y;
-    u32 rgba = *colorPtr;
 
     GXWGFifo.f32 = x1;
     GXWGFifo.f32 = y1;
+    u32 rgba = *colorPtr;
     GXWGFifo.f32 = z1;
     GXWGFifo.u32 = rgba;
     GXWGFifo.f32 = u0;
     GXWGFifo.f32 = v0;
+
+    f32 x2 = pos2.x;
+    f32 y2 = pos2.y;
 
     GXWGFifo.f32 = x2;
     GXWGFifo.f32 = y1;
@@ -1202,14 +1204,15 @@ void CUtil::RenderQuadNoTex(Vec pos1, Vec pos2, _GXColor color)
     f32 x1 = pos1.x;
     f32 y1 = pos1.y;
     f32 z1 = pos1.z;
-    f32 x2 = pos2.x;
-    f32 y2 = pos2.y;
 
     GXWGFifo.f32 = x1;
     GXWGFifo.f32 = y1;
     u32 rgba = *reinterpret_cast<u32*>(&color);
     GXWGFifo.f32 = z1;
     GXWGFifo.u32 = rgba;
+
+    f32 x2 = pos2.x;
+    f32 y2 = pos2.y;
 
     GXWGFifo.f32 = x2;
     GXWGFifo.f32 = y1;

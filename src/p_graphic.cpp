@@ -274,6 +274,7 @@ void CGraphicPcs::drawScreenFade()
                 GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
                 _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
                 _GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
+                GXLoadTexObj(&Graphic.m_smallBackTexObj, GX_TEXMAP0);
 
                 const float phase = slotData->m_phase;
                 const float stretch = slotData->m_stretch;

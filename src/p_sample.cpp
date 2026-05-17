@@ -6,6 +6,37 @@ extern "C" void destroy__10CSamplePcsFv(CSamplePcs*);
 extern "C" void func0__10CSamplePcsFv(CSamplePcs*);
 extern "C" void func1__10CSamplePcsFv(CSamplePcs*);
 
+/*
+ * --INFO--
+ * PAL Address: 0x8001FEB0
+ * PAL Size: 188b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline CSamplePcs::CSamplePcs()
+{
+	static unsigned int desc0[] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__10CSamplePcsFv)};
+	static unsigned int desc1[] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__10CSamplePcsFv)};
+	static unsigned int desc2[] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(func0__10CSamplePcsFv)};
+	static unsigned int desc3[] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(func1__10CSamplePcsFv)};
+	unsigned int* table = reinterpret_cast<unsigned int*>(&m_table__10CSamplePcs);
+
+	table[1] = desc0[0];
+	table[2] = desc0[1];
+	table[3] = desc0[2];
+	table[4] = desc1[0];
+	table[5] = desc1[1];
+	table[6] = desc1[2];
+	table[7] = desc2[0];
+	table[8] = desc2[1];
+	table[9] = desc2[2];
+	table[12] = desc3[0];
+	table[13] = desc3[1];
+	table[14] = desc3[2];
+}
+
 CSamplePcsTable m_table__10CSamplePcs = {
     const_cast<char*>(s_CSamplePcs_801D6CC8),
     {
@@ -178,35 +209,4 @@ void CSamplePcs::Quit()
 void CSamplePcs::Init()
 {
 	return;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8001FEB0
- * PAL Size: 188b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-inline CSamplePcs::CSamplePcs()
-{
-	static unsigned int desc0[] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__10CSamplePcsFv)};
-	static unsigned int desc1[] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__10CSamplePcsFv)};
-	static unsigned int desc2[] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(func0__10CSamplePcsFv)};
-	static unsigned int desc3[] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(func1__10CSamplePcsFv)};
-	unsigned int* table = reinterpret_cast<unsigned int*>(&m_table__10CSamplePcs);
-
-	table[1] = desc0[0];
-	table[2] = desc0[1];
-	table[3] = desc0[2];
-	table[4] = desc1[0];
-	table[5] = desc1[1];
-	table[6] = desc1[2];
-	table[7] = desc2[0];
-	table[8] = desc2[1];
-	table[9] = desc2[2];
-	table[12] = desc3[0];
-	table[13] = desc3[1];
-	table[14] = desc3[2];
 }

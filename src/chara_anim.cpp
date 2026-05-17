@@ -370,6 +370,77 @@ CChara::CAnimNode::~CAnimNode()
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CChara::CAnimNode::mapping(CChara::CAnim*)
+{
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 296b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CChara::CAnimNode::Create(CChunkFile& chunkFile)
+{
+	CChunkFile::CChunk chunk;
+
+	chunkFile.PushChunk();
+	while (chunkFile.GetNextChunk(chunk)) {
+		int chunkId = static_cast<int>(chunk.m_id);
+		switch (chunkId) {
+		case 0x4E414D45:
+			strcpy(m_name, chunkFile.GetString());
+			break;
+		case 0x44415441: {
+			int i = 0;
+			int shift = 0;
+			do {
+				int type = chunkFile.Get4();
+				int mode;
+
+				if (type == 0) {
+					mode = 0;
+				} else if (type == 1) {
+					mode = 1;
+				} else {
+					mode = 2;
+				}
+
+				unsigned int dataOffset = chunkFile.Get4();
+				if (i == 0) {
+					m_dataOffset = dataOffset;
+				}
+
+				unsigned int flags = ((m_flags >> 0xD) & 0x3FFFF) | (static_cast<unsigned int>(mode) << shift);
+				m_flags = __rlwimi(m_flags, flags, 13, 1, 18);
+
+				if ((i >= 6) && (type != 0)) {
+					unsigned char* flagsByte = reinterpret_cast<unsigned char*>(&m_flags);
+					*flagsByte = static_cast<unsigned char>(__rlwimi(*flagsByte, 1, 7, 24, 24));
+				}
+
+				i++;
+				shift += 2;
+			} while (i < 9);
+			break;
+		}
+		}
+	}
+	chunkFile.PopChunk();
+}
+
+/*
+ * --INFO--
  * Address:	TODO
  * Size:	TODO
  */

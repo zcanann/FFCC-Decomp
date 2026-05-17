@@ -1542,7 +1542,7 @@ RedMusicHEAD* CRedEntry::MusicHeadAdd(RedMusicHEAD* musicHead)
  */
 RedMusicHEAD* CRedEntry::SetMusicData(RedMusicHEAD* musicHead)
 {
-	int result;
+	int entryAddress;
 
 	if ((musicHead->m_signature[REDSOUND_MUSIC_SIGNATURE_0_INDEX] != REDSOUND_MUSIC_SIGNATURE_0) ||
 	    (musicHead->m_signature[REDSOUND_MUSIC_SIGNATURE_1_INDEX] != REDSOUND_MUSIC_SIGNATURE_1) ||
@@ -1555,19 +1555,19 @@ RedMusicHEAD* CRedEntry::SetMusicData(RedMusicHEAD* musicHead)
 		return 0;
 	}
 
-	result = SearchMusicSequence(static_cast<int>(musicHead->m_musicNo));
-	if (result >= 0) {
+	entryAddress = SearchMusicSequence(static_cast<int>(musicHead->m_musicNo));
+	if (entryAddress >= 0) {
 		RedDelete(musicHead);
-		MusicHistoryChoice(RedEntryMusicBankGet(this, result));
-		result = RedEntryMusicBankGet(this, result)->m_address;
+		MusicHistoryChoice(RedEntryMusicBankGet(this, entryAddress));
+		entryAddress = RedEntryMusicBankGet(this, entryAddress)->m_address;
 	} else {
-		result = reinterpret_cast<int>(MusicHeadAdd(musicHead));
-		if (result == 0) {
+		entryAddress = reinterpret_cast<int>(MusicHeadAdd(musicHead));
+		if (entryAddress == 0) {
 			RedDelete(musicHead);
 		}
 	}
 
-	return reinterpret_cast<RedMusicHEAD*>(result);
+	return reinterpret_cast<RedMusicHEAD*>(entryAddress);
 }
 /*
  * --INFO--
@@ -1879,7 +1879,7 @@ RedSeSepHEAD* CRedEntry::SeSepHeadAdd(RedSeSepHEAD* seSepHead)
  */
 RedSeSepHEAD* CRedEntry::SetSeSepData(RedSeSepHEAD* seSepHead)
 {
-	int result;
+	int entryAddress;
 
 	if ((seSepHead->m_signature[REDSOUND_SESEP_SIGNATURE_0_INDEX] != REDSOUND_SESEP_SIGNATURE_0) ||
 	    (seSepHead->m_signature[REDSOUND_SESEP_SIGNATURE_1_INDEX] != REDSOUND_SESEP_SIGNATURE_1) ||
@@ -1894,19 +1894,19 @@ RedSeSepHEAD* CRedEntry::SetSeSepData(RedSeSepHEAD* seSepHead)
 		return 0;
 	}
 
-	result = SearchSeSepSequence(seSepHead->m_seNo);
-	if (result >= 0) {
+	entryAddress = SearchSeSepSequence(seSepHead->m_seNo);
+	if (entryAddress >= 0) {
 		RedDelete(seSepHead);
-		SeSepHistoryChoice(RedEntrySeSepBankGet(this, result));
-		result = RedEntrySeSepBankGet(this, result)->m_address;
+		SeSepHistoryChoice(RedEntrySeSepBankGet(this, entryAddress));
+		entryAddress = RedEntrySeSepBankGet(this, entryAddress)->m_address;
 	} else {
-		result = reinterpret_cast<int>(SeSepHeadAdd(seSepHead));
-		if (result == 0) {
+		entryAddress = reinterpret_cast<int>(SeSepHeadAdd(seSepHead));
+		if (entryAddress == 0) {
 			RedDelete(seSepHead);
 		}
 	}
 
-	return reinterpret_cast<RedSeSepHEAD*>(result);
+	return reinterpret_cast<RedSeSepHEAD*>(entryAddress);
 }
 /*
  * --INFO--

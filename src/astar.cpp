@@ -712,7 +712,8 @@ void CAStar::check(int startGroup, int goalGroup, CATemp& temp)
 				path1[14] = reinterpret_cast<unsigned int*>(temp.m_path)[14];
 				path1[15] = reinterpret_cast<unsigned int*>(temp.m_path)[15];
 
-				float cost1 = temp.m_cost + PSVECDistance(&pos0->m_position, &m_portals[other0].m_position);
+				double dist1 = PSVECDistance(&pos0->m_position, &m_portals[other0].m_position);
+				float cost1 = temp.m_cost + dist1;
 				path1Bytes[pathLen1] = static_cast<unsigned char>(idx0);
 				++pathLen1;
 				visited1Bytes[other0] = 1;

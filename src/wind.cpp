@@ -316,10 +316,16 @@ found:
 		return -1;
 	}
 
+	int type = 1;
 	float centerX = pos->x;
-	obj->type = 1;
+	obj->type = type;
+	float radiusSq = radius * radius;
 	float centerZ = pos->z;
+	float minX = centerX - radius;
+	float minZ = centerZ - radius;
 	obj->flags = static_cast<u8>(__rlwimi(obj->flags, 1, 7, 24, 24));
+	float maxX = centerX + radius;
+	float maxZ = centerZ + radius;
 
 	int id = m_nextId;
 	m_nextId = id + 1;
@@ -334,14 +340,14 @@ found:
 	obj->basePower = speed;
 
 	obj->radius = radius;
-	obj->radiusSq = radius * radius;
+	obj->radiusSq = radiusSq;
 
 	obj->centerX = centerX;
 	obj->centerZ = centerZ;
-	obj->minX = centerX - radius;
-	obj->minZ = centerZ - radius;
-	obj->maxX = centerX + radius;
-	obj->maxZ = centerZ + radius;
+	obj->minX = minX;
+	obj->minZ = minZ;
+	obj->maxX = maxX;
+	obj->maxZ = maxZ;
 
 	return obj->id;
 }

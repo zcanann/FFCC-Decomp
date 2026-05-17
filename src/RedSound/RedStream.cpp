@@ -184,7 +184,7 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 	int aramOffset;
 	int streamPitch;
 	int channelIndex;
-	int sampleByteOffset;
+	int adpcmSampleOffset;
 	RedStreamFile* streamFile;
 	RedStreamADPCMHeader* adpcmHeader;
 	RedStreamDATA* streamData;
@@ -211,19 +211,19 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 	if ((streamData->m_track != REDSOUND_STREAM_TRACK_NONE) &&
 	    (streamData->m_buffer != REDSOUND_STREAM_BUFFER_NONE) &&
 	    (streamData->m_aramBuffer != REDSOUND_STREAM_ARAM_BUFFER_NONE)) {
-		sampleByteOffset = REDSOUND_STREAM_FILE_AUDIO_OFFSET;
+		adpcmSampleOffset = REDSOUND_STREAM_FILE_AUDIO_OFFSET;
 		streamFile = reinterpret_cast<RedStreamFile*>(streamHeader);
 		adpcmHeader = RedStreamFileGetAdpcm(streamFile, REDSOUND_STREAM_LEFT_CHANNEL);
-		adpcmHeader->m_data.pred_scale = (short)RedStreamFileGetSampleByte(streamFile, sampleByteOffset);
+		adpcmHeader->m_data.pred_scale = (short)RedStreamFileGetSampleByte(streamFile, adpcmSampleOffset);
 		adpcmHeader->m_data.yn1 = adpcmHeader->m_data.yn2 = 0;
 		if (streamData->m_header.m_channelCount == REDSOUND_STREAM_STEREO_CHANNEL_COUNT) {
 			if (streamData->m_header.m_loopStart < REDSOUND_STREAM_LOOP_ENABLED_MIN) {
-				sampleByteOffset += REDSOUND_STREAM_PAGE_SIZE;
+				adpcmSampleOffset += REDSOUND_STREAM_PAGE_SIZE;
 			} else {
-				sampleByteOffset += REDSOUND_STREAM_STEREO_RIGHT_FRAME_OFFSET;
+				adpcmSampleOffset += REDSOUND_STREAM_STEREO_RIGHT_FRAME_OFFSET;
 			}
 			RedStreamAdpcmHeaderGetChannel(adpcmHeader, REDSOUND_STREAM_RIGHT_CHANNEL)->m_data.pred_scale =
-			    (short)RedStreamFileGetSampleByte(streamFile, sampleByteOffset);
+			    (short)RedStreamFileGetSampleByte(streamFile, adpcmSampleOffset);
 			RedStreamAdpcmHeaderGetChannel(adpcmHeader, REDSOUND_STREAM_RIGHT_CHANNEL)->m_data.yn1 =
 			    RedStreamAdpcmHeaderGetChannel(adpcmHeader, REDSOUND_STREAM_RIGHT_CHANNEL)->m_data.yn2 = 0;
 		}

@@ -660,26 +660,26 @@ static void _SetReverbData(RedReverbDATA* reverb, int* reverbParams)
 
     switch (RedReverbGetKind(reverb)) {
     case REDSOUND_REVERB_KIND_STD: {
-        AXFX_REVERBSTD* std = (AXFX_REVERBSTD*)RedReverbGetContext(reverb);
-        std->tempDisableFX = REDSOUND_REVERB_FX_ENABLE;
-        std->preDelay = (float)reverbParams[REDSOUND_REVERB_PARAM_PRE_DELAY] / s_ReverbTimeScale;
-        std->time = (float)reverbParams[REDSOUND_REVERB_PARAM_TIME] / s_ReverbTimeScale;
-        std->coloration = (float)reverbParams[REDSOUND_REVERB_PARAM_COLORATION] / s_ReverbEffectScale;
-        std->damping = (float)reverbParams[REDSOUND_REVERB_PARAM_DAMPING] / s_ReverbEffectScale;
-        std->mix = (float)reverbParams[REDSOUND_REVERB_PARAM_MIX] / s_ReverbEffectScale;
-        settingsResult = AXFXReverbStdSettings(std);
+        AXFX_REVERBSTD* stdReverb = (AXFX_REVERBSTD*)RedReverbGetContext(reverb);
+        stdReverb->tempDisableFX = REDSOUND_REVERB_FX_ENABLE;
+        stdReverb->preDelay = (float)reverbParams[REDSOUND_REVERB_PARAM_PRE_DELAY] / s_ReverbTimeScale;
+        stdReverb->time = (float)reverbParams[REDSOUND_REVERB_PARAM_TIME] / s_ReverbTimeScale;
+        stdReverb->coloration = (float)reverbParams[REDSOUND_REVERB_PARAM_COLORATION] / s_ReverbEffectScale;
+        stdReverb->damping = (float)reverbParams[REDSOUND_REVERB_PARAM_DAMPING] / s_ReverbEffectScale;
+        stdReverb->mix = (float)reverbParams[REDSOUND_REVERB_PARAM_MIX] / s_ReverbEffectScale;
+        settingsResult = AXFXReverbStdSettings(stdReverb);
         break;
     }
     case REDSOUND_REVERB_KIND_HI: {
-        AXFX_REVERBHI* hi = (AXFX_REVERBHI*)RedReverbGetContext(reverb);
-        hi->tempDisableFX = REDSOUND_REVERB_FX_ENABLE;
-        hi->preDelay = (float)reverbParams[REDSOUND_REVERB_PARAM_PRE_DELAY] / s_ReverbTimeScale;
-        hi->time = (float)reverbParams[REDSOUND_REVERB_PARAM_TIME] / s_ReverbTimeScale;
-        hi->coloration = (float)reverbParams[REDSOUND_REVERB_PARAM_COLORATION] / s_ReverbEffectScale;
-        hi->damping = (float)reverbParams[REDSOUND_REVERB_PARAM_DAMPING] / s_ReverbEffectScale;
-        hi->mix = (float)reverbParams[REDSOUND_REVERB_PARAM_MIX] / s_ReverbEffectScale;
-        hi->crosstalk = (float)reverbParams[REDSOUND_REVERB_PARAM_CROSSTALK] / s_ReverbEffectScale;
-        settingsResult = AXFXReverbHiSettings(hi);
+        AXFX_REVERBHI* hiReverb = (AXFX_REVERBHI*)RedReverbGetContext(reverb);
+        hiReverb->tempDisableFX = REDSOUND_REVERB_FX_ENABLE;
+        hiReverb->preDelay = (float)reverbParams[REDSOUND_REVERB_PARAM_PRE_DELAY] / s_ReverbTimeScale;
+        hiReverb->time = (float)reverbParams[REDSOUND_REVERB_PARAM_TIME] / s_ReverbTimeScale;
+        hiReverb->coloration = (float)reverbParams[REDSOUND_REVERB_PARAM_COLORATION] / s_ReverbEffectScale;
+        hiReverb->damping = (float)reverbParams[REDSOUND_REVERB_PARAM_DAMPING] / s_ReverbEffectScale;
+        hiReverb->mix = (float)reverbParams[REDSOUND_REVERB_PARAM_MIX] / s_ReverbEffectScale;
+        hiReverb->crosstalk = (float)reverbParams[REDSOUND_REVERB_PARAM_CROSSTALK] / s_ReverbEffectScale;
+        settingsResult = AXFXReverbHiSettings(hiReverb);
         break;
     }
     case REDSOUND_REVERB_KIND_DELAY: {
@@ -708,14 +708,14 @@ static void _SetReverbData(RedReverbDATA* reverb, int* reverbParams)
         break;
     }
     case REDSOUND_REVERB_KIND_HI_DPL2: {
-        AXFX_REVERBHI_DPL2* hiDpl2 = (AXFX_REVERBHI_DPL2*)RedReverbGetContext(reverb);
-        hiDpl2->tempDisableFX = REDSOUND_REVERB_FX_ENABLE;
-        hiDpl2->preDelay = (float)reverbParams[REDSOUND_REVERB_PARAM_PRE_DELAY] / s_ReverbTimeScale;
-        hiDpl2->time = (float)reverbParams[REDSOUND_REVERB_PARAM_TIME] / s_ReverbTimeScale;
-        hiDpl2->coloration = (float)reverbParams[REDSOUND_REVERB_PARAM_COLORATION] / s_ReverbEffectScale;
-        hiDpl2->damping = (float)reverbParams[REDSOUND_REVERB_PARAM_DAMPING] / s_ReverbEffectScale;
-        hiDpl2->mix = (float)reverbParams[REDSOUND_REVERB_PARAM_MIX] / s_ReverbEffectScale;
-        settingsResult = AXFXReverbHiSettingsDpl2(hiDpl2);
+        AXFX_REVERBHI_DPL2* hiDpl2Reverb = (AXFX_REVERBHI_DPL2*)RedReverbGetContext(reverb);
+        hiDpl2Reverb->tempDisableFX = REDSOUND_REVERB_FX_ENABLE;
+        hiDpl2Reverb->preDelay = (float)reverbParams[REDSOUND_REVERB_PARAM_PRE_DELAY] / s_ReverbTimeScale;
+        hiDpl2Reverb->time = (float)reverbParams[REDSOUND_REVERB_PARAM_TIME] / s_ReverbTimeScale;
+        hiDpl2Reverb->coloration = (float)reverbParams[REDSOUND_REVERB_PARAM_COLORATION] / s_ReverbEffectScale;
+        hiDpl2Reverb->damping = (float)reverbParams[REDSOUND_REVERB_PARAM_DAMPING] / s_ReverbEffectScale;
+        hiDpl2Reverb->mix = (float)reverbParams[REDSOUND_REVERB_PARAM_MIX] / s_ReverbEffectScale;
+        settingsResult = AXFXReverbHiSettingsDpl2(hiDpl2Reverb);
         break;
     }
     }
@@ -824,28 +824,28 @@ RedReverbSize* SetReverb(int bank, int kind, int* reverbParams)
     case REDSOUND_REVERB_KIND_STD: {
         RedReverbSetContext(reverb, (void*)RedNew(REDSOUND_AXFX_REVERB_STD_SIZE));
         RedReverbSetCallback(reverb, (int)AXFXReverbStdCallback);
-        AXFX_REVERBSTD* std = (AXFX_REVERBSTD*)RedReverbGetContext(reverb);
-        std->tempDisableFX = REDSOUND_REVERB_FX_ENABLE;
-        std->preDelay = (float)reverbParams[REDSOUND_REVERB_PARAM_PRE_DELAY] / s_ReverbTimeScale;
-        std->time = (float)reverbParams[REDSOUND_REVERB_PARAM_TIME] / s_ReverbTimeScale;
-        std->coloration = (float)reverbParams[REDSOUND_REVERB_PARAM_COLORATION] / s_ReverbEffectScale;
-        std->damping = (float)reverbParams[REDSOUND_REVERB_PARAM_DAMPING] / s_ReverbEffectScale;
-        std->mix = (float)reverbParams[REDSOUND_REVERB_PARAM_MIX] / s_ReverbEffectScale;
-        initResult = AXFXReverbStdInit(std);
+        AXFX_REVERBSTD* stdReverb = (AXFX_REVERBSTD*)RedReverbGetContext(reverb);
+        stdReverb->tempDisableFX = REDSOUND_REVERB_FX_ENABLE;
+        stdReverb->preDelay = (float)reverbParams[REDSOUND_REVERB_PARAM_PRE_DELAY] / s_ReverbTimeScale;
+        stdReverb->time = (float)reverbParams[REDSOUND_REVERB_PARAM_TIME] / s_ReverbTimeScale;
+        stdReverb->coloration = (float)reverbParams[REDSOUND_REVERB_PARAM_COLORATION] / s_ReverbEffectScale;
+        stdReverb->damping = (float)reverbParams[REDSOUND_REVERB_PARAM_DAMPING] / s_ReverbEffectScale;
+        stdReverb->mix = (float)reverbParams[REDSOUND_REVERB_PARAM_MIX] / s_ReverbEffectScale;
+        initResult = AXFXReverbStdInit(stdReverb);
         break;
     }
     case REDSOUND_REVERB_KIND_HI: {
         RedReverbSetContext(reverb, (void*)RedNew(REDSOUND_AXFX_REVERB_HI_SIZE));
         RedReverbSetCallback(reverb, (int)AXFXReverbHiCallback);
-        AXFX_REVERBHI* hi = (AXFX_REVERBHI*)RedReverbGetContext(reverb);
-        hi->tempDisableFX = REDSOUND_REVERB_FX_ENABLE;
-        hi->preDelay = (float)reverbParams[REDSOUND_REVERB_PARAM_PRE_DELAY] / s_ReverbTimeScale;
-        hi->time = (float)reverbParams[REDSOUND_REVERB_PARAM_TIME] / s_ReverbTimeScale;
-        hi->coloration = (float)reverbParams[REDSOUND_REVERB_PARAM_COLORATION] / s_ReverbEffectScale;
-        hi->damping = (float)reverbParams[REDSOUND_REVERB_PARAM_DAMPING] / s_ReverbEffectScale;
-        hi->mix = (float)reverbParams[REDSOUND_REVERB_PARAM_MIX] / s_ReverbEffectScale;
-        hi->crosstalk = (float)reverbParams[REDSOUND_REVERB_PARAM_CROSSTALK] / s_ReverbEffectScale;
-        initResult = AXFXReverbHiInit(hi);
+        AXFX_REVERBHI* hiReverb = (AXFX_REVERBHI*)RedReverbGetContext(reverb);
+        hiReverb->tempDisableFX = REDSOUND_REVERB_FX_ENABLE;
+        hiReverb->preDelay = (float)reverbParams[REDSOUND_REVERB_PARAM_PRE_DELAY] / s_ReverbTimeScale;
+        hiReverb->time = (float)reverbParams[REDSOUND_REVERB_PARAM_TIME] / s_ReverbTimeScale;
+        hiReverb->coloration = (float)reverbParams[REDSOUND_REVERB_PARAM_COLORATION] / s_ReverbEffectScale;
+        hiReverb->damping = (float)reverbParams[REDSOUND_REVERB_PARAM_DAMPING] / s_ReverbEffectScale;
+        hiReverb->mix = (float)reverbParams[REDSOUND_REVERB_PARAM_MIX] / s_ReverbEffectScale;
+        hiReverb->crosstalk = (float)reverbParams[REDSOUND_REVERB_PARAM_CROSSTALK] / s_ReverbEffectScale;
+        initResult = AXFXReverbHiInit(hiReverb);
         break;
     }
     case REDSOUND_REVERB_KIND_DELAY: {
@@ -880,14 +880,14 @@ RedReverbSize* SetReverb(int bank, int kind, int* reverbParams)
     case REDSOUND_REVERB_KIND_HI_DPL2: {
         RedReverbSetContext(reverb, (void*)RedNew(REDSOUND_AXFX_REVERB_HI_DPL2_SIZE));
         RedReverbSetCallback(reverb, (int)AXFXReverbHiCallbackDpl2);
-        AXFX_REVERBHI_DPL2* hiDpl2 = (AXFX_REVERBHI_DPL2*)RedReverbGetContext(reverb);
-        hiDpl2->tempDisableFX = REDSOUND_REVERB_FX_ENABLE;
-        hiDpl2->preDelay = (float)reverbParams[REDSOUND_REVERB_PARAM_PRE_DELAY] / s_ReverbTimeScale;
-        hiDpl2->time = (float)reverbParams[REDSOUND_REVERB_PARAM_TIME] / s_ReverbTimeScale;
-        hiDpl2->coloration = (float)reverbParams[REDSOUND_REVERB_PARAM_COLORATION] / s_ReverbEffectScale;
-        hiDpl2->damping = (float)reverbParams[REDSOUND_REVERB_PARAM_DAMPING] / s_ReverbEffectScale;
-        hiDpl2->mix = (float)reverbParams[REDSOUND_REVERB_PARAM_MIX] / s_ReverbEffectScale;
-        initResult = AXFXReverbHiInitDpl2(hiDpl2);
+        AXFX_REVERBHI_DPL2* hiDpl2Reverb = (AXFX_REVERBHI_DPL2*)RedReverbGetContext(reverb);
+        hiDpl2Reverb->tempDisableFX = REDSOUND_REVERB_FX_ENABLE;
+        hiDpl2Reverb->preDelay = (float)reverbParams[REDSOUND_REVERB_PARAM_PRE_DELAY] / s_ReverbTimeScale;
+        hiDpl2Reverb->time = (float)reverbParams[REDSOUND_REVERB_PARAM_TIME] / s_ReverbTimeScale;
+        hiDpl2Reverb->coloration = (float)reverbParams[REDSOUND_REVERB_PARAM_COLORATION] / s_ReverbEffectScale;
+        hiDpl2Reverb->damping = (float)reverbParams[REDSOUND_REVERB_PARAM_DAMPING] / s_ReverbEffectScale;
+        hiDpl2Reverb->mix = (float)reverbParams[REDSOUND_REVERB_PARAM_MIX] / s_ReverbEffectScale;
+        initResult = AXFXReverbHiInitDpl2(hiDpl2Reverb);
         break;
     }
     }

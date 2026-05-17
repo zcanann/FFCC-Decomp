@@ -71,7 +71,7 @@ enum RedStreamReadPointIndex {
 
 struct RedSoundBssState {
 	u8 m_globalInitWork[REDSOUND_GLOBAL_INIT_WORK_SIZE];
-	int m_standbyStatus[REDSOUND_STANDBY_STATUS_COUNT];
+	int m_StandbyStatus[REDSOUND_STANDBY_STATUS_COUNT];
 };
 
 struct RedSoundStreamBank {
@@ -95,16 +95,16 @@ enum RedSoundStreamBankLayout {
 };
 
 struct RedSoundSmallDataState {
-	CRedDriver m_driver;
+	CRedDriver c_Driver;
 	u8 m_driverPadding[REDSOUND_SBSS_PADDING_SIZE];
-	volatile unsigned int m_autoId;
-	RedSoundStreamBank* m_streamBank;
+	volatile unsigned int m_AutoID;
+	RedSoundStreamBank* p_StreamBank;
 };
 
 enum RedSoundSmallDataOffset {
-	REDSOUND_SOUND_SBSS_DRIVER_OFFSET = (unsigned int)&(((RedSoundSmallDataState*)0)->m_driver),
-	REDSOUND_SOUND_SBSS_AUTO_ID_OFFSET = (unsigned int)&(((RedSoundSmallDataState*)0)->m_autoId),
-	REDSOUND_SOUND_SBSS_STREAM_BANK_OFFSET = (unsigned int)&(((RedSoundSmallDataState*)0)->m_streamBank),
+	REDSOUND_SOUND_SBSS_DRIVER_OFFSET = (unsigned int)&(((RedSoundSmallDataState*)0)->c_Driver),
+	REDSOUND_SOUND_SBSS_AUTO_ID_OFFSET = (unsigned int)&(((RedSoundSmallDataState*)0)->m_AutoID),
+	REDSOUND_SOUND_SBSS_STREAM_BANK_OFFSET = (unsigned int)&(((RedSoundSmallDataState*)0)->p_StreamBank),
 	REDSOUND_SBSS_SIZE = sizeof(RedSoundSmallDataState),
 };
 
@@ -166,16 +166,16 @@ STATIC_ASSERT(REDSOUND_STREAM_BANK_RESERVED18_OFFSET + REDSOUND_STREAM_BANK_RESE
 STATIC_ASSERT(sizeof(RedSoundStreamBank) == REDSOUND_STREAM_BANK_ENTRY_SIZE);
 STATIC_ASSERT(REDSOUND_STREAM_BANK_ENTRY_SIZE * REDSOUND_STREAM_BANK_COUNT == REDSOUND_STREAM_BANK_SIZE);
 STATIC_ASSERT(offsetof(RedSoundBssState, m_globalInitWork) == 0);
-STATIC_ASSERT(offsetof(RedSoundBssState, m_standbyStatus) == REDSOUND_STANDBY_STATUS_OFFSET);
+STATIC_ASSERT(offsetof(RedSoundBssState, m_StandbyStatus) == REDSOUND_STANDBY_STATUS_OFFSET);
 STATIC_ASSERT(sizeof(RedSoundBssState) == REDSOUND_BSS_SIZE);
 STATIC_ASSERT(REDSOUND_GLOBAL_INIT_WORK_SIZE + REDSOUND_STANDBY_STATUS_SIZE == REDSOUND_BSS_SIZE);
 STATIC_ASSERT(REDSOUND_STANDBY_STATUS_SIZE == REDSOUND_STANDBY_STATUS_ALLOC_SIZE);
 STATIC_ASSERT(sizeof(c_Driver) == REDSOUND_DRIVER_OBJECT_SIZE);
 STATIC_ASSERT(sizeof(m_AutoID) == REDSOUND_AUTO_ID_SIZE);
 STATIC_ASSERT(sizeof(p_StreamBank) == REDSOUND_STREAM_BANK_PTR_SIZE);
-STATIC_ASSERT(offsetof(RedSoundSmallDataState, m_driver) == REDSOUND_SOUND_SBSS_DRIVER_OFFSET);
-STATIC_ASSERT(offsetof(RedSoundSmallDataState, m_autoId) == REDSOUND_SOUND_SBSS_AUTO_ID_OFFSET);
-STATIC_ASSERT(offsetof(RedSoundSmallDataState, m_streamBank) == REDSOUND_SOUND_SBSS_STREAM_BANK_OFFSET);
+STATIC_ASSERT(offsetof(RedSoundSmallDataState, c_Driver) == REDSOUND_SOUND_SBSS_DRIVER_OFFSET);
+STATIC_ASSERT(offsetof(RedSoundSmallDataState, m_AutoID) == REDSOUND_SOUND_SBSS_AUTO_ID_OFFSET);
+STATIC_ASSERT(offsetof(RedSoundSmallDataState, p_StreamBank) == REDSOUND_SOUND_SBSS_STREAM_BANK_OFFSET);
 STATIC_ASSERT(sizeof(RedSoundSmallDataState) == REDSOUND_SBSS_SIZE);
 STATIC_ASSERT(sizeof(c_Driver) + REDSOUND_SBSS_PADDING_SIZE + sizeof(m_AutoID) + sizeof(p_StreamBank) ==
               REDSOUND_SBSS_SIZE);

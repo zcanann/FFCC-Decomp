@@ -3109,7 +3109,8 @@ static int _SeMidiNoteExecute(
                             } else if ((track->m_voiceSwitch & REDSOUND_VOICE_SWITCH_FUZZY_DELTA_TIME) != 0) {
                                 int fuzzyDelta = deltaTime * track->m_fuzzyDeltaTimeDepth >> REDSOUND_FUZZY_DELTA_DEPTH_SHIFT;
                                 s8 random = (s8)GetRandomData();
-                                deltaTime += fuzzyDelta * random >> REDSOUND_FUZZY_DELTA_RANDOM_SHIFT;
+                                int fuzzyAdjust = fuzzyDelta * random >> REDSOUND_FUZZY_DELTA_RANDOM_SHIFT;
+                                deltaTime += fuzzyAdjust;
                                 if (deltaTime < 1) {
                                     deltaTime = 1;
                                 }

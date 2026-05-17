@@ -2253,6 +2253,8 @@ static void _ExecuteExtraData()
     RedVoiceDATA* voice;
     RedTrackDATA* track;
     RedTrackDATA* musicBase;
+    int pitchOffset;
+    int basePitch;
 
     soundControl = RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY);
     do {
@@ -2291,8 +2293,8 @@ static void _ExecuteExtraData()
         voice = RedVoiceDataGetBegin();
         do {
             if ((voice->m_stateFlags & REDSOUND_VOICE_STATE_PLAYING_MASK) == 0) {
-                int pitchOffset = (int)voice->m_track->m_keyTranspose + (int)voice->m_track->m_pitchBend;
-                int basePitch = voice->m_basePitch + RedMusicPitchControlGetValue();
+                pitchOffset = (int)voice->m_track->m_keyTranspose + (int)voice->m_track->m_pitchBend;
+                basePitch = voice->m_basePitch + RedMusicPitchControlGetValue();
                 voice->m_pitch = PitchCompute(basePitch, pitchOffset, voice->m_waveData->m_pitch,
                                                voice->m_track->m_fineTune);
                 voice->m_updateFlags |= REDSOUND_VOICE_UPDATE_PITCH;

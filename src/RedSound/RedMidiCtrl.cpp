@@ -1464,7 +1464,7 @@ static void __MidiCtrl_Wave(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track
     waveNo = *track->m_command++;
     if ((track->m_waveBankData != REDSOUND_WAVE_BANK_DATA_NONE) && (waveNo < track->m_waveBankData->m_tableCount)) {
         waveTable = track->m_waveBankData->m_waveOffsets;
-        track->m_waveData = (RedWaveDATA*)((int)track->m_waveBankData + waveTable[waveNo]);
+        track->m_waveData = (RedWaveDATA*)((u8*)track->m_waveBankData + waveTable[waveNo]);
         track->m_waveBase = track->m_waveBankData->m_aramAddress;
         RedTrackAdsrFillDefault(&track->m_adsr);
     }
@@ -1496,7 +1496,7 @@ static void __MidiCtrl_WaveWithBank(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDAT
 	if (waveBank != 0) {
 		waveBankData = waveBank->m_waveHead;
 		waveTable = waveBankData->m_waveOffsets;
-		track->m_waveData = (RedWaveDATA*)((int)waveBankData + waveTable[waveNo]);
+		track->m_waveData = (RedWaveDATA*)((u8*)waveBankData + waveTable[waveNo]);
 		track->m_waveBase = waveBankData->m_aramAddress;
 		RedTrackAdsrFillDefault(&track->m_adsr);
 	}

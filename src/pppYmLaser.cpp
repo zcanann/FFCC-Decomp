@@ -134,7 +134,7 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 	pppFMATRIX unitMtx;
 	Mtx shapeMtx;
 	Mtx rotateMtx;
-	Mtx debugMtx;
+	Mtx debugMtx ATTRIBUTE_ALIGN(8);
 	Mtx pointMtx;
 	Mtx sphereMtx;
 	pppFMATRIX managerMtx;

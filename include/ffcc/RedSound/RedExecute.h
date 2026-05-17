@@ -423,7 +423,7 @@ void* ReverbAreaAlloc(unsigned long size);
 void ReverbAreaFree(void* area);
 void InitReverb();
 RedReverbSize* GetReverbInfo();
-RedReverbSize* SetReverb(int bank, int kind, int* params);
+RedReverbSize* SetReverb(int bank, int kind, int* reverbParams);
 
 RedVoiceDATA* EntryVoiceSearch(RedTrackDATA* track);
 void SetVoiceVolumeMix(RedVoiceDATA* voice, int pan, int volume);

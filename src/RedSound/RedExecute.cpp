@@ -2411,10 +2411,10 @@ static void _MusicTrackDataExecute(RedTrackDATA* track, int frames)
             if (voiceData->m_track == track) {
                 voiceData->m_basePitch += addPitch;
                 if (voiceData->m_waveData != 0) {
+                    int basePitch = voiceData->m_basePitch + RedMusicPitchControlGetValue();
+                    int pitchOffset = (int)(s16)track->m_keyTranspose + (int)(s16)track->m_pitchBend;
                     voiceData->m_pitch =
-                        PitchCompute(voiceData->m_basePitch + RedMusicPitchControlGetValue(),
-                                     (int)(s16)track->m_keyTranspose + (int)(s16)track->m_pitchBend,
-                                     voiceData->m_waveData->m_pitch, (s8)track->m_fineTune);
+                        PitchCompute(basePitch, pitchOffset, voiceData->m_waveData->m_pitch, (s8)track->m_fineTune);
                 }
             }
             voiceData++;
@@ -3000,10 +3000,10 @@ static void _SeTrackDataExecute(RedTrackDATA* track, int frames)
 	}
 
 	if (((voice->m_updateFlags & REDSOUND_VOICE_UPDATE_PITCH) != 0) && (voice->m_waveData != 0)) {
+		int pitchOffset = (int)(s16)track->m_keyTranspose + (int)(s16)track->m_pitchBend;
 		voice->m_pitch =
-			PitchCompute(voice->m_basePitch + track->m_pitch,
-			             (int)(s16)track->m_keyTranspose + (int)(s16)track->m_pitchBend,
-			             voice->m_waveData->m_pitch, track->m_fineTune);
+			PitchCompute(voice->m_basePitch + track->m_pitch, pitchOffset, voice->m_waveData->m_pitch,
+			             track->m_fineTune);
 	}
 
 	if (track->m_vibrateFunc != 0) {

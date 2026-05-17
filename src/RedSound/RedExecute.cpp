@@ -550,7 +550,7 @@ u8 GetRandomData()
  */
 int PitchCompute(int basePitch, int pitchOffset, int wavePitch, int fineTune)
 {
-    int value;
+    int pitchScale;
     int pitch;
     int octaveAdjust;
     int noteBand;
@@ -567,20 +567,20 @@ int PitchCompute(int basePitch, int pitchOffset, int wavePitch, int fineTune)
     noteBand = (pitch >> REDSOUND_PITCH_NOTE_SHIFT) & REDSOUND_PITCH_NOTE_MASK;
     octaveAdjust += noteBand / REDSOUND_NOTES_PER_OCTAVE;
     noteBand %= REDSOUND_NOTES_PER_OCTAVE;
-    value = RedTonePitchGet(noteBand) >> (REDSOUND_PITCH_TONE_SHIFT - octaveAdjust);
-    value *= RedFinePitchGet(pitch & REDSOUND_PITCH_FINE_MASK);
-    value >>= REDSOUND_FIXED_SHIFT;
+    pitchScale = RedTonePitchGet(noteBand) >> (REDSOUND_PITCH_TONE_SHIFT - octaveAdjust);
+    pitchScale *= RedFinePitchGet(pitch & REDSOUND_PITCH_FINE_MASK);
+    pitchScale >>= REDSOUND_FIXED_SHIFT;
 
     if (fineTune != 0) {
         if ((int)fineTune > 0) {
-            value = value + ((int)(value * (fineTune + 1)) >> REDSOUND_PITCH_FINE_TUNE_POSITIVE_SHIFT);
+            pitchScale = pitchScale + ((int)(pitchScale * (fineTune + 1)) >> REDSOUND_PITCH_FINE_TUNE_POSITIVE_SHIFT);
         } else {
-            value *= fineTune & REDSOUND_PITCH_FINE_MASK;
-            value >>= REDSOUND_PITCH_FINE_TUNE_NEGATIVE_SHIFT;
+            pitchScale *= fineTune & REDSOUND_PITCH_FINE_MASK;
+            pitchScale >>= REDSOUND_PITCH_FINE_TUNE_NEGATIVE_SHIFT;
         }
     }
 
-    return value;
+    return pitchScale;
 }
 
 /*

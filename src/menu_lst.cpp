@@ -243,8 +243,8 @@ int CMenuPcs::MLstClose()
 			entry++;
 		}
 	}
-	zero = FLOAT_803333D0;
 	if (this->lstData->count == completedItems) {
+		zero = FLOAT_803333D0;
 		entry = this->lstData->entries;
 		if ((int)itemCount > 0) {
 			count = itemCount >> 3;
@@ -374,11 +374,11 @@ void CMenuPcs::MLstCtrl()
 		}
 	}
 
-	one = FLOAT_803333F0;
 	if (!blocked) {
 		return;
 	}
 
+	one = FLOAT_803333F0;
 	MenuLstEntry* entry = this->lstData->entries;
 	for (i = 0; (itemCount = (unsigned int)this->lstData->count), i < (int)itemCount; i++) {
 		entry->alpha = one;
@@ -482,8 +482,8 @@ int CMenuPcs::MLstOpen()
 		}
 	}
 
-	one = FLOAT_803333F0;
 	if (this->lstData->count == completedItems) {
+		one = FLOAT_803333F0;
 		entry = this->lstData->entries;
 		if ((int)itemCount > 0) {
 			count = itemCount >> 3;

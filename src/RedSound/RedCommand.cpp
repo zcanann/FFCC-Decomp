@@ -1049,25 +1049,25 @@ static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* wav
 	RedReverbDepthSetCount(REDSOUND_REVERB_DEPTH_MUSIC, 0);
 	music->m_waveNo = musicHead->m_waveNo;
 
-	RedMusicTrackBlock* trackBlock = RedMusicGetTrackBlocks(musicHead);
-	int remainingTracks = musicHead->m_trackCount;
-	char trackNo = 0;
+	RedMusicTrackBlock* musicTrackBlock = RedMusicGetTrackBlocks(musicHead);
+	int remainingTrackCount = musicHead->m_trackCount;
+	char musicTrackNo = 0;
 	do {
-		int blockSize = RedMusicTrackBlockGetSize(trackBlock);
-		track->m_trackNo = trackNo - 1;
+		int musicTrackBlockSize = RedMusicTrackBlockGetSize(musicTrackBlock);
+		track->m_trackNo = musicTrackNo - 1;
 		track->m_waveBankData = waveHead;
-		trackBlock = RedMusicTrackBlockGetCommandBlock(trackBlock);
-		track->m_command = (unsigned char*)trackBlock;
-		trackBlock = RedMusicTrackBlockGetNext(trackBlock, blockSize);
+		musicTrackBlock = RedMusicTrackBlockGetCommandBlock(musicTrackBlock);
+		track->m_command = (unsigned char*)musicTrackBlock;
+		musicTrackBlock = RedMusicTrackBlockGetNext(musicTrackBlock, musicTrackBlockSize);
 		track->m_deltaTime = DeltaTimeSumup((unsigned char**)&track->m_command) + 1;
 		track->m_seSepId = REDSOUND_TRACK_SESEP_ID_NONE;
-		signed char* keySignatureData;
+		signed char* defaultKeySignatureData;
 		if (RedMusicKeySignatureIsEnabled()) {
-			keySignatureData = RedKeySignatureGetDefaultData();
+			defaultKeySignatureData = RedKeySignatureGetDefaultData();
 		} else {
-			keySignatureData = 0;
+			defaultKeySignatureData = 0;
 		}
-		track->m_keySignatureData = keySignatureData;
+		track->m_keySignatureData = defaultKeySignatureData;
 		track->m_mixVolume = REDSOUND_VOLUME_DEFAULT;
 		track->m_mixVolumeDelta = 0;
 		track->m_volume = REDSOUND_VOLUME_FULL;
@@ -1109,12 +1109,12 @@ static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* wav
 		track->m_voiceSwitch = REDSOUND_VOICE_SWITCH_MUSIC_DEFAULT;
 		memset(&track->m_adsr, REDSOUND_TRACK_ADSR_DEFAULT_WORD, REDSOUND_TRACK_ADSR_SIZE);
 
-		remainingTracks--;
-		trackNo++;
-		if (remainingTracks != 0) {
+		remainingTrackCount--;
+		musicTrackNo++;
+		if (remainingTrackCount != 0) {
 			track++;
 		}
-	} while (remainingTracks != 0);
+	} while (remainingTrackCount != 0);
 
 	music->m_skipFrames = REDSOUND_CONTROL_INITIAL_SKIP_FRAMES;
 	music->m_channelAlloc = REDSOUND_CONTROL_CHANNEL_ALLOC_NONE;

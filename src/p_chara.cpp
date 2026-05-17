@@ -14,6 +14,9 @@ extern "C" {
 extern u8* gCharaPartWorkPtr;
 }
 
+extern const float FLOAT_80330288;
+extern const float FLOAT_8033028c;
+
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h"
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
@@ -2349,14 +2352,14 @@ CCharaPcs::CHandle::CHandle()
 	m_currentAnimIndex = -1;
 	m_flags = 0;
 
-	m_colorPhase = 1.0f; // FLOAT_8033028c
-	m_sortZ = 0.0f; // FLOAT_80330288
+	m_colorPhase = FLOAT_8033028c;
+	m_sortZ = FLOAT_80330288;
 	m_shadowTexturePtr = nullptr;
 
 	m_asyncState = 0;
 	m_asyncFileHandle = (CFile::CHandle*)nullptr;
 
-	m_fogBlend = 0.0f;
+	m_fogBlend = FLOAT_80330288;
 	m_unk0x158 = 0;
 	m_drawListFlags = static_cast<unsigned char>(__rlwimi(m_drawListFlags, 1, 7, 24, 24));
 }

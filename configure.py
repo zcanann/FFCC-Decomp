@@ -453,7 +453,7 @@ def RedSoundLib(objects: List[Object]) -> Dict[str, Any]:
         # PAL MAP ownership attributes these units to RedSound.a rather than
         # the main game archive, so keep their shared flags at the library level.
         "lib": "RedSound",
-        "mw_version": config.linker_version,
+        "mw_version": "GC/2.0",
         "cflags": redsound_cflags,
         "progress_category": "redsound",
         "objects": objects,
@@ -479,7 +479,7 @@ config.libs = [
         Object(NonMatching, "RedSound/RedEntry.cpp", cflags=redsound_unit_cflags("RedEntry")),
         Object(NonMatching, "RedSound/RedExecute.cpp", cflags=redsound_unit_cflags("RedExecute")),
         Object(NonMatching, "RedSound/RedMemory.cpp", cflags=redsound_unit_cflags("RedMemory")),
-        Object(NonMatching, "RedSound/RedMidiCtrl.cpp", mw_version="GC/2.0", cflags=redsound_unit_cflags("RedMidiCtrl")),
+        Object(Matching, "RedSound/RedMidiCtrl.cpp", cflags=redsound_unit_cflags("RedMidiCtrl")),
         Object(Matching, "RedSound/RedSound.cpp", cflags=redsound_unit_cflags("RedSound")),
         Object(
             NonMatching,

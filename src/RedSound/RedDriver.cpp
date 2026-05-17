@@ -893,8 +893,8 @@ STATIC_ASSERT(sizeof(sRedDriverLogWarnColor) + sizeof(sRedDriverLogReset) == RED
  */
 static void _SetSoundMode(int* command)
 {
-    RedSoundModeSet(command[REDSOUND_SOUND_MODE_COMMAND_MODE]);
-    if (command[REDSOUND_SOUND_MODE_COMMAND_MODE] == REDSOUND_SOUND_MODE_MONO) {
+    RedSoundModeSet(RedExecCommandArgGet(command, REDSOUND_SOUND_MODE_COMMAND_MODE));
+    if (RedExecCommandArgGet(command, REDSOUND_SOUND_MODE_COMMAND_MODE) == REDSOUND_SOUND_MODE_MONO) {
         OSGetSoundMode(OS_SOUND_MODE_MONO);
     } else {
         OSGetSoundMode(OS_SOUND_MODE_STEREO);
@@ -927,9 +927,9 @@ static void _SetReverbDepth(int* command)
     int fadeStep;
     RedTrackDATA* track;
 
-    reverbBank = command[REDSOUND_REVERB_COMMAND_BANK] & REDSOUND_REVERB_BANK_MASK;
-    reverbDepth = command[REDSOUND_REVERB_COMMAND_DEPTH] & REDSOUND_COMMAND_VALUE_MASK;
-    fadeStep = command[REDSOUND_REVERB_COMMAND_FADE_TIME];
+    reverbBank = RedExecCommandArgGet(command, REDSOUND_REVERB_COMMAND_BANK) & REDSOUND_REVERB_BANK_MASK;
+    reverbDepth = RedExecCommandArgGet(command, REDSOUND_REVERB_COMMAND_DEPTH) & REDSOUND_COMMAND_VALUE_MASK;
+    fadeStep = RedExecCommandArgGet(command, REDSOUND_REVERB_COMMAND_FADE_TIME);
     if (reverbDepth != 0) {
         reverbDepth += 1;
         reverbDepth <<= REDSOUND_REVERB_DEPTH_INPUT_SCALE_SHIFT;
@@ -968,7 +968,7 @@ static void _SetReverbDepth(int* command)
  */
 static void _SetMusicData(int* command)
 {
-    c_RedEntry.SetMusicData((RedMusicHEAD*)command[REDSOUND_DATA_COMMAND_BUFFER]);
+    c_RedEntry.SetMusicData((RedMusicHEAD*)RedExecCommandArgGet(command, REDSOUND_DATA_COMMAND_BUFFER));
 }
 
 /*
@@ -982,7 +982,7 @@ static void _SetMusicData(int* command)
  */
 static void _ClearMusicData(int* command)
 {
-    c_RedEntry.ClearMusicData(command[REDSOUND_MUSIC_COMMAND_ID]);
+    c_RedEntry.ClearMusicData(RedExecCommandArgGet(command, REDSOUND_MUSIC_COMMAND_ID));
 }
 
 static void _MusicPlaySequence(int* command);
@@ -1000,9 +1000,9 @@ static void _MusicNextPlaySequence(int* command);
  */
 static void _MusicStop(int* command)
 {
-    MusicStop(command[REDSOUND_MUSIC_COMMAND_ID]);
-    if ((command[REDSOUND_MUSIC_COMMAND_ID] == REDSOUND_MUSIC_ID_NONE) ||
-        (RedMusicNextPlayIdGet() == command[REDSOUND_MUSIC_COMMAND_ID])) {
+    MusicStop(RedExecCommandArgGet(command, REDSOUND_MUSIC_COMMAND_ID));
+    if ((RedExecCommandArgGet(command, REDSOUND_MUSIC_COMMAND_ID) == REDSOUND_MUSIC_ID_NONE) ||
+        (RedMusicNextPlayIdGet() == RedExecCommandArgGet(command, REDSOUND_MUSIC_COMMAND_ID))) {
         RedMusicNextPlayIdSet(REDSOUND_MUSIC_ID_NONE);
     }
     if (RedMusicNextPlayIdGet() < REDSOUND_MUSIC_ID_MIN) {
@@ -1132,15 +1132,15 @@ static void _MusicNextPlaySequence(int* command)
     RedSoundCONTROL* soundControl;
 
     soundControl = RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY);
-    if ((command[REDSOUND_MUSIC_COMMAND_ID] == soundControl[REDSOUND_CONTROL_MUSIC_PRIMARY].m_musicId) ||
-        (command[REDSOUND_MUSIC_COMMAND_ID] == soundControl[REDSOUND_CONTROL_MUSIC_SECONDARY].m_musicId) ||
-        (command[REDSOUND_MUSIC_COMMAND_ID] == soundControl[REDSOUND_CONTROL_MUSIC_SKIP].m_musicId)) {
+    if ((RedExecCommandArgGet(command, REDSOUND_MUSIC_COMMAND_ID) == soundControl[REDSOUND_CONTROL_MUSIC_PRIMARY].m_musicId) ||
+        (RedExecCommandArgGet(command, REDSOUND_MUSIC_COMMAND_ID) == soundControl[REDSOUND_CONTROL_MUSIC_SECONDARY].m_musicId) ||
+        (RedExecCommandArgGet(command, REDSOUND_MUSIC_COMMAND_ID) == soundControl[REDSOUND_CONTROL_MUSIC_SKIP].m_musicId)) {
         return;
     }
-    if (c_RedEntry.SearchMusicSequence(command[REDSOUND_MUSIC_COMMAND_ID]) >= 0) {
-        RedMusicNextPlayIdSet(command[REDSOUND_MUSIC_COMMAND_ID]);
-        RedMusicNextPlayVolumeSet(command[REDSOUND_MUSIC_COMMAND_VOLUME]);
-        RedMusicNextPlayModeSet(command[REDSOUND_MUSIC_COMMAND_MODE]);
+    if (c_RedEntry.SearchMusicSequence(RedExecCommandArgGet(command, REDSOUND_MUSIC_COMMAND_ID)) >= 0) {
+        RedMusicNextPlayIdSet(RedExecCommandArgGet(command, REDSOUND_MUSIC_COMMAND_ID));
+        RedMusicNextPlayVolumeSet(RedExecCommandArgGet(command, REDSOUND_MUSIC_COMMAND_VOLUME));
+        RedMusicNextPlayModeSet(RedExecCommandArgGet(command, REDSOUND_MUSIC_COMMAND_MODE));
     }
 }
 
@@ -1157,7 +1157,7 @@ static void _MusicMasterVolume(int* command)
 {
     RedVoiceDATA* voice;
 
-    RedMasterMusicVolumeSet(command[REDSOUND_MASTER_VOLUME_COMMAND_VOLUME] & REDSOUND_COMMAND_VALUE_MASK);
+    RedMasterMusicVolumeSet(RedExecCommandArgGet(command, REDSOUND_MASTER_VOLUME_COMMAND_VOLUME) & REDSOUND_COMMAND_VALUE_MASK);
     if (RedMasterMusicVolumeGet() != 0) {
         RedMasterMusicVolumeSet(RedMasterMusicVolumeGet() + 1);
         RedMasterMusicVolumeSet(RedMasterMusicVolumeGet() * REDSOUND_MASTER_VOLUME_SCALE);
@@ -1181,12 +1181,12 @@ static void _MusicMasterVolume(int* command)
  */
 static void _MusicVolume(int* command)
 {
-    if (command[REDSOUND_MUSIC_COMMAND_STOP_NEXT] == REDSOUND_MUSIC_VOLUME_MODE_FADE_OUT) {
+    if (RedExecCommandArgGet(command, REDSOUND_MUSIC_COMMAND_STOP_NEXT) == REDSOUND_MUSIC_VOLUME_MODE_FADE_OUT) {
         RedMusicNextPlayIdSet(REDSOUND_MUSIC_ID_NONE);
         RedMusicPhraseStopClear();
     }
-    SetMusicVolume(command[REDSOUND_MUSIC_COMMAND_ID], command[REDSOUND_MUSIC_COMMAND_VOLUME],
-                   command[REDSOUND_MUSIC_COMMAND_FADE_TIME], command[REDSOUND_MUSIC_COMMAND_STOP_NEXT]);
+    SetMusicVolume(RedExecCommandArgGet(command, REDSOUND_MUSIC_COMMAND_ID), RedExecCommandArgGet(command, REDSOUND_MUSIC_COMMAND_VOLUME),
+                   RedExecCommandArgGet(command, REDSOUND_MUSIC_COMMAND_FADE_TIME), RedExecCommandArgGet(command, REDSOUND_MUSIC_COMMAND_STOP_NEXT));
 }
 
 /*
@@ -1199,7 +1199,7 @@ static void _MusicVolume(int* command)
  */
 static void _MusicTempo(int* command)
 {
-    SetMusicTempo(command[REDSOUND_MUSIC_COMMAND_VOLUME], command[REDSOUND_MUSIC_COMMAND_FADE_TIME]);
+    SetMusicTempo(RedExecCommandArgGet(command, REDSOUND_MUSIC_COMMAND_VOLUME), RedExecCommandArgGet(command, REDSOUND_MUSIC_COMMAND_FADE_TIME));
 }
 
 /*
@@ -1212,7 +1212,7 @@ static void _MusicTempo(int* command)
  */
 static void _MusicPitch(int* command)
 {
-    SetMusicPitch(command[REDSOUND_MUSIC_COMMAND_VOLUME], command[REDSOUND_MUSIC_COMMAND_FADE_TIME]);
+    SetMusicPitch(RedExecCommandArgGet(command, REDSOUND_MUSIC_COMMAND_VOLUME), RedExecCommandArgGet(command, REDSOUND_MUSIC_COMMAND_FADE_TIME));
 }
 
 /*
@@ -1225,7 +1225,7 @@ static void _MusicPitch(int* command)
  */
 static void _MusicPause(int* command)
 {
-    MusicPause(command[REDSOUND_MUSIC_COMMAND_ID], command[REDSOUND_MUSIC_COMMAND_VOLUME]);
+    MusicPause(RedExecCommandArgGet(command, REDSOUND_MUSIC_COMMAND_ID), RedExecCommandArgGet(command, REDSOUND_MUSIC_COMMAND_VOLUME));
 }
 
 /*
@@ -1239,7 +1239,7 @@ static void _MusicPause(int* command)
  */
 static void _SetMusicPhraseStop(int* command)
 {
-    RedMusicPhraseStopSet(command[REDSOUND_MUSIC_COMMAND_ID]);
+    RedMusicPhraseStopSet(RedExecCommandArgGet(command, REDSOUND_MUSIC_COMMAND_ID));
 }
 
 /*

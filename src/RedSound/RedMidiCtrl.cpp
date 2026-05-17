@@ -2800,12 +2800,12 @@ static void __MidiCtrl_ReverbMix(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* 
  */
 static void __MidiCtrl_StepRelative(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    int value;
+    int stepOffset;
     short step;
 
-    value = (s8)*track->m_command++;
-    if (value != 0) {
-        step = track->m_step + value;
+    stepOffset = (s8)*track->m_command++;
+    if (stepOffset != 0) {
+        step = track->m_step + stepOffset;
     } else {
         step = 0;
     }
@@ -2829,14 +2829,14 @@ static void __MidiCtrl_StepRelative(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDAT
  */
 static void __MidiCtrl_StepRelative2(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    int value;
+    int stepOffset;
     short step;
 
-    value = *track->m_command++;
+    stepOffset = *track->m_command++;
     track->m_step = 0;
 
-    if (value != 0) {
-        step = track->m_step2 + value;
+    if (stepOffset != 0) {
+        step = track->m_step2 + stepOffset;
     } else {
         step = 0;
     }
@@ -2860,37 +2860,37 @@ static void __MidiCtrl_StepRelative2(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDA
 static void __MidiCtrl_FuzzyOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
     int mode;
-    int value;
+    int depth;
     int fuzzyValue;
 
     mode = *track->m_command++;
-    value = *track->m_command++;
-    if (value != 0) {
-        fuzzyValue = value + REDSOUND_MIDI_FUZZY_DEPTH_BIAS;
+    depth = *track->m_command++;
+    if (depth != 0) {
+        fuzzyValue = depth + REDSOUND_MIDI_FUZZY_DEPTH_BIAS;
     } else {
         fuzzyValue = REDSOUND_MIDI_FUZZY_DEFAULT_DEPTH;
     }
-    value = fuzzyValue;
+    depth = fuzzyValue;
 
     switch (mode) {
     case REDSOUND_MIDI_FUZZY_MODE_VOLUME:
-        track->m_fuzzyVolumeDepth = value;
+        track->m_fuzzyVolumeDepth = depth;
         track->m_voiceSwitch |= REDSOUND_VOICE_SWITCH_FUZZY_VOLUME;
         return;
     case REDSOUND_MIDI_FUZZY_MODE_PAN:
-        track->m_fuzzyPanDepth = value;
+        track->m_fuzzyPanDepth = depth;
         track->m_voiceSwitch |= REDSOUND_VOICE_SWITCH_FUZZY_PAN;
         return;
     case REDSOUND_MIDI_FUZZY_MODE_DELTA_TIME:
-        track->m_fuzzyDeltaTimeDepth = value;
+        track->m_fuzzyDeltaTimeDepth = depth;
         track->m_voiceSwitch |= REDSOUND_VOICE_SWITCH_FUZZY_DELTA_TIME;
         return;
     case REDSOUND_MIDI_FUZZY_MODE_ADSR:
-        track->m_fuzzyAdsrDepth = value;
+        track->m_fuzzyAdsrDepth = depth;
         track->m_voiceSwitch |= REDSOUND_VOICE_SWITCH_FUZZY_ADSR;
         return;
     default:
-        track->m_fuzzyPitchDepth = value;
+        track->m_fuzzyPitchDepth = depth;
         track->m_voiceSwitch |= REDSOUND_VOICE_SWITCH_FUZZY_PITCH;
         return;
     }

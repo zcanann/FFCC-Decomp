@@ -3848,10 +3848,11 @@ int CRedDriver::PlayWaveItem(int waveNo, int itemNo, int key, int pan, int volum
  */
 inline void CRedDriver::StopWaveItem()
 {
+    RedTrackDATA* editorTrack = RedEditorTrackGet();
     RedVoiceDATA* voice = RedVoiceDataGetBegin();
 
     do {
-        if (voice->m_track == RedEditorTrackGet()) {
+        if (voice->m_track == editorTrack) {
             voice->m_flags |= REDSOUND_VOICE_FLAGS_RELEASED;
             voice->m_active = REDSOUND_VOICE_ACTIVE_OFF;
             voice->m_track = REDSOUND_VOICE_TRACK_NONE;

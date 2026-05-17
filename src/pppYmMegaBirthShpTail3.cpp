@@ -3,11 +3,15 @@
 #include "ffcc/pppPart.h"
 #include "ffcc/pppGetRotMatrixXYZ.h"
 extern "C" {
+extern const float FLOAT_803305A0;
 extern const float kPppYmMegaBirthShpTail3Zero;
 extern const float FLOAT_803305A8;
+extern const float FLOAT_803305AC;
 extern const float FLOAT_803305B0;
 extern const float FLOAT_803305C8;
 extern const float FLOAT_803305CC;
+extern const float FLOAT_803305D0;
+extern const float FLOAT_803305D4;
 extern int gPppCalcDisabled;
 }
 #include "dolphin/mtx.h"
@@ -43,6 +47,7 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
     _PARTICLE_WMAT* wmats = *(_PARTICLE_WMAT**)((u8*)&object->field_0xc0 + particleDataOffset);
     _PARTICLE_COLOR* colors = *(_PARTICLE_COLOR**)((u8*)&object->field_0xc4 + particleDataOffset);
     const u32 maxParticles = *(u32*)((u8*)&object->field_0xc8 + particleDataOffset);
+    VColor* colorWork = (VColor*)((u8*)object + 0x80 + offsets->m_serializedDataOffsets[1]);
     bool hasRequiredMemory = false;
 
     if (particles != 0 && wmats != 0) {
@@ -75,31 +80,31 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                 const u8 trailReadIndex = *(u8*)(particle + 0x38);
                 const u8 trailMaxIndex = (u8)(*(u8*)(particle + 0x37) - 1);
                 u8 trailNextIndex = (u8)(trailReadIndex + 1);
+                const float alphaScale = (float)*(s16*)((u8*)colorWork + 6) / FLOAT_803305A0;
+                float stepDivisor = (float)((s32)frameCountRaw - 1);
                 float drawScale = *(float*)(payload + 0x5C);
-                const float drawScaleStep =
-                    (drawScale - *(float*)(payload + 0x60)) /
-                    ((frameCountRaw > 1) ? (float)(frameCountRaw - 1) : FLOAT_803305B0);
-                float fadeR = (float)*(s16*)((u8*)&object->m_data[4] + particleDataOffset) / 128.0f;
-                float fadeG = (float)*(s16*)((u8*)&object->m_data[6] + particleDataOffset) / 128.0f;
-                float fadeB = (float)*(s16*)((u8*)&object->m_data[8] + particleDataOffset) / 128.0f;
-                float fadeA = (float)*(s16*)((u8*)&object->m_data[10] + particleDataOffset) / 128.0f;
+                const float drawScaleStep = (drawScale - *(float*)(payload + 0x60)) / stepDivisor;
+                float fadeR = (float)(*(s16*)((u8*)&object->m_data[4] + particleDataOffset) >> 7);
+                float fadeG = (float)(*(s16*)((u8*)&object->m_data[6] + particleDataOffset) >> 7);
+                float fadeB = (float)(*(s16*)((u8*)&object->m_data[8] + particleDataOffset) >> 7);
+                float fadeA = (float)(*(s16*)((u8*)&object->m_data[10] + particleDataOffset) >> 7) * alphaScale;
                 const float fadeRStep =
-                    (fadeR - (float)*(s16*)((u8*)&object->m_data[16] + particleDataOffset) / 128.0f) /
-                    ((frameCountRaw > 1) ? (float)(frameCountRaw - 1) : FLOAT_803305B0);
+                    (fadeR - (float)(*(s16*)((u8*)&object->m_data[12] + particleDataOffset) >> 7)) /
+                    stepDivisor;
                 const float fadeGStep =
-                    (fadeG - (float)*(s16*)((u8*)&object->m_data[18] + particleDataOffset) / 128.0f) /
-                    ((frameCountRaw > 1) ? (float)(frameCountRaw - 1) : FLOAT_803305B0);
+                    (fadeG - (float)(*(s16*)((u8*)&object->m_data[14] + particleDataOffset) >> 7)) /
+                    stepDivisor;
                 const float fadeBStep =
-                    (fadeB - (float)*(s16*)((u8*)&object->m_data[20] + particleDataOffset) / 128.0f) /
-                    ((frameCountRaw > 1) ? (float)(frameCountRaw - 1) : FLOAT_803305B0);
+                    (fadeB - (float)(*(s16*)((u8*)&object->m_data[16] + particleDataOffset) >> 7)) /
+                    stepDivisor;
                 const float fadeAStep =
-                    (fadeA - (float)*(s16*)((u8*)&object->m_data[22] + particleDataOffset) / 128.0f) /
-                    ((frameCountRaw > 1) ? (float)(frameCountRaw - 1) : FLOAT_803305B0);
+                    (fadeA - (float)(*(s16*)((u8*)&object->m_data[18] + particleDataOffset) >> 7) * alphaScale) /
+                    stepDivisor;
                 const float spacing = *(float*)(payload + 0x98);
                 Vec* history = (Vec*)(particle + 0x80);
                 Vec segVec;
                 float segLen;
-                float segProgress = 0.0f;
+                float segProgress = kPppYmMegaBirthShpTail3Zero;
                 u16 frameCount = frameCountRaw;
                 u16 particleShapeFrame = *(u16*)(particle + 0x1C);
                 const u16 shapeFrameStep = *(u16*)(shapeTable + 0x12);
@@ -114,9 +119,9 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                 segVec.x = cameraPos.x - drawPos.x;
                 segVec.y = cameraPos.y - drawPos.y;
                 segVec.z = cameraPos.z - drawPos.z;
-                zeroVec.x = 0.0f;
-                zeroVec.y = 0.0f;
-                zeroVec.z = 0.0f;
+                zeroVec.x = kPppYmMegaBirthShpTail3Zero;
+                zeroVec.y = kPppYmMegaBirthShpTail3Zero;
+                zeroVec.z = kPppYmMegaBirthShpTail3Zero;
                 segLen = PSVECDistance(&zeroVec, &segVec);
 
                 if (payload[0x9E] == 0) {
@@ -125,7 +130,9 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
 
                 while (frameCount != 0) {
                     Vec trailPos = drawPos;
-                    bool canDraw = (trailPos.x != 0.0f) || (trailPos.y != 0.0f) || (trailPos.z != 0.0f);
+                    bool canDraw = (trailPos.x != kPppYmMegaBirthShpTail3Zero) ||
+                                   (trailPos.y != kPppYmMegaBirthShpTail3Zero) ||
+                                   (trailPos.z != kPppYmMegaBirthShpTail3Zero);
                     if (canDraw) {
                         workRand = (u16)((u32)workRand * 0x80d + 7);
                         const u32 shapeFrame = (u32)(particleShapeFrame + workRand) / shapeFrameStep;
@@ -166,7 +173,7 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                         amb.r = (u8)fadeR;
                         amb.g = (u8)fadeG;
                         amb.b = (u8)fadeB;
-                        amb.a = (u8)(fadeA * (FLOAT_803305B0 - *(float*)(particle + 0x30)));
+                        amb.a = (u8)(fadeA * (FLOAT_803305AC * (FLOAT_803305B0 - *(float*)(particle + 0x30))));
                         if (amb.a > 0x7F) {
                             amb.a = 0x7F;
                         }
@@ -176,7 +183,7 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                     }
 
                     frameCount--;
-                    if (frameCount == 0 || spacing <= 0.0f) {
+                    if (frameCount == 0 || spacing <= kPppYmMegaBirthShpTail3Zero) {
                         break;
                     }
 
@@ -185,12 +192,12 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                     fadeG -= fadeGStep;
                     fadeB -= fadeBStep;
                     fadeA -= fadeAStep;
-                    if (drawScale <= 0.0f) {
+                    if (drawScale <= kPppYmMegaBirthShpTail3Zero) {
                         break;
                     }
 
                     segProgress += spacing;
-                    while (segLen > 0.0f && segProgress > segLen) {
+                    while (segLen > kPppYmMegaBirthShpTail3Zero && segProgress > segLen) {
                         const float overflow = segProgress - segLen;
                         trailNextIndex++;
                         if (trailNextIndex > trailMaxIndex) {
@@ -215,7 +222,7 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                         segLen = PSVECDistance(&zeroVec, &segVec);
                         segProgress = overflow;
                     }
-                    if (frameCount == 0 || segLen <= 0.0f) {
+                    if (frameCount == 0 || segLen <= kPppYmMegaBirthShpTail3Zero) {
                         break;
                     }
 
@@ -480,8 +487,8 @@ extern "C" void calc(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirth
     if (fadeTime != 0 && frameState[4] <= fadeTime) {
         *blend = *blend -
             (float)alpha / (float)fadeTime;
-        if (*blend < 0.0f) {
-            *blend = 0.0f;
+        if (*blend < kPppYmMegaBirthShpTail3Zero) {
+            *blend = kPppYmMegaBirthShpTail3Zero;
         }
     }
 
@@ -490,8 +497,8 @@ extern "C" void calc(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirth
         unsigned char fadeInFrames = *((unsigned char*)&pYmMegaBirthShpTail3->m_matrix[1] + 7);
         *blend = *blend +
             (float)alpha / (float)fadeInFrames;
-        if (*blend > 1.0f) {
-            *blend = 1.0f;
+        if (*blend > FLOAT_803305B0) {
+            *blend = FLOAT_803305B0;
         }
     }
 
@@ -560,7 +567,7 @@ extern "C" void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirt
 
     if ((mode < 6) && (pYmMegaBirthShpTail3->m_speedRandRange != 0.0f)) {
         float speedRandRange = pYmMegaBirthShpTail3->m_speedRandRange;
-        float speedRandHalf = 0.5f * speedRandRange;
+        float speedRandHalf = FLOAT_803305D4 * speedRandRange;
         u8 randType = paramBytes[0x6a];
 
         if (randType <= 1) {
@@ -572,26 +579,26 @@ extern "C" void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirt
             particleData->m_matrix[0][2] = speedRandRange * Math.RandF() - speedRandHalf;
         } else if (randType == 3) {
             particleData->m_matrix[0][0] =
-                -(2.0f * (speedRandRange * Math.RandF() * Math.RandF()) - speedRandRange) -
+                -(FLOAT_803305D0 * (speedRandRange * Math.RandF() * Math.RandF()) - speedRandRange) -
                 speedRandHalf;
             particleData->m_matrix[0][1] =
-                -(2.0f * (speedRandRange * Math.RandF() * Math.RandF()) - speedRandRange) -
+                -(FLOAT_803305D0 * (speedRandRange * Math.RandF() * Math.RandF()) - speedRandRange) -
                 speedRandHalf;
             particleData->m_matrix[0][2] =
-                -(2.0f * (speedRandRange * Math.RandF() * Math.RandF()) - speedRandRange) -
+                -(FLOAT_803305D0 * (speedRandRange * Math.RandF() * Math.RandF()) - speedRandRange) -
                 speedRandHalf;
         } else if (randType == 5) {
-            particleData->m_matrix[0][0] = -(0.5f * (Math.RandF() *
+            particleData->m_matrix[0][0] = -(FLOAT_803305D4 * (Math.RandF() *
                                                      (speedRandRange * Math.RandF() *
                                                       Math.RandF())) -
                                              speedRandRange) -
                                             speedRandHalf;
-            particleData->m_matrix[0][1] = -(0.5f * (Math.RandF() *
+            particleData->m_matrix[0][1] = -(FLOAT_803305D4 * (Math.RandF() *
                                                      (speedRandRange * Math.RandF() *
                                                       Math.RandF())) -
                                              speedRandRange) -
                                             speedRandHalf;
-            particleData->m_matrix[0][2] = -(0.5f * (Math.RandF() *
+            particleData->m_matrix[0][2] = -(FLOAT_803305D4 * (Math.RandF() *
                                                      (speedRandRange * Math.RandF() *
                                                       Math.RandF())) -
                                              speedRandRange) -
@@ -672,13 +679,13 @@ extern "C" void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirt
                 }
             }
         }
-    } else if (pYmMegaBirthShpTail3->m_speedRandRange != 0.0f) {
+    } else if (pYmMegaBirthShpTail3->m_speedRandRange != kPppYmMegaBirthShpTail3Zero) {
         float speedRandRange = pYmMegaBirthShpTail3->m_speedRandRange;
         u8 randType = paramBytes[0x6a];
         float scale = speedRandRange;
 
         if (randType == 3) {
-            scale = -(2.0f * (speedRandRange * Math.RandF() * Math.RandF()) - speedRandRange);
+            scale = -(FLOAT_803305D0 * (speedRandRange * Math.RandF() * Math.RandF()) - speedRandRange);
         } else if (randType == 1) {
             Math.RandF();
             scale = speedRandRange * Math.RandF();
@@ -687,7 +694,7 @@ extern "C" void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirt
         } else if (randType == 4) {
             scale = Math.RandF() * (Math.RandF() * (speedRandRange * Math.RandF()));
         } else if (randType == 5) {
-            scale = -(0.5f * (Math.RandF() *
+            scale = -(FLOAT_803305D4 * (Math.RandF() *
                               (speedRandRange * Math.RandF() * Math.RandF())) -
                       speedRandRange);
         }
@@ -706,9 +713,9 @@ extern "C" void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirt
 
     particleData->m_matrix[2][2] = pYmMegaBirthShpTail3->m_colorDeltaAdd[1];
     particleData->m_matrix[2][3] = pYmMegaBirthShpTail3->m_sizeStart;
-    if (pYmMegaBirthShpTail3->m_colorDeltaAdd[3] != 0.0f) {
+    if (pYmMegaBirthShpTail3->m_colorDeltaAdd[3] != kPppYmMegaBirthShpTail3Zero) {
         particleData->m_matrix[2][2] +=
-            (2.0f * pYmMegaBirthShpTail3->m_colorDeltaAdd[3]) * Math.RandF() -
+            (FLOAT_803305C8 * pYmMegaBirthShpTail3->m_colorDeltaAdd[3]) * Math.RandF() -
             pYmMegaBirthShpTail3->m_colorDeltaAdd[3];
     }
 
@@ -732,9 +739,9 @@ extern "C" void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirt
     particleBytes[0x37] = 0x1f;
 
     Vec zeroVec;
-    zeroVec.x = 0.0f;
-    zeroVec.y = 0.0f;
-    zeroVec.z = 0.0f;
+    zeroVec.x = kPppYmMegaBirthShpTail3Zero;
+    zeroVec.y = kPppYmMegaBirthShpTail3Zero;
+    zeroVec.z = kPppYmMegaBirthShpTail3Zero;
     Vec* history = (Vec*)((u8*)particleData + 0x80);
     for (int i = 0; i < 0x1f; i++) {
         pppCopyVector(history[i], zeroVec);

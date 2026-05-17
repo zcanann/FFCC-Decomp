@@ -844,7 +844,10 @@ void CUtil::RenderColorQuad(float x, float y, float width, float height, _GXColo
     _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
     _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
     GXSetNumTexGens(0);
-    *reinterpret_cast<u32*>(&white) = 0xFFFFFFFF;
+    white.r = 0xFF;
+    white.g = 0xFF;
+    white.b = 0xFF;
+    white.a = 0xFF;
     GXSetChanAmbColor(GX_COLOR0A0, white);
     GXSetChanCtrl(GX_COLOR0A0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
     GXSetNumChans(1);
@@ -894,7 +897,7 @@ void CUtil::ClearZBufferRect(float x, float y, float width, float height)
     Mtx cameraMtx;
     Mtx44 orthoMtx;
     Mtx44 screenMtx;
-    GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
+    GXColor white;
     float indMtx[2][3];
 
     PSMTXIdentity(modelMtx);
@@ -930,6 +933,10 @@ void CUtil::ClearZBufferRect(float x, float y, float width, float height)
     _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
     _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
     GXSetNumTexGens(0);
+    white.r = 0xFF;
+    white.g = 0xFF;
+    white.b = 0xFF;
+    white.a = 0xFF;
     GXSetChanAmbColor(GX_COLOR0A0, white);
     GXSetChanMatColor(GX_COLOR0A0, white);
     GXSetChanCtrl(GX_COLOR0A0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);

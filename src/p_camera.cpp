@@ -168,6 +168,19 @@ void pppEditGetViewMatrix__FPA4_f(float (*)[4]);
 void pppEditGetProjectionMatrix__FPA4_f(float (*)[4]);
 }
 
+namespace {
+
+struct CameraStateCopy {
+    u8 bytes[0x108];
+};
+
+static inline void CopyCameraState(u8* dst, u8* src)
+{
+    *reinterpret_cast<CameraStateCopy*>(dst) = *reinterpret_cast<CameraStateCopy*>(src);
+}
+
+}
+
 /*
  * --INFO--
  * PAL Address: 0x8003A250
@@ -1429,7 +1442,11 @@ int CCameraPcs::GetShadowRect(CBound&)
         if (gObject->m_charaModelHandle != 0) {
             unsigned int displayFlags = gObject->m_displayFlags;
             if ((displayFlags & 1) != 0 && (displayFlags & 0x40) == 0) {
-                if (static_cast<signed char>(gObject->m_weaponNodeFlags >> 8) < 0) {
+                if (static_cast<signed char>(
+                        static_cast<int>((static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(
+                                             &gObject->m_weaponNodeFlags)) << 26) &
+                                         0xC0000000) >>
+                        31) != 0) {
                     if ((displayFlags & 0x80) != 0 || gObject->m_lookAtTimer == FLOAT_8032fa1c) {
                         include = true;
                     }
@@ -1480,22 +1497,22 @@ int CCameraPcs::GetShadowRect(CBound&)
             continue;
         }
 
-        if (shadowRect[0] < minX) {
+        if (minX < shadowRect[0]) {
             shadowRect[0] = minX;
         }
-        if (shadowRect[1] < minY) {
+        if (minY < shadowRect[1]) {
             shadowRect[1] = minY;
         }
-        if (shadowRect[2] < minZ) {
+        if (minZ < shadowRect[2]) {
             shadowRect[2] = minZ;
         }
-        if (maxX < shadowRect[3]) {
+        if (shadowRect[3] < maxX) {
             shadowRect[3] = maxX;
         }
-        if (maxY < shadowRect[4]) {
+        if (shadowRect[4] < maxY) {
             shadowRect[4] = maxY;
         }
-        if (maxZ < shadowRect[5]) {
+        if (shadowRect[5] < maxZ) {
             shadowRect[5] = maxZ;
         }
         count += 1;
@@ -1530,8 +1547,8 @@ void CCameraPcs::drawShadowBegin()
 
     GXInvalidateTexAll();
 
-    memcpy(self + 0x10C, self + 4, 0x108);
-    memcpy(self + 0x214, self + 4, 0x108);
+    CopyCameraState(self + 0x10C, self + 4);
+    CopyCameraState(self + 0x214, self + 4);
 
     if (Game.m_currentSceneId == 3) {
         float stickX = FLOAT_8032fa34;
@@ -1638,7 +1655,7 @@ void CCameraPcs::drawShadowBegin()
     g_shadow_refpos.y = *reinterpret_cast<float*>(self + 0x2E8);
     g_shadow_refpos.z = *reinterpret_cast<float*>(self + 0x2EC);
 
-    memcpy(self + 4, self + 0x214, 0x108);
+    CopyCameraState(self + 4, self + 0x214);
     GXSetProjection(reinterpret_cast<Mtx44Ptr>(self + 0x94), GX_ORTHOGRAPHIC);
     GXSetColorUpdate(GX_FALSE);
     GXSetCullMode(GX_CULL_BACK);

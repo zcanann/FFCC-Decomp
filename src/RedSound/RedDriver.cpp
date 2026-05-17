@@ -329,6 +329,14 @@ STATIC_ASSERT(offsetof(RedDmaRequest, m_size) == REDSOUND_DMA_REQUEST_SIZE_OFFSE
 STATIC_ASSERT(offsetof(RedDmaRequest, m_callback) == REDSOUND_DMA_REQUEST_CALLBACK_OFFSET);
 STATIC_ASSERT(offsetof(RedDmaRequest, m_callbackData) == REDSOUND_DMA_REQUEST_CALLBACK_DATA_OFFSET);
 STATIC_ASSERT(sizeof(RedDmaRequest) == REDSOUND_DMA_REQUEST_SIZE);
+
+#define RedDmaRequestSetId(request, id) ((request)->m_id = (id))
+#define RedDmaRequestSetDirection(request, direction) ((request)->m_direction = (direction))
+#define RedDmaRequestSetMainMemory(request, memory) ((request)->m_mainMemory = (memory))
+#define RedDmaRequestSetAramMemory(request, memory) ((request)->m_aramMemory = (memory))
+#define RedDmaRequestSetSize(request, size) ((request)->m_size = (size))
+#define RedDmaRequestSetCallback(request, callback) ((request)->m_callback = (callback))
+#define RedDmaRequestSetCallbackData(request, data) ((request)->m_callbackData = (data))
 STATIC_ASSERT(offsetof(RedDriverSyncState, m_dmaQueue) == REDSOUND_DRIVER_SYNC_DMA_QUEUE_OFFSET);
 STATIC_ASSERT(offsetof(RedDriverSyncState, m_streamDmaQueue) == REDSOUND_DRIVER_SYNC_STREAM_DMA_QUEUE_OFFSET);
 STATIC_ASSERT(sizeof(((RedDriverSyncState*)0)->m_dmaQueue) == REDSOUND_DMA_QUEUE_SIZE);
@@ -1883,20 +1891,20 @@ int RedDmaEntry(int flags, int direction, int mainMemory, int aramMemory, int si
             } else {
                 chunkSize = sizeBytes;
             }
-            queueEntry->m_id = entryID;
+            RedDmaRequestSetId(queueEntry, entryID);
             transferSize = chunkSize;
             sizeBytes -= transferSize;
-            queueEntry->m_direction = direction;
-            queueEntry->m_mainMemory = mainMemory;
+            RedDmaRequestSetDirection(queueEntry, direction);
+            RedDmaRequestSetMainMemory(queueEntry, mainMemory);
             mainMemory += transferSize;
-            queueEntry->m_aramMemory = aramMemory;
+            RedDmaRequestSetAramMemory(queueEntry, aramMemory);
             aramMemory += transferSize;
-            queueEntry->m_size = transferSize;
-            queueEntry->m_callbackData = callbackData;
+            RedDmaRequestSetSize(queueEntry, transferSize);
+            RedDmaRequestSetCallbackData(queueEntry, callbackData);
             if (sizeBytes < 1) {
-                queueEntry->m_callback = callback;
+                RedDmaRequestSetCallback(queueEntry, callback);
             } else {
-                queueEntry->m_callback = REDSOUND_DMA_CALLBACK_NONE;
+                RedDmaRequestSetCallback(queueEntry, REDSOUND_DMA_CALLBACK_NONE);
             }
             queueEntry++;
             if (!(queueEntry < queueBase + REDSOUND_DMA_QUEUE_ENTRY_COUNT)) {
@@ -1905,13 +1913,13 @@ int RedDmaEntry(int flags, int direction, int mainMemory, int aramMemory, int si
         } while (sizeBytes > 0);
         *queuePtr = queueEntry;
     } else {
-        queueEntry->m_id = entryID;
-        queueEntry->m_direction = direction;
-        queueEntry->m_mainMemory = mainMemory;
-        queueEntry->m_aramMemory = aramMemory;
-        queueEntry->m_size = sizeBytes;
-        queueEntry->m_callback = callback;
-        queueEntry->m_callbackData = callbackData;
+        RedDmaRequestSetId(queueEntry, entryID);
+        RedDmaRequestSetDirection(queueEntry, direction);
+        RedDmaRequestSetMainMemory(queueEntry, mainMemory);
+        RedDmaRequestSetAramMemory(queueEntry, aramMemory);
+        RedDmaRequestSetSize(queueEntry, sizeBytes);
+        RedDmaRequestSetCallback(queueEntry, callback);
+        RedDmaRequestSetCallbackData(queueEntry, callbackData);
         queueEntry++;
         if (!(queueEntry < queueBase + REDSOUND_DMA_QUEUE_ENTRY_COUNT)) {
             queueEntry = queueBase;

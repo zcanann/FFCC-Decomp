@@ -622,8 +622,9 @@ void CGraphicPcs::drawBar()
     const bool useDebugPad = (Pad._452_4_ != 0) || (Pad._448_4_ != -1);
     int padState = 0;
     if (!useDebugPad) {
-        __cntlzw(static_cast<unsigned int>(Pad._448_4_));
-        padState = *reinterpret_cast<int*>(reinterpret_cast<u8*>(&Pad) + 0x60);
+        int padIndex = useDebugPad;
+        padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad._448_4_)) & 0x20) >> 5);
+        padState = *reinterpret_cast<int*>(reinterpret_cast<u8*>(&Pad) + padIndex * 0x54 + 60);
     }
     const bool drawText = (padState != 0) && (GetPadType__6JoyBusFi(&Joybus, 0) != 0x40000);
 

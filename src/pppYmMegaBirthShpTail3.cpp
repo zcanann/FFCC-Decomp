@@ -258,8 +258,8 @@ void pppFrameYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthShp
     u8* paramPayload;
     int colorOffset;
     u8* particleData;
-    _PARTICLE_WMAT* worldMat;
     _PARTICLE_COLOR* particleColor;
+    _PARTICLE_WMAT* worldMat;
     int spawnCount;
 
     colorOffset = offsets->m_serializedDataOffsets[1];
@@ -400,8 +400,8 @@ void pppFrameYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthShp
 
         spawnCount = 0;
         particleData = (u8*)work->m_particles;
-        particleColor = work->m_colors;
         worldMat = work->m_wmats;
+        particleColor = work->m_colors;
 
         if ((gPppCalcDisabled == 0) && (*(s32*)(paramPayload + 4) != 0xffff)) {
             work->m_lifeLimit = work->m_lifeLimit + 1;

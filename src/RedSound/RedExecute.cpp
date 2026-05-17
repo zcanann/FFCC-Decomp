@@ -2625,7 +2625,7 @@ static int _MusicMidiNoteExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnDa
  */
 static void _MusicNoteExecute()
 {
-    int i;
+    int trackIndex;
     u32 trackCount;
     RedTrackDATA* track;
     RedSavedTrackDATA* savedTrackData;
@@ -2640,14 +2640,14 @@ static void _MusicNoteExecute()
         track = RedCurrentSoundControlGet()->m_tracks;
         trackCount = RedCurrentSoundControlGet()->m_trackCount;
         savedTrackData = &RedCurrentSoundControlGet()->m_savedTracks;
-        i = 0;
+        trackIndex = 0;
         do {
-            track->m_command = savedTrackData->m_command[i];
-            track->m_deltaTime = savedTrackData->m_delta[i];
-            track->m_flags = savedTrackData->m_flags[i];
-            *(int*)&track->m_note = *(int*)&savedTrackData->m_note[i];
+            track->m_command = savedTrackData->m_command[trackIndex];
+            track->m_deltaTime = savedTrackData->m_delta[trackIndex];
+            track->m_flags = savedTrackData->m_flags[trackIndex];
+            *(int*)&track->m_note = *(int*)&savedTrackData->m_note[trackIndex];
             track++;
-            i++;
+            trackIndex++;
         } while (--trackCount != 0);
 
         status = _MusicMidiNoteExecute(RedCurrentSoundControlGet(), RedKeyOnDataGet(), 1);

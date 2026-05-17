@@ -49,6 +49,11 @@ public:
 		unsigned int m_dataOffset;
 		unsigned int m_flags;
 	};
+
+	unsigned char _pad0[0x205C];
+	void* m_animAmemBase;
+	unsigned char _pad2060[0x14];
+	int m_animBankAddress;
 };
 
 #endif // _FFCC_CHARA_ANIM_H_

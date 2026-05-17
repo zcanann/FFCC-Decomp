@@ -1126,6 +1126,8 @@ void CMenuPcs::DrawQuit()
 u16 CMenuPcs::GetButtonDown(int port)
 {
     bool noInput = false;
+    u32 result;
+
     if (Pad._452_4_ == 0) {
         if (port != 0) {
             goto input_check_done;
@@ -1138,11 +1140,13 @@ u16 CMenuPcs::GetButtonDown(int port)
 
 input_check_done:
     if (noInput) {
-        return 0;
+        result = 0;
+    } else {
+        u32 clamped = (Pad._448_4_ == port) ? 0 : port;
+        result = *(u16*)((u8*)&Pad + 0x8 + clamped * 0x54);
     }
 
-    u32 clamped = (u32)port & ~((int)~(Pad._448_4_ - port | port - Pad._448_4_) >> 0x1f);
-    return *(u16*)((u8*)&Pad + 0x8 + clamped * 0x54);
+    return result;
 }
 
 /*
@@ -1157,6 +1161,8 @@ input_check_done:
 u16 CMenuPcs::GetButtonRepeat(int port)
 {
     bool noInput = false;
+    u32 result;
+
     if (Pad._452_4_ == 0) {
         if (port != 0) {
             goto repeat_check_done;
@@ -1169,11 +1175,13 @@ u16 CMenuPcs::GetButtonRepeat(int port)
 
 repeat_check_done:
     if (noInput) {
-        return 0;
+        result = 0;
+    } else {
+        u32 clamped = (Pad._448_4_ == port) ? 0 : port;
+        result = *(u16*)((u8*)&Pad + 0x14 + clamped * 0x54);
     }
 
-    u32 clamped = (u32)port & ~((int)~(Pad._448_4_ - port | port - Pad._448_4_) >> 0x1f);
-    return *(u16*)((u8*)&Pad + 0x14 + clamped * 0x54);
+    return result;
 }
 
 /*

@@ -141,7 +141,7 @@ extern "C" CGObjWork* dtor_800A2D8C(CGObjWork* gObjWork, short shouldDelete)
  */
 void CGObjWork::Init(int baseDataIndex, CRomWork* romWork, int idOffset)
 {
-	short* romData = reinterpret_cast<short*>(romWork);
+	unsigned short* romData = reinterpret_cast<unsigned short*>(romWork);
 
 	m_baseDataIndex = baseDataIndex;
 	m_id = romData[0] + idOffset;
@@ -690,7 +690,7 @@ void CCaravanWork::FGPutGil(int gilToRemove)
 	int put = putGil__10CGPartyObjFi((CGPartyObj*)m_ownerObj, gilToRemove);
 	if (put != 0) {
 		m_gil += -gilToRemove;
-		if (99999999 < m_gil) {
+		if (m_gil > 99999999) {
 			m_gil -= m_gil - 99999999;
 		} else if (m_gil < 0) {
 			m_gil = 0;
@@ -2146,7 +2146,8 @@ extern "C" int GetCmdListItemName__12CCaravanWorkFi(CCaravanWork* caravanWork, i
 			for (int i = 0; i < groupedCount; i++) {
 				short invSlot = (short)caravanWork->m_commandListInventorySlotRef[cmdListIdx + i];
 				short itemId = (short)caravanWork->m_inventoryItems[invSlot];
-				if (*(short*)(Game.unkCFlatData0[2] + itemId * 0x48) == 1) {
+				int itemType = GetItemDataPtr(itemId)[0];
+				if (itemType == 1) {
 					*itemCmdListIdx = cmdListIdx + i;
 					return 1;
 				}

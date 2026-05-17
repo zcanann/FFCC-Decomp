@@ -397,27 +397,40 @@ void CGItemObj::onFrameStat()
 	float zero = FLOAT_80331b20;
 
 	switch (stateId) {
+	case 0x1b:
+		if (*(int*)(self + 0x528) <= 8) {
+			float wobble = (float)sin((double)(FLOAT_80331b9c * (float)(*(int*)(self + 0x528)) * FLOAT_80331b68));
+
+			*(float*)(self + 0x17c) = wobble;
+			*(float*)(self + 0x178) = wobble;
+			*(float*)(self + 0x174) = wobble;
+
+			if (*(int*)(self + 0x528) == 8) {
+				changeStat__8CGPrgObjFiii(this, 0, 0, 0);
+			}
+		}
+		break;
 	case 0: {
 		int hasOwner = *(int*)(self + 0x550) != 0;
 		int isActive = (self[0x50] & 8) != 0;
 
 		if (!hasOwner && isActive) {
-			double distance = (double)FLOAT_80331b20;
+			float distance = FLOAT_80331b20;
 
-			if (Game.unk_flat3_0xc7d0 == 0) {
+			if (Game.unk_flat3_0xc7d0 != 0) {
+				distance = PSVECDistance((Vec*)(self + 0x15c), (Vec*)(Game.unk_flat3_0xc7d0 + 0x15c));
+			} else {
 				if (*(int*)(CFlat + 0x4780) == 1) {
 					Vec partyCenter;
 
 					partyCenter.x = (Game.m_partyMinX + Game.m_partyMaxX) * FLOAT_80331b3c;
 					partyCenter.y = (Game.m_partyMinY + Game.m_partyMaxY) * FLOAT_80331b3c;
 					partyCenter.z = (Game.m_partyMinZ + Game.m_partyMaxZ) * FLOAT_80331b3c;
-					distance = (double)PSVECDistance((Vec*)(self + 0x15c), &partyCenter);
+					distance = PSVECDistance((Vec*)(self + 0x15c), &partyCenter);
 				}
-			} else {
-				distance = (double)PSVECDistance((Vec*)(self + 0x15c), (Vec*)(Game.unk_flat3_0xc7d0 + 0x15c));
 			}
 
-			if (*(int*)(self + 0x94) < 1 || DOUBLE_80331ba0 < distance) {
+			if (*(int*)(self + 0x94) <= 0 || distance > DOUBLE_80331ba0) {
 				Printf__7CSystemFPce(&System, const_cast<char*>(DAT_801dcf80));
 				*(float*)(self + 0x4b8) = FLOAT_80331b54;
 				*(float*)(self + 0x4b4) = zero;
@@ -428,11 +441,6 @@ void CGItemObj::onFrameStat()
 		}
 		break;
 	}
-	case 9:
-		if (*(int*)(self + 0x528) == 8) {
-			self[0x38] = static_cast<unsigned char>(__rlwimi(self[0x38], 1, 7, 24, 24));
-		}
-		break;
 	case 0xB:
 		if (*(int*)(self + 0x528) == *(int*)(self + 0x554)) {
 			CVector attachOffset(FLOAT_80331b20, FLOAT_80331b20, FLOAT_80331b20);
@@ -479,7 +487,7 @@ void CGItemObj::onFrameStat()
 		if (*(int*)(self + 0x528) == *(int*)(self + 0x554)) {
 			CGPartyObj* carryObj = *(CGPartyObj**)(self + 0x550);
 			Vec safePos;
-			float launchSpeed = FLOAT_80331b40;
+			float launchSpeed;
 
 			if (*(int*)(self + 0x520) == 0xC) {
 				bool useMenuLaunchSpeed = false;
@@ -518,8 +526,13 @@ void CGItemObj::onFrameStat()
 			Detach__8CGObjectFv(this);
 			*(Vec*)(self + 0x15C) = safePos;
 
-			float ownerRotY = *(float*)((unsigned char*)carryObj + 0x1B4);
-			CVector moveVec((float)sin((double)ownerRotY), FLOAT_80331b54, (float)cos((double)ownerRotY));
+			if (*(int*)(self + 0x520) != 0xC) {
+				launchSpeed = FLOAT_80331b40;
+			}
+
+			float ownerCos = (float)cos((double)*(float*)((unsigned char*)carryObj + 0x1B4));
+			float ownerSin = (float)sin((double)*(float*)((unsigned char*)carryObj + 0x1B4));
+			CVector moveVec(ownerSin, FLOAT_80331b54, ownerCos);
 			MoveVector__8CGObjectFP3Vecfiiii(this, reinterpret_cast<Vec*>(&moveVec), launchSpeed, 1, 0, 1, 0);
 
 			*(int*)(self + 0x550) = 0;
@@ -531,7 +544,7 @@ void CGItemObj::onFrameStat()
 			int worldParamA = *(int*)(self + 0x500);
 			bool isActive = (self[0x50] & 0x80) != 0;
 
-			if ((worldParamA == 1 || worldParamA == 2) && isActive) {
+			if ((worldParamA == 0xD || worldParamA == 0xE) && isActive) {
 				changeStat__8CGPrgObjFiii(this, 0x1F, 0, 0);
 			} else if (isActive) {
 				changeStat__8CGPrgObjFiii(this, 0, 0, 0);
@@ -569,19 +582,6 @@ void CGItemObj::onFrameStat()
 			prgObj->m_rotationZ = prgObj->m_rotationZ * FLOAT_80331BAC;
 		}
 		break;
-	case 0x1b:
-		if (*(int*)(self + 0x528) < 9) {
-			float wobble = (float)sin((double)(FLOAT_80331b9c * (float)(*(int*)(self + 0x528)) * FLOAT_80331b68));
-
-			*(float*)(self + 0x17c) = wobble;
-			*(float*)(self + 0x178) = wobble;
-			*(float*)(self + 0x174) = wobble;
-
-			if (*(int*)(self + 0x528) == 8) {
-				changeStat__8CGPrgObjFiii(this, 0, 0, 0);
-			}
-		}
-		break;
 	case 0x1F:
 		pppSetLocSlot__8CPartMngFiP3Vec(&PartMng, *(int*)(self + 0x55C), &prgObj->m_worldPosition);
 
@@ -589,11 +589,11 @@ void CGItemObj::onFrameStat()
 			if (*(int*)(self + 0x530) == 0x7D) {
 				EndParticleSlot__13CFlatRuntime2Fii(CFlat, *(int*)(self + 0x55C), 0);
 			}
-		} else if (*(int*)(self + 0x52C) == 0 && *(int*)(self + 0x530) == 0) {
+		} else if (*(int*)(self + 0x52C) < 1 && -1 < *(int*)(self + 0x52C) && *(int*)(self + 0x530) == 0) {
 			int particleNoA;
 			int particleNoB;
 
-			if (*(int*)(self + 0x500) == 2) {
+			if (*(int*)(self + 0x500) == 0xE) {
 				particleNoA = 0x19;
 				particleNoB = 0x1E;
 			} else {
@@ -764,6 +764,11 @@ void CGItemObj::onFrameStat()
 		}
 		break;
 	}
+	case 9:
+		if (*(int*)(self + 0x528) == 8) {
+			self[0x38] = static_cast<unsigned char>(__rlwimi(self[0x38], 1, 7, 24, 24));
+		}
+		break;
 	default:
 		break;
 	}
@@ -804,7 +809,7 @@ int CGItemObj::DeleteOld(int deleteMask, int maxDeleteCount, CFlatRuntime::CObje
 			if ((unsigned int)System.m_execParam >= 3U) {
 				Printf__7CSystemFPce(&System, const_cast<char*>(DAT_801dced4));
 			}
-			return deletedCount;
+			break;
 		}
 
 		deletedCount++;
@@ -1396,26 +1401,27 @@ void CGItemObj::DrawOmoideName(CFont* font)
 			hasModel = true;
 		}
 
-		if (hasModel && *(int*)(self + 0x500) == 0xCB && FLOAT_80331b20 < *(float*)(self + 0x74) &&
-		    FLOAT_80331b20 != *(float*)(self + 0x4B0)) {
+		if (hasModel && *(int*)(self + 0x500) == 0xCB && 0.0f < *(float*)(self + 0x74) &&
+		    0.0f != *(float*)(self + 0x4B0)) {
 			font->SetTlut(7);
 
-			int alphaInt = (int)(FLOAT_80331b30 * *(float*)(self + 0x4B0));
+			int alphaInt = (int)(255.0f * *(float*)(self + 0x4B0));
+			u32 textColor;
 			GXColor constructedColor;
-			GXColor textColor = *(GXColor*)__ct__6CColorFUcUcUcUc(&constructedColor, 0xFF, 0xFF, 0xFF, alphaInt);
-			SetColor__5CFontF8_GXColor(font, &textColor);
+			textColor = *(u32*)__ct__6CColorFUcUcUcUc(&constructedColor, 0xFF, 0xFF, 0xFF, alphaInt);
+			SetColor__5CFontF8_GXColor(font, reinterpret_cast<GXColor*>(&textColor));
 
 			const ItemObjFlatData* flatData = reinterpret_cast<const ItemObjFlatData*>(&Game.m_cFlatDataArr[1]);
 			const char* name = flatData->table[2].index[*(int*)(self + 0x570)];
 			float width = font->GetWidth(name);
 			float depthScale = FLOAT_80331b18 / (*(float*)(self + 0x74) - FLOAT_80331b1c);
-			float posY = FLOAT_80331b34 - FLOAT_80331b34 * *(float*)(self + 0x6C) * depthScale;
+			float posY = 224.0f - 224.0f * *(float*)(self + 0x6C) * depthScale;
 			float posZ = *(float*)(self + 0x70) * depthScale;
 			float posX =
-			    -(FLOAT_80331b3c * width - (FLOAT_80331b38 * *(float*)(self + 0x68) * depthScale + FLOAT_80331b38));
+			    -(0.5f * width - (320.0f * *(float*)(self + 0x68) * depthScale + 320.0f));
 
 			font->SetPosX(posX);
-			font->SetPosY(posY - FLOAT_80331b40);
+			font->SetPosY(posY - 11.0f);
 			font->SetPosZ(posZ);
 			font->Draw(name);
 		}

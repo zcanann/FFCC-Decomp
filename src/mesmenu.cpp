@@ -266,7 +266,13 @@ void CMesMenu::Open(char* script, int x, int y, int flags, int unk1, int unk2, i
     }
     SetPosition__4CMesFff((char*)this + 0x1C, fVar1, (float)dVar4);
 
-    *(unsigned int*)((char*)this + 0x0C) = ((unsigned int)flags >> 4) & 1;
+    unsigned int state;
+    if (*(int*)((char*)this + 0x18) < 4) {
+        state = ((unsigned int)flags >> 4) & 1;
+    } else {
+        state = (flags & 0x10) != 0;
+    }
+    *(unsigned int*)((char*)this + 0x0C) = state;
     *(int*)((char*)this + 0x10) = 0;
     *(int*)((char*)this + 0x14) = 8;
     if ((flags & 0x11) == 0 && ((*(unsigned int*)((char*)this + 0x3D8C) & 0x4000) == 0)) {

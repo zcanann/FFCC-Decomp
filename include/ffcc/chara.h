@@ -38,6 +38,7 @@ public:
 
 	class CAnim : public CRef
 	{
+	public:
 		CAnim();
 		~CAnim();
 
@@ -50,6 +51,9 @@ public:
         void IsBanked();
         void SetLastFrame(int);
         void SetInterp(int);
+
+		u8 _pad8[0x8];
+		u16 m_frameCount;
 	};
 
 	class CAnimNode
@@ -81,7 +85,9 @@ public:
 		void Duplicate(CChara::CNode*, CMemory::CStage*);
 		void CalcBind(CChara::CModel*);
 
-		u8 _pad0[0x6C];
+		u8 _pad0[0x14];
+		Mtx m_localRuntimeMtx;
+		u8 _pad44[0x28];
 		Mtx m_mtx;
 		u8 _pad9C[0x20];
 		u8 m_flags;

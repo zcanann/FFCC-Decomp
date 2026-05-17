@@ -87,18 +87,19 @@ static inline void* TextureAt(CTextureSet* textureSet, unsigned long index)
 
 static inline void ReplaceRef(void** slot, void* ref)
 {
-    int* current = reinterpret_cast<int*>(*slot);
+    CRef* current = reinterpret_cast<CRef*>(*slot);
     if (current != 0) {
-        int refCount = current[1] - 1;
-        current[1] = refCount;
-        if ((refCount == 0) && (current != 0)) {
-            (*reinterpret_cast<void (**)(int*, int)>(*current + 8))(current, 1);
+        int* refCountPtr = reinterpret_cast<int*>(Ptr(current, 4));
+        int refCount = *refCountPtr - 1;
+        *refCountPtr = refCount;
+        if (refCount == 0) {
+            delete current;
         }
         *slot = 0;
     }
 
     *slot = ref;
-    *reinterpret_cast<int*>(Ptr(ref, 4)) = *reinterpret_cast<int*>(Ptr(ref, 4)) + 1;
+    reinterpret_cast<CRef*>(ref)->AddRef();
 }
 
 static inline void SetMaterialTextureSlot(void* material, unsigned long slotIndex, void* texture)

@@ -172,8 +172,8 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 	CAPos* behindBest = (CAPos*)0;
 	CAPos* aheadBest = (CAPos*)0;
 	float aheadBestDist = behindBestDist;
-	int i = 0;
 	CAPos* portal = m_portals;
+	int i = 0;
 
 	do
 	{
@@ -1089,14 +1089,14 @@ void CAStar::CATemp::operator= (const CAStar::CATemp& other)
 void CAStar::addAstar(float x, float y, float z, int groupA, int groupB)
 {
 	int groupLow = groupA;
+	int groupHigh = groupB;
 	Vec* pos = reinterpret_cast<Vec*>(&CVector(x, y, z));
 
 	if (groupB < groupA)
 	{
 		groupLow = groupB;
-		groupB = groupA;
+		groupHigh = groupA;
 	}
-	groupA = groupLow;
 
 	int index = 0;
 
@@ -1104,7 +1104,7 @@ void CAStar::addAstar(float x, float y, float z, int groupA, int groupB)
 	{
 		CAPos& p = m_portals[index];
 
-		if (p.m_groupA == groupA && p.m_groupB == groupB)
+		if (p.m_groupA == groupLow && p.m_groupB == groupHigh)
 		{
 			break;
 		}
@@ -1136,8 +1136,8 @@ void CAStar::addAstar(float x, float y, float z, int groupA, int groupB)
 	portal.m_position.x = pos->x;
 	portal.m_position.y = pos->y;
 	portal.m_position.z = pos->z;
-	m_portals[index].m_groupA = static_cast<unsigned char>(groupA);
-	m_portals[index].m_groupB = static_cast<unsigned char>(groupB);
+	m_portals[index].m_groupA = static_cast<unsigned char>(groupLow);
+	m_portals[index].m_groupB = static_cast<unsigned char>(groupHigh);
 }
 /*
  * --INFO--

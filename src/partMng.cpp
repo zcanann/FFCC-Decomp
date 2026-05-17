@@ -4224,10 +4224,10 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
  */
 int CPartMng::pppCreate(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam, int allowFpOverride)
 {
-    if (DAT_8032ed68 == 0) {
-        return pppCreate0(pdtSlotIndex, fpNo, createParam, allowFpOverride);
+    if (PartPcs.m_usbStreamData.m_disableShokiDraw != 0) {
+        return -1;
     }
-    return -1;
+    return pppCreate0(pdtSlotIndex, fpNo, createParam, allowFpOverride);
 }
 
 /*

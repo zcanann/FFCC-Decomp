@@ -25,6 +25,27 @@ static const float FLOAT_80332fe8 = 128.0f;
 static const float FLOAT_80332fec = 8.0f;
 static const float FLOAT_80332ff0 = 0.75f;
 
+extern "C" {
+extern const float FLOAT_80333448 = -1.0f;
+extern const float FLOAT_8033344c = 1.2f;
+extern const float FLOAT_80333450 = 10000000000.0f;
+extern const float FLOAT_80333454 = -10000000000.0f;
+extern const float FLOAT_80333458 = 15.5f;
+extern const float FLOAT_8033345c = 6.2831855f;
+const char s_MenuOptionMusic[] = "Music";
+const char s_MenuOptionOn[] = "On";
+const char s_MenuOptionOff[] = "Off";
+const char s_MenuOptionStereo[] = "Stereo";
+const char s_MenuOptionMin[] = "Min";
+const char s_MenuOptionMax[] = "Max";
+const char s_MenuOptionStrengthDe[] = {'S', 't', '\xe4', 'r', 'k', 'e', '\0', '\0'};
+const char s_MenuOptionDefenceDe[] = "Abwehr";
+const char s_MenuOptionMusicDe[] = "Musik";
+const char s_MenuOptionOnDe[] = "AN";
+const char s_MenuOptionOffDe[] = "AUS";
+const char s_MenuOptionStereoDe[] = "STEREO";
+}
+
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 extern "C" void SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(CMenuPcs*, int);
 extern "C" void SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(CMenuPcs*, int);
@@ -740,7 +761,7 @@ void CMenuPcs::ArtiInit()
 	float fVar3;
 	float fVar4;
 	int iVar5;
-	short sVar6;
+	int sVar6;
 	short sVar7;
 	short* psVar8;
 	int iVar9;
@@ -823,10 +844,8 @@ void CMenuPcs::ArtiInit()
 	iVar11 = 4;
 	do {
 		psVar8 = (short*)(GetArtiListBase(this) + iVar5 + 8);
-		psVar8[0x16] = 0;
-		psVar8[0x17] = 2;
-		psVar8[0xe] = 0;
-		psVar8[0xf] = 0x37;
+		*(int*)(psVar8 + 0x16) = 2;
+		*(int*)(psVar8 + 0xe) = 0x37;
 		sVar7 = sVar7 + 2;
 		*psVar8 = *(short*)(iVar10 + 8) + 0x24;
 		sVar1 = sVar6 + 0x20;
@@ -842,10 +861,8 @@ void CMenuPcs::ArtiInit()
 		iVar9 = iVar5 + 0x48;
 		iVar5 = iVar5 + 0x80;
 		psVar8 = (short*)(GetArtiListBase(this) + iVar9);
-		psVar8[0x16] = 0;
-		psVar8[0x17] = 2;
-		psVar8[0xe] = 0;
-		psVar8[0xf] = 0x37;
+		*(int*)(psVar8 + 0x16) = 2;
+		*(int*)(psVar8 + 0xe) = 0x37;
 		*psVar8 = *(short*)(iVar10 + 8) + 0x24;
 		sVar6 = sVar6 + 0x40;
 		psVar8[1] = *(short*)(iVar10 + 10) + sVar1;

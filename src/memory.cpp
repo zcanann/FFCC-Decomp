@@ -731,7 +731,7 @@ CMemory::CStage* CMemory::CreateStage(unsigned long size, char* source, int mode
                         source = DAT_8032f7d4;
                     }
                     strcpy(reinterpret_cast<char*>(stageBytes + 0x10), source);
-                    *reinterpret_cast<int*>(stageBytes + 0x10C) = mode;
+                    stage->m_allocationMode = mode;
 
                     if (mode != 2) {
                         unsigned char* fill = reinterpret_cast<unsigned char*>(
@@ -781,7 +781,7 @@ CMemory::CStage* CMemory::CreateStage(unsigned long size, char* source, int mode
                         *reinterpret_cast<int*>(stageBytes + 0x120) = 0;
                     }
 
-                    *reinterpret_cast<unsigned int*>(stageBytes + 0x108) = static_cast<unsigned int>(-1);
+                    stage->m_defaultParam = static_cast<unsigned int>(-1);
                     return stage;
                 }
                 list = next;
@@ -1079,7 +1079,7 @@ void* CMemory::CStage::alloc(unsigned long size, char* source, unsigned long lin
                         static_cast<unsigned char>(
                             *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Memory) + 0x779C) << 4);
                     *reinterpret_cast<unsigned long*>(node + 0x14) =
-                        *reinterpret_cast<unsigned long*>(reinterpret_cast<unsigned char*>(this) + 0x108);
+                        m_defaultParam;
                     *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x124) += 1;
                     *reinterpret_cast<CStage**>(node + 0x0C) = this;
                     break;
@@ -2092,10 +2092,7 @@ void CAmemCacheSet::AmemFreeLowPrio(int size)
         }
 
         if (bestEntry != 0) {
-            int cachedData = reinterpret_cast<int>(bestEntry->m_cacheData);
-            if (cachedData != 0) {
-                operator delete(reinterpret_cast<void*>(cachedData));
-            }
+            operator delete(bestEntry->m_cacheData);
             bestEntry->m_cacheData = 0;
         }
 
@@ -2327,7 +2324,7 @@ void CMemory::CStage::heapInfo(unsigned long& heapTotal, unsigned long& heapUse,
     int top;
     int node;
 
-    if (m_unknown11C == 2) {
+    if (m_allocationMode == 2) {
         node = stageGetHeapHead(this);
     } else {
         node = *reinterpret_cast<int*>(stageGetHeapHead(this) + 8);
@@ -2337,7 +2334,7 @@ void CMemory::CStage::heapInfo(unsigned long& heapTotal, unsigned long& heapUse,
     heapUse = 0;
     heapUnuse = 0;
 
-    if (m_unknown11C == 2) {
+    if (m_allocationMode == 2) {
         top = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 8);
 
         for (i = 0; i <= *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x120); i++, node += 0x40) {

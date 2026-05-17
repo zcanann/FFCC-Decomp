@@ -19,9 +19,6 @@ extern const float kPppHeapUseRateDivisor;
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
 extern "C" const char s_no_name_8032fdcc[];
-extern "C" {
-const char s_no_name_8032fdcc[] = "no name";
-}
 
 extern "C" CProfile* __ct__8CProfileFPc(CProfile*, char*);
 extern "C" CProfile* __dt__8CProfileFv(CProfile*, short);
@@ -144,12 +141,6 @@ static const char DAT_801d81d4[] = {
     (char)0x82, (char)0xDC, (char)0x82, (char)0xB7, (char)0x81, (char)0x42, (char)0x0A, (char)0x00,
     (char)0x00, (char)0x00, (char)0x00, (char)0x00,
 };
-extern "C" {
-const char* g_MaxDataSize;
-signed char g_MaxHeapSize[4];
-int lbl_8032ED48;
-signed char lbl_8032ED4C;
-}
 unsigned int CPartPcs::m_table_desc0[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__8CPartPcsFv)};
 unsigned int CPartPcs::m_table_desc1[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__8CPartPcsFv)};
 unsigned int CPartPcs::m_table_desc2[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcInit__8CPartPcsFv)};
@@ -200,6 +191,12 @@ char g_MsgFlashy[0x36] =
     "\x81\x9A\x81\x99\x0A";
 int DAT_8032ed38;
 int DAT_8032ed3c;
+extern "C" {
+const char* g_MaxDataSize;
+signed char g_MaxHeapSize[4];
+int lbl_8032ED48;
+signed char lbl_8032ED4C;
+}
 
 /*
  * --INFO--
@@ -1205,6 +1202,10 @@ void CPartPcs::GetParColIdx(int index, pppFVECTOR4& color)
 	color.y = pppMngSt->g;
 	color.z = pppMngSt->b;
 	color.w = pppMngSt->a;
+}
+
+extern "C" {
+const char s_no_name_8032fdcc[] = "no name";
 }
 
 /*

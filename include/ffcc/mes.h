@@ -29,7 +29,7 @@ public:
     void SetPosition(float, float);
     int useFlag(int, int);
     void addFlag(class CFlag&);
-    void MakeAgbString(char*, char*, int, int);
+    static void MakeAgbString(char*, char*, int, int);
     static unsigned long drawTagString(CFont*, char*, int, int, int);
     static int m_tempVar[0x14];
 

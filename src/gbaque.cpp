@@ -1004,17 +1004,17 @@ void GbaQueue::SetSmithData(int channel, unsigned int value)
 
 	unsigned int materialTable = itemTableBase;
 	for (int i = 0; i < 3; i++, materialTable += 2) {
-		const unsigned short materialId = *reinterpret_cast<unsigned short*>(materialTable + 0x26);
+		const unsigned int materialId = *reinterpret_cast<unsigned short*>(materialTable + 0x26);
 		if (materialId == 0) {
 			break;
 		}
 
-		const unsigned short materialCount = *reinterpret_cast<unsigned short*>(materialTable + 0x2C);
+		const unsigned int materialCount = *reinterpret_cast<unsigned short*>(materialTable + 0x2C);
 		if (materialCount == 0) {
 			break;
 		}
 
-		for (int materialIdx = 0; materialIdx < materialCount; materialIdx++) {
+		for (int materialIdx = 0; materialIdx < static_cast<int>(materialCount); materialIdx++) {
 			CCaravanWork* currentWork = reinterpret_cast<CCaravanWork*>(*scriptFoodBase);
 			int foundSlot = 0;
 			int rowBase = 0;
@@ -1064,13 +1064,13 @@ void GbaQueue::SetSmithData(int channel, unsigned int value)
 		}
 	}
 
-	if (AddItem__12CCaravanWorkFiPi(reinterpret_cast<void*>(caravanWork), smithItem, 0) == 0) {
+	if (caravanWork->AddItem(smithItem, 0) == 0) {
 		Joybus.SendResult(channel, 1, valueBytes[0], valueBytes[1]);
 	}
 
 	const float smithRate = static_cast<float>(caravanWork->m_shopParam) / 100.0f;
 	const int gilCost = -static_cast<int>(static_cast<float>(*reinterpret_cast<unsigned short*>(itemTableBase + 0x24)) * smithRate);
-	if (AddGil__12CCaravanWorkFi(reinterpret_cast<void*>(caravanWork), gilCost) == 0) {
+	if (caravanWork->AddGil(gilCost) == 0) {
 		Joybus.SendResult(channel, 1, valueBytes[0], valueBytes[1]);
 	}
 
@@ -4008,34 +4008,34 @@ Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocat
 				const int recipeBase = itemBase + j * 4;
 
 				const unsigned short materialA = *reinterpret_cast<unsigned short*>(recipeBase + 0x38);
-				reinterpret_cast<unsigned short*>(itemBuf)[8 + j] = SwapU16(materialA);
+				reinterpret_cast<unsigned short*>(itemBuf)[8 + j * 2] = SwapU16(materialA);
 				if (materialA == 0) {
-					reinterpret_cast<unsigned short*>(itemBuf)[12 + j * 2] = 0;
-					reinterpret_cast<unsigned short*>(itemBuf)[13 + j * 2] = 0;
-					reinterpret_cast<unsigned short*>(itemBuf)[14 + j * 2] = 0;
+					reinterpret_cast<unsigned short*>(itemBuf)[12 + j * 8] = 0;
+					reinterpret_cast<unsigned short*>(itemBuf)[13 + j * 8] = 0;
+					reinterpret_cast<unsigned short*>(itemBuf)[14 + j * 8] = 0;
 				} else {
 					const int materialBase = flatBase + materialA * 0x48;
-					reinterpret_cast<unsigned short*>(itemBuf)[12 + j * 2] =
+					reinterpret_cast<unsigned short*>(itemBuf)[12 + j * 8] =
 						SwapU16(*reinterpret_cast<unsigned short*>(materialBase + 4));
-					reinterpret_cast<unsigned short*>(itemBuf)[13 + j * 2] =
+					reinterpret_cast<unsigned short*>(itemBuf)[13 + j * 8] =
 						SwapU16(*reinterpret_cast<unsigned short*>(materialBase + 6));
-					reinterpret_cast<unsigned short*>(itemBuf)[14 + j * 2] =
+					reinterpret_cast<unsigned short*>(itemBuf)[14 + j * 8] =
 						SwapU16(*reinterpret_cast<unsigned short*>(materialBase + 8));
 				}
 
 				const unsigned short materialB = *reinterpret_cast<unsigned short*>(recipeBase + 0x3A);
-				reinterpret_cast<unsigned short*>(itemBuf)[17 + j] = SwapU16(materialB);
+				reinterpret_cast<unsigned short*>(itemBuf)[9 + j * 2] = SwapU16(materialB);
 				if (materialB == 0) {
-					reinterpret_cast<unsigned short*>(itemBuf)[16 + j * 2] = 0;
-					reinterpret_cast<unsigned short*>(itemBuf)[17 + j * 2 + 2] = 0;
-					reinterpret_cast<unsigned short*>(itemBuf)[18 + j * 2 + 2] = 0;
+					reinterpret_cast<unsigned short*>(itemBuf)[16 + j * 8] = 0;
+					reinterpret_cast<unsigned short*>(itemBuf)[17 + j * 8] = 0;
+					reinterpret_cast<unsigned short*>(itemBuf)[18 + j * 8] = 0;
 				} else {
 					const int materialBase = flatBase + materialB * 0x48;
-					reinterpret_cast<unsigned short*>(itemBuf)[16 + j * 2] =
+					reinterpret_cast<unsigned short*>(itemBuf)[16 + j * 8] =
 						SwapU16(*reinterpret_cast<unsigned short*>(materialBase + 4));
-					reinterpret_cast<unsigned short*>(itemBuf)[17 + j * 2 + 2] =
+					reinterpret_cast<unsigned short*>(itemBuf)[17 + j * 8] =
 						SwapU16(*reinterpret_cast<unsigned short*>(materialBase + 6));
-					reinterpret_cast<unsigned short*>(itemBuf)[18 + j * 2 + 2] =
+					reinterpret_cast<unsigned short*>(itemBuf)[18 + j * 8] =
 						SwapU16(*reinterpret_cast<unsigned short*>(materialBase + 8));
 				}
 			}

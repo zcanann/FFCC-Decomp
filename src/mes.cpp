@@ -34,6 +34,8 @@ static const char s_mesTagMissing[] = "This TAG is not created. %02x\n";
 static const char s_mesNumFmt[] = "%d";
 static const char s_mesFallback[] = "---";
 static const char s_mesEmpty[] = "";
+static char* sTag54Source;
+static unsigned char sTag54Init;
 
 struct CMesFlatTableView
 {
@@ -829,11 +831,10 @@ void CMes::Draw()
 	if (*(int*)((char*)this + 8) != 0)
 	{
 		unsigned char* menuPcs = reinterpret_cast<unsigned char*>(&MenuPcs);
-		unsigned int globalAlpha;
+		int globalAlpha;
 		if ((*(int*)((char*)this + 0x3CAC) != 0) && (*(int*)((char*)this + 0x3CB8) != 0))
 		{
-			globalAlpha = 0xFF - (unsigned int)(*(int*)((char*)this + 0x3CBC) * 0xFF) /
-			                        (unsigned int)*(int*)((char*)this + 0x3CB8);
+			globalAlpha = 0xFF - (*(int*)((char*)this + 0x3CBC) * 0xFF) / *(int*)((char*)this + 0x3CB8);
 		}
 		else
 		{
@@ -848,7 +849,7 @@ void CMes::Draw()
 		for (int i = 0; i < *(int*)((char*)this + 8); i++)
 		{
 			CFont* nextFont = font;
-			if ((int)(unsigned int)*(unsigned short*)(glyph + 2) <= *(int*)((char*)this + 0x3C80))
+			if ((int)(unsigned int)*(unsigned short*)((char*)glyph + 0x0C) <= *(int*)((char*)this + 0x3C80))
 			{
 				unsigned int ch = (unsigned int)*(unsigned char*)(glyph + 4);
 				if (ch < 0x20)
@@ -1073,8 +1074,6 @@ int CMes::useFlag(int maxCount, int stopOnClear)
  */
 void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOnLineBreak)
 {
-	static char* sTag54Source = (char*)s_mesEmpty;
-	static int sTag54Init = 0;
 	if (sTag54Init == 0)
 	{
 		sTag54Source = (char*)s_mesEmpty;

@@ -40,11 +40,6 @@ struct pppCrystal2UnkB {
     f32 m_perspectiveScale;
 };
 
-struct pppCrystal2UnkC {
-    u8 _pad0[0xC];
-    s32* m_serializedDataOffsets;
-};
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -52,10 +47,10 @@ extern "C" {
 void ImageBufferSetPixel_IA8(HSD_ImageBuffer*, unsigned long, unsigned long, unsigned long, unsigned long, unsigned long, unsigned long);
 void MakeRefractionMap(HSD_ImageBuffer*);
 
-void pppConstructCrystal2(pppCrystal2* crystal, pppCrystal2UnkC* param_2);
-void pppDestructCrystal2(pppCrystal2* crystal, pppCrystal2UnkC* param_2);
-void pppFrameCrystal2(pppCrystal2* crystal, pppCrystal2UnkB* param_2, pppCrystal2UnkC* param_3);
-void pppRenderCrystal2(pppCrystal2* crystal, pppCrystal2UnkB* param_2, pppCrystal2UnkC* param_3);
+void pppConstructCrystal2(pppCrystal2* crystal, _pppCtrlTable* param_2);
+void pppDestructCrystal2(pppCrystal2* crystal, _pppCtrlTable* param_2);
+void pppFrameCrystal2(pppCrystal2* crystal, pppCrystal2UnkB* param_2, _pppCtrlTable* param_3);
+void pppRenderCrystal2(pppCrystal2* crystal, pppCrystal2UnkB* param_2, _pppCtrlTable* param_3);
 
 #ifdef __cplusplus
 }

@@ -21,7 +21,7 @@ extern const float FLOAT_80331060 = 0.0f;
 extern const float FLOAT_80331064 = 0.0078125f;
 extern const float FLOAT_80331068 = -1.0f;
 extern const float FLOAT_8033106C = 16777215.0f;
-extern const double DOUBLE_80331070 = 4503601774854144.0;
+extern const double DOUBLE_80331070 = 4503599627370496.0;
 __declspec(section ".sdata2") unsigned long long g_chara_fur_1;
 __declspec(section ".sdata2") unsigned long long g_chara_fur_2;
 
@@ -45,7 +45,7 @@ extern "C" char* sMogRadarTypeLabels[];
 extern "C" char sMogRadarDebugFormatBlock[];
 extern "C" char sMogFurTextureName[];
 extern "C" {
-extern unsigned char m_mogWork[0x2C];
+extern unsigned char m_mogWork[0x30];
 void* gMogFurTexBuffer;
 }
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
@@ -373,21 +373,21 @@ void CChara::TimeMogFur()
 
 	if (*timeStamp + 0x1A5E0 < System.m_frameCounter) {
 		*timeStamp = System.m_frameCounter;
-		if (static_cast<unsigned int>(System.m_execParam) > 2U) {
+		if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
 			System.Printf("");
 		}
-		if (static_cast<unsigned int>(System.m_execParam) > 2U) {
-			System.Printf("");
+		if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
+			System.Printf(sMogRadarDebugFormatBlock);
 		}
-		if (static_cast<unsigned int>(System.m_execParam) > 2U) {
+		if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
 			System.Printf("");
 		}
 	}
 
 	memset(reinterpret_cast<unsigned char*>(this) + 0x2018, 0, 0x40);
 
-	for (unsigned int y = 0; y < 0x40; y++) {
-		for (unsigned int x = 0; x < 0x40; x++) {
+	for (int y = 0; y < 0x40; y++) {
+		for (int x = 0; x < 0x40; x++) {
 			int light;
 			int r;
 			int g;
@@ -694,7 +694,7 @@ static Vec s_mogFurVelocityRand;
 static Vec s_mogFurAccel;
 static Vec s_mogFurAccelRand;
 extern "C" {
-unsigned char m_mogWork[0x2C];
+unsigned char m_mogWork[0x30];
 }
 static unsigned int s_mogFurRand;
 static float s_mogFurMaxY;

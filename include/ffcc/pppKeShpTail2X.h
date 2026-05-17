@@ -11,16 +11,15 @@ struct pppKeShpTail2X
 };
 
 struct pppKeShpTail2XUnkB;
-struct pppKeShpTail2XUnkC;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void pppKeShpTail2X(struct pppKeShpTail2X*, struct pppKeShpTail2XUnkB*, struct pppKeShpTail2XUnkC*);
-void pppKeShpTail2XDraw(struct pppKeShpTail2X*, struct pppKeShpTail2XUnkB*, struct pppKeShpTail2XUnkC*);
-void pppKeShpTail2XCon(void*, void*);
-void pppKeShpTail2XDes(void*, void*);
+void pppKeShpTail2X(struct pppKeShpTail2X*, struct pppKeShpTail2XUnkB*, _pppCtrlTable*);
+void pppKeShpTail2XDraw(struct pppKeShpTail2X*, struct pppKeShpTail2XUnkB*, _pppCtrlTable*);
+void pppKeShpTail2XCon(void*, _pppCtrlTable*);
+void pppKeShpTail2XDes(void*, _pppCtrlTable*);
 
 #ifdef __cplusplus
 }

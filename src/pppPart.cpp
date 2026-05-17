@@ -40,10 +40,9 @@ static int CrossCheckSphereVectorRaw(Vec* outPos, float* outT, Vec* origin, Vec*
                                                                   scale, innerRadius, outerRadius);
 }
 
-static const float kPppZero = 0.0; // FLOAT_8032fddc
-static const float kPppOne = 1.0; // FLOAT_8032fdfc
 static const double kScaleConstA = 4503601774854144.0; // DOUBLE_803304b0
 static const float kScaleConstB = 0.017453292f; // FLOAT_803304a8
+static const float kPppLocalZero = 0.0f;
 extern "C" unsigned char gPppBlendModeState;
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 extern "C" float FLOAT_8032ed8c;
@@ -107,7 +106,8 @@ static inline unsigned char* PartPcsRaw() { return reinterpret_cast<unsigned cha
 static const char s_pppPart_cpp[] = "pppPart.cpp";
 static const char s_ERROR_prog_NULL[] = "\nERROR!!!! prog=NULL\n\n";
 static const char s_CPartPcs_heap_801D821C[] = "CPartPcs.heap";
-extern "C" float FLOAT_8032fddc;
+extern "C" const float FLOAT_8032fddc;
+extern "C" const float FLOAT_8032fdfc;
 extern "C" float FLOAT_8032fde0;
 extern "C" float FLOAT_8032fde4;
 extern "C" float FLOAT_8032FDE8;
@@ -248,12 +248,16 @@ void pppSetRowVector(pppFMATRIX& pppFMtx, Vec& vecA, Vec& vecB, Vec& vecC, Vec& 
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 800574a0
+ * PAL Size: 84b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void pppNormalize(Vec& dest, Vec source)
 { 
-	float zero = kPppZero;
+	float zero = FLOAT_8032fddc;
 	if ((source.x == zero) && (source.y == zero) && (source.z == zero)) {
 		return;
 	}
@@ -317,16 +321,20 @@ void pppSubVector(Vec& dest, Vec a, Vec b)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 80057388
+ * PAL Size: 52b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 float pppVectorLength(Vec vec)
 {
 	Vec zeroVec;
 
-	zeroVec.x = kPppZero;
-	zeroVec.y = kPppZero;
-	zeroVec.z = kPppZero;
+	zeroVec.x = FLOAT_8032fddc;
+	zeroVec.y = FLOAT_8032fddc;
+	zeroVec.z = FLOAT_8032fddc;
 
 	return PSVECDistance(&vec, &zeroVec);
 }
@@ -1343,7 +1351,7 @@ MatrixMode7:
 	goto ScaleOnly;
 
 ScaleOnly:
-	if (pppMngSt->m_scale.x != kPppOne) {
+	if (pppMngSt->m_scale.x != FLOAT_8032fdfc) {
 		scaleAxis0.x = pppMngStPtr->m_matrix.value[0][0];
 		scaleAxis0.y = pppMngStPtr->m_matrix.value[1][0];
 		scaleAxis0.z = pppMngStPtr->m_matrix.value[2][0];
@@ -1353,7 +1361,7 @@ ScaleOnly:
 		pppMngStPtr->m_matrix.value[2][0] = scaleAxis0.z;
 	}
 
-	if (pppMngSt->m_scale.y != kPppOne) {
+	if (pppMngSt->m_scale.y != FLOAT_8032fdfc) {
 		scaleAxis1.x = pppMngStPtr->m_matrix.value[0][1];
 		scaleAxis1.y = pppMngStPtr->m_matrix.value[1][1];
 		scaleAxis1.z = pppMngStPtr->m_matrix.value[2][1];
@@ -1363,7 +1371,7 @@ ScaleOnly:
 		pppMngStPtr->m_matrix.value[2][1] = scaleAxis1.z;
 	}
 
-	if (pppMngSt->m_scale.z == kPppOne) {
+	if (pppMngSt->m_scale.z == FLOAT_8032fdfc) {
 		return;
 	}
 
@@ -1454,21 +1462,21 @@ void pppSetFpMatrix(_pppMngSt* pppMngSt)
 	local_70.z = ppvWorldMatrix[2][1];
 	local_90.y = ppvWorldMatrix[1][1];
 	local_90.z = ppvWorldMatrix[2][1];
-	if ((ppvWorldMatrix[0][1] != kPppZero) || (ppvWorldMatrix[1][1] != kPppZero) || (ppvWorldMatrix[2][1] != kPppZero)) {
+	if ((ppvWorldMatrix[0][1] != FLOAT_8032fddc) || (ppvWorldMatrix[1][1] != FLOAT_8032fddc) || (ppvWorldMatrix[2][1] != FLOAT_8032fddc)) {
 		PSVECNormalize(&local_90, &local_70);
 	}
 
 	local_60.x = local_70.y;
 	local_9c.y = -local_70.x;
-	local_60.z = kPppZero;
+	local_60.z = FLOAT_8032fddc;
 	local_9c.x = local_70.y;
 	ppvWorldMatrixWood[0][1] = local_70.x;
 	ppvWorldMatrixWood[1][1] = local_70.y;
 	ppvWorldMatrixWood[2][1] = local_70.z;
-	local_9c.z = kPppZero;
+	local_9c.z = FLOAT_8032fddc;
 	local_60.y = local_9c.y;
 
-	if ((local_70.y != kPppZero) || (local_9c.y != kPppZero)) {
+	if ((local_70.y != FLOAT_8032fddc) || (local_9c.y != FLOAT_8032fddc)) {
 		PSVECNormalize(&local_9c, &local_60);
 	}
 
@@ -1480,7 +1488,7 @@ void pppSetFpMatrix(_pppMngSt* pppMngSt)
 	local_a8.y = local_80.y;
 	local_a8.z = local_80.z;
 
-	if ((local_80.x != kPppZero) || (local_80.y != kPppZero) || (local_80.z != kPppZero)) {
+	if ((local_80.x != FLOAT_8032fddc) || (local_80.y != FLOAT_8032fddc) || (local_80.z != FLOAT_8032fddc)) {
 		PSVECNormalize(&local_a8, &local_80);
 	}
 
@@ -1588,22 +1596,55 @@ void pppCacheRefCnt0UpShape(short*, _pppDataHead*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 8005a280
+ * PAL Size: 172b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppCacheDumpModel(short*, _pppDataHead*)
+void pppCacheDumpModel(short* modelList, _pppDataHead*)
 {
-	// TODO
+	short modelCount = *modelList;
+	short i = 0;
+	modelList = modelList + 1;
+	u32 pppResSet = *reinterpret_cast<u32*>(pppMngStPtr->m_pppResSet);
+
+	while (i < modelCount) {
+		short modelIndex = *modelList;
+		modelList = modelList + 1;
+		CMapMesh* mapMesh = *(CMapMesh**)(*(u32*)(pppResSet + 0x14) + modelIndex * 4);
+		short cacheIndex = *reinterpret_cast<short*>(reinterpret_cast<u8*>(mapMesh) + 0x46);
+
+		ppvAmemCacheSet.Release(cacheIndex);
+		mapMesh->pppCacheDumpModelTexture(pppEnvStPtr->m_materialSetPtr, &ppvAmemCacheSet);
+		++i;
+	}
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 8005a214
+ * PAL Size: 108b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppCacheDumpShape(short*, _pppDataHead*)
+void pppCacheDumpShape(short* shapeList, _pppDataHead* pppDataHead)
 {
-	// TODO
+	short shapeCount = *shapeList;
+	short i = 0;
+	shapeList = shapeList + 1;
+
+	while (i < shapeCount) {
+		short shapeIndex = *shapeList;
+		shapeList = shapeList + 1;
+		pppCacheDumpShapeTexture(
+		    *(pppShapeSt**)(pppDataHead->m_shapeNames + shapeIndex * 4),
+		    *reinterpret_cast<CMaterialSet**>(reinterpret_cast<u8*>(&PartMng) + 0x7E4));
+		++i;
+	}
 }
 
 /*
@@ -2548,8 +2589,8 @@ void pppSetBlendMode(unsigned char blendMode)
  */
 void pppClearDrawEnv()
 {
-	if (kPppZero != FLOAT_8032ed8c) {
-		FLOAT_8032ed8c = kPppZero;
+	if (FLOAT_8032fddc != FLOAT_8032ed8c) {
+		FLOAT_8032ed8c = FLOAT_8032fddc;
 		ppvScreenMatrix[2][3] = gPartScreenMatrixRow2W;
 		GXSetProjection(ppvScreenMatrix, GX_PERSPECTIVE);
 	}
@@ -2611,9 +2652,9 @@ void pppSetDrawEnv(pppCVECTOR* pppColor, pppFMATRIX* pppMtx, float depth, unsign
 			nrmMtx[0][2] = pppMtx->value[0][2];
 			nrmMtx[1][2] = pppMtx->value[1][2];
 			nrmMtx[2][2] = pppMtx->value[2][2];
-			nrmMtx[0][3] = kPppZero;
-			nrmMtx[1][3] = kPppZero;
-			nrmMtx[2][3] = kPppZero;
+			nrmMtx[0][3] = kPppLocalZero;
+			nrmMtx[1][3] = kPppLocalZero;
+			nrmMtx[2][3] = kPppLocalZero;
 			GXLoadNrmMtxImm(nrmMtx, GX_PNMTX0);
 		}
 	}

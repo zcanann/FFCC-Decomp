@@ -58,6 +58,7 @@ extern "C" void CalcFurColor__Q26CChara6CModelFv(CChara::CModel*);
 extern "C" void MogFurFrame__Q26CChara6CModelFP8CGObject(CChara::CModel*, CGObject*);
 extern double DOUBLE_803303e8;
 extern double DOUBLE_80330400;
+extern const float FLOAT_80330350;
 
 struct Vec4d {
     float x;
@@ -2149,9 +2150,8 @@ void CGObject::onDraw()
  */
 void CGObject::CancelMove(int moveType)
 {
-    u8 flags = *((u8*)&m_weaponNodeFlags + 1);
-    flags = static_cast<u8>(__rlwimi(flags, 0, 5, 26, 26));
-    *((u8*)&m_weaponNodeFlags + 1) = flags;
+    *((u8*)&m_weaponNodeFlags + 1) =
+        static_cast<u8>(__rlwimi(*((u8*)&m_weaponNodeFlags + 1), 0, 5, 26, 26));
 
     CFlatRuntime::CStack arg;
     arg.m_word = static_cast<u32>(moveType);
@@ -3105,24 +3105,21 @@ void CGObject::CancelAnim(int keepFacing)
 {
 	m_currentAnimSlot = -1;
 
-	u8 flags = *((u8*)&m_shieldNodeFlags);
-	flags = static_cast<u8>(__rlwimi(flags, 0, 6, 25, 25));
-	*((u8*)&m_shieldNodeFlags) = flags;
+	*((u8*)&m_shieldNodeFlags) =
+	    static_cast<u8>(__rlwimi(*((u8*)&m_shieldNodeFlags), 0, 6, 25, 25));
 
-	m_turnSpeed = sZeroFloat;
+	m_turnSpeed = FLOAT_80330350;
 
 	if (keepFacing != 0)
 	{
 		m_rotTargetY = m_rotBaseY;
 	}
 
-	flags = *((u8*)&m_shieldNodeFlags);
-	flags = static_cast<u8>(__rlwimi(flags, 0, 3, 28, 28));
-	*((u8*)&m_shieldNodeFlags) = flags;
+	*((u8*)&m_shieldNodeFlags) =
+	    static_cast<u8>(__rlwimi(*((u8*)&m_shieldNodeFlags), 0, 3, 28, 28));
 
-	flags = *((u8*)&m_shieldNodeFlags);
-	flags = static_cast<u8>(__rlwimi(flags, 0, 7, 24, 24));
-	*((u8*)&m_shieldNodeFlags) = flags;
+	*((u8*)&m_shieldNodeFlags) =
+	    static_cast<u8>(__rlwimi(*((u8*)&m_shieldNodeFlags), 0, 7, 24, 24));
 }
 
 /*
@@ -3168,7 +3165,7 @@ void CGObject::PlayAnim(int slot, int param2, int param3, int param4, int param5
     flags = *reinterpret_cast<u8*>(&m_shieldNodeFlags);
     flags = static_cast<u8>(__rlwimi(flags, 1, 3, 28, 28));
     *reinterpret_cast<u8*>(&m_shieldNodeFlags) = flags;
-    m_turnSpeed = sZeroFloat;
+    m_turnSpeed = FLOAT_80330350;
 }
 
 /*

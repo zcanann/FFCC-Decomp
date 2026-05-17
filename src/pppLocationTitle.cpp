@@ -65,7 +65,7 @@ void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitle
 
     dataValIndex = param_2->m_dataValIndex;
     serializedOffset = *param_3->m_serializedDataOffsets;
-    work = (LocationTitleWork*)((u8*)pppLocationTitle + 0x80 + serializedOffset);
+    work = (LocationTitleWork*)(pppLocationTitle->m_workArea + serializedOffset);
 
     if (dataValIndex == 0xFFFF) {
         return;
@@ -138,7 +138,7 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
     LocationTitleParticle* dst;
     int serializedOffset;
     int colorOffset;
-    s32* serializedOffsets;
+    int* serializedOffsets;
     LocationTitleWork* work;
     LocationTitleColorBlock* colorData;
     int graphFrame;
@@ -161,8 +161,8 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
     serializedOffsets = param_3->m_serializedDataOffsets;
     serializedOffset = serializedOffsets[0];
     colorOffset = serializedOffsets[1];
-    work = (LocationTitleWork*)((u8*)pppLocationTitle + 0x80 + serializedOffset);
-    colorData = (LocationTitleColorBlock*)((u8*)pppLocationTitle + 0x80 + colorOffset);
+    work = (LocationTitleWork*)(pppLocationTitle->m_workArea + serializedOffset);
+    colorData = (LocationTitleColorBlock*)(pppLocationTitle->m_workArea + colorOffset);
     rand();
 
     if (param_2->m_dataValIndex == 0xFFFF) {
@@ -284,7 +284,7 @@ void pppDestructLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTit
 
     serializedOffsets = *(s32**)((u8*)param_2 + 0xC);
     serializedOffset = *serializedOffsets;
-    stagePtr = (CMemory::CStage**)((u8*)pppLocationTitle + serializedOffset + 0x80);
+    stagePtr = (CMemory::CStage**)(pppLocationTitle->m_workArea + serializedOffset);
 
     if (*stagePtr != NULL) {
         pppHeapUseRate(*stagePtr);
@@ -307,7 +307,7 @@ void pppConstructLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTi
     f32 value;
 
     value = FLOAT_80330ee0;
-    work = (LocationTitleWork*)((u8*)pppLocationTitle + 0x80 + *param_2->m_serializedDataOffsets);
+    work = (LocationTitleWork*)(pppLocationTitle->m_workArea + *param_2->m_serializedDataOffsets);
     work->m_particles = 0;
     work->m_count = 0;
     work->m_acc = value;

@@ -298,8 +298,9 @@ bool CMenuPcs::FavoClose()
     count = *favoList;
     entry = reinterpret_cast<FavoEntry*>(favoList + 4);
     frame = singMenuState->frame;
+    int remaining = count;
     if (0 < count) {
-        for (int i = 0; i < count; i++) {
+        do {
             if (frame >= entry->startFrame) {
                 if (entry->startFrame + entry->duration <= frame) {
                     float step = FLOAT_80333040;
@@ -310,17 +311,18 @@ bool CMenuPcs::FavoClose()
                 } else {
                     entry->step = entry->step + 1;
                     entry->alpha =
-                        (float)-((DOUBLE_80333050 / (double)entry->duration) * (double)entry->step - DOUBLE_80333050);
+                        (float)(DOUBLE_80333050 - (DOUBLE_80333050 / (double)entry->duration) * (double)entry->step);
                     if ((entry->flags & 2) == 0) {
                         float step =
-                            (float)-((DOUBLE_80333050 / (double)entry->duration) * (double)entry->step - DOUBLE_80333050);
+                            (float)(DOUBLE_80333050 - (DOUBLE_80333050 / (double)entry->duration) * (double)entry->step);
                         entry->dx = (entry->targetX - (float)entry->x) * step;
                         entry->dy = (entry->targetY - (float)entry->y) * step;
                     }
                 }
             }
             entry++;
-        }
+            remaining = remaining - 1;
+        } while (remaining != 0);
     }
 
 	bool finished = false;

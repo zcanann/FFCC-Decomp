@@ -96,18 +96,18 @@ extern char s_Encendido_801E36A0[];
 extern char s_Monoaural_801E36AC[];
 extern char s_Mejorado_801E36B8[];
 extern char lbl_801E36C4[];
-extern char lbl_80333460[];
-extern char lbl_80333468[];
-extern char lbl_8033346C[];
-extern char lbl_80333470[];
-extern char lbl_80333478[];
-extern char lbl_8033347C[];
-extern char lbl_80333480[];
-extern char lbl_80333488[];
-extern char lbl_80333490[];
-extern char lbl_80333498[];
-extern char lbl_8033349C[];
-extern char lbl_803334A0[];
+extern char s_MenuOptionMusic[];
+extern char s_MenuOptionOn[];
+extern char s_MenuOptionOff[];
+extern char s_MenuOptionStereo[];
+extern char s_MenuOptionMin[];
+extern char s_MenuOptionMax[];
+extern char s_MenuOptionStrengthDe[];
+extern char s_MenuOptionDefenceDe[];
+extern char s_MenuOptionMusicDe[];
+extern char s_MenuOptionOnDe[];
+extern char s_MenuOptionOffDe[];
+extern char s_MenuOptionStereoDe[];
 extern char lbl_803334A8[];
 extern char lbl_803334B0[];
 extern char lbl_803334B8[];
@@ -133,30 +133,30 @@ extern "C" const char lbl_80333698[] = {'V', 'a', 'c', '\xED', 'o', '.', '\0', '
 
 extern "C" char* g_strMenuUtilMes[] = {
 	s_Strength_801E30A4, s_Defence_801E30B0, s_Position_Markers_801E30BC, s_Sound_Mode_801E30D0,
-	lbl_80333460, s_Sound_Effects_801E30DC, s_GBA_Colour_Balance_801E30EC,
+	s_MenuOptionMusic, s_Sound_Effects_801E30DC, s_GBA_Colour_Balance_801E30EC,
 	s_Show_or_hide_position_marker_under_each_character_s_feet_801E3100,
 	s_Select_stereo_or_monaural_sound_801E313C, s_Adjust_volume_of_background_music_801E3160,
 	s_Adjust_volume_of_sound_effects_801E3184, s_Adjust_colour_balance_of_Game_Boy_Advance_801E31A4,
-	lbl_80333468, lbl_8033346C, lbl_80333470, s_Monaural_801E31D0,
-	lbl_80333478, lbl_8033347C, s_Enhanced_801E31DC, s_Standard_801E31E8,
-	lbl_80333480, lbl_80333488, s_Erkennungskreisel_801E31F4, s_Tonausgabe_801E3208,
-	lbl_80333490, lbl_801E3214, s_Farbeinstellung_801E3224,
+	s_MenuOptionOn, s_MenuOptionOff, s_MenuOptionStereo, s_Monaural_801E31D0,
+	s_MenuOptionMin, s_MenuOptionMax, s_Enhanced_801E31DC, s_Standard_801E31E8,
+	s_MenuOptionStrengthDe, s_MenuOptionDefenceDe, s_Erkennungskreisel_801E31F4, s_Tonausgabe_801E3208,
+	s_MenuOptionMusicDe, lbl_801E3214, s_Farbeinstellung_801E3224,
 	s_Erkennungskreisel_des_Charakters_AN_AUS_schalten_801E3234,
 	s_Tonausgabe_auf_Stereo_oder_Mono_schalten_801E3268, lbl_801E3294, lbl_801E32B4,
-	lbl_801E32DC, lbl_80333498, lbl_8033349C, lbl_803334A0, lbl_803334A8,
-	lbl_80333478, lbl_8033347C, s_Erweitert_801E330C, lbl_803334B0,
+	lbl_801E32DC, s_MenuOptionOnDe, s_MenuOptionOffDe, s_MenuOptionStereoDe, lbl_803334A8,
+	s_MenuOptionMin, s_MenuOptionMax, s_Erweitert_801E330C, lbl_803334B0,
 	lbl_803334B8, lbl_803334C0, s_Indicatori_di_posizione_801E3318, lbl_803334C8,
 	lbl_803334D0, s_Effetti_sonori_801E3330, s_Bilanc_colore_GBA_801E3340,
 	s_Attiva_o_disattiva_l_indicatore_ai_piedi_dei_personaggi_801E3354,
 	s_Scegli_tra_sonoro_mono_o_stereo_801E3390, s_Regola_il_volume_della_musica_801E33B4,
 	s_Regola_il_volume_degli_effetti_sonori_801E33D4, s_Regola_il_colore_sul_Game_Boy_Advance_801E33FC,
-	lbl_80333468, lbl_8033346C, lbl_80333470, lbl_803334D8, lbl_80333478, lbl_8033347C,
+	s_MenuOptionOn, s_MenuOptionOff, s_MenuOptionStereo, lbl_803334D8, s_MenuOptionMin, s_MenuOptionMax,
 	lbl_803334E0, lbl_803334E8,
 	s_Force_803334F0, lbl_801E3424, s_Sceau_de_position_801E3430, s_Signal_sonore_801E3444,
 	s_Musique_803334F8, s_Effets_sonores_801E3454, s_Affichage_du_GBA_801E3464,
 	s_Affichage_du_sceau_de_position_aux_pieds_des_personnages_801E3478,
 	lbl_801E34B4, lbl_801E34E0, lbl_801E3500, lbl_801E3524, s_Active_80333500,
-	lbl_801E355C, s_Stereo_80333508, lbl_803334D8, lbl_80333478, lbl_8033347C,
+	lbl_801E355C, s_Stereo_80333508, lbl_803334D8, s_MenuOptionMin, s_MenuOptionMax,
 	lbl_801E3568, s_Standard_801E31E8,
 	s_Fuerza_80333510, s_Defensa_80333518, lbl_801E3574, s_Tipo_de_sonido_801E3584,
 	s_Musica_80333520, s_Efectos_de_sonido_801E3594, s_Color_de_la_GBA_801E35A8,

@@ -5,9 +5,6 @@
 #include "ffcc/system.h"
 #include "ffcc/usb.h"
 
-extern unsigned int m_table_desc0__7CUSBPcs[];
-extern unsigned int m_table_desc1__7CUSBPcs[];
-extern unsigned int m_table_desc2__7CUSBPcs[];
 extern unsigned int m_table__7CUSBPcs[];
 
 class CUSBPcs : public CProcess
@@ -15,18 +12,7 @@ class CUSBPcs : public CProcess
 public:
     class CDataHeader;
 
-    CUSBPcs()
-    {
-        m_table__7CUSBPcs[1] = m_table_desc0__7CUSBPcs[0];
-        m_table__7CUSBPcs[2] = m_table_desc0__7CUSBPcs[1];
-        m_table__7CUSBPcs[3] = m_table_desc0__7CUSBPcs[2];
-        m_table__7CUSBPcs[4] = m_table_desc1__7CUSBPcs[0];
-        m_table__7CUSBPcs[5] = m_table_desc1__7CUSBPcs[1];
-        m_table__7CUSBPcs[6] = m_table_desc1__7CUSBPcs[2];
-        m_table__7CUSBPcs[7] = m_table_desc2__7CUSBPcs[0];
-        m_table__7CUSBPcs[8] = m_table_desc2__7CUSBPcs[1];
-        m_table__7CUSBPcs[9] = m_table_desc2__7CUSBPcs[2];
-    }
+    CUSBPcs();
 
     void Init();
     void Quit();

@@ -71,10 +71,10 @@ extern const char lbl_80331CB4[] = "ON";
 extern const char lbl_80331CB8[] = "OFF";
 extern const char lbl_80331CBC[] = "?";
 
-u32 m_table_desc0__11CDbgMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(create__11CDbgMenuPcsFv)};
-u32 m_table_desc1__11CDbgMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(destroy__11CDbgMenuPcsFv)};
-u32 m_table_desc2__11CDbgMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(calc__11CDbgMenuPcsFv)};
-u32 m_table_desc3__11CDbgMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(draw__11CDbgMenuPcsFv)};
+static u32 m_table_desc0__11CDbgMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(create__11CDbgMenuPcsFv)};
+static u32 m_table_desc1__11CDbgMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(destroy__11CDbgMenuPcsFv)};
+static u32 m_table_desc2__11CDbgMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(calc__11CDbgMenuPcsFv)};
+static u32 m_table_desc3__11CDbgMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(draw__11CDbgMenuPcsFv)};
 u32 m_table__11CDbgMenuPcs[0x15C / sizeof(u32)] = {
     reinterpret_cast<u32>(const_cast<char*>(s_CDbgMenuPcs_801DD428)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x11, 0, 0, 0, 0, 0x4A, 1
 };
@@ -476,32 +476,34 @@ void CDbgMenuPcs::calcMenu(CDbgMenuPcs::CDM* menu)
  */
 void CDbgMenuPcs::drawMenu(CDbgMenuPcs::CDM* menu)
 {
+	CDM* current = menu;
 	CDM* head = menu;
 
 	do {
-		m_currentMenu = menu;
-		GXSetViewport((f32)menu->m_drawX, (f32)menu->m_drawY, FLOAT_80331CA8, FLOAT_80331CAC, FLOAT_80331C98, FLOAT_80331CB0);
+		m_currentMenu = current;
+		GXSetViewport((f32)current->m_drawX, (f32)current->m_drawY, FLOAT_80331CA8, FLOAT_80331CAC, FLOAT_80331C98,
+		              FLOAT_80331CB0);
 
-		int type = menu->m_type;
+		int type = current->m_type;
 		if (type != 2) {
-			if (type >= 2) {
-				if (type < 4) {
-					drawWindow((menu->m_state != 0) ? 2 : 0, 1, 1, 0x1E, 0xE, 0);
+			if (type < 2) {
+				if (type == 0) {
+					drawWindow(current->m_y, 0, 0, current->m_unk18, current->m_unk1C, current->m_text);
+				} else if (type >= 0) {
+					drawFont(current->m_y, 0, 0, current->m_text);
 				}
-			} else if (type == 0) {
-				drawWindow(menu->m_y, 0, 0, menu->m_unk18, menu->m_unk1C, menu->m_text);
-			} else if (type >= 0) {
-				drawFont(menu->m_y, 0, 0, menu->m_text);
+			} else if (type < 4) {
+				drawWindow((current->m_state != 0) ? 2 : 0, 1, 1, 0x1E, 0xE, 0);
 			}
 		} else {
-			drawWindow((menu->m_state != 0) ? 2 : 0, 1, 1, 0x1E, 0xE, 0);
+			drawWindow((current->m_state != 0) ? 2 : 0, 1, 1, 0x1E, 0xE, 0);
 
 			const char* stateText;
-			if (menu->m_state == 1) {
+			if (current->m_state == 1) {
 				stateText = lbl_80331CB4;
 			} else {
 				stateText = lbl_80331CBC;
-				if (menu->m_state == 0) {
+				if (current->m_state == 0) {
 					stateText = lbl_80331CB8;
 				}
 			}
@@ -509,16 +511,16 @@ void CDbgMenuPcs::drawMenu(CDbgMenuPcs::CDM* menu)
 			drawFont(9, 0x10, 8, const_cast<char*>(stateText));
 		}
 
-		menu = menu->m_next;
-	} while (menu != head);
+		current = current->m_next;
+	} while (current != head);
 
-	menu = head;
+	current = head;
 	do {
-		if (menu->m_firstChild != 0) {
-			drawMenu(menu->m_firstChild);
+		if (current->m_firstChild != 0) {
+			drawMenu(current->m_firstChild);
 		}
-		menu = menu->m_next;
-	} while (menu != head);
+		current = current->m_next;
+	} while (current != head);
 }
 
 /*
@@ -569,23 +571,28 @@ void CDbgMenuPcs::drawWindow(int flags, int x, int y, int width, int height, cha
 		GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT1, 4);
 
 		const u32* borderColors = gDbgMenuWindowBorderColors;
-		int vertexIndex = 0;
+		u32 vertexIndex = 0;
+		int count = 2;
 
-		for (int i = 0; i < 2; i++) {
-			int row = vertexIndex >> 1;
-			int nextVertexIndex = vertexIndex + 1;
-			vertexIndex += 2;
+		do {
+			u32 col = vertexIndex & 1;
+			u32 row = vertexIndex >> 1;
+			u32 nextVertexIndex = vertexIndex + 1;
 
-			GXPosition3f32((float)x, (float)(y + (height & -(row & 1))), 0.0f);
+			GXPosition3f32((float)(x + (width & -static_cast<int>(col))),
+			               (float)(y + (height & -static_cast<int>(row & 1))),
+			               0.0f);
 			GXColor1u32(borderColors[0]);
 
+			vertexIndex = nextVertexIndex;
 			GXPosition3f32((float)(x + (width & -(nextVertexIndex & 1))),
 			               (float)(y + (height & -((nextVertexIndex >> 1) & 1))),
 			               0.0f);
 			GXColor1u32(borderColors[1]);
 
+			vertexIndex = nextVertexIndex + 1;
 			borderColors += 2;
-		}
+		} while (--count != 0);
 	}
 
 	int fillColorIndex = (flags >> 1) & 1;

@@ -393,11 +393,11 @@ foundFile:
                 if ((result >= 0) && (CARDFastOpen(1, result, &fileInfo) >= 0))
                 {
 readFile:
-                    if (CARDRead(&fileInfo, buffer, length, 0) >= 0)
+                    if (CARDRead(&fileInfo, buffer, length, 0) < 0)
                     {
-                        success = 1;
+                        goto closeFile;
                     }
-                    CARDClose(&fileInfo);
+                    goto setSuccess;
                 }
             }
             else
@@ -409,8 +409,10 @@ readFile:
                     result = CARDWrite(&fileInfo, buffer, length, 0);
                     if (result >= 0)
                     {
+setSuccess:
                         success = 1;
                     }
+closeFile:
                     CARDClose(&fileInfo);
                 }
             }

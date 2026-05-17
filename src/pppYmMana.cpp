@@ -19,7 +19,7 @@ extern float FLOAT_80330e48;
 extern float FLOAT_80330e4c;
 extern float FLOAT_80330e58;
 extern float FLOAT_80330e5c;
-extern char DAT_80330e50[];
+extern const char DAT_80330e50[];
 
 extern const float FLOAT_80330e60 = 2.0f;
 extern const float FLOAT_80330e64 = 0.015625f;
@@ -42,27 +42,27 @@ extern const float FLOAT_80330ec0 = 255.0f;
 
 static inline float CameraWorldX()
 {
-    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0xE0);
+    return CameraPcs._224_4_;
 }
 
 static inline float CameraWorldY()
 {
-    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0xE4);
+    return CameraPcs._228_4_;
 }
 
 static inline float CameraWorldZ()
 {
-    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0xE8);
+    return CameraPcs._232_4_;
 }
 
 static inline Mtx& CameraMatrix()
 {
-    return *reinterpret_cast<Mtx*>(reinterpret_cast<u8*>(&CameraPcs) + 0x4);
+    return CameraPcs.m_cameraMatrix;
 }
 
 static inline Mtx44& CameraScreenMatrix()
 {
-    return *reinterpret_cast<Mtx44*>(reinterpret_cast<u8*>(&CameraPcs) + 0x94);
+    return CameraPcs.m_screenMatrix;
 }
 
 struct Vec2d {
@@ -121,6 +121,11 @@ static void CalcWaterReflectionVector(
 void SetEnvMap(PYmMana*, VYmMana* vYmMana)
 {
     unsigned char* vYmManaBytes = (unsigned char*)vYmMana;
+
+    GXSetNumChans(1);
+    GXSetChanCtrl((GXChannelID)4, (GXBool)0, (GXColorSrc)0, (GXColorSrc)1, 0, (GXDiffuseFn)0, (GXAttnFn)2);
+    GXSetBlendMode((GXBlendMode)1, (GXBlendFactor)4, (GXBlendFactor)5, (GXLogicOp)0xf);
+
     GXTexObj* texObjA = *(GXTexObj**)(vYmManaBytes + 0x2c);
     GXTexObj* texObjB = *(GXTexObj**)(vYmManaBytes + 0x28);
     void* texObjCData = *(void**)(vYmManaBytes + 0x80);
@@ -128,12 +133,8 @@ void SetEnvMap(PYmMana*, VYmMana* vYmMana)
     unsigned char alpha = *(unsigned char*)(vYmManaBytes + 0xe8);
 
     _GXColor white = {0xff, 0xff, 0xff, 0xff};
-    _GXColor whiteAlpha = {0xff, 0xff, 0xff, alpha};
     _GXColor alphaOnly = {0x00, 0x00, 0x00, alpha};
-
-    GXSetNumChans(1);
-    GXSetChanCtrl((GXChannelID)4, (GXBool)0, (GXColorSrc)0, (GXColorSrc)1, 0, (GXDiffuseFn)0, (GXAttnFn)2);
-    GXSetBlendMode((GXBlendMode)1, (GXBlendFactor)4, (GXBlendFactor)5, (GXLogicOp)0xf);
+    _GXColor whiteAlpha = {0xff, 0xff, 0xff, alpha};
     GXSetChanAmbColor((GXChannelID)4, white);
     GXSetChanMatColor((GXChannelID)4, white);
     GXSetTevKColor((GXTevKColorID)0, alphaOnly);
@@ -749,7 +750,7 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaUnkB* param_2, pppYmManaUnkC* p
         work[11] = (u32)pppMemAlloc(0x20, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp_801DB4D8), 0x399);
     }
 
-    texBufferSize = GXGetTexBufferSize(0x80, 0x80, GX_TF_RGBA8, GX_FALSE, 0);
+    texBufferSize = GXGetTexBufferSize(0x80, 0x80, GX_TF_RGB565, GX_FALSE, 0);
     if (work[12] == 0) {
         work[12] = (u32)pppMemAlloc(texBufferSize, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp_801DB4D8), 0x3A1);
     }
@@ -757,8 +758,8 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaUnkB* param_2, pppYmManaUnkC* p
         work[13] = (u32)pppMemAlloc(texBufferSize, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp_801DB4D8), 0x3A3);
     }
 
-    GXInitTexObj((GXTexObj*)work[10], (void*)work[12], 0x80, 0x80, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
-    GXInitTexObj((GXTexObj*)work[11], (void*)work[13], 0x80, 0x80, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
+    GXInitTexObj((GXTexObj*)work[10], (void*)work[12], 0x80, 0x80, GX_TF_RGB565, GX_CLAMP, GX_CLAMP, GX_FALSE);
+    GXInitTexObj((GXTexObj*)work[11], (void*)work[13], 0x80, 0x80, GX_TF_RGB565, GX_CLAMP, GX_CLAMP, GX_FALSE);
 
     if (work[8] == 0) {
         work[8] = (u32)pppMemAlloc(0xC0, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp_801DB4D8), 0x3B0);

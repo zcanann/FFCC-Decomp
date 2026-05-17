@@ -251,28 +251,28 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
  */
 void pppFrameYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDeformationMdlUnkB* param_2, pppYmDeformationMdlUnkC* param_3)
 {
-    s16* psVar1;
+    YmDeformationMdlState* state;
 
     if ((gPppCalcDisabled == 0) &&
-        ((psVar1 = (s16*)((u8*)pppYmDeformationMdl + 0x80 + param_3->m_serializedDataOffsets[2])),
+        ((state = (YmDeformationMdlState*)((u8*)pppYmDeformationMdl + 0x80 + param_3->m_serializedDataOffsets[2])),
          (param_2->m_dataValIndex != 0xFFFF))) {
         CalcGraphValue(
-            (_pppPObject*)pppYmDeformationMdl, param_2->m_graphId, *(float*)(psVar1 + 2), *(float*)(psVar1 + 4),
-            *(float*)(psVar1 + 6), param_2->m_initWOrk, param_2->m_stepValue, param_2->m_arg3);
+            (_pppPObject*)pppYmDeformationMdl, param_2->m_graphId, state->m_scale, state->m_values[0],
+            state->m_values[1], param_2->m_initWOrk, param_2->m_stepValue, param_2->m_arg3);
         CalcGraphValue(
-            (_pppPObject*)pppYmDeformationMdl, param_2->m_graphId, *(float*)(psVar1 + 8), *(float*)(psVar1 + 10),
-            *(float*)(psVar1 + 0xC), param_2->m_payload0, param_2->m_payload1, param_2->m_payload2);
+            (_pppPObject*)pppYmDeformationMdl, param_2->m_graphId, state->m_values[2], state->m_values[3],
+            state->m_values[4], param_2->m_payload0, param_2->m_payload1, param_2->m_payload2);
 
         if (gPppInConstructor == 0) {
-            if (*(u8*)(psVar1 + 1) != 0) {
-                *psVar1 = *psVar1 + (int)*(float*)(psVar1 + 8);
-                if (*psVar1 > param_2->m_payload3) {
-                    *(u8*)(psVar1 + 1) = 0;
+            if (state->m_direction != 0) {
+                state->m_angle = state->m_angle + (int)state->m_values[2];
+                if (state->m_angle > param_2->m_payload3) {
+                    state->m_direction = 0;
                 }
             } else {
-                *psVar1 = *psVar1 - (int)*(float*)(psVar1 + 8);
-                if ((int)*psVar1 < -(int)param_2->m_payload3) {
-                    *(u8*)(psVar1 + 1) = 1;
+                state->m_angle = state->m_angle - (int)state->m_values[2];
+                if ((int)state->m_angle < -(int)param_2->m_payload3) {
+                    state->m_direction = 1;
                 }
             }
         }

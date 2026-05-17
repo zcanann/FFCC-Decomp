@@ -1082,6 +1082,7 @@ void CGraphic::makeSphere()
 {
     float vertices[126];
     int vertexCount = 1;
+    float* vertex = vertices + 3;
 
     vertices[0] = FLOAT_8032F6D0;
     vertices[1] = kGraphicZeroF;
@@ -1094,9 +1095,10 @@ void CGraphic::makeSphere()
 
         for (int seg = 0; seg < 8; seg++) {
             float yaw = FLOAT_8032F704 * (float)seg;
-            vertices[vertexCount * 3 + 0] = x;
-            vertices[vertexCount * 3 + 1] = radius * (float)sin(yaw);
-            vertices[vertexCount * 3 + 2] = radius * (float)cos(yaw);
+            vertex[0] = x;
+            vertex[1] = radius * (float)sin(yaw);
+            vertex[2] = radius * (float)cos(yaw);
+            vertex += 3;
             vertexCount++;
         }
     }
@@ -1115,32 +1117,34 @@ void CGraphic::makeSphere()
     GXBegin(GX_LINES, GX_VTXFMT0, 0xB0);
 
     int ringStart = 1;
+    float* ringVertex = vertices + 3;
     for (int ring = 0; ring < 5; ring++) {
-        int base = ringStart * 3;
+        float* current = ringVertex;
         for (int pair = 0; pair < 4; pair++) {
             int next0 = ringStart + ((pair * 2 + 1) % 8);
             int next1 = ringStart + ((pair * 2 + 2) % 8);
-            int nextBase = base + 3;
+            float* next = current + 3;
 
-            GXWGFifo.f32 = vertices[base + 1];
-            GXWGFifo.f32 = vertices[base + 0];
-            GXWGFifo.f32 = vertices[base + 2];
+            GXWGFifo.f32 = current[1];
+            GXWGFifo.f32 = current[0];
+            GXWGFifo.f32 = current[2];
 
             GXWGFifo.f32 = vertices[next0 * 3 + 1];
             GXWGFifo.f32 = vertices[next0 * 3 + 0];
             GXWGFifo.f32 = vertices[next0 * 3 + 2];
 
-            GXWGFifo.f32 = vertices[nextBase + 1];
-            GXWGFifo.f32 = vertices[nextBase + 0];
-            GXWGFifo.f32 = vertices[nextBase + 2];
+            GXWGFifo.f32 = next[1];
+            GXWGFifo.f32 = next[0];
+            GXWGFifo.f32 = next[2];
 
             GXWGFifo.f32 = vertices[next1 * 3 + 1];
             GXWGFifo.f32 = vertices[next1 * 3 + 0];
             GXWGFifo.f32 = vertices[next1 * 3 + 2];
 
-            base += 6;
+            current += 6;
         }
         ringStart += 8;
+        ringVertex += 24;
     }
 
     for (int seg = 0; seg < 8; seg++) {

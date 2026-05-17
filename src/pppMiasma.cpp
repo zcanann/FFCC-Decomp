@@ -34,7 +34,7 @@ union PackedMiasmaColor {
     u8 bytes[4];
 };
 
-static float CalcSphereRadius(Vec* vertices, u16 count)
+static inline float CalcSphereRadius(Vec* vertices, u16 count)
 {
     float radius = FLOAT_80331930;
 

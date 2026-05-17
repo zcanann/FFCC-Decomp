@@ -133,6 +133,8 @@ extern "C" const f32 FLOAT_8033086C = 0.125f;
 extern "C" void* __register_global_object(void* object, void* destructor, void* registration);
 extern "C" void __dt__8CMenuPcsFv(void*);
 extern "C" unsigned long GetInternal22Size__8CFontManFv(void*);
+extern const char __RTTI__8CManager_8032E7A8[];
+extern const char __RTTI__8CProcess_8032E7B0[];
 extern "C" void create__8CMenuPcsFv(CMenuPcs*);
 extern "C" void destroy__8CMenuPcsFv(CMenuPcs*);
 extern "C" void calc__8CMenuPcsFv(CMenuPcs*);
@@ -289,6 +291,16 @@ int sMenuTextureInfoTable[] = {
     2, reinterpret_cast<int>(const_cast<char*>(lbl_803307F0)),
     2, reinterpret_cast<int>(const_cast<char*>(lbl_803307F8)),
     2, reinterpret_cast<int>(const_cast<char*>(lbl_803307FC))
+};
+
+unsigned int s_CMenuPcsTablePad0[3] = {
+    reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CManager_8032E7A8)), 0, 0};
+unsigned int s_CMenuPcsTablePad1[5] = {
+    reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CManager_8032E7A8)),
+    0,
+    reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CProcess_8032E7B0)),
+    0,
+    0,
 };
 
 static inline void ReleaseRefObject(void* object)
@@ -729,10 +741,8 @@ void CMenuPcs::freeTexture(int textureSetStart, int textureSetCount, int texture
         if (refObject != nullptr) {
             int refCount = refObject[1] - 1;
             refObject[1] = refCount;
-            if ((refCount == 0) && (refObject != nullptr)) {
-                typedef void (*TextureDtor)(void*, int);
-                TextureDtor* vtable = reinterpret_cast<TextureDtor*>(refObject[0]);
-                vtable[2](refObject, 1);
+            if (refCount == 0) {
+                delete reinterpret_cast<CRef*>(refObject);
             }
             *reinterpret_cast<void**>(self + 0x18C + offset) = nullptr;
         }
@@ -744,10 +754,8 @@ void CMenuPcs::freeTexture(int textureSetStart, int textureSetCount, int texture
         if (refObject != nullptr) {
             int refCount = refObject[1] - 1;
             refObject[1] = refCount;
-            if ((refCount == 0) && (refObject != nullptr)) {
-                typedef void (*TextureSetDtor)(void*, int);
-                TextureSetDtor* vtable = reinterpret_cast<TextureSetDtor*>(refObject[0]);
-                vtable[2](refObject, 1);
+            if (refCount == 0) {
+                delete reinterpret_cast<CRef*>(refObject);
             }
             *reinterpret_cast<void**>(self + 0x14C + offset) = nullptr;
         }

@@ -51,17 +51,18 @@ struct pppMngStBlurCharaRaw {
     void* m_charaObj;
 };
 
-extern float FLOAT_80331030;
-extern float FLOAT_80331034;
-extern float FLOAT_80331038;
-extern float FLOAT_8033103c;
-extern float FLOAT_80331040;
-extern float FLOAT_80331044;
-extern float FLOAT_80331048;
-extern float FLOAT_8033104c;
-extern float FLOAT_80331050;
-extern float FLOAT_80331054;
+extern const f32 FLOAT_80331030;
+extern const f32 FLOAT_80331034;
+extern const f32 FLOAT_80331038;
+extern const f32 FLOAT_8033103c;
+extern const f32 FLOAT_80331040;
+extern const f32 FLOAT_80331044;
+extern const f32 FLOAT_80331048;
+extern const f32 FLOAT_8033104c;
+extern const f32 FLOAT_80331050;
+extern const f32 FLOAT_80331054;
 extern const double DOUBLE_80330FE8 = 3.0;
+extern const double DOUBLE_80331058;
 
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
 
@@ -442,7 +443,7 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void
     width = (int)FLOAT_80331050;
     height = (int)FLOAT_80331054;
 
-    Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, &backTexObj, 0, 0, width, height, 0, GX_NEAR, GX_TF_RGBA8, 0);
+    Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &backTexObj, 0, 0, width, height, 0, GX_LINEAR, GX_TF_RGBA8, 0);
 
     gUtil.SetVtxFmt_POS_CLR();
     white.r = 0;

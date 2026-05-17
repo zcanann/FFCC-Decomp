@@ -76,23 +76,21 @@ found_glyph:
 	}
 
 found_fallback:
-	unsigned char flags = renderFlags;
 	int drawWidth;
-	float localMargin = margin;
 	float localScaleX = scaleX;
+	float localMargin = margin;
+	CFontRenderFlagBits& renderFlagBits = GetRenderFlagBits(renderFlags);
 
-	if (GetRenderFlagBits(renderFlags).fixedWidth != 0) {
+	if (renderFlagBits.fixedWidth != 0) {
 		drawWidth = static_cast<int>(m_glyphWidth);
 	} else {
-		signed char sign = static_cast<signed char>(flags);
-		sign >>= 7;
-		unsigned int extra =
-		    static_cast<unsigned int>((-static_cast<int>(sign) | static_cast<int>(sign))) >> 30 & 2;
+		signed char sign = renderFlagBits.shadow;
+		unsigned int extra = static_cast<unsigned int>(-static_cast<int>(sign) | static_cast<int>(sign)) >> 30 & 2;
 		drawWidth = static_cast<int>(*(reinterpret_cast<unsigned char*>(glyph) + extra + 4));
 	}
 
 	double width = static_cast<double>(localScaleX * (localMargin + static_cast<float>(drawWidth)));
-	if (GetRenderFlagBits(renderFlags).snapPosition != 0) {
+	if (renderFlagBits.snapPosition != 0) {
 		width = floor(width);
 	}
 
@@ -102,7 +100,7 @@ find_fallback:
 	glyphBucket = m_glyphBuckets[63];
 	unsigned short* fallbackGlyph = glyphBucket + 1;
 	for (count = static_cast<int>(*glyphBucket); count > 0; count--) {
-		if (*reinterpret_cast<unsigned char*>(fallbackGlyph + 1) != '\0') {
+		if (static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(fallbackGlyph + 1)) != 0) {
 			fallbackGlyph += 4;
 		} else {
 			goto found_fallback_glyph;
@@ -409,14 +407,14 @@ void CFont::DrawInit()
 
     _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
 
-    int zCompareFlag = renderFlagBits.zCompare;
-    int zUpdateFlag = renderFlagBits.zUpdate;
+    signed char zCompareFlag = renderFlagBits.zCompare;
     int zFunction = 7;
     int zUpdate = (zCompareFlag != 0) ? 1 : 0;
+    signed char zUpdateFlag = renderFlagBits.zUpdate;
     if (zUpdateFlag != 0) {
         zFunction = 3;
     }
-    int zEnable = (zCompareFlag != 0 || zUpdateFlag != 0) ? 1 : 0;
+    signed char zEnable = (zCompareFlag != 0 || zUpdateFlag != 0) ? 1 : 0;
     GXSetZMode(zEnable, (GXCompare)zFunction, zUpdate);
 
     _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(6, 1, 0, 7, 0);

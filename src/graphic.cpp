@@ -32,38 +32,20 @@ int gGraphicDrawDoneRequest = 0;
 signed char gGraphicDrawDoneRequestInit = 0;
 int gGraphicDrawDonePartControlRequest = 0;
 signed char gGraphicDrawDonePartControlInit = 0;
-_GXColor gGraphicDefaultClearColor = {0, 0, 0, 0};
-const float kGraphicZeroF = 0.0f;
-const float kGraphicOneF = 1.0f;
-const float kGraphicBlurAlphaScale = -100.0f;
-const float kGraphicNoiseTexScaleU = 0.015625f;
-const float kGraphicNoiseTexScaleV = 0.010416667f;
 }
 
-static const char s_CGraphic_801d6330[] = "CGraphic";
-static const char s_graphic_cpp_801d6348[] = "graphic.cpp";
-static const char DAT_801d637c[] = {
-    0x50, 0x61, 0x72, 0x74, 0x44, 0x72, 0x61, 0x77, 0x44, 0x6F, 0x6E, 0x65, 0x28, 0x66, 0x69, 0x6C, 0x65, 0x20,
-    0x3D, 0x20, 0x25, 0x73, 0x20, 0x6C, 0x69, 0x6E, 0x65, 0x20, 0x3D, 0x20, 0x25, 0x64, 0x29, 0x20, 0x50, 0x41,
-    0x52, 0x54, 0x20, 0x43, 0x54, 0x52, 0x4C, 0x20, 0x88, 0xC8, 0x8A, 0x4F, 0x82, 0xAA, 0x8F, 0x49, 0x97, 0xB9,
-    0x82, 0xB5, 0x82, 0xDC, 0x82, 0xB9, 0x82, 0xF1, 0x81, 0x42, 0x0A, 0x00};
-static const char DAT_801d63c0[] = {
-    0x50, 0x61, 0x72, 0x74, 0x44, 0x72, 0x61, 0x77, 0x44, 0x6F, 0x6E, 0x65, 0x28, 0x66, 0x69, 0x6C, 0x65, 0x20,
-    0x3D, 0x20, 0x25, 0x73, 0x20, 0x6C, 0x69, 0x6E, 0x65, 0x20, 0x3D, 0x20, 0x25, 0x64, 0x29, 0x20, 0x50, 0x41,
-    0x52, 0x54, 0x20, 0x43, 0x48, 0x41, 0x52, 0x41, 0x20, 0x82, 0xAA, 0x8F, 0x49, 0x97, 0xB9, 0x82, 0xB5, 0x82,
-    0xDC, 0x82, 0xB9, 0x82, 0xF1, 0x81, 0x42, 0x0A, 0x00};
-static const char DAT_801d6400[] = {
-    0x50, 0x61, 0x72, 0x74, 0x44, 0x72, 0x61, 0x77, 0x44, 0x6F, 0x6E, 0x65, 0x28, 0x66, 0x69, 0x6C, 0x65, 0x20,
-    0x3D, 0x20, 0x25, 0x73, 0x20, 0x6C, 0x69, 0x6E, 0x65, 0x20, 0x3D, 0x20, 0x25, 0x64, 0x29, 0x20, 0x63, 0x74,
-    0x72, 0x6C, 0x3D, 0x25, 0x73, 0x20, 0x82, 0xAA, 0x8F, 0x49, 0x97, 0xB9, 0x82, 0xB5, 0x82, 0xDC, 0x82, 0xB9,
-    0x82, 0xF1, 0x81, 0x42, 0x0A, 0x00};
-static const char DAT_801d643c[] = {
-    0x44, 0x72, 0x61, 0x77, 0x44, 0x6F, 0x6E, 0x65, 0x28, 0x66, 0x69, 0x6C, 0x65, 0x20, 0x3D, 0x20, 0x25, 0x73,
-    0x20, 0x6C, 0x69, 0x6E, 0x65, 0x20, 0x3D, 0x20, 0x25, 0x64, 0x20, 0x70, 0x72, 0x6F, 0x63, 0x65, 0x73, 0x73,
-    0x20, 0x3D, 0x20, 0x25, 0x73, 0x28, 0x25, 0x64, 0x29, 0x20, 0x64, 0x61, 0x74, 0x61, 0x20, 0x3D, 0x20, 0x25,
-    0x64, 0x29, 0x82, 0xAA, 0x8F, 0x49, 0x97, 0xB9, 0x82, 0xB5, 0x82, 0xDC, 0x82, 0xB9, 0x82, 0xF1, 0x81, 0x42,
-    0x0A, 0x00};
-static const char sGraphicMemoryStageName[] = "CManager";
+extern "C" const char lbl_801D6290[];
+extern "C" const char s_graphic_cpp_801d6348[];
+
+enum GraphicRodataOffset {
+    kGraphicRodataCGraphic = 0xA0,
+    kGraphicRodataFileName = 0xB8,
+    kGraphicRodataPartControlDoneFmt = 0xEC,
+    kGraphicRodataPartCharaDoneFmt = 0x130,
+    kGraphicRodataPartDoneFmt = 0x170,
+    kGraphicRodataDrawDoneFmt = 0x1AC,
+    kGraphicRodataCGraphic2 = 0x1F8,
+};
 
 static inline void*& PtrAt(CGraphic* self, u32 offset) {
     return *reinterpret_cast<void**>(reinterpret_cast<u8*>(self) + offset);
@@ -153,8 +135,10 @@ int checkThread(void*)
  */
 void CGraphic::Init()
 {
-    PtrAt(this, 0x4) = Memory.CreateStage(0x19C000, const_cast<char*>(s_CGraphic_801d6330), 0);
-    PtrAt(this, 0x8) = Memory.CreateStage(0xD6000, const_cast<char*>(sGraphicMemoryStageName), 0);
+    char* graphicRodata = const_cast<char*>(lbl_801D6290);
+
+    PtrAt(this, 0x4) = Memory.CreateStage(0x19C000, graphicRodata + kGraphicRodataCGraphic, 0);
+    PtrAt(this, 0x8) = Memory.CreateStage(0xD6000, graphicRodata + kGraphicRodataCGraphic2, 0);
 
     S32At(this, 0x14) = 0;
     U8At(this, 0x7200) = 0;
@@ -162,8 +146,8 @@ void CGraphic::Init()
     U8At(this, 0x7202) = 0;
     U8At(this, 0x7203) = 0;
 
-    *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x7208) = 0.0f;
-    *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x7204) = 0.0f;
+    *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x7208) = kGraphicZeroF;
+    *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x7204) = kGraphicZeroF;
 
     U8At(this, 0x735F) = U8At(this, 0x7200);
     U8At(this, 0x7360) = U8At(this, 0x7201);
@@ -183,26 +167,27 @@ void CGraphic::Init()
     u16 efbHeight = U16At(renderMode, 6);
     u16 xfbHeight = U16At(renderMode, 8);
 
-    PtrAt(this, 0x71E4) = new (reinterpret_cast<CMemory::CStage*>(PtrAt(this, 0x4)), const_cast<char*>(s_graphic_cpp_801d6348), 0x86)
+    PtrAt(this, 0x71E4) = new (reinterpret_cast<CMemory::CStage*>(PtrAt(this, 0x4)), graphicRodata + kGraphicRodataFileName, 0x86)
         u8[alignedWidth * xfbHeight * 2];
     memset(PtrAt(this, 0x71E4), 0, 4);
 
-    PtrAt(this, 0x71EC) = new (reinterpret_cast<CMemory::CStage*>(PtrAt(this, 0x4)), const_cast<char*>(s_graphic_cpp_801d6348), 0x88)
+    PtrAt(this, 0x71EC) = new (reinterpret_cast<CMemory::CStage*>(PtrAt(this, 0x4)), graphicRodata + kGraphicRodataFileName, 0x88)
         u8[alignedWidth * efbHeight * 2];
     memset(PtrAt(this, 0x71EC), 0, 4);
 
     PtrAt(this, 0x71E8) = _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(&Memory, alignedWidth * efbHeight * 2 + 0x46000,
                                                                      reinterpret_cast<CMemory::CStage*>(PtrAt(this, 0x8)),
-                                                                     const_cast<char*>(s_graphic_cpp_801d6348), 0xB53, 0);
+                                                                     graphicRodata + kGraphicRodataFileName, 0xB53, 0);
     memset(PtrAt(this, 0x71E8), 0, 0x46004);
 
     PtrAt(this, 0x10) =
-        new (reinterpret_cast<CMemory::CStage*>(PtrAt(this, 0x4)), const_cast<char*>(s_graphic_cpp_801d6348), 0x8B) u8[0x60000];
+        new (reinterpret_cast<CMemory::CStage*>(PtrAt(this, 0x4)), graphicRodata + kGraphicRodataFileName, 0x8B) u8[0x60000];
 
     VIConfigure(reinterpret_cast<GXRenderModeObj*>(PtrAt(this, 0x71E0)));
     GXInit(PtrAt(this, 0x10), 0x60000);
 
-    GXSetViewport(0.0f, 0.0f, static_cast<f32>(U16At(renderMode, 4)), static_cast<f32>(U16At(renderMode, 6)), 0.0f, 1.0f);
+    GXSetViewport(kGraphicZeroF, kGraphicZeroF, static_cast<f32>(U16At(renderMode, 4)), static_cast<f32>(U16At(renderMode, 6)),
+                  kGraphicZeroF, kGraphicOneF);
     GXSetScissor(0, 0, U16At(renderMode, 4), U16At(renderMode, 6));
     GXSetDispCopyYScale(GXGetYScaleFactor(U16At(renderMode, 6), U16At(renderMode, 8)));
     GXSetDispCopySrc(0, 0, U16At(renderMode, 4), U16At(renderMode, 6));
@@ -239,7 +224,7 @@ void CGraphic::Init()
     m_blurBufferIndex = 0;
     m_blurTextureCount = 0;
     GXCopyDisp(PtrAt(this, 0x71E4), GX_TRUE);
-    PtrAt(this, 0x7368) = const_cast<char*>(s_graphic_cpp_801d6348);
+    PtrAt(this, 0x7368) = graphicRodata + kGraphicRodataFileName;
     S32At(this, 0x736C) = 0xBE;
     S32At(this, 0x7364) = 1;
     GXSetDrawDone();
@@ -536,6 +521,7 @@ void CGraphic::Thread()
         OSThread* thread;
     };
 
+    char* debugFmtBase = const_cast<char*>(lbl_801D6290);
     int lastCounter = -1;
     int debugCountdown = 5;
 
@@ -554,11 +540,11 @@ void CGraphic::Thread()
                 if ((drawSyncRaw & 0x8000) != 0) {
                     drawSyncPart &= 0x7FFF;
                     if (drawSyncPart == 0x7FFF) {
-                        System.Printf(const_cast<char*>(DAT_801d637c), PtrAt(this, 0x7368), S32At(this, 0x736C));
+                        System.Printf(debugFmtBase + kGraphicRodataPartControlDoneFmt, PtrAt(this, 0x7368), S32At(this, 0x736C));
                     } else if (drawSyncPart == 0x7FFE) {
-                        System.Printf(const_cast<char*>(DAT_801d63c0), PtrAt(this, 0x7368), S32At(this, 0x736C));
+                        System.Printf(debugFmtBase + kGraphicRodataPartCharaDoneFmt, PtrAt(this, 0x7368), S32At(this, 0x736C));
                     } else {
-                        System.Printf(const_cast<char*>(DAT_801d6400), PtrAt(this, 0x7368), S32At(this, 0x736C),
+                        System.Printf(debugFmtBase + kGraphicRodataPartDoneFmt, PtrAt(this, 0x7368), S32At(this, 0x736C),
                                       s_pppSysProgTable[drawSyncPart].m_pppName);
                     }
                 }
@@ -576,7 +562,7 @@ void CGraphic::Thread()
                 } else {
                     orderName = sGraphicUnknownOrderName;
                 }
-                System.Printf(const_cast<char*>(DAT_801d643c), PtrAt(this, 0x7368), S32At(this, 0x736C), orderName, orderIndex,
+                System.Printf(debugFmtBase + kGraphicRodataDrawDoneFmt, PtrAt(this, 0x7368), S32At(this, 0x736C), orderName, orderIndex,
                               static_cast<int>(static_cast<char>(drawSyncPart)));
             }
         } else {
@@ -1082,6 +1068,7 @@ void CGraphic::makeSphere()
 {
     float vertices[126];
     int vertexCount = 1;
+    float* vertex = vertices + 3;
 
     vertices[0] = FLOAT_8032F6D0;
     vertices[1] = kGraphicZeroF;
@@ -1094,9 +1081,10 @@ void CGraphic::makeSphere()
 
         for (int seg = 0; seg < 8; seg++) {
             float yaw = FLOAT_8032F704 * (float)seg;
-            vertices[vertexCount * 3 + 0] = x;
-            vertices[vertexCount * 3 + 1] = radius * (float)sin(yaw);
-            vertices[vertexCount * 3 + 2] = radius * (float)cos(yaw);
+            vertex[0] = x;
+            vertex[1] = radius * (float)sin(yaw);
+            vertex[2] = radius * (float)cos(yaw);
+            vertex += 3;
             vertexCount++;
         }
     }
@@ -1115,32 +1103,34 @@ void CGraphic::makeSphere()
     GXBegin(GX_LINES, GX_VTXFMT0, 0xB0);
 
     int ringStart = 1;
+    float* ringVertex = vertices + 3;
     for (int ring = 0; ring < 5; ring++) {
-        int base = ringStart * 3;
+        float* current = ringVertex;
         for (int pair = 0; pair < 4; pair++) {
             int next0 = ringStart + ((pair * 2 + 1) % 8);
             int next1 = ringStart + ((pair * 2 + 2) % 8);
-            int nextBase = base + 3;
+            float* next = current + 3;
 
-            GXWGFifo.f32 = vertices[base + 1];
-            GXWGFifo.f32 = vertices[base + 0];
-            GXWGFifo.f32 = vertices[base + 2];
+            GXWGFifo.f32 = current[1];
+            GXWGFifo.f32 = current[0];
+            GXWGFifo.f32 = current[2];
 
             GXWGFifo.f32 = vertices[next0 * 3 + 1];
             GXWGFifo.f32 = vertices[next0 * 3 + 0];
             GXWGFifo.f32 = vertices[next0 * 3 + 2];
 
-            GXWGFifo.f32 = vertices[nextBase + 1];
-            GXWGFifo.f32 = vertices[nextBase + 0];
-            GXWGFifo.f32 = vertices[nextBase + 2];
+            GXWGFifo.f32 = next[1];
+            GXWGFifo.f32 = next[0];
+            GXWGFifo.f32 = next[2];
 
             GXWGFifo.f32 = vertices[next1 * 3 + 1];
             GXWGFifo.f32 = vertices[next1 * 3 + 0];
             GXWGFifo.f32 = vertices[next1 * 3 + 2];
 
-            base += 6;
+            current += 6;
         }
         ringStart += 8;
+        ringVertex += 24;
     }
 
     for (int seg = 0; seg < 8; seg++) {

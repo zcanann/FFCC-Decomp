@@ -50,7 +50,7 @@ public:
     void MLstInit();
     void MLstInit1();
     int MLstOpen();
-    void MLstCtrl();
+    int MLstCtrl();
     int MLstClose();
     void MLstDraw();
     void MLstCtrlCur();

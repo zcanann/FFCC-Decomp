@@ -31,6 +31,7 @@ extern "C" int rand(void);
 extern "C" void Printf__7CSystemFPce(CSystem* system, const char* format, ...);
 extern "C" void DrawOptionMenu__8CMenuPcsFv(CMenuPcs*);
 extern "C" void DrawSingCMake__8CMenuPcsFv(CMenuPcs*);
+extern CMenuPcs MenuPcs;
 
 extern "C" void SetAnim__Q29CCharaPcs7CHandleFiiiii(void*, int, int, int, int, int);
 extern "C" void LoadAnim__Q29CCharaPcs7CHandleFPciiiiii(void*, char*, int, int, int, int, int, int);
@@ -623,30 +624,32 @@ void CMenuPcs::InitFrameInfo()
 void CMenuPcs::InitFrame0Info()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* const frame = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x820)[0]);
+	unsigned int* const framePtr = reinterpret_cast<unsigned int*>(bytes + 0x820);
 
-	reinterpret_cast<unsigned short*>(frame + 4)[0] = 0x10;
-	reinterpret_cast<unsigned short*>(frame + 6)[0] = 0x10;
-	reinterpret_cast<unsigned short*>(frame + 8)[0] = 0xE8;
-	reinterpret_cast<unsigned short*>(frame + 0xA)[0] = 0x168;
-	reinterpret_cast<float*>(frame + 0xC)[0] = FLOAT_803313dc;
-	reinterpret_cast<float*>(frame + 0x10)[0] = FLOAT_803313dc;
-	reinterpret_cast<float*>(frame + 0x14)[0] = FLOAT_803313e8;
-	reinterpret_cast<float*>(frame + 0x18)[0] = FLOAT_803313e8;
-	reinterpret_cast<unsigned int*>(frame + 0x1C)[0] = 0;
+	*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(framePtr[0]) + 4) = 0x10;
+	*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(framePtr[0]) + 6) = 0x10;
+	*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(framePtr[0]) + 8) = 0xE8;
+	*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(framePtr[0]) + 0xA) = 0x168;
+	*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(framePtr[0]) + 0xC) = FLOAT_803313dc;
+	*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(framePtr[0]) + 0x10) = FLOAT_803313dc;
+	*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(framePtr[0]) + 0x14) = FLOAT_803313e8;
+	*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(framePtr[0]) + 0x18) = FLOAT_803313e8;
+	*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(framePtr[0]) + 0x1C) = 0;
 
-	reinterpret_cast<short*>(frame + 0x20)[0] = *reinterpret_cast<short*>(frame + 4);
-	reinterpret_cast<short*>(frame + 0x22)[0] = *reinterpret_cast<short*>(frame + 6);
-	reinterpret_cast<short*>(frame + 0x24)[0] = *reinterpret_cast<short*>(frame + 8);
-	reinterpret_cast<short*>(frame + 0x26)[0] = *reinterpret_cast<short*>(frame + 0xA);
-	reinterpret_cast<unsigned int*>(frame + 0x28)[0] = reinterpret_cast<unsigned int*>(frame + 0xC)[0];
-	reinterpret_cast<unsigned int*>(frame + 0x2C)[0] = reinterpret_cast<unsigned int*>(frame + 0x10)[0];
-	reinterpret_cast<unsigned int*>(frame + 0x30)[0] = reinterpret_cast<unsigned int*>(frame + 0x14)[0];
-	reinterpret_cast<unsigned int*>(frame + 0x34)[0] = reinterpret_cast<unsigned int*>(frame + 0x18)[0];
-	reinterpret_cast<unsigned int*>(frame + 0x38)[0] = reinterpret_cast<unsigned int*>(frame + 0x1C)[0];
+	unsigned char* frame = reinterpret_cast<unsigned char*>(framePtr[0]);
+	*reinterpret_cast<short*>(frame + 0x20) = *reinterpret_cast<short*>(frame + 4);
+	*reinterpret_cast<short*>(frame + 0x22) = *reinterpret_cast<short*>(frame + 6);
+	*reinterpret_cast<short*>(frame + 0x24) = *reinterpret_cast<short*>(frame + 8);
+	*reinterpret_cast<short*>(frame + 0x26) = *reinterpret_cast<short*>(frame + 0xA);
+	*reinterpret_cast<float*>(frame + 0x28) = *reinterpret_cast<float*>(frame + 0xC);
+	*reinterpret_cast<float*>(frame + 0x2C) = *reinterpret_cast<float*>(frame + 0x10);
+	*reinterpret_cast<float*>(frame + 0x30) = *reinterpret_cast<float*>(frame + 0x14);
+	*reinterpret_cast<float*>(frame + 0x34) = *reinterpret_cast<float*>(frame + 0x18);
+	*reinterpret_cast<unsigned int*>(frame + 0x38) = *reinterpret_cast<unsigned int*>(frame + 0x1C);
 
-	reinterpret_cast<short*>(frame + 0x20)[0] = 0x280 - (reinterpret_cast<short*>(frame + 8)[0] + reinterpret_cast<short*>(frame + 4)[0]);
-	reinterpret_cast<unsigned int*>(frame + 0x38)[0] = 8;
+	frame = reinterpret_cast<unsigned char*>(framePtr[0]);
+	*reinterpret_cast<short*>(frame + 0x20) = 0x280 - (*reinterpret_cast<short*>(frame + 8) + *reinterpret_cast<short*>(frame + 4));
+	*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(framePtr[0]) + 0x38) = 8;
 }
 
 /*
@@ -1949,31 +1952,30 @@ void CMenuPcs::CalcMoveMenu()
  */
 void CMenuPcs::InitSaveLoadMenu()
 {
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* const worldState = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x82C)[0]);
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(&MenuPcs);
+	unsigned int* const worldStatePtr = reinterpret_cast<unsigned int*>(bytes + 0x82C);
+	int zero = 0;
+	float posY = FLOAT_803313e8;
+	float posX = FLOAT_803313dc;
 
-	if (worldState != 0) {
-		*reinterpret_cast<float*>(worldState + 0x00) = FLOAT_803313dc;
-		*reinterpret_cast<float*>(worldState + 0x04) = FLOAT_803313e8;
-		worldState[0x08] = 0;
-		worldState[0x09] = 0;
-		worldState[0x0A] = 0;
-		*reinterpret_cast<short*>(worldState + 0x0E) = 0;
-		*reinterpret_cast<short*>(worldState + 0x10) = 0;
-		*reinterpret_cast<short*>(worldState + 0x12) = 0;
-		*reinterpret_cast<short*>(worldState + 0x16) = 0;
-		*reinterpret_cast<short*>(worldState + 0x18) = 0;
-		*reinterpret_cast<short*>(worldState + 0x1A) = 0;
-		*reinterpret_cast<short*>(worldState + 0x22) = 0;
-		*reinterpret_cast<short*>(worldState + 0x24) = 0;
-		worldState[0x0B] = 0;
-		*reinterpret_cast<short*>(worldState + 0x26) = 0;
-		*reinterpret_cast<short*>(worldState + 0x2E) = 0;
-	}
-
-	*reinterpret_cast<short*>(bytes + 0x870) = 0;
-	bytes[0x86E] = 0;
-	bytes[0x858] = 0;
+	*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(worldStatePtr[0]) + 0x22) = zero;
+	*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(worldStatePtr[0]) + 0x24) = zero;
+	reinterpret_cast<unsigned char*>(worldStatePtr[0])[0x08] = static_cast<unsigned char>(zero);
+	reinterpret_cast<unsigned char*>(worldStatePtr[0])[0x09] = static_cast<unsigned char>(zero);
+	reinterpret_cast<unsigned char*>(worldStatePtr[0])[0x0A] = static_cast<unsigned char>(zero);
+	*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(worldStatePtr[0]) + 0x0E) = zero;
+	*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(worldStatePtr[0]) + 0x10) = zero;
+	*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(worldStatePtr[0]) + 0x12) = zero;
+	*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(worldStatePtr[0]) + 0x16) = zero;
+	*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(worldStatePtr[0]) + 0x18) = zero;
+	*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(worldStatePtr[0]) + 0x1A) = zero;
+	*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(worldStatePtr[0]) + 0x04) = posY;
+	*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(worldStatePtr[0]) + 0x00) = posX;
+	*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(worldStatePtr[0]) + 0x2E) = zero;
+	reinterpret_cast<unsigned char*>(worldStatePtr[0])[0x0B] = static_cast<unsigned char>(zero);
+	*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(worldStatePtr[0]) + 0x26) = zero;
+	*reinterpret_cast<short*>(bytes + 0x870) = zero;
+	bytes[0x86E] = static_cast<unsigned char>(zero);
 }
 
 /*

@@ -47,7 +47,7 @@ void pppSRandFV(_pppPObject* basePtr, SRandFVParams* in, _pppCtrlTable* ctrl)
         return;
     }
 
-    s32 currentIndex = *(s32*)((u8*)basePtr + 0xC);
+    s32 currentIndex = basePtr->m_graphId;
     if (currentIndex == 0) {
         randVec = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
         randVec[0] = randf(in->useNormalDistribution);

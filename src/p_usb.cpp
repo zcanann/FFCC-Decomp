@@ -14,9 +14,23 @@ extern "C" void destroy__7CUSBPcsFv(CUSBPcs*);
 extern "C" void func__7CUSBPcsFv(CUSBPcs*);
 
 extern const char s_CUSBPcs_8032f810[] = "CUSBPcs";
-extern "C" unsigned int m_table_desc0__7CUSBPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__7CUSBPcsFv)};
-extern "C" unsigned int m_table_desc1__7CUSBPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__7CUSBPcsFv)};
-extern "C" unsigned int m_table_desc2__7CUSBPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(func__7CUSBPcsFv)};
+inline CUSBPcs::CUSBPcs()
+{
+    static unsigned int desc0[] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__7CUSBPcsFv)};
+    static unsigned int desc1[] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__7CUSBPcsFv)};
+    static unsigned int desc2[] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(func__7CUSBPcsFv)};
+
+    m_table__7CUSBPcs[1] = desc0[0];
+    m_table__7CUSBPcs[2] = desc0[1];
+    m_table__7CUSBPcs[3] = desc0[2];
+    m_table__7CUSBPcs[4] = desc1[0];
+    m_table__7CUSBPcs[5] = desc1[1];
+    m_table__7CUSBPcs[6] = desc1[2];
+    m_table__7CUSBPcs[7] = desc2[0];
+    m_table__7CUSBPcs[8] = desc2[1];
+    m_table__7CUSBPcs[9] = desc2[2];
+}
+
 unsigned int m_table__7CUSBPcs[0x11C / sizeof(unsigned int)] = {
     reinterpret_cast<unsigned int>(const_cast<char*>(s_CUSBPcs_8032f810)),
     0,
@@ -36,19 +50,6 @@ const char* DAT_8032E838[2] = {lbl_801DA074, 0};
 extern const char s_p_usb_cpp_801D6D08[] = "p_usb.cpp";
 extern const char s_usbRootPath[16] = "plot/kmitsuru/";
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(u32 size, CMemory::CStage* stage, char* file, int line);
-
-inline CUSBPcs::CUSBPcs()
-{
-    m_table__7CUSBPcs[1] = m_table_desc0__7CUSBPcs[0];
-    m_table__7CUSBPcs[2] = m_table_desc0__7CUSBPcs[1];
-    m_table__7CUSBPcs[3] = m_table_desc0__7CUSBPcs[2];
-    m_table__7CUSBPcs[4] = m_table_desc1__7CUSBPcs[0];
-    m_table__7CUSBPcs[5] = m_table_desc1__7CUSBPcs[1];
-    m_table__7CUSBPcs[6] = m_table_desc1__7CUSBPcs[2];
-    m_table__7CUSBPcs[7] = m_table_desc2__7CUSBPcs[0];
-    m_table__7CUSBPcs[8] = m_table_desc2__7CUSBPcs[1];
-    m_table__7CUSBPcs[9] = m_table_desc2__7CUSBPcs[2];
-}
 
 CUSBPcs USBPcs;
 

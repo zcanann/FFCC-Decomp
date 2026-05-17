@@ -52,13 +52,13 @@ extern "C" void drawShadowChrBegin__10CCameraPcsFv(CCameraPcs*);
 extern "C" void SetFullScreenShadow__10CCameraPcsFPA4_fl(CCameraPcs*);
 extern "C" void drawShadowEndAll__10CCameraPcsFv(CCameraPcs*);
 
-const char s_CCameraPcs_GAME_801D7860[] = "CCameraPcs(GAME)";
-const char s_CCameraPcs_CHARA_801D7874[] = "CCameraPcs(CHARA)";
-const char s_CCameraPcs_MAP_801D7888[] = "CCameraPcs(MAP)";
-const char s_CCameraPcs_MATERIALEDITOR_801D7898[] = "CCameraPcs(MATERIALEDITOR)";
-const char s_CCameraPcs_FUNNYSHAPE_801D78B4[] = "CCameraPcs(FUNNYSHAPE)";
-const char s_CCameraPcs_PART_801D78CC[] = "CCameraPcs(PART)";
-const char s_CCameraPcs_SHADOW_801D78E0[] = "CCameraPcs(SHADOW)";
+extern "C" const char s_CCameraPcs_GAME_801D7860[] = "CCameraPcs(GAME)";
+extern "C" const char s_CCameraPcs_CHARA_801D7874[] = "CCameraPcs(CHARA)";
+extern "C" const char s_CCameraPcs_MAP_801D7888[] = "CCameraPcs(MAP)";
+extern "C" const char s_CCameraPcs_MATERIALEDITOR_801D7898[] = "CCameraPcs(MATERIALEDITOR)";
+extern "C" const char s_CCameraPcs_FUNNYSHAPE_801D78B4[] = "CCameraPcs(FUNNYSHAPE)";
+extern "C" const char s_CCameraPcs_PART_801D78CC[] = "CCameraPcs(PART)";
+extern "C" const char s_CCameraPcs_SHADOW_801D78E0[] = "CCameraPcs(SHADOW)";
 
 extern float FLOAT_8032fa30;
 extern float FLOAT_8032fa34;
@@ -103,10 +103,9 @@ extern float FLOAT_8032fab0;
 extern float FLOAT_8032fab4;
 extern float FLOAT_8032fab8;
 extern double DOUBLE_8032fa28;
-static const char s_fov_warning_801d7928[] =
-    "!!!!!!!!!!!!!!!!!!FOV\x82\xcc\x92\x6c\x82\xaa\x88\xd9\x8f\xed\x82\xc5\x82\xb7\x81\x42%f"
-    "!!!!!!!!!!!!!!!!!!!!\n";
 extern double DOUBLE_8032fa28;
+extern char s_p_camera_cpp_801D7918[];
+extern char DAT_801d7928[];
 extern unsigned char g_map_draw_prof;
 unsigned int m_table_desc0__10CCameraPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__10CCameraPcsFv)};
 unsigned int m_table_desc1__10CCameraPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__10CCameraPcsFv)};
@@ -722,7 +721,7 @@ void CCameraPcs::calc()
 
     float fov = *reinterpret_cast<float*>(self + 0xFC);
     if (fov < FLOAT_8032fac8 && System.m_execParam != 0) {
-        Printf__7CSystemFPce(&System, const_cast<char*>(s_fov_warning_801d7928));
+        Printf__7CSystemFPce(&System, DAT_801d7928);
         fov = FLOAT_8032fab4;
     }
     C_MTXPerspective(reinterpret_cast<Mtx44Ptr>(self + 0x94), fov, FLOAT_8032fa3c,
@@ -791,7 +790,7 @@ void CCameraPcs::SetStdProjectionMatrix()
     float fov = *reinterpret_cast<float*>(self + 0xFC);
 
     if (fov < FLOAT_8032fac8 && System.m_execParam != 0) {
-        Printf__7CSystemFPce(&System, const_cast<char*>(s_fov_warning_801d7928));
+        Printf__7CSystemFPce(&System, DAT_801d7928);
         fov = FLOAT_8032fab4;
     }
 
@@ -911,8 +910,9 @@ void CCameraPcs::SetViewerSRT(const SRT* srt)
 {
     u32* dst = reinterpret_cast<u32*>(reinterpret_cast<u8*>(this) + 0x448);
     const u32* src = reinterpret_cast<const u32*>(srt);
-    u32 value1 = src[1];
+    u32 value1;
     u32 value0 = *src++;
+    value1 = *src;
     dst[0] = value0;
     u32 value2 = src[1];
     dst[1] = value1;
@@ -1324,11 +1324,11 @@ void CCameraPcs::createFullShadow()
     *reinterpret_cast<void**>(self + 0x31C) = 0;
     rampTexSize = GXGetTexBufferSize(0x1E0, 0x1E0, GX_TF_I8, GX_FALSE, 0);
     *reinterpret_cast<void**>(self + 0x31C) =
-        __nwa__FUlPQ27CMemory6CStagePci(rampTexSize, stage, const_cast<char*>("p_camera.cpp"), 0x3A5);
+        __nwa__FUlPQ27CMemory6CStagePci(rampTexSize, stage, s_p_camera_cpp_801D7918, 0x3A5);
 
     rampTexSize = GXGetTexBufferSize(0x10, 0x10, GX_TF_I8, GX_FALSE, 0);
     rampTex = static_cast<unsigned char*>(
-        __nwa__FUlPQ27CMemory6CStagePci(rampTexSize, stage, const_cast<char*>("p_camera.cpp"), 0x361));
+        __nwa__FUlPQ27CMemory6CStagePci(rampTexSize, stage, s_p_camera_cpp_801D7918, 0x361));
     *reinterpret_cast<unsigned char**>(self + 0x320) = rampTex;
 
     for (i = 0; i < 0x100; i += 8) {

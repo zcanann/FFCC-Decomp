@@ -1,6 +1,7 @@
 #include "ffcc/p_light.h"
 
 #include "ffcc/graphic.h"
+#include "ffcc/gxfunc.h"
 #include "ffcc/linkage.h"
 #include "ffcc/materialman.h"
 #include "ffcc/p_graphic.h"
@@ -107,45 +108,21 @@ static inline double U32ToDouble(unsigned int value)
  */
 void CLightPcs::Init()
 {
-    float fVar2;
-    float fVar1;
-    unsigned char bVar3;
-    unsigned int uVar4;
-    unsigned int uVar5;
-
     m_mapLightColor[0].r = 0x3F;
-    uVar4 = __cntlzw(0);
     m_mapLightColor[0].g = 0x3F;
-    fVar1 = FLOAT_8032fc14;
     m_mapLightColor[0].b = 0x3F;
-    fVar2 = FLOAT_8032fc2c;
-    uVar5 = __cntlzw(1);
-    bVar3 = static_cast<unsigned char>(-((unsigned char)(uVar4 >> 5) & 1)) & 0x3F;
     m_mapLightColor[0].a = 0xFF;
-    m_mapLightColor[1].r = bVar3;
-    uVar4 = __cntlzw(2);
-    m_mapLightColor[1].g = bVar3;
-    m_mapLightColor[1].b = bVar3;
-    bVar3 = static_cast<unsigned char>(-((unsigned char)(uVar5 >> 5) & 1)) & 0x3F;
-    m_mapLightColor[1].a = 0xFF;
-    m_mapLightParams[0] = fVar1;
-    m_mapLightParams[1] = fVar1;
-    m_mapLightParams[2] = fVar2;
-    m_mapLightColor[2].r = bVar3;
-    m_mapLightColor[2].g = bVar3;
-    m_mapLightColor[2].b = bVar3;
-    bVar3 = static_cast<unsigned char>(-((unsigned char)(uVar4 >> 5) & 1)) & 0x3F;
-    m_mapLightColor[2].a = 0xFF;
-    m_mapLightParams[3] = fVar1;
-    m_mapLightParams[4] = fVar1;
-    m_mapLightParams[5] = fVar2;
-    m_mapLightColor[3].r = bVar3;
-    m_mapLightColor[3].g = bVar3;
-    m_mapLightColor[3].b = bVar3;
-    m_mapLightColor[3].a = 0xFF;
-    m_mapLightParams[6] = fVar1;
-    m_mapLightParams[7] = fVar1;
-    m_mapLightParams[8] = fVar2;
+
+    for (int i = 0; i < 3; i++) {
+        unsigned char color = (i == 0) ? 0x3F : 0;
+        m_mapLightColor[i + 1].r = color;
+        m_mapLightColor[i + 1].g = color;
+        m_mapLightColor[i + 1].b = color;
+        m_mapLightColor[i + 1].a = 0xFF;
+        m_mapLightParams[i * 3 + 0] = FLOAT_8032fc14;
+        m_mapLightParams[i * 3 + 1] = FLOAT_8032fc14;
+        m_mapLightParams[i * 3 + 2] = FLOAT_8032fc2c;
+    }
 }
 
 /*
@@ -1057,10 +1034,10 @@ void CLightPcs::MakeLightMap()
     GXSetCullMode(GX_CULL_BACK);
     GXSetZCompLoc(GX_TRUE);
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
-    GXSetBlendMode(GX_BM_NONE, GX_BL_ZERO, GX_BL_ZERO, GX_LO_SET);
-    GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0xFF);
+    _GXSetBlendMode(GX_BM_NONE, GX_BL_ZERO, GX_BL_ZERO, GX_LO_NOOP);
+    _GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0xFF);
     GXSetColorUpdate(GX_TRUE);
-    GXSetPixelFmt(GX_PF_RGB8_Z24, GX_ZC_LINEAR);
+    GXSetPixelFmt(GX_PF_RGBA6_Z24, GX_ZC_LINEAR);
     GXSetViewport(FLOAT_8032fc14, FLOAT_8032fc14, FLOAT_8032fc28, FLOAT_8032fc28, FLOAT_8032fc14, FLOAT_8032fc1c);
     GXSetScissor(0, 0, 0x40, 0x40);
     C_MTXOrtho(projection, FLOAT_8032fc2c, FLOAT_8032fc1c, FLOAT_8032fc2c, FLOAT_8032fc1c, FLOAT_8032fc1c,
@@ -1068,11 +1045,11 @@ void CLightPcs::MakeLightMap()
     GXSetProjection(projection, GX_ORTHOGRAPHIC);
     GXSetChanCtrl(GX_COLOR0, GX_TRUE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT0, GX_DF_CLAMP, GX_AF_NONE);
     GXSetChanCtrl(GX_ALPHA0, GX_TRUE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT0, GX_DF_NONE, GX_AF_SPEC);
-    GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
+    _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
     GXSetTevDirect(GX_TEVSTAGE0);
-    GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
-    GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
-    GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
+    _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
+    _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
+    _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
     GXSetNumIndStages(0);
     GXSetNumTevStages(1);
     GXSetNumTexGens(0);

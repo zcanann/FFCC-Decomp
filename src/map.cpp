@@ -3831,7 +3831,7 @@ extern "C" void __sinit_map_cpp(void)
         0x1C,
         2);
 
-    __construct_array(Ptr(&MapMng, 0x214E4), __ct__9CMapIdGrpFv, 0, 0x14, 0x100);
+    __construct_array(Ptr(&MapMng, 0x214E8), __ct__9CMapIdGrpFv, 0, 0x14, 0x100);
     __register_global_object(&MapMng, reinterpret_cast<void*>(__dt__7CMapMngFv), &Vec_80245758);
 }
 

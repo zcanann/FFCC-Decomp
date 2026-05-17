@@ -336,7 +336,7 @@ void CMesMenu::DrawHeart(float x, float y, float z, float alpha)
         return;
     }
 
-    if (alpha <= FLOAT_803308d8) {
+    if (FLOAT_803308d8 >= alpha) {
         return;
     }
 
@@ -360,23 +360,27 @@ void CMesMenu::DrawHeart(float x, float y, float z, float alpha)
     float pulseMul = FLOAT_80330920;
     int timerOffset = (int)this;
 
-    for (int i = 0; i < (int)(unsigned int)(*(unsigned short*)(scriptFood + 0x1A) >> 1); i++) {
+    for (unsigned int i = 0; i < (*(unsigned short*)(scriptFood + 0x1A) >> 1); i++) {
         int heartValue = *(int*)((char*)this + 0x3DA8) - valueOffset;
         float timer = (float)*(unsigned int*)(timerOffset + 0x3DB0);
         float pulse = (pulseScale * (float)sin(stepScale * -(timer * timerScale - one)) + one) * pulseMul;
 
         unsigned int subTimer = *(unsigned int*)(timerOffset + 0x3DD0);
-        int shakeX = 0;
-        if (subTimer != 0) {
+        int shakeX;
+        if (subTimer == 0) {
+            shakeX = 0;
+        } else {
             shakeX = ((int)subTimer >> 2) * DAT_8020f998[((subTimer + 1) * 4 & 0xC) / 4];
         }
 
-        int shakeY = 0;
-        if (subTimer != 0) {
+        float drawX = baseX + (float)shakeX;
+        int shakeY;
+        if (subTimer == 0) {
+            shakeY = 0;
+        } else {
             shakeY = ((int)subTimer >> 2) * DAT_8020f998[subTimer & 3];
         }
 
-        float drawX = baseX + (float)shakeX;
         float drawY = baseY + (float)shakeY;
 
         DrawRect__8CMenuPcsFUlfffffffff(
@@ -494,7 +498,7 @@ void CMesMenu::CalcHeart()
  */
 void CMesMenu::onDraw()
 {
-    if ((*(int*)((char*)this + 0x18) == 0) && ((*(unsigned char*)(CFlat + 0x12E4) & 2) != 0)) {
+    if ((*(int*)((char*)this + 0x18) == 0) && ((int)((unsigned int)*(unsigned char*)(CFlat + 0x12E4) << 30) < 0)) {
         int iconFrame = 0;
         int charaMode = *(int*)((char*)&Chara + 0x2004);
         if (charaMode == 2) {
@@ -510,8 +514,7 @@ void CMesMenu::onDraw()
             if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
                 buttons = 0;
             } else {
-                __cntlzw((unsigned int)Pad._448_4_);
-                buttons = Pad._4_2_;
+                buttons = Pad.GetPadInputs()[__cntlzw((unsigned int)Pad._448_4_) >> 5].button[0];
             }
 
             iconFrame = DAT_8020F9A8[0];
@@ -679,7 +682,7 @@ void CMesMenu::onDraw()
             {
                 unsigned int heartFood = Game.m_scriptFoodBase[*(int*)((char*)this + 0x18)];
                 if ((heartFood != 0) && (stageBlend > FLOAT_803308d8)) {
-                    __ct__6CColorFUcUcUcUc(colorStorage, 0xFF, 0xFF, 0xFF, (int)(FLOAT_80330908 * stageBlend));
+                    __ct__6CColorFUcUcUcUc(colorStorage, 0xFF, 0xFF, 0xFF, (unsigned char)(int)(FLOAT_80330908 * stageBlend));
                     SetColor__8CMenuPcsFR6CColor(&MenuPcs, colorStorage);
                     SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x17);
 
@@ -693,7 +696,7 @@ void CMesMenu::onDraw()
                     int heartValueOffset = 0;
                     int heartTimerOffset = (int)this;
 
-                    for (int heartIndex = 0; heartIndex < (int)(unsigned int)(*(unsigned short*)(heartFood + 0x1A) >> 1);
+                    for (int heartIndex = 0; heartIndex < (int)((unsigned int)*(unsigned short*)(heartFood + 0x1A) >> 1);
                          heartIndex++) {
                         int heartValue = *(int*)((char*)this + 0x3DA8) - heartValueOffset;
                         float heartTimer = (float)*(unsigned int*)(heartTimerOffset + 0x3DB0);

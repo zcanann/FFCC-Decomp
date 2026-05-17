@@ -2093,34 +2093,30 @@ extern "C" int GetCmdListItemName__12CCaravanWorkFi(CCaravanWork* caravanWork, i
 	if (Game.m_gameWork.m_menuStageMode == 0) {
 		groupedCount = 1;
 	} else {
-		short* slotRef = caravanWork->m_commandListExtra + cmdListIdx;
-		if (slotRef[0] == 0) {
+		if (caravanWork->m_commandListExtra[cmdListIdx] == 0) {
 			groupedCount = 1;
 		} else {
 			int scanCount = cmdListIdx + 1;
 			int topIdx = cmdListIdx;
-			if (cmdListIdx >= 0) {
-				while (scanCount != 0) {
-					if (slotRef[0] != -1) {
+			if (topIdx >= 0) {
+				for (; scanCount != 0; scanCount--) {
+					if (caravanWork->m_commandListExtra[topIdx] != -1) {
 						break;
 					}
-					slotRef--;
 					topIdx--;
-					scanCount--;
 				}
 			}
 
 			groupedCount = 1;
 			scanCount = static_cast<short>(caravanWork->m_numCmdListSlots) - (topIdx + 1);
-			slotRef = caravanWork->m_commandListExtra + topIdx + 1;
-			if ((topIdx + 1) < static_cast<short>(caravanWork->m_numCmdListSlots)) {
-				while (scanCount != 0) {
-					if (slotRef[0] != -1) {
+			int nextIdx = topIdx + 1;
+			if (nextIdx < static_cast<short>(caravanWork->m_numCmdListSlots)) {
+				for (; scanCount != 0; scanCount--) {
+					if (caravanWork->m_commandListExtra[nextIdx] != -1) {
 						break;
 					}
 					groupedCount++;
-					slotRef++;
-					scanCount--;
+					nextIdx++;
 				}
 			}
 		}
@@ -2128,22 +2124,20 @@ extern "C" int GetCmdListItemName__12CCaravanWorkFi(CCaravanWork* caravanWork, i
 
 	if (groupedCount > 1) {
 		int scanCount = cmdListIdx + 1;
-		short* slotRef = caravanWork->m_commandListExtra + cmdListIdx;
 		if (cmdListIdx >= 0) {
-			while (scanCount != 0) {
-				if (slotRef[0] != -1) {
+			for (; scanCount != 0; scanCount--) {
+				if (caravanWork->m_commandListExtra[cmdListIdx] != -1) {
 					break;
 				}
-				slotRef--;
 				cmdListIdx--;
-				scanCount--;
 			}
 		}
 
 		short cmdId = caravanWork->m_commandListExtra[cmdListIdx];
 		if (cmdId == 0x207 || cmdId == 0x20B || cmdId == 0x20F) {
 			*firstCmdIdx = cmdListIdx;
-			for (int i = 0; i < groupedCount; i++) {
+			int i = 0;
+			for (; groupedCount != 0; groupedCount--) {
 				short invSlot = (short)caravanWork->m_commandListInventorySlotRef[cmdListIdx + i];
 				short itemId = (short)caravanWork->m_inventoryItems[invSlot];
 				int itemType = GetItemDataPtr(itemId)[0];
@@ -2151,6 +2145,7 @@ extern "C" int GetCmdListItemName__12CCaravanWorkFi(CCaravanWork* caravanWork, i
 					*itemCmdListIdx = cmdListIdx + i;
 					return 1;
 				}
+				i++;
 			}
 		}
 	}

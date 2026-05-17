@@ -30,7 +30,7 @@ void pppRandUpFloat(_pppPObject* basePtr, RandUpFloatParam* in, _pppCtrlTable* c
     u8* base = (u8*)basePtr;
     f32* valuePtr;
 
-    s32 id = *(s32*)(base + 0xC);
+    s32 id = basePtr->m_graphId;
     if (id == 0) {
         f32 value = Math.RandF();
 

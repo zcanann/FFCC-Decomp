@@ -120,7 +120,7 @@ void CGraphicPcs::drawScreenFade()
 
     PSMTXIdentity(identityMtx);
     GXLoadPosMtxImm(identityMtx, 0);
-    GXLoadTexMtxImm(identityMtx, GX_TEXMTX0, GX_MTX3x4);
+    GXLoadTexMtxImm(identityMtx, GX_TEXMTX0, GX_MTX2x4);
 
     for (int slot = 0; slot < 4; slot++) {
         ScreenFadeSlot* slotData = &m_screenFade[slot];
@@ -140,9 +140,14 @@ void CGraphicPcs::drawScreenFade()
         GXSetNumIndStages(0);
         GXSetTevDirect(GX_TEVSTAGE0);
         GXSetNumChans(1);
-        GXSetChanCtrl(GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPEC);
-        GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_SPEC);
+        GXSetChanCtrl(GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPOT);
+        GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
         _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
+
+        CColor whiteColor(0xFF, 0xFF, 0xFF, 0xFF);
+        GXSetChanAmbColor(GX_COLOR0A0, whiteColor.color);
+        _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
+        _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
 
         _GXColor baseColor = slotData->m_colorA;
         _GXColor baseColor2 = slotData->m_colorB;
@@ -155,11 +160,6 @@ void CGraphicPcs::drawScreenFade()
         const u8 fadeAlpha = (u8)(255.0f * fadeWave);
         baseColor.a = fadeAlpha;
         baseColor2.a = fadeAlpha;
-
-        const _GXColor whiteColor = {0xFF, 0xFF, 0xFF, 0xFF};
-        GXSetChanAmbColor(GX_COLOR0A0, *(GXColor*)&whiteColor);
-        _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
-        _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
 
         if (slot == 3) {
             const int barHeight = (int)(448.0f * fadeWave);
@@ -274,6 +274,7 @@ void CGraphicPcs::drawScreenFade()
                 GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
                 _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
                 _GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
+                GXLoadTexObj(&Graphic.m_smallBackTexObj, GX_TEXMAP0);
 
                 const float phase = slotData->m_phase;
                 const float stretch = slotData->m_stretch;
@@ -622,8 +623,9 @@ void CGraphicPcs::drawBar()
     const bool useDebugPad = (Pad._452_4_ != 0) || (Pad._448_4_ != -1);
     int padState = 0;
     if (!useDebugPad) {
-        __cntlzw(static_cast<unsigned int>(Pad._448_4_));
-        padState = *reinterpret_cast<int*>(reinterpret_cast<u8*>(&Pad) + 0x60);
+        int padIndex = useDebugPad;
+        padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad._448_4_)) & 0x20) >> 5);
+        padState = *reinterpret_cast<int*>(reinterpret_cast<u8*>(&Pad) + padIndex * 0x54 + 60);
     }
     const bool drawText = (padState != 0) && (GetPadType__6JoyBusFi(&Joybus, 0) != 0x40000);
 
@@ -647,9 +649,9 @@ void CGraphicPcs::drawBar()
     float x = 0.0f;
     int hue = 0;
     u32 y = 0x10;
-    for (int i = 0; i < orderCount && order != NULL; i++) {
+    for (int i = 0; i < orderCount; i++) {
         const float width = (100.0f * order->m_lastTime) / 16.666666f;
-        const u32 rgb = Math.Hsb2Rgb(orderCount > 0 ? (hue / orderCount) : 0, 100, 100);
+        const u32 rgb = Math.Hsb2Rgb(hue / orderCount, 100, 100);
         const float y0 = drawText ? static_cast<float>(y) : ((order->m_priority == 0x26) ? 456.0f : 464.0f);
         const float y1 = drawText ? static_cast<float>(y + 8) : ((order->m_priority == 0x26) ? 464.0f : 456.0f);
 
@@ -745,7 +747,7 @@ void CGraphicPcs::drawBar()
         order = System.GetFirstOrder();
         x = 0.0f;
         y = 0x10;
-        for (int i = 0; i < orderCount && order != NULL; i++) {
+        for (int i = 0; i < orderCount; i++) {
             const float width = (100.0f * order->m_lastTime) / 16.666666f;
 
             if (order->m_priority != 0x27) {

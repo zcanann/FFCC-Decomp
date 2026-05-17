@@ -1910,18 +1910,16 @@ void CSound::StopSe3DGroup(int group)
     u32 i = 0;
 
     while (i < 0x80) {
-        if ((*se < 0) && (*reinterpret_cast<int*>(se + 0x24) >= 0) &&
+        if (((*se & 0x80) != 0) && (*reinterpret_cast<int*>(se + 0x24) >= 0) &&
             (*reinterpret_cast<int*>(se + 0x24) == group)) {
             int se3dHandle = *reinterpret_cast<int*>(se + 4);
             if (se3dHandle < 0) {
                 Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
             } else {
-                char* search = reinterpret_cast<char*>(this) + 0x2C;
-                char* found;
+                char* found = reinterpret_cast<char*>(this) + 0x2C;
                 int count;
 
                 for (count = 0x20; count != 0; count--) {
-                    found = search;
                     if ((*found & 0x80) != 0) {
                         if (*reinterpret_cast<int*>(found + 4) == se3dHandle) {
                             goto found_se;
@@ -1949,7 +1947,7 @@ void CSound::StopSe3DGroup(int group)
                         }
                     }
 
-                    search = found + 0x28;
+                    found += 0x28;
                 }
                 found = 0;
 found_se:

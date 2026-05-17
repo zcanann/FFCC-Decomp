@@ -41,6 +41,7 @@ extern "C" void DrawHelpMessage__8CMenuPcsFiP5CFontii8_GXColoriff(CMenuPcs*, int
 extern "C" int GetAttrStr__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" const char* GetMenuStr__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
+extern CMenuPcs MenuPcs;
 
 extern const float FLOAT_80332eb8;
 extern const double DOUBLE_80332ec0;
@@ -143,7 +144,7 @@ int CMenuPcs::ChkEquipActive(int index)
 	s16* itemEntries = entries + 1;
 	int equipIndex = GetEquipState(this)[0x13];
 
-	if ((index < 0) || (entryCount <= index)) {
+	if ((index < 0) || (index >= entryCount)) {
 		return 0;
 	}
 
@@ -499,7 +500,7 @@ void CMenuPcs::EquipDraw()
 	int helpItem = -1;
 
 	_GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
-	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
+	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(&MenuPcs, 0);
 
 	for (int i = 0; i < menuData[0]; i++) {
 		if (*(int*)(item + 0xe) >= 0) {
@@ -514,7 +515,7 @@ void CMenuPcs::EquipDraw()
 				sx = sx + h;
 			}
 
-			SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, tex);
+			SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, tex);
 			GXColor color;
 			color.r = 0xff;
 			color.g = 0xff;
@@ -522,7 +523,7 @@ void CMenuPcs::EquipDraw()
 			color.a = (u8)(FLOAT_80332ee4 * *(float*)(item + 8));
 			GXSetChanMatColor((GXChannelID)4, color);
 			DrawRect__8CMenuPcsFUlfffffffff(x, (double)(float)((double)item[1] - DOUBLE_80332ed8), w, h, y, sx,
-			                                (double)*(float*)(item + 10), (double)*(float*)(item + 10), this, 0);
+			                                (double)*(float*)(item + 10), (double)*(float*)(item + 10), &MenuPcs, 0);
 		}
 		item += 0x20;
 	}
@@ -566,7 +567,7 @@ void CMenuPcs::EquipDraw()
 	DrawInit__8CMenuPcsFv(this);
 
 	if (*(s16*)(menuState + 0x32) != 0) {
-		SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
+		SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(&MenuPcs, 0);
 		int drawIndex = 0;
 		s16* listItem = menuData + menuData[0] * 0x20 + 4;
 		s16* letter = GetLetterBuffer__6JoyBusFi(&Joybus, 0);
@@ -583,7 +584,42 @@ void CMenuPcs::EquipDraw()
 				double v = (double)*(float*)(listItem + 6);
 				double alpha = (double)*(float*)(listItem + 8);
 
-				if (tex == 0x37) {
+				if (i == menuData[0]) {
+					SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(&MenuPcs, 1);
+					SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, tex);
+					GXColor colors[4];
+					colors[0].r = 0xff;
+					colors[0].g = 0xff;
+					colors[0].b = 0xff;
+					colors[0].a = 0xff;
+					colors[1] = colors[0];
+					colors[2] = colors[0];
+					colors[3] = colors[0];
+					GXColor color;
+					color.r = 0xff;
+					color.g = 0xff;
+					color.b = 0xff;
+					color.a = 0xff;
+					GXSetChanMatColor((GXChannelID)4, color);
+					double fillWidth = (double)(float)(alpha * w);
+					if ((double)FLOAT_80332eb8 < fillWidth) {
+						DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(
+						    x, y, fillWidth, h, u, v, (double)FLOAT_80332ee0, (double)FLOAT_80332ee0, &MenuPcs, 0,
+						    colors);
+						x = (double)(float)(x + fillWidth);
+						u = (double)(float)(u + fillWidth);
+					}
+					if (((double)FLOAT_80332eb8 < fillWidth) && (fillWidth < w)) {
+						colors[1].a = 0;
+						colors[3].a = 0;
+						double fadeWidth =
+						    (double)((float)(DOUBLE_80332ec0 / (double)*(int*)(listItem + 0x14)) * (float)listItem[2]);
+						DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(
+						    x, y, fadeWidth, h, u, v, (double)FLOAT_80332ee0, (double)FLOAT_80332ee0, &MenuPcs, 0,
+						    colors);
+					}
+					SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(&MenuPcs, 0);
+				} else if (tex == 0x37) {
 					int idx = drawIndex + *(s16*)(menuState + 0x34);
 					if ((idx < 1) || (letterCount <= idx)) {
 						if ((idx >= letterCount) || (ChkEquipActive(idx) == 0)) {
@@ -608,15 +644,17 @@ void CMenuPcs::EquipDraw()
 					drawIndex++;
 				}
 
-				SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, tex);
-				GXColor color;
-				color.r = 0xff;
-				color.g = 0xff;
-				color.b = 0xff;
-				color.a = (u8)((double)FLOAT_80332ee4 * alpha);
-				GXSetChanMatColor((GXChannelID)4, color);
-				DrawRect__8CMenuPcsFUlfffffffff(x, y, w, h, u, v, (double)*(float*)(listItem + 10),
-				                                (double)*(float*)(listItem + 10), this, 0);
+				if (i != menuData[0]) {
+					SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, tex);
+					GXColor color;
+					color.r = 0xff;
+					color.g = 0xff;
+					color.b = 0xff;
+					color.a = (u8)((double)FLOAT_80332ee4 * alpha);
+					GXSetChanMatColor((GXChannelID)4, color);
+					DrawRect__8CMenuPcsFUlfffffffff(x, y, w, h, u, v, (double)*(float*)(listItem + 10),
+					                                (double)*(float*)(listItem + 10), &MenuPcs, 0);
+				}
 			}
 			listItem += 0x20;
 		}

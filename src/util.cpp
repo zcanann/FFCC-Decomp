@@ -254,7 +254,7 @@ void CUtil::ReWriteDisplayList(void* dlData, unsigned long dlSize, unsigned long
 			break;
 		}
 
-		while (count > 0) {
+		for (int i = 0; i < count; i++) {
 			u16 value = *(u16*)current;
 
 			if ((copyFlags & 1) != 0) {
@@ -277,8 +277,6 @@ void CUtil::ReWriteDisplayList(void* dlData, unsigned long dlSize, unsigned long
 					current += 2;
 				}
 			}
-
-			count--;
 		}
 	}
 	DCFlushRange(dlData, dlSize);

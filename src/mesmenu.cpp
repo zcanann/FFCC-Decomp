@@ -336,7 +336,7 @@ void CMesMenu::DrawHeart(float x, float y, float z, float alpha)
         return;
     }
 
-    if (alpha <= FLOAT_803308d8) {
+    if (FLOAT_803308d8 >= alpha) {
         return;
     }
 
@@ -360,7 +360,7 @@ void CMesMenu::DrawHeart(float x, float y, float z, float alpha)
     float pulseMul = FLOAT_80330920;
     int timerOffset = (int)this;
 
-    for (int i = 0; i < (int)(unsigned int)(*(unsigned short*)(scriptFood + 0x1A) >> 1); i++) {
+    for (int i = 0; i < (int)((unsigned int)*(unsigned short*)(scriptFood + 0x1A) >> 1); i++) {
         int heartValue = *(int*)((char*)this + 0x3DA8) - valueOffset;
         float timer = (float)*(unsigned int*)(timerOffset + 0x3DB0);
         float pulse = (pulseScale * (float)sin(stepScale * -(timer * timerScale - one)) + one) * pulseMul;
@@ -494,7 +494,7 @@ void CMesMenu::CalcHeart()
  */
 void CMesMenu::onDraw()
 {
-    if ((*(int*)((char*)this + 0x18) == 0) && ((*(unsigned char*)(CFlat + 0x12E4) & 2) != 0)) {
+    if ((*(int*)((char*)this + 0x18) == 0) && ((int)((unsigned int)*(unsigned char*)(CFlat + 0x12E4) << 30) < 0)) {
         int iconFrame = 0;
         int charaMode = *(int*)((char*)&Chara + 0x2004);
         if (charaMode == 2) {
@@ -693,7 +693,7 @@ void CMesMenu::onDraw()
                     int heartValueOffset = 0;
                     int heartTimerOffset = (int)this;
 
-                    for (int heartIndex = 0; heartIndex < (int)(unsigned int)(*(unsigned short*)(heartFood + 0x1A) >> 1);
+                    for (int heartIndex = 0; heartIndex < (int)((unsigned int)*(unsigned short*)(heartFood + 0x1A) >> 1);
                          heartIndex++) {
                         int heartValue = *(int*)((char*)this + 0x3DA8) - heartValueOffset;
                         float heartTimer = (float)*(unsigned int*)(heartTimerOffset + 0x3DB0);

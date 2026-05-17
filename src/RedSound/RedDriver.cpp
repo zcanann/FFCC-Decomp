@@ -1253,7 +1253,7 @@ static void _SetMusicPhraseStop(int* command)
  */
 static void _SetSeBlockData(int* command)
 {
-    u32 index = (u32)command[REDSOUND_SE_BLOCK_DATA_COMMAND_BANK] & REDSOUND_SE_BLOCK_BANK_MASK;
+    u32 index = (u32)RedExecCommandArgGet(command, REDSOUND_SE_BLOCK_DATA_COMMAND_BANK) & REDSOUND_SE_BLOCK_BANK_MASK;
     RedSeBlockHEAD* seBlockData;
 
     if (RedSeBlockDataGet(index) != REDSOUND_SE_BLOCK_DATA_NONE) {
@@ -1261,8 +1261,8 @@ static void _SetSeBlockData(int* command)
         RedSeBlockDataSet(index, REDSOUND_SE_BLOCK_DATA_NONE);
     }
 
-    if (command[REDSOUND_SE_BLOCK_DATA_COMMAND_BUFFER] != 0) {
-        seBlockData = (RedSeBlockHEAD*)command[REDSOUND_SE_BLOCK_DATA_COMMAND_BUFFER];
+    if (RedExecCommandArgGet(command, REDSOUND_SE_BLOCK_DATA_COMMAND_BUFFER) != 0) {
+        seBlockData = (RedSeBlockHEAD*)RedExecCommandArgGet(command, REDSOUND_SE_BLOCK_DATA_COMMAND_BUFFER);
         if ((seBlockData->m_signature[REDSOUND_SE_BLOCK_SIGNATURE_0_INDEX] = REDSOUND_SE_BLOCK_SIGNATURE_0) &&
             (seBlockData->m_signature[REDSOUND_SE_BLOCK_SIGNATURE_1_INDEX] = REDSOUND_SE_BLOCK_SIGNATURE_1) &&
             (seBlockData->m_signature[REDSOUND_SE_BLOCK_SIGNATURE_2_INDEX] = REDSOUND_SE_BLOCK_SIGNATURE_2) &&
@@ -1288,7 +1288,7 @@ static void _SetSeBlockData(int* command)
  */
 static void _SetSeSepData(int* command)
 {
-    c_RedEntry.SetSeSepData((RedSeSepHEAD*)command[REDSOUND_DATA_COMMAND_BUFFER]);
+    c_RedEntry.SetSeSepData((RedSeSepHEAD*)RedExecCommandArgGet(command, REDSOUND_DATA_COMMAND_BUFFER));
 }
 
 /*
@@ -1302,7 +1302,7 @@ static void _SetSeSepData(int* command)
  */
 static void _ClearSeSepData(int* command)
 {
-    c_RedEntry.ClearSeSepData(command[REDSOUND_SE_COMMAND_ID]);
+    c_RedEntry.ClearSeSepData(RedExecCommandArgGet(command, REDSOUND_SE_COMMAND_ID));
 }
 
 /*
@@ -1316,8 +1316,8 @@ static void _ClearSeSepData(int* command)
  */
 static void _ClearSeSepDataMG(int* command)
 {
-    c_RedEntry.ClearSeSepDataMG(command[REDSOUND_SE_MG_COMMAND_BANK], command[REDSOUND_SE_MG_COMMAND_SEP],
-                                command[REDSOUND_SE_MG_COMMAND_GROUP], command[REDSOUND_SE_MG_COMMAND_KIND]);
+    c_RedEntry.ClearSeSepDataMG(RedExecCommandArgGet(command, REDSOUND_SE_MG_COMMAND_BANK), RedExecCommandArgGet(command, REDSOUND_SE_MG_COMMAND_SEP),
+                                RedExecCommandArgGet(command, REDSOUND_SE_MG_COMMAND_GROUP), RedExecCommandArgGet(command, REDSOUND_SE_MG_COMMAND_KIND));
 }
 
 /*
@@ -1331,7 +1331,7 @@ static void _ClearSeSepDataMG(int* command)
  */
 static void _SeStop(int* command)
 {
-    SeStopID(command[REDSOUND_SE_COMMAND_ID]);
+    SeStopID(RedExecCommandArgGet(command, REDSOUND_SE_COMMAND_ID));
 }
 
 /*
@@ -1344,7 +1344,7 @@ static void _SeStop(int* command)
  */
 static void _SeStopG(int* command)
 {
-    SeStopG(command[REDSOUND_SE_COMMAND_ID]);
+    SeStopG(RedExecCommandArgGet(command, REDSOUND_SE_COMMAND_ID));
 }
 
 /*
@@ -1358,8 +1358,8 @@ static void _SeStopG(int* command)
  */
 static void _SeStopMG(int* command)
 {
-    SeStopMG(command[REDSOUND_SE_MG_COMMAND_BANK], command[REDSOUND_SE_MG_COMMAND_SEP],
-             command[REDSOUND_SE_MG_COMMAND_GROUP], command[REDSOUND_SE_MG_COMMAND_KIND]);
+    SeStopMG(RedExecCommandArgGet(command, REDSOUND_SE_MG_COMMAND_BANK), RedExecCommandArgGet(command, REDSOUND_SE_MG_COMMAND_SEP),
+             RedExecCommandArgGet(command, REDSOUND_SE_MG_COMMAND_GROUP), RedExecCommandArgGet(command, REDSOUND_SE_MG_COMMAND_KIND));
 }
 
 /*
@@ -1373,10 +1373,10 @@ static void _SeStopMG(int* command)
  */
 static void _SeBlockPlay(int* command)
 {
-    RedSeSkipStepSet(command[REDSOUND_SE_BLOCK_COMMAND_PITCH]);
-    SeBlockPlay(command[REDSOUND_SE_COMMAND_ID], command[REDSOUND_SE_BLOCK_COMMAND_BANK],
-                command[REDSOUND_SE_BLOCK_COMMAND_NO], command[REDSOUND_SE_BLOCK_COMMAND_PAN],
-                command[REDSOUND_SE_BLOCK_COMMAND_VOLUME]);
+    RedSeSkipStepSet(RedExecCommandArgGet(command, REDSOUND_SE_BLOCK_COMMAND_PITCH));
+    SeBlockPlay(RedExecCommandArgGet(command, REDSOUND_SE_COMMAND_ID), RedExecCommandArgGet(command, REDSOUND_SE_BLOCK_COMMAND_BANK),
+                RedExecCommandArgGet(command, REDSOUND_SE_BLOCK_COMMAND_NO), RedExecCommandArgGet(command, REDSOUND_SE_BLOCK_COMMAND_PAN),
+                RedExecCommandArgGet(command, REDSOUND_SE_BLOCK_COMMAND_VOLUME));
 }
 
 /*
@@ -1392,12 +1392,12 @@ static void _SeSepPlay(int* command)
 {
     RedSeSepHEAD* seSepHead;
 
-    seSepHead = c_RedEntry.SetSeSepData((RedSeSepHEAD*)command[REDSOUND_SE_SEP_COMMAND_DATA]);
+    seSepHead = c_RedEntry.SetSeSepData((RedSeSepHEAD*)RedExecCommandArgGet(command, REDSOUND_SE_SEP_COMMAND_DATA));
     if (seSepHead != 0) {
-        RedSeSkipStepSet(command[REDSOUND_SE_SEP_COMMAND_PITCH]);
-        int seID = command[REDSOUND_SE_COMMAND_ID];
-        SeSepPlay(seID, seSepHead->m_seNo, command[REDSOUND_SE_SEP_COMMAND_PAN],
-                  command[REDSOUND_SE_SEP_COMMAND_VOLUME]);
+        RedSeSkipStepSet(RedExecCommandArgGet(command, REDSOUND_SE_SEP_COMMAND_PITCH));
+        int seID = RedExecCommandArgGet(command, REDSOUND_SE_COMMAND_ID);
+        SeSepPlay(seID, seSepHead->m_seNo, RedExecCommandArgGet(command, REDSOUND_SE_SEP_COMMAND_PAN),
+                  RedExecCommandArgGet(command, REDSOUND_SE_SEP_COMMAND_VOLUME));
     }
 }
 
@@ -1412,10 +1412,10 @@ static void _SeSepPlay(int* command)
  */
 static void _SeSepPlaySequence(int* command)
 {
-    if (c_RedEntry.SearchSeSepSequence(command[REDSOUND_SE_SEP_COMMAND_ID]) >= 0) {
-        RedSeSkipStepSet(command[REDSOUND_SE_SEP_COMMAND_PITCH]);
-        SeSepPlay(command[REDSOUND_SE_COMMAND_ID], command[REDSOUND_SE_SEP_COMMAND_ID],
-                  command[REDSOUND_SE_SEP_COMMAND_PAN], command[REDSOUND_SE_SEP_COMMAND_VOLUME]);
+    if (c_RedEntry.SearchSeSepSequence(RedExecCommandArgGet(command, REDSOUND_SE_SEP_COMMAND_ID)) >= 0) {
+        RedSeSkipStepSet(RedExecCommandArgGet(command, REDSOUND_SE_SEP_COMMAND_PITCH));
+        SeSepPlay(RedExecCommandArgGet(command, REDSOUND_SE_COMMAND_ID), RedExecCommandArgGet(command, REDSOUND_SE_SEP_COMMAND_ID),
+                  RedExecCommandArgGet(command, REDSOUND_SE_SEP_COMMAND_PAN), RedExecCommandArgGet(command, REDSOUND_SE_SEP_COMMAND_VOLUME));
     }
 }
 
@@ -1432,7 +1432,7 @@ static void _SeMasterVolume(int* command)
 {
     RedVoiceDATA* voice;
 
-    RedMasterSEVolumeSet(command[REDSOUND_MASTER_VOLUME_COMMAND_VOLUME] & REDSOUND_COMMAND_VALUE_MASK);
+    RedMasterSEVolumeSet(RedExecCommandArgGet(command, REDSOUND_MASTER_VOLUME_COMMAND_VOLUME) & REDSOUND_COMMAND_VALUE_MASK);
     if (RedMasterSEVolumeGet() != 0) {
         RedMasterSEVolumeSet(RedMasterSEVolumeGet() + 1);
         RedMasterSEVolumeSet(RedMasterSEVolumeGet() * REDSOUND_MASTER_VOLUME_SCALE);

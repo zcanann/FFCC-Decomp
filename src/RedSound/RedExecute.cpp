@@ -550,37 +550,37 @@ u8 GetRandomData()
  */
 int PitchCompute(int basePitch, int pitchOffset, int wavePitch, int fineTune)
 {
-    int pitchScale;
-    int pitch;
+    int pitchOutput;
+    int pitchValue;
     int octaveAdjust;
-    int noteBand;
+    int noteIndex;
 
     octaveAdjust = 0;
     basePitch >>= REDSOUND_FIXED_SHIFT;
-    pitch = pitchOffset + (wavePitch >> REDSOUND_PITCH_WAVE_SHIFT);
-    pitch = basePitch + pitch;
-    while (pitch < 0) {
-        pitch += REDSOUND_PITCH_OCTAVE_UNITS;
+    pitchValue = pitchOffset + (wavePitch >> REDSOUND_PITCH_WAVE_SHIFT);
+    pitchValue = basePitch + pitchValue;
+    while (pitchValue < 0) {
+        pitchValue += REDSOUND_PITCH_OCTAVE_UNITS;
         octaveAdjust -= 1;
     }
 
-    noteBand = (pitch >> REDSOUND_PITCH_NOTE_SHIFT) & REDSOUND_PITCH_NOTE_MASK;
-    octaveAdjust += noteBand / REDSOUND_NOTES_PER_OCTAVE;
-    noteBand %= REDSOUND_NOTES_PER_OCTAVE;
-    pitchScale = RedTonePitchGet(noteBand) >> (REDSOUND_PITCH_TONE_SHIFT - octaveAdjust);
-    pitchScale *= RedFinePitchGet(pitch & REDSOUND_PITCH_FINE_MASK);
-    pitchScale >>= REDSOUND_FIXED_SHIFT;
+    noteIndex = (pitchValue >> REDSOUND_PITCH_NOTE_SHIFT) & REDSOUND_PITCH_NOTE_MASK;
+    octaveAdjust += noteIndex / REDSOUND_NOTES_PER_OCTAVE;
+    noteIndex %= REDSOUND_NOTES_PER_OCTAVE;
+    pitchOutput = RedTonePitchGet(noteIndex) >> (REDSOUND_PITCH_TONE_SHIFT - octaveAdjust);
+    pitchOutput *= RedFinePitchGet(pitchValue & REDSOUND_PITCH_FINE_MASK);
+    pitchOutput >>= REDSOUND_FIXED_SHIFT;
 
     if (fineTune != 0) {
         if ((int)fineTune > 0) {
-            pitchScale = pitchScale + ((int)(pitchScale * (fineTune + 1)) >> REDSOUND_PITCH_FINE_TUNE_POSITIVE_SHIFT);
+            pitchOutput = pitchOutput + ((int)(pitchOutput * (fineTune + 1)) >> REDSOUND_PITCH_FINE_TUNE_POSITIVE_SHIFT);
         } else {
-            pitchScale *= fineTune & REDSOUND_PITCH_FINE_MASK;
-            pitchScale >>= REDSOUND_PITCH_FINE_TUNE_NEGATIVE_SHIFT;
+            pitchOutput *= fineTune & REDSOUND_PITCH_FINE_MASK;
+            pitchOutput >>= REDSOUND_PITCH_FINE_TUNE_NEGATIVE_SHIFT;
         }
     }
 
-    return pitchScale;
+    return pitchOutput;
 }
 
 /*

@@ -61,6 +61,8 @@ extern float FLOAT_80331d58;
 extern float FLOAT_80331d6c;
 extern float FLOAT_80331d70;
 extern float FLOAT_80331d74;
+extern float FLOAT_80331d7c;
+extern float FLOAT_80331d80;
 extern float FLOAT_80331d78;
 extern float FLOAT_80331d7c;
 extern float FLOAT_80331d80;
@@ -1744,6 +1746,30 @@ void CGMonObj::frameStatFuncTetsukyojin()
 		}
 		if (prgObj->m_stateFrame > 0xF) {
 			moveFrame__8CGMonObjFv(this);
+		}
+		reinterpret_cast<CGCharaObj*>(this)->statAttack();
+	} else if (state > 99) {
+		if ((*reinterpret_cast<int*>(CFlat + 4840) != 0) && (prgObj->m_stateFrame == 0x25)) {
+			int flatCount = *reinterpret_cast<int*>(CFlat + 4840);
+			if (flatCount < 1) {
+				*reinterpret_cast<int*>(CFlat + 4840) = 0;
+			} else if (((flatCount == 1) && (*reinterpret_cast<int*>(SoundBuffer + 0x4EC) > 0x13)) ||
+			           ((flatCount > 1) && (*reinterpret_cast<int*>(SoundBuffer + 0x4EC) > 4))) {
+				*reinterpret_cast<int*>(SoundBuffer + 0x4EC) = 0;
+				object->DispCharaParts(1);
+
+				int pdtNo = -1;
+				if (object->m_charaModelHandle->m_pdtLoadRef != 0) {
+					pdtNo = *reinterpret_cast<int*>(reinterpret_cast<u8*>(object->m_charaModelHandle->m_pdtLoadRef) + 0x14);
+				}
+				putParticle__8CGPrgObjFiiP8CGObjectfi(prgObj, (pdtNo << 8) | 0x2D, 0, object, FLOAT_80331d18, 0x101E4);
+
+				if (*reinterpret_cast<int*>(self + 0x6B4) == 0) {
+					*reinterpret_cast<int*>(CFlat + 4840) = *reinterpret_cast<int*>(CFlat + 4840) - 1;
+				}
+				*reinterpret_cast<int*>(self + 0x6B4) = 1;
+				*reinterpret_cast<int*>(self + 0x6C8) = 0;
+			}
 		}
 		reinterpret_cast<CGCharaObj*>(this)->statAttack();
 	}

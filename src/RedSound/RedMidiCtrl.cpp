@@ -594,16 +594,16 @@ STATIC_ASSERT(sizeof(m_SignDataTable) + sizeof(SwingEntryFunction) + sizeof(p_Mi
  */
 int DataAddCompute(int* current, int target, int* delta)
 {
-    int result = 0;
+    int stepAdd = 0;
 
     if (target - (*current >> REDSOUND_FIXED_SHIFT) != 0) {
-        result = ((target << REDSOUND_FIXED_SHIFT) | REDSOUND_FIXED_HALF) - *current;
-        result /= *delta;
+        stepAdd = ((target << REDSOUND_FIXED_SHIFT) | REDSOUND_FIXED_HALF) - *current;
+        stepAdd /= *delta;
     } else {
         *delta = 0;
     }
 
-    return result;
+    return stepAdd;
 }
 /*
  * --INFO--

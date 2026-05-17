@@ -143,6 +143,9 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XUnkB* param_2,
     float colorStepB;
     float colorStepA;
     float invCountMinusOne;
+    pppFVECTOR4 colorStart;
+    pppFVECTOR4 colorEnd;
+    pppFVECTOR4 colorStep;
     pppFMATRIX localBase;
     pppFMATRIX drawMtx;
     Vec zeroVec ATTRIBUTE_ALIGN(8);
@@ -179,21 +182,29 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XUnkB* param_2,
     count = step->m_drawCount;
     invCountMinusOne = (float)(count - 1);
     alphaMul = (float)*(s16*)((u8*)obj + 0x86 + param_3->m_serializedDataOffsets[1]) / kPppKeShpTail2XAlphaScale;
-    colorR = step->m_colorStartR;
-    colorG = step->m_colorStartG;
-    colorB = step->m_colorStartB;
-    colorA = (float)step->m_colorStartA * alphaMul;
+    U8ToF32(&colorStart, &step->m_colorStartR);
+    U8ToF32(&colorEnd, &step->m_colorEndR);
+    colorStart.w *= alphaMul;
+    colorEnd.w *= alphaMul;
+    colorR = colorStart.x;
+    colorG = colorStart.y;
+    colorB = colorStart.z;
+    colorA = colorStart.w;
     if (invCountMinusOne != zero) {
-        colorStepR = (colorR - (float)step->m_colorEndR) / invCountMinusOne;
-        colorStepG = (colorG - (float)step->m_colorEndG) / invCountMinusOne;
-        colorStepB = (colorB - (float)step->m_colorEndB) / invCountMinusOne;
-        colorStepA = (colorA - ((float)step->m_colorEndA * alphaMul)) / invCountMinusOne;
+        colorStep.x = (colorStart.x - colorEnd.x) / invCountMinusOne;
+        colorStep.y = (colorStart.y - colorEnd.y) / invCountMinusOne;
+        colorStep.z = (colorStart.z - colorEnd.z) / invCountMinusOne;
+        colorStep.w = (colorStart.w - colorEnd.w) / invCountMinusOne;
     } else {
-        colorStepR = FLOAT_80330508;
-        colorStepG = FLOAT_80330508;
-        colorStepB = FLOAT_80330508;
-        colorStepA = FLOAT_80330508;
+        colorStep.x = FLOAT_80330508;
+        colorStep.y = FLOAT_80330508;
+        colorStep.z = FLOAT_80330508;
+        colorStep.w = FLOAT_80330508;
     }
+    colorStepR = colorStep.x;
+    colorStepG = colorStep.y;
+    colorStepB = colorStep.z;
+    colorStepA = colorStep.w;
 
     work = (KeShpTail2XWork*)((u8*)obj + 0x80 + param_3->m_serializedDataOffsets[0]);
     shapeTable = *(long***)(*(u32*)&pppEnvStPtr->m_particleColors[0] + dataValIndex * 4);

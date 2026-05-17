@@ -766,6 +766,10 @@ static OSSemaphore m_WaveSettingSemaphore;
 #define RedWaveSettingSemaphoreGet() (&m_WaveSettingSemaphore)
 static RedWaveSettingState m_WaveSettingData;
 #define RedWaveSettingDataGet() (&m_WaveSettingData)
+#define RedWaveSettingDataSetSlot(slot) (RedWaveSettingDataGet()->m_slot = reinterpret_cast<int*>(slot))
+#define RedWaveSettingDataSetWaveId(waveId) (RedWaveSettingDataGet()->m_waveId = (waveId))
+#define RedWaveSettingDataSetWaveData(waveData) (RedWaveSettingDataGet()->m_waveData = (waveData))
+#define RedWaveSettingDataSetWaveSize(waveSize) (RedWaveSettingDataGet()->m_waveSize = (waveSize))
 static OSThread m_DmaExecuteThread;
 static OSSemaphore m_DmaExecuteSemaphore;
 #define RedDmaExecuteSemaphoreGet() (&m_DmaExecuteSemaphore)
@@ -3572,9 +3576,9 @@ void CRedDriver::SetWaveData(int slot, int waveID, void* waveData, int waveSize)
         RedSleep(REDSOUND_THREAD_YIELD_SLEEP_US);
     }
 
-    RedWaveSettingDataGet()->m_slot = reinterpret_cast<int*>(slot);
-    RedWaveSettingDataGet()->m_waveId = waveID;
-    RedWaveSettingDataGet()->m_waveData = waveData;
+    RedWaveSettingDataSetSlot(slot);
+    RedWaveSettingDataSetWaveId(waveID);
+    RedWaveSettingDataSetWaveData(waveData);
 
     if (waveSize == REDSOUND_WAVE_SIZE_AUTO) {
         RedWaveHeadWD* const waveHeader = (RedWaveHeadWD*)waveData;
@@ -3586,12 +3590,12 @@ void CRedDriver::SetWaveData(int slot, int waveID, void* waveData, int waveSize)
             dataSize += waveHeader->m_toneCount * REDSOUND_WAVE_TONE_ENTRY_SIZE;
             dataSize = waveHeader->m_waveSize + dataSize;
             dataSize += REDSOUND_WAVE_HEADER_COPY_BASE_SIZE;
-            RedWaveSettingDataGet()->m_waveSize = dataSize;
+            RedWaveSettingDataSetWaveSize(dataSize);
         } else {
-            RedWaveSettingDataGet()->m_waveSize = 0;
+            RedWaveSettingDataSetWaveSize(0);
         }
     } else {
-        RedWaveSettingDataGet()->m_waveSize = waveSize;
+        RedWaveSettingDataSetWaveSize(waveSize);
     }
     OSSignalSemaphore(RedWaveSettingSemaphoreGet());
 }

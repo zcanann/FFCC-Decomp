@@ -202,27 +202,27 @@ enum RedExecuteSmallDataLayout {
 };
 
 struct RedExecuteSmallDataState {
-    volatile u8 m_randomIndex;
-    u8 m_randomIndexAlignPadding[REDSOUND_EXECUTE_SBSS_RANDOM_PAD_SIZE];
-    RedReverbDATA* volatile m_reverbData;
-    RedReverbSize* m_reverbSize;
-    volatile u32 m_changeStatus;
-    RedKeyOnDATA* volatile m_skipKeyOn;
+    volatile u8 m_RandomIndex;
+    u8 m_RandomIndexAlignPadding[REDSOUND_EXECUTE_SBSS_RANDOM_PAD_SIZE];
+    RedReverbDATA* volatile p_ReverbData;
+    RedReverbSize* p_ReverbSize;
+    volatile u32 m_ChangeStatus;
+    RedKeyOnDATA* volatile p_SkipKeyOn;
 };
 
 enum RedExecuteSmallDataOffset {
     REDSOUND_EXECUTE_SBSS_RANDOM_INDEX_OFFSET =
-        (unsigned int)&(((RedExecuteSmallDataState*)0)->m_randomIndex),
+        (unsigned int)&(((RedExecuteSmallDataState*)0)->m_RandomIndex),
     REDSOUND_EXECUTE_SBSS_RANDOM_PAD_OFFSET =
-        (unsigned int)&(((RedExecuteSmallDataState*)0)->m_randomIndexAlignPadding),
+        (unsigned int)&(((RedExecuteSmallDataState*)0)->m_RandomIndexAlignPadding),
     REDSOUND_EXECUTE_SBSS_REVERB_DATA_OFFSET =
-        (unsigned int)&(((RedExecuteSmallDataState*)0)->m_reverbData),
+        (unsigned int)&(((RedExecuteSmallDataState*)0)->p_ReverbData),
     REDSOUND_EXECUTE_SBSS_REVERB_SIZE_OFFSET =
-        (unsigned int)&(((RedExecuteSmallDataState*)0)->m_reverbSize),
+        (unsigned int)&(((RedExecuteSmallDataState*)0)->p_ReverbSize),
     REDSOUND_EXECUTE_SBSS_CHANGE_STATUS_OFFSET =
-        (unsigned int)&(((RedExecuteSmallDataState*)0)->m_changeStatus),
+        (unsigned int)&(((RedExecuteSmallDataState*)0)->m_ChangeStatus),
     REDSOUND_EXECUTE_SBSS_SKIP_KEY_ON_OFFSET =
-        (unsigned int)&(((RedExecuteSmallDataState*)0)->m_skipKeyOn),
+        (unsigned int)&(((RedExecuteSmallDataState*)0)->p_SkipKeyOn),
     REDSOUND_EXECUTE_SBSS_SIZE = sizeof(RedExecuteSmallDataState),
 };
 
@@ -357,13 +357,13 @@ STATIC_ASSERT(sizeof(t_TonePitch) + sizeof(t_FinePitch) + sizeof(t_KeySignatureI
 STATIC_ASSERT(REDSOUND_EXECUTE_DATA_TABLE_SIZE == REDSOUND_EXECUTE_DATA_TABLE_ALLOC_SIZE);
 STATIC_ASSERT(REDSOUND_REVERB_DATA_BUFFER_SIZE == REDSOUND_REVERB_DATA_ALLOC_SIZE);
 STATIC_ASSERT(sizeof(m_TerminateNote) == REDSOUND_EXECUTE_SDATA_SIZE);
-STATIC_ASSERT(offsetof(RedExecuteSmallDataState, m_randomIndex) == REDSOUND_EXECUTE_SBSS_RANDOM_INDEX_OFFSET);
-STATIC_ASSERT(offsetof(RedExecuteSmallDataState, m_randomIndexAlignPadding) ==
+STATIC_ASSERT(offsetof(RedExecuteSmallDataState, m_RandomIndex) == REDSOUND_EXECUTE_SBSS_RANDOM_INDEX_OFFSET);
+STATIC_ASSERT(offsetof(RedExecuteSmallDataState, m_RandomIndexAlignPadding) ==
               REDSOUND_EXECUTE_SBSS_RANDOM_PAD_OFFSET);
-STATIC_ASSERT(offsetof(RedExecuteSmallDataState, m_reverbData) == REDSOUND_EXECUTE_SBSS_REVERB_DATA_OFFSET);
-STATIC_ASSERT(offsetof(RedExecuteSmallDataState, m_reverbSize) == REDSOUND_EXECUTE_SBSS_REVERB_SIZE_OFFSET);
-STATIC_ASSERT(offsetof(RedExecuteSmallDataState, m_changeStatus) == REDSOUND_EXECUTE_SBSS_CHANGE_STATUS_OFFSET);
-STATIC_ASSERT(offsetof(RedExecuteSmallDataState, m_skipKeyOn) == REDSOUND_EXECUTE_SBSS_SKIP_KEY_ON_OFFSET);
+STATIC_ASSERT(offsetof(RedExecuteSmallDataState, p_ReverbData) == REDSOUND_EXECUTE_SBSS_REVERB_DATA_OFFSET);
+STATIC_ASSERT(offsetof(RedExecuteSmallDataState, p_ReverbSize) == REDSOUND_EXECUTE_SBSS_REVERB_SIZE_OFFSET);
+STATIC_ASSERT(offsetof(RedExecuteSmallDataState, m_ChangeStatus) == REDSOUND_EXECUTE_SBSS_CHANGE_STATUS_OFFSET);
+STATIC_ASSERT(offsetof(RedExecuteSmallDataState, p_SkipKeyOn) == REDSOUND_EXECUTE_SBSS_SKIP_KEY_ON_OFFSET);
 STATIC_ASSERT(sizeof(RedExecuteSmallDataState) == REDSOUND_EXECUTE_SBSS_SIZE);
 STATIC_ASSERT(sizeof(m_RandomIndex) + REDSOUND_EXECUTE_SBSS_RANDOM_PAD_SIZE + sizeof(p_ReverbData) +
                   sizeof(p_ReverbSize) + sizeof(m_ChangeStatus) + sizeof(p_SkipKeyOn) ==

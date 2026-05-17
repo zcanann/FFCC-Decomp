@@ -71,10 +71,10 @@ extern const char lbl_80331CB4[] = "ON";
 extern const char lbl_80331CB8[] = "OFF";
 extern const char lbl_80331CBC[] = "?";
 
-static u32 m_table_desc0__11CDbgMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(create__11CDbgMenuPcsFv)};
-static u32 m_table_desc1__11CDbgMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(destroy__11CDbgMenuPcsFv)};
-static u32 m_table_desc2__11CDbgMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(calc__11CDbgMenuPcsFv)};
-static u32 m_table_desc3__11CDbgMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(draw__11CDbgMenuPcsFv)};
+u32 m_table_desc0__11CDbgMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(create__11CDbgMenuPcsFv)};
+u32 m_table_desc1__11CDbgMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(destroy__11CDbgMenuPcsFv)};
+u32 m_table_desc2__11CDbgMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(calc__11CDbgMenuPcsFv)};
+u32 m_table_desc3__11CDbgMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(draw__11CDbgMenuPcsFv)};
 u32 m_table__11CDbgMenuPcs[0x15C / sizeof(u32)] = {
     reinterpret_cast<u32>(const_cast<char*>(s_CDbgMenuPcs_801DD428)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x11, 0, 0, 0, 0, 0x4A, 1
 };
@@ -566,6 +566,7 @@ void CDbgMenuPcs::changeVtxFmt(int vtxFmt)
 void CDbgMenuPcs::drawWindow(int flags, int x, int y, int width, int height, char* text)
 {
 	changeVtxFmt(1);
+	float z = FLOAT_80331C98;
 
 	if ((flags & 1) == 0) {
 		GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT1, 4);
@@ -581,13 +582,13 @@ void CDbgMenuPcs::drawWindow(int flags, int x, int y, int width, int height, cha
 
 			GXPosition3f32((float)(x + (width & -static_cast<int>(col))),
 			               (float)(y + (height & -static_cast<int>(row & 1))),
-			               0.0f);
+			               z);
 			GXColor1u32(borderColors[0]);
 
 			vertexIndex = nextVertexIndex;
 			GXPosition3f32((float)(x + (width & -(nextVertexIndex & 1))),
 			               (float)(y + (height & -((nextVertexIndex >> 1) & 1))),
-			               0.0f);
+			               z);
 			GXColor1u32(borderColors[1]);
 
 			vertexIndex = nextVertexIndex + 1;
@@ -598,19 +599,19 @@ void CDbgMenuPcs::drawWindow(int flags, int x, int y, int width, int height, cha
 	int fillColorIndex = (flags >> 1) & 1;
 
 	GXBegin(GX_LINESTRIP, GX_VTXFMT1, 3);
-	GXPosition3f32((float)(x + width), (float)y, 0.0f);
+	GXPosition3f32((float)(x + width), (float)y, z);
 	GXColor1u32(gDbgMenuWindowFillColors[fillColorIndex]);
-	GXPosition3f32((float)x, (float)y, 0.0f);
+	GXPosition3f32((float)x, (float)y, z);
 	GXColor1u32(gDbgMenuWindowFillColors[fillColorIndex]);
-	GXPosition3f32((float)x, (float)(y + height), 0.0f);
+	GXPosition3f32((float)x, (float)(y + height), z);
 	GXColor1u32(gDbgMenuWindowFillColors[fillColorIndex]);
 
 	GXBegin(GX_LINESTRIP, GX_VTXFMT1, 3);
-	GXPosition3f32((float)(x + width), (float)y, 0.0f);
+	GXPosition3f32((float)(x + width), (float)y, z);
 	GXColor1u32(gDbgMenuWindowFillColors[1 - fillColorIndex]);
-	GXPosition3f32((float)(x + width), (float)(y + height), 0.0f);
+	GXPosition3f32((float)(x + width), (float)(y + height), z);
 	GXColor1u32(gDbgMenuWindowFillColors[1 - fillColorIndex]);
-	GXPosition3f32((float)x, (float)(y + height), 0.0f);
+	GXPosition3f32((float)x, (float)(y + height), z);
 	GXColor1u32(gDbgMenuWindowFillColors[1 - fillColorIndex]);
 
 	s8 selected = static_cast<s32>((static_cast<u32>(m_currentMenu->m_status) << 25) & 0xC0000000) >> 31;
@@ -626,7 +627,6 @@ void CDbgMenuPcs::drawWindow(int flags, int x, int y, int width, int height, cha
 		highlightColor.g = alpha;
 		highlightColor.b = alpha;
 
-		float z = FLOAT_80331C98;
 		GXBegin(GX_LINESTRIP, GX_VTXFMT1, 5);
 		GXPosition3f32((float)(x + width + 1), (float)(y - 1), z);
 		GXColor1u32(*reinterpret_cast<u32*>(&highlightColor));

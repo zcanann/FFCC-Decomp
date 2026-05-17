@@ -984,7 +984,7 @@ static void _SetMusicData(int* command)
  * JP Address: TODO
  * JP Size: TODO
  */
-static void _ClearMusicData(int* command)
+static inline void _ClearMusicData(int* command)
 {
     c_RedEntry.ClearMusicData(RedExecCommandArgGet(command, REDSOUND_MUSIC_COMMAND_ID));
 }
@@ -1201,7 +1201,7 @@ static void _MusicVolume(int* command)
  * EN Size: 52b
  * JP Address: TODO
  */
-static void _MusicTempo(int* command)
+static inline void _MusicTempo(int* command)
 {
     SetMusicTempo(RedExecCommandArgGet(command, REDSOUND_MUSIC_COMMAND_VOLUME), RedExecCommandArgGet(command, REDSOUND_MUSIC_COMMAND_FADE_TIME));
 }
@@ -1214,7 +1214,7 @@ static void _MusicTempo(int* command)
  * EN Size: 52b
  * JP Address: TODO
  */
-static void _MusicPitch(int* command)
+static inline void _MusicPitch(int* command)
 {
     SetMusicPitch(RedExecCommandArgGet(command, REDSOUND_MUSIC_COMMAND_VOLUME), RedExecCommandArgGet(command, REDSOUND_MUSIC_COMMAND_FADE_TIME));
 }
@@ -1227,7 +1227,7 @@ static void _MusicPitch(int* command)
  * EN Size: 52b
  * JP Address: TODO
  */
-static void _MusicPause(int* command)
+static inline void _MusicPause(int* command)
 {
     MusicPause(RedExecCommandArgGet(command, REDSOUND_MUSIC_COMMAND_ID), RedExecCommandArgGet(command, REDSOUND_MUSIC_COMMAND_VOLUME));
 }
@@ -1346,7 +1346,7 @@ static void _SeStop(int* command)
  * EN Size: 48b
  * JP Address: TODO
  */
-static void _SeStopG(int* command)
+static inline void _SeStopG(int* command)
 {
     SeStopG(RedExecCommandArgGet(command, REDSOUND_SE_COMMAND_ID));
 }
@@ -1987,7 +1987,7 @@ int RedDmaSearchID(int id)
  * JP Address: TODO
  * JP Size: TODO
  */
-void RedDmaClearID(int id)
+inline void RedDmaClearID(int id)
 {
     unsigned int interruptLevel;
     RedDmaRequest* queueEntry;
@@ -3784,7 +3784,7 @@ inline void CRedDriver::SetMute(unsigned int voiceNo, unsigned int mute)
  * JP Address: TODO
  * JP Size: TODO
  */
-int CRedDriver::PlayWaveItem(int waveNo, int itemNo, int key, int pan, int volume)
+inline int CRedDriver::PlayWaveItem(int waveNo, int itemNo, int key, int pan, int volume)
 {
     RedTrackDATA* editorTrack;
     RedVoiceDATA* voice;
@@ -3885,7 +3885,7 @@ inline void CRedDriver::StopWaveItem()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CRedDriver::SetWavePitch(int pitch)
+inline void CRedDriver::SetWavePitch(int pitch)
 {
     RedTrackDATA* editorTrack;
     int* voiceNo;
@@ -3911,7 +3911,7 @@ void CRedDriver::SetWavePitch(int pitch)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CRedDriver::SetWaveTune(int key, int fineTune)
+inline void CRedDriver::SetWaveTune(int key, int fineTune)
 {
     RedTrackDATA* editorTrack;
     int* voiceNo;
@@ -3942,7 +3942,7 @@ void CRedDriver::SetWaveTune(int key, int fineTune)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CRedDriver::SetWaveAdsr(int attack, RedAdsrDATA* adsr)
+inline void CRedDriver::SetWaveAdsr(int attack, RedAdsrDATA* adsr)
 {
     RedTrackDATA* editorTrack;
     int* voiceNo;

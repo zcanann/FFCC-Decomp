@@ -435,11 +435,13 @@ extern "C" void calc__FP11_pppPObjectP20VYmMegaBirthShpTail2P20PYmMegaBirthShpTa
     frameEntry = colorTable + (u32)frameIndex * 8 + 0x10;
     *(u16*)(color + 0x1c) =
         *(u16*)(color + 0x1c) + *reinterpret_cast<s32*>((u8*)pYmMegaBirthShpTail2->m_matrix[0] + 8);
-    if ((int)*(u16*)(color + 0x1c) < *(s16*)(frameEntry + 2)) {
+    int elapsedFrame = *(u16*)(color + 0x1c);
+    int frameDuration = *(s16*)(frameEntry + 2);
+    if ((int)elapsedFrame < frameDuration) {
         return;
     }
 
-    *(u16*)(color + 0x1c) = *(u16*)(color + 0x1c) - *(s16*)(frameEntry + 2);
+    *(u16*)(color + 0x1c) = (u16)(elapsedFrame - frameDuration);
     *(u16*)(color + 0x1e) = *(u16*)(color + 0x1e) + 1;
     if ((int)*(u16*)(color + 0x1e) >= *(s16*)(colorTable + 6)) {
         if ((*(u8*)(frameEntry + 4) & 0x80) != 0) {

@@ -1077,9 +1077,7 @@ void CRingMenu::DrawIcon()
 	viewPos.y = worldPos.y;
 	viewPos.z = worldPos.z;
 	PSMTXMultVec(cameraMtx, &viewPos, &viewPos);
-	if (FLOAT_803309c8 < viewPos.z) {
-		viewPos.z = FLOAT_803309c8;
-	}
+	viewPos.z = (FLOAT_803309c8 < viewPos.z) ? FLOAT_803309c8 : viewPos.z;
 
 	Mtx44 screenMtx;
 	PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);

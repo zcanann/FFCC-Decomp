@@ -2668,7 +2668,7 @@ static void _PitchBendCompute(RedTrackDATA* track, int bend)
                 if ((voiceData->m_stateFlags & REDSOUND_VOICE_STATE_PLAYING_MASK) != 0) {
                     pitch = voiceData->m_basePitch + track->m_pitch;
                 } else {
-                    pitch = voiceData->m_basePitch + RedMusicPitchControlGet()->m_value;
+                    pitch = voiceData->m_basePitch + RedMusicPitchControlGetValue();
                 }
                 computedPitch = pitch;
                 voiceData->m_pitch = PitchCompute(computedPitch, track->m_keyTranspose + bend,

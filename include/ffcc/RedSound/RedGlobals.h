@@ -288,9 +288,21 @@ extern int* volatile p_MusicReplayPoint;
 extern RedControlRamp* volatile p_MusicTempoControl;
 #define RedMusicTempoControlGet() (p_MusicTempoControl)
 #define RedMusicTempoControlSet(control) (p_MusicTempoControl = (control))
+#define RedMusicTempoControlGetValue() (RedMusicTempoControlGet()->m_value)
+#define RedMusicTempoControlAddStep() (RedMusicTempoControlGet()->m_value += RedMusicTempoControlGet()->m_step)
+#define RedMusicTempoControlSetStep(step) (RedMusicTempoControlGet()->m_step = (step))
+#define RedMusicTempoControlGetCount() (RedMusicTempoControlGet()->m_count)
+#define RedMusicTempoControlSetCount(count) (RedMusicTempoControlGet()->m_count = (count))
+#define RedMusicTempoControlDecCount() (RedMusicTempoControlGet()->m_count--)
 extern RedControlRamp* volatile p_MusicPitchControl;
 #define RedMusicPitchControlGet() (p_MusicPitchControl)
 #define RedMusicPitchControlSet(control) (p_MusicPitchControl = (control))
+#define RedMusicPitchControlGetValue() (RedMusicPitchControlGet()->m_value)
+#define RedMusicPitchControlAddStep() (RedMusicPitchControlGet()->m_value += RedMusicPitchControlGet()->m_step)
+#define RedMusicPitchControlSetStep(step) (RedMusicPitchControlGet()->m_step = (step))
+#define RedMusicPitchControlGetCount() (RedMusicPitchControlGet()->m_count)
+#define RedMusicPitchControlSetCount(count) (RedMusicPitchControlGet()->m_count = (count))
+#define RedMusicPitchControlDecCount() (RedMusicPitchControlGet()->m_count--)
 extern int m_MusicPhraseStop;
 #define RedMusicPhraseStopGet() (m_MusicPhraseStop)
 #define RedMusicPhraseStopSet(status) (m_MusicPhraseStop = (status))

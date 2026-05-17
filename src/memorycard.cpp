@@ -194,14 +194,14 @@ static const char DAT_801db07c[] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 };
 
-#define sMcWriteErrorFmt (lbl_801DAF40 + 0x04)
-#define sMcSetStatErrorFmt (lbl_801DAF40 + 0x1C)
-#define sBrokenLoadData (lbl_801DAF40 + 0x38)
-#define sLoadDataVersionDifferent (lbl_801DAF40 + 0x4C)
-#define sLoadDataItemCountError (lbl_801DAF40 + 0x74)
-#define sMemoryCardIconPathFmt (lbl_801DAF40 + 0xB4)
-#define sMemoryCardOpenErrorFmt (lbl_801DAF40 + 0xC4)
-#define sMemoryCardDataErrorFmt (lbl_801DAF40 + 0xE4)
+#define sMcWriteErrorFmt (lbl_801DA9C0 + 0x584)
+#define sMcSetStatErrorFmt (lbl_801DA9C0 + 0x59C)
+#define sBrokenLoadData (lbl_801DA9C0 + 0x5B8)
+#define sLoadDataVersionDifferent (lbl_801DA9C0 + 0x5CC)
+#define sLoadDataItemCountError (lbl_801DA9C0 + 0x5F4)
+#define sMemoryCardIconPathFmt (lbl_801DA9C0 + 0x634)
+#define sMemoryCardOpenErrorFmt (lbl_801DA9C0 + 0x644)
+#define sMemoryCardDataErrorFmt (lbl_801DA9C0 + 0x664)
 #define sMcGetStatErrorFmt (sMemoryAllocationError + 0x70)
 
 static inline CChara* GetCharaGlobal()

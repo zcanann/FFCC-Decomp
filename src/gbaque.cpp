@@ -2241,7 +2241,7 @@ int GbaQueue::MakeLetterList(int channel, char* outData)
 char* npcNameBuf = static_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
 0x800, GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp_801DB370), 0x7A7));
 	if (npcNameBuf == 0) {
-		if (System.m_execParam >= 1) {
+		if ((unsigned int)System.m_execParam >= 1) {
 Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp_801DB370), 0x7A9);
 		}
 		return -1;
@@ -2251,7 +2251,7 @@ Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocat
 char* subjectNameBuf = static_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
 0x1800, GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp_801DB370), 0x7B1));
 	if (subjectNameBuf == 0) {
-		if (System.m_execParam >= 1) {
+		if ((unsigned int)System.m_execParam >= 1) {
 Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp_801DB370), 0x7B3);
 		}
 		return -1;
@@ -2261,7 +2261,7 @@ Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocat
 unsigned int* letterEntryBuf = static_cast<unsigned int*>(__nwa__FUlPQ27CMemory6CStagePci(
 0x4000, GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp_801DB370), 0x7BB));
 	if (letterEntryBuf == 0) {
-		if (System.m_execParam >= 1) {
+		if ((unsigned int)System.m_execParam >= 1) {
 Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp_801DB370), 0x7BD);
 		}
 		return -1;
@@ -2305,7 +2305,7 @@ Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocat
 		}
 
 		if (matchedNpc == -1) {
-			if (npcCount > 0x7F && System.m_execParam >= 1) {
+			if (npcCount > 0x7F && (unsigned int)System.m_execParam >= 1) {
 Printf__7CSystemFPce(&System, const_cast<char*>(s_npc_max_over), const_cast<char*>(s_gbaque_cpp_801DB370), 0x7DC);
 			}
 
@@ -2321,7 +2321,7 @@ Printf__7CSystemFPce(&System, const_cast<char*>(s_npc_max_over), const_cast<char
 		}
 
 		if (matchedSubject == -1) {
-			if (subjectCount > 0xFF && System.m_execParam >= 1) {
+			if (subjectCount > 0xFF && (unsigned int)System.m_execParam >= 1) {
 Printf__7CSystemFPce(&System, const_cast<char*>(s_subject_max_over), const_cast<char*>(s_gbaque_cpp_801DB370), 0x7F0);
 			}
 
@@ -2356,7 +2356,7 @@ Printf__7CSystemFPce(&System, const_cast<char*>(s_subject_max_over), const_cast<
 				if (value < 0x100 || value > 0x124) {
 					flags |= 0x10;
 					entryWrite[0] = (value << 24) | ((value >> 8) << 16);
-				} else if (System.m_execParam >= 1) {
+				} else if ((unsigned int)System.m_execParam >= 1) {
 Printf__7CSystemFPce(&System, const_cast<char*>(s_letter_data_error), const_cast<char*>(s_gbaque_cpp_801DB370), 0x810, channel, i);
 				}
 			}

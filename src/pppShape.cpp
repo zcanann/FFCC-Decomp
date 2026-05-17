@@ -136,9 +136,9 @@ void pppCacheDumpShapeTexture(pppShapeSt* shapeSt, CMaterialSet* materialSet)
         shapeOffset = *(short*)((int)currentFrame + 0x10);
         shapeBase = animData + shapeOffset;
         shapeIndex = 0;
-        shapeStep = shapeOffset;
+        shapeStep = shapeIndex;
         while (shapeIndex < *(short*)(shapeBase + 2)) {
-            shapeEntry = (unsigned char*)(animData + 8);
+            shapeEntry = (unsigned char*)(shapeBase + 8);
             shapeEntry += shapeStep;
             shapeIndex += 1;
             shapeStep += 8;
@@ -189,9 +189,9 @@ void pppCacheLoadShapeTexture(pppShapeSt* shapeSt, CMaterialSet* materialSet)
         shapeOffset = *(short*)((int)currentFrame + 0x10);
         shapeBase = animData + shapeOffset;
         shapeIndex = 0;
-        shapeStep = shapeOffset;
+        shapeStep = shapeIndex;
         while (shapeIndex < *(short*)(shapeBase + 2)) {
-            shapeEntry = (unsigned char*)(animData + 8);
+            shapeEntry = (unsigned char*)(shapeBase + 8);
             shapeEntry += shapeStep;
             shapeIndex += 1;
             shapeStep += 8;

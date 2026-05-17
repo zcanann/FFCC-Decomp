@@ -450,27 +450,27 @@ void CRedSound::ReportPrint(int debugFlag)
  */
 int CRedSound::ReportStandby(int id)
 {
-	int i;
+	int statusIndex;
 	int result = 0;
 
 	if (id == 0) {
-		i = 0;
+		statusIndex = 0;
 		do {
-			if (RedStandbyStatusGet(i) != 0) {
+			if (RedStandbyStatusGet(statusIndex) != 0) {
 				result++;
 				break;
 			}
-			i++;
-	} while (i < REDSOUND_STANDBY_STATUS_COUNT);
+			statusIndex++;
+	} while (statusIndex < REDSOUND_STANDBY_STATUS_COUNT);
 	} else {
-		i = 0;
+		statusIndex = 0;
 		do {
-			if (id == RedStandbyStatusGet(i)) {
+			if (id == RedStandbyStatusGet(statusIndex)) {
 				result++;
 				break;
 			}
-			i++;
-		} while (i < REDSOUND_STANDBY_STATUS_COUNT);
+			statusIndex++;
+		} while (statusIndex < REDSOUND_STANDBY_STATUS_COUNT);
 	}
 
 	return result;

@@ -120,7 +120,7 @@ void CGraphicPcs::drawScreenFade()
 
     PSMTXIdentity(identityMtx);
     GXLoadPosMtxImm(identityMtx, 0);
-    GXLoadTexMtxImm(identityMtx, GX_TEXMTX0, GX_MTX3x4);
+    GXLoadTexMtxImm(identityMtx, GX_TEXMTX0, GX_MTX2x4);
 
     for (int slot = 0; slot < 4; slot++) {
         ScreenFadeSlot* slotData = &m_screenFade[slot];
@@ -140,9 +140,14 @@ void CGraphicPcs::drawScreenFade()
         GXSetNumIndStages(0);
         GXSetTevDirect(GX_TEVSTAGE0);
         GXSetNumChans(1);
-        GXSetChanCtrl(GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPEC);
-        GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_SPEC);
+        GXSetChanCtrl(GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPOT);
+        GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
         _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
+
+        CColor whiteColor(0xFF, 0xFF, 0xFF, 0xFF);
+        GXSetChanAmbColor(GX_COLOR0A0, whiteColor.color);
+        _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
+        _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
 
         _GXColor baseColor = slotData->m_colorA;
         _GXColor baseColor2 = slotData->m_colorB;
@@ -155,11 +160,6 @@ void CGraphicPcs::drawScreenFade()
         const u8 fadeAlpha = (u8)(255.0f * fadeWave);
         baseColor.a = fadeAlpha;
         baseColor2.a = fadeAlpha;
-
-        const _GXColor whiteColor = {0xFF, 0xFF, 0xFF, 0xFF};
-        GXSetChanAmbColor(GX_COLOR0A0, *(GXColor*)&whiteColor);
-        _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
-        _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
 
         if (slot == 3) {
             const int barHeight = (int)(448.0f * fadeWave);

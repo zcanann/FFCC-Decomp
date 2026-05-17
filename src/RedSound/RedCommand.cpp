@@ -835,6 +835,7 @@ static int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volum
 	int state;
 	int attrMask;
 	RedSeInfoSequence* seq;
+	int waveNo;
 	int deltaTime;
 	int count;
 	unsigned char* current;
@@ -843,15 +844,15 @@ static int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volum
 	int isMulti;
 
 	RedSoundControlGet(REDSOUND_CONTROL_SE)->m_updateFlags = 0;
-	deltaTime = (unsigned int)info->m_waveNoLo +
-	            (unsigned int)info->m_waveNoHi * REDSOUND_SE_INFO_U16_HIGH_SCALE;
-	waveBase = c_RedEntry.SearchWaveBase(deltaTime);
+	waveNo = (unsigned int)info->m_waveNoHi * REDSOUND_SE_INFO_U16_HIGH_SCALE +
+	         (unsigned int)info->m_waveNoLo;
+	waveBase = c_RedEntry.SearchWaveBase(waveNo);
 	if (waveBase != 0) {
 		c_RedEntry.WaveHistoryManager(REDSOUND_HISTORY_MODE_USE, waveBase->m_waveNo);
 	} else {
 		if (RedReportPrintIsEnabled()) {
 			OSReport(sRedCommandWaveNotEntryFmt, sRedCommandLogPrefix, sRedCommandLogWarnColor,
-			         deltaTime, sRedCommandLogReset);
+			         waveNo, sRedCommandLogReset);
 			fflush(__files + 1);
 		}
 	}

@@ -214,7 +214,6 @@ static int _EraseTime(int eraseTrack)
 	RedTrackDATA* track = *trackBasePtr;
 	int sepId;
 	int erasedCount;
-	int trackNo;
 
 	do {
 		if ((track->m_command != REDSOUND_TRACK_COMMAND_NONE) && (track->m_attrMask == REDSOUND_TRACK_ATTR_NONE) &&
@@ -247,6 +246,8 @@ static int _EraseTime(int eraseTrack)
 		if ((track->m_command != REDSOUND_TRACK_COMMAND_NONE) && (track->m_attrMask == REDSOUND_TRACK_ATTR_NONE) &&
 		    (track->m_eraseTrack <= eraseTrack) &&
 		    (track->m_playTime == minEraseTrack)) {
+			int trackNo;
+
 			KeyOnReserveClear(RedKeyOnDataGet(), track);
 			track->m_seId = REDSOUND_SE_ID_NONE;
 			track->m_flags = REDSOUND_TRACK_FLAGS_NONE;

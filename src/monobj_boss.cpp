@@ -62,7 +62,10 @@ extern float FLOAT_80331d6c;
 extern float FLOAT_80331d70;
 extern float FLOAT_80331d74;
 extern float FLOAT_80331d78;
+extern float FLOAT_80331d7c;
+extern float FLOAT_80331d80;
 extern float FLOAT_80331d84;
+extern float FLOAT_80331d88;
 extern float FLOAT_80331d8c;
 extern float FLOAT_80331d90;
 extern float FLOAT_80331d94;
@@ -1666,11 +1669,79 @@ void CGMonObj::frameStatFuncTetsukyojin()
 				changeStat__8CGPrgObjFiii(prgObj, 0, 0, 0);
 			}
 		}
-	} else if (state == 100) {
-		moveFrame__8CGMonObjFv(this);
-	} else if (state > 99) {
-		reinterpret_cast<CGCharaObj*>(this)->statAttack();
-	} else if (state == 0x67) {
+	} else if (state < 0x66) {
+		if (state == 100) {
+			if (prgObj->m_stateFrame == 0) {
+				Vec target;
+				Vec delta;
+				Vec defaultDelta = {FLOAT_80331cf8, FLOAT_80331cf8, FLOAT_80331d80};
+
+				CGPartyObj* partyObj = Game.m_partyObjArr[*reinterpret_cast<int*>(self + 0x6C4)];
+				target.x = -partyObj->m_worldPosition.x;
+				target.y = FLOAT_80331cf8;
+				target.z = -partyObj->m_worldPosition.z;
+				if (PSVECMag(&target) < FLOAT_80331d7c) {
+					target = defaultDelta;
+				}
+				PSVECNormalize(&target, &target);
+				PSVECScale(&target, &target, FLOAT_80331d84 - object->m_capsuleHalfHeight);
+				*reinterpret_cast<Vec*>(SoundBuffer_1260_ + 4) = target;
+
+				PSVECSubtract(&target, &object->m_worldPosition, &delta);
+				float distance = PSVECDistance(&delta, &object->m_worldPosition);
+				if (FLOAT_80331d88 < distance) {
+					distance = FLOAT_80331d88;
+				}
+
+				memset(self + 0x70C, 0, 0x34);
+				*reinterpret_cast<u32*>(self + 0x70C) = 0x2114;
+				*reinterpret_cast<Vec*>(self + 0x718) = delta;
+				*reinterpret_cast<float*>(self + 0x724) = FLOAT_80331d58;
+				*reinterpret_cast<int*>(self + 0x72C) = static_cast<int>(distance * FLOAT_80331d30);
+				*reinterpret_cast<int*>(self + 0x738) = 0x67;
+			}
+			moveFrame__8CGMonObjFv(this);
+		} else if (state > 99) {
+			if (*reinterpret_cast<int*>(CFlat + 4840) != 0 && prgObj->m_stateFrame == 0x25) {
+				int flatCount = *reinterpret_cast<int*>(CFlat + 4840);
+				int soundCount = *reinterpret_cast<int*>(SoundBuffer_1260_);
+				if (flatCount < 1) {
+					*reinterpret_cast<int*>(CFlat + 4840) = 0;
+				} else if ((flatCount == 1 && soundCount > 0x13) || (flatCount > 1 && soundCount > 4)) {
+					*reinterpret_cast<int*>(SoundBuffer_1260_) = 0;
+					object->DispCharaParts(1);
+
+					int pdtNo = -1;
+					if (object->m_charaModelHandle->m_pdtLoadRef != 0) {
+						pdtNo =
+						    *reinterpret_cast<int*>(reinterpret_cast<u8*>(object->m_charaModelHandle->m_pdtLoadRef) + 0x14);
+					}
+					putParticle__8CGPrgObjFiiP8CGObjectfi(prgObj, (pdtNo << 8) | 0x2D, 0, object, FLOAT_80331d18,
+					                                      0x101E4);
+					if (*reinterpret_cast<int*>(self + 0x6B4) == 0) {
+						*reinterpret_cast<int*>(CFlat + 4840) = flatCount - 1;
+					}
+					*reinterpret_cast<int*>(self + 0x6B4) = 1;
+					*reinterpret_cast<int*>(self + 0x6C8) = 0;
+				}
+			}
+			reinterpret_cast<CGCharaObj*>(this)->statAttack();
+		}
+	} else if (state < 0x68) {
+		if (prgObj->m_stateFrame == 0x10) {
+			Vec attackOffset = *reinterpret_cast<Vec*>(SoundBuffer + 0x4F0);
+			CVector launch(-attackOffset.x, -attackOffset.y, -attackOffset.z);
+
+			memset(self + 0x70C, 0, 0x34);
+			*reinterpret_cast<u32*>(self + 0x70C) = 0x2410;
+			*reinterpret_cast<float*>(self + 0x718) = launch.x;
+			*reinterpret_cast<float*>(self + 0x71C) = launch.y;
+			*reinterpret_cast<float*>(self + 0x720) = launch.z;
+			*reinterpret_cast<float*>(self + 0x724) = FLOAT_80331d78;
+			*reinterpret_cast<int*>(self + 0x72C) =
+			    static_cast<int>((FLOAT_80331d58 * (FLOAT_80331d84 - object->m_capsuleHalfHeight)) /
+			                     FLOAT_80331d78);
+		}
 		if (prgObj->m_stateFrame > 0xF) {
 			moveFrame__8CGMonObjFv(this);
 		}

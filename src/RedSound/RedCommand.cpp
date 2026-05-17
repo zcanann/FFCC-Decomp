@@ -1051,7 +1051,7 @@ static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* wav
 	music->m_waveNo = musicHead->m_waveNo;
 
 	RedMusicTrackBlock* current = RedMusicGetTrackBlocks(musicHead);
-	int count = musicHead->m_trackCount;
+	int remainingTracks = musicHead->m_trackCount;
 	char trackNo = 0;
 	do {
 		int blockSize = RedMusicTrackBlockGetSize(current);
@@ -1110,12 +1110,12 @@ static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* wav
 		track->m_voiceSwitch = REDSOUND_VOICE_SWITCH_MUSIC_DEFAULT;
 		memset(&track->m_adsr, REDSOUND_TRACK_ADSR_DEFAULT_WORD, REDSOUND_TRACK_ADSR_SIZE);
 
-		count--;
+		remainingTracks--;
 		trackNo++;
-		if (count != 0) {
+		if (remainingTracks != 0) {
 			track++;
 		}
-	} while (count != 0);
+	} while (remainingTracks != 0);
 
 	music->m_skipFrames = REDSOUND_CONTROL_INITIAL_SKIP_FRAMES;
 	music->m_channelAlloc = REDSOUND_CONTROL_CHANNEL_ALLOC_NONE;

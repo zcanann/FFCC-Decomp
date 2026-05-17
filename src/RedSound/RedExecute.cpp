@@ -1930,26 +1930,26 @@ void EnvelopeKeyExecute()
                     memcpy(&voice->pb.adpcmLoop, &waveData->m_adpcm.m_loop, sizeof(voice->pb.adpcmLoop));
                     memset(voice->pb.src.last_samples, 0, sizeof(voice->pb.src.last_samples));
                     voice->pb.addr.format = REDSOUND_AX_ADDR_FORMAT_ADPCM;
-                    int key = trackData->m_waveBase + waveData->m_sampleStart;
-                    key += REDSOUND_AX_SAMPLE_START_BIAS;
-                    key *= REDSOUND_AX_SAMPLE_ADDR_SCALE;
-                    voice->pb.addr.currentAddressHi = (u16)(key >> REDSOUND_AX_HIGH_WORD_SHIFT);
-                    voice->pb.addr.currentAddressLo = (u16)key;
-                    int keyBase = key - REDSOUND_AX_SAMPLE_ADDR_SCALE;
+                    int sampleAddress = trackData->m_waveBase + waveData->m_sampleStart;
+                    sampleAddress += REDSOUND_AX_SAMPLE_START_BIAS;
+                    sampleAddress *= REDSOUND_AX_SAMPLE_ADDR_SCALE;
+                    voice->pb.addr.currentAddressHi = (u16)(sampleAddress >> REDSOUND_AX_HIGH_WORD_SHIFT);
+                    voice->pb.addr.currentAddressLo = (u16)sampleAddress;
+                    int sampleBaseAddress = sampleAddress - REDSOUND_AX_SAMPLE_ADDR_SCALE;
 
                     if (waveData->m_loopStart < 0) {
                         voice->pb.addr.loopFlag = REDSOUND_AX_VOICE_LOOP_OFF;
-                        key = keyBase;
+                        sampleAddress = sampleBaseAddress;
                     } else {
                         voice->pb.addr.loopFlag = REDSOUND_AX_VOICE_LOOP_ON;
-                        key = keyBase + waveData->m_loopStart;
+                        sampleAddress = sampleBaseAddress + waveData->m_loopStart;
                     }
 
-                    voice->pb.addr.loopAddressHi = (u16)(key >> REDSOUND_AX_HIGH_WORD_SHIFT);
-                    voice->pb.addr.loopAddressLo = (u16)key;
-                    key = keyBase + waveData->m_loopEnd;
-                    voice->pb.addr.endAddressHi = (u16)(key >> REDSOUND_AX_HIGH_WORD_SHIFT);
-                    voice->pb.addr.endAddressLo = (u16)key;
+                    voice->pb.addr.loopAddressHi = (u16)(sampleAddress >> REDSOUND_AX_HIGH_WORD_SHIFT);
+                    voice->pb.addr.loopAddressLo = (u16)sampleAddress;
+                    sampleAddress = sampleBaseAddress + waveData->m_loopEnd;
+                    voice->pb.addr.endAddressHi = (u16)(sampleAddress >> REDSOUND_AX_HIGH_WORD_SHIFT);
+                    voice->pb.addr.endAddressLo = (u16)sampleAddress;
 
                     voiceFlags |= AX_SYNC_FLAG_COPYADPCMLOOP | AX_SYNC_FLAG_COPYSRC | AX_SYNC_FLAG_COPYADPCM |
                                   AX_SYNC_FLAG_COPYCURADDR | AX_SYNC_FLAG_COPYADDR | AX_SYNC_FLAG_COPYTYPE |

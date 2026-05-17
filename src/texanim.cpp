@@ -644,11 +644,16 @@ void CTexAnimSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
     unsigned int innerChunkData[4];
     unsigned int& innerChunkSize = innerChunkData[3];
     CTexAnimSetStorage* self = reinterpret_cast<CTexAnimSetStorage*>(this);
+    int tanmTag = 0x54414E4D;
+    int seqTag = 0x53455120;
+    int nameTag = 0x4E414D45;
+    int infoTag = 0x494E464F;
+    int keyTag = 0x4B455920;
 
     self->texAnims.SetStage(stage);
     chunkFile.PushChunk();
     while ((int)chunkFile.GetNextChunk(*reinterpret_cast<CChunkFile::CChunk*>(outerChunkData)) != 0) {
-        if (outerChunkData[0] != 0x54414E4DU) {
+        if ((int)outerChunkData[0] != tanmTag) {
             continue;
         }
 
@@ -688,8 +693,8 @@ void CTexAnimSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
 
         chunkFile.PushChunk();
         while ((int)chunkFile.GetNextChunk(*reinterpret_cast<CChunkFile::CChunk*>(middleChunkData)) != 0) {
-            if (middleChunkData[0] != 0x53455120U) {
-                if (((int)middleChunkData[0] < 0x53455120U) && (middleChunkData[0] == 0x4E414D45U)) {
+            if ((int)middleChunkData[0] != seqTag) {
+                if (((int)middleChunkData[0] < seqTag) && ((int)middleChunkData[0] == nameTag)) {
                     middleChunkArg0 = middleChunkData[1];
                     refData->texSrtIndex = middleChunkArg0;
                     strcpy(refData->name, chunkFile.GetString());
@@ -708,8 +713,8 @@ void CTexAnimSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
             chunkFile.PushChunk();
             char* seqName = seq->name;
             while ((int)chunkFile.GetNextChunk(*reinterpret_cast<CChunkFile::CChunk*>(innerChunkData)) != 0) {
-                if (innerChunkData[0] != 0x4B455920U) {
-                    if (innerChunkData[0] == 0x494E464FU) {
+                if ((int)innerChunkData[0] != keyTag) {
+                    if ((int)innerChunkData[0] == infoTag) {
                         seq->totalFrames = chunkFile.Get4();
                         chunkFile.Get4();
                         char b7 = (char)chunkFile.Get4();
@@ -719,7 +724,7 @@ void CTexAnimSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
                         unsigned int eq = (unsigned int)__cntlzw((unsigned int)strcmp(seqName, DAT_8032fb48));
                         seq->flags = (unsigned char)(((unsigned char)((int)(char)(eq >> 5) << 5) & 0x20) | (seq->flags & 0xDF));
                     }
-                    if (((int)innerChunkData[0] >= 0x4B455920U) && (innerChunkData[0] == 0x4E414D45U)) {
+                    if (((int)innerChunkData[0] >= keyTag) && ((int)innerChunkData[0] == nameTag)) {
                         strcpy(seqName, chunkFile.GetString());
                     }
                 } else {

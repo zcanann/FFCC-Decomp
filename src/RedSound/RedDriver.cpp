@@ -304,7 +304,7 @@ struct RedDriverBssState {
 };
 
 struct RedDriverSmallDataTailState {
-    u8 m_beforeRedMemory[REDSOUND_DRIVER_SBSS_BEFORE_RED_MEMORY_SIZE];
+    RedDriverSmallDataPrefixState m_prefix;
     CRedMemory c_RedMemory;
     u8 m_redMemoryAlignPadding[REDSOUND_DRIVER_SBSS_RED_MEMORY_PAD_SIZE];
     volatile int m_DMAExecute;
@@ -313,7 +313,7 @@ struct RedDriverSmallDataTailState {
 };
 
 struct RedDriverSourceSmallDataTailState {
-    u8 m_beforeSilentWave[REDSOUND_DRIVER_SOURCE_SBSS_SILENT_WAVE_OFFSET];
+    RedDriverSmallDataPrefixState m_prefix;
     int m_SilentWave;
     CRedMemory c_RedMemory;
     u8 m_redMemoryAlignPadding[REDSOUND_DRIVER_SOURCE_SBSS_RED_MEMORY_PAD_SIZE];
@@ -569,6 +569,8 @@ STATIC_ASSERT(sizeof(((RedDriverSmallDataPrefixState*)0)->p_EditorVoice) ==
 STATIC_ASSERT(offsetof(RedDriverSmallDataPrefixState, m_Mute) == REDSOUND_DRIVER_SBSS_MUTE_OFFSET);
 STATIC_ASSERT(sizeof(((RedDriverSmallDataPrefixState*)0)->m_Mute) == REDSOUND_MUTE_WORD_COUNT * sizeof(int));
 STATIC_ASSERT(sizeof(RedDriverSmallDataPrefixState) == REDSOUND_DRIVER_SBSS_BEFORE_RED_MEMORY_SIZE);
+STATIC_ASSERT(sizeof(((RedDriverSmallDataTailState*)0)->m_prefix) ==
+              REDSOUND_DRIVER_SBSS_BEFORE_RED_MEMORY_SIZE);
 STATIC_ASSERT(sizeof(CRedMemory) == REDSOUND_RED_MEMORY_SIZE);
 STATIC_ASSERT(sizeof(CRedEntry) == REDSOUND_RED_ENTRY_SIZE);
 STATIC_ASSERT(sizeof(p_SeBlockData) == REDSOUND_SE_BLOCK_DATA_TABLE_SIZE);
@@ -584,6 +586,8 @@ STATIC_ASSERT(offsetof(RedDriverSmallDataTailState, m_SilentWave) ==
 STATIC_ASSERT(sizeof(((RedDriverSmallDataTailState*)0)->m_SilentWave) ==
               REDSOUND_DRIVER_SBSS_UNUSED_SILENT_WAVE_SIZE);
 STATIC_ASSERT(sizeof(RedDriverSmallDataTailState) == REDSOUND_DRIVER_SBSS_SIZE);
+STATIC_ASSERT(sizeof(((RedDriverSourceSmallDataTailState*)0)->m_prefix) ==
+              REDSOUND_DRIVER_SOURCE_SBSS_SILENT_WAVE_OFFSET);
 STATIC_ASSERT(offsetof(RedDriverSourceSmallDataTailState, m_SilentWave) ==
               REDSOUND_DRIVER_SOURCE_SBSS_SILENT_WAVE_OFFSET);
 STATIC_ASSERT(offsetof(RedDriverSourceSmallDataTailState, c_RedMemory) ==

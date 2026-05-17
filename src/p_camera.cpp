@@ -1784,8 +1784,10 @@ void CCameraPcs::drawShadowChrBegin()
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
 
     if (self[0x404] != 0) {
-        *reinterpret_cast<float*>(self + 0x3E0) *= FLOAT_8032fa58;
-        *reinterpret_cast<float*>(self + 0x3F0) *= FLOAT_8032fa58;
+        float shadowX = *reinterpret_cast<float*>(self + 0x3E0);
+        float scale = FLOAT_8032fa58;
+        *reinterpret_cast<float*>(self + 0x3E0) = shadowX * scale;
+        *reinterpret_cast<float*>(self + 0x3F0) *= scale;
         PSMTXConcat(reinterpret_cast<MtxPtr>(self + 0x3D4),
                     reinterpret_cast<MtxPtr>(self + 0x214),
                     reinterpret_cast<MtxPtr>(self + 0x3A4));

@@ -291,7 +291,7 @@ inline void* RedResize(void* address, int size)
 int RedNewA(int size, int offset, int maxSize)
 {
 	unsigned int interrupts;
-	int result;
+	int allocAddress;
 	int rangeStart;
 	int currentAddress;
 	int gap;
@@ -320,7 +320,7 @@ int RedNewA(int size, int offset, int maxSize)
 	size += REDSOUND_MEMORY_BANK_ALIGN_MASK;
 	size &= ~REDSOUND_MEMORY_BANK_ALIGN_MASK;
 	currentAddress = rangeStart;
-	result = REDSOUND_MEMORY_ALLOC_FAILED;
+	allocAddress = REDSOUND_MEMORY_ALLOC_FAILED;
 	maxGap = maxSize;
 	bestBlock = 0;
 
@@ -330,7 +330,7 @@ int RedNewA(int size, int offset, int maxSize)
 	}
 
 	if (blockPtr->m_size == REDSOUND_MEMORY_BLOCK_SIZE_EMPTY) {
-		result = currentAddress;
+		allocAddress = currentAddress;
 		bestBlock = blockPtr;
 	} else {
 		for (; (blockPtr->m_size != REDSOUND_MEMORY_BLOCK_SIZE_EMPTY) &&
@@ -341,7 +341,7 @@ int RedNewA(int size, int offset, int maxSize)
 					if (maxGap > gap) {
 						maxGap = gap;
 					}
-					result = currentAddress;
+					allocAddress = currentAddress;
 					bestBlock = blockPtr;
 				}
 			} else {
@@ -354,23 +354,23 @@ int RedNewA(int size, int offset, int maxSize)
 		    (blockPtr < RedMemoryBankGetEnd(m_AMemoryBank))) {
 			gap = (rangeStart + maxSize) - currentAddress;
 			if ((size <= gap) && (maxGap > gap)) {
-				result = currentAddress;
+				allocAddress = currentAddress;
 				bestBlock = blockPtr;
 			}
 		}
 	}
 
-	if ((bestBlock != 0) && ((u32)(result + size) <= (u32)(rangeStart + maxSize))) {
+	if ((bestBlock != 0) && ((u32)(allocAddress + size) <= (u32)(rangeStart + maxSize))) {
 		if (bestBlock->m_size > REDSOUND_MEMORY_BLOCK_SIZE_EMPTY) {
 			gap = RedMemoryBankGetTailCount(m_AMemoryBank, bestBlock);
 			if (gap > REDSOUND_MEMORY_BLOCK_COUNT_NONE) {
 				memmove(bestBlock + 1, bestBlock, gap * REDSOUND_MEMORY_BLOCK_SIZE);
 			}
 		}
-		bestBlock->m_address = result;
+		bestBlock->m_address = allocAddress;
 		bestBlock->m_size = size;
 		OSRestoreInterrupts(interrupts);
-		return result;
+		return allocAddress;
 	}
 
 	OSRestoreInterrupts(interrupts);

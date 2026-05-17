@@ -259,7 +259,6 @@ static RedSoundStreamBank* _SearchStreamBank(int streamId)
  */
 CRedSound::CRedSound()
 {
-	// TODO
 }
 /*
  * --INFO--

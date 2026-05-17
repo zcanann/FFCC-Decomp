@@ -939,7 +939,6 @@ static void __MidiCtrl_NoSupport(RedSoundCONTROL* control, RedKeyOnDATA* keyOnDa
  */
 static void __MidiCtrl_Pass(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
 {
-	// TODO
 }
 /*
  * --INFO--

@@ -2179,7 +2179,6 @@ static void _RedAXCallback()
  */
 CRedDriver::CRedDriver()
 {
-	// TODO
 }
 
 /*

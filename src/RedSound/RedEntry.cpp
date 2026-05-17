@@ -293,7 +293,6 @@ STATIC_ASSERT(sizeof(sRedEntryErrorColor) + sizeof(sRedEntryResetColor) + sizeof
  */
 CRedEntry::CRedEntry()
 {
-	// TODO
 }
 /*
  * --INFO--

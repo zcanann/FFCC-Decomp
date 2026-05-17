@@ -24,20 +24,20 @@ enum RedMidiSignTableSize {
 };
 
 struct RedMidiDataTable {
-    int m_signDataTable[REDSOUND_SIGN_DATA_TABLE_COUNT];
-    RedSwingFunc m_swingFunction[REDSOUND_SWING_FUNCTION_COUNT];
-    RedMidiControlFunc m_midiControlFunction[REDSOUND_MIDI_CONTROL_FUNCTION_COUNT];
+    int m_SignDataTable[REDSOUND_SIGN_DATA_TABLE_COUNT];
+    RedSwingFunc SwingEntryFunction[REDSOUND_SWING_FUNCTION_COUNT];
+    RedMidiControlFunc p_MidiControl_Function[REDSOUND_MIDI_CONTROL_FUNCTION_COUNT];
 };
 
 enum RedMidiDataTableSize {
-    REDSOUND_SIGN_DATA_TABLE_OFFSET = (unsigned int)&(((RedMidiDataTable*)0)->m_signDataTable),
+    REDSOUND_SIGN_DATA_TABLE_OFFSET = (unsigned int)&(((RedMidiDataTable*)0)->m_SignDataTable),
     REDSOUND_SIGN_DATA_TABLE_SIZE = REDSOUND_SIGN_DATA_TABLE_COUNT * sizeof(int),
     REDSOUND_SIGN_DATA_TABLE_ALLOC_SIZE = REDSOUND_SIGN_DATA_TABLE_SIZE,
-    REDSOUND_SWING_FUNCTION_TABLE_OFFSET = (unsigned int)&(((RedMidiDataTable*)0)->m_swingFunction),
+    REDSOUND_SWING_FUNCTION_TABLE_OFFSET = (unsigned int)&(((RedMidiDataTable*)0)->SwingEntryFunction),
     REDSOUND_SWING_FUNCTION_TABLE_SIZE = REDSOUND_SWING_FUNCTION_COUNT * sizeof(RedSwingFunc),
     REDSOUND_SWING_FUNCTION_TABLE_ALLOC_SIZE = REDSOUND_SWING_FUNCTION_TABLE_SIZE,
     REDSOUND_MIDI_CONTROL_FUNCTION_TABLE_OFFSET =
-        (unsigned int)&(((RedMidiDataTable*)0)->m_midiControlFunction),
+        (unsigned int)&(((RedMidiDataTable*)0)->p_MidiControl_Function),
     REDSOUND_MIDI_CONTROL_FUNCTION_TABLE_SIZE =
         REDSOUND_MIDI_CONTROL_FUNCTION_COUNT * sizeof(RedMidiControlFunc),
     REDSOUND_MIDI_CONTROL_FUNCTION_TABLE_ALLOC_SIZE = REDSOUND_MIDI_CONTROL_FUNCTION_TABLE_SIZE,
@@ -350,8 +350,8 @@ static int m_SignDataTable[REDSOUND_SIGN_DATA_TABLE_COUNT] = {
 };
 #define RedSignDataGet(index) (m_SignDataTable[(index)])
 STATIC_ASSERT(sizeof(m_SignDataTable) == REDSOUND_SIGN_DATA_TABLE_SIZE);
-STATIC_ASSERT(offsetof(RedMidiDataTable, m_signDataTable) == REDSOUND_SIGN_DATA_TABLE_OFFSET);
-STATIC_ASSERT(sizeof(((RedMidiDataTable*)0)->m_signDataTable) == REDSOUND_SIGN_DATA_TABLE_SIZE);
+STATIC_ASSERT(offsetof(RedMidiDataTable, m_SignDataTable) == REDSOUND_SIGN_DATA_TABLE_OFFSET);
+STATIC_ASSERT(sizeof(((RedMidiDataTable*)0)->m_SignDataTable) == REDSOUND_SIGN_DATA_TABLE_SIZE);
 STATIC_ASSERT(REDSOUND_SIGN_DATA_TABLE_SIZE == REDSOUND_SIGN_DATA_TABLE_ALLOC_SIZE);
 
 static int SineSwing(int phase);
@@ -372,8 +372,8 @@ RedSwingFunc SwingEntryFunction[REDSOUND_SWING_FUNCTION_COUNT] = {
     RandomSwingR, DutySwingR, DutySwingR, DutySwingR,
 };
 STATIC_ASSERT(sizeof(SwingEntryFunction) == REDSOUND_SWING_FUNCTION_TABLE_SIZE);
-STATIC_ASSERT(offsetof(RedMidiDataTable, m_swingFunction) == REDSOUND_SWING_FUNCTION_TABLE_OFFSET);
-STATIC_ASSERT(sizeof(((RedMidiDataTable*)0)->m_swingFunction) == REDSOUND_SWING_FUNCTION_TABLE_SIZE);
+STATIC_ASSERT(offsetof(RedMidiDataTable, SwingEntryFunction) == REDSOUND_SWING_FUNCTION_TABLE_OFFSET);
+STATIC_ASSERT(sizeof(((RedMidiDataTable*)0)->SwingEntryFunction) == REDSOUND_SWING_FUNCTION_TABLE_SIZE);
 STATIC_ASSERT(REDSOUND_SWING_FUNCTION_TABLE_OFFSET == REDSOUND_SIGN_DATA_TABLE_OFFSET +
                                                      REDSOUND_SIGN_DATA_TABLE_ALLOC_SIZE);
 STATIC_ASSERT(REDSOUND_SWING_FUNCTION_TABLE_SIZE == REDSOUND_SWING_FUNCTION_TABLE_ALLOC_SIZE);
@@ -574,8 +574,8 @@ RedMidiControlFunc p_MidiControl_Function[REDSOUND_MIDI_CONTROL_FUNCTION_COUNT] 
     __MidiCtrl_NoSupport,        __MidiCtrl_Pass,
 };
 STATIC_ASSERT(sizeof(p_MidiControl_Function) == REDSOUND_MIDI_CONTROL_FUNCTION_TABLE_SIZE);
-STATIC_ASSERT(offsetof(RedMidiDataTable, m_midiControlFunction) == REDSOUND_MIDI_CONTROL_FUNCTION_TABLE_OFFSET);
-STATIC_ASSERT(sizeof(((RedMidiDataTable*)0)->m_midiControlFunction) == REDSOUND_MIDI_CONTROL_FUNCTION_TABLE_SIZE);
+STATIC_ASSERT(offsetof(RedMidiDataTable, p_MidiControl_Function) == REDSOUND_MIDI_CONTROL_FUNCTION_TABLE_OFFSET);
+STATIC_ASSERT(sizeof(((RedMidiDataTable*)0)->p_MidiControl_Function) == REDSOUND_MIDI_CONTROL_FUNCTION_TABLE_SIZE);
 STATIC_ASSERT(REDSOUND_MIDI_CONTROL_FUNCTION_TABLE_OFFSET ==
               REDSOUND_SWING_FUNCTION_TABLE_OFFSET + REDSOUND_SWING_FUNCTION_TABLE_ALLOC_SIZE);
 STATIC_ASSERT(REDSOUND_MIDI_CONTROL_FUNCTION_TABLE_SIZE == REDSOUND_MIDI_CONTROL_FUNCTION_TABLE_ALLOC_SIZE);

@@ -105,9 +105,7 @@ extern "C" void _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTe
     int, int, int, int, int);
 extern "C" const double DOUBLE_8032FCC0 = 1.0;
 extern "C" const float FLOAT_8032FCC8 = 1.0f;
-extern "C" float FLOAT_8032FCD8;
 extern "C" float FLOAT_8032FCDC;
-extern "C" double DOUBLE_8032FCD0;
 
 static inline void WriteU8(void* base, unsigned int offset, unsigned char value) {
     reinterpret_cast<unsigned char*>(base)[offset] = value;
@@ -448,10 +446,10 @@ void CMaterialEditorPcs::calcViewer()
         m_usbStream.SetUSBStreamDataDone();
     }
 
-    rotationValue = FLOAT_8032FCD8;
-    srt.transZ = FLOAT_8032FCD8;
-    srt.transY = FLOAT_8032FCD8;
-    srt.transX = FLOAT_8032FCD8;
+    rotationValue = 0.0f;
+    srt.transZ = 0.0f;
+    srt.transY = 0.0f;
+    srt.transX = 0.0f;
     srt.rotZ = rotationValue;
     srt.rotY = rotationValue;
     srt.rotX = rotationValue;
@@ -648,8 +646,8 @@ void CMaterialEditorPcs::drawViewer()
                 case 'H':
                 if (polygon->textureIndex < static_cast<s16>(m_loadedTextureCount)) {
                     s16* textureHeader = m_textureHeader[polygon->textureIndex];
-                    float scaleU = static_cast<float>(DOUBLE_8032FCC0 / (static_cast<double>(textureHeader[2]) - DOUBLE_8032FCD0));
-                    float scaleV = static_cast<float>(DOUBLE_8032FCC0 / (static_cast<double>(textureHeader[3]) - DOUBLE_8032FCD0));
+                    float scaleU = static_cast<float>(DOUBLE_8032FCC0 / static_cast<double>(textureHeader[2]));
+                    float scaleV = static_cast<float>(DOUBLE_8032FCC0 / static_cast<double>(textureHeader[3]));
 
                     polygon->texCoord[0][0] = scaleU * static_cast<float>(polygon->u0);
                     if (polygon->u0 < 0) {

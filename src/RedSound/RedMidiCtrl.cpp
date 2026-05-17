@@ -1299,13 +1299,13 @@ static void __MidiCtrl_TimeSignature(RedSoundCONTROL* control, RedKeyOnDATA*, Re
 static void __MidiCtrl_KeySignature(RedSoundCONTROL* control, RedKeyOnDATA*, RedTrackDATA* track)
 {
     RedTrackDATA* scan;
-    unsigned int value;
+    unsigned int keyIndex;
 
-    value = *track->m_command++;
-    value &= REDSOUND_KEY_SIGNATURE_INDEX_MASK;
-    control->m_keySignature = value;
-    value = RedKeySignatureIndexGet(value);
-    control->m_keySignatureData = RedKeySignatureDataGet(value);
+    keyIndex = *track->m_command++;
+    keyIndex &= REDSOUND_KEY_SIGNATURE_INDEX_MASK;
+    control->m_keySignature = keyIndex;
+    keyIndex = RedKeySignatureIndexGet(keyIndex);
+    control->m_keySignatureData = RedKeySignatureDataGet(keyIndex);
 
     if (RedMusicKeySignatureIsEnabled()) {
         scan = control->m_tracks;

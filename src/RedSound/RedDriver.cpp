@@ -412,6 +412,8 @@ struct RedExecCommand {
 };
 
 #define RedExecCommandGetArg(command, index) ((command)->m_args[(index)])
+#define RedExecCommandSetFunc(command, func) ((command)->m_func = (func))
+#define RedExecCommandSetArg(command, index, arg) (RedExecCommandGetArg((command), (index)) = (arg))
 
 enum RedExecCommandLayout {
     REDSOUND_EXEC_COMMAND_FUNC_OFFSET = (unsigned int)&(((RedExecCommand*)0)->m_func),
@@ -1573,14 +1575,14 @@ static RedExecCommand* _EntryExecCommand(RedExecCommandFunc func, int arg1, int 
 
     interruptLevel = OSDisableInterrupts();
     writePos = RedExecCommandGetNow();
-    writePos->m_func = func;
-    RedExecCommandGetArg(writePos, REDSOUND_EXEC_COMMAND_ARG0) = arg1;
-    RedExecCommandGetArg(writePos, REDSOUND_EXEC_COMMAND_ARG1) = arg2;
-    RedExecCommandGetArg(writePos, REDSOUND_EXEC_COMMAND_ARG2) = arg3;
-    RedExecCommandGetArg(writePos, REDSOUND_EXEC_COMMAND_ARG3) = arg4;
-    RedExecCommandGetArg(writePos, REDSOUND_EXEC_COMMAND_ARG4) = arg5;
-    RedExecCommandGetArg(writePos, REDSOUND_EXEC_COMMAND_ARG5) = arg6;
-    RedExecCommandGetArg(writePos, REDSOUND_EXEC_COMMAND_ARG6) = arg7;
+    RedExecCommandSetFunc(writePos, func);
+    RedExecCommandSetArg(writePos, REDSOUND_EXEC_COMMAND_ARG0, arg1);
+    RedExecCommandSetArg(writePos, REDSOUND_EXEC_COMMAND_ARG1, arg2);
+    RedExecCommandSetArg(writePos, REDSOUND_EXEC_COMMAND_ARG2, arg3);
+    RedExecCommandSetArg(writePos, REDSOUND_EXEC_COMMAND_ARG3, arg4);
+    RedExecCommandSetArg(writePos, REDSOUND_EXEC_COMMAND_ARG4, arg5);
+    RedExecCommandSetArg(writePos, REDSOUND_EXEC_COMMAND_ARG5, arg6);
+    RedExecCommandSetArg(writePos, REDSOUND_EXEC_COMMAND_ARG6, arg7);
     writePos++;
     if (writePos == RedExecCommandGetEnd()) {
         writePos = RedExecCommandGetBegin();

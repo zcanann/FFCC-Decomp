@@ -6,10 +6,12 @@ extern "C" void destroy__10CSamplePcsFv(CSamplePcs*);
 extern "C" void func0__10CSamplePcsFv(CSamplePcs*);
 extern "C" void func1__10CSamplePcsFv(CSamplePcs*);
 
-static unsigned int m_table_desc0__10CSamplePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__10CSamplePcsFv)};
-static unsigned int m_table_desc1__10CSamplePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__10CSamplePcsFv)};
-static unsigned int m_table_desc2__10CSamplePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(func0__10CSamplePcsFv)};
-static unsigned int m_table_desc3__10CSamplePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(func1__10CSamplePcsFv)};
+static unsigned int m_table_desc__10CSamplePcs[4][3] = {
+    {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__10CSamplePcsFv)},
+    {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__10CSamplePcsFv)},
+    {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(func0__10CSamplePcsFv)},
+    {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(func1__10CSamplePcsFv)},
+};
 
 CSamplePcsTable m_table__10CSamplePcs = {
     const_cast<char*>(s_CSamplePcs_801D6CC8),
@@ -198,16 +200,16 @@ inline CSamplePcs::CSamplePcs()
 {
 	unsigned int* table = reinterpret_cast<unsigned int*>(&m_table__10CSamplePcs);
 
-	table[1] = m_table_desc0__10CSamplePcs[0];
-	table[2] = m_table_desc0__10CSamplePcs[1];
-	table[3] = m_table_desc0__10CSamplePcs[2];
-	table[4] = m_table_desc1__10CSamplePcs[0];
-	table[5] = m_table_desc1__10CSamplePcs[1];
-	table[6] = m_table_desc1__10CSamplePcs[2];
-	table[7] = m_table_desc2__10CSamplePcs[0];
-	table[8] = m_table_desc2__10CSamplePcs[1];
-	table[9] = m_table_desc2__10CSamplePcs[2];
-	table[12] = m_table_desc3__10CSamplePcs[0];
-	table[13] = m_table_desc3__10CSamplePcs[1];
-	table[14] = m_table_desc3__10CSamplePcs[2];
+	table[1] = m_table_desc__10CSamplePcs[0][0];
+	table[2] = m_table_desc__10CSamplePcs[0][1];
+	table[3] = m_table_desc__10CSamplePcs[0][2];
+	table[4] = m_table_desc__10CSamplePcs[1][0];
+	table[5] = m_table_desc__10CSamplePcs[1][1];
+	table[6] = m_table_desc__10CSamplePcs[1][2];
+	table[7] = m_table_desc__10CSamplePcs[2][0];
+	table[8] = m_table_desc__10CSamplePcs[2][1];
+	table[9] = m_table_desc__10CSamplePcs[2][2];
+	table[12] = m_table_desc__10CSamplePcs[3][0];
+	table[13] = m_table_desc__10CSamplePcs[3][1];
+	table[14] = m_table_desc__10CSamplePcs[3][2];
 }

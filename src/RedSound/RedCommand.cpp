@@ -313,29 +313,29 @@ int SeStopMG(int bank, int sep, int group, int kind)
  * JP Address: TODO
  * JP Size: TODO
  */
-int SeBlockPlay(int seId, int bank, int sepNo, int pan, int volume)
+int SeBlockPlay(int seId, int bank, int sequenceNo, int pan, int volume)
 {
 	bank = bank & REDSOUND_SE_BLOCK_BANK_MASK;
-	sepNo = sepNo & REDSOUND_SE_BLOCK_SEQUENCE_MASK;
+	sequenceNo = sequenceNo & REDSOUND_SE_BLOCK_SEQUENCE_MASK;
 
 	if (RedSeBlockDataGet(bank) != REDSOUND_SE_BLOCK_DATA_NONE) {
-		RedSeBlockHEAD* bankData = RedSeBlockDataGet(bank);
-		int seNo = sepNo;
+		RedSeBlockHEAD* seBlock = RedSeBlockDataGet(bank);
+		int blockSequence = sequenceNo;
 
-		sepNo += bank << REDSOUND_SE_BLOCK_BANK_SHIFT;
-		sepNo |= REDSOUND_SE_BLOCK_DATA_FLAG;
-		if (seNo < bankData->m_seCount) {
-			int* entries = bankData->m_entries;
+		sequenceNo += bank << REDSOUND_SE_BLOCK_BANK_SHIFT;
+		sequenceNo |= REDSOUND_SE_BLOCK_DATA_FLAG;
+		if (blockSequence < seBlock->m_seCount) {
+			int* entries = seBlock->m_entries;
 
-			if (entries[seNo] != REDSOUND_SE_BLOCK_ENTRY_EMPTY) {
-				RedSeINFO* seInfo = RedSeBlockGetInfoFromEntry(bankData, entries, seNo);
+			if (entries[blockSequence] != REDSOUND_SE_BLOCK_ENTRY_EMPTY) {
+				RedSeINFO* seInfo = RedSeBlockGetInfoFromEntry(seBlock, entries, blockSequence);
 				RedSeINFO* playInfo = seInfo;
 
-				if (((unsigned int)entries[seNo] & REDSOUND_SE_BLOCK_DATA_FLAG) != 0) {
+				if (((unsigned int)entries[blockSequence] & REDSOUND_SE_BLOCK_DATA_FLAG) != 0) {
 					playInfo->m_flagsAndCount |= REDSOUND_SE_INFO_MULTI_FLAG;
 				}
-				if (_SePlayStart(playInfo, seId, sepNo, pan, volume) != 0) {
-					return seNo;
+				if (_SePlayStart(playInfo, seId, sequenceNo, pan, volume) != 0) {
+					return blockSequence;
 				}
 			}
 		}

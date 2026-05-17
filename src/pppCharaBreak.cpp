@@ -13,15 +13,6 @@
 #include <string.h>
 #include "ffcc/ppp_linkage.h"
 
-struct _pppMngStCharaBreak {
-    u8 _pad0[0xD8];
-    void* m_charaObj;
-};
-extern _pppMngStCharaBreak* pppMngStPtr;
-
-extern struct _pppEnvSt {
-    CMemory::CStage* m_stagePtr;
-} *pppEnvStPtr;
 class CMaterialMan;
 extern const char s_pppCharaBreak_cpp_801dd690[] = "pppCharaBreak.cpp";
 extern float FLOAT_80332048;
@@ -62,6 +53,7 @@ int GetNumPolygonFromDL__5CUtilFPvUl(CUtil*, void*, unsigned long);
 int IsHasDrawFmtDL__5CUtilFUc(CUtil*, unsigned char);
 void _WaitDrawDone__8CGraphicFPci(CGraphic*, const char*, int);
 void pppHeapUseRate__FPQ27CMemory6CStage(void*);
+
 void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(void*, void*, float, u8, u8, u8, u8, u8, u8, u8);
 
 void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
@@ -84,28 +76,9 @@ struct POLYGON_DATA {
     u16 m_texIndices[3];
 };
 
-struct CharaBreakStep {
-    s32 m_graphId;
-    f32 m_dataValIndex;
-    f32 m_graphInit;
-    f32 m_graphStep;
-    f32 m_gravity;
-    f32 _pad14;
-    Vec m_direction;
-    u8 _pad24[0x4];
-    f32 m_payloadGraphInit;
-    f32 m_payloadGraphStep;
-    f32 m_payloadGraphStepStep;
-    u8 m_alphaBase;
-    u8 m_alphaRange;
-    u8 _pad36[0x2];
-    f32 m_velocityBase;
-    f32 m_velocityRange;
-    u8 m_spinMode;
-    u8 m_clipMode;
-    u8 m_worldSpaceMode;
-    u8 _pad43;
-};
+typedef CharaBreakUnkB CharaBreakStep;
+
+STATIC_ASSERT(sizeof(CharaBreakStep) == 0x44);
 
 struct CharaBreakWork {
     u32 _pad0;
@@ -120,7 +93,7 @@ struct CharaBreakWork {
     u8 _pad2C[0x4];
     Vec m_bboxMax;
     f32 m_miscValue;
-    u8* m_model;
+    CChara::CModel* m_model;
     u32 m_enabled;
 };
 
@@ -240,18 +213,15 @@ extern "C" u32 CharaBreak_BeforeCalcMatrixCallback__FPQ26CChara6CModelPvPv(u32, 
 void pppRenderCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB*, CharaBreakUnkC* data)
 {
     int colorOffset = data->m_serializedDataOffsets[0];
-    u8* work = (u8*)charaBreak + 0x80 + data->m_serializedDataOffsets[2];
-    u8* colorWork = (u8*)charaBreak + 0x80 + colorOffset;
+    CharaBreakWork* work = (CharaBreakWork*)(charaBreak->m_workArea + data->m_serializedDataOffsets[2]);
+    u8* colorWork = charaBreak->m_workArea + colorOffset;
 
-    if (*(u32*)(work + 0x44) != 0) {
-        void* envColor = colorWork + 8;
-        void* envMtx = (u8*)charaBreak + 0x40;
-
+    if (work->m_enabled != 0) {
         _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
         pppInitBlendMode();
         pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-            envColor,
-            envMtx,
+            colorWork + 8,
+            (u8*)charaBreak + 0x40,
             FLOAT_80332048,
             0,
             0,
@@ -261,10 +231,10 @@ void pppRenderCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB*, CharaBreakU
             1,
             0);
         _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(0, 2, 2, 3);
-        work[0] = 0xFF;
-        work[1] = 0xFF;
-        work[2] = 0xFF;
-        work[3] = colorWork[0xB];
+        ((u8*)work)[0] = 0xFF;
+        ((u8*)work)[1] = 0xFF;
+        ((u8*)work)[2] = 0xFF;
+        ((u8*)work)[3] = colorWork[0xB];
     }
 }
 /*
@@ -280,7 +250,7 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
 {
     CharaBreakStep* stepData;
     CharaBreakWork* work;
-    u8* model;
+    CChara::CModel* model;
     void* handle;
     u8* mesh;
     u32 i;
@@ -290,14 +260,14 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
         return;
     }
 
-    handle = pppMngStPtr->m_charaObj;
-    work = (CharaBreakWork*)((u8*)charaBreak + 0x80 + data->m_serializedDataOffsets[2]);
+    handle = pppMngStPtr->m_owner;
+    work = (CharaBreakWork*)(charaBreak->m_workArea + data->m_serializedDataOffsets[2]);
     if (work->m_enabled == 0) {
         return;
     }
 
     handle = GetCharaHandlePtr__FP8CGObjectl(handle, 0);
-    model = (u8*)GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
+    model = (CChara::CModel*)GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
     work->m_model = model;
 
     CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(charaBreak,
@@ -318,14 +288,17 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
                                                  stepData->m_payloadGraphStep,
                                                  stepData->m_payloadGraphStepStep);
 
-    *(u32*)(model + 0xE4) = (u32)work;
-    *(u32*)(model + 0xE8) = (u32)stepData;
-    *(u32*)(model + 0xF4) = (u32)CharaBreak_BeforeMeshLockEnvCallback__FPQ26CChara6CModelPvPvi;
-    *(u32*)(model + 0xFC) = (u32)CharaBreak_DrawMeshDLCallback__FPQ26CChara6CModelPvPviiPA4_f;
-    *(u32*)(model + 0x104) = (u32)CharaBreak_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f;
-    *(u32*)(model + 0xEC) = (u32)CharaBreak_BeforeCalcMatrixCallback__FPQ26CChara6CModelPvPv;
+    model->m_callbackContext = work;
+    model->m_callbackParam = stepData;
+    model->m_beforeMeshLockEnvCallback = (void (*)(CChara::CModel*, void*, void*, int))
+        CharaBreak_BeforeMeshLockEnvCallback__FPQ26CChara6CModelPvPvi;
+    model->m_drawMeshDLCallback = (void (*)(CChara::CModel*, void*, void*, int, int, float (*)[4]))
+        CharaBreak_DrawMeshDLCallback__FPQ26CChara6CModelPvPviiPA4_f;
+    model->m_afterDrawMeshCallback = (void (*)(CChara::CModel*, void*, void*, int, float (*)[4]))
+        CharaBreak_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f;
+    *(u32*)((u8*)model + 0xEC) = (u32)CharaBreak_BeforeCalcMatrixCallback__FPQ26CChara6CModelPvPv;
 
-    if (stepData->m_graphId == *(s32*)charaBreak) {
+    if (stepData->m_graphId == charaBreak->m_graphId) {
         f32 zero = FLOAT_80332048;
         if (stepData->m_direction.x == zero && stepData->m_direction.y == zero &&
             stepData->m_direction.z == zero) {
@@ -337,22 +310,22 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
         }
     }
 
-    mesh = reinterpret_cast<u8*>(ModelMeshes(reinterpret_cast<CChara::CModel*>(model)));
+    mesh = reinterpret_cast<u8*>(ModelMeshes(model));
 
     if (work->m_meshBuffers == NULL) {
         work->m_miscValue = FLOAT_80332050;
         work->m_meshBuffers =
-            pppMemFree__FPv(ModelData(reinterpret_cast<CChara::CModel*>(model))->m_meshCount << 2,
+            pppMemFree__FPv(ModelData(model)->m_meshCount << 2,
                             pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppCharaBreak_cpp_801dd690), 0x3D0);
         if (work->m_meshBuffers == NULL) {
             goto fail;
         }
 
-        for (i = 0; i < ModelData(reinterpret_cast<CChara::CModel*>(model))->m_meshCount; i++) {
+        for (i = 0; i < ModelData(model)->m_meshCount; i++) {
             ((u32*)work->m_meshBuffers)[i] = 0;
         }
 
-        for (i = 0; i < ModelData(reinterpret_cast<CChara::CModel*>(model))->m_meshCount; i++) {
+        for (i = 0; i < ModelData(model)->m_meshCount; i++) {
             {
                 CharaBreakMeshData* meshData = reinterpret_cast<CharaBreakMeshRef*>(mesh)->m_data;
 
@@ -363,7 +336,7 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
                         &work->m_bboxMax,
                         reinterpret_cast<CharaBreakMeshRef*>(mesh)->m_workPositions,
                         meshData->m_vertexCount,
-                        ModelData(reinterpret_cast<CChara::CModel*>(model))->m_posQuant);
+                        ModelData(model)->m_posQuant);
                 }
             }
 
@@ -423,9 +396,9 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
                     (*dlEntries)->m_polygonCount = (u16)polygonCount;
 
                     CreatePolygon((*dlEntries)->m_polygonData, displayList->m_data, displayList->m_size,
-                                  (CChara::CModel*)model, (CChara::CMesh*)mesh);
+                                  model, (CChara::CMesh*)mesh);
                     InitPolygonParameter((PCharaBreak*)stepData, (VCharaBreak*)work, (*dlEntries)->m_polygonData,
-                                         (*dlEntries)->m_polygonCount, (CChara::CModel*)model, (CChara::CMesh*)mesh);
+                                         (*dlEntries)->m_polygonCount, model, (CChara::CMesh*)mesh);
 
                     dlEntries--;
                 }
@@ -436,18 +409,18 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
     }
 
     if (gPppInConstructor == 0) {
-        UpdatePolygonData((PCharaBreak*)stepData, (VCharaBreak*)work, (CChara::CModel*)model);
+        UpdatePolygonData((PCharaBreak*)stepData, (VCharaBreak*)work, model);
     }
     return;
 
 fail:
     work->m_enabled = 0;
-    *(u32*)(model + 0xE4) = 0;
-    *(u32*)(model + 0xE8) = 0;
-    *(u32*)(model + 0xF4) = 0;
-    *(u32*)(model + 0xFC) = 0;
-    *(u32*)(model + 0x104) = 0;
-    *(u32*)(model + 0xEC) = 0;
+    model->m_callbackContext = 0;
+    model->m_callbackParam = 0;
+    model->m_beforeMeshLockEnvCallback = 0;
+    model->m_drawMeshDLCallback = 0;
+    model->m_afterDrawMeshCallback = 0;
+    *(u32*)((u8*)model + 0xEC) = 0;
 }
 
 /*
@@ -463,22 +436,22 @@ void pppDestructCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkC* data)
 {
     _WaitDrawDone__8CGraphicFPci(&Graphic, const_cast<char*>(s_pppCharaBreak_cpp_801dd690), 0x319);
 
-    CharaBreakWork* work = (CharaBreakWork*)((u8*)charaBreak + 0x80 + data->m_serializedDataOffsets[2]);
-    u8* model = work->m_model;
+    CharaBreakWork* work = (CharaBreakWork*)(charaBreak->m_workArea + data->m_serializedDataOffsets[2]);
+    CChara::CModel* model = work->m_model;
 
-    *(u32*)(model + 0xE4) = 0;
-    *(u32*)(model + 0xE8) = 0;
-    *(u32*)(model + 0xF4) = 0;
-    *(u32*)(model + 0xFC) = 0;
-    *(u32*)(model + 0x104) = 0;
-    *(u32*)(model + 0xEC) = 0;
+    model->m_callbackContext = 0;
+    model->m_callbackParam = 0;
+    model->m_beforeMeshLockEnvCallback = 0;
+    model->m_drawMeshDLCallback = 0;
+    model->m_afterDrawMeshCallback = 0;
+    *(u32*)((u8*)model + 0xEC) = 0;
 
     void** perMeshBuffers = (void**)work->m_meshBuffers;
-    u8* mesh = *(u8**)(model + 0xAC);
+    u8* mesh = reinterpret_cast<u8*>(ModelMeshes(model));
     void** meshBufferSlot = perMeshBuffers;
 
     if (perMeshBuffers != NULL) {
-        for (u32 meshIndex = 0; meshIndex < *(u32*)(*(u8**)(model + 0xA4) + 0xC); meshIndex++) {
+        for (u32 meshIndex = 0; meshIndex < ModelData(model)->m_meshCount; meshIndex++) {
             u32 dlEntryBase = (u32)*meshBufferSlot;
             int meshData = *(int*)(mesh + 8);
             if (dlEntryBase != 0) {
@@ -529,14 +502,14 @@ void pppConstruct2CharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkC* data)
 {
     float fVar1 = FLOAT_80332048;
     int dataOffset = data->m_serializedDataOffsets[2];
-    u8* work = (u8*)charaBreak + 0x80 + dataOffset;
+    CharaBreakWork* work = (CharaBreakWork*)(charaBreak->m_workArea + dataOffset);
 
-    *(float*)(work + 0xC) = FLOAT_80332048;
-    *(float*)(work + 8) = fVar1;
-    *(float*)(work + 4) = fVar1;
-    *(float*)(work + 0x18) = fVar1;
-    *(float*)(work + 0x14) = fVar1;
-    *(float*)(work + 0x10) = fVar1;
+    work->m_value2 = FLOAT_80332048;
+    work->m_value1 = fVar1;
+    work->m_value0 = fVar1;
+    work->m_value5 = fVar1;
+    work->m_value4 = fVar1;
+    work->m_value3 = fVar1;
 }
 
 /*
@@ -552,16 +525,16 @@ void pppConstructCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkC* data)
 {
     float fVar1 = FLOAT_80332048;
     int dataOffset = data->m_serializedDataOffsets[2];
-    u8* work = (u8*)charaBreak + 0x80 + dataOffset;
+    CharaBreakWork* work = (CharaBreakWork*)(charaBreak->m_workArea + dataOffset);
 
-    *(u32*)(work + 0x1C) = 0;
-    *(float*)(work + 0xC) = fVar1;
-    *(float*)(work + 8) = fVar1;
-    *(float*)(work + 4) = fVar1;
-    *(float*)(work + 0x18) = fVar1;
-    *(float*)(work + 0x14) = fVar1;
-    *(float*)(work + 0x10) = fVar1;
-    *(u32*)(work + 0x44) = 1;
+    work->m_meshBuffers = 0;
+    work->m_value2 = fVar1;
+    work->m_value1 = fVar1;
+    work->m_value0 = fVar1;
+    work->m_value5 = fVar1;
+    work->m_value4 = fVar1;
+    work->m_value3 = fVar1;
+    work->m_enabled = 1;
 }
 
 /*

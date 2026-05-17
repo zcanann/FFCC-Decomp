@@ -575,7 +575,7 @@ void CDbgMenuPcs::drawWindow(int flags, int x, int y, int width, int height, cha
 		u32 vertexIndex = 0;
 		int count = 2;
 
-		do {
+		while (count != 0) {
 			u32 col = vertexIndex & 1;
 			u32 row = vertexIndex >> 1;
 			u32 nextVertexIndex = vertexIndex + 1;
@@ -593,7 +593,8 @@ void CDbgMenuPcs::drawWindow(int flags, int x, int y, int width, int height, cha
 
 			vertexIndex = nextVertexIndex + 1;
 			borderColors += 2;
-		} while (--count != 0);
+			count--;
+		}
 	}
 
 	int fillColorIndex = (flags >> 1) & 1;

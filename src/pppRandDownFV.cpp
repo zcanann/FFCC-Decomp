@@ -14,7 +14,7 @@ struct RandDownFVParams {
     u8 useNormalDistribution;
 };
 
-static inline float randf(float value, float scale)
+static float randf(float value, float scale)
 {
     float result = value * scale;
     return result;
@@ -38,7 +38,7 @@ void pppRandDownFV(_pppPObject* basePtr, RandDownFVParams* in, _pppCtrlTable* ct
     u8* base = (u8*)basePtr;
     f32* valuePtr;
 
-    s32 baseState = *(s32*)(base + 0xC);
+    s32 baseState = basePtr->m_graphId;
     if (baseState == 0) {
         f32 value = -Math.RandF();
         if (in->useNormalDistribution != 0) {

@@ -108,45 +108,21 @@ static inline double U32ToDouble(unsigned int value)
  */
 void CLightPcs::Init()
 {
-    float fVar2;
-    float fVar1;
-    unsigned char bVar3;
-    unsigned int uVar4;
-    unsigned int uVar5;
-
     m_mapLightColor[0].r = 0x3F;
-    uVar4 = __cntlzw(0);
     m_mapLightColor[0].g = 0x3F;
-    fVar1 = FLOAT_8032fc14;
     m_mapLightColor[0].b = 0x3F;
-    fVar2 = FLOAT_8032fc2c;
-    uVar5 = __cntlzw(1);
-    bVar3 = static_cast<unsigned char>(-((unsigned char)(uVar4 >> 5) & 1)) & 0x3F;
     m_mapLightColor[0].a = 0xFF;
-    m_mapLightColor[1].r = bVar3;
-    uVar4 = __cntlzw(2);
-    m_mapLightColor[1].g = bVar3;
-    m_mapLightColor[1].b = bVar3;
-    bVar3 = static_cast<unsigned char>(-((unsigned char)(uVar5 >> 5) & 1)) & 0x3F;
-    m_mapLightColor[1].a = 0xFF;
-    m_mapLightParams[0] = fVar1;
-    m_mapLightParams[1] = fVar1;
-    m_mapLightParams[2] = fVar2;
-    m_mapLightColor[2].r = bVar3;
-    m_mapLightColor[2].g = bVar3;
-    m_mapLightColor[2].b = bVar3;
-    bVar3 = static_cast<unsigned char>(-((unsigned char)(uVar4 >> 5) & 1)) & 0x3F;
-    m_mapLightColor[2].a = 0xFF;
-    m_mapLightParams[3] = fVar1;
-    m_mapLightParams[4] = fVar1;
-    m_mapLightParams[5] = fVar2;
-    m_mapLightColor[3].r = bVar3;
-    m_mapLightColor[3].g = bVar3;
-    m_mapLightColor[3].b = bVar3;
-    m_mapLightColor[3].a = 0xFF;
-    m_mapLightParams[6] = fVar1;
-    m_mapLightParams[7] = fVar1;
-    m_mapLightParams[8] = fVar2;
+
+    for (int i = 0; i < 3; i++) {
+        unsigned char color = (i == 0) ? 0x3F : 0;
+        m_mapLightColor[i + 1].r = color;
+        m_mapLightColor[i + 1].g = color;
+        m_mapLightColor[i + 1].b = color;
+        m_mapLightColor[i + 1].a = 0xFF;
+        m_mapLightParams[i * 3 + 0] = FLOAT_8032fc14;
+        m_mapLightParams[i * 3 + 1] = FLOAT_8032fc14;
+        m_mapLightParams[i * 3 + 2] = FLOAT_8032fc2c;
+    }
 }
 
 /*

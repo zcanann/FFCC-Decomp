@@ -31,7 +31,7 @@ void pppRandShort(_pppPObject* basePtr, RandShortParams* in, _pppCtrlTable* ctrl
         return;
     }
 
-    s32 baseState = *(s32*)(base + 0xC);
+    s32 baseState = basePtr->m_graphId;
     if (baseState == 0) {
         f32 value = Math.RandF();
         if (in->useNormalDistribution != 0) {

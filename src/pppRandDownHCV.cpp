@@ -37,7 +37,7 @@ void pppRandDownHCV(_pppPObject* basePtr, RandDownHCVParams* in, _pppCtrlTable* 
         return;
     }
 
-    if (in->targetId == *(s32*)(base + 0xC)) {
+    if (in->targetId == basePtr->m_graphId) {
         f32 value = -Math.RandF();
         if (in->useNormalDistribution != 0) {
             f32 random = Math.RandF();
@@ -48,7 +48,7 @@ void pppRandDownHCV(_pppPObject* basePtr, RandDownHCVParams* in, _pppCtrlTable* 
 
         valuePtr = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
         *valuePtr = value;
-    } else if (in->targetId != *(s32*)(base + 0xC)) {
+    } else if (in->targetId != basePtr->m_graphId) {
         return;
     } else {
         valuePtr = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);

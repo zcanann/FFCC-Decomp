@@ -741,10 +741,8 @@ void CMenuPcs::freeTexture(int textureSetStart, int textureSetCount, int texture
         if (refObject != nullptr) {
             int refCount = refObject[1] - 1;
             refObject[1] = refCount;
-            if ((refCount == 0) && (refObject != nullptr)) {
-                typedef void (*TextureDtor)(void*, int);
-                TextureDtor* vtable = reinterpret_cast<TextureDtor*>(refObject[0]);
-                vtable[2](refObject, 1);
+            if (refCount == 0) {
+                delete reinterpret_cast<CRef*>(refObject);
             }
             *reinterpret_cast<void**>(self + 0x18C + offset) = nullptr;
         }
@@ -756,10 +754,8 @@ void CMenuPcs::freeTexture(int textureSetStart, int textureSetCount, int texture
         if (refObject != nullptr) {
             int refCount = refObject[1] - 1;
             refObject[1] = refCount;
-            if ((refCount == 0) && (refObject != nullptr)) {
-                typedef void (*TextureSetDtor)(void*, int);
-                TextureSetDtor* vtable = reinterpret_cast<TextureSetDtor*>(refObject[0]);
-                vtable[2](refObject, 1);
+            if (refCount == 0) {
+                delete reinterpret_cast<CRef*>(refObject);
             }
             *reinterpret_cast<void**>(self + 0x14C + offset) = nullptr;
         }

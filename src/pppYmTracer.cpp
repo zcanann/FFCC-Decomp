@@ -196,7 +196,6 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
     TRACE_POLYGON* entry;
     TRACE_POLYGON* poly;
     TracerWork* work;
-    float* valuePtr;
     f32 fVar3;
     u8 alpha;
     u8 decay;
@@ -230,25 +229,22 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
     }
 
     if (param_2->m_graphId == pppYmTracer->m_object.m_graphId) {
-        if (param_2->m_initWOrk == -1) {
-            valuePtr = reinterpret_cast<float*>(gPppDefaultValueBuffer);
-        } else {
-            valuePtr = reinterpret_cast<float*>(
-                reinterpret_cast<_pppPObject*>(pppMngStPtr->m_pppPDataVals[param_2->m_initWOrk].m_pppPObjLink)
-                    ->m_workArea +
-                param_2->m_stepValue);
-        }
-        work->initWork = valuePtr;
+        work->initWork =
+            (param_2->m_initWOrk == -1)
+                ? reinterpret_cast<float*>(gPppDefaultValueBuffer)
+                : reinterpret_cast<float*>(
+                      reinterpret_cast<_pppPObject*>(
+                          pppMngStPtr->m_pppPDataVals[param_2->m_initWOrk].m_pppPObjLink)
+                              ->m_workArea +
+                      param_2->m_stepValue);
 
-        if (param_2->m_arg3 == -1) {
-            valuePtr = reinterpret_cast<float*>(gPppDefaultValueBuffer);
-        } else {
-            valuePtr = reinterpret_cast<float*>(
-                reinterpret_cast<_pppPObject*>(pppMngStPtr->m_pppPDataVals[param_2->m_arg3].m_pppPObjLink)
-                    ->m_workArea +
-                param_2->m_tracer.m_arg3WorkOffset);
-        }
-        work->arg3Work = valuePtr;
+        work->arg3Work =
+            (param_2->m_arg3 == -1)
+                ? reinterpret_cast<float*>(gPppDefaultValueBuffer)
+                : reinterpret_cast<float*>(
+                      reinterpret_cast<_pppPObject*>(pppMngStPtr->m_pppPDataVals[param_2->m_arg3].m_pppPObjLink)
+                              ->m_workArea +
+                      param_2->m_tracer.m_arg3WorkOffset);
     }
 
     if (work->count + 1 < param_2->m_tracer.m_entryCount) {

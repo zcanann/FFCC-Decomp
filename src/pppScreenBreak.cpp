@@ -774,7 +774,8 @@ int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void* para
             PSMTXConcat(quatMtx, transMtx, (float(*)[4])nodeMtx);
 
             pieceData[3] -= pieceData[0];
-            pieceData[4] = pieceData[1] * pieceData[0xC] - 0.5f * *(float*)((u8*)param_3 + 0x18) * pieceData[0xC] * pieceData[0xC];
+            float gravityTerm = 0.5f * *(float*)((u8*)param_3 + 0x18) * pieceData[0xC];
+            pieceData[4] = pieceData[1] * pieceData[0xC] - gravityTerm * pieceData[0xC];
             pieceData[5] -= pieceData[2];
 
             if (*(float*)((u8*)param_3 + 0x30) != zero) {

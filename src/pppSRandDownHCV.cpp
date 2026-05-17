@@ -48,14 +48,14 @@ void pppSRandDownHCV(_pppPObject* basePtr, SRandDownHCVParams* in, _pppCtrlTable
 
 	float* target;
 
-	if (in->targetId == *(s32*)(base + 0xC)) {
+	if (in->targetId == basePtr->m_graphId) {
 		target = (float*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
 		target[0] = randf(in->useNormalDistribution);
 		target[1] = randf(in->useNormalDistribution);
 		target[2] = randf(in->useNormalDistribution);
 		target[3] = randf(in->useNormalDistribution);
 	} else {
-		if (in->targetId != *(s32*)(base + 0xC)) {
+		if (in->targetId != basePtr->m_graphId) {
 			return;
 		}
 		target = (float*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);

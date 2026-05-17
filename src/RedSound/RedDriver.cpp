@@ -678,6 +678,8 @@ static RedTickHistory* volatile p_Tick;
 #define RedTickHistoryGet() (p_Tick)
 #define RedTickHistorySet(tick) (p_Tick = (tick))
 #define RedTickHistoryGetTicks() (RedTickHistoryGet()->m_ticks)
+#define RedTickHistoryGetEnd() (RedTickHistoryGetTicks() + REDSOUND_TICK_HISTORY_COUNT)
+#define RedTickHistorySetLatest(ticks) (RedTickHistoryGetTicks()[REDSOUND_TICK_HISTORY_LATEST] = (ticks))
 u8* volatile p_ZeroData;
 static RedExecCommand* volatile p_ExecCommand;
 static RedExecCommand* volatile p_ExecCommandNow;
@@ -1754,7 +1756,7 @@ static int _MainThread(void*)
             }
             memmove(RedTickHistoryGetTicks() + 1, RedTickHistoryGetTicks(), REDSOUND_TICK_HISTORY_SHIFT_SIZE);
             endTick = OSGetTick();
-            RedTickHistoryGetTicks()[REDSOUND_TICK_HISTORY_LATEST] = endTick - startTick;
+            RedTickHistorySetLatest(endTick - startTick);
         }
     }
     RedThreadExecuteRemove(REDSOUND_THREAD_FLAG_MAIN);
@@ -2365,7 +2367,7 @@ int CRedDriver::GetProgramTime()
     do {
         sum += *p;
         p++;
-    } while (p < RedTickHistoryGetTicks() + REDSOUND_TICK_HISTORY_COUNT);
+    } while (p < RedTickHistoryGetEnd());
     return sum;
 }
 

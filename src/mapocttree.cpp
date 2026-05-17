@@ -697,15 +697,13 @@ void COctTree::DrawTypeMeshFrustumIn_r(COctNode* octNode)
 void COctTree::DrawTypeMesh_r(COctNode* octNode)
 {
 	float localX = m_localPosX;
-	float localY = m_localPosY;
-	float localZ = m_localPosZ;
-	unsigned int andMask;
+	unsigned char andMask;
+	unsigned char orMask;
 	int farCount;
-	unsigned int orMask;
 
-	if ((localX <= octNode->m_boundMaxX) && (localY <= octNode->m_boundMaxY) &&
-	    (localZ <= octNode->m_boundMaxZ) && (octNode->m_boundMinX <= localX) &&
-	    (octNode->m_boundMinY <= localY) && (octNode->m_boundMinZ <= localZ)) {
+	if ((localX <= octNode->m_boundMaxX) && (m_localPosY <= octNode->m_boundMaxY) &&
+	    (m_localPosZ <= octNode->m_boundMaxZ) && (localX >= octNode->m_boundMinX) &&
+	    (m_localPosY >= octNode->m_boundMinY) && (m_localPosZ >= octNode->m_boundMinZ)) {
 		orMask = 0xF;
 	} else {
 		Vec localCorner;
@@ -722,7 +720,7 @@ void COctTree::DrawTypeMesh_r(COctNode* octNode)
 			for (int y = 0; y < 2; y++) {
 				localCorner.y = (y == 0) ? octNode->m_boundMinY : octNode->m_boundMaxY;
 				for (int z = 0; z < 2; z++) {
-					unsigned int clipFlags;
+					unsigned char clipFlags;
 					double depth;
 
 					localCorner.z = (z == 0) ? octNode->m_boundMinZ : octNode->m_boundMaxZ;
@@ -733,9 +731,9 @@ void COctTree::DrawTypeMesh_r(COctNode* octNode)
 					}
 
 					depth = static_cast<double>(viewPos.z);
-					if (minDepth < viewPos.z) {
+					if (viewPos.z > minDepth) {
 						farCount++;
-						if (-depth < static_cast<double>(viewPos.x)) {
+						if (static_cast<double>(viewPos.x) > -depth) {
 							clipFlags = 0x11;
 						} else if (static_cast<double>(viewPos.x) < depth) {
 							clipFlags = 0x12;
@@ -743,13 +741,13 @@ void COctTree::DrawTypeMesh_r(COctNode* octNode)
 							clipFlags = 0x10;
 						}
 
-						if (-depth < static_cast<double>(viewPos.y)) {
+						if (static_cast<double>(viewPos.y) > -depth) {
 							clipFlags |= 0x14;
 						} else if (static_cast<double>(viewPos.y) < depth) {
 							clipFlags |= 0x18;
 						}
 					} else {
-						if (-depth < static_cast<double>(viewPos.x)) {
+						if (static_cast<double>(viewPos.x) > -depth) {
 							clipFlags = 1;
 						} else if (static_cast<double>(viewPos.x) < depth) {
 							clipFlags = 2;
@@ -757,7 +755,7 @@ void COctTree::DrawTypeMesh_r(COctNode* octNode)
 							clipFlags = 0;
 						}
 
-						if (-depth < static_cast<double>(viewPos.y)) {
+						if (static_cast<double>(viewPos.y) > -depth) {
 							clipFlags |= 4;
 						} else if (static_cast<double>(viewPos.y) < depth) {
 							clipFlags |= 8;
@@ -770,7 +768,7 @@ void COctTree::DrawTypeMesh_r(COctNode* octNode)
 			}
 		}
 
-		if (farCount > 7) {
+		if (farCount >= 8) {
 			return;
 		}
 		if (maxDepth < *reinterpret_cast<float*>(Ptr(&MapMng, 0x22A70))) {

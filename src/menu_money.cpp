@@ -525,8 +525,8 @@ int CMenuPcs::MoneyClose()
 	frame = this->moneyState->frame;
 
 	for (int i = 0; i < count; i++, anim++) {
-		if (anim->startFrame <= frame) {
-			if (!(frame < anim->startFrame + anim->duration)) {
+		if (!(frame < anim->startFrame)) {
+			if (anim->startFrame + anim->duration <= frame) {
 				float zero = FLOAT_80332f64;
 				finished++;
 				anim->progress = FLOAT_80332f64;
@@ -611,23 +611,12 @@ int CMenuPcs::MoneyCtrl()
  */
 bool CMenuPcs::MoneyOpen()
 {
-	float fVar1;
-	int iVar7;
-	int iVar8;
-	int iVar10;
-	int iVar12;
-	int iVar13;
-	int iVar15;
-	signed char* puVar9;
-	short* psVar11;
-	signed char* puVar14;
-
 	if (this->moneyState->initialized == '\0') {
 		memset(this->moneyPanel, 0, 0x1008);
 
-		fVar1 = FLOAT_80332f70;
-		iVar8 = (int)this->moneyPanel + 8;
-		iVar15 = 8;
+		float fVar1 = FLOAT_80332f70;
+		int iVar8 = (int)this->moneyPanel + 8;
+		int iVar15 = 8;
 		do {
 			*(float *)(iVar8 + 0x14) = fVar1;
 			*(float *)(iVar8 + 0x54) = fVar1;
@@ -657,25 +646,26 @@ bool CMenuPcs::MoneyOpen()
 
 		unsigned int scriptFood = Game.m_scriptFoodBase[0];
 		s_Money = 0;
-		puVar9 = s_place;
+		signed char* puVar9 = s_place;
 		iVar15 = 0;
 		do {
 			iVar8 = 10000000;
+			int iVar12;
 			if (iVar15 == 0) {
 				iVar12 = *(int *)(scriptFood + 0x200);
 			} else {
 				iVar12 = 0;
 			}
-			iVar13 = 0;
-			iVar7 = 8;
-			bool started = false;
-			puVar14 = puVar9;
+			int iVar13 = 0;
+			int iVar7 = 8;
+			int started = 0;
+			signed char* puVar14 = puVar9;
 			do {
-				if ((!started) && (iVar8 <= iVar12)) {
-					started = true;
+				if ((!started) && (iVar12 >= iVar8)) {
+					started = 1;
 				}
-				if (((started) || (iVar8 <= iVar12)) || (6 < iVar13)) {
-					iVar10 = iVar12 / iVar8;
+				if (((started) || (iVar12 >= iVar8)) || (6 < iVar13)) {
+					int iVar10 = iVar12 / iVar8;
 					if (9 < iVar10) {
 						iVar10 = 9;
 					}
@@ -697,19 +687,24 @@ bool CMenuPcs::MoneyOpen()
 		this->moneyState->initialized = 1;
 	}
 
-	iVar15 = 0;
+	int iVar15 = 0;
 	this->moneyState->frame = this->moneyState->frame + 1;
-	iVar12 = (int)this->moneyPanel->count;
-	psVar11 = reinterpret_cast<short*>(this->moneyPanel->anims);
-	iVar7 = (int)this->moneyState->frame;
-	iVar8 = iVar12;
+	int iVar12 = (int)this->moneyPanel->count;
+	short* psVar11 = reinterpret_cast<short*>(this->moneyPanel->anims);
+	int iVar7 = (int)this->moneyState->frame;
+	int iVar8 = iVar12;
 	if (0 < iVar12) {
 		do {
-			if (*(int *)(psVar11 + 0x12) <= iVar7) {
-				if (iVar7 < *(int *)(psVar11 + 0x12) + *(int *)(psVar11 + 0x14)) {
+			if (!(iVar7 < *(int *)(psVar11 + 0x12))) {
+				if (*(int *)(psVar11 + 0x12) + *(int *)(psVar11 + 0x14) <= iVar7) {
+					iVar15 = iVar15 + 1;
+					*(float *)(psVar11 + 8) = FLOAT_80332f70;
+					*(float *)(psVar11 + 0x18) = FLOAT_80332f64;
+					*(float *)(psVar11 + 0x1a) = FLOAT_80332f64;
+				} else {
 					*(int *)(psVar11 + 0x10) = *(int *)(psVar11 + 0x10) + 1;
-					fVar1 = (float)((DOUBLE_80332F90 / (double)*(int *)(psVar11 + 0x14)) *
-					                (double)*(int *)(psVar11 + 0x10));
+					float fVar1 = (float)((DOUBLE_80332F90 / (double)*(int *)(psVar11 + 0x14)) *
+					                      (double)*(int *)(psVar11 + 0x10));
 					*(float *)(psVar11 + 8) = fVar1;
 					if ((*(unsigned int *)(psVar11 + 0x16) & 2) == 0) {
 						float t = (float)((DOUBLE_80332F90 / (double)*(int *)(psVar11 + 0x14)) *
@@ -719,11 +714,6 @@ bool CMenuPcs::MoneyOpen()
 						*(float *)(psVar11 + 0x18) = dx * t;
 						*(float *)(psVar11 + 0x1a) = dy * t;
 					}
-				} else {
-					iVar15 = iVar15 + 1;
-					*(float *)(psVar11 + 8) = FLOAT_80332f70;
-					*(float *)(psVar11 + 0x18) = FLOAT_80332f64;
-					*(float *)(psVar11 + 0x1a) = FLOAT_80332f64;
 				}
 			}
 			psVar11 = psVar11 + 0x20;

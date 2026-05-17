@@ -578,8 +578,10 @@ void CMaterialEditorPcs::drawViewer()
         _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(7, 0, 0, 7, 0);
         GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
 
-        GXColor ambColor = {0xff, 0xff, 0xff, 0xff};
-        GXColor matColor = ambColor;
+        GXColor ambColor;
+        *reinterpret_cast<u32*>(&ambColor) = kMaterialEditorDefaultColorRgba;
+        GXColor matColor;
+        *reinterpret_cast<u32*>(&matColor) = kMaterialEditorDefaultColorRgba;
         GXSetChanAmbColor(GX_COLOR0, ambColor);
         GXSetChanMatColor(GX_COLOR0, matColor);
 
@@ -703,8 +705,16 @@ void CMaterialEditorPcs::drawViewer()
                     }
 
                     if ((textureHeader[1] == 4) || (textureHeader[1] == 8)) {
-                        GXColor red = {0xff, 0xff, 0, 0};
-                        GXColor blue = {0, 0, 0xff, 0xff};
+                        GXColor red;
+                        GXColor blue;
+                        red.r = 0xff;
+                        red.g = 0xff;
+                        red.b = 0;
+                        red.a = 0;
+                        blue.r = 0;
+                        blue.g = 0;
+                        blue.b = 0xff;
+                        blue.a = 0xff;
 
                         GXSetNumTevStages(3);
                         GXSetNumTexGens(1);

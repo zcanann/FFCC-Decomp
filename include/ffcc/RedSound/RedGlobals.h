@@ -340,6 +340,10 @@ extern RedReverbDepth* volatile p_ReverbDepth;
 #define RedReverbDepthGetBegin() (p_ReverbDepth)
 #define RedReverbDepthSetBegin(depth) (p_ReverbDepth = (depth))
 #define RedReverbDepthGet(index) (p_ReverbDepth + (index))
+#define RedReverbDepthGetDepth(index) (RedReverbDepthGet(index)->m_depth)
+#define RedReverbDepthSetDepth(index, depth) (RedReverbDepthGet(index)->m_depth = (depth))
+#define RedReverbDepthSetStep(index, step) (RedReverbDepthGet(index)->m_step = (step))
+#define RedReverbDepthSetCount(index, count) (RedReverbDepthGet(index)->m_count = (count))
 extern unsigned int m_Mute[REDSOUND_MUTE_WORD_COUNT];
 #define RedMuteGetBegin() (m_Mute)
 #define RedMuteGetWord(voiceNo) (m_Mute[(voiceNo) / REDSOUND_MUTE_BITS_PER_WORD])

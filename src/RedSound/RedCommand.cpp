@@ -916,7 +916,7 @@ static int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volum
 				track->m_volume = REDSOUND_VOLUME_FULL;
 				track->m_expression = REDSOUND_VOLUME_DEFAULT;
 				track->m_pan = pan << REDSOUND_FIXED_SHIFT;
-				track->m_reverbDepth = RedReverbDepthGet(REDSOUND_REVERB_DEPTH_SE)->m_depth;
+				track->m_reverbDepth = RedReverbDepthGetDepth(REDSOUND_REVERB_DEPTH_SE);
 				track->m_reverbDepthDelta = 0;
 				track->m_panDelta = 0;
 				track->m_expressionDelta = 0;
@@ -1038,14 +1038,15 @@ static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* wav
 		SetReverb(0, RedReverbModeDataGet(reverbKind)->m_kind, RedReverbModeDataGet(reverbKind)->m_params);
 	}
 
-	RedReverbDepthGet(REDSOUND_REVERB_DEPTH_MUSIC)->m_depth = (int)musicHead->m_reverbDepth;
-	if (RedReverbDepthGet(REDSOUND_REVERB_DEPTH_MUSIC)->m_depth != 0) {
-		RedReverbDepthGet(REDSOUND_REVERB_DEPTH_MUSIC)->m_depth =
-		    (RedReverbDepthGet(REDSOUND_REVERB_DEPTH_MUSIC)->m_depth + 1) << REDSOUND_REVERB_DEPTH_BYTE_SHIFT;
-		RedReverbDepthGet(REDSOUND_REVERB_DEPTH_MUSIC)->m_depth = (RedReverbDepthGet(REDSOUND_REVERB_DEPTH_MUSIC)->m_depth - 1) << REDSOUND_FIXED_SHIFT;
+	RedReverbDepthSetDepth(REDSOUND_REVERB_DEPTH_MUSIC, (int)musicHead->m_reverbDepth);
+	if (RedReverbDepthGetDepth(REDSOUND_REVERB_DEPTH_MUSIC) != 0) {
+		RedReverbDepthSetDepth(REDSOUND_REVERB_DEPTH_MUSIC,
+		    (RedReverbDepthGetDepth(REDSOUND_REVERB_DEPTH_MUSIC) + 1) << REDSOUND_REVERB_DEPTH_BYTE_SHIFT);
+		RedReverbDepthSetDepth(REDSOUND_REVERB_DEPTH_MUSIC,
+		    (RedReverbDepthGetDepth(REDSOUND_REVERB_DEPTH_MUSIC) - 1) << REDSOUND_FIXED_SHIFT);
 	}
-	RedReverbDepthGet(REDSOUND_REVERB_DEPTH_MUSIC)->m_step = 0;
-	RedReverbDepthGet(REDSOUND_REVERB_DEPTH_MUSIC)->m_count = 0;
+	RedReverbDepthSetStep(REDSOUND_REVERB_DEPTH_MUSIC, 0);
+	RedReverbDepthSetCount(REDSOUND_REVERB_DEPTH_MUSIC, 0);
 	music->m_waveNo = musicHead->m_waveNo;
 
 	RedMusicTrackBlock* current = RedMusicGetTrackBlocks(musicHead);
@@ -1072,7 +1073,7 @@ static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* wav
 		track->m_volume = REDSOUND_VOLUME_FULL;
 		track->m_expression = REDSOUND_VOLUME_DEFAULT;
 		track->m_pan = REDSOUND_PAN_CENTER;
-		track->m_reverbDepth = RedReverbDepthGet(REDSOUND_REVERB_DEPTH_MUSIC)->m_depth;
+		track->m_reverbDepth = RedReverbDepthGetDepth(REDSOUND_REVERB_DEPTH_MUSIC);
 		track->m_reverbDepthDelta = 0;
 		track->m_panDelta = 0;
 		track->m_expressionDelta = 0;

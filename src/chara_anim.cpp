@@ -11,8 +11,11 @@ extern "C" void __dt__Q26CChara9CAnimNodeFv(void*, int);
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void __dla__FPv(void*);
 extern "C" void __dl__FPv(void*);
-extern "C" char s_charaAnimSourceFile[];
-extern "C" char s_charaAnimAllocWarn[];
+extern "C" const char s_CChara_CAnim_801DA970[] = "CChara::CAnim";
+extern "C" const char s_charaAnimSourceFile[] = "chara_anim.cpp";
+extern "C" const char s_charaAnimAllocWarn[32] =
+    "\214\303\202\242\203\101\203\152\203\201\201\133\203\126\203\207\203\223"
+    "\214\140\216\256\202\305\202\267\201\102\n";
 extern "C" void gqrInit__6CCharaFUlUlUl(void*, unsigned long, unsigned long, unsigned long);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 extern "C" void SetGroup__7CMemoryFPvi(CMemory*, void*, int);
@@ -208,7 +211,7 @@ void CChara::CAnim::Create(void* data, CMemory::CStage* stage)
 		}
 		if (chunk.m_version < 2) {
 			if ((unsigned int)System.m_execParam >= 2) {
-				System.Printf(s_charaAnimAllocWarn);
+				System.Printf(const_cast<char*>(s_charaAnimAllocWarn));
 			}
 			return;
 		}
@@ -224,7 +227,7 @@ void CChara::CAnim::Create(void* data, CMemory::CStage* stage)
 			unsigned short nodeCount = m_nodeCount;
 
 			void* nodeArray = __nwa__FUlPQ27CMemory6CStagePci(
-			    (unsigned long)nodeCount * 0x18 + 0x10, stage, s_charaAnimSourceFile, 0x5F);
+			    (unsigned long)nodeCount * 0x18 + 0x10, stage, const_cast<char*>(s_charaAnimSourceFile), 0x5F);
 			nodeArray = __construct_new_array(
 			    nodeArray, reinterpret_cast<ConstructorDestructor>(__ct__Q26CChara9CAnimNodeFv),
 			    reinterpret_cast<ConstructorDestructor>(__dt__Q26CChara9CAnimNodeFv), 0x18, nodeCount);
@@ -301,7 +304,8 @@ void CChara::CAnim::Create(void* data, CMemory::CStage* stage)
 				}
 				case 0x42414E4B:
 					m_bankSize = (chunk.m_size + 0x1F) & 0xFFFFFFE0;
-					m_bank = __nwa__FUlPQ27CMemory6CStagePci(chunk.m_size, stage, s_charaAnimSourceFile, 0x7C);
+					m_bank = __nwa__FUlPQ27CMemory6CStagePci(
+					    chunk.m_size, stage, const_cast<char*>(s_charaAnimSourceFile), 0x7C);
 					chunkFile.Get(m_bank, chunk.m_size);
 
 					Memory.CopyToAMemorySync(
@@ -370,77 +374,6 @@ CChara::CAnimNode::~CAnimNode()
 
 /*
  * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 4b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CChara::CAnimNode::mapping(CChara::CAnim*)
-{
-}
-
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 296b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CChara::CAnimNode::Create(CChunkFile& chunkFile)
-{
-	CChunkFile::CChunk chunk;
-
-	chunkFile.PushChunk();
-	while (chunkFile.GetNextChunk(chunk)) {
-		int chunkId = static_cast<int>(chunk.m_id);
-		switch (chunkId) {
-		case 0x4E414D45:
-			strcpy(m_name, chunkFile.GetString());
-			break;
-		case 0x44415441: {
-			int i = 0;
-			int shift = 0;
-			do {
-				int type = chunkFile.Get4();
-				int mode;
-
-				if (type == 0) {
-					mode = 0;
-				} else if (type == 1) {
-					mode = 1;
-				} else {
-					mode = 2;
-				}
-
-				unsigned int dataOffset = chunkFile.Get4();
-				if (i == 0) {
-					m_dataOffset = dataOffset;
-				}
-
-				unsigned int flags = ((m_flags >> 0xD) & 0x3FFFF) | (static_cast<unsigned int>(mode) << shift);
-				m_flags = __rlwimi(m_flags, flags, 13, 1, 18);
-
-				if ((i >= 6) && (type != 0)) {
-					unsigned char* flagsByte = reinterpret_cast<unsigned char*>(&m_flags);
-					*flagsByte = static_cast<unsigned char>(__rlwimi(*flagsByte, 1, 7, 24, 24));
-				}
-
-				i++;
-				shift += 2;
-			} while (i < 9);
-			break;
-		}
-		}
-	}
-	chunkFile.PopChunk();
-}
-
-/*
- * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
@@ -449,7 +382,7 @@ void CChara::CAnimNode::Interp(CChara::CAnim* anim, SRT* srt, float frame)
 	if (anim->m_bank == 0) {
 		while (anim->m_bank == 0) {
 			anim->m_bank = _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
-			    &Memory, anim->m_bankSize, anim->m_stage, s_charaAnimSourceFile, 0x160, 1);
+			    &Memory, anim->m_bankSize, anim->m_stage, const_cast<char*>(s_charaAnimSourceFile), 0x160, 1);
 
 			if (anim->m_bank != 0) {
 				break;
@@ -475,9 +408,10 @@ void CChara::CAnimNode::Interp(CChara::CAnim* anim, SRT* srt, float frame)
 	}
 
 	register int flags = static_cast<int>((m_flags >> 0xD) & 0x3FFFF);
+	register unsigned int dataOffset = m_dataOffset;
 	frameInt *= 2;
 	register unsigned short* inData =
-	    reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(anim->m_bank) + m_dataOffset);
+	    reinterpret_cast<unsigned short*>(dataOffset + reinterpret_cast<unsigned int>(anim->m_bank));
 	register float* outData = reinterpret_cast<float*>(srt);
 
 	for (int i = 0; i < 3; i++) {

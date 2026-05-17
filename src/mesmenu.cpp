@@ -498,7 +498,7 @@ void CMesMenu::CalcHeart()
  */
 void CMesMenu::onDraw()
 {
-    if ((*(int*)((char*)this + 0x18) == 0) && ((*(unsigned char*)(CFlat + 0x12E4) & 2) != 0)) {
+    if ((*(int*)((char*)this + 0x18) == 0) && ((int)((unsigned int)*(unsigned char*)(CFlat + 0x12E4) << 30) < 0)) {
         int iconFrame = 0;
         int charaMode = *(int*)((char*)&Chara + 0x2004);
         if (charaMode == 2) {
@@ -514,8 +514,7 @@ void CMesMenu::onDraw()
             if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
                 buttons = 0;
             } else {
-                __cntlzw((unsigned int)Pad._448_4_);
-                buttons = Pad._4_2_;
+                buttons = Pad.GetPadInputs()[__cntlzw((unsigned int)Pad._448_4_) >> 5].button[0];
             }
 
             iconFrame = DAT_8020F9A8[0];
@@ -683,7 +682,7 @@ void CMesMenu::onDraw()
             {
                 unsigned int heartFood = Game.m_scriptFoodBase[*(int*)((char*)this + 0x18)];
                 if ((heartFood != 0) && (stageBlend > FLOAT_803308d8)) {
-                    __ct__6CColorFUcUcUcUc(colorStorage, 0xFF, 0xFF, 0xFF, (int)(FLOAT_80330908 * stageBlend));
+                    __ct__6CColorFUcUcUcUc(colorStorage, 0xFF, 0xFF, 0xFF, (unsigned char)(int)(FLOAT_80330908 * stageBlend));
                     SetColor__8CMenuPcsFR6CColor(&MenuPcs, colorStorage);
                     SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x17);
 
@@ -697,7 +696,7 @@ void CMesMenu::onDraw()
                     int heartValueOffset = 0;
                     int heartTimerOffset = (int)this;
 
-                    for (int heartIndex = 0; heartIndex < (int)(unsigned int)(*(unsigned short*)(heartFood + 0x1A) >> 1);
+                    for (int heartIndex = 0; heartIndex < (int)((unsigned int)*(unsigned short*)(heartFood + 0x1A) >> 1);
                          heartIndex++) {
                         int heartValue = *(int*)((char*)this + 0x3DA8) - heartValueOffset;
                         float heartTimer = (float)*(unsigned int*)(heartTimerOffset + 0x3DB0);

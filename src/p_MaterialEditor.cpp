@@ -105,6 +105,7 @@ extern "C" void _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTe
     int, int, int, int, int);
 extern "C" const double DOUBLE_8032FCC0 = 1.0;
 extern "C" const float FLOAT_8032FCC8 = 1.0f;
+extern "C" const float FLOAT_8032FCD8 = 0.0f;
 extern "C" float FLOAT_8032FCDC;
 
 static inline void WriteU8(void* base, unsigned int offset, unsigned char value) {
@@ -164,34 +165,38 @@ void CMaterialEditorPcs::Init()
     level = static_cast<unsigned char>(-((__cntlzw(1) >> 5) & 1));
     level &= 0x3f;
     self[0xf] = 0xff;
-    *reinterpret_cast<float*>(self + 0x18) = 0.0f;
-    *reinterpret_cast<float*>(self + 0x1c) = 0.0f;
-    *reinterpret_cast<float*>(self + 0x20) = -1.0f;
+    float zero = FLOAT_8032FCD8;
+    float minusOne = FLOAT_8032FCDC;
+    float one = FLOAT_8032FCC8;
+
+    *reinterpret_cast<float*>(self + 0x18) = zero;
+    *reinterpret_cast<float*>(self + 0x1c) = zero;
+    *reinterpret_cast<float*>(self + 0x20) = minusOne;
     self[0x10] = level;
     self[0x11] = level;
     self[0x12] = level;
     level = static_cast<unsigned char>(-((__cntlzw(2) >> 5) & 1));
     level &= 0x3f;
     self[0x13] = 0xff;
-    *reinterpret_cast<float*>(self + 0x24) = 0.0f;
-    *reinterpret_cast<float*>(self + 0x28) = 0.0f;
-    *reinterpret_cast<float*>(self + 0x2c) = -1.0f;
+    *reinterpret_cast<float*>(self + 0x24) = zero;
+    *reinterpret_cast<float*>(self + 0x28) = zero;
+    *reinterpret_cast<float*>(self + 0x2c) = minusOne;
     self[0x14] = level;
     self[0x15] = level;
     self[0x16] = level;
     self[0x17] = 0xff;
-    *reinterpret_cast<float*>(self + 0x30) = 0.0f;
-    *reinterpret_cast<float*>(self + 0x34) = 0.0f;
-    *reinterpret_cast<float*>(self + 0x38) = -1.0f;
-    *reinterpret_cast<float*>(self + 0x44) = 0.0f;
-    *reinterpret_cast<float*>(self + 0x40) = 0.0f;
-    *reinterpret_cast<float*>(self + 0x3c) = 0.0f;
-    *reinterpret_cast<float*>(self + 0x50) = 0.0f;
-    *reinterpret_cast<float*>(self + 0x4c) = 0.0f;
-    *reinterpret_cast<float*>(self + 0x48) = 0.0f;
-    *reinterpret_cast<float*>(self + 0x5c) = 1.0f;
-    *reinterpret_cast<float*>(self + 0x58) = 1.0f;
-    *reinterpret_cast<float*>(self + 0x54) = 1.0f;
+    *reinterpret_cast<float*>(self + 0x30) = zero;
+    *reinterpret_cast<float*>(self + 0x34) = zero;
+    *reinterpret_cast<float*>(self + 0x38) = minusOne;
+    *reinterpret_cast<float*>(self + 0x44) = zero;
+    *reinterpret_cast<float*>(self + 0x40) = zero;
+    *reinterpret_cast<float*>(self + 0x3c) = zero;
+    *reinterpret_cast<float*>(self + 0x50) = zero;
+    *reinterpret_cast<float*>(self + 0x4c) = zero;
+    *reinterpret_cast<float*>(self + 0x48) = zero;
+    *reinterpret_cast<float*>(self + 0x5c) = one;
+    *reinterpret_cast<float*>(self + 0x58) = one;
+    *reinterpret_cast<float*>(self + 0x54) = one;
     *reinterpret_cast<u32*>(self + 0xbc) = 0;
 
     remaining = 2;

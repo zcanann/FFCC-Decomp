@@ -16,7 +16,6 @@ extern const float kMapOctTreeDefaultOffsetZ;
 // Linkage definitions from config/GCCP01/symbols.txt.
 const float kOctTreeBoundMinInit = 10000000000.0f;
 const float kOctTreeBoundMaxInit = -10000000000.0f;
-const float kOctTreeCylinderPad = 1.0f;
 struct CBoundRaw
 {
     CBoundRaw()
@@ -40,26 +39,25 @@ struct CBoundRaw
     Vec m_min;
     Vec m_max;
 };
+
 struct CMapCylinderRaw
 {
     CMapCylinderRaw()
     {
-        m_direction2.y = kOctTreeBoundMinInit;
-        m_direction2.x = kOctTreeBoundMinInit;
-        m_top.z = kOctTreeBoundMinInit;
-        m_height2 = kOctTreeBoundMaxInit;
-        m_radius2 = kOctTreeBoundMaxInit;
-        m_direction2.z = kOctTreeBoundMaxInit;
+        m_boundsMin.z = kOctTreeBoundMinInit;
+        m_boundsMin.y = kOctTreeBoundMinInit;
+        m_boundsMin.x = kOctTreeBoundMinInit;
+        m_boundsMax.z = kOctTreeBoundMaxInit;
+        m_boundsMax.y = kOctTreeBoundMaxInit;
+        m_boundsMax.x = kOctTreeBoundMaxInit;
     }
 
     Vec m_bottom;
-    Vec m_direction;
-    float m_radius;
-    float m_height;
     Vec m_top;
-    Vec m_direction2;
-    float m_radius2;
-    float m_height2;
+    Vec m_axis;
+    float m_radius;
+    Vec m_boundsMin;
+    Vec m_boundsMax;
 };
 
 struct CMaterialManEnvRaw
@@ -697,15 +695,13 @@ void COctTree::DrawTypeMeshFrustumIn_r(COctNode* octNode)
 void COctTree::DrawTypeMesh_r(COctNode* octNode)
 {
 	float localX = m_localPosX;
-	float localY = m_localPosY;
-	float localZ = m_localPosZ;
-	unsigned int andMask;
+	unsigned char andMask;
+	unsigned char orMask;
 	int farCount;
-	unsigned int orMask;
 
-	if ((localX <= octNode->m_boundMaxX) && (localY <= octNode->m_boundMaxY) &&
-	    (localZ <= octNode->m_boundMaxZ) && (octNode->m_boundMinX <= localX) &&
-	    (octNode->m_boundMinY <= localY) && (octNode->m_boundMinZ <= localZ)) {
+	if ((localX <= octNode->m_boundMaxX) && (m_localPosY <= octNode->m_boundMaxY) &&
+	    (m_localPosZ <= octNode->m_boundMaxZ) && (localX >= octNode->m_boundMinX) &&
+	    (m_localPosY >= octNode->m_boundMinY) && (m_localPosZ >= octNode->m_boundMinZ)) {
 		orMask = 0xF;
 	} else {
 		Vec localCorner;
@@ -722,7 +718,7 @@ void COctTree::DrawTypeMesh_r(COctNode* octNode)
 			for (int y = 0; y < 2; y++) {
 				localCorner.y = (y == 0) ? octNode->m_boundMinY : octNode->m_boundMaxY;
 				for (int z = 0; z < 2; z++) {
-					unsigned int clipFlags;
+					unsigned char clipFlags;
 					double depth;
 
 					localCorner.z = (z == 0) ? octNode->m_boundMinZ : octNode->m_boundMaxZ;
@@ -733,9 +729,9 @@ void COctTree::DrawTypeMesh_r(COctNode* octNode)
 					}
 
 					depth = static_cast<double>(viewPos.z);
-					if (minDepth < viewPos.z) {
+					if (viewPos.z > minDepth) {
 						farCount++;
-						if (-depth < static_cast<double>(viewPos.x)) {
+						if (static_cast<double>(viewPos.x) > -depth) {
 							clipFlags = 0x11;
 						} else if (static_cast<double>(viewPos.x) < depth) {
 							clipFlags = 0x12;
@@ -743,13 +739,13 @@ void COctTree::DrawTypeMesh_r(COctNode* octNode)
 							clipFlags = 0x10;
 						}
 
-						if (-depth < static_cast<double>(viewPos.y)) {
+						if (static_cast<double>(viewPos.y) > -depth) {
 							clipFlags |= 0x14;
 						} else if (static_cast<double>(viewPos.y) < depth) {
 							clipFlags |= 0x18;
 						}
 					} else {
-						if (-depth < static_cast<double>(viewPos.x)) {
+						if (static_cast<double>(viewPos.x) > -depth) {
 							clipFlags = 1;
 						} else if (static_cast<double>(viewPos.x) < depth) {
 							clipFlags = 2;
@@ -757,7 +753,7 @@ void COctTree::DrawTypeMesh_r(COctNode* octNode)
 							clipFlags = 0;
 						}
 
-						if (-depth < static_cast<double>(viewPos.y)) {
+						if (static_cast<double>(viewPos.y) > -depth) {
 							clipFlags |= 4;
 						} else if (static_cast<double>(viewPos.y) < depth) {
 							clipFlags |= 8;
@@ -770,7 +766,7 @@ void COctTree::DrawTypeMesh_r(COctNode* octNode)
 			}
 		}
 
-		if (farCount > 7) {
+		if (farCount >= 8) {
 			return;
 		}
 		if (maxDepth < *reinterpret_cast<float*>(Ptr(&MapMng, 0x22A70))) {
@@ -1696,11 +1692,11 @@ int COctTree::CheckHitCylinder_r(COctNode* node)
 	int xyOverlap = false;
 	int xOverlap = false;
 
-	if (boundMinX < *reinterpret_cast<float*>(Ptr(&s_cyl, 0x28))) {
-		xOverlap = *reinterpret_cast<float*>(Ptr(&s_cyl, 0x28)) <= node->m_boundMaxX;
+	if (boundMinX < s_cyl.m_boundsMin.x) {
+		xOverlap = s_cyl.m_boundsMin.x <= node->m_boundMaxX;
 	} else {
-		if (boundMinX > *reinterpret_cast<float*>(Ptr(&s_cyl, 0x28))) {
-			xOverlap = boundMinX <= *reinterpret_cast<float*>(Ptr(&s_cyl, 0x34));
+		if (boundMinX > s_cyl.m_boundsMin.x) {
+			xOverlap = boundMinX <= s_cyl.m_boundsMax.x;
 		} else {
 			xOverlap = true;
 		}
@@ -1708,11 +1704,11 @@ int COctTree::CheckHitCylinder_r(COctNode* node)
 
 	if (xOverlap) {
 		float boundMinY = node->m_boundMinY;
-		if (boundMinY < *reinterpret_cast<float*>(Ptr(&s_cyl, 0x2C))) {
-			xOverlap = *reinterpret_cast<float*>(Ptr(&s_cyl, 0x2C)) <= node->m_boundMaxY;
+		if (boundMinY < s_cyl.m_boundsMin.y) {
+			xOverlap = s_cyl.m_boundsMin.y <= node->m_boundMaxY;
 		} else {
-			if (boundMinY > *reinterpret_cast<float*>(Ptr(&s_cyl, 0x2C))) {
-				xOverlap = boundMinY <= *reinterpret_cast<float*>(Ptr(&s_cyl, 0x38));
+			if (boundMinY > s_cyl.m_boundsMin.y) {
+				xOverlap = boundMinY <= s_cyl.m_boundsMax.y;
 			} else {
 				xOverlap = true;
 			}
@@ -1724,11 +1720,11 @@ int COctTree::CheckHitCylinder_r(COctNode* node)
 
 	if (xyOverlap) {
 		float boundMinZ = node->m_boundMinZ;
-		if (boundMinZ < *reinterpret_cast<float*>(Ptr(&s_cyl, 0x30))) {
-			xOverlap = *reinterpret_cast<float*>(Ptr(&s_cyl, 0x30)) <= node->m_boundMaxZ;
+		if (boundMinZ < s_cyl.m_boundsMin.z) {
+			xOverlap = s_cyl.m_boundsMin.z <= node->m_boundMaxZ;
 		} else {
-			if (boundMinZ > *reinterpret_cast<float*>(Ptr(&s_cyl, 0x30))) {
-				xOverlap = boundMinZ <= *reinterpret_cast<float*>(Ptr(&s_cyl, 0x3C));
+			if (boundMinZ > s_cyl.m_boundsMin.z) {
+				xOverlap = boundMinZ <= s_cyl.m_boundsMax.z;
 			} else {
 				xOverlap = true;
 			}
@@ -1759,11 +1755,11 @@ int COctTree::CheckHitCylinder_r(COctNode* node)
 			bool childOverlap = false;
 			bool childXYOverlap = false;
 			int childXOverlap = false;
-			if (childBoundMinX < *reinterpret_cast<float*>(Ptr(&s_cyl, 0x28))) {
-				childXOverlap = *reinterpret_cast<float*>(Ptr(&s_cyl, 0x28)) <= child->m_boundMaxX;
+			if (childBoundMinX < s_cyl.m_boundsMin.x) {
+				childXOverlap = s_cyl.m_boundsMin.x <= child->m_boundMaxX;
 			} else {
-				if (childBoundMinX > *reinterpret_cast<float*>(Ptr(&s_cyl, 0x28))) {
-					childXOverlap = childBoundMinX <= *reinterpret_cast<float*>(Ptr(&s_cyl, 0x34));
+				if (childBoundMinX > s_cyl.m_boundsMin.x) {
+					childXOverlap = childBoundMinX <= s_cyl.m_boundsMax.x;
 				} else {
 					childXOverlap = true;
 				}
@@ -1771,11 +1767,11 @@ int COctTree::CheckHitCylinder_r(COctNode* node)
 
 			if (childXOverlap) {
 				float childBoundMinY = child->m_boundMinY;
-				if (childBoundMinY < *reinterpret_cast<float*>(Ptr(&s_cyl, 0x2C))) {
-					childXOverlap = *reinterpret_cast<float*>(Ptr(&s_cyl, 0x2C)) <= child->m_boundMaxY;
+				if (childBoundMinY < s_cyl.m_boundsMin.y) {
+					childXOverlap = s_cyl.m_boundsMin.y <= child->m_boundMaxY;
 				} else {
-					if (childBoundMinY > *reinterpret_cast<float*>(Ptr(&s_cyl, 0x2C))) {
-						childXOverlap = childBoundMinY <= *reinterpret_cast<float*>(Ptr(&s_cyl, 0x38));
+					if (childBoundMinY > s_cyl.m_boundsMin.y) {
+						childXOverlap = childBoundMinY <= s_cyl.m_boundsMax.y;
 					} else {
 						childXOverlap = true;
 					}
@@ -1787,11 +1783,11 @@ int COctTree::CheckHitCylinder_r(COctNode* node)
 
 			if (childXYOverlap) {
 				float childBoundMinZ = child->m_boundMinZ;
-				if (childBoundMinZ < *reinterpret_cast<float*>(Ptr(&s_cyl, 0x30))) {
-					childXOverlap = *reinterpret_cast<float*>(Ptr(&s_cyl, 0x30)) <= child->m_boundMaxZ;
+				if (childBoundMinZ < s_cyl.m_boundsMin.z) {
+					childXOverlap = s_cyl.m_boundsMin.z <= child->m_boundMaxZ;
 				} else {
-					if (childBoundMinZ > *reinterpret_cast<float*>(Ptr(&s_cyl, 0x30))) {
-						childXOverlap = childBoundMinZ <= *reinterpret_cast<float*>(Ptr(&s_cyl, 0x3C));
+					if (childBoundMinZ > s_cyl.m_boundsMin.z) {
+						childXOverlap = childBoundMinZ <= s_cyl.m_boundsMax.z;
 					} else {
 						childXOverlap = true;
 					}
@@ -1817,7 +1813,7 @@ int COctTree::CheckHitCylinder_r(COctNode* node)
 							break;
 						}
 
-						if ((reinterpret_cast<CBound*>(grandChild)->CheckCross(*reinterpret_cast<CBound*>(Ptr(&s_cyl, 0x28)))) != 0) {
+						if ((reinterpret_cast<CBound*>(grandChild)->CheckCross(*reinterpret_cast<CBound*>(&s_cyl.m_boundsMin))) != 0) {
 							if ((grandChild->m_meshCount != 0) &&
 								((*reinterpret_cast<CMapHit**>(Ptr(m_mapObject, 0xC)))
 									 ->CheckHitCylinder((CMapCylinder*)&s_cyl, &s_mvec,
@@ -1877,36 +1873,36 @@ int COctTree::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long 
 		if (mapHit != 0) {
 			PSMTXInverse(reinterpret_cast<MtxPtr>(reinterpret_cast<u8*>(m_mapObject) + 0xB8), inverseMtx);
 			PSMTXMultVec(inverseMtx, &cylinder->m_bottom, &s_cyl.m_bottom);
-			PSMTXMultVec(inverseMtx, &cylinder->m_top, &s_cyl.m_direction);
-			PSMTXMultVecSR(inverseMtx, &cylinder->m_axis, reinterpret_cast<Vec*>(&s_cyl.m_radius));
+			PSMTXMultVec(inverseMtx, &cylinder->m_top, &s_cyl.m_top);
+			PSMTXMultVecSR(inverseMtx, &cylinder->m_axis, &s_cyl.m_axis);
 			PSMTXMultVecSR(inverseMtx, move, &s_mvec);
 
-			s_cyl.m_top.y = cylinder->m_radius;
-			radiusPad = kOctTreeCylinderPad + s_cyl.m_top.y;
-			if (s_cyl.m_bottom.x < s_cyl.m_direction.x) {
-				s_cyl.m_top.z = s_cyl.m_bottom.x - radiusPad;
-				s_cyl.m_direction2.z = s_cyl.m_direction.x + radiusPad;
+			s_cyl.m_radius = cylinder->m_radius;
+			radiusPad = 1.0f + s_cyl.m_radius;
+			if (s_cyl.m_bottom.x < s_cyl.m_top.x) {
+				s_cyl.m_boundsMin.x = s_cyl.m_bottom.x - radiusPad;
+				s_cyl.m_boundsMax.x = s_cyl.m_top.x + radiusPad;
 			} else {
-				s_cyl.m_top.z = s_cyl.m_direction.x - radiusPad;
-				s_cyl.m_direction2.z = s_cyl.m_bottom.x + radiusPad;
+				s_cyl.m_boundsMin.x = s_cyl.m_top.x - radiusPad;
+				s_cyl.m_boundsMax.x = s_cyl.m_bottom.x + radiusPad;
 			}
 
-			radiusPad = kOctTreeCylinderPad + s_cyl.m_top.y;
-			if (s_cyl.m_bottom.y < s_cyl.m_direction.y) {
-				s_cyl.m_direction2.x = s_cyl.m_bottom.y - radiusPad;
-				s_cyl.m_radius2 = s_cyl.m_direction.y + radiusPad;
+			radiusPad = 1.0f + s_cyl.m_radius;
+			if (s_cyl.m_bottom.y < s_cyl.m_top.y) {
+				s_cyl.m_boundsMin.y = s_cyl.m_bottom.y - radiusPad;
+				s_cyl.m_boundsMax.y = s_cyl.m_top.y + radiusPad;
 			} else {
-				s_cyl.m_direction2.x = s_cyl.m_direction.y - radiusPad;
-				s_cyl.m_radius2 = s_cyl.m_bottom.y + radiusPad;
+				s_cyl.m_boundsMin.y = s_cyl.m_top.y - radiusPad;
+				s_cyl.m_boundsMax.y = s_cyl.m_bottom.y + radiusPad;
 			}
 
-			radiusPad = kOctTreeCylinderPad + s_cyl.m_top.y;
-			if (s_cyl.m_bottom.z < s_cyl.m_direction.z) {
-				s_cyl.m_direction2.y = s_cyl.m_bottom.z - radiusPad;
-				s_cyl.m_height2 = s_cyl.m_direction.z + radiusPad;
+			radiusPad = 1.0f + s_cyl.m_radius;
+			if (s_cyl.m_bottom.z < s_cyl.m_top.z) {
+				s_cyl.m_boundsMin.z = s_cyl.m_bottom.z - radiusPad;
+				s_cyl.m_boundsMax.z = s_cyl.m_top.z + radiusPad;
 			} else {
-				s_cyl.m_direction2.y = s_cyl.m_direction.z - radiusPad;
-				s_cyl.m_height2 = s_cyl.m_bottom.z + radiusPad;
+				s_cyl.m_boundsMin.z = s_cyl.m_top.z - radiusPad;
+				s_cyl.m_boundsMax.z = s_cyl.m_bottom.z + radiusPad;
 			}
 			InsertShadow_level = flag;
 			if (CheckHitCylinder_r(m_nodePool) != 0) {
@@ -1934,11 +1930,11 @@ void COctTree::CheckHitCylinderNear_r(COctNode* octNode)
 	bool xyOverlap = false;
 	int xOverlap = false;
 
-	if (boundMinX < *reinterpret_cast<float*>(Ptr(&s_cyl, 0x28))) {
-		xOverlap = *reinterpret_cast<float*>(Ptr(&s_cyl, 0x28)) <= octNode->m_boundMaxX;
+	if (boundMinX < s_cyl.m_boundsMin.x) {
+		xOverlap = s_cyl.m_boundsMin.x <= octNode->m_boundMaxX;
 	} else {
-		if (boundMinX > *reinterpret_cast<float*>(Ptr(&s_cyl, 0x28))) {
-			xOverlap = boundMinX <= *reinterpret_cast<float*>(Ptr(&s_cyl, 0x34));
+		if (boundMinX > s_cyl.m_boundsMin.x) {
+			xOverlap = boundMinX <= s_cyl.m_boundsMax.x;
 		} else {
 			xOverlap = true;
 		}
@@ -1946,11 +1942,11 @@ void COctTree::CheckHitCylinderNear_r(COctNode* octNode)
 
 	if (xOverlap) {
 		float boundMinY = octNode->m_boundMinY;
-		if (boundMinY < *reinterpret_cast<float*>(Ptr(&s_cyl, 0x2C))) {
-			xOverlap = *reinterpret_cast<float*>(Ptr(&s_cyl, 0x2C)) <= octNode->m_boundMaxY;
+		if (boundMinY < s_cyl.m_boundsMin.y) {
+			xOverlap = s_cyl.m_boundsMin.y <= octNode->m_boundMaxY;
 		} else {
-			if (boundMinY > *reinterpret_cast<float*>(Ptr(&s_cyl, 0x2C))) {
-				xOverlap = boundMinY <= *reinterpret_cast<float*>(Ptr(&s_cyl, 0x38));
+			if (boundMinY > s_cyl.m_boundsMin.y) {
+				xOverlap = boundMinY <= s_cyl.m_boundsMax.y;
 			} else {
 				xOverlap = true;
 			}
@@ -1962,11 +1958,11 @@ void COctTree::CheckHitCylinderNear_r(COctNode* octNode)
 
 	if (xyOverlap) {
 		float boundMinZ = octNode->m_boundMinZ;
-		if (boundMinZ < *reinterpret_cast<float*>(Ptr(&s_cyl, 0x30))) {
-			xOverlap = *reinterpret_cast<float*>(Ptr(&s_cyl, 0x30)) <= octNode->m_boundMaxZ;
+		if (boundMinZ < s_cyl.m_boundsMin.z) {
+			xOverlap = s_cyl.m_boundsMin.z <= octNode->m_boundMaxZ;
 		} else {
-			if (boundMinZ > *reinterpret_cast<float*>(Ptr(&s_cyl, 0x30))) {
-				xOverlap = boundMinZ <= *reinterpret_cast<float*>(Ptr(&s_cyl, 0x3C));
+			if (boundMinZ > s_cyl.m_boundsMin.z) {
+				xOverlap = boundMinZ <= s_cyl.m_boundsMax.z;
 			} else {
 				xOverlap = true;
 			}
@@ -1998,11 +1994,11 @@ void COctTree::CheckHitCylinderNear_r(COctNode* octNode)
 		bool childOverlap = false;
 		bool childXYOverlap = false;
 		int childXOverlap = false;
-		if (childBoundMinX < *reinterpret_cast<float*>(Ptr(&s_cyl, 0x28))) {
-			childXOverlap = *reinterpret_cast<float*>(Ptr(&s_cyl, 0x28)) <= child->m_boundMaxX;
+		if (childBoundMinX < s_cyl.m_boundsMin.x) {
+			childXOverlap = s_cyl.m_boundsMin.x <= child->m_boundMaxX;
 		} else {
-			if (childBoundMinX > *reinterpret_cast<float*>(Ptr(&s_cyl, 0x28))) {
-				childXOverlap = childBoundMinX <= *reinterpret_cast<float*>(Ptr(&s_cyl, 0x34));
+			if (childBoundMinX > s_cyl.m_boundsMin.x) {
+				childXOverlap = childBoundMinX <= s_cyl.m_boundsMax.x;
 			} else {
 				childXOverlap = true;
 			}
@@ -2010,11 +2006,11 @@ void COctTree::CheckHitCylinderNear_r(COctNode* octNode)
 
 		if (childXOverlap) {
 			float childBoundMinY = child->m_boundMinY;
-			if (childBoundMinY < *reinterpret_cast<float*>(Ptr(&s_cyl, 0x2C))) {
-				childXOverlap = *reinterpret_cast<float*>(Ptr(&s_cyl, 0x2C)) <= child->m_boundMaxY;
+			if (childBoundMinY < s_cyl.m_boundsMin.y) {
+				childXOverlap = s_cyl.m_boundsMin.y <= child->m_boundMaxY;
 			} else {
-				if (childBoundMinY > *reinterpret_cast<float*>(Ptr(&s_cyl, 0x2C))) {
-					childXOverlap = childBoundMinY <= *reinterpret_cast<float*>(Ptr(&s_cyl, 0x38));
+				if (childBoundMinY > s_cyl.m_boundsMin.y) {
+					childXOverlap = childBoundMinY <= s_cyl.m_boundsMax.y;
 				} else {
 					childXOverlap = true;
 				}
@@ -2026,11 +2022,11 @@ void COctTree::CheckHitCylinderNear_r(COctNode* octNode)
 
 		if (childXYOverlap) {
 			float childBoundMinZ = child->m_boundMinZ;
-			if (childBoundMinZ < *reinterpret_cast<float*>(Ptr(&s_cyl, 0x30))) {
-				childXOverlap = *reinterpret_cast<float*>(Ptr(&s_cyl, 0x30)) <= child->m_boundMaxZ;
+			if (childBoundMinZ < s_cyl.m_boundsMin.z) {
+				childXOverlap = s_cyl.m_boundsMin.z <= child->m_boundMaxZ;
 			} else {
-				if (childBoundMinZ > *reinterpret_cast<float*>(Ptr(&s_cyl, 0x30))) {
-					childXOverlap = childBoundMinZ <= *reinterpret_cast<float*>(Ptr(&s_cyl, 0x3C));
+				if (childBoundMinZ > s_cyl.m_boundsMin.z) {
+					childXOverlap = childBoundMinZ <= s_cyl.m_boundsMax.z;
 				} else {
 					childXOverlap = true;
 				}
@@ -2055,7 +2051,7 @@ void COctTree::CheckHitCylinderNear_r(COctNode* octNode)
 					break;
 				}
 
-				if ((reinterpret_cast<CBound*>(grandChild)->CheckCross(*reinterpret_cast<CBound*>(Ptr(&s_cyl, 0x28)))) != 0) {
+				if ((reinterpret_cast<CBound*>(grandChild)->CheckCross(*reinterpret_cast<CBound*>(&s_cyl.m_boundsMin))) != 0) {
 					if (grandChild->m_meshCount != 0) {
 						(*reinterpret_cast<CMapHit**>(Ptr(m_mapObject, 0xC)))
 						    ->CheckHitCylinderNear((CMapCylinder*)&s_cyl, &s_mvec,
@@ -2100,36 +2096,36 @@ void COctTree::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned 
 		if (mapHit != 0) {
 			PSMTXInverse(reinterpret_cast<MtxPtr>(reinterpret_cast<u8*>(m_mapObject) + 0xB8), inverseMtx);
 			PSMTXMultVec(inverseMtx, &cylinder->m_bottom, &s_cyl.m_bottom);
-			PSMTXMultVec(inverseMtx, &cylinder->m_top, &s_cyl.m_direction);
-			PSMTXMultVecSR(inverseMtx, &cylinder->m_axis, reinterpret_cast<Vec*>(&s_cyl.m_radius));
+			PSMTXMultVec(inverseMtx, &cylinder->m_top, &s_cyl.m_top);
+			PSMTXMultVecSR(inverseMtx, &cylinder->m_axis, &s_cyl.m_axis);
 			PSMTXMultVecSR(inverseMtx, move, &s_mvec);
 
-			s_cyl.m_top.y = cylinder->m_radius;
-			radiusPad = kOctTreeCylinderPad + s_cyl.m_top.y;
-			if (s_cyl.m_bottom.x < s_cyl.m_direction.x) {
-				s_cyl.m_top.z = s_cyl.m_bottom.x - radiusPad;
-				s_cyl.m_direction2.z = s_cyl.m_direction.x + radiusPad;
+			s_cyl.m_radius = cylinder->m_radius;
+			radiusPad = 1.0f + s_cyl.m_radius;
+			if (s_cyl.m_bottom.x < s_cyl.m_top.x) {
+				s_cyl.m_boundsMin.x = s_cyl.m_bottom.x - radiusPad;
+				s_cyl.m_boundsMax.x = s_cyl.m_top.x + radiusPad;
 			} else {
-				s_cyl.m_top.z = s_cyl.m_direction.x - radiusPad;
-				s_cyl.m_direction2.z = s_cyl.m_bottom.x + radiusPad;
+				s_cyl.m_boundsMin.x = s_cyl.m_top.x - radiusPad;
+				s_cyl.m_boundsMax.x = s_cyl.m_bottom.x + radiusPad;
 			}
 
-			radiusPad = kOctTreeCylinderPad + s_cyl.m_top.y;
-			if (s_cyl.m_bottom.y < s_cyl.m_direction.y) {
-				s_cyl.m_direction2.x = s_cyl.m_bottom.y - radiusPad;
-				s_cyl.m_radius2 = s_cyl.m_direction.y + radiusPad;
+			radiusPad = 1.0f + s_cyl.m_radius;
+			if (s_cyl.m_bottom.y < s_cyl.m_top.y) {
+				s_cyl.m_boundsMin.y = s_cyl.m_bottom.y - radiusPad;
+				s_cyl.m_boundsMax.y = s_cyl.m_top.y + radiusPad;
 			} else {
-				s_cyl.m_direction2.x = s_cyl.m_direction.y - radiusPad;
-				s_cyl.m_radius2 = s_cyl.m_bottom.y + radiusPad;
+				s_cyl.m_boundsMin.y = s_cyl.m_top.y - radiusPad;
+				s_cyl.m_boundsMax.y = s_cyl.m_bottom.y + radiusPad;
 			}
 
-			radiusPad = kOctTreeCylinderPad + s_cyl.m_top.y;
-			if (s_cyl.m_bottom.z < s_cyl.m_direction.z) {
-				s_cyl.m_direction2.y = s_cyl.m_bottom.z - radiusPad;
-				s_cyl.m_height2 = s_cyl.m_direction.z + radiusPad;
+			radiusPad = 1.0f + s_cyl.m_radius;
+			if (s_cyl.m_bottom.z < s_cyl.m_top.z) {
+				s_cyl.m_boundsMin.z = s_cyl.m_bottom.z - radiusPad;
+				s_cyl.m_boundsMax.z = s_cyl.m_top.z + radiusPad;
 			} else {
-				s_cyl.m_direction2.y = s_cyl.m_direction.z - radiusPad;
-				s_cyl.m_height2 = s_cyl.m_bottom.z + radiusPad;
+				s_cyl.m_boundsMin.z = s_cyl.m_top.z - radiusPad;
+				s_cyl.m_boundsMax.z = s_cyl.m_bottom.z + radiusPad;
 			}
 			InsertShadow_level = flag;
 			CheckHitCylinderNear_r(m_nodePool);

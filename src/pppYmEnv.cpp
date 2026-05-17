@@ -98,6 +98,24 @@ struct CModelRaw {
     CAnimRaw* m_anim;
 };
 
+extern const float FLOAT_803310C0 = 320.0f;
+extern const float FLOAT_803310C4 = 224.0f;
+extern const float FLOAT_803310C8 = 0.0f;
+extern const float FLOAT_803310CC = 1.0f;
+extern const double DOUBLE_803310D0 = 4503599627370496.0;
+extern const char lbl_803310D8[] = "MAP";
+extern const char lbl_803310DC[] = "MON";
+extern const char lbl_803310E0[] = "SCO";
+extern const char lbl_803310E4[] = "TRE";
+extern const char lbl_803310E8[] = "|\n";
+extern const double DOUBLE_803310F0 = 57.295780181884766;
+extern const float FLOAT_803310F8 = 1.5f;
+extern const double DOUBLE_80331100 = 4503601774854144.0;
+extern const float FLOAT_80331108 = 0.25f;
+extern const float FLOAT_8033110C = 0.0f;
+extern const float FLOAT_80331110 = 10.0f;
+extern const char sMogFurTextureName[] = "n915m_2";
+
 /*
  * --INFO--
  * PAL Address: 0x800e46dc
@@ -652,12 +670,12 @@ int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)
     animFrameMax = (int)(float)animFrameCount;
     frameInt = (int)modelTime;
     frame = (float)(frameInt - (frameInt / animFrameMax) * animFrameMax);
-    if (frame < 0.0f) {
+    if (frame < FLOAT_80331190) {
         return 0;
     }
 
     if (frame != FLOAT_80331180) {
-        frame -= 1.0f;
+        frame -= FLOAT_80331184;
     }
 
     CalcFrameMatrix__Q26CChara6CModelFfPQ26CChara5CNodePA4_f(model, frame + frameAdd, node, outMatrix);

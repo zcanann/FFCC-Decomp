@@ -419,7 +419,7 @@ extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialE
         while ((heightFactor & 1) == 0) {
             heightFactor >>= 1;
         }
-        if ((heightFactor != 1) || (heightFactor != 1)) {
+        if ((widthFactor != 1) || (heightFactor != 1)) {
             isPowerOfTwo = GX_FALSE;
         }
 

@@ -1949,31 +1949,29 @@ void CMenuPcs::CalcMoveMenu()
  */
 void CMenuPcs::InitSaveLoadMenu()
 {
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* const worldState = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x82C)[0]);
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(&MenuPcs);
 
-	if (worldState != 0) {
-		*reinterpret_cast<float*>(worldState + 0x00) = FLOAT_803313dc;
-		*reinterpret_cast<float*>(worldState + 0x04) = FLOAT_803313e8;
-		worldState[0x08] = 0;
-		worldState[0x09] = 0;
-		worldState[0x0A] = 0;
-		*reinterpret_cast<short*>(worldState + 0x0E) = 0;
-		*reinterpret_cast<short*>(worldState + 0x10) = 0;
-		*reinterpret_cast<short*>(worldState + 0x12) = 0;
-		*reinterpret_cast<short*>(worldState + 0x16) = 0;
-		*reinterpret_cast<short*>(worldState + 0x18) = 0;
-		*reinterpret_cast<short*>(worldState + 0x1A) = 0;
-		*reinterpret_cast<short*>(worldState + 0x22) = 0;
-		*reinterpret_cast<short*>(worldState + 0x24) = 0;
-		worldState[0x0B] = 0;
-		*reinterpret_cast<short*>(worldState + 0x26) = 0;
-		*reinterpret_cast<short*>(worldState + 0x2E) = 0;
-	}
+	float x = FLOAT_803313dc;
+	float y = FLOAT_803313e8;
+	*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(MenuPcs.m_artiState) + 0x22) = 0;
+	*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(MenuPcs.m_artiState) + 0x24) = 0;
+	reinterpret_cast<unsigned char*>(MenuPcs.m_artiState)[0x08] = 0;
+	reinterpret_cast<unsigned char*>(MenuPcs.m_artiState)[0x09] = 0;
+	reinterpret_cast<unsigned char*>(MenuPcs.m_artiState)[0x0A] = 0;
+	*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(MenuPcs.m_artiState) + 0x0E) = 0;
+	*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(MenuPcs.m_artiState) + 0x10) = 0;
+	*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(MenuPcs.m_artiState) + 0x12) = 0;
+	*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(MenuPcs.m_artiState) + 0x16) = 0;
+	*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(MenuPcs.m_artiState) + 0x18) = 0;
+	*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(MenuPcs.m_artiState) + 0x1A) = 0;
+	*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(MenuPcs.m_artiState) + 0x04) = y;
+	*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(MenuPcs.m_artiState) + 0x00) = x;
+	*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(MenuPcs.m_artiState) + 0x2E) = 0;
+	reinterpret_cast<unsigned char*>(MenuPcs.m_artiState)[0x0B] = 0;
+	*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(MenuPcs.m_artiState) + 0x26) = 0;
 
 	*reinterpret_cast<short*>(bytes + 0x870) = 0;
 	bytes[0x86E] = 0;
-	bytes[0x858] = 0;
 }
 
 /*

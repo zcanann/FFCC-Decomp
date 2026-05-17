@@ -152,18 +152,403 @@ static void AddMesFlag(CMes* mes, unsigned char type, unsigned char index, short
 
 /*
  * --INFO--
- * Address: 8009b358
- * Size: 92b
+ * PAL Address: 0x800981f0
+ * PAL Size: 380b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-CMes::CMes()
+unsigned long CMes::drawTagString(CFont* font, char* text, int drawChars, int breakOnLineTag, int lineBaseY)
 {
-	mText = 0;
-	mCounter = 0;
-	*(int*)((char*)this + 0x3c10) = 0;
-	*(int*)((char*)this + 0x3c0c) = 0;
-	*(int*)((char*)this + 0x3d34) = 0;
-	*(int*)((char*)this + 0x3d38) = 1;
-	memset((char*)this + 0x3cc0, 0, 0x50);
+	unsigned int width = 0;
+	unsigned char* src = (unsigned char*)text;
+	bool continueDraw = true;
+	float lineStartX = font->posX;
+	int lineStartXInt = (int)lineStartX;
+
+	while (continueDraw)
+	{
+		unsigned char ch = *src;
+		unsigned char* next = src + 1;
+
+		if (ch == 0)
+		{
+			continueDraw = false;
+			src = next;
+		}
+		else if (ch == 0xFF)
+		{
+			unsigned char tag = *next;
+			src += 2;
+			if (tag == 0xA1)
+			{
+				continueDraw = false;
+			}
+			else if ((tag == 0xA0) && (breakOnLineTag != 0))
+			{
+				font->SetPosX((float)lineStartXInt);
+				font->SetPosY((float)lineBaseY + font->posY + (float)font->m_glyphHeight * font->scaleY);
+			}
+		}
+		else
+		{
+			if (drawChars != 0)
+			{
+				font->Draw(ch);
+			}
+			width = (unsigned int)((double)(float)width + (double)font->GetWidth(ch));
+			src = next;
+		}
+	}
+
+	return width;
+}
+/*
+ * --INFO--
+ * PAL Address: 0x8009836c
+ * PAL Size: 2136b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOnLineBreak)
+{
+	if (sTag54Init == 0)
+	{
+		sTag54Source = (char*)s_mesEmpty;
+		sTag54Init = 1;
+	}
+
+	int caseMode = 0;
+	int branchMode = 0;
+	const unsigned char* in = (const unsigned char*)src;
+	char* dst = out;
+
+	while (true)
+	{
+		unsigned char c = in[0];
+		if (c == 0)
+		{
+			return;
+		}
+
+		if (c != 0xFF)
+		{
+			if (branchMode != 2)
+			{
+				*dst = (char)c;
+				dst++;
+			}
+			in++;
+			continue;
+		}
+
+		unsigned int tag = ((unsigned int)in[1] - 0xA0U) & 0xFFU;
+		const unsigned char* next = in + 2;
+
+		switch (tag)
+		{
+		case 0:
+			if (keepHyphenOnLineBreak == 0)
+			{
+				*dst++ = '\n';
+			}
+			else if (dst[-1] == '-')
+			{
+				dst[-1] = '\0';
+				dst--;
+			}
+			break;
+		case 4:
+			*dst++ = 0x1D;
+			break;
+		case 5:
+			*dst++ = 0x1C;
+			break;
+		case 6:
+			*dst++ = 0x1E;
+			break;
+		case 8:
+		{
+			signed char varIndex = (signed char)GetMesNibbleValue((const char*)in + 4);
+			const char* text = GetFlatName(5, CMes::m_tempVar[varIndex]);
+			strcpy(dst, text);
+			dst += strlen(dst);
+			next = in + 6;
+			break;
+		}
+		case 9:
+		case 0x1D:
+		case 0x37:
+		case 0x39:
+		case 0x3B:
+		case 0x3D:
+		case 0x3F:
+		{
+			signed char varIndex = (signed char)GetMesNibbleValue((const char*)in + 4);
+			int value = CMes::m_tempVar[varIndex];
+			if ((tag == 9) || (tag == 0x37))
+			{
+				strcpy(dst, GetFlatName(0, value * 5 + 1));
+			}
+			else if (tag == 0x1D)
+			{
+				strcpy(dst, GetFlatName(0, value * 5));
+			}
+			else if (tag == 0x39)
+			{
+				strcpy(dst, GetFlatName(0, value * 5 + 3));
+			}
+			else if (tag == 0x3B)
+			{
+				Game.MakeArtItemName(dst, value, 1);
+			}
+			else if (tag == 0x3D)
+			{
+				signed char countIdx = (signed char)GetMesNibbleValue((const char*)in + 6);
+				int count = (unsigned int)CMes::m_tempVar[countIdx] & 0xFFFF;
+				Game.MakeArtItemName(dst, value, count);
+			}
+			else
+			{
+				signed char countIdx = (signed char)GetMesNibbleValue((const char*)in + 6);
+				int count = (unsigned int)CMes::m_tempVar[countIdx] & 0xFFFF;
+				Game.MakeNumItemName(dst, value, count);
+			}
+			ApplyCaseMode(dst, caseMode);
+			dst += strlen(dst);
+			next = in + 6;
+			break;
+		}
+		case 0x1E:
+		case 0x2A:
+		case 0x38:
+		case 0x3A:
+		case 0x3C:
+		case 0x3E:
+		case 0x40:
+		{
+			signed char varIndex = (signed char)GetMesNibbleValue((const char*)in + 4);
+			int value = CMes::m_tempVar[varIndex];
+			if ((tag == 0x2A) || (tag == 0x38))
+			{
+				strcpy(dst, GetFlatName(1, value * 5 + 1));
+			}
+			else if (tag == 0x1E)
+			{
+				strcpy(dst, GetFlatName(1, value * 5));
+			}
+			else if (tag == 0x3A)
+			{
+				strcpy(dst, GetFlatName(1, value * 5 + 3));
+			}
+			else if (tag == 0x3C)
+			{
+				Game.MakeArtMonName(dst, value, 1);
+			}
+			else if (tag == 0x3E)
+			{
+				signed char countIdx = (signed char)GetMesNibbleValue((const char*)in + 6);
+				int count = (unsigned int)CMes::m_tempVar[countIdx] & 0xFFFF;
+				Game.MakeArtMonName(dst, value, count);
+			}
+			else
+			{
+				signed char countIdx = (signed char)GetMesNibbleValue((const char*)in + 6);
+				int count = (unsigned int)CMes::m_tempVar[countIdx] & 0xFFFF;
+				Game.MakeNumMonName(dst, value, count);
+			}
+			ApplyCaseMode(dst, caseMode);
+			dst += strlen(dst);
+			next = in + 6;
+			break;
+		}
+		case 0x2B:
+		{
+			signed char varIndex = (signed char)GetMesNibbleValue((const char*)in + 4);
+			strcpy(dst, GetFlatName(2, CMes::m_tempVar[varIndex]));
+			dst += strlen(dst);
+			next = in + 6;
+			break;
+		}
+		case 0x2C:
+		{
+			signed char varIndex = (signed char)GetMesNibbleValue((const char*)in + 4);
+			strcpy(dst, GetFlatName(3, CMes::m_tempVar[varIndex]));
+			dst += strlen(dst);
+			next = in + 6;
+			break;
+		}
+		case 0x2D:
+		{
+			signed char varIndex = (signed char)GetMesNibbleValue((const char*)in + 4);
+			strcpy(dst, GetFlatName(3, CMes::m_tempVar[varIndex] + 0x3C));
+			dst += strlen(dst);
+			next = in + 6;
+			break;
+		}
+		case 0x2E:
+		{
+			signed char varIndex = (signed char)GetMesNibbleValue((const char*)in + 2);
+			strcpy(dst, GetFlatName(5, CMes::m_tempVar[varIndex]));
+			dst += strlen(dst);
+			next = in + 4;
+			break;
+		}
+		case 0x2F:
+			strcpy(dst, s_mesFallback);
+			dst += strlen(dst);
+			break;
+		case 0x30:
+		{
+			signed char varIndex = (signed char)GetMesNibbleValue((const char*)in + 2);
+			sprintf(dst, s_mesNumFmt, CMes::m_tempVar[varIndex]);
+			dst += strlen(dst);
+			next = in + 4;
+			break;
+		}
+		case 0x41:
+		{
+			unsigned char mode = (unsigned char)GetMesNibbleValue((const char*)in + 2);
+			if (mode == 1)
+			{
+				caseMode = 1;
+			}
+			else if (mode == 0)
+			{
+				caseMode = 3;
+			}
+			else
+			{
+				caseMode = 2;
+			}
+			next = in + 4;
+			break;
+		}
+		case 0x42:
+		{
+			signed char varIndex = (signed char)GetMesNibbleValue((const char*)in + 2);
+			branchMode = (CMes::m_tempVar[varIndex] == 1) ? 1 : 2;
+			next = in + 4;
+			break;
+		}
+		case 0x44:
+			branchMode = (playerIndex == 0) ? 1 : 2;
+			break;
+		case 0x45:
+		{
+			signed char varIndex = (signed char)GetMesNibbleValue((const char*)in + 2);
+			int caravanIdx = CMes::m_tempVar[varIndex];
+			branchMode = (Game.m_caravanWorkArr[caravanIdx].m_genderFlag == 0) ? 1 : 2;
+			next = in + 4;
+			break;
+		}
+		case 0x46:
+			if (branchMode == 1)
+			{
+				branchMode = 2;
+			}
+			else if (branchMode == 2)
+			{
+				branchMode = 1;
+			}
+			break;
+		case 0x47:
+			branchMode = 0;
+			break;
+		case 0x54:
+			strcpy(dst, sTag54Source);
+			dst += strlen(dst);
+			break;
+		case 0x0C:
+		case 0x0E:
+		case 0x13:
+		case 0x14:
+			if ((unsigned int)System.m_execParam > 1U)
+			{
+				Printf__7CSystemFPce(&System, s_mesTagMissing, tag + 0xA0);
+			}
+			break;
+		case 2:
+		case 3:
+		case 7:
+		case 0x0A:
+		case 0x0B:
+		case 0x0D:
+		case 0x0F:
+		case 0x10:
+		case 0x11:
+		case 0x12:
+		case 0x15:
+		case 0x16:
+		case 0x17:
+		case 0x18:
+		case 0x23:
+		case 0x24:
+		case 0x25:
+		case 0x26:
+		case 0x27:
+		case 0x28:
+		case 0x29:
+		case 0x55:
+			if (System.m_execParam != 0)
+			{
+				Printf__7CSystemFPce(&System, s_mesTagUnknown, tag + 0xA0);
+			}
+			break;
+		default:
+			break;
+		}
+
+		in = next;
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80098bc4
+ * PAL Size: 192b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CMes::useFlag(int maxCount, int stopOnClear)
+{
+	unsigned char* flagEntry = (unsigned char*)((char*)this + *(int*)((char*)this + 0x3c10) * 6 + 0x3c14);
+	while (*(int*)((char*)this + 0x3c10) < maxCount)
+	{
+		int type = *flagEntry;
+
+		if (type != 3)
+		{
+			if (type < 3)
+			{
+				if (type == 1)
+				{
+					int idx = (unsigned int)flagEntry[2] * 4 + 0x3cc0;
+					*(int*)((char*)this + idx) = *(int*)((char*)this + idx) + 1;
+				}
+				else if (type != 0)
+				{
+					*(int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3cc0) = (int)*(short*)(flagEntry + 4);
+				}
+			}
+			else if ((type < 5) &&
+			         (*(int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3cc0) == 0) &&
+			         (stopOnClear == 0))
+			{
+				return 0;
+			}
+		}
+
+		flagEntry += 6;
+		*(int*)((char*)this + 0x3c10) = *(int*)((char*)this + 0x3c10) + 1;
+	}
+
+	return 1;
 }
 
 /*
@@ -171,180 +556,307 @@ CMes::CMes()
  * Address:	TODO
  * Size:	TODO
  */
-CMes::~CMes()
+void CMes::SetPosition(float x, float y)
 {
-	// Destructor - no dynamic allocation to clean up in basic implementation
+	*(float*)&mData[0x3c8c] = x;
+	*(float*)&mData[0x3c90] = y;
 }
 
 /*
  * --INFO--
- * Address: 8009b168
- * Size: 436b
+ * Address:	TODO
+ * Size:	TODO
  */
-void CMes::Set(char* text, int param)
+void CMes::Draw()
 {
-	*(int*)((char*)this + 4) = (int)text;
-	*(int*)((char*)this + 0x3c74) = 0;
-	*(float*)((char*)this + 0x3ca8) = FLOAT_8033089c;
-	*(float*)((char*)this + 0x3ca4) = FLOAT_8033089c;
-	*(int*)((char*)this + 8) = 0;
-	*(int*)((char*)this + 0x3c10) = 0;
-	*(int*)((char*)this + 0x3c0c) = 0;
-	*(int*)((char*)this + 0x3d10) = 0;
-	*(int*)((char*)this + 0x3d30) = param;
-	*(float*)((char*)this + 0x3d3c) = FLOAT_8033089c;
-	*(int*)((char*)this + 0x3d40) = 0;
-	*(float*)((char*)this + 0x3d44) = FLOAT_80330898;
-	*(float*)((char*)this + 0x3d48) = FLOAT_80330898;
-	*(int*)((char*)this + 0x3d4c) = 1;
-
-	if (text != 0) {
-		unsigned char flagBackup[0x50];
-		memcpy(flagBackup, (char*)this + 0x3cc0, sizeof(flagBackup));
-
-		while (*(int*)((char*)this + 0x3c74) == 0) {
-			*(int*)((char*)this + 8) = 0;
-			*(int*)((char*)this + 0x3c10) = 0;
-			*(int*)((char*)this + 0x3c0c) = 0;
-			*(float*)((char*)this + 0x3c88) = FLOAT_8033089c;
-			*(float*)((char*)this + 0x3c84) = FLOAT_8033089c;
-			*(float*)((char*)this + 0x3c90) = FLOAT_8033089c;
-			*(float*)((char*)this + 0x3c8c) = FLOAT_8033089c;
-
-			addString((char**)((char*)this + 4), 1);
-
-			float width = *(float*)((char*)this + 0x3c8c);
-			if (width > *(float*)((char*)this + 0x3ca4)) {
-				*(float*)((char*)this + 0x3ca4) = width;
-			}
-			float height = *(float*)((char*)this + 0x3c90);
-			if (height > *(float*)((char*)this + 0x3ca8)) {
-				*(float*)((char*)this + 0x3ca8) = height;
-			}
+	if (*(int*)((char*)this + 8) != 0)
+	{
+		unsigned char* menuPcs = reinterpret_cast<unsigned char*>(&MenuPcs);
+		int globalAlpha;
+		if ((*(int*)((char*)this + 0x3CAC) != 0) && (*(int*)((char*)this + 0x3CB8) != 0))
+		{
+			globalAlpha = 0xFF - (*(int*)((char*)this + 0x3CBC) * 0xFF) / *(int*)((char*)this + 0x3CB8);
+		}
+		else
+		{
+			globalAlpha = 0xFF;
 		}
 
-		memcpy((char*)this + 0x3cc0, flagBackup, sizeof(flagBackup));
-		*(float*)((char*)this + 0x3ca4) = *(float*)((char*)this + 0x3ca4) - *(float*)((char*)this + 0x3d3c);
-		*(float*)((char*)this + 0x3ca8) = *(float*)((char*)this + 0x3ca8) - FLOAT_803308a4;
+		float* glyph = (float*)((char*)this + 0x0C);
+		CFont* font = 0;
+		unsigned int activeTlut = 0xFFFFFFFF;
+		unsigned int activeFontId = 0xFFFFFFFF;
 
-		*(int*)((char*)this + 4) = (int)text;
-		*(int*)((char*)this + 0x3c74) = 0;
-		*(int*)((char*)this + 0x3cb0) = (param == 0);
-		*(int*)((char*)this + 0x3cb4) = 3;
-		*(int*)((char*)this + 0x3cb8) = 0;
-		*(int*)((char*)this + 0x3d10) = 0;
-		*(int*)((char*)this + 0x3d2c) = 0;
-		*(int*)((char*)this + 0x3d28) = 7;
-		*(float*)((char*)this + 0x3d3c) = FLOAT_8033089c;
-		*(int*)((char*)this + 0x3d40) = 0;
-		*(float*)((char*)this + 0x3d44) = FLOAT_80330898;
-		*(float*)((char*)this + 0x3d48) = FLOAT_80330898;
-		*(int*)((char*)this + 0x3d4c) = 1;
-		Next();
+		for (int i = 0; i < *(int*)((char*)this + 8); i++)
+		{
+			CFont* nextFont = font;
+			if ((int)(unsigned int)*(unsigned short*)((char*)glyph + 0x0C) <= *(int*)((char*)this + 0x3C80))
+			{
+				unsigned int ch = (unsigned int)*(unsigned char*)(glyph + 4);
+				if (ch < 0x20)
+				{
+					if (font != 0)
+					{
+						font->DrawQuit();
+					}
+					DrawInit__8CMenuPcsFv(&MenuPcs);
+
+					unsigned int iconId = ch;
+					if (ch == 7)
+					{
+						unsigned int mode;
+						if ((Game.m_currentMapId == 0x21) && (GetPadType__6JoyBusFi(&Joybus, 0) != 0x40))
+						{
+							int padType = GetPadType__6JoyBusFi(&Joybus, 0);
+							mode = (unsigned int)(((0x40000U - (unsigned int)padType) |
+							                       ((unsigned int)padType - 0x40000U)) >>
+							                      31);
+						}
+						else
+						{
+							mode = (unsigned int)Game.m_gameWork.m_menuStageMode;
+						}
+						iconId = (mode != 0) ? 7 : 0x0B;
+					}
+					else if (ch == 8)
+					{
+						unsigned int mode;
+						if ((Game.m_currentMapId == 0x21) && (GetPadType__6JoyBusFi(&Joybus, 0) != 0x40))
+						{
+							int padType = GetPadType__6JoyBusFi(&Joybus, 0);
+							mode = (unsigned int)(((0x40000U - (unsigned int)padType) |
+							                       ((unsigned int)padType - 0x40000U)) >>
+							                      31);
+						}
+						else
+						{
+							mode = (unsigned int)Game.m_gameWork.m_menuStageMode;
+						}
+						iconId = (mode != 0) ? 8 : 0x0C;
+					}
+					else if (ch == 0x0A)
+					{
+						unsigned int mode;
+						if ((Game.m_currentMapId == 0x21) && (GetPadType__6JoyBusFi(&Joybus, 0) != 0x40))
+						{
+							int padType = GetPadType__6JoyBusFi(&Joybus, 0);
+							mode = (unsigned int)(((0x40000U - (unsigned int)padType) |
+							                       ((unsigned int)padType - 0x40000U)) >>
+							                      31);
+						}
+						else
+						{
+							mode = (unsigned int)Game.m_gameWork.m_menuStageMode;
+						}
+						iconId = (mode != 0) ? 9 : 0x0D;
+					}
+					else if (ch == 0x0B)
+					{
+						unsigned int mode;
+						if ((Game.m_currentMapId == 0x21) && (GetPadType__6JoyBusFi(&Joybus, 0) != 0x40))
+						{
+							int padType = GetPadType__6JoyBusFi(&Joybus, 0);
+							mode = (unsigned int)(((0x40000U - (unsigned int)padType) |
+							                       ((unsigned int)padType - 0x40000U)) >>
+							                      31);
+						}
+						else
+						{
+							mode = (unsigned int)Game.m_gameWork.m_menuStageMode;
+						}
+						iconId = (mode != 0) ? 0x0A : 0x0E;
+					}
+
+					unsigned char colorStorage[8];
+					__ct__6CColorFUcUcUcUc(colorStorage, 0xFF, 0xFF, 0xFF, 0xFF);
+					SetColor__8CMenuPcsFR6CColor(&MenuPcs, colorStorage);
+					SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x15);
+
+					DrawRect__8CMenuPcsFUlfffffffff(
+					    &MenuPcs, 0, *(float*)((char*)this + 0x3C9C) + *glyph,
+					    FLOAT_80330890 + *(float*)((char*)this + 0x3CA0) + (float)*(short*)(glyph + 2),
+					    FLOAT_80330894, FLOAT_80330894, (float)((iconId % 5) * 0x16),
+					    (float)((iconId / 5) * 0x16), FLOAT_80330898, FLOAT_80330898, 0.0f);
+
+					if (font != 0)
+					{
+						font->DrawInit();
+					}
+				}
+				else
+				{
+					unsigned int fontId = (unsigned int)*(unsigned char*)((char*)glyph + 0x0E) & 0x0F;
+					if (activeFontId != fontId)
+					{
+						nextFont = *reinterpret_cast<CFont**>(menuPcs + 0x100);
+						if (fontId == 0)
+						{
+							nextFont = *reinterpret_cast<CFont**>(menuPcs + 0x0F8);
+						}
+						else if ((fontId == 1) || (fontId >= 4))
+						{
+							nextFont = font;
+						}
+
+						nextFont->SetShadow(*(int*)((char*)this + 0x3D38));
+						nextFont->SetMargin(FLOAT_8033089c);
+						nextFont->SetScaleX(*(float*)((char*)this + 0x3D44));
+						nextFont->SetScaleY(*(float*)((char*)this + 0x3D48));
+						nextFont->DrawInit();
+						activeFontId = fontId;
+						font = nextFont;
+					}
+
+					unsigned int fadeCur = (unsigned int)*(unsigned char*)((char*)glyph + 0x0F) & 0x0F;
+					unsigned int fadeMax = (unsigned int)*(unsigned char*)((char*)glyph + 0x0F) >> 4;
+					float ratio = (float)fadeCur / (float)fadeMax;
+					unsigned char alpha;
+					if (ratio >= FLOAT_80330898)
+					{
+						alpha = (unsigned char)globalAlpha;
+					}
+					else
+					{
+						alpha = (unsigned char)((float)globalAlpha * ratio);
+					}
+
+					_GXColor color = {0xFF, 0xFF, 0xFF, alpha};
+					font->SetColor(color);
+
+					unsigned int tlut = (unsigned int)*(unsigned char*)((char*)glyph + 0x12);
+					if ((activeTlut != tlut) && (((unsigned int)*(unsigned char*)((char*)glyph + 0x0E) & 0x0F) < 2))
+					{
+						font->SetTlut((int)tlut + *(int*)((char*)this + 0x3D34));
+						activeTlut = tlut;
+					}
+
+					font->SetPosX(*(float*)((char*)this + 0x3C9C) + *glyph);
+					font->SetPosY(*(float*)((char*)this + 0x3CA0) + (float)*(short*)(glyph + 2));
+					font->SetScaleX(FLOAT_803308a0 * (float)*(unsigned char*)((char*)glyph + 0x0A));
+					font->SetScaleY(FLOAT_803308a0 * (float)*(unsigned char*)((char*)glyph + 0x11));
+					font->renderFlags = font->renderFlags & 0xF7 | 8;
+					font->Draw((unsigned short)ch);
+					font->renderFlags &= 0xF7;
+				}
+			}
+
+			glyph += 5;
+			font = nextFont;
+		}
+
+		font->DrawQuit();
 	}
 }
 
 /*
  * --INFO--
- * PAL Address: 0x8009af54
- * PAL Size: 528b
+ * PAL Address: 0x800992d0
+ * PAL Size: 368b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMes::Next()
+void CMes::Calc()
 {
-	unsigned char type;
-	float groupWidth;
-	float halfVal;
-	int remaining;
-	unsigned int runLength;
-	int i;
-	unsigned char* flagEntry;
-	float* start;
-	int entryCount;
-	float* curr;
-	char tempFlags[0x50];
-
-	if (*(int*)((char*)this + 4) != 0)
+	if (*(int*)((char*)this + 8) == 0)
 	{
-		entryCount = *(int*)((char*)this + 0x3c0c);
-		flagEntry = (unsigned char*)((char*)this + *(int*)((char*)this + 0x3c10) * 6 + 0x3c14);
-		while ((halfVal = FLOAT_8033089c, *(int*)((char*)this + 0x3c10) < entryCount))
+		return;
+	}
+
+	int textEntry = (int)((char*)this + 0xC);
+	unsigned int maxAdvance = 0;
+	for (int i = 0; i < *(int*)((char*)this + 8); i++)
+	{
+		if ((int)(unsigned int)*(unsigned short*)(textEntry + 0xC) <= *(int*)((char*)this + 0x3C80))
 		{
-			type = *flagEntry;
+			unsigned char fadeMax = *(unsigned char*)(textEntry + 0xF) >> 4;
+			unsigned char fadeCurr = (*(unsigned char*)(textEntry + 0xF) & 0xF) + 1;
+			if (fadeCurr < fadeMax)
+			{
+				fadeMax = fadeCurr;
+			}
+			*(unsigned char*)(textEntry + 0xF) =
+			    (unsigned char)((fadeMax & 0xF) | (*(unsigned char*)(textEntry + 0xF) & 0xF0));
+			maxAdvance = (unsigned int)*(unsigned char*)(textEntry + 0x13);
+		}
+		textEntry += 0x14;
+	}
+
+	unsigned char* flagEntry =
+	    (unsigned char*)((char*)this + *(int*)((char*)this + 0x3C10) * 6 + 0x3C14);
+	while (true)
+	{
+		if ((int)maxAdvance <= *(int*)((char*)this + 0x3C10))
+		{
+			break;
+		}
+
+		unsigned char type = *flagEntry;
+		if (type != 3)
+		{
 			if (type < 3)
 			{
 				if (type == 1)
 				{
-					remaining = (unsigned int)flagEntry[2] * 4 + 0x3cc0;
-					*(int*)((char*)this + remaining) = *(int*)((char*)this + remaining) + 1;
+					int idx = (unsigned int)flagEntry[2] * 4 + 0x3CC0;
+					*(int*)((char*)this + idx) = *(int*)((char*)this + idx) + 1;
 				}
 				else if (type != 0)
 				{
-					*(int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3cc0) = (int)*(short*)(flagEntry + 4);
+					*(int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3CC0) =
+					    (int)*(short*)(flagEntry + 4);
 				}
 			}
-			flagEntry += 6;
-			*(int*)((char*)this + 0x3c10) = *(int*)((char*)this + 0x3c10) + 1;
-		}
-		*(int*)((char*)this + 8) = 0;
-		*(int*)((char*)this + 0x3c10) = 0;
-		*(int*)((char*)this + 0x3c0c) = 0;
-		*(float*)((char*)this + 0x3c88) = halfVal;
-		*(float*)((char*)this + 0x3c84) = halfVal;
-		*(float*)((char*)this + 0x3c90) = halfVal;
-		*(float*)((char*)this + 0x3c8c) = halfVal;
-		*(int*)((char*)this + 0x3c80) = 0;
-		*(int*)((char*)this + 0x3c7c) = 0;
-		*(int*)((char*)this + 0x3cac) = 0;
-		memcpy(tempFlags, (char*)this + 0x3cc0, sizeof(tempFlags));
-		addString((char**)((char*)this + 4), 0);
-		memcpy((char*)this + 0x3cc0, tempFlags, sizeof(tempFlags));
-		halfVal = FLOAT_803308b0;
-		i = 0;
-		curr = (float*)((char*)this + 0xc);
-		while ((start = curr, remaining = *(int*)((char*)this + 8), i < remaining))
-		{
-			i = i + 1;
-			curr = start + 5;
-			entryCount = remaining - i;
-			if (i < remaining)
+			else if ((type < 5) &&
+			         (*(int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3CC0) == 0))
 			{
-				do
-				{
-					if (((*(unsigned char*)((char*)start + 0xe) >> 4) != (*(unsigned char*)((char*)curr + 0xe) >> 4)) ||
-					    (*(short*)(start + 2) != *(short*)(curr + 2)))
-					{
-						break;
-					}
-					i = i + 1;
-					curr = curr + 5;
-					entryCount = entryCount + -1;
-				} while (entryCount != 0);
-			}
-			runLength = (unsigned int)((int)curr - (int)start) / 0x14;
-			groupWidth = (curr[-5] - *start) + start[1] + *(float*)((char*)this + 0x3d3c);
-			if (start <= curr - 5)
-			{
-				do
-				{
-					type = *(unsigned char*)((char*)start + 0xe) >> 4;
-					if (type == 1)
-					{
-						*start = halfVal * (*(float*)((char*)this + 0x3ca4) - groupWidth) + *start;
-					}
-					else if (type == 2)
-					{
-						*start = *start + (*(float*)((char*)this + 0x3ca4) - groupWidth);
-					}
-					start = start + 5;
-					runLength = runLength - 1;
-				} while (runLength != 0);
+				goto doneAdvance;
 			}
 		}
+
+		flagEntry += 6;
+		*(int*)((char*)this + 0x3C10) = *(int*)((char*)this + 0x3C10) + 1;
 	}
+
+	{
+		int next = *(int*)((char*)this + 0x3C80) + 1;
+		if (next > 0x7FFE)
+		{
+			next = 0x7FFF;
+		}
+		*(int*)((char*)this + 0x3C80) = next;
+	}
+
+doneAdvance:
+	if (*(int*)((char*)this + 0x3CAC) != 0)
+	{
+		int next = *(int*)((char*)this + 0x3CBC) + 1;
+		int max = *(int*)((char*)this + 0x3CB8);
+		if (next < max)
+		{
+			max = next;
+		}
+		*(int*)((char*)this + 0x3CBC) = max;
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80099440
+ * PAL Size: 32b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CMes::GetWait()
+{
+	if (*(int*)((char*)this + 0x3c7c) < *(int*)((char*)this + 0x3c80))
+	{
+		return *(int*)((char*)this + 0x3c78);
+	}
+	return 0;
 }
 
 /*
@@ -712,710 +1224,197 @@ render_char:
 
 /*
  * --INFO--
- * PAL Address: 0x80099440
- * PAL Size: 32b
+ * PAL Address: 0x8009af54
+ * PAL Size: 528b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-int CMes::GetWait()
+void CMes::Next()
 {
-	if (*(int*)((char*)this + 0x3c7c) < *(int*)((char*)this + 0x3c80))
-	{
-		return *(int*)((char*)this + 0x3c78);
-	}
-	return 0;
-}
+	unsigned char type;
+	float groupWidth;
+	float halfVal;
+	int remaining;
+	unsigned int runLength;
+	int i;
+	unsigned char* flagEntry;
+	float* start;
+	int entryCount;
+	float* curr;
+	char tempFlags[0x50];
 
-/*
- * --INFO--
- * PAL Address: 0x800992d0
- * PAL Size: 368b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMes::Calc()
-{
-	if (*(int*)((char*)this + 8) == 0)
+	if (*(int*)((char*)this + 4) != 0)
 	{
-		return;
-	}
-
-	int textEntry = (int)((char*)this + 0xC);
-	unsigned int maxAdvance = 0;
-	for (int i = 0; i < *(int*)((char*)this + 8); i++)
-	{
-		if ((int)(unsigned int)*(unsigned short*)(textEntry + 0xC) <= *(int*)((char*)this + 0x3C80))
+		entryCount = *(int*)((char*)this + 0x3c0c);
+		flagEntry = (unsigned char*)((char*)this + *(int*)((char*)this + 0x3c10) * 6 + 0x3c14);
+		while ((halfVal = FLOAT_8033089c, *(int*)((char*)this + 0x3c10) < entryCount))
 		{
-			unsigned char fadeMax = *(unsigned char*)(textEntry + 0xF) >> 4;
-			unsigned char fadeCurr = (*(unsigned char*)(textEntry + 0xF) & 0xF) + 1;
-			if (fadeCurr < fadeMax)
-			{
-				fadeMax = fadeCurr;
-			}
-			*(unsigned char*)(textEntry + 0xF) =
-			    (unsigned char)((fadeMax & 0xF) | (*(unsigned char*)(textEntry + 0xF) & 0xF0));
-			maxAdvance = (unsigned int)*(unsigned char*)(textEntry + 0x13);
-		}
-		textEntry += 0x14;
-	}
-
-	unsigned char* flagEntry =
-	    (unsigned char*)((char*)this + *(int*)((char*)this + 0x3C10) * 6 + 0x3C14);
-	while (true)
-	{
-		if ((int)maxAdvance <= *(int*)((char*)this + 0x3C10))
-		{
-			break;
-		}
-
-		unsigned char type = *flagEntry;
-		if (type != 3)
-		{
+			type = *flagEntry;
 			if (type < 3)
 			{
 				if (type == 1)
 				{
-					int idx = (unsigned int)flagEntry[2] * 4 + 0x3CC0;
-					*(int*)((char*)this + idx) = *(int*)((char*)this + idx) + 1;
-				}
-				else if (type != 0)
-				{
-					*(int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3CC0) =
-					    (int)*(short*)(flagEntry + 4);
-				}
-			}
-			else if ((type < 5) &&
-			         (*(int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3CC0) == 0))
-			{
-				goto doneAdvance;
-			}
-		}
-
-		flagEntry += 6;
-		*(int*)((char*)this + 0x3C10) = *(int*)((char*)this + 0x3C10) + 1;
-	}
-
-	{
-		int next = *(int*)((char*)this + 0x3C80) + 1;
-		if (next > 0x7FFE)
-		{
-			next = 0x7FFF;
-		}
-		*(int*)((char*)this + 0x3C80) = next;
-	}
-
-doneAdvance:
-	if (*(int*)((char*)this + 0x3CAC) != 0)
-	{
-		int next = *(int*)((char*)this + 0x3CBC) + 1;
-		int max = *(int*)((char*)this + 0x3CB8);
-		if (next < max)
-		{
-			max = next;
-		}
-		*(int*)((char*)this + 0x3CBC) = max;
-	}
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMes::Draw()
-{
-	if (*(int*)((char*)this + 8) != 0)
-	{
-		unsigned char* menuPcs = reinterpret_cast<unsigned char*>(&MenuPcs);
-		int globalAlpha;
-		if ((*(int*)((char*)this + 0x3CAC) != 0) && (*(int*)((char*)this + 0x3CB8) != 0))
-		{
-			globalAlpha = 0xFF - (*(int*)((char*)this + 0x3CBC) * 0xFF) / *(int*)((char*)this + 0x3CB8);
-		}
-		else
-		{
-			globalAlpha = 0xFF;
-		}
-
-		float* glyph = (float*)((char*)this + 0x0C);
-		CFont* font = 0;
-		unsigned int activeTlut = 0xFFFFFFFF;
-		unsigned int activeFontId = 0xFFFFFFFF;
-
-		for (int i = 0; i < *(int*)((char*)this + 8); i++)
-		{
-			CFont* nextFont = font;
-			if ((int)(unsigned int)*(unsigned short*)((char*)glyph + 0x0C) <= *(int*)((char*)this + 0x3C80))
-			{
-				unsigned int ch = (unsigned int)*(unsigned char*)(glyph + 4);
-				if (ch < 0x20)
-				{
-					if (font != 0)
-					{
-						font->DrawQuit();
-					}
-					DrawInit__8CMenuPcsFv(&MenuPcs);
-
-					unsigned int iconId = ch;
-					if (ch == 7)
-					{
-						unsigned int mode;
-						if ((Game.m_currentMapId == 0x21) && (GetPadType__6JoyBusFi(&Joybus, 0) != 0x40))
-						{
-							int padType = GetPadType__6JoyBusFi(&Joybus, 0);
-							mode = (unsigned int)(((0x40000U - (unsigned int)padType) |
-							                       ((unsigned int)padType - 0x40000U)) >>
-							                      31);
-						}
-						else
-						{
-							mode = (unsigned int)Game.m_gameWork.m_menuStageMode;
-						}
-						iconId = (mode != 0) ? 7 : 0x0B;
-					}
-					else if (ch == 8)
-					{
-						unsigned int mode;
-						if ((Game.m_currentMapId == 0x21) && (GetPadType__6JoyBusFi(&Joybus, 0) != 0x40))
-						{
-							int padType = GetPadType__6JoyBusFi(&Joybus, 0);
-							mode = (unsigned int)(((0x40000U - (unsigned int)padType) |
-							                       ((unsigned int)padType - 0x40000U)) >>
-							                      31);
-						}
-						else
-						{
-							mode = (unsigned int)Game.m_gameWork.m_menuStageMode;
-						}
-						iconId = (mode != 0) ? 8 : 0x0C;
-					}
-					else if (ch == 0x0A)
-					{
-						unsigned int mode;
-						if ((Game.m_currentMapId == 0x21) && (GetPadType__6JoyBusFi(&Joybus, 0) != 0x40))
-						{
-							int padType = GetPadType__6JoyBusFi(&Joybus, 0);
-							mode = (unsigned int)(((0x40000U - (unsigned int)padType) |
-							                       ((unsigned int)padType - 0x40000U)) >>
-							                      31);
-						}
-						else
-						{
-							mode = (unsigned int)Game.m_gameWork.m_menuStageMode;
-						}
-						iconId = (mode != 0) ? 9 : 0x0D;
-					}
-					else if (ch == 0x0B)
-					{
-						unsigned int mode;
-						if ((Game.m_currentMapId == 0x21) && (GetPadType__6JoyBusFi(&Joybus, 0) != 0x40))
-						{
-							int padType = GetPadType__6JoyBusFi(&Joybus, 0);
-							mode = (unsigned int)(((0x40000U - (unsigned int)padType) |
-							                       ((unsigned int)padType - 0x40000U)) >>
-							                      31);
-						}
-						else
-						{
-							mode = (unsigned int)Game.m_gameWork.m_menuStageMode;
-						}
-						iconId = (mode != 0) ? 0x0A : 0x0E;
-					}
-
-					unsigned char colorStorage[8];
-					__ct__6CColorFUcUcUcUc(colorStorage, 0xFF, 0xFF, 0xFF, 0xFF);
-					SetColor__8CMenuPcsFR6CColor(&MenuPcs, colorStorage);
-					SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x15);
-
-					DrawRect__8CMenuPcsFUlfffffffff(
-					    &MenuPcs, 0, *(float*)((char*)this + 0x3C9C) + *glyph,
-					    FLOAT_80330890 + *(float*)((char*)this + 0x3CA0) + (float)*(short*)(glyph + 2),
-					    FLOAT_80330894, FLOAT_80330894, (float)((iconId % 5) * 0x16),
-					    (float)((iconId / 5) * 0x16), FLOAT_80330898, FLOAT_80330898, 0.0f);
-
-					if (font != 0)
-					{
-						font->DrawInit();
-					}
-				}
-				else
-				{
-					unsigned int fontId = (unsigned int)*(unsigned char*)((char*)glyph + 0x0E) & 0x0F;
-					if (activeFontId != fontId)
-					{
-						nextFont = *reinterpret_cast<CFont**>(menuPcs + 0x100);
-						if (fontId == 0)
-						{
-							nextFont = *reinterpret_cast<CFont**>(menuPcs + 0x0F8);
-						}
-						else if ((fontId == 1) || (fontId >= 4))
-						{
-							nextFont = font;
-						}
-
-						nextFont->SetShadow(*(int*)((char*)this + 0x3D38));
-						nextFont->SetMargin(FLOAT_8033089c);
-						nextFont->SetScaleX(*(float*)((char*)this + 0x3D44));
-						nextFont->SetScaleY(*(float*)((char*)this + 0x3D48));
-						nextFont->DrawInit();
-						activeFontId = fontId;
-						font = nextFont;
-					}
-
-					unsigned int fadeCur = (unsigned int)*(unsigned char*)((char*)glyph + 0x0F) & 0x0F;
-					unsigned int fadeMax = (unsigned int)*(unsigned char*)((char*)glyph + 0x0F) >> 4;
-					float ratio = (float)fadeCur / (float)fadeMax;
-					unsigned char alpha;
-					if (ratio >= FLOAT_80330898)
-					{
-						alpha = (unsigned char)globalAlpha;
-					}
-					else
-					{
-						alpha = (unsigned char)((float)globalAlpha * ratio);
-					}
-
-					_GXColor color = {0xFF, 0xFF, 0xFF, alpha};
-					font->SetColor(color);
-
-					unsigned int tlut = (unsigned int)*(unsigned char*)((char*)glyph + 0x12);
-					if ((activeTlut != tlut) && (((unsigned int)*(unsigned char*)((char*)glyph + 0x0E) & 0x0F) < 2))
-					{
-						font->SetTlut((int)tlut + *(int*)((char*)this + 0x3D34));
-						activeTlut = tlut;
-					}
-
-					font->SetPosX(*(float*)((char*)this + 0x3C9C) + *glyph);
-					font->SetPosY(*(float*)((char*)this + 0x3CA0) + (float)*(short*)(glyph + 2));
-					font->SetScaleX(FLOAT_803308a0 * (float)*(unsigned char*)((char*)glyph + 0x0A));
-					font->SetScaleY(FLOAT_803308a0 * (float)*(unsigned char*)((char*)glyph + 0x11));
-					font->renderFlags = font->renderFlags & 0xF7 | 8;
-					font->Draw((unsigned short)ch);
-					font->renderFlags &= 0xF7;
-				}
-			}
-
-			glyph += 5;
-			font = nextFont;
-		}
-
-		font->DrawQuit();
-	}
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMes::SetPosition(float x, float y)
-{
-	*(float*)&mData[0x3c8c] = x;
-	*(float*)&mData[0x3c90] = y;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80098bc4
- * PAL Size: 192b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int CMes::useFlag(int maxCount, int stopOnClear)
-{
-	unsigned char* flagEntry = (unsigned char*)((char*)this + *(int*)((char*)this + 0x3c10) * 6 + 0x3c14);
-	while (*(int*)((char*)this + 0x3c10) < maxCount)
-	{
-		int type = *flagEntry;
-
-		if (type != 3)
-		{
-			if (type < 3)
-			{
-				if (type == 1)
-				{
-					int idx = (unsigned int)flagEntry[2] * 4 + 0x3cc0;
-					*(int*)((char*)this + idx) = *(int*)((char*)this + idx) + 1;
+					remaining = (unsigned int)flagEntry[2] * 4 + 0x3cc0;
+					*(int*)((char*)this + remaining) = *(int*)((char*)this + remaining) + 1;
 				}
 				else if (type != 0)
 				{
 					*(int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3cc0) = (int)*(short*)(flagEntry + 4);
 				}
 			}
-			else if ((type < 5) &&
-			         (*(int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3cc0) == 0) &&
-			         (stopOnClear == 0))
-			{
-				return 0;
-			}
+			flagEntry += 6;
+			*(int*)((char*)this + 0x3c10) = *(int*)((char*)this + 0x3c10) + 1;
 		}
-
-		flagEntry += 6;
-		*(int*)((char*)this + 0x3c10) = *(int*)((char*)this + 0x3c10) + 1;
-	}
-
-	return 1;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8009836c
- * PAL Size: 2136b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOnLineBreak)
-{
-	if (sTag54Init == 0)
-	{
-		sTag54Source = (char*)s_mesEmpty;
-		sTag54Init = 1;
-	}
-
-	int caseMode = 0;
-	int branchMode = 0;
-	const unsigned char* in = (const unsigned char*)src;
-	char* dst = out;
-
-	while (true)
-	{
-		unsigned char c = in[0];
-		if (c == 0)
+		*(int*)((char*)this + 8) = 0;
+		*(int*)((char*)this + 0x3c10) = 0;
+		*(int*)((char*)this + 0x3c0c) = 0;
+		*(float*)((char*)this + 0x3c88) = halfVal;
+		*(float*)((char*)this + 0x3c84) = halfVal;
+		*(float*)((char*)this + 0x3c90) = halfVal;
+		*(float*)((char*)this + 0x3c8c) = halfVal;
+		*(int*)((char*)this + 0x3c80) = 0;
+		*(int*)((char*)this + 0x3c7c) = 0;
+		*(int*)((char*)this + 0x3cac) = 0;
+		memcpy(tempFlags, (char*)this + 0x3cc0, sizeof(tempFlags));
+		addString((char**)((char*)this + 4), 0);
+		memcpy((char*)this + 0x3cc0, tempFlags, sizeof(tempFlags));
+		halfVal = FLOAT_803308b0;
+		i = 0;
+		curr = (float*)((char*)this + 0xc);
+		while ((start = curr, remaining = *(int*)((char*)this + 8), i < remaining))
 		{
-			return;
+			i = i + 1;
+			curr = start + 5;
+			entryCount = remaining - i;
+			if (i < remaining)
+			{
+				do
+				{
+					if (((*(unsigned char*)((char*)start + 0xe) >> 4) != (*(unsigned char*)((char*)curr + 0xe) >> 4)) ||
+					    (*(short*)(start + 2) != *(short*)(curr + 2)))
+					{
+						break;
+					}
+					i = i + 1;
+					curr = curr + 5;
+					entryCount = entryCount + -1;
+				} while (entryCount != 0);
+			}
+			runLength = (unsigned int)((int)curr - (int)start) / 0x14;
+			groupWidth = (curr[-5] - *start) + start[1] + *(float*)((char*)this + 0x3d3c);
+			if (start <= curr - 5)
+			{
+				do
+				{
+					type = *(unsigned char*)((char*)start + 0xe) >> 4;
+					if (type == 1)
+					{
+						*start = halfVal * (*(float*)((char*)this + 0x3ca4) - groupWidth) + *start;
+					}
+					else if (type == 2)
+					{
+						*start = *start + (*(float*)((char*)this + 0x3ca4) - groupWidth);
+					}
+					start = start + 5;
+					runLength = runLength - 1;
+				} while (runLength != 0);
+			}
 		}
-
-		if (c != 0xFF)
-		{
-			if (branchMode != 2)
-			{
-				*dst = (char)c;
-				dst++;
-			}
-			in++;
-			continue;
-		}
-
-		unsigned int tag = ((unsigned int)in[1] - 0xA0U) & 0xFFU;
-		const unsigned char* next = in + 2;
-
-		switch (tag)
-		{
-		case 0:
-			if (keepHyphenOnLineBreak == 0)
-			{
-				*dst++ = '\n';
-			}
-			else if (dst[-1] == '-')
-			{
-				dst[-1] = '\0';
-				dst--;
-			}
-			break;
-		case 4:
-			*dst++ = 0x1D;
-			break;
-		case 5:
-			*dst++ = 0x1C;
-			break;
-		case 6:
-			*dst++ = 0x1E;
-			break;
-		case 8:
-		{
-			signed char varIndex = (signed char)GetMesNibbleValue((const char*)in + 4);
-			const char* text = GetFlatName(5, CMes::m_tempVar[varIndex]);
-			strcpy(dst, text);
-			dst += strlen(dst);
-			next = in + 6;
-			break;
-		}
-		case 9:
-		case 0x1D:
-		case 0x37:
-		case 0x39:
-		case 0x3B:
-		case 0x3D:
-		case 0x3F:
-		{
-			signed char varIndex = (signed char)GetMesNibbleValue((const char*)in + 4);
-			int value = CMes::m_tempVar[varIndex];
-			if ((tag == 9) || (tag == 0x37))
-			{
-				strcpy(dst, GetFlatName(0, value * 5 + 1));
-			}
-			else if (tag == 0x1D)
-			{
-				strcpy(dst, GetFlatName(0, value * 5));
-			}
-			else if (tag == 0x39)
-			{
-				strcpy(dst, GetFlatName(0, value * 5 + 3));
-			}
-			else if (tag == 0x3B)
-			{
-				Game.MakeArtItemName(dst, value, 1);
-			}
-			else if (tag == 0x3D)
-			{
-				signed char countIdx = (signed char)GetMesNibbleValue((const char*)in + 6);
-				int count = (unsigned int)CMes::m_tempVar[countIdx] & 0xFFFF;
-				Game.MakeArtItemName(dst, value, count);
-			}
-			else
-			{
-				signed char countIdx = (signed char)GetMesNibbleValue((const char*)in + 6);
-				int count = (unsigned int)CMes::m_tempVar[countIdx] & 0xFFFF;
-				Game.MakeNumItemName(dst, value, count);
-			}
-			ApplyCaseMode(dst, caseMode);
-			dst += strlen(dst);
-			next = in + 6;
-			break;
-		}
-		case 0x1E:
-		case 0x2A:
-		case 0x38:
-		case 0x3A:
-		case 0x3C:
-		case 0x3E:
-		case 0x40:
-		{
-			signed char varIndex = (signed char)GetMesNibbleValue((const char*)in + 4);
-			int value = CMes::m_tempVar[varIndex];
-			if ((tag == 0x2A) || (tag == 0x38))
-			{
-				strcpy(dst, GetFlatName(1, value * 5 + 1));
-			}
-			else if (tag == 0x1E)
-			{
-				strcpy(dst, GetFlatName(1, value * 5));
-			}
-			else if (tag == 0x3A)
-			{
-				strcpy(dst, GetFlatName(1, value * 5 + 3));
-			}
-			else if (tag == 0x3C)
-			{
-				Game.MakeArtMonName(dst, value, 1);
-			}
-			else if (tag == 0x3E)
-			{
-				signed char countIdx = (signed char)GetMesNibbleValue((const char*)in + 6);
-				int count = (unsigned int)CMes::m_tempVar[countIdx] & 0xFFFF;
-				Game.MakeArtMonName(dst, value, count);
-			}
-			else
-			{
-				signed char countIdx = (signed char)GetMesNibbleValue((const char*)in + 6);
-				int count = (unsigned int)CMes::m_tempVar[countIdx] & 0xFFFF;
-				Game.MakeNumMonName(dst, value, count);
-			}
-			ApplyCaseMode(dst, caseMode);
-			dst += strlen(dst);
-			next = in + 6;
-			break;
-		}
-		case 0x2B:
-		{
-			signed char varIndex = (signed char)GetMesNibbleValue((const char*)in + 4);
-			strcpy(dst, GetFlatName(2, CMes::m_tempVar[varIndex]));
-			dst += strlen(dst);
-			next = in + 6;
-			break;
-		}
-		case 0x2C:
-		{
-			signed char varIndex = (signed char)GetMesNibbleValue((const char*)in + 4);
-			strcpy(dst, GetFlatName(3, CMes::m_tempVar[varIndex]));
-			dst += strlen(dst);
-			next = in + 6;
-			break;
-		}
-		case 0x2D:
-		{
-			signed char varIndex = (signed char)GetMesNibbleValue((const char*)in + 4);
-			strcpy(dst, GetFlatName(3, CMes::m_tempVar[varIndex] + 0x3C));
-			dst += strlen(dst);
-			next = in + 6;
-			break;
-		}
-		case 0x2E:
-		{
-			signed char varIndex = (signed char)GetMesNibbleValue((const char*)in + 2);
-			strcpy(dst, GetFlatName(5, CMes::m_tempVar[varIndex]));
-			dst += strlen(dst);
-			next = in + 4;
-			break;
-		}
-		case 0x2F:
-			strcpy(dst, s_mesFallback);
-			dst += strlen(dst);
-			break;
-		case 0x30:
-		{
-			signed char varIndex = (signed char)GetMesNibbleValue((const char*)in + 2);
-			sprintf(dst, s_mesNumFmt, CMes::m_tempVar[varIndex]);
-			dst += strlen(dst);
-			next = in + 4;
-			break;
-		}
-		case 0x41:
-		{
-			unsigned char mode = (unsigned char)GetMesNibbleValue((const char*)in + 2);
-			if (mode == 1)
-			{
-				caseMode = 1;
-			}
-			else if (mode == 0)
-			{
-				caseMode = 3;
-			}
-			else
-			{
-				caseMode = 2;
-			}
-			next = in + 4;
-			break;
-		}
-		case 0x42:
-		{
-			signed char varIndex = (signed char)GetMesNibbleValue((const char*)in + 2);
-			branchMode = (CMes::m_tempVar[varIndex] == 1) ? 1 : 2;
-			next = in + 4;
-			break;
-		}
-		case 0x44:
-			branchMode = (playerIndex == 0) ? 1 : 2;
-			break;
-		case 0x45:
-		{
-			signed char varIndex = (signed char)GetMesNibbleValue((const char*)in + 2);
-			int caravanIdx = CMes::m_tempVar[varIndex];
-			branchMode = (Game.m_caravanWorkArr[caravanIdx].m_genderFlag == 0) ? 1 : 2;
-			next = in + 4;
-			break;
-		}
-		case 0x46:
-			if (branchMode == 1)
-			{
-				branchMode = 2;
-			}
-			else if (branchMode == 2)
-			{
-				branchMode = 1;
-			}
-			break;
-		case 0x47:
-			branchMode = 0;
-			break;
-		case 0x54:
-			strcpy(dst, sTag54Source);
-			dst += strlen(dst);
-			break;
-		case 0x0C:
-		case 0x0E:
-		case 0x13:
-		case 0x14:
-			if ((unsigned int)System.m_execParam > 1U)
-			{
-				Printf__7CSystemFPce(&System, s_mesTagMissing, tag + 0xA0);
-			}
-			break;
-		case 2:
-		case 3:
-		case 7:
-		case 0x0A:
-		case 0x0B:
-		case 0x0D:
-		case 0x0F:
-		case 0x10:
-		case 0x11:
-		case 0x12:
-		case 0x15:
-		case 0x16:
-		case 0x17:
-		case 0x18:
-		case 0x23:
-		case 0x24:
-		case 0x25:
-		case 0x26:
-		case 0x27:
-		case 0x28:
-		case 0x29:
-		case 0x55:
-			if (System.m_execParam != 0)
-			{
-				Printf__7CSystemFPce(&System, s_mesTagUnknown, tag + 0xA0);
-			}
-			break;
-		default:
-			break;
-		}
-
-		in = next;
 	}
 }
 
 /*
  * --INFO--
- * PAL Address: 0x800981f0
- * PAL Size: 380b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
+ * Address: 8009b168
+ * Size: 436b
  */
-unsigned long CMes::drawTagString(CFont* font, char* text, int drawChars, int breakOnLineTag, int lineBaseY)
+void CMes::Set(char* text, int param)
 {
-	unsigned int width = 0;
-	unsigned char* src = (unsigned char*)text;
-	bool continueDraw = true;
-	float lineStartX = font->posX;
-	int lineStartXInt = (int)lineStartX;
+	*(int*)((char*)this + 4) = (int)text;
+	*(int*)((char*)this + 0x3c74) = 0;
+	*(float*)((char*)this + 0x3ca8) = FLOAT_8033089c;
+	*(float*)((char*)this + 0x3ca4) = FLOAT_8033089c;
+	*(int*)((char*)this + 8) = 0;
+	*(int*)((char*)this + 0x3c10) = 0;
+	*(int*)((char*)this + 0x3c0c) = 0;
+	*(int*)((char*)this + 0x3d10) = 0;
+	*(int*)((char*)this + 0x3d30) = param;
+	*(float*)((char*)this + 0x3d3c) = FLOAT_8033089c;
+	*(int*)((char*)this + 0x3d40) = 0;
+	*(float*)((char*)this + 0x3d44) = FLOAT_80330898;
+	*(float*)((char*)this + 0x3d48) = FLOAT_80330898;
+	*(int*)((char*)this + 0x3d4c) = 1;
 
-	while (continueDraw)
-	{
-		unsigned char ch = *src;
-		unsigned char* next = src + 1;
+	if (text != 0) {
+		unsigned char flagBackup[0x50];
+		memcpy(flagBackup, (char*)this + 0x3cc0, sizeof(flagBackup));
 
-		if (ch == 0)
-		{
-			continueDraw = false;
-			src = next;
-		}
-		else if (ch == 0xFF)
-		{
-			unsigned char tag = *next;
-			src += 2;
-			if (tag == 0xA1)
-			{
-				continueDraw = false;
+		while (*(int*)((char*)this + 0x3c74) == 0) {
+			*(int*)((char*)this + 8) = 0;
+			*(int*)((char*)this + 0x3c10) = 0;
+			*(int*)((char*)this + 0x3c0c) = 0;
+			*(float*)((char*)this + 0x3c88) = FLOAT_8033089c;
+			*(float*)((char*)this + 0x3c84) = FLOAT_8033089c;
+			*(float*)((char*)this + 0x3c90) = FLOAT_8033089c;
+			*(float*)((char*)this + 0x3c8c) = FLOAT_8033089c;
+
+			addString((char**)((char*)this + 4), 1);
+
+			float width = *(float*)((char*)this + 0x3c8c);
+			if (width > *(float*)((char*)this + 0x3ca4)) {
+				*(float*)((char*)this + 0x3ca4) = width;
 			}
-			else if ((tag == 0xA0) && (breakOnLineTag != 0))
-			{
-				font->SetPosX((float)lineStartXInt);
-				font->SetPosY((float)lineBaseY + font->posY + (float)font->m_glyphHeight * font->scaleY);
+			float height = *(float*)((char*)this + 0x3c90);
+			if (height > *(float*)((char*)this + 0x3ca8)) {
+				*(float*)((char*)this + 0x3ca8) = height;
 			}
 		}
-		else
-		{
-			if (drawChars != 0)
-			{
-				font->Draw(ch);
-			}
-			width = (unsigned int)((double)(float)width + (double)font->GetWidth(ch));
-			src = next;
-		}
+
+		memcpy((char*)this + 0x3cc0, flagBackup, sizeof(flagBackup));
+		*(float*)((char*)this + 0x3ca4) = *(float*)((char*)this + 0x3ca4) - *(float*)((char*)this + 0x3d3c);
+		*(float*)((char*)this + 0x3ca8) = *(float*)((char*)this + 0x3ca8) - FLOAT_803308a4;
+
+		*(int*)((char*)this + 4) = (int)text;
+		*(int*)((char*)this + 0x3c74) = 0;
+		*(int*)((char*)this + 0x3cb0) = (param == 0);
+		*(int*)((char*)this + 0x3cb4) = 3;
+		*(int*)((char*)this + 0x3cb8) = 0;
+		*(int*)((char*)this + 0x3d10) = 0;
+		*(int*)((char*)this + 0x3d2c) = 0;
+		*(int*)((char*)this + 0x3d28) = 7;
+		*(float*)((char*)this + 0x3d3c) = FLOAT_8033089c;
+		*(int*)((char*)this + 0x3d40) = 0;
+		*(float*)((char*)this + 0x3d44) = FLOAT_80330898;
+		*(float*)((char*)this + 0x3d48) = FLOAT_80330898;
+		*(int*)((char*)this + 0x3d4c) = 1;
+		Next();
 	}
+}
 
-	return width;
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+CMes::~CMes()
+{
+	// Destructor - no dynamic allocation to clean up in basic implementation
+}
+
+/*
+ * --INFO--
+ * Address: 8009b358
+ * Size: 92b
+ */
+CMes::CMes()
+{
+	mText = 0;
+	mCounter = 0;
+	*(int*)((char*)this + 0x3c10) = 0;
+	*(int*)((char*)this + 0x3c0c) = 0;
+	*(int*)((char*)this + 0x3d34) = 0;
+	*(int*)((char*)this + 0x3d38) = 1;
+	memset((char*)this + 0x3cc0, 0, 0x50);
 }

@@ -32,7 +32,7 @@ void pppRandFloat(_pppPObject* basePtrIn, RandFloatParam* in, _pppCtrlTable* ctr
     }
 
     base = (u8*)basePtrIn;
-    s32 state = *(s32*)(base + 0xC);
+    s32 state = basePtrIn->m_graphId;
 
     if (state == 0) {
         f32 value = Math.RandF();

@@ -144,7 +144,7 @@ int CMenuPcs::ChkEquipActive(int index)
 	s16* itemEntries = entries + 1;
 	int equipIndex = GetEquipState(this)[0x13];
 
-	if ((index < 0) || (entryCount <= index)) {
+	if ((index < 0) || (index >= entryCount)) {
 		return 0;
 	}
 

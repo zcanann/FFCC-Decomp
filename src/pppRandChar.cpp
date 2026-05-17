@@ -33,7 +33,7 @@ void pppRandChar(_pppPObject* basePtr, RandCharParam* in, _pppCtrlTable* ctrl)
         return;
     }
 
-    s32 state = *(s32*)(base + 0xC);
+    s32 state = basePtr->m_graphId;
     if (state == 0) {
         f32 value = Math.RandF();
         if (in->useNormalDistribution != 0) {

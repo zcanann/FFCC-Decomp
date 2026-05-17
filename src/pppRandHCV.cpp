@@ -37,7 +37,7 @@ void pppRandHCV(_pppPObject* basePtr, RandHCVParams* in, _pppCtrlTable* ctrl)
         return;
     }
 
-    if (in->targetId == *(s32*)(base + 0xC)) {
+    if (in->targetId == basePtr->m_graphId) {
         f32 value = Math.RandF();
         if (in->useNormalDistribution != 0) {
             value += Math.RandF();
@@ -47,7 +47,7 @@ void pppRandHCV(_pppPObject* basePtr, RandHCVParams* in, _pppCtrlTable* ctrl)
 
         randomValue = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);
         *randomValue = value;
-    } else if (in->targetId != *(s32*)(base + 0xC)) {
+    } else if (in->targetId != basePtr->m_graphId) {
         return;
     } else {
         randomValue = (f32*)(basePtr->m_workArea + *ctrl->m_serializedDataOffsets);

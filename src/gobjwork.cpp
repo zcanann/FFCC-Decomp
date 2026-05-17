@@ -141,7 +141,7 @@ extern "C" CGObjWork* dtor_800A2D8C(CGObjWork* gObjWork, short shouldDelete)
  */
 void CGObjWork::Init(int baseDataIndex, CRomWork* romWork, int idOffset)
 {
-	short* romData = reinterpret_cast<short*>(romWork);
+	unsigned short* romData = reinterpret_cast<unsigned short*>(romWork);
 
 	m_baseDataIndex = baseDataIndex;
 	m_id = romData[0] + idOffset;

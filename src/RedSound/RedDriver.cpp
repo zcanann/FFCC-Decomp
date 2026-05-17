@@ -1561,7 +1561,7 @@ static void _StreamVolume(int* command)
  * EN Size: 56b
  * JP Address: TODO
  */
-static void _StreamPan(int* command)
+static inline void _StreamPan(int* command)
 {
 	SetStreamPan(RedExecCommandArgGet(command, REDSOUND_STREAM_COMMAND_ID), RedExecCommandArgGet(command, REDSOUND_STREAM_COMMAND_PAN),
 	             RedExecCommandArgGet(command, REDSOUND_STREAM_COMMAND_FADE_TIME));

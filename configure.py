@@ -410,7 +410,9 @@ redsound_inline_deferred_units = parse_unit_env_set(
     "FFCC_REDSOUND_INLINE_DEFERRED_UNITS"
 )
 redsound_no_inline_flag_units = {
+    "RedDriver",
     "RedMidiCtrl",
+    *parse_unit_env_set("FFCC_REDSOUND_NO_INLINE_FLAG_UNITS"),
 }
 redsound_remove_flag_prefixes = parse_flag_env_list("FFCC_REDSOUND_REMOVE_PREFIXES")
 redsound_extra_flags = parse_flag_env_list("FFCC_REDSOUND_EXTRA_FLAGS")
@@ -425,7 +427,7 @@ def redsound_unit_cflags(unit_name: str, *, cpp_exceptions: bool = False) -> Lis
         flags = replace_flag_prefix(flags, "-O", "-O0")
     if unit_name in redsound_no_inline_flag_units:
         flags = [flag for flag in flags if not flag.startswith("-inline ")]
-    if unit_name in redsound_inline_off_units:
+    elif unit_name in redsound_inline_off_units:
         flags = replace_flag_prefix(flags, "-inline ", "-inline off")
     elif unit_name in redsound_inline_deferred_units:
         flags = replace_flag_prefix(flags, "-inline ", "-inline deferred")

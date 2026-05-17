@@ -781,15 +781,15 @@ static int SawSwing(int phase)
 static int DutySwing(int phase)
 {
     int level;
-    int result;
+    int outputLevel;
 
     if ((phase & REDSOUND_SWING_PHASE_SIGN) != 0) {
         level = -REDSOUND_SWING_LEVEL_FULL;
     } else {
         level = REDSOUND_SWING_LEVEL_FULL;
     }
-    result = level;
-    return result;
+    outputLevel = level;
+    return outputLevel;
 }
 /*
  * --INFO--
@@ -869,7 +869,7 @@ static int TriangleSwingR(int phase)
 static int DutySwingR(int phase)
 {
     int level;
-    int result;
+    int outputLevel;
 
     phase ^= REDSOUND_SWING_PHASE_SIGN;
     if ((phase & REDSOUND_SWING_PHASE_SIGN) != 0) {
@@ -878,8 +878,8 @@ static int DutySwingR(int phase)
         level = REDSOUND_SWING_LEVEL_FULL;
     }
 
-    result = level;
-    return result;
+    outputLevel = level;
+    return outputLevel;
 }
 /*
  * --INFO--

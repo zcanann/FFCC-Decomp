@@ -533,7 +533,7 @@ private:
 	int m_status[REDSOUND_MIDI_CTRL_STATUS_COUNT];
 };
 
-int DataAddCompute(int* current, int target, int* delta);
+int DataAddCompute(int* currentValue, int targetValue, int* stepCount);
 void KeyOnReserveClear(RedKeyOnDATA* keyOnData, RedTrackDATA* track);
 void KeyOnReserve(RedKeyOnDATA* keyOnData, RedTrackDATA* track);
 void KeyOffSet(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* track);

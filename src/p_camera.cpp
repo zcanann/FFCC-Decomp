@@ -911,8 +911,9 @@ void CCameraPcs::SetViewerSRT(const SRT* srt)
 {
     u32* dst = reinterpret_cast<u32*>(reinterpret_cast<u8*>(this) + 0x448);
     const u32* src = reinterpret_cast<const u32*>(srt);
-    u32 value1 = src[1];
+    u32 value1;
     u32 value0 = *src++;
+    value1 = *src;
     dst[0] = value0;
     u32 value2 = src[1];
     dst[1] = value1;

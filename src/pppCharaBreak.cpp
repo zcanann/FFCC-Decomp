@@ -877,6 +877,7 @@ void CreatePolygon(POLYGON_DATA* polygonData, void* displayList, unsigned long, 
         u8 drawMode = drawCmd & 7;
         u8 primitive = drawCmd & 0xF8;
         s16 triCount;
+        s32 keepTri;
         s32 outVertex;
         u16* stripRestart;
 
@@ -885,9 +886,9 @@ void CreatePolygon(POLYGON_DATA* polygonData, void* displayList, unsigned long, 
             keepReading = 0;
         } else {
             triCount = (s16)(drawCount - 2);
+            keepTri = 1;
             outVertex = 0;
             stripRestart = 0;
-            s32 keepTri = 1;
 
             if (primitive == 0x90) {
                 triCount = (s16)((s32)drawCount / 3);
@@ -899,11 +900,10 @@ void CreatePolygon(POLYGON_DATA* polygonData, void* displayList, unsigned long, 
                 u16 nrmIndex = stream[1];
                 u16 texIndex = stream[3];
 
-                stripRestart = stream + 4;
+                stream += 4;
                 if (drawMode == 2) {
-                    stripRestart = stream + 5;
+                    stream++;
                 }
-                stream = stripRestart;
 
                 if (isRigid != 0) {
                     S16Vec* sourcePos = workPositions + posIndex;

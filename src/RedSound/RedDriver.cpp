@@ -238,16 +238,6 @@ enum RedDriverSmallDataLayout {
     REDSOUND_DRIVER_SBSS_UNUSED_SILENT_WAVE_SIZE = sizeof(int),
     REDSOUND_DRIVER_SBSS_SIZE =
         REDSOUND_DRIVER_SBSS_UNUSED_SILENT_WAVE_OFFSET + REDSOUND_DRIVER_SBSS_UNUSED_SILENT_WAVE_SIZE,
-    REDSOUND_DRIVER_SOURCE_SBSS_SILENT_WAVE_OFFSET = REDSOUND_DRIVER_SBSS_BEFORE_RED_MEMORY_SIZE,
-    REDSOUND_DRIVER_SOURCE_SBSS_RED_MEMORY_OFFSET =
-        REDSOUND_DRIVER_SOURCE_SBSS_SILENT_WAVE_OFFSET + sizeof(int),
-    REDSOUND_DRIVER_SOURCE_SBSS_RED_MEMORY_PAD_OFFSET =
-        REDSOUND_DRIVER_SOURCE_SBSS_RED_MEMORY_OFFSET + REDSOUND_RED_MEMORY_SIZE,
-    REDSOUND_DRIVER_SOURCE_SBSS_RED_MEMORY_PAD_SIZE = REDSOUND_DRIVER_SBSS_RED_MEMORY_PAD_SIZE,
-    REDSOUND_DRIVER_SOURCE_SBSS_DMA_EXECUTE_OFFSET =
-        REDSOUND_DRIVER_SOURCE_SBSS_RED_MEMORY_PAD_OFFSET + REDSOUND_DRIVER_SOURCE_SBSS_RED_MEMORY_PAD_SIZE,
-    REDSOUND_DRIVER_SOURCE_SBSS_DMA_IN_THREAD_OFFSET =
-        REDSOUND_DRIVER_SOURCE_SBSS_DMA_EXECUTE_OFFSET + sizeof(int),
 };
 
 enum RedDriverStringLayout {
@@ -310,15 +300,6 @@ struct RedDriverSmallDataTailState {
     volatile int m_DMAExecute;
     volatile int m_DMAInThread;
     int m_SilentWave;
-};
-
-struct RedDriverSourceSmallDataTailState {
-    RedDriverSmallDataPrefixState m_prefix;
-    int m_SilentWave;
-    CRedMemory c_RedMemory;
-    u8 m_redMemoryAlignPadding[REDSOUND_DRIVER_SOURCE_SBSS_RED_MEMORY_PAD_SIZE];
-    volatile int m_DMAExecute;
-    volatile int m_DMAInThread;
 };
 
 STATIC_ASSERT(offsetof(RedDmaRequest, m_id) == REDSOUND_DMA_REQUEST_ID_OFFSET);
@@ -586,21 +567,6 @@ STATIC_ASSERT(offsetof(RedDriverSmallDataTailState, m_SilentWave) ==
 STATIC_ASSERT(sizeof(((RedDriverSmallDataTailState*)0)->m_SilentWave) ==
               REDSOUND_DRIVER_SBSS_UNUSED_SILENT_WAVE_SIZE);
 STATIC_ASSERT(sizeof(RedDriverSmallDataTailState) == REDSOUND_DRIVER_SBSS_SIZE);
-STATIC_ASSERT(sizeof(((RedDriverSourceSmallDataTailState*)0)->m_prefix) ==
-              REDSOUND_DRIVER_SOURCE_SBSS_SILENT_WAVE_OFFSET);
-STATIC_ASSERT(offsetof(RedDriverSourceSmallDataTailState, m_SilentWave) ==
-              REDSOUND_DRIVER_SOURCE_SBSS_SILENT_WAVE_OFFSET);
-STATIC_ASSERT(offsetof(RedDriverSourceSmallDataTailState, c_RedMemory) ==
-              REDSOUND_DRIVER_SOURCE_SBSS_RED_MEMORY_OFFSET);
-STATIC_ASSERT(offsetof(RedDriverSourceSmallDataTailState, m_redMemoryAlignPadding) ==
-              REDSOUND_DRIVER_SOURCE_SBSS_RED_MEMORY_PAD_OFFSET);
-STATIC_ASSERT(sizeof(((RedDriverSourceSmallDataTailState*)0)->m_redMemoryAlignPadding) ==
-              REDSOUND_DRIVER_SOURCE_SBSS_RED_MEMORY_PAD_SIZE);
-STATIC_ASSERT(offsetof(RedDriverSourceSmallDataTailState, m_DMAExecute) ==
-              REDSOUND_DRIVER_SOURCE_SBSS_DMA_EXECUTE_OFFSET);
-STATIC_ASSERT(offsetof(RedDriverSourceSmallDataTailState, m_DMAInThread) ==
-              REDSOUND_DRIVER_SOURCE_SBSS_DMA_IN_THREAD_OFFSET);
-STATIC_ASSERT(sizeof(RedDriverSourceSmallDataTailState) == REDSOUND_DRIVER_SBSS_SIZE);
 
 enum RedDriverBufferSize {
     REDSOUND_ZERO_BUFFER_SIZE = 0x1000,
@@ -783,7 +749,6 @@ u8* volatile p_MusicSkipThreadStack;
 volatile int m_MusicSkipComplete;
 RedReverbDepth* volatile p_ReverbDepth;
 unsigned int m_Mute[REDSOUND_MUTE_WORD_COUNT];
-static int m_SilentWave;
 static RedDmaRequest m_DmaControl[REDSOUND_DMA_CONTROL_ENTRY_COUNT];
 static OSThread m_MainThread;
 static OSSemaphore m_MainSemaphore;
@@ -808,6 +773,7 @@ RedSeBlockHEAD* volatile p_SeBlockData[REDSOUND_SE_BLOCK_BANK_COUNT];
 CRedMemory c_RedMemory;
 static volatile int m_DMAExecute;
 static volatile int m_DMAInThread;
+static int m_SilentWave;
 #define RedDmaExecuteGet() (m_DMAExecute)
 #define RedDmaExecuteSet(status) (m_DMAExecute = (status))
 #define RedDmaThreadStateGet() (m_DMAInThread)

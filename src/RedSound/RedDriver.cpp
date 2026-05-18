@@ -948,7 +948,7 @@ static void _SetMusicData(int* command)
  * JP Address: TODO
  * JP Size: TODO
  */
-static void _ClearMusicData(int* command)
+static inline void _ClearMusicData(int* command)
 {
     c_RedEntry.ClearMusicData(RedExecCommandArgGet(command, REDSOUND_MUSIC_COMMAND_ID));
 }
@@ -1165,7 +1165,7 @@ static void _MusicVolume(int* command)
  * EN Size: 52b
  * JP Address: TODO
  */
-static void _MusicTempo(int* command)
+static inline void _MusicTempo(int* command)
 {
     SetMusicTempo(RedExecCommandArgGet(command, REDSOUND_MUSIC_COMMAND_VOLUME), RedExecCommandArgGet(command, REDSOUND_MUSIC_COMMAND_FADE_TIME));
 }
@@ -1178,7 +1178,7 @@ static void _MusicTempo(int* command)
  * EN Size: 52b
  * JP Address: TODO
  */
-static void _MusicPitch(int* command)
+static inline void _MusicPitch(int* command)
 {
     SetMusicPitch(RedExecCommandArgGet(command, REDSOUND_MUSIC_COMMAND_VOLUME), RedExecCommandArgGet(command, REDSOUND_MUSIC_COMMAND_FADE_TIME));
 }
@@ -1191,7 +1191,7 @@ static void _MusicPitch(int* command)
  * EN Size: 52b
  * JP Address: TODO
  */
-static void _MusicPause(int* command)
+static inline void _MusicPause(int* command)
 {
     MusicPause(RedExecCommandArgGet(command, REDSOUND_MUSIC_COMMAND_ID), RedExecCommandArgGet(command, REDSOUND_MUSIC_COMMAND_VOLUME));
 }
@@ -1310,7 +1310,7 @@ static void _SeStop(int* command)
  * EN Size: 48b
  * JP Address: TODO
  */
-static void _SeStopG(int* command)
+static inline void _SeStopG(int* command)
 {
     SeStopG(RedExecCommandArgGet(command, REDSOUND_SE_COMMAND_ID));
 }
@@ -1525,7 +1525,7 @@ static void _StreamVolume(int* command)
  * EN Size: 56b
  * JP Address: TODO
  */
-static void _StreamPan(int* command)
+static inline void _StreamPan(int* command)
 {
 	SetStreamPan(RedExecCommandArgGet(command, REDSOUND_STREAM_COMMAND_ID), RedExecCommandArgGet(command, REDSOUND_STREAM_COMMAND_PAN),
 	             RedExecCommandArgGet(command, REDSOUND_STREAM_COMMAND_FADE_TIME));
@@ -2453,7 +2453,7 @@ int CRedDriver::SetMusicData(void* musicData)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CRedDriver::ClearMusicData(int musicID)
+inline void CRedDriver::ClearMusicData(int musicID)
 {
     _EntryExecCommand(_ClearMusicData, musicID, 0, 0, 0, 0, 0, 0);
 }
@@ -2747,7 +2747,7 @@ void CRedDriver::MusicVolume(int musicID, int volume, int frameCount)
  * EN Size: 76b
  * JP Address: TODO
  */
-void CRedDriver::MusicTempo(int tempo, int frameCount)
+inline void CRedDriver::MusicTempo(int tempo, int frameCount)
 {
     _EntryExecCommand(_MusicTempo, 0, tempo, frameCount, 0, 0, 0, 0);
 }
@@ -2760,7 +2760,7 @@ void CRedDriver::MusicTempo(int tempo, int frameCount)
  * EN Size: 76b
  * JP Address: TODO
  */
-void CRedDriver::MusicPitch(int pitch, int frameCount)
+inline void CRedDriver::MusicPitch(int pitch, int frameCount)
 {
     _EntryExecCommand(_MusicPitch, 0, pitch, frameCount, 0, 0, 0, 0);
 }
@@ -2773,7 +2773,7 @@ void CRedDriver::MusicPitch(int pitch, int frameCount)
  * EN Size: 76b
  * JP Address: TODO
  */
-void CRedDriver::MusicPause(int musicID, int pause)
+inline void CRedDriver::MusicPause(int musicID, int pause)
 {
     _EntryExecCommand(_MusicPause, musicID, pause, 0, 0, 0, 0, 0);
 }
@@ -3049,7 +3049,7 @@ void CRedDriver::SeStop(int id)
  * EN Size: 72b
  * JP Address: TODO
  */
-void CRedDriver::SeStopG(int group)
+inline void CRedDriver::SeStopG(int group)
 {
     _EntryExecCommand(_SeStopG, group, 0, 0, 0, 0, 0, 0);
 }
@@ -3487,7 +3487,7 @@ void CRedDriver::StreamVolume(int streamID, int volume, int frameCount)
  * EN Size: 80b
  * JP Address: TODO
  */
-void CRedDriver::StreamPan(int streamID, int pan, int frameCount)
+inline void CRedDriver::StreamPan(int streamID, int pan, int frameCount)
 {
     _EntryExecCommand(_StreamPan, streamID, pan, frameCount, 0, 0, 0, 0);
 }

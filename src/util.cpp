@@ -127,27 +127,25 @@ int CUtil::GetNumPolygonFromDL(void* dlData, unsigned long)
         }
 
         if (vertexFormat == 2) {
-            if (count == 0) {
-                continue;
-            }
+            if (count > 0) {
+                int blocks = (u32)count >> 3;
 
-            int blocks = (u32)count >> 3;
+                if (blocks != 0) {
+                    do {
+                        data += 0x50;
+                    } while (--blocks != 0);
 
-            if (blocks != 0) {
-                do {
-                    data += 0x50;
-                } while (--blocks != 0);
-
-                count &= 7;
-                if (count == 0) {
-                    continue;
+                    count &= 7;
+                    if (count == 0) {
+                        continue;
+                    }
                 }
-            }
 
-            do {
-                data += 10;
-            } while (--count != 0);
-        } else if (count != 0) {
+                do {
+                    data += 10;
+                } while (--count != 0);
+            }
+        } else if (count > 0) {
             int blocks = (u32)count >> 3;
 
             if (blocks != 0) {
@@ -857,17 +855,35 @@ void CUtil::RenderColorQuad(float x, float y, float width, float height, _GXColo
 
     float x2 = x + width;
     float y2 = y + height;
+    Vec pos0;
+    Vec pos1;
+    pos0.x = x;
+    pos0.y = y;
+    pos0.z = kUtilZero;
+    pos1.x = x2;
+    pos1.y = y2;
+    pos1.z = kUtilZero;
     u32 colorValue = *reinterpret_cast<u32*>(&color);
+    Vec v0 = pos1;
+    Vec v1 = pos0;
 
     GXBegin(GX_QUADS, GX_VTXFMT7, 4);
-    GXPosition3f32(x, y, kUtilZero);
-    GXColor1u32(colorValue);
-    GXPosition3f32(x2, y, kUtilZero);
-    GXColor1u32(colorValue);
-    GXPosition3f32(x2, y2, kUtilZero);
-    GXColor1u32(colorValue);
-    GXPosition3f32(x, y2, kUtilZero);
-    GXColor1u32(colorValue);
+    GXWGFifo.f32 = v1.x;
+    GXWGFifo.f32 = v1.y;
+    GXWGFifo.f32 = v1.z;
+    GXWGFifo.u32 = colorValue;
+    GXWGFifo.f32 = v0.x;
+    GXWGFifo.f32 = v1.y;
+    GXWGFifo.f32 = v1.z;
+    GXWGFifo.u32 = colorValue;
+    GXWGFifo.f32 = v0.x;
+    GXWGFifo.f32 = v0.y;
+    GXWGFifo.f32 = v1.z;
+    GXWGFifo.u32 = colorValue;
+    GXWGFifo.f32 = v1.x;
+    GXWGFifo.f32 = v0.y;
+    GXWGFifo.f32 = v1.z;
+    GXWGFifo.u32 = colorValue;
 
     PSMTXCopy(GetCameraMatrix(), cameraMtx);
     PSMTX44Copy(GetScreenMatrix(), screenMtx);
@@ -936,19 +952,38 @@ void CUtil::ClearZBufferRect(float x, float y, float width, float height)
 
     float x2 = x + width;
     float y2 = y + height;
+    Vec pos0;
+    Vec pos1;
+    pos0.x = x;
+    pos0.y = y;
+    pos0.z = kUtilQuadDepth;
+    pos1.x = x2;
+    pos1.y = y2;
+    pos1.z = kUtilQuadDepth;
 
     GXSetColorUpdate(GX_FALSE);
     GXSetAlphaUpdate(GX_FALSE);
 
+    Vec v0 = pos1;
+    Vec v1 = pos0;
+
     GXBegin(GX_QUADS, GX_VTXFMT7, 4);
-    GXPosition3f32(x, y, kUtilQuadDepth);
-    GXColor1u32(*reinterpret_cast<u32*>(&white));
-    GXPosition3f32(x2, y, kUtilQuadDepth);
-    GXColor1u32(*reinterpret_cast<u32*>(&white));
-    GXPosition3f32(x2, y2, kUtilQuadDepth);
-    GXColor1u32(*reinterpret_cast<u32*>(&white));
-    GXPosition3f32(x, y2, kUtilQuadDepth);
-    GXColor1u32(*reinterpret_cast<u32*>(&white));
+    GXWGFifo.f32 = v1.x;
+    GXWGFifo.f32 = v1.y;
+    GXWGFifo.f32 = v1.z;
+    GXWGFifo.u32 = *reinterpret_cast<u32*>(&white);
+    GXWGFifo.f32 = v0.x;
+    GXWGFifo.f32 = v1.y;
+    GXWGFifo.f32 = v1.z;
+    GXWGFifo.u32 = *reinterpret_cast<u32*>(&white);
+    GXWGFifo.f32 = v0.x;
+    GXWGFifo.f32 = v0.y;
+    GXWGFifo.f32 = v1.z;
+    GXWGFifo.u32 = *reinterpret_cast<u32*>(&white);
+    GXWGFifo.f32 = v1.x;
+    GXWGFifo.f32 = v0.y;
+    GXWGFifo.f32 = v1.z;
+    GXWGFifo.u32 = *reinterpret_cast<u32*>(&white);
 
     PSMTXCopy(GetCameraMatrix(), cameraMtx);
     PSMTX44Copy(GetScreenMatrix(), screenMtx);

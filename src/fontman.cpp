@@ -141,7 +141,7 @@ float CFont::GetWidth(char* text)
 			if (static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(glyph + 1)) != ((ch >> 8) & 0xFF)) {
 				glyph += 4;
 			} else {
-				goto use_glyph;
+				goto found_glyph;
 			}
 		}
 		glyph = 0;
@@ -188,7 +188,7 @@ find_fallback:
 use_fallback_glyph:
 		glyph = fallbackGlyph;
 		if (glyph != 0) {
-			goto found_glyph;
+			goto use_glyph;
 		}
 		charWidth = FLOAT_803306B8;
 

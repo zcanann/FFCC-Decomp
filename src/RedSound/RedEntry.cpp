@@ -672,9 +672,13 @@ int CRedEntry::SetWaveData(int waveBankNo, void* waveData, int waveDataSize)
 	int existingWaveBankIndex;
 	int waveAramAddress;
 	int remainingWaveSize;
+	int waveHeaderCopySize;
+	int waveTransferSize;
 	u8* waveBodyData;
+	RedWaveHeadWD* waveHead;
 
 	waveNo = 0;
+	waveHead = (RedWaveHeadWD*)waveData;
 	if (waveDataSize == 0) {
 		if ((m_waveLoadNo >= 0) && ((waveNo = SearchWaveSequence(m_waveLoadNo)) >= 0)) {
 			WaveDelete(RedEntryWaveBankGet(this, waveNo));
@@ -686,7 +690,7 @@ int CRedEntry::SetWaveData(int waveBankNo, void* waveData, int waveDataSize)
 
 	waveAramAddress = 0;
 	if (m_waveLoadNo < 0) {
-		waveNo = ((RedWaveHeadWD*)waveData)->m_waveNo;
+		waveNo = waveHead->m_waveNo;
 
 		if ((waveBankNo >= 0) && (waveNo != RedEntryWaveBankGet(this, waveBankNo)->m_id)) {
 			WaveDelete(RedEntryWaveBankGet(this, waveBankNo));
@@ -708,18 +712,18 @@ int CRedEntry::SetWaveData(int waveBankNo, void* waveData, int waveDataSize)
 
 			WaveHistoryChoice(RedEntryWaveBankGet(this, existingWaveBankIndex));
 		} else {
-			m_waveLoadNo = ((RedWaveHeadWD*)waveData)->m_waveNo;
-			waveAramAddress = WaveHeadAdd(waveBankNo, (RedWaveHeadWD*)waveData, waveNo);
+			m_waveLoadNo = waveHead->m_waveNo;
+			waveAramAddress = WaveHeadAdd(waveBankNo, waveHead, waveNo);
 			if (waveAramAddress < 0) {
 				m_waveLoadSize = 0;
 				m_waveLoadNo = REDSOUND_WAVE_NO_NONE;
 				return REDSOUND_WAVE_NO_NONE;
 			}
 
-			int waveHeaderCopySize = RedWaveHeadGetToneSize((RedWaveHeadWD*)waveData);
+			waveHeaderCopySize = RedWaveHeadGetToneSize(waveHead);
 			waveHeaderCopySize +=
-			    RedWaveHeadGetTableSize((RedWaveHeadWD*)waveData) + REDSOUND_WAVE_HEADER_COPY_BASE_SIZE;
-			remainingWaveSize = ((RedWaveHeadWD*)waveData)->m_waveSize;
+			    RedWaveHeadGetTableSize(waveHead) + REDSOUND_WAVE_HEADER_COPY_BASE_SIZE;
+			remainingWaveSize = waveHead->m_waveSize;
 			waveDataSize -= waveHeaderCopySize;
 			waveBodyData = (u8*)waveData + waveHeaderCopySize;
 		}
@@ -730,7 +734,6 @@ int CRedEntry::SetWaveData(int waveBankNo, void* waveData, int waveDataSize)
 	}
 
 	if ((waveAramAddress != 0) && (waveDataSize > 0)) {
-		int waveTransferSize;
 		if (remainingWaveSize > waveDataSize) {
 			waveTransferSize = waveDataSize;
 		} else {

@@ -110,7 +110,7 @@ extern "C" void _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTe
     int, int, int, int, int);
 extern "C" const double DOUBLE_8032FCC0 = 1.0;
 extern "C" const float FLOAT_8032FCC8 = 1.0f;
-extern "C" const float FLOAT_8032FCD8 = 0.0f;
+extern "C" const float FLOAT_8032FCD8;
 extern "C" float FLOAT_8032FCDC;
 
 static inline void WriteU8(void* base, unsigned int offset, unsigned char value) {

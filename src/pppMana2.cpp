@@ -1022,12 +1022,17 @@ void CalcReflectionVector2(
             outVec = &reflectionVec[posIndex];
             C_VECReflect(&cameraVector, &objSpaceNormal, outVec);
 
-            maxAxis = fabsf(outVec->x);
-            if (maxAxis < fabsf(outVec->y)) {
+            float absY = fabsf(outVec->y);
+            float absX = fabsf(outVec->x);
+            float absZ = fabsf(outVec->z);
+
+            axis = absX < absY;
+            maxAxis = absX;
+            if (axis != 0) {
                 axis = 1;
-                maxAxis = fabsf(outVec->y);
+                maxAxis = absY;
             }
-            if (maxAxis < fabsf(outVec->z)) {
+            if (maxAxis < absZ) {
                 axis = 2;
             }
             CVector reflected(outVec->x, outVec->y, outVec->z);

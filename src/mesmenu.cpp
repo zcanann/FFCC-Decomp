@@ -206,7 +206,10 @@ void CMesMenu::Open(char* script, int x, int y, int flags, int unk1, int unk2, i
         fVar1 = FLOAT_803308dc;
         *(float*)((char*)this + 0x3D9C) = fVar1;
         *(float*)((char*)this + 0x3DA0) = fVar1;
-        *(unsigned int*)((char*)this + 0x3D50) = (unsigned int)(-(flags >> 1 & 1) & 0x1C);
+        int flagMask = -(flags >> 1 & 1);
+        int displayOffset = 0x1C;
+        displayOffset &= flagMask;
+        *(unsigned int*)((char*)this + 0x3D50) = (unsigned int)displayOffset;
         *(unsigned int*)((char*)this + 0x3D54) = uVar2;
     } else {
         SetFade__9CRingMenuFi(*(void**)((char*)&MenuPcs + 0x13C + *(int*)((char*)this + 0x18) * 4), 0);
@@ -224,9 +227,9 @@ void CMesMenu::Open(char* script, int x, int y, int flags, int unk1, int unk2, i
     *(float*)((char*)this + 0x3D7C) = FLOAT_803308e8 * *(float*)((char*)this + 0x3D9C) + *(float*)((char*)this + 0x3CC0);
     *(float*)((char*)this + 0x3D80) = fVar1 * *(float*)((char*)this + 0x3DA0) + *(float*)((char*)this + 0x3CC4);
 
-    fVar1 = FLOAT_803308ec;
     if (*(int*)((char*)this + 0x18) >= 4) {
         if ((flags & 8) != 0) {
+            fVar1 = FLOAT_803308ec;
             *(float*)((char*)this + 0x3D6C) = -(FLOAT_803308ec * *(float*)((char*)this + 0x3D7C) - *(float*)((char*)this + 0x3D6C));
             *(float*)((char*)this + 0x3D70) = -(fVar1 * *(float*)((char*)this + 0x3D80) - *(float*)((char*)this + 0x3D70));
         } else if ((flags & 0x8000) != 0) {

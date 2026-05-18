@@ -455,8 +455,8 @@ u8 FunnyShapePcs[sizeof(CFunnyShapePcs)];
  */
 CFunnyShapePcs::~CFunnyShapePcs()
 {
-    reinterpret_cast<CPtrArray<_GXTexObj*>*>(reinterpret_cast<u8*>(this) + 0x61D8)->~CPtrArray<_GXTexObj*>();
-    reinterpret_cast<CPtrArray<OSFS_TEXTURE_ST*>*>(reinterpret_cast<u8*>(this) + 0x61BC)->~CPtrArray<OSFS_TEXTURE_ST*>();
+    reinterpret_cast<CPtrArray<_GXTexObj*>*>(reinterpret_cast<u8*>(this) + 0x61D8)->CPtrArray<_GXTexObj*>::~CPtrArray();
+    reinterpret_cast<CPtrArray<OSFS_TEXTURE_ST*>*>(reinterpret_cast<u8*>(this) + 0x61BC)->CPtrArray<OSFS_TEXTURE_ST*>::~CPtrArray();
     __dt__11CFunnyShapeFv(reinterpret_cast<CFunnyShape*>(reinterpret_cast<u8*>(this) + 0x50), -1);
     __dt__14CUSBStreamDataFv(reinterpret_cast<CUSBStreamData*>(reinterpret_cast<u8*>(this) + 0x3C), -1);
 }

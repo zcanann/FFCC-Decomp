@@ -1093,27 +1093,29 @@ void CMesMenu::onCalc()
                     Next__4CMesFv((char*)this + 0x1C);
                 } else {
                     int wait5 = GetWait__4CMesFv((char*)this + 0x1C);
-                    *(int*)((char*)this + 0x3DA4) = 0;
-                    if ((wait5 != 4) && (*(int*)((char*)this + 0x0C) < 2)) {
-                        if ((*(unsigned int*)((char*)this + 0x3D8C) & 0x40) == 0) {
-                            *(int*)((char*)this + 0x0C) = 2;
-                            *(int*)((char*)this + 0x10) = 0;
-                            *(int*)((char*)this + 0x14) = 4;
-                            if (((*(unsigned int*)((char*)this + 0x3D8C) & 1) == 0) &&
-                                ((*(unsigned int*)((char*)this + 0x3D8C) & 0x4000) == 0)) {
-                                Sound.PlaySe(6, 0x40, 0x7F, 0);
-                            }
-                        } else {
-                            int stack[2];
-                            Set__4CMesFPci((char*)this + 0x1C, 0, 0);
-                            stack[0] = *(int*)((char*)this + 0x18);
-                            stack[1] = *(int*)((char*)this + 0x3DA4);
-                            SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-                                CFlat, 0, 1, 3, 2, stack, 0);
-                            *(int*)((char*)this + 0x0C) = 4;
-                            *(int*)((char*)this + 0x08) = 0;
-                            if (*(int*)((char*)this + 0x18) < 4) {
-                                SetFade__9CRingMenuFi(*(void**)((char*)&MenuPcs + 0x13C + *(int*)((char*)this + 0x18) * 4), 1);
+                    if (wait5 != 4) {
+                        *(int*)((char*)this + 0x3DA4) = 0;
+                        if (*(int*)((char*)this + 0x0C) < 2) {
+                            if ((*(unsigned int*)((char*)this + 0x3D8C) & 0x40) == 0) {
+                                *(int*)((char*)this + 0x0C) = 2;
+                                *(int*)((char*)this + 0x10) = 0;
+                                *(int*)((char*)this + 0x14) = 4;
+                                if (((*(unsigned int*)((char*)this + 0x3D8C) & 1) == 0) &&
+                                    ((*(unsigned int*)((char*)this + 0x3D8C) & 0x4000) == 0)) {
+                                    Sound.PlaySe(6, 0x40, 0x7F, 0);
+                                }
+                            } else {
+                                int stack[2];
+                                Set__4CMesFPci((char*)this + 0x1C, 0, 0);
+                                stack[0] = *(int*)((char*)this + 0x18);
+                                stack[1] = *(int*)((char*)this + 0x3DA4);
+                                SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+                                    CFlat, 0, 1, 3, 2, stack, 0);
+                                *(int*)((char*)this + 0x0C) = 4;
+                                *(int*)((char*)this + 0x08) = 0;
+                                if (*(int*)((char*)this + 0x18) < 4) {
+                                    SetFade__9CRingMenuFi(*(void**)((char*)&MenuPcs + 0x13C + *(int*)((char*)this + 0x18) * 4), 1);
+                                }
                             }
                         }
                     }

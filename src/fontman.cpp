@@ -253,7 +253,7 @@ found_fallback:
 
 	unsigned char flags = renderFlags;
 	CFontRenderFlagBits& renderFlagBits = GetRenderFlagBits(renderFlags);
-	signed char sign = static_cast<signed char>(flags) >> 7;
+	signed char sign = static_cast<signed char>(renderFlagBits.shadow);
 	int drawWidth;
 	unsigned char* glyphInfo = reinterpret_cast<unsigned char*>(glyph) +
 	                           ((static_cast<unsigned int>(-static_cast<int>(sign) | static_cast<int>(sign)) >> 30 & 2) + 3);

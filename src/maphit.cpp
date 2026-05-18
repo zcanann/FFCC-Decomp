@@ -163,11 +163,7 @@ void CMapHit::Draw()
 
     face = reinterpret_cast<unsigned char*>(m_faces);
     faceIndex = 0;
-    while (true) {
-        if (static_cast<int>(m_faceCount) <= faceIndex) {
-            return;
-        }
-
+    while (faceIndex < static_cast<int>(m_faceCount)) {
         CMapHitFace* hitFace = reinterpret_cast<CMapHitFace*>(face);
         if ((hitFace->m_drawFlags & 1) == 0) {
             hitFace->m_drawFlags = 0;
@@ -212,9 +208,9 @@ void CMapHit::Draw()
  */
 void CMapHit::CheckHitCylinderNear(CMapCylinder* mapCylinder, Vec* position, unsigned short startFace, unsigned short faceCount, unsigned long mask)
 {
-    int endFace = static_cast<unsigned short>(startFace + faceCount);
     int faceIndex = static_cast<unsigned short>(startFace);
     int faceOffset = faceIndex * 0x50;
+    int endFace = static_cast<unsigned short>(faceCount + startFace);
 
     g_hit_cyl = *mapCylinder;
     g_hit_mvec = *position;
@@ -253,8 +249,8 @@ void CMapHit::CheckHitCylinderNear(CMapCylinder* mapCylinder, Vec* position, uns
 int CMapHit::CheckHitCylinder(CMapCylinder* mapCylinder, Vec* position, unsigned short startFace, unsigned short faceCount, unsigned long mask)
 {
     int faceIndex = static_cast<unsigned short>(startFace);
-    int endFace = static_cast<unsigned short>(startFace + faceCount);
     int faceOffset = faceIndex * 0x50;
+    int endFace = static_cast<unsigned short>(faceCount + startFace);
 
     g_hit_cyl = *mapCylinder;
     g_hit_mvec = *position;
@@ -634,7 +630,8 @@ int CMapHit::ReadOtmHit(CChunkFile& chunkFile)
     chunkFile.PushChunk();
 
     while (chunkFile.GetNextChunk(chunk)) {
-        if (chunk.m_id == 'HITV') {
+        switch (chunk.m_id) {
+        case 'HITV': {
             m_vertexCount = static_cast<unsigned short>(chunk.m_arg0);
             m_vertices =
                 new (*reinterpret_cast<CMemory::CStage**>(&MapMng), const_cast<char*>(s_maphit_cpp_801D7088), 0x143)
@@ -661,7 +658,9 @@ int CMapHit::ReadOtmHit(CChunkFile& chunkFile)
             m_positionMax.x += FLOAT_8032F8CC;
             m_positionMax.y += FLOAT_8032F8CC;
             m_positionMax.z += FLOAT_8032F8CC;
-        } else if (chunk.m_id == 'HITF') {
+            break;
+        }
+        case 'HITF': {
             m_faceCount = static_cast<unsigned short>(chunk.m_arg0);
             m_faces =
                 new (*reinterpret_cast<CMemory::CStage**>(&MapMng), const_cast<char*>(s_maphit_cpp_801D7088), 0x159)
@@ -744,9 +743,13 @@ int CMapHit::ReadOtmHit(CChunkFile& chunkFile)
                 face.m_boundsMax.z += (offsetScale + face.m_radiusScale);
                 face.m_radiusScale = static_cast<float>(radiusBase - face.m_radiusScale);
             }
-        } else if (chunk.m_id == 'NAME') {
+            break;
+        }
+        case 'NAME': {
             char* mapHitName = chunkFile.GetString();
             MapMng.AttachMapHit(this, mapHitName);
+            break;
+        }
         }
     }
 

@@ -981,8 +981,7 @@ void CMenuPcs::createSingleMenu()
         }
 
         char path[128];
-        char* language = GetLangString__5CGameFv(&Game);
-        sprintf(path, s_dvd__smenu_subfont_fnt_801de8f8, language);
+        sprintf(path, s_dvd__smenu_subfont_fnt_801de8f8, GetLangString__5CGameFv(&Game));
         loadFont__8CMenuPcsFiPcii(this, 1, path, 4, -1);
 
         self[0x85A] = 0;

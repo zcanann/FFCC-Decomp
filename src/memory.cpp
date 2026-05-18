@@ -1276,6 +1276,7 @@ int CMemory::CStage::heapWalker(int flag, void*, unsigned long group)
  */
 void CMemory::CStage::drawHeapBar(int y)
 {
+    _GXColor color;
     unsigned int colors[16];
     colors[0] = s_heapBarColors_801D64A8[0];
     colors[1] = s_heapBarColors_801D64A8[1];
@@ -1308,48 +1309,11 @@ void CMemory::CStage::drawHeapBar(int y)
     int heapTop = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 8);
     int heapSpan = (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0xC) - 0x40) - heapTop;
 
-    do {
+    while (true) {
         int curNode = node;
         unsigned char flags = *reinterpret_cast<unsigned char*>(curNode + 2);
         if ((flags & 2) != 0) {
-            unsigned int drawColor = static_cast<unsigned int>(heapBar[0]);
-            unsigned char* colorPtr = heapBar;
-            int segmentStart = 0;
-            int x = 0;
-
-            do {
-                if ((drawColor != *colorPtr) || (x == 0x17B)) {
-                    unsigned int color;
-                    if (drawColor == 0xFF) {
-                        if (stageGetAllocationMode(this) == 0) {
-                            color = 0x4080;
-                        } else {
-                            color = 0x400080;
-                        }
-                    } else if (stageGetAllocationMode(this) == 0) {
-                        color = colors[drawColor];
-                    } else {
-                        color = colors[drawColor];
-                    }
-
-                    GXBegin(static_cast<GXPrimitive>(0x98), GX_VTXFMT0, 4);
-                    GXPosition3f32(static_cast<float>(segmentStart + 0x80), static_cast<float>(y), 0.0f);
-                    GXColor1u32(color);
-                    GXPosition3f32(static_cast<float>(x + 0x80), static_cast<float>(y), 0.0f);
-                    GXColor1u32(color);
-                    GXPosition3f32(static_cast<float>(segmentStart + 0x80), static_cast<float>(y + 8), 0.0f);
-                    GXColor1u32(color);
-                    GXPosition3f32(static_cast<float>(x + 0x80), static_cast<float>(y + 8), 0.0f);
-                    GXColor1u32(color);
-
-                    drawColor = static_cast<unsigned int>(*colorPtr);
-                    segmentStart = x;
-                }
-
-                x++;
-                colorPtr++;
-            } while (x < 0x17C);
-            return;
+            break;
         }
 
         bool isUsed = false;
@@ -1367,15 +1331,14 @@ void CMemory::CStage::drawHeapBar(int y)
                 unsigned int loop = fillCount >> 3;
                 if (loop != 0) {
                     do {
-                        unsigned char color = static_cast<unsigned char>(*reinterpret_cast<unsigned char*>(curNode + 2) >> 4);
-                        dst[0] = color;
-                        dst[1] = color;
-                        dst[2] = color;
-                        dst[3] = color;
-                        dst[4] = color;
-                        dst[5] = color;
-                        dst[6] = color;
-                        dst[7] = color;
+                        dst[0] = static_cast<unsigned char>(*reinterpret_cast<unsigned char*>(curNode + 2) >> 4);
+                        dst[1] = static_cast<unsigned char>(*reinterpret_cast<unsigned char*>(curNode + 2) >> 4);
+                        dst[2] = static_cast<unsigned char>(*reinterpret_cast<unsigned char*>(curNode + 2) >> 4);
+                        dst[3] = static_cast<unsigned char>(*reinterpret_cast<unsigned char*>(curNode + 2) >> 4);
+                        dst[4] = static_cast<unsigned char>(*reinterpret_cast<unsigned char*>(curNode + 2) >> 4);
+                        dst[5] = static_cast<unsigned char>(*reinterpret_cast<unsigned char*>(curNode + 2) >> 4);
+                        dst[6] = static_cast<unsigned char>(*reinterpret_cast<unsigned char*>(curNode + 2) >> 4);
+                        dst[7] = static_cast<unsigned char>(*reinterpret_cast<unsigned char*>(curNode + 2) >> 4);
                         dst += 8;
                         loop--;
                     } while (loop != 0);
@@ -1396,7 +1359,7 @@ void CMemory::CStage::drawHeapBar(int y)
 
 checkHeapNode:
         if (*reinterpret_cast<int*>(curNode + 0x10) != *reinterpret_cast<int*>(curNode + 8) - (curNode + 0x40)) {
-            if (System.m_execParam != 0) {
+            if (0 < static_cast<unsigned int>(System.m_execParam)) {
                 Printf__7CSystemFPce(&System, DAT_801d67d8);
             }
             return;
@@ -1406,12 +1369,49 @@ checkHeapNode:
         node = *reinterpret_cast<int*>(curNode + 8);
         prevNode = curNode;
         if (linkMismatch) {
-            if (System.m_execParam != 0) {
+            if (0 < static_cast<unsigned int>(System.m_execParam)) {
                 Printf__7CSystemFPce(&System, DAT_801d67d8);
             }
             return;
         }
-    } while (true);
+    }
+
+    unsigned int drawColor = static_cast<unsigned int>(heapBar[0]);
+    unsigned char* colorPtr = heapBar;
+    int segmentStart = 0;
+    int x = 0;
+
+    do {
+        if ((drawColor != *colorPtr) || (x == 0x17B)) {
+            if (drawColor == 0xFF) {
+                if (stageGetAllocationMode(this) == 0) {
+                    *reinterpret_cast<u32*>(&color) = 0x4080;
+                } else {
+                    *reinterpret_cast<u32*>(&color) = 0x400080;
+                }
+            } else if (stageGetAllocationMode(this) == 0) {
+                *reinterpret_cast<u32*>(&color) = colors[drawColor];
+            } else {
+                *reinterpret_cast<u32*>(&color) = colors[drawColor];
+            }
+
+            GXBegin(static_cast<GXPrimitive>(0x98), GX_VTXFMT0, 4);
+            GXPosition3f32(static_cast<float>(segmentStart + 0x80), static_cast<float>(y), 0.0f);
+            GXColor1u32(*reinterpret_cast<u32*>(&color));
+            GXPosition3f32(static_cast<float>(x + 0x80), static_cast<float>(y), 0.0f);
+            GXColor1u32(*reinterpret_cast<u32*>(&color));
+            GXPosition3f32(static_cast<float>(segmentStart + 0x80), static_cast<float>(y + 8), 0.0f);
+            GXColor1u32(*reinterpret_cast<u32*>(&color));
+            GXPosition3f32(static_cast<float>(x + 0x80), static_cast<float>(y + 8), 0.0f);
+            GXColor1u32(*reinterpret_cast<u32*>(&color));
+
+            drawColor = static_cast<unsigned int>(*colorPtr);
+            segmentStart = x;
+        }
+
+        x++;
+        colorPtr++;
+    } while (x < 0x17C);
 }
 
 /*

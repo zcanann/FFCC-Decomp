@@ -975,7 +975,7 @@ int CCaravanWork::DeleteItem(int itemIndex, int updateJoybus)
     int i;
 
     for (i = 0; i < 0x40; i++) {
-        if ((short)m_inventoryItems[i] != -1 && (short)m_inventoryItems[i] == itemIndex) {
+        if (m_inventoryItems[i] != -1 && m_inventoryItems[i] == itemIndex) {
             m_inventoryItems[i] = 0xFFFF;
             m_inventoryItemCount = m_inventoryItemCount - 1;
             if (updateJoybus != 0) {

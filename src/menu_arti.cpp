@@ -9,8 +9,8 @@
 typedef signed short s16;
 typedef unsigned char u8;
 
-static const double DOUBLE_80332fb0 = 1.0;
-static const double DOUBLE_80332fb8 = 0.5;
+extern const double DOUBLE_80332fb0;
+extern const double DOUBLE_80332fb8;
 extern const double DOUBLE_80332fe0;
 static const float FLOAT_80332fa8 = 0.0f;
 static const float FLOAT_80332fac = 1.0f;
@@ -21,8 +21,8 @@ extern const float FLOAT_80332fcc;
 extern const float FLOAT_80332fd0;
 extern const float FLOAT_80332fd4;
 extern const float FLOAT_80332fd8;
-static const float FLOAT_80332fe8 = 128.0f;
-static const float FLOAT_80332fec = 8.0f;
+extern const float FLOAT_80332fe8;
+extern const float FLOAT_80332fec;
 static const float FLOAT_80332ff0 = 0.75f;
 
 extern "C" {

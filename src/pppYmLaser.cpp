@@ -63,6 +63,7 @@ void pppDrawShp__FPlsP12CMaterialSetUc(long*, short, CMaterialSet*, u8);
 }
 
 extern "C" const char s_pppYmLaser_cpp_801DB4B0[] = "pppYmLaser.cpp";
+extern const f32 FLOAT_80330de0 = -1.0f;
 
 static inline f32 LoadLaserFloat(const f32& value)
 {
@@ -377,7 +378,6 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 	}
 }
 
-extern const f32 FLOAT_80330de0 = -1.0f;
 extern const f32 FLOAT_80330de4 = 1.2f;
 extern const f32 FLOAT_80330de8 = 10000000000.0f;
 extern const f32 FLOAT_80330dec = -10000000000.0f;

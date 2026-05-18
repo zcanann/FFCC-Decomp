@@ -534,7 +534,7 @@ void CMenuPcs::EquipDraw()
 			int iconY = (int)((float)(item[1] + 6) - FLOAT_80332ee0);
 			int iconX = item[0] + item[2] - 0x10;
 			int itemIdx = *(s16*)(caravanWork + *(s16*)(caravanWork + 0xac + i * 2) * 2 + 0xb6);
-			DrawSingleIcon__8CMenuPcsFiiifif((double)*(float*)(item + 8), this, itemIdx, iconX, iconY, 0.0f);
+			DrawSingleIcon__8CMenuPcsFiiifif((double)*(float*)(item + 8), this, itemIdx, iconX, iconY, FLOAT_80332ee0);
 		}
 		item += 0x20;
 	}
@@ -711,7 +711,7 @@ void CMenuPcs::EquipDraw()
 				int iconY = (int)((float)(iconItem[1] + 6) - FLOAT_80332ee0);
 				int iconX = (int)(float)(iconItem[0] + iconItem[2] - 0x10);
 				int itemIdx = *(s16*)(caravanWork + letter[idx] * 2 + 0xb6);
-				DrawSingleIcon__8CMenuPcsFiiifif((double)*(float*)(listStart + 8), this, itemIdx, iconX, iconY, 0.0f);
+				DrawSingleIcon__8CMenuPcsFiiifif((double)*(float*)(listStart + 8), this, itemIdx, iconX, iconY, FLOAT_80332ee0);
 			}
 			iconItem += 0x20;
 		}

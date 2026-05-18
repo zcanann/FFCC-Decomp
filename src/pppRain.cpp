@@ -20,7 +20,6 @@ int rand(void);
 void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(void*, void*, float, u8, u8, u8, u8, u8, u8, u8);
 
-void SetVtxFmt_POS_CLR_TEX__5CUtilFv(void*);
 void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
 void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 }
@@ -75,7 +74,7 @@ void pppRenderRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_D
     _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0xFF, 4);
     _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 4);
     GXSetLineWidth(param_2->m_lineWidth, GX_TO_ZERO);
-    SetVtxFmt_POS_CLR_TEX__5CUtilFv(&gUtil);
+    gUtil.SetVtxFmt_POS_CLR_TEX();
 
     drop = *(RainDrop**)((u8*)pppRain + workOffset);
     baseX = pppMngStPtr->m_matrix.value[0][3];

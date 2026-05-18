@@ -97,14 +97,6 @@ void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 int GetTextureFromRSD__FiP9_pppEnvSt(int, _pppEnvSt*);
 void InitTexObj__8CTextureFv(void*);
 void genParaboloidMap__FPvPUlUs9_GXVtxFmt(void*, unsigned long*, unsigned short, GXVtxFmt);
-void BeginQuadEnv__5CUtilFv(void*);
-void EndQuadEnv__5CUtilFv(void*);
-void SetVtxFmt_POS_CLR_TEX__5CUtilFv(void*);
-void ReWriteDisplayList__5CUtilFPvUlUl(void*, void*, unsigned long, unsigned long);
-void RenderTextureQuad__5CUtilFffffP9_GXTexObjP5Vec2dP5Vec2dP8_GXColor14_GXBlendFactor14_GXBlendFactor(
-    CUtil* util, float x0, float y0, float x1, float y1, _GXTexObj* texObj, Vec2d* uv0, Vec2d* uv1, _GXColor* color,
-    _GXBlendFactor srcFactor, _GXBlendFactor dstFactor);
-void RenderQuad__5CUtilF3Vec3Vec8_GXColorP5Vec2dP5Vec2d(void*, Vec*, Vec*, GXColor, Vec2d*, Vec2d*);
 }
 
 static int CreateWaterMesh(Vec* param_1, Vec* param_2, Vec2d* param_3, unsigned short* param_4, float param_5);
@@ -641,7 +633,7 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* para
                     work[0x3A] = dlInfo[0];
                     memcpy((void*)*(u32*)(work[0x18] + dlOffset), (void*)dlInfo[1], dlInfo[0]);
                     DCFlushRange((void*)*(u32*)(work[0x18] + dlOffset), dlInfo[0]);
-                    ReWriteDisplayList__5CUtilFPvUlUl(&gUtil, (void*)*(u32*)(work[0x18] + dlOffset), dlInfo[0], 1);
+                    gUtil.ReWriteDisplayList((void*)*(u32*)(work[0x18] + dlOffset), dlInfo[0], 1);
                     dlOffset -= 4;
                     dlInfo += 3;
                 }
@@ -837,10 +829,9 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
             C_MTXLookAt(lookAtMtx, (Point3d*)&centerPos, &cameraUp, (Point3d*)&cameraPos);
             Graphic.SetViewport();
             GXSetScissor(0, 0, 0x280, 0x1C0);
-            RenderTextureQuad__5CUtilFffffP9_GXTexObjP5Vec2dP5Vec2dP8_GXColor14_GXBlendFactor14_GXBlendFactor(
-                &gUtil, LoadFloat(FLOAT_80331898), LoadFloat(FLOAT_80331898), LoadFloat(FLOAT_803318c8),
-                LoadFloat(FLOAT_803318c8),
-                (GXTexObj*)baseParaboloidTexObjs, 0, 0, 0, (_GXBlendFactor)4, (_GXBlendFactor)5);
+            gUtil.RenderTextureQuad(LoadFloat(FLOAT_80331898), LoadFloat(FLOAT_80331898), LoadFloat(FLOAT_803318c8),
+                                    LoadFloat(FLOAT_803318c8), (GXTexObj*)baseParaboloidTexObjs, 0, 0, 0,
+                                    (_GXBlendFactor)4, (_GXBlendFactor)5);
             baseParaboloidTexObjs += 0x20;
         }
 
@@ -849,10 +840,10 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
         GXSetScissor(0, 0, 0x280, 0x1C0);
         GXSetZTexture((GXZTexOp)2, (_GXTexFmt)0x16, 0);
         GXSetColorUpdate(GX_FALSE);
-        BeginQuadEnv__5CUtilFv(&gUtil);
+        gUtil.BeginQuadEnv();
         GXSetZMode(GX_TRUE, (_GXCompare)7, GX_TRUE);
         GXSetZCompLoc(GX_FALSE);
-        SetVtxFmt_POS_CLR_TEX__5CUtilFv(&gUtil);
+        gUtil.SetVtxFmt_POS_CLR_TEX();
         _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 4);
         _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 0xFF);
         _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(
@@ -874,16 +865,15 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
         quadColor.g = 0xFF;
         quadColor.b = 0xFF;
         quadColor.a = 0;
-        RenderQuad__5CUtilF3Vec3Vec8_GXColorP5Vec2dP5Vec2d(&gUtil, &quadMin, &quadMax, quadColor, 0, 0);
-        EndQuadEnv__5CUtilFv(&gUtil);
+        gUtil.RenderQuad(quadMin, quadMax, quadColor, 0, 0);
+        gUtil.EndQuadEnv();
         GXSetZTexture((GXZTexOp)0, (_GXTexFmt)0x11, 0);
         GXSetColorUpdate(GX_TRUE);
         GXSetAlphaUpdate(GX_TRUE);
         GXSetZCompLoc(GX_TRUE);
-        RenderTextureQuad__5CUtilFffffP9_GXTexObjP5Vec2dP5Vec2dP8_GXColor14_GXBlendFactor14_GXBlendFactor(
-            &gUtil, LoadFloat(FLOAT_80331898), LoadFloat(FLOAT_80331898), LoadFloat(FLOAT_803318c8),
-            LoadFloat(FLOAT_803318c8), &sceneTexObj, 0, 0, 0,
-            (_GXBlendFactor)4, (_GXBlendFactor)5);
+        gUtil.RenderTextureQuad(LoadFloat(FLOAT_80331898), LoadFloat(FLOAT_80331898), LoadFloat(FLOAT_803318c8),
+                                LoadFloat(FLOAT_803318c8), &sceneTexObj, 0, 0, 0, (_GXBlendFactor)4,
+                                (_GXBlendFactor)5);
         *((u8*)work + 0xEC) = 1;
     }
 

@@ -11,6 +11,7 @@
 #include "ffcc/p_light.h"
 #include "ffcc/p_usb.h"
 #include "ffcc/ptrarray.h"
+#include "ffcc/ref.h"
 #include "ffcc/stopwatch.h"
 #include "ffcc/system.h"
 #include "ffcc/texanim.h"
@@ -145,18 +146,13 @@ static inline CharaViewerModel* ViewerModel(CChara::CModel* model)
     return reinterpret_cast<CharaViewerModel*>(model);
 }
 
-static inline void destroyRef(int* ref)
-{
-    (*reinterpret_cast<void (***)(void*, int)>(ref))[2](ref, 1);
-}
-
 template <class T>
 static inline void ReleaseShared(T*& ptr)
 {
     if (ptr != 0) {
-        int* ref = reinterpret_cast<int*>(ptr);
-        if ((--ref[1] == 0) && (ref != 0)) {
-            destroyRef(ref);
+        CRef* ref = reinterpret_cast<CRef*>(ptr);
+        if (--reinterpret_cast<int*>(ref)[1] == 0) {
+            delete ref;
         }
         ptr = 0;
     }

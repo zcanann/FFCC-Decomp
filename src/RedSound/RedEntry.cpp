@@ -672,13 +672,9 @@ int CRedEntry::SetWaveData(int waveBankNo, void* waveData, int waveDataSize)
 	int existingWaveBankIndex;
 	int waveAramAddress;
 	int remainingWaveSize;
-	int waveHeaderCopySize;
-	int waveTransferSize;
 	u8* waveBodyData;
-	RedWaveHeadWD* waveHead;
 
 	waveNo = 0;
-	waveHead = (RedWaveHeadWD*)waveData;
 	if (waveDataSize == 0) {
 		if ((m_waveLoadNo >= 0) && ((waveNo = SearchWaveSequence(m_waveLoadNo)) >= 0)) {
 			WaveDelete(RedEntryWaveBankGet(this, waveNo));
@@ -690,6 +686,7 @@ int CRedEntry::SetWaveData(int waveBankNo, void* waveData, int waveDataSize)
 
 	waveAramAddress = 0;
 	if (m_waveLoadNo < 0) {
+		RedWaveHeadWD* waveHead = (RedWaveHeadWD*)waveData;
 		waveNo = waveHead->m_waveNo;
 
 		if ((waveBankNo >= 0) && (waveNo != RedEntryWaveBankGet(this, waveBankNo)->m_id)) {
@@ -720,7 +717,7 @@ int CRedEntry::SetWaveData(int waveBankNo, void* waveData, int waveDataSize)
 				return REDSOUND_WAVE_NO_NONE;
 			}
 
-			waveHeaderCopySize = RedWaveHeadGetToneSize(waveHead);
+			int waveHeaderCopySize = RedWaveHeadGetToneSize(waveHead);
 			waveHeaderCopySize +=
 			    RedWaveHeadGetTableSize(waveHead) + REDSOUND_WAVE_HEADER_COPY_BASE_SIZE;
 			remainingWaveSize = waveHead->m_waveSize;
@@ -734,6 +731,7 @@ int CRedEntry::SetWaveData(int waveBankNo, void* waveData, int waveDataSize)
 	}
 
 	if ((waveAramAddress != 0) && (waveDataSize > 0)) {
+		int waveTransferSize;
 		if (remainingWaveSize > waveDataSize) {
 			waveTransferSize = waveDataSize;
 		} else {

@@ -123,32 +123,13 @@ void CWind::ChangePower(int id, float power)
     WindObject* obj;
     WindObject* scan = m_objects;
 
-    for (int blocks = 8; blocks != 0; blocks--) {
+    for (int i = 0; i < 32; i++, scan++) {
         if (GetWindActiveFlag(scan) != 0) {
             if (id == scan->id) {
                 obj = scan;
                 goto found;
             }
         }
-        if (GetWindActiveFlag(++scan) != 0) {
-            if (id == scan->id) {
-                obj = scan;
-                goto found;
-            }
-        }
-        if (GetWindActiveFlag(++scan) != 0) {
-            if (id == scan->id) {
-                obj = scan;
-                goto found;
-            }
-        }
-        if (GetWindActiveFlag(++scan) != 0) {
-            if (id == scan->id) {
-                obj = scan;
-                goto found;
-            }
-        }
-        scan++;
     }
 
     obj = 0;

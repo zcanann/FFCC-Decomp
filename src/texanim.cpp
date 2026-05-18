@@ -638,11 +638,9 @@ CTexAnimSet::~CTexAnimSet()
  */
 void CTexAnimSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
 {
-    unsigned int outerChunkData[4];
-    unsigned int middleChunkData[4];
-    unsigned int middleChunkArg0 = 0;
-    unsigned int innerChunkData[4];
-    unsigned int& innerChunkSize = innerChunkData[3];
+    CChunkFile::CChunk outerChunk;
+    CChunkFile::CChunk middleChunk;
+    CChunkFile::CChunk innerChunk;
     CTexAnimSetStorage* self = reinterpret_cast<CTexAnimSetStorage*>(this);
     int tanmTag = 0x54414E4D;
     int seqTag = 0x53455120;
@@ -652,8 +650,8 @@ void CTexAnimSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
 
     self->texAnims.SetStage(stage);
     chunkFile.PushChunk();
-    while ((int)chunkFile.GetNextChunk(*reinterpret_cast<CChunkFile::CChunk*>(outerChunkData)) != 0) {
-        if ((int)outerChunkData[0] != tanmTag) {
+    while ((int)chunkFile.GetNextChunk(outerChunk) != 0) {
+        if ((int)outerChunk.m_id != tanmTag) {
             continue;
         }
 
@@ -692,11 +690,10 @@ void CTexAnimSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
         refData->texAnimSeqs.SetStage(stage);
 
         chunkFile.PushChunk();
-        while ((int)chunkFile.GetNextChunk(*reinterpret_cast<CChunkFile::CChunk*>(middleChunkData)) != 0) {
-            if ((int)middleChunkData[0] != seqTag) {
-                if (((int)middleChunkData[0] < seqTag) && ((int)middleChunkData[0] == nameTag)) {
-                    middleChunkArg0 = middleChunkData[1];
-                    refData->texSrtIndex = middleChunkArg0;
+        while ((int)chunkFile.GetNextChunk(middleChunk) != 0) {
+            if ((int)middleChunk.m_id != seqTag) {
+                if (((int)middleChunk.m_id < seqTag) && ((int)middleChunk.m_id == nameTag)) {
+                    refData->texSrtIndex = middleChunk.m_arg0;
                     strcpy(refData->name, chunkFile.GetString());
                 }
                 continue;
@@ -712,9 +709,9 @@ void CTexAnimSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
             }
             chunkFile.PushChunk();
             char* seqName = seq->name;
-            while ((int)chunkFile.GetNextChunk(*reinterpret_cast<CChunkFile::CChunk*>(innerChunkData)) != 0) {
-                if ((int)innerChunkData[0] != keyTag) {
-                    if ((int)innerChunkData[0] == infoTag) {
+            while ((int)chunkFile.GetNextChunk(innerChunk) != 0) {
+                if ((int)innerChunk.m_id != keyTag) {
+                    if ((int)innerChunk.m_id == infoTag) {
                         seq->totalFrames = chunkFile.Get4();
                         chunkFile.Get4();
                         char b7 = (char)chunkFile.Get4();
@@ -723,15 +720,15 @@ void CTexAnimSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
                         seq->flags = (unsigned char)((((int)b6 << 6) & 0x40) | (seq->flags & 0xBF));
                         unsigned int eq = (unsigned int)__cntlzw((unsigned int)strcmp(seqName, DAT_8032fb48));
                         seq->flags = (unsigned char)(((unsigned char)((int)(char)(eq >> 5) << 5) & 0x20) | (seq->flags & 0xDF));
-                    } else if (((int)innerChunkData[0] >= keyTag) && ((int)innerChunkData[0] == nameTag)) {
+                    } else if (((int)innerChunk.m_id >= keyTag) && ((int)innerChunk.m_id == nameTag)) {
                         strcpy(seqName, chunkFile.GetString());
                     }
                 } else {
-                    seq->keyCount = innerChunkSize / 0x30;
+                    seq->keyCount = innerChunk.m_size / 0x30;
                     int keys = (int)_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
-                        &Memory, innerChunkSize, stage, const_cast<char*>(s_texanim_cpp_801d7adc), 0x1D4, 0);
+                        &Memory, innerChunk.m_size, stage, const_cast<char*>(s_texanim_cpp_801d7adc), 0x1D4, 0);
                     seq->keys = reinterpret_cast<unsigned int*>(keys);
-                    memcpy(seq->keys, chunkFile.GetAddress(), innerChunkSize);
+                    memcpy(seq->keys, chunkFile.GetAddress(), innerChunk.m_size);
                 }
             }
             chunkFile.PopChunk();

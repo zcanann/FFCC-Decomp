@@ -11,7 +11,6 @@
 #include <dolphin/ai.h>
 #include <dolphin/os.h>
 #include <dolphin/os/OSCache.h>
-#include <stddef.h>
 #include <string.h>
 
 struct THPSimpleControl {
@@ -46,7 +45,6 @@ struct THPSimpleControl {
     s32 audioDecodeIndex;          // 0x168
     s32 audioPlayIndex;            // 0x16C
     s32 unk170;                    // 0x170
-    u8 pad174[0x18];               // 0x174
 };
 
 THPSimpleControl SimpleControl;
@@ -1011,7 +1009,7 @@ s32 THPSimpleInit(s32 audioMixMode)
     u32 interruptState;
 
     File.CheckQueue();
-    memset(&SimpleControl, 0, offsetof(THPSimpleControl, pad174));
+    memset(&SimpleControl, 0, sizeof(THPSimpleControl));
     LCEnable();
 
     if (THPInit() == FALSE) {

@@ -1185,46 +1185,44 @@ void CMesMenu::Destroy()
  */
 void CMesMenu::Create()
 {
-    typedef void (*VFunc)(void*);
-
-    (*reinterpret_cast<VFunc**>(this))[4](this);
+    Destroy();
     Create__5CMenuFv(this);
 
     float defaultValue = FLOAT_803308d8;
-    *(float*)((char*)this + 0x3D78) = defaultValue;
-    *(float*)((char*)this + 0x3D74) = defaultValue;
-    *(int*)((char*)this + 8) = 0;
-    *(int*)((char*)this + 0xC) = 4;
-    *(int*)((char*)this + 0x3DF4) = 0;
-    *(int*)((char*)this + 0x3DF8) = 0;
+    m_offsetY = defaultValue;
+    m_offsetX = defaultValue;
+    m_active = 0;
+    m_state = 4;
+    m_stageFadeTimer = 0;
+    m_stageFadeOut = 0;
 
-    if (*(int*)((char*)this + 0x18) < 4) {
+    if (m_menuIndex < 4) {
         int x = 0x10;
-        if ((*(int*)((char*)this + 0x18) & 1) != 0) {
+        if ((m_menuIndex & 1) != 0) {
             x = 0x270;
         }
-        *(float*)((char*)this + 0x3D6C) = (float)x;
+        m_baseX = (float)x;
 
         int y = 0x18;
-        if ((*(int*)((char*)this + 0x18) & 2) != 0) {
+        if ((m_menuIndex & 2) != 0) {
             y = 0x1B0;
         }
         defaultValue = FLOAT_803308d8;
-        *(float*)((char*)this + 0x3D70) = (float)y;
-        *(float*)((char*)this + 0x3D7C) = defaultValue;
-        *(float*)((char*)this + 0x3D80) = defaultValue;
-        *(float*)((char*)this + 0x3D84) = defaultValue;
-        *(int*)((char*)this + 0x3D88) = 0;
-        *(int*)((char*)this + 0x3D8C) = 0;
-        *(int*)((char*)this + 0x3DA8) = 0;
-        *(int*)((char*)this + 0x3DAC) = 0;
-        memset((char*)this + 0x3DB0, 0, 0x20);
-        memset((char*)this + 0x3DD0, 0, 0x20);
-        *(int*)((char*)this + 0x3DF0) = 0;
+        m_baseY = (float)y;
+        m_windowWidth = defaultValue;
+        m_windowHeight = defaultValue;
+        m_windowScale = defaultValue;
+        m_fromScriptPosition = 0;
+        m_flags = 0;
+        m_heartValue = 0;
+        m_heartTarget = 0;
+        memset(m_heartGrowTimers, 0, sizeof(m_heartGrowTimers));
+        memset(m_heartDropTimers, 0, sizeof(m_heartDropTimers));
+        m_foodShakeTimer = 0;
     }
 
-    *(int*)((char*)this + 0x3D98) = 0;
-    *(int*)((char*)this + 0x3D94) = 0;
+    m_nameIndex = 0;
+    m_itemIndex = 0;
 }
 
 /*

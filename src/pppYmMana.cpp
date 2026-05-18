@@ -272,7 +272,9 @@ void Chara_DrawShadowMeshDLCallback(CChara::CModel* model, void* work, void* vYm
     DCFlushRange(shadowColor, 4);
     GXSetArray((GXAttr)0xB, shadowColor, 4);
 
-    u32* dl = (u32*)(*(s32*)(*(s32*)(meshData + meshIndex * 0x14 + 8) + 0x50) + dlIndex * 0xC);
+    s32 meshOffset = meshIndex * 0x14 + 8;
+    s32 mesh = *(s32*)(meshData + meshOffset);
+    u32* dl = (u32*)(*(s32*)(mesh + 0x50) + dlIndex * 0xC);
     SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
         &MaterialMan, *(void**)(*(s32*)((u8*)model + 0xA4) + 0x24), *(u16*)((u8*)dl + 8), 0, 0);
     GXCallDisplayList((void*)dl[1], dl[0]);

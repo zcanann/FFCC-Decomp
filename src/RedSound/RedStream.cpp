@@ -706,21 +706,22 @@ void StreamControl()
 	RedStreamDATA* streamData = RedStreamDataGetBegin();
 	do {
 		RedVoiceDATA* voiceData;
+		int streamResult;
 		if (streamData->m_state == REDSOUND_STREAM_STATE_PLAYING) {
 			voiceData = streamData->m_voiceData;
 			if (voiceData->m_axVoice != REDSOUND_AX_VOICE_NONE) {
 				if (voiceData->m_axVoice->priority == 0) {
 					_StreamStop(streamData);
-					} else {
-						int currentBufferSampleStart =
-						    (streamData->m_aramBuffer + streamData->m_streamCursorBase) *
-						    REDSOUND_STREAM_ARAM_TO_AX_ADDRESS_SCALE;
-						int axSamplePosition = voiceData->m_axVoice->pb.addr.currentAddressHi;
-						axSamplePosition <<= REDSOUND_STREAM_AX_CURRENT_ADDRESS_HI_SHIFT;
-						axSamplePosition |= voiceData->m_axVoice->pb.addr.currentAddressLo;
+				} else {
+					int currentBufferSampleStart =
+					    (streamData->m_aramBuffer + streamData->m_streamCursorBase) *
+					    REDSOUND_STREAM_ARAM_TO_AX_ADDRESS_SCALE;
+					int axSamplePosition = voiceData->m_axVoice->pb.addr.currentAddressHi;
+					axSamplePosition <<= REDSOUND_STREAM_AX_CURRENT_ADDRESS_HI_SHIFT;
+					axSamplePosition |= voiceData->m_axVoice->pb.addr.currentAddressLo;
 					if ((axSamplePosition >= currentBufferSampleStart) &&
 					    (axSamplePosition < currentBufferSampleStart + REDSOUND_STREAM_STEREO_PLANE_SIZE)) {
-						int streamResult = 0;
+						streamResult = 0;
 						if (streamData->m_header.m_loopStart < REDSOUND_STREAM_LOOP_ENABLED_MIN) {
 							streamData->m_header.m_loopEnd = streamData->m_header.m_loopEnd - REDSOUND_STREAM_SAMPLE_ADVANCE;
 							if (streamData->m_header.m_loopEnd < 1) {
@@ -751,18 +752,18 @@ void StreamControl()
 						}
 					}
 
-					int mixChanged = 0;
+					streamResult = 0;
 					if (streamData->m_pan.m_stepCount != 0) {
-						mixChanged += 1;
+						streamResult += 1;
 						streamData->m_pan.m_stepCount -= 1;
 						streamData->m_pan.m_value += streamData->m_pan.m_step;
 					}
 					if (streamData->m_volume.m_stepCount != 0) {
-						mixChanged += 1;
+						streamResult += 1;
 						streamData->m_volume.m_stepCount -= 1;
 						streamData->m_volume.m_value += streamData->m_volume.m_step;
 					}
-					if (mixChanged != 0) {
+					if (streamResult != 0) {
 						if (streamData->m_header.m_channelCount == REDSOUND_STREAM_STEREO_CHANNEL_COUNT) {
 							SetVoiceVolumeMix(voiceData, REDSOUND_STREAM_SILENT_PAN,
 							                  streamData->m_volume.m_value >> REDSOUND_FIXED_SHIFT);

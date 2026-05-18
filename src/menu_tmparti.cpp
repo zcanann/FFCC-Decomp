@@ -235,8 +235,8 @@ unsigned int CMenuPcs::TmpArtiClose()
 		}
 	}
 
-	zero = FLOAT_80332f2c;
 	if (this->m_tmpArtiList->count == completedItems) {
+		zero = FLOAT_80332f2c;
 		entry = this->m_tmpArtiList->entries;
 		if ((int)itemCount > 0) {
 			count = itemCount >> 3;
@@ -500,8 +500,8 @@ unsigned int CMenuPcs::TmpArtiOpen()
 		} while (remaining != 0);
 	}
 
-	one = FLOAT_80332f30;
 	if (this->m_tmpArtiList->count == completedItems) {
+		one = FLOAT_80332f30;
 		entry = this->m_tmpArtiList->entries;
 		if ((int)itemCount > 0) {
 			count = itemCount >> 3;

@@ -1300,16 +1300,14 @@ static void _PitchExecute(RedVoiceDATA* voice)
         }
         vibratoPitchDelta = PitchCompute(basePitch, pitchOffset, voice->m_waveData->m_pitch, voice->m_track->m_fineTune);
 
-        vibratoPitchDelta =
-            ((vibratoPitchDelta - voice->m_pitch) *
-             (voice->m_track->m_vibrateFunc((u32)voice->m_pitchModPhase >> REDSOUND_FIXED_SHIFT) >> REDSOUND_PITCH_MOD_WAVE_SHIFT)) >>
-            REDSOUND_FIXED_SHIFT;
+        int pitchDelta = vibratoPitchDelta - voice->m_pitch;
+        int vibratoWave = voice->m_track->m_vibrateFunc((u32)voice->m_pitchModPhase >> REDSOUND_FIXED_SHIFT);
+        vibratoPitchDelta = (pitchDelta * (vibratoWave >> REDSOUND_PITCH_MOD_WAVE_SHIFT)) >> REDSOUND_FIXED_SHIFT;
 
         if (voice->m_pitchModFrames != 0) {
-            int rampFrame = voice->m_pitchModFrame;
-            int rampedPitch = vibratoPitchDelta * rampFrame;
+            vibratoPitchDelta *= voice->m_pitchModFrame;
             voice->m_pitchModFrame = voice->m_pitchModFrame + 1;
-            vibratoPitchDelta = rampedPitch / voice->m_pitchModFrames;
+            vibratoPitchDelta /= voice->m_pitchModFrames;
             if (voice->m_pitchModFrame >= voice->m_pitchModFrames) {
                 voice->m_pitchModFrames = 0;
             }

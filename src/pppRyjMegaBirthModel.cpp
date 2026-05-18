@@ -1039,13 +1039,11 @@ void set_matrix(_pppPObject* pObject, pppFMATRIX mtxA, pppFMATRIX mtxB, PRyjMega
         PSMTXScaleApply(mtxB.value, objectMatrix->value, particleData->m_sizeStart * pppMngStPtr->m_scale.x,
                         particleData->m_sizeEnd * pppMngStPtr->m_scale.y, particleData->m_sizeVal * pppMngStPtr->m_scale.z);
 
-        if (particleData->m_colorDeltaAdd[1] != FLOAT_80330498) {
-            pppFMATRIX rot;
+        pppFMATRIX rot;
 
-            PSMTXRotRad(rot.value, 'z', FLOAT_803304a8 * -particleData->m_colorDeltaAdd[1]);
-            pppCopyMatrix(tmp, *objectMatrix);
-            pppMulMatrix(*objectMatrix, rot, tmp);
-        }
+        PSMTXRotRad(rot.value, 'z', FLOAT_803304a8 * -particleData->m_colorDeltaAdd[1]);
+        pppCopyMatrix(tmp, *objectMatrix);
+        pppMulMatrix(*objectMatrix, rot, tmp);
 
         PSMTXMultVec(ppvWorldMatrix, &endPos, &endPos);
         objectMatrix->value[0][3] = endPos.x;

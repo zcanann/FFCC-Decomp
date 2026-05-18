@@ -2717,26 +2717,27 @@ void CGObject::SetClassWork(int ownerType, int workIndex)
     m_ownerType = (char)ownerType;
     m_classWorkIndex = (unsigned char)workIndex;
 
-    if (ownerType == 1) {
+    switch (ownerType) {
+    case 0: {
+        m_scriptHandle = reinterpret_cast<void**>(&Game.m_caravanWorkArr[Game.m_gameWork.m_wmBackupParams[workIndex]]);
+        m_scriptHandle[2] = reinterpret_cast<void*>(Game.m_gameWork.m_wmBackupParams[workIndex]);
+        m_scriptHandle[3] = this;
+        Game.m_scriptFoodBase[workIndex] = reinterpret_cast<u32>(m_scriptHandle);
+        return;
+    }
+
+    case 1:
         m_scriptHandle = reinterpret_cast<void**>(&Game.m_monWorkArr[workIndex]);
         m_scriptHandle[3] = this;
         m_scriptHandle[2] = reinterpret_cast<void*>(workIndex);
         Game.m_scriptWork[0][0][workIndex] = reinterpret_cast<u32>(this);
         Game.m_scriptWork[2][0][workIndex] = reinterpret_cast<u32>(m_scriptHandle);
         return;
-    }
 
-    if ((ownerType < 1) && (-1 < ownerType)) {
-        int backupIndex = Game.m_gameWork.m_wmBackupParams[workIndex];
-
-        m_scriptHandle = reinterpret_cast<void**>(&Game.m_caravanWorkArr[backupIndex]);
-        m_scriptHandle[2] = reinterpret_cast<void*>(backupIndex);
-        m_scriptHandle[3] = this;
-        Game.m_scriptFoodBase[workIndex] = reinterpret_cast<u32>(m_scriptHandle);
+    default:
+        m_scriptHandle = 0;
         return;
     }
-
-    m_scriptHandle = 0;
 }
 
 /*

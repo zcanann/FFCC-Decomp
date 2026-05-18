@@ -10,6 +10,10 @@
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
+extern const float FLOAT_80330998;
+extern const float FLOAT_8033099C;
+extern const float FLOAT_803309a8 = 0.95f;
+
 namespace {
 static inline unsigned short* GetItemDataPtr(int itemIdx)
 {
@@ -35,7 +39,7 @@ struct ShoukiByteFlags {
 
 static inline float GetStatusMultiplier(int offset)
 {
-	return ((float)(*(unsigned short*)(Game.unk_flat3_field_8_0xc7dc + offset)) * 0.01f) + 1.0f;
+	return ((float)(*(unsigned short*)(Game.unk_flat3_field_8_0xc7dc + offset)) * FLOAT_8033099C) + FLOAT_80330998;
 }
 }
 
@@ -51,7 +55,6 @@ extern "C" void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFla
 extern "C" void* __vt__8CMonWork[];
 extern "C" void* __vt__12CCaravanWork[];
 extern "C" void* __vt__9CGObjWork[];
-extern float FLOAT_803309a8;
 extern char lbl_801D9EC8[];
 static const char DAT_801d9ff0[] = {
 	(char)0x81, (char)0x69, (char)0x82, (char)0xC8, (char)0x82, (char)0xDC, (char)0x82, (char)0xA6,
@@ -2838,7 +2841,7 @@ void CMonWork::Init(int baseDataIndex, CRomWork* romWork, int)
 		unsigned int bossArtifact = Game.m_bossArtifactBase;
 		bossArtifact += Game.m_gameWork.m_bossArtifactStageIndex * 0x168;
 		unsigned short artifactScale = *(unsigned short*)(bossArtifact + 0x60);
-		m_maxHp = (unsigned short)((float)m_maxHp * ((((float)artifactScale) * 0.01f) + 1.0f));
+		m_maxHp = (unsigned short)((float)m_maxHp * ((((float)artifactScale) * FLOAT_8033099C) + FLOAT_80330998));
 	}
 
 	m_hp = m_maxHp;

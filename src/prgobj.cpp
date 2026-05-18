@@ -18,9 +18,9 @@ extern "C" void SetParticleWorkTrace__13CFlatRuntime2FPQ212CFlatRuntime7CObject(
 extern "C" void SetParticleWorkPos__13CFlatRuntime2FR3Vecf(void*, Vec&, float);
 extern "C" void SetParticleWorkSe__13CFlatRuntime2Fiii(void*, int, int, int);
 extern "C" void PutParticleWork__13CFlatRuntime2Fv(void*);
-static const float FLOAT_80331BD0 = 1.0f;
-static const float FLOAT_80331BD4 = 0.0f;
-static const float FLOAT_80331BD8 = 3.1415927f;
+extern const float FLOAT_80331BD0 = 1.0f;
+extern const float FLOAT_80331BD4 = 0.0f;
+extern const float FLOAT_80331BD8 = 3.1415927f;
 
 static inline float LoadFloat(const float& value)
 {
@@ -416,7 +416,7 @@ int CGPrgObj::playSe3D(int seNo, int volume, int dist, int pitch, Vec* pos)
 	return handle;
 }
 
-static const float FLOAT_80331BE8 = -1.0f;
+extern const float FLOAT_80331BE8 = -1.0f;
 
 /*
  * --INFO--

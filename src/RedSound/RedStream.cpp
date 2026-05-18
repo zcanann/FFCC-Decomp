@@ -804,7 +804,7 @@ void StreamControl()
  * JP Address: TODO
  * JP Size: TODO
  */
-void SetStreamPan(int streamID, int pan, int frameCount)
+inline void SetStreamPan(int streamID, int pan, int frameCount)
 {
 	volatile RedStreamDATA* streamData;
 

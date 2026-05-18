@@ -223,7 +223,8 @@ void CFunnyShapePcs::SetUSBData()
             for (; j < static_cast<s16>(list[1]);
                  src2c += 0x2C, src24 += 0x24, j++, dst24 += 0x24, dst2c += 0x2C) {
                 if ((list[0] & 8) != 0) {
-                    u8* src = listData + 0x10 + src2c;
+                    u8* src = listData + 0x10;
+                    src += src2c;
                     u32* p32 = reinterpret_cast<u32*>(src);
                     StoreSwap32(&p32[0]);
                     StoreSwap32(&p32[1]);
@@ -240,11 +241,13 @@ void CFunnyShapePcs::SetUSBData()
                     *reinterpret_cast<s16*>(src + 0x24) = LoadSwap16(*reinterpret_cast<s16*>(src + 0x24));
                     *reinterpret_cast<s16*>(src + 0x26) = LoadSwap16(*reinterpret_cast<s16*>(src + 0x26));
 
-                    u8* dst = listData + 0x10 + dst2c;
+                    u8* dst = listData + 0x10;
+                    dst += dst2c;
                     memcpy(dst, src, 0x2C);
                     DCStoreRange(dst, 0x2C);
                 } else {
-                    u8* src = listData + 0x10 + src24;
+                    u8* src = listData + 0x10;
+                    src += src24;
                     u32* p32 = reinterpret_cast<u32*>(src);
                     StoreSwap32(&p32[0]);
                     StoreSwap32(&p32[1]);
@@ -257,7 +260,8 @@ void CFunnyShapePcs::SetUSBData()
                     *reinterpret_cast<s16*>(src + 0x1C) = LoadSwap16(*reinterpret_cast<s16*>(src + 0x1C));
                     *reinterpret_cast<s16*>(src + 0x1E) = LoadSwap16(*reinterpret_cast<s16*>(src + 0x1E));
 
-                    u8* dst = listData + 0x10 + dst24;
+                    u8* dst = listData + 0x10;
+                    dst += dst24;
                     memcpy(dst, src, 0x24);
                     DCStoreRange(dst, 0x24);
                 }
@@ -299,7 +303,8 @@ void CFunnyShapePcs::SetUSBData()
         for (; i < m_shape.count;
              src2c += 0x2C, src24 += 0x24, i++, dst24 += 0x24, dst2c += 0x2C) {
             if ((m_shape.flags & 8) != 0) {
-                u8* src = meshData + 0x10 + src2c;
+                u8* src = meshData + 0x10;
+                src += src2c;
                 u32* p32 = reinterpret_cast<u32*>(src);
                 StoreSwap32(&p32[0]);
                 StoreSwap32(&p32[1]);
@@ -316,11 +321,13 @@ void CFunnyShapePcs::SetUSBData()
                 *reinterpret_cast<s16*>(src + 0x24) = LoadSwap16(*reinterpret_cast<s16*>(src + 0x24));
                 *reinterpret_cast<s16*>(src + 0x26) = LoadSwap16(*reinterpret_cast<s16*>(src + 0x26));
 
-                u8* dst = meshData + 0x10 + dst2c;
+                u8* dst = meshData + 0x10;
+                dst += dst2c;
                 memcpy(dst, src, 0x2C);
                 DCStoreRange(dst, 0x2C);
             } else {
-                u8* src = meshData + 0x10 + src24;
+                u8* src = meshData + 0x10;
+                src += src24;
                 u32* p32 = reinterpret_cast<u32*>(src);
                 StoreSwap32(&p32[0]);
                 StoreSwap32(&p32[1]);
@@ -333,7 +340,8 @@ void CFunnyShapePcs::SetUSBData()
                 *reinterpret_cast<s16*>(src + 0x1C) = LoadSwap16(*reinterpret_cast<s16*>(src + 0x1C));
                 *reinterpret_cast<s16*>(src + 0x1E) = LoadSwap16(*reinterpret_cast<s16*>(src + 0x1E));
 
-                u8* dst = meshData + 0x10 + dst24;
+                u8* dst = meshData + 0x10;
+                dst += dst24;
                 memcpy(dst, src, 0x24);
                 DCStoreRange(dst, 0x24);
             }

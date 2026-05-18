@@ -441,7 +441,7 @@ int CMenuPcs::MLstOpen()
 		zero = FLOAT_803333D0;
 		initializedCount = 0;
 		yPos = 0x18;
-		for (int i = 0; i < 9; i++) {
+		for (i = 0; i < 9; i++) {
 			entry = &this->lstData->entries[i];
 			entry->unk_2C = 2;
 			initializedCount++;

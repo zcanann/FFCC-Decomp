@@ -240,29 +240,38 @@ void RedDelete(void* address)
  * JP Address: TODO
  * JP Size: TODO
  */
-inline int RedResize(int address, int size)
+int RedResize(int address, int size)
 {
+	unsigned int interrupts;
 	RedMemoryBlock* blockPtr;
+	RedMemoryBlock* bankEnd;
+	int resizedAddress;
 
+	interrupts = OSDisableInterrupts();
+	resizedAddress = REDSOUND_MEMORY_ADDRESS_NONE;
 	if ((address == REDSOUND_MEMORY_ADDRESS_NONE) || (m_MemoryBank == 0)) {
-		return REDSOUND_MEMORY_ADDRESS_NONE;
+		OSRestoreInterrupts(interrupts);
+		return resizedAddress;
 	}
 
 	size += REDSOUND_MEMORY_BANK_ALIGN_MASK;
 	size &= ~REDSOUND_MEMORY_BANK_ALIGN_MASK;
 	blockPtr = m_MemoryBank;
+	bankEnd = RedMemoryBankGetEnd(m_MemoryBank);
 
 	while ((blockPtr->m_size != REDSOUND_MEMORY_BLOCK_SIZE_EMPTY) &&
-	       (blockPtr < RedMemoryBankGetEnd(m_MemoryBank))) {
+	       (blockPtr < bankEnd)) {
 		if (blockPtr->m_address == address) {
 			blockPtr->m_size = size;
-			return address;
+			resizedAddress = address;
+			break;
 		}
 
 		blockPtr++;
 	}
 
-	return REDSOUND_MEMORY_ADDRESS_NONE;
+	OSRestoreInterrupts(interrupts);
+	return resizedAddress;
 }
 
 /*
@@ -274,7 +283,7 @@ inline int RedResize(int address, int size)
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void* RedResize(void* address, int size)
+void* RedResize(void* address, int size)
 {
 	return (void*)RedResize((int)address, size);
 }
@@ -439,29 +448,38 @@ void RedDeleteA(void* address)
  * JP Address: TODO
  * JP Size: TODO
  */
-inline int RedResizeA(int address, int size)
+int RedResizeA(int address, int size)
 {
+	unsigned int interrupts;
 	RedMemoryBlock* blockPtr;
+	RedMemoryBlock* bankEnd;
+	int resizedAddress;
 
+	interrupts = OSDisableInterrupts();
+	resizedAddress = REDSOUND_MEMORY_ADDRESS_NONE;
 	if ((address == REDSOUND_MEMORY_ADDRESS_NONE) || (m_AMemoryBank == 0)) {
-		return REDSOUND_MEMORY_ADDRESS_NONE;
+		OSRestoreInterrupts(interrupts);
+		return resizedAddress;
 	}
 
 	size += REDSOUND_MEMORY_BANK_ALIGN_MASK;
 	size &= ~REDSOUND_MEMORY_BANK_ALIGN_MASK;
 	blockPtr = m_AMemoryBank;
+	bankEnd = RedMemoryBankGetEnd(m_AMemoryBank);
 
 	while ((blockPtr->m_size != REDSOUND_MEMORY_BLOCK_SIZE_EMPTY) &&
-	       (blockPtr < RedMemoryBankGetEnd(m_AMemoryBank))) {
+	       (blockPtr < bankEnd)) {
 		if (blockPtr->m_address == address) {
 			blockPtr->m_size = size;
-			return address;
+			resizedAddress = address;
+			break;
 		}
 
 		blockPtr++;
 	}
 
-	return REDSOUND_MEMORY_ADDRESS_NONE;
+	OSRestoreInterrupts(interrupts);
+	return resizedAddress;
 }
 
 /*
@@ -473,7 +491,7 @@ inline int RedResizeA(int address, int size)
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void* RedResizeA(void* address, int size)
+void* RedResizeA(void* address, int size)
 {
 	return (void*)RedResizeA((int)address, size);
 }

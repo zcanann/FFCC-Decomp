@@ -699,12 +699,10 @@ bool CMenuPcs::ItemOpen()
     for (int i = 0; i < count; i++, anim++) {
         if (frame >= anim->startFrame) {
             if (anim->startFrame + anim->duration <= frame) {
-                float progress = FLOAT_80332e64;
                 finished++;
-                float zero = FLOAT_80332e60;
-                anim->progress = progress;
-                anim->dx = zero;
-                anim->dy = zero;
+                anim->progress = FLOAT_80332e64;
+                anim->dx = FLOAT_80332e60;
+                anim->dy = FLOAT_80332e60;
             } else {
                 anim->frame++;
                 double one = DOUBLE_80332e68;

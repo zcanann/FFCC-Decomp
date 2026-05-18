@@ -1883,9 +1883,9 @@ void EnvelopeKeyExecute()
             AXVPB* voice;
 
             if ((voiceData->m_flags & REDSOUND_VOICE_FLAGS_START) != 0) {
-                voice = voiceData->m_axVoice;
-                if ((voice != REDSOUND_AX_VOICE_NONE) && (voice->priority != 0)) {
-                    AXFreeVoice(voice);
+                if ((voiceData->m_axVoice != REDSOUND_AX_VOICE_NONE) &&
+                    (voiceData->m_axVoice->priority != 0)) {
+                    AXFreeVoice(voiceData->m_axVoice);
                     voiceData->m_axVoice = REDSOUND_AX_VOICE_NONE;
                 }
 
@@ -1913,7 +1913,7 @@ void EnvelopeKeyExecute()
 
             if ((voiceData->m_flags & REDSOUND_VOICE_FLAGS_PITCH_DIRTY) != 0) {
                 int pitch = voiceData->m_targetPitch;
-                voiceFlags = AX_SYNC_FLAG_COPYRATIO;
+                voiceFlags |= AX_SYNC_FLAG_COPYRATIO;
                 voice->pb.src.ratioHi = (u16)(((u32)pitch >> REDSOUND_AX_HIGH_WORD_SHIFT) & REDSOUND_AX_SRC_RATIO_HI_MASK);
                 voice->pb.src.ratioLo = (u16)pitch;
             }
@@ -1939,7 +1939,7 @@ void EnvelopeKeyExecute()
             if (((voiceData->m_voiceSwitch & REDSOUND_VOICE_SWITCH_PAUSE) == 0) &&
                 ((voiceData->m_flags & REDSOUND_VOICE_FLAGS_ADSR_START) != 0)) {
                 _AdsrStart(voiceData);
-                envChanged = 1;
+                envChanged += 1;
             }
 
             if ((voiceData->m_flags & REDSOUND_VOICE_FLAGS_START) != 0) {
@@ -1966,8 +1966,8 @@ void EnvelopeKeyExecute()
                     sampleAddress += REDSOUND_AX_SAMPLE_START_BIAS;
                     sampleAddress *= REDSOUND_AX_SAMPLE_ADDR_SCALE;
                     voice->pb.addr.currentAddressHi = (u16)(sampleAddress >> REDSOUND_AX_HIGH_WORD_SHIFT);
-                    voice->pb.addr.currentAddressLo = (u16)sampleAddress;
                     int sampleBaseAddress = sampleAddress - REDSOUND_AX_SAMPLE_ADDR_SCALE;
+                    voice->pb.addr.currentAddressLo = (u16)sampleAddress;
 
                     if (waveData->m_loopStart < 0) {
                         voice->pb.addr.loopFlag = REDSOUND_AX_VOICE_LOOP_OFF;

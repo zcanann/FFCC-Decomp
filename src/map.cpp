@@ -3301,7 +3301,7 @@ void CMapMng::SetIdGrpColor(int mapIdGrpIndex, int channelIndex, _GXColor color)
 void CMapMng::SetMeshCameraSemiTransRange(unsigned short id, float nearRange, float farRange, float minAlpha,
                                           float maxAlpha, float fadeRange)
 {
-    bool found = false;
+    int found = 0;
     unsigned char* mapObj = reinterpret_cast<unsigned char*>(this);
 
     for (int i = 0; i < *reinterpret_cast<short*>(Ptr(this, 0xC)); i++) {
@@ -3318,7 +3318,7 @@ void CMapMng::SetMeshCameraSemiTransRange(unsigned short id, float nearRange, fl
                 *reinterpret_cast<unsigned char*>(mapObj + 0x97A) = 1;
             }
             *reinterpret_cast<short*>(mapObj + 0x97E) = 0x4000;
-            found = true;
+            found = 1;
             *reinterpret_cast<short*>(mapObj + 0x97C) = 0x4000;
             *reinterpret_cast<short*>(mapObj + 0x980) = 0;
         }
@@ -3352,13 +3352,13 @@ void CMapMng::SetMeshCameraSemiTransRange(unsigned short id, float nearRange, fl
  */
 void CMapMng::SetMeshCameraSemiTransAlpha(unsigned short id, int alpha, int frameCount)
 {
-    bool found = false;
+    int found = 0;
     unsigned char* mapObj = reinterpret_cast<unsigned char*>(this);
 
     for (int i = 0; i < *reinterpret_cast<short*>(Ptr(this, 0xC)); i++) {
         if (*reinterpret_cast<unsigned short*>(mapObj + 0x988) == id) {
             *reinterpret_cast<short*>(mapObj + 0x97E) = static_cast<short>(alpha << 7);
-            found = true;
+            found = 1;
             *reinterpret_cast<short*>(mapObj + 0x980) = static_cast<short>(
                 (static_cast<int>(*reinterpret_cast<short*>(mapObj + 0x97E)) -
                  static_cast<int>(*reinterpret_cast<short*>(mapObj + 0x97C))) /

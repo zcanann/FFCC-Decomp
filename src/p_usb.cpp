@@ -19,16 +19,17 @@ inline CUSBPcs::CUSBPcs()
     static unsigned int desc0[] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__7CUSBPcsFv)};
     static unsigned int desc1[] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__7CUSBPcsFv)};
     static unsigned int desc2[] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(func__7CUSBPcsFv)};
+    unsigned int* table = reinterpret_cast<unsigned int*>(&m_table__7CUSBPcs);
 
-    m_table__7CUSBPcs[1] = desc0[0];
-    m_table__7CUSBPcs[2] = desc0[1];
-    m_table__7CUSBPcs[3] = desc0[2];
-    m_table__7CUSBPcs[4] = desc1[0];
-    m_table__7CUSBPcs[5] = desc1[1];
-    m_table__7CUSBPcs[6] = desc1[2];
-    m_table__7CUSBPcs[7] = desc2[0];
-    m_table__7CUSBPcs[8] = desc2[1];
-    m_table__7CUSBPcs[9] = desc2[2];
+    table[1] = desc0[0];
+    table[2] = desc0[1];
+    table[3] = desc0[2];
+    table[4] = desc1[0];
+    table[5] = desc1[1];
+    table[6] = desc1[2];
+    table[7] = desc2[0];
+    table[8] = desc2[1];
+    table[9] = desc2[2];
 }
 
 unsigned int m_table__7CUSBPcs[0x11C / sizeof(unsigned int)] = {

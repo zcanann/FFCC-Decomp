@@ -2078,11 +2078,10 @@ static void _KeyOnControl()
     int shakeDepth;
     RedSoundCONTROL* soundControl;
     RedTrackDATA* track;
-    RedTrackDATA* trackData;
     RedVoiceDATA* voice;
     int volume;
     int muteTrackNo;
-    int bit;
+    u32 bit;
 
     _VoiceEnvelopeCheck();
     int keyOnEntry = RedKeyOnEntryGet();
@@ -2159,10 +2158,9 @@ static void _KeyOnControl()
                     (voice->m_track->m_tremoloFunc != 0) ||
                     (voice->m_track->m_shakeFunc != 0)) {
                     soundControl = RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY);
-                    trackData = voice->m_track;
-                    if ((soundControl->m_tracks <= trackData) &&
-                        (trackData < soundControl->m_tracks + soundControl->m_trackCount)) {
-                        muteTrackNo = trackData->m_trackNo;
+                    if (!(voice->m_track < soundControl->m_tracks) &&
+                        (voice->m_track < soundControl->m_tracks + soundControl->m_trackCount)) {
+                        muteTrackNo = voice->m_track->m_trackNo;
                         if ((RedMuteGetMask(muteTrackNo) & RedMuteGetWord(muteTrackNo)) == 0) {
                             volume = ((soundControl->m_volumeScale + 1) *
                                       (soundControl->m_volume >> REDSOUND_FIXED_SHIFT)) >>
@@ -2176,36 +2174,36 @@ static void _KeyOnControl()
                             volume = 0;
                         }
                     } else {
-                        volume = RedMasterSEVolumeGet();
-                        if ((soundControl[REDSOUND_CONTROL_MUSIC_SECONDARY].m_tracks <= trackData) &&
-                            (trackData <
-                             soundControl[REDSOUND_CONTROL_MUSIC_SECONDARY].m_tracks +
-                                 soundControl[REDSOUND_CONTROL_MUSIC_SECONDARY].m_trackCount)) {
-                            muteTrackNo = trackData->m_trackNo;
+                        RedSoundCONTROL* secondaryControl =
+                            &soundControl[REDSOUND_CONTROL_MUSIC_SECONDARY];
+                        if (!(voice->m_track < secondaryControl->m_tracks) &&
+                            (voice->m_track <
+                             secondaryControl->m_tracks + secondaryControl->m_trackCount)) {
+                            muteTrackNo = voice->m_track->m_trackNo;
 
                             if ((RedMuteGetMask(muteTrackNo) & RedMuteGetWord(muteTrackNo)) == 0) {
-                                volume = ((soundControl[REDSOUND_CONTROL_MUSIC_SECONDARY].m_volumeScale + 1) *
-                                          (soundControl[REDSOUND_CONTROL_MUSIC_SECONDARY].m_volume >>
-                                           REDSOUND_FIXED_SHIFT)) >>
+                                volume = ((secondaryControl->m_volumeScale + 1) *
+                                          (secondaryControl->m_volume >> REDSOUND_FIXED_SHIFT)) >>
                                          REDSOUND_CONTROL_VOLUME_SCALE_SHIFT;
-                                if (soundControl[REDSOUND_CONTROL_MUSIC_SECONDARY].m_masterVolumeDelta != 0) {
-                                    volume = (volume *
-                                              (soundControl[REDSOUND_CONTROL_MUSIC_SECONDARY].m_masterVolume >>
-                                               REDSOUND_FIXED_SHIFT)) >>
-                                             REDSOUND_CONTROL_MASTER_VOLUME_SCALE_SHIFT;
+                                if (secondaryControl->m_masterVolumeDelta != 0) {
+                                    volume = (volume * (secondaryControl->m_masterVolume >>
+                                                        REDSOUND_FIXED_SHIFT)) >>
+                                              REDSOUND_CONTROL_MASTER_VOLUME_SCALE_SHIFT;
                                 }
                                 volume = (volume * RedMasterMusicVolumeGet()) >>
                                          REDSOUND_CONTROL_MASTER_VOLUME_SCALE_SHIFT;
                             } else {
                                 volume = 0;
                             }
+                        } else {
+                            volume = RedMasterSEVolumeGet();
                         }
                     }
                     _VolumeExecute(voice, volume);
                 }
 
-                if ((voice->m_updateFlags & REDSOUND_VOICE_UPDATE_PITCH) != 0 ||
-                    (voice->m_track->m_vibrateFunc != 0)) {
+                if ((voice->m_updateFlags & REDSOUND_VOICE_UPDATE_PITCH) |
+                    (u32)voice->m_track->m_vibrateFunc) {
                     _PitchExecute(voice);
                 }
                 voice->m_updateFlags = 0;
@@ -2215,8 +2213,8 @@ static void _KeyOnControl()
     }
 
     {
-        bit = 1;
         voice = RedVoiceDataGetBegin();
+        bit = 1;
         do {
             if ((voiceStartMask[REDSOUND_VOICE_START_MASK_LOW] & bit) != 0) {
                 voiceStartMask[REDSOUND_VOICE_START_MASK_LOW] &= ~bit;
@@ -2228,8 +2226,8 @@ static void _KeyOnControl()
     }
 
     {
-        bit = 1;
         voice = RedVoiceDataGet(REDSOUND_MUTE_BITS_PER_WORD);
+        bit = 1;
         do {
             if ((voiceStartMask[REDSOUND_VOICE_START_MASK_HIGH] & bit) != 0) {
                 voiceStartMask[REDSOUND_VOICE_START_MASK_HIGH] &= ~bit;

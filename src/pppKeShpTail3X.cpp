@@ -66,6 +66,14 @@ struct KeShpTail3XWork {
     u8 m_initialized;
 };
 
+inline void S4ToF32(pppFVECTOR4* dest, s16* src)
+{
+    dest->x = src[0] >> 7;
+    dest->y = src[1] >> 7;
+    dest->z = src[2] >> 7;
+    dest->w = src[3] >> 7;
+}
+
 /*
  * --INFO--
  * PAL Address: 0x8008922c
@@ -157,6 +165,9 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* p
     float colorStepB;
     float colorStepA;
     float invCountMinusOne;
+    pppFVECTOR4 colorStart;
+    pppFVECTOR4 colorEnd;
+    pppFVECTOR4 colorStep;
     pppFMATRIX localBase;
     pppFMATRIX drawMtx;
     pppFMATRIX rotMtx;
@@ -202,26 +213,34 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* p
 
     invCountMinusOne = (float)(count - 1);
     alphaMul = (float)*(s16*)((u8*)obj + 0x86 + offsets->m_serializedDataOffsets[1]) / kPppKeShpTail3XAlphaScale;
-    colorR = (float)(work->m_values[0] >> 7);
-    colorG = (float)(work->m_values[1] >> 7);
-    colorB = (float)(work->m_values[2] >> 7);
-    colorA = (float)(work->m_values[3] >> 7) * alphaMul;
-    colorEndR = (float)(work->m_values[4] >> 7);
-    colorEndG = (float)(work->m_values[5] >> 7);
-    colorEndB = (float)(work->m_values[6] >> 7);
-    colorEndA = (float)(work->m_values[7] >> 7) * alphaMul;
+    S4ToF32(&colorStart, &work->m_values[0]);
+    S4ToF32(&colorEnd, &work->m_values[4]);
+    colorStart.w *= alphaMul;
+    colorEnd.w *= alphaMul;
+    colorR = colorStart.x;
+    colorG = colorStart.y;
+    colorB = colorStart.z;
+    colorA = colorStart.w;
+    colorEndR = colorEnd.x;
+    colorEndG = colorEnd.y;
+    colorEndB = colorEnd.z;
+    colorEndA = colorEnd.w;
 
     if (invCountMinusOne != zero) {
-        colorStepR = (colorR - colorEndR) / invCountMinusOne;
-        colorStepG = (colorG - colorEndG) / invCountMinusOne;
-        colorStepB = (colorB - colorEndB) / invCountMinusOne;
-        colorStepA = (colorA - colorEndA) / invCountMinusOne;
+        colorStep.x = (colorStart.x - colorEnd.x) / invCountMinusOne;
+        colorStep.y = (colorStart.y - colorEnd.y) / invCountMinusOne;
+        colorStep.z = (colorStart.z - colorEnd.z) / invCountMinusOne;
+        colorStep.w = (colorStart.w - colorEnd.w) / invCountMinusOne;
     } else {
-        colorStepR = kPppKeShpTail3XHalf;
-        colorStepG = kPppKeShpTail3XHalf;
-        colorStepB = kPppKeShpTail3XHalf;
-        colorStepA = kPppKeShpTail3XHalf;
+        colorStep.x = kPppKeShpTail3XHalf;
+        colorStep.y = kPppKeShpTail3XHalf;
+        colorStep.z = kPppKeShpTail3XHalf;
+        colorStep.w = kPppKeShpTail3XHalf;
     }
+    colorStepR = colorStep.x;
+    colorStepG = colorStep.y;
+    colorStepB = colorStep.z;
+    colorStepA = colorStep.w;
 
     shapeTable = *(long***)(*(u32*)&pppEnvStPtr->m_particleColors[0] + dataValIndex * 4);
     shapeData = (u8*)*shapeTable;

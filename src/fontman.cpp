@@ -12,11 +12,9 @@ unsigned char g_tFont22[0x10D40] = {
 #include <dolphin/mtx.h>
 
 extern "C" void __dt__8CFontManFv(void*);
-extern "C" void __ct__4CRefFv(void*);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, int, int, int, int);
-extern "C" void* __vt__5CFont[];
 extern "C" const float FLOAT_803306B8;
 extern "C" const float FLOAT_803306C8;
 extern "C" const float FLOAT_803306D8;
@@ -77,24 +75,24 @@ found_glyph:
 
 found_fallback:
 	int drawWidth;
-	float localScaleX = scaleX;
 	float localMargin = margin;
+	float localScaleX = scaleX;
 	CFontRenderFlagBits& renderFlagBits = GetRenderFlagBits(renderFlags);
 
 	if (renderFlagBits.fixedWidth != 0) {
 		drawWidth = static_cast<int>(m_glyphWidth);
 	} else {
-		signed char sign = renderFlagBits.shadow;
+		signed char sign = static_cast<signed char>(renderFlagBits.shadow);
 		unsigned int extra = static_cast<unsigned int>(-static_cast<int>(sign) | static_cast<int>(sign)) >> 30 & 2;
 		drawWidth = static_cast<int>(*(reinterpret_cast<unsigned char*>(glyph) + extra + 4));
 	}
 
-	double width = static_cast<double>(localScaleX * (localMargin + static_cast<float>(drawWidth)));
+	float width = localScaleX * (localMargin + static_cast<float>(drawWidth));
 	if (renderFlagBits.snapPosition != 0) {
-		width = floor(width);
+		width = static_cast<float>(floor(width));
 	}
 
-	return static_cast<float>(width);
+	return width;
 
 find_fallback:
 	glyphBucket = m_glyphBuckets[63];
@@ -863,37 +861,7 @@ void CFontMan::Init()
 	CMemory::CStage* stage = Memory.CreateStage(0x8000, const_cast<char*>(s_CFontMan), 0);
 	m_stage = stage;
 
-	CFont* font = reinterpret_cast<CFont*>(
-	    _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
-	        &Memory,
-	        sizeof(CFont),
-	        FontMan.m_stage,
-	        const_cast<char*>(s_fontman_cpp),
-	        0x3D,
-	        0));
-
-	if (font != 0) {
-		__ct__4CRefFv(font);
-		*reinterpret_cast<void**>(font) = __vt__5CFont;
-		font->m_glyphData = 0;
-		font->texturePtr = 0;
-		font->margin = FLOAT_803306B8;
-		font->posZ = FLOAT_803306B8;
-		font->posY = FLOAT_803306B8;
-		font->posX = FLOAT_803306B8;
-		CFontRenderFlagBits& bits = GetRenderFlagBits(font->renderFlags);
-		bits.shadow = 0;
-		font->scaleY = FLOAT_803306C8;
-		font->scaleX = FLOAT_803306C8;
-		bits.snapPosition = 0;
-		font->m_color.r = 0xFF;
-		font->m_color.g = 0xFF;
-		font->m_color.b = 0xFF;
-		font->m_color.a = 0xFF;
-		bits.zCompare = 0;
-		bits.zUpdate = 0;
-		font->m_usesEmbeddedData = 0;
-	}
+	CFont* font = new (FontMan.m_stage, const_cast<char*>(s_fontman_cpp), 0x3D) CFont;
 
 	m_font = font;
 	m_font->Create(0, 0);

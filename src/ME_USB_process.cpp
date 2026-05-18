@@ -130,8 +130,6 @@ extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialE
         Vec minPos;
         Vec maxPos;
         RSDITEM* rsdItem = materialEditorPcs->GetRsdItem()->rsdItem;
-        u32 size = usb.m_sizeBytes;
-        u32 dataSize = size * 0xC;
         u32* xyzData;
 
         if (rsdItem->ptr10 != 0) {
@@ -139,15 +137,15 @@ extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialE
             rsdItem->ptr10 = 0;
         }
 
-        rsdItem->countA = size;
+        rsdItem->countA = usb.m_sizeBytes;
         void* allocData = _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
-            &Memory, dataSize, MaterialEditorStage(), s_ME_USB_process_cpp_801d7d78, 0x31, 0);
+            &Memory, usb.m_sizeBytes * 0xC, MaterialEditorStage(), s_ME_USB_process_cpp_801d7d78, 0x31, 0);
         if (allocData == 0) {
-            Printf__7CSystemFPce(&System, s_MemAlloc_Error____size__d_801d7d8c, dataSize);
+            Printf__7CSystemFPce(&System, s_MemAlloc_Error____size__d_801d7d8c, usb.m_sizeBytes * 0xC);
         }
         rsdItem->ptr10 = allocData;
 
-        memcpy(rsdItem->ptr10, usb.m_data, dataSize);
+        memcpy(rsdItem->ptr10, usb.m_data, usb.m_sizeBytes * 0xC);
 
         xyzData = reinterpret_cast<u32*>(rsdItem->ptr10);
         for (u32 i = 0, offset = 0; i < usb.m_sizeBytes; i++, offset += 0xC) {
@@ -174,24 +172,22 @@ extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialE
     }
     case 0x13: {
         RSDITEM* rsdItem = materialEditorPcs->GetRsdItem()->rsdItem;
-        u32 size = usb.m_sizeBytes;
-        u32 dataSize = size * 0x70;
 
         if (rsdItem->ptr18 != 0) {
             __dla__FPv(rsdItem->ptr18);
             rsdItem->ptr18 = 0;
         }
 
-        rsdItem->countC = size;
+        rsdItem->countC = usb.m_sizeBytes;
         void* allocData = _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
-            &Memory, dataSize, MaterialEditorStage(), s_ME_USB_process_cpp_801d7d78, 0x31, 0);
+            &Memory, usb.m_sizeBytes * 0x70, MaterialEditorStage(), s_ME_USB_process_cpp_801d7d78, 0x31, 0);
         if (allocData == 0) {
-            Printf__7CSystemFPce(&System, s_MemAlloc_Error____size__d_801d7d8c, dataSize);
+            Printf__7CSystemFPce(&System, s_MemAlloc_Error____size__d_801d7d8c, usb.m_sizeBytes * 0x70);
         }
         rsdItem->ptr18 = allocData;
 
-        memset(rsdItem->ptr18, 0, dataSize);
-        memcpy(rsdItem->ptr18, usb.m_data, dataSize);
+        memset(rsdItem->ptr18, 0, usb.m_sizeBytes * 0x70);
+        memcpy(rsdItem->ptr18, usb.m_data, usb.m_sizeBytes * 0x70);
 
         for (u32 i = 0; i < usb.m_sizeBytes; i++) {
             u8* data = reinterpret_cast<u8*>(rsdItem->ptr18) + i * 0x70;
@@ -235,8 +231,6 @@ extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialE
         break;
     case 0x12: {
         RSDITEM* rsdItem = materialEditorPcs->GetRsdItem()->rsdItem;
-        u32 size = usb.m_sizeBytes;
-        u32 dataSize = size * 0xC;
         u32* xyzData;
 
         if (rsdItem->ptr14 != 0) {
@@ -244,15 +238,15 @@ extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialE
             rsdItem->ptr14 = 0;
         }
 
-        rsdItem->countB = size;
+        rsdItem->countB = usb.m_sizeBytes;
         void* allocData = _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
-            &Memory, dataSize, MaterialEditorStage(), s_ME_USB_process_cpp_801d7d78, 0x31, 0);
+            &Memory, usb.m_sizeBytes * 0xC, MaterialEditorStage(), s_ME_USB_process_cpp_801d7d78, 0x31, 0);
         if (allocData == 0) {
-            Printf__7CSystemFPce(&System, s_MemAlloc_Error____size__d_801d7d8c, dataSize);
+            Printf__7CSystemFPce(&System, s_MemAlloc_Error____size__d_801d7d8c, usb.m_sizeBytes * 0xC);
         }
         rsdItem->ptr14 = allocData;
 
-        memcpy(rsdItem->ptr14, usb.m_data, dataSize);
+        memcpy(rsdItem->ptr14, usb.m_data, usb.m_sizeBytes * 0xC);
 
         xyzData = reinterpret_cast<u32*>(rsdItem->ptr14);
         for (u32 i = 0, offset = 0; i < usb.m_sizeBytes; i++, offset += 0xC) {
@@ -303,16 +297,15 @@ extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialE
         break;
     }
     case 0x31: {
-        u32 size = usb.m_sizeBytes;
         u8* dstBuffer = reinterpret_cast<u8*>(_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
-            &Memory, size, MaterialEditorStage(), s_ME_USB_process_cpp_801d7d78, 0x31, 0));
+            &Memory, usb.m_sizeBytes, MaterialEditorStage(), s_ME_USB_process_cpp_801d7d78, 0x31, 0));
 
         if (dstBuffer == 0) {
-            Printf__7CSystemFPce(&System, s_MemAlloc_Error____size__d_801d7d8c, size);
+            Printf__7CSystemFPce(&System, s_MemAlloc_Error____size__d_801d7d8c, usb.m_sizeBytes);
         }
 
         RSDITEM* rsdItem = materialEditorPcs->GetRsdItem()->rsdItem;
-        memcpy(dstBuffer, usb.m_data, size);
+        memcpy(dstBuffer, usb.m_data, usb.m_sizeBytes);
 
         u8* target = reinterpret_cast<u8*>(rsdItem->ptr18);
         for (u32 i = 0; i < usb.m_sizeBytes; i++) {
@@ -419,7 +412,7 @@ extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialE
         while ((heightFactor & 1) == 0) {
             heightFactor >>= 1;
         }
-        if ((widthFactor != 1) || (heightFactor != 1)) {
+        if ((heightFactor != 1) || (heightFactor != 1)) {
             isPowerOfTwo = GX_FALSE;
         }
 

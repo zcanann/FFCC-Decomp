@@ -2274,8 +2274,9 @@ void CSound::Add3DLine(int lineIndex, Vec* position)
  */
 void CSound::SetReverb(int reverb, int depth)
 {
-    RedSound(this)->SetReverb(1, reverb);
-    RedSound(this)->SetReverbDepth(1, depth, 0xF);
+    u8* soundObj = reinterpret_cast<u8*>(this);
+    reinterpret_cast<CRedSound*>(soundObj + 8)->SetReverb(1, reverb);
+    reinterpret_cast<CRedSound*>(soundObj + 8)->SetReverbDepth(1, depth, 0xF);
 }
 
 /*

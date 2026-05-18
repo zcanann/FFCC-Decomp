@@ -24,6 +24,7 @@ extern "C" void Create__Q26CChara5CMeshFPQ26CChara6CModelR10CChunkFilePQ27CMemor
     void*, void*, CChunkFile&, CMemory::CStage*);
 extern "C" void __dla__FPv(void*);
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
+extern "C" CMemory::CStage* CreateStage__7CMemoryFUlPci(CMemory*, unsigned long, char*, int);
 extern "C" void __ct__Q26CChara5CNodeFv(void*);
 extern "C" void __dt__Q26CChara5CNodeFv(void*, int);
 extern "C" void __ct__Q26CChara5CMeshFv(void*);
@@ -49,6 +50,7 @@ extern "C" float FLOAT_803301e4;
 extern "C" float FLOAT_803301e8;
 extern "C" float FLOAT_803301f8;
 extern "C" CLightPcs::CBumpLight* DAT_8032edc0;
+extern "C" const char lbl_80330220[];
 
 namespace {
 
@@ -648,12 +650,17 @@ void D3DXMatrixMultiplyRotate(float (*out)[4], float (*a)[4], float (*b)[4])
  */
 void CChara::Init()
 {
-	*(void**)((u8*)this + 0x2058) = 0;
+	*(CMemory::CStage**)((u8*)this + 0x2058) =
+	    CreateStage__7CMemoryFUlPci(&Memory, 0xc0000, const_cast<char*>(lbl_80330220), 0);
 	*(u32*)((u8*)this + 0x205c) = 0;
-	*(void**)((u8*)this + 0x2068) = new u8[0x58000];
-	*(void**)((u8*)this + 0x2070) = new u8[0x58000];
+	CMemory::CStage* stage = *(CMemory::CStage**)((u8*)&Chara + 0x2058);
+	*(void**)((u8*)this + 0x2068) = new (stage, const_cast<char*>(s_chara_cpp_801d90c8), 0x3f) u8[0x58000];
+	stage = *(CMemory::CStage**)((u8*)&Chara + 0x2058);
+	*(void**)((u8*)this + 0x2070) = new (stage, const_cast<char*>(s_chara_cpp_801d90c8), 0x40) u8[0x58000];
 	*(s32*)((u8*)this + 0x2060) = 1;
-	FlipDBuffer();
+	*(s32*)((u8*)this + 0x2060) = 1 - *(s32*)((u8*)this + 0x2060);
+	u8* dbuffer = (u8*)this + *(s32*)((u8*)this + 0x2060) * 8;
+	*(u32*)(dbuffer + 0x2064) = 0;
 	*(u32*)((u8*)this + 0x2074) = 0;
 }
 

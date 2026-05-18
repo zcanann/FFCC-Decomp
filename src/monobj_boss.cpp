@@ -1786,12 +1786,12 @@ int CGMonObj::calcBranchFuncTetsukyojin(int)
 void CGMonObj::damagedFuncGigasLoad()
 {
 	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
-	if (*reinterpret_cast<int*>(mon + 0x6D0) == 0) {
+	switch (*reinterpret_cast<int*>(mon + 0x6D0)) {
+	case 0:
 		changeStat__8CGPrgObjFiii(reinterpret_cast<CGPrgObj*>(this), 4, 0, 0);
 		*reinterpret_cast<int*>(mon + 0x6D0) = 1;
 		*reinterpret_cast<int*>(CFlat + 4840) = 1;
-	} else {
-		return;
+		break;
 	}
 }
 
@@ -1890,11 +1890,11 @@ void CGMonObj::damagedFuncWifeLamia()
 {
 	CGObject* object = reinterpret_cast<CGObject*>(this);
 	unsigned short* script = reinterpret_cast<unsigned short*>(object->m_scriptHandle);
-	if (script != 0 && script[7] < 2) {
+	if (script[14] <= 1) {
 		reinterpret_cast<CGCharaObj*>(this)->ClearAllSta();
 		object->m_bgColMask &= 0xFFF7FFFF;
 		changeStat__8CGPrgObjFiii(reinterpret_cast<CGPrgObj*>(this), 100, 0, 0);
-		*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6B4) = 1;
+		*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6D0) = 1;
 	}
 }
 
@@ -2597,10 +2597,22 @@ void CGMonObj::damagedFuncDuct()
 {
 	CGObject* object = reinterpret_cast<CGObject*>(this);
 	int pdtNo = -1;
-	if (object->m_charaModelHandle != 0 && object->m_charaModelHandle->m_pdtLoadRef != 0) {
-		pdtNo = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(object->m_charaModelHandle->m_pdtLoadRef) + 0x14);
+	CRef* pdtLoadRef = object->m_charaModelHandle->m_pdtLoadRef;
+	void* scriptKind = object->m_scriptHandle[4];
+	int slot = reinterpret_cast<int>(scriptKind) - 0x8E;
+	if (pdtLoadRef != 0) {
+		pdtNo = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(pdtLoadRef) + 0x14);
 	}
 	putParticle__8CGPrgObjFiiP8CGObjectfi(reinterpret_cast<CGPrgObj*>(this), (pdtNo << 8) | 2, 0, object, FLOAT_80331d18, 0);
+
+	if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + 0x1C) == 0) {
+		CGObject* bossObj = *reinterpret_cast<CGObject**>(SoundBuffer_1260_ + 0x68);
+		CChara::CModel* model = bossObj->m_charaModelHandle->m_model;
+		CChara::CNode** nodes = reinterpret_cast<CChara::CNode**>(SoundBuffer_1260_ + 0x8);
+		int dispIndex = GetDispIndex__Q26CChara6CModelFPQ26CChara5CNode(
+		    model, nodes[slot]);
+		model->m_meshVisibleMask &= ~(1 << dispIndex);
+	}
 }
 
 /*

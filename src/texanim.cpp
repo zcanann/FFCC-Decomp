@@ -808,17 +808,16 @@ CTexAnimSet* CTexAnimSet::Duplicate(CMemory::CStage* stage)
  */
 void CTexAnimSet::AttachMaterialSet(CMaterialSet* materialSet)
 {
-    CTexAnimSetStorage* self = reinterpret_cast<CTexAnimSetStorage*>(this);
     CMaterialSetStorage* materialSetStorage = reinterpret_cast<CMaterialSetStorage*>(materialSet);
     unsigned int texAnimIndex;
     unsigned int texAnimCount;
     int materialIndex;
 
     for (texAnimIndex = 0;
-         ((texAnimCount = static_cast<unsigned int>(self->texAnims.GetSize())), texAnimIndex < texAnimCount);
+         ((texAnimCount = static_cast<unsigned int>(m_texAnims.GetSize())), texAnimIndex < texAnimCount);
          texAnimIndex = texAnimIndex + 1) {
-        CTexAnimStorage* texAnim = reinterpret_cast<CTexAnimStorage*>(self->texAnims[texAnimIndex]);
-        int* material = reinterpret_cast<int*>(*reinterpret_cast<void**>((int)texAnim->refData + 0x108));
+        CTexAnim* texAnim = m_texAnims[texAnimIndex];
+        int* material = reinterpret_cast<int*>(texAnim->m_refData->m_material);
 
         if (material != 0) {
             int refCount = material[1] - 1;
@@ -826,14 +825,14 @@ void CTexAnimSet::AttachMaterialSet(CMaterialSet* materialSet)
             if ((refCount == 0) && (material != 0)) {
                 (*(void (**)(int*, int))(*material + 8))(material, 1);
             }
-            *reinterpret_cast<int*>((int)texAnim->refData + 0x108) = 0;
+            texAnim->m_refData->m_material = 0;
         }
 
         if ((materialSet != 0) &&
-            ((materialIndex = materialSet->Find(reinterpret_cast<char*>((int)texAnim->refData + 8))), materialIndex >= 0)) {
+            ((materialIndex = materialSet->Find(texAnim->m_refData->m_name)), materialIndex >= 0)) {
             CMaterial* foundMaterial = materialSetStorage->materials[materialIndex];
-            *reinterpret_cast<void**>((int)texAnim->refData + 0x108) = foundMaterial;
-            material = reinterpret_cast<int*>(*reinterpret_cast<void**>((int)texAnim->refData + 0x108));
+            texAnim->m_refData->m_material = foundMaterial;
+            material = reinterpret_cast<int*>(texAnim->m_refData->m_material);
             material[1] = material[1] + 1;
         }
     }
@@ -950,28 +949,26 @@ void CTexAnimSet::AddFrame()
  */
 void CTexAnimSet::Change(char* name, float frame, CTexAnimSet::ANIM_TYPE mode)
 {
-    CTexAnimSetStorage* self = reinterpret_cast<CTexAnimSetStorage*>(this);
     unsigned int seqIndex;
     unsigned int texAnimIndex;
 
-    for (texAnimIndex = 0; texAnimIndex < static_cast<unsigned int>(self->texAnims.GetSize());
+    for (texAnimIndex = 0; texAnimIndex < static_cast<unsigned int>(m_texAnims.GetSize());
          texAnimIndex = texAnimIndex + 1) {
-        CTexAnimStorage* texAnim = reinterpret_cast<CTexAnimStorage*>(self->texAnims[texAnimIndex]);
+        CTexAnim* texAnim = m_texAnims[texAnimIndex];
         for (seqIndex = 0;
-             seqIndex < static_cast<unsigned int>(reinterpret_cast<CTexAnimRefDataStorage*>(texAnim->refData)->texAnimSeqs.GetSize());
+             seqIndex < static_cast<unsigned int>(texAnim->m_refData->m_texAnimSeqs.GetSize());
              seqIndex = seqIndex + 1) {
-            CTexAnimSeqStorage* seq =
-                reinterpret_cast<CTexAnimSeqStorage*>(reinterpret_cast<CTexAnimRefDataStorage*>(texAnim->refData)->texAnimSeqs[seqIndex]);
-            if (strcmp(name, seq->name) == 0) {
+            CTexAnimSeq* seq = texAnim->m_refData->m_texAnimSeqs[seqIndex];
+            if (strcmp(name, seq->m_name) == 0) {
                 goto found;
             }
         }
         seqIndex = 0xFFFFFFFF;
 found:
         if (static_cast<int>(seqIndex) >= 0) {
-            texAnim->unk0C = static_cast<int>(seqIndex);
-            texAnim->unk10 = frame;
-            texAnim->unk14 = static_cast<int>(mode);
+            texAnim->m_seqIndex = static_cast<int>(seqIndex);
+            texAnim->m_frame = frame;
+            texAnim->m_mode = static_cast<int>(mode);
             return;
         }
     }

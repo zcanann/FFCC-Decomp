@@ -81,25 +81,25 @@ extern float FLOAT_8033092c;
 extern float FLOAT_80330930;
 extern float FLOAT_80330934;
 extern float FLOAT_80330938;
-extern float FLOAT_8033093c;
+extern float FLOAT_8033093C;
 extern float FLOAT_80330940;
 extern float FLOAT_80330944;
 extern float FLOAT_80330948;
-extern float FLOAT_8033094c;
+extern float FLOAT_8033094C;
 extern float FLOAT_80330950;
 extern float FLOAT_80330954;
 extern float FLOAT_80330958;
-extern float FLOAT_8033095c;
+extern float FLOAT_8033095C;
 extern float FLOAT_80330960;
 extern float FLOAT_80330964;
 extern float FLOAT_80330968;
-extern float FLOAT_8033096c;
+extern float FLOAT_8033096C;
 extern float FLOAT_80330970;
 extern float FLOAT_80330974;
 extern double DOUBLE_80330978;
 extern float FLOAT_80330984;
 extern float FLOAT_80330988;
-extern float FLOAT_8033098c;
+extern float FLOAT_8033098C;
 extern float FLOAT_80330990;
 extern float FLOAT_80330980;
 extern float FLOAT_80330994;
@@ -616,18 +616,18 @@ void CMesMenu::onDraw()
                 SetColor__8CMenuPcsFR6CColor(&MenuPcs, colorStorage);
 
                 float cursorWave = sinf(FLOAT_80330930 * (FLOAT_80330914 - stateBlend) + FLOAT_80330930);
-                float signX = ((menuIndex & 1) != 0) ? 32.0f : -32.0f;
-                float iconX = drawX + signX * (FLOAT_80330914 - cursorWave);
-                iconX += ((menuIndex & 1) != 0) ? FLOAT_80330938 : (width - FLOAT_8033093c) - FLOAT_80330938;
+                int signX = ((menuIndex & 1) != 0) ? 32 : -32;
+                float iconX = drawX + (float)signX * (FLOAT_80330914 - cursorWave);
+                iconX += ((menuIndex & 1) != 0) ? FLOAT_80330938 : (width - FLOAT_8033093C) - FLOAT_80330938;
                 float iconY = drawY + (((menuIndex & 2) != 0) ? FLOAT_80330940 + height : FLOAT_80330944);
                 DrawRect__8CMenuPcsFUlfffffffff(
-                    &MenuPcs, ((menuIndex & 1) != 0) ? 8 : 0, iconX, iconY, FLOAT_8033093c, FLOAT_80330948,
-                    ((menuIndex & 2) != 0) ? 144.0f : FLOAT_803308d8, FLOAT_803308d8, FLOAT_80330914, FLOAT_80330914,
+                    &MenuPcs, ((menuIndex & 1) != 0) ? 8 : 0, iconX, iconY, FLOAT_8033093C, FLOAT_80330948,
+                    (float)(((menuIndex & 2) != 0) ? 144 : 0), FLOAT_803308d8, FLOAT_80330914, FLOAT_80330914,
                     FLOAT_803308d8);
 
                 CFlatDataView* flatData = reinterpret_cast<CFlatDataView*>(&Game.m_cFlatDataArr[1]);
                 if (*(int*)((char*)this + 0x3D98) >= 0) {
-                    SetScale__5CFontFf(FLOAT_8033094c, font);
+                    SetScale__5CFontFf(FLOAT_8033094C, font);
                     SetShadow__5CFontFi(font, 1);
                     SetMargin__5CFontFf(FLOAT_803308d8, font);
                     float textWidth = GetWidth__5CFontFPc(font, flatData->m_table[2].index[*(int*)((char*)this + 0x3D98)]);
@@ -637,7 +637,7 @@ void CMesMenu::onDraw()
                     SetColor__5CFontF8_GXColor(font, colorStorage);
                     SetPosX__5CFontFf(
                         iconX + (((menuIndex & 1) != 0) ? FLOAT_80330950 : FLOAT_80330954 - textWidth), font);
-                    SetPosY__5CFontFf(iconY + (((menuIndex & 2) != 0) ? 8.0f : 31.0f), font);
+                    SetPosY__5CFontFf(iconY + (float)(((menuIndex & 2) != 0) ? 8 : 31), font);
                     Draw__5CFontFPc(font, flatData->m_table[2].index[*(int*)((char*)this + 0x3D98)]);
                     DrawInit__8CMenuPcsFv(&MenuPcs);
                 }
@@ -648,12 +648,12 @@ void CMesMenu::onDraw()
                                                                colorStorage, 0xFF, 0xFF, 0xFF, (unsigned char)(int)alphaF));
                     SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x18);
                     SetExternalTlut__8CTextureFPvi(MenuPcs.m_textures[0x18], 0, 1);
-                    float itemX = iconX + (((menuIndex & 1) != 0) ? 13.0f : 83.0f);
+                    float itemX = iconX + (float)(((menuIndex & 1) != 0) ? 13 : 83);
                     int iconColumn = itemIndex % 8;
                     int iconRow = itemIndex / 8;
                     DrawRect__8CMenuPcsFUlfffffffff(
                         &MenuPcs, (((menuIndex & 1) != 0) && ((*(unsigned int*)((char*)this + 0x3D8C) & 4) == 0)) ? 8 : 0,
-                        itemX, iconY + FLOAT_80330958, FLOAT_8033095c, FLOAT_80330960, (float)(iconColumn * 0x30),
+                        itemX, iconY + FLOAT_80330958, FLOAT_8033095C, FLOAT_80330960, (float)(iconColumn * 0x30),
                         (float)(iconRow * 0x30), FLOAT_80330914, FLOAT_80330914, FLOAT_803308d8);
                 }
             }
@@ -661,21 +661,21 @@ void CMesMenu::onDraw()
             SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x16);
             __ct__6CColorFUcUcUcUc(colorStorage, 0xFF, 0xFF, 0xFF, (unsigned char)(int)(FLOAT_80330908 * stageBlend));
             SetColor__8CMenuPcsFR6CColor(&MenuPcs, colorStorage);
-            float frameX = baseX - (((menuIndex & 1) != 0) ? 128.0f : FLOAT_803308d8);
-            float frameY = baseY - (((menuIndex & 2) != 0) ? 56.0f : FLOAT_803308d8);
+            float frameX = baseX - (float)(((menuIndex & 1) != 0) ? 128 : 0);
+            float frameY = baseY - (float)(((menuIndex & 2) != 0) ? 56 : 0);
             DrawRect__8CMenuPcsFUlfffffffff(
                 &MenuPcs, 0, frameX, frameY, FLOAT_80330964, FLOAT_80330948,
-                ((menuIndex & 2) != 0) ? 128.0f : FLOAT_803308d8,
-                ((menuIndex & 1) != 0) ? 56.0f : FLOAT_803308d8, FLOAT_80330914, FLOAT_80330914, FLOAT_803308d8);
+                (float)(((menuIndex & 2) != 0) ? 128 : 0),
+                (float)(((menuIndex & 1) != 0) ? 56 : 0), FLOAT_80330914, FLOAT_80330914, FLOAT_803308d8);
 
-            SetScale__5CFontFf(FLOAT_8033094c, font);
+            SetScale__5CFontFf(FLOAT_8033094C, font);
             float titleWidth = GetWidth__5CFontFPc(font, reinterpret_cast<char*>(scriptFood + 0x3CA));
             DrawInit__5CFontFv(font);
             SetTlut__5CFontFi(font, 0xF);
             __ct__6CColorFUcUcUcUc(colorStorage, 0xFF, 0xFF, 0xFF, (unsigned char)(int)(FLOAT_80330908 * stageBlend));
             SetColor__5CFontF8_GXColor(font, colorStorage);
             SetPosX__5CFontFf(frameX + (((menuIndex & 1) != 0) ? FLOAT_80330968 - titleWidth : FLOAT_80330950), font);
-            SetPosY__5CFontFf(frameY + FLOAT_8033096c, font);
+            SetPosY__5CFontFf(frameY + FLOAT_8033096C, font);
             Draw__5CFontFPc(font, reinterpret_cast<char*>(scriptFood + 0x3CA));
             DrawInit__8CMenuPcsFv(&MenuPcs);
 
@@ -748,15 +748,15 @@ void CMesMenu::onDraw()
             int foodTier = (int)foodAmount - 100;
             foodTier = foodTier / 100 + (foodTier >> 31);
             unsigned int foodIcon = (foodAmount % 100) + (foodTier - (foodTier >> 31)) * 4;
-            float shakeX = (foodTimer != 0) ? (float)(((int)foodTimer >> 2) * DAT_8020f998[(3 - ((foodTimer + 1) & 3)) & 3]) : 0.0f;
-            float shakeY = (foodTimer != 0) ? (float)(((int)foodTimer >> 2) * DAT_8020f998[(3 - (foodTimer & 3)) & 3]) : 0.0f;
+            float shakeX = (foodTimer != 0) ? (float)(((int)foodTimer >> 2) * DAT_8020f998[(3 - ((foodTimer + 1) & 3)) & 3]) : FLOAT_803308d8;
+            float shakeY = (foodTimer != 0) ? (float)(((int)foodTimer >> 2) * DAT_8020f998[(3 - (foodTimer & 3)) & 3]) : FLOAT_803308d8;
             SetColor__8CMenuPcsFR6CColor(
                 &MenuPcs, __ct__6CColorFUcUcUcUc(colorStorage, 0xFF, 0xFF, 0xFF, (unsigned char)(int)(FLOAT_80330908 * stageBlend)));
             SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x18);
             SetExternalTlut__8CTextureFPvi(MenuPcs.m_textures[0x18], (*(short*)(scriptFood + 0x1C) == 0) ? (void*)0x802ea500 : 0, 1);
             DrawRect__8CMenuPcsFUlfffffffff(
-                &MenuPcs, ((menuIndex & 1) == 0) ? 8 : 0, frameX + shakeX + (((menuIndex & 1) != 0) ? 75.0f : 5.0f),
-                frameY + shakeY + FLOAT_80330958, FLOAT_8033095c, FLOAT_80330960,
+                &MenuPcs, ((menuIndex & 1) == 0) ? 8 : 0, frameX + shakeX + (float)(((menuIndex & 1) != 0) ? 75 : 5),
+                frameY + shakeY + FLOAT_80330958, FLOAT_8033095C, FLOAT_80330960,
                 (float)((foodIcon % 8) * 0x30), (float)((foodIcon / 8) * 0x30), FLOAT_80330914, FLOAT_80330914,
                 FLOAT_803308d8);
         }
@@ -785,16 +785,16 @@ void CMesMenu::onDraw()
                 SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x14);
                 SetColor__8CMenuPcsFR6CColor(
                     &MenuPcs, __ct__6CColorFUcUcUcUc(colorStorage, 0xFF, 0xFF, 0xFF, (unsigned char)(int)alphaF));
-                float iconX = drawX + FLOAT_80330938 + ((anchorX == 0) ? sizeX - FLOAT_8033093c : FLOAT_803308d8);
+                float iconX = drawX + FLOAT_80330938 + ((anchorX == 0) ? sizeX - FLOAT_8033093C : FLOAT_803308d8);
                 float iconY = drawY + ((anchorY != 0) ? FLOAT_80330940 + sizeY : FLOAT_80330944);
                 DrawRect__8CMenuPcsFUlfffffffff(
-                    &MenuPcs, anchorX != 0 ? 8 : 0, iconX, iconY, FLOAT_8033093c, FLOAT_80330948,
-                    anchorY != 0 ? 144.0f : FLOAT_803308d8, FLOAT_803308d8, FLOAT_80330914, FLOAT_80330914,
+                    &MenuPcs, anchorX != 0 ? 8 : 0, iconX, iconY, FLOAT_8033093C, FLOAT_80330948,
+                    (float)(anchorY != 0 ? 144 : 0), FLOAT_803308d8, FLOAT_80330914, FLOAT_80330914,
                     FLOAT_803308d8);
 
                 CFlatDataView* flatData = reinterpret_cast<CFlatDataView*>(&Game.m_cFlatDataArr[1]);
                 if (*(int*)((char*)this + 0x3D98) >= 0) {
-                    SetScale__5CFontFf(FLOAT_8033094c, font);
+                    SetScale__5CFontFf(FLOAT_8033094C, font);
                     SetShadow__5CFontFi(font, 1);
                     SetMargin__5CFontFf(FLOAT_803308d8, font);
                     float textWidth = GetWidth__5CFontFPc(font, flatData->m_table[2].index[*(int*)((char*)this + 0x3D98)]);
@@ -803,7 +803,7 @@ void CMesMenu::onDraw()
                     SetColor__5CFontF8_GXColor(
                         font, __ct__6CColorFUcUcUcUc(colorStorage, 0xFF, 0xFF, 0xFF, (unsigned char)(int)alphaF));
                     SetPosX__5CFontFf(iconX + ((anchorX == 0) ? FLOAT_80330954 - textWidth : FLOAT_80330950), font);
-                    SetPosY__5CFontFf(iconY + (anchorY != 0 ? 8.0f : 31.0f), font);
+                    SetPosY__5CFontFf(iconY + (float)(anchorY != 0 ? 8 : 31), font);
                     Draw__5CFontFPc(font, flatData->m_table[2].index[*(int*)((char*)this + 0x3D98)]);
                     DrawInit__8CMenuPcsFv(&MenuPcs);
                 }
@@ -816,7 +816,7 @@ void CMesMenu::onDraw()
                     SetExternalTlut__8CTextureFPvi(MenuPcs.m_textures[0x18], 0, 1);
                     DrawRect__8CMenuPcsFUlfffffffff(
                         &MenuPcs, (anchorX != 0 && ((*(unsigned int*)((char*)this + 0x3D8C) & 4) == 0)) ? 8 : 0,
-                        iconX + (anchorX != 0 ? 13.0f : 83.0f), iconY + FLOAT_80330958, FLOAT_8033095c, FLOAT_80330960,
+                        iconX + (float)(anchorX != 0 ? 13 : 83), iconY + FLOAT_80330958, FLOAT_8033095C, FLOAT_80330960,
                         (float)((itemIndex % 8) * 0x30), (float)((itemIndex / 8) * 0x30), FLOAT_80330914, FLOAT_80330914,
                         FLOAT_803308d8);
                 }
@@ -843,13 +843,13 @@ void CMesMenu::onDraw()
             float waveY = promptY - FLOAT_80330988 * (pulseScale * sinY);
             float fadeScale = FLOAT_80330914 - pulseScale;
             DrawRect__8CMenuPcsFUlfffffffff(
-                &MenuPcs, 3, FLOAT_803308e4 + waveX, FLOAT_803308e4 + waveY, FLOAT_8033098c, FLOAT_8033095c, FLOAT_803308d8,
+                &MenuPcs, 3, FLOAT_803308e4 + waveX, FLOAT_803308e4 + waveY, FLOAT_8033098C, FLOAT_8033095C, FLOAT_803308d8,
                 FLOAT_803308d8, FLOAT_80330990 * (FLOAT_80330914 + fadeScale), FLOAT_80330990 * (pulseScale + fadeScale),
                 FLOAT_803308d8);
             SetColor__8CMenuPcsFR6CColor(
                 &MenuPcs, __ct__6CColorFUcUcUcUc(colorStorage, 0xFF, 0xFF, 0xFF, (unsigned char)(int)((FLOAT_80330908 * windowScale) * stageBlend)));
             DrawRect__8CMenuPcsFUlfffffffff(
-                &MenuPcs, 3, waveX, waveY, FLOAT_8033098c, FLOAT_8033095c, FLOAT_803308d8, FLOAT_803308d8,
+                &MenuPcs, 3, waveX, waveY, FLOAT_8033098C, FLOAT_8033095C, FLOAT_803308d8, FLOAT_803308d8,
                 FLOAT_80330990 * pulseScale, FLOAT_80330990 * pulseScale, FLOAT_803308d8);
         }
 
@@ -1185,46 +1185,44 @@ void CMesMenu::Destroy()
  */
 void CMesMenu::Create()
 {
-    typedef void (*VFunc)(void*);
-
-    (*reinterpret_cast<VFunc**>(this))[4](this);
+    Destroy();
     Create__5CMenuFv(this);
 
     float defaultValue = FLOAT_803308d8;
-    *(float*)((char*)this + 0x3D78) = defaultValue;
-    *(float*)((char*)this + 0x3D74) = defaultValue;
-    *(int*)((char*)this + 8) = 0;
-    *(int*)((char*)this + 0xC) = 4;
-    *(int*)((char*)this + 0x3DF4) = 0;
-    *(int*)((char*)this + 0x3DF8) = 0;
+    m_offsetY = defaultValue;
+    m_offsetX = defaultValue;
+    m_active = 0;
+    m_state = 4;
+    m_stageFadeTimer = 0;
+    m_stageFadeOut = 0;
 
-    if (*(int*)((char*)this + 0x18) < 4) {
+    if (m_menuIndex < 4) {
         int x = 0x10;
-        if ((*(int*)((char*)this + 0x18) & 1) != 0) {
+        if ((m_menuIndex & 1) != 0) {
             x = 0x270;
         }
-        *(float*)((char*)this + 0x3D6C) = (float)x;
+        m_baseX = (float)x;
 
         int y = 0x18;
-        if ((*(int*)((char*)this + 0x18) & 2) != 0) {
+        if ((m_menuIndex & 2) != 0) {
             y = 0x1B0;
         }
         defaultValue = FLOAT_803308d8;
-        *(float*)((char*)this + 0x3D70) = (float)y;
-        *(float*)((char*)this + 0x3D7C) = defaultValue;
-        *(float*)((char*)this + 0x3D80) = defaultValue;
-        *(float*)((char*)this + 0x3D84) = defaultValue;
-        *(int*)((char*)this + 0x3D88) = 0;
-        *(int*)((char*)this + 0x3D8C) = 0;
-        *(int*)((char*)this + 0x3DA8) = 0;
-        *(int*)((char*)this + 0x3DAC) = 0;
-        memset((char*)this + 0x3DB0, 0, 0x20);
-        memset((char*)this + 0x3DD0, 0, 0x20);
-        *(int*)((char*)this + 0x3DF0) = 0;
+        m_baseY = (float)y;
+        m_windowWidth = defaultValue;
+        m_windowHeight = defaultValue;
+        m_windowScale = defaultValue;
+        m_fromScriptPosition = 0;
+        m_flags = 0;
+        m_heartValue = 0;
+        m_heartTarget = 0;
+        memset(m_heartGrowTimers, 0, sizeof(m_heartGrowTimers));
+        memset(m_heartDropTimers, 0, sizeof(m_heartDropTimers));
+        m_foodShakeTimer = 0;
     }
 
-    *(int*)((char*)this + 0x3D98) = 0;
-    *(int*)((char*)this + 0x3D94) = 0;
+    m_nameIndex = 0;
+    m_itemIndex = 0;
 }
 
 /*

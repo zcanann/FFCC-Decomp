@@ -52,7 +52,7 @@ unsigned char gBonusMenuFlag0 = 0;
 unsigned char gBonusMenuFlag1 = 0;
 unsigned char gBonusMenuFlag2 = 0;
 unsigned char gBonusMenuFlagPad = 0;
-float* gBonusCheckMarkPosBuffer[2] = {0, 0};
+float* s_Base[1];
 }
 #pragma force_active reset
 extern "C" const char s_draw_Bonus_pctd_801DD5C0[16] = {
@@ -398,8 +398,8 @@ static void FillBonusArtiBasePositions(float* out, const BonusAnimSprite* boardS
 
 static float* GetBonusArtiBasePositions(const BonusAnimSprite* sprite)
 {
-	FillBonusArtiBasePositions(gBonusCheckMarkPosBuffer[0], sprite, sprite);
-	return gBonusCheckMarkPosBuffer[0];
+	FillBonusArtiBasePositions(s_Base[0], sprite, sprite);
+	return s_Base[0];
 }
 
 static void InitSelectOpenPartyIcon(BonusAnimSprite* sprite, int slotIndex, short y)
@@ -628,7 +628,7 @@ static void DrawBonusActiveMarks(CMenuPcs* menu, int statePtr, float alpha)
 	GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(alpha * 255.0f)};
 	GXSetChanMatColor(GX_COLOR0A0, color);
 
-	float* markPos = gBonusCheckMarkPosBuffer[0];
+	float* markPos = s_Base[0];
 	if (markPos == 0) {
 		return;
 	}
@@ -792,7 +792,7 @@ static void UpdateSelectCursorSprite(int statePtr, BonusAnimHeader* header, Bonu
 
 	int slot = (*(short*)(statePtr + 0x26)) & 7;
 	float pulse = (float)(frame & 0x1f) / 31.0f;
-	float* markPos = gBonusCheckMarkPosBuffer[0];
+	float* markPos = s_Base[0];
 
 	if (markPos != 0) {
 		cursor->x = (short)(markPos[slot * 2 + 0] - 4.0f);
@@ -1088,7 +1088,7 @@ void CMenuPcs::BonusInit()
 {
 	gBonusMenuWork0 = 0;
 	GetBonusMenuMembers(this).m_bonusAnimPtr = 0;
-	gBonusCheckMarkPosBuffer[0] = 0;
+	s_Base[0] = 0;
 }
 
 /*
@@ -1125,8 +1125,8 @@ void CMenuPcs::createBonus()
 	if (s_bonusBoardState == 0) {
 		s_bonusBoardState = new unsigned char[0x48];
 	}
-	if (gBonusCheckMarkPosBuffer[0] == 0) {
-		gBonusCheckMarkPosBuffer[0] = new float[18];
+	if (s_Base[0] == 0) {
+		s_Base[0] = new float[18];
 	}
 
 	if (statePtr == 0) {
@@ -1188,8 +1188,8 @@ void CMenuPcs::createBonus()
 	if (s_bonusBoardState != 0) {
 		memset(s_bonusBoardState, 0, 0x48);
 	}
-	if (gBonusCheckMarkPosBuffer[0] != 0) {
-		memset(gBonusCheckMarkPosBuffer[0], 0, sizeof(float) * 18);
+	if (s_Base[0] != 0) {
+		memset(s_Base[0], 0, sizeof(float) * 18);
 	}
 
 	memset(reinterpret_cast<unsigned char*>(this) + 0x774, 0, 0x60);
@@ -1486,9 +1486,9 @@ void CMenuPcs::destroyBonus()
 		delete[] s_bonusBoardState;
 		s_bonusBoardState = 0;
 	}
-	if (gBonusCheckMarkPosBuffer[0] != 0) {
-		delete[] gBonusCheckMarkPosBuffer[0];
-		gBonusCheckMarkPosBuffer[0] = 0;
+	if (s_Base[0] != 0) {
+		delete[] s_Base[0];
+		s_Base[0] = 0;
 	}
 
 	freeTexture__8CMenuPcsFiiii(this, 2, 1, 0x16, 0x12);
@@ -3216,7 +3216,7 @@ void CMenuPcs::DrawArtiBase(CMenuPcs::Sprt2* sprt, float alpha)
 	}
 
 	BonusAnimSprite* sprite = reinterpret_cast<BonusAnimSprite*>(sprt);
-	float* pos = gBonusCheckMarkPosBuffer[0];
+	float* pos = s_Base[0];
 	int statePtr = GetBonusMenuMembers(this).m_bonusStatePtr;
 	int selectedSlot = -1;
 	unsigned char activeMask = 0;
@@ -3263,7 +3263,7 @@ void CMenuPcs::DrawBonusChkMark(float alpha)
 {
 	int animPtr = GetBonusMenuMembers(this).m_bonusAnimPtr;
 	int statePtr = GetBonusMenuMembers(this).m_bonusStatePtr;
-	float* currentPos = gBonusCheckMarkPosBuffer[0];
+	float* currentPos = s_Base[0];
 	float a = alpha;
 	float strongest = a;
 	float pulse = 0.0f;
@@ -3344,7 +3344,7 @@ void CMenuPcs::ArtiBaseInfoInit(CMenuPcs::Sprt2* a, CMenuPcs::Sprt2* b)
 {
 	short* board = reinterpret_cast<short*>(a);
 	short* icon = reinterpret_cast<short*>(b);
-	float* pos = gBonusCheckMarkPosBuffer[0];
+	float* pos = s_Base[0];
 
 	float x = (float)board[0];
 	float y = (float)board[1];

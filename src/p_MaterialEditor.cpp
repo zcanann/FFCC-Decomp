@@ -28,6 +28,11 @@ extern "C" void* __vt__8CManager[];
 extern "C" void* __vt__8CProcess[];
 extern "C" char __RTTI__8CManager_8032E648[];
 extern "C" char __RTTI__8CProcess_8032E650[];
+extern "C" unsigned int m_table_desc0__18CMaterialEditorPcs[];
+extern "C" unsigned int m_table_desc1__18CMaterialEditorPcs[];
+extern "C" unsigned int m_table_desc2__18CMaterialEditorPcs[];
+extern "C" unsigned int m_table_desc3__18CMaterialEditorPcs[];
+extern "C" unsigned int m_table__18CMaterialEditorPcs[];
 extern "C" const char s_CMaterialEditorPcs_VIEWER_801D7D18[] = "CMaterialEditorPcs(VIEWER)";
 extern "C" const char s_CMaterialEditorPcs_801D7D34[] = "CMaterialEditorPcs";
 extern "C" const char s_CManager_801D7D48[] = "CManager";
@@ -59,11 +64,11 @@ u8 lbl_8026D338[0xC];
 extern "C" void __sinit_p_MaterialEditor_cpp(void)
 {
     u8* self = reinterpret_cast<u8*>(&MaterialEditorPcs);
-    unsigned int* dst = CMaterialEditorPcs::m_table;
-    unsigned int* desc0 = CMaterialEditorPcs::m_table_desc0;
-    unsigned int* desc1 = CMaterialEditorPcs::m_table_desc1;
-    unsigned int* desc2 = CMaterialEditorPcs::m_table_desc2;
-    unsigned int* desc3 = CMaterialEditorPcs::m_table_desc3;
+    unsigned int* dst = m_table__18CMaterialEditorPcs;
+    unsigned int* desc0 = m_table_desc0__18CMaterialEditorPcs;
+    unsigned int* desc1 = m_table_desc1__18CMaterialEditorPcs;
+    unsigned int* desc2 = m_table_desc2__18CMaterialEditorPcs;
+    unsigned int* desc3 = m_table_desc3__18CMaterialEditorPcs;
 
     *reinterpret_cast<void**>(self) = __vt__8CManager;
     *reinterpret_cast<void**>(self) = __vt__8CProcess;

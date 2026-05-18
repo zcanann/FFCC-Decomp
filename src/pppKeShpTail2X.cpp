@@ -274,7 +274,6 @@ draw_loop:
     pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc((void*)0, &drawMtx,
                                                                (step->m_useEnvDepth != 0) ? step->m_envDepth : kPppKeShpTail2XZero, 0,
                                                                step->m_drawA, step->m_blendMode, 0, zEnable, 1, 0);
-    GXLoadPosMtxImm(drawMtx.value, 0);
 
     {
         GXColor amb;
@@ -318,11 +317,10 @@ update_step:
 advance_segment:
     if (nextIndex == lastIndex) {
         nextIndex = 0;
-        goto wrapped_segment;
+    } else {
+        nextIndex++;
     }
-    nextIndex++;
-wrapped_segment:
-    if (nextIndex == work->m_head) {
+    if (nextIndex == curIndex) {
         return;
     }
 

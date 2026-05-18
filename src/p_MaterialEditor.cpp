@@ -402,20 +402,18 @@ void CMaterialEditorPcs::destroyViewer()
  */
 void CMaterialEditorPcs::ClearTextureData()
 {
-    unsigned char* cursor = reinterpret_cast<unsigned char*>(this);
     unsigned int i = 0;
 
-    *reinterpret_cast<volatile unsigned char*>(reinterpret_cast<unsigned char*>(this) + 0x3BC) = 0;
+    m_loadedTextureCount = 0;
 
     do {
-        MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(cursor + 0x2BC)));
-        MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(cursor + 0x2FC)));
-        MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(cursor + 0x23C)));
-        MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(cursor + 0x33C)));
-        MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(cursor + 0x37C)));
-        MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(cursor + 0x27C)));
+        MemFree__18CMaterialEditorPcsFPv(this, m_textureData[i]);
+        MemFree__18CMaterialEditorPcsFPv(this, m_tlutData[i]);
+        MemFree__18CMaterialEditorPcsFPv(this, m_texObj[i]);
+        MemFree__18CMaterialEditorPcsFPv(this, m_tlutObj0[i]);
+        MemFree__18CMaterialEditorPcsFPv(this, m_tlutObj1[i]);
+        MemFree__18CMaterialEditorPcsFPv(this, m_textureHeader[i]);
         i += 1;
-        cursor += 4;
     } while (i < 0x10);
 }
 

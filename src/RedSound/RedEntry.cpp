@@ -592,6 +592,7 @@ int CRedEntry::WaveHeadAdd(int waveBankNo, RedWaveHeadWD* waveHead, int waveNo)
 
 	int aramRangeStart;
 	int aramRangeEnd;
+	int aramAddress;
 	if ((waveNo >= REDSOUND_WAVE_LARGE_RANGE_BEGIN) && (waveNo < REDSOUND_WAVE_LARGE_RANGE_END)) {
 		aramRangeStart = REDSOUND_WAVE_LARGE_REGION_OFFSET;
 		aramRangeEnd = aramRangeStart + REDSOUND_WAVE_LARGE_REGION_SIZE;
@@ -621,7 +622,6 @@ int CRedEntry::WaveHeadAdd(int waveBankNo, RedWaveHeadWD* waveHead, int waveNo)
 			}
 		}
 
-		int aramAddress;
 		if ((allocatedWaveBank < RedEntryWaveBankGetEnd(this)) &&
 		    ((aramAddress = RedNewA(waveHead->m_loadSize, aramRangeStart, aramRangeEnd)) != 0)) {
 			int waveCopySize = RedWaveHeadGetTableSize(waveHead);
@@ -640,7 +640,7 @@ int CRedEntry::WaveHeadAdd(int waveBankNo, RedWaveHeadWD* waveHead, int waveNo)
 					allocatedWaveBank->m_historyNo = REDSOUND_HISTORY_UNUSED;
 				}
 				memcpy(copiedWaveHead, waveHead, waveCopySize);
-				return aramAddress;
+				goto success;
 			}
 			RedDeleteA((void*)aramAddress);
 		}
@@ -653,6 +653,9 @@ int CRedEntry::WaveHeadAdd(int waveBankNo, RedWaveHeadWD* waveHead, int waveNo)
 	}
 
 	return REDSOUND_WAVE_ADD_FAILED;
+
+success:
+	return aramAddress;
 }
 /*
  * --INFO--

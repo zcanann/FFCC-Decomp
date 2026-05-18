@@ -53,7 +53,7 @@ extern const float FLOAT_803311B4;
 extern const float FLOAT_803311B8;
 extern const double DOUBLE_803311C0;
 extern const float FLOAT_803311C8;
-extern const char s_Exiting_803311CC[] = "Exiting";
+extern const char s_Exiting_803311CC[8];
 
 struct _pppEnvStYmEnv {
     void* m_stagePtr;

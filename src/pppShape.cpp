@@ -10,8 +10,8 @@ extern const float FLOAT_80330108;
 void pppSetBlendMode(unsigned char);
 
 extern "C" {
-    unsigned short FindTexName__12CMaterialSetFPcPl(CMaterialSet* materialSet, char* textureName,
-                                                     long* outIndex);
+    unsigned int FindTexName__12CMaterialSetFPcPl(CMaterialSet* materialSet, char* textureName,
+                                                  long* outIndex);
     void CacheLoadTexture__12CMaterialSetFiP13CAmemCacheSet(CMaterialSet* materialSet, unsigned int textureIndex,
                                                              void* amemCacheSet);
 }

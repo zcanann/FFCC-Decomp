@@ -29,7 +29,7 @@ void SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(void* materialMa
 void SetMaterialPart__12CMaterialManFP12CMaterialSetii(void* materialMan, CMaterialSet* materialSet,
                                                         unsigned int materialIdx, int partIdx);
 void SetMaterialCharaShadow__12CMaterialManFP9CMaterial(void* materialMan, void* material);
-unsigned short FindTexName__12CMaterialSetFPcPl(CMaterialSet* materialSet, char* textureName, long* outIndex);
+unsigned int FindTexName__12CMaterialSetFPcPl(CMaterialSet* materialSet, char* textureName, long* outIndex);
 void CacheLoadTexture__12CMaterialSetFiP13CAmemCacheSet(CMaterialSet* materialSet, unsigned int materialIdx,
                                                          CAmemCacheSet* cacheSet);
 void CacheDumpTexture__12CMaterialSetFiP13CAmemCacheSet(CMaterialSet* materialSet, unsigned int materialIdx,

@@ -15,6 +15,8 @@ extern "C" const float FLOAT_8032F8CC;
 extern "C" const float FLOAT_8032F8D0;
 extern "C" const float FLOAT_8032F8D4;
 extern "C" const float FLOAT_8032F8D8;
+extern "C" const double DOUBLE_8032F8E0;
+extern "C" const float FLOAT_8032F8E8;
 extern "C" const float FLOAT_8032F8F4;
 extern "C" const float FLOAT_8032F8F8;
 extern "C" const double DOUBLE_8032F900;
@@ -445,52 +447,56 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
         return 0;
     }
 
-    bool overlap = false;
+    bool boundsOverlap = false;
+    bool xOverlap = false;
     if (g_hit_cyl.m_boundsMin.x <= g_hit_lpface->m_boundsMin.x) {
         if (g_hit_lpface->m_boundsMin.x <= g_hit_cyl.m_boundsMin.x) {
-            overlap = true;
+            xOverlap = true;
         } else {
-            overlap = g_hit_lpface->m_boundsMin.x <= g_hit_cyl.m_boundsMax.x;
+            xOverlap = g_hit_lpface->m_boundsMin.x <= g_hit_cyl.m_boundsMax.x;
         }
     } else {
-        overlap = g_hit_cyl.m_boundsMin.x <= g_hit_lpface->m_boundsMax.x;
-    }
-    if (!overlap) {
-        return 0;
+        xOverlap = g_hit_cyl.m_boundsMin.x <= g_hit_lpface->m_boundsMax.x;
     }
 
-    overlap = false;
-    if (g_hit_cyl.m_boundsMin.y <= g_hit_lpface->m_boundsMin.y) {
-        if (g_hit_lpface->m_boundsMin.y <= g_hit_cyl.m_boundsMin.y) {
-            overlap = true;
+    if (xOverlap) {
+        bool yOverlap = false;
+        if (g_hit_cyl.m_boundsMin.y <= g_hit_lpface->m_boundsMin.y) {
+            if (g_hit_lpface->m_boundsMin.y <= g_hit_cyl.m_boundsMin.y) {
+                yOverlap = true;
+            } else {
+                yOverlap = g_hit_lpface->m_boundsMin.y <= g_hit_cyl.m_boundsMax.y;
+            }
         } else {
-            overlap = g_hit_lpface->m_boundsMin.y <= g_hit_cyl.m_boundsMax.y;
+            yOverlap = g_hit_cyl.m_boundsMin.y <= g_hit_lpface->m_boundsMax.y;
         }
-    } else {
-        overlap = g_hit_cyl.m_boundsMin.y <= g_hit_lpface->m_boundsMax.y;
-    }
-    if (!overlap) {
-        return 0;
+
+        if (yOverlap) {
+            bool zOverlap = false;
+            if (g_hit_cyl.m_boundsMin.z <= g_hit_lpface->m_boundsMin.z) {
+                if (g_hit_lpface->m_boundsMin.z <= g_hit_cyl.m_boundsMin.z) {
+                    zOverlap = true;
+                } else {
+                    zOverlap = g_hit_lpface->m_boundsMin.z <= g_hit_cyl.m_boundsMax.z;
+                }
+            } else {
+                zOverlap = g_hit_cyl.m_boundsMin.z <= g_hit_lpface->m_boundsMax.z;
+            }
+
+            if (zOverlap) {
+                boundsOverlap = true;
+            }
+        }
     }
 
-    overlap = false;
-    if (g_hit_cyl.m_boundsMin.z <= g_hit_lpface->m_boundsMin.z) {
-        if (g_hit_lpface->m_boundsMin.z <= g_hit_cyl.m_boundsMin.z) {
-            overlap = true;
-        } else {
-            overlap = g_hit_lpface->m_boundsMin.z <= g_hit_cyl.m_boundsMax.z;
-        }
-    } else {
-        overlap = g_hit_cyl.m_boundsMin.z <= g_hit_lpface->m_boundsMax.z;
-    }
-    if (!overlap) {
+    if (!boundsOverlap) {
         return 0;
     }
 
     Vec* normal = &g_hit_lpface->m_normal;
     Vec* hitDirection = &g_hit_cyl.m_axis;
     float dot = PSVECDotProduct(hitDirection, normal);
-    if (dot >= 0.0f) {
+    if (dot >= FLOAT_8032F8D0) {
         return 0;
     }
 
@@ -498,7 +504,11 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
     g_hit_edge_t = -((hitDot - (g_hit_lpface->m_planeD + g_hit_cyl.m_radius)) / dot);
     int edgeIndex = -1;
 
-    if (0.0f < g_hit_edge_t && g_hit_edge_t < g_hit_t_min) {
+    if (g_hit_edge_t > DOUBLE_8032F8E0) {
+        return 0;
+    }
+
+    if (FLOAT_8032F8E8 <= g_hit_edge_t && g_hit_edge_t < g_hit_t_min) {
         PSVECScale(hitDirection, &g_hit_hpv, g_hit_edge_t);
         PSVECAdd(&g_hit_cyl.m_bottom, &g_hit_hpv, &g_hit_hpv);
 
@@ -517,33 +527,33 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
             if (g_hit_lpface->m_projectionAxis == 1) {
                 edgeStart.x = previous.x + g_hit_lpface->m_vertexOffsets[i][0];
                 edgeStart.y = previous.z + g_hit_lpface->m_vertexOffsets[i][1];
-                edgeStart.z = 0.0f;
+                edgeStart.z = FLOAT_8032F8D0;
                 edgeEnd.x = current.x + g_hit_lpface->m_vertexOffsets[i][0];
                 edgeEnd.y = current.z + g_hit_lpface->m_vertexOffsets[i][1];
-                edgeEnd.z = 0.0f;
+                edgeEnd.z = FLOAT_8032F8D0;
                 point.x = pushedHit.x;
                 point.y = pushedHit.z;
-                point.z = 0.0f;
+                point.z = FLOAT_8032F8D0;
             } else if (g_hit_lpface->m_projectionAxis == 0) {
                 edgeStart.x = previous.y + g_hit_lpface->m_vertexOffsets[i][0];
                 edgeStart.y = previous.z + g_hit_lpface->m_vertexOffsets[i][1];
-                edgeStart.z = 0.0f;
+                edgeStart.z = FLOAT_8032F8D0;
                 edgeEnd.x = current.y + g_hit_lpface->m_vertexOffsets[i][0];
                 edgeEnd.y = current.z + g_hit_lpface->m_vertexOffsets[i][1];
-                edgeEnd.z = 0.0f;
+                edgeEnd.z = FLOAT_8032F8D0;
                 point.x = pushedHit.y;
                 point.y = pushedHit.z;
-                point.z = 0.0f;
+                point.z = FLOAT_8032F8D0;
             } else {
                 edgeStart.x = previous.x + g_hit_lpface->m_vertexOffsets[i][0];
                 edgeStart.y = previous.y + g_hit_lpface->m_vertexOffsets[i][1];
-                edgeStart.z = 0.0f;
+                edgeStart.z = FLOAT_8032F8D0;
                 edgeEnd.x = current.x + g_hit_lpface->m_vertexOffsets[i][0];
                 edgeEnd.y = current.y + g_hit_lpface->m_vertexOffsets[i][1];
-                edgeEnd.z = 0.0f;
+                edgeEnd.z = FLOAT_8032F8D0;
                 point.x = pushedHit.x;
                 point.y = pushedHit.y;
-                point.z = 0.0f;
+                point.z = FLOAT_8032F8D0;
             }
 
             Vec edge;
@@ -552,7 +562,7 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
             PSVECSubtract(&edgeEnd, &edgeStart, &edge);
             PSVECSubtract(&point, &edgeEnd, &toPoint);
             PSVECCrossProduct(&edge, &toPoint, &cross);
-            if (cross.z < 0.0f) {
+            if (cross.z < FLOAT_8032F8D0) {
                 sideMask &= 2;
             } else {
                 sideMask &= 1;
@@ -571,7 +581,7 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
         }
     }
 
-    if (edgeIndex != -1 || g_hit_edge_t <= 0.0f || g_hit_t_min <= g_hit_edge_t) {
+    if (edgeIndex != -1 || g_hit_edge_t < FLOAT_8032F8E8 || g_hit_t_min <= g_hit_edge_t) {
         Vec previous = m_vertices[g_hit_lpface->m_vertexIndices[g_hit_lpface->m_vertexCount - 1]];
         for (int i = 0; i < static_cast<int>(g_hit_lpface->m_vertexCount); i++) {
             Vec current = m_vertices[g_hit_lpface->m_vertexIndices[i]];
@@ -633,6 +643,11 @@ int CMapHit::ReadOtmHit(CChunkFile& chunkFile)
 
     while (chunkFile.GetNextChunk(chunk)) {
         switch (chunk.m_id) {
+        case 'NAME': {
+            char* mapHitName = chunkFile.GetString();
+            MapMng.AttachMapHit(this, mapHitName);
+            break;
+        }
         case 'HITV': {
             m_vertexCount = static_cast<unsigned short>(chunk.m_arg0);
             m_vertices =
@@ -691,9 +706,11 @@ int CMapHit::ReadOtmHit(CChunkFile& chunkFile)
                 face.m_drawFlags = 0;
 
                 const unsigned int vertexCount = face.m_vertexCount;
+                float* vertexOffset = &face.m_vertexOffsets[0][0];
                 for (unsigned int i = 0; i < vertexCount; i++) {
-                    face.m_vertexOffsets[i][0] = zero;
-                    face.m_vertexOffsets[i][1] = zero;
+                    vertexOffset[1] = zero;
+                    vertexOffset[0] = zero;
+                    vertexOffset += 2;
                 }
 
                 if (chunk.m_version == 0) {
@@ -723,10 +740,9 @@ int CMapHit::ReadOtmHit(CChunkFile& chunkFile)
                 }
 
                 for (unsigned int i = 0; i < vertexCount; i++) {
-                    const unsigned short idx = chunkFile.Get2();
-                    face.m_vertexIndices[i] = idx;
+                    face.m_vertexIndices[i] = chunkFile.Get2();
 
-                    const Vec& v = m_vertices[idx];
+                    const Vec& v = m_vertices[face.m_vertexIndices[i]];
                     face.m_boundsMin.x = (face.m_boundsMin.x < v.x) ? face.m_boundsMin.x : v.x;
                     face.m_boundsMin.y = (face.m_boundsMin.y < v.y) ? face.m_boundsMin.y : v.y;
                     face.m_boundsMin.z = (face.m_boundsMin.z < v.z) ? face.m_boundsMin.z : v.z;
@@ -745,11 +761,6 @@ int CMapHit::ReadOtmHit(CChunkFile& chunkFile)
                 face.m_boundsMax.z += (offsetScale + face.m_radiusScale);
                 face.m_radiusScale = static_cast<float>(radiusBase - face.m_radiusScale);
             }
-            break;
-        }
-        case 'NAME': {
-            char* mapHitName = chunkFile.GetString();
-            MapMng.AttachMapHit(this, mapHitName);
             break;
         }
         }

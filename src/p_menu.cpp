@@ -1955,6 +1955,11 @@ void CMenuPcs::drawBattle()
             GXSetChanMatColor(GX_COLOR0A0, frameColor.color);
 
             if (LoadFloat(kMenuInitOne) < static_cast<float>(totalWidth)) {
+                float bodyWidth = static_cast<float>(totalWidth) - LoadFloat(FLOAT_80330818);
+                if (bodyWidth < LoadFloat(kMenuInitOne)) {
+                    bodyWidth = LoadFloat(kMenuInitOne);
+                }
+
                 CTexture* tex = MenuPcs.m_textures[0xDD];
                 TextureMan.SetTexture(GX_TEXMAP0, tex);
                 u32 width = tex->m_width;
@@ -1977,7 +1982,7 @@ void CMenuPcs::drawBattle()
                 GXSetNumTexGens(1);
                 GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
                 TextureMan.SetTextureTev(tex);
-                MenuPcs.DrawRect(0, bodyLeft, screenY, static_cast<float>(totalWidth - 16), LoadFloat(FLOAT_80330820), LoadFloat(kMenuInitOne), LoadFloat(kMenuInitOne), LoadFloat(FLOAT_80330808), LoadFloat(FLOAT_80330808), LoadFloat(kMenuInitOne));
+                MenuPcs.DrawRect(0, bodyLeft, screenY, bodyWidth, LoadFloat(FLOAT_80330820), LoadFloat(kMenuInitOne), LoadFloat(kMenuInitOne), LoadFloat(FLOAT_80330808), LoadFloat(FLOAT_80330808), LoadFloat(kMenuInitOne));
 
                 tex = MenuPcs.m_textures[0xDF];
                 TextureMan.SetTexture(GX_TEXMAP0, tex);

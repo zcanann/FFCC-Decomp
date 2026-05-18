@@ -927,6 +927,7 @@ void COctTree::SetDrawFlag()
  */
 void ClearLight_r(COctNode* octNode)
 {
+	COctNode* nodeIter;
 	int iVar1;
 	int iVar2;
 	COctNode* pCVar3;
@@ -945,8 +946,9 @@ void ClearLight_r(COctNode* octNode)
 		*reinterpret_cast<unsigned long*>(Ptr(octNode, 0x44)) = 0;
 	}
 	iVar1 = 0;
+	nodeIter = octNode;
 	do {
-		pCVar8 = *reinterpret_cast<COctNode**>(Ptr(octNode, 0x1C));
+		pCVar8 = *reinterpret_cast<COctNode**>(Ptr(nodeIter, 0x1C));
 		if (pCVar8 == 0) {
 			return;
 		}
@@ -1011,7 +1013,7 @@ void ClearLight_r(COctNode* octNode)
 			pCVar8 = reinterpret_cast<COctNode*>(Ptr(pCVar8, 4));
 		} while (iVar2 < 8);
 		iVar1 = iVar1 + 1;
-		octNode = reinterpret_cast<COctNode*>(Ptr(octNode, 4));
+		nodeIter = reinterpret_cast<COctNode*>(Ptr(nodeIter, 4));
 	} while (iVar1 < 8);
 }
 
@@ -1235,6 +1237,7 @@ void COctTree::InsertLight(long bitIndex, Vec& position, float radius, unsigned 
  */
 void ClearShadow_r(COctNode* node)
 {
+	COctNode* nodeIter;
 	int iVar1;
 	int iVar2;
 	COctNode* pCVar3;
@@ -1253,8 +1256,9 @@ void ClearShadow_r(COctNode* node)
 		*reinterpret_cast<unsigned long*>(Ptr(node, 0x48)) = 0;
 	}
 	iVar1 = 0;
+	nodeIter = node;
 	do {
-		pCVar8 = *reinterpret_cast<COctNode**>(Ptr(node, 0x1C));
+		pCVar8 = *reinterpret_cast<COctNode**>(Ptr(nodeIter, 0x1C));
 		if (pCVar8 == 0) {
 			return;
 		}
@@ -1319,7 +1323,7 @@ void ClearShadow_r(COctNode* node)
 			pCVar8 = reinterpret_cast<COctNode*>(Ptr(pCVar8, 4));
 		} while (iVar2 < 8);
 		iVar1 = iVar1 + 1;
-		node = reinterpret_cast<COctNode*>(Ptr(node, 4));
+		nodeIter = reinterpret_cast<COctNode*>(Ptr(nodeIter, 4));
 	} while (iVar1 < 8);
 }
 
@@ -1542,6 +1546,7 @@ void COctTree::InsertShadow(long bitIndex, Vec& position, CBound& bound)
  */
 void ClearFlag_r(COctNode* node)
 {
+	int i;
 	COctNode* child1;
 	COctNode* child2;
 	COctNode* child3;
@@ -1555,8 +1560,9 @@ void ClearFlag_r(COctNode* node)
 		node->m_drawFlags &= s_shadow_no;
 	}
 
+	i = 0;
 	COctNode* nodeIter = node;
-	for (int i = 0; i < 8; i++) {
+	do {
 		child1 = nodeIter->m_children[0];
 		if (child1 == 0) {
 			return;
@@ -1657,8 +1663,9 @@ void ClearFlag_r(COctNode* node)
 			child1 = reinterpret_cast<COctNode*>(Ptr(child1, 4));
 		}
 
+		i++;
 		nodeIter = reinterpret_cast<COctNode*>(Ptr(nodeIter, 4));
-	}
+	} while (i < 8);
 }
 
 /*

@@ -120,9 +120,9 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 	int colorOffset = serializedDataOffsets[1];
 	pppYmLaserColorData* colorData = (pppYmLaserColorData*)((u8*)laser + 0x80 + colorOffset);
 	s32 dataValIndex = step->m_dataValIndex;
-	s32 count;
+	u8 count;
 	s32 i;
-	u8 alphaStep;
+	s32 alphaStep;
 	char alphaMax;
 	float negHalfWidth;
 	float length;

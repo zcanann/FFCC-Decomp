@@ -940,8 +940,8 @@ static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* wav
 	music->m_keySignature = REDSOUND_CONTROL_KEY_SIGNATURE_NONE;
 	music->m_keySignatureData = RedKeySignatureGetDefaultData();
 	music->m_trackCount = musicHead->m_trackCount;
-	music->m_activeTrackCount = (short)musicHead->m_trackCount;
-	music->m_volumeScale = (unsigned char)(musicHead->m_flags & REDSOUND_MUSIC_HEADER_VOLUME_SCALE_MASK);
+	music->m_activeTrackCount = musicHead->m_trackCount;
+	music->m_volumeScale = musicHead->m_flags & REDSOUND_MUSIC_HEADER_VOLUME_SCALE_MASK;
 	music->m_tickCounter = REDSOUND_CONTROL_INITIAL_TICK_COUNTER;
 	music->m_tempo = REDSOUND_FIXED_ONE;
 	music->m_ticksPerMeasure = REDSOUND_CONTROL_DEFAULT_TICKS_PER_MEASURE;

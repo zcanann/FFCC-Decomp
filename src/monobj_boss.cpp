@@ -1786,12 +1786,12 @@ int CGMonObj::calcBranchFuncTetsukyojin(int)
 void CGMonObj::damagedFuncGigasLoad()
 {
 	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
-	if (*reinterpret_cast<int*>(mon + 0x6D0) == 0) {
+	switch (*reinterpret_cast<int*>(mon + 0x6D0)) {
+	case 0:
 		changeStat__8CGPrgObjFiii(reinterpret_cast<CGPrgObj*>(this), 4, 0, 0);
 		*reinterpret_cast<int*>(mon + 0x6D0) = 1;
 		*reinterpret_cast<int*>(CFlat + 4840) = 1;
-	} else {
-		return;
+		break;
 	}
 }
 
@@ -1890,11 +1890,11 @@ void CGMonObj::damagedFuncWifeLamia()
 {
 	CGObject* object = reinterpret_cast<CGObject*>(this);
 	unsigned short* script = reinterpret_cast<unsigned short*>(object->m_scriptHandle);
-	if (script != 0 && script[7] < 2) {
+	if (script[14] <= 1) {
 		reinterpret_cast<CGCharaObj*>(this)->ClearAllSta();
 		object->m_bgColMask &= 0xFFF7FFFF;
 		changeStat__8CGPrgObjFiii(reinterpret_cast<CGPrgObj*>(this), 100, 0, 0);
-		*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6B4) = 1;
+		*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6D0) = 1;
 	}
 }
 

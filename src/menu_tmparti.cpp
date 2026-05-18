@@ -483,7 +483,8 @@ unsigned int CMenuPcs::TmpArtiOpen()
 	entry = this->m_tmpArtiList->entries;
 	currentFrame = (int)this->m_tmpArtiState->frame;
 	if ((int)itemCount > 0) {
-		for (unsigned int remaining = itemCount; remaining != 0; remaining--) {
+		unsigned int remaining = itemCount;
+		do {
 			if (entry->startFrame <= currentFrame) {
 				if (entry->startFrame + entry->duration <= currentFrame) {
 					completedItems++;
@@ -495,7 +496,8 @@ unsigned int CMenuPcs::TmpArtiOpen()
 				}
 			}
 			entry++;
-		}
+			remaining--;
+		} while (remaining != 0);
 	}
 
 	one = FLOAT_80332f30;

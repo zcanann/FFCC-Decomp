@@ -2484,7 +2484,7 @@ int CRedDriver::ReentryMusicData(int musicID)
  * EN Size: 372b
  * JP Address: TODO
  */
-inline int CRedDriver::MusicPlayState(int musicID)
+int CRedDriver::MusicPlayState(int musicID)
 {
     RedExecCommand* commandNow;
     unsigned int interruptLevel;
@@ -2572,7 +2572,7 @@ int CRedDriver::MusicPlay(int musicID, int volume, int mode)
  * EN Size: 272b
  * JP Address: TODO
  */
-inline int CRedDriver::MusicPlay(void* musicData, int volume, int mode)
+int CRedDriver::MusicPlay(void* musicData, int volume, int mode)
 {
     int musicNo;
     RedMusicHEAD localHeader;
@@ -2621,7 +2621,7 @@ int CRedDriver::MusicCrossPlay(int musicID, int volume, int mode)
  * EN Size: 272b
  * JP Address: TODO
  */
-inline int CRedDriver::MusicCrossPlay(void* musicData, int volume, int mode)
+int CRedDriver::MusicCrossPlay(void* musicData, int volume, int mode)
 {
     int musicNo;
     RedMusicHEAD localHeader;
@@ -2670,7 +2670,7 @@ int CRedDriver::MusicNextPlay(int musicID, int volume, int mode)
  * EN Size: 272b
  * JP Address: TODO
  */
-inline int CRedDriver::MusicNextPlay(void* musicData, int volume, int mode)
+int CRedDriver::MusicNextPlay(void* musicData, int volume, int mode)
 {
     int musicNo;
     RedMusicHEAD localHeader;
@@ -3097,7 +3097,7 @@ int CRedDriver::SePlay(int bank, int sep, int autoID, int pan, int volume, int p
  * EN Size: 312b
  * JP Address: TODO
  */
-inline int CRedDriver::SePlay(void* seSepData, int autoID, int pan, int volume, int pitch)
+int CRedDriver::SePlay(void* seSepData, int autoID, int pan, int volume, int pitch)
 {
     int seNo = REDSOUND_SESEP_ID_NONE;
     RedSeSepHEAD* const header = (RedSeSepHEAD*)seSepData;

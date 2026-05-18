@@ -1048,9 +1048,9 @@ void CRedEntry::DisplayWaveInfo()
 					}
 					entryWaveCount += 1;
 				} else {
-					int memoryBlockByteOffset = (int)aMemoryBlock - (int)aMemoryBlocks;
 					OSReport(sRedEntryAMemoryFreeBlockInfoFmt, sRedEntryLogPrefix, aMemoryBlock->m_address,
-					         aMemoryBlock->m_size, reportFreeSize, memoryBlockByteOffset / REDSOUND_MEMORY_BLOCK_SIZE);
+					         aMemoryBlock->m_size, reportFreeSize,
+					         ((int)aMemoryBlock - (int)aMemoryBlocks) / REDSOUND_MEMORY_BLOCK_SIZE);
 					fflush(__files + 1);
 				}
 

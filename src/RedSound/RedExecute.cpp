@@ -561,10 +561,10 @@ STATIC_ASSERT(offsetof(AXVPB, pb) + offsetof(AXPB, type) == REDSOUND_AX_VOICE_TY
  */
 u8 GetRandomData()
 {
-	signed char* value = t_RandomData + m_RandomIndex;
+	u8 value = RedRandomDataGet(m_RandomIndex);
 
 	m_RandomIndex++;
-	return *value;
+	return value;
 }
 
 /*

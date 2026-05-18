@@ -1165,6 +1165,7 @@ static void _VolumeExecute(RedVoiceDATA* voice, int volume)
     int panPosition;
     int voiceMixVolume;
     int volumeScaleValue;
+    int velocityScaleValue;
 
     if (volume != 0) {
         volume = volume + 1;
@@ -1179,7 +1180,8 @@ static void _VolumeExecute(RedVoiceDATA* voice, int volume)
         } else {
             volumeScaleValue = 0;
         }
-        voiceMixVolume = voiceMixVolume * volumeScaleValue >> REDSOUND_VOLUME_MOD_SCALE_SHIFT;
+        velocityScaleValue = volumeScaleValue;
+        voiceMixVolume = voiceMixVolume * velocityScaleValue >> REDSOUND_VOLUME_MOD_SCALE_SHIFT;
     }
 
     volumeScaleValue = voice->m_track->m_mixVolume >> REDSOUND_FIXED_SHIFT;

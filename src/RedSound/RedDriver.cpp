@@ -1951,20 +1951,21 @@ int RedDmaSearchID(int id)
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void RedDmaClearID(int id)
+void RedDmaClearID(int id)
 {
-    unsigned int interruptLevel;
+    int queueId;
+    RedDmaRequest* queueEnd;
     RedDmaRequest* queueEntry;
 
-    interruptLevel = OSDisableInterrupts();
     queueEntry = RedDriverMainDmaQueue();
+    queueEnd = RedDriverStreamDmaQueueEnd();
     do {
-        if ((id == REDSOUND_DMA_ID_NONE) || (RedDmaRequestGetId(queueEntry) == id)) {
+        queueId = RedDmaRequestGetId(queueEntry);
+        if ((id == REDSOUND_DMA_ID_NONE) || (queueId == id)) {
             RedDmaRequestClearId(queueEntry);
         }
         queueEntry++;
-    } while (queueEntry < RedDriverStreamDmaQueueEnd());
-    OSRestoreInterrupts(interruptLevel);
+    } while (queueEntry < queueEnd);
 }
 
 /*

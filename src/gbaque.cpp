@@ -1110,19 +1110,19 @@ void GbaQueue::SetStageNo(int stageId, int mapId)
 
     obj[0x2D38] = 0;
     obj[0x2D39] = 0;
-    obj[0x2C89] = 0;
+    obj[0x2D61] = 0;
+    *reinterpret_cast<int*>(obj + 0x2AF8) = 0;
     obj[0x2C88] = 0;
-    obj[0x2C8A] = 0;
     memset(obj + 0x2B00, 0, 0x188);
 
     if ((*reinterpret_cast<int*>(obj + 0x444) != stageId) || (*reinterpret_cast<int*>(obj + 0x448) != mapId)) {
-        *reinterpret_cast<int*>(obj + 0x44C) = 0xF;
-        obj[0x2C89] = 0xF;
+        obj[0x44C] = 0xF;
+        obj[0x2D37] = 0xF;
     }
 
     *reinterpret_cast<int*>(obj + 0x444) = stageId;
     *reinterpret_cast<int*>(obj + 0x448) = mapId;
-    obj[0x2C8B] = 0xF;
+    obj[0x2D55] = 0xF;
 
     i = 0;
     semaphoreIter = this;
@@ -1141,8 +1141,8 @@ void GbaQueue::SetStageNo(int stageId, int mapId)
             semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
         } while (i < 4);
 
-        *reinterpret_cast<int*>(obj + 0x44C) = 0xF;
-        obj[0x2C89] = 0xF;
+        obj[0x44C] = 0xF;
+        obj[0x2D37] = 0xF;
 
         i = 0;
         semaphoreIter = this;
@@ -1153,8 +1153,8 @@ void GbaQueue::SetStageNo(int stageId, int mapId)
         } while (i < 4);
     }
 
-    memset(obj + 0x2D40, 0xFF, 0x10);
-    obj[0x2C8A] = 0;
+    memset(obj + 0x2D44, 0xFF, 0x10);
+    obj[0x2D54] = 0;
 }
 
 /*

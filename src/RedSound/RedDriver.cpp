@@ -773,7 +773,6 @@ RedSeBlockHEAD* volatile p_SeBlockData[REDSOUND_SE_BLOCK_BANK_COUNT];
 CRedMemory c_RedMemory;
 static volatile int m_DMAExecute;
 static volatile int m_DMAInThread;
-static int m_SilentWave;
 #define RedDmaExecuteGet() (m_DMAExecute)
 #define RedDmaExecuteSet(status) (m_DMAExecute = (status))
 #define RedDmaThreadStateGet() (m_DMAInThread)
@@ -802,7 +801,6 @@ STATIC_ASSERT(REDSOUND_DRIVER_SBSS_BEFORE_RED_MEMORY_SIZE + sizeof(c_RedMemory) 
                   REDSOUND_DRIVER_SBSS_RED_MEMORY_PAD_SIZE + sizeof(m_DMAExecute) +
                   sizeof(m_DMAInThread) + REDSOUND_DRIVER_SBSS_UNUSED_SILENT_WAVE_SIZE ==
               REDSOUND_DRIVER_SBSS_SIZE);
-STATIC_ASSERT(sizeof(m_SilentWave) == sizeof(int));
 
 static inline RedDriverSyncState& RedDriverSync()
 {

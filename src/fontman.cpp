@@ -125,7 +125,7 @@ found_fallback_glyph:
 float CFont::GetWidth(char* text)
 {
 	char* textPtr = text;
-	float width = 0.0f;
+	float width = FLOAT_803306B8;
 	unsigned short ch;
 	int hasChar;
 

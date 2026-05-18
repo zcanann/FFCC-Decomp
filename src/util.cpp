@@ -855,28 +855,18 @@ void CUtil::RenderColorQuad(float x, float y, float width, float height, _GXColo
     GXSetChanCtrl(GX_COLOR0A0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
     GXSetNumChans(1);
 
-    float x1 = x;
-    float y1 = y;
-    float z1 = kUtilZero;
     float x2 = x + width;
     float y2 = y + height;
-    float z2 = kUtilZero;
-    float x3 = x2;
-    float y3 = y2;
-    float z3 = kUtilZero;
-    float x4 = x1;
-    float y4 = y2;
-    float z4 = kUtilZero;
     u32 colorValue = *reinterpret_cast<u32*>(&color);
 
     GXBegin(GX_QUADS, GX_VTXFMT7, 4);
-    GXPosition3f32(x1, y1, z1);
+    GXPosition3f32(x, y, kUtilZero);
     GXColor1u32(colorValue);
-    GXPosition3f32(x2, y1, z2);
+    GXPosition3f32(x2, y, kUtilZero);
     GXColor1u32(colorValue);
-    GXPosition3f32(x3, y3, z3);
+    GXPosition3f32(x2, y2, kUtilZero);
     GXColor1u32(colorValue);
-    GXPosition3f32(x4, y4, z4);
+    GXPosition3f32(x, y2, kUtilZero);
     GXColor1u32(colorValue);
 
     PSMTXCopy(GetCameraMatrix(), cameraMtx);

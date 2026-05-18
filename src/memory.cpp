@@ -2084,7 +2084,7 @@ void CAmemCacheSet::AmemFreeLowPrio(int size)
         for (int i = 0; i < m_cacheCount; i++) {
             CAmemCache& entry = cacheEntryAt(this, i);
             if (entry.m_inUse != 0 && entry.m_refCount == 0 && entry.m_dmaCopy != 0 &&
-                entry.m_cacheData != 0 && currentSize <= entry.m_size &&
+                entry.m_cacheData != 0 && entry.m_size >= currentSize &&
                 static_cast<unsigned int>(entry.m_priority) < bestPriority) {
                 bestEntry = &entry;
                 bestPriority = static_cast<unsigned int>(entry.m_priority);

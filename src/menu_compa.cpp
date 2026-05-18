@@ -440,7 +440,7 @@ activeHold:
 		CompaOpenAnim* entry = compaList->entries;
 		while (entryCount != 0) {
 			entry->frame = 0;
-			entry->alpha = 1.0f;
+			entry->alpha = FLOAT_80333000;
 			entry++;
 			entryCount--;
 		}

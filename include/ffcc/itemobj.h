@@ -31,10 +31,8 @@ public:
 	static int DeleteOld(int, int, CFlatRuntime::CObject*, CFlatRuntime::CObject*);
 	static unsigned int CanCreateFromScript();
 	static CGPrgObj* CreateFromScript(int, int, int, CGObject*, float, CGItemObj::CCFS*);
-	void safeDetach(int, float);
 	void carry(CGPartyObj*, int, int);
 	void onChangePrg(int);
-	void statPot();
 	void onFrameAlways();
 	void onHitParticle(int, int, int, int, Vec*, PPPIFPARAM*);
 	void loadModel();

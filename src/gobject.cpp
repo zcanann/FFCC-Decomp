@@ -20,6 +20,8 @@
 #include "ffcc/wind.h"
 
 #include <dolphin/gx.h>
+extern "C" double sin(double);
+extern "C" double cos(double);
 #include <math.h>
 #include <string.h>
 
@@ -2759,7 +2761,7 @@ void CGObject::SetTexAnim(char* name)
     if (hasModel) {
         texAnimSet = *reinterpret_cast<CTexAnimSet**>(reinterpret_cast<unsigned char*>(handle->m_model) + 0xD4);
         if (texAnimSet != (CTexAnimSet*)0) {
-            texAnimSet->Change(name, sZeroFloat, (CTexAnimSet::ANIM_TYPE)-2);
+            texAnimSet->Change(name, FLOAT_80330350, (CTexAnimSet::ANIM_TYPE)-2);
         }
     }
 }

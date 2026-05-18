@@ -68,6 +68,10 @@ public:
     CGraphicPcs()
     {
         u32* table = &m_table__11CGraphicPcs[1];
+        table[31] = m_table_desc7__11CGraphicPcs[0];
+        table[32] = m_table_desc7__11CGraphicPcs[1];
+        table[36] = m_table_desc8__11CGraphicPcs[0];
+        table[37] = m_table_desc8__11CGraphicPcs[1];
         table[0] = m_table_desc0__11CGraphicPcs[0];
         table[1] = m_table_desc0__11CGraphicPcs[1];
         table[2] = m_table_desc0__11CGraphicPcs[2];
@@ -89,11 +93,7 @@ public:
         table[26] = m_table_desc6__11CGraphicPcs[0];
         table[27] = m_table_desc6__11CGraphicPcs[1];
         table[28] = m_table_desc6__11CGraphicPcs[2];
-        table[31] = m_table_desc7__11CGraphicPcs[0];
-        table[32] = m_table_desc7__11CGraphicPcs[1];
         table[33] = m_table_desc7__11CGraphicPcs[2];
-        table[36] = m_table_desc8__11CGraphicPcs[0];
-        table[37] = m_table_desc8__11CGraphicPcs[1];
         table[38] = m_table_desc8__11CGraphicPcs[2];
         table[41] = m_table_desc9__11CGraphicPcs[0];
         table[42] = m_table_desc9__11CGraphicPcs[1];

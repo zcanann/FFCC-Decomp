@@ -1255,6 +1255,7 @@ CLightPcs::CLight::CLight()
     float f2 = FLOAT_8032fc14;
 
     m_radius = radius;
+    m_partMask = -1;
     float f1 = FLOAT_8032fc10;
     m_offsetZ = f2;
     m_offsetX = f2;
@@ -1263,7 +1264,6 @@ CLightPcs::CLight::CLight()
     m_spotFn = 0;
     m_unk4D = 4;
     m_specularMode = 0;
-    m_partMask = -1;
     m_part = 0;
     *(u32*)&m_targetColor[0] = 0;
     *(u32*)&m_targetColor[1] = 0;

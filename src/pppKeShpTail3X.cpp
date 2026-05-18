@@ -307,9 +307,9 @@ draw_loop:
 
     if (step->m_worldSpaceMode == 0) {
         PSMTXScaleApply(obj->pppPObject.m_localMatrix.value, obj->field_0x40.value,
-                        drawScale * (localBase.value[0][0] * pppMngStPtr->m_scale.x),
-                        drawScale * (localBase.value[1][1] * pppMngStPtr->m_scale.y),
-                        drawScale * (localBase.value[2][2] * pppMngStPtr->m_scale.z));
+                        localBase.value[0][0] * (drawScale * pppMngStPtr->m_scale.x),
+                        localBase.value[1][1] * (drawScale * pppMngStPtr->m_scale.y),
+                        localBase.value[2][2] * (drawScale * pppMngStPtr->m_scale.z));
         if ((step->m_rotateEnabled != 0) && (count != 0)) {
             PSMTXRotRad(rotMtx.value, 'z', kPppKeShpTail3XDegToRad * (float)work->m_angles[count]);
             tmpMtx = obj->field_0x40;

@@ -1003,16 +1003,6 @@ CGPrgObj* CGItemObj::CreateFromScript(
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGItemObj::safeDetach(int, float)
-{
-	// TODO
-}
-
-/*
- * --INFO--
  * PAL Address: 0x80125650
  * PAL Size: 916b
  * EN Address: TODO
@@ -1154,16 +1144,6 @@ void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
  * JP Size: TODO
  */
 void CGItemObj::onChangePrg(int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGItemObj::statPot()
 {
 	// TODO
 }

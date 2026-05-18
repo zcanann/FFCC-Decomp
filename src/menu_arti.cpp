@@ -515,12 +515,16 @@ void CMenuPcs::ArtiDraw()
  */
 int CMenuPcs::ArtiClose()
 {
-	int finished = 0;
-	GetArtiState(this)[0x11]++;
+	int count;
+	int finished;
+	int frame;
 
-	int count = GetArtiList(this)[0];
+	GetArtiState(this)[0x11]++;
+	finished = 0;
+
+	count = GetArtiList(this)[0];
 	ArtiOpenAnim* anim = (ArtiOpenAnim*)((u8*)GetArtiList(this) + 8);
-	int frame = GetArtiState(this)[0x11];
+	frame = GetArtiState(this)[0x11];
 
 	for (int i = 0; i < count; i++, anim++) {
 		float zeroF = FLOAT_80332fa8;
@@ -586,16 +590,16 @@ int CMenuPcs::ArtiCtrl()
  */
 int CMenuPcs::ArtiOpen()
 {
-	int finished;
 	int count;
+	int finished;
 	int frame;
 
 	if (*(char*)(GetArtiStateBase(this) + 0xb) == '\0') {
 		ArtiInit();
 	}
 
-	finished = 0;
 	*(short*)(GetArtiStateBase(this) + 0x22) = *(short*)(GetArtiStateBase(this) + 0x22) + 1;
+	finished = 0;
 	count = *GetArtiList(this);
 	ArtiOpenAnim* entry = (ArtiOpenAnim*)((u8*)GetArtiList(this) + 8);
 	frame = (int)*(short*)(GetArtiStateBase(this) + 0x22);

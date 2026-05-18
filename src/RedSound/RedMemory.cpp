@@ -25,12 +25,12 @@ STATIC_ASSERT(REDSOUND_MEMORY_AUX_BANK_OFFSET + REDSOUND_MEMORY_BANK_SIZE == RED
 STATIC_ASSERT(REDSOUND_MEMORY_DATA_BUFFER_OFFSET == REDSOUND_MEMORY_BANK_TABLE_SIZE);
 
 static volatile int m_DataBuffer;
-static volatile int m_ADataBuffer;
+static int m_ADataBuffer;
 static volatile int m_DataBufferSize;
-static volatile int m_ADataBufferSize;
+static int m_ADataBufferSize;
 
 static RedMemoryBlock* volatile m_MemoryBank;
-static RedMemoryBlock* volatile m_AMemoryBank;
+static RedMemoryBlock* m_AMemoryBank;
 
 const char s_redMemoryMainBankFullFmt[] = "%s%sMemory Bank Full !!%s\n";
 const char sRedMemoryLogPrefix[] = "\x1b[7;34mSound\x1b[0m:";

@@ -1217,8 +1217,8 @@ static int UpdateWaterMesh(VMana2* mana2)
     }
 
     for (int row = 1, rowBase = 0x11; row < 0x10; row++, rowBase += 0x11) {
-        currentScale = FLOAT_80331898;
-        neighborScale = FLOAT_803318a4;
+        currentScale = LoadFloat(FLOAT_80331898);
+        neighborScale = LoadFloat(FLOAT_803318a4);
         for (int col = 1; col < 0x10; col += 5) {
             int index = rowBase + col;
             int above0 = index - 0x11;

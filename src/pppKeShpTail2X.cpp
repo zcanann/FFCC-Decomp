@@ -317,11 +317,10 @@ update_step:
 advance_segment:
     if (nextIndex == lastIndex) {
         nextIndex = 0;
-        goto wrapped_segment;
+    } else {
+        nextIndex++;
     }
-    nextIndex++;
-wrapped_segment:
-    if (nextIndex == work->m_head) {
+    if (nextIndex == curIndex) {
         return;
     }
 

@@ -1315,12 +1315,26 @@ void CUtil::GetSplinePos(Vec& out, Vec p0, Vec p1, Vec p2, Vec p3, float t, floa
 	t3 = t2 * t;
 	hermite[0] = kUtilOne + ((kUtilHermiteCoeff2 * t3) - (kUtilHermiteCoeff3 * t2));
 	hermite[1] = (kUtilHermiteCoeff3 * t2) + (kUtilHermiteCoeffNeg2 * t3);
-	hermite[2] = t - ((kUtilHermiteCoeff2 * t2) - t3);
+	hermite[2] = t + (t3 - (kUtilHermiteCoeff2 * t2));
 	hermite[3] = t3 - t2;
 
-	out.x = (hermite[3] * tan1.x) + (hermite[2] * tan0.x) + (hermite[0] * p1.x) + (hermite[1] * p2.x);
-	out.y = (hermite[3] * tan1.y) + (hermite[2] * tan0.y) + (hermite[0] * p1.y) + (hermite[1] * p2.y);
-	out.z = (hermite[3] * tan1.z) + (hermite[2] * tan0.z) + (hermite[0] * p1.z) + (hermite[1] * p2.z);
+	float pos = hermite[1] * p2.x;
+	pos += hermite[0] * p1.x;
+	pos += hermite[2] * tan0.x;
+	pos += hermite[3] * tan1.x;
+	out.x = pos;
+
+	pos = hermite[1] * p2.y;
+	pos += hermite[0] * p1.y;
+	pos += hermite[2] * tan0.y;
+	pos += hermite[3] * tan1.y;
+	out.y = pos;
+
+	pos = hermite[1] * p2.z;
+	pos += hermite[0] * p1.z;
+	pos += hermite[2] * tan0.z;
+	pos += hermite[3] * tan1.z;
+	out.z = pos;
 }
 
 /*

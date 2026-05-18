@@ -1809,10 +1809,10 @@ void CSound::calcVolumePan(CSound::CSe3D* se3D, int& outVolume, int& outPan)
             (u32*)0, &nearestT, reinterpret_cast<const Vec*>(&CameraPcs._212_4_));
         if (iVar4 != 0) {
             PSMTXMultVec(CameraPcs.m_cameraMatrix, &nearestPoint, &nearestPoint);
-            fVar3 = se3D->m_nearDistance;
-            if (nearestDistance < fVar3) {
+            if (nearestDistance < se3D->m_nearDistance) {
                 outVolume = 0x7F;
             } else {
+                fVar3 = se3D->m_nearDistance;
                 outVolume = 0x7F - (int)(FLOAT_80330ce8 * ((nearestDistance - fVar3) / (se3D->m_farDistance - fVar3)));
             }
 

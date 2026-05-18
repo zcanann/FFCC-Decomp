@@ -337,18 +337,22 @@ void CMapHit::CalcHitPosition(Vec* position)
 int CMapHit::CalcHitSlide(Vec* out, float y)
 {
     if (g_hit_edge_idx_min != -1) {
-        if (gMapHitFace->m_normal.y < y) {
+        CMapHitFace* face = gMapHitFace;
+        if (face->m_normal.y < y) {
             Vec previous;
             Vec current;
             if (g_hit_edge_idx_min == 0) {
-                previous = m_vertices[gMapHitFace->m_vertexIndices[gMapHitFace->m_vertexCount - 1]];
-                current = m_vertices[gMapHitFace->m_vertexIndices[0]];
+                unsigned short* indices = face->m_vertexIndices;
+                previous = m_vertices[indices[face->m_vertexCount - 1]];
+                current = m_vertices[indices[0]];
             } else {
-                previous = m_vertices[gMapHitFace->m_vertexIndices[g_hit_edge_idx_min - 1]];
-                current = m_vertices[gMapHitFace->m_vertexIndices[g_hit_edge_idx_min]];
+                previous = m_vertices[face->m_vertexIndices[g_hit_edge_idx_min - 1]];
+                current = m_vertices[face->m_vertexIndices[g_hit_edge_idx_min]];
             }
 
             Vec edge;
+            Vec nearestPoint;
+            Vec edgeProjection;
             Vec edgeToCenter;
             PSVECSubtract(&current, &previous, &edge);
             PSVECSubtract(&current, &g_hit_cyl_min.m_top, &edgeToCenter);
@@ -356,8 +360,6 @@ int CMapHit::CalcHitSlide(Vec* out, float y)
             float edgeDot = PSVECDotProduct(&edge, &edgeToCenter);
             float edgeLenSq = PSVECDotProduct(&edge, &edge);
 
-            Vec edgeProjection;
-            Vec nearestPoint;
             PSVECScale(&edge, &edgeProjection, edgeDot / edgeLenSq);
             PSVECSubtract(&current, &edgeProjection, &nearestPoint);
 

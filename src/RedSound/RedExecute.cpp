@@ -806,7 +806,7 @@ static void _ClearReverb(int bank)
  * JP Address: TODO
  * JP Size: TODO
  */
-static int _CompFX(float a, float b)
+static inline int _CompFX(float a, float b)
 {
     return 1;
 }
@@ -944,7 +944,7 @@ RedReverbSize* SetReverb(int bank, int kind, int* reverbParams)
  * JP Address: TODO
  * JP Size: TODO
  */
-RedReverbSize* GetReverbInfo()
+inline RedReverbSize* GetReverbInfo()
 {
     return RedReverbSizeGet();
 }
@@ -1653,7 +1653,7 @@ static RedVoiceDATA* _VoiceDataSelect(RedTrackDATA* track, RedNoteDATA* note, in
  * JP Address: TODO
  * JP Size: TODO
  */
-void SetAllVoiceAccess(RedSoundCONTROL* control, int mask)
+inline void SetAllVoiceAccess(RedSoundCONTROL* control, int mask)
 {
     RedTrackDATA* track = control->m_tracks;
     RedTrackDATA* trackEnd = track + control->m_trackCount;

@@ -1269,8 +1269,10 @@ int CRedSound::GetSeUsedWave(int bank, int seNo)
 int CRedSound::GetSeUsedWave(void* seSepData)
 {
 	RedSeSepHEAD* seSepHead = (RedSeSepHEAD*)seSepData;
+	int waveNo;
 
-	return RedSeSepGetWaveNo(seSepHead);
+	waveNo = seSepHead->m_waveNoHi * REDSOUND_SESEP_WAVE_NO_HIGH_SCALE;
+	return waveNo | seSepHead->m_waveNoLo;
 }
 /*
  * --INFO--
@@ -1296,7 +1298,7 @@ int CRedSound::StreamStandby(void* streamHeader, int fileSize)
 			RedSoundStreamBankSetFileSize(bank, fileSize);
 			RedSoundStreamBankSetReadPoint(bank, REDSOUND_STREAM_BANK_POINT_NONE);
 			RedSoundStreamBankSetPlayPoint(bank, REDSOUND_STREAM_BANK_POINT_NONE);
-			RedSoundStreamBankSetReserved(bank, REDSOUND_STREAM_BANK_RESERVED_NONE);
+			RedSoundStreamBankSetReserved(bank, streamId);
 		}
 	} else if (RedReportPrintIsEnabled()) {
 		OSReport(sRedSoundInvalidStreamData,

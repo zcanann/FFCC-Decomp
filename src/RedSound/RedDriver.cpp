@@ -1951,7 +1951,7 @@ int RedDmaSearchID(int id)
  * JP Address: TODO
  * JP Size: TODO
  */
-void RedDmaClearID(int id)
+inline void RedDmaClearID(int id)
 {
     int queueId;
     RedDmaRequest* queueEnd;
@@ -1977,7 +1977,7 @@ void RedDmaClearID(int id)
  * JP Address: TODO
  * JP Size: TODO
  */
-void RedSetDMAMode(int mode)
+inline void RedSetDMAMode(int mode)
 {
     RedDmaModeSet(mode);
 }
@@ -2815,7 +2815,7 @@ inline int CRedDriver::CheckMusicEntry(int musicID)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CRedDriver::SetMusicFastSpeed(int speed)
+inline void CRedDriver::SetMusicFastSpeed(int speed)
 {
     RedMusicFastSpeedSet(speed);
 }
@@ -2843,7 +2843,7 @@ inline int CRedDriver::CheckMusicPhraseStop()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CRedDriver::DisplayMusicInfo()
+inline void CRedDriver::DisplayMusicInfo()
 {
     c_RedEntry.DisplayMusicInfo();
 }
@@ -3661,7 +3661,7 @@ void CRedDriver::DisplayWaveInfo()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CRedDriver::DisplayMMemoryInfo()
+inline void CRedDriver::DisplayMMemoryInfo()
 {
     c_RedEntry.DisplayMMemoryInfo();
 }
@@ -3689,7 +3689,7 @@ void CRedDriver::SetReverb(int bank, int kind)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CRedDriver::SetReverb(int bank, int kind, int* reverbParams)
+inline void CRedDriver::SetReverb(int bank, int kind, int* reverbParams)
 {
     ::SetReverb(bank, kind, reverbParams);
 }
@@ -3731,7 +3731,7 @@ inline RedReverbDepth* CRedDriver::GetReverbDepth()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CRedDriver::SetMute(unsigned int voiceNo, unsigned int mute)
+inline void CRedDriver::SetMute(unsigned int voiceNo, unsigned int mute)
 {
     if (mute != 0) {
         RedMuteSet(voiceNo);

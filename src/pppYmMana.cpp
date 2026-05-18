@@ -254,7 +254,7 @@ void Mana_BeforeDrawShadowLockEnvCallback(CChara::CModel*, void*, void*, int)
 void Chara_DrawShadowMeshDLCallback(CChara::CModel* model, void* work, void* vYmMana, int meshIndex, int dlIndex, float (*) [4])
 {
     s32 meshData = *(s32*)((u8*)model + 0xAC);
-    u8 alpha = *(u8*)((u8*)vYmMana + 0x3B);
+    const u8 alpha = *(u8*)((u8*)vYmMana + 0x3B);
 
     if (alpha != 0) {
         *(u8*)((u8*)work + 0xFC) = 0xFF;
@@ -268,8 +268,9 @@ void Chara_DrawShadowMeshDLCallback(CChara::CModel* model, void* work, void* vYm
         *(u8*)((u8*)work + 0xFF) = 0xFF;
     }
 
-    DCFlushRange((u8*)work + 0xFC, 4);
-    GXSetArray((GXAttr)0xB, (u8*)work + 0xFC, 4);
+    u8* shadowColor = (u8*)work + 0xFC;
+    DCFlushRange(shadowColor, 4);
+    GXSetArray((GXAttr)0xB, shadowColor, 4);
 
     u32* dl = (u32*)(*(s32*)(*(s32*)(meshData + meshIndex * 0x14 + 8) + 0x50) + dlIndex * 0xC);
     SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(

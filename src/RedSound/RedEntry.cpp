@@ -1022,6 +1022,7 @@ void CRedEntry::DisplayWaveInfo()
 				} else {
 					nextFreeSize = aBufferEnd - nextFreeSize;
 				}
+				int reportFreeSize = nextFreeSize;
 
 				RedHistoryBANK* waveBank = m_waveBankBase;
 				do {
@@ -1037,19 +1038,19 @@ void CRedEntry::DisplayWaveInfo()
 						OSReport(sRedEntryAMemoryWaveBankInfoFmt, sRedEntryLogPrefix,
 						         waveBank - m_waveBankBase,
 						         (int)waveBank->m_waveHead->m_waveNo, waveBank->m_waveHead->m_aramAddress, aMemoryBlock->m_size,
-						         nextFreeSize, waveBank->m_historyNo);
+						         reportFreeSize, waveBank->m_historyNo);
 						fflush(__files + 1);
 					} else {
 						OSReport(sRedEntryAMemoryUnbankedWaveInfoFmt, sRedEntryLogPrefix,
 						         (int)waveBank->m_waveHead->m_waveNo, waveBank->m_waveHead->m_aramAddress, aMemoryBlock->m_size,
-						         nextFreeSize, waveBank->m_historyNo);
+						         reportFreeSize, waveBank->m_historyNo);
 						fflush(__files + 1);
 					}
 					entryWaveCount += 1;
 				} else {
 					int memoryBlockByteOffset = (int)aMemoryBlock - (int)aMemoryBlocks;
 					OSReport(sRedEntryAMemoryFreeBlockInfoFmt, sRedEntryLogPrefix, aMemoryBlock->m_address,
-					         aMemoryBlock->m_size, nextFreeSize, memoryBlockByteOffset / REDSOUND_MEMORY_BLOCK_SIZE);
+					         aMemoryBlock->m_size, reportFreeSize, memoryBlockByteOffset / REDSOUND_MEMORY_BLOCK_SIZE);
 					fflush(__files + 1);
 				}
 

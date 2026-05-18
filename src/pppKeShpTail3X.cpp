@@ -156,10 +156,6 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* p
     float colorG;
     float colorB;
     float colorA;
-    float colorEndR;
-    float colorEndG;
-    float colorEndB;
-    float colorEndA;
     float colorStepR;
     float colorStepG;
     float colorStepB;
@@ -172,9 +168,9 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* p
     pppFMATRIX drawMtx;
     pppFMATRIX rotMtx;
     pppFMATRIX tmpMtx;
-    Vec zeroVec;
-    Vec pos;
-    Vec seg;
+    Vec zeroVec ATTRIBUTE_ALIGN(8);
+    Vec pos ATTRIBUTE_ALIGN(8);
+    Vec seg ATTRIBUTE_ALIGN(8);
     float drawScale;
     float segDx;
     float segDy;
@@ -221,11 +217,6 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* p
     colorG = colorStart.y;
     colorB = colorStart.z;
     colorA = colorStart.w;
-    colorEndR = colorEnd.x;
-    colorEndG = colorEnd.y;
-    colorEndB = colorEnd.z;
-    colorEndA = colorEnd.w;
-
     if (invCountMinusOne != zero) {
         colorStep.x = (colorStart.x - colorEnd.x) / invCountMinusOne;
         colorStep.y = (colorStart.y - colorEnd.y) / invCountMinusOne;

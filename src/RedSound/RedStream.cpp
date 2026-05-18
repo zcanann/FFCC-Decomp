@@ -638,6 +638,45 @@ void SetStreamVolume(int streamID, int volume, int frameCount)
 }
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 184b
+ * EN Address: UNUSED
+ * EN Size: 184b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void SetStreamPan(int streamID, int pan, int frameCount)
+{
+	volatile RedStreamDATA* streamData;
+
+	if (frameCount < REDSOUND_STREAM_MIN_FRAME_COUNT) {
+		frameCount = REDSOUND_STREAM_MIN_FRAME_COUNT;
+	} else {
+		frameCount *= REDSOUND_STREAM_FADE_TICKS_PER_SECOND;
+		frameCount /= REDSOUND_FRAMES_PER_SECOND;
+	}
+
+	pan &= REDSOUND_PAN_BYTE_MASK;
+	pan <<= REDSOUND_FIXED_SHIFT;
+	pan |= REDSOUND_FIXED_HALF;
+	streamData = RedStreamDataGetBegin();
+	do {
+		if ((streamData->m_streamId != REDSOUND_STREAM_ID_NONE) &&
+		    ((streamID == REDSOUND_STREAM_ID_ALL) || (streamID == streamData->m_streamId))) {
+			if (frameCount > 0) {
+				int panDelta = pan - streamData->m_pan.m_value;
+				streamData->m_pan.m_step = panDelta / frameCount;
+				streamData->m_pan.m_stepCount = frameCount;
+			} else {
+				streamData->m_pan.m_value = pan;
+				streamData->m_pan.m_stepCount = 0;
+			}
+		}
+		streamData++;
+	} while (streamData < RedStreamDataGetEnd());
+}
+/*
+ * --INFO--
  * PAL Address: 0x801cc600
  * PAL Size: 392b
  * EN Address: 0x8020e524
@@ -792,45 +831,6 @@ void StreamControl()
 			}
 		}
 
-		streamData++;
-	} while (streamData < RedStreamDataGetEnd());
-}
-/*
- * --INFO--
- * PAL Address: UNUSED
- * PAL Size: 184b
- * EN Address: UNUSED
- * EN Size: 184b
- * JP Address: TODO
- * JP Size: TODO
- */
-inline void SetStreamPan(int streamID, int pan, int frameCount)
-{
-	volatile RedStreamDATA* streamData;
-
-	if (frameCount < REDSOUND_STREAM_MIN_FRAME_COUNT) {
-		frameCount = REDSOUND_STREAM_MIN_FRAME_COUNT;
-	} else {
-		frameCount *= REDSOUND_STREAM_FADE_TICKS_PER_SECOND;
-		frameCount /= REDSOUND_FRAMES_PER_SECOND;
-	}
-
-	pan &= REDSOUND_PAN_BYTE_MASK;
-	pan <<= REDSOUND_FIXED_SHIFT;
-	pan |= REDSOUND_FIXED_HALF;
-	streamData = RedStreamDataGetBegin();
-	do {
-		if ((streamData->m_streamId != REDSOUND_STREAM_ID_NONE) &&
-		    ((streamID == REDSOUND_STREAM_ID_ALL) || (streamID == streamData->m_streamId))) {
-			if (frameCount > 0) {
-				int panDelta = pan - streamData->m_pan.m_value;
-				streamData->m_pan.m_step = panDelta / frameCount;
-				streamData->m_pan.m_stepCount = frameCount;
-			} else {
-				streamData->m_pan.m_value = pan;
-				streamData->m_pan.m_stepCount = 0;
-			}
-		}
 		streamData++;
 	} while (streamData < RedStreamDataGetEnd());
 }

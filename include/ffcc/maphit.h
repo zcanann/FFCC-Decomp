@@ -82,7 +82,13 @@ public:
     CMapHitFace* m_faces;         // 0x20
 };
 
-extern unsigned char gMapHitDrawMode;
+union UMapHitDrawMode
+{
+    unsigned long m_word;
+    unsigned char m_byte;
+};
+
+extern UMapHitDrawMode gMapHitDrawMode;
 extern int g_hit_edge_idx_min;
 extern float g_hit_edge_t;
 extern float g_hit_t;

@@ -609,7 +609,7 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
     g_hit_edge_idx_min = edgeIndex;
     g_hit_f = g_hit_lpface;
     g_hit_cyl_min = g_hit_cyl;
-    if (gMapHitDrawMode != 0) {
+    if (gMapHitDrawMode.m_byte != 0) {
         g_hit_lpface->m_drawFlags = 1;
     }
     g_hit_mvec_min = g_hit_mvec;

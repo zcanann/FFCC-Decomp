@@ -3293,7 +3293,7 @@ void CRedDriver::DisplaySePlayInfo()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CRedDriver::ClearSePlayLine()
+inline void CRedDriver::ClearSePlayLine()
 {
 	RedSoundCONTROL* control = RedSoundControlGet(REDSOUND_CONTROL_SE);
 	RedTrackDATA* track = control->m_tracks;
@@ -3313,7 +3313,7 @@ void CRedDriver::ClearSePlayLine()
  * JP Address: TODO
  * JP Size: TODO
  */
-RedTrackDATA* CRedDriver::GetSePlayTrack()
+inline RedTrackDATA* CRedDriver::GetSePlayTrack()
 {
 	RedTrackDATA* track = RedSoundControlGet(REDSOUND_CONTROL_SE)->m_tracks;
 	RedTrackDATA* trackEnd = RedSoundControlGetSeTrackEnd(RedSoundControlGet(REDSOUND_CONTROL_SE));
@@ -3423,7 +3423,7 @@ int CRedDriver::GetStreamPlayPoint(int streamID, int* playPoint, int* readPoint)
  * JP Address: TODO
  * JP Size: TODO
  */
-RedStreamDATA* CRedDriver::GetStreamPlayBlock(int streamID)
+inline RedStreamDATA* CRedDriver::GetStreamPlayBlock(int streamID)
 {
 	RedStreamDATA* streamData = RedStreamDataGetBegin();
 

@@ -326,14 +326,6 @@ void pppDestructMana2(pppMana2* pppMana2, pppMana2UnkC* param_2)
         *(u32*)(model + 0xFC) = 0;
     }
 
-    if (work[8] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[8]);
-        work[8] = 0;
-    }
-    if (work[9] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[9]);
-        work[9] = 0;
-    }
     if (work[10] != 0) {
         pppHeapUseRate((CMemory::CStage*)work[10]);
         work[10] = 0;
@@ -349,6 +341,10 @@ void pppDestructMana2(pppMana2* pppMana2, pppMana2UnkC* param_2)
     if (work[13] != 0) {
         pppHeapUseRate((CMemory::CStage*)work[13]);
         work[13] = 0;
+    }
+    if (work[8] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[8]);
+        work[8] = 0;
     }
     if (work[15] != 0) {
         pppHeapUseRate((CMemory::CStage*)work[15]);
@@ -382,6 +378,14 @@ void pppDestructMana2(pppMana2* pppMana2, pppMana2UnkC* param_2)
         pppHeapUseRate((CMemory::CStage*)work[23]);
         work[23] = 0;
     }
+    if (work[29] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[29]);
+        work[29] = 0;
+    }
+    if (work[9] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[9]);
+        work[9] = 0;
+    }
     if (work[17] != 0) {
         pppHeapUseRate((CMemory::CStage*)work[17]);
         work[17] = 0;
@@ -401,10 +405,6 @@ void pppDestructMana2(pppMana2* pppMana2, pppMana2UnkC* param_2)
     if (work[28] != 0) {
         pppHeapUseRate((CMemory::CStage*)work[28]);
         work[28] = 0;
-    }
-    if (work[29] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[29]);
-        work[29] = 0;
     }
     if (work[30] != 0) {
         pppHeapUseRate((CMemory::CStage*)work[30]);

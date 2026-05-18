@@ -806,7 +806,7 @@ static void _ClearReverb(int bank)
  * JP Address: TODO
  * JP Size: TODO
  */
-static int _CompFX(float a, float b)
+static inline int _CompFX(float a, float b)
 {
     return 1;
 }

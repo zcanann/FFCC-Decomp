@@ -488,10 +488,11 @@ int RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* verti
 	PSMTXConcat(texMtx, layout->m_modelMatrix.value, tempMtx);
 
 	for (i = 0; i < 4; i++) {
-		projectedObjPtrs[i] = &projectedObj[i];
+		Vec* projectedObjPtr = &projectedObj[i];
+		projectedObjPtrs[i] = projectedObjPtr;
 		PSMTXMultVec(tempMtx, &vertices[i], projectedObjPtrs[i]);
-		projectedObjPtrs[i]->x = projectedObjPtrs[i]->x / projectedObjPtrs[i]->z;
-		projectedObjPtrs[i]->y = projectedObjPtrs[i]->y / projectedObjPtrs[i]->z;
+		projectedObjPtr->x = projectedObjPtr->x / projectedObjPtr->z;
+		projectedObjPtr->y = projectedObjPtr->y / projectedObjPtr->z;
 	}
 
 	minXIndex = 0;

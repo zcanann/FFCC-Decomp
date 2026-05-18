@@ -25,25 +25,19 @@ template <class T>
 class CPtrArray
 {
 public:
-    void** vtable;
+    CPtrArray();
+    virtual ~CPtrArray();
+
+    void RemoveAll();
+    void DeleteAndRemoveAll();
+
     unsigned long size;
     unsigned long numItems;
     unsigned long defaultSize;
     T* items;
     CMemory::CStage* stage;
     int growCapacity;
-
-    CPtrArray();
-    ~CPtrArray();
-
-    void RemoveAll();
-    void DeleteAndRemoveAll();
 };
-
-template <class T>
-inline void SetPtrArrayDtorVtable(CPtrArray<T>*)
-{
-}
 
 extern "C" void __dl__FPv(void* ptr);
 extern "C" void __dla__FPv(void* ptr);
@@ -58,8 +52,6 @@ extern "C" CFunnyShape* __dt__11CFunnyShapeFv(CFunnyShape*, short);
 extern "C" void __dt__14CFunnyShapePcsFv(void*);
 extern "C" void* __vt__8CManager[];
 extern "C" void* __vt__8CProcess[];
-extern "C" void* gVtable_CPtrArray_OSFSTexture[];
-extern "C" void* gVtable_CPtrArray_GXTexObj[];
 extern "C" void* __vt__14CFunnyShapePcs[];
 extern "C" const char lbl_801D7DD0[] = "CFunnyShapePcs(VIEWER)";
 extern "C" const Vec s_funnyEye = {0.0f, 0.0f, 4.0f};
@@ -98,32 +90,12 @@ static inline CFunnyShape* FunnyShape(CFunnyShapePcs* self)
 template <class T>
 CPtrArray<T>::CPtrArray()
 {
-    vtable = 0;
     numItems = 0;
     size = 0;
     defaultSize = 0x10;
     items = 0;
     stage = 0;
     growCapacity = 1;
-}
-
-template <class T>
-CPtrArray<T>::~CPtrArray()
-{
-    SetPtrArrayDtorVtable(this);
-    RemoveAll();
-}
-
-template <>
-inline void SetPtrArrayDtorVtable(CPtrArray<_GXTexObj*>* ptrArray)
-{
-    ptrArray->vtable = gVtable_CPtrArray_GXTexObj;
-}
-
-template <>
-inline void SetPtrArrayDtorVtable(CPtrArray<OSFS_TEXTURE_ST*>* ptrArray)
-{
-    ptrArray->vtable = gVtable_CPtrArray_OSFSTexture;
 }
 
 /*
@@ -476,16 +448,21 @@ u8 FunnyShapePcs[sizeof(CFunnyShapePcs)];
  */
 CFunnyShapePcs::~CFunnyShapePcs()
 {
-    reinterpret_cast<CPtrArray<_GXTexObj*>*>(reinterpret_cast<u8*>(this) + 0x61D8)->~CPtrArray<_GXTexObj*>();
-    reinterpret_cast<CPtrArray<OSFS_TEXTURE_ST*>*>(reinterpret_cast<u8*>(this) + 0x61BC)->~CPtrArray<OSFS_TEXTURE_ST*>();
+    reinterpret_cast<CPtrArray<_GXTexObj*>*>(reinterpret_cast<u8*>(this) + 0x61D8)->CPtrArray<_GXTexObj*>::~CPtrArray();
+    reinterpret_cast<CPtrArray<OSFS_TEXTURE_ST*>*>(reinterpret_cast<u8*>(this) + 0x61BC)->CPtrArray<OSFS_TEXTURE_ST*>::~CPtrArray();
     __dt__11CFunnyShapeFv(reinterpret_cast<CFunnyShape*>(reinterpret_cast<u8*>(this) + 0x50), -1);
     __dt__14CUSBStreamDataFv(reinterpret_cast<CUSBStreamData*>(reinterpret_cast<u8*>(this) + 0x3C), -1);
+}
+
+template <class T>
+CPtrArray<T>::~CPtrArray()
+{
+    RemoveAll();
 }
 
 template <>
 CPtrArray<_GXTexObj*>::CPtrArray()
 {
-    vtable = gVtable_CPtrArray_GXTexObj;
     numItems = 0;
     size = 0;
     defaultSize = 0x10;
@@ -497,7 +474,6 @@ CPtrArray<_GXTexObj*>::CPtrArray()
 template <>
 CPtrArray<OSFS_TEXTURE_ST*>::CPtrArray()
 {
-    vtable = gVtable_CPtrArray_OSFSTexture;
     numItems = 0;
     size = 0;
     defaultSize = 0x10;
@@ -509,14 +485,12 @@ CPtrArray<OSFS_TEXTURE_ST*>::CPtrArray()
 template <>
 CPtrArray<OSFS_TEXTURE_ST*>::~CPtrArray()
 {
-    SetPtrArrayDtorVtable(this);
     RemoveAll();
 }
 
 template <>
 CPtrArray<_GXTexObj*>::~CPtrArray()
 {
-    SetPtrArrayDtorVtable(this);
     RemoveAll();
 }
 

@@ -401,7 +401,7 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
     s32 dataValIndex = step->m_dataValIndex;
     u32 count;
     s32 i;
-    u8 alphaStep;
+    s32 alphaStep;
     char alphaMax;
     float negHalfWidth;
     float length;

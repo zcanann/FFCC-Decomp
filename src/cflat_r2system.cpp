@@ -4193,16 +4193,15 @@ CFlatRuntime::CVal* CFlatRuntime2::onSystemVal(CFlatRuntime::CObject*, int syste
     CGame::CGameWork& gameWork = Game.m_gameWork;
     unsigned int* lastResult = reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x96C);
 
-    if (systemValue < -0xFFF) {
+    if (systemValue <= -0x1000) {
         int valueIndex = -0x1000 - systemValue;
         unsigned int result = 0;
-        int valueGroup = valueIndex / 0x600 + (valueIndex >> 0x1F);
-        int groupIndex = valueGroup - (valueGroup >> 0x1F);
+        int valueGroup = valueIndex / 0x600;
         const unsigned short* row =
             reinterpret_cast<const unsigned short*>(Game.unkCFlatData0[2]) +
-            (0x5FF - (valueIndex + groupIndex * -0x600)) * 0x24;
+            (0x5FF - (valueIndex - valueGroup * 0x600)) * 0x24;
 
-        switch (groupIndex) {
+        switch (valueGroup) {
         case 0: result = row[0]; break;
         case 1: result = row[1]; break;
         case 2: result = row[2]; break;
@@ -4245,17 +4244,13 @@ CFlatRuntime::CVal* CFlatRuntime2::onSystemVal(CFlatRuntime::CObject*, int syste
         *lastResult = result;
     } else if (systemValue < -499) {
         unsigned int bitIndex = static_cast<unsigned int>(systemValue + 0x9F3);
-        int sign = static_cast<int>(bitIndex) >> 0x1F;
-        int byteIndex = (static_cast<int>(bitIndex) >> 3) +
-                        static_cast<unsigned int>((static_cast<int>(bitIndex) < 0) && ((bitIndex & 7) != 0)) + 8;
-        unsigned int mask =
-            1U << ((sign * 8 | static_cast<int>(bitIndex * 0x20000000U + static_cast<unsigned int>(sign >> 0x1D))) -
-                   sign);
+        int byteIndex = static_cast<int>(bitIndex) / 8 + 8;
+        unsigned int mask = 1U << (static_cast<int>(bitIndex) % 8);
         *lastResult =
             ((static_cast<unsigned int>(static_cast<unsigned char>(gameWork.m_eventFlags[byteIndex])) & mask) != 0)
                 ? 1U
                 : 0U;
-    } else if (systemValue < -199) {
+    } else if (systemValue <= -200) {
         *lastResult = static_cast<unsigned int>(
             static_cast<int>(static_cast<short>(Game.m_caravanWorkArr[0].m_artifacts[systemValue + 0x1E])));
     } else {
@@ -4385,13 +4380,8 @@ void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack,
     if (systemValue > -0x1000) {
         if (systemValue <= -500) {
             unsigned int bitIndex = static_cast<unsigned int>(systemValue + 0x9F3);
-            int sign = static_cast<int>(bitIndex) >> 0x1F;
-            signed char* flagByte =
-                gameWork.m_eventFlags + (static_cast<int>(bitIndex) >> 3) +
-                static_cast<unsigned int>((static_cast<int>(bitIndex) < 0) && ((bitIndex & 7) != 0)) + 8;
-            unsigned int mask =
-                1U << ((sign * 8 | static_cast<int>(bitIndex * 0x20000000U + static_cast<unsigned int>(sign >> 0x1D))) -
-                       sign);
+            signed char* flagByte = gameWork.m_eventFlags + static_cast<int>(bitIndex) / 8 + 8;
+            unsigned int mask = 1U << (static_cast<int>(bitIndex) % 8);
             unsigned int value = -((static_cast<int>(-((static_cast<unsigned char>(*flagByte) & mask)))) >> 0x1F);
             stack[-1].m_word = value;
 

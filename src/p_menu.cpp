@@ -159,12 +159,12 @@ extern "C" void _WaitDrawDone__8CGraphicFPci(void*, const char*, int);
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, unsigned char, int, int, unsigned char);
 
-unsigned int m_table_desc0__8CMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__8CMenuPcsFv)};
-unsigned int m_table_desc1__8CMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__8CMenuPcsFv)};
-unsigned int m_table_desc2__8CMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__8CMenuPcsFv)};
-unsigned int m_table_desc3__8CMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(draw__8CMenuPcsFv)};
-unsigned int m_table_desc4__8CMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(loadTextureAsync__8CMenuPcsFPPciiPQ28CMenuPcs4CTmpiii)};
-unsigned int m_table_desc5__8CMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawSingleMenu__8CMenuPcsFv)};
+static unsigned int m_table_desc0__8CMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__8CMenuPcsFv)};
+static unsigned int m_table_desc1__8CMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__8CMenuPcsFv)};
+static unsigned int m_table_desc2__8CMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__8CMenuPcsFv)};
+static unsigned int m_table_desc3__8CMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(draw__8CMenuPcsFv)};
+static unsigned int m_table_desc4__8CMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(loadTextureAsync__8CMenuPcsFPPciiPQ28CMenuPcs4CTmpiii)};
+static unsigned int m_table_desc5__8CMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawSingleMenu__8CMenuPcsFv)};
 
 unsigned int m_table__8CMenuPcs[0x57] = {
     reinterpret_cast<unsigned int>(const_cast<char*>(kMenuPcsStageName)),
@@ -180,7 +180,7 @@ unsigned int m_table__8CMenuPcs[0x57] = {
     0x49, 0x11
 };
 
-int DAT_8020ef9c[] = {
+static int DAT_8020ef9c[] = {
     0, reinterpret_cast<int>(const_cast<char*>(lbl_80330714)),
     0, reinterpret_cast<int>(const_cast<char*>(lbl_8033071C)),
     1, reinterpret_cast<int>(const_cast<char*>(lbl_80330724)),
@@ -205,19 +205,19 @@ int DAT_8020ef9c[] = {
     0, reinterpret_cast<int>(const_cast<char*>(lbl_803307B4))
 };
 
-u8 sMenuFontShadeTable[] = {
+static u8 sMenuFontShadeTable[] = {
     0xFF, 0xF5, 0xF5, 0xF5, 0xF5, 0xF5, 0xF5, 0xF5, 0xBD, 0xA8, 0x92, 0x7B, 0x39, 0x22, 0x00, 0x00
 };
 
-u8 sMenuFontPrimaryAlphaTable[] = {
+static u8 sMenuFontPrimaryAlphaTable[] = {
     0x00, 0x0A, 0x1E, 0x32, 0x46, 0x64, 0xD2, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
 };
 
-u8 sMenuFontSecondaryAlphaTable[] = {
+static u8 sMenuFontSecondaryAlphaTable[] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0A, 0x1E, 0x32, 0x46, 0x78, 0xB9, 0xDC, 0xFF
 };
 
-MenuFontTlutPalette sMenuFontTlutPaletteTable[] = {
+static MenuFontTlutPalette sMenuFontTlutPaletteTable[] = {
     {{0x00, 0x00, 0x00, 0xFF}, {0x7C, 0x78, 0x86, 0xFF}},
     {{0x99, 0xB7, 0xE2, 0xFF}, {0x03, 0x0C, 0x44, 0xFF}},
     {{0xF7, 0x7F, 0x37, 0xFF}, {0x44, 0x19, 0x00, 0xFF}},
@@ -609,7 +609,7 @@ void CMenuPcs::loadFont(int type, char* path, int slot, int tlutMode)
         stage = m_stageF0;
     }
 
-    if ((slot == 0) && (FontMan.m_font != 0)) {
+    if ((slot == 0) && FontMan.m_font) {
         m_fonts[0] = FontMan.m_font;
         reinterpret_cast<u32*>(m_fonts[0])[1] = reinterpret_cast<u32*>(m_fonts[0])[1] + 1;
     } else {

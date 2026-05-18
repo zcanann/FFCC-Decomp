@@ -750,17 +750,6 @@ void callConProg(_pppPObject*)
  */
 _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
 {
-	struct pppPObjectRaw
-	{
-		_pppPObjLink m_link;
-		s32 m_graphId;
-		u8 m_pad10[0x70 - 0x10];
-		void* m_field70;
-		void* m_field74;
-		u8 m_pad78[4];
-		u8 m_field7C;
-	};
-
 	_pppPDataVal* dataVal = pppPDataVal;
 	_pppProgSetDef* programSet = dataVal->m_programSetDef;
 	s16 numStages = programSet->m_numStages;
@@ -881,12 +870,12 @@ _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
 	}
 	else
 	{
-		pppPObjectRaw* newObjectRaw = (pppPObjectRaw*)newObj;
-		newObjectRaw->m_graphId = 0;
-		newObjectRaw->m_field70 = 0;
-		newObjectRaw->m_field74 = 0;
-		newObjectRaw->m_link.m_owner = pppPDataVal;
-		newObjectRaw->m_field7C = 1;
+		_pppPObject* newObject = (_pppPObject*)newObj;
+		newObject->m_graphId = 0;
+		newObject->m_field70 = 0;
+		newObject->m_field74 = 0;
+		newObject->m_link.m_owner = pppPDataVal;
+		newObject->m_field7C = 1;
 
 		_pppPObjLink* objHead = &pppMngSt->m_pppPObjLinkHead;
 		_pppPObjLink* firstObj = objHead->m_next;

@@ -2597,10 +2597,22 @@ void CGMonObj::damagedFuncDuct()
 {
 	CGObject* object = reinterpret_cast<CGObject*>(this);
 	int pdtNo = -1;
-	if (object->m_charaModelHandle != 0 && object->m_charaModelHandle->m_pdtLoadRef != 0) {
-		pdtNo = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(object->m_charaModelHandle->m_pdtLoadRef) + 0x14);
+	CRef* pdtLoadRef = object->m_charaModelHandle->m_pdtLoadRef;
+	void* scriptKind = object->m_scriptHandle[4];
+	int slot = reinterpret_cast<int>(scriptKind) - 0x8E;
+	if (pdtLoadRef != 0) {
+		pdtNo = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(pdtLoadRef) + 0x14);
 	}
 	putParticle__8CGPrgObjFiiP8CGObjectfi(reinterpret_cast<CGPrgObj*>(this), (pdtNo << 8) | 2, 0, object, FLOAT_80331d18, 0);
+
+	if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + 0x1C) == 0) {
+		CGObject* bossObj = *reinterpret_cast<CGObject**>(SoundBuffer_1260_ + 0x68);
+		CChara::CModel* model = bossObj->m_charaModelHandle->m_model;
+		CChara::CNode** nodes = reinterpret_cast<CChara::CNode**>(SoundBuffer_1260_ + 0x8);
+		int dispIndex = GetDispIndex__Q26CChara6CModelFPQ26CChara5CNode(
+		    model, nodes[slot]);
+		model->m_meshVisibleMask &= ~(1 << dispIndex);
+	}
 }
 
 /*

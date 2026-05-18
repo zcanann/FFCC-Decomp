@@ -299,7 +299,7 @@ void CMapObj::Init()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
+int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
 {
     enum {
         CHUNK_AMBI = 0x414D4249,
@@ -719,6 +719,7 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
         }
     }
     chunkFile.PopChunk();
+    return 1;
 }
 
 /*
@@ -1049,12 +1050,7 @@ void CMapObj::SetLink()
     m_child = head0;
 }
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void calcColorKeyFrame(CMapKeyFrame* keyFrame, _GXColor& out, _GXColor* colors)
+static inline void calcColorKeyFrameInline(CMapKeyFrame* keyFrame, _GXColor& out, _GXColor* colors)
 {
     if (IsRun__12CMapKeyFrameFv(keyFrame) == 0) {
         return;
@@ -1145,22 +1141,22 @@ void CMapObj::Calc()
             _GXColor& colorCurrent = *reinterpret_cast<_GXColor*>(attr + 8);
             _GXColor* colorTable = reinterpret_cast<_GXColor*>(attr + 0x40);
 
-            calcColorKeyFrame(reinterpret_cast<CMapKeyFrame*>(attr + 0xC0), colorCurrent, colorTable);
+            calcColorKeyFrameInline(reinterpret_cast<CMapKeyFrame*>(attr + 0xC0), colorCurrent, colorTable);
             if (*reinterpret_cast<unsigned char*>(attr + 0x2F) != 0) {
                 *reinterpret_cast<_GXColor*>(attr + 0xC) = colorCurrent;
             }
 
-            calcColorKeyFrame(reinterpret_cast<CMapKeyFrame*>(attr + 0xE8), colorCurrent, colorTable);
+            calcColorKeyFrameInline(reinterpret_cast<CMapKeyFrame*>(attr + 0xE8), colorCurrent, colorTable);
         } else if (attrType == CMapObjAtr::POINT_LIGHT) {
                 _GXColor& colorCurrent = *reinterpret_cast<_GXColor*>(attr + 8);
                 _GXColor* colorTable = reinterpret_cast<_GXColor*>(attr + 0x24);
 
-                calcColorKeyFrame(reinterpret_cast<CMapKeyFrame*>(attr + 0xA4), colorCurrent, colorTable);
+                calcColorKeyFrameInline(reinterpret_cast<CMapKeyFrame*>(attr + 0xA4), colorCurrent, colorTable);
                 if (*reinterpret_cast<unsigned char*>(attr + 0x1F) != 0) {
                     *reinterpret_cast<_GXColor*>(attr + 0xC) = colorCurrent;
                 }
 
-                calcColorKeyFrame(reinterpret_cast<CMapKeyFrame*>(attr + 0xCC), colorCurrent, colorTable);
+                calcColorKeyFrameInline(reinterpret_cast<CMapKeyFrame*>(attr + 0xCC), colorCurrent, colorTable);
         } else if ((attrType == CMapObjAtr::MIME) &&
                    (IsRun__12CMapKeyFrameFv(reinterpret_cast<CMapKeyFrame*>(attr + 0x14)) != 0)) {
             int key0 = 0;

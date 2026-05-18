@@ -738,6 +738,7 @@ void CCharaPcs::calcViewer()
 void CCharaPcs::destroyViewer()
 {
     unsigned int i;
+    unsigned int j;
 
     Destroy__6CCharaFv(&Chara);
     DestroyBumpLightAll__9CLightPcsFQ29CLightPcs6TARGET(&LightPcs, 0);
@@ -755,11 +756,11 @@ void CCharaPcs::destroyViewer()
 
     ReleaseShared(m_viewerBackTextureSet);
 
-    i = 0;
+    j = 0;
     do {
-        ReleaseShared(m_viewerAnimBank[i]);
-        i++;
-    } while (i < 0x40);
+        ReleaseShared(m_viewerAnimBank[j]);
+        j++;
+    } while (j < 0x40);
 
     DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, m_viewerModelStage);
     DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, m_viewerTextureStage);

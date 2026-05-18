@@ -723,8 +723,7 @@ void CTexAnimSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
                         seq->flags = (unsigned char)((((int)b6 << 6) & 0x40) | (seq->flags & 0xBF));
                         unsigned int eq = (unsigned int)__cntlzw((unsigned int)strcmp(seqName, DAT_8032fb48));
                         seq->flags = (unsigned char)(((unsigned char)((int)(char)(eq >> 5) << 5) & 0x20) | (seq->flags & 0xDF));
-                    }
-                    if (((int)innerChunkData[0] >= keyTag) && ((int)innerChunkData[0] == nameTag)) {
+                    } else if (((int)innerChunkData[0] >= keyTag) && ((int)innerChunkData[0] == nameTag)) {
                         strcpy(seqName, chunkFile.GetString());
                     }
                 } else {

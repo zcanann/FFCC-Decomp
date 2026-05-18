@@ -2432,7 +2432,7 @@ static void _MusicTrackDataExecute(RedTrackDATA* track, int frames)
             } else {
                 step = track->m_vibrateRateDelta;
             }
-            track->m_vibrateRateDelta -= (s16)step;
+            track->m_vibrateRateDelta -= step;
             track->m_vibrateRate += track->m_vibrateRateAdd * step;
         }
         if (track->m_vibrateDepthDelta != 0) {
@@ -2442,7 +2442,7 @@ static void _MusicTrackDataExecute(RedTrackDATA* track, int frames)
             } else {
                 step = track->m_vibrateDepthDelta;
             }
-            track->m_vibrateDepthDelta -= (s16)step;
+            track->m_vibrateDepthDelta -= step;
             track->m_vibrateDepth += track->m_vibrateDepthAdd * step;
         }
     }
@@ -2455,7 +2455,7 @@ static void _MusicTrackDataExecute(RedTrackDATA* track, int frames)
             } else {
                 step = track->m_tremoloRateDelta;
             }
-            track->m_tremoloRateDelta -= (s16)step;
+            track->m_tremoloRateDelta -= step;
             track->m_tremoloRate += track->m_tremoloRateAdd * step;
         }
         if (track->m_tremoloDepthDelta != 0) {
@@ -2465,7 +2465,7 @@ static void _MusicTrackDataExecute(RedTrackDATA* track, int frames)
             } else {
                 step = track->m_tremoloDepthDelta;
             }
-            track->m_tremoloDepthDelta -= (s16)step;
+            track->m_tremoloDepthDelta -= step;
             track->m_tremoloDepth += track->m_tremoloDepthAdd * step;
         }
     }
@@ -2479,7 +2479,7 @@ static void _MusicTrackDataExecute(RedTrackDATA* track, int frames)
             } else {
                 step = track->m_shakeRateDelta;
             }
-            track->m_shakeRateDelta -= (s16)step;
+            track->m_shakeRateDelta -= step;
             track->m_shakeRate += track->m_shakeRateAdd * step;
         }
         if (track->m_shakeDepthDelta != 0) {
@@ -2489,7 +2489,7 @@ static void _MusicTrackDataExecute(RedTrackDATA* track, int frames)
             } else {
                 step = track->m_shakeDepthDelta;
             }
-            track->m_shakeDepthDelta -= (s16)step;
+            track->m_shakeDepthDelta -= step;
             track->m_shakeDepth += track->m_shakeDepthAdd * step;
         }
     }
@@ -2503,7 +2503,7 @@ static void _MusicTrackDataExecute(RedTrackDATA* track, int frames)
                 } else {
                     step = voiceData->m_pitchModDelay;
                 }
-                voiceData->m_pitchModDelay -= (s16)step;
+                voiceData->m_pitchModDelay -= step;
             }
             if (voiceData->m_volumeModDelay != 0) {
                 int step;
@@ -2512,7 +2512,7 @@ static void _MusicTrackDataExecute(RedTrackDATA* track, int frames)
                 } else {
                     step = voiceData->m_volumeModDelay;
                 }
-                voiceData->m_volumeModDelay -= (s16)step;
+                voiceData->m_volumeModDelay -= step;
             }
             voiceData->m_updateFlags |= updateFlags;
         }
@@ -3016,7 +3016,7 @@ static void _SeTrackDataExecute(RedTrackDATA* track, int frames)
 			} else {
 				vibrateRateStep = track->m_vibrateRateDelta;
 			}
-			track->m_vibrateRateDelta = track->m_vibrateRateDelta - (short)vibrateRateStep;
+			track->m_vibrateRateDelta = track->m_vibrateRateDelta - vibrateRateStep;
 			track->m_vibrateRate += track->m_vibrateRateAdd * vibrateRateStep;
 		}
 		if (track->m_vibrateDepthDelta != 0) {
@@ -3025,7 +3025,7 @@ static void _SeTrackDataExecute(RedTrackDATA* track, int frames)
 			} else {
 				vibrateDepthStep = track->m_vibrateDepthDelta;
 			}
-			track->m_vibrateDepthDelta = track->m_vibrateDepthDelta - (short)vibrateDepthStep;
+			track->m_vibrateDepthDelta = track->m_vibrateDepthDelta - vibrateDepthStep;
 			track->m_vibrateDepth += track->m_vibrateDepthAdd * vibrateDepthStep;
 		}
 	}
@@ -3037,7 +3037,7 @@ static void _SeTrackDataExecute(RedTrackDATA* track, int frames)
 			} else {
 				tremoloRateStep = track->m_tremoloRateDelta;
 			}
-			track->m_tremoloRateDelta = track->m_tremoloRateDelta - (short)tremoloRateStep;
+			track->m_tremoloRateDelta = track->m_tremoloRateDelta - tremoloRateStep;
 			track->m_tremoloRate += track->m_tremoloRateAdd * tremoloRateStep;
 		}
 		if (track->m_tremoloDepthDelta != 0) {
@@ -3046,7 +3046,7 @@ static void _SeTrackDataExecute(RedTrackDATA* track, int frames)
 			} else {
 				tremoloDepthStep = track->m_tremoloDepthDelta;
 			}
-			track->m_tremoloDepthDelta = track->m_tremoloDepthDelta - (short)tremoloDepthStep;
+			track->m_tremoloDepthDelta = track->m_tremoloDepthDelta - tremoloDepthStep;
 			track->m_tremoloDepth += track->m_tremoloDepthAdd * tremoloDepthStep;
 		}
 	}
@@ -3058,7 +3058,7 @@ static void _SeTrackDataExecute(RedTrackDATA* track, int frames)
 			} else {
 				shakeRateStep = track->m_shakeRateDelta;
 			}
-			track->m_shakeRateDelta = track->m_shakeRateDelta - (short)shakeRateStep;
+			track->m_shakeRateDelta = track->m_shakeRateDelta - shakeRateStep;
 			track->m_shakeRate += track->m_shakeRateAdd * shakeRateStep;
 		}
 		if (track->m_shakeDepthDelta != 0) {
@@ -3067,7 +3067,7 @@ static void _SeTrackDataExecute(RedTrackDATA* track, int frames)
 			} else {
 				shakeDepthStep = track->m_shakeDepthDelta;
 			}
-			track->m_shakeDepthDelta = track->m_shakeDepthDelta - (short)shakeDepthStep;
+			track->m_shakeDepthDelta = track->m_shakeDepthDelta - shakeDepthStep;
 			track->m_shakeDepth += track->m_shakeDepthAdd * shakeDepthStep;
 		}
 	}
@@ -3078,7 +3078,7 @@ static void _SeTrackDataExecute(RedTrackDATA* track, int frames)
 		} else {
 			pitchModDelayStep = voice->m_pitchModDelay;
 		}
-		voice->m_pitchModDelay = voice->m_pitchModDelay - (short)pitchModDelayStep;
+		voice->m_pitchModDelay = voice->m_pitchModDelay - pitchModDelayStep;
 	}
 
 	if (voice->m_volumeModDelay != 0) {
@@ -3087,7 +3087,7 @@ static void _SeTrackDataExecute(RedTrackDATA* track, int frames)
 		} else {
 			volumeModDelayStep = voice->m_volumeModDelay;
 		}
-		voice->m_volumeModDelay = voice->m_volumeModDelay - (short)volumeModDelayStep;
+		voice->m_volumeModDelay = voice->m_volumeModDelay - volumeModDelayStep;
 	}
 }
 

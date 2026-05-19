@@ -62,6 +62,7 @@ extern "C" const double DOUBLE_80332aa8;
 extern "C" const double DOUBLE_80332ab8;
 extern "C" const double DOUBLE_80332ac0;
 extern "C" const float FLOAT_80332ad0;
+extern "C" const float FLOAT_80332AD4;
 extern "C" const float FLOAT_80332ac8;
 extern "C" const float FLOAT_80332a70;
 extern "C" const float FLOAT_80332ab0;
@@ -1090,7 +1091,7 @@ void CMenuPcs::CmdDraw()
 		const s32 tex = *reinterpret_cast<s32*>(entry + 0xE);
 		if (tex >= 0) {
 			const float x = static_cast<float>(entry[0]);
-			const float y = static_cast<float>(entry[1]);
+			float y = static_cast<float>(entry[1]);
 			const float w = static_cast<float>(entry[2]);
 			float h = static_cast<float>(entry[3]);
 			float t = FLOAT_80332ad0;
@@ -1104,6 +1105,7 @@ void CMenuPcs::CmdDraw()
 				if ((animState == 1) && (i < *reinterpret_cast<s16*>(caravanWork + 0xBAA)) &&
 				    (i == *reinterpret_cast<s16*>(reinterpret_cast<u8*>(cmdState) + 0x26))) {
 					t = FLOAT_80332b10;
+					y -= FLOAT_80332ad0;
 					h += FLOAT_80332ad0;
 				}
 
@@ -1185,7 +1187,7 @@ void CMenuPcs::CmdDraw()
 		if ((i > 1) && (*reinterpret_cast<s16*>(caravanIter + 0x204) >= 0)) {
 			DrawSingleIcon__8CMenuPcsFiiifif(
 			    this, *reinterpret_cast<s16*>(caravanWork + *reinterpret_cast<s16*>(caravanIter + 0x204) * 2 + 0xB6),
-			    entry[0] + entry[2] - 0x10, entry[1] - 1, *reinterpret_cast<float*>(entry + 8), 0, 0.0f);
+			    entry[0] + entry[2] - 0x10, entry[1] - 2, *reinterpret_cast<float*>(entry + 8), 0, 0.0f);
 		}
 		caravanIter += 2;
 		entry += 0x20;
@@ -2094,20 +2096,27 @@ void CMenuPcs::DrawUniteList()
 {
 	const s32 caravanWork = Game.m_scriptFoodBase[0];
 	s16* const list = GetCmdList(this);
-	const s16* const cmd = GetCmdState(this);
-	const s16 selected = cmd[0x26 / 2];
+	s16* const cmd = GetCmdState(this);
+	s16 selected = cmd[0x26 / 2];
 	const s16 foodCount = *reinterpret_cast<const s16*>(caravanWork + 0xBAA);
 
 	_GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
 	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
 
 	DAT_8032eec8 = 0;
+	bool active = false;
 	for (s32 i = 0; i < 8; i++) {
+		const s32 slotType = *reinterpret_cast<const s16*>(caravanWork + i * 2 + 0x214);
+		if (i == selected) {
+			active = true;
+		} else if (slotType >= 0) {
+			active = false;
+		}
+
 		if (i >= foodCount) {
 			break;
 		}
 
-		const s32 slotType = *reinterpret_cast<const s16*>(caravanWork + i * 2 + 0x214);
 		if (slotType == 0) {
 			continue;
 		}
@@ -2117,7 +2126,7 @@ void CMenuPcs::DrawUniteList()
 		color.r = 0xFF;
 		color.g = 0xFF;
 		color.b = 0xFF;
-		color.a = static_cast<u8>(FLOAT_80332acc * entry[8]);
+		color.a = static_cast<u8>(FLOAT_80332acc * *reinterpret_cast<float*>(entry + 8));
 		GXSetChanMatColor((_GXChannelID)4, color);
 
 		s32 groupSize = 1;
@@ -2129,19 +2138,24 @@ void CMenuPcs::DrawUniteList()
 			}
 		}
 
-		bool active = (i == selected);
-		if ((!active) && (slotType > 0) && (i <= selected) && (selected < i + groupSize)) {
-			active = true;
+		if (slotType > 0) {
+			selected = cmd[0x26 / 2];
+			if ((i <= selected) && (selected < i + groupSize)) {
+				if ((cmd[0x12 / 2] == 3) && (i != selected)) {
+					cmd[0x26 / 2] = static_cast<s16>(i);
+				}
+				active = true;
+			}
 		}
 
 		SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, (groupSize == 2) ? 0x36 : 0x35);
 		DrawRect__8CMenuPcsFUlfffffffff(this, 0,
-			static_cast<float>(entry[0]),
+			static_cast<float>(entry[0] + 4),
 			static_cast<float>(entry[1]) - FLOAT_80332ad0,
 			static_cast<float>(entry[2]) - 8.0f,
-			static_cast<float>(entry[3]),
+			FLOAT_80332AD4,
 			static_cast<float>(entry[4]),
-			active ? FLOAT_80332ac8 : FLOAT_80332ab0,
+			active ? FLOAT_80332AD4 : FLOAT_80332ab0,
 			FLOAT_80332a70,
 			FLOAT_80332a70,
 			FLOAT_80332a70);
@@ -2162,7 +2176,7 @@ void CMenuPcs::DrawUniteList()
 		}
 
 		s16* const entry = list + i * 0x20 + 4;
-		const float alpha = (cmd[0x30 / 2] == 3) ? FLOAT_80332a70 : entry[8];
+		const float alpha = (cmd[0x30 / 2] == 3) ? FLOAT_80332a70 : *reinterpret_cast<float*>(entry + 8);
 
 		GXColor color;
 		color.r = 0xFF;

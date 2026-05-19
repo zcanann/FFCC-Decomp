@@ -882,7 +882,7 @@ _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
 	{
 		_pppPObject* newObject = (_pppPObject*)newObj;
 		newObject->m_graphId = 0;
-		newObject->m_field70 = 0;
+		newObject->m_drawMatrixPtr = 0;
 		newObject->m_field74 = 0;
 		newObject->m_link.m_owner = pppPDataVal;
 		newObject->m_field7C = 1;

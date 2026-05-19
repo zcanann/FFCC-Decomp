@@ -1,6 +1,7 @@
 #include "ffcc/pppRyjMegaBirthModel.h"
 #include "ffcc/partMng.h"
 #include "ffcc/math.h"
+#include "ffcc/materialman.h"
 #include "ffcc/pppPart.h"
 #include <string.h>
 #include "ffcc/ppp_linkage.h"
@@ -92,6 +93,28 @@ static inline unsigned char clamp_u8(float value)
         return 0xFF;
     }
     return (unsigned char)ivalue;
+}
+
+static inline unsigned char clamp_u8_int(int value)
+{
+    if (value < 0) {
+        return 0;
+    }
+    if (value > 0xFF) {
+        return 0xFF;
+    }
+    return (unsigned char)value;
+}
+
+static inline unsigned char clamp_alpha_7f(int value)
+{
+    if (value < 0) {
+        return 0;
+    }
+    if (value > 0x7F) {
+        return 0x7F;
+    }
+    return (unsigned char)value;
 }
 
 static float calc_spawn_speed(float speedMag, u8 speedMode)
@@ -822,6 +845,7 @@ void pppRyjDrawMegaBirthModel(_pppPObject* obj, void* stepData, _pppCtrlTable* c
 {
     PRyjMegaBirthModel* params = (PRyjMegaBirthModel*)stepData;
     u8* payload = (u8*)params;
+    VColor* baseColor = (VColor*)(obj->m_workArea + ctrlTable->m_serializedDataOffsets[1]);
     VRyjMegaBirthModel* work =
         (VRyjMegaBirthModel*)(obj->m_workArea + ctrlTable->m_serializedDataOffsets[2]);
     _PARTICLE_DATA* particleBlock = work->m_particleBlock;
@@ -846,11 +870,6 @@ void pppRyjDrawMegaBirthModel(_pppPObject* obj, void* stepData, _pppCtrlTable* c
 
     int modelIndex = *(int*)(payload + 4);
     if (modelIndex == 0xFFFF) {
-        return;
-    }
-
-    pppModelSt* model = (pppModelSt*)pppEnvStPtr->m_mapMeshPtr[modelIndex];
-    if (model == NULL) {
         return;
     }
 
@@ -879,20 +898,42 @@ void pppRyjDrawMegaBirthModel(_pppPObject* obj, void* stepData, _pppCtrlTable* c
         }
 
         pppFMATRIX drawMatrix;
-        pppCVECTOR drawColor = {{0xFF, 0xFF, 0xFF, clamp_u8(*f32_at(particle, 0x98))}};
+        int red = baseColor->m_red + (int)*(s8*)((u8*)particle + 0x32);
+        int green = baseColor->m_green + (int)*(s8*)((u8*)particle + 0x33);
+        int blue = baseColor->m_blue + (int)*(s8*)((u8*)particle + 0x34);
+        int alpha = baseColor->m_alpha + (int)*(s8*)((u8*)particle + 0x35) - (int)*f32_at(particle, 0x98);
 
         if (particleColor != NULL) {
-            drawColor.rgba[0] = clamp_u8(particleColor->m_color[0]);
-            drawColor.rgba[1] = clamp_u8(particleColor->m_color[1]);
-            drawColor.rgba[2] = clamp_u8(particleColor->m_color[2]);
+            red += (int)particleColor->m_color[0];
+            green += (int)particleColor->m_color[1];
+            blue += (int)particleColor->m_color[2];
+            alpha += (int)particleColor->m_color[3];
         }
 
-        set_matrix(obj, emitterMatrix, scratchMatrix, params, particle, particleWorldMatrix, drawMatrix, 0);
-        pppSetDrawEnv(&drawColor, &drawMatrix, 0.0f, 0, 0, 0, 0, 1, 1, 0);
-        pppDrawMesh(model, 0, 1);
-    }
+        pppCVECTOR drawColor = {{
+            clamp_u8_int(red),
+            clamp_u8_int(green),
+            clamp_u8_int(blue),
+            clamp_alpha_7f(alpha),
+        }};
 
-    PSMTXCopy(g_matKeep, g_matTmp);
+        set_matrix(obj, emitterMatrix, scratchMatrix, params, particle, particleWorldMatrix, drawMatrix, payload[0x0D]);
+        GXSetChanAmbColor(GX_COLOR0A0, *(_GXColor*)drawColor.rgba);
+
+        pppCopyMatrix(*(pppFMATRIX*)&g_matTmp, obj->m_localMatrix);
+        pppMulMatrix(obj->m_localMatrix, obj->m_localMatrix, *(pppFMATRIX*)&g_matKeep);
+
+        pppSetDrawEnv(&drawColor, &obj->m_drawMatrix,
+                      payload[0x0D] != 0 ? *(float*)(payload + 0x18) : FLOAT_80330498,
+                      payload[0x13F], payload[0x09], payload[0x13C], payload[0x13D],
+                      payload[0x13A], 1, 0);
+        MaterialMan.SetTexScroll(*f32_at(particle, 0x88) + *f32_at(particle, 0x90),
+                                 *f32_at(particle, 0x8C) + *f32_at(particle, 0x94),
+                                 FLOAT_80330498, FLOAT_80330498);
+        pppSetBlendMode(payload[0x13C]);
+        pppDrawMesh((pppModelSt*)pppEnvStPtr->m_mapMeshPtr[modelIndex], obj->m_drawMatrixPtr, 1);
+        pppCopyMatrix(obj->m_localMatrix, *(pppFMATRIX*)&g_matTmp);
+    }
 }
 
 /*
@@ -947,7 +988,7 @@ void set_matrix(_pppPObject* pObject, pppFMATRIX mtxA, pppFMATRIX mtxB, PRyjMega
     const u8 flagsEnd = payload[0x137];
     pppFMATRIX tmp;
     Mtx scale;
-    pppFMATRIX* objectMatrix = (pppFMATRIX*)(pObject + 1);
+    pppFMATRIX* objectMatrix = &pObject->m_drawMatrix;
 
     if (matrixMode == 0) {
         pppUnitMatrix(mtxB);

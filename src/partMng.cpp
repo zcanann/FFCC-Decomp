@@ -4637,18 +4637,25 @@ void CPartMng::pppEndCHandle(CCharaPcs::CHandle* handle)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800578b0
+ * PAL Size: 272b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 int CPartMng::pppIsDeadCHandle(CCharaPcs::CHandle* handle)
 {
+    unsigned char mode;
+    void* owner;
     int mngIndex = 0;
+
     for (int i = 0; i < 0x180; i++) {
         _pppMngSt* pppMngSt = &m_pppMng[mngIndex];
         if (m_pppMng[mngIndex].m_baseTime != -0x1000) {
-            unsigned char mode = m_pppMng[mngIndex].m_matrixMode;
+            mode = m_pppMng[mngIndex].m_matrixMode;
             if (mode == 3 || static_cast<unsigned char>(mode - 5) <= 2 || mode == 8) {
-                void* owner = pppMngSt->m_owner;
+                owner = pppMngSt->m_owner;
                 if (owner != 0 &&
                     *reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<char*>(owner) + 0xf8) == handle) {
                     return 0;

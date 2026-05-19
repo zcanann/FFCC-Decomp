@@ -132,14 +132,14 @@ void CPtrArray<OSFS_TEXTURE_ST*>::RemoveAll();
  */
 void CFunnyShapePcs::drawViewer()
 {
-    Mtx44 ortho;
+    Mtx44 projection;
     Mtx44 view;
-    Vec eye = {0.0f, 0.0f, 4.0f};
-    Vec at = {0.0f, 0.0f, 0.0f};
+    Point3d eye = {0.0f, 0.0f, 4.0f};
+    Point3d at = {0.0f, 0.0f, 0.0f};
     Vec up = {0.0f, 1.0f, 0.0f};
-    C_MTXOrtho(ortho, kFunnyShapeNdcMax, kFunnyShapeNdcMin, kFunnyShapeNdcMin, kFunnyShapeNdcMax, kFunnyShapeNdcMax, kFunnyShapeOrthoFarZ);
-    GXSetProjection(ortho, GX_ORTHOGRAPHIC);
-    C_MTXLookAt(view, reinterpret_cast<Point3d*>(&eye), &up, reinterpret_cast<Point3d*>(&at));
+    C_MTXOrtho(projection, kFunnyShapeNdcMax, kFunnyShapeNdcMin, kFunnyShapeNdcMin, kFunnyShapeNdcMax, kFunnyShapeNdcMax, kFunnyShapeOrthoFarZ);
+    GXSetProjection(projection, GX_ORTHOGRAPHIC);
+    C_MTXLookAt(view, &eye, &up, &at);
     GXLoadPosMtxImm(view, GX_PNMTX0);
 
     GXClearVtxDesc();

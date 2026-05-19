@@ -40,7 +40,6 @@ public:
 	void ClearAnmData();
 	void ClearTextureData();
 	void RenderShape(FS_tagOAN3_SHAPE*, Vec2d, float);
-	void SetDefaultStage();
 
     CFunnyShapeAnmWork m_anmWork[0x200]; // 0x0000
     OSFS_SHAPE_ST m_shape;               // 0x6000

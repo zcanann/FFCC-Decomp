@@ -432,6 +432,7 @@ enum RedWaveHeadLayout {
 #define RedMusicHeadFromBankAddress(address) reinterpret_cast<RedMusicHEAD*>(address)
 
 #define RedWaveHeadFromBankAddress(address) reinterpret_cast<RedWaveHeadWD*>(address)
+#define RedWaveHeadFromData(waveData) reinterpret_cast<RedWaveHeadWD*>(waveData)
 
 #define RedSeSepHeadFromBankAddress(address) reinterpret_cast<RedSeSepHEAD*>(address)
 

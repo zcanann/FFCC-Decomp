@@ -3782,7 +3782,7 @@ void CRedDriver::SetWaveData(int slot, int waveID, void* waveData, int waveSize)
     RedWaveSettingDataSetWaveData(waveData);
 
     if (waveSize == REDSOUND_WAVE_SIZE_AUTO) {
-        RedWaveHeadWD* const waveHeader = (RedWaveHeadWD*)waveData;
+        RedWaveHeadWD* const waveHeader = RedWaveHeadFromData(waveData);
 
         if ((waveHeader->m_signature[REDSOUND_WAVE_SIGNATURE_MAGIC0_INDEX] == REDSOUND_WAVE_SIGNATURE_MAGIC0) &&
             (waveHeader->m_signature[REDSOUND_WAVE_SIGNATURE_MAGIC1_INDEX] == REDSOUND_WAVE_SIGNATURE_MAGIC1)) {

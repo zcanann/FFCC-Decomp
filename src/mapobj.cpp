@@ -1447,77 +1447,76 @@ void CMapObj::DrawHitNormal()
  */
 int CMapObj::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long mask)
 {
-    if ((U8At(this, 0x1D) != 2) || (m_mapData == 0) || (S8At(this, 0x1F) != -1)) {
-        return 0;
-    }
+    if ((U8At(this, 0x1D) == 2) && (m_mapData != 0) && (S8At(this, 0x1F) == -1)) {
+        Mtx inverseMtx;
 
-    Mtx inverseMtx;
+        PSMTXInverse(MtxAt(this, 0xB8), inverseMtx);
+        CMapCylinder localCylinder;
+        PSMTXMultVec(inverseMtx, &cylinder->m_bottom, &localCylinder.m_bottom);
+        PSMTXMultVec(inverseMtx, &cylinder->m_top, &localCylinder.m_top);
 
-    PSMTXInverse(MtxAt(this, 0xB8), inverseMtx);
-    CMapCylinder localCylinder;
-    PSMTXMultVec(inverseMtx, &cylinder->m_bottom, &localCylinder.m_bottom);
-    PSMTXMultVec(inverseMtx, &cylinder->m_top, &localCylinder.m_top);
+        localCylinder.m_radius = cylinder->m_radius;
+        float margin = kMapObjZero + localCylinder.m_radius;
 
-    localCylinder.m_radius = cylinder->m_radius;
-    float margin = kMapObjZero + localCylinder.m_radius;
+        localCylinder.m_boundsMin.x = localCylinder.m_top.x;
+        if (localCylinder.m_bottom.x < localCylinder.m_top.x) {
+            localCylinder.m_boundsMin.x = localCylinder.m_bottom.x;
+            localCylinder.m_bottom.x = localCylinder.m_top.x;
+        }
+        localCylinder.m_boundsMax.x = localCylinder.m_bottom.x + margin;
+        localCylinder.m_boundsMin.x -= margin;
 
-    localCylinder.m_boundsMin.x = localCylinder.m_top.x;
-    if (localCylinder.m_bottom.x < localCylinder.m_top.x) {
-        localCylinder.m_boundsMin.x = localCylinder.m_bottom.x;
-        localCylinder.m_bottom.x = localCylinder.m_top.x;
-    }
-    localCylinder.m_boundsMax.x = localCylinder.m_bottom.x + margin;
-    localCylinder.m_boundsMin.x -= margin;
+        localCylinder.m_boundsMin.y = localCylinder.m_top.y;
+        if (localCylinder.m_bottom.y < localCylinder.m_top.y) {
+            localCylinder.m_boundsMin.y = localCylinder.m_bottom.y;
+            localCylinder.m_bottom.y = localCylinder.m_top.y;
+        }
+        localCylinder.m_boundsMax.y = localCylinder.m_bottom.y + margin;
+        localCylinder.m_boundsMin.y -= margin;
 
-    localCylinder.m_boundsMin.y = localCylinder.m_top.y;
-    if (localCylinder.m_bottom.y < localCylinder.m_top.y) {
-        localCylinder.m_boundsMin.y = localCylinder.m_bottom.y;
-        localCylinder.m_bottom.y = localCylinder.m_top.y;
-    }
-    localCylinder.m_boundsMax.y = localCylinder.m_bottom.y + margin;
-    localCylinder.m_boundsMin.y -= margin;
+        localCylinder.m_boundsMin.z = localCylinder.m_top.z;
+        if (localCylinder.m_bottom.z < localCylinder.m_top.z) {
+            localCylinder.m_boundsMin.z = localCylinder.m_bottom.z;
+            localCylinder.m_bottom.z = localCylinder.m_top.z;
+        }
+        localCylinder.m_boundsMax.z = localCylinder.m_bottom.z + margin;
+        localCylinder.m_boundsMin.z -= margin;
 
-    localCylinder.m_boundsMin.z = localCylinder.m_top.z;
-    if (localCylinder.m_bottom.z < localCylinder.m_top.z) {
-        localCylinder.m_boundsMin.z = localCylinder.m_bottom.z;
-        localCylinder.m_bottom.z = localCylinder.m_top.z;
-    }
-    localCylinder.m_boundsMax.z = localCylinder.m_bottom.z + margin;
-    localCylinder.m_boundsMin.z -= margin;
+        CMapHit* mapHit = reinterpret_cast<CMapHit*>(m_mapData);
+        bool hitBounds = false;
+        bool xyOverlap = false;
+        bool xOverlap = mapHit->m_positionMin.x < localCylinder.m_boundsMin.x
+            ? localCylinder.m_boundsMin.x <= mapHit->m_positionMax.x
+            : mapHit->m_positionMin.x <= localCylinder.m_boundsMax.x;
 
-    CMapHit* mapHit = reinterpret_cast<CMapHit*>(m_mapData);
-    bool hitBounds = false;
-    bool xyOverlap = false;
-    bool xOverlap = mapHit->m_positionMin.x < localCylinder.m_boundsMin.x
-        ? localCylinder.m_boundsMin.x <= mapHit->m_positionMax.x
-        : mapHit->m_positionMin.x <= localCylinder.m_boundsMax.x;
+        if (xOverlap) {
+            bool yOverlap = mapHit->m_positionMin.y < localCylinder.m_boundsMin.y
+                ? localCylinder.m_boundsMin.y <= mapHit->m_positionMax.y
+                : mapHit->m_positionMin.y <= localCylinder.m_boundsMax.y;
+            if (yOverlap) {
+                xyOverlap = true;
+            }
+        }
 
-    if (xOverlap) {
-        bool yOverlap = mapHit->m_positionMin.y < localCylinder.m_boundsMin.y
-            ? localCylinder.m_boundsMin.y <= mapHit->m_positionMax.y
-            : mapHit->m_positionMin.y <= localCylinder.m_boundsMax.y;
-        if (yOverlap) {
-            xyOverlap = true;
+        if (xyOverlap) {
+            bool zOverlap = mapHit->m_positionMin.z < localCylinder.m_boundsMin.z
+                ? localCylinder.m_boundsMin.z <= mapHit->m_positionMax.z
+                : mapHit->m_positionMin.z <= localCylinder.m_boundsMax.z;
+
+            if (zOverlap) {
+                hitBounds = true;
+            }
+        }
+        if (hitBounds) {
+            Vec localMove;
+            PSMTXMultVecSR(inverseMtx, &cylinder->m_axis, &localCylinder.m_axis);
+            PSMTXMultVecSR(inverseMtx, move, &localMove);
+            if (mapHit->CheckHitCylinder(&localCylinder, &localMove, mask) != 0) {
+                return 1;
+            }
         }
     }
 
-    if (xyOverlap) {
-        bool zOverlap = mapHit->m_positionMin.z < localCylinder.m_boundsMin.z
-            ? localCylinder.m_boundsMin.z <= mapHit->m_positionMax.z
-            : mapHit->m_positionMin.z <= localCylinder.m_boundsMax.z;
-
-        if (zOverlap) {
-            hitBounds = true;
-        }
-    }
-    if (hitBounds) {
-        Vec localMove;
-        PSMTXMultVecSR(inverseMtx, &cylinder->m_axis, &localCylinder.m_axis);
-        PSMTXMultVecSR(inverseMtx, move, &localMove);
-        if (mapHit->CheckHitCylinder(&localCylinder, &localMove, mask) != 0) {
-            return 1;
-        }
-    }
     return 0;
 }
 

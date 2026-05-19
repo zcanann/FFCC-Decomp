@@ -47,6 +47,8 @@ public:
 class CMapAnim
 {
     CPtrArray<CMapAnimNode*> mapAnimNodes;
+    int m_startFrame;
+    int m_endFrame;
 
 public:
     CMapAnim();

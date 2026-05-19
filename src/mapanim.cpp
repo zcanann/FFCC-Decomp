@@ -165,8 +165,8 @@ void CMapAnim::ReadOtmAnim(CChunkFile& chunkFile)
     mapAnimKeyDtArray = reinterpret_cast<CPtrArray<CMapAnimKeyDt*>*>(reinterpret_cast<unsigned char*>(&MapMng) + 0x21418);
     while ((hasChunk = static_cast<int>(chunkFile.GetNextChunk(*reinterpret_cast<CChunkFile::CChunk*>(outerChunkData)))) != 0) {
         if (chunkId == 0x4652414D) {
-            reinterpret_cast<int*>(this)[7] = static_cast<int>(chunkFile.Get4());
-            reinterpret_cast<int*>(this)[8] = static_cast<int>(chunkFile.Get4());
+            m_startFrame = static_cast<int>(chunkFile.Get4());
+            m_endFrame = static_cast<int>(chunkFile.Get4());
         } else if (chunkId == 0x4E4F4445) {
             item = static_cast<int*>(
                 __nw__FUlPQ27CMemory6CStagePci(

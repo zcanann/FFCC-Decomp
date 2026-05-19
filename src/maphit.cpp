@@ -350,8 +350,8 @@ int CMapHit::CalcHitSlide(Vec* out, float y)
 
             Vec edge;
             Vec nearestPoint;
-            Vec edgeProjection;
             Vec edgeToCenter;
+            Vec edgeProjection;
             PSVECSubtract(&current, &previous, &edge);
             PSVECSubtract(&current, &g_hit_cyl_min.m_top, &edgeToCenter);
 

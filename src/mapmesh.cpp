@@ -58,29 +58,9 @@ static inline unsigned char* Ptr(CMapMesh* self, unsigned int offset)
     return reinterpret_cast<unsigned char*>(self) + offset;
 }
 
-static inline void*& PtrAt(CMapMesh* self, unsigned int offset)
-{
-    return *reinterpret_cast<void**>(Ptr(self, offset));
-}
-
 static inline int& S32At(CMapMesh* self, unsigned int offset)
 {
     return *reinterpret_cast<int*>(Ptr(self, offset));
-}
-
-static inline float& F32At(CMapMesh* self, unsigned int offset)
-{
-    return *reinterpret_cast<float*>(Ptr(self, offset));
-}
-
-static inline unsigned short& U16At(CMapMesh* self, unsigned int offset)
-{
-    return *reinterpret_cast<unsigned short*>(Ptr(self, offset));
-}
-
-static inline CMaterialSet* DefaultMaterialSet()
-{
-    return *reinterpret_cast<CMaterialSet**>(reinterpret_cast<unsigned char*>(&MapMng) + 0x213D4);
 }
 
 static inline unsigned int Align32(unsigned int value)
@@ -321,11 +301,11 @@ void CMapMesh::DrawMesh(unsigned short startIdx, unsigned short count)
  */
 void CMapMesh::SetRenderArray()
 {
-    GXSetArray((GXAttr)9, PtrAt(this, 0x2C), 0xC);
-    GXSetArray((GXAttr)0xB, PtrAt(this, 0x3C), 4);
-    GXSetArray((GXAttr)0xD, PtrAt(this, 0x38), 4);
-    GXSetArray((GXAttr)0xE, PtrAt(this, 0x38), 4);
-    *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(&MaterialMan) + 4) = PtrAt(this, 0x30);
+    GXSetArray((GXAttr)9, m_vertices, 0xC);
+    GXSetArray((GXAttr)0xB, m_colors, 4);
+    GXSetArray((GXAttr)0xD, m_uvPairs, 4);
+    GXSetArray((GXAttr)0xE, m_uvPairs, 4);
+    *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(&MaterialMan) + 4) = m_normals;
 }
 
 /*
@@ -367,9 +347,9 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
             workSize += chunk.m_size;
             break;
         case 0x444C4844:
-            U16At(this, 0xA) = static_cast<unsigned short>(chunk.m_arg0);
+            m_displayListCount = static_cast<unsigned short>(chunk.m_arg0);
             workSize = Align32(workSize);
-            workSize += static_cast<unsigned int>(U16At(this, 0xA)) * 0x10U;
+            workSize += static_cast<unsigned int>(m_displayListCount) * 0x10U;
             reader.PushChunk();
             while (reader.GetNextChunk(chunk)) {
                 switch (chunk.m_id) {

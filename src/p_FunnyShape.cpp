@@ -473,6 +473,12 @@ CPtrArray<_GXTexObj*>::CPtrArray()
 }
 
 template <>
+CPtrArray<_GXTexObj*>::~CPtrArray()
+{
+    RemoveAll();
+}
+
+template <>
 CPtrArray<OSFS_TEXTURE_ST*>::CPtrArray()
 {
     numItems = 0;
@@ -485,12 +491,6 @@ CPtrArray<OSFS_TEXTURE_ST*>::CPtrArray()
 
 template <>
 CPtrArray<OSFS_TEXTURE_ST*>::~CPtrArray()
-{
-    RemoveAll();
-}
-
-template <>
-CPtrArray<_GXTexObj*>::~CPtrArray()
 {
     RemoveAll();
 }

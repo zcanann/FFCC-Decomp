@@ -27,6 +27,11 @@ static inline float LoadFloat(const float& value)
 	return value;
 }
 
+static inline Vec* ConstructVec(Vec& dst, const Vec& src)
+{
+	return reinterpret_cast<Vec*>(__ct__7CVectorFRC3Vec(reinterpret_cast<CVector*>(&dst), src));
+}
+
 /*
  * --INFO--
  * PAL Address: 0x80127008
@@ -225,12 +230,11 @@ void CGPrgObj::dstTargetRot(CGPrgObj* target)
 	Vec targetPos;
 	Vec basePos;
 	Vec deltaPos;
-	CVector* baseVec;
 
-	__ct__7CVectorFRC3Vec(reinterpret_cast<CVector*>(&targetPos), target->m_worldPosition);
-	baseVec = __ct__7CVectorFRC3Vec(reinterpret_cast<CVector*>(&basePos), m_worldPosition);
+	ConstructVec(targetPos, target->m_worldPosition);
+	Vec* baseVec = ConstructVec(basePos, m_worldPosition);
 	__ct__7CVectorFv(reinterpret_cast<CVector*>(&deltaPos));
-	PSVECSubtract(reinterpret_cast<Vec*>(baseVec), &targetPos, &deltaPos);
+	PSVECSubtract(baseVec, &targetPos, &deltaPos);
 	deltaX = deltaPos.x;
 	deltaZ = deltaPos.z;
 	if ((deltaX == FLOAT_80331BD4) || (deltaZ == FLOAT_80331BD4)) {
@@ -260,12 +264,11 @@ void CGPrgObj::rotTarget(CGPrgObj* target)
 	Vec targetPos;
 	Vec basePos;
 	Vec deltaPos;
-	CVector* baseVec;
 
-	__ct__7CVectorFRC3Vec(reinterpret_cast<CVector*>(&targetPos), target->m_worldPosition);
-	baseVec = __ct__7CVectorFRC3Vec(reinterpret_cast<CVector*>(&basePos), m_worldPosition);
+	ConstructVec(targetPos, target->m_worldPosition);
+	Vec* baseVec = ConstructVec(basePos, m_worldPosition);
 	__ct__7CVectorFv(reinterpret_cast<CVector*>(&deltaPos));
-	PSVECSubtract(reinterpret_cast<Vec*>(baseVec), &targetPos, &deltaPos);
+	PSVECSubtract(baseVec, &targetPos, &deltaPos);
 	deltaX = deltaPos.x;
 	deltaZ = deltaPos.z;
 	if ((deltaX == FLOAT_80331BD4) || (deltaZ == FLOAT_80331BD4)) {
@@ -293,12 +296,11 @@ float CGPrgObj::getTargetRot(CGPrgObj* target)
 	Vec basePos;
 	Vec targetPos;
 	Vec deltaPos;
-	CVector* baseVec;
 
-	__ct__7CVectorFRC3Vec(reinterpret_cast<CVector*>(&targetPos), target->m_worldPosition);
-	baseVec = __ct__7CVectorFRC3Vec(reinterpret_cast<CVector*>(&basePos), m_worldPosition);
+	ConstructVec(targetPos, target->m_worldPosition);
+	Vec* baseVec = ConstructVec(basePos, m_worldPosition);
 	__ct__7CVectorFv(reinterpret_cast<CVector*>(&deltaPos));
-	PSVECSubtract(reinterpret_cast<Vec*>(baseVec), &targetPos, &deltaPos);
+	PSVECSubtract(baseVec, &targetPos, &deltaPos);
 	deltaX = deltaPos.x;
 	deltaZ = deltaPos.z;
 	if ((deltaX == FLOAT_80331BD4) || (deltaZ == FLOAT_80331BD4)) {

@@ -185,7 +185,7 @@ retry:
 
         int hasScratchTexture = (int)Graphic.m_scratchTextureBuffer;
         hasScratchTexture = hasScratchTexture != 0;
-        int compactLayout = 0;
+        u8 compactLayout = 0;
         if (hasScratchTexture && usingFallbackFont == 0)
         {
             compactLayout = 1;

@@ -463,22 +463,21 @@ int CMenuPcs::MLstOpen()
 	itemCount = (unsigned int)this->lstData->count;
 	entry = this->lstData->entries;
 	currentFrame = (int)this->lstState->frame;
-	if ((int)itemCount > 0) {
-		for (unsigned int remaining = itemCount; remaining != 0; remaining--) {
-			if (entry->startFrame <= currentFrame) {
-				if (entry->startFrame + entry->duration <= currentFrame) {
-					completedItems++;
-					entry->alpha = FLOAT_803333F0;
-				} else {
-					entry->timer = entry->timer + 1;
-					double ratio = DOUBLE_80333410 / (double)entry->duration;
-					entry->alpha = (float)(ratio * (double)entry->timer);
-				}
+	for (int remaining = itemCount; remaining > 0; remaining--) {
+		if (entry->startFrame <= currentFrame) {
+			if (entry->startFrame + entry->duration <= currentFrame) {
+				completedItems++;
+				entry->alpha = FLOAT_803333F0;
+			} else {
+				entry->timer = entry->timer + 1;
+				double ratio = DOUBLE_80333410 / (double)entry->duration;
+				entry->alpha = (float)(ratio * (double)entry->timer);
 			}
-			entry++;
 		}
+		entry++;
 	}
 
+	int result = 0;
 	if (this->lstData->count == completedItems) {
 		one = FLOAT_803333F0;
 		entry = this->lstData->entries;
@@ -522,7 +521,7 @@ int CMenuPcs::MLstOpen()
 				} while (itemCount != 0);
 			}
 		}
-		return 1;
+		result = 1;
 	}
-	return 0;
+	return result;
 }

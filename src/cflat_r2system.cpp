@@ -4383,15 +4383,10 @@ void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack,
     CGame::CGameWork& gameWork = Game.m_gameWork;
     if (systemValue > -0x1000) {
         if (systemValue <= -500) {
-            unsigned int bitIndex = static_cast<unsigned int>(systemValue + 0x9F3);
-            int sign = static_cast<int>(bitIndex) >> 0x1F;
-            signed char* flagByte =
-                gameWork.m_eventFlags + (static_cast<int>(bitIndex) >> 3) +
-                static_cast<unsigned int>((static_cast<int>(bitIndex) < 0) && ((bitIndex & 7) != 0)) + 8;
-            unsigned int mask =
-                1U << ((sign * 8 | static_cast<int>(bitIndex * 0x20000000U + static_cast<unsigned int>(sign >> 0x1D))) -
-                       sign);
-            unsigned int value = -((static_cast<int>(-((static_cast<unsigned char>(*flagByte) & mask)))) >> 0x1F);
+            int bitIndex = systemValue + 0x9F3;
+            unsigned char* flagByte = reinterpret_cast<unsigned char*>(gameWork.m_eventFlags) + bitIndex / 8;
+            unsigned int mask = 1U << (bitIndex % 8);
+            unsigned int value = (*flagByte & mask) != 0;
             stack[-1].m_word = value;
 
             if (setMode == 0) {
@@ -4404,22 +4399,22 @@ void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack,
                 value = value + stack->m_word;
             }
 
-            if (value == 0) {
-                *flagByte = static_cast<signed char>(*flagByte & static_cast<signed char>(~static_cast<unsigned char>(mask)));
+            if (value != 0) {
+                *flagByte |= mask;
             } else {
-                *flagByte = static_cast<signed char>(*flagByte | static_cast<signed char>(mask));
+                *flagByte &= ~mask;
             }
         } else if (systemValue <= -200) {
-            unsigned short* artifact = Game.m_caravanWorkArr[0].m_artifacts + systemValue + 0x1E;
-            stack[-1].m_word = static_cast<int>(static_cast<short>(*artifact));
+            short* artifact = gameWork.m_eventWork + systemValue + 0x1C7;
+            stack[-1].m_word = *artifact;
             if (setMode == 0) {
-                *artifact = static_cast<unsigned short>(stack->m_word);
+                *artifact = static_cast<short>(stack->m_word);
             } else if (setMode < 0) {
                 if (-2 < setMode) {
-                    *artifact = static_cast<unsigned short>(*artifact - static_cast<short>(stack->m_word));
+                    *artifact = static_cast<short>(*artifact - static_cast<short>(stack->m_word));
                 }
             } else if (setMode < 2) {
-                *artifact = static_cast<unsigned short>(*artifact + static_cast<short>(stack->m_word));
+                *artifact = static_cast<short>(*artifact + static_cast<short>(stack->m_word));
             }
         } else {
             switch (systemValue) {

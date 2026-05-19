@@ -985,13 +985,14 @@ void set_matrix(_pppPObject* pObject, pppFMATRIX mtxA, pppFMATRIX mtxB, PRyjMega
 {
     u8* payload = (u8*)params;
     const u8 matrixMode = payload[0x2A];
+    const u8 flagsMatrix = payload[0x135];
     const u8 flagsEnd = payload[0x137];
     pppFMATRIX tmp;
     Mtx scale;
     pppFMATRIX* objectMatrix = &pObject->m_drawMatrix;
     bool copyOutMatrix = true;
 
-    if (matrixMode == 0) {
+    if (flagsMatrix == 0) {
         pppUnitMatrix(mtxB);
         mtxB.value[0][3] = particleData->m_matrix[0][3];
         mtxB.value[1][3] = particleData->m_matrix[1][3];
@@ -1000,13 +1001,13 @@ void set_matrix(_pppPObject* pObject, pppFMATRIX mtxA, pppFMATRIX mtxB, PRyjMega
         pppCopyMatrix(mtxB, *(pppFMATRIX*)&particleData->m_matrix);
     }
 
-    if (particleData->m_directionTail.z != FLOAT_80330498 ||
-        particleData->m_colorDeltaAdd[0] != FLOAT_80330498 ||
-        particleData->m_colorDeltaAdd[1] != FLOAT_80330498) {
+    if (*s32_at(particleData, 0x38) != 0 ||
+        *s32_at(particleData, 0x3C) != 0 ||
+        *s32_at(particleData, 0x40) != 0) {
         Vec rot;
-        rot.x = -particleData->m_directionTail.z * (FLOAT_803304a0 / FLOAT_803304a4);
-        rot.y = -particleData->m_colorDeltaAdd[0] * (FLOAT_803304a0 / FLOAT_803304a4);
-        rot.z = -particleData->m_colorDeltaAdd[1] * (FLOAT_803304a0 / FLOAT_803304a4);
+        rot.x = (FLOAT_803304a0 * (float)-*s32_at(particleData, 0x38)) / FLOAT_803304a4;
+        rot.y = (FLOAT_803304a0 * (float)-*s32_at(particleData, 0x3C)) / FLOAT_803304a4;
+        rot.z = (FLOAT_803304a0 * (float)-*s32_at(particleData, 0x40)) / FLOAT_803304a4;
         pppFMATRIX r;
         pppUnitMatrix(r);
         pppRotMatrix(r, r, rot);
@@ -1014,7 +1015,7 @@ void set_matrix(_pppPObject* pObject, pppFMATRIX mtxA, pppFMATRIX mtxB, PRyjMega
         pppMulMatrix(mtxB, tmp, r);
     }
 
-    PSMTXScale(scale, particleData->m_sizeStart, particleData->m_sizeEnd, particleData->m_sizeVal);
+    PSMTXScale(scale, *f32_at(particleData, 0x5C), *f32_at(particleData, 0x60), *f32_at(particleData, 0x64));
     pppCopyMatrix(tmp, mtxB);
     pppMulMatrix(mtxB, tmp, *(pppFMATRIX*)&scale);
     pppCopyMatrix(*(pppFMATRIX*)&g_matKeep, mtxB);
@@ -1079,12 +1080,13 @@ void set_matrix(_pppPObject* pObject, pppFMATRIX mtxA, pppFMATRIX mtxB, PRyjMega
         pppAddVector(endPos, endPos, objectPos);
 
         pppUnitMatrix(mtxB);
-        PSMTXScaleApply(mtxB.value, objectMatrix->value, particleData->m_sizeStart * pppMngStPtr->m_scale.x,
-                        particleData->m_sizeEnd * pppMngStPtr->m_scale.y, particleData->m_sizeVal * pppMngStPtr->m_scale.z);
+        PSMTXScaleApply(mtxB.value, objectMatrix->value, *f32_at(particleData, 0x5C) * pppMngStPtr->m_scale.x,
+                        *f32_at(particleData, 0x60) * pppMngStPtr->m_scale.y,
+                        *f32_at(particleData, 0x64) * pppMngStPtr->m_scale.z);
 
         pppFMATRIX rot;
 
-        PSMTXRotRad(rot.value, 'z', FLOAT_803304a8 * -particleData->m_colorDeltaAdd[1]);
+        PSMTXRotRad(rot.value, 'z', FLOAT_803304a8 * (float)-*s32_at(particleData, 0x40));
         pppCopyMatrix(tmp, *objectMatrix);
         pppMulMatrix(*objectMatrix, rot, tmp);
 

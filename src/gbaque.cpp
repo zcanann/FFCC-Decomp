@@ -4285,9 +4285,9 @@ int GbaQueue::GetArtifactData(int channel, unsigned char* outData)
 	localPlayerData = *GetPlayerDataView(this, channel);
 	OSSignalSemaphore(accessSemaphores + channel);
 
-	artifactData[0] = SwapU32(localPlayerData.m_artifacts[0]);
-	artifactData[1] = SwapU32(localPlayerData.m_artifacts[1]);
-	artifactData[2] = SwapU32(localPlayerData.m_artifacts[2]);
+	artifactData[0] = SwapU32Value(localPlayerData.m_artifacts[0]);
+	artifactData[1] = SwapU32Value(localPlayerData.m_artifacts[1]);
+	artifactData[2] = SwapU32Value(localPlayerData.m_artifacts[2]);
 	memcpy(outData, artifactData, sizeof(artifactData));
 	return 0xC;
 }
@@ -4471,9 +4471,9 @@ int GbaQueue::MakeArtiData(int channel, char* outData)
 	unsigned int artifactData[3];
 
 	OSWaitSemaphore(accessSemaphores + channel);
-	artifactData[0] = SwapU32(*reinterpret_cast<unsigned int*>(compatibilityStr + channel * 0xDC + 0x24));
-	artifactData[1] = SwapU32(*reinterpret_cast<unsigned int*>(compatibilityStr + channel * 0xDC + 0x28));
-	artifactData[2] = SwapU32(*reinterpret_cast<unsigned int*>(compatibilityStr + channel * 0xDC + 0x2C));
+	artifactData[0] = SwapU32Value(*reinterpret_cast<unsigned int*>(compatibilityStr + channel * 0xDC + 0x24));
+	artifactData[1] = SwapU32Value(*reinterpret_cast<unsigned int*>(compatibilityStr + channel * 0xDC + 0x28));
+	artifactData[2] = SwapU32Value(*reinterpret_cast<unsigned int*>(compatibilityStr + channel * 0xDC + 0x2C));
 	OSSignalSemaphore(accessSemaphores + channel);
 
 	memcpy(outData, artifactData, sizeof(artifactData));
@@ -4498,19 +4498,16 @@ int GbaQueue::MakeArtiData(int channel, char* outData)
 int GbaQueue::GetTmpArtifactData(int channel, unsigned char* outData)
 {
 	GbaQueuePlayerDataView localPlayerData;
+	unsigned short tmpArtifacts[4];
 
 	OSWaitSemaphore(accessSemaphores + channel);
 	localPlayerData = *GetPlayerDataView(this, channel);
 	OSSignalSemaphore(accessSemaphores + channel);
 
-	*reinterpret_cast<unsigned short*>(outData + 0) =
-		SwapU16(localPlayerData.m_tmpArtifacts[0]);
-	*reinterpret_cast<unsigned short*>(outData + 2) =
-		SwapU16(localPlayerData.m_tmpArtifacts[1]);
-	*reinterpret_cast<unsigned short*>(outData + 4) =
-		SwapU16(localPlayerData.m_tmpArtifacts[2]);
-	*reinterpret_cast<unsigned short*>(outData + 6) =
-		SwapU16(localPlayerData.m_tmpArtifacts[3]);
+	for (int i = 0; i < 4; i++) {
+		tmpArtifacts[i] = SwapU16(localPlayerData.m_tmpArtifacts[i]);
+	}
+	memcpy(outData, tmpArtifacts, sizeof(tmpArtifacts));
 
 	return 8;
 }

@@ -1002,13 +1002,13 @@ void CRedEntry::DisplayWaveInfo()
 		OSReport(sRedEntryAMemoryInfoColumnFmt, sRedEntryLogPrefix);
 		fflush(__files + 1);
 
+		RedMemoryBlock* aMemoryBlocks;
+		RedMemoryBlock* aMemoryBlock;
 		int maxFreeSize = 0;
 		int totalAllocatedSize = 0;
 		int entryWaveCount = 0;
 		int previousBlockEnd;
 		int aBufferEnd;
-		RedMemoryBlock* aMemoryBlocks;
-		RedMemoryBlock* aMemoryBlock;
 
 		previousBlockEnd = c_RedMemory.GetABufferAddress();
 		aMemoryBlocks = c_RedMemory.GetABankAddress();

@@ -281,6 +281,8 @@ enum RedSeSepHeadLayout {
 };
 
 #define RedSeSepGetInfo(seSepHead) reinterpret_cast<RedSeINFO*>(&(seSepHead)->m_seInfoFlags)
+#define RedSeSepGetSize(seSepHead) ((seSepHead)->m_sizeAndFlags & REDSOUND_SESEP_SIZE_MASK)
+#define RedSeSepHasFlags(seSepHead) (((seSepHead)->m_sizeAndFlags & REDSOUND_SESEP_FLAGS_MASK) != 0)
 #define RedSeSepGetWaveNo(seSepHead)                                                                  \
 	(((seSepHead)->m_waveNoHi * REDSOUND_SESEP_WAVE_NO_HIGH_SCALE) | (seSepHead)->m_waveNoLo)
 

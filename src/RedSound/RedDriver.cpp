@@ -3320,7 +3320,7 @@ inline int CRedDriver::SePlay(void* seSepData, int autoID, int pan, int volume, 
           (header->m_signature[REDSOUND_SESEP_SIGNATURE_2_INDEX] == REDSOUND_SESEP_SIGNATURE_2)) &&
          ((header->m_signature[REDSOUND_SESEP_SIGNATURE_3_INDEX] == REDSOUND_SESEP_SIGNATURE_3 &&
            (header->m_signature[REDSOUND_SESEP_SIGNATURE_4_INDEX] == REDSOUND_SESEP_SIGNATURE_4))))) {
-        headerSize = header->m_sizeAndFlags & REDSOUND_SESEP_SIZE_MASK;
+        headerSize = RedSeSepGetSize(header);
         copiedHeader = (RedSeSepHEAD*)RedNew(headerSize);
         if (copiedHeader != 0) {
             memcpy(copiedHeader, header, headerSize);
@@ -3788,7 +3788,7 @@ void CRedDriver::SetWaveData(int slot, int waveID, void* waveData, int waveSize)
             (waveHeader->m_signature[REDSOUND_WAVE_SIGNATURE_MAGIC1_INDEX] == REDSOUND_WAVE_SIGNATURE_MAGIC1)) {
             int dataSize = waveHeader->m_tableCount * REDSOUND_WAVE_TABLE_ENTRY_SIZE;
             dataSize = (dataSize += REDSOUND_WAVE_SETTING_TABLE_ALIGN - 1) & REDSOUND_WAVE_SETTING_TABLE_ALIGN_MASK;
-            dataSize += waveHeader->m_toneCount * REDSOUND_WAVE_TONE_ENTRY_SIZE;
+            dataSize += RedWaveHeadGetToneSize(waveHeader);
             dataSize = waveHeader->m_waveSize + dataSize;
             dataSize += REDSOUND_WAVE_HEADER_COPY_BASE_SIZE;
             RedWaveSettingDataSetWaveSize(dataSize);

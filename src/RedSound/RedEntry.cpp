@@ -1267,7 +1267,7 @@ RedSeSepHEAD* CRedEntry::SeSepHeadAdd(RedSeSepHEAD* seSepHead)
 	    (bank < RedEntrySeSepBankGetEnd(this))) {
 		bank->m_seSepHead = seSepHead;
 		addedHead = seSepHead;
-		bank->m_size = seSepHead->m_sizeAndFlags & REDSOUND_SESEP_SIZE_MASK;
+		bank->m_size = RedSeSepGetSize(seSepHead);
 		bank->m_id = seSepHead->m_seNo;
 		SeSepHistoryAdd();
 		bank->m_historyNo = REDSOUND_HISTORY_MOST_RECENT;

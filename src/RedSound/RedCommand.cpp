@@ -655,7 +655,7 @@ int SeSepPlay(int seId, int sepId, int pan, int volume)
 	if (sepBank != 0) {
 		sepHead = sepBank->m_seSepHead;
 		sepInfo = RedSeSepGetInfo(sepHead);
-		if ((sepHead->m_sizeAndFlags & REDSOUND_SESEP_FLAGS_MASK) != 0) {
+		if (RedSeSepHasFlags(sepHead)) {
 			sepInfo->m_flagsAndCount |= REDSOUND_SE_INFO_MULTI_FLAG;
 		}
 		if (_SePlayStart(sepInfo, seId, sepId, pan, volume) != 0) {

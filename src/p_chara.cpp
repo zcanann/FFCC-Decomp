@@ -2876,6 +2876,13 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
     if ((flags & 1) == 0 || (flags & 0x400000) != 0) {
         return;
     }
+    const float lightAlpha = m_model->m_lightAlpha;
+    if (lightAlpha == FLOAT_80330288 && (flags & 0x80) == 0) {
+        return;
+    }
+    if ((flags & 0x100) != 0 && drawPass != 5) {
+        return;
+    }
     if (drawPass == 1 && (flags & 0x40) != 0) {
         return;
     }
@@ -2892,13 +2899,10 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
         return;
     }
 
-    if (immediatePass == 0 && drawPass == 0 && (flags & 0x40000) == 0) {
+    if (immediatePass != 0 && drawPass == 0 && (lightAlpha < FLOAT_8033028c || (flags & 0x40000) != 0)) {
         ppvDrawMng.AddPrim(-m_sortZ, this);
         return;
     }
-
-    Mtx viewMtx;
-    PSMTXCopy(*reinterpret_cast<Mtx*>(Ptr(&CameraPcs, 4)), viewMtx);
 
     if (drawPass != 1 && drawPass != 2 && (flags & 0x200000) == 0) {
         const unsigned int lightBank = (flags >> 19) & 1;
@@ -2910,9 +2914,17 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
         if (phaseIndex > 3) {
             phaseIndex = 3;
         }
-        const float blendT = phase - static_cast<float>(phaseIndex);
-        _GXColor* phaseColors = reinterpret_cast<_GXColor*>(Ptr(&CharaPcs, 0x12C));
-        const _GXColor shade = BlendColor(phaseColors[phaseIndex], phaseColors[phaseIndex + 1], blendT);
+        _GXColor shade;
+        if ((flags & 0x20000) == 0 || drawPass == 3) {
+            const float blendT = phase - static_cast<float>(phaseIndex);
+            _GXColor* phaseColors = reinterpret_cast<_GXColor*>(Ptr(&CharaPcs, 0x12C));
+            shade = BlendColor(phaseColors[phaseIndex], phaseColors[phaseIndex + 1], blendT);
+        } else {
+            shade.r = 0xFF;
+            shade.g = 0xFF;
+            shade.b = 0xFF;
+            shade.a = 0xFF;
+        }
         const _GXColor ambientBase = *reinterpret_cast<_GXColor*>(Ptr(&CharaPcs, 0xE8 + lightBank * 4));
         const _GXColor ambientColor = ModulateColor(ambientBase, shade);
         LightPcs.SetAmbient(ambientColor);
@@ -2930,6 +2942,9 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
         lightPos.z = (*modelMtx)[2][3];
         LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(0), &lightPos, 0xFFFFFFFF);
     }
+
+    Mtx viewMtx;
+    PSMTXCopy(*reinterpret_cast<Mtx*>(Ptr(&CameraPcs, 4)), viewMtx);
 
     if (drawPass == 3) {
         if ((flags & 4) != 0) {

@@ -147,7 +147,8 @@ public:
 		u8 _pad0[0x68];
 		Mtx m_matrix;
 		u32 m_meshVisibleMask;
-		u8 _pad9C[0x8];
+		float m_lightAlpha;
+		u8 _padA0[0x4];
 		CCharaModelData* m_data;
 		CNode* m_nodes;
 		CMesh* m_meshes;

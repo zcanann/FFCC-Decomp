@@ -566,6 +566,15 @@ void COctTree::DrawCharaShadowTypeMeshFlag_r(COctNode* octNode)
  */
 void COctTree::DrawTypeMeshFrustumIn_r(COctNode* octNode)
 {
+	int i;
+	int j;
+	int k;
+	int m;
+	int n;
+	int o;
+	int p;
+	int q;
+	int r;
 	COctNode* child1;
 	COctNode* child2;
 	COctNode* child3;
@@ -574,12 +583,15 @@ void COctTree::DrawTypeMeshFrustumIn_r(COctNode* octNode)
 	COctNode* child6;
 	COctNode* child7;
 	COctNode* child8;
+	COctNode* node;
+
+	node = octNode;
 	if (octNode->m_meshCount != 0) {
-		octNode->m_drawFlags |= 1;
+		node->m_drawFlags |= 1;
 	}
 
-	for (int i = 0; i < 8; i++) {
-		child1 = octNode->m_children[0];
+	for (i = 0; i < 8; i++) {
+		child1 = node->m_children[0];
 		if (child1 == 0) {
 			return;
 		}
@@ -587,7 +599,7 @@ void COctTree::DrawTypeMeshFrustumIn_r(COctNode* octNode)
 			child1->m_drawFlags |= 1;
 		}
 
-		for (int j = 0; j < 8; j++) {
+		for (j = 0; j < 8; j++) {
 			child2 = child1->m_children[0];
 			if (child2 == 0) {
 				break;
@@ -596,7 +608,7 @@ void COctTree::DrawTypeMeshFrustumIn_r(COctNode* octNode)
 				child2->m_drawFlags |= 1;
 			}
 
-			for (int k = 0; k < 8; k++) {
+			for (k = 0; k < 8; k++) {
 				child3 = child2->m_children[0];
 				if (child3 == 0) {
 					break;
@@ -605,7 +617,7 @@ void COctTree::DrawTypeMeshFrustumIn_r(COctNode* octNode)
 					child3->m_drawFlags |= 1;
 				}
 
-				for (int m = 0; m < 8; m++) {
+				for (m = 0; m < 8; m++) {
 					child4 = child3->m_children[0];
 					if (child4 == 0) {
 						break;
@@ -614,7 +626,7 @@ void COctTree::DrawTypeMeshFrustumIn_r(COctNode* octNode)
 						child4->m_drawFlags |= 1;
 					}
 
-					for (int n = 0; n < 8; n++) {
+					for (n = 0; n < 8; n++) {
 						child5 = child4->m_children[0];
 						if (child5 == 0) {
 							break;
@@ -623,7 +635,7 @@ void COctTree::DrawTypeMeshFrustumIn_r(COctNode* octNode)
 							child5->m_drawFlags |= 1;
 						}
 
-						for (int o = 0; o < 8; o++) {
+						for (o = 0; o < 8; o++) {
 							child6 = child5->m_children[0];
 							if (child6 == 0) {
 								break;
@@ -632,7 +644,7 @@ void COctTree::DrawTypeMeshFrustumIn_r(COctNode* octNode)
 								child6->m_drawFlags |= 1;
 							}
 
-							for (int p = 0; p < 8; p++) {
+							for (p = 0; p < 8; p++) {
 								child7 = child6->m_children[0];
 								if (child7 == 0) {
 									break;
@@ -641,7 +653,7 @@ void COctTree::DrawTypeMeshFrustumIn_r(COctNode* octNode)
 									child7->m_drawFlags |= 1;
 								}
 
-								for (int q = 0; q < 8; q++) {
+								for (q = 0; q < 8; q++) {
 									child8 = child7->m_children[0];
 									if (child8 == 0) {
 										break;
@@ -650,7 +662,7 @@ void COctTree::DrawTypeMeshFrustumIn_r(COctNode* octNode)
 										child8->m_drawFlags |= 1;
 									}
 
-									for (int r = 0; r < 8; r++) {
+									for (r = 0; r < 8; r++) {
 										if (child8->m_children[0] == 0) {
 											break;
 										}
@@ -679,7 +691,7 @@ void COctTree::DrawTypeMeshFrustumIn_r(COctNode* octNode)
 			child1 = reinterpret_cast<COctNode*>(Ptr(child1, 4));
 		}
 
-		octNode = reinterpret_cast<COctNode*>(Ptr(octNode, 4));
+		node = reinterpret_cast<COctNode*>(Ptr(node, 4));
 	}
 }
 

@@ -4571,17 +4571,24 @@ void CPartMng::pppSetLocSlot(int slot, Vec* position)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80057a6c
+ * PAL Size: 192b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CPartMng::pppDeleteCHandle(CCharaPcs::CHandle* handle)
 {
     char* base = reinterpret_cast<char*>(this);
+    unsigned char mode;
+    int baseTime;
+
     for (int i = 0; i < 0x180; i++) {
         _pppMngSt* pppMngSt = reinterpret_cast<_pppMngSt*>(base + 0x2A18);
-        int baseTime = pppMngSt->m_baseTime;
+        baseTime = pppMngSt->m_baseTime;
         if (baseTime != -0x1000) {
-            unsigned char mode = *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(pppMngSt) + 0xE7);
+            mode = *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(pppMngSt) + 0xE7);
             if (mode == 3 || static_cast<unsigned char>(mode - 5) <= 2 || mode == 8) {
                 void* owner = pppMngSt->m_owner;
                 if (owner != 0 &&

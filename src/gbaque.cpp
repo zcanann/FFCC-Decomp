@@ -2227,15 +2227,14 @@ int GbaQueue::GetPlayerHP(int channel, unsigned char* outData)
  */
 int GbaQueue::MakeLetterList(int channel, char* outData)
 {
-	GbaQueueFlagView* flags = GetFlagView(this);
 	const unsigned int scriptFood = Game.m_scriptFoodBase[channel];
 
 	if (scriptFood == 0) {
-		const unsigned char channelMask = static_cast<unsigned char>(1U << channel);
+		const unsigned int channelMask = 1U << channel;
 
-		flags->m_letterDatFlg = static_cast<unsigned char>(flags->m_letterDatFlg | channelMask);
+		GetFlagView(this)->m_letterDatFlg |= channelMask;
 		Joybus.SetLetterSize(channel, 0);
-		m_letterFlags = static_cast<unsigned char>(m_letterFlags & ~channelMask);
+		m_letterFlags &= ~channelMask;
 		return 0;
 	}
 
@@ -2391,11 +2390,11 @@ Printf__7CSystemFPce(&System, const_cast<char*>(s_letter_data_error), const_cast
 	__dla__FPv(subjectNameBuf);
 	__dla__FPv(npcNameBuf);
 
-	const unsigned char channelMask = static_cast<unsigned char>(1U << channel);
+	const unsigned int channelMask = 1U << channel;
 
-	flags->m_letterDatFlg = static_cast<unsigned char>(flags->m_letterDatFlg | channelMask);
+	GetFlagView(this)->m_letterDatFlg |= channelMask;
 	Joybus.SetLetterSize(channel, totalSize);
-	m_letterFlags = static_cast<unsigned char>(m_letterFlags & ~channelMask);
+	m_letterFlags &= ~channelMask;
 	return totalSize;
 }
 

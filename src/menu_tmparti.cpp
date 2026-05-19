@@ -31,7 +31,6 @@ extern const float FLOAT_80332f2c;
 extern const float FLOAT_80332f30;
 extern const float FLOAT_80332F34;
 extern const float FLOAT_80332F38;
-extern const double DOUBLE_80332f40;
 extern const double DOUBLE_80332f48;
 extern const double DOUBLE_80332f50;
 extern const double DOUBLE_80332f58;
@@ -40,17 +39,7 @@ extern const double DOUBLE_80333420 = 216.0;
 
 static inline double TmpArtiIntToDouble(int value)
 {
-    union {
-        struct {
-            unsigned int hi;
-            unsigned int lo;
-        } words;
-        double value;
-    } conv;
-
-    conv.words.hi = 0x43300000;
-    conv.words.lo = (unsigned int)value ^ 0x80000000U;
-    return conv.value - DOUBLE_80332f40;
+    return (double)value;
 }
 
 STATIC_ASSERT(offsetof(TmpArtiState, initialized) == 0xB);

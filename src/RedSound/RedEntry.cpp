@@ -216,6 +216,13 @@ enum RedEntryStringLayout {
 	REDSOUND_ENTRY_SDATA2_STRING_SIZE = 0x23,
 };
 
+enum RedEntryMapLayout {
+	REDSOUND_ENTRY_MAP_RODATA_STRING_OFFSET = 0x00,
+	REDSOUND_ENTRY_MAP_RODATA_STRING_SIZE = 0x53C,
+	REDSOUND_ENTRY_MAP_SDATA2_STRING_OFFSET = 0x00,
+	REDSOUND_ENTRY_MAP_SDATA2_STRING_SIZE = 0x23,
+};
+
 enum RedEntryTiming {
 	REDSOUND_WAVE_LOAD_DMA_POLL_SLEEP_US = 1000,
 };
@@ -278,9 +285,13 @@ STATIC_ASSERT(sizeof(sRedEntryColoredBlankLineFmt) + sizeof(sRedEntryLogPrefix) 
                   sizeof(sRedEntryMMemorySeInfoFmt) + sizeof(sRedEntryMMemoryFreeBlockInfoFmt) +
                   sizeof(sRedEntryEntryItemsFmt) ==
               REDSOUND_ENTRY_RODATA_STRING_SIZE);
+STATIC_ASSERT(REDSOUND_ENTRY_MAP_RODATA_STRING_OFFSET == 0);
+STATIC_ASSERT(REDSOUND_ENTRY_RODATA_STRING_SIZE == REDSOUND_ENTRY_MAP_RODATA_STRING_SIZE);
 STATIC_ASSERT(sizeof(sRedEntryErrorColor) + sizeof(sRedEntryResetColor) + sizeof(sRedEntryHeaderErrorColor) +
                   sizeof(sRedEntryInfoColor) + sizeof(sRedEntryNewline) + sizeof(sRedEntryPrefixedNewlineFmt) ==
               REDSOUND_ENTRY_SDATA2_STRING_SIZE);
+STATIC_ASSERT(REDSOUND_ENTRY_MAP_SDATA2_STRING_OFFSET == 0);
+STATIC_ASSERT(REDSOUND_ENTRY_SDATA2_STRING_SIZE == REDSOUND_ENTRY_MAP_SDATA2_STRING_SIZE);
 
 /*
  * --INFO--

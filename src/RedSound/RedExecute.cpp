@@ -328,13 +328,23 @@ enum RedMusicSkipTiming {
     REDSOUND_MUSIC_SKIP_LOOP_SLEEP_US = 1000,
 };
 
-enum RedVoiceStartMaskIndex {
-    REDSOUND_VOICE_START_MASK_LOW = 0,
-    REDSOUND_VOICE_START_MASK_HIGH = 1,
+struct RedVoiceStartMask {
+    int m_low;
+    int m_high;
+};
+
+enum RedVoiceStartMaskLayout {
+    REDSOUND_VOICE_START_MASK_LOW_OFFSET = (unsigned int)&(((RedVoiceStartMask*)0)->m_low),
+    REDSOUND_VOICE_START_MASK_HIGH_OFFSET = (unsigned int)&(((RedVoiceStartMask*)0)->m_high),
     REDSOUND_VOICE_START_MASK_COUNT = 2,
+    REDSOUND_VOICE_START_MASK_SIZE = sizeof(RedVoiceStartMask),
 };
 
 STATIC_ASSERT(sizeof(t_TonePitch) == REDSOUND_TONE_PITCH_TABLE_SIZE);
+STATIC_ASSERT(offsetof(RedVoiceStartMask, m_low) == REDSOUND_VOICE_START_MASK_LOW_OFFSET);
+STATIC_ASSERT(offsetof(RedVoiceStartMask, m_high) == REDSOUND_VOICE_START_MASK_HIGH_OFFSET);
+STATIC_ASSERT(sizeof(RedVoiceStartMask) == REDSOUND_VOICE_START_MASK_SIZE);
+STATIC_ASSERT(sizeof(RedVoiceStartMask) == REDSOUND_VOICE_START_MASK_COUNT * sizeof(int));
 STATIC_ASSERT(offsetof(RedExecuteDataTable, t_TonePitch) == REDSOUND_TONE_PITCH_TABLE_OFFSET);
 STATIC_ASSERT(sizeof(((RedExecuteDataTable*)0)->t_TonePitch) == REDSOUND_TONE_PITCH_TABLE_SIZE);
 STATIC_ASSERT(REDSOUND_TONE_PITCH_TABLE_SIZE == REDSOUND_TONE_PITCH_TABLE_ALLOC_SIZE);
@@ -2069,7 +2079,7 @@ void EnvelopeKeyExecute()
  */
 static void _KeyOnControl()
 {
-    int voiceStartMask[REDSOUND_VOICE_START_MASK_COUNT];
+    RedVoiceStartMask voiceStartMask;
     RedKeyOnSlot* reserve;
     RedVoiceDATA* voiceData;
     RedSwingFunc waveFunc;
@@ -2083,15 +2093,15 @@ static void _KeyOnControl()
 
     _VoiceEnvelopeCheck();
     int keyOnEntry = RedKeyOnEntryGet();
-    voiceStartMask[REDSOUND_VOICE_START_MASK_HIGH] = 0;
-    voiceStartMask[REDSOUND_VOICE_START_MASK_LOW] = 0;
+    voiceStartMask.m_high = 0;
+    voiceStartMask.m_low = 0;
 
     if (keyOnEntry != 0) {
         reserve = RedKeyOnGetFixedBegin(RedKeyOnDataGet());
         voiceData = RedVoiceDataGetBegin();
         do {
             if ((reserve->m_track != 0) && (reserve->m_track->m_waveData != 0)) {
-                voiceData = _VoiceDataSelect(reserve->m_track, &reserve->m_note, voiceStartMask);
+                voiceData = _VoiceDataSelect(reserve->m_track, &reserve->m_note, &voiceStartMask.m_low);
             }
             reserve++;
         } while ((voiceData != 0) && (reserve < RedKeyOnGetEnd(RedKeyOnDataGet())));
@@ -2214,26 +2224,26 @@ static void _KeyOnControl()
         voice = RedVoiceDataGetBegin();
         bit = 1;
         do {
-            if ((voiceStartMask[REDSOUND_VOICE_START_MASK_LOW] & bit) != 0) {
-                voiceStartMask[REDSOUND_VOICE_START_MASK_LOW] &= ~bit;
+            if ((voiceStartMask.m_low & bit) != 0) {
+                voiceStartMask.m_low &= ~bit;
                 voice->m_flags |= REDSOUND_VOICE_FLAGS_START;
             }
             bit <<= 1;
             voice++;
-        } while (voiceStartMask[REDSOUND_VOICE_START_MASK_LOW] != 0);
+        } while (voiceStartMask.m_low != 0);
     }
 
     {
         voice = RedVoiceDataGet(REDSOUND_MUTE_BITS_PER_WORD);
         bit = 1;
         do {
-            if ((voiceStartMask[REDSOUND_VOICE_START_MASK_HIGH] & bit) != 0) {
-                voiceStartMask[REDSOUND_VOICE_START_MASK_HIGH] &= ~bit;
+            if ((voiceStartMask.m_high & bit) != 0) {
+                voiceStartMask.m_high &= ~bit;
                 voice->m_flags |= REDSOUND_VOICE_FLAGS_START;
             }
             bit <<= 1;
             voice++;
-        } while (voiceStartMask[REDSOUND_VOICE_START_MASK_HIGH] != 0);
+        } while (voiceStartMask.m_high != 0);
     }
 }
 

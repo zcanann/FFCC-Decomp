@@ -617,28 +617,26 @@ void CTexture::CacheLoadTexture(CAmemCacheSet* amemCacheSet)
 void CTexture::Create(CChunkFile& chunkFile, CMemory::CStage* stage, CAmemCacheSet* amemCacheSet, int cacheTag, int useAddress)
 {
     CChunkFile::CChunk chunk;
-    unsigned char* texture = reinterpret_cast<unsigned char*>(this);
     unsigned int width;
     unsigned int height;
     unsigned int format;
 
-    *reinterpret_cast<unsigned int*>(texture + 0x6C) = 1;
-    *reinterpret_cast<unsigned int*>(texture + 0x60) = 6;
-    texture[0x71] = 0;
-    texture[0x75] = static_cast<unsigned char>(useAddress);
+    m_wrapMode = 1;
+    m_format = 6;
+    m_isAlphaLut = 0;
+    m_usesExternalAddress = static_cast<unsigned char>(useAddress);
 
     chunkFile.PushChunk();
     while (chunkFile.GetNextChunk(chunk)) {
         switch (chunk.m_id) {
         case 0x4E414D45:
-            strcpy(reinterpret_cast<char*>(texture + 0x08), chunkFile.GetString());
+            strcpy(m_name, chunkFile.GetString());
             break;
         case 0x53495A45:
-            *reinterpret_cast<unsigned int*>(texture + 0x64) = chunkFile.Get4();
-            *reinterpret_cast<unsigned int*>(texture + 0x68) = chunkFile.Get4();
-            if ((*reinterpret_cast<unsigned int*>(texture + 0x64) == 0) || (*reinterpret_cast<unsigned int*>(texture + 0x68) == 0)) {
-                System.Printf(const_cast<char*>(s_Error_width_pctd_height_pctd_801D7984), *reinterpret_cast<unsigned int*>(texture + 0x64),
-                              *reinterpret_cast<unsigned int*>(texture + 0x68));
+            m_width = chunkFile.Get4();
+            m_height = chunkFile.Get4();
+            if ((static_cast<unsigned int>(m_width) == 0) || (static_cast<unsigned int>(m_height) == 0)) {
+                System.Printf(const_cast<char*>(s_Error_width_pctd_height_pctd_801D7984), m_width, m_height);
                 chunkFile.PopChunk();
                 return;
             }
@@ -648,77 +646,75 @@ void CTexture::Create(CChunkFile& chunkFile, CMemory::CStage* stage, CAmemCacheS
                 void* data = _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
                     &Memory, chunk.m_size, stage, const_cast<char*>(s_textureman_cpp_801D7974), 0x150, 0);
                 chunkFile.Get(data, chunk.m_size);
-                *reinterpret_cast<short*>(texture + 0x72) = SetData__13CAmemCacheSetFPviQ210CAmemCache4TYPEi(
+                m_cacheId = SetData__13CAmemCacheSetFPviQ210CAmemCache4TYPEi(
                     amemCacheSet, data, chunk.m_size, static_cast<CAmemCache::TYPE>(0), cacheTag);
                 __dl__FPv(data);
-                *reinterpret_cast<void**>(texture + 0x78) = 0;
+                m_imageData = 0;
             } else {
-                if (texture[0x75] != 0) {
-                    *reinterpret_cast<void**>(texture + 0x78) = chunkFile.GetAddress();
+                if (m_usesExternalAddress != 0) {
+                    m_imageData = chunkFile.GetAddress();
                 } else {
-                    *reinterpret_cast<void**>(texture + 0x78) =
-                        _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
-                            &Memory, chunk.m_size, stage, const_cast<char*>(s_textureman_cpp_801D7974), 0x15C, 0);
-                    chunkFile.Get(*reinterpret_cast<void**>(texture + 0x78), chunk.m_size);
+                    m_imageData = _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
+                        &Memory, chunk.m_size, stage, const_cast<char*>(s_textureman_cpp_801D7974), 0x15C, 0);
+                    chunkFile.Get(m_imageData, chunk.m_size);
                 }
-                DCFlushRange(*reinterpret_cast<void**>(texture + 0x78), chunk.m_size);
-                *reinterpret_cast<short*>(texture + 0x72) = -1;
+                DCFlushRange(m_imageData, chunk.m_size);
+                m_cacheId = -1;
             }
             break;
         case 0x50414C54:
-            if (texture[0x75] != 0) {
-                *reinterpret_cast<void**>(texture + 0x7C) = chunkFile.GetAddress();
+            if (m_usesExternalAddress != 0) {
+                m_tlutData = chunkFile.GetAddress();
             } else {
-                *reinterpret_cast<void**>(texture + 0x7C) =
-                    _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
-                        &Memory, chunk.m_size, stage, const_cast<char*>(s_textureman_cpp_801D7974), 0x178, 0);
-                chunkFile.Get(*reinterpret_cast<void**>(texture + 0x7C), chunk.m_size);
+                m_tlutData = _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
+                    &Memory, chunk.m_size, stage, const_cast<char*>(s_textureman_cpp_801D7974), 0x178, 0);
+                chunkFile.Get(m_tlutData, chunk.m_size);
             }
-            DCFlushRange(*reinterpret_cast<void**>(texture + 0x7C), chunk.m_size);
+            DCFlushRange(m_tlutData, chunk.m_size);
             break;
         case 0x464D5420: {
             unsigned char chunkFormat = chunkFile.Get1();
 
             switch (chunkFormat) {
             case 0:
-                *reinterpret_cast<unsigned int*>(texture + 0x60) = 6;
+                m_format = 6;
                 break;
             case 1:
-                *reinterpret_cast<unsigned int*>(texture + 0x60) = 4;
+                m_format = 4;
                 break;
             case 2:
-                *reinterpret_cast<unsigned int*>(texture + 0x60) = 9;
+                m_format = 9;
                 break;
             case 3:
-                *reinterpret_cast<unsigned int*>(texture + 0x60) = 8;
+                m_format = 8;
                 break;
             case 6:
-                *reinterpret_cast<unsigned int*>(texture + 0x60) = 0xE;
+                m_format = 0xE;
                 break;
             case 7:
-                *reinterpret_cast<unsigned int*>(texture + 0x60) = 3;
-                texture[0x70] = 1;
+                m_format = 3;
+                m_isIntensityAlpha = 1;
                 break;
             case 8:
-                *reinterpret_cast<unsigned int*>(texture + 0x60) = 3;
+                m_format = 3;
                 break;
             case 9:
-                *reinterpret_cast<unsigned int*>(texture + 0x60) = 1;
+                m_format = 1;
                 break;
             case 10:
-                *reinterpret_cast<unsigned int*>(texture + 0x60) = 0xE;
-                texture[0x71] = 1;
+                m_format = 0xE;
+                m_isAlphaLut = 1;
                 break;
             case 5:
-                *reinterpret_cast<unsigned int*>(texture + 0x60) = 0;
+                m_format = 0;
                 break;
             }
 
-            texture[0x74] = chunkFile.Get1();
+            m_maxLod = chunkFile.Get1();
             chunkFormat = chunkFile.Get1();
             unsigned int wrapMode = chunkFormat;
             if (static_cast<int>(chunk.m_size) > 3) {
-                *reinterpret_cast<unsigned int*>(texture + 0x6C) = wrapMode;
+                m_wrapMode = wrapMode;
             }
             break;
         }
@@ -726,14 +722,14 @@ void CTexture::Create(CChunkFile& chunkFile, CMemory::CStage* stage, CAmemCacheS
     }
     chunkFile.PopChunk();
 
-    width = *reinterpret_cast<unsigned int*>(texture + 0x64);
+    width = m_width;
     for (;;) {
         if ((width & 1) != 0) {
             break;
         }
         width >>= 1;
     }
-    height = *reinterpret_cast<unsigned int*>(texture + 0x68);
+    height = m_height;
     for (;;) {
         if ((height & 1) != 0) {
             break;
@@ -741,38 +737,33 @@ void CTexture::Create(CChunkFile& chunkFile, CMemory::CStage* stage, CAmemCacheS
         height >>= 1;
     }
     if ((width != 1) || (height != 1)) {
-        *reinterpret_cast<unsigned int*>(texture + 0x6C) = 0;
+        m_wrapMode = 0;
     }
-    if (*reinterpret_cast<short*>(texture + 0x72) != -1) {
+    if (m_cacheId != -1) {
         return;
     }
 
-    format = *reinterpret_cast<unsigned int*>(texture + 0x60);
+    format = m_format;
     if ((format == 9) || (format == 8)) {
-        int tlutData = reinterpret_cast<int>(*reinterpret_cast<void**>(texture + 0x7C));
-        GXInitTexObjCI(reinterpret_cast<GXTexObj*>(texture + 0x28), *reinterpret_cast<void**>(texture + 0x78),
-                       static_cast<u16>(*reinterpret_cast<unsigned int*>(texture + 0x64)),
-                       static_cast<u16>(*reinterpret_cast<unsigned int*>(texture + 0x68)),
-                       static_cast<GXCITexFmt>(format), static_cast<GXTexWrapMode>(*reinterpret_cast<unsigned int*>(texture + 0x6C)),
-                       static_cast<GXTexWrapMode>(*reinterpret_cast<unsigned int*>(texture + 0x6C)), 0, 0);
-        GXInitTlutObj(reinterpret_cast<GXTlutObj*>(texture + 0x48), reinterpret_cast<void*>(tlutData), GX_TL_IA8,
-                      *reinterpret_cast<unsigned int*>(texture + 0x60) == 9 ? 0x100 : 0x10);
-        GXInitTlutObj(reinterpret_cast<GXTlutObj*>(texture + 0x54),
-                      reinterpret_cast<void*>(tlutData + (*reinterpret_cast<unsigned int*>(texture + 0x60) == 9 ? 0x100 : 0x10) * 2),
-                      GX_TL_IA8, *reinterpret_cast<unsigned int*>(texture + 0x60) == 9 ? 0x100 : 0x10);
+        int tlutData = reinterpret_cast<int>(m_tlutData);
+        GXInitTexObjCI(&m_texObj, m_imageData, static_cast<u16>(m_width), static_cast<u16>(m_height),
+                       static_cast<GXCITexFmt>(format), static_cast<GXTexWrapMode>(m_wrapMode),
+                       static_cast<GXTexWrapMode>(m_wrapMode), 0, 0);
+        GXInitTlutObj(&m_tlutObj0, reinterpret_cast<void*>(tlutData), GX_TL_IA8,
+                      m_format == 9 ? 0x100 : 0x10);
+        GXInitTlutObj(&m_tlutObj1,
+                      reinterpret_cast<void*>(tlutData + (m_format == 9 ? 0x100 : 0x10) * 2),
+                      GX_TL_IA8, m_format == 9 ? 0x100 : 0x10);
     } else {
-        unsigned int mipmap = (1 - texture[0x74]) >> 31;
-        GXInitTexObj(reinterpret_cast<GXTexObj*>(texture + 0x28), *reinterpret_cast<void**>(texture + 0x78),
-                     static_cast<u16>(*reinterpret_cast<unsigned int*>(texture + 0x64)),
-                     static_cast<u16>(*reinterpret_cast<unsigned int*>(texture + 0x68)),
-                     static_cast<GXTexFmt>(format), static_cast<GXTexWrapMode>(*reinterpret_cast<unsigned int*>(texture + 0x6C)),
-                     static_cast<GXTexWrapMode>(*reinterpret_cast<unsigned int*>(texture + 0x6C)),
-                     mipmap);
+        unsigned int mipmap = (1 - m_maxLod) >> 31;
+        GXInitTexObj(&m_texObj, m_imageData, static_cast<u16>(m_width), static_cast<u16>(m_height),
+                     static_cast<GXTexFmt>(format), static_cast<GXTexWrapMode>(m_wrapMode),
+                     static_cast<GXTexWrapMode>(m_wrapMode), mipmap);
     }
 
-    if (1 < texture[0x74]) {
-        GXInitTexObjLOD(reinterpret_cast<GXTexObj*>(texture + 0x28), GX_LIN_MIP_LIN, GX_LINEAR, 0.0f,
-                        static_cast<float>(texture[0x74]) - 1.0f, 0.0f, GX_TRUE, GX_FALSE, GX_ANISO_1);
+    if (1 < m_maxLod) {
+        GXInitTexObjLOD(&m_texObj, GX_LIN_MIP_LIN, GX_LINEAR, 0.0f,
+                        static_cast<float>(m_maxLod) - 1.0f, 0.0f, GX_TRUE, GX_FALSE, GX_ANISO_1);
     }
 }
 

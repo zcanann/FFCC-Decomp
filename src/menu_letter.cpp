@@ -1,4 +1,5 @@
 #include "ffcc/menu_letter.h"
+#include "ffcc/color.h"
 #include "ffcc/fontman.h"
 #include "ffcc/pad.h"
 #include "ffcc/game.h"
@@ -1464,8 +1465,8 @@ void CMenuPcs::LetterListDraw()
 	font->SetScale(FLOAT_803330f8);
 	font->DrawInit();
 
-	GXColor titleColor = {0xFF, 0xFF, 0xFF, static_cast<u8>(FLOAT_803330a0 * *reinterpret_cast<float*>(menuDataBase + 0x58))};
-	font->SetColor(titleColor);
+	CColor titleColor(0xFF, 0xFF, 0xFF, static_cast<u8>(FLOAT_803330a0 * *reinterpret_cast<float*>(menuDataBase + 0x58)));
+	font->SetColor(titleColor.color);
 
 	const char* menuTitle = GetMenuStr__8CMenuPcsFi(this, 0x1D);
 	float titleX = static_cast<float>((static_cast<double>(FLOAT_80333158) - static_cast<double>(font->GetWidth(menuTitle))) *
@@ -1476,8 +1477,8 @@ void CMenuPcs::LetterListDraw()
 		return;
 	}
 
-	GXColor textColor = {0xFF, 0xFF, 0xFF, 0xFF};
-	font->SetColor(textColor);
+	CColor textColor(0xFF, 0xFF, 0xFF, 0xFF);
+	font->SetColor(textColor.color);
 
 	const unsigned int caravanWork = Game.m_scriptFoodBase[0];
 	const int topRow = static_cast<int>(*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x34));

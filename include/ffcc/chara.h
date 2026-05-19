@@ -100,7 +100,7 @@ public:
 		CModel();
 		~CModel();
 
-		class CRefData
+		class CRefData : public CRef
 		{
 			CRefData();
 			~CRefData();

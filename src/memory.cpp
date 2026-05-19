@@ -230,30 +230,29 @@ void* operator new[](unsigned long size, CMemory::CStage* stage, char* file, int
 void operator delete(void* ptr)
 {
     if (ptr != (void*)nullptr) {
-        unsigned char* mem = reinterpret_cast<unsigned char*>(ptr);
+        int mem = reinterpret_cast<int>(ptr);
         if ((*reinterpret_cast<short*>(mem - 0x40) != 0x4b41) ||
             (*reinterpret_cast<short*>(mem - 2) != 0x4d49)) {
             Printf__7CSystemFPce(&System, DAT_801d6648, ptr, mem - 0x26, *reinterpret_cast<unsigned short*>(mem - 0x28));
         }
 
-        mem[-0x3e] &= 0xfb;
+        *reinterpret_cast<unsigned char*>(mem - 0x3e) &= 0xfb;
 
-        int blockPrev = *reinterpret_cast<int*>(mem - 0x38);
-        if ((*(reinterpret_cast<unsigned char*>(blockPrev) + 2) & 4) == 0) {
+        if ((*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(mem - 0x38) + 2) & 4) == 0) {
             *reinterpret_cast<int*>(mem - 0x30) =
-                *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(blockPrev) + 0x10) +
+                *reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x38) + 0x10) +
                 *reinterpret_cast<int*>(mem - 0x30) + 0x40;
-            *reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(blockPrev) + 8) + 4) =
-                reinterpret_cast<int>(mem) - 0x40;
+            *reinterpret_cast<int*>(*reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x38) + 8) + 4) =
+                mem - 0x40;
             *reinterpret_cast<int*>(mem - 0x38) =
-                *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(blockPrev) + 8);
+                *reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x38) + 8);
         }
 
         int blockNext = *reinterpret_cast<int*>(mem - 0x3c);
-        if ((*(reinterpret_cast<unsigned char*>(blockNext) + 2) & 4) == 0) {
-            *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(blockNext) + 0x10) =
+        if ((*reinterpret_cast<unsigned char*>(blockNext + 2) & 4) == 0) {
+            *reinterpret_cast<int*>(blockNext + 0x10) =
                 *reinterpret_cast<int*>(mem - 0x30) +
-                *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(blockNext) + 0x10) + 0x40;
+                *reinterpret_cast<int*>(blockNext + 0x10) + 0x40;
             *reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x3c) + 8) = *reinterpret_cast<int*>(mem - 0x38);
             *reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x38) + 4) = *reinterpret_cast<int*>(mem - 0x3c);
         }
@@ -274,30 +273,29 @@ void operator delete(void* ptr)
 void operator delete[](void* ptr)
 {
     if (ptr != (void*)nullptr) {
-        unsigned char* mem = reinterpret_cast<unsigned char*>(ptr);
+        int mem = reinterpret_cast<int>(ptr);
         if ((*reinterpret_cast<short*>(mem - 0x40) != 0x4b41) ||
             (*reinterpret_cast<short*>(mem - 2) != 0x4d49)) {
             Printf__7CSystemFPce(&System, DAT_801d6648, ptr, mem - 0x26, *reinterpret_cast<unsigned short*>(mem - 0x28));
         }
 
-        mem[-0x3e] &= 0xfb;
+        *reinterpret_cast<unsigned char*>(mem - 0x3e) &= 0xfb;
 
-        int blockPrev = *reinterpret_cast<int*>(mem - 0x38);
-        if ((*(reinterpret_cast<unsigned char*>(blockPrev) + 2) & 4) == 0) {
+        if ((*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(mem - 0x38) + 2) & 4) == 0) {
             *reinterpret_cast<int*>(mem - 0x30) =
-                *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(blockPrev) + 0x10) +
+                *reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x38) + 0x10) +
                 *reinterpret_cast<int*>(mem - 0x30) + 0x40;
-            *reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(blockPrev) + 8) + 4) =
-                reinterpret_cast<int>(mem) - 0x40;
+            *reinterpret_cast<int*>(*reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x38) + 8) + 4) =
+                mem - 0x40;
             *reinterpret_cast<int*>(mem - 0x38) =
-                *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(blockPrev) + 8);
+                *reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x38) + 8);
         }
 
         int blockNext = *reinterpret_cast<int*>(mem - 0x3c);
-        if ((*(reinterpret_cast<unsigned char*>(blockNext) + 2) & 4) == 0) {
-            *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(blockNext) + 0x10) =
+        if ((*reinterpret_cast<unsigned char*>(blockNext + 2) & 4) == 0) {
+            *reinterpret_cast<int*>(blockNext + 0x10) =
                 *reinterpret_cast<int*>(mem - 0x30) +
-                *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(blockNext) + 0x10) + 0x40;
+                *reinterpret_cast<int*>(blockNext + 0x10) + 0x40;
             *reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x3c) + 8) = *reinterpret_cast<int*>(mem - 0x38);
             *reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x38) + 4) = *reinterpret_cast<int*>(mem - 0x3c);
         }
@@ -858,30 +856,29 @@ void* CMemory::_Alloc(unsigned long size, CMemory::CStage* stage, char* source, 
 void CMemory::Free(void* ptr)
 {
     if (ptr != (void*)nullptr) {
-        unsigned char* mem = reinterpret_cast<unsigned char*>(ptr);
+        int mem = reinterpret_cast<int>(ptr);
         if ((*reinterpret_cast<short*>(mem - 0x40) != 0x4b41) ||
             (*reinterpret_cast<short*>(mem - 2) != 0x4d49)) {
             Printf__7CSystemFPce(&System, DAT_801d6648, ptr, mem - 0x26, *reinterpret_cast<unsigned short*>(mem - 0x28));
         }
 
-        mem[-0x3e] &= 0xfb;
+        *reinterpret_cast<unsigned char*>(mem - 0x3e) &= 0xfb;
 
-        int blockPrev = *reinterpret_cast<int*>(mem - 0x38);
-        if ((*(reinterpret_cast<unsigned char*>(blockPrev) + 2) & 4) == 0) {
+        if ((*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(mem - 0x38) + 2) & 4) == 0) {
             *reinterpret_cast<int*>(mem - 0x30) =
-                *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(blockPrev) + 0x10) +
+                *reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x38) + 0x10) +
                 *reinterpret_cast<int*>(mem - 0x30) + 0x40;
-            *reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(blockPrev) + 8) + 4) =
-                reinterpret_cast<int>(mem) - 0x40;
+            *reinterpret_cast<int*>(*reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x38) + 8) + 4) =
+                mem - 0x40;
             *reinterpret_cast<int*>(mem - 0x38) =
-                *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(blockPrev) + 8);
+                *reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x38) + 8);
         }
 
         int blockNext = *reinterpret_cast<int*>(mem - 0x3c);
-        if ((*(reinterpret_cast<unsigned char*>(blockNext) + 2) & 4) == 0) {
-            *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(blockNext) + 0x10) =
+        if ((*reinterpret_cast<unsigned char*>(blockNext + 2) & 4) == 0) {
+            *reinterpret_cast<int*>(blockNext + 0x10) =
                 *reinterpret_cast<int*>(mem - 0x30) +
-                *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(blockNext) + 0x10) + 0x40;
+                *reinterpret_cast<int*>(blockNext + 0x10) + 0x40;
             *reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x3c) + 8) = *reinterpret_cast<int*>(mem - 0x38);
             *reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x38) + 4) = *reinterpret_cast<int*>(mem - 0x3c);
         }
@@ -2092,13 +2089,13 @@ void CAmemCacheSet::AmemFreeLowPrio(int size)
         }
 
         if (bestEntry != 0) {
-            operator delete(bestEntry->m_cacheData);
+            freeAmemCacheBlock(reinterpret_cast<unsigned long>(bestEntry->m_cacheData));
             bestEntry->m_cacheData = 0;
         }
 
         int allocated = reinterpret_cast<int>(m_rStage->alloc(size, const_cast<char*>(s_memory_cpp), 0x86D, 1));
         if (allocated != 0) {
-            operator delete(reinterpret_cast<void*>(allocated));
+            freeAmemCacheBlock(static_cast<unsigned long>(allocated));
             return;
         }
 
@@ -2156,33 +2153,7 @@ void CAmemCacheSet::CacheClear()
         if ((entry.m_inUse != 0) && (entry.m_refCount == 0) && (entry.m_dmaCopy != 0)) {
             int data = reinterpret_cast<int>(entry.m_cacheData);
             if (data != 0) {
-                unsigned char* mem = reinterpret_cast<unsigned char*>(data);
-                if ((*reinterpret_cast<short*>(mem - 0x40) != 0x4B41) ||
-                    (*reinterpret_cast<short*>(mem - 2) != 0x4D49)) {
-                    Printf__7CSystemFPce(&System, DAT_801d6648, data, mem - 0x26, *reinterpret_cast<unsigned short*>(mem - 0x28));
-                }
-
-                mem[-0x3E] &= 0xFB;
-
-                int blockPrev = *reinterpret_cast<int*>(mem - 0x38);
-                if ((*(reinterpret_cast<unsigned char*>(blockPrev) + 2) & 4) == 0) {
-                    *reinterpret_cast<int*>(mem - 0x30) =
-                        *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(blockPrev) + 0x10) +
-                        *reinterpret_cast<int*>(mem - 0x30) + 0x40;
-                    *reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(blockPrev) + 8) + 4) = data - 0x40;
-                    *reinterpret_cast<int*>(mem - 0x38) = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(blockPrev) + 8);
-                }
-
-                int blockNext = *reinterpret_cast<int*>(mem - 0x3C);
-                if ((*(reinterpret_cast<unsigned char*>(blockNext) + 2) & 4) == 0) {
-                    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(blockNext) + 0x10) =
-                        *reinterpret_cast<int*>(mem - 0x30) +
-                        *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(blockNext) + 0x10) + 0x40;
-                    *reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x3C) + 8) = *reinterpret_cast<int*>(mem - 0x38);
-                    *reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x38) + 4) = *reinterpret_cast<int*>(mem - 0x3C);
-                }
-
-                *reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x34) + 0x124) -= 1;
+                freeAmemCacheBlock(static_cast<unsigned long>(data));
                 entry.m_cacheData = 0;
             }
         }

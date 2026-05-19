@@ -113,8 +113,8 @@ void CLightPcs::Init()
     m_mapLightColor[0].b = 0x3F;
     m_mapLightColor[0].a = 0xFF;
 
-    float lightParam = FLOAT_8032fc14;
     float lightRange = FLOAT_8032fc2c;
+    float lightParam = FLOAT_8032fc14;
 
     for (int i = 0; i < 3; i++) {
         unsigned char color = (i == 0) ? 0x3F : 0;

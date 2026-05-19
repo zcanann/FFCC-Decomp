@@ -1977,7 +1977,7 @@ void CRedEntry::DisplayMMemoryInfo()
  * JP Address: TODO
  * JP Size: TODO
  */
-inline int CRedEntry::ClearMusicData(int musicNo)
+int CRedEntry::ClearMusicData(int musicNo)
 {
 	int clearResult = 0;
 
@@ -2010,7 +2010,7 @@ inline int CRedEntry::ClearMusicData(int musicNo)
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CRedEntry::DisplayMusicInfo()
+void CRedEntry::DisplayMusicInfo()
 {
 	if (RedReportPrintIsEnabled()) {
 		OSReport(sRedEntryNewline);

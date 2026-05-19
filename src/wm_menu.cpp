@@ -1952,11 +1952,11 @@ void CMenuPcs::CalcMoveMenu()
  */
 void CMenuPcs::InitSaveLoadMenu()
 {
+	float posX = FLOAT_803313dc;
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(&MenuPcs);
 	unsigned int* const worldStatePtr = reinterpret_cast<unsigned int*>(bytes + 0x82C);
-	int zero = 0;
 	float posY = FLOAT_803313e8;
-	float posX = FLOAT_803313dc;
+	int zero = 0;
 
 	*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(worldStatePtr[0]) + 0x22) = zero;
 	*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(worldStatePtr[0]) + 0x24) = zero;

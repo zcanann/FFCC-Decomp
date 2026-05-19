@@ -989,6 +989,7 @@ void set_matrix(_pppPObject* pObject, pppFMATRIX mtxA, pppFMATRIX mtxB, PRyjMega
     pppFMATRIX tmp;
     Mtx scale;
     pppFMATRIX* objectMatrix = &pObject->m_drawMatrix;
+    bool copyOutMatrix = true;
 
     if (matrixMode == 0) {
         pppUnitMatrix(mtxB);
@@ -1046,9 +1047,10 @@ void set_matrix(_pppPObject* pObject, pppFMATRIX mtxA, pppFMATRIX mtxB, PRyjMega
         if (particleWMat != NULL) {
             pppCopyMatrix(tmp, mtxB);
             pppMulMatrix(mtxB, *(pppFMATRIX*)particleWMat, tmp);
-        } else if (payload[0x136] != 0) {
+        } else {
             pppCopyMatrix(tmp, mtxB);
             pppMulMatrix(mtxB, pppMngStPtr->m_matrix, tmp);
+            copyOutMatrix = false;
         }
         break;
     }
@@ -1059,7 +1061,7 @@ void set_matrix(_pppPObject* pObject, pppFMATRIX mtxA, pppFMATRIX mtxB, PRyjMega
         pppCopyMatrix(*objectMatrix, mtxB);
     }
 
-    if (copyOut != 0) {
+    if ((copyOut != 0) && copyOutMatrix) {
         pppCopyMatrix(out, mtxB);
     }
 

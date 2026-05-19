@@ -1123,165 +1123,331 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 		unsigned short condBits = *reinterpret_cast<unsigned short*>(curLetter + 0x18);
 
 		if ((condBits & 0x7FFF) != 0) {
-			const bool invert = (condBits & 0x8000) != 0;
-			bool matched = false;
-
 			if ((condBits & 0x0001) != 0 && m_tribeId == 0) {
-				matched = true;
+				if ((condBits & 0x8000) == 0) {
+					goto PassedPersonalConditions;
+				}
+			} else if ((condBits & 0x0001) != 0 && (condBits & 0x8000) != 0) {
+				goto NextLetter;
 			}
 			if ((condBits & 0x0002) != 0 && m_tribeId == 1) {
-				matched = true;
+				if ((condBits & 0x8000) == 0) {
+					goto PassedPersonalConditions;
+				}
+			} else if ((condBits & 0x0002) != 0 && (condBits & 0x8000) != 0) {
+				goto NextLetter;
 			}
 			if ((condBits & 0x0004) != 0 && m_tribeId == 2) {
-				matched = true;
+				if ((condBits & 0x8000) == 0) {
+					goto PassedPersonalConditions;
+				}
+			} else if ((condBits & 0x0004) != 0 && (condBits & 0x8000) != 0) {
+				goto NextLetter;
 			}
 			if ((condBits & 0x0008) != 0 && m_tribeId == 3) {
-				matched = true;
+				if ((condBits & 0x8000) == 0) {
+					goto PassedPersonalConditions;
+				}
+			} else if ((condBits & 0x0008) != 0 && (condBits & 0x8000) != 0) {
+				goto NextLetter;
 			}
 			if ((condBits & 0x0010) != 0 && m_genderFlag == 0) {
-				matched = true;
+				if ((condBits & 0x8000) == 0) {
+					goto PassedPersonalConditions;
+				}
+			} else if ((condBits & 0x0010) != 0 && (condBits & 0x8000) != 0) {
+				goto NextLetter;
 			}
 			if ((condBits & 0x0020) != 0 && m_genderFlag == 1) {
-				matched = true;
+				if ((condBits & 0x8000) == 0) {
+					goto PassedPersonalConditions;
+				}
+			} else if ((condBits & 0x0020) != 0 && (condBits & 0x8000) != 0) {
+				goto NextLetter;
 			}
 			if ((condBits & 0x0040) != 0 && GetFoodRank(0) == 0) {
-				matched = true;
+				if ((condBits & 0x8000) == 0) {
+					goto PassedPersonalConditions;
+				}
+			} else if ((condBits & 0x0040) != 0 && (condBits & 0x8000) != 0) {
+				goto NextLetter;
 			}
 			if ((condBits & 0x0080) != 0 && GetFoodRank(1) == 0) {
-				matched = true;
+				if ((condBits & 0x8000) == 0) {
+					goto PassedPersonalConditions;
+				}
+			} else if ((condBits & 0x0080) != 0 && (condBits & 0x8000) != 0) {
+				goto NextLetter;
 			}
 			if ((condBits & 0x0100) != 0 && GetFoodRank(2) == 0) {
-				matched = true;
+				if ((condBits & 0x8000) == 0) {
+					goto PassedPersonalConditions;
+				}
+			} else if ((condBits & 0x0100) != 0 && (condBits & 0x8000) != 0) {
+				goto NextLetter;
 			}
 			if ((condBits & 0x0200) != 0 && GetFoodRank(3) == 0) {
-				matched = true;
+				if ((condBits & 0x8000) == 0) {
+					goto PassedPersonalConditions;
+				}
+			} else if ((condBits & 0x0200) != 0 && (condBits & 0x8000) != 0) {
+				goto NextLetter;
 			}
 			if ((condBits & 0x0400) != 0 && GetFoodRank(4) == 0) {
-				matched = true;
+				if ((condBits & 0x8000) == 0) {
+					goto PassedPersonalConditions;
+				}
+			} else if ((condBits & 0x0400) != 0 && (condBits & 0x8000) != 0) {
+				goto NextLetter;
 			}
 			if ((condBits & 0x0800) != 0 && GetFoodRank(5) == 0) {
-				matched = true;
+				if ((condBits & 0x8000) == 0) {
+					goto PassedPersonalConditions;
+				}
+			} else if ((condBits & 0x0800) != 0 && (condBits & 0x8000) != 0) {
+				goto NextLetter;
 			}
 			if ((condBits & 0x1000) != 0 && GetFoodRank(6) == 0) {
-				matched = true;
+				if ((condBits & 0x8000) == 0) {
+					goto PassedPersonalConditions;
+				}
+			} else if ((condBits & 0x1000) != 0 && (condBits & 0x8000) != 0) {
+				goto NextLetter;
 			}
 			if ((condBits & 0x2000) != 0 && GetFoodRank(7) == 0) {
-				matched = true;
+				if ((condBits & 0x8000) == 0) {
+					goto PassedPersonalConditions;
+				}
+			} else if ((condBits & 0x2000) != 0 && (condBits & 0x8000) != 0) {
+				goto NextLetter;
 			}
 
-			if ((!invert && !matched) || (invert && matched)) {
-				continue;
+			if ((condBits & 0x8000) == 0) {
+				goto NextLetter;
 			}
 		}
+	PassedPersonalConditions:
 
 		condBits = *reinterpret_cast<unsigned short*>(curLetter + 0x1A);
 		if ((condBits & 0x7FFF) != 0) {
-			const bool invert = (condBits & 0x8000) != 0;
-			bool matched = false;
-
 			if ((condBits & 0x0001) != 0 && unk_0x3ac == 0) {
-				matched = true;
+				if ((condBits & 0x8000) == 0) {
+					goto PassedLinkConditions;
+				}
+			} else if ((condBits & 0x0001) != 0 && (condBits & 0x8000) != 0) {
+				goto NextLetter;
 			}
 			if ((condBits & 0x0002) != 0 && unk_0x3ac == 1) {
-				matched = true;
+				if ((condBits & 0x8000) == 0) {
+					goto PassedLinkConditions;
+				}
+			} else if ((condBits & 0x0002) != 0 && (condBits & 0x8000) != 0) {
+				goto NextLetter;
 			}
 			if ((condBits & 0x0004) != 0 && unk_0x3ac == 2) {
-				matched = true;
+				if ((condBits & 0x8000) == 0) {
+					goto PassedLinkConditions;
+				}
+			} else if ((condBits & 0x0004) != 0 && (condBits & 0x8000) != 0) {
+				goto NextLetter;
 			}
 			if ((condBits & 0x0008) != 0 && unk_0x3ac == 3) {
-				matched = true;
+				if ((condBits & 0x8000) == 0) {
+					goto PassedLinkConditions;
+				}
+			} else if ((condBits & 0x0008) != 0 && (condBits & 0x8000) != 0) {
+				goto NextLetter;
 			}
 			if ((condBits & 0x0010) != 0 && unk_0x3ac == 4) {
-				matched = true;
+				if ((condBits & 0x8000) == 0) {
+					goto PassedLinkConditions;
+				}
+			} else if ((condBits & 0x0010) != 0 && (condBits & 0x8000) != 0) {
+				goto NextLetter;
 			}
 			if ((condBits & 0x0020) != 0 && unk_0x3ac == 5) {
-				matched = true;
+				if ((condBits & 0x8000) == 0) {
+					goto PassedLinkConditions;
+				}
+			} else if ((condBits & 0x0020) != 0 && (condBits & 0x8000) != 0) {
+				goto NextLetter;
 			}
 			if ((condBits & 0x0040) != 0 && unk_0x3ac == 6) {
-				matched = true;
+				if ((condBits & 0x8000) == 0) {
+					goto PassedLinkConditions;
+				}
+			} else if ((condBits & 0x0040) != 0 && (condBits & 0x8000) != 0) {
+				goto NextLetter;
 			}
 			if ((condBits & 0x0080) != 0 && unk_0x3ac == 7) {
-				matched = true;
+				if ((condBits & 0x8000) == 0) {
+					goto PassedLinkConditions;
+				}
+			} else if ((condBits & 0x0080) != 0 && (condBits & 0x8000) != 0) {
+				goto NextLetter;
 			}
 			if ((condBits & 0x0100) != 0 && linkBase[1] != 0) {
-				matched = true;
+				if ((condBits & 0x8000) == 0) {
+					goto PassedLinkConditions;
+				}
+			} else if ((condBits & 0x0100) != 0 && (condBits & 0x8000) != 0) {
+				goto NextLetter;
 			}
 			if ((condBits & 0x0200) != 0 && linkBase[2] != 0) {
-				matched = true;
+				if ((condBits & 0x8000) == 0) {
+					goto PassedLinkConditions;
+				}
+			} else if ((condBits & 0x0200) != 0 && (condBits & 0x8000) != 0) {
+				goto NextLetter;
 			}
 			if ((condBits & 0x0400) != 0 && linkBase[3] != 0) {
-				matched = true;
+				if ((condBits & 0x8000) == 0) {
+					goto PassedLinkConditions;
+				}
+			} else if ((condBits & 0x0400) != 0 && (condBits & 0x8000) != 0) {
+				goto NextLetter;
 			}
 			if ((condBits & 0x0800) != 0 && linkBase[4] != 0) {
-				matched = true;
+				if ((condBits & 0x8000) == 0) {
+					goto PassedLinkConditions;
+				}
+			} else if ((condBits & 0x0800) != 0 && (condBits & 0x8000) != 0) {
+				goto NextLetter;
 			}
 			if ((condBits & 0x1000) != 0 && linkBase[5] != 0) {
-				matched = true;
+				if ((condBits & 0x8000) == 0) {
+					goto PassedLinkConditions;
+				}
+			} else if ((condBits & 0x1000) != 0 && (condBits & 0x8000) != 0) {
+				goto NextLetter;
 			}
 			if ((condBits & 0x2000) != 0 && linkBase[6] != 0) {
-				matched = true;
+				if ((condBits & 0x8000) == 0) {
+					goto PassedLinkConditions;
+				}
+			} else if ((condBits & 0x2000) != 0 && (condBits & 0x8000) != 0) {
+				goto NextLetter;
 			}
 			if ((condBits & 0x4000) != 0 && linkBase[7] != 0) {
-				matched = true;
+				if ((condBits & 0x8000) == 0) {
+					goto PassedLinkConditions;
+				}
+			} else if ((condBits & 0x4000) != 0 && (condBits & 0x8000) != 0) {
+				goto NextLetter;
 			}
 
-			if ((!invert && !matched) || (invert && matched)) {
-				continue;
+			if ((condBits & 0x8000) == 0) {
+				goto NextLetter;
 			}
 		}
+	PassedLinkConditions:
 
 		condBits = *reinterpret_cast<unsigned short*>(curLetter + 0x1C);
 		if ((condBits & 0x7FFF) != 0) {
-			const bool invert = (condBits & 0x8000) != 0;
-			bool matched = false;
-
 			if ((condBits & 0x0001) != 0 && linkBase[1] >= 0x3D) {
-				matched = true;
+				if ((condBits & 0x8000) == 0) {
+					goto PassedLinkValueConditions;
+				}
+			} else if ((condBits & 0x0001) != 0 && (condBits & 0x8000) != 0) {
+				goto NextLetter;
 			}
 			if ((condBits & 0x0002) != 0 && linkBase[2] >= 0x3D) {
-				matched = true;
+				if ((condBits & 0x8000) == 0) {
+					goto PassedLinkValueConditions;
+				}
+			} else if ((condBits & 0x0002) != 0 && (condBits & 0x8000) != 0) {
+				goto NextLetter;
 			}
 			if ((condBits & 0x0004) != 0 && linkBase[3] >= 0x3D) {
-				matched = true;
+				if ((condBits & 0x8000) == 0) {
+					goto PassedLinkValueConditions;
+				}
+			} else if ((condBits & 0x0004) != 0 && (condBits & 0x8000) != 0) {
+				goto NextLetter;
 			}
 			if ((condBits & 0x0008) != 0 && linkBase[4] >= 0x3D) {
-				matched = true;
+				if ((condBits & 0x8000) == 0) {
+					goto PassedLinkValueConditions;
+				}
+			} else if ((condBits & 0x0008) != 0 && (condBits & 0x8000) != 0) {
+				goto NextLetter;
 			}
 			if ((condBits & 0x0010) != 0 && linkBase[5] >= 0x3D) {
-				matched = true;
+				if ((condBits & 0x8000) == 0) {
+					goto PassedLinkValueConditions;
+				}
+			} else if ((condBits & 0x0010) != 0 && (condBits & 0x8000) != 0) {
+				goto NextLetter;
 			}
 			if ((condBits & 0x0020) != 0 && linkBase[6] >= 0x3D) {
-				matched = true;
+				if ((condBits & 0x8000) == 0) {
+					goto PassedLinkValueConditions;
+				}
+			} else if ((condBits & 0x0020) != 0 && (condBits & 0x8000) != 0) {
+				goto NextLetter;
 			}
 			if ((condBits & 0x0040) != 0 && linkBase[7] >= 0x3D) {
-				matched = true;
+				if ((condBits & 0x8000) == 0) {
+					goto PassedLinkValueConditions;
+				}
+			} else if ((condBits & 0x0040) != 0 && (condBits & 0x8000) != 0) {
+				goto NextLetter;
 			}
 			if ((condBits & 0x0100) != 0 && linkBase[1] > 0 && linkBase[1] <= 0x28) {
-				matched = true;
+				if ((condBits & 0x8000) == 0) {
+					goto PassedLinkValueConditions;
+				}
+			} else if ((condBits & 0x0100) != 0 && (condBits & 0x8000) != 0) {
+				goto NextLetter;
 			}
 			if ((condBits & 0x0200) != 0 && linkBase[2] > 0 && linkBase[2] <= 0x28) {
-				matched = true;
+				if ((condBits & 0x8000) == 0) {
+					goto PassedLinkValueConditions;
+				}
+			} else if ((condBits & 0x0200) != 0 && (condBits & 0x8000) != 0) {
+				goto NextLetter;
 			}
 			if ((condBits & 0x0400) != 0 && linkBase[3] > 0 && linkBase[3] <= 0x28) {
-				matched = true;
+				if ((condBits & 0x8000) == 0) {
+					goto PassedLinkValueConditions;
+				}
+			} else if ((condBits & 0x0400) != 0 && (condBits & 0x8000) != 0) {
+				goto NextLetter;
 			}
 			if ((condBits & 0x0800) != 0 && linkBase[4] > 0 && linkBase[4] <= 0x28) {
-				matched = true;
+				if ((condBits & 0x8000) == 0) {
+					goto PassedLinkValueConditions;
+				}
+			} else if ((condBits & 0x0800) != 0 && (condBits & 0x8000) != 0) {
+				goto NextLetter;
 			}
 			if ((condBits & 0x1000) != 0 && linkBase[5] > 0 && linkBase[5] <= 0x28) {
-				matched = true;
+				if ((condBits & 0x8000) == 0) {
+					goto PassedLinkValueConditions;
+				}
+			} else if ((condBits & 0x1000) != 0 && (condBits & 0x8000) != 0) {
+				goto NextLetter;
 			}
 			if ((condBits & 0x2000) != 0 && linkBase[6] > 0 && linkBase[6] <= 0x28) {
-				matched = true;
+				if ((condBits & 0x8000) == 0) {
+					goto PassedLinkValueConditions;
+				}
+			} else if ((condBits & 0x2000) != 0 && (condBits & 0x8000) != 0) {
+				goto NextLetter;
 			}
 			if ((condBits & 0x4000) != 0 && linkBase[7] > 0 && linkBase[7] <= 0x28) {
-				matched = true;
+				if ((condBits & 0x8000) == 0) {
+					goto PassedLinkValueConditions;
+				}
+			} else if ((condBits & 0x4000) != 0 && (condBits & 0x8000) != 0) {
+				goto NextLetter;
 			}
 
-			if ((!invert && !matched) || (invert && matched)) {
-				continue;
+			if ((condBits & 0x8000) == 0) {
+				goto NextLetter;
 			}
 		}
+	PassedLinkValueConditions:
 
 		unsigned int cmpValue = 0;
 		for (int i = 0; i < 4; i++) {

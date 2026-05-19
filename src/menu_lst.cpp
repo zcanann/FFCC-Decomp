@@ -225,23 +225,21 @@ int CMenuPcs::MLstClose()
 	itemCount = (unsigned int)this->lstData->count;
 	entry = this->lstData->entries;
 	currentFrame = (int)this->lstState->frame;
-	if ((int)itemCount > 0) {
-		for (unsigned int remaining = itemCount; remaining != 0; remaining--) {
-			if (entry->startFrame <= currentFrame) {
-				if (entry->startFrame + entry->duration <= currentFrame) {
-					completedItems++;
+	for (int remaining = itemCount; remaining > 0; remaining--) {
+		if (entry->startFrame <= currentFrame) {
+			if (entry->startFrame + entry->duration <= currentFrame) {
+				completedItems++;
+				entry->alpha = FLOAT_803333D0;
+			} else {
+				entry->timer = entry->timer + 1;
+				double ratio = DOUBLE_80333410 / (double)entry->duration;
+				entry->alpha = (float)(DOUBLE_80333410 - ratio * (double)entry->timer);
+				if ((double)entry->alpha < DOUBLE_80333418) {
 					entry->alpha = FLOAT_803333D0;
-				} else {
-					entry->timer = entry->timer + 1;
-					double ratio = DOUBLE_80333410 / (double)entry->duration;
-					entry->alpha = (float)(DOUBLE_80333410 - ratio * (double)entry->timer);
-					if ((double)entry->alpha < DOUBLE_80333418) {
-						entry->alpha = FLOAT_803333D0;
-					}
 				}
 			}
-			entry++;
 		}
+		entry++;
 	}
 	if (this->lstData->count == completedItems) {
 		zero = FLOAT_803333D0;

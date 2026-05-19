@@ -4457,21 +4457,20 @@ void CPartMng::pppFieldShowFpNo(short fieldNo, unsigned char visible)
  */
 void CPartMng::pppFieldEndFpNo(short fieldNo)
 {
-    char* pppMngSt = reinterpret_cast<char*>(this);
+    char* base = reinterpret_cast<char*>(this);
 
     for (int i = 0; i < 0x180; i++) {
-        int baseTime = *reinterpret_cast<int*>(pppMngSt + 0x14);
-        if ((baseTime != -0x1000) && (*reinterpret_cast<short*>(pppMngSt + 0x74) == 0) &&
-            (*reinterpret_cast<short*>(pppMngSt + 0x76) == fieldNo)) {
+        _pppMngSt* pppMngSt = reinterpret_cast<_pppMngSt*>(base + 0x2A18);
+        int baseTime = pppMngSt->m_baseTime;
+        if ((baseTime != -0x1000) && (pppMngSt->m_kind == 0) && (pppMngSt->m_nodeIndex == fieldNo)) {
             if (baseTime < 0) {
-                *reinterpret_cast<unsigned char*>(pppMngSt + 0xe4) = 1;
-                pppStopSe__FP9_pppMngStP7PPPSEST(reinterpret_cast<_pppMngSt*>(pppMngSt),
-                                                 reinterpret_cast<PPPSEST*>(pppMngSt + 0x11c));
+                pppMngSt->m_particleEnded = 1;
+                pppStopSe__FP9_pppMngStP7PPPSEST(pppMngSt, &pppMngSt->m_soundEffectData);
             } else {
-                *reinterpret_cast<int*>(pppMngSt + 0x14) = -0x1000;
+                pppMngSt->m_baseTime = -0x1000;
             }
         }
-        pppMngSt += 0x158;
+        base += 0x158;
     }
 }
 

@@ -1065,9 +1065,9 @@ void calcColorKeyFrame(CMapKeyFrame* keyFrame, _GXColor& out, _GXColor* colors)
         return;
     }
 
-    int key0 = 0;
-    int key1 = 0;
-    float blend = 0.0f;
+    int key0;
+    int key1;
+    float blend;
     if (Get__12CMapKeyFrameFRiRiRf(keyFrame, &key0, &key1, &blend) == 0) {
         out = colors[key0];
     } else {
@@ -1076,13 +1076,13 @@ void calcColorKeyFrame(CMapKeyFrame* keyFrame, _GXColor& out, _GXColor* colors)
         _GXColor c1 = colors[key1];
 
         out.r = static_cast<unsigned char>(
-            c0.r + static_cast<char>((blendRate * (static_cast<int>(c1.r) - static_cast<int>(c0.r))) >> 8));
+            c0.r + ((blendRate * (static_cast<int>(c1.r) - static_cast<int>(c0.r))) >> 8));
         out.g = static_cast<unsigned char>(
-            c0.g + static_cast<char>((blendRate * (static_cast<int>(c1.g) - static_cast<int>(c0.g))) >> 8));
+            c0.g + ((blendRate * (static_cast<int>(c1.g) - static_cast<int>(c0.g))) >> 8));
         out.b = static_cast<unsigned char>(
-            c0.b + static_cast<char>((blendRate * (static_cast<int>(c1.b) - static_cast<int>(c0.b))) >> 8));
+            c0.b + ((blendRate * (static_cast<int>(c1.b) - static_cast<int>(c0.b))) >> 8));
         out.a = static_cast<unsigned char>(
-            c0.a + static_cast<char>((blendRate * (static_cast<int>(c1.a) - static_cast<int>(c0.a))) >> 8));
+            c0.a + ((blendRate * (static_cast<int>(c1.a) - static_cast<int>(c0.a))) >> 8));
     }
 
     Calc__12CMapKeyFrameFv(keyFrame);
@@ -1168,9 +1168,9 @@ void CMapObj::Calc()
                 calcColorKeyFrame(reinterpret_cast<CMapKeyFrame*>(attr + 0xCC), colorCurrent, colorTable);
         } else if ((attrType == CMapObjAtr::MIME) &&
                    (IsRun__12CMapKeyFrameFv(reinterpret_cast<CMapKeyFrame*>(attr + 0x14)) != 0)) {
-            int key0 = 0;
-            int key1 = 0;
-            float blend = 0.0f;
+            int key0;
+            int key1;
+            float blend;
             int vertexCount = *reinterpret_cast<int*>(attr + 0x10);
             int frameList = *reinterpret_cast<int*>(attr + 0xC);
             Vec* outVerts = *reinterpret_cast<Vec**>(reinterpret_cast<unsigned char*>(m_mapData) + 0x2C);

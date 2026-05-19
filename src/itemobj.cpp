@@ -103,6 +103,7 @@ extern const float FLOAT_80331BC4 = 1.5f;
 extern const char DAT_80331bc8[] = "hip";
 u32 gItemObjCreateFlags;
 extern char SoundBuffer[];
+extern unsigned char m_boss__8CGMonObj[];
 static const char DAT_801dcec0[] = "num free item = %d\n";
 static const char DAT_801dced4[] = {
     (char)0x8F, (char)0xC1, (char)0x82, (char)0xB9, (char)0x82, (char)0xE9, (char)0x83, 0x49,
@@ -356,7 +357,7 @@ void CGItemObj::onFrame()
 
 			CGObject* owner = m_owner;
 			int ownerScriptSlot = *(int*)(*(int*)((unsigned char*)owner + 0x58) + 0x3B4);
-			int soundEntry = *(int*)(*(int*)(*(int*)(SoundBuffer + 0x4EC) + 0xF8) + 0x178);
+			int soundEntry = *(int*)(*(int*)(*reinterpret_cast<int*>(m_boss__8CGMonObj) + 0xF8) + 0x178);
 			if (soundEntry != 0) {
 				soundEntry = *(int*)(soundEntry + 0x14);
 			} else {
@@ -488,31 +489,28 @@ void CGItemObj::onFrameStat()
 			CGPartyObj* carryObj = *(CGPartyObj**)(self + 0x550);
 			Vec safePos;
 			float launchSpeed;
+			bool useMenuLaunchSpeed = false;
 
-			if (*(int*)(self + 0x520) == 0xC) {
-				bool useMenuLaunchSpeed = false;
-
-				if (Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
-					unsigned int carryCid = static_cast<unsigned short>(carryObj->GetCID());
-					if ((carryCid & 0x6D) == 0x6D &&
-					    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(carryObj->m_scriptHandle) + 0x3B4) != 0) {
-						useMenuLaunchSpeed = true;
-					}
+			if (Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
+				unsigned int carryCid = static_cast<unsigned short>(carryObj->GetCID());
+				if ((carryCid & 0x6D) == 0x6D &&
+				    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(carryObj->m_scriptHandle) + 0x3B4) != 0) {
+					useMenuLaunchSpeed = true;
 				}
+			}
 
-				if (useMenuLaunchSpeed) {
+			if (useMenuLaunchSpeed) {
+				launchSpeed = FLOAT_80331b18;
+			} else if (*(int*)(CFlat + 0x4780) == 1) {
+				unsigned int carryCid = static_cast<unsigned short>(carryObj->GetCID());
+				if ((carryCid & 0x6D) == 0x6D &&
+				    1 < *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(carryObj->m_scriptHandle) + 0x3E0)) {
 					launchSpeed = FLOAT_80331b18;
-				} else if (*(int*)(CFlat + 0x4780) == 1) {
-					unsigned int carryCid = static_cast<unsigned short>(carryObj->GetCID());
-					if ((carryCid & 0x6D) == 0x6D &&
-					    1 < *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(carryObj->m_scriptHandle) + 0x3E0)) {
-						launchSpeed = FLOAT_80331b18;
-					} else {
-						launchSpeed = FLOAT_80331BA8;
-					}
 				} else {
-					launchSpeed = FLOAT_80331b90;
+					launchSpeed = FLOAT_80331BA8;
 				}
+			} else {
+				launchSpeed = FLOAT_80331b90;
 			}
 
 			float safeDist = CalcSafePos__8CGObjectFiP8CGObjectP3Vec(this, 0x41, carryObj, &safePos);
@@ -710,7 +708,7 @@ void CGItemObj::onFrameStat()
 			prgObj->m_stepSlopeLimit = zero;
 			EndParticleSlot__13CFlatRuntime2Fii(CFlat, *(int*)(self + 0x55C), 0);
 
-			int soundEntry = *(int*)(*(int*)(*(int*)(SoundBuffer + 0x4EC) + 0xF8) + 0x178);
+			int soundEntry = *(int*)(*(int*)(*reinterpret_cast<int*>(m_boss__8CGMonObj) + 0xF8) + 0x178);
 			if (soundEntry != 0) {
 				pdtNo = *(int*)(soundEntry + 0x14);
 			}
@@ -727,7 +725,7 @@ void CGItemObj::onFrameStat()
 				Printf__7CSystemFPce(&System, const_cast<char*>(DAT_801dcfc8), ownerSlot);
 			}
 
-			*(int*)(SoundBuffer + ownerSlot * 4 + 0x4F4) = 0;
+			*(int*)(m_boss__8CGMonObj + ownerSlot * 4 + 8) = 0;
 			CGPrgObj* newItem = CreateFromScript(0, 0, 0x103, 0, FLOAT_80331b20, 0);
 			if (newItem == 0) {
 				if ((unsigned int)System.m_execParam > 1U) {
@@ -764,7 +762,7 @@ void CGItemObj::onFrameStat()
 			prgObj->m_stepSlopeLimit = zero;
 			EndParticleSlot__13CFlatRuntime2Fii(CFlat, *(int*)(self + 0x55C), 0);
 
-			int soundEntry = *(int*)(*(int*)(*(int*)(SoundBuffer + 0x4EC) + 0xF8) + 0x178);
+			int soundEntry = *(int*)(*(int*)(*reinterpret_cast<int*>(m_boss__8CGMonObj) + 0xF8) + 0x178);
 			if (soundEntry != 0) {
 				pdtNo = *(int*)(soundEntry + 0x14);
 			}
@@ -783,7 +781,7 @@ void CGItemObj::onFrameStat()
 
 			CFlatRuntime::CStack stack;
 			stack.m_word = 0;
-			*(int*)(SoundBuffer + ownerSlot * 4 + 0x4F4) = 0;
+			*(int*)(m_boss__8CGMonObj + ownerSlot * 4 + 8) = 0;
 			SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
 			    &CFlat, *(int*)(self + 0x550), 2, 0x16, 1, &stack, 0);
 
@@ -975,7 +973,7 @@ CGPrgObj* CGItemObj::CreateFromScript(
 			if ((unsigned int)System.m_execParam >= 3U) {
 				Printf__7CSystemFPce(&System, const_cast<char*>(DAT_801dcf34), ownerScriptSlot);
 			}
-			*(CGPrgObj**)(SoundBuffer + (int)ownerScriptSlot * 4 + 0x4F4) = newItem;
+			*(CGPrgObj**)(m_boss__8CGMonObj + (int)ownerScriptSlot * 4 + 8) = newItem;
 
 			void* handle = __nw__Q29CCharaPcs7CHandleFUlPQ27CMemory6CStagePci(
 			    0x194, Game.m_mainStage, const_cast<char*>(DAT_801dcf58), 0x28E);

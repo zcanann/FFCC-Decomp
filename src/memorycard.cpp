@@ -1741,12 +1741,11 @@ int CMemoryCardMan::DummySave()
     {
     }
 
-    if (m_result == 0)
+    if (m_result != 0)
     {
-        if (m_saveBuffer != 0)
+        if (static_cast<unsigned int>(System.m_execParam) >= 1)
         {
-            delete[] m_saveBuffer;
-            m_saveBuffer = 0;
+            System.Printf(const_cast<char*>(sMcWriteErrorFmt), 0);
         }
 
         int chan = m_fileInfo.chan;
@@ -1772,15 +1771,22 @@ int CMemoryCardMan::DummySave()
         m_state = 2;
         m_currentSlot = 0xFF;
 
-        return 0;
-    }
+        if (m_saveBuffer != 0)
+        {
+            delete[] m_saveBuffer;
+            m_saveBuffer = 0;
+        }
 
-    if (static_cast<unsigned int>(System.m_execParam) >= 1)
-    {
-        System.Printf(const_cast<char*>(sMcWriteErrorFmt), 0);
+        return m_result;
     }
 
     int chan = m_fileInfo.chan;
+
+    if (m_saveBuffer != 0)
+    {
+        delete[] m_saveBuffer;
+        m_saveBuffer = 0;
+    }
 
     if (chan < 0 || chan > 1)
     {
@@ -1802,13 +1808,7 @@ int CMemoryCardMan::DummySave()
     m_state = 2;
     m_currentSlot = 0xFF;
 
-    if (m_saveBuffer != 0)
-    {
-        delete[] m_saveBuffer;
-        m_saveBuffer = 0;
-    }
-
-    return m_result;
+    return 0;
 }
 
 /*

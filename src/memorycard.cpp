@@ -1912,8 +1912,14 @@ int CMemoryCardMan::DummyLoad()
     {
     }
 
-    if (m_result == 0)
+    if (m_result != 0)
     {
+        if (static_cast<unsigned int>(System.m_execParam) >= 1)
+        {
+            // "McRead(%d) error(%d)"
+            System.Printf(const_cast<char*>(sMcReadErrorFmt), 0);
+        }
+
         int chan = m_fileInfo.chan;
 
         if (chan < 0 || chan > 1)
@@ -1936,23 +1942,13 @@ int CMemoryCardMan::DummyLoad()
         m_state = 2;
         m_currentSlot = 0xFF;
 
-        // Game.LoadInit();
-        SetLoadData();
-        // Game.LoadFinished();
-
         if (m_saveBuffer != 0)
         {
             delete[] m_saveBuffer;
             m_saveBuffer = 0;
         }
 
-        return 0;
-    }
-
-    if (static_cast<unsigned int>(System.m_execParam) >= 1)
-    {
-        // "McRead(%d) error(%d)"
-        System.Printf(const_cast<char*>(sMcReadErrorFmt), 0);
+        return m_result;
     }
 
     int chan = m_fileInfo.chan;
@@ -1977,13 +1973,17 @@ int CMemoryCardMan::DummyLoad()
     m_state = 2;
     m_currentSlot = 0xFF;
 
+    Game.LoadInit();
+    SetLoadData();
+    Game.LoadFinished();
+
     if (m_saveBuffer != 0)
     {
         delete[] m_saveBuffer;
         m_saveBuffer = 0;
     }
 
-    return m_result;
+    return 0;
 }
 
 /*

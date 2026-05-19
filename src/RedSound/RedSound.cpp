@@ -94,7 +94,7 @@ struct RedSoundStreamBank {
 	int m_fileSize;
 	int m_readPoint;
 	int m_playPoint;
-	int m_reserved14;
+	int m_standbyId;
 	u8 m_reserved18[REDSOUND_STREAM_BANK_RESERVED18_SIZE];
 };
 
@@ -104,7 +104,7 @@ enum RedSoundStreamBankLayout {
 	REDSOUND_STREAM_BANK_FILE_SIZE_OFFSET = (unsigned int)&(((RedSoundStreamBank*)0)->m_fileSize),
 	REDSOUND_STREAM_BANK_READ_POINT_OFFSET = (unsigned int)&(((RedSoundStreamBank*)0)->m_readPoint),
 	REDSOUND_STREAM_BANK_PLAY_POINT_OFFSET = (unsigned int)&(((RedSoundStreamBank*)0)->m_playPoint),
-	REDSOUND_STREAM_BANK_RESERVED14_OFFSET = (unsigned int)&(((RedSoundStreamBank*)0)->m_reserved14),
+	REDSOUND_STREAM_BANK_STANDBY_ID_OFFSET = (unsigned int)&(((RedSoundStreamBank*)0)->m_standbyId),
 	REDSOUND_STREAM_BANK_RESERVED18_OFFSET = (unsigned int)&(((RedSoundStreamBank*)0)->m_reserved18),
 };
 
@@ -142,7 +142,7 @@ static RedSoundStreamBank* p_StreamBank;
 #define RedSoundStreamBankSetFileSize(bank, size) ((bank)->m_fileSize = (size))
 #define RedSoundStreamBankSetReadPoint(bank, point) ((bank)->m_readPoint = (point))
 #define RedSoundStreamBankSetPlayPoint(bank, point) ((bank)->m_playPoint = (point))
-#define RedSoundStreamBankSetReserved(bank, value) ((bank)->m_reserved14 = (value))
+#define RedSoundStreamBankSetStandbyId(bank, value) ((bank)->m_standbyId = (value))
 #define RedSoundStreamBankClear(bank)                                                                 \
 	do {                                                                                            \
 		RedSoundStreamBankSetId((bank), REDSOUND_STREAM_ID_NONE);                                  \
@@ -171,9 +171,9 @@ STATIC_ASSERT(offsetof(RedSoundStreamBank, m_streamData) == REDSOUND_STREAM_BANK
 STATIC_ASSERT(offsetof(RedSoundStreamBank, m_fileSize) == REDSOUND_STREAM_BANK_FILE_SIZE_OFFSET);
 STATIC_ASSERT(offsetof(RedSoundStreamBank, m_readPoint) == REDSOUND_STREAM_BANK_READ_POINT_OFFSET);
 STATIC_ASSERT(offsetof(RedSoundStreamBank, m_playPoint) == REDSOUND_STREAM_BANK_PLAY_POINT_OFFSET);
-STATIC_ASSERT(offsetof(RedSoundStreamBank, m_reserved14) == REDSOUND_STREAM_BANK_RESERVED14_OFFSET);
-STATIC_ASSERT(sizeof(((RedSoundStreamBank*)0)->m_reserved14) == REDSOUND_STREAM_BANK_RESERVED14_SIZE);
-STATIC_ASSERT(REDSOUND_STREAM_BANK_RESERVED14_OFFSET + REDSOUND_STREAM_BANK_RESERVED14_SIZE ==
+STATIC_ASSERT(offsetof(RedSoundStreamBank, m_standbyId) == REDSOUND_STREAM_BANK_STANDBY_ID_OFFSET);
+STATIC_ASSERT(sizeof(((RedSoundStreamBank*)0)->m_standbyId) == REDSOUND_STREAM_BANK_RESERVED14_SIZE);
+STATIC_ASSERT(REDSOUND_STREAM_BANK_STANDBY_ID_OFFSET + REDSOUND_STREAM_BANK_RESERVED14_SIZE ==
               REDSOUND_STREAM_BANK_RESERVED18_OFFSET);
 STATIC_ASSERT(offsetof(RedSoundStreamBank, m_reserved18) == REDSOUND_STREAM_BANK_RESERVED18_OFFSET);
 STATIC_ASSERT(sizeof(((RedSoundStreamBank*)0)->m_reserved18) == REDSOUND_STREAM_BANK_RESERVED18_SIZE);
@@ -1329,7 +1329,7 @@ int CRedSound::StreamStandby(void* streamHeader, int fileSize)
 			RedSoundStreamBankSetFileSize(bank, fileSize);
 			RedSoundStreamBankSetReadPoint(bank, REDSOUND_STREAM_BANK_POINT_NONE);
 			RedSoundStreamBankSetPlayPoint(bank, REDSOUND_STREAM_BANK_POINT_NONE);
-			RedSoundStreamBankSetReserved(bank, streamId);
+			RedSoundStreamBankSetStandbyId(bank, streamId);
 		}
 	} else if (RedReportPrintIsEnabled()) {
 		OSReport(sRedSoundInvalidStreamData,

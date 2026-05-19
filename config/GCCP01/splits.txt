@@ -94,7 +94,6 @@ p_usb.cpp:
 	.rodata     start:0x801D6D08 end:0x801D6D24
 	.data       start:0x801E8690 end:0x801E8818
 	.bss        start:0x80244028 end:0x8024413C
-	.sdata      start:0x8032E838 end:0x8032E840
 	.sbss       start:0x8032EC68 end:0x8032EC70
 	.sdata2     start:0x8032F810 end:0x8032F818
 
@@ -1044,6 +1043,7 @@ joybus.cpp:
 	.rodata     start:0x801DA0A4 end:0x801DA3E4
 	.data       start:0x8020FB10 end:0x8020FB2C
 	.bss        start:0x802EAAB0 end:0x802F2600
+	.sdata      start:0x8032E830 end:0x8032E840
 	.sbss       start:0x8032EDB8 end:0x8032EDBC
 
 cflat_r2system.cpp:

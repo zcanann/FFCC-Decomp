@@ -105,7 +105,7 @@ extern "C" void Create__9CMaterialFUlQ212CMaterialMan7TEV_BIT(CMaterial*, unsign
 extern "C" void AddMaterial__12CMaterialSetFP9CMateriali(CMaterialSet*, CMaterial*, int);
 PPPCREATEPARAM g_dcp;
 extern "C" {
-unsigned char DAT_8032ed68 = 0;
+int DAT_8032ed68 = 0;
 int DAT_8032ed6c = 0;
 int DAT_8032ed74 = 0;
 unsigned char gPppInConstructor = 0;

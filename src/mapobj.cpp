@@ -141,6 +141,11 @@ static inline CMapObj* MapObjArrayStart()
     return reinterpret_cast<CMapObj*>(reinterpret_cast<unsigned char*>(&MapMng) + 0x954);
 }
 
+static inline Mtx& MapObjHitDrawMtx()
+{
+    return *reinterpret_cast<Mtx*>(reinterpret_cast<unsigned char*>(&MapMng) + 0x228F8);
+}
+
 }
 
 extern "C" void __dl__FPv(void*);
@@ -1397,7 +1402,7 @@ void CMapObj::SetDrawFlag()
 void CMapObj::DrawHit()
 {
     if ((U8At(this, 0x1D) == 2) && (m_mapData != 0)) {
-        MaterialMan.SetObjMatrix(reinterpret_cast<float(*)[4]>(0x8026805C), MtxAt(this, 0xB8));
+        MaterialMan.SetObjMatrix(MapObjHitDrawMtx(), MtxAt(this, 0xB8));
         reinterpret_cast<CMapHit*>(m_mapData)->Draw();
     }
 }
@@ -1414,7 +1419,7 @@ void CMapObj::DrawHit()
 void CMapObj::DrawHitWire()
 {
     if ((U8At(this, 0x1D) == 2) && (m_mapData != 0)) {
-        MaterialMan.SetObjMatrix(reinterpret_cast<float(*)[4]>(0x8026805C), MtxAt(this, 0xB8));
+        MaterialMan.SetObjMatrix(MapObjHitDrawMtx(), MtxAt(this, 0xB8));
         reinterpret_cast<CMapHit*>(m_mapData)->DrawWire();
     }
 }
@@ -1431,7 +1436,7 @@ void CMapObj::DrawHitWire()
 void CMapObj::DrawHitNormal()
 {
     if ((U8At(this, 0x1D) == 2) && (m_mapData != 0)) {
-        MaterialMan.SetObjMatrix(reinterpret_cast<float(*)[4]>(0x8026805C), MtxAt(this, 0xB8));
+        MaterialMan.SetObjMatrix(MapObjHitDrawMtx(), MtxAt(this, 0xB8));
         reinterpret_cast<CMapHit*>(m_mapData)->DrawNormal();
     }
 }

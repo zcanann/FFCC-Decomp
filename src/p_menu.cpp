@@ -1299,7 +1299,8 @@ void CMenuPcs::SetTexture(CMenuPcs::TEX tex)
 
         width = *(u32*)((u8*)texture + 0x64);
         height = *(u32*)((u8*)texture + 0x68);
-        PSMTXScale(texMtx, FLOAT_80330808 / (f32)width, FLOAT_80330808 / (f32)height, FLOAT_80330808);
+        PSMTXScale(texMtx, LoadFloat(FLOAT_80330808) / (f32)width, LoadFloat(FLOAT_80330808) / (f32)height,
+                   LoadFloat(FLOAT_80330808));
         GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX2x4);
         GXSetNumTexGens(1);
         GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);

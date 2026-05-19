@@ -2,11 +2,11 @@
 #define _PPP_YMCHANGETEX_H_
 
 #include "ffcc/chara.h"
+#include "ffcc/partMng.h"
 #include <dolphin/types.h>
 
 struct pppYmChangeTex {
-    u8 _pad0[0xC];
-    s32 m_graphId;
+    _pppPObject m_object;
 };
 
 struct pppYmChangeTexStep {

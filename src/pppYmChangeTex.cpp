@@ -8,17 +8,6 @@
 #include <dolphin/os/OSCache.h>
 #include "ffcc/ppp_linkage.h"
 
-struct _pppMngStYmChangeTex {
-	char _pad0[0xd8];
-	void* m_charaObj;
-};
-
-struct _pppEnvStYmChangeTex {
-	void* m_stagePtr;
-	CMaterialSet* m_materialSetPtr;
-	CMapMesh** m_mapMeshPtr;
-};
-
 struct ChangeTexDisplayList {
 	u32 m_size;
 	void* m_data;
@@ -83,9 +72,6 @@ struct ChangeTexModelRaw {
 	void (*m_afterDrawMeshCallback)(CChara::CModel*, void*, void*, int, float (*)[4]);
 };
 
-extern _pppMngStYmChangeTex* pppMngStPtr;
-extern _pppEnvStYmChangeTex* pppEnvStPtr;
-
 extern const char s_pppYmChangeTex_cpp_801db4c0[] = "pppYmChangeTex.cpp";
 extern const float FLOAT_80330df8;
 extern const float FLOAT_80330dfc;
@@ -119,7 +105,7 @@ extern "C" {
 	void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
 	void* GetCharaHandlePtr__FP8CGObjectl(void*, long);
 	int GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void*);
-	void* GetTextureFromRSD__FiP9_pppEnvSt(int, _pppEnvStYmChangeTex*);
+	void* GetTextureFromRSD__FiP9_pppEnvSt(int, _pppEnvSt*);
 	void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, void*, char*, int);
 	void ReWriteDisplayList__5CUtilFPvUlUl(CUtil*, void*, unsigned long, unsigned long);
 	void pppHeapUseRate__FPQ27CMemory6CStage(void*);
@@ -139,7 +125,7 @@ void pppRenderYmChangeTex(pppYmChangeTex*, pppYmChangeTexStep* step, pppYmChange
 {
 	int textureIndex;
 	if (step->m_dataValIndex != 0xffff) {
-		_pppEnvStYmChangeTex* env = pppEnvStPtr;
+		_pppEnvSt* env = pppEnvStPtr;
 		CMapMesh* mapMesh = env->m_mapMeshPtr[step->m_dataValIndex];
 		textureIndex = 0;
 		GetTexture__8CMapMeshFP12CMaterialSetRi(mapMesh, env->m_materialSetPtr, textureIndex);
@@ -163,13 +149,12 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 	}
 
 	s32* serializedDataOffsets = data->m_serializedDataOffsets;
-	u8* base = (u8*)ymChangeTex;
-	pppYmChangeTexState* state = (pppYmChangeTexState*)(base + serializedDataOffsets[2] + 0x80);
-	CCharaPcs::CHandle* handle0 = GetCharaHandlePtr((CGObject*)pppMngStPtr->m_charaObj, 0);
+	pppYmChangeTexState* state = (pppYmChangeTexState*)(ymChangeTex->m_object.m_workArea + serializedDataOffsets[2]);
+	CCharaPcs::CHandle* handle0 = GetCharaHandlePtr((CGObject*)pppMngStPtr->m_owner, 0);
 	CChara::CModel* model0 = GetCharaModelPtr(handle0);
 	ChangeTexModelRaw* model0Raw = (ChangeTexModelRaw*)model0;
 
-	state->m_charaObj = (CGObject*)pppMngStPtr->m_charaObj;
+	state->m_charaObj = (CGObject*)pppMngStPtr->m_owner;
 	state->m_context = pppEnvStPtr;
 	model0Raw->m_state = state;
 	model0Raw->m_step = step;
@@ -202,7 +187,7 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 
 	state->m_value1 = state->m_value1 + state->m_value2;
 	state->m_value0 = state->m_value0 + state->m_value1;
-	if (step->m_graphId == ymChangeTex->m_graphId) {
+	if (step->m_graphId == ymChangeTex->m_object.m_graphId) {
 		state->m_value0 = state->m_value0 + step->m_initWOrk;
 		state->m_value1 = state->m_value1 + step->m_stepValue;
 		state->m_value2 = state->m_value2 + step->m_arg3;
@@ -319,7 +304,7 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 void pppDestructYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexData* data)
 {
 	pppYmChangeTexState* state =
-	    (pppYmChangeTexState*)((char*)ymChangeTex + 0x80 + data->m_serializedDataOffsets[2]);
+	    (pppYmChangeTexState*)(ymChangeTex->m_object.m_workArea + data->m_serializedDataOffsets[2]);
 	void* handle0 = GetCharaHandlePtr__FP8CGObjectl(state->m_charaObj, 0);
 	void* handle1 = GetCharaHandlePtr__FP8CGObjectl(state->m_charaObj, 1);
 	void* handle2 = GetCharaHandlePtr__FP8CGObjectl(state->m_charaObj, 2);
@@ -413,7 +398,7 @@ void pppConstructYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexData* da
 {
 	float init = ChangeTexConst(kPppYmChangeTexInitZero);
 	pppYmChangeTexState* state =
-	    (pppYmChangeTexState*)((char*)ymChangeTex + data->m_serializedDataOffsets[2] + 0x80);
+	    (pppYmChangeTexState*)(ymChangeTex->m_object.m_workArea + data->m_serializedDataOffsets[2]);
 
 	state->m_value0 = init;
 	state->m_value2 = init;

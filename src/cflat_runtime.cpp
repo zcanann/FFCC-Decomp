@@ -1751,10 +1751,277 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 			}
 			break;
 		}
+		case 0x0C:
+			--object->m_sp;
+			break;
+		case 0x0D:
+		case 0x10: {
+			unsigned int* sp = object->m_sp;
+			--object->m_sp;
+			unsigned int* value = reinterpret_cast<unsigned int*>(sp[-2]);
+			sp[-2] = *value;
+			*value = sp[-1];
+			break;
+		}
+		case 0x0E: {
+			unsigned int* sp = object->m_sp;
+			--object->m_sp;
+			unsigned int* value = reinterpret_cast<unsigned int*>(sp[-2]);
+			sp[-2] = *value;
+			*value += sp[-1];
+			break;
+		}
+		case 0x0F: {
+			unsigned int* sp = object->m_sp;
+			--object->m_sp;
+			unsigned int* value = reinterpret_cast<unsigned int*>(sp[-2]);
+			sp[-2] = *value;
+			*value -= sp[-1];
+			break;
+		}
+		case 0x11: {
+			unsigned int* sp = object->m_sp;
+			--object->m_sp;
+			float* value = reinterpret_cast<float*>(sp[-2]);
+			float delta = *reinterpret_cast<float*>(&sp[-1]);
+			sp[-2] = *reinterpret_cast<unsigned int*>(value);
+			*value += delta;
+			break;
+		}
+		case 0x12: {
+			unsigned int* sp = object->m_sp;
+			--object->m_sp;
+			float* value = reinterpret_cast<float*>(sp[-2]);
+			float delta = *reinterpret_cast<float*>(&sp[-1]);
+			sp[-2] = *reinterpret_cast<unsigned int*>(value);
+			*value -= delta;
+			break;
+		}
+		case 0x13:
+		case 0x16:
+		case 0x14:
+		case 0x17:
+		case 0x15:
+		case 0x18: {
+			unsigned int* sp = object->m_sp - 1;
+			object->m_sp = sp;
+			const u32 systemValue = sp[-1];
+			int setMode;
+			if ((code[0] == 0x14) || (code[0] == 0x17)) {
+				setMode = 1;
+			} else if ((code[0] == 0x15) || (code[0] == 0x18)) {
+				setMode = -1;
+			} else {
+				setMode = 0;
+			}
+
+			if (((systemValue >> 12) & 1) == 0) {
+				typedef void (*SetSystemValFn)(CFlatRuntime*, int, CStack*, int);
+				reinterpret_cast<SetSystemValFn>((*reinterpret_cast<void***>(this))[12])(
+				    this, static_cast<int>(systemValue) >> 13, reinterpret_cast<CStack*>(sp), setMode);
+			} else {
+				typedef CClass* (*IntToClassFn)(CFlatRuntime*, int);
+				typedef void (*SetClassSystemValFn)(CFlatRuntime*, int, CObject*, CStack*, int);
+				CObject* target = reinterpret_cast<CObject*>(
+				    reinterpret_cast<IntToClassFn>((*reinterpret_cast<void***>(this))[15])(this, systemValue & 0xFFF));
+				reinterpret_cast<SetClassSystemValFn>((*reinterpret_cast<void***>(this))[13])(
+				    this, static_cast<int>(systemValue) >> 13, target, reinterpret_cast<CStack*>(sp), setMode);
+			}
+			break;
+		}
+		case 0x19:
+		case 0x1A:
+		case 0x1B:
+		case 0x1C:
+		case 0x1D:
+		case 0x1E:
+		case 0x1F:
+		case 0x20:
+		case 0x21:
+		case 0x22:
+		case 0x23:
+		case 0x24:
+		case 0x25:
+		case 0x26:
+		case 0x27:
+		case 0x28:
+		case 0x29:
+		case 0x2A:
+		case 0x2B:
+			GetCodeInfo(reinterpret_cast<char*>(object));
+			break;
+		case 0x2C: {
+			unsigned int* sp = object->m_sp;
+			--object->m_sp;
+			sp[-2] = (__cntlzw(sp[-1] - sp[-2]) >> 5) & 0xFF;
+			break;
+		}
+		case 0x2D: {
+			unsigned int* sp = object->m_sp;
+			--object->m_sp;
+			sp[-2] = ((sp[-1] - sp[-2]) | (sp[-2] - sp[-1])) >> 31;
+			break;
+		}
+		case 0x2E: {
+			unsigned int* sp = object->m_sp;
+			--object->m_sp;
+			const u32 value = sp[-1] ^ sp[-2];
+			sp[-2] = (static_cast<int>((value >> 1) - (value & sp[-1])) >> 31);
+			break;
+		}
+		case 0x2F: {
+			unsigned int* sp = object->m_sp;
+			--object->m_sp;
+			sp[-2] = (static_cast<int>(sp[-1]) >> 31)
+			         + ((sp[-2] <= sp[-1]) - (static_cast<int>(sp[-2]) >> 31)) & 0xFF;
+			break;
+		}
+		case 0x30: {
+			unsigned int* sp = object->m_sp;
+			--object->m_sp;
+			const u32 value = sp[-2] ^ sp[-1];
+			sp[-2] = (static_cast<int>((value >> 1) - (value & sp[-2])) >> 31);
+			break;
+		}
+		case 0x31: {
+			unsigned int* sp = object->m_sp;
+			--object->m_sp;
+			sp[-2] = (static_cast<int>(sp[-2]) >> 31)
+			         + ((sp[-1] <= sp[-2]) - (static_cast<int>(sp[-1]) >> 31)) & 0xFF;
+			break;
+		}
+		case 0x32:
+		case 0x33:
+		case 0x34:
+		case 0x35:
+		case 0x36:
+		case 0x37: {
+			union FloatWord {
+				u32 u;
+				float f;
+			};
+			unsigned int* sp = object->m_sp;
+			--object->m_sp;
+			FloatWord lhs;
+			FloatWord rhs;
+			FloatWord result;
+			lhs.u = sp[-2];
+			rhs.u = sp[-1];
+
+			switch (code[0]) {
+			case 0x32:
+				result.f = (lhs.f == rhs.f) ? 1.0f : 0.0f;
+				break;
+			case 0x33:
+				result.f = (lhs.f != rhs.f) ? 1.0f : 0.0f;
+				break;
+			case 0x34:
+				result.f = (lhs.f < rhs.f) ? 1.0f : 0.0f;
+				break;
+			case 0x35:
+				result.f = (lhs.f <= rhs.f) ? 1.0f : 0.0f;
+				break;
+			case 0x36:
+				result.f = (rhs.f < lhs.f) ? 1.0f : 0.0f;
+				break;
+			default:
+				result.f = (rhs.f <= lhs.f) ? 1.0f : 0.0f;
+				break;
+			}
+			sp[-2] = result.u;
+			break;
+		}
+		case 0x39: {
+			--object->m_sp;
+			const u32 returnValue = *object->m_sp;
+			--object->m_sp;
+			const u32 classWord = *object->m_sp;
+			typedef CClass* (*IntToClassFn)(CFlatRuntime*, int);
+			CObject* target = reinterpret_cast<CObject*>(
+			    reinterpret_cast<IntToClassFn>((*reinterpret_cast<void***>(this))[15])(this, classWord >> 16));
+			object->m_engineObject = target;
+			object->m_classIndex = static_cast<s16>(classWord);
+			--object->m_sp;
+			object->m_thisBase = reinterpret_cast<unsigned int*>(*object->m_sp);
+			--object->m_sp;
+			*object->m_sp++ = returnValue;
+			break;
+		}
+		case 0x3A:
+			*object->m_sp = object->m_sp[-1];
+			object->m_sp++;
+			break;
+		case 0x3C: {
+			const u8 oldFlags = object->m_flags;
+
+			--object->m_sp;
+			const u32 returnValue = *object->m_sp;
+			--object->m_sp;
+			const u32 packedFlags = *object->m_sp;
+			--object->m_sp;
+			const u32 previousActive = *object->m_sp;
+			--object->m_sp;
+			const u32 previousCodePos = *object->m_sp;
+			--object->m_sp;
+			unsigned int* previousLocalBase = reinterpret_cast<unsigned int*>(*object->m_sp);
+
+			object->m_sp = object->m_localBase;
+			*object->m_sp++ = returnValue;
+			object->m_localBase = previousLocalBase;
+			object->m_codePos = previousCodePos;
+			object->m_flags = static_cast<u8>((object->m_flags & 0xDF) | ((static_cast<s8>(previousActive) << 5) & 0x20));
+			object->m_waitCounter = static_cast<int>(packedFlags) >> 16;
+			object->m_reqFlag0 = 0;
+			object->m_reqFlag1 = 0;
+			object->m_reqFlag2 = 0;
+			object->m_reqFlag3 = static_cast<u8>((packedFlags >> 15) & 1);
+			object->m_argCount = static_cast<s16>(packedFlags);
+
+			if ((static_cast<int>(object->m_flags) << 24) < 0) {
+				return 0;
+			}
+			if ((static_cast<int>(oldFlags) << 26) < 0) {
+				return 1;
+			}
+
+			funcs = *reinterpret_cast<u8**>(self + 0x20);
+			code = *reinterpret_cast<u8**>(
+			    funcs + ((static_cast<int>(static_cast<s16>(object->m_codePos >> 16)) >> 4) * 0x50) + 0x34)
+			    + (static_cast<int>(object->m_codePos << 12) >> 12);
+			continue;
+		}
+		case 0x3D: {
+			union FloatWord {
+				u32 u;
+				float f;
+			};
+			FloatWord value;
+			value.u = object->m_sp[-1];
+			object->m_sp[-1] = static_cast<int>(value.f);
+			break;
+		}
+		case 0x3E: {
+			union FloatWord {
+				u32 u;
+				float f;
+			};
+			FloatWord value;
+			value.f = static_cast<float>(static_cast<int>(object->m_sp[-1]));
+			object->m_sp[-1] = value.u;
+			break;
+		}
+		case 0x3F:
+			*object->m_sp++ = 0;
+			break;
 		default:
 			break;
 		}
-		break;
+
+		const int step = (code[0] < 0x0C) ? 5 : 1;
+		const u32 codePos = object->m_codePos;
+		const int current = static_cast<int>(codePos << 12) >> 12;
+		code += step;
+		object->m_codePos = (codePos & 0xFFF00000) | ((current + step) & 0x000FFFFF);
 	}
 
 	watch.Stop();

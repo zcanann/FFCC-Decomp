@@ -376,10 +376,9 @@ update_step:
     goto draw_loop;
 
 advance_segment:
-    if (nextIndex == 0x1b) {
+    nextIndex++;
+    if (nextIndex > 0x1b) {
         nextIndex = 0;
-    } else {
-        nextIndex++;
     }
     if (nextIndex == currentIndex) {
         return;

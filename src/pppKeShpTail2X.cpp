@@ -315,10 +315,9 @@ update_step:
     }
 
 advance_segment:
-    if (nextIndex == lastIndex) {
+    nextIndex++;
+    if (nextIndex > lastIndex) {
         nextIndex = 0;
-    } else {
-        nextIndex++;
     }
     if (nextIndex == curIndex) {
         return;

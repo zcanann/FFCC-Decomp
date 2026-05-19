@@ -1735,7 +1735,7 @@ static void _StreamVolume(int* command)
  * EN Size: 56b
  * JP Address: TODO
  */
-static inline void _StreamPan(int* command)
+static void _StreamPan(int* command)
 {
 	SetStreamPan(RedExecCommandArgGet(command, REDSOUND_STREAM_COMMAND_ID), RedExecCommandArgGet(command, REDSOUND_STREAM_COMMAND_PAN),
 	             RedExecCommandArgGet(command, REDSOUND_STREAM_COMMAND_FADE_TIME));
@@ -3697,7 +3697,7 @@ void CRedDriver::StreamVolume(int streamID, int volume, int frameCount)
  * EN Size: 80b
  * JP Address: TODO
  */
-inline void CRedDriver::StreamPan(int streamID, int pan, int frameCount)
+void CRedDriver::StreamPan(int streamID, int pan, int frameCount)
 {
     _EntryExecCommand(_StreamPan, streamID, pan, frameCount, 0, 0, 0, 0);
 }

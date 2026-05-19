@@ -656,7 +656,7 @@ void SetStreamVolume(int streamID, int volume, int frameCount)
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void SetStreamPan(int streamID, int pan, int frameCount)
+void SetStreamPan(int streamID, int pan, int frameCount)
 {
 	volatile RedStreamDATA* streamData;
 

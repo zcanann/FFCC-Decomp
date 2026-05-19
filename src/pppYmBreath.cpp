@@ -493,6 +493,7 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
 extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pppYmBreathUnkC* offsets)
 {
     YmBreathParams* params = reinterpret_cast<YmBreathParams*>(pYmBreath);
+    YmBreathParticleGroup* groupData;
     _pppMngSt* mngSt;
     int* dataOffsets;
     VColor* color;
@@ -502,7 +503,6 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
     int i;
     int groupIndex;
     int firstParticle;
-    YmBreathParticleGroup* groupData;
     short slotIndex;
     int particleSlot;
     int slotCount;
@@ -660,7 +660,7 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
     int i;
     int k;
     int j;
-    int group;
+    YmBreathParticleGroup* checkGroup;
     YmBreathParticleGroup* groupCursor;
     YmBreathParticleGroup* groupData;
     short groupIndex;
@@ -717,10 +717,10 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
                     int slot;
 
                     slot = 0;
-                    group = (int)vYmBreath->m_groups + (int)foundGroup * 0x5C;
+                    checkGroup = &vYmBreath->m_groups[(int)foundGroup];
                     for (slot = 0; slot < (int)params->m_slotCount; slot++) {
-                        if ((*(signed char*)(*(int*)(group + 4) + slot) != -1) ||
-                            (*(signed char*)(*(int*)(group + 8) + slot) != 1)) {
+                        if ((checkGroup->particleIndices[slot] != -1) ||
+                            (checkGroup->particleStates[slot] != 1)) {
                             found = false;
                             goto group_checked;
                         }

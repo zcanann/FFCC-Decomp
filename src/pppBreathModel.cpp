@@ -483,6 +483,7 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
  */
 extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* pBreathModel, pppBreathModelUnkC* offsets)
 {
+    BreathParticleGroup* groupData;
     _pppMngSt* mngSt;
     int colorOffset;
     int* dataOffsets;
@@ -493,7 +494,6 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
     int i;
     int groupIndex;
     int firstParticle;
-    BreathParticleGroup* groupData;
     short slotIndex;
     int particleSlot;
     int slotCount;
@@ -583,10 +583,10 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
     particleWMat = reinterpret_cast<Mtx*>(work->m_particleWmats);
     groupData = work->m_groups;
     for (groupIndex = 0; groupIndex < (int)pBreathModel->m_groupCount; groupIndex++) {
-        BreathParticleGroup* checkGroup = &work->m_groups[(short)groupIndex];
+        groupCheck = &work->m_groups[(short)groupIndex];
         slotCount = pBreathModel->m_slotCount;
         for (slotIndex = 0; slotIndex < (int)slotCount; slotIndex++) {
-            if ((checkGroup->particleIndices[slotIndex] == -1) || (checkGroup->particleStates[slotIndex] != 1)) {
+            if ((groupCheck->particleIndices[slotIndex] == -1) || (groupCheck->particleStates[slotIndex] != 1)) {
                 ready = 0;
                 goto group_ready;
             }
@@ -646,7 +646,7 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
     int i;
     int k;
     int j;
-    int group;
+    BreathParticleGroup* checkGroup;
     BreathParticleGroup* groupCursor;
     BreathParticleGroup* groupData;
     short groupIndex;
@@ -700,10 +700,10 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
                     int slot;
 
                     slot = 0;
-                    group = (int)vBreathModel->m_groups + (int)foundGroup * 0x5C;
+                    checkGroup = &vBreathModel->m_groups[(int)foundGroup];
                     for (slot = 0; slot < (int)params->m_slotCount; slot++) {
-                        if ((*(signed char*)(*(int*)(group + 4) + slot) != -1) ||
-                            (*(signed char*)(*(int*)(group + 8) + slot) != 1)) {
+                        if ((checkGroup->particleIndices[slot] != -1) ||
+                            (checkGroup->particleStates[slot] != 1)) {
                             found = false;
                             goto group_checked;
                         }

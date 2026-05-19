@@ -1050,7 +1050,7 @@ void CRedEntry::DisplayWaveInfo()
 				} else {
 					OSReport(sRedEntryAMemoryFreeBlockInfoFmt, sRedEntryLogPrefix, aMemoryBlock->m_address,
 					         aMemoryBlock->m_size, reportFreeSize,
-					         ((int)aMemoryBlock - (int)aMemoryBlocks) / REDSOUND_MEMORY_BLOCK_SIZE);
+					         aMemoryBlock - aMemoryBlocks);
 					fflush(__files + 1);
 				}
 

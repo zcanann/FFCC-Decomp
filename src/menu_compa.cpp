@@ -97,10 +97,22 @@ void CMenuPcs::CompaDraw()
 				SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, tex);
 
 				GXColor colors[4];
-				reinterpret_cast<unsigned int*>(colors)[0] = 0xFFFFFFFF;
-				reinterpret_cast<unsigned int*>(colors)[1] = 0xFFFFFFFF;
-				reinterpret_cast<unsigned int*>(colors)[2] = 0xFFFFFFFF;
-				reinterpret_cast<unsigned int*>(colors)[3] = 0xFFFFFFFF;
+				colors[0].r = 0xFF;
+				colors[0].g = 0xFF;
+				colors[0].b = 0xFF;
+				colors[0].a = 0xFF;
+				colors[1].r = 0xFF;
+				colors[1].g = 0xFF;
+				colors[1].b = 0xFF;
+				colors[1].a = 0xFF;
+				colors[2].r = 0xFF;
+				colors[2].g = 0xFF;
+				colors[2].b = 0xFF;
+				colors[2].a = 0xFF;
+				colors[3].r = 0xFF;
+				colors[3].g = 0xFF;
+				colors[3].b = 0xFF;
+				colors[3].a = 0xFF;
 				GXSetChanMatColor(GX_COLOR0A0, colors[0]);
 
 				float fillW = alpha * w;
@@ -131,10 +143,22 @@ void CMenuPcs::CompaDraw()
 
 				if (fillW > FLOAT_80332FF8 && fillW < w) {
 					GXColor fadeColors[4];
-					reinterpret_cast<unsigned int*>(fadeColors)[0] = 0xFFFFFF00;
-					reinterpret_cast<unsigned int*>(fadeColors)[1] = 0xFFFFFF00;
-					reinterpret_cast<unsigned int*>(fadeColors)[2] = 0xFFFFFF00;
-					reinterpret_cast<unsigned int*>(fadeColors)[3] = 0xFFFFFF00;
+					fadeColors[0].r = 0xFF;
+					fadeColors[0].g = 0xFF;
+					fadeColors[0].b = 0xFF;
+					fadeColors[0].a = 0;
+					fadeColors[1].r = 0xFF;
+					fadeColors[1].g = 0xFF;
+					fadeColors[1].b = 0xFF;
+					fadeColors[1].a = 0;
+					fadeColors[2].r = 0xFF;
+					fadeColors[2].g = 0xFF;
+					fadeColors[2].b = 0xFF;
+					fadeColors[2].a = 0;
+					fadeColors[3].r = 0xFF;
+					fadeColors[3].g = 0xFF;
+					fadeColors[3].b = 0xFF;
+					fadeColors[3].a = 0;
 					float remainW = (static_cast<float>(DOUBLE_80333008) / static_cast<float>(entry->duration)) * w;
 					if (tex == 0x51) {
 						int yStep = static_cast<int>(y);

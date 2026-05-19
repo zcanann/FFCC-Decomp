@@ -2571,12 +2571,12 @@ CChara::CNode::CRefData::CRefData()
 	s8* raw = reinterpret_cast<s8*>(this);
 	s8 invalidIndex = -1;
 
-	raw[0x8D] = invalidIndex;
+	signedRaw[0x8D] = invalidIndex;
 	raw[0x8E] = 0;
 	raw[0x8A] = 0;
 	memset(raw + 0x6A, 0, 0x20);
 	*reinterpret_cast<float*>(raw + 0x60) = FLOAT_803301b0;
-	raw[0x90] = invalidIndex;
+	signedRaw[0x90] = invalidIndex;
 }
 
 /*

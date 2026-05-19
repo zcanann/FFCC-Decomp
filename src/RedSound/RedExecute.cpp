@@ -153,7 +153,7 @@ s16 t_PanningDataR[REDSOUND_PAN_TABLE_COUNT] = {
 };
 
 static u8 m_RandomIndex;
-static RedReverbDATA* volatile p_ReverbData;
+static RedReverbDATA* p_ReverbData;
 #define RedReverbDataGetBegin() (p_ReverbData)
 #define RedReverbDataSetBegin(data) (p_ReverbData = (data))
 #define RedReverbDataGet(bank) (p_ReverbData + ((bank) & REDSOUND_REVERB_BANK_MASK))
@@ -172,7 +172,7 @@ static RedReverbSize* p_ReverbSize;
     (RedReverbSizeGet()->m_requested = RedReverbSizeGet()->m_aligned = 0)
 volatile u32 m_ChangeStatus;
 u32 m_TerminateNote[REDSOUND_TERMINATE_NOTE_WORD_COUNT] = { 0 };
-static RedKeyOnDATA* volatile p_SkipKeyOn;
+static RedKeyOnDATA* p_SkipKeyOn;
 #define RedSkipKeyOnDataGet() (p_SkipKeyOn)
 #define RedSkipKeyOnDataSet(data) (p_SkipKeyOn = (data))
 static const float s_ReverbTimeScale = 1000.0f;
@@ -214,10 +214,10 @@ enum RedExecuteSmallDataLayout {
 struct RedExecuteSmallDataState {
     u8 m_RandomIndex;
     u8 m_RandomIndexAlignPadding[REDSOUND_EXECUTE_SBSS_RANDOM_PAD_SIZE];
-    RedReverbDATA* volatile p_ReverbData;
+    RedReverbDATA* p_ReverbData;
     RedReverbSize* p_ReverbSize;
     volatile u32 m_ChangeStatus;
-    RedKeyOnDATA* volatile p_SkipKeyOn;
+    RedKeyOnDATA* p_SkipKeyOn;
 };
 
 enum RedExecuteSmallDataOffset {

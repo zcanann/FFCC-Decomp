@@ -669,11 +669,8 @@ int CBound::CheckFrustum0(CBound& outBound)
     float maxInit;
     float minInit;
     unsigned char clipMask;
-    int zIndex;
     unsigned int insideMask;
-    int yIndex;
     unsigned int outsideMask;
-    int xIndex;
     float viewZ;
     float zero;
     Vec vertex;
@@ -690,18 +687,15 @@ int CBound::CheckFrustum0(CBound& outBound)
 
     if ((s_f_vpos.x <= m_max.x) && (s_f_vpos.y <= m_max.y) && (s_f_vpos.z <= m_max.z) &&
         (s_f_vpos.x >= m_min.x) && (s_f_vpos.y >= m_min.y) && (s_f_vpos.z >= m_min.z)) {
-        xIndex = 0;
-        do {
+        for (int xIndex = 0; xIndex < 2; xIndex++) {
             if (xIndex == 0) {
                 vertex.x = m_min.x;
             } else {
                 vertex.x = m_max.x;
             }
-            yIndex = 0;
-            do {
+            for (int yIndex = 0; yIndex < 2; yIndex++) {
                 vertex.y = (yIndex == 0) ? m_min.y : m_max.y;
-                zIndex = 0;
-                do {
+                for (int zIndex = 0; zIndex < 2; zIndex++) {
                     vertex.z = (zIndex == 0) ? m_min.z : m_max.z;
                     PSMTXMultVec(s_f_lvmtx, &vertex, &transformed);
 
@@ -711,30 +705,24 @@ int CBound::CheckFrustum0(CBound& outBound)
                     outBound.m_max.x = outBound.m_max.x > transformed.x ? outBound.m_max.x : transformed.x;
                     outBound.m_max.y = outBound.m_max.y > transformed.y ? outBound.m_max.y : transformed.y;
                     outBound.m_max.z = outBound.m_max.z > transformed.z ? outBound.m_max.z : transformed.z;
-                    zIndex = zIndex + 1;
-                } while (zIndex < 2);
-                yIndex = yIndex + 1;
-            } while (yIndex < 2);
-            xIndex = xIndex + 1;
-        } while (xIndex < 2);
+                }
+            }
+        }
         return 1;
     }
 
     zero = 0.0;
     insideMask = 0xF;
     outsideMask = 0;
-    xIndex = 0;
-    do {
+    for (int xIndex = 0; xIndex < 2; xIndex++) {
         if (xIndex == 0) {
             vertex.x = m_min.x;
         } else {
             vertex.x = m_max.x;
         }
-        yIndex = 0;
-        do {
+        for (int yIndex = 0; yIndex < 2; yIndex++) {
             vertex.y = (yIndex == 0) ? m_min.y : m_max.y;
-            zIndex = 0;
-            do {
+            for (int zIndex = 0; zIndex < 2; zIndex++) {
                 vertex.z = (zIndex == 0) ? m_min.z : m_max.z;
                 PSMTXMultVec(s_f_lvmtx, &vertex, &transformed);
 
@@ -775,14 +763,11 @@ int CBound::CheckFrustum0(CBound& outBound)
                         clipMask = clipMask | 8;
                     }
                 }
-                zIndex = zIndex + 1;
                 insideMask = insideMask & clipMask;
                 outsideMask = outsideMask | clipMask;
-            } while (zIndex < 2);
-            yIndex = yIndex + 1;
-        } while (yIndex < 2);
-        xIndex = xIndex + 1;
-    } while (xIndex < 2);
+            }
+        }
+    }
 
     if ((unsigned char)insideMask != 0) {
         return 0;

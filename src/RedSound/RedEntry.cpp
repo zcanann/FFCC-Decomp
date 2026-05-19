@@ -1313,7 +1313,7 @@ RedSeSepHEAD* CRedEntry::SetSeSepData(RedSeSepHEAD* seSepHead)
 		}
 	}
 
-	return reinterpret_cast<RedSeSepHEAD*>(entryAddress);
+	return RedSeSepHeadFromBankAddress(entryAddress);
 }
 /*
  * --INFO--
@@ -1817,7 +1817,7 @@ RedMusicHEAD* CRedEntry::SetMusicData(RedMusicHEAD* musicHead)
 		}
 	}
 
-	return reinterpret_cast<RedMusicHEAD*>(entryAddress);
+	return RedMusicHeadFromBankAddress(entryAddress);
 }
 /*
  * --INFO--

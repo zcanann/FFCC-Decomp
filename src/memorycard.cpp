@@ -11,7 +11,7 @@
 #include "dolphin/card.h"
 #include "string.h"
 
-extern "C" int sprintf(char* s, const char* format, const char* arg0, char* arg1);
+extern "C" int sprintf(char* s, const char* format, ...);
 
 class CardConst
 {

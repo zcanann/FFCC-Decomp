@@ -487,7 +487,7 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 			RedStreamFile* streamFile;
 
 			adpcmSampleOffset = REDSOUND_STREAM_FILE_AUDIO_OFFSET;
-			streamFile = reinterpret_cast<RedStreamFile*>(streamHeader);
+			streamFile = RedStreamFileFromHeader(streamHeader);
 			adpcmHeader = RedStreamFileGetAdpcm(streamFile, REDSOUND_STREAM_LEFT_CHANNEL);
 			adpcmHeader->m_data.pred_scale = RedStreamFileGetSampleByte(streamFile, adpcmSampleOffset);
 			adpcmHeader->m_data.yn1 = adpcmHeader->m_data.yn2 = 0;

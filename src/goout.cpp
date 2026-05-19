@@ -241,9 +241,9 @@ void CGoOutMenu::SetMemCardProc(unsigned char)
  * Address:	TODO
  * Size:	TODO
  */
-void CGoOutMenu::SetMemCardSaveBuff(void*)
+void CGoOutMenu::SetMemCardSaveBuff(void* buffer)
 {
-	// TODO
+	field_0x8 = reinterpret_cast<int>(buffer);
 }
 
 /*
@@ -251,9 +251,9 @@ void CGoOutMenu::SetMemCardSaveBuff(void*)
  * Address:	TODO
  * Size:	TODO
  */
-void CGoOutMenu::GetMemCardResult()
+int CGoOutMenu::GetMemCardResult()
 {
-	// TODO
+	return field_0x4;
 }
 
 /*

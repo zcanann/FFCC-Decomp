@@ -2568,8 +2568,8 @@ void CChara::CNode::CalcBind(CChara::CModel* model)
  */
 CChara::CNode::CRefData::CRefData()
 {
-	u8* raw = reinterpret_cast<u8*>(this);
-	u16 invalidIndex = 0xFF;
+	s8* raw = reinterpret_cast<s8*>(this);
+	s8 invalidIndex = -1;
 
 	raw[0x8D] = invalidIndex;
 	raw[0x8E] = 0;

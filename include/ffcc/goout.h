@@ -26,7 +26,7 @@ public:
     void SetMemCardSlot(int, int);
     void SetMemCardProc(unsigned char);
     void SetMemCardSaveBuff(void*);
-    void GetMemCardResult();
+    int GetMemCardResult();
     void CalcMemCardProc();
     int SetMemCardError();
     void SetMenu(short, long);

@@ -2579,7 +2579,7 @@ int CRedDriver::GetProgramTime()
  * JP Address: TODO
  * JP Size: TODO
  */
-inline int CRedDriver::GetMasterTime()
+int CRedDriver::GetMasterTime()
 {
     return RedMasterTimeGet();
 }
@@ -3011,7 +3011,7 @@ void CRedDriver::SetMusicPhraseStop(int stop)
  * JP Address: TODO
  * JP Size: TODO
  */
-inline int CRedDriver::CheckMusicEntry(int musicID)
+int CRedDriver::CheckMusicEntry(int musicID)
 {
     return c_RedEntry.SearchMusicSequence(musicID);
 }
@@ -3025,7 +3025,7 @@ inline int CRedDriver::CheckMusicEntry(int musicID)
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CRedDriver::SetMusicFastSpeed(int speed)
+void CRedDriver::SetMusicFastSpeed(int speed)
 {
     RedMusicFastSpeedSet(speed);
 }
@@ -3039,7 +3039,7 @@ inline void CRedDriver::SetMusicFastSpeed(int speed)
  * JP Address: TODO
  * JP Size: TODO
  */
-inline int CRedDriver::CheckMusicPhraseStop()
+int CRedDriver::CheckMusicPhraseStop()
 {
     return RedMusicPhraseStopGet();
 }
@@ -3053,7 +3053,7 @@ inline int CRedDriver::CheckMusicPhraseStop()
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CRedDriver::DisplayMusicInfo()
+void CRedDriver::DisplayMusicInfo()
 {
     c_RedEntry.DisplayMusicInfo();
 }
@@ -3181,7 +3181,7 @@ int CRedDriver::ReentrySeSepData(int id)
  * JP Address: TODO
  * JP Size: TODO
  */
-inline int CRedDriver::CheckSeSepEntry(int id)
+int CRedDriver::CheckSeSepEntry(int id)
 {
     return c_RedEntry.SearchSeSepSequence(id);
 }
@@ -3503,7 +3503,7 @@ void CRedDriver::DisplaySePlayInfo()
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CRedDriver::ClearSePlayLine()
+void CRedDriver::ClearSePlayLine()
 {
 	RedSoundCONTROL* control = RedSoundControlGet(REDSOUND_CONTROL_SE);
 	RedTrackDATA* track = control->m_tracks;
@@ -3843,7 +3843,7 @@ inline RedWaveHeadWD* CRedDriver::GetWaveInfo(int waveID)
  * JP Address: TODO
  * JP Size: TODO
  */
-inline int CRedDriver::CheckWaveEntry(int waveID)
+int CRedDriver::CheckWaveEntry(int waveID)
 {
     return c_RedEntry.SearchWaveSequence(waveID);
 }
@@ -3871,7 +3871,7 @@ void CRedDriver::DisplayWaveInfo()
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CRedDriver::DisplayMMemoryInfo()
+void CRedDriver::DisplayMMemoryInfo()
 {
     c_RedEntry.DisplayMMemoryInfo();
 }
@@ -3913,7 +3913,7 @@ inline void CRedDriver::SetReverb(int bank, int kind, int* reverbParams)
  * JP Address: TODO
  * JP Size: TODO
  */
-inline RedReverbSize* CRedDriver::GetReverbInfo()
+RedReverbSize* CRedDriver::GetReverbInfo()
 {
     return ::GetReverbInfo();
 }
@@ -3927,7 +3927,7 @@ inline RedReverbSize* CRedDriver::GetReverbInfo()
  * JP Address: TODO
  * JP Size: TODO
  */
-inline RedReverbDepth* CRedDriver::GetReverbDepth()
+RedReverbDepth* CRedDriver::GetReverbDepth()
 {
     return p_ReverbDepth;
 }
@@ -4173,7 +4173,7 @@ inline int CRedDriver::WavePitchCompute(int key, int pitch)
  * JP Address: TODO
  * JP Size: TODO
  */
-inline RedReverbModeData* CRedDriver::GetReverbModeTable(int mode)
+RedReverbModeData* CRedDriver::GetReverbModeTable(int mode)
 {
     mode &= REDSOUND_REVERB_MODE_INDEX_MASK;
     return RedReverbModeDataGet(mode);

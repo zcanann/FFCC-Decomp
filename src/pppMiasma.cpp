@@ -34,6 +34,21 @@ union PackedMiasmaColor {
     u8 bytes[4];
 };
 
+struct MiasmaFrameWork {
+    s16 m_position[4];
+    s16 m_velocity[4];
+    s16 m_accel[4];
+};
+
+struct MiasmaColorWork {
+    u8 m_pad[8];
+    GXColor m_color;
+};
+
+struct MiasmaRadiusWork {
+    float m_scale;
+};
+
 static inline float CalcSphereRadius(Vec* vertices, u16 count)
 {
     float radius = FLOAT_80331930;
@@ -58,38 +73,38 @@ static inline float CalcSphereRadius(Vec* vertices, u16 count)
  */
 void pppFrameMiasma(pppMiasma* pppMiasma, pppMiasmaFrameStep* param_2, _pppCtrlTable* param_3)
 {
-    s16* work;
+    MiasmaFrameWork* work;
 
     if (gPppCalcDisabled != 0) {
         return;
     }
 
-    work = (s16*)((u8*)pppMiasma + 0x80 + param_3->m_serializedDataOffsets[2]);
-    work[4] = work[4] + work[8];
-    work[0] = work[0] + work[4];
-    work[5] = work[5] + work[9];
-    work[1] = work[1] + work[5];
-    work[6] = work[6] + work[10];
-    work[2] = work[2] + work[6];
-    work[7] = work[7] + work[11];
-    work[3] = work[3] + work[7];
+    work = (MiasmaFrameWork*)((u8*)pppMiasma + 0x80 + param_3->m_serializedDataOffsets[2]);
+    work->m_velocity[0] = work->m_velocity[0] + work->m_accel[0];
+    work->m_position[0] = work->m_position[0] + work->m_velocity[0];
+    work->m_velocity[1] = work->m_velocity[1] + work->m_accel[1];
+    work->m_position[1] = work->m_position[1] + work->m_velocity[1];
+    work->m_velocity[2] = work->m_velocity[2] + work->m_accel[2];
+    work->m_position[2] = work->m_position[2] + work->m_velocity[2];
+    work->m_velocity[3] = work->m_velocity[3] + work->m_accel[3];
+    work->m_position[3] = work->m_position[3] + work->m_velocity[3];
 
     if (pppMiasma->m_graphId != param_2->m_graphId) {
         return;
     }
 
-    work[0] = work[0] + param_2->m_addPosX;
-    work[1] = work[1] + param_2->m_addPosY;
-    work[2] = work[2] + param_2->m_addPosZ;
-    work[3] = work[3] + param_2->m_addPosW;
-    work[4] = work[4] + param_2->m_addVelX;
-    work[5] = work[5] + param_2->m_addVelY;
-    work[6] = work[6] + param_2->m_addVelZ;
-    work[7] = work[7] + param_2->m_addVelW;
-    work[8] = work[8] + param_2->m_addAccX;
-    work[9] = work[9] + param_2->m_addAccY;
-    work[10] = work[10] + param_2->m_addAccZ;
-    work[11] = work[11] + param_2->m_addAccW;
+    work->m_position[0] = work->m_position[0] + param_2->m_addPosX;
+    work->m_position[1] = work->m_position[1] + param_2->m_addPosY;
+    work->m_position[2] = work->m_position[2] + param_2->m_addPosZ;
+    work->m_position[3] = work->m_position[3] + param_2->m_addPosW;
+    work->m_velocity[0] = work->m_velocity[0] + param_2->m_addVelX;
+    work->m_velocity[1] = work->m_velocity[1] + param_2->m_addVelY;
+    work->m_velocity[2] = work->m_velocity[2] + param_2->m_addVelZ;
+    work->m_velocity[3] = work->m_velocity[3] + param_2->m_addVelW;
+    work->m_accel[0] = work->m_accel[0] + param_2->m_addAccX;
+    work->m_accel[1] = work->m_accel[1] + param_2->m_addAccY;
+    work->m_accel[2] = work->m_accel[2] + param_2->m_addAccZ;
+    work->m_accel[3] = work->m_accel[3] + param_2->m_addAccW;
 }
 
 /*
@@ -156,9 +171,9 @@ void pppConstructMiasma(pppMiasma* pppMiasma, _pppCtrlTable* param_2)
 void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtrlTable* param_3)
 {
     pppModelSt* model;
-    s16* work;
-    u8* colorData;
-    u8* radiusScaleData;
+    MiasmaFrameWork* work;
+    MiasmaColorWork* colorWork;
+    MiasmaRadiusWork* radiusWork;
     pppCVECTOR drawColor;
     PackedMiasmaColor packedWork;
     int textureIndex;
@@ -187,6 +202,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
     GXTexObj backI4Tex;
     GXTexObj backRgba8Tex;
     GXTexObj backRgba8Tex2;
+    CGraphic* graphic;
     Mtx44 screenMtx;
     Mtx firstLocalMtx;
     Mtx firstScaleMtx;
@@ -196,9 +212,9 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
 
     Graphic.SetDrawDoneDebugData(0x31);
 
-    work = (s16*)((u8*)pppMiasma + 0x80 + param_3->m_serializedDataOffsets[2]);
-    colorData = (u8*)pppMiasma + 0x80 + param_3->m_serializedDataOffsets[1];
-    radiusScaleData = (u8*)pppMiasma + 0x80 + param_3->m_serializedDataOffsets[3];
+    work = (MiasmaFrameWork*)((u8*)pppMiasma + 0x80 + param_3->m_serializedDataOffsets[2]);
+    colorWork = (MiasmaColorWork*)((u8*)pppMiasma + 0x80 + param_3->m_serializedDataOffsets[1]);
+    radiusWork = (MiasmaRadiusWork*)((u8*)pppMiasma + 0x80 + param_3->m_serializedDataOffsets[3]);
 
     textureIndex = 0;
     model = (pppModelSt*)(((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[param_2->m_dataValIndex]);
@@ -208,14 +224,11 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
         param_2->m_payload[0x1E] = 0xFE;
     }
 
-    packedColor.bytes[0] = colorData[8];
-    packedColor.bytes[1] = colorData[9];
-    packedColor.bytes[2] = colorData[10];
-    packedColor.bytes[3] = colorData[11];
-    packedWork.bytes[0] = (u8)(work[0] >> 7);
-    packedWork.bytes[1] = (u8)(work[1] >> 7);
-    packedWork.bytes[2] = (u8)(work[2] >> 7);
-    packedWork.bytes[3] = (u8)(work[3] >> 7);
+    packedColor.color = colorWork->m_color;
+    packedWork.bytes[0] = (u8)(work->m_position[0] >> 7);
+    packedWork.bytes[1] = (u8)(work->m_position[1] >> 7);
+    packedWork.bytes[2] = (u8)(work->m_position[2] >> 7);
+    packedWork.bytes[3] = (u8)(work->m_position[3] >> 7);
 
     i4TexSize = GXGetTexBufferSize((int)FLOAT_80331928, (int)FLOAT_8033192c, (GXTexFmt)6, GX_FALSE, 0);
     rgba8TexSize = GXGetTexBufferSize((int)FLOAT_80331928, (int)FLOAT_8033192c, (GXTexFmt)0x28, GX_FALSE, 0);
@@ -237,7 +250,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
         maxRadius = FLOAT_80331934;
     }
 
-    scaledRadius = maxRadius * *(float*)radiusScaleData;
+    scaledRadius = maxRadius * radiusWork->m_scale;
     if ((s32)Game.m_currentSceneId != 7) {
         Game.unkFloat_0xca10 = scaledRadius;
     }
@@ -251,6 +264,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
     scissorHeight = (u32)FLOAT_8033192c;
     scissorWidth = (u32)FLOAT_80331928;
     yStep = FLOAT_8033192c;
+    graphic = &Graphic;
 
     for (slice = 0; slice < 2; slice++) {
         yPos = (float)slice * yStep;
@@ -338,9 +352,9 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
 
         Graphic.SetDrawDoneDebugData(0x34);
         pppDrawMesh(model, pppMiasma->m_meshPoints, 0);
-        Graphic.SetDrawDoneDebugData(0x35);
+        graphic->SetDrawDoneDebugData(0x35);
 
-        Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &backRgba8Tex, 0, yOffset, texWidth, texHeight, i4TexSize,
+        graphic->GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &backRgba8Tex, 0, yOffset, texWidth, texHeight, i4TexSize,
                                    GX_LINEAR, GX_TF_RGBA8, 0);
         if (param_2->m_payload[0x1D] != 0) {
             if (isCameraInside) {
@@ -416,7 +430,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
                                        i4TexSize + rgba8TexSize, GX_LINEAR, GX_TF_RGBA8, 0);
         }
 
-        Graphic.SetViewport();
+        graphic->SetViewport();
         gUtil.RenderTextureQuad(FLOAT_8033193c, yPos, FLOAT_80331928, FLOAT_8033192c, &backI4Tex, 0, 0,
                                        0, (GXBlendFactor)4, (GXBlendFactor)5);
         gUtil.BeginQuadEnv();

@@ -161,6 +161,7 @@ void CFile::DrawError(DVDFileInfo& info, int errorCode)
 
     while (true)
     {
+retry:
         if ((unsigned int)System.m_execParam >= 1)
         {
             System.Printf(const_cast<char*>(s_drawErrorFmt), errorCode);
@@ -319,16 +320,21 @@ void CFile::DrawError(DVDFileInfo& info, int errorCode)
         Graphic._WaitDrawDone(const_cast<char*>(s_fileCpp), 0x35B);
         m_fatalDiskErrorFlag = 0;
 
-        while (status == 1)
+        while (true)
         {
+            if (status != 1)
+            {
+                if (status == 0x0B || ((u32)(status - 4) <= 2U) || status == -1)
+                {
+                    errorCode = status;
+                    goto retry;
+                }
+
+                break;
+            }
+
             VIWaitForRetrace();
             status = DVDGetCommandBlockStatus(&info.cb);
-        }
-
-        if (status == 0x0B || ((u32)(status - 4) <= 2U) || status == -1)
-        {
-            errorCode = status;
-            continue;
         }
 
         break;

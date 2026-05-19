@@ -659,7 +659,7 @@ void CDbgMenuPcs::drawFont(int flags, int x, int y, char* text)
 {
 	changeVtxFmt(0);
 
-	GXColor mainColor = {0xFF, 0xFF, 0xFF, 0xFF};
+	GXColor mainColor = *reinterpret_cast<const GXColor*>(&DAT_80331C8C);
 	if ((flags & 2) != 0) {
 		mainColor.b = 0;
 		mainColor.g = 0;

@@ -18,13 +18,18 @@ extern "C" void SetParticleWorkTrace__13CFlatRuntime2FPQ212CFlatRuntime7CObject(
 extern "C" void SetParticleWorkPos__13CFlatRuntime2FR3Vecf(void*, Vec&, float);
 extern "C" void SetParticleWorkSe__13CFlatRuntime2Fiii(void*, int, int, int);
 extern "C" void PutParticleWork__13CFlatRuntime2Fv(void*);
-extern const float FLOAT_80331BD0 = 1.0f;
-extern const float FLOAT_80331BD4 = 0.0f;
-extern const float FLOAT_80331BD8 = 3.1415927f;
+const float FLOAT_80331BD0 = 1.0f;
+const float FLOAT_80331BD4 = 0.0f;
+const float FLOAT_80331BD8 = 3.1415927f;
 
 static inline float LoadFloat(const float& value)
 {
 	return value;
+}
+
+static inline Vec* ConstructVec(Vec& dst, const Vec& src)
+{
+	return reinterpret_cast<Vec*>(__ct__7CVectorFRC3Vec(reinterpret_cast<CVector*>(&dst), src));
 }
 
 /*
@@ -225,12 +230,11 @@ void CGPrgObj::dstTargetRot(CGPrgObj* target)
 	Vec targetPos;
 	Vec basePos;
 	Vec deltaPos;
-	CVector* baseVec;
 
-	__ct__7CVectorFRC3Vec(reinterpret_cast<CVector*>(&targetPos), target->m_worldPosition);
-	baseVec = __ct__7CVectorFRC3Vec(reinterpret_cast<CVector*>(&basePos), m_worldPosition);
+	ConstructVec(targetPos, target->m_worldPosition);
+	Vec* baseVec = ConstructVec(basePos, m_worldPosition);
 	__ct__7CVectorFv(reinterpret_cast<CVector*>(&deltaPos));
-	PSVECSubtract(reinterpret_cast<Vec*>(baseVec), &targetPos, &deltaPos);
+	PSVECSubtract(baseVec, &targetPos, &deltaPos);
 	deltaX = deltaPos.x;
 	deltaZ = deltaPos.z;
 	if ((deltaX == FLOAT_80331BD4) || (deltaZ == FLOAT_80331BD4)) {
@@ -260,12 +264,11 @@ void CGPrgObj::rotTarget(CGPrgObj* target)
 	Vec targetPos;
 	Vec basePos;
 	Vec deltaPos;
-	CVector* baseVec;
 
-	__ct__7CVectorFRC3Vec(reinterpret_cast<CVector*>(&targetPos), target->m_worldPosition);
-	baseVec = __ct__7CVectorFRC3Vec(reinterpret_cast<CVector*>(&basePos), m_worldPosition);
+	ConstructVec(targetPos, target->m_worldPosition);
+	Vec* baseVec = ConstructVec(basePos, m_worldPosition);
 	__ct__7CVectorFv(reinterpret_cast<CVector*>(&deltaPos));
-	PSVECSubtract(reinterpret_cast<Vec*>(baseVec), &targetPos, &deltaPos);
+	PSVECSubtract(baseVec, &targetPos, &deltaPos);
 	deltaX = deltaPos.x;
 	deltaZ = deltaPos.z;
 	if ((deltaX == FLOAT_80331BD4) || (deltaZ == FLOAT_80331BD4)) {
@@ -293,12 +296,11 @@ float CGPrgObj::getTargetRot(CGPrgObj* target)
 	Vec basePos;
 	Vec targetPos;
 	Vec deltaPos;
-	CVector* baseVec;
 
-	__ct__7CVectorFRC3Vec(reinterpret_cast<CVector*>(&targetPos), target->m_worldPosition);
-	baseVec = __ct__7CVectorFRC3Vec(reinterpret_cast<CVector*>(&basePos), m_worldPosition);
+	ConstructVec(targetPos, target->m_worldPosition);
+	Vec* baseVec = ConstructVec(basePos, m_worldPosition);
 	__ct__7CVectorFv(reinterpret_cast<CVector*>(&deltaPos));
-	PSVECSubtract(reinterpret_cast<Vec*>(baseVec), &targetPos, &deltaPos);
+	PSVECSubtract(baseVec, &targetPos, &deltaPos);
 	deltaX = deltaPos.x;
 	deltaZ = deltaPos.z;
 	if ((deltaX == FLOAT_80331BD4) || (deltaZ == FLOAT_80331BD4)) {
@@ -416,7 +418,7 @@ int CGPrgObj::playSe3D(int seNo, int volume, int dist, int pitch, Vec* pos)
 	return handle;
 }
 
-extern const float FLOAT_80331BE8 = -1.0f;
+const float FLOAT_80331BE8 = -1.0f;
 
 /*
  * --INFO--

@@ -97,14 +97,6 @@ void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 int GetTextureFromRSD__FiP9_pppEnvSt(int, _pppEnvSt*);
 void InitTexObj__8CTextureFv(void*);
 void genParaboloidMap__FPvPUlUs9_GXVtxFmt(void*, unsigned long*, unsigned short, GXVtxFmt);
-void BeginQuadEnv__5CUtilFv(void*);
-void EndQuadEnv__5CUtilFv(void*);
-void SetVtxFmt_POS_CLR_TEX__5CUtilFv(void*);
-void ReWriteDisplayList__5CUtilFPvUlUl(void*, void*, unsigned long, unsigned long);
-void RenderTextureQuad__5CUtilFffffP9_GXTexObjP5Vec2dP5Vec2dP8_GXColor14_GXBlendFactor14_GXBlendFactor(
-    CUtil* util, float x0, float y0, float x1, float y1, _GXTexObj* texObj, Vec2d* uv0, Vec2d* uv1, _GXColor* color,
-    _GXBlendFactor srcFactor, _GXBlendFactor dstFactor);
-void RenderQuad__5CUtilF3Vec3Vec8_GXColorP5Vec2dP5Vec2d(void*, Vec*, Vec*, GXColor, Vec2d*, Vec2d*);
 }
 
 static int CreateWaterMesh(Vec* param_1, Vec* param_2, Vec2d* param_3, unsigned short* param_4, float param_5);
@@ -326,14 +318,6 @@ void pppDestructMana2(pppMana2* pppMana2, pppMana2UnkC* param_2)
         *(u32*)(model + 0xFC) = 0;
     }
 
-    if (work[8] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[8]);
-        work[8] = 0;
-    }
-    if (work[9] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[9]);
-        work[9] = 0;
-    }
     if (work[10] != 0) {
         pppHeapUseRate((CMemory::CStage*)work[10]);
         work[10] = 0;
@@ -349,6 +333,10 @@ void pppDestructMana2(pppMana2* pppMana2, pppMana2UnkC* param_2)
     if (work[13] != 0) {
         pppHeapUseRate((CMemory::CStage*)work[13]);
         work[13] = 0;
+    }
+    if (work[8] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[8]);
+        work[8] = 0;
     }
     if (work[15] != 0) {
         pppHeapUseRate((CMemory::CStage*)work[15]);
@@ -382,6 +370,14 @@ void pppDestructMana2(pppMana2* pppMana2, pppMana2UnkC* param_2)
         pppHeapUseRate((CMemory::CStage*)work[23]);
         work[23] = 0;
     }
+    if (work[29] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[29]);
+        work[29] = 0;
+    }
+    if (work[9] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[9]);
+        work[9] = 0;
+    }
     if (work[17] != 0) {
         pppHeapUseRate((CMemory::CStage*)work[17]);
         work[17] = 0;
@@ -401,10 +397,6 @@ void pppDestructMana2(pppMana2* pppMana2, pppMana2UnkC* param_2)
     if (work[28] != 0) {
         pppHeapUseRate((CMemory::CStage*)work[28]);
         work[28] = 0;
-    }
-    if (work[29] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[29]);
-        work[29] = 0;
     }
     if (work[30] != 0) {
         pppHeapUseRate((CMemory::CStage*)work[30]);
@@ -641,7 +633,7 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* para
                     work[0x3A] = dlInfo[0];
                     memcpy((void*)*(u32*)(work[0x18] + dlOffset), (void*)dlInfo[1], dlInfo[0]);
                     DCFlushRange((void*)*(u32*)(work[0x18] + dlOffset), dlInfo[0]);
-                    ReWriteDisplayList__5CUtilFPvUlUl(&gUtil, (void*)*(u32*)(work[0x18] + dlOffset), dlInfo[0], 1);
+                    gUtil.ReWriteDisplayList((void*)*(u32*)(work[0x18] + dlOffset), dlInfo[0], 1);
                     dlOffset -= 4;
                     dlInfo += 3;
                 }
@@ -837,10 +829,9 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
             C_MTXLookAt(lookAtMtx, (Point3d*)&centerPos, &cameraUp, (Point3d*)&cameraPos);
             Graphic.SetViewport();
             GXSetScissor(0, 0, 0x280, 0x1C0);
-            RenderTextureQuad__5CUtilFffffP9_GXTexObjP5Vec2dP5Vec2dP8_GXColor14_GXBlendFactor14_GXBlendFactor(
-                &gUtil, LoadFloat(FLOAT_80331898), LoadFloat(FLOAT_80331898), LoadFloat(FLOAT_803318c8),
-                LoadFloat(FLOAT_803318c8),
-                (GXTexObj*)baseParaboloidTexObjs, 0, 0, 0, (_GXBlendFactor)4, (_GXBlendFactor)5);
+            gUtil.RenderTextureQuad(LoadFloat(FLOAT_80331898), LoadFloat(FLOAT_80331898), LoadFloat(FLOAT_803318c8),
+                                    LoadFloat(FLOAT_803318c8), (GXTexObj*)baseParaboloidTexObjs, 0, 0, 0,
+                                    (_GXBlendFactor)4, (_GXBlendFactor)5);
             baseParaboloidTexObjs += 0x20;
         }
 
@@ -849,10 +840,10 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
         GXSetScissor(0, 0, 0x280, 0x1C0);
         GXSetZTexture((GXZTexOp)2, (_GXTexFmt)0x16, 0);
         GXSetColorUpdate(GX_FALSE);
-        BeginQuadEnv__5CUtilFv(&gUtil);
+        gUtil.BeginQuadEnv();
         GXSetZMode(GX_TRUE, (_GXCompare)7, GX_TRUE);
         GXSetZCompLoc(GX_FALSE);
-        SetVtxFmt_POS_CLR_TEX__5CUtilFv(&gUtil);
+        gUtil.SetVtxFmt_POS_CLR_TEX();
         _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 4);
         _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 0xFF);
         _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(
@@ -874,16 +865,15 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
         quadColor.g = 0xFF;
         quadColor.b = 0xFF;
         quadColor.a = 0;
-        RenderQuad__5CUtilF3Vec3Vec8_GXColorP5Vec2dP5Vec2d(&gUtil, &quadMin, &quadMax, quadColor, 0, 0);
-        EndQuadEnv__5CUtilFv(&gUtil);
+        gUtil.RenderQuad(quadMin, quadMax, quadColor, 0, 0);
+        gUtil.EndQuadEnv();
         GXSetZTexture((GXZTexOp)0, (_GXTexFmt)0x11, 0);
         GXSetColorUpdate(GX_TRUE);
         GXSetAlphaUpdate(GX_TRUE);
         GXSetZCompLoc(GX_TRUE);
-        RenderTextureQuad__5CUtilFffffP9_GXTexObjP5Vec2dP5Vec2dP8_GXColor14_GXBlendFactor14_GXBlendFactor(
-            &gUtil, LoadFloat(FLOAT_80331898), LoadFloat(FLOAT_80331898), LoadFloat(FLOAT_803318c8),
-            LoadFloat(FLOAT_803318c8), &sceneTexObj, 0, 0, 0,
-            (_GXBlendFactor)4, (_GXBlendFactor)5);
+        gUtil.RenderTextureQuad(LoadFloat(FLOAT_80331898), LoadFloat(FLOAT_80331898), LoadFloat(FLOAT_803318c8),
+                                LoadFloat(FLOAT_803318c8), &sceneTexObj, 0, 0, 0, (_GXBlendFactor)4,
+                                (_GXBlendFactor)5);
         *((u8*)work + 0xEC) = 1;
     }
 
@@ -954,9 +944,9 @@ void CalcReflectionVector2(
     Mtx nodeMtx;
     Mtx nodeRotMtx;
     Mtx cameraMtx;
+    Mtx cameraModelMtx;
     u16* dl = (u16*)displayList;
     u16* dlEnd;
-    const double half = (double)LoadFloat(FLOAT_803318a4);
 
     cameraPos.x = CameraWorldX();
     cameraPos.y = CameraWorldY();
@@ -983,7 +973,9 @@ void CalcReflectionVector2(
     nodeRotMtx[2][3] = LoadFloat(FLOAT_80331898);
 
     PSMTXCopy(CameraMatrix(), cameraMtx);
-    PSMTXConcat(cameraMtx, matrix, cameraMtx);
+    PSMTXConcat(cameraMtx, matrix, cameraModelMtx);
+
+    const double half = (double)LoadFloat(FLOAT_803318a4);
 
     dlEnd = (u16*)((u8*)displayList + displayListSize);
     while (dl < dlEnd) {
@@ -1020,12 +1012,17 @@ void CalcReflectionVector2(
             outVec = &reflectionVec[posIndex];
             C_VECReflect(&cameraVector, &objSpaceNormal, outVec);
 
-            maxAxis = fabsf(outVec->x);
-            if (maxAxis < fabsf(outVec->y)) {
+            float absY = fabsf(outVec->y);
+            float absX = fabsf(outVec->x);
+            float absZ = fabsf(outVec->z);
+
+            axis = absX < absY;
+            maxAxis = absX;
+            if (axis != 0) {
                 axis = 1;
-                maxAxis = fabsf(outVec->y);
+                maxAxis = absY;
             }
-            if (maxAxis < fabsf(outVec->z)) {
+            if (maxAxis < absZ) {
                 axis = 2;
             }
             CVector reflected(outVec->x, outVec->y, outVec->z);
@@ -1216,33 +1213,50 @@ static int UpdateWaterMesh(VMana2* mana2)
         return 0;
     }
 
-    for (int row = 1; row < 0x10; row++) {
-        currentScale = FLOAT_80331898;
-        neighborScale = FLOAT_803318a4;
-        int rowBase = row * 0x11;
-        for (int colBlock = 0; colBlock < 3; colBlock++) {
-            int index = rowBase + colBlock * 5 + 1;
+    for (int row = 1, rowBase = 0x11; row < 0x10; row++, rowBase += 0x11) {
+        currentScale = LoadFloat(FLOAT_80331898);
+        neighborScale = LoadFloat(FLOAT_803318a4);
+        for (int col = 1; col < 0x10; col += 5) {
+            int index = rowBase + col;
+            int above0 = index - 0x11;
+            int below0 = index + 0x11;
 
             waterHeightB[index] = currentScale * waterHeightA[index] +
-                                  neighborScale * (waterHeightA[index + 1] + waterHeightA[index - 1] +
-                                                   waterHeightA[index - 0x11] + waterHeightA[index + 0x11]) -
+                                  neighborScale * (waterHeightA[above0] + waterHeightA[below0] +
+                                                   waterHeightA[index - 1] + waterHeightA[index + 1]) -
                                   waterHeightB[index];
-            waterHeightB[index + 1] = currentScale * waterHeightA[index + 1] +
-                                      neighborScale * (waterHeightA[index + 2] + waterHeightA[index] +
-                                                       waterHeightA[index - 0x10] + waterHeightA[index + 0x12]) -
-                                      waterHeightB[index + 1];
-            waterHeightB[index + 2] = currentScale * waterHeightA[index + 2] +
-                                      neighborScale * (waterHeightA[index + 3] + waterHeightA[index + 1] +
-                                                       waterHeightA[index - 0x0F] + waterHeightA[index + 0x13]) -
-                                      waterHeightB[index + 2];
-            waterHeightB[index + 3] = currentScale * waterHeightA[index + 3] +
-                                      neighborScale * (waterHeightA[index + 4] + waterHeightA[index + 2] +
-                                                       waterHeightA[index - 0x0E] + waterHeightA[index + 0x14]) -
-                                      waterHeightB[index + 3];
-            waterHeightB[index + 4] = currentScale * waterHeightA[index + 4] +
-                                      neighborScale * (waterHeightA[index + 5] + waterHeightA[index + 3] +
-                                                       waterHeightA[index - 0x0D] + waterHeightA[index + 0x15]) -
-                                      waterHeightB[index + 4];
+
+            int index1 = index + 1;
+            int above1 = index1 - 0x11;
+            int below1 = index1 + 0x11;
+            waterHeightB[index1] = currentScale * waterHeightA[index1] +
+                                   neighborScale * (waterHeightA[above1] + waterHeightA[below1] +
+                                                    waterHeightA[index1 - 1] + waterHeightA[index1 + 1]) -
+                                   waterHeightB[index1];
+
+            int index2 = index + 2;
+            int above2 = index2 - 0x11;
+            int below2 = index2 + 0x11;
+            waterHeightB[index2] = currentScale * waterHeightA[index2] +
+                                   neighborScale * (waterHeightA[above2] + waterHeightA[below2] +
+                                                    waterHeightA[index2 - 1] + waterHeightA[index2 + 1]) -
+                                   waterHeightB[index2];
+
+            int index3 = index + 3;
+            int above3 = index3 - 0x11;
+            int below3 = index3 + 0x11;
+            waterHeightB[index3] = currentScale * waterHeightA[index3] +
+                                   neighborScale * (waterHeightA[above3] + waterHeightA[below3] +
+                                                    waterHeightA[index3 - 1] + waterHeightA[index3 + 1]) -
+                                   waterHeightB[index3];
+
+            int index4 = index + 4;
+            int above4 = index4 - 0x11;
+            int below4 = index4 + 0x11;
+            waterHeightB[index4] = currentScale * waterHeightA[index4] +
+                                   neighborScale * (waterHeightA[above4] + waterHeightA[below4] +
+                                                    waterHeightA[index4 - 1] + waterHeightA[index4 + 1]) -
+                                   waterHeightB[index4];
         }
     }
 

@@ -127,27 +127,25 @@ int CUtil::GetNumPolygonFromDL(void* dlData, unsigned long)
         }
 
         if (vertexFormat == 2) {
-            if (count == 0) {
-                continue;
-            }
+            if (count > 0) {
+                int blocks = (u32)count >> 3;
 
-            int blocks = (u32)count >> 3;
+                if (blocks != 0) {
+                    do {
+                        data += 0x50;
+                    } while (--blocks != 0);
 
-            if (blocks != 0) {
-                do {
-                    data += 0x50;
-                } while (--blocks != 0);
-
-                count &= 7;
-                if (count == 0) {
-                    continue;
+                    count &= 7;
+                    if (count == 0) {
+                        continue;
+                    }
                 }
-            }
 
-            do {
-                data += 10;
-            } while (--count != 0);
-        } else if (count != 0) {
+                do {
+                    data += 10;
+                } while (--count != 0);
+            }
+        } else if (count > 0) {
             int blocks = (u32)count >> 3;
 
             if (blocks != 0) {
@@ -855,29 +853,37 @@ void CUtil::RenderColorQuad(float x, float y, float width, float height, _GXColo
     GXSetChanCtrl(GX_COLOR0A0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
     GXSetNumChans(1);
 
-    float x1 = x;
-    float y1 = y;
-    float z1 = kUtilZero;
     float x2 = x + width;
     float y2 = y + height;
-    float z2 = kUtilZero;
-    float x3 = x2;
-    float y3 = y2;
-    float z3 = kUtilZero;
-    float x4 = x1;
-    float y4 = y2;
-    float z4 = kUtilZero;
+    Vec pos0;
+    Vec pos1;
+    pos0.x = x;
+    pos0.y = y;
+    pos0.z = kUtilZero;
+    pos1.x = x2;
+    pos1.y = y2;
+    pos1.z = kUtilZero;
     u32 colorValue = *reinterpret_cast<u32*>(&color);
+    Vec v0 = pos1;
+    Vec v1 = pos0;
 
     GXBegin(GX_QUADS, GX_VTXFMT7, 4);
-    GXPosition3f32(x1, y1, z1);
-    GXColor1u32(colorValue);
-    GXPosition3f32(x2, y1, z2);
-    GXColor1u32(colorValue);
-    GXPosition3f32(x3, y3, z3);
-    GXColor1u32(colorValue);
-    GXPosition3f32(x4, y4, z4);
-    GXColor1u32(colorValue);
+    GXWGFifo.f32 = v1.x;
+    GXWGFifo.f32 = v1.y;
+    GXWGFifo.f32 = v1.z;
+    GXWGFifo.u32 = colorValue;
+    GXWGFifo.f32 = v0.x;
+    GXWGFifo.f32 = v1.y;
+    GXWGFifo.f32 = v1.z;
+    GXWGFifo.u32 = colorValue;
+    GXWGFifo.f32 = v0.x;
+    GXWGFifo.f32 = v0.y;
+    GXWGFifo.f32 = v1.z;
+    GXWGFifo.u32 = colorValue;
+    GXWGFifo.f32 = v1.x;
+    GXWGFifo.f32 = v0.y;
+    GXWGFifo.f32 = v1.z;
+    GXWGFifo.u32 = colorValue;
 
     PSMTXCopy(GetCameraMatrix(), cameraMtx);
     PSMTX44Copy(GetScreenMatrix(), screenMtx);
@@ -946,19 +952,38 @@ void CUtil::ClearZBufferRect(float x, float y, float width, float height)
 
     float x2 = x + width;
     float y2 = y + height;
+    Vec pos0;
+    Vec pos1;
+    pos0.x = x;
+    pos0.y = y;
+    pos0.z = kUtilQuadDepth;
+    pos1.x = x2;
+    pos1.y = y2;
+    pos1.z = kUtilQuadDepth;
 
     GXSetColorUpdate(GX_FALSE);
     GXSetAlphaUpdate(GX_FALSE);
 
+    Vec v0 = pos1;
+    Vec v1 = pos0;
+
     GXBegin(GX_QUADS, GX_VTXFMT7, 4);
-    GXPosition3f32(x, y, kUtilQuadDepth);
-    GXColor1u32(*reinterpret_cast<u32*>(&white));
-    GXPosition3f32(x2, y, kUtilQuadDepth);
-    GXColor1u32(*reinterpret_cast<u32*>(&white));
-    GXPosition3f32(x2, y2, kUtilQuadDepth);
-    GXColor1u32(*reinterpret_cast<u32*>(&white));
-    GXPosition3f32(x, y2, kUtilQuadDepth);
-    GXColor1u32(*reinterpret_cast<u32*>(&white));
+    GXWGFifo.f32 = v1.x;
+    GXWGFifo.f32 = v1.y;
+    GXWGFifo.f32 = v1.z;
+    GXWGFifo.u32 = *reinterpret_cast<u32*>(&white);
+    GXWGFifo.f32 = v0.x;
+    GXWGFifo.f32 = v1.y;
+    GXWGFifo.f32 = v1.z;
+    GXWGFifo.u32 = *reinterpret_cast<u32*>(&white);
+    GXWGFifo.f32 = v0.x;
+    GXWGFifo.f32 = v0.y;
+    GXWGFifo.f32 = v1.z;
+    GXWGFifo.u32 = *reinterpret_cast<u32*>(&white);
+    GXWGFifo.f32 = v1.x;
+    GXWGFifo.f32 = v0.y;
+    GXWGFifo.f32 = v1.z;
+    GXWGFifo.u32 = *reinterpret_cast<u32*>(&white);
 
     PSMTXCopy(GetCameraMatrix(), cameraMtx);
     PSMTX44Copy(GetScreenMatrix(), screenMtx);
@@ -1082,15 +1107,14 @@ void CUtil::RenderQuadTex2(Vec pos1, Vec pos2, _GXColor color, Vec2d* uv1, Vec2d
     GXBegin(GX_QUADS, GX_VTXFMT7, 4);
     f32 x1 = pos1.x;
     f32 y1 = pos1.y;
-    f32 z1 = pos1.z;
-    f32 x2 = pos2.x;
-    f32 y2 = pos2.y;
-    u32 rgba = *colorPtr;
-
     GXWGFifo.f32 = x1;
     GXWGFifo.f32 = y1;
+    f32 z1 = pos1.z;
     GXWGFifo.f32 = z1;
+    u32 rgba = *colorPtr;
+    f32 x2 = pos2.x;
     GXWGFifo.u32 = rgba;
+    f32 y2 = pos2.y;
     GXWGFifo.f32 = u1;
     GXWGFifo.f32 = v1;
     GXWGFifo.f32 = u1;
@@ -1156,15 +1180,14 @@ void CUtil::RenderQuad(Vec pos1, Vec pos2, _GXColor color, Vec2d* uv1, Vec2d* uv
     GXBegin(GX_QUADS, GX_VTXFMT7, 4);
     f32 x1 = pos1.x;
     f32 y1 = pos1.y;
-    f32 z1 = pos1.z;
-    f32 x2 = pos2.x;
-    f32 y2 = pos2.y;
-    u32 rgba = *colorPtr;
-
     GXWGFifo.f32 = x1;
     GXWGFifo.f32 = y1;
+    f32 z1 = pos1.z;
     GXWGFifo.f32 = z1;
+    u32 rgba = *colorPtr;
+    f32 x2 = pos2.x;
     GXWGFifo.u32 = rgba;
+    f32 y2 = pos2.y;
     GXWGFifo.f32 = u0;
     GXWGFifo.f32 = v0;
 
@@ -1313,14 +1336,30 @@ void CUtil::GetSplinePos(Vec& out, Vec p0, Vec p1, Vec p2, Vec p3, float t, floa
 
 	t2 = t * t;
 	t3 = t2 * t;
-	hermite[0] = kUtilOne + ((kUtilHermiteCoeff2 * t3) - (kUtilHermiteCoeff3 * t2));
-	hermite[1] = (kUtilHermiteCoeff3 * t2) + (kUtilHermiteCoeffNeg2 * t3);
-	hermite[2] = t - ((kUtilHermiteCoeff2 * t2) - t3);
+
+	float k3t2 = kUtilHermiteCoeff3 * t2;
+	hermite[1] = k3t2 + (kUtilHermiteCoeffNeg2 * t3);
+	hermite[0] = kUtilOne + ((kUtilHermiteCoeff2 * t3) - k3t2);
+	hermite[2] = t + (t3 - (kUtilHermiteCoeff2 * t2));
 	hermite[3] = t3 - t2;
 
-	out.x = (hermite[3] * tan1.x) + (hermite[2] * tan0.x) + (hermite[0] * p1.x) + (hermite[1] * p2.x);
-	out.y = (hermite[3] * tan1.y) + (hermite[2] * tan0.y) + (hermite[0] * p1.y) + (hermite[1] * p2.y);
-	out.z = (hermite[3] * tan1.z) + (hermite[2] * tan0.z) + (hermite[0] * p1.z) + (hermite[1] * p2.z);
+	float pos = hermite[1] * p2.x;
+	pos += hermite[0] * p1.x;
+	pos += hermite[2] * tan0.x;
+	pos += hermite[3] * tan1.x;
+	out.x = pos;
+
+	pos = hermite[1] * p2.y;
+	pos += hermite[0] * p1.y;
+	pos += hermite[2] * tan0.y;
+	pos += hermite[3] * tan1.y;
+	out.y = pos;
+
+	pos = hermite[1] * p2.z;
+	pos += hermite[0] * p1.z;
+	pos += hermite[2] * tan0.z;
+	pos += hermite[3] * tan1.z;
+	out.z = pos;
 }
 
 /*

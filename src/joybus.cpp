@@ -99,12 +99,11 @@ extern const unsigned short JoyBusCrcTable[256] =
     0x2E93, 0x3EB2, 0x0ED1, 0x1EF0
 };
 
-static const char s_dvd_gba_dir_underscore[] = "dvd_gba/";
+static const char s_dvd_gba_dir[] = "dvd/gba/";
 static const char s_ffcc_cli_bin[] = "ffcc_cli.bin";
+static const char s_objdat_spt[] = "objdat.spt";
 static const char s_joybus_cpp[] = "joybus.cpp";
 static const char s_mem_alloc_error_fmt[] = "%s(%d): Error: memory allocation";
-static const char s_dvd_gba_dir[] = "dvd/gba/";
-static const char s_objdat_spt[] = "objdat.spt";
 static const char s_not_found_error_fmt[] = "Error: %s not found";
 static const char s_map_filename_fmt[] = "m%02d_%d.mcd";
 static const char s_thread_init_end_nl[] = "JoyBus::ThreadInit end\n";
@@ -112,6 +111,12 @@ static const char s_recv_type_mismatch_warn_fmt[] = "(%d):%s(%d): Warning: Recv 
 static const char s_send_ppos_bad_state_fmt[] = "JoyBus::SendPpos: bad state (port=%d, cnt=%d)\n";
 static const char s_load_bin_error[] = "JoyBus::LoadBin() error";
 static const char s_thread_init_end[] = "JoyBus::ThreadInit end";
+
+namespace JoyBusConst {
+char* DVD_DIR = const_cast<char*>(s_dvd_gba_dir);
+char* CLIENT_FILE = const_cast<char*>(s_ffcc_cli_bin);
+char* OBJ_FILE = const_cast<char*>(s_objdat_spt);
+}
 
 inline unsigned int MakeJoyCmd32(unsigned char op, unsigned char a, unsigned char b, unsigned char c)
 {
@@ -158,8 +163,8 @@ JoyBus::JoyBus()
         m_letterSizeArr[i] = 0;
     }
 
-    strcpy(m_pathBuf, const_cast<char*>(s_dvd_gba_dir_underscore));
-    strcat(m_pathBuf, const_cast<char*>(s_ffcc_cli_bin), 128UL);
+    strcpy(m_pathBuf, JoyBusConst::DVD_DIR);
+    strcat(m_pathBuf, JoyBusConst::CLIENT_FILE, 128UL);
 
     memset(m_sendBuffer, 0, 0x4000);
     memset(m_stageFlags, 0, 8);
@@ -255,10 +260,10 @@ void JoyBus::CreateInit()
     }
 
     char path[140];
-    strcpy(path, const_cast<char*>(s_dvd_gba_dir));
+    strcpy(path, JoyBusConst::DVD_DIR);
 
     // MWCC PPC requires 3-arg strcat
-    strcat(path, const_cast<char*>(s_objdat_spt), 131UL);
+    strcat(path, JoyBusConst::OBJ_FILE, 131UL);
 
     CFile::CHandle* file = File.Open(path, 0, CFile::PRI_LOW);
 
@@ -526,7 +531,7 @@ int JoyBus::LoadMap(int stageId, int mapId)
     char path[132];
     char tmp[16];
 
-    strcpy(path, const_cast<char*>(s_dvd_gba_dir));
+    strcpy(path, JoyBusConst::DVD_DIR);
     sprintf(tmp, const_cast<char*>(s_map_filename_fmt), stageId, mapId);
     strcat(path, tmp, 132UL);
 
@@ -6443,34 +6448,40 @@ int JoyBus::SendUseItem(int portIndex, char itemId)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800A6324
+ * PAL Size: 260b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 int JoyBus::SendHitEnemy(int portIndex, char enemyId, short hitValue)
 {
-    unsigned int cmd = MakeJoyCmd32(0x22, enemyId, hitValue & 0xFF, hitValue >> 8);
-
-    if (m_threadRunningMask == 0)
-	{
-        return 0;
-	}
-
-    const int port = m_threadParams[portIndex].m_portIndex;
     unsigned int result = 0;
+    unsigned short hit = hitValue;
+    unsigned int cmd = 0;
+    unsigned char* cmdBytes = reinterpret_cast<unsigned char*>(&cmd);
 
-    OSWaitSemaphore(&m_accessSemaphores[port]);
+    cmdBytes[0] = 0x22;
+    cmdBytes[1] = enemyId;
+    *reinterpret_cast<unsigned short*>(cmdBytes + 2) = __lhbrx(&hit, 0);
 
-    if (static_cast<int>(m_cmdCount[port]) < 0x40)
-    {
-        m_cmdQueueData[port][m_cmdCount[port]] = cmd;
-        m_cmdCount[port]++;
+    if (static_cast<signed char>(m_threadRunningMask) != 0) {
+        OSWaitSemaphore(&m_accessSemaphores[m_threadParams[portIndex].m_portIndex]);
+
+        unsigned int port = m_threadParams[portIndex].m_portIndex;
+        if (static_cast<int>(m_cmdCount[port]) < 0x40) {
+            m_cmdQueueData[port][m_cmdCount[port]] = cmd;
+            port = m_threadParams[portIndex].m_portIndex;
+            m_cmdCount[port]++;
+            OSSignalSemaphore(&m_accessSemaphores[m_threadParams[portIndex].m_portIndex]);
+            result = 0;
+        } else {
+            OSSignalSemaphore(&m_accessSemaphores[port]);
+            result = 0xFFFFFFFF;
+        }
     }
-    else
-    {
-        result = 0xFFFFFFFF;
-    }
 
-    OSSignalSemaphore(&m_accessSemaphores[port]);
     return result;
 }
 

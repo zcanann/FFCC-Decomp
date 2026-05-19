@@ -386,11 +386,10 @@ int CMenuPcs::MLstCtrl()
 
 		startFrame = 0;
 		duration = 4;
-		MenuLstEntry* closeEntry = &this->lstData->entries[this->lstData->count - 1];
 		for (int idx = this->lstData->count - 1; idx >= 0; idx--) {
+			MenuLstEntry* closeEntry = &this->lstData->entries[idx];
 			closeEntry->startFrame = startFrame++;
 			closeEntry->duration = duration;
-			closeEntry--;
 		}
 
 		this->lstState->frame = 0;
@@ -442,7 +441,7 @@ int CMenuPcs::MLstOpen()
 		zero = FLOAT_803333D0;
 		initializedCount = 0;
 		yPos = 0x18;
-		for (int i = 0; i < 9; i++) {
+		for (i = 0; i < 9; i++) {
 			entry = &this->lstData->entries[i];
 			entry->unk_2C = 2;
 			initializedCount++;

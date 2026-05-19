@@ -8,6 +8,7 @@
 #include "ffcc/p_light.h"
 #include "ffcc/p_tina.h"
 #include "ffcc/pppDrawMng.h"
+#include "ffcc/ref.h"
 #include "ffcc/textureman.h"
 #include "ffcc/util.h"
 extern "C" {
@@ -32,7 +33,6 @@ extern "C" int __cntlzw(unsigned int);
 extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void* __nw__11CTextureSetFUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
-extern "C" void __dt__4CRefFv(void*, int);
 extern "C" void __dt__Q29CCharaPcs7CHandleFv(void*, int);
 extern "C" void __ct__6CColorFv(void*);
 extern "C" void __construct_array(void*, void (*)(void*), void (*)(void*, int), unsigned long, unsigned long);
@@ -455,10 +455,9 @@ template <typename T>
 static inline void ReleaseShared(T*& ptr)
 {
     if (ptr != 0) {
-        int* refData = reinterpret_cast<int*>(ptr);
-        refData[1]--;
-        if (refData[1] == 0) {
-            (*(void (**)(void*, int))(refData[0] + 8))(ptr, 1);
+        CRef* ref = reinterpret_cast<CRef*>(ptr);
+        if (--reinterpret_cast<int*>(ref)[1] == 0) {
+            delete ref;
         }
         ptr = 0;
     }
@@ -1022,9 +1021,9 @@ void CCharaPcs::Reset(CCharaPcs::RESET mode)
                     continue;
                 }
 
-                loadAnim[1]--;
-                if (loadAnim[1] == 0) {
-                    (*(void (**)(void*, int))(*loadAnim + 8))(loadAnim, 1);
+                CRef* loadAnimRef = reinterpret_cast<CRef*>(loadAnim);
+                if (--reinterpret_cast<int*>(loadAnimRef)[1] == 0) {
+                    delete loadAnimRef;
                 }
                 LoadAnimArray(this)->RemoveAt(static_cast<unsigned long>(i));
             }
@@ -3056,65 +3055,11 @@ void CCharaPcs::CHandle::LoadModelASync(int charaKind, unsigned long charaNo, un
 	Graphic._WaitDrawDone((char*)"p_chara.cpp", 0x8C9);
 	PartMng.pppDeleteCHandle(this);
 
-	if (m_model != 0)
-	{
-		int* modelRef = reinterpret_cast<int*>(m_model);
-		int refCount = modelRef[1] - 1;
-		modelRef[1] = refCount;
-		if (refCount == 0)
-		{
-			(*(void (**)(void*, int))(*modelRef + 8))(m_model, 1);
-		}
-		m_model = (CChara::CModel*)0;
-	}
-
-	if (m_textureSet != 0)
-	{
-		int* textureRef = reinterpret_cast<int*>(m_textureSet);
-		int refCount = textureRef[1] - 1;
-		textureRef[1] = refCount;
-		if (refCount == 0)
-		{
-			(*(void (**)(void*, int))(*textureRef + 8))(m_textureSet, 1);
-		}
-		m_textureSet = (CTextureSet*)0;
-	}
-
-	if (m_modelLoadRef != 0)
-	{
-		int* modelLoadRef = reinterpret_cast<int*>(m_modelLoadRef);
-		int refCount = modelLoadRef[1] - 1;
-		modelLoadRef[1] = refCount;
-		if (refCount == 0)
-		{
-			(*(void (**)(void*, int))(*modelLoadRef + 8))(m_modelLoadRef, 1);
-		}
-		m_modelLoadRef = (CRef*)0;
-	}
-
-	if (m_texLoadRef != 0)
-	{
-		int* texLoadRef = reinterpret_cast<int*>(m_texLoadRef);
-		int refCount = texLoadRef[1] - 1;
-		texLoadRef[1] = refCount;
-		if (refCount == 0)
-		{
-			(*(void (**)(void*, int))(*texLoadRef + 8))(m_texLoadRef, 1);
-		}
-		m_texLoadRef = (CRef*)0;
-	}
-
-	if (m_pdtLoadRef != 0)
-	{
-		int* pdtLoadRef = reinterpret_cast<int*>(m_pdtLoadRef);
-		int refCount = pdtLoadRef[1] - 1;
-		pdtLoadRef[1] = refCount;
-		if (refCount == 0)
-		{
-			(*(void (**)(void*, int))(*pdtLoadRef + 8))(m_pdtLoadRef, 1);
-		}
-		m_pdtLoadRef = (CRef*)0;
-	}
+	ReleaseShared(m_model);
+	ReleaseShared(m_textureSet);
+	ReleaseShared(m_modelLoadRef);
+	ReleaseShared(m_texLoadRef);
+	ReleaseShared(m_pdtLoadRef);
 
 	CharaPcs.releaseUnuseLoadModel(0);
 	m_asyncCharaKind = charaKind;
@@ -3284,16 +3229,7 @@ CCharaPcs::CLoadModel::CLoadModel()
  */
 CCharaPcs::CLoadModel::~CLoadModel()
 {
-    void* model = *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(this) + 0x18);
-    if (model != 0) {
-        int* refData = reinterpret_cast<int*>(model);
-        int refCount = refData[1] - 1;
-        refData[1] = refCount;
-        if (refCount == 0) {
-            delete reinterpret_cast<CRef*>(model);
-        }
-        *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(this) + 0x18) = 0;
-    }
+    ReleaseShared(m_model);
 }
 
 /*
@@ -3314,16 +3250,7 @@ CCharaPcs::CLoadAnim::CLoadAnim()
  */
 CCharaPcs::CLoadAnim::~CLoadAnim()
 {
-    void* anim = *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(this) + 0x28);
-    if (anim != 0) {
-        int* refData = reinterpret_cast<int*>(anim);
-        int refCount = refData[1] - 1;
-        refData[1] = refCount;
-        if (refCount == 0) {
-            delete reinterpret_cast<CRef*>(anim);
-        }
-        *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(this) + 0x28) = 0;
-    }
+    ReleaseShared(m_anim);
 }
 
 /*
@@ -3351,16 +3278,7 @@ CCharaPcs::CLoadTexture::CLoadTexture()
  */
 CCharaPcs::CLoadTexture::~CLoadTexture()
 {
-    void* texture = *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(this) + 0x1C);
-    if (texture != 0) {
-        int* refData = reinterpret_cast<int*>(texture);
-        int refCount = refData[1] - 1;
-        refData[1] = refCount;
-        if (refCount == 0) {
-            delete reinterpret_cast<CRef*>(texture);
-        }
-        *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(this) + 0x1C) = 0;
-    }
+    ReleaseShared(m_textureSet);
 }
 
 /*

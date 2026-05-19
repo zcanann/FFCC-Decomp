@@ -289,16 +289,17 @@ CMapKeyFrame::~CMapKeyFrame()
  */
 float CMapKeyFrame::Get()
 {
-    if (m_mode == 1) {
+    switch (m_mode) {
+    case 1:
         return Spline1D__5CMathFifPfPfPf(
             &Math, static_cast<int>(m_keyCount) - 1, static_cast<float>(m_currentFrame), m_keyValue, m_keyFrame,
             m_splineTable);
-    }
-    if (m_mode == 0) {
+    case 0:
         return Line1D__5CMathFifPfPf(
             &Math, static_cast<int>(m_keyCount) - 1, static_cast<float>(m_currentFrame), m_keyValue, m_keyFrame);
+    default:
+        return 0.0f;
     }
-    return 0.0f;
 }
 
 /*
@@ -1245,45 +1246,48 @@ CMapShadow* CPtrArray<CMapShadow*>::GetAt(unsigned long index)
  */
 int CMapKeyFrame::Get(int& key0, int& key1, float& blend)
 {
-    if (m_mode == 1) {
+    switch (m_mode) {
+    case 1:
         blend = Spline1D__5CMathFifPfPfPf(
             &Math, static_cast<int>(m_keyCount) - 1, static_cast<float>(m_currentFrame), m_keyValue, m_keyFrame,
             m_splineTable);
-    } else if (m_mode == 0) {
+        break;
+    case 0:
         blend =
             Line1D__5CMathFifPfPf(&Math, static_cast<int>(m_keyCount) - 1, static_cast<float>(m_currentFrame), m_keyValue, m_keyFrame);
-    } else {
+        break;
+    default:
         blend = 0.0f;
         key0 = m_junTable[0];
         key1 = key0;
         return 0;
     }
 
-    if (blend > 0.0f) {
-        const float junMax = static_cast<float>(m_junCount - 1);
-        if (blend < junMax) {
-            key0 = static_cast<int>(blend);
-            key1 = static_cast<int>(1.0f + blend);
-            blend = blend - static_cast<float>(key0);
-            key0 = m_junTable[key0];
-            if (blend == 0.0f) {
-                key1 = key0;
-                return 0;
-            }
-            key1 = m_junTable[key1];
-            return 1;
-        }
+    if (blend <= 0.0f) {
+        key0 = m_junTable[0];
+        key1 = key0;
+        blend = 0.0f;
+        return 0;
+    }
 
+    const float junMax = static_cast<float>(m_junCount - 1);
+    if (blend >= junMax) {
         key0 = m_junTable[m_junCount - 1];
         key1 = key0;
         blend = 1.0f;
         return 0;
     }
 
-    key0 = m_junTable[0];
-    key1 = key0;
-    blend = 0.0f;
-    return 0;
+    key0 = static_cast<int>(blend);
+    key1 = static_cast<int>(1.0f + blend);
+    blend = blend - static_cast<float>(key0);
+    key0 = m_junTable[key0];
+    if (blend == 0.0f) {
+        key1 = key0;
+        return 0;
+    }
+    key1 = m_junTable[key1];
+    return 1;
 }
 
 /*
@@ -3297,7 +3301,7 @@ void CMapMng::SetIdGrpColor(int mapIdGrpIndex, int channelIndex, _GXColor color)
 void CMapMng::SetMeshCameraSemiTransRange(unsigned short id, float nearRange, float farRange, float minAlpha,
                                           float maxAlpha, float fadeRange)
 {
-    bool found = false;
+    int found = 0;
     unsigned char* mapObj = reinterpret_cast<unsigned char*>(this);
 
     for (int i = 0; i < *reinterpret_cast<short*>(Ptr(this, 0xC)); i++) {
@@ -3314,7 +3318,7 @@ void CMapMng::SetMeshCameraSemiTransRange(unsigned short id, float nearRange, fl
                 *reinterpret_cast<unsigned char*>(mapObj + 0x97A) = 1;
             }
             *reinterpret_cast<short*>(mapObj + 0x97E) = 0x4000;
-            found = true;
+            found = 1;
             *reinterpret_cast<short*>(mapObj + 0x97C) = 0x4000;
             *reinterpret_cast<short*>(mapObj + 0x980) = 0;
         }
@@ -3348,13 +3352,13 @@ void CMapMng::SetMeshCameraSemiTransRange(unsigned short id, float nearRange, fl
  */
 void CMapMng::SetMeshCameraSemiTransAlpha(unsigned short id, int alpha, int frameCount)
 {
-    bool found = false;
+    int found = 0;
     unsigned char* mapObj = reinterpret_cast<unsigned char*>(this);
 
     for (int i = 0; i < *reinterpret_cast<short*>(Ptr(this, 0xC)); i++) {
         if (*reinterpret_cast<unsigned short*>(mapObj + 0x988) == id) {
             *reinterpret_cast<short*>(mapObj + 0x97E) = static_cast<short>(alpha << 7);
-            found = true;
+            found = 1;
             *reinterpret_cast<short*>(mapObj + 0x980) = static_cast<short>(
                 (static_cast<int>(*reinterpret_cast<short*>(mapObj + 0x97E)) -
                  static_cast<int>(*reinterpret_cast<short*>(mapObj + 0x97C))) /

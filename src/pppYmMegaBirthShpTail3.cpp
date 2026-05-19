@@ -398,14 +398,15 @@ void pppFrameYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthShp
             break;
         }
 
-        spawnCount = 0;
+        i = 0;
         particleData = (u8*)work->m_particles;
         worldMat = work->m_wmats;
         particleColor = work->m_colors;
+        spawnCount = i;
 
         if ((gPppCalcDisabled == 0) && (*(s32*)(paramPayload + 4) != 0xffff)) {
             work->m_lifeLimit = work->m_lifeLimit + 1;
-            for (i = 0; i < work->m_maxParticles; i++) {
+            for (; i < work->m_maxParticles; i++) {
                 if (*(u16*)(particleData + 0x22) != 0) {
                     calc((_pppPObject*)object, work, param, (_PARTICLE_DATA*)particleData, colorWork, particleColor);
                 } else {

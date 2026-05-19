@@ -1062,15 +1062,21 @@ void CLightPcs::MakeLightMap()
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_NRM, GX_NRM_XYZ, GX_F32, 0);
     GXSetAlphaUpdate(GX_TRUE);
 
+    u32 target = 0;
     char* lightTarget = (char*)this;
-    for (u32 target = 0; target < 4; target++, lightTarget += 0x9c0) {
+    do {
+        u32 i = 0;
         char* bump = lightTarget;
-        for (u32 i = 0; i < 8; i++, bump += 0x138) {
+        do {
             if (*(u8*)(bump + 0x1cec) != 0) {
                 ((CLightPcs::CBumpLight*)(bump + 0x1c3c))->MakeLightMap();
             }
-        }
-    }
+            i++;
+            bump += 0x138;
+        } while (i < 8);
+        target++;
+        lightTarget += 0x9c0;
+    } while (target < 4);
 
     Graphic.SetStdPixelFmt();
     setViewport__11CGraphicPcsFv(&GraphicPcs);
@@ -1080,7 +1086,7 @@ void CLightPcs::MakeLightMap()
     GXSetAlphaUpdate(GX_FALSE);
     GXSetTexCopySrc(0, 0, 0x40, 0x40);
     GXSetTexCopyDst((u16)0x40, (u16)0x40, GX_TF_IA8, GX_FALSE);
-    GXCopyTex(gRenderScratchTextureBuffer, GX_TRUE);
+    GXCopyTex(Graphic.m_scratchTextureBuffer, GX_TRUE);
 }
 
 /*
@@ -1255,6 +1261,7 @@ CLightPcs::CLight::CLight()
     float f2 = FLOAT_8032fc14;
 
     m_radius = radius;
+    m_partMask = -1;
     float f1 = FLOAT_8032fc10;
     m_offsetZ = f2;
     m_offsetX = f2;
@@ -1263,7 +1270,6 @@ CLightPcs::CLight::CLight()
     m_spotFn = 0;
     m_unk4D = 4;
     m_specularMode = 0;
-    m_partMask = -1;
     m_part = 0;
     *(u32*)&m_targetColor[0] = 0;
     *(u32*)&m_targetColor[1] = 0;

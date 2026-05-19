@@ -11,6 +11,7 @@
 #include "ffcc/p_light.h"
 #include "ffcc/p_usb.h"
 #include "ffcc/ptrarray.h"
+#include "ffcc/ref.h"
 #include "ffcc/stopwatch.h"
 #include "ffcc/system.h"
 #include "ffcc/texanim.h"
@@ -145,18 +146,13 @@ static inline CharaViewerModel* ViewerModel(CChara::CModel* model)
     return reinterpret_cast<CharaViewerModel*>(model);
 }
 
-static inline void destroyRef(int* ref)
-{
-    (*reinterpret_cast<void (***)(void*, int)>(ref))[2](ref, 1);
-}
-
 template <class T>
 static inline void ReleaseShared(T*& ptr)
 {
     if (ptr != 0) {
-        int* ref = reinterpret_cast<int*>(ptr);
-        if ((--ref[1] == 0) && (ref != 0)) {
-            destroyRef(ref);
+        CRef* ref = reinterpret_cast<CRef*>(ptr);
+        if (--reinterpret_cast<int*>(ref)[1] == 0) {
+            delete ref;
         }
         ptr = 0;
     }
@@ -201,7 +197,24 @@ static inline int ViewerModelFrameShift(CChara::CModel* model)
     return ViewerModel(model)->data->frameShift;
 }
 
-extern "C" const char s_no_texture____801da7e8[];
+extern "C" const char s_no_texture____801da7e8[0x188] =
+    "no texture...\0\0\0"
+    "p_chara_viewer.cpp\0\0"
+    "GPU = %f.5%%(C = %.5f%% G = %.5f%%)\0"
+    "CCharaPcs.calcViewer: %s\n\0\0\0"
+    "%splot%d.cha\0\0\0\0"
+    "FRAME = %.2f SPEED=%.2f\0"
+    "I = %s IFRAME = %.2f %s\0"
+    "CONT = %d\0\0\0"
+    "CPU = %.5f%%(M = %.5f%% S = %.5f%%) %dNODES\0"
+    "CCharaPcs LoadModel\0"
+    "CCharaPcs LoadTexture\0\0\0"
+    "CCharaPcs LoadAnim\0\0"
+    "plot/kmitsuru/plot.chm\0\0"
+    "plot/kmitsuru/plot.chd\0\0"
+    "plot/kmitsuru/plot.cha\0\0"
+    "plot/kmitsuru/plot.tex\0\0"
+    "%sback.tex";
 #define s_no_texture (viewerStrings + 0x0)
 #define s_p_chara_viewer_cpp (viewerStrings + 0x10)
 #define s_gpu_profile_fmt (viewerStrings + 0x24)
@@ -742,6 +755,7 @@ void CCharaPcs::calcViewer()
 void CCharaPcs::destroyViewer()
 {
     unsigned int i;
+    unsigned int j;
 
     Destroy__6CCharaFv(&Chara);
     DestroyBumpLightAll__9CLightPcsFQ29CLightPcs6TARGET(&LightPcs, 0);
@@ -759,11 +773,11 @@ void CCharaPcs::destroyViewer()
 
     ReleaseShared(m_viewerBackTextureSet);
 
-    i = 0;
+    j = 0;
     do {
-        ReleaseShared(m_viewerAnimBank[i]);
-        i++;
-    } while (i < 0x40);
+        ReleaseShared(m_viewerAnimBank[j]);
+        j++;
+    } while (j < 0x40);
 
     DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, m_viewerModelStage);
     DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, m_viewerTextureStage);

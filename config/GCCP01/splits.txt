@@ -1063,6 +1063,7 @@ p_chara_viewer.cpp:
 	extab       start:0x80008350 end:0x80008390
 	extabindex  start:0x8000EA10 end:0x8000EA40
 	.text       start:0x800BD848 end:0x800BF620
+	.rodata     start:0x801DA7E8 end:0x801DA970
 	.bss        start:0x802F2600 end:0x802F2628
 	.sbss       start:0x8032EDC4 end:0x8032EDE0
 	.sdata2     start:0x80330BF8 end:0x80330C78
@@ -1364,7 +1365,7 @@ THPSimple.cpp:
 	extabindex  start:0x8000FDD8 end:0x8000FE68
 	.text       start:0x801040C8 end:0x8010597C
 	.data       start:0x802111E8 end:0x802112E8
-	.bss        start:0x802FFA80 end:0x80300160
+	.bss        start:0x802FFA80 end:0x80300140
 	.sbss       start:0x8032EE48 end:0x8032EE60
 
 THPDraw.cpp:
@@ -1422,7 +1423,7 @@ monobj.cpp:
 	extabindex  start:0x80010120 end:0x8001033C
 	.text       start:0x80112D54 end:0x8011A574
 	.data       start:0x80211498 end:0x802116A4
-	.bss        start:0x80300160 end:0x803001F8
+	.bss        start:0x80300140 end:0x803001D8
 	.sdata2     start:0x803319C8 end:0x80331A58
 
 partyobj.cpp:

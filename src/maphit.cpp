@@ -210,9 +210,9 @@ void CMapHit::Draw()
  */
 void CMapHit::CheckHitCylinderNear(CMapCylinder* mapCylinder, Vec* position, unsigned short startFace, unsigned short faceCount, unsigned long mask)
 {
-    int faceIndex = static_cast<unsigned short>(startFace);
-    int faceOffset = faceIndex * 0x50;
-    int endFace = static_cast<unsigned short>(faceCount + startFace);
+    unsigned int faceIndex = startFace;
+    unsigned int faceOffset = faceIndex * sizeof(CMapHitFace);
+    unsigned int endFace = static_cast<unsigned short>(faceCount + startFace);
 
     g_hit_cyl = *mapCylinder;
     g_hit_mvec = *position;
@@ -220,7 +220,7 @@ void CMapHit::CheckHitCylinderNear(CMapCylinder* mapCylinder, Vec* position, uns
     while (faceIndex < endFace) {
         g_hit_lpface = reinterpret_cast<CMapHitFace*>(Ptr(m_faces, faceOffset));
         CheckHitFaceCylinder(mask);
-        faceOffset += 0x50;
+        faceOffset += sizeof(CMapHitFace);
         faceIndex++;
     }
 }
@@ -250,9 +250,9 @@ void CMapHit::CheckHitCylinderNear(CMapCylinder* mapCylinder, Vec* position, uns
  */
 int CMapHit::CheckHitCylinder(CMapCylinder* mapCylinder, Vec* position, unsigned short startFace, unsigned short faceCount, unsigned long mask)
 {
-    int faceIndex = static_cast<unsigned short>(startFace);
-    int faceOffset = faceIndex * 0x50;
-    int endFace = static_cast<unsigned short>(faceCount + startFace);
+    unsigned int faceIndex = startFace;
+    unsigned int faceOffset = faceIndex * sizeof(CMapHitFace);
+    unsigned int endFace = static_cast<unsigned short>(faceCount + startFace);
 
     g_hit_cyl = *mapCylinder;
     g_hit_mvec = *position;
@@ -265,7 +265,7 @@ int CMapHit::CheckHitCylinder(CMapCylinder* mapCylinder, Vec* position, unsigned
             return 1;
         }
 
-        faceOffset += 0x50;
+        faceOffset += sizeof(CMapHitFace);
         faceIndex++;
     }
 
@@ -654,19 +654,19 @@ int CMapHit::ReadOtmHit(CChunkFile& chunkFile)
                 new (*reinterpret_cast<CMemory::CStage**>(&MapMng), const_cast<char*>(s_maphit_cpp_801D7088), 0x143)
                     Vec[m_vertexCount];
 
-            for (unsigned int i = 0; i < m_vertexCount; i++) {
-                Vec& v = m_vertices[i];
-                v.x = chunkFile.GetF4();
-                v.y = chunkFile.GetF4();
-                v.z = chunkFile.GetF4();
+            for (int i = 0; i < m_vertexCount; i++) {
+                m_vertices[i].x = chunkFile.GetF4();
+                m_vertices[i].y = chunkFile.GetF4();
+                m_vertices[i].z = chunkFile.GetF4();
 
-                m_positionMin.x = (m_positionMin.x < v.x) ? m_positionMin.x : v.x;
-                m_positionMin.y = (m_positionMin.y < v.y) ? m_positionMin.y : v.y;
-                m_positionMin.z = (m_positionMin.z < v.z) ? m_positionMin.z : v.z;
+                Vec* v = &m_vertices[i];
+                m_positionMin.x = (m_positionMin.x < v->x) ? m_positionMin.x : v->x;
+                m_positionMin.y = (m_positionMin.y < v->y) ? m_positionMin.y : v->y;
+                m_positionMin.z = (m_positionMin.z < v->z) ? m_positionMin.z : v->z;
 
-                m_positionMax.x = (m_positionMax.x < v.x) ? v.x : m_positionMax.x;
-                m_positionMax.y = (m_positionMax.y < v.y) ? v.y : m_positionMax.y;
-                m_positionMax.z = (m_positionMax.z < v.z) ? v.z : m_positionMax.z;
+                m_positionMax.x = (m_positionMax.x < v->x) ? v->x : m_positionMax.x;
+                m_positionMax.y = (m_positionMax.y < v->y) ? v->y : m_positionMax.y;
+                m_positionMax.z = (m_positionMax.z < v->z) ? v->z : m_positionMax.z;
             }
 
             m_positionMin.x -= FLOAT_8032F8CC;
@@ -705,26 +705,25 @@ int CMapHit::ReadOtmHit(CChunkFile& chunkFile)
                 face.m_flags = 0;
                 face.m_drawFlags = 0;
 
-                const unsigned int vertexCount = face.m_vertexCount;
                 float* vertexOffset = &face.m_vertexOffsets[0][0];
-                for (unsigned int i = 0; i < vertexCount; i++) {
+                for (int i = 0; i < face.m_vertexCount; i++) {
                     vertexOffset[1] = zero;
                     vertexOffset[0] = zero;
                     vertexOffset += 2;
                 }
 
                 if (chunk.m_version == 0) {
-                    if (System.m_execParam != 0) {
+                    if ((unsigned int)System.m_execParam >= 1) {
                         System.Printf(const_cast<char*>(s_old_mid_format_801D7094));
                     }
                     chunkFile.Align(4);
-                    for (unsigned int i = 0; i < vertexCount; i++) {
+                    for (int i = 0; i < face.m_vertexCount; i++) {
                         (void)chunkFile.GetF4();
                         (void)chunkFile.GetF4();
                     }
                     face.m_radiusScale = zero;
                 } else if (chunk.m_version == 1) {
-                    if (System.m_execParam != 0) {
+                    if ((unsigned int)System.m_execParam >= 1) {
                         System.Printf(const_cast<char*>(s_old_mid_format_801D7094));
                     }
                     face.m_radiusScale = chunkFile.GetF4();
@@ -733,13 +732,13 @@ int CMapHit::ReadOtmHit(CChunkFile& chunkFile)
                     face.m_radiusScale = chunkFile.GetF4();
                     chunkFile.Align(4);
                     const float vertexOffsetScale = FLOAT_8032F8F4;
-                    for (unsigned int i = 0; i < vertexCount; i++) {
+                    for (int i = 0; i < face.m_vertexCount; i++) {
                         face.m_vertexOffsets[i][0] = chunkFile.GetF4() * vertexOffsetScale;
                         face.m_vertexOffsets[i][1] = chunkFile.GetF4() * vertexOffsetScale;
                     }
                 }
 
-                for (unsigned int i = 0; i < vertexCount; i++) {
+                for (int i = 0; i < face.m_vertexCount; i++) {
                     face.m_vertexIndices[i] = chunkFile.Get2();
 
                     const Vec& v = m_vertices[face.m_vertexIndices[i]];

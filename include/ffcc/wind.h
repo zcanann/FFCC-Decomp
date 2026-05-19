@@ -32,6 +32,15 @@ struct WindObject
     Vec force;
 };
 
+struct WindGrassObject
+{
+    u8 flags;
+    u8 _pad01[3];
+    Vec pos;
+    s32 id;
+    u8 _pad14[0x24];
+};
+
 class CWind
 {
 public:
@@ -39,18 +48,21 @@ public:
     void Frame();
     void Draw();
     void Calc(Vec*, const Vec*, int);
-    void searchFreeObj();
-    void getObj(int);
+    WindObject* searchFreeObj();
+    WindObject* getObj(int);
     int AddAmbient(float, float);
     int AddDiffuse(const Vec*, float, float, float);
     int AddSphere(const Vec*, float, float, int);
     void ChangePower(int, float);
+    WindGrassObject* searchFreeGrass();
+    WindGrassObject* getGrass(int);
+    int AddGrass(const Vec*);
 
 private:
     WindObject m_objects[32];
     s32 m_nextId;
-    u8 _padC84[0x7000];
-    u32 m_unk7C84;
+    WindGrassObject m_grass[512];
+    u32 m_nextGrassId;
 };
 
 extern CWind Wind;

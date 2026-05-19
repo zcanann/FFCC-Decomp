@@ -25,6 +25,11 @@ static inline s8 GetWindActiveFlag(const WindObject* obj)
     return static_cast<s8>((((int)(obj->flags & 0xC0)) << 24) >> 31);
 }
 
+static inline s8 GetGrassActiveFlag(const WindGrassObject* obj)
+{
+    return static_cast<s8>((((int)(obj->flags & 0xC0)) << 24) >> 31);
+}
+
 const float FLOAT_80330ef0 = 0.0f;
 const float FLOAT_80330ef4 = 0.0001f;
 const float FLOAT_80330ef8 = 1.0f;
@@ -118,32 +123,13 @@ void CWind::ChangePower(int id, float power)
     WindObject* obj;
     WindObject* scan = m_objects;
 
-    for (int blocks = 8; blocks != 0; blocks--) {
+    for (int i = 0; i < 32; i++, scan++) {
         if (GetWindActiveFlag(scan) != 0) {
             if (id == scan->id) {
                 obj = scan;
                 goto found;
             }
         }
-        if (GetWindActiveFlag(++scan) != 0) {
-            if (id == scan->id) {
-                obj = scan;
-                goto found;
-            }
-        }
-        if (GetWindActiveFlag(++scan) != 0) {
-            if (id == scan->id) {
-                obj = scan;
-                goto found;
-            }
-        }
-        if (GetWindActiveFlag(++scan) != 0) {
-            if (id == scan->id) {
-                obj = scan;
-                goto found;
-            }
-        }
-        scan++;
     }
 
     obj = 0;
@@ -418,6 +404,52 @@ found:
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 160b
+ * EN Address: 0x800f55cc
+ * EN Size: 116b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+WindObject* CWind::getObj(int id)
+{
+    WindObject* obj = m_objects;
+
+    for (int i = 0; i < 32; i++, obj++) {
+        if (GetWindActiveFlag(obj) != 0) {
+            if (id == obj->id) {
+                return obj;
+            }
+        }
+    }
+
+    return 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 192b
+ * EN Address: 0x800f5564
+ * EN Size: 104b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+WindObject* CWind::searchFreeObj()
+{
+    WindObject* obj = m_objects;
+
+    for (int i = 0; i < 32; i++, obj++) {
+        if (GetWindActiveFlag(obj) == 0) {
+            return obj;
+        }
+    }
+
+    return 0;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x800d9840
  * PAL Size: 748b
  * EN Address: TODO
@@ -649,6 +681,79 @@ void CWind::ClearAll()
 {
 	memset(m_objects, 0, sizeof(m_objects));
 	m_nextId = 1;
-	memset(_padC84, 0, sizeof(_padC84));
-	m_unk7C84 = 10000000;
+	memset(m_grass, 0, sizeof(m_grass));
+	m_nextGrassId = 10000000;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 196b
+ * EN Address: UNUSED
+ * EN Size: 104b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+WindGrassObject* CWind::searchFreeGrass()
+{
+    WindGrassObject* obj = m_grass;
+
+    for (int i = 0; i < 512; i++, obj++) {
+        if (GetGrassActiveFlag(obj) == 0) {
+            return obj;
+        }
+    }
+
+    return 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 164b
+ * EN Address: UNUSED
+ * EN Size: 116b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+WindGrassObject* CWind::getGrass(int id)
+{
+    WindGrassObject* obj = m_grass;
+
+    for (int i = 0; i < 512; i++, obj++) {
+        if (GetGrassActiveFlag(obj) != 0) {
+            if (id == obj->id) {
+                return obj;
+            }
+        }
+    }
+
+    return 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 668b
+ * EN Address: UNUSED
+ * EN Size: 412b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CWind::AddGrass(const Vec* pos)
+{
+    WindGrassObject* obj = searchFreeGrass();
+
+    if (obj == 0) {
+        return -1;
+    }
+
+    obj->flags = static_cast<u8>(__rlwimi(obj->flags, 1, 7, 24, 24));
+
+    int id = m_nextGrassId;
+    m_nextGrassId = id + 1;
+    obj->id = id;
+    obj->pos = *pos;
+
+    return obj->id;
 }

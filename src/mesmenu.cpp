@@ -206,7 +206,10 @@ void CMesMenu::Open(char* script, int x, int y, int flags, int unk1, int unk2, i
         fVar1 = FLOAT_803308dc;
         *(float*)((char*)this + 0x3D9C) = fVar1;
         *(float*)((char*)this + 0x3DA0) = fVar1;
-        *(unsigned int*)((char*)this + 0x3D50) = (unsigned int)(-(flags >> 1 & 1) & 0x1C);
+        int flagMask = -(flags >> 1 & 1);
+        int displayOffset = 0x1C;
+        displayOffset &= flagMask;
+        *(unsigned int*)((char*)this + 0x3D50) = (unsigned int)displayOffset;
         *(unsigned int*)((char*)this + 0x3D54) = uVar2;
     } else {
         SetFade__9CRingMenuFi(*(void**)((char*)&MenuPcs + 0x13C + *(int*)((char*)this + 0x18) * 4), 0);
@@ -224,9 +227,9 @@ void CMesMenu::Open(char* script, int x, int y, int flags, int unk1, int unk2, i
     *(float*)((char*)this + 0x3D7C) = FLOAT_803308e8 * *(float*)((char*)this + 0x3D9C) + *(float*)((char*)this + 0x3CC0);
     *(float*)((char*)this + 0x3D80) = fVar1 * *(float*)((char*)this + 0x3DA0) + *(float*)((char*)this + 0x3CC4);
 
-    fVar1 = FLOAT_803308ec;
     if (*(int*)((char*)this + 0x18) >= 4) {
         if ((flags & 8) != 0) {
+            fVar1 = FLOAT_803308ec;
             *(float*)((char*)this + 0x3D6C) = -(FLOAT_803308ec * *(float*)((char*)this + 0x3D7C) - *(float*)((char*)this + 0x3D6C));
             *(float*)((char*)this + 0x3D70) = -(fVar1 * *(float*)((char*)this + 0x3D80) - *(float*)((char*)this + 0x3D70));
         } else if ((flags & 0x8000) != 0) {
@@ -1093,27 +1096,29 @@ void CMesMenu::onCalc()
                     Next__4CMesFv((char*)this + 0x1C);
                 } else {
                     int wait5 = GetWait__4CMesFv((char*)this + 0x1C);
-                    *(int*)((char*)this + 0x3DA4) = 0;
-                    if ((wait5 != 4) && (*(int*)((char*)this + 0x0C) < 2)) {
-                        if ((*(unsigned int*)((char*)this + 0x3D8C) & 0x40) == 0) {
-                            *(int*)((char*)this + 0x0C) = 2;
-                            *(int*)((char*)this + 0x10) = 0;
-                            *(int*)((char*)this + 0x14) = 4;
-                            if (((*(unsigned int*)((char*)this + 0x3D8C) & 1) == 0) &&
-                                ((*(unsigned int*)((char*)this + 0x3D8C) & 0x4000) == 0)) {
-                                Sound.PlaySe(6, 0x40, 0x7F, 0);
-                            }
-                        } else {
-                            int stack[2];
-                            Set__4CMesFPci((char*)this + 0x1C, 0, 0);
-                            stack[0] = *(int*)((char*)this + 0x18);
-                            stack[1] = *(int*)((char*)this + 0x3DA4);
-                            SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-                                CFlat, 0, 1, 3, 2, stack, 0);
-                            *(int*)((char*)this + 0x0C) = 4;
-                            *(int*)((char*)this + 0x08) = 0;
-                            if (*(int*)((char*)this + 0x18) < 4) {
-                                SetFade__9CRingMenuFi(*(void**)((char*)&MenuPcs + 0x13C + *(int*)((char*)this + 0x18) * 4), 1);
+                    if (wait5 != 4) {
+                        *(int*)((char*)this + 0x3DA4) = 0;
+                        if (*(int*)((char*)this + 0x0C) < 2) {
+                            if ((*(unsigned int*)((char*)this + 0x3D8C) & 0x40) == 0) {
+                                *(int*)((char*)this + 0x0C) = 2;
+                                *(int*)((char*)this + 0x10) = 0;
+                                *(int*)((char*)this + 0x14) = 4;
+                                if (((*(unsigned int*)((char*)this + 0x3D8C) & 1) == 0) &&
+                                    ((*(unsigned int*)((char*)this + 0x3D8C) & 0x4000) == 0)) {
+                                    Sound.PlaySe(6, 0x40, 0x7F, 0);
+                                }
+                            } else {
+                                int stack[2];
+                                Set__4CMesFPci((char*)this + 0x1C, 0, 0);
+                                stack[0] = *(int*)((char*)this + 0x18);
+                                stack[1] = *(int*)((char*)this + 0x3DA4);
+                                SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+                                    CFlat, 0, 1, 3, 2, stack, 0);
+                                *(int*)((char*)this + 0x0C) = 4;
+                                *(int*)((char*)this + 0x08) = 0;
+                                if (*(int*)((char*)this + 0x18) < 4) {
+                                    SetFade__9CRingMenuFi(*(void**)((char*)&MenuPcs + 0x13C + *(int*)((char*)this + 0x18) * 4), 1);
+                                }
                             }
                         }
                     }

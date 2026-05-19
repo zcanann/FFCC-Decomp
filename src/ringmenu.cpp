@@ -157,335 +157,355 @@ struct RingMenuFlatData
 
 /*
  * --INFO--
- * PAL Address: 0x800a5350
- * PAL Size: 60b
+ * PAL Address: 0x800a2dd4
+ * PAL Size: 1388b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-CRingMenu::CRingMenu()
+void CRingMenu::DrawIcon()
+{
+	drawGBA();
+
+	if (!((Game.m_gameWork.m_menuStageMode == 0) || (m_menuIndex < 2))) {
+		return;
+	}
+
+	const unsigned int flatFlags = *reinterpret_cast<unsigned int*>(CFlat + 0x12A0) &
+	                               *reinterpret_cast<unsigned int*>(CFlat + 0x12A4);
+	if ((flatFlags & 1) == 0) {
+		return;
+	}
+
+	int menuIndex = m_menuIndex;
+	CGPartyObj* partyObj = Game.m_partyObjArr[menuIndex];
+	if (partyObj == 0) {
+		return;
+	}
+	unsigned char weaponFlagsHi = *(reinterpret_cast<unsigned char*>(&partyObj->m_weaponNodeFlags) + 1);
+	if (static_cast<signed char>(
+	        static_cast<int>((static_cast<unsigned int>(weaponFlagsHi) << 24) & 0xC0000000) >> 31) == 0) {
+		return;
+	}
+
+	unsigned int scriptFood = Game.m_scriptFoodBase[menuIndex];
+	Mtx cameraMtx;
+	PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
+
+	CVector offset(FLOAT_803309c0, FLOAT_803309c4 * partyObj->unk_0x188, FLOAT_803309c0);
+	CVector baseWorldPos(partyObj->m_worldPosition);
+	CVector worldPos;
+	PSVECAdd(reinterpret_cast<Vec*>(&baseWorldPos), reinterpret_cast<Vec*>(&offset), reinterpret_cast<Vec*>(&worldPos));
+
+	Vec viewPos;
+	viewPos.x = worldPos.x;
+	viewPos.y = worldPos.y;
+	viewPos.z = worldPos.z;
+	PSMTXMultVec(cameraMtx, &viewPos, &viewPos);
+	viewPos.z = (FLOAT_803309c8 < viewPos.z) ? FLOAT_803309c8 : viewPos.z;
+
+	Mtx44 screenMtx;
+	PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
+	Vec4d clipPos;
+	MTX44MultVec4__5CMathFPA4_fP3VecP5Vec4d(&Math, screenMtx, &viewPos, &clipPos);
+
+	clipPos.x = clipPos.x * (FLOAT_803309cc / clipPos.w);
+	clipPos.y = clipPos.y * (FLOAT_803309cc / clipPos.w);
+	if ((FLOAT_803309d0 < clipPos.x) && (clipPos.x < FLOAT_803309cc) && (FLOAT_803309d0 < clipPos.y) &&
+	    (clipPos.y < FLOAT_803309cc)) {
+		return;
+	}
+
+	float clampedX = FLOAT_803309d4;
+	if (FLOAT_803309d4 <= clipPos.x) {
+		clampedX = clipPos.x;
+		if (FLOAT_803309d8 < clipPos.x) {
+			clampedX = FLOAT_803309d8;
+		}
+	}
+
+	float clampedY = FLOAT_803309dc;
+	if (FLOAT_803309dc <= clipPos.y) {
+		clampedY = clipPos.y;
+		if (FLOAT_803309e0 < clipPos.y) {
+			clampedY = FLOAT_803309e0;
+		}
+	}
+
+	(void)atan2(static_cast<double>(clampedX), static_cast<double>(clampedY));
+
+	double posX = static_cast<double>(FLOAT_803309e4 * clampedX + FLOAT_803309e4);
+	double posY = -static_cast<double>(FLOAT_803309e8 * clampedY - FLOAT_803309e8);
+	unsigned char blinkAlpha = DAT_8020fab8[frameNibble(System.m_frameCounter)];
+
+	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcsVoid(), 0x19);
+	int iconRow;
+	unsigned int iconCol;
+	if ((Game.m_gameWork.m_menuStageMode == 0) || (menuIndex < 1)) {
+		iconRow = *reinterpret_cast<int*>(scriptFood + 0x3B4);
+		int foodProgress = static_cast<int>(*reinterpret_cast<unsigned short*>(scriptFood + 0x14));
+		int progress = foodProgress - 100;
+		int q = progress / 100 + (progress >> 31);
+		iconCol = foodProgress % 100 + static_cast<unsigned int>((q - (q >> 31)) * 4);
+	} else {
+		iconRow = 1;
+		iconCol = 0x65;
+	}
+
+	unsigned int bgColor[1];
+	__ct__6CColorFUcUcUcUc(bgColor, 0, 0, 0, 0x80);
+	SetColor__8CMenuPcsFR6CColor(MenuPcsVoid(), bgColor);
+	DrawRect__8CMenuPcsFUlfffffffff(MenuPcsVoid(), 3, static_cast<float>(FLOAT_803309ec + posX),
+	                                 static_cast<float>(FLOAT_803309ec + posY), FLOAT_803309f0, FLOAT_803309f0,
+	                                 FLOAT_803309c0, FLOAT_803309c0, FLOAT_803309cc, FLOAT_803309cc, 0.0f);
+
+	unsigned int fgColor[1];
+	__ct__6CColorFUcUcUcUc(fgColor, 0xFF, 0xFF, 0xFF, 0xFF);
+	SetColor__8CMenuPcsFR6CColor(MenuPcsVoid(), fgColor);
+	DrawRect__8CMenuPcsFUlfffffffff(
+	    MenuPcsVoid(), 3, static_cast<float>(posX), static_cast<float>(posY), FLOAT_803309f0, FLOAT_803309f0, FLOAT_803309c0,
+	    static_cast<float>(iconRow * 0x38), FLOAT_803309cc, FLOAT_803309cc,
+	    0.0f);
+
+	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcsVoid(), 0x18);
+	void* tlut = MenuPcs.m_externalFontTlut;
+	if (*reinterpret_cast<short*>(scriptFood + 0x1C) != 0) {
+		tlut = 0;
+	}
+	SetExternalTlut__8CTextureFPvi(MenuPcs.m_textures[0x18], tlut, 1);
+	GXSetTevDirect(GX_TEVSTAGE2);
+	_GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(2, 0xF, 0, 0xC, 0xB);
+	_GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg(2, 7, 0, 6, 7);
+	_GXSetTevColorOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(2, 0, 0, 3, 1, 0);
+	_GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(2, 0, 0, 0, 1, 0);
+	_GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(2, 0, 0);
+	_GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(2, 0xFF, 0xFF, 4);
+
+	unsigned int iconColor[1];
+	__ct__6CColorFUcUcUcUc(iconColor, 0xFF, 0xFF, 0xFF, blinkAlpha);
+	SetColor__8CMenuPcsFR6CColor(MenuPcsVoid(), iconColor);
+
+	int signedIconCol = static_cast<int>(iconCol);
+	int colSign = signedIconCol >> 31;
+	float u = static_cast<float>((((colSign * 8) | (signedIconCol * 0x20000000 + colSign) >> 29) - colSign) * 0x30);
+	float v = static_cast<float>(((signedIconCol >> 3) + ((signedIconCol < 0) && ((iconCol & 7) != 0))) * 0x30);
+	DrawRect__8CMenuPcsFUlfffffffff(MenuPcsVoid(), 3, static_cast<float>(posX), static_cast<float>(posY), FLOAT_803309f4,
+	                                 FLOAT_803309f4, u, v, FLOAT_803309f8, FLOAT_803309f8, 0.0f);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800a3340
+ * PAL Size: 156b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRingMenu::SetBattleCommand(int buttonGroupIndex, int newCommandId, int newRotation)
+{
+	if (newCommandId == 0) {
+		newCommandId = -1;
+	}
+
+	const int currentCommand = m_battleButtons[buttonGroupIndex * 2 + 2];
+
+	if (currentCommand == newCommandId) {
+		return;
+	}
+
+	if (((currentCommand >= 0) && (newCommandId < 0)) || ((currentCommand < 0) && (newCommandId >= 0))) {
+		m_buttonTimers[buttonGroupIndex * 3 + 2] = 8 - m_buttonTimers[buttonGroupIndex * 3 + 2];
+	}
+
+	m_battleButtons[buttonGroupIndex * 2 + 3] = m_battleButtons[buttonGroupIndex * 2 + 2];
+	m_battleButtons[buttonGroupIndex * 2 + 2] = newCommandId;
+	m_buttonTimers[buttonGroupIndex * 3 + 1] = 8 - m_buttonTimers[buttonGroupIndex * 3];
+	m_buttonTimers[buttonGroupIndex * 3] = 8 - m_buttonTimers[buttonGroupIndex * 3];
+
+	if (buttonGroupIndex != 2) {
+		return;
+	}
+
+	m_rotationPhase = m_ringRotation;
+	m_ringRotation = newRotation;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800a33dc
+ * PAL Size: 28b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRingMenu::SetBattleButton(int buttonIndex, int newValue)
+{
+	int current = m_battleButtons[buttonIndex];
+
+	if (current == newValue) {
+		return;
+	}
+
+	m_battleButtons[buttonIndex] = newValue;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800a33f8
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRingMenu::SetFade(int)
 {
 }
 
 /*
  * --INFO--
- * PAL Address: 0x800a52dc
- * PAL Size: 116b
+ * PAL Address: 0x800a33fc
+ * PAL Size: 4b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-CRingMenu::~CRingMenu()
+void CRingMenu::onScriptChanged(char*, int)
 {
-	Destroy();
 }
 
 /*
  * --INFO--
- * PAL Address: 0x800a5204
- * PAL Size: 216b
+ * PAL Address: 0x800a3400
+ * PAL Size: 4b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CRingMenu::Create()
+void CRingMenu::onScriptChanging(char*)
 {
-	Destroy();
-	CMenu::Create();
-
-	m_displayDirection = 0;
-	m_displayCounter = 0;
-	m_stateFlag = -1;
-	m_transitionCounter = 0x10;
-	m_animDirection = 1;
-	m_battleButtons[0] = 0;
-	m_battleButtons[2] = -1;
-	m_battleButtons[3] = -1;
-	m_buttonTimers[0] = 0;
-	m_buttonTimers[1] = 0;
-	m_buttonTimers[2] = 0;
-	m_battleButtons[1] = 0;
-	m_battleButtons[4] = -1;
-	m_battleButtons[5] = -1;
-	m_buttonTimers[3] = 0;
-	m_buttonTimers[4] = 0;
-	m_buttonTimers[5] = 0;
-	m_battleButtons[2] = 0;
-	m_battleButtons[6] = -1;
-	m_battleButtons[7] = -1;
-	m_buttonTimers[6] = 0;
-	m_buttonTimers[7] = 0;
-	m_buttonTimers[8] = 0;
-	m_ringRotation = -1;
-	m_rotationPhase = -1;
-	m_spinPhase = FLOAT_803309c0;
-	m_gbaConnectedFlag = 0;
-	m_gbaAnimCounter = 0;
-	m_commonFrameCounter = 0;
-	m_unk4f8 = 0;
-	m_timerB = 0;
-	m_currentCommandIndex = 0;
-	m_spinAccumulator = FLOAT_803309c0;
 }
 
 /*
  * --INFO--
- * PAL Address: 0x800a51e4
- * PAL Size: 32b
+ * PAL Address: 0x800a3404
+ * PAL Size: 1472b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CRingMenu::Destroy()
-{
-	CMenu::Destroy();
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800a51ac
- * PAL Size: 56b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-double CRingMenu::GetDispCounter()
-{
-	return static_cast<double>(FLOAT_803309cc - static_cast<float>(m_displayCounter) * FLOAT_80330a08);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800a4c3c
- * PAL Size: 1392b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CRingMenu::onCalc()
+void CRingMenu::drawGBA()
 {
 	const int menuIndex = m_menuIndex;
-	if ((Game.m_gameWork.m_menuStageMode == 0) || (menuIndex < 1)) {
-		const int animDirection = m_displayDirection;
-		const unsigned int targetAnimDirection =
-			((*reinterpret_cast<unsigned int*>(CFlat + 0x12A0) & *reinterpret_cast<unsigned int*>(CFlat + 0x12A4)) >> 2) & 1;
-		if (animDirection != static_cast<int>(targetAnimDirection)) {
-			System.Printf(const_cast<char*>(DAT_801da01c), menuIndex);
-			m_displayDirection = (static_cast<unsigned int>(__cntlzw(static_cast<unsigned int>(animDirection))) >> 5) & 0xFF;
-			m_displayCounter = 0x10 - m_displayCounter;
-		}
+	if (!((Game.m_gameWork.m_menuStageMode == 0) || (menuIndex < 1))) {
+		return;
+	}
 
-		m_displayCounter = clampDecToZero(m_displayCounter);
-		m_transitionCounter = clampDecToZero(m_transitionCounter);
-		m_commonFrameCounter = m_commonFrameCounter + 1;
-		m_timerB = clampDecToZero(m_timerB);
+	const unsigned int scriptFood = Game.m_scriptFoodBase[menuIndex];
+	if (scriptFood == 0) {
+		return;
+	}
 
-		for (int i = 0; i < 9; i++) {
-			m_buttonTimers[i] = clampDecToZero(m_buttonTimers[i]);
-		}
+	double showScale = static_cast<double>(static_cast<float>(m_displayCounter) * FLOAT_80330a08);
+	if (m_displayDirection != 0) {
+		showScale = static_cast<double>(FLOAT_803309cc) - showScale;
+	}
+	if (showScale == static_cast<double>(FLOAT_803309c0)) {
+		return;
+	}
 
-		const float animStep = FLOAT_80330a54;
-		const float animMin = FLOAT_803309c0;
-		for (int i = 0; i < 9; i++) {
-			for (int j = 0; j < 3; j++) {
-				m_animFloat[i][j] = m_animFloat[i][j] - animStep;
-				if (m_animFloat[i][j] < animMin) {
-					m_animFloat[i][j] = animMin;
-				}
+	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcsVoid(), 0x16);
+
+	double gbaAnim = static_cast<double>(
+	    sin(static_cast<double>(FLOAT_80330a0c * static_cast<float>(m_gbaAnimCounter)) / static_cast<double>(FLOAT_80330a10)));
+	if (m_gbaConnectedFlag == 1) {
+		gbaAnim = static_cast<double>(FLOAT_803309cc) - gbaAnim;
+	}
+
+	int posXInt = 0x30;
+	if ((menuIndex & 1) != 0) {
+		posXInt = 0x250;
+	}
+	float posX = static_cast<float>(posXInt);
+
+	int posYInt = 0x30;
+	if ((menuIndex & 2) != 0) {
+		posYInt = 400;
+	}
+	float posY = static_cast<float>(posYInt);
+
+	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(MenuPcsVoid(), 0);
+
+	const double sizePulse = static_cast<double>(FLOAT_80330a14 * static_cast<float>(static_cast<double>(FLOAT_803309cc) - gbaAnim) +
+	                                             FLOAT_803309cc);
+	float cycle = static_cast<float>(fmod(static_cast<double>(FLOAT_80330a18 * static_cast<float>(m_commonFrameCounter)),
+	                                      DOUBLE_80330a20));
+	if (cycle > FLOAT_803309cc) {
+		cycle = FLOAT_80330a28 - cycle;
+	}
+
+	const double angle = static_cast<double>(FLOAT_80330a2c * cycle);
+	const double sinA = static_cast<double>(sin(angle));
+	const double sinB = static_cast<double>(sin(static_cast<double>(FLOAT_80330a30) + angle));
+
+	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcsVoid(), 0x1E);
+
+	const double alphaBase = static_cast<double>(FLOAT_80330a34) * gbaAnim;
+	const unsigned int alphaShadow =
+	    static_cast<unsigned int>(static_cast<int>(static_cast<double>(FLOAT_803309c4) * alphaBase * showScale));
+	unsigned int shadowColor[1];
+	__ct__6CColorFUcUcUcUc(shadowColor, 0, 0, 0, static_cast<unsigned char>(alphaShadow));
+	SetColor__8CMenuPcsFR6CColor(MenuPcsVoid(), shadowColor);
+
+	const double invSize = static_cast<double>(FLOAT_803309cc) - sizePulse;
+	const float drawX = static_cast<float>(static_cast<double>(posX) + static_cast<double>(FLOAT_80330a3c * static_cast<float>(sizePulse * sinB)));
+	const float drawY = static_cast<float>(static_cast<double>(posY) - static_cast<double>(FLOAT_80330a40 * static_cast<float>(sizePulse * sinA)));
+	const float menuV = static_cast<float>(menuIndex * 0x30);
+	DrawRect__8CMenuPcsFUlfffffffff(MenuPcsVoid(), 3, FLOAT_80330a38 + drawX, FLOAT_80330a38 + drawY, FLOAT_80330a44, FLOAT_80330a48,
+	                                 FLOAT_803309c0, menuV, FLOAT_80330a4c * static_cast<float>(static_cast<double>(FLOAT_803309cc) + invSize),
+	                                 FLOAT_80330a4c * static_cast<float>(sizePulse + invSize), 0.0f);
+
+	const double alphaLit = alphaBase * showScale;
+	const unsigned int alphaIcon = static_cast<unsigned int>(static_cast<int>(alphaLit));
+	unsigned int iconColor[1];
+	__ct__6CColorFUcUcUcUc(iconColor, 0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alphaIcon));
+	SetColor__8CMenuPcsFR6CColor(MenuPcsVoid(), iconColor);
+	DrawRect__8CMenuPcsFUlfffffffff(MenuPcsVoid(), 3, drawX, drawY, FLOAT_80330a44, FLOAT_80330a48, FLOAT_803309c0, menuV,
+	                                 FLOAT_80330a4c * static_cast<float>(sizePulse), FLOAT_80330a4c * static_cast<float>(sizePulse), 0.0f);
+
+	const unsigned int flatFlags = *reinterpret_cast<unsigned int*>(CFlat + 0x12A0) & *reinterpret_cast<unsigned int*>(CFlat + 0x12A4);
+	if (((flatFlags & 8) != 0) && (Joybus.GetGBAStart(menuIndex) == 0)) {
+		if (Joybus.IsInitSend(menuIndex) == 0) {
+			SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcsVoid(), 0x1D);
+			const double blink = static_cast<double>(sin(static_cast<double>(FLOAT_80330a54 * static_cast<float>(m_commonFrameCounter))));
+			const unsigned int sendAlpha = static_cast<unsigned int>(
+			    static_cast<int>(static_cast<double>(FLOAT_803309c4) * (alphaLit * static_cast<double>(FLOAT_803309cc + static_cast<float>(blink)))));
+			unsigned int sendColor[1];
+			__ct__6CColorFUcUcUcUc(sendColor, 0xFF, 0xFF, 0xFF, static_cast<unsigned char>(sendAlpha));
+			SetColor__8CMenuPcsFR6CColor(MenuPcsVoid(), sendColor);
+			DrawRect__8CMenuPcsFUlfffffffff(MenuPcsVoid(), 3, drawX, drawY, FLOAT_80330a48, FLOAT_80330a48, FLOAT_803309c0, FLOAT_80330a58,
+			                                 FLOAT_803309cc, FLOAT_803309cc, 0.0f);
+		} else {
+			int frameHalf = static_cast<int>(System.m_frameCounter) >> 1;
+			int frameSign = frameHalf >> 31;
+			unsigned int frameTex = static_cast<unsigned int>(
+			    (frameSign * 0x10 | (frameHalf * 0x10000000 + frameSign) >> 28) - frameSign);
+			if (frameTex > 3) {
+				frameTex &= 1;
 			}
-		}
-
-		fmod(static_cast<double>(m_spinPhase), DOUBLE_80330a98);
-		int i = 0x1B;
-		while (i > 0) {
-			i--;
-		}
-
-		unsigned short ctrlMode = Joybus.GetCtrlMode(menuIndex);
-		unsigned int gbaConnected = (static_cast<unsigned int>(__cntlzw(1 - ctrlMode)) >> 5) & 0xFF;
-
-		if (!Joybus.GetGBAStart(menuIndex)) {
-			gbaConnected = 1;
-		}
-
-		if ((Joybus.GetPadType(menuIndex) == 0x09000000) || (Joybus.GetPadType(menuIndex) == 0x8B100000)) {
-			gbaConnected = 0;
-		}
-
-		if (m_gbaConnectedFlag != static_cast<int>(gbaConnected)) {
-			m_gbaConnectedFlag = static_cast<int>(gbaConnected);
-			m_gbaAnimCounter = 0x0C - m_gbaAnimCounter;
-		}
-		m_gbaAnimCounter = clampDecToZero(m_gbaAnimCounter);
-
-		CGPartyObj* partyObj = Game.m_partyObjArr[menuIndex];
-		if (partyObj != 0) {
-			CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(partyObj->m_scriptHandle);
-			int currentCmd = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Chara) + 0x2004);
-
-			if (Game.m_gameWork.m_bossArtifactStageIndex != 0x19) {
-				currentCmd = caravanWork->GetIdxCmdList();
-			}
-
-			int* trackedCmd = &m_currentCommandIndex;
-			if (Game.m_gameWork.m_bossArtifactStageIndex == 0x19) {
-				trackedCmd = reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Chara) + 0x2008);
-			}
-
-			double scrollDelta = 0.0;
-			if (*trackedCmd != currentCmd) {
-				int prev = currentCmd;
-				int next = currentCmd;
-				for (int step = 1; step < 4; step++) {
-					int nextCandidate = (currentCmd + step) % 5;
-					int prevCandidate = (currentCmd + 5 - step) % 5;
-
-					if (Game.m_gameWork.m_bossArtifactStageIndex != 0x19) {
-						nextCandidate = caravanWork->GetNextCmdListIdx(next, 1);
-						prevCandidate = caravanWork->GetNextCmdListIdx(prev, -1);
-					}
-
-					prev = prevCandidate;
-					next = nextCandidate;
-
-					if (*trackedCmd == prevCandidate) {
-						scrollDelta = static_cast<double>(step);
-						break;
-					}
-					if (*trackedCmd == nextCandidate) {
-						scrollDelta = -static_cast<double>(step);
-						break;
-					}
-				}
-
-				if (scrollDelta == 0.0) {
-					int dirPos = (*trackedCmd == prev) ? 1 : 0;
-					int dirNeg = (*trackedCmd == next) ? 1 : 0;
-					if (dirPos != 0 && dirNeg != 0) {
-						unsigned short trigger = 0;
-						if ((Pad._452_4_ == 0) && !((menuIndex == 0) && (Pad._448_4_ != -1))) {
-							const int idx =
-								menuIndex &
-								~(static_cast<int>(~(Pad._448_4_ - menuIndex | menuIndex - Pad._448_4_)) >> 31);
-							trigger = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Pad) + 4 + idx * 0x54);
-						}
-						scrollDelta = ((trigger & 0x40) != 0) ? static_cast<double>(dirPos) : -static_cast<double>(dirNeg);
-					} else if (dirPos != 0) {
-						scrollDelta = static_cast<double>(dirPos);
-					} else if (dirNeg != 0) {
-						scrollDelta = -static_cast<double>(dirNeg);
-					}
-				}
-			}
-
-			*trackedCmd = currentCmd;
-			m_spinAccumulator = (m_spinAccumulator + static_cast<float>(scrollDelta)) * FLOAT_80330ae8;
+			SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcsVoid(), 0x1D);
+			DrawRect__8CMenuPcsFUlfffffffff(MenuPcsVoid(), 3, drawX, drawY, FLOAT_80330a48, FLOAT_80330a48, FLOAT_803309c0,
+			                                 static_cast<float>(frameTex * 0x30), FLOAT_803309cc, FLOAT_803309cc, 0.0f);
 		}
 	}
-}
 
-/*
- * --INFO--
- * PAL Address: 0x800a48f0
- * PAL Size: 844b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void drawCommand(int state, CFont* font, float posX, float posY, CCaravanWork* caravanWork, int cmdIndex, float angle, float alphaScale)
-{
-	float fVar1;
-	bool reverseDir;
-	float clampedAlpha;
-	int tlut;
-	int* cmdNameTable;
-	int commandLabel;
-	double waveX;
-	double waveY;
-	double textWidth;
-	double textHeight;
-	unsigned char colorStorage[4];
-
-	cmdNameTable = reinterpret_cast<int*>(reinterpret_cast<RingMenuFlatData*>(&Game.m_cFlatDataArr[1])->table[4].strings);
-	if (Game.m_gameWork.m_bossArtifactStageIndex == 0x19) {
-		commandLabel = cmdNameTable[cmdIndex + 0x1E];
-	} else if (cmdIndex < 2) {
-		tlut = 9;
-		if (cmdIndex == 0) {
-			tlut = 1;
-		}
-		commandLabel = cmdNameTable[tlut];
-	} else {
-		commandLabel = caravanWork->GetWeaponAttrib(cmdIndex);
-	}
-
-	if (Game.m_gameWork.m_bossArtifactStageIndex == 0x19) {
-		tlut = 7;
-		if (cmdIndex == 2) {
-			tlut = 4;
-		} else if (cmdIndex < 2) {
-			if (cmdIndex == 0) {
-				tlut = 2;
-			} else if (cmdIndex >= 0) {
-				tlut = 1;
-			}
-		} else if (cmdIndex == 4) {
-			tlut = 7;
-		} else if (cmdIndex < 4) {
-			tlut = 6;
-		}
-		font->SetTlut(tlut);
-	} else if (cmdIndex == 0) {
-		font->SetTlut(7);
-	} else {
-		font->SetTlut(4);
-	}
-
-	waveX = static_cast<double>(FLOAT_80330ac4 * static_cast<float>(sin(static_cast<double>(angle))));
-	reverseDir = false;
-	if ((state == 0) || (state == 3)) {
-		reverseDir = true;
-	}
-
-	waveY = 1.0;
-	if (reverseDir) {
-		waveY = -1.0;
-	}
-	waveY = static_cast<double>(static_cast<float>(waveY) * FLOAT_80330a40 * static_cast<float>(sin(static_cast<double>(angle))));
-	if (Game.m_gameWork.m_bossArtifactStageIndex == 0x19) {
-		waveY = static_cast<double>(static_cast<float>(waveY + static_cast<double>(FLOAT_80330a28)));
-	}
-
-	font->SetScale(static_cast<float>(-(DOUBLE_80330ad0 * fabs(static_cast<double>(angle)) - DOUBLE_80330ac8)));
-	textWidth = static_cast<double>(font->GetWidth(reinterpret_cast<const char*>(commandLabel)));
-	fVar1 = static_cast<float>(-(DOUBLE_80330ad8 * fabs(static_cast<double>(angle)) - DOUBLE_80330a98));
-	textHeight = static_cast<double>(static_cast<float>(font->m_glyphWidth) * font->scaleY);
-
-	clampedAlpha = FLOAT_803309c0;
-	if ((FLOAT_803309c0 <= fVar1) && ((clampedAlpha = fVar1), (FLOAT_803309cc < fVar1))) {
-		clampedAlpha = FLOAT_803309cc;
-	}
-
-	int alpha = static_cast<int>((FLOAT_80330a34 * alphaScale) * clampedAlpha);
-	GXColor* color = static_cast<GXColor*>(__ct__6CColorFUcUcUcUc(colorStorage, 0xFF, 0xFF, 0xFF, alpha));
-	font->SetColor(*color);
-	font->SetPosX(static_cast<float>(waveX + -(static_cast<double>(static_cast<float>(
-		textWidth * static_cast<double>(FLOAT_803309c4) -
-		static_cast<double>(static_cast<float>(static_cast<double>(FLOAT_80330aa8) + static_cast<double>(posX))))))));
-	font->SetPosY(
-		FLOAT_80330a40 +
-			static_cast<float>(waveY + -(static_cast<double>(static_cast<float>(
-				textHeight * static_cast<double>(FLOAT_803309c4) -
-				static_cast<double>(static_cast<float>(static_cast<double>(FLOAT_803309ec) + static_cast<double>(posY))))))));
-	font->SetPosZ(FLOAT_803309c0);
-	font->Draw(reinterpret_cast<const char*>(commandLabel));
+	DrawInit__8CMenuPcsFv(MenuPcsVoid());
 }
 
 /*
@@ -810,349 +830,333 @@ void CRingMenu::onDraw()
 
 /*
  * --INFO--
- * PAL Address: 0x800a3404
- * PAL Size: 1472b
+ * PAL Address: 0x800a48f0
+ * PAL Size: 844b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CRingMenu::drawGBA()
+void drawCommand(int state, CFont* font, float posX, float posY, CCaravanWork* caravanWork, int cmdIndex, float angle, float alphaScale)
+{
+	float fVar1;
+	bool reverseDir;
+	float clampedAlpha;
+	int tlut;
+	int* cmdNameTable;
+	int commandLabel;
+	double waveX;
+	double waveY;
+	double textWidth;
+	double textHeight;
+	unsigned char colorStorage[4];
+
+	cmdNameTable = reinterpret_cast<int*>(reinterpret_cast<RingMenuFlatData*>(&Game.m_cFlatDataArr[1])->table[4].strings);
+	if (Game.m_gameWork.m_bossArtifactStageIndex == 0x19) {
+		commandLabel = cmdNameTable[cmdIndex + 0x1E];
+	} else if (cmdIndex < 2) {
+		tlut = 9;
+		if (cmdIndex == 0) {
+			tlut = 1;
+		}
+		commandLabel = cmdNameTable[tlut];
+	} else {
+		commandLabel = caravanWork->GetWeaponAttrib(cmdIndex);
+	}
+
+	if (Game.m_gameWork.m_bossArtifactStageIndex == 0x19) {
+		tlut = 7;
+		if (cmdIndex == 2) {
+			tlut = 4;
+		} else if (cmdIndex < 2) {
+			if (cmdIndex == 0) {
+				tlut = 2;
+			} else if (cmdIndex >= 0) {
+				tlut = 1;
+			}
+		} else if (cmdIndex == 4) {
+			tlut = 7;
+		} else if (cmdIndex < 4) {
+			tlut = 6;
+		}
+		font->SetTlut(tlut);
+	} else if (cmdIndex == 0) {
+		font->SetTlut(7);
+	} else {
+		font->SetTlut(4);
+	}
+
+	waveX = static_cast<double>(FLOAT_80330ac4 * static_cast<float>(sin(static_cast<double>(angle))));
+	reverseDir = false;
+	if ((state == 0) || (state == 3)) {
+		reverseDir = true;
+	}
+
+	waveY = 1.0;
+	if (reverseDir) {
+		waveY = -1.0;
+	}
+	waveY = static_cast<double>(static_cast<float>(waveY) * FLOAT_80330a40 * static_cast<float>(sin(static_cast<double>(angle))));
+	if (Game.m_gameWork.m_bossArtifactStageIndex == 0x19) {
+		waveY = static_cast<double>(static_cast<float>(waveY + static_cast<double>(FLOAT_80330a28)));
+	}
+
+	font->SetScale(static_cast<float>(-(DOUBLE_80330ad0 * fabs(static_cast<double>(angle)) - DOUBLE_80330ac8)));
+	textWidth = static_cast<double>(font->GetWidth(reinterpret_cast<const char*>(commandLabel)));
+	fVar1 = static_cast<float>(-(DOUBLE_80330ad8 * fabs(static_cast<double>(angle)) - DOUBLE_80330a98));
+	textHeight = static_cast<double>(static_cast<float>(font->m_glyphWidth) * font->scaleY);
+
+	clampedAlpha = FLOAT_803309c0;
+	if ((FLOAT_803309c0 <= fVar1) && ((clampedAlpha = fVar1), (FLOAT_803309cc < fVar1))) {
+		clampedAlpha = FLOAT_803309cc;
+	}
+
+	int alpha = static_cast<int>((FLOAT_80330a34 * alphaScale) * clampedAlpha);
+	GXColor* color = static_cast<GXColor*>(__ct__6CColorFUcUcUcUc(colorStorage, 0xFF, 0xFF, 0xFF, alpha));
+	font->SetColor(*color);
+	font->SetPosX(static_cast<float>(waveX + -(static_cast<double>(static_cast<float>(
+		textWidth * static_cast<double>(FLOAT_803309c4) -
+		static_cast<double>(static_cast<float>(static_cast<double>(FLOAT_80330aa8) + static_cast<double>(posX))))))));
+	font->SetPosY(
+		FLOAT_80330a40 +
+			static_cast<float>(waveY + -(static_cast<double>(static_cast<float>(
+				textHeight * static_cast<double>(FLOAT_803309c4) -
+				static_cast<double>(static_cast<float>(static_cast<double>(FLOAT_803309ec) + static_cast<double>(posY))))))));
+	font->SetPosZ(FLOAT_803309c0);
+	font->Draw(reinterpret_cast<const char*>(commandLabel));
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800a4c3c
+ * PAL Size: 1392b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRingMenu::onCalc()
 {
 	const int menuIndex = m_menuIndex;
-	if (!((Game.m_gameWork.m_menuStageMode == 0) || (menuIndex < 1))) {
-		return;
-	}
-
-	const unsigned int scriptFood = Game.m_scriptFoodBase[menuIndex];
-	if (scriptFood == 0) {
-		return;
-	}
-
-	double showScale = static_cast<double>(static_cast<float>(m_displayCounter) * FLOAT_80330a08);
-	if (m_displayDirection != 0) {
-		showScale = static_cast<double>(FLOAT_803309cc) - showScale;
-	}
-	if (showScale == static_cast<double>(FLOAT_803309c0)) {
-		return;
-	}
-
-	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcsVoid(), 0x16);
-
-	double gbaAnim = static_cast<double>(
-	    sin(static_cast<double>(FLOAT_80330a0c * static_cast<float>(m_gbaAnimCounter)) / static_cast<double>(FLOAT_80330a10)));
-	if (m_gbaConnectedFlag == 1) {
-		gbaAnim = static_cast<double>(FLOAT_803309cc) - gbaAnim;
-	}
-
-	int posXInt = 0x30;
-	if ((menuIndex & 1) != 0) {
-		posXInt = 0x250;
-	}
-	float posX = static_cast<float>(posXInt);
-
-	int posYInt = 0x30;
-	if ((menuIndex & 2) != 0) {
-		posYInt = 400;
-	}
-	float posY = static_cast<float>(posYInt);
-
-	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(MenuPcsVoid(), 0);
-
-	const double sizePulse = static_cast<double>(FLOAT_80330a14 * static_cast<float>(static_cast<double>(FLOAT_803309cc) - gbaAnim) +
-	                                             FLOAT_803309cc);
-	float cycle = static_cast<float>(fmod(static_cast<double>(FLOAT_80330a18 * static_cast<float>(m_commonFrameCounter)),
-	                                      DOUBLE_80330a20));
-	if (cycle > FLOAT_803309cc) {
-		cycle = FLOAT_80330a28 - cycle;
-	}
-
-	const double angle = static_cast<double>(FLOAT_80330a2c * cycle);
-	const double sinA = static_cast<double>(sin(angle));
-	const double sinB = static_cast<double>(sin(static_cast<double>(FLOAT_80330a30) + angle));
-
-	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcsVoid(), 0x1E);
-
-	const double alphaBase = static_cast<double>(FLOAT_80330a34) * gbaAnim;
-	const unsigned int alphaShadow =
-	    static_cast<unsigned int>(static_cast<int>(static_cast<double>(FLOAT_803309c4) * alphaBase * showScale));
-	unsigned int shadowColor[1];
-	__ct__6CColorFUcUcUcUc(shadowColor, 0, 0, 0, static_cast<unsigned char>(alphaShadow));
-	SetColor__8CMenuPcsFR6CColor(MenuPcsVoid(), shadowColor);
-
-	const double invSize = static_cast<double>(FLOAT_803309cc) - sizePulse;
-	const float drawX = static_cast<float>(static_cast<double>(posX) + static_cast<double>(FLOAT_80330a3c * static_cast<float>(sizePulse * sinB)));
-	const float drawY = static_cast<float>(static_cast<double>(posY) - static_cast<double>(FLOAT_80330a40 * static_cast<float>(sizePulse * sinA)));
-	const float menuV = static_cast<float>(menuIndex * 0x30);
-	DrawRect__8CMenuPcsFUlfffffffff(MenuPcsVoid(), 3, FLOAT_80330a38 + drawX, FLOAT_80330a38 + drawY, FLOAT_80330a44, FLOAT_80330a48,
-	                                 FLOAT_803309c0, menuV, FLOAT_80330a4c * static_cast<float>(static_cast<double>(FLOAT_803309cc) + invSize),
-	                                 FLOAT_80330a4c * static_cast<float>(sizePulse + invSize), 0.0f);
-
-	const double alphaLit = alphaBase * showScale;
-	const unsigned int alphaIcon = static_cast<unsigned int>(static_cast<int>(alphaLit));
-	unsigned int iconColor[1];
-	__ct__6CColorFUcUcUcUc(iconColor, 0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alphaIcon));
-	SetColor__8CMenuPcsFR6CColor(MenuPcsVoid(), iconColor);
-	DrawRect__8CMenuPcsFUlfffffffff(MenuPcsVoid(), 3, drawX, drawY, FLOAT_80330a44, FLOAT_80330a48, FLOAT_803309c0, menuV,
-	                                 FLOAT_80330a4c * static_cast<float>(sizePulse), FLOAT_80330a4c * static_cast<float>(sizePulse), 0.0f);
-
-	const unsigned int flatFlags = *reinterpret_cast<unsigned int*>(CFlat + 0x12A0) & *reinterpret_cast<unsigned int*>(CFlat + 0x12A4);
-	if (((flatFlags & 8) != 0) && (Joybus.GetGBAStart(menuIndex) == 0)) {
-		if (Joybus.IsInitSend(menuIndex) == 0) {
-			SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcsVoid(), 0x1D);
-			const double blink = static_cast<double>(sin(static_cast<double>(FLOAT_80330a54 * static_cast<float>(m_commonFrameCounter))));
-			const unsigned int sendAlpha = static_cast<unsigned int>(
-			    static_cast<int>(static_cast<double>(FLOAT_803309c4) * (alphaLit * static_cast<double>(FLOAT_803309cc + static_cast<float>(blink)))));
-			unsigned int sendColor[1];
-			__ct__6CColorFUcUcUcUc(sendColor, 0xFF, 0xFF, 0xFF, static_cast<unsigned char>(sendAlpha));
-			SetColor__8CMenuPcsFR6CColor(MenuPcsVoid(), sendColor);
-			DrawRect__8CMenuPcsFUlfffffffff(MenuPcsVoid(), 3, drawX, drawY, FLOAT_80330a48, FLOAT_80330a48, FLOAT_803309c0, FLOAT_80330a58,
-			                                 FLOAT_803309cc, FLOAT_803309cc, 0.0f);
-		} else {
-			int frameHalf = static_cast<int>(System.m_frameCounter) >> 1;
-			int frameSign = frameHalf >> 31;
-			unsigned int frameTex = static_cast<unsigned int>(
-			    (frameSign * 0x10 | (frameHalf * 0x10000000 + frameSign) >> 28) - frameSign);
-			if (frameTex > 3) {
-				frameTex &= 1;
-			}
-			SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcsVoid(), 0x1D);
-			DrawRect__8CMenuPcsFUlfffffffff(MenuPcsVoid(), 3, drawX, drawY, FLOAT_80330a48, FLOAT_80330a48, FLOAT_803309c0,
-			                                 static_cast<float>(frameTex * 0x30), FLOAT_803309cc, FLOAT_803309cc, 0.0f);
-		}
-	}
-
-	DrawInit__8CMenuPcsFv(MenuPcsVoid());
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800a3400
- * PAL Size: 4b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CRingMenu::onScriptChanging(char*)
-{
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800a33fc
- * PAL Size: 4b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CRingMenu::onScriptChanged(char*, int)
-{
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800a33f8
- * PAL Size: 4b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CRingMenu::SetFade(int)
-{
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800a33dc
- * PAL Size: 28b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CRingMenu::SetBattleButton(int buttonIndex, int newValue)
-{
-	int current = m_battleButtons[buttonIndex];
-
-	if (current == newValue) {
-		return;
-	}
-
-	m_battleButtons[buttonIndex] = newValue;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800a3340
- * PAL Size: 156b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CRingMenu::SetBattleCommand(int buttonGroupIndex, int newCommandId, int newRotation)
-{
-	if (newCommandId == 0) {
-		newCommandId = -1;
-	}
-
-	const int currentCommand = m_battleButtons[buttonGroupIndex * 2 + 2];
-
-	if (currentCommand == newCommandId) {
-		return;
-	}
-
-	if (((currentCommand >= 0) && (newCommandId < 0)) || ((currentCommand < 0) && (newCommandId >= 0))) {
-		m_buttonTimers[buttonGroupIndex * 3 + 2] = 8 - m_buttonTimers[buttonGroupIndex * 3 + 2];
-	}
-
-	m_battleButtons[buttonGroupIndex * 2 + 3] = m_battleButtons[buttonGroupIndex * 2 + 2];
-	m_battleButtons[buttonGroupIndex * 2 + 2] = newCommandId;
-	m_buttonTimers[buttonGroupIndex * 3 + 1] = 8 - m_buttonTimers[buttonGroupIndex * 3];
-	m_buttonTimers[buttonGroupIndex * 3] = 8 - m_buttonTimers[buttonGroupIndex * 3];
-
-	if (buttonGroupIndex != 2) {
-		return;
-	}
-
-	m_rotationPhase = m_ringRotation;
-	m_ringRotation = newRotation;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CRingMenu::DrawIcon()
-{
-	drawGBA();
-
-	if (!((Game.m_gameWork.m_menuStageMode == 0) || (m_menuIndex < 2))) {
-		return;
-	}
-
-	const unsigned int flatFlags = *reinterpret_cast<unsigned int*>(CFlat + 0x12A0) &
-	                               *reinterpret_cast<unsigned int*>(CFlat + 0x12A4);
-	if ((flatFlags & 1) == 0) {
-		return;
-	}
-
-	int menuIndex = m_menuIndex;
-	CGPartyObj* partyObj = Game.m_partyObjArr[menuIndex];
-	if (partyObj == 0) {
-		return;
-	}
-	unsigned char weaponFlagsHi = *(reinterpret_cast<unsigned char*>(&partyObj->m_weaponNodeFlags) + 1);
-	if (static_cast<signed char>(
-	        static_cast<int>((static_cast<unsigned int>(weaponFlagsHi) << 24) & 0xC0000000) >> 31) == 0) {
-		return;
-	}
-
-	unsigned int scriptFood = Game.m_scriptFoodBase[menuIndex];
-	Mtx cameraMtx;
-	PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
-
-	CVector offset(FLOAT_803309c0, FLOAT_803309c4 * partyObj->unk_0x188, FLOAT_803309c0);
-	CVector baseWorldPos(partyObj->m_worldPosition);
-	CVector worldPos;
-	PSVECAdd(reinterpret_cast<Vec*>(&baseWorldPos), reinterpret_cast<Vec*>(&offset), reinterpret_cast<Vec*>(&worldPos));
-
-	Vec viewPos;
-	viewPos.x = worldPos.x;
-	viewPos.y = worldPos.y;
-	viewPos.z = worldPos.z;
-	PSMTXMultVec(cameraMtx, &viewPos, &viewPos);
-	viewPos.z = (FLOAT_803309c8 < viewPos.z) ? FLOAT_803309c8 : viewPos.z;
-
-	Mtx44 screenMtx;
-	PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
-	Vec4d clipPos;
-	MTX44MultVec4__5CMathFPA4_fP3VecP5Vec4d(&Math, screenMtx, &viewPos, &clipPos);
-
-	clipPos.x = clipPos.x * (FLOAT_803309cc / clipPos.w);
-	clipPos.y = clipPos.y * (FLOAT_803309cc / clipPos.w);
-	if ((FLOAT_803309d0 < clipPos.x) && (clipPos.x < FLOAT_803309cc) && (FLOAT_803309d0 < clipPos.y) &&
-	    (clipPos.y < FLOAT_803309cc)) {
-		return;
-	}
-
-	float clampedX = FLOAT_803309d4;
-	if (FLOAT_803309d4 <= clipPos.x) {
-		clampedX = clipPos.x;
-		if (FLOAT_803309d8 < clipPos.x) {
-			clampedX = FLOAT_803309d8;
-		}
-	}
-
-	float clampedY = FLOAT_803309dc;
-	if (FLOAT_803309dc <= clipPos.y) {
-		clampedY = clipPos.y;
-		if (FLOAT_803309e0 < clipPos.y) {
-			clampedY = FLOAT_803309e0;
-		}
-	}
-
-	(void)atan2(static_cast<double>(clampedX), static_cast<double>(clampedY));
-
-	double posX = static_cast<double>(FLOAT_803309e4 * clampedX + FLOAT_803309e4);
-	double posY = -static_cast<double>(FLOAT_803309e8 * clampedY - FLOAT_803309e8);
-	unsigned char blinkAlpha = DAT_8020fab8[frameNibble(System.m_frameCounter)];
-
-	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcsVoid(), 0x19);
-	int iconRow;
-	unsigned int iconCol;
 	if ((Game.m_gameWork.m_menuStageMode == 0) || (menuIndex < 1)) {
-		iconRow = *reinterpret_cast<int*>(scriptFood + 0x3B4);
-		int foodProgress = static_cast<int>(*reinterpret_cast<unsigned short*>(scriptFood + 0x14));
-		int progress = foodProgress - 100;
-		int q = progress / 100 + (progress >> 31);
-		iconCol = foodProgress % 100 + static_cast<unsigned int>((q - (q >> 31)) * 4);
-	} else {
-		iconRow = 1;
-		iconCol = 0x65;
+		const int animDirection = m_displayDirection;
+		const unsigned int targetAnimDirection =
+			((*reinterpret_cast<unsigned int*>(CFlat + 0x12A0) & *reinterpret_cast<unsigned int*>(CFlat + 0x12A4)) >> 2) & 1;
+		if (animDirection != static_cast<int>(targetAnimDirection)) {
+			System.Printf(const_cast<char*>(DAT_801da01c), menuIndex);
+			m_displayDirection = (static_cast<unsigned int>(__cntlzw(static_cast<unsigned int>(animDirection))) >> 5) & 0xFF;
+			m_displayCounter = 0x10 - m_displayCounter;
+		}
+
+		m_displayCounter = clampDecToZero(m_displayCounter);
+		m_transitionCounter = clampDecToZero(m_transitionCounter);
+		m_commonFrameCounter = m_commonFrameCounter + 1;
+		m_timerB = clampDecToZero(m_timerB);
+
+		for (int i = 0; i < 9; i++) {
+			m_buttonTimers[i] = clampDecToZero(m_buttonTimers[i]);
+		}
+
+		const float animStep = FLOAT_80330a54;
+		const float animMin = FLOAT_803309c0;
+		for (int i = 0; i < 9; i++) {
+			for (int j = 0; j < 3; j++) {
+				m_animFloat[i][j] = m_animFloat[i][j] - animStep;
+				if (m_animFloat[i][j] < animMin) {
+					m_animFloat[i][j] = animMin;
+				}
+			}
+		}
+
+		fmod(static_cast<double>(m_spinPhase), DOUBLE_80330a98);
+		int i = 0x1B;
+		while (i > 0) {
+			i--;
+		}
+
+		unsigned short ctrlMode = Joybus.GetCtrlMode(menuIndex);
+		unsigned int gbaConnected = (static_cast<unsigned int>(__cntlzw(1 - ctrlMode)) >> 5) & 0xFF;
+
+		if (!Joybus.GetGBAStart(menuIndex)) {
+			gbaConnected = 1;
+		}
+
+		if ((Joybus.GetPadType(menuIndex) == 0x09000000) || (Joybus.GetPadType(menuIndex) == 0x8B100000)) {
+			gbaConnected = 0;
+		}
+
+		if (m_gbaConnectedFlag != static_cast<int>(gbaConnected)) {
+			m_gbaConnectedFlag = static_cast<int>(gbaConnected);
+			m_gbaAnimCounter = 0x0C - m_gbaAnimCounter;
+		}
+		m_gbaAnimCounter = clampDecToZero(m_gbaAnimCounter);
+
+		CGPartyObj* partyObj = Game.m_partyObjArr[menuIndex];
+		if (partyObj != 0) {
+			CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(partyObj->m_scriptHandle);
+			int currentCmd = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Chara) + 0x2004);
+
+			if (Game.m_gameWork.m_bossArtifactStageIndex != 0x19) {
+				currentCmd = caravanWork->GetIdxCmdList();
+			}
+
+			int* trackedCmd = &m_currentCommandIndex;
+			if (Game.m_gameWork.m_bossArtifactStageIndex == 0x19) {
+				trackedCmd = reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Chara) + 0x2008);
+			}
+
+			double scrollDelta = 0.0;
+			if (*trackedCmd != currentCmd) {
+				int prev = currentCmd;
+				int next = currentCmd;
+				for (int step = 1; step < 4; step++) {
+					int nextCandidate = (currentCmd + step) % 5;
+					int prevCandidate = (currentCmd + 5 - step) % 5;
+
+					if (Game.m_gameWork.m_bossArtifactStageIndex != 0x19) {
+						nextCandidate = caravanWork->GetNextCmdListIdx(next, 1);
+						prevCandidate = caravanWork->GetNextCmdListIdx(prev, -1);
+					}
+
+					prev = prevCandidate;
+					next = nextCandidate;
+
+					if (*trackedCmd == prevCandidate) {
+						scrollDelta = static_cast<double>(step);
+						break;
+					}
+					if (*trackedCmd == nextCandidate) {
+						scrollDelta = -static_cast<double>(step);
+						break;
+					}
+				}
+
+				if (scrollDelta == 0.0) {
+					int dirPos = (*trackedCmd == prev) ? 1 : 0;
+					int dirNeg = (*trackedCmd == next) ? 1 : 0;
+					if (dirPos != 0 && dirNeg != 0) {
+						unsigned short trigger = 0;
+						if ((Pad._452_4_ == 0) && !((menuIndex == 0) && (Pad._448_4_ != -1))) {
+							const int idx =
+								menuIndex &
+								~(static_cast<int>(~(Pad._448_4_ - menuIndex | menuIndex - Pad._448_4_)) >> 31);
+							trigger = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Pad) + 4 + idx * 0x54);
+						}
+						scrollDelta = ((trigger & 0x40) != 0) ? static_cast<double>(dirPos) : -static_cast<double>(dirNeg);
+					} else if (dirPos != 0) {
+						scrollDelta = static_cast<double>(dirPos);
+					} else if (dirNeg != 0) {
+						scrollDelta = -static_cast<double>(dirNeg);
+					}
+				}
+			}
+
+			*trackedCmd = currentCmd;
+			m_spinAccumulator = (m_spinAccumulator + static_cast<float>(scrollDelta)) * FLOAT_80330ae8;
+		}
 	}
+}
 
-	unsigned int bgColor[1];
-	__ct__6CColorFUcUcUcUc(bgColor, 0, 0, 0, 0x80);
-	SetColor__8CMenuPcsFR6CColor(MenuPcsVoid(), bgColor);
-	DrawRect__8CMenuPcsFUlfffffffff(MenuPcsVoid(), 3, static_cast<float>(FLOAT_803309ec + posX),
-	                                 static_cast<float>(FLOAT_803309ec + posY), FLOAT_803309f0, FLOAT_803309f0,
-	                                 FLOAT_803309c0, FLOAT_803309c0, FLOAT_803309cc, FLOAT_803309cc, 0.0f);
+/*
+ * --INFO--
+ * PAL Address: 0x800a51ac
+ * PAL Size: 56b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+double CRingMenu::GetDispCounter()
+{
+	return static_cast<double>(FLOAT_803309cc - static_cast<float>(m_displayCounter) * FLOAT_80330a08);
+}
 
-	unsigned int fgColor[1];
-	__ct__6CColorFUcUcUcUc(fgColor, 0xFF, 0xFF, 0xFF, 0xFF);
-	SetColor__8CMenuPcsFR6CColor(MenuPcsVoid(), fgColor);
-	DrawRect__8CMenuPcsFUlfffffffff(
-	    MenuPcsVoid(), 3, static_cast<float>(posX), static_cast<float>(posY), FLOAT_803309f0, FLOAT_803309f0, FLOAT_803309c0,
-	    static_cast<float>(iconRow * 0x38), FLOAT_803309cc, FLOAT_803309cc,
-	    0.0f);
+/*
+ * --INFO--
+ * PAL Address: 0x800a51e4
+ * PAL Size: 32b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRingMenu::Destroy()
+{
+	CMenu::Destroy();
+}
 
-	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcsVoid(), 0x18);
-	void* tlut = MenuPcs.m_externalFontTlut;
-	if (*reinterpret_cast<short*>(scriptFood + 0x1C) != 0) {
-		tlut = 0;
-	}
-	SetExternalTlut__8CTextureFPvi(MenuPcs.m_textures[0x18], tlut, 1);
-	GXSetTevDirect(GX_TEVSTAGE2);
-	_GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(2, 0xF, 0, 0xC, 0xB);
-	_GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg(2, 7, 0, 6, 7);
-	_GXSetTevColorOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(2, 0, 0, 3, 1, 0);
-	_GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(2, 0, 0, 0, 1, 0);
-	_GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(2, 0, 0);
-	_GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(2, 0xFF, 0xFF, 4);
+/*
+ * --INFO--
+ * PAL Address: 0x800a5204
+ * PAL Size: 216b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CRingMenu::Create()
+{
+	Destroy();
+	CMenu::Create();
 
-	unsigned int iconColor[1];
-	__ct__6CColorFUcUcUcUc(iconColor, 0xFF, 0xFF, 0xFF, blinkAlpha);
-	SetColor__8CMenuPcsFR6CColor(MenuPcsVoid(), iconColor);
+	m_displayDirection = 0;
+	m_displayCounter = 0;
+	m_stateFlag = -1;
+	m_transitionCounter = 0x10;
+	m_animDirection = 1;
+	m_battleButtons[0] = 0;
+	m_battleButtons[2] = -1;
+	m_battleButtons[3] = -1;
+	m_buttonTimers[0] = 0;
+	m_buttonTimers[1] = 0;
+	m_buttonTimers[2] = 0;
+	m_battleButtons[1] = 0;
+	m_battleButtons[4] = -1;
+	m_battleButtons[5] = -1;
+	m_buttonTimers[3] = 0;
+	m_buttonTimers[4] = 0;
+	m_buttonTimers[5] = 0;
+	m_battleButtons[2] = 0;
+	m_battleButtons[6] = -1;
+	m_battleButtons[7] = -1;
+	m_buttonTimers[6] = 0;
+	m_buttonTimers[7] = 0;
+	m_buttonTimers[8] = 0;
+	m_ringRotation = -1;
+	m_rotationPhase = -1;
+	m_spinPhase = FLOAT_803309c0;
+	m_gbaConnectedFlag = 0;
+	m_gbaAnimCounter = 0;
+	m_commonFrameCounter = 0;
+	m_unk4f8 = 0;
+	m_timerB = 0;
+	m_currentCommandIndex = 0;
+	m_spinAccumulator = FLOAT_803309c0;
+}
 
-	int signedIconCol = static_cast<int>(iconCol);
-	int colSign = signedIconCol >> 31;
-	float u = static_cast<float>((((colSign * 8) | (signedIconCol * 0x20000000 + colSign) >> 29) - colSign) * 0x30);
-	float v = static_cast<float>(((signedIconCol >> 3) + ((signedIconCol < 0) && ((iconCol & 7) != 0))) * 0x30);
-	DrawRect__8CMenuPcsFUlfffffffff(MenuPcsVoid(), 3, static_cast<float>(posX), static_cast<float>(posY), FLOAT_803309f4,
-	                                 FLOAT_803309f4, u, v, FLOAT_803309f8, FLOAT_803309f8, 0.0f);
+/*
+ * --INFO--
+ * PAL Address: 0x800a52dc
+ * PAL Size: 116b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+CRingMenu::~CRingMenu()
+{
+	Destroy();
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800a5350
+ * PAL Size: 60b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+CRingMenu::CRingMenu()
+{
 }

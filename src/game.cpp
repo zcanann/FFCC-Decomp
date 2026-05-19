@@ -1042,13 +1042,13 @@ void CGame::Calc()
             m_partyMinZ = (m_partyMinZ < position) ? m_partyMinZ : position;
 
             position = partyObj->m_worldPosition.x;
-            m_partyMaxX = (position < m_partyMaxX) ? m_partyMaxX : position;
+            m_partyMaxX = (m_partyMaxX > position) ? m_partyMaxX : position;
 
             position = partyObj->m_worldPosition.y;
-            m_partyMaxY = (position < m_partyMaxY) ? m_partyMaxY : position;
+            m_partyMaxY = (m_partyMaxY > position) ? m_partyMaxY : position;
 
             position = partyObj->m_worldPosition.z;
-            m_partyMaxZ = (position < m_partyMaxZ) ? m_partyMaxZ : position;
+            m_partyMaxZ = (m_partyMaxZ > position) ? m_partyMaxZ : position;
         }
     }
 
@@ -1304,7 +1304,7 @@ int CGame::GetBossArtifact(int ratioIndex, int amount)
         stage = 2;
     }
 
-    s16 stageBase = s_top[stage];
+    int stageBase = s_top[stage];
     int scaledAmount = (int)((float)amount * s_ratio[ratioIndex - 1]);
 
     u16 thresholds[4];
@@ -1325,8 +1325,10 @@ int CGame::GetBossArtifact(int ratioIndex, int amount)
     }
 
     scaledAmount = rand();
-    return bossArtifactBase + stageIndex * 0x168 + 0x20 +
-           ((int)stageBase + (scaledAmount - (scaledAmount / (artifactRank + 1)) * (artifactRank + 1))) * 8;
+    int divisor = artifactRank + 1;
+    int quotient = scaledAmount / divisor;
+    stageBase += scaledAmount - quotient * divisor;
+    return bossArtifactBase + stageIndex * 0x168 + 0x20 + stageBase * 8;
 }
 
 /*

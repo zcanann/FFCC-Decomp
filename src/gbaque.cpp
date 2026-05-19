@@ -1005,21 +1005,22 @@ void GbaQueue::SetSmithData(int channel, unsigned int value)
 	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(*scriptFoodBase);
 	unsigned char* valueBytes = reinterpret_cast<unsigned char*>(&value);
 	const unsigned int itemSlot = valueBytes[2];
+	const unsigned char recipeIndex = valueBytes[3];
 	const short baseItem = caravanWork->m_inventoryItems[itemSlot];
 
 	caravanWork->DeleteItemIdx(itemSlot, 1);
 
 	const unsigned int itemTableBase = Game.unkCFlatData0[2] + static_cast<int>(baseItem) * 0x48;
-	const unsigned short smithItem = *reinterpret_cast<unsigned short*>(itemTableBase + valueBytes[3] * 2 + 0x38);
+	const unsigned short smithItem = *reinterpret_cast<unsigned short*>(itemTableBase + recipeIndex * 2 + 0x38);
 
 	unsigned int materialTable = itemTableBase;
 	for (int i = 0; i < 3; i++, materialTable += 2) {
-		const unsigned int materialId = *reinterpret_cast<unsigned short*>(materialTable + 0x26);
-		if (materialId == 0) {
+		const int materialId = *reinterpret_cast<unsigned short*>(materialTable + 0x26);
+		if (materialId <= 0) {
 			break;
 		}
 
-		const unsigned int materialCount = *reinterpret_cast<unsigned short*>(materialTable + 0x2C);
+		const int materialCount = *reinterpret_cast<unsigned short*>(materialTable + 0x2C);
 		if (materialCount == 0) {
 			break;
 		}
@@ -1074,13 +1075,13 @@ void GbaQueue::SetSmithData(int channel, unsigned int value)
 		}
 	}
 
-	if (caravanWork->AddItem(smithItem, 0) == 0) {
+	if (reinterpret_cast<CCaravanWork*>(*scriptFoodBase)->AddItem(smithItem, 0) == 0) {
 		Joybus.SendResult(channel, 1, valueBytes[0], valueBytes[1]);
 	}
 
-	const float smithRate = static_cast<float>(caravanWork->m_shopParam) / 100.0f;
+	const float smithRate = static_cast<float>(reinterpret_cast<CCaravanWork*>(*scriptFoodBase)->m_shopParam) / 100.0f;
 	const int gilCost = -static_cast<int>(static_cast<float>(*reinterpret_cast<unsigned short*>(itemTableBase + 0x24)) * smithRate);
-	if (caravanWork->AddGil(gilCost) == 0) {
+	if (reinterpret_cast<CCaravanWork*>(*scriptFoodBase)->AddGil(gilCost) == 0) {
 		Joybus.SendResult(channel, 1, valueBytes[0], valueBytes[1]);
 	}
 
@@ -1110,19 +1111,19 @@ void GbaQueue::SetStageNo(int stageId, int mapId)
 
     obj[0x2D38] = 0;
     obj[0x2D39] = 0;
-    obj[0x2C89] = 0;
+    obj[0x2D61] = 0;
+    *reinterpret_cast<int*>(obj + 0x2AF8) = 0;
     obj[0x2C88] = 0;
-    obj[0x2C8A] = 0;
     memset(obj + 0x2B00, 0, 0x188);
 
     if ((*reinterpret_cast<int*>(obj + 0x444) != stageId) || (*reinterpret_cast<int*>(obj + 0x448) != mapId)) {
-        *reinterpret_cast<int*>(obj + 0x44C) = 0xF;
-        obj[0x2C89] = 0xF;
+        obj[0x44C] = 0xF;
+        obj[0x2D37] = 0xF;
     }
 
     *reinterpret_cast<int*>(obj + 0x444) = stageId;
     *reinterpret_cast<int*>(obj + 0x448) = mapId;
-    obj[0x2C8B] = 0xF;
+    obj[0x2D55] = 0xF;
 
     i = 0;
     semaphoreIter = this;
@@ -1141,8 +1142,8 @@ void GbaQueue::SetStageNo(int stageId, int mapId)
             semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
         } while (i < 4);
 
-        *reinterpret_cast<int*>(obj + 0x44C) = 0xF;
-        obj[0x2C89] = 0xF;
+        obj[0x44C] = 0xF;
+        obj[0x2D37] = 0xF;
 
         i = 0;
         semaphoreIter = this;
@@ -1153,8 +1154,8 @@ void GbaQueue::SetStageNo(int stageId, int mapId)
         } while (i < 4);
     }
 
-    memset(obj + 0x2D40, 0xFF, 0x10);
-    obj[0x2C8A] = 0;
+    memset(obj + 0x2D44, 0xFF, 0x10);
+    obj[0x2D54] = 0;
 }
 
 /*
@@ -2353,14 +2354,14 @@ Printf__7CSystemFPce(&System, const_cast<char*>(s_subject_max_over), const_cast<
 			if (value != 0) {
 				if (value < 0x100 || value > 0x124) {
 					flags |= 0x10;
-					entryWrite[0] = (value << 24) | ((value >> 8) << 16);
+					entryWrite[0] = SwapU32(value);
 				} else if ((unsigned int)System.m_execParam >= 1) {
 Printf__7CSystemFPce(&System, const_cast<char*>(s_letter_data_error), const_cast<char*>(s_gbaque_cpp_801DB370), 0x810, channel, i);
 				}
 			}
 		} else if (value != 0) {
 			flags |= 0x20;
-			entryWrite[0] = value * 0x64000000 | ((value * 100 >> 8) << 16);
+			entryWrite[0] = SwapU32(value * 100);
 		}
 
 		(reinterpret_cast<unsigned char*>(entryWrite))[6] = flags;
@@ -2369,12 +2370,9 @@ Printf__7CSystemFPce(&System, const_cast<char*>(s_letter_data_error), const_cast
 
 	unsigned int header[4];
 	memset(header, 0, 0x10);
-	header[0] = (letterCount << 24) | ((letterCount >> 8) & 0xFF) << 16 |
-		((letterCount >> 16) & 0xFF) << 8 | (letterCount >> 24);
-	header[1] = (subjectCount << 24) | ((subjectCount >> 8) & 0xFF) << 16 |
-		((subjectCount >> 16) & 0xFF) << 8 | (subjectCount >> 24);
-	header[2] = (npcCount << 24) | ((npcCount >> 8) & 0xFF) << 16 |
-		((npcCount >> 16) & 0xFF) << 8 | (npcCount >> 24);
+	header[0] = SwapU32(letterCount);
+	header[1] = SwapU32(subjectCount);
+	header[2] = SwapU32(npcCount);
 	header[3] = reinterpret_cast<unsigned int*>(&CFlat)[0x1042];
 
 	memcpy(outData, header, 0x10);
@@ -4003,24 +4001,21 @@ Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocat
 				static_cast<float>(static_cast<unsigned short>(*reinterpret_cast<unsigned short*>(itemBase + 0x24))) *
 				static_cast<float>(static_cast<float>(*reinterpret_cast<short*>(*scriptFood + 0xBE2)) / 100.0f));
 
-			itemBuf[0] =
-				(static_cast<unsigned int>(price) << 24) |
-				(((static_cast<unsigned int>(price) >> 8) & 0xFF) << 16) |
-				(((static_cast<unsigned int>(price) >> 16) & 0xFF) << 8) |
-				(static_cast<unsigned int>(price) >> 24);
+			itemBuf[0] = SwapU32(static_cast<unsigned int>(price));
 
-			reinterpret_cast<unsigned short*>(itemBuf)[2] = SwapU16Value(*reinterpret_cast<unsigned short*>(itemBase + 0x26));
-			reinterpret_cast<unsigned short*>(itemBuf)[3] = SwapU16Value(*reinterpret_cast<unsigned short*>(itemBase + 0x28));
-			reinterpret_cast<unsigned short*>(itemBuf)[4] = SwapU16Value(*reinterpret_cast<unsigned short*>(itemBase + 0x2A));
-			reinterpret_cast<unsigned short*>(itemBuf)[5] = SwapU16Value(*reinterpret_cast<unsigned short*>(itemBase + 0x2C));
-			reinterpret_cast<unsigned short*>(itemBuf)[6] = SwapU16Value(*reinterpret_cast<unsigned short*>(itemBase + 0x2E));
-			reinterpret_cast<unsigned short*>(itemBuf)[7] = SwapU16Value(*reinterpret_cast<unsigned short*>(itemBase + 0x30));
+			reinterpret_cast<unsigned short*>(itemBuf)[2] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 0x26), 0);
+			reinterpret_cast<unsigned short*>(itemBuf)[3] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 0x28), 0);
+			reinterpret_cast<unsigned short*>(itemBuf)[4] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 0x2A), 0);
+			reinterpret_cast<unsigned short*>(itemBuf)[5] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 0x2C), 0);
+			reinterpret_cast<unsigned short*>(itemBuf)[6] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 0x2E), 0);
+			reinterpret_cast<unsigned short*>(itemBuf)[7] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 0x30), 0);
 
 			for (int j = 0; j < 2; j++) {
 				const int recipeBase = itemBase + j * 4;
 
 				const unsigned short materialA = *reinterpret_cast<unsigned short*>(recipeBase + 0x38);
-				reinterpret_cast<unsigned short*>(itemBuf)[8 + j * 2] = SwapU16Value(materialA);
+				reinterpret_cast<unsigned short*>(itemBuf)[8 + j * 2] =
+					__lhbrx(reinterpret_cast<unsigned short*>(recipeBase + 0x38), 0);
 				if (materialA == 0) {
 					reinterpret_cast<unsigned short*>(itemBuf)[12 + j * 8] = 0;
 					reinterpret_cast<unsigned short*>(itemBuf)[13 + j * 8] = 0;
@@ -4028,15 +4023,16 @@ Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocat
 				} else {
 					const int materialBase = flatBase + materialA * 0x48;
 					reinterpret_cast<unsigned short*>(itemBuf)[12 + j * 8] =
-						SwapU16Value(*reinterpret_cast<unsigned short*>(materialBase + 4));
+						__lhbrx(reinterpret_cast<unsigned short*>(materialBase + 4), 0);
 					reinterpret_cast<unsigned short*>(itemBuf)[13 + j * 8] =
-						SwapU16Value(*reinterpret_cast<unsigned short*>(materialBase + 6));
+						__lhbrx(reinterpret_cast<unsigned short*>(materialBase + 6), 0);
 					reinterpret_cast<unsigned short*>(itemBuf)[14 + j * 8] =
-						SwapU16Value(*reinterpret_cast<unsigned short*>(materialBase + 8));
+						__lhbrx(reinterpret_cast<unsigned short*>(materialBase + 8), 0);
 				}
 
 				const unsigned short materialB = *reinterpret_cast<unsigned short*>(recipeBase + 0x3A);
-				reinterpret_cast<unsigned short*>(itemBuf)[9 + j * 2] = SwapU16Value(materialB);
+				reinterpret_cast<unsigned short*>(itemBuf)[9 + j * 2] =
+					__lhbrx(reinterpret_cast<unsigned short*>(recipeBase + 0x3A), 0);
 				if (materialB == 0) {
 					reinterpret_cast<unsigned short*>(itemBuf)[16 + j * 8] = 0;
 					reinterpret_cast<unsigned short*>(itemBuf)[17 + j * 8] = 0;
@@ -4044,11 +4040,11 @@ Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocat
 				} else {
 					const int materialBase = flatBase + materialB * 0x48;
 					reinterpret_cast<unsigned short*>(itemBuf)[16 + j * 8] =
-						SwapU16Value(*reinterpret_cast<unsigned short*>(materialBase + 4));
+						__lhbrx(reinterpret_cast<unsigned short*>(materialBase + 4), 0);
 					reinterpret_cast<unsigned short*>(itemBuf)[17 + j * 8] =
-						SwapU16Value(*reinterpret_cast<unsigned short*>(materialBase + 6));
+						__lhbrx(reinterpret_cast<unsigned short*>(materialBase + 6), 0);
 					reinterpret_cast<unsigned short*>(itemBuf)[18 + j * 8] =
-						SwapU16Value(*reinterpret_cast<unsigned short*>(materialBase + 8));
+						__lhbrx(reinterpret_cast<unsigned short*>(materialBase + 8), 0);
 				}
 			}
 
@@ -4059,7 +4055,7 @@ Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocat
 	}
 
 	for (int i = 0; i < 4; i++) {
-		unsigned int value = SwapU32Value(*reinterpret_cast<unsigned int*>(*scriptFood + i * 4 + 0xC08));
+		unsigned int value = __lwbrx(reinterpret_cast<unsigned int*>(*scriptFood + i * 4 + 0xC08), 0);
 		memcpy(writePtr, &value, 4);
 		writePtr += 4;
 		totalSize += 4;

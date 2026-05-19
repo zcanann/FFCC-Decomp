@@ -866,6 +866,9 @@ void birth(
 					*f32_at(particlePayload, 0x00) = pathVec->x * *f32_at(payload, 0xD8);
 					*f32_at(particlePayload, 0x04) = pathVec->y * *f32_at(payload, 0xDC);
 					*f32_at(particlePayload, 0x08) = pathVec->z * *f32_at(payload, 0xE0);
+					if ((mode == 8) || (mode == 9)) {
+						PSVECNormalize((Vec*)particlePayload, (Vec*)(particlePayload + 0x10));
+					}
 				}
 			}
 		}

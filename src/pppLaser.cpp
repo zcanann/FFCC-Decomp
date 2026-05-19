@@ -40,8 +40,6 @@ void ParticleFrameCallback__5CGameFiiiiiP3Vec(CGame*, int, int, int, int, int, V
 int GetTextureFromRSD__FiP9_pppEnvSt(int, _pppEnvSt*);
 
 void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(void*, void*, float, u8, u8, u8, u8, u8, u8, u8);
-void SetVtxFmt_POS_CLR_TEX__5CUtilFv(void*);
-void SetVtxFmt_POS_CLR__5CUtilFv(void*);
 void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
 void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, int, int, int, int);
 void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
@@ -401,7 +399,7 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
     s32 dataValIndex = step->m_dataValIndex;
     u32 count;
     s32 i;
-    u8 alphaStep;
+    s32 alphaStep;
     char alphaMax;
     float negHalfWidth;
     float length;
@@ -450,7 +448,7 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
     _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg(
         0, 7, 7, 7, 5);
     _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(0, 0, 0, 0, 1, 0);
-    SetVtxFmt_POS_CLR_TEX__5CUtilFv(&gUtil);
+    gUtil.SetVtxFmt_POS_CLR_TEX();
     GXLoadTexObj((GXTexObj*)(tex + 0x28), GX_TEXMAP0);
 
     halfWidth = work->m_halfWidth;
@@ -566,7 +564,7 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
 
         u8* cflat = CFlat;
         if ((*reinterpret_cast<u32*>(cflat + 0x129c) & 0x200000) != 0) {
-            SetVtxFmt_POS_CLR__5CUtilFv(&gUtil);
+            gUtil.SetVtxFmt_POS_CLR();
             _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0xFF, 0xFF, 4);
             _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 4);
             GXSetNumTexGens(0);

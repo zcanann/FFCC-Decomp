@@ -147,7 +147,12 @@ struct _pppPObject
     _pppPObjLink m_link;        // 0x0
     s32 m_graphId;              // 0xc
     pppFMATRIX m_localMatrix;   // 0x10 (size 0x30)
-    char m_pad40[0x80 - 0x40];  // 0x40
+    char m_pad40[0x70 - 0x40];  // 0x40
+    void* m_field70;            // 0x70
+    void* m_field74;            // 0x74
+    char m_pad78[0x7C - 0x78];  // 0x78
+    u8 m_field7C;               // 0x7C
+    char m_pad7D[0x80 - 0x7D];  // 0x7D
     u8 m_workArea[1];           // 0x80 - per-instance work block, indexed by _pppCtrlTable::m_serializedDataOffsets[N]
 };
 

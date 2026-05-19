@@ -313,19 +313,18 @@ bool CMenuPcs::CompaClose()
     entry = this->compaList->entries;
     frame = this->compaMenuState->frame;
     for (int i = 0; i < count; i++) {
-        float step = FLOAT_80332FF8;
         if (frame >= entry->startFrame) {
             if (entry->startFrame + entry->duration <= frame) {
                 finishedCount = finishedCount + 1;
                 entry->alpha = FLOAT_80332FF8;
-                entry->dx = step;
-                entry->dy = step;
+                entry->dx = FLOAT_80332FF8;
+                entry->dy = FLOAT_80332FF8;
             } else {
                 entry->frame = entry->frame + 1;
                 entry->alpha =
                     (float)-((DOUBLE_80333008 / (double)entry->duration) * (double)entry->frame - DOUBLE_80333008);
                 if ((entry->flags & 2) == 0) {
-                    step =
+                    float step =
                         (float)-((DOUBLE_80333008 / (double)entry->duration) * (double)entry->frame - DOUBLE_80333008);
                     float dx = entry->targetX - (float)entry->x;
                     float dy = entry->targetY - (float)entry->y;
@@ -356,12 +355,13 @@ bool CMenuPcs::CompaClose()
 void CMenuPcs::CompaCtrl()
 {
 	bool activeInput = false;
+	int padState = Pad._452_4_;
 	unsigned int rawPress;
 	short press;
 	short hold;
-	int doReset = 0;
+	bool doReset = false;
 
-	if (Pad._452_4_ == 0) {
+	if (padState == 0) {
 		if (Pad._448_4_ != -1) {
 			goto activePress;
 		}
@@ -381,7 +381,7 @@ activePress:
 	press = rawPress & 0xffff;
 
 	activeInput = false;
-	if (Pad._452_4_ == 0) {
+	if (padState == 0) {
 		if (Pad._448_4_ != -1) {
 			goto activeHold;
 		}
@@ -400,27 +400,27 @@ activeHold:
 	}
 
 	if (hold == 0) {
-		doReset = 0;
+		doReset = false;
 	} else if ((press & 0x20) != 0) {
 		this->compaMenuState->cursorMove = 1;
 		Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
-		doReset = 1;
+		doReset = true;
 	} else if ((press & 0x40) != 0) {
 		this->compaMenuState->cursorMove = -1;
 		Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
-		doReset = 1;
+		doReset = true;
 	} else if ((press & 0x100) != 0) {
 		Sound.PlaySe(4, 0x40, 0x7f, 0);
-		doReset = 0;
+		doReset = false;
 	} else if ((press & 0x200) != 0) {
 		this->compaMenuState->closeRequested = 1;
 		Sound.PlaySe(3, 0x40, 0x7f, 0);
-		doReset = 1;
+		doReset = true;
 	} else {
-		doReset = 0;
+		doReset = false;
 	}
 
-	if (doReset != 0) {
+	if (doReset) {
 		CompaOpenAnimList* compaList = this->compaList;
 		compaList->entries[0].startFrame = 2;
 		compaList->entries[0].duration = 5;
@@ -440,7 +440,7 @@ activeHold:
 		CompaOpenAnim* entry = compaList->entries;
 		while (entryCount != 0) {
 			entry->frame = 0;
-			entry->alpha = 1.0f;
+			entry->alpha = FLOAT_80333000;
 			entry++;
 			entryCount--;
 		}
@@ -473,18 +473,17 @@ bool CMenuPcs::CompaOpen()
     entry = this->compaList->entries;
     frame = this->compaMenuState->frame;
     for (int i = 0; i < count; i++) {
-        float step = FLOAT_80332FF8;
         if (frame >= entry->startFrame) {
             if (entry->startFrame + entry->duration <= frame) {
                 finishedCount = finishedCount + 1;
                 entry->alpha = FLOAT_80333000;
-                entry->dx = step;
-                entry->dy = step;
+                entry->dx = FLOAT_80332FF8;
+                entry->dy = FLOAT_80332FF8;
             } else {
                 entry->frame = entry->frame + 1;
                 entry->alpha = (float)((DOUBLE_80333008 / (double)entry->duration) * (double)entry->frame);
                 if ((entry->flags & 2) == 0) {
-                    step = (float)((DOUBLE_80333008 / (double)entry->duration) * (double)entry->frame);
+                    float step = (float)((DOUBLE_80333008 / (double)entry->duration) * (double)entry->frame);
                     float dx = entry->targetX - (float)entry->x;
                     float dy = entry->targetY - (float)entry->y;
                     entry->dx = dx * step;

@@ -84,7 +84,6 @@ void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int stage
 void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int comp0, int ref0, int op, int comp1, int ref1);
 void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int stage, int texCoord, int texMap, int chan);
 void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int stage, int mode);
-void SetVtxFmt_POS_TEX0_TEX1__5CUtilFv(void* util);
 GXTexObj* GetBackBufferRect__8CGraphicFRiRiRiRii(CGraphic* graphic, int& left, int& top, int& width, int& height, int copy);
 void DisableIndWarp__F13_GXTevStageID16_GXIndTexStageID(int stage, int indStage);
 void MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(void* math, Mtx44 mtx, Vec4d* src, Vec4d* dst);
@@ -130,7 +129,7 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 		_GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(7, 0, 1, 7, 0);
 		_GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 4);
 		_GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 3);
-		SetVtxFmt_POS_TEX0_TEX1__5CUtilFv(&gUtil);
+		gUtil.SetVtxFmt_POS_TEX0_TEX1();
 		GXLoadTexObj((GXTexObj*)(textureBase + 0x28), GX_TEXMAP1);
 		GXSetNumIndStages(1);
 		GXSetIndTexOrder(GX_INDTEXSTAGE0, GX_TEXCOORD1, GX_TEXMAP1);
@@ -488,10 +487,11 @@ int RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* verti
 	PSMTXConcat(texMtx, layout->m_modelMatrix.value, tempMtx);
 
 	for (i = 0; i < 4; i++) {
-		projectedObjPtrs[i] = &projectedObj[i];
+		Vec* projectedObjPtr = &projectedObj[i];
+		projectedObjPtrs[i] = projectedObjPtr;
 		PSMTXMultVec(tempMtx, &vertices[i], projectedObjPtrs[i]);
-		projectedObjPtrs[i]->x = projectedObjPtrs[i]->x / projectedObjPtrs[i]->z;
-		projectedObjPtrs[i]->y = projectedObjPtrs[i]->y / projectedObjPtrs[i]->z;
+		projectedObjPtr->x = projectedObjPtr->x / projectedObjPtr->z;
+		projectedObjPtr->y = projectedObjPtr->y / projectedObjPtr->z;
 	}
 
 	minXIndex = 0;

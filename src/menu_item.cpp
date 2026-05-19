@@ -182,54 +182,53 @@ int CMenuPcs::ItemCtrlCur()
         return 0;
     }
 
-    int menuState = (int)itemMenuState;
-    int mode = (int)*(s16*)(menuState + 0x30);
+    int mode = this->itemMenuState->mode;
     s16 letterAttachFlg = SingGetLetterAttachflg__8CMenuPcsFv(this);
 
     if (mode == 0) {
         if ((hold & 8) == 0) {
             if ((hold & 4) != 0) {
-                if (*(s16*)(menuState + 0x26) < 7) {
-                    *(s16*)(menuState + 0x26) = *(s16*)(menuState + 0x26) + 1;
+                if (this->itemMenuState->selectedIndex < 7) {
+                    this->itemMenuState->selectedIndex = this->itemMenuState->selectedIndex + 1;
                 } else {
-                    s16 scroll = *(s16*)(menuState + 0x34);
+                    s16 scroll = this->itemMenuState->scroll;
                     if (scroll > 0x3E) {
-                        *(s16*)(menuState + 0x34) = 0;
+                        this->itemMenuState->scroll = 0;
                     } else {
-                        *(s16*)(menuState + 0x34) = scroll + 1;
+                        this->itemMenuState->scroll = scroll + 1;
                     }
                 }
                 Sound.PlaySe(1, 0x40, 0x7F, 0);
             }
-        } else if (*(s16*)(menuState + 0x26) == 0) {
-            if (*(s16*)(menuState + 0x34) == 0) {
-                *(s16*)(menuState + 0x34) = 0x3F;
+        } else if (this->itemMenuState->selectedIndex == 0) {
+            if (this->itemMenuState->scroll == 0) {
+                this->itemMenuState->scroll = 0x3F;
             } else {
-                *(s16*)(menuState + 0x34) = *(s16*)(menuState + 0x34) - 1;
+                this->itemMenuState->scroll = this->itemMenuState->scroll - 1;
             }
             Sound.PlaySe(1, 0x40, 0x7F, 0);
         } else {
-            *(s16*)(menuState + 0x26) = *(s16*)(menuState + 0x26) - 1;
+            this->itemMenuState->selectedIndex = this->itemMenuState->selectedIndex - 1;
             Sound.PlaySe(1, 0x40, 0x7F, 0);
         }
 
         if ((hold & 0xC) == 0) {
             if ((press & 0x20) != 0) {
                 if (letterAttachFlg < 0) {
-                    *(s16*)(menuState + 0x1E) = 1;
+                    this->itemMenuState->cursorMove = 1;
                     Sound.PlaySe(0x5A, 0x40, 0x7F, 0);
                     return 1;
                 }
                 Sound.PlaySe(4, 0x40, 0x7F, 0);
             } else if ((press & 0x40) != 0) {
                 if (letterAttachFlg < 0) {
-                    *(s16*)(menuState + 0x1E) = -1;
+                    this->itemMenuState->cursorMove = -1;
                     Sound.PlaySe(0x5A, 0x40, 0x7F, 0);
                     return 1;
                 }
                 Sound.PlaySe(4, 0x40, 0x7F, 0);
             } else if ((press & 0x100) != 0) {
-                int idx = (int)*(s16*)(menuState + 0x34) + (int)*(s16*)(menuState + 0x26);
+                int idx = this->itemMenuState->scroll + this->itemMenuState->selectedIndex;
                 if (idx > 0x3F) {
                     idx -= 0x40;
                 }
@@ -245,14 +244,14 @@ int CMenuPcs::ItemCtrlCur()
                     Sound.PlaySe(2, 0x40, 0x7F, 0);
                     return 1;
                 } else {
-                    *(u8*)(menuState + 9) = 0xC;
+                    this->itemMenuState->optionFlags = 0xC;
                     int itemType = GetItemType__8CMenuPcsFii(this, idx, 0);
 
                     if ((itemType == 7) && (CanPlayerUseItem__12CCaravanWorkFv((void*)caravanWork) != 0)) {
-                        *(u8*)(menuState + 9) = *(u8*)(menuState + 9) | 1;
+                        this->itemMenuState->optionFlags = this->itemMenuState->optionFlags | 1;
                     }
                     if ((itemType != 1) && (CanPlayerPutItem__12CCaravanWorkFv((void*)caravanWork) != 0)) {
-                        *(u8*)(menuState + 9) = *(u8*)(menuState + 9) | 2;
+                        this->itemMenuState->optionFlags = this->itemMenuState->optionFlags | 2;
                     }
 
                     s16 winW;
@@ -261,8 +260,8 @@ int CMenuPcs::ItemCtrlCur()
                     SetSingWinInfo__8CMenuPcsFiiii(this, 0xF0, 0xA0, winW, winH);
 
                     this->singWindowInfo[5] = 0;
-                    *(s16*)(menuState + 0x12) = 0;
-                    *(s16*)(menuState + 0x30) = 1;
+                    this->itemMenuState->optionFrame = 0;
+                    this->itemMenuState->mode = 1;
                     Sound.PlaySe(2, 0x40, 0x7F, 0);
                 }
             } else if ((press & 0x200) != 0) {
@@ -271,13 +270,13 @@ int CMenuPcs::ItemCtrlCur()
                     Sound.PlaySe(3, 0x40, 0x7F, 0);
                     return 1;
                 }
-                *(u8*)(menuState + 0xD) = 1;
+                this->itemMenuState->closeRequested = 1;
                 Sound.PlaySe(3, 0x40, 0x7F, 0);
                 return 1;
             }
         }
     } else {
-        int optBase = menuState + mode * 2;
+        int optBase = (int)this->itemMenuState + mode * 2;
 
         if ((hold & 8) == 0) {
             if ((hold & 4) != 0) {
@@ -300,10 +299,10 @@ int CMenuPcs::ItemCtrlCur()
         if ((hold & 0xC) == 0) {
             if ((press & 0x100) != 0) {
                 int option = (int)*(s16*)(optBase + 0x26);
-                if (((int)*(char*)(menuState + 9) & (1 << option)) == 0) {
+                if (((int)this->itemMenuState->optionFlags & (1 << option)) == 0) {
                     Sound.PlaySe(4, 0x40, 0x7F, 0);
                 } else {
-                    int idx = (int)*(s16*)(menuState + 0x34) + (int)*(s16*)(menuState + 0x26);
+                    int idx = this->itemMenuState->scroll + this->itemMenuState->selectedIndex;
                     if (idx > 0x3F) {
                         idx -= 0x40;
                     }
@@ -319,12 +318,12 @@ int CMenuPcs::ItemCtrlCur()
                     }
 
                     this->singWindowInfo[5] = 2;
-                    *(s16*)(menuState + 0x12) = *(s16*)(menuState + 0x12) + 1;
+                    this->itemMenuState->optionFrame = this->itemMenuState->optionFrame + 1;
                     Sound.PlaySe(2, 0x40, 0x7F, 0);
                 }
             } else if ((press & 0x200) != 0) {
                 this->singWindowInfo[5] = 2;
-                *(s16*)(menuState + 0x12) = *(s16*)(menuState + 0x12) + 1;
+                this->itemMenuState->optionFrame = this->itemMenuState->optionFrame + 1;
                 Sound.PlaySe(3, 0x40, 0x7F, 0);
             }
         }
@@ -700,12 +699,10 @@ bool CMenuPcs::ItemOpen()
     for (int i = 0; i < count; i++, anim++) {
         if (frame >= anim->startFrame) {
             if (anim->startFrame + anim->duration <= frame) {
-                float progress = FLOAT_80332e64;
                 finished++;
-                float zero = FLOAT_80332e60;
-                anim->progress = progress;
-                anim->dx = zero;
-                anim->dy = zero;
+                anim->progress = FLOAT_80332e64;
+                anim->dx = FLOAT_80332e60;
+                anim->dy = FLOAT_80332e60;
             } else {
                 anim->frame++;
                 double one = DOUBLE_80332e68;

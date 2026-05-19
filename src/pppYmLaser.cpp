@@ -43,8 +43,6 @@ int GetCharaNodeFrameMatrix__FP9_pppMngStfPA4_f(_pppMngSt*, float, Mtx);
 int GetTextureFromRSD__FiP9_pppEnvSt(int, _pppEnvSt*);
 
 void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(void*, void*, float, u8, u8, u8, u8, u8, u8, u8);
-void SetVtxFmt_POS_CLR_TEX__5CUtilFv(void*);
-void SetVtxFmt_POS_CLR__5CUtilFv(void*);
 void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
 void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, int, int, int, int);
 void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
@@ -63,6 +61,7 @@ void pppDrawShp__FPlsP12CMaterialSetUc(long*, short, CMaterialSet*, u8);
 }
 
 extern "C" const char s_pppYmLaser_cpp_801DB4B0[] = "pppYmLaser.cpp";
+extern const f32 FLOAT_80330de0 = -1.0f;
 
 static inline f32 LoadLaserFloat(const f32& value)
 {
@@ -120,9 +119,9 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 	int colorOffset = serializedDataOffsets[1];
 	pppYmLaserColorData* colorData = (pppYmLaserColorData*)((u8*)laser + 0x80 + colorOffset);
 	s32 dataValIndex = step->m_dataValIndex;
-	s32 count;
+	int count;
 	s32 i;
-	u8 alphaStep;
+	s32 alphaStep;
 	char alphaMax;
 	float negHalfWidth;
 	float length;
@@ -171,7 +170,7 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 	_GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg(
 		0, 7, 7, 7, 5);
 	_GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(0, 0, 0, 0, 1, 0);
-	SetVtxFmt_POS_CLR_TEX__5CUtilFv(&gUtil);
+	gUtil.SetVtxFmt_POS_CLR_TEX();
 	GXLoadTexObj((GXTexObj*)(tex + 0x28), GX_TEXMAP0);
 
 	halfWidth = work->m_halfWidth;
@@ -285,7 +284,7 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 
 		u8* cflat = CFlat;
 		if ((*reinterpret_cast<u32*>(cflat + 0x129c) & 0x200000) != 0) {
-			SetVtxFmt_POS_CLR__5CUtilFv(&gUtil);
+			gUtil.SetVtxFmt_POS_CLR();
 			_GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0xFF, 0xFF, 4);
 			_GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 4);
 			GXSetNumTexGens(0);
@@ -377,7 +376,6 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 	}
 }
 
-extern const f32 FLOAT_80330de0 = -1.0f;
 extern const f32 FLOAT_80330de4 = 1.2f;
 extern const f32 FLOAT_80330de8 = 10000000000.0f;
 extern const f32 FLOAT_80330dec = -10000000000.0f;

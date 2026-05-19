@@ -30,7 +30,6 @@ public:
     void LetterMessDraw();
     int LetterCtrlCur();
     void LetterLstBaseDraw(float);
-    void LetterDrawPageMark(int);
     void LetterSetAttachItem(unsigned int, int);
 };
 

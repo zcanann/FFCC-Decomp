@@ -981,8 +981,7 @@ void CMenuPcs::createSingleMenu()
         }
 
         char path[128];
-        char* language = GetLangString__5CGameFv(&Game);
-        sprintf(path, s_dvd__smenu_subfont_fnt_801de8f8, language);
+        sprintf(path, s_dvd__smenu_subfont_fnt_801de8f8, GetLangString__5CGameFv(&Game));
         loadFont__8CMenuPcsFiPcii(this, 1, path, 4, -1);
 
         self[0x85A] = 0;
@@ -3105,20 +3104,20 @@ void CMenuPcs::GetRaceStr(int itemNo, char* outText)
     outText[0] = '\0';
 
     if ((raceBits & 0xF) == 0xF) {
-        text = PTR_s_Tutti_802143ec;
-        if (Game.m_gameWork.m_languageId != 3) {
-            if (Game.m_gameWork.m_languageId < 3) {
-                if (Game.m_gameWork.m_languageId != 1 && Game.m_gameWork.m_languageId != 0) {
-                    text = PTR_s_Alle_Rassen_8021430c;
-                }
+        if (Game.m_gameWork.m_languageId == 3) {
+            text = gSingMenuTextTableIt[19];
+        } else if (Game.m_gameWork.m_languageId < 3) {
+            if (Game.m_gameWork.m_languageId == 1 || Game.m_gameWork.m_languageId == 0) {
+                text = gSingMenuTextTableEn[19];
             } else {
-                text = PTR_s_Todos_802145ac;
-                if (Game.m_gameWork.m_languageId != 5 && Game.m_gameWork.m_languageId >= 5) {
-                    text = PTR_DAT_8021422c;
-                } else if (Game.m_gameWork.m_languageId < 5) {
-                    text = PTR_DAT_802144cc;
-                }
+                text = gSingMenuTextTableDe[19];
             }
+        } else if (Game.m_gameWork.m_languageId == 5) {
+            text = gSingMenuTextTableEs[19];
+        } else if (Game.m_gameWork.m_languageId < 5) {
+            text = gSingMenuTextTableFr[19];
+        } else {
+            text = gSingMenuTextTableEn[19];
         }
         strcpy(outText, text);
         return;
@@ -3168,22 +3167,21 @@ void CMenuPcs::GetRaceStr(int itemNo, char* outText)
         return;
     }
 
-    suffix = 0;
     raceType = (raceBits & 0x30) >> 5;
     if (Game.m_gameWork.m_languageId == 3) {
-        suffix = PTR_s_Maschio_802143e4[raceType];
+        suffix = gSingMenuTextTableIt[raceType + 17];
     } else if (Game.m_gameWork.m_languageId < 3) {
-        if (Game.m_gameWork.m_languageId != 1 && Game.m_gameWork.m_languageId != 0) {
-            suffix = PTR_DAT_80214304[raceType];
+        if (Game.m_gameWork.m_languageId == 1 || Game.m_gameWork.m_languageId == 0) {
+            suffix = gSingMenuTextTableEn[raceType + 17];
+        } else {
+            suffix = gSingMenuTextTableDe[raceType + 17];
         }
     } else if (Game.m_gameWork.m_languageId == 5) {
-        suffix = PTR_s_Hombre_802145a4[raceType];
+        suffix = gSingMenuTextTableEs[raceType + 17];
     } else if (Game.m_gameWork.m_languageId < 5) {
-        suffix = PTR_s_Masculin_802144c4[raceType];
-    }
-
-    if (suffix == 0) {
-        suffix = PTR_DAT_80214224[raceType];
+        suffix = gSingMenuTextTableFr[raceType + 17];
+    } else {
+        suffix = gSingMenuTextTableEn[raceType + 17];
     }
     strcat(outText, suffix);
 }

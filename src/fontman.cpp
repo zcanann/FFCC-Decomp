@@ -125,7 +125,7 @@ found_fallback_glyph:
 float CFont::GetWidth(char* text)
 {
 	char* textPtr = text;
-	float width = 0.0f;
+	float width = FLOAT_803306B8;
 	unsigned short ch;
 	int hasChar;
 
@@ -141,7 +141,7 @@ float CFont::GetWidth(char* text)
 			if (static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(glyph + 1)) != ((ch >> 8) & 0xFF)) {
 				glyph += 4;
 			} else {
-				goto use_glyph;
+				goto found_glyph;
 			}
 		}
 		glyph = 0;
@@ -188,7 +188,7 @@ find_fallback:
 use_fallback_glyph:
 		glyph = fallbackGlyph;
 		if (glyph != 0) {
-			goto found_glyph;
+			goto use_glyph;
 		}
 		charWidth = FLOAT_803306B8;
 
@@ -253,7 +253,7 @@ found_fallback:
 
 	unsigned char flags = renderFlags;
 	CFontRenderFlagBits& renderFlagBits = GetRenderFlagBits(renderFlags);
-	signed char sign = static_cast<signed char>(flags) >> 7;
+	signed char sign = static_cast<signed char>(renderFlagBits.shadow);
 	int drawWidth;
 	unsigned char* glyphInfo = reinterpret_cast<unsigned char*>(glyph) +
 	                           ((static_cast<unsigned int>(-static_cast<int>(sign) | static_cast<int>(sign)) >> 30 & 2) + 3);
@@ -295,14 +295,14 @@ found_fallback:
 	posX += advance;
 
 	if (glyphInfo[0] == 0) {
-		u0 += 1.0f;
+		u0 += FLOAT_803306C8;
 	}
 	if (m_glyphWidth == glyphInfo[0] + glyphInfo[1]) {
-		u1 -= 1.0f;
+		u1 -= FLOAT_803306C8;
 	}
 
-	v0 += 1.0f;
-	v1 -= 1.0f;
+	v0 += FLOAT_803306C8;
+	v1 -= FLOAT_803306C8;
 
 	GXBegin(GX_QUADS, GX_VTXFMT0, 4);
 	GXPosition3f32(x0, y0, posZ);

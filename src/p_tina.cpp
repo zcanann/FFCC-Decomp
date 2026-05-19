@@ -237,11 +237,11 @@ static inline char* InitCPartPcsTable(char* profileName)
 	table[28] = CPartPcs::m_table_desc6[1];
 	table[29] = CPartPcs::m_table_desc6[2];
 	table[32] = CPartPcs::m_table_desc7[0];
-	table[35] = CPartPcs::m_table_desc7[2];
+	table[34] = CPartPcs::m_table_desc7[2];
 	table[39] = CPartPcs::m_table_desc8[2];
-	table[44] = CPartPcs::m_table_desc9[0];
-	table[45] = CPartPcs::m_table_desc9[1];
-	table[46] = CPartPcs::m_table_desc9[2];
+	table[42] = CPartPcs::m_table_desc9[0];
+	table[43] = CPartPcs::m_table_desc9[1];
+	table[44] = CPartPcs::m_table_desc9[2];
 	table[88] = CPartPcs::m_table_desc10[0];
 	table[89] = CPartPcs::m_table_desc10[1];
 	table[90] = CPartPcs::m_table_desc10[2];

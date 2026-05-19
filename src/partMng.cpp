@@ -3440,8 +3440,9 @@ void CPartMng::LoadPartNoSyncCalc()
     for (int i = 0; i < 0x10; i++) {
         if (m_partAsyncBusy[i] != 0) {
             if (File.IsCompleted(m_partAsyncBusy[i])) {
+                int len;
                 void* readBuffer = File.m_readBuffer;
-                int len = File.GetLength(m_partAsyncBusy[i]);
+                len = File.GetLength(m_partAsyncBusy[i]);
                 void* amemCursor = reinterpret_cast<void*>(m_partAMemCursor);
 
                 Memory.CopyToAMemorySync(readBuffer, amemCursor, (len + 0x1f) & ~0x1f);

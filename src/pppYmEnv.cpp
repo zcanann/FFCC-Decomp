@@ -53,7 +53,7 @@ extern const float FLOAT_803311B4;
 extern const float FLOAT_803311B8;
 extern const double DOUBLE_803311C0;
 extern const float FLOAT_803311C8;
-extern const char s_Exiting_803311CC[] = "Exiting";
+extern const char s_Exiting_803311CC[8];
 
 struct _pppEnvStYmEnv {
     void* m_stagePtr;
@@ -131,7 +131,7 @@ void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displa
 {
     const unsigned char s_texObjIndices[] = {5, 2, 1, 0, 4, 5, 0, 0, 0, 0};
     const unsigned char s_xAxisRotIndices[] = {0, 0, 0, 0, 1, 1, 0, 0, 2, 0};
-    const unsigned char s_yAxisRotIndices[] = {4, 2, 1, 0, 4, 3, 0, 0, 0, 0};
+    const unsigned char s_yAxisRotIndices[] = {1, 3, 4, 2, 1, 0, 4, 3, 0, 0};
     const float s_xAxisAngles[] = {90.0f, 180.0f, 270.0f, 180.0f, -90.0f, 90.0f};
     const unsigned char s_xAxisIds[] = {'y', 'y', 'y', 'y', 'x', 'x'};
     const float s_yAxisAngles[] = {0.0f, 180.0f};
@@ -667,9 +667,10 @@ int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)
         animFrameCount = 0;
     }
 
-    animFrameMax = (int)(float)animFrameCount;
     frameInt = (int)modelTime;
-    frame = (float)(frameInt - (frameInt / animFrameMax) * animFrameMax);
+    animFrameMax = (int)(float)animFrameCount;
+    int frameDiv = frameInt / animFrameMax;
+    frame = (float)(frameInt - frameDiv * animFrameMax);
     if (frame < FLOAT_80331190) {
         return 0;
     }

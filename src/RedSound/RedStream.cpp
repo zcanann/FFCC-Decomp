@@ -34,6 +34,13 @@ enum RedStreamStringLayout {
 	REDSOUND_STREAM_SDATA2_STRING_SIZE = 0x15,
 };
 
+enum RedStreamMapLayout {
+	REDSOUND_STREAM_MAP_RODATA_STRING_OFFSET = 0x00,
+	REDSOUND_STREAM_MAP_RODATA_STRING_SIZE = 0xC6,
+	REDSOUND_STREAM_MAP_SDATA2_STRING_OFFSET = 0x00,
+	REDSOUND_STREAM_MAP_SDATA2_STRING_SIZE = 0x15,
+};
+
 enum RedStreamLayoutSize {
 	REDSOUND_STREAM_SAMPLE_ADVANCE = REDSOUND_STREAM_PAGE_SIZE / REDSOUND_STREAM_STEREO_CHANNEL_FRAME_BYTES,
 	REDSOUND_STREAM_FILE_HEADER_SIZE = sizeof(RedStreamHEAD),
@@ -140,8 +147,12 @@ STATIC_ASSERT(sizeof(sRedStreamBufferDidntSecureFmt) + sizeof(sRedStreamLogPrefi
                   sizeof(sRedStreamMainMemoryDidntCreateFmt) + sizeof(sRedStreamAramMemoryDidntCreateFmt) +
                   sizeof(sRedStreamPauseOnFmt) + sizeof(sRedStreamPauseOffFmt) ==
               REDSOUND_STREAM_RODATA_STRING_SIZE);
+STATIC_ASSERT(REDSOUND_STREAM_MAP_RODATA_STRING_OFFSET == 0);
+STATIC_ASSERT(REDSOUND_STREAM_RODATA_STRING_SIZE == REDSOUND_STREAM_MAP_RODATA_STRING_SIZE);
 STATIC_ASSERT(sizeof(sRedStreamLogErrorColor) + sizeof(sRedStreamLogReset) + sizeof(sRedStreamLogWarnColor) ==
               REDSOUND_STREAM_SDATA2_STRING_SIZE);
+STATIC_ASSERT(REDSOUND_STREAM_MAP_SDATA2_STRING_OFFSET == 0);
+STATIC_ASSERT(REDSOUND_STREAM_SDATA2_STRING_SIZE == REDSOUND_STREAM_MAP_SDATA2_STRING_SIZE);
 
 static RedStreamDATA* _SearchEmptyStreamData();
 static void _StreamStop(RedStreamDATA* streamData);

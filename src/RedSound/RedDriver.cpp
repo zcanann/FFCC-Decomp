@@ -519,7 +519,7 @@ struct RedMusicPlayCommand {
     int m_musicId;
     int m_volume;
     int m_mode;
-    int m_reserved;
+    int m_stopNext;
 };
 
 #define RedMusicCommandFromArgs(args) ((RedMusicPlayCommand*)(args))
@@ -527,15 +527,15 @@ struct RedMusicPlayCommand {
 #define RedMusicCommandGetVolume(args) (RedMusicCommandFromArgs(args)->m_volume)
 #define RedMusicCommandGetMode(args) (RedMusicCommandFromArgs(args)->m_mode)
 #define RedMusicCommandGetFadeTime(args) (RedMusicCommandFromArgs(args)->m_mode)
-#define RedMusicCommandGetStopNext(args) (RedMusicCommandFromArgs(args)->m_reserved)
+#define RedMusicCommandGetStopNext(args) (RedMusicCommandFromArgs(args)->m_stopNext)
 
 enum RedMusicPlayCommandLayout {
     REDSOUND_MUSIC_PLAY_COMMAND_ID_OFFSET = (unsigned int)&(((RedMusicPlayCommand*)0)->m_musicId),
     REDSOUND_MUSIC_PLAY_COMMAND_VOLUME_OFFSET = (unsigned int)&(((RedMusicPlayCommand*)0)->m_volume),
     REDSOUND_MUSIC_PLAY_COMMAND_MODE_OFFSET = (unsigned int)&(((RedMusicPlayCommand*)0)->m_mode),
-    REDSOUND_MUSIC_PLAY_COMMAND_RESERVED_OFFSET = (unsigned int)&(((RedMusicPlayCommand*)0)->m_reserved),
+    REDSOUND_MUSIC_PLAY_COMMAND_STOP_NEXT_OFFSET = (unsigned int)&(((RedMusicPlayCommand*)0)->m_stopNext),
     REDSOUND_MUSIC_PLAY_COMMAND_SIZE = sizeof(RedMusicPlayCommand),
-    REDSOUND_MUSIC_PLAY_COMMAND_RESERVED_SIZE = sizeof(((RedMusicPlayCommand*)0)->m_reserved),
+    REDSOUND_MUSIC_PLAY_COMMAND_STOP_NEXT_SIZE = sizeof(((RedMusicPlayCommand*)0)->m_stopNext),
 };
 
 enum RedMusicCommandWord {
@@ -620,8 +620,8 @@ STATIC_ASSERT(sizeof(RedExecCommand) == REDSOUND_EXEC_COMMAND_SIZE);
 STATIC_ASSERT(offsetof(RedMusicPlayCommand, m_musicId) == REDSOUND_MUSIC_PLAY_COMMAND_ID_OFFSET);
 STATIC_ASSERT(offsetof(RedMusicPlayCommand, m_volume) == REDSOUND_MUSIC_PLAY_COMMAND_VOLUME_OFFSET);
 STATIC_ASSERT(offsetof(RedMusicPlayCommand, m_mode) == REDSOUND_MUSIC_PLAY_COMMAND_MODE_OFFSET);
-STATIC_ASSERT(offsetof(RedMusicPlayCommand, m_reserved) == REDSOUND_MUSIC_PLAY_COMMAND_RESERVED_OFFSET);
-STATIC_ASSERT(sizeof(((RedMusicPlayCommand*)0)->m_reserved) == REDSOUND_MUSIC_PLAY_COMMAND_RESERVED_SIZE);
+STATIC_ASSERT(offsetof(RedMusicPlayCommand, m_stopNext) == REDSOUND_MUSIC_PLAY_COMMAND_STOP_NEXT_OFFSET);
+STATIC_ASSERT(sizeof(((RedMusicPlayCommand*)0)->m_stopNext) == REDSOUND_MUSIC_PLAY_COMMAND_STOP_NEXT_SIZE);
 STATIC_ASSERT(sizeof(RedMusicPlayCommand) == REDSOUND_MUSIC_PLAY_COMMAND_SIZE);
 STATIC_ASSERT(sizeof(RedTickHistory) == REDSOUND_TICK_HISTORY_SIZE);
 STATIC_ASSERT(sizeof(((RedTickHistory*)0)->m_ticks) == REDSOUND_TICK_HISTORY_SIZE);

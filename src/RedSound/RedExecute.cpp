@@ -152,7 +152,7 @@ s16 t_PanningDataR[REDSOUND_PAN_TABLE_COUNT] = {
     48, 42, 36, 30, 24, 18, 12, 6,
 };
 
-static volatile u8 m_RandomIndex;
+static u8 m_RandomIndex;
 static RedReverbDATA* volatile p_ReverbData;
 #define RedReverbDataGetBegin() (p_ReverbData)
 #define RedReverbDataSetBegin(data) (p_ReverbData = (data))
@@ -212,7 +212,7 @@ enum RedExecuteSmallDataLayout {
 };
 
 struct RedExecuteSmallDataState {
-    volatile u8 m_RandomIndex;
+    u8 m_RandomIndex;
     u8 m_RandomIndexAlignPadding[REDSOUND_EXECUTE_SBSS_RANDOM_PAD_SIZE];
     RedReverbDATA* volatile p_ReverbData;
     RedReverbSize* p_ReverbSize;

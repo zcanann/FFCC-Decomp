@@ -14222,6 +14222,7 @@ m_Mute = .sbss:0x8032F478; // type:object size:0x8 data:4byte
 c_RedMemory = .sbss:0x8032F480; // type:object size:0x1
 m_DMAExecute = .sbss:0x8032F484; // type:object size:0x4 scope:local data:4byte
 m_DMAInThread = .sbss:0x8032F488; // type:object size:0x4 scope:local data:4byte
+m_SilentWave = .sbss:0x8032F48C; // type:object size:0x4 scope:local data:4byte
 m_DataBuffer = .sbss:0x8032F490; // type:object size:0x4 scope:local data:4byte
 m_ADataBuffer = .sbss:0x8032F494; // type:object size:0x4 scope:local data:4byte
 m_DataBufferSize = .sbss:0x8032F498; // type:object size:0x4 scope:local data:4byte

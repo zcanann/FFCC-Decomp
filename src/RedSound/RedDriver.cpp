@@ -982,6 +982,7 @@ static volatile int m_DMAInThread;
 #define RedDmaExecuteSet(status) (m_DMAExecute = (status))
 #define RedDmaThreadStateGet() (m_DMAInThread)
 #define RedDmaThreadStateSet(state) (m_DMAInThread = (state))
+static int m_SilentWave;
 CRedEntry c_RedEntry;
 
 STATIC_ASSERT(sizeof(m_RedMasterTime) + sizeof(m_SequencialID) + sizeof(m_ThreadControl) +
@@ -1004,7 +1005,7 @@ STATIC_ASSERT(sizeof(m_RedMasterTime) + sizeof(m_SequencialID) + sizeof(m_Thread
               REDSOUND_DRIVER_SBSS_BEFORE_RED_MEMORY_SIZE);
 STATIC_ASSERT(REDSOUND_DRIVER_SBSS_BEFORE_RED_MEMORY_SIZE + sizeof(c_RedMemory) +
                   REDSOUND_DRIVER_SBSS_RED_MEMORY_PAD_SIZE + sizeof(m_DMAExecute) +
-                  sizeof(m_DMAInThread) + REDSOUND_DRIVER_SBSS_UNUSED_SILENT_WAVE_SIZE ==
+                  sizeof(m_DMAInThread) + sizeof(m_SilentWave) ==
               REDSOUND_DRIVER_SBSS_SIZE);
 
 static inline RedDriverSyncState& RedDriverSync()

@@ -2947,7 +2947,7 @@ static void __MidiCtrl_FuzzyOff(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* t
  * EN Size: 4b
  * JP Address: TODO
  */
-inline CRedMidiCtrl::CRedMidiCtrl()
+CRedMidiCtrl::CRedMidiCtrl()
 {
 }
 
@@ -2959,7 +2959,7 @@ inline CRedMidiCtrl::CRedMidiCtrl()
  * EN Size: 72b
  * JP Address: TODO
  */
-inline CRedMidiCtrl::~CRedMidiCtrl()
+CRedMidiCtrl::~CRedMidiCtrl()
 {
 }
 
@@ -2971,7 +2971,7 @@ inline CRedMidiCtrl::~CRedMidiCtrl()
  * EN Size: 28b
  * JP Address: TODO
  */
-inline void CRedMidiCtrl::Init()
+void CRedMidiCtrl::Init()
 {
     m_status[REDSOUND_MIDI_CTRL_STATUS_0] = 0;
     m_status[REDSOUND_MIDI_CTRL_STATUS_1] = 0;

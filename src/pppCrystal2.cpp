@@ -269,7 +269,6 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, _pppCt
             xCoord = -1.0f;
 
             for (x = 0; x < (u32)textureInfo->m_width; x++) {
-                u32 xFine = x & 3;
                 magnitude = xCoord * xCoord + ySq;
 
                 if (magnitude > 0.0f) {
@@ -280,6 +279,7 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, _pppCt
                     magnitude = *(float*)__float_nan;
                 }
 
+                u32 xFine = x & 3;
                 if (magnitude > 1.0f) {
                     magnitude = 1.0f;
                 }

@@ -1099,15 +1099,15 @@ void GbaQueue::SetSmithData(int channel, unsigned int value)
  */
 void GbaQueue::SetStageNo(int stageId, int mapId)
 {
-    int i = 0;
-    GbaQueue* semaphoreIter = this;
     char* obj = reinterpret_cast<char*>(this);
+    int waitIndex = 0;
+    GbaQueue* waitSemaphore = this;
 
     do {
-        OSWaitSemaphore(semaphoreIter->accessSemaphores);
-        i++;
-        semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
-    } while (i < 4);
+        OSWaitSemaphore(waitSemaphore->accessSemaphores);
+        waitIndex++;
+        waitSemaphore = reinterpret_cast<GbaQueue*>(waitSemaphore->accessSemaphores + 1);
+    } while (waitIndex < 4);
 
     obj[0x2D38] = 0;
     obj[0x2D39] = 0;
@@ -1125,33 +1125,33 @@ void GbaQueue::SetStageNo(int stageId, int mapId)
     *reinterpret_cast<int*>(obj + 0x448) = mapId;
     obj[0x2D55] = 0xF;
 
-    i = 0;
-    semaphoreIter = this;
+    int signalIndex = 0;
+    GbaQueue* signalSemaphore = this;
     do {
-        OSSignalSemaphore(semaphoreIter->accessSemaphores);
-        i++;
-        semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
-    } while (i < 4);
+        OSSignalSemaphore(signalSemaphore->accessSemaphores);
+        signalIndex++;
+        signalSemaphore = reinterpret_cast<GbaQueue*>(signalSemaphore->accessSemaphores + 1);
+    } while (signalIndex < 4);
 
     if (Joybus.LoadMap(stageId, mapId) == 0) {
-        i = 0;
-        semaphoreIter = this;
+        int loadWaitIndex = 0;
+        GbaQueue* loadWaitSemaphore = this;
         do {
-            OSWaitSemaphore(semaphoreIter->accessSemaphores);
-            i++;
-            semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
-        } while (i < 4);
+            OSWaitSemaphore(loadWaitSemaphore->accessSemaphores);
+            loadWaitIndex++;
+            loadWaitSemaphore = reinterpret_cast<GbaQueue*>(loadWaitSemaphore->accessSemaphores + 1);
+        } while (loadWaitIndex < 4);
 
         obj[0x44C] = 0xF;
         obj[0x2D37] = 0xF;
 
-        i = 0;
-        semaphoreIter = this;
+        int loadSignalIndex = 0;
+        GbaQueue* loadSignalSemaphore = this;
         do {
-            OSSignalSemaphore(semaphoreIter->accessSemaphores);
-            i++;
-            semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
-        } while (i < 4);
+            OSSignalSemaphore(loadSignalSemaphore->accessSemaphores);
+            loadSignalIndex++;
+            loadSignalSemaphore = reinterpret_cast<GbaQueue*>(loadSignalSemaphore->accessSemaphores + 1);
+        } while (loadSignalIndex < 4);
     }
 
     memset(obj + 0x2D44, 0xFF, 0x10);

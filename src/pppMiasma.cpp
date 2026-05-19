@@ -271,7 +271,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
         yOffset = (int)yPos;
 
         Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &backI4Tex, 0, yOffset, texWidth, texHeight, 0, GX_LINEAR,
-                                   GX_TF_I4, 0);
+                                   GX_TF_RGBA8, 0);
         GXSetScissor(0, (u32)yPos, scissorWidth, scissorHeight);
 
         if (isCameraInside) {
@@ -355,7 +355,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
         graphic->SetDrawDoneDebugData(0x35);
 
         graphic->GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &backRgba8Tex, 0, yOffset, texWidth, texHeight, i4TexSize,
-                                   GX_LINEAR, GX_TF_RGBA8, 0);
+                                   GX_LINEAR, GX_CTF_R8, 0);
         if (param_2->m_payload[0x1D] != 0) {
             if (isCameraInside) {
                 drawColor.rgba[0] = 0xFF;
@@ -427,7 +427,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
             Graphic.SetDrawDoneDebugData(0x39);
 
             Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &backRgba8Tex2, 0, yOffset, texWidth, texHeight,
-                                       i4TexSize + rgba8TexSize, GX_LINEAR, GX_TF_RGBA8, 0);
+                                       i4TexSize + rgba8TexSize, GX_LINEAR, GX_CTF_R8, 0);
         }
 
         graphic->SetViewport();

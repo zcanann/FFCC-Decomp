@@ -25,7 +25,7 @@
 #include "ffcc/fontman.h"
 
 extern "C" void* __vt__Q212CFlatRuntime7CObject[];
-extern "C" void* __vt__8CGBaseObj[];
+extern "C" void* __vt__9CGBaseObj[];
 extern "C" void* __vt__8CGObject[];
 extern "C" int rand(void);
 extern "C" void Printf__7CSystemFPce(CSystem* system, const char* format, ...);
@@ -369,7 +369,7 @@ CMenuPcs::EffectInfo::EffectInfo()
 
 	*vtable = __vt__Q212CFlatRuntime7CObject;
 	bytes[0x44] &= 0xEF;
-	*vtable = __vt__8CGBaseObj;
+	*vtable = __vt__9CGBaseObj;
 	*vtable = __vt__8CGObject;
 }
 

@@ -138,6 +138,7 @@ static inline float CameraDirY() { return *reinterpret_cast<float*>(reinterpret_
 static inline float CameraDirZ() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xF4); }
 static inline MtxPtr CameraMatrix() { return reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x4); }
 static inline Mtx44Ptr CameraScreenMatrix() { return reinterpret_cast<Mtx44Ptr>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x48); }
+static inline u8* ScreenBreakModelDataRaw(CChara::CModel* model) { return *(u8**)((u8*)model + 0xA4); }
 
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
 static inline int GraphicScreenBreakBlurEnabled() { return Graphic.m_blurActive; }
@@ -445,9 +446,8 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
     float dVar25;
     S16Vec globalMax;
     u32 uStack_b4;
-    u8* modelData = *(u8**)((u8*)model + 0xA4);
 
-    memset(*(void**)((u8*)work + 0xC), 0, *(s32*)(modelData + 0xC) * 0x3C);
+    memset(*(void**)((u8*)work + 0xC), 0, *(s32*)(ScreenBreakModelDataRaw(model) + 0xC) * 0x3C);
     dVar19 = FLOAT_80331cc8;
     iVar16 = *(s32*)((u8*)model + 0xAC);
     dVar18 = -dVar19;
@@ -461,7 +461,7 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
     dVar24 = FLOAT_80331cc0;
     dVar25 = FLOAT_80331cd8;
 
-    for (uVar15 = 0; uVar15 < *(u32*)(modelData + 0xC); uVar15++) {
+    for (uVar15 = 0; uVar15 < *(u32*)(ScreenBreakModelDataRaw(model) + 0xC); uVar15++) {
         iVar14 = *(s32*)(iVar16 + 8);
         iVar5 = *(s32*)((u8*)model + 0xA8) + (*(s32*)(iVar14 + 0x5C) * 0xC0);
         ((ScreenBreakNode*)iVar5)->m_disabled = 0;
@@ -549,7 +549,7 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
         meshMax.x += sVar2;
         meshMax.y += sVar3;
         meshMax.z += minZ;
-        ConvI2FVector__5CUtilFR3Vec6S16Vecl(&gUtil, inVec + 3, meshMax, *(u32*)(modelData + 0x34));
+        ConvI2FVector__5CUtilFR3Vec6S16Vecl(&gUtil, inVec + 3, meshMax, *(u32*)(ScreenBreakModelDataRaw(model) + 0x34));
         PSVECScale(inVec + 3, inVec + 3, FLOAT_80331ccc);
 
         dVar17 = inVec[3].x;
@@ -587,7 +587,7 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
         inVec += 5;
     }
 
-    ConvI2FVector__5CUtilFR3Vec6S16Vecl(&gUtil, (Vec*)((u8*)work + 0x18), globalMax, *(u32*)(modelData + 0x34));
+    ConvI2FVector__5CUtilFR3Vec6S16Vecl(&gUtil, (Vec*)((u8*)work + 0x18), globalMax, *(u32*)(ScreenBreakModelDataRaw(model) + 0x34));
 }
 
 /*

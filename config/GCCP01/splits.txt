@@ -816,7 +816,7 @@ gobject.cpp:
 	.text       start:0x8007BE40 end:0x80082278
 	.rodata     start:0x801D9BD0 end:0x801D9BDC
 	.data       start:0x801FD360 end:0x801FD3A4
-	.sdata2     start:0x80330370 end:0x80330460
+	.sdata2     start:0x80330370 end:0x80330458
 
 pppRyjMegaBirth.cpp:
 	extab       start:0x80007988 end:0x800079C0
@@ -825,6 +825,7 @@ pppRyjMegaBirth.cpp:
 	.rodata     start:0x801D9C00 end:0x801D9C14
 	.data       start:0x801FD3A8 end:0x801FD3D0
 	.bss        start:0x802EA080 end:0x802EA0B0
+	.sdata2     start:0x80330458 end:0x803304A8
 
 pppRyjMegaBirthModel.cpp:
 	extab       start:0x800079C0 end:0x80007A00

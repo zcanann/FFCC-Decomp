@@ -31,7 +31,7 @@ inline CUSBPcs::CUSBPcs()
     table[9] = desc2[2];
 }
 
-unsigned int m_table__7CUSBPcs[0x11C / sizeof(unsigned int)] = {
+unsigned int m_table__7CUSBPcs[0x15C / sizeof(unsigned int)] = {
     reinterpret_cast<unsigned int>(const_cast<char*>(s_CUSBPcs_8032f810)),
     0,
     0,

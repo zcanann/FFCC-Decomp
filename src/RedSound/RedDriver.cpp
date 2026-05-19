@@ -1158,7 +1158,7 @@ static void _SetMusicData(int* command)
  * JP Address: TODO
  * JP Size: TODO
  */
-static inline void _ClearMusicData(int* command)
+static void _ClearMusicData(int* command)
 {
     c_RedEntry.ClearMusicData(RedExecCommandArgGet(command, REDSOUND_MUSIC_COMMAND_ID));
 }
@@ -1520,7 +1520,7 @@ static void _SeStop(int* command)
  * EN Size: 48b
  * JP Address: TODO
  */
-static inline void _SeStopG(int* command)
+static void _SeStopG(int* command)
 {
     SeStopG(RedExecCommandArgGet(command, REDSOUND_SE_COMMAND_ID));
 }
@@ -2663,7 +2663,7 @@ int CRedDriver::SetMusicData(void* musicData)
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CRedDriver::ClearMusicData(int musicID)
+void CRedDriver::ClearMusicData(int musicID)
 {
     _EntryExecCommand(_ClearMusicData, musicID, 0, 0, 0, 0, 0, 0);
 }
@@ -3259,7 +3259,7 @@ void CRedDriver::SeStop(int id)
  * EN Size: 72b
  * JP Address: TODO
  */
-inline void CRedDriver::SeStopG(int group)
+void CRedDriver::SeStopG(int group)
 {
     _EntryExecCommand(_SeStopG, group, 0, 0, 0, 0, 0, 0);
 }

@@ -430,11 +430,15 @@ enum RedWaveHeadLayout {
 	((RedWaveDATA*)((unsigned char*)(waveHead) + (waveHead)->m_waveOffsets[(waveIndex)]))
 
 #define RedMusicHeadFromBankAddress(address) reinterpret_cast<RedMusicHEAD*>(address)
+#define RedMusicHeadFromData(musicData) reinterpret_cast<RedMusicHEAD*>(musicData)
+
+#define RedSeBlockHeadFromData(seBlockData) reinterpret_cast<RedSeBlockHEAD*>(seBlockData)
 
 #define RedWaveHeadFromBankAddress(address) reinterpret_cast<RedWaveHeadWD*>(address)
 #define RedWaveHeadFromData(waveData) reinterpret_cast<RedWaveHeadWD*>(waveData)
 
 #define RedSeSepHeadFromBankAddress(address) reinterpret_cast<RedSeSepHEAD*>(address)
+#define RedSeSepHeadFromData(seSepData) reinterpret_cast<RedSeSepHEAD*>(seSepData)
 
 class CRedEntry
 {

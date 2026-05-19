@@ -1375,7 +1375,7 @@ static void _MusicVolume(int* command)
  * EN Size: 52b
  * JP Address: TODO
  */
-static inline void _MusicTempo(int* command)
+static void _MusicTempo(int* command)
 {
     SetMusicTempo(RedExecCommandArgGet(command, REDSOUND_MUSIC_COMMAND_VOLUME), RedExecCommandArgGet(command, REDSOUND_MUSIC_COMMAND_FADE_TIME));
 }
@@ -1388,7 +1388,7 @@ static inline void _MusicTempo(int* command)
  * EN Size: 52b
  * JP Address: TODO
  */
-static inline void _MusicPitch(int* command)
+static void _MusicPitch(int* command)
 {
     SetMusicPitch(RedExecCommandArgGet(command, REDSOUND_MUSIC_COMMAND_VOLUME), RedExecCommandArgGet(command, REDSOUND_MUSIC_COMMAND_FADE_TIME));
 }
@@ -1401,7 +1401,7 @@ static inline void _MusicPitch(int* command)
  * EN Size: 52b
  * JP Address: TODO
  */
-static inline void _MusicPause(int* command)
+static void _MusicPause(int* command)
 {
     MusicPause(RedExecCommandArgGet(command, REDSOUND_MUSIC_COMMAND_ID), RedExecCommandArgGet(command, REDSOUND_MUSIC_COMMAND_VOLUME));
 }
@@ -2957,7 +2957,7 @@ void CRedDriver::MusicVolume(int musicID, int volume, int frameCount)
  * EN Size: 76b
  * JP Address: TODO
  */
-inline void CRedDriver::MusicTempo(int tempo, int frameCount)
+void CRedDriver::MusicTempo(int tempo, int frameCount)
 {
     _EntryExecCommand(_MusicTempo, 0, tempo, frameCount, 0, 0, 0, 0);
 }
@@ -2970,7 +2970,7 @@ inline void CRedDriver::MusicTempo(int tempo, int frameCount)
  * EN Size: 76b
  * JP Address: TODO
  */
-inline void CRedDriver::MusicPitch(int pitch, int frameCount)
+void CRedDriver::MusicPitch(int pitch, int frameCount)
 {
     _EntryExecCommand(_MusicPitch, 0, pitch, frameCount, 0, 0, 0, 0);
 }
@@ -2983,7 +2983,7 @@ inline void CRedDriver::MusicPitch(int pitch, int frameCount)
  * EN Size: 76b
  * JP Address: TODO
  */
-inline void CRedDriver::MusicPause(int musicID, int pause)
+void CRedDriver::MusicPause(int musicID, int pause)
 {
     _EntryExecCommand(_MusicPause, musicID, pause, 0, 0, 0, 0, 0);
 }

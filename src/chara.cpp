@@ -2431,7 +2431,7 @@ CChara::CNode::CNode()
 	*(u32*)((u8*)this + 0x4) = 0;
 	*(u32*)((u8*)this + 0x9C) = 0;
 	*(u32*)((u8*)this + 0xA0) = 0;
-	*(u8*)((u8*)this + 0xBC) = (*(u8*)((u8*)this + 0xBC) & 0x7F) | 0x80;
+	*(u8*)((u8*)this + 0xBC) = static_cast<u8>(__rlwimi(*(u8*)((u8*)this + 0xBC), 1, 7, 24, 24));
 }
 
 /*
@@ -2569,14 +2569,14 @@ void CChara::CNode::CalcBind(CChara::CModel* model)
 CChara::CNode::CRefData::CRefData()
 {
 	u8* raw = reinterpret_cast<u8*>(this);
-	u16 invalidIndex = 0xFF;
+	s8* sraw = reinterpret_cast<s8*>(this);
 
-	raw[0x8D] = invalidIndex;
+	sraw[0x8D] = -1;
 	raw[0x8E] = 0;
 	raw[0x8A] = 0;
 	memset(raw + 0x6A, 0, 0x20);
 	*reinterpret_cast<float*>(raw + 0x60) = FLOAT_803301b0;
-	raw[0x90] = invalidIndex;
+	sraw[0x90] = -1;
 }
 
 /*

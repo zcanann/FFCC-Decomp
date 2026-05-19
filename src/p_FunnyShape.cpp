@@ -79,12 +79,22 @@ static inline u8* Ptr(CFunnyShapePcs* self, u32 offset)
 
 static inline CUSBStreamData* UsbStream(CFunnyShapePcs* self)
 {
-    return reinterpret_cast<CUSBStreamData*>(Ptr(self, 0x3C));
+    return reinterpret_cast<CUSBStreamData*>(self->m_usbStreamDataStorage);
 }
 
 static inline CFunnyShape* FunnyShape(CFunnyShapePcs* self)
 {
-    return reinterpret_cast<CFunnyShape*>(Ptr(self, 0x50));
+    return reinterpret_cast<CFunnyShape*>(self->m_funnyShapeStorage);
+}
+
+static inline CPtrArray<OSFS_TEXTURE_ST*>* TextureHeaders(CFunnyShapePcs* self)
+{
+    return reinterpret_cast<CPtrArray<OSFS_TEXTURE_ST*>*>(self->m_texturePtrArrayStorage);
+}
+
+static inline CPtrArray<_GXTexObj*>* TextureObjects(CFunnyShapePcs* self)
+{
+    return reinterpret_cast<CPtrArray<_GXTexObj*>*>(self->m_gxTexObjPtrArrayStorage);
 }
 } // namespace
 
@@ -148,13 +158,13 @@ void CFunnyShapePcs::drawViewer()
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
 
-    if ((*reinterpret_cast<u32*>(Ptr(this, 0x6178)) & 1) != 0) {
+    if ((m_displayPending.flags & 1) != 0) {
         FunnyShape(this)->RenderTexture();
     }
-    if ((*reinterpret_cast<u32*>(Ptr(this, 0x6178)) & 4) != 0) {
+    if ((m_displayPending.flags & 4) != 0) {
         FunnyShape(this)->RenderShape();
     }
-    if ((*reinterpret_cast<u32*>(Ptr(this, 0x6178)) & 8) != 0) {
+    if ((m_displayPending.flags & 8) != 0) {
         FunnyShape(this)->Render();
     }
 
@@ -214,12 +224,12 @@ void CFunnyShapePcs::destroyViewer()
     clearColor.a = 0;
     GXSetCopyClear(clearColor, 0xFFFFFF);
 
-    reinterpret_cast<CPtrArray<OSFS_TEXTURE_ST*>*>(Ptr(this, 0x61BC))->DeleteAndRemoveAll();
-    reinterpret_cast<CPtrArray<_GXTexObj*>*>(Ptr(this, 0x61D8))->DeleteAndRemoveAll();
+    TextureHeaders(this)->DeleteAndRemoveAll();
+    TextureObjects(this)->DeleteAndRemoveAll();
 
     DeleteBuffer__14CUSBStreamDataFv(UsbStream(this));
     __dt__11CFunnyShapeFv(FunnyShape(this), -1);
-    Memory.DestroyStage(*reinterpret_cast<CMemory::CStage**>(Ptr(this, 0x4)));
+    Memory.DestroyStage(m_viewerStage);
 }
 
 /*
@@ -229,8 +239,7 @@ void CFunnyShapePcs::destroyViewer()
  */
 void CFunnyShapePcs::createViewer()
 {
-    *reinterpret_cast<CMemory::CStage**>(Ptr(this, 0x4)) =
-        Memory.CreateStage(0x200000, const_cast<char*>(s_CFunnyShapePcs), 0);
+    m_viewerStage = Memory.CreateStage(0x200000, const_cast<char*>(s_CFunnyShapePcs), 0);
     USBPcs.IsBigAlloc(1);
 
     GXColor clearColor;
@@ -240,9 +249,9 @@ void CFunnyShapePcs::createViewer()
     clearColor.a = 0xFF;
     GXSetCopyClear(clearColor, 0xFFFFFF);
 
-    memset(Ptr(this, 0x6178), 0, 0x40);
+    memset(&m_displayPending, 0, 0x40);
     UsbStream(this)->CreateBuffer();
-    *reinterpret_cast<u32*>(Ptr(this, 0x61B8)) = 0;
+    m_displayTextureEnabled = 0;
 }
 
 /*
@@ -455,10 +464,10 @@ u8 FunnyShapePcs[sizeof(CFunnyShapePcs)];
  */
 CFunnyShapePcs::~CFunnyShapePcs()
 {
-    reinterpret_cast<CPtrArray<_GXTexObj*>*>(reinterpret_cast<u8*>(this) + 0x61D8)->CPtrArray<_GXTexObj*>::~CPtrArray();
-    reinterpret_cast<CPtrArray<OSFS_TEXTURE_ST*>*>(reinterpret_cast<u8*>(this) + 0x61BC)->CPtrArray<OSFS_TEXTURE_ST*>::~CPtrArray();
-    __dt__11CFunnyShapeFv(reinterpret_cast<CFunnyShape*>(reinterpret_cast<u8*>(this) + 0x50), -1);
-    __dt__14CUSBStreamDataFv(reinterpret_cast<CUSBStreamData*>(reinterpret_cast<u8*>(this) + 0x3C), -1);
+    TextureObjects(this)->CPtrArray<_GXTexObj*>::~CPtrArray();
+    TextureHeaders(this)->CPtrArray<OSFS_TEXTURE_ST*>::~CPtrArray();
+    __dt__11CFunnyShapeFv(FunnyShape(this), -1);
+    __dt__14CUSBStreamDataFv(UsbStream(this), -1);
 }
 
 template <>

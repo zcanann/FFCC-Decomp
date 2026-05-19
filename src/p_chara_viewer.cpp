@@ -814,36 +814,22 @@ void CCharaPcs::createViewer()
     self->m_viewerAnimStage =
         reinterpret_cast<CMemory::CStage*>(CreateStage__7CMemoryFUlPci(&Memory, 0x190000, s_load_anim, 0));
 
-    p[0xE8] = 0x3F;
-    p[0xE9] = 0x3F;
-    p[0xEA] = 0x3F;
-    p[0xEB] = 0xFF;
-    unsigned char c = (unsigned char)(0x3F & -((__cntlzw(0) >> 5) & 1));
-    p[0xF0] = c;
-    p[0xF1] = c;
-    p[0xF2] = c;
-    p[0xF3] = 0xFF;
-    *(float*)(p + 0x108) = kCharaViewerZero;
-    *(float*)(p + 0x10C) = kCharaViewerZero;
-    *(float*)(p + 0x110) = kCharaViewerFineStep;
+    self->m_viewerAmbientColor.r = 0x3F;
+    self->m_viewerAmbientColor.g = 0x3F;
+    self->m_viewerAmbientColor.b = 0x3F;
+    self->m_viewerAmbientColor.a = 0xFF;
 
-    c = (unsigned char)(0x3F & -((__cntlzw(1) >> 5) & 1));
-    p[0xF4] = c;
-    p[0xF5] = c;
-    p[0xF6] = c;
-    p[0xF7] = 0xFF;
-    *(float*)(p + 0x114) = kCharaViewerZero;
-    *(float*)(p + 0x118) = kCharaViewerZero;
-    *(float*)(p + 0x11C) = kCharaViewerFineStep;
+    for (i = 0; i < 3; i++) {
+        unsigned char c = (i == 0) ? 0x3F : 0;
 
-    c = (unsigned char)(0x3F & -((__cntlzw(2) >> 5) & 1));
-    p[0xF8] = c;
-    p[0xF9] = c;
-    p[0xFA] = c;
-    p[0xFB] = 0xFF;
-    *(float*)(p + 0x120) = kCharaViewerZero;
-    *(float*)(p + 0x124) = kCharaViewerZero;
-    *(float*)(p + 0x128) = kCharaViewerFineStep;
+        self->m_viewerDiffuseColor[i].r = c;
+        self->m_viewerDiffuseColor[i].g = c;
+        self->m_viewerDiffuseColor[i].b = c;
+        self->m_viewerDiffuseColor[i].a = 0xFF;
+        self->m_viewerDiffusePos[i].x = kCharaViewerZero;
+        self->m_viewerDiffusePos[i].y = kCharaViewerZero;
+        self->m_viewerDiffusePos[i].z = kCharaViewerFineStep;
+    }
 
     for (i = 0; i < 5; i++) {
         unsigned char* whiteChannels =

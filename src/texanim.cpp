@@ -11,11 +11,9 @@
 #include "dolphin/mtx.h"
 
 extern "C" void __dl__FPv(void*);
-extern "C" void __dla__FPv(void*);
 extern "C" void __ct__4CRefFv(void*);
 extern "C" void __dt__4CRefFv(void*, int);
 extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
-extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 extern "C" void* __vt__11CTexAnimSet[];
 extern "C" void* __vt__8CTexAnim[];
 extern "C" void* __vt__11CTexAnimSeq[];
@@ -251,7 +249,7 @@ template <>
 void CPtrArray<CTexAnimSeq*>::RemoveAll()
 {
     if (m_items != 0) {
-        __dla__FPv(m_items);
+        delete[] m_items;
         m_items = 0;
     }
     m_size = 0;
@@ -286,7 +284,7 @@ void CPtrArray<CTexAnimSeq*>::ReleaseAndRemoveAll()
     }
 
     if (m_items != 0) {
-        __dla__FPv(m_items);
+        delete[] m_items;
         m_items = 0;
     }
     m_size = 0;
@@ -347,8 +345,9 @@ int CPtrArray<CTexAnimSeq*>::setSize(unsigned long newSize)
             m_size = m_size << 1;
         }
 
-        newItems = (CTexAnimSeq**)_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
-            &Memory, (unsigned long)(m_size << 2), m_stage, const_cast<char*>(s_collection_ptrarray_h_801D7B30), 0xFA, 0);
+        newItems = static_cast<CTexAnimSeq**>(
+            Memory._Alloc(static_cast<unsigned long>(m_size << 2), m_stage,
+                          const_cast<char*>(s_collection_ptrarray_h_801D7B30), 0xFA, 0));
         if (newItems == 0) {
             return 0;
         }
@@ -357,7 +356,7 @@ int CPtrArray<CTexAnimSeq*>::setSize(unsigned long newSize)
             memcpy(newItems, m_items, m_numItems << 2);
         }
         if (m_items != 0) {
-            __dla__FPv(m_items);
+            delete[] m_items;
             m_items = 0;
         }
         m_items = newItems;
@@ -466,7 +465,7 @@ template <>
 void CPtrArray<CTexAnim*>::RemoveAll()
 {
     if (m_items != 0) {
-        __dla__FPv(m_items);
+        delete[] m_items;
         m_items = 0;
     }
     m_size = 0;
@@ -501,7 +500,7 @@ void CPtrArray<CTexAnim*>::ReleaseAndRemoveAll()
     }
 
     if (m_items != 0) {
-        __dla__FPv(m_items);
+        delete[] m_items;
         m_items = 0;
     }
     m_size = 0;
@@ -562,8 +561,9 @@ int CPtrArray<CTexAnim*>::setSize(unsigned long newSize)
             m_size = m_size << 1;
         }
 
-        newItems = (CTexAnim**)_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
-            &Memory, (unsigned long)(m_size << 2), m_stage, const_cast<char*>(s_collection_ptrarray_h_801D7B30), 0xFA, 0);
+        newItems = static_cast<CTexAnim**>(
+            Memory._Alloc(static_cast<unsigned long>(m_size << 2), m_stage,
+                          const_cast<char*>(s_collection_ptrarray_h_801D7B30), 0xFA, 0));
         if (newItems == 0) {
             return 0;
         }
@@ -572,7 +572,7 @@ int CPtrArray<CTexAnim*>::setSize(unsigned long newSize)
             memcpy(newItems, m_items, m_numItems << 2);
         }
         if (m_items != 0) {
-            __dla__FPv(m_items);
+            delete[] m_items;
             m_items = 0;
         }
         m_items = newItems;
@@ -725,9 +725,8 @@ void CTexAnimSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
                     }
                 } else {
                     seq->keyCount = innerChunk.m_size / 0x30;
-                    int keys = (int)_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
-                        &Memory, innerChunk.m_size, stage, const_cast<char*>(s_texanim_cpp_801d7adc), 0x1D4, 0);
-                    seq->keys = reinterpret_cast<unsigned int*>(keys);
+                    seq->keys = new (stage, const_cast<char*>(s_texanim_cpp_801d7adc), 0x1D4)
+                        unsigned int[innerChunk.m_size / sizeof(unsigned int)];
                     memcpy(seq->keys, chunkFile.GetAddress(), innerChunk.m_size);
                 }
             }
@@ -1079,7 +1078,7 @@ CTexAnimSeq::~CTexAnimSeq()
     CTexAnimSeqStorage* self = reinterpret_cast<CTexAnimSeqStorage*>(this);
 
     if (self->keys != 0) {
-        __dla__FPv(self->keys);
+        delete[] self->keys;
         self->keys = 0;
     }
 }

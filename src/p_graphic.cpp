@@ -699,8 +699,8 @@ void CGraphicPcs::drawBar()
         }
 
         if (i == orderCount - 1) {
-            const float soundWidth = (100.0f * Sound.GetPerformance()) / 16.666666f;
             const u32 soundColor = Math.Hsb2Rgb(0, 100, 100);
+            const float soundWidth = (100.0f * Sound.GetPerformance()) / 16.666666f;
 
             GXBegin(GX_QUADS, GX_VTXFMT0, 4);
             GXPosition3f32(x, drawText ? static_cast<float>(y) : 456.0f, 0.0f);

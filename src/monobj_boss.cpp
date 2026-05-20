@@ -2830,7 +2830,7 @@ void CGMonObj::frameStatFuncLastBoss()
 			prgObj->putParticle((pdtNo << 8) | 0x12, 0, object, 1.0f, 0);
 			prgObj->playSe3D(0x12913, 0x32, 0x96, 0, 0);
 		} else if (stateFrame == 0x29) {
-			object->m_bodyEllipsoidRadius = 7.0f;
+			object->m_bodyEllipsoidRadius = FLOAT_80331d20;
 		} else if (prgObj->isLoopAnim() != 0) {
 			object->m_bgColMask |= 0x80000;
 			prgObj->changeStat(0, 0, 0);
@@ -2854,7 +2854,7 @@ void CGMonObj::frameStatFuncLastBoss()
 				prgObj->putParticle((pdtNo << 8) | 0x10, 0, object, 1.0f, 0);
 				prgObj->playSe3D(0x12912, 0x32, 0x96, 0, 0);
 			} else if (stateFrame == 0x7D) {
-				object->m_bodyEllipsoidRadius = 2.0f;
+				object->m_bodyEllipsoidRadius = FLOAT_80331d1c;
 			} else if (prgObj->isLoopAnim() != 0) {
 				object->m_bgColMask |= 0x80000;
 				object->SetAnimSlot(0x12, 0);
@@ -2989,7 +2989,7 @@ void CGMonObj::teleport(
 		} else {
 			pdtNo = -1;
 		}
-		prgObj->putParticle(particleStart | (pdtNo << 8), *reinterpret_cast<int*>(mon + 0x58C), object, 1.0f, 0);
+		prgObj->putParticle(particleStart | (pdtNo << 8), *reinterpret_cast<int*>(mon + 0x58C), object, FLOAT_80331d18, 0);
 
 		if (mode == 0) {
 			if (object->m_charaModelHandle->m_pdtLoadRef != 0) {
@@ -2997,14 +2997,14 @@ void CGMonObj::teleport(
 			} else {
 				pdtNo = -1;
 			}
-			prgObj->putParticle(particleBlend | (pdtNo << 8), *reinterpret_cast<int*>(mon + 0x58C), &object->m_worldPosition, 1.0f, 0);
+			prgObj->putParticle(particleBlend | (pdtNo << 8), *reinterpret_cast<int*>(mon + 0x58C), &object->m_worldPosition, FLOAT_80331d18, 0);
 		} else {
 			if (object->m_charaModelHandle->m_pdtLoadRef != 0) {
 				pdtNo = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(object->m_charaModelHandle->m_pdtLoadRef) + 0x14);
 			} else {
 				pdtNo = -1;
 			}
-			prgObj->putParticle(particleBlend | (pdtNo << 8), *reinterpret_cast<int*>(mon + 0x58C), object, 1.0f, 0);
+			prgObj->putParticle(particleBlend | (pdtNo << 8), *reinterpret_cast<int*>(mon + 0x58C), object, FLOAT_80331d18, 0);
 		}
 	}
 
@@ -3059,7 +3059,7 @@ void CGMonObj::teleport(
 				} else {
 					pdtNo = -1;
 				}
-				prgObj->putParticle(particleEnd | (pdtNo << 8), *reinterpret_cast<int*>(mon + 0x58C), &teleportPoints[teleportIndex], 1.0f, 0);
+				prgObj->putParticle(particleEnd | (pdtNo << 8), *reinterpret_cast<int*>(mon + 0x58C), &teleportPoints[teleportIndex], FLOAT_80331d18, 0);
 				prgObj->playSe3D(seEnd, 0x32, 0x1C2, 0, 0);
 			}
 		} else if (stateFrame <= blendEndPlusFrame) {
@@ -3071,7 +3071,7 @@ void CGMonObj::teleport(
 					} else {
 						pdtNo = -1;
 					}
-					prgObj->putParticle(particleEnd | (pdtNo << 8), *reinterpret_cast<int*>(mon + 0x58C), &object->m_worldPosition, 1.0f, 0);
+					prgObj->putParticle(particleEnd | (pdtNo << 8), *reinterpret_cast<int*>(mon + 0x58C), &object->m_worldPosition, FLOAT_80331d18, 0);
 					prgObj->playSe3D(seEnd, 0x32, 0x1C2, 0, 0);
 				}
 
@@ -3141,7 +3141,7 @@ void CGMonObj::suikomiSub(CGObject*, float)
 			dist = NAN;
 		}
 	} else {
-		double inv = 1.0 / sqrt(dist);
+		double inv = (double)FLOAT_80331d18 / sqrt(dist);
 		inv = DOUBLE_80331d00 * inv * -(dist * inv * inv - DOUBLE_80331d08);
 		inv = DOUBLE_80331d00 * inv * -(dist * inv * inv - DOUBLE_80331d08);
 		dist = (double)(float)(dist * DOUBLE_80331d00 * inv * -(dist * inv * inv - DOUBLE_80331d08));

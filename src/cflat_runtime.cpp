@@ -133,6 +133,7 @@ void CFlatRuntime::Destroy()
 	typedef void (*OnDeleteFn)(CFlatRuntime*, CFlatRuntime::CObject*);
 
 	u8* const self = reinterpret_cast<u8*>(this);
+	const u32 clearBit = 0;
 	CObject* const root = &m_objectSentinel;
 	CObject* object = m_objectSentinel.m_next;
 
@@ -145,11 +146,10 @@ void CFlatRuntime::Destroy()
 		*reinterpret_cast<void**>(reinterpret_cast<u8*>(*object->m_freeListNode) + 4) = object->m_freeListNode[1];
 		*reinterpret_cast<void**>(object->m_freeListNode[1]) = *object->m_freeListNode;
 
-		void** freeHead = m_objectFreeListHead;
-		object->m_freeListNode[1] = freeHead[0];
-		freeHead[0] = object->m_freeListNode;
+		object->m_freeListNode[1] = m_objectFreeListHead;
+		m_objectFreeListHead = object->m_freeListNode;
 
-		object->m_flags &= 0xEF;
+		object->m_flags = static_cast<u8>(__rlwimi(object->m_flags, clearBit, 4, 27, 27));
 
 		OnDeleteFn onDelete = reinterpret_cast<OnDeleteFn>((*reinterpret_cast<void***>(this))[7]);
 		onDelete(this, object);
@@ -721,7 +721,7 @@ int CFlatRuntime::Frame(int unused, int mode)
 			object->m_freeListNode[1] = *reinterpret_cast<void***>(self + 0x98C);
 			*reinterpret_cast<void***>(self + 0x98C) = object->m_freeListNode;
 
-			object->m_flags &= 0xEF;
+			object->m_flags = static_cast<u8>(__rlwimi(object->m_flags, 0, 4, 27, 27));
 
 			typedef void (*OnDeleteFn)(CFlatRuntime*, CObject*);
 			reinterpret_cast<OnDeleteFn>((*reinterpret_cast<void***>(this))[7])(this, object);
@@ -744,6 +744,7 @@ int CFlatRuntime::Frame(int unused, int mode)
  */
 void CFlatRuntime::AfterFrame(int mode)
 {
+	const u32 clearBit = 0;
 	CObject* object = m_objectSentinel.m_next;
 
 	while (object != &m_objectSentinel) {
@@ -756,11 +757,10 @@ void CFlatRuntime::AfterFrame(int mode)
 			*reinterpret_cast<void**>(reinterpret_cast<u8*>(*object->m_freeListNode) + 4) = object->m_freeListNode[1];
 			*reinterpret_cast<void**>(object->m_freeListNode[1]) = *object->m_freeListNode;
 
-			void** freeHead = m_objectFreeListHead;
-			object->m_freeListNode[1] = freeHead[0];
-			freeHead[0] = object->m_freeListNode;
+			object->m_freeListNode[1] = m_objectFreeListHead;
+			m_objectFreeListHead = object->m_freeListNode;
 
-			object->m_flags &= 0xEF;
+			object->m_flags = static_cast<u8>(__rlwimi(object->m_flags, clearBit, 4, 27, 27));
 
 			typedef void (*OnDeleteFn)(CFlatRuntime*, CObject*);
 			reinterpret_cast<OnDeleteFn>((*reinterpret_cast<void***>(this))[7])(this, object);
@@ -781,17 +781,18 @@ void CFlatRuntime::AfterFrame(int mode)
  */
 void CFlatRuntime::deleteObject(CFlatRuntime::CObject* object)
 {
+	const u32 clearBit = 0;
+
 	object->m_previous->m_next = object->m_next;
 	object->m_next->m_previous = object->m_previous;
 
 	*(void**)((char*)*object->m_freeListNode + 4) = object->m_freeListNode[1];
 	*(void**)object->m_freeListNode[1] = *object->m_freeListNode;
 
-	void** freeHead = m_objectFreeListHead;
-	object->m_freeListNode[1] = freeHead[0];
-	freeHead[0] = object->m_freeListNode;
+	object->m_freeListNode[1] = m_objectFreeListHead;
+	m_objectFreeListHead = object->m_freeListNode;
 
-	object->m_flags &= 0xEF;
+	object->m_flags = static_cast<u8>(__rlwimi(object->m_flags, clearBit, 4, 27, 27));
 
 	typedef void (*OnDeleteFn)(CFlatRuntime*, CObject*);
 	reinterpret_cast<OnDeleteFn>((*reinterpret_cast<void***>(this))[7])(this, object);
@@ -2231,7 +2232,8 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 					*reinterpret_cast<void**>(*reinterpret_cast<u8**>(engineObject + 0x04) + 0x04) =
 					    *reinterpret_cast<void**>(self + 0x98C);
 					*reinterpret_cast<void**>(self + 0x98C) = *reinterpret_cast<void**>(engineObject + 0x04);
-					*reinterpret_cast<u8*>(engineObject + 0x38) &= 0xEF;
+					*reinterpret_cast<u8*>(engineObject + 0x38) =
+					    static_cast<u8>(__rlwimi(*reinterpret_cast<u8*>(engineObject + 0x38), 0, 4, 27, 27));
 
 					typedef void (*OnDeleteFn)(CFlatRuntime*, CFlatRuntime::CObject*);
 					reinterpret_cast<OnDeleteFn>((*reinterpret_cast<void***>(this))[7])(

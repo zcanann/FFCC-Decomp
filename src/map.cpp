@@ -457,7 +457,7 @@ template <>
 void CPtrArray<CMapLightHolder*>::RemoveAll()
 {
     if (m_items != 0) {
-        __dla__FPv(m_items);
+        delete[] m_items;
         m_items = 0;
     }
     *reinterpret_cast<int*>(Ptr(this, 8)) = 0;
@@ -499,8 +499,8 @@ int CPtrArray<CMapLightHolder*>::setSize(unsigned long newSize)
             m_size = m_size << 1;
         }
 
-        newItems = (CMapLightHolder**)_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
-            &Memory, m_size << 2, m_stage, const_cast<char*>(s_map_collection_ptrarray_h), 0xFA, 0);
+        newItems = static_cast<CMapLightHolder**>(
+            Memory._Alloc(m_size << 2, m_stage, const_cast<char*>(s_map_collection_ptrarray_h), 0xFA, 0));
         if (newItems == 0) {
             return 0;
         }
@@ -509,7 +509,7 @@ int CPtrArray<CMapLightHolder*>::setSize(unsigned long newSize)
             memcpy(newItems, m_items, m_numItems << 2);
         }
         if (m_items != 0) {
-            __dla__FPv(m_items);
+            delete[] m_items;
             m_items = 0;
         }
 
@@ -570,7 +570,7 @@ template <>
 void CPtrArray<CMapAnim*>::RemoveAll()
 {
     if (m_items != 0) {
-        __dla__FPv(m_items);
+        delete[] m_items;
         m_items = 0;
     }
     *reinterpret_cast<int*>(Ptr(this, 8)) = 0;
@@ -712,7 +712,7 @@ template <>
 void CPtrArray<CMapAnimKeyDt*>::RemoveAll()
 {
     if (m_items != 0) {
-        __dla__FPv(m_items);
+        delete[] m_items;
         m_items = 0;
     }
     *reinterpret_cast<int*>(Ptr(this, 8)) = 0;
@@ -758,8 +758,8 @@ int CPtrArray<CMapAnim*>::setSize(unsigned long newSize)
             m_size = m_size << 1;
         }
 
-        newItems = (CMapAnim**)_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
-            &Memory, m_size << 2, m_stage, const_cast<char*>(s_map_collection_ptrarray_h), 0xFA, 0);
+        newItems = static_cast<CMapAnim**>(
+            Memory._Alloc(m_size << 2, m_stage, const_cast<char*>(s_map_collection_ptrarray_h), 0xFA, 0));
         if (newItems == 0) {
             return 0;
         }
@@ -768,7 +768,7 @@ int CPtrArray<CMapAnim*>::setSize(unsigned long newSize)
             memcpy(newItems, m_items, m_numItems << 2);
         }
         if (m_items != 0) {
-            __dla__FPv(m_items);
+            delete[] m_items;
             m_items = 0;
         }
 
@@ -811,7 +811,7 @@ template <>
 CPtrArray<CMapAnimRun*>::~CPtrArray()
 {
     if (m_items != 0) {
-        __dla__FPv(m_items);
+        delete[] m_items;
         m_items = 0;
     }
     m_size = 0;
@@ -882,7 +882,7 @@ template <>
 CPtrArray<CMapAnim*>::~CPtrArray()
 {
     if (m_items != 0) {
-        __dla__FPv(m_items);
+        delete[] m_items;
         m_items = 0;
     }
 
@@ -954,7 +954,7 @@ template <>
 CPtrArray<CMapAnimKeyDt*>::~CPtrArray()
 {
     if (m_items != 0) {
-        __dla__FPv(m_items);
+        delete[] m_items;
         m_items = 0;
     }
 
@@ -1026,7 +1026,7 @@ template <>
 CPtrArray<CMapShadow*>::~CPtrArray()
 {
     if (m_items != 0) {
-        __dla__FPv(m_items);
+        delete[] m_items;
         m_items = 0;
     }
 
@@ -1105,7 +1105,7 @@ template <>
 void CPtrArray<CMapAnimRun*>::RemoveAll()
 {
     if (m_items != 0) {
-        __dla__FPv(m_items);
+        delete[] m_items;
         m_items = 0;
     }
     *reinterpret_cast<int*>(Ptr(this, 8)) = 0;
@@ -1186,7 +1186,7 @@ template <>
 void CPtrArray<CMapShadow*>::RemoveAll()
 {
     if (m_items != 0) {
-        __dla__FPv(m_items);
+        delete[] m_items;
         m_items = 0;
     }
     *reinterpret_cast<int*>(Ptr(this, 8)) = 0;

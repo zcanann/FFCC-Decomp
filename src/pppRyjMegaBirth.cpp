@@ -37,6 +37,10 @@ extern const float FLOAT_80330478 = 0.5f;
 extern const double DOUBLE_80330480 = 1.0;
 extern const double DOUBLE_80330488 = 0.5;
 extern const float FLOAT_80330490[2] = { -1.0f, 0.0f };
+extern const float FLOAT_80330498 = 0.0f;
+extern const float FLOAT_8033049c = 30.0f;
+extern const float FLOAT_803304a0 = 3.1415927f;
+extern const float FLOAT_803304a4 = 32768.0f;
 
 static inline float* f32_at(void* base, s32 off)
 {
@@ -129,6 +133,64 @@ static inline float calc_spawn_speed(float speed, u8 mode)
 		return -(FLOAT_80330478 * (Math.RandF() * (speed * Math.RandF() * Math.RandF())) - speed) - halfSpeed;
 	default:
 		return speed * Math.RandF() - halfSpeed;
+	}
+}
+
+static inline float calc_direction_speed(float speed, u8 mode)
+{
+	switch (mode) {
+	case 1:
+		(void)Math.RandF();
+		return speed * Math.RandF();
+	case 2:
+		return speed * Math.RandF() * Math.RandF();
+	case 3:
+		return -(FLOAT_80330474 * (speed * Math.RandF() * Math.RandF()) - speed);
+	case 4:
+		return Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF() * speed;
+	case 5:
+		return -(FLOAT_80330478 * (Math.RandF() * (speed * Math.RandF() * Math.RandF())) - speed);
+	default:
+		return speed;
+	}
+}
+
+static inline void calc_spawn_position(Vec* out, float speed, u8 mode)
+{
+	float halfSpeed = FLOAT_80330478 * speed;
+
+	switch (mode) {
+	case 1:
+		(void)Math.RandF();
+		out->x = speed * Math.RandF() - halfSpeed;
+		out->y = speed * Math.RandF() - halfSpeed;
+		out->z = speed * Math.RandF() - halfSpeed;
+		break;
+	case 2:
+		out->x = speed * Math.RandF() * Math.RandF() - halfSpeed;
+		out->y = speed * Math.RandF() * Math.RandF() - halfSpeed;
+		out->z = speed * Math.RandF() * Math.RandF() - halfSpeed;
+		break;
+	case 3:
+		out->x = -(FLOAT_80330474 * (speed * Math.RandF() * Math.RandF()) - speed) - halfSpeed;
+		out->y = -(FLOAT_80330474 * (speed * Math.RandF() * Math.RandF()) - speed) - halfSpeed;
+		out->z = -(FLOAT_80330474 * (speed * Math.RandF() * Math.RandF()) - speed) - halfSpeed;
+		break;
+	case 4:
+		out->x = Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF() * speed - halfSpeed;
+		out->y = Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF() * speed - halfSpeed;
+		out->z = Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF() * speed - halfSpeed;
+		break;
+	case 5:
+		out->x = -(FLOAT_80330478 * (Math.RandF() * (speed * Math.RandF() * Math.RandF())) - speed) - halfSpeed;
+		out->y = -(FLOAT_80330478 * (Math.RandF() * (speed * Math.RandF() * Math.RandF())) - speed) - halfSpeed;
+		out->z = -(FLOAT_80330478 * (Math.RandF() * (speed * Math.RandF() * Math.RandF())) - speed) - halfSpeed;
+		break;
+	default:
+		out->x = speed * Math.RandF() - halfSpeed;
+		out->y = speed * Math.RandF() - halfSpeed;
+		out->z = speed * Math.RandF() - halfSpeed;
+		break;
 	}
 }
 
@@ -341,8 +403,6 @@ void pppRyjDrawMegaBirth(_pppPObject* obj, void* stepData, _pppCtrlTable* ctrlTa
 			Mtx drawMatrix;
 			Vec drawPos;
 			pppCVECTOR drawColor;
-			short frame = *s16_at(particle, 0x20);
-			tagOAN3_SHAPE* shape = (tagOAN3_SHAPE*)((u8*)animData + *(s16*)((u8*)animData + frame * 8 + 0x10));
 			int red;
 			int green;
 			int blue;
@@ -369,23 +429,46 @@ void pppRyjDrawMegaBirth(_pppPObject* obj, void* stepData, _pppCtrlTable* ctrlTa
 			drawMatrix[2][3] = drawPos.z;
 
 			switch (payload[0xEC]) {
-			case 0:
-				PSMTXMultVec(baseViewMatrix.value, &drawPos, &drawPos);
+			case 0: {
+				Vec viewPos;
+
+				viewPos.x = drawPos.x;
+				viewPos.y = drawPos.y;
+				viewPos.z = drawPos.z;
+				PSMTXMultVec(baseViewMatrix.value, &viewPos, &viewPos);
+				drawPos.x = viewPos.x;
+				drawPos.y = viewPos.y;
+				drawPos.z = viewPos.z;
 				break;
+			}
 			case 1: {
 				pppFMATRIX viewMatrix;
+				Vec viewPos;
 
 				PSMTXConcat(*(Mtx*)particleWorldMat, obj->m_localMatrix.value, viewMatrix.value);
 				PSMTXConcat(ppvCameraMatrix, viewMatrix.value, viewMatrix.value);
-				PSMTXMultVec(viewMatrix.value, &drawPos, &drawPos);
+				viewPos.x = drawPos.x;
+				viewPos.y = drawPos.y;
+				viewPos.z = drawPos.z;
+				PSMTXMultVec(viewMatrix.value, &viewPos, &viewPos);
+				drawPos.x = viewPos.x;
+				drawPos.y = viewPos.y;
+				drawPos.z = viewPos.z;
 				break;
 			}
 			case 2: {
 				pppFMATRIX viewMatrix;
+				Vec viewPos;
 
 				PSMTXConcat(work->m_worldMatrix, *(Mtx*)particleWorldMat, viewMatrix.value);
 				PSMTXConcat(ppvCameraMatrix, viewMatrix.value, viewMatrix.value);
-				PSMTXMultVec(viewMatrix.value, &drawPos, &drawPos);
+				viewPos.x = drawPos.x;
+				viewPos.y = drawPos.y;
+				viewPos.z = drawPos.z;
+				PSMTXMultVec(viewMatrix.value, &viewPos, &viewPos);
+				drawPos.x = viewPos.x;
+				drawPos.y = viewPos.y;
+				drawPos.z = viewPos.z;
 				break;
 			}
 			default:
@@ -397,6 +480,9 @@ void pppRyjDrawMegaBirth(_pppPObject* obj, void* stepData, _pppCtrlTable* ctrlTa
 			drawMatrix[2][3] = drawPos.z;
 
 			GXLoadPosMtxImm(drawMatrix, 0);
+
+			short frame = *s16_at(particle, 0x20);
+			tagOAN3_SHAPE* shape = (tagOAN3_SHAPE*)((u8*)animData + *(s16*)((u8*)animData + frame * 8 + 0x10));
 
 			red = baseRed + (int)*(s8*)((u8*)particle + 0x24);
 			green = baseGreen + (int)*(s8*)((u8*)particle + 0x25);
@@ -733,11 +819,14 @@ void calc(
 				*f32_at(particlePayload, 0x4C) = kPppRyjMegaBirthZero;
 			}
 		}
-		else if ((*f32_at(paramPayload, 0xC0) < kPppRyjMegaBirthZero) &&
-		         (kPppRyjMegaBirthZero < *f32_at(paramPayload, 0xC4)) &&
-		         (kPppRyjMegaBirthZero < *f32_at(particlePayload, 0x4C)))
+		else
 		{
-			*f32_at(particlePayload, 0x4C) = kPppRyjMegaBirthZero;
+			if ((*f32_at(paramPayload, 0xC0) < kPppRyjMegaBirthZero) &&
+			    (kPppRyjMegaBirthZero < *f32_at(paramPayload, 0xC4)) &&
+			    (kPppRyjMegaBirthZero < *f32_at(particlePayload, 0x4C)))
+			{
+				*f32_at(particlePayload, 0x4C) = kPppRyjMegaBirthZero;
+			}
 		}
 	}
 
@@ -786,13 +875,11 @@ void birth(
 {
 	u8* payload;
 	u8* particlePayload;
-	u8 mode;
 	float speed;
 	s16 life;
 
 	payload = (u8*)param;
 	particlePayload = (u8*)particle;
-	mode = payload[0x2A];
 	float spread = (float)payload[0x2B];
 	float range = FLOAT_80330470 * spread;
 
@@ -804,7 +891,7 @@ void birth(
 		memset(colorData, 0, 0x20);
 	}
 
-	if (mode < 8) {
+	if (*(s8*)(payload + 0x2A) < 8) {
 		Vec baseDirection;
 		Vec* direction;
 		s32 angle[4];
@@ -819,7 +906,7 @@ void birth(
 		angle[2] = (s32)((float)((s32)(range * Math.RandF() - spread) << 15) / FLOAT_8033045c);
 		angle[3] = 0;
 
-		if ((mode == 2) || (mode == 3)) {
+		if ((payload[0x2A] == 2) || (payload[0x2A] == 3)) {
 			angle[0] = 0;
 			angle[1] = 0;
 		}
@@ -834,49 +921,55 @@ void birth(
 	}
 
 	speed = *f32_at(payload, 0xD4);
-	if (speed != kPppRyjMegaBirthZero) {
-		u8 speedMode = payload[0xE8];
+	if ((*(s8*)(payload + 0x2A) < 4) || (*(s8*)(payload + 0x2A) >= 10)) {
+		if (speed != kPppRyjMegaBirthZero) {
+			u8 speedMode = payload[0xE8];
 
-		if ((mode < 4) || (mode >= 10)) {
 			Vec* direction = (Vec*)(particlePayload + 0x10);
 			Vec* position = (Vec*)particlePayload;
-			PSVECScale(direction, position, calc_spawn_speed(speed, speedMode));
-		} else if (mode < 6) {
-			*f32_at(particlePayload, 0x00) = calc_spawn_speed(speed, speedMode) * *f32_at(payload, 0xD8);
-			*f32_at(particlePayload, 0x04) = calc_spawn_speed(speed, speedMode) * *f32_at(payload, 0xDC);
-			*f32_at(particlePayload, 0x08) = calc_spawn_speed(speed, speedMode) * *f32_at(payload, 0xE0);
-		} else if (mode < 10) {
-			s16 pathIndex = *s16_at(payload, 0xF0);
-			Vec* pathBase = *(Vec**)((u8*)pObject + 0x70);
+			PSVECScale(direction, position, calc_direction_speed(speed, speedMode));
+		}
+	} else if (*(s8*)(payload + 0x2A) < 6) {
+		if (speed != kPppRyjMegaBirthZero) {
+			u8 speedMode = payload[0xE8];
 
-			if (pathIndex >= 0) {
-				s16* pathInfo = (s16*)(*(int*)&pppEnvStPtr->m_particleColors[1] + pathIndex * 8);
+			calc_spawn_position((Vec*)particlePayload, speed, speedMode);
+			*f32_at(particlePayload, 0x00) = *f32_at(particlePayload, 0x00) * *f32_at(payload, 0xD8);
+			*f32_at(particlePayload, 0x04) = *f32_at(particlePayload, 0x04) * *f32_at(payload, 0xDC);
+			*f32_at(particlePayload, 0x08) = *f32_at(particlePayload, 0x08) * *f32_at(payload, 0xE0);
+		}
+	} else if (*(s8*)(payload + 0x2A) < 10) {
+		u8 speedMode = payload[0xE8];
+		s16 pathIndex = *s16_at(payload, 0xF0);
+		Vec* pathBase = *(Vec**)((u8*)pObject + 0x70);
 
-				if (pathBase == NULL) {
-					pathBase = (Vec*)pppEnvStPtr->m_mapMeshPtr[pathInfo[0]]->m_vertices;
+		if (pathIndex >= 0) {
+			s16* pathInfo = (s16*)(*(int*)&pppEnvStPtr->m_particleColors[1] + pathIndex * 8);
+
+			if (pathBase == NULL) {
+				pathBase = (Vec*)pppEnvStPtr->m_mapMeshPtr[pathInfo[0]]->m_vertices;
+			}
+
+			if (pathBase != NULL) {
+				u16 sampleIndex;
+
+				if ((u16)work->m_meshEmitIndex >= (u16)pathInfo[1]) {
+					work->m_meshEmitIndex = 0;
 				}
 
-				if (pathBase != NULL) {
-					u16 sampleIndex;
+				if ((speedMode == 0) || (speedMode >= 6)) {
+					sampleIndex = work->m_meshEmitIndex;
+					work->m_meshEmitIndex = sampleIndex + 1;
+				} else {
+					sampleIndex = (u16)((int)(calc_mesh_sample_t(speedMode) * (float)pathInfo[1]));
+				}
 
-					if ((u16)work->m_meshEmitIndex >= (u16)pathInfo[1]) {
-						work->m_meshEmitIndex = 0;
-					}
-
-					if ((speedMode == 0) || (speedMode >= 6)) {
-						sampleIndex = work->m_meshEmitIndex;
-						work->m_meshEmitIndex = sampleIndex + 1;
-					} else {
-						sampleIndex = (u16)((int)(calc_mesh_sample_t(speedMode) * (float)pathInfo[1]));
-					}
-
-					Vec* pathVec = pathBase + ((u16*)*(int*)(pathInfo + 2))[sampleIndex];
-					*f32_at(particlePayload, 0x00) = pathVec->x * *f32_at(payload, 0xD8);
-					*f32_at(particlePayload, 0x04) = pathVec->y * *f32_at(payload, 0xDC);
-					*f32_at(particlePayload, 0x08) = pathVec->z * *f32_at(payload, 0xE0);
-					if ((mode == 8) || (mode == 9)) {
-						PSVECNormalize((Vec*)particlePayload, (Vec*)(particlePayload + 0x10));
-					}
+				Vec* pathVec = pathBase + ((u16*)*(int*)(pathInfo + 2))[sampleIndex];
+				*f32_at(particlePayload, 0x00) = pathVec->x * *f32_at(payload, 0xD8);
+				*f32_at(particlePayload, 0x04) = pathVec->y * *f32_at(payload, 0xDC);
+				*f32_at(particlePayload, 0x08) = pathVec->z * *f32_at(payload, 0xE0);
+				if ((payload[0x2A] == 8) || (payload[0x2A] == 9)) {
+					PSVECNormalize((Vec*)particlePayload, (Vec*)(particlePayload + 0x10));
 				}
 			}
 		}
@@ -929,17 +1022,17 @@ void birth(
 		}
 	}
 
-	*f32_at(particlePayload, 0x34) = *f32_at(payload, 0x60);
-	*f32_at(particlePayload, 0x38) = *f32_at(payload, 0x5C);
-	*f32_at(particlePayload, 0x3C) = *f32_at(payload, 0x68);
-	*f32_at(particlePayload, 0x40) = *f32_at(payload, 0x6C);
+	*f32_at(particlePayload, 0x34) = *f32_at(payload, 0x50);
+	*f32_at(particlePayload, 0x38) = *f32_at(payload, 0x54);
+	*f32_at(particlePayload, 0x3C) = *f32_at(payload, 0x60);
+	*f32_at(particlePayload, 0x40) = *f32_at(payload, 0x64);
 
 	if (payload[0xEA] != 0) {
 		if ((payload[0xEA] & 0x20) == 0) {
-			*f32_at(particlePayload, 0x44) = *f32_at(payload, 0x78) * Math.RandF();
-			*f32_at(particlePayload, 0x48) = *f32_at(payload, 0x7C) * Math.RandF();
+			*f32_at(particlePayload, 0x44) = *f32_at(payload, 0x80) * Math.RandF();
+			*f32_at(particlePayload, 0x48) = *f32_at(payload, 0x84) * Math.RandF();
 		} else {
-			float randomRotation = *f32_at(payload, 0x78) * Math.RandF();
+			float randomRotation = *f32_at(payload, 0x80) * Math.RandF();
 			*f32_at(particlePayload, 0x44) = randomRotation;
 			*f32_at(particlePayload, 0x48) = randomRotation;
 		}
@@ -968,9 +1061,6 @@ void birth(
 	} else {
 		*(s16*)(particlePayload + 0x22) = life;
 	}
-	*(u16*)(particlePayload + 0x1C) = 0;
-	*(u16*)(particlePayload + 0x1E) = 0;
-	*(u16*)(particlePayload + 0x20) = 0;
 	*(u8*)(particlePayload + 0x58) = 0;
 
 	if (worldMat != NULL) {

@@ -308,13 +308,15 @@ void COctTree::DrawTypeMeshFlag_r(COctNode* octNode)
 {
 	int iVar1;
 	int iVar2;
-	COctNode* pCVar3;
+	COctNode* nodeIter;
 	COctNode* pCVar4;
+	COctNode* pCVar3;
+	CMaterialManEnvRaw* env;
 	int iVar5;
 
 	if ((octNode->m_meshCount != 0) &&
 	    ((octNode->m_drawFlags & 1) != 0)) {
-		CMaterialManEnvRaw* env = reinterpret_cast<CMaterialManEnvRaw*>(&MaterialMan);
+		env = reinterpret_cast<CMaterialManEnvRaw*>(&MaterialMan);
 		env->m_curEnvTevBit = 0xACE0F;
 		env->m_activeEnvTevBit = 0xFFFFFFFF;
 		env->m_alphaRef = 0xFF;
@@ -586,11 +588,11 @@ void COctTree::DrawTypeMeshFrustumIn_r(COctNode* octNode)
 	COctNode* child8;
 	COctNode* node;
 
-	node = octNode;
 	if (octNode->m_meshCount != 0) {
-		node->m_drawFlags |= 1;
+		octNode->m_drawFlags |= 1;
 	}
 
+	node = octNode;
 	for (i = 0; i < 8; i++) {
 		child1 = node->m_children[0];
 		if (child1 == 0) {

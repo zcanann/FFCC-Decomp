@@ -982,7 +982,7 @@ int CCaravanWork::DeleteItem(int itemIndex, int updateJoybus)
             m_inventoryItems[i] = 0xFFFF;
             m_inventoryItemCount = m_inventoryItemCount - 1;
             if (updateJoybus != 0) {
-                DelItem__6JoyBusFiUc(&Joybus, m_joybusCaravanId, (char)i);
+                Joybus.DelItem(m_joybusCaravanId, static_cast<unsigned char>(i));
             }
             return 1;
         }
@@ -1711,7 +1711,7 @@ void CCaravanWork::SafeDeleteTempItem()
 		System.Printf(const_cast<char*>(lbl_801D9F64));
 	}
 
-	unsigned short* artifact = m_artifacts;
+	short* artifact = reinterpret_cast<short*>(m_artifacts);
 	for (int i = 0; i < 50; i++, artifactIndex += 2, artifact += 2) {
 		if (artifactIndex < 96 && (short)artifact[0] > 0) {
 			unsigned short* artifactData =
@@ -2056,37 +2056,37 @@ void CCaravanWork::CalcStatus()
 	}
 
 	cappedValue = 99;
-	if (m_strength < 100) {
+	if (m_strength <= 99) {
 		cappedValue = m_strength;
 	}
 	m_strength = cappedValue;
 
 	cappedValue = 99;
-	if (m_defense < 100) {
+	if (m_defense <= 99) {
 		cappedValue = m_defense;
 	}
 	m_defense = cappedValue;
 
 	cappedValue = 99;
-	if (m_magic < 100) {
+	if (m_magic <= 99) {
 		cappedValue = m_magic;
 	}
 	m_magic = cappedValue;
 
 	cappedValue = 99;
-	if (m_baseStrength < 100) {
+	if (m_baseStrength <= 99) {
 		cappedValue = m_baseStrength;
 	}
 	m_baseStrength = cappedValue;
 
 	cappedValue = 99;
-	if (m_baseDefense < 100) {
+	if (m_baseDefense <= 99) {
 		cappedValue = m_baseDefense;
 	}
 	m_baseDefense = cappedValue;
 
 	cappedValue = 99;
-	if (m_baseMagic < 100) {
+	if (m_baseMagic <= 99) {
 		cappedValue = m_baseMagic;
 	}
 	m_baseMagic = cappedValue;

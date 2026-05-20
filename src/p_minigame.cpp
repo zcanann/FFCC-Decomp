@@ -1992,8 +1992,7 @@ void CMiniGamePcs::MngThreadMain(void*)
                 else if (*reinterpret_cast<unsigned int*>(threadParam + 0x94) == 0 || (loopCounter & 0x1F) == 0)
                 {
                     OSTime now = OSGetTime();
-                    if ((OS_BUS_CLOCK / 4000) * 5000 < static_cast<unsigned long long>(now - startTime) ||
-                        threadParam[0xC6] != 0)
+                    if ((OS_BUS_CLOCK / 4000) * 5000 < static_cast<unsigned long long>(now - startTime))
                     {
 disconnect_player:
                         if ((self[0x134B] & bit) != 0)

@@ -75,26 +75,8 @@ extern float FLOAT_80331b08;
 extern float FLOAT_8032EE80;
 extern float FLOAT_8032EE84;
 
-struct GhostPartyWork {
-	unsigned char _pad0[0x20];
-	int mood;
-	int thresholdA;
-	int thresholdB;
-	int thresholdC;
-	int slotSel;
-	float carrySpeed;
-	int pressure;
-	int settleTimer;
-	int activeTrailCount;
-	int trailIndex;
-	Vec trail[5];
-	Vec leaderTrail[5];
-	Vec carryDir;
-	int auraParticle;
-};
-
-extern unsigned char m_boss__8CGMonObj_field108_0x6c[0x90];
-#define sGhostPartyWork (*reinterpret_cast<GhostPartyWork*>(m_boss__8CGMonObj_field108_0x6c))
+GhostPartyWork CGPartyObj::m_ghostWork;
+#define sGhostPartyWork CGPartyObj::m_ghostWork
 
 struct BossGhostPartyCounters {
 	unsigned char _pad0[0x24];
@@ -103,7 +85,7 @@ struct BossGhostPartyCounters {
 	int thresholdC;
 };
 
-#define sBossGhostPartyCounters (*reinterpret_cast<BossGhostPartyCounters*>(m_boss__8CGMonObj_field108_0x6c))
+#define sBossGhostPartyCounters (*reinterpret_cast<BossGhostPartyCounters*>(&CGPartyObj::m_ghostWork))
 
 struct PartyObjFlags {
 	unsigned char commandActive : 1;
@@ -1285,13 +1267,13 @@ void CGPartyObj::enableAttackCol(int enabled, int isFriendly, int hitMask)
 		if (isFriendly == 0 || (hitMask & 1) != 0) {
 			col0Enabled = true;
 		}
-		bool col1Enabled = false;
 		*reinterpret_cast<unsigned int*>(self + 0x20C) = col0Enabled != false;
+		bool col1Enabled = false;
 		if (isFriendly != 0 && (hitMask & 2) != 0) {
 			col1Enabled = true;
 		}
-		bool col2Enabled = false;
 		*reinterpret_cast<unsigned int*>(self + 0x23C) = col1Enabled != false;
+		bool col2Enabled = false;
 		if (isFriendly != 0 && (hitMask & 4) != 0) {
 			col2Enabled = true;
 		}

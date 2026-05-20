@@ -406,7 +406,7 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
 
     if ((*(u32*)(CFlat + 0x129C) & 0x200000) != 0) {
         BreathParticleGroup* debugGroupData = groupData;
-        for (i = 0; i < (int)pBreathModel->m_groupCount; i++) {
+        for (i = 0; i < (int)pBreathModel->m_groupCount; i++, debugGroupData++) {
             if (debugGroupData->active == 1) {
                 int firstParticle;
                 int j;
@@ -468,7 +468,6 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
                 pppSetBlendMode(1);
                 DrawSphere__8CGraphicFPA4_f8_GXColor(&Graphic, sphereMtx, debugColor);
             }
-            debugGroupData++;
         }
 
         pppInitBlendMode();
@@ -491,7 +490,6 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
     VBreathModel* work;
     Mtx* particleWMat;
     Mtx* particleMtx;
-    int i;
     int groupIndex;
     int firstParticle;
     short slotIndex;
@@ -522,6 +520,7 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
 
     if (work->m_particleData == NULL) {
         BreathParticleGroup* groupTable;
+        int i;
 
         work->m_particleCount = pBreathModel->m_particleCount;
         work->m_slotCount = pBreathModel->m_slotCount;
@@ -677,7 +676,7 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
                 groupCursor = vBreathModel->m_groups;
                 foundGroup = -1;
                 foundSlot = -1;
-                for (groupIndex = 0; groupIndex < (int)params->m_groupCount; groupIndex++) {
+                for (groupIndex = 0; groupIndex < (int)params->m_groupCount; groupIndex++, groupCursor++) {
                     for (slotIndex = 0; slotIndex < (int)params->m_slotCount; slotIndex++) {
                         signed char* particleIndices = groupCursor->particleIndices;
                         if ((short)i == particleIndices[(short)slotIndex]) {
@@ -687,7 +686,6 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
                             goto found_index;
                         }
                     }
-                    groupCursor++;
                 }
                 found = false;
 

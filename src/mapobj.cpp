@@ -152,8 +152,137 @@ extern "C" void __dl__FPv(void*);
 extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 
-template class CPtrArray<CMapAnimRun*>;
-template class CPtrArray<CMapShadow*>;
+/*
+ * --INFO--
+ * PAL Address: 0x8002C444
+ * PAL Size: 112b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <>
+int CPtrArray<CMapAnimRun*>::Add(CMapAnimRun* item)
+{
+    if (setSize(m_numItems + 1) == 0) {
+        return 0;
+    }
+
+    m_items[m_numItems] = item;
+    m_numItems = m_numItems + 1;
+    return 1;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8002C4B4
+ * PAL Size: 240b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <>
+int CPtrArray<CMapAnimRun*>::setSize(unsigned long newSize)
+{
+    CMapAnimRun** newItems;
+
+    if (m_size < newSize) {
+        if (m_size == 0) {
+            m_size = m_defaultSize;
+        } else {
+            if (m_growCapacity == 0) {
+                System.Printf(const_cast<char*>(s_CPtrArrayGrowError));
+            }
+            m_size = m_size << 1;
+        }
+
+        newItems = static_cast<CMapAnimRun**>(Memory._Alloc(m_size * sizeof(CMapAnimRun*), m_stage,
+                                                            const_cast<char*>(s_CPtrArrayFile), 0xfa, 0));
+        if (newItems == 0) {
+            return 0;
+        }
+
+        if (m_items != 0) {
+            memcpy(newItems, m_items, m_numItems * sizeof(CMapAnimRun*));
+        }
+
+        if (m_items != 0) {
+            delete[] m_items;
+            m_items = 0;
+        }
+
+        m_items = newItems;
+    }
+
+    return 1;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8002C5A4
+ * PAL Size: 112b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <>
+int CPtrArray<CMapShadow*>::Add(CMapShadow* item)
+{
+    if (setSize(m_numItems + 1) == 0) {
+        return 0;
+    }
+
+    m_items[m_numItems] = item;
+    m_numItems = m_numItems + 1;
+    return 1;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8002C614
+ * PAL Size: 240b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <>
+int CPtrArray<CMapShadow*>::setSize(unsigned long newSize)
+{
+    CMapShadow** newItems;
+
+    if (m_size < newSize) {
+        if (m_size == 0) {
+            m_size = m_defaultSize;
+        } else {
+            if (m_growCapacity == 0) {
+                System.Printf(const_cast<char*>(s_CPtrArrayGrowError));
+            }
+            m_size = m_size << 1;
+        }
+
+        newItems = static_cast<CMapShadow**>(Memory._Alloc(m_size * sizeof(CMapShadow*), m_stage,
+                                                           const_cast<char*>(s_CPtrArrayFile), 0xfa, 0));
+        if (newItems == 0) {
+            return 0;
+        }
+
+        if (m_items != 0) {
+            memcpy(newItems, m_items, m_numItems * sizeof(CMapShadow*));
+        }
+
+        if (m_items != 0) {
+            delete[] m_items;
+            m_items = 0;
+        }
+
+        m_items = newItems;
+    }
+
+    return 1;
+}
 
 /*
  * --INFO--

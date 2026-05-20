@@ -1,4 +1,5 @@
 #include "ffcc/partyobj.h"
+#include "ffcc/cflat_runtime2.h"
 #include "ffcc/gobjwork.h"
 #include "ffcc/pad.h"
 #include "ffcc/map.h"
@@ -31,11 +32,6 @@ extern "C" CGObject* FindGObjNext__13CFlatRuntime2FP8CGObject(void*, CGObject*);
 extern "C" void onPush__9CGBaseObjFP9CGBaseObji(CGBaseObj*, CGBaseObj*, int);
 extern "C" void* CreateFromScript__9CGItemObjFiiiP8CGObjectfPQ29CGItemObj4CCFS(
     int type, int createMode, int itemId, CGObject* owner, float arg, CGItemObj::CCFS* cfs);
-extern "C" void ResetParticleWork__13CFlatRuntime2Fii(void*, int, int);
-extern "C" void SetParticleWorkPos__13CFlatRuntime2FR3Vecf(void*, Vec&, float);
-extern "C" void SetParticleWorkTrace__13CFlatRuntime2FPQ212CFlatRuntime7CObject(void*, void*);
-extern "C" void SetParticleWorkBind__13CFlatRuntime2FPQ212CFlatRuntime7CObject(void*, void*);
-extern "C" void PutParticleWork__13CFlatRuntime2Fv(void*);
 extern const char lbl_801DCB1C[];
 extern const char lbl_801DCB38[];
 extern "C" int DAT_8032EE70;
@@ -1116,11 +1112,10 @@ void CGPartyObj::shouki()
 	if (chaliceDist > FLOAT_80331b00 * Game.unkFloat_0xca10 || !cflatBit4) {
 		if (m_unk688 != 2) {
 			deletePSlotBit(0x200);
-			ResetParticleWork__13CFlatRuntime2Fii(CFlat, 1, m_particleSlots[9]);
-			SetParticleWorkTrace__13CFlatRuntime2FPQ212CFlatRuntime7CObject(
-			    CFlat, reinterpret_cast<void*>(Game.unk_flat3_0xc7d0));
-			SetParticleWorkBind__13CFlatRuntime2FPQ212CFlatRuntime7CObject(CFlat, this);
-			PutParticleWork__13CFlatRuntime2Fv(CFlat);
+			gCFlatRuntime2.ResetParticleWork(1, m_particleSlots[9]);
+			gCFlatRuntime2.SetParticleWorkTrace(reinterpret_cast<CFlatRuntime::CObject*>(Game.unk_flat3_0xc7d0));
+			gCFlatRuntime2.SetParticleWorkBind(this);
+			gCFlatRuntime2.PutParticleWork();
 		}
 		m_unk688 = 2;
 	} else {
@@ -1130,12 +1125,11 @@ void CGPartyObj::shouki()
 		} else {
 			if ((static_cast<unsigned char>(m_flags) & 3) == 0) {
 				playSe3D(0x1E, 0x32, 0x96, 0, 0);
-				ResetParticleWork__13CFlatRuntime2Fii(CFlat, 2, 0);
-				SetParticleWorkPos__13CFlatRuntime2FR3Vecf(CFlat, m_worldPosition, m_rotBaseY);
-				SetParticleWorkTrace__13CFlatRuntime2FPQ212CFlatRuntime7CObject(
-				    CFlat, reinterpret_cast<void*>(Game.unk_flat3_0xc7d0));
-				SetParticleWorkBind__13CFlatRuntime2FPQ212CFlatRuntime7CObject(CFlat, this);
-				PutParticleWork__13CFlatRuntime2Fv(CFlat);
+				gCFlatRuntime2.ResetParticleWork(2, 0);
+				gCFlatRuntime2.SetParticleWorkPos(m_worldPosition, m_rotBaseY);
+				gCFlatRuntime2.SetParticleWorkTrace(reinterpret_cast<CFlatRuntime::CObject*>(Game.unk_flat3_0xc7d0));
+				gCFlatRuntime2.SetParticleWorkBind(this);
+				gCFlatRuntime2.PutParticleWork();
 			}
 			m_unk688 = 1;
 		}

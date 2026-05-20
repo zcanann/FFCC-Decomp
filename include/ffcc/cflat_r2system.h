@@ -32,7 +32,7 @@ class CFlatRuntime2
 	void SetParticleWorkParam(int, CFlatRuntime::CObject*);
 	void SetParticleWorkSpeed(float);
 	void SetParticleWorkSe(int, int, int);
-	void GetFreeParticleSlot();
+	int GetFreeParticleSlot();
 	void EndParticleSlot(int, int);
 	void IgnoreParticle(int, CFlatRuntime::CObject*);
 	void initAllFinished();

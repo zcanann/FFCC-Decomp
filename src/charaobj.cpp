@@ -1,5 +1,6 @@
 #include "ffcc/charaobj.h"
 #include "ffcc/astar.h"
+#include "ffcc/cflat_runtime2.h"
 #include "ffcc/fontman.h"
 #include "ffcc/gobjwork.h"
 #include "ffcc/linkage.h"
@@ -18,24 +19,6 @@
 
 extern "C" void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
 	void*, int, int, int, int, void*, void*);
-extern "C" void DeleteParticleSlot__13CFlatRuntime2Fii(void*, int, int);
-extern "C" int GetFreeParticleSlot__13CFlatRuntime2Fv(void*);
-extern "C" void EndParticleSlot__13CFlatRuntime2Fii(void*, int, int);
-extern "C" void ResetParticleWork__13CFlatRuntime2Fii(void*, int, int);
-extern "C" void SetParticleWorkScale__13CFlatRuntime2Ff(void*, float);
-extern "C" void SetParticleWorkParam__13CFlatRuntime2FiPQ212CFlatRuntime7CObject(void*, int, void*);
-extern "C" void SetParticleWorkSpeed__13CFlatRuntime2Ff(void*, float);
-extern "C" void SetParticleWorkSe__13CFlatRuntime2Fiii(void*, int, int, int);
-extern "C" void SetParticleWorkCol__13CFlatRuntime2Fiif(void*, int, int, float);
-extern "C" void SetParticleWorkPos__13CFlatRuntime2FR3Vecf(void*, Vec&, float);
-extern "C" void SetParticleWorkVector__13CFlatRuntime2Fff(void*, float, float);
-extern "C" void SetParticleWorkTrace__13CFlatRuntime2FPQ212CFlatRuntime7CObject(void*, void*);
-extern "C" void SetParticleWorkTarget__13CFlatRuntime2FR3Vec(void*, Vec&);
-extern "C" void SetParticleWorkBind__13CFlatRuntime2FPQ212CFlatRuntime7CObject(void*, void*);
-extern "C" void SetParticleWorkNo__13CFlatRuntime2Fi(void*, int);
-extern "C" void PutParticleWork__13CFlatRuntime2Fv(void*);
-extern "C" int intToClass__13CFlatRuntime2Fi(void*, int);
-extern "C" void IgnoreParticle__13CFlatRuntime2FiPQ212CFlatRuntime7CObject(void*, int, void*);
 extern "C" void pppEndPart__8CPartMngFi(void*, int);
 extern "C" unsigned char m_boss__8CGMonObj[];
 extern char SoundBuffer[];
@@ -109,7 +92,7 @@ static void CharaObjEndSlots(CGCharaObj* charaObj, unsigned int slotMask)
 {
 	for (int i = 0; i < 0x16; i++) {
 		if ((slotMask & (1U << i)) != 0) {
-			EndParticleSlot__13CFlatRuntime2Fii(CFlat, charaObj->m_particleSlots[i], 1);
+			gCFlatRuntime2.EndParticleSlot(charaObj->m_particleSlots[i], 1);
 		}
 	}
 }
@@ -445,7 +428,7 @@ void CGCharaObj::onCreate()
 	memset(m_unk6AC, 0, sizeof(m_unk6AC));
 
 	for (int i = 0; i < 0x16; i++) {
-		m_particleSlots[i] = GetFreeParticleSlot__13CFlatRuntime2Fv(CFlat);
+		m_particleSlots[i] = gCFlatRuntime2.GetFreeParticleSlot();
 	}
 }
 
@@ -523,21 +506,21 @@ void CGCharaObj::onCancelStat(int)
 			if (state == 2) {
 				for (int i = 0; i < 0x16; i++) {
 					if (((1U << i) & 0x18U) != 0) {
-						EndParticleSlot__13CFlatRuntime2Fii(CFlat, m_particleSlots[i], 1);
+						gCFlatRuntime2.EndParticleSlot(m_particleSlots[i], 1);
 					}
 				}
 			}
 		} else if (state == 0x12) {
 			for (int i = 0; i < 0x16; i++) {
 				if (((1U << i) & 1U) != 0) {
-					EndParticleSlot__13CFlatRuntime2Fii(CFlat, m_particleSlots[i], 1);
+					gCFlatRuntime2.EndParticleSlot(m_particleSlots[i], 1);
 				}
 			}
 		}
 	} else {
 		for (int i = 0; i < 0x16; i++) {
 			if (((1U << i) & 0x138U) != 0) {
-				EndParticleSlot__13CFlatRuntime2Fii(CFlat, m_particleSlots[i], 1);
+				gCFlatRuntime2.EndParticleSlot(m_particleSlots[i], 1);
 			}
 		}
 		m_damageParticle = -1;
@@ -764,7 +747,7 @@ void CGCharaObj::endPSlotBit(int slotMask)
 {
 	for (int i = 0; i < 0x16; i++) {
 		if ((static_cast<unsigned int>(slotMask) & (1U << i)) != 0) {
-			EndParticleSlot__13CFlatRuntime2Fii(CFlat, m_particleSlots[i], 1);
+			gCFlatRuntime2.EndParticleSlot(m_particleSlots[i], 1);
 		}
 	}
 }
@@ -782,7 +765,7 @@ void CGCharaObj::deletePSlotBit(int slotMask)
 {
 	for (int i = 0; i < 0x16; i++) {
 		if (((unsigned int)slotMask & (1U << i)) != 0) {
-			DeleteParticleSlot__13CFlatRuntime2Fii(CFlat, m_particleSlots[i], 1);
+			gCFlatRuntime2.DeleteParticleSlot(m_particleSlots[i], 1);
 		}
 	}
 }
@@ -826,7 +809,7 @@ void CGCharaObj::onFrameStat()
 				if (m_subFrame == 0) {
 					for (int i = 0; i < 0x16; i++) {
 						if ((8U & (1U << i)) != 0) {
-							EndParticleSlot__13CFlatRuntime2Fii(CFlat, m_particleSlots[i], 1);
+							gCFlatRuntime2.EndParticleSlot(m_particleSlots[i], 1);
 						}
 					}
 					reqAnim(m_unk558, 0, 0);
@@ -835,7 +818,7 @@ void CGCharaObj::onFrameStat()
 				if (m_itemId != 0 && m_subFrame == 10) {
 					for (int i = 0; i < 0x16; i++) {
 						if ((2U & (1U << i)) != 0) {
-							EndParticleSlot__13CFlatRuntime2Fii(CFlat, m_particleSlots[i], 1);
+							gCFlatRuntime2.EndParticleSlot(m_particleSlots[i], 1);
 						}
 					}
 					putParticleFromItem(m_itemId, 2, m_particleSlots[1], &CharaObjComboCenter(this));
@@ -854,7 +837,7 @@ void CGCharaObj::onFrameStat()
 				Sound.StopSe3DGroup(m_particleId);
 				for (int i = 0; i < 0x16; i++) {
 					if ((0x3BU & (1U << i)) != 0) {
-						DeleteParticleSlot__13CFlatRuntime2Fii(CFlat, m_particleSlots[i], 1);
+						gCFlatRuntime2.DeleteParticleSlot(m_particleSlots[i], 1);
 					}
 				}
 				reqAnim(4, 0, 0);
@@ -909,7 +892,7 @@ void CGCharaObj::onFrameStat()
 				Sound.StopSe3DGroup(m_particleId);
 				for (int i = 0; i < 0x16; i++) {
 					if ((0x3BU & (1U << i)) != 0) {
-						DeleteParticleSlot__13CFlatRuntime2Fii(CFlat, m_particleSlots[i], 1);
+						gCFlatRuntime2.DeleteParticleSlot(m_particleSlots[i], 1);
 					}
 				}
 				reqAnim(6, 1, 0);
@@ -940,7 +923,7 @@ void CGCharaObj::onFrameStat()
 					Sound.StopSe3DGroup(m_particleId);
 					for (int i = 0; i < 0x16; i++) {
 						if ((0x3BU & (1U << i)) != 0) {
-							DeleteParticleSlot__13CFlatRuntime2Fii(CFlat, m_particleSlots[i], 1);
+							gCFlatRuntime2.DeleteParticleSlot(m_particleSlots[i], 1);
 						}
 					}
 					reqAnim(0x1A, 0, 0);
@@ -969,7 +952,7 @@ void CGCharaObj::onFrameStat()
 				Sound.StopSe3DGroup(m_particleId);
 				for (int i = 0; i < 0x16; i++) {
 					if ((0x3BU & (1U << i)) != 0) {
-						DeleteParticleSlot__13CFlatRuntime2Fii(CFlat, m_particleSlots[i], 1);
+						gCFlatRuntime2.DeleteParticleSlot(m_particleSlots[i], 1);
 					}
 				}
 				reqAnim(0x1D, 0, 0);
@@ -1050,7 +1033,7 @@ void CGCharaObj::damageDelete()
 	Sound.StopSe3DGroup(m_particleId);
 	for (int i = 0; i < 0x16; i++) {
 		if (((1U << i) & 0x3bU) != 0) {
-			DeleteParticleSlot__13CFlatRuntime2Fii(CFlat, m_particleSlots[i], 1);
+			gCFlatRuntime2.DeleteParticleSlot(m_particleSlots[i], 1);
 		}
 	}
 }
@@ -1152,7 +1135,7 @@ void CGCharaObj::onHitParticle(int effectIndex, int, int, int colliderIndex, Vec
 	int particleIndex = hitParam->m_particleIndex;
 	CGPrgObj* sourceObj = 0;
 	if (hitParam->m_classId != 0) {
-		sourceObj = reinterpret_cast<CGPrgObj*>(intToClass__13CFlatRuntime2Fi(CFlat, static_cast<int>(hitParam->m_classId)));
+		sourceObj = reinterpret_cast<CGPrgObj*>(gCFlatRuntime2.intToClass(static_cast<int>(hitParam->m_classId)));
 	}
 
 	if (sourceObj != 0) {
@@ -1163,7 +1146,7 @@ void CGCharaObj::onHitParticle(int effectIndex, int, int, int colliderIndex, Vec
 		}
 	}
 
-	IgnoreParticle__13CFlatRuntime2FiPQ212CFlatRuntime7CObject(CFlat, static_cast<short>(effectIndex), this);
+	gCFlatRuntime2.IgnoreParticle(static_cast<short>(effectIndex), this);
 	if ((*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + (particleIndex * 0x48) + 0xC) & 0x100) != 0) {
 		pppEndPart__8CPartMngFi(&PartMng, effectIndex);
 	}
@@ -1219,18 +1202,18 @@ void CGCharaObj::putHitParticleFromItem(CGPrgObj* sourceObj, int itemId)
 				particleBank = 3;
 			}
 
-			ResetParticleWork__13CFlatRuntime2Fii(CFlat, (particleBank << 8) | ((particleSpec & 0xFF) + particleOffset), 0);
+			gCFlatRuntime2.ResetParticleWork((particleBank << 8) | ((particleSpec & 0xFF) + particleOffset), 0);
 			particleFlags = *reinterpret_cast<unsigned short*>(itemData + 0x0C);
 			if ((particleFlags & 0x200) == 0) {
 				Vec origin;
 				origin.x = 0.0f;
 				origin.y = 0.0f;
 				origin.z = 0.0f;
-				SetParticleWorkPos__13CFlatRuntime2FR3Vecf(CFlat, origin, 1.0f);
+				gCFlatRuntime2.SetParticleWorkPos(origin, 1.0f);
 			} else if (sourceObj != 0) {
-				SetParticleWorkBind__13CFlatRuntime2FPQ212CFlatRuntime7CObject(CFlat, sourceObj);
+				gCFlatRuntime2.SetParticleWorkBind(sourceObj);
 			}
-			PutParticleWork__13CFlatRuntime2Fv(CFlat);
+			gCFlatRuntime2.PutParticleWork();
 		}
 	}
 
@@ -1282,7 +1265,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 			case 0:
 				for (int i = 0; i < 0x16; i++) {
 					if (((1U << i) & 0x4U) != 0) {
-						EndParticleSlot__13CFlatRuntime2Fii(CFlat, slots[i], 1);
+						gCFlatRuntime2.EndParticleSlot(slots[i], 1);
 					}
 				}
 				if (isIceJ) {
@@ -1297,7 +1280,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 			case 1:
 				for (int i = 0; i < 0x16; i++) {
 					if (((1U << i) & 0x40U) != 0) {
-						EndParticleSlot__13CFlatRuntime2Fii(CFlat, slots[i], 1);
+						gCFlatRuntime2.EndParticleSlot(slots[i], 1);
 					}
 				}
 				if (isIceJ) {
@@ -1310,7 +1293,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 				m_castTimeTick = 0;
 				for (int i = 0; i < 0x16; i++) {
 					if (((1U << i) & 0x80000U) != 0) {
-						EndParticleSlot__13CFlatRuntime2Fii(CFlat, slots[i], 1);
+						gCFlatRuntime2.EndParticleSlot(slots[i], 1);
 					}
 				}
 				putParticleBindTrace(0x10C, slots[19], this, 20.0f * m_attackColRadius, 0);
@@ -1318,7 +1301,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 			case 3:
 				for (int i = 0; i < 0x16; i++) {
 					if (((1U << i) & 0x40000U) != 0) {
-						EndParticleSlot__13CFlatRuntime2Fii(CFlat, slots[i], 1);
+						gCFlatRuntime2.EndParticleSlot(slots[i], 1);
 					}
 				}
 				putParticleBindTrace(0x10D, slots[18], this, 20.0f * m_attackColRadius, 0);
@@ -1326,7 +1309,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 			case 4:
 				for (int i = 0; i < 0x16; i++) {
 					if (((1U << i) & 0x80U) != 0) {
-						EndParticleSlot__13CFlatRuntime2Fii(CFlat, slots[i], 1);
+						gCFlatRuntime2.EndParticleSlot(slots[i], 1);
 					}
 				}
 				if (isIceJ) {
@@ -1338,7 +1321,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 			case 6:
 				for (int i = 0; i < 0x16; i++) {
 					if (((1U << i) & 0x100000U) != 0) {
-						EndParticleSlot__13CFlatRuntime2Fii(CFlat, slots[i], 1);
+						gCFlatRuntime2.EndParticleSlot(slots[i], 1);
 					}
 				}
 				putParticleBindTrace(0x107, slots[20], this, 20.0f * m_attackColRadius, 0);
@@ -1346,7 +1329,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 			case 7: {
 				for (int i = 0; i < 0x16; i++) {
 					if (((1U << i) & 0x8000U) != 0) {
-						EndParticleSlot__13CFlatRuntime2Fii(CFlat, slots[i], 1);
+						gCFlatRuntime2.EndParticleSlot(slots[i], 1);
 					}
 				}
 				int particleNo = isMon ? 0x170 : 0x114;
@@ -1356,7 +1339,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 			case 8: {
 				for (int i = 0; i < 0x16; i++) {
 					if (((1U << i) & 0x2000U) != 0) {
-						EndParticleSlot__13CFlatRuntime2Fii(CFlat, slots[i], 1);
+						gCFlatRuntime2.EndParticleSlot(slots[i], 1);
 					}
 				}
 				int particleNo = (isMon ? 0x16E : 0x112) | 0x100;
@@ -1366,7 +1349,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 			case 9: {
 				for (int i = 0; i < 0x16; i++) {
 					if (((1U << i) & 0x4000U) != 0) {
-						EndParticleSlot__13CFlatRuntime2Fii(CFlat, slots[i], 1);
+						gCFlatRuntime2.EndParticleSlot(slots[i], 1);
 					}
 				}
 				int particleNo = (isMon ? 0x16C : 0x110) | 0x100;
@@ -1381,7 +1364,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 			case 0x1B:
 				for (int i = 0; i < 0x16; i++) {
 					if (((1U << i) & 0x400U) != 0) {
-						EndParticleSlot__13CFlatRuntime2Fii(CFlat, slots[i], 1);
+						gCFlatRuntime2.EndParticleSlot(slots[i], 1);
 					}
 				}
 				putParticle(0x11C, slots[10], this, 1.0f, 0x1290D);
@@ -1399,7 +1382,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 			case 0:
 				for (int i = 0; i < 0x16; i++) {
 					if (((1U << i) & 0x4U) != 0) {
-						EndParticleSlot__13CFlatRuntime2Fii(CFlat, slots[i], 1);
+						gCFlatRuntime2.EndParticleSlot(slots[i], 1);
 					}
 				}
 				if (isIceJ) {
@@ -1415,21 +1398,21 @@ void CGCharaObj::setSta(int staIndex, int value)
 			case 1:
 				for (int i = 0; i < 0x16; i++) {
 					if (((1U << i) & 0x40U) != 0) {
-						EndParticleSlot__13CFlatRuntime2Fii(CFlat, slots[i], 1);
+						gCFlatRuntime2.EndParticleSlot(slots[i], 1);
 					}
 				}
 				break;
 			case 2:
 				for (int i = 0; i < 0x16; i++) {
 					if (((1U << i) & 0x80000U) != 0) {
-						EndParticleSlot__13CFlatRuntime2Fii(CFlat, slots[i], 1);
+						gCFlatRuntime2.EndParticleSlot(slots[i], 1);
 					}
 				}
 				break;
 			case 3:
 				for (int i = 0; i < 0x16; i++) {
 					if (((1U << i) & 0x40000U) != 0) {
-						EndParticleSlot__13CFlatRuntime2Fii(CFlat, slots[i], 1);
+						gCFlatRuntime2.EndParticleSlot(slots[i], 1);
 					}
 				}
 				putParticle(0x10E, 0, this, 20.0f * m_attackColRadius, 0);
@@ -1438,21 +1421,21 @@ void CGCharaObj::setSta(int staIndex, int value)
 			case 4:
 				for (int i = 0; i < 0x16; i++) {
 					if (((1U << i) & 0x80U) != 0) {
-						EndParticleSlot__13CFlatRuntime2Fii(CFlat, slots[i], 1);
+						gCFlatRuntime2.EndParticleSlot(slots[i], 1);
 					}
 				}
 				break;
 			case 6:
 				for (int i = 0; i < 0x16; i++) {
 					if (((1U << i) & 0x100000U) != 0) {
-						EndParticleSlot__13CFlatRuntime2Fii(CFlat, slots[i], 1);
+						gCFlatRuntime2.EndParticleSlot(slots[i], 1);
 					}
 				}
 				break;
 			case 7: {
 				for (int i = 0; i < 0x16; i++) {
 					if (((1U << i) & 0x8000U) != 0) {
-						EndParticleSlot__13CFlatRuntime2Fii(CFlat, slots[i], 1);
+						gCFlatRuntime2.EndParticleSlot(slots[i], 1);
 					}
 				}
 				int particleNo = (isMon ? 0x171 : 0x115) | 0x100;
@@ -1462,7 +1445,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 			case 8: {
 				for (int i = 0; i < 0x16; i++) {
 					if (((1U << i) & 0x2000U) != 0) {
-						EndParticleSlot__13CFlatRuntime2Fii(CFlat, slots[i], 1);
+						gCFlatRuntime2.EndParticleSlot(slots[i], 1);
 					}
 				}
 				int particleNo = (isMon ? 0x16F : 0x113) | 0x100;
@@ -1472,7 +1455,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 			case 9: {
 				for (int i = 0; i < 0x16; i++) {
 					if (((1U << i) & 0x4000U) != 0) {
-						EndParticleSlot__13CFlatRuntime2Fii(CFlat, slots[i], 1);
+						gCFlatRuntime2.EndParticleSlot(slots[i], 1);
 					}
 				}
 				int particleNo = (isMon ? 0x16D : 0x111) | 0x100;
@@ -1488,7 +1471,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 			case 0x1B:
 				for (int i = 0; i < 0x16; i++) {
 					if (((1U << i) & 0x400U) != 0) {
-						EndParticleSlot__13CFlatRuntime2Fii(CFlat, slots[i], 1);
+						gCFlatRuntime2.EndParticleSlot(slots[i], 1);
 					}
 				}
 				break;
@@ -2247,10 +2230,10 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 	}
 
 	if (particleNo >= 0) {
-		ResetParticleWork__13CFlatRuntime2Fii(CFlat, (particleBank << 8) | particleNo, effectArg1);
-		SetParticleWorkScale__13CFlatRuntime2Ff(CFlat, *reinterpret_cast<unsigned short*>(itemData + 0x10) * 0.01f);
-		SetParticleWorkParam__13CFlatRuntime2FiPQ212CFlatRuntime7CObject(CFlat, effectId, this);
-		SetParticleWorkSpeed__13CFlatRuntime2Ff(CFlat, *reinterpret_cast<unsigned short*>(itemData + 0x26) * 0.01f);
+		gCFlatRuntime2.ResetParticleWork((particleBank << 8) | particleNo, effectArg1);
+		gCFlatRuntime2.SetParticleWorkScale(*reinterpret_cast<unsigned short*>(itemData + 0x10) * 0.01f);
+		gCFlatRuntime2.SetParticleWorkParam(effectId, this);
+		gCFlatRuntime2.SetParticleWorkSpeed(*reinterpret_cast<unsigned short*>(itemData + 0x26) * 0.01f);
 
 		if (effectId > 500) {
 			unsigned short itemType = *reinterpret_cast<unsigned short*>(itemData + 2);
@@ -2259,7 +2242,7 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 				colType = itemType;
 			}
 			if (colType >= 0) {
-				SetParticleWorkCol__13CFlatRuntime2Fiif(CFlat, colType, -1, *reinterpret_cast<unsigned short*>(itemData + 4) * 0.01f);
+				gCFlatRuntime2.SetParticleWorkCol(colType, -1, *reinterpret_cast<unsigned short*>(itemData + 4) * 0.01f);
 			}
 		}
 
@@ -2267,21 +2250,21 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 		case 0:
 			seNo = CharaObjDecodeSe(*reinterpret_cast<unsigned short*>(itemData + 0x38));
 			if (seNo != 0 && (*reinterpret_cast<unsigned short*>(itemData + 0x3A) & 0x8000) != 0) {
-				SetParticleWorkSe__13CFlatRuntime2Fiii(CFlat, seNo, 2, *reinterpret_cast<unsigned short*>(itemData + 0x3A) & 0xFF);
+				gCFlatRuntime2.SetParticleWorkSe(seNo, 2, *reinterpret_cast<unsigned short*>(itemData + 0x3A) & 0xFF);
 				seNo = 0;
 			}
 			break;
 		case 1:
 			seNo = CharaObjDecodeSe(*reinterpret_cast<unsigned short*>(itemData + 0x3C));
 			if (seNo != 0 && (*reinterpret_cast<unsigned short*>(itemData + 0x3E) & 0x8000) != 0) {
-				SetParticleWorkSe__13CFlatRuntime2Fiii(CFlat, seNo, 2, *reinterpret_cast<unsigned short*>(itemData + 0x3E) & 0xFF);
+				gCFlatRuntime2.SetParticleWorkSe(seNo, 2, *reinterpret_cast<unsigned short*>(itemData + 0x3E) & 0xFF);
 				seNo = 0;
 			}
 			break;
 		case 2:
 			seNo = CharaObjDecodeSe(*reinterpret_cast<unsigned short*>(itemData + 0x40));
 			if (seNo != 0 && (*reinterpret_cast<unsigned short*>(itemData + 0x0C) & 0x400) != 0) {
-				SetParticleWorkSe__13CFlatRuntime2Fiii(CFlat, seNo, 2, 0);
+				gCFlatRuntime2.SetParticleWorkSe(seNo, 2, 0);
 				seNo = 0;
 			}
 			break;
@@ -2290,36 +2273,36 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 		}
 
 		if ((particleFlags & 0x100) != 0) {
-			SetParticleWorkBind__13CFlatRuntime2FPQ212CFlatRuntime7CObject(CFlat, this);
+			gCFlatRuntime2.SetParticleWorkBind(this);
 		} else if ((particleFlags & 0x200) != 0) {
 			float distance = *reinterpret_cast<unsigned short*>(itemData + 0x2A) * 1.0f;
 			Vec offsetPos;
 			offsetPos.x = m_worldPosition.x + sinf(m_rotTargetY) * distance;
 			offsetPos.y = m_worldPosition.y;
 			offsetPos.z = m_worldPosition.z + cosf(m_rotTargetY) * distance;
-			SetParticleWorkPos__13CFlatRuntime2FR3Vecf(CFlat, offsetPos, m_rotTargetY);
-			SetParticleWorkVector__13CFlatRuntime2Fff(CFlat, m_rotTargetY, 0.0f);
+			gCFlatRuntime2.SetParticleWorkPos(offsetPos, m_rotTargetY);
+			gCFlatRuntime2.SetParticleWorkVector(m_rotTargetY, 0.0f);
 			if ((*reinterpret_cast<unsigned short*>(itemData + 0x0C) & 0x4000) != 0) {
-				SetParticleWorkPos__13CFlatRuntime2FR3Vecf(CFlat, m_worldPosition, m_rotTargetY);
-				SetParticleWorkTarget__13CFlatRuntime2FR3Vec(CFlat, m_jumpOffset);
-				SetParticleWorkTrace__13CFlatRuntime2FPQ212CFlatRuntime7CObject(CFlat, this);
+				gCFlatRuntime2.SetParticleWorkPos(m_worldPosition, m_rotTargetY);
+				gCFlatRuntime2.SetParticleWorkTarget(m_jumpOffset);
+				gCFlatRuntime2.SetParticleWorkTrace(this);
 			}
 		} else if (pos != 0) {
-			SetParticleWorkPos__13CFlatRuntime2FR3Vecf(CFlat, *pos, m_rotTargetY);
+			gCFlatRuntime2.SetParticleWorkPos(*pos, m_rotTargetY);
 		} else if ((particleFlags & 0x400) != 0) {
-			SetParticleWorkPos__13CFlatRuntime2FR3Vecf(CFlat, m_jumpOffset, 0.0f);
+			gCFlatRuntime2.SetParticleWorkPos(m_jumpOffset, 0.0f);
 		} else {
-			SetParticleWorkPos__13CFlatRuntime2FR3Vecf(CFlat, m_worldPosition, m_rotTargetY);
+			gCFlatRuntime2.SetParticleWorkPos(m_worldPosition, m_rotTargetY);
 		}
 
 		if (effectId == 0x3B4 && effectArg0 == 3 && pos != 0) {
-			SetParticleWorkPos__13CFlatRuntime2FR3Vecf(CFlat, *pos, m_rotTargetY);
-			PutParticleWork__13CFlatRuntime2Fv(CFlat);
+			gCFlatRuntime2.SetParticleWorkPos(*pos, m_rotTargetY);
+			gCFlatRuntime2.PutParticleWork();
 			emittedCustom = true;
 		} else if (effectId == 0x409 && effectArg0 == 3) {
 			for (int i = 3; i < 9; i++) {
-				SetParticleWorkNo__13CFlatRuntime2Fi(CFlat, (particleBank << 8) | i);
-				PutParticleWork__13CFlatRuntime2Fv(CFlat);
+				gCFlatRuntime2.SetParticleWorkNo((particleBank << 8) | i);
+				gCFlatRuntime2.PutParticleWork();
 			}
 			emittedCustom = true;
 		} else if (effectId > 0x46C && effectId < 0x46F) {
@@ -2328,21 +2311,21 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 				randomPos.x = m_worldPosition.x + Math.RandFPM(20.0f);
 				randomPos.y = m_worldPosition.y + 1.0f;
 				randomPos.z = m_worldPosition.z + Math.RandFPM(20.0f);
-				SetParticleWorkNo__13CFlatRuntime2Fi(CFlat, (particleBank << 8) | 0x1D);
-				SetParticleWorkPos__13CFlatRuntime2FR3Vecf(CFlat, randomPos, m_rotTargetY);
-				PutParticleWork__13CFlatRuntime2Fv(CFlat);
+				gCFlatRuntime2.SetParticleWorkNo((particleBank << 8) | 0x1D);
+				gCFlatRuntime2.SetParticleWorkPos(randomPos, m_rotTargetY);
+				gCFlatRuntime2.PutParticleWork();
 				emittedCustom = true;
 			} else if (effectArg0 == 3) {
 				for (int i = 0x0D; i < 0x1D; i++) {
-					SetParticleWorkNo__13CFlatRuntime2Fi(CFlat, (particleBank << 8) | i);
-					PutParticleWork__13CFlatRuntime2Fv(CFlat);
+					gCFlatRuntime2.SetParticleWorkNo((particleBank << 8) | i);
+					gCFlatRuntime2.PutParticleWork();
 				}
 				emittedCustom = true;
 			}
 		} else if (effectId > 0x472 && effectId < 0x479 && effectArg0 == 3) {
 			for (int i = 7; i < 0x0C; i++) {
-				SetParticleWorkNo__13CFlatRuntime2Fi(CFlat, (particleBank << 8) | i);
-				PutParticleWork__13CFlatRuntime2Fv(CFlat);
+				gCFlatRuntime2.SetParticleWorkNo((particleBank << 8) | i);
+				gCFlatRuntime2.PutParticleWork();
 			}
 			emittedCustom = true;
 		} else if (effectId > 0x49C && effectId < 0x4A0 && effectArg0 == 2) {
@@ -2352,9 +2335,9 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 				sidePos.x = m_worldPosition.x + cosf(m_rotTargetY) * side;
 				sidePos.y = m_worldPosition.y;
 				sidePos.z = m_worldPosition.z - sinf(m_rotTargetY) * side;
-				SetParticleWorkPos__13CFlatRuntime2FR3Vecf(CFlat, sidePos, m_rotTargetY);
-				SetParticleWorkVector__13CFlatRuntime2Fff(CFlat, m_rotTargetY, 0.0f);
-				PutParticleWork__13CFlatRuntime2Fv(CFlat);
+				gCFlatRuntime2.SetParticleWorkPos(sidePos, m_rotTargetY);
+				gCFlatRuntime2.SetParticleWorkVector(m_rotTargetY, 0.0f);
+				gCFlatRuntime2.PutParticleWork();
 			}
 			emittedCustom = true;
 		}
@@ -2370,11 +2353,11 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 			if (effectArg0 == 3 && fanCount > 1) {
 				for (int i = 0; i < fanCount; i++) {
 					float t = (fanCount > 1) ? ((float)i / (float)(fanCount - 1)) : 0.0f;
-					SetParticleWorkVector__13CFlatRuntime2Fff(CFlat, t * 0.75f, 0.0f);
-					PutParticleWork__13CFlatRuntime2Fv(CFlat);
+					gCFlatRuntime2.SetParticleWorkVector(t * 0.75f, 0.0f);
+					gCFlatRuntime2.PutParticleWork();
 				}
 			} else {
-				PutParticleWork__13CFlatRuntime2Fv(CFlat);
+				gCFlatRuntime2.PutParticleWork();
 			}
 		}
 	} else if (effectArg0 == 2) {

@@ -1,5 +1,6 @@
 #include "ffcc/prgobj.h"
 #include "ffcc/charaobj.h"
+#include "ffcc/cflat_runtime2.h"
 #include "ffcc/math.h"
 #include "ffcc/partyobj.h"
 #include "ffcc/p_tina.h"
@@ -11,13 +12,6 @@ extern "C" double atan2(double, double);
 extern "C" CVector* __ct__7CVectorFRC3Vec(CVector*, const Vec&);
 extern "C" CVector* __ct__7CVectorFv(CVector*);
 
-extern "C" void ResetParticleWork__13CFlatRuntime2Fii(void*, int, int);
-extern "C" void SetParticleWorkScale__13CFlatRuntime2Ff(void*, float);
-extern "C" void SetParticleWorkBind__13CFlatRuntime2FPQ212CFlatRuntime7CObject(void*, void*);
-extern "C" void SetParticleWorkTrace__13CFlatRuntime2FPQ212CFlatRuntime7CObject(void*, void*);
-extern "C" void SetParticleWorkPos__13CFlatRuntime2FR3Vecf(void*, Vec&, float);
-extern "C" void SetParticleWorkSe__13CFlatRuntime2Fiii(void*, int, int, int);
-extern "C" void PutParticleWork__13CFlatRuntime2Fv(void*);
 extern "C" const float FLOAT_80331BD0 = 1.0f;
 extern "C" const float FLOAT_80331BD4 = 0.0f;
 extern "C" const float FLOAT_80331BD8 = 3.1415927f;
@@ -321,13 +315,13 @@ float CGPrgObj::getTargetRot(CGPrgObj* target)
  */
 void CGPrgObj::putParticleBindTrace(int no, int dataNo, CGObject* obj, float scale, int seNo)
 {
-	ResetParticleWork__13CFlatRuntime2Fii(CFlat, no, dataNo);
-	SetParticleWorkScale__13CFlatRuntime2Ff(CFlat, scale);
-	SetParticleWorkBind__13CFlatRuntime2FPQ212CFlatRuntime7CObject(CFlat, this);
-	SetParticleWorkTrace__13CFlatRuntime2FPQ212CFlatRuntime7CObject(CFlat, obj);
-	PutParticleWork__13CFlatRuntime2Fv(CFlat);
+	gCFlatRuntime2.ResetParticleWork(no, dataNo);
+	gCFlatRuntime2.SetParticleWorkScale(scale);
+	gCFlatRuntime2.SetParticleWorkBind(this);
+	gCFlatRuntime2.SetParticleWorkTrace(obj);
+	gCFlatRuntime2.PutParticleWork();
 	if (seNo != 0) {
-		SetParticleWorkSe__13CFlatRuntime2Fiii(CFlat, seNo, 2, 0);
+		gCFlatRuntime2.SetParticleWorkSe(seNo, 2, 0);
 	}
 }
 
@@ -342,12 +336,12 @@ void CGPrgObj::putParticleBindTrace(int no, int dataNo, CGObject* obj, float sca
  */
 void CGPrgObj::putParticleTrace(int no, int dataNo, CGObject* obj, float scale, int seNo)
 {
-	ResetParticleWork__13CFlatRuntime2Fii(CFlat, no, dataNo);
-	SetParticleWorkScale__13CFlatRuntime2Ff(CFlat, scale);
-	SetParticleWorkTrace__13CFlatRuntime2FPQ212CFlatRuntime7CObject(CFlat, this);
-	PutParticleWork__13CFlatRuntime2Fv(CFlat);
+	gCFlatRuntime2.ResetParticleWork(no, dataNo);
+	gCFlatRuntime2.SetParticleWorkScale(scale);
+	gCFlatRuntime2.SetParticleWorkTrace(this);
+	gCFlatRuntime2.PutParticleWork();
 	if (seNo != 0) {
-		SetParticleWorkSe__13CFlatRuntime2Fiii(CFlat, seNo, 2, 0);
+		gCFlatRuntime2.SetParticleWorkSe(seNo, 2, 0);
 	}
 }
 
@@ -362,13 +356,13 @@ void CGPrgObj::putParticleTrace(int no, int dataNo, CGObject* obj, float scale, 
  */
 void CGPrgObj::putParticle(int no, int dataNo, CGObject* traceObj, float scale, int seNo)
 {
-	ResetParticleWork__13CFlatRuntime2Fii(CFlat, no, dataNo);
-	SetParticleWorkScale__13CFlatRuntime2Ff(CFlat, scale);
-	SetParticleWorkBind__13CFlatRuntime2FPQ212CFlatRuntime7CObject(CFlat, this);
+	gCFlatRuntime2.ResetParticleWork(no, dataNo);
+	gCFlatRuntime2.SetParticleWorkScale(scale);
+	gCFlatRuntime2.SetParticleWorkBind(this);
 	if (seNo != 0) {
-		SetParticleWorkSe__13CFlatRuntime2Fiii(CFlat, seNo, 2, 0);
+		gCFlatRuntime2.SetParticleWorkSe(seNo, 2, 0);
 	}
-	PutParticleWork__13CFlatRuntime2Fv(CFlat);
+	gCFlatRuntime2.PutParticleWork();
 }
 
 /*
@@ -384,13 +378,13 @@ void CGPrgObj::putParticle(int no, int dataNo, Vec* pos, float scale, int seNo)
 {
 	const float* zero = &FLOAT_80331BD4;
 
-	ResetParticleWork__13CFlatRuntime2Fii(CFlat, no, dataNo);
-	SetParticleWorkScale__13CFlatRuntime2Ff(CFlat, scale);
-	SetParticleWorkPos__13CFlatRuntime2FR3Vecf(CFlat, *pos, *zero);
+	gCFlatRuntime2.ResetParticleWork(no, dataNo);
+	gCFlatRuntime2.SetParticleWorkScale(scale);
+	gCFlatRuntime2.SetParticleWorkPos(*pos, *zero);
 	if (seNo != 0) {
-		SetParticleWorkSe__13CFlatRuntime2Fiii(CFlat, seNo, 2, 0);
+		gCFlatRuntime2.SetParticleWorkSe(seNo, 2, 0);
 	}
-	PutParticleWork__13CFlatRuntime2Fv(CFlat);
+	gCFlatRuntime2.PutParticleWork();
 }
 
 /*

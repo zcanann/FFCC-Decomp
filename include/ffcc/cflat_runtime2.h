@@ -140,7 +140,7 @@ public:
 	void SetParticleWorkParam(int, CFlatRuntime::CObject*);
 	void SetParticleWorkSe(int, int, int);
 
-	void GetFreeParticleSlot();
+	int GetFreeParticleSlot();
 	void EndParticleSlot(int, int);
 	void EndParticle(CCharaPcs::CHandle*);
 	void DeleteParticleSlot(int, int);

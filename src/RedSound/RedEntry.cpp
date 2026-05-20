@@ -330,9 +330,9 @@ void CRedEntry::Init()
 {
 	int bankIndex;
 
-	m_waveBankBase = (RedHistoryBANK*)RedNew(REDSOUND_WAVE_BANK_SIZE);
-	m_seSepBankBase = (RedHistoryBANK*)RedNew(REDSOUND_SESEP_BANK_SIZE);
-	m_musicBankBase = (RedHistoryBANK*)RedNew(REDSOUND_MUSIC_BANK_SIZE);
+	m_waveBankBase = (RedHistoryBANK*)RedNew(REDSOUND_WAVE_BANK_ALLOC_SIZE);
+	m_seSepBankBase = (RedHistoryBANK*)RedNew(REDSOUND_SESEP_BANK_ALLOC_SIZE);
+	m_musicBankBase = (RedHistoryBANK*)RedNew(REDSOUND_MUSIC_BANK_ALLOC_SIZE);
 
 	memset(m_waveBankBase, 0, REDSOUND_WAVE_BANK_SIZE);
 	bankIndex = 0;

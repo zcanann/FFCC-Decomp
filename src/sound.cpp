@@ -79,7 +79,6 @@ extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor
 extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, int, int, int, int);
 extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
-extern "C" void* __ct__6CColorFUcUcUcUc(void*, unsigned char, unsigned char, unsigned char, unsigned char);
 CSound Sound;
 
 struct CLineSegment {
@@ -890,12 +889,12 @@ void CSound::Draw()
     unsigned char* se = sound.m_seWork;
     for (u32 i = 0; i < 0x80; i++, se += 0x28) {
         if (((static_cast<u8>(*se) >> 7) & 1) != 0) {
-            u32 innerColor;
-            u32 outerColor;
+            CColor innerColor(0xC0, 0xC0, 0xC0, 0x80);
+            CColor outerColor(0x80, 0x80, 0x80, 0x80);
             Graphic.DrawSphere(cameraMatrix, reinterpret_cast<Vec*>(se + 0x18), *reinterpret_cast<float*>(se + 0x10),
-                               static_cast<_GXColor*>(__ct__6CColorFUcUcUcUc(&innerColor, 0xC0, 0xC0, 0xC0, 0x80)));
+                               &innerColor.color);
             Graphic.DrawSphere(cameraMatrix, reinterpret_cast<Vec*>(se + 0x18), *reinterpret_cast<float*>(se + 0x14),
-                               static_cast<_GXColor*>(__ct__6CColorFUcUcUcUc(&outerColor, 0x80, 0x80, 0x80, 0x80)));
+                               &outerColor.color);
         }
     }
 

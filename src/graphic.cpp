@@ -24,7 +24,6 @@ extern "C" double cos(double);
 CGraphic Graphic;
 
 extern GXRenderModeObj gDefaultGXRenderMode;
-extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 extern "C" {
 OSThread m_thread;
 u8 m_threadStack[0x4000] ATTRIBUTE_ALIGN(8);
@@ -175,9 +174,9 @@ void CGraphic::Init()
         u8[alignedWidth * efbHeight * 2];
     memset(PtrAt(this, 0x71EC), 0, 4);
 
-    PtrAt(this, 0x71E8) = _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(&Memory, alignedWidth * efbHeight * 2 + 0x46000,
-                                                                     reinterpret_cast<CMemory::CStage*>(PtrAt(this, 0x8)),
-                                                                     graphicRodata + kGraphicRodataFileName, 0xB53, 0);
+    PtrAt(this, 0x71E8) = new (reinterpret_cast<CMemory::CStage*>(PtrAt(this, 0x8)),
+                               graphicRodata + kGraphicRodataFileName, 0xB53)
+        u8[alignedWidth * efbHeight * 2 + 0x46000];
     memset(PtrAt(this, 0x71E8), 0, 0x46004);
 
     PtrAt(this, 0x10) =
@@ -2048,10 +2047,9 @@ void CGraphic::CreateTempBuffer()
 	void* renderMode = PtrAt(this, 0x71E0);
 	u16 efbHeight = U16At(renderMode, 6);
 	u32 alignedWidth = (U16At(renderMode, 4) + 0xF) & 0xFFF0;
-	u8* tempBuffer = reinterpret_cast<u8*>(_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
-	    &Memory,
-	    alignedWidth * (u32)efbHeight * 2 + 0x46000,
-	    (CMemory::CStage*)PtrAt(this, 0x8), const_cast<char*>(s_graphic_cpp_801d6348), 0xB53, 0));
+	u8* tempBuffer = new (reinterpret_cast<CMemory::CStage*>(PtrAt(this, 0x8)),
+	                      const_cast<char*>(s_graphic_cpp_801d6348), 0xB53)
+	    u8[alignedWidth * (u32)efbHeight * 2 + 0x46000];
 
 	PtrAt(this, 0x71E8) = tempBuffer;
 	memset(PtrAt(this, 0x71E8), 0, 0x46004);

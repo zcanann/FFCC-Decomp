@@ -3303,7 +3303,7 @@ unsigned int CMaterialSet::FindTexName(char* textureName, long* textureIndexOut)
         materialIndex++;
     }
 
-    return 0xFFFF;
+    return static_cast<unsigned int>(-1);
 }
 
 /*
@@ -3375,13 +3375,13 @@ unsigned long CMaterialSet::Find(char* name)
     CPtrArray<CMaterial*>* materialArray = reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(this, 8));
     unsigned long index = 0;
 
-    do {
+    while (index < UnkMaterialSetGetter(materialArray)) {
         CMaterial* material = (*materialArray)[index];
         if ((material != 0) && (strcmp(reinterpret_cast<char*>(Ptr(material, 8)), name) == 0)) {
             return index;
         }
         index++;
-    } while (index < static_cast<unsigned long>(materialArray->GetSize()));
+    }
 
     return 0xFFFFFFFF;
 }

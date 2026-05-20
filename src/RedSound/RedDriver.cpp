@@ -312,7 +312,7 @@ enum RedDriverSmallDataMapOffset {
 };
 
 enum RedDriverStringLayout {
-    REDSOUND_DRIVER_DMA_CHECK_HEADER_SIZE = 0x20,
+    REDSOUND_DRIVER_DMA_CHECK_HEADER_FMT_SIZE = 0x20,
     REDSOUND_DRIVER_LOG_PREFIX_SIZE = 0x12,
     REDSOUND_DRIVER_DMA_STATUS_FMT_SIZE = 0x3E,
     REDSOUND_DRIVER_DMA_ENTRY_FMT_SIZE = 0x48,
@@ -1036,7 +1036,7 @@ static inline OSThread& RedDriverMainThread()
     return m_MainThread;
 }
 
-static const char s_redDriverDmaCheckHeaderFmt[] = "%s **** DMA CHECK PROCESS ****\n";
+static const char sRedDriverDmaCheckHeaderFmt[] = "%s **** DMA CHECK PROCESS ****\n";
 static const char sRedDriverLogPrefix[] = "\x1B[7;34mSound\x1B[0m:";
 static const char sRedDriverDmaStatusFmt[] = "%s Status = %d, Semaphore = %d, Execute = %d, In Thread = %d\n";
 static const char sRedDriverDmaEntryFmt[] = "%s ID = %d, MMem = %8.8X, AMem = %8.8X, Size = %8.8X, Callback = %8.8X\n";
@@ -1045,7 +1045,7 @@ static const char sRedDriverSeSepHeaderErrorFmt[] = "%s%sSE-Sep-Header was broke
 static const char sRedDriverLogWarnColor[] = "\x1B[4;31m";
 static const char sRedDriverLogReset[] = "\x1B[0m";
 
-STATIC_ASSERT(sizeof(s_redDriverDmaCheckHeaderFmt) == REDSOUND_DRIVER_DMA_CHECK_HEADER_SIZE);
+STATIC_ASSERT(sizeof(sRedDriverDmaCheckHeaderFmt) == REDSOUND_DRIVER_DMA_CHECK_HEADER_FMT_SIZE);
 STATIC_ASSERT(sizeof(sRedDriverLogPrefix) == REDSOUND_DRIVER_LOG_PREFIX_SIZE);
 STATIC_ASSERT(sizeof(sRedDriverDmaStatusFmt) == REDSOUND_DRIVER_DMA_STATUS_FMT_SIZE);
 STATIC_ASSERT(sizeof(sRedDriverDmaEntryFmt) == REDSOUND_DRIVER_DMA_ENTRY_FMT_SIZE);
@@ -1053,7 +1053,7 @@ STATIC_ASSERT(sizeof(sRedDriverMusicHeaderErrorFmt) == REDSOUND_DRIVER_MUSIC_HEA
 STATIC_ASSERT(sizeof(sRedDriverSeSepHeaderErrorFmt) == REDSOUND_DRIVER_SE_SEP_HEADER_ERROR_FMT_SIZE);
 STATIC_ASSERT(sizeof(sRedDriverLogWarnColor) == REDSOUND_DRIVER_LOG_WARN_COLOR_SIZE);
 STATIC_ASSERT(sizeof(sRedDriverLogReset) == REDSOUND_DRIVER_LOG_RESET_SIZE);
-STATIC_ASSERT(sizeof(s_redDriverDmaCheckHeaderFmt) + sizeof(sRedDriverLogPrefix) +
+STATIC_ASSERT(sizeof(sRedDriverDmaCheckHeaderFmt) + sizeof(sRedDriverLogPrefix) +
                   sizeof(sRedDriverDmaStatusFmt) + sizeof(sRedDriverDmaEntryFmt) +
                   sizeof(sRedDriverMusicHeaderErrorFmt) + sizeof(sRedDriverSeSepHeaderErrorFmt) ==
               REDSOUND_DRIVER_RODATA_SIZE);
@@ -2008,7 +2008,7 @@ static void _DMACheckProcess()
     RedDmaRequest* dmaInfo;
 
     if (RedReportPrintIsEnabled()) {
-        OSReport(s_redDriverDmaCheckHeaderFmt, sRedDriverLogPrefix);
+        OSReport(sRedDriverDmaCheckHeaderFmt, sRedDriverLogPrefix);
         fflush(__files + 1);
 
         OSReport(sRedDriverDmaStatusFmt, sRedDriverLogPrefix, RedDmaStatusGet(),

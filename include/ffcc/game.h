@@ -47,10 +47,7 @@ public:
         unsigned char m_spModeFlags[4];                  // 0x02
         unsigned char m_languageId;                      // 0x06
         unsigned char m_gameDataStartMarker;             // 0x07
-        unsigned char m_scriptSysVal0;                   // 0x08
-        unsigned char m_scriptSysVal1;                   // 0x09
-        unsigned char m_scriptSysVal2;                   // 0x0A
-        unsigned char m_scriptSysVal3;                   // 0x0B
+        int m_scriptSysVal0;                             // 0x08
         int m_timerA;                                    // 0x0C
         int m_scriptGlobalTime;                          // 0x10
         int m_frameCounter;                              // 0x14

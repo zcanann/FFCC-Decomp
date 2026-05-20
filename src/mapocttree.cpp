@@ -97,11 +97,6 @@ unsigned long clear_flag_mask = 0;
 UMapHitDrawMode gMapHitDrawMode;
 unsigned long octtree_draw_node_ct = 0;
 
-extern "C" void __dl__FPv(void*);
-extern "C" void __dla__FPv(void*);
-extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
-extern "C" void __ct__8COctNodeFv(void*);
-extern "C" void* __construct_new_array(void*, void*, void*, unsigned long, unsigned long);
 extern "C" void Printf__7CSystemFPce(CSystem* system, const char* format, ...);
 extern unsigned long g_pStage;
 extern unsigned long s_insertShadowNo;
@@ -219,8 +214,6 @@ int COctTree::ReadOtmOctTree(CChunkFile& chunkFile)
         }
 
         case 'NODN': {
-            void* rootNode;
-
             m_nodeCount = chunkFile.Get2();
             signed char mapObjType = *reinterpret_cast<signed char*>(Ptr(m_mapObject, 0x1E));
             if ((mapObjType != 1) && (static_cast<unsigned int>(System.m_execParam) >= 3U)) {
@@ -228,11 +221,8 @@ int COctTree::ReadOtmOctTree(CChunkFile& chunkFile)
             }
 
             nodeCount = m_nodeCount;
-            rootNode = __nwa__FUlPQ27CMemory6CStagePci(
-                nodeCount * 0x4C + 0x10, *reinterpret_cast<CMemory::CStage**>(&MapMng), const_cast<char*>(s_mapocttree_cpp_801D72EC),
-                0x59);
-            m_nodePool = reinterpret_cast<COctNode*>(
-                __construct_new_array(rootNode, reinterpret_cast<void*>(__ct__8COctNodeFv), 0, 0x4C, nodeCount));
+            m_nodePool = new (*reinterpret_cast<CMemory::CStage**>(&MapMng), const_cast<char*>(s_mapocttree_cpp_801D72EC), 0x59)
+                COctNode[nodeCount];
             break;
         }
 

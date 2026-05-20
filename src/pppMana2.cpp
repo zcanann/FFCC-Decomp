@@ -1119,8 +1119,8 @@ static int CreateWaterMesh(Vec* param_1, Vec* param_2, Vec2d* param_3, unsigned 
     float z;
     float rowUv;
     int indexOffset;
-    short quadIndex;
-    short rowBase;
+    int quadIndex;
+    int rowBase;
     float* positions;
     int rowCount;
     float* normals;
@@ -1162,24 +1162,23 @@ static int CreateWaterMesh(Vec* param_1, Vec* param_2, Vec2d* param_3, unsigned 
     rowCount = 0;
     rowBase = 0;
     do {
-        pairCount = 8;
         quadIndex = rowBase;
-        do {
+        for (pairCount = 0; pairCount < 8; pairCount++) {
             param_4[indexOffset++] = quadIndex;
             param_4[indexOffset++] = quadIndex + 1;
             param_4[indexOffset++] = quadIndex + 0x12;
             param_4[indexOffset++] = quadIndex + 0x12;
             param_4[indexOffset++] = quadIndex + 0x11;
             param_4[indexOffset++] = quadIndex;
+            quadIndex = quadIndex + 1;
+            param_4[indexOffset++] = quadIndex;
             param_4[indexOffset++] = quadIndex + 1;
-            param_4[indexOffset++] = quadIndex + 2;
-            param_4[indexOffset++] = quadIndex + 0x13;
-            param_4[indexOffset++] = quadIndex + 0x13;
             param_4[indexOffset++] = quadIndex + 0x12;
-            param_4[indexOffset++] = quadIndex + 1;
-            quadIndex = quadIndex + 2;
-            pairCount = pairCount + -1;
-        } while (pairCount != 0);
+            param_4[indexOffset++] = quadIndex + 0x12;
+            param_4[indexOffset++] = quadIndex + 0x11;
+            param_4[indexOffset++] = quadIndex;
+            quadIndex = quadIndex + 1;
+        }
         rowCount = rowCount + 1;
         rowBase = rowBase + 0x11;
     } while (rowCount < 0x10);

@@ -1733,7 +1733,7 @@ public:
 int CLine<64>::Calc(Vec* nearestPosition, float* nearestDistance, unsigned long* nearestSegment,
                     float* nearestSegmentRatio, Vec* targetPosition, float maxDistance)
 {
-    const bool infiniteRange = (maxDistance == kLineSegmentMinT);
+    const bool infiniteRange = (kLineSegmentMinT == maxDistance);
     float bestDistance = infiniteRange ? kLineBoundsInitMin : maxDistance;
     const float maxDistanceSq = maxDistance * maxDistance;
     int found = 0;
@@ -1746,13 +1746,7 @@ int CLine<64>::Calc(Vec* nearestPosition, float* nearestDistance, unsigned long*
         float distanceSq = PSVECSquareDistance(candidate, targetPosition);
         if (distanceSq < maxDistanceSq || infiniteRange) {
             Vec candidatePosition = *candidate;
-            float distance = distanceSq;
-            if (distanceSq <= kLineSegmentMinT) {
-                distance = NAN;
-            } else {
-                distance = (float)sqrt(distanceSq);
-            }
-
+            float distance = sqrtf(distanceSq);
             if (distance < bestDistance) {
                 bestDistance = distance;
                 bestPosition = candidatePosition;
@@ -1767,13 +1761,7 @@ int CLine<64>::Calc(Vec* nearestPosition, float* nearestDistance, unsigned long*
             distanceSq = PSVECSquareDistance(candidate, targetPosition);
             if (distanceSq < maxDistanceSq || infiniteRange) {
                 Vec candidatePosition = *candidate;
-                float distance = distanceSq;
-                if (distanceSq <= kLineSegmentMinT) {
-                    distance = NAN;
-                } else {
-                    distance = (float)sqrt(distanceSq);
-                }
-
+                float distance = sqrtf(distanceSq);
                 if (distance < bestDistance) {
                     bestDistance = distance;
                     bestPosition = candidatePosition;

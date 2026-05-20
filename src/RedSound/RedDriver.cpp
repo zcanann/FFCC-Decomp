@@ -1213,7 +1213,7 @@ static void _MusicPlaySequence(int* command)
     int replayPoint;
     RedSoundCONTROL* soundControl;
 
-    soundControl = RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY);
+    soundControl = RedSoundControlGetBegin();
     if ((RedExecCommandArgGet(command, REDSOUND_MUSIC_COMMAND_ID) == soundControl[REDSOUND_CONTROL_MUSIC_PRIMARY].m_musicId) ||
         (RedExecCommandArgGet(command, REDSOUND_MUSIC_COMMAND_ID) == soundControl[REDSOUND_CONTROL_MUSIC_SECONDARY].m_musicId) ||
         (RedExecCommandArgGet(command, REDSOUND_MUSIC_COMMAND_ID) == soundControl[REDSOUND_CONTROL_MUSIC_SKIP].m_musicId)) {
@@ -1260,7 +1260,7 @@ static void _MusicCrossPlaySequence(int* command)
     if (RedMusicCommandGetFadeTime(command) == 0) {
         RedMusicCommandGetFadeTime(command) = RedMusicCommandGetFadeTime(command) + 1;
     }
-    musicControlBuffer = RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY);
+    musicControlBuffer = RedSoundControlGetBegin();
     if ((RedMusicCommandGetId(command) == musicControlBuffer[REDSOUND_CONTROL_MUSIC_PRIMARY].m_musicId) ||
         (RedMusicCommandGetId(command) == musicControlBuffer[REDSOUND_CONTROL_MUSIC_SKIP].m_musicId)) {
         return;
@@ -1320,7 +1320,7 @@ static void _MusicNextPlaySequence(int* command)
 {
     RedSoundCONTROL* soundControl;
 
-    soundControl = RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY);
+    soundControl = RedSoundControlGetBegin();
     if ((RedExecCommandArgGet(command, REDSOUND_MUSIC_COMMAND_ID) == soundControl[REDSOUND_CONTROL_MUSIC_PRIMARY].m_musicId) ||
         (RedExecCommandArgGet(command, REDSOUND_MUSIC_COMMAND_ID) == soundControl[REDSOUND_CONTROL_MUSIC_SECONDARY].m_musicId) ||
         (RedExecCommandArgGet(command, REDSOUND_MUSIC_COMMAND_ID) == soundControl[REDSOUND_CONTROL_MUSIC_SKIP].m_musicId)) {
@@ -2716,7 +2716,7 @@ int CRedDriver::MusicPlayState(int musicID)
 
     interruptLevel = OSDisableInterrupts();
     playState = 0;
-    soundControl = RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY);
+    soundControl = RedSoundControlGetBegin();
     if (((musicID == REDSOUND_MUSIC_ID_NONE) ||
          (soundControl[REDSOUND_CONTROL_MUSIC_PRIMARY].m_musicId == musicID)) &&
         (soundControl[REDSOUND_CONTROL_MUSIC_PRIMARY].m_activeTrackCount != 0)) {

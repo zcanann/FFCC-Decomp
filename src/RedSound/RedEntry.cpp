@@ -436,7 +436,7 @@ int CRedEntry::SearchWaveSequence(int waveNo)
 	RedHistoryBANK* waveBank = m_waveBankBase;
 
 	while (waveBank < RedEntryWaveBankGetEnd(this)) {
-		if ((waveBank->m_size != REDSOUND_HISTORY_BANK_EMPTY_SIZE) && (waveBank->m_id == waveNo)) {
+		if (RedHistoryBankHasData(waveBank) && (waveBank->m_id == waveNo)) {
 			return waveBank - m_waveBankBase;
 		}
 		waveBank += 1;
@@ -620,14 +620,14 @@ int CRedEntry::WaveHeadAdd(int waveBankNo, RedWaveHeadWD* waveHead, int waveNo)
 		RedHistoryBANK* allocatedWaveBank;
 		if (waveBankNo < 0) {
 			allocatedWaveBank = RedEntryWaveHistoryGetBegin(this);
-			while ((allocatedWaveBank->m_size != REDSOUND_HISTORY_BANK_EMPTY_SIZE) &&
+			while (RedHistoryBankHasData(allocatedWaveBank) &&
 			       (allocatedWaveBank < RedEntryWaveBankGetEnd(this))) {
 				allocatedWaveBank += 1;
 			}
 		} else {
 			waveBankNo &= REDSOUND_WAVE_PRIMARY_BANK_MASK;
 			allocatedWaveBank = RedEntryWaveBankGet(this, waveBankNo);
-			if (allocatedWaveBank->m_size != REDSOUND_HISTORY_BANK_EMPTY_SIZE) {
+			if (RedHistoryBankHasData(allocatedWaveBank)) {
 				WaveDelete(allocatedWaveBank);
 			}
 		}
@@ -1169,14 +1169,14 @@ int CRedEntry::SearchSeSepSequence(int seNo)
 
 	if (seNo == REDSOUND_SESEP_SEARCH_FIRST) {
 		do {
-			if (seSepBank->m_size != REDSOUND_HISTORY_BANK_EMPTY_SIZE) {
+			if (RedHistoryBankHasData(seSepBank)) {
 				return seSepBank - m_seSepBankBase;
 			}
 			seSepBank += 1;
 		} while (seSepBank < RedEntrySeSepBankGetEnd(this));
 	} else {
 		do {
-			if ((seSepBank->m_size != REDSOUND_HISTORY_BANK_EMPTY_SIZE) && (seSepBank->m_id == seNo)) {
+			if (RedHistoryBankHasData(seSepBank) && (seSepBank->m_id == seNo)) {
 				return seSepBank - m_seSepBankBase;
 			}
 			seSepBank += 1;
@@ -1226,7 +1226,7 @@ RedHistoryBANK* CRedEntry::SeSepOldDelete()
 	RedHistoryBANK* history = m_seSepBankBase;
 
 	do {
-		if ((history->m_size != REDSOUND_HISTORY_BANK_EMPTY_SIZE) && (historyNo < history->m_historyNo)) {
+		if (RedHistoryBankHasData(history) && (historyNo < history->m_historyNo)) {
 			historyNo = history->m_historyNo;
 			selected = history;
 		}
@@ -1253,7 +1253,7 @@ RedSeSepHEAD* CRedEntry::SeSepHeadAdd(RedSeSepHEAD* seSepHead)
 	RedHistoryBANK* bank = m_seSepBankBase;
 	RedSeSepHEAD* addedHead = 0;
 
-	while ((bank->m_size != REDSOUND_HISTORY_BANK_EMPTY_SIZE) &&
+	while (RedHistoryBankHasData(bank) &&
 	       (bank < RedEntrySeSepBankGetEnd(this))) {
 		bank += 1;
 	}
@@ -1326,7 +1326,7 @@ int CRedEntry::ClearSeSepData(int seNo)
 	if (seNo == REDSOUND_SESEP_CLEAR_ALL) {
 		RedHistoryBANK* history = m_seSepBankBase;
 		do {
-			if (history->m_size != REDSOUND_HISTORY_BANK_EMPTY_SIZE) {
+			if (RedHistoryBankHasData(history)) {
 				SeSepMemoryFree(history);
 			}
 			history += 1;
@@ -1355,7 +1355,7 @@ int CRedEntry::ClearSeSepDataMG(int bankNo, int sepNo, int groupNo, int kindNo)
 	RedHistoryBANK* bank = m_seSepBankBase;
 
 	do {
-		if (bank->m_size != REDSOUND_HISTORY_BANK_EMPTY_SIZE) {
+		if (RedHistoryBankHasData(bank)) {
 			int seNo = bank->m_id / REDSOUND_SE_MG_ID_DIVISOR;
 			if ((bankNo != seNo) && (sepNo != seNo) && (groupNo != seNo) && (kindNo != seNo)) {
 				SeSepMemoryFree(bank);
@@ -1582,7 +1582,7 @@ int CRedEntry::SearchMusicSequence(int musicNo)
 	RedHistoryBANK* musicBank = m_musicBankBase;
 
 	do {
-		if ((musicBank->m_size != REDSOUND_HISTORY_BANK_EMPTY_SIZE) && (musicBank->m_id == musicNo)) {
+		if (RedHistoryBankHasData(musicBank) && (musicBank->m_id == musicNo)) {
 			return musicBank - m_musicBankBase;
 		}
 		musicBank += 1;
@@ -1654,7 +1654,7 @@ RedHistoryBANK* CRedEntry::MusicOldChoice()
 	RedHistoryBANK* history = m_musicBankBase;
 
 	do {
-		if (history->m_size == REDSOUND_HISTORY_BANK_EMPTY_SIZE) {
+		if (RedHistoryBankIsEmpty(history)) {
 			return history;
 		}
 		if (history->m_historyNo > historyNo) {
@@ -1760,7 +1760,7 @@ RedMusicHEAD* CRedEntry::MusicHeadAdd(RedMusicHEAD* musicHead)
 {
 	RedMusicHEAD* addedHead = 0;
 	RedHistoryBANK* bank = MusicOldChoice();
-	if ((bank != 0) && (bank->m_size != REDSOUND_HISTORY_BANK_EMPTY_SIZE)) {
+	if ((bank != 0) && RedHistoryBankHasData(bank)) {
 		MusicOldClear();
 		bank = MusicOldChoice();
 	}

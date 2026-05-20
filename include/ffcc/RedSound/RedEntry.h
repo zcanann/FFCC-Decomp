@@ -66,6 +66,9 @@ enum RedHistoryMode {
 	REDSOUND_HISTORY_MODE_USE = 1,
 };
 
+#define RedHistoryBankHasData(bank) ((bank)->m_size != REDSOUND_HISTORY_BANK_EMPTY_SIZE)
+#define RedHistoryBankIsEmpty(bank) ((bank)->m_size == REDSOUND_HISTORY_BANK_EMPTY_SIZE)
+
 enum RedHistoryNumber {
 	REDSOUND_HISTORY_UNUSED = 0,
 	REDSOUND_HISTORY_MOST_RECENT = 1,

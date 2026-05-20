@@ -4147,7 +4147,7 @@ void CRedDriver::SetWaveAdsr(int attack, RedAdsrDATA* adsr)
  * JP Address: TODO
  * JP Size: TODO
  */
-inline int CRedDriver::WavePitchCompute(int key, int pitch)
+int CRedDriver::WavePitchCompute(int key, int pitch)
 {
     int basePitch = key << REDSOUND_PITCH_BASE_NOTE_SHIFT;
     int pitchOffset;

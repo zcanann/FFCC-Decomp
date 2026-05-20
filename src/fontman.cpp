@@ -12,7 +12,6 @@ unsigned char g_tFont22[0x10D40] = {
 #include <dolphin/mtx.h>
 
 extern "C" void __dt__8CFontManFv(void*);
-extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, int, int, int, int);
 extern "C" const float FLOAT_803306B8;
@@ -741,7 +740,7 @@ void CFont::Create(void* filePtr, CMemory::CStage* stage)
  */
 void* CFont::operator new(unsigned long size, CMemory::CStage* stage, char* file, int line)
 {
-	return _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(&Memory, size, FontMan.m_stage, file, line, 0);
+	return Memory._Alloc(size, FontMan.m_stage, file, line, 0);
 }
 
 /*

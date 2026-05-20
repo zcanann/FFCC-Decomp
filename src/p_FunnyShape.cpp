@@ -39,8 +39,6 @@ public:
 };
 
 extern "C" void* __register_global_object(void* object, void* destructor, void* regmem);
-extern "C" void CreateBuffer__14CUSBStreamDataFv(CUSBStreamData*);
-extern "C" void DeleteBuffer__14CUSBStreamDataFv(CUSBStreamData*);
 extern "C" void createViewer__14CFunnyShapePcsFv(CFunnyShapePcs*);
 extern "C" void destroyViewer__14CFunnyShapePcsFv(CFunnyShapePcs*);
 extern "C" void calcViewer__14CFunnyShapePcsFv(CFunnyShapePcs*);
@@ -63,7 +61,6 @@ extern const char __RTTI__8CManager_8032E660[];
 extern const char __RTTI__8CProcess_8032E668[];
 extern u8 ARRAY_8026D728[];
 
-extern "C" CUSBStreamData* __dt__14CUSBStreamDataFv(CUSBStreamData* self, short shouldDelete);
 extern "C" const char lbl_8032FD1C[5];
 
 inline void* operator new(unsigned long, void* ptr)
@@ -227,7 +224,7 @@ void CFunnyShapePcs::destroyViewer()
     TextureHeaders(this)->DeleteAndRemoveAll();
     TextureObjects(this)->DeleteAndRemoveAll();
 
-    DeleteBuffer__14CUSBStreamDataFv(UsbStream(this));
+    UsbStream(this)->DeleteBuffer();
     FunnyShape(this)->~CFunnyShape();
     Memory.DestroyStage(m_viewerStage);
 }
@@ -417,10 +414,10 @@ extern "C" void __sinit_p_FunnyShape_cpp(void)
     *reinterpret_cast<void**>(self) = __vt__8CProcess;
     *reinterpret_cast<void**>(self) = __vt__14CFunnyShapePcs;
 
-    __ct__14CUSBStreamDataFv(self + 0x3C);
+    new (self + 0x3C) CUSBStreamData;
     new (self + 0x50) CFunnyShape;
-    __ct__29CPtrArray_P15OSFS_TEXTURE_ST_Fv(self + 0x61BC);
-    __ct__22CPtrArray_P9_GXTexObj_Fv(self + 0x61D8);
+    new (self + 0x61BC) CPtrArray<OSFS_TEXTURE_ST*>;
+    new (self + 0x61D8) CPtrArray<_GXTexObj*>;
     __register_global_object(self, __dt__14CFunnyShapePcsFv, ARRAY_8026D728);
     unsigned int* table = dst + 1;
     table[0] = desc0[0];
@@ -467,7 +464,7 @@ CFunnyShapePcs::~CFunnyShapePcs()
     TextureObjects(this)->CPtrArray<_GXTexObj*>::~CPtrArray();
     TextureHeaders(this)->CPtrArray<OSFS_TEXTURE_ST*>::~CPtrArray();
     FunnyShape(this)->~CFunnyShape();
-    __dt__14CUSBStreamDataFv(UsbStream(this), -1);
+    UsbStream(this)->~CUSBStreamData();
 }
 
 template <>
@@ -513,8 +510,8 @@ inline CFunnyShapePcs::CFunnyShapePcs()
 {
     u8* self = reinterpret_cast<u8*>(this);
 
-    __ct__14CUSBStreamDataFv(self + 0x3C);
+    new (self + 0x3C) CUSBStreamData;
     new (self + 0x50) CFunnyShape;
-    __ct__29CPtrArray_P15OSFS_TEXTURE_ST_Fv(self + 0x61BC);
-    __ct__22CPtrArray_P9_GXTexObj_Fv(self + 0x61D8);
+    new (self + 0x61BC) CPtrArray<OSFS_TEXTURE_ST*>;
+    new (self + 0x61D8) CPtrArray<_GXTexObj*>;
 }

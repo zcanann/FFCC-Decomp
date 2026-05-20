@@ -49,7 +49,6 @@ char* CardConst::MCDAT_VERSION = const_cast<char*>(lbl_80330CC8);
 
 CMemoryCardMan MemoryCardMan;
 
-extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" int memcmp(const void* lhs, const void* rhs, unsigned long count);
 extern const char sMcOdekakeReturn[];
 // CRC32 lookup table
@@ -588,8 +587,8 @@ void CMemoryCardMan::CreateMcBuff()
 {
     if (m_saveBuffer == 0)
     {
-        m_saveBuffer = reinterpret_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
-            0xA000, reinterpret_cast<CMemory::CStage*>(m_stage), const_cast<char*>(sMemoryCardSourceFile), 0x2AB));
+        m_saveBuffer = new (reinterpret_cast<CMemory::CStage*>(m_stage), const_cast<char*>(sMemoryCardSourceFile), 0x2AB)
+            char[0xA000];
 
         if (m_saveBuffer == 0 && static_cast<unsigned int>(System.m_execParam) >= 1)
         {
@@ -673,8 +672,8 @@ void CMemoryCardMan::SetMcIconImage()
     {
         if (m_saveBuffer == (char*)nullptr)
         {
-            m_saveBuffer = reinterpret_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
-                0xA000, reinterpret_cast<CMemory::CStage*>(m_stage), const_cast<char*>(sMemoryCardSourceFile), 0x2AB));
+            m_saveBuffer = new (reinterpret_cast<CMemory::CStage*>(m_stage), const_cast<char*>(sMemoryCardSourceFile), 0x2AB)
+                char[0xA000];
 
             if (m_saveBuffer == (char*)nullptr && static_cast<unsigned int>(System.m_execParam) >= 1)
             {
@@ -927,8 +926,8 @@ void CMemoryCardMan::MakeSaveData()
 {
     if (m_saveBuffer == (char*)nullptr)
     {
-        m_saveBuffer = reinterpret_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
-            0xA000, reinterpret_cast<CMemory::CStage*>(m_stage), const_cast<char*>(sMemoryCardSourceFile), 0x2AB));
+        m_saveBuffer = new (reinterpret_cast<CMemory::CStage*>(m_stage), const_cast<char*>(sMemoryCardSourceFile), 0x2AB)
+            char[0xA000];
         if (m_saveBuffer == (char*)nullptr && static_cast<unsigned int>(System.m_execParam) >= 1)
         {
             System.Printf(const_cast<char*>(sMemoryAllocationError), const_cast<char*>(sMemoryCardSourceFile), 0x2AD);
@@ -1629,8 +1628,8 @@ int CMemoryCardMan::DummySave()
 
         if (m_saveBuffer == 0)
         {
-            m_saveBuffer = reinterpret_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
-                0xA000, reinterpret_cast<CMemory::CStage*>(m_stage), const_cast<char*>(sMemoryCardSourceFile), 0x2AB));
+            m_saveBuffer = new (reinterpret_cast<CMemory::CStage*>(m_stage), const_cast<char*>(sMemoryCardSourceFile), 0x2AB)
+                char[0xA000];
 
             if (m_saveBuffer == 0 && static_cast<unsigned int>(System.m_execParam) >= 1)
             {
@@ -1716,8 +1715,8 @@ int CMemoryCardMan::DummySave()
     {
         if (m_saveBuffer == 0)
         {
-            m_saveBuffer = reinterpret_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
-                0xA000, reinterpret_cast<CMemory::CStage*>(m_stage), const_cast<char*>(sMemoryCardSourceFile), 0x2AB));
+            m_saveBuffer = new (reinterpret_cast<CMemory::CStage*>(m_stage), const_cast<char*>(sMemoryCardSourceFile), 0x2AB)
+                char[0xA000];
 
             if (m_saveBuffer == 0 && static_cast<unsigned int>(System.m_execParam) >= 1)
             {
@@ -1889,8 +1888,8 @@ int CMemoryCardMan::DummyLoad()
 
     if (m_saveBuffer == 0)
     {
-        m_saveBuffer = reinterpret_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
-            0xA000, reinterpret_cast<CMemory::CStage*>(m_stage), const_cast<char*>(sMemoryCardSourceFile), 0x2AB));
+        m_saveBuffer = new (reinterpret_cast<CMemory::CStage*>(m_stage), const_cast<char*>(sMemoryCardSourceFile), 0x2AB)
+            char[0xA000];
 
         if (m_saveBuffer == 0 && static_cast<unsigned int>(System.m_execParam) >= 1)
         {

@@ -1100,8 +1100,8 @@ void GbaQueue::SetSmithData(int channel, unsigned int value)
 void GbaQueue::SetStageNo(int stageId, int mapId)
 {
     char* obj = reinterpret_cast<char*>(this);
-    int waitIndex = 0;
     GbaQueue* waitSemaphore = this;
+    int waitIndex = 0;
 
     do {
         OSWaitSemaphore(waitSemaphore->accessSemaphores);

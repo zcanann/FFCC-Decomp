@@ -574,7 +574,7 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 			channelIndex = _ArrangeStreamDataLoop(streamData, REDSOUND_STREAM_BUFFER_SIDE_A, REDSOUND_STREAM_STEREO_PLANE_SIZE);
 		}
 		streamData->m_dmaId = channelIndex;
-		streamData->m_streamCursorBase = REDSOUND_STREAM_PAGE_SIZE;
+		streamData->m_streamCursorBase = RedStreamBufferSideGetCursorBase(REDSOUND_STREAM_BUFFER_SIDE_B);
 		streamData->m_state = REDSOUND_STREAM_STATE_LOADING;
 	} else {
 		if (RedReportPrintIsEnabled()) {
@@ -789,10 +789,10 @@ void StreamControl()
 						if (streamResult == 0) {
 							if (streamData->m_streamCursorBase != 0) {
 								streamResult = REDSOUND_STREAM_BUFFER_SIDE_A;
-								streamData->m_streamCursorBase = 0;
+								streamData->m_streamCursorBase = RedStreamBufferSideGetCursorBase(REDSOUND_STREAM_BUFFER_SIDE_A);
 							} else {
 								streamResult = REDSOUND_STREAM_BUFFER_SIDE_B;
-								streamData->m_streamCursorBase = REDSOUND_STREAM_PAGE_SIZE;
+								streamData->m_streamCursorBase = RedStreamBufferSideGetCursorBase(REDSOUND_STREAM_BUFFER_SIDE_B);
 							}
 
 							if (RedStreamHeaderHasNoLoop(&streamData->m_header)) {

@@ -98,6 +98,7 @@ struct RedStreamFile {
 #define RedStreamHeaderIsStereo(header) ((header)->m_channelCount == REDSOUND_STREAM_STEREO_CHANNEL_COUNT)
 #define RedStreamHeaderGetAramSize(header) ((header)->m_channelCount * REDSOUND_STREAM_STEREO_PLANE_SIZE)
 #define RedStreamHeaderGetPageAdvance(header) ((header)->m_channelCount * REDSOUND_STREAM_PAGE_SIZE)
+#define RedStreamBufferSideGetCursorBase(side) ((side) * REDSOUND_STREAM_PAGE_SIZE)
 
 #define RedStreamBufferGetPage(buffer, pageIndex) ((buffer) + (pageIndex) * REDSOUND_STREAM_PAGE_SIZE)
 

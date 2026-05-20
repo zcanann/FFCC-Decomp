@@ -485,7 +485,6 @@ static int _SePlayStart(RedSeINFO* seInfo, int seId, int sepId, int pan, int vol
 	remainingSequences = RedSeInfoGetSequenceCount(seInfo);
 	sequenceCommandData = RedSeInfoGetCommandData(sequence, remainingSequences);
 	do {
-		tracksToStart = remainingSequences;
 		if (sepId != REDSOUND_SEP_DIRECT_PLAY_ID) {
 			tracksToStart = 0;
 			do {
@@ -494,6 +493,8 @@ static int _SePlayStart(RedSeINFO* seInfo, int seId, int sepId, int pan, int vol
 					break;
 				}
 			} while ((int)tracksToStart < (int)remainingSequences);
+		} else {
+			tracksToStart = remainingSequences;
 		}
 
 		seTrack = SearchSeEmptyTrack((int)tracksToStart, seInfo->m_eraseTrack, eraseAttrMask);

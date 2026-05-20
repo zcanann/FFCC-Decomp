@@ -4058,13 +4058,11 @@ void CRedDriver::StopWaveItem()
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CRedDriver::SetWavePitch(int pitch)
+void CRedDriver::SetWavePitch(int pitch)
 {
-    RedTrackDATA* editorTrack;
     int* voiceNo;
 
-    editorTrack = RedEditorTrackGet();
-    editorTrack->m_pitch = pitch;
+    RedEditorTrackGet()->m_pitch = pitch;
     voiceNo = RedEditorVoiceGetBegin();
     do {
         int voiceIndex = *voiceNo;

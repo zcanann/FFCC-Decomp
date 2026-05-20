@@ -2179,7 +2179,7 @@ unsigned int GbaQueue::GetScrFlg()
  */
 int GbaQueue::GetPlayerHP(int channel, unsigned char* outData)
 {
-	unsigned char* obj = reinterpret_cast<unsigned char*>(this);
+	char* obj = reinterpret_cast<char*>(this);
 	char hpFlags = 0;
 	char prevHpFlags = 0;
 	char hp;
@@ -2188,10 +2188,10 @@ int GbaQueue::GetPlayerHP(int channel, unsigned char* outData)
 	for (int i = 0; i < 4; i++) {
 		OSWaitSemaphore(accessSemaphores + i);
 
-		unsigned char* playerData = obj + i * 0xDC;
+		char* playerData = obj + i * 0xDC;
 		if (i == channel) {
-			hp = static_cast<char>(playerData[0x46B]);
-			prevHp = static_cast<char>(playerData[0x7DB]);
+			hp = playerData[0x46B];
+			prevHp = playerData[0x7DB];
 		}
 		if (playerData[0x46B] != 0) {
 			hpFlags = static_cast<char>(hpFlags | (1 << i));
@@ -2203,8 +2203,15 @@ int GbaQueue::GetPlayerHP(int channel, unsigned char* outData)
 		OSSignalSemaphore(accessSemaphores + i);
 	}
 
-	unsigned char channelMask = static_cast<unsigned char>(1 << channel);
-	unsigned int changed = (prevHpFlags != hpFlags);
+	int hpChanged = hp != prevHp;
+	unsigned int changed = static_cast<unsigned int>(
+	    (static_cast<int>(prevHpFlags) - static_cast<int>(hpFlags)) |
+	    (static_cast<int>(hpFlags) - static_cast<int>(prevHpFlags))) >> 31;
+	if (hpChanged) {
+		changed = 1;
+	}
+
+	int channelMask = 1 << channel;
 	if (hp != prevHp) {
 		changed = 1;
 	}

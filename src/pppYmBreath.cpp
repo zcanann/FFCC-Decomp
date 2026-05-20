@@ -914,8 +914,6 @@ void UpdateParticle(VYmBreath* vYmBreath, PYmBreath* pYmBreath, PARTICLE_DATA* p
 void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VColor* vColor, PARTICLE_DATA* particleData,
                    PARTICLE_WMAT* particleWmat, PARTICLE_COLOR* particleColor)
 {
-    YmBreathParams* params = reinterpret_cast<YmBreathParams*>(pYmBreath);
-    YmBreathParticleData* particle = reinterpret_cast<YmBreathParticleData*>(particleData);
     Vec baseDir;
     int angle[3];
     pppFMATRIX rotMtx;
@@ -923,7 +921,7 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
     float range;
     u8 flags;
 
-    spread = (float)(unsigned int)params->m_spread;
+    spread = (float)(unsigned int)reinterpret_cast<YmBreathParams*>(pYmBreath)->m_spread;
     range = LoadFloat(FLOAT_80330CA8) * spread;
 
     memset(particleData, 0, 0x60);
@@ -933,6 +931,9 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
     if (particleColor != NULL) {
         memset(particleColor, 0, 0x20);
     }
+
+    YmBreathParams* params = reinterpret_cast<YmBreathParams*>(pYmBreath);
+    YmBreathParticleData* particle = reinterpret_cast<YmBreathParticleData*>(particleData);
 
     baseDir.x = FLOAT_80330c80;
     baseDir.y = FLOAT_80330c80;

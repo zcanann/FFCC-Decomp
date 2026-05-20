@@ -8,9 +8,7 @@
 
 extern "C" void __ct__Q26CChara9CAnimNodeFv(void*);
 extern "C" void __dt__Q26CChara9CAnimNodeFv(void*, int);
-extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void __dla__FPv(void*);
-extern "C" void __dl__FPv(void*);
 extern "C" const char s_CChara_CAnim_801DA970[] = "CChara::CAnim";
 extern "C" const char s_charaAnimSourceFile[] = "chara_anim.cpp";
 extern "C" const char s_charaAnimAllocWarn[32] =
@@ -177,7 +175,7 @@ CChara::CAnim::CAnim()
 CChara::CAnim::~CAnim()
 {
 	if (m_nodes != 0) {
-		__destroy_new_array(m_nodes, (ConstructorDestructor)__dt__Q26CChara9CAnimNodeFv);
+		delete[] m_nodes;
 		m_nodes = 0;
 	}
 
@@ -226,12 +224,7 @@ void CChara::CAnim::Create(void* data, CMemory::CStage* stage)
 			m_nodeCount = static_cast<unsigned short>(chunk.m_arg0);
 			unsigned short nodeCount = m_nodeCount;
 
-			void* nodeArray = __nwa__FUlPQ27CMemory6CStagePci(
-			    (unsigned long)nodeCount * 0x18 + 0x10, stage, const_cast<char*>(s_charaAnimSourceFile), 0x5F);
-			nodeArray = __construct_new_array(
-			    nodeArray, reinterpret_cast<ConstructorDestructor>(__ct__Q26CChara9CAnimNodeFv),
-			    reinterpret_cast<ConstructorDestructor>(__dt__Q26CChara9CAnimNodeFv), 0x18, nodeCount);
-			m_nodes = reinterpret_cast<CChara::CAnimNode*>(nodeArray);
+			m_nodes = new (stage, const_cast<char*>(s_charaAnimSourceFile), 0x5F) CChara::CAnimNode[nodeCount];
 
 			int nodeOffset = 0;
 			chunkFile.PushChunk();
@@ -304,8 +297,7 @@ void CChara::CAnim::Create(void* data, CMemory::CStage* stage)
 				}
 				case 0x42414E4B:
 					m_bankSize = (chunk.m_size + 0x1F) & 0xFFFFFFE0;
-					m_bank = __nwa__FUlPQ27CMemory6CStagePci(
-					    chunk.m_size, stage, const_cast<char*>(s_charaAnimSourceFile), 0x7C);
+					m_bank = new (stage, const_cast<char*>(s_charaAnimSourceFile), 0x7C) unsigned char[chunk.m_size];
 					chunkFile.Get(m_bank, chunk.m_size);
 
 					Memory.CopyToAMemorySync(
@@ -316,7 +308,7 @@ void CChara::CAnim::Create(void* data, CMemory::CStage* stage)
 					m_bankAddress = Chara.m_animBankAddress;
 					Chara.m_animBankAddress += m_bankSize;
 					if (m_bank != 0) {
-						__dl__FPv(m_bank);
+						delete[] static_cast<unsigned char*>(m_bank);
 						m_bank = 0;
 					}
 					break;

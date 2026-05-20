@@ -4,6 +4,7 @@
 #include "ffcc/fontman.h"
 #include "ffcc/game.h"
 #include "ffcc/pad.h"
+#include "ffcc/memory.h"
 #include "ffcc/sound.h"
 #include "ffcc/system.h"
 #include "ffcc/linkage.h"
@@ -12,7 +13,6 @@
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
-extern "C" void __dl__FPv(void*);
 extern "C" void freeTexture__8CMenuPcsFiiii(CMenuPcs*, int, int, int, int);
 extern "C" void CmakeVillageDraw__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned short CmakeVillageCtrl__8CMenuPcsFv(CMenuPcs*);
@@ -100,7 +100,6 @@ extern "C" int DAT_8032ef10;
 extern "C" char* GetLangString__5CGameFv(void*);
 extern "C" void loadFont__8CMenuPcsFiPcii(CMenuPcs*, int, char*, int, int);
 extern "C" void loadTexture__8CMenuPcsFPPciiPQ28CMenuPcs4CTmpiii(CMenuPcs*, char**, int, int, void*, int, int, int);
-extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, void*, char*, int);
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 extern "C" void SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(void*, int);
 extern "C" void SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(void*, int);
@@ -3596,7 +3595,7 @@ void CMenuPcs::destroyVillageMenu()
 
         void*& villageWork = *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(this) + 0x830);
         if (villageWork != nullptr) {
-            __dl__FPv(villageWork);
+            delete[] static_cast<unsigned char*>(villageWork);
             villageWork = nullptr;
         }
 
@@ -3627,10 +3626,9 @@ void CMenuPcs::calcVillageMenu()
             loadTexture__8CMenuPcsFPPciiPQ28CMenuPcs4CTmpiii(
                 this, PTR_s_world2_802159a4, 8, 1, &DAT_802159c8, 0x60, 9, 3);
 
-            void* stage = *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(this) + 0xEC);
+            CMemory::CStage* stage = *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(this) + 0xEC);
             int& villageWork = MenuS32(this, 0x830);
-            villageWork =
-                reinterpret_cast<int>(__nw__FUlPQ27CMemory6CStagePci(0x48, stage, const_cast<char*>(s_cmake_cpp_801e3038), 0xCB3));
+            villageWork = reinterpret_cast<int>(new (stage, const_cast<char*>(s_cmake_cpp_801e3038), 0xCB3) unsigned char[0x48]);
             memset(reinterpret_cast<void*>(villageWork), 0, 0x48);
             LoadCmakeVillageName();
             MenuS16(this, 0x86C) = 1;
@@ -3652,7 +3650,7 @@ void CMenuPcs::calcVillageMenu()
                 freeTexture__8CMenuPcsFiiii(this, 8, 1, 0x60, 9);
                 int& villageWork = MenuS32(this, 0x830);
                 if (villageWork != 0) {
-                    __dl__FPv(reinterpret_cast<void*>(villageWork));
+                    delete[] reinterpret_cast<unsigned char*>(villageWork);
                     villageWork = 0;
                 }
                 MenuS16(this, 0x86C) = 0;

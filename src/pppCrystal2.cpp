@@ -13,7 +13,7 @@
 
 extern int __float_nan[];
 extern const double DOUBLE_80331FC0 = 2.4;
-static const float kPppScreenQuakeZero[2] = {0.0f, 0.0f};
+extern const float kPppScreenQuakeZero[2] = {0.0f, 0.0f};
 extern "C" unsigned int __cvt_fp2unsigned(double);
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, const char*, int);
 
@@ -62,9 +62,9 @@ union Crystal2FloatBits {
     u32 bits;
 };
 
-static const Crystal2IndTexMtx s_crystal2IndTexMtxBase = {{{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}}};
+extern const Crystal2IndTexMtx s_crystal2IndTexMtxBase = {{{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}}};
 
-static const Crystal2TexMtx s_crystal2TexMtxBase = {
+extern const Crystal2TexMtx s_crystal2TexMtxBase = {
     {{0.5f, 0.0f, 0.0f, 0.5f}, {0.0f, -0.5f, 0.0f, 0.5f}, {0.0f, 0.0f, 0.0f, 1.0f}}};
 
 extern const char s_pppCrystal2Cpp[] = "pppCrystal2.cpp";

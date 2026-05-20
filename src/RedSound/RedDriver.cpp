@@ -3107,11 +3107,7 @@ int CRedDriver::SetSeSepData(void* seSepData)
     int seNo = REDSOUND_SESEP_ID_NONE;
     RedSeSepHEAD* header = RedSeSepHeadFromData(seSepData);
 
-    if (((((header->m_signature[REDSOUND_SESEP_SIGNATURE_0_INDEX] == REDSOUND_SESEP_SIGNATURE_0) &&
-           (header->m_signature[REDSOUND_SESEP_SIGNATURE_1_INDEX] == REDSOUND_SESEP_SIGNATURE_1)) &&
-          (header->m_signature[REDSOUND_SESEP_SIGNATURE_2_INDEX] == REDSOUND_SESEP_SIGNATURE_2)) &&
-         ((header->m_signature[REDSOUND_SESEP_SIGNATURE_3_INDEX] == REDSOUND_SESEP_SIGNATURE_3 &&
-           (header->m_signature[REDSOUND_SESEP_SIGNATURE_4_INDEX] == REDSOUND_SESEP_SIGNATURE_4))))) {
+    if (RedSeSepHeadHasValidSignature(header)) {
         headerSize = RedSeSepHeadFromData(seSepData)->m_sizeAndFlags;
         headerSize &= REDSOUND_SESEP_SIZE_MASK;
         header = (RedSeSepHEAD*)RedNew(headerSize);
@@ -3318,11 +3314,7 @@ int CRedDriver::SePlay(void* seSepData, int autoID, int pan, int volume, int pit
     RedSeSepHEAD* copiedHeader;
     int headerSize;
 
-    if (((((header->m_signature[REDSOUND_SESEP_SIGNATURE_0_INDEX] == REDSOUND_SESEP_SIGNATURE_0) &&
-           (header->m_signature[REDSOUND_SESEP_SIGNATURE_1_INDEX] == REDSOUND_SESEP_SIGNATURE_1)) &&
-          (header->m_signature[REDSOUND_SESEP_SIGNATURE_2_INDEX] == REDSOUND_SESEP_SIGNATURE_2)) &&
-         ((header->m_signature[REDSOUND_SESEP_SIGNATURE_3_INDEX] == REDSOUND_SESEP_SIGNATURE_3 &&
-           (header->m_signature[REDSOUND_SESEP_SIGNATURE_4_INDEX] == REDSOUND_SESEP_SIGNATURE_4))))) {
+    if (RedSeSepHeadHasValidSignature(header)) {
         headerSize = RedSeSepGetSize(header);
         copiedHeader = (RedSeSepHEAD*)RedNew(headerSize);
         if (copiedHeader != 0) {

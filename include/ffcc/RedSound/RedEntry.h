@@ -293,6 +293,12 @@ enum RedSeSepHeadLayout {
 #define RedSeSepHasFlags(seSepHead) (((seSepHead)->m_sizeAndFlags & REDSOUND_SESEP_FLAGS_MASK) != 0)
 #define RedSeSepGetWaveNo(seSepHead)                                                                  \
 	(((seSepHead)->m_waveNoHi * REDSOUND_SESEP_WAVE_NO_HIGH_SCALE) | (seSepHead)->m_waveNoLo)
+#define RedSeSepHeadHasValidSignature(seSepHead)                                                   \
+	((seSepHead)->m_signature[REDSOUND_SESEP_SIGNATURE_0_INDEX] == REDSOUND_SESEP_SIGNATURE_0 &&  \
+	 (seSepHead)->m_signature[REDSOUND_SESEP_SIGNATURE_1_INDEX] == REDSOUND_SESEP_SIGNATURE_1 &&  \
+	 (seSepHead)->m_signature[REDSOUND_SESEP_SIGNATURE_2_INDEX] == REDSOUND_SESEP_SIGNATURE_2 &&  \
+	 (seSepHead)->m_signature[REDSOUND_SESEP_SIGNATURE_3_INDEX] == REDSOUND_SESEP_SIGNATURE_3 &&  \
+	 (seSepHead)->m_signature[REDSOUND_SESEP_SIGNATURE_4_INDEX] == REDSOUND_SESEP_SIGNATURE_4)
 
 struct RedSeInfoSequence
 {

@@ -445,27 +445,36 @@ int CMenuPcs::EquipCtrlCur()
 				int index = static_cast<int>(*reinterpret_cast<s16*>(menuState + 0x34)) +
 				            static_cast<int>(*reinterpret_cast<s16*>(menuState + mode * 2 + 0x26));
 				s16* entries = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
+				CCaravanWork* activeCaravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
+				s16* activeEntries = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
 				int equipIndex = static_cast<int>(*reinterpret_cast<s16*>(menuState + 0x26));
-				bool valid = false;
+				unsigned int valid;
 
-				if ((index >= 0) && (index < entries[0])) {
-					if (index == 0) {
-						if (equipIndex >= 3) {
-							valid = *reinterpret_cast<s16*>(caravanWork + equipIndex * 2 + 0xac) >= 0;
-						}
+				if ((index < 0) || (activeEntries[0] <= index)) {
+					valid = 0;
+				} else if (index == 0) {
+					if (equipIndex < 3) {
+						valid = 0;
 					} else {
-						int item = static_cast<int>(*reinterpret_cast<s16*>(caravanWork + entries[index] * 2 + 0xb6));
-						valid = ChkEquipPossible__8CMenuPcsFi(this, item) != 0;
-						if (valid && (GetEquipType__8CMenuPcsFi(this, item) != equipIndex)) {
-							valid = false;
-						}
+						valid = (unsigned int)(int)activeCaravanWork->m_equipment[equipIndex] >> 0x1f ^ 1;
+					}
+				} else {
+					int item = activeCaravanWork->m_inventoryItems[activeEntries[index]];
+					valid = ChkEquipPossible__8CMenuPcsFi(this, item);
+					if (((valid & 0xff) != 0) && (GetEquipType__8CMenuPcsFi(this, item) != equipIndex)) {
+						valid = 0;
 					}
 				}
 
-				if (!valid || ((index != 0) && (EquipChk__8CMenuPcsFi(this, entries[index]) != 0))) {
+				if (((valid & 0xff) == 0) || ((index != 0) && (EquipChk__8CMenuPcsFi(this, entries[index]) != 0))) {
 					Sound.PlaySe(4, 0x40, 0x7f, 0);
 				} else {
-					int item = (index == 0) ? -1 : static_cast<int>(entries[index]);
+					int item;
+					if (index == 0) {
+						item = -1;
+					} else {
+						item = entries[index];
+					}
 					ChgEquipPos__12CCaravanWorkFii(reinterpret_cast<void*>(caravanWork), equipIndex, item);
 					CalcStatus__12CCaravanWorkFv(reinterpret_cast<void*>(caravanWork));
 					*reinterpret_cast<s16*>(menuState + 0x12) = *reinterpret_cast<s16*>(menuState + 0x12) + 1;

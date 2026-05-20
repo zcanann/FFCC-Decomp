@@ -62,6 +62,7 @@ int sprintf(char*, const char*, ...);
 }
 extern unsigned char CFlat[0x10440];
 extern int gWmMenuWorkA;
+extern float FLOAT_80330B30;
 extern float FLOAT_80330b74;
 extern float FLOAT_80330b54;
 extern float FLOAT_80330b64;
@@ -709,7 +710,7 @@ extern "C" float GetRightStickY__4CPadFl(void* pad, long padIndex)
 
 done_check:
     if (isInvalidPad) {
-        return 0.0f;
+        return FLOAT_80330B30;
     }
 
     int slot = (self->_448_4_ == padIndex) ? 0 : static_cast<int>(padIndex);
@@ -742,7 +743,7 @@ extern "C" float GetRightStickX__4CPadFl(void* pad, long padIndex)
 
 done_check:
     if (isInvalidPad) {
-        return 0.0f;
+        return FLOAT_80330B30;
     }
 
     int slot = (self->_448_4_ == padIndex) ? 0 : static_cast<int>(padIndex);
@@ -775,7 +776,7 @@ extern "C" float GetLeftStickY__4CPadFl(void* pad, long padIndex)
 
 done_check:
     if (isInvalidPad) {
-        return 0.0f;
+        return FLOAT_80330B30;
     }
 
     int slot = (self->_448_4_ == padIndex) ? 0 : static_cast<int>(padIndex);
@@ -808,7 +809,7 @@ extern "C" float GetLeftStickX__4CPadFl(void* pad, long padIndex)
 
 done_check:
     if (isInvalidPad) {
-        return 0.0f;
+        return FLOAT_80330B30;
     }
 
     int slot = (self->_448_4_ == padIndex) ? 0 : static_cast<int>(padIndex);

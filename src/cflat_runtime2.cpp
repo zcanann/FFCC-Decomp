@@ -2624,7 +2624,7 @@ void CFlatRuntime2::resetChangeScript()
 	*reinterpret_cast<u32*>(runtime + 0x12E8) = 0;
 	*reinterpret_cast<u32*>(runtime + 0x12EC) = 0;
 	memset(runtime + 0x1041C, 0, 0x14);
-	memset(reinterpret_cast<void*>(0x8030014C), 0, 0x8C);
+	memset(m_boss__8CGMonObj, 0, sizeof(m_boss__8CGMonObj));
 	runtime[0x12E4] &= 0xFD;
 	runtime[0x12E4] &= 0xF7;
 	runtime[0x12E4] &= 0xFE;

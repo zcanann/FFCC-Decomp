@@ -37,6 +37,10 @@ extern const float FLOAT_80330478 = 0.5f;
 extern const double DOUBLE_80330480 = 1.0;
 extern const double DOUBLE_80330488 = 0.5;
 extern const float FLOAT_80330490[2] = { -1.0f, 0.0f };
+extern const float FLOAT_80330498 = 0.0f;
+extern const float FLOAT_8033049c = 30.0f;
+extern const float FLOAT_803304a0 = 3.1415927f;
+extern const float FLOAT_803304a4 = 32768.0f;
 
 static inline float* f32_at(void* base, s32 off)
 {

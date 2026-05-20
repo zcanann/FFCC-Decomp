@@ -844,7 +844,7 @@ static void _ClearReverb(int bank)
     }
 
     RedReverbSetCallback(reverb, REDSOUND_REVERB_CALLBACK_NONE);
-    RedDelete((int)RedReverbGetContext(reverb));
+    RedDelete(RedMemoryAddress(RedReverbGetContext(reverb)));
 }
 
 /*

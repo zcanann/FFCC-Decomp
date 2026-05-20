@@ -392,7 +392,7 @@ int CRedSound::Init(void* mainBuffer, int mainBufferSize, int aramBuffer, int ar
 		AIInit(0);
 		AXInit();
 		AXARTInit();
-        c_RedMemory.Init((int)mainBuffer, mainBufferSize, aramBuffer, aramBufferSize);
+        c_RedMemory.Init(RedMemoryAddress(mainBuffer), mainBufferSize, aramBuffer, aramBufferSize);
 		c_RedEntry.Init();
 		Start();
 		c_Driver.Init();

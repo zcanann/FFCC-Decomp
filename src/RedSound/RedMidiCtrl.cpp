@@ -998,7 +998,7 @@ static void __MidiCtrl_Stop(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, R
             c_RedEntry.WaveHistoryManager(REDSOUND_HISTORY_MODE_RELEASE, control->m_waveNo);
             control->m_musicId = REDSOUND_MUSIC_ID_NONE;
             control->m_updateFlags = 0;
-            RedDelete((int)control->m_tracks);
+            RedDelete(RedMemoryAddress(control->m_tracks));
             control->m_tracks = REDSOUND_TRACK_NONE;
         }
     } else {

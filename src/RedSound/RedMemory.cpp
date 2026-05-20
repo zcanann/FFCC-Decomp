@@ -264,7 +264,7 @@ void RedDelete(int address)
  */
 void RedDelete(void* address)
 {
-	RedDelete((int)address);
+	RedDelete(RedMemoryAddress(address));
 }
 
 /*
@@ -321,7 +321,7 @@ int RedResize(int address, int size)
  */
 void* RedResize(void* address, int size)
 {
-	return (void*)RedResize((int)address, size);
+	return (void*)RedResize(RedMemoryAddress(address), size);
 }
 
 /*
@@ -472,7 +472,7 @@ void RedDeleteA(int address)
  */
 void RedDeleteA(void* address)
 {
-	RedDeleteA((int)address);
+	RedDeleteA(RedMemoryAddress(address));
 }
 
 /*
@@ -529,7 +529,7 @@ int RedResizeA(int address, int size)
  */
 void* RedResizeA(void* address, int size)
 {
-	return (void*)RedResizeA((int)address, size);
+	return (void*)RedResizeA(RedMemoryAddress(address), size);
 }
 
 /*

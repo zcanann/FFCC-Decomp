@@ -5,20 +5,20 @@
 #include "ffcc/partMng.h"
 #include "ffcc/pppYmEnv.h"
 extern "C" {
-extern const float FLOAT_803305f0 = 0.017453292f;
-extern const float kPppYmDeformationShpZero = 0.0f;
-extern const float FLOAT_803305f8 = 1.0f;
-extern const double DOUBLE_80330600 = 4503601774854144.0;
-extern const double DOUBLE_80330608 = 4503599627370496.0;
-extern const float FLOAT_80330610 = 320.0f;
-extern const float FLOAT_80330614 = 0.003125f;
-extern const float FLOAT_80330618 = 224.0f;
-extern const float FLOAT_8033061c = 0.004464f;
-extern const float FLOAT_80330620 = 1000.0f;
-extern const float FLOAT_80330624 = -1000.0f;
-extern const float FLOAT_80330628 = -0.5f;
-extern const float FLOAT_8033062c = -1.0f;
-extern const float FLOAT_80330630 = 0.5f;
+extern const float FLOAT_803305f0;
+extern const float kPppYmDeformationShpZero;
+extern const float FLOAT_803305f8;
+extern const double DOUBLE_80330600;
+extern const double DOUBLE_80330608;
+extern const float FLOAT_80330610;
+extern const float FLOAT_80330614;
+extern const float FLOAT_80330618;
+extern const float FLOAT_8033061c;
+extern const float FLOAT_80330620;
+extern const float FLOAT_80330624;
+extern const float FLOAT_80330628;
+extern const float FLOAT_8033062c;
+extern const float FLOAT_80330630;
 extern int gPppCalcDisabled;
 extern unsigned char gPppInConstructor;
 }

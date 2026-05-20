@@ -1334,7 +1334,7 @@ static void _PitchExecute(RedVoiceDATA* voice)
     int adjustedPitchDelta = 0;
 
     if ((voice->m_track->m_vibrateFunc != 0) && (voice->m_pitchModDelay == 0)) {
-        u32 vibratoDepth = voice->m_track->m_vibrateDepth >> REDSOUND_FIXED_SHIFT;
+        int vibratoDepth = voice->m_track->m_vibrateDepth >> REDSOUND_FIXED_SHIFT;
         if (vibratoDepth < REDSOUND_PITCH_MOD_DEPTH_SPLIT) {
             vibratoPitchDelta = (vibratoDepth + 1) * REDSOUND_PITCH_MOD_SHALLOW_SCALE;
         } else {

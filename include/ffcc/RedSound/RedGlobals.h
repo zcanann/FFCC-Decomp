@@ -246,6 +246,7 @@ extern RedSoundCONTROL* volatile p_SoundControlBuffer;
 #define RedSoundControlGet(index) (p_SoundControlBuffer + (index))
 #define RedSoundControlGetMusicPlayEnd() RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PLAY_END)
 #define RedSoundControlGetMusicAllEnd() RedSoundControlGet(REDSOUND_CONTROL_MUSIC_ALL_END)
+#define RedSoundControlIsMusic(control) ((control) < RedSoundControlGetMusicAllEnd())
 extern RedSoundCONTROL* volatile p_SoundControl;
 #define RedCurrentSoundControlGet() (p_SoundControl)
 #define RedCurrentSoundControlSet(control) (p_SoundControl = (control))

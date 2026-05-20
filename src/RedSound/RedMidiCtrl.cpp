@@ -977,7 +977,7 @@ static void __MidiCtrl_Stop(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, R
     } while (voice < RedVoiceDataGetEnd());
 
     track->m_command = REDSOUND_TRACK_COMMAND_NONE;
-    if (control < RedSoundControlGet(REDSOUND_CONTROL_SE)) {
+    if (RedSoundControlIsMusic(control)) {
         control->m_activeTrackCount--;
         if ((control->m_activeTrackCount == 0) &&
             ((RedMusicPhraseStopIsOn()) ||

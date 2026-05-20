@@ -48,15 +48,19 @@ public:
     void Frame();
     void Draw();
     void Calc(Vec*, const Vec*, int);
+#ifndef VERSION_GCCP01
     WindObject* searchFreeObj();
     WindObject* getObj(int);
+#endif
     int AddAmbient(float, float);
     int AddDiffuse(const Vec*, float, float, float);
     int AddSphere(const Vec*, float, float, int);
     void ChangePower(int, float);
+#ifndef VERSION_GCCP01
     WindGrassObject* searchFreeGrass();
     WindGrassObject* getGrass(int);
     int AddGrass(const Vec*);
+#endif
 
 private:
     WindObject m_objects[32];

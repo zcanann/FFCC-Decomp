@@ -8,6 +8,7 @@
 #include "ffcc/mapanim.h"
 #include "ffcc/maptexanim.h"
 #include "ffcc/materialman.h"
+#include "ffcc/textureman.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/game.h"
 #include "ffcc/p_light.h"
@@ -47,9 +48,6 @@ extern "C" void __ct__21CPtrArray_P8CMapAnim_Fv(void*);
 extern "C" void __ct__27CPtrArray_P13CMapAnimKeyDt_Fv(void*);
 extern "C" void __ct__24CPtrArray_P10CMapShadow_Fv(void*);
 extern "C" void __ct__29CPtrArray_P15CMapLightHolder_Fv(void*);
-extern "C" void* __nw__11CTextureSetFUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
-extern "C" CTextureSet* __ct__11CTextureSetFv(CTextureSet*);
-extern "C" void Create__11CTextureSetFPvPQ27CMemory6CStageiP13CAmemCacheSetii(CTextureSet*, void*, CMemory::CStage*, int, void*, int, int);
 extern "C" void* PTR_PTR_s_CMapTexAnimSet_801e896c;
 extern "C" float Spline1D__5CMathFifPfPfPf(CMath*, int, float, float*, float*, float*);
 extern "C" float Line1D__5CMathFifPfPf(CMath*, int, float, float*, float*);
@@ -1996,12 +1994,7 @@ void CMapMng::ReadMtx(char* mapName)
 
     if (asyncLoadState.m_mapReadMode != 2 && asyncLoadState.m_mapReadMode != 3) {
         CMemory::CStage* stage = *reinterpret_cast<CMemory::CStage**>(self + 0x0);
-        CTextureSet* textureSet =
-            static_cast<CTextureSet*>(
-                __nw__11CTextureSetFUlPQ27CMemory6CStagePci(0x24, stage, const_cast<char*>(s_map_cpp), 0x3A9));
-        if (textureSet != 0) {
-            textureSet = __ct__11CTextureSetFv(textureSet);
-        }
+        CTextureSet* textureSet = new (stage, const_cast<char*>(s_map_cpp), 0x3A9) CTextureSet;
         *reinterpret_cast<CTextureSet**>(self + 0x213D8) = textureSet;
     }
 
@@ -2080,14 +2073,8 @@ void CMapMng::ReadMtx(char* mapName)
             } else {
                 while (chunkFile.GetNextChunk(chunk)) {
                     if (chunk.m_id == 0x54534554) {
-                        Create__11CTextureSetFPvPQ27CMemory6CStageiP13CAmemCacheSetii(
-                            *reinterpret_cast<CTextureSet**>(self + 0x213D8),
-                            &chunkFile,
-                            *reinterpret_cast<CMemory::CStage**>(self + 0x0),
-                            append,
-                            0,
-                            0,
-                            0);
+                        (*reinterpret_cast<CTextureSet**>(self + 0x213D8))
+                            ->Create(chunkFile, *reinterpret_cast<CMemory::CStage**>(self + 0x0), append, 0, 0, 0);
                         append = 1;
                         if (chunk.m_arg0 == 1) {
                             return;

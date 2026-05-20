@@ -1,5 +1,6 @@
 #include "ffcc/p_camera.h"
 
+#include "ffcc/color.h"
 #include "ffcc/linkage.h"
 #include "ffcc/materialman.h"
 #include "ffcc/map.h"
@@ -155,7 +156,6 @@ extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor
 extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, int, int, int, int);
 extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
 extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
-extern "C" void* __ct__6CColorFUcUcUcUc(void*, unsigned char, unsigned char, unsigned char, unsigned char);
 extern "C" void setViewport__11CGraphicPcsFv(void*);
 extern "C" int CheckHitCylinder__7CMapMngFP12CMapCylinderP3VecUl(void*, void*, Vec*, unsigned long);
 extern "C" void CalcHitSlide__7CMapObjFP3Vecf(void*, Vec*);
@@ -827,7 +827,6 @@ void CCameraPcs::draw()
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
     Mtx shadowMtx;
     Mtx cameraMtx;
-    _GXColor drawColor;
     unsigned int redColor;
     unsigned int magentaColor;
 
@@ -846,9 +845,9 @@ void CCameraPcs::draw()
         GXClearVtxDesc();
         GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
         GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
-        __ct__6CColorFUcUcUcUc(&drawColor, 0xFF, 0xFF, 0xFF, 0xFF);
+        CColor drawColor(0xFF, 0xFF, 0xFF, 0xFF);
         Graphic.DrawSphere(reinterpret_cast<MtxPtr>(self + 4), reinterpret_cast<Vec*>(self + 0xD4), FLOAT_8032fabc,
-                           &drawColor);
+                           &drawColor.color);
     }
 
     if (g_map_draw_prof != 0) {

@@ -509,7 +509,7 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 		streamData->m_readOffset = REDSOUND_STREAM_PAGE_SIZE;
 		streamData->m_streamCursor = 0;
 		streamData->m_voiceData = RedVoiceDataGet(streamData->m_track->m_trackNo);
-		streamData->m_fileData = (u8*)streamHeader;
+		streamData->m_fileData = RedStreamFileFromHeader(streamHeader);
 		streamData->m_fileSize = fileSize;
 		if (volume != 0) {
 			volume = ((volume + 1) * REDSOUND_VOLUME_BYTE_SCALE - 1) * REDSOUND_FIXED_ONE;

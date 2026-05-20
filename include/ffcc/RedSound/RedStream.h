@@ -104,7 +104,7 @@ struct RedStreamFile {
 
 #define RedStreamAramGetChannelPlane(buffer, channel) ((buffer) + (channel) * REDSOUND_STREAM_STEREO_PLANE_SIZE)
 
-#define RedStreamGetReadCursor(stream) ((stream)->m_fileData + (stream)->m_readOffset)
+#define RedStreamGetReadCursor(stream) ((u8*)(stream)->m_fileData + (stream)->m_readOffset)
 
 enum RedStreamFileLayoutOffset {
     REDSOUND_STREAM_FILE_HEAD_OFFSET = (unsigned int)&(((RedStreamFile*)0)->m_header),
@@ -185,7 +185,7 @@ enum RedStreamHeaderFlag {
 struct RedStreamDATA {
     RedTrackDATA* m_track;
     RedVoiceDATA* m_voiceData;
-    u8* m_fileData;
+    RedStreamFile* m_fileData;
     u8* m_buffer;
     RedStreamHEAD m_header;
     RedWaveDATA m_trackData[REDSOUND_STREAM_TRACK_DATA_COUNT];

@@ -4113,19 +4113,25 @@ inline void CRedDriver::SetWaveTune(int key, int fineTune)
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CRedDriver::SetWaveAdsr(int attack, RedAdsrDATA* adsr)
+void CRedDriver::SetWaveAdsr(int attack, RedAdsrDATA* adsr)
 {
     RedTrackDATA* editorTrack;
     int* voiceNo;
 
     editorTrack = RedEditorTrackGet();
     memcpy(&editorTrack->m_adsr, adsr, REDSOUND_TRACK_ADSR_SIZE);
+    if (attack >= 0) {
+        editorTrack->m_adsr.m_time[REDSOUND_VOICE_ADSR_ATTACK] = attack;
+    }
     voiceNo = RedEditorVoiceGetBegin();
     do {
         int voiceIndex = *voiceNo;
         if (voiceIndex != 0) {
             RedVoiceDATA* voice = RedVoiceDataGet(voiceIndex);
             memcpy(&voice->m_adsr, adsr, REDSOUND_ADSR_DATA_SIZE);
+            if (attack >= 0) {
+                voice->m_adsr.m_time[REDSOUND_VOICE_ADSR_ATTACK] = attack;
+            }
             voice->m_flags |= REDSOUND_VOICE_FLAGS_ADSR_START;
         }
         voiceNo++;

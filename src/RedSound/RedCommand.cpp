@@ -81,6 +81,9 @@ enum RedCommandVolumeParam {
 	REDSOUND_MUSIC_VOLUME_INPUT_SCALE_SHIFT = 2,
 };
 
+#define RedMusicVolumeFromInput(volume)                                                            \
+	((((volume) + 1) * REDSOUND_MASTER_VOLUME_SCALE - 1) * REDSOUND_FIXED_ONE)
+
 enum RedCommandEraseTrack {
 	REDSOUND_ERASE_TRACK_SENTINEL = 0x100,
 	REDSOUND_SEP_DIRECT_PLAY_ID = 1000000,
@@ -961,7 +964,7 @@ static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* wav
 	music->m_measure = REDSOUND_CONTROL_INITIAL_MEASURE;
 	music->m_elapsedTime = REDSOUND_CONTROL_ELAPSED_TIME_NONE;
 	if (volume != 0) {
-		volume = (((volume + 1) * REDSOUND_MASTER_VOLUME_SCALE) - 1) * REDSOUND_FIXED_ONE;
+		volume = RedMusicVolumeFromInput(volume);
 	}
 	music->m_volume = volume;
 	music->m_volumeDelta = REDSOUND_CONTROL_VOLUME_DELTA_NONE;

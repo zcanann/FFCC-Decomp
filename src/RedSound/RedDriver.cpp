@@ -509,6 +509,7 @@ struct RedExecCommand {
 #define RedExecCommandSetArg(command, index, arg) (RedExecCommandGetArg((command), (index)) = (arg))
 #define RedExecCommandArgGet(args, index) ((args)[(index)])
 #define RedExecCommandPointerArg(pointer) ((int)(pointer))
+#define RedExecCommandPointerArgGet(args, index) RedExecCommandArgGet((args), (index))
 
 enum RedExecCommandLayout {
     REDSOUND_EXEC_COMMAND_FUNC_OFFSET = (unsigned int)&(((RedExecCommand*)0)->m_func),
@@ -1147,7 +1148,7 @@ static void _SetReverbDepth(int* command)
  */
 static void _SetMusicData(int* command)
 {
-    c_RedEntry.SetMusicData(RedMusicHeadFromData(RedExecCommandArgGet(command, REDSOUND_DATA_COMMAND_BUFFER)));
+    c_RedEntry.SetMusicData(RedMusicHeadFromData(RedExecCommandPointerArgGet(command, REDSOUND_DATA_COMMAND_BUFFER)));
 }
 
 /*
@@ -1440,8 +1441,8 @@ static void _SetSeBlockData(int* command)
         RedSeBlockDataSet(index, REDSOUND_SE_BLOCK_DATA_NONE);
     }
 
-    if (RedExecCommandArgGet(command, REDSOUND_SE_BLOCK_DATA_COMMAND_BUFFER) != 0) {
-        seBlockData = RedSeBlockHeadFromData(RedExecCommandArgGet(command, REDSOUND_SE_BLOCK_DATA_COMMAND_BUFFER));
+    if (RedExecCommandPointerArgGet(command, REDSOUND_SE_BLOCK_DATA_COMMAND_BUFFER) != 0) {
+        seBlockData = RedSeBlockHeadFromData(RedExecCommandPointerArgGet(command, REDSOUND_SE_BLOCK_DATA_COMMAND_BUFFER));
         if ((seBlockData->m_signature[REDSOUND_SE_BLOCK_SIGNATURE_0_INDEX] = REDSOUND_SE_BLOCK_SIGNATURE_0) &&
             (seBlockData->m_signature[REDSOUND_SE_BLOCK_SIGNATURE_1_INDEX] = REDSOUND_SE_BLOCK_SIGNATURE_1) &&
             (seBlockData->m_signature[REDSOUND_SE_BLOCK_SIGNATURE_2_INDEX] = REDSOUND_SE_BLOCK_SIGNATURE_2) &&
@@ -1467,7 +1468,7 @@ static void _SetSeBlockData(int* command)
  */
 static void _SetSeSepData(int* command)
 {
-    c_RedEntry.SetSeSepData(RedSeSepHeadFromData(RedExecCommandArgGet(command, REDSOUND_DATA_COMMAND_BUFFER)));
+    c_RedEntry.SetSeSepData(RedSeSepHeadFromData(RedExecCommandPointerArgGet(command, REDSOUND_DATA_COMMAND_BUFFER)));
 }
 
 /*
@@ -1571,7 +1572,7 @@ static void _SeSepPlay(int* command)
 {
     RedSeSepHEAD* seSepHead;
 
-    seSepHead = c_RedEntry.SetSeSepData(RedSeSepHeadFromData(RedExecCommandArgGet(command, REDSOUND_SE_SEP_COMMAND_DATA)));
+    seSepHead = c_RedEntry.SetSeSepData(RedSeSepHeadFromData(RedExecCommandPointerArgGet(command, REDSOUND_SE_SEP_COMMAND_DATA)));
     if (seSepHead != 0) {
         RedSeSkipStepSet(RedExecCommandArgGet(command, REDSOUND_SE_SEP_COMMAND_PITCH));
         int seID = RedExecCommandArgGet(command, REDSOUND_SE_COMMAND_ID);

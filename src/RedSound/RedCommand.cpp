@@ -570,8 +570,8 @@ static int _SePlayStart(RedSeINFO* seInfo, int seId, int sepId, int pan, int vol
 			}
 
 			tracksToStart = tracksToStart - 1;
-			sequence++;
 			remainingSequences = remainingSequences - 1;
+			sequence++;
 			if (tracksToStart == 0) {
 				break;
 			}

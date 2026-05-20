@@ -720,7 +720,7 @@ void ReverbAreaFree(void* area)
  */
 void InitReverb()
 {
-    RedReverbDataSetBegin((RedReverbDATA*)RedNew(REDSOUND_REVERB_DATA_BUFFER_SIZE));
+    RedReverbDataSetBegin((RedReverbDATA*)RedNew(REDSOUND_REVERB_DATA_ALLOC_SIZE));
     memset(RedReverbDataGetBegin(), 0, REDSOUND_REVERB_DATA_BUFFER_SIZE);
     RedReverbSizeSet((RedReverbSize*)RedNew(REDSOUND_REVERB_SIZE_ALLOC_SIZE));
 }

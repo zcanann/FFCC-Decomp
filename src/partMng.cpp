@@ -617,7 +617,7 @@ void CPartMng::pppReleasePdt(int pdtSlotIndex)
     }
 
     if (modelNames != 0) {
-        __dla__FPv(modelNames);
+        delete[] modelNames;
         pdt->m_modelNames = 0;
     }
 
@@ -640,32 +640,30 @@ void CPartMng::pppReleasePdt(int pdtSlotIndex)
     }
 
     if (shapeNames != 0) {
-        __dla__FPv(shapeNames);
+        delete[] shapeNames;
         pdt->m_shapeNames = 0;
     }
 
-    unsigned char* shapeGroups = reinterpret_cast<unsigned char*>(pdt->m_shapeGroups);
+    pppShapeGroupRaw* shapeGroups = reinterpret_cast<pppShapeGroupRaw*>(pdt->m_shapeGroups);
     for (int i = 0; i < pdt->m_shapeGroupCount; i++) {
-        void** groupData = reinterpret_cast<void**>(shapeGroups + i * 8 + 4);
-        if (*groupData != 0) {
-            __dl__FPv(*groupData);
-            *groupData = 0;
+        if (shapeGroups[i].m_shapeList != 0) {
+            delete[] shapeGroups[i].m_shapeList;
+            shapeGroups[i].m_shapeList = 0;
         }
     }
 
     if (shapeGroups != 0) {
-        __dla__FPv(shapeGroups);
+        delete[] shapeGroups;
         pdt->m_shapeGroups = 0;
     }
 
-    unsigned char* cacheChunks = reinterpret_cast<unsigned char*>(pdt->m_cacheChunks);
+    s16* cacheChunks = reinterpret_cast<s16*>(pdt->m_cacheChunks);
     for (int i = 0; i < pdt->m_cacheChunkCount; i++) {
-        short cacheId = *reinterpret_cast<short*>(cacheChunks + i * 8);
-        ppvAmemCacheSet.DestroyCache(cacheId);
+        ppvAmemCacheSet.DestroyCache(cacheChunks[i * 4]);
     }
 
     if (cacheChunks != 0) {
-        __dl__FPv(cacheChunks);
+        delete[] cacheChunks;
         pdt->m_cacheChunks = 0;
     }
 

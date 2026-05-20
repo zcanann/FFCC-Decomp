@@ -62,7 +62,6 @@ extern "C" unsigned int DAT_8032ed80;
 extern "C" unsigned int IsEnable__13CAmemCacheSetFs(CAmemCacheSet*, short);
 extern "C" int GetData__13CAmemCacheSetFsPci(CAmemCacheSet*, short, char*, int);
 extern "C" void AddRef__13CAmemCacheSetFs(CAmemCacheSet*, short);
-extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void __dl__FPv(void*);
 extern "C" void* CreateStage__7CMemoryFUlPci(void*, unsigned long, const char*, int);
 extern "C" void DestroyStage__7CMemoryFPQ27CMemory6CStage(void*, void*);
@@ -1997,13 +1996,6 @@ void pppInitPdt(long* progOffsetReconstructionTable, pppProg* pppProg)
  */
 void pppInitData(_pppDataHead* pppDataHead, pppProg* pppProg, int param_3)
 {
-	struct pppShapeGroupRaw
-	{
-		u16 m_groupId;
-		u16 m_shapeCount;
-		s16* m_shapeList;
-	};
-
 	u8* dataBase = reinterpret_cast<u8*>(&pppDataHead->m_version);
 
 	pppDataHead->m_cacheChunks = pppDataHead->m_cacheChunks + reinterpret_cast<u32>(dataBase);
@@ -2013,27 +2005,25 @@ void pppInitData(_pppDataHead* pppDataHead, pppProg* pppProg, int param_3)
 
 	int* chunkOffsets = reinterpret_cast<int*>(pppDataHead->m_cacheChunks);
 	CMemory::CStage* stageLoad = *reinterpret_cast<CMemory::CStage**>(PartPcsRaw() + 0x1C);
-	s16* cacheChunks = reinterpret_cast<s16*>(__nwa__FUlPQ27CMemory6CStagePci(
-	                                          static_cast<u32>(pppDataHead->m_cacheChunkCount) << 3,
-	                                          stageLoad, const_cast<char*>(s_pppPart_cpp), 0x620));
+	s16* cacheChunks = new (stageLoad, const_cast<char*>(s_pppPart_cpp), 0x620)
+	    s16[static_cast<u32>(pppDataHead->m_cacheChunkCount) * 4];
 	pppDataHead->m_cacheChunks = reinterpret_cast<u32>(cacheChunks);
 
 	for (int i = 0; i < pppDataHead->m_cacheChunkCount; i++) {
 		int chunkOffset = chunkOffsets[0];
 		int chunkSize = chunkOffsets[1] - chunkOffset;
-		void* chunkData = __nwa__FUlPQ27CMemory6CStagePci(chunkSize, stageLoad, const_cast<char*>(s_pppPart_cpp), 0x626);
+		u8* chunkData = new (stageLoad, const_cast<char*>(s_pppPart_cpp), 0x626) u8[chunkSize];
 
 		memcpy(chunkData, dataBase + chunkOffset, chunkSize);
 		cacheChunks[(i << 2)] = SetData__13CAmemCacheSetFPviQ210CAmemCache4TYPEi(
 		    &ppvAmemCacheSet, chunkData, chunkSize, static_cast<CAmemCache::TYPE>(2), param_3);
-		__dl__FPv(chunkData);
+		delete[] chunkData;
 		chunkOffsets++;
 	}
 
 	char* modelName = reinterpret_cast<char*>(pppDataHead->m_modelNames);
-	pppModelSt** modelRefs = reinterpret_cast<pppModelSt**>(__nwa__FUlPQ27CMemory6CStagePci(
-	                                                        static_cast<u32>(pppDataHead->m_modelCount) << 2,
-	                                                        stageLoad, const_cast<char*>(s_pppPart_cpp), 0x636));
+	pppModelSt** modelRefs = new (stageLoad, const_cast<char*>(s_pppPart_cpp), 0x636)
+	    pppModelSt*[pppDataHead->m_modelCount];
 	pppDataHead->m_modelNames = reinterpret_cast<u32>(modelRefs);
 
 	pppModelSt* modelArray = *reinterpret_cast<pppModelSt**>(reinterpret_cast<u8*>(&PartMng) + 0x7EC);
@@ -2052,9 +2042,8 @@ void pppInitData(_pppDataHead* pppDataHead, pppProg* pppProg, int param_3)
 	}
 
 	char* shapeName = reinterpret_cast<char*>(pppDataHead->m_shapeNames);
-	pppShapeSt** shapeRefs = reinterpret_cast<pppShapeSt**>(__nwa__FUlPQ27CMemory6CStagePci(
-	                                                        static_cast<u32>(pppDataHead->m_shapeCount) << 2,
-	                                                        stageLoad, const_cast<char*>(s_pppPart_cpp), 0x643));
+	pppShapeSt** shapeRefs = new (stageLoad, const_cast<char*>(s_pppPart_cpp), 0x643)
+	    pppShapeSt*[pppDataHead->m_shapeCount];
 	pppDataHead->m_shapeNames = reinterpret_cast<u32>(shapeRefs);
 
 	pppShapeSt* shapeArray = *reinterpret_cast<pppShapeSt**>(reinterpret_cast<u8*>(&PartMng) + 0x7F0);
@@ -2073,17 +2062,15 @@ void pppInitData(_pppDataHead* pppDataHead, pppProg* pppProg, int param_3)
 	}
 
 	pppShapeGroupRaw* shapeGroups = reinterpret_cast<pppShapeGroupRaw*>(pppDataHead->m_shapeGroups);
-	pppShapeGroupRaw* shapeGroupRefs = reinterpret_cast<pppShapeGroupRaw*>(__nwa__FUlPQ27CMemory6CStagePci(
-	                                                                       static_cast<u32>(pppDataHead->m_shapeGroupCount)
-	                                                                           << 3,
-	                                                                       stageLoad, const_cast<char*>(s_pppPart_cpp), 0x651));
+	pppShapeGroupRaw* shapeGroupRefs = new (stageLoad, const_cast<char*>(s_pppPart_cpp), 0x651)
+	    pppShapeGroupRaw[pppDataHead->m_shapeGroupCount];
 	pppDataHead->m_shapeGroups = reinterpret_cast<u32>(shapeGroupRefs);
 
 	for (int i = 0; i < pppDataHead->m_shapeGroupCount; i++) {
 		shapeGroupRefs[i].m_groupId = shapeGroups[i].m_groupId;
 		shapeGroupRefs[i].m_shapeCount = shapeGroups[i].m_shapeCount;
-		shapeGroupRefs[i].m_shapeList = reinterpret_cast<s16*>(__nwa__FUlPQ27CMemory6CStagePci(
-		    static_cast<int>(shapeGroups[i].m_shapeCount) << 1, stageLoad, const_cast<char*>(s_pppPart_cpp), 0x656));
+		shapeGroupRefs[i].m_shapeList =
+		    new (stageLoad, const_cast<char*>(s_pppPart_cpp), 0x656) s16[shapeGroups[i].m_shapeCount];
 
 		shapeGroups[i].m_shapeList = reinterpret_cast<s16*>(reinterpret_cast<u8*>(shapeGroups[i].m_shapeList) + reinterpret_cast<u32>(dataBase));
 		memcpy(shapeGroupRefs[i].m_shapeList, shapeGroups[i].m_shapeList, static_cast<int>(shapeGroups[i].m_shapeCount) << 1);

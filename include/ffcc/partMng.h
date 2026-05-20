@@ -227,6 +227,13 @@ struct _pppDataHead
     unsigned int m_shapeGroups;       // 0x1c
 }; // Size 0x20
 
+struct pppShapeGroupRaw
+{
+    u16 m_groupId;     // 0x0
+    u16 m_shapeCount;  // 0x2
+    s16* m_shapeList;  // 0x4
+}; // Size 0x8
+
 struct pppIVECTOR4
 {
     short x;

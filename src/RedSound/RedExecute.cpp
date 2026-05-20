@@ -2344,7 +2344,7 @@ static void _ExecuteExtraData()
             }
         }
         soundControl++;
-    } while (soundControl < RedSoundControlGet(REDSOUND_CONTROL_MUSIC_SKIP));
+    } while (soundControl < RedSoundControlGetMusicPlayEnd());
 
     soundControl = RedSoundControlGetBegin();
 
@@ -2395,7 +2395,7 @@ static void _ExecuteExtraData()
             }
         }
         soundControl++;
-    } while (soundControl < RedSoundControlGet(REDSOUND_CONTROL_SE));
+    } while (soundControl < RedSoundControlGetMusicAllEnd());
 }
 
 /*

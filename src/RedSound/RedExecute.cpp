@@ -2303,7 +2303,6 @@ static void _ExecuteExtraData()
     RedSoundCONTROL* soundControl;
     RedVoiceDATA* voice;
     RedTrackDATA* track;
-    RedTrackDATA* musicBase;
     int pitchOffset;
     int basePitch;
 
@@ -2317,11 +2316,11 @@ static void _ExecuteExtraData()
             }
 
             if (soundControl->m_tracks != 0) {
-                musicBase = soundControl->m_tracks;
+                track = soundControl->m_tracks;
                 voice = RedVoiceDataGetBegin();
                 do {
-                    if ((voice->m_track >= musicBase) &&
-                        (voice->m_track < musicBase + soundControl->m_trackCount)) {
+                    if ((voice->m_track >= track) &&
+                        (voice->m_track < track + soundControl->m_trackCount)) {
                         voice->m_updateFlags |= REDSOUND_VOICE_UPDATE_VOLUME;
                     }
                     voice++;

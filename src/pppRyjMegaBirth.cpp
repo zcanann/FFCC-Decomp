@@ -832,13 +832,11 @@ void birth(
 {
 	u8* payload;
 	u8* particlePayload;
-	s8 mode;
 	float speed;
 	s16 life;
 
 	payload = (u8*)param;
 	particlePayload = (u8*)particle;
-	mode = payload[0x2A];
 	float spread = (float)payload[0x2B];
 	float range = FLOAT_80330470 * spread;
 
@@ -850,7 +848,7 @@ void birth(
 		memset(colorData, 0, 0x20);
 	}
 
-	if (mode < 8) {
+	if (*(s8*)(payload + 0x2A) < 8) {
 		Vec baseDirection;
 		Vec* direction;
 		s32 angle[4];
@@ -865,7 +863,7 @@ void birth(
 		angle[2] = (s32)((float)((s32)(range * Math.RandF() - spread) << 15) / FLOAT_8033045c);
 		angle[3] = 0;
 
-		if ((mode == 2) || (mode == 3)) {
+		if ((payload[0x2A] == 2) || (payload[0x2A] == 3)) {
 			angle[0] = 0;
 			angle[1] = 0;
 		}
@@ -880,7 +878,7 @@ void birth(
 	}
 
 	speed = *f32_at(payload, 0xD4);
-	if ((mode < 4) || (mode >= 10)) {
+	if ((*(s8*)(payload + 0x2A) < 4) || (*(s8*)(payload + 0x2A) >= 10)) {
 		if (speed != kPppRyjMegaBirthZero) {
 			u8 speedMode = payload[0xE8];
 
@@ -888,7 +886,7 @@ void birth(
 			Vec* position = (Vec*)particlePayload;
 			PSVECScale(direction, position, calc_direction_speed(speed, speedMode));
 		}
-	} else if (mode < 6) {
+	} else if (*(s8*)(payload + 0x2A) < 6) {
 		if (speed != kPppRyjMegaBirthZero) {
 			u8 speedMode = payload[0xE8];
 
@@ -896,7 +894,7 @@ void birth(
 			*f32_at(particlePayload, 0x04) = calc_spawn_speed(speed, speedMode) * *f32_at(payload, 0xDC);
 			*f32_at(particlePayload, 0x08) = calc_spawn_speed(speed, speedMode) * *f32_at(payload, 0xE0);
 		}
-	} else if (mode < 10) {
+	} else if (*(s8*)(payload + 0x2A) < 10) {
 		u8 speedMode = payload[0xE8];
 		s16 pathIndex = *s16_at(payload, 0xF0);
 		Vec* pathBase = *(Vec**)((u8*)pObject + 0x70);
@@ -926,7 +924,7 @@ void birth(
 				*f32_at(particlePayload, 0x00) = pathVec->x * *f32_at(payload, 0xD8);
 				*f32_at(particlePayload, 0x04) = pathVec->y * *f32_at(payload, 0xDC);
 				*f32_at(particlePayload, 0x08) = pathVec->z * *f32_at(payload, 0xE0);
-				if ((mode == 8) || (mode == 9)) {
+				if ((payload[0x2A] == 8) || (payload[0x2A] == 9)) {
 					PSVECNormalize((Vec*)particlePayload, (Vec*)(particlePayload + 0x10));
 				}
 			}

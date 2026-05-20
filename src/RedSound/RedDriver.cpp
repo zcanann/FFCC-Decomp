@@ -3940,7 +3940,7 @@ RedReverbDepth* CRedDriver::GetReverbDepth()
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CRedDriver::SetMute(unsigned int voiceNo, unsigned int mute)
+void CRedDriver::SetMute(unsigned int voiceNo, unsigned int mute)
 {
     if (mute != 0) {
         RedMuteSet(voiceNo);

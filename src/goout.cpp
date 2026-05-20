@@ -1,4 +1,5 @@
 #include "ffcc/goout.h"
+#include "ffcc/memory.h"
 #include "ffcc/wm_menu.h"
 #include <stdarg.h>
 #include <string.h>
@@ -10,8 +11,6 @@ int g_freeCaravanIdx;
 extern "C" int GetYesNoXPos__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" int CalcGoOutSelChar__8CMenuPcsFUcUc(CMenuPcs*, unsigned char, unsigned char);
 extern "C" void Calc__10CGoOutMenuFv(CGoOutMenu*);
-extern "C" void __dl__FPv(void*);
-extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" int GetWinMess__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" const char* const* GetMcWinMessBuff__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" const char* g_strGooutMes[];
@@ -713,11 +712,11 @@ void CGoOutMenu::Destroy()
     CMenuPcsGoOutLayout& menuPcsLayout = *reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs);
 
     if (menuPcsLayout.m_transferSaveData != 0) {
-        __dl__FPv(menuPcsLayout.m_transferSaveData);
+        delete[] reinterpret_cast<unsigned char*>(menuPcsLayout.m_transferSaveData);
         menuPcsLayout.m_transferSaveData = 0;
     }
     if (menuPcsLayout.m_transferWork != 0) {
-        __dl__FPv(menuPcsLayout.m_transferWork);
+        delete[] static_cast<unsigned char*>(menuPcsLayout.m_transferWork);
         menuPcsLayout.m_transferWork = 0;
     }
 
@@ -1848,10 +1847,9 @@ void CGoOutMenu::Calc()
         field_0x34 = -1;
         field_0x38 = 0;
         SetMainMode(1);
-        menuPcsLayout.m_transferSaveData = static_cast<Mc::SaveDat*>(
-            __nw__FUlPQ27CMemory6CStagePci(0x8BD0, MenuPcs.m_menuStage, const_cast<char*>(s_gooutCpp), 0x32B));
-        menuPcsLayout.m_transferWork =
-            __nw__FUlPQ27CMemory6CStagePci(0x8BD0, MenuPcs.m_menuStage, const_cast<char*>(s_gooutCpp), 0x32D);
+        menuPcsLayout.m_transferSaveData =
+            reinterpret_cast<Mc::SaveDat*>(new (MenuPcs.m_menuStage, const_cast<char*>(s_gooutCpp), 0x32B) unsigned char[0x8BD0]);
+        menuPcsLayout.m_transferWork = new (MenuPcs.m_menuStage, const_cast<char*>(s_gooutCpp), 0x32D) unsigned char[0x8BD0];
         menuPcsLayout.m_transferWorkActive = 0;
         menuPcsLayout.m_unknown_888 = 0;
         menuPcsLayout.m_saveLoadMode = 0;
@@ -1904,11 +1902,11 @@ void CGoOutMenu::Calc()
                     MenuGoOutState(menuPcsLayout).m_resultSelect = -1;
 
                     if (menuPcsLayout.m_transferSaveData != 0) {
-                        __dl__FPv(menuPcsLayout.m_transferSaveData);
+                        delete[] reinterpret_cast<unsigned char*>(menuPcsLayout.m_transferSaveData);
                         menuPcsLayout.m_transferSaveData = 0;
                     }
                     if (menuPcsLayout.m_transferWork != 0) {
-                        __dl__FPv(menuPcsLayout.m_transferWork);
+                        delete[] static_cast<unsigned char*>(menuPcsLayout.m_transferWork);
                         menuPcsLayout.m_transferWork = 0;
                     }
 

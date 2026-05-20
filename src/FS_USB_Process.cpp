@@ -9,8 +9,6 @@
 
 #include <string.h>
 
-extern "C" void* __nw__FUlPQ27CMemory6CStagePci(u32 size, CMemory::CStage* stage, char* file, int line);
-
 extern "C" const char s_FS_USB_Process_cpp_801D7E80[] = "FS_USB_Process.cpp";
 
 namespace {
@@ -137,7 +135,8 @@ void CFunnyShapePcs::SetUSBData()
             new (FunnyShapePcs.m_viewerStage, const_cast<char*>(s_FS_USB_Process_cpp_801D7E80), 0x55)
                 u8[usb->m_sizeBytes]);
         m_textureHeaders[m_textureCount] =
-            __nw__FUlPQ27CMemory6CStagePci(0x30, FunnyShapePcs.m_viewerStage, const_cast<char*>(s_FS_USB_Process_cpp_801D7E80), 0x57);
+            new (FunnyShapePcs.m_viewerStage, const_cast<char*>(s_FS_USB_Process_cpp_801D7E80), 0x57)
+                OSFS_TEXTURE_ST;
 
         memcpy(tmp, usb->m_data, usb->m_sizeBytes);
         tmp[0] = LoadSwap16(tmp[0]);
@@ -160,8 +159,9 @@ void CFunnyShapePcs::SetUSBData()
         memcpy(m_textureData[m_textureCount], tmp + 0x18, usb->m_sizeBytes - 0x30);
         DCFlushRange(m_textureData[m_textureCount], usb->m_sizeBytes - 0x30);
 
-        m_texObjData[m_textureCount] = __nw__FUlPQ27CMemory6CStagePci(
-            0x20, FunnyShapePcs.m_viewerStage, const_cast<char*>(s_FS_USB_Process_cpp_801D7E80), 0x73);
+        m_texObjData[m_textureCount] =
+            new (FunnyShapePcs.m_viewerStage, const_cast<char*>(s_FS_USB_Process_cpp_801D7E80), 0x73)
+                GXTexObj;
         GXInitTexObj(static_cast<GXTexObj*>(m_texObjData[m_textureCount]), m_textureData[m_textureCount], tmp[2], tmp[3], GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
 
         m_textureCount++;

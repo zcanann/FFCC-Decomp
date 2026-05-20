@@ -968,66 +968,66 @@ void CMapObj::SetShow_r(int show)
     CMapObj* root = this;
 
     do {
-        if (show == 0) {
-            U8At(root, 0x18) &= 0xFE;
-        } else {
+        if (show != 0) {
             U8At(root, 0x18) |= 1;
+        } else {
+            U8At(root, 0x18) &= 0xFE;
         }
 
         for (CMapObj* c0 = root->m_child; c0 != 0; c0 = c0->m_next) {
-            if (show == 0) {
-                U8At(c0, 0x18) &= 0xFE;
-            } else {
+            if (show != 0) {
                 U8At(c0, 0x18) |= 1;
+            } else {
+                U8At(c0, 0x18) &= 0xFE;
             }
 
             for (CMapObj* c1 = c0->m_child; c1 != 0; c1 = c1->m_next) {
-                if (show == 0) {
-                    U8At(c1, 0x18) &= 0xFE;
-                } else {
+                if (show != 0) {
                     U8At(c1, 0x18) |= 1;
+                } else {
+                    U8At(c1, 0x18) &= 0xFE;
                 }
 
                 for (CMapObj* c2 = c1->m_child; c2 != 0; c2 = c2->m_next) {
-                    if (show == 0) {
-                        U8At(c2, 0x18) &= 0xFE;
-                    } else {
+                    if (show != 0) {
                         U8At(c2, 0x18) |= 1;
+                    } else {
+                        U8At(c2, 0x18) &= 0xFE;
                     }
 
                     for (CMapObj* c3 = c2->m_child; c3 != 0; c3 = c3->m_next) {
-                        if (show == 0) {
-                            U8At(c3, 0x18) &= 0xFE;
-                        } else {
+                        if (show != 0) {
                             U8At(c3, 0x18) |= 1;
+                        } else {
+                            U8At(c3, 0x18) &= 0xFE;
                         }
 
                         for (CMapObj* c4 = c3->m_child; c4 != 0; c4 = c4->m_next) {
-                            if (show == 0) {
-                                U8At(c4, 0x18) &= 0xFE;
-                            } else {
+                            if (show != 0) {
                                 U8At(c4, 0x18) |= 1;
+                            } else {
+                                U8At(c4, 0x18) &= 0xFE;
                             }
 
                             for (CMapObj* c5 = c4->m_child; c5 != 0; c5 = c5->m_next) {
-                                if (show == 0) {
-                                    U8At(c5, 0x18) &= 0xFE;
-                                } else {
+                                if (show != 0) {
                                     U8At(c5, 0x18) |= 1;
+                                } else {
+                                    U8At(c5, 0x18) &= 0xFE;
                                 }
 
                                 for (CMapObj* c6 = c5->m_child; c6 != 0; c6 = c6->m_next) {
-                                    if (show == 0) {
-                                        U8At(c6, 0x18) &= 0xFE;
-                                    } else {
+                                    if (show != 0) {
                                         U8At(c6, 0x18) |= 1;
+                                    } else {
+                                        U8At(c6, 0x18) &= 0xFE;
                                     }
 
                                     for (CMapObj* c7 = c6->m_child; c7 != 0; c7 = c7->m_next) {
-                                        if (show == 0) {
-                                            U8At(c7, 0x18) &= 0xFE;
-                                        } else {
+                                        if (show != 0) {
                                             U8At(c7, 0x18) |= 1;
+                                        } else {
+                                            U8At(c7, 0x18) &= 0xFE;
                                         }
 
                                         if (c7->m_child != 0) {
@@ -1876,7 +1876,8 @@ CMapObjAtrMime::CMapObjAtrMime()
  */
 void CMapObj::SetCalcMtx()
 {
-	// TODO
+    m_calcMtxPending = 1;
+    m_localMtxDirty = 1;
 }
 
 /*

@@ -2161,7 +2161,7 @@ int RedDmaSearchID(int id)
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void RedDmaClearID(int id)
+void RedDmaClearID(int id)
 {
     int queueId;
     RedDmaRequest* queueEnd;
@@ -2187,7 +2187,7 @@ inline void RedDmaClearID(int id)
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void RedSetDMAMode(int mode)
+void RedSetDMAMode(int mode)
 {
     RedDmaModeSet(mode);
 }

@@ -1397,7 +1397,7 @@ void CSound::LoadWave(int waveId)
                     sound.m_waveState = 0;
                     sound.m_waveID = -1;
                     sound.m_waveSyncMode = 1;
-                    while (waveFile != 0) {
+                    while (((u32)__cntlzw((u32)waveFile) >> 5) == 0) {
                         loadWaveFrame();
                     }
                 }

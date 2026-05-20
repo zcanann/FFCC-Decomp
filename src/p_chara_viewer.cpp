@@ -85,14 +85,11 @@ extern "C" void DestroyStage__7CMemoryFPQ27CMemory6CStage(void*, void*);
 extern "C" void* CreateStage__7CMemoryFUlPci(void*, unsigned long, const char*, int);
 extern "C" void* createTextureSet__9CCharaPcsFPvi(void*, void*, int);
 extern "C" void Printf__7CSystemFPce(void*, const char*, ...);
-extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, void*, char*, int);
-extern "C" void* __ct__Q26CChara6CModelFv(void*);
 extern "C" void Create__Q26CChara6CModelFPvPQ27CMemory6CStage(void*, void*, void*);
 extern "C" void CreateDynamics__Q26CChara6CModelFPvPQ27CMemory6CStage(void*, void*, void*);
 extern "C" void AttachTextureSet__Q26CChara6CModelFP11CTextureSet(void*, void*);
 extern "C" void AttachAnim__Q26CChara6CModelFPQ26CChara5CAnimiii(void*, void*, int, int, int);
 extern "C" void SetFrame__Q26CChara6CModelFf(float, void*);
-extern "C" void* __ct__Q26CChara5CAnimFv(void*);
 extern "C" void Create__Q26CChara5CAnimFPvPQ27CMemory6CStage(void*, void*, void*);
 extern "C" void __ct__Q29CLightPcs10CBumpLightFv(void*);
 extern "C" float FLOAT_80330BEC;
@@ -408,12 +405,8 @@ void CCharaPcs::calcViewer()
 
                 File.Read(fileHandle);
                 File.SyncCompleted(fileHandle);
-                CChara::CModel* model = reinterpret_cast<CChara::CModel*>(__nw__FUlPQ27CMemory6CStagePci(
-                    0x124, CharaPcs.m_stage,
-                    const_cast<char*>(s_p_chara_viewer_cpp), 0xEA));
-                if (model != 0) {
-                    model = reinterpret_cast<CChara::CModel*>(__ct__Q26CChara6CModelFv(model));
-                }
+                CChara::CModel* model =
+                    new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_viewer_cpp), 0xEA) CChara::CModel;
                 self->m_viewerModel[0] = model;
                 Create__Q26CChara6CModelFPvPQ27CMemory6CStage(
                     self->m_viewerModel[0], File.m_readBuffer, self->m_viewerModelStage);
@@ -455,12 +448,8 @@ void CCharaPcs::calcViewer()
                     if (fileHandle != 0) {
                         File.Read(fileHandle);
                         File.SyncCompleted(fileHandle);
-                        CChara::CAnim* anim = reinterpret_cast<CChara::CAnim*>(__nw__FUlPQ27CMemory6CStagePci(
-                            0x30, CharaPcs.m_stage,
-                            const_cast<char*>(s_p_chara_viewer_cpp), 0x124));
-                        if (anim != 0) {
-                            anim = reinterpret_cast<CChara::CAnim*>(__ct__Q26CChara5CAnimFv(anim));
-                        }
+                        CChara::CAnim* anim =
+                            new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_viewer_cpp), 0x124) CChara::CAnim;
                         self->m_viewerAnimBank[idx] = anim;
                         Create__Q26CChara5CAnimFPvPQ27CMemory6CStage(
                             self->m_viewerAnimBank[idx], File.m_readBuffer, self->m_viewerAnimStage);
@@ -479,12 +468,8 @@ void CCharaPcs::calcViewer()
                 if (fileHandle != 0) {
                     File.Read(fileHandle);
                     File.SyncCompleted(fileHandle);
-                    CChara::CAnim* anim = reinterpret_cast<CChara::CAnim*>(__nw__FUlPQ27CMemory6CStagePci(
-                        0x30, CharaPcs.m_stage,
-                        const_cast<char*>(s_p_chara_viewer_cpp), 0x111));
-                    if (anim != 0) {
-                        anim = reinterpret_cast<CChara::CAnim*>(__ct__Q26CChara5CAnimFv(anim));
-                    }
+                    CChara::CAnim* anim =
+                        new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_viewer_cpp), 0x111) CChara::CAnim;
                     self->m_viewerAnim[0] = anim;
                     Create__Q26CChara5CAnimFPvPQ27CMemory6CStage(
                         self->m_viewerAnim[0], File.m_readBuffer, self->m_viewerAnimStage);

@@ -151,6 +151,45 @@ static inline float calc_direction_speed(float speed, u8 mode)
 	}
 }
 
+static inline void calc_spawn_position(Vec* out, float speed, u8 mode)
+{
+	float halfSpeed = FLOAT_80330478 * speed;
+
+	switch (mode) {
+	case 1:
+		(void)Math.RandF();
+		out->x = speed * Math.RandF() - halfSpeed;
+		out->y = speed * Math.RandF() - halfSpeed;
+		out->z = speed * Math.RandF() - halfSpeed;
+		break;
+	case 2:
+		out->x = speed * Math.RandF() * Math.RandF() - halfSpeed;
+		out->y = speed * Math.RandF() * Math.RandF() - halfSpeed;
+		out->z = speed * Math.RandF() * Math.RandF() - halfSpeed;
+		break;
+	case 3:
+		out->x = -(FLOAT_80330474 * (speed * Math.RandF() * Math.RandF()) - speed) - halfSpeed;
+		out->y = -(FLOAT_80330474 * (speed * Math.RandF() * Math.RandF()) - speed) - halfSpeed;
+		out->z = -(FLOAT_80330474 * (speed * Math.RandF() * Math.RandF()) - speed) - halfSpeed;
+		break;
+	case 4:
+		out->x = Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF() * speed - halfSpeed;
+		out->y = Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF() * speed - halfSpeed;
+		out->z = Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF() * speed - halfSpeed;
+		break;
+	case 5:
+		out->x = -(FLOAT_80330478 * (Math.RandF() * (speed * Math.RandF() * Math.RandF())) - speed) - halfSpeed;
+		out->y = -(FLOAT_80330478 * (Math.RandF() * (speed * Math.RandF() * Math.RandF())) - speed) - halfSpeed;
+		out->z = -(FLOAT_80330478 * (Math.RandF() * (speed * Math.RandF() * Math.RandF())) - speed) - halfSpeed;
+		break;
+	default:
+		out->x = speed * Math.RandF() - halfSpeed;
+		out->y = speed * Math.RandF() - halfSpeed;
+		out->z = speed * Math.RandF() - halfSpeed;
+		break;
+	}
+}
+
 static inline signed char random_signed_byte_span(u8 span)
 {
 	return (signed char)((s32)((float)(span << 1) * Math.RandF() - (float)(span >> 1)));
@@ -890,9 +929,10 @@ void birth(
 		if (speed != kPppRyjMegaBirthZero) {
 			u8 speedMode = payload[0xE8];
 
-			*f32_at(particlePayload, 0x00) = calc_spawn_speed(speed, speedMode) * *f32_at(payload, 0xD8);
-			*f32_at(particlePayload, 0x04) = calc_spawn_speed(speed, speedMode) * *f32_at(payload, 0xDC);
-			*f32_at(particlePayload, 0x08) = calc_spawn_speed(speed, speedMode) * *f32_at(payload, 0xE0);
+			calc_spawn_position((Vec*)particlePayload, speed, speedMode);
+			*f32_at(particlePayload, 0x00) = *f32_at(particlePayload, 0x00) * *f32_at(payload, 0xD8);
+			*f32_at(particlePayload, 0x04) = *f32_at(particlePayload, 0x04) * *f32_at(payload, 0xDC);
+			*f32_at(particlePayload, 0x08) = *f32_at(particlePayload, 0x08) * *f32_at(payload, 0xE0);
 		}
 	} else if (*(s8*)(payload + 0x2A) < 10) {
 		u8 speedMode = payload[0xE8];
@@ -978,17 +1018,17 @@ void birth(
 		}
 	}
 
-	*f32_at(particlePayload, 0x34) = *f32_at(payload, 0x60);
-	*f32_at(particlePayload, 0x38) = *f32_at(payload, 0x5C);
-	*f32_at(particlePayload, 0x3C) = *f32_at(payload, 0x68);
-	*f32_at(particlePayload, 0x40) = *f32_at(payload, 0x6C);
+	*f32_at(particlePayload, 0x34) = *f32_at(payload, 0x50);
+	*f32_at(particlePayload, 0x38) = *f32_at(payload, 0x54);
+	*f32_at(particlePayload, 0x3C) = *f32_at(payload, 0x60);
+	*f32_at(particlePayload, 0x40) = *f32_at(payload, 0x64);
 
 	if (payload[0xEA] != 0) {
 		if ((payload[0xEA] & 0x20) == 0) {
-			*f32_at(particlePayload, 0x44) = *f32_at(payload, 0x78) * Math.RandF();
-			*f32_at(particlePayload, 0x48) = *f32_at(payload, 0x7C) * Math.RandF();
+			*f32_at(particlePayload, 0x44) = *f32_at(payload, 0x80) * Math.RandF();
+			*f32_at(particlePayload, 0x48) = *f32_at(payload, 0x84) * Math.RandF();
 		} else {
-			float randomRotation = *f32_at(payload, 0x78) * Math.RandF();
+			float randomRotation = *f32_at(payload, 0x80) * Math.RandF();
 			*f32_at(particlePayload, 0x44) = randomRotation;
 			*f32_at(particlePayload, 0x48) = randomRotation;
 		}
@@ -1017,9 +1057,6 @@ void birth(
 	} else {
 		*(s16*)(particlePayload + 0x22) = life;
 	}
-	*(u16*)(particlePayload + 0x1C) = 0;
-	*(u16*)(particlePayload + 0x1E) = 0;
-	*(u16*)(particlePayload + 0x20) = 0;
 	*(u8*)(particlePayload + 0x58) = 0;
 
 	if (worldMat != NULL) {

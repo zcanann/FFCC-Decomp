@@ -32,9 +32,9 @@ static int m_ADataBufferSize;
 static RedMemoryBlock* volatile m_MemoryBank;
 static RedMemoryBlock* volatile m_AMemoryBank;
 
-const char s_redMemoryMainBankFullFmt[] = "%s%sMemory Bank Full !!%s\n";
+const char sRedMemoryMainBankFullFmt[] = "%s%sMemory Bank Full !!%s\n";
 const char sRedMemoryLogPrefix[] = "\x1b[7;34mSound\x1b[0m:";
-const char s_redMemoryAuxBankFullFmt[] = "%s%sA-Memory Bank Full !!%s\n";
+const char sRedMemoryAuxBankFullFmt[] = "%s%sA-Memory Bank Full !!%s\n";
 const char sRedMemoryLogErrorColor[] = "\x1b[7;31m";
 const char sRedMemoryLogReset[] = "\x1b[0m";
 
@@ -82,14 +82,14 @@ enum RedMemorySmallDataLayout {
 	REDSOUND_MEMORY_SBSS_SIZE = sizeof(RedMemorySmallDataState),
 };
 
-STATIC_ASSERT(sizeof(s_redMemoryMainBankFullFmt) == REDSOUND_MEMORY_MAIN_BANK_FULL_FMT_SIZE);
+STATIC_ASSERT(sizeof(sRedMemoryMainBankFullFmt) == REDSOUND_MEMORY_MAIN_BANK_FULL_FMT_SIZE);
 STATIC_ASSERT(sizeof(sRedMemoryLogPrefix) == REDSOUND_MEMORY_LOG_PREFIX_SIZE);
-STATIC_ASSERT(sizeof(s_redMemoryAuxBankFullFmt) == REDSOUND_MEMORY_AUX_BANK_FULL_FMT_SIZE);
+STATIC_ASSERT(sizeof(sRedMemoryAuxBankFullFmt) == REDSOUND_MEMORY_AUX_BANK_FULL_FMT_SIZE);
 STATIC_ASSERT(sizeof(sRedMemoryLogErrorColor) == REDSOUND_MEMORY_LOG_ERROR_COLOR_SIZE);
 STATIC_ASSERT(sizeof(sRedMemoryLogReset) == REDSOUND_MEMORY_LOG_RESET_SIZE);
-STATIC_ASSERT(sizeof(s_redMemoryMainBankFullFmt) + sizeof(sRedMemoryLogPrefix) +
-                  sizeof(s_redMemoryAuxBankFullFmt) ==
-              REDSOUND_MEMORY_RODATA_STRING_SIZE);
+STATIC_ASSERT(sizeof(sRedMemoryMainBankFullFmt) + sizeof(sRedMemoryLogPrefix) +
+                  sizeof(sRedMemoryAuxBankFullFmt) ==
+                  REDSOUND_MEMORY_RODATA_STRING_SIZE);
 STATIC_ASSERT(REDSOUND_MEMORY_MAP_RODATA_STRING_OFFSET == 0);
 STATIC_ASSERT(REDSOUND_MEMORY_RODATA_STRING_SIZE == REDSOUND_MEMORY_MAP_RODATA_STRING_SIZE);
 STATIC_ASSERT(sizeof(sRedMemoryLogErrorColor) + sizeof(sRedMemoryLogReset) == REDSOUND_MEMORY_SDATA2_STRING_SIZE);
@@ -182,7 +182,7 @@ int RedNew(int size)
 		if ((slot->m_size == REDSOUND_MEMORY_BLOCK_SIZE_EMPTY) || ((address + size) <= slot->m_address)) {
 			if (RedMemoryBankGetLast(m_MemoryBank)->m_size > REDSOUND_MEMORY_BLOCK_SIZE_EMPTY) {
 				if (RedReportPrintIsEnabled()) {
-					OSReport(s_redMemoryMainBankFullFmt, sRedMemoryLogPrefix, sRedMemoryLogErrorColor,
+					OSReport(sRedMemoryMainBankFullFmt, sRedMemoryLogPrefix, sRedMemoryLogErrorColor,
 					         sRedMemoryLogReset);
 					fflush(__files + 1);
 				}
@@ -350,7 +350,7 @@ int RedNewA(int size, int offset, int maxSize)
 	}
 	if (RedMemoryBankGetLast(m_AMemoryBank)->m_size > REDSOUND_MEMORY_BLOCK_SIZE_EMPTY) {
 		if (RedReportPrintIsEnabled()) {
-			OSReport(s_redMemoryAuxBankFullFmt, sRedMemoryLogPrefix, sRedMemoryLogErrorColor, sRedMemoryLogReset);
+			OSReport(sRedMemoryAuxBankFullFmt, sRedMemoryLogPrefix, sRedMemoryLogErrorColor, sRedMemoryLogReset);
 			fflush(__files + 1);
 		}
 		return REDSOUND_MEMORY_ADDRESS_NONE;

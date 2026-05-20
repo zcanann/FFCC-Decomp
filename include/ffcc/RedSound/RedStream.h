@@ -91,6 +91,10 @@ struct RedStreamFile {
 
 #define RedStreamHeaderFromData(streamData) reinterpret_cast<RedStreamHEAD*>(streamData)
 #define RedStreamFileFromHeader(streamHeader) reinterpret_cast<RedStreamFile*>(streamHeader)
+#define RedStreamHeaderHasValidSignature(header)                                                   \
+    ((header)->m_signature[REDSOUND_STREAM_SIGNATURE_0_INDEX] == REDSOUND_STREAM_SIGNATURE_0 &&    \
+     (header)->m_signature[REDSOUND_STREAM_SIGNATURE_1_INDEX] == REDSOUND_STREAM_SIGNATURE_1 &&    \
+     (header)->m_signature[REDSOUND_STREAM_SIGNATURE_2_INDEX] == REDSOUND_STREAM_SIGNATURE_2)
 #define RedStreamFileGetAdpcm(streamFile, channel) (&(streamFile)->m_adpcm[(channel)])
 #define RedStreamAdpcmHeaderGetChannel(headerData, channel) ((headerData) + (channel))
 #define RedStreamFileGetSampleByte(streamFile, offset) ((s8*)(streamFile))[(offset)]

@@ -75,8 +75,8 @@ extern float FLOAT_80331b08;
 extern float FLOAT_8032EE80;
 extern float FLOAT_8032EE84;
 
-GhostPartyWork CGPartyObj::m_ghostWork;
-#define sGhostPartyWork CGPartyObj::m_ghostWork
+unsigned char CGPartyObj::m_ghostWork[0x90];
+#define sGhostPartyWork (*reinterpret_cast<GhostPartyWork*>(CGPartyObj::m_ghostWork))
 
 struct BossGhostPartyCounters {
 	unsigned char _pad0[0x24];
@@ -85,7 +85,7 @@ struct BossGhostPartyCounters {
 	int thresholdC;
 };
 
-#define sBossGhostPartyCounters (*reinterpret_cast<BossGhostPartyCounters*>(&CGPartyObj::m_ghostWork))
+#define sBossGhostPartyCounters (*reinterpret_cast<BossGhostPartyCounters*>(CGPartyObj::m_ghostWork))
 
 struct PartyObjFlags {
 	unsigned char commandActive : 1;

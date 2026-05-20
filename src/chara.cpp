@@ -2440,7 +2440,12 @@ CChara::CNode::CNode()
 	*(u32*)((u8*)this + 0x4) = 0;
 	*(u32*)((u8*)this + 0x9C) = 0;
 	*(u32*)((u8*)this + 0xA0) = 0;
-	*(u8*)((u8*)this + 0xBC) = (*(u8*)((u8*)this + 0xBC) & 0x7F) | 0x80;
+	static const u8 clearMask = 0x7F;
+	static const u8 setMask = 0x80;
+	u8 flags = *(u8*)((u8*)this + 0xBC);
+	flags &= clearMask;
+	flags |= setMask;
+	*(u8*)((u8*)this + 0xBC) = flags;
 }
 
 /*

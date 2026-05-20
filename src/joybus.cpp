@@ -601,8 +601,7 @@ void JoyBus::ThreadMain(void* arg)
     unsigned int localCmd = 0;
     unsigned char localBuf[4] = {};
 
-    threadParam->m_gbaStatus = 0;
-    // TODO: threadParam->m_gbaStatus = GBAReset(threadParam->m_portIndex, &threadParam->m_unk3);
+    threadParam->m_gbaStatus = GBAReset(threadParam->m_portIndex, &threadParam->m_unk3);
 
     ThreadSleep((OS_BUS_CLOCK / 4000) * 0xF);
     stateStartTime = OSGetTime();
@@ -768,8 +767,9 @@ void JoyBus::ThreadMain(void* arg)
 
             ResetQueue(threadParam);
 
-            threadParam->m_gbaStatus = 0;
-            // TODO: threadParam->m_gbaStatus = GBAJoyBoot(port, port << 1, 2, m_gbaBootParamA, m_gbaBootParamB, &threadParam->m_unk3);
+            threadParam->m_gbaStatus =
+                GBAJoyBoot(port, port << 1, 2, reinterpret_cast<unsigned char*>(m_gbaBootImage), m_gbaBootImageSize,
+                           &threadParam->m_unk3);
 
             if (threadParam->m_gbaStatus == 3 && (threadParam->m_unk3 & 0x10) != 0)
             {
@@ -841,8 +841,7 @@ void JoyBus::ThreadMain(void* arg)
 
             ResetQueue(threadParam);
 
-            threadParam->m_gbaStatus = 0;
-            // TODO: threadParam->m_gbaStatus = GBAReset(threadParam->m_portIndex, &threadParam->m_unk3);
+            threadParam->m_gbaStatus = GBAReset(threadParam->m_portIndex, &threadParam->m_unk3);
 
             if (threadParam->m_gbaStatus == 0)
             {
@@ -1193,14 +1192,13 @@ int JoyBus::RecvGBA(ThreadParam* threadParam, unsigned int* recvBuffer)
 
     bool isSingle = GbaQue.IsSingleMode(port);
 
-    if (!isSingle || port == 1)
+    if (isSingle && port != 1)
     {
-        // TODO: threadParam->m_gbaStatus = GBAGetStatus(port, &threadParam->m_unk3);
-        threadParam->m_gbaStatus = (int)this; // GBAGetStatus(port, &threadParam->m_unk3);
+        threadParam->m_gbaStatus = 0;
     }
     else
     {
-        threadParam->m_gbaStatus = 0;
+        threadParam->m_gbaStatus = GBAGetStatus(port, &threadParam->m_unk3);
     }
 
     if (threadParam->m_gbaStatus != 0)
@@ -1220,8 +1218,7 @@ int JoyBus::RecvGBA(ThreadParam* threadParam, unsigned int* recvBuffer)
 
     unsigned int data = 0;
 
-    // TODO: threadParam->m_gbaStatus = GBARead(port, &data, &threadParam->m_unk3);
-    threadParam->m_gbaStatus = (int)this; // GBARead(port, &data, &threadParam->m_unk3);
+    threadParam->m_gbaStatus = GBARead(port, (unsigned char*)&data, &threadParam->m_unk3);
 
     if (threadParam->m_gbaStatus != 0)
     {
@@ -5536,14 +5533,13 @@ int JoyBus::GetGBAStat(ThreadParam* threadParam)
 {
     bool single = GbaQue.IsSingleMode(threadParam->m_portIndex);
 
-    if (!single || threadParam->m_portIndex == 1)
+    if (single && threadParam->m_portIndex != 1)
     {
-		// TODO // GBAGetStatus(threadParam->m_portIndex, &threadParam->m_unk3);
-        threadParam->m_gbaStatus = (int)this;
+        threadParam->m_gbaStatus = 0;
     }
     else
     {
-        threadParam->m_gbaStatus = 0;
+        threadParam->m_gbaStatus = GBAGetStatus(threadParam->m_portIndex, &threadParam->m_unk3);
     }
 
     return threadParam->m_gbaStatus;

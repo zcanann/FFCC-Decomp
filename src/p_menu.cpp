@@ -601,12 +601,11 @@ void CMenuPcs::loadFont(int type, char* path, int slot, int tlutMode)
             for (int tlutIndex = 0; tlutIndex < 0x1C; tlutIndex++) {
                 float blend = 0.0f;
                 float blendInv = 0.0f;
-                _GXColor tlutColor = {
-                    static_cast<u8>(0xFF - color[colorIndex]),
-                    static_cast<u8>(0xFF - color[colorIndex]),
-                    static_cast<u8>(0xFF - color[colorIndex]),
-                    alpha1[colorIndex],
-                };
+                _GXColor tlutColor;
+                tlutColor.r = static_cast<u8>(0xFF - color[colorIndex]);
+                tlutColor.g = static_cast<u8>(0xFF - color[colorIndex]);
+                tlutColor.b = static_cast<u8>(0xFF - color[colorIndex]);
+                tlutColor.a = alpha1[colorIndex];
 
                 if (colorIndex < 8) {
                     tlutColor.r = palette[tlutIndex].highlight.r;
@@ -615,12 +614,12 @@ void CMenuPcs::loadFont(int type, char* path, int slot, int tlutMode)
                 } else {
                     blend = LoadFloat(FLOAT_80330808) - static_cast<float>(colorIndex - 8) * LoadFloat(FLOAT_8033086C);
                     blendInv = LoadFloat(FLOAT_80330808) - blend;
-                    tlutColor.r = static_cast<u8>(static_cast<float>(palette[tlutIndex].shadow.r) * blendInv +
-                                                  static_cast<float>(palette[tlutIndex].highlight.r) * blend);
-                    tlutColor.g = static_cast<u8>(static_cast<float>(palette[tlutIndex].shadow.g) * blendInv +
-                                                  static_cast<float>(palette[tlutIndex].highlight.g) * blend);
-                    tlutColor.b = static_cast<u8>(static_cast<float>(palette[tlutIndex].shadow.b) * blendInv +
-                                                  static_cast<float>(palette[tlutIndex].highlight.b) * blend);
+                    tlutColor.r = static_cast<u8>(static_cast<float>(palette[tlutIndex].highlight.r) * blend +
+                                                  static_cast<float>(palette[tlutIndex].shadow.r) * blendInv);
+                    tlutColor.g = static_cast<u8>(static_cast<float>(palette[tlutIndex].highlight.g) * blend +
+                                                  static_cast<float>(palette[tlutIndex].shadow.g) * blendInv);
+                    tlutColor.b = static_cast<u8>(static_cast<float>(palette[tlutIndex].highlight.b) * blend +
+                                                  static_cast<float>(palette[tlutIndex].shadow.b) * blendInv);
                 }
 
                 m_fonts[slot]->SetTlutColor(tlutIndex, colorIndex, tlutColor);

@@ -1845,15 +1845,10 @@ int CAmemCacheSet::SetData(void* src, int size, CAmemCache::TYPE type, int dmaCo
     entry.m_dmaCopy = static_cast<unsigned char>(dmaCopy);
     entry.m_refCount = 0;
 
-    if (dmaCopy == 0) {
-        while (true) {
-            entry.m_workData = m_rStage->alloc(allocSize, const_cast<char*>(s_memory_cpp), 0x807, 1);
-            if (entry.m_workData != 0) {
-                break;
-            }
-            AmemFreeLowPrio(allocSize);
-        }
-
+    if (dmaCopy != 0) {
+        m_amemPrev = m_amemCursor;
+        m_amemCursor += allocSize;
+        entry.m_workData = reinterpret_cast<void*>(m_amemPrev);
         entry.m_cacheData = 0;
         entry.m_size = static_cast<int>(allocSize);
 
@@ -1871,7 +1866,7 @@ int CAmemCacheSet::SetData(void* src, int size, CAmemCache::TYPE type, int dmaCo
 
                 remainingBytes &= 7;
                 if (remainingBytes == 0) {
-                    goto checksum_done_copy;
+                    goto checksum_done_dma;
                 }
             }
 
@@ -1882,7 +1877,7 @@ int CAmemCacheSet::SetData(void* src, int size, CAmemCache::TYPE type, int dmaCo
             } while (remainingBytes != 0);
         }
 
-    checksum_done_copy:
+    checksum_done_dma:
         entry.m_checksum = checksum;
 
         if (entry.m_dmaCopy == 0) {
@@ -1899,13 +1894,17 @@ int CAmemCacheSet::SetData(void* src, int size, CAmemCache::TYPE type, int dmaCo
             }
         }
 
-        DCFlushRange(entry.m_workData, allocSize);
         return index;
     }
 
-    m_amemPrev = m_amemCursor;
-    m_amemCursor += allocSize;
-    entry.m_workData = reinterpret_cast<void*>(m_amemPrev);
+    while (true) {
+        entry.m_workData = m_rStage->alloc(allocSize, const_cast<char*>(s_memory_cpp), 0x807, 1);
+        if (entry.m_workData != 0) {
+            break;
+        }
+        AmemFreeLowPrio(allocSize);
+    }
+
     entry.m_cacheData = 0;
     entry.m_size = static_cast<int>(allocSize);
 
@@ -1923,7 +1922,7 @@ int CAmemCacheSet::SetData(void* src, int size, CAmemCache::TYPE type, int dmaCo
 
             remainingBytes &= 7;
             if (remainingBytes == 0) {
-                goto checksum_done_dma;
+                goto checksum_done_copy;
             }
         }
 
@@ -1934,7 +1933,7 @@ int CAmemCacheSet::SetData(void* src, int size, CAmemCache::TYPE type, int dmaCo
         } while (remainingBytes != 0);
     }
 
-checksum_done_dma:
+checksum_done_copy:
     entry.m_checksum = checksum;
 
     if (entry.m_dmaCopy == 0) {
@@ -1951,6 +1950,7 @@ checksum_done_dma:
         }
     }
 
+    DCFlushRange(entry.m_workData, allocSize);
     return index;
 }
 

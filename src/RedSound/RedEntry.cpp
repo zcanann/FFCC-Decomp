@@ -880,7 +880,7 @@ void CRedEntry::ClearWaveBank(int waveBankNo)
 				}
 			}
 		}
-	} else if ((waveBankNo >= 0) && (waveBankNo < REDSOUND_WAVE_PRIMARY_BANK_ENTRY_COUNT)) {
+	} else if (RedEntryWavePrimaryBankNoIsValid(waveBankNo)) {
 		WaveDelete(RedEntryWaveBankGet(this, waveBankNo));
 	}
 }
@@ -895,7 +895,7 @@ void CRedEntry::ClearWaveBank(int waveBankNo)
  */
 RedHistoryBANK* CRedEntry::GetWaveBank(int waveNo)
 {
-	if ((waveNo >= 0) && (waveNo < REDSOUND_WAVE_PRIMARY_BANK_ENTRY_COUNT))
+	if (RedEntryWavePrimaryBankNoIsValid(waveNo))
 	{
 		return RedEntryWaveBankGet(this, waveNo);
 	}

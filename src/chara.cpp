@@ -1243,70 +1243,48 @@ void CChara::CModel::setup()
  */
 CChara::CModel* CChara::CModel::Duplicate(CMemory::CStage* stage)
 {
-	if (ModelRef(this) == 0) {
-		return 0;
-	}
-
 	CModel* clone = new (stage, const_cast<char*>(s_chara_cpp_801d90c8), 0x25A) CModel();
-	if (clone == 0) {
-		return 0;
-	}
 
-	clone->Init();
 	*reinterpret_cast<void**>(ModelRaw(clone) + 0xA4) = ModelRef(this);
 	RetainRefCounted(ModelRef(clone));
 
 	const u16 nodeCount = ModelNodeCount(this);
-	if (nodeCount != 0) {
-		void* nodeBlock = __nwa__FUlPQ27CMemory6CStagePci(
-		    static_cast<unsigned long>(nodeCount) * 0xC0 + 0x10, stage, const_cast<char*>("chara.cpp"), 0x263);
-		CChara::CNode* cloneNodes = 0;
-		if (nodeBlock != 0) {
-			cloneNodes = reinterpret_cast<CChara::CNode*>(__construct_new_array(
-			    nodeBlock, reinterpret_cast<ConstructorDestructor>(__ct__Q26CChara5CNodeFv),
-			    reinterpret_cast<ConstructorDestructor>(__dt__Q26CChara5CNodeFv), 0xC0, nodeCount));
-		}
-		if (cloneNodes != 0) {
-			*reinterpret_cast<CChara::CNode**>(ModelRaw(clone) + 0xA8) = cloneNodes;
-			for (u32 i = 0; i < nodeCount; i++) {
-				CChara::CNode* dst = &cloneNodes[i];
-				CChara::CNode* src = &ModelNodes(this)[i];
-				*reinterpret_cast<void**>(dst) = *reinterpret_cast<void**>(src);
-				PSMTXCopy(reinterpret_cast<float(*)[4]>(reinterpret_cast<u8*>(src) + 8),
-				          reinterpret_cast<float(*)[4]>(reinterpret_cast<u8*>(dst) + 8));
-				PSMTXCopy(NodeWorldMtx(src), NodeWorldMtx(dst));
-				NodePreviousQuat(dst) = NodePreviousQuat(src);
-				NodePreviousPosition(dst) = NodePreviousPosition(src);
-				NodePreviousScale(dst) = NodePreviousScale(src);
-				NodeAnimNode0(dst) = 0;
-				NodeAnimNode1(dst) = 0;
-				NodeRuntimeFlags(dst) = (NodeRuntimeFlags(dst) & 0x7F) | (NodeRuntimeFlags(src) & 0x80);
-			}
-		}
+	void* nodeBlock = __nwa__FUlPQ27CMemory6CStagePci(
+	    static_cast<unsigned long>(nodeCount) * 0xC0 + 0x10, stage, const_cast<char*>("chara.cpp"), 0x263);
+	CChara::CNode* cloneNodes = reinterpret_cast<CChara::CNode*>(__construct_new_array(
+	    nodeBlock, reinterpret_cast<ConstructorDestructor>(__ct__Q26CChara5CNodeFv),
+	    reinterpret_cast<ConstructorDestructor>(__dt__Q26CChara5CNodeFv), 0xC0, nodeCount));
+	*reinterpret_cast<CChara::CNode**>(ModelRaw(clone) + 0xA8) = cloneNodes;
+	for (u32 i = 0; i < nodeCount; i++) {
+		CChara::CNode* dst = &cloneNodes[i];
+		CChara::CNode* src = &ModelNodes(this)[i];
+		*reinterpret_cast<void**>(dst) = *reinterpret_cast<void**>(src);
+		PSMTXCopy(reinterpret_cast<float(*)[4]>(reinterpret_cast<u8*>(src) + 8),
+		          reinterpret_cast<float(*)[4]>(reinterpret_cast<u8*>(dst) + 8));
+		PSMTXCopy(NodeWorldMtx(src), NodeWorldMtx(dst));
+		NodePreviousQuat(dst) = NodePreviousQuat(src);
+		NodePreviousPosition(dst) = NodePreviousPosition(src);
+		NodePreviousScale(dst) = NodePreviousScale(src);
+		NodeAnimNode0(dst) = 0;
+		NodeAnimNode1(dst) = 0;
+		NodeRuntimeFlags(dst) = (NodeRuntimeFlags(dst) & 0x7F) | (NodeRuntimeFlags(src) & 0x80);
 	}
 
 	const u16 meshCount = ModelMeshCount(this);
-	if (meshCount != 0) {
-		void* meshBlock = __nwa__FUlPQ27CMemory6CStagePci(
-		    static_cast<unsigned long>(meshCount) * 0x14 + 0x10, stage, const_cast<char*>("chara.cpp"), 0x26C);
-		CChara::CMesh* cloneMeshes = 0;
-		if (meshBlock != 0) {
-			cloneMeshes = reinterpret_cast<CChara::CMesh*>(__construct_new_array(
-			    meshBlock, reinterpret_cast<ConstructorDestructor>(__ct__Q26CChara5CMeshFv),
-			    reinterpret_cast<ConstructorDestructor>(__dt__Q26CChara5CMeshFv), 0x14, meshCount));
-		}
-		if (cloneMeshes != 0) {
-			*reinterpret_cast<CChara::CMesh**>(ModelRaw(clone) + 0xAC) = cloneMeshes;
-			for (u32 i = 0; i < meshCount; i++) {
-				CChara::CMesh* dst = &cloneMeshes[i];
-				CChara::CMesh* src = &reinterpret_cast<CChara::CMesh*>(ModelMeshes(this))[i];
-				u8* dstRaw = reinterpret_cast<u8*>(dst);
-				u8* srcRaw = reinterpret_cast<u8*>(src);
-				*reinterpret_cast<void**>(dstRaw) = *reinterpret_cast<void**>(srcRaw);
-				*reinterpret_cast<void**>(dstRaw + 4) = 0;
-				*reinterpret_cast<void**>(dstRaw + 8) = 0;
-			}
-		}
+	void* meshBlock = __nwa__FUlPQ27CMemory6CStagePci(
+	    static_cast<unsigned long>(meshCount) * 0x14 + 0x10, stage, const_cast<char*>("chara.cpp"), 0x26C);
+	CChara::CMesh* cloneMeshes = reinterpret_cast<CChara::CMesh*>(__construct_new_array(
+	    meshBlock, reinterpret_cast<ConstructorDestructor>(__ct__Q26CChara5CMeshFv),
+	    reinterpret_cast<ConstructorDestructor>(__dt__Q26CChara5CMeshFv), 0x14, meshCount));
+	*reinterpret_cast<CChara::CMesh**>(ModelRaw(clone) + 0xAC) = cloneMeshes;
+	for (u32 i = 0; i < meshCount; i++) {
+		CChara::CMesh* dst = &cloneMeshes[i];
+		CChara::CMesh* src = &reinterpret_cast<CChara::CMesh*>(ModelMeshes(this))[i];
+		u8* dstRaw = reinterpret_cast<u8*>(dst);
+		u8* srcRaw = reinterpret_cast<u8*>(src);
+		*reinterpret_cast<void**>(dstRaw) = *reinterpret_cast<void**>(srcRaw);
+		*reinterpret_cast<void**>(dstRaw + 4) = 0;
+		*reinterpret_cast<void**>(dstRaw + 8) = 0;
 	}
 
 	if (m_texSet != 0) {
@@ -1315,9 +1293,40 @@ CChara::CModel* CChara::CModel::Duplicate(CMemory::CStage* stage)
 	*reinterpret_cast<CTexAnimSet**>(ModelRaw(clone) + 0xD4) =
 	    (ModelTexAnimSet(this) != 0) ? ModelTexAnimSet(this)->Duplicate(stage) : 0;
 
-	if ((nodeCount == 0 || ModelNodes(clone) != 0) && (meshCount == 0 || ModelMeshes(clone) != 0)) {
-		clone->setup();
-	}
+	*(float*)(ModelRaw(clone) + 0xB4) = 0.0f;
+	*(float*)(ModelRaw(clone) + 0xB8) = 0.0f;
+	*(float*)(ModelRaw(clone) + 0xC4) = 0.0f;
+	*(float*)(ModelRaw(clone) + 0xC8) = 0.0f;
+	*(float*)(ModelRaw(clone) + 0xCC) = 0.0f;
+	*reinterpret_cast<u16*>(ModelRaw(clone) + 0xD8) = 0;
+	*reinterpret_cast<u16*>(ModelRaw(clone) + 0xDA) = 0;
+	*reinterpret_cast<u32*>(ModelRaw(clone) + 0x98) = 0xFFFFFFFF;
+	*(float*)(ModelRaw(clone) + 0xBC) = 0.0f;
+	*(float*)(ModelRaw(clone) + 0xC0) = 0.0f;
+	*(float*)(ModelRaw(clone) + 0xE0) = 0.0f;
+	*(float*)(ModelRaw(clone) + 0xDC) = 0.0f;
+	*(float*)(ModelRaw(clone) + 0x9C) = 1.0f;
+	*reinterpret_cast<void**>(ModelRaw(clone) + 0xE4) = 0;
+	*reinterpret_cast<void**>(ModelRaw(clone) + 0xE8) = 0;
+	*reinterpret_cast<void**>(ModelRaw(clone) + 0xEC) = 0;
+	*reinterpret_cast<void**>(ModelRaw(clone) + 0xF0) = 0;
+	*reinterpret_cast<void**>(ModelRaw(clone) + 0xF4) = 0;
+	*reinterpret_cast<void**>(ModelRaw(clone) + 0xF8) = 0;
+	*reinterpret_cast<void**>(ModelRaw(clone) + 0xFC) = 0;
+	*reinterpret_cast<void**>(ModelRaw(clone) + 0x100) = 0;
+	*reinterpret_cast<void**>(ModelRaw(clone) + 0x104) = 0;
+	*reinterpret_cast<void**>(ModelRaw(clone) + 0x108) = 0;
+	*(ModelRaw(clone) + 0x10C) = (*(ModelRaw(clone) + 0x10C) & 0x7F) | 0x80;
+	*(ModelRaw(clone) + 0xA0) &= 0x7F;
+	*(ModelRaw(clone) + 0xA0) &= 0xBF;
+	*(ModelRaw(clone) + 0xA0) = (*(ModelRaw(clone) + 0xA0) & 0xDF) | 0x20;
+	*(ModelRaw(clone) + 0x10C) &= 0xBF;
+	*(float*)(ModelRaw(clone) + 0x118) = 1.0f;
+	*(float*)(ModelRaw(clone) + 0x11C) = 1.0f;
+	*(ModelRaw(clone) + 0xA1) = 0;
+	*(float*)(ModelRaw(clone) + 0x120) = 0.0f;
+
+	clone->setup();
 	return clone;
 }
 

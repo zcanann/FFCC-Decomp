@@ -143,28 +143,33 @@ void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displa
 
     const unsigned int modeOffset = mode * 5;
 
-    _GXColor clearColor;
-    clearColor.r = 0;
-    clearColor.g = 0;
-    clearColor.b = 0;
-    clearColor.a = 0xFF;
+    _GXColor color;
+    GXLightObj lightObj;
+    Mtx44 orthoMtx;
+    Mtx cameraMtx;
+    Mtx objectMtx;
+    Mtx lightFrustumMtx;
+    Mtx tempMtx;
+
+    color.r = 0;
+    color.g = 0;
+    color.b = 0;
+    color.a = 0xFF;
     const Vec s_cameraPos = {0.0f, 0.0f, 6.0f};
     const Vec s_cameraUp = {0.0f, 1.0f, 0.0f};
     const Vec s_cameraLook = {0.0f, 0.0f, 0.0f};
 
-    gUtil.RenderColorQuad(0.0f, 0.0f, texWidth, texHeight, clearColor);
+    gUtil.RenderColorQuad(0.0f, 0.0f, texWidth, texHeight, color);
 
     const unsigned short rtWidth = GXGetTexObjWidth(targetTexObj);
     const unsigned short rtHeight = GXGetTexObjHeight(targetTexObj);
     const GXTexFmt targetFmt = GXGetTexObjFmt(targetTexObj);
     void* targetData = GXGetTexObjData(targetTexObj);
 
-    Mtx44 orthoMtx;
     C_MTXOrtho(orthoMtx, FLOAT_80331184, FLOAT_80331188, FLOAT_80331188, FLOAT_80331184, FLOAT_80331184,
                FLOAT_8033118C);
     GXSetProjection(orthoMtx, GX_ORTHOGRAPHIC);
 
-    Mtx cameraMtx;
     C_MTXLookAt(cameraMtx, &s_cameraPos, &s_cameraUp, &s_cameraLook);
     GXLoadPosMtxImm(cameraMtx, 0);
 
@@ -176,19 +181,17 @@ void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displa
 
     GXSetChanCtrl(GX_COLOR0A0, GX_ENABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT0, GX_DF_NONE, GX_AF_SPEC);
 
-    _GXColor whiteColor;
-    whiteColor.r = 0xFF;
-    whiteColor.g = 0xFF;
-    whiteColor.b = 0xFF;
-    whiteColor.a = 0xFF;
-    GXLightObj lightObj;
-    GXInitLightColor(&lightObj, whiteColor);
-    GXSetChanMatColor(GX_COLOR0A0, whiteColor);
-    whiteColor.r = 0;
-    whiteColor.g = 0;
-    whiteColor.b = 0;
-    whiteColor.a = 0;
-    GXSetChanAmbColor(GX_COLOR0A0, whiteColor);
+    color.r = 0xFF;
+    color.g = 0xFF;
+    color.b = 0xFF;
+    color.a = 0xFF;
+    GXInitLightColor(&lightObj, color);
+    GXSetChanMatColor(GX_COLOR0A0, color);
+    color.r = 0;
+    color.g = 0;
+    color.b = 0;
+    color.a = 0;
+    GXSetChanAmbColor(GX_COLOR0A0, color);
     GXInitLightAttnA(&lightObj, FLOAT_80331180, FLOAT_80331190, FLOAT_80331180);
     GXInitLightAttnK(&lightObj, FLOAT_80331180, FLOAT_80331184, FLOAT_80331180);
     GXInitLightPos(&lightObj, FLOAT_80331180, FLOAT_80331180, FLOAT_80331188);
@@ -206,7 +209,6 @@ void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displa
     GXSetNumTexGens(1);
     GXSetNumChans(1);
 
-    Mtx lightFrustumMtx;
     C_MTXLightFrustum(lightFrustumMtx, FLOAT_80331194, FLOAT_80331198, FLOAT_80331194, FLOAT_80331198,
                       FLOAT_80331184, FLOAT_8033119C, FLOAT_8033119C, FLOAT_8033119C, FLOAT_8033119C);
     GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
@@ -234,11 +236,11 @@ void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displa
         _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(1, 0, 1, 4);
         _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
         _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(1, 0, 0);
-        whiteColor.r = 0xFF;
-        whiteColor.g = 0xFF;
-        whiteColor.b = 0xFF;
-        whiteColor.a = 0xFF;
-        GXSetChanMatColor(GX_COLOR0A0, whiteColor);
+        color.r = 0xFF;
+        color.g = 0xFF;
+        color.b = 0xFF;
+        color.a = 0xFF;
+        GXSetChanMatColor(GX_COLOR0A0, color);
         GXLoadTexObj(blendTexObj, GX_TEXMAP0);
     }
 
@@ -248,8 +250,8 @@ void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displa
     GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
     GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_NRM, GX_NRM_XYZ, GX_F32, 0);
 
-    const float kZero = FLOAT_80331180;
     const float kDegToRad = FLOAT_803311A0;
+    const float kZero = FLOAT_80331180;
     for (int i = 0; i < 5; i++) {
         const unsigned char texObjIdx = s_texObjIndices[modeOffset + i];
         const unsigned char xRotIdx = s_xAxisRotIndices[modeOffset + i];
@@ -261,12 +263,11 @@ void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displa
             GXLoadTexObj(&texObjs[texObjIdx], GX_TEXMAP0);
         }
 
-        Mtx objectMtx;
-        Mtx tempMtx;
         PSMTXIdentity(objectMtx);
 
-        if (s_yAxisAngles[yRotIdx] != kZero) {
-            PSMTXRotRad(tempMtx, 'y', kDegToRad * s_yAxisAngles[yRotIdx]);
+        const float yAxisAngle = s_yAxisAngles[yRotIdx];
+        if (yAxisAngle != kZero) {
+            PSMTXRotRad(tempMtx, 'y', FLOAT_803311A0 * yAxisAngle);
             PSMTXConcat(objectMtx, tempMtx, objectMtx);
         }
 

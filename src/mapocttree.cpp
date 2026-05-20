@@ -308,13 +308,15 @@ void COctTree::DrawTypeMeshFlag_r(COctNode* octNode)
 {
 	int iVar1;
 	int iVar2;
-	COctNode* pCVar3;
+	COctNode* nodeIter;
 	COctNode* pCVar4;
+	COctNode* pCVar3;
+	CMaterialManEnvRaw* env;
 	int iVar5;
 
 	if ((octNode->m_meshCount != 0) &&
 	    ((octNode->m_drawFlags & 1) != 0)) {
-		CMaterialManEnvRaw* env = reinterpret_cast<CMaterialManEnvRaw*>(&MaterialMan);
+		env = reinterpret_cast<CMaterialManEnvRaw*>(&MaterialMan);
 		env->m_curEnvTevBit = 0xACE0F;
 		env->m_activeEnvTevBit = 0xFFFFFFFF;
 		env->m_alphaRef = 0xFF;
@@ -346,15 +348,16 @@ void COctTree::DrawTypeMeshFlag_r(COctNode* octNode)
 			->DrawMesh(octNode->m_meshStart,
 			           octNode->m_meshCount);
 	}
+	env = reinterpret_cast<CMaterialManEnvRaw*>(&MaterialMan);
+	nodeIter = octNode;
 	iVar2 = 0;
 	do {
-		pCVar4 = octNode->m_children[0];
+		pCVar4 = nodeIter->m_children[0];
 		if (pCVar4 == 0) {
 			return;
 		}
 		if ((pCVar4->m_meshCount != 0) &&
 		    ((pCVar4->m_drawFlags & 1) != 0)) {
-			CMaterialManEnvRaw* env = reinterpret_cast<CMaterialManEnvRaw*>(&MaterialMan);
 			env->m_curEnvTevBit = 0xACE0F;
 			env->m_activeEnvTevBit = 0xFFFFFFFF;
 			env->m_alphaRef = 0xFF;
@@ -422,7 +425,7 @@ void COctTree::DrawTypeMeshFlag_r(COctNode* octNode)
 			pCVar4 = reinterpret_cast<COctNode*>(Ptr(pCVar4, 4));
 		} while (iVar5 < 8);
 		iVar2 = iVar2 + 1;
-		octNode = reinterpret_cast<COctNode*>(Ptr(octNode, 4));
+		nodeIter = reinterpret_cast<COctNode*>(Ptr(nodeIter, 4));
 	} while (iVar2 < 8);
 }
 
@@ -585,11 +588,11 @@ void COctTree::DrawTypeMeshFrustumIn_r(COctNode* octNode)
 	COctNode* child8;
 	COctNode* node;
 
-	node = octNode;
 	if (octNode->m_meshCount != 0) {
-		node->m_drawFlags |= 1;
+		octNode->m_drawFlags |= 1;
 	}
 
+	node = octNode;
 	for (i = 0; i < 8; i++) {
 		child1 = node->m_children[0];
 		if (child1 == 0) {

@@ -1017,8 +1017,8 @@ RedVoiceDATA* EntryVoiceSearch(RedTrackDATA* track)
     RedVoiceDATA* voiceEnd;
     RedVoiceDATA* bestVoice = REDSOUND_VOICE_DATA_NONE;
 
-    if ((static_cast<s8>(track->m_note.m_allocFlags) & REDSOUND_NOTE_ALLOC_DIRECT_MASK) != 0) {
-        if (((track->m_note.m_allocFlags & REDSOUND_NOTE_ALLOC_DIRECT) != 0) ||
+    if (RedNoteAllocHasDirectMask(track->m_note.m_allocFlags)) {
+        if (RedNoteAllocHasDirect(track->m_note.m_allocFlags) ||
             (RedVoiceDataGet(track->m_trackNo)->m_track == REDSOUND_VOICE_TRACK_NONE) ||
             (RedVoiceDataGet(track->m_trackNo)->m_track == track)) {
             voice = RedVoiceDataGet(track->m_trackNo);
@@ -1026,7 +1026,7 @@ RedVoiceDATA* EntryVoiceSearch(RedTrackDATA* track)
             voice = REDSOUND_VOICE_DATA_NONE;
         }
     } else {
-        if ((track->m_note.m_allocFlags & REDSOUND_NOTE_ALLOC_PRIORITY) != 0) {
+        if (RedNoteAllocHasPriority(track->m_note.m_allocFlags)) {
             voice = RedVoiceDataGetBegin();
         } else {
             voice = RedVoiceDataGet((s8)RedCurrentSoundControlGet()->m_channelAlloc);
@@ -1514,9 +1514,9 @@ static void _VoiceDataAsign(RedTrackDATA* track, RedVoiceDATA* voice, RedNoteDAT
     voice->m_pitch = workValue;
 
     if ((track->m_flags & REDSOUND_TRACK_FLAG_SLUR_RELEASE) != 0) {
-        if ((((s8)track->m_note.m_allocFlags & REDSOUND_NOTE_ALLOC_DIRECT_MASK) == 0) ||
+        if (!RedNoteAllocHasDirectMask(track->m_note.m_allocFlags) ||
             ((track->m_flags & (REDSOUND_TRACK_FLAG_SLUR | REDSOUND_TRACK_FLAG_TENUTO)) != 0)) {
-            if ((((s8)track->m_note.m_allocFlags & REDSOUND_NOTE_ALLOC_DIRECT_MASK) != 0) ||
+            if (RedNoteAllocHasDirectMask(track->m_note.m_allocFlags) ||
                 ((track->m_flags & REDSOUND_TRACK_FLAG_SLUR) != 0)) {
                 goto skipModSetup;
             }
@@ -1681,7 +1681,7 @@ static RedVoiceDATA* _VoiceDataSelect(RedTrackDATA* track, RedNoteDATA* note, in
         _VoiceDataAsign(track, voiceData, note, voiceMask);
 
         if (((voiceData->m_waveData->m_flags & REDSOUND_WAVE_FLAG_PAIRED_ENTRY) != 0) &&
-            (((s8)track->m_note.m_allocFlags & REDSOUND_NOTE_ALLOC_DIRECT_MASK) == 0)) {
+            !RedNoteAllocHasDirectMask(track->m_note.m_allocFlags)) {
             RedWaveDATA* wave = voiceData->m_waveData;
             voiceData->m_voiceSwitch |= REDSOUND_VOICE_SWITCH_PAIRED_LEFT;
             voiceData = EntryVoiceSearch(track);

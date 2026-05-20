@@ -80,6 +80,10 @@ enum RedNoteAllocFlag {
 	REDSOUND_NOTE_ALLOC_DIRECT_MASK = REDSOUND_NOTE_ALLOC_DIRECT | REDSOUND_NOTE_ALLOC_RESERVED,
 };
 
+#define RedNoteAllocHasDirect(flags) (((flags) & REDSOUND_NOTE_ALLOC_DIRECT) != 0)
+#define RedNoteAllocHasPriority(flags) (((flags) & REDSOUND_NOTE_ALLOC_PRIORITY) != 0)
+#define RedNoteAllocHasDirectMask(flags) (((static_cast<s8>(flags)) & REDSOUND_NOTE_ALLOC_DIRECT_MASK) != 0)
+
 struct RedWaveADPCMInfo {
 	AXPBADPCM m_data;
 	AXPBADPCMLOOP m_loop;

@@ -129,10 +129,12 @@ static int m_StandbyStatus[REDSOUND_STANDBY_STATUS_COUNT];
 #define RedStandbyStatusGet(index) (m_StandbyStatus[(index)])
 #define RedStandbyStatusSet(slot, id) (*(slot) = (id))
 #define RedStandbyStatusGetEnd() (m_StandbyStatus + REDSOUND_STANDBY_STATUS_COUNT)
+#define RedStandbyStatusAddress(slot) ((int)(slot))
 volatile unsigned int m_AutoID;
 #define RedAutoIDGet() (m_AutoID)
 #define RedAutoIDInc() (m_AutoID++)
 #define RedAutoIDApplyMask() (m_AutoID &= REDSOUND_AUTO_ID_MASK)
+#define RedAutoIDIsInvalid() ((int)RedAutoIDGet() == 0)
 static RedSoundStreamBank* p_StreamBank;
 #define RedSoundStreamBankGetBegin() (p_StreamBank)
 #define RedSoundStreamBankSetBegin(bank) (p_StreamBank = (bank))
@@ -317,7 +319,7 @@ unsigned int CRedSound::GetAutoID()
 	do {
 		RedAutoIDInc();
 		RedAutoIDApplyMask();
-	} while ((int)RedAutoIDGet() == 0);
+	} while (RedAutoIDIsInvalid());
 
 	return RedAutoIDGet();
 }
@@ -1057,7 +1059,7 @@ unsigned int CRedSound::SetWaveData(int waveID, void* waveData, int waveSize)
 	unsigned int id = GetAutoID();
 	int* slot = EntryStandbyID(id);
 	if (slot != 0) {
-		c_Driver.SetWaveData((int)slot, waveID, waveData, waveSize);
+		c_Driver.SetWaveData(RedStandbyStatusAddress(slot), waveID, waveData, waveSize);
 	}
 	return id;
 }

@@ -1741,9 +1741,10 @@ int CLine<64>::Calc(Vec* nearestPosition, float* nearestDistance, unsigned long*
     Vec bestPosition;
 
     for (unsigned int i = 0; i + 1 < m_numPoints; i++) {
-        Vec candidate = m_points[i];
-        float distanceSq = PSVECSquareDistance(&candidate, targetPosition);
+        Vec* candidate = &m_points[i];
+        float distanceSq = PSVECSquareDistance(candidate, targetPosition);
         if (distanceSq < maxDistanceSq || infiniteRange) {
+            Vec candidatePosition = *candidate;
             float distance = distanceSq;
             if (distanceSq <= kLineSegmentMinT) {
                 distance = NAN;
@@ -1753,7 +1754,7 @@ int CLine<64>::Calc(Vec* nearestPosition, float* nearestDistance, unsigned long*
 
             if (distance < bestDistance) {
                 bestDistance = distance;
-                bestPosition = candidate;
+                bestPosition = candidatePosition;
                 bestIndex = i;
                 bestT = kLineSegmentMinT;
                 found = 1;
@@ -1761,9 +1762,10 @@ int CLine<64>::Calc(Vec* nearestPosition, float* nearestDistance, unsigned long*
         }
 
         if (i + 1 == m_numPoints - 1) {
-            candidate = m_points[i + 1];
-            distanceSq = PSVECSquareDistance(&candidate, targetPosition);
+            candidate = &m_points[i + 1];
+            distanceSq = PSVECSquareDistance(candidate, targetPosition);
             if (distanceSq < maxDistanceSq || infiniteRange) {
+                Vec candidatePosition = *candidate;
                 float distance = distanceSq;
                 if (distanceSq <= kLineSegmentMinT) {
                     distance = NAN;
@@ -1773,7 +1775,7 @@ int CLine<64>::Calc(Vec* nearestPosition, float* nearestDistance, unsigned long*
 
                 if (distance < bestDistance) {
                     bestDistance = distance;
-                    bestPosition = candidate;
+                    bestPosition = candidatePosition;
                     bestIndex = i;
                     bestT = kLineSegmentMaxT;
                     found = 1;

@@ -459,7 +459,7 @@ void StreamStop(int streamID)
 int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volume)
 {
 	int aramSize;
-	int aramOffset;
+	unsigned int aramOffset;
 	RedStreamADPCMHeader* adpcmHeader;
 	RedStreamDATA* streamData;
 

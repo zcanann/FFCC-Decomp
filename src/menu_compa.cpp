@@ -381,9 +381,10 @@ void CMenuPcs::CompaCtrl()
 	bool activeInput = false;
 	int padState = Pad._452_4_;
 	unsigned int rawPress;
+	unsigned int rawHold;
 	short press;
 	short hold;
-	bool doReset = false;
+	int doReset = 0;
 
 	if (padState == 0) {
 		if (Pad._448_4_ != -1) {
@@ -415,36 +416,37 @@ activeHold:
 	}
 
 	if (activeInput) {
-		hold = 0;
+		rawHold = 0;
 	} else {
 		unsigned int port = 0;
 		int mask = -((__cntlzw((unsigned int)Pad._448_4_) >> 5) & 1);
 		port &= ~mask;
-		hold = *reinterpret_cast<unsigned short*>(reinterpret_cast<u8*>(&Pad) + port * 0x54 + 0x14);
+		rawHold = *reinterpret_cast<unsigned short*>(reinterpret_cast<u8*>(&Pad) + port * 0x54 + 0x14);
 	}
+	hold = rawHold & 0xffff;
 
 	if (hold == 0) {
-		doReset = false;
+		doReset = 0;
 	} else if ((press & 0x20) != 0) {
 		this->compaMenuState->cursorMove = 1;
 		Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
-		doReset = true;
+		doReset = 1;
 	} else if ((press & 0x40) != 0) {
 		this->compaMenuState->cursorMove = -1;
 		Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
-		doReset = true;
+		doReset = 1;
 	} else if ((press & 0x100) != 0) {
 		Sound.PlaySe(4, 0x40, 0x7f, 0);
-		doReset = false;
+		doReset = 0;
 	} else if ((press & 0x200) != 0) {
 		this->compaMenuState->closeRequested = 1;
 		Sound.PlaySe(3, 0x40, 0x7f, 0);
-		doReset = true;
+		doReset = 1;
 	} else {
-		doReset = false;
+		doReset = 0;
 	}
 
-	if (doReset) {
+	if (doReset != 0) {
 		CompaOpenAnimList* compaList = this->compaList;
 		compaList->entries[0].startFrame = 2;
 		compaList->entries[0].duration = 5;

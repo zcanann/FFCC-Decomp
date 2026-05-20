@@ -45,6 +45,19 @@ struct CMapCylinderRaw
 	Vec m_direction2;
 };
 
+struct CAStarTempWork
+{
+	unsigned char m_visited[64];
+	unsigned char m_path[64];
+	int m_pathLength;
+	float m_cost;
+};
+
+static inline CAStar::CATemp& AsCATemp(CAStarTempWork& temp)
+{
+	return *reinterpret_cast<CAStar::CATemp*>(&temp);
+}
+
 static inline float LoadFloat(const float& value)
 {
 	return value;
@@ -676,11 +689,9 @@ void CAStar::check(int startGroup, int goalGroup, CATemp& temp)
 
 			if (temp.m_visited[other0] == 0)
 			{
-				unsigned int visited1[16];
-				unsigned int path1[16];
-				int pathLen1 = temp.m_pathLength;
-				unsigned char* visited1Bytes = reinterpret_cast<unsigned char*>(visited1);
-				unsigned char* path1Bytes = reinterpret_cast<unsigned char*>(path1);
+				CAStarTempWork level1;
+				unsigned int* visited1 = reinterpret_cast<unsigned int*>(level1.m_visited);
+				unsigned int* path1 = reinterpret_cast<unsigned int*>(level1.m_path);
 
 				visited1[0] = reinterpret_cast<unsigned int*>(temp.m_visited)[0];
 				visited1[1] = reinterpret_cast<unsigned int*>(temp.m_visited)[1];
@@ -716,15 +727,16 @@ void CAStar::check(int startGroup, int goalGroup, CATemp& temp)
 				path1[14] = reinterpret_cast<unsigned int*>(temp.m_path)[14];
 				path1[15] = reinterpret_cast<unsigned int*>(temp.m_path)[15];
 
-				float cost1 = temp.m_cost;
-				int pathSlot1 = pathLen1++;
-				cost1 += PSVECDistance(&pos0->m_position, &m_portals[other0].m_position);
-				path1Bytes[pathSlot1] = static_cast<unsigned char>(idx0);
-				visited1Bytes[other0] = 1;
+				level1.m_pathLength = temp.m_pathLength;
+				level1.m_cost = temp.m_cost;
+				int pathSlot1 = level1.m_pathLength++;
+				level1.m_cost += PSVECDistance(&pos0->m_position, &m_portals[other0].m_position);
+				level1.m_path[pathSlot1] = static_cast<unsigned char>(idx0);
+				level1.m_visited[other0] = 1;
 
 				if (other0 == goalGroup)
 				{
-					if (cost1 < m_bestPath.m_cost)
+					if (level1.m_cost < m_bestPath.m_cost)
 					{
 						unsigned int* dstVisited = reinterpret_cast<unsigned int*>(m_bestPath.m_visited);
 						unsigned int* dstPath = reinterpret_cast<unsigned int*>(m_bestPath.m_path);
@@ -762,8 +774,8 @@ void CAStar::check(int startGroup, int goalGroup, CATemp& temp)
 						dstPath[13] = path1[13];
 						dstPath[14] = path1[14];
 						dstPath[15] = path1[15];
-						m_bestPath.m_pathLength = pathLen1;
-						m_bestPath.m_cost = cost1;
+						m_bestPath.m_pathLength = level1.m_pathLength;
+						m_bestPath.m_cost = level1.m_cost;
 					}
 				}
 				else
@@ -792,9 +804,9 @@ void CAStar::check(int startGroup, int goalGroup, CATemp& temp)
 								other1 = pos1->m_groupB;
 							}
 
-							if (visited1Bytes[other1] == 0)
+							if (level1.m_visited[other1] == 0)
 							{
-								CATemp level2;
+								CAStarTempWork level2;
 								unsigned int* level2Visited = reinterpret_cast<unsigned int*>(level2.m_visited);
 								unsigned int* level2Path = reinterpret_cast<unsigned int*>(level2.m_path);
 
@@ -831,8 +843,8 @@ void CAStar::check(int startGroup, int goalGroup, CATemp& temp)
 								level2Path[13] = path1[13];
 								level2Path[14] = path1[14];
 								level2Path[15] = path1[15];
-								level2.m_pathLength = pathLen1;
-								level2.m_cost = cost1;
+								level2.m_pathLength = level1.m_pathLength;
+								level2.m_cost = level1.m_cost;
 								level2.m_cost += PSVECDistance(&pos1->m_position, &m_portals[other1].m_position);
 								level2.m_path[level2.m_pathLength++] = static_cast<unsigned char>(idx1);
 								level2.m_visited[other1] = 1;
@@ -841,7 +853,7 @@ void CAStar::check(int startGroup, int goalGroup, CATemp& temp)
 								{
 									if (level2.m_cost < m_bestPath.m_cost)
 									{
-										m_bestPath = level2;
+										m_bestPath = AsCATemp(level2);
 									}
 								}
 								else
@@ -856,7 +868,7 @@ void CAStar::check(int startGroup, int goalGroup, CATemp& temp)
 
 											if (level2.m_visited[nextGroup] == 0)
 											{
-												CATemp deeper(level2);
+												CATemp deeper(AsCATemp(level2));
 												deeper.m_cost += edge->CalcLength(m_portals[nextGroup]);
 												deeper.m_path[deeper.m_pathLength++] = static_cast<unsigned char>(idx2);
 												check(nextGroup, goalGroup, deeper);

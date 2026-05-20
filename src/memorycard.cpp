@@ -2292,8 +2292,7 @@ void CMemoryCardMan::Odekake(int mode, Mc::SaveDat& srcSave, int srcChar, Mc::Sa
 
         memset(dstCharData + 0xC8, 0xFF, 0x10);
         memset(dstCharData + 0xD8, 0, 0x10);
-        dstCharData[0x28] = 0;
-        dstCharData[0x29] = 0;
+        *reinterpret_cast<u16*>(dstCharData + 0x28) = 0;
         memset(dstCharData + 0x3C, 0xFF, 0x80);
 
         int artifact = static_cast<int>(*reinterpret_cast<s16*>(dstCharData + 0x34));

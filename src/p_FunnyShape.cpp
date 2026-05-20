@@ -40,7 +40,6 @@ public:
 };
 
 extern "C" void __dl__FPv(void* ptr);
-extern "C" void __dla__FPv(void* ptr);
 extern "C" void* __register_global_object(void* object, void* destructor, void* regmem);
 extern "C" void CreateBuffer__14CUSBStreamDataFv(CUSBStreamData*);
 extern "C" void DeleteBuffer__14CUSBStreamDataFv(CUSBStreamData*);
@@ -370,7 +369,7 @@ template <>
 void CPtrArray<_GXTexObj*>::RemoveAll()
 {
     if (items != 0) {
-        __dla__FPv(items);
+        delete[] items;
         items = 0;
     }
     numItems = 0;
@@ -386,7 +385,7 @@ template <>
 void CPtrArray<OSFS_TEXTURE_ST*>::RemoveAll()
 {
     if (items != 0) {
-        __dla__FPv(items);
+        delete[] items;
         items = 0;
     }
     numItems = 0;

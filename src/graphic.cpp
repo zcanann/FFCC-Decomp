@@ -400,7 +400,7 @@ void CGraphic::BeginFrame()
     void* renderMode = PtrAt(this, 0x71E0);
     u16 width = U16At(renderMode, 4);
     u16 height = U16At(renderMode, 6);
-    GXSetViewport(0.0f, 0.0f, (f32)width, (f32)height, 0.0f, 1.0f);
+    GXSetViewport(kGraphicZeroF, kGraphicZeroF, (f32)width, (f32)height, kGraphicZeroF, kGraphicOneF);
     GXInvalidateVtxCache();
     GXInvalidateTexAll();
 

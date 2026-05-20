@@ -2,6 +2,7 @@
 #define _FFCC_PARTYOBJ_H_
 
 #include "ffcc/charaobj.h"
+#include <dolphin/mtx.h>
 
 class CGObject;
 class CGBaseObj;
@@ -19,9 +20,29 @@ void chooseMagic();
 void decMagic(int);
 void calcWeightMax();
 
+struct GhostPartyWork {
+	unsigned char _pad0[0x20];
+	int mood;
+	int thresholdA;
+	int thresholdB;
+	int thresholdC;
+	int slotSel;
+	float carrySpeed;
+	int pressure;
+	int settleTimer;
+	int activeTrailCount;
+	int trailIndex;
+	Vec trail[5];
+	Vec leaderTrail[5];
+	Vec carryDir;
+	int auraParticle;
+};
+
 class CGPartyObj : public CGCharaObj
 {
 public:
+	static GhostPartyWork m_ghostWork;
+
     void onCreate();
     void onDestroy();
 

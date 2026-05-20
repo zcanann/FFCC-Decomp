@@ -2894,19 +2894,8 @@ CMonWork::CMonWork()
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" CMonWork* dtor_8009E9B4(CMonWork* monWork, short shouldDelete)
+CMonWork::~CMonWork()
 {
-	if (monWork != 0) {
-		*(void**)monWork = __vt__8CMonWork;
-		if (monWork != 0) {
-			*(void**)monWork = __vt__9CGObjWork;
-		}
-		if (0 < shouldDelete) {
-			__dl__FPv(monWork);
-		}
-	}
-
-	return monWork;
 }
 
 /*

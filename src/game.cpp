@@ -252,7 +252,7 @@ CMapLightHolder* CPtrArray<CMapLightHolder*>::operator[](unsigned long index)
  * Address:	TODO
  * Size:	TODO
  */
-CGame::CGame()
+inline CGame::CGame()
     : m_partyMinX(FLOAT_8032f688)
     , m_partyMinY(FLOAT_8032f688)
     , m_partyMinZ(FLOAT_8032f688)
@@ -715,7 +715,7 @@ void CGame::clearWork()
  * Address:	TODO
  * Size:	TODO
  */
-void CGame::clearWorkMap()
+inline void CGame::clearWorkMap()
 {
     MapMng.DestroyMap();
     CharaPcs.Reset(static_cast<CCharaPcs::RESET>(0));
@@ -730,7 +730,7 @@ void CGame::clearWorkMap()
  * Address:	TODO
  * Size:	TODO
  */
-void CGame::clearWorkScript()
+inline void CGame::clearWorkScript()
 {
     for (int i = 0; i < 4; i++) {
         m_partyObjArr[i] = 0;
@@ -1646,7 +1646,7 @@ const char* CGame::GetLangString()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGame::CGameWork::ClearEvtWork()
+inline void CGame::CGameWork::ClearEvtWork()
 {
     memset(m_eventFlags, 0, sizeof(m_eventFlags));
     memset(m_eventWork, 0, sizeof(m_eventWork));
@@ -1657,7 +1657,7 @@ void CGame::CGameWork::ClearEvtWork()
  * Address:	TODO
  * Size:	TODO
  */
-void CGame::CGameWork::Init()
+inline void CGame::CGameWork::Init()
 {
     memset(&m_gameDataStartMarker, 0, 0x13E1);
     memset(m_wmBackupParams, 0xFF, sizeof(m_wmBackupParams));
@@ -1673,7 +1673,7 @@ void CGame::CGameWork::Init()
  * Address:	TODO
  * Size:	TODO
  */
-void CGame::CGameWork::InitNewGame()
+inline void CGame::CGameWork::InitNewGame()
 {
     const unsigned short optionValue = m_optionValue;
     const unsigned char radarType = m_radarType;
@@ -1709,7 +1709,7 @@ void CGame::CGameWork::InitNewGame()
  * Address:	TODO
  * Size:	TODO
  */
-void CGame::CGameWork::ClearScriptChange()
+inline void CGame::CGameWork::ClearScriptChange()
 {
     *reinterpret_cast<unsigned int*>(&m_scriptSysVal0) = 1;
 }
@@ -1719,7 +1719,7 @@ void CGame::CGameWork::ClearScriptChange()
  * Address:	TODO
  * Size:	TODO
  */
-int CGame::IsWorldMap()
+inline int CGame::IsWorldMap()
 {
     return m_currentMapId == 0x21;
 }
@@ -1729,7 +1729,7 @@ int CGame::IsWorldMap()
  * Address:	TODO
  * Size:	TODO
  */
-int CGame::IsPartyExist(int index)
+inline int CGame::IsPartyExist(int index)
 {
     return index >= 0 && index < 4 && GetPartyObj(index) != 0;
 }
@@ -1739,7 +1739,7 @@ int CGame::IsPartyExist(int index)
  * Address:	TODO
  * Size:	TODO
  */
-char* CGame::GetItemName(int itemIndex)
+inline char* CGame::GetItemName(int itemIndex)
 {
     return reinterpret_cast<CFlatDataView*>(&m_cFlatDataArr[1])->m_tabl[0].m_strings[itemIndex * 5 + 1];
 }
@@ -1749,7 +1749,7 @@ char* CGame::GetItemName(int itemIndex)
  * Address:	TODO
  * Size:	TODO
  */
-char* CGame::GetItemArt(int itemIndex)
+inline char* CGame::GetItemArt(int itemIndex)
 {
     return reinterpret_cast<CFlatDataView*>(&m_cFlatDataArr[1])->m_tabl[0].m_strings[itemIndex * 5];
 }
@@ -1759,7 +1759,7 @@ char* CGame::GetItemArt(int itemIndex)
  * Address:	TODO
  * Size:	TODO
  */
-char* CGame::GetItemNames(int itemIndex)
+inline char* CGame::GetItemNames(int itemIndex)
 {
     return reinterpret_cast<CFlatDataView*>(&m_cFlatDataArr[1])->m_tabl[0].m_strings[itemIndex * 5 + 3];
 }
@@ -1769,7 +1769,7 @@ char* CGame::GetItemNames(int itemIndex)
  * Address:	TODO
  * Size:	TODO
  */
-char* CGame::GetItemArts(int itemIndex)
+inline char* CGame::GetItemArts(int itemIndex)
 {
     return reinterpret_cast<CFlatDataView*>(&m_cFlatDataArr[1])->m_tabl[0].m_strings[itemIndex * 5 + 2];
 }
@@ -1779,7 +1779,7 @@ char* CGame::GetItemArts(int itemIndex)
  * Address:	TODO
  * Size:	TODO
  */
-char* CGame::GetItemName(int itemIndex, int count)
+inline char* CGame::GetItemName(int itemIndex, int count)
 {
     return count > 1 ? GetItemNames(itemIndex) : GetItemName(itemIndex);
 }
@@ -1789,7 +1789,7 @@ char* CGame::GetItemName(int itemIndex, int count)
  * Address:	TODO
  * Size:	TODO
  */
-char* CGame::GetMonName(int monIndex)
+inline char* CGame::GetMonName(int monIndex)
 {
     return reinterpret_cast<CFlatDataView*>(&m_cFlatDataArr[1])->m_tabl[1].m_strings[monIndex * 5 + 1];
 }
@@ -1799,7 +1799,7 @@ char* CGame::GetMonName(int monIndex)
  * Address:	TODO
  * Size:	TODO
  */
-char* CGame::GetMonArt(int monIndex)
+inline char* CGame::GetMonArt(int monIndex)
 {
     return reinterpret_cast<CFlatDataView*>(&m_cFlatDataArr[1])->m_tabl[1].m_strings[monIndex * 5];
 }
@@ -1809,7 +1809,7 @@ char* CGame::GetMonArt(int monIndex)
  * Address:	TODO
  * Size:	TODO
  */
-char* CGame::GetMonNames(int monIndex)
+inline char* CGame::GetMonNames(int monIndex)
 {
     return reinterpret_cast<CFlatDataView*>(&m_cFlatDataArr[1])->m_tabl[1].m_strings[monIndex * 5 + 3];
 }
@@ -1819,7 +1819,7 @@ char* CGame::GetMonNames(int monIndex)
  * Address:	TODO
  * Size:	TODO
  */
-char* CGame::GetMonArts(int monIndex)
+inline char* CGame::GetMonArts(int monIndex)
 {
     return reinterpret_cast<CFlatDataView*>(&m_cFlatDataArr[1])->m_tabl[1].m_strings[monIndex * 5 + 2];
 }
@@ -1829,7 +1829,7 @@ char* CGame::GetMonArts(int monIndex)
  * Address:	TODO
  * Size:	TODO
  */
-char* CGame::GetMonName(int monIndex, int count)
+inline char* CGame::GetMonName(int monIndex, int count)
 {
     return count > 1 ? GetMonNames(monIndex) : GetMonName(monIndex);
 }
@@ -1839,7 +1839,7 @@ char* CGame::GetMonName(int monIndex, int count)
  * Address:	TODO
  * Size:	TODO
  */
-CGame::CGameWork::CGameWork()
+inline CGame::CGameWork::CGameWork()
 {
     memset(&m_gameDataStartMarker, 0, 0x13E1);
     memset(m_wmBackupParams, 0xFF, sizeof(m_wmBackupParams));
@@ -1849,5 +1849,3 @@ CGame::CGameWork::CGameWork()
     strcpy(m_townName, m_languageId == 3 ? DAT_8032f6a4 : DAT_8032f6ac);
     m_gameInitFlag = 1;
 }
-
-template class CPtrArray<CMapLightHolder*>;

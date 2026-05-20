@@ -43,6 +43,7 @@ class CMonWork : public CGObjWork
 {
 public:
     CMonWork();
+    virtual ~CMonWork();
 
     virtual void Init(int, CRomWork*, int);
     void CalcStatus();

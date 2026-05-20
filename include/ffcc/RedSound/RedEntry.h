@@ -521,6 +521,7 @@ public:
 
 #define RedEntryWaveBankGet(entry, index) ((entry)->m_waveBankBase + (index))
 #define RedEntryWaveBankGetEnd(entry) RedEntryWaveBankGet(entry, REDSOUND_WAVE_BANK_ENTRY_COUNT)
+#define RedEntryWavePrimaryBankGetEnd(entry) RedEntryWaveBankGet(entry, REDSOUND_WAVE_PRIMARY_BANK_ENTRY_COUNT)
 #define RedEntryWaveHistoryGetBegin(entry) RedEntryWaveBankGet(entry, REDSOUND_WAVE_PRIMARY_BANK_ENTRY_COUNT)
 #define RedEntrySeSepBankGet(entry, index) ((entry)->m_seSepBankBase + (index))
 #define RedEntrySeSepBankGetEnd(entry) RedEntrySeSepBankGet(entry, REDSOUND_SESEP_BANK_ENTRY_COUNT)

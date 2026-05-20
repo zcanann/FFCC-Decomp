@@ -1045,7 +1045,7 @@ void CRedEntry::DisplayWaveInfo()
 				} while (waveBank < RedEntryWaveBankGetEnd(this));
 
 				if (waveBank < RedEntryWaveBankGetEnd(this)) {
-					if (waveBank < m_waveBankBase + REDSOUND_WAVE_PRIMARY_BANK_ENTRY_COUNT) {
+					if (waveBank < RedEntryWavePrimaryBankGetEnd(this)) {
 						OSReport(sRedEntryAMemoryWaveBankInfoFmt, sRedEntryLogPrefix,
 						         waveBank - m_waveBankBase,
 						         (int)waveBank->m_waveHead->m_waveNo, waveBank->m_waveHead->m_aramAddress, aMemoryBlock->m_size,

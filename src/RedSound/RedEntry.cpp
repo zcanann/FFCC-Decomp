@@ -979,7 +979,7 @@ void CRedEntry::WaveHistoryManager(int mode, int waveNo)
 		}
 		if (used == 0) {
 			used = SearchWaveSequence(waveNo);
-			if ((used >= REDSOUND_WAVE_PRIMARY_BANK_ENTRY_COUNT) &&
+			if (RedEntryWaveBankNoIsHistory(used) &&
 			    (RedEntryWaveBankGet(this, used)->m_historyNo == REDSOUND_HISTORY_UNUSED)) {
 				WaveHistoryAdd(REDSOUND_WAVE_RELEASE_HISTORY_NO);
 				RedEntryWaveBankGet(this, used)->m_historyNo = REDSOUND_WAVE_RELEASE_HISTORY_NO;
@@ -987,7 +987,7 @@ void CRedEntry::WaveHistoryManager(int mode, int waveNo)
 		}
 	} else {
 		used = SearchWaveSequence(waveNo);
-		if ((used >= REDSOUND_WAVE_PRIMARY_BANK_ENTRY_COUNT) &&
+		if (RedEntryWaveBankNoIsHistory(used) &&
 		    (RedEntryWaveBankGet(this, used)->m_historyNo != REDSOUND_HISTORY_UNUSED)) {
 			WaveHistoryDelete(RedEntryWaveBankGet(this, used)->m_historyNo);
 			RedEntryWaveBankGet(this, used)->m_historyNo = REDSOUND_HISTORY_UNUSED;

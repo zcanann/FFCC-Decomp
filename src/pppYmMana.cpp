@@ -1172,8 +1172,8 @@ static int CreateWaterMesh(Vec* positionsInOut, Vec* normalsOut, Vec2d* uvOut, u
     float z;
     float rowUv;
     int indexOffset;
-    short quadIndex;
-    short rowBase;
+    int quadIndex;
+    int rowBase;
     float* positions;
     int rowCount;
     float* normals;
@@ -1181,11 +1181,11 @@ static int CreateWaterMesh(Vec* positionsInOut, Vec* normalsOut, Vec2d* uvOut, u
     int colCount;
     int pairCount;
 
-    rowCount = 0;
-    radius = size * LoadFloat(FLOAT_80330e5c);
-    uvStep = LoadFloat(FLOAT_80330e6c);
-    zero = LoadFloat(FLOAT_80330e4c);
     normalY = LoadFloat(FLOAT_80330e58);
+    zero = LoadFloat(FLOAT_80330e4c);
+    rowCount = 0;
+    uvStep = LoadFloat(FLOAT_80330e6c);
+    radius = size * LoadFloat(FLOAT_80330e5c);
     for (z = radius; -radius <= z; z -= size * uvStep) {
         colCount = 0;
         rowUv = static_cast<float>(rowCount) * uvStep;
@@ -1215,9 +1215,8 @@ static int CreateWaterMesh(Vec* positionsInOut, Vec* normalsOut, Vec2d* uvOut, u
     rowCount = 0;
     rowBase = 0;
     do {
-        pairCount = 8;
         quadIndex = rowBase;
-        do {
+        for (pairCount = 0; pairCount < 8; pairCount++) {
             indicesOut[indexOffset++] = quadIndex;
             indicesOut[indexOffset++] = quadIndex + 1;
             indicesOut[indexOffset++] = quadIndex + 0x12;
@@ -1231,8 +1230,7 @@ static int CreateWaterMesh(Vec* positionsInOut, Vec* normalsOut, Vec2d* uvOut, u
             indicesOut[indexOffset++] = quadIndex + 0x12;
             indicesOut[indexOffset++] = quadIndex + 1;
             quadIndex = quadIndex + 2;
-            pairCount = pairCount + -1;
-        } while (pairCount != 0);
+        }
         rowCount = rowCount + 1;
         rowBase = rowBase + 0x11;
     } while (rowCount < 0x10);

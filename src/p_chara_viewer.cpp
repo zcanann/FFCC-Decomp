@@ -98,9 +98,6 @@ extern "C" void Create__Q26CChara5CAnimFPvPQ27CMemory6CStage(void*, void*, void*
 extern "C" void __ct__Q29CLightPcs10CBumpLightFv(void*);
 extern "C" int AddBump__9CLightPcsFPQ29CLightPcs6CLightQ29CLightPcs6TARGETPQ27CMemory6CStagei(
     void*, void*, int, void*, int);
-extern "C" void* __ct__6CColorFUcUcUcUc(void*, unsigned char, unsigned char, unsigned char, unsigned char);
-extern "C" void __ct__6CColorFv(void*);
-extern "C" void __ct__6CColorFR6CColor(void*, void*);
 extern "C" float FLOAT_80330BEC;
 extern "C" float FLOAT_80330BF0;
 extern "C" double fmod(double, double);
@@ -798,9 +795,6 @@ void CCharaPcs::createViewer()
     unsigned char* p = reinterpret_cast<unsigned char*>(self);
     register const char* viewerStrings = s_no_texture____801da7e8;
     unsigned int i;
-    unsigned char colorTmp[4];
-    unsigned char colorCopy[4];
-    unsigned char white[4];
     char pathBuf[256];
     CFile::CHandle* fileHandle;
 
@@ -830,19 +824,18 @@ void CCharaPcs::createViewer()
     }
 
     for (int colorIndex = 0; colorIndex < 5; colorIndex++) {
-        unsigned char* whiteChannels =
-            reinterpret_cast<unsigned char*>(__ct__6CColorFUcUcUcUc(reinterpret_cast<CColor*>(white), 0xFF, 0xFF, 0xFF, 0xFF));
-        __ct__6CColorFv(reinterpret_cast<CColor*>(colorTmp));
+        CColor white(0xFF, 0xFF, 0xFF, 0xFF);
+        CColor colorTmp;
         float scale = static_cast<float>(colorIndex) * kCharaViewerLerpScale;
-        colorTmp[0] = static_cast<unsigned char>(static_cast<int>(static_cast<float>(whiteChannels[0]) * scale));
-        colorTmp[1] = static_cast<unsigned char>(static_cast<int>(static_cast<float>(whiteChannels[1]) * scale));
-        colorTmp[2] = static_cast<unsigned char>(static_cast<int>(static_cast<float>(whiteChannels[2]) * scale));
-        colorTmp[3] = static_cast<unsigned char>(static_cast<int>(static_cast<float>(whiteChannels[3]) * scale));
-        __ct__6CColorFR6CColor(reinterpret_cast<CColor*>(colorCopy), reinterpret_cast<CColor*>(colorTmp));
-        p[0x12C + colorIndex * 4 + 0] = colorCopy[0];
-        p[0x12C + colorIndex * 4 + 1] = colorCopy[1];
-        p[0x12C + colorIndex * 4 + 2] = colorCopy[2];
-        p[0x12C + colorIndex * 4 + 3] = colorCopy[3];
+        colorTmp.color.r = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.r) * scale));
+        colorTmp.color.g = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.g) * scale));
+        colorTmp.color.b = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.b) * scale));
+        colorTmp.color.a = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.a) * scale));
+        CColor colorCopy(colorTmp);
+        p[0x12C + colorIndex * 4 + 0] = colorCopy.color.r;
+        p[0x12C + colorIndex * 4 + 1] = colorCopy.color.g;
+        p[0x12C + colorIndex * 4 + 2] = colorCopy.color.b;
+        p[0x12C + colorIndex * 4 + 3] = colorCopy.color.a;
     }
 
     _GXColor clearColor;

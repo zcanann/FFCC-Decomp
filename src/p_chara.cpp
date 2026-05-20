@@ -1,5 +1,6 @@
 #include "ffcc/p_chara.h"
 #include "ffcc/chunkfile.h"
+#include "ffcc/color.h"
 #include "ffcc/graphic.h"
 #include "ffcc/linkage.h"
 #include "ffcc/memory.h"
@@ -80,8 +81,6 @@ extern "C" void* __ct__Q26CChara5CAnimFv(void*);
 extern "C" void Create__Q26CChara5CAnimFPvPQ27CMemory6CStage(void*, void*, void*);
 extern "C" void LoadSe__6CSoundFPv(void*, void*);
 extern "C" void LoadWave__6CSoundFPv(void*, void*);
-extern "C" void* __ct__6CColorFUcUcUcUc(void*, unsigned char, unsigned char, unsigned char, unsigned char);
-extern "C" void __ct__6CColorFR6CColor(void*, void*);
 extern "C" void* __ct__7CVectorFfff(void*, float, float, float);
 extern "C" void DestroyBumpLightAll__9CLightPcsFQ29CLightPcs6TARGET(void*, int);
 extern "C" void DestroyStage__7CMemoryFPQ27CMemory6CStage(void*, void*);
@@ -798,36 +797,27 @@ void CCharaPcs::Init()
 
     unsigned char* fadeColor = reinterpret_cast<unsigned char*>(this);
     for (int i = 0; i < 5; i++) {
-        unsigned char shadeCopy[4];
-        unsigned char white[4];
-        unsigned char shade[4];
-        unsigned char* whiteChannels =
-            reinterpret_cast<unsigned char*>(__ct__6CColorFUcUcUcUc(white, 0xFF, 0xFF, 0xFF, 0xFF));
-        __ct__6CColorFv(shade);
+        CColor white(0xFF, 0xFF, 0xFF, 0xFF);
+        CColor shade;
 
         float scale = static_cast<float>(i) * 0.25f;
-        shade[0] = static_cast<unsigned char>(static_cast<int>(static_cast<float>(whiteChannels[0]) * scale));
-        shade[1] = static_cast<unsigned char>(static_cast<int>(static_cast<float>(whiteChannels[1]) * scale));
-        shade[2] = static_cast<unsigned char>(static_cast<int>(static_cast<float>(whiteChannels[2]) * scale));
-        shade[3] = static_cast<unsigned char>(static_cast<int>(static_cast<float>(whiteChannels[3]) * scale));
-        __ct__6CColorFR6CColor(shadeCopy, shade);
+        shade.color.r = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.r) * scale));
+        shade.color.g = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.g) * scale));
+        shade.color.b = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.b) * scale));
+        shade.color.a = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.a) * scale));
+        CColor shadeCopy(shade);
 
-        fadeColor[0x12C] = shadeCopy[0];
-        fadeColor[0x12D] = shadeCopy[1];
-        fadeColor[0x12E] = shadeCopy[2];
-        fadeColor[0x12F] = shadeCopy[3];
+        fadeColor[0x12C] = shadeCopy.color.r;
+        fadeColor[0x12D] = shadeCopy.color.g;
+        fadeColor[0x12E] = shadeCopy.color.b;
+        fadeColor[0x12F] = shadeCopy.color.a;
         fadeColor += 4;
     }
 
     *reinterpret_cast<int*>(Ptr(this, 0xE4)) = 0;
     *reinterpret_cast<int*>(Ptr(this, 0x24)) = 0;
-    unsigned char baseColor[4];
-    unsigned int colorValue =
-        *reinterpret_cast<unsigned int*>(__ct__6CColorFUcUcUcUc(baseColor, 0x00, 0x00, 0x40, 0x40));
-    reinterpret_cast<_GXColor*>(Ptr(this, 0x18C))->r = static_cast<unsigned char>(colorValue >> 24);
-    reinterpret_cast<_GXColor*>(Ptr(this, 0x18C))->g = static_cast<unsigned char>(colorValue >> 16);
-    reinterpret_cast<_GXColor*>(Ptr(this, 0x18C))->b = static_cast<unsigned char>(colorValue >> 8);
-    reinterpret_cast<_GXColor*>(Ptr(this, 0x18C))->a = static_cast<unsigned char>(colorValue);
+    CColor baseColor(0x00, 0x00, 0x40, 0x40);
+    *reinterpret_cast<_GXColor*>(Ptr(this, 0x18C)) = baseColor.color;
 
     Vec baseVec;
     Vec* constructedVec = reinterpret_cast<Vec*>(__ct__7CVectorFfff(&baseVec, 0.0f, 10.0f, 0.0f));
@@ -1164,24 +1154,20 @@ void CCharaPcs::onScriptChanging(char*)
     unsigned char* fadeColor = reinterpret_cast<unsigned char*>(this);
 
     for (int i = 0; i < 5; i++) {
-        unsigned char shadeCopy[4];
-        unsigned char white[4];
-        unsigned char shade[4];
-        unsigned char* whiteChannels =
-            reinterpret_cast<unsigned char*>(__ct__6CColorFUcUcUcUc(white, 0xFF, 0xFF, 0xFF, 0xFF));
-        __ct__6CColorFv(shade);
+        CColor white(0xFF, 0xFF, 0xFF, 0xFF);
+        CColor shade;
 
         float scale = static_cast<float>(i) * 0.25f;
-        shade[0] = static_cast<unsigned char>(static_cast<int>(static_cast<float>(whiteChannels[0]) * scale));
-        shade[1] = static_cast<unsigned char>(static_cast<int>(static_cast<float>(whiteChannels[1]) * scale));
-        shade[2] = static_cast<unsigned char>(static_cast<int>(static_cast<float>(whiteChannels[2]) * scale));
-        shade[3] = static_cast<unsigned char>(static_cast<int>(static_cast<float>(whiteChannels[3]) * scale));
-        __ct__6CColorFR6CColor(shadeCopy, shade);
+        shade.color.r = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.r) * scale));
+        shade.color.g = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.g) * scale));
+        shade.color.b = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.b) * scale));
+        shade.color.a = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.a) * scale));
+        CColor shadeCopy(shade);
 
-        fadeColor[0x12C] = shadeCopy[0];
-        fadeColor[0x12D] = shadeCopy[1];
-        fadeColor[0x12E] = shadeCopy[2];
-        fadeColor[0x12F] = shadeCopy[3];
+        fadeColor[0x12C] = shadeCopy.color.r;
+        fadeColor[0x12D] = shadeCopy.color.g;
+        fadeColor[0x12E] = shadeCopy.color.b;
+        fadeColor[0x12F] = shadeCopy.color.a;
         fadeColor += 4;
     }
 

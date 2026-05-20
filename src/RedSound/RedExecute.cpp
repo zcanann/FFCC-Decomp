@@ -2322,7 +2322,7 @@ static void _ExecuteExtraData()
     int pitchOffset;
     int basePitch;
 
-    soundControl = RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY);
+    soundControl = RedSoundControlGetBegin();
     do {
         if ((soundControl->m_masterVolumeDelta != 0) && (soundControl->m_tracks != 0)) {
             soundControl->m_masterVolumeDelta--;
@@ -2750,7 +2750,7 @@ static void _MusicNoteExecute()
         status = _MusicMidiNoteExecute(RedCurrentSoundControlGet(), RedKeyOnDataGet(), 1);
     }
 
-    if ((RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY)->m_musicId < REDSOUND_MUSIC_ID_MIN) &&
+    if ((RedSoundControlGetBegin()->m_musicId < REDSOUND_MUSIC_ID_MIN) &&
         (RedSoundControlGet(REDSOUND_CONTROL_MUSIC_SECONDARY)->m_musicId < REDSOUND_MUSIC_ID_MIN) &&
         (RedSoundControlGet(REDSOUND_CONTROL_MUSIC_SKIP)->m_musicId < REDSOUND_MUSIC_ID_MIN)) {
         RedMusicPhraseStopClear();
@@ -2879,7 +2879,7 @@ static void _SkipMusicEntry()
             src++;
         }
 
-        soundControl = RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY);
+        soundControl = RedSoundControlGetBegin();
         if (soundControl[REDSOUND_CONTROL_MUSIC_PRIMARY].m_musicId != REDSOUND_MUSIC_ID_NONE) {
             if (soundControl[REDSOUND_CONTROL_MUSIC_SECONDARY].m_musicId != REDSOUND_MUSIC_ID_NONE) {
                 MusicStop(soundControl[REDSOUND_CONTROL_MUSIC_SECONDARY].m_musicId);
@@ -3260,7 +3260,7 @@ void MainControl(int frames)
     RedCurrentSoundControlSet(RedSoundControlGet(REDSOUND_CONTROL_SE));
     _SeMidiNoteExecute(RedCurrentSoundControlGet(), RedKeyOnDataGet(),
                        RedCurrentSoundControlGet()->m_tracks, RedCurrentSoundControlGet()->m_skipFrames, frames);
-    RedCurrentSoundControlSet(RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY));
+    RedCurrentSoundControlSet(RedSoundControlGetBegin());
 
     if (RedCurrentSoundControlGet()->m_activeTrackCount != 0) {
         if ((RedCurrentSoundControlGet()->m_flags & REDSOUND_CONTROL_FLAG_PAUSE) == 0) {
@@ -3300,7 +3300,7 @@ void MainControl(int frames)
             RedCurrentSoundControlGet()->m_trackCount = 0;
             RedCurrentSoundControlGet()->m_musicId = REDSOUND_MUSIC_ID_NONE;
         }
-        RedCurrentSoundControlSet(RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY));
+        RedCurrentSoundControlSet(RedSoundControlGetBegin());
     }
 
     _ExecuteExtraData();

@@ -3183,7 +3183,82 @@ extern "C" void CGMonObj_UpdateActionStateFromTarget(CGMonObj* monObj)
 			}
 
 			if (*reinterpret_cast<short*>(script + 0x10C) == 1) {
-				actionState = (nextAction < 100) ? 0x21 : nextAction;
+				actionState = nextAction;
+				if (nextAction < 100) {
+					short aiState = *reinterpret_cast<short*>(mon + 0x6E4);
+					int aiStateIndex = static_cast<int>(aiState);
+					unsigned char* aiScript = script;
+					if (aiState != 0) {
+						aiScript = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
+							(aiStateIndex + *reinterpret_cast<unsigned short*>(script + 0x100)) * 0x1D0 + 0x10;
+					}
+
+					int actionOffset = nextAction * 0x10;
+					if ((*reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x110) & 0x20) != 0) {
+						actionState = 0x21;
+						CGPartyObj* target = Game.m_partyObjArr[targetPartyIndex];
+						if (*reinterpret_cast<int*>(mon + 0x734) != 4) {
+							memset(mon + 0x70C, 0, 0x34);
+							*reinterpret_cast<unsigned int*>(mon + 0x70C) = 0x855;
+							if ((*reinterpret_cast<unsigned short*>(script + 0xFE) & 4) != 0) {
+								*reinterpret_cast<unsigned int*>(mon + 0x70C) |= 0x400;
+							}
+							if (aiState == 0) {
+								aiScript = script;
+							} else {
+								aiScript = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
+									(aiStateIndex + *reinterpret_cast<unsigned short*>(script + 0x100)) * 0x1D0 + 0x10;
+							}
+							if ((*reinterpret_cast<unsigned short*>(aiScript + 0x102) & 0x80) != 0) {
+								*reinterpret_cast<unsigned int*>(mon + 0x70C) |= 0x20000;
+							}
+							*reinterpret_cast<int*>(mon + 0x734) = 4;
+							*reinterpret_cast<float*>(mon + 0x728) =
+								static_cast<float>(*reinterpret_cast<unsigned short*>(script + 0xD6));
+							*reinterpret_cast<unsigned int*>(mon + 0x72C) =
+								*reinterpret_cast<unsigned short*>(script + 0x1B6);
+						}
+						*reinterpret_cast<CGPartyObj**>(mon + 0x714) = target;
+						*reinterpret_cast<int*>(mon + 0x6D8) = 5;
+						*reinterpret_cast<int*>(mon + 0x6DC) = 0;
+						mon[0x6BB] = 1;
+						return;
+					}
+
+					if (aiState == 0) {
+						aiScript = script;
+					} else {
+						aiScript = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
+							(aiStateIndex + *reinterpret_cast<unsigned short*>(script + 0x100)) * 0x1D0 + 0x10;
+					}
+					float actionRange = static_cast<float>(*reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x11C));
+					if (aiState == 0) {
+						aiScript = script;
+					} else {
+						aiScript = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
+							(aiStateIndex + *reinterpret_cast<unsigned short*>(script + 0x100)) * 0x1D0 + 0x10;
+					}
+					short actionParam = *reinterpret_cast<short*>(aiScript + actionOffset + 0x11E);
+					actionState = 0x21;
+					CGPartyObj* target = Game.m_partyObjArr[targetPartyIndex];
+					if (*reinterpret_cast<int*>(mon + 0x734) != 2) {
+						memset(mon + 0x70C, 0, 0x34);
+						*reinterpret_cast<unsigned int*>(mon + 0x70C) = 0x325;
+						if (aiState == 0) {
+							aiScript = script;
+						} else {
+							aiScript = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
+								(aiStateIndex + *reinterpret_cast<unsigned short*>(script + 0x100)) * 0x1D0 + 0x10;
+						}
+						if ((*reinterpret_cast<unsigned short*>(aiScript + 0x102) & 0x40) != 0) {
+							*reinterpret_cast<unsigned int*>(mon + 0x70C) |= 0x10000;
+						}
+						*reinterpret_cast<int*>(mon + 0x734) = 2;
+					}
+					*reinterpret_cast<CGPartyObj**>(mon + 0x714) = target;
+					*reinterpret_cast<float*>(mon + 0x728) = actionRange;
+					*reinterpret_cast<int*>(mon + 0x738) = static_cast<int>(actionParam);
+				}
 			} else {
 				actionState = nextAction - 0xE;
 			}

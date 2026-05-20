@@ -1983,11 +1983,11 @@ void CGMonObj::frameStatFuncMolbol()
 void CGMonObj::initFinishedFuncMeteoParasiteC()
 {
 	initFinishedFuncDefault__8CGMonObjFv(this);
-	*reinterpret_cast<CGMonObj**>(SoundBuffer_1260_ + 0x74) = this;
+	*reinterpret_cast<CGMonObj**>(m_boss__8CGMonObj + 0x74) = this;
 
 	if (strcmp(Game.m_currentScriptName, s_meteo_3_80331D64) == 0) {
 		CGObject* object = reinterpret_cast<CGObject*>(this);
-		MeteoParasiteCBossWork* work = reinterpret_cast<MeteoParasiteCBossWork*>(SoundBuffer_1260_);
+		MeteoParasiteCBossWork* work = reinterpret_cast<MeteoParasiteCBossWork*>(m_boss__8CGMonObj);
 		work->bits.m_meteo3 = 1;
 		work->m_index = 3;
 		*reinterpret_cast<u16*>(reinterpret_cast<u8*>(object->m_scriptHandle) + 0x1C) = 1;
@@ -2248,7 +2248,7 @@ void CGMonObj::frameStatFuncMeteoParasiteC()
  */
 int CGMonObj::calcBranchFuncMeteoParasiteC(int)
 {
-	return *reinterpret_cast<int*>(SoundBuffer_1260_ + 0x78);
+	return *reinterpret_cast<int*>(m_boss__8CGMonObj + 0x78);
 }
 
 /*
@@ -2264,7 +2264,7 @@ void CGMonObj::logicFuncMeteoParasiteC()
 {
 	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
 	int nextState = -1;
-	MeteoParasiteCBossWork* work = reinterpret_cast<MeteoParasiteCBossWork*>(SoundBuffer_1260_);
+	MeteoParasiteCBossWork* work = reinterpret_cast<MeteoParasiteCBossWork*>(m_boss__8CGMonObj);
 	if (work->bits.m_meteo3 != 0) {
 		nextState = 0x68;
 	} else {
@@ -2365,7 +2365,7 @@ void CGMonObj::changeStatFuncMeteoParasite(int stat)
 	int scriptKind = reinterpret_cast<int>(object->m_scriptHandle[4]);
 	if (scriptKind == 0x87) {
 		if (stat == 0x67) {
-			CGMonObj* meteoC = *reinterpret_cast<CGMonObj**>(SoundBuffer_1260_ + 0x74);
+			CGMonObj* meteoC = *reinterpret_cast<CGMonObj**>(m_boss__8CGMonObj + 0x74);
 			if (*reinterpret_cast<int*>(reinterpret_cast<u8*>(meteoC) + 0x6D0) == 1) {
 				setActionParam__8CGMonObjFi(this, -13);
 			} else {
@@ -2533,12 +2533,12 @@ int CGMonObj::attackCheckFuncMeteoParasite(int)
 	case 0x85:
 		return -2;
 	case 0x86:
-		if (*reinterpret_cast<int*>(SoundBuffer_1260_ + 0x78) == 1 && *reinterpret_cast<int*>(mon + 0x6D0) == 1) {
+		if (*reinterpret_cast<int*>(m_boss__8CGMonObj + 0x78) == 1 && *reinterpret_cast<int*>(mon + 0x6D0) == 1) {
 			return -1;
 		}
 		return -2;
 	case 0x87:
-		if (*reinterpret_cast<int*>(SoundBuffer_1260_ + 0x78) == 2 && *reinterpret_cast<int*>(mon + 0x6D0) < 2) {
+		if (*reinterpret_cast<int*>(m_boss__8CGMonObj + 0x78) == 2 && *reinterpret_cast<int*>(mon + 0x6D0) < 2) {
 			return -1;
 		}
 		return -2;

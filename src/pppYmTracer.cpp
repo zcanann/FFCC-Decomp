@@ -197,14 +197,16 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
     u8 alpha;
     u8 decay;
     s32 i;
+    TRACE_POLYGON* entriesPtr;
 
     if (gPppCalcDisabled != 0) {
         return;
     }
 
     work = (TracerWork*)(pppYmTracer->m_object.m_workArea + *param_3->m_serializedDataOffsets);
-    entries = work->entries;
-    if (entries == 0) {
+    entriesPtr = work->entries;
+    entries = entriesPtr;
+    if (entriesPtr == 0) {
         work->entries = (TRACE_POLYGON*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
             (u32)param_2->m_tracer.m_entryCount * sizeof(TRACE_POLYGON), pppEnvStPtr->m_stagePtr,
             const_cast<char*>(s_pppYmTracer_cpp_801d9ce0), 0xEB);

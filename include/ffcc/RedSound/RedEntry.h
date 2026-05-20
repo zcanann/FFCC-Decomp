@@ -232,6 +232,10 @@ enum RedMusicTrackBlockLayout {
 	((RedMusicTrackBlock*)((unsigned char*)(block) + (blockSize)))
 #define RedMusicGetTrackBlocks(musicHead) reinterpret_cast<RedMusicTrackBlock*>((musicHead) + 1)
 #define RedMusicHeadGetTrackArenaSize(musicHead) ((musicHead)->m_trackCount * REDSOUND_TRACK_SIZE)
+#define RedMusicHeadHasValidSignature(musicHead)                                                   \
+	((musicHead)->m_signature[REDSOUND_MUSIC_SIGNATURE_0_INDEX] == REDSOUND_MUSIC_SIGNATURE_0 &&  \
+	 (musicHead)->m_signature[REDSOUND_MUSIC_SIGNATURE_1_INDEX] == REDSOUND_MUSIC_SIGNATURE_1 &&  \
+	 (musicHead)->m_signature[REDSOUND_MUSIC_SIGNATURE_2_INDEX] == REDSOUND_MUSIC_SIGNATURE_2)
 
 enum RedMusicHeaderFlag {
 	REDSOUND_MUSIC_HEADER_SIZE = sizeof(RedMusicHEAD),

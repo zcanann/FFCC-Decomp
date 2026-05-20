@@ -1793,9 +1793,7 @@ RedMusicHEAD* CRedEntry::SetMusicData(RedMusicHEAD* musicHead)
 {
 	int entryAddress;
 
-	if ((musicHead->m_signature[REDSOUND_MUSIC_SIGNATURE_0_INDEX] != REDSOUND_MUSIC_SIGNATURE_0) ||
-	    (musicHead->m_signature[REDSOUND_MUSIC_SIGNATURE_1_INDEX] != REDSOUND_MUSIC_SIGNATURE_1) ||
-	    (musicHead->m_signature[REDSOUND_MUSIC_SIGNATURE_2_INDEX] != REDSOUND_MUSIC_SIGNATURE_2)) {
+	if (!RedMusicHeadHasValidSignature(musicHead)) {
 		RedDelete(musicHead);
 		if (RedReportPrintIsEnabled()) {
 			OSReport(sRedEntryMusicHeaderBrokenFmt, sRedEntryLogPrefix, sRedEntryHeaderErrorColor, sRedEntryResetColor);

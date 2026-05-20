@@ -1,4 +1,5 @@
 #include "ffcc/mes.h"
+#include "ffcc/color.h"
 #include "ffcc/fontman.h"
 #include "ffcc/game.h"
 #include "ffcc/p_menu.h"
@@ -8,8 +9,6 @@
 
 extern "C" int GetPadType__6JoyBusFi(void*, int);
 extern "C" void DrawInit__8CMenuPcsFv(void*);
-extern "C" void* __ct__6CColorFUcUcUcUc(void*, unsigned char, unsigned char, unsigned char, unsigned char);
-extern "C" void SetColor__8CMenuPcsFR6CColor(void*, void*);
 extern "C" void SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(void*, int);
 extern "C" void DrawRect__8CMenuPcsFUlfffffffff(
     void*, unsigned long, float, float, float, float, float, float, float, float, float);
@@ -667,9 +666,8 @@ void CMes::Draw()
 						iconId = (mode != 0) ? 0x0A : 0x0E;
 					}
 
-					unsigned char colorStorage[8];
-					__ct__6CColorFUcUcUcUc(colorStorage, 0xFF, 0xFF, 0xFF, 0xFF);
-					SetColor__8CMenuPcsFR6CColor(&MenuPcs, colorStorage);
+					CColor color(0xFF, 0xFF, 0xFF, 0xFF);
+					MenuPcs.SetColor(color);
 					SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x15);
 
 					DrawRect__8CMenuPcsFUlfffffffff(

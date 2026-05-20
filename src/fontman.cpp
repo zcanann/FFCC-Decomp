@@ -666,11 +666,8 @@ void CFont::Create(void* filePtr, CMemory::CStage* stage)
     CChunkFile::CChunk chunk;
 
     m_usesEmbeddedData = static_cast<unsigned char>((filePtr == 0) && (stage == 0));
-    if (m_usesEmbeddedData != 0) {
-        filePtr = g_tFont22;
-    }
 
-    CChunkFile chunkFile(filePtr);
+    CChunkFile chunkFile(m_usesEmbeddedData != 0 ? g_tFont22 : filePtr);
     while (chunkFile.GetNextChunk(chunk)) {
         switch (chunk.m_id) {
         case 'FONT':

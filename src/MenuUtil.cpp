@@ -1,6 +1,7 @@
 #include "ffcc/MenuUtil.h"
 #include "ffcc/partMng.h"
 #include "ffcc/game.h"
+#include "ffcc/memory.h"
 #include "ffcc/pad.h"
 #include "ffcc/sound.h"
 #include "ffcc/system.h"
@@ -12,8 +13,6 @@
 extern CMenuPcs MenuPcs;
 extern "C" void pppDeletePart__8CPartMngFi(void*, int);
 extern "C" short BindEffect__8CMenuPcsFiii(CMenuPcs*, int, int, int);
-extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, void*, char*, int);
-extern "C" void __dla__FPv(void*);
 extern "C" char* strcat(char*, const char*);
 extern "C" void MakeAgbString__4CMesFPcPcii(char*, char*, int, int);
 extern "C" int drawTagString__4CMesFP5CFontPciii(CFont*, int, int, int, int);
@@ -330,12 +329,12 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 		firstLine = msgNo * 3 + 0x1F5;
 	}
 
-	void* stage = *reinterpret_cast<void**>(menuPcsGlobal + 0xEC);
+	CMemory::CStage* stage = *reinterpret_cast<CMemory::CStage**>(menuPcsGlobal + 0xEC);
 	if (Game.m_gameWork.m_menuStageMode != 0) {
-		stage = *reinterpret_cast<void**>(menuPcsGlobal + 0xF4);
+		stage = *reinterpret_cast<CMemory::CStage**>(menuPcsGlobal + 0xF4);
 	}
 
-	char* temp = reinterpret_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(0x200, stage, s_MenuUtil_cpp_801e37fc, 0x8C));
+	char* temp = new (stage, s_MenuUtil_cpp_801e37fc, 0x8C) char[0x200];
 	if ((temp == nullptr) && (System.m_execParam != 0)) {
 		System.Printf(s_MenuUtil_cpp_801e37fc + 0x10, s_MenuUtil_cpp_801e37fc, 0x8E);
 	}
@@ -350,7 +349,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 			}
 		}
 	}
-	__dla__FPv(temp);
+	delete[] temp;
 
 	if ((msgNo < 0x259) || (0x268 < msgNo)) {
 		if (msgNo == 0x209) {
@@ -388,12 +387,12 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 	if (rangeKind == 0) {
 		int lineCount = 3;
 		int firstNonEmptyLine = firstLine;
-		stage = *reinterpret_cast<void**>(menuPcsGlobal + 0xEC);
+		stage = *reinterpret_cast<CMemory::CStage**>(menuPcsGlobal + 0xEC);
 		if (Game.m_gameWork.m_menuStageMode != 0) {
-			stage = *reinterpret_cast<void**>(menuPcsGlobal + 0xF4);
+			stage = *reinterpret_cast<CMemory::CStage**>(menuPcsGlobal + 0xF4);
 		}
 
-		temp = reinterpret_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(0x200, stage, s_MenuUtil_cpp_801e37fc, 0x23D));
+		temp = new (stage, s_MenuUtil_cpp_801e37fc, 0x23D) char[0x200];
 		if ((temp == nullptr) && (System.m_execParam != 0)) {
 			System.Printf(s_MenuUtil_cpp_801e37fc + 0x10, s_MenuUtil_cpp_801e37fc, 0x23F);
 		}
@@ -408,7 +407,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 				}
 			}
 		}
-		__dla__FPv(temp);
+		delete[] temp;
 
 		u32 y = lineBaseY[lineCount + drawPrefix - 1];
 		if (drawPrefix != 0) {

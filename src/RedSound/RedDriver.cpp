@@ -778,7 +778,9 @@ STATIC_ASSERT(REDSOUND_DRIVER_SBSS_SIZE == REDSOUND_DRIVER_MAP_SBSS_SIZE);
 
 enum RedDriverBufferSize {
     REDSOUND_ZERO_BUFFER_SIZE = 0x1000,
+    REDSOUND_ZERO_ALLOC_SIZE = REDSOUND_ZERO_BUFFER_SIZE,
     REDSOUND_THREAD_STACK_SIZE = 0x1000,
+    REDSOUND_THREAD_STACK_ALLOC_SIZE = REDSOUND_THREAD_STACK_SIZE,
     REDSOUND_WAVE_SETTING_TABLE_ALIGN = 0x40,
     REDSOUND_WAVE_SETTING_TABLE_ALIGN_MASK = ~(REDSOUND_WAVE_SETTING_TABLE_ALIGN - 1),
     REDSOUND_MUSIC_REPLAY_POINT_COUNT = 0x100,
@@ -789,6 +791,8 @@ enum RedDriverBufferSize {
     REDSOUND_EXEC_COMMAND_ALLOC_SIZE = REDSOUND_EXEC_COMMAND_BUFFER_SIZE,
     REDSOUND_EXEC_COMMAND_WORD_COUNT = REDSOUND_EXEC_COMMAND_BUFFER_SIZE / sizeof(int),
     REDSOUND_MUSIC_NEXT_PLAY_BUFFER_SIZE = sizeof(RedMusicPlayCommand),
+    REDSOUND_CONTROL_RAMP_ALLOC_SIZE = REDSOUND_CONTROL_RAMP_SIZE,
+    REDSOUND_EDITOR_TRACK_ALLOC_SIZE = REDSOUND_TRACK_SIZE,
     REDSOUND_SOUND_CONTROL_ALLOC_SIZE = REDSOUND_CONTROL_BUFFER_SIZE,
     REDSOUND_KEY_ON_ALLOC_SIZE = REDSOUND_KEY_ON_BUFFER_SIZE,
     REDSOUND_VOICE_ALLOC_SIZE = REDSOUND_VOICE_BUFFER_SIZE,
@@ -802,8 +806,12 @@ enum RedDriverReverbScale {
     REDSOUND_REVERB_DEPTH_INPUT_SCALE_SHIFT = 8,
 };
 
+STATIC_ASSERT(REDSOUND_ZERO_BUFFER_SIZE == REDSOUND_ZERO_ALLOC_SIZE);
+STATIC_ASSERT(REDSOUND_THREAD_STACK_SIZE == REDSOUND_THREAD_STACK_ALLOC_SIZE);
 STATIC_ASSERT(sizeof(int) * REDSOUND_MUSIC_REPLAY_POINT_COUNT == REDSOUND_MUSIC_REPLAY_POINT_ALLOC_SIZE);
 STATIC_ASSERT(sizeof(RedExecCommand) * REDSOUND_EXEC_COMMAND_COUNT == REDSOUND_EXEC_COMMAND_ALLOC_SIZE);
+STATIC_ASSERT(sizeof(RedControlRamp) == REDSOUND_CONTROL_RAMP_ALLOC_SIZE);
+STATIC_ASSERT(sizeof(RedTrackDATA) == REDSOUND_EDITOR_TRACK_ALLOC_SIZE);
 STATIC_ASSERT(sizeof(RedSoundCONTROL) * REDSOUND_CONTROL_COUNT == REDSOUND_SOUND_CONTROL_ALLOC_SIZE);
 STATIC_ASSERT(sizeof(RedKeyOnDATA) == REDSOUND_KEY_ON_ALLOC_SIZE);
 STATIC_ASSERT(sizeof(RedVoiceDATA) * REDSOUND_VOICE_COUNT == REDSOUND_VOICE_ALLOC_SIZE);
@@ -2425,13 +2433,13 @@ void CRedDriver::Init()
         seBlockSlots[index] = REDSOUND_SE_BLOCK_DATA_NONE;
         index = nextIndex;
     } while (nextIndex < REDSOUND_SE_BLOCK_BANK_COUNT);
-    RedZeroDataSet((u8*)RedNew(REDSOUND_ZERO_BUFFER_SIZE));
+    RedZeroDataSet((u8*)RedNew(REDSOUND_ZERO_ALLOC_SIZE));
     memset(RedZeroDataGet(), 0, REDSOUND_ZERO_BUFFER_SIZE);
     RedMusicReplayPointSetBegin((int*)RedNew(REDSOUND_MUSIC_REPLAY_POINT_ALLOC_SIZE));
     memset(RedMusicReplayPointGetBegin(), 0, REDSOUND_MUSIC_REPLAY_POINT_SIZE);
-    RedMusicTempoControlSet((RedControlRamp*)RedNew(REDSOUND_CONTROL_RAMP_SIZE));
+    RedMusicTempoControlSet((RedControlRamp*)RedNew(REDSOUND_CONTROL_RAMP_ALLOC_SIZE));
     memset(RedMusicTempoControlGet(), 0, REDSOUND_CONTROL_RAMP_SIZE);
-    RedMusicPitchControlSet((RedControlRamp*)RedNew(REDSOUND_CONTROL_RAMP_SIZE));
+    RedMusicPitchControlSet((RedControlRamp*)RedNew(REDSOUND_CONTROL_RAMP_ALLOC_SIZE));
     memset(RedMusicPitchControlGet(), 0, REDSOUND_CONTROL_RAMP_SIZE);
     bufferSize = REDSOUND_EXEC_COMMAND_BUFFER_SIZE;
     RedExecCommandSetBegin((RedExecCommand*)RedNew(bufferSize));
@@ -2476,7 +2484,7 @@ void CRedDriver::Init()
         seTracks[nextIndex].m_trackNo = (char)(nextIndex + REDSOUND_SE_VOICE_BASE_INDEX);
         nextIndex = nextIndex + 1;
     } while (nextIndex < REDSOUND_SE_TRACK_COUNT);
-    RedEditorTrackSet((RedTrackDATA*)RedNew(REDSOUND_TRACK_SIZE));
+    RedEditorTrackSet((RedTrackDATA*)RedNew(REDSOUND_EDITOR_TRACK_ALLOC_SIZE));
     memset(RedEditorTrackGet(), 0, REDSOUND_TRACK_SIZE);
     RedReverbDepthSetBegin((RedReverbDepth*)RedNew(REDSOUND_REVERB_DEPTH_ALLOC_SIZE));
     memset(RedReverbDepthGetBegin(), 0, REDSOUND_REVERB_DEPTH_BUFFER_SIZE);
@@ -2500,26 +2508,26 @@ void CRedDriver::Init()
     AXFXSetHooks(ReverbAreaAlloc, ReverbAreaFree);
     InitReverb();
     OSInitSemaphore(&sync.m_DmaExecuteSemaphore, 0);
-    RedDmaExecuteThreadStackSet((u8*)RedNew(REDSOUND_THREAD_STACK_SIZE));
+    RedDmaExecuteThreadStackSet((u8*)RedNew(REDSOUND_THREAD_STACK_ALLOC_SIZE));
     OSCreateThread(&sync.m_DmaExecuteThread, (void* (*)(void*))_DmaExecuteThread, 0,
                    RedDmaExecuteThreadStackGet() + REDSOUND_THREAD_STACK_SIZE, REDSOUND_THREAD_STACK_SIZE,
                    REDSOUND_DMA_THREAD_PRIORITY, REDSOUND_THREAD_DETACHED);
     OSResumeThread(&sync.m_DmaExecuteThread);
     OSInitSemaphore(&sync.m_WaveSettingSemaphore, 0);
-    RedWaveSettingThreadStackSet((u8*)RedNew(REDSOUND_THREAD_STACK_SIZE));
+    RedWaveSettingThreadStackSet((u8*)RedNew(REDSOUND_THREAD_STACK_ALLOC_SIZE));
     OSCreateThread(&sync.m_WaveSettingThread, (void* (*)(void*))_WaveSettingThread, &sync.m_WaveSettingData,
                    RedWaveSettingThreadStackGet() + REDSOUND_THREAD_STACK_SIZE, REDSOUND_THREAD_STACK_SIZE,
                    REDSOUND_WORKER_THREAD_PRIORITY, REDSOUND_THREAD_DETACHED);
     OSResumeThread(&sync.m_WaveSettingThread);
     OSInitSemaphore(&sync.m_MusicSkipSemaphore, 0);
-    RedMusicSkipThreadStackSet((u8*)RedNew(REDSOUND_THREAD_STACK_SIZE));
+    RedMusicSkipThreadStackSet((u8*)RedNew(REDSOUND_THREAD_STACK_ALLOC_SIZE));
     OSCreateThread(&sync.m_MusicSkipThread, (void* (*)(void*))_MusicSkipThread, 0,
                    RedMusicSkipThreadStackGet() + REDSOUND_THREAD_STACK_SIZE, REDSOUND_THREAD_STACK_SIZE,
                    REDSOUND_WORKER_THREAD_PRIORITY, REDSOUND_THREAD_DETACHED);
     OSResumeThread(&sync.m_MusicSkipThread);
     OSInitSemaphore(&sync.m_MainSemaphore, 0);
     RedMainThreadTimeSet(0);
-    RedMainThreadStackSet((u8*)RedNew(REDSOUND_THREAD_STACK_SIZE));
+    RedMainThreadStackSet((u8*)RedNew(REDSOUND_THREAD_STACK_ALLOC_SIZE));
     OSCreateThread(&sync.m_MainThread, (void* (*)(void*))_MainThread, 0,
                    RedMainThreadStackGet() + REDSOUND_THREAD_STACK_SIZE, REDSOUND_THREAD_STACK_SIZE,
                    REDSOUND_WORKER_THREAD_PRIORITY, REDSOUND_THREAD_DETACHED);

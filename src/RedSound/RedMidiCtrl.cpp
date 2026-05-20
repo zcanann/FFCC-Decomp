@@ -984,8 +984,7 @@ static void __MidiCtrl_Stop(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, R
              ((control->m_flags & REDSOUND_CONTROL_FLAG_WHOLE_LOOP_ACTIVE) == 0))) {
             voice = RedVoiceDataGetBegin();
             do {
-                if ((voice->m_track >= control->m_tracks) &&
-                    (voice->m_track < RedSoundControlGetTrackEnd(control))) {
+                if (RedSoundControlHasTrack(control, voice->m_track)) {
                     voice->m_voiceSwitch &= REDSOUND_VOICE_SWITCH_CLEAR_SUSTAIN_PAUSE_MASK;
                     voice->m_flags &= REDSOUND_VOICE_FLAGS_CLEAR_ACTIVE_MASK;
                     voice->m_flags |= REDSOUND_VOICE_FLAGS_RELEASED;

@@ -415,6 +415,8 @@ struct RedSoundCONTROL {
 };
 
 #define RedSoundControlGetTrackEnd(control) ((control)->m_tracks + (control)->m_trackCount)
+#define RedSoundControlHasTrack(control, track)                                                     \
+	(((track) >= (control)->m_tracks) && ((track) < RedSoundControlGetTrackEnd(control)))
 #define RedSeTrackGetEnd(track) ((track) + REDSOUND_SE_TRACK_COUNT)
 #define RedSeTrackGetLast(track) ((track) + REDSOUND_SE_TRACK_LAST_INDEX)
 #define RedSoundControlGetSeTrackEnd(control) RedSeTrackGetEnd((control)->m_tracks)

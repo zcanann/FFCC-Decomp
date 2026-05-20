@@ -1003,8 +1003,7 @@ int MusicStop(int musicId)
 			if (music->m_activeTrackCount != 0) {
 				RedVoiceDATA* voiceData = RedVoiceDataGetBegin();
 				do {
-					if ((voiceData->m_track >= music->m_tracks) &&
-					    (voiceData->m_track < RedSoundControlGetTrackEnd(music))) {
+					if (RedSoundControlHasTrack(music, voiceData->m_track)) {
 						voiceData->m_voiceSwitch &= REDSOUND_VOICE_SWITCH_CLEAR_SUSTAIN_PAUSE_MASK;
 						voiceData->m_flags &= REDSOUND_VOICE_FLAGS_CLEAR_ACTIVE_MASK;
 						voiceData->m_flags |= REDSOUND_VOICE_FLAGS_RELEASED;
@@ -1241,8 +1240,7 @@ void MusicPause(int musicId, int pause)
 				if (music->m_activeTrackCount != 0) {
 					voice = RedVoiceDataGetBegin();
 					do {
-						if ((voice->m_track >= music->m_tracks) &&
-						    (voice->m_track < RedSoundControlGetTrackEnd(music))) {
+						if (RedSoundControlHasTrack(music, voice->m_track)) {
 							if (voice->m_axVoice != REDSOUND_AX_VOICE_NONE) {
 								voice->m_targetPitch = 0;
 								voice->m_flags |= REDSOUND_VOICE_FLAGS_PAUSE_DIRTY;
@@ -1257,8 +1255,7 @@ void MusicPause(int musicId, int pause)
 			} else {
 				voice = RedVoiceDataGetBegin();
 				do {
-					if ((voice->m_track >= music->m_tracks) &&
-					    (voice->m_track < RedSoundControlGetTrackEnd(music))) {
+					if (RedSoundControlHasTrack(music, voice->m_track)) {
 						voice->m_updateFlags |= REDSOUND_VOICE_UPDATE_ALL;
 						voice->m_track->m_voiceSwitch &= REDSOUND_VOICE_SWITCH_CLEAR_PAUSE_MASK;
 						voice->m_voiceSwitch &= REDSOUND_VOICE_SWITCH_CLEAR_PAUSE_MASK;

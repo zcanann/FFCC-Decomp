@@ -1711,7 +1711,7 @@ void CCaravanWork::SafeDeleteTempItem()
 		System.Printf(const_cast<char*>(lbl_801D9F64));
 	}
 
-	unsigned short* artifact = m_artifacts;
+	short* artifact = reinterpret_cast<short*>(m_artifacts);
 	for (int i = 0; i < 50; i++, artifactIndex += 2, artifact += 2) {
 		if (artifactIndex < 96 && (short)artifact[0] > 0) {
 			unsigned short* artifactData =

@@ -94,6 +94,7 @@ struct RedStreamFile {
 #define RedStreamFileGetAdpcm(streamFile, channel) (&(streamFile)->m_adpcm[(channel)])
 #define RedStreamAdpcmHeaderGetChannel(headerData, channel) ((headerData) + (channel))
 #define RedStreamFileGetSampleByte(streamFile, offset) ((s8*)(streamFile))[(offset)]
+#define RedStreamHeaderHasNoLoop(header) ((header)->m_loopStart < REDSOUND_STREAM_LOOP_ENABLED_MIN)
 
 #define RedStreamBufferGetPage(buffer, pageIndex) ((buffer) + (pageIndex) * REDSOUND_STREAM_PAGE_SIZE)
 

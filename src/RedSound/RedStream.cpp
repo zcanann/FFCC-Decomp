@@ -496,7 +496,7 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 			adpcmHeader->m_data.pred_scale = RedStreamFileGetSampleByte(streamFile, adpcmSampleOffset);
 			adpcmHeader->m_data.yn1 = adpcmHeader->m_data.yn2 = 0;
 			if (streamData->m_header.m_channelCount == REDSOUND_STREAM_STEREO_CHANNEL_COUNT) {
-				if (streamData->m_header.m_loopStart < REDSOUND_STREAM_LOOP_ENABLED_MIN) {
+				if (RedStreamHeaderHasNoLoop(&streamData->m_header)) {
 					adpcmSampleOffset += REDSOUND_STREAM_PAGE_SIZE;
 				} else {
 					adpcmSampleOffset += REDSOUND_STREAM_STEREO_RIGHT_FRAME_OFFSET;
@@ -568,7 +568,7 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 			channelIndex += 1;
 		} while (channelIndex < streamData->m_header.m_channelCount);
 
-		if (streamData->m_header.m_loopStart < REDSOUND_STREAM_LOOP_ENABLED_MIN) {
+		if (RedStreamHeaderHasNoLoop(&streamData->m_header)) {
 			channelIndex = _ArrangeStreamDataNoLoop(streamData, REDSOUND_STREAM_BUFFER_SIDE_A, REDSOUND_STREAM_STEREO_PLANE_SIZE);
 		} else {
 			channelIndex = _ArrangeStreamDataLoop(streamData, REDSOUND_STREAM_BUFFER_SIDE_A, REDSOUND_STREAM_STEREO_PLANE_SIZE);
@@ -774,7 +774,7 @@ void StreamControl()
 					if ((axSamplePosition >= currentBufferSampleStart) &&
 					    (axSamplePosition < RedStreamAramSampleGetEnd(currentBufferSampleStart))) {
 						streamResult = 0;
-						if (streamData->m_header.m_loopStart < REDSOUND_STREAM_LOOP_ENABLED_MIN) {
+						if (RedStreamHeaderHasNoLoop(&streamData->m_header)) {
 							streamData->m_header.m_loopEnd = streamData->m_header.m_loopEnd - REDSOUND_STREAM_SAMPLE_ADVANCE;
 							if (streamData->m_header.m_loopEnd < 1) {
 								_StreamStop(streamData);
@@ -795,7 +795,7 @@ void StreamControl()
 								streamData->m_streamCursorBase = REDSOUND_STREAM_PAGE_SIZE;
 							}
 
-							if (streamData->m_header.m_loopStart < REDSOUND_STREAM_LOOP_ENABLED_MIN) {
+							if (RedStreamHeaderHasNoLoop(&streamData->m_header)) {
 								streamResult = _ArrangeStreamDataNoLoop(streamData, streamResult, REDSOUND_STREAM_PAGE_SIZE);
 							} else {
 								streamResult = _ArrangeStreamDataLoop(streamData, streamResult, REDSOUND_STREAM_PAGE_SIZE);

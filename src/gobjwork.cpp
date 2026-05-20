@@ -982,7 +982,7 @@ int CCaravanWork::DeleteItem(int itemIndex, int updateJoybus)
             m_inventoryItems[i] = 0xFFFF;
             m_inventoryItemCount = m_inventoryItemCount - 1;
             if (updateJoybus != 0) {
-                DelItem__6JoyBusFiUc(&Joybus, m_joybusCaravanId, (char)i);
+                Joybus.DelItem(m_joybusCaravanId, static_cast<unsigned char>(i));
             }
             return 1;
         }

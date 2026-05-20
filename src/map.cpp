@@ -99,7 +99,6 @@ extern char g_MsgFlashy[];
 extern const char DAT_8032f984[] = "\n";
 extern "C" unsigned char Vec_80245758[];
 extern "C" void __ct__Q29CLightPcs6CLightFv(void*);
-extern "C" void DestroyBumpLightAll__9CLightPcsFQ29CLightPcs6TARGET(void*, int);
 extern "C" void SetLink__7CMapObjFv();
 extern "C" int ReadOtmOctTree__8COctTreeFR10CChunkFile(void*, CChunkFile&);
 extern "C" CPtrArray<CMapLightHolder*>* dtor_80034414(CPtrArray<CMapLightHolder*>*, short);
@@ -1624,7 +1623,7 @@ void CMapMng::DestroyMap()
         mapLightHolderArray->RemoveAll();
     }
 
-    DestroyBumpLightAll__9CLightPcsFQ29CLightPcs6TARGET(&LightPcs, 1);
+    LightPcs.DestroyBumpLightAll(static_cast<CLightPcs::TARGET>(1));
     *reinterpret_cast<void**>(self + 0x228E8) = 0;
 }
 

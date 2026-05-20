@@ -1492,7 +1492,7 @@ void InsertShadow_r(COctNode* node)
 				s_light_no++;
 				COctNode* grandChild = childIter->m_children[0];
 
-				if ((reinterpret_cast<CBound*>(&s_bound)->CheckCross(*reinterpret_cast<CBound*>(grandChild))) != 0) {
+				if ((reinterpret_cast<CBound*>(grandChild)->CheckCross(*reinterpret_cast<CBound*>(&s_bound))) != 0) {
 					if ((s_light_no >= 3) && (grandChild->m_meshCount != 0)) {
 						setbit32(reinterpret_cast<unsigned long*>(Ptr(grandChild, 0x48)), s_insertShadowNo);
 					}

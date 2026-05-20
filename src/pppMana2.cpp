@@ -109,355 +109,888 @@ static void CalcWaterReflectionVector(
 
 /*
  * --INFO--
- * PAL Address: 0x80108db0
- * PAL Size: 1060b
+ * PAL Address: 0x8010617c
+ * PAL Size: 700b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void Mana2_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int partIndex, int dlIndex, float (*mtx)[4])
+static void CalcWaterReflectionVector(
+    Vec* reflectionVec,
+    Vec* positions,
+    Vec* normals,
+    long count,
+    Vec waterOrigin,
+    float (*matrix)[4],
+    _GXColor* color,
+    Vec2d* texCoord)
 {
-    u8 type = *(u8*)((char*)step + 0x1C);
-    int shape = *(int*)(*(int*)((char*)model + 0xAC) + partIndex * 0x14 + 8);
-    u32* dlEntry = (u32*)(*(int*)(shape + 0x50) + dlIndex * 0xC);
-    bool draw = false;
+    Vec cameraPos;
+    Vec transformedCameraPos;
+    Vec objPos;
+    Vec reflected;
+    Mtx matrixNoTranslate;
+    Mtx inverseMtx;
+    Vec* reflectionIt;
+    Vec* normalIt;
+    unsigned char* colorBytes;
+    float* texCoordFloat;
+    float zero;
+    float half;
+    long i;
 
-    if (type == 2) {
-        if (strcmp((char*)shape, DAT_80331900) == 0 || strcmp((char*)shape, DAT_803318dc) == 0) {
-            draw = true;
-        }
-    } else if (type < 2) {
-        if (type == 0) {
-            if (strcmp((char*)shape, DAT_80331900) == 0) {
-                draw = true;
-            }
-        } else if (strcmp((char*)shape, DAT_80331900) == 0 || strcmp((char*)shape, DAT_803318d4) == 0) {
-            draw = true;
-        }
-    } else if (type < 4 && (strcmp((char*)shape, DAT_80331900) == 0 || strcmp((char*)shape, DAT_803318e4) == 0)) {
-        draw = true;
+    (void)waterOrigin;
+
+    if ((int)Game.m_currentSceneId == 7) {
+        cameraPos.x = ppvCameraMatrix[0][3];
+        cameraPos.y = ppvCameraMatrix[1][3];
+        cameraPos.z = ppvCameraMatrix[2][3];
+    } else {
+        cameraPos.x = CameraWorldX();
+        cameraPos.y = CameraWorldY();
+        cameraPos.z = CameraWorldZ();
     }
 
-    int waterCmp = strcmp((char*)shape, DAT_803318ec);
-    if ((waterCmp == 0 && type == 1) || (strcmp((char*)shape, DAT_803318f4) == 0 && type == 2)) {
-        Mtx cameraMtx;
-        Mtx rotMtx;
-        Mtx posMtx;
-        Vec offset;
-        double x = (double)mtx[0][3];
-        double y = (double)mtx[1][3];
-        double z = (double)mtx[2][3];
+    transformedCameraPos.x = LoadFloat(FLOAT_80331898);
+    transformedCameraPos.y = LoadFloat(FLOAT_80331898);
+    transformedCameraPos.z = LoadFloat(FLOAT_80331898);
 
-        PSMTXCopy(ppvCameraMatrix0, cameraMtx);
-        PSMTXRotRad(rotMtx, 'z', LoadFloat(FLOAT_80331904));
-        mtx[0][3] = LoadFloat(FLOAT_80331898);
-        mtx[1][3] = LoadFloat(FLOAT_80331898);
-        mtx[2][3] = LoadFloat(FLOAT_80331898);
-        PSMTXConcat(mtx, rotMtx, mtx);
+    PSMTXCopy(matrix, matrixNoTranslate);
+    objPos.x = matrixNoTranslate[0][3];
+    objPos.y = matrixNoTranslate[1][3];
+    objPos.z = matrixNoTranslate[2][3];
+    matrixNoTranslate[0][3] = transformedCameraPos.x;
+    matrixNoTranslate[1][3] = transformedCameraPos.y;
+    matrixNoTranslate[2][3] = transformedCameraPos.z;
+    PSMTXInverse(matrixNoTranslate, inverseMtx);
 
-        offset.x = LoadFloat(FLOAT_80331898);
-        offset.y = *(float*)((char*)step + 0x30);
-        offset.z = LoadFloat(FLOAT_80331898);
-        PSMTXMultVec(mtx, &offset, &offset);
+    PSVECSubtract(&objPos, &cameraPos, &cameraPos);
+    PSVECScale(&cameraPos, &cameraPos, LoadFloat(FLOAT_8033189c));
+    PSMTXMultVec(inverseMtx, &cameraPos, &transformedCameraPos);
 
-        mtx[0][3] = (float)x;
-        mtx[1][3] = (float)(y - (double)offset.y);
-        mtx[2][3] = (float)z;
+    colorBytes = (unsigned char*)color;
+    texCoordFloat = (float*)texCoord;
+    reflectionIt = reflectionVec;
+    normalIt = normals;
+    zero = LoadFloat(FLOAT_80331898);
+    half = LoadFloat(FLOAT_803318a4);
 
-        PSMTXConcat(cameraMtx, mtx, posMtx);
-        GXLoadPosMtxImm(posMtx, 0);
-        PSMTXCopy(mtx, (float(*)[4])((char*)work + 0x80));
-        GXSetZMode(GX_ENABLE, GX_LEQUAL, GX_DISABLE);
-        RenderWaterMesh((VMana2*)work);
-        GXSetCullMode((GXCullMode)1);
-    }
+    for (i = 0; i < count; i++) {
+        PSVECSubtract(positions, &transformedCameraPos, &reflected);
+        C_VECReflect(&reflected, normalIt, reflectionIt);
+        PSMTXMultVec(matrixNoTranslate, reflectionIt, reflectionIt);
+        PSVECNormalize(reflectionIt, reflectionIt);
 
-    if (draw) {
-        if (strcmp((char*)shape, DAT_80331900) != 0) {
-            PSMTXCopy(mtx, (float(*)[4])((char*)work + 0xB0));
-            if (*(char*)((char*)work + 0xEC) != 0) {
-                *(u8*)((char*)work + 0x38) = **(u8**)(shape + 0x28);
-                *(u8*)((char*)work + 0x39) = *((u8*)(*(int*)(shape + 0x28)) + 1);
-                *(u8*)((char*)work + 0x3A) = *((u8*)(*(int*)(shape + 0x28)) + 2);
-                *(u8*)((char*)work + 0x3B) = 0x80;
-                DCFlushRange((u8*)work + 0x38, 4);
-                GXSetArray((GXAttr)0xB, *(void**)((char*)work + 0x68), 4);
-                GXSetArray((GXAttr)0xD, *(void**)((char*)work + 0x6C), 4);
-                *(u32*)(MaterialManRaw() + 0x08) = *(u32*)((char*)work + 0x64);
-                *(u32*)(MaterialManRaw() + 0x44) = 0xFFFFFFFF;
-                *(u8*)(MaterialManRaw() + 0x4C) = 0xFF;
-                *(u32*)(MaterialManRaw() + 0x11C) = 0;
-                *(u32*)(MaterialManRaw() + 0x120) = 0x1E;
-                *(u32*)(MaterialManRaw() + 0x124) = 0;
-                *(u8*)(MaterialManRaw() + 0x205) = 0xFF;
-                *(u8*)(MaterialManRaw() + 0x206) = 0xFF;
-                *(u32*)(MaterialManRaw() + 0x58) = 0;
-                *(u32*)(MaterialManRaw() + 0x5C) = 0;
-                *(u8*)(MaterialManRaw() + 0x208) = 0;
-                *(u32*)(MaterialManRaw() + 0x48) = 0x2ACE0F;
-                *(u32*)(MaterialManRaw() + 0x128) = 0;
-                *(u32*)(MaterialManRaw() + 0x12C) = 0x1E;
-                *(u32*)(MaterialManRaw() + 0x130) = 0;
-                *(u32*)(MaterialManRaw() + 0x40) = 0x2ACE0F;
-                *(u32*)(MaterialManRaw() + 0xD0) = *(u32*)((char*)work + 0x20);
-                GXSetCullMode((GXCullMode)1);
-                GXSetZMode(GX_ENABLE, GX_LEQUAL, GX_DISABLE);
-                SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
-                    &MaterialMan, *(void**)(*(int*)((char*)model + 0xA4) + 0x24), *(u16*)((char*)dlEntry + 8), 0, 0);
-                GXCallDisplayList(*(void**)(*(int*)((char*)work + 0x60) + dlIndex * 4), *dlEntry);
-            }
+        if (reflectionIt->z >= zero) {
+            float denomBase;
+
+            colorBytes[0] = 0x80;
+            colorBytes[1] = 0x80;
+            colorBytes[2] = 0xff;
+            colorBytes[3] = 0xbc;
+            denomBase = LoadFloat(FLOAT_803318a0);
+            *texCoordFloat = -reflectionIt->x / (denomBase + reflectionIt->z);
+            texCoordFloat[1] = -reflectionIt->y / (denomBase + reflectionIt->z);
         } else {
-            GXSetZMode(GX_ENABLE, GX_LEQUAL, GX_ENABLE);
-            SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
-                &MaterialMan, *(void**)(*(int*)((char*)model + 0xA4) + 0x24), *(u16*)((char*)dlEntry + 8), 0, 0);
-            GXCallDisplayList((void*)dlEntry[1], dlEntry[0]);
+            float denomBase;
+
+            colorBytes[0] = 0x80;
+            colorBytes[1] = 0xff;
+            colorBytes[2] = 0x80;
+            colorBytes[3] = 0x7f;
+            denomBase = LoadFloat(FLOAT_803318a0);
+            *texCoordFloat = -reflectionIt->x / (denomBase - reflectionIt->z);
+            texCoordFloat[1] = -reflectionIt->y / (denomBase - reflectionIt->z);
         }
+
+        positions++;
+        reflectionIt++;
+        normalIt++;
+        colorBytes += 4;
+        *texCoordFloat = *texCoordFloat * half;
+        *texCoordFloat = *texCoordFloat + half;
+        texCoordFloat[1] = texCoordFloat[1] * half;
+        texCoordFloat[1] = texCoordFloat[1] + half;
+        texCoordFloat += 2;
     }
+
+    DCFlushRange(reflectionVec, count * sizeof(Vec));
+    DCFlushRange(texCoord, count << 3);
+}
+/*
+ * --INFO--
+ * PAL Address: 0x80106438
+ * PAL Size: 604b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+static void CalculateNormal(VMana2* mana2)
+{
+    Vec* positions;
+    Vec* normals;
+    u16* indices;
+    Vec edgeA;
+    Vec edgeB;
+    Vec faceNormal;
+
+    positions = *(Vec**)((u8*)mana2 + 0x3C);
+    normals = *(Vec**)((u8*)mana2 + 0x40);
+    indices = *(u16**)((u8*)mana2 + 0x50);
+
+    float zero = FLOAT_80331898;
+    for (s32 i = 0; i < 0x121; i++) {
+        normals[i].z = zero;
+        normals[i].y = zero;
+        normals[i].x = zero;
+    }
+
+    s32 indicesOffset = 0;
+    for (s32 i = 0; i < 0x200; i++, indicesOffset += 3) {
+        u16 i0 = indices[indicesOffset];
+        u16 i1 = indices[indicesOffset + 1];
+        u16 i2 = indices[indicesOffset + 2];
+
+        edgeA.x = positions[i1].x - positions[i0].x;
+        edgeA.y = positions[i1].y - positions[i0].y;
+        edgeA.z = positions[i1].z - positions[i0].z;
+
+        edgeB.x = positions[i2].x - positions[i0].x;
+        edgeB.y = positions[i2].y - positions[i0].y;
+        edgeB.z = positions[i2].z - positions[i0].z;
+
+        PSVECCrossProduct(&edgeA, &edgeB, &faceNormal);
+        PSVECNormalize(&faceNormal, &faceNormal);
+
+        PSVECAdd(&normals[i0], &faceNormal, &normals[i0]);
+        PSVECAdd(&normals[i1], &faceNormal, &normals[i1]);
+        PSVECAdd(&normals[i2], &faceNormal, &normals[i2]);
+    }
+
+    for (s32 i = 0; i < 0x121; i++) {
+        PSVECNormalize(&normals[i], &normals[i]);
+    }
+
+    DCFlushRange(normals, 0xD8C);
 }
 
 /*
  * --INFO--
- * PAL Address: 0x80108c80
- * PAL Size: 304b
+ * PAL Address: 0x80106694
+ * PAL Size: 1472b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructMana2(pppMana2* pppMana2, pppMana2UnkC* param_2)
+static int RenderWaterMesh(VMana2* mana2)
 {
-    CGObject* gObject;
-    void* handle;
-    u32 model;
-    u32* work;
-    s32 workOffset;
+    u8* work = (u8*)mana2;
+    void* positions = *(void**)(work + 0x3C);
+    void* normals = *(void**)(work + 0x40);
+    void* texCoord0 = *(void**)(work + 0x54);
+    void* texCoord1 = *(void**)(work + 0x58);
+    u16* indices = *(u16**)(work + 0x50);
+    void* colors = *(void**)(work + 0x5C);
+    void* texObj0 = *(void**)(work + 0x28);
+    void* texObj2;
+    _GXColor blendColor;
+    _GXColor modulateColor;
 
-    workOffset = param_2->m_serializedDataOffsets[2];
-    work = (u32*)((char*)pppMana2 + 0x80 + workOffset);
-    gObject = *(CGObject**)((char*)pppMngStPtr + 0xDC);
-    gObject->m_stepSlopeLimit = LoadFloat(FLOAT_803318fc);
+    GXClearVtxDesc();
+    GXSetVtxDesc((GXAttr)9, GX_INDEX16);
+    GXSetVtxDesc((GXAttr)10, GX_INDEX16);
+    GXSetVtxDesc((GXAttr)0xB, GX_INDEX16);
+    GXSetVtxDesc((GXAttr)0xD, GX_INDEX16);
+    GXSetVtxDesc((GXAttr)0xE, GX_INDEX16);
+    GXSetVtxAttrFmt((GXVtxFmt)7, (GXAttr)9, (GXCompCnt)1, (GXCompType)4, 0);
+    GXSetVtxAttrFmt((GXVtxFmt)7, (GXAttr)10, (GXCompCnt)0, (GXCompType)4, 0);
+    GXSetVtxAttrFmt((GXVtxFmt)7, (GXAttr)0xB, (GXCompCnt)1, (GXCompType)5, 0);
+    GXSetVtxAttrFmt((GXVtxFmt)7, (GXAttr)0xD, (GXCompCnt)1, (GXCompType)4, 0);
+    GXSetVtxAttrFmt((GXVtxFmt)7, (GXAttr)0xE, (GXCompCnt)1, (GXCompType)4, 0);
+    GXSetNumTexGens(2);
+    GXSetCullMode((GXCullMode)0);
+    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 0xF);
+    GXSetChanCtrl((GXChannelID)4, GX_DISABLE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
+    GXSetZMode(GX_ENABLE, GX_LEQUAL, GX_DISABLE);
+    GXSetNumChans(1);
+    blendColor.r = 0xFF;
+    blendColor.g = 0xFF;
+    blendColor.b = 0xFF;
+    blendColor.a = 0xFF;
+    _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
+    _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(1, 0, 0);
+    GXSetArray((GXAttr)9, positions, 0xC);
+    GXSetArray((GXAttr)10, normals, 0xC);
+    GXSetArray((GXAttr)0xB, colors, 4);
+    GXSetArray((GXAttr)0xD, texCoord0, 8);
+    GXSetArray((GXAttr)0xE, texCoord1, 8);
+    texObj2 = *(void**)(work + 0x7C);
+    GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)1, (GXTexGenSrc)4, 0x3C, GX_FALSE, 0x7D);
+    GXSetTexCoordGen2((GXTexCoordID)1, (GXTexGenType)1, (GXTexGenSrc)5, 0x3C, GX_FALSE, 0x7D);
+    u8 alpha = *(u8*)(work + 0xE0);
+    blendColor.r = 0x80;
+    blendColor.g = 0x80;
+    blendColor.b = 0x80;
+    blendColor.a = 0x80;
+    modulateColor.r = alpha;
+    modulateColor.g = alpha;
+    modulateColor.b = alpha;
+    modulateColor.a = alpha;
+
+    GXSetTevDirect((GXTevStageID)0);
+    _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
+    _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 4);
+    GXLoadTexObj((GXTexObj*)((u8*)texObj2 + 0x28), GX_TEXMAP0);
+    GXSetTevKColor((GXTevKColorID)1, modulateColor);
+    GXSetTevKColorSel((GXTevStageID)0, (GXTevKColorSel)0xD);
+    GXSetTevKAlphaSel((GXTevStageID)0, (GXTevKAlphaSel)0x1D);
+    _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(0, 0xF, 0xF,
+                                                                                                           0xF, 8);
+    _GXSetTevColorOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(0, 0, 0, 0, 1, 0);
+    _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg(0, 7, 6, 4, 7);
+    _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(0, 0, 0, 0, 1, 0);
+
+    GXSetTevDirect((GXTevStageID)1);
+    _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(1, 0, 0);
+    _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(1, 1, 1, 4);
+    GXLoadTexObj(*(GXTexObj**)(work + 0x28), GX_TEXMAP1);
+    GXSetTevKColor((GXTevKColorID)0, blendColor);
+    GXSetTevKColorSel((GXTevStageID)1, (GXTevKColorSel)0xC);
+    GXSetTevKAlphaSel((GXTevStageID)1, (GXTevKAlphaSel)0x1C);
+    _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(1, 0xB, 0xE,
+                                                                                                           8, 0xF);
+    _GXSetTevColorOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(1, 8, 0, 0, 1, 0);
+    _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg(1, 7, 7, 7, 0);
+    _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(1, 0, 0, 1, 1, 0);
+
+    GXSetTevDirect((GXTevStageID)2);
+    _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(2, 0, 0);
+    _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(2, 1, 2, 4);
+    GXLoadTexObj(*(GXTexObj**)(work + 0x2C), GX_TEXMAP2);
+    GXSetTevKColor((GXTevKColorID)0, blendColor);
+    GXSetTevKColorSel((GXTevStageID)2, (GXTevKColorSel)0xC);
+    GXSetTevKAlphaSel((GXTevStageID)2, (GXTevKAlphaSel)0x1C);
+    _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(2, 0xE, 0xB,
+                                                                                                           8, 0);
+    _GXSetTevColorOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(2, 8, 0, 0, 1, 0);
+    _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg(2, 7, 7, 7, 0);
+    _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(2, 0, 0, 0, 1, 0);
+
+    GXSetNumTevStages(3);
+    GXBegin((GXPrimitive)0x90, GX_VTXFMT7, 0x600);
+    u16* indexIt = indices;
+    for (int i = 0; i < 0x180; i++) {
+        GXPosition1x16(indexIt[0]);
+        GXNormal1x16(indexIt[0]);
+        GXColor1x16(indexIt[0]);
+        GXTexCoord1x16(indexIt[0]);
+        GXTexCoord1x16(indexIt[0]);
+        GXPosition1x16(indexIt[1]);
+        GXNormal1x16(indexIt[1]);
+        GXColor1x16(indexIt[1]);
+        GXTexCoord1x16(indexIt[1]);
+        GXTexCoord1x16(indexIt[1]);
+        GXPosition1x16(indexIt[2]);
+        GXNormal1x16(indexIt[2]);
+        GXColor1x16(indexIt[2]);
+        GXTexCoord1x16(indexIt[2]);
+        GXTexCoord1x16(indexIt[2]);
+        GXPosition1x16(indexIt[3]);
+        GXNormal1x16(indexIt[3]);
+        GXColor1x16(indexIt[3]);
+        GXTexCoord1x16(indexIt[3]);
+        GXTexCoord1x16(indexIt[3]);
+        indexIt += 4;
+    }
+
+    _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0xFF, 4);
+    _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 4);
+    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(0, 4, 5, 0xF);
+    GXSetNumTevStages(1);
+    GXLoadTexObj((GXTexObj*)texObj0, GX_TEXMAP0);
+    return 1;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80106c54
+ * PAL Size: 968b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+static int UpdateWaterMesh(VMana2* mana2)
+{
+    u8* work;
+    float* waterHeightA;
+    float* waterHeightB;
+    Vec* positions;
+    Vec origin;
+    float currentScale;
+    float neighborScale;
+
+    work = (u8*)mana2;
+    waterHeightA = *(float**)(work + 0x48);
+    positions = *(Vec**)(work + 0x3C);
+    waterHeightB = *(float**)(work + 0x4C);
+    if (waterHeightA == NULL) {
+        return 0;
+    }
+
+    for (int row = 1, rowBase = 0x11; row < 0x10; row++, rowBase += 0x11) {
+        currentScale = FLOAT_80331898;
+        neighborScale = FLOAT_803318a4;
+        for (int col = 1; col < 0x10; col += 5) {
+            int index = rowBase + col;
+            int above0 = index - 0x11;
+            int below0 = index + 0x11;
+
+            waterHeightB[index] = currentScale * waterHeightA[index] +
+                                  neighborScale * (waterHeightA[above0] + waterHeightA[below0] +
+                                                   waterHeightA[index - 1] + waterHeightA[index + 1]) -
+                                  waterHeightB[index];
+
+            int index1 = index + 1;
+            int above1 = index1 - 0x11;
+            int below1 = index1 + 0x11;
+            waterHeightB[index1] = currentScale * waterHeightA[index1] +
+                                   neighborScale * (waterHeightA[above1] + waterHeightA[below1] +
+                                                    waterHeightA[index1 - 1] + waterHeightA[index1 + 1]) -
+                                   waterHeightB[index1];
+
+            int index2 = index + 2;
+            int above2 = index2 - 0x11;
+            int below2 = index2 + 0x11;
+            waterHeightB[index2] = currentScale * waterHeightA[index2] +
+                                   neighborScale * (waterHeightA[above2] + waterHeightA[below2] +
+                                                    waterHeightA[index2 - 1] + waterHeightA[index2 + 1]) -
+                                   waterHeightB[index2];
+
+            int index3 = index + 3;
+            int above3 = index3 - 0x11;
+            int below3 = index3 + 0x11;
+            waterHeightB[index3] = currentScale * waterHeightA[index3] +
+                                   neighborScale * (waterHeightA[above3] + waterHeightA[below3] +
+                                                    waterHeightA[index3 - 1] + waterHeightA[index3 + 1]) -
+                                   waterHeightB[index3];
+
+            int index4 = index + 4;
+            int above4 = index4 - 0x11;
+            int below4 = index4 + 0x11;
+            waterHeightB[index4] = currentScale * waterHeightA[index4] +
+                                   neighborScale * (waterHeightA[above4] + waterHeightA[below4] +
+                                                    waterHeightA[index4 - 1] + waterHeightA[index4 + 1]) -
+                                   waterHeightB[index4];
+        }
+    }
+
+    for (int i = 0; i < 0x121; i++) {
+        float tmp = waterHeightA[i];
+        waterHeightA[i] = waterHeightB[i];
+        waterHeightB[i] = tmp;
+        positions[i].y = waterHeightA[i];
+    }
+
+    DCFlushRange(positions, 0xD8C);
+    CalculateNormal(mana2);
+
+    origin.x = *(float*)(work + 0x8C);
+    origin.y = *(float*)(work + 0x9C);
+    origin.z = *(float*)(work + 0xAC);
+    CalcWaterReflectionVector(*(Vec**)(work + 0x44), *(Vec**)(work + 0x3C), *(Vec**)(work + 0x40), 0x121, origin,
+                              (float(*)[4])(work + 0x80), *(_GXColor**)(work + 0x5C), *(Vec2d**)(work + 0x58));
+    return 1;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8010701c
+ * PAL Size: 404b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+static int CreateWaterMesh(Vec* param_1, Vec* param_2, Vec2d* param_3, unsigned short* param_4, float param_5)
+{
+    float zero;
+    float normalY;
+    float radius;
+    float uvStep;
+    float x;
+    float z;
+    float rowUv;
+    int indexOffset;
+    short quadIndex;
+    short rowBase;
+    float* positions;
+    int rowCount;
+    float* normals;
+    float* uvs;
+    int colCount;
+    int pairCount;
+
+    normalY = LoadFloat(FLOAT_803318a0);
+    zero = LoadFloat(FLOAT_80331898);
+    rowCount = 0;
+    uvStep = LoadFloat(FLOAT_803318A8);
+    radius = param_5 * LoadFloat(FLOAT_803318a4);
+    for (z = radius; -radius <= z; z -= param_5 * uvStep) {
+        colCount = 0;
+        rowUv = static_cast<float>(rowCount) * uvStep;
+        positions = reinterpret_cast<float*>(param_1);
+        normals = reinterpret_cast<float*>(param_2);
+        uvs = reinterpret_cast<float*>(param_3);
+        for (x = -radius; x <= radius; x += param_5 * uvStep) {
+            *positions = x;
+            param_1 = reinterpret_cast<Vec*>(positions + 3);
+            positions[1] = zero;
+            param_2 = reinterpret_cast<Vec*>(normals + 3);
+            param_3 = reinterpret_cast<Vec2d*>(uvs + 2);
+            positions[2] = z;
+            positions = positions + 3;
+            *normals = zero;
+            normals[1] = normalY;
+            normals[2] = zero;
+            normals = normals + 3;
+            *uvs = static_cast<float>(colCount) * uvStep;
+            uvs[1] = rowUv;
+            uvs = uvs + 2;
+            colCount = colCount + 1;
+        }
+        rowCount = rowCount + 1;
+    }
+    indexOffset = 0;
+    rowCount = 0;
+    rowBase = 0;
+    do {
+        pairCount = 8;
+        quadIndex = rowBase;
+        do {
+            param_4[indexOffset++] = quadIndex;
+            param_4[indexOffset++] = quadIndex + 1;
+            param_4[indexOffset++] = quadIndex + 0x12;
+            param_4[indexOffset++] = quadIndex + 0x12;
+            param_4[indexOffset++] = quadIndex + 0x11;
+            param_4[indexOffset++] = quadIndex;
+            param_4[indexOffset++] = quadIndex + 1;
+            param_4[indexOffset++] = quadIndex + 2;
+            param_4[indexOffset++] = quadIndex + 0x13;
+            param_4[indexOffset++] = quadIndex + 0x13;
+            param_4[indexOffset++] = quadIndex + 0x12;
+            param_4[indexOffset++] = quadIndex + 1;
+            quadIndex = quadIndex + 2;
+            pairCount = pairCount + -1;
+        } while (pairCount != 0);
+        rowCount = rowCount + 1;
+        rowBase = rowBase + 0x11;
+    } while (rowCount < 0x10);
+    return 1;
+}
+
+#ifndef VERSION_GCCP01
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void MakeWave(Vec*, unsigned short*, float*, Vec, float, float)
+{
+	// TODO
+}
+#endif
+
+/*
+ * --INFO--
+ * PAL Address: 0x801071b0
+ * PAL Size: 1428b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CalcReflectionVector2(
+    Vec* reflectionVec,
+    S16Vec* positions,
+    S16Vec* normals,
+    long count,
+    unsigned long posScale,
+    unsigned long normalScale,
+    float (*matrix)[4],
+    void* displayList,
+    unsigned long displayListSize,
+    _GXColor* color,
+    S16Vec2d* texCoord,
+    CChara::CNode* node)
+{
+    Vec cameraPos;
+    Vec nodeOffset;
+    Vec worldPos;
+    Vec cameraVector;
+    Vec objSpacePos;
+    Vec objSpaceNormal;
+    Vec2d uv;
+    Mtx nodeMtx;
+    Mtx nodeRotMtx;
+    Mtx cameraMtx;
+    Mtx cameraModelMtx;
+    u16* dl = (u16*)displayList;
+    u16* dlEnd;
+
+    cameraPos.x = CameraWorldX();
+    cameraPos.y = CameraWorldY();
+    cameraPos.z = CameraWorldZ();
+
+    PSMTXCopy(matrix, nodeMtx);
+    nodeOffset.x = *(float*)((char*)node + 0x78);
+    nodeOffset.y = *(float*)((char*)node + 0x88);
+    nodeOffset.z = *(float*)((char*)node + 0x98);
+
+    worldPos.x = nodeMtx[0][3];
+    worldPos.y = nodeMtx[1][3];
+    worldPos.z = nodeMtx[2][3];
+    PSVECAdd(&nodeOffset, &worldPos, &worldPos);
+
+    PSMTXCopy((float(*)[4])((char*)node + 0x6C), matrix);
+    matrix[0][3] = worldPos.x;
+    matrix[1][3] = worldPos.y;
+    matrix[2][3] = worldPos.z;
+
+    PSMTXCopy(matrix, nodeRotMtx);
+    nodeRotMtx[0][3] = LoadFloat(FLOAT_80331898);
+    nodeRotMtx[1][3] = LoadFloat(FLOAT_80331898);
+    nodeRotMtx[2][3] = LoadFloat(FLOAT_80331898);
+
+    PSMTXCopy(CameraMatrix(), cameraMtx);
+    PSMTXConcat(cameraMtx, matrix, cameraModelMtx);
+
+    const double half = (double)LoadFloat(FLOAT_803318a4);
+
+    dlEnd = (u16*)((u8*)displayList + displayListSize);
+    while (dl < dlEnd) {
+        u8 drawFmt = *(u8*)dl;
+        u16 itemCount = *(u16*)((u8*)dl + 1);
+        int i;
+
+        if (gUtil.IsHasDrawFmtDL(drawFmt) == 0) {
+            break;
+        }
+
+        dl = (u16*)((u8*)dl + 3);
+        for (i = 0; i < itemCount; i++) {
+            u16 posIndex = dl[0];
+            u16 normalIndex = dl[1];
+            u16* next = dl + 4;
+            int axis = 0;
+            float maxAxis;
+            float invAxis;
+            Vec* outVec;
+            u8* clr;
+
+            if ((drawFmt & 7) == 2) {
+                next = dl + 5;
+            }
+
+            gUtil.ConvI2FVector(objSpacePos, positions[posIndex], posScale);
+            gUtil.ConvI2FVector(objSpaceNormal, normals[normalIndex], normalScale);
+            PSMTXMultVec(matrix, &objSpacePos, &objSpacePos);
+            PSMTXMultVec(nodeRotMtx, &objSpaceNormal, &objSpaceNormal);
+
+            PSVECSubtract(&objSpacePos, &cameraPos, &cameraVector);
+            PSVECNormalize(&cameraVector, &cameraVector);
+            outVec = &reflectionVec[posIndex];
+            C_VECReflect(&cameraVector, &objSpaceNormal, outVec);
+
+            float absY = fabsf(outVec->y);
+            float absX = fabsf(outVec->x);
+            float absZ = fabsf(outVec->z);
+
+            axis = absX < absY;
+            maxAxis = absX;
+            if (axis != 0) {
+                axis = 1;
+                maxAxis = absY;
+            }
+            if (maxAxis < absZ) {
+                axis = 2;
+            }
+            CVector reflected(outVec->x, outVec->y, outVec->z);
+
+            clr = (u8*)&color[posIndex];
+            clr[0] = 0x80;
+            clr[1] = 0x80;
+            clr[2] = 0x80;
+            clr[3] = 0xFF;
+
+            uv.x = (float)half;
+            uv.y = (float)half;
+
+            if (axis == 1) {
+                invAxis = LoadFloat(FLOAT_803318b8) * reflected.y;
+                if (outVec->y < LoadFloat(FLOAT_80331898)) {
+                    clr[1] = (u8)(clr[1] - 0x7F);
+                    uv.x = (float)((half - (double)(reflected.x / invAxis)) * (double)LoadFloat(FLOAT_803318bc) +
+                                   (double)LoadFloat(FLOAT_803318bc));
+                    uv.y =
+                        (float)((double)((float)(half + (double)(reflected.z / invAxis)) * LoadFloat(FLOAT_803318bc)) + half);
+                } else {
+                    clr[1] = (u8)(clr[1] + 0x7F);
+                    uv.y = (float)((half + (double)(reflected.z / invAxis)) * (double)LoadFloat(FLOAT_803318bc));
+                    uv.x =
+                        (float)((double)((float)(half + (double)(reflected.x / invAxis)) * LoadFloat(FLOAT_803318bc)) + half);
+                }
+            } else if (axis == 0) {
+                invAxis = LoadFloat(FLOAT_803318b8) * reflected.x;
+                if (outVec->x < LoadFloat(FLOAT_80331898)) {
+                    clr[0] = (u8)(clr[0] - 0x7F);
+                    uv.x = (float)((half - (double)(reflected.z / invAxis)) * (double)LoadFloat(FLOAT_803318bc) +
+                                   (double)LoadFloat(FLOAT_803318c0));
+                    uv.y = (float)((half + (double)(reflected.y / invAxis)) * (double)LoadFloat(FLOAT_803318bc) +
+                                   (double)LoadFloat(FLOAT_803318bc));
+                } else {
+                    clr[0] = (u8)(clr[0] + 0x7F);
+                    uv.x = (float)((half - (double)(reflected.z / invAxis)) * (double)LoadFloat(FLOAT_803318bc) +
+                                   (double)LoadFloat(FLOAT_803318bc));
+                    uv.y = (float)((half - (double)(reflected.y / invAxis)) * (double)LoadFloat(FLOAT_803318bc) +
+                                   (double)LoadFloat(FLOAT_803318bc));
+                }
+            } else {
+                invAxis = LoadFloat(FLOAT_803318b8) * reflected.z;
+                if (outVec->z < LoadFloat(FLOAT_80331898)) {
+                    clr[2] = (u8)(clr[2] - 0x7F);
+                    uv.x =
+                        (float)((double)((float)(half + (double)(reflected.x / invAxis)) * LoadFloat(FLOAT_803318bc)) + half);
+                    uv.y = (float)((half + (double)(reflected.y / invAxis)) * (double)LoadFloat(FLOAT_803318bc) +
+                                   (double)LoadFloat(FLOAT_803318bc));
+                } else {
+                    clr[2] = (u8)(clr[2] + 0x7F);
+                    uv.x = (float)((half + (double)(reflected.x / invAxis)) * (double)LoadFloat(FLOAT_803318bc));
+                    uv.y = (float)((half - (double)(reflected.y / invAxis)) * (double)LoadFloat(FLOAT_803318bc) +
+                                   (double)LoadFloat(FLOAT_803318bc));
+                }
+            }
+
+            gUtil.ConvF2IVector2d(texCoord[normalIndex], uv, 12);
+            dl = next;
+        }
+    }
+
+    DCFlushRange(reflectionVec, count * sizeof(Vec));
+    DCFlushRange(texCoord, count << 3);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80107744
+ * PAL Size: 1796b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, float (*) [4], int)
+{
+    u32* work;
+    s32 model;
+    void* handle;
+    CGObject* gObject;
+    Mtx identityMtx;
+    Mtx savedCameraMtx;
+    Mtx lookAtMtx;
+    Mtx44 projectionMtx;
+    Mtx44 savedScreenMtx;
+    _GXTexObj sceneTexObj;
+    _GXTexObj depthTexObj;
+    Vec centerPos;
+    Vec cameraPos;
+    Vec cameraUp;
+    Vec quadMin;
+    Vec quadMax;
+    GXColor quadColor;
+    u32 depthTexSize;
+    u32 baseParaboloidTexObjs;
+    u32 sourceTexObjs;
+    s32 i;
+
+    work = (u32*)param_2;
+    baseParaboloidTexObjs = work[8];
+    if (*(u8*)((char*)param_3 + 0x1C) == 0) {
+        return;
+    }
+
+    PSMTXIdentity(identityMtx);
+    PSMTXCopy(CameraMatrix(), savedCameraMtx);
+    PSMTX44Copy(CameraScreenMatrix(), savedScreenMtx);
+    Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, &sceneTexObj, 0, 0, 0x80, 0x80, 0, GX_NEAR, GX_TF_RGBA8, 0);
+
+    gObject = (CGObject*)work[0];
+    if (gObject == NULL) {
+        return;
+    }
 
     handle = GetCharaHandlePtr__FP8CGObjectl(gObject, 0);
-    GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
-    model = *(u32*)((char*)handle + 0x168);
-    *(u32*)(model + 0x98) = 0x3F;
-    work[1] = (u32)pppMngStPtr;
+    model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
+    *(u32*)(model + 0xF0) = 0;
+    *(u32*)(model + 0xFC) = 0;
 
-    work[0] = 0;
-    work[1] = 0;
-    work[9] = 0;
-    work[8] = 0;
-    work[15] = 0;
-    work[16] = 0;
-    work[18] = 0;
-    work[19] = 0;
-    work[20] = 0;
-    work[21] = 0;
-    work[22] = 0;
-    work[24] = 0;
-    work[17] = 0;
-    work[23] = 0;
-    work[29] = 0;
-    work[28] = 0;
-    work[30] = 0;
-    work[31] = 0;
-    work[25] = 0;
-    work[26] = 0;
-    work[27] = 0;
-    work[10] = 0;
-    work[11] = 0;
-    work[12] = 0;
-    work[13] = 0;
-    *(u8*)(work + 0x38) = 0xFF;
-    PSMTXIdentity((float (*)[4])(work + 0x20));
-    PSMTXIdentity((float (*)[4])(work + 0x2C));
-    *(u8*)(work + 0xE) = 0xFF;
-    *((u8*)work + 0x39) = 0xFF;
-    *((u8*)work + 0x3A) = 0xFF;
-    *((u8*)work + 0x3B) = 0xFF;
-    work[2] = 0;
-    work[3] = 0;
-    work[4] = 0;
-    work[5] = 0;
-    work[6] = 0;
-    work[7] = 0;
-    work[0x39] = 0;
-    work[0x3A] = 0;
-    *(u8*)(work + 0x3B) = 0;
+    if ((int)Game.m_currentSceneId == 7) {
+        centerPos.x = LoadFloat(FLOAT_80331898);
+        centerPos.y = LoadFloat(FLOAT_80331898);
+        centerPos.z = LoadFloat(FLOAT_80331898);
+    } else {
+        centerPos.x = gObject->m_worldPosition.x;
+        centerPos.y = gObject->m_worldPosition.y;
+        centerPos.z = gObject->m_worldPosition.z;
+    }
+    centerPos.y += LoadFloat(FLOAT_803318c4);
+
+    depthTexSize = GXGetTexBufferSize(0x80, 0x80, (_GXTexFmt)6, GX_FALSE, 0);
+    GXGetTexBufferSize(0x80, 0x80, (_GXTexFmt)4, GX_FALSE, 0);
+    sourceTexObjs = work[0x1D];
+
+    if (*(u8*)((char*)param_3 + 0x38) != 0) {
+        Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, &depthTexObj, 0, 0, 0x80, 0x80, depthTexSize, GX_LINEAR,
+                                   (_GXTexFmt)0x16, 1);
+        GXSetViewport(LoadFloat(FLOAT_80331898), LoadFloat(FLOAT_80331898), LoadFloat(FLOAT_803318c8),
+                      LoadFloat(FLOAT_803318c8), LoadFloat(FLOAT_80331898), LoadFloat(FLOAT_803318a0));
+        C_MTXPerspective(projectionMtx, LoadFloat(FLOAT_803318cc), LoadFloat(FLOAT_803318a0),
+                         LoadFloat(FLOAT_803318a0), LoadFloat(FLOAT_803318d0));
+        GXSetProjection(projectionMtx, (_GXProjectionType)0);
+
+        for (i = 0; i < 6; i++) {
+            cameraPos.x = centerPos.x;
+            cameraPos.y = centerPos.y;
+            cameraPos.z = centerPos.z;
+            cameraUp.y = LoadFloat(FLOAT_803318a0);
+            cameraUp.z = LoadFloat(FLOAT_80331898);
+
+            if (i == 3) {
+                cameraPos.y = centerPos.y - LoadFloat(FLOAT_803318a0);
+                cameraUp.y = LoadFloat(FLOAT_80331898);
+                cameraUp.z = LoadFloat(FLOAT_803318a0);
+            } else if (i < 3) {
+                if (i == 1) {
+                    cameraPos.x = centerPos.x - LoadFloat(FLOAT_803318a0);
+                } else if (i < 1) {
+                    cameraPos.x = centerPos.x + LoadFloat(FLOAT_803318a0);
+                } else {
+                    cameraPos.y = centerPos.y + LoadFloat(FLOAT_803318a0);
+                    cameraUp.y = LoadFloat(FLOAT_80331898);
+                    cameraUp.z = LoadFloat(FLOAT_8033189c);
+                }
+            } else if (i == 5) {
+                cameraPos.z = centerPos.z - LoadFloat(FLOAT_803318a0);
+            } else {
+                cameraPos.z = centerPos.z + LoadFloat(FLOAT_803318a0);
+            }
+
+            cameraUp.x = LoadFloat(FLOAT_80331898);
+            C_MTXLookAt(lookAtMtx, (Point3d*)&centerPos, &cameraUp, (Point3d*)&cameraPos);
+            Graphic.SetViewport();
+            GXSetScissor(0, 0, 0x280, 0x1C0);
+            gUtil.RenderTextureQuad(LoadFloat(FLOAT_80331898), LoadFloat(FLOAT_80331898), LoadFloat(FLOAT_803318c8),
+                                    LoadFloat(FLOAT_803318c8), (GXTexObj*)baseParaboloidTexObjs, 0, 0, 0,
+                                    (_GXBlendFactor)4, (_GXBlendFactor)5);
+            baseParaboloidTexObjs += 0x20;
+        }
+
+        PSMTXCopy(savedCameraMtx, CameraMatrix());
+        Graphic.SetViewport();
+        GXSetScissor(0, 0, 0x280, 0x1C0);
+        GXSetZTexture((GXZTexOp)2, (_GXTexFmt)0x16, 0);
+        GXSetColorUpdate(GX_FALSE);
+        gUtil.BeginQuadEnv();
+        GXSetZMode(GX_TRUE, (_GXCompare)7, GX_TRUE);
+        GXSetZCompLoc(GX_FALSE);
+        gUtil.SetVtxFmt_POS_CLR_TEX();
+        _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 4);
+        _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 0xFF);
+        _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(
+            0, 0xF, 0xF, 0xF, 0xF);
+        _GXSetTevColorOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(0, 0, 0, 0, 1, 0);
+        _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg(0, 7, 7,
+                                                                                                                7, 6);
+        _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(0, 0, 0, 0, 1, 0);
+        GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
+        GXLoadTexObj(&depthTexObj, GX_TEXMAP0);
+
+        quadMin.x = LoadFloat(FLOAT_80331898);
+        quadMin.y = LoadFloat(FLOAT_80331898);
+        quadMin.z = LoadFloat(FLOAT_80331898);
+        quadMax.x = LoadFloat(FLOAT_803318c8);
+        quadMax.y = LoadFloat(FLOAT_803318c8);
+        quadMax.z = LoadFloat(FLOAT_80331898);
+        quadColor.r = 0xFF;
+        quadColor.g = 0xFF;
+        quadColor.b = 0xFF;
+        quadColor.a = 0;
+        gUtil.RenderQuad(quadMin, quadMax, quadColor, 0, 0);
+        gUtil.EndQuadEnv();
+        GXSetZTexture((GXZTexOp)0, (_GXTexFmt)0x11, 0);
+        GXSetColorUpdate(GX_TRUE);
+        GXSetAlphaUpdate(GX_TRUE);
+        GXSetZCompLoc(GX_TRUE);
+        gUtil.RenderTextureQuad(LoadFloat(FLOAT_80331898), LoadFloat(FLOAT_80331898), LoadFloat(FLOAT_803318c8),
+                                LoadFloat(FLOAT_803318c8), &sceneTexObj, 0, 0, 0, (_GXBlendFactor)4,
+                                (_GXBlendFactor)5);
+        *((u8*)work + 0xEC) = 1;
+    }
+
+    baseParaboloidTexObjs = work[0x1E];
+    if (*(u8*)((char*)param_3 + 0x38) == 0) {
+        if (*((u8*)work + 0xEC) == 0) {
+            GXInitTexObj((GXTexObj*)work[10], (void*)work[12], 0x80, 0x80, (_GXTexFmt)4, (_GXTexWrapMode)1,
+                         (_GXTexWrapMode)1, GX_FALSE);
+            GXInitTexObj((GXTexObj*)work[11], (void*)work[13], 0x80, 0x80, (_GXTexFmt)4, (_GXTexWrapMode)1,
+                         (_GXTexWrapMode)1, GX_FALSE);
+            drawParaboloidMap((GXTexObj*)work[8], (GXTexObj*)work[11], (void*)work[9], work[0x39],
+                              (GXTexObj*)(baseParaboloidTexObjs + 0x28), 1);
+            drawParaboloidMap((GXTexObj*)work[8], (GXTexObj*)work[10], (void*)work[9], work[0x39],
+                              (GXTexObj*)(baseParaboloidTexObjs + 0x28), 0);
+            *((u8*)work + 0xEC) = 1;
+        }
+    } else {
+        GXInitTexObj((GXTexObj*)work[10], (void*)work[12], 0x80, 0x80, (_GXTexFmt)4, (_GXTexWrapMode)0,
+                     (_GXTexWrapMode)0, GX_FALSE);
+        GXInitTexObj((GXTexObj*)work[11], (void*)work[13], 0x80, 0x80, (_GXTexFmt)4, (_GXTexWrapMode)0,
+                     (_GXTexWrapMode)0, GX_FALSE);
+        drawParaboloidMap((GXTexObj*)sourceTexObjs, (GXTexObj*)work[11], (void*)work[9], work[0x39],
+                          (GXTexObj*)(baseParaboloidTexObjs + 0x28), 1);
+        drawParaboloidMap((GXTexObj*)sourceTexObjs, (GXTexObj*)work[10], (void*)work[9], work[0x39],
+                          (GXTexObj*)(baseParaboloidTexObjs + 0x28), 0);
+        Graphic.SetViewport();
+        GXSetProjection(savedScreenMtx, (_GXProjectionType)0);
+        PSMTXCopy(savedCameraMtx, CameraMatrix());
+    }
+
+    GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
+    handle = GetCharaHandlePtr__FP8CGObjectl(gObject, 0);
+    model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
+    *(u32*)(model + 0xF0) = (u32)Mana2_BeforeDrawCallback;
+    *(u32*)(model + 0xFC) = (u32)Mana2_DrawMeshDLCallback;
 }
 
 /*
  * --INFO--
- * PAL Address: 0x801088a0
- * PAL Size: 992b
+ * PAL Address: 0x80107e48
+ * PAL Size: 92b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDestructMana2(pppMana2* pppMana2, pppMana2UnkC* param_2)
+void pppRenderMana2(pppMana2*, pppMana2UnkB*, pppMana2UnkC*)
 {
-    u32* work;
-    CGObject* gObject;
-    void* handle;
-    s32 model;
-    s32 meshEntry;
-    s32 step;
-    u32 i;
-    u32 j;
-
-    work = (u32*)((char*)pppMana2 + 0x80 + *(s32*)((char*)param_2 + 0xC));
-    gObject = *(CGObject**)((char*)pppMngStPtr + 0xDC);
-    if (gObject != NULL) {
-        handle = GetCharaHandlePtr__FP8CGObjectl(gObject, 0);
-        model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
-        *(u32*)(model + 0xE4) = 0;
-        *(u32*)(model + 0xE8) = 0;
-        *(u32*)(model + 0xF0) = 0;
-        *(u32*)(model + 0xFC) = 0;
-    }
-
-    if (work[10] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[10]);
-        work[10] = 0;
-    }
-    if (work[11] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[11]);
-        work[11] = 0;
-    }
-    if (work[12] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[12]);
-        work[12] = 0;
-    }
-    if (work[13] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[13]);
-        work[13] = 0;
-    }
-    if (work[8] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[8]);
-        work[8] = 0;
-    }
-    if (work[15] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[15]);
-        work[15] = 0;
-    }
-    if (work[16] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[16]);
-        work[16] = 0;
-    }
-    if (work[18] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[18]);
-        work[18] = 0;
-    }
-    if (work[19] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[19]);
-        work[19] = 0;
-    }
-    if (work[20] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[20]);
-        work[20] = 0;
-    }
-    if (work[21] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[21]);
-        work[21] = 0;
-    }
-    if (work[22] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[22]);
-        work[22] = 0;
-    }
-    if (work[23] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[23]);
-        work[23] = 0;
-    }
-    if (work[29] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[29]);
-        work[29] = 0;
-    }
-    if (work[9] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[9]);
-        work[9] = 0;
-    }
-    if (work[17] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[17]);
-        work[17] = 0;
-    }
-    if (work[25] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[25]);
-        work[25] = 0;
-    }
-    if (work[26] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[26]);
-        work[26] = 0;
-    }
-    if (work[27] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[27]);
-        work[27] = 0;
-    }
-    if (work[28] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[28]);
-        work[28] = 0;
-    }
-    if (work[30] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[30]);
-        work[30] = 0;
-    }
-    if (work[31] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[31]);
-        work[31] = 0;
-    }
-    if (work[0x1D] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[0x1D]);
-        work[0x1D] = 0;
-    }
-
-    meshEntry = *(s32*)(model + 0xAC);
-    step = work[0x1C];
-    for (i = 0; i < *(u32*)(*(s32*)(model + 0xA4) + 0xC); i++) {
-        u8 stepType = *(u8*)(step + 0x1C);
-        s32 shape = *(s32*)(meshEntry + 8);
-
-        if (stepType == 1) {
-            if (strcmp((char*)shape, DAT_803318d4) == 0) {
-                for (j = 0; j < *(u32*)(shape + 0x4C); j++) {
-                    if (work[0x18] != 0 && *(CMemory::CStage**)(work[0x18] + j * 4) != NULL) {
-                        pppHeapUseRate(*(CMemory::CStage**)(work[0x18] + j * 4));
-                        *(u32*)(work[0x18] + j * 4) = 0;
-                    }
-                }
-                if (work[0x18] != 0) {
-                    pppHeapUseRate((CMemory::CStage*)work[0x18]);
-                    work[0x18] = 0;
-                }
-            }
-        } else if (stepType == 2) {
-            if (strcmp((char*)shape, DAT_803318dc) == 0) {
-                for (j = 0; j < *(u32*)(shape + 0x4C); j++) {
-                    if (work[0x18] != 0 && *(CMemory::CStage**)(work[0x18] + j * 4) != NULL) {
-                        pppHeapUseRate(*(CMemory::CStage**)(work[0x18] + j * 4));
-                        *(u32*)(work[0x18] + j * 4) = 0;
-                    }
-                }
-                if (work[0x18] != 0) {
-                    pppHeapUseRate((CMemory::CStage*)work[0x18]);
-                    work[0x18] = 0;
-                }
-            }
-        } else if (stepType == 3 && strcmp((char*)shape, DAT_803318e4) == 0) {
-            for (j = 0; j < *(u32*)(shape + 0x4C); j++) {
-                if (work[0x18] != 0 && *(CMemory::CStage**)(work[0x18] + j * 4) != NULL) {
-                    pppHeapUseRate(*(CMemory::CStage**)(work[0x18] + j * 4));
-                    *(u32*)(work[0x18] + j * 4) = 0;
-                }
-            }
-            if (work[0x18] != 0) {
-                pppHeapUseRate((CMemory::CStage*)work[0x18]);
-                work[0x18] = 0;
-            }
-        }
-
-        meshEntry += 0x14;
-    }
+    Graphic.Printf(const_cast<char*>(s_Render_Mana2___801dc4d0));
+    GXSetNumTevStages(1);
+    GXSetNumTexGens(1);
+    GXSetNumChans(1);
+    Graphic.SetViewport();
+    pppInitBlendMode();
 }
 
 /*
@@ -700,888 +1233,355 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* para
         }
     }
 }
-
 /*
  * --INFO--
- * PAL Address: 0x80107e48
- * PAL Size: 92b
+ * PAL Address: 0x801088a0
+ * PAL Size: 992b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderMana2(pppMana2*, pppMana2UnkB*, pppMana2UnkC*)
-{
-    Graphic.Printf(const_cast<char*>(s_Render_Mana2___801dc4d0));
-    GXSetNumTevStages(1);
-    GXSetNumTexGens(1);
-    GXSetNumChans(1);
-    Graphic.SetViewport();
-    pppInitBlendMode();
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80107744
- * PAL Size: 1796b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, float (*) [4], int)
+void pppDestructMana2(pppMana2* pppMana2, pppMana2UnkC* param_2)
 {
     u32* work;
-    s32 model;
-    void* handle;
     CGObject* gObject;
-    Mtx identityMtx;
-    Mtx savedCameraMtx;
-    Mtx lookAtMtx;
-    Mtx44 projectionMtx;
-    Mtx44 savedScreenMtx;
-    _GXTexObj sceneTexObj;
-    _GXTexObj depthTexObj;
-    Vec centerPos;
-    Vec cameraPos;
-    Vec cameraUp;
-    Vec quadMin;
-    Vec quadMax;
-    GXColor quadColor;
-    u32 depthTexSize;
-    u32 baseParaboloidTexObjs;
-    u32 sourceTexObjs;
-    s32 i;
+    void* handle;
+    s32 model;
+    s32 meshEntry;
+    s32 step;
+    u32 i;
+    u32 j;
 
-    work = (u32*)param_2;
-    baseParaboloidTexObjs = work[8];
-    if (*(u8*)((char*)param_3 + 0x1C) == 0) {
-        return;
+    work = (u32*)((char*)pppMana2 + 0x80 + *(s32*)((char*)param_2 + 0xC));
+    gObject = *(CGObject**)((char*)pppMngStPtr + 0xDC);
+    if (gObject != NULL) {
+        handle = GetCharaHandlePtr__FP8CGObjectl(gObject, 0);
+        model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
+        *(u32*)(model + 0xE4) = 0;
+        *(u32*)(model + 0xE8) = 0;
+        *(u32*)(model + 0xF0) = 0;
+        *(u32*)(model + 0xFC) = 0;
     }
 
-    PSMTXIdentity(identityMtx);
-    PSMTXCopy(CameraMatrix(), savedCameraMtx);
-    PSMTX44Copy(CameraScreenMatrix(), savedScreenMtx);
-    Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, &sceneTexObj, 0, 0, 0x80, 0x80, 0, GX_NEAR, GX_TF_RGBA8, 0);
-
-    gObject = (CGObject*)work[0];
-    if (gObject == NULL) {
-        return;
+    if (work[10] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[10]);
+        work[10] = 0;
     }
+    if (work[11] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[11]);
+        work[11] = 0;
+    }
+    if (work[12] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[12]);
+        work[12] = 0;
+    }
+    if (work[13] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[13]);
+        work[13] = 0;
+    }
+    if (work[8] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[8]);
+        work[8] = 0;
+    }
+    if (work[15] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[15]);
+        work[15] = 0;
+    }
+    if (work[16] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[16]);
+        work[16] = 0;
+    }
+    if (work[18] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[18]);
+        work[18] = 0;
+    }
+    if (work[19] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[19]);
+        work[19] = 0;
+    }
+    if (work[20] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[20]);
+        work[20] = 0;
+    }
+    if (work[21] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[21]);
+        work[21] = 0;
+    }
+    if (work[22] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[22]);
+        work[22] = 0;
+    }
+    if (work[23] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[23]);
+        work[23] = 0;
+    }
+    if (work[29] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[29]);
+        work[29] = 0;
+    }
+    if (work[9] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[9]);
+        work[9] = 0;
+    }
+    if (work[17] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[17]);
+        work[17] = 0;
+    }
+    if (work[25] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[25]);
+        work[25] = 0;
+    }
+    if (work[26] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[26]);
+        work[26] = 0;
+    }
+    if (work[27] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[27]);
+        work[27] = 0;
+    }
+    if (work[28] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[28]);
+        work[28] = 0;
+    }
+    if (work[30] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[30]);
+        work[30] = 0;
+    }
+    if (work[31] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[31]);
+        work[31] = 0;
+    }
+    if (work[0x1D] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[0x1D]);
+        work[0x1D] = 0;
+    }
+
+    meshEntry = *(s32*)(model + 0xAC);
+    step = work[0x1C];
+    for (i = 0; i < *(u32*)(*(s32*)(model + 0xA4) + 0xC); i++) {
+        u8 stepType = *(u8*)(step + 0x1C);
+        s32 shape = *(s32*)(meshEntry + 8);
+
+        if (stepType == 1) {
+            if (strcmp((char*)shape, DAT_803318d4) == 0) {
+                for (j = 0; j < *(u32*)(shape + 0x4C); j++) {
+                    if (work[0x18] != 0 && *(CMemory::CStage**)(work[0x18] + j * 4) != NULL) {
+                        pppHeapUseRate(*(CMemory::CStage**)(work[0x18] + j * 4));
+                        *(u32*)(work[0x18] + j * 4) = 0;
+                    }
+                }
+                if (work[0x18] != 0) {
+                    pppHeapUseRate((CMemory::CStage*)work[0x18]);
+                    work[0x18] = 0;
+                }
+            }
+        } else if (stepType == 2) {
+            if (strcmp((char*)shape, DAT_803318dc) == 0) {
+                for (j = 0; j < *(u32*)(shape + 0x4C); j++) {
+                    if (work[0x18] != 0 && *(CMemory::CStage**)(work[0x18] + j * 4) != NULL) {
+                        pppHeapUseRate(*(CMemory::CStage**)(work[0x18] + j * 4));
+                        *(u32*)(work[0x18] + j * 4) = 0;
+                    }
+                }
+                if (work[0x18] != 0) {
+                    pppHeapUseRate((CMemory::CStage*)work[0x18]);
+                    work[0x18] = 0;
+                }
+            }
+        } else if (stepType == 3 && strcmp((char*)shape, DAT_803318e4) == 0) {
+            for (j = 0; j < *(u32*)(shape + 0x4C); j++) {
+                if (work[0x18] != 0 && *(CMemory::CStage**)(work[0x18] + j * 4) != NULL) {
+                    pppHeapUseRate(*(CMemory::CStage**)(work[0x18] + j * 4));
+                    *(u32*)(work[0x18] + j * 4) = 0;
+                }
+            }
+            if (work[0x18] != 0) {
+                pppHeapUseRate((CMemory::CStage*)work[0x18]);
+                work[0x18] = 0;
+            }
+        }
+
+        meshEntry += 0x14;
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80108c80
+ * PAL Size: 304b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppConstructMana2(pppMana2* pppMana2, pppMana2UnkC* param_2)
+{
+    CGObject* gObject;
+    void* handle;
+    u32 model;
+    u32* work;
+    s32 workOffset;
+
+    workOffset = param_2->m_serializedDataOffsets[2];
+    work = (u32*)((char*)pppMana2 + 0x80 + workOffset);
+    gObject = *(CGObject**)((char*)pppMngStPtr + 0xDC);
+    gObject->m_stepSlopeLimit = LoadFloat(FLOAT_803318fc);
 
     handle = GetCharaHandlePtr__FP8CGObjectl(gObject, 0);
-    model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
-    *(u32*)(model + 0xF0) = 0;
-    *(u32*)(model + 0xFC) = 0;
+    GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
+    model = *(u32*)((char*)handle + 0x168);
+    *(u32*)(model + 0x98) = 0x3F;
+    work[1] = (u32)pppMngStPtr;
 
-    if ((int)Game.m_currentSceneId == 7) {
-        centerPos.x = LoadFloat(FLOAT_80331898);
-        centerPos.y = LoadFloat(FLOAT_80331898);
-        centerPos.z = LoadFloat(FLOAT_80331898);
-    } else {
-        centerPos.x = gObject->m_worldPosition.x;
-        centerPos.y = gObject->m_worldPosition.y;
-        centerPos.z = gObject->m_worldPosition.z;
-    }
-    centerPos.y += LoadFloat(FLOAT_803318c4);
+    work[0] = 0;
+    work[1] = 0;
+    work[9] = 0;
+    work[8] = 0;
+    work[15] = 0;
+    work[16] = 0;
+    work[18] = 0;
+    work[19] = 0;
+    work[20] = 0;
+    work[21] = 0;
+    work[22] = 0;
+    work[24] = 0;
+    work[17] = 0;
+    work[23] = 0;
+    work[29] = 0;
+    work[28] = 0;
+    work[30] = 0;
+    work[31] = 0;
+    work[25] = 0;
+    work[26] = 0;
+    work[27] = 0;
+    work[10] = 0;
+    work[11] = 0;
+    work[12] = 0;
+    work[13] = 0;
+    *(u8*)(work + 0x38) = 0xFF;
+    PSMTXIdentity((float (*)[4])(work + 0x20));
+    PSMTXIdentity((float (*)[4])(work + 0x2C));
+    *(u8*)(work + 0xE) = 0xFF;
+    *((u8*)work + 0x39) = 0xFF;
+    *((u8*)work + 0x3A) = 0xFF;
+    *((u8*)work + 0x3B) = 0xFF;
+    work[2] = 0;
+    work[3] = 0;
+    work[4] = 0;
+    work[5] = 0;
+    work[6] = 0;
+    work[7] = 0;
+    work[0x39] = 0;
+    work[0x3A] = 0;
+    *(u8*)(work + 0x3B) = 0;
+}
 
-    depthTexSize = GXGetTexBufferSize(0x80, 0x80, (_GXTexFmt)6, GX_FALSE, 0);
-    GXGetTexBufferSize(0x80, 0x80, (_GXTexFmt)4, GX_FALSE, 0);
-    sourceTexObjs = work[0x1D];
+/*
+ * --INFO--
+ * PAL Address: 0x80108db0
+ * PAL Size: 1060b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void Mana2_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int partIndex, int dlIndex, float (*mtx)[4])
+{
+    u8 type = *(u8*)((char*)step + 0x1C);
+    int shape = *(int*)(*(int*)((char*)model + 0xAC) + partIndex * 0x14 + 8);
+    u32* dlEntry = (u32*)(*(int*)(shape + 0x50) + dlIndex * 0xC);
+    bool draw = false;
 
-    if (*(u8*)((char*)param_3 + 0x38) != 0) {
-        Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, &depthTexObj, 0, 0, 0x80, 0x80, depthTexSize, GX_LINEAR,
-                                   (_GXTexFmt)0x16, 1);
-        GXSetViewport(LoadFloat(FLOAT_80331898), LoadFloat(FLOAT_80331898), LoadFloat(FLOAT_803318c8),
-                      LoadFloat(FLOAT_803318c8), LoadFloat(FLOAT_80331898), LoadFloat(FLOAT_803318a0));
-        C_MTXPerspective(projectionMtx, LoadFloat(FLOAT_803318cc), LoadFloat(FLOAT_803318a0),
-                         LoadFloat(FLOAT_803318a0), LoadFloat(FLOAT_803318d0));
-        GXSetProjection(projectionMtx, (_GXProjectionType)0);
-
-        for (i = 0; i < 6; i++) {
-            cameraPos.x = centerPos.x;
-            cameraPos.y = centerPos.y;
-            cameraPos.z = centerPos.z;
-            cameraUp.y = LoadFloat(FLOAT_803318a0);
-            cameraUp.z = LoadFloat(FLOAT_80331898);
-
-            if (i == 3) {
-                cameraPos.y = centerPos.y - LoadFloat(FLOAT_803318a0);
-                cameraUp.y = LoadFloat(FLOAT_80331898);
-                cameraUp.z = LoadFloat(FLOAT_803318a0);
-            } else if (i < 3) {
-                if (i == 1) {
-                    cameraPos.x = centerPos.x - LoadFloat(FLOAT_803318a0);
-                } else if (i < 1) {
-                    cameraPos.x = centerPos.x + LoadFloat(FLOAT_803318a0);
-                } else {
-                    cameraPos.y = centerPos.y + LoadFloat(FLOAT_803318a0);
-                    cameraUp.y = LoadFloat(FLOAT_80331898);
-                    cameraUp.z = LoadFloat(FLOAT_8033189c);
-                }
-            } else if (i == 5) {
-                cameraPos.z = centerPos.z - LoadFloat(FLOAT_803318a0);
-            } else {
-                cameraPos.z = centerPos.z + LoadFloat(FLOAT_803318a0);
+    if (type == 2) {
+        if (strcmp((char*)shape, DAT_80331900) == 0 || strcmp((char*)shape, DAT_803318dc) == 0) {
+            draw = true;
+        }
+    } else if (type < 2) {
+        if (type == 0) {
+            if (strcmp((char*)shape, DAT_80331900) == 0) {
+                draw = true;
             }
-
-            cameraUp.x = LoadFloat(FLOAT_80331898);
-            C_MTXLookAt(lookAtMtx, (Point3d*)&centerPos, &cameraUp, (Point3d*)&cameraPos);
-            Graphic.SetViewport();
-            GXSetScissor(0, 0, 0x280, 0x1C0);
-            gUtil.RenderTextureQuad(LoadFloat(FLOAT_80331898), LoadFloat(FLOAT_80331898), LoadFloat(FLOAT_803318c8),
-                                    LoadFloat(FLOAT_803318c8), (GXTexObj*)baseParaboloidTexObjs, 0, 0, 0,
-                                    (_GXBlendFactor)4, (_GXBlendFactor)5);
-            baseParaboloidTexObjs += 0x20;
+        } else if (strcmp((char*)shape, DAT_80331900) == 0 || strcmp((char*)shape, DAT_803318d4) == 0) {
+            draw = true;
         }
-
-        PSMTXCopy(savedCameraMtx, CameraMatrix());
-        Graphic.SetViewport();
-        GXSetScissor(0, 0, 0x280, 0x1C0);
-        GXSetZTexture((GXZTexOp)2, (_GXTexFmt)0x16, 0);
-        GXSetColorUpdate(GX_FALSE);
-        gUtil.BeginQuadEnv();
-        GXSetZMode(GX_TRUE, (_GXCompare)7, GX_TRUE);
-        GXSetZCompLoc(GX_FALSE);
-        gUtil.SetVtxFmt_POS_CLR_TEX();
-        _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 4);
-        _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 0xFF);
-        _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(
-            0, 0xF, 0xF, 0xF, 0xF);
-        _GXSetTevColorOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(0, 0, 0, 0, 1, 0);
-        _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg(0, 7, 7,
-                                                                                                                7, 6);
-        _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(0, 0, 0, 0, 1, 0);
-        GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
-        GXLoadTexObj(&depthTexObj, GX_TEXMAP0);
-
-        quadMin.x = LoadFloat(FLOAT_80331898);
-        quadMin.y = LoadFloat(FLOAT_80331898);
-        quadMin.z = LoadFloat(FLOAT_80331898);
-        quadMax.x = LoadFloat(FLOAT_803318c8);
-        quadMax.y = LoadFloat(FLOAT_803318c8);
-        quadMax.z = LoadFloat(FLOAT_80331898);
-        quadColor.r = 0xFF;
-        quadColor.g = 0xFF;
-        quadColor.b = 0xFF;
-        quadColor.a = 0;
-        gUtil.RenderQuad(quadMin, quadMax, quadColor, 0, 0);
-        gUtil.EndQuadEnv();
-        GXSetZTexture((GXZTexOp)0, (_GXTexFmt)0x11, 0);
-        GXSetColorUpdate(GX_TRUE);
-        GXSetAlphaUpdate(GX_TRUE);
-        GXSetZCompLoc(GX_TRUE);
-        gUtil.RenderTextureQuad(LoadFloat(FLOAT_80331898), LoadFloat(FLOAT_80331898), LoadFloat(FLOAT_803318c8),
-                                LoadFloat(FLOAT_803318c8), &sceneTexObj, 0, 0, 0, (_GXBlendFactor)4,
-                                (_GXBlendFactor)5);
-        *((u8*)work + 0xEC) = 1;
+    } else if (type < 4 && (strcmp((char*)shape, DAT_80331900) == 0 || strcmp((char*)shape, DAT_803318e4) == 0)) {
+        draw = true;
     }
 
-    baseParaboloidTexObjs = work[0x1E];
-    if (*(u8*)((char*)param_3 + 0x38) == 0) {
-        if (*((u8*)work + 0xEC) == 0) {
-            GXInitTexObj((GXTexObj*)work[10], (void*)work[12], 0x80, 0x80, (_GXTexFmt)4, (_GXTexWrapMode)1,
-                         (_GXTexWrapMode)1, GX_FALSE);
-            GXInitTexObj((GXTexObj*)work[11], (void*)work[13], 0x80, 0x80, (_GXTexFmt)4, (_GXTexWrapMode)1,
-                         (_GXTexWrapMode)1, GX_FALSE);
-            drawParaboloidMap((GXTexObj*)work[8], (GXTexObj*)work[11], (void*)work[9], work[0x39],
-                              (GXTexObj*)(baseParaboloidTexObjs + 0x28), 1);
-            drawParaboloidMap((GXTexObj*)work[8], (GXTexObj*)work[10], (void*)work[9], work[0x39],
-                              (GXTexObj*)(baseParaboloidTexObjs + 0x28), 0);
-            *((u8*)work + 0xEC) = 1;
-        }
-    } else {
-        GXInitTexObj((GXTexObj*)work[10], (void*)work[12], 0x80, 0x80, (_GXTexFmt)4, (_GXTexWrapMode)0,
-                     (_GXTexWrapMode)0, GX_FALSE);
-        GXInitTexObj((GXTexObj*)work[11], (void*)work[13], 0x80, 0x80, (_GXTexFmt)4, (_GXTexWrapMode)0,
-                     (_GXTexWrapMode)0, GX_FALSE);
-        drawParaboloidMap((GXTexObj*)sourceTexObjs, (GXTexObj*)work[11], (void*)work[9], work[0x39],
-                          (GXTexObj*)(baseParaboloidTexObjs + 0x28), 1);
-        drawParaboloidMap((GXTexObj*)sourceTexObjs, (GXTexObj*)work[10], (void*)work[9], work[0x39],
-                          (GXTexObj*)(baseParaboloidTexObjs + 0x28), 0);
-        Graphic.SetViewport();
-        GXSetProjection(savedScreenMtx, (_GXProjectionType)0);
-        PSMTXCopy(savedCameraMtx, CameraMatrix());
+    int waterCmp = strcmp((char*)shape, DAT_803318ec);
+    if ((waterCmp == 0 && type == 1) || (strcmp((char*)shape, DAT_803318f4) == 0 && type == 2)) {
+        Mtx cameraMtx;
+        Mtx rotMtx;
+        Mtx posMtx;
+        Vec offset;
+        double x = (double)mtx[0][3];
+        double y = (double)mtx[1][3];
+        double z = (double)mtx[2][3];
+
+        PSMTXCopy(ppvCameraMatrix0, cameraMtx);
+        PSMTXRotRad(rotMtx, 'z', LoadFloat(FLOAT_80331904));
+        mtx[0][3] = LoadFloat(FLOAT_80331898);
+        mtx[1][3] = LoadFloat(FLOAT_80331898);
+        mtx[2][3] = LoadFloat(FLOAT_80331898);
+        PSMTXConcat(mtx, rotMtx, mtx);
+
+        offset.x = LoadFloat(FLOAT_80331898);
+        offset.y = *(float*)((char*)step + 0x30);
+        offset.z = LoadFloat(FLOAT_80331898);
+        PSMTXMultVec(mtx, &offset, &offset);
+
+        mtx[0][3] = (float)x;
+        mtx[1][3] = (float)(y - (double)offset.y);
+        mtx[2][3] = (float)z;
+
+        PSMTXConcat(cameraMtx, mtx, posMtx);
+        GXLoadPosMtxImm(posMtx, 0);
+        PSMTXCopy(mtx, (float(*)[4])((char*)work + 0x80));
+        GXSetZMode(GX_ENABLE, GX_LEQUAL, GX_DISABLE);
+        RenderWaterMesh((VMana2*)work);
+        GXSetCullMode((GXCullMode)1);
     }
 
-    GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
-    handle = GetCharaHandlePtr__FP8CGObjectl(gObject, 0);
-    model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
-    *(u32*)(model + 0xF0) = (u32)Mana2_BeforeDrawCallback;
-    *(u32*)(model + 0xFC) = (u32)Mana2_DrawMeshDLCallback;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x801071b0
- * PAL Size: 1428b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CalcReflectionVector2(
-    Vec* reflectionVec,
-    S16Vec* positions,
-    S16Vec* normals,
-    long count,
-    unsigned long posScale,
-    unsigned long normalScale,
-    float (*matrix)[4],
-    void* displayList,
-    unsigned long displayListSize,
-    _GXColor* color,
-    S16Vec2d* texCoord,
-    CChara::CNode* node)
-{
-    Vec cameraPos;
-    Vec nodeOffset;
-    Vec worldPos;
-    Vec cameraVector;
-    Vec objSpacePos;
-    Vec objSpaceNormal;
-    Vec2d uv;
-    Mtx nodeMtx;
-    Mtx nodeRotMtx;
-    Mtx cameraMtx;
-    Mtx cameraModelMtx;
-    u16* dl = (u16*)displayList;
-    u16* dlEnd;
-
-    cameraPos.x = CameraWorldX();
-    cameraPos.y = CameraWorldY();
-    cameraPos.z = CameraWorldZ();
-
-    PSMTXCopy(matrix, nodeMtx);
-    nodeOffset.x = *(float*)((char*)node + 0x78);
-    nodeOffset.y = *(float*)((char*)node + 0x88);
-    nodeOffset.z = *(float*)((char*)node + 0x98);
-
-    worldPos.x = nodeMtx[0][3];
-    worldPos.y = nodeMtx[1][3];
-    worldPos.z = nodeMtx[2][3];
-    PSVECAdd(&nodeOffset, &worldPos, &worldPos);
-
-    PSMTXCopy((float(*)[4])((char*)node + 0x6C), matrix);
-    matrix[0][3] = worldPos.x;
-    matrix[1][3] = worldPos.y;
-    matrix[2][3] = worldPos.z;
-
-    PSMTXCopy(matrix, nodeRotMtx);
-    nodeRotMtx[0][3] = LoadFloat(FLOAT_80331898);
-    nodeRotMtx[1][3] = LoadFloat(FLOAT_80331898);
-    nodeRotMtx[2][3] = LoadFloat(FLOAT_80331898);
-
-    PSMTXCopy(CameraMatrix(), cameraMtx);
-    PSMTXConcat(cameraMtx, matrix, cameraModelMtx);
-
-    const double half = (double)LoadFloat(FLOAT_803318a4);
-
-    dlEnd = (u16*)((u8*)displayList + displayListSize);
-    while (dl < dlEnd) {
-        u8 drawFmt = *(u8*)dl;
-        u16 itemCount = *(u16*)((u8*)dl + 1);
-        int i;
-
-        if (gUtil.IsHasDrawFmtDL(drawFmt) == 0) {
-            break;
-        }
-
-        dl = (u16*)((u8*)dl + 3);
-        for (i = 0; i < itemCount; i++) {
-            u16 posIndex = dl[0];
-            u16 normalIndex = dl[1];
-            u16* next = dl + 4;
-            int axis = 0;
-            float maxAxis;
-            float invAxis;
-            Vec* outVec;
-            u8* clr;
-
-            if ((drawFmt & 7) == 2) {
-                next = dl + 5;
+    if (draw) {
+        if (strcmp((char*)shape, DAT_80331900) != 0) {
+            PSMTXCopy(mtx, (float(*)[4])((char*)work + 0xB0));
+            if (*(char*)((char*)work + 0xEC) != 0) {
+                *(u8*)((char*)work + 0x38) = **(u8**)(shape + 0x28);
+                *(u8*)((char*)work + 0x39) = *((u8*)(*(int*)(shape + 0x28)) + 1);
+                *(u8*)((char*)work + 0x3A) = *((u8*)(*(int*)(shape + 0x28)) + 2);
+                *(u8*)((char*)work + 0x3B) = 0x80;
+                DCFlushRange((u8*)work + 0x38, 4);
+                GXSetArray((GXAttr)0xB, *(void**)((char*)work + 0x68), 4);
+                GXSetArray((GXAttr)0xD, *(void**)((char*)work + 0x6C), 4);
+                *(u32*)(MaterialManRaw() + 0x08) = *(u32*)((char*)work + 0x64);
+                *(u32*)(MaterialManRaw() + 0x44) = 0xFFFFFFFF;
+                *(u8*)(MaterialManRaw() + 0x4C) = 0xFF;
+                *(u32*)(MaterialManRaw() + 0x11C) = 0;
+                *(u32*)(MaterialManRaw() + 0x120) = 0x1E;
+                *(u32*)(MaterialManRaw() + 0x124) = 0;
+                *(u8*)(MaterialManRaw() + 0x205) = 0xFF;
+                *(u8*)(MaterialManRaw() + 0x206) = 0xFF;
+                *(u32*)(MaterialManRaw() + 0x58) = 0;
+                *(u32*)(MaterialManRaw() + 0x5C) = 0;
+                *(u8*)(MaterialManRaw() + 0x208) = 0;
+                *(u32*)(MaterialManRaw() + 0x48) = 0x2ACE0F;
+                *(u32*)(MaterialManRaw() + 0x128) = 0;
+                *(u32*)(MaterialManRaw() + 0x12C) = 0x1E;
+                *(u32*)(MaterialManRaw() + 0x130) = 0;
+                *(u32*)(MaterialManRaw() + 0x40) = 0x2ACE0F;
+                *(u32*)(MaterialManRaw() + 0xD0) = *(u32*)((char*)work + 0x20);
+                GXSetCullMode((GXCullMode)1);
+                GXSetZMode(GX_ENABLE, GX_LEQUAL, GX_DISABLE);
+                SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
+                    &MaterialMan, *(void**)(*(int*)((char*)model + 0xA4) + 0x24), *(u16*)((char*)dlEntry + 8), 0, 0);
+                GXCallDisplayList(*(void**)(*(int*)((char*)work + 0x60) + dlIndex * 4), *dlEntry);
             }
-
-            gUtil.ConvI2FVector(objSpacePos, positions[posIndex], posScale);
-            gUtil.ConvI2FVector(objSpaceNormal, normals[normalIndex], normalScale);
-            PSMTXMultVec(matrix, &objSpacePos, &objSpacePos);
-            PSMTXMultVec(nodeRotMtx, &objSpaceNormal, &objSpaceNormal);
-
-            PSVECSubtract(&objSpacePos, &cameraPos, &cameraVector);
-            PSVECNormalize(&cameraVector, &cameraVector);
-            outVec = &reflectionVec[posIndex];
-            C_VECReflect(&cameraVector, &objSpaceNormal, outVec);
-
-            float absY = fabsf(outVec->y);
-            float absX = fabsf(outVec->x);
-            float absZ = fabsf(outVec->z);
-
-            axis = absX < absY;
-            maxAxis = absX;
-            if (axis != 0) {
-                axis = 1;
-                maxAxis = absY;
-            }
-            if (maxAxis < absZ) {
-                axis = 2;
-            }
-            CVector reflected(outVec->x, outVec->y, outVec->z);
-
-            clr = (u8*)&color[posIndex];
-            clr[0] = 0x80;
-            clr[1] = 0x80;
-            clr[2] = 0x80;
-            clr[3] = 0xFF;
-
-            uv.x = (float)half;
-            uv.y = (float)half;
-
-            if (axis == 1) {
-                invAxis = LoadFloat(FLOAT_803318b8) * reflected.y;
-                if (outVec->y < LoadFloat(FLOAT_80331898)) {
-                    clr[1] = (u8)(clr[1] - 0x7F);
-                    uv.x = (float)((half - (double)(reflected.x / invAxis)) * (double)LoadFloat(FLOAT_803318bc) +
-                                   (double)LoadFloat(FLOAT_803318bc));
-                    uv.y =
-                        (float)((double)((float)(half + (double)(reflected.z / invAxis)) * LoadFloat(FLOAT_803318bc)) + half);
-                } else {
-                    clr[1] = (u8)(clr[1] + 0x7F);
-                    uv.y = (float)((half + (double)(reflected.z / invAxis)) * (double)LoadFloat(FLOAT_803318bc));
-                    uv.x =
-                        (float)((double)((float)(half + (double)(reflected.x / invAxis)) * LoadFloat(FLOAT_803318bc)) + half);
-                }
-            } else if (axis == 0) {
-                invAxis = LoadFloat(FLOAT_803318b8) * reflected.x;
-                if (outVec->x < LoadFloat(FLOAT_80331898)) {
-                    clr[0] = (u8)(clr[0] - 0x7F);
-                    uv.x = (float)((half - (double)(reflected.z / invAxis)) * (double)LoadFloat(FLOAT_803318bc) +
-                                   (double)LoadFloat(FLOAT_803318c0));
-                    uv.y = (float)((half + (double)(reflected.y / invAxis)) * (double)LoadFloat(FLOAT_803318bc) +
-                                   (double)LoadFloat(FLOAT_803318bc));
-                } else {
-                    clr[0] = (u8)(clr[0] + 0x7F);
-                    uv.x = (float)((half - (double)(reflected.z / invAxis)) * (double)LoadFloat(FLOAT_803318bc) +
-                                   (double)LoadFloat(FLOAT_803318bc));
-                    uv.y = (float)((half - (double)(reflected.y / invAxis)) * (double)LoadFloat(FLOAT_803318bc) +
-                                   (double)LoadFloat(FLOAT_803318bc));
-                }
-            } else {
-                invAxis = LoadFloat(FLOAT_803318b8) * reflected.z;
-                if (outVec->z < LoadFloat(FLOAT_80331898)) {
-                    clr[2] = (u8)(clr[2] - 0x7F);
-                    uv.x =
-                        (float)((double)((float)(half + (double)(reflected.x / invAxis)) * LoadFloat(FLOAT_803318bc)) + half);
-                    uv.y = (float)((half + (double)(reflected.y / invAxis)) * (double)LoadFloat(FLOAT_803318bc) +
-                                   (double)LoadFloat(FLOAT_803318bc));
-                } else {
-                    clr[2] = (u8)(clr[2] + 0x7F);
-                    uv.x = (float)((half + (double)(reflected.x / invAxis)) * (double)LoadFloat(FLOAT_803318bc));
-                    uv.y = (float)((half - (double)(reflected.y / invAxis)) * (double)LoadFloat(FLOAT_803318bc) +
-                                   (double)LoadFloat(FLOAT_803318bc));
-                }
-            }
-
-            gUtil.ConvF2IVector2d(texCoord[normalIndex], uv, 12);
-            dl = next;
-        }
-    }
-
-    DCFlushRange(reflectionVec, count * sizeof(Vec));
-    DCFlushRange(texCoord, count << 3);
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void MakeWave(Vec*, unsigned short*, float*, Vec, float, float)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8010701c
- * PAL Size: 404b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-static int CreateWaterMesh(Vec* param_1, Vec* param_2, Vec2d* param_3, unsigned short* param_4, float param_5)
-{
-    float zero;
-    float normalY;
-    float radius;
-    float uvStep;
-    float x;
-    float z;
-    float rowUv;
-    int indexOffset;
-    short quadIndex;
-    short rowBase;
-    float* positions;
-    int rowCount;
-    float* normals;
-    float* uvs;
-    int colCount;
-    int pairCount;
-
-    normalY = LoadFloat(FLOAT_803318a0);
-    zero = LoadFloat(FLOAT_80331898);
-    rowCount = 0;
-    uvStep = LoadFloat(FLOAT_803318A8);
-    radius = param_5 * LoadFloat(FLOAT_803318a4);
-    for (z = radius; -radius <= z; z -= param_5 * uvStep) {
-        colCount = 0;
-        rowUv = static_cast<float>(rowCount) * uvStep;
-        positions = reinterpret_cast<float*>(param_1);
-        normals = reinterpret_cast<float*>(param_2);
-        uvs = reinterpret_cast<float*>(param_3);
-        for (x = -radius; x <= radius; x += param_5 * uvStep) {
-            *positions = x;
-            param_1 = reinterpret_cast<Vec*>(positions + 3);
-            positions[1] = zero;
-            param_2 = reinterpret_cast<Vec*>(normals + 3);
-            param_3 = reinterpret_cast<Vec2d*>(uvs + 2);
-            positions[2] = z;
-            positions = positions + 3;
-            *normals = zero;
-            normals[1] = normalY;
-            normals[2] = zero;
-            normals = normals + 3;
-            *uvs = static_cast<float>(colCount) * uvStep;
-            uvs[1] = rowUv;
-            uvs = uvs + 2;
-            colCount = colCount + 1;
-        }
-        rowCount = rowCount + 1;
-    }
-    indexOffset = 0;
-    rowCount = 0;
-    rowBase = 0;
-    do {
-        pairCount = 8;
-        quadIndex = rowBase;
-        do {
-            param_4[indexOffset++] = quadIndex;
-            param_4[indexOffset++] = quadIndex + 1;
-            param_4[indexOffset++] = quadIndex + 0x12;
-            param_4[indexOffset++] = quadIndex + 0x12;
-            param_4[indexOffset++] = quadIndex + 0x11;
-            param_4[indexOffset++] = quadIndex;
-            param_4[indexOffset++] = quadIndex + 1;
-            param_4[indexOffset++] = quadIndex + 2;
-            param_4[indexOffset++] = quadIndex + 0x13;
-            param_4[indexOffset++] = quadIndex + 0x13;
-            param_4[indexOffset++] = quadIndex + 0x12;
-            param_4[indexOffset++] = quadIndex + 1;
-            quadIndex = quadIndex + 2;
-            pairCount = pairCount + -1;
-        } while (pairCount != 0);
-        rowCount = rowCount + 1;
-        rowBase = rowBase + 0x11;
-    } while (rowCount < 0x10);
-    return 1;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80106c54
- * PAL Size: 968b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-static int UpdateWaterMesh(VMana2* mana2)
-{
-    u8* work;
-    float* waterHeightA;
-    float* waterHeightB;
-    Vec* positions;
-    Vec origin;
-    float currentScale;
-    float neighborScale;
-
-    work = (u8*)mana2;
-    waterHeightA = *(float**)(work + 0x48);
-    positions = *(Vec**)(work + 0x3C);
-    waterHeightB = *(float**)(work + 0x4C);
-    if (waterHeightA == NULL) {
-        return 0;
-    }
-
-    for (int row = 1, rowBase = 0x11; row < 0x10; row++, rowBase += 0x11) {
-        currentScale = FLOAT_80331898;
-        neighborScale = FLOAT_803318a4;
-        for (int col = 1; col < 0x10; col += 5) {
-            int index = rowBase + col;
-            int above0 = index - 0x11;
-            int below0 = index + 0x11;
-
-            waterHeightB[index] = currentScale * waterHeightA[index] +
-                                  neighborScale * (waterHeightA[above0] + waterHeightA[below0] +
-                                                   waterHeightA[index - 1] + waterHeightA[index + 1]) -
-                                  waterHeightB[index];
-
-            int index1 = index + 1;
-            int above1 = index1 - 0x11;
-            int below1 = index1 + 0x11;
-            waterHeightB[index1] = currentScale * waterHeightA[index1] +
-                                   neighborScale * (waterHeightA[above1] + waterHeightA[below1] +
-                                                    waterHeightA[index1 - 1] + waterHeightA[index1 + 1]) -
-                                   waterHeightB[index1];
-
-            int index2 = index + 2;
-            int above2 = index2 - 0x11;
-            int below2 = index2 + 0x11;
-            waterHeightB[index2] = currentScale * waterHeightA[index2] +
-                                   neighborScale * (waterHeightA[above2] + waterHeightA[below2] +
-                                                    waterHeightA[index2 - 1] + waterHeightA[index2 + 1]) -
-                                   waterHeightB[index2];
-
-            int index3 = index + 3;
-            int above3 = index3 - 0x11;
-            int below3 = index3 + 0x11;
-            waterHeightB[index3] = currentScale * waterHeightA[index3] +
-                                   neighborScale * (waterHeightA[above3] + waterHeightA[below3] +
-                                                    waterHeightA[index3 - 1] + waterHeightA[index3 + 1]) -
-                                   waterHeightB[index3];
-
-            int index4 = index + 4;
-            int above4 = index4 - 0x11;
-            int below4 = index4 + 0x11;
-            waterHeightB[index4] = currentScale * waterHeightA[index4] +
-                                   neighborScale * (waterHeightA[above4] + waterHeightA[below4] +
-                                                    waterHeightA[index4 - 1] + waterHeightA[index4 + 1]) -
-                                   waterHeightB[index4];
-        }
-    }
-
-    for (int i = 0; i < 0x121; i++) {
-        float tmp = waterHeightA[i];
-        waterHeightA[i] = waterHeightB[i];
-        waterHeightB[i] = tmp;
-        positions[i].y = waterHeightA[i];
-    }
-
-    DCFlushRange(positions, 0xD8C);
-    CalculateNormal(mana2);
-
-    origin.x = *(float*)(work + 0x8C);
-    origin.y = *(float*)(work + 0x9C);
-    origin.z = *(float*)(work + 0xAC);
-    CalcWaterReflectionVector(*(Vec**)(work + 0x44), *(Vec**)(work + 0x3C), *(Vec**)(work + 0x40), 0x121, origin,
-                              (float(*)[4])(work + 0x80), *(_GXColor**)(work + 0x5C), *(Vec2d**)(work + 0x58));
-    return 1;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80106694
- * PAL Size: 1472b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-static int RenderWaterMesh(VMana2* mana2)
-{
-    u8* work = (u8*)mana2;
-    void* positions = *(void**)(work + 0x3C);
-    void* normals = *(void**)(work + 0x40);
-    void* texCoord0 = *(void**)(work + 0x54);
-    void* texCoord1 = *(void**)(work + 0x58);
-    u16* indices = *(u16**)(work + 0x50);
-    void* colors = *(void**)(work + 0x5C);
-    void* texObj0 = *(void**)(work + 0x28);
-    void* texObj2;
-    _GXColor blendColor;
-    _GXColor modulateColor;
-
-    GXClearVtxDesc();
-    GXSetVtxDesc((GXAttr)9, GX_INDEX16);
-    GXSetVtxDesc((GXAttr)10, GX_INDEX16);
-    GXSetVtxDesc((GXAttr)0xB, GX_INDEX16);
-    GXSetVtxDesc((GXAttr)0xD, GX_INDEX16);
-    GXSetVtxDesc((GXAttr)0xE, GX_INDEX16);
-    GXSetVtxAttrFmt((GXVtxFmt)7, (GXAttr)9, (GXCompCnt)1, (GXCompType)4, 0);
-    GXSetVtxAttrFmt((GXVtxFmt)7, (GXAttr)10, (GXCompCnt)0, (GXCompType)4, 0);
-    GXSetVtxAttrFmt((GXVtxFmt)7, (GXAttr)0xB, (GXCompCnt)1, (GXCompType)5, 0);
-    GXSetVtxAttrFmt((GXVtxFmt)7, (GXAttr)0xD, (GXCompCnt)1, (GXCompType)4, 0);
-    GXSetVtxAttrFmt((GXVtxFmt)7, (GXAttr)0xE, (GXCompCnt)1, (GXCompType)4, 0);
-    GXSetNumTexGens(2);
-    GXSetCullMode((GXCullMode)0);
-    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 0xF);
-    GXSetChanCtrl((GXChannelID)4, GX_DISABLE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
-    GXSetZMode(GX_ENABLE, GX_LEQUAL, GX_DISABLE);
-    GXSetNumChans(1);
-    blendColor.r = 0xFF;
-    blendColor.g = 0xFF;
-    blendColor.b = 0xFF;
-    blendColor.a = 0xFF;
-    _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
-    _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(1, 0, 0);
-    GXSetArray((GXAttr)9, positions, 0xC);
-    GXSetArray((GXAttr)10, normals, 0xC);
-    GXSetArray((GXAttr)0xB, colors, 4);
-    GXSetArray((GXAttr)0xD, texCoord0, 8);
-    GXSetArray((GXAttr)0xE, texCoord1, 8);
-    texObj2 = *(void**)(work + 0x7C);
-    GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)1, (GXTexGenSrc)4, 0x3C, GX_FALSE, 0x7D);
-    GXSetTexCoordGen2((GXTexCoordID)1, (GXTexGenType)1, (GXTexGenSrc)5, 0x3C, GX_FALSE, 0x7D);
-    u8 alpha = *(u8*)(work + 0xE0);
-    blendColor.r = 0x80;
-    blendColor.g = 0x80;
-    blendColor.b = 0x80;
-    blendColor.a = 0x80;
-    modulateColor.r = alpha;
-    modulateColor.g = alpha;
-    modulateColor.b = alpha;
-    modulateColor.a = alpha;
-
-    GXSetTevDirect((GXTevStageID)0);
-    _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
-    _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 4);
-    GXLoadTexObj((GXTexObj*)((u8*)texObj2 + 0x28), GX_TEXMAP0);
-    GXSetTevKColor((GXTevKColorID)1, modulateColor);
-    GXSetTevKColorSel((GXTevStageID)0, (GXTevKColorSel)0xD);
-    GXSetTevKAlphaSel((GXTevStageID)0, (GXTevKAlphaSel)0x1D);
-    _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(0, 0xF, 0xF,
-                                                                                                           0xF, 8);
-    _GXSetTevColorOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(0, 0, 0, 0, 1, 0);
-    _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg(0, 7, 6, 4, 7);
-    _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(0, 0, 0, 0, 1, 0);
-
-    GXSetTevDirect((GXTevStageID)1);
-    _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(1, 0, 0);
-    _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(1, 1, 1, 4);
-    GXLoadTexObj(*(GXTexObj**)(work + 0x28), GX_TEXMAP1);
-    GXSetTevKColor((GXTevKColorID)0, blendColor);
-    GXSetTevKColorSel((GXTevStageID)1, (GXTevKColorSel)0xC);
-    GXSetTevKAlphaSel((GXTevStageID)1, (GXTevKAlphaSel)0x1C);
-    _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(1, 0xB, 0xE,
-                                                                                                           8, 0xF);
-    _GXSetTevColorOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(1, 8, 0, 0, 1, 0);
-    _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg(1, 7, 7, 7, 0);
-    _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(1, 0, 0, 1, 1, 0);
-
-    GXSetTevDirect((GXTevStageID)2);
-    _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(2, 0, 0);
-    _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(2, 1, 2, 4);
-    GXLoadTexObj(*(GXTexObj**)(work + 0x2C), GX_TEXMAP2);
-    GXSetTevKColor((GXTevKColorID)0, blendColor);
-    GXSetTevKColorSel((GXTevStageID)2, (GXTevKColorSel)0xC);
-    GXSetTevKAlphaSel((GXTevStageID)2, (GXTevKAlphaSel)0x1C);
-    _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(2, 0xE, 0xB,
-                                                                                                           8, 0);
-    _GXSetTevColorOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(2, 8, 0, 0, 1, 0);
-    _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg(2, 7, 7, 7, 0);
-    _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(2, 0, 0, 0, 1, 0);
-
-    GXSetNumTevStages(3);
-    GXBegin((GXPrimitive)0x90, GX_VTXFMT7, 0x600);
-    u16* indexIt = indices;
-    for (int i = 0; i < 0x180; i++) {
-        GXPosition1x16(indexIt[0]);
-        GXNormal1x16(indexIt[0]);
-        GXColor1x16(indexIt[0]);
-        GXTexCoord1x16(indexIt[0]);
-        GXTexCoord1x16(indexIt[0]);
-        GXPosition1x16(indexIt[1]);
-        GXNormal1x16(indexIt[1]);
-        GXColor1x16(indexIt[1]);
-        GXTexCoord1x16(indexIt[1]);
-        GXTexCoord1x16(indexIt[1]);
-        GXPosition1x16(indexIt[2]);
-        GXNormal1x16(indexIt[2]);
-        GXColor1x16(indexIt[2]);
-        GXTexCoord1x16(indexIt[2]);
-        GXTexCoord1x16(indexIt[2]);
-        GXPosition1x16(indexIt[3]);
-        GXNormal1x16(indexIt[3]);
-        GXColor1x16(indexIt[3]);
-        GXTexCoord1x16(indexIt[3]);
-        GXTexCoord1x16(indexIt[3]);
-        indexIt += 4;
-    }
-
-    _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0xFF, 4);
-    _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 4);
-    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(0, 4, 5, 0xF);
-    GXSetNumTevStages(1);
-    GXLoadTexObj((GXTexObj*)texObj0, GX_TEXMAP0);
-    return 1;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80106438
- * PAL Size: 604b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-static void CalculateNormal(VMana2* mana2)
-{
-    Vec* positions;
-    Vec* normals;
-    u16* indices;
-    Vec edgeA;
-    Vec edgeB;
-    Vec faceNormal;
-
-    positions = *(Vec**)((u8*)mana2 + 0x3C);
-    normals = *(Vec**)((u8*)mana2 + 0x40);
-    indices = *(u16**)((u8*)mana2 + 0x50);
-
-    float zero = FLOAT_80331898;
-    for (s32 i = 0; i < 0x121; i++) {
-        normals[i].z = zero;
-        normals[i].y = zero;
-        normals[i].x = zero;
-    }
-
-    s32 indicesOffset = 0;
-    for (s32 i = 0; i < 0x200; i++, indicesOffset += 3) {
-        u16 i0 = indices[indicesOffset];
-        u16 i1 = indices[indicesOffset + 1];
-        u16 i2 = indices[indicesOffset + 2];
-
-        edgeA.x = positions[i1].x - positions[i0].x;
-        edgeA.y = positions[i1].y - positions[i0].y;
-        edgeA.z = positions[i1].z - positions[i0].z;
-
-        edgeB.x = positions[i2].x - positions[i0].x;
-        edgeB.y = positions[i2].y - positions[i0].y;
-        edgeB.z = positions[i2].z - positions[i0].z;
-
-        PSVECCrossProduct(&edgeA, &edgeB, &faceNormal);
-        PSVECNormalize(&faceNormal, &faceNormal);
-
-        PSVECAdd(&normals[i0], &faceNormal, &normals[i0]);
-        PSVECAdd(&normals[i1], &faceNormal, &normals[i1]);
-        PSVECAdd(&normals[i2], &faceNormal, &normals[i2]);
-    }
-
-    for (s32 i = 0; i < 0x121; i++) {
-        PSVECNormalize(&normals[i], &normals[i]);
-    }
-
-    DCFlushRange(normals, 0xD8C);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8010617c
- * PAL Size: 700b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-static void CalcWaterReflectionVector(
-    Vec* reflectionVec,
-    Vec* positions,
-    Vec* normals,
-    long count,
-    Vec waterOrigin,
-    float (*matrix)[4],
-    _GXColor* color,
-    Vec2d* texCoord)
-{
-    Vec cameraPos;
-    Vec transformedCameraPos;
-    Vec objPos;
-    Vec reflected;
-    Mtx matrixNoTranslate;
-    Mtx inverseMtx;
-    Vec* reflectionIt;
-    Vec* normalIt;
-    unsigned char* colorBytes;
-    float* texCoordFloat;
-    float zero;
-    float half;
-    long i;
-
-    (void)waterOrigin;
-
-    if ((int)Game.m_currentSceneId == 7) {
-        cameraPos.x = ppvCameraMatrix[0][3];
-        cameraPos.y = ppvCameraMatrix[1][3];
-        cameraPos.z = ppvCameraMatrix[2][3];
-    } else {
-        cameraPos.x = CameraWorldX();
-        cameraPos.y = CameraWorldY();
-        cameraPos.z = CameraWorldZ();
-    }
-
-    transformedCameraPos.x = LoadFloat(FLOAT_80331898);
-    transformedCameraPos.y = LoadFloat(FLOAT_80331898);
-    transformedCameraPos.z = LoadFloat(FLOAT_80331898);
-
-    PSMTXCopy(matrix, matrixNoTranslate);
-    objPos.x = matrixNoTranslate[0][3];
-    objPos.y = matrixNoTranslate[1][3];
-    objPos.z = matrixNoTranslate[2][3];
-    matrixNoTranslate[0][3] = transformedCameraPos.x;
-    matrixNoTranslate[1][3] = transformedCameraPos.y;
-    matrixNoTranslate[2][3] = transformedCameraPos.z;
-    PSMTXInverse(matrixNoTranslate, inverseMtx);
-
-    PSVECSubtract(&objPos, &cameraPos, &cameraPos);
-    PSVECScale(&cameraPos, &cameraPos, LoadFloat(FLOAT_8033189c));
-    PSMTXMultVec(inverseMtx, &cameraPos, &transformedCameraPos);
-
-    colorBytes = (unsigned char*)color;
-    texCoordFloat = (float*)texCoord;
-    reflectionIt = reflectionVec;
-    normalIt = normals;
-    zero = LoadFloat(FLOAT_80331898);
-    half = LoadFloat(FLOAT_803318a4);
-
-    for (i = 0; i < count; i++) {
-        PSVECSubtract(positions, &transformedCameraPos, &reflected);
-        C_VECReflect(&reflected, normalIt, reflectionIt);
-        PSMTXMultVec(matrixNoTranslate, reflectionIt, reflectionIt);
-        PSVECNormalize(reflectionIt, reflectionIt);
-
-        if (reflectionIt->z >= zero) {
-            float denomBase;
-
-            colorBytes[0] = 0x80;
-            colorBytes[1] = 0x80;
-            colorBytes[2] = 0xff;
-            colorBytes[3] = 0xbc;
-            denomBase = LoadFloat(FLOAT_803318a0);
-            *texCoordFloat = -reflectionIt->x / (denomBase + reflectionIt->z);
-            texCoordFloat[1] = -reflectionIt->y / (denomBase + reflectionIt->z);
         } else {
-            float denomBase;
-
-            colorBytes[0] = 0x80;
-            colorBytes[1] = 0xff;
-            colorBytes[2] = 0x80;
-            colorBytes[3] = 0x7f;
-            denomBase = LoadFloat(FLOAT_803318a0);
-            *texCoordFloat = -reflectionIt->x / (denomBase - reflectionIt->z);
-            texCoordFloat[1] = -reflectionIt->y / (denomBase - reflectionIt->z);
+            GXSetZMode(GX_ENABLE, GX_LEQUAL, GX_ENABLE);
+            SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
+                &MaterialMan, *(void**)(*(int*)((char*)model + 0xA4) + 0x24), *(u16*)((char*)dlEntry + 8), 0, 0);
+            GXCallDisplayList((void*)dlEntry[1], dlEntry[0]);
         }
-
-        positions++;
-        reflectionIt++;
-        normalIt++;
-        colorBytes += 4;
-        *texCoordFloat = *texCoordFloat * half;
-        *texCoordFloat = *texCoordFloat + half;
-        texCoordFloat[1] = texCoordFloat[1] * half;
-        texCoordFloat[1] = texCoordFloat[1] + half;
-        texCoordFloat += 2;
     }
-
-    DCFlushRange(reflectionVec, count * sizeof(Vec));
-    DCFlushRange(texCoord, count << 3);
 }

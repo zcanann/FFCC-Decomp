@@ -1499,7 +1499,7 @@ static void _VoiceDataAsign(RedTrackDATA* track, RedVoiceDATA* voice, RedNoteDAT
 
     pitchWork = track->m_keyTranspose + track->m_pitchBend;
     int basePitch;
-    if ((voice->m_stateFlags & REDSOUND_VOICE_STATE_PLAYING_MASK) != 0) {
+    if (RedVoiceIsPlaying(voice)) {
         basePitch = voice->m_basePitch + track->m_pitch;
     } else {
         basePitch = voice->m_basePitch + RedMusicPitchControlGetValue();
@@ -1939,7 +1939,7 @@ void EnvelopeKeyExecute()
                     voiceData->m_axVoice = REDSOUND_AX_VOICE_NONE;
                 }
 
-                if ((voiceData->m_stateFlags & REDSOUND_VOICE_STATE_PLAYING_MASK) != 0) {
+                if (RedVoiceIsPlaying(voiceData)) {
                     voiceData->m_axVoice = AXAcquireVoice(REDSOUND_VOICE_INDEX_MASK, _VoiceDropedCallback, 0);
                 } else {
                     int prio = RedVoiceDataGetIndex(voiceData);

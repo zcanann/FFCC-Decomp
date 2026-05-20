@@ -24,7 +24,7 @@ extern "C" {
 struct RedWaveSettingState {
     int* m_slot;
     int m_waveId;
-    void* m_waveData;
+    RedWaveHeadWD* m_waveData;
     int m_waveSize;
 };
 
@@ -965,7 +965,7 @@ static RedWaveSettingState m_WaveSettingData;
 #define RedWaveSettingDataGet() (&m_WaveSettingData)
 #define RedWaveSettingDataSetSlot(slot) (RedWaveSettingDataGet()->m_slot = reinterpret_cast<int*>(slot))
 #define RedWaveSettingDataSetWaveId(waveId) (RedWaveSettingDataGet()->m_waveId = (waveId))
-#define RedWaveSettingDataSetWaveData(waveData) (RedWaveSettingDataGet()->m_waveData = (waveData))
+#define RedWaveSettingDataSetWaveData(waveData) (RedWaveSettingDataGet()->m_waveData = RedWaveHeadFromData(waveData))
 #define RedWaveSettingDataSetWaveSize(waveSize) (RedWaveSettingDataGet()->m_waveSize = (waveSize))
 static OSThread m_DmaExecuteThread;
 static OSSemaphore m_DmaExecuteSemaphore;

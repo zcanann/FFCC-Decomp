@@ -1,3 +1,4 @@
+#define FFCC_PTRARRAY_NO_INLINE_ACCESSORS
 #include "ffcc/singmenu.h"
 #include "ffcc/chara.h"
 #include "ffcc/color.h"

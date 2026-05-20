@@ -1,3 +1,4 @@
+#define FFCC_PTRARRAY_NO_INLINE_ACCESSORS
 #include "ffcc/p_map.h"
 #include "ffcc/gxfunc.h"
 #include "ffcc/graphic.h"

@@ -834,9 +834,10 @@ void CCharaPcs::createViewer()
             reinterpret_cast<unsigned char*>(__ct__6CColorFUcUcUcUc(reinterpret_cast<CColor*>(white), 0xFF, 0xFF, 0xFF, 0xFF));
         __ct__6CColorFv(reinterpret_cast<CColor*>(colorTmp));
         float scale = static_cast<float>(colorIndex) * kCharaViewerLerpScale;
-        for (int c = 0; c < 4; c++) {
-            colorTmp[c] = static_cast<unsigned char>(static_cast<int>(static_cast<float>(whiteChannels[c]) * scale));
-        }
+        colorTmp[0] = static_cast<unsigned char>(static_cast<int>(static_cast<float>(whiteChannels[0]) * scale));
+        colorTmp[1] = static_cast<unsigned char>(static_cast<int>(static_cast<float>(whiteChannels[1]) * scale));
+        colorTmp[2] = static_cast<unsigned char>(static_cast<int>(static_cast<float>(whiteChannels[2]) * scale));
+        colorTmp[3] = static_cast<unsigned char>(static_cast<int>(static_cast<float>(whiteChannels[3]) * scale));
         __ct__6CColorFR6CColor(reinterpret_cast<CColor*>(colorCopy), reinterpret_cast<CColor*>(colorTmp));
         p[0x12C + colorIndex * 4 + 0] = colorCopy[0];
         p[0x12C + colorIndex * 4 + 1] = colorCopy[1];

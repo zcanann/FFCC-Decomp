@@ -1983,11 +1983,11 @@ void CGMonObj::frameStatFuncMolbol()
 void CGMonObj::initFinishedFuncMeteoParasiteC()
 {
 	initFinishedFuncDefault__8CGMonObjFv(this);
-	*reinterpret_cast<CGMonObj**>(SoundBuffer_1260_ + 0x74) = this;
+	*reinterpret_cast<CGMonObj**>(m_boss__8CGMonObj + 0x74) = this;
 
 	if (strcmp(Game.m_currentScriptName, s_meteo_3_80331D64) == 0) {
+		MeteoParasiteCBossWork* work = reinterpret_cast<MeteoParasiteCBossWork*>(m_boss__8CGMonObj);
 		CGObject* object = reinterpret_cast<CGObject*>(this);
-		MeteoParasiteCBossWork* work = reinterpret_cast<MeteoParasiteCBossWork*>(SoundBuffer_1260_);
 		work->bits.m_meteo3 = 1;
 		work->m_index = 3;
 		*reinterpret_cast<u16*>(reinterpret_cast<u8*>(object->m_scriptHandle) + 0x1C) = 1;
@@ -2264,7 +2264,7 @@ void CGMonObj::logicFuncMeteoParasiteC()
 {
 	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
 	int nextState = -1;
-	MeteoParasiteCBossWork* work = reinterpret_cast<MeteoParasiteCBossWork*>(SoundBuffer_1260_);
+	MeteoParasiteCBossWork* work = reinterpret_cast<MeteoParasiteCBossWork*>(m_boss__8CGMonObj);
 	if (work->bits.m_meteo3 != 0) {
 		nextState = 0x68;
 	} else {

@@ -562,7 +562,7 @@ static int _SePlayStart(RedSeINFO* seInfo, int seId, int sepId, int pan, int vol
 				seTrack->m_portamentPitch = REDSOUND_TRACK_PORTAMENT_PITCH_NONE;
 				seTrack->m_voiceSwitch = REDSOUND_VOICE_SWITCH_DRY_STEREO;
 				memset(&seTrack->m_adsr, REDSOUND_TRACK_ADSR_DEFAULT_WORD, REDSOUND_TRACK_ADSR_SIZE);
-				seTrack->m_note.m_allocFlags = REDSOUND_NOTE_ALLOC_DIRECT_MASK;
+				RedNoteAllocSetDirectMask(seTrack->m_note.m_allocFlags);
 				seTrack->m_seTickCounter = 1;
 				voice->m_track = seTrack;
 				voice->m_stateFlags = REDSOUND_VOICE_STATE_PLAYING | REDSOUND_VOICE_STATE_SE;
@@ -939,7 +939,7 @@ static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* wav
 		track->m_fuzzyVolumeDepth = 0;
 		track->m_fuzzyPitchDepth = 0;
 		track->m_portamentPitch = REDSOUND_TRACK_PORTAMENT_PITCH_NONE;
-		track->m_note.m_allocFlags = REDSOUND_NOTE_ALLOC_NONE;
+		RedNoteAllocClear(track->m_note.m_allocFlags);
 		track->m_voiceSwitch = REDSOUND_VOICE_SWITCH_MUSIC_DEFAULT;
 		memset(&track->m_adsr, REDSOUND_TRACK_ADSR_DEFAULT_BYTE, REDSOUND_TRACK_ADSR_SIZE);
 

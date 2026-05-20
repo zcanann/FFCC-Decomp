@@ -2072,9 +2072,9 @@ static void __MidiCtrl_ChannelPriority(RedSoundCONTROL*, RedKeyOnDATA*, RedTrack
 
     command = *track->m_command++;
     if (command != 0) {
-        track->m_note.m_allocFlags |= REDSOUND_NOTE_ALLOC_PRIORITY;
+        RedNoteAllocSetPriority(track->m_note.m_allocFlags);
     } else {
-        track->m_note.m_allocFlags &= ~REDSOUND_NOTE_ALLOC_PRIORITY;
+        RedNoteAllocClearPriority(track->m_note.m_allocFlags);
     }
 }
 /*
@@ -2092,9 +2092,9 @@ static void __MidiCtrl_ChannelFix(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*
 
     command = *track->m_command++;
     if (command != 0) {
-        track->m_note.m_allocFlags |= REDSOUND_NOTE_ALLOC_RESERVED;
+        RedNoteAllocSetFixed(track->m_note.m_allocFlags);
     } else {
-        track->m_note.m_allocFlags &= ~REDSOUND_NOTE_ALLOC_RESERVED;
+        RedNoteAllocClearFixed(track->m_note.m_allocFlags);
     }
 }
 /*

@@ -3981,7 +3981,7 @@ int CRedDriver::PlayWaveItem(int waveNo, int itemNo, int key, int pan, int volum
     editorTrack->m_waveBase = waveHead->m_aramAddress;
     editorTrack->m_note.m_key = key;
     editorTrack->m_note.m_velocity = REDSOUND_VOLUME_MAX;
-    editorTrack->m_note.m_allocFlags = REDSOUND_NOTE_ALLOC_DIRECT_MASK;
+    RedNoteAllocSetDirectMask(editorTrack->m_note.m_allocFlags);
     editorTrack->m_trackNo = REDSOUND_EDITOR_VOICE_LEFT + 1;
     editorTrack->m_volume = REDSOUND_VOLUME_FULL;
     editorTrack->m_expression = REDSOUND_VOLUME_DEFAULT;

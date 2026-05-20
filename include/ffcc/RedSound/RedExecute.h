@@ -75,17 +75,23 @@ enum RedNoteAllocFlag {
 	REDSOUND_NOTE_ALLOC_NONE = 0,
 	REDSOUND_NOTE_ALLOC_DIRECT = 1,
 	REDSOUND_NOTE_ALLOC_STREAM = 2,
-	REDSOUND_NOTE_ALLOC_RESERVED = 4,
+	REDSOUND_NOTE_ALLOC_FIXED = 4,
 	REDSOUND_NOTE_ALLOC_PRIORITY = 8,
-	REDSOUND_NOTE_ALLOC_DIRECT_MASK = REDSOUND_NOTE_ALLOC_DIRECT | REDSOUND_NOTE_ALLOC_RESERVED,
+	REDSOUND_NOTE_ALLOC_DIRECT_MASK = REDSOUND_NOTE_ALLOC_DIRECT | REDSOUND_NOTE_ALLOC_FIXED,
 };
 
+#define RedNoteAllocClear(flags) ((flags) = REDSOUND_NOTE_ALLOC_NONE)
 #define RedNoteAllocHasDirect(flags) (((flags) & REDSOUND_NOTE_ALLOC_DIRECT) != 0)
 #define RedNoteAllocHasStream(flags) (((flags) & REDSOUND_NOTE_ALLOC_STREAM) != 0)
 #define RedNoteAllocHasPriority(flags) (((flags) & REDSOUND_NOTE_ALLOC_PRIORITY) != 0)
 #define RedNoteAllocHasDirectMask(flags) (((static_cast<s8>(flags)) & REDSOUND_NOTE_ALLOC_DIRECT_MASK) != 0)
+#define RedNoteAllocSetDirectMask(flags) ((flags) = REDSOUND_NOTE_ALLOC_DIRECT_MASK)
 #define RedNoteAllocSetStream(flags) ((flags) |= REDSOUND_NOTE_ALLOC_STREAM)
 #define RedNoteAllocClearStream(flags) ((flags) &= ~REDSOUND_NOTE_ALLOC_STREAM)
+#define RedNoteAllocSetPriority(flags) ((flags) |= REDSOUND_NOTE_ALLOC_PRIORITY)
+#define RedNoteAllocClearPriority(flags) ((flags) &= ~REDSOUND_NOTE_ALLOC_PRIORITY)
+#define RedNoteAllocSetFixed(flags) ((flags) |= REDSOUND_NOTE_ALLOC_FIXED)
+#define RedNoteAllocClearFixed(flags) ((flags) &= ~REDSOUND_NOTE_ALLOC_FIXED)
 
 struct RedWaveADPCMInfo {
 	AXPBADPCM m_data;

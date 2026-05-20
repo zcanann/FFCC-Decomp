@@ -207,6 +207,11 @@ static inline u8 MakeSaveBool(u8 value)
     return static_cast<u8>((0U - static_cast<u32>(value)) >> 31);
 }
 
+static inline u8 MakeLoadBool(s8 value)
+{
+    return static_cast<u8>((static_cast<u32>(-value) | static_cast<u32>(value)) >> 31);
+}
+
 static inline u32 CalcSaveCrc(u8* data)
 {
     u32 crc = 0xFFFFFFFF;
@@ -1046,8 +1051,7 @@ void CMemoryCardMan::MakeSaveData()
         {
             *reinterpret_cast<u16*>(dst + 0x12 + i * 2) = caravanWork->m_letterMeta[i];
         }
-        dst[0x24] = caravanWork->unk_0x3c8;
-        dst[0x25] = caravanWork->unk_0x3c9;
+        *reinterpret_cast<u16*>(dst + 0x24) = caravanWork->unk_0x3c8;
         *reinterpret_cast<u16*>(dst + 0x28) = caravanWork->m_inventoryItemCount;
         *reinterpret_cast<u16*>(dst + 0x2A) = caravanWork->m_progressValue;
         *reinterpret_cast<u16*>(dst + 0x2C) = caravanWork->m_tribeId;
@@ -1192,34 +1196,32 @@ void CMemoryCardMan::SetLoadData()
         return;
     }
 
-    CGame::CGameWork* gameWork = &Game.m_gameWork;
-    gameWork->m_scriptSysVal0 = save[0x20];
-    gameWork->m_scriptSysVal1 = save[0x21];
-    gameWork->m_scriptSysVal2 = save[0x22];
-    gameWork->m_scriptSysVal3 = save[0x23];
-    gameWork->m_timerA = *reinterpret_cast<int*>(save + 0x24);
-    gameWork->m_scriptGlobalTime = *reinterpret_cast<int*>(save + 0x28);
-    gameWork->m_frameCounter = *reinterpret_cast<int*>(save + 0x2C);
-    memcpy(gameWork->m_wmBackupParams, save + 0x30, 0x10);
-    memcpy(gameWork->m_bossArtifactStageTable, save + 0x40, 0x3C);
-    memcpy(gameWork->m_unkStageTable, save + 0x7C, 0x3C);
-    gameWork->m_chaliceElement = *reinterpret_cast<int*>(save + 0xB8);
-    memcpy(gameWork->m_linkTable, save + 0xC0, 0x1000);
-    memcpy(gameWork->m_townName, save + 0x10C0, 0x10);
-    memcpy(gameWork->m_eventFlags, save + 0x10D0, 0x100);
-    memcpy(gameWork->m_eventWork, save + 0x11D0, 0x200);
-    gameWork->m_mcSerial0 = *reinterpret_cast<u32*>(save + 0x13D0);
-    gameWork->m_mcSerial1 = *reinterpret_cast<u32*>(save + 0x13D4);
-    gameWork->m_mcRandom = *reinterpret_cast<u32*>(save + 0x13D8);
-    gameWork->m_mcHasSerial = save[0x13DC];
+    *reinterpret_cast<u32*>(&Game.m_gameWork.m_scriptSysVal0) = *reinterpret_cast<u32*>(save + 0x20);
+    Game.m_gameWork.m_timerA = *reinterpret_cast<int*>(save + 0x24);
+    Game.m_gameWork.m_scriptGlobalTime = *reinterpret_cast<int*>(save + 0x28);
+    Game.m_gameWork.m_frameCounter = *reinterpret_cast<int*>(save + 0x2C);
+    memcpy(Game.m_gameWork.m_wmBackupParams, save + 0x30, 0x10);
+    memcpy(Game.m_gameWork.m_bossArtifactStageTable, save + 0x40, 0x3C);
+    memcpy(Game.m_gameWork.m_unkStageTable, save + 0x7C, 0x3C);
+    Game.m_gameWork.m_chaliceElement = *reinterpret_cast<int*>(save + 0xB8);
+    memcpy(Game.m_gameWork.m_linkTable, save + 0xC0, 0x1000);
+    memcpy(Game.m_gameWork.m_townName, save + 0x10C0, 0x10);
+    memcpy(Game.m_gameWork.m_eventFlags, save + 0x10D0, 0x100);
+    memcpy(Game.m_gameWork.m_eventWork, save + 0x11D0, 0x200);
+    Game.m_gameWork.m_mcSerial0 = *reinterpret_cast<u32*>(save + 0x13D0);
+    Game.m_gameWork.m_mcSerial1 = *reinterpret_cast<u32*>(save + 0x13D4);
+    Game.m_gameWork.m_mcRandom = *reinterpret_cast<u32*>(save + 0x13D8);
+    Game.m_gameWork.m_mcHasSerial = save[0x13DC];
     Sound.SetBgmMasterVolume(static_cast<s8>(save[0x13DD]));
     Sound.SetSeMasterVolume(static_cast<s8>(save[0x13DE]));
     Sound.SetStereo(static_cast<u32>(__cntlzw(GetRedSoundGlobal()->GetSoundMode())) >> 5);
-    gameWork->m_gameInitFlag = MakeSaveBool(save[0x13E0]);
-    gameWork->m_spModeFlags[0] = MakeSaveBool(save[0x13E1]);
-    gameWork->m_spModeFlags[1] = MakeSaveBool(save[0x13E2]);
-    gameWork->m_spModeFlags[2] = MakeSaveBool(save[0x13E3]);
-    gameWork->m_spModeFlags[3] = MakeSaveBool(save[0x13E4]);
+
+    CGame::CGameWork* gameWork = &Game.m_gameWork;
+    gameWork->m_gameInitFlag = MakeLoadBool(static_cast<s8>(save[0x13E0]));
+    gameWork->m_spModeFlags[0] = MakeLoadBool(static_cast<s8>(save[0x13E1]));
+    gameWork->m_spModeFlags[1] = MakeLoadBool(static_cast<s8>(save[0x13E2]));
+    gameWork->m_spModeFlags[2] = MakeLoadBool(static_cast<s8>(save[0x13E3]));
+    gameWork->m_spModeFlags[3] = MakeLoadBool(static_cast<s8>(save[0x13E4]));
 
     for (int c = 0; c < 8; c++)
     {
@@ -1259,8 +1261,7 @@ void CMemoryCardMan::SetLoadData()
         {
             caravanWork->m_letterMeta[i] = *reinterpret_cast<u16*>(src + 0x12 + i * 2);
         }
-        caravanWork->unk_0x3c8 = src[0x24];
-        caravanWork->unk_0x3c9 = src[0x25];
+        caravanWork->unk_0x3c8 = *reinterpret_cast<u16*>(src + 0x24);
         caravanWork->m_inventoryItemCount = *reinterpret_cast<u16*>(src + 0x28);
         caravanWork->m_progressValue = *reinterpret_cast<u16*>(src + 0x2A);
         caravanWork->m_tribeId = *reinterpret_cast<u16*>(src + 0x2C);

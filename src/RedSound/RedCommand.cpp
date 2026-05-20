@@ -407,7 +407,7 @@ int SeStopMG(int bank, int sep, int group, int kind)
 	track = soundControl->m_tracks;
 	do {
 		if ((track->m_command != REDSOUND_TRACK_COMMAND_NONE) &&
-		    ((track->m_seSepId & REDSOUND_SE_BLOCK_DATA_FLAG) == 0)) {
+		    RedSeBlockIdIsSeSepData(track->m_seSepId)) {
 			int id = track->m_seSepId / REDSOUND_SE_MG_ID_DIVISOR;
 			if ((bank != id) && (sep != id) && (group != id) && (kind != id)) {
 				int trackNo;
@@ -624,7 +624,7 @@ int SeBlockPlay(int seId, int bank, int sequenceNo, int pan, int volume)
 				seInfo = RedSeBlockGetInfoFromEntry(seBlock, entries, blockSequence);
 				playInfo = seInfo;
 
-				if (((unsigned int)entries[blockSequence] & REDSOUND_SE_BLOCK_DATA_FLAG) != 0) {
+				if (RedSeBlockIdIsBlockData((unsigned int)entries[blockSequence])) {
 					playInfo->m_flagsAndCount |= REDSOUND_SE_INFO_MULTI_FLAG;
 				}
 				if (_SePlayStart(playInfo, seId, sequenceNo, pan, volume) != 0) {
@@ -1137,7 +1137,7 @@ int SeStopG(int group)
 	track = soundControl->m_tracks;
 	do {
 		if ((track->m_command != REDSOUND_TRACK_COMMAND_NONE) &&
-		    ((track->m_seSepId & REDSOUND_SE_BLOCK_DATA_FLAG) == 0) &&
+		    RedSeBlockIdIsSeSepData(track->m_seSepId) &&
 		    (track->m_seSepId / REDSOUND_SE_MG_ID_DIVISOR == group)) {
 			int trackNo;
 

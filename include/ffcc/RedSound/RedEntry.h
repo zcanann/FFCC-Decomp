@@ -370,6 +370,8 @@ enum RedSeBlockEntryLayout {
 #define RedSeBlockIdGetSequenceNo(seBlockId) ((seBlockId) & REDSOUND_SE_BLOCK_SEQUENCE_MASK)
 #define RedSeBlockIdAddBank(seBlockId, bank) ((seBlockId) += (bank) << REDSOUND_SE_BLOCK_BANK_SHIFT)
 #define RedSeBlockIdSetDataFlag(seBlockId) ((seBlockId) |= REDSOUND_SE_BLOCK_DATA_FLAG)
+#define RedSeBlockIdIsBlockData(seBlockId) (((seBlockId) & REDSOUND_SE_BLOCK_DATA_FLAG) != 0)
+#define RedSeBlockIdIsSeSepData(seBlockId) (((seBlockId) & REDSOUND_SE_BLOCK_DATA_FLAG) == 0)
 
 #define RedSeBlockGetInfoBase(seBlock) RedSeBlockGetInfoBaseFromEntries(seBlock, (seBlock)->m_entries)
 

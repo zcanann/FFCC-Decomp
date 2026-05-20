@@ -1474,7 +1474,7 @@ void CRedEntry::DisplaySePlayInfo()
 		int displayWaveNo;
 		do {
 			if (seTrack->m_command != REDSOUND_TRACK_COMMAND_NONE) {
-				if ((seTrack->m_seSepId & REDSOUND_SE_BLOCK_DATA_FLAG) != 0) {
+				if (RedSeBlockIdIsBlockData(seTrack->m_seSepId)) {
 					unsigned int seBlockId = (unsigned int)seTrack->m_seSepId;
 					seBlockId &= REDSOUND_SE_BLOCK_ENTRY_MASK;
 					int seBlockBankNo = RedSeBlockIdGetBankNo(seBlockId);

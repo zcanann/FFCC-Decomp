@@ -2355,7 +2355,7 @@ void CFlatRuntime2::IgnoreParticle(int slotNo, CFlatRuntime::CObject* object)
  */
 void CFlatRuntime2::initAllFinished()
 {
-	memset(&CGPartyObj::m_ghostWork, 0, sizeof(CGPartyObj::m_ghostWork));
+	memset(&CGPartyObj::m_ghostWork, 0, 0x90);
 }
 
 /*

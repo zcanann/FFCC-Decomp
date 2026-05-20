@@ -1771,7 +1771,7 @@ RedMemoryBlock* CRedSound::GetABankAddress()
  */
 RedSoundCONTROL* CRedSound::GetControlAddress()
 {
-	return RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY);
+	return RedSoundControlGetBegin();
 }
 /*
  * --INFO--

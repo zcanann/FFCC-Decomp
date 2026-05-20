@@ -62,7 +62,7 @@ public:
         u8 m_useViewSpace;    // 0xB1
         u8 m_target;          // 0xB2
         u8 m_textureCount;    // 0xB3
-        void* m_textureData;  // 0xB4
+        u8* m_textureData;    // 0xB4
         GXTexObj m_textures[4]; // 0xB8
     };
     enum TARGET

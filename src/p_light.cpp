@@ -23,8 +23,6 @@ extern "C" void draw__9CLightPcsFv(CLightPcs*);
 extern "C" void MakeLightMap__9CLightPcsFv(CLightPcs*);
 extern "C" void __ct__Q29CLightPcs6CLightFv(void*);
 extern "C" void __ct__Q29CLightPcs10CBumpLightFv(void*);
-extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
-extern "C" void* Free__7CMemoryFPv(CMemory*, void*);
 extern unsigned int DAT_8032fc0c;
 extern unsigned int DAT_8032fc08;
 extern float FLOAT_8032fc10;
@@ -214,39 +212,31 @@ void CLightPcs::create()
  */
 void CLightPcs::destroy()
 {
-    unsigned int i = 0;
-    unsigned char* light = reinterpret_cast<unsigned char*>(this);
-    do {
-        void* texture = *reinterpret_cast<void**>(light + 0x26b0);
-        if (texture != 0) {
-            bool hasTexture = texture != 0;
+    for (u32 i = 0; i < 8; i++) {
+        CBumpLight& light = m_bumpLights[8 + i];
+        if (light.m_textureData != 0) {
+            bool hasTexture = light.m_textureData != 0;
             if (hasTexture) {
-                Free__7CMemoryFPv(&Memory, texture);
-                *reinterpret_cast<void**>(light + 0x26b0) = 0;
+                delete[] light.m_textureData;
+                light.m_textureData = 0;
             }
-            light[0x26ac] = 0;
-            light[0x26ad] = 0;
+            light.m_hasTexture = 0;
+            light.m_useViewSpace = 0;
         }
-        i++;
-        light += 0x138;
-    } while (i < 8);
+    }
 
-    i = 0;
-    light = reinterpret_cast<unsigned char*>(this);
-    do {
-        void* texture = *reinterpret_cast<void**>(light + 0x1cf0);
-        if (texture != 0) {
-            bool hasTexture = texture != 0;
+    for (u32 i = 0; i < 8; i++) {
+        CBumpLight& light = m_bumpLights[i];
+        if (light.m_textureData != 0) {
+            bool hasTexture = light.m_textureData != 0;
             if (hasTexture) {
-                Free__7CMemoryFPv(&Memory, texture);
-                *reinterpret_cast<void**>(light + 0x1cf0) = 0;
+                delete[] light.m_textureData;
+                light.m_textureData = 0;
             }
-            light[0x1cec] = 0;
-            light[0x1ced] = 0;
+            light.m_hasTexture = 0;
+            light.m_useViewSpace = 0;
         }
-        i++;
-        light += 0x138;
-    } while (i < 8);
+    }
 }
 
 /*
@@ -260,25 +250,20 @@ void CLightPcs::destroy()
  */
 void CLightPcs::DestroyBumpLightAll(CLightPcs::TARGET target)
 {
-    char* light = reinterpret_cast<char*>(this) + (static_cast<int>(target) * 0x9c0);
-    u32 i = 0;
+    CBumpLight* light = &m_bumpLights[static_cast<int>(target) * 8];
 
-    do {
-        void* texture = *reinterpret_cast<void**>(light + 0x1cf0);
-        if (texture != 0) {
-            bool hasTexture = texture != 0;
+    for (u32 i = 0; i < 8; i++) {
+        if (light[i].m_textureData != 0) {
+            bool hasTexture = light[i].m_textureData != 0;
             if (hasTexture) {
-                Free__7CMemoryFPv(&Memory, texture);
-                *reinterpret_cast<void**>(light + 0x1cf0) = 0;
+                delete[] light[i].m_textureData;
+                light[i].m_textureData = 0;
             }
 
-            light[0x1cec] = 0;
-            light[0x1ced] = 0;
+            light[i].m_hasTexture = 0;
+            light[i].m_useViewSpace = 0;
         }
-
-        i++;
-        light += 0x138;
-    } while (i < 8);
+    }
 }
 
 /*
@@ -445,12 +430,11 @@ CLightPcs::CBumpLight* CLightPcs::AddBump(CLightPcs::CLight* srcLight, CLightPcs
     bumpLight->m_textureCount = count;
 
     int texSize = GXGetTexBufferSize(0x40, 0x40, 3, 0, 0);
-    bumpLight->m_textureData = _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
-        &Memory, texSize * count, stage, const_cast<char*>(s_p_light_cpp_801D7CAC), 0x13b, 0);
+    bumpLight->m_textureData = new (stage, const_cast<char*>(s_p_light_cpp_801D7CAC), 0x13b) u8[texSize * count];
 
     int texOffset = 0;
     for (int i = 0; i < count; i++) {
-        GXInitTexObj(&bumpLight->m_textures[i], (u8*)bumpLight->m_textureData + texOffset, (u16)0x40, (u16)0x40,
+        GXInitTexObj(&bumpLight->m_textures[i], bumpLight->m_textureData + texOffset, (u16)0x40, (u16)0x40,
                      (GXTexFmt)3, (GXTexWrapMode)0, (GXTexWrapMode)0, (u8)0);
         texOffset += texSize;
     }

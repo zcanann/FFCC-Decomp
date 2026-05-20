@@ -4033,13 +4033,12 @@ inline int CRedDriver::PlayWaveItem(int waveNo, int itemNo, int key, int pan, in
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CRedDriver::StopWaveItem()
+void CRedDriver::StopWaveItem()
 {
-    RedTrackDATA* editorTrack = RedEditorTrackGet();
     RedVoiceDATA* voice = RedVoiceDataGetBegin();
 
     do {
-        if (voice->m_track == editorTrack) {
+        if (voice->m_track == RedEditorTrackGet()) {
             voice->m_flags |= REDSOUND_VOICE_FLAGS_RELEASED;
             voice->m_active = REDSOUND_VOICE_ACTIVE_OFF;
             voice->m_track = REDSOUND_VOICE_TRACK_NONE;

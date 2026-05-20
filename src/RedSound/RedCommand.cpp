@@ -319,14 +319,14 @@ RedTrackDATA* SearchSeEmptyTrack(int trackCount, int eraseTrack, int attrMask)
 			remaining = trackCount - 1;
 			while (remaining != 0) {
 				if ((track->m_command != REDSOUND_TRACK_COMMAND_NONE) ||
-				    ((track->m_note.m_allocFlags & REDSOUND_NOTE_ALLOC_STREAM) != 0)) {
+				    RedNoteAllocHasStream(track->m_note.m_allocFlags)) {
 					break;
 				}
 				track--;
 				remaining--;
 			}
 			if ((track->m_command != REDSOUND_TRACK_COMMAND_NONE) ||
-			    ((track->m_note.m_allocFlags & REDSOUND_NOTE_ALLOC_STREAM) != 0)) {
+			    RedNoteAllocHasStream(track->m_note.m_allocFlags)) {
 				scan = track;
 				remaining = 1;
 			}

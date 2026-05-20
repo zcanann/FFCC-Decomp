@@ -649,7 +649,7 @@ void KeyOnReserve(RedKeyOnDATA* keyOnData, RedTrackDATA* track)
 {
     RedKeyOnSlot* slot;
 
-    if (((signed char)track->m_note.m_allocFlags & REDSOUND_NOTE_ALLOC_DIRECT_MASK) != 0) {
+    if (RedNoteAllocHasDirectMask(track->m_note.m_allocFlags)) {
         slot = RedKeyOnGetFixedBegin(keyOnData) + track->m_trackNo;
         if ((slot->m_track == REDSOUND_TRACK_NONE) || (slot->m_track == track)) {
             slot->m_track = track;
@@ -659,7 +659,7 @@ void KeyOnReserve(RedKeyOnDATA* keyOnData, RedTrackDATA* track)
         return;
     }
 
-    if ((track->m_note.m_allocFlags & REDSOUND_NOTE_ALLOC_PRIORITY) != 0) {
+    if (RedNoteAllocHasPriority(track->m_note.m_allocFlags)) {
         slot = RedKeyOnGetPriorityBegin(keyOnData);
         do {
             if (slot->m_track == REDSOUND_TRACK_NONE) {

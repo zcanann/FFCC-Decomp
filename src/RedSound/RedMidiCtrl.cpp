@@ -1240,7 +1240,7 @@ static void __MidiCtrl_ReverbDepthDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTra
 {
     RedControlRamp* reverbDepth = (RedControlRamp*)&track->m_reverbDepth;
 
-    reverbDepth->m_value = *(s8*)track->m_command++;
+    reverbDepth->m_value = RedTrackCommandReadS8(track);
 
     if (reverbDepth->m_value != 0) {
         reverbDepth->m_value += 1;
@@ -2627,7 +2627,7 @@ static void __MidiCtrl_FineTuneAbsolute(RedSoundCONTROL*, RedKeyOnDATA*, RedTrac
  */
 static void __MidiCtrl_FineTuneRelative(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	track->m_fineTune = track->m_fineTune + *(s8*)track->m_command++;
+	track->m_fineTune = track->m_fineTune + RedTrackCommandReadS8(track);
 	RedChangeStatusAdd(REDSOUND_VOICE_UPDATE_PITCH);
 }
 /*
@@ -2641,7 +2641,7 @@ static void __MidiCtrl_FineTuneRelative(RedSoundCONTROL*, RedKeyOnDATA*, RedTrac
  */
 static void __MidiCtrl_KeyTransposeAbsolute(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	track->m_keyTranspose = (short)(*(s8*)track->m_command++ << REDSOUND_MIDI_KEY_TRANSPOSE_SHIFT);
+	track->m_keyTranspose = (short)(RedTrackCommandReadS8(track) << REDSOUND_MIDI_KEY_TRANSPOSE_SHIFT);
 	RedChangeStatusAdd(REDSOUND_VOICE_UPDATE_PITCH);
 }
 /*
@@ -2655,7 +2655,7 @@ static void __MidiCtrl_KeyTransposeAbsolute(RedSoundCONTROL*, RedKeyOnDATA*, Red
  */
 static void __MidiCtrl_KeyTransposeRelative(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	track->m_keyTranspose += *(s8*)track->m_command++ << REDSOUND_MIDI_KEY_TRANSPOSE_SHIFT;
+	track->m_keyTranspose += RedTrackCommandReadS8(track) << REDSOUND_MIDI_KEY_TRANSPOSE_SHIFT;
 	RedChangeStatusAdd(REDSOUND_VOICE_UPDATE_PITCH);
 }
 /*

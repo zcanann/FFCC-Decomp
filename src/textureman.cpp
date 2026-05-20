@@ -34,7 +34,6 @@ private:
 };
 
 extern "C" void __dl__FPv(void*);
-extern "C" void __dla__FPv(void*);
 extern "C" void __ct__4CRefFv(void*);
 extern "C" void __dt__4CRefFv(void*, int);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
@@ -1111,7 +1110,7 @@ template <>
 void CPtrArray<CTexture*>::RemoveAll()
 {
     if (m_items != 0) {
-        __dla__FPv(m_items);
+        delete[] m_items;
         m_items = 0;
     }
     m_size = 0;
@@ -1143,7 +1142,7 @@ void CPtrArray<CTexture*>::ReleaseAndRemoveAll()
     }
 
     if (m_items != 0) {
-        __dla__FPv(m_items);
+        delete[] m_items;
         m_items = 0;
     }
     m_size = 0;
@@ -1220,13 +1219,9 @@ int CPtrArray<CTexture*>::setSize(unsigned long newSize)
             m_size = m_size << 1;
         }
 
-        newItems = (CTexture**)_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
-            &Memory,
-            (unsigned long)(m_size << 2),
-            m_stage,
-            const_cast<char*>(s_collection_ptrarray_h_801D79F4),
-            0xFA,
-            0);
+        newItems = static_cast<CTexture**>(
+            Memory._Alloc(static_cast<unsigned long>(m_size << 2), m_stage,
+                          const_cast<char*>(s_collection_ptrarray_h_801D79F4), 0xFA, 0));
         if (newItems == 0) {
             return 0;
         }
@@ -1235,7 +1230,7 @@ int CPtrArray<CTexture*>::setSize(unsigned long newSize)
             memcpy(newItems, m_items, m_numItems << 2);
         }
         if (m_items != 0) {
-            __dla__FPv(m_items);
+            delete[] m_items;
             m_items = 0;
         }
         m_items = newItems;

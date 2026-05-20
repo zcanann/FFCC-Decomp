@@ -14,6 +14,7 @@ extern const float FLOAT_8033104c = 448.0f;
 extern const float FLOAT_80331050 = 320.0f;
 extern const float FLOAT_80331054 = 224.0f;
 extern const double DOUBLE_80331058 = 4503601774854144.0;
+extern const float FLOAT_803310C8;
 
 struct CoronaWork {
     s16 m_shapeX;
@@ -168,7 +169,7 @@ void pppDestructCorona(pppCorona*, pppCoronaUnkC*)
  */
 void pppConstructCorona(pppCorona* param1, pppCoronaUnkC* param2)
 {
-    float fVar1 = FLOAT_80331050;
+    float fVar1 = FLOAT_803310C8;
     u16* puVar2 = (u16*)((u8*)param1 + 0x80 + param2->m_serializedDataOffsets[3]);
     puVar2[2] = 0;
     puVar2[1] = 0;

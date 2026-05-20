@@ -1836,37 +1836,38 @@ extern "C" void CalcBound__9CLine(CLine<64>* line)
     line->m_max.z = kLineBoundsInitMax;
     line->m_totalLength = kLineSegmentMinT;
 
-    for (unsigned int i = 0; i < line->m_numPoints; i++) {
-        const Vec& point = line->m_points[i];
+    Vec* point = line->m_points;
+    CLineSegment64* segment = line->m_segments;
+    for (unsigned int i = 0; i < line->m_numPoints; i++, point++, segment++) {
 
-        if (point.x < line->m_min.x) {
-            line->m_min.x = point.x;
+        if (point->x < line->m_min.x) {
+            line->m_min.x = point->x;
         }
-        if (point.y < line->m_min.y) {
-            line->m_min.y = point.y;
+        if (point->y < line->m_min.y) {
+            line->m_min.y = point->y;
         }
-        if (point.z < line->m_min.z) {
-            line->m_min.z = point.z;
+        if (point->z < line->m_min.z) {
+            line->m_min.z = point->z;
         }
 
-        if (line->m_max.x < point.x) {
-            line->m_max.x = point.x;
+        if (point->x > line->m_max.x) {
+            line->m_max.x = point->x;
         }
-        if (line->m_max.y < point.y) {
-            line->m_max.y = point.y;
+        if (point->y > line->m_max.y) {
+            line->m_max.y = point->y;
         }
-        if (line->m_max.z < point.z) {
-            line->m_max.z = point.z;
+        if (point->z > line->m_max.z) {
+            line->m_max.z = point->z;
         }
 
         if (i != 0) {
-            CLineSegment64& segment = line->m_segments[i - 1];
-            PSVECSubtract(&line->m_points[i], &line->m_points[i - 1], &segment.delta);
-            segment.length = PSVECMag(&segment.delta);
-            segment.startLength = line->m_totalLength;
-            line->m_totalLength += segment.length;
-            if (segment.length != kLineSegmentMinT) {
-                PSVECNormalize(&segment.delta, &segment.normal);
+            CLineSegment64* prevSegment = segment - 1;
+            PSVECSubtract(point, point - 1, &prevSegment->delta);
+            prevSegment->length = PSVECMag(&prevSegment->delta);
+            prevSegment->startLength = line->m_totalLength;
+            line->m_totalLength += prevSegment->length;
+            if (prevSegment->length != kLineSegmentMinT) {
+                PSVECNormalize(&prevSegment->delta, &prevSegment->normal);
             }
         }
     }

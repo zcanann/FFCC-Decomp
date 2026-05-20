@@ -2056,37 +2056,37 @@ void CCaravanWork::CalcStatus()
 	}
 
 	cappedValue = 99;
-	if (m_strength < 100) {
+	if (m_strength <= 99) {
 		cappedValue = m_strength;
 	}
 	m_strength = cappedValue;
 
 	cappedValue = 99;
-	if (m_defense < 100) {
+	if (m_defense <= 99) {
 		cappedValue = m_defense;
 	}
 	m_defense = cappedValue;
 
 	cappedValue = 99;
-	if (m_magic < 100) {
+	if (m_magic <= 99) {
 		cappedValue = m_magic;
 	}
 	m_magic = cappedValue;
 
 	cappedValue = 99;
-	if (m_baseStrength < 100) {
+	if (m_baseStrength <= 99) {
 		cappedValue = m_baseStrength;
 	}
 	m_baseStrength = cappedValue;
 
 	cappedValue = 99;
-	if (m_baseDefense < 100) {
+	if (m_baseDefense <= 99) {
 		cappedValue = m_baseDefense;
 	}
 	m_baseDefense = cappedValue;
 
 	cappedValue = 99;
-	if (m_baseMagic < 100) {
+	if (m_baseMagic <= 99) {
 		cappedValue = m_baseMagic;
 	}
 	m_baseMagic = cappedValue;

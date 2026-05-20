@@ -145,8 +145,6 @@ unsigned int PTR_s_CCameraPcs_GAME__801e915c[7][0x15C / sizeof(unsigned int)] = 
 Vec g_shadow_pos;
 Vec g_shadow_refpos;
 extern "C" void Printf__7CSystemFPce(CSystem* system, char* format, ...);
-extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long size, CMemory::CStage* stage, char* file, int line);
-extern "C" void __dl__FPv(void*);
 extern "C" CGObject* FindGObjFirst__13CFlatRuntime2Fv(void*);
 extern "C" CGObject* FindGObjNext__13CFlatRuntime2FP8CGObject(void*, CGObject*);
 extern "C" void SetFrustum__6CBoundFR3VecPA4_f(float* bound, Vec* point, Mtx matrix);
@@ -1335,12 +1333,10 @@ void CCameraPcs::createFullShadow()
 
     *reinterpret_cast<void**>(self + 0x31C) = 0;
     rampTexSize = GXGetTexBufferSize(0x1E0, 0x1E0, GX_TF_I8, GX_FALSE, 0);
-    *reinterpret_cast<void**>(self + 0x31C) =
-        __nwa__FUlPQ27CMemory6CStagePci(rampTexSize, stage, s_p_camera_cpp_801D7918, 0x3A5);
+    *reinterpret_cast<void**>(self + 0x31C) = new (stage, s_p_camera_cpp_801D7918, 0x3A5) u8[rampTexSize];
 
     rampTexSize = GXGetTexBufferSize(0x10, 0x10, GX_TF_I8, GX_FALSE, 0);
-    rampTex = static_cast<unsigned char*>(
-        __nwa__FUlPQ27CMemory6CStagePci(rampTexSize, stage, s_p_camera_cpp_801D7918, 0x361));
+    rampTex = new (stage, s_p_camera_cpp_801D7918, 0x361) u8[rampTexSize];
     *reinterpret_cast<unsigned char**>(self + 0x320) = rampTex;
 
     for (i = 0; i < 0x100; i += 8) {
@@ -1394,12 +1390,12 @@ void CCameraPcs::destroyFullShadow()
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
 
     if (*reinterpret_cast<void**>(self + 0x31C) != 0) {
-        __dl__FPv(*reinterpret_cast<void**>(self + 0x31C));
+        delete[] static_cast<u8*>(*reinterpret_cast<void**>(self + 0x31C));
         *reinterpret_cast<void**>(self + 0x31C) = 0;
     }
 
     if (*reinterpret_cast<void**>(self + 0x320) != 0) {
-        __dl__FPv(*reinterpret_cast<void**>(self + 0x320));
+        delete[] static_cast<u8*>(*reinterpret_cast<void**>(self + 0x320));
         *reinterpret_cast<void**>(self + 0x320) = 0;
     }
 }

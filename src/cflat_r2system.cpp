@@ -55,12 +55,10 @@ int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, CMapCylinder
 void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
 int GetWait__4CMesFv(void*);
 int GetPadType__6JoyBusFi(void*, int);
-unsigned int getNumFreeObject__13CFlatRuntime2Fi(void*, int);
 unsigned short GetButtonDown__4CPadFl(void*, long);
 void Printf__7CSystemFPce(CSystem*, const char*, ...);
 int sprintf(char*, const char*, ...);
 }
-extern unsigned char CFlat[0x10440];
 extern int gWmMenuWorkA;
 extern float FLOAT_80330B30;
 extern float FLOAT_80330b74;
@@ -4167,7 +4165,7 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         outResult = 0;
         return;
     case -3:
-        runtime->push(object, getNumFreeObject__13CFlatRuntime2Fi(this, 5));
+        runtime->push(object, getNumFreeObject(5));
         outResult = 0;
         return;
     default:

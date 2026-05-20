@@ -1,17 +1,10 @@
 #ifndef _FFCC_CFLAT_R2CLASS_H_
 #define _FFCC_CFLAT_R2CLASS_H_
 
-#include "ffcc/cflat_runtime.h"
+#include "ffcc/cflat_runtime2.h"
 
 class CGObjWork;
 
 void SAFE_CAST_MON_WORK(CGObjWork*);
-
-class CFlatRuntime2
-{
-	void onClassSystemFunc(CFlatRuntime::CObject*, int, int, int&);
-	CFlatRuntime::CVal* onClassSystemVal(CFlatRuntime::CObject*, int);
-	void onSetClassSystemVal(int, CFlatRuntime::CObject*, CFlatRuntime::CStack*, int);
-};
 
 #endif // _FFCC_CFLAT_R2CLASS_H_

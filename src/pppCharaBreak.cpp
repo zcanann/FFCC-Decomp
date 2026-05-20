@@ -4,6 +4,7 @@
 #include "ffcc/linkage.h"
 #include "ffcc/math.h"
 #include "ffcc/p_camera.h"
+#include "ffcc/pppPart.h"
 #include "ffcc/ppp_constants.h"
 #include "ffcc/util.h"
 
@@ -14,6 +15,7 @@
 #include "ffcc/ppp_linkage.h"
 
 class CMaterialMan;
+class CMaterialSet;
 extern const char s_pppCharaBreak_cpp_801dd690[] = "pppCharaBreak.cpp";
 extern float FLOAT_80332048;
 extern float FLOAT_8033204c;
@@ -30,8 +32,10 @@ extern int DAT_801dd684;
 extern int DAT_801dd688;
 extern int DAT_801dd68c;
 extern Vec kPppCharaBreakUpVector;
-extern "C" void SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(void* materialMan, void* materialSet,
-                                                                            unsigned int materialIdx, int, int);
+extern "C" void SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(CMaterialMan* materialMan,
+                                                                            CMaterialSet* materialSet,
+                                                                            unsigned int materialIdx, int,
+                                                                            _GXTevScale);
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
 
 static inline Mtx& CameraMatrix()
@@ -43,9 +47,9 @@ void pppInitBlendMode(void);
 
 extern "C" {
 int rand(void);
-void* GetCharaHandlePtr__FP8CGObjectl(void*, long);
-int GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void*);
-void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(void*, long, float&, float&, float&, float, float&, float&);
+CCharaPcs::CHandle* GetCharaHandlePtr__FP8CGObjectl(CGObject*, long);
+CChara::CModel* GetCharaModelPtr__FPQ29CCharaPcs7CHandle(CCharaPcs::CHandle*);
+void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(_pppPObject*, long, float&, float&, float&, float, float&, float&);
 void* pppMemFree__FPv(unsigned long, CMemory::CStage*, char*, int);
 void CalcBoundaryBoxQuantized__5CUtilFP3VecP3VecP6S16VecUlUl(CUtil*, Vec*, Vec*, S16Vec*, unsigned long, unsigned long);
 void ReWriteDisplayList__5CUtilFPvUlUl(CUtil*, void*, unsigned long, unsigned long);
@@ -54,7 +58,7 @@ int IsHasDrawFmtDL__5CUtilFUc(CUtil*, unsigned char);
 void _WaitDrawDone__8CGraphicFPci(CGraphic*, const char*, int);
 void pppHeapUseRate__FPQ27CMemory6CStage(void*);
 
-void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(void*, void*, float, u8, u8, u8, u8, u8, u8, u8);
+void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(pppCVECTOR*, pppFMATRIX*, float, u8, u8, u8, u8, u8, u8, u8);
 
 void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
 void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
@@ -148,7 +152,7 @@ struct CharaBreakModelData {
     u8 _pad0[0xC];
     u32 m_meshCount;
     u8 _pad10[0x14];
-    void* m_materialSet;
+    CMaterialSet* m_materialSet;
     u8 _pad28[0xC];
     u32 m_posQuant;
     u32 m_normQuant;
@@ -220,8 +224,8 @@ void pppRenderCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB*, CharaBreakU
         _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
         pppInitBlendMode();
         pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-            colorWork + 8,
-            (u8*)charaBreak + 0x40,
+            reinterpret_cast<pppCVECTOR*>(colorWork + 8),
+            reinterpret_cast<pppFMATRIX*>((u8*)charaBreak + 0x40),
             FLOAT_80332048,
             0,
             0,
@@ -251,7 +255,8 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
     CharaBreakStep* stepData;
     CharaBreakWork* work;
     CChara::CModel* model;
-    void* handle;
+    CGObject* owner;
+    CCharaPcs::CHandle* handle;
     u8* mesh;
     u32 i;
 
@@ -260,14 +265,14 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
         return;
     }
 
-    handle = pppMngStPtr->m_owner;
+    owner = static_cast<CGObject*>(pppMngStPtr->m_owner);
     work = (CharaBreakWork*)(charaBreak->m_workArea + data->m_serializedDataOffsets[2]);
     if (work->m_enabled == 0) {
         return;
     }
 
-    handle = GetCharaHandlePtr__FP8CGObjectl(handle, 0);
-    model = (CChara::CModel*)GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
+    handle = GetCharaHandlePtr__FP8CGObjectl(owner, 0);
+    model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
     work->m_model = model;
 
     CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(charaBreak,
@@ -993,7 +998,8 @@ extern "C" void CharaBreak_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f(v
             POLYGON_DATA* vertexData = (*displayListEntry)->m_polygonData;
 
             SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
-                &MaterialMan, ModelData(modelPtr)->m_materialSet, materialData->m_material, 0, 0);
+                &MaterialMan, ModelData(modelPtr)->m_materialSet, static_cast<unsigned int>(materialData->m_material), 0,
+                static_cast<_GXTevScale>(0));
 
             GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
             GXSetCullMode(GX_CULL_NONE);

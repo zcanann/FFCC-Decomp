@@ -1285,13 +1285,13 @@ void CGPartyObj::enableAttackCol(int enabled, int isFriendly, int hitMask)
 		if (isFriendly == 0 || (hitMask & 1) != 0) {
 			col0Enabled = true;
 		}
-		bool col1Enabled = false;
 		*reinterpret_cast<unsigned int*>(self + 0x20C) = col0Enabled != false;
+		bool col1Enabled = false;
 		if (isFriendly != 0 && (hitMask & 2) != 0) {
 			col1Enabled = true;
 		}
-		bool col2Enabled = false;
 		*reinterpret_cast<unsigned int*>(self + 0x23C) = col1Enabled != false;
+		bool col2Enabled = false;
 		if (isFriendly != 0 && (hitMask & 4) != 0) {
 			col2Enabled = true;
 		}

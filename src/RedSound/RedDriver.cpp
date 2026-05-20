@@ -4082,7 +4082,7 @@ void CRedDriver::SetWavePitch(int pitch)
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CRedDriver::SetWaveTune(int key, int fineTune)
+void CRedDriver::SetWaveTune(int key, int fineTune)
 {
     RedTrackDATA* editorTrack;
     int* voiceNo;

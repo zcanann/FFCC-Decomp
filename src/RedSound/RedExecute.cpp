@@ -2725,7 +2725,7 @@ static void _MusicNoteExecute()
             track->m_command = savedTrackData->m_command[trackIndex];
             track->m_deltaTime = savedTrackData->m_delta[trackIndex];
             track->m_flags = savedTrackData->m_flags[trackIndex];
-            *(int*)&track->m_note = *(int*)&savedTrackData->m_note[trackIndex];
+            RedNoteCopy(&track->m_note, &savedTrackData->m_note[trackIndex]);
             track++;
             trackIndex++;
         } while (--trackCount != 0);
@@ -2814,7 +2814,7 @@ static void _SkipMusicEntry()
         do {
             if ((src->m_track != REDSOUND_TRACK_NONE) && (dst->m_track == REDSOUND_TRACK_NONE)) {
                 dst->m_track = src->m_track;
-                *(int*)&dst->m_note = *(int*)&src->m_note;
+                RedNoteCopy(&dst->m_note, &src->m_note);
                 keyOnEntryCount++;
                 RedKeyOnEntryInc();
             }
@@ -2834,7 +2834,7 @@ static void _SkipMusicEntry()
                (src < RedKeyOnGetNormalBegin(RedSkipKeyOnDataGet()))) {
             if (src->m_track != REDSOUND_TRACK_NONE) {
                 dst->m_track = src->m_track;
-                *(int*)&dst->m_note = *(int*)&src->m_note;
+                RedNoteCopy(&dst->m_note, &src->m_note);
                 dst++;
                 keyOnEntryCount++;
                 RedKeyOnEntryInc();
@@ -2854,7 +2854,7 @@ static void _SkipMusicEntry()
                (src < RedKeyOnGetEnd(RedSkipKeyOnDataGet()))) {
             if (src->m_track != REDSOUND_TRACK_NONE) {
                 dst->m_track = src->m_track;
-                *(int*)&dst->m_note = *(int*)&src->m_note;
+                RedNoteCopy(&dst->m_note, &src->m_note);
                 dst++;
                 keyOnEntryCount++;
                 RedKeyOnEntryInc();
@@ -2922,7 +2922,7 @@ void MusicSkipFunction()
             track->m_command = savedTrackData->m_command[trackIndex];
             track->m_deltaTime = savedTrackData->m_delta[trackIndex];
             track->m_flags = savedTrackData->m_flags[trackIndex];
-            *(int*)&track->m_note = *(int*)&savedTrackData->m_note[trackIndex];
+            RedNoteCopy(&track->m_note, &savedTrackData->m_note[trackIndex]);
             trackCount -= 1;
             trackIndex += 1;
             track += 1;

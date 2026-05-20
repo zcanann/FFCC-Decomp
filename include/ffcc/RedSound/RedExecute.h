@@ -55,11 +55,7 @@ struct RedNoteDATA {
 	unsigned char m_reserved03;
 };
 
-inline void RedNoteCopy(RedNoteDATA* dst, const RedNoteDATA* src)
-{
-	*(int*)&dst->m_key = *(int*)&src->m_key;
-}
-
+#define RedNoteCopy(dst, src) (*(int*)&(dst)->m_key = *(int*)&(src)->m_key)
 #define RedNoteGetKey(note) (*(char*)&(note)->m_key)
 
 enum RedNoteLayoutOffset {

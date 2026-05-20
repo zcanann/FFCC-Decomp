@@ -171,6 +171,7 @@ static RedReverbSize* p_ReverbSize;
 #define RedReverbSizeAddAligned(size) (RedReverbSizeGet()->m_aligned += (size))
 #define RedReverbSizeClear()                                                                           \
     (RedReverbSizeGet()->m_requested = RedReverbSizeGet()->m_aligned = 0)
+#define RedReverbAllocSize(size) ((int)(size))
 volatile u32 m_ChangeStatus;
 u32 m_TerminateNote[REDSOUND_TERMINATE_NOTE_WORD_COUNT] = { 0 };
 static RedKeyOnDATA* p_SkipKeyOn;
@@ -691,7 +692,7 @@ void* ReverbAreaAlloc(unsigned long size)
 {
     RedReverbSizeAddRequested((u32)size);
     RedReverbSizeAddAligned(((u32)size + REDSOUND_REVERB_ALLOC_ALIGN_MASK) & ~REDSOUND_REVERB_ALLOC_ALIGN_MASK);
-    return (void*)RedNew((int)size);
+    return (void*)RedNew(RedReverbAllocSize(size));
 }
 
 /*

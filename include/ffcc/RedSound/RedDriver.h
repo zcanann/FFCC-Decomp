@@ -42,7 +42,7 @@ enum RedDmaSearchResult {
 struct RedDmaRequest {
 	int m_id;
 	int m_direction;
-	int m_mainMemory;
+	void* m_mainMemory;
 	int m_aramMemory;
 	int m_size;
 	RedDmaCallback m_callback;

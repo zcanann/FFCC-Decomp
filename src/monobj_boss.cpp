@@ -46,7 +46,7 @@ extern "C" void teleport__8CGMonObjFiiiiiiiiiP3VecRiR3Vec(CGMonObj*, int, int, i
 extern "C" int SearchNode__Q26CChara6CModelFPc(CChara::CModel*, char*);
 extern "C" int GetDispIndex__Q26CChara6CModelFPQ26CChara5CNode(CChara::CModel*, CChara::CNode*);
 extern float FLOAT_80331dd0;
-extern float FLOAT_80331cf8;
+extern const float FLOAT_80331cf8 = 0.0f;
 extern float FLOAT_80331dcc;
 extern float FLOAT_80331dc8;
 extern float FLOAT_80331d18;

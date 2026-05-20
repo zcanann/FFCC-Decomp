@@ -1316,7 +1316,7 @@ int CRedSound::GetSeUsedWave(void* seSepData)
 int CRedSound::StreamStandby(void* streamHeader, int fileSize)
 {
 	int streamId = REDSOUND_STREAM_ID_NONE;
-	RedStreamHEAD* header = reinterpret_cast<RedStreamHEAD*>(streamHeader);
+	RedStreamHEAD* header = RedStreamHeaderFromData(streamHeader);
 
 	if (header->m_signature[REDSOUND_STREAM_SIGNATURE_0_INDEX] == REDSOUND_STREAM_SIGNATURE_0 &&
 	    header->m_signature[REDSOUND_STREAM_SIGNATURE_1_INDEX] == REDSOUND_STREAM_SIGNATURE_1 &&
@@ -1325,7 +1325,7 @@ int CRedSound::StreamStandby(void* streamHeader, int fileSize)
 		if (bank != 0) {
 			streamId = GetAutoID();
 			RedSoundStreamBankSetId(bank, streamId);
-			RedSoundStreamBankSetData(bank, reinterpret_cast<RedStreamFile*>(streamHeader));
+			RedSoundStreamBankSetData(bank, RedStreamFileFromHeader(streamHeader));
 			RedSoundStreamBankSetFileSize(bank, fileSize);
 			RedSoundStreamBankSetReadPoint(bank, REDSOUND_STREAM_BANK_POINT_NONE);
 			RedSoundStreamBankSetPlayPoint(bank, REDSOUND_STREAM_BANK_POINT_NONE);

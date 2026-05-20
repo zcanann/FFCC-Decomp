@@ -36,8 +36,6 @@ extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::C
 extern "C" {
 int GetTexture__8CMapMeshFP12CMaterialSetRi(CMapMesh* mapMesh, CMaterialSet* materialSet, int& textureIndex);
 
-void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(void*, void*, float, u8, u8, u8, u8, u8, u8, u8);
-void pppDrawMesh__FP10pppModelStP3Veci(pppModelSt*, Vec*, int);
 void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
 void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
 void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
@@ -54,15 +52,6 @@ struct CrystalIndTexMtx {
 
 struct CrystalTexMtx {
     float value[3][4];
-};
-
-struct pppCrystalRenderObject {
-    u8 _pad0[0x10];
-    pppFMATRIX m_localMatrix;
-    pppFMATRIX m_drawMatrix;
-    Vec* m_drawMatrixPtr;
-    u8 _pad74[0xC];
-    CrystalWork m_work;
 };
 
 struct pppCrystalColorBlock {
@@ -132,7 +121,6 @@ void pppRenderCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* para
 	s32 dataValIndex = param_2->m_dataValIndex;
 	CrystalWork* work = (CrystalWork*)((u8*)pppCrystal + serializedDataOffsets[2] + 0x80);
 	pppCrystalColorBlock* colorBlock = (pppCrystalColorBlock*)((u8*)pppCrystal + serializedDataOffsets[1] + 0x80);
-	pppCrystalRenderObject* object;
 
 	if (dataValIndex == 0xFFFF) {
 		return;
@@ -160,7 +148,7 @@ void pppRenderCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* para
 	}
 
 	pppSetBlendMode(param_2->m_payload[1]);
-	pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
+	pppSetDrawEnv(
 		&colorBlock->m_color, (pppFMATRIX*)((u8*)pppCrystal + 0x40), param_2->m_arg3,
 		param_2->m_payload[5], param_2->m_payload[4], param_2->m_payload[1], param_2->m_payload[2], 1, 1, param_2->m_payload[3]);
 
@@ -229,8 +217,7 @@ void pppRenderCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* para
 	GXSetVtxDesc((GXAttr)10, GX_INDEX16);
 	GXSetVtxDesc((GXAttr)0xB, GX_INDEX16);
 	GXSetVtxDesc((GXAttr)0xD, GX_INDEX16);
-	object = (pppCrystalRenderObject*)pppCrystal;
-	pppDrawMesh__FP10pppModelStP3Veci(model, object->m_drawMatrixPtr, 0);
+	pppDrawMesh(model, pppCrystal->m_object.m_drawMatrixPtr, 0);
 	GXSetNumIndStages(0);
 	GXSetTevDirect((GXTevStageID)0);
 	memset(&indMtx, 0, sizeof(indMtx));

@@ -60,6 +60,8 @@ enum RedMemorySentinel {
 	(RedMemoryBankGetEnd(bank) - ((block) + REDSOUND_MEMORY_NEXT_BLOCK_INDEX))
 #define RedMemoryBlockGetNext(block) ((block) + REDSOUND_MEMORY_NEXT_BLOCK_INDEX)
 #define RedMemoryBlockGetEndAddress(block) ((block)->m_address + (block)->m_size)
+#define RedMemoryBankGetAuxBank(bank, bankSize) ((RedMemoryBlock*)((unsigned char*)(bank) + (bankSize)))
+#define RedMemoryBankGetDataBuffer(bank, bankSize) ((int)((unsigned char*)(bank) + (bankSize)))
 #define RedMemoryAddress(address) ((int)(address))
 
 class CRedMemory

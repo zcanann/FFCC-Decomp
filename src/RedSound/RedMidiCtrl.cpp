@@ -1238,7 +1238,7 @@ static void __MidiCtrl_TempoChange(RedSoundCONTROL* control, RedKeyOnDATA*, RedT
  */
 static void __MidiCtrl_ReverbDepthDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    RedControlRamp* reverbDepth = (RedControlRamp*)&track->m_reverbDepth;
+    RedControlRamp* reverbDepth = RedTrackReverbDepthGetRamp(track);
 
     reverbDepth->m_value = RedTrackCommandReadS8(track);
 
@@ -1264,7 +1264,7 @@ static void __MidiCtrl_ReverbDepthDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTra
  */
 static void __MidiCtrl_ReverbDepthChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    RedControlRamp* reverbDepth = (RedControlRamp*)&track->m_reverbDepth;
+    RedControlRamp* reverbDepth = RedTrackReverbDepthGetRamp(track);
     int targetDepth;
     unsigned int stepCount;
 

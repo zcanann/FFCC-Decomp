@@ -1,6 +1,7 @@
 #include "ffcc/monobj.h"
 #include "ffcc/charaobj.h"
 #include "ffcc/gobjwork.h"
+#include "ffcc/itemobj.h"
 #include "ffcc/fontman.h"
 #include "ffcc/math.h"
 #include "ffcc/astar.h"
@@ -29,26 +30,12 @@ u8 m_boss__8CGMonObj[0x8C];
 
 extern "C" void __ptmf_scall(...);
 extern "C" int __cntlzw(unsigned int);
-extern "C" void onCreate__10CGCharaObjFv(CGCharaObj*);
-extern "C" void onChangePrg__10CGCharaObjFi(CGCharaObj*, int);
-extern "C" void onFramePreCalc__10CGCharaObjFv(CGCharaObj*);
-extern "C" void onChangeStat__10CGCharaObjFi(CGCharaObj*, int);
-extern "C" void onCancelStat__10CGCharaObjFi(CGCharaObj*, int);
-extern "C" void onAnimPoint__10CGCharaObjFii(CGCharaObj*, int, int);
-extern "C" void onFrameStat__10CGCharaObjFv(CGCharaObj*);
-extern "C" void putParticleFromItem__10CGCharaObjFiiiP3Vec(CGCharaObj*, int, int, int, Vec*);
-extern "C" int calcCastTime__10CGCharaObjFi(CGCharaObj*, int);
 extern "C" void aiAddDuct__8CGMonObjFRi(CGMonObj*, int&);
 extern "C" CGMonObj* FindGMonObjFirst__13CFlatRuntime2Fv(void*);
 extern "C" CGMonObj* FindGMonObjNext__13CFlatRuntime2FP8CGMonObj(void*, CGMonObj*);
-extern "C" int IsDispRader__8CGObjectFv(CGObject*);
-extern "C" int getNearParty__8CGMonObjFiiffi(CGMonObj*, int, int, float, float, int);
-extern "C" void onDestroy__10CGCharaObjFv(CGCharaObj*);
 extern "C" int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, CMapCylinder*, Vec*, unsigned int);
 extern "C" void AddDebugDrawCC__13CFlatRuntime2FP3VecP3Vecfii(void*, Vec*, Vec*, float, int, int);
 extern "C" char SoundBuffer_1248_[];
-extern "C" void* CreateFromScript__9CGItemObjFiiiP8CGObjectfPQ29CGItemObj4CCFS(
-	int, int, int, CGObject*, float, void*);
 extern "C" float DAT_8032ec24;
 extern "C" float g_hit_t;
 extern float FLOAT_803319C0;
@@ -100,8 +87,7 @@ static const char s_monObjDistanceFmt[] = "%d %d %d";
  */
 void CGMonObj::onCreate()
 {
-	CGCharaObj* charaObj = reinterpret_cast<CGCharaObj*>(this);
-	onCreate__10CGCharaObjFv(charaObj);
+	CGCharaObj::onCreate();
 
 	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
 	*reinterpret_cast<unsigned int*>(mon + 0x6C4) = static_cast<unsigned int>(-1);
@@ -142,7 +128,7 @@ void CGMonObj::onCreate()
  */
 void CGMonObj::onDestroy()
 {
-	onDestroy__10CGCharaObjFv(reinterpret_cast<CGCharaObj*>(this));
+	CGCharaObj::onDestroy();
 }
 
 /*
@@ -170,7 +156,7 @@ void CGMonObj::onFramePreCalc()
 	CGObject* object = reinterpret_cast<CGObject*>(this);
 	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
 
-	onFramePreCalc__10CGCharaObjFv(reinterpret_cast<CGCharaObj*>(this));
+	CGCharaObj::onFramePreCalc();
 	*reinterpret_cast<unsigned int*>(mon + 0x6F4) += 1;
 
 	if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x10C) == 1) {
@@ -632,7 +618,7 @@ void CGMonObj::onChangeStat(int state)
 		if (actionType <= 3) {
 			if (actionType == 2) {
 				*reinterpret_cast<unsigned int*>(mon + 0x68C) =
-					calcCastTime__10CGCharaObjFi(reinterpret_cast<CGCharaObj*>(this), *reinterpret_cast<int*>(mon + 0x560));
+					CGCharaObj::calcCastTime(*reinterpret_cast<int*>(mon + 0x560));
 			} else if ((actionType <= 1) || (actionType == 3)) {
 				*reinterpret_cast<unsigned int*>(mon + 0x630) =
 					*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + actionOffset + 0x20);
@@ -644,7 +630,7 @@ void CGMonObj::onChangeStat(int state)
 		}
 	}
 
-	onChangeStat__10CGCharaObjFi(reinterpret_cast<CGCharaObj*>(this), state);
+	CGCharaObj::onChangeStat(state);
 }
 
 /*
@@ -739,7 +725,7 @@ void CGMonObj::onCancelStat(int state)
 		break;
 	}
 
-	onCancelStat__10CGCharaObjFi(reinterpret_cast<CGCharaObj*>(this), state);
+	CGCharaObj::onCancelStat(state);
 }
 
 /*
@@ -1133,7 +1119,7 @@ void CGMonObj::onFrameStat()
 		break;
 	}
 
-	onFrameStat__10CGCharaObjFv(reinterpret_cast<CGCharaObj*>(this));
+	CGCharaObj::onFrameStat();
 }
 
 /*
@@ -1177,12 +1163,10 @@ void CGMonObj::onStatMagic()
 				targetPrg->bonus(0x17, *reinterpret_cast<int*>(mon + 0x560), targetPrg);
 			}
 
-			putParticleFromItem__10CGCharaObjFiiiP3Vec(
-				reinterpret_cast<CGCharaObj*>(this), *reinterpret_cast<int*>(mon + 0x560), 0,
-				*reinterpret_cast<int*>(mon + 0x570), (Vec*)0);
-			putParticleFromItem__10CGCharaObjFiiiP3Vec(
-				reinterpret_cast<CGCharaObj*>(this), *reinterpret_cast<int*>(mon + 0x560), 1,
-				*reinterpret_cast<int*>(mon + 0x570), (Vec*)0);
+			CGCharaObj::putParticleFromItem(
+				*reinterpret_cast<int*>(mon + 0x560), 0, *reinterpret_cast<int*>(mon + 0x570), (Vec*)0);
+			CGCharaObj::putParticleFromItem(
+				*reinterpret_cast<int*>(mon + 0x560), 1, *reinterpret_cast<int*>(mon + 0x570), (Vec*)0);
 		}
 		return;
 	}
@@ -1242,7 +1226,7 @@ void CGMonObj::onAnimPoint(int param2, int param3)
 		);
 	}
 
-	onAnimPoint__10CGCharaObjFii(reinterpret_cast<CGCharaObj*>(this), param2, param3);
+	CGCharaObj::onAnimPoint(param2, param3);
 }
 
 /*
@@ -1424,14 +1408,10 @@ void CGMonObj::onStatDie()
 				}
 
 				*reinterpret_cast<int*>(mon + 0x560) = particleId;
-				putParticleFromItem__10CGCharaObjFiiiP3Vec(
-					reinterpret_cast<CGCharaObj*>(this), particleId, 0, *reinterpret_cast<int*>(mon + 0x564), (Vec*)0);
-				putParticleFromItem__10CGCharaObjFiiiP3Vec(
-					reinterpret_cast<CGCharaObj*>(this), particleId, 1, *reinterpret_cast<int*>(mon + 0x564), (Vec*)0);
-				putParticleFromItem__10CGCharaObjFiiiP3Vec(
-					reinterpret_cast<CGCharaObj*>(this), particleId, 2, *reinterpret_cast<int*>(mon + 0x564), (Vec*)0);
-				putParticleFromItem__10CGCharaObjFiiiP3Vec(
-					reinterpret_cast<CGCharaObj*>(this), particleId, 3, *reinterpret_cast<int*>(mon + 0x564), (Vec*)0);
+				CGCharaObj::putParticleFromItem(particleId, 0, *reinterpret_cast<int*>(mon + 0x564), (Vec*)0);
+				CGCharaObj::putParticleFromItem(particleId, 1, *reinterpret_cast<int*>(mon + 0x564), (Vec*)0);
+				CGCharaObj::putParticleFromItem(particleId, 2, *reinterpret_cast<int*>(mon + 0x564), (Vec*)0);
+				CGCharaObj::putParticleFromItem(particleId, 3, *reinterpret_cast<int*>(mon + 0x564), (Vec*)0);
 				return;
 			}
 			if (subFrame != 0x19) {
@@ -1447,7 +1427,7 @@ void CGMonObj::onStatDie()
 		object->m_bgColMask &= 0xFFF6FFFD;
 		reinterpret_cast<CGPrgObj*>(this)->playSe3D(0x17, 0x32, 0x96, 0, (Vec*)0);
 		reinterpret_cast<CGPrgObj*>(this)->putParticle(0x116, 0, object, 20.0f * object->m_attackColRadius, 0);
-		CreateFromScript__9CGItemObjFiiiP8CGObjectfPQ29CGItemObj4CCFS(1, 0, 0, object, 0.0f, 0);
+		CGItemObj::CreateFromScript(1, 0, 0, object, 0.0f, 0);
 		object->PutDropItem();
 		reinterpret_cast<CGPrgObj*>(this)->changeSubStat(2);
 		return;
@@ -1710,7 +1690,7 @@ void CGMonObj::link(CGPartyObj*, CGMonObj*)
  */
 void CGMonObj::aiTarget()
 {
-	int partyIndex = getNearParty__8CGMonObjFiiffi(this, 0, 7, 0.0f, DAT_8032ec24, -1);
+	int partyIndex = getNearParty(0, 7, 0.0f, DAT_8032ec24, -1);
 	if (partyIndex >= 0) {
 		*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6C4) = partyIndex;
 	}
@@ -1727,7 +1707,7 @@ void CGMonObj::aiTarget()
  */
 void CGMonObj::aiTargetAttackRomMon(int classId)
 {
-	int partyIndex = getNearParty__8CGMonObjFiiffi(this, -1, 0x47, 0.0f, 0.0f, classId);
+	int partyIndex = getNearParty(-1, 0x47, 0.0f, 0.0f, classId);
 	if (partyIndex >= 0) {
 		*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6C4) = partyIndex;
 	}
@@ -2469,7 +2449,7 @@ unsigned int CGMonObj::IsDispRader()
 {
 	CGObject* object = reinterpret_cast<CGObject*>(this);
 	unsigned char result = 0;
-	if (IsDispRader__8CGObjectFv(object) != 0 &&
+	if (object->CGObject::IsDispRader() != 0 &&
 	    static_cast<signed char>(
 	        static_cast<int>((static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(&object->m_weaponNodeFlags)) << 24) &
 	                         0xC0000000) >>
@@ -3121,7 +3101,7 @@ extern "C" void CGMonObj_UpdateActionStateFromTarget(CGMonObj* monObj)
 		if (homeDist < homeRange) {
 			if (mon[0x6BD] != 0) {
 				float reacquireRange = static_cast<float>(*reinterpret_cast<unsigned short*>(script + 0xC8));
-				int nearTarget = getNearParty__8CGMonObjFiiffi(monObj, 6, 0, object->m_rotBaseY, reacquireRange, -1);
+				int nearTarget = monObj->getNearParty(6, 0, object->m_rotBaseY, reacquireRange, -1);
 				if (nearTarget >= 0) {
 					targetPartyIndex = nearTarget;
 					mon[0x6BD] = 0;
@@ -3609,7 +3589,7 @@ void CGMonObj::onChangePrg(int value)
 		}
 	}
 
-	onChangePrg__10CGCharaObjFi(reinterpret_cast<CGCharaObj*>(this), value);
+	CGCharaObj::onChangePrg(value);
 }
 
 /*

@@ -1,15 +1,16 @@
 #ifndef _FFCC_MONOBJ_H_
 #define _FFCC_MONOBJ_H_
 
+#include "ffcc/charaobj.h"
+
 class CFont;
 class CGPrgObj;
 class CGPartyObj;
-class CGCharaObj;
 struct Vec;
 class CVector;
 class CMapPcs;
 
-class CGMonObj
+class CGMonObj : public CGCharaObj
 {
 public:
     class CMoveWork

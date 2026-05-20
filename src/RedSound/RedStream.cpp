@@ -359,11 +359,11 @@ static int _ArrangeStreamDataLoop(RedStreamDATA* stream, int bufferIndex, int by
 			}
 			
 			dmaID = RedDmaEntry(REDSOUND_DMA_FLAGS_STREAM_LOAD, REDSOUND_DMA_DIRECTION_TO_ARAM,
-			                    (int)dstBase, RedStreamAramGetPage(stream->m_aramBuffer, bufferIndex),
+			                    RedDmaMainMemoryAddress(dstBase), RedStreamAramGetPage(stream->m_aramBuffer, bufferIndex),
 			                    REDSOUND_STREAM_PAGE_SIZE, REDSOUND_DMA_CALLBACK_NONE,
 			                    REDSOUND_DMA_CALLBACK_DATA_NONE);
 			dmaID = RedDmaEntry(REDSOUND_DMA_FLAGS_STREAM_LOAD, REDSOUND_DMA_DIRECTION_TO_ARAM,
-			                    (int)RedStreamBufferGetRightPlane(dstBase),
+			                    RedDmaMainMemoryAddress(RedStreamBufferGetRightPlane(dstBase)),
 			                    RedStreamAramGetPage(stream->m_aramBuffer,
 			                                         bufferIndex + REDSOUND_STREAM_STEREO_PLANE_PAGE_COUNT),
 			                    REDSOUND_STREAM_PAGE_SIZE, REDSOUND_DMA_CALLBACK_NONE,
@@ -401,7 +401,7 @@ static int _ArrangeStreamDataLoop(RedStreamDATA* stream, int bufferIndex, int by
 			}
 			
 			dmaID = RedDmaEntry(REDSOUND_DMA_FLAGS_STREAM_LOAD, REDSOUND_DMA_DIRECTION_TO_ARAM,
-			                    (int)dstBase, RedStreamAramGetPage(stream->m_aramBuffer, bufferIndex),
+			                    RedDmaMainMemoryAddress(dstBase), RedStreamAramGetPage(stream->m_aramBuffer, bufferIndex),
 			                    REDSOUND_STREAM_PAGE_SIZE, REDSOUND_DMA_CALLBACK_NONE,
 			                    REDSOUND_DMA_CALLBACK_DATA_NONE);
 			

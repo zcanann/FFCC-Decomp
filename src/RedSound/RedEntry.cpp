@@ -749,7 +749,7 @@ int CRedEntry::SetWaveData(int waveBankNo, void* waveData, int waveDataSize)
 		}
 
 		int dmaId = RedDmaEntry(REDSOUND_DMA_FLAGS_WAVE_LOAD, REDSOUND_DMA_DIRECTION_TO_ARAM,
-		                        (int)waveBodyData, waveAramAddress, waveTransferSize, REDSOUND_DMA_CALLBACK_NONE,
+		                        RedDmaMainMemoryAddress(waveBodyData), waveAramAddress, waveTransferSize, REDSOUND_DMA_CALLBACK_NONE,
 		                        REDSOUND_DMA_CALLBACK_DATA_NONE);
 		remainingWaveSize -= waveTransferSize;
 		waveAramAddress += waveTransferSize;

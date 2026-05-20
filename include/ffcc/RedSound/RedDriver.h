@@ -39,6 +39,8 @@ enum RedDmaSearchResult {
 	REDSOUND_DMA_SEARCH_FOUND = 1,
 };
 
+#define RedDmaMainMemoryAddress(memory) ((int)(memory))
+
 struct RedDmaRequest {
 	int m_id;
 	int m_direction;

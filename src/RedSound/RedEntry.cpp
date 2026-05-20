@@ -465,7 +465,7 @@ int CRedEntry::SearchUseWave(int waveNo)
 			MusicStop(control->m_musicId);
 		}
 		control--;
-	} while ((u32)control >= (u32)RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY));
+	} while ((u32)control >= (u32)RedSoundControlGetBegin());
 
 	control = RedSoundControlGet(REDSOUND_CONTROL_SE);
 	RedTrackDATA* track = control->m_tracks;
@@ -957,8 +957,8 @@ void CRedEntry::WaveHistoryManager(int mode, int waveNo)
 
 	if (mode == REDSOUND_HISTORY_MODE_RELEASE) {
 		used = 0;
-		if ((RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY)->m_activeTrackCount != 0) &&
-		    (RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY)->m_waveNo == waveNo)) {
+		if ((RedSoundControlGetBegin()->m_activeTrackCount != 0) &&
+		    (RedSoundControlGetBegin()->m_waveNo == waveNo)) {
 			used |= 1;
 		}
 		if ((RedSoundControlGet(REDSOUND_CONTROL_MUSIC_SECONDARY)->m_activeTrackCount != 0) &&
@@ -1724,8 +1724,8 @@ void CRedEntry::MusicHistoryManager(int mode, int musicNo)
 
 	if (mode == REDSOUND_HISTORY_MODE_RELEASE) {
 		musicSeq = 0;
-		if ((RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY)->m_activeTrackCount != 0)
-		    && (RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY)->m_musicId == musicNo)) {
+		if ((RedSoundControlGetBegin()->m_activeTrackCount != 0)
+		    && (RedSoundControlGetBegin()->m_musicId == musicNo)) {
 			musicSeq |= 1;
 		}
 		if ((RedSoundControlGet(REDSOUND_CONTROL_MUSIC_SECONDARY)->m_activeTrackCount != 0)
@@ -2024,8 +2024,8 @@ void CRedEntry::DisplayMusicInfo()
 		do {
 			if (history->m_size != REDSOUND_HISTORY_BANK_EMPTY_SIZE) {
 				int playing = REDSOUND_ENTRY_SEARCH_NOT_FOUND;
-				if ((RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY)->m_activeTrackCount != 0) &&
-				    (RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY)->m_musicId == history->m_id)) {
+				if ((RedSoundControlGetBegin()->m_activeTrackCount != 0) &&
+				    (RedSoundControlGetBegin()->m_musicId == history->m_id)) {
 					playing = REDSOUND_ENTRY_SEARCH_FOUND;
 				}
 				if ((RedSoundControlGet(REDSOUND_CONTROL_MUSIC_SECONDARY)->m_activeTrackCount != 0) &&

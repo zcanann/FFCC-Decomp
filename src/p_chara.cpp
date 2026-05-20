@@ -207,7 +207,7 @@ template <class T>
 CPtrArray<T>::~CPtrArray()
 {
     if (m_items != 0) {
-        __dla__FPv(m_items);
+        delete[] m_items;
         m_items = 0;
     }
     m_size = 0;
@@ -307,8 +307,8 @@ int CPtrArray<T>::setSize(unsigned long newSize)
             m_size = m_size << 1;
         }
 
-        newItems = (T*)_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
-            &Memory, (unsigned long)(m_size << 2), m_stage, s_p_chara_collection_ptrarray_h, 0xFA, 0);
+        newItems = static_cast<T*>(
+            Memory._Alloc(static_cast<unsigned long>(m_size << 2), m_stage, s_p_chara_collection_ptrarray_h, 0xFA, 0));
         if (newItems == 0) {
             return 0;
         }
@@ -317,7 +317,7 @@ int CPtrArray<T>::setSize(unsigned long newSize)
             memcpy(newItems, m_items, m_numItems << 2);
         }
         if (m_items != 0) {
-            __dla__FPv(m_items);
+            delete[] m_items;
             m_items = 0;
         }
         m_items = newItems;
@@ -336,7 +336,7 @@ template <class T>
 void CPtrArray<T>::RemoveAll()
 {
     if (m_items != 0) {
-        __dla__FPv(m_items);
+        delete[] m_items;
         m_items = 0;
     }
     m_size = 0;

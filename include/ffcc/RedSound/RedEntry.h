@@ -228,6 +228,7 @@ enum RedMusicTrackBlockLayout {
 #define RedMusicTrackBlockGetNext(block, blockSize)                                                \
 	((RedMusicTrackBlock*)((unsigned char*)(block) + (blockSize)))
 #define RedMusicGetTrackBlocks(musicHead) reinterpret_cast<RedMusicTrackBlock*>((musicHead) + 1)
+#define RedMusicHeadGetTrackArenaSize(musicHead) ((musicHead)->m_trackCount * REDSOUND_TRACK_SIZE)
 
 enum RedMusicHeaderFlag {
 	REDSOUND_MUSIC_HEADER_SIZE = sizeof(RedMusicHEAD),

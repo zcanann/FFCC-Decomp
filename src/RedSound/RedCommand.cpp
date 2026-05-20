@@ -850,7 +850,7 @@ static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* wav
 		music->m_masterVolumeDelta = 0;
 	}
 
-	RedTrackDATA* track = (RedTrackDATA*)RedNew(musicHead->m_trackCount * REDSOUND_TRACK_SIZE);
+	RedTrackDATA* track = (RedTrackDATA*)RedNew(RedMusicHeadGetTrackArenaSize(musicHead));
 	if (track == 0) {
 		if (RedReportPrintIsEnabled()) {
 			OSReport(sRedCommandMusicTrackCreateErrorFmt,
@@ -858,7 +858,7 @@ static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* wav
 			fflush(__files + 1);
 			OSReport(sRedCommandMusicNeedMemoryFmt,
 			         sRedCommandLogPrefix, sRedCommandLogErrorColor,
-			         (int)musicHead->m_musicNo, musicHead->m_trackCount * REDSOUND_TRACK_SIZE, sRedCommandLogReset);
+			         (int)musicHead->m_musicNo, RedMusicHeadGetTrackArenaSize(musicHead), sRedCommandLogReset);
 			fflush(__files + 1);
 		}
 		c_RedEntry.DisplayMMemoryInfo();

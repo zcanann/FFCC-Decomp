@@ -170,7 +170,7 @@ JoyBus::JoyBus()
     memset(m_stageFlags, 0, 8);
     memset(m_cmdQueueData, 0, 0x400);
     memset(m_recvQueueEntriesArr, 0, 0x400);
-    memset(m_threadParams, 0, 0xF0);
+    memset(m_threadParams, 0, sizeof(m_threadParams));
     memset(m_perThreadTemp, 0, 0x60);
     memset(m_recvBuffer, 0, 0x1020);
 
@@ -223,7 +223,7 @@ void JoyBus::CreateInit()
     memset(m_stageFlags, 0, 8);
     memset(m_cmdQueueData, 0, 0x400);
     memset(m_recvQueueEntriesArr, 0, 0x400);
-    memset(m_threadParams, 0, 0xF0);
+    memset(m_threadParams, 0, sizeof(m_threadParams));
     memset(m_perThreadTemp, 0, 0x60);
     memset(m_recvBuffer, 0, 0x1020);
 
@@ -380,7 +380,7 @@ void JoyBus::Destroy()
     memset(m_stageFlags, 0, 8);
     memset(m_cmdQueueData, 0, 0x400);
     memset(m_recvQueueEntriesArr, 0, 0x400);
-    memset(m_threadParams, 0, 0xF0);
+    memset(m_threadParams, 0, sizeof(m_threadParams));
     memset(m_perThreadTemp, 0, 0x60);
     memset(m_recvBuffer, 0, 0x1020);
 
@@ -6300,7 +6300,7 @@ void JoyBus::RestartThread()
         System.Printf(const_cast<char*>(s_load_bin_error));
 	}
 
-    memset((void*)0x802F07D0, 0, 0xF0);
+    memset(Joybus.m_threadParams, 0, sizeof(Joybus.m_threadParams));
 
     Joybus.m_threadInitFlag = 0;
     Joybus.m_threadRunningMask = 0;

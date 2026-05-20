@@ -84,7 +84,6 @@ extern "C" void Create__6CCharaFv(CChara*);
 extern "C" void DestroyBumpLightAll__9CLightPcsFQ29CLightPcs6TARGET(void*, int);
 extern "C" void DestroyStage__7CMemoryFPQ27CMemory6CStage(void*, void*);
 extern "C" void* CreateStage__7CMemoryFUlPci(void*, unsigned long, const char*, int);
-extern "C" void SetCopyClear__8CGraphicF8_GXColori(void*, void*, int);
 extern "C" void* createTextureSet__9CCharaPcsFPvi(void*, void*, int);
 extern "C" void Printf__7CSystemFPce(void*, const char*, ...);
 extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, void*, char*, int);
@@ -799,7 +798,6 @@ void CCharaPcs::createViewer()
     unsigned char* p = reinterpret_cast<unsigned char*>(self);
     register const char* viewerStrings = s_no_texture____801da7e8;
     unsigned int i;
-    unsigned int x;
     unsigned char colorTmp[4];
     unsigned char colorCopy[4];
     unsigned char white[4];
@@ -831,21 +829,19 @@ void CCharaPcs::createViewer()
         self->m_viewerDiffusePos[i].z = kCharaViewerFineStep;
     }
 
-    for (i = 0; i < 5; i++) {
+    for (int colorIndex = 0; colorIndex < 5; colorIndex++) {
         unsigned char* whiteChannels =
             reinterpret_cast<unsigned char*>(__ct__6CColorFUcUcUcUc(reinterpret_cast<CColor*>(white), 0xFF, 0xFF, 0xFF, 0xFF));
         __ct__6CColorFv(reinterpret_cast<CColor*>(colorTmp));
-        x = i ^ 0x80000000;
-        float scale = static_cast<float>(static_cast<double>(x) - kCharaViewerColorCenterBias) * kCharaViewerLerpScale;
+        float scale = static_cast<float>(colorIndex) * kCharaViewerLerpScale;
         for (int c = 0; c < 4; c++) {
-            float channel = static_cast<float>(static_cast<double>(whiteChannels[c]) - kCharaViewerColorWhiteBias);
-            colorTmp[c] = static_cast<unsigned char>(static_cast<int>(channel * scale));
+            colorTmp[c] = static_cast<unsigned char>(static_cast<int>(static_cast<float>(whiteChannels[c]) * scale));
         }
         __ct__6CColorFR6CColor(reinterpret_cast<CColor*>(colorCopy), reinterpret_cast<CColor*>(colorTmp));
-        p[0x12C + i * 4 + 0] = colorCopy[0];
-        p[0x12C + i * 4 + 1] = colorCopy[1];
-        p[0x12C + i * 4 + 2] = colorCopy[2];
-        p[0x12C + i * 4 + 3] = colorCopy[3];
+        p[0x12C + colorIndex * 4 + 0] = colorCopy[0];
+        p[0x12C + colorIndex * 4 + 1] = colorCopy[1];
+        p[0x12C + colorIndex * 4 + 2] = colorCopy[2];
+        p[0x12C + colorIndex * 4 + 3] = colorCopy[3];
     }
 
     _GXColor clearColor;
@@ -853,7 +849,7 @@ void CCharaPcs::createViewer()
     clearColor.g = 0x40;
     clearColor.b = 0x40;
     clearColor.a = 0xFF;
-    SetCopyClear__8CGraphicF8_GXColori(&Graphic, &clearColor, 0xFFFFFF);
+    Graphic.SetCopyClear(clearColor, 0xFFFFFF);
 
     self->m_viewerModel[0] = 0;
     self->m_viewerAnim[0] = 0;

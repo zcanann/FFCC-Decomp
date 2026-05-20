@@ -224,6 +224,8 @@ struct RedStreamDATA {
 #define RedStreamGetVoiceData(stream, channel) ((stream)->m_voiceData + (channel))
 #define RedStreamGetTrackData(stream, channel) (&(stream)->m_trackData[(channel)])
 #define RedStreamVoiceDataGetChannel(voiceData, channel) ((voiceData) + (channel))
+#define RedStreamDataIsPlaying(stream) ((stream)->m_state == REDSOUND_STREAM_STATE_PLAYING)
+#define RedStreamDataIsLoading(stream) ((stream)->m_state == REDSOUND_STREAM_STATE_LOADING)
 
 enum RedStreamDataLayoutOffset {
     REDSOUND_STREAM_TRACK_OFFSET = (unsigned int)&(((RedStreamDATA*)0)->m_track),

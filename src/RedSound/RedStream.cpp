@@ -761,7 +761,7 @@ void StreamControl()
 	do {
 		RedVoiceDATA* voiceData;
 		int streamResult;
-		if (streamData->m_state == REDSOUND_STREAM_STATE_PLAYING) {
+		if (RedStreamDataIsPlaying(streamData)) {
 			voiceData = streamData->m_voiceData;
 			if (voiceData->m_axVoice != REDSOUND_AX_VOICE_NONE) {
 				if (voiceData->m_axVoice->priority == 0) {
@@ -829,7 +829,7 @@ void StreamControl()
 					}
 				}
 			}
-		} else if ((streamData->m_state == REDSOUND_STREAM_STATE_LOADING) &&
+		} else if (RedStreamDataIsLoading(streamData) &&
 		           (RedDmaSearchID(streamData->m_dmaId) == REDSOUND_DMA_SEARCH_NOT_FOUND)) {
 			voiceData = streamData->m_voiceData;
 			streamData->m_state = REDSOUND_STREAM_STATE_PLAYING;

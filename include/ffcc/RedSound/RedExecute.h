@@ -57,6 +57,7 @@ struct RedNoteDATA {
 
 #define RedNoteCopy(dst, src) (*(int*)&(dst)->m_key = *(int*)&(src)->m_key)
 #define RedNoteGetKey(note) (*(char*)&(note)->m_key)
+#define RedVoiceSetNote(voice, note) (*(int*)&(voice)->m_key = *(int*)&(note)->m_key)
 
 enum RedNoteLayoutOffset {
 	REDSOUND_NOTE_KEY_OFFSET = (unsigned int)&(((RedNoteDATA*)0)->m_key),

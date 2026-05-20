@@ -1469,7 +1469,7 @@ static void _VoiceDataAsign(RedTrackDATA* track, RedVoiceDATA* voice, RedNoteDAT
         }
     }
 
-    *(int*)&voice->m_key = *(int*)noteData;
+    RedVoiceSetNote(voice, noteData);
     voice->m_trackVolume = &track->m_volume;
     voice->m_trackExpression = &track->m_expression;
     voice->m_trackPan = &track->m_pan;

@@ -17,7 +17,6 @@ CMaterialMan MaterialMan;
 
 extern "C" unsigned long UnkMaterialSetGetter(void*);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
-extern "C" void __dla__FPv(void*);
 extern "C" void __dl__FPv(void*);
 extern "C" void __ct__6CColorFv(void*);
 extern "C" void __ct__4CRefFv(void*);
@@ -321,7 +320,7 @@ template <>
 void CPtrArray<CMaterial*>::RemoveAll()
 {
     if (m_items != 0) {
-        __dla__FPv(m_items);
+        delete[] m_items;
         m_items = 0;
     }
     m_size = 0;
@@ -361,14 +360,8 @@ int CPtrArray<CMaterial*>::setSize(unsigned long size)
             m_size = m_size << 1;
         }
 
-        newItems = reinterpret_cast<CMaterial**>(
-            _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
-                &Memory,
-                m_size << 2,
-                m_stage,
-                const_cast<char*>(s_collection_ptrarray_h),
-                0xFA,
-                0));
+        newItems = static_cast<CMaterial**>(
+            Memory._Alloc(m_size << 2, m_stage, const_cast<char*>(s_collection_ptrarray_h), 0xFA, 0));
         if (newItems == 0) {
             return 0;
         }
@@ -377,7 +370,7 @@ int CPtrArray<CMaterial*>::setSize(unsigned long size)
             memcpy(newItems, m_items, m_numItems << 2);
         }
         if (m_items != 0) {
-            __dla__FPv(m_items);
+            delete[] m_items;
             m_items = 0;
         }
         m_items = newItems;

@@ -60,6 +60,8 @@ enum RedStreamLayoutSize {
 };
 
 #define RedStreamVolumeFromInput(volume) (((volume + 1) * REDSOUND_VOLUME_BYTE_SCALE - 1) * REDSOUND_FIXED_ONE)
+#define RedStreamGetCurrentAramSampleStart(stream)                                                \
+	(((stream)->m_aramBuffer + (stream)->m_streamCursorBase) * REDSOUND_STREAM_ARAM_TO_AX_ADDRESS_SCALE)
 
 STATIC_ASSERT(offsetof(RedStreamHEAD, m_signature) == REDSOUND_STREAM_HEAD_SIGNATURE_OFFSET);
 STATIC_ASSERT(sizeof(((RedStreamHEAD*)0)->m_signature) == REDSOUND_STREAM_SIGNATURE_SIZE);
@@ -765,9 +767,7 @@ void StreamControl()
 				if (voiceData->m_axVoice->priority == 0) {
 					_StreamStop(streamData);
 				} else {
-					int currentBufferSampleStart =
-					    (streamData->m_aramBuffer + streamData->m_streamCursorBase) *
-					    REDSOUND_STREAM_ARAM_TO_AX_ADDRESS_SCALE;
+					int currentBufferSampleStart = RedStreamGetCurrentAramSampleStart(streamData);
 					int axSamplePosition = voiceData->m_axVoice->pb.addr.currentAddressHi;
 					axSamplePosition <<= REDSOUND_STREAM_AX_CURRENT_ADDRESS_HI_SHIFT;
 					axSamplePosition |= voiceData->m_axVoice->pb.addr.currentAddressLo;

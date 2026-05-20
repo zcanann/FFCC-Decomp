@@ -14,7 +14,10 @@ extern const float FLOAT_8033104c = 448.0f;
 extern const float FLOAT_80331050 = 320.0f;
 extern const float FLOAT_80331054 = 224.0f;
 extern const double DOUBLE_80331058 = 4503601774854144.0;
+extern const float FLOAT_803310C0;
+extern const float FLOAT_803310C4;
 extern const float FLOAT_803310C8;
+extern const float FLOAT_803310CC;
 
 struct CoronaWork {
     s16 m_shapeX;
@@ -72,16 +75,16 @@ void pppRenderCorona(pppCorona* param1, CoronaParam* param2, pppCoronaUnkC* para
 
     PSMTXIdentity(mtx.value);
 
-    viewDir.x = FLOAT_80331048;
-    viewDir.y = FLOAT_8033104c;
-    viewDir.z = FLOAT_80331050;
+    viewDir.x = FLOAT_803310C0;
+    viewDir.y = FLOAT_803310C4;
+    viewDir.z = FLOAT_803310C8;
     PSVECSubtract(&vecWork->m_cameraOffset, &viewDir, &fromOrigin);
 
     mag = PSVECMag(&fromOrigin);
     scale = param2->m_distMin;
     if (mag < param2->m_distRange) {
         distScale = param2->m_distMax - param2->m_distMin;
-        distScale *= FLOAT_80331054 - (mag / param2->m_distRange);
+        distScale *= FLOAT_803310CC - (mag / param2->m_distRange);
         scale = param2->m_distMin + distScale;
     }
 
@@ -101,7 +104,7 @@ void pppRenderCorona(pppCorona* param1, CoronaParam* param2, pppCoronaUnkC* para
     color.rgba[2] = param2->m_colorB;
     color.rgba[3] = alpha;
 
-    pppSetDrawEnv(&color, (pppFMATRIX*)0, FLOAT_80331050, param2->m_drawA, param2->m_drawB, param2->m_blendMode, 0, 1,
+    pppSetDrawEnv(&color, (pppFMATRIX*)0, FLOAT_803310C8, param2->m_drawA, param2->m_drawB, param2->m_blendMode, 0, 1,
                   1, 0);
     pppSetBlendMode(param2->m_blendMode);
     pppDrawShp(*shape, work->m_shapeY, pppEnvStPtr->m_materialSetPtr, param2->m_blendMode);

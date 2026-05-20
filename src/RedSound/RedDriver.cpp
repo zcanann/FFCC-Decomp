@@ -4016,7 +4016,7 @@ int CRedDriver::PlayWaveItem(int waveNo, int itemNo, int key, int pan, int volum
     if ((wave->m_reverbMix != 0) && (wave->m_reverbMix != 1)) {
         voice->m_voiceSwitch |= REDSOUND_VOICE_SWITCH_REVERB_STEREO;
     }
-    memcpy(&voice->m_adsr, wave->m_adsr, REDSOUND_ADSR_DATA_SIZE);
+    memcpy(&voice->m_adsr, &wave->m_adsr, REDSOUND_ADSR_DATA_SIZE);
     voice->m_basePitch = key << REDSOUND_PITCH_BASE_NOTE_SHIFT;
     if ((wave->m_flags & REDSOUND_WAVE_FLAG_USE_WAVE_KEY) != 0) {
         voice->m_basePitch = wave->m_splitKey << REDSOUND_PITCH_BASE_NOTE_SHIFT;

@@ -177,7 +177,7 @@ static RedStreamDATA* _SearchEmptyStreamData()
 	RedStreamDATA* streamData = RedStreamDataGetBegin();
 
 	for (;;) {
-		if (streamData->m_streamId == REDSOUND_STREAM_ID_NONE) {
+		if (RedStreamDataIsEmpty(streamData)) {
 			return streamData;
 		}
 
@@ -200,7 +200,7 @@ static RedStreamDATA* _SearchEmptyStreamData()
 static void _StreamStop(RedStreamDATA* streamData)
 {
 	fflush(__files + 1);
-	if (streamData->m_streamId != REDSOUND_STREAM_ID_NONE) {
+	if (RedStreamDataHasId(streamData)) {
 		streamData->m_streamId = REDSOUND_STREAM_ID_NONE;
 		streamData->m_state = REDSOUND_STREAM_STATE_STOPPED;
 		if (streamData->m_buffer != REDSOUND_STREAM_BUFFER_NONE) {
@@ -442,8 +442,7 @@ void StreamStop(int streamID)
 	volatile RedStreamDATA* streamData = RedStreamDataGetBegin();
 
 	do {
-		if ((streamData->m_streamId != REDSOUND_STREAM_ID_NONE) &&
-		    ((streamID == REDSOUND_STREAM_ID_ALL) || (streamID == streamData->m_streamId))) {
+		if (RedStreamDataMatchesId(streamData, streamID)) {
 			_StreamStop((RedStreamDATA*)streamData);
 		}
 		streamData++;
@@ -637,8 +636,7 @@ void SetStreamVolume(int streamID, int volume, int frameCount)
 
 	streamData = RedStreamDataGetBegin();
 	do {
-		if ((streamData->m_streamId != REDSOUND_STREAM_ID_NONE) &&
-		    ((streamID == REDSOUND_STREAM_ID_ALL) || (streamID == streamData->m_streamId))) {
+		if (RedStreamDataMatchesId(streamData, streamID)) {
 			if (frameCount > 0) {
 				int volumeDelta = volume - streamData->m_volume.m_value;
 				streamData->m_volume.m_step = volumeDelta / frameCount;
@@ -676,8 +674,7 @@ void SetStreamPan(int streamID, int pan, int frameCount)
 	pan |= REDSOUND_FIXED_HALF;
 	streamData = RedStreamDataGetBegin();
 	do {
-		if ((streamData->m_streamId != REDSOUND_STREAM_ID_NONE) &&
-		    ((streamID == REDSOUND_STREAM_ID_ALL) || (streamID == streamData->m_streamId))) {
+		if (RedStreamDataMatchesId(streamData, streamID)) {
 			if (frameCount > 0) {
 				int panDelta = pan - streamData->m_pan.m_value;
 				streamData->m_pan.m_step = panDelta / frameCount;

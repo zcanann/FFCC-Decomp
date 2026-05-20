@@ -789,8 +789,9 @@ void CDbgMenuPcs::Add()
         param.m_text = const_cast<char*>(menuDefs->text);
         Add(10, 1, param);
 
-        u32 actionType = menuDefs->actionType;
+        u32 actionType;
         u32 actionFlags = menuDefs->actionFlags;
+        actionType = menuDefs->actionType;
 
         memset(&actionParam, 0, sizeof(actionParam));
         actionParam.m_type = (int)actionType;

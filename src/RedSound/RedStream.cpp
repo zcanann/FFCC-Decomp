@@ -257,8 +257,8 @@ static int _ArrangeStreamDataNoLoop(RedStreamDATA* stream, int bufferIndex, int 
 
 		dmaDstOffset = RedStreamAramGetPage(stream->m_aramBuffer, bufferIndex);
 		dmaID = RedDmaEntry(REDSOUND_DMA_FLAGS_STREAM_LOAD, REDSOUND_DMA_DIRECTION_TO_ARAM,
-		                    (int)dstBuffer, dmaDstOffset, REDSOUND_STREAM_PAGE_SIZE, REDSOUND_DMA_CALLBACK_NONE,
-		                    REDSOUND_DMA_CALLBACK_DATA_NONE);
+		                    RedDmaMainMemoryAddress(dstBuffer), dmaDstOffset, REDSOUND_STREAM_PAGE_SIZE,
+		                    REDSOUND_DMA_CALLBACK_NONE, REDSOUND_DMA_CALLBACK_DATA_NONE);
 
 		if ((bufferIndex == REDSOUND_STREAM_BUFFER_SIDE_A) && (voiceData->m_axVoice != REDSOUND_AX_VOICE_NONE)) {
 			voiceData->m_axVoice->pb.adpcmLoop.loop_pred_scale = (unsigned short)*dstBuffer;
@@ -271,7 +271,7 @@ static int _ArrangeStreamDataNoLoop(RedStreamDATA* stream, int bufferIndex, int 
 			dmaDstOffset = RedStreamAramGetRightPlane(dmaDstOffset);
 			voiceData += 1;
 			dmaID = RedDmaEntry(REDSOUND_DMA_FLAGS_STREAM_LOAD, REDSOUND_DMA_DIRECTION_TO_ARAM,
-			                    (int)dstBuffer, dmaDstOffset, REDSOUND_STREAM_PAGE_SIZE,
+			                    RedDmaMainMemoryAddress(dstBuffer), dmaDstOffset, REDSOUND_STREAM_PAGE_SIZE,
 			                    REDSOUND_DMA_CALLBACK_NONE, REDSOUND_DMA_CALLBACK_DATA_NONE);
 			if ((bufferIndex == REDSOUND_STREAM_BUFFER_SIDE_A) && (voiceData->m_axVoice != REDSOUND_AX_VOICE_NONE)) {
 				voiceData->m_axVoice->pb.adpcmLoop.loop_pred_scale = (unsigned short)*dstBuffer;

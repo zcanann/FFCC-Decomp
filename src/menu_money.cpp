@@ -128,15 +128,18 @@ int CMenuPcs::MoneyCtrlCur()
 
 	int caravanWork = Game.m_scriptFoodBase[0];
 	int menuState = (int)this->moneyState;
-	s16* singWindowInfo = this->singWindowInfo;
 	int mode = (int)*(s16*)(menuState + 0x30);
 	int maxDigits = 1;
 	int maxGil = *(int*)(caravanWork + 0x200);
 	int digitPlace = 10;
 
-	while ((maxDigits < 8) && (0 < maxGil / digitPlace)) {
-		digitPlace *= 10;
-		maxDigits++;
+	while (maxDigits < 8) {
+		if (0 < maxGil / digitPlace) {
+			digitPlace *= 10;
+			maxDigits++;
+		} else {
+			break;
+		}
 	}
 	int attachFlag = SingGetLetterAttachflg__8CMenuPcsFv(this);
 
@@ -276,7 +279,7 @@ int CMenuPcs::MoneyCtrlCur()
 					}
 					GetSingWinSize__8CMenuPcsFiPsPsi(this, 1, &winW, &winH, 0);
 					SetSingWinInfo__8CMenuPcsFiiii(this, 0xF0, 0xD0, winW, winH);
-					*(s16*)((int)singWindowInfo + 10) = 0;
+					this->singWindowInfo[5] = 0;
 					*(s16*)(menuState + 0x12) = 0;
 					*(s16*)(menuState + 0x30) = 1;
 					Sound.PlaySe(2, 0x40, 0x7F, 0);
@@ -365,11 +368,11 @@ int CMenuPcs::MoneyCtrlCur()
 						count = count + -1;
 					} while (count != 0);
 				}
-				*(s16*)((int)singWindowInfo + 10) = 2;
+				this->singWindowInfo[5] = 2;
 				*(s16*)(menuState + 0x12) = *(s16*)(menuState + 0x12) + 1;
 				Sound.PlaySe(2, 0x40, 0x7F, 0);
 			} else if ((press & 0x200) != 0) {
-				*(s16*)((int)singWindowInfo + 10) = 2;
+				this->singWindowInfo[5] = 2;
 				*(s16*)(menuState + 0x12) = *(s16*)(menuState + 0x12) + 1;
 				Sound.PlaySe(3, 0x40, 0x7F, 0);
 			}
@@ -566,30 +569,29 @@ int CMenuPcs::MoneyClose()
  */
 int CMenuPcs::MoneyCtrl()
 {
-	int iVar2;
-	int iVar3;
-	int sVar1;
+	int result;
+	MoneyMenuState* state;
+	int mode;
 
-	iVar2 = 0;
-	*(s16*)((int)this->moneyState + 0x32) = *(s16*)((int)this->moneyState + 0x30);
-	iVar3 = (int)this->moneyState;
-	sVar1 = *(s16*)(iVar3 + 0x30);
-	if ((sVar1 == 0) || ((sVar1 != 0) && (*(s16*)(iVar3 + 0x12) == 1))) {
-		iVar2 = MoneyCtrlCur();
-	} else if ((sVar1 == 1) && ((int)*(s16*)(iVar3 + 0x12) == 0)) {
-		if (*(s16*)((int)this->singWindowInfo + 10) == 1) {
-			iVar2 = 0;
-			*(s16*)(iVar3 + 0x12) = *(s16*)(iVar3 + 0x12) + 1;
+	result = 0;
+	this->moneyState->prevMode = this->moneyState->mode;
+	state = this->moneyState;
+	mode = state->mode;
+	if ((mode == 0) || ((mode != 0) && (state->optionState == 1))) {
+		result = MoneyCtrlCur();
+	} else if ((mode == 1) && ((int)state->optionState == 0)) {
+		if (this->singWindowInfo[5] == 1) {
+			result = 0;
+			state->optionState = state->optionState + 1;
 		}
-	} else if (((sVar1 == 1) && (*(s16*)(iVar3 + 0x12) == 2)) &&
-	           (*(s16*)((int)this->singWindowInfo + 10) == 3)) {
-		iVar2 = 0;
-		*(s16*)(iVar3 + 0x12) = 0;
-		*(s16*)((int)this->moneyState + 0x30) = 0;
-		*(s16*)((int)this->moneyState + 0x22) = 0;
+	} else if (((mode == 1) && (state->optionState == 2)) && (this->singWindowInfo[5] == 3)) {
+		result = 0;
+		state->optionState = 0;
+		this->moneyState->mode = 0;
+		this->moneyState->frame = 0;
 	}
 
-	if (iVar2 != 0) {
+	if (result != 0) {
 		MoneyMenuAnim* anim = this->moneyPanel->anims;
 		anim->progress = FLOAT_80332f70;
 		anim->startFrame = 0;
@@ -597,7 +599,7 @@ int CMenuPcs::MoneyCtrl()
 		anim->frame = 0;
 	}
 
-	return iVar2;
+	return result;
 }
 
 /*

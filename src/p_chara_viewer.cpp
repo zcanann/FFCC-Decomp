@@ -321,8 +321,8 @@ void CCharaPcs::drawViewer()
         for (int i = -10; i <= 10; i++) {
             GXColor color = {0x80, 0x80, 0x80, static_cast<u8>((i == 0) ? 0x60 : 0x20)};
             GXSetChanMatColor(GX_COLOR0A0, color);
-            float x = (float)i * kCharaViewerGridSpacing;
             GXBegin((GXPrimitive)0xA8, GX_VTXFMT0, 4);
+            float x = (float)i * kCharaViewerGridSpacing;
             GXPosition3f32(x, kCharaViewerZero, kCharaViewerGridMin);
             GXPosition3f32(x, kCharaViewerZero, kCharaViewerGridMax);
             GXPosition3f32(kCharaViewerGridMax, kCharaViewerZero, x);

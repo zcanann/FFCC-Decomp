@@ -181,15 +181,15 @@ void CMaterialEditorPcs::DeleteRsdItem(RSDLISTITEM* listItem)
             rsdItem->ptrC = 0;
         }
         if (rsdItem->ptr10 != (void*)0) {
-            __dla__FPv(rsdItem->ptr10);
+            delete[] static_cast<u8*>(rsdItem->ptr10);
             rsdItem->ptr10 = 0;
         }
         if (rsdItem->ptr14 != (void*)0) {
-            __dla__FPv(rsdItem->ptr14);
+            delete[] static_cast<u8*>(rsdItem->ptr14);
             rsdItem->ptr14 = 0;
         }
         if (rsdItem->ptr18 != (void*)0) {
-            __dla__FPv(rsdItem->ptr18);
+            delete[] static_cast<u8*>(rsdItem->ptr18);
             rsdItem->ptr18 = 0;
         }
         delete rsdItem;
@@ -247,15 +247,15 @@ void CMaterialEditorPcs::ResetRsdList(ZLIST* zlist)
                 rsdItem->ptrC = 0;
             }
             if (rsdItem->ptr10 != (void*)0) {
-                __dla__FPv(rsdItem->ptr10);
+                delete[] static_cast<u8*>(rsdItem->ptr10);
                 rsdItem->ptr10 = 0;
             }
             if (rsdItem->ptr14 != (void*)0) {
-                __dla__FPv(rsdItem->ptr14);
+                delete[] static_cast<u8*>(rsdItem->ptr14);
                 rsdItem->ptr14 = 0;
             }
             if (rsdItem->ptr18 != (void*)0) {
-                __dla__FPv(rsdItem->ptr18);
+                delete[] static_cast<u8*>(rsdItem->ptr18);
                 rsdItem->ptr18 = 0;
             }
             if (rsdItem != (RSDITEM*)0) {

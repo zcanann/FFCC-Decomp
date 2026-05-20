@@ -508,6 +508,7 @@ struct RedExecCommand {
 #define RedExecCommandSetFunc(command, func) ((command)->m_func = (func))
 #define RedExecCommandSetArg(command, index, arg) (RedExecCommandGetArg((command), (index)) = (arg))
 #define RedExecCommandArgGet(args, index) ((args)[(index)])
+#define RedExecCommandPointerArg(pointer) ((int)(pointer))
 
 enum RedExecCommandLayout {
     REDSOUND_EXEC_COMMAND_FUNC_OFFSET = (unsigned int)&(((RedExecCommand*)0)->m_func),
@@ -2645,7 +2646,7 @@ int CRedDriver::SetMusicData(void* musicData)
         if (header != 0) {
             memcpy(header, musicData, headerSize);
             musicNo = localHeader.m_musicNo;
-            _EntryExecCommand(_SetMusicData, (int)header, 0, 0, 0, 0, 0, 0);
+            _EntryExecCommand(_SetMusicData, RedExecCommandPointerArg(header), 0, 0, 0, 0, 0, 0);
         }
     } else if (RedReportPrintIsEnabled()) {
         OSReport(sRedDriverMusicHeaderErrorFmt, sRedDriverLogPrefix, sRedDriverLogWarnColor, sRedDriverLogReset);
@@ -2803,7 +2804,7 @@ int CRedDriver::MusicPlay(void* musicData, int volume, int mode)
         }
         memcpy(copiedHeader, header, headerSize);
         musicNo = copiedHeader->m_musicNo;
-        _EntryExecCommand(_SetMusicData, (int)copiedHeader, 0, 0, 0, 0, 0, 0);
+        _EntryExecCommand(_SetMusicData, RedExecCommandPointerArg(copiedHeader), 0, 0, 0, 0, 0, 0);
         _EntryExecCommand(_MusicPlaySequence, musicNo, volume, mode, 0, 0, 0, 0);
     }
     return musicNo;
@@ -2852,7 +2853,7 @@ int CRedDriver::MusicCrossPlay(void* musicData, int volume, int mode)
         }
         memcpy(copiedHeader, header, headerSize);
         musicNo = copiedHeader->m_musicNo;
-        _EntryExecCommand(_SetMusicData, (int)copiedHeader, 0, 0, 0, 0, 0, 0);
+        _EntryExecCommand(_SetMusicData, RedExecCommandPointerArg(copiedHeader), 0, 0, 0, 0, 0, 0);
         _EntryExecCommand(_MusicCrossPlaySequence, musicNo, volume, mode, 0, 0, 0, 0);
     }
     return musicNo;
@@ -2901,7 +2902,7 @@ int CRedDriver::MusicNextPlay(void* musicData, int volume, int mode)
         }
         memcpy(copiedHeader, header, headerSize);
         musicNo = copiedHeader->m_musicNo;
-        _EntryExecCommand(_SetMusicData, (int)copiedHeader, 0, 0, 0, 0, 0, 0);
+        _EntryExecCommand(_SetMusicData, RedExecCommandPointerArg(copiedHeader), 0, 0, 0, 0, 0, 0);
         _EntryExecCommand(_MusicNextPlaySequence, musicNo, volume, mode, 0, 0, 0, 0);
     }
     return musicNo;
@@ -3085,7 +3086,7 @@ void* CRedDriver::SetSeBlockData(int blockIndex, void* seBlockData)
     } else {
         copiedBuffer = 0;
     }
-    _EntryExecCommand(_SetSeBlockData, blockIndex, (int)copiedBuffer, 0, 0, 0, 0, 0);
+    _EntryExecCommand(_SetSeBlockData, blockIndex, RedExecCommandPointerArg(copiedBuffer), 0, 0, 0, 0, 0);
     return copiedBuffer;
 }
 
@@ -3115,7 +3116,7 @@ int CRedDriver::SetSeSepData(void* seSepData)
         if (header != 0) {
             memcpy(header, seSepData, headerSize);
             seNo = header->m_seNo;
-            _EntryExecCommand(_SetSeSepData, (int)header, 0, 0, 0, 0, 0, 0);
+            _EntryExecCommand(_SetSeSepData, RedExecCommandPointerArg(header), 0, 0, 0, 0, 0, 0);
         }
     } else if (RedReportPrintIsEnabled()) {
         OSReport(sRedDriverSeSepHeaderErrorFmt, sRedDriverLogPrefix,
@@ -3325,7 +3326,7 @@ int CRedDriver::SePlay(void* seSepData, int autoID, int pan, int volume, int pit
         if (copiedHeader != 0) {
             memcpy(copiedHeader, header, headerSize);
             seNo = copiedHeader->m_seNo;
-            _EntryExecCommand(_SetSeSepData, (int)copiedHeader, 0, 0, 0, 0, 0, 0);
+            _EntryExecCommand(_SetSeSepData, RedExecCommandPointerArg(copiedHeader), 0, 0, 0, 0, 0, 0);
             _EntryExecCommand(_SeSepPlaySequence, autoID, seNo, pan, volume, pitch, 0, 0);
         } else {
             seNo = REDSOUND_SESEP_ID_NONE;
@@ -3670,7 +3671,7 @@ void CRedDriver::StreamStop(int streamID)
  */
 int CRedDriver::StreamPlay(int streamID, void* streamData, int fileSize, int pan, int volume)
 {
-	_EntryExecCommand(_StreamPlay, streamID, (int)streamData, fileSize, pan, volume, 0, 0);
+	_EntryExecCommand(_StreamPlay, streamID, RedExecCommandPointerArg(streamData), fileSize, pan, volume, 0, 0);
 	return streamID;
 }
 

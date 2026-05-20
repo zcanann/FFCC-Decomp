@@ -2180,7 +2180,7 @@ static void _KeyOnControl()
                 track->m_shakeOutput += track->m_shakeRate;
             }
             track++;
-        } while (track < soundControl->m_tracks + soundControl->m_trackCount);
+        } while (track < RedSoundControlGetTrackEnd(soundControl));
     }
 
     soundControl = RedSoundControlGet(REDSOUND_CONTROL_MUSIC_SECONDARY);
@@ -2197,7 +2197,7 @@ static void _KeyOnControl()
                 track->m_shakeOutput += track->m_shakeRate;
             }
             track++;
-        } while (track < soundControl->m_tracks + soundControl->m_trackCount);
+        } while (track < RedSoundControlGetTrackEnd(soundControl));
     }
 
     {
@@ -2226,7 +2226,7 @@ static void _KeyOnControl()
                     (voice->m_track->m_shakeFunc != 0)) {
                     soundControl = RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY);
                     if (!(voice->m_track < soundControl->m_tracks) &&
-                        (voice->m_track < soundControl->m_tracks + soundControl->m_trackCount)) {
+                        (voice->m_track < RedSoundControlGetTrackEnd(soundControl))) {
                         muteTrackNo = voice->m_track->m_trackNo;
                         if ((RedMuteGetMask(muteTrackNo) & RedMuteGetWord(muteTrackNo)) == 0) {
                             volume = ((soundControl->m_volumeScale + 1) *
@@ -2244,8 +2244,7 @@ static void _KeyOnControl()
                         RedSoundCONTROL* secondaryControl =
                             &soundControl[REDSOUND_CONTROL_MUSIC_SECONDARY];
                         if (!(voice->m_track < secondaryControl->m_tracks) &&
-                            (voice->m_track <
-                             secondaryControl->m_tracks + secondaryControl->m_trackCount)) {
+                            (voice->m_track < RedSoundControlGetTrackEnd(secondaryControl))) {
                             muteTrackNo = voice->m_track->m_trackNo;
 
                             if ((RedMuteGetMask(muteTrackNo) & RedMuteGetWord(muteTrackNo)) == 0) {
@@ -2392,7 +2391,7 @@ static void _ExecuteExtraData()
                         } while (voice < RedVoiceDataGetEnd());
                     }
                     track++;
-                } while (track < soundControl->m_tracks + soundControl->m_trackCount);
+                } while (track < RedSoundControlGetTrackEnd(soundControl));
             }
         }
         soundControl++;
@@ -2668,7 +2667,7 @@ static void _MidiTrackExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData,
             }
         }
         track++;
-    } while ((control->m_activeTrackCount != 0) && (track < control->m_tracks + control->m_trackCount));
+    } while ((control->m_activeTrackCount != 0) && (track < RedSoundControlGetTrackEnd(control)));
 }
 
 

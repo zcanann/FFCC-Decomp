@@ -1710,8 +1710,8 @@ void COctTree::ClearFlag(unsigned long flag)
 int COctTree::CheckHitCylinder_r(COctNode* node)
 {
 	float boundMinX = node->m_boundMinX;
-	int overlap = false;
-	int xyOverlap = false;
+	bool overlap = false;
+	bool xyOverlap = false;
 	int xOverlap = false;
 
 	if (boundMinX < s_cyl.m_boundsMin.x) {

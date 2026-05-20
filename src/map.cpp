@@ -3856,7 +3856,7 @@ CMapMng::~CMapMng()
 {
     __destroy_arr(
         Ptr(this, 0x21450), reinterpret_cast<void*>(dtor_80034414), 0x1C, 2);
-    if (this != reinterpret_cast<CMapMng*>(0xFFFDEBCC)) {
+    if (Ptr(this, 0x21434) != 0) {
         *reinterpret_cast<void***>(Ptr(this, 0x21434)) = __vt__8CPtrArrayIP10CMapShadow;
         void* items = *reinterpret_cast<void**>(Ptr(this, 0x21444));
         if (items != 0) {
@@ -3866,7 +3866,7 @@ CMapMng::~CMapMng()
         *reinterpret_cast<int*>(Ptr(this, 0x2143C)) = 0;
         *reinterpret_cast<int*>(Ptr(this, 0x21438)) = 0;
     }
-    if (this != reinterpret_cast<CMapMng*>(0xFFFDEBE8)) {
+    if (Ptr(this, 0x21418) != 0) {
         *reinterpret_cast<void***>(Ptr(this, 0x21418)) = __vt__8CPtrArrayIP13CMapAnimKeyDt;
         void* items = *reinterpret_cast<void**>(Ptr(this, 0x21428));
         if (items != 0) {
@@ -3876,7 +3876,7 @@ CMapMng::~CMapMng()
         *reinterpret_cast<int*>(Ptr(this, 0x21420)) = 0;
         *reinterpret_cast<int*>(Ptr(this, 0x2141C)) = 0;
     }
-    if (this != reinterpret_cast<CMapMng*>(0xFFFDEC04)) {
+    if (Ptr(this, 0x213FC) != 0) {
         *reinterpret_cast<void***>(Ptr(this, 0x213FC)) = __vt__8CPtrArrayIP7CMapAnim;
         void* items = *reinterpret_cast<void**>(Ptr(this, 0x2140C));
         if (items != 0) {
@@ -3886,7 +3886,7 @@ CMapMng::~CMapMng()
         *reinterpret_cast<int*>(Ptr(this, 0x21404)) = 0;
         *reinterpret_cast<int*>(Ptr(this, 0x21400)) = 0;
     }
-    if (this != reinterpret_cast<CMapMng*>(0xFFFDEC20)) {
+    if (Ptr(this, 0x213E0) != 0) {
         *reinterpret_cast<void***>(Ptr(this, 0x213E0)) = __vt__8CPtrArrayIP11CMapAnimRun;
         void* items = *reinterpret_cast<void**>(Ptr(this, 0x213F0));
         if (items != 0) {

@@ -18,7 +18,6 @@ extern "C" void SetMargin__5CFontFf(float, CFont*);
 extern "C" void SetShadow__5CFontFi(CFont*, int);
 extern "C" void SetScale__5CFontFf(float, CFont*);
 extern "C" void DrawInit__5CFontFv(CFont*);
-extern "C" void SetColor__5CFontF8_GXColor(CFont*, GXColor*);
 extern "C" float GetWidth__5CFontFPc(CFont*, const char*);
 extern "C" void SetPosX__5CFontFf(float, CFont*);
 extern "C" void SetPosY__5CFontFf(float, CFont*);
@@ -162,8 +161,7 @@ void CMenuPcs::TmpArtiDraw()
 		if (*(short*)(foodPtr + 0x1F6) >= 0) {
 			float alpha = *(float*)(entry + 8);
 			CColor textColor(0xFF, 0xFF, 0xFF, (unsigned char)(int)(FLOAT_80332F28 * alpha));
-			GXColor color = textColor.color;
-			SetColor__5CFontF8_GXColor(font, &color);
+			font->SetColor(textColor.color);
 
 			const char* text = flatData->table[0].strings[*(short*)(foodPtr + 0x1F6) * 5 + 4];
 			float width = GetWidth__5CFontFPc(font, text);

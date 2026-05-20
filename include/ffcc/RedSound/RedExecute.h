@@ -84,6 +84,8 @@ enum RedNoteAllocFlag {
 #define RedNoteAllocHasStream(flags) (((flags) & REDSOUND_NOTE_ALLOC_STREAM) != 0)
 #define RedNoteAllocHasPriority(flags) (((flags) & REDSOUND_NOTE_ALLOC_PRIORITY) != 0)
 #define RedNoteAllocHasDirectMask(flags) (((static_cast<s8>(flags)) & REDSOUND_NOTE_ALLOC_DIRECT_MASK) != 0)
+#define RedNoteAllocSetStream(flags) ((flags) |= REDSOUND_NOTE_ALLOC_STREAM)
+#define RedNoteAllocClearStream(flags) ((flags) &= ~REDSOUND_NOTE_ALLOC_STREAM)
 
 struct RedWaveADPCMInfo {
 	AXPBADPCM m_data;

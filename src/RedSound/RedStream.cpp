@@ -210,12 +210,12 @@ static void _StreamStop(RedStreamDATA* streamData)
 			streamData->m_aramBuffer = REDSOUND_STREAM_ARAM_BUFFER_NONE;
 		}
 		streamData->m_voiceData->m_flags |= REDSOUND_VOICE_FLAGS_RELEASED;
-		streamData->m_track->m_note.m_allocFlags &= ~REDSOUND_NOTE_ALLOC_STREAM;
+		RedNoteAllocClearStream(streamData->m_track->m_note.m_allocFlags);
 		streamData->m_voiceData->m_stateFlags &= REDSOUND_VOICE_STATE_CLEAR_STREAM_MASK;
 		streamData->m_voiceData->m_active = REDSOUND_VOICE_ACTIVE_OFF;
 		if (streamData->m_header.m_channelCount == REDSOUND_STREAM_STEREO_CHANNEL_COUNT) {
 			RedStreamGetVoiceData(streamData, REDSOUND_STREAM_RIGHT_CHANNEL)->m_flags |= REDSOUND_VOICE_FLAGS_RELEASED;
-			RedStreamGetTrack(streamData, REDSOUND_STREAM_RIGHT_CHANNEL)->m_note.m_allocFlags &= ~REDSOUND_NOTE_ALLOC_STREAM;
+			RedNoteAllocClearStream(RedStreamGetTrack(streamData, REDSOUND_STREAM_RIGHT_CHANNEL)->m_note.m_allocFlags);
 			RedStreamGetVoiceData(streamData, REDSOUND_STREAM_RIGHT_CHANNEL)->m_stateFlags &= REDSOUND_VOICE_STATE_CLEAR_STREAM_MASK;
 			RedStreamGetVoiceData(streamData, REDSOUND_STREAM_RIGHT_CHANNEL)->m_active = REDSOUND_VOICE_ACTIVE_OFF;
 		}
@@ -523,7 +523,7 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 		do {
 			RedVoiceDATA* voice = RedStreamGetVoiceData(streamData, channelIndex);
 			voice->m_track = RedStreamGetTrack(streamData, channelIndex);
-			voice->m_track->m_note.m_allocFlags |= REDSOUND_NOTE_ALLOC_STREAM;
+			RedNoteAllocSetStream(voice->m_track->m_note.m_allocFlags);
 			voice->m_stateFlags |= REDSOUND_VOICE_STATE_STREAM;
 			voice->m_voiceSwitch = REDSOUND_VOICE_SWITCH_STREAM_DEFAULT;
 			if (streamData->m_header.m_flags != REDSOUND_STREAM_HEADER_REVERB_NONE) {

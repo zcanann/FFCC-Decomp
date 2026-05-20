@@ -2963,7 +2963,7 @@ static void _SeTrackDataExecute(RedTrackDATA* track, int frames)
 	int pitchModDelayStep;
 	int volumeModDelayStep;
 
-	if ((track->m_note.m_allocFlags & REDSOUND_NOTE_ALLOC_STREAM) != 0) {
+	if (RedNoteAllocHasStream(track->m_note.m_allocFlags)) {
 		return;
 	}
 

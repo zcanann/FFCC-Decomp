@@ -1,4 +1,5 @@
 #include "ffcc/itemobj.h"
+#include "ffcc/color.h"
 #include "ffcc/linkage.h"
 #include "ffcc/map.h"
 #include "ffcc/maphit.h"
@@ -58,8 +59,6 @@ extern "C" void LoadModelASync__Q29CCharaPcs7CHandleFiUlUl(void*, int, unsigned 
 extern "C" int IsLoadModelASyncCompleted__Q29CCharaPcs7CHandleFv(void*);
 extern "C" void SetDamageCol__8CGObjectFiPcffP3Vec(void*, int, char*, float, float, Vec*);
 extern "C" void onFrame__8CGPrgObjFv(void*);
-extern "C" void* __ct__6CColorFUcUcUcUc(void*, int, int, int, int);
-extern "C" void SetColor__5CFontF8_GXColor(CFont*, GXColor*);
 extern "C" int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, CMapCylinder*, Vec*, unsigned int);
 extern "C" void putParticle__8CGPrgObjFiiP3Vecfi(void*, int, int, Vec*, float, int);
 extern "C" void playSe3D__8CGPrgObjFiiiiP3Vec(void*, int, int, int, int, Vec*);
@@ -1411,10 +1410,8 @@ void CGItemObj::DrawOmoideName(CFont* font)
 			font->SetTlut(7);
 
 			int alphaInt = (int)(255.0f * *(float*)(self + 0x4B0));
-			u32 textColor;
-			GXColor constructedColor;
-			textColor = *(u32*)__ct__6CColorFUcUcUcUc(&constructedColor, 0xFF, 0xFF, 0xFF, alphaInt);
-			SetColor__5CFontF8_GXColor(font, reinterpret_cast<GXColor*>(&textColor));
+			CColor textColor(0xFF, 0xFF, 0xFF, alphaInt);
+			font->SetColor(textColor.color);
 
 			const ItemObjFlatData* flatData = reinterpret_cast<const ItemObjFlatData*>(&Game.m_cFlatDataArr[1]);
 			const char* name = flatData->table[2].index[*(int*)(self + 0x570)];

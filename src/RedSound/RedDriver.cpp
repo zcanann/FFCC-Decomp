@@ -510,6 +510,7 @@ struct RedExecCommand {
 #define RedExecCommandArgGet(args, index) ((args)[(index)])
 #define RedExecCommandPointerArg(pointer) ((int)(pointer))
 #define RedExecCommandPointerArgGet(args, index) RedExecCommandArgGet((args), (index))
+#define RedSePlayStateFromTrack(track) ((int)(track))
 
 enum RedExecCommandLayout {
     REDSOUND_EXEC_COMMAND_FUNC_OFFSET = (unsigned int)&(((RedExecCommand*)0)->m_func),
@@ -3212,7 +3213,7 @@ int CRedDriver::SePlayState(int seID)
     seInfo = *seInfoBase;
     do {
         if (((u32)seInfo->m_command != REDSOUND_TRACK_COMMAND_NONE) && ((seID == REDSOUND_SE_ID_ALL || (seInfo->m_seId == seID)))) {
-            playState = (int)seInfo;
+            playState = RedSePlayStateFromTrack(seInfo);
             break;
         }
         seInfo++;

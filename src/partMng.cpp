@@ -1379,13 +1379,14 @@ void pppEditGetProjectionMatrix(float (*projectionMatrix)[4])
  */
 void CPartMng::pppEditAllReleaseResource()
 {
+    static const int kUsbMapMeshTableOffset = 0x7F4;
+    static const int kUsbShapeSlotTableOffset = 0x7F8;
+    static const int kRecvBuffOffset = 0x23554;
+
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
     CMaterialSet* materialSet = *reinterpret_cast<CMaterialSet**>(self + 0x7E4);
     CTextureSet* textureSet = *reinterpret_cast<CTextureSet**>(self + 0x7E8);
     int iVar3;
-    CMapMesh* mapMesh;
-    int* piVar4;
-    int iVar5;
     unsigned char* iter;
 
     if (materialSet != 0) {
@@ -1434,58 +1435,38 @@ void CPartMng::pppEditAllReleaseResource()
         iter = iter + 0xC;
     } while (iVar3 < 0x80);
 
-    if (*reinterpret_cast<void**>(self + 0x23554) != 0) {
-        __dla__FPv(*reinterpret_cast<void**>(self + 0x23554));
-        *reinterpret_cast<void**>(self + 0x23554) = 0;
+    u8*& recvBuffer = *reinterpret_cast<u8**>(self + kRecvBuffOffset);
+    if (recvBuffer != 0) {
+        delete[] recvBuffer;
+        recvBuffer = 0;
     }
 
-    if (*reinterpret_cast<int*>(self + 0x7F4) != 0) {
-        iVar5 = 0;
-        iVar3 = 0;
-        do {
-            mapMesh = *reinterpret_cast<CMapMesh**>(*reinterpret_cast<int*>(self + 0x7F4) + iVar5);
-            if (mapMesh != 0) {
-                mapMesh->~CMapMesh();
-                __dl__FPv(mapMesh);
-                *reinterpret_cast<int*>(*reinterpret_cast<int*>(self + 0x7F4) + iVar5) = 0;
+    pppModelSt**& modelSlots = *reinterpret_cast<pppModelSt***>(self + kUsbMapMeshTableOffset);
+    if (modelSlots != 0) {
+        for (int i = 0; i < 0x88; i++) {
+            pppModelSt* model = modelSlots[i];
+            if (model != 0) {
+                delete model;
+                modelSlots[i] = 0;
             }
-            iVar3 = iVar3 + 1;
-            iVar5 = iVar5 + 4;
-        } while (iVar3 < 0x88);
-
-        if (*reinterpret_cast<int*>(self + 0x7F4) != 0) {
-            __dl__FPv(*reinterpret_cast<void**>(self + 0x7F4));
-            *reinterpret_cast<int*>(self + 0x7F4) = 0;
         }
+
+        delete[] modelSlots;
+        modelSlots = 0;
     }
 
-    if (*reinterpret_cast<int*>(self + 0x7F8) != 0) {
-        iVar3 = 0;
-        iVar5 = 0;
-        do {
-            piVar4 = *reinterpret_cast<int**>(*reinterpret_cast<int*>(self + 0x7F8) + iVar5);
-            if (piVar4 != 0) {
-                if (piVar4 != 0) {
-                    if (*piVar4 != 0) {
-                        __dl__FPv(reinterpret_cast<void*>(*piVar4));
-                        *piVar4 = 0;
-                    }
-                    if (piVar4[1] != 0) {
-                        __dl__FPv(reinterpret_cast<void*>(piVar4[1]));
-                        piVar4[1] = 0;
-                    }
-                    __dl__FPv(piVar4);
-                }
-                *reinterpret_cast<int*>(*reinterpret_cast<int*>(self + 0x7F8) + iVar5) = 0;
+    pppShapeSt**& shapeSlots = *reinterpret_cast<pppShapeSt***>(self + kUsbShapeSlotTableOffset);
+    if (shapeSlots != 0) {
+        for (int i = 0; i < 0x80; i++) {
+            pppShapeSt* shape = shapeSlots[i];
+            if (shape != 0) {
+                delete shape;
+                shapeSlots[i] = 0;
             }
-            iVar3 = iVar3 + 1;
-            iVar5 = iVar5 + 4;
-        } while (iVar3 < 0x80);
-
-        if (*reinterpret_cast<int*>(self + 0x7F8) != 0) {
-            __dl__FPv(*reinterpret_cast<void**>(self + 0x7F8));
-            *reinterpret_cast<int*>(self + 0x7F8) = 0;
         }
+
+        delete[] shapeSlots;
+        shapeSlots = 0;
     }
 
     iVar3 = 0;
@@ -1738,9 +1719,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         {
             pppModelSt*** modelTablePtr = reinterpret_cast<pppModelSt***>(self + kUsbMapMeshTableOffset);
             if (*modelTablePtr == 0) {
-                *modelTablePtr = static_cast<pppModelSt**>(
-                    __nwa__FUlPQ27CMemory6CStagePci(
-                        sizeof(pppModelSt*) * 0x88, stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0x5F8));
+                *modelTablePtr = new (stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0x5F8) pppModelSt*[0x88];
                 if (*modelTablePtr != 0) {
                     memset(*modelTablePtr, 0, sizeof(pppModelSt*) * 0x88);
                 }
@@ -1788,9 +1767,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         {
             pppShapeSt*** shapeSlotTablePtr = reinterpret_cast<pppShapeSt***>(self + kUsbShapeSlotTableOffset);
             if (*shapeSlotTablePtr == 0) {
-                *shapeSlotTablePtr = static_cast<pppShapeSt**>(
-                    __nwa__FUlPQ27CMemory6CStagePci(
-                        sizeof(pppShapeSt*) * 0x80, stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0x60A));
+                *shapeSlotTablePtr = new (stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0x60A) pppShapeSt*[0x80];
                 if (*shapeSlotTablePtr != 0) {
                     memset(*shapeSlotTablePtr, 0, sizeof(pppShapeSt*) * 0x80);
                 }
@@ -1854,8 +1831,8 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         pdtSlots[0].m_pdt = reinterpret_cast<_pppDataHead*>(
             __nwa__FUlPQ27CMemory6CStagePci(
                 packetSize - 0x20, stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0x64D));
-        *reinterpret_cast<void**>(self + kRecvBuffOffset) = __nwa__FUlPQ27CMemory6CStagePci(
-            0x3000, stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0x64E);
+        *reinterpret_cast<u8**>(self + kRecvBuffOffset) =
+            new (stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0x64E) u8[0x3000];
         if (pdtSlots[0].m_pdt != 0) {
             memcpy(pdtSlots[0].m_pdt, payload, packetSize - 0x20);
             pppInitPdt(reinterpret_cast<long*>(pdtSlots[0].m_pdt), pppGetSysProgTable());
@@ -1917,8 +1894,8 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
             pdtSlots[pdtCount].m_pdt = reinterpret_cast<_pppDataHead*>(
                 __nwa__FUlPQ27CMemory6CStagePci(
                     packetSize - 0x20, stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0x678));
-            *reinterpret_cast<void**>(self + kRecvBuffOffset) = __nwa__FUlPQ27CMemory6CStagePci(
-                0x3000, stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0x679);
+            *reinterpret_cast<u8**>(self + kRecvBuffOffset) =
+                new (stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0x679) u8[0x3000];
             if (pdtSlots[pdtCount].m_pdt != 0) {
                 memcpy(pdtSlots[pdtCount].m_pdt, payload, packetSize - 0x20);
                 pppInitPdt(reinterpret_cast<long*>(pdtSlots[pdtCount].m_pdt), pppGetSysProgTable());

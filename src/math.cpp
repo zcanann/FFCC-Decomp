@@ -572,11 +572,11 @@ int CBound::CheckFrustum(Vec& viewPos, float (*viewMatrix)[4], float farPlane)
 int CBound::CheckFrustum0(float farPlane)
 {
     unsigned int clipMask;
-    int zIndex;
-    unsigned int insideMask;
-    int yIndex;
     unsigned int outsideMask;
     int xIndex;
+    int yIndex;
+    int zIndex;
+    unsigned int insideMask;
     float farthestZ;
     float zero;
     Vec vertex;

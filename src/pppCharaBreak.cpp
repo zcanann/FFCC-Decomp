@@ -6,6 +6,7 @@
 #include "ffcc/p_camera.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/ppp_constants.h"
+#include "ffcc/pppPart.h"
 #include "ffcc/util.h"
 
 #include "dolphin/gx.h"
@@ -42,8 +43,6 @@ static inline Mtx& CameraMatrix()
 {
     return CameraPcs.m_cameraMatrix;
 }
-
-void pppInitBlendMode(void);
 
 extern "C" {
 int rand(void);
@@ -464,16 +463,16 @@ void pppDestructCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkC* data)
                 for (u32 dlIndex = 0; dlIndex < *(u32*)(meshData + 0x4C); dlIndex++) {
                     if ((void*)*dlEntries != NULL) {
                         if (*(void**)*dlEntries != NULL) {
-                            pppHeapUseRate__FPQ27CMemory6CStage(*(void**)*dlEntries);
+                            pppHeapUseRate((CMemory::CStage*)*(void**)*dlEntries);
                             *(u32*)*dlEntries = 0;
                         }
                         if (*(void**)(*dlEntries + 0xC) != NULL) {
-                            pppHeapUseRate__FPQ27CMemory6CStage(*(void**)(*dlEntries + 0xC));
+                            pppHeapUseRate((CMemory::CStage*)*(void**)(*dlEntries + 0xC));
                             *(u32*)(*dlEntries + 0xC) = 0;
                         }
                     }
                     if ((void*)*dlEntries != NULL) {
-                        pppHeapUseRate__FPQ27CMemory6CStage((void*)*dlEntries);
+                        pppHeapUseRate((CMemory::CStage*)*dlEntries);
                         *dlEntries = 0;
                     }
                     dlEntries++;
@@ -481,7 +480,7 @@ void pppDestructCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkC* data)
             }
 
             if (*meshBufferSlot != NULL) {
-                pppHeapUseRate__FPQ27CMemory6CStage(*meshBufferSlot);
+                pppHeapUseRate((CMemory::CStage*)*meshBufferSlot);
                 *meshBufferSlot = NULL;
             }
             meshBufferSlot++;
@@ -490,7 +489,7 @@ void pppDestructCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkC* data)
     }
 
     if (perMeshBuffers != NULL) {
-        pppHeapUseRate__FPQ27CMemory6CStage(perMeshBuffers);
+        pppHeapUseRate((CMemory::CStage*)perMeshBuffers);
     }
 }
 

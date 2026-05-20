@@ -427,10 +427,10 @@ bool CMenuPcs::FavoOpen()
     int remaining = count;
     if (0 < count) {
         do {
-            float resetStep = FLOAT_80333040;
             if (frame >= entry->startFrame) {
                 if (entry->startFrame + entry->duration <= frame) {
                     finishedCount = finishedCount + 1;
+                    float resetStep = FLOAT_80333040;
                     entry->alpha = FLOAT_80333048;
                     entry->dx = resetStep;
                     entry->dy = resetStep;

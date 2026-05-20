@@ -705,11 +705,9 @@ int CMapHit::ReadOtmHit(CChunkFile& chunkFile)
                 face.m_flags = 0;
                 face.m_drawFlags = 0;
 
-                float* vertexOffset = &face.m_vertexOffsets[0][0];
                 for (int i = 0; i < face.m_vertexCount; i++) {
-                    vertexOffset[1] = zero;
-                    vertexOffset[0] = zero;
-                    vertexOffset += 2;
+                    face.m_vertexOffsets[i][1] = zero;
+                    face.m_vertexOffsets[i][0] = zero;
                 }
 
                 if (chunk.m_version == 0) {

@@ -90,7 +90,7 @@ DbgMenuDef PTR_DAT_80212524[] = {
     { s_ITEM_WEAPON_801DD47C, 120, 2, 1 }, { s_SMITH_MASTER_801DD488, 121, 2, 1 }, { lbl_80331C80, 122, 2, 1 },
 };
 u32 gDbgMenuWindowBorderColors[4] = {0x0000FFC0, 0x4040FFC0, 0x4040FFC0, 0x8080FFC0};
-u32 gDbgMenuWindowFillColors[2] = {0xFFFFFF80, 0x00000080};
+GXColor gDbgMenuWindowFillColors[2] = {{0xFF, 0xFF, 0xFF, 0x80}, {0, 0, 0, 0x80}};
 
 /*
  * --INFO--
@@ -601,19 +601,19 @@ void CDbgMenuPcs::drawWindow(int flags, int x, int y, int width, int height, cha
 
 	GXBegin(GX_LINESTRIP, GX_VTXFMT1, 3);
 	GXPosition3f32((float)(x + width), (float)y, z);
-	GXColor1u32(gDbgMenuWindowFillColors[fillColorIndex]);
+	GXColor1u32(*reinterpret_cast<u32*>(&gDbgMenuWindowFillColors[fillColorIndex]));
 	GXPosition3f32((float)x, (float)y, z);
-	GXColor1u32(gDbgMenuWindowFillColors[fillColorIndex]);
+	GXColor1u32(*reinterpret_cast<u32*>(&gDbgMenuWindowFillColors[fillColorIndex]));
 	GXPosition3f32((float)x, (float)(y + height), z);
-	GXColor1u32(gDbgMenuWindowFillColors[fillColorIndex]);
+	GXColor1u32(*reinterpret_cast<u32*>(&gDbgMenuWindowFillColors[fillColorIndex]));
 
 	GXBegin(GX_LINESTRIP, GX_VTXFMT1, 3);
 	GXPosition3f32((float)(x + width), (float)y, z);
-	GXColor1u32(gDbgMenuWindowFillColors[1 - fillColorIndex]);
+	GXColor1u32(*reinterpret_cast<u32*>(&gDbgMenuWindowFillColors[1 - fillColorIndex]));
 	GXPosition3f32((float)(x + width), (float)(y + height), z);
-	GXColor1u32(gDbgMenuWindowFillColors[1 - fillColorIndex]);
+	GXColor1u32(*reinterpret_cast<u32*>(&gDbgMenuWindowFillColors[1 - fillColorIndex]));
 	GXPosition3f32((float)x, (float)(y + height), z);
-	GXColor1u32(gDbgMenuWindowFillColors[1 - fillColorIndex]);
+	GXColor1u32(*reinterpret_cast<u32*>(&gDbgMenuWindowFillColors[1 - fillColorIndex]));
 
 	s8 selected = static_cast<s32>((static_cast<u32>(m_currentMenu->m_status) << 25) & 0xC0000000) >> 31;
 	if (selected != 0) {

@@ -1,3 +1,4 @@
+#define FFCC_DEFINE_MATERIALEDITORPCS_STORAGE
 #include "ffcc/p_MaterialEditor.h"
 #include "ffcc/p_usb.h"
 #include "ffcc/ME_USB_process.h"
@@ -49,49 +50,9 @@ unsigned int CMaterialEditorPcs::m_table[0x15C / sizeof(unsigned int)] = {
 };
 unsigned int s_CMaterialEditorPcsTablePad0[3] = {reinterpret_cast<unsigned int>(__RTTI__8CManager_8032E648), 0, 0};
 unsigned int s_CMaterialEditorPcsTablePad1[5] = {reinterpret_cast<unsigned int>(__RTTI__8CManager_8032E648), 0, reinterpret_cast<unsigned int>(__RTTI__8CProcess_8032E650), 0, 0};
-CMaterialEditorPcs MaterialEditorPcs;
 u8 lbl_8026D338[0xC];
+u8 MaterialEditorPcs[sizeof(CMaterialEditorPcs)];
 
-/*
- * --INFO--
- * PAL Address: 0x8004c588
- * PAL Size: 280b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" void __sinit_p_MaterialEditor_cpp(void)
-{
-    u8* self = reinterpret_cast<u8*>(&MaterialEditorPcs);
-    unsigned int* dst = m_table__18CMaterialEditorPcs;
-    unsigned int* desc0 = m_table_desc0__18CMaterialEditorPcs;
-    unsigned int* desc1 = m_table_desc1__18CMaterialEditorPcs;
-    unsigned int* desc2 = m_table_desc2__18CMaterialEditorPcs;
-    unsigned int* desc3 = m_table_desc3__18CMaterialEditorPcs;
-
-    *reinterpret_cast<void**>(self) = __vt__8CManager;
-    *reinterpret_cast<void**>(self) = __vt__8CProcess;
-    *reinterpret_cast<void**>(self) = __vt__18CMaterialEditorPcs;
-
-    __ct__14CUSBStreamDataFv(self + 0x84);
-    __ct__5ZLISTFv(self + 0xC8);
-    __ct__5ZLISTFv(self + 0xD8);
-    __register_global_object(self, __dt__18CMaterialEditorPcsFv, lbl_8026D338);
-
-    dst[1] = desc0[0];
-    dst[2] = desc0[1];
-    dst[3] = desc0[2];
-    dst[4] = desc1[0];
-    dst[5] = desc1[1];
-    dst[6] = desc1[2];
-    dst[7] = desc2[0];
-    dst[8] = desc2[1];
-    dst[9] = desc2[2];
-    dst[12] = desc3[0];
-    dst[13] = desc3[1];
-    dst[14] = desc3[2];
-}
 
 extern "C" void Printf__8CGraphicFPce(void*, const char*, ...);
 extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
@@ -109,6 +70,7 @@ extern "C" void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSe
 extern "C" void _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
     int, int, int, int, int);
 extern "C" const double DOUBLE_8032FCC0 = 1.0;
+extern "C" const double DOUBLE_8032FCD0;
 extern "C" const float FLOAT_8032FCC8 = 1.0f;
 extern "C" const float FLOAT_8032FCD8;
 extern "C" float FLOAT_8032FCDC;
@@ -130,382 +92,55 @@ static inline float LoadFloat(const float& value)
     return value;
 }
 
-/*
- * --INFO--
- * PAL Address: 0x8004c6a0
- * PAL Size: 124b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-CMaterialEditorPcs::~CMaterialEditorPcs()
+static inline double S16ToDouble(s16 value)
 {
+    union {
+        unsigned long long bits;
+        double value;
+    } conv;
+
+    conv.bits = 0x4330000000000000ULL | static_cast<unsigned int>(value ^ 0x80000000U);
+    return conv.value - DOUBLE_8032FCD0;
 }
 
 /*
  * --INFO--
- * PAL Address: 0x8004c3c4
- * PAL Size: 452b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMaterialEditorPcs::Init()
-{
-    unsigned char* self;
-    int remaining;
-
-    self = reinterpret_cast<unsigned char*>(this);
-    self[0x8] = 0x7f;
-    self[0x9] = 0x7f;
-    self[0xa] = 0x7f;
-    unsigned char level = static_cast<unsigned char>(-((__cntlzw(0) >> 5) & 1));
-    level &= 0x3f;
-    self[0xb] = 0xff;
-    self[0xc] = level;
-    self[0xd] = level;
-    self[0xe] = level;
-    level = static_cast<unsigned char>(-((__cntlzw(1) >> 5) & 1));
-    level &= 0x3f;
-    self[0xf] = 0xff;
-    float zero = FLOAT_8032FCD8;
-    float minusOne = FLOAT_8032FCDC;
-    float one = FLOAT_8032FCC8;
-
-    *reinterpret_cast<float*>(self + 0x18) = zero;
-    *reinterpret_cast<float*>(self + 0x1c) = zero;
-    *reinterpret_cast<float*>(self + 0x20) = minusOne;
-    self[0x10] = level;
-    self[0x11] = level;
-    self[0x12] = level;
-    level = static_cast<unsigned char>(-((__cntlzw(2) >> 5) & 1));
-    level &= 0x3f;
-    self[0x13] = 0xff;
-    *reinterpret_cast<float*>(self + 0x24) = zero;
-    *reinterpret_cast<float*>(self + 0x28) = zero;
-    *reinterpret_cast<float*>(self + 0x2c) = minusOne;
-    self[0x14] = level;
-    self[0x15] = level;
-    self[0x16] = level;
-    self[0x17] = 0xff;
-    *reinterpret_cast<float*>(self + 0x30) = zero;
-    *reinterpret_cast<float*>(self + 0x34) = zero;
-    *reinterpret_cast<float*>(self + 0x38) = minusOne;
-    *reinterpret_cast<float*>(self + 0x44) = zero;
-    *reinterpret_cast<float*>(self + 0x40) = zero;
-    *reinterpret_cast<float*>(self + 0x3c) = zero;
-    *reinterpret_cast<float*>(self + 0x50) = zero;
-    *reinterpret_cast<float*>(self + 0x4c) = zero;
-    *reinterpret_cast<float*>(self + 0x48) = zero;
-    *reinterpret_cast<float*>(self + 0x5c) = one;
-    *reinterpret_cast<float*>(self + 0x58) = one;
-    *reinterpret_cast<float*>(self + 0x54) = one;
-    *reinterpret_cast<u32*>(self + 0xbc) = 0;
-
-    remaining = 2;
-    while (remaining != 0) {
-        *reinterpret_cast<u32*>(self + 0x2bc) = 0;
-        *reinterpret_cast<u32*>(self + 0x2fc) = 0;
-        *reinterpret_cast<u32*>(self + 0x23c) = 0;
-        *reinterpret_cast<u32*>(self + 0x33c) = 0;
-        *reinterpret_cast<u32*>(self + 0x37c) = 0;
-        *reinterpret_cast<u32*>(self + 0x27c) = 0;
-        *reinterpret_cast<u32*>(self + 0x2c0) = 0;
-        *reinterpret_cast<u32*>(self + 0x300) = 0;
-        *reinterpret_cast<u32*>(self + 0x240) = 0;
-        *reinterpret_cast<u32*>(self + 0x340) = 0;
-        *reinterpret_cast<u32*>(self + 0x380) = 0;
-        *reinterpret_cast<u32*>(self + 0x280) = 0;
-        *reinterpret_cast<u32*>(self + 0x2c4) = 0;
-        *reinterpret_cast<u32*>(self + 0x304) = 0;
-        *reinterpret_cast<u32*>(self + 0x244) = 0;
-        *reinterpret_cast<u32*>(self + 0x344) = 0;
-        *reinterpret_cast<u32*>(self + 0x384) = 0;
-        *reinterpret_cast<u32*>(self + 0x284) = 0;
-        *reinterpret_cast<u32*>(self + 0x2c8) = 0;
-        *reinterpret_cast<u32*>(self + 0x308) = 0;
-        *reinterpret_cast<u32*>(self + 0x248) = 0;
-        *reinterpret_cast<u32*>(self + 0x348) = 0;
-        *reinterpret_cast<u32*>(self + 0x388) = 0;
-        *reinterpret_cast<u32*>(self + 0x288) = 0;
-        *reinterpret_cast<u32*>(self + 0x2cc) = 0;
-        *reinterpret_cast<u32*>(self + 0x30c) = 0;
-        *reinterpret_cast<u32*>(self + 0x24c) = 0;
-        *reinterpret_cast<u32*>(self + 0x34c) = 0;
-        *reinterpret_cast<u32*>(self + 0x38c) = 0;
-        *reinterpret_cast<u32*>(self + 0x28c) = 0;
-        *reinterpret_cast<u32*>(self + 0x2d0) = 0;
-        *reinterpret_cast<u32*>(self + 0x310) = 0;
-        *reinterpret_cast<u32*>(self + 0x250) = 0;
-        *reinterpret_cast<u32*>(self + 0x350) = 0;
-        *reinterpret_cast<u32*>(self + 0x390) = 0;
-        *reinterpret_cast<u32*>(self + 0x290) = 0;
-        *reinterpret_cast<u32*>(self + 0x2d4) = 0;
-        *reinterpret_cast<u32*>(self + 0x314) = 0;
-        *reinterpret_cast<u32*>(self + 0x254) = 0;
-        *reinterpret_cast<u32*>(self + 0x354) = 0;
-        *reinterpret_cast<u32*>(self + 0x394) = 0;
-        *reinterpret_cast<u32*>(self + 0x294) = 0;
-        *reinterpret_cast<u32*>(self + 0x2d8) = 0;
-        *reinterpret_cast<u32*>(self + 0x318) = 0;
-        *reinterpret_cast<u32*>(self + 0x258) = 0;
-        *reinterpret_cast<u32*>(self + 0x358) = 0;
-        *reinterpret_cast<u32*>(self + 0x398) = 0;
-        *reinterpret_cast<u32*>(self + 0x298) = 0;
-        self += 0x20;
-        remaining--;
-    }
-
-    reinterpret_cast<unsigned char*>(this)[0x3bc] = 0;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8004c314
+ * PAL Address: 0x8004b21c
  * PAL Size: 176b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMaterialEditorPcs::Quit()
+void CMaterialEditorPcs::CreateBoundaryBox(Vec& minPos, Vec& maxPos, long count, const Vec* points)
 {
-    unsigned int i;
-    CMaterialEditorPcs* cursor = this;
+    f32 maxInit = LoadFloat(kMaterialEditorControlMaxInit);
+    minPos.x = minPos.y = minPos.z = maxInit;
+    f32 minInit = LoadFloat(kMaterialEditorControlMinInit);
+    maxPos.x = maxPos.y = maxPos.z = minInit;
 
-    *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(this) + 0x3BC) = static_cast<unsigned char>(i = 0);
-
-    do {
-        MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(
-                                                   reinterpret_cast<unsigned char*>(cursor) + 0x2BC)));
-        MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(
-                                                   reinterpret_cast<unsigned char*>(cursor) + 0x2FC)));
-        MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(
-                                                   reinterpret_cast<unsigned char*>(cursor) + 0x23C)));
-        MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(
-                                                   reinterpret_cast<unsigned char*>(cursor) + 0x33C)));
-        MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(
-                                                   reinterpret_cast<unsigned char*>(cursor) + 0x37C)));
-        MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(
-                                                   reinterpret_cast<unsigned char*>(cursor) + 0x27C)));
-        i += 1;
-        cursor = reinterpret_cast<CMaterialEditorPcs*>(reinterpret_cast<unsigned char*>(cursor) + 4);
-    } while (i < 0x10);
-
-    unsigned int textureBlock = *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(this) + 0xBC);
-    if (textureBlock != 0) {
-        MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(textureBlock));
+    for (; count > 0; count--, points++) {
+        const Vec& point = *points;
+        if (minPos.x > point.x) {
+            minPos.x = point.x;
+        }
+        if (minPos.y > point.y) {
+            minPos.y = point.y;
+        }
+        if (minPos.z > point.z) {
+            minPos.z = point.z;
+        }
+        if (maxPos.x < point.x) {
+            maxPos.x = point.x;
+        }
+        if (maxPos.y < point.y) {
+            maxPos.y = point.y;
+        }
+        if (maxPos.z < point.z) {
+            maxPos.z = point.z;
+        }
     }
 }
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-int CMaterialEditorPcs::GetTable(unsigned long index)
-{
-    return reinterpret_cast<int>(reinterpret_cast<unsigned char*>(CMaterialEditorPcs::m_table) + index * 0x15C);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8004c234
- * PAL Size: 204b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMaterialEditorPcs::createViewer()
-{
-    unsigned char* self = reinterpret_cast<unsigned char*>(this);
-    CMemory::CStage* stage = reinterpret_cast<CMemory::CStage*>(
-        Memory.CreateStage(0x200000, const_cast<char*>(s_CMaterialEditorPcs_801D7D34), 0));
-    GXColor clear;
-    float fVar1;
-
-    WriteU32(self, 0x4, reinterpret_cast<unsigned int>(stage));
-    USBPcs.IsBigAlloc(1);
-
-    clear.r = 0x40;
-    clear.g = 0x40;
-    clear.b = 0x40;
-    clear.a = 0xff;
-    GXSetCopyClear(clear, 0xffffff);
-
-    WriteU32(self, 0x98, 1);
-    WriteU32(self, 0xe8, 0);
-    memset(self + 0xec, 0, 0x120);
-
-    fVar1 = LoadFloat(FLOAT_8032FCC8);
-    WriteF32(self, 0x128, fVar1);
-    WriteF32(self, 0x114, fVar1);
-    WriteF32(self, 0x100, fVar1);
-    WriteF32(self, 0xec, fVar1);
-
-    PSMTXIdentity(reinterpret_cast<MtxPtr>(self + 0x20C));
-    m_usbStream.CreateBuffer();
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8004c138
- * PAL Size: 252b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMaterialEditorPcs::destroyViewer()
-{
-    GXColor clear;
-
-    USBPcs.IsBigAlloc(0);
-
-    clear.r = 0;
-    clear.g = 0;
-    clear.b = 0;
-    clear.a = 0;
-    GXSetCopyClear(clear, 0xffffff);
-
-    reinterpret_cast<CUSBStreamData*>(reinterpret_cast<unsigned char*>(this) + 0x84)->DeleteBuffer();
-    MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(this) + 0xbc)));
-    unsigned int uVar2;
-    CMaterialEditorPcs* pCVar1 = this;
-
-    reinterpret_cast<unsigned char*>(this)[0x3bc] = static_cast<unsigned char>(uVar2 = 0);
-    do {
-        MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(pCVar1) + 0x2bc)));
-        MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(pCVar1) + 0x2fc)));
-        MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(pCVar1) + 0x23c)));
-        MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(pCVar1) + 0x33c)));
-        MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(pCVar1) + 0x37c)));
-        MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(pCVar1) + 0x27c)));
-        uVar2 += 1;
-        pCVar1 = reinterpret_cast<CMaterialEditorPcs*>(reinterpret_cast<unsigned char*>(pCVar1) + 4);
-    } while (uVar2 < 0x10);
-
-    Memory.DestroyStage(reinterpret_cast<CMemory::CStage*>(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(this) + 0x4)));
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8004c098
- * PAL Size: 160b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMaterialEditorPcs::ClearTextureData()
-{
-    unsigned int i = 0;
-
-    m_loadedTextureCount = 0;
-
-    do {
-        MemFree__18CMaterialEditorPcsFPv(this, m_textureData[i]);
-        MemFree__18CMaterialEditorPcsFPv(this, m_tlutData[i]);
-        MemFree__18CMaterialEditorPcsFPv(this, m_texObj[i]);
-        MemFree__18CMaterialEditorPcsFPv(this, m_tlutObj0[i]);
-        MemFree__18CMaterialEditorPcsFPv(this, m_tlutObj1[i]);
-        MemFree__18CMaterialEditorPcsFPv(this, m_textureHeader[i]);
-        i += 1;
-    } while (i < 0x10);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8004bec8
- * PAL Size: 464b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CMaterialEditorPcs::calcViewer()
-{
-    struct ViewerSRT {
-        float transX;
-        float transY;
-        float transZ;
-        float rotX;
-        float rotY;
-        float rotZ;
-        float scaleX;
-        float scaleY;
-        float scaleZ;
-    };
-
-    Mtx cameraMatrix;
-    ViewerSRT srt;
-    Mtx scaleMatrix;
-    float rotationValue;
-    float one;
-
-    USBPcs.mccReadData();
-
-    int usbDone = m_usbStream.IsUSBStreamDataDone();
-    if (usbDone != 0) {
-        SetUSBData();
-        m_usbStream.SetUSBStreamDataDone();
-    }
-
-    one = LoadFloat(FLOAT_8032FCC8);
-    rotationValue = LoadFloat(FLOAT_8032FCD8);
-    srt.transZ = rotationValue;
-    srt.transY = rotationValue;
-    srt.transX = rotationValue;
-    srt.rotZ = rotationValue;
-    srt.rotY = rotationValue;
-    srt.rotX = rotationValue;
-    srt.scaleZ = one;
-    srt.scaleY = one;
-    srt.scaleX = one;
-    srt.transX = field268_0x15c.x;
-    srt.transY = field268_0x15c.y;
-    srt.transZ = -field268_0x15c.z;
-    CameraPcs.SetViewerSRT(reinterpret_cast<const SRT*>(&srt));
-
-    PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMatrix);
-
-    m_unkMatrix.value[0][0] = field_0x12c;
-    m_unkMatrix.value[0][1] = field_0x130;
-    m_unkMatrix.value[0][2] = field_0x134;
-    m_unkMatrix.value[0][3] = field_0x138;
-    m_unkMatrix.value[1][0] = field_0x13c;
-    m_unkMatrix.value[1][1] = field_0x140;
-    m_unkMatrix.value[1][2] = field_0x144;
-    m_unkMatrix.value[1][3] = field_0x148;
-    m_unkMatrix.value[2][0] = field_0x14c;
-    m_unkMatrix.value[2][1] = field_0x150;
-    m_unkMatrix.value[2][2] = field_0x154;
-    m_unkMatrix.value[2][3] = field_0x158;
-
-    PSMTXTranspose(m_unkMatrix.value, m_unkMatrix.value);
-
-    m_unkMatrix.value[0][1] = -m_unkMatrix.value[0][1];
-    m_unkMatrix.value[1][1] = -m_unkMatrix.value[1][1];
-    m_unkMatrix.value[2][1] = -m_unkMatrix.value[2][1];
-    m_unkMatrix.value[2][0] = -m_unkMatrix.value[2][0];
-    m_unkMatrix.value[2][1] = -m_unkMatrix.value[2][1];
-    m_unkMatrix.value[2][2] = -m_unkMatrix.value[2][2];
-
-    PSMTXIdentity(scaleMatrix);
-    scaleMatrix[1][1] = FLOAT_8032FCDC;
-    PSMTXConcat(m_unkMatrix.value, scaleMatrix, m_unkMatrix.value);
-
-    PSMTXIdentity(scaleMatrix);
-    scaleMatrix[2][2] = FLOAT_8032FCDC;
-    PSMTXConcat(m_unkMatrix.value, scaleMatrix, m_unkMatrix.value);
-
-    PSMTXConcat(cameraMatrix, m_unkMatrix.value, cameraMatrix);
-    GXLoadPosMtxImm(cameraMatrix, 0);
-}
-
 /*
  * --INFO--
  * PAL Address: 0x8004b2cc
@@ -656,8 +291,8 @@ void CMaterialEditorPcs::drawViewer()
                 case 'H':
                 if (polygon->textureIndex < static_cast<s16>(m_loadedTextureCount)) {
                     s16* textureHeader = m_textureHeader[polygon->textureIndex];
-                    float scaleU = static_cast<float>(DOUBLE_8032FCC0 / static_cast<double>(textureHeader[2]));
-                    float scaleV = static_cast<float>(DOUBLE_8032FCC0 / static_cast<double>(textureHeader[3]));
+                    float scaleU = static_cast<float>(DOUBLE_8032FCC0 / S16ToDouble(textureHeader[2]));
+                    float scaleV = static_cast<float>(DOUBLE_8032FCC0 / S16ToDouble(textureHeader[3]));
 
                     polygon->texCoord[0][0] = scaleU * static_cast<float>(polygon->u0);
                     if (polygon->u0 < 0) {
@@ -802,42 +437,412 @@ void CMaterialEditorPcs::drawViewer()
         }
     }
 }
-
 /*
  * --INFO--
- * PAL Address: 0x8004b21c
+ * PAL Address: 0x8004bec8
+ * PAL Size: 464b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMaterialEditorPcs::calcViewer()
+{
+    struct ViewerSRT {
+        float transX;
+        float transY;
+        float transZ;
+        float rotX;
+        float rotY;
+        float rotZ;
+        float scaleX;
+        float scaleY;
+        float scaleZ;
+    };
+
+    Mtx cameraMatrix;
+    ViewerSRT srt;
+    Mtx scaleMatrix;
+    float rotationValue;
+    float one;
+
+    USBPcs.mccReadData();
+
+    int usbDone = m_usbStream.IsUSBStreamDataDone();
+    if (usbDone != 0) {
+        SetUSBData();
+        m_usbStream.SetUSBStreamDataDone();
+    }
+
+    one = LoadFloat(FLOAT_8032FCC8);
+    rotationValue = LoadFloat(FLOAT_8032FCD8);
+    srt.transZ = rotationValue;
+    srt.transY = rotationValue;
+    srt.transX = rotationValue;
+    srt.rotZ = rotationValue;
+    srt.rotY = rotationValue;
+    srt.rotX = rotationValue;
+    srt.scaleZ = one;
+    srt.scaleY = one;
+    srt.scaleX = one;
+    srt.transX = field268_0x15c.x;
+    srt.transY = field268_0x15c.y;
+    srt.transZ = -field268_0x15c.z;
+    CameraPcs.SetViewerSRT(reinterpret_cast<const SRT*>(&srt));
+
+    PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMatrix);
+
+    m_unkMatrix.value[0][0] = field_0x12c;
+    m_unkMatrix.value[0][1] = field_0x130;
+    m_unkMatrix.value[0][2] = field_0x134;
+    m_unkMatrix.value[0][3] = field_0x138;
+    m_unkMatrix.value[1][0] = field_0x13c;
+    m_unkMatrix.value[1][1] = field_0x140;
+    m_unkMatrix.value[1][2] = field_0x144;
+    m_unkMatrix.value[1][3] = field_0x148;
+    m_unkMatrix.value[2][0] = field_0x14c;
+    m_unkMatrix.value[2][1] = field_0x150;
+    m_unkMatrix.value[2][2] = field_0x154;
+    m_unkMatrix.value[2][3] = field_0x158;
+
+    PSMTXTranspose(m_unkMatrix.value, m_unkMatrix.value);
+
+    m_unkMatrix.value[0][1] = -m_unkMatrix.value[0][1];
+    m_unkMatrix.value[1][1] = -m_unkMatrix.value[1][1];
+    m_unkMatrix.value[2][1] = -m_unkMatrix.value[2][1];
+    m_unkMatrix.value[2][0] = -m_unkMatrix.value[2][0];
+    m_unkMatrix.value[2][1] = -m_unkMatrix.value[2][1];
+    m_unkMatrix.value[2][2] = -m_unkMatrix.value[2][2];
+
+    PSMTXIdentity(scaleMatrix);
+    scaleMatrix[1][1] = FLOAT_8032FCDC;
+    PSMTXConcat(m_unkMatrix.value, scaleMatrix, m_unkMatrix.value);
+
+    PSMTXIdentity(scaleMatrix);
+    scaleMatrix[2][2] = FLOAT_8032FCDC;
+    PSMTXConcat(m_unkMatrix.value, scaleMatrix, m_unkMatrix.value);
+
+    PSMTXConcat(cameraMatrix, m_unkMatrix.value, cameraMatrix);
+    GXLoadPosMtxImm(cameraMatrix, 0);
+}
+/*
+ * --INFO--
+ * PAL Address: 0x8004c098
+ * PAL Size: 160b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMaterialEditorPcs::ClearTextureData()
+{
+    unsigned int i = 0;
+
+    m_loadedTextureCount = 0;
+
+    do {
+        MemFree__18CMaterialEditorPcsFPv(this, m_textureData[i]);
+        MemFree__18CMaterialEditorPcsFPv(this, m_tlutData[i]);
+        MemFree__18CMaterialEditorPcsFPv(this, m_texObj[i]);
+        MemFree__18CMaterialEditorPcsFPv(this, m_tlutObj0[i]);
+        MemFree__18CMaterialEditorPcsFPv(this, m_tlutObj1[i]);
+        MemFree__18CMaterialEditorPcsFPv(this, m_textureHeader[i]);
+        i += 1;
+    } while (i < 0x10);
+}
+/*
+ * --INFO--
+ * PAL Address: 0x8004c138
+ * PAL Size: 252b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMaterialEditorPcs::destroyViewer()
+{
+    GXColor clear;
+
+    USBPcs.IsBigAlloc(0);
+
+    clear.r = 0;
+    clear.g = 0;
+    clear.b = 0;
+    clear.a = 0;
+    GXSetCopyClear(clear, 0xffffff);
+
+    reinterpret_cast<CUSBStreamData*>(reinterpret_cast<unsigned char*>(this) + 0x84)->DeleteBuffer();
+    MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(this) + 0xbc)));
+    unsigned int uVar2;
+    CMaterialEditorPcs* pCVar1 = this;
+
+    reinterpret_cast<unsigned char*>(this)[0x3bc] = static_cast<unsigned char>(uVar2 = 0);
+    do {
+        MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(pCVar1) + 0x2bc)));
+        MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(pCVar1) + 0x2fc)));
+        MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(pCVar1) + 0x23c)));
+        MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(pCVar1) + 0x33c)));
+        MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(pCVar1) + 0x37c)));
+        MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(pCVar1) + 0x27c)));
+        uVar2 += 1;
+        pCVar1 = reinterpret_cast<CMaterialEditorPcs*>(reinterpret_cast<unsigned char*>(pCVar1) + 4);
+    } while (uVar2 < 0x10);
+
+    Memory.DestroyStage(reinterpret_cast<CMemory::CStage*>(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(this) + 0x4)));
+}
+/*
+ * --INFO--
+ * PAL Address: 0x8004c234
+ * PAL Size: 204b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMaterialEditorPcs::createViewer()
+{
+    unsigned char* self = reinterpret_cast<unsigned char*>(this);
+    CMemory::CStage* stage = reinterpret_cast<CMemory::CStage*>(
+        Memory.CreateStage(0x200000, const_cast<char*>(s_CMaterialEditorPcs_801D7D34), 0));
+    GXColor clear;
+    float fVar1;
+
+    WriteU32(self, 0x4, reinterpret_cast<unsigned int>(stage));
+    USBPcs.IsBigAlloc(1);
+
+    clear.r = 0x40;
+    clear.g = 0x40;
+    clear.b = 0x40;
+    clear.a = 0xff;
+    GXSetCopyClear(clear, 0xffffff);
+
+    WriteU32(self, 0x98, 1);
+    WriteU32(self, 0xe8, 0);
+    memset(self + 0xec, 0, 0x120);
+
+    fVar1 = LoadFloat(FLOAT_8032FCC8);
+    WriteF32(self, 0x128, fVar1);
+    WriteF32(self, 0x114, fVar1);
+    WriteF32(self, 0x100, fVar1);
+    WriteF32(self, 0xec, fVar1);
+
+    PSMTXIdentity(reinterpret_cast<MtxPtr>(self + 0x20C));
+    m_usbStream.CreateBuffer();
+}
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+int CMaterialEditorPcs::GetTable(unsigned long index)
+{
+    return reinterpret_cast<int>(reinterpret_cast<unsigned char*>(CMaterialEditorPcs::m_table) + index * 0x15C);
+}
+/*
+ * --INFO--
+ * PAL Address: 0x8004c314
  * PAL Size: 176b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMaterialEditorPcs::CreateBoundaryBox(Vec& minPos, Vec& maxPos, long count, const Vec* points)
+void CMaterialEditorPcs::Quit()
 {
-    f32 maxInit = LoadFloat(kMaterialEditorControlMaxInit);
-    minPos.x = minPos.y = minPos.z = maxInit;
-    f32 minInit = LoadFloat(kMaterialEditorControlMinInit);
-    maxPos.x = maxPos.y = maxPos.z = minInit;
+    unsigned int i;
+    CMaterialEditorPcs* cursor = this;
 
-    for (; count > 0; count--, points++) {
-        const Vec& point = *points;
-        if (minPos.x > point.x) {
-            minPos.x = point.x;
-        }
-        if (minPos.y > point.y) {
-            minPos.y = point.y;
-        }
-        if (minPos.z > point.z) {
-            minPos.z = point.z;
-        }
-        if (maxPos.x < point.x) {
-            maxPos.x = point.x;
-        }
-        if (maxPos.y < point.y) {
-            maxPos.y = point.y;
-        }
-        if (maxPos.z < point.z) {
-            maxPos.z = point.z;
-        }
+    *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(this) + 0x3BC) = static_cast<unsigned char>(i = 0);
+
+    do {
+        MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(
+                                                   reinterpret_cast<unsigned char*>(cursor) + 0x2BC)));
+        MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(
+                                                   reinterpret_cast<unsigned char*>(cursor) + 0x2FC)));
+        MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(
+                                                   reinterpret_cast<unsigned char*>(cursor) + 0x23C)));
+        MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(
+                                                   reinterpret_cast<unsigned char*>(cursor) + 0x33C)));
+        MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(
+                                                   reinterpret_cast<unsigned char*>(cursor) + 0x37C)));
+        MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(
+                                                   reinterpret_cast<unsigned char*>(cursor) + 0x27C)));
+        i += 1;
+        cursor = reinterpret_cast<CMaterialEditorPcs*>(reinterpret_cast<unsigned char*>(cursor) + 4);
+    } while (i < 0x10);
+
+    unsigned int textureBlock = *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(this) + 0xBC);
+    if (textureBlock != 0) {
+        MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(textureBlock));
     }
+}
+/*
+ * --INFO--
+ * PAL Address: 0x8004c3c4
+ * PAL Size: 452b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMaterialEditorPcs::Init()
+{
+    unsigned char* self;
+    int remaining;
+
+    self = reinterpret_cast<unsigned char*>(this);
+    self[0x8] = 0x7f;
+    self[0x9] = 0x7f;
+    self[0xa] = 0x7f;
+    unsigned char level = static_cast<unsigned char>(-((__cntlzw(0) >> 5) & 1));
+    level &= 0x3f;
+    self[0xb] = 0xff;
+    self[0xc] = level;
+    self[0xd] = level;
+    self[0xe] = level;
+    level = static_cast<unsigned char>(-((__cntlzw(1) >> 5) & 1));
+    level &= 0x3f;
+    self[0xf] = 0xff;
+    float zero = FLOAT_8032FCD8;
+    float minusOne = FLOAT_8032FCDC;
+    float one = FLOAT_8032FCC8;
+
+    *reinterpret_cast<float*>(self + 0x18) = zero;
+    *reinterpret_cast<float*>(self + 0x1c) = zero;
+    *reinterpret_cast<float*>(self + 0x20) = minusOne;
+    self[0x10] = level;
+    self[0x11] = level;
+    self[0x12] = level;
+    level = static_cast<unsigned char>(-((__cntlzw(2) >> 5) & 1));
+    level &= 0x3f;
+    self[0x13] = 0xff;
+    *reinterpret_cast<float*>(self + 0x24) = zero;
+    *reinterpret_cast<float*>(self + 0x28) = zero;
+    *reinterpret_cast<float*>(self + 0x2c) = minusOne;
+    self[0x14] = level;
+    self[0x15] = level;
+    self[0x16] = level;
+    self[0x17] = 0xff;
+    *reinterpret_cast<float*>(self + 0x30) = zero;
+    *reinterpret_cast<float*>(self + 0x34) = zero;
+    *reinterpret_cast<float*>(self + 0x38) = minusOne;
+    *reinterpret_cast<float*>(self + 0x44) = zero;
+    *reinterpret_cast<float*>(self + 0x40) = zero;
+    *reinterpret_cast<float*>(self + 0x3c) = zero;
+    *reinterpret_cast<float*>(self + 0x50) = zero;
+    *reinterpret_cast<float*>(self + 0x4c) = zero;
+    *reinterpret_cast<float*>(self + 0x48) = zero;
+    *reinterpret_cast<float*>(self + 0x5c) = one;
+    *reinterpret_cast<float*>(self + 0x58) = one;
+    *reinterpret_cast<float*>(self + 0x54) = one;
+    *reinterpret_cast<u32*>(self + 0xbc) = 0;
+
+    remaining = 2;
+    while (remaining != 0) {
+        *reinterpret_cast<u32*>(self + 0x2bc) = 0;
+        *reinterpret_cast<u32*>(self + 0x2fc) = 0;
+        *reinterpret_cast<u32*>(self + 0x23c) = 0;
+        *reinterpret_cast<u32*>(self + 0x33c) = 0;
+        *reinterpret_cast<u32*>(self + 0x37c) = 0;
+        *reinterpret_cast<u32*>(self + 0x27c) = 0;
+        *reinterpret_cast<u32*>(self + 0x2c0) = 0;
+        *reinterpret_cast<u32*>(self + 0x300) = 0;
+        *reinterpret_cast<u32*>(self + 0x240) = 0;
+        *reinterpret_cast<u32*>(self + 0x340) = 0;
+        *reinterpret_cast<u32*>(self + 0x380) = 0;
+        *reinterpret_cast<u32*>(self + 0x280) = 0;
+        *reinterpret_cast<u32*>(self + 0x2c4) = 0;
+        *reinterpret_cast<u32*>(self + 0x304) = 0;
+        *reinterpret_cast<u32*>(self + 0x244) = 0;
+        *reinterpret_cast<u32*>(self + 0x344) = 0;
+        *reinterpret_cast<u32*>(self + 0x384) = 0;
+        *reinterpret_cast<u32*>(self + 0x284) = 0;
+        *reinterpret_cast<u32*>(self + 0x2c8) = 0;
+        *reinterpret_cast<u32*>(self + 0x308) = 0;
+        *reinterpret_cast<u32*>(self + 0x248) = 0;
+        *reinterpret_cast<u32*>(self + 0x348) = 0;
+        *reinterpret_cast<u32*>(self + 0x388) = 0;
+        *reinterpret_cast<u32*>(self + 0x288) = 0;
+        *reinterpret_cast<u32*>(self + 0x2cc) = 0;
+        *reinterpret_cast<u32*>(self + 0x30c) = 0;
+        *reinterpret_cast<u32*>(self + 0x24c) = 0;
+        *reinterpret_cast<u32*>(self + 0x34c) = 0;
+        *reinterpret_cast<u32*>(self + 0x38c) = 0;
+        *reinterpret_cast<u32*>(self + 0x28c) = 0;
+        *reinterpret_cast<u32*>(self + 0x2d0) = 0;
+        *reinterpret_cast<u32*>(self + 0x310) = 0;
+        *reinterpret_cast<u32*>(self + 0x250) = 0;
+        *reinterpret_cast<u32*>(self + 0x350) = 0;
+        *reinterpret_cast<u32*>(self + 0x390) = 0;
+        *reinterpret_cast<u32*>(self + 0x290) = 0;
+        *reinterpret_cast<u32*>(self + 0x2d4) = 0;
+        *reinterpret_cast<u32*>(self + 0x314) = 0;
+        *reinterpret_cast<u32*>(self + 0x254) = 0;
+        *reinterpret_cast<u32*>(self + 0x354) = 0;
+        *reinterpret_cast<u32*>(self + 0x394) = 0;
+        *reinterpret_cast<u32*>(self + 0x294) = 0;
+        *reinterpret_cast<u32*>(self + 0x2d8) = 0;
+        *reinterpret_cast<u32*>(self + 0x318) = 0;
+        *reinterpret_cast<u32*>(self + 0x258) = 0;
+        *reinterpret_cast<u32*>(self + 0x358) = 0;
+        *reinterpret_cast<u32*>(self + 0x398) = 0;
+        *reinterpret_cast<u32*>(self + 0x298) = 0;
+        self += 0x20;
+        remaining--;
+    }
+
+    reinterpret_cast<unsigned char*>(this)[0x3bc] = 0;
+}
+/*
+ * --INFO--
+ * PAL Address: 0x8004c588
+ * PAL Size: 280b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void __sinit_p_MaterialEditor_cpp(void)
+{
+    u8* self = reinterpret_cast<u8*>(&MaterialEditorPcs);
+    unsigned int* dst = m_table__18CMaterialEditorPcs;
+    unsigned int* desc0 = m_table_desc0__18CMaterialEditorPcs;
+    unsigned int* desc1 = m_table_desc1__18CMaterialEditorPcs;
+    unsigned int* desc2 = m_table_desc2__18CMaterialEditorPcs;
+    unsigned int* desc3 = m_table_desc3__18CMaterialEditorPcs;
+
+    *reinterpret_cast<void**>(self) = __vt__8CManager;
+    *reinterpret_cast<void**>(self) = __vt__8CProcess;
+    *reinterpret_cast<void**>(self) = __vt__18CMaterialEditorPcs;
+
+    __ct__14CUSBStreamDataFv(self + 0x84);
+    __ct__5ZLISTFv(self + 0xC8);
+    __ct__5ZLISTFv(self + 0xD8);
+    __register_global_object(self, __dt__18CMaterialEditorPcsFv, lbl_8026D338);
+
+    dst[1] = desc0[0];
+    dst[2] = desc0[1];
+    dst[3] = desc0[2];
+    dst[4] = desc1[0];
+    dst[5] = desc1[1];
+    dst[6] = desc1[2];
+    dst[7] = desc2[0];
+    dst[8] = desc2[1];
+    dst[9] = desc2[2];
+    dst[12] = desc3[0];
+    dst[13] = desc3[1];
+    dst[14] = desc3[2];
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8004c6a0
+ * PAL Size: 124b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+CMaterialEditorPcs::~CMaterialEditorPcs()
+{
 }

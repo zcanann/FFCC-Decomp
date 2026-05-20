@@ -1,4 +1,3 @@
-#define FFCC_DEFINE_FUNNYSHAPEPCS_STORAGE
 #include "ffcc/p_FunnyShape.h"
 #include "ffcc/FunnyShape.h"
 #include "ffcc/USBStreamData.h"
@@ -455,7 +454,7 @@ unsigned int lbl_801EA910[5] = {
     0,
 };
 u8 ARRAY_8026D728[0xC];
-u8 FunnyShapePcs[sizeof(CFunnyShapePcs)];
+CFunnyShapePcs FunnyShapePcs;
 
 /*
  * --INFO--

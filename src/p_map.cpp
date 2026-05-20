@@ -381,24 +381,10 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
             *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(&MapMng) + 0x229A8) = 2;
         } else if (mode == 2) {
             char* mapMngBase = reinterpret_cast<char*>(&MapMng);
-            char* mapMngBase2 = mapMngBase + 0x20;
             *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(&MapMng) + 0x229A8) = 3;
-            *reinterpret_cast<void**>(mapMngBase + 0x22A2C) = 0;
-            *reinterpret_cast<void**>(mapMngBase + 0x22A30) = 0;
-            *reinterpret_cast<void**>(mapMngBase + 0x22A34) = 0;
-            *reinterpret_cast<void**>(mapMngBase + 0x22A38) = 0;
-            *reinterpret_cast<void**>(mapMngBase + 0x22A3C) = 0;
-            *reinterpret_cast<void**>(mapMngBase + 0x22A40) = 0;
-            *reinterpret_cast<void**>(mapMngBase + 0x22A44) = 0;
-            *reinterpret_cast<void**>(mapMngBase + 0x22A48) = 0;
-            *reinterpret_cast<void**>(mapMngBase2 + 0x22A2C) = 0;
-            *reinterpret_cast<void**>(mapMngBase2 + 0x22A30) = 0;
-            *reinterpret_cast<void**>(mapMngBase2 + 0x22A34) = 0;
-            *reinterpret_cast<void**>(mapMngBase2 + 0x22A38) = 0;
-            *reinterpret_cast<void**>(mapMngBase2 + 0x22A3C) = 0;
-            *reinterpret_cast<void**>(mapMngBase2 + 0x22A40) = 0;
-            *reinterpret_cast<void**>(mapMngBase2 + 0x22A44) = 0;
-            *reinterpret_cast<void**>(mapMngBase2 + 0x22A48) = 0;
+            for (int i = 0; i < 0x10; i++) {
+                *reinterpret_cast<void**>(mapMngBase + 0x22A2C + i * 4) = 0;
+            }
         } else {
             *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(&MapMng) + 0x229A8) = 1;
         }

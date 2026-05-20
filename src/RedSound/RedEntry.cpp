@@ -1768,7 +1768,7 @@ RedMusicHEAD* CRedEntry::MusicHeadAdd(RedMusicHEAD* musicHead)
 	if (bank != 0) {
 		bank->m_musicHead = musicHead;
 		addedHead = musicHead;
-		bank->m_size = musicHead->m_size;
+		bank->m_size = RedMusicHeadGetSize(musicHead);
 		bank->m_id = static_cast<int>(musicHead->m_musicNo);
 		MusicHistoryAdd();
 		bank->m_historyNo = REDSOUND_HISTORY_MOST_RECENT;

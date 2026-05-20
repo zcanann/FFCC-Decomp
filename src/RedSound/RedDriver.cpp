@@ -2649,7 +2649,7 @@ int CRedDriver::SetMusicData(void* musicData)
     musicNo = REDSOUND_MUSIC_ID_NONE;
     if (RedMusicHeadHasValidSignature(header)) {
         memcpy(&localHeader, musicData, REDSOUND_MUSIC_HEADER_SIZE);
-        headerSize = localHeader.m_size;
+        headerSize = RedMusicHeadGetSize(&localHeader);
         header = (RedMusicHEAD*)RedNew(headerSize);
         if (header != 0) {
             memcpy(header, musicData, headerSize);
@@ -2803,7 +2803,7 @@ int CRedDriver::MusicPlay(void* musicData, int volume, int mode)
     musicNo = REDSOUND_MUSIC_ID_NONE;
     if (RedMusicHeadHasValidSignature(header)) {
         memcpy(&localHeader, header, REDSOUND_MUSIC_HEADER_SIZE);
-        headerSize = localHeader.m_size;
+        headerSize = RedMusicHeadGetSize(&localHeader);
         copiedHeader = (RedMusicHEAD*)RedNew(headerSize);
         if (copiedHeader == 0) {
             return musicNo;
@@ -2850,7 +2850,7 @@ int CRedDriver::MusicCrossPlay(void* musicData, int volume, int mode)
     musicNo = REDSOUND_MUSIC_ID_NONE;
     if (RedMusicHeadHasValidSignature(header)) {
         memcpy(&localHeader, header, REDSOUND_MUSIC_HEADER_SIZE);
-        headerSize = localHeader.m_size;
+        headerSize = RedMusicHeadGetSize(&localHeader);
         copiedHeader = (RedMusicHEAD*)RedNew(headerSize);
         if (copiedHeader == 0) {
             return musicNo;
@@ -2897,7 +2897,7 @@ int CRedDriver::MusicNextPlay(void* musicData, int volume, int mode)
     musicNo = REDSOUND_MUSIC_ID_NONE;
     if (RedMusicHeadHasValidSignature(header)) {
         memcpy(&localHeader, header, REDSOUND_MUSIC_HEADER_SIZE);
-        headerSize = localHeader.m_size;
+        headerSize = RedMusicHeadGetSize(&localHeader);
         copiedHeader = (RedMusicHEAD*)RedNew(headerSize);
         if (copiedHeader == 0) {
             return musicNo;

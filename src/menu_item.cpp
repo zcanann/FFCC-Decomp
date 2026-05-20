@@ -399,7 +399,7 @@ void CMenuPcs::ItemDraw()
             float fillW = alpha * w;
             if (fillW > FLOAT_80332e60) {
                 DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(
-                    &MenuPcs, 0, x, y, fillW, h, u, v, barColors, FLOAT_80332e64, FLOAT_80332e64, 0.0f);
+                    &MenuPcs, 0, x, y, fillW, h, u, v, barColors, FLOAT_80332e64, FLOAT_80332e64, FLOAT_80332e60);
                 x += fillW;
                 u += fillW;
             }
@@ -425,7 +425,7 @@ void CMenuPcs::ItemDraw()
 
                 float remainW = (float)((double)(DOUBLE_80332e68 / (double)*(int*)(entry + 0x14)) * (double)w);
                 DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(
-                    &MenuPcs, 0, x, y, remainW, h, u, v, fadeColors, FLOAT_80332e64, FLOAT_80332e64, 0.0f);
+                    &MenuPcs, 0, x, y, remainW, h, u, v, fadeColors, FLOAT_80332e64, FLOAT_80332e64, FLOAT_80332e60);
             }
 
             SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(&MenuPcs, 0);
@@ -520,9 +520,9 @@ void CMenuPcs::ItemDraw()
 
         s16 itemId = *(s16*)(caravanWork + menuIndex * 2 + 0xB6);
         if (itemId > 0) {
-            int iconY = (int)((float)iconEntry[1] + 6.0f - FLOAT_80332e64);
+            int iconY = (int)((float)(iconEntry[1] + 6) - FLOAT_80332e64);
             int iconX = (int)(float)(iconEntry[0] + iconEntry[2] - 0x10);
-            DrawSingleIcon__8CMenuPcsFiiifif(this, itemId, iconX, iconY, *(float*)(listStart + 8), 0, 0.0f);
+            DrawSingleIcon__8CMenuPcsFiiifif(this, itemId, iconX, iconY, *(float*)(listStart + 8), 0, FLOAT_80332e60);
         }
     }
 

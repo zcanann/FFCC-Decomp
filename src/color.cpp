@@ -25,6 +25,19 @@ CColor3::CColor3(CColor3& other)
  * Address:	TODO
  * Size:	TODO
  */
+CColor3::CColor3(unsigned char r, unsigned char g, unsigned char b)
+{
+	this->color.r = r;
+	this->color.g = g;
+	this->color.b = b;
+	this->color.a = 0xFF;
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
 CColor3::CColor3()
 {
 }
@@ -69,4 +82,17 @@ CColor::CColor(unsigned char r, unsigned char g, unsigned char b, unsigned char 
  */
 CColor::CColor()
 {
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CColor::Identity()
+{
+	this->color.r = 0xFF;
+	this->color.g = 0xFF;
+	this->color.b = 0xFF;
+	this->color.a = 0xFF;
 }

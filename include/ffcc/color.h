@@ -11,6 +11,7 @@ public:
 	CColor(CColor& other);
 	CColor(_GXColor& other);
 	operator _GXColor();
+	void Identity();
 
 	GXColor color;
 };
@@ -19,6 +20,7 @@ class CColor3
 {
 public:
 	CColor3();
+	CColor3(unsigned char r, unsigned char g, unsigned char b);
 	CColor3(CColor3& other);
 	CColor3(_GXColor& other);
 

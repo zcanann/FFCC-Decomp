@@ -39,7 +39,6 @@ extern "C" void __dl__FPv(void*);
 extern "C" int __cntlzw(unsigned int);
 extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void* __nw__11CTextureSetFUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
-extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void __dt__Q29CCharaPcs7CHandleFv(void*, int);
 extern "C" void __ct__6CColorFv(void*);
 extern "C" void __construct_array(void*, void (*)(void*), void (*)(void*, int), unsigned long, unsigned long);
@@ -1002,7 +1001,7 @@ void CCharaPcs::Reset(CCharaPcs::RESET mode)
     for (int i = 0; i < 4; i++) {
         CameraCountAt(this, i) = 0;
         if (CameraDataAt(this, i) != 0) {
-            __dla__FPv(CameraDataAt(this, i));
+            delete[] static_cast<u8*>(CameraDataAt(this, i));
             CameraDataAt(this, i) = 0;
         }
     }
@@ -1807,7 +1806,7 @@ void CCharaPcs::LoadCam(int index, char* fileName)
     void*& cameraBuffer = cameraData[index];
 
     if (cameraBuffer != 0) {
-        __dla__FPv(cameraBuffer);
+        delete[] static_cast<u8*>(cameraBuffer);
         cameraBuffer = 0;
     }
 
@@ -1829,8 +1828,7 @@ void CCharaPcs::LoadCam(int index, char* fileName)
         cameraCounts[index] = static_cast<int>(chunk.m_arg0);
 
         CMemory::CStage* stage = *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(this) + 0xD4);
-        cameraBuffer = __nwa__FUlPQ27CMemory6CStagePci(
-            static_cast<unsigned long>(cameraCounts[index] << 5), stage, s_p_chara_cpp, 0x4D4);
+        cameraBuffer = new (stage, s_p_chara_cpp, 0x4D4) u8[static_cast<unsigned long>(cameraCounts[index] << 5)];
 
         float* values = reinterpret_cast<float*>(cameraBuffer);
         for (int i = 0; i < cameraCounts[index] * 8; i++) {

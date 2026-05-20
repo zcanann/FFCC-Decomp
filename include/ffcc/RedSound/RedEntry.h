@@ -441,6 +441,9 @@ enum RedWaveHeadLayout {
 	((RedWaveDATA*)((unsigned char*)(waveHead) + (waveHead)->m_waveOffsets[(waveIndex)]))
 
 #define RedWaveHeadGetBodyData(waveData, waveHeaderSize) ((u8*)(waveData) + (waveHeaderSize))
+#define RedWaveHeadHasValidSignature(waveHead)                                                     \
+	((waveHead)->m_signature[REDSOUND_WAVE_SIGNATURE_MAGIC0_INDEX] == REDSOUND_WAVE_SIGNATURE_MAGIC0 && \
+	 (waveHead)->m_signature[REDSOUND_WAVE_SIGNATURE_MAGIC1_INDEX] == REDSOUND_WAVE_SIGNATURE_MAGIC1)
 
 #define RedMusicHeadFromBankAddress(address) reinterpret_cast<RedMusicHEAD*>(address)
 #define RedMusicHeadFromData(musicData) reinterpret_cast<RedMusicHEAD*>(musicData)

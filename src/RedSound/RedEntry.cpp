@@ -571,8 +571,7 @@ int CRedEntry::WaveOldClear(int offset, int maxSize)
  */
 int CRedEntry::WaveHeadAdd(int waveBankNo, RedWaveHeadWD* waveHead, int waveNo)
 {
-	if ((waveHead->m_signature[REDSOUND_WAVE_SIGNATURE_MAGIC0_INDEX] != REDSOUND_WAVE_SIGNATURE_MAGIC0) ||
-	    (waveHead->m_signature[REDSOUND_WAVE_SIGNATURE_MAGIC1_INDEX] != REDSOUND_WAVE_SIGNATURE_MAGIC1)) {
+	if (!RedWaveHeadHasValidSignature(waveHead)) {
 		if (RedReportPrintIsEnabled()) {
 			OSReport(sRedEntryWaveHeaderBrokenFmt, sRedEntryLogPrefix, sRedEntryHeaderErrorColor, sRedEntryResetColor);
 			fflush(__files + 1);

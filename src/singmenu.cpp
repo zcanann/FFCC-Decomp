@@ -101,10 +101,6 @@ extern "C" void* __nw__11CTextureSetFUlPQ27CMemory6CStagePci(unsigned long, CMem
 extern "C" CCharaPcs::CHandle* __ct__Q29CCharaPcs7CHandleFv(CCharaPcs::CHandle*);
 extern "C" void __dt__Q29CCharaPcs7CHandleFv(void*, int);
 extern "C" CTextureSet* __ct__11CTextureSetFv(CTextureSet*);
-extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
-extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
-extern "C" void __dl__FPv(void*);
-extern "C" void __dla__FPv(void*);
 extern "C" void Create__11CTextureSetFPvPQ27CMemory6CStageiP13CAmemCacheSetii(CTextureSet*, void*, CMemory::CStage*, int, void*, int, int);
 extern "C" int Find__11CTextureSetFPc(CTextureSet*, char*);
 extern "C" char* GetLangString__5CGameFv(void*);
@@ -1039,25 +1035,25 @@ void CMenuPcs::destroySingleMenu()
 
     void* ptr = *reinterpret_cast<void**>(self + 0x814);
     if (ptr != 0) {
-        __dla__FPv(ptr);
+        delete[] static_cast<u8*>(ptr);
         *reinterpret_cast<void**>(self + 0x814) = 0;
     }
 
     ptr = *reinterpret_cast<void**>(self + 0x850);
     if (ptr != 0) {
-        __dl__FPv(ptr);
+        delete static_cast<SingleFadeState*>(ptr);
         *reinterpret_cast<void**>(self + 0x850) = 0;
     }
 
     ptr = *reinterpret_cast<void**>(self + 0x82C);
     if (ptr != 0) {
-        __dl__FPv(ptr);
+        delete[] static_cast<u8*>(ptr);
         *reinterpret_cast<void**>(self + 0x82C) = 0;
     }
 
     ptr = *reinterpret_cast<void**>(self + 0x848);
     if (ptr != 0) {
-        __dl__FPv(ptr);
+        delete[] static_cast<u8*>(ptr);
         *reinterpret_cast<void**>(self + 0x848) = 0;
     }
 
@@ -1112,7 +1108,7 @@ void CMenuPcs::SingMenuInit()
     if (Game.m_gameWork.m_menuStageMode != 0) {
         stage = *reinterpret_cast<CMemory::CStage**>(self + 0xF4);
     }
-    *reinterpret_cast<void**>(self + 0x814) = __nwa__FUlPQ27CMemory6CStagePci(0x50, stage, s_singmenu_cpp_801de8d4, 0x5DD);
+    *reinterpret_cast<void**>(self + 0x814) = new (stage, s_singmenu_cpp_801de8d4, 0x5DD) u8[0x50];
 
     int state = *reinterpret_cast<int*>(self + 0x814);
     *reinterpret_cast<float*>(state + 0x24) = FLOAT_8033294c;
@@ -1153,21 +1149,21 @@ void CMenuPcs::SingMenuInit()
     if (Game.m_gameWork.m_menuStageMode != 0) {
         stage = *reinterpret_cast<CMemory::CStage**>(self + 0xF4);
     }
-    *reinterpret_cast<void**>(self + 0x850) = __nw__FUlPQ27CMemory6CStagePci(0x1008, stage, s_singmenu_cpp_801de8d4, 0x605);
+    *reinterpret_cast<void**>(self + 0x850) = new (stage, s_singmenu_cpp_801de8d4, 0x605) SingleFadeState;
     memset(*reinterpret_cast<void**>(self + 0x850), 0, 0x1008);
 
     stage = *reinterpret_cast<CMemory::CStage**>(self + 0xEC);
     if (Game.m_gameWork.m_menuStageMode != 0) {
         stage = *reinterpret_cast<CMemory::CStage**>(self + 0xF4);
     }
-    *reinterpret_cast<void**>(self + 0x82C) = __nw__FUlPQ27CMemory6CStagePci(0x48, stage, s_singmenu_cpp_801de8d4, 0x609);
+    *reinterpret_cast<void**>(self + 0x82C) = new (stage, s_singmenu_cpp_801de8d4, 0x609) u8[0x48];
     memset(*reinterpret_cast<void**>(self + 0x82C), 0, 0x48);
 
     stage = *reinterpret_cast<CMemory::CStage**>(self + 0xEC);
     if (Game.m_gameWork.m_menuStageMode != 0) {
         stage = *reinterpret_cast<CMemory::CStage**>(self + 0xF4);
     }
-    *reinterpret_cast<void**>(self + 0x848) = __nw__FUlPQ27CMemory6CStagePci(0xC, stage, s_singmenu_cpp_801de8d4, 0x60D);
+    *reinterpret_cast<void**>(self + 0x848) = new (stage, s_singmenu_cpp_801de8d4, 0x60D) u8[0xC];
     memset(*reinterpret_cast<void**>(self + 0x848), 0, 0xC);
 
     *reinterpret_cast<s16*>(self + 0x866) = 0;
@@ -1251,22 +1247,22 @@ void CMenuPcs::drawSingleMenu()
             }
 
             if (*reinterpret_cast<void**>(self + 0x814) != 0) {
-                __dla__FPv(*reinterpret_cast<void**>(self + 0x814));
+                delete[] static_cast<u8*>(*reinterpret_cast<void**>(self + 0x814));
                 *reinterpret_cast<void**>(self + 0x814) = 0;
             }
 
             if (*reinterpret_cast<void**>(self + 0x82C) != 0) {
-                __dl__FPv(*reinterpret_cast<void**>(self + 0x82C));
+                delete[] static_cast<u8*>(*reinterpret_cast<void**>(self + 0x82C));
                 *reinterpret_cast<void**>(self + 0x82C) = 0;
             }
 
             if (*reinterpret_cast<void**>(self + 0x850) != 0) {
-                __dl__FPv(*reinterpret_cast<void**>(self + 0x850));
+                delete static_cast<SingleFadeState*>(*reinterpret_cast<void**>(self + 0x850));
                 *reinterpret_cast<void**>(self + 0x850) = 0;
             }
 
             if (*reinterpret_cast<void**>(self + 0x848) != 0) {
-                __dl__FPv(*reinterpret_cast<void**>(self + 0x848));
+                delete[] static_cast<u8*>(*reinterpret_cast<void**>(self + 0x848));
                 *reinterpret_cast<void**>(self + 0x848) = 0;
             }
 

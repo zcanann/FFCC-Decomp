@@ -1,4 +1,5 @@
 #include "ffcc/menu_arti.h"
+#include "ffcc/color.h"
 #include "ffcc/fontman.h"
 #include "ffcc/pad.h"
 #include "ffcc/game.h"
@@ -59,7 +60,6 @@ extern "C" void DrawCursor__8CMenuPcsFiif(CMenuPcs*, int, int, float);
 extern "C" void DrawHelpMessage__8CMenuPcsFiP5CFontii8_GXColoriff(CMenuPcs*, int, CFont*, int, int, GXColor, int, float, float);
 extern "C" void DrawFont__8CMenuPcsFii8_GXColoriPcff(CMenuPcs*, int, int, GXColor, int, const char*, float, float);
 extern "C" float CalcCenteringPos__8CMenuPcsFPcP5CFont(CMenuPcs*, const char*, CFont*);
-extern "C" void* __ct__6CColorFUcUcUcUc(void*, unsigned char, unsigned char, unsigned char, unsigned char);
 extern "C" const char* GetMenuStr__8CMenuPcsFi(CMenuPcs*, int);
 extern CMenuPcs MenuPcs;
 
@@ -420,9 +420,8 @@ void CMenuPcs::ArtiDraw()
 	const ArtiFlatData* flatData = reinterpret_cast<const ArtiFlatData*>(&Game.m_cFlatDataArr[1]);
 	for (int i = 0; i < 8; i++) {
 		u8 alpha = (u8)(255.0f * *(float*)(textEntry + 8));
-		GXColor color;
-		__ct__6CColorFUcUcUcUc(&color, 0xFF, 0xFF, 0xFF, alpha);
-		listFont->SetColor(color);
+		CColor color(0xFF, 0xFF, 0xFF, alpha);
+		listFont->SetColor(color.color);
 
 		int menuIndex = i + *(short*)(GetArtiStateBase(this) + 0x34);
 		short itemCount = *(short*)(scriptFood + menuIndex * 2 + 0x136);
@@ -491,16 +490,16 @@ void CMenuPcs::ArtiDraw()
 
 	if (selectedArtifactId == -1) {
 		const char* text = GetMenuStr__8CMenuPcsFi(this, 0x14);
-		GXColor color;
-		__ct__6CColorFUcUcUcUc(&color, 0xFF, 0xFF, 0xFF, helpAlpha);
+		CColor color(0xFF, 0xFF, 0xFF, helpAlpha);
 		int x = (int)CalcCenteringPos__8CMenuPcsFPcP5CFont(this, text, helpFont);
-		DrawFont__8CMenuPcsFii8_GXColoriPcff(this, x, (int)FLOAT_80332fcc, color, 10, text, FLOAT_80332fac, FLOAT_80332fd0);
+		DrawFont__8CMenuPcsFii8_GXColoriPcff(
+			this, x, (int)FLOAT_80332fcc, color.color, 10, text, FLOAT_80332fac, FLOAT_80332fd0);
 	} else {
-		GXColor helpColor;
-		__ct__6CColorFUcUcUcUc(&helpColor, 0xFF, 0xFF, 0xFF, helpAlpha);
+		CColor helpColor(0xFF, 0xFF, 0xFF, helpAlpha);
 		int x = (int)-(helpWidth * FLOAT_80332fd8 - FLOAT_80332fd4);
 		DrawHelpMessage__8CMenuPcsFiP5CFontii8_GXColoriff(
-			this, selectedArtifactId, helpFont, x, (int)FLOAT_80332fcc, helpColor, 10, FLOAT_80332fac, FLOAT_80332fd0);
+			this, selectedArtifactId, helpFont, x, (int)FLOAT_80332fcc, helpColor.color, 10, FLOAT_80332fac,
+			FLOAT_80332fd0);
 	}
 }
 

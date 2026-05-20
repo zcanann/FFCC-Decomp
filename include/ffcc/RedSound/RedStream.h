@@ -96,6 +96,7 @@ struct RedStreamFile {
 #define RedStreamFileGetSampleByte(streamFile, offset) ((s8*)(streamFile))[(offset)]
 #define RedStreamHeaderHasNoLoop(header) ((header)->m_loopStart < REDSOUND_STREAM_LOOP_ENABLED_MIN)
 #define RedStreamHeaderIsStereo(header) ((header)->m_channelCount == REDSOUND_STREAM_STEREO_CHANNEL_COUNT)
+#define RedStreamHeaderGetAramSize(header) ((header)->m_channelCount * REDSOUND_STREAM_STEREO_PLANE_SIZE)
 
 #define RedStreamBufferGetPage(buffer, pageIndex) ((buffer) + (pageIndex) * REDSOUND_STREAM_PAGE_SIZE)
 

@@ -471,7 +471,7 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 	memcpy(&streamData->m_header, streamHeader, REDSOUND_STREAM_HEAD_SIZE);
 	streamData->m_track = SearchSeEmptyTrack(streamData->m_header.m_channelCount, REDSOUND_STREAM_ERASE_TRACK, 0);
 	streamData->m_buffer = (u8*)RedNew(REDSOUND_STREAM_TRANSFER_BUFFER_ALLOC_SIZE);
-	aramSize = streamData->m_header.m_channelCount * REDSOUND_STREAM_STEREO_PLANE_SIZE;
+	aramSize = RedStreamHeaderGetAramSize(&streamData->m_header);
 	if (c_RedMemory.GetABufferSize() < REDSOUND_STREAM_ARAM_HIGH_THRESHOLD) {
 		aramOffset = REDSOUND_STREAM_ARAM_LOW_OFFSET;
 	} else {
@@ -597,7 +597,7 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 			if (RedReportPrintIsEnabled()) {
 				OSReport(sRedStreamAramMemoryDidntCreateFmt,
 				         sRedStreamLogPrefix, sRedStreamLogWarnColor,
-				         streamData->m_header.m_channelCount * REDSOUND_STREAM_STEREO_PLANE_SIZE,
+				         RedStreamHeaderGetAramSize(&streamData->m_header),
 				         sRedStreamLogReset);
 				fflush(__files + 1);
 			}

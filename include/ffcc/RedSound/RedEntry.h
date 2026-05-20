@@ -437,6 +437,8 @@ enum RedWaveHeadLayout {
 #define RedWaveHeadGetWaveData(waveHead, waveIndex)                                               \
 	((RedWaveDATA*)((unsigned char*)(waveHead) + (waveHead)->m_waveOffsets[(waveIndex)]))
 
+#define RedWaveHeadGetBodyData(waveData, waveHeaderSize) ((u8*)(waveData) + (waveHeaderSize))
+
 #define RedMusicHeadFromBankAddress(address) reinterpret_cast<RedMusicHEAD*>(address)
 #define RedMusicHeadFromData(musicData) reinterpret_cast<RedMusicHEAD*>(musicData)
 

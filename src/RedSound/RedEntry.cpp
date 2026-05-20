@@ -732,7 +732,7 @@ int CRedEntry::SetWaveData(int waveBankNo, void* waveData, int waveDataSize)
 			    RedWaveHeadGetTableSize(RedWaveHeadFromData(waveData)) + REDSOUND_WAVE_HEADER_COPY_BASE_SIZE;
 			remainingWaveSize = RedWaveHeadFromData(waveData)->m_waveSize;
 			waveDataSize -= waveHeaderCopySize;
-			waveBodyData = (u8*)waveData + waveHeaderCopySize;
+			waveBodyData = RedWaveHeadGetBodyData(waveData, waveHeaderCopySize);
 		}
 	} else {
 		waveAramAddress = m_waveLoadAddress;

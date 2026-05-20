@@ -8,14 +8,12 @@
 
 extern "C" void __ct__Q26CChara9CAnimNodeFv(void*);
 extern "C" void __dt__Q26CChara9CAnimNodeFv(void*, int);
-extern "C" void __dla__FPv(void*);
 extern "C" const char s_CChara_CAnim_801DA970[] = "CChara::CAnim";
 extern "C" const char s_charaAnimSourceFile[] = "chara_anim.cpp";
 extern "C" const char s_charaAnimAllocWarn[32] =
     "\214\303\202\242\203\101\203\152\203\201\201\133\203\126\203\207\203\223"
     "\214\140\216\256\202\305\202\267\201\102\n";
 extern "C" void gqrInit__6CCharaFUlUlUl(void*, unsigned long, unsigned long, unsigned long);
-extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 extern "C" void SetGroup__7CMemoryFPvi(CMemory*, void*, int);
 extern "C" void CopyFromAMemorySync__7CMemoryFPvPvUl(CMemory*, void*, void*, unsigned long);
 extern "C" int TryReleaseAnimBank__9CCharaPcsFi(void*, int);
@@ -180,7 +178,7 @@ CChara::CAnim::~CAnim()
 	}
 
 	if (m_bank != 0) {
-		__dla__FPv(m_bank);
+		delete[] static_cast<unsigned char*>(m_bank);
 		m_bank = 0;
 	}
 }
@@ -373,8 +371,8 @@ void CChara::CAnimNode::Interp(CChara::CAnim* anim, SRT* srt, float frame)
 {
 	if (anim->m_bank == 0) {
 		while (anim->m_bank == 0) {
-			anim->m_bank = _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
-			    &Memory, anim->m_bankSize, anim->m_stage, const_cast<char*>(s_charaAnimSourceFile), 0x160, 1);
+			anim->m_bank =
+			    new (anim->m_stage, const_cast<char*>(s_charaAnimSourceFile), 0x160) unsigned char[anim->m_bankSize];
 
 			if (anim->m_bank != 0) {
 				break;

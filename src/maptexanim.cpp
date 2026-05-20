@@ -25,7 +25,6 @@ extern "C" void __ct__4CRefFv(void*);
 extern "C" void __dt__4CRefFv(void*, int);
 extern "C" CMapTexAnim* __dt__11CMapTexAnimFv(CMapTexAnim*, short);
 extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
-extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void __dl__FPv(void*);
 extern "C" void* __RTTI__11CMapTexAnim_8032E690;
 extern "C" void* PTR_PTR_s_CMapTexAnim[] = {
@@ -308,10 +307,9 @@ void CMapTexAnimSet::Create(CChunkFile& chunkFile, CMaterialSet* materialSet, CT
 
             chunkFile.Get4();
             chunkFile.Get4();
-            unsigned short* frameTable = reinterpret_cast<unsigned short*>(__nwa__FUlPQ27CMemory6CStagePci(
-                static_cast<unsigned long>(ref->m_frameCount << 1),
-                *reinterpret_cast<CMemory::CStage**>(&MapMng),
-                const_cast<char*>(s_maptexanim_cpp_801d7ec4), 0x3B));
+            unsigned short* frameTable =
+                new (*reinterpret_cast<CMemory::CStage**>(&MapMng), const_cast<char*>(s_maptexanim_cpp_801d7ec4), 0x3B)
+                    unsigned short[ref->m_frameCount];
             ref->m_frameTable = frameTable;
 
             for (int i = 0; i < ref->m_frameCount; i++) {
@@ -353,7 +351,7 @@ extern "C" CMapTexAnim* __dt__11CMapTexAnimFv(CMapTexAnim* anim, short shouldDel
 
         *reinterpret_cast<void**>(p) = PTR_PTR_s_CMapTexAnim;
 
-        __dl__FPv(*reinterpret_cast<void**>(p + 0x20));
+        delete[] *reinterpret_cast<unsigned short**>(p + 0x20);
         *reinterpret_cast<void**>(p + 0x20) = 0;
 
         if ((reinterpret_cast<int>(anim) + 0x24) != 0) {

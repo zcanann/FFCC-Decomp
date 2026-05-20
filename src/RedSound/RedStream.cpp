@@ -781,7 +781,7 @@ void StreamControl()
 								streamResult = 1;
 							}
 						}
-						streamData->m_fileCursor += streamData->m_header.m_channelCount * REDSOUND_STREAM_PAGE_SIZE;
+						streamData->m_fileCursor += RedStreamHeaderGetPageAdvance(&streamData->m_header);
 						if (streamData->m_fileCursor >= streamData->m_fileSize) {
 							streamData->m_fileCursor -= streamData->m_fileSize;
 						}

@@ -18,6 +18,11 @@ class CGItemObj : public CGPrgObj
 public:
 	struct CCFS
 	{
+		int m_arg0;
+		unsigned int m_modelId;
+		unsigned int m_modelParam;
+		int m_itemJumpCountdown;
+		char* m_memoryCapsuleName;
 	};
 
 	void onCreate();

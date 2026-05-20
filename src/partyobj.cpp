@@ -30,7 +30,7 @@ extern "C" CGObject* FindGObjFirst__13CFlatRuntime2Fv(void*);
 extern "C" CGObject* FindGObjNext__13CFlatRuntime2FP8CGObject(void*, CGObject*);
 extern "C" void onPush__9CGBaseObjFP9CGBaseObji(CGBaseObj*, CGBaseObj*, int);
 extern "C" void* CreateFromScript__9CGItemObjFiiiP8CGObjectfPQ29CGItemObj4CCFS(
-    int type, int createMode, int itemId, CGObject* owner, float arg, void* cfs);
+    int type, int createMode, int itemId, CGObject* owner, float arg, CGItemObj::CCFS* cfs);
 extern "C" void ResetParticleWork__13CFlatRuntime2Fii(void*, int, int);
 extern "C" void SetParticleWorkPos__13CFlatRuntime2FR3Vecf(void*, Vec&, float);
 extern "C" void SetParticleWorkTrace__13CFlatRuntime2FPQ212CFlatRuntime7CObject(void*, void*);
@@ -1276,22 +1276,31 @@ void CGPartyObj::onAnimPoint(int no, int dataNo)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGPartyObj::enableAttackCol(int attackNo, int onOff, int isFriendly)
+void CGPartyObj::enableAttackCol(int enabled, int isFriendly, int hitMask)
 {
-	(void)attackNo;
 	unsigned char* self = reinterpret_cast<unsigned char*>(this);
-	if (onOff == 0) {
+	if (enabled != 0) {
+		resetIgnoreHit();
+		bool col0Enabled = false;
+		if (isFriendly == 0 || (hitMask & 1) != 0) {
+			col0Enabled = true;
+		}
+		bool col1Enabled = false;
+		*reinterpret_cast<unsigned int*>(self + 0x20C) = col0Enabled != false;
+		if (isFriendly != 0 && (hitMask & 2) != 0) {
+			col1Enabled = true;
+		}
+		bool col2Enabled = false;
+		*reinterpret_cast<unsigned int*>(self + 0x23C) = col1Enabled != false;
+		if (isFriendly != 0 && (hitMask & 4) != 0) {
+			col2Enabled = true;
+		}
+		*reinterpret_cast<unsigned int*>(self + 0x26C) = col2Enabled != false;
+	} else {
 		*reinterpret_cast<int*>(self + 0x20C) = 0;
 		*reinterpret_cast<int*>(self + 0x23C) = 0;
 		*reinterpret_cast<int*>(self + 0x26C) = 0;
-		return;
 	}
-
-	resetIgnoreHit();
-	unsigned int hitMask = (isFriendly != 0) ? 7u : 1u;
-	*reinterpret_cast<unsigned int*>(self + 0x20C) = (hitMask & 1u) ? 1u : 0u;
-	*reinterpret_cast<unsigned int*>(self + 0x23C) = (hitMask & 2u) ? 1u : 0u;
-	*reinterpret_cast<unsigned int*>(self + 0x26C) = (hitMask & 4u) ? 1u : 0u;
 }
 
 /*
@@ -2606,7 +2615,7 @@ void CGPartyObj::putItem(int)
 
 	int itemId = PartyData(this).weaponItem;
 	void* created = CreateFromScript__9CGItemObjFiiiP8CGObjectfPQ29CGItemObj4CCFS(
-	    0, 9, itemId, this, FLOAT_80331a78, nullptr);
+	    0, 9, itemId, this, FLOAT_80331a78, (CGItemObj::CCFS*)0);
 	if (created == nullptr) {
 		return;
 	}
@@ -2634,7 +2643,7 @@ void CGPartyObj::putGil(int amount)
 	}
 
 	void* created = CreateFromScript__9CGItemObjFiiiP8CGObjectfPQ29CGItemObj4CCFS(
-	    2, 1, amount, this, FLOAT_80331a78, nullptr);
+	    2, 1, amount, this, FLOAT_80331a78, (CGItemObj::CCFS*)0);
 	if (created == nullptr) {
 		return;
 	}
@@ -3200,13 +3209,13 @@ void CGPartyObj::setAlive(int restoreDamageCol, int keepTarget)
  */
 void CGPartyObj::PutMemoryCapsule(int arg0, int arg1, int arg2, int arg3, char* arg4)
 {
-	int args[5];
-	args[0] = arg0;
-	args[1] = arg1;
-	args[2] = arg2;
-	args[3] = arg3;
-	args[4] = reinterpret_cast<int>(arg4);
-	CreateFromScript__9CGItemObjFiiiP8CGObjectfPQ29CGItemObj4CCFS(0, 2, 399, this, FLOAT_80331a78, args);
+	CGItemObj::CCFS ccfs;
+	ccfs.m_arg0 = arg0;
+	ccfs.m_modelId = arg1;
+	ccfs.m_modelParam = arg2;
+	ccfs.m_itemJumpCountdown = arg3;
+	ccfs.m_memoryCapsuleName = arg4;
+	CreateFromScript__9CGItemObjFiiiP8CGObjectfPQ29CGItemObj4CCFS(0, 2, 399, this, FLOAT_80331a78, &ccfs);
 }
 
 /*

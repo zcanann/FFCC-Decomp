@@ -983,16 +983,16 @@ CGPrgObj* CGItemObj::CreateFromScript(
 			*(void**)(itemSelf + 0x564) = handle;
 			Add__Q29CCharaPcs7CHandleFv(*(void**)(itemSelf + 0x564));
 
-			unsigned int* ccfsData = (unsigned int*)ccfs;
-			LoadModelASync__Q29CCharaPcs7CHandleFiUlUl(*(void**)(itemSelf + 0x564), 2, ccfsData[1], ccfsData[2]);
+			LoadModelASync__Q29CCharaPcs7CHandleFiUlUl(
+			    *(void**)(itemSelf + 0x564), 2, ccfs->m_modelId, ccfs->m_modelParam);
 
 			if ((unsigned int)System.m_execParam >= 3U) {
 				Printf__7CSystemFPce(&System, const_cast<char*>(DAT_801dcf64));
 			}
 
-			*(int*)(itemSelf + 0x56C) = (int)ccfsData[3];
-			*(int*)(itemSelf + 0x570) = (int)ccfsData[4];
-			*(int*)(itemSelf + 0x574) = (int)ccfsData[0];
+			*(int*)(itemSelf + 0x56C) = ccfs->m_itemJumpCountdown;
+			*(char**)(itemSelf + 0x570) = ccfs->m_memoryCapsuleName;
+			*(int*)(itemSelf + 0x574) = ccfs->m_arg0;
 		}
 	}
 

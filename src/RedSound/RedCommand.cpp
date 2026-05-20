@@ -169,11 +169,6 @@ static int _SePlayStart(RedSeINFO* seInfo, int seId, int sepId, int pan, int vol
 static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int musicId, int volume,
                                      int mode);
 
-static inline void RedTrackAdsrFillDefault(RedAdsrDATA* adsr)
-{
-	memset(adsr, REDSOUND_TRACK_ADSR_DEFAULT_BYTE, REDSOUND_TRACK_ADSR_SIZE);
-}
-
 /*
  * --INFO--
  * PAL Address: 0x801ca038
@@ -943,7 +938,7 @@ static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* wav
 		track->m_portamentPitch = REDSOUND_TRACK_PORTAMENT_PITCH_NONE;
 		track->m_note.m_allocFlags = REDSOUND_NOTE_ALLOC_NONE;
 		track->m_voiceSwitch = REDSOUND_VOICE_SWITCH_MUSIC_DEFAULT;
-		RedTrackAdsrFillDefault(&track->m_adsr);
+		memset(&track->m_adsr, REDSOUND_TRACK_ADSR_DEFAULT_BYTE, REDSOUND_TRACK_ADSR_SIZE);
 
 		remainingTrackCount--;
 		musicTrackNo++;

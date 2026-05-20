@@ -199,7 +199,7 @@ static void _EraseAttribute(int eraseTrack, int attrMask)
 
 			trackNo = track->m_trackNo;
 			RedVoiceDataGet(trackNo)->m_stateFlags &= REDSOUND_VOICE_STATE_CLEAR_PLAYING_MASK;
-			RedVoiceDataGet(trackNo)->m_voiceSwitch &= REDSOUND_VOICE_SWITCH_CLEAR_SE_MASK;
+			RedVoiceDataGet(trackNo)->m_voiceSwitch &= REDSOUND_VOICE_SWITCH_CLEAR_PAUSE_MASK;
 			RedVoiceDataGet(trackNo)->m_flags &= REDSOUND_VOICE_FLAGS_CLEAR_ACTIVE_MASK;
 			RedVoiceDataGet(trackNo)->m_flags |= REDSOUND_VOICE_FLAGS_RELEASED;
 			RedVoiceDataGet(trackNo)->m_active = REDSOUND_VOICE_ACTIVE_OFF;
@@ -270,7 +270,7 @@ static int _EraseTime(int eraseTrack)
 
 			trackNo = track->m_trackNo;
 			RedVoiceDataGet(trackNo)->m_stateFlags &= REDSOUND_VOICE_STATE_CLEAR_PLAYING_MASK;
-			RedVoiceDataGet(trackNo)->m_voiceSwitch &= REDSOUND_VOICE_SWITCH_CLEAR_SE_MASK;
+			RedVoiceDataGet(trackNo)->m_voiceSwitch &= REDSOUND_VOICE_SWITCH_CLEAR_PAUSE_MASK;
 			RedVoiceDataGet(trackNo)->m_flags &= REDSOUND_VOICE_FLAGS_CLEAR_ACTIVE_MASK;
 			RedVoiceDataGet(trackNo)->m_flags |= REDSOUND_VOICE_FLAGS_RELEASED;
 			RedVoiceDataGet(trackNo)->m_active = REDSOUND_VOICE_ACTIVE_OFF;
@@ -370,7 +370,7 @@ int SeStopID(int seId)
 
 			trackNo = track->m_trackNo;
 			RedVoiceDataGet(trackNo)->m_stateFlags &= REDSOUND_VOICE_STATE_CLEAR_PLAYING_MASK;
-			RedVoiceDataGet(trackNo)->m_voiceSwitch &= REDSOUND_VOICE_SWITCH_CLEAR_SE_MASK;
+			RedVoiceDataGet(trackNo)->m_voiceSwitch &= REDSOUND_VOICE_SWITCH_CLEAR_PAUSE_MASK;
 			RedVoiceDataGet(trackNo)->m_flags &= REDSOUND_VOICE_FLAGS_CLEAR_ACTIVE_MASK;
 			RedVoiceDataGet(trackNo)->m_flags |= REDSOUND_VOICE_FLAGS_RELEASED;
 			RedVoiceDataGet(trackNo)->m_track = REDSOUND_VOICE_TRACK_NONE;
@@ -418,7 +418,7 @@ int SeStopMG(int bank, int sep, int group, int kind)
 
 				trackNo = track->m_trackNo;
 				RedVoiceDataGet(trackNo)->m_stateFlags &= REDSOUND_VOICE_STATE_CLEAR_PLAYING_MASK;
-				RedVoiceDataGet(trackNo)->m_voiceSwitch &= REDSOUND_VOICE_SWITCH_CLEAR_SE_MASK;
+				RedVoiceDataGet(trackNo)->m_voiceSwitch &= REDSOUND_VOICE_SWITCH_CLEAR_PAUSE_MASK;
 				RedVoiceDataGet(trackNo)->m_flags &= REDSOUND_VOICE_FLAGS_CLEAR_ACTIVE_MASK;
 				RedVoiceDataGet(trackNo)->m_flags |= REDSOUND_VOICE_FLAGS_RELEASED;
 				RedVoiceDataGet(trackNo)->m_track = REDSOUND_VOICE_TRACK_NONE;
@@ -1148,7 +1148,7 @@ int SeStopG(int group)
 
 			trackNo = track->m_trackNo;
 			RedVoiceDataGet(trackNo)->m_stateFlags &= REDSOUND_VOICE_STATE_CLEAR_PLAYING_MASK;
-			RedVoiceDataGet(trackNo)->m_voiceSwitch &= REDSOUND_VOICE_SWITCH_CLEAR_SE_MASK;
+			RedVoiceDataGet(trackNo)->m_voiceSwitch &= REDSOUND_VOICE_SWITCH_CLEAR_PAUSE_MASK;
 			RedVoiceDataGet(trackNo)->m_flags &= REDSOUND_VOICE_FLAGS_CLEAR_ACTIVE_MASK;
 			RedVoiceDataGet(trackNo)->m_flags |= REDSOUND_VOICE_FLAGS_RELEASED;
 			RedVoiceDataGet(trackNo)->m_track = REDSOUND_VOICE_TRACK_NONE;

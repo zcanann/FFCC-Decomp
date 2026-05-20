@@ -643,19 +643,17 @@ void CTexture::Create(CChunkFile& chunkFile, CMemory::CStage* stage, CAmemCacheS
             break;
         case 0x494D4147:
             if (amemCacheSet != 0) {
-                void* data = _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
-                    &Memory, chunk.m_size, stage, const_cast<char*>(s_textureman_cpp_801D7974), 0x150, 0);
+                u8* data = new (stage, const_cast<char*>(s_textureman_cpp_801D7974), 0x150) u8[chunk.m_size];
                 chunkFile.Get(data, chunk.m_size);
                 m_cacheId = SetData__13CAmemCacheSetFPviQ210CAmemCache4TYPEi(
                     amemCacheSet, data, chunk.m_size, static_cast<CAmemCache::TYPE>(0), cacheTag);
-                __dl__FPv(data);
+                delete[] data;
                 m_imageData = 0;
             } else {
                 if (m_usesExternalAddress != 0) {
                     m_imageData = chunkFile.GetAddress();
                 } else {
-                    m_imageData = _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
-                        &Memory, chunk.m_size, stage, const_cast<char*>(s_textureman_cpp_801D7974), 0x15C, 0);
+                    m_imageData = new (stage, const_cast<char*>(s_textureman_cpp_801D7974), 0x15C) u8[chunk.m_size];
                     chunkFile.Get(m_imageData, chunk.m_size);
                 }
                 DCFlushRange(m_imageData, chunk.m_size);
@@ -666,8 +664,7 @@ void CTexture::Create(CChunkFile& chunkFile, CMemory::CStage* stage, CAmemCacheS
             if (m_usesExternalAddress != 0) {
                 m_tlutData = chunkFile.GetAddress();
             } else {
-                m_tlutData = _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
-                    &Memory, chunk.m_size, stage, const_cast<char*>(s_textureman_cpp_801D7974), 0x178, 0);
+                m_tlutData = new (stage, const_cast<char*>(s_textureman_cpp_801D7974), 0x178) u8[chunk.m_size];
                 chunkFile.Get(m_tlutData, chunk.m_size);
             }
             DCFlushRange(m_tlutData, chunk.m_size);
@@ -835,11 +832,11 @@ CTexture::~CTexture()
         m_tlutData = 0;
     } else {
         if (m_imageData != 0) {
-            __dla__FPv(m_imageData);
+            delete[] static_cast<u8*>(m_imageData);
             m_imageData = 0;
         }
         if (m_tlutData != 0) {
-            __dla__FPv(m_tlutData);
+            delete[] static_cast<u8*>(m_tlutData);
             m_tlutData = 0;
         }
     }

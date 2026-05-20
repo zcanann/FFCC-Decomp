@@ -37,8 +37,6 @@ u8* gCharaPartWorkPtr = 0;
 extern "C" void __dla__FPv(void*);
 extern "C" void __dl__FPv(void*);
 extern "C" int __cntlzw(unsigned int);
-extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
-extern "C" void* __nw__11CTextureSetFUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void __dt__Q29CCharaPcs7CHandleFv(void*, int);
 extern "C" void __ct__6CColorFv(void*);
 extern "C" void __construct_array(void*, void (*)(void*), void (*)(void*, int), unsigned long, unsigned long);
@@ -63,7 +61,6 @@ extern "C" void __ct__Q29CLightPcs10CBumpLightFv(void*);
 extern "C" void Create__6CCharaFv(void*);
 extern "C" void Destroy__6CCharaFv(void*);
 extern "C" void Printf__7CSystemFPce(void*, const char*, ...);
-extern "C" void* __ct__Q26CChara6CModelFv(void*);
 extern "C" void Create__Q26CChara6CModelFPvPQ27CMemory6CStage(void*, void*, void*);
 extern "C" void CreateDynamics__Q26CChara6CModelFPvPQ27CMemory6CStage(void*, void*, void*);
 extern "C" void AttachAnim__Q26CChara6CModelFPQ26CChara5CAnimiii(void*, void*, int, int, int);
@@ -74,7 +71,6 @@ extern "C" void InitMogFurTex__Q26CChara6CModelFv(void*);
 extern "C" void Draw__Q26CChara6CModelFPA4_fii(void*, Mtx, int, int);
 extern "C" void DrawShadow__Q26CChara6CModelFPA4_fi(void*, Mtx, int);
 extern "C" void DrawFur__Q26CChara6CModelFPA4_fi(void*, Mtx, int);
-extern "C" void* __ct__Q26CChara5CAnimFv(void*);
 extern "C" void Create__Q26CChara5CAnimFPvPQ27CMemory6CStage(void*, void*, void*);
 extern "C" void LoadSe__6CSoundFPv(void*, void*);
 extern "C" void LoadWave__6CSoundFPv(void*, void*);
@@ -502,10 +498,8 @@ static CCharaPcs::CLoadAnim* LoadAnimFromDisk(
     File.Read(fileHandle);
     File.SyncCompleted(fileHandle);
 
-    CChara::CAnim* anim = reinterpret_cast<CChara::CAnim*>(
-        __nw__FUlPQ27CMemory6CStagePci(0x30, StageAt(self, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x62A));
+    CChara::CAnim* anim = new (StageAt(self, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x62A) CChara::CAnim;
     if (anim != 0) {
-        anim = reinterpret_cast<CChara::CAnim*>(__ct__Q26CChara5CAnimFv(anim));
         Create__Q26CChara5CAnimFPvPQ27CMemory6CStage(anim, File.m_readBuffer, StageAt(self, 0xD4));
     }
 
@@ -1977,10 +1971,9 @@ void CCharaPcs::LoadMergeFile(int mergeFileId, int mergeFlags, int streamToAmem)
                                 LoadModelArray(pcs)->Add(loadModel);
 
                                 if (streamToAmem == 0) {
-                                    loadModel->m_model = reinterpret_cast<CChara::CModel*>(
-                                        __nw__FUlPQ27CMemory6CStagePci(0x124, StageAt(pcs, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x5F1));
+                                    loadModel->m_model =
+                                        new (StageAt(pcs, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x5F1) CChara::CModel;
                                     if (loadModel->m_model != 0) {
-                                        loadModel->m_model = reinterpret_cast<CChara::CModel*>(__ct__Q26CChara6CModelFv(loadModel->m_model));
                                         Create__Q26CChara6CModelFPvPQ27CMemory6CStage(
                                             loadModel->m_model, rawData, SelectLoadStage(pcs, StageAt(pcs, 0xCC)));
                                     }
@@ -2059,10 +2052,9 @@ void CCharaPcs::LoadMergeFile(int mergeFileId, int mergeFlags, int streamToAmem)
                         }
 
                         if (loadAnim == 0) {
-                            CChara::CAnim* anim = reinterpret_cast<CChara::CAnim*>(
-                                __nw__FUlPQ27CMemory6CStagePci(0x30, StageAt(pcs, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x62A));
+                            CChara::CAnim* anim =
+                                new (StageAt(pcs, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x62A) CChara::CAnim;
                             if (anim != 0) {
-                                anim = reinterpret_cast<CChara::CAnim*>(__ct__Q26CChara5CAnimFv(anim));
                                 Create__Q26CChara5CAnimFPvPQ27CMemory6CStage(anim, rawData, StageAt(pcs, 0xD4));
                             }
 
@@ -2575,14 +2567,13 @@ void CCharaPcs::CHandle::LoadModel(
             loadModel->m_keyId = static_cast<int>(charaNo);
             loadModel->m_mergeFileId = mergeFileId;
             loadModel->m_mergeFlags = mergeFlags;
-            loadModel->m_model = reinterpret_cast<CChara::CModel*>(
-                __nw__FUlPQ27CMemory6CStagePci(0x124, StageAt(&CharaPcs, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x5F1));
+            loadModel->m_model =
+                new (StageAt(&CharaPcs, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x5F1) CChara::CModel;
             loadModel->m_streamMode = 0;
             loadModel->m_streamOffset = 0;
             loadModel->m_streamSize = 0;
 
             if (loadModel->m_model != 0) {
-                loadModel->m_model = reinterpret_cast<CChara::CModel*>(__ct__Q26CChara6CModelFv(loadModel->m_model));
                 Create__Q26CChara6CModelFPvPQ27CMemory6CStage(loadModel->m_model, File.m_readBuffer, HandleModelStage(charaKind, 0));
             }
             LoadModelArray(&CharaPcs)->Add(loadModel);
@@ -2615,10 +2606,9 @@ void CCharaPcs::CHandle::LoadModel(
                     reinterpret_cast<unsigned char*>(StageBase(StageAt(&CharaPcs, 0xC8))) +
                         reinterpret_cast<unsigned int>(loadModel->m_streamOffset),
                     static_cast<unsigned long>(loadModel->m_streamSize));
-                loadModel->m_model = reinterpret_cast<CChara::CModel*>(
-                    __nw__FUlPQ27CMemory6CStagePci(0x124, StageAt(&CharaPcs, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x7C7));
+                loadModel->m_model =
+                    new (StageAt(&CharaPcs, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x7C7) CChara::CModel;
                 if (loadModel->m_model != 0) {
-                    loadModel->m_model = reinterpret_cast<CChara::CModel*>(__ct__Q26CChara6CModelFv(loadModel->m_model));
                     Create__Q26CChara6CModelFPvPQ27CMemory6CStage(
                         loadModel->m_model, File.m_readBuffer, HandleModelStage(charaKind, specialModelStage));
                 }
@@ -3131,14 +3121,11 @@ void CCharaPcs::CHandle::loadModelASyncFrame()
         loadModel->m_mergeFileId = -1;
         loadModel->m_mergeFlags = 0;
         LoadModelArray(&CharaPcs)->Add(loadModel);
-        loadModel->m_model = reinterpret_cast<CChara::CModel*>(
-            __nw__FUlPQ27CMemory6CStagePci(0x124, StageAt(&CharaPcs, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x5F1));
+        loadModel->m_model =
+            new (StageAt(&CharaPcs, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x5F1) CChara::CModel;
         loadModel->m_streamMode = 0;
         loadModel->m_streamOffset = 0;
         loadModel->m_streamSize = 0;
-        if (loadModel->m_model != 0) {
-            loadModel->m_model = reinterpret_cast<CChara::CModel*>(__ct__Q26CChara6CModelFv(loadModel->m_model));
-        }
         Create__Q26CChara6CModelFPvPQ27CMemory6CStage(
             loadModel->m_model, File.m_readBuffer, HandleModelStage(m_asyncCharaKind, 0));
         m_modelLoadRef = loadModel;
@@ -3157,14 +3144,10 @@ void CCharaPcs::CHandle::loadModelASyncFrame()
         loadTexture->m_mergeFlags = 0;
         loadTexture->m_variantTag = reinterpret_cast<void*>(m_asyncTextureVariant);
         LoadTextureArray(&CharaPcs)->Add(loadTexture);
-        loadTexture->m_textureSet = reinterpret_cast<CTextureSet*>(
-            __nw__11CTextureSetFUlPQ27CMemory6CStagePci(0x24, StageAt(&CharaPcs, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x397));
+        loadTexture->m_textureSet = new (StageAt(&CharaPcs, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x397) CTextureSet;
         loadTexture->m_streamMode = 0;
         loadTexture->m_streamOffset = 0;
         loadTexture->m_streamSize = 0;
-        if (loadTexture->m_textureSet != 0) {
-            loadTexture->m_textureSet = ::new (loadTexture->m_textureSet) CTextureSet;
-        }
         loadTexture->m_textureSet->Create(File.m_readBuffer, HandleTextureStage(m_asyncCharaKind), 0, 0, 0, 0);
         m_texLoadRef = loadTexture;
         AddSharedRef(m_texLoadRef);

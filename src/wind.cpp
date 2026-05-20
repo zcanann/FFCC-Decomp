@@ -410,6 +410,7 @@ found:
  * JP Address: TODO
  * JP Size: TODO
  */
+#ifndef VERSION_GCCP01
 WindObject* CWind::getObj(int id)
 {
     WindObject* obj = m_objects;
@@ -424,6 +425,7 @@ WindObject* CWind::getObj(int id)
 
     return 0;
 }
+#endif
 
 /*
  * --INFO--
@@ -434,6 +436,7 @@ WindObject* CWind::getObj(int id)
  * JP Address: TODO
  * JP Size: TODO
  */
+#ifndef VERSION_GCCP01
 WindObject* CWind::searchFreeObj()
 {
     WindObject* obj = m_objects;
@@ -446,6 +449,7 @@ WindObject* CWind::searchFreeObj()
 
     return 0;
 }
+#endif
 
 /*
  * --INFO--
@@ -693,6 +697,7 @@ void CWind::ClearAll()
  * JP Address: TODO
  * JP Size: TODO
  */
+#ifndef VERSION_GCCP01
 WindGrassObject* CWind::searchFreeGrass()
 {
     WindGrassObject* obj = m_grass;
@@ -705,6 +710,7 @@ WindGrassObject* CWind::searchFreeGrass()
 
     return 0;
 }
+#endif
 
 /*
  * --INFO--
@@ -715,6 +721,7 @@ WindGrassObject* CWind::searchFreeGrass()
  * JP Address: TODO
  * JP Size: TODO
  */
+#ifndef VERSION_GCCP01
 WindGrassObject* CWind::getGrass(int id)
 {
     WindGrassObject* obj = m_grass;
@@ -729,6 +736,7 @@ WindGrassObject* CWind::getGrass(int id)
 
     return 0;
 }
+#endif
 
 /*
  * --INFO--
@@ -739,6 +747,7 @@ WindGrassObject* CWind::getGrass(int id)
  * JP Address: TODO
  * JP Size: TODO
  */
+#ifndef VERSION_GCCP01
 int CWind::AddGrass(const Vec* pos)
 {
     WindGrassObject* obj = searchFreeGrass();
@@ -756,3 +765,4 @@ int CWind::AddGrass(const Vec* pos)
 
     return obj->id;
 }
+#endif

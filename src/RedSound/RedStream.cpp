@@ -203,11 +203,11 @@ static void _StreamStop(RedStreamDATA* streamData)
 	if (RedStreamDataHasId(streamData)) {
 		streamData->m_streamId = REDSOUND_STREAM_ID_NONE;
 		streamData->m_state = REDSOUND_STREAM_STATE_STOPPED;
-		if (streamData->m_buffer != REDSOUND_STREAM_BUFFER_NONE) {
+		if (RedStreamDataHasBuffer(streamData)) {
 			RedDelete(streamData->m_buffer);
 			streamData->m_buffer = REDSOUND_STREAM_BUFFER_NONE;
 		}
-		if (streamData->m_aramBuffer != REDSOUND_STREAM_ARAM_BUFFER_NONE) {
+		if (RedStreamDataHasAramBuffer(streamData)) {
 			RedDeleteA(streamData->m_aramBuffer);
 			streamData->m_aramBuffer = REDSOUND_STREAM_ARAM_BUFFER_NONE;
 		}
@@ -477,14 +477,14 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 		aramOffset = REDSOUND_STREAM_ARAM_HIGH_OFFSET;
 	}
 	streamData->m_aramBuffer = RedNewA(aramSize, 0, aramOffset);
-	if (streamData->m_aramBuffer == REDSOUND_STREAM_ARAM_BUFFER_NONE) {
+	if (RedStreamDataIsAramBufferEmpty(streamData)) {
 		c_RedEntry.WaveOldClear(0, aramOffset);
 		streamData->m_aramBuffer = RedNewA(aramSize, 0, aramOffset);
 	}
 
 	if ((streamData->m_track != REDSOUND_STREAM_TRACK_NONE) &&
-	    (streamData->m_buffer != REDSOUND_STREAM_BUFFER_NONE) &&
-	    (streamData->m_aramBuffer != REDSOUND_STREAM_ARAM_BUFFER_NONE)) {
+	    RedStreamDataHasBuffer(streamData) &&
+	    RedStreamDataHasAramBuffer(streamData)) {
 		{
 			int adpcmSampleOffset;
 			RedStreamFile* streamFile;
@@ -580,7 +580,7 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 			OSReport(sRedStreamBufferDidntSecureFmt, sRedStreamLogPrefix, sRedStreamLogErrorColor, sRedStreamLogReset);
 			fflush(__files + 1);
 		}
-		if (streamData->m_buffer != REDSOUND_STREAM_BUFFER_NONE) {
+		if (RedStreamDataHasBuffer(streamData)) {
 			RedDelete(streamData->m_buffer);
 		} else {
 			if (RedReportPrintIsEnabled()) {
@@ -590,7 +590,7 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 				fflush(__files + 1);
 			}
 		}
-		if (streamData->m_aramBuffer != REDSOUND_STREAM_ARAM_BUFFER_NONE) {
+		if (RedStreamDataHasAramBuffer(streamData)) {
 			RedDeleteA(streamData->m_aramBuffer);
 		} else {
 			if (RedReportPrintIsEnabled()) {

@@ -230,6 +230,9 @@ struct RedStreamDATA {
 #define RedStreamDataHasId(stream) ((stream)->m_streamId != REDSOUND_STREAM_ID_NONE)
 #define RedStreamDataMatchesId(stream, streamId)                                                   \
     (RedStreamDataHasId(stream) && (((streamId) == REDSOUND_STREAM_ID_ALL) || ((streamId) == (stream)->m_streamId)))
+#define RedStreamDataHasBuffer(stream) ((stream)->m_buffer != REDSOUND_STREAM_BUFFER_NONE)
+#define RedStreamDataHasAramBuffer(stream) ((stream)->m_aramBuffer != REDSOUND_STREAM_ARAM_BUFFER_NONE)
+#define RedStreamDataIsAramBufferEmpty(stream) ((stream)->m_aramBuffer == REDSOUND_STREAM_ARAM_BUFFER_NONE)
 
 enum RedStreamDataLayoutOffset {
     REDSOUND_STREAM_TRACK_OFFSET = (unsigned int)&(((RedStreamDATA*)0)->m_track),

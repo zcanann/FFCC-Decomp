@@ -10,9 +10,6 @@
 class CMaterial;
 class CMapHitFace;
 
-extern "C" void __dl__FPv(void* ptr);
-extern "C" void __dla__FPv(void* ptr);
-extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long size, CMemory::CStage* stage, char* file, int line);
 extern "C" CMemory::CStage* g_hit_lpface_min;
 extern "C" char s_mapmesh_cpp_801D70B0[];
 extern "C" const float FLOAT_8032F930;
@@ -379,7 +376,7 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
     while (reader.GetNextChunk(chunk)) {
         switch (chunk.m_id) {
         case 0x56455254:
-            m_meshData = __nwa__FUlPQ27CMemory6CStagePci(workSize, MapMeshAllocStage(), s_mapmesh_cpp_801D70B0, 0x13A);
+            m_meshData = new (MapMeshAllocStage(), s_mapmesh_cpp_801D70B0, 0x13A) unsigned char[workSize];
 
             cursor = reinterpret_cast<unsigned char*>(m_meshData);
             m_vertexCount = static_cast<unsigned short>(chunk.m_size / 0xC);
@@ -465,8 +462,7 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
         case 0x444C4844:
             m_displayListCount = static_cast<unsigned short>(chunk.m_arg0);
             if (usePreallocated != 0) {
-                m_displayListData =
-                    __nwa__FUlPQ27CMemory6CStagePci(workSize, MapMeshAllocStage(), s_mapmesh_cpp_801D70B0, 0x1D5);
+                m_displayListData = new (MapMeshAllocStage(), s_mapmesh_cpp_801D70B0, 0x1D5) unsigned char[workSize];
                 cursor = reinterpret_cast<unsigned char*>(m_displayListData);
             } else {
                 cursor = reinterpret_cast<unsigned char*>(Align32(reinterpret_cast<unsigned int>(cursor)));
@@ -610,12 +606,12 @@ void CMapMesh::Ptr2Off()
 CMapMesh::~CMapMesh()
 {
     if (m_meshData != 0) {
-        __dla__FPv(m_meshData);
+        delete[] static_cast<unsigned char*>(m_meshData);
         m_meshData = 0;
     }
 
     if (m_displayListData != 0) {
-        __dla__FPv(m_displayListData);
+        delete[] static_cast<unsigned char*>(m_displayListData);
         m_displayListData = 0;
     }
 
@@ -639,12 +635,12 @@ CMapMesh::~CMapMesh()
 void CMapMesh::Destroy()
 {
     if (m_meshData != 0) {
-        __dla__FPv(m_meshData);
+        delete[] static_cast<unsigned char*>(m_meshData);
         m_meshData = 0;
     }
 
     if (m_displayListData != 0) {
-        __dla__FPv(m_displayListData);
+        delete[] static_cast<unsigned char*>(m_displayListData);
         m_displayListData = 0;
     }
 

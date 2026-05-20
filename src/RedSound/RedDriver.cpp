@@ -3523,17 +3523,16 @@ void CRedDriver::ClearSePlayLine()
  * JP Address: TODO
  * JP Size: TODO
  */
-inline RedTrackDATA* CRedDriver::GetSePlayTrack()
+RedTrackDATA* CRedDriver::GetSePlayTrack()
 {
 	RedTrackDATA* track = RedSoundControlGet(REDSOUND_CONTROL_SE)->m_tracks;
-	RedTrackDATA* trackEnd = RedSoundControlGetSeTrackEnd(RedSoundControlGet(REDSOUND_CONTROL_SE));
 
-	do {
+	while (track < RedSoundControlGetSeTrackEnd(RedSoundControlGet(REDSOUND_CONTROL_SE))) {
 		if (track->m_command != REDSOUND_TRACK_COMMAND_NONE) {
 			return track;
 		}
 		track++;
-	} while (track < trackEnd);
+	}
 	return 0;
 }
 

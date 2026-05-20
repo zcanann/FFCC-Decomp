@@ -17,10 +17,7 @@ public:
 
     // void* vtable;                        // 0x0000
     int m_objType;                          // 0x0004
-    unsigned char m_saveSlot;               // 0x0008
-    unsigned char m_partyIndex;             // 0x0009
-    unsigned char m_isLoadingFlag;          // 0x000A
-    unsigned char m_miscFlags;              // 0x000B
+    int m_saveSlot;                         // 0x0008
     void* m_ownerObj;                       // 0x000C
     int m_baseDataIndex;                    // 0x0010
     unsigned short m_id;                    // 0x0014

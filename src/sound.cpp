@@ -72,8 +72,6 @@ extern "C" void __ct__9CRedSoundFv(void*);
 extern "C" void __dt__6CSoundFv(void*);
 extern "C" CMemory::CStage* CreateStage__7CMemoryFUlPci(CMemory*, unsigned long, char*, int);
 extern "C" void DestroyStage__7CMemoryFPQ27CMemory6CStage(CMemory*, CMemory::CStage*);
-extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
-extern "C" void __dla__FPv(void*);
 extern "C" int Printf__7CSystemFPce(CSystem*, const char*, ...);
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, int, int, int, int);
@@ -386,10 +384,10 @@ void CSound::Init()
 {
     SoundData(this).m_stage = CreateStage__7CMemoryFUlPci(&Memory, 0xA4000, const_cast<char*>(s_CSound_80330ce0), 0);
 
-    SoundData(this).m_aramBuffer = static_cast<u8*>(__nwa__FUlPQ27CMemory6CStagePci(
-        0x80000, SoundData(this).m_stage, const_cast<char*>(s_sound_cpp_801db2d4), 0x2E));
-    SoundData(this).m_streamBuffer = static_cast<u8*>(__nwa__FUlPQ27CMemory6CStagePci(
-        0x20000, SoundData(this).m_stage, const_cast<char*>(s_sound_cpp_801db2d4), 0x2F));
+    SoundData(this).m_aramBuffer =
+        new (SoundData(this).m_stage, const_cast<char*>(s_sound_cpp_801db2d4), 0x2E) u8[0x80000];
+    SoundData(this).m_streamBuffer =
+        new (SoundData(this).m_stage, const_cast<char*>(s_sound_cpp_801db2d4), 0x2F) u8[0x20000];
 
     SoundData(this).m_bgmMasterVolume = 0x7F;
     SoundData(this).m_seMasterVolume = 0x7F;
@@ -479,13 +477,13 @@ void CSound::Quit()
 
     u8*& streamBuffer = sound.m_streamBuffer;
     if (streamBuffer != 0) {
-        __dla__FPv(streamBuffer);
+        delete[] streamBuffer;
         streamBuffer = 0;
     }
 
     u8*& aramBuffer = sound.m_aramBuffer;
     if (aramBuffer != 0) {
-        __dla__FPv(aramBuffer);
+        delete[] aramBuffer;
         aramBuffer = 0;
     }
 

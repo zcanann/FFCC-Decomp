@@ -30,6 +30,7 @@ extern int DAT_801dd684;
 extern int DAT_801dd688;
 extern int DAT_801dd68c;
 extern Vec kPppCharaBreakUpVector;
+static const float kPppCharaBreakDrawScale = 0.0f;
 extern "C" void SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(void* materialMan, void* materialSet,
                                                                             unsigned int materialIdx, int, int);
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
@@ -222,7 +223,7 @@ void pppRenderCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB*, CharaBreakU
         pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
             colorWork + 8,
             (u8*)charaBreak + 0x40,
-            FLOAT_80332048,
+            kPppCharaBreakDrawScale,
             0,
             0,
             0,

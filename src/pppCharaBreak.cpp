@@ -5,6 +5,7 @@
 #include "ffcc/math.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/ppp_constants.h"
+#include "ffcc/pppPart.h"
 #include "ffcc/util.h"
 
 #include "dolphin/gx.h"
@@ -39,22 +40,16 @@ static inline Mtx& CameraMatrix()
     return CameraPcs.m_cameraMatrix;
 }
 
-void pppInitBlendMode(void);
-
 extern "C" {
 int rand(void);
 void* GetCharaHandlePtr__FP8CGObjectl(void*, long);
 int GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void*);
 void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(void*, long, float&, float&, float&, float, float&, float&);
-void* pppMemFree__FPv(unsigned long, CMemory::CStage*, char*, int);
 void CalcBoundaryBoxQuantized__5CUtilFP3VecP3VecP6S16VecUlUl(CUtil*, Vec*, Vec*, S16Vec*, unsigned long, unsigned long);
 void ReWriteDisplayList__5CUtilFPvUlUl(CUtil*, void*, unsigned long, unsigned long);
 int GetNumPolygonFromDL__5CUtilFPvUl(CUtil*, void*, unsigned long);
 int IsHasDrawFmtDL__5CUtilFUc(CUtil*, unsigned char);
 void _WaitDrawDone__8CGraphicFPci(CGraphic*, const char*, int);
-void pppHeapUseRate__FPQ27CMemory6CStage(void*);
-
-void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(void*, void*, float, u8, u8, u8, u8, u8, u8, u8);
 
 void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
 void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
@@ -219,9 +214,9 @@ void pppRenderCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB*, CharaBreakU
     if (work->m_enabled != 0) {
         _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
         pppInitBlendMode();
-        pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-            colorWork + 8,
-            (u8*)charaBreak + 0x40,
+        pppSetDrawEnv(
+            (pppCVECTOR*)(colorWork + 8),
+            (pppFMATRIX*)((u8*)charaBreak + 0x40),
             FLOAT_80332048,
             0,
             0,
@@ -459,16 +454,16 @@ void pppDestructCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkC* data)
                 for (u32 dlIndex = 0; dlIndex < *(u32*)(meshData + 0x4C); dlIndex++) {
                     if ((void*)*dlEntries != NULL) {
                         if (*(void**)*dlEntries != NULL) {
-                            pppHeapUseRate__FPQ27CMemory6CStage(*(void**)*dlEntries);
+                            pppHeapUseRate((CMemory::CStage*)*(void**)*dlEntries);
                             *(u32*)*dlEntries = 0;
                         }
                         if (*(void**)(*dlEntries + 0xC) != NULL) {
-                            pppHeapUseRate__FPQ27CMemory6CStage(*(void**)(*dlEntries + 0xC));
+                            pppHeapUseRate((CMemory::CStage*)*(void**)(*dlEntries + 0xC));
                             *(u32*)(*dlEntries + 0xC) = 0;
                         }
                     }
                     if ((void*)*dlEntries != NULL) {
-                        pppHeapUseRate__FPQ27CMemory6CStage((void*)*dlEntries);
+                        pppHeapUseRate((CMemory::CStage*)*dlEntries);
                         *dlEntries = 0;
                     }
                     dlEntries++;
@@ -476,7 +471,7 @@ void pppDestructCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkC* data)
             }
 
             if (*meshBufferSlot != NULL) {
-                pppHeapUseRate__FPQ27CMemory6CStage(*meshBufferSlot);
+                pppHeapUseRate((CMemory::CStage*)*meshBufferSlot);
                 *meshBufferSlot = NULL;
             }
             meshBufferSlot++;
@@ -485,7 +480,7 @@ void pppDestructCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkC* data)
     }
 
     if (perMeshBuffers != NULL) {
-        pppHeapUseRate__FPQ27CMemory6CStage(perMeshBuffers);
+        pppHeapUseRate((CMemory::CStage*)perMeshBuffers);
     }
 }
 

@@ -62,9 +62,6 @@ extern "C" void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFla
     void* flatRuntime, int object, int a, int b, int c, void* inStack, void* outStack);
 extern char g_MsgFlashy[];
 
-extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
-extern "C" void __dl__FPv(void*);
-
 struct MiniGameAlarm {
     OSAlarm alarm;
     OSThread* thread;
@@ -331,13 +328,13 @@ void CMiniGamePcs::MiniGameGo(char* managerFilePath, char* managerSpFilePath)
 
         if (*reinterpret_cast<void**>(self + 0x1354) != 0)
         {
-            __dl__FPv(*reinterpret_cast<void**>(self + 0x1354));
+            delete[] static_cast<u8*>(*reinterpret_cast<void**>(self + 0x1354));
             *reinterpret_cast<void**>(self + 0x1354) = 0;
         }
 
         if (*reinterpret_cast<void**>(self + 0x135C) != 0)
         {
-            __dl__FPv(*reinterpret_cast<void**>(self + 0x135C));
+            delete[] static_cast<u8*>(*reinterpret_cast<void**>(self + 0x135C));
             *reinterpret_cast<void**>(self + 0x135C) = 0;
         }
     }
@@ -354,11 +351,9 @@ void CMiniGamePcs::MiniGameGo(char* managerFilePath, char* managerSpFilePath)
     self[0x6494] = 0;
 
     *reinterpret_cast<void**>(self + 0x1354) =
-        __nwa__FUlPQ27CMemory6CStagePci(
-            0x40000, PartPcs.m_usbStreamData.m_stageLoad, const_cast<char*>(s_miniGameSourceName), 0xF1);
+        new (PartPcs.m_usbStreamData.m_stageLoad, const_cast<char*>(s_miniGameSourceName), 0xF1) u8[0x40000];
     *reinterpret_cast<void**>(self + 0x135C) =
-        __nwa__FUlPQ27CMemory6CStagePci(
-            0x40000, PartPcs.m_usbStreamData.m_stageLoad, const_cast<char*>(s_miniGameSourceName), 0xF2);
+        new (PartPcs.m_usbStreamData.m_stageLoad, const_cast<char*>(s_miniGameSourceName), 0xF2) u8[0x40000];
 
     *reinterpret_cast<unsigned int*>(self + 0x1364) = OSGetTick();
     *reinterpret_cast<unsigned int*>(*reinterpret_cast<unsigned int*>(self + 0x1354) + 200) =
@@ -1623,13 +1618,13 @@ void CMiniGamePcs::calc(void)
 
         if (*reinterpret_cast<void**>(self + 0x1354) != 0)
         {
-            __dl__FPv(*reinterpret_cast<void**>(self + 0x1354));
+            delete[] static_cast<u8*>(*reinterpret_cast<void**>(self + 0x1354));
             *reinterpret_cast<void**>(self + 0x1354) = 0;
         }
 
         if (*reinterpret_cast<void**>(self + 0x135C) != 0)
         {
-            __dl__FPv(*reinterpret_cast<void**>(self + 0x135C));
+            delete[] static_cast<u8*>(*reinterpret_cast<void**>(self + 0x135C));
             *reinterpret_cast<void**>(self + 0x135C) = 0;
         }
     }

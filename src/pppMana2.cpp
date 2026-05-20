@@ -307,16 +307,9 @@ void pppDestructMana2(pppMana2* pppMana2, pppMana2UnkC* param_2)
     u32 i;
     u32 j;
 
-    work = (u32*)((char*)pppMana2 + 0x80 + *(s32*)((char*)param_2 + 0xC));
-    gObject = *(CGObject**)((char*)pppMngStPtr + 0xDC);
-    if (gObject != NULL) {
-        handle = GetCharaHandlePtr__FP8CGObjectl(gObject, 0);
-        model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
-        *(u32*)(model + 0xE4) = 0;
-        *(u32*)(model + 0xE8) = 0;
-        *(u32*)(model + 0xF0) = 0;
-        *(u32*)(model + 0xFC) = 0;
-    }
+    work = (u32*)((char*)pppMana2 + 0x80 + param_2->m_serializedDataOffsets[2]);
+    *(u32*)(MaterialManRaw() + 0xD0) = 0;
+    *(u32*)(MaterialManRaw() + 0xDC) = 0;
 
     if (work[10] != 0) {
         pppHeapUseRate((CMemory::CStage*)work[10]);
@@ -366,10 +359,6 @@ void pppDestructMana2(pppMana2* pppMana2, pppMana2UnkC* param_2)
         pppHeapUseRate((CMemory::CStage*)work[22]);
         work[22] = 0;
     }
-    if (work[23] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[23]);
-        work[23] = 0;
-    }
     if (work[29] != 0) {
         pppHeapUseRate((CMemory::CStage*)work[29]);
         work[29] = 0;
@@ -377,6 +366,10 @@ void pppDestructMana2(pppMana2* pppMana2, pppMana2UnkC* param_2)
     if (work[9] != 0) {
         pppHeapUseRate((CMemory::CStage*)work[9]);
         work[9] = 0;
+    }
+    if (work[23] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[23]);
+        work[23] = 0;
     }
     if (work[17] != 0) {
         pppHeapUseRate((CMemory::CStage*)work[17]);
@@ -394,22 +387,11 @@ void pppDestructMana2(pppMana2* pppMana2, pppMana2UnkC* param_2)
         pppHeapUseRate((CMemory::CStage*)work[27]);
         work[27] = 0;
     }
-    if (work[28] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[28]);
-        work[28] = 0;
-    }
-    if (work[30] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[30]);
-        work[30] = 0;
-    }
-    if (work[31] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[31]);
-        work[31] = 0;
-    }
-    if (work[0x1D] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[0x1D]);
-        work[0x1D] = 0;
-    }
+    gObject = *(CGObject**)((char*)pppMngStPtr + 0xDC);
+    handle = GetCharaHandlePtr__FP8CGObjectl(gObject, 0);
+    model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
+    *(u32*)(model + 0xF0) = 0;
+    *(u32*)(model + 0xFC) = 0;
 
     meshEntry = *(s32*)(model + 0xAC);
     step = work[0x1C];
@@ -485,14 +467,16 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* para
     s32 dlOffset;
     u32 meshIndex;
     u32 vertexIndex;
+    s32* offsets;
 
     if (gPppCalcDisabled != 0) {
         return;
     }
 
     gObject = *(CGObject**)((char*)pppMngStPtr + 0xDC);
-    setupOffset = *(s32*)((char*)param_3 + 8);
-    work = (u32*)((char*)pppMana2 + 0x80 + *(s32*)((char*)param_3 + 0xC));
+    offsets = param_3->m_serializedDataOffsets;
+    setupOffset = offsets[1];
+    work = (u32*)((char*)pppMana2 + 0x80 + offsets[2]);
     if (gObject == NULL) {
         return;
     }

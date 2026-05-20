@@ -945,7 +945,7 @@ void CreatePolygon(POLYGON_DATA* polygonData, void* displayList, unsigned long, 
                         if (triCount <= 0) {
                             keepTri = 0;
                         }
-                        if (triCount != 1) {
+                        if (((u32)__cntlzw((s32)triCount) >> 5) == 0) {
                             stream = previousRestart;
                         }
                         outVertex = 0;

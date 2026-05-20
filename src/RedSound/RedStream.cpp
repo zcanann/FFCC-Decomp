@@ -59,6 +59,8 @@ enum RedStreamLayoutSize {
 	REDSOUND_STREAM_VOLUME_INPUT_SCALE_SHIFT = 8,
 };
 
+#define RedStreamVolumeFromInput(volume) (((volume + 1) * REDSOUND_VOLUME_BYTE_SCALE - 1) * REDSOUND_FIXED_ONE)
+
 STATIC_ASSERT(offsetof(RedStreamHEAD, m_signature) == REDSOUND_STREAM_HEAD_SIGNATURE_OFFSET);
 STATIC_ASSERT(sizeof(((RedStreamHEAD*)0)->m_signature) == REDSOUND_STREAM_SIGNATURE_SIZE);
 STATIC_ASSERT(offsetof(RedStreamHEAD, m_reserved04) == REDSOUND_STREAM_HEAD_RESERVED04_OFFSET);
@@ -512,7 +514,7 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 		streamData->m_fileData = RedStreamFileFromHeader(streamHeader);
 		streamData->m_fileSize = fileSize;
 		if (volume != 0) {
-			volume = ((volume + 1) * REDSOUND_VOLUME_BYTE_SCALE - 1) * REDSOUND_FIXED_ONE;
+			volume = RedStreamVolumeFromInput(volume);
 		}
 		streamData->m_volume.m_value = volume;
 		streamData->m_volume.m_stepCount = 0;

@@ -1,6 +1,7 @@
 #include "ffcc/mesmenu.h"
 #include "ffcc/chara.h"
 #include "ffcc/color.h"
+#include "ffcc/fontman.h"
 #include "ffcc/game.h"
 #include "ffcc/linkage.h"
 #include "ffcc/menu.h"
@@ -31,7 +32,6 @@ void SetScale__5CFontFf(float scale, void* font);
 void DrawInit__5CFontFv(void* font);
 void SetTlut__5CFontFi(void* font, int tlut);
 float GetWidth__5CFontFPc(void* font, const char* text);
-void SetColor__5CFontF8_GXColor(void* font, void* color);
 void SetPosX__5CFontFf(float x, void* font);
 void SetPosY__5CFontFf(float y, void* font);
 void Draw__5CFontFPc(void* font, const char* text);
@@ -39,7 +39,6 @@ void SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(void* menuPcs, int fmt);
 void DrawWindow__8CMenuPcsFffffQ28CMenuPcs3TEXf(void* menuPcs, float x, float y, float w, float h, int tex, float rot);
 void DrawInit__8CMenuPcsFv(void* menuPcs);
 void Draw__4CMesFv(void* mes);
-void SetColor__8CMenuPcsFR6CColor(void* menuPcs, void* color);
 void SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(void* menuPcs, int tex);
 void SetExternalTlut__8CTextureFPvi(void* texture, void* tlut, int enable);
 void DrawRect__8CMenuPcsFUlfffffffff(
@@ -344,7 +343,7 @@ void CMesMenu::DrawHeart(float x, float y, float z, float alpha)
     }
 
     CColor colorStorage(0xFF, 0xFF, 0xFF, (int)(FLOAT_80330908 * alpha));
-    SetColor__8CMenuPcsFR6CColor(&MenuPcs, &colorStorage);
+    MenuPcs.SetColor(colorStorage);
     SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x17);
 
     int offset = 0x4C;
@@ -528,7 +527,7 @@ void CMesMenu::onDraw()
         }
 
         CColor colorStorage(0xFF, 0xFF, 0xFF, 0xFF);
-        SetColor__8CMenuPcsFR6CColor(&MenuPcs, &colorStorage);
+        MenuPcs.SetColor(colorStorage);
         SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0);
         DrawRect__8CMenuPcsFUlfffffffff(
             &MenuPcs, 0, (float)(*(int*)((char*)&Chara + 0x200C) - 0x20), (float)*(int*)((char*)&Chara + 0x2010),
@@ -603,7 +602,7 @@ void CMesMenu::onDraw()
 
             float alphaF = FLOAT_80330908 * stateBlend * stageBlend;
             CColor colorStorage(0xFF, 0xFF, 0xFF, (unsigned char)(int)alphaF);
-            SetColor__8CMenuPcsFR6CColor(&MenuPcs, &colorStorage);
+            MenuPcs.SetColor(colorStorage);
             DrawWindow__8CMenuPcsFffffQ28CMenuPcs3TEXf(&MenuPcs, drawX, drawY, width, height, 2, FLOAT_8033092c);
 
             if ((*(int*)((char*)this + 0x0C) == 1) && (stageBlend == FLOAT_80330914)) {
@@ -614,7 +613,7 @@ void CMesMenu::onDraw()
             if ((*(int*)((char*)this + 0x3D94) >= 0) || (*(int*)((char*)this + 0x3D98) >= 0)) {
                 SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x14);
                 colorStorage = CColor(0xFF, 0xFF, 0xFF, (unsigned char)(int)alphaF);
-                SetColor__8CMenuPcsFR6CColor(&MenuPcs, &colorStorage);
+                MenuPcs.SetColor(colorStorage);
 
                 float cursorWave = sinf(FLOAT_80330930 * (FLOAT_80330914 - stateBlend) + FLOAT_80330930);
                 int signX = ((menuIndex & 1) != 0) ? 32 : -32;
@@ -635,7 +634,7 @@ void CMesMenu::onDraw()
                     DrawInit__5CFontFv(font);
                     SetTlut__5CFontFi(font, 0xF);
                     colorStorage = CColor(0xFF, 0xFF, 0xFF, (unsigned char)(int)alphaF);
-                    SetColor__5CFontF8_GXColor(font, &colorStorage);
+                    font->SetColor(colorStorage.color);
                     SetPosX__5CFontFf(
                         iconX + (((menuIndex & 1) != 0) ? FLOAT_80330950 : FLOAT_80330954 - textWidth), font);
                     SetPosY__5CFontFf(iconY + (float)(((menuIndex & 2) != 0) ? 8 : 31), font);
@@ -646,7 +645,7 @@ void CMesMenu::onDraw()
                 if (*(int*)((char*)this + 0x3D94) >= 0) {
                     int itemIndex = *(int*)((char*)this + 0x3D94);
                     colorStorage = CColor(0xFF, 0xFF, 0xFF, (unsigned char)(int)alphaF);
-                    SetColor__8CMenuPcsFR6CColor(&MenuPcs, &colorStorage);
+                    MenuPcs.SetColor(colorStorage);
                     SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x18);
                     SetExternalTlut__8CTextureFPvi(MenuPcs.m_textures[0x18], 0, 1);
                     float itemX = iconX + (float)(((menuIndex & 1) != 0) ? 13 : 83);
@@ -661,7 +660,7 @@ void CMesMenu::onDraw()
 
             SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x16);
             colorStorage = CColor(0xFF, 0xFF, 0xFF, (unsigned char)(int)(FLOAT_80330908 * stageBlend));
-            SetColor__8CMenuPcsFR6CColor(&MenuPcs, &colorStorage);
+            MenuPcs.SetColor(colorStorage);
             float frameX = baseX - (float)(((menuIndex & 1) != 0) ? 128 : 0);
             float frameY = baseY - (float)(((menuIndex & 2) != 0) ? 56 : 0);
             DrawRect__8CMenuPcsFUlfffffffff(
@@ -674,7 +673,7 @@ void CMesMenu::onDraw()
             DrawInit__5CFontFv(font);
             SetTlut__5CFontFi(font, 0xF);
             colorStorage = CColor(0xFF, 0xFF, 0xFF, (unsigned char)(int)(FLOAT_80330908 * stageBlend));
-            SetColor__5CFontF8_GXColor(font, &colorStorage);
+            font->SetColor(colorStorage.color);
             SetPosX__5CFontFf(frameX + (((menuIndex & 1) != 0) ? FLOAT_80330968 - titleWidth : FLOAT_80330950), font);
             SetPosY__5CFontFf(frameY + FLOAT_8033096C, font);
             Draw__5CFontFPc(font, reinterpret_cast<char*>(scriptFood + 0x3CA));
@@ -684,7 +683,7 @@ void CMesMenu::onDraw()
                 unsigned int heartFood = Game.m_scriptFoodBase[*(int*)((char*)this + 0x18)];
                 if ((heartFood != 0) && (stageBlend > FLOAT_803308d8)) {
                     colorStorage = CColor(0xFF, 0xFF, 0xFF, (unsigned char)(int)(FLOAT_80330908 * stageBlend));
-                    SetColor__8CMenuPcsFR6CColor(&MenuPcs, &colorStorage);
+                    MenuPcs.SetColor(colorStorage);
                     SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x17);
 
                     int heartOffset = 0x4C;
@@ -752,9 +751,10 @@ void CMesMenu::onDraw()
             float shakeX = (foodTimer != 0) ? (float)(((int)foodTimer >> 2) * DAT_8020f998[(3 - ((foodTimer + 1) & 3)) & 3]) : FLOAT_803308d8;
             float shakeY = (foodTimer != 0) ? (float)(((int)foodTimer >> 2) * DAT_8020f998[(3 - (foodTimer & 3)) & 3]) : FLOAT_803308d8;
             colorStorage = CColor(0xFF, 0xFF, 0xFF, (unsigned char)(int)(FLOAT_80330908 * stageBlend));
-            SetColor__8CMenuPcsFR6CColor(&MenuPcs, &colorStorage);
+            MenuPcs.SetColor(colorStorage);
             SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x18);
-            SetExternalTlut__8CTextureFPvi(MenuPcs.m_textures[0x18], (*(short*)(scriptFood + 0x1C) == 0) ? (void*)0x802ea500 : 0, 1);
+            SetExternalTlut__8CTextureFPvi(
+                MenuPcs.m_textures[0x18], (*(short*)(scriptFood + 0x1C) == 0) ? MenuPcs.m_externalFontTlut : 0, 1);
             DrawRect__8CMenuPcsFUlfffffffff(
                 &MenuPcs, ((menuIndex & 1) == 0) ? 8 : 0, frameX + shakeX + (float)(((menuIndex & 1) != 0) ? 75 : 5),
                 frameY + shakeY + FLOAT_80330958, FLOAT_8033095C, FLOAT_80330960,
@@ -773,7 +773,7 @@ void CMesMenu::onDraw()
         if ((*(unsigned int*)((char*)this + 0x3D8C) & 1) == 0) {
             float alphaF = FLOAT_80330908 * stateBlend * stageBlend;
             colorStorage = CColor(0xFF, 0xFF, 0xFF, (unsigned char)(int)alphaF);
-            SetColor__8CMenuPcsFR6CColor(&MenuPcs, &colorStorage);
+            MenuPcs.SetColor(colorStorage);
 
             int tex = ((*(unsigned int*)((char*)this + 0x3D8C) & 0x200) != 0) ? 2 : 0xB;
             DrawWindow__8CMenuPcsFffffQ28CMenuPcs3TEXf(&MenuPcs, drawX, drawY, sizeX, sizeY, tex, FLOAT_8033092c);
@@ -785,7 +785,7 @@ void CMesMenu::onDraw()
                 unsigned int anchorY = iconAnchor & 2;
                 SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x14);
                 colorStorage = CColor(0xFF, 0xFF, 0xFF, (unsigned char)(int)alphaF);
-                SetColor__8CMenuPcsFR6CColor(&MenuPcs, &colorStorage);
+                MenuPcs.SetColor(colorStorage);
                 float iconX = drawX + FLOAT_80330938 + ((anchorX == 0) ? sizeX - FLOAT_8033093C : FLOAT_803308d8);
                 float iconY = drawY + ((anchorY != 0) ? FLOAT_80330940 + sizeY : FLOAT_80330944);
                 DrawRect__8CMenuPcsFUlfffffffff(
@@ -802,7 +802,7 @@ void CMesMenu::onDraw()
                     DrawInit__5CFontFv(font);
                     SetTlut__5CFontFi(font, 0xF);
                     colorStorage = CColor(0xFF, 0xFF, 0xFF, (unsigned char)(int)alphaF);
-                    SetColor__5CFontF8_GXColor(font, &colorStorage);
+                    font->SetColor(colorStorage.color);
                     SetPosX__5CFontFf(iconX + ((anchorX == 0) ? FLOAT_80330954 - textWidth : FLOAT_80330950), font);
                     SetPosY__5CFontFf(iconY + (float)(anchorY != 0 ? 8 : 31), font);
                     Draw__5CFontFPc(font, flatData->m_table[2].index[*(int*)((char*)this + 0x3D98)]);
@@ -812,7 +812,7 @@ void CMesMenu::onDraw()
                 if (*(int*)((char*)this + 0x3D94) >= 0) {
                     int itemIndex = *(int*)((char*)this + 0x3D94);
                     colorStorage = CColor(0xFF, 0xFF, 0xFF, (unsigned char)(int)alphaF);
-                    SetColor__8CMenuPcsFR6CColor(&MenuPcs, &colorStorage);
+                    MenuPcs.SetColor(colorStorage);
                     SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x18);
                     SetExternalTlut__8CTextureFPvi(MenuPcs.m_textures[0x18], 0, 1);
                     DrawRect__8CMenuPcsFUlfffffffff(
@@ -838,7 +838,7 @@ void CMesMenu::onDraw()
             SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x1E);
             int shadowAlpha = (int)((FLOAT_803308ec * (FLOAT_80330908 * windowScale)) * stageBlend);
             colorStorage = CColor(0, 0, 0, shadowAlpha);
-            SetColor__8CMenuPcsFR6CColor(&MenuPcs, &colorStorage);
+            MenuPcs.SetColor(colorStorage);
             float promptX = FLOAT_803308f8 + drawX;
             float promptY = FLOAT_8033092c + drawY;
             float waveX = promptX + FLOAT_80330984 * (pulseScale * sinX);
@@ -849,7 +849,7 @@ void CMesMenu::onDraw()
                 FLOAT_803308d8, FLOAT_80330990 * (FLOAT_80330914 + fadeScale), FLOAT_80330990 * (pulseScale + fadeScale),
                 FLOAT_803308d8);
             colorStorage = CColor(0xFF, 0xFF, 0xFF, (unsigned char)(int)((FLOAT_80330908 * windowScale) * stageBlend));
-            SetColor__8CMenuPcsFR6CColor(&MenuPcs, &colorStorage);
+            MenuPcs.SetColor(colorStorage);
             DrawRect__8CMenuPcsFUlfffffffff(
                 &MenuPcs, 3, waveX, waveY, FLOAT_8033098C, FLOAT_8033095C, FLOAT_803308d8, FLOAT_803308d8,
                 FLOAT_80330990 * pulseScale, FLOAT_80330990 * pulseScale, FLOAT_803308d8);
@@ -865,7 +865,7 @@ void CMesMenu::onDraw()
         SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0);
         float alphaF = FLOAT_80330908 * stageBlend;
         CColor colorStorage(0xFF, 0xFF, 0xFF, (unsigned char)(int)alphaF);
-        SetColor__8CMenuPcsFR6CColor(&MenuPcs, &colorStorage);
+        MenuPcs.SetColor(colorStorage);
 
         DrawRect__8CMenuPcsFUlfffffffff(
             &MenuPcs, 0, FLOAT_80330994 + *(float*)((char*)this + 0x3CB8),

@@ -1,4 +1,5 @@
 #include "ffcc/shopmenu.h"
+#include "ffcc/fontman.h"
 #include "ffcc/graphic.h"
 #include "ffcc/materialman.h"
 #include "ffcc/pad.h"
@@ -47,7 +48,6 @@ void SetScaleX__5CFontFf(float, CFont*);
 void SetScaleY__5CFontFf(float, CFont*);
 void SetMargin__5CFontFf(float, CFont*);
 void SetShadow__5CFontFi(CFont*, int);
-void SetColor__5CFontF8_GXColor(CFont*, _GXColor*);
 void SetPosX__5CFontFf(float, CFont*);
 void SetPosY__5CFontFf(float, CFont*);
 void SetTlut__5CFontFi(CFont*, int);
@@ -443,7 +443,7 @@ static void SetupShopMenuInfoFont(CFont* font, _GXColor* color)
     SetMargin__5CFontFf(FLOAT_80332d28, font);
     SetShadow__5CFontFi(font, 1);
     SetScale__5CFontFf(FLOAT_80332d28, font);
-    SetColor__5CFontF8_GXColor(font, color);
+    font->SetColor(*color);
 }
 
 static void SetupShopMenuUnitFont(CFont* font)
@@ -459,7 +459,7 @@ static void SetupShopMenuAmountFont(CFont* font, _GXColor* color)
     SetShadow__5CFontFi(font, 1);
     SetScaleX__5CFontFf(FLOAT_80332d28, font);
     SetScaleY__5CFontFf(FLOAT_80332d8c, font);
-    SetColor__5CFontF8_GXColor(font, color);
+    font->SetColor(*color);
     DrawInit__5CFontFv(font);
     reinterpret_cast<unsigned char*>(font)[0x24] = (reinterpret_cast<unsigned char*>(font)[0x24] & 0xEF) | 0x10;
     SetMargin__5CFontFf(FLOAT_80332d64, font);
@@ -493,7 +493,7 @@ static void SetupShopMenuLabelFont(CFont* font, _GXColor* color)
     SetShadow__5CFontFi(font, 0);
     SetScaleX__5CFontFf(FLOAT_80332d2c, font);
     SetScaleY__5CFontFf(FLOAT_80332d28, font);
-    SetColor__5CFontF8_GXColor(font, color);
+    font->SetColor(*color);
 }
 
 static inline CFont* GetShopMenuInfoPanelFont()
@@ -970,7 +970,7 @@ void CShopMenu::DrawItemHelp(int index, int centerX, int y)
     SetScaleY__5CFontFf(FLOAT_80332d28, font);
 
     _GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
-    SetColor__5CFontF8_GXColor(font, &white);
+    font->SetColor(white);
     float width = GetWidth__5CFontFPc(font, helpText);
     float x = static_cast<float>(centerX) - width * 0.5f;
     DrawInit__5CFontFv(font);
@@ -1010,7 +1010,7 @@ void CShopMenu::DrawItemInfo(int itemNo, int x, int y, int unused0, int attrY, i
     SetScaleX__5CFontFf(FLOAT_80332d2c, font);
     SetScaleY__5CFontFf(FLOAT_80332d28, font);
     _GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
-    SetColor__5CFontF8_GXColor(font, &white);
+    font->SetColor(white);
     DrawInit__5CFontFv(font);
 
     int languageId = static_cast<unsigned int>(Game.m_gameWork.m_languageId);
@@ -1077,7 +1077,7 @@ void CShopMenu::DrawItemInfo(int itemNo, int x, int y, int unused0, int attrY, i
     int valueRightX = x + 0x108;
     SetShadow__5CFontFi(font, 1);
     SetScale__5CFontFf(FLOAT_80332d28, font);
-    SetColor__5CFontF8_GXColor(font, &white);
+    font->SetColor(white);
     DrawInit__5CFontFv(font);
     reinterpret_cast<unsigned char*>(font)[0x24] = (reinterpret_cast<unsigned char*>(font)[0x24] & 0xEF) | 0x10;
     SetMargin__5CFontFf(FLOAT_80332d34, font);
@@ -1161,7 +1161,7 @@ void CShopMenu::DrawItemInfo0()
     SetScaleX__5CFontFf(FLOAT_80332d2c, font);
     SetScaleY__5CFontFf(FLOAT_80332d28, font);
     _GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
-    SetColor__5CFontF8_GXColor(font, &white);
+    font->SetColor(white);
     DrawInit__5CFontFv(font);
 
     if (itemNo > 0) {
@@ -1247,7 +1247,7 @@ void CShopMenu::DrawItemInfo0()
         int amount = ShopMenuInt(this, 0x44);
         SetShadow__5CFontFi(font, 1);
         SetScale__5CFontFf(FLOAT_80332d28, font);
-        SetColor__5CFontF8_GXColor(font, &white);
+        font->SetColor(white);
         DrawInit__5CFontFv(font);
         reinterpret_cast<unsigned char*>(font)[0x24] = (reinterpret_cast<unsigned char*>(font)[0x24] & 0xEF) | 0x10;
         SetMargin__5CFontFf(FLOAT_80332d34, font);
@@ -1501,7 +1501,7 @@ void CShopMenu::DrawItemList()
             SetScale__5CFontFf(FLOAT_80332d28, font);
 
             _GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
-            SetColor__5CFontF8_GXColor(font, &white);
+            font->SetColor(white);
             DrawInit__5CFontFv(font);
             SetPosX__5CFontFf(static_cast<float>(frameX - 0x54), font);
             SetPosY__5CFontFf(static_cast<float>(y - 0x14), font);
@@ -1718,7 +1718,7 @@ void CShopMenu::DrawShopBase()
         SetShadow__5CFontFi(font, 0);
         SetScaleX__5CFontFf(FLOAT_80332d2c, font);
         SetScaleY__5CFontFf(FLOAT_80332d28, font);
-        SetColor__5CFontF8_GXColor(font, &white);
+        font->SetColor(white);
 
         char* confirmText = (ShopMenuInt(this, 0x14) == 0) ? ShopMenuMes(languageId, SHOP_MENU_TEXT_BUY) :
                                                              ShopMenuMes(languageId, SHOP_MENU_TEXT_SELL);
@@ -1848,7 +1848,7 @@ void CShopMenu::DrawSoubi()
     SetScale__5CFontFf(FLOAT_80332d28, font);
 
     _GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
-    SetColor__5CFontF8_GXColor(font, &white);
+    font->SetColor(white);
     DrawInit__5CFontFv(font);
 
     char* itemName = 0;
@@ -1876,7 +1876,7 @@ void CShopMenu::DrawSoubi()
     SetShadow__5CFontFi(labelFont, 0);
     SetScaleX__5CFontFf(FLOAT_80332d2c, labelFont);
     SetScaleY__5CFontFf(FLOAT_80332d28, labelFont);
-    SetColor__5CFontF8_GXColor(labelFont, &white);
+    labelFont->SetColor(white);
 
     char* equipText = ShopMenuMes(languageId, SHOP_MENU_TEXT_EQUIP);
     float equipTextX = CalcCenteredShopMenuX(labelFont, equipText);
@@ -1943,7 +1943,7 @@ void CShopMenu::DrawMake()
     SetShadow__5CFontFi(font, 1);
     SetScale__5CFontFf(FLOAT_80332d28, font);
     _GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
-    SetColor__5CFontF8_GXColor(font, &white);
+    font->SetColor(white);
 
     const char* itemName = GetItemName(resultItem);
     DrawInit__5CFontFv(font);
@@ -2007,7 +2007,7 @@ void CShopMenu::DrawMake()
     SetMargin__5CFontFf(FLOAT_80332d28, font);
     SetShadow__5CFontFi(font, 1);
     SetScale__5CFontFf(FLOAT_80332d28, font);
-    SetColor__5CFontF8_GXColor(font, &white);
+    font->SetColor(white);
     DrawInit__5CFontFv(font);
     const char* materialsText = ShopMenuMes(languageId, SHOP_MENU_TEXT_MATERIALS);
     float materialsX = FLOAT_80332e30 - GetWidth__5CFontFPc(font, materialsText) * FLOAT_80332d78;
@@ -2038,7 +2038,7 @@ void CShopMenu::DrawMake()
         SetMargin__5CFontFf(FLOAT_80332d28, font);
         SetShadow__5CFontFi(font, 1);
         SetScale__5CFontFf(FLOAT_80332d28, font);
-        SetColor__5CFontF8_GXColor(font, &white);
+        font->SetColor(white);
 
         DrawInit__5CFontFv(font);
         DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(MenuPcsVoid(), font, DAT_80332d84, 60.0f, rowY, 0x1B, 0x12);
@@ -2052,7 +2052,7 @@ void CShopMenu::DrawMake()
         SetMargin__5CFontFf(FLOAT_80332d28, font);
         SetShadow__5CFontFi(font, 1);
         SetScale__5CFontFf(FLOAT_80332d28, font);
-        SetColor__5CFontF8_GXColor(font, &white);
+        font->SetColor(white);
         float slashX = neededX - FLOAT_80332d28 - GetWidth__5CFontFPc(font, "/");
         DrawInit__5CFontFv(font);
         DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(MenuPcsVoid(), font, const_cast<char*>("/"), slashX, rowY, 0x1B, 0x12);
@@ -2139,7 +2139,7 @@ void CShopMenu::DrawSmith0()
     SetScale__5CFontFf(FLOAT_80332d8c, font);
 
     _GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
-    SetColor__5CFontF8_GXColor(font, &white);
+    font->SetColor(white);
     DrawInit__5CFontFv(font);
 
     int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
@@ -2175,7 +2175,7 @@ void CShopMenu::DrawShop0()
     SetScale__5CFontFf(FLOAT_80332d8c, font);
 
     _GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
-    SetColor__5CFontF8_GXColor(font, &white);
+    font->SetColor(white);
 
     for (int i = 0; i < 3; i++) {
         int x = 0x88;

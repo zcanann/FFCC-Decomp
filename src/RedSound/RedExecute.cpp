@@ -2166,7 +2166,7 @@ static void _KeyOnControl()
         } while ((voiceData != 0) && (reserve < RedKeyOnGetEnd(RedKeyOnDataGet())));
     }
 
-    soundControl = RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY);
+    soundControl = RedSoundControlGetBegin();
     if ((soundControl->m_activeTrackCount != 0) &&
         ((soundControl->m_flags & REDSOUND_CONTROL_FLAG_PAUSE) == 0)) {
         track = soundControl->m_tracks;
@@ -2346,7 +2346,7 @@ static void _ExecuteExtraData()
         soundControl++;
     } while (soundControl < RedSoundControlGet(REDSOUND_CONTROL_MUSIC_SKIP));
 
-    soundControl = RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY);
+    soundControl = RedSoundControlGetBegin();
 
     if (RedMusicTempoControlGetCount() != 0) {
         RedMusicTempoControlDecCount();

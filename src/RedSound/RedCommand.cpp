@@ -616,7 +616,7 @@ int SeBlockPlay(int seId, int bank, int sequenceNo, int pan, int volume)
 
 		RedSeBlockIdAddBank(sequenceNo, bank);
 		RedSeBlockIdSetDataFlag(sequenceNo);
-		if (blockSequence < seBlock->m_seCount) {
+		if (blockSequence < RedSeBlockGetSeCount(seBlock)) {
 			entries = seBlock->m_entries;
 
 			if (entries[blockSequence] != REDSOUND_SE_BLOCK_ENTRY_EMPTY) {

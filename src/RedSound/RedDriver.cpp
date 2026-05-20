@@ -3076,7 +3076,7 @@ void* CRedDriver::SetSeBlockData(int blockIndex, void* seBlockData)
     int copySize;
 
     if (seBlockData != 0) {
-        copySize = RedSeBlockHeadFromData(seBlockData)->m_size;
+        copySize = RedSeBlockGetSize(RedSeBlockHeadFromData(seBlockData));
         if (copySize > 0) {
             copiedBuffer = (void*)RedNew(copySize);
             if (copiedBuffer != 0) {

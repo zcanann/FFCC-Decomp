@@ -388,6 +388,8 @@ enum RedSeBlockEntryLayout {
 #define RedSeBlockIdIsBlockData(seBlockId) (((seBlockId) & REDSOUND_SE_BLOCK_DATA_FLAG) != 0)
 #define RedSeBlockIdIsSeSepData(seBlockId) (((seBlockId) & REDSOUND_SE_BLOCK_DATA_FLAG) == 0)
 
+#define RedSeBlockGetSize(seBlock) ((seBlock)->m_size)
+#define RedSeBlockGetSeCount(seBlock) ((seBlock)->m_seCount)
 #define RedSeBlockGetInfoBase(seBlock) RedSeBlockGetInfoBaseFromEntries(seBlock, (seBlock)->m_entries)
 
 #define RedSeBlockGetInfoBaseFromEntries(seBlock, entries)                                       \

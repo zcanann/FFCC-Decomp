@@ -992,7 +992,7 @@ static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* wav
  */
 int MusicStop(int musicId)
 {
-	RedSoundCONTROL* music = RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY);
+	RedSoundCONTROL* music = RedSoundControlGetBegin();
 
 	do {
 		if ((musicId == REDSOUND_MUSIC_ID_NONE) ||
@@ -1034,7 +1034,7 @@ int MusicStop(int musicId)
 		music++;
 	} while (music < RedSoundControlGetMusicPlayEnd());
 
-	music = RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY);
+	music = RedSoundControlGetBegin();
 	if ((music->m_musicId < REDSOUND_MUSIC_ID_MIN) &&
 	    (music[REDSOUND_CONTROL_MUSIC_SECONDARY].m_musicId >= REDSOUND_MUSIC_ID_MIN)) {
 		memcpy(RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY),
@@ -1102,7 +1102,7 @@ void SetMusicVolume(int musicId, int volume, int duration, int mode)
 		duration /= REDSOUND_FRAMES_PER_SECOND;
 	}
 
-	music = RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY);
+	music = RedSoundControlGetBegin();
 	do {
 		if ((musicId == REDSOUND_MUSIC_ID_NONE) || (musicId == music->m_musicId) ||
 		    (music->m_musicId < REDSOUND_MUSIC_ID_MIN)) {
@@ -1232,7 +1232,7 @@ void MusicPause(int musicId, int pause)
 		fflush(__files + 1);
 	}
 
-	music = RedSoundControlGet(REDSOUND_CONTROL_MUSIC_PRIMARY);
+	music = RedSoundControlGetBegin();
 	do {
 		if ((musicId == REDSOUND_MUSIC_ID_NONE) ||
 		    ((music->m_musicId >= REDSOUND_MUSIC_ID_MIN) && (music->m_musicId == musicId))) {

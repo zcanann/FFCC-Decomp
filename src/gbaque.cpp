@@ -1099,15 +1099,15 @@ void GbaQueue::SetSmithData(int channel, unsigned int value)
  */
 void GbaQueue::SetStageNo(int stageId, int mapId)
 {
-    int i = 0;
-    GbaQueue* semaphoreIter = this;
     char* obj = reinterpret_cast<char*>(this);
+    int waitIndex = 0;
+    GbaQueue* waitSemaphore = this;
 
     do {
-        OSWaitSemaphore(semaphoreIter->accessSemaphores);
-        i++;
-        semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
-    } while (i < 4);
+        OSWaitSemaphore(waitSemaphore->accessSemaphores);
+        waitIndex++;
+        waitSemaphore = reinterpret_cast<GbaQueue*>(waitSemaphore->accessSemaphores + 1);
+    } while (waitIndex < 4);
 
     obj[0x2D38] = 0;
     obj[0x2D39] = 0;
@@ -1125,33 +1125,33 @@ void GbaQueue::SetStageNo(int stageId, int mapId)
     *reinterpret_cast<int*>(obj + 0x448) = mapId;
     obj[0x2D55] = 0xF;
 
-    i = 0;
-    semaphoreIter = this;
+    int signalIndex = 0;
+    GbaQueue* signalSemaphore = this;
     do {
-        OSSignalSemaphore(semaphoreIter->accessSemaphores);
-        i++;
-        semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
-    } while (i < 4);
+        OSSignalSemaphore(signalSemaphore->accessSemaphores);
+        signalIndex++;
+        signalSemaphore = reinterpret_cast<GbaQueue*>(signalSemaphore->accessSemaphores + 1);
+    } while (signalIndex < 4);
 
     if (Joybus.LoadMap(stageId, mapId) == 0) {
-        i = 0;
-        semaphoreIter = this;
+        int loadWaitIndex = 0;
+        GbaQueue* loadWaitSemaphore = this;
         do {
-            OSWaitSemaphore(semaphoreIter->accessSemaphores);
-            i++;
-            semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
-        } while (i < 4);
+            OSWaitSemaphore(loadWaitSemaphore->accessSemaphores);
+            loadWaitIndex++;
+            loadWaitSemaphore = reinterpret_cast<GbaQueue*>(loadWaitSemaphore->accessSemaphores + 1);
+        } while (loadWaitIndex < 4);
 
         obj[0x44C] = 0xF;
         obj[0x2D37] = 0xF;
 
-        i = 0;
-        semaphoreIter = this;
+        int loadSignalIndex = 0;
+        GbaQueue* loadSignalSemaphore = this;
         do {
-            OSSignalSemaphore(semaphoreIter->accessSemaphores);
-            i++;
-            semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
-        } while (i < 4);
+            OSSignalSemaphore(loadSignalSemaphore->accessSemaphores);
+            loadSignalIndex++;
+            loadSignalSemaphore = reinterpret_cast<GbaQueue*>(loadSignalSemaphore->accessSemaphores + 1);
+        } while (loadSignalIndex < 4);
     }
 
     memset(obj + 0x2D44, 0xFF, 0x10);
@@ -1843,10 +1843,11 @@ void GbaQueue::GetEnemyPos(int channel, unsigned int* outData, int* outCount)
     obj = reinterpret_cast<char*>(this);
 
     OSWaitSemaphore(accessSemaphores + channel);
-    if (((unsigned int)__cntlzw(1 - static_cast<int>(m_singleMode)) >> 5 & 0xFFU) != 0U) {
+    unsigned int singleMode = (unsigned int)__cntlzw(1 - static_cast<int>(m_singleMode)) >> 5;
+    OSSignalSemaphore(accessSemaphores + channel);
+    if ((singleMode & 0xFFU) != 0U) {
         channel = 0;
     }
-    OSSignalSemaphore(accessSemaphores + channel);
 
     OSWaitSemaphore(accessSemaphores + channel);
 
@@ -1854,26 +1855,30 @@ void GbaQueue::GetEnemyPos(int channel, unsigned int* outData, int* outCount)
     baseZ = *reinterpret_cast<short*>(obj + channel * 0xDC + 0x34);
     memcpy(localEnemyData, obj + 0xB34, 0x500);
 
+    prevEntry = obj + channel * 0x500 + 0x1034;
     radarMode = obj[channel + 0x2D32];
     localEntry = localEnemyData;
     for (i = 0; i < 0x40; i++) {
-        int enemyX = *reinterpret_cast<short*>(localEntry + 8) - baseX;
-        int enemyZ = *reinterpret_cast<short*>(localEntry + 10) - baseZ;
+        *reinterpret_cast<short*>(localEntry + 8) = *reinterpret_cast<short*>(localEntry + 8) - baseX;
+        *reinterpret_cast<short*>(localEntry + 10) = *reinterpret_cast<short*>(localEntry + 10) - baseZ;
 
-        *reinterpret_cast<short*>(localEntry + 8) = static_cast<short>(enemyX);
-        *reinterpret_cast<short*>(localEntry + 10) = static_cast<short>(enemyZ);
-
-        if ((enemyX < 0 ? -enemyX : enemyX) < 0x50 && (enemyZ < 0 ? -enemyZ : enemyZ) < 0x40) {
-            localEntry[0] = 1;
+        int enemyX = *reinterpret_cast<short*>(localEntry + 8);
+        if ((enemyX < 0 ? -enemyX : enemyX) < 0x50) {
+            int enemyZ = *reinterpret_cast<short*>(localEntry + 10);
+            if ((enemyZ < 0 ? -enemyZ : enemyZ) < 0x40) {
+                localEntry[0] = 1;
+            } else {
+                *reinterpret_cast<short*>(localEntry + 8) = -1;
+                *reinterpret_cast<short*>(localEntry + 10) = -1;
+                localEntry[0] = 0;
+            }
         } else {
-            localEntry[8] = -1;
-            localEntry[9] = -1;
-            localEntry[10] = -1;
-            localEntry[11] = -1;
+            *reinterpret_cast<short*>(localEntry + 8) = -1;
+            *reinterpret_cast<short*>(localEntry + 10) = -1;
             localEntry[0] = 0;
         }
 
-        if (*reinterpret_cast<short*>(localEntry + 4) == 0 || localEntry[2] == 0) {
+        if (*reinterpret_cast<unsigned short*>(localEntry + 4) == 0 || localEntry[2] == 0) {
             localEntry[0] = 0;
         }
 
@@ -1888,7 +1893,6 @@ void GbaQueue::GetEnemyPos(int channel, unsigned int* outData, int* outCount)
 
     count = 0;
     localEntry = localEnemyData;
-    prevEntry = obj + channel * 0x500 + 0x1034;
     outPtr = reinterpret_cast<unsigned char*>(outData);
     for (i = 0; i < 0x40; i++) {
         if ((localEntry[0] != 0 || prevEntry[0] != 0) && memcmp(localEntry, prevEntry, 0x14) != 0) {
@@ -2227,15 +2231,14 @@ int GbaQueue::GetPlayerHP(int channel, unsigned char* outData)
  */
 int GbaQueue::MakeLetterList(int channel, char* outData)
 {
-	GbaQueueFlagView* flags = GetFlagView(this);
 	const unsigned int scriptFood = Game.m_scriptFoodBase[channel];
 
 	if (scriptFood == 0) {
-		const unsigned char channelMask = static_cast<unsigned char>(1U << channel);
+		const unsigned int channelMask = 1U << channel;
 
-		flags->m_letterDatFlg = static_cast<unsigned char>(flags->m_letterDatFlg | channelMask);
+		GetFlagView(this)->m_letterDatFlg |= channelMask;
 		Joybus.SetLetterSize(channel, 0);
-		m_letterFlags = static_cast<unsigned char>(m_letterFlags & ~channelMask);
+		m_letterFlags &= ~channelMask;
 		return 0;
 	}
 
@@ -2391,11 +2394,11 @@ Printf__7CSystemFPce(&System, const_cast<char*>(s_letter_data_error), const_cast
 	__dla__FPv(subjectNameBuf);
 	__dla__FPv(npcNameBuf);
 
-	const unsigned char channelMask = static_cast<unsigned char>(1U << channel);
+	const unsigned int channelMask = 1U << channel;
 
-	flags->m_letterDatFlg = static_cast<unsigned char>(flags->m_letterDatFlg | channelMask);
+	GetFlagView(this)->m_letterDatFlg |= channelMask;
 	Joybus.SetLetterSize(channel, totalSize);
-	m_letterFlags = static_cast<unsigned char>(m_letterFlags & ~channelMask);
+	m_letterFlags &= ~channelMask;
 	return totalSize;
 }
 
@@ -4285,9 +4288,9 @@ int GbaQueue::GetArtifactData(int channel, unsigned char* outData)
 	localPlayerData = *GetPlayerDataView(this, channel);
 	OSSignalSemaphore(accessSemaphores + channel);
 
-	artifactData[0] = SwapU32(localPlayerData.m_artifacts[0]);
-	artifactData[1] = SwapU32(localPlayerData.m_artifacts[1]);
-	artifactData[2] = SwapU32(localPlayerData.m_artifacts[2]);
+	artifactData[0] = SwapU32Value(localPlayerData.m_artifacts[0]);
+	artifactData[1] = SwapU32Value(localPlayerData.m_artifacts[1]);
+	artifactData[2] = SwapU32Value(localPlayerData.m_artifacts[2]);
 	memcpy(outData, artifactData, sizeof(artifactData));
 	return 0xC;
 }
@@ -4471,9 +4474,9 @@ int GbaQueue::MakeArtiData(int channel, char* outData)
 	unsigned int artifactData[3];
 
 	OSWaitSemaphore(accessSemaphores + channel);
-	artifactData[0] = SwapU32(*reinterpret_cast<unsigned int*>(compatibilityStr + channel * 0xDC + 0x24));
-	artifactData[1] = SwapU32(*reinterpret_cast<unsigned int*>(compatibilityStr + channel * 0xDC + 0x28));
-	artifactData[2] = SwapU32(*reinterpret_cast<unsigned int*>(compatibilityStr + channel * 0xDC + 0x2C));
+	artifactData[0] = SwapU32Value(*reinterpret_cast<unsigned int*>(compatibilityStr + channel * 0xDC + 0x24));
+	artifactData[1] = SwapU32Value(*reinterpret_cast<unsigned int*>(compatibilityStr + channel * 0xDC + 0x28));
+	artifactData[2] = SwapU32Value(*reinterpret_cast<unsigned int*>(compatibilityStr + channel * 0xDC + 0x2C));
 	OSSignalSemaphore(accessSemaphores + channel);
 
 	memcpy(outData, artifactData, sizeof(artifactData));
@@ -4498,19 +4501,16 @@ int GbaQueue::MakeArtiData(int channel, char* outData)
 int GbaQueue::GetTmpArtifactData(int channel, unsigned char* outData)
 {
 	GbaQueuePlayerDataView localPlayerData;
+	unsigned short tmpArtifacts[4];
 
 	OSWaitSemaphore(accessSemaphores + channel);
 	localPlayerData = *GetPlayerDataView(this, channel);
 	OSSignalSemaphore(accessSemaphores + channel);
 
-	*reinterpret_cast<unsigned short*>(outData + 0) =
-		SwapU16(localPlayerData.m_tmpArtifacts[0]);
-	*reinterpret_cast<unsigned short*>(outData + 2) =
-		SwapU16(localPlayerData.m_tmpArtifacts[1]);
-	*reinterpret_cast<unsigned short*>(outData + 4) =
-		SwapU16(localPlayerData.m_tmpArtifacts[2]);
-	*reinterpret_cast<unsigned short*>(outData + 6) =
-		SwapU16(localPlayerData.m_tmpArtifacts[3]);
+	for (int i = 0; i < 4; i++) {
+		tmpArtifacts[i] = SwapU16(localPlayerData.m_tmpArtifacts[i]);
+	}
+	memcpy(outData, tmpArtifacts, sizeof(tmpArtifacts));
 
 	return 8;
 }

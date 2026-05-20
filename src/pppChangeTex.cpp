@@ -12,19 +12,6 @@ extern unsigned char gPppInConstructor;
 #include <string.h>
 #include <dolphin/os/OSCache.h>
 
-struct _pppMngStChangeTex {
-	char _pad0[0xd8];
-	void* m_charaObj;
-};
-
-struct _pppEnvStChangeTex {
-	void* m_stagePtr;
-	CMaterialSet* m_materialSetPtr;
-	CMapMesh** m_mapMeshPtr;
-};
-extern _pppMngStChangeTex* pppMngStPtr;
-extern _pppEnvStChangeTex* pppEnvStPtr;
-
 struct ChangeTexDisplayList {
 	u32 m_size;
 	void* m_data;
@@ -136,8 +123,8 @@ extern "C" {
 		void* GetCharaHandlePtr__FP8CGObjectl(void* obj, long index);
 		int GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void* handle);
 		void pppHeapUseRate__FPQ27CMemory6CStage(void* stage);
-		void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(void*, long, float&, float&, float&, float, float&, float&);
-		void* GetTextureFromRSD__FiP9_pppEnvSt(int, _pppEnvStChangeTex*);
+		void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(_pppPObject*, long, float&, float&, float&, float, float&, float&);
+		void* GetTextureFromRSD__FiP9_pppEnvSt(int, _pppEnvSt*);
 		void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, void*, char*, int);
 		void ReWriteDisplayList__5CUtilFPvUlUl(CUtil*, void*, unsigned long, unsigned long);
 		void CalcBoundaryBoxQuantized__5CUtilFP3VecP3VecP6S16VecUlUl(CUtil*, Vec*, Vec*, S16Vec*, unsigned long, unsigned long);
@@ -157,7 +144,7 @@ void pppRenderChangeTex(pppChangeTex*, pppChangeTexUnkB* step, pppChangeTexUnkC*
 	int textureIndex;
 
 	if (step->m_dataValIndex != 0xffff) {
-		_pppEnvStChangeTex* env = pppEnvStPtr;
+		_pppEnvSt* env = pppEnvStPtr;
 		CMapMesh* mapMesh = env->m_mapMeshPtr[step->m_dataValIndex];
 		textureIndex = 0;
 		GetTexture__8CMapMeshFP12CMaterialSetRi(
@@ -183,18 +170,17 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 	}
 
 	s32* serializedDataOffsets = data->m_serializedDataOffsets;
-	u8* base = (u8*)changeTex;
-	ChangeTexWork* work = (ChangeTexWork*)(base + serializedDataOffsets[2] + 0x80);
-	u8* colorData = base + serializedDataOffsets[1] + 0x80;
-	CCharaPcs::CHandle* handle0 = GetCharaHandlePtr((CGObject*)pppMngStPtr->m_charaObj, 0);
+	ChangeTexWork* work = (ChangeTexWork*)(changeTex->m_object.m_workArea + serializedDataOffsets[2]);
+	u8* colorData = changeTex->m_object.m_workArea + serializedDataOffsets[1];
+	CCharaPcs::CHandle* handle0 = GetCharaHandlePtr((CGObject*)pppMngStPtr->m_owner, 0);
 	CChara::CModel* model0 = GetCharaModelPtr(handle0);
 	ChangeTexModelRaw* model0Raw = (ChangeTexModelRaw*)model0;
 
 	CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
-	    changeTex, step->m_graphId, work->m_value0, work->m_value1, work->m_value2, step->m_initWOrk,
+	    &changeTex->m_object, step->m_graphId, work->m_value0, work->m_value1, work->m_value2, step->m_initWOrk,
 	    step->m_stepValue, step->m_arg3);
 
-	work->m_charaObj = (CGObject*)pppMngStPtr->m_charaObj;
+	work->m_charaObj = (CGObject*)pppMngStPtr->m_owner;
 	work->m_context = pppEnvStPtr;
 	model0Raw->m_state = work;
 	model0Raw->m_step = step;
@@ -343,7 +329,7 @@ void pppDestructChangeTex(pppChangeTex* changeTex, pppChangeTexUnkC* data)
 {
 	_WaitDrawDone__8CGraphicFPci(&Graphic, const_cast<char*>(s_pppChangeTex_cpp_801dd660), 0x9d);
 	int dataOffset = data->m_serializedDataOffsets[2];
-	ChangeTexWork* work = (ChangeTexWork*)((char*)changeTex + dataOffset + 0x80);
+	ChangeTexWork* work = (ChangeTexWork*)(changeTex->m_object.m_workArea + dataOffset);
 	void* handle0 = GetCharaHandlePtr__FP8CGObjectl(work->m_charaObj, 0);
 	void* handle1 = GetCharaHandlePtr__FP8CGObjectl(work->m_charaObj, 1);
 	void* handle2 = GetCharaHandlePtr__FP8CGObjectl(work->m_charaObj, 2);
@@ -435,7 +421,7 @@ freeArrays:
  */
 void pppConstruct2ChangeTex(pppChangeTex* changeTex, pppChangeTexUnkC* data)
 {
-	ChangeTexWork* work = (ChangeTexWork*)((char*)changeTex + data->m_serializedDataOffsets[2] + 0x80);
+	ChangeTexWork* work = (ChangeTexWork*)(changeTex->m_object.m_workArea + data->m_serializedDataOffsets[2]);
 	float init = kPppChangeTexInit;
 
 	work->m_value0 = init;
@@ -455,7 +441,7 @@ void pppConstruct2ChangeTex(pppChangeTex* changeTex, pppChangeTexUnkC* data)
 void pppConstructChangeTex(pppChangeTex* changeTex, pppChangeTexUnkC* data)
 {
 	float init = kPppChangeTexInit;
-	ChangeTexWork* work = (ChangeTexWork*)((char*)changeTex + data->m_serializedDataOffsets[2] + 0x80);
+	ChangeTexWork* work = (ChangeTexWork*)(changeTex->m_object.m_workArea + data->m_serializedDataOffsets[2]);
 
 	work->m_value0 = init;
 	work->m_value2 = init;

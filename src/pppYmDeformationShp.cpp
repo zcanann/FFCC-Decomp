@@ -476,9 +476,9 @@ int RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* verti
 	texMtx[2][2] = FLOAT_8033062c;
 
 	PSMTXConcat(texMtx, layout->m_modelMatrix.value, tempMtx);
-	cameraPos.x = kPppYmDeformationShpZero;
-	cameraPos.y = kPppYmDeformationShpZero;
 	cameraPos.z = kPppYmDeformationShpZero;
+	cameraPos.y = kPppYmDeformationShpZero;
+	cameraPos.x = kPppYmDeformationShpZero;
 	PSMTXMultVec(tempMtx, &cameraPos, &cameraPos);
 	cameraPos.x = cameraPos.x / cameraPos.z;
 	cameraPos.y = cameraPos.y / cameraPos.z;

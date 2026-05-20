@@ -1329,18 +1329,18 @@ void CFlatRuntime2::Destroy()
 	Destroy__12CFlatRuntimeFv(reinterpret_cast<CFlatRuntime*>(this));
 	Destroy__9CFlatDataFv(reinterpret_cast<u8*>(this) + 0xCF20);
 
-	u8* layer = reinterpret_cast<u8*>(this) + 0x1770;
-	for (int i = 0; i < 8; i++, layer += 0xC) {
-		CFile::CHandle* fileHandle = *reinterpret_cast<CFile::CHandle**>(layer + 8);
+	CFlatRuntime2* layer = this;
+	for (int i = 0; i < 8; i++, layer = reinterpret_cast<CFlatRuntime2*>(reinterpret_cast<u8*>(layer) + 0xC)) {
+		CFile::CHandle* fileHandle = *reinterpret_cast<CFile::CHandle**>(reinterpret_cast<u8*>(layer) + 0x1778);
 		if (fileHandle != 0) {
 			File.Close(fileHandle);
-			*reinterpret_cast<CFile::CHandle**>(layer + 8) = 0;
+			*reinterpret_cast<CFile::CHandle**>(reinterpret_cast<u8*>(layer) + 0x1778) = 0;
 		}
 
-		void* textureSet = *reinterpret_cast<void**>(layer + 4);
+		void* textureSet = *reinterpret_cast<void**>(reinterpret_cast<u8*>(layer) + 0x1774);
 		if (textureSet != 0) {
 			(*(void (**)(void*, int))(*reinterpret_cast<int*>(textureSet) + 8))(textureSet, 1);
-			*reinterpret_cast<void**>(layer + 4) = 0;
+			*reinterpret_cast<void**>(reinterpret_cast<u8*>(layer) + 0x1774) = 0;
 		}
 	}
 }

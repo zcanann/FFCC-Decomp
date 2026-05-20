@@ -198,6 +198,8 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
     int slice;
     int tevSwapChannel;
     int tevAlphaScale;
+    u8 tevStageCount;
+    u8 texGenCount;
     int isCameraInside;
     GXTexObj backI4Tex;
     GXTexObj backRgba8Tex;
@@ -577,6 +579,8 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
                     tevAlphaScale = 2;
                 }
                 _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(2, 0, 0, tevAlphaScale, 1, 0);
+                tevStageCount = 3;
+                texGenCount = 1;
             } else {
                 GXSetTevDirect((GXTevStageID)0);
                 GXLoadTexObj(&backRgba8Tex, GX_TEXMAP0);
@@ -611,10 +615,12 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
                     tevAlphaScale = 2;
                 }
                 _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(2, 0, 0, tevAlphaScale, 1, 0);
+                tevStageCount = 3;
+                texGenCount = 1;
             }
 
-            GXSetNumTevStages(3);
-            GXSetNumTexGens(1);
+            GXSetNumTevStages(tevStageCount);
+            GXSetNumTexGens(texGenCount);
             quadA.x = FLOAT_8033193c;
             quadA.y = yPos;
             quadA.z = FLOAT_8033193c;

@@ -8,6 +8,7 @@ extern const float FLOAT_80330564 = 16384.0f;
 extern const float FLOAT_80330568 = 0.5f;
 extern const float FLOAT_8033056C = 0.00787f;
 extern const float FLOAT_80330570 = 127.0f;
+extern const float FLOAT_80330590;
 extern int gPppCalcDisabled;
 }
 #include <dolphin/mtx.h>
@@ -519,9 +520,9 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* work, PYmMegaBirthShpT
             particleData->m_matrix[0][1] = speedRandRange * Math.RandF() - speedRandHalf;
             particleData->m_matrix[0][2] = speedRandRange * Math.RandF() - speedRandHalf;
         } else if (randType == 3) {
-            particleData->m_matrix[0][0] = -(2.0f * (speedRandRange * Math.RandF() * Math.RandF()) - speedRandRange) - speedRandHalf;
-            particleData->m_matrix[0][1] = -(2.0f * (speedRandRange * Math.RandF() * Math.RandF()) - speedRandRange) - speedRandHalf;
-            particleData->m_matrix[0][2] = -(2.0f * (speedRandRange * Math.RandF() * Math.RandF()) - speedRandRange) - speedRandHalf;
+            particleData->m_matrix[0][0] = -(FLOAT_80330590 * (speedRandRange * Math.RandF() * Math.RandF()) - speedRandRange) - speedRandHalf;
+            particleData->m_matrix[0][1] = -(FLOAT_80330590 * (speedRandRange * Math.RandF() * Math.RandF()) - speedRandRange) - speedRandHalf;
+            particleData->m_matrix[0][2] = -(FLOAT_80330590 * (speedRandRange * Math.RandF() * Math.RandF()) - speedRandRange) - speedRandHalf;
         } else if (randType == 5) {
             particleData->m_matrix[0][0] =
                 -(FLOAT_80330568 * (Math.RandF() * (speedRandRange * Math.RandF() * Math.RandF())) - speedRandRange) - speedRandHalf;
@@ -607,7 +608,7 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* work, PYmMegaBirthShpT
         float scale = speedRandRange;
 
         if (randType == 3) {
-            scale = -(2.0f * (speedRandRange * Math.RandF() * Math.RandF()) - speedRandRange);
+            scale = -(FLOAT_80330590 * (speedRandRange * Math.RandF() * Math.RandF()) - speedRandRange);
         } else if (randType == 1) {
             Math.RandF();
             scale = speedRandRange * Math.RandF();

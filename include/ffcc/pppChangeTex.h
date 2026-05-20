@@ -4,12 +4,13 @@
 #include "ffcc/chara.h"
 #include "ffcc/materialman.h"
 #include "ffcc/mapmesh.h"
+#include "ffcc/partMng.h"
 #include "dolphin/gx/GXDispList.h"
 #include "dolphin/gx/GXVert.h"
 #include <dolphin/types.h>
 
 struct pppChangeTex {
-    u32 m_graphId;
+    _pppPObject m_object;
 };
 
 struct pppChangeTexUnkB {

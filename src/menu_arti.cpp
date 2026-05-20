@@ -646,7 +646,6 @@ int CMenuPcs::ArtiOpen()
 void CMenuPcs::ArtiInit1()
 {
 	float fVar1;
-	short* psVar3;
 	unsigned int uVar4;
 	unsigned int uVar5;
 	ArtiOpenAnimList* list;
@@ -711,28 +710,28 @@ void CMenuPcs::ArtiInit1()
 	list->entries[11].duration = 5;
 	list = GetArtiOpenAnimList(this);
 	uVar4 = (unsigned int)list->count;
-	psVar3 = (short*)list->entries;
+	ArtiOpenAnim* entry = list->entries;
 	if (0 < (int)uVar4) {
 		uVar5 = uVar4 >> 3;
 		if (uVar5 != 0) {
 			do {
-				*(int*)(psVar3 + 0x10) = 0;
-				*(float*)(psVar3 + 8) = fVar1;
-				*(int*)(psVar3 + 0x30) = 0;
-				*(float*)(psVar3 + 0x28) = fVar1;
-				*(int*)(psVar3 + 0x50) = 0;
-				*(float*)(psVar3 + 0x48) = fVar1;
-				*(int*)(psVar3 + 0x70) = 0;
-				*(float*)(psVar3 + 0x68) = fVar1;
-				*(int*)(psVar3 + 0x90) = 0;
-				*(float*)(psVar3 + 0x88) = fVar1;
-				*(int*)(psVar3 + 0xb0) = 0;
-				*(float*)(psVar3 + 0xa8) = fVar1;
-				*(int*)(psVar3 + 0xd0) = 0;
-				*(float*)(psVar3 + 200) = fVar1;
-				*(int*)(psVar3 + 0xf0) = 0;
-				*(float*)(psVar3 + 0xe8) = fVar1;
-				psVar3 = psVar3 + 0x100;
+				entry[0].step = 0;
+				entry[0].alpha = fVar1;
+				entry[1].step = 0;
+				entry[1].alpha = fVar1;
+				entry[2].step = 0;
+				entry[2].alpha = fVar1;
+				entry[3].step = 0;
+				entry[3].alpha = fVar1;
+				entry[4].step = 0;
+				entry[4].alpha = fVar1;
+				entry[5].step = 0;
+				entry[5].alpha = fVar1;
+				entry[6].step = 0;
+				entry[6].alpha = fVar1;
+				entry[7].step = 0;
+				entry[7].alpha = fVar1;
+				entry += 8;
 				uVar5 = uVar5 - 1;
 			} while (uVar5 != 0);
 			uVar4 = uVar4 & 7;
@@ -741,9 +740,9 @@ void CMenuPcs::ArtiInit1()
 			}
 		}
 		do {
-			*(int*)(psVar3 + 0x10) = 0;
-			*(float*)(psVar3 + 8) = fVar1;
-			psVar3 = psVar3 + 0x20;
+			entry->step = 0;
+			entry->alpha = fVar1;
+			entry++;
 			uVar4 = uVar4 - 1;
 		} while (uVar4 != 0);
 	}

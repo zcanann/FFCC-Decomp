@@ -430,7 +430,7 @@ void CFunnyShape::RenderShape()
     offset.x = offsetCopy.x;
     offset.y = offsetCopy.y;
     FS_tagOAN3_SHAPE* shape = reinterpret_cast<FS_tagOAN3_SHAPE*>(m_meshData);
-    RenderShape(shape, offset, FLOAT_8032fd6c);
+    RenderShape(shape, offsetCopy, FLOAT_8032fd6c);
 }
 
 /*
@@ -807,15 +807,4 @@ CFunnyShape::CFunnyShape()
     }
 
     m_textureCount = 0;
-}
-
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CFunnyShape::SetDefaultStage()
-{
-	// TODO
 }

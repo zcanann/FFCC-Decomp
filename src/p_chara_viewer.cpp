@@ -805,9 +805,6 @@ void CCharaPcs::createViewer()
     unsigned char white[4];
     char pathBuf[256];
     CFile::CHandle* fileHandle;
-    Vec lightPos;
-    Vec lightTarget;
-    Vec lightDir;
 
     memset(&self->m_viewerModelStage, 0, 0x18);
     self->m_viewerModelStage =
@@ -923,14 +920,15 @@ void CCharaPcs::createViewer()
 
     CLightPcs::CBumpLight bumpLight;
     bumpLight.m_type = 1;
-    lightPos.x = kCharaViewerLightPosX;
-    lightPos.y = kCharaViewerLightPosY;
-    lightPos.z = kCharaViewerLightPosZ;
-    lightTarget.x = kCharaViewerLightTargetX;
-    lightTarget.y = kCharaViewerLightTargetY;
-    lightTarget.z = kCharaViewerLightTargetZ;
-    PSVECSubtract(&lightTarget, &lightPos, &lightDir);
-    PSVECNormalize(&lightDir, &lightDir);
+    bumpLight.m_position.x = kCharaViewerLightPosX;
+    bumpLight.m_position.y = kCharaViewerLightPosY;
+    bumpLight.m_position.z = kCharaViewerLightPosZ;
+    bumpLight.m_targetPosition.x = kCharaViewerLightTargetX;
+    bumpLight.m_targetPosition.y = kCharaViewerLightTargetY;
+    bumpLight.m_targetPosition.z = kCharaViewerLightTargetZ;
+    PSVECSubtract(reinterpret_cast<Vec*>(&bumpLight.m_targetPosition), reinterpret_cast<Vec*>(&bumpLight.m_position),
+                  reinterpret_cast<Vec*>(&bumpLight.m_direction));
+    PSVECNormalize(reinterpret_cast<Vec*>(&bumpLight.m_direction), reinterpret_cast<Vec*>(&bumpLight.m_direction));
     bumpLight.m_bumpShade[0] = 0x80;
     bumpLight.m_bumpShade[1] = 0x80;
     bumpLight.m_bumpShade[2] = 0;

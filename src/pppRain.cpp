@@ -43,8 +43,9 @@ void pppRenderRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_D
     int i;
     int colorOffset;
     int workOffset;
-    u8* colorBase;
+    RainColorData* colorData;
     RainDrop* drop;
+    RainWork* work;
     float tex1;
     float tex0;
     float baseX;
@@ -54,10 +55,10 @@ void pppRenderRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_D
 
     colorOffset = param_3->m_serializedDataOffsets[1];
     workOffset = param_3->m_serializedDataOffsets[2] + 0x80;
-    colorBase = (u8*)pppRain + colorOffset + 0x80;
+    colorData = (RainColorData*)((u8*)pppRain + colorOffset + 0x80);
     pppSetBlendMode(param_2->m_blendMode);
     pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-        (pppCVECTOR*)(colorBase + 8),
+        &colorData->color,
         ppvCameraMatrix,
         kPppRainTexCoordBase,
         param_2->m_lightTarget,
@@ -76,7 +77,8 @@ void pppRenderRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_D
     GXSetLineWidth(param_2->m_lineWidth, GX_TO_ZERO);
     gUtil.SetVtxFmt_POS_CLR_TEX();
 
-    drop = *(RainDrop**)((u8*)pppRain + workOffset);
+    work = (RainWork*)((u8*)pppRain + workOffset);
+    drop = work->drops;
     baseX = pppMngStPtr->m_matrix.value[0][3];
     baseY = pppMngStPtr->m_matrix.value[1][3];
     baseZ = pppMngStPtr->m_matrix.value[2][3];
@@ -95,14 +97,14 @@ void pppRenderRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_D
             GXWGFifo.f32 = x;
             GXWGFifo.f32 = y;
             GXWGFifo.f32 = z;
-            GXWGFifo.u32 = *(u32*)(colorBase + 8);
+            GXWGFifo.u32 = *(u32*)&colorData->color;
             GXWGFifo.f32 = tex0;
             GXWGFifo.f32 = tex0;
 
             GXWGFifo.f32 = x + segment.x;
             GXWGFifo.f32 = y + segment.y;
             GXWGFifo.f32 = z + segment.z;
-            GXWGFifo.u32 = *(u32*)(colorBase + 8);
+            GXWGFifo.u32 = *(u32*)&colorData->color;
             GXWGFifo.f32 = tex1;
             GXWGFifo.f32 = tex1;
         }

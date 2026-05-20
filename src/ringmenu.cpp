@@ -1,4 +1,5 @@
 #include "ffcc/ringmenu.h"
+#include "ffcc/color.h"
 #include "ffcc/fontman.h"
 #include "ffcc/gobjwork.h"
 #include "ffcc/joybus.h"
@@ -23,8 +24,6 @@ extern "C" void SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(void*, int);
 extern "C" void SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(void*, int);
 extern "C" void DrawInit__8CMenuPcsFv(void*);
 extern "C" void DrawRect__8CMenuPcsFUlfffffffff(void*, unsigned long, float, float, float, float, float, float, float, float, float);
-extern "C" void SetColor__8CMenuPcsFR6CColor(void*, void*);
-extern "C" void* __ct__6CColorFUcUcUcUc(void*, unsigned char, unsigned char, unsigned char, unsigned char);
 extern "C" void SetExternalTlut__8CTextureFPvi(void*, void*, int);
 extern "C" void _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(
     int, int, int, int, int);
@@ -253,16 +252,14 @@ void CRingMenu::DrawIcon()
 		iconCol = 0x65;
 	}
 
-	unsigned int bgColor[1];
-	__ct__6CColorFUcUcUcUc(bgColor, 0, 0, 0, 0x80);
-	SetColor__8CMenuPcsFR6CColor(MenuPcsVoid(), bgColor);
+	CColor bgColor(0, 0, 0, 0x80);
+	MenuPcs.SetColor(bgColor);
 	DrawRect__8CMenuPcsFUlfffffffff(MenuPcsVoid(), 3, static_cast<float>(FLOAT_803309ec + posX),
 	                                 static_cast<float>(FLOAT_803309ec + posY), FLOAT_803309f0, FLOAT_803309f0,
 	                                 FLOAT_803309c0, FLOAT_803309c0, FLOAT_803309cc, FLOAT_803309cc, 0.0f);
 
-	unsigned int fgColor[1];
-	__ct__6CColorFUcUcUcUc(fgColor, 0xFF, 0xFF, 0xFF, 0xFF);
-	SetColor__8CMenuPcsFR6CColor(MenuPcsVoid(), fgColor);
+	CColor fgColor(0xFF, 0xFF, 0xFF, 0xFF);
+	MenuPcs.SetColor(fgColor);
 	DrawRect__8CMenuPcsFUlfffffffff(
 	    MenuPcsVoid(), 3, static_cast<float>(posX), static_cast<float>(posY), FLOAT_803309f0, FLOAT_803309f0, FLOAT_803309c0,
 	    static_cast<float>(iconRow * 0x38), FLOAT_803309cc, FLOAT_803309cc,
@@ -282,9 +279,8 @@ void CRingMenu::DrawIcon()
 	_GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(2, 0, 0);
 	_GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(2, 0xFF, 0xFF, 4);
 
-	unsigned int iconColor[1];
-	__ct__6CColorFUcUcUcUc(iconColor, 0xFF, 0xFF, 0xFF, blinkAlpha);
-	SetColor__8CMenuPcsFR6CColor(MenuPcsVoid(), iconColor);
+	CColor iconColor(0xFF, 0xFF, 0xFF, blinkAlpha);
+	MenuPcs.SetColor(iconColor);
 
 	int signedIconCol = static_cast<int>(iconCol);
 	int colSign = signedIconCol >> 31;
@@ -459,9 +455,8 @@ void CRingMenu::drawGBA()
 	const double alphaBase = static_cast<double>(FLOAT_80330a34) * gbaAnim;
 	const unsigned int alphaShadow =
 	    static_cast<unsigned int>(static_cast<int>(static_cast<double>(FLOAT_803309c4) * alphaBase * showScale));
-	unsigned int shadowColor[1];
-	__ct__6CColorFUcUcUcUc(shadowColor, 0, 0, 0, static_cast<unsigned char>(alphaShadow));
-	SetColor__8CMenuPcsFR6CColor(MenuPcsVoid(), shadowColor);
+	CColor shadowColor(0, 0, 0, static_cast<unsigned char>(alphaShadow));
+	MenuPcs.SetColor(shadowColor);
 
 	const double invSize = static_cast<double>(FLOAT_803309cc) - sizePulse;
 	const float drawX = static_cast<float>(static_cast<double>(posX) + static_cast<double>(FLOAT_80330a3c * static_cast<float>(sizePulse * sinB)));
@@ -473,9 +468,8 @@ void CRingMenu::drawGBA()
 
 	const double alphaLit = alphaBase * showScale;
 	const unsigned int alphaIcon = static_cast<unsigned int>(static_cast<int>(alphaLit));
-	unsigned int iconColor[1];
-	__ct__6CColorFUcUcUcUc(iconColor, 0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alphaIcon));
-	SetColor__8CMenuPcsFR6CColor(MenuPcsVoid(), iconColor);
+	CColor iconColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alphaIcon));
+	MenuPcs.SetColor(iconColor);
 	DrawRect__8CMenuPcsFUlfffffffff(MenuPcsVoid(), 3, drawX, drawY, FLOAT_80330a44, FLOAT_80330a48, FLOAT_803309c0, menuV,
 	                                 FLOAT_80330a4c * static_cast<float>(sizePulse), FLOAT_80330a4c * static_cast<float>(sizePulse), 0.0f);
 
@@ -486,9 +480,8 @@ void CRingMenu::drawGBA()
 			const double blink = static_cast<double>(sin(static_cast<double>(FLOAT_80330a54 * static_cast<float>(m_commonFrameCounter))));
 			const unsigned int sendAlpha = static_cast<unsigned int>(
 			    static_cast<int>(static_cast<double>(FLOAT_803309c4) * (alphaLit * static_cast<double>(FLOAT_803309cc + static_cast<float>(blink)))));
-			unsigned int sendColor[1];
-			__ct__6CColorFUcUcUcUc(sendColor, 0xFF, 0xFF, 0xFF, static_cast<unsigned char>(sendAlpha));
-			SetColor__8CMenuPcsFR6CColor(MenuPcsVoid(), sendColor);
+			CColor sendColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(sendAlpha));
+			MenuPcs.SetColor(sendColor);
 			DrawRect__8CMenuPcsFUlfffffffff(MenuPcsVoid(), 3, drawX, drawY, FLOAT_80330a48, FLOAT_80330a48, FLOAT_803309c0, FLOAT_80330a58,
 			                                 FLOAT_803309cc, FLOAT_803309cc, 0.0f);
 		} else {
@@ -615,9 +608,9 @@ void CRingMenu::onDraw()
 		}
 
 		SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcsVoid(), 0x1F);
-		unsigned int buttonColor[1];
-		__ct__6CColorFUcUcUcUc(buttonColor, 0xFF, 0xFF, 0xFF, static_cast<unsigned char>(static_cast<int>(buttonAlpha * alphaScaleBase)));
-		SetColor__8CMenuPcsFR6CColor(MenuPcsVoid(), buttonColor);
+		CColor buttonColor(
+			0xFF, 0xFF, 0xFF, static_cast<unsigned char>(static_cast<int>(buttonAlpha * alphaScaleBase)));
+		MenuPcs.SetColor(buttonColor);
 
 		float drawX = posX;
 		float drawY = posY;
@@ -800,18 +793,15 @@ void CRingMenu::onDraw()
 							float blink = FLOAT_803309c0;
 							if (charge == 0) {
 								if (!caravanWork->IsSelectedCmdList(i)) {
-									unsigned int color[1];
-									__ct__6CColorFUcUcUcUc(color, 0x80, 0x80, 0x80, static_cast<unsigned char>(static_cast<int>(dimAlpha)));
-									SetColor__8CMenuPcsFR6CColor(MenuPcsVoid(), color);
+									CColor color(0x80, 0x80, 0x80, static_cast<unsigned char>(static_cast<int>(dimAlpha)));
+									MenuPcs.SetColor(color);
 								} else {
-									unsigned int color[1];
-									__ct__6CColorFUcUcUcUc(color, 0x20, 0xFF, 0x20, static_cast<unsigned char>(static_cast<int>(fullAlpha)));
-									SetColor__8CMenuPcsFR6CColor(MenuPcsVoid(), color);
+									CColor color(0x20, 0xFF, 0x20, static_cast<unsigned char>(static_cast<int>(fullAlpha)));
+									MenuPcs.SetColor(color);
 								}
 							} else {
-								unsigned int color[1];
-								__ct__6CColorFUcUcUcUc(color, 0x00, 0xFF, 0x00, static_cast<unsigned char>(static_cast<int>(fullAlpha)));
-								SetColor__8CMenuPcsFR6CColor(MenuPcsVoid(), color);
+								CColor color(0x00, 0xFF, 0x00, static_cast<unsigned char>(static_cast<int>(fullAlpha)));
+								MenuPcs.SetColor(color);
 								blink = static_cast<float>((System.m_frameCounter >> 2) & 1);
 							}
 
@@ -849,7 +839,6 @@ void drawCommand(int state, CFont* font, float posX, float posY, CCaravanWork* c
 	double waveY;
 	double textWidth;
 	double textHeight;
-	unsigned char colorStorage[4];
 
 	cmdNameTable = reinterpret_cast<int*>(reinterpret_cast<RingMenuFlatData*>(&Game.m_cFlatDataArr[1])->table[4].strings);
 	if (Game.m_gameWork.m_bossArtifactStageIndex == 0x19) {
@@ -912,8 +901,8 @@ void drawCommand(int state, CFont* font, float posX, float posY, CCaravanWork* c
 	}
 
 	int alpha = static_cast<int>((FLOAT_80330a34 * alphaScale) * clampedAlpha);
-	GXColor* color = static_cast<GXColor*>(__ct__6CColorFUcUcUcUc(colorStorage, 0xFF, 0xFF, 0xFF, alpha));
-	font->SetColor(*color);
+	CColor color(0xFF, 0xFF, 0xFF, alpha);
+	font->SetColor(color.color);
 	font->SetPosX(static_cast<float>(waveX + -(static_cast<double>(static_cast<float>(
 		textWidth * static_cast<double>(FLOAT_803309c4) -
 		static_cast<double>(static_cast<float>(static_cast<double>(FLOAT_80330aa8) + static_cast<double>(posX))))))));

@@ -125,17 +125,17 @@ enum RedStreamFrameWordIndex {
     REDSOUND_STREAM_STEREO_FRAME_WORD_COUNT = 2,
 };
 
-struct RedStreamStereoFrame {
-    unsigned int m_left[REDSOUND_STREAM_STEREO_FRAME_WORD_COUNT];
-    unsigned int m_right[REDSOUND_STREAM_STEREO_FRAME_WORD_COUNT];
-};
-
 struct RedStreamChannelFrame {
     unsigned int m_word[REDSOUND_STREAM_STEREO_FRAME_WORD_COUNT];
 };
 
-#define RedStreamStereoFrameGetLeftWord(frame, index) ((frame)->m_left[(index)])
-#define RedStreamStereoFrameGetRightWord(frame, index) ((frame)->m_right[(index)])
+struct RedStreamStereoFrame {
+    RedStreamChannelFrame m_left;
+    RedStreamChannelFrame m_right;
+};
+
+#define RedStreamStereoFrameGetLeftWord(frame, index) ((frame)->m_left.m_word[(index)])
+#define RedStreamStereoFrameGetRightWord(frame, index) ((frame)->m_right.m_word[(index)])
 #define RedStreamChannelFrameGetWord(frame, index) ((frame)->m_word[(index)])
 
 enum RedStreamFrameLayoutSize {

@@ -3958,7 +3958,7 @@ void CRedDriver::SetMute(unsigned int voiceNo, unsigned int mute)
  * JP Address: TODO
  * JP Size: TODO
  */
-inline int CRedDriver::PlayWaveItem(int waveNo, int itemNo, int key, int pan, int volume)
+int CRedDriver::PlayWaveItem(int waveNo, int itemNo, int key, int pan, int volume)
 {
     RedTrackDATA* editorTrack;
     RedVoiceDATA* voice;
@@ -3983,8 +3983,17 @@ inline int CRedDriver::PlayWaveItem(int waveNo, int itemNo, int key, int pan, in
     editorTrack->m_volume = REDSOUND_VOLUME_FULL;
     editorTrack->m_expression = REDSOUND_VOLUME_DEFAULT;
     editorTrack->m_mixVolume = volume << REDSOUND_FIXED_SHIFT;
+    editorTrack->m_mixVolumeDelta = 0;
+    editorTrack->m_mixVolumeMode = REDSOUND_SE_VOLUME_MODE_NORMAL;
+    editorTrack->m_pitchDelta = 0;
+    editorTrack->m_pitch = 0;
     editorTrack->m_pan = pan << REDSOUND_FIXED_SHIFT;
     editorTrack->m_reverbDepth = RedReverbDepthGetDepth(REDSOUND_REVERB_DEPTH_SE);
+    editorTrack->m_reverbDepthDelta = 0;
+    editorTrack->m_panDelta = 0;
+    editorTrack->m_expressionDelta = 0;
+    editorTrack->m_volumeDelta = 0;
+    editorTrack->m_portamentTime = 0;
     editorTrack->m_portamentPitch = key << REDSOUND_PITCH_BASE_NOTE_SHIFT;
     editorTrack->m_pitchBendRange = REDSOUND_SE_DEFAULT_PITCH_BEND_RANGE;
     editorTrack->m_voiceSwitch = REDSOUND_VOICE_SWITCH_DRY_STEREO;

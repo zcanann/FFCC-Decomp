@@ -1889,7 +1889,7 @@ void CRedEntry::DisplayMMemoryInfo()
 				seBlockBank = 0;
 				do {
 					if ((RedSeBlockDataGet(seBlockBank) != REDSOUND_SE_BLOCK_DATA_NONE) &&
-					    (bankEntry->m_address == reinterpret_cast<int>(RedSeBlockDataGet(seBlockBank)))) {
+					    (bankEntry->m_address == RedSeBlockHeadAddress(RedSeBlockDataGet(seBlockBank)))) {
 						OSReport(sRedEntryMMemorySeBlockInfoFmt, sRedEntryLogPrefix, bankEntry->m_address,
 						         bankEntry->m_size, freeSize);
 						fflush(__files + 1);

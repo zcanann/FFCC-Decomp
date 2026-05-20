@@ -105,7 +105,7 @@ void CGraphicPcs::drawScreenFade()
 {
     Mtx44 orthoMtx;
     Mtx cameraMtx;
-    Mtx screenMtx;
+    Mtx44 screenMtx;
     Mtx44 worldScreenMtx;
     Mtx identityMtx;
 

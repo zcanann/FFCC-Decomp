@@ -142,7 +142,7 @@ static inline void StoreF32(CFlatRuntime::CStack* stack, float* value, int setMo
 	stack[-1].m_word = *reinterpret_cast<unsigned int*>(value);
 
 	if (setMode == 0) {
-		*value = static_cast<float>(stack->m_word);
+		*reinterpret_cast<unsigned int*>(value) = stack->m_word;
 	} else if (setMode < 0) {
 		if (setMode > -2) {
 			*value -= static_cast<float>(stack->m_word);

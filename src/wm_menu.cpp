@@ -60,7 +60,6 @@ extern "C" void SetMargin__5CFontFf(float, CFont*);
 extern "C" void SetShadow__5CFontFi(CFont*, int);
 extern "C" void SetScale__5CFontFf(float, CFont*);
 extern "C" void SetTlut__5CFontFi(CFont*, int);
-extern "C" void SetColor__5CFontF8_GXColor(CFont*, GXColor*);
 extern "C" void DrawInit__5CFontFv(CFont*);
 extern "C" float GetWidth__5CFontFPc(CFont*, const char*);
 extern "C" void SetPosX__5CFontFf(float, CFont*);
@@ -6661,7 +6660,7 @@ void CMenuPcs::DrawCharaName()
 	SetShadow__5CFontFi(font, 1);
 	SetScale__5CFontFf(FLOAT_8033158C, font);
 	DrawInit__5CFontFv(font);
-	SetColor__5CFontF8_GXColor(font, &shade.color);
+	font->SetColor(shade.color);
 
 	for (int row = 0; row < 2; row++) {
 		float y = FLOAT_80331478 + static_cast<float>(row * 0xB8) + FLOAT_80331688 - FLOAT_80331550;
@@ -6692,7 +6691,7 @@ void CMenuPcs::DrawCharaName()
 					                                   static_cast<float>(-(DOUBLE_80331460 * static_cast<double>(phase < 0 ? -phase : phase) -
 					                                                        DOUBLE_80331420)));
 					CColor blinkColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(blink));
-					SetColor__5CFontF8_GXColor(font, &blinkColor.color);
+					font->SetColor(blinkColor.color);
 					restoreColor = true;
 				}
 			}
@@ -6703,7 +6702,7 @@ void CMenuPcs::DrawCharaName()
 			SetPosY__5CFontFf(y, font);
 			Draw__5CFontFPc(font, text);
 			if (restoreColor) {
-				SetColor__5CFontF8_GXColor(font, &shade.color);
+				font->SetColor(shade.color);
 			}
 		}
 	}

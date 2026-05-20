@@ -1197,7 +1197,8 @@ int CMemory::CStage::heapWalker(int flag, void*, unsigned long group)
             if (size != 0) {
                 if ((flag & 1) != 0) {
                     Printf__7CSystemFPce(
-                        &System, s_heapWalkerEntryFmt, freeCount, "FREE", 0, size, totalSize, 0, 0, "-------", 0);
+                        &System, s_heapWalkerEntryFmt, freeCount, "FREE", 0, top - blockTail, totalSize, 0, 0, 0,
+                        "-------", 0);
                 }
                 usedSize += size;
                 totalSize += size;
@@ -1210,7 +1211,7 @@ int CMemory::CStage::heapWalker(int flag, void*, unsigned long group)
                     Printf__7CSystemFPce(
                         &System, s_heapWalkerEntryFmt, usedCount, "USED",
                         *reinterpret_cast<unsigned char*>(node + 3), used, totalSize,
-                        *reinterpret_cast<int*>(node + 4), 0, reinterpret_cast<char*>(node + 0x1A),
+                        *reinterpret_cast<int*>(node + 4), 0, 0, reinterpret_cast<char*>(node + 0x1A),
                         *reinterpret_cast<unsigned short*>(node + 0x18));
                 }
                 freeSize += used;
@@ -1235,7 +1236,8 @@ int CMemory::CStage::heapWalker(int flag, void*, unsigned long group)
                     int index = isUsed ? usedCount : freeCount;
                     Printf__7CSystemFPce(
                         &System, s_heapWalkerEntryFmt, index, kind, level, *reinterpret_cast<int*>(node + 0x10),
-                        totalSize, node + 0x40, *reinterpret_cast<int*>(node + 4), source, line);
+                        totalSize, node + 0x40, *reinterpret_cast<int*>(node + 4), *reinterpret_cast<int*>(node + 8),
+                        source, line);
                 }
             }
 

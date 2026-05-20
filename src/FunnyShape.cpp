@@ -12,7 +12,6 @@ extern "C" double cos(double);
 #include <string.h>
 
 extern "C" void __dl__FPv(void* ptr);
-extern "C" void __dla__FPv(void* ptr);
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 extern "C" s32 rand();
 
@@ -343,7 +342,7 @@ void CFunnyShape::ClearTextureData()
     CFunnyShape* iter = this;
     for (s32 i = 0; i < 0x10; i++) {
         if (iter->m_textureData[0] != 0) {
-            __dla__FPv(iter->m_textureData[0]);
+            delete[] static_cast<u8*>(iter->m_textureData[0]);
             iter->m_textureData[0] = 0;
         }
 
@@ -372,7 +371,7 @@ void CFunnyShape::ClearTextureData()
 void CFunnyShape::ClearAnmData()
 {
     if (m_anm.anmData != 0) {
-        __dla__FPv(m_anm.anmData);
+        delete[] static_cast<u8*>(m_anm.anmData);
         m_anm.anmData = 0;
     }
 
@@ -721,12 +720,12 @@ extern "C" CFunnyShape* __dt__11CFunnyShapeFv(CFunnyShape* funnyShape, short sho
 {
     if (funnyShape != 0) {
         if (funnyShape->m_meshData != 0) {
-            __dla__FPv(funnyShape->m_meshData);
+            delete[] static_cast<u8*>(funnyShape->m_meshData);
             funnyShape->m_meshData = 0;
         }
 
         if (funnyShape->m_anm.anmData != 0) {
-            __dla__FPv(funnyShape->m_anm.anmData);
+            delete[] static_cast<u8*>(funnyShape->m_anm.anmData);
             funnyShape->m_anm.anmData = 0;
         }
 
@@ -734,7 +733,7 @@ extern "C" CFunnyShape* __dt__11CFunnyShapeFv(CFunnyShape* funnyShape, short sho
         s32 i = 0;
         do {
             if (iter->m_textureData[0] != 0) {
-                __dla__FPv(iter->m_textureData[0]);
+                delete[] static_cast<u8*>(iter->m_textureData[0]);
                 iter->m_textureData[0] = 0;
             }
 

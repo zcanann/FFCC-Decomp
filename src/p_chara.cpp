@@ -60,8 +60,6 @@ extern "C" void SetNumDiffuse__9CLightPcsFUl(void*, unsigned long);
 extern "C" void SetDiffuse__9CLightPcsFUl8_GXColorP3Veci(void*, unsigned long, void*, void*, int);
 extern "C" void SetPosition__9CLightPcsFQ29CLightPcs6TARGETP3VecUl(void*, int, Vec*, unsigned long);
 extern "C" void __ct__Q29CLightPcs10CBumpLightFv(void*);
-extern "C" int AddBump__9CLightPcsFPQ29CLightPcs6CLightQ29CLightPcs6TARGETPQ27CMemory6CStagei(
-    void*, void*, int, void*, int);
 extern "C" void Create__6CCharaFv(void*);
 extern "C" void Destroy__6CCharaFv(void*);
 extern "C" void Printf__7CSystemFPce(void*, const char*, ...);
@@ -81,7 +79,6 @@ extern "C" void Create__Q26CChara5CAnimFPvPQ27CMemory6CStage(void*, void*, void*
 extern "C" void LoadSe__6CSoundFPv(void*, void*);
 extern "C" void LoadWave__6CSoundFPv(void*, void*);
 extern "C" void* __ct__7CVectorFfff(void*, float, float, float);
-extern "C" void DestroyBumpLightAll__9CLightPcsFQ29CLightPcs6TARGET(void*, int);
 extern "C" void DestroyStage__7CMemoryFPQ27CMemory6CStage(void*, void*);
 extern "C" void loadModelASyncFrame__Q29CCharaPcs7CHandleFv(CCharaPcs::CHandle*);
 extern "C" int GetBackBufferRect__8CGraphicFRiRiRiRii(CGraphic*, int&, int&, int&, int&, int);
@@ -925,8 +922,9 @@ void CCharaPcs::create()
     bumpLight.m_offsetX = FLOAT_80330288;
     bumpLight.m_offsetZ = FLOAT_80330288;
 
-    gCharaPartWorkPtr = reinterpret_cast<u8*>(AddBump__9CLightPcsFPQ29CLightPcs6CLightQ29CLightPcs6TARGETPQ27CMemory6CStagei(
-        &LightPcs, &bumpLight, 0, *reinterpret_cast<void**>(Ptr(&Chara, 0x2058)), 4));
+    gCharaPartWorkPtr = reinterpret_cast<u8*>(LightPcs.AddBump(
+        &bumpLight, static_cast<CLightPcs::TARGET>(0),
+        *reinterpret_cast<CMemory::CStage**>(Ptr(&Chara, 0x2058)), 4));
     Create__6CCharaFv(&Chara);
 }
 
@@ -959,7 +957,7 @@ void CCharaPcs::createLoad()
 void CCharaPcs::destroy()
 {
     Reset(static_cast<RESET>(1));
-    DestroyBumpLightAll__9CLightPcsFQ29CLightPcs6TARGET(&LightPcs, 0);
+    LightPcs.DestroyBumpLightAll(static_cast<CLightPcs::TARGET>(0));
     gCharaPartWorkPtr = 0;
 
     if (*reinterpret_cast<void**>(Ptr(this, 0x4C)) != 0) {

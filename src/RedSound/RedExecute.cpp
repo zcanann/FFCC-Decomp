@@ -1046,7 +1046,7 @@ RedVoiceDATA* EntryVoiceSearch(RedTrackDATA* track)
         if (RedNoteAllocHasPriority(track->m_note.m_allocFlags)) {
             voice = RedVoiceDataGetBegin();
         } else {
-            voice = RedVoiceDataGet((s8)RedCurrentSoundControlGet()->m_channelAlloc);
+            voice = RedVoiceDataGetBegin() + (s8)RedCurrentSoundControlGet()->m_channelAlloc;
         }
 
         bestEnvelope = REDSOUND_ENVELOPE_LEVEL_FULL;

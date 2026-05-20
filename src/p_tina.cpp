@@ -498,7 +498,8 @@ unsigned int pppFreeMngStPrioForData()
 		}
 
 		char* nextPartMngBase = partMngBase + sizeof(_pppMngSt);
-		_pppMngSt* candidateB = &partMng->m_pppMng[1];
+		CPartMng* nextPartMng = reinterpret_cast<CPartMng*>(nextPartMngBase);
+		_pppMngSt* candidateB = nextPartMng->m_pppMng;
 		partMngBase = nextPartMngBase;
 		if (candidateB != currentMngSt && candidateB->m_baseTime != -0x1000 &&
 		    candidateB->m_kind != 0) {

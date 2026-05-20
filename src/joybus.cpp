@@ -5533,7 +5533,7 @@ int JoyBus::GetGBAStat(ThreadParam* threadParam)
 {
     bool single = GbaQue.IsSingleMode(threadParam->m_portIndex);
 
-    if (single && threadParam->m_portIndex != 1)
+    if (single && static_cast<int>(threadParam->m_portIndex) != 1)
     {
         threadParam->m_gbaStatus = 0;
     }

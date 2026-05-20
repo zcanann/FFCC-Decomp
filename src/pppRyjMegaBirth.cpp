@@ -701,7 +701,7 @@ void calc(
 		float angleWrap = FLOAT_80330458;
 		volatile float* angle = f32_at(particlePayload, 0x28);
 		angleMin = FLOAT_80330460;
-		while (angleMin > *angle)
+		while (*angle < angleMin)
 		{
 			*angle = *angle + angleWrap;
 		}
@@ -733,14 +733,11 @@ void calc(
 				*f32_at(particlePayload, 0x4C) = kPppRyjMegaBirthZero;
 			}
 		}
-		else
+		else if ((*f32_at(paramPayload, 0xC0) < kPppRyjMegaBirthZero) &&
+		         (kPppRyjMegaBirthZero < *f32_at(paramPayload, 0xC4)) &&
+		         (kPppRyjMegaBirthZero < *f32_at(particlePayload, 0x4C)))
 		{
-			if ((*f32_at(paramPayload, 0xC0) < kPppRyjMegaBirthZero) &&
-			    (kPppRyjMegaBirthZero < *f32_at(paramPayload, 0xC4)) &&
-			    (kPppRyjMegaBirthZero < *f32_at(particlePayload, 0x4C)))
-			{
-				*f32_at(particlePayload, 0x4C) = kPppRyjMegaBirthZero;
-			}
+			*f32_at(particlePayload, 0x4C) = kPppRyjMegaBirthZero;
 		}
 	}
 

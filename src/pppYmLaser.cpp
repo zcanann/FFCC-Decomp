@@ -9,6 +9,7 @@ extern int gPppCalcDisabled;
 }
 #include "ffcc/util.h"
 #include "ffcc/pppPart.h"
+#include "ffcc/pppcolor.h"
 #include "ffcc/pppShape.h"
 
 #include <string.h>
@@ -98,11 +99,6 @@ struct pppYmLaserWork {
 	float m_shapeRotation;
 };
 
-struct pppYmLaserColorData {
-	u8 m_pad0[8];
-	pppCVECTOR m_color;
-};
-
 /*
  * --INFO--
  * PAL Address: 0x800d2614
@@ -117,9 +113,9 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 	int* serializedDataOffsets = data->m_serializedDataOffsets;
 	pppYmLaserWork* work = (pppYmLaserWork*)((u8*)laser + 0x80 + serializedDataOffsets[2]);
 	int colorOffset = serializedDataOffsets[1];
-	pppYmLaserColorData* colorData = (pppYmLaserColorData*)((u8*)laser + 0x80 + colorOffset);
+	_pppColorWork* colorData = (_pppColorWork*)((u8*)laser + 0x80 + colorOffset);
 	s32 dataValIndex = step->m_dataValIndex;
-	int count;
+	u32 count;
 	s32 i;
 	s32 alphaStep;
 	char alphaMax;
@@ -130,10 +126,10 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 	float u1;
 	float uvStep;
 	pppFMATRIX mtxOut;
-	pppFMATRIX unitMtx;
-	Mtx shapeMtx;
-	Mtx rotateMtx;
-	Mtx debugMtx;
+	pppFMATRIX unitMtx ATTRIBUTE_ALIGN(8);
+	Mtx shapeMtx ATTRIBUTE_ALIGN(8);
+	Mtx rotateMtx ATTRIBUTE_ALIGN(8);
+	Mtx debugMtx ATTRIBUTE_ALIGN(8);
 	Mtx pointMtx;
 	Mtx sphereMtx;
 	pppFMATRIX managerMtx;
@@ -154,14 +150,14 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 	pppSetBlendMode(step->m_laser.m_blendMode);
 	_GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(1, 0, 0);
 	pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-		&colorData->m_color, &laser->m_localMatrix, kPppYmLaserOne, step->m_laser.m_drawEnvColor1,
+		&colorData->result, &laser->m_localMatrix, kPppYmLaserOne, step->m_laser.m_drawEnvColor1,
 		step->m_laser.m_drawEnvColor0, step->m_laser.m_blendMode, 0, 1, 1, 0);
 	GXSetNumTevStages(1);
 	GXSetNumTexGens(1);
 	GXSetNumChans(1);
 	GXSetCullMode(GX_CULL_NONE);
 	_GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(7, 0, 1, 7, 0);
-	color = *(_GXColor*)&colorData->m_color;
+	color = *(_GXColor*)&colorData->result;
 	_GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 4);
 	GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)1, (GXTexGenSrc)4, 0x3C, GX_FALSE, 0x7D);
 	_GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(

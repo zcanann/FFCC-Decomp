@@ -412,10 +412,7 @@ void CGItemObj::onFrameStat()
 		}
 		break;
 	case 0: {
-		int hasOwner = *(int*)(self + 0x550) != 0;
-		int isActive = (self[0x50] & 8) != 0;
-
-		if (!hasOwner && isActive) {
+		if (m_owner == 0 && (m_stateFlags0 & 8) != 0) {
 			float distance = FLOAT_80331b20;
 
 			if (Game.unk_flat3_0xc7d0 != 0) {

@@ -17,7 +17,6 @@ CWind Wind;
 extern int __float_nan[];
 extern "C" double cos(double);
 extern "C" double sin(double);
-extern "C" void* __ct__6CColorFUcUcUcUc(void*, unsigned char, unsigned char, unsigned char, unsigned char);
 extern "C" void* __ct__7CVectorFfff(void*, float, float, float);
 
 static inline s8 GetWindActiveFlag(const WindObject* obj)

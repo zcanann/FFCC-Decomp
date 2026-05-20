@@ -109,6 +109,7 @@ extern "C" void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSe
 extern "C" void _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
     int, int, int, int, int);
 extern "C" const double DOUBLE_8032FCC0 = 1.0;
+extern "C" const double DOUBLE_8032FCD0;
 extern "C" const float FLOAT_8032FCC8 = 1.0f;
 extern "C" const float FLOAT_8032FCD8;
 extern "C" float FLOAT_8032FCDC;
@@ -128,6 +129,17 @@ static inline void WriteF32(void* base, unsigned int offset, float value) {
 static inline float LoadFloat(const float& value)
 {
     return value;
+}
+
+static inline double S16ToDouble(s16 value)
+{
+    union {
+        unsigned long long bits;
+        double value;
+    } conv;
+
+    conv.bits = 0x4330000000000000ULL | static_cast<unsigned int>(value ^ 0x80000000U);
+    return conv.value - DOUBLE_8032FCD0;
 }
 
 /*
@@ -656,8 +668,8 @@ void CMaterialEditorPcs::drawViewer()
                 case 'H':
                 if (polygon->textureIndex < static_cast<s16>(m_loadedTextureCount)) {
                     s16* textureHeader = m_textureHeader[polygon->textureIndex];
-                    float scaleU = static_cast<float>(DOUBLE_8032FCC0 / static_cast<double>(textureHeader[2]));
-                    float scaleV = static_cast<float>(DOUBLE_8032FCC0 / static_cast<double>(textureHeader[3]));
+                    float scaleU = static_cast<float>(DOUBLE_8032FCC0 / S16ToDouble(textureHeader[2]));
+                    float scaleV = static_cast<float>(DOUBLE_8032FCC0 / S16ToDouble(textureHeader[3]));
 
                     polygon->texCoord[0][0] = scaleU * static_cast<float>(polygon->u0);
                     if (polygon->u0 < 0) {

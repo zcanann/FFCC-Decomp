@@ -1167,8 +1167,8 @@ void InsertLight_r(COctNode* node)
 		if (childOverlap) {
 			if (child->m_meshCount != 0) {
 				unsigned long byteOffset = (g_pStage >> 3) & 0x1ffffffc;
-				unsigned long* bits = reinterpret_cast<unsigned long*>(Ptr(&child->m_lightFlags, byteOffset));
-				*bits |= 1UL << (g_pStage & 0x1f);
+				unsigned long* bits = reinterpret_cast<unsigned long*>(Ptr(child, byteOffset));
+				bits[0x44 / sizeof(unsigned long)] |= 1UL << (g_pStage & 0x1f);
 			}
 
 			COctNode* childIter = child;
@@ -1479,8 +1479,8 @@ void InsertShadow_r(COctNode* node)
 		if (childOverlap) {
 			if ((s_light_no >= 3) && (child->m_meshCount != 0)) {
 				unsigned long byteOffset = (s_insertShadowNo >> 3) & 0x1ffffffc;
-				unsigned long* bits = reinterpret_cast<unsigned long*>(Ptr(&child->m_shadowFlags, byteOffset));
-				*bits |= 1UL << (s_insertShadowNo & 0x1f);
+				unsigned long* bits = reinterpret_cast<unsigned long*>(Ptr(child, byteOffset));
+				bits[0x48 / sizeof(unsigned long)] |= 1UL << (s_insertShadowNo & 0x1f);
 			}
 
 			COctNode* childIter = child;

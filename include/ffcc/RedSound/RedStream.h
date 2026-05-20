@@ -105,6 +105,8 @@ struct RedStreamFile {
 
 #define RedStreamAramGetChannelPlane(buffer, channel) ((buffer) + (channel) * REDSOUND_STREAM_STEREO_PLANE_SIZE)
 
+#define RedStreamAramSampleGetEnd(sampleStart) ((sampleStart) + REDSOUND_STREAM_STEREO_PLANE_SIZE)
+
 #define RedStreamGetReadCursor(stream) ((u8*)(stream)->m_fileData + (stream)->m_readOffset)
 
 enum RedStreamFileLayoutOffset {

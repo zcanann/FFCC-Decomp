@@ -772,7 +772,7 @@ void StreamControl()
 					axSamplePosition <<= REDSOUND_STREAM_AX_CURRENT_ADDRESS_HI_SHIFT;
 					axSamplePosition |= voiceData->m_axVoice->pb.addr.currentAddressLo;
 					if ((axSamplePosition >= currentBufferSampleStart) &&
-					    (axSamplePosition < currentBufferSampleStart + REDSOUND_STREAM_STEREO_PLANE_SIZE)) {
+					    (axSamplePosition < RedStreamAramSampleGetEnd(currentBufferSampleStart))) {
 						streamResult = 0;
 						if (streamData->m_header.m_loopStart < REDSOUND_STREAM_LOOP_ENABLED_MIN) {
 							streamData->m_header.m_loopEnd = streamData->m_header.m_loopEnd - REDSOUND_STREAM_SAMPLE_ADVANCE;

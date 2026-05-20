@@ -818,8 +818,8 @@ void CTexAnimSet::AttachMaterialSet(CMaterialSet* materialSet)
         if (material != 0) {
             int refCount = material[1] - 1;
             material[1] = refCount;
-            if ((refCount == 0) && (material != 0)) {
-                (*(void (**)(int*, int))(*material + 8))(material, 1);
+            if (refCount == 0) {
+                delete reinterpret_cast<CMaterial*>(material);
             }
             texAnim->m_refData->m_material = 0;
         }

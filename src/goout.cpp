@@ -1895,7 +1895,7 @@ void CGoOutMenu::Calc()
                         SetMainMode(field_0x2d);
                     }
                 }
-            } else if (field_0x45 != 0) {
+            } else if (mode >= 0 && field_0x45 != 0) {
                 input = GetGoOutInputMask();
                 if ((input & 0x200) != 0) {
                     Sound.PlaySe(3, 0x40, 0x7f, 0);

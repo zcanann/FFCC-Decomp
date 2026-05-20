@@ -1035,7 +1035,7 @@ RedVoiceDATA* EntryVoiceSearch(RedTrackDATA* track)
         bestEnvelope = REDSOUND_ENVELOPE_LEVEL_FULL;
         voiceEnd = RedVoiceDataGetEnd();
         do {
-            if ((voice->m_stateFlags & REDSOUND_VOICE_STATE_PLAYING_MASK) == 0) {
+            if (RedVoiceIsNotPlaying(voice)) {
                 if (voice->m_envelopeLevel < 1) {
                     if (voice->m_track != REDSOUND_VOICE_TRACK_NONE) {
                         voice->m_track = REDSOUND_VOICE_TRACK_NONE;
@@ -2343,7 +2343,7 @@ static void _ExecuteExtraData()
         RedMusicPitchControlAddStep();
         voice = RedVoiceDataGetBegin();
         do {
-            if ((voice->m_stateFlags & REDSOUND_VOICE_STATE_PLAYING_MASK) == 0) {
+            if (RedVoiceIsNotPlaying(voice)) {
                 pitchOffset = (int)voice->m_track->m_keyTranspose + (int)voice->m_track->m_pitchBend;
                 basePitch = voice->m_basePitch + RedMusicPitchControlGetValue();
                 voice->m_pitch = PitchCompute(basePitch, pitchOffset, voice->m_waveData->m_pitch,

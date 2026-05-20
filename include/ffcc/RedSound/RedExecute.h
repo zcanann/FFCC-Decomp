@@ -399,6 +399,7 @@ enum RedVoiceCleanupMask {
 
 #define RedVoiceStateIsPlaying(flags) (((flags) & REDSOUND_VOICE_STATE_PLAYING_MASK) != 0)
 #define RedVoiceIsPlaying(voice) RedVoiceStateIsPlaying((voice)->m_stateFlags)
+#define RedVoiceIsNotPlaying(voice) (!RedVoiceIsPlaying(voice))
 
 enum RedVoiceUpdateFlag {
 	REDSOUND_VOICE_UPDATE_PITCH = 1,

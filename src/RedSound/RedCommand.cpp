@@ -615,8 +615,8 @@ int SeBlockPlay(int seId, int bank, int sequenceNo, int pan, int volume)
 		seBlock = RedSeBlockDataGet(bank);
 		blockSequence = sequenceNo;
 
-		sequenceNo += bank << REDSOUND_SE_BLOCK_BANK_SHIFT;
-		sequenceNo |= REDSOUND_SE_BLOCK_DATA_FLAG;
+		RedSeBlockIdAddBank(sequenceNo, bank);
+		RedSeBlockIdSetDataFlag(sequenceNo);
 		if (blockSequence < seBlock->m_seCount) {
 			entries = seBlock->m_entries;
 

@@ -1345,7 +1345,7 @@ static void _PitchExecute(RedVoiceDATA* voice)
 
         int pitchOffset = voice->m_track->m_keyTranspose + voice->m_track->m_pitchBend + vibratoPitchDelta;
         int basePitch;
-        if ((voice->m_stateFlags & REDSOUND_VOICE_STATE_PLAYING_MASK) != 0) {
+        if (RedVoiceIsPlaying(voice)) {
             basePitch = voice->m_basePitch + voice->m_track->m_pitch;
         } else {
             basePitch = voice->m_basePitch + RedMusicPitchControlGetValue();

@@ -933,8 +933,8 @@ void CCharaPcs::create()
     bumpLight.m_bumpShade[1] = 0x80;
     bumpLight.m_bumpShade[2] = 0x00;
     bumpLight.m_bumpShade[3] = 0xFF;
-    bumpLight.m_offsetX = 0.0f;
-    bumpLight.m_offsetZ = 0.0f;
+    bumpLight.m_offsetX = FLOAT_80330288;
+    bumpLight.m_offsetZ = FLOAT_80330288;
 
     gCharaPartWorkPtr = reinterpret_cast<u8*>(AddBump__9CLightPcsFPQ29CLightPcs6CLightQ29CLightPcs6TARGETPQ27CMemory6CStagei(
         &LightPcs, &bumpLight, 0, *reinterpret_cast<void**>(Ptr(&Chara, 0x2058)), 4));

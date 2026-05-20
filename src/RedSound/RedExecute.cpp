@@ -2606,7 +2606,7 @@ static void _MidiTrackExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData,
                 func(control, keyOnData, track);
                 if (track->m_command != REDSOUND_TRACK_COMMAND_NONE) {
                     if (track->m_deltaTime < 1) {
-                        deltaTime = DeltaTimeSumup((unsigned char**)&track->m_command);
+                        deltaTime = RedTrackCommandReadDeltaTime(track);
                     } else {
                         deltaTime = track->m_deltaTime;
                         track->m_deltaTime = 0;
@@ -3182,7 +3182,7 @@ static int _SeMidiNoteExecute(
                     RedMidiControlFunc midiControlFunc = RedMidiControlFunctionGet(*commandPtr);
                     midiControlFunc(control, keyOnData, track);
                     if (track->m_command != REDSOUND_TRACK_COMMAND_NONE) {
-                        deltaTime = DeltaTimeSumup((unsigned char**)&track->m_command);
+                        deltaTime = RedTrackCommandReadDeltaTime(track);
                         if (deltaTime != 0) {
                             deltaTime += track->m_step;
                             if (deltaTime < 1) {

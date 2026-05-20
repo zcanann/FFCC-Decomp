@@ -80,6 +80,7 @@ enum RedDmaRequestLayout {
 };
 
 unsigned int DeltaTimeSumup(unsigned char** buffer);
+#define RedTrackCommandReadDeltaTime(track) DeltaTimeSumup((unsigned char**)&(track)->m_command)
 unsigned int GetMyEntryID();
 void RedSleep(int microseconds);
 int RedDmaEntry(int flags, int direction, int mainMemory, int aramMemory, int size,

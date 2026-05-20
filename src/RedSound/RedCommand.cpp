@@ -506,7 +506,7 @@ static int _SePlayStart(RedSeINFO* seInfo, int seId, int sepId, int pan, int vol
 			seTrack->m_waveBankData = waveHead;
 			seTrack->m_command = sequenceCommandData;
 			sequenceCommandData = RedSeInfoCommandGetNext(sequenceCommandData, sequence);
-			seTrack->m_deltaTime = (int)DeltaTimeSumup((unsigned char**)&seTrack->m_command) + 1;
+			seTrack->m_deltaTime = (int)RedTrackCommandReadDeltaTime(seTrack) + 1;
 			if (RedSeSkipStepIsActive()) {
 				seTrack->m_deltaTime = seTrack->m_deltaTime - RedSeSkipStepGet();
 			}
@@ -893,7 +893,7 @@ static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* wav
 		musicTrackBlock = RedMusicTrackBlockGetCommandBlock(musicTrackBlock);
 		track->m_command = (unsigned char*)musicTrackBlock;
 		musicTrackBlock = RedMusicTrackBlockGetNext(musicTrackBlock, musicTrackBlockSize);
-		track->m_deltaTime = DeltaTimeSumup((unsigned char**)&track->m_command) + 1;
+		track->m_deltaTime = RedTrackCommandReadDeltaTime(track) + 1;
 		track->m_seSepId = REDSOUND_TRACK_SESEP_ID_NONE;
 		signed char* defaultKeySignatureData;
 		if (RedMusicKeySignatureIsEnabled()) {

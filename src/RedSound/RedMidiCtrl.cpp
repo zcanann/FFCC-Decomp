@@ -1081,7 +1081,7 @@ static void __MidiCtrl_WholeLoopStart(RedSoundCONTROL* control, RedKeyOnDATA* ke
                     RedMidiControlFunctionGet(cmd)(control, keyOnData, scan);
 
                     if (scan->m_command != REDSOUND_TRACK_COMMAND_NONE) {
-                        delta = DeltaTimeSumup((unsigned char**)&scan->m_command);
+                        delta = RedTrackCommandReadDeltaTime(scan);
                         currentDelta += delta;
                         scan->m_deltaTime += delta;
                     }
@@ -1555,7 +1555,7 @@ static void __MidiCtrl_VolumeChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDAT
     int delta;
     int volume;
 
-    delta = DeltaTimeSumup((unsigned char**)&track->m_command);
+    delta = RedTrackCommandReadDeltaTime(track);
     if (delta == 0) {
         delta++;
     }
@@ -1602,7 +1602,7 @@ static void __MidiCtrl_ExpressionChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrac
     int delta;
     int expression;
 
-    delta = DeltaTimeSumup((unsigned char**)&track->m_command);
+    delta = RedTrackCommandReadDeltaTime(track);
     if (delta == 0) {
         delta++;
     }
@@ -1647,7 +1647,7 @@ static void __MidiCtrl_PanChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* 
 	int delta;
 	u32 pan;
 
-	delta = DeltaTimeSumup((unsigned char**)&track->m_command);
+	delta = RedTrackCommandReadDeltaTime(track);
 	if (delta == 0) {
 		delta++;
 	}
@@ -1670,7 +1670,7 @@ static void __MidiCtrl_PanChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* 
  */
 static void __MidiCtrl_PortamentOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	track->m_portamentTime = DeltaTimeSumup((unsigned char**)&track->m_command);
+	track->m_portamentTime = RedTrackCommandReadDeltaTime(track);
 }
 /*
  * --INFO--
@@ -1729,7 +1729,7 @@ static void __MidiCtrl_Sweep(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* trac
     int currentPitch;
     RedVoiceDATA* voiceData;
 
-    delta = DeltaTimeSumup((unsigned char**)&track->m_command);
+    delta = RedTrackCommandReadDeltaTime(track);
     if (delta == 0) {
         delta += 1;
     }
@@ -1840,7 +1840,7 @@ static void __MidiCtrl_ADSR_AR(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* tr
     RedVoiceDATA* voice;
     int delta;
 
-    delta = DeltaTimeSumup((unsigned char**)&track->m_command);
+    delta = RedTrackCommandReadDeltaTime(track);
     track->m_adsr.m_time[REDSOUND_VOICE_ADSR_ATTACK] = delta;
 
     voice = RedVoiceDataGetBegin();
@@ -1892,7 +1892,7 @@ static void __MidiCtrl_ADSR_DR(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* tr
     RedVoiceDATA* voice;
     int delta;
 
-    delta = DeltaTimeSumup((unsigned char**)&track->m_command);
+    delta = RedTrackCommandReadDeltaTime(track);
     track->m_adsr.m_time[REDSOUND_VOICE_ADSR_DECAY] = delta;
 
     voice = RedVoiceDataGetBegin();
@@ -1944,7 +1944,7 @@ static void __MidiCtrl_ADSR_SR(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* tr
     RedVoiceDATA* voice;
     int delta;
 
-    delta = DeltaTimeSumup((unsigned char**)&track->m_command);
+    delta = RedTrackCommandReadDeltaTime(track);
     track->m_adsr.m_time[REDSOUND_VOICE_ADSR_SUSTAIN] = delta;
 
     voice = RedVoiceDataGetBegin();
@@ -1996,7 +1996,7 @@ static void __MidiCtrl_ADSR_RR(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* tr
 	RedVoiceDATA* voice;
 	int delta;
 
-	delta = DeltaTimeSumup((unsigned char**)&track->m_command);
+	delta = RedTrackCommandReadDeltaTime(track);
 	track->m_adsr.m_time[REDSOUND_VOICE_ADSR_RELEASE] = delta;
 
 	voice = RedVoiceDataGetBegin();
@@ -2186,7 +2186,7 @@ static void __MidiCtrl_VibrateDepthChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTr
 {
 	int delta;
 
-	delta = DeltaTimeSumup((unsigned char**)&track->m_command);
+	delta = RedTrackCommandReadDeltaTime(track);
 	if (delta == 0) {
 		delta += 1;
 	}
@@ -2232,7 +2232,7 @@ static void __MidiCtrl_VibrateRateChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTra
     int rate;
     int divisor;
 
-    trackDelta = DeltaTimeSumup((unsigned char**)&track->m_command);
+    trackDelta = RedTrackCommandReadDeltaTime(track);
     if (trackDelta == 0) {
         trackDelta += 1;
     }
@@ -2367,7 +2367,7 @@ static void __MidiCtrl_TremoloDepthChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTr
 {
 	int delta;
 
-	delta = DeltaTimeSumup((unsigned char**)&track->m_command);
+	delta = RedTrackCommandReadDeltaTime(track);
 	if (delta == 0) {
 		delta += 1;
 	}
@@ -2413,7 +2413,7 @@ static void __MidiCtrl_TremoloRateChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTra
 	int rate;
 	int divisor;
 
-	delta = DeltaTimeSumup((unsigned char**)&track->m_command);
+	delta = RedTrackCommandReadDeltaTime(track);
 	if (delta == 0) {
 		delta += 1;
 	}
@@ -2526,7 +2526,7 @@ static void __MidiCtrl_ShakeDepthChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrac
 {
 	int delta;
 
-	delta = DeltaTimeSumup((unsigned char**)&track->m_command);
+	delta = RedTrackCommandReadDeltaTime(track);
 	if (delta == 0) {
 		delta += 1;
 	}
@@ -2572,7 +2572,7 @@ static void __MidiCtrl_ShakeRateChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrack
 	int rate;
 	int divisor;
 
-	delta = DeltaTimeSumup((unsigned char**)&track->m_command);
+	delta = RedTrackCommandReadDeltaTime(track);
 	if (delta == 0) {
 		delta += 1;
 	}

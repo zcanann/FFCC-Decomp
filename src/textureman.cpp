@@ -87,8 +87,14 @@ static inline unsigned short& U16At(void* p, unsigned int offset)
 
 static inline CTexture* AllocTexture()
 {
-    return new (*reinterpret_cast<CMemory::CStage**>(Ptr(&TextureMan, 4)), const_cast<char*>(s_textureman_cpp_801D7974),
-                0x2ED) CTexture;
+    void* texture = _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
+        &Memory, sizeof(CTexture), *reinterpret_cast<CMemory::CStage**>(Ptr(&TextureMan, 4)),
+        const_cast<char*>(s_textureman_cpp_801D7974), 0x2ED, 0);
+
+    if (texture == 0) {
+        return 0;
+    }
+    return ::new (texture) CTexture;
 }
 
 }

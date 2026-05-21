@@ -486,9 +486,10 @@ void CDbgMenuPcs::drawMenu(CDbgMenuPcs::CDM* menu)
 		int type = current->m_type;
 		if (type != 2) {
 			if (type < 2) {
-				if (type == 0) {
+				if (type < 0) {
+				} else if (type == 0) {
 					drawWindow(current->m_y, 0, 0, current->m_unk18, current->m_unk1C, current->m_text);
-				} else if (type >= 0) {
+				} else {
 					drawFont(current->m_y, 0, 0, current->m_text);
 				}
 			} else if (type < 4) {

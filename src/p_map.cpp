@@ -155,7 +155,6 @@ static const char s_map_load_ok_fmt[] =
 static const char s_dvd_map_stage_map_fmt[] = "dvd/map/stg%03d/map%03d";
 extern "C" void Destroy__7CMapMngFv(CMapMng*);
 extern "C" void MapFileRead__7CMapMngFPcRUl(CMapMng*);
-extern "C" void Printf__7CSystemFPce(CSystem* system, const char* format, ...);
 
 extern "C" void DrawBound__8CGraphicFR6CBound8_GXColor(CGraphic*, void*, _GXColor);
 
@@ -424,9 +423,8 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
         }
 
         if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
-            Printf__7CSystemFPce(
-                &System,
-                s_map_load_ok_fmt,
+            System.Printf(
+                const_cast<char*>(s_map_load_ok_fmt),
                 mapPath,
                 (int)*reinterpret_cast<short*>(reinterpret_cast<char*>(&MapMng) + 0xC),
                 (int)*reinterpret_cast<short*>(reinterpret_cast<char*>(&MapMng) + 0x8),
@@ -604,9 +602,8 @@ void CMapPcs::calc()
         }
 
         if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
-            Printf__7CSystemFPce(
-                &System,
-                s_map_load_ok_fmt,
+            System.Printf(
+                const_cast<char*>(s_map_load_ok_fmt),
                 m_mapName,
                 *reinterpret_cast<short*>(reinterpret_cast<char*>(&MapMng) + 0xC),
                 *reinterpret_cast<short*>(reinterpret_cast<char*>(&MapMng) + 0x8),

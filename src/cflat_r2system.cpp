@@ -56,7 +56,6 @@ void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
 int GetWait__4CMesFv(void*);
 int GetPadType__6JoyBusFi(void*, int);
 unsigned short GetButtonDown__4CPadFl(void*, long);
-void Printf__7CSystemFPce(CSystem*, const char*, ...);
 int sprintf(char*, const char*, ...);
 }
 extern int gWmMenuWorkA;
@@ -425,7 +424,7 @@ int CMiniGamePcs::GetMiniGameParam(int id)
 void CMiniGamePcs::SetMiniGameParam(int id, int value)
 {
     if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
-        Printf__7CSystemFPce(&System, s_setMiniGameParamFmt, id, value);
+        System.Printf(const_cast<char*>(s_setMiniGameParamFmt), id, value);
     }
 
     if (id != 0x1202) {
@@ -1074,20 +1073,6 @@ extern "C" int IsUse__8CMesMenuFv(void* mesMenu)
 
 /*
  * --INFO--
- * PAL Address: 0x800B9528
- * PAL Size: 16b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" void* _GetMesMenu__8CMenuPcsFi(void* menuPcs, int index)
-{
-    return *reinterpret_cast<void**>(reinterpret_cast<char*>(menuPcs) + 0x10C + index * 4);
-}
-
-/*
- * --INFO--
  * PAL Address: 0x800B94DC
  * PAL Size: 16b
  * EN Address: TODO
@@ -1165,9 +1150,9 @@ extern "C" char* GetNumSysMes__5CGameFv(void* game, int index)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" char* __ct__14PPPCREATEPARAMFv(void* game, int index)
+CMesMenu* CMenuPcs::GetMesMenu(int index)
 {
-    return ((char**)((char*)game + 0x10C))[index];
+    return reinterpret_cast<CMesMenu**>(reinterpret_cast<char*>(this) + 0x10C)[index];
 }
 
 /*
@@ -1179,31 +1164,31 @@ extern "C" char* __ct__14PPPCREATEPARAMFv(void* game, int index)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void __ct__14PPPCREATEPARAMFv2(PPPCREATEPARAM* pppCreateParam)
+static void InitCreateParam(PPPCREATEPARAM* createParam)
 {
-    pppCreateParam->m_soundEffectParams.m_soundEffectHandle = -1;
-    pppCreateParam->m_soundEffectParams.m_soundEffectSlot = -1;
-    pppCreateParam->m_soundEffectParams.m_soundEffectStopFlag = 0;
-    pppCreateParam->m_soundEffectParams.m_soundEffectKind = 1;
-    pppCreateParam->m_soundEffectParams.m_soundEffectStartFrame = 0;
-    pppCreateParam->m_soundEffectParams.m_soundEffectStartedOnce = 0;
-    pppCreateParam->m_soundEffectParams.m_soundEffectFadeFrames = 30;
-    pppCreateParam->m_hitParamA = 0;
-    pppCreateParam->m_hitParamB = 0;
-    pppCreateParam->m_hitObjectCount = 0;
-    pppCreateParam->m_hitFlags = 0;
-    pppCreateParam->m_positionOffsetPtr = 0;
-    pppCreateParam->m_rotationPtr = 0;
-    pppCreateParam->m_scalePtr = 0;
-    pppCreateParam->m_extraPositionPtr = 0;
-    pppCreateParam->m_paramA = 0;
-    pppCreateParam->m_paramB = 0;
-    pppCreateParam->m_lookTargetPtr = 0;
-    pppCreateParam->m_objectHitMask = 0;
-    pppCreateParam->m_cylinderAttribute = 0;
-    pppCreateParam->m_paramC = 1.0f;
-    pppCreateParam->m_paramD = 1.0f;
-    *(unsigned char*)&pppCreateParam->m_owner = 0;
+    createParam->m_soundEffectParams.m_soundEffectHandle = -1;
+    createParam->m_soundEffectParams.m_soundEffectSlot = -1;
+    createParam->m_soundEffectParams.m_soundEffectStopFlag = 0;
+    createParam->m_soundEffectParams.m_soundEffectKind = 1;
+    createParam->m_soundEffectParams.m_soundEffectStartFrame = 0;
+    createParam->m_soundEffectParams.m_soundEffectStartedOnce = 0;
+    createParam->m_soundEffectParams.m_soundEffectFadeFrames = 30;
+    createParam->m_hitParamA = 0;
+    createParam->m_hitParamB = 0;
+    createParam->m_hitObjectCount = 0;
+    createParam->m_hitFlags = 0;
+    createParam->m_positionOffsetPtr = 0;
+    createParam->m_rotationPtr = 0;
+    createParam->m_scalePtr = 0;
+    createParam->m_extraPositionPtr = 0;
+    createParam->m_paramA = 0;
+    createParam->m_paramB = 0;
+    createParam->m_lookTargetPtr = 0;
+    createParam->m_objectHitMask = 0;
+    createParam->m_cylinderAttribute = 0;
+    createParam->m_paramC = 1.0f;
+    createParam->m_paramD = 1.0f;
+    *reinterpret_cast<unsigned char*>(&createParam->m_owner) = 0;
 }
 
 /*
@@ -2428,7 +2413,7 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         return;
     case -0xBB: {
         PPPCREATEPARAM createParam;
-        __ct__14PPPCREATEPARAMFv2(&createParam);
+        InitCreateParam(&createParam);
         PartMng.pppCreate(0, *object->m_localBase, &createParam, 1);
         runtime->push(object, 0);
         outResult = 0;
@@ -3179,10 +3164,10 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         return;
     }
     case -0x4D: {
-        void* mesMenu = _GetMesMenu__8CMenuPcsFi(&MenuPcs, *object->m_localBase);
+        CMesMenu* mesMenu = MenuPcs.GetMesMenu(*object->m_localBase);
         if (mesMenu == 0) {
             if (GetNumMes__9CFlatDataFv(&System) != 0) {
-                Printf__7CSystemFPce(&System, "MesMenu no %d is null\n", *object->m_localBase);
+                System.Printf(const_cast<char*>("MesMenu no %d is null\n"), *object->m_localBase);
             }
             runtime->push(object, 0);
             outResult = 0;
@@ -3224,10 +3209,10 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         outResult = 0;
         return;
     case -0x48: {
-        void* mesMenu = _GetMesMenu__8CMenuPcsFi(&MenuPcs, *object->m_localBase);
+        CMesMenu* mesMenu = MenuPcs.GetMesMenu(*object->m_localBase);
         if (mesMenu == 0) {
             if (GetNumMes__9CFlatDataFv(&System) != 0) {
-                Printf__7CSystemFPce(&System, "MesMenu no %d is null\n", *object->m_localBase);
+                System.Printf(const_cast<char*>("MesMenu no %d is null\n"), *object->m_localBase);
             }
             runtime->push(object, 0);
         } else {
@@ -3237,10 +3222,10 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         return;
     }
     case -0x47: {
-        void* mesMenu = _GetMesMenu__8CMenuPcsFi(&MenuPcs, *object->m_localBase);
+        CMesMenu* mesMenu = MenuPcs.GetMesMenu(*object->m_localBase);
         if (mesMenu == 0) {
             if (GetNumMes__9CFlatDataFv(&System) != 0) {
-                Printf__7CSystemFPce(&System, "MesMenu no %d is null\n", *object->m_localBase);
+                System.Printf(const_cast<char*>("MesMenu no %d is null\n"), *object->m_localBase);
             }
         } else {
             GetMes__9CFlatDataFi(mesMenu, object->m_localBase[1], object->m_localBase[2]);
@@ -3250,10 +3235,10 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         return;
     }
     case -0x46: {
-        void* mesMenu = _GetMesMenu__8CMenuPcsFi(&MenuPcs, *object->m_localBase);
+        CMesMenu* mesMenu = MenuPcs.GetMesMenu(*object->m_localBase);
         if (mesMenu == 0) {
             if (GetNumMes__9CFlatDataFv(&System) != 0) {
-                Printf__7CSystemFPce(&System, "MesMenu no %d is null\n", *object->m_localBase);
+                System.Printf(const_cast<char*>("MesMenu no %d is null\n"), *object->m_localBase);
             }
         } else {
             reinterpret_cast<CMesMenu*>(mesMenu)->CloseRequest(1);
@@ -3264,10 +3249,10 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
     }
     case -0x45: {
         unsigned int* localBase = object->m_localBase;
-        void* mesMenu = _GetMesMenu__8CMenuPcsFi(&MenuPcs, localBase[0]);
+        CMesMenu* mesMenu = MenuPcs.GetMesMenu(localBase[0]);
         if (mesMenu == 0) {
             if (GetNumMes__9CFlatDataFv(&System) != 0) {
-                Printf__7CSystemFPce(&System, "MesMenu no %d is null\n", localBase[0]);
+                System.Printf(const_cast<char*>("MesMenu no %d is null\n"), localBase[0]);
             }
         } else {
             char* message;

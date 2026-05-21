@@ -31,6 +31,18 @@ private:
 class CMapTexAnim : public CRef
 {
 public:
+    CMapTexAnim()
+    {
+        m_keyFrame.m_loop = 1;
+        m_frameTable = 0;
+        m_frameStep = 1.0f;
+        m_currentFrame = 0.0f;
+        m_usesBlendTexture = 0;
+        m_usesKeyFrame = 0;
+        m_materialId = -1;
+        m_wrapMode = 1;
+    }
+
     ~CMapTexAnim();
     void Calc(CMaterialSet*, CTextureSet*);
     void SetMapTexAnim(int frameStart, int frameEnd, int wrapMode)

@@ -22,20 +22,8 @@ public:
     CPtrArray<CTexture*> m_textures;
 };
 
-extern "C" void Calc__11CMapTexAnimFP12CMaterialSetP11CTextureSet(CMapTexAnim*, CMaterialSet*, CTextureSet*);
-extern "C" void __ct__4CRefFv(void*);
-extern "C" void __dt__4CRefFv(void*, int);
-extern "C" CMapTexAnim* __dt__11CMapTexAnimFv(CMapTexAnim*, short);
-extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
-extern "C" void* __RTTI__11CMapTexAnim_8032E690;
-extern "C" void* PTR_PTR_s_CMapTexAnim[] = {
-    &__RTTI__11CMapTexAnim_8032E690,
-    0,
-    reinterpret_cast<void*>(__dt__11CMapTexAnimFv),
-};
 extern "C" {
 static const char s_maptexanim_cpp_801d7ec4[] = "maptexanim.cpp";
-static const char s_CMapTexAnim_801D7ED4[] = "CMapTexAnim";
 char s_SetMapTexAnim_MaterialIdNotFound[];
 }
 extern "C" float FLOAT_8032fd38;
@@ -150,7 +138,7 @@ void CMapTexAnimSet::SetMapTexAnim(int materialId, int frameStart, int frameEnd,
 void CMapTexAnimSet::Calc()
 {
     for (int i = 0; i < m_count; i++) {
-        Calc__11CMapTexAnimFP12CMaterialSetP11CTextureSet(m_anims[i], m_materialSet, m_textureSet);
+        m_anims[i]->Calc(m_materialSet, m_textureSet);
     }
 }
 
@@ -262,29 +250,8 @@ void CMapTexAnimSet::Create(CChunkFile& chunkFile, CMaterialSet* materialSet, CT
     while (chunkFile.GetNextChunk(chunk) != 0) {
         switch (chunk.m_id) {
         case 0x54414E4D:
-            ref = static_cast<CMapTexAnim*>(__nw__FUlPQ27CMemory6CStagePci(
-                0x4C, *reinterpret_cast<CMemory::CStage**>(&MapMng), const_cast<char*>(s_maptexanim_cpp_801d7ec4),
-                0x24));
-            if (ref != 0) {
-                __ct__4CRefFv(ref);
-                *reinterpret_cast<void**>(ref) = PTR_PTR_s_CMapTexAnim;
-                float currentFrame;
-                float frameStep = FLOAT_8032fd48;
-                ref->m_keyFrame.m_junTable = 0;
-                currentFrame = FLOAT_8032fd4c;
-                ref->m_keyFrame.m_keyFrame = 0;
-                ref->m_keyFrame.m_keyValue = 0;
-                ref->m_keyFrame.m_splineTable = 0;
-                ref->m_keyFrame.m_loop = 1;
-                ref->m_keyFrame.m_isRun = 0;
-                ref->m_frameTable = 0;
-                ref->m_frameStep = frameStep;
-                ref->m_currentFrame = currentFrame;
-                ref->m_usesBlendTexture = 0;
-                ref->m_usesKeyFrame = 0;
-                ref->m_materialId = -1;
-                ref->m_wrapMode = 1;
-            }
+            ref = new (*reinterpret_cast<CMemory::CStage**>(&MapMng), const_cast<char*>(s_maptexanim_cpp_801d7ec4),
+                0x24) CMapTexAnim;
 
             ref->m_materialIndex = chunkFile.Get2();
             ref->m_textureSlot = chunkFile.Get2();
@@ -345,40 +312,8 @@ void CMapTexAnimSet::Create(CChunkFile& chunkFile, CMaterialSet* materialSet, CT
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" CMapTexAnim* __dt__11CMapTexAnimFv(CMapTexAnim* anim, short shouldDelete)
+CMapTexAnim::~CMapTexAnim()
 {
-    if (anim != 0) {
-        unsigned char* const p = reinterpret_cast<unsigned char*>(anim);
-
-        *reinterpret_cast<void**>(p) = PTR_PTR_s_CMapTexAnim;
-
-        delete[] *reinterpret_cast<unsigned short**>(p + 0x20);
-        *reinterpret_cast<void**>(p + 0x20) = 0;
-
-        if ((reinterpret_cast<int>(anim) + 0x24) != 0) {
-            if (*reinterpret_cast<void**>(p + 0x3C) != 0) {
-                delete[] *reinterpret_cast<unsigned char**>(p + 0x3C);
-                *reinterpret_cast<void**>(p + 0x3C) = 0;
-            }
-            if (*reinterpret_cast<void**>(p + 0x40) != 0) {
-                delete[] *reinterpret_cast<float**>(p + 0x40);
-                *reinterpret_cast<void**>(p + 0x40) = 0;
-            }
-            if (*reinterpret_cast<void**>(p + 0x44) != 0) {
-                delete[] *reinterpret_cast<float**>(p + 0x44);
-                *reinterpret_cast<void**>(p + 0x44) = 0;
-            }
-            if (*reinterpret_cast<void**>(p + 0x48) != 0) {
-                delete[] *reinterpret_cast<float**>(p + 0x48);
-                *reinterpret_cast<void**>(p + 0x48) = 0;
-            }
-        }
-
-        __dt__4CRefFv(anim, 0);
-        if (shouldDelete > 0) {
-            operator delete(anim);
-        }
-    }
-
-    return anim;
+    delete[] m_frameTable;
+    m_frameTable = 0;
 }

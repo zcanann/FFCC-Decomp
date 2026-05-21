@@ -34,9 +34,6 @@ extern int gPppHeapUseRateWords[3];
 #include <PowerPC_EABI_Support/Runtime/MWCPlusLib.h>
 #include <PowerPC_EABI_Support/Runtime/New.h>
 
-extern "C" void Printf__7CSystemFPce(CSystem*, const char*, ...);
-extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
-extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void _WaitDrawDone__8CGraphicFPci(CGraphic*, const char*, int);
 extern "C" void pppCreateHeap__FP9_pppEnvStUl(_pppEnvSt*, unsigned long);
 extern "C" unsigned int CheckSum__FPvi(void*, int);
@@ -461,7 +458,7 @@ void CPartMng::pppDumpMngSt()
     PppPdtSlotRaw* pdtSlots = reinterpret_cast<PppPdtSlotRaw*>(self + 0x22E18);
 
     if (System.m_execParam != 0) {
-        Printf__7CSystemFPce(&System, s__________________________________801d8358);
+        System.Printf(const_cast<char*>(s__________________________________801d8358));
     }
 
     PppMngStDumpRaw* mng = reinterpret_cast<PppMngStDumpRaw*>(self + 0x1D4);
@@ -471,8 +468,8 @@ void CPartMng::pppDumpMngSt()
             int heapGroup = (mng->m_heapGroupRef + 0x2D) / 0x158;
             int heapSize = pppEnvStPtr->m_stagePtr->heapWalker(0, 0, static_cast<unsigned long>(heapGroup));
 
-            Printf__7CSystemFPce(
-                &System, s_prioTime__d_prio__d_heapSize__d_p_801d8454, mng->m_prioTime,
+            System.Printf(
+                const_cast<char*>(s_prioTime__d_prio__d_heapSize__d_p_801d8454), mng->m_prioTime,
                 mng->m_prio, heapSize, kind, static_cast<int>(mng->m_nodeIndex), heapGroup,
                 pdtSlots[kind].m_name);
         }
@@ -483,11 +480,11 @@ void CPartMng::pppDumpMngSt()
     pppEnvStPtr->m_stagePtr->heapInfo(heapTotal, heapUse, heapFree);
 
     if (System.m_execParam != 0) {
-        Printf__7CSystemFPce(
-            &System, s_HEAP_TOTAL__dKbyte_USE__dKbyte_F_801d84a0,
+        System.Printf(
+            const_cast<char*>(s_HEAP_TOTAL__dKbyte_USE__dKbyte_F_801d84a0),
             static_cast<int>(heapTotal >> 10), static_cast<int>(heapUse >> 10),
             static_cast<int>(heapFree >> 10));
-        Printf__7CSystemFPce(&System, s__________________________________801d8358);
+        System.Printf(const_cast<char*>(s__________________________________801d8358));
     }
 }
 
@@ -1277,7 +1274,7 @@ void CPartMng::pppReadShp(CChunkFile& chunkFile, pppShapeSt* shapeSt)
 				if (chunk.m_id == 0x444C5354) // 'DLST'
 				{
 					shapeSt->m_displayListData =
-						__nwa__FUlPQ27CMemory6CStagePci(
+						operator new[](
 						    chunk.m_arg0, stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0x4B3);
 					chunkFile.Get(shapeSt->m_displayListData, chunk.m_arg0);
 					DCFlushRange(shapeSt->m_displayListData, (chunk.m_arg0 + 0x1F) & 0xFFFFFFE0);
@@ -1287,7 +1284,7 @@ void CPartMng::pppReadShp(CChunkFile& chunkFile, pppShapeSt* shapeSt)
 					if (chunk.m_id == 0x414E494D) // 'ANIM'
 					{
 						shapeSt->m_animData =
-							__nwa__FUlPQ27CMemory6CStagePci(
+							operator new[](
 							    chunk.m_arg0, stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0x4B9);
 						chunkFile.Get(shapeSt->m_animData, chunk.m_arg0);
 						pppSetShapeMaterial(shapeSt,
@@ -1793,7 +1790,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
             *reinterpret_cast<void**>(self + kRecvBuffOffset) = 0;
         }
         pdtSlots[0].m_pdt = reinterpret_cast<_pppDataHead*>(
-            __nwa__FUlPQ27CMemory6CStagePci(
+            operator new[](
                 packetSize - 0x20, stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0x64D));
         *reinterpret_cast<u8**>(self + kRecvBuffOffset) =
             new (stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0x64E) u8[0x3000];
@@ -1856,7 +1853,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
             }
 
             pdtSlots[pdtCount].m_pdt = reinterpret_cast<_pppDataHead*>(
-                __nwa__FUlPQ27CMemory6CStagePci(
+                operator new[](
                     packetSize - 0x20, stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0x678));
             *reinterpret_cast<u8**>(self + kRecvBuffOffset) =
                 new (stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0x679) u8[0x3000];
@@ -2136,7 +2133,7 @@ void CPartMng::pppEditBeforeCalc()
         CMemory::CStage* stageLoad =
             *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(&PartPcs) + 0x1c);
         *editorObj = static_cast<CGObject*>(
-            __nw__FUlPQ27CMemory6CStagePci(0x518, stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0x7b5));
+            operator new(0x518, stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0x7b5));
         if (*editorObj != 0) {
             Create__9CGBaseObjFv(*editorObj);
 
@@ -3557,7 +3554,7 @@ void CPartMng::pppLoadPmd(const char* baseName)
         CMemory::CStage* stageLoad =
             *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(&PartPcs) + 0x1c);
         pppModelSt* modelArray = reinterpret_cast<pppModelSt*>(
-            __nw__FUlPQ27CMemory6CStagePci(
+            operator new(
                 0x6c00, stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0xca9));
         if (modelArray != 0) {
             __construct_array(modelArray, reinterpret_cast<ConstructorDestructor>(__ct__10pppModelStFv),
@@ -3677,7 +3674,7 @@ void CPartMng::pppLoadPan(const char* baseName)
         CMemory::CStage* stageLoad =
             *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(&PartPcs) + 0x1c);
         pppShapeSt* shapeArray = reinterpret_cast<pppShapeSt*>(
-            __nw__FUlPQ27CMemory6CStagePci(
+            operator new(
                 0x2c00, stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0xd0b));
         if (shapeArray != 0) {
             __construct_array(shapeArray, reinterpret_cast<ConstructorDestructor>(__ct__10pppShapeStFv),
@@ -3752,7 +3749,7 @@ void CPartMng::pppLoadPan(const char* baseName)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CPartMng::pppLoadPdt(const char* baseName, int pdtSlotIndex, int cachePriority, void* readBuffer, int readBufferSize)
+int CPartMng::pppLoadPdt(const char* baseName, int pdtSlotIndex, int cachePriority, void* readBuffer, int readBufferSize)
 {
     struct PppPdtSlotRaw {
         _pppDataHead* m_pppDataHead;
@@ -3785,13 +3782,13 @@ void CPartMng::pppLoadPdt(const char* baseName, int pdtSlotIndex, int cachePrior
             System.Printf(const_cast<char*>(s_CAN_NOT_READ_pcts_801d8508), pdtPath);
         }
         stageLoad->resDefaultParam();
-        return;
+        return 0;
     }
 
     // Async file mode can return sentinel 1 before data is available.
     if (pdtData == reinterpret_cast<void*>(1)) {
         stageLoad->resDefaultParam();
-        return;
+        return 1;
     }
 
     CChunkFile pdtFile;
@@ -3810,7 +3807,7 @@ void CPartMng::pppLoadPdt(const char* baseName, int pdtSlotIndex, int cachePrior
 
                     unsigned long copySize = sourceHead->m_partCount * 0x60 + 0x20;
                     _pppDataHead* copiedHead = static_cast<_pppDataHead*>(
-                        __nwa__FUlPQ27CMemory6CStagePci(
+                        operator new[](
                             copySize, stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0xd56));
                     pdtSlot->m_pppDataHead = copiedHead;
 
@@ -3837,6 +3834,7 @@ void CPartMng::pppLoadPdt(const char* baseName, int pdtSlotIndex, int cachePrior
     }
 
     stageLoad->resDefaultParam();
+    return 1;
 }
 
 /*

@@ -247,6 +247,7 @@ public:
     void BindMcObj();
     void DrawFilter(unsigned char, unsigned char, unsigned char, unsigned char);
     CFont* GetFont22();
+    CMesMenu* GetMesMenu(int);
     void CopyNowCaravanDat(Mc::SaveDat*);
     void SetCaravanWork(Mc::SaveDat*);
     int GetSameCharaData(Mc::SaveDat*, Mc::SaveDat*, int, int);

@@ -67,8 +67,6 @@ extern "C" unsigned int DAT_8032ed80;
 extern "C" unsigned int IsEnable__13CAmemCacheSetFs(CAmemCacheSet*, short);
 extern "C" int GetData__13CAmemCacheSetFsPci(CAmemCacheSet*, short, char*, int);
 extern "C" void AddRef__13CAmemCacheSetFs(CAmemCacheSet*, short);
-extern "C" void* CreateStage__7CMemoryFUlPci(void*, unsigned long, const char*, int);
-extern "C" void DestroyStage__7CMemoryFPQ27CMemory6CStage(void*, void*);
 extern "C" unsigned short SetData__13CAmemCacheSetFPviQ210CAmemCache4TYPEi(CAmemCacheSet*, void*, int, CAmemCache::TYPE,
                                                                             int);
 extern "C" void SetPart__9CLightPcsFQ29CLightPcs6TARGETPvUc(CLightPcs*, int, void*, unsigned char);
@@ -347,8 +345,8 @@ float pppVectorLength(Vec vec)
  * Size:	TODO
  */
 void pppCreateHeap(_pppEnvSt* pppEnvSt, unsigned long param_2)
-{ 
-	pppEnvSt->m_stagePtr = static_cast<CMemory::CStage*>(CreateStage__7CMemoryFUlPci(&Memory, param_2, s_CPartPcs_heap_801D821C, 0));
+{
+	pppEnvSt->m_stagePtr = Memory.CreateStage(param_2, const_cast<char*>(s_CPartPcs_heap_801D821C), 0);
 }
 
 /*
@@ -357,8 +355,8 @@ void pppCreateHeap(_pppEnvSt* pppEnvSt, unsigned long param_2)
  * Size:	TODO
  */
 void pppDestroyHeap(_pppEnvSt* pppEnvSt)
-{ 
-	DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, pppEnvSt->m_stagePtr);
+{
+	Memory.DestroyStage(pppEnvSt->m_stagePtr);
 }
 
 /*

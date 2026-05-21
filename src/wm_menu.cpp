@@ -29,7 +29,6 @@ extern "C" void* __vt__Q212CFlatRuntime7CObject[];
 extern "C" void* __vt__9CGBaseObj[];
 extern "C" void* __vt__8CGObject[];
 extern "C" int rand(void);
-extern "C" void Printf__7CSystemFPce(CSystem* system, const char* format, ...);
 extern "C" void DrawOptionMenu__8CMenuPcsFv(CMenuPcs*);
 extern "C" void DrawSingCMake__8CMenuPcsFv(CMenuPcs*);
 extern CMenuPcs MenuPcs;
@@ -1169,7 +1168,7 @@ void CMenuPcs::CalcDiaryMenu()
 		break;
 	default:
 		if (System.m_execParam != 0) {
-			Printf__7CSystemFPce(&System, s__s__d___Error_WM_menu_no_error___801dc424, s_wm_menu_cpp_801dc418, 0x4c0);
+			System.Printf(const_cast<char*>(s__s__d___Error_WM_menu_no_error___801dc424), s_wm_menu_cpp_801dc418, 0x4c0);
 		}
 		break;
 	}
@@ -3056,7 +3055,7 @@ void CMenuPcs::drawWorld()
 			break;
 		default:
 			if (System.m_execParam != 0) {
-				Printf__7CSystemFPce(&System, s__s__d___Error_WM_menu_no_error___801dc424, s_wm_menu_cpp_801dc418, 0xC59);
+				System.Printf(const_cast<char*>(s__s__d___Error_WM_menu_no_error___801dc424), s_wm_menu_cpp_801dc418, 0xC59);
 			}
 			break;
 		}
@@ -4258,7 +4257,7 @@ void CMenuPcs::SetWorldParam(int code, int value)
 		break;
 	default:
 		if (System.m_execParam != 0) {
-			Printf__7CSystemFPce(&System, s__s__d___Error_function_code_not_f_801dc3ec, s_wm_menu_cpp_801dc418, 0x1482, code);
+			System.Printf(const_cast<char*>(s__s__d___Error_function_code_not_f_801dc3ec), s_wm_menu_cpp_801dc418, 0x1482, code);
 		}
 		break;
 	case 0x12: {
@@ -4435,7 +4434,7 @@ void CMenuPcs::GetWorldParam(int code)
 	}
 	default:
 		if (System.m_execParam != 0) {
-			Printf__7CSystemFPce(&System, s__s__d___Error_function_code_not_f_801dc3ec, s_wm_menu_cpp_801dc418, 0x1521, code);
+			System.Printf(const_cast<char*>(s__s__d___Error_function_code_not_f_801dc3ec), s_wm_menu_cpp_801dc418, 0x1521, code);
 		}
 		break;
 	case 0x15:
@@ -6272,8 +6271,8 @@ void CMenuPcs::CalcCharaSelect()
 					CCharaPcs::CHandle* const handle = GetWmCharaHandles(this)[entry.m_currentSlot];
 					if (handle->IsModelLoaded(1) && handle->m_charaKind != 3) {
 						if (static_cast<unsigned int>(System.m_execParam) > 2) {
-							Printf__7CSystemFPce(&System, s_SetCMakeEnd___chan____d_cur____d_801dc3b4, i,
-							                     static_cast<int>(entry.m_currentSlot));
+							System.Printf(const_cast<char*>(s_SetCMakeEnd___chan____d_cur____d_801dc3b4), i,
+							              static_cast<int>(entry.m_currentSlot));
 						}
 						modelData[entry.m_currentSlot * 0x34 + 0x0C] = 0;
 						handle->LoadModelASync(3, 0x43, 0);
@@ -7353,8 +7352,8 @@ void CMenuPcs::SetCMakeEnd(int channel)
 	unsigned char* const selectData = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x828)[0]);
 	selectData[channel * 0x10 + 0xC] = 1;
 	if ((unsigned int)System.m_execParam > 2) {
-		Printf__7CSystemFPce(&System, s_SetCMakeEnd___chan____d_cur____d_801dc3b4, channel,
-		                     (int)*reinterpret_cast<short*>(selectData + channel * 0x10 + 4));
+		System.Printf(const_cast<char*>(s_SetCMakeEnd___chan____d_cur____d_801dc3b4), channel,
+		              (int)*reinterpret_cast<short*>(selectData + channel * 0x10 + 4));
 	}
 }
 
@@ -7376,7 +7375,7 @@ void CMenuPcs::ClrCMakeFlg(int channel)
 	selectData[channel * 0x10 + 0xB] = 0;
 	const int current = *reinterpret_cast<short*>(selectData + channel * 0x10 + 4);
 	if ((unsigned int)System.m_execParam > 2) {
-		Printf__7CSystemFPce(&System, s_ClrCMakeFlg___chan____d_cur____d_801dc390, channel, current);
+		System.Printf(const_cast<char*>(s_ClrCMakeFlg___chan____d_cur____d_801dc390), channel, current);
 	}
 	modelData[current * 0x34 + 0xC] = 0;
 	GetWmCharaHandles(this)[current]->LoadModelASync(3, 0x43, 0);

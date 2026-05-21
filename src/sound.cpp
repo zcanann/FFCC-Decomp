@@ -70,14 +70,17 @@ extern double DOUBLE_80330d20;
 extern double DOUBLE_80330d28;
 extern "C" void __ct__9CRedSoundFv(void*);
 extern "C" void __dt__6CSoundFv(void*);
-extern "C" CMemory::CStage* CreateStage__7CMemoryFUlPci(CMemory*, unsigned long, char*, int);
-extern "C" void DestroyStage__7CMemoryFPQ27CMemory6CStage(CMemory*, CMemory::CStage*);
 extern "C" int Printf__7CSystemFPce(CSystem*, const char*, ...);
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, int, int, int, int);
 extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
 CSound Sound;
+
+inline void* operator new(unsigned long, void* ptr)
+{
+    return ptr;
+}
 
 struct CLineSegment {
     Vec delta;
@@ -86,14 +89,17 @@ struct CLineSegment {
     float startLength;
 };
 
+template <int PointCount>
 struct CLine {
+    CLine();
+
     Vec min;
     Vec max;
     u32 pointCount;
     u32 unused;
     float unk20[4];
-    Vec points[10];
-    CLineSegment segments[9];
+    Vec points[PointCount];
+    CLineSegment segments[PointCount - 1];
     float totalLength;
 };
 
@@ -132,7 +138,7 @@ struct CSoundLayout {
     int m_waveSyncMode;
     int m_seCount;
     u8 m_seWork[0x1400];
-    CLine m_lines[8];
+    CLine<10> m_lines[8];
     u8* m_streamBuffer;
     CFile::CHandle* m_streamFile;
     int m_streamOffset;
@@ -167,12 +173,13 @@ static inline CRedSound* RedSound(CSound* self)
     return reinterpret_cast<CRedSound*>(reinterpret_cast<u8*>(self) + 8);
 }
 
-extern "C" void __ct__9CLine(CLine* line)
+template <int PointCount>
+CLine<PointCount>::CLine()
 {
-    line->pointCount = 0;
+    pointCount = 0;
 }
 
-extern "C" int Calc__9CLine(double maxDistance, CLine* line, Vec* outPos, float* outDistance, u32* outIndex,
+extern "C" int Calc__9CLine(double maxDistance, CLine<10>* line, Vec* outPos, float* outDistance, u32* outIndex,
                              float* outT, const Vec* queryPos)
 {
     const bool infiniteRange = ((float)maxDistance == kLineSegmentMinT);
@@ -250,7 +257,7 @@ extern "C" int Calc__9CLine(double maxDistance, CLine* line, Vec* outPos, float*
     return found;
 }
 
-extern "C" void Draw__9CLine(CLine* line)
+extern "C" void Draw__9CLine(CLine<10>* line)
 {
     if (line->pointCount == 0) {
         return;
@@ -301,7 +308,7 @@ extern "C" void Draw__9CLine(CLine* line)
     }
 }
 
-extern "C" void CalcBound__9CLine2(CLine* line)
+extern "C" void CalcBound__9CLine2(CLine<10>* line)
 {
     line->min.x = kLineBoundsInitMin;
     line->min.y = kLineBoundsInitMin;
@@ -358,7 +365,9 @@ inline CSound::CSound()
     unsigned char* sound = reinterpret_cast<unsigned char*>(this);
 
     __ct__9CRedSoundFv(sound + 8);
-    __construct_array(sound + 0x142C, reinterpret_cast<ConstructorDestructor>(__ct__9CLine), 0, 0x1cc, 8);
+    for (int i = 0; i < 8; i++) {
+        new (&SoundData(this).m_lines[i]) CLine<10>;
+    }
 }
 
 /*
@@ -382,7 +391,7 @@ CSound::~CSound()
  */
 void CSound::Init()
 {
-    SoundData(this).m_stage = CreateStage__7CMemoryFUlPci(&Memory, 0xA4000, const_cast<char*>(s_CSound_80330ce0), 0);
+    SoundData(this).m_stage = Memory.CreateStage(0xA4000, const_cast<char*>(s_CSound_80330ce0), 0);
 
     SoundData(this).m_aramBuffer =
         new (SoundData(this).m_stage, const_cast<char*>(s_sound_cpp_801db2d4), 0x2E) u8[0x80000];
@@ -487,7 +496,7 @@ void CSound::Quit()
         aramBuffer = 0;
     }
 
-    DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, sound.m_stage);
+    Memory.DestroyStage(sound.m_stage);
 }
 
 /*
@@ -901,10 +910,10 @@ void CSound::Draw()
     GXSetChanMatColor((GXChannelID)4, lineColor);
     GXLoadPosMtxImm(cameraMatrix, 0);
 
-    CLine* line = sound.m_lines;
+    CLine<10>* line = sound.m_lines;
     for (u32 i = 0; i < 8; i++) {
         Draw__9CLine(line);
-        line = reinterpret_cast<CLine*>(reinterpret_cast<unsigned char*>(line) + 0x1CC);
+        line++;
     }
 }
 

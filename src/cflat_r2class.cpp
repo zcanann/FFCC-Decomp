@@ -15,7 +15,6 @@
 #include <math.h>
 
 extern "C" int IsAnimFinished__8CGObjectFi(CGObject*, int);
-extern "C" void Printf__7CSystemFPce(CSystem*, const char*, ...);
 extern "C" void push__12CFlatRuntimeFPQ212CFlatRuntime7CObjecti(CFlatRuntime2*, CFlatRuntime::CObject*, int);
 extern const char lbl_801DA778[];
 
@@ -170,7 +169,7 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 
 	if ((engineFlags & 5) != 5 && systemVal == -0x1B) {
 		if (static_cast<unsigned int>(System.m_execParam) >= 2) {
-			Printf__7CSystemFPce(&System, lbl_801DA778);
+			System.Printf(const_cast<char*>(lbl_801DA778));
 		}
 		return;
 	}

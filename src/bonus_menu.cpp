@@ -28,7 +28,6 @@ extern "C" void SetProjection__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" void SetLight__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" void RestoreProjection__8CMenuPcsFv(CMenuPcs*);
 extern "C" void DrawMenuIdx__8CPartPcsFi(CPartPcs*, int);
-extern "C" void Printf__7CSystemFPce(CSystem* system, const char* format, ...);
 extern "C" void loadTexture__8CMenuPcsFPPciiPQ28CMenuPcs4CTmpiii(CMenuPcs*, char**, int, int, void*, int, int, int);
 extern "C" char* GetLangString__5CGameFv(void*);
 extern "C" void loadFont__8CMenuPcsFiPcii(CMenuPcs*, int, char*, int, int);
@@ -1573,7 +1572,7 @@ void CMenuPcs::drawBonus()
 	gUtil.ClearZBufferRect(0.0f, 0.0f, 640.0f, 480.0f);
 
 	if (System.m_execParam != 0) {
-		Printf__7CSystemFPce(&System, s_draw_Bonus_pctd_801DD5C0, (int)*(short*)(statePtr + 0x1c));
+		System.Printf(const_cast<char*>(s_draw_Bonus_pctd_801DD5C0), (int)*(short*)(statePtr + 0x1c));
 	}
 
 	switch (*(short*)(statePtr + 0x1c)) {

@@ -9,8 +9,6 @@
 #include "ffcc/vector.h"
 
 extern "C" double atan2(double, double);
-extern "C" CVector* __ct__7CVectorFRC3Vec(CVector*, const Vec&);
-extern "C" CVector* __ct__7CVectorFv(CVector*);
 
 extern "C" const float FLOAT_80331BD0 = 1.0f;
 extern "C" const float FLOAT_80331BD4 = 0.0f;
@@ -21,9 +19,9 @@ static inline float LoadFloat(const float& value)
 	return value;
 }
 
-static inline Vec* ConstructVec(Vec& dst, const Vec& src)
+static inline Vec* AsVec(CVector& vec)
 {
-	return reinterpret_cast<Vec*>(__ct__7CVectorFRC3Vec(reinterpret_cast<CVector*>(&dst), src));
+	return reinterpret_cast<Vec*>(&vec);
 }
 
 static inline CFlatRuntime2* GetCFlatRuntime2()
@@ -226,14 +224,11 @@ void CGPrgObj::dstTargetRot(CGPrgObj* target)
 	float targetRot;
 	float deltaX;
 	float deltaZ;
-	Vec targetPos;
-	Vec basePos;
-	Vec deltaPos;
+	CVector targetPos(target->m_worldPosition);
+	CVector basePos(m_worldPosition);
+	CVector deltaPos;
 
-	ConstructVec(targetPos, target->m_worldPosition);
-	Vec* baseVec = ConstructVec(basePos, m_worldPosition);
-	__ct__7CVectorFv(reinterpret_cast<CVector*>(&deltaPos));
-	PSVECSubtract(baseVec, &targetPos, &deltaPos);
+	PSVECSubtract(AsVec(basePos), AsVec(targetPos), AsVec(deltaPos));
 	deltaX = deltaPos.x;
 	deltaZ = deltaPos.z;
 	if ((deltaX == FLOAT_80331BD4) || (deltaZ == FLOAT_80331BD4)) {
@@ -260,14 +255,11 @@ void CGPrgObj::rotTarget(CGPrgObj* target)
 	float targetRot;
 	float deltaX;
 	float deltaZ;
-	Vec targetPos;
-	Vec basePos;
-	Vec deltaPos;
+	CVector targetPos(target->m_worldPosition);
+	CVector basePos(m_worldPosition);
+	CVector deltaPos;
 
-	ConstructVec(targetPos, target->m_worldPosition);
-	Vec* baseVec = ConstructVec(basePos, m_worldPosition);
-	__ct__7CVectorFv(reinterpret_cast<CVector*>(&deltaPos));
-	PSVECSubtract(baseVec, &targetPos, &deltaPos);
+	PSVECSubtract(AsVec(basePos), AsVec(targetPos), AsVec(deltaPos));
 	deltaX = deltaPos.x;
 	deltaZ = deltaPos.z;
 	if ((deltaX == FLOAT_80331BD4) || (deltaZ == FLOAT_80331BD4)) {
@@ -292,14 +284,11 @@ float CGPrgObj::getTargetRot(CGPrgObj* target)
 	float targetRot;
 	float deltaX;
 	float deltaZ;
-	Vec basePos;
-	Vec targetPos;
-	Vec deltaPos;
+	CVector basePos(m_worldPosition);
+	CVector targetPos(target->m_worldPosition);
+	CVector deltaPos;
 
-	ConstructVec(targetPos, target->m_worldPosition);
-	Vec* baseVec = ConstructVec(basePos, m_worldPosition);
-	__ct__7CVectorFv(reinterpret_cast<CVector*>(&deltaPos));
-	PSVECSubtract(baseVec, &targetPos, &deltaPos);
+	PSVECSubtract(AsVec(basePos), AsVec(targetPos), AsVec(deltaPos));
 	deltaX = deltaPos.x;
 	deltaZ = deltaPos.z;
 	if ((deltaX == FLOAT_80331BD4) || (deltaZ == FLOAT_80331BD4)) {

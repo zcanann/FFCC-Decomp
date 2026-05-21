@@ -4,6 +4,7 @@
 #include "ffcc/goout.h"
 #include "ffcc/graphic.h"
 #include "ffcc/gxfunc.h"
+#include "ffcc/itemobj.h"
 #include "ffcc/monobj.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/p_dbgmenu.h"
@@ -26,9 +27,6 @@
 class CFont;
 
 extern "C" void StaticFrame__10CGCharaObjFv();
-extern "C" void CheckGameOver__10CGPartyObjFv();
-extern "C" void DrawDebug__8CGObjectFP5CFont(CGObject*, CFont*);
-extern "C" void DrawOmoideName__9CGItemObjFP5CFont(CGItemObj*, CFont*);
 extern "C" void Create__9CGBaseObjFv(CGBaseObj*);
 extern "C" void Destroy__9CGBaseObjFv(CGBaseObj*);
 extern "C" void Frame__9CGBaseObjFv(CGBaseObj*);
@@ -55,7 +53,6 @@ extern "C" void __ct__9CGQuadObjFv(CGQuadObj*);
 extern "C" void __ct__9CGBaseObjFv(CGBaseObj*);
 extern "C" void pppCreate__8CPartMngFiiP14PPPCREATEPARAMi(CPartMng*, int, int, PPPCREATEPARAM*, int);
 extern "C" char* GetLangString__5CGameFv(void*);
-extern "C" void Printf__7CSystemFPce(CSystem*, const char*, ...);
 extern "C" void ClrBattleItem__8CMenuPcsFv(void*);
 extern "C" int GetBackBufferRect__8CGraphicFRiRiRiRii(CGraphic*, int&, int&, int&, int&, int);
 
@@ -909,7 +906,7 @@ void CFlatRuntime2::Frame(int arg0, int mode)
 
 	if (mode == 0) {
 		StaticFrame__10CGCharaObjFv();
-		CheckGameOver__10CGPartyObjFv();
+		CGPartyObj::CheckGameOver();
 		Frame__12CFlatRuntimeFii(reinterpret_cast<CFlatRuntime*>(this), arg0, mode);
 
 		CFlatRuntime::CObject* const root =
@@ -1047,7 +1044,7 @@ int CFlatRuntime2::Load(char* fileName)
 
 	resetChangeScript();
 	if (System.m_execParam > 2) {
-		Printf__7CSystemFPce(&System, sCFlatRuntime2LoadMsg);
+		System.Printf(const_cast<char*>(sCFlatRuntime2LoadMsg));
 	}
 	return 1;
 }
@@ -1483,7 +1480,7 @@ void CFlatRuntime2::Draw()
 		 object != 0;
 		 object = reinterpret_cast<CGObject*>(FindNextGBaseObjByCidMask(
 			 this, reinterpret_cast<CFlatRuntime::CObject*>(object)->m_next, 5))) {
-		DrawDebug__8CGObjectFP5CFont(object, font);
+		object->DrawDebug(font);
 	}
 
 	font->SetZMode(0, 0);
@@ -1503,7 +1500,7 @@ void CFlatRuntime2::Draw()
 		 item != 0;
 		 item = reinterpret_cast<CGItemObj*>(FindNextGBaseObjByCidMask(
 			 this, reinterpret_cast<CFlatRuntime::CObject*>(item)->m_next, 0x1D))) {
-		DrawOmoideName__9CGItemObjFP5CFont(item, font);
+		item->DrawOmoideName(font);
 	}
 
 	font->SetZMode(0, 0);

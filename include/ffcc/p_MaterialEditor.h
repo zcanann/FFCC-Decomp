@@ -3,6 +3,7 @@
 
 #include "ffcc/p_sample.h"
 #include "ffcc/memory.h"
+#include "ffcc/pppTypes.h"
 #include "ffcc/USBStreamData.h"
 #include "ffcc/zlist.h"
 #include <Dolphin/mtx.h>
@@ -26,10 +27,6 @@ struct RSDLISTITEM {
     ZCANMGRP* colAnmData;
     int colAnmCount;
     int flag;
-};
-
-struct pppFMATRIX {
-    float value[3][4];
 };
 
 class CMaterialEditorPcs : public CSamplePcs

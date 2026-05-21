@@ -51,7 +51,7 @@ public:
 
     void menu();
     void onFrameAlways();
-    void CheckMenu();
+    static void CheckMenu();
 
     void onFramePreCalc();
     void onFramePostCalc();
@@ -116,7 +116,7 @@ public:
     void statWeaponChange();
     void changeWeapon(int, int, int);
 
-    void CheckGameOver();
+    static void CheckGameOver();
     static void SetBonusCondition(int, int, int, int, int);
 
     void InitFinished();

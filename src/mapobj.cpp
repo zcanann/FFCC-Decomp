@@ -35,19 +35,22 @@ extern const float kMapObjInitValue50;
 extern const char s_mapobj_cpp_801D70C0[];
 extern unsigned int DAT_8032e498;
 unsigned int DAT_8032E8B8 = 5;
-extern "C" void __ct__12CMapKeyFrameFv(CMapKeyFrame*);
-extern "C" int IsRun__12CMapKeyFrameFv(CMapKeyFrame*);
-extern "C" int Get__12CMapKeyFrameFRiRiRf(CMapKeyFrame*, int*, int*, float*);
-extern "C" void Calc__12CMapKeyFrameFv(CMapKeyFrame*);
-extern "C" void ReadJun__12CMapKeyFrameFR10CChunkFilei(CMapKeyFrame*, CChunkFile*, int);
-extern "C" void ReadFrame__12CMapKeyFrameFR10CChunkFilei(CMapKeyFrame*, CChunkFile*);
-extern "C" void ReadKey__12CMapKeyFrameFR10CChunkFilei(CMapKeyFrame*, CChunkFile*, int);
 extern "C" void DCFlushRange(void*, unsigned long);
+
+inline void* operator new(unsigned long, void* ptr)
+{
+    return ptr;
+}
 
 namespace {
 static inline unsigned char* Ptr(CMapObj* self, unsigned int offset)
 {
     return reinterpret_cast<unsigned char*>(self) + offset;
+}
+
+static inline CMapKeyFrame& KeyFrameAt(void* self, unsigned int offset)
+{
+    return *reinterpret_cast<CMapKeyFrame*>(reinterpret_cast<unsigned char*>(self) + offset);
 }
 
 struct MapObjAttrBaseLayout
@@ -148,9 +151,6 @@ static inline Mtx& MapObjHitDrawMtx()
 }
 
 }
-
-extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
-extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 
 /*
  * --INFO--
@@ -547,7 +547,7 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             } else if ((U8At(this, 0x1D) == 2) || (U8At(this, 0x1D) == 3)) {
                 if (meshOrHitIdx == -2) {
                     CMapObjAtrMeshName* meshName = reinterpret_cast<CMapObjAtrMeshName*>(
-                        __nw__FUlPQ27CMemory6CStagePci(0x28, *reinterpret_cast<CMemory::CStage**>(&MapMng), "mapobj.cpp", 0x84));
+                        operator new(0x28, *reinterpret_cast<CMemory::CStage**>(&MapMng), "mapobj.cpp", 0x84));
                     if (meshName != 0) {
                         meshName->CMapObjAtrMeshName::CMapObjAtrMeshName();
                     }
@@ -600,7 +600,7 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             U8At(this, 0x1B) = 1;
         } else if (chunk.m_id == CHUNK_ANIM) {
             unsigned char* animRun = reinterpret_cast<unsigned char*>(
-                __nw__FUlPQ27CMemory6CStagePci(0x14, *reinterpret_cast<CMemory::CStage**>(&MapMng), "mapobj.cpp", 0x21E));
+                operator new(0x14, *reinterpret_cast<CMemory::CStage**>(&MapMng), "mapobj.cpp", 0x21E));
             if (animRun != 0) {
                 *reinterpret_cast<int*>(animRun) = -1;
                 *reinterpret_cast<unsigned short*>(animRun + 0x12) = static_cast<unsigned short>(chunkFile.Get4());
@@ -621,7 +621,7 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 System.Printf(const_cast<char*>(s_mapobj_cpp_801D70C0 + 0xCC), objIndex);
             }
             unsigned char* mime = reinterpret_cast<unsigned char*>(
-                __nw__FUlPQ27CMemory6CStagePci(0x3C, *reinterpret_cast<CMemory::CStage**>(&MapMng), "mapobj.cpp", 0x33B));
+                operator new(0x3C, *reinterpret_cast<CMemory::CStage**>(&MapMng), "mapobj.cpp", 0x33B));
 
             if (mime != 0) {
                 reinterpret_cast<CMapObjAtrMime*>(mime)->CMapObjAtrMime::CMapObjAtrMime();
@@ -640,22 +640,20 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             while (chunkFile.GetNextChunk(mimeChunk) != 0) {
                 if (mimeChunk.m_id == CHUNK_KEY) {
                     if (mime != 0) {
-                        ReadKey__12CMapKeyFrameFR10CChunkFilei(
-                            reinterpret_cast<CMapKeyFrame*>(mime + 0x14), &chunkFile, static_cast<char>(mimeChunk.m_arg0));
+                        KeyFrameAt(mime, 0x14).ReadKey(chunkFile, static_cast<char>(mimeChunk.m_arg0));
                     }
                 } else if (mimeChunk.m_id == CHUNK_JUN) {
                     if (mime != 0) {
-                        ReadJun__12CMapKeyFrameFR10CChunkFilei(
-                            reinterpret_cast<CMapKeyFrame*>(mime + 0x14), &chunkFile, static_cast<char>(mimeChunk.m_arg0));
+                        KeyFrameAt(mime, 0x14).ReadJun(chunkFile, static_cast<char>(mimeChunk.m_arg0));
                     }
                 } else if (mimeChunk.m_id == CHUNK_FRAM) {
                     if (mime != 0) {
-                        ReadFrame__12CMapKeyFrameFR10CChunkFilei(reinterpret_cast<CMapKeyFrame*>(mime + 0x14), &chunkFile);
+                        KeyFrameAt(mime, 0x14).ReadFrame(chunkFile, static_cast<char>(mimeChunk.m_arg0));
                     }
                 } else if (mimeChunk.m_id == CHUNK_VTXL) {
                     if (mime != 0) {
                         *(mime + 0x8) = static_cast<unsigned char>(mimeChunk.m_arg0);
-                        *reinterpret_cast<void**>(mime + 0xC) = __nwa__FUlPQ27CMemory6CStagePci(
+                        *reinterpret_cast<void**>(mime + 0xC) = operator new[](
                             static_cast<unsigned long>(*(mime + 0x8)) << 2,
                             *reinterpret_cast<CMemory::CStage**>(&MapMng), "mapobj.cpp", 0x348);
                     }
@@ -665,7 +663,7 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                     int vtxTableOffset = 0;
                     while (chunkFile.GetNextChunk(vtxChunk) != 0) {
                         if (vtxChunk.m_id == CHUNK_VTX) {
-                            float* vtx = reinterpret_cast<float*>(__nwa__FUlPQ27CMemory6CStagePci(
+                            float* vtx = reinterpret_cast<float*>(operator new[](
                                 static_cast<unsigned long>(vtxChunk.m_arg0) * 0xC,
                                 *reinterpret_cast<CMemory::CStage**>(&MapMng), "mapobj.cpp", 0x353));
                             if ((mime != 0) && (*reinterpret_cast<void**>(mime + 0xC) != 0)) {
@@ -695,7 +693,7 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 System.Printf(const_cast<char*>(s_mapobj_cpp_801D70C0 + 0xCC), objIndex);
             }
             unsigned char* pointLight = reinterpret_cast<unsigned char*>(
-                __nw__FUlPQ27CMemory6CStagePci(0xF4, *reinterpret_cast<CMemory::CStage**>(&MapMng), "mapobj.cpp", 0xD4));
+                operator new(0xF4, *reinterpret_cast<CMemory::CStage**>(&MapMng), "mapobj.cpp", 0xD4));
 
             if (pointLight != 0) {
                 reinterpret_cast<CMapObjAtrPointLight*>(pointLight)->CMapObjAtrPointLight::CMapObjAtrPointLight();
@@ -736,21 +734,17 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                         *reinterpret_cast<unsigned int*>(pointLight + 0x8) = *reinterpret_cast<unsigned int*>(pointLight + 0x24);
                         *reinterpret_cast<unsigned int*>(pointLight + 0xC) = *reinterpret_cast<unsigned int*>(pointLight + 0x64);
                     } else if (lightChunk.m_id == CHUNK_CFRM) {
-                        ReadFrame__12CMapKeyFrameFR10CChunkFilei(reinterpret_cast<CMapKeyFrame*>(pointLight + 0xCC), &chunkFile);
+                        KeyFrameAt(pointLight, 0xCC).ReadFrame(chunkFile, static_cast<char>(lightChunk.m_arg0));
                     } else if (lightChunk.m_id == CHUNK_CJUN) {
-                        ReadJun__12CMapKeyFrameFR10CChunkFilei(
-                            reinterpret_cast<CMapKeyFrame*>(pointLight + 0xCC), &chunkFile, static_cast<char>(lightChunk.m_arg0));
+                        KeyFrameAt(pointLight, 0xCC).ReadJun(chunkFile, static_cast<char>(lightChunk.m_arg0));
                     } else if (lightChunk.m_id == CHUNK_CKEY) {
-                        ReadKey__12CMapKeyFrameFR10CChunkFilei(
-                            reinterpret_cast<CMapKeyFrame*>(pointLight + 0xCC), &chunkFile, static_cast<char>(lightChunk.m_arg0));
+                        KeyFrameAt(pointLight, 0xCC).ReadKey(chunkFile, static_cast<char>(lightChunk.m_arg0));
                     } else if (lightChunk.m_id == CHUNK_MFRM) {
-                        ReadFrame__12CMapKeyFrameFR10CChunkFilei(reinterpret_cast<CMapKeyFrame*>(pointLight + 0xA4), &chunkFile);
+                        KeyFrameAt(pointLight, 0xA4).ReadFrame(chunkFile, static_cast<char>(lightChunk.m_arg0));
                     } else if (lightChunk.m_id == CHUNK_MJUN) {
-                        ReadJun__12CMapKeyFrameFR10CChunkFilei(
-                            reinterpret_cast<CMapKeyFrame*>(pointLight + 0xA4), &chunkFile, static_cast<char>(lightChunk.m_arg0));
+                        KeyFrameAt(pointLight, 0xA4).ReadJun(chunkFile, static_cast<char>(lightChunk.m_arg0));
                     } else if (lightChunk.m_id == CHUNK_MKEY) {
-                        ReadKey__12CMapKeyFrameFR10CChunkFilei(
-                            reinterpret_cast<CMapKeyFrame*>(pointLight + 0xA4), &chunkFile, static_cast<char>(lightChunk.m_arg0));
+                        KeyFrameAt(pointLight, 0xA4).ReadKey(chunkFile, static_cast<char>(lightChunk.m_arg0));
                     }
                 }
                 chunkFile.PopChunk();
@@ -761,7 +755,7 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 System.Printf(const_cast<char*>(s_mapobj_cpp_801D70C0 + 0xCC), objIndex);
             }
             unsigned char* spotLight = reinterpret_cast<unsigned char*>(
-                __nw__FUlPQ27CMemory6CStagePci(0x110, *reinterpret_cast<CMemory::CStage**>(&MapMng), "mapobj.cpp", 0x139));
+                operator new(0x110, *reinterpret_cast<CMemory::CStage**>(&MapMng), "mapobj.cpp", 0x139));
 
             if (spotLight != 0) {
                 reinterpret_cast<CMapObjAtrSpotLight*>(spotLight)->CMapObjAtrSpotLight::CMapObjAtrSpotLight();
@@ -819,21 +813,17 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                         *reinterpret_cast<unsigned int*>(spotLight + 0x8) = *reinterpret_cast<unsigned int*>(spotLight + 0x40);
                         *reinterpret_cast<unsigned int*>(spotLight + 0xC) = *reinterpret_cast<unsigned int*>(spotLight + 0x80);
                     } else if (lightChunk.m_id == CHUNK_CFRM) {
-                        ReadFrame__12CMapKeyFrameFR10CChunkFilei(reinterpret_cast<CMapKeyFrame*>(spotLight + 0xE8), &chunkFile);
+                        KeyFrameAt(spotLight, 0xE8).ReadFrame(chunkFile, static_cast<char>(lightChunk.m_arg0));
                     } else if (lightChunk.m_id == CHUNK_CJUN) {
-                        ReadJun__12CMapKeyFrameFR10CChunkFilei(
-                            reinterpret_cast<CMapKeyFrame*>(spotLight + 0xE8), &chunkFile, static_cast<char>(lightChunk.m_arg0));
+                        KeyFrameAt(spotLight, 0xE8).ReadJun(chunkFile, static_cast<char>(lightChunk.m_arg0));
                     } else if (lightChunk.m_id == CHUNK_CKEY) {
-                        ReadKey__12CMapKeyFrameFR10CChunkFilei(
-                            reinterpret_cast<CMapKeyFrame*>(spotLight + 0xE8), &chunkFile, static_cast<char>(lightChunk.m_arg0));
+                        KeyFrameAt(spotLight, 0xE8).ReadKey(chunkFile, static_cast<char>(lightChunk.m_arg0));
                     } else if (lightChunk.m_id == CHUNK_MFRM) {
-                        ReadFrame__12CMapKeyFrameFR10CChunkFilei(reinterpret_cast<CMapKeyFrame*>(spotLight + 0xC0), &chunkFile);
+                        KeyFrameAt(spotLight, 0xC0).ReadFrame(chunkFile, static_cast<char>(lightChunk.m_arg0));
                     } else if (lightChunk.m_id == CHUNK_MJUN) {
-                        ReadJun__12CMapKeyFrameFR10CChunkFilei(
-                            reinterpret_cast<CMapKeyFrame*>(spotLight + 0xC0), &chunkFile, static_cast<char>(lightChunk.m_arg0));
+                        KeyFrameAt(spotLight, 0xC0).ReadJun(chunkFile, static_cast<char>(lightChunk.m_arg0));
                     } else if (lightChunk.m_id == CHUNK_MKEY) {
-                        ReadKey__12CMapKeyFrameFR10CChunkFilei(
-                            reinterpret_cast<CMapKeyFrame*>(spotLight + 0xC0), &chunkFile, static_cast<char>(lightChunk.m_arg0));
+                        KeyFrameAt(spotLight, 0xC0).ReadKey(chunkFile, static_cast<char>(lightChunk.m_arg0));
                     }
                 }
                 chunkFile.PopChunk();
@@ -844,7 +834,7 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 System.Printf(const_cast<char*>(s_mapobj_cpp_801D70C0 + 0xCC), objIndex);
             }
             CMapObjAtrPlaySta* playSta = reinterpret_cast<CMapObjAtrPlaySta*>(
-                __nw__FUlPQ27CMemory6CStagePci(0xC, *reinterpret_cast<CMemory::CStage**>(&MapMng), "mapobj.cpp", 0x39B));
+                operator new(0xC, *reinterpret_cast<CMemory::CStage**>(&MapMng), "mapobj.cpp", 0x39B));
             if (playSta != 0) {
                 playSta->CMapObjAtrPlaySta::CMapObjAtrPlaySta();
                 *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(playSta) + 8) = chunkFile.Get1();
@@ -1190,14 +1180,14 @@ void CMapObj::SetLink()
  */
 void calcColorKeyFrame(CMapKeyFrame* keyFrame, _GXColor& out, _GXColor* colors)
 {
-    if (IsRun__12CMapKeyFrameFv(keyFrame) == 0) {
+    if (keyFrame->IsRun() == 0) {
         return;
     }
 
     int key0;
     int key1;
     float blend;
-    if (Get__12CMapKeyFrameFRiRiRf(keyFrame, &key0, &key1, &blend) == 0) {
+    if (keyFrame->Get(key0, key1, blend) == 0) {
         out = colors[key0];
     } else {
         int blendRate = static_cast<int>(kMapObjColorBlendScale * blend);
@@ -1214,7 +1204,7 @@ void calcColorKeyFrame(CMapKeyFrame* keyFrame, _GXColor& out, _GXColor* colors)
             c0.a + ((blendRate * (static_cast<int>(c1.a) - static_cast<int>(c0.a))) >> 8));
     }
 
-    Calc__12CMapKeyFrameFv(keyFrame);
+    keyFrame->Calc();
 }
 
 /*
@@ -1295,8 +1285,7 @@ void CMapObj::Calc()
                 }
 
                 calcColorKeyFrame(reinterpret_cast<CMapKeyFrame*>(attr + 0xCC), colorCurrent, colorTable);
-        } else if ((attrType == CMapObjAtr::MIME) &&
-                   (IsRun__12CMapKeyFrameFv(reinterpret_cast<CMapKeyFrame*>(attr + 0x14)) != 0)) {
+        } else if ((attrType == CMapObjAtr::MIME) && (KeyFrameAt(reinterpret_cast<void*>(attr), 0x14).IsRun() != 0)) {
             int key0;
             int key1;
             float blend;
@@ -1304,7 +1293,7 @@ void CMapObj::Calc()
             int frameList = *reinterpret_cast<int*>(attr + 0xC);
             Vec* outVerts = *reinterpret_cast<Vec**>(reinterpret_cast<unsigned char*>(m_mapData) + 0x2C);
 
-            if (Get__12CMapKeyFrameFRiRiRf(reinterpret_cast<CMapKeyFrame*>(attr + 0x14), &key0, &key1, &blend) == 0) {
+            if (KeyFrameAt(reinterpret_cast<void*>(attr), 0x14).Get(key0, key1, blend) == 0) {
                 float* src = *reinterpret_cast<float**>(frameList + key0 * 4);
                 for (int i = 0; i < vertexCount; i++) {
                     outVerts[i].x = src[0];
@@ -1326,7 +1315,7 @@ void CMapObj::Calc()
             }
 
             DCFlushRange(outVerts, static_cast<unsigned long>(vertexCount * 0xC));
-            Calc__12CMapKeyFrameFv(reinterpret_cast<CMapKeyFrame*>(attr + 0x14));
+            KeyFrameAt(reinterpret_cast<void*>(attr), 0x14).Calc();
         }
     }
 }
@@ -1875,7 +1864,7 @@ CMapObjAtrMime::CMapObjAtrMime()
     self->vertexListCount = 0;
     self->vertexLists = 0;
     self->vertexCount = 0;
-    __ct__12CMapKeyFrameFv(reinterpret_cast<CMapKeyFrame*>(reinterpret_cast<unsigned char*>(this) + 0x14));
+    new (&self->keyFrame) CMapKeyFrame;
 }
 
 /*

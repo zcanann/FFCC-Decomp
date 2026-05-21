@@ -14,7 +14,6 @@
 JoyBus Joybus;
 
 int DAT_8032edb8 = 0;
-extern "C" void __dt__6JoyBusFv(void*);
 
 extern const unsigned short JoyBusCrcTable[256] =
 {

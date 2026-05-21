@@ -8,6 +8,7 @@
 #include "ffcc/p_light.h"
 #include "ffcc/texanim.h"
 #include "ffcc/textureman.h"
+#include "ffcc/vector.h"
 
 #include <PowerPC_EABI_Support/Runtime/MWCPlusLib.h>
 #include <PowerPC_EABI_Support/Runtime/New.h>
@@ -23,14 +24,11 @@ extern "C" void Create__Q26CChara5CNodeFR10CChunkFilePQ26CChara6CModelQ36CChara5
     void*, CChunkFile&, void*, int, CMemory::CStage*);
 extern "C" void Create__Q26CChara5CMeshFPQ26CChara6CModelR10CChunkFilePQ27CMemory6CStage(
     void*, void*, CChunkFile&, CMemory::CStage*);
-extern "C" CMemory::CStage* CreateStage__7CMemoryFUlPci(CMemory*, unsigned long, char*, int);
 extern "C" void __dt__Q36CChara5CNode8CRefDataFv(void*, int);
 extern "C" void __dt__Q36CChara5CMesh8CRefDataFv(void*, int);
 extern "C" void __dt__Q36CChara5CMesh12CDisplayListFv(void*, int);
 extern "C" void __dt__Q26CChara5CSkinFv(void*, int);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
-extern "C" void __ct__7CVectorFv(void*);
-extern "C" void Printf__7CSystemFPce(CSystem*, const char*, ...);
 extern "C" void InitQuantize__Q26CChara5CAnimFv(void*);
 extern "C" void Interp__Q26CChara9CAnimNodeFPQ26CChara5CAnimP3SRTf(void*, void*, void*, float);
 extern "C" void SetTextureSet__12CMaterialSetFP11CTextureSet(CMaterialSet*, CTextureSet*);
@@ -45,7 +43,12 @@ extern "C" float FLOAT_803301e4;
 extern "C" float FLOAT_803301e8;
 extern "C" float FLOAT_803301f8;
 extern "C" CLightPcs::CBumpLight* DAT_8032edc0;
-extern "C" const char lbl_80330220[];
+extern const char s_CChara_80330220[];
+
+inline void* operator new(unsigned long, void* ptr)
+{
+	return ptr;
+}
 
 namespace {
 
@@ -646,7 +649,7 @@ void D3DXMatrixMultiplyRotate(float (*out)[4], float (*a)[4], float (*b)[4])
 void CChara::Init()
 {
 	*(CMemory::CStage**)((u8*)this + 0x2058) =
-	    CreateStage__7CMemoryFUlPci(&Memory, 0xc0000, const_cast<char*>(lbl_80330220), 0);
+	    Memory.CreateStage(0xc0000, const_cast<char*>(s_CChara_80330220), 0);
 	*(u32*)((u8*)this + 0x205c) = 0;
 	CMemory::CStage* stage = *(CMemory::CStage**)((u8*)&Chara + 0x2058);
 	*(void**)((u8*)this + 0x2068) = new (stage, const_cast<char*>(s_chara_cpp_801d90c8), 0x3f) u8[0x58000];
@@ -2421,8 +2424,8 @@ int CChara::CModel::GetDispIndex(CChara::CNode* node)
  */
 CChara::CNode::CNode()
 {
-	__ct__7CVectorFv((u8*)this + 0xA4);
-	__ct__7CVectorFv((u8*)this + 0xB0);
+	new (reinterpret_cast<void*>((u8*)this + 0xA4)) CVector;
+	new (reinterpret_cast<void*>((u8*)this + 0xB0)) CVector;
 	*(u32*)((u8*)this + 0x0) = 0;
 	*(u32*)((u8*)this + 0x4) = 0;
 	*(u32*)((u8*)this + 0x9C) = 0;
@@ -2984,7 +2987,7 @@ void CChara::CMesh::Calc(CChara::CModel* model)
 
 		if ((s_charaMeshWorkWarnArmed != 0) && (System.m_execParam > 1)) {
 			s_charaMeshWorkWarnArmed = 0;
-			Printf__7CSystemFPce(&System, s_charaMeshWorkOverflow);
+			System.Printf(const_cast<char*>(s_charaMeshWorkOverflow));
 		}
 		return;
 	}

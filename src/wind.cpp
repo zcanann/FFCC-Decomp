@@ -17,7 +17,6 @@ CWind Wind;
 extern int __float_nan[];
 extern "C" double cos(double);
 extern "C" double sin(double);
-extern "C" void* __ct__7CVectorFfff(void*, float, float, float);
 
 static inline s8 GetWindActiveFlag(const WindObject* obj)
 {
@@ -546,15 +545,14 @@ void CWind::Draw()
         int i = 0;
         do {
             if (GetWindActiveFlag(obj) != 0) {
+                CVector center(obj->centerX, FLOAT_80330ef0, obj->centerZ);
                 if (obj->type == 1) {
-                    Graphic.DrawSphere(viewMtx,
-                                       (Vec*)&CVector(obj->centerX, FLOAT_80330ef0, obj->centerZ),
-                                       obj->radius, &CColor(0xff, 0xff, 0, 0xff).color);
+                    CColor color(0xff, 0xff, 0, 0xff);
+                    Graphic.DrawSphere(viewMtx, reinterpret_cast<Vec*>(&center), obj->radius, &color.color);
                 } else {
                     u8 alpha = (u8)(FLOAT_80330f1c * (FLOAT_80330ef8 - obj->lifeRatio));
-                    Graphic.DrawSphere(viewMtx,
-                                       (Vec*)&CVector(obj->centerX, FLOAT_80330ef0, obj->centerZ),
-                                       obj->radius, &CColor(0xff, 0xff, 0x80, alpha).color);
+                    CColor color(0xff, 0xff, 0x80, alpha);
+                    Graphic.DrawSphere(viewMtx, reinterpret_cast<Vec*>(&center), obj->radius, &color.color);
                 }
             }
 

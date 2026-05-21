@@ -10,7 +10,6 @@
 #include <math.h>
 #include "dolphin/mtx.h"
 
-extern "C" void __dla__FPv(void*);
 extern "C" void __ct__4CRefFv(void*);
 extern "C" void __dt__4CRefFv(void*, int);
 extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
@@ -737,7 +736,7 @@ template <>
 void CPtrArray<CTexAnimSeq*>::RemoveAll()
 {
     if (m_items != 0) {
-        __dla__FPv(m_items);
+        delete[] m_items;
         m_items = 0;
     }
     m_size = 0;
@@ -772,7 +771,7 @@ void CPtrArray<CTexAnimSeq*>::ReleaseAndRemoveAll()
     }
 
     if (m_items != 0) {
-        __dla__FPv(m_items);
+        delete[] m_items;
         m_items = 0;
     }
     m_size = 0;
@@ -843,7 +842,7 @@ int CPtrArray<CTexAnimSeq*>::setSize(unsigned long newSize)
             memcpy(newItems, m_items, m_numItems << 2);
         }
         if (m_items != 0) {
-            __dla__FPv(m_items);
+            delete[] m_items;
             m_items = 0;
         }
         m_items = newItems;
@@ -952,7 +951,7 @@ template <>
 void CPtrArray<CTexAnim*>::RemoveAll()
 {
     if (m_items != 0) {
-        __dla__FPv(m_items);
+        delete[] m_items;
         m_items = 0;
     }
     m_size = 0;
@@ -987,7 +986,7 @@ void CPtrArray<CTexAnim*>::ReleaseAndRemoveAll()
     }
 
     if (m_items != 0) {
-        __dla__FPv(m_items);
+        delete[] m_items;
         m_items = 0;
     }
     m_size = 0;
@@ -1058,7 +1057,7 @@ int CPtrArray<CTexAnim*>::setSize(unsigned long newSize)
             memcpy(newItems, m_items, m_numItems << 2);
         }
         if (m_items != 0) {
-            __dla__FPv(m_items);
+            delete[] m_items;
             m_items = 0;
         }
         m_items = newItems;

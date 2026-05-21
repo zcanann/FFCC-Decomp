@@ -37,7 +37,6 @@ extern "C" unsigned int getNumFreeObject__13CFlatRuntime2Fi(void*, int);
 extern "C" void* FindGItemObjFirst__13CFlatRuntime2Fv(void*);
 extern "C" void* FindGItemObjNext__13CFlatRuntime2FP9CGItemObj(void*, void*);
 extern "C" void deleteObject__12CFlatRuntimeFPQ212CFlatRuntime7CObject(void*, void*);
-extern "C" void Printf__7CSystemFPce(void*, char*, ...);
 extern "C" void EndParticleSlot__13CFlatRuntime2Fii(void*, int, int);
 extern "C" void ResetParticleWork__13CFlatRuntime2Fii(void*, int, int);
 extern "C" void SetParticleWorkPos__13CFlatRuntime2FR3Vecf(void*, Vec&, float);
@@ -756,7 +755,7 @@ CGPrgObj* CGItemObj::CreateFromScript(
     int createMode, int createFlags, int scriptArg, CGObject* owner, float launchAngle, CGItemObj::CCFS* ccfs)
 {
 	int freeItemCount = getNumFreeObject__13CFlatRuntime2Fi(CFlat, 5);
-	Printf__7CSystemFPce(&System, const_cast<char*>(DAT_801dcec0), freeItemCount);
+	System.Printf(const_cast<char*>(DAT_801dcec0), freeItemCount);
 
 	if (freeItemCount == 0) {
 		int deletedCount = 0;
@@ -783,14 +782,14 @@ CGPrgObj* CGItemObj::CreateFromScript(
 			deletedCount = 1;
 		} else {
 			if (2U < (unsigned int)System.m_execParam) {
-				Printf__7CSystemFPce(&System, const_cast<char*>(DAT_801dced4));
+				System.Printf(const_cast<char*>(DAT_801dced4));
 			}
 		}
 
-		Printf__7CSystemFPce(&System, const_cast<char*>(DAT_801dcef8), deletedCount);
+		System.Printf(const_cast<char*>(DAT_801dcef8), deletedCount);
 		if (deletedCount == 0) {
 			if (2U < (unsigned int)System.m_execParam) {
-				Printf__7CSystemFPce(&System, const_cast<char*>(DAT_801dcf10));
+				System.Printf(const_cast<char*>(DAT_801dcf10));
 			}
 			return 0;
 		}
@@ -855,7 +854,7 @@ CGPrgObj* CGItemObj::CreateFromScript(
 
 			void* ownerScriptSlot = owner->m_scriptHandle[0xED];
 			if ((unsigned int)System.m_execParam >= 3U) {
-				Printf__7CSystemFPce(&System, const_cast<char*>(DAT_801dcf34), ownerScriptSlot);
+				System.Printf(const_cast<char*>(DAT_801dcf34), ownerScriptSlot);
 			}
 			*(CGPrgObj**)(m_boss__8CGMonObj + (int)ownerScriptSlot * 4 + 8) = newItem;
 
@@ -866,7 +865,7 @@ CGPrgObj* CGItemObj::CreateFromScript(
 			handle->LoadModelASync(2, ccfs->m_modelId, ccfs->m_modelParam);
 
 			if ((unsigned int)System.m_execParam >= 3U) {
-				Printf__7CSystemFPce(&System, const_cast<char*>(DAT_801dcf64));
+				System.Printf(const_cast<char*>(DAT_801dcf64));
 			}
 
 			*(int*)(itemSelf + 0x56C) = ccfs->m_itemJumpCountdown;
@@ -927,7 +926,7 @@ int CGItemObj::DeleteOld(int deleteMask, int maxDeleteCount, CFlatRuntime::CObje
 			deleteObject__12CFlatRuntimeFPQ212CFlatRuntime7CObject(CFlat, bestItemObj);
 		} else {
 			if ((unsigned int)System.m_execParam >= 3U) {
-				Printf__7CSystemFPce(&System, const_cast<char*>(DAT_801dced4));
+				System.Printf(const_cast<char*>(DAT_801dced4));
 			}
 			break;
 		}
@@ -986,7 +985,7 @@ void CGItemObj::onFrameStat()
 			}
 
 			if (*(int*)(self + 0x94) <= 0 || distance > DOUBLE_80331ba0) {
-				Printf__7CSystemFPce(&System, const_cast<char*>(DAT_801dcf80));
+				System.Printf(const_cast<char*>(DAT_801dcf80));
 				*(float*)(self + 0x4b8) = FLOAT_80331b54;
 				*(float*)(self + 0x4b4) = zero;
 				*(unsigned int*)(self + 0x1c0) = 1;
@@ -1276,14 +1275,14 @@ void CGItemObj::onFrameStat()
 			int ownerSlot = *(int*)(*(unsigned char**)(*(unsigned char**)(self + 0x550) + 0x58) + 0x3B4);
 
 			if ((unsigned int)System.m_execParam >= 3U) {
-				Printf__7CSystemFPce(&System, const_cast<char*>(DAT_801dcfc8), ownerSlot);
+				System.Printf(const_cast<char*>(DAT_801dcfc8), ownerSlot);
 			}
 
 			*(int*)(m_boss__8CGMonObj + ownerSlot * 4 + 8) = 0;
 			CGPrgObj* newItem = CreateFromScript(0, 0, 0x103, 0, FLOAT_80331b20, 0);
 			if (newItem == 0) {
 				if ((unsigned int)System.m_execParam > 1U) {
-					Printf__7CSystemFPce(&System, const_cast<char*>(DAT_801dcfec));
+					System.Printf(const_cast<char*>(DAT_801dcfec));
 				}
 			} else {
 				unsigned char* newItemSelf = reinterpret_cast<unsigned char*>(newItem);
@@ -1330,7 +1329,7 @@ void CGItemObj::onFrameStat()
 			int ownerSlot = *(int*)(*(unsigned char**)(*(unsigned char**)(self + 0x550) + 0x58) + 0x3B4);
 
 			if ((unsigned int)System.m_execParam >= 3U) {
-				Printf__7CSystemFPce(&System, const_cast<char*>(DAT_801dcfa4), ownerSlot);
+				System.Printf(const_cast<char*>(DAT_801dcfa4), ownerSlot);
 			}
 
 			CFlatRuntime::CStack stack;
@@ -1369,7 +1368,7 @@ void CGItemObj::onFrame()
 
 	if (handle != 0 && handle->IsLoadModelASyncCompleted()) {
 		if ((unsigned int)System.m_execParam >= 3U) {
-			Printf__7CSystemFPce(&System, const_cast<char*>(DAT_801dd010));
+			System.Printf(const_cast<char*>(DAT_801dd010));
 		}
 
 		m_charaModelHandle = reinterpret_cast<CCharaPcs::CHandle*>(m_pendingModelHandle);

@@ -72,7 +72,6 @@ extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
 extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, unsigned char, int, int,
                                                                                 unsigned char);
-extern "C" void DrawFur__Q26CChara6CModelFPA4_fi(void*, Mtx, int);
 extern "C" void SRTToMatrix__5CMathFPA4_fP3SRT(void*, Mtx, void*);
 extern "C" void Printf__8CGraphicFPce(void*, const char*, ...);
 extern "C" void Destroy__6CCharaFv(CChara*);
@@ -337,7 +336,7 @@ void CCharaPcs::drawViewer()
                 LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(0), &lightPos, 0xFFFFFFFF);
 
                 model->Draw(cameraMtx, 0, 0);
-                DrawFur__Q26CChara6CModelFPA4_fi(model, cameraMtx, 0);
+                model->DrawFur(cameraMtx, 0);
                 watch.Stop();
                 float cpuTime = watch.Get();
                 watch.Start();

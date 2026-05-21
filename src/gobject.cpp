@@ -39,7 +39,6 @@ extern "C" void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
 extern "C" void GetHitFaceNormal__7CMapObjFP3Vec(void*, Vec*);
 extern "C" void* CreateFromScript__9CGItemObjFiiiP8CGObjectfPQ29CGItemObj4CCFS(
     int, int, int, CGObject*, float, void*);
-extern "C" void MogFurFrame__Q26CChara6CModelFP8CGObject(CChara::CModel*, CGObject*);
 extern double DOUBLE_803303e8;
 extern double DOUBLE_80330400;
 extern const float FLOAT_80330350;
@@ -1873,7 +1872,7 @@ void CGObject::update()
     }
 
     if (HasLoadedModel(m_charaModelHandle) && (ModelFlagsA0(m_charaModelHandle->m_model) & 0x40) != 0) {
-        MogFurFrame__Q26CChara6CModelFP8CGObject(m_charaModelHandle->m_model, this);
+        m_charaModelHandle->m_model->MogFurFrame(this);
     }
 }
 

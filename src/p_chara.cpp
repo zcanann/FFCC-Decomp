@@ -60,7 +60,6 @@ extern "C" void __ct__Q29CLightPcs10CBumpLightFv(void*);
 extern "C" void Create__6CCharaFv(void*);
 extern "C" void Destroy__6CCharaFv(void*);
 extern "C" void Printf__7CSystemFPce(void*, const char*, ...);
-extern "C" void DrawFur__Q26CChara6CModelFPA4_fi(void*, Mtx, int);
 extern "C" void Create__Q26CChara5CAnimFPvPQ27CMemory6CStage(void*, void*, void*);
 extern "C" void LoadSe__6CSoundFPv(void*, void*);
 extern "C" void LoadWave__6CSoundFPv(void*, void*);
@@ -3002,7 +3001,7 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
     }
 
     if (drawPass == 0 || drawPass == 4) {
-        DrawFur__Q26CChara6CModelFPA4_fi(m_model, viewMtx, static_cast<int>((flags >> 23) & 1));
+        m_model->DrawFur(viewMtx, static_cast<int>((flags >> 23) & 1));
     }
 
     if (restoreFog) {

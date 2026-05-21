@@ -27,7 +27,6 @@ extern "C" double cos(double);
 
 extern "C" void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
     void*, CGBaseObj*, int, int, int, CFlatRuntime::CStack*, CFlatRuntime::CStack*);
-extern "C" int SearchNode__Q26CChara6CModelFPc(CChara::CModel*, char*);
 extern "C" CGObject* FindGObjFirst__13CFlatRuntime2Fv(void*);
 extern "C" CGObject* FindGObjNext__13CFlatRuntime2FP8CGObject(void*, CGObject*);
 extern "C" CGQuadObj* FindGQuadObjFirst__13CFlatRuntime2Fv(void*);
@@ -40,11 +39,6 @@ extern "C" void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
 extern "C" void GetHitFaceNormal__7CMapObjFP3Vec(void*, Vec*);
 extern "C" void* CreateFromScript__9CGItemObjFiiiP8CGObjectfPQ29CGItemObj4CCFS(
     int, int, int, CGObject*, float, void*);
-extern "C" void SetFrame__Q26CChara6CModelFf(float, CChara::CModel*);
-extern "C" void SetMatrix__Q26CChara6CModelFPA4_f(CChara::CModel*, Mtx);
-extern "C" void CalcMatrix__Q26CChara6CModelFv(CChara::CModel*);
-extern "C" void CalcSkin__Q26CChara6CModelFv(CChara::CModel*);
-extern "C" void CalcFurColor__Q26CChara6CModelFv(CChara::CModel*);
 extern "C" void MogFurFrame__Q26CChara6CModelFP8CGObject(CChara::CModel*, CGObject*);
 extern double DOUBLE_803303e8;
 extern double DOUBLE_80330400;
@@ -1470,7 +1464,7 @@ void CGObject::update()
                 frame = ModelAnimEnd(m_charaModelHandle->m_model) - ModelAnimStart(m_charaModelHandle->m_model);
             }
             m_turnSpeed = frame;
-            SetFrame__Q26CChara6CModelFf(m_turnSpeed, m_charaModelHandle->m_model);
+            m_charaModelHandle->m_model->SetFrame(m_turnSpeed);
         }
 
         shieldFlagsLo &= ~0x8;
@@ -1670,7 +1664,7 @@ void CGObject::update()
         ModelChestTilt(model) += lookBlend * (lookPitch - ModelChestTilt(model));
         ModelTwistAngle(model) += sBgAttrFast * (*reinterpret_cast<float*>(m_worldMode) - ModelTwistAngle(model));
 
-        SetMatrix__Q26CChara6CModelFPA4_f(model, modelMtx);
+        model->SetMatrix(modelMtx);
 
         Vec windVec;
         Wind.Calc(&windVec, &m_worldPosition, 0);
@@ -1705,9 +1699,9 @@ void CGObject::update()
         }
 
         if ((m_displayFlags & 1) != 0) {
-            CalcMatrix__Q26CChara6CModelFv(model);
+            model->CalcMatrix();
             if ((weaponFlagsLo & 0x40) != 0 && miniGameModelPass) {
-                CalcSkin__Q26CChara6CModelFv(model);
+                model->CalcSkin();
             }
 
             ModelLightAlpha(model) = m_lookAtTimer;
@@ -1717,7 +1711,7 @@ void CGObject::update()
                                            ((m_displayFlags & 0x20) != 0 ? 0x80 : 0));
         }
 
-        CalcFurColor__Q26CChara6CModelFv(model);
+        model->CalcFurColor();
 
         if ((m_displayFlags & 2) != 0) {
             float frameStep = m_turnSpeed;
@@ -1745,7 +1739,7 @@ void CGObject::update()
             }
 
             const float prevTime = ModelTime(model);
-            SetFrame__Q26CChara6CModelFf(frameStep, model);
+            model->SetFrame(frameStep);
 
             const int activeAnimIndex = m_charaModelHandle->m_currentAnimIndex;
             if (activeAnimIndex >= 0 && m_charaModelHandle->m_animSlot[activeAnimIndex] != 0) {
@@ -1829,10 +1823,10 @@ void CGObject::update()
             Mtx attachMtx;
             PSMTXCopy(ModelNodeMtx(model, m_weaponAttachNode), attachMtx);
             PSMTXTransApply(attachMtx, attachMtx, m_worldPosition.x, m_worldPosition.y, m_worldPosition.z);
-            SetMatrix__Q26CChara6CModelFPA4_f(m_weaponModelHandle->m_model, attachMtx);
-            CalcMatrix__Q26CChara6CModelFv(m_weaponModelHandle->m_model);
+            m_weaponModelHandle->m_model->SetMatrix(attachMtx);
+            m_weaponModelHandle->m_model->CalcMatrix();
             if ((weaponFlagsLo & 0x40) != 0) {
-                CalcSkin__Q26CChara6CModelFv(m_weaponModelHandle->m_model);
+                m_weaponModelHandle->m_model->CalcSkin();
             }
 
             ModelLightAlpha(m_weaponModelHandle->m_model) = m_lookAtTimer;
@@ -1846,10 +1840,10 @@ void CGObject::update()
             Mtx attachMtx;
             PSMTXCopy(ModelNodeMtx(model, m_shieldAttachNodeIndex), attachMtx);
             PSMTXTransApply(attachMtx, attachMtx, m_worldPosition.x, m_worldPosition.y, m_worldPosition.z);
-            SetMatrix__Q26CChara6CModelFPA4_f(m_shieldModelHandle->m_model, attachMtx);
-            CalcMatrix__Q26CChara6CModelFv(m_shieldModelHandle->m_model);
+            m_shieldModelHandle->m_model->SetMatrix(attachMtx);
+            m_shieldModelHandle->m_model->CalcMatrix();
             if ((weaponFlagsLo & 0x40) != 0) {
-                CalcSkin__Q26CChara6CModelFv(m_shieldModelHandle->m_model);
+                m_shieldModelHandle->m_model->CalcSkin();
             }
 
             ModelLightAlpha(m_shieldModelHandle->m_model) = m_lookAtTimer;
@@ -2432,7 +2426,7 @@ void CGObject::Attach(CGObject* owner, char* nodeName, Vec* attachLocal)
     }
 
     if (hasModel) {
-        int nodeIndex = SearchNode__Q26CChara6CModelFPc(handle->m_model, nodeName);
+        int nodeIndex = handle->m_model->SearchNode(nodeName);
         if (nodeIndex >= 0) {
             reinterpret_cast<WeaponNodeFlagBits*>(&m_weaponNodeFlags)->m_attached = true;
 
@@ -2519,7 +2513,7 @@ void CGObject::SetAttackCol(int hitIndex, char* nodeName, float hitMask, Vec* po
     }
 
     if (hasModel) {
-        float nodeIndex = static_cast<float>(SearchNode__Q26CChara6CModelFPc(handle->m_model, nodeName));
+        float nodeIndex = static_cast<float>(handle->m_model->SearchNode(nodeName));
         AttackCol& attack = m_attackColliders[hitIndex];
 
         attack.m_radius2 = nodeIndex;
@@ -2545,7 +2539,7 @@ void CGObject::SetDamageCol(int colliderIndex, char* nodeName, float hitMask, fl
     }
 
     if (hasModel) {
-        float nodeIndex = static_cast<float>(SearchNode__Q26CChara6CModelFPc(handle->m_model, nodeName));
+        float nodeIndex = static_cast<float>(handle->m_model->SearchNode(nodeName));
         DamageCol& damage = m_damageColliders[colliderIndex];
 
         damage.m_outerRadius = nodeIndex;
@@ -2779,7 +2773,7 @@ void CGObject::LookAt(CGObject* target, char* nodeName)
     if (nodeName == 0) {
         nodeIndex = -1;
     } else {
-        nodeIndex = SearchNode__Q26CChara6CModelFPc(m_charaModelHandle->m_model, nodeName);
+        nodeIndex = m_charaModelHandle->m_model->SearchNode(nodeName);
     }
     m_lookAtTargetNodeIndex = nodeIndex;
 }
@@ -2849,7 +2843,7 @@ void CGObject::LoadWeapon(int itemId, int itemVariant)
         m_weaponModelHandle->LoadModel(
             4, static_cast<unsigned long>(itemId), static_cast<unsigned long>(itemVariant), textureVariant, -1, 0, 1);
         m_weaponAttachNode =
-            SearchNode__Q26CChara6CModelFPc(m_charaModelHandle->m_model, const_cast<char*>(s_r_item));
+            m_charaModelHandle->m_model->SearchNode(const_cast<char*>(s_r_item));
     }
 }
 
@@ -2880,7 +2874,7 @@ void CGObject::LoadShield(int itemId)
 
         m_shieldModelHandle->LoadModel(4, static_cast<unsigned long>(itemId), 0, textureVariant, -1, 0, 1);
         m_shieldAttachNodeIndex =
-            SearchNode__Q26CChara6CModelFPc(m_charaModelHandle->m_model, const_cast<char*>(s_l_item2));
+            m_charaModelHandle->m_model->SearchNode(const_cast<char*>(s_l_item2));
     }
 }
 

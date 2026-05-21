@@ -12,12 +12,12 @@
 #include <dolphin/mtx.h>
 
 #include <string.h>
+#include <PowerPC_EABI_Support/Runtime/New.h>
 
 CMaterialMan MaterialMan;
 
 extern "C" unsigned long UnkMaterialSetGetter(void*);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
-extern "C" void __dl__FPv(void*);
 extern "C" void __ct__6CColorFv(void*);
 extern "C" void __ct__4CRefFv(void*);
 extern "C" void __dt__4CRefFv(void*, int);
@@ -310,7 +310,7 @@ extern "C" CPtrArray<CMaterial*>* dtor_80043AAC(CPtrArray<CMaterial*>* ptrArray,
     if (ptrArray != 0) {
         ptrArray->RemoveAll();
         if (shouldDelete > 0) {
-            __dl__FPv(ptrArray);
+            operator delete(ptrArray);
         }
     }
     return ptrArray;
@@ -2413,7 +2413,7 @@ extern "C" CMaterial* __dt__Q29CMaterial25_class_529materialman_cppFv(CMaterial*
     if (material != 0) {
         __destroy_arr(Ptr(material, 0x10), (void*)__dt__10CTexScrollFv, 0x14, 4);
         if (shouldDelete > 0) {
-            __dl__FPv(material);
+            operator delete(material);
         }
     }
 
@@ -2432,29 +2432,29 @@ CTexScroll::~CTexScroll()
         if (keyFrame0 != 0) {
             void*& table0 = *reinterpret_cast<void**>(Ptr(keyFrame0, 0x18));
             if (table0 != 0) {
-                __dl__FPv(table0);
+                delete[] static_cast<unsigned char*>(table0);
                 table0 = 0;
             }
 
             void*& table1 = *reinterpret_cast<void**>(Ptr(keyFrame0, 0x1C));
             if (table1 != 0) {
-                __dl__FPv(table1);
+                delete[] static_cast<float*>(table1);
                 table1 = 0;
             }
 
             void*& table2 = *reinterpret_cast<void**>(Ptr(keyFrame0, 0x20));
             if (table2 != 0) {
-                __dl__FPv(table2);
+                delete[] static_cast<float*>(table2);
                 table2 = 0;
             }
 
             void*& table3 = *reinterpret_cast<void**>(Ptr(keyFrame0, 0x24));
             if (table3 != 0) {
-                __dl__FPv(table3);
+                delete[] static_cast<float*>(table3);
                 table3 = 0;
             }
 
-            __dl__FPv(keyFrame0);
+            operator delete(keyFrame0);
             keyFrame0 = 0;
         }
     }
@@ -2464,29 +2464,29 @@ CTexScroll::~CTexScroll()
         if (keyFrame1 != 0) {
             void*& table0 = *reinterpret_cast<void**>(Ptr(keyFrame1, 0x18));
             if (table0 != 0) {
-                __dl__FPv(table0);
+                delete[] static_cast<unsigned char*>(table0);
                 table0 = 0;
             }
 
             void*& table1 = *reinterpret_cast<void**>(Ptr(keyFrame1, 0x1C));
             if (table1 != 0) {
-                __dl__FPv(table1);
+                delete[] static_cast<float*>(table1);
                 table1 = 0;
             }
 
             void*& table2 = *reinterpret_cast<void**>(Ptr(keyFrame1, 0x20));
             if (table2 != 0) {
-                __dl__FPv(table2);
+                delete[] static_cast<float*>(table2);
                 table2 = 0;
             }
 
             void*& table3 = *reinterpret_cast<void**>(Ptr(keyFrame1, 0x24));
             if (table3 != 0) {
-                __dl__FPv(table3);
+                delete[] static_cast<float*>(table3);
                 table3 = 0;
             }
 
-            __dl__FPv(keyFrame1);
+            operator delete(keyFrame1);
             keyFrame1 = 0;
         }
     }

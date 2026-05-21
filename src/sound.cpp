@@ -158,39 +158,47 @@ CLine<PointCount>::CLine()
     pointCount = 0;
 }
 
-extern "C" int Calc__9CLine(double maxDistance, CLine<10>* line, Vec* outPos, float* outDistance, u32* outIndex,
+extern "C" int Calc__9CLine(float maxDistance, CLine<10>* line, Vec* outPos, float* outDistance, u32* outIndex,
                              float* outT, const Vec* queryPos)
 {
-    const bool infiniteRange = ((float)maxDistance == kLineSegmentMinT);
-    float bestDistance = infiniteRange ? kLineBoundsInitMin : (float)maxDistance;
-    const float maxDistanceSq = (float)(maxDistance * maxDistance);
+    const float zero = kLineSegmentMinT;
+    const bool infiniteRange = (zero == maxDistance);
+    float bestDistance;
+    if (infiniteRange) {
+        bestDistance = kLineBoundsInitMin;
+    } else {
+        bestDistance = maxDistance;
+    }
+    const float maxDistanceSq = maxDistance * maxDistance;
     int found = 0;
     u32 bestIndex = 0;
     float bestT = kLineSegmentMinT;
     Vec bestPos;
+    Vec* point = line->points;
+    CLineSegment* segment = line->segments;
 
-    for (u32 i = 0; i + 1 < line->pointCount; i++) {
-        Vec candidate = line->points[i];
-        float distanceSq = PSVECSquareDistance(&candidate, queryPos);
+    for (u32 i = 0; i < line->pointCount - 1; i++, point++, segment++) {
+        const Vec* candidate = point;
+        float distanceSq = PSVECSquareDistance(candidate, queryPos);
         if (distanceSq < maxDistanceSq || infiniteRange) {
             float distance = sqrtf(distanceSq);
             if (distance < bestDistance) {
                 bestDistance = distance;
-                bestPos = candidate;
+                bestPos = *candidate;
                 bestIndex = i;
                 bestT = kLineSegmentMinT;
                 found = 1;
             }
         }
 
-        if (i + 1 == line->pointCount - 1) {
-            candidate = line->points[i + 1];
-            distanceSq = PSVECSquareDistance(&candidate, queryPos);
+        if (i == line->pointCount - 2) {
+            candidate = point + 1;
+            distanceSq = PSVECSquareDistance(candidate, queryPos);
             if (distanceSq < maxDistanceSq || infiniteRange) {
                 float distance = sqrtf(distanceSq);
                 if (distance < bestDistance) {
                     bestDistance = distance;
-                    bestPos = candidate;
+                    bestPos = *candidate;
                     bestIndex = i;
                     bestT = kLineSegmentMaxT;
                     found = 1;
@@ -198,15 +206,14 @@ extern "C" int Calc__9CLine(double maxDistance, CLine<10>* line, Vec* outPos, fl
             }
         }
 
-        const CLineSegment& segment = line->segments[i];
-        const float dotQuery = PSVECDotProduct(queryPos, &segment.delta);
-        const float dotStart = PSVECDotProduct(&line->points[i], &segment.delta);
-        const float t = (dotQuery - dotStart) / (segment.length * segment.length);
+        const float dotQuery = PSVECDotProduct(queryPos, &segment->delta);
+        const float dotStart = PSVECDotProduct(point, &segment->delta);
+        const float t = (dotQuery - dotStart) / (segment->length * segment->length);
         if (((kLineSegmentMinT <= t) && (t <= kLineSegmentMaxT)) || infiniteRange) {
             Vec scaled;
             Vec projected;
-            PSVECScale(&segment.delta, &scaled, t);
-            PSVECAdd(&line->points[i], &scaled, &projected);
+            PSVECScale(&segment->delta, &scaled, t);
+            PSVECAdd(point, &scaled, &projected);
             const float distance = PSVECDistance(queryPos, &projected);
             if (distance < bestDistance) {
                 bestDistance = distance;
@@ -1784,7 +1791,7 @@ void CSound::calcVolumePan(CSound::CSe3D* se3D, int& outVolume, int& outPan)
 
     if (se3D->m_lineIndex >= 0) {
         iVar4 = Calc__9CLine(
-            (double)se3D->m_farDistance, &SoundData(this).m_lines[se3D->m_lineIndex], &nearestPoint, &nearestDistance,
+            se3D->m_farDistance, &SoundData(this).m_lines[se3D->m_lineIndex], &nearestPoint, &nearestDistance,
             (u32*)0, &nearestT, reinterpret_cast<const Vec*>(&CameraPcs._212_4_));
         if (iVar4 != 0) {
             PSMTXMultVec(CameraPcs.m_cameraMatrix, &nearestPoint, &nearestPoint);

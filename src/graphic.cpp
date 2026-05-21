@@ -174,9 +174,9 @@ void CGraphic::Init()
         u8[alignedWidth * efbHeight * 2];
     memset(PtrAt(this, 0x71EC), 0, 4);
 
-    PtrAt(this, 0x71E8) = new (reinterpret_cast<CMemory::CStage*>(PtrAt(this, 0x8)),
-                               graphicRodata + kGraphicRodataFileName, 0xB53)
-        u8[alignedWidth * efbHeight * 2 + 0x46000];
+    PtrAt(this, 0x71E8) =
+        Memory._Alloc(alignedWidth * efbHeight * 2 + 0x46000, reinterpret_cast<CMemory::CStage*>(PtrAt(this, 0x8)),
+                      graphicRodata + kGraphicRodataFileName, 0xB53, 0);
     memset(PtrAt(this, 0x71E8), 0, 0x46004);
 
     PtrAt(this, 0x10) =
@@ -2047,11 +2047,9 @@ void CGraphic::CreateTempBuffer()
 	void* renderMode = PtrAt(this, 0x71E0);
 	u16 efbHeight = U16At(renderMode, 6);
 	u32 alignedWidth = (U16At(renderMode, 4) + 0xF) & 0xFFF0;
-	u8* tempBuffer = static_cast<u8*>(Memory._Alloc(alignedWidth * (u32)efbHeight * 2 + 0x46000,
-	                                                reinterpret_cast<CMemory::CStage*>(PtrAt(this, 0x8)),
-	                                                const_cast<char*>(s_graphic_cpp_801d6348), 0xB53, 0));
-
-	PtrAt(this, 0x71E8) = tempBuffer;
+	PtrAt(this, 0x71E8) =
+	    Memory._Alloc(alignedWidth * (u32)efbHeight * 2 + 0x46000, reinterpret_cast<CMemory::CStage*>(PtrAt(this, 0x8)),
+	                  const_cast<char*>(s_graphic_cpp_801d6348), 0xB53, 0);
 	memset(PtrAt(this, 0x71E8), 0, 0x46004);
 }
 

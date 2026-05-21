@@ -1718,7 +1718,6 @@ menu_lst.cpp:
 	extab       start:0x8000A12C end:0x8000A14C
 	extabindex  start:0x8001168C end:0x800116BC
 	.text       start:0x8017474C end:0x801754E0
-	.sdata2     start:0x80333614 end:0x80333674
 
 pppLaser.cpp:
 	extab       start:0x8000A14C end:0x8000A16C
@@ -1731,7 +1730,7 @@ MenuUtil.cpp:
 	extabindex  start:0x800116EC end:0x8001177C
 	.text       start:0x8017683C end:0x8017AF14
 	.data       start:0x80215A48 end:0x80215BD8
-	.sdata2     start:0x80333690 end:0x803336A0
+	.sdata2     start:0x80333614 end:0x80333680
 
 wmm_str.cpp:
 	extab       start:0x8000A1CC end:0x8000A1DC

@@ -40,7 +40,8 @@ public:
 		unsigned int* m_sp;        // 0x8
 		unsigned int* m_localBase; // 0xC
 		unsigned int* m_thisBase;  // 0x10
-		short m_classIndex;        // 0x14-0x16
+		short m_classIndex;        // 0x14
+		short m_activeClassIndex;  // 0x16
 		void* m_engineObject;      // 0x18
 		unsigned int m_codePos;    // 0x1C
 		CObject* m_previous;       // 0x20

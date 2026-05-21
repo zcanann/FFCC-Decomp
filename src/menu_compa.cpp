@@ -184,7 +184,11 @@ void CMenuPcs::CompaDraw()
 				SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(&MenuPcs, 0);
 			} else {
 				SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, tex);
-				GXColor color = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alpha * FLOAT_80333010)};
+				GXColor color;
+				color.r = 0xFF;
+				color.g = 0xFF;
+				color.b = 0xFF;
+				color.a = static_cast<unsigned char>(alpha * FLOAT_80333010);
 				GXSetChanMatColor(GX_COLOR0A0, color);
 				DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 0, x, y, w, h, u, v, uvScale, uvScale, FLOAT_80332FF8);
 			}
@@ -195,7 +199,11 @@ void CMenuPcs::CompaDraw()
 
 	float globalAlpha = compaList->entries[0].alpha;
 
-	GXColor color = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(globalAlpha * FLOAT_80333010)};
+	GXColor color;
+	color.r = 0xFF;
+	color.g = 0xFF;
+	color.b = 0xFF;
+	color.a = static_cast<unsigned char>(globalAlpha * FLOAT_80333010);
 	GXSetChanMatColor(GX_COLOR0A0, color);
 	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x3A);
 

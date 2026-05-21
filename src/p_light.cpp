@@ -213,11 +213,11 @@ void CLightPcs::create()
 void CLightPcs::destroy()
 {
     for (u32 i = 0; i < 8; i++) {
-        CBumpLight& light = m_bumpLights[8 + i];
+        CBumpLight& light = m_bumpLights[1][i];
         if (light.m_textureData != 0) {
             bool hasTexture = light.m_textureData != 0;
             if (hasTexture) {
-                delete[] light.m_textureData;
+                Memory.Free(light.m_textureData);
                 light.m_textureData = 0;
             }
             light.m_hasTexture = 0;
@@ -226,11 +226,11 @@ void CLightPcs::destroy()
     }
 
     for (u32 i = 0; i < 8; i++) {
-        CBumpLight& light = m_bumpLights[i];
+        CBumpLight& light = m_bumpLights[0][i];
         if (light.m_textureData != 0) {
             bool hasTexture = light.m_textureData != 0;
             if (hasTexture) {
-                delete[] light.m_textureData;
+                Memory.Free(light.m_textureData);
                 light.m_textureData = 0;
             }
             light.m_hasTexture = 0;
@@ -250,18 +250,17 @@ void CLightPcs::destroy()
  */
 void CLightPcs::DestroyBumpLightAll(CLightPcs::TARGET target)
 {
-    CBumpLight* light = &m_bumpLights[static_cast<int>(target) * 8];
-
     for (u32 i = 0; i < 8; i++) {
-        if (light[i].m_textureData != 0) {
-            bool hasTexture = light[i].m_textureData != 0;
+        CBumpLight& light = m_bumpLights[static_cast<int>(target)][i];
+        if (light.m_textureData != 0) {
+            bool hasTexture = light.m_textureData != 0;
             if (hasTexture) {
-                delete[] light[i].m_textureData;
-                light[i].m_textureData = 0;
+                Memory.Free(light.m_textureData);
+                light.m_textureData = 0;
             }
 
-            light[i].m_hasTexture = 0;
-            light[i].m_useViewSpace = 0;
+            light.m_hasTexture = 0;
+            light.m_useViewSpace = 0;
         }
     }
 }
@@ -381,7 +380,7 @@ CLightPcs::CBumpLight* CLightPcs::AddBump(CLightPcs::CLight* srcLight, CLightPcs
                                           CMemory::CStage* stage, int count)
 {
     CBumpLight* bumpLight = 0;
-    CBumpLight* bumpLights = &m_bumpLights[target * 8];
+    CBumpLight* bumpLights = m_bumpLights[target];
 
     for (int i = 0; i < 8; i++) {
         if (!bumpLights[i].m_hasTexture) {

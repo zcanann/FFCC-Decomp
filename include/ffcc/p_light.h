@@ -105,7 +105,7 @@ public:
     u32 m_sceneLightCount;           // 0xB8
     CLight m_diffuseLights[8];       // 0xBC
     CLight m_sceneLights[0x20];      // 0x63C
-    CBumpLight m_bumpLights[0x20];   // 0x1C3C
+    CBumpLight m_bumpLights[4][8];   // 0x1C3C
     _GXColor m_mapLightColor[4];     // 0x433C
     float m_mapLightParams[9];       // 0x434C
     GXLightObj m_mapLightObj;        // 0x4370

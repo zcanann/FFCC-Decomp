@@ -1747,7 +1747,7 @@ int COctTree::CheckHitCylinder_r(COctNode* node)
 
 	if (overlap) {
 		if ((node->m_meshCount != 0) &&
-			((*reinterpret_cast<CMapHit**>(Ptr(m_mapObject, 0xC)))
+			(static_cast<CMapHit*>(m_mapObject->m_mapData)
 				 ->CheckHitCylinder((CMapCylinder*)&s_cyl, &s_mvec,
 									node->m_meshStart,
 									node->m_meshCount,
@@ -1759,7 +1759,7 @@ int COctTree::CheckHitCylinder_r(COctNode* node)
 		for (int i = 0; i < 8; i++) {
 			COctNode* child = nodeIter->m_children[0];
 			if (child == 0) {
-				return 0;
+				break;
 			}
 
 			float childBoundMinX = child->m_boundMinX;
@@ -1811,7 +1811,7 @@ int COctTree::CheckHitCylinder_r(COctNode* node)
 			if (childOverlap) {
 				int childHit = false;
 				if ((child->m_meshCount != 0) &&
-					((*reinterpret_cast<CMapHit**>(Ptr(m_mapObject, 0xC)))
+					(static_cast<CMapHit*>(m_mapObject->m_mapData)
 						 ->CheckHitCylinder((CMapCylinder*)&s_cyl, &s_mvec,
 											child->m_meshStart,
 											child->m_meshCount,
@@ -1826,7 +1826,7 @@ int COctTree::CheckHitCylinder_r(COctNode* node)
 
 						if ((reinterpret_cast<CBound*>(grandChild)->CheckCross(*reinterpret_cast<CBound*>(&s_cyl.m_boundsMin))) != 0) {
 							if ((grandChild->m_meshCount != 0) &&
-								((*reinterpret_cast<CMapHit**>(Ptr(m_mapObject, 0xC)))
+								(static_cast<CMapHit*>(m_mapObject->m_mapData)
 									 ->CheckHitCylinder((CMapCylinder*)&s_cyl, &s_mvec,
 														grandChild->m_meshStart,
 														grandChild->m_meshCount,
@@ -1988,7 +1988,7 @@ void COctTree::CheckHitCylinderNear_r(COctNode* octNode)
 	}
 
 	if (octNode->m_meshCount != 0) {
-		(*reinterpret_cast<CMapHit**>(Ptr(m_mapObject, 0xC)))
+		static_cast<CMapHit*>(m_mapObject->m_mapData)
 		    ->CheckHitCylinderNear((CMapCylinder*)&s_cyl, &s_mvec,
 		                           octNode->m_meshStart,
 		                           octNode->m_meshCount,
@@ -2049,7 +2049,7 @@ void COctTree::CheckHitCylinderNear_r(COctNode* octNode)
 
 		if (childOverlap) {
 			if (child->m_meshCount != 0) {
-				(*reinterpret_cast<CMapHit**>(Ptr(m_mapObject, 0xC)))
+				static_cast<CMapHit*>(m_mapObject->m_mapData)
 				    ->CheckHitCylinderNear((CMapCylinder*)&s_cyl, &s_mvec,
 				                           child->m_meshStart,
 				                           child->m_meshCount,
@@ -2064,7 +2064,7 @@ void COctTree::CheckHitCylinderNear_r(COctNode* octNode)
 
 				if ((reinterpret_cast<CBound*>(grandChild)->CheckCross(*reinterpret_cast<CBound*>(&s_cyl.m_boundsMin))) != 0) {
 					if (grandChild->m_meshCount != 0) {
-						(*reinterpret_cast<CMapHit**>(Ptr(m_mapObject, 0xC)))
+						static_cast<CMapHit*>(m_mapObject->m_mapData)
 						    ->CheckHitCylinderNear((CMapCylinder*)&s_cyl, &s_mvec,
 						                           grandChild->m_meshStart,
 						                           grandChild->m_meshCount,

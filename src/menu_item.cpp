@@ -151,8 +151,8 @@ STATIC_ASSERT(sizeof(MenuItemOpenAnim) == 0x40);
 int CMenuPcs::ItemCtrlCur()
 {
     bool blocked = false;
-    u16 press;
-    u16 hold;
+    unsigned int press;
+    unsigned int hold;
     int caravanWork = Game.m_scriptFoodBase[0];
 
     if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {

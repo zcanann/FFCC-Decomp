@@ -161,25 +161,6 @@ struct MapObjAttachObj
  * Address:	TODO
  * Size:	TODO
  */
-CMapKeyFrame::CMapKeyFrame()
-{
-    *reinterpret_cast<int*>(Ptr(this, 0)) = 0;
-    *reinterpret_cast<int*>(Ptr(this, 4)) = 0;
-    *reinterpret_cast<int*>(Ptr(this, 8)) = 0;
-    *reinterpret_cast<int*>(Ptr(this, 0xC)) = 0;
-    *reinterpret_cast<int*>(Ptr(this, 0x10)) = 0;
-    *reinterpret_cast<int*>(Ptr(this, 0x14)) = 0;
-    *reinterpret_cast<int*>(Ptr(this, 0x18)) = 0;
-    *reinterpret_cast<int*>(Ptr(this, 0x1C)) = 0;
-    *reinterpret_cast<int*>(Ptr(this, 0x20)) = 0;
-    *reinterpret_cast<int*>(Ptr(this, 0x24)) = 0;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
 CMapTexAnimSet::CMapTexAnimSet()
 {
 	// TODO

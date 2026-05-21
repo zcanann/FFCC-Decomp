@@ -6,6 +6,7 @@
 
 class CChunkFile;
 class CMapCylinder;
+class CMapObj;
 class COctNode;
 class CBound;
 
@@ -86,7 +87,7 @@ private:
 	u8 m_unk01;             // 0x01
 	u16 m_nodeCount;        // 0x02
 	COctNode* m_nodePool;   // 0x04
-	void* m_mapObject;      // 0x08
+	CMapObj* m_mapObject;   // 0x08
 	u8 m_pad0C[0x30];       // 0x0C
 	float m_localPosX;      // 0x3C
 	float m_localPosY;      // 0x40

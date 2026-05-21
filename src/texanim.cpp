@@ -10,7 +10,6 @@
 #include <math.h>
 #include "dolphin/mtx.h"
 
-extern "C" void __dl__FPv(void*);
 extern "C" void __dla__FPv(void*);
 extern "C" void __ct__4CRefFv(void*);
 extern "C" void __dt__4CRefFv(void*, int);

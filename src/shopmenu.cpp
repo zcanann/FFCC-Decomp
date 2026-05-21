@@ -11,6 +11,7 @@
 #include "ffcc/linkage.h"
 #include "ffcc/p_tina.h"
 #include <string.h>
+#include <PowerPC_EABI_Support/Runtime/New.h>
 
 extern "C" {
 void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, void*, char*, int);
@@ -38,7 +39,6 @@ void DeleteItemIdx__12CCaravanWorkFii(void*, int, int);
 char EquipChk__8CMenuPcsFi(void*, int);
 int GetSmithItem__8CMenuPcsFi(void*, int);
 int __cntlzw(unsigned int);
-void __dl__FPv(void*);
 void pppCacheLoadShape__FPsP12_pppDataHead(short*, _pppDataHead*);
 int GetEquipType__8CMenuPcsFi(void*, int);
 void ChgEquipPos__12CCaravanWorkFii(void*, int, int);
@@ -2645,7 +2645,7 @@ void CShopMenu::Calc()
                 ReleasePdt__8CPartPcsFi(PartPcsVoid(), ShopMenuInt(this, 0x18));
                 reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0])->CallShop(0, 0, 0, 0, 0);
                 *reinterpret_cast<unsigned short*>(MenuPcsRaw() + 0x850 + 6) = 1;
-                __dl__FPv(*reinterpret_cast<void**>(MenuPcsRaw() + 0x878));
+                operator delete(*reinterpret_cast<void**>(MenuPcsRaw() + 0x878));
                 *reinterpret_cast<void**>(MenuPcsRaw() + 0x878) = nullptr;
                 return;
             }
@@ -2736,7 +2736,7 @@ void CShopMenu::Calc()
                 ReleasePdt__8CPartPcsFi(PartPcsVoid(), ShopMenuInt(this, 0x18));
                 reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0])->CallShop(0, 0, 0, 0, 0);
                 *reinterpret_cast<unsigned short*>(MenuPcsRaw() + 0x850 + 6) = 1;
-                __dl__FPv(*reinterpret_cast<void**>(MenuPcsRaw() + 0x878));
+                operator delete(*reinterpret_cast<void**>(MenuPcsRaw() + 0x878));
                 *reinterpret_cast<void**>(MenuPcsRaw() + 0x878) = nullptr;
                 return;
             }

@@ -327,8 +327,8 @@ void CMenuPcs::CompaDraw()
  */
 bool CMenuPcs::CompaClose()
 {
-    int finishedCount;
     CompaOpenAnim* entry;
+    int finishedCount;
     int count;
     int frame;
 
@@ -449,19 +449,31 @@ activeHold:
 
 	if (doReset != 0) {
 		CompaOpenAnimList* compaList = this->compaList;
-		compaList->entries[0].startFrame = 2;
-		compaList->entries[0].duration = 5;
-		compaList->entries[1].startFrame = 2;
-		compaList->entries[1].duration = 5;
-		compaList->entries[2].startFrame = 2;
-		compaList->entries[2].duration = 5;
-		compaList->entries[3].startFrame = 7;
-		compaList->entries[3].duration = 5;
-		compaList->entries[4].startFrame = 7;
-		compaList->entries[4].duration = 5;
-		compaList->entries[5].flags = 2;
-		compaList->entries[5].startFrame = 7;
-		compaList->entries[5].duration = 5;
+		int entryIndex = 0;
+		CompaOpenAnim* setupEntry = &compaList->entries[entryIndex++];
+		setupEntry->startFrame = 2;
+		setupEntry->duration = 5;
+		compaList = this->compaList;
+		setupEntry = &compaList->entries[entryIndex++];
+		setupEntry->startFrame = 2;
+		setupEntry->duration = 5;
+		compaList = this->compaList;
+		setupEntry = &compaList->entries[entryIndex++];
+		setupEntry->startFrame = 2;
+		setupEntry->duration = 5;
+		compaList = this->compaList;
+		setupEntry = &compaList->entries[entryIndex++];
+		setupEntry->startFrame = 7;
+		setupEntry->duration = 5;
+		compaList = this->compaList;
+		setupEntry = &compaList->entries[entryIndex++];
+		setupEntry->startFrame = 7;
+		setupEntry->duration = 5;
+		compaList = this->compaList;
+		setupEntry = &compaList->entries[entryIndex++];
+		setupEntry->flags = 2;
+		setupEntry->startFrame = 7;
+		setupEntry->duration = 5;
 
 		unsigned int entryCount = compaList->count;
 		CompaOpenAnim* entry = compaList->entries;
@@ -485,8 +497,8 @@ activeHold:
  */
 bool CMenuPcs::CompaOpen()
 {
-    int finishedCount;
     CompaOpenAnim* entry;
+    int finishedCount;
     int count;
     int frame;
 

@@ -47,7 +47,15 @@ struct OSFS_ANM_ST
 
 struct OSFS_TEXTURE_ST
 {
-    u8 data[0x30];
+    s16 unk00;      // 0x00
+    s16 unk02;      // 0x02
+    s16 width;      // 0x04
+    s16 height;     // 0x06
+    s16 unk08;      // 0x08
+    s16 unk0A;      // 0x0A
+    s16 unk0C;      // 0x0C
+    s16 unk0E;      // 0x0E
+    u8 unk10[0x20]; // 0x10
 };
 
 #endif // _FFCC_FS_USB_PROCESS_H_

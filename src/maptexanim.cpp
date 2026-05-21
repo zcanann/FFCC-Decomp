@@ -6,6 +6,8 @@
 #define FFCC_PTRARRAY_NO_INLINE_ACCESSORS
 #include "ffcc/ptrarray.h"
 
+#include <PowerPC_EABI_Support/Runtime/New.h>
+
 class CMaterial;
 
 class CMaterialSet : public CRef
@@ -25,7 +27,6 @@ extern "C" void __ct__4CRefFv(void*);
 extern "C" void __dt__4CRefFv(void*, int);
 extern "C" CMapTexAnim* __dt__11CMapTexAnimFv(CMapTexAnim*, short);
 extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
-extern "C" void __dl__FPv(void*);
 extern "C" void* __RTTI__11CMapTexAnim_8032E690;
 extern "C" void* PTR_PTR_s_CMapTexAnim[] = {
     &__RTTI__11CMapTexAnim_8032E690,
@@ -356,26 +357,26 @@ extern "C" CMapTexAnim* __dt__11CMapTexAnimFv(CMapTexAnim* anim, short shouldDel
 
         if ((reinterpret_cast<int>(anim) + 0x24) != 0) {
             if (*reinterpret_cast<void**>(p + 0x3C) != 0) {
-                __dl__FPv(*reinterpret_cast<void**>(p + 0x3C));
+                delete[] *reinterpret_cast<unsigned char**>(p + 0x3C);
                 *reinterpret_cast<void**>(p + 0x3C) = 0;
             }
             if (*reinterpret_cast<void**>(p + 0x40) != 0) {
-                __dl__FPv(*reinterpret_cast<void**>(p + 0x40));
+                delete[] *reinterpret_cast<float**>(p + 0x40);
                 *reinterpret_cast<void**>(p + 0x40) = 0;
             }
             if (*reinterpret_cast<void**>(p + 0x44) != 0) {
-                __dl__FPv(*reinterpret_cast<void**>(p + 0x44));
+                delete[] *reinterpret_cast<float**>(p + 0x44);
                 *reinterpret_cast<void**>(p + 0x44) = 0;
             }
             if (*reinterpret_cast<void**>(p + 0x48) != 0) {
-                __dl__FPv(*reinterpret_cast<void**>(p + 0x48));
+                delete[] *reinterpret_cast<float**>(p + 0x48);
                 *reinterpret_cast<void**>(p + 0x48) = 0;
             }
         }
 
         __dt__4CRefFv(anim, 0);
         if (shouldDelete > 0) {
-            __dl__FPv(anim);
+            operator delete(anim);
         }
     }
 

@@ -157,7 +157,6 @@ extern "C" void Destroy__7CMapMngFv(CMapMng*);
 extern "C" void MapFileRead__7CMapMngFPcRUl(CMapMng*);
 extern "C" void Printf__7CSystemFPce(CSystem* system, const char* format, ...);
 
-extern "C" void __dl__FPv(void*);
 extern "C" void DrawBound__8CGraphicFR6CBound8_GXColor(CGraphic*, void*, _GXColor);
 
 struct CBoundHack {

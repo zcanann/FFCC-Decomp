@@ -4,12 +4,7 @@
 #include "ffcc/partMng.h"
 
 typedef struct {
-    u8 m_pad_0x0[0xc];
-    s32 m_graphId;
-    pppFMATRIX m_localMatrix;
-    pppFMATRIX m_drawMatrix;
-    Vec* m_meshPoints;
-    u8 m_pad_0x74[0xc];
+    _pppPObject m_object;
 } pppMiasma;
 
 typedef struct {

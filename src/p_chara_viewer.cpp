@@ -81,8 +81,6 @@ extern "C" void DestroyStage__7CMemoryFPQ27CMemory6CStage(void*, void*);
 extern "C" void* CreateStage__7CMemoryFUlPci(void*, unsigned long, const char*, int);
 extern "C" void* createTextureSet__9CCharaPcsFPvi(void*, void*, int);
 extern "C" void Printf__7CSystemFPce(void*, const char*, ...);
-extern "C" void Create__Q26CChara6CModelFPvPQ27CMemory6CStage(void*, void*, void*);
-extern "C" void CreateDynamics__Q26CChara6CModelFPvPQ27CMemory6CStage(void*, void*, void*);
 extern "C" void Create__Q26CChara5CAnimFPvPQ27CMemory6CStage(void*, void*, void*);
 extern "C" void __ct__Q29CLightPcs10CBumpLightFv(void*);
 extern "C" float FLOAT_80330BEC;
@@ -401,8 +399,7 @@ void CCharaPcs::calcViewer()
                 CChara::CModel* model =
                     new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_viewer_cpp), 0xEA) CChara::CModel;
                 self->m_viewerModel[0] = model;
-                Create__Q26CChara6CModelFPvPQ27CMemory6CStage(
-                    self->m_viewerModel[0], File.m_readBuffer, self->m_viewerModelStage);
+                self->m_viewerModel[0]->Create(File.m_readBuffer, self->m_viewerModelStage);
                 *(reinterpret_cast<unsigned char*>(self->m_viewerModel[0]) + 0x10C) =
                     (*(reinterpret_cast<unsigned char*>(self->m_viewerModel[0]) + 0x10C) & 0xBF) | 0x40;
                 File.Close(fileHandle);
@@ -416,8 +413,7 @@ void CCharaPcs::calcViewer()
             if (fileHandle != 0) {
                 File.Read(fileHandle);
                 File.SyncCompleted(fileHandle);
-                CreateDynamics__Q26CChara6CModelFPvPQ27CMemory6CStage(
-                    self->m_viewerModel[0], File.m_readBuffer, self->m_viewerModelStage);
+                self->m_viewerModel[0]->CreateDynamics(File.m_readBuffer, self->m_viewerModelStage);
                 File.Close(fileHandle);
             }
             self->m_viewerLoadDynamics = 0;

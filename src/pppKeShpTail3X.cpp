@@ -177,8 +177,8 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* p
     float segDz;
     u16 rng;
     int life;
-    s16 shapeSetCount;
-    s16 shapeCount;
+    s32 shapeSetCount;
+    s32 shapeCount;
     float shapeScale;
     float shapeScaleStep;
     float trailStep;

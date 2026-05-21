@@ -351,7 +351,7 @@ void CFunnyShape::ClearTextureData()
         }
 
         if (iter->m_textureHeaders[0] != 0) {
-            delete static_cast<OSFS_TEXTURE_ST*>(iter->m_textureHeaders[0]);
+            delete iter->m_textureHeaders[0];
             iter->m_textureHeaders[0] = 0;
         }
         iter = reinterpret_cast<CFunnyShape*>(Ptr(iter, 4));
@@ -467,9 +467,8 @@ void CFunnyShape::RenderTexture()
     _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 2, 3);
     GXLoadTexObj(reinterpret_cast<GXTexObj*>(m_texObjData[0]), GX_TEXMAP0);
 
-    const u8* texData = reinterpret_cast<const u8*>(m_textureHeaders[0]);
-    const s16 width = *reinterpret_cast<const s16*>(texData + 4);
-    const s16 height = *reinterpret_cast<const s16*>(texData + 6);
+    const s16 width = m_textureHeaders[0]->width;
+    const s16 height = m_textureHeaders[0]->height;
     GXSetViewport(FLOAT_8032fd98, FLOAT_8032fd98, static_cast<float>(width), static_cast<float>(height),
                   FLOAT_8032fd6c, FLOAT_8032fd74);
 
@@ -741,7 +740,7 @@ CFunnyShape::~CFunnyShape()
         }
 
         if (iter->m_textureHeaders[0] != 0) {
-            delete static_cast<OSFS_TEXTURE_ST*>(iter->m_textureHeaders[0]);
+            delete iter->m_textureHeaders[0];
             iter->m_textureHeaders[0] = 0;
         }
 

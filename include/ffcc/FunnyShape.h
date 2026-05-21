@@ -45,7 +45,7 @@ public:
     OSFS_SHAPE_ST m_shape;               // 0x6000
     void* m_meshData;                    // 0x6010
     void* m_texObjData[0x10];            // 0x6014
-    void* m_textureHeaders[0x10];        // 0x6054
+    OSFS_TEXTURE_ST* m_textureHeaders[0x10]; // 0x6054
     void* m_textureData[0x10];           // 0x6094
     s8 m_textureCount;                   // 0x60D4
     u8 m_textureCountPad[3];             // 0x60D5

@@ -659,7 +659,7 @@ void CFunnyShape::Update()
 void CFunnyShape::InitAnmWork()
 {
     const float zero = 0.0f;
-    const u8 noSpread = (u8)((((ShapeFlags(this) >> 7) & 1) ^ 1));
+    const bool noSpread = (ShapeFlags(this) & 0x80) == 0;
     const float angleMul = 3.14f;
     const float angleDiv = 180.0f;
     CFunnyShapeAnmWork* work = m_anmWork;

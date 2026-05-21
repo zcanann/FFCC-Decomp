@@ -4,6 +4,7 @@
 #include "ffcc/render_buffers.h"
 #include "ffcc/mapmesh.h"
 #include "ffcc/p_camera.h"
+#include "ffcc/p_chara.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/util.h"
@@ -102,7 +103,6 @@ int GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void* handle);
 int GetTexture__8CMapMeshFP12CMaterialSetRi(CMapMesh* mapMesh, CMaterialSet* materialSet, int& textureIndex);
 int pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 void pppHeapUseRate__FPQ27CMemory6CStage(CMemory::CStage* stage);
-void Draw__Q29CCharaPcs7CHandleFi(void* handle, int drawType);
 
 void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(pppCVECTOR*, pppFMATRIX*, float, unsigned char,
                                                                  unsigned char, unsigned char, unsigned char,
@@ -371,7 +371,8 @@ void pppFrameBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppBl
 void pppDestructBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkC* data)
 {
     pppBlurCharaWork* work = GetBlurWork(blurChara, data);
-    void* handle = GetCharaHandlePtr__FP8CGObjectl(work->m_ownerObj, 0);
+    CCharaPcs::CHandle* handle =
+        reinterpret_cast<CCharaPcs::CHandle*>(GetCharaHandlePtr__FP8CGObjectl(work->m_ownerObj, 0));
     BlurCharaModelRaw* rawModel = reinterpret_cast<BlurCharaModelRaw*>(GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle));
 
     rawModel->m_afterDrawModelCallback = 0;
@@ -433,7 +434,8 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void
     pppBlurCharaUnkB* renderData = reinterpret_cast<pppBlurCharaUnkB*>(param_3);
     int width;
     int height;
-    void* handle = GetCharaHandlePtr__FP8CGObjectl(work->m_ownerObj, 0);
+    CCharaPcs::CHandle* handle =
+        reinterpret_cast<CCharaPcs::CHandle*>(GetCharaHandlePtr__FP8CGObjectl(work->m_ownerObj, 0));
     _GXTexObj backTexObj;
     Vec posA;
     Vec posB;
@@ -468,7 +470,7 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void
 
     rawModel->m_beforeMeshLockCallback = BlurChara_SetBeforeMeshLockEnvCallback;
     rawModel->m_afterDrawModelCallback = 0;
-    Draw__Q29CCharaPcs7CHandleFi(handle, 0);
+    handle->Draw(0);
     rawModel->m_beforeMeshLockCallback = 0;
     rawModel->m_afterDrawModelCallback = BlurChara_AfterDrawModelCallback;
 

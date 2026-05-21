@@ -98,7 +98,6 @@ void InitTexObj__8CTextureFv(void*);
 void genParaboloidMap__FPvPUlUs9_GXVtxFmt(void*, unsigned long*, unsigned short, GXVtxFmt);
 void DispCharaParts__8CGObjectFi(CGObject*, int);
 void _WaitDrawDone__8CGraphicFPci(CGraphic*, char*, int);
-void Draw__Q29CCharaPcs7CHandleFi(CCharaPcs::CHandle* handle, int drawType);
 }
 
 static int CreateWaterMesh(Vec* positionsInOut, Vec* normalsOut, Vec2d* uvOut, unsigned short* indicesOut, float size);
@@ -1077,7 +1076,7 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
                 *(u32*)((u8*)ownerModel + 0xE8) = (u32)step;
                 *(u32*)((u8*)owner->m_model + 0xF8) = (u32)Mana_BeforeDrawShadowLockEnvCallback;
                 *(u32*)((u8*)owner->m_model + 0x100) = (u32)Chara_DrawShadowMeshDLCallback;
-                Draw__Q29CCharaPcs7CHandleFi(owner, 1);
+                owner->Draw(1);
                 ownerModel = owner->m_model;
                 *(u32*)((u8*)ownerModel + 0xE4) = 0;
                 *(u32*)((u8*)ownerModel + 0xE8) = 0;

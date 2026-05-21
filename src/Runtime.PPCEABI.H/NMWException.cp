@@ -1,6 +1,7 @@
 #include "PowerPC_EABI_Support/Runtime/exception.h"
 #include "PowerPC_EABI_Support/Runtime/NMWException.h"
 #include "PowerPC_EABI_Support/Runtime/MWCPlusLib.h"
+#include "PowerPC_EABI_Support/Runtime/New.h"
 
 #pragma exceptions on
 
@@ -8,7 +9,6 @@
 
 extern "C" {
 extern void abort();
-extern void __dla__FPv(void*);
 }
 
 namespace std {
@@ -267,6 +267,6 @@ extern "C" void __destroy_new_array(void* block, ConstructorDestructor dtor) {
 				i++;
 			}
 		}
-		__dla__FPv((char*)block - 0x10);
+		operator delete[]((char*)block - 0x10);
 	}
 }

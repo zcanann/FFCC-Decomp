@@ -20,6 +20,7 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include <dolphin/os.h>
+#include <PowerPC_EABI_Support/Runtime/New.h>
 #include <math.h>
 #include <string.h>
 #include "ffcc/fontman.h"
@@ -60,7 +61,6 @@ extern "C" void InitEnv__9CCharaPcsFi(void*, int);
 extern "C" unsigned int pppCreate__8CPartMngFiiP14PPPCREATEPARAMi(void*, int, int, void*, int);
 extern "C" void pppDeletePart__8CPartMngFi(void*, int);
 extern "C" void pppDestroyAll__8CPartMngFv(void*);
-extern "C" void __dla__FPv(void*);
 extern "C" void* Free__7CMemoryFPv(CMemory*, void*);
 extern "C" int GetPadType__7CJoybusFi(void*, int);
 extern "C" char GetGBAConnect__7CJoybusFi(void*, int);
@@ -888,9 +888,7 @@ void CMenuPcs::destroyWorld()
 	{
 		int iVar = *reinterpret_cast<int*>(bytes + 0x840);
 		if (iVar != 0) {
-			if (iVar != 0) {
-				__dla__FPv(reinterpret_cast<void*>(iVar - 0x10));
-			}
+			operator delete[](reinterpret_cast<void*>(iVar - 0x10));
 			reinterpret_cast<void**>(bytes + 0x840)[0] = 0;
 		}
 	}

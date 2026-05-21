@@ -676,7 +676,8 @@ void CFunnyShape::InitAnmWork()
 
         r = rand();
         const s16 shapeCount = *reinterpret_cast<s16*>(reinterpret_cast<u8*>(AnimData(this)) + 6);
-        work->frame = static_cast<s16>(r - (r / shapeCount) * shapeCount);
+        const s32 shapeDiv = r / shapeCount;
+        work->frame = static_cast<s16>(r - shapeDiv * shapeCount);
         work->delay = 0x200;
         work->viewportY = zero;
         work->viewportX = zero;

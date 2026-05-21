@@ -40,7 +40,6 @@ u8* gCharaPartWorkPtr = 0;
 extern "C" int __cntlzw(unsigned int);
 extern "C" void ReleasePdt__8CPartPcsFi(void*, int);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
-extern "C" CMemory::CStage* CreateStage__7CMemoryFUlPci(CMemory*, unsigned long, const char*, int);
 extern "C" void CopyFromAMemorySync__7CMemoryFPvPvUl(CMemory*, void*, void*, unsigned long);
 extern "C" void CopyToAMemorySync__7CMemoryFPvPvUl(CMemory*, void*, void*, unsigned long);
 extern "C" void SetStdProjectionMatrix__10CCameraPcsFv(void*);
@@ -60,7 +59,6 @@ extern "C" void Destroy__6CCharaFv(void*);
 extern "C" void Create__Q26CChara5CAnimFPvPQ27CMemory6CStage(void*, void*, void*);
 extern "C" void LoadSe__6CSoundFPv(void*, void*);
 extern "C" void LoadWave__6CSoundFPv(void*, void*);
-extern "C" void DestroyStage__7CMemoryFPQ27CMemory6CStage(void*, void*);
 extern "C" int GetBackBufferRect__8CGraphicFRiRiRiRii(CGraphic*, int&, int&, int&, int&, int);
 extern "C" unsigned char DbgMenuPcs[];
 extern unsigned char PTR_s_CCharaPcs_GAME__801fce10[];
@@ -723,9 +721,9 @@ CCharaPcs::~CCharaPcs()
  */
 void CCharaPcs::Init()
 {
-    StageAt(this, 0xC0) = CreateStage__7CMemoryFUlPci(&Memory, 0x38000, s_CCharaPcs_stage, 0);
-    StageAt(this, 0xC4) = CreateStage__7CMemoryFUlPci(&Memory, 0x380000, s_CCharaPcs_amem, 2);
-    StageAt(this, 0xC8) = CreateStage__7CMemoryFUlPci(&Memory, 0x70000, s_CCharaPcs_amemw, 2);
+    StageAt(this, 0xC0) = Memory.CreateStage(0x38000, const_cast<char*>(s_CCharaPcs_stage), 0);
+    StageAt(this, 0xC4) = Memory.CreateStage(0x380000, const_cast<char*>(s_CCharaPcs_amem), 2);
+    StageAt(this, 0xC8) = Memory.CreateStage(0x70000, const_cast<char*>(s_CCharaPcs_amemw), 2);
     CharaAmemStage() = StageAt(this, 0xC4);
 
     LoadModelArray(this)->SetStage(StageAt(this, 0xC0));
@@ -839,13 +837,13 @@ void CCharaPcs::create()
 {
     FreeMergeMask(this) = 0;
 
-    StageAt(this, 0xCC) = CreateStage__7CMemoryFUlPci(&Memory, 0x177000, s_CCharaPcs_loadModel, 0);
-    StageAt(this, 0xD0) = CreateStage__7CMemoryFUlPci(&Memory, 0x130000, s_CCharaPcs_loadTex, 0);
-    StageAt(this, 0xD8) = CreateStage__7CMemoryFUlPci(&Memory, 0x8400, s_CCharaPcs_loadWepTex, 0);
-    StageAt(this, 0xDC) = CreateStage__7CMemoryFUlPci(&Memory, 0x18000, s_CCharaPcs_loadWepModel, 0);
-    StageAt(this, 0xE0) = CreateStage__7CMemoryFUlPci(&Memory, 0x10000, s_CCharaPcs_loadFaModel, 0);
-    StageAt(this, 0xD4) = CreateStage__7CMemoryFUlPci(
-        &Memory, CurrentSceneId() == 4 ? 0x190000UL : 0x1E0000UL, s_CCharaPcs_loadAnim, 0);
+    StageAt(this, 0xCC) = Memory.CreateStage(0x177000, const_cast<char*>(s_CCharaPcs_loadModel), 0);
+    StageAt(this, 0xD0) = Memory.CreateStage(0x130000, const_cast<char*>(s_CCharaPcs_loadTex), 0);
+    StageAt(this, 0xD8) = Memory.CreateStage(0x8400, const_cast<char*>(s_CCharaPcs_loadWepTex), 0);
+    StageAt(this, 0xDC) = Memory.CreateStage(0x18000, const_cast<char*>(s_CCharaPcs_loadWepModel), 0);
+    StageAt(this, 0xE0) = Memory.CreateStage(0x10000, const_cast<char*>(s_CCharaPcs_loadFaModel), 0);
+    StageAt(this, 0xD4) =
+        Memory.CreateStage(CurrentSceneId() == 4 ? 0x190000UL : 0x1E0000UL, const_cast<char*>(s_CCharaPcs_loadAnim), 0);
 
     CHandle* sentinel = reinterpret_cast<CHandle*>(
         _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(&Memory, 0x194, StageAt(&CharaPcs, 0xC0), const_cast<char*>(s_p_chara_cpp), 0xDB, 0));
@@ -945,12 +943,12 @@ void CCharaPcs::destroy()
         *reinterpret_cast<void**>(Ptr(this, 0x4C)) = 0;
     }
 
-    DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, *reinterpret_cast<void**>(Ptr(this, 0xCC)));
-    DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, *reinterpret_cast<void**>(Ptr(this, 0xD0)));
-    DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, *reinterpret_cast<void**>(Ptr(this, 0xD8)));
-    DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, *reinterpret_cast<void**>(Ptr(this, 0xDC)));
-    DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, *reinterpret_cast<void**>(Ptr(this, 0xE0)));
-    DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, *reinterpret_cast<void**>(Ptr(this, 0xD4)));
+    Memory.DestroyStage(StageAt(this, 0xCC));
+    Memory.DestroyStage(StageAt(this, 0xD0));
+    Memory.DestroyStage(StageAt(this, 0xD8));
+    Memory.DestroyStage(StageAt(this, 0xDC));
+    Memory.DestroyStage(StageAt(this, 0xE0));
+    Memory.DestroyStage(StageAt(this, 0xD4));
     Destroy__6CCharaFv(&Chara);
 }
 

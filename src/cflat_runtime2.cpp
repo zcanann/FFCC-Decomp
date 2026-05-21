@@ -4,6 +4,7 @@
 #include "ffcc/goout.h"
 #include "ffcc/graphic.h"
 #include "ffcc/gxfunc.h"
+#include "ffcc/itemobj.h"
 #include "ffcc/monobj.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/p_dbgmenu.h"
@@ -25,6 +26,7 @@
 
 class CFont;
 
+extern "C" void StaticFrame__10CGCharaObjFv();
 extern "C" void Create__9CGBaseObjFv(CGBaseObj*);
 extern "C" void Destroy__9CGBaseObjFv(CGBaseObj*);
 extern "C" void Frame__9CGBaseObjFv(CGBaseObj*);
@@ -903,7 +905,7 @@ void CFlatRuntime2::Frame(int arg0, int mode)
 	CStopWatch watch((char*)-1);
 
 	if (mode == 0) {
-		CGCharaObj::StaticFrame();
+		StaticFrame__10CGCharaObjFv();
 		CGPartyObj::CheckGameOver();
 		Frame__12CFlatRuntimeFii(reinterpret_cast<CFlatRuntime*>(this), arg0, mode);
 

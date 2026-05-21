@@ -78,7 +78,7 @@ public:
 	void onDrawDebug(CFont*, float, float&, float);
 	void addSe(int);
 	void seDamageDelete();
-	static void StaticFrame();
+	void StaticFrame();
 	void combi2();
 	void sendCombiToScript(CGCharaObj*, int, int);
 	void scCheckItem(CCombi2Set*, CGCharaObj*, int);

@@ -86,10 +86,13 @@ extern CProfile g_par_calc_prof;
 extern CProfile g_par_draw_prof;
 extern PPPCREATEPARAM g_dcp;
 
+#ifndef FFCC_PPPFMATRIX_DEFINED
+#define FFCC_PPPFMATRIX_DEFINED
 struct pppFMATRIX
 {
     Mtx value;
 };
+#endif
 #if !defined(PPP_BREATHMODEL_CUSTOM_PARTICLE_TYPES) && !defined(PPP_YMBREATH_CUSTOM_PARTICLE_TYPES)
 typedef Mtx PARTICLE_WMAT;  // Size 0x30
 #endif

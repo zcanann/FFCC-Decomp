@@ -28,9 +28,12 @@ struct RSDLISTITEM {
     int flag;
 };
 
+#ifndef FFCC_PPPFMATRIX_DEFINED
+#define FFCC_PPPFMATRIX_DEFINED
 struct pppFMATRIX {
     float value[3][4];
 };
+#endif
 
 class CMaterialEditorPcs : public CSamplePcs
 {

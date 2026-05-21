@@ -60,7 +60,6 @@ extern "C" void InitEnv__9CCharaPcsFi(void*, int);
 extern "C" unsigned int pppCreate__8CPartMngFiiP14PPPCREATEPARAMi(void*, int, int, void*, int);
 extern "C" void pppDeletePart__8CPartMngFi(void*, int);
 extern "C" void pppDestroyAll__8CPartMngFv(void*);
-extern "C" void __dl__FPv(void*);
 extern "C" void __dla__FPv(void*);
 extern "C" void* Free__7CMemoryFPv(CMemory*, void*);
 extern "C" int GetPadType__7CJoybusFi(void*, int);
@@ -829,7 +828,7 @@ void CMenuPcs::destroyWorld()
 	}
 
 	if (reinterpret_cast<void**>(bytes + 0x81C)[0] != 0) {
-		__dl__FPv(reinterpret_cast<void**>(bytes + 0x81C)[0]);
+		delete[] reinterpret_cast<unsigned char*>(reinterpret_cast<void**>(bytes + 0x81C)[0]);
 		reinterpret_cast<void**>(bytes + 0x81C)[0] = 0;
 	}
 
@@ -847,43 +846,43 @@ void CMenuPcs::destroyWorld()
 	}
 
 	if (reinterpret_cast<void**>(bytes + 0x814)[0] != 0) {
-		__dla__FPv(reinterpret_cast<void**>(bytes + 0x814)[0]);
+		delete[] reinterpret_cast<unsigned char*>(reinterpret_cast<void**>(bytes + 0x814)[0]);
 		reinterpret_cast<void**>(bytes + 0x814)[0] = 0;
 	}
 	if (reinterpret_cast<void**>(bytes + 0x818)[0] != 0) {
-		__dl__FPv(reinterpret_cast<void**>(bytes + 0x818)[0]);
+		delete[] reinterpret_cast<unsigned char*>(reinterpret_cast<void**>(bytes + 0x818)[0]);
 		reinterpret_cast<void**>(bytes + 0x818)[0] = 0;
 	}
 	if (reinterpret_cast<void**>(bytes + 0x81C)[0] != 0) {
-		__dl__FPv(reinterpret_cast<void**>(bytes + 0x81C)[0]);
+		delete[] reinterpret_cast<unsigned char*>(reinterpret_cast<void**>(bytes + 0x81C)[0]);
 		reinterpret_cast<void**>(bytes + 0x81C)[0] = 0;
 	}
 	if (reinterpret_cast<void**>(bytes + 0x820)[0] != 0) {
-		__dl__FPv(reinterpret_cast<void**>(bytes + 0x820)[0]);
+		delete[] reinterpret_cast<unsigned char*>(reinterpret_cast<void**>(bytes + 0x820)[0]);
 		reinterpret_cast<void**>(bytes + 0x820)[0] = 0;
 	}
 	if (reinterpret_cast<void**>(bytes + 0x824)[0] != 0) {
-		__dla__FPv(reinterpret_cast<void**>(bytes + 0x824)[0]);
+		delete[] reinterpret_cast<unsigned char*>(reinterpret_cast<void**>(bytes + 0x824)[0]);
 		reinterpret_cast<void**>(bytes + 0x824)[0] = 0;
 	}
 	if (reinterpret_cast<void**>(bytes + 0x828)[0] != 0) {
-		__dla__FPv(reinterpret_cast<void**>(bytes + 0x828)[0]);
+		delete[] reinterpret_cast<unsigned char*>(reinterpret_cast<void**>(bytes + 0x828)[0]);
 		reinterpret_cast<void**>(bytes + 0x828)[0] = 0;
 	}
 	if (reinterpret_cast<void**>(bytes + 0x844)[0] != 0) {
-		__dla__FPv(reinterpret_cast<void**>(bytes + 0x844)[0]);
+		delete[] reinterpret_cast<unsigned char*>(reinterpret_cast<void**>(bytes + 0x844)[0]);
 		reinterpret_cast<void**>(bytes + 0x844)[0] = 0;
 	}
 	if (reinterpret_cast<void**>(bytes + 0x82C)[0] != 0) {
-		__dl__FPv(reinterpret_cast<void**>(bytes + 0x82C)[0]);
+		delete[] reinterpret_cast<unsigned char*>(reinterpret_cast<void**>(bytes + 0x82C)[0]);
 		reinterpret_cast<void**>(bytes + 0x82C)[0] = 0;
 	}
 	if (reinterpret_cast<void**>(bytes + 0x838)[0] != 0) {
-		__dla__FPv(reinterpret_cast<void**>(bytes + 0x838)[0]);
+		delete[] reinterpret_cast<unsigned char*>(reinterpret_cast<void**>(bytes + 0x838)[0]);
 		reinterpret_cast<void**>(bytes + 0x838)[0] = 0;
 	}
 	if (reinterpret_cast<void**>(bytes + 0x83C)[0] != 0) {
-		__dl__FPv(reinterpret_cast<void**>(bytes + 0x83C)[0]);
+		delete[] reinterpret_cast<unsigned char*>(reinterpret_cast<void**>(bytes + 0x83C)[0]);
 		reinterpret_cast<void**>(bytes + 0x83C)[0] = 0;
 	}
 	{
@@ -896,7 +895,7 @@ void CMenuPcs::destroyWorld()
 		}
 	}
 	if (reinterpret_cast<void**>(bytes + 0x848)[0] != 0) {
-		__dl__FPv(reinterpret_cast<void**>(bytes + 0x848)[0]);
+		delete[] reinterpret_cast<unsigned char*>(reinterpret_cast<void**>(bytes + 0x848)[0]);
 		reinterpret_cast<void**>(bytes + 0x848)[0] = 0;
 	}
 

@@ -12,6 +12,7 @@
 #include "ffcc/ref.h"
 #include "ffcc/textureman.h"
 #include "ffcc/util.h"
+#include "ffcc/vector.h"
 extern "C" {
 extern u8* gCharaPartWorkPtr;
 }
@@ -56,14 +57,12 @@ extern "C" void SetAmbient__9CLightPcsF8_GXColor(void*, void*);
 extern "C" void SetNumDiffuse__9CLightPcsFUl(void*, unsigned long);
 extern "C" void SetDiffuse__9CLightPcsFUl8_GXColorP3Veci(void*, unsigned long, void*, void*, int);
 extern "C" void SetPosition__9CLightPcsFQ29CLightPcs6TARGETP3VecUl(void*, int, Vec*, unsigned long);
-extern "C" void __ct__Q29CLightPcs10CBumpLightFv(void*);
 extern "C" void Create__6CCharaFv(void*);
 extern "C" void Destroy__6CCharaFv(void*);
 extern "C" void Printf__7CSystemFPce(void*, const char*, ...);
 extern "C" void Create__Q26CChara5CAnimFPvPQ27CMemory6CStage(void*, void*, void*);
 extern "C" void LoadSe__6CSoundFPv(void*, void*);
 extern "C" void LoadWave__6CSoundFPv(void*, void*);
-extern "C" void* __ct__7CVectorFfff(void*, float, float, float);
 extern "C" void DestroyStage__7CMemoryFPQ27CMemory6CStage(void*, void*);
 extern "C" int GetBackBufferRect__8CGraphicFRiRiRiRii(CGraphic*, int&, int&, int&, int&, int);
 extern "C" unsigned char DbgMenuPcs[];
@@ -797,8 +796,8 @@ void CCharaPcs::Init()
     CColor baseColor(0x00, 0x00, 0x40, 0x40);
     *reinterpret_cast<_GXColor*>(Ptr(this, 0x18C)) = baseColor.color;
 
-    Vec baseVec;
-    Vec* constructedVec = reinterpret_cast<Vec*>(__ct__7CVectorFfff(&baseVec, 0.0f, 10.0f, 0.0f));
+    CVector baseVec(0.0f, 10.0f, 0.0f);
+    Vec* constructedVec = reinterpret_cast<Vec*>(&baseVec);
     reinterpret_cast<Vec*>(Ptr(this, 0x17C))->x = constructedVec->x;
     reinterpret_cast<Vec*>(Ptr(this, 0x17C))->y = constructedVec->y;
     reinterpret_cast<Vec*>(Ptr(this, 0x17C))->z = constructedVec->z;

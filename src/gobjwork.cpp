@@ -7,6 +7,7 @@
 #include "ffcc/game.h"
 #include "ffcc/p_menu.h"
 #include "ffcc/system.h"
+#include <PowerPC_EABI_Support/Runtime/New.h>
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
@@ -43,7 +44,6 @@ static inline float GetStatusMultiplier(int offset)
 }
 }
 
-extern "C" void __dl__FPv(void*);
 extern "C" int useItem__10CGPartyObjFi(CGPartyObj*, int);
 extern "C" int putItem__10CGPartyObjFi(CGPartyObj*, int);
 extern "C" int putGil__10CGPartyObjFi(CGPartyObj*, int);
@@ -126,7 +126,7 @@ extern "C" CGObjWork* dtor_800A2D8C(CGObjWork* gObjWork, short shouldDelete)
 	if (gObjWork != 0) {
 		*(void**)gObjWork = __vt__9CGObjWork;
 		if (0 < shouldDelete) {
-			__dl__FPv(gObjWork);
+			operator delete(gObjWork);
 		}
 	}
 
@@ -245,7 +245,7 @@ extern "C" CCaravanWork* dtor_800A2B9C(CCaravanWork* caravanWork, short shouldDe
 			*(void**)caravanWork = __vt__9CGObjWork;
 		}
 		if (0 < shouldDelete) {
-			__dl__FPv(caravanWork);
+			operator delete(caravanWork);
 		}
 	}
 

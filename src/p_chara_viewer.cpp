@@ -81,7 +81,6 @@ extern "C" void* CreateStage__7CMemoryFUlPci(void*, unsigned long, const char*, 
 extern "C" void* createTextureSet__9CCharaPcsFPvi(void*, void*, int);
 extern "C" void Printf__7CSystemFPce(void*, const char*, ...);
 extern "C" void Create__Q26CChara5CAnimFPvPQ27CMemory6CStage(void*, void*, void*);
-extern "C" void __ct__Q29CLightPcs10CBumpLightFv(void*);
 extern "C" float FLOAT_80330BEC;
 extern "C" float FLOAT_80330BF0;
 extern "C" double fmod(double, double);

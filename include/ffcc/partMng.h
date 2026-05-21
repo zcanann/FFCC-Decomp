@@ -385,7 +385,7 @@ public:
 
     void InitMaterialSet();
     void ReadTex(CChunkFile&);
-    void pppReadRsd(CChunkFile&, pppModelSt*);
+    unsigned int pppReadRsd(CChunkFile&, pppModelSt*);
     void pppReadShp(CChunkFile&, pppShapeSt*);
 
     void pppEditAllReleaseResource();

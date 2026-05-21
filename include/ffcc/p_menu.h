@@ -78,12 +78,12 @@ public:
 
         mcCtrl[0] = 0;
         mcCtrl[1] = 0;
-        mcCtrl[2] = 0;
         mcCtrl[3] = 0;
-        mcCtrl[4] = 0;
         mcCtrl[5] = 0;
-        mcCtrl[6] = 0;
         mcCtrl[7] = 0;
+        mcCtrl[6] = 0;
+        mcCtrl[2] = 0;
+        mcCtrl[4] = 0;
     }
     ~CMenuPcs();
 

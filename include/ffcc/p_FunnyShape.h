@@ -2,7 +2,6 @@
 #define _FFCC_P_FUNNYSHAPE_H_
 
 #include "ffcc/memory.h"
-#include "ffcc/p_sample.h"
 #include "ffcc/p_usb.h"
 #include "ffcc/system.h"
 #include "ffcc/FS_USB_Process.h"
@@ -14,7 +13,7 @@ extern unsigned int m_table_desc2__14CFunnyShapePcs[];
 extern unsigned int m_table_desc3__14CFunnyShapePcs[];
 extern unsigned int m_table__14CFunnyShapePcs[];
 
-class CFunnyShapePcs : public CSamplePcs
+class CFunnyShapePcs : public CProcess
 {
 public:
     CFunnyShapePcs();

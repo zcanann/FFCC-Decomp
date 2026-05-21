@@ -1440,13 +1440,15 @@ void CGraphic::GetBackBufferRect2(void* dstBuffer, _GXTexObj* texObj, int x, int
     if ((xEnd >= 0) && (yEnd >= 0) && (copyX <= U16At(PtrAt(this, 0x71E0), 4)) &&
         ((yEnd >= 0) && (copyY <= U16At(PtrAt(this, 0x71E0), 6))) &&
         ((copyWidth > 0) && ((copyHeight > 0) && (xEnd != copyX))) && (yEnd != copyY)) {
-        int textureSize = GXGetTexBufferSize(copyWidth & 0xFFFF, copyHeight & 0xFFFF, copyFormat, GX_FALSE, GX_FALSE);
+        u16 texWidth = copyWidth & 0xFFFF;
+        u16 texHeight = copyHeight & 0xFFFF;
+        int textureSize = GXGetTexBufferSize(texWidth, texHeight, copyFormat, GX_FALSE, GX_FALSE);
         void* textureBase =
             reinterpret_cast<void*>((reinterpret_cast<u32>(dstBuffer) + ((dstOffset + 0x1F) & 0xFFFFFFE0) + 0x1F) &
                                     0xFFFFFFE0);
 
-        GXSetTexCopySrc(copyX & 0xFFFF, copyY & 0xFFFF, copyWidth & 0xFFFF, copyHeight & 0xFFFF);
-        GXSetTexCopyDst(copyWidth & 0xFFFF, copyHeight & 0xFFFF, copyFormat, GX_FALSE);
+        GXSetTexCopySrc(copyX & 0xFFFF, copyY & 0xFFFF, texWidth, texHeight);
+        GXSetTexCopyDst(texWidth, texHeight, copyFormat, GX_FALSE);
         DCInvalidateRange(textureBase, textureSize);
         GXCopyTex(textureBase, copyClear);
         GXPixModeSync();
@@ -1473,7 +1475,7 @@ void CGraphic::GetBackBufferRect2(void* dstBuffer, _GXTexObj* texObj, int x, int
         }
 
         if (texObj != nullptr) {
-            GXInitTexObj(texObj, textureBase, copyWidth & 0xFFFF, copyHeight & 0xFFFF, copyFormat, GX_CLAMP, GX_CLAMP,
+            GXInitTexObj(texObj, textureBase, texWidth, texHeight, copyFormat, GX_CLAMP, GX_CLAMP,
                          GX_FALSE);
             float zero = LoadFloat(kGraphicZeroF);
             GXInitTexObjLOD(texObj, copyFilter, copyFilter, zero, zero, zero, GX_FALSE, GX_FALSE,

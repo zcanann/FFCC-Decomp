@@ -211,8 +211,6 @@ CMenuPcs::~CMenuPcs()
 {
     u8* self = reinterpret_cast<u8*>(this);
 
-    *reinterpret_cast<u32*>(self) = reinterpret_cast<u32>(__vt__8CMenuPcs);
-
     if (self + 0x20 != nullptr) {
         *reinterpret_cast<u32*>(self + 0x20) = 0;
         *reinterpret_cast<u32*>(self + 0x24) = 0;

@@ -613,19 +613,18 @@ void pppDestructYmMana(PYmMana* ymMana, pppYmManaUnkC* param_2)
 
     meshEntry = *(s32*)(model + 0xAC);
     step = work[0x1D];
-    for (i = 0; i < *(u32*)(*(s32*)(model + 0xA4) + 0xC); i++) {
+    for (i = 0; i < *(u32*)(*(s32*)(model + 0xA4) + 0xC); i++, meshEntry += 0x14) {
         u8 stepType = *(u8*)(step + 0x1C);
         s32 shape = *(s32*)(meshEntry + 8);
 
         if (stepType == 1) {
             if (strcmp((char*)shape, DAT_80330e88) == 0) {
-                s32 dlOffset = 0;
-                for (j = 0; j < *(u32*)(shape + 0x4C); j++) {
+                s32 dlOffset;
+                for (j = 0, dlOffset = 0; j < *(u32*)(shape + 0x4C); j++, dlOffset += 4) {
                     if (work[0x18] != 0 && *(CMemory::CStage**)(work[0x18] + dlOffset) != NULL) {
                         pppHeapUseRate(*(CMemory::CStage**)(work[0x18] + dlOffset));
                         *(u32*)(work[0x18] + dlOffset) = 0;
                     }
-                    dlOffset += 4;
                 }
                 if (work[0x18] != 0) {
                     pppHeapUseRate((CMemory::CStage*)work[0x18]);
@@ -634,13 +633,12 @@ void pppDestructYmMana(PYmMana* ymMana, pppYmManaUnkC* param_2)
             }
         } else if (stepType == 2) {
             if (strcmp((char*)shape, DAT_80330e90) == 0) {
-                s32 dlOffset = 0;
-                for (j = 0; j < *(u32*)(shape + 0x4C); j++) {
+                s32 dlOffset;
+                for (j = 0, dlOffset = 0; j < *(u32*)(shape + 0x4C); j++, dlOffset += 4) {
                     if (work[0x18] != 0 && *(CMemory::CStage**)(work[0x18] + dlOffset) != NULL) {
                         pppHeapUseRate(*(CMemory::CStage**)(work[0x18] + dlOffset));
                         *(u32*)(work[0x18] + dlOffset) = 0;
                     }
-                    dlOffset += 4;
                 }
                 if (work[0x18] != 0) {
                     pppHeapUseRate((CMemory::CStage*)work[0x18]);
@@ -648,21 +646,18 @@ void pppDestructYmMana(PYmMana* ymMana, pppYmManaUnkC* param_2)
                 }
             }
         } else if (stepType == 3 && strcmp((char*)shape, DAT_80330e98) == 0) {
-            s32 dlOffset = 0;
-            for (j = 0; j < *(u32*)(shape + 0x4C); j++) {
+            s32 dlOffset;
+            for (j = 0, dlOffset = 0; j < *(u32*)(shape + 0x4C); j++, dlOffset += 4) {
                 if (work[0x18] != 0 && *(CMemory::CStage**)(work[0x18] + dlOffset) != NULL) {
                     pppHeapUseRate(*(CMemory::CStage**)(work[0x18] + dlOffset));
                     *(u32*)(work[0x18] + dlOffset) = 0;
                 }
-                dlOffset += 4;
             }
             if (work[0x18] != 0) {
                 pppHeapUseRate((CMemory::CStage*)work[0x18]);
                 work[0x18] = 0;
             }
         }
-
-        meshEntry += 0x14;
     }
 }
 

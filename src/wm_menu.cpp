@@ -1198,7 +1198,7 @@ void CMenuPcs::CalcMCardMenu()
 		uVar3 = 0;
 	} else {
 		__cntlzw(static_cast<unsigned int>(Pad._448_4_));
-		uVar3 = Pad._8_2_;
+		uVar3 = Pad.GetPadInputs()[0].buttonDown[0];
 	}
 	unsigned short uVar6 = GetButtonRepeat(0);
 
@@ -2001,7 +2001,7 @@ void CMenuPcs::CalcLoadMenu()
 		uVar4 = 0;
 	} else {
 		__cntlzw(static_cast<unsigned int>(Pad._448_4_));
-		uVar4 = Pad._8_2_;
+		uVar4 = Pad.GetPadInputs()[0].buttonDown[0];
 	}
 	unsigned short uVar7 = GetButtonRepeat(0);
 

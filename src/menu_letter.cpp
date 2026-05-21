@@ -1742,7 +1742,7 @@ int CMenuPcs::LetterCtrlCur()
 	if (blocked) {
 		press = 0;
 	} else {
-		press = Pad._8_2_;
+		press = Pad.GetPadInputs()[0].buttonDown[0];
 	}
 
 	blocked = false;
@@ -1752,7 +1752,7 @@ int CMenuPcs::LetterCtrlCur()
 	if (blocked) {
 		hold = 0;
 	} else {
-		hold = Pad._20_2_;
+		hold = Pad.GetPadInputs()[0].repeatButton;
 	}
 
 	if (hold == 0) {

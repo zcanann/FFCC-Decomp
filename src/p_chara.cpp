@@ -38,7 +38,6 @@ u8* gCharaPartWorkPtr = 0;
 }
 
 extern "C" int __cntlzw(unsigned int);
-extern "C" void __ct__6CColorFv(void*);
 extern "C" void ReleasePdt__8CPartPcsFi(void*, int);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 extern "C" CMemory::CStage* CreateStage__7CMemoryFUlPci(CMemory*, unsigned long, const char*, int);
@@ -695,7 +694,9 @@ CCharaPcs::CCharaPcs()
     new (LoadAnimArray(this)) CPtrArray<CLoadAnim*>();
     new (LoadTextureArray(this)) CPtrArray<CLoadTexture*>();
     new (LoadPdtArray(this)) CPtrArray<CLoadPdt*>();
-    __construct_array(Ptr(this, 0x12C), reinterpret_cast<ConstructorDestructor>(__ct__6CColorFv), 0, 4, 5);
+    for (int i = 0; i < 5; i++) {
+        new (&m_viewerChoiceColor[i]) CColor;
+    }
 }
 
 /*

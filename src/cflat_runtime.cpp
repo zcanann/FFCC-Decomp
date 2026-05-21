@@ -6,8 +6,6 @@
 
 extern "C" {
 void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, void*, char*, int);
-void __dl__FPv(void*);
-void __dla__FPv(void*);
 void __ct__Q212CFlatRuntime6CClassFv(void*);
 void* __construct_new_array(void*, void*, void*, unsigned long, unsigned long);
 char DAT_80330118[];
@@ -159,54 +157,54 @@ void CFlatRuntime::Destroy()
 
 	void* ptr = *reinterpret_cast<void**>(self + 0x08);
 	if (ptr != 0) {
-		__dla__FPv(ptr);
+		delete[] reinterpret_cast<u8*>(ptr);
 	}
 
 	u8* funcs = m_funcs;
 	const int funcCount = m_funcCount;
 	for (int i = 0, off = 0; i < funcCount; i++, off += 0x50) {
-		__dla__FPv(*reinterpret_cast<void**>(funcs + off + 0x34));
-		__dla__FPv(*reinterpret_cast<void**>(funcs + off + 0x3C));
+		delete[] *reinterpret_cast<u8**>(funcs + off + 0x34);
+		delete[] *reinterpret_cast<u8**>(funcs + off + 0x3C);
 	}
 
 	ptr = m_funcs;
 	if (ptr != 0) {
-		__dla__FPv(ptr);
+		delete[] reinterpret_cast<u8*>(ptr);
 	}
 
 	ptr = m_classes;
 	if (ptr != 0) {
-		__dla__FPv(reinterpret_cast<u8*>(ptr) - 0x10);
+		delete[] (reinterpret_cast<u8*>(ptr) - 0x10);
 	}
 
 	ptr = m_strBlob;
 	if (ptr != 0) {
-		__dla__FPv(ptr);
+		delete[] reinterpret_cast<u8*>(ptr);
 	}
 
 	ptr = m_strOffsets;
 	if (ptr != 0) {
-		__dla__FPv(ptr);
+		delete[] reinterpret_cast<u8*>(ptr);
 	}
 
 	ptr = m_fstrBlob;
 	if (ptr != 0) {
-		__dla__FPv(ptr);
+		delete[] reinterpret_cast<u8*>(ptr);
 	}
 
 	ptr = m_fstrOffsets;
 	if (ptr != 0) {
-		__dla__FPv(ptr);
+		delete[] reinterpret_cast<u8*>(ptr);
 	}
 
 	ptr = m_vstrBlob;
 	if (ptr != 0) {
-		__dla__FPv(ptr);
+		delete[] reinterpret_cast<u8*>(ptr);
 	}
 
 	ptr = m_vstrOffsets;
 	if (ptr != 0) {
-		__dla__FPv(ptr);
+		delete[] reinterpret_cast<u8*>(ptr);
 	}
 
 	clear();

@@ -258,7 +258,7 @@ void CLightPcs::DestroyBumpLightAll(CLightPcs::TARGET target)
         if (light[i].m_textureData != 0) {
             bool hasTexture = light[i].m_textureData != 0;
             if (hasTexture) {
-                delete[] light[i].m_textureData;
+                Memory.Free(light[i].m_textureData);
                 light[i].m_textureData = 0;
             }
 

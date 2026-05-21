@@ -13,6 +13,7 @@
 #include "ffcc/sound.h"
 #include "ffcc/p_light.h"
 #include "ffcc/partMng.h"
+#include "ffcc/p_tina.h"
 #include "ffcc/THPSimple.h"
 #include "ffcc/joybus.h"
 #include "ffcc/color.h"
@@ -110,8 +111,18 @@ extern float FLOAT_80331528;
 extern float FLOAT_803315cc;
 extern float FLOAT_803315d0;
 extern float FLOAT_80331598;
+extern float FLOAT_80331588;
 extern float FLOAT_803315d4;
 extern float FLOAT_80331698;
+extern float FLOAT_8033169C;
+extern float FLOAT_803316A0;
+extern float FLOAT_803316A4;
+extern float FLOAT_803316A8;
+extern float FLOAT_803316AC;
+extern float FLOAT_803316B0;
+extern float FLOAT_803316B4;
+extern float FLOAT_803316B8;
+extern float FLOAT_803316BC;
 extern float FLOAT_80331748;
 extern float FLOAT_8033174c;
 extern float FLOAT_80331750;
@@ -6017,7 +6028,183 @@ void CMenuPcs::DrawCharaBase()
  */
 void CMenuPcs::CalcChara()
 {
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	unsigned char* const charaSelect = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x828)[0]);
+	unsigned char* modelData = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x824)[0]);
+	int* charaWork = reinterpret_cast<int*>(reinterpret_cast<unsigned int*>(bytes + 0x814)[0] + 0xA00);
+	unsigned int selectedMask = 0;
+
+	if (charaSelect[0x0D] == 1) {
+		selectedMask = 1u << static_cast<unsigned int>(*reinterpret_cast<short*>(charaSelect + 0x04));
+	}
+	if (charaSelect[0x1D] == 1) {
+		selectedMask |= 1u << static_cast<unsigned int>(*reinterpret_cast<short*>(charaSelect + 0x14));
+	}
+	if (charaSelect[0x2D] == 1) {
+		selectedMask |= 1u << static_cast<unsigned int>(*reinterpret_cast<short*>(charaSelect + 0x24));
+	}
+	if (charaSelect[0x3D] == 1) {
+		selectedMask |= 1u << static_cast<unsigned int>(*reinterpret_cast<short*>(charaSelect + 0x34));
+	}
+
+	for (int slot = 0; slot < 8; slot++) {
+		unsigned int effectMask = 0;
+		int effectCount = 0;
+
+		for (int player = 0; player < 4; player++) {
+			unsigned char* const entry = charaSelect + player * 0x10;
+			const int currentSlot = *reinterpret_cast<short*>(entry + 0x04);
+			if ((entry[0x0D] == 1) && (currentSlot >= 0) && (slot == currentSlot)) {
+				effectCount++;
+				effectMask |= 1u << player;
+			}
+		}
+
+		if (effectCount != 0) {
+			float offset;
+			if (effectCount == 1) {
+				offset = FLOAT_803313dc;
+			} else if (effectCount == 2) {
+				offset = FLOAT_80331588;
+			} else if (effectCount == 3) {
+				offset = FLOAT_8033169C;
+			} else {
+				offset = FLOAT_803316A0;
+			}
+
+			for (int player = 0; player < 4; player++) {
+				if ((effectMask & (1u << player)) != 0) {
+					Vec loc;
+					loc.x = s_RingOrgPos.x;
+					loc.y = static_cast<float>((double)s_RingOrgPos.y + DOUBLE_80331420 + (double)offset);
+					loc.z = s_RingOrgPos.z;
+					PartPcs.SetParLocIdx(*reinterpret_cast<int*>(reinterpret_cast<unsigned int*>(bytes + 0x840)[0] +
+					                                              player * 0x524 + 0xA484),
+					                     loc);
+					offset = static_cast<float>((double)offset - (double)FLOAT_8033169C);
+				}
+			}
+		}
+	}
+
 	CalcCharaSelect();
+
+	int* animState = GetWmCharaAnimState(this);
+	for (int i = 0; i < 8; i++, charaWork += 0x14, animState += 5, modelData += 0x34) {
+		CCharaPcs::CHandle* const handle = GetWmCharaHandles(this)[i];
+		if (!handle->IsModelLoaded(1)) {
+			charaWork[0] = 0;
+			continue;
+		}
+
+		if (modelData[0x0C] == 1) {
+			CCharaPcs::CHandle* const loadHandle = GetWmCharaHandles(this)[i];
+			reinterpret_cast<float*>(charaWork)[0x0B] = FLOAT_80331664;
+			if (loadHandle->m_charaKind != 3) {
+				const unsigned int charaBase = static_cast<unsigned int>(loadHandle->m_charaNo) / 100;
+				const int modelNo = charaBase * 100;
+				const int baseAnim = (charaBase - 1) * 6;
+				loadHandle->LoadAnim(s_stand_80331638, baseAnim, 1, 0, modelNo, -1, 0);
+				loadHandle->LoadAnim(DAT_80331640, baseAnim + 1, 1, 0, modelNo, -1, 0);
+				loadHandle->LoadAnim(DAT_80331648, baseAnim + 2, 1, 0, modelNo, -1, 0);
+				loadHandle->LoadAnim(DAT_8033164c, baseAnim + 3, 3, 0, modelNo, -1, 0);
+				loadHandle->LoadAnim(DAT_80331654, baseAnim + 4, 1, 0, modelNo, -1, 0);
+				loadHandle->LoadAnim(DAT_8033165c, baseAnim + 5, 1, 0, modelNo, -1, 0);
+				animState[0] = 0;
+				animState[1] = -1;
+				animState[2] = rand() % 250;
+				loadHandle->SetAnim(baseAnim, -1, -1, -1 - (loadHandle->m_currentAnimIndex >> 31), 1);
+				animState[3] = reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(loadHandle->m_model) + 0xB4)[0];
+				animState[4] = reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(loadHandle->m_model) + 0xC0)[0];
+			}
+			modelData[0x0C] = 0;
+		}
+
+		charaWork[0] = 1;
+		float zScale = FLOAT_803316BC;
+		float selectedX = FLOAT_803316B0;
+		float normalX = FLOAT_803316A4;
+		float scale = FLOAT_803313e8;
+		const float zero = FLOAT_803313dc;
+		CCharaPcs::CHandle* const charaHandle = GetWmCharaHandles(this)[i];
+		if (charaHandle->m_charaKind == 3) {
+			if ((selectedMask & (1u << i)) == 0) {
+				reinterpret_cast<float*>(charaWork)[7] = zero;
+				reinterpret_cast<float*>(charaWork)[8] = zero;
+				reinterpret_cast<float*>(charaWork)[9] = zero;
+				reinterpret_cast<float*>(charaWork)[0x0D] = scale;
+				reinterpret_cast<float*>(charaWork)[0x0E] = scale;
+				reinterpret_cast<float*>(charaWork)[0x0F] = scale;
+				reinterpret_cast<float*>(charaWork)[10] = zero;
+				reinterpret_cast<float*>(charaWork)[0x0B] = zero;
+			} else {
+				reinterpret_cast<float*>(charaWork)[7] = zero;
+				scale = FLOAT_803316A8;
+				reinterpret_cast<float*>(charaWork)[8] = normalX;
+				normalX = FLOAT_803316AC;
+				reinterpret_cast<float*>(charaWork)[9] = zero;
+				reinterpret_cast<float*>(charaWork)[0x0D] = scale;
+				reinterpret_cast<float*>(charaWork)[0x0E] = scale;
+				reinterpret_cast<float*>(charaWork)[0x0F] = scale;
+				reinterpret_cast<float*>(charaWork)[10] = normalX;
+				reinterpret_cast<float*>(charaWork)[0x0B] = zero;
+			}
+		} else if ((selectedMask & (1u << i)) == 0) {
+			reinterpret_cast<float*>(charaWork)[7] = zero;
+			scale = FLOAT_80331434;
+			reinterpret_cast<float*>(charaWork)[8] = zScale;
+			normalX = FLOAT_803315d0;
+			reinterpret_cast<float*>(charaWork)[9] = zero;
+			reinterpret_cast<float*>(charaWork)[0x0D] = scale;
+			reinterpret_cast<float*>(charaWork)[0x0E] = scale;
+			reinterpret_cast<float*>(charaWork)[0x0F] = scale;
+			reinterpret_cast<float*>(charaWork)[10] = normalX;
+		} else {
+			reinterpret_cast<float*>(charaWork)[7] = zero;
+			scale = FLOAT_803316B4;
+			reinterpret_cast<float*>(charaWork)[8] = selectedX;
+			normalX = FLOAT_803316B8;
+			reinterpret_cast<float*>(charaWork)[9] = zero;
+			reinterpret_cast<float*>(charaWork)[0x0D] = scale;
+			reinterpret_cast<float*>(charaWork)[0x0E] = scale;
+			reinterpret_cast<float*>(charaWork)[0x0F] = scale;
+			reinterpret_cast<float*>(charaWork)[10] = normalX;
+		}
+
+		double alpha = (double)DOUBLE_803314e8 *
+		               ((double)*reinterpret_cast<short*>(reinterpret_cast<unsigned int*>(bytes + 0x82C)[0] + 0x22) -
+		                DOUBLE_80331408);
+		if (DOUBLE_80331420 < alpha) {
+			alpha = (double)FLOAT_803313e8;
+		}
+
+		CChara::CModel* const model = charaHandle->m_model;
+		const short state = *reinterpret_cast<short*>(reinterpret_cast<unsigned int*>(bytes + 0x82C)[0] + 0x10);
+		if (state == 1) {
+			model->m_lightAlpha = static_cast<float>(alpha);
+		} else if (state == 2) {
+			model->m_lightAlpha = FLOAT_803313e8;
+		} else {
+			model->m_lightAlpha = static_cast<float>(DOUBLE_80331420 - alpha);
+		}
+
+		Mtx scaleMtx;
+		Mtx rotXMtx;
+		Mtx rotYMtx;
+		PSMTXScale(scaleMtx, reinterpret_cast<float*>(charaWork)[0x0D], reinterpret_cast<float*>(charaWork)[0x0E],
+		           reinterpret_cast<float*>(charaWork)[0x0F]);
+		PSMTXRotRad(rotXMtx, 'x', reinterpret_cast<float*>(charaWork)[10]);
+		PSMTXRotRad(rotYMtx, 'y', reinterpret_cast<float*>(charaWork)[0x0B]);
+		PSMTXConcat(rotXMtx, rotYMtx, rotXMtx);
+		rotXMtx[0][3] = reinterpret_cast<float*>(charaWork)[7];
+		rotXMtx[1][3] = reinterpret_cast<float*>(charaWork)[8];
+		rotXMtx[2][3] = reinterpret_cast<float*>(charaWork)[9];
+		PSMTXConcat(rotXMtx, scaleMtx, scaleMtx);
+		model->SetMatrix(scaleMtx);
+		model->CalcMatrix();
+		model->CalcSkin();
+	}
+
 	PCAnimCtrl();
 }
 

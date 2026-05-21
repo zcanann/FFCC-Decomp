@@ -196,6 +196,7 @@ int CMenuPcs::MLstClose()
 	unsigned int itemCount;
 	int currentFrame;
 	unsigned int count;
+	int result;
 
 	completedItems = 0;
 	this->lstState->frame = this->lstState->frame + 1;
@@ -218,6 +219,7 @@ int CMenuPcs::MLstClose()
 		}
 		entry++;
 	}
+	result = 0;
 	if (this->lstData->count == completedItems) {
 		zero = FLOAT_803333D0;
 		entry = this->lstData->entries;
@@ -261,10 +263,10 @@ int CMenuPcs::MLstClose()
 				} while (itemCount != 0);
 			}
 		}
-		return 1;
+		result = 1;
 	}
 
-	return 0;
+	return result;
 }
 
 /*

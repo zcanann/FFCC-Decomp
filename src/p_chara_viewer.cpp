@@ -506,13 +506,13 @@ void CCharaPcs::calcViewer()
         heldButtons = 0;
     } else {
         __cntlzw((unsigned int)Pad._448_4_);
-        heldButtons = Pad._4_2_;
+        heldButtons = Pad.GetPadInputs()[0].button[0];
     }
     if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
         triggerButtons = 0;
     } else {
         __cntlzw((unsigned int)Pad._448_4_);
-        triggerButtons = Pad._8_2_;
+        triggerButtons = Pad.GetPadInputs()[0].buttonDown[0];
     }
 
     if ((self->m_viewerModel[0] != 0) && (self->m_viewerResetIFrame != 0)) {

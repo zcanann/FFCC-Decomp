@@ -1566,7 +1566,7 @@ void CGPartyObj::onStatShield()
 	if (m_subState == 1) {
 		unsigned short trig = 0;
 		if ((Pad._452_4_ == 0) && (Pad._448_4_ == -1)) {
-			trig = static_cast<unsigned short>(Pad._4_2_);
+			trig = static_cast<unsigned short>(Pad.GetPadInputs()[0].button[0]);
 		}
 		if ((trig & 0x100) == 0) {
 			changeSubStat(3);

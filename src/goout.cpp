@@ -97,7 +97,7 @@ static inline unsigned short GetGoOutInputMask()
     }
 
     __cntlzw(Pad._448_4_);
-    return static_cast<unsigned short>(Pad._8_2_);
+    return static_cast<unsigned short>(Pad.GetPadInputs()[0].buttonDown[0]);
 }
 
 static inline const char* GetGoOutMessageLine(int languageId, int line)

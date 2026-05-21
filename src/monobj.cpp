@@ -2449,7 +2449,8 @@ unsigned int CGMonObj::IsDispRader()
 {
 	CGObject* object = reinterpret_cast<CGObject*>(this);
 	unsigned char result = 0;
-	if (object->CGObject::IsDispRader() != 0 &&
+	int isDispRader = object->CGObject::IsDispRader();
+	if (isDispRader != 0 &&
 	    static_cast<signed char>(
 	        static_cast<int>((static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(&object->m_weaponNodeFlags)) << 24) &
 	                         0xC0000000) >>

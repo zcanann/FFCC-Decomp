@@ -95,8 +95,8 @@ STATIC_ASSERT(sizeof(MoneyMenuAnim) == 0x40);
 int CMenuPcs::MoneyCtrlCur()
 {
 	bool blocked;
-	u16 press;
-	u16 hold;
+	unsigned int press;
+	unsigned int hold;
 
 	blocked = false;
 	if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {

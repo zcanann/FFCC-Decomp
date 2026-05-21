@@ -345,7 +345,7 @@ void CTexAnimSet::AddFrame()
         seq = reinterpret_cast<CTexAnimSeqStorage*>(refData->texAnimSeqs[texAnim->unk0C]);
 
         if (!IsTexAnimE1Flag(seq->flags) || !IsTexAnimE1Flag(seq->flags) ||
-            (FLOAT_8032fb3c != texAnim->unk10) || (Math.Rand(0x1E) == 0)) {
+            (FLOAT_8032fb3c != texAnim->unk10) || (static_cast<unsigned int>(Math.Rand(0x1E)) == 0)) {
             float currentFrame = (float)fmod((double)texAnim->unk10, (double)(float)seq->totalFrames);
             unsigned int keyCount = seq->keyCount;
             unsigned int* keys = seq->keys;

@@ -70,8 +70,6 @@ extern double DOUBLE_80330d20;
 extern double DOUBLE_80330d28;
 extern "C" void __ct__9CRedSoundFv(void*);
 extern "C" void __dt__6CSoundFv(void*);
-extern "C" CMemory::CStage* CreateStage__7CMemoryFUlPci(CMemory*, unsigned long, char*, int);
-extern "C" void DestroyStage__7CMemoryFPQ27CMemory6CStage(CMemory*, CMemory::CStage*);
 extern "C" int Printf__7CSystemFPce(CSystem*, const char*, ...);
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, int, int, int, int);
@@ -393,7 +391,7 @@ CSound::~CSound()
  */
 void CSound::Init()
 {
-    SoundData(this).m_stage = CreateStage__7CMemoryFUlPci(&Memory, 0xA4000, const_cast<char*>(s_CSound_80330ce0), 0);
+    SoundData(this).m_stage = Memory.CreateStage(0xA4000, const_cast<char*>(s_CSound_80330ce0), 0);
 
     SoundData(this).m_aramBuffer =
         new (SoundData(this).m_stage, const_cast<char*>(s_sound_cpp_801db2d4), 0x2E) u8[0x80000];
@@ -498,7 +496,7 @@ void CSound::Quit()
         aramBuffer = 0;
     }
 
-    DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, sound.m_stage);
+    Memory.DestroyStage(sound.m_stage);
 }
 
 /*

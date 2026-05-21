@@ -9,6 +9,7 @@
 #include "ffcc/pad.h"
 #include "ffcc/ringmenu.h"
 #include "ffcc/sound.h"
+#include "ffcc/system.h"
 
 #include <math.h>
 #include <string.h>
@@ -50,7 +51,6 @@ void Calc__4CMesFv(void* mes);
 void Next__4CMesFv(void* mes);
 int GetWait__4CMesFv(void* mes);
 int useFlag__4CMesFii(void* mes, int flag, int value);
-void Printf__7CSystemFPce(CSystem* system, const char* format, ...);
 
 static const char s_CMesMenu_801D9E90[] = "CMesMenu";
 const char DAT_801d9e9c[] =
@@ -901,7 +901,7 @@ void CMesMenu::onCalc()
 
     unsigned int desiredStageFlag = stageBit != 0;
     if (*(unsigned int*)((char*)this + 0x3DF8) != desiredStageFlag) {
-        Printf__7CSystemFPce(&System, DAT_801d9e9c);
+        System.Printf(const_cast<char*>(DAT_801d9e9c));
         *(unsigned int*)((char*)this + 0x3DF8) =
             ((unsigned int)__cntlzw(*(unsigned int*)((char*)this + 0x3DF8)) >> 5) & 0xFF;
         *(int*)((char*)this + 0x3DF4) = 0x10 - *(int*)((char*)this + 0x3DF4);

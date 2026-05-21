@@ -97,7 +97,6 @@ unsigned long clear_flag_mask = 0;
 UMapHitDrawMode gMapHitDrawMode;
 unsigned long octtree_draw_node_ct = 0;
 
-extern "C" void Printf__7CSystemFPce(CSystem* system, const char* format, ...);
 extern unsigned long g_pStage;
 extern unsigned long s_insertShadowNo;
 
@@ -217,7 +216,7 @@ int COctTree::ReadOtmOctTree(CChunkFile& chunkFile)
             m_nodeCount = chunkFile.Get2();
             signed char mapObjType = *reinterpret_cast<signed char*>(Ptr(m_mapObject, 0x1E));
             if ((mapObjType != 1) && (static_cast<unsigned int>(System.m_execParam) >= 3U)) {
-                Printf__7CSystemFPce(&System, s_m_node_pctd_m_meshtype_pctd_801D7268, m_nodeCount, mapObjType);
+                System.Printf(const_cast<char*>(s_m_node_pctd_m_meshtype_pctd_801D7268), m_nodeCount, mapObjType);
             }
 
             nodeCount = m_nodeCount;

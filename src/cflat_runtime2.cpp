@@ -55,7 +55,6 @@ extern "C" void __ct__9CGQuadObjFv(CGQuadObj*);
 extern "C" void __ct__9CGBaseObjFv(CGBaseObj*);
 extern "C" void pppCreate__8CPartMngFiiP14PPPCREATEPARAMi(CPartMng*, int, int, PPPCREATEPARAM*, int);
 extern "C" char* GetLangString__5CGameFv(void*);
-extern "C" void Printf__7CSystemFPce(CSystem*, const char*, ...);
 extern "C" void ClrBattleItem__8CMenuPcsFv(void*);
 extern "C" int GetBackBufferRect__8CGraphicFRiRiRiRii(CGraphic*, int&, int&, int&, int&, int);
 
@@ -1047,7 +1046,7 @@ int CFlatRuntime2::Load(char* fileName)
 
 	resetChangeScript();
 	if (System.m_execParam > 2) {
-		Printf__7CSystemFPce(&System, sCFlatRuntime2LoadMsg);
+		System.Printf(const_cast<char*>(sCFlatRuntime2LoadMsg));
 	}
 	return 1;
 }

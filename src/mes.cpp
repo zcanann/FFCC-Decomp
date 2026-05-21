@@ -4,6 +4,7 @@
 #include "ffcc/game.h"
 #include "ffcc/p_menu.h"
 #include "ffcc/joybus.h"
+#include "ffcc/system.h"
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
@@ -21,7 +22,6 @@ extern float FLOAT_803308a4;
 extern float FLOAT_803308A8;
 extern float FLOAT_803308ac;
 extern float FLOAT_803308b0;
-extern "C" void Printf__7CSystemFPce(CSystem* system, const char* format, ...);
 // PAL map: CMes::m_tempVar in mes.o, .bss size 0x50.
 int CMes::m_tempVar[0x14];
 extern "C" void toupper(char*);
@@ -467,7 +467,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		case 0x14:
 			if ((unsigned int)System.m_execParam > 1U)
 			{
-				Printf__7CSystemFPce(&System, s_mesTagMissing, tag + 0xA0);
+				System.Printf(const_cast<char*>(s_mesTagMissing), tag + 0xA0);
 			}
 			break;
 		case 2:
@@ -494,7 +494,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		case 0x55:
 			if (System.m_execParam != 0)
 			{
-				Printf__7CSystemFPce(&System, s_mesTagUnknown, tag + 0xA0);
+				System.Printf(const_cast<char*>(s_mesTagUnknown), tag + 0xA0);
 			}
 			break;
 		default:

@@ -958,38 +958,42 @@ void CMemoryCardMan::MakeSaveData()
     save[0x12] = 0;
 
     int wm = Game.m_gameWork.m_wmBackupParams[0];
-    if (Game.m_caravanWorkArr[wm].m_shopState == 0)
+    CCaravanWork* wmWork = &Game.m_caravanWorkArr[wm];
+    if (wmWork->m_shopState == 0)
     {
         Game.m_gameWork.m_wmBackupParams[0] = -1;
     }
-    if (Game.m_caravanWorkArr[wm].m_shopBusyFlag != 0)
+    if (wmWork->m_shopBusyFlag != 0)
     {
         Game.m_gameWork.m_wmBackupParams[0] = -1;
     }
     wm = Game.m_gameWork.m_wmBackupParams[1];
-    if (Game.m_caravanWorkArr[wm].m_shopState == 0)
+    wmWork = &Game.m_caravanWorkArr[wm];
+    if (wmWork->m_shopState == 0)
     {
         Game.m_gameWork.m_wmBackupParams[1] = -1;
     }
-    if (Game.m_caravanWorkArr[wm].m_shopBusyFlag != 0)
+    if (wmWork->m_shopBusyFlag != 0)
     {
         Game.m_gameWork.m_wmBackupParams[1] = -1;
     }
     wm = Game.m_gameWork.m_wmBackupParams[2];
-    if (Game.m_caravanWorkArr[wm].m_shopState == 0)
+    wmWork = &Game.m_caravanWorkArr[wm];
+    if (wmWork->m_shopState == 0)
     {
         Game.m_gameWork.m_wmBackupParams[2] = -1;
     }
-    if (Game.m_caravanWorkArr[wm].m_shopBusyFlag != 0)
+    if (wmWork->m_shopBusyFlag != 0)
     {
         Game.m_gameWork.m_wmBackupParams[2] = -1;
     }
     wm = Game.m_gameWork.m_wmBackupParams[3];
-    if (Game.m_caravanWorkArr[wm].m_shopState == 0)
+    wmWork = &Game.m_caravanWorkArr[wm];
+    if (wmWork->m_shopState == 0)
     {
         Game.m_gameWork.m_wmBackupParams[3] = -1;
     }
-    if (Game.m_caravanWorkArr[wm].m_shopBusyFlag != 0)
+    if (wmWork->m_shopBusyFlag != 0)
     {
         Game.m_gameWork.m_wmBackupParams[3] = -1;
     }
@@ -1348,38 +1352,42 @@ void CMemoryCardMan::SetLoadData()
     }
 
     int wm = gameWork->m_wmBackupParams[0];
-    if (Game.m_caravanWorkArr[wm].m_shopState == 0)
+    CCaravanWork* wmWork = &Game.m_caravanWorkArr[wm];
+    if (wmWork->m_shopState == 0)
     {
         gameWork->m_wmBackupParams[0] = -1;
     }
-    if (Game.m_caravanWorkArr[wm].m_shopBusyFlag != 0)
+    if (wmWork->m_shopBusyFlag != 0)
     {
         gameWork->m_wmBackupParams[0] = -1;
     }
     wm = gameWork->m_wmBackupParams[1];
-    if (Game.m_caravanWorkArr[wm].m_shopState == 0)
+    wmWork = &Game.m_caravanWorkArr[wm];
+    if (wmWork->m_shopState == 0)
     {
         gameWork->m_wmBackupParams[1] = -1;
     }
-    if (Game.m_caravanWorkArr[wm].m_shopBusyFlag != 0)
+    if (wmWork->m_shopBusyFlag != 0)
     {
         gameWork->m_wmBackupParams[1] = -1;
     }
     wm = gameWork->m_wmBackupParams[2];
-    if (Game.m_caravanWorkArr[wm].m_shopState == 0)
+    wmWork = &Game.m_caravanWorkArr[wm];
+    if (wmWork->m_shopState == 0)
     {
         gameWork->m_wmBackupParams[2] = -1;
     }
-    if (Game.m_caravanWorkArr[wm].m_shopBusyFlag != 0)
+    if (wmWork->m_shopBusyFlag != 0)
     {
         gameWork->m_wmBackupParams[2] = -1;
     }
     wm = gameWork->m_wmBackupParams[3];
-    if (Game.m_caravanWorkArr[wm].m_shopState == 0)
+    wmWork = &Game.m_caravanWorkArr[wm];
+    if (wmWork->m_shopState == 0)
     {
         gameWork->m_wmBackupParams[3] = -1;
     }
-    if (Game.m_caravanWorkArr[wm].m_shopBusyFlag != 0)
+    if (wmWork->m_shopBusyFlag != 0)
     {
         gameWork->m_wmBackupParams[3] = -1;
     }

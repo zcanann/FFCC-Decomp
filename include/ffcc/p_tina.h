@@ -64,8 +64,10 @@ public:
     void calc();
     void calcViewer();
     void calcDead();
+    void CalcTick();
 
     void ClearOt();
+    void DrawInit();
 
     void drawShadow();
     void drawCharaBefore();

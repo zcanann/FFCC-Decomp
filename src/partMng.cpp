@@ -96,18 +96,20 @@ int gPppCalcDisabled = 0;
 }
 CPartMng PartMng;
 static const char s_partMng_cpp_801d8230[] = "partMng.cpp";
-static const char s_pppGetFreePppDataMngSt_CAN_NOT_ALLOC[] = "pppGetFreePppDataMngSt CAN NOT ALLOC!!\n";
-static const char s_CheckSum_ERROR_code_0x_x____801d82f0[] = "CheckSum ERROR code[0x%x]!!!";
+static const char s_pppCreate0_pdtID_d_fpno_d_mngNo_d_name_s[] =
+    "pppCreate0 pdtID=%d fpno=%d mngNo=%d name=%s\n";
+static const char s_pppGetFreePppDataMngSt_CAN_NOT_ALLOC[] = "pppGetFreePppDataMngSt CAN NOT ALLOC !!!\n";
+static const char s_ReadPdt_fn_pcts_801d8544[] = "ReadPdt fn=%s\n";
+static const char s_CAN_NOT_READ_pcts_801d8508[] = "CAN NOT READ %s !!!!!!\n";
+static const char s_ReadPan_fn_pcts_801d8530[] = "ReadPan fn=%s\n";
+static const char s_ReadPmd_fn_pcts_801d851c[] = "ReadPmd fn=%s\n";
+static const char s_ReadPtx_fn_pcts_801d84f4[] = "ReadPtx fn=%s\n";
+static const char s_CheckSum_ERROR_code_0x_x____801d82f0[] = "CheckSum ERROR code=0x%x!!!\n";
 static const char s__________________________________801d8358[] = "----------------------------------\n";
 static const char s_prioTime__d_prio__d_heapSize__d_p_801d8454[] =
     "  prioTime=%d  prio=%d  heapSize=%d  pdtID=%2d  fpno=%3d   mngNo=%d  %s\n";
 static const char s_HEAP_TOTAL__dKbyte_USE__dKbyte_F_801d84a0[] =
     "HEAP TOTAL=%dKbyte  USE=%dKbyte  FREE=%dKbyte\n";
-static const char s_ReadPtx_fn_pcts_801d84f4[] = "ReadPtx fn=[%s]\n";
-static const char s_CAN_NOT_READ_pcts_801d8508[] = "CAN NOT READ[%s]!!\n";
-static const char s_ReadPmd_fn_pcts_801d851c[] = "ReadPmd fn=[%s]\n";
-static const char s_ReadPan_fn_pcts_801d8530[] = "ReadPan fn=[%s]\n";
-static const char s_ReadPdt_fn_pcts_801d8544[] = "ReadPdt fn=[%s]\n";
 
 struct CPtrArrayBare {
     void* m_vtable;
@@ -4006,6 +4008,11 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
     }
 
     PppMngStCreateRaw* mng = reinterpret_cast<PppMngStCreateRaw*>(self + 0x1D4 + freeIdx * 0x158);
+    if (System.m_execParam != 0) {
+        System.Printf(const_cast<char*>(s_pppCreate0_pdtID_d_fpno_d_mngNo_d_name_s), pdtSlotIndex, fpNo, freeIdx,
+                      slot + 0x18);
+    }
+
     unsigned char* fpData = reinterpret_cast<unsigned char*>(pdt) + 0x20 + fpNo * 0x60;
     unsigned char* fpData1 = fpData + 0x20;
     unsigned char* fpData2 = fpData + 0x40;

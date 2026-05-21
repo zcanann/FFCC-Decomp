@@ -688,7 +688,7 @@ int CMapHit::ReadOtmHit(CChunkFile& chunkFile)
             const float zero = FLOAT_8032F8D0;
             const double radiusBase = DOUBLE_8032F900;
 
-            for (unsigned int faceIdx = 0; faceIdx < m_faceCount; faceIdx++) {
+            for (int faceIdx = 0; faceIdx < m_faceCount; faceIdx++) {
                 chunkFile.Align(4);
 
                 CMapHitFace& face = m_faces[faceIdx];
@@ -719,7 +719,7 @@ int CMapHit::ReadOtmHit(CChunkFile& chunkFile)
                         (void)chunkFile.GetF4();
                         (void)chunkFile.GetF4();
                     }
-                    face.m_radiusScale = zero;
+                    face.m_radiusScale = FLOAT_8032F8D0;
                 } else if (chunk.m_version == 1) {
                     if ((unsigned int)System.m_execParam >= 1) {
                         System.Printf(const_cast<char*>(s_old_mid_format_801D7094));

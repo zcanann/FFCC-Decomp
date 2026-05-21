@@ -37,7 +37,6 @@ u8* gCharaPartWorkPtr = 0;
 extern "C" void __dla__FPv(void*);
 extern "C" void __dl__FPv(void*);
 extern "C" int __cntlzw(unsigned int);
-extern "C" void __dt__Q29CCharaPcs7CHandleFv(void*, int);
 extern "C" void __ct__6CColorFv(void*);
 extern "C" void __construct_array(void*, void (*)(void*), void (*)(void*, int), unsigned long, unsigned long);
 extern "C" void ReleasePdt__8CPartPcsFi(void*, int);
@@ -954,8 +953,8 @@ void CCharaPcs::destroy()
     LightPcs.DestroyBumpLightAll(static_cast<CLightPcs::TARGET>(0));
     gCharaPartWorkPtr = 0;
 
-    if (*reinterpret_cast<void**>(Ptr(this, 0x4C)) != 0) {
-        __dt__Q29CCharaPcs7CHandleFv(*reinterpret_cast<void**>(Ptr(this, 0x4C)), 1);
+    if (*reinterpret_cast<CHandle**>(Ptr(this, 0x4C)) != 0) {
+        delete *reinterpret_cast<CHandle**>(Ptr(this, 0x4C));
         *reinterpret_cast<void**>(Ptr(this, 0x4C)) = 0;
     }
 
@@ -1001,7 +1000,7 @@ void CCharaPcs::Reset(CCharaPcs::RESET mode)
     CHandle* handle = HandleListHead(this)->m_next;
     while (handle != HandleListHead(this)) {
         CHandle* next = handle->m_next;
-        __dt__Q29CCharaPcs7CHandleFv(handle, 1);
+        delete handle;
         handle = next;
     }
 

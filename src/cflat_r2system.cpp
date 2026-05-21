@@ -56,7 +56,6 @@ void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
 int GetWait__4CMesFv(void*);
 int GetPadType__6JoyBusFi(void*, int);
 unsigned short GetButtonDown__4CPadFl(void*, long);
-void Printf__7CSystemFPce(CSystem*, const char*, ...);
 int sprintf(char*, const char*, ...);
 }
 extern int gWmMenuWorkA;
@@ -425,7 +424,7 @@ int CMiniGamePcs::GetMiniGameParam(int id)
 void CMiniGamePcs::SetMiniGameParam(int id, int value)
 {
     if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
-        Printf__7CSystemFPce(&System, s_setMiniGameParamFmt, id, value);
+        System.Printf(const_cast<char*>(s_setMiniGameParamFmt), id, value);
     }
 
     if (id != 0x1202) {
@@ -3168,7 +3167,7 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         CMesMenu* mesMenu = MenuPcs.GetMesMenu(*object->m_localBase);
         if (mesMenu == 0) {
             if (GetNumMes__9CFlatDataFv(&System) != 0) {
-                Printf__7CSystemFPce(&System, "MesMenu no %d is null\n", *object->m_localBase);
+                System.Printf(const_cast<char*>("MesMenu no %d is null\n"), *object->m_localBase);
             }
             runtime->push(object, 0);
             outResult = 0;
@@ -3213,7 +3212,7 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         CMesMenu* mesMenu = MenuPcs.GetMesMenu(*object->m_localBase);
         if (mesMenu == 0) {
             if (GetNumMes__9CFlatDataFv(&System) != 0) {
-                Printf__7CSystemFPce(&System, "MesMenu no %d is null\n", *object->m_localBase);
+                System.Printf(const_cast<char*>("MesMenu no %d is null\n"), *object->m_localBase);
             }
             runtime->push(object, 0);
         } else {
@@ -3226,7 +3225,7 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         CMesMenu* mesMenu = MenuPcs.GetMesMenu(*object->m_localBase);
         if (mesMenu == 0) {
             if (GetNumMes__9CFlatDataFv(&System) != 0) {
-                Printf__7CSystemFPce(&System, "MesMenu no %d is null\n", *object->m_localBase);
+                System.Printf(const_cast<char*>("MesMenu no %d is null\n"), *object->m_localBase);
             }
         } else {
             GetMes__9CFlatDataFi(mesMenu, object->m_localBase[1], object->m_localBase[2]);
@@ -3239,7 +3238,7 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         CMesMenu* mesMenu = MenuPcs.GetMesMenu(*object->m_localBase);
         if (mesMenu == 0) {
             if (GetNumMes__9CFlatDataFv(&System) != 0) {
-                Printf__7CSystemFPce(&System, "MesMenu no %d is null\n", *object->m_localBase);
+                System.Printf(const_cast<char*>("MesMenu no %d is null\n"), *object->m_localBase);
             }
         } else {
             reinterpret_cast<CMesMenu*>(mesMenu)->CloseRequest(1);
@@ -3253,7 +3252,7 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         CMesMenu* mesMenu = MenuPcs.GetMesMenu(localBase[0]);
         if (mesMenu == 0) {
             if (GetNumMes__9CFlatDataFv(&System) != 0) {
-                Printf__7CSystemFPce(&System, "MesMenu no %d is null\n", localBase[0]);
+                System.Printf(const_cast<char*>("MesMenu no %d is null\n"), localBase[0]);
             }
         } else {
             char* message;

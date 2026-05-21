@@ -40,6 +40,11 @@ static int CrossCheckSphereVectorRaw(Vec* outPos, float* outT, Vec* origin, Vec*
                                                                   scale, innerRadius, outerRadius);
 }
 
+static inline CChara::CModel* GetPppOwnerModel(_pppMngSt* pppMngSt)
+{
+	return reinterpret_cast<CGObject*>(pppMngSt->m_owner)->m_charaModelHandle->m_model;
+}
+
 static const double kScaleConstA = 4503601774854144.0; // DOUBLE_803304b0
 static const float kScaleConstB = 0.017453292f; // FLOAT_803304a8
 static const float kPppLocalZero = 0.0f;
@@ -73,7 +78,6 @@ extern "C" void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
 extern "C" CGObject* FindGObjFirst__13CFlatRuntime2Fv(void*);
 extern "C" CGObject* FindGObjNext__13CFlatRuntime2FP8CGObject(void*, CGObject*);
 extern "C" void _WaitDrawDone__8CGraphicFPci(CGraphic*, const char*, int);
-extern "C" void CalcSafeNodeWorldMatrix__Q26CChara6CModelFPA4_fPQ26CChara5CNode(void*, float (*)[4], void*);
 extern "C" int printf(const char*, ...);
 
 _pppEnvSt* pppEnvStPtr;
@@ -1173,9 +1177,7 @@ MatrixMode3:
 		}
 	}
 
-	CalcSafeNodeWorldMatrix__Q26CChara6CModelFPA4_fPQ26CChara5CNode(
-	    *reinterpret_cast<void**>(*reinterpret_cast<int*>(reinterpret_cast<u8*>(pppMngSt->m_owner) + 0xF8) + 0x168),
-	    nodeMtx, pppMngSt->m_bindNode);
+	GetPppOwnerModel(pppMngSt)->CalcSafeNodeWorldMatrix(nodeMtx, pppMngSt->m_bindNode);
 
 	PSMTXMultVecSR(nodeMtx, &pppMngStPtr->m_position, &tmpPos);
 	nodeMtx[0][3] += tmpPos.x;
@@ -1233,9 +1235,7 @@ MatrixMode5:
 		}
 	}
 
-	CalcSafeNodeWorldMatrix__Q26CChara6CModelFPA4_fPQ26CChara5CNode(
-	    *reinterpret_cast<void**>(*reinterpret_cast<int*>(reinterpret_cast<u8*>(pppMngSt->m_owner) + 0xF8) + 0x168),
-	    nodeMtx, pppMngSt->m_bindNode);
+	GetPppOwnerModel(pppMngSt)->CalcSafeNodeWorldMatrix(nodeMtx, pppMngSt->m_bindNode);
 
 	nodeMtx[0][3] += pppMngStPtr->m_position.x;
 	nodeMtx[1][3] += pppMngStPtr->m_position.y;
@@ -1287,9 +1287,7 @@ MatrixModeHigh:
 		}
 	}
 
-	CalcSafeNodeWorldMatrix__Q26CChara6CModelFPA4_fPQ26CChara5CNode(
-	    *reinterpret_cast<void**>(*reinterpret_cast<int*>(reinterpret_cast<u8*>(pppMngSt->m_owner) + 0xF8) + 0x168),
-	    nodeMtx, pppMngSt->m_bindNode);
+	GetPppOwnerModel(pppMngSt)->CalcSafeNodeWorldMatrix(nodeMtx, pppMngSt->m_bindNode);
 
 	PSVECNormalize(reinterpret_cast<Vec*>(nodeMtx[0]), reinterpret_cast<Vec*>(nodeMtx[0]));
 	PSVECNormalize(reinterpret_cast<Vec*>(nodeMtx[1]), reinterpret_cast<Vec*>(nodeMtx[1]));
@@ -1342,9 +1340,7 @@ MatrixMode7:
 		}
 	}
 
-	CalcSafeNodeWorldMatrix__Q26CChara6CModelFPA4_fPQ26CChara5CNode(
-	    *reinterpret_cast<void**>(*reinterpret_cast<int*>(reinterpret_cast<u8*>(pppMngSt->m_owner) + 0xF8) + 0x168),
-	    nodeMtx, pppMngSt->m_bindNode);
+	GetPppOwnerModel(pppMngSt)->CalcSafeNodeWorldMatrix(nodeMtx, pppMngSt->m_bindNode);
 
 	PSMTXMultVecSR(nodeMtx, &pppMngStPtr->m_position, &tmpPos);
 	pppMngStPtr->m_matrix.value[0][3] = nodeMtx[0][3] + tmpPos.x;

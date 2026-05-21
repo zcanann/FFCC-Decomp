@@ -136,8 +136,8 @@ extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialE
         }
 
         rsdItem->countA = usb.m_sizeBytes;
-        void* allocData =
-            new (MaterialEditorStage(), const_cast<char*>(s_ME_USB_process_cpp_801d7d78), 0x31) u8[usb.m_sizeBytes * 0xC];
+        void* allocData = _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
+            &Memory, usb.m_sizeBytes * 0xC, MaterialEditorStage(), s_ME_USB_process_cpp_801d7d78, 0x31, 0);
         if (allocData == 0) {
             System.Printf(const_cast<char*>(s_MemAlloc_Error____size__d_801d7d8c), usb.m_sizeBytes * 0xC);
         }
@@ -177,8 +177,8 @@ extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialE
         }
 
         rsdItem->countC = usb.m_sizeBytes;
-        void* allocData =
-            new (MaterialEditorStage(), const_cast<char*>(s_ME_USB_process_cpp_801d7d78), 0x31) u8[usb.m_sizeBytes * 0x70];
+        void* allocData = _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
+            &Memory, usb.m_sizeBytes * 0x70, MaterialEditorStage(), s_ME_USB_process_cpp_801d7d78, 0x31, 0);
         if (allocData == 0) {
             System.Printf(const_cast<char*>(s_MemAlloc_Error____size__d_801d7d8c), usb.m_sizeBytes * 0x70);
         }
@@ -237,8 +237,8 @@ extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialE
         }
 
         rsdItem->countB = usb.m_sizeBytes;
-        void* allocData =
-            new (MaterialEditorStage(), const_cast<char*>(s_ME_USB_process_cpp_801d7d78), 0x31) u8[usb.m_sizeBytes * 0xC];
+        void* allocData = _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
+            &Memory, usb.m_sizeBytes * 0xC, MaterialEditorStage(), s_ME_USB_process_cpp_801d7d78, 0x31, 0);
         if (allocData == 0) {
             System.Printf(const_cast<char*>(s_MemAlloc_Error____size__d_801d7d8c), usb.m_sizeBytes * 0xC);
         }
@@ -295,8 +295,8 @@ extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialE
         break;
     }
     case 0x31: {
-        u8* dstBuffer =
-            new (MaterialEditorStage(), const_cast<char*>(s_ME_USB_process_cpp_801d7d78), 0x31) u8[usb.m_sizeBytes];
+        u8* dstBuffer = static_cast<u8*>(_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
+            &Memory, usb.m_sizeBytes, MaterialEditorStage(), s_ME_USB_process_cpp_801d7d78, 0x31, 0));
 
         if (dstBuffer == 0) {
             System.Printf(const_cast<char*>(s_MemAlloc_Error____size__d_801d7d8c), usb.m_sizeBytes);
@@ -317,8 +317,8 @@ extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialE
     }
     case 0x20: {
         u32 size = usb.m_sizeBytes;
-        s16* headerBuffer = reinterpret_cast<s16*>(
-            new (MaterialEditorStage(), const_cast<char*>(s_ME_USB_process_cpp_801d7d78), 0x31) u8[size]);
+        s16* headerBuffer = reinterpret_cast<s16*>(_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
+            &Memory, size, MaterialEditorStage(), s_ME_USB_process_cpp_801d7d78, 0x31, 0));
 
         if (headerBuffer == 0) {
             System.Printf(const_cast<char*>(s_MemAlloc_Error____size__d_801d7d8c), size);

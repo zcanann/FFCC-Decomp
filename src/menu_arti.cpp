@@ -734,16 +734,15 @@ void CMenuPcs::ArtiInit1()
 				uVar5 = uVar5 - 1;
 			} while (uVar5 != 0);
 			uVar4 = uVar4 & 7;
-			if (uVar4 == 0) {
-				return;
-			}
 		}
-		do {
-			entry->step = 0;
-			entry->alpha = fVar1;
-			entry++;
-			uVar4 = uVar4 - 1;
-		} while (uVar4 != 0);
+		if (uVar4 != 0) {
+			do {
+				entry->step = 0;
+				entry->alpha = fVar1;
+				entry++;
+				uVar4 = uVar4 - 1;
+			} while (uVar4 != 0);
+		}
 	}
 }
 

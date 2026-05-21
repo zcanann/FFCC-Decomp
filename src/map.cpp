@@ -161,25 +161,6 @@ struct MapObjAttachObj
  * Address:	TODO
  * Size:	TODO
  */
-CMapKeyFrame::CMapKeyFrame()
-{
-    *reinterpret_cast<int*>(Ptr(this, 0)) = 0;
-    *reinterpret_cast<int*>(Ptr(this, 4)) = 0;
-    *reinterpret_cast<int*>(Ptr(this, 8)) = 0;
-    *reinterpret_cast<int*>(Ptr(this, 0xC)) = 0;
-    *reinterpret_cast<int*>(Ptr(this, 0x10)) = 0;
-    *reinterpret_cast<int*>(Ptr(this, 0x14)) = 0;
-    *reinterpret_cast<int*>(Ptr(this, 0x18)) = 0;
-    *reinterpret_cast<int*>(Ptr(this, 0x1C)) = 0;
-    *reinterpret_cast<int*>(Ptr(this, 0x20)) = 0;
-    *reinterpret_cast<int*>(Ptr(this, 0x24)) = 0;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
 CMapTexAnimSet::CMapTexAnimSet()
 {
 	// TODO
@@ -244,31 +225,6 @@ CMapIdGrp::CMapIdGrp()
     *reinterpret_cast<unsigned char*>(Ptr(this, 17)) = 0x40;
     *reinterpret_cast<unsigned char*>(Ptr(this, 18)) = 0;
     *reinterpret_cast<unsigned char*>(Ptr(this, 19)) = 0x80;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-CMapKeyFrame::~CMapKeyFrame()
-{
-    if (m_junTable != 0) {
-        delete[] m_junTable;
-        m_junTable = 0;
-    }
-    if (m_keyFrame != 0) {
-        delete[] m_keyFrame;
-        m_keyFrame = 0;
-    }
-    if (m_keyValue != 0) {
-        delete[] m_keyValue;
-        m_keyValue = 0;
-    }
-    if (m_splineTable != 0) {
-        delete[] m_splineTable;
-        m_splineTable = 0;
-    }
 }
 
 /*

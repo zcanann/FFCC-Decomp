@@ -723,7 +723,9 @@ void CFile::Quit()
 
     u32 nextOffset = m_handlePoolHead.m_currentOffset;
     if (nextOffset != 0) {
-        operator delete[](reinterpret_cast<void*>(nextOffset - 0x10));
+        if (nextOffset != 0) {
+            delete[] reinterpret_cast<unsigned char*>(nextOffset - 0x10);
+        }
         m_handlePoolHead.m_currentOffset = 0;
     }
 

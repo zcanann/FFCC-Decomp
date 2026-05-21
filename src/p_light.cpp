@@ -671,18 +671,17 @@ void CLightPcs::SetPosition(CLightPcs::TARGET target, Vec* pos, unsigned long ma
     char* lightSlot = lightPcs + 0xbc;
     *(u32*)(lightPcs + 0xb4) = (1 << *(u32*)(lightPcs + 0xb0)) - 1;
 
-    for (u32 i = 0; i < *(u32*)(lightPcs + 0xac); i++) {
+    for (u32 i = 0; i < *(u32*)(lightPcs + 0xac); i++, lightSlot += 0xb0) {
         GXLoadLightObjImm((GXLightObj*)(lightSlot + 0x6c), (GXLightID)(1 << i));
-        lightSlot += 0xb0;
     }
 
     if (pos != nullptr) {
         char* bumpSlot = lightPcs + 0x63c;
-        for (u32 i = 0; i < *(u32*)(lightPcs + 0xb8); i++) {
+        for (u32 i = 0; i < *(u32*)(lightPcs + 0xb8); i++, bumpSlot += 0xb0) {
             if ((*(u8*)((int)target + (int)bumpSlot + 0x60) != 0) && ((*(u32*)(bumpSlot + 0x34) & mask) != 0) &&
                 ((double)PSVECSquareDistance(pos, (Vec*)(bumpSlot + 4)) < (double)*(float*)(bumpSlot + 0xac))) {
-                GXInitLightColor((GXLightObj*)(bumpSlot + 0x6c),
-                                 *reinterpret_cast<_GXColor*>(bumpSlot + 0x50 + ((int)target * 4)));
+                CLight* light = reinterpret_cast<CLight*>(bumpSlot);
+                GXInitLightColor(&light->m_gxLightObj, light->m_targetColor[target]);
                 GXLoadLightObjImm((GXLightObj*)(bumpSlot + 0x6c), (GXLightID)(1 << *(u32*)(lightPcs + 0xb0)));
                 *(u32*)(lightPcs + 0xb4) |= 1 << *(u32*)(lightPcs + 0xb0);
                 *(u32*)(lightPcs + 0xb0) += 1;
@@ -690,7 +689,6 @@ void CLightPcs::SetPosition(CLightPcs::TARGET target, Vec* pos, unsigned long ma
                     break;
                 }
             }
-            bumpSlot += 0xb0;
         }
     }
 

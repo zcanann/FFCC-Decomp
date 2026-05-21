@@ -3,9 +3,32 @@
 
 #include "ffcc/file.h"
 #include "ffcc/manager.h"
+#include "ffcc/memory.h"
+#include "ffcc/RedSound/RedSound.h"
+#include <dolphin/mtx.h>
 
 struct _pppMngSt;
-struct Vec;
+
+struct CLineSegment {
+    Vec delta;
+    Vec normal;
+    float length;
+    float startLength;
+};
+
+template <int PointCount>
+struct CLine {
+    CLine();
+
+    Vec min;
+    Vec max;
+    unsigned int pointCount;
+    unsigned int unused;
+    float unk20[4];
+    Vec points[PointCount];
+    CLineSegment segments[PointCount - 1];
+    float totalLength;
+};
 
 class CSound : public CManager
 {
@@ -77,7 +100,35 @@ public:
     void WaitASync();
 
 private:
-    unsigned char m_storage[0x22D4];
+    CMemory::CStage* m_stage;
+    CRedSound m_redSound;
+    unsigned char* m_aramBuffer;
+    CFile::CHandle* m_waveFile;
+    int m_waveRemain;
+    int m_waveOffset;
+    int m_waveID;
+    int m_waveState;
+    int m_waveSyncMode;
+    int m_seCount;
+    unsigned char m_seWork[0x1400];
+    CLine<10> m_lines[8];
+    unsigned char* m_streamBuffer;
+    CFile::CHandle* m_streamFile;
+    int m_streamOffset;
+    int m_streamID;
+    unsigned int m_streamHalf;
+    int m_streamPlaying;
+    int m_streamRemain;
+    int m_streamState;
+    int m_streamWaveID;
+    int m_bgmMasterVolume;
+    int m_seMasterVolume;
+    int m_curMusicVolume;
+    int m_seMaxVolume;
+    short m_noFreeSeGroups[4];
+    short m_noFreeWaves[4];
+    int m_pauseAllSe;
+    int m_debugPrint;
 };
 
 extern CSound Sound;

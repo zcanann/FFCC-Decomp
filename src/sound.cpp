@@ -82,27 +82,6 @@ inline void* operator new(unsigned long, void* ptr)
     return ptr;
 }
 
-struct CLineSegment {
-    Vec delta;
-    Vec normal;
-    float length;
-    float startLength;
-};
-
-template <int PointCount>
-struct CLine {
-    CLine();
-
-    Vec min;
-    Vec max;
-    u32 pointCount;
-    u32 unused;
-    float unk20[4];
-    Vec points[PointCount];
-    CLineSegment segments[PointCount - 1];
-    float totalLength;
-};
-
 class CSound::CSe3D {
 public:
     union {
@@ -362,12 +341,6 @@ extern "C" void CalcBound__9CLine2(CLine<10>* line)
  */
 inline CSound::CSound()
 {
-    unsigned char* sound = reinterpret_cast<unsigned char*>(this);
-
-    __ct__9CRedSoundFv(sound + 8);
-    for (int i = 0; i < 8; i++) {
-        new (&SoundData(this).m_lines[i]) CLine<10>;
-    }
 }
 
 /*
@@ -377,7 +350,6 @@ inline CSound::CSound()
  */
 CSound::~CSound()
 {
-    RedSound(this)->~CRedSound();
 }
 
 /*

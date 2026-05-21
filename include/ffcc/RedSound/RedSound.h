@@ -138,6 +138,9 @@ public:
 	void SetWaveAdsr(int attack, RedAdsrDATA* adsr);
 
 	void TestProcess(int mode);
+
+private:
+	unsigned int m_storage;
 };
 
 #endif // _FFCC_REDSOUND_REDSOUND_H

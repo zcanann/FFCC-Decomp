@@ -121,7 +121,7 @@ static const char lbl_801D626C[] = {
     0x83, 0x56, 0x81, 0x5B, 0x83, 0x93, 0x82, 0xAA, 0x88, 0xD9, 0x8F, 0xED, 0x82, 0xC5, 0x82, 0xB7,
     0x81, 0x42, 0x25, 0x64, 0x0A, 0x00, 0x00, 0x00};
 static const char s_GameDebug_801D6284[] = "GameDebug";
-extern const char lbl_8032F630[];
+extern const char s_SN_EXIT_8032F630[];
 extern const char s_SN_DUMMY_801D600C[];
 extern const char s_SN_CHARA_801D6018[];
 extern const char lbl_8032F638[];
@@ -131,7 +131,7 @@ extern const char s_SN_FUNNYSHAPE_801D6038[];
 extern const char s_SN_PARTVIEW_801D6048[];
 extern const char* s_localLangDirs[];
 static const char* m_tStatus[] = {
-    lbl_8032F630,
+    s_SN_EXIT_8032F630,
     s_SN_DUMMY_801D600C,
     s_SN_CHARA_801D6018,
     lbl_8032F638,

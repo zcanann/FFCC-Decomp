@@ -764,4 +764,4 @@ void CFile::Init()
     }
 }
 
-extern "C" const char lbl_8032F630[] = "SN_EXIT";
+extern "C" const char s_SN_EXIT_8032F630[] = "SN_EXIT";

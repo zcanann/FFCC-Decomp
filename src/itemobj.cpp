@@ -191,6 +191,19 @@ struct CMapCylinderRaw {
 
 /*
  * --INFO--
+ * PAL Address: 0x80124b78
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CGItemObj::GetCID()
+{
+	return 0x1d;
+}
+/*
+ * --INFO--
  * PAL Address: 0x80124b80
  * PAL Size: 8b
  * EN Address: TODO
@@ -205,172 +218,724 @@ int CGPrgObj::getReplaceStat(int state)
 
 /*
  * --INFO--
- * PAL Address: 0x80126f94
- * PAL Size: 116b
+ * PAL Address: 0x80124b88
+ * PAL Size: 164b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGItemObj::onCreate()
+void CGItemObj::DispAllFieldItem(int show)
 {
-	onCreate__8CGPrgObjFv(this);
-	m_flagBits.bits.unk0 = 0;
-	m_owner = 0;
-	m_scriptArg = 0;
-	m_createFlags = 0;
-	unk_0x562 = 0;
-	m_pendingModelHandle = 0;
-	m_itemJumpCountdown = 0;
-	memset(&m_memoryCapsuleNameIndex, 0, 0xc);
-	m_particleSlot = GetFreeParticleSlot__13CFlatRuntime2Fv(CFlat);
+	for (CGItemObj* itemObj = (CGItemObj*)FindGItemObjFirst__13CFlatRuntime2Fv(CFlat); itemObj != 0;
+	     itemObj = (CGItemObj*)FindGItemObjNext__13CFlatRuntime2FP9CGItemObj(CFlat, itemObj)) {
+		if (itemObj->m_owner == 0 &&
+		    static_cast<signed char>(
+		        static_cast<int>((static_cast<unsigned int>(itemObj->m_stateFlags0) << 28) & 0xC0000000) >> 31) != 0) {
+			if (show != 0) {
+				itemObj->m_displayFlags &= 0xffbfffff;
+			} else {
+				itemObj->m_displayFlags |= 0x400000;
+			}
+		}
+	}
 }
 
 /*
  * --INFO--
- * PAL Address: 0x80126f3c
- * PAL Size: 88b
+ * PAL Address: 0x80124c2c
+ * PAL Size: 140b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGItemObj::onDestroy()
+void CGItemObj::DeleteAllFieldItem()
+{
+	for (CGItemObj* itemObj = (CGItemObj*)FindGItemObjFirst__13CFlatRuntime2Fv(CFlat); itemObj != 0;
+	     itemObj = (CGItemObj*)FindGItemObjNext__13CFlatRuntime2FP9CGItemObj(CFlat, itemObj)) {
+		if (itemObj->m_owner == 0 &&
+		    static_cast<signed char>(
+		        static_cast<int>((static_cast<unsigned int>(itemObj->m_stateFlags0) << 28) & 0xC0000000) >> 31) != 0) {
+			itemObj->m_flags = static_cast<unsigned char>(__rlwimi(itemObj->m_flags, 1, 7, 24, 24));
+		}
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80124cb8
+ * PAL Size: 332b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGItemObj::ItemJump(int state, float jump)
+{
+	for (CGItemObj* itemObj = static_cast<CGItemObj*>(FindGItemObjFirst__13CFlatRuntime2Fv(CFlat)); itemObj != 0;
+	     itemObj = static_cast<CGItemObj*>(FindGItemObjNext__13CFlatRuntime2FP9CGItemObj(CFlat, itemObj))) {
+		CGObject* object = reinterpret_cast<CGObject*>(itemObj);
+
+		if ((object->m_objectFlags & 0x10) == 0) {
+			unsigned int mapMask = object->m_bgHitMask;
+			CMapCylinderRaw cylinder;
+			Vec move;
+
+			move.x = FLOAT_80331b20;
+			move.y = FLOAT_80331b24;
+			move.z = FLOAT_80331b20;
+
+			cylinder.m_bottom = object->m_worldPosition;
+			cylinder.m_bottom.y += FLOAT_80331b1c;
+			cylinder.m_top.x = FLOAT_80331b20;
+			cylinder.m_top.y = FLOAT_80331b20;
+			cylinder.m_top.z = FLOAT_80331b20;
+			cylinder.m_axis.x = FLOAT_80331b20;
+			cylinder.m_axis.y = FLOAT_80331b24;
+			cylinder.m_axis.z = FLOAT_80331b20;
+			cylinder.m_radius = FLOAT_80331b20;
+			cylinder.m_boundsMin.x = FLOAT_80331b28;
+			cylinder.m_boundsMin.y = FLOAT_80331b28;
+			cylinder.m_boundsMin.z = FLOAT_80331b28;
+			cylinder.m_boundsMax.x = FLOAT_80331b2c;
+			cylinder.m_boundsMax.y = FLOAT_80331b2c;
+			cylinder.m_boundsMax.z = FLOAT_80331b2c;
+
+			if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
+			        &MapMng, reinterpret_cast<CMapCylinder*>(&cylinder), &move, mapMask) != 0 &&
+			    g_hit_f->m_groupIndex == state) {
+				object->m_groundHitOffset.y += jump;
+			}
+		}
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80124e04
+ * PAL Size: 424b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGItemObj::DrawOmoideName(CFont* font)
 {
 	unsigned char* self = (unsigned char*)this;
-	CCharaPcs::CHandle* handle = m_pendingModelHandle;
 
-	if (handle != 0) {
-		delete handle;
+	if ((signed char)((int)(((unsigned int)*(unsigned char*)(self + 0x9A) << 0x1A) & 0xC0000000) >> 31) != 0) {
+		void* charaHandle = *(void**)(self + 0xF8);
+		bool hasModel = false;
+		if (charaHandle != 0 && *(void**)((unsigned char*)charaHandle + 0x168) != 0) {
+			hasModel = true;
+		}
+
+		if (hasModel && *(int*)(self + 0x500) == 0xCB && 0.0f < *(float*)(self + 0x74) &&
+		    0.0f != *(float*)(self + 0x4B0)) {
+			font->SetTlut(7);
+
+			int alphaInt = (int)(255.0f * *(float*)(self + 0x4B0));
+			CColor textColor(0xFF, 0xFF, 0xFF, alphaInt);
+			font->SetColor(textColor.color);
+
+			const ItemObjFlatData* flatData = reinterpret_cast<const ItemObjFlatData*>(&Game.m_cFlatDataArr[1]);
+			const char* name = flatData->table[2].index[*(int*)(self + 0x570)];
+			float width = font->GetWidth(name);
+			float depthScale = FLOAT_80331b18 / (*(float*)(self + 0x74) - FLOAT_80331b1c);
+			float posY = 224.0f - 224.0f * *(float*)(self + 0x6C) * depthScale;
+			float posZ = *(float*)(self + 0x70) * depthScale;
+			float posX =
+			    -(0.5f * width - (320.0f * *(float*)(self + 0x68) * depthScale + 320.0f));
+
+			font->SetPosX(posX);
+			font->SetPosY(posY - 11.0f);
+			font->SetPosZ(posZ);
+			font->Draw(name);
+		}
 	}
-
-	DeleteParticleSlot__13CFlatRuntime2Fii(CFlat, *(int*)(self + 0x55c), 0);
-	onDestroy__8CGPrgObjFv(self);
 }
 
 /*
  * --INFO--
- * PAL Address: 0x80126f38
+ * PAL Address: 0x80124fac
+ * PAL Size: 52b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGItemObj::onNewFinished()
+{
+	*(float*)((u8*)this + 0x568) = *(float*)((u8*)this + 0x144);
+	*(u16*)((u8*)this + 0x560) = (u16)((gItemObjCreateFlags >> 3) & 1);
+	loadModel();
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80124FE0
+ * PAL Size: 700b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGItemObj::loadModel()
+{
+	unsigned char* self = (unsigned char*)this;
+	int modelNo = -1;
+	int modelVariant = 0;
+	int modelFlag = 0;
+	unsigned long animFlags = (unsigned long)-1;
+	char* standAnim = const_cast<char*>(s_stand_80331B44);
+	int useParticleTable = 1;
+	int itemType = *(int*)(self + 0x500);
+
+	switch (itemType) {
+	case 0xA:
+		modelNo = 8;
+		useParticleTable = 0;
+		break;
+	case 0xC:
+		modelNo = 0x27;
+		useParticleTable = 0;
+		break;
+	case 0xD:
+		modelNo = 0x33;
+		useParticleTable = 0;
+		break;
+	case 0xE:
+		modelNo = 0x33;
+		modelVariant = 1;
+		useParticleTable = 0;
+		break;
+	case 0x12:
+	case 0x13:
+	case 0x14:
+	case 0x15:
+	case 0x16:
+	case 0x17:
+	case 0x1F:
+	case 0x20:
+	case 0x21:
+	case 0x24: {
+		int itemEntryOffset = *(int*)(self + 0x504) * 0x48 + 2;
+		int itemEntry = *(unsigned short*)(Game.unkCFlatData0[2] + itemEntryOffset);
+
+		self[0x53] = 1;
+		modelNo = itemEntry & 0xFFF;
+		modelVariant = itemEntry >> 0xC;
+		self[0x50] = static_cast<unsigned char>(__rlwimi(self[0x50], 1, 3, 28, 28));
+		*(int*)(self + 0x94) = 0x1194;
+		animFlags = 0x12;
+		modelFlag = 1;
+		break;
+	}
+	case 0xCB:
+	default:
+		break;
+	}
+
+	if (modelNo >= 0) {
+		LoadModel__8CGObjectFiUlUli(this, 3, modelNo, modelVariant, modelFlag);
+		LoadAnim__8CGObjectFPciiiUl(this, standAnim, 0, 0, 3, animFlags);
+		SetAnimSlot__8CGObjectFii(this, 0, 0);
+		PlayAnim__8CGObjectFiiiiiPSc(this, 0, 1, 0, -1, -1, 0);
+	}
+
+	if (*(int*)(self + 0x500) == 0x12) {
+		DispCharaParts__8CGObjectFi(this, 0);
+		self[0x50] = static_cast<unsigned char>(__rlwimi(self[0x50], 1, 4, 27, 27));
+	}
+
+	if (useParticleTable != 0) {
+		for (int i = 0; i < 3; i++) {
+			if (i != 0 || m_createFlags != 1) {
+				int entryBase = Game.unkCFlatData0[2] + *(int*)(self + 0x504) * 0x48;
+				int particleNo = *(unsigned short*)(entryBase + i * 2 + 0x14);
+
+				if (particleNo != 0xFFFF) {
+					float particleScale =
+					    FLOAT_80331b50 * (float)(unsigned short)*(unsigned short*)(entryBase + 0x10) + FLOAT_80331b4c;
+					putParticle__8CGPrgObjFiiP8CGObjectfi(
+					    this, particleNo | 0x100, *(int*)(self + 0x55C), this, particleScale, 0);
+				}
+			}
+		}
+	}
+
+	if (*(int*)(self + 0x500) == 0xCB) {
+		*(float*)(self + 0x1D4) = FLOAT_80331b54 - RandF__5CMathFf(FLOAT_80331b58, &Math);
+		*(unsigned char*)(self + 0x9A) =
+		    static_cast<unsigned char>(__rlwimi(*(unsigned char*)(self + 0x9A), 0, 2, 29, 29));
+	}
+
+	self[0x54C] = static_cast<unsigned char>(__rlwimi(self[0x54C], 1, 7, 24, 24));
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8012529C
+ * PAL Size: 556b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGItemObj::onHitParticle(int effectIndex, int, int, int, Vec*, PPPIFPARAM* hitParam)
+{
+	unsigned char* self = (unsigned char*)this;
+	int worldParamA = *(int*)(self + 0x500);
+	unsigned char* particleRow = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2] + hitParam->m_particleIndex * 0x48);
+	int particleAttr = (int)*reinterpret_cast<unsigned short*>(particleRow + 8);
+
+	if (worldParamA == 0xD || worldParamA == 0xE) {
+		if (((particleAttr == 0 || particleAttr == 4) && worldParamA == 0xD) ||
+		    (particleAttr == 1 && worldParamA == 0xE)) {
+			int particleNo;
+			int classControl;
+
+			switch (particleAttr) {
+			case 1:
+				particleNo = 0x20;
+				classControl = 0x491;
+				break;
+			case 0:
+				particleNo = 0x1F;
+				classControl = 0x492;
+				break;
+			case 4:
+				particleNo = 0x2F;
+				classControl = 0x493;
+				break;
+			}
+
+			EndParticleSlot__13CFlatRuntime2Fii(CFlat, *(int*)(self + 0x55C), 0);
+			ResetParticleWork__13CFlatRuntime2Fii(CFlat, particleNo | 0x100, *(int*)(self + 0x55C));
+			SetParticleWorkPos__13CFlatRuntime2FR3Vecf(CFlat, *(Vec*)(self + 0x15C), FLOAT_80331b20);
+			SetParticleWorkCol__13CFlatRuntime2Fiif(CFlat, 9, 0, FLOAT_80331b18);
+			SetParticleWorkParam__13CFlatRuntime2FiPQ212CFlatRuntime7CObject(CFlat, classControl, this);
+			PutParticleWork__13CFlatRuntime2Fv(CFlat);
+			*(unsigned int*)(self + 0x1C0) &= 0xFFF7FFFF;
+			addSubStat__8CGPrgObjFv(this);
+		}
+	} else {
+		if (((worldParamA != 0xCB) || (*(int*)(self + 0x520) != 0x24)) && *(int*)(self + 0x520) != 0x25) {
+			return;
+		}
+
+		if ((static_cast<unsigned int>(particleAttr - 0x66) <= 1U) || (particleAttr == 0x65)) {
+			int classId = hitParam->m_classId;
+			unsigned char* classObj;
+
+			if (classId != 0) {
+				classObj = (unsigned char*)intToClass__13CFlatRuntime2Fi(CFlat, classId);
+			} else {
+				classObj = 0;
+			}
+
+			void* objectBehavior = *(void**)(classObj + 0x48);
+			unsigned int cid =
+			    reinterpret_cast<unsigned int (*)(void*)>((*reinterpret_cast<void***>(objectBehavior))[3])(
+			        objectBehavior);
+
+			if ((cid & 0x6D) == 0x6D && *(void**)(self + 0x550) == classObj) {
+				changeStat__8CGPrgObjFiii(this, 0x26, 0, 0);
+			}
+		}
+	}
+
+	IgnoreParticle__13CFlatRuntime2FiPQ212CFlatRuntime7CObject(CFlat, effectIndex, this);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x801254cc
+ * PAL Size: 384b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGItemObj::onFrameAlways()
+{
+	unsigned char* self = (unsigned char*)this;
+	int countdown = *(int*)(self + 0x56C);
+
+	if (countdown != 0) {
+		int next = countdown - 1;
+		*(int*)(self + 0x56C) = next & ~(next >> 0x1F);
+		float radius = *(float*)(self + 0x568) * (float)(8 - *(int*)(self + 0x56C));
+		*(float*)(self + 0x144) = radius * FLOAT_80331b68;
+	}
+
+	if (*(int*)(self + 0x500) == 0xA) {
+		int canUseTrace;
+
+		if (static_cast<int>(Game.m_gameWork.m_gameInitFlag) != 0 &&
+		    static_cast<signed char>(
+		        static_cast<int>((static_cast<unsigned int>(*(unsigned char*)(CFlat + 4836)) << 28) & 0xC0000000) >> 31) != 0 &&
+		    static_cast<signed char>(
+		        static_cast<int>((static_cast<unsigned int>(*(unsigned char*)(CFlat + 4836)) << 29) & 0xC0000000) >> 31) != 0 &&
+		    static_cast<signed char>(
+		        static_cast<int>((static_cast<unsigned int>(*(unsigned char*)(self + 0x9A)) << 24) & 0xC0000000) >> 31) != 0 &&
+		    *(int*)(CFlat + 4780) == 0 && *(void**)(self + 0x550) == 0) {
+			canUseTrace = true;
+		} else {
+			canUseTrace = false;
+		}
+
+		if (canUseTrace && *(int*)(CFlat + 66604) == 0) {
+			*(int*)(CFlat + 66604) = GetFreeParticleSlot__13CFlatRuntime2Fv(CFlat);
+			putParticleTrace__8CGPrgObjFiiP8CGObjectfi(this, 0x141, *(int*)(CFlat + 66604), this, FLOAT_80331b18, 0);
+		} else if (!canUseTrace && *(int*)(CFlat + 66604) != 0) {
+			EndParticleSlot__13CFlatRuntime2Fii(CFlat, *(int*)(CFlat + 66604), 0);
+			*(int*)(CFlat + 66604) = 0;
+		}
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8012564c
  * PAL Size: 4b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGItemObj::onFramePreCalc()
+void CGItemObj::onChangePrg(int)
 {
 	// TODO
 }
 
 /*
  * --INFO--
- * PAL Address: 0x80126f08
- * PAL Size: 48b
+ * PAL Address: 0x80125650
+ * PAL Size: 916b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGItemObj::onFramePostCalc()
+void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 {
 	unsigned char* self = (unsigned char*)this;
+	CFlatRuntime::CStack stack[3];
+	int canSystemCall = 0;
 
-	if (static_cast<signed char>(
-	        static_cast<int>((static_cast<unsigned int>(self[0x50]) << 28) & 0xC0000000) >> 31) != 0 &&
-	    *(void**)(self + 0x550) == 0) {
-		*(int*)(self + 0x94) = *(int*)(self + 0x94) - 1;
-	}
-}
+	if (carryState == 0) {
+		bool isStageCarry = false;
+		bool isMenuBossStage = false;
 
-/*
- * --INFO--
- * PAL Address: 0x80126ee0
- * PAL Size: 40b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGItemObj::onChangeStat(int state)
-{
-	unsigned char* self = (unsigned char*)this;
-
-	if (state < 0x28 && state >= 0x26) {
-		*(unsigned int*)(self + 0x1c0) = *(unsigned int*)(self + 0x1c0) & 0xfff7fffe;
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80126eb4
- * PAL Size: 44b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGItemObj::onCancelStat(int)
-{
-	unsigned char* self = (unsigned char*)this;
-
-	if (*(int*)(self + 0x520) == 0x1b) {
-		*(unsigned int*)(self + 0x1c0) = *(unsigned int*)(self + 0x1c0) | 2;
-		*(float*)(self + 0x17c) = FLOAT_80331b18;
-		*(float*)(self + 0x178) = FLOAT_80331b18;
-		*(float*)(self + 0x174) = FLOAT_80331b18;
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80126d08
- * PAL Size: 428b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGItemObj::onFrame()
-{
-	CCharaPcs::CHandle* handle = m_pendingModelHandle;
-
-	if (handle != 0 && handle->IsLoadModelASyncCompleted()) {
-		if ((unsigned int)System.m_execParam >= 3U) {
-			Printf__7CSystemFPce(&System, const_cast<char*>(DAT_801dd010));
+		if (Game.m_gameWork.m_menuStageMode != 0 &&
+			Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
+			isMenuBossStage = true;
+		}
+		if (isMenuBossStage) {
+			unsigned int cid = static_cast<unsigned short>(partyObj->GetCID());
+			unsigned int stageCarry = (unsigned int)__cntlzw(0x6D - (cid & 0x6D));
+			if (((stageCarry >> 5) & 0xFF) != 0) {
+				isStageCarry = true;
+			}
+		}
+		if (isStageCarry && *(int*)(*(unsigned char**)((unsigned char*)partyObj + 0x58) + 0x3B4) != 0) {
+			canSystemCall = 1;
 		}
 
-		m_charaModelHandle = reinterpret_cast<CCharaPcs::CHandle*>(m_pendingModelHandle);
-		m_pendingModelHandle = 0;
+		*(CGPartyObj**)(self + 0x550) = partyObj;
+		*(int*)(self + 0x554) = carryMode;
 
-		if (m_worldParamA == 0xCB) {
-			LoadAnim__8CGObjectFPciiiUl(this, m_pendingAnimName, 0, 0, 2, m_pendingAnimFlags);
-			SetAnimSlot__8CGObjectFii(this, 0, 0);
-			PlayAnim__8CGObjectFiiiiiPSc(this, 0, 1, 0, -1, -1, 0);
+		if (carryMode == 0) {
+			CVector attachOffset(FLOAT_80331b20, FLOAT_80331b20, FLOAT_80331b20);
+			bool useBossAttachName = false;
 
-			CGObject* owner = m_owner;
-			int ownerScriptSlot = *(int*)(*(int*)((unsigned char*)owner + 0x58) + 0x3B4);
-			int soundEntry = *(int*)(*(int*)(*reinterpret_cast<int*>(m_boss__8CGMonObj) + 0xF8) + 0x178);
-			if (soundEntry != 0) {
-				soundEntry = *(int*)(soundEntry + 0x14);
-			} else {
-				soundEntry = -1;
+			if (Game.m_gameWork.m_menuStageMode != 0) {
+				bool condA = false;
+				bool condB = false;
+				bool condC = false;
+
+				if (Game.m_gameWork.m_menuStageMode != 0 &&
+					Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
+					condC = true;
+				}
+				if (condC) {
+					unsigned int cid = static_cast<unsigned short>(partyObj->GetCID());
+					unsigned int stageCarry = (unsigned int)__cntlzw(0x6D - (cid & 0x6D));
+					if (((stageCarry >> 5) & 0xFF) != 0) {
+						condB = true;
+					}
+				}
+				if (condB && *(int*)(*(unsigned char**)((unsigned char*)partyObj + 0x58) + 0x3B4) != 0) {
+					condA = true;
+				}
+				if (condA) {
+					useBossAttachName = true;
+				}
 			}
 
-			unsigned char* itemTable = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]);
-			float particleValue = static_cast<float>(*reinterpret_cast<unsigned short*>(itemTable + m_worldParamB * 0x48 + 0x10));
-			float particleScale = FLOAT_80331b50 * (float)particleValue + FLOAT_80331b4c;
-			putParticle__8CGPrgObjFiiP8CGObjectfi(
-			    this, (soundEntry << 8) | ownerScriptSlot, m_particleSlot, this, particleScale, 0x12909);
+			const char* attachName = DAT_80331b84;
+			if (useBossAttachName) {
+				attachName = DAT_80331b7c;
+			}
+			Attach__8CGObjectFP8CGObjectPcP3Vec(this, partyObj, const_cast<char*>(attachName),
+			                                    reinterpret_cast<Vec*>(&attachOffset));
+			changeStat__8CGPrgObjFiii(this, 0, 0, 0);
+			*(float*)(self + 0x144) = FLOAT_80331b20;
+		} else {
+			changeStat__8CGPrgObjFiii(this, 0xB, 0, 0);
+		}
+	} else if (carryState == 1 || carryState == 2) {
+		bool isStageCarry = false;
+		bool isMenuBossStage = false;
 
-			CVector zero(FLOAT_80331b20, FLOAT_80331b20, FLOAT_80331b20);
-			SetDamageCol__8CGObjectFiPcffP3Vec(
-			    this, 0, const_cast<char*>(DAT_80331bc8), FLOAT_80331bb8, FLOAT_80331bb8, reinterpret_cast<Vec*>(&zero));
-			*reinterpret_cast<unsigned int*>(&m_damageColliders[1].m_localPosition.x) = 8;
-			addSubStat__8CGPrgObjFv(this);
+		if (Game.m_gameWork.m_menuStageMode != 0 &&
+			Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
+			isMenuBossStage = true;
+		}
+		if (isMenuBossStage) {
+			CGPartyObj* carryObj = *(CGPartyObj**)(self + 0x550);
+			unsigned int cid = static_cast<unsigned short>(carryObj->GetCID());
+			unsigned int stageCarry = (unsigned int)__cntlzw(0x6D - (cid & 0x6D));
+			if (((stageCarry >> 5) & 0xFF) != 0) {
+				isStageCarry = true;
+			}
+		}
+		if (isStageCarry && *(int*)(*(unsigned char**)(*(unsigned char**)(self + 0x550) + 0x58) + 0x3B4) != 0) {
+			canSystemCall = 1;
+		}
+
+		*(int*)(self + 0x554) = carryMode;
+
+		if (carryMode == 0) {
+			Vec safePos;
+			float safeDist = CalcSafePos__8CGObjectFiP8CGObjectP3Vec(
+				this, 0x41, *(CGPartyObj**)(self + 0x550), &safePos);
+			if (FLOAT_80331b20 < safeDist) {
+				CGPartyObj* carryObj = *(CGPartyObj**)(self + 0x550);
+				moveVectorHRot__8CGObjectFfffi(
+					carryObj,
+					FLOAT_80331b8c + *(float*)((unsigned char*)carryObj + 0x1A8),
+					FLOAT_80331b20,
+					safeDist / FLOAT_80331b90,
+					3);
+			}
+			Detach__8CGObjectFv(this);
+			*(Vec*)(self + 0x15C) = safePos;
+			*(int*)(self + 0x550) = 0;
+			changeStat__8CGPrgObjFiii(this, 0, 0, 0);
+			*(int*)(self + 0x56C) = 8;
+			*(float*)(self + 0x144) = FLOAT_80331b20;
+		} else {
+			changeStat__8CGPrgObjFiii(this, ((int)~(carryState - 1 | 1 - carryState) >> 0x1F) + 0xD, 0, 0);
+		}
+
+		*reinterpret_cast<u32*>(self + 0x94) = 0x1194;
+	}
+
+	if ((*(unsigned int*)(self + 0x5C) & 0x10) != 0 && canSystemCall != 0) {
+		stack[0].m_word = 3;
+		stack[1].m_word = static_cast<unsigned int>((-carryState | carryState) >> 0x1F);
+		stack[2].m_word = 0;
+		SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+			&CFlat, 0, 1, 9, 3, stack, 0);
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x801259e4
+ * PAL Size: 1168b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+CGPrgObj* CGItemObj::CreateFromScript(
+    int createMode, int createFlags, int scriptArg, CGObject* owner, float launchAngle, CGItemObj::CCFS* ccfs)
+{
+	int freeItemCount = getNumFreeObject__13CFlatRuntime2Fi(CFlat, 5);
+	Printf__7CSystemFPce(&System, const_cast<char*>(DAT_801dcec0), freeItemCount);
+
+	if (freeItemCount == 0) {
+		int deletedCount = 0;
+		int bestScriptObjectPos = 0x00989680;
+		unsigned char* bestItemObj = 0;
+
+		for (unsigned char* itemObj = (unsigned char*)FindGItemObjFirst__13CFlatRuntime2Fv(CFlat);
+		     itemObj != 0;
+		     itemObj = (unsigned char*)FindGItemObjNext__13CFlatRuntime2FP9CGItemObj(CFlat, itemObj)) {
+			int canDelete = (itemObj[0x53] & 1) != 0;
+			int scriptObjectPos = *(int*)(itemObj + 0x94);
+
+			if (*(void**)(itemObj + 0x550) == 0 &&
+			    static_cast<signed char>(
+			        static_cast<int>((static_cast<unsigned int>(itemObj[0x50]) << 28) & 0xC0000000) >> 31) != 0 &&
+			    canDelete != 0 && scriptObjectPos < bestScriptObjectPos) {
+				bestScriptObjectPos = scriptObjectPos;
+				bestItemObj = itemObj;
+			}
+		}
+
+		if (bestItemObj != 0) {
+			deleteObject__12CFlatRuntimeFPQ212CFlatRuntime7CObject(CFlat, bestItemObj);
+			deletedCount = 1;
+		} else {
+			if (2U < (unsigned int)System.m_execParam) {
+				Printf__7CSystemFPce(&System, const_cast<char*>(DAT_801dced4));
+			}
+		}
+
+		Printf__7CSystemFPce(&System, const_cast<char*>(DAT_801dcef8), deletedCount);
+		if (deletedCount == 0) {
+			if (2U < (unsigned int)System.m_execParam) {
+				Printf__7CSystemFPce(&System, const_cast<char*>(DAT_801dcf10));
+			}
+			return 0;
 		}
 	}
 
-	onFrame__8CGPrgObjFv(this);
+	gItemObjCreateFlags = createFlags;
+	CFlatRuntime::CStack inStack[5];
+	CFlatRuntime::CStack outStack;
+	inStack[0].m_word = createMode;
+	inStack[1].m_word = createFlags;
+	inStack[2].m_word = scriptArg;
+	inStack[3].m_word = owner != 0 ? owner->m_particleId : 0;
+	*reinterpret_cast<float*>(&inStack[4].m_word) = launchAngle;
+	SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+	    &CFlat, 0, 1, 7, 5, inStack, &outStack);
+
+	CGPrgObj* newItem = 0;
+	if (createMode != 1) {
+		newItem = (CGPrgObj*)intToClass__13CFlatRuntime2Fi(CFlat, (int)outStack.m_word);
+		unsigned char* itemSelf = (unsigned char*)newItem;
+
+		if (createMode == 2) {
+			*(int*)(itemSelf + 0x558) = scriptArg;
+			newItem->m_radiusCtrl.y = FLOAT_80331b18;
+		}
+
+		changeStat__8CGPrgObjFiii(newItem, 0x1B, 0, 0);
+
+		if ((createFlags & 1) != 0) {
+			float safePosDist;
+			Vec safePos;
+			float yRot = owner->m_rotBaseY + RandFPM__5CMathFf(FLOAT_80331b54, &Math);
+
+			newItem->m_worldPosition.x = FLOAT_80331b1c * (float)sin((double)yRot) + owner->m_worldPosition.x;
+			newItem->m_worldPosition.y = FLOAT_80331b1c + owner->m_worldPosition.y;
+			newItem->m_worldPosition.z = FLOAT_80331b1c * (float)cos((double)yRot) + owner->m_worldPosition.z;
+
+			safePosDist = CalcSafePos__8CGObjectFiP8CGObjectP3Vec(newItem, 0x41, owner, &safePos);
+			if (FLOAT_80331b20 < safePosDist) {
+				moveVectorHRot__8CGObjectFfffi(
+				    owner, FLOAT_80331b8c + owner->m_rotBaseY, FLOAT_80331b20, safePosDist / FLOAT_80331b90, 3);
+			}
+
+			newItem->m_worldPosition = safePos;
+			SetPosBG__8CGObjectFP3Veci(newItem, &safePos, 1);
+		}
+
+		if ((createFlags & 4) != 0) {
+			newItem->m_worldPosition = owner->m_worldPosition;
+			SetPosBG__8CGObjectFP3Veci(newItem, &newItem->m_worldPosition, 1);
+
+			CVector moveVec((float)sin((double)launchAngle), FLOAT_80331b1c, (float)cos((double)launchAngle));
+			MoveVector__8CGObjectFP3Vecfiiii(newItem, (Vec*)&moveVec, FLOAT_80331b94, 1, 0, 1, 0);
+		}
+
+		if ((createFlags & 2) != 0) {
+			changeStat__8CGPrgObjFiii(newItem, 0x23, 0, 0);
+			newItem->m_worldPosition.x = owner->m_worldPosition.x;
+			newItem->m_worldPosition.y = owner->m_worldPosition.y + FLOAT_80331b98;
+			newItem->m_worldPosition.z = owner->m_worldPosition.z;
+			*(CGObject**)(itemSelf + 0x550) = owner;
+
+			void* ownerScriptSlot = owner->m_scriptHandle[0xED];
+			if ((unsigned int)System.m_execParam >= 3U) {
+				Printf__7CSystemFPce(&System, const_cast<char*>(DAT_801dcf34), ownerScriptSlot);
+			}
+			*(CGPrgObj**)(m_boss__8CGMonObj + (int)ownerScriptSlot * 4 + 8) = newItem;
+
+			CCharaPcs::CHandle* handle = new (Game.m_mainStage, const_cast<char*>(DAT_801dcf58), 0x28E) CCharaPcs::CHandle;
+			reinterpret_cast<CGItemObj*>(newItem)->m_pendingModelHandle = handle;
+			handle->Add();
+
+			handle->LoadModelASync(2, ccfs->m_modelId, ccfs->m_modelParam);
+
+			if ((unsigned int)System.m_execParam >= 3U) {
+				Printf__7CSystemFPce(&System, const_cast<char*>(DAT_801dcf64));
+			}
+
+			*(int*)(itemSelf + 0x56C) = ccfs->m_itemJumpCountdown;
+			*(char**)(itemSelf + 0x570) = ccfs->m_memoryCapsuleName;
+			*(int*)(itemSelf + 0x574) = ccfs->m_arg0;
+		}
+	}
+
+	return newItem;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80125e74
+ * PAL Size: 56b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+unsigned int CGItemObj::CanCreateFromScript()
+{
+	unsigned int numFreeObjects = getNumFreeObject__13CFlatRuntime2Fi(CFlat, 5);
+
+	return (-numFreeObjects & ~numFreeObjects) >> 31;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80125eac
+ * PAL Size: 260b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CGItemObj::DeleteOld(int deleteMask, int maxDeleteCount, CFlatRuntime::CObject*, CFlatRuntime::CObject*)
+{
+	int deletedCount = 0;
+
+	while (deletedCount < maxDeleteCount) {
+		unsigned char* bestItemObj = 0;
+		int bestScriptObjectPos = 0x00989680;
+
+		for (unsigned char* itemObj = (unsigned char*)FindGItemObjFirst__13CFlatRuntime2Fv(CFlat);
+			 itemObj != 0;
+			 itemObj = (unsigned char*)FindGItemObjNext__13CFlatRuntime2FP9CGItemObj(CFlat, itemObj)) {
+			if (*(void**)(itemObj + 0x550) == 0 &&
+				static_cast<signed char>(
+				    static_cast<int>((static_cast<unsigned int>(itemObj[0x50]) << 28) & 0xC0000000) >> 31) != 0 &&
+				(((int)(char)itemObj[0x53] & deleteMask) != 0) && *(int*)(itemObj + 0x94) < bestScriptObjectPos) {
+				bestScriptObjectPos = *(int*)(itemObj + 0x94);
+				bestItemObj = itemObj;
+			}
+		}
+
+		if (bestItemObj != 0) {
+			deleteObject__12CFlatRuntimeFPQ212CFlatRuntime7CObject(CFlat, bestItemObj);
+		} else {
+			if ((unsigned int)System.m_execParam >= 3U) {
+				Printf__7CSystemFPce(&System, const_cast<char*>(DAT_801dced4));
+			}
+			break;
+		}
+
+		deletedCount++;
+	}
+
+	return deletedCount;
 }
 
 /*
@@ -790,736 +1355,171 @@ void CGItemObj::onFrameStat()
 
 /*
  * --INFO--
- * PAL Address: 0x80125eac
- * PAL Size: 260b
+ * PAL Address: 0x80126d08
+ * PAL Size: 428b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-int CGItemObj::DeleteOld(int deleteMask, int maxDeleteCount, CFlatRuntime::CObject*, CFlatRuntime::CObject*)
-{
-	int deletedCount = 0;
-
-	while (deletedCount < maxDeleteCount) {
-		unsigned char* bestItemObj = 0;
-		int bestScriptObjectPos = 0x00989680;
-
-		for (unsigned char* itemObj = (unsigned char*)FindGItemObjFirst__13CFlatRuntime2Fv(CFlat);
-			 itemObj != 0;
-			 itemObj = (unsigned char*)FindGItemObjNext__13CFlatRuntime2FP9CGItemObj(CFlat, itemObj)) {
-			if (*(void**)(itemObj + 0x550) == 0 &&
-				static_cast<signed char>(
-				    static_cast<int>((static_cast<unsigned int>(itemObj[0x50]) << 28) & 0xC0000000) >> 31) != 0 &&
-				(((int)(char)itemObj[0x53] & deleteMask) != 0) && *(int*)(itemObj + 0x94) < bestScriptObjectPos) {
-				bestScriptObjectPos = *(int*)(itemObj + 0x94);
-				bestItemObj = itemObj;
-			}
-		}
-
-		if (bestItemObj != 0) {
-			deleteObject__12CFlatRuntimeFPQ212CFlatRuntime7CObject(CFlat, bestItemObj);
-		} else {
-			if ((unsigned int)System.m_execParam >= 3U) {
-				Printf__7CSystemFPce(&System, const_cast<char*>(DAT_801dced4));
-			}
-			break;
-		}
-
-		deletedCount++;
-	}
-
-	return deletedCount;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80125e74
- * PAL Size: 56b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-unsigned int CGItemObj::CanCreateFromScript()
-{
-	unsigned int numFreeObjects = getNumFreeObject__13CFlatRuntime2Fi(CFlat, 5);
-
-	return (-numFreeObjects & ~numFreeObjects) >> 31;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x801259e4
- * PAL Size: 1168b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-CGPrgObj* CGItemObj::CreateFromScript(
-    int createMode, int createFlags, int scriptArg, CGObject* owner, float launchAngle, CGItemObj::CCFS* ccfs)
-{
-	int freeItemCount = getNumFreeObject__13CFlatRuntime2Fi(CFlat, 5);
-	Printf__7CSystemFPce(&System, const_cast<char*>(DAT_801dcec0), freeItemCount);
-
-	if (freeItemCount == 0) {
-		int deletedCount = 0;
-		int bestScriptObjectPos = 0x00989680;
-		unsigned char* bestItemObj = 0;
-
-		for (unsigned char* itemObj = (unsigned char*)FindGItemObjFirst__13CFlatRuntime2Fv(CFlat);
-		     itemObj != 0;
-		     itemObj = (unsigned char*)FindGItemObjNext__13CFlatRuntime2FP9CGItemObj(CFlat, itemObj)) {
-			int canDelete = (itemObj[0x53] & 1) != 0;
-			int scriptObjectPos = *(int*)(itemObj + 0x94);
-
-			if (*(void**)(itemObj + 0x550) == 0 &&
-			    static_cast<signed char>(
-			        static_cast<int>((static_cast<unsigned int>(itemObj[0x50]) << 28) & 0xC0000000) >> 31) != 0 &&
-			    canDelete != 0 && scriptObjectPos < bestScriptObjectPos) {
-				bestScriptObjectPos = scriptObjectPos;
-				bestItemObj = itemObj;
-			}
-		}
-
-		if (bestItemObj != 0) {
-			deleteObject__12CFlatRuntimeFPQ212CFlatRuntime7CObject(CFlat, bestItemObj);
-			deletedCount = 1;
-		} else {
-			if (2U < (unsigned int)System.m_execParam) {
-				Printf__7CSystemFPce(&System, const_cast<char*>(DAT_801dced4));
-			}
-		}
-
-		Printf__7CSystemFPce(&System, const_cast<char*>(DAT_801dcef8), deletedCount);
-		if (deletedCount == 0) {
-			if (2U < (unsigned int)System.m_execParam) {
-				Printf__7CSystemFPce(&System, const_cast<char*>(DAT_801dcf10));
-			}
-			return 0;
-		}
-	}
-
-	gItemObjCreateFlags = createFlags;
-	CFlatRuntime::CStack inStack[5];
-	CFlatRuntime::CStack outStack;
-	inStack[0].m_word = createMode;
-	inStack[1].m_word = createFlags;
-	inStack[2].m_word = scriptArg;
-	inStack[3].m_word = owner != 0 ? owner->m_particleId : 0;
-	*reinterpret_cast<float*>(&inStack[4].m_word) = launchAngle;
-	SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-	    &CFlat, 0, 1, 7, 5, inStack, &outStack);
-
-	CGPrgObj* newItem = 0;
-	if (createMode != 1) {
-		newItem = (CGPrgObj*)intToClass__13CFlatRuntime2Fi(CFlat, (int)outStack.m_word);
-		unsigned char* itemSelf = (unsigned char*)newItem;
-
-		if (createMode == 2) {
-			*(int*)(itemSelf + 0x558) = scriptArg;
-			newItem->m_radiusCtrl.y = FLOAT_80331b18;
-		}
-
-		changeStat__8CGPrgObjFiii(newItem, 0x1B, 0, 0);
-
-		if ((createFlags & 1) != 0) {
-			float safePosDist;
-			Vec safePos;
-			float yRot = owner->m_rotBaseY + RandFPM__5CMathFf(FLOAT_80331b54, &Math);
-
-			newItem->m_worldPosition.x = FLOAT_80331b1c * (float)sin((double)yRot) + owner->m_worldPosition.x;
-			newItem->m_worldPosition.y = FLOAT_80331b1c + owner->m_worldPosition.y;
-			newItem->m_worldPosition.z = FLOAT_80331b1c * (float)cos((double)yRot) + owner->m_worldPosition.z;
-
-			safePosDist = CalcSafePos__8CGObjectFiP8CGObjectP3Vec(newItem, 0x41, owner, &safePos);
-			if (FLOAT_80331b20 < safePosDist) {
-				moveVectorHRot__8CGObjectFfffi(
-				    owner, FLOAT_80331b8c + owner->m_rotBaseY, FLOAT_80331b20, safePosDist / FLOAT_80331b90, 3);
-			}
-
-			newItem->m_worldPosition = safePos;
-			SetPosBG__8CGObjectFP3Veci(newItem, &safePos, 1);
-		}
-
-		if ((createFlags & 4) != 0) {
-			newItem->m_worldPosition = owner->m_worldPosition;
-			SetPosBG__8CGObjectFP3Veci(newItem, &newItem->m_worldPosition, 1);
-
-			CVector moveVec((float)sin((double)launchAngle), FLOAT_80331b1c, (float)cos((double)launchAngle));
-			MoveVector__8CGObjectFP3Vecfiiii(newItem, (Vec*)&moveVec, FLOAT_80331b94, 1, 0, 1, 0);
-		}
-
-		if ((createFlags & 2) != 0) {
-			changeStat__8CGPrgObjFiii(newItem, 0x23, 0, 0);
-			newItem->m_worldPosition.x = owner->m_worldPosition.x;
-			newItem->m_worldPosition.y = owner->m_worldPosition.y + FLOAT_80331b98;
-			newItem->m_worldPosition.z = owner->m_worldPosition.z;
-			*(CGObject**)(itemSelf + 0x550) = owner;
-
-			void* ownerScriptSlot = owner->m_scriptHandle[0xED];
-			if ((unsigned int)System.m_execParam >= 3U) {
-				Printf__7CSystemFPce(&System, const_cast<char*>(DAT_801dcf34), ownerScriptSlot);
-			}
-			*(CGPrgObj**)(m_boss__8CGMonObj + (int)ownerScriptSlot * 4 + 8) = newItem;
-
-			CCharaPcs::CHandle* handle = new (Game.m_mainStage, const_cast<char*>(DAT_801dcf58), 0x28E) CCharaPcs::CHandle;
-			reinterpret_cast<CGItemObj*>(newItem)->m_pendingModelHandle = handle;
-			handle->Add();
-
-			handle->LoadModelASync(2, ccfs->m_modelId, ccfs->m_modelParam);
-
-			if ((unsigned int)System.m_execParam >= 3U) {
-				Printf__7CSystemFPce(&System, const_cast<char*>(DAT_801dcf64));
-			}
-
-			*(int*)(itemSelf + 0x56C) = ccfs->m_itemJumpCountdown;
-			*(char**)(itemSelf + 0x570) = ccfs->m_memoryCapsuleName;
-			*(int*)(itemSelf + 0x574) = ccfs->m_arg0;
-		}
-	}
-
-	return newItem;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80125650
- * PAL Size: 916b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
+void CGItemObj::onFrame()
 {
 	unsigned char* self = (unsigned char*)this;
-	CFlatRuntime::CStack stack[3];
-	int canSystemCall = 0;
+	CCharaPcs::CHandle* handle = m_pendingModelHandle;
 
-	if (carryState == 0) {
-		bool isStageCarry = false;
-		bool isMenuBossStage = false;
-
-		if (Game.m_gameWork.m_menuStageMode != 0 &&
-			Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
-			isMenuBossStage = true;
-		}
-		if (isMenuBossStage) {
-			unsigned int cid = static_cast<unsigned short>(partyObj->GetCID());
-			unsigned int stageCarry = (unsigned int)__cntlzw(0x6D - (cid & 0x6D));
-			if (((stageCarry >> 5) & 0xFF) != 0) {
-				isStageCarry = true;
-			}
-		}
-		if (isStageCarry && *(int*)(*(unsigned char**)((unsigned char*)partyObj + 0x58) + 0x3B4) != 0) {
-			canSystemCall = 1;
+	if (handle != 0 && handle->IsLoadModelASyncCompleted()) {
+		if ((unsigned int)System.m_execParam >= 3U) {
+			Printf__7CSystemFPce(&System, const_cast<char*>(DAT_801dd010));
 		}
 
-		*(CGPartyObj**)(self + 0x550) = partyObj;
-		*(int*)(self + 0x554) = carryMode;
+		m_charaModelHandle = reinterpret_cast<CCharaPcs::CHandle*>(m_pendingModelHandle);
+		m_pendingModelHandle = 0;
 
-		if (carryMode == 0) {
-			CVector attachOffset(FLOAT_80331b20, FLOAT_80331b20, FLOAT_80331b20);
-			bool useBossAttachName = false;
+		if (m_worldParamA == 0xCB) {
+			LoadAnim__8CGObjectFPciiiUl(this, m_pendingAnimName, 0, 0, 2, m_pendingAnimFlags);
+			SetAnimSlot__8CGObjectFii(this, 0, 0);
+			PlayAnim__8CGObjectFiiiiiPSc(this, 0, 1, 0, -1, -1, 0);
 
-			if (Game.m_gameWork.m_menuStageMode != 0) {
-				bool condA = false;
-				bool condB = false;
-				bool condC = false;
-
-				if (Game.m_gameWork.m_menuStageMode != 0 &&
-					Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
-					condC = true;
-				}
-				if (condC) {
-					unsigned int cid = static_cast<unsigned short>(partyObj->GetCID());
-					unsigned int stageCarry = (unsigned int)__cntlzw(0x6D - (cid & 0x6D));
-					if (((stageCarry >> 5) & 0xFF) != 0) {
-						condB = true;
-					}
-				}
-				if (condB && *(int*)(*(unsigned char**)((unsigned char*)partyObj + 0x58) + 0x3B4) != 0) {
-					condA = true;
-				}
-				if (condA) {
-					useBossAttachName = true;
-				}
+			CGObject* owner = m_owner;
+			int ownerScriptSlot = *(int*)(*(int*)((unsigned char*)owner + 0x58) + 0x3B4);
+			int soundEntry = *(int*)(*(int*)(*reinterpret_cast<int*>(m_boss__8CGMonObj) + 0xF8) + 0x178);
+			if (soundEntry != 0) {
+				soundEntry = *(int*)(soundEntry + 0x14);
+			} else {
+				soundEntry = -1;
 			}
 
-			const char* attachName = DAT_80331b84;
-			if (useBossAttachName) {
-				attachName = DAT_80331b7c;
-			}
-			Attach__8CGObjectFP8CGObjectPcP3Vec(this, partyObj, const_cast<char*>(attachName),
-			                                    reinterpret_cast<Vec*>(&attachOffset));
-			changeStat__8CGPrgObjFiii(this, 0, 0, 0);
-			*(float*)(self + 0x144) = FLOAT_80331b20;
-		} else {
-			changeStat__8CGPrgObjFiii(this, 0xB, 0, 0);
-		}
-	} else if (carryState == 1 || carryState == 2) {
-		bool isStageCarry = false;
-		bool isMenuBossStage = false;
+			unsigned char* itemTable = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]);
+			float particleValue = static_cast<float>(*reinterpret_cast<unsigned short*>(itemTable + m_worldParamB * 0x48 + 0x10));
+			float particleScale = FLOAT_80331b50 * (float)particleValue + FLOAT_80331b4c;
+			putParticle__8CGPrgObjFiiP8CGObjectfi(
+			    this, (soundEntry << 8) | ownerScriptSlot, m_particleSlot, this, particleScale, 0x12909);
 
-		if (Game.m_gameWork.m_menuStageMode != 0 &&
-			Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
-			isMenuBossStage = true;
+			CVector zero(FLOAT_80331b20, FLOAT_80331b20, FLOAT_80331b20);
+			SetDamageCol__8CGObjectFiPcffP3Vec(
+			    this, 0, const_cast<char*>(DAT_80331bc8), FLOAT_80331bb8, FLOAT_80331bb8, reinterpret_cast<Vec*>(&zero));
+			*reinterpret_cast<unsigned int*>(&m_damageColliders[1].m_localPosition.x) = 8;
+			addSubStat__8CGPrgObjFv(this);
 		}
-		if (isMenuBossStage) {
-			CGPartyObj* carryObj = *(CGPartyObj**)(self + 0x550);
-			unsigned int cid = static_cast<unsigned short>(carryObj->GetCID());
-			unsigned int stageCarry = (unsigned int)__cntlzw(0x6D - (cid & 0x6D));
-			if (((stageCarry >> 5) & 0xFF) != 0) {
-				isStageCarry = true;
-			}
-		}
-		if (isStageCarry && *(int*)(*(unsigned char**)(*(unsigned char**)(self + 0x550) + 0x58) + 0x3B4) != 0) {
-			canSystemCall = 1;
-		}
-
-		*(int*)(self + 0x554) = carryMode;
-
-		if (carryMode == 0) {
-			Vec safePos;
-			float safeDist = CalcSafePos__8CGObjectFiP8CGObjectP3Vec(
-				this, 0x41, *(CGPartyObj**)(self + 0x550), &safePos);
-			if (FLOAT_80331b20 < safeDist) {
-				CGPartyObj* carryObj = *(CGPartyObj**)(self + 0x550);
-				moveVectorHRot__8CGObjectFfffi(
-					carryObj,
-					FLOAT_80331b8c + *(float*)((unsigned char*)carryObj + 0x1A8),
-					FLOAT_80331b20,
-					safeDist / FLOAT_80331b90,
-					3);
-			}
-			Detach__8CGObjectFv(this);
-			*(Vec*)(self + 0x15C) = safePos;
-			*(int*)(self + 0x550) = 0;
-			changeStat__8CGPrgObjFiii(this, 0, 0, 0);
-			*(int*)(self + 0x56C) = 8;
-			*(float*)(self + 0x144) = FLOAT_80331b20;
-		} else {
-			changeStat__8CGPrgObjFiii(this, ((int)~(carryState - 1 | 1 - carryState) >> 0x1F) + 0xD, 0, 0);
-		}
-
-		*reinterpret_cast<u32*>(self + 0x94) = 0x1194;
 	}
 
-	if ((*(unsigned int*)(self + 0x5C) & 0x10) != 0 && canSystemCall != 0) {
-		stack[0].m_word = 3;
-		stack[1].m_word = static_cast<unsigned int>((-carryState | carryState) >> 0x1F);
-		stack[2].m_word = 0;
-		SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-			&CFlat, 0, 1, 9, 3, stack, 0);
+	onFrame__8CGPrgObjFv(this);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80126eb4
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGItemObj::onCancelStat(int)
+{
+	unsigned char* self = (unsigned char*)this;
+
+	if (*(int*)(self + 0x520) == 0x1b) {
+		*(unsigned int*)(self + 0x1c0) = *(unsigned int*)(self + 0x1c0) | 2;
+		*(float*)(self + 0x17c) = FLOAT_80331b18;
+		*(float*)(self + 0x178) = FLOAT_80331b18;
+		*(float*)(self + 0x174) = FLOAT_80331b18;
 	}
 }
 
 /*
  * --INFO--
- * PAL Address: 0x8012564c
+ * PAL Address: 0x80126ee0
+ * PAL Size: 40b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGItemObj::onChangeStat(int state)
+{
+	unsigned char* self = (unsigned char*)this;
+
+	if (state < 0x28 && state >= 0x26) {
+		*(unsigned int*)(self + 0x1c0) = *(unsigned int*)(self + 0x1c0) & 0xfff7fffe;
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80126f08
+ * PAL Size: 48b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGItemObj::onFramePostCalc()
+{
+	unsigned char* self = (unsigned char*)this;
+
+	if (static_cast<signed char>(
+	        static_cast<int>((static_cast<unsigned int>(self[0x50]) << 28) & 0xC0000000) >> 31) != 0 &&
+	    *(void**)(self + 0x550) == 0) {
+		*(int*)(self + 0x94) = *(int*)(self + 0x94) - 1;
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80126f38
  * PAL Size: 4b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGItemObj::onChangePrg(int)
+void CGItemObj::onFramePreCalc()
 {
 	// TODO
 }
 
 /*
  * --INFO--
- * PAL Address: 0x801254cc
- * PAL Size: 384b
+ * PAL Address: 0x80126f3c
+ * PAL Size: 88b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGItemObj::onFrameAlways()
+void CGItemObj::onDestroy()
 {
 	unsigned char* self = (unsigned char*)this;
-	int countdown = *(int*)(self + 0x56C);
+	CCharaPcs::CHandle* handle = m_pendingModelHandle;
 
-	if (countdown != 0) {
-		int next = countdown - 1;
-		*(int*)(self + 0x56C) = next & ~(next >> 0x1F);
-		float radius = *(float*)(self + 0x568) * (float)(8 - *(int*)(self + 0x56C));
-		*(float*)(self + 0x144) = radius * FLOAT_80331b68;
+	if (handle != 0) {
+		delete handle;
 	}
 
-	if (*(int*)(self + 0x500) == 0xA) {
-		int canUseTrace;
-
-		if (static_cast<int>(Game.m_gameWork.m_gameInitFlag) != 0 &&
-		    static_cast<signed char>(
-		        static_cast<int>((static_cast<unsigned int>(*(unsigned char*)(CFlat + 4836)) << 28) & 0xC0000000) >> 31) != 0 &&
-		    static_cast<signed char>(
-		        static_cast<int>((static_cast<unsigned int>(*(unsigned char*)(CFlat + 4836)) << 29) & 0xC0000000) >> 31) != 0 &&
-		    static_cast<signed char>(
-		        static_cast<int>((static_cast<unsigned int>(*(unsigned char*)(self + 0x9A)) << 24) & 0xC0000000) >> 31) != 0 &&
-		    *(int*)(CFlat + 4780) == 0 && *(void**)(self + 0x550) == 0) {
-			canUseTrace = true;
-		} else {
-			canUseTrace = false;
-		}
-
-		if (canUseTrace && *(int*)(CFlat + 66604) == 0) {
-			*(int*)(CFlat + 66604) = GetFreeParticleSlot__13CFlatRuntime2Fv(CFlat);
-			putParticleTrace__8CGPrgObjFiiP8CGObjectfi(this, 0x141, *(int*)(CFlat + 66604), this, FLOAT_80331b18, 0);
-		} else if (!canUseTrace && *(int*)(CFlat + 66604) != 0) {
-			EndParticleSlot__13CFlatRuntime2Fii(CFlat, *(int*)(CFlat + 66604), 0);
-			*(int*)(CFlat + 66604) = 0;
-		}
-	}
+	DeleteParticleSlot__13CFlatRuntime2Fii(CFlat, *(int*)(self + 0x55c), 0);
+	onDestroy__8CGPrgObjFv(self);
 }
 
 /*
  * --INFO--
- * PAL Address: 0x8012529C
- * PAL Size: 556b
+ * PAL Address: 0x80126f94
+ * PAL Size: 116b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGItemObj::onHitParticle(int effectIndex, int, int, int, Vec*, PPPIFPARAM* hitParam)
+void CGItemObj::onCreate()
 {
-	unsigned char* self = (unsigned char*)this;
-	int worldParamA = *(int*)(self + 0x500);
-	unsigned char* particleRow = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2] + hitParam->m_particleIndex * 0x48);
-	int particleAttr = (int)*reinterpret_cast<unsigned short*>(particleRow + 8);
-
-	if (worldParamA == 0xD || worldParamA == 0xE) {
-		if (((particleAttr == 0 || particleAttr == 4) && worldParamA == 0xD) ||
-		    (particleAttr == 1 && worldParamA == 0xE)) {
-			int particleNo;
-			int classControl;
-
-			switch (particleAttr) {
-			case 1:
-				particleNo = 0x20;
-				classControl = 0x491;
-				break;
-			case 0:
-				particleNo = 0x1F;
-				classControl = 0x492;
-				break;
-			case 4:
-				particleNo = 0x2F;
-				classControl = 0x493;
-				break;
-			}
-
-			EndParticleSlot__13CFlatRuntime2Fii(CFlat, *(int*)(self + 0x55C), 0);
-			ResetParticleWork__13CFlatRuntime2Fii(CFlat, particleNo | 0x100, *(int*)(self + 0x55C));
-			SetParticleWorkPos__13CFlatRuntime2FR3Vecf(CFlat, *(Vec*)(self + 0x15C), FLOAT_80331b20);
-			SetParticleWorkCol__13CFlatRuntime2Fiif(CFlat, 9, 0, FLOAT_80331b18);
-			SetParticleWorkParam__13CFlatRuntime2FiPQ212CFlatRuntime7CObject(CFlat, classControl, this);
-			PutParticleWork__13CFlatRuntime2Fv(CFlat);
-			*(unsigned int*)(self + 0x1C0) &= 0xFFF7FFFF;
-			addSubStat__8CGPrgObjFv(this);
-		}
-	} else {
-		if (((worldParamA != 0xCB) || (*(int*)(self + 0x520) != 0x24)) && *(int*)(self + 0x520) != 0x25) {
-			return;
-		}
-
-		if ((static_cast<unsigned int>(particleAttr - 0x66) <= 1U) || (particleAttr == 0x65)) {
-			int classId = hitParam->m_classId;
-			unsigned char* classObj;
-
-			if (classId != 0) {
-				classObj = (unsigned char*)intToClass__13CFlatRuntime2Fi(CFlat, classId);
-			} else {
-				classObj = 0;
-			}
-
-			void* objectBehavior = *(void**)(classObj + 0x48);
-			unsigned int cid =
-			    reinterpret_cast<unsigned int (*)(void*)>((*reinterpret_cast<void***>(objectBehavior))[3])(
-			        objectBehavior);
-
-			if ((cid & 0x6D) == 0x6D && *(void**)(self + 0x550) == classObj) {
-				changeStat__8CGPrgObjFiii(this, 0x26, 0, 0);
-			}
-		}
-	}
-
-	IgnoreParticle__13CFlatRuntime2FiPQ212CFlatRuntime7CObject(CFlat, effectIndex, this);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80124FE0
- * PAL Size: 700b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGItemObj::loadModel()
-{
-	unsigned char* self = (unsigned char*)this;
-	int modelNo = -1;
-	int modelVariant = 0;
-	int modelFlag = 0;
-	unsigned long animFlags = (unsigned long)-1;
-	char* standAnim = const_cast<char*>(s_stand_80331B44);
-	int useParticleTable = 1;
-	int itemType = *(int*)(self + 0x500);
-
-	switch (itemType) {
-	case 0xA:
-		modelNo = 8;
-		useParticleTable = 0;
-		break;
-	case 0xC:
-		modelNo = 0x27;
-		useParticleTable = 0;
-		break;
-	case 0xD:
-		modelNo = 0x33;
-		useParticleTable = 0;
-		break;
-	case 0xE:
-		modelNo = 0x33;
-		modelVariant = 1;
-		useParticleTable = 0;
-		break;
-	case 0x12:
-	case 0x13:
-	case 0x14:
-	case 0x15:
-	case 0x16:
-	case 0x17:
-	case 0x1F:
-	case 0x20:
-	case 0x21:
-	case 0x24: {
-		int itemEntryOffset = *(int*)(self + 0x504) * 0x48 + 2;
-		int itemEntry = *(unsigned short*)(Game.unkCFlatData0[2] + itemEntryOffset);
-
-		self[0x53] = 1;
-		modelNo = itemEntry & 0xFFF;
-		modelVariant = itemEntry >> 0xC;
-		self[0x50] = static_cast<unsigned char>(__rlwimi(self[0x50], 1, 3, 28, 28));
-		*(int*)(self + 0x94) = 0x1194;
-		animFlags = 0x12;
-		modelFlag = 1;
-		break;
-	}
-	case 0xCB:
-	default:
-		break;
-	}
-
-	if (modelNo >= 0) {
-		LoadModel__8CGObjectFiUlUli(this, 3, modelNo, modelVariant, modelFlag);
-		LoadAnim__8CGObjectFPciiiUl(this, standAnim, 0, 0, 3, animFlags);
-		SetAnimSlot__8CGObjectFii(this, 0, 0);
-		PlayAnim__8CGObjectFiiiiiPSc(this, 0, 1, 0, -1, -1, 0);
-	}
-
-	if (*(int*)(self + 0x500) == 0x12) {
-		DispCharaParts__8CGObjectFi(this, 0);
-		self[0x50] = static_cast<unsigned char>(__rlwimi(self[0x50], 1, 4, 27, 27));
-	}
-
-	if (useParticleTable != 0) {
-		for (int i = 0; i < 3; i++) {
-			if (i != 0 || m_createFlags != 1) {
-				int entryBase = Game.unkCFlatData0[2] + *(int*)(self + 0x504) * 0x48;
-				int particleNo = *(unsigned short*)(entryBase + i * 2 + 0x14);
-
-				if (particleNo != 0xFFFF) {
-					float particleScale =
-					    FLOAT_80331b50 * (float)(unsigned short)*(unsigned short*)(entryBase + 0x10) + FLOAT_80331b4c;
-					putParticle__8CGPrgObjFiiP8CGObjectfi(
-					    this, particleNo | 0x100, *(int*)(self + 0x55C), this, particleScale, 0);
-				}
-			}
-		}
-	}
-
-	if (*(int*)(self + 0x500) == 0xCB) {
-		*(float*)(self + 0x1D4) = FLOAT_80331b54 - RandF__5CMathFf(FLOAT_80331b58, &Math);
-		*(unsigned char*)(self + 0x9A) =
-		    static_cast<unsigned char>(__rlwimi(*(unsigned char*)(self + 0x9A), 0, 2, 29, 29));
-	}
-
-	self[0x54C] = static_cast<unsigned char>(__rlwimi(self[0x54C], 1, 7, 24, 24));
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80124fac
- * PAL Size: 52b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGItemObj::onNewFinished()
-{
-	*(float*)((u8*)this + 0x568) = *(float*)((u8*)this + 0x144);
-	*(u16*)((u8*)this + 0x560) = (u16)((gItemObjCreateFlags >> 3) & 1);
-	loadModel();
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80124e04
- * PAL Size: 424b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGItemObj::DrawOmoideName(CFont* font)
-{
-	unsigned char* self = (unsigned char*)this;
-
-	if ((signed char)((int)(((unsigned int)*(unsigned char*)(self + 0x9A) << 0x1A) & 0xC0000000) >> 31) != 0) {
-		void* charaHandle = *(void**)(self + 0xF8);
-		bool hasModel = false;
-		if (charaHandle != 0 && *(void**)((unsigned char*)charaHandle + 0x168) != 0) {
-			hasModel = true;
-		}
-
-		if (hasModel && *(int*)(self + 0x500) == 0xCB && 0.0f < *(float*)(self + 0x74) &&
-		    0.0f != *(float*)(self + 0x4B0)) {
-			font->SetTlut(7);
-
-			int alphaInt = (int)(255.0f * *(float*)(self + 0x4B0));
-			CColor textColor(0xFF, 0xFF, 0xFF, alphaInt);
-			font->SetColor(textColor.color);
-
-			const ItemObjFlatData* flatData = reinterpret_cast<const ItemObjFlatData*>(&Game.m_cFlatDataArr[1]);
-			const char* name = flatData->table[2].index[*(int*)(self + 0x570)];
-			float width = font->GetWidth(name);
-			float depthScale = FLOAT_80331b18 / (*(float*)(self + 0x74) - FLOAT_80331b1c);
-			float posY = 224.0f - 224.0f * *(float*)(self + 0x6C) * depthScale;
-			float posZ = *(float*)(self + 0x70) * depthScale;
-			float posX =
-			    -(0.5f * width - (320.0f * *(float*)(self + 0x68) * depthScale + 320.0f));
-
-			font->SetPosX(posX);
-			font->SetPosY(posY - 11.0f);
-			font->SetPosZ(posZ);
-			font->Draw(name);
-		}
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80124cb8
- * PAL Size: 332b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGItemObj::ItemJump(int state, float jump)
-{
-	for (CGItemObj* itemObj = static_cast<CGItemObj*>(FindGItemObjFirst__13CFlatRuntime2Fv(CFlat)); itemObj != 0;
-	     itemObj = static_cast<CGItemObj*>(FindGItemObjNext__13CFlatRuntime2FP9CGItemObj(CFlat, itemObj))) {
-		CGObject* object = reinterpret_cast<CGObject*>(itemObj);
-
-		if ((object->m_objectFlags & 0x10) == 0) {
-			unsigned int mapMask = object->m_bgHitMask;
-			CMapCylinderRaw cylinder;
-			Vec move;
-
-			move.x = FLOAT_80331b20;
-			move.y = FLOAT_80331b24;
-			move.z = FLOAT_80331b20;
-
-			cylinder.m_bottom = object->m_worldPosition;
-			cylinder.m_bottom.y += FLOAT_80331b1c;
-			cylinder.m_top.x = FLOAT_80331b20;
-			cylinder.m_top.y = FLOAT_80331b20;
-			cylinder.m_top.z = FLOAT_80331b20;
-			cylinder.m_axis.x = FLOAT_80331b20;
-			cylinder.m_axis.y = FLOAT_80331b24;
-			cylinder.m_axis.z = FLOAT_80331b20;
-			cylinder.m_radius = FLOAT_80331b20;
-			cylinder.m_boundsMin.x = FLOAT_80331b28;
-			cylinder.m_boundsMin.y = FLOAT_80331b28;
-			cylinder.m_boundsMin.z = FLOAT_80331b28;
-			cylinder.m_boundsMax.x = FLOAT_80331b2c;
-			cylinder.m_boundsMax.y = FLOAT_80331b2c;
-			cylinder.m_boundsMax.z = FLOAT_80331b2c;
-
-			if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
-			        &MapMng, reinterpret_cast<CMapCylinder*>(&cylinder), &move, mapMask) != 0 &&
-			    g_hit_f->m_groupIndex == state) {
-				object->m_groundHitOffset.y += jump;
-			}
-		}
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80124c2c
- * PAL Size: 140b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGItemObj::DeleteAllFieldItem()
-{
-	for (CGItemObj* itemObj = (CGItemObj*)FindGItemObjFirst__13CFlatRuntime2Fv(CFlat); itemObj != 0;
-	     itemObj = (CGItemObj*)FindGItemObjNext__13CFlatRuntime2FP9CGItemObj(CFlat, itemObj)) {
-		if (itemObj->m_owner == 0 &&
-		    static_cast<signed char>(
-		        static_cast<int>((static_cast<unsigned int>(itemObj->m_stateFlags0) << 28) & 0xC0000000) >> 31) != 0) {
-			itemObj->m_flags = static_cast<unsigned char>(__rlwimi(itemObj->m_flags, 1, 7, 24, 24));
-		}
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80124b88
- * PAL Size: 164b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGItemObj::DispAllFieldItem(int show)
-{
-	for (CGItemObj* itemObj = (CGItemObj*)FindGItemObjFirst__13CFlatRuntime2Fv(CFlat); itemObj != 0;
-	     itemObj = (CGItemObj*)FindGItemObjNext__13CFlatRuntime2FP9CGItemObj(CFlat, itemObj)) {
-		if (itemObj->m_owner == 0 &&
-		    static_cast<signed char>(
-		        static_cast<int>((static_cast<unsigned int>(itemObj->m_stateFlags0) << 28) & 0xC0000000) >> 31) != 0) {
-			if (show != 0) {
-				itemObj->m_displayFlags &= 0xffbfffff;
-			} else {
-				itemObj->m_displayFlags |= 0x400000;
-			}
-		}
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80124b78
- * PAL Size: 8b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-int CGItemObj::GetCID()
-{
-	return 0x1d;
+	onCreate__8CGPrgObjFv(this);
+	m_flagBits.bits.unk0 = 0;
+	m_owner = 0;
+	m_scriptArg = 0;
+	m_createFlags = 0;
+	unk_0x562 = 0;
+	m_pendingModelHandle = 0;
+	m_itemJumpCountdown = 0;
+	memset(&m_memoryCapsuleNameIndex, 0, 0xc);
+	m_particleSlot = GetFreeParticleSlot__13CFlatRuntime2Fv(CFlat);
 }

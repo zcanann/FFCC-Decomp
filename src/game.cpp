@@ -978,7 +978,7 @@ void CGame::loadCfd()
         localLangDirs[4] = s_localLangDirs[4];
         localLangDirs[5] = s_localLangDirs[5];
 
-        sprintf(path, PTR_s_dvd__scft_param_cfd[i], localLangDirs[m_gameWork.m_languageId]);
+        sprintf(path, PTR_s_dvd__scft_param_cfd[i], localLangDirs[Game.m_gameWork.m_languageId]);
         CFile::CHandle* handle = File.Open(path, 0, CFile::PRI_LOW);
 
         if (handle != nullptr)

@@ -1227,6 +1227,9 @@ void CSound::LoadBlock()
     u8* self = reinterpret_cast<u8*>(this);
     CSoundLayout& sound = *reinterpret_cast<CSoundLayout*>(self);
     CFile::CHandle*& waveFile = sound.m_waveFile;
+    char sePath[256];
+    char wavePath0[256];
+    char wavePath1[256];
 
     if (reinterpret_cast<CRedSound*>(self + 8)->ReentryWaveData(0) == -1) {
         if (waveFile != 0) {
@@ -1237,9 +1240,8 @@ void CSound::LoadBlock()
 
         reinterpret_cast<CRedSound*>(self + 8)->SetWaveData(-1, 0, 0);
 
-        char wavePath[256];
-        sprintf(wavePath, s_soundWavePathFmt, 0);
-        waveFile = File.Open(wavePath, 0, CFile::PRI_LOW);
+        sprintf(wavePath0, s_soundWavePathFmt, 0);
+        waveFile = File.Open(wavePath0, 0, CFile::PRI_LOW);
         if (waveFile != 0) {
             sound.m_waveRemain = File.GetLength(waveFile);
             sound.m_waveOffset = 0;
@@ -1261,9 +1263,8 @@ void CSound::LoadBlock()
 
         reinterpret_cast<CRedSound*>(self + 8)->SetWaveData(-1, 0, 0);
 
-        char wavePath[256];
-        sprintf(wavePath, s_soundWavePathFmt, 500);
-        waveFile = File.Open(wavePath, 0, CFile::PRI_LOW);
+        sprintf(wavePath1, s_soundWavePathFmt, 500);
+        waveFile = File.Open(wavePath1, 0, CFile::PRI_LOW);
         if (waveFile != 0) {
             sound.m_waveRemain = File.GetLength(waveFile);
             sound.m_waveOffset = 0;
@@ -1277,7 +1278,6 @@ void CSound::LoadBlock()
     }
 
     for (int i = 0; i < 4; i++) {
-        char sePath[260];
         sprintf(sePath, s_soundSeBlockPathFmt, i);
         CFile::CHandle* handle = File.Open(sePath, 0, CFile::PRI_LOW);
         if (handle != 0) {

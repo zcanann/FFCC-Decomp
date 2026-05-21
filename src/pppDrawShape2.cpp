@@ -4,10 +4,6 @@
 #include "dolphin/types.h"
 #include "ffcc/ppp_linkage.h"
 
-extern "C" {
-void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(void*, void*, float, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char);
-}
-
 typedef struct ShapeState {
     u16 value;
     u16 counter;

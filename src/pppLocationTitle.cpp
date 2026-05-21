@@ -7,11 +7,6 @@
 #include <string.h>
 #include "ffcc/ppp_linkage.h"
 
-extern void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(void*, void*, float,
-                                                                       unsigned char, unsigned char,
-                                                                       unsigned char, unsigned char,
-                                                                       unsigned char, unsigned char,
-                                                                       unsigned char);
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" int rand(void);
 

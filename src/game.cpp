@@ -22,11 +22,13 @@
 #include "ffcc/cflat_runtime2.h"
 #include "ffcc/gobject.h"
 #include "ffcc/linkage.h"
+#include "ffcc/p_chara.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/p_FunnyShape.h"
 #include "ffcc/p_graphic.h"
 #include "ffcc/p_light.h"
 #include "ffcc/p_map.h"
+#include "ffcc/p_MaterialEditor.h"
 #include "ffcc/p_mc.h"
 #include "ffcc/p_menu.h"
 #include "ffcc/p_tina.h"
@@ -36,50 +38,24 @@
 
 #include <dolphin/os/OSMemory.h>
 #include <dolphin/os/OSRtc.h>
-#include <string.h>
 
 extern "C" {
 void Printf__7CSystemFPce(CSystem*, const char*, ...);
 unsigned int AddScenegraph__7CSystemFP8CProcessi(CSystem*, void*, int);
 void RemoveScenegraph__7CSystemFP8CProcessi(CSystem*, void*, int);
 void ExecScenegraph__7CSystemFv(CSystem*);
-void Quit__11CDbgMenuPcsFv(void*);
-void Quit__6CMcPcsFv(void*);
-void Quit__7CGbaPcsFv(void*);
-void Quit__8CMenuPcsFv(void*);
-void Quit__6CCharaFv(void*);
-void Quit__7CMapPcsFv(void*);
-void Quit__18CMaterialEditorPcsFv(void*);
-void Quit__14CFunnyShapePcsFv(void*);
-void Quit__11CGraphicPcsFv(void*);
-void Quit__10CCameraPcsFv(void*);
 void createLoad__8CPartPcsFv(void*);
 void pppDeleteAll__8CPartMngFv(void*);
 void pppDestroyAll__8CPartMngFv(void*);
 int pppGetIfDt__8CPartMngFs(void*, short);
 void pppEndPart__8CPartMngFi(void*, int);
-void Init__11CGraphicPcsFv(void*);
-void Init__7CMapPcsFv(void*);
-void Init__18CMaterialEditorPcsFv(void*);
-void Init__14CFunnyShapePcsFv(void*);
-void Init__10CCameraPcsFv(void*);
-void Init__7CGbaPcsFv(void*);
-void Init__11CDbgMenuPcsFv(void*);
-void Init__9CCharaPcsFv(void*);
-void Init__8CMenuPcsFv(void*);
-void Init__6CCharaFv(void*);
-void Init__6CMcPcsFv(void*);
 int sprintf(char*, const char*, ...);
 int GetMapObjIdx__7CMapMngFUs(void*, unsigned short);
 void SetMapObjLMtx__7CMapMngFiPA4_f(void*, int, Mtx);
 void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
     void*, int, int, int, int, void*, void*);
 void Draw__5CWindFv(void*);
-void CheckMenu__10CGPartyObjFv();
 void CheckMenu__10CGPartyObjFv(void);
-void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-    void*, int, int, int, int, void*, void*);
-int sprintf(char*, const char*, ...);
 int rand(void);
 void* __register_global_object(void*, void*, void*);
 void __ct__12CCaravanWorkFv(void*);
@@ -300,19 +276,19 @@ void CGame::Init()
         break;
     }
 
-    Init__10CCameraPcsFv(&CameraPcs);
-    Init__11CGraphicPcsFv(&GraphicPcs);
-    Init__6CCharaFv(&gChara);
+    CameraPcs.Init();
+    GraphicPcs.Init();
+    gChara.Init();
     LightPcs.Init();
-    Init__9CCharaPcsFv(&CharaPcs);
-    Init__7CMapPcsFv(&MapPcs);
-    Init__18CMaterialEditorPcsFv(&MaterialEditorPcs);
-    Init__14CFunnyShapePcsFv(&FunnyShapePcs);
+    CharaPcs.Init();
+    MapPcs.Init();
+    MaterialEditorPcs.Init();
+    FunnyShapePcs.Init();
     USBPcs.Init();
-    Init__8CMenuPcsFv(&MenuPcs);
-    Init__7CGbaPcsFv(&GbaPcs);
-    Init__6CMcPcsFv(GetMcPcsSingleton());
-    Init__11CDbgMenuPcsFv(&DbgMenuPcs);
+    MenuPcs.Init();
+    GbaPcs.Init();
+    GetMcPcsSingleton()->Init();
+    DbgMenuPcs.Init();
 
     m_mainStage = Memory.CreateStage(0x106000, const_cast<char*>(lbl_8032F6B4), 0);
     if (OSGetConsoleSimulatedMemSize() == 0x3000000) {
@@ -347,19 +323,19 @@ void CGame::Quit()
 	}
 
 	Memory.DestroyStage(m_mainStage);
-	Quit__11CDbgMenuPcsFv(&DbgMenuPcs);
-	Quit__6CMcPcsFv(GetMcPcsSingleton());
-	Quit__7CGbaPcsFv(&GbaPcs);
-	Quit__8CMenuPcsFv(&MenuPcs);
+	DbgMenuPcs.Quit();
+	GetMcPcsSingleton()->Quit();
+	GbaPcs.Quit();
+	MenuPcs.Quit();
 	USBPcs.Quit();
-	Quit__6CCharaFv(&Chara);
+	Chara.Quit();
 	CharaPcs.Quit();
 	LightPcs.Quit();
-	Quit__7CMapPcsFv(&MapPcs);
-	Quit__18CMaterialEditorPcsFv(&MaterialEditorPcs);
-	Quit__14CFunnyShapePcsFv(&FunnyShapePcs);
-	Quit__11CGraphicPcsFv(&GraphicPcs);
-	Quit__10CCameraPcsFv(&CameraPcs);
+	MapPcs.Quit();
+	MaterialEditorPcs.Quit();
+	FunnyShapePcs.Quit();
+	GraphicPcs.Quit();
+	CameraPcs.Quit();
 }
 
 /*

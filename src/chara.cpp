@@ -30,7 +30,6 @@ extern "C" void __dt__Q36CChara5CMesh12CDisplayListFv(void*, int);
 extern "C" void __dt__Q26CChara5CSkinFv(void*, int);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 extern "C" void __ct__7CVectorFv(void*);
-extern "C" void Printf__7CSystemFPce(CSystem*, const char*, ...);
 extern "C" void InitQuantize__Q26CChara5CAnimFv(void*);
 extern "C" void Interp__Q26CChara9CAnimNodeFPQ26CChara5CAnimP3SRTf(void*, void*, void*, float);
 extern "C" void SetTextureSet__12CMaterialSetFP11CTextureSet(CMaterialSet*, CTextureSet*);
@@ -2984,7 +2983,7 @@ void CChara::CMesh::Calc(CChara::CModel* model)
 
 		if ((s_charaMeshWorkWarnArmed != 0) && (System.m_execParam > 1)) {
 			s_charaMeshWorkWarnArmed = 0;
-			Printf__7CSystemFPce(&System, s_charaMeshWorkOverflow);
+			System.Printf(const_cast<char*>(s_charaMeshWorkOverflow));
 		}
 		return;
 	}

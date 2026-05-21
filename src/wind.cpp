@@ -545,13 +545,14 @@ void CWind::Draw()
         int i = 0;
         do {
             if (GetWindActiveFlag(obj) != 0) {
-                CVector center(obj->centerX, FLOAT_80330ef0, obj->centerZ);
                 if (obj->type == 1) {
                     CColor color(0xff, 0xff, 0, 0xff);
+                    CVector center(obj->centerX, FLOAT_80330ef0, obj->centerZ);
                     Graphic.DrawSphere(viewMtx, reinterpret_cast<Vec*>(&center), obj->radius, &color.color);
                 } else {
                     u8 alpha = (u8)(FLOAT_80330f1c * (FLOAT_80330ef8 - obj->lifeRatio));
                     CColor color(0xff, 0xff, 0x80, alpha);
+                    CVector center(obj->centerX, FLOAT_80330ef0, obj->centerZ);
                     Graphic.DrawSphere(viewMtx, reinterpret_cast<Vec*>(&center), obj->radius, &color.color);
                 }
             }

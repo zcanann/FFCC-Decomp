@@ -5,8 +5,6 @@
 
 #include <string.h>
 
-extern "C" void __ct__Q26CChara9CAnimNodeFv(void*);
-extern "C" void __dt__Q26CChara9CAnimNodeFv(void*, int);
 extern "C" const char s_CChara_CAnim_801DA970[] = "CChara::CAnim";
 extern "C" const char s_charaAnimSourceFile[] = "chara_anim.cpp";
 extern "C" const char s_charaAnimAllocWarn[32] =

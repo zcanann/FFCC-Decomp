@@ -33,11 +33,6 @@ extern "C" CGObject* FindGObjNext__13CFlatRuntime2FP8CGObject(void*, CGObject*);
 extern "C" CGQuadObj* FindGQuadObjFirst__13CFlatRuntime2Fv(void*);
 extern "C" int CrossCheckSphereVector__5CMathFP3VecPfP3VecP3VecP3Vecf(
     CMath*, Vec*, float*, Vec*, Vec*, Vec*, float, float, float);
-extern "C" void* __nw__Q29CCharaPcs7CHandleFUlPQ27CMemory6CStagePci(unsigned long, void*, char*, int);
-extern "C" void* __ct__Q29CCharaPcs7CHandleFv(void*);
-extern "C" void __dt__Q29CCharaPcs7CHandleFv(void*, int);
-extern "C" void Add__Q29CCharaPcs7CHandleFv(void*);
-extern "C" void LoadModel__Q29CCharaPcs7CHandleFiUlUlUliii(void*, int, unsigned long, unsigned long, unsigned long, int, int, int);
 extern "C" CGQuadObj* FindGQuadObjNext__13CFlatRuntime2FP9CGQuadObj(void*, CGQuadObj*);
 extern "C" int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, CMapCylinder*, Vec*, u32);
 extern "C" int CalcHitSlide__7CMapObjFP3Vecf(void*, Vec*);
@@ -2817,19 +2812,13 @@ void CGObject::InitWork(int index)
 void CGObject::LoadModel(int kind, unsigned long modelId, unsigned long variant, int arg3)
 {
     if (m_charaModelHandle != 0) {
-        __dt__Q29CCharaPcs7CHandleFv(m_charaModelHandle, 1);
+        delete m_charaModelHandle;
         m_charaModelHandle = 0;
     }
 
-    void* handle = __nw__Q29CCharaPcs7CHandleFUlPQ27CMemory6CStagePci(
-        0x194, Game.m_mainStage, const_cast<char*>(s_gobject_cpp), 0xA01);
-    if (handle != 0) {
-        handle = __ct__Q29CCharaPcs7CHandleFv(handle);
-    }
-
-    m_charaModelHandle = static_cast<CCharaPcs::CHandle*>(handle);
-    Add__Q29CCharaPcs7CHandleFv(m_charaModelHandle);
-    LoadModel__Q29CCharaPcs7CHandleFiUlUlUliii(m_charaModelHandle, kind, modelId, variant, 0, -1, 0, arg3);
+    m_charaModelHandle = new (Game.m_mainStage, const_cast<char*>(s_gobject_cpp), 0xA01) CCharaPcs::CHandle;
+    m_charaModelHandle->Add();
+    m_charaModelHandle->LoadModel(kind, modelId, variant, 0, -1, 0, arg3);
 }
 
 /*
@@ -2844,29 +2833,21 @@ void CGObject::LoadModel(int kind, unsigned long modelId, unsigned long variant,
 void CGObject::LoadWeapon(int itemId, int itemVariant)
 {
     if (m_weaponModelHandle != 0) {
-        __dt__Q29CCharaPcs7CHandleFv(m_weaponModelHandle, 1);
+        delete m_weaponModelHandle;
         m_weaponModelHandle = 0;
     }
 
     if (itemId > 0) {
-        void* handle =
-            __nw__Q29CCharaPcs7CHandleFUlPQ27CMemory6CStagePci(
-                0x194, Game.m_mainStage, const_cast<char*>(s_gobject_cpp), 0xA11);
-        if (handle != 0) {
-            handle = __ct__Q29CCharaPcs7CHandleFv(handle);
-        }
-
-        m_weaponModelHandle = static_cast<CCharaPcs::CHandle*>(handle);
-        Add__Q29CCharaPcs7CHandleFv(m_weaponModelHandle);
+        m_weaponModelHandle = new (Game.m_mainStage, const_cast<char*>(s_gobject_cpp), 0xA11) CCharaPcs::CHandle;
+        m_weaponModelHandle->Add();
 
         unsigned long textureVariant = 0;
         if (m_ownerType == 0) {
             textureVariant = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2);
         }
 
-        LoadModel__Q29CCharaPcs7CHandleFiUlUlUliii(
-            m_weaponModelHandle, 4, static_cast<unsigned long>(itemId), static_cast<unsigned long>(itemVariant),
-            textureVariant, -1, 0, 1);
+        m_weaponModelHandle->LoadModel(
+            4, static_cast<unsigned long>(itemId), static_cast<unsigned long>(itemVariant), textureVariant, -1, 0, 1);
         m_weaponAttachNode =
             SearchNode__Q26CChara6CModelFPc(m_charaModelHandle->m_model, const_cast<char*>(s_r_item));
     }
@@ -2884,28 +2865,20 @@ void CGObject::LoadWeapon(int itemId, int itemVariant)
 void CGObject::LoadShield(int itemId)
 {
     if (m_shieldModelHandle != 0) {
-        __dt__Q29CCharaPcs7CHandleFv(m_shieldModelHandle, 1);
+        delete m_shieldModelHandle;
         m_shieldModelHandle = 0;
     }
 
     if (itemId > 0) {
-        void* handle =
-            __nw__Q29CCharaPcs7CHandleFUlPQ27CMemory6CStagePci(
-                0x194, Game.m_mainStage, const_cast<char*>(s_gobject_cpp), 0xA23);
-        if (handle != 0) {
-            handle = __ct__Q29CCharaPcs7CHandleFv(handle);
-        }
-
-        m_shieldModelHandle = static_cast<CCharaPcs::CHandle*>(handle);
-        Add__Q29CCharaPcs7CHandleFv(m_shieldModelHandle);
+        m_shieldModelHandle = new (Game.m_mainStage, const_cast<char*>(s_gobject_cpp), 0xA23) CCharaPcs::CHandle;
+        m_shieldModelHandle->Add();
 
         unsigned long textureVariant = 0;
         if (m_ownerType == 0) {
             textureVariant = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2);
         }
 
-        LoadModel__Q29CCharaPcs7CHandleFiUlUlUliii(
-            m_shieldModelHandle, 4, static_cast<unsigned long>(itemId), 0, textureVariant, -1, 0, 1);
+        m_shieldModelHandle->LoadModel(4, static_cast<unsigned long>(itemId), 0, textureVariant, -1, 0, 1);
         m_shieldAttachNodeIndex =
             SearchNode__Q26CChara6CModelFPc(m_charaModelHandle->m_model, const_cast<char*>(s_l_item2));
     }

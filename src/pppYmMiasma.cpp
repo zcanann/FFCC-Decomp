@@ -30,7 +30,6 @@ extern "C" void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
     void*, void*, float, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char,
     unsigned char);
 extern "C" void pppSetBlendMode(unsigned char);
-extern "C" void pppDrawShp__FPlsP12CMaterialSetUc(long*, short, CMaterialSet*, unsigned char);
 extern "C" const char s_pppYmMiasma_cpp_801D9CA8[] = "pppYmMiasma.cpp";
 
 struct PARTICLE_DATA : _PARTICLE_DATA {};
@@ -204,8 +203,7 @@ void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, YmMiasmaRenderStep* step, pppY
             amb.a = state->m_color.m_a;
             GXSetChanAmbColor(GX_COLOR0A0, amb);
             pppSetBlendMode(step->m_blendMode);
-            pppDrawShp__FPlsP12CMaterialSetUc(
-                *shape, state->m_shapeDrawFrame, pppEnvStPtr->m_materialSetPtr, step->m_blendMode);
+            pppDrawShp(*shape, state->m_shapeDrawFrame, pppEnvStPtr->m_materialSetPtr, step->m_blendMode);
         }
 
         particleData = (PARTICLE_DATA*)((u8*)particleData + 0x50);

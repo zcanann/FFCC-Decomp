@@ -13,6 +13,35 @@ class CMemory;
 
 enum _GXTexMapID;
 
+#ifdef FFCC_TEXTUREMAN_USE_PTRARRAY_MEMBER
+template <class T>
+class CPtrArray
+{
+public:
+    CPtrArray();
+    virtual ~CPtrArray();
+
+    bool Add(T item);
+    void SetAt(unsigned long index, T item);
+    int GetSize();
+    void RemoveAll();
+    void ReleaseAndRemoveAll();
+    T operator[](unsigned long index);
+    void SetStage(CMemory::CStage* stage);
+    void SetDefaultSize(unsigned long defaultSize);
+    int setSize(unsigned long newSize);
+    T GetAt(unsigned long index);
+
+private:
+    unsigned long m_numItems;
+    unsigned long m_size;
+    unsigned long m_defaultSize;
+    T* m_items;
+    CMemory::CStage* m_stage;
+    int m_growCapacity;
+};
+#endif
+
 class CTexture : public CRef
 {
 public:
@@ -63,7 +92,11 @@ public:
     int Find(char*);
     void ReleaseTextureIdx(int, CAmemCacheSet*);
 
-    unsigned char m_textureArrayStorage[0x1C];
+#ifdef FFCC_TEXTUREMAN_USE_PTRARRAY_MEMBER
+    CPtrArray<CTexture*> m_textureArray;
+#else
+    unsigned char m_textureArray[0x1C];
+#endif
 };
 
 class CTextureMan : public CManager

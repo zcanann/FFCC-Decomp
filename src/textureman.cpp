@@ -1,3 +1,4 @@
+#define FFCC_TEXTUREMAN_USE_PTRARRAY_MEMBER
 #include "ffcc/textureman.h"
 #include "ffcc/chunkfile.h"
 #include "ffcc/system.h"
@@ -6,33 +7,6 @@
 #include <PowerPC_EABI_Support/Runtime/New.h>
 
 CTextureMan TextureMan;
-
-template <class T>
-class CPtrArray
-{
-public:
-    CPtrArray();
-    virtual ~CPtrArray();
-
-    bool Add(T item);
-    void SetAt(unsigned long index, T item);
-    int GetSize();
-    void RemoveAll();
-    void ReleaseAndRemoveAll();
-    T operator[](unsigned long index);
-    void SetStage(CMemory::CStage* stage);
-    void SetDefaultSize(unsigned long defaultSize);
-    int setSize(unsigned long newSize);
-    T GetAt(unsigned long index);
-
-private:
-    unsigned long m_numItems;
-    unsigned long m_size;
-    unsigned long m_defaultSize;
-    T* m_items;
-    CMemory::CStage* m_stage;
-    int m_growCapacity;
-};
 
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
@@ -75,11 +49,6 @@ static inline unsigned char* Ptr(void* p, unsigned int offset)
     return reinterpret_cast<unsigned char*>(p) + offset;
 }
 
-static inline CPtrArray<CTexture*>* TextureArray(unsigned char* storage)
-{
-    return reinterpret_cast<CPtrArray<CTexture*>*>(storage);
-}
-
 static inline unsigned short& U16At(void* p, unsigned int offset)
 {
     return *reinterpret_cast<unsigned short*>(Ptr(p, offset));
@@ -109,22 +78,22 @@ static inline CTexture* AllocTexture()
  */
 void CTextureSet::ReleaseTextureIdx(int idx, CAmemCacheSet* amemCacheSet)
 {
-    if ((*TextureArray(m_textureArrayStorage))[idx] != 0) {
-        if ((*TextureArray(m_textureArrayStorage))[idx]->m_cacheId != -1) {
-            if (*reinterpret_cast<int*>(Ptr((*TextureArray(m_textureArrayStorage))[idx], 4)) <= 1) {
-                amemCacheSet->DestroyCache((*TextureArray(m_textureArrayStorage))[idx]->m_cacheId);
-                (*TextureArray(m_textureArrayStorage))[idx]->m_imageData = 0;
+    if (m_textureArray[idx] != 0) {
+        if (m_textureArray[idx]->m_cacheId != -1) {
+            if (*reinterpret_cast<int*>(Ptr(m_textureArray[idx], 4)) <= 1) {
+                amemCacheSet->DestroyCache(m_textureArray[idx]->m_cacheId);
+                m_textureArray[idx]->m_imageData = 0;
             }
         }
 
-        int* refObj = reinterpret_cast<int*>((*TextureArray(m_textureArrayStorage))[idx]);
+        int* refObj = reinterpret_cast<int*>(m_textureArray[idx]);
         int refCount = refObj[1] - 1;
         refObj[1] = refCount;
         if (refCount == 0) {
             delete reinterpret_cast<CTexture*>(refObj);
         }
 
-        TextureArray(m_textureArrayStorage)->SetAt(idx, 0);
+        m_textureArray.SetAt(idx, 0);
     }
 }
 
@@ -139,8 +108,8 @@ void CTextureSet::ReleaseTextureIdx(int idx, CAmemCacheSet* amemCacheSet)
  */
 int CTextureSet::Find(char* name)
 {
-    for (unsigned long i = 0; i < static_cast<unsigned long>(TextureArray(m_textureArrayStorage)->GetSize()); i++) {
-        CTexture* texture = (*TextureArray(m_textureArrayStorage))[i];
+    for (unsigned long i = 0; i < static_cast<unsigned long>(m_textureArray.GetSize()); i++) {
+        CTexture* texture = m_textureArray[i];
         if ((texture != 0) && (strcmp(texture->m_name, name) == 0)) {
             return static_cast<int>(i);
         }
@@ -163,7 +132,7 @@ void CTextureSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage, int appe
     CTexture* texture;
 
     if (append == 0) {
-        TextureArray(m_textureArrayStorage)->ReleaseAndRemoveAll();
+        m_textureArray.ReleaseAndRemoveAll();
     }
 
     chunkFile.PushChunk();
@@ -175,8 +144,8 @@ void CTextureSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage, int appe
 
             if (texture->m_name[0] != 0) {
                 unsigned int duplicateIdx;
-                for (duplicateIdx = 0; duplicateIdx < (unsigned int)TextureArray(m_textureArrayStorage)->GetSize(); duplicateIdx++) {
-                    CTexture* existing = (*TextureArray(m_textureArrayStorage))[duplicateIdx];
+                for (duplicateIdx = 0; duplicateIdx < (unsigned int)m_textureArray.GetSize(); duplicateIdx++) {
+                    CTexture* existing = m_textureArray[duplicateIdx];
                     if ((existing != 0) && (strcmp(existing->m_name, texture->m_name) == 0)) {
                         goto found_duplicate;
                     }
@@ -197,21 +166,21 @@ void CTextureSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage, int appe
                         delete reinterpret_cast<CTexture*>(refObj);
                     }
 
-                    texture = (*TextureArray(m_textureArrayStorage))[duplicateIdx];
+                    texture = m_textureArray[duplicateIdx];
                     *reinterpret_cast<int*>(Ptr(texture, 4)) = *reinterpret_cast<int*>(Ptr(texture, 4)) + 1;
                 }
             }
 
             if (append != 0) {
-                for (unsigned int i = 0; i < (unsigned int)TextureArray(m_textureArrayStorage)->GetSize(); i++) {
-                    if ((*TextureArray(m_textureArrayStorage))[i] == 0) {
-                        TextureArray(m_textureArrayStorage)->SetAt(i, texture);
+                for (unsigned int i = 0; i < (unsigned int)m_textureArray.GetSize(); i++) {
+                    if (m_textureArray[i] == 0) {
+                        m_textureArray.SetAt(i, texture);
                         goto next_chunk;
                     }
                 }
             }
 
-            TextureArray(m_textureArrayStorage)->Add(texture);
+            m_textureArray.Add(texture);
         next_chunk:;
             break;
         }
@@ -246,7 +215,7 @@ void CTextureSet::Create(void* filePtr, CMemory::CStage* stage, int append, CAme
                 while (chunkFile.GetNextChunk(chunk)) {
                     if (chunk.m_id == 0x54534554) {
                         if (append == 0) {
-                            TextureArray(m_textureArrayStorage)->ReleaseAndRemoveAll();
+                            m_textureArray.ReleaseAndRemoveAll();
                         }
 
                         chunkFile.PushChunk();
@@ -259,8 +228,8 @@ void CTextureSet::Create(void* filePtr, CMemory::CStage* stage, int append, CAme
                                 if (texture->m_name[0] != 0) {
                                     char* textureName = texture->m_name;
                                     unsigned int duplicateIdx;
-                                    for (duplicateIdx = 0; duplicateIdx < (unsigned int)TextureArray(m_textureArrayStorage)->GetSize(); duplicateIdx++) {
-                                        CTexture* existing = (*TextureArray(m_textureArrayStorage))[duplicateIdx];
+                                    for (duplicateIdx = 0; duplicateIdx < (unsigned int)m_textureArray.GetSize(); duplicateIdx++) {
+                                        CTexture* existing = m_textureArray[duplicateIdx];
                                         if ((existing != 0)
                                             && (strcmp(existing->m_name, textureName) == 0)) {
                                             goto found_duplicate;
@@ -282,21 +251,21 @@ void CTextureSet::Create(void* filePtr, CMemory::CStage* stage, int append, CAme
                                             delete reinterpret_cast<CTexture*>(refObj);
                                         }
 
-                                        texture = (*TextureArray(m_textureArrayStorage))[duplicateIdx];
+                                        texture = m_textureArray[duplicateIdx];
                                         *reinterpret_cast<int*>(Ptr(texture, 4)) = *reinterpret_cast<int*>(Ptr(texture, 4)) + 1;
                                     }
                                 }
 
                                 if (append != 0) {
-                                    for (unsigned long i = 0; i < static_cast<unsigned long>(TextureArray(m_textureArrayStorage)->GetSize()); i++) {
-                                        if ((*TextureArray(m_textureArrayStorage))[i] == 0) {
-                                            TextureArray(m_textureArrayStorage)->SetAt(i, texture);
+                                    for (unsigned long i = 0; i < static_cast<unsigned long>(m_textureArray.GetSize()); i++) {
+                                        if (m_textureArray[i] == 0) {
+                                            m_textureArray.SetAt(i, texture);
                                             goto next_texture;
                                         }
                                     }
                                 }
 
-                                TextureArray(m_textureArrayStorage)->Add(texture);
+                                m_textureArray.Add(texture);
                                 break;
                             }
                         next_texture:;
@@ -334,8 +303,7 @@ void* CTextureSet::operator new(unsigned long size, CMemory::CStage*, char* file
  */
 CTextureSet::~CTextureSet()
 {
-    TextureArray(m_textureArrayStorage)->ReleaseAndRemoveAll();
-    TextureArray(m_textureArrayStorage)->CPtrArray<CTexture*>::~CPtrArray();
+    m_textureArray.ReleaseAndRemoveAll();
 }
 
 /*
@@ -349,9 +317,8 @@ CTextureSet::~CTextureSet()
  */
 CTextureSet::CTextureSet()
 {
-    new (TextureArray(m_textureArrayStorage)) CPtrArray<CTexture*>;
-    TextureArray(m_textureArrayStorage)->SetDefaultSize(0x10);
-    TextureArray(m_textureArrayStorage)->SetStage(TextureMan.m_memoryStage);
+    m_textureArray.SetDefaultSize(0x10);
+    m_textureArray.SetStage(TextureMan.m_memoryStage);
 }
 
 /*

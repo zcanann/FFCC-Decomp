@@ -546,17 +546,17 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
     CharaBreakStep* stepData = (CharaBreakStep*)step;
     CharaBreakWork* workData = (CharaBreakWork*)work;
     CharaBreakModelData* modelData = ModelData(model);
-    CChara::CMesh* mesh = reinterpret_cast<CChara::CMesh*>(ModelMeshes(model));
+    CharaBreakMeshRef* mesh = ModelMeshes(model);
     u32 meshIndex;
-    s32 threshold;
+    s16 threshold;
 
     threshold = (s32)((workData->m_value0 * (workData->m_bboxMax.y - workData->m_bboxMin.y)) *
-                      (float)((double)(1 << modelData->m_posQuant)));
+                      (float)(1 << modelData->m_posQuant));
 
     for (meshIndex = 0; meshIndex < modelData->m_meshCount; meshIndex++) {
         bool needsMtxUpdate = false;
         Mtx meshToWorld;
-        CharaBreakMeshRef* meshRef = reinterpret_cast<CharaBreakMeshRef*>(mesh);
+        CharaBreakMeshRef* meshRef = mesh;
         CharaBreakMeshData* meshData = meshRef->m_data;
         S16Vec* workPositions = meshRef->m_workPositions;
 
@@ -567,9 +567,12 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
         }
 
         for (int dl = meshData->m_displayListCount - 1; dl >= 0; dl--) {
-            int meshBuffers = *(int*)((int)workData->m_meshBuffers + (meshIndex * 4));
-            u8* polygon = *(u8**)(*(int*)(meshBuffers + (dl * 4)) + 0xC);
-            u16 polygonCount = *(u16*)(*(int*)(meshBuffers + (dl * 4)) + 8);
+            CharaBreakDisplayListPair** displayListPairs =
+                reinterpret_cast<CharaBreakDisplayListPair**>(
+                    reinterpret_cast<void**>(workData->m_meshBuffers)[meshIndex]);
+            CharaBreakDisplayListPair* displayListPair = displayListPairs[dl];
+            u8* polygon = reinterpret_cast<u8*>(displayListPair->m_polygonData);
+            u16 polygonCount = displayListPair->m_polygonCount;
 
             for (u32 polyIndex = 0; polyIndex < polygonCount; polyIndex++) {
                 S16Vec transformed[3];
@@ -753,7 +756,7 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
             }
         }
 
-        mesh = (CChara::CMesh*)((u8*)mesh + 0x14);
+        mesh++;
     }
 }
 

@@ -7,6 +7,7 @@
 #include "ffcc/partMng.h"
 #include "ffcc/partyobj.h"
 #include "ffcc/prgobj.h"
+#include "ffcc/cflat_runtime2.h"
 #include "ffcc/game.h"
 #include "ffcc/vector.h"
 
@@ -530,18 +531,15 @@ void CGItemObj::onHitParticle(int effectIndex, int, int, int, Vec*, PPPIFPARAM* 
 
 		if ((static_cast<unsigned int>(particleAttr - 0x66) <= 1U) || (particleAttr == 0x65)) {
 			int classId = hitParam->m_classId;
-			unsigned char* classObj;
+			CGObject* classObj;
 
 			if (classId != 0) {
-				classObj = (unsigned char*)intToClass__13CFlatRuntime2Fi(CFlat, classId);
+				classObj = reinterpret_cast<CGObject*>(gCFlatRuntime2.intToClass(classId));
 			} else {
 				classObj = 0;
 			}
 
-			void* objectBehavior = *(void**)(classObj + 0x48);
-			unsigned int cid =
-			    reinterpret_cast<unsigned int (*)(void*)>((*reinterpret_cast<void***>(objectBehavior))[3])(
-			        objectBehavior);
+			unsigned int cid = classObj->GetCID();
 
 			if ((cid & 0x6D) == 0x6D && *(void**)(self + 0x550) == classObj) {
 				changeStat__8CGPrgObjFiii(this, 0x26, 0, 0);

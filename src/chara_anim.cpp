@@ -13,6 +13,7 @@ extern "C" const char s_charaAnimAllocWarn[32] =
 extern "C" void gqrInit__6CCharaFUlUlUl(void*, unsigned long, unsigned long, unsigned long);
 extern "C" void SetGroup__7CMemoryFPvi(CMemory*, void*, int);
 extern "C" void CopyFromAMemorySync__7CMemoryFPvPvUl(CMemory*, void*, void*, unsigned long);
+extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 extern "C" int TryReleaseAnimBank__9CCharaPcsFi(void*, int);
 class CCharaPcs;
 extern CChara Chara;
@@ -303,7 +304,7 @@ void CChara::CAnim::Create(void* data, CMemory::CStage* stage)
 					m_bankAddress = Chara.m_animBankAddress;
 					Chara.m_animBankAddress += m_bankSize;
 					if (m_bank != 0) {
-						delete[] static_cast<unsigned char*>(m_bank);
+						delete static_cast<unsigned char*>(m_bank);
 						m_bank = 0;
 					}
 					break;
@@ -368,8 +369,8 @@ void CChara::CAnimNode::Interp(CChara::CAnim* anim, SRT* srt, float frame)
 {
 	if (anim->m_bank == 0) {
 		while (anim->m_bank == 0) {
-			anim->m_bank =
-			    new (anim->m_stage, const_cast<char*>(s_charaAnimSourceFile), 0x160) unsigned char[anim->m_bankSize];
+			anim->m_bank = _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
+			    &Memory, anim->m_bankSize, anim->m_stage, const_cast<char*>(s_charaAnimSourceFile), 0x160, 1);
 
 			if (anim->m_bank != 0) {
 				break;

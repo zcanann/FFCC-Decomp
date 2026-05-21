@@ -326,8 +326,8 @@ void CMenuPcs::CompaDraw()
  */
 bool CMenuPcs::CompaClose()
 {
-    int finishedCount;
     CompaOpenAnim* entry;
+    int finishedCount;
     int count;
     int frame;
 
@@ -484,8 +484,8 @@ activeHold:
  */
 bool CMenuPcs::CompaOpen()
 {
-    int finishedCount;
     CompaOpenAnim* entry;
+    int finishedCount;
     int count;
     int frame;
 

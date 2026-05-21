@@ -20,8 +20,6 @@ extern const float kPppHeapUseRateDivisor;
 
 extern "C" const char s_no_name_8032fdcc[];
 
-extern "C" CProfile* __ct__8CProfileFPc(CProfile*, char*);
-extern "C" CProfile* __dt__8CProfileFv(CProfile*, short);
 extern "C" void create__8CPartPcsFv(CPartPcs*);
 extern "C" void destroy__8CPartPcsFv(CPartPcs*);
 extern "C" void calcInit__8CPartPcsFv(CPartPcs*);
@@ -42,7 +40,6 @@ extern "C" int pppLoadPdt__8CPartMngFPCciiPvi(CPartMng*, const char*, int, int, 
 extern "C" void pppLoadPmd__8CPartMngFPCc(CPartMng*, const char*);
 extern "C" void pppLoadPan__8CPartMngFPCc(CPartMng*, const char*);
 extern "C" int pppGetFreeDataMng__8CPartMngFv(CPartMng*);
-extern "C" char* GetLangString__5CGameFv(void*);
 extern "C" void pppReleasePdt__8CPartMngFi(CPartMng*, int);
 extern "C" int pppCreate__8CPartMngFiiP14PPPCREATEPARAMi(CPartMng*, int, int, PPPCREATEPARAM*, int);
 extern "C" void SetRStage__13CAmemCacheSetFPQ27CMemory6CStage(void*, void*);
@@ -1460,7 +1457,7 @@ int CPartPcs::LoadMenuPdt(char* fileName)
     CMemory::CStage* stage;
     char path[0x100];
 
-    sprintf(path, s_dvd__smenu__s_801d7fb0, GetLangString__5CGameFv(&Game), fileName);
+    sprintf(path, s_dvd__smenu__s_801d7fb0, Game.GetLangString(), fileName);
 
     if (Game.m_gameWork.m_menuStageMode != 0) {
         stage = MenuPcs.m_stageF4;

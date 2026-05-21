@@ -393,8 +393,8 @@ void CMemory::Init()
             *reinterpret_cast<unsigned char**>(modeBase + 4) = modeBase;
             *reinterpret_cast<unsigned char**>(modeBase + 0x130) = modeBase + 600;
 
-            unsigned char* stageBase = modeBase;
-            for (int index = 0; index < 32; index += 4) {
+            CStage* stageBase = reinterpret_cast<CStage*>(modeBase + 0x258);
+            for (int index = 0; index < 32; index++) {
                 unsigned char* next;
 
                 if (index == 0x1F) {
@@ -402,30 +402,9 @@ void CMemory::Init()
                 } else {
                     next = modeBase + (index + 1) * 300 + 600;
                 }
-                *reinterpret_cast<unsigned char**>(stageBase + 0x25C) = next;
 
-                if (index == 0x1E) {
-                    next = modeBase + 300;
-                } else {
-                    next = modeBase + (index + 2) * 300 + 600;
-                }
-                *reinterpret_cast<unsigned char**>(stageBase + 0x388) = next;
-
-                if (index == 0x1D) {
-                    next = modeBase + 300;
-                } else {
-                    next = modeBase + (index + 3) * 300 + 600;
-                }
-                *reinterpret_cast<unsigned char**>(stageBase + 0x4B4) = next;
-
-                if (index == 0x1C) {
-                    next = modeBase + 300;
-                } else {
-                    next = modeBase + (index + 4) * 300 + 600;
-                }
-                *reinterpret_cast<unsigned char**>(stageBase + 0x5E0) = next;
-
-                stageBase += 0x4B0;
+                stageBase->m_next = reinterpret_cast<CStage*>(next);
+                stageBase++;
             }
         }
 

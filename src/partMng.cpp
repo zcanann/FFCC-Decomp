@@ -80,7 +80,6 @@ extern "C" void __dt__10pppModelStFv(pppModelSt* modelSt, int);
 extern "C" void __construct_array(void*, void (*)(void*), void (*)(void*, int), unsigned long, unsigned long);
 extern "C" void __destroy_arr(void*, void*, unsigned long, unsigned long);
 extern "C" void pppDestroyHeap__FP9_pppEnvSt(_pppEnvSt*);
-extern "C" void __dt__Q29CCharaPcs7CHandleFv(void*, int);
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, int, int, int, int);
 extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
@@ -422,9 +421,10 @@ void CPartMng::Destroy()
     }
 
     if (res->m_editorObj != 0) {
-        void* handle = *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(res->m_editorObj) + 0xf8);
+        CCharaPcs::CHandle* handle =
+            *reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(res->m_editorObj) + 0xf8);
         if (handle != 0) {
-            __dt__Q29CCharaPcs7CHandleFv(handle, 1);
+            delete handle;
             *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(res->m_editorObj) + 0xf8) = 0;
         }
         __dl__FPv(res->m_editorObj);

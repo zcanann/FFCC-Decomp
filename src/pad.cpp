@@ -14,6 +14,8 @@
 
 #include <string.h>
 
+extern "C" void* __RTTI__8CManager[];
+
 CPad Pad;
 
 void* operator new[](unsigned long, CMemory::CStage*, char*, int);

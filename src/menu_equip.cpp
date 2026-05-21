@@ -30,7 +30,7 @@ extern "C" void DrawRect__8CMenuPcsFUlfffffffff(double, double, double, double, 
                                                  int);
 extern "C" void DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(double, double, double, double, double, double, double, double,
                                                            CMenuPcs*, int, void*);
-extern "C" void DrawSingleIcon__8CMenuPcsFiiifif(double, CMenuPcs*, int, int, int, float);
+extern "C" void DrawSingleIcon__8CMenuPcsFiiifif(CMenuPcs*, int, int, int, float, int, float);
 extern "C" void DrawInit__8CMenuPcsFv(CMenuPcs*);
 extern "C" s16* GetLetterBuffer__6JoyBusFi(void*, int);
 extern "C" double CalcListPos__8CMenuPcsFiii(CMenuPcs*, int, int, int);
@@ -543,7 +543,7 @@ void CMenuPcs::EquipDraw()
 			int iconY = (int)((float)(item[1] + 6) - FLOAT_80332ee0);
 			int iconX = item[0] + item[2] - 0x10;
 			int itemIdx = *(s16*)(caravanWork + *(s16*)(caravanWork + 0xac + i * 2) * 2 + 0xb6);
-			DrawSingleIcon__8CMenuPcsFiiifif((double)*(float*)(item + 8), this, itemIdx, iconX, iconY, FLOAT_80332ee0);
+			DrawSingleIcon__8CMenuPcsFiiifif(this, itemIdx, iconX, iconY, *(float*)(item + 8), 0, FLOAT_80332ee0);
 		}
 		item += 0x20;
 	}
@@ -720,7 +720,7 @@ void CMenuPcs::EquipDraw()
 				int iconY = (int)((float)(iconItem[1] + 6) - FLOAT_80332ee0);
 				int iconX = (int)(float)(iconItem[0] + iconItem[2] - 0x10);
 				int itemIdx = *(s16*)(caravanWork + letter[idx] * 2 + 0xb6);
-				DrawSingleIcon__8CMenuPcsFiiifif((double)*(float*)(listStart + 8), this, itemIdx, iconX, iconY, FLOAT_80332ee0);
+				DrawSingleIcon__8CMenuPcsFiiifif(this, itemIdx, iconX, iconY, *(float*)(listStart + 8), 0, FLOAT_80332ee0);
 			}
 			iconItem += 0x20;
 		}

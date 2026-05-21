@@ -752,8 +752,6 @@ void CLightPcs::SetBit32(CLightPcs::TARGET target, unsigned long* bits)
  */
 void CLightPcs::SetPart(CLightPcs::TARGET target, void* part, unsigned char mode)
 {
-    char* lightPcs = (char*)this;
-
     if (mode == 0) {
         GXSetNumChans((u8)1);
         GXSetChanCtrl((GXChannelID)0, (u8)1, (GXColorSrc)0, (GXColorSrc)1, 0, (GXDiffuseFn)0, (GXAttnFn)2);
@@ -761,36 +759,34 @@ void CLightPcs::SetPart(CLightPcs::TARGET target, void* part, unsigned char mode
         return;
     }
 
-    char* bumpSlot = lightPcs + 0x63c;
-    *(u32*)(lightPcs + 0xb0) = 0;
-    *(u32*)(lightPcs + 0xb4) = 0;
     GXAttnFn attnFn = (GXAttnFn)1;
+    CLight* light = m_sceneLights;
+    m_loadedLightCount = 0;
+    m_loadedLightMask = 0;
 
-    for (u32 i = 0; i < *(u32*)(lightPcs + 0xb8); i++) {
-        if ((*(char*)(bumpSlot + 0x60 + (int)target) != '\0') && (*(u32*)(bumpSlot + 0x64) == (u32)part)) {
-            _GXColor lightColor;
-            *(u32*)&lightColor = *(u32*)(bumpSlot + 0x50 + ((int)target * 4));
-            GXInitLightColor((GXLightObj*)(bumpSlot + 0x6c), lightColor);
-            GXLoadLightObjImm((GXLightObj*)(bumpSlot + 0x6c), (GXLightID)(1 << *(u32*)(lightPcs + 0xb0)));
+    for (u32 i = 0; i < m_sceneLightCount; i++, light++) {
+        if ((light->m_targetEnable[target] != 0) && (light->m_part == part)) {
+            _GXColor lightColor = light->m_targetColor[target];
+            GXInitLightColor(&light->m_gxLightObj, lightColor);
+            GXLoadLightObjImm(&light->m_gxLightObj, (GXLightID)(1 << m_loadedLightCount));
 
-            if (*(char*)(bumpSlot + 0x4f) != '\0') {
+            if (light->m_specularMode != 0) {
                 attnFn = (GXAttnFn)0;
             }
 
-            *(u32*)(lightPcs + 0xb4) |= 1 << *(u32*)(lightPcs + 0xb0);
-            *(u32*)(lightPcs + 0xb0) += 1;
-            if (*(u32*)(lightPcs + 0xb0) > 7) {
+            m_loadedLightMask |= 1 << m_loadedLightCount;
+            m_loadedLightCount += 1;
+            if (m_loadedLightCount >= 8) {
                 break;
             }
         }
-        bumpSlot += 0xb0;
     }
 
     GXSetNumChans((u8)1);
     if (mode == 1) {
-        GXSetChanCtrl((GXChannelID)0, (u8)1, (GXColorSrc)0, (GXColorSrc)1, *(u32*)(lightPcs + 0xb4), (GXDiffuseFn)2, attnFn);
+        GXSetChanCtrl((GXChannelID)0, (u8)1, (GXColorSrc)0, (GXColorSrc)1, m_loadedLightMask, (GXDiffuseFn)2, attnFn);
     } else {
-        GXSetChanCtrl((GXChannelID)0, (u8)1, (GXColorSrc)1, (GXColorSrc)0, *(u32*)(lightPcs + 0xb4), (GXDiffuseFn)2, attnFn);
+        GXSetChanCtrl((GXChannelID)0, (u8)1, (GXColorSrc)1, (GXColorSrc)0, m_loadedLightMask, (GXDiffuseFn)2, attnFn);
     }
     GXSetChanCtrl((GXChannelID)2, (u8)1, (GXColorSrc)0, (GXColorSrc)1, 0, (GXDiffuseFn)0, (GXAttnFn)2);
 }

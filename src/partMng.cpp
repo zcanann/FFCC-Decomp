@@ -2439,17 +2439,27 @@ void CPartMng::pppEditDrawShadow()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8005ae80
+ * PAL Size: 1844b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CPartMng::pppEditDraw()
 {
     static const int kPppMngCount = 0x180;
     static const int kPppMngStride = 0x158;
+    static const int kEditCountOffset = 0x2355C;
+    static const int kEditDrawModeOffset = 0x23570;
+    static const int kCursorEnableOffset = 0x10;
     static const int kBaseTimeOffset = 0x14;
+    static const int kLifeEndOffset = 0x24;
+    static const int kCurrentFrameOffset = 0x34;
     static const int kMatrixOffset = 0x78;
-    static const int kEndRequestedOffset = 0xe5;
+    static const int kEndRequestedOffset = 0xe4;
     static const int kDrawPassOffset = 0xed;
+    static const int kStopAtLifeEndOffset = 0xef;
     static const int kSlotVisibleOffset = 0xe9;
     static const int kOwnerVisibleOffset = 0xf0;
     static const int kCullRadiusSqOffset = 0x108;
@@ -2461,73 +2471,105 @@ void CPartMng::pppEditDraw()
         return;
     }
 
+    m_pppEnvSt.m_debugCounter = 0;
+
     Mtx invCamera;
     Vec cameraPos;
     Vec partPos;
     Vec cameraDelta;
     Vec viewPos;
 
-    for (int passIndex = 0; passIndex < 4; passIndex++) {
-        unsigned char drawPass = 0;
-        if (passIndex == 0) {
-            drawPass = 8;
-        } else if (passIndex == 1) {
-            drawPass = 4;
-        } else if (passIndex == 2) {
-            pppDraw();
-            drawPass = 6;
-        } else {
-            drawPass = 7;
-        }
-
-        PSMTXInverse(ppvCameraMatrix0, invCamera);
-        cameraPos.x = invCamera[0][3];
-        cameraPos.y = invCamera[1][3];
-        cameraPos.z = invCamera[2][3];
-
-        char* mng = reinterpret_cast<char*>(this);
-        for (int i = 0; i < kPppMngCount; i++) {
-            int baseTime = *reinterpret_cast<int*>(mng + kBaseTimeOffset);
-            unsigned char endRequested = *reinterpret_cast<unsigned char*>(mng + kEndRequestedOffset);
-            unsigned char partDrawPass = *reinterpret_cast<unsigned char*>(mng + kDrawPassOffset);
-            unsigned char slotVisible = *reinterpret_cast<unsigned char*>(mng + kSlotVisibleOffset);
-            unsigned char ownerVisible = *reinterpret_cast<unsigned char*>(mng + kOwnerVisibleOffset);
-
-            if (endRequested == 0 && baseTime != -0x1000 && partDrawPass == drawPass && baseTime < 0 && slotVisible != 0
-                && ownerVisible != 0) {
-                partPos.x = *reinterpret_cast<float*>(mng + kMatrixOffset + 0xc);
-                partPos.y = *reinterpret_cast<float*>(mng + kMatrixOffset + 0x1c);
-                partPos.z = *reinterpret_cast<float*>(mng + kMatrixOffset + 0x2c);
-
-                float cullRadiusSq = *reinterpret_cast<float*>(mng + kCullRadiusSqOffset);
-                bool shouldDraw = (cullRadiusSq == 0.0f);
-                if (!shouldDraw) {
-                    PSVECSubtract(&cameraPos, &partPos, &cameraDelta);
-                    if (PSVECSquareMag(&cameraDelta) < cullRadiusSq) {
-                        CBound bound;
-                        float cullRadius = *reinterpret_cast<float*>(mng + kCullRadiusOffset);
-                        float cullYOffset = *reinterpret_cast<float*>(mng + kCullYOffsetOffset);
-                        Vec min;
-                        min.x = partPos.x - cullRadius;
-                        min.y = partPos.y;
-                        min.z = partPos.z - cullRadius;
-                        shouldDraw = (bound.CheckFrustum(min, ppvCameraMatrix0, partPos.y + cullYOffset) != 0);
-                    }
+    if (m_pdtSlots[0].m_pppDataHead != 0) {
+        if (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + kEditDrawModeOffset) < 4) {
+            for (int passIndex = 0; passIndex < 4; passIndex++) {
+                unsigned char drawPass = 0;
+                if (passIndex == 0) {
+                    drawPass = 8;
+                } else if (passIndex == 1) {
+                    drawPass = 4;
+                } else if (passIndex == 2) {
+                    pppDraw();
+                    drawPass = 6;
+                } else {
+                    drawPass = 7;
                 }
 
-                if (shouldDraw) {
-                    PSMTXMultVec(ppvCameraMatrix0, &partPos, &viewPos);
-                    *reinterpret_cast<float*>(mng + kSortDepthOffset) = viewPos.z;
+                PSMTXInverse(ppvCameraMatrix0, invCamera);
+                cameraPos.x = invCamera[0][3];
+                cameraPos.y = invCamera[1][3];
+                cameraPos.z = invCamera[2][3];
 
-                    pppMngStPtr = reinterpret_cast<_pppMngSt*>(mng);
-                    pppEnvStPtr = reinterpret_cast<_pppEnvSt*>(*reinterpret_cast<char**>(mng) + 4);
-                    pppSetFpMatrix(pppMngStPtr);
-                    _pppDrawPart__FP9_pppMngSt(pppMngStPtr);
+                char* mng = reinterpret_cast<char*>(m_pppMng);
+                for (int i = 0; i < kPppMngCount; i++) {
+                    int baseTime = *reinterpret_cast<int*>(mng + kBaseTimeOffset);
+                    unsigned char endRequested = *reinterpret_cast<unsigned char*>(mng + kEndRequestedOffset);
+                    unsigned char partDrawPass = *reinterpret_cast<unsigned char*>(mng + kDrawPassOffset);
+                    unsigned char slotVisible = *reinterpret_cast<unsigned char*>(mng + kSlotVisibleOffset);
+                    unsigned char ownerVisible = *reinterpret_cast<unsigned char*>(mng + kOwnerVisibleOffset);
+
+                    if (endRequested == 0 && baseTime != -0x1000 && partDrawPass == drawPass && baseTime < 0
+                        && slotVisible != 0 && ownerVisible != 0) {
+                        partPos.x = *reinterpret_cast<float*>(mng + kMatrixOffset + 0xc);
+                        partPos.y = *reinterpret_cast<float*>(mng + kMatrixOffset + 0x1c);
+                        partPos.z = *reinterpret_cast<float*>(mng + kMatrixOffset + 0x2c);
+
+                        float cullRadiusSq = *reinterpret_cast<float*>(mng + kCullRadiusSqOffset);
+                        bool shouldDraw = (cullRadiusSq == 0.0f);
+                        if (!shouldDraw) {
+                            PSVECSubtract(&cameraPos, &partPos, &cameraDelta);
+                            if (PSVECSquareMag(&cameraDelta) < cullRadiusSq) {
+                                CBound bound;
+                                float cullRadius = *reinterpret_cast<float*>(mng + kCullRadiusOffset);
+                                float cullYOffset = *reinterpret_cast<float*>(mng + kCullYOffsetOffset);
+                                Vec min;
+                                min.x = partPos.x - cullRadius;
+                                min.y = partPos.y;
+                                min.z = partPos.z - cullRadius;
+                                shouldDraw = (bound.CheckFrustum(min, ppvCameraMatrix0, partPos.y + cullYOffset) != 0);
+                            }
+                        }
+
+                        if (shouldDraw) {
+                            PSMTXMultVec(ppvCameraMatrix0, &partPos, &viewPos);
+                            *reinterpret_cast<float*>(mng + kSortDepthOffset) = viewPos.z;
+
+                            pppMngStPtr = reinterpret_cast<_pppMngSt*>(mng);
+                            pppEnvStPtr = reinterpret_cast<_pppEnvSt*>(*reinterpret_cast<char**>(mng) + 4);
+                            pppSetFpMatrix(pppMngStPtr);
+                            _pppDrawPart__FP9_pppMngSt(pppMngStPtr);
+                        }
+                    }
+
+                    mng += kPppMngStride;
                 }
             }
-
-            mng += kPppMngStride;
+        } else {
+            char* mng = reinterpret_cast<char*>(m_pppMng);
+            int editCount = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + kEditCountOffset);
+            for (int i = 0; i < editCount; i++) {
+                int baseTime = *reinterpret_cast<int*>(mng + kBaseTimeOffset);
+                pppMngStPtr = reinterpret_cast<_pppMngSt*>(mng);
+                if (baseTime != -0x1000 && baseTime < 0) {
+                    partPos.x = *reinterpret_cast<float*>(mng + kMatrixOffset + 0xc);
+                    partPos.y = *reinterpret_cast<float*>(mng + kMatrixOffset + 0x1c);
+                    partPos.z = *reinterpret_cast<float*>(mng + kMatrixOffset + 0x2c);
+                    PSMTXMultVec(ppvCameraMatrix0, &partPos, &viewPos);
+                    *reinterpret_cast<float*>(mng + kSortDepthOffset) = viewPos.z;
+                    ppvDrawMng.AddPrimOt(0x3ff, reinterpret_cast<_pppMngSt*>(mng));
+                    if (*reinterpret_cast<unsigned char*>(mng + kStopAtLifeEndOffset) != 0
+                        && *reinterpret_cast<int*>(mng + kCurrentFrameOffset) == *reinterpret_cast<int*>(mng + kLifeEndOffset)) {
+                        gPppHeapUseRateWords[1] = 0;
+                    }
+                }
+                mng += kPppMngStride;
+            }
+            ppvDrawMng.DrawOt();
         }
+    }
+
+    if (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + kCursorEnableOffset) != 0) {
+        drawCursor();
+        render3Dcursor();
     }
 
     ppvScreenMatrix[2][3] = gPartScreenMatrixRow2W;
@@ -2547,9 +2589,11 @@ void CPartMng::pppEditPartDrawAfter()
 {
     static const int kPppMngCount = 0x180;
     static const int kPppMngStride = 0x158;
+    static const int kEditDrawModeOffset = 0x23570;
+    static const int kHeapCheckIntervalOffset = 0x170;
     static const int kBaseTimeOffset = 0x14;
     static const int kMatrixOffset = 0x78;
-    static const int kEndRequestedOffset = 0xe5;
+    static const int kEndRequestedOffset = 0xe4;
     static const int kDrawPassOffset = 0xed;
     static const int kSlotVisibleOffset = 0xe9;
     static const int kOwnerVisibleOffset = 0xf0;
@@ -2558,67 +2602,75 @@ void CPartMng::pppEditPartDrawAfter()
     static const int kCullYOffsetOffset = 0x110;
     static const int kSortDepthOffset = 0x114;
 
-    if (DAT_8032ed68 != 0) {
-        return;
-    }
+    if (DAT_8032ed68 == 0) {
+        m_pppEnvSt.m_debugCounter = 0;
+        if (m_pdtSlots[0].m_pppDataHead != 0
+            && *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + kEditDrawModeOffset) < 4) {
+            Mtx invCamera;
+            Vec cameraPos;
+            Vec partPos;
+            Vec cameraDelta;
+            Vec viewPos;
 
-    Mtx invCamera;
-    Vec cameraPos;
-    Vec partPos;
-    Vec cameraDelta;
-    Vec viewPos;
+            for (int passIndex = 0; passIndex < 3; passIndex++) {
+                unsigned char drawPass = static_cast<unsigned char>(passIndex + 5);
 
-    for (int passIndex = 0; passIndex < 3; passIndex++) {
-        unsigned char drawPass = static_cast<unsigned char>(passIndex + 5);
+                PSMTXInverse(ppvCameraMatrix0, invCamera);
+                cameraPos.x = invCamera[0][3];
+                cameraPos.y = invCamera[1][3];
+                cameraPos.z = invCamera[2][3];
 
-        PSMTXInverse(ppvCameraMatrix0, invCamera);
-        cameraPos.x = invCamera[0][3];
-        cameraPos.y = invCamera[1][3];
-        cameraPos.z = invCamera[2][3];
+                char* mng = reinterpret_cast<char*>(m_pppMng);
+                for (int i = 0; i < kPppMngCount; i++) {
+                    int baseTime = *reinterpret_cast<int*>(mng + kBaseTimeOffset);
+                    unsigned char endRequested = *reinterpret_cast<unsigned char*>(mng + kEndRequestedOffset);
+                    unsigned char partDrawPass = *reinterpret_cast<unsigned char*>(mng + kDrawPassOffset);
+                    unsigned char slotVisible = *reinterpret_cast<unsigned char*>(mng + kSlotVisibleOffset);
+                    unsigned char ownerVisible = *reinterpret_cast<unsigned char*>(mng + kOwnerVisibleOffset);
 
-        char* mng = reinterpret_cast<char*>(this);
-        for (int i = 0; i < kPppMngCount; i++) {
-            int baseTime = *reinterpret_cast<int*>(mng + kBaseTimeOffset);
-            unsigned char endRequested = *reinterpret_cast<unsigned char*>(mng + kEndRequestedOffset);
-            unsigned char partDrawPass = *reinterpret_cast<unsigned char*>(mng + kDrawPassOffset);
-            unsigned char slotVisible = *reinterpret_cast<unsigned char*>(mng + kSlotVisibleOffset);
-            unsigned char ownerVisible = *reinterpret_cast<unsigned char*>(mng + kOwnerVisibleOffset);
+                    if (endRequested == 0 && baseTime != -0x1000 && partDrawPass == drawPass && baseTime < 0
+                        && slotVisible != 0 && ownerVisible != 0) {
+                        partPos.x = *reinterpret_cast<float*>(mng + kMatrixOffset + 0xc);
+                        partPos.y = *reinterpret_cast<float*>(mng + kMatrixOffset + 0x1c);
+                        partPos.z = *reinterpret_cast<float*>(mng + kMatrixOffset + 0x2c);
 
-            if (endRequested == 0 && baseTime != -0x1000 && partDrawPass == drawPass && baseTime < 0 && slotVisible != 0
-                && ownerVisible != 0) {
-                partPos.x = *reinterpret_cast<float*>(mng + kMatrixOffset + 0xc);
-                partPos.y = *reinterpret_cast<float*>(mng + kMatrixOffset + 0x1c);
-                partPos.z = *reinterpret_cast<float*>(mng + kMatrixOffset + 0x2c);
+                        float cullRadiusSq = *reinterpret_cast<float*>(mng + kCullRadiusSqOffset);
+                        bool shouldDraw = (cullRadiusSq == 0.0f);
+                        if (!shouldDraw) {
+                            PSVECSubtract(&cameraPos, &partPos, &cameraDelta);
+                            if (PSVECSquareMag(&cameraDelta) < cullRadiusSq) {
+                                CBound bound;
+                                float cullRadius = *reinterpret_cast<float*>(mng + kCullRadiusOffset);
+                                float cullYOffset = *reinterpret_cast<float*>(mng + kCullYOffsetOffset);
+                                Vec min;
+                                min.x = partPos.x - cullRadius;
+                                min.y = partPos.y;
+                                min.z = partPos.z - cullRadius;
+                                shouldDraw = (bound.CheckFrustum(min, ppvCameraMatrix0, partPos.y + cullYOffset) != 0);
+                            }
+                        }
 
-                float cullRadiusSq = *reinterpret_cast<float*>(mng + kCullRadiusSqOffset);
-                bool shouldDraw = (cullRadiusSq == 0.0f);
-                if (!shouldDraw) {
-                    PSVECSubtract(&cameraPos, &partPos, &cameraDelta);
-                    if (PSVECSquareMag(&cameraDelta) < cullRadiusSq) {
-                        CBound bound;
-                        float cullRadius = *reinterpret_cast<float*>(mng + kCullRadiusOffset);
-                        float cullYOffset = *reinterpret_cast<float*>(mng + kCullYOffsetOffset);
-                        Vec min;
-                        min.x = partPos.x - cullRadius;
-                        min.y = partPos.y;
-                        min.z = partPos.z - cullRadius;
-                        shouldDraw = (bound.CheckFrustum(min, ppvCameraMatrix0, partPos.y + cullYOffset) != 0);
+                        if (shouldDraw) {
+                            PSMTXMultVec(ppvCameraMatrix0, &partPos, &viewPos);
+                            *reinterpret_cast<float*>(mng + kSortDepthOffset) = viewPos.z;
+
+                            pppMngStPtr = reinterpret_cast<_pppMngSt*>(mng);
+                            pppEnvStPtr = reinterpret_cast<_pppEnvSt*>(*reinterpret_cast<char**>(mng) + 4);
+                            pppSetFpMatrix(pppMngStPtr);
+                            _pppDrawPart__FP9_pppMngSt(pppMngStPtr);
+                        }
                     }
-                }
-
-                if (shouldDraw) {
-                    PSMTXMultVec(ppvCameraMatrix0, &partPos, &viewPos);
-                    *reinterpret_cast<float*>(mng + kSortDepthOffset) = viewPos.z;
-
-                    pppMngStPtr = reinterpret_cast<_pppMngSt*>(mng);
-                    pppEnvStPtr = reinterpret_cast<_pppEnvSt*>(*reinterpret_cast<char**>(mng) + 4);
-                    pppSetFpMatrix(pppMngStPtr);
-                    _pppDrawPart__FP9_pppMngSt(pppMngStPtr);
+                    mng += kPppMngStride;
                 }
             }
-
-            mng += kPppMngStride;
         }
+    }
+
+    gPppHeapUseRateWords[0] = pppHeapCheckLeak__FPQ27CMemory6CStage2(pppEnvStPtr->m_stagePtr);
+    if (gPppHeapUseRateWords[2] == 0
+        || (--gPppHeapUseRateWords[2], gPppHeapUseRateWords[1] < gPppHeapUseRateWords[0])) {
+        gPppHeapUseRateWords[2] = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + kHeapCheckIntervalOffset) << 1;
+        gPppHeapUseRateWords[1] = gPppHeapUseRateWords[0];
     }
 }
 

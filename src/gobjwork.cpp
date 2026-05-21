@@ -95,7 +95,7 @@ static const char lbl_801D9F94[] = {
 CGObjWork::CGObjWork()
 {
 	m_objType = -1;
-	*reinterpret_cast<unsigned int*>(&m_saveSlot) = 0xFFFFFFFF;
+	m_saveSlot = -1;
 	m_ownerObj = 0;
 }
 
@@ -598,7 +598,7 @@ void CCaravanWork::FGLetterOpen(int letterIdx)
 	}
 	CMes::m_tempVar[7] = gil;
 
-	CMes::m_tempVar[8] = *reinterpret_cast<int*>(&self->m_saveSlot);
+	CMes::m_tempVar[8] = self->m_saveSlot;
 
 	reinterpret_cast<LetterFlags*>(letter + letterBase)->opened = 1;
 }
@@ -1111,7 +1111,6 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 {
 	int foundCount = 0;
 	unsigned char* curLetter = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[3]);
-	unsigned char* linkBase = &Game.m_gameWork.m_linkTable[m_saveSlot][0][0][0];
 
 	if (maxResults > 0) {
 		for (int i = 0; i < maxResults; i++) {
@@ -1286,49 +1285,49 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 			} else if ((condBits & 0x0080) != 0 && (condBits & 0x8000) != 0) {
 				goto NextLetter;
 			}
-			if ((condBits & 0x0100) != 0 && linkBase[1] != 0) {
+			if ((condBits & 0x0100) != 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][1] != 0) {
 				if ((condBits & 0x8000) == 0) {
 					goto PassedLinkConditions;
 				}
 			} else if ((condBits & 0x0100) != 0 && (condBits & 0x8000) != 0) {
 				goto NextLetter;
 			}
-			if ((condBits & 0x0200) != 0 && linkBase[2] != 0) {
+			if ((condBits & 0x0200) != 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][2] != 0) {
 				if ((condBits & 0x8000) == 0) {
 					goto PassedLinkConditions;
 				}
 			} else if ((condBits & 0x0200) != 0 && (condBits & 0x8000) != 0) {
 				goto NextLetter;
 			}
-			if ((condBits & 0x0400) != 0 && linkBase[3] != 0) {
+			if ((condBits & 0x0400) != 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][3] != 0) {
 				if ((condBits & 0x8000) == 0) {
 					goto PassedLinkConditions;
 				}
 			} else if ((condBits & 0x0400) != 0 && (condBits & 0x8000) != 0) {
 				goto NextLetter;
 			}
-			if ((condBits & 0x0800) != 0 && linkBase[4] != 0) {
+			if ((condBits & 0x0800) != 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][4] != 0) {
 				if ((condBits & 0x8000) == 0) {
 					goto PassedLinkConditions;
 				}
 			} else if ((condBits & 0x0800) != 0 && (condBits & 0x8000) != 0) {
 				goto NextLetter;
 			}
-			if ((condBits & 0x1000) != 0 && linkBase[5] != 0) {
+			if ((condBits & 0x1000) != 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][5] != 0) {
 				if ((condBits & 0x8000) == 0) {
 					goto PassedLinkConditions;
 				}
 			} else if ((condBits & 0x1000) != 0 && (condBits & 0x8000) != 0) {
 				goto NextLetter;
 			}
-			if ((condBits & 0x2000) != 0 && linkBase[6] != 0) {
+			if ((condBits & 0x2000) != 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][6] != 0) {
 				if ((condBits & 0x8000) == 0) {
 					goto PassedLinkConditions;
 				}
 			} else if ((condBits & 0x2000) != 0 && (condBits & 0x8000) != 0) {
 				goto NextLetter;
 			}
-			if ((condBits & 0x4000) != 0 && linkBase[7] != 0) {
+			if ((condBits & 0x4000) != 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][7] != 0) {
 				if ((condBits & 0x8000) == 0) {
 					goto PassedLinkConditions;
 				}
@@ -1344,98 +1343,98 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 
 		condBits = *reinterpret_cast<unsigned short*>(curLetter + 0x1C);
 		if ((condBits & 0x7FFF) != 0) {
-			if ((condBits & 0x0001) != 0 && linkBase[1] >= 0x3D) {
+			if ((condBits & 0x0001) != 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][1] >= 0x3D) {
 				if ((condBits & 0x8000) == 0) {
 					goto PassedLinkValueConditions;
 				}
 			} else if ((condBits & 0x0001) != 0 && (condBits & 0x8000) != 0) {
 				goto NextLetter;
 			}
-			if ((condBits & 0x0002) != 0 && linkBase[2] >= 0x3D) {
+			if ((condBits & 0x0002) != 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][2] >= 0x3D) {
 				if ((condBits & 0x8000) == 0) {
 					goto PassedLinkValueConditions;
 				}
 			} else if ((condBits & 0x0002) != 0 && (condBits & 0x8000) != 0) {
 				goto NextLetter;
 			}
-			if ((condBits & 0x0004) != 0 && linkBase[3] >= 0x3D) {
+			if ((condBits & 0x0004) != 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][3] >= 0x3D) {
 				if ((condBits & 0x8000) == 0) {
 					goto PassedLinkValueConditions;
 				}
 			} else if ((condBits & 0x0004) != 0 && (condBits & 0x8000) != 0) {
 				goto NextLetter;
 			}
-			if ((condBits & 0x0008) != 0 && linkBase[4] >= 0x3D) {
+			if ((condBits & 0x0008) != 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][4] >= 0x3D) {
 				if ((condBits & 0x8000) == 0) {
 					goto PassedLinkValueConditions;
 				}
 			} else if ((condBits & 0x0008) != 0 && (condBits & 0x8000) != 0) {
 				goto NextLetter;
 			}
-			if ((condBits & 0x0010) != 0 && linkBase[5] >= 0x3D) {
+			if ((condBits & 0x0010) != 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][5] >= 0x3D) {
 				if ((condBits & 0x8000) == 0) {
 					goto PassedLinkValueConditions;
 				}
 			} else if ((condBits & 0x0010) != 0 && (condBits & 0x8000) != 0) {
 				goto NextLetter;
 			}
-			if ((condBits & 0x0020) != 0 && linkBase[6] >= 0x3D) {
+			if ((condBits & 0x0020) != 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][6] >= 0x3D) {
 				if ((condBits & 0x8000) == 0) {
 					goto PassedLinkValueConditions;
 				}
 			} else if ((condBits & 0x0020) != 0 && (condBits & 0x8000) != 0) {
 				goto NextLetter;
 			}
-			if ((condBits & 0x0040) != 0 && linkBase[7] >= 0x3D) {
+			if ((condBits & 0x0040) != 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][7] >= 0x3D) {
 				if ((condBits & 0x8000) == 0) {
 					goto PassedLinkValueConditions;
 				}
 			} else if ((condBits & 0x0040) != 0 && (condBits & 0x8000) != 0) {
 				goto NextLetter;
 			}
-			if ((condBits & 0x0100) != 0 && linkBase[1] > 0 && linkBase[1] <= 0x28) {
+			if ((condBits & 0x0100) != 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][1] > 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][1] <= 0x28) {
 				if ((condBits & 0x8000) == 0) {
 					goto PassedLinkValueConditions;
 				}
 			} else if ((condBits & 0x0100) != 0 && (condBits & 0x8000) != 0) {
 				goto NextLetter;
 			}
-			if ((condBits & 0x0200) != 0 && linkBase[2] > 0 && linkBase[2] <= 0x28) {
+			if ((condBits & 0x0200) != 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][2] > 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][2] <= 0x28) {
 				if ((condBits & 0x8000) == 0) {
 					goto PassedLinkValueConditions;
 				}
 			} else if ((condBits & 0x0200) != 0 && (condBits & 0x8000) != 0) {
 				goto NextLetter;
 			}
-			if ((condBits & 0x0400) != 0 && linkBase[3] > 0 && linkBase[3] <= 0x28) {
+			if ((condBits & 0x0400) != 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][3] > 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][3] <= 0x28) {
 				if ((condBits & 0x8000) == 0) {
 					goto PassedLinkValueConditions;
 				}
 			} else if ((condBits & 0x0400) != 0 && (condBits & 0x8000) != 0) {
 				goto NextLetter;
 			}
-			if ((condBits & 0x0800) != 0 && linkBase[4] > 0 && linkBase[4] <= 0x28) {
+			if ((condBits & 0x0800) != 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][4] > 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][4] <= 0x28) {
 				if ((condBits & 0x8000) == 0) {
 					goto PassedLinkValueConditions;
 				}
 			} else if ((condBits & 0x0800) != 0 && (condBits & 0x8000) != 0) {
 				goto NextLetter;
 			}
-			if ((condBits & 0x1000) != 0 && linkBase[5] > 0 && linkBase[5] <= 0x28) {
+			if ((condBits & 0x1000) != 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][5] > 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][5] <= 0x28) {
 				if ((condBits & 0x8000) == 0) {
 					goto PassedLinkValueConditions;
 				}
 			} else if ((condBits & 0x1000) != 0 && (condBits & 0x8000) != 0) {
 				goto NextLetter;
 			}
-			if ((condBits & 0x2000) != 0 && linkBase[6] > 0 && linkBase[6] <= 0x28) {
+			if ((condBits & 0x2000) != 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][6] > 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][6] <= 0x28) {
 				if ((condBits & 0x8000) == 0) {
 					goto PassedLinkValueConditions;
 				}
 			} else if ((condBits & 0x2000) != 0 && (condBits & 0x8000) != 0) {
 				goto NextLetter;
 			}
-			if ((condBits & 0x4000) != 0 && linkBase[7] > 0 && linkBase[7] <= 0x28) {
+			if ((condBits & 0x4000) != 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][7] > 0 && Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][7] <= 0x28) {
 				if ((condBits & 0x8000) == 0) {
 					goto PassedLinkValueConditions;
 				}
@@ -1452,8 +1451,8 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 		unsigned int cmpValue = 0;
 		for (int i = 0; i < 4; i++) {
 			const unsigned short cmpType = *reinterpret_cast<unsigned short*>(curLetter + 0x1E + i * 4);
-			const unsigned short sourceType = (cmpType >> 11) & 3;
-			const unsigned short sourceIdx = cmpType & 0x7FF;
+			const int sourceType = (cmpType >> 11) & 3;
+			const int sourceIdx = cmpType & 0x7FF;
 
 			if (sourceType != 3) {
 				if (sourceType == 1) {
@@ -1468,11 +1467,11 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 					} else if (sourceIdx == 3) {
 						cmpValue = static_cast<unsigned int>(Game.m_gameWork.m_frameCounter);
 					}
-				} else if (sourceType == 2) {
+				} else if (sourceType < 3) {
 					cmpValue = static_cast<unsigned int>(m_evtWordArr[sourceIdx]);
 				}
 
-				const unsigned short op = cmpType >> 13;
+				const int op = cmpType >> 13;
 				const unsigned int compareValue = static_cast<unsigned int>(*reinterpret_cast<unsigned short*>(curLetter + 0x20 + i * 4));
 				if (op == 0) {
 					if (cmpValue != compareValue) {
@@ -1503,16 +1502,16 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 		}
 
 		{
-			unsigned int bit0 = 0;
-			unsigned int bit1 = 0;
-			unsigned int bit2 = 0;
+			int bit0 = 0;
+			int bit1 = 0;
+			int bit2 = 0;
 			unsigned char* evtWorkBytes = reinterpret_cast<unsigned char*>(m_evtWorkArr);
 
 			for (int i = 0; i < 8; i++) {
 				const unsigned short evtRule = *reinterpret_cast<unsigned short*>(curLetter + 0x2E + i * 2);
-				const unsigned short sourceType = (evtRule >> 11) & 3;
-				const unsigned short sourceIdx = evtRule & 0x7FF;
-				unsigned int checkValue = bit0;
+				const int sourceType = (evtRule >> 11) & 3;
+				const int sourceIdx = evtRule & 0x7FF;
+				int checkValue = bit0;
 
 				if (sourceType == 3) {
 					continue;
@@ -1522,7 +1521,7 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 					bit0 = ((evtWorkBytes[sourceIdx >> 3] & (1 << (sourceIdx & 7))) != 0);
 					bit1 = ((evtWorkBytes[(sourceIdx + 1) >> 3] & (1 << ((sourceIdx + 1) & 7))) != 0);
 					bit2 = ((evtWorkBytes[(sourceIdx + 2) >> 3] & (1 << ((sourceIdx + 2) & 7))) != 0);
-				} else if (sourceType == 1) {
+				} else if ((sourceType < 2) && (sourceType != 0)) {
 					bit0 = ((static_cast<unsigned char>(Game.m_gameWork.m_eventFlags[(sourceIdx >> 3) + 8]) &
 							 (1 << (sourceIdx & 7))) != 0);
 					bit1 = ((static_cast<unsigned char>(Game.m_gameWork.m_eventFlags[((sourceIdx + 1) >> 3) + 8]) &

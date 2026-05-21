@@ -39,7 +39,6 @@ void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
 void ParticleFrameCallback__5CGameFiiiiiP3Vec(CGame*, int, int, int, int, int, Vec*);
 int GetTextureFromRSD__FiP9_pppEnvSt(int, _pppEnvSt*);
 
-void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(void*, void*, float, u8, u8, u8, u8, u8, u8, u8);
 void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
 void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, int, int, int, int);
 void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
@@ -52,10 +51,6 @@ void _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevA
     int, int, int, int, int);
 void _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(
     int, int, int, int, int, int);
-void pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(pppFMATRIX*, pppFMATRIX*, pppFMATRIX*);
-void pppUnitMatrix__FR10pppFMATRIX(pppFMATRIX*);
-void pppDrawShp__FPlsP12CMaterialSetUc(long*, short, CMaterialSet*, u8);
-
 }
 
 extern "C" const char s_pppLaser_cpp_801E3048[] = "pppLaser.cpp";
@@ -431,7 +426,7 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
     tex = GetTextureFromRSD__FiP9_pppEnvSt(dataValIndex, pppEnvStPtr);
     pppSetBlendMode(step->m_laser.m_blendMode);
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(1, 0, 0);
-    pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
+    pppSetDrawEnv(
         &colorData->m_color, &pppLaser->m_localMatrix, kPppLaserZero, step->m_laser.m_drawEnvColor1,
         step->m_laser.m_drawEnvColor0, step->m_laser.m_blendMode, 0, 1, 1, 0);
     GXSetNumTevStages(1);
@@ -455,13 +450,13 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
     length = work->m_length;
     negHalfWidth = -halfWidth;
 
-    pppUnitMatrix__FR10pppFMATRIX(&unitMtx);
+    pppUnitMatrix(unitMtx);
     localMtx = pppLaser->m_localMatrix;
     managerMtx = pppMngStPtr->m_matrix;
-    pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(&mtxOut, &managerMtx, &localMtx);
+    pppMulMatrix(mtxOut, managerMtx, localMtx);
     modelMtx = mtxOut;
     cameraMtx = *(pppFMATRIX*)&ppvCameraMatrix;
-    pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(&mtxOut, &cameraMtx, &modelMtx);
+    pppMulMatrix(mtxOut, cameraMtx, modelMtx);
     GXLoadPosMtxImm(mtxOut.value, 0);
 
     GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT7, 4);
@@ -507,8 +502,7 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
         shapeMtx[1][3] = shapePos.y;
         shapeMtx[2][3] = shapePos.z;
         GXLoadPosMtxImm(shapeMtx, GX_PNMTX0);
-        pppDrawShp__FPlsP12CMaterialSetUc(
-            *shapeTable, work->m_shapeArg2, pppEnvStPtr->m_materialSetPtr, step->m_laser.m_blendMode);
+        pppDrawShp(*shapeTable, work->m_shapeArg2, pppEnvStPtr->m_materialSetPtr, step->m_laser.m_blendMode);
 
         count = step->m_laser.m_pointCount;
         uvStep = FLOAT_8033342c / (float)count;

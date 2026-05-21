@@ -15,7 +15,7 @@ class CGObject;
 class CPad;
 class CColor;
 
-extern unsigned int PTR_s_CCameraPcs_GAME__801e915c[][0x15C / sizeof(unsigned int)];
+extern unsigned int m_table__10CCameraPcs[][0x15C / sizeof(unsigned int)];
 extern unsigned int m_table_desc0__10CCameraPcs[];
 extern unsigned int m_table_desc1__10CCameraPcs[];
 extern unsigned int m_table_desc2__10CCameraPcs[];

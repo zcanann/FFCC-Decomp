@@ -284,18 +284,20 @@ float CGPrgObj::getTargetRot(CGPrgObj* target)
 	float targetRot;
 	float deltaX;
 	float deltaZ;
-	CVector basePos(m_worldPosition);
 	CVector targetPos(target->m_worldPosition);
+	CVector basePos(m_worldPosition);
 	CVector deltaPos;
 
 	PSVECSubtract(AsVec(basePos), AsVec(targetPos), AsVec(deltaPos));
 	deltaX = deltaPos.x;
 	deltaZ = deltaPos.z;
 	if ((deltaX == FLOAT_80331BD4) || (deltaZ == FLOAT_80331BD4)) {
-		return FLOAT_80331BD4;
+		targetRot = FLOAT_80331BD4;
+	} else {
+		targetRot = (float)atan2(-(double)deltaX, -(double)deltaZ);
 	}
 
-	return (float)atan2(-(double)deltaX, -(double)deltaZ);
+	return targetRot;
 }
 
 /*

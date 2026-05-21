@@ -9,9 +9,9 @@ struct MoneyMenuAnim
     short y;
     short w;
     short h;
+    float u;
+    float v;
     float alpha;
-    float scale;
-    float progress;
     float uvScale;
     int unk18;
     int tex;

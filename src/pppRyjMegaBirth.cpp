@@ -42,6 +42,11 @@ extern const float FLOAT_8033049c = 30.0f;
 extern const float FLOAT_803304a0 = 3.1415927f;
 extern const float FLOAT_803304a4 = 32768.0f;
 
+static inline float RyjZero()
+{
+	return *reinterpret_cast<const float*>(&kPppRyjMegaBirthZero);
+}
+
 static inline float* f32_at(void* base, s32 off)
 {
 	return (float*)((u8*)base + off);
@@ -821,11 +826,12 @@ void calc(
 		}
 		else
 		{
-			if ((*f32_at(paramPayload, 0xC0) < kPppRyjMegaBirthZero) &&
-			    (kPppRyjMegaBirthZero < *f32_at(paramPayload, 0xC4)) &&
-			    (kPppRyjMegaBirthZero < *f32_at(particlePayload, 0x4C)))
+			float zero = RyjZero();
+			if ((*f32_at(paramPayload, 0xC0) < zero) &&
+			    (zero < *f32_at(paramPayload, 0xC4)) &&
+			    (zero < *f32_at(particlePayload, 0x4C)))
 			{
-				*f32_at(particlePayload, 0x4C) = kPppRyjMegaBirthZero;
+				*f32_at(particlePayload, 0x4C) = zero;
 			}
 		}
 	}

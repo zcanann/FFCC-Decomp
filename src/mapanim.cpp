@@ -7,8 +7,8 @@
 #include "dolphin/mtx.h"
 
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h"
+#include <PowerPC_EABI_Support/Runtime/New.h>
 
-extern "C" void __dl__FPv(void*);
 extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void Calc__8CMapAnimFl(CMapAnim*, long);
 
@@ -233,7 +233,7 @@ CMapAnim::~CMapAnim()
         CMapAnimNode* node = mapAnimNodes[i];
         if (node != 0 && (node = mapAnimNodes[i], node != 0)) {
             node->m_mapAnim = 0;
-            __dl__FPv(node);
+            operator delete(node);
         }
         i++;
     }

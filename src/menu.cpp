@@ -1,8 +1,9 @@
 #include "ffcc/menu.h"
 
+#include <PowerPC_EABI_Support/Runtime/New.h>
+
 extern "C" void* __vt__5CMenu[];
 extern "C" CRef* __dt__4CRefFv(CRef*, short);
-extern "C" void __dl__FPv(void*);
 
 /*
  * --INFO--
@@ -113,7 +114,7 @@ extern "C" CMenu* __dt__5CMenuFv(CMenu* menu, short shouldDelete)
 		*(void***)menu = __vt__5CMenu;
 		__dt__4CRefFv(menu, 0);
 		if (0 < shouldDelete) {
-			__dl__FPv(menu);
+			operator delete(menu);
 		}
 	}
 

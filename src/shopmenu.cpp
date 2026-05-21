@@ -86,6 +86,8 @@ extern float FLOAT_80332d78;
 extern float FLOAT_80332dc8;
 extern float FLOAT_80332dcc;
 extern float FLOAT_80332dd0;
+extern float FLOAT_80332dec;
+extern float FLOAT_80332df0;
 extern float FLOAT_80332de0;
 extern float FLOAT_80332e0c;
 extern float FLOAT_80332e10;
@@ -116,6 +118,8 @@ extern double DOUBLE_80332DA8;
 extern double DOUBLE_80332DB0;
 extern double DOUBLE_80332DB8;
 extern double DOUBLE_80332DC0;
+extern unsigned int DAT_80332CFC;
+extern unsigned int DAT_80332D00;
 extern char DAT_80332d84[];
 extern char DAT_80332d14[];
 extern char DAT_80332d18[];
@@ -2925,14 +2929,78 @@ void drawShapeSeqGrouad(int shapeNo, int groupNo, int x, int y, float scaleX, fl
  */
 void drawShapeSeqScale(int shapeNo, int groupNo, int x, int y, float scaleX, float scaleY, unsigned char alpha)
 {
-    long* animData = GetShopMenuShapeAnimData(shapeNo);
-    tagOAN3_SHAPE* shape = GetShopMenuFrameShape(animData, groupNo);
-    if (shape == 0) {
-        return;
-    }
+    Mtx44 projectionMtx;
+    Mtx screenMtx;
 
-    setOrtho(x, y, scaleX, scaleY, 0.0f);
-    drawShp(shape, pppEnvStPtr->m_materialSetPtr, alpha);
+    PSMTXIdentity(screenMtx);
+    screenMtx[0][0] = scaleX;
+    screenMtx[1][1] = -scaleY;
+    screenMtx[0][3] = static_cast<float>(x);
+    screenMtx[1][3] = static_cast<float>(y);
+    screenMtx[2][2] = FLOAT_80332d78;
+    GXLoadPosMtxImm(screenMtx, 0);
+    GXSetCurrentMtx(0);
+
+    C_MTXOrtho(projectionMtx, FLOAT_80332d9c, FLOAT_80332dec, FLOAT_80332d9c, FLOAT_80332df0, FLOAT_80332d9c,
+               FLOAT_80332d28);
+    projectionMtx[2][3] += FLOAT_80332d9c;
+    GXSetProjection(projectionMtx, GX_ORTHOGRAPHIC);
+
+    int shapeData = **reinterpret_cast<int**>(*reinterpret_cast<int*>(&pppEnvStPtr->m_particleColors[0]) + shapeNo * 4);
+    tagOAN3_SHAPE* shape =
+        reinterpret_cast<tagOAN3_SHAPE*>(shapeData + *reinterpret_cast<short*>(shapeData + groupNo * 8 + 0x10));
+
+    unsigned char* materialMan = reinterpret_cast<unsigned char*>(&MaterialMan);
+    *reinterpret_cast<unsigned int*>(materialMan + 0x48) = 0xACE0F;
+    *reinterpret_cast<unsigned int*>(materialMan + 0x44) = 0xFFFFFFFF;
+    *reinterpret_cast<unsigned char*>(materialMan + 0x4C) = 0xFF;
+    *reinterpret_cast<unsigned int*>(materialMan + 0x11C) = 0;
+    *reinterpret_cast<unsigned int*>(materialMan + 0x120) = 0x1E;
+    *reinterpret_cast<unsigned int*>(materialMan + 0x124) = 0;
+    *reinterpret_cast<unsigned char*>(materialMan + 0x205) = 0xFF;
+    *reinterpret_cast<unsigned char*>(materialMan + 0x206) = 0xFF;
+    *reinterpret_cast<unsigned int*>(materialMan + 0x58) = 0;
+    *reinterpret_cast<unsigned int*>(materialMan + 0x5C) = 0;
+    *reinterpret_cast<unsigned char*>(materialMan + 0x208) = 0;
+    *reinterpret_cast<unsigned int*>(materialMan + 0x128) = 0;
+    *reinterpret_cast<unsigned int*>(materialMan + 0x12C) = 0x1E;
+    *reinterpret_cast<unsigned int*>(materialMan + 0x130) = 0;
+    *reinterpret_cast<unsigned int*>(materialMan + 0x40) = 0xACE0F;
+
+    _GXColor amb;
+    *reinterpret_cast<unsigned int*>(&amb) = DAT_80332CFC;
+    GXSetChanAmbColor(GX_COLOR0A0, amb);
+
+    _GXColor mat;
+    *reinterpret_cast<unsigned int*>(&mat) = (DAT_80332D00 & 0xFFFFFF00) | alpha;
+    GXSetChanMatColor(GX_COLOR0A0, mat);
+
+    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 5);
+    _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(7, 0, 0, 7, 0xFF);
+    GXSetZCompLoc(GX_TRUE);
+    GXSetNumChans(1);
+    GXSetChanCtrl(GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
+    GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
+
+    *reinterpret_cast<unsigned int*>(materialMan + 0x128) = *reinterpret_cast<unsigned int*>(materialMan + 0x11C);
+    *reinterpret_cast<unsigned int*>(materialMan + 0x12C) = *reinterpret_cast<unsigned int*>(materialMan + 0x120);
+    *reinterpret_cast<unsigned int*>(materialMan + 0x130) = *reinterpret_cast<unsigned int*>(materialMan + 0x124);
+    *reinterpret_cast<unsigned int*>(materialMan + 0x40) = *reinterpret_cast<unsigned int*>(materialMan + 0x48);
+
+    MaterialMan.SetMaterialMenu(
+        pppEnvStPtr->m_materialSetPtr,
+        static_cast<int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(shape) + 10)), 0);
+    GXClearVtxDesc();
+    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
+
+    unsigned char* displayList = reinterpret_cast<unsigned char*>(shape);
+    int shapeCount = *reinterpret_cast<short*>(displayList + 2);
+    for (int i = 0; i < shapeCount; i++) {
+        GXCallDisplayList(*reinterpret_cast<void**>(displayList + 0xC), 0x60);
+        displayList += 8;
+    }
 }
 /*
  * --INFO--
@@ -2944,16 +3012,92 @@ void drawShapeSeq(int shapeNo, int groupNo, int x, int y, unsigned char alpha, u
 {
     (void)tlut;
 
-    long* animData = GetShopMenuShapeAnimData(shapeNo);
-    tagOAN3_SHAPE* shape = GetShopMenuFrameShape(animData, groupNo);
-    if (shape == 0) {
-        return;
-    }
+    Mtx44 projectionMtx;
+    Mtx screenMtx;
 
-    float scaleX = (flipX != 0) ? FLOAT_80332dd0 : FLOAT_80332d78;
-    float scaleY = (flipY != 0) ? FLOAT_80332dd0 : FLOAT_80332d78;
-    setOrtho(x, y, scaleX, scaleY, zOffset);
-    drawShp(shape, pppEnvStPtr->m_materialSetPtr, alpha);
+    PSMTXIdentity(screenMtx);
+    float scaleX;
+    if (flipX != 0) {
+        scaleX = FLOAT_80332dd0;
+    } else {
+        scaleX = FLOAT_80332d78;
+    }
+    screenMtx[0][0] = scaleX;
+
+    float scaleY;
+    if (flipY != 0) {
+        scaleY = FLOAT_80332d78;
+    } else {
+        scaleY = FLOAT_80332dd0;
+    }
+    screenMtx[1][1] = scaleY;
+    screenMtx[0][3] = static_cast<float>(x);
+    screenMtx[1][3] = static_cast<float>(y);
+    screenMtx[2][2] = FLOAT_80332d78;
+    GXLoadPosMtxImm(screenMtx, 0);
+    GXSetCurrentMtx(0);
+
+    C_MTXOrtho(projectionMtx, FLOAT_80332d9c, FLOAT_80332dec, FLOAT_80332d9c, FLOAT_80332df0, FLOAT_80332d9c,
+               FLOAT_80332d28);
+    projectionMtx[2][3] += zOffset;
+    GXSetProjection(projectionMtx, GX_ORTHOGRAPHIC);
+
+    int shapeData = **reinterpret_cast<int**>(*reinterpret_cast<int*>(&pppEnvStPtr->m_particleColors[0]) + shapeNo * 4);
+    tagOAN3_SHAPE* shape =
+        reinterpret_cast<tagOAN3_SHAPE*>(shapeData + *reinterpret_cast<short*>(shapeData + groupNo * 8 + 0x10));
+
+    unsigned char* materialMan = reinterpret_cast<unsigned char*>(&MaterialMan);
+    *reinterpret_cast<unsigned int*>(materialMan + 0x48) = 0xACE0F;
+    *reinterpret_cast<unsigned int*>(materialMan + 0x44) = 0xFFFFFFFF;
+    *reinterpret_cast<unsigned char*>(materialMan + 0x4C) = 0xFF;
+    *reinterpret_cast<unsigned int*>(materialMan + 0x11C) = 0;
+    *reinterpret_cast<unsigned int*>(materialMan + 0x120) = 0x1E;
+    *reinterpret_cast<unsigned int*>(materialMan + 0x124) = 0;
+    *reinterpret_cast<unsigned char*>(materialMan + 0x205) = 0xFF;
+    *reinterpret_cast<unsigned char*>(materialMan + 0x206) = 0xFF;
+    *reinterpret_cast<unsigned int*>(materialMan + 0x58) = 0;
+    *reinterpret_cast<unsigned int*>(materialMan + 0x5C) = 0;
+    *reinterpret_cast<unsigned char*>(materialMan + 0x208) = 0;
+    *reinterpret_cast<unsigned int*>(materialMan + 0x128) = 0;
+    *reinterpret_cast<unsigned int*>(materialMan + 0x12C) = 0x1E;
+    *reinterpret_cast<unsigned int*>(materialMan + 0x130) = 0;
+    *reinterpret_cast<unsigned int*>(materialMan + 0x40) = 0xACE0F;
+
+    _GXColor amb;
+    *reinterpret_cast<unsigned int*>(&amb) = DAT_80332CFC;
+    GXSetChanAmbColor(GX_COLOR0A0, amb);
+
+    _GXColor mat;
+    *reinterpret_cast<unsigned int*>(&mat) = (DAT_80332D00 & 0xFFFFFF00) | alpha;
+    GXSetChanMatColor(GX_COLOR0A0, mat);
+
+    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 5);
+    _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(7, 0, 0, 7, 0xFF);
+    GXSetZCompLoc(GX_TRUE);
+    GXSetNumChans(1);
+    GXSetChanCtrl(GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
+    GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
+
+    *reinterpret_cast<unsigned int*>(materialMan + 0x128) = *reinterpret_cast<unsigned int*>(materialMan + 0x11C);
+    *reinterpret_cast<unsigned int*>(materialMan + 0x12C) = *reinterpret_cast<unsigned int*>(materialMan + 0x120);
+    *reinterpret_cast<unsigned int*>(materialMan + 0x130) = *reinterpret_cast<unsigned int*>(materialMan + 0x124);
+    *reinterpret_cast<unsigned int*>(materialMan + 0x40) = *reinterpret_cast<unsigned int*>(materialMan + 0x48);
+
+    MaterialMan.SetMaterialMenu(
+        pppEnvStPtr->m_materialSetPtr,
+        static_cast<int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(shape) + 10)), 0);
+    GXClearVtxDesc();
+    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
+
+    unsigned char* shapeBytes = reinterpret_cast<unsigned char*>(shape);
+    unsigned char* displayList = shapeBytes;
+    int shapeCount = *reinterpret_cast<short*>(shapeBytes + 2);
+    for (int i = 0; i < shapeCount; i++) {
+        GXCallDisplayList(*reinterpret_cast<void**>(displayList + 0xC), 0x60);
+        displayList += 8;
+    }
 }
 /*
  * --INFO--

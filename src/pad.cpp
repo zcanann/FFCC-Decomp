@@ -17,7 +17,6 @@
 CPad Pad;
 
 void* operator new[](unsigned long, CMemory::CStage*, char*, int);
-extern "C" void* __RTTI__8CManager[];
 
 extern const char s_CPad[] = "CPad";
 static const float FLOAT_8032f820 = 0.0f;

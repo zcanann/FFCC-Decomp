@@ -1267,6 +1267,32 @@ unsigned int CPartPcs::IsLoadPartCompleted()
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CPartPcs::CalcTick()
+{
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CPartPcs::DrawInit()
+{
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x800524d0
  * PAL Size: 400b
  * EN Address: TODO
@@ -1555,10 +1581,22 @@ void CPartPcs::EndMiruraEvent()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 64b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CPartPcs::SetUSBData()
 {
-	// TODO
+    int packetCode;
+
+    if (m_usbStreamData.IsUSBStreamDataDone()) {
+        packetCode = m_usbStreamData.m_packetCode;
+        if (packetCode != 0) {
+            PartMng.pppDataRcv(packetCode, reinterpret_cast<char*>(m_usbStreamData.m_data), m_usbStreamData.m_sizeBytes);
+        }
+        m_usbStreamData.SetUSBStreamDataDone();
+    }
 }

@@ -27,6 +27,7 @@ extern const float FLOAT_8033031C;
 extern const float FLOAT_80330320;
 
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h"
+#include <PowerPC_EABI_Support/Runtime/New.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
 CCharaPcs CharaPcs;
@@ -36,7 +37,6 @@ u8* gCharaPartWorkPtr = 0;
 }
 
 extern "C" void __dla__FPv(void*);
-extern "C" void __dl__FPv(void*);
 extern "C" int __cntlzw(unsigned int);
 extern "C" void __ct__6CColorFv(void*);
 extern "C" void __construct_array(void*, void (*)(void*), void (*)(void*, int), unsigned long, unsigned long);
@@ -595,7 +595,7 @@ extern "C" CPtrArray<CCharaPcs::CLoadPdt*>* dtor_8007B904(CPtrArray<CCharaPcs::C
     if (ptrArray != 0) {
         ptrArray->~CPtrArray<CCharaPcs::CLoadPdt*>();
         if (shouldDelete > 0) {
-            __dl__FPv(ptrArray);
+            operator delete(ptrArray);
         }
     }
     return ptrArray;
@@ -615,7 +615,7 @@ extern "C" CPtrArray<CCharaPcs::CLoadTexture*>* dtor_8007B9B4(CPtrArray<CCharaPc
     if (ptrArray != 0) {
         ptrArray->~CPtrArray<CCharaPcs::CLoadTexture*>();
         if (shouldDelete > 0) {
-            __dl__FPv(ptrArray);
+            operator delete(ptrArray);
         }
     }
     return ptrArray;
@@ -635,7 +635,7 @@ extern "C" CPtrArray<CCharaPcs::CLoadAnim*>* dtor_8007BA64(CPtrArray<CCharaPcs::
     if (ptrArray != 0) {
         ptrArray->~CPtrArray<CCharaPcs::CLoadAnim*>();
         if (shouldDelete > 0) {
-            __dl__FPv(ptrArray);
+            operator delete(ptrArray);
         }
     }
     return ptrArray;
@@ -655,7 +655,7 @@ extern "C" CPtrArray<CCharaPcs::CLoadModel*>* dtor_8007BB14(CPtrArray<CCharaPcs:
     if (ptrArray != 0) {
         ptrArray->~CPtrArray<CCharaPcs::CLoadModel*>();
         if (shouldDelete > 0) {
-            __dl__FPv(ptrArray);
+            operator delete(ptrArray);
         }
     }
     return ptrArray;
@@ -972,7 +972,7 @@ void CCharaPcs::Reset(CCharaPcs::RESET mode)
         unsigned char* loadAnim = reinterpret_cast<unsigned char*>((*LoadAnimArray(this))[static_cast<unsigned long>(i)]);
         unsigned char* anim = *reinterpret_cast<unsigned char**>(loadAnim + 0x28);
         if (*reinterpret_cast<void**>(anim + 0x20) != 0) {
-            __dl__FPv(*reinterpret_cast<void**>(anim + 0x20));
+            operator delete(*reinterpret_cast<void**>(anim + 0x20));
             *reinterpret_cast<void**>(anim + 0x20) = 0;
         }
     }
@@ -1114,7 +1114,7 @@ int CCharaPcs::correctLoadAnimAmem()
         scanOffset = nextOffset;
     }
 
-    __dl__FPv(tempBuffer);
+    operator delete(tempBuffer);
     return compactedSize;
 }
 
@@ -1195,7 +1195,7 @@ void CCharaPcs::calcAfter()
         void*& bankPtr = *reinterpret_cast<void**>(Ptr(loadAnim->m_anim, 0x20));
         const int bankRefCount = *reinterpret_cast<int*>(Ptr(loadAnim->m_anim, 4));
         if (bankRefCount == 1 && bankPtr != 0) {
-            __dl__FPv(bankPtr);
+            operator delete(bankPtr);
             bankPtr = 0;
         }
     }
@@ -1228,7 +1228,7 @@ void CCharaPcs::ReleaseAllAnimBank()
 
         void*& bankPtr = *reinterpret_cast<void**>(Ptr(loadAnim->m_anim, 0x20));
         if (bankPtr != 0) {
-            __dl__FPv(bankPtr);
+            operator delete(bankPtr);
             bankPtr = 0;
         }
     }
@@ -1250,7 +1250,7 @@ void CCharaPcs::ReleaseUnusedAnimBank()
         void*& bankPtr = *reinterpret_cast<void**>(Ptr(loadAnim->m_anim, 0x20));
         const int bankRefCount = *reinterpret_cast<int*>(Ptr(loadAnim->m_anim, 4));
         if (bankRefCount == 1 && bankPtr != 0) {
-            __dl__FPv(bankPtr);
+            operator delete(bankPtr);
             bankPtr = 0;
         }
     }
@@ -1289,7 +1289,7 @@ int CCharaPcs::TryReleaseAnimBank(int requiredSize)
 
     void* bankPtr = *reinterpret_cast<void**>(Ptr(releaseAnim->m_anim, 0x20));
     if (bankPtr != 0) {
-        __dl__FPv(bankPtr);
+        operator delete(bankPtr);
         *reinterpret_cast<void**>(Ptr(releaseAnim->m_anim, 0x20)) = 0;
     }
 

@@ -875,6 +875,7 @@ next:
 void CSound::Draw()
 {
     Mtx cameraMatrix;
+    GXColor lineColor;
     PSMTXCopy(*reinterpret_cast<Mtx*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x4), cameraMatrix);
 
     _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
@@ -897,23 +898,23 @@ void CSound::Draw()
     for (u32 i = 0; i < 0x80; i++, se += 0x28) {
         if (((static_cast<u8>(*se) >> 7) & 1) != 0) {
             CColor innerColor(0xC0, 0xC0, 0xC0, 0x80);
-            CColor outerColor(0x80, 0x80, 0x80, 0x80);
             Graphic.DrawSphere(cameraMatrix, reinterpret_cast<Vec*>(se + 0x18), *reinterpret_cast<float*>(se + 0x10),
-                               &innerColor.color);
+                               reinterpret_cast<GXColor*>(&innerColor));
+            CColor outerColor(0x80, 0x80, 0x80, 0x80);
             Graphic.DrawSphere(cameraMatrix, reinterpret_cast<Vec*>(se + 0x18), *reinterpret_cast<float*>(se + 0x14),
-                               &outerColor.color);
+                               reinterpret_cast<GXColor*>(&outerColor));
         }
     }
 
-    u32 lineColorRaw = 0xFF8000FF;
-    GXColor lineColor = *reinterpret_cast<GXColor*>(&lineColorRaw);
+    lineColor.r = 0xFF;
+    lineColor.g = 0x80;
+    lineColor.b = 0;
+    lineColor.a = 0xFF;
     GXSetChanMatColor((GXChannelID)4, lineColor);
     GXLoadPosMtxImm(cameraMatrix, 0);
 
-    CLine<10>* line = sound.m_lines;
     for (u32 i = 0; i < 8; i++) {
-        Draw__9CLine(line);
-        line++;
+        Draw__9CLine(&sound.m_lines[i]);
     }
 }
 

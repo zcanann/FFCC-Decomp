@@ -3084,31 +3084,31 @@ CChara::CMesh::CRefData::~CRefData()
 	CCharaMeshRefRaw* ref = reinterpret_cast<CCharaMeshRefRaw*>(this);
 
 	if (ref->m_vertices != 0) {
-		operator delete(ref->m_vertices);
+		operator delete[](ref->m_vertices);
 		ref->m_vertices = 0;
 	}
 	if (ref->m_normals != 0) {
-		operator delete(ref->m_normals);
+		operator delete[](ref->m_normals);
 		ref->m_normals = 0;
 	}
 	if (ref->m_colors != 0) {
-		operator delete(ref->m_colors);
+		operator delete[](ref->m_colors);
 		ref->m_colors = 0;
 	}
 	if (ref->m_uvs != 0) {
-		operator delete(ref->m_uvs);
+		operator delete[](ref->m_uvs);
 		ref->m_uvs = 0;
 	}
 	if (ref->m_oneWeightData != 0) {
-		operator delete(ref->m_oneWeightData);
+		operator delete[](ref->m_oneWeightData);
 		ref->m_oneWeightData = 0;
 	}
 	if (ref->m_twoWeightData != 0) {
-		operator delete(ref->m_twoWeightData);
+		operator delete[](ref->m_twoWeightData);
 		ref->m_twoWeightData = 0;
 	}
 	if (ref->m_threeWeightData != 0) {
-		operator delete(ref->m_threeWeightData);
+		operator delete[](ref->m_threeWeightData);
 		ref->m_threeWeightData = 0;
 	}
 	if (ref->m_displayLists != 0) {
@@ -3150,7 +3150,7 @@ CChara::CMesh::CDisplayList::~CDisplayList()
 {
 	void** data = (void**)((u8*)this + 4);
 	if (data[0] != 0) {
-		operator delete(data[0]);
+		operator delete[](data[0]);
 		data[0] = 0;
 	}
 }

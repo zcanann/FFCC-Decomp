@@ -56,6 +56,7 @@ extern float FLOAT_80331d28;
 extern float FLOAT_80331d2c;
 extern float FLOAT_80331d30;
 extern float FLOAT_80331d58;
+extern float FLOAT_80331d5c;
 extern float FLOAT_80331d6c;
 extern float FLOAT_80331d70;
 extern float FLOAT_80331d74;
@@ -86,6 +87,8 @@ extern double DOUBLE_80331dc0;
 extern "C" char s_meteo_3_80331D64[8];
 extern char SoundBuffer[];
 extern char SoundBuffer_1260_[];
+extern "C" float MG_GBA_THREAD_MSG_SETPORT_ct;
+extern "C" char g_errCt;
 extern "C" unsigned char m_boss__8CGMonObj[];
 extern "C" Vec DAT_802127c0;
 extern "C" Vec DAT_802127f0[];
@@ -2382,34 +2385,51 @@ void CGMonObj::alwaysFuncMeteoParasite()
 	CGObject* object = reinterpret_cast<CGObject*>(this);
 	CGCharaObj* chara = reinterpret_cast<CGCharaObj*>(this);
 	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
-	u8* bossFlags = m_boss__8CGMonObj + 0x5C;
-	int* bossIndex = reinterpret_cast<int*>(m_boss__8CGMonObj + 0x58);
-	int* bossMode = reinterpret_cast<int*>(m_boss__8CGMonObj + 0x60);
 	u8* mon = reinterpret_cast<u8*>(this);
 	const int scriptKind = reinterpret_cast<int>(object->m_scriptHandle[4]);
 
-	if (object->m_scriptHandle[4] == reinterpret_cast<void*>(0x85) && ((*reinterpret_cast<unsigned char*>(SoundBuffer + 1356) & 0x40) == 0)) {
-		*reinterpret_cast<float*>(SoundBuffer + 1260) += FLOAT_80331d60;
+	if (scriptKind == 0x85 && ((m_boss__8CGMonObj[0x7C] & 0x40) == 0)) {
+		if (g_errCt == 0) {
+			g_errCt = 1;
+			MG_GBA_THREAD_MSG_SETPORT_ct = FLOAT_80331cf8;
+		}
+
+		PSMTXRotRad(reinterpret_cast<CChara::CNode**>(m_boss__8CGMonObj)[0]->m_localRuntimeMtx, 'x',
+		            MG_GBA_THREAD_MSG_SETPORT_ct);
+		PSMTXRotRad(reinterpret_cast<CChara::CNode**>(m_boss__8CGMonObj)[1]->m_localRuntimeMtx, 'x',
+		            -MG_GBA_THREAD_MSG_SETPORT_ct);
+
+		float rotBase = FLOAT_80331d58;
+		float rotStep = FLOAT_80331d2c;
+		float rotDivisor = FLOAT_80331d5c;
+		CGObject** rotObjects = reinterpret_cast<CGObject**>(m_boss__8CGMonObj + 0x38);
+		for (int i = 0; i < 12; i++) {
+			rotObjects[i]->m_rotTargetY =
+			    (rotBase * rotStep * static_cast<float>(i + 3)) / rotDivisor + MG_GBA_THREAD_MSG_SETPORT_ct;
+		}
+
+		MG_GBA_THREAD_MSG_SETPORT_ct += FLOAT_80331d60;
 	}
 
-	if (scriptKind < 0x88 && scriptKind > 0x84 && *bossIndex == scriptKind - 0x85 && (*bossFlags & 0x80) != 0) {
+	if (scriptKind < 0x88 && scriptKind > 0x84 &&
+	    *reinterpret_cast<int*>(m_boss__8CGMonObj + 0x78) == scriptKind - 0x85 && (m_boss__8CGMonObj[0x7C] & 0x80) != 0) {
 		int effect;
 		int arg0;
 		int arg1;
 		if (chara->getItemPdt(0, 0, effect, arg0, arg1) != 0) {
-			if (*bossMode == 0) {
+			if (*reinterpret_cast<int*>(m_boss__8CGMonObj + 0x80) == 0) {
 				changeStat__8CGPrgObjFiii(prgObj, 100, 0, 0);
-				*reinterpret_cast<int*>(mon + 0x6B4) = 0;
+				*reinterpret_cast<int*>(mon + 0x6D0) = 0;
 			}
-			if (*bossMode == 2) {
+			if (*reinterpret_cast<int*>(m_boss__8CGMonObj + 0x80) == 2) {
 				changeStat__8CGPrgObjFiii(prgObj, 0x65, 0, 0);
-				*reinterpret_cast<int*>(mon + 0x6B4) = 2;
+				*reinterpret_cast<int*>(mon + 0x6D0) = 2;
 			}
-			if (*bossMode == 1) {
+			if (*reinterpret_cast<int*>(m_boss__8CGMonObj + 0x80) == 1) {
 				changeStat__8CGPrgObjFiii(prgObj, 0x66, 0, 0);
-				*reinterpret_cast<int*>(mon + 0x6B4) = 1;
+				*reinterpret_cast<int*>(mon + 0x6D0) = 1;
 			}
-			*bossFlags &= 0x7F;
+			m_boss__8CGMonObj[0x7C] &= 0x7F;
 		}
 	}
 }

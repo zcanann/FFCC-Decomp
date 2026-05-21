@@ -3,6 +3,7 @@
 #include "ffcc/system.h"
 
 #include <string.h>
+#include <PowerPC_EABI_Support/Runtime/New.h>
 
 CTextureMan TextureMan;
 
@@ -647,7 +648,7 @@ void CTexture::Create(CChunkFile& chunkFile, CMemory::CStage* stage, CAmemCacheS
                 chunkFile.Get(data, chunk.m_size);
                 m_cacheId = SetData__13CAmemCacheSetFPviQ210CAmemCache4TYPEi(
                     amemCacheSet, data, chunk.m_size, static_cast<CAmemCache::TYPE>(0), cacheTag);
-                __dl__FPv(data);
+                operator delete(data);
                 m_imageData = 0;
             } else {
                 if (m_usesExternalAddress != 0) {

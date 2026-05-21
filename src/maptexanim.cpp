@@ -314,6 +314,6 @@ void CMapTexAnimSet::Create(CChunkFile& chunkFile, CMaterialSet* materialSet, CT
  */
 CMapTexAnim::~CMapTexAnim()
 {
-    delete[] m_frameTable;
+    delete m_frameTable;
     m_frameTable = 0;
 }

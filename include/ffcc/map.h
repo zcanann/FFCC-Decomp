@@ -25,30 +25,22 @@ void GXSetTexCoordGen();
 class CMapKeyFrame
 {
 public:
-    CMapKeyFrame()
-    {
-        m_junTable = 0;
-        m_keyFrame = 0;
-        m_keyValue = 0;
-        m_splineTable = 0;
-        m_isRun = 0;
-    }
     ~CMapKeyFrame()
     {
         if (m_junTable != 0) {
-            delete[] m_junTable;
+            delete m_junTable;
             m_junTable = 0;
         }
         if (m_keyFrame != 0) {
-            delete[] m_keyFrame;
+            delete m_keyFrame;
             m_keyFrame = 0;
         }
         if (m_keyValue != 0) {
-            delete[] m_keyValue;
+            delete m_keyValue;
             m_keyValue = 0;
         }
         if (m_splineTable != 0) {
-            delete[] m_splineTable;
+            delete m_splineTable;
             m_splineTable = 0;
         }
     }

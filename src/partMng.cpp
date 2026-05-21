@@ -31,6 +31,7 @@ extern int gPppHeapUseRateWords[3];
 
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
+#include <PowerPC_EABI_Support/Runtime/MWCPlusLib.h>
 #include <PowerPC_EABI_Support/Runtime/New.h>
 
 extern "C" void Printf__7CSystemFPce(CSystem*, const char*, ...);
@@ -76,8 +77,6 @@ extern "C" void __ct__10pppShapeStFv(pppShapeSt* shapeSt);
 extern "C" void __dt__10pppShapeStFv(pppShapeSt* shapeSt, int);
 extern "C" void __ct__10pppModelStFv(pppModelSt* modelSt);
 extern "C" void __dt__10pppModelStFv(pppModelSt* modelSt, int);
-extern "C" void __construct_array(void*, void (*)(void*), void (*)(void*, int), unsigned long, unsigned long);
-extern "C" void __destroy_arr(void*, void*, unsigned long, unsigned long);
 extern "C" void pppDestroyHeap__FP9_pppEnvSt(_pppEnvSt*);
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, int, int, int, int);
@@ -368,7 +367,7 @@ void CPartMng::Destroy()
                 }
             }
         }
-        __destroy_arr(res->m_pppModelStArr, reinterpret_cast<void*>(__dt__10pppModelStFv), 0x6c, 0x100);
+        __destroy_arr(res->m_pppModelStArr, reinterpret_cast<ConstructorDestructor>(__dt__10pppModelStFv), 0x6c, 0x100);
         operator delete(res->m_pppModelStArr);
         res->m_pppModelStArr = 0;
     }
@@ -392,7 +391,7 @@ void CPartMng::Destroy()
                 }
             }
         }
-        __destroy_arr(res->m_pppShapeStArr, reinterpret_cast<void*>(__dt__10pppShapeStFv), 0x2c, 0x100);
+        __destroy_arr(res->m_pppShapeStArr, reinterpret_cast<ConstructorDestructor>(__dt__10pppShapeStFv), 0x2c, 0x100);
         operator delete(res->m_pppShapeStArr);
         res->m_pppShapeStArr = 0;
     }
@@ -3561,8 +3560,8 @@ void CPartMng::pppLoadPmd(const char* baseName)
             __nw__FUlPQ27CMemory6CStagePci(
                 0x6c00, stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0xca9));
         if (modelArray != 0) {
-            __construct_array(modelArray, reinterpret_cast<void (*)(void*)>(__ct__10pppModelStFv),
-                              reinterpret_cast<void (*)(void*, int)>(__dt__10pppModelStFv), 0x6c, 0x100);
+            __construct_array(modelArray, reinterpret_cast<ConstructorDestructor>(__ct__10pppModelStFv),
+                              reinterpret_cast<ConstructorDestructor>(__dt__10pppModelStFv), 0x6c, 0x100);
             for (int i = 0; i < 0x100; i++) {
                 modelArray[i].m_isUsed = 0;
             }
@@ -3681,8 +3680,8 @@ void CPartMng::pppLoadPan(const char* baseName)
             __nw__FUlPQ27CMemory6CStagePci(
                 0x2c00, stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0xd0b));
         if (shapeArray != 0) {
-            __construct_array(shapeArray, reinterpret_cast<void (*)(void*)>(__ct__10pppShapeStFv),
-                              reinterpret_cast<void (*)(void*, int)>(__dt__10pppShapeStFv), 0x2c, 0x100);
+            __construct_array(shapeArray, reinterpret_cast<ConstructorDestructor>(__ct__10pppShapeStFv),
+                              reinterpret_cast<ConstructorDestructor>(__dt__10pppShapeStFv), 0x2c, 0x100);
             for (int i = 0; i < 0x100; i++) {
                 shapeArray[i].m_inUse = 0;
             }
@@ -4691,8 +4690,8 @@ extern "C" void __sinit_partMng_cpp(void)
     // To match, replace with proper constructors or initializer expressions, then
     // delete this function so the compiler auto-generates it.
 
-    __construct_array(reinterpret_cast<unsigned char*>(&PartMng) + 0x2A18, (void (*)(void*))__ct__9_pppMngStFv, 0,
-                      0x158, 0x180);
+    __construct_array(reinterpret_cast<unsigned char*>(&PartMng) + 0x2A18,
+                      reinterpret_cast<ConstructorDestructor>(__ct__9_pppMngStFv), 0, 0x158, 0x180);
 
     g_dcp.m_soundEffectParams.m_soundEffectHandle = -1;
     g_dcp.m_soundEffectParams.m_soundEffectSlot = -1;

@@ -17,6 +17,7 @@
 #include "ffcc/system.h"
 
 #include <string.h>
+#include <PowerPC_EABI_Support/Runtime/MWCPlusLib.h>
 #include <PowerPC_EABI_Support/Runtime/New.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
@@ -24,7 +25,6 @@ CMapMng MapMng;
 char g_StrTmp[0x400];
 
 extern "C" unsigned long UnkMaterialSetGetter(void*);
-extern "C" void __destroy_arr(void*, void*, unsigned long, unsigned long);
 extern "C" void __dt__4CRefFv(void*, int);
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
@@ -35,7 +35,6 @@ extern "C" void __dt__8CMapMeshFv(void*, int);
 extern "C" void __dt__7CMapMngFv(void*, int);
 extern "C" void __dt__8CMapAnimFv(void*, int);
 extern "C" void __dt__13CMapAnimKeyDtFv(void*, int);
-extern "C" void __construct_array(void*, void (*)(void*), void (*)(void*, int), unsigned long, unsigned long);
 extern "C" void* __register_global_object(void*, void*, void*);
 extern "C" void __ct__8COctTreeFv(void*);
 extern "C" void __ct__7CMapHitFv(void*);
@@ -3792,22 +3791,26 @@ extern "C" void __sinit_map_cpp(void)
     // (and any sub-construction) into the class constructor, then delete this
     // function. The compiler will auto-generate __sinit from the global object.
 
-    __construct_array(Ptr(&MapMng, 0x14), __ct__8COctTreeFv, __dt__8COctTreeFv, 0x4C, 0x10);
-    __construct_array(Ptr(&MapMng, 0x4D4), __ct__7CMapHitFv, __dt__7CMapHitFv, 0x24, 0x20);
-    __construct_array(Ptr(&MapMng, 0x954), __ct__7CMapObjFv, __dt__7CMapObjFv, 0xF0, 0x200);
-    __construct_array(Ptr(&MapMng, 0x1E954), __ct__8CMapMeshFv, __dt__8CMapMeshFv, 0x44, 0xA0);
+    __construct_array(Ptr(&MapMng, 0x14), reinterpret_cast<ConstructorDestructor>(__ct__8COctTreeFv),
+                      reinterpret_cast<ConstructorDestructor>(__dt__8COctTreeFv), 0x4C, 0x10);
+    __construct_array(Ptr(&MapMng, 0x4D4), reinterpret_cast<ConstructorDestructor>(__ct__7CMapHitFv),
+                      reinterpret_cast<ConstructorDestructor>(__dt__7CMapHitFv), 0x24, 0x20);
+    __construct_array(Ptr(&MapMng, 0x954), reinterpret_cast<ConstructorDestructor>(__ct__7CMapObjFv),
+                      reinterpret_cast<ConstructorDestructor>(__dt__7CMapObjFv), 0xF0, 0x200);
+    __construct_array(Ptr(&MapMng, 0x1E954), reinterpret_cast<ConstructorDestructor>(__ct__8CMapMeshFv),
+                      reinterpret_cast<ConstructorDestructor>(__dt__8CMapMeshFv), 0x44, 0xA0);
     __ct__25CPtrArray_P11CMapAnimRun_Fv(Ptr(&MapMng, 0x213E0));
     __ct__21CPtrArray_P8CMapAnim_Fv(Ptr(&MapMng, 0x213FC));
     __ct__27CPtrArray_P13CMapAnimKeyDt_Fv(Ptr(&MapMng, 0x21418));
     __ct__24CPtrArray_P10CMapShadow_Fv(Ptr(&MapMng, 0x21434));
     __construct_array(
         Ptr(&MapMng, 0x21450),
-        __ct__29CPtrArray_P15CMapLightHolder_Fv,
-        reinterpret_cast<void (*)(void*, int)>(dtor_80034414),
+        reinterpret_cast<ConstructorDestructor>(__ct__29CPtrArray_P15CMapLightHolder_Fv),
+        reinterpret_cast<ConstructorDestructor>(dtor_80034414),
         0x1C,
         2);
 
-    __construct_array(Ptr(&MapMng, 0x214E8), __ct__9CMapIdGrpFv, 0, 0x14, 0x100);
+    __construct_array(Ptr(&MapMng, 0x214E8), reinterpret_cast<ConstructorDestructor>(__ct__9CMapIdGrpFv), 0, 0x14, 0x100);
     __register_global_object(&MapMng, reinterpret_cast<void*>(__dt__7CMapMngFv), &Vec_80245758);
 }
 
@@ -3822,8 +3825,7 @@ extern "C" void __sinit_map_cpp(void)
  */
 CMapMng::~CMapMng()
 {
-    __destroy_arr(
-        Ptr(this, 0x21450), reinterpret_cast<void*>(dtor_80034414), 0x1C, 2);
+    __destroy_arr(Ptr(this, 0x21450), reinterpret_cast<ConstructorDestructor>(dtor_80034414), 0x1C, 2);
     if (Ptr(this, 0x21434) != 0) {
         *reinterpret_cast<void***>(Ptr(this, 0x21434)) = __vt__8CPtrArrayIP10CMapShadow;
         void* items = *reinterpret_cast<void**>(Ptr(this, 0x21444));
@@ -3864,10 +3866,10 @@ CMapMng::~CMapMng()
         *reinterpret_cast<int*>(Ptr(this, 0x213E8)) = 0;
         *reinterpret_cast<int*>(Ptr(this, 0x213E4)) = 0;
     }
-    __destroy_arr(Ptr(this, 0x1E954), (void*)__dt__8CMapMeshFv, 0x44, 0xA0);
-    __destroy_arr(Ptr(this, 0x954), (void*)__dt__7CMapObjFv, 0xF0, 0x200);
-    __destroy_arr(Ptr(this, 0x4D4), (void*)__dt__7CMapHitFv, 0x24, 0x20);
-    __destroy_arr(Ptr(this, 0x14), (void*)__dt__8COctTreeFv, 0x4C, 0x10);
+    __destroy_arr(Ptr(this, 0x1E954), reinterpret_cast<ConstructorDestructor>(__dt__8CMapMeshFv), 0x44, 0xA0);
+    __destroy_arr(Ptr(this, 0x954), reinterpret_cast<ConstructorDestructor>(__dt__7CMapObjFv), 0xF0, 0x200);
+    __destroy_arr(Ptr(this, 0x4D4), reinterpret_cast<ConstructorDestructor>(__dt__7CMapHitFv), 0x24, 0x20);
+    __destroy_arr(Ptr(this, 0x14), reinterpret_cast<ConstructorDestructor>(__dt__8COctTreeFv), 0x4C, 0x10);
 }
 
 /*

@@ -12,6 +12,7 @@
 #include <dolphin/mtx.h>
 
 #include <string.h>
+#include <PowerPC_EABI_Support/Runtime/MWCPlusLib.h>
 #include <PowerPC_EABI_Support/Runtime/New.h>
 
 CMaterialMan MaterialMan;
@@ -23,8 +24,6 @@ extern "C" void __ct__4CRefFv(void*);
 extern "C" void __dt__4CRefFv(void*, int);
 extern "C" void __ct__10CTexScrollFv(void*);
 extern "C" void __dt__10CTexScrollFv(void*, int);
-extern "C" void __construct_array(void*, void (*)(void*), void (*)(void*, int), unsigned long, unsigned long);
-extern "C" void __destroy_arr(void*, void*, unsigned long, unsigned long);
 extern "C" int CheckName__8CTextureFPc(CTexture*, char*);
 extern "C" int CheckFrustum__6CBoundFR3VecPA4_ff(CBound*, Vec*, float (*)[4], float);
 extern "C" int GetBackBufferRect__8CGraphicFRiRiRiRii(CGraphic*, int*, int*, int*, int*, int);
@@ -240,7 +239,8 @@ static CMaterial* AllocMaterial()
 
     __ct__4CRefFv(material);
     *reinterpret_cast<void**>(material) = __vt__9CMaterial;
-    __construct_array(material + 0x4C, __ct__10CTexScrollFv, __dt__10CTexScrollFv, 0x14, 4);
+    __construct_array(material + 0x4C, reinterpret_cast<ConstructorDestructor>(__ct__10CTexScrollFv),
+                      reinterpret_cast<ConstructorDestructor>(__dt__10CTexScrollFv), 0x14, 4);
     memset(material + 8, 0, 0x10);
     *reinterpret_cast<int*>(material + 0x9C) = -1;
     material[0xA0] = 4;
@@ -2411,7 +2411,7 @@ void CMaterialMan::ErrorTexMapIdCur()
 extern "C" CMaterial* __dt__Q29CMaterial25_class_529materialman_cppFv(CMaterial* material, short shouldDelete)
 {
     if (material != 0) {
-        __destroy_arr(Ptr(material, 0x10), (void*)__dt__10CTexScrollFv, 0x14, 4);
+        __destroy_arr(Ptr(material, 0x10), reinterpret_cast<ConstructorDestructor>(__dt__10CTexScrollFv), 0x14, 4);
         if (shouldDelete > 0) {
             operator delete(material);
         }
@@ -2532,7 +2532,7 @@ CMaterial::~CMaterial()
         *reinterpret_cast<void**>(textureRef) = 0;
     }
 
-    __destroy_arr(Ptr(this, 0x4C), (void*)__dt__10CTexScrollFv, 0x14, 4);
+    __destroy_arr(Ptr(this, 0x4C), reinterpret_cast<ConstructorDestructor>(__dt__10CTexScrollFv), 0x14, 4);
 }
 
 /*
@@ -2546,7 +2546,8 @@ CMaterial::~CMaterial()
  */
 CMaterial::CMaterial()
 {
-    __construct_array(Ptr(this, 0x4C), __ct__10CTexScrollFv, __dt__10CTexScrollFv, 0x14, 4);
+    __construct_array(Ptr(this, 0x4C), reinterpret_cast<ConstructorDestructor>(__ct__10CTexScrollFv),
+                      reinterpret_cast<ConstructorDestructor>(__dt__10CTexScrollFv), 0x14, 4);
     memset(Ptr(this, 0x8), 0, 0x10);
     *reinterpret_cast<int*>(Ptr(this, 0x9C)) = -1;
     *Ptr(this, 0xA0) = 4;
@@ -2993,7 +2994,8 @@ void CMaterialSet::SetPartFromTextureSet(CTextureSet* textureSet, int pdtSlotInd
             if (material != 0) {
                 __ct__4CRefFv(material);
                 *reinterpret_cast<void**>(material) = __vt__9CMaterial;
-                __construct_array(material + 0x4C, __ct__10CTexScrollFv, __dt__10CTexScrollFv, 0x14, 4);
+                __construct_array(material + 0x4C, reinterpret_cast<ConstructorDestructor>(__ct__10CTexScrollFv),
+                                  reinterpret_cast<ConstructorDestructor>(__dt__10CTexScrollFv), 0x14, 4);
                 memset(material + 8, 0, 0x10);
                 *reinterpret_cast<int*>(material + 0x9C) = -1;
                 material[0xA0] = 4;

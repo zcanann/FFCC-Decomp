@@ -26,7 +26,6 @@ class CMapKeyFrame
 {
 public:
     CMapKeyFrame();
-    ~CMapKeyFrame();
 
     float Get();
     int Get(int&, int&, float&);

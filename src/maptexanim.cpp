@@ -314,6 +314,24 @@ void CMapTexAnimSet::Create(CChunkFile& chunkFile, CMaterialSet* materialSet, CT
  */
 CMapTexAnim::~CMapTexAnim()
 {
-    delete[] m_frameTable;
+    delete m_frameTable;
     m_frameTable = 0;
+    if (&m_keyFrame != 0) {
+        if (m_keyFrame.m_junTable != 0) {
+            delete m_keyFrame.m_junTable;
+            m_keyFrame.m_junTable = 0;
+        }
+        if (m_keyFrame.m_keyFrame != 0) {
+            delete m_keyFrame.m_keyFrame;
+            m_keyFrame.m_keyFrame = 0;
+        }
+        if (m_keyFrame.m_keyValue != 0) {
+            delete m_keyFrame.m_keyValue;
+            m_keyFrame.m_keyValue = 0;
+        }
+        if (m_keyFrame.m_splineTable != 0) {
+            delete m_keyFrame.m_splineTable;
+            m_keyFrame.m_splineTable = 0;
+        }
+    }
 }

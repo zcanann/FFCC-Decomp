@@ -43,8 +43,6 @@ extern "C" CGMonObj* FindGMonObjFirst__13CFlatRuntime2Fv(void*);
 extern "C" CGMonObj* FindGMonObjNext__13CFlatRuntime2FP8CGMonObj(void*, CGMonObj*);
 extern "C" void teleport__8CGMonObjFiiiiiiiiiP3VecRiR3Vec(CGMonObj*, int, int, int, int, int, int, int, int, int,
                                                            Vec*, int&, Vec&);
-extern "C" int SearchNode__Q26CChara6CModelFPc(CChara::CModel*, char*);
-extern "C" int GetDispIndex__Q26CChara6CModelFPQ26CChara5CNode(CChara::CModel*, CChara::CNode*);
 extern float FLOAT_80331dd0;
 extern const float FLOAT_80331cf8 = 0.0f;
 extern float FLOAT_80331dcc;
@@ -2313,30 +2311,25 @@ void CGMonObj::initFinishedFuncMeteoParasite()
 
 	const int scriptKind = reinterpret_cast<int>(reinterpret_cast<CGObject*>(this)->m_scriptHandle[4]);
 	if (scriptKind == 0x85) {
+		CGObject* object = reinterpret_cast<CGObject*>(this);
+		CChara::CModel* model = object->m_charaModelHandle->m_model;
 		CChara::CNode** nodes = reinterpret_cast<CChara::CNode**>(SoundBuffer_1260_);
-		int nodeIndex =
-		    SearchNode__Q26CChara6CModelFPc(reinterpret_cast<CGObject*>(this)->m_charaModelHandle->m_model,
-		                                    const_cast<char*>(s_to_a_obj_801dd4e8));
-		nodes[0] = reinterpret_cast<CGObject*>(this)->m_charaModelHandle->m_model->m_nodes + nodeIndex;
+		int nodeIndex = model->SearchNode(const_cast<char*>(s_to_a_obj_801dd4e8));
+		nodes[0] = model->m_nodes + nodeIndex;
 		nodes[0]->m_flags &= 0x7F;
 
-		nodeIndex =
-		    SearchNode__Q26CChara6CModelFPc(reinterpret_cast<CGObject*>(this)->m_charaModelHandle->m_model,
-		                                    const_cast<char*>(s_to_b_obj_801dd4f4));
-		nodes[1] = reinterpret_cast<CGObject*>(this)->m_charaModelHandle->m_model->m_nodes + nodeIndex;
+		nodeIndex = model->SearchNode(const_cast<char*>(s_to_b_obj_801dd4f4));
+		nodes[1] = model->m_nodes + nodeIndex;
 		nodes[1]->m_flags &= 0x7F;
 
 		char nodeName[256];
 		for (int i = 0; i < 12; i++) {
 			sprintf(nodeName, s_to_02d_obj_801dd500, i + 1);
-			nodeIndex = SearchNode__Q26CChara6CModelFPc(reinterpret_cast<CGObject*>(this)->m_charaModelHandle->m_model,
-			                                            nodeName);
-			nodes[i + 2] = reinterpret_cast<CGObject*>(this)->m_charaModelHandle->m_model->m_nodes + nodeIndex;
+			nodeIndex = model->SearchNode(nodeName);
+			nodes[i + 2] = model->m_nodes + nodeIndex;
 			if ((m_boss__8CGMonObj[0x5C] & 0x40) != 0) {
-				int dispIndex =
-				    GetDispIndex__Q26CChara6CModelFPQ26CChara5CNode(
-				        reinterpret_cast<CGObject*>(this)->m_charaModelHandle->m_model, nodes[i + 2]);
-				reinterpret_cast<CGObject*>(this)->m_charaModelHandle->m_model->m_meshVisibleMask &= ~(1 << dispIndex);
+				int dispIndex = model->GetDispIndex(nodes[i + 2]);
+				model->m_meshVisibleMask &= ~(1 << dispIndex);
 			}
 		}
 	}
@@ -2609,8 +2602,7 @@ void CGMonObj::damagedFuncDuct()
 		CGObject* bossObj = *reinterpret_cast<CGObject**>(SoundBuffer_1260_ + 0x68);
 		CChara::CModel* model = bossObj->m_charaModelHandle->m_model;
 		CChara::CNode** nodes = reinterpret_cast<CChara::CNode**>(SoundBuffer_1260_ + 0x8);
-		int dispIndex = GetDispIndex__Q26CChara6CModelFPQ26CChara5CNode(
-		    model, nodes[slot]);
+		int dispIndex = model->GetDispIndex(nodes[slot]);
 		model->m_meshVisibleMask &= ~(1 << dispIndex);
 	}
 }

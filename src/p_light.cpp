@@ -220,8 +220,8 @@ void CLightPcs::destroy()
                 Memory.Free(light.m_textureData);
                 light.m_textureData = 0;
             }
-            light.m_hasTexture = 0;
-            light.m_useViewSpace = 0;
+            light->m_hasTexture = 0;
+            light->m_useViewSpace = 0;
         }
     }
 
@@ -233,8 +233,8 @@ void CLightPcs::destroy()
                 Memory.Free(light.m_textureData);
                 light.m_textureData = 0;
             }
-            light.m_hasTexture = 0;
-            light.m_useViewSpace = 0;
+            light->m_hasTexture = 0;
+            light->m_useViewSpace = 0;
         }
     }
 }

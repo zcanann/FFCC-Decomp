@@ -957,39 +957,43 @@ void CMemoryCardMan::MakeSaveData()
     save[0x11] = static_cast<u8>(Math.Rand(0xFF));
     save[0x12] = 0;
 
-    int wm0 = Game.m_gameWork.m_wmBackupParams[0];
-    int wm1 = Game.m_gameWork.m_wmBackupParams[1];
-    int wm2 = Game.m_gameWork.m_wmBackupParams[2];
-    int wm3 = Game.m_gameWork.m_wmBackupParams[3];
-    if (Game.m_caravanWorkArr[Game.m_gameWork.m_wmBackupParams[0]].m_shopState == 0)
+    int wm = Game.m_gameWork.m_wmBackupParams[0];
+    CCaravanWork* wmWork = &Game.m_caravanWorkArr[wm];
+    if (wmWork->m_shopState == 0)
     {
         Game.m_gameWork.m_wmBackupParams[0] = -1;
     }
-    if (Game.m_caravanWorkArr[wm0].m_shopBusyFlag != 0)
+    if (wmWork->m_shopBusyFlag != 0)
     {
         Game.m_gameWork.m_wmBackupParams[0] = -1;
     }
-    if (Game.m_caravanWorkArr[Game.m_gameWork.m_wmBackupParams[1]].m_shopState == 0)
+    wm = Game.m_gameWork.m_wmBackupParams[1];
+    wmWork = &Game.m_caravanWorkArr[wm];
+    if (wmWork->m_shopState == 0)
     {
         Game.m_gameWork.m_wmBackupParams[1] = -1;
     }
-    if (Game.m_caravanWorkArr[wm1].m_shopBusyFlag != 0)
+    if (wmWork->m_shopBusyFlag != 0)
     {
         Game.m_gameWork.m_wmBackupParams[1] = -1;
     }
-    if (Game.m_caravanWorkArr[Game.m_gameWork.m_wmBackupParams[2]].m_shopState == 0)
+    wm = Game.m_gameWork.m_wmBackupParams[2];
+    wmWork = &Game.m_caravanWorkArr[wm];
+    if (wmWork->m_shopState == 0)
     {
         Game.m_gameWork.m_wmBackupParams[2] = -1;
     }
-    if (Game.m_caravanWorkArr[wm2].m_shopBusyFlag != 0)
+    if (wmWork->m_shopBusyFlag != 0)
     {
         Game.m_gameWork.m_wmBackupParams[2] = -1;
     }
-    if (Game.m_caravanWorkArr[Game.m_gameWork.m_wmBackupParams[3]].m_shopState == 0)
+    wm = Game.m_gameWork.m_wmBackupParams[3];
+    wmWork = &Game.m_caravanWorkArr[wm];
+    if (wmWork->m_shopState == 0)
     {
         Game.m_gameWork.m_wmBackupParams[3] = -1;
     }
-    if (Game.m_caravanWorkArr[wm3].m_shopBusyFlag != 0)
+    if (wmWork->m_shopBusyFlag != 0)
     {
         Game.m_gameWork.m_wmBackupParams[3] = -1;
     }
@@ -1347,39 +1351,43 @@ void CMemoryCardMan::SetLoadData()
 
     }
 
-    int wm0 = gameWork->m_wmBackupParams[0];
-    int wm1 = gameWork->m_wmBackupParams[1];
-    int wm2 = gameWork->m_wmBackupParams[2];
-    int wm3 = gameWork->m_wmBackupParams[3];
-    if (Game.m_caravanWorkArr[gameWork->m_wmBackupParams[0]].m_shopState == 0)
+    int wm = gameWork->m_wmBackupParams[0];
+    CCaravanWork* wmWork = &Game.m_caravanWorkArr[wm];
+    if (wmWork->m_shopState == 0)
     {
         gameWork->m_wmBackupParams[0] = -1;
     }
-    if (Game.m_caravanWorkArr[wm0].m_shopBusyFlag != 0)
+    if (wmWork->m_shopBusyFlag != 0)
     {
         gameWork->m_wmBackupParams[0] = -1;
     }
-    if (Game.m_caravanWorkArr[gameWork->m_wmBackupParams[1]].m_shopState == 0)
+    wm = gameWork->m_wmBackupParams[1];
+    wmWork = &Game.m_caravanWorkArr[wm];
+    if (wmWork->m_shopState == 0)
     {
         gameWork->m_wmBackupParams[1] = -1;
     }
-    if (Game.m_caravanWorkArr[wm1].m_shopBusyFlag != 0)
+    if (wmWork->m_shopBusyFlag != 0)
     {
         gameWork->m_wmBackupParams[1] = -1;
     }
-    if (Game.m_caravanWorkArr[gameWork->m_wmBackupParams[2]].m_shopState == 0)
+    wm = gameWork->m_wmBackupParams[2];
+    wmWork = &Game.m_caravanWorkArr[wm];
+    if (wmWork->m_shopState == 0)
     {
         gameWork->m_wmBackupParams[2] = -1;
     }
-    if (Game.m_caravanWorkArr[wm2].m_shopBusyFlag != 0)
+    if (wmWork->m_shopBusyFlag != 0)
     {
         gameWork->m_wmBackupParams[2] = -1;
     }
-    if (Game.m_caravanWorkArr[gameWork->m_wmBackupParams[3]].m_shopState == 0)
+    wm = gameWork->m_wmBackupParams[3];
+    wmWork = &Game.m_caravanWorkArr[wm];
+    if (wmWork->m_shopState == 0)
     {
         gameWork->m_wmBackupParams[3] = -1;
     }
-    if (Game.m_caravanWorkArr[wm3].m_shopBusyFlag != 0)
+    if (wmWork->m_shopBusyFlag != 0)
     {
         gameWork->m_wmBackupParams[3] = -1;
     }

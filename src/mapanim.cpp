@@ -9,7 +9,6 @@
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h"
 #include <PowerPC_EABI_Support/Runtime/New.h>
 
-extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void Calc__8CMapAnimFl(CMapAnim*, long);
 
 static const char s_mapanim_cpp[] = "mapanim.cpp";
@@ -166,8 +165,7 @@ void CMapAnim::ReadOtmAnim(CChunkFile& chunkFile)
             m_endFrame = static_cast<int>(chunkFile.Get4());
         } else if (chunkId == 0x4E4F4445) {
             item = static_cast<int*>(
-                __nw__FUlPQ27CMemory6CStagePci(
-                    0xC, *reinterpret_cast<CMemory::CStage**>(&MapMng), const_cast<char*>(s_mapanim_cpp), 0xC2));
+                operator new(0xC, *reinterpret_cast<CMemory::CStage**>(&MapMng), const_cast<char*>(s_mapanim_cpp), 0xC2));
             if (item != 0) {
                 item[2] = 0;
             }
@@ -180,7 +178,7 @@ void CMapAnim::ReadOtmAnim(CChunkFile& chunkFile)
                     item[0] = reinterpret_cast<int>(reinterpret_cast<unsigned char*>(&MapMng) + (nodeIdx * 0xF0) + 0x954);
                 } else if (innerChunkId == 0x5452414E) {
                     keyData = reinterpret_cast<int>(
-                        __nw__FUlPQ27CMemory6CStagePci(
+                        operator new(
                             0x18, *reinterpret_cast<CMemory::CStage**>(&MapMng), const_cast<char*>(s_mapanim_cpp), 0x4C));
                     if (keyData != 0) {
                         *reinterpret_cast<int*>(keyData + 0x4) = 0;

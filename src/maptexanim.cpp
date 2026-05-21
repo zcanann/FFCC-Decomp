@@ -26,7 +26,6 @@ extern "C" void Calc__11CMapTexAnimFP12CMaterialSetP11CTextureSet(CMapTexAnim*, 
 extern "C" void __ct__4CRefFv(void*);
 extern "C" void __dt__4CRefFv(void*, int);
 extern "C" CMapTexAnim* __dt__11CMapTexAnimFv(CMapTexAnim*, short);
-extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void* __RTTI__11CMapTexAnim_8032E690;
 extern "C" void* PTR_PTR_s_CMapTexAnim[] = {
     &__RTTI__11CMapTexAnim_8032E690,
@@ -262,7 +261,7 @@ void CMapTexAnimSet::Create(CChunkFile& chunkFile, CMaterialSet* materialSet, CT
     while (chunkFile.GetNextChunk(chunk) != 0) {
         switch (chunk.m_id) {
         case 0x54414E4D:
-            ref = static_cast<CMapTexAnim*>(__nw__FUlPQ27CMemory6CStagePci(
+            ref = static_cast<CMapTexAnim*>(operator new(
                 0x4C, *reinterpret_cast<CMemory::CStage**>(&MapMng), const_cast<char*>(s_maptexanim_cpp_801d7ec4),
                 0x24));
             if (ref != 0) {

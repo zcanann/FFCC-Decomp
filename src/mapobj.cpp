@@ -149,9 +149,6 @@ static inline Mtx& MapObjHitDrawMtx()
 
 }
 
-extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
-extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
-
 /*
  * --INFO--
  * PAL Address: 0x8002C444
@@ -547,7 +544,7 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             } else if ((U8At(this, 0x1D) == 2) || (U8At(this, 0x1D) == 3)) {
                 if (meshOrHitIdx == -2) {
                     CMapObjAtrMeshName* meshName = reinterpret_cast<CMapObjAtrMeshName*>(
-                        __nw__FUlPQ27CMemory6CStagePci(0x28, *reinterpret_cast<CMemory::CStage**>(&MapMng), "mapobj.cpp", 0x84));
+                        operator new(0x28, *reinterpret_cast<CMemory::CStage**>(&MapMng), "mapobj.cpp", 0x84));
                     if (meshName != 0) {
                         meshName->CMapObjAtrMeshName::CMapObjAtrMeshName();
                     }
@@ -600,7 +597,7 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             U8At(this, 0x1B) = 1;
         } else if (chunk.m_id == CHUNK_ANIM) {
             unsigned char* animRun = reinterpret_cast<unsigned char*>(
-                __nw__FUlPQ27CMemory6CStagePci(0x14, *reinterpret_cast<CMemory::CStage**>(&MapMng), "mapobj.cpp", 0x21E));
+                operator new(0x14, *reinterpret_cast<CMemory::CStage**>(&MapMng), "mapobj.cpp", 0x21E));
             if (animRun != 0) {
                 *reinterpret_cast<int*>(animRun) = -1;
                 *reinterpret_cast<unsigned short*>(animRun + 0x12) = static_cast<unsigned short>(chunkFile.Get4());
@@ -621,7 +618,7 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 System.Printf(const_cast<char*>(s_mapobj_cpp_801D70C0 + 0xCC), objIndex);
             }
             unsigned char* mime = reinterpret_cast<unsigned char*>(
-                __nw__FUlPQ27CMemory6CStagePci(0x3C, *reinterpret_cast<CMemory::CStage**>(&MapMng), "mapobj.cpp", 0x33B));
+                operator new(0x3C, *reinterpret_cast<CMemory::CStage**>(&MapMng), "mapobj.cpp", 0x33B));
 
             if (mime != 0) {
                 reinterpret_cast<CMapObjAtrMime*>(mime)->CMapObjAtrMime::CMapObjAtrMime();
@@ -655,7 +652,7 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 } else if (mimeChunk.m_id == CHUNK_VTXL) {
                     if (mime != 0) {
                         *(mime + 0x8) = static_cast<unsigned char>(mimeChunk.m_arg0);
-                        *reinterpret_cast<void**>(mime + 0xC) = __nwa__FUlPQ27CMemory6CStagePci(
+                        *reinterpret_cast<void**>(mime + 0xC) = operator new[](
                             static_cast<unsigned long>(*(mime + 0x8)) << 2,
                             *reinterpret_cast<CMemory::CStage**>(&MapMng), "mapobj.cpp", 0x348);
                     }
@@ -665,7 +662,7 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                     int vtxTableOffset = 0;
                     while (chunkFile.GetNextChunk(vtxChunk) != 0) {
                         if (vtxChunk.m_id == CHUNK_VTX) {
-                            float* vtx = reinterpret_cast<float*>(__nwa__FUlPQ27CMemory6CStagePci(
+                            float* vtx = reinterpret_cast<float*>(operator new[](
                                 static_cast<unsigned long>(vtxChunk.m_arg0) * 0xC,
                                 *reinterpret_cast<CMemory::CStage**>(&MapMng), "mapobj.cpp", 0x353));
                             if ((mime != 0) && (*reinterpret_cast<void**>(mime + 0xC) != 0)) {
@@ -695,7 +692,7 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 System.Printf(const_cast<char*>(s_mapobj_cpp_801D70C0 + 0xCC), objIndex);
             }
             unsigned char* pointLight = reinterpret_cast<unsigned char*>(
-                __nw__FUlPQ27CMemory6CStagePci(0xF4, *reinterpret_cast<CMemory::CStage**>(&MapMng), "mapobj.cpp", 0xD4));
+                operator new(0xF4, *reinterpret_cast<CMemory::CStage**>(&MapMng), "mapobj.cpp", 0xD4));
 
             if (pointLight != 0) {
                 reinterpret_cast<CMapObjAtrPointLight*>(pointLight)->CMapObjAtrPointLight::CMapObjAtrPointLight();
@@ -761,7 +758,7 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 System.Printf(const_cast<char*>(s_mapobj_cpp_801D70C0 + 0xCC), objIndex);
             }
             unsigned char* spotLight = reinterpret_cast<unsigned char*>(
-                __nw__FUlPQ27CMemory6CStagePci(0x110, *reinterpret_cast<CMemory::CStage**>(&MapMng), "mapobj.cpp", 0x139));
+                operator new(0x110, *reinterpret_cast<CMemory::CStage**>(&MapMng), "mapobj.cpp", 0x139));
 
             if (spotLight != 0) {
                 reinterpret_cast<CMapObjAtrSpotLight*>(spotLight)->CMapObjAtrSpotLight::CMapObjAtrSpotLight();
@@ -844,7 +841,7 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 System.Printf(const_cast<char*>(s_mapobj_cpp_801D70C0 + 0xCC), objIndex);
             }
             CMapObjAtrPlaySta* playSta = reinterpret_cast<CMapObjAtrPlaySta*>(
-                __nw__FUlPQ27CMemory6CStagePci(0xC, *reinterpret_cast<CMemory::CStage**>(&MapMng), "mapobj.cpp", 0x39B));
+                operator new(0xC, *reinterpret_cast<CMemory::CStage**>(&MapMng), "mapobj.cpp", 0x39B));
             if (playSta != 0) {
                 playSta->CMapObjAtrPlaySta::CMapObjAtrPlaySta();
                 *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(playSta) + 8) = chunkFile.Get1();

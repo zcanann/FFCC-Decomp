@@ -35,8 +35,6 @@ extern int gPppHeapUseRateWords[3];
 #include <PowerPC_EABI_Support/Runtime/New.h>
 
 extern "C" void Printf__7CSystemFPce(CSystem*, const char*, ...);
-extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
-extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void _WaitDrawDone__8CGraphicFPci(CGraphic*, const char*, int);
 extern "C" void pppCreateHeap__FP9_pppEnvStUl(_pppEnvSt*, unsigned long);
 extern "C" unsigned int CheckSum__FPvi(void*, int);
@@ -1277,7 +1275,7 @@ void CPartMng::pppReadShp(CChunkFile& chunkFile, pppShapeSt* shapeSt)
 				if (chunk.m_id == 0x444C5354) // 'DLST'
 				{
 					shapeSt->m_displayListData =
-						__nwa__FUlPQ27CMemory6CStagePci(
+						operator new[](
 						    chunk.m_arg0, stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0x4B3);
 					chunkFile.Get(shapeSt->m_displayListData, chunk.m_arg0);
 					DCFlushRange(shapeSt->m_displayListData, (chunk.m_arg0 + 0x1F) & 0xFFFFFFE0);
@@ -1287,7 +1285,7 @@ void CPartMng::pppReadShp(CChunkFile& chunkFile, pppShapeSt* shapeSt)
 					if (chunk.m_id == 0x414E494D) // 'ANIM'
 					{
 						shapeSt->m_animData =
-							__nwa__FUlPQ27CMemory6CStagePci(
+							operator new[](
 							    chunk.m_arg0, stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0x4B9);
 						chunkFile.Get(shapeSt->m_animData, chunk.m_arg0);
 						pppSetShapeMaterial(shapeSt,
@@ -1793,7 +1791,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
             *reinterpret_cast<void**>(self + kRecvBuffOffset) = 0;
         }
         pdtSlots[0].m_pdt = reinterpret_cast<_pppDataHead*>(
-            __nwa__FUlPQ27CMemory6CStagePci(
+            operator new[](
                 packetSize - 0x20, stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0x64D));
         *reinterpret_cast<u8**>(self + kRecvBuffOffset) =
             new (stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0x64E) u8[0x3000];
@@ -1856,7 +1854,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
             }
 
             pdtSlots[pdtCount].m_pdt = reinterpret_cast<_pppDataHead*>(
-                __nwa__FUlPQ27CMemory6CStagePci(
+                operator new[](
                     packetSize - 0x20, stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0x678));
             *reinterpret_cast<u8**>(self + kRecvBuffOffset) =
                 new (stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0x679) u8[0x3000];
@@ -2136,7 +2134,7 @@ void CPartMng::pppEditBeforeCalc()
         CMemory::CStage* stageLoad =
             *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(&PartPcs) + 0x1c);
         *editorObj = static_cast<CGObject*>(
-            __nw__FUlPQ27CMemory6CStagePci(0x518, stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0x7b5));
+            operator new(0x518, stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0x7b5));
         if (*editorObj != 0) {
             Create__9CGBaseObjFv(*editorObj);
 
@@ -3557,7 +3555,7 @@ void CPartMng::pppLoadPmd(const char* baseName)
         CMemory::CStage* stageLoad =
             *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(&PartPcs) + 0x1c);
         pppModelSt* modelArray = reinterpret_cast<pppModelSt*>(
-            __nw__FUlPQ27CMemory6CStagePci(
+            operator new(
                 0x6c00, stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0xca9));
         if (modelArray != 0) {
             __construct_array(modelArray, reinterpret_cast<ConstructorDestructor>(__ct__10pppModelStFv),
@@ -3677,7 +3675,7 @@ void CPartMng::pppLoadPan(const char* baseName)
         CMemory::CStage* stageLoad =
             *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(&PartPcs) + 0x1c);
         pppShapeSt* shapeArray = reinterpret_cast<pppShapeSt*>(
-            __nw__FUlPQ27CMemory6CStagePci(
+            operator new(
                 0x2c00, stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0xd0b));
         if (shapeArray != 0) {
             __construct_array(shapeArray, reinterpret_cast<ConstructorDestructor>(__ct__10pppShapeStFv),
@@ -3810,7 +3808,7 @@ void CPartMng::pppLoadPdt(const char* baseName, int pdtSlotIndex, int cachePrior
 
                     unsigned long copySize = sourceHead->m_partCount * 0x60 + 0x20;
                     _pppDataHead* copiedHead = static_cast<_pppDataHead*>(
-                        __nwa__FUlPQ27CMemory6CStagePci(
+                        operator new[](
                             copySize, stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0xd56));
                     pdtSlot->m_pppDataHead = copiedHead;
 

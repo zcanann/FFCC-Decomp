@@ -34,7 +34,6 @@ extern "C" float Get__12CMapKeyFrameFv(CMapKeyFrame*);
 extern "C" void Calc__12CMapKeyFrameFv(CMapKeyFrame*);
 extern "C" void ReadFrame__12CMapKeyFrameFR10CChunkFilei(CMapKeyFrame*, CChunkFile*);
 extern "C" void ReadKey__12CMapKeyFrameFR10CChunkFilei(CMapKeyFrame*, CChunkFile*, int);
-extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void* __vt__9CMaterial[];
 extern "C" void* __vt__8CManager[];
 extern "C" void* __vt__12CMaterialMan[];
@@ -268,7 +267,7 @@ static void AddTextureIndex(CMaterial* material, unsigned short textureIndex)
 
 static CMapKeyFrame* AllocMapKeyFrame(int line)
 {
-    CMapKeyFrame* keyFrame = reinterpret_cast<CMapKeyFrame*>(__nw__FUlPQ27CMemory6CStagePci(
+    CMapKeyFrame* keyFrame = reinterpret_cast<CMapKeyFrame*>(operator new(
         0x28,
         MaterialMan.GetMemoryStage(),
         const_cast<char*>(s_materialman_cpp),

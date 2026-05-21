@@ -33,15 +33,6 @@ extern "C" void DrawOptionMenu__8CMenuPcsFv(CMenuPcs*);
 extern "C" void DrawSingCMake__8CMenuPcsFv(CMenuPcs*);
 extern CMenuPcs MenuPcs;
 
-extern "C" void SetAnim__Q29CCharaPcs7CHandleFiiiii(void*, int, int, int, int, int);
-extern "C" void LoadAnim__Q29CCharaPcs7CHandleFPciiiiii(void*, char*, int, int, int, int, int, int);
-extern "C" void LoadModelASync__Q29CCharaPcs7CHandleFiUlUl(void*, int, unsigned long, unsigned long);
-extern "C" void SetFrame__Q26CChara6CModelFf(float, void*);
-extern "C" void AddFrame__Q26CChara6CModelFf(float, void*);
-extern "C" void SetMatrix__Q26CChara6CModelFPA4_f(void*, Mtx);
-extern "C" void CalcMatrix__Q26CChara6CModelFv(void*);
-extern "C" void CalcSkin__Q26CChara6CModelFv(void*);
-extern "C" int IsModelLoaded__Q29CCharaPcs7CHandleFi(void*, int);
 extern "C" void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
     void*, void*, int, int, int, void*, void*);
 extern "C" int GetWinMess__8CMenuPcsFi(CMenuPcs*, int);
@@ -65,7 +56,6 @@ extern "C" float GetWidth__5CFontFPc(CFont*, const char*);
 extern "C" void SetPosX__5CFontFf(float, CFont*);
 extern "C" void SetPosY__5CFontFf(float, CFont*);
 extern "C" void Draw__5CFontFPc(CFont*, const char*);
-extern "C" void Draw__Q29CCharaPcs7CHandleFi(void*, int);
 extern "C" void InitEnv__9CCharaPcsFi(void*, int);
 extern "C" unsigned int pppCreate__8CPartMngFiiP14PPPCREATEPARAMi(void*, int, int, void*, int);
 extern "C" void pppDeletePart__8CPartMngFi(void*, int);
@@ -291,6 +281,18 @@ static inline unsigned char* GetWmCharaModelData(CMenuPcs* menu)
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(menu);
 	return reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x824)[0]);
+}
+
+static inline CCharaPcs::CHandle** GetWmCharaHandles(CMenuPcs* menu)
+{
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(menu);
+	return reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x7F4);
+}
+
+static inline CCharaPcs::CHandle** GetWmWorldHandles(CMenuPcs* menu)
+{
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(menu);
+	return reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x774);
 }
 
 static inline int* GetWmCharaAnimState(CMenuPcs* menu)
@@ -945,16 +947,17 @@ void CMenuPcs::calcWorld()
 
 	if (worldState[8] == 0) {
 		Sound.PlaySe(0x138B, 0x40, 0x7F, 0);
-		SetAnim__Q29CCharaPcs7CHandleFiiiii(reinterpret_cast<void*>(reinterpret_cast<unsigned int*>(bytes + 0x778)[0]), 0, -1, -1, -1, 0);
+		GetWmWorldHandles(this)[1]->SetAnim(0, -1, -1, -1, 0);
 		reinterpret_cast<unsigned int*>(worldParams + 8)[0] = 0;
 		worldState[8] = 1;
 		reinterpret_cast<short*>(worldState + 0x10)[0] = 1;
 	}
 
-	void* const handle = reinterpret_cast<void*>(reinterpret_cast<unsigned int*>(bytes + 0x778)[0]);
-	void* const model = reinterpret_cast<void*>(reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(handle) + 0x168)[0]);
-	const float animEnd = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(model) + 0xC0)[0];
-	const float animTime = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(model) + 0xB4)[0];
+	CCharaPcs::CHandle* const handle = GetWmWorldHandles(this)[1];
+	CChara::CModel* const model = handle->m_model;
+	unsigned char* const modelBytes = reinterpret_cast<unsigned char*>(model);
+	const float animEnd = reinterpret_cast<float*>(modelBytes + 0xC0)[0];
+	const float animTime = reinterpret_cast<float*>(modelBytes + 0xB4)[0];
 	const short animState = reinterpret_cast<short*>(worldState + 0x10)[0];
 
 	if (animState == 1) {
@@ -965,7 +968,7 @@ void CMenuPcs::calcWorld()
 				stackData[1] = 0;
 				stackData[2] = 0;
 
-				SetAnim__Q29CCharaPcs7CHandleFiiiii(handle, 1, -1, -1, -1, 0);
+				handle->SetAnim(1, -1, -1, -1, 0);
 				reinterpret_cast<unsigned int*>(worldParams + 8)[0] = 1;
 				SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
 				    CFlat, 0, 1, 4, 3, stackData, 0);
@@ -973,7 +976,7 @@ void CMenuPcs::calcWorld()
 				reinterpret_cast<short*>(worldState + 0x22)[0] = 0;
 			}
 		} else {
-			AddFrame__Q26CChara6CModelFf(FLOAT_80331698, model);
+			model->AddFrame(FLOAT_80331698);
 			reinterpret_cast<short*>(worldState + 0x22)[0] = 0;
 		}
 	} else if (animState == 2) {
@@ -981,10 +984,10 @@ void CMenuPcs::calcWorld()
 
 		if (nextAnim == 0) {
 			if (animEnd <= animTime) {
-				SetAnim__Q29CCharaPcs7CHandleFiiiii(handle, 1, -1, -1, -1, 0);
+				handle->SetAnim(1, -1, -1, -1, 0);
 				reinterpret_cast<unsigned int*>(worldParams + 8)[0] = 1;
 			} else {
-				AddFrame__Q26CChara6CModelFf(FLOAT_80331698, model);
+				model->AddFrame(FLOAT_80331698);
 			}
 		} else {
 			if (nextAnim >= 1 && nextAnim <= 4) {
@@ -998,25 +1001,25 @@ void CMenuPcs::calcWorld()
 			}
 
 			if (nextAnim != reinterpret_cast<int*>(worldParams + 8)[0]) {
-				SetAnim__Q29CCharaPcs7CHandleFiiiii(handle, nextAnim, -1, -1, -1, 0);
+				handle->SetAnim(nextAnim, -1, -1, -1, 0);
 				reinterpret_cast<int*>(worldParams + 8)[0] = nextAnim;
 
 				if (nextAnim == 0) {
-					SetFrame__Q26CChara6CModelFf(animEnd, model);
+					model->SetFrame(animEnd);
 				}
 			}
 			bytes[0xE] = 0;
 		}
 	} else if (animState == 3 && reinterpret_cast<short*>(worldState + 0x22)[0] > 9) {
 		if (animEnd <= animTime) {
-			SetAnim__Q29CCharaPcs7CHandleFiiiii(handle, 0, -1, -1, -1, 0);
+			handle->SetAnim(0, -1, -1, -1, 0);
 			reinterpret_cast<unsigned int*>(worldParams + 8)[0] = 0;
 			reinterpret_cast<short*>(worldState + 0x18)[0] = 10;
 			reinterpret_cast<short*>(worldState + 0x1E)[0] = -1;
 			reinterpret_cast<short*>(worldState + 0x10)[0] = 4;
 			Sound.PlaySe(0x32, 0x40, 0x7F, 0);
 		} else {
-			AddFrame__Q26CChara6CModelFf(FLOAT_80331698, model);
+			model->AddFrame(FLOAT_80331698);
 		}
 	} else if (animState == 4) {
 		if (reinterpret_cast<short*>(worldState + 0x18)[0] == 0) {
@@ -1054,9 +1057,9 @@ void CMenuPcs::calcWorld()
 	PSMTXScaleApply(matrix, matrix, reinterpret_cast<float*>(worldObj + 0x84)[0], reinterpret_cast<float*>(worldObj + 0x88)[0],
 	                reinterpret_cast<float*>(worldObj + 0x8C)[0]);
 
-	SetMatrix__Q26CChara6CModelFPA4_f(model, matrix);
-	CalcMatrix__Q26CChara6CModelFv(model);
-	CalcSkin__Q26CChara6CModelFv(model);
+	model->SetMatrix(matrix);
+	model->CalcMatrix();
+	model->CalcSkin();
 
 	const short updatedAnimState = reinterpret_cast<short*>(worldState + 0x10)[0];
 
@@ -2695,8 +2698,7 @@ void CMenuPcs::CalcLoadMenu()
 							uVar22 = 0;
 							*reinterpret_cast<unsigned char*>(iVar17 + 0xC) = 1;
 						}
-						LoadModelASync__Q29CCharaPcs7CHandleFiUlUl(
-						    *reinterpret_cast<void**>(bytes + 0x7F4 + pOff), uVar22, charaId, 0);
+						GetWmCharaHandles(this)[iVar14]->LoadModelASync(uVar22, charaId, 0);
 						iVar14++;
 						iVar23 += 0x9C0;
 						iVar25 += 0xC30;
@@ -4691,7 +4693,7 @@ void CMenuPcs::CalcPitcher()
 	rotXMtx[2][3] = reinterpret_cast<float*>(worldObj + 0x1B4)[0];
 	PSMTXConcat(rotXMtx, scaleMtx, scaleMtx);
 
-	void* const model = reinterpret_cast<void*>(reinterpret_cast<unsigned int*>(handle + 0x168)[0]);
+	CChara::CModel* const model = reinterpret_cast<CChara::CModel*>(reinterpret_cast<unsigned int*>(handle + 0x168)[0]);
 	if (model == 0) {
 		return;
 	}
@@ -4705,9 +4707,9 @@ void CMenuPcs::CalcPitcher()
 	}
 	reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(model) + 0x9C)[0] = blend;
 
-	SetMatrix__Q26CChara6CModelFPA4_f(model, scaleMtx);
-	CalcMatrix__Q26CChara6CModelFv(model);
-	CalcSkin__Q26CChara6CModelFv(model);
+	model->SetMatrix(scaleMtx);
+	model->CalcMatrix();
+	model->CalcSkin();
 }
 
 /*
@@ -5016,10 +5018,11 @@ void CMenuPcs::CalcFukidashi()
 		rotXMtx[2][3] = *reinterpret_cast<float*>(puVar20 + 9);
 		PSMTXConcat(rotXMtx, scaleMtx, scaleMtx);
 
-		void* modelPtr = *reinterpret_cast<void**>(*reinterpret_cast<int*>(bytes + 0x7F4 + modelIdx * 4) + 0x168);
-		SetMatrix__Q26CChara6CModelFPA4_f(modelPtr, scaleMtx);
-		CalcMatrix__Q26CChara6CModelFv(modelPtr);
-		CalcSkin__Q26CChara6CModelFv(modelPtr);
+		CChara::CModel* const modelPtr =
+		    *reinterpret_cast<CChara::CModel**>(*reinterpret_cast<int*>(bytes + 0x7F4 + modelIdx * 4) + 0x168);
+		modelPtr->SetMatrix(scaleMtx);
+		modelPtr->CalcMatrix();
+		modelPtr->CalcSkin();
 
 		puVar20[1] = puVar20[1] + 1;
 		if ((double)(DOUBLE_803314a8 * (double)DAT_8032e8b4[DAT_8032e8b0 * 4 - 4]) <=
@@ -5148,10 +5151,11 @@ void CMenuPcs::CalcFukidashi()
 				rxMtx[2][3] = *reinterpret_cast<float*>(puVar20 + 9);
 				PSMTXConcat(rxMtx, sMtx, sMtx);
 
-				void* mdl = *reinterpret_cast<void**>(*reinterpret_cast<int*>(bytes + 0x7F4 + (padIdx + 8) * 4) + 0x168);
-				SetMatrix__Q26CChara6CModelFPA4_f(mdl, sMtx);
-				CalcMatrix__Q26CChara6CModelFv(mdl);
-				CalcSkin__Q26CChara6CModelFv(mdl);
+				CChara::CModel* const mdl =
+				    *reinterpret_cast<CChara::CModel**>(*reinterpret_cast<int*>(bytes + 0x7F4 + (padIdx + 8) * 4) + 0x168);
+				mdl->SetMatrix(sMtx);
+				mdl->CalcMatrix();
+				mdl->CalcSkin();
 
 				puVar20[1] = puVar20[1] + 1;
 				if ((double)(DOUBLE_803314a8 * (double)DAT_8032e8b4[DAT_8032e8b0 * 4 - 4]) <=
@@ -6052,26 +6056,28 @@ void CMenuPcs::PCAnimCtrl()
 
 	int* animState = reinterpret_cast<int*>(reinterpret_cast<unsigned int*>(bytes + 0x844)[0]);
 	for (int i = 0; i < 8; i++, animState += 5) {
-		unsigned char* const handle = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x7F4)[i]);
+		CCharaPcs::CHandle* const handle = GetWmCharaHandles(this)[i];
 		if (handle == 0) {
 			continue;
 		}
+		unsigned char* const handleBytes = reinterpret_cast<unsigned char*>(handle);
 
-		unsigned char* const model = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(handle + 0x168)[0]);
-		if (model == 0 || reinterpret_cast<unsigned int*>(model + 0xB0)[0] == 0 || reinterpret_cast<int*>(handle)[0] == 3) {
+		CChara::CModel* const modelObj = handle->m_model;
+		unsigned char* const model = reinterpret_cast<unsigned char*>(modelObj);
+		if (model == 0 || reinterpret_cast<unsigned int*>(model + 0xB0)[0] == 0 || handle->m_charaKind == 3) {
 			continue;
 		}
 
 		const unsigned int isSelected = selectedMask & (1u << static_cast<unsigned int>(i));
 		animState[3] = reinterpret_cast<int*>(model + 0xB4)[0];
-		const int baseAnim = (static_cast<int>(reinterpret_cast<unsigned int*>(handle + 4)[0] / 100) - 1) * 6;
-		const int currentAnimIndex = reinterpret_cast<int*>(handle + 0x16C)[0];
+		const int baseAnim = (static_cast<int>(handle->m_charaNo / 100) - 1) * 6;
+		const int currentAnimIndex = reinterpret_cast<int*>(handleBytes + 0x16C)[0];
 		const int blendMode = -1 - (currentAnimIndex >> 31);
 
 		if (animState[1] >= 0) {
 			animState[0] = animState[1];
 			animState[1] = -1;
-			SetAnim__Q29CCharaPcs7CHandleFiiiii(handle, baseAnim + animState[0], -1, -1, blendMode, 0);
+			handle->SetAnim(baseAnim + animState[0], -1, -1, blendMode, 0);
 			animState[3] = reinterpret_cast<int*>(model + 0xB4)[0];
 			animState[4] = reinterpret_cast<int*>(model + 0xC0)[0];
 			animState[2] = 0;
@@ -6082,7 +6088,7 @@ void CMenuPcs::PCAnimCtrl()
 		const float frameEnd = reinterpret_cast<float*>(model + 0xC0)[0];
 		if (isSelected == 0 && reinterpret_cast<short*>(worldState + 0x1C)[0] != 8 && animState[0] == 0 && animState[2] > 2999) {
 			animState[0] = 4;
-			SetAnim__Q29CCharaPcs7CHandleFiiiii(handle, baseAnim + animState[0], -1, -1, blendMode, 0);
+			handle->SetAnim(baseAnim + animState[0], -1, -1, blendMode, 0);
 			animState[3] = reinterpret_cast<int*>(model + 0xB4)[0];
 			animState[4] = reinterpret_cast<int*>(model + 0xC0)[0];
 			animState[2] = 0;
@@ -6100,34 +6106,34 @@ void CMenuPcs::PCAnimCtrl()
 				if (frameEnd <= frame) {
 					if (animState[0] == 3 || animState[0] == 4 || animState[0] == 5) {
 						animState[0] = 0;
-						SetAnim__Q29CCharaPcs7CHandleFiiiii(handle, baseAnim + animState[0], -1, -1, blendMode, 0);
+						handle->SetAnim(baseAnim + animState[0], -1, -1, blendMode, 0);
 						animState[3] = reinterpret_cast<int*>(model + 0xB4)[0];
 						animState[4] = reinterpret_cast<int*>(model + 0xC0)[0];
 						animState[2] = isSelected == 0 ? 0 : 0x834;
 					}
-					SetFrame__Q26CChara6CModelFf(FLOAT_803313dc, model);
+					modelObj->SetFrame(FLOAT_803313dc);
 				} else {
-					AddFrame__Q26CChara6CModelFf(FLOAT_80331698, model);
+					modelObj->AddFrame(FLOAT_80331698);
 				}
 				animState[2]++;
 				continue;
 			}
 
-			SetAnim__Q29CCharaPcs7CHandleFiiiii(handle, baseAnim + animState[0], -1, -1, blendMode, 0);
+			handle->SetAnim(baseAnim + animState[0], -1, -1, blendMode, 0);
 			animState[3] = reinterpret_cast<int*>(model + 0xB4)[0];
 			animState[4] = reinterpret_cast<int*>(model + 0xC0)[0];
 		} else {
 			if (frameEnd <= frame) {
 				if (animState[0] == 3 || animState[0] == 4 || animState[0] == 5) {
 					animState[0] = 0;
-					SetAnim__Q29CCharaPcs7CHandleFiiiii(handle, baseAnim + animState[0], -1, -1, blendMode, 0);
+					handle->SetAnim(baseAnim + animState[0], -1, -1, blendMode, 0);
 					animState[3] = reinterpret_cast<int*>(model + 0xB4)[0];
 					animState[4] = reinterpret_cast<int*>(model + 0xC0)[0];
 					animState[2] = isSelected == 0 ? 0 : 0x834;
 				}
-				SetFrame__Q26CChara6CModelFf(FLOAT_803313dc, model);
+				modelObj->SetFrame(FLOAT_803313dc);
 			} else {
-				AddFrame__Q26CChara6CModelFf(FLOAT_80331698, model);
+				modelObj->AddFrame(FLOAT_80331698);
 			}
 			animState[2]++;
 		}
@@ -6265,17 +6271,16 @@ void CMenuPcs::CalcCharaSelect()
 
 				if (entry.m_currentSlot >= 0 &&
 				    Game.m_caravanWorkArr[entry.m_currentSlot].m_shopState == 0 &&
-				    IsModelLoaded__Q29CCharaPcs7CHandleFi(reinterpret_cast<void*>(reinterpret_cast<unsigned int*>(bytes + 0x7F4)[entry.m_currentSlot]), 1) != 0 &&
-				    reinterpret_cast<int*>(reinterpret_cast<void*>(reinterpret_cast<unsigned int*>(bytes + 0x7F4)[entry.m_currentSlot]))[0] != 3 &&
 				    entry.m_cmakeReady == 0) {
-					if (static_cast<unsigned int>(System.m_execParam) > 2) {
-						Printf__7CSystemFPce(&System, s_SetCMakeEnd___chan____d_cur____d_801dc3b4, i,
-						                     static_cast<int>(entry.m_currentSlot));
+					CCharaPcs::CHandle* const handle = GetWmCharaHandles(this)[entry.m_currentSlot];
+					if (handle->IsModelLoaded(1) && handle->m_charaKind != 3) {
+						if (static_cast<unsigned int>(System.m_execParam) > 2) {
+							Printf__7CSystemFPce(&System, s_SetCMakeEnd___chan____d_cur____d_801dc3b4, i,
+							                     static_cast<int>(entry.m_currentSlot));
+						}
+						modelData[entry.m_currentSlot * 0x34 + 0x0C] = 0;
+						handle->LoadModelASync(3, 0x43, 0);
 					}
-					modelData[entry.m_currentSlot * 0x34 + 0x0C] = 0;
-					LoadModelASync__Q29CCharaPcs7CHandleFiUlUl(
-					    reinterpret_cast<void*>(reinterpret_cast<unsigned int*>(bytes + 0x7F4)[entry.m_currentSlot]),
-					    3, 0x43, 0);
 				}
 			} else if (entry.m_cmakePending == 0 && Joybus.GetMType(i) == 1) {
 				Joybus.SetMType(i, 4);
@@ -7084,19 +7089,16 @@ void CMenuPcs::WMChgMenu()
 			int iVar13 = *reinterpret_cast<int*>(bytes + 0x814) + 0xA00;
 			do {
 				*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x824) + iVar8 + 0xC) = 1;
-				int iVar3 = iVar12 * 4;
 				*reinterpret_cast<float*>(iVar13 + 0x2C) = (float)dVar16b;
 				int selectData = *reinterpret_cast<int*>(bytes + 0x828) + iVar11;
 				*reinterpret_cast<short*>(selectData + 6) = *reinterpret_cast<short*>(selectData + 4);
-				int iVar9 = IsModelLoaded__Q29CCharaPcs7CHandleFi(
-				    *reinterpret_cast<void**>(bytes + 0x7F4 + iVar3), 1);
-				if (iVar9 != 0) {
+				CCharaPcs::CHandle* const handle = GetWmCharaHandles(this)[iVar12];
+				if (handle->IsModelLoaded(1)) {
 					Mtx mtx;
 					PSMTXIdentity(mtx);
-					void* handle = *reinterpret_cast<void**>(bytes + 0x7F4 + iVar3);
-					SetMatrix__Q26CChara6CModelFPA4_f(*reinterpret_cast<void**>(reinterpret_cast<int>(handle) + 0x168), mtx);
-					CalcMatrix__Q26CChara6CModelFv(*reinterpret_cast<void**>(reinterpret_cast<int>(handle) + 0x168));
-					CalcSkin__Q26CChara6CModelFv(*reinterpret_cast<void**>(reinterpret_cast<int>(handle) + 0x168));
+					handle->m_model->SetMatrix(mtx);
+					handle->m_model->CalcMatrix();
+					handle->m_model->CalcSkin();
 				}
 				iVar12 = iVar12 + 1;
 				iVar11 = iVar11 + 0x10;
@@ -7380,7 +7382,7 @@ void CMenuPcs::ClrCMakeFlg(int channel)
 		Printf__7CSystemFPce(&System, s_ClrCMakeFlg___chan____d_cur____d_801dc390, channel, current);
 	}
 	modelData[current * 0x34 + 0xC] = 0;
-	LoadModelASync__Q29CCharaPcs7CHandleFiUlUl(reinterpret_cast<void*>(reinterpret_cast<unsigned int*>(bytes + 0x7F4)[current]), 3, 0x43, 0);
+	GetWmCharaHandles(this)[current]->LoadModelASync(3, 0x43, 0);
 }
 
 /*
@@ -7426,16 +7428,14 @@ void CMenuPcs::ChgAllModel()
 		modelData = reinterpret_cast<unsigned char*>(*reinterpret_cast<unsigned int*>(bytes + 0x824) + modelOffset);
 		if ((int)race < 0) {
 			modelData[0xC] = 0;
-			LoadModelASync__Q29CCharaPcs7CHandleFiUlUl(
-			    *reinterpret_cast<void**>(handleData + 0x7F4), 3, 0x43, 0);
+			GetWmCharaHandles(this)[i]->LoadModelASync(3, 0x43, 0);
 		} else {
 			modelId = race * 200 + 100;
 			if (variant != 0) {
 				modelId = race * 200 + 200;
 			}
 			modelData[0xC] = 1;
-			LoadModelASync__Q29CCharaPcs7CHandleFiUlUl(
-			    *reinterpret_cast<void**>(handleData + 0x7F4), 0, modelId + index, 0);
+			GetWmCharaHandles(this)[i]->LoadModelASync(0, modelId + index, 0);
 		}
 
 		gameData += 0xC30;
@@ -7483,16 +7483,14 @@ void CMenuPcs::ChgAllModel2()
 		modelData = reinterpret_cast<unsigned char*>(*reinterpret_cast<unsigned int*>(bytes + 0x824) + modelOffset);
 		if ((int)race < 0) {
 			modelData[0xC] = 0;
-			LoadModelASync__Q29CCharaPcs7CHandleFiUlUl(
-			    *reinterpret_cast<void**>(handleData + 0x7F4), 3, 0x43, 0);
+			GetWmCharaHandles(this)[i]->LoadModelASync(3, 0x43, 0);
 		} else {
 			modelId = race * 200 + 100;
 			if (variant != 0) {
 				modelId = race * 200 + 200;
 			}
 			modelData[0xC] = 1;
-			LoadModelASync__Q29CCharaPcs7CHandleFiUlUl(
-			    *reinterpret_cast<void**>(handleData + 0x7F4), 0, modelId + index, 0);
+			GetWmCharaHandles(this)[i]->LoadModelASync(0, modelId + index, 0);
 		}
 
 		handleData += 4;
@@ -7582,8 +7580,7 @@ void CMenuPcs::ChgModel(int slot, int tribe, int job, int isFemale)
 		modelData[0xC] = 1;
 	}
 
-	LoadModelASync__Q29CCharaPcs7CHandleFiUlUl(reinterpret_cast<void*>(reinterpret_cast<unsigned int*>(bytes + 0x7F4)[slot]), charaKind,
-	                                            static_cast<unsigned long>(modelNo), 0);
+	GetWmCharaHandles(this)[slot]->LoadModelASync(charaKind, static_cast<unsigned long>(modelNo), 0);
 }
 
 /*
@@ -7598,32 +7595,33 @@ void CMenuPcs::ChgModel(int slot, int tribe, int job, int isFemale)
 void CMenuPcs::SetAnim(int anim)
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* const handle = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x7F4)[anim]);
-	if (handle == 0 || reinterpret_cast<int*>(handle)[0] == 3) {
+	CCharaPcs::CHandle* const handle = GetWmCharaHandles(this)[anim];
+	if (handle == 0 || handle->m_charaKind == 3) {
 		return;
 	}
+	unsigned char* const handleBytes = reinterpret_cast<unsigned char*>(handle);
 
-	const unsigned int charaNo = reinterpret_cast<unsigned int*>(handle + 4)[0];
+	const unsigned int charaNo = handle->m_charaNo;
 	const int modelBase = static_cast<int>(charaNo / 100) * 100;
 	const int animBase = (static_cast<int>(charaNo / 100) - 1) * 6;
 
-	LoadAnim__Q29CCharaPcs7CHandleFPciiiiii(handle, s_stand_80331638, animBase + 0, 1, 0, modelBase, -1, 0);
-	LoadAnim__Q29CCharaPcs7CHandleFPciiiiii(handle, DAT_80331640, animBase + 1, 1, 0, modelBase, -1, 0);
-	LoadAnim__Q29CCharaPcs7CHandleFPciiiiii(handle, DAT_80331648, animBase + 2, 1, 0, modelBase, -1, 0);
-	LoadAnim__Q29CCharaPcs7CHandleFPciiiiii(handle, DAT_8033164c, animBase + 3, 3, 0, modelBase, -1, 0);
-	LoadAnim__Q29CCharaPcs7CHandleFPciiiiii(handle, DAT_80331654, animBase + 4, 1, 0, modelBase, -1, 0);
-	LoadAnim__Q29CCharaPcs7CHandleFPciiiiii(handle, DAT_8033165c, animBase + 5, 1, 0, modelBase, -1, 0);
+	handle->LoadAnim(s_stand_80331638, animBase + 0, 1, 0, modelBase, -1, 0);
+	handle->LoadAnim(DAT_80331640, animBase + 1, 1, 0, modelBase, -1, 0);
+	handle->LoadAnim(DAT_80331648, animBase + 2, 1, 0, modelBase, -1, 0);
+	handle->LoadAnim(DAT_8033164c, animBase + 3, 3, 0, modelBase, -1, 0);
+	handle->LoadAnim(DAT_80331654, animBase + 4, 1, 0, modelBase, -1, 0);
+	handle->LoadAnim(DAT_8033165c, animBase + 5, 1, 0, modelBase, -1, 0);
 
 	int* const animState = reinterpret_cast<int*>(reinterpret_cast<unsigned int*>(bytes + 0x844)[0]) + anim * 5;
 	animState[0] = 0;
 	animState[1] = -1;
 	animState[2] = rand() % 250;
 
-	const int currentAnimIndex = reinterpret_cast<int*>(handle + 0x16C)[0];
+	const int currentAnimIndex = reinterpret_cast<int*>(handleBytes + 0x16C)[0];
 	const int blendMode = -1 - (currentAnimIndex >> 31);
-	SetAnim__Q29CCharaPcs7CHandleFiiiii(handle, animBase + animState[0], -1, -1, blendMode, 1);
+	handle->SetAnim(animBase + animState[0], -1, -1, blendMode, 1);
 
-	unsigned char* const model = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(handle + 0x168)[0]);
+	unsigned char* const model = reinterpret_cast<unsigned char*>(handle->m_model);
 	if (model != 0) {
 		animState[3] = reinterpret_cast<int*>(model + 0xB4)[0];
 		animState[4] = reinterpret_cast<int*>(model + 0xC0)[0];
@@ -7887,7 +7885,7 @@ void CMenuPcs::DrawMainMenuSub()
 			handleIndex = 1;
 		}
 
-		unsigned char* const handle = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x774)[handleIndex]);
+		CCharaPcs::CHandle* const handle = GetWmWorldHandles(this)[handleIndex];
 		if (handle == 0) {
 			continue;
 		}
@@ -7919,7 +7917,7 @@ void CMenuPcs::DrawMainMenuSub()
 			                                         reinterpret_cast<Vec*>(&DAT_8021082c[lightIndex * 3 + 5]), 0);
 		}
 		SetPosition__9CLightPcsFQ29CLightPcs6TARGETP3VecUl(&LightPcs, 0, 0, 0xFFFFFFFF);
-		Draw__Q29CCharaPcs7CHandleFi(handle, 5);
+		handle->Draw(5);
 		DrawInit__8CMenuPcsFv(this);
 
 		GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
@@ -9200,8 +9198,8 @@ void CMenuPcs::IsAsyncCharaLoadFinish()
 	int ready = 1;
 	int loadedCount = 0;
 	for (int i = 0; i < 4; i++) {
-		unsigned char* const handle = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x7F4)[i]);
-		if (handle == 0 || IsModelLoaded__Q29CCharaPcs7CHandleFi(handle, 1) == 0) {
+		CCharaPcs::CHandle* const handle = GetWmCharaHandles(this)[i];
+		if (handle == 0 || !handle->IsModelLoaded(1)) {
 			ready = 0;
 			break;
 		}

@@ -17,13 +17,13 @@
 #include "ffcc/system.h"
 
 #include <string.h>
+#include <PowerPC_EABI_Support/Runtime/New.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
 CMapMng MapMng;
 char g_StrTmp[0x400];
 
 extern "C" unsigned long UnkMaterialSetGetter(void*);
-extern "C" void __dl__FPv(void*);
 extern "C" void __dla__FPv(void*);
 extern "C" void __destroy_arr(void*, void*, unsigned long, unsigned long);
 extern "C" void __dt__4CRefFv(void*, int);
@@ -406,7 +406,7 @@ extern "C" CPtrArray<CMapLightHolder*>* dtor_80034414(CPtrArray<CMapLightHolder*
         *reinterpret_cast<int*>(Ptr(ptrArray, 4)) = 0;
 
         if (0 < param_2) {
-            __dl__FPv(ptrArray);
+            operator delete(ptrArray);
         }
     }
 
@@ -834,7 +834,7 @@ extern "C" CPtrArray<CMapAnimRun*>* dtor_800344C4(CPtrArray<CMapAnimRun*>* ptrAr
         *reinterpret_cast<int*>(Ptr(ptrArray, 4)) = 0;
 
         if (0 < param_2) {
-            __dl__FPv(ptrArray);
+            operator delete(ptrArray);
         }
     }
 
@@ -906,7 +906,7 @@ extern "C" CPtrArray<CMapAnim*>* dtor_80034574(CPtrArray<CMapAnim*>* ptrArray, s
         *reinterpret_cast<int*>(Ptr(ptrArray, 4)) = 0;
 
         if (0 < param_2) {
-            __dl__FPv(ptrArray);
+            operator delete(ptrArray);
         }
     }
 
@@ -978,7 +978,7 @@ extern "C" CPtrArray<CMapAnimKeyDt*>* dtor_80034624(CPtrArray<CMapAnimKeyDt*>* p
         *reinterpret_cast<int*>(Ptr(ptrArray, 4)) = 0;
 
         if (0 < param_2) {
-            __dl__FPv(ptrArray);
+            operator delete(ptrArray);
         }
     }
 
@@ -1050,7 +1050,7 @@ extern "C" CPtrArray<CMapShadow*>* dtor_800346D4(CPtrArray<CMapShadow*>* ptrArra
         *reinterpret_cast<int*>(Ptr(ptrArray, 4)) = 0;
 
         if (0 < param_2) {
-            __dl__FPv(ptrArray);
+            operator delete(ptrArray);
         }
     }
 
@@ -1594,7 +1594,7 @@ void CMapMng::DestroyMap()
     for (unsigned int i = 0; i < static_cast<unsigned int>(mapAnimRunArray->GetSize()); i++) {
         CMapAnimRun* mapAnimRun = (*mapAnimRunArray)[i];
         if (mapAnimRun != 0) {
-            __dl__FPv(mapAnimRun);
+            operator delete(mapAnimRun);
         }
     }
     mapAnimRunArray->RemoveAll();
@@ -1603,7 +1603,7 @@ void CMapMng::DestroyMap()
     for (unsigned int i = 0; i < static_cast<unsigned int>(mapShadowArray->GetSize()); i++) {
         CMapShadow* mapShadow = (*mapShadowArray)[i];
         if (mapShadow != 0) {
-            __dl__FPv(mapShadow);
+            operator delete(mapShadow);
         }
     }
     mapShadowArray->RemoveAll();
@@ -1615,7 +1615,7 @@ void CMapMng::DestroyMap()
         for (unsigned int j = 0; j < static_cast<unsigned int>(mapLightHolderArray->GetSize()); j++) {
             CMapLightHolder* holder = (*mapLightHolderArray)[j];
             if (holder != 0) {
-                __dl__FPv(holder);
+                operator delete(holder);
             }
         }
         mapLightHolderArray->RemoveAll();

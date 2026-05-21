@@ -370,39 +370,36 @@ CSound::~CSound()
  */
 void CSound::Init()
 {
-    SoundData(this).m_stage = Memory.CreateStage(0xA4000, const_cast<char*>(s_CSound_80330ce0), 0);
+    m_stage = Memory.CreateStage(0xA4000, const_cast<char*>(s_CSound_80330ce0), 0);
 
-    SoundData(this).m_aramBuffer =
-        new (SoundData(this).m_stage, const_cast<char*>(s_sound_cpp_801db2d4), 0x2E) u8[0x80000];
-    SoundData(this).m_streamBuffer =
-        new (SoundData(this).m_stage, const_cast<char*>(s_sound_cpp_801db2d4), 0x2F) u8[0x20000];
+    m_aramBuffer = new (m_stage, const_cast<char*>(s_sound_cpp_801db2d4), 0x2E) u8[0x80000];
+    m_streamBuffer = new (m_stage, const_cast<char*>(s_sound_cpp_801db2d4), 0x2F) u8[0x20000];
 
-    SoundData(this).m_bgmMasterVolume = 0x7F;
-    SoundData(this).m_seMasterVolume = 0x7F;
-    SoundData(this).m_seMaxVolume = 0x7F;
-    SoundData(this).m_curMusicVolume = 0x7F;
-    SoundData(this).m_debugPrint = 0;
+    m_bgmMasterVolume = 0x7F;
+    m_seMasterVolume = 0x7F;
+    m_seMaxVolume = 0x7F;
+    m_curMusicVolume = 0x7F;
+    m_debugPrint = 0;
 
     ARInit(0, 0);
     ARQInit();
 
-    RedSound(this)->Init(SoundData(this).m_aramBuffer, 0x80000, 0x800000, 0x800000);
-    RedSound(this)->ReportPrint((-SoundData(this).m_debugPrint | SoundData(this).m_debugPrint) >> 31);
+    m_redSound.Init(m_aramBuffer, 0x80000, 0x800000, 0x800000);
+    m_redSound.ReportPrint(static_cast<u32>(-m_debugPrint | m_debugPrint) >> 31);
 
-    u32 soundMode = RedSound(this)->GetSoundMode();
-    RedSound(this)->SetSoundMode((u32)__cntlzw((u32)__cntlzw(soundMode) >> 5) >> 5);
+    m_redSound.SetSoundMode((u32)__cntlzw((u32)__cntlzw(m_redSound.GetSoundMode()) >> 5) >> 5);
 
-    RedSound(this)->MusicMasterVolume(SoundData(this).m_bgmMasterVolume);
-    RedSound(this)->SeMasterVolume(SoundData(this).m_seMasterVolume);
-    RedSound(this)->SetReverb(1, 4);
-    RedSound(this)->SetReverbDepth(1, 0x40, 0xF);
+    m_redSound.MusicMasterVolume(m_bgmMasterVolume);
+    m_redSound.SeMasterVolume(m_seMasterVolume);
+    m_redSound.SetReverb(1, 4);
+    m_redSound.SetReverbDepth(1, 0x40, 0xF);
 
-    SoundData(this).m_waveFile = 0;
-    SoundData(this).m_streamFile = 0;
-    SoundData(this).m_streamPlaying = 0;
-    memset(SoundData(this).m_noFreeSeGroups, 0xFF, sizeof(SoundData(this).m_noFreeSeGroups));
-    memset(SoundData(this).m_noFreeWaves, 0xFF, sizeof(SoundData(this).m_noFreeWaves));
-    SoundData(this).m_pauseAllSe = 0;
+    m_waveFile = 0;
+    m_streamFile = 0;
+    m_streamPlaying = 0;
+    memset(m_noFreeSeGroups, 0xFF, sizeof(m_noFreeSeGroups));
+    memset(m_noFreeWaves, 0xFF, sizeof(m_noFreeWaves));
+    m_pauseAllSe = 0;
 }
 
 /*
@@ -756,90 +753,89 @@ void CSound::CheckDriver(int mode)
 void CSound::Frame()
 {
     loadWaveFrame();
-    CRedSound* redSound = RedSound(this);
-    unsigned char* se = reinterpret_cast<unsigned char*>(this) + 0x2C;
+    CSe3D* se = reinterpret_cast<CSe3D*>(m_seWork);
     u32 i = 0;
     do {
-        if (((static_cast<u8>(*se) >> 7) & 1) != 0) {
-            int pan;
+        if (se->m_bits.m_active) {
             int volume;
+            int pan;
 
-            calcVolumePan(reinterpret_cast<CSe3D*>(se), volume, pan);
+            calcVolumePan(se, volume, pan);
 
-            if (((*se >> 6) & 1) != 0) {
+            if (se->m_bits.m_paused) {
                 if (volume != 0) {
                     if ((*reinterpret_cast<unsigned int*>(CFlat + 0x129C) & 0x400000) != 0) {
-                        Printf__7CSystemFPce(&System, s_soundEnvSePlayFmt, *reinterpret_cast<int*>(se + 0xC));
+                        Printf__7CSystemFPce(&System, s_soundEnvSePlayFmt, se->m_soundId);
                     }
 
                     int vol = volume;
-                    int seNo = *reinterpret_cast<int*>(se + 0xC);
+                    int seNo = se->m_soundId;
+                    int panValue = pan;
                     if (seNo < 0) {
                         Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
                         seNo = -1;
                     } else if (seNo < 4000) {
                         int bank = seNo / 1000;
-                        seNo = redSound->SePlay(bank, seNo % 1000, pan, 0, 0);
-                        redSound->SeVolume(seNo, vol, 0x1E);
+                        seNo = m_redSound.SePlay(bank, seNo % 1000, panValue, 0, 0);
+                        m_redSound.SeVolume(seNo, vol, 0x1E);
                     } else {
-                        seNo = redSound->SePlay(-1, seNo, pan, 0, 0);
-                        redSound->SeVolume(seNo, vol, 0x1E);
+                        seNo = m_redSound.SePlay(-1, seNo, panValue, 0, 0);
+                        m_redSound.SeVolume(seNo, vol, 0x1E);
                     }
-                    *reinterpret_cast<int*>(se + 8) = seNo;
-                    *se &= 0xBF;
+                    se->m_playId = seNo;
+                    se->m_bits.m_paused = 0;
                 }
             } else {
-                if (redSound->SePlayState(*reinterpret_cast<int*>(se + 8)) == 0) {
-                    *se &= 0x7F;
+                if (m_redSound.SePlayState(se->m_playId) == 0) {
+                    se->m_bits.m_active = 0;
                 } else {
-                    int playing = redSound->ReportSeLoop(*reinterpret_cast<int*>(se + 8));
+                    int playing = m_redSound.ReportSeLoop(se->m_playId);
                     if ((playing != 0) &&
-                        (redSound->GetSeVolume(*reinterpret_cast<int*>(se + 8), REDSOUND_SE_VOLUME_QUERY_VALUE) == 0) &&
-                        (redSound->GetSeVolume(*reinterpret_cast<int*>(se + 8), REDSOUND_SE_VOLUME_QUERY_DELTA) == 0)) {
+                        (m_redSound.GetSeVolume(se->m_playId, REDSOUND_SE_VOLUME_QUERY_VALUE) == 0) &&
+                        (m_redSound.GetSeVolume(se->m_playId, REDSOUND_SE_VOLUME_QUERY_DELTA) == 0)) {
                         if ((*reinterpret_cast<unsigned int*>(CFlat + 0x129C) & 0x400000) != 0) {
-                            Printf__7CSystemFPce(&System, s_soundEnvSeStopFmt, *reinterpret_cast<int*>(se + 0xC));
+                            Printf__7CSystemFPce(&System, s_soundEnvSeStopFmt, se->m_soundId);
                         }
-                        redSound->SeStop(*reinterpret_cast<int*>(se + 8));
-                        *se = (*se & 0xBF) | 0x40;
+                        m_redSound.SeStop(se->m_playId);
+                        se->m_bits.m_paused = 1;
                         goto next;
                     }
 
-                    if (static_cast<signed char>(se[2]) != pan) {
-                        if (*reinterpret_cast<int*>(se + 8) < 0) {
+                    if (static_cast<signed char>(se->m_pan) != pan) {
+                        if (se->m_playId < 0) {
                             Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
                         } else {
-                            redSound->SePan(*reinterpret_cast<int*>(se + 8), pan, 0x1E);
+                            m_redSound.SePan(se->m_playId, pan, 0x1E);
                         }
-                        se[2] = static_cast<unsigned char>(pan);
+                        se->m_pan = static_cast<unsigned char>(pan);
                     }
 
-                    if (static_cast<signed char>(se[1]) != volume) {
-                        if (*reinterpret_cast<int*>(se + 8) < 0) {
+                    if (static_cast<signed char>(se->m_volume) != volume) {
+                        if (se->m_playId < 0) {
                             Printf__7CSystemFPce(&System, s_soundMinusOneFmt);
                         } else {
-                            redSound->SeVolume(*reinterpret_cast<int*>(se + 8), volume, 0x1E);
+                            m_redSound.SeVolume(se->m_playId, volume, 0x1E);
                         }
-                        se[1] = static_cast<unsigned char>(volume);
+                        se->m_volume = static_cast<unsigned char>(volume);
                     }
                 }
             }
         }
 next:
         i++;
-        se += 0x28;
+        se++;
     } while (i < 0x80);
 
-    CSoundLayout& sound = SoundData(this);
-    int currentMusicVolume = sound.m_curMusicVolume;
-    if (currentMusicVolume != sound.m_seMaxVolume) {
-        if (currentMusicVolume < sound.m_seMaxVolume) {
-            sound.m_curMusicVolume = currentMusicVolume + 1;
+    int currentMusicVolume = m_curMusicVolume;
+    if (currentMusicVolume != m_seMaxVolume) {
+        if (currentMusicVolume < m_seMaxVolume) {
+            m_curMusicVolume = currentMusicVolume + 1;
         } else {
-            sound.m_curMusicVolume = currentMusicVolume - 1;
+            m_curMusicVolume = currentMusicVolume - 1;
         }
     }
 
-    RedSound(this)->MusicVolume(-1, sound.m_curMusicVolume, 0);
+    m_redSound.MusicVolume(-1, m_curMusicVolume, 0);
 }
 
 /*
@@ -1821,7 +1817,7 @@ void CSound::calcVolumePan(CSound::CSe3D* se3D, int& outVolume, int& outPan)
         outPan = 0x40;
     } else {
         fVar1 = kLineSegmentMaxT;
-        if (Game.m_gameWork.m_soundOptionFlag != 0) {
+        if (static_cast<int>(Game.m_gameWork.m_soundOptionFlag) != 0) {
             switch (Game.m_gameWork.m_bossArtifactStageIndex) {
             case 8:
             case 0xE:

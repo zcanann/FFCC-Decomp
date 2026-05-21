@@ -11,7 +11,6 @@ extern "C" double cos(double);
 #include <math.h>
 #include <string.h>
 
-extern "C" void __dl__FPv(void* ptr);
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 extern "C" s32 rand();
 
@@ -347,12 +346,12 @@ void CFunnyShape::ClearTextureData()
         }
 
         if (iter->m_texObjData[0] != 0) {
-            __dl__FPv(iter->m_texObjData[0]);
+            delete static_cast<GXTexObj*>(iter->m_texObjData[0]);
             iter->m_texObjData[0] = 0;
         }
 
         if (iter->m_textureHeaders[0] != 0) {
-            __dl__FPv(iter->m_textureHeaders[0]);
+            delete static_cast<OSFS_TEXTURE_ST*>(iter->m_textureHeaders[0]);
             iter->m_textureHeaders[0] = 0;
         }
         iter = reinterpret_cast<CFunnyShape*>(Ptr(iter, 4));
@@ -716,47 +715,39 @@ void CFunnyShape::InitAnmWork()
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" CFunnyShape* __dt__11CFunnyShapeFv(CFunnyShape* funnyShape, short shouldDelete)
+CFunnyShape::~CFunnyShape()
 {
-    if (funnyShape != 0) {
-        if (funnyShape->m_meshData != 0) {
-            delete[] static_cast<u8*>(funnyShape->m_meshData);
-            funnyShape->m_meshData = 0;
-        }
-
-        if (funnyShape->m_anm.anmData != 0) {
-            delete[] static_cast<u8*>(funnyShape->m_anm.anmData);
-            funnyShape->m_anm.anmData = 0;
-        }
-
-        CFunnyShape* iter = funnyShape;
-        s32 i = 0;
-        do {
-            if (iter->m_textureData[0] != 0) {
-                delete[] static_cast<u8*>(iter->m_textureData[0]);
-                iter->m_textureData[0] = 0;
-            }
-
-            if (iter->m_texObjData[0] != 0) {
-                __dl__FPv(iter->m_texObjData[0]);
-                iter->m_texObjData[0] = 0;
-            }
-
-            if (iter->m_textureHeaders[0] != 0) {
-                __dl__FPv(iter->m_textureHeaders[0]);
-                iter->m_textureHeaders[0] = 0;
-            }
-
-            i++;
-            iter = reinterpret_cast<CFunnyShape*>(Ptr(iter, 4));
-        } while (i < 0x10);
-
-        if (shouldDelete > 0) {
-            __dl__FPv(funnyShape);
-        }
+    if (m_meshData != 0) {
+        delete[] static_cast<u8*>(m_meshData);
+        m_meshData = 0;
     }
 
-    return funnyShape;
+    if (m_anm.anmData != 0) {
+        delete[] static_cast<u8*>(m_anm.anmData);
+        m_anm.anmData = 0;
+    }
+
+    CFunnyShape* iter = this;
+    s32 i = 0;
+    do {
+        if (iter->m_textureData[0] != 0) {
+            delete[] static_cast<u8*>(iter->m_textureData[0]);
+            iter->m_textureData[0] = 0;
+        }
+
+        if (iter->m_texObjData[0] != 0) {
+            delete static_cast<GXTexObj*>(iter->m_texObjData[0]);
+            iter->m_texObjData[0] = 0;
+        }
+
+        if (iter->m_textureHeaders[0] != 0) {
+            delete static_cast<OSFS_TEXTURE_ST*>(iter->m_textureHeaders[0]);
+            iter->m_textureHeaders[0] = 0;
+        }
+
+        i++;
+        iter = reinterpret_cast<CFunnyShape*>(Ptr(iter, 4));
+    } while (i < 0x10);
 }
 
 /*

@@ -920,8 +920,6 @@ static void FurPlotHair(unsigned short* tex, const CHairSet& hair, int layer, un
 	}
 }
 
-extern "C" int PickFur__Q26CChara6CModelFPA4_f8_GXColoriiP8_GXColorP8_GXColorP3Vec(
-    void*, Mtx, _GXColor, int, int, _GXColor*, _GXColor*, Vec*);
 void brush(unsigned short*, int, int, float, float, int, _GXColor, _GXColor*, _GXColor*);
 
 namespace {
@@ -1229,14 +1227,14 @@ void CChara::CModel::InitMogFurTex()
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void MogFurFrame__Q26CChara6CModelFP8CGObject(void* model, void* object)
+void CChara::CModel::MogFurFrame(CGObject* object)
 {
-	unsigned char* modelBytes = reinterpret_cast<unsigned char*>(model);
+	unsigned char* modelBytes = reinterpret_cast<unsigned char*>(this);
 	if ((modelBytes[0x10C] & 0x40) == 0) {
 		return;
 	}
 
-	CGObject* gObject = reinterpret_cast<CGObject*>(object);
+	CGObject* gObject = object;
 	MogWorkRaw& work = MogWork();
 	const unsigned short heldButtons = MogHeldButtons();
 	const unsigned short triggerButtons = MogTriggerButtons();
@@ -1326,10 +1324,9 @@ extern "C" void MogFurFrame__Q26CChara6CModelFP8CGObject(void* model, void* obje
 		Mtx cameraMtx;
 
 		PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
-		CopyMogTextureFromChara(model);
-		int pickResult = PickFur__Q26CChara6CModelFPA4_f8_GXColoriiP8_GXColorP8_GXColorP3Vec(
-		    model, cameraMtx, brushColor, doPaint, eraseMode, &centerBefore, &centerAfter, &worldPos);
-		CopyMogTextureToChara(model);
+		CopyMogTextureFromChara(this);
+		int pickResult = PickFur(cameraMtx, brushColor, doPaint, eraseMode, &centerBefore, &centerAfter, &worldPos);
+		CopyMogTextureToChara(this);
 		CalcMogScore__6CCharaFv(&Chara);
 
 		if (pickResult >= 0) {
@@ -1414,10 +1411,10 @@ extern "C" void MogFurFrame__Q26CChara6CModelFP8CGObject(void* model, void* obje
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" int PickFur__Q26CChara6CModelFPA4_f8_GXColoriiP8_GXColorP8_GXColorP3Vec(
-    void* model, Mtx param_2, _GXColor brushColor, int doPaint, int mode, _GXColor* centerBefore, _GXColor* centerAfter, Vec* worldPos)
+int CChara::CModel::PickFur(
+    Mtx param_2, _GXColor brushColor, int doPaint, int mode, _GXColor* centerBefore, _GXColor* centerAfter, Vec* worldPos)
 {
-	if ((ModelFlags10C(model) & 0x40) == 0) {
+	if ((ModelFlags10C(this) & 0x40) == 0) {
 		return -1;
 	}
 
@@ -1439,7 +1436,7 @@ extern "C" int PickFur__Q26CChara6CModelFPA4_f8_GXColoriiP8_GXColorP8_GXColorP3V
 		worldPos->z = 0.0f;
 	}
 
-	CTexture* texture = FindMogFurTexture(model);
+	CTexture* texture = FindMogFurTexture(this);
 	if (texture == 0) {
 		return 0;
 	}
@@ -1456,9 +1453,9 @@ extern "C" int PickFur__Q26CChara6CModelFPA4_f8_GXColoriiP8_GXColorP8_GXColorP3V
 		return 0;
 	}
 
-	CMaterialSet* materialSet = ModelMaterialSet(model);
-	FurMeshRaw* mesh = ModelMeshes(model);
-	void* nodes = ModelNodes(model);
+	CMaterialSet* materialSet = ModelMaterialSet(this);
+	FurMeshRaw* mesh = ModelMeshes(this);
+	void* nodes = ModelNodes(this);
 	if (materialSet == 0 || mesh == 0 || nodes == 0) {
 		return 0;
 	}
@@ -1468,8 +1465,8 @@ extern "C" int PickFur__Q26CChara6CModelFPA4_f8_GXColoriiP8_GXColorP8_GXColorP3V
 		return 0;
 	}
 
-	const unsigned short meshCount = ModelMeshCount(model);
-	const int posQuant = ModelPosQuant(model) & 0xFF;
+	const unsigned short meshCount = ModelMeshCount(this);
+	const int posQuant = ModelPosQuant(this) & 0xFF;
 	const float cursorX = static_cast<float>(CharaU32(0x200C));
 	const float cursorY = static_cast<float>(CharaU32(0x2010));
 	float hitU = 0.0f;
@@ -1482,17 +1479,17 @@ extern "C" int PickFur__Q26CChara6CModelFPA4_f8_GXColoriiP8_GXColorP8_GXColorP3V
 		if (mesh->m_data == 0 || mesh->m_workPositions == 0 || mesh->m_data->m_uvs == 0) {
 			continue;
 		}
-		if (((ModelMeshVisibleMask(model) >> meshIndex) & 1) == 0) {
+		if (((ModelMeshVisibleMask(this) >> meshIndex) & 1) == 0) {
 			continue;
 		}
 
 		Mtx meshMtx;
 		if (mesh->m_data->m_skinCount == 0) {
-			PSMTXConcat(ModelDrawMtx(model),
+			PSMTXConcat(ModelDrawMtx(this),
 			            reinterpret_cast<float(*)[4]>(reinterpret_cast<unsigned char*>(nodes) + mesh->m_data->m_nodeIndex * 0xC0 + 0x44),
 			            meshMtx);
 		} else {
-			PSMTXCopy(ModelDrawMtx(model), meshMtx);
+			PSMTXCopy(ModelDrawMtx(this), meshMtx);
 		}
 
 		Mtx modelViewMtx;
@@ -1643,18 +1640,18 @@ extern "C" int PickFur__Q26CChara6CModelFPA4_f8_GXColoriiP8_GXColorP8_GXColorP3V
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void DrawFur__Q26CChara6CModelFPA4_fi(void* model, Mtx viewMtx, int shadowPass)
+void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 {
-	if ((ModelFlags10C(model) & 0x40) == 0) {
+	if ((ModelFlags10C(this) & 0x40) == 0) {
 		return;
 	}
-	if ((shadowPass != 0) && ((ModelFlags10C(model) & 0x80) == 0)) {
+	if ((shadowPass != 0) && ((ModelFlags10C(this) & 0x80) == 0)) {
 		return;
 	}
 
-	CMaterialSet* materialSet = ModelMaterialSet(model);
-	FurMeshRaw* mesh = ModelMeshes(model);
-	void* nodes = ModelNodes(model);
+	CMaterialSet* materialSet = ModelMaterialSet(this);
+	FurMeshRaw* mesh = ModelMeshes(this);
+	void* nodes = ModelNodes(this);
 	if (materialSet == 0 || mesh == 0 || nodes == 0) {
 		return;
 	}
@@ -1683,12 +1680,12 @@ extern "C" void DrawFur__Q26CChara6CModelFPA4_fi(void* model, Mtx viewMtx, int s
 		return;
 	}
 
-	float furStep = ModelFurStep(model);
+	float furStep = ModelFurStep(this);
 	if (furStep == 0.0f) {
 		furStep = 1.0f;
 	}
 	float furDepth = FLOAT_8033110C;
-	Vec modelPos = {ModelDrawMtx(model)[0][3], ModelDrawMtx(model)[1][3], ModelDrawMtx(model)[2][3]};
+	Vec modelPos = {ModelDrawMtx(this)[0][3], ModelDrawMtx(this)[1][3], ModelDrawMtx(this)[2][3]};
 	Vec viewPos;
 	PSMTXMultVec(viewMtx, &modelPos, &viewPos);
 	if (viewPos.z < FLOAT_8033114C) {
@@ -1699,11 +1696,11 @@ extern "C" void DrawFur__Q26CChara6CModelFPA4_fi(void* model, Mtx viewMtx, int s
 		}
 	}
 
-	float furLength = ModelFurLenScale(model) * (FLOAT_80331138 - furDepth) + ModelFurLenScale(model);
+	float furLength = ModelFurLenScale(this) * (FLOAT_80331138 - furDepth) + ModelFurLenScale(this);
 	if (furLength <= 0.0f) {
 		furLength = 1.0f;
 	}
-	const int furShade = static_cast<int>(FLOAT_80331150 * ModelFurCur(model));
+	const int furShade = static_cast<int>(FLOAT_80331150 * ModelFurCur(this));
 	const GXColor furColor = CColor(static_cast<unsigned char>(furShade), static_cast<unsigned char>(furShade),
 	                                static_cast<unsigned char>(furShade), 0xFF)
 	                             .color;
@@ -1718,7 +1715,7 @@ extern "C" void DrawFur__Q26CChara6CModelFPA4_fi(void* model, Mtx viewMtx, int s
 	GXSetVtxDesc(GX_VA_NRM, GX_INDEX16);
 	GXSetVtxDesc(GX_VA_TEX0, GX_INDEX16);
 	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
-	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_NRM, GX_NRM_XYZ, GX_S16, ModelNormQuant(model) & 0xFF);
+	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_NRM, GX_NRM_XYZ, GX_S16, ModelNormQuant(this) & 0xFF);
 	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_U16, 0x0C);
 	GXSetNumTexGens(1);
 	GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
@@ -1727,7 +1724,7 @@ extern "C" void DrawFur__Q26CChara6CModelFPA4_fi(void* model, Mtx viewMtx, int s
 	GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
 	GXSetChanMatColor(GX_COLOR0A0, furColor);
 	LightPcs.EnableLight(1, 1);
-	LightPcs.SetAmbientAlpha(ModelLightAlpha(model));
+	LightPcs.SetAmbientAlpha(ModelLightAlpha(this));
 
 	Mtx texMtx;
 	PSMTXIdentity(texMtx);
@@ -1735,25 +1732,25 @@ extern "C" void DrawFur__Q26CChara6CModelFPA4_fi(void* model, Mtx viewMtx, int s
 	texMtx[1][1] = furStep;
 	GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX2x4);
 
-	const unsigned short meshCount = ModelMeshCount(model);
-	const int posQuant = ModelPosQuant(model) & 0xFF;
-	const int normQuant = ModelNormQuant(model) & 0xFF;
+	const unsigned short meshCount = ModelMeshCount(this);
+	const int posQuant = ModelPosQuant(this) & 0xFF;
+	const int normQuant = ModelNormQuant(this) & 0xFF;
 
 	for (unsigned int meshIndex = 0; meshIndex < meshCount; meshIndex++, mesh++) {
 		if (mesh->m_data == 0 || mesh->m_workPositions == 0 || mesh->m_workNormals == 0) {
 			continue;
 		}
-		if (((ModelMeshVisibleMask(model) >> meshIndex) & 1) == 0) {
+		if (((ModelMeshVisibleMask(this) >> meshIndex) & 1) == 0) {
 			continue;
 		}
 
 		Mtx meshMtx;
 		if (mesh->m_data->m_skinCount == 0) {
-			PSMTXConcat(ModelDrawMtx(model),
+			PSMTXConcat(ModelDrawMtx(this),
 			            reinterpret_cast<float(*)[4]>(reinterpret_cast<unsigned char*>(nodes) + mesh->m_data->m_nodeIndex * 0xC0 + 0x44),
 			            meshMtx);
 		} else {
-			PSMTXCopy(ModelDrawMtx(model), meshMtx);
+			PSMTXCopy(ModelDrawMtx(this), meshMtx);
 		}
 
 		Mtx modelViewMtx;

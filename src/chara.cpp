@@ -10,6 +10,7 @@
 #include "ffcc/textureman.h"
 
 #include <PowerPC_EABI_Support/Runtime/MWCPlusLib.h>
+#include <PowerPC_EABI_Support/Runtime/New.h>
 #include <math.h>
 #include <string.h>
 
@@ -22,13 +23,7 @@ extern "C" void Create__Q26CChara5CNodeFR10CChunkFilePQ26CChara6CModelQ36CChara5
     void*, CChunkFile&, void*, int, CMemory::CStage*);
 extern "C" void Create__Q26CChara5CMeshFPQ26CChara6CModelR10CChunkFilePQ27CMemory6CStage(
     void*, void*, CChunkFile&, CMemory::CStage*);
-extern "C" void __dla__FPv(void*);
-extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" CMemory::CStage* CreateStage__7CMemoryFUlPci(CMemory*, unsigned long, char*, int);
-extern "C" void __ct__Q26CChara5CNodeFv(void*);
-extern "C" void __dt__Q26CChara5CNodeFv(void*, int);
-extern "C" void __ct__Q26CChara5CMeshFv(void*);
-extern "C" void __dt__Q26CChara5CMeshFv(void*, int);
 extern "C" void __dt__Q36CChara5CNode8CRefDataFv(void*, int);
 extern "C" void __dt__Q36CChara5CMesh8CRefDataFv(void*, int);
 extern "C" void __dt__Q36CChara5CMesh12CDisplayListFv(void*, int);
@@ -678,11 +673,11 @@ void CChara::Quit()
 	void** buf0 = (void**)((u8*)this + 0x2068);
 	void** buf1 = (void**)((u8*)this + 0x2070);
 	if (*buf0 != 0) {
-		__dla__FPv(*buf0);
+		delete[] static_cast<u8*>(*buf0);
 		*buf0 = 0;
 	}
 	if (*buf1 != 0) {
-		__dla__FPv(*buf1);
+		delete[] static_cast<u8*>(*buf1);
 		*buf1 = 0;
 	}
 	Memory.DestroyStage(*reinterpret_cast<CMemory::CStage**>((u8*)this + 0x2058));
@@ -791,7 +786,7 @@ CChara::CModel::CRefData::~CRefData()
 
 	ptr = reinterpret_cast<void**>(raw + 0x40);
 	if (*ptr != 0) {
-		__dla__FPv(*ptr);
+		delete[] static_cast<u8*>(*ptr);
 		*ptr = 0;
 	}
 	ptr = reinterpret_cast<void**>(raw + 0x10);
@@ -806,7 +801,7 @@ CChara::CModel::CRefData::~CRefData()
 	}
 	ptr = reinterpret_cast<void**>(raw + 0x18);
 	if (*ptr != 0) {
-		__dla__FPv(*ptr);
+		delete[] static_cast<u8*>(*ptr);
 		*ptr = 0;
 	}
 	ptr = reinterpret_cast<void**>(raw + 0x24);
@@ -879,13 +874,13 @@ CChara::CModel::~CModel()
 
 	void*& nodes = *reinterpret_cast<void**>((u8*)this + 0xA8);
 	if (nodes != 0) {
-		__destroy_new_array(nodes, reinterpret_cast<ConstructorDestructor>(__dt__Q26CChara5CNodeFv));
+		delete[] static_cast<CChara::CNode*>(nodes);
 		nodes = 0;
 	}
 
 	void*& meshes = *reinterpret_cast<void**>((u8*)this + 0xAC);
 	if (meshes != 0) {
-		__destroy_new_array(meshes, reinterpret_cast<ConstructorDestructor>(__dt__Q26CChara5CMeshFv));
+		delete[] static_cast<CChara::CMesh*>(meshes);
 		meshes = 0;
 	}
 }
@@ -1101,7 +1096,7 @@ void CChara::CModel::CreateDynamics(void* dynData, CMemory::CStage* stage)
 		}
 
 		if (ModelDynParams(this) != 0) {
-			__dla__FPv(ModelDynParams(this));
+			operator delete(ModelDynParams(this));
 			ModelDynParams(this) = 0;
 		}
 		ModelDynCount(this) = 0;
@@ -1249,11 +1244,7 @@ CChara::CModel* CChara::CModel::Duplicate(CMemory::CStage* stage)
 	RetainRefCounted(ModelRef(clone));
 
 	const u16 nodeCount = ModelNodeCount(this);
-	void* nodeBlock = __nwa__FUlPQ27CMemory6CStagePci(
-	    static_cast<unsigned long>(nodeCount) * 0xC0 + 0x10, stage, const_cast<char*>("chara.cpp"), 0x263);
-	CChara::CNode* cloneNodes = reinterpret_cast<CChara::CNode*>(__construct_new_array(
-	    nodeBlock, reinterpret_cast<ConstructorDestructor>(__ct__Q26CChara5CNodeFv),
-	    reinterpret_cast<ConstructorDestructor>(__dt__Q26CChara5CNodeFv), 0xC0, nodeCount));
+	CChara::CNode* cloneNodes = new (stage, const_cast<char*>("chara.cpp"), 0x263) CChara::CNode[nodeCount];
 	*reinterpret_cast<CChara::CNode**>(ModelRaw(clone) + 0xA8) = cloneNodes;
 	for (u32 i = 0; i < nodeCount; i++) {
 		CChara::CNode* dst = &cloneNodes[i];
@@ -1271,11 +1262,7 @@ CChara::CModel* CChara::CModel::Duplicate(CMemory::CStage* stage)
 	}
 
 	const u16 meshCount = ModelMeshCount(this);
-	void* meshBlock = __nwa__FUlPQ27CMemory6CStagePci(
-	    static_cast<unsigned long>(meshCount) * 0x14 + 0x10, stage, const_cast<char*>("chara.cpp"), 0x26C);
-	CChara::CMesh* cloneMeshes = reinterpret_cast<CChara::CMesh*>(__construct_new_array(
-	    meshBlock, reinterpret_cast<ConstructorDestructor>(__ct__Q26CChara5CMeshFv),
-	    reinterpret_cast<ConstructorDestructor>(__dt__Q26CChara5CMeshFv), 0x14, meshCount));
+	CChara::CMesh* cloneMeshes = new (stage, const_cast<char*>("chara.cpp"), 0x26C) CChara::CMesh[meshCount];
 	*reinterpret_cast<CChara::CMesh**>(ModelRaw(clone) + 0xAC) = cloneMeshes;
 	for (u32 i = 0; i < meshCount; i++) {
 		CChara::CMesh* dst = &cloneMeshes[i];
@@ -3094,31 +3081,31 @@ CChara::CMesh::CRefData::~CRefData()
 	CCharaMeshRefRaw* ref = reinterpret_cast<CCharaMeshRefRaw*>(this);
 
 	if (ref->m_vertices != 0) {
-		__dla__FPv(ref->m_vertices);
+		operator delete(ref->m_vertices);
 		ref->m_vertices = 0;
 	}
 	if (ref->m_normals != 0) {
-		__dla__FPv(ref->m_normals);
+		operator delete(ref->m_normals);
 		ref->m_normals = 0;
 	}
 	if (ref->m_colors != 0) {
-		__dla__FPv(ref->m_colors);
+		operator delete(ref->m_colors);
 		ref->m_colors = 0;
 	}
 	if (ref->m_uvs != 0) {
-		__dla__FPv(ref->m_uvs);
+		operator delete(ref->m_uvs);
 		ref->m_uvs = 0;
 	}
 	if (ref->m_oneWeightData != 0) {
-		__dla__FPv(ref->m_oneWeightData);
+		operator delete(ref->m_oneWeightData);
 		ref->m_oneWeightData = 0;
 	}
 	if (ref->m_twoWeightData != 0) {
-		__dla__FPv(ref->m_twoWeightData);
+		operator delete(ref->m_twoWeightData);
 		ref->m_twoWeightData = 0;
 	}
 	if (ref->m_threeWeightData != 0) {
-		__dla__FPv(ref->m_threeWeightData);
+		operator delete(ref->m_threeWeightData);
 		ref->m_threeWeightData = 0;
 	}
 	if (ref->m_displayLists != 0) {
@@ -3160,7 +3147,7 @@ CChara::CMesh::CDisplayList::~CDisplayList()
 {
 	void** data = (void**)((u8*)this + 4);
 	if (data[0] != 0) {
-		__dla__FPv(data[0]);
+		operator delete(data[0]);
 		data[0] = 0;
 	}
 }

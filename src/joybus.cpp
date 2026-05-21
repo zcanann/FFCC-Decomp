@@ -249,8 +249,7 @@ void JoyBus::CreateInit()
 
     if (m_gbaBootImage == 0)
     {
-        // TODO: __nwa__FUlPQ27CMemory6CStagePci
-        m_gbaBootImage = (char*)__nwa(0x38000);
+        m_gbaBootImage = new char[0x38000];
 
         if (m_gbaBootImage == 0 && System.m_execParam != 0)
         {
@@ -280,7 +279,6 @@ void JoyBus::CreateInit()
 
     if (m_fileBaseA == 0)
     {
-		// TODO: __nwa__FUlPQ27CMemory6CStagePci
         m_fileBaseA = new unsigned int[0x20];
 
         if (m_fileBaseA == (unsigned int*)nullptr && System.m_execParam != 0)
@@ -296,7 +294,6 @@ void JoyBus::CreateInit()
 
     if (m_fileBaseB == 0)
     {
-        // TODO: __nwa__FUlPQ27CMemory6CStagePci
         m_fileBaseB = new unsigned int[0x5000];
 
         if (m_fileBaseB == 0 && System.m_execParam != 0)
@@ -313,8 +310,7 @@ void JoyBus::CreateInit()
     {
         if (m_letterBuffer[i] == 0)
         {
-            // TODO: __nwa__FUlPQ27CMemory6CStagePci
-            m_letterBuffer[i] = (char*)__nwa(0x2800);
+            m_letterBuffer[i] = new char[0x2800];
 
             if (m_letterBuffer[i] == 0 && System.m_execParam != 0)
             {
@@ -347,22 +343,19 @@ void JoyBus::Destroy()
 
     if (m_gbaBootImage != 0)
     {
-        // TODO: __dla__FPv
-        // free((void*)m_gbaBootImage);
+        delete[] m_gbaBootImage;
         m_gbaBootImage = 0;
     }
 
     if (m_fileBaseA != 0)
     {
-        // TODO: __dla__FPv
-        // free((void*)m_fileBaseA);
+        delete[] m_fileBaseA;
         m_fileBaseA = 0;
     }
 
     if (m_fileBaseB != 0)
     {
-        // TODO: __dla__FPv
-        // free((void*)m_fileBaseB);
+        delete[] m_fileBaseB;
         m_fileBaseB = 0;
     }
 
@@ -370,8 +363,7 @@ void JoyBus::Destroy()
     {
         if (m_letterBuffer[i] != 0)
         {
-            // TODO: __dla__FPv
-            // free((void*)m_letterBuffer[i]);
+            delete[] m_letterBuffer[i];
             m_letterBuffer[i] = 0;
         }
     }

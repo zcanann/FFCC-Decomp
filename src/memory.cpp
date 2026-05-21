@@ -93,8 +93,6 @@ extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(in
 extern "C" void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
 extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
 extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
-extern "C" void __ct__10CAmemCacheFv(void*, int);
-extern "C" void __dt__10CAmemCacheFv(void*, int);
 
 static int stageGetAllocationMode(CMemory::CStage* stage)
 {
@@ -1559,12 +1557,7 @@ void CAmemCacheSet::Init(char* sourceName, CMemory::CStage* rStage, CMemory::CSt
         m_amemEnd = stage->m_heapBottom;
         m_amemLock = 0;
 
-        int count = m_cacheCount;
-        void* block = rStage->alloc(count * 0x1C + 0x10, const_cast<char*>(s_memory_cpp), 0x787, 0);
-        void* table = __construct_new_array(
-            block, reinterpret_cast<ConstructorDestructor>(__ct__10CAmemCacheFv),
-            reinterpret_cast<ConstructorDestructor>(__dt__10CAmemCacheFv), 0x1C, count);
-        m_cacheTable = reinterpret_cast<CAmemCache*>(table);
+        m_cacheTable = new (rStage, const_cast<char*>(s_memory_cpp), 0x787) CAmemCache[m_cacheCount];
     }
 }
 
@@ -1593,10 +1586,8 @@ void CAmemCacheSet::SetRStage(CMemory::CStage* stage)
  */
 void CAmemCacheSet::Destroy()
 {
-    void* cacheArray = m_cacheTable;
-
-    if (cacheArray != nullptr) {
-        __destroy_new_array(cacheArray, (ConstructorDestructor)__dt__10CAmemCacheFv);
+    if (m_cacheTable != nullptr) {
+        delete[] m_cacheTable;
         m_cacheTable = 0;
     }
 }

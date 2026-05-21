@@ -11,13 +11,13 @@
 #include "ffcc/util.h"
 
 #include "PowerPC_EABI_Support/Runtime/MWCPlusLib.h"
+#include <PowerPC_EABI_Support/Runtime/New.h>
 #include <dolphin/gx.h>
 #include <dolphin/os/OSCache.h>
 #include <dolphin/vi.h>
 
 #include <string.h>
 
-extern "C" void __dla__FPv(void*);
 CFile File;
 
 static const char s_diskReadErrorJp0[] = {0x83, 0x66, 0x83, 0x42, 0x83, 0x58, 0x83, 0x4E, 0x82, 0xF0, 0x93, 0xC7, 0x82, 0xDF, 0x82, 0xDC, 0x82, 0xB9, 0x82, 0xF1, 0x82, 0xC5, 0x82, 0xB5, 0x82, 0xBD, 0x81, 0x42, 0x00};
@@ -723,9 +723,7 @@ void CFile::Quit()
 
     u32 nextOffset = m_handlePoolHead.m_currentOffset;
     if (nextOffset != 0) {
-        if (nextOffset != 0) {
-            __dla__FPv((void*)(nextOffset - 0x10));
-        }
+        operator delete[](reinterpret_cast<void*>(nextOffset - 0x10));
         m_handlePoolHead.m_currentOffset = 0;
     }
 

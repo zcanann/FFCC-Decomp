@@ -15,10 +15,7 @@
 // External function declarations
 extern "C" int rand(void);
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, const char*, int);
-extern "C" int SearchNode__Q26CChara6CModelFPc(CChara::CModel*, char*);
 extern "C" void CalcBind__Q26CChara5CNodeFPQ26CChara6CModel(void*, CChara::CModel*);
-extern "C" void SetFrame__Q26CChara6CModelFf(float, CChara::CModel*);
-extern "C" void CalcMatrix__Q26CChara6CModelFv(CChara::CModel*);
 
 static inline int GetGraphFrameFromId(s32 graphId)
 {
@@ -261,7 +258,7 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
         }
 
         modelRaw = (LocationTitle2ModelRaw*)model;
-        nodeIndex = SearchNode__Q26CChara6CModelFPc(model, const_cast<char*>(s_locationNodeName));
+        nodeIndex = model->SearchNode(const_cast<char*>(s_locationNodeName));
         node = modelRaw->m_nodes + nodeIndex * 0xC0;
         zOffset = 1.0f;
 
@@ -269,8 +266,8 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
             Mtx nodeMtx;
 
             CalcBind__Q26CChara5CNodeFPQ26CChara6CModel(node, model);
-            SetFrame__Q26CChara6CModelFf((float)(s32)frameIndex, model);
-            CalcMatrix__Q26CChara6CModelFv(model);
+            model->SetFrame((float)(s32)frameIndex);
+            model->CalcMatrix();
             PSMTXCopy((float(*)[4])(node + 0x14), nodeMtx);
 
             particles[work->m_count].m_pos.x = nodeMtx[0][3];
@@ -353,7 +350,7 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
             }
         }
 
-        SetFrame__Q26CChara6CModelFf(0.0f, model);
+        model->SetFrame(0.0f);
     }
 }
 

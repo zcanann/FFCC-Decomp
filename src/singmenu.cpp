@@ -88,21 +88,9 @@ extern "C" void RestoreProjection__8CMenuPcsFv(CMenuPcs*);
 extern "C" void Draw__9CShopMenuFv(void*);
 extern "C" void Calc__9CShopMenuFv(void*);
 extern "C" void SingleDrawCtrl__8CMenuPcsFv(CMenuPcs*);
-extern "C" void SetFrame__Q26CChara6CModelFf(float, CChara::CModel*);
-extern "C" void AddFrame__Q26CChara6CModelFf(float, CChara::CModel*);
-extern "C" void SetMatrix__Q26CChara6CModelFPA4_f(CChara::CModel*, Mtx);
-extern "C" void CalcMatrix__Q26CChara6CModelFv(CChara::CModel*);
-extern "C" void CalcSkin__Q26CChara6CModelFv(CChara::CModel*);
 extern "C" void _WaitDrawDone__8CGraphicFPci(CGraphic*, const char*, int);
 extern "C" void DestroyTempBuffer__8CGraphicFv(CGraphic*);
 extern "C" int GetModelNo__8CMenuPcsFiii(CMenuPcs*, int, int, int);
-extern "C" void* __nw__Q29CCharaPcs7CHandleFUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
-extern "C" void* __nw__11CTextureSetFUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
-extern "C" CCharaPcs::CHandle* __ct__Q29CCharaPcs7CHandleFv(CCharaPcs::CHandle*);
-extern "C" void __dt__Q29CCharaPcs7CHandleFv(void*, int);
-extern "C" CTextureSet* __ct__11CTextureSetFv(CTextureSet*);
-extern "C" void Create__11CTextureSetFPvPQ27CMemory6CStageiP13CAmemCacheSetii(CTextureSet*, void*, CMemory::CStage*, int, void*, int, int);
-extern "C" int Find__11CTextureSetFPc(CTextureSet*, char*);
 extern "C" char* GetLangString__5CGameFv(void*);
 extern "C" void loadFont__8CMenuPcsFiPcii(CMenuPcs*, int, char*, int, int);
 extern "C" void loadTexture__8CMenuPcsFPPciiPQ28CMenuPcs4CTmpiii(CMenuPcs*, char**, int, int, void*, int, int, int);
@@ -1085,12 +1073,7 @@ void CMenuPcs::SingMenuInit()
         stage = *reinterpret_cast<CMemory::CStage**>(self + 0xF4);
     }
 
-    CCharaPcs::CHandle* handle =
-        static_cast<CCharaPcs::CHandle*>(__nw__Q29CCharaPcs7CHandleFUlPQ27CMemory6CStagePci(
-            0x194, stage, s_singmenu_cpp_801de8d4, 0x5CD));
-    if (handle != 0) {
-        handle = __ct__Q29CCharaPcs7CHandleFv(handle);
-    }
+    CCharaPcs::CHandle* handle = new (stage, s_singmenu_cpp_801de8d4, 0x5CD) CCharaPcs::CHandle;
     *reinterpret_cast<CCharaPcs::CHandle**>(self + 0x774) = handle;
 
     handle->Add();
@@ -1242,7 +1225,7 @@ void CMenuPcs::drawSingleMenu()
             freeTexture__8CMenuPcsFiiii(this, 5, 2, 0x2D, 0x33);
 
             if (*reinterpret_cast<void**>(self + 0x774) != 0) {
-                __dt__Q29CCharaPcs7CHandleFv(*reinterpret_cast<void**>(self + 0x774), 1);
+                delete *reinterpret_cast<CCharaPcs::CHandle**>(self + 0x774);
                 *reinterpret_cast<void**>(self + 0x774) = 0;
             }
 
@@ -1457,11 +1440,7 @@ void CMenuPcs::loadTextureAsync(char **, int, int, CMenuPcs::CTmp*, int, int, in
                     stage = *reinterpret_cast<CMemory::CStage**>(self + 0xF4);
                 }
 
-                CTextureSet* textureSet = static_cast<CTextureSet*>(
-                    __nw__11CTextureSetFUlPQ27CMemory6CStagePci(0x24, stage, s_singmenu_cpp_801de8d4, 0x748));
-                if (textureSet != 0) {
-                    textureSet = __ct__11CTextureSetFv(textureSet);
-                }
+                CTextureSet* textureSet = new (stage, s_singmenu_cpp_801de8d4, 0x748) CTextureSet;
                 *reinterpret_cast<CTextureSet**>(self + 0x160 + loadIndex * 4) = textureSet;
 
                 stage = *reinterpret_cast<CMemory::CStage**>(self + 0xEC);
@@ -1469,7 +1448,7 @@ void CMenuPcs::loadTextureAsync(char **, int, int, CMenuPcs::CTmp*, int, int, in
                     stage = *reinterpret_cast<CMemory::CStage**>(self + 0xF4);
                 }
 
-                Create__11CTextureSetFPvPQ27CMemory6CStageiP13CAmemCacheSetii(textureSet, File.m_readBuffer, stage, 0, 0, 0, 0);
+                textureSet->Create(File.m_readBuffer, stage, 0, 0, 0, 0);
                 File.Close(gSingMenuAsyncFileHandle);
                 gSingMenuAsyncFileHandle = 0;
                 *reinterpret_cast<int*>(self + 0x860) = 0;
@@ -1482,7 +1461,7 @@ void CMenuPcs::loadTextureAsync(char **, int, int, CMenuPcs::CTmp*, int, int, in
                 SingMenuTextureRef* mapping = DAT_80214b3c;
                 for (int i = 0; i < 0x33; i++) {
                     CTextureSet* set = *reinterpret_cast<CTextureSet**>(self + 0x14C + mapping->textureSetIndex * 4);
-                    int texIdx = Find__11CTextureSetFPc(set, mapping->textureName);
+                    int texIdx = set->Find(mapping->textureName);
                     CTexture* tex = (*reinterpret_cast<CPtrArray<CTexture*>*>(reinterpret_cast<u8*>(set) + 8))[static_cast<unsigned long>(texIdx)];
                     *reinterpret_cast<CTexture**>(reinterpret_cast<u8*>(this) + 0x240 + i * 4) = tex;
                     *reinterpret_cast<int*>(reinterpret_cast<u8*>(tex) + 4) = *reinterpret_cast<int*>(reinterpret_cast<u8*>(tex) + 4) + 1;
@@ -1547,9 +1526,9 @@ void CMenuPcs::SingCalcChara(float frameStep)
 
     if (*reinterpret_cast<float*>(reinterpret_cast<u8*>(model) + 0x10) <=
         *reinterpret_cast<float*>(reinterpret_cast<u8*>(model) + 0x08)) {
-        SetFrame__Q26CChara6CModelFf(FLOAT_8033294c, model);
+        model->SetFrame(FLOAT_8033294c);
     } else {
-        AddFrame__Q26CChara6CModelFf(frameStep, model);
+        model->AddFrame(frameStep);
     }
 
     unsigned short modelScaleIndex = *reinterpret_cast<unsigned short*>(Game.m_scriptFoodBase[0] + 0x3E0);
@@ -1562,9 +1541,9 @@ void CMenuPcs::SingCalcChara(float frameStep)
 
     int modelPtr = *reinterpret_cast<int*>(*reinterpret_cast<int*>(self + 0x774) + 0x168);
     *reinterpret_cast<u8*>(modelPtr + 0x10C) = (*reinterpret_cast<u8*>(modelPtr + 0x10C) & 0x7F) | 0x80;
-    SetMatrix__Q26CChara6CModelFPA4_f(model, scaleMtx);
-    CalcMatrix__Q26CChara6CModelFv(model);
-    CalcSkin__Q26CChara6CModelFv(model);
+    model->SetMatrix(scaleMtx);
+    model->CalcMatrix();
+    model->CalcSkin();
 }
 
 /*
@@ -1903,9 +1882,9 @@ void CMenuPcs::SingleCalcFadeIn()
     CChara::CModel* model = *reinterpret_cast<CChara::CModel**>(*reinterpret_cast<int*>(self + 0x774) + 0x168);
     if (*reinterpret_cast<float*>(reinterpret_cast<u8*>(model) + 0x10) <=
         *reinterpret_cast<float*>(reinterpret_cast<u8*>(model) + 0x08)) {
-        SetFrame__Q26CChara6CModelFf(FLOAT_8033294c, model);
+        model->SetFrame(FLOAT_8033294c);
     } else {
-        AddFrame__Q26CChara6CModelFf(FLOAT_80332934, model);
+        model->AddFrame(FLOAT_80332934);
     }
 
     unsigned short modelScaleIndex = *reinterpret_cast<unsigned short*>(Game.m_scriptFoodBase[0] + 0x3E0);
@@ -1918,9 +1897,9 @@ void CMenuPcs::SingleCalcFadeIn()
 
     int modelPtr = *reinterpret_cast<int*>(*reinterpret_cast<int*>(self + 0x774) + 0x168);
     *reinterpret_cast<u8*>(modelPtr + 0x10C) = (*reinterpret_cast<u8*>(modelPtr + 0x10C) & 0x7F) | 0x80;
-    SetMatrix__Q26CChara6CModelFPA4_f(model, scaleMtx);
-    CalcMatrix__Q26CChara6CModelFv(model);
-    CalcSkin__Q26CChara6CModelFv(model);
+    model->SetMatrix(scaleMtx);
+    model->CalcMatrix();
+    model->CalcSkin();
 
     if (**reinterpret_cast<short**>(self + 0x850) == completed) {
         (*reinterpret_cast<short**>(self + 0x850))[3] = 1;
@@ -2009,9 +1988,9 @@ void CMenuPcs::SingleCalcFadeOut()
     CChara::CModel* model = *reinterpret_cast<CChara::CModel**>(*reinterpret_cast<int*>(self + 0x774) + 0x168);
     if (*reinterpret_cast<float*>(reinterpret_cast<u8*>(model) + 0x10) <=
         *reinterpret_cast<float*>(reinterpret_cast<u8*>(model) + 0x08)) {
-        SetFrame__Q26CChara6CModelFf(FLOAT_8033294c, model);
+        model->SetFrame(FLOAT_8033294c);
     } else {
-        AddFrame__Q26CChara6CModelFf(FLOAT_80332934, model);
+        model->AddFrame(FLOAT_80332934);
     }
 
     unsigned short modelScaleIndex = *reinterpret_cast<unsigned short*>(Game.m_scriptFoodBase[0] + 0x3E0);
@@ -2024,9 +2003,9 @@ void CMenuPcs::SingleCalcFadeOut()
 
     int modelPtr = *reinterpret_cast<int*>(*reinterpret_cast<int*>(self + 0x774) + 0x168);
     *reinterpret_cast<u8*>(modelPtr + 0x10C) = (*reinterpret_cast<u8*>(modelPtr + 0x10C) & 0x7F) | 0x80;
-    SetMatrix__Q26CChara6CModelFPA4_f(model, scaleMtx);
-    CalcMatrix__Q26CChara6CModelFv(model);
-    CalcSkin__Q26CChara6CModelFv(model);
+    model->SetMatrix(scaleMtx);
+    model->CalcMatrix();
+    model->CalcSkin();
 
     if (totalEntries == completed) {
         fadeState->done = 1;
@@ -2081,9 +2060,9 @@ void CMenuPcs::SingleCalcCtrl()
     CChara::CModel* model = *reinterpret_cast<CChara::CModel**>(*reinterpret_cast<int*>(self + 0x774) + 0x168);
     if (*reinterpret_cast<float*>(reinterpret_cast<u8*>(model) + 0x10) <=
         *reinterpret_cast<float*>(reinterpret_cast<u8*>(model) + 0x08)) {
-        SetFrame__Q26CChara6CModelFf(FLOAT_8033294c, model);
+        model->SetFrame(FLOAT_8033294c);
     } else {
-        AddFrame__Q26CChara6CModelFf(FLOAT_80332934, model);
+        model->AddFrame(FLOAT_80332934);
     }
 
     unsigned short modelScaleIndex = *reinterpret_cast<unsigned short*>(Game.m_scriptFoodBase[0] + 0x3E0);
@@ -2096,9 +2075,9 @@ void CMenuPcs::SingleCalcCtrl()
 
     int modelPtr = *reinterpret_cast<int*>(*reinterpret_cast<int*>(self + 0x774) + 0x168);
     *reinterpret_cast<u8*>(modelPtr + 0x10C) = (*reinterpret_cast<u8*>(modelPtr + 0x10C) & 0x7F) | 0x80;
-    SetMatrix__Q26CChara6CModelFPA4_f(model, scaleMtx);
-    CalcMatrix__Q26CChara6CModelFv(model);
-    CalcSkin__Q26CChara6CModelFv(model);
+    model->SetMatrix(scaleMtx);
+    model->CalcMatrix();
+    model->CalcSkin();
 
     s16 mode = *reinterpret_cast<s16*>(self + 0x864);
     s16 proc = *reinterpret_cast<s16*>(statePtr + 0x10);

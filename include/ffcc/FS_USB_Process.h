@@ -45,4 +45,9 @@ struct OSFS_ANM_ST
     void* anmData;   // 0x0C
 };
 
+struct OSFS_TEXTURE_ST
+{
+    u8 data[0x30];
+};
+
 #endif // _FFCC_FS_USB_PROCESS_H_

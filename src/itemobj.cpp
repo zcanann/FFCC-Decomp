@@ -18,7 +18,6 @@ extern "C" void onCreate__8CGPrgObjFv(void*);
 extern "C" void onDestroy__8CGPrgObjFv(void*);
 extern "C" int GetFreeParticleSlot__13CFlatRuntime2Fv(void*);
 extern "C" void DeleteParticleSlot__13CFlatRuntime2Fii(void*, int, int);
-extern "C" void __dt__Q29CCharaPcs7CHandleFv(void*, int);
 extern "C" void Attach__8CGObjectFP8CGObjectPcP3Vec(void*, void*, char*, Vec*);
 extern "C" void Detach__8CGObjectFv(void*);
 extern "C" void changeStat__8CGPrgObjFiii(void*, int, int, int);
@@ -52,11 +51,6 @@ extern "C" float RandFPM__5CMathFf(float, CMath*);
 extern "C" void SetPosBG__8CGObjectFP3Veci(void*, Vec*, int);
 extern "C" void MoveVector__8CGObjectFP3Vecfiiii(void*, Vec*, float, int, int, int, int);
 extern "C" void EndParticle__13CFlatRuntime2FPQ29CCharaPcs7CHandle(void*, void*);
-extern "C" void* __nw__Q29CCharaPcs7CHandleFUlPQ27CMemory6CStagePci(unsigned long, void*, char*, int);
-extern "C" void* __ct__Q29CCharaPcs7CHandleFv(void*);
-extern "C" void Add__Q29CCharaPcs7CHandleFv(void*);
-extern "C" void LoadModelASync__Q29CCharaPcs7CHandleFiUlUl(void*, int, unsigned long, unsigned long);
-extern "C" int IsLoadModelASyncCompleted__Q29CCharaPcs7CHandleFv(void*);
 extern "C" void SetDamageCol__8CGObjectFiPcffP3Vec(void*, int, char*, float, float, Vec*);
 extern "C" void onFrame__8CGPrgObjFv(void*);
 extern "C" int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, CMapCylinder*, Vec*, unsigned int);
@@ -865,16 +859,11 @@ CGPrgObj* CGItemObj::CreateFromScript(
 			}
 			*(CGPrgObj**)(m_boss__8CGMonObj + (int)ownerScriptSlot * 4 + 8) = newItem;
 
-			void* handle = __nw__Q29CCharaPcs7CHandleFUlPQ27CMemory6CStagePci(
-			    0x194, Game.m_mainStage, const_cast<char*>(DAT_801dcf58), 0x28E);
-			if (handle != 0) {
-				handle = __ct__Q29CCharaPcs7CHandleFv(handle);
-			}
-			*(void**)(itemSelf + 0x564) = handle;
-			Add__Q29CCharaPcs7CHandleFv(*(void**)(itemSelf + 0x564));
+			CCharaPcs::CHandle* handle = new (Game.m_mainStage, const_cast<char*>(DAT_801dcf58), 0x28E) CCharaPcs::CHandle;
+			reinterpret_cast<CGItemObj*>(newItem)->m_pendingModelHandle = handle;
+			handle->Add();
 
-			LoadModelASync__Q29CCharaPcs7CHandleFiUlUl(
-			    *(void**)(itemSelf + 0x564), 2, ccfs->m_modelId, ccfs->m_modelParam);
+			handle->LoadModelASync(2, ccfs->m_modelId, ccfs->m_modelParam);
 
 			if ((unsigned int)System.m_execParam >= 3U) {
 				Printf__7CSystemFPce(&System, const_cast<char*>(DAT_801dcf64));
@@ -1376,9 +1365,9 @@ void CGItemObj::onFrameStat()
 void CGItemObj::onFrame()
 {
 	unsigned char* self = (unsigned char*)this;
-	void* handle = m_pendingModelHandle;
+	CCharaPcs::CHandle* handle = m_pendingModelHandle;
 
-	if (handle != 0 && IsLoadModelASyncCompleted__Q29CCharaPcs7CHandleFv(handle) != 0) {
+	if (handle != 0 && handle->IsLoadModelASyncCompleted()) {
 		if ((unsigned int)System.m_execParam >= 3U) {
 			Printf__7CSystemFPce(&System, const_cast<char*>(DAT_801dd010));
 		}
@@ -1502,10 +1491,10 @@ void CGItemObj::onFramePreCalc()
 void CGItemObj::onDestroy()
 {
 	unsigned char* self = (unsigned char*)this;
-	void* handle = *(void**)(self + 0x564);
+	CCharaPcs::CHandle* handle = m_pendingModelHandle;
 
 	if (handle != 0) {
-		__dt__Q29CCharaPcs7CHandleFv(handle, 1);
+		delete handle;
 	}
 
 	DeleteParticleSlot__13CFlatRuntime2Fii(CFlat, *(int*)(self + 0x55c), 0);
@@ -1534,4 +1523,3 @@ void CGItemObj::onCreate()
 	memset(&m_memoryCapsuleNameIndex, 0, 0xc);
 	m_particleSlot = GetFreeParticleSlot__13CFlatRuntime2Fv(CFlat);
 }
-

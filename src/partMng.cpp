@@ -13,6 +13,7 @@
 #include "ffcc/p_map.h"
 #include "ffcc/p_usb.h"
 #include "ffcc/p_tina.h"
+#include "ffcc/textureman.h"
 #include "ffcc/USBStreamData.h"
 #include "ffcc/pppDrawMng.h"
 #include "ffcc/pppfunctbl.h"
@@ -30,10 +31,10 @@ extern int gPppHeapUseRateWords[3];
 
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
+#include <PowerPC_EABI_Support/Runtime/MWCPlusLib.h>
+#include <PowerPC_EABI_Support/Runtime/New.h>
 
 extern "C" void Printf__7CSystemFPce(CSystem*, const char*, ...);
-extern "C" void __dl__FPv(void* ptr);
-extern "C" void __dla__FPv(void* ptr);
 extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void _WaitDrawDone__8CGraphicFPci(CGraphic*, const char*, int);
@@ -76,10 +77,7 @@ extern "C" void __ct__10pppShapeStFv(pppShapeSt* shapeSt);
 extern "C" void __dt__10pppShapeStFv(pppShapeSt* shapeSt, int);
 extern "C" void __ct__10pppModelStFv(pppModelSt* modelSt);
 extern "C" void __dt__10pppModelStFv(pppModelSt* modelSt, int);
-extern "C" void __construct_array(void*, void (*)(void*), void (*)(void*, int), unsigned long, unsigned long);
-extern "C" void __destroy_arr(void*, void*, unsigned long, unsigned long);
 extern "C" void pppDestroyHeap__FP9_pppEnvSt(_pppEnvSt*);
-extern "C" void __dt__Q29CCharaPcs7CHandleFv(void*, int);
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, int, int, int, int);
 extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
@@ -87,22 +85,6 @@ extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 extern "C" void _pppDrawPart__FP9_pppMngSt(_pppMngSt*);
 extern "C" void Create__9CGBaseObjFv(CGBaseObj*);
 extern "C" void LoadMap__7CMapPcsFiiPvUlUc(void*, int, int, void*, unsigned long, unsigned char);
-extern "C" int SearchNodeSk__Q26CChara6CModelFPc(CChara::CModel*, char*);
-extern "C" void SetFrame__Q26CChara6CModelFf(float, CChara::CModel*);
-extern "C" void CalcMatrix__Q26CChara6CModelFv(CChara::CModel*);
-extern "C" void CalcSkin__Q26CChara6CModelFv(CChara::CModel*);
-extern "C" void* __nw__11CTextureSetFUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
-extern "C" CTextureSet* __ct__11CTextureSetFv(CTextureSet*);
-extern "C" void Create__11CTextureSetFPvPQ27CMemory6CStageiP13CAmemCacheSetii(
-    CTextureSet*, void*, CMemory::CStage*, int, CAmemCacheSet*, int, int);
-extern "C" void* __nw__12CMaterialSetFUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
-extern "C" CMaterialSet* __ct__12CMaterialSetFv(CMaterialSet*);
-extern "C" void SetPartFromTextureSet__12CMaterialSetFP11CTextureSeti(CMaterialSet*, CTextureSet*, int);
-extern "C" void SetTextureSet__12CMaterialSetFP11CTextureSet(CMaterialSet*, CTextureSet*);
-extern "C" void* __nw__9CMaterialFUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
-extern "C" CMaterial* __ct__9CMaterialFv(CMaterial*);
-extern "C" void Create__9CMaterialFUlQ212CMaterialMan7TEV_BIT(CMaterial*, unsigned long, unsigned long);
-extern "C" void AddMaterial__12CMaterialSetFP9CMateriali(CMaterialSet*, CMaterial*, int);
 PPPCREATEPARAM g_dcp;
 extern "C" {
 int DAT_8032ed68 = 0;
@@ -209,12 +191,12 @@ pppShapeSt::pppShapeSt()
 pppShapeSt::~pppShapeSt()
 {
     if (m_animData != 0) {
-        __dl__FPv(m_animData);
+        delete[] reinterpret_cast<u8*>(m_animData);
         m_animData = 0;
     }
 
     if (m_displayListData != 0) {
-        __dl__FPv(m_displayListData);
+        delete[] reinterpret_cast<u8*>(m_displayListData);
         m_displayListData = 0;
     }
 }
@@ -385,8 +367,8 @@ void CPartMng::Destroy()
                 }
             }
         }
-        __destroy_arr(res->m_pppModelStArr, reinterpret_cast<void*>(__dt__10pppModelStFv), 0x6c, 0x100);
-        __dl__FPv(res->m_pppModelStArr);
+        __destroy_arr(res->m_pppModelStArr, reinterpret_cast<ConstructorDestructor>(__dt__10pppModelStFv), 0x6c, 0x100);
+        operator delete(res->m_pppModelStArr);
         res->m_pppModelStArr = 0;
     }
 
@@ -397,11 +379,11 @@ void CPartMng::Destroy()
                 shape->m_refCount--;
                 if (shape->m_refCount < 1) {
                     if (shape->m_animData != 0) {
-                        __dl__FPv(shape->m_animData);
+                        delete[] reinterpret_cast<u8*>(shape->m_animData);
                         shape->m_animData = 0;
                     }
                     if (shape->m_displayListData != 0) {
-                        __dl__FPv(shape->m_displayListData);
+                        delete[] reinterpret_cast<u8*>(shape->m_displayListData);
                         shape->m_displayListData = 0;
                     }
                     shape->m_refCount = 0;
@@ -409,8 +391,8 @@ void CPartMng::Destroy()
                 }
             }
         }
-        __destroy_arr(res->m_pppShapeStArr, reinterpret_cast<void*>(__dt__10pppShapeStFv), 0x2c, 0x100);
-        __dl__FPv(res->m_pppShapeStArr);
+        __destroy_arr(res->m_pppShapeStArr, reinterpret_cast<ConstructorDestructor>(__dt__10pppShapeStFv), 0x2c, 0x100);
+        operator delete(res->m_pppShapeStArr);
         res->m_pppShapeStArr = 0;
     }
 
@@ -433,12 +415,13 @@ void CPartMng::Destroy()
     }
 
     if (res->m_editorObj != 0) {
-        void* handle = *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(res->m_editorObj) + 0xf8);
+        CCharaPcs::CHandle* handle =
+            *reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(res->m_editorObj) + 0xf8);
         if (handle != 0) {
-            __dt__Q29CCharaPcs7CHandleFv(handle, 1);
+            delete handle;
             *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(res->m_editorObj) + 0xf8) = 0;
         }
-        __dl__FPv(res->m_editorObj);
+        operator delete(res->m_editorObj);
         res->m_editorObj = 0;
     }
 
@@ -627,11 +610,11 @@ void CPartMng::pppReleasePdt(int pdtSlotIndex)
         shape->m_refCount--;
         if (shape->m_refCount < 1) {
             if (shape->m_animData != 0) {
-                __dl__FPv(shape->m_animData);
+                delete[] reinterpret_cast<u8*>(shape->m_animData);
                 shape->m_animData = 0;
             }
             if (shape->m_displayListData != 0) {
-                __dl__FPv(shape->m_displayListData);
+                delete[] reinterpret_cast<u8*>(shape->m_displayListData);
                 shape->m_displayListData = 0;
             }
             shape->m_refCount = 0;
@@ -667,7 +650,7 @@ void CPartMng::pppReleasePdt(int pdtSlotIndex)
         pdt->m_cacheChunks = 0;
     }
 
-    __dl__FPv(pdtSlot->m_pppDataHead);
+    delete[] reinterpret_cast<u8*>(pdtSlot->m_pppDataHead);
     pdtSlot->m_pppDataHead = 0;
 
     _WaitDrawDone__8CGraphicFPci(&Graphic, s_partMng_cpp_801d8230, 0x182);
@@ -1168,8 +1151,7 @@ void CPartMng::SetFp()
             mng->m_owner = owner;
             mng->m_lookTarget = owner;
             if (owner != 0 && owner->m_charaModelHandle != 0 && owner->m_charaModelHandle->m_model != 0) {
-                int node = SearchNodeSk__Q26CChara6CModelFPc(owner->m_charaModelHandle->m_model,
-                                                             reinterpret_cast<char*>(fpBytes + 0x50));
+                int node = owner->m_charaModelHandle->m_model->SearchNodeSk(reinterpret_cast<char*>(fpBytes + 0x50));
                 if (node >= 0) {
                     mng->m_bindNode = reinterpret_cast<void*>(
                         *reinterpret_cast<int*>(*reinterpret_cast<int*>(
@@ -1404,7 +1386,7 @@ void CPartMng::pppEditAllReleaseResource()
     iter = self;
     do {
         if (*reinterpret_cast<void**>(iter + 0x1D4) != 0) {
-            __dl__FPv(*reinterpret_cast<void**>(iter + 0x1D4));
+            operator delete(*reinterpret_cast<void**>(iter + 0x1D4));
             *reinterpret_cast<void**>(iter + 0x1D4) = 0;
         }
         iVar3 = iVar3 + 1;
@@ -1415,7 +1397,7 @@ void CPartMng::pppEditAllReleaseResource()
     iter = self;
     do {
         if (*reinterpret_cast<void**>(iter + 0x1D8) != 0) {
-            __dl__FPv(*reinterpret_cast<void**>(iter + 0x1D8));
+            operator delete(*reinterpret_cast<void**>(iter + 0x1D8));
             *reinterpret_cast<void**>(iter + 0x1D8) = 0;
         }
         iVar3 = iVar3 + 1;
@@ -1426,7 +1408,7 @@ void CPartMng::pppEditAllReleaseResource()
     iter = self;
     do {
         if (*reinterpret_cast<long**>(iter + 0x1DC) != 0) {
-            __dl__FPv(*reinterpret_cast<long**>(iter + 0x1DC));
+            operator delete(*reinterpret_cast<long**>(iter + 0x1DC));
             *reinterpret_cast<long**>(iter + 0x1DC) = 0;
         }
         iVar3 = iVar3 + 1;
@@ -1471,7 +1453,7 @@ void CPartMng::pppEditAllReleaseResource()
     iter = self;
     do {
         if (*reinterpret_cast<void**>(iter + 0x1D8) != 0) {
-            __dl__FPv(*reinterpret_cast<void**>(iter + 0x1D8));
+            operator delete(*reinterpret_cast<void**>(iter + 0x1D8));
             *reinterpret_cast<void**>(iter + 0x1D8) = 0;
         }
         iVar3 = iVar3 + 1;
@@ -1479,7 +1461,7 @@ void CPartMng::pppEditAllReleaseResource()
     } while (iVar3 < 0x80);
 
     if (*reinterpret_cast<int*>(self + 0x7FC) != 0) {
-        __dl__FPv(*reinterpret_cast<void**>(self + 0x7FC));
+        operator delete(*reinterpret_cast<void**>(self + 0x7FC));
         *reinterpret_cast<int*>(self + 0x7FC) = 0;
     }
 }
@@ -1679,34 +1661,18 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         env->m_isEditMode = 0;
 
         if (res->m_textureSet == 0) {
-            CTextureSet* textureSet = static_cast<CTextureSet*>(
-                __nw__11CTextureSetFUlPQ27CMemory6CStagePci(
-                    0x24, stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0x447));
-            if (textureSet != 0) {
-                textureSet = __ct__11CTextureSetFv(textureSet);
-            }
-            res->m_textureSet = textureSet;
+            res->m_textureSet = new (stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0x447) CTextureSet;
         }
 
         if (res->m_materialSet == 0) {
-            CMaterialSet* materialSet = static_cast<CMaterialSet*>(
-                __nw__12CMaterialSetFUlPQ27CMemory6CStagePci(
-                    0x24, stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0x44B));
-            if (materialSet != 0) {
-                materialSet = __ct__12CMaterialSetFv(materialSet);
-            }
+            CMaterialSet* materialSet = new (stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0x44B) CMaterialSet;
             res->m_materialSet = materialSet;
             env->m_materialSetPtr = materialSet;
 
-            CMaterial* defaultMaterial = static_cast<CMaterial*>(
-                __nw__9CMaterialFUlPQ27CMemory6CStagePci(
-                    0xA8, stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0x44E));
+            CMaterial* defaultMaterial = new (stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0x44E) CMaterial;
             if (defaultMaterial != 0) {
-                defaultMaterial = __ct__9CMaterialFv(defaultMaterial);
-            }
-            if (defaultMaterial != 0) {
-                Create__9CMaterialFUlQ212CMaterialMan7TEV_BIT(defaultMaterial, 0, 0xFFF531F0);
-                AddMaterial__12CMaterialSetFP9CMateriali(res->m_materialSet, defaultMaterial, 0);
+                defaultMaterial->Create(0, static_cast<CMaterialMan::TEV_BIT>(0xFFF531F0));
+                res->m_materialSet->AddMaterial(defaultMaterial, 0);
             }
         }
         return;
@@ -1778,11 +1744,11 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
                     shapeSlot->m_refCount--;
                     if (shapeSlot->m_refCount < 1) {
                         if (shapeSlot->m_animData != 0) {
-                            __dl__FPv(shapeSlot->m_animData);
+                            delete[] reinterpret_cast<u8*>(shapeSlot->m_animData);
                             shapeSlot->m_animData = 0;
                         }
                         if (shapeSlot->m_displayListData != 0) {
-                            __dl__FPv(shapeSlot->m_displayListData);
+                            delete[] reinterpret_cast<u8*>(shapeSlot->m_displayListData);
                             shapeSlot->m_displayListData = 0;
                         }
                         shapeSlot->m_refCount = 0;
@@ -1819,11 +1785,11 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         *reinterpret_cast<int*>(self + kEditCountOffset) = 0;
         _WaitDrawDone__8CGraphicFPci(&Graphic, s_partMng_cpp_801d8230, 0x3B3);
         if (pdtSlots[0].m_pdt != 0) {
-            __dl__FPv(pdtSlots[0].m_pdt);
+            delete[] reinterpret_cast<u8*>(pdtSlots[0].m_pdt);
             pdtSlots[0].m_pdt = 0;
         }
         if (*reinterpret_cast<void**>(self + kRecvBuffOffset) != 0) {
-            __dl__FPv(*reinterpret_cast<void**>(self + kRecvBuffOffset));
+            delete[] *reinterpret_cast<u8**>(self + kRecvBuffOffset);
             *reinterpret_cast<void**>(self + kRecvBuffOffset) = 0;
         }
         pdtSlots[0].m_pdt = reinterpret_cast<_pppDataHead*>(
@@ -1881,11 +1847,11 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         int pdtCount = *reinterpret_cast<int*>(self + kPdtCountOffset);
         if (0 <= pdtCount && pdtCount < 0x18) {
             if (pdtSlots[pdtCount].m_pdt != 0) {
-                __dl__FPv(pdtSlots[pdtCount].m_pdt);
+                delete[] reinterpret_cast<u8*>(pdtSlots[pdtCount].m_pdt);
                 pdtSlots[pdtCount].m_pdt = 0;
             }
             if (*reinterpret_cast<void**>(self + kRecvBuffOffset) != 0) {
-                __dl__FPv(*reinterpret_cast<void**>(self + kRecvBuffOffset));
+                delete[] *reinterpret_cast<u8**>(self + kRecvBuffOffset);
                 *reinterpret_cast<void**>(self + kRecvBuffOffset) = 0;
             }
 
@@ -1917,42 +1883,25 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
                 }
 
                 if (res->m_textureSet == 0) {
-                    CTextureSet* textureSet = static_cast<CTextureSet*>(
-                        __nw__11CTextureSetFUlPQ27CMemory6CStagePci(
-                            0x24, stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0x447));
-                    if (textureSet != 0) {
-                        textureSet = __ct__11CTextureSetFv(textureSet);
-                    }
-                    res->m_textureSet = textureSet;
+                    res->m_textureSet = new (stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0x447) CTextureSet;
                 }
 
                 if (res->m_materialSet == 0) {
-                    CMaterialSet* materialSet = static_cast<CMaterialSet*>(
-                        __nw__12CMaterialSetFUlPQ27CMemory6CStagePci(
-                            0x24, stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0x44B));
-                    if (materialSet != 0) {
-                        materialSet = __ct__12CMaterialSetFv(materialSet);
-                    }
+                    CMaterialSet* materialSet = new (stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0x44B) CMaterialSet;
                     res->m_materialSet = materialSet;
                     env->m_materialSetPtr = materialSet;
 
-                    CMaterial* defaultMaterial = static_cast<CMaterial*>(
-                        __nw__9CMaterialFUlPQ27CMemory6CStagePci(
-                            0xA8, stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0x44E));
+                    CMaterial* defaultMaterial = new (stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0x44E) CMaterial;
                     if (defaultMaterial != 0) {
-                        defaultMaterial = __ct__9CMaterialFv(defaultMaterial);
-                    }
-                    if (defaultMaterial != 0) {
-                        Create__9CMaterialFUlQ212CMaterialMan7TEV_BIT(defaultMaterial, 0, 0xFFF531F0);
-                        AddMaterial__12CMaterialSetFP9CMateriali(res->m_materialSet, defaultMaterial, 0);
+                        defaultMaterial->Create(0, static_cast<CMaterialMan::TEV_BIT>(0xFFF531F0));
+                        res->m_materialSet->AddMaterial(defaultMaterial, 0);
                     }
                 }
 
                 if (res->m_textureSet != 0 && res->m_materialSet != 0) {
-                    Create__11CTextureSetFPvPQ27CMemory6CStageiP13CAmemCacheSetii(
-                        res->m_textureSet, &chunkFile, stageLoad, 1, 0, 0, 0);
-                    SetPartFromTextureSet__12CMaterialSetFP11CTextureSeti(res->m_materialSet, res->m_textureSet, 0);
-                    SetTextureSet__12CMaterialSetFP11CTextureSet(res->m_materialSet, res->m_textureSet);
+                    res->m_textureSet->Create(chunkFile, stageLoad, 1, 0, 0, 0);
+                    res->m_materialSet->SetPartFromTextureSet(res->m_textureSet, 0);
+                    res->m_materialSet->SetTextureSet(res->m_textureSet);
                 }
             }
         }
@@ -2180,7 +2129,7 @@ void CPartMng::pppEditBeforeCalc()
                 delete (*editorObj)->m_charaModelHandle;
                 (*editorObj)->m_charaModelHandle = 0;
             }
-            __dl__FPv(*editorObj);
+            operator delete(*editorObj);
             *editorObj = 0;
         }
 
@@ -2283,9 +2232,9 @@ void CPartMng::pppEditPartCalc()
     OSStopStopwatch(&g_par_calc_prof);
     if (editorObj != 0 && editorObj->m_charaModelHandle != 0 && editorObj->m_charaModelHandle->m_model != 0) {
         CChara::CModel* model = editorObj->m_charaModelHandle->m_model;
-        CalcMatrix__Q26CChara6CModelFv(model);
-        CalcSkin__Q26CChara6CModelFv(model);
-        SetFrame__Q26CChara6CModelFf(*reinterpret_cast<float*>(self + 0x23564), model);
+        model->CalcMatrix();
+        model->CalcSkin();
+        model->SetFrame(*reinterpret_cast<float*>(self + 0x23564));
         if (gPppCalcDisabled == 0) {
             *reinterpret_cast<float*>(self + 0x23564) += FLOAT_8032fe18;
         }
@@ -3534,35 +3483,19 @@ int CPartMng::pppLoadPtx(const char* baseName, int pdtSlotIndex, int appendMode,
     }
 
     if (res->m_textureSet == 0) {
-        CTextureSet* textureSet = static_cast<CTextureSet*>(
-            __nw__11CTextureSetFUlPQ27CMemory6CStagePci(
-                0x24, stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0xC10));
-        if (textureSet != 0) {
-            textureSet = __ct__11CTextureSetFv(textureSet);
-        }
-        res->m_textureSet = textureSet;
+        res->m_textureSet = new (stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0xC10) CTextureSet;
     }
 
     if (res->m_materialSet == 0) {
-        CMaterialSet* materialSet = static_cast<CMaterialSet*>(
-            __nw__12CMaterialSetFUlPQ27CMemory6CStagePci(
-                0x24, stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0xC14));
-        if (materialSet != 0) {
-            materialSet = __ct__12CMaterialSetFv(materialSet);
-        }
+        CMaterialSet* materialSet = new (stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0xC14) CMaterialSet;
         res->m_materialSet = materialSet;
         reinterpret_cast<_pppEnvSt*>(reinterpret_cast<unsigned char*>(this) + kEnvOffset)->m_materialSetPtr =
             res->m_materialSet;
 
-        CMaterial* defaultMaterial = static_cast<CMaterial*>(
-            __nw__9CMaterialFUlPQ27CMemory6CStagePci(
-                0xA8, stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0xC17));
+        CMaterial* defaultMaterial = new (stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0xC17) CMaterial;
         if (defaultMaterial != 0) {
-            defaultMaterial = __ct__9CMaterialFv(defaultMaterial);
-        }
-        if (defaultMaterial != 0) {
-            Create__9CMaterialFUlQ212CMaterialMan7TEV_BIT(defaultMaterial, 0, 0xFFF531F0);
-            AddMaterial__12CMaterialSetFP9CMateriali(res->m_materialSet, defaultMaterial, 0);
+            defaultMaterial->Create(0, static_cast<CMaterialMan::TEV_BIT>(0xFFF531F0));
+            res->m_materialSet->AddMaterial(defaultMaterial, 0);
         }
     }
 
@@ -3572,13 +3505,12 @@ int CPartMng::pppLoadPtx(const char* baseName, int pdtSlotIndex, int appendMode,
     CChunkFile::CChunk chunk;
     while (chunkFile.GetNextChunk(chunk)) {
         if (chunk.m_id == kChunkTSET) {
-            Create__11CTextureSetFPvPQ27CMemory6CStageiP13CAmemCacheSetii(
-                res->m_textureSet, &chunkFile, stageLoad, 1, &ppvAmemCacheSet, appendMode, 0);
+            res->m_textureSet->Create(chunkFile, stageLoad, 1, &ppvAmemCacheSet, appendMode, 0);
         }
     }
 
-    SetPartFromTextureSet__12CMaterialSetFP11CTextureSeti(res->m_materialSet, res->m_textureSet, pdtSlotIndex);
-    SetTextureSet__12CMaterialSetFP11CTextureSet(res->m_materialSet, res->m_textureSet);
+    res->m_materialSet->SetPartFromTextureSet(res->m_textureSet, pdtSlotIndex);
+    res->m_materialSet->SetTextureSet(res->m_textureSet);
     stageLoad->resDefaultParam();
     return 1;
 }
@@ -3628,8 +3560,8 @@ void CPartMng::pppLoadPmd(const char* baseName)
             __nw__FUlPQ27CMemory6CStagePci(
                 0x6c00, stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0xca9));
         if (modelArray != 0) {
-            __construct_array(modelArray, reinterpret_cast<void (*)(void*)>(__ct__10pppModelStFv),
-                              reinterpret_cast<void (*)(void*, int)>(__dt__10pppModelStFv), 0x6c, 0x100);
+            __construct_array(modelArray, reinterpret_cast<ConstructorDestructor>(__ct__10pppModelStFv),
+                              reinterpret_cast<ConstructorDestructor>(__dt__10pppModelStFv), 0x6c, 0x100);
             for (int i = 0; i < 0x100; i++) {
                 modelArray[i].m_isUsed = 0;
             }
@@ -3662,7 +3594,7 @@ void CPartMng::pppLoadPmd(const char* baseName)
                             *meshDataPtr, 0, static_cast<CAmemCache::TYPE>(1), 1));
 
                         if (*meshDataPtr != 0) {
-                            __dl__FPv(*meshDataPtr);
+                            operator delete(*meshDataPtr);
                             *meshDataPtr = 0;
                         }
 
@@ -3748,8 +3680,8 @@ void CPartMng::pppLoadPan(const char* baseName)
             __nw__FUlPQ27CMemory6CStagePci(
                 0x2c00, stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0xd0b));
         if (shapeArray != 0) {
-            __construct_array(shapeArray, reinterpret_cast<void (*)(void*)>(__ct__10pppShapeStFv),
-                              reinterpret_cast<void (*)(void*, int)>(__dt__10pppShapeStFv), 0x2c, 0x100);
+            __construct_array(shapeArray, reinterpret_cast<ConstructorDestructor>(__ct__10pppShapeStFv),
+                              reinterpret_cast<ConstructorDestructor>(__dt__10pppShapeStFv), 0x2c, 0x100);
             for (int i = 0; i < 0x100; i++) {
                 shapeArray[i].m_inUse = 0;
             }
@@ -4230,8 +4162,7 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
         *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(mng) + 0xD8) = owner;
         *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(mng) + 0xDC) = createParam->m_lookTargetPtr;
         if (owner != 0 && owner->m_charaModelHandle != 0 && owner->m_charaModelHandle->m_model != 0) {
-            int node = SearchNodeSk__Q26CChara6CModelFPc(owner->m_charaModelHandle->m_model,
-                                                         reinterpret_cast<char*>(fpData2 + 0x10));
+            int node = owner->m_charaModelHandle->m_model->SearchNodeSk(reinterpret_cast<char*>(fpData2 + 0x10));
             if (node >= 0) {
                 *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(mng) + 0xE0) = 0;
             }
@@ -4759,8 +4690,8 @@ extern "C" void __sinit_partMng_cpp(void)
     // To match, replace with proper constructors or initializer expressions, then
     // delete this function so the compiler auto-generates it.
 
-    __construct_array(reinterpret_cast<unsigned char*>(&PartMng) + 0x2A18, (void (*)(void*))__ct__9_pppMngStFv, 0,
-                      0x158, 0x180);
+    __construct_array(reinterpret_cast<unsigned char*>(&PartMng) + 0x2A18,
+                      reinterpret_cast<ConstructorDestructor>(__ct__9_pppMngStFv), 0, 0x158, 0x180);
 
     g_dcp.m_soundEffectParams.m_soundEffectHandle = -1;
     g_dcp.m_soundEffectParams.m_soundEffectSlot = -1;

@@ -7,10 +7,12 @@
 #include <dolphin/mtx.h>
 
 class CChunkFile;
+class CGObject;
 class CMaterialSet;
 class CTextureSet;
 class CMemory;
 class CTexAnimSet;
+struct _GXColor;
 struct Vec;
 
 struct CCharaModelData
@@ -134,6 +136,9 @@ public:
 		void SetFrame(float);
 		void CalcFurColor();
 		void InitMogFurTex();
+		void MogFurFrame(CGObject*);
+		int PickFur(float (*)[4], _GXColor, int, int, _GXColor*, _GXColor*, Vec*);
+		void DrawFur(float (*)[4], int);
 		int GetDispIndex(CChara::CNode*);
 		void GetMatrix();
 		void GetMatrix(float(*)[4]);
@@ -171,6 +176,7 @@ public:
 
 	class CMesh : public CRef
 	{
+	public:
 		CMesh();
 		~CMesh();
 

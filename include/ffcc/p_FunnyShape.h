@@ -8,10 +8,6 @@
 #include "ffcc/FS_USB_Process.h"
 #include "ffcc/p_usb.h"
 
-extern "C" void* __ct__14CUSBStreamDataFv(void*);
-extern "C" void* __ct__11CFunnyShapeFv(void*);
-extern "C" void __ct__22CPtrArray_P9_GXTexObj_Fv(void*);
-extern "C" void __ct__29CPtrArray_P15OSFS_TEXTURE_ST_Fv(void*);
 extern unsigned int m_table_desc0__14CFunnyShapePcs[];
 extern unsigned int m_table_desc1__14CFunnyShapePcs[];
 extern unsigned int m_table_desc2__14CFunnyShapePcs[];

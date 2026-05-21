@@ -27,7 +27,6 @@ extern "C" void SetMcWinInfo__8CMenuPcsFii(CMenuPcs*, int, int);
 extern "C" void SetProjection__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" void SetLight__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" void RestoreProjection__8CMenuPcsFv(CMenuPcs*);
-extern "C" void Draw__Q29CCharaPcs7CHandleFi(void*, int);
 extern "C" void DrawMenuIdx__8CPartPcsFi(CPartPcs*, int);
 extern "C" void Printf__7CSystemFPce(CSystem* system, const char* format, ...);
 extern "C" void loadTexture__8CMenuPcsFPPciiPQ28CMenuPcs4CTmpiii(CMenuPcs*, char**, int, int, void*, int, int, int);
@@ -103,7 +102,7 @@ struct BonusFlatDataRaw {
 
 struct BonusPartySummary {
 	int m_partySlot;
-	void* m_partyHandle;
+	CCharaPcs::CHandle* m_partyHandle;
 	int m_bonusCondition;
 	int m_totalValue;
 	int m_foodValue;
@@ -285,7 +284,7 @@ static CCharaPcs::CHandle* GetBonusResultOpenHandle(CMenuPcs* menu, int modelInd
 
 	if (modelIndex < activePartyCount) {
 		BonusPartySummary* summary = GetBonusPartySummary(modelIndex);
-		return (summary != 0) ? reinterpret_cast<CCharaPcs::CHandle*>(summary->m_partyHandle) : 0;
+		return (summary != 0) ? summary->m_partyHandle : 0;
 	}
 
 	CCharaPcs::CHandle** displaySlots = GetBonusDisplayHandleSlots(menu);
@@ -579,7 +578,7 @@ static void DrawBonusPartyModel(CMenuPcs* menu, int modelIndex, float alpha)
 		return;
 	}
 
-	void* handle = summary->m_partyHandle;
+	CCharaPcs::CHandle* handle = summary->m_partyHandle;
 	if (handle == 0) {
 		return;
 	}
@@ -587,10 +586,10 @@ static void DrawBonusPartyModel(CMenuPcs* menu, int modelIndex, float alpha)
 	SetBonusPartyModelAlpha(menu, modelIndex, ClampBonusUnit(alpha));
 	SetProjection__8CMenuPcsFi(menu, modelIndex);
 	SetLight__8CMenuPcsFi(menu, 1);
-	unsigned int oldFlags = *(unsigned int*)((char*)handle + 8);
-	*(unsigned int*)((char*)handle + 8) = 0x300543;
-	Draw__Q29CCharaPcs7CHandleFi(handle, 5);
-	*(unsigned int*)((char*)handle + 8) = oldFlags;
+	unsigned int oldFlags = handle->m_flags;
+	handle->m_flags = 0x300543;
+	handle->Draw(5);
+	handle->m_flags = oldFlags;
 	RestoreProjection__8CMenuPcsFv(menu);
 }
 
@@ -601,14 +600,13 @@ static void SetBonusPartyModelAlpha(CMenuPcs* menu, int modelIndex, float alpha)
 		return;
 	}
 
-	void* handle = summary->m_partyHandle;
+	CCharaPcs::CHandle* handle = summary->m_partyHandle;
 	if (handle == 0) {
 		return;
 	}
 
-	int modelPtr = *(int*)((char*)handle + 0x168);
-	if (modelPtr != 0) {
-		*(float*)(modelPtr + 0x9C) = ClampBonusUnit(alpha);
+	if (handle->m_model != 0) {
+		*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C) = ClampBonusUnit(alpha);
 	}
 }
 
@@ -1210,7 +1208,8 @@ void CMenuPcs::createBonus()
 
 			BonusPartySummary& entry = s_bonusSummaryData->m_party[activeCount];
 			entry.m_partySlot = i;
-			entry.m_partyHandle = (Game.m_partyObjArr[i] != 0) ? *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(Game.m_partyObjArr[i]) + 0xF8) : 0;
+			entry.m_partyHandle =
+			    (Game.m_partyObjArr[i] != 0) ? *reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(Game.m_partyObjArr[i]) + 0xF8) : 0;
 			entry.m_bonusCondition = (int)caravanWork->m_bonusCondition;
 			entry.m_foodValue = (int)caravanWork->m_artifactRelated[2] + (int)caravanWork->m_artifactRelated[3];
 			if (entry.m_foodValue > 100) {
@@ -1226,11 +1225,8 @@ void CMenuPcs::createBonus()
 			}
 			entry.m_tribeId = (unsigned int)caravanWork->m_tribeId;
 			entry.m_ownedArtifactMask = 0;
-			if (entry.m_partyHandle != 0) {
-				int modelPtr = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(entry.m_partyHandle) + 0x168);
-				if (modelPtr != 0) {
-					*reinterpret_cast<float*>(modelPtr + 0x9C) = 0.0f;
-				}
+			if (entry.m_partyHandle != 0 && entry.m_partyHandle->m_model != 0) {
+				*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(entry.m_partyHandle->m_model) + 0x9C) = 0.0f;
 			}
 
 			for (int t = 0; t < 4 && tempArtifactCount < 4; t++) {

@@ -16,7 +16,6 @@ CDbgMenuPcs DbgMenuPcs;
 extern unsigned char DAT_8032e698;
 extern unsigned char g_map_draw_prof;
 
-extern "C" void __construct_array(void*, void (*)(void*), void (*)(void*, int), unsigned long, unsigned long);
 extern "C" void __ct__Q211CDbgMenuPcs3CDMFv(void*);
 extern "C" void create__11CDbgMenuPcsFv(CDbgMenuPcs*);
 extern "C" void destroy__11CDbgMenuPcsFv(CDbgMenuPcs*);

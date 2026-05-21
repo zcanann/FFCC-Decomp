@@ -18,7 +18,6 @@ extern const f32 kFunnyShapeViewportHeight;
 #include <string.h>
 
 struct _GXTexObj;
-struct OSFS_TEXTURE_ST;
 
 template <class T>
 class CPtrArray
@@ -39,15 +38,11 @@ public:
     void DeleteAndRemoveAll();
 };
 
-extern "C" void __dl__FPv(void* ptr);
 extern "C" void* __register_global_object(void* object, void* destructor, void* regmem);
-extern "C" void CreateBuffer__14CUSBStreamDataFv(CUSBStreamData*);
-extern "C" void DeleteBuffer__14CUSBStreamDataFv(CUSBStreamData*);
 extern "C" void createViewer__14CFunnyShapePcsFv(CFunnyShapePcs*);
 extern "C" void destroyViewer__14CFunnyShapePcsFv(CFunnyShapePcs*);
 extern "C" void calcViewer__14CFunnyShapePcsFv(CFunnyShapePcs*);
 extern "C" void drawViewer__14CFunnyShapePcsFv(CFunnyShapePcs*);
-extern "C" CFunnyShape* __dt__11CFunnyShapeFv(CFunnyShape*, short);
 extern "C" void __dt__14CFunnyShapePcsFv(void*);
 extern "C" void* __vt__8CManager[];
 extern "C" void* __vt__8CProcess[];
@@ -66,8 +61,12 @@ extern const char __RTTI__8CManager_8032E660[];
 extern const char __RTTI__8CProcess_8032E668[];
 extern u8 ARRAY_8026D728[];
 
-extern "C" CUSBStreamData* __dt__14CUSBStreamDataFv(CUSBStreamData* self, short shouldDelete);
 extern "C" const char lbl_8032FD1C[5];
+
+inline void* operator new(unsigned long, void* ptr)
+{
+    return ptr;
+}
 
 namespace {
 static inline u8* Ptr(CFunnyShapePcs* self, u32 offset)
@@ -225,8 +224,8 @@ void CFunnyShapePcs::destroyViewer()
     TextureHeaders(this)->DeleteAndRemoveAll();
     TextureObjects(this)->DeleteAndRemoveAll();
 
-    DeleteBuffer__14CUSBStreamDataFv(UsbStream(this));
-    __dt__11CFunnyShapeFv(FunnyShape(this), -1);
+    UsbStream(this)->DeleteBuffer();
+    FunnyShape(this)->~CFunnyShape();
     Memory.DestroyStage(m_viewerStage);
 }
 
@@ -333,9 +332,9 @@ template <>
 void CPtrArray<_GXTexObj*>::DeleteAndRemoveAll()
 {
     for (unsigned int i = 0; i < static_cast<unsigned int>(size); i++) {
-        void* item = items[i];
+        _GXTexObj* item = items[i];
         if (item != 0) {
-            __dl__FPv(item);
+            delete item;
             items[i] = 0;
         }
     }
@@ -351,9 +350,9 @@ template <>
 void CPtrArray<OSFS_TEXTURE_ST*>::DeleteAndRemoveAll()
 {
     for (unsigned int i = 0; i < static_cast<unsigned int>(size); i++) {
-        void* item = items[i];
+        OSFS_TEXTURE_ST* item = items[i];
         if (item != 0) {
-            __dl__FPv(item);
+            delete item;
             items[i] = 0;
         }
     }
@@ -415,10 +414,10 @@ extern "C" void __sinit_p_FunnyShape_cpp(void)
     *reinterpret_cast<void**>(self) = __vt__8CProcess;
     *reinterpret_cast<void**>(self) = __vt__14CFunnyShapePcs;
 
-    __ct__14CUSBStreamDataFv(self + 0x3C);
-    __ct__11CFunnyShapeFv(self + 0x50);
-    __ct__29CPtrArray_P15OSFS_TEXTURE_ST_Fv(self + 0x61BC);
-    __ct__22CPtrArray_P9_GXTexObj_Fv(self + 0x61D8);
+    new (self + 0x3C) CUSBStreamData;
+    new (self + 0x50) CFunnyShape;
+    new (self + 0x61BC) CPtrArray<OSFS_TEXTURE_ST*>;
+    new (self + 0x61D8) CPtrArray<_GXTexObj*>;
     __register_global_object(self, __dt__14CFunnyShapePcsFv, ARRAY_8026D728);
     unsigned int* table = dst + 1;
     table[0] = desc0[0];
@@ -464,8 +463,8 @@ CFunnyShapePcs::~CFunnyShapePcs()
 {
     TextureObjects(this)->CPtrArray<_GXTexObj*>::~CPtrArray();
     TextureHeaders(this)->CPtrArray<OSFS_TEXTURE_ST*>::~CPtrArray();
-    __dt__11CFunnyShapeFv(FunnyShape(this), -1);
-    __dt__14CUSBStreamDataFv(UsbStream(this), -1);
+    FunnyShape(this)->~CFunnyShape();
+    UsbStream(this)->~CUSBStreamData();
 }
 
 template <>
@@ -511,8 +510,8 @@ inline CFunnyShapePcs::CFunnyShapePcs()
 {
     u8* self = reinterpret_cast<u8*>(this);
 
-    __ct__14CUSBStreamDataFv(self + 0x3C);
-    __ct__11CFunnyShapeFv(self + 0x50);
-    __ct__29CPtrArray_P15OSFS_TEXTURE_ST_Fv(self + 0x61BC);
-    __ct__22CPtrArray_P9_GXTexObj_Fv(self + 0x61D8);
+    new (self + 0x3C) CUSBStreamData;
+    new (self + 0x50) CFunnyShape;
+    new (self + 0x61BC) CPtrArray<OSFS_TEXTURE_ST*>;
+    new (self + 0x61D8) CPtrArray<_GXTexObj*>;
 }

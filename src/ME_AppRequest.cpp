@@ -3,7 +3,6 @@
 #include "ffcc/zlist.h"
 
 extern "C" {
-void __dla__FPv(void*);
 void* memset(void*, int, unsigned int);
 }
 
@@ -149,13 +148,13 @@ void CMaterialEditorPcs::DeleteColAnmData(ZCANMGRP** colAnmData, int colAnmCount
         int i = 0;
         while (i < colAnmCount) {
             if (entry->ptr != (void*)0) {
-                __dla__FPv(entry->ptr);
+                delete[] static_cast<u8*>(entry->ptr);
                 entry->ptr = (void*)0;
             }
             entry = entry + 1;
             i = i + 1;
         }
-        __dla__FPv(*colAnmData);
+        delete[] reinterpret_cast<u8*>(*colAnmData);
         *colAnmData = (ZCANMGRP*)0;
     }
 }
@@ -177,7 +176,7 @@ void CMaterialEditorPcs::DeleteRsdItem(RSDLISTITEM* listItem)
 
     if (rsdItem != (RSDITEM*)0) {
         if (rsdItem->ptrC != (void*)0) {
-            __dla__FPv(rsdItem->ptrC);
+            delete[] static_cast<u8*>(rsdItem->ptrC);
             rsdItem->ptrC = 0;
         }
         if (rsdItem->ptr10 != (void*)0) {
@@ -243,7 +242,7 @@ void CMaterialEditorPcs::ResetRsdList(ZLIST* zlist)
         rsdItem = listItem->rsdItem;
         if (rsdItem != (RSDITEM*)0) {
             if (rsdItem->ptrC != (void*)0) {
-                __dla__FPv(rsdItem->ptrC);
+                delete[] static_cast<u8*>(rsdItem->ptrC);
                 rsdItem->ptrC = 0;
             }
             if (rsdItem->ptr10 != (void*)0) {
@@ -267,12 +266,12 @@ void CMaterialEditorPcs::ResetRsdList(ZLIST* zlist)
         if (colAnmData != (ZCANMGRP*)0) {
             for (i = 0; i < colAnmCount; colAnmData++, i++) {
                 if (colAnmData->ptr != (void*)0) {
-                    __dla__FPv(colAnmData->ptr);
+                    delete[] static_cast<u8*>(colAnmData->ptr);
                     colAnmData->ptr = (void*)0;
                 }
             }
             if (listItem->colAnmData != (ZCANMGRP*)0) {
-                __dla__FPv(listItem->colAnmData);
+                delete[] reinterpret_cast<u8*>(listItem->colAnmData);
                 listItem->colAnmData = (ZCANMGRP*)0;
             }
             listItem->colAnmData = (ZCANMGRP*)0;

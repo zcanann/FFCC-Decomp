@@ -19,8 +19,6 @@ extern "C" double cos(double);
 
 extern "C" {
 int GetTexture__8CMapMeshFP12CMaterialSetRi(CMapMesh* mapMesh, CMaterialSet* materialSet, int& textureIndex);
-int SearchNodeSk__Q26CChara6CModelFPc(CChara::CModel*, char*);
-void CalcFrameMatrix__Q26CChara6CModelFfPQ26CChara5CNodePA4_f(CChara::CModel*, float, void*, float (*)[4]);
 void _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
     int tevSwapSel, int red, int green, int blue, int alpha);
 void _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(
@@ -654,7 +652,7 @@ int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)
         return 0;
     }
 
-    skNodeIndex = SearchNodeSk__Q26CChara6CModelFPc(model, (char*)nodeNameBase + 0x50);
+    skNodeIndex = model->SearchNodeSk((char*)nodeNameBase + 0x50);
     if (skNodeIndex == -1) {
         return 0;
     }
@@ -680,7 +678,7 @@ int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)
         frame -= FLOAT_80331184;
     }
 
-    CalcFrameMatrix__Q26CChara6CModelFfPQ26CChara5CNodePA4_f(model, frame + frameAdd, node, outMatrix);
+    model->CalcFrameMatrix(frame + frameAdd, node, outMatrix);
 
     switch (mngSt->m_rotationOrder) {
     case 0:

@@ -21,6 +21,7 @@ extern const char s_CPtrArrayFile[] = "collection_ptrarray.h";
 #include "ffcc/system.h"
 #include <dolphin/mtx.h>
 #include <string.h>
+#include <PowerPC_EABI_Support/Runtime/New.h>
 
 // Constants defined externally, placed in .sdata2 by the linker.
 extern const float kMapObjBoundMinInit;
@@ -148,7 +149,6 @@ static inline Mtx& MapObjHitDrawMtx()
 
 }
 
-extern "C" void __dl__FPv(void*);
 extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 
@@ -361,7 +361,7 @@ extern "C" CMapObj* dtor_8002BE7C(CMapObj* mapObj, short param_2)
 
         mapObj->Init();
         if (0 < param_2) {
-            __dl__FPv(mapObj);
+            operator delete(mapObj);
         }
     }
 
@@ -1821,11 +1821,20 @@ CMapObjAtr::~CMapObjAtr()
 {
 }
 
-static inline void FreeAndClear(void* base, unsigned int offset)
+static inline void FreeByteArrayAndClear(void* base, unsigned int offset)
 {
     void*& ptr = *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(base) + offset);
     if (ptr != 0) {
-        __dl__FPv(ptr);
+        delete[] static_cast<unsigned char*>(ptr);
+        ptr = 0;
+    }
+}
+
+static inline void FreeFloatArrayAndClear(void* base, unsigned int offset)
+{
+    void*& ptr = *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(base) + offset);
+    if (ptr != 0) {
+        delete[] static_cast<float*>(ptr);
         ptr = 0;
     }
 }
@@ -1917,14 +1926,14 @@ CMapObjAtrMeshName::~CMapObjAtrMeshName()
  */
 CMapObjAtrPointLight::~CMapObjAtrPointLight()
 {
-    FreeAndClear(this, 0xE4);
-    FreeAndClear(this, 0xE8);
-    FreeAndClear(this, 0xEC);
-    FreeAndClear(this, 0xF0);
-    FreeAndClear(this, 0xBC);
-    FreeAndClear(this, 0xC0);
-    FreeAndClear(this, 0xC4);
-    FreeAndClear(this, 0xC8);
+    FreeByteArrayAndClear(this, 0xE4);
+    FreeFloatArrayAndClear(this, 0xE8);
+    FreeFloatArrayAndClear(this, 0xEC);
+    FreeFloatArrayAndClear(this, 0xF0);
+    FreeByteArrayAndClear(this, 0xBC);
+    FreeFloatArrayAndClear(this, 0xC0);
+    FreeFloatArrayAndClear(this, 0xC4);
+    FreeFloatArrayAndClear(this, 0xC8);
 }
 
 /*
@@ -1938,14 +1947,14 @@ CMapObjAtrPointLight::~CMapObjAtrPointLight()
  */
 CMapObjAtrSpotLight::~CMapObjAtrSpotLight()
 {
-    FreeAndClear(this, 0x100);
-    FreeAndClear(this, 0x104);
-    FreeAndClear(this, 0x108);
-    FreeAndClear(this, 0x10C);
-    FreeAndClear(this, 0xD8);
-    FreeAndClear(this, 0xDC);
-    FreeAndClear(this, 0xE0);
-    FreeAndClear(this, 0xE4);
+    FreeByteArrayAndClear(this, 0x100);
+    FreeFloatArrayAndClear(this, 0x104);
+    FreeFloatArrayAndClear(this, 0x108);
+    FreeFloatArrayAndClear(this, 0x10C);
+    FreeByteArrayAndClear(this, 0xD8);
+    FreeFloatArrayAndClear(this, 0xDC);
+    FreeFloatArrayAndClear(this, 0xE0);
+    FreeFloatArrayAndClear(this, 0xE4);
 }
 
 /*
@@ -1966,7 +1975,7 @@ CMapObjAtrMime::~CMapObjAtrMime()
     while (i < static_cast<int>(*reinterpret_cast<unsigned char*>(self + 2))) {
         void** entry = reinterpret_cast<void**>(self[3] + offset);
         if (*entry != 0) {
-            __dl__FPv(*entry);
+            delete[] static_cast<float*>(*entry);
             *entry = 0;
         }
 
@@ -1975,14 +1984,14 @@ CMapObjAtrMime::~CMapObjAtrMime()
     }
 
     if (self[3] != 0) {
-        __dl__FPv(reinterpret_cast<void*>(self[3]));
+        delete[] reinterpret_cast<void**>(self[3]);
         self[3] = 0;
     }
 
-    FreeAndClear(this, 0x2C);
-    FreeAndClear(this, 0x30);
-    FreeAndClear(this, 0x34);
-    FreeAndClear(this, 0x38);
+    FreeByteArrayAndClear(this, 0x2C);
+    FreeFloatArrayAndClear(this, 0x30);
+    FreeFloatArrayAndClear(this, 0x34);
+    FreeFloatArrayAndClear(this, 0x38);
 }
 
 /*

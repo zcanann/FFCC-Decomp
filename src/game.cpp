@@ -38,8 +38,6 @@
 #include <dolphin/os/OSRtc.h>
 #include <string.h>
 
-typedef void* ConstructorDestructor;
-
 extern "C" {
 void Printf__7CSystemFPce(CSystem*, const char*, ...);
 unsigned int AddScenegraph__7CSystemFP8CProcessi(CSystem*, void*, int);
@@ -85,7 +83,6 @@ void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CS
     void*, int, int, int, int, void*, void*);
 int sprintf(char*, const char*, ...);
 int rand(void);
-void __construct_array(void*, ConstructorDestructor, ConstructorDestructor, unsigned long, unsigned long);
 void* __register_global_object(void*, void*, void*);
 void __ct__12CCaravanWorkFv(void*);
 void __dt__12CCaravanWorkFv(void*, int);

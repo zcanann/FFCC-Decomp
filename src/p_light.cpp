@@ -21,8 +21,6 @@ extern "C" void destroy__9CLightPcsFv(CLightPcs*);
 extern "C" void calc__9CLightPcsFv(CLightPcs*);
 extern "C" void draw__9CLightPcsFv(CLightPcs*);
 extern "C" void MakeLightMap__9CLightPcsFv(CLightPcs*);
-extern "C" void __ct__Q29CLightPcs6CLightFv(void*);
-extern "C" void __ct__Q29CLightPcs10CBumpLightFv(void*);
 extern unsigned int DAT_8032fc0c;
 extern unsigned int DAT_8032fc08;
 extern float FLOAT_8032fc10;

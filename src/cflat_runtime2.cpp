@@ -21,6 +21,7 @@
 #include <string.h>
 #include "ffcc/fontman.h"
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
+#include <PowerPC_EABI_Support/Runtime/MWCPlusLib.h>
 
 class CFont;
 
@@ -37,7 +38,6 @@ extern "C" void Create__12CFlatRuntimeFPv(CFlatRuntime*, void*);
 extern "C" int CreateDebug__12CFlatRuntimeFPvi(CFlatRuntime*, void*, int);
 extern "C" void Destroy__12CFlatRuntimeFv(CFlatRuntime*);
 extern "C" void Destroy__9CFlatDataFv(void*);
-extern "C" void __construct_array(void*, void (*)(void*), void (*)(void*, int), unsigned long, unsigned long);
 extern "C" void* __register_global_object(void* object, void* destructor, void* regmem);
 extern "C" void AfterFrame__12CFlatRuntimeFi(CFlatRuntime*, int);
 extern "C" void __dt__9CFlatDataFv(void*, int);
@@ -527,12 +527,12 @@ extern "C" void __sinit_cflat_runtime2_cpp(void)
 	__ct__13CFlatRuntime2Fv(reinterpret_cast<CFlatRuntime2*>(CFlat));
 	__register_global_object(CFlat, reinterpret_cast<void*>(__dt__13CFlatRuntime2Fv), CFlat_guard);
 
-	__construct_array(m_gBaseObjArr, reinterpret_cast<void (*)(void*)>(__ct__9CGBaseObjFv), 0, 0x50, 0x28);
-	__construct_array(m_gObjQuadArr, reinterpret_cast<void (*)(void*)>(__ct__9CGQuadObjFv), 0, 0xAC, 0x18);
-	__construct_array(m_gObjArr, reinterpret_cast<void (*)(void*)>(__ct__8CGObjectFv), 0, 0x518, 0x38);
-	__construct_array(m_objItem, reinterpret_cast<void (*)(void*)>(__ct__9CGItemObjFv), 0, 0x57C, 0x20);
-	__construct_array(m_objParty, reinterpret_cast<void (*)(void*)>(__ct__10CGPartyObjFv), 0, 0x6F8, 4);
-	__construct_array(m_objMon, reinterpret_cast<void (*)(void*)>(__ct__8CGMonObjFv), 0, 0x740, 0x40);
+	__construct_array(m_gBaseObjArr, reinterpret_cast<ConstructorDestructor>(__ct__9CGBaseObjFv), 0, 0x50, 0x28);
+	__construct_array(m_gObjQuadArr, reinterpret_cast<ConstructorDestructor>(__ct__9CGQuadObjFv), 0, 0xAC, 0x18);
+	__construct_array(m_gObjArr, reinterpret_cast<ConstructorDestructor>(__ct__8CGObjectFv), 0, 0x518, 0x38);
+	__construct_array(m_objItem, reinterpret_cast<ConstructorDestructor>(__ct__9CGItemObjFv), 0, 0x57C, 0x20);
+	__construct_array(m_objParty, reinterpret_cast<ConstructorDestructor>(__ct__10CGPartyObjFv), 0, 0x6F8, 4);
+	__construct_array(m_objMon, reinterpret_cast<ConstructorDestructor>(__ct__8CGMonObjFv), 0, 0x740, 0x40);
 }
 
 /*

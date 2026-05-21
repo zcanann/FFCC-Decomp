@@ -72,11 +72,6 @@ extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
 extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, unsigned char, int, int,
                                                                                 unsigned char);
-extern "C" void Draw__Q26CChara6CModelFPA4_fii(void*, Mtx, int, int);
-extern "C" void DrawFur__Q26CChara6CModelFPA4_fi(void*, Mtx, int);
-extern "C" void SetMatrix__Q26CChara6CModelFPA4_f(void*, Mtx);
-extern "C" void CalcMatrix__Q26CChara6CModelFv(void*);
-extern "C" void CalcSkin__Q26CChara6CModelFv(void*);
 extern "C" void SRTToMatrix__5CMathFPA4_fP3SRT(void*, Mtx, void*);
 extern "C" void Printf__8CGraphicFPce(void*, const char*, ...);
 extern "C" void Destroy__6CCharaFv(CChara*);
@@ -85,16 +80,7 @@ extern "C" void DestroyStage__7CMemoryFPQ27CMemory6CStage(void*, void*);
 extern "C" void* CreateStage__7CMemoryFUlPci(void*, unsigned long, const char*, int);
 extern "C" void* createTextureSet__9CCharaPcsFPvi(void*, void*, int);
 extern "C" void Printf__7CSystemFPce(void*, const char*, ...);
-extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, void*, char*, int);
-extern "C" void* __ct__Q26CChara6CModelFv(void*);
-extern "C" void Create__Q26CChara6CModelFPvPQ27CMemory6CStage(void*, void*, void*);
-extern "C" void CreateDynamics__Q26CChara6CModelFPvPQ27CMemory6CStage(void*, void*, void*);
-extern "C" void AttachTextureSet__Q26CChara6CModelFP11CTextureSet(void*, void*);
-extern "C" void AttachAnim__Q26CChara6CModelFPQ26CChara5CAnimiii(void*, void*, int, int, int);
-extern "C" void SetFrame__Q26CChara6CModelFf(float, void*);
-extern "C" void* __ct__Q26CChara5CAnimFv(void*);
 extern "C" void Create__Q26CChara5CAnimFPvPQ27CMemory6CStage(void*, void*, void*);
-extern "C" void __ct__Q29CLightPcs10CBumpLightFv(void*);
 extern "C" float FLOAT_80330BEC;
 extern "C" float FLOAT_80330BF0;
 extern "C" double fmod(double, double);
@@ -348,8 +334,8 @@ void CCharaPcs::drawViewer()
                 lightPos.z = scratchMtx[2][3];
                 LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(0), &lightPos, 0xFFFFFFFF);
 
-                Draw__Q26CChara6CModelFPA4_fii(model, cameraMtx, 0, 0);
-                DrawFur__Q26CChara6CModelFPA4_fi(model, cameraMtx, 0);
+                model->Draw(cameraMtx, 0, 0);
+                model->DrawFur(cameraMtx, 0);
                 watch.Stop();
                 float cpuTime = watch.Get();
                 watch.Start();
@@ -408,15 +394,10 @@ void CCharaPcs::calcViewer()
 
                 File.Read(fileHandle);
                 File.SyncCompleted(fileHandle);
-                CChara::CModel* model = reinterpret_cast<CChara::CModel*>(__nw__FUlPQ27CMemory6CStagePci(
-                    0x124, CharaPcs.m_stage,
-                    const_cast<char*>(s_p_chara_viewer_cpp), 0xEA));
-                if (model != 0) {
-                    model = reinterpret_cast<CChara::CModel*>(__ct__Q26CChara6CModelFv(model));
-                }
+                CChara::CModel* model =
+                    new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_viewer_cpp), 0xEA) CChara::CModel;
                 self->m_viewerModel[0] = model;
-                Create__Q26CChara6CModelFPvPQ27CMemory6CStage(
-                    self->m_viewerModel[0], File.m_readBuffer, self->m_viewerModelStage);
+                self->m_viewerModel[0]->Create(File.m_readBuffer, self->m_viewerModelStage);
                 *(reinterpret_cast<unsigned char*>(self->m_viewerModel[0]) + 0x10C) =
                     (*(reinterpret_cast<unsigned char*>(self->m_viewerModel[0]) + 0x10C) & 0xBF) | 0x40;
                 File.Close(fileHandle);
@@ -430,8 +411,7 @@ void CCharaPcs::calcViewer()
             if (fileHandle != 0) {
                 File.Read(fileHandle);
                 File.SyncCompleted(fileHandle);
-                CreateDynamics__Q26CChara6CModelFPvPQ27CMemory6CStage(
-                    self->m_viewerModel[0], File.m_readBuffer, self->m_viewerModelStage);
+                self->m_viewerModel[0]->CreateDynamics(File.m_readBuffer, self->m_viewerModelStage);
                 File.Close(fileHandle);
             }
             self->m_viewerLoadDynamics = 0;
@@ -455,12 +435,8 @@ void CCharaPcs::calcViewer()
                     if (fileHandle != 0) {
                         File.Read(fileHandle);
                         File.SyncCompleted(fileHandle);
-                        CChara::CAnim* anim = reinterpret_cast<CChara::CAnim*>(__nw__FUlPQ27CMemory6CStagePci(
-                            0x30, CharaPcs.m_stage,
-                            const_cast<char*>(s_p_chara_viewer_cpp), 0x124));
-                        if (anim != 0) {
-                            anim = reinterpret_cast<CChara::CAnim*>(__ct__Q26CChara5CAnimFv(anim));
-                        }
+                        CChara::CAnim* anim =
+                            new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_viewer_cpp), 0x124) CChara::CAnim;
                         self->m_viewerAnimBank[idx] = anim;
                         Create__Q26CChara5CAnimFPvPQ27CMemory6CStage(
                             self->m_viewerAnimBank[idx], File.m_readBuffer, self->m_viewerAnimStage);
@@ -479,12 +455,8 @@ void CCharaPcs::calcViewer()
                 if (fileHandle != 0) {
                     File.Read(fileHandle);
                     File.SyncCompleted(fileHandle);
-                    CChara::CAnim* anim = reinterpret_cast<CChara::CAnim*>(__nw__FUlPQ27CMemory6CStagePci(
-                        0x30, CharaPcs.m_stage,
-                        const_cast<char*>(s_p_chara_viewer_cpp), 0x111));
-                    if (anim != 0) {
-                        anim = reinterpret_cast<CChara::CAnim*>(__ct__Q26CChara5CAnimFv(anim));
-                    }
+                    CChara::CAnim* anim =
+                        new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_viewer_cpp), 0x111) CChara::CAnim;
                     self->m_viewerAnim[0] = anim;
                     Create__Q26CChara5CAnimFPvPQ27CMemory6CStage(
                         self->m_viewerAnim[0], File.m_readBuffer, self->m_viewerAnimStage);
@@ -509,10 +481,8 @@ void CCharaPcs::calcViewer()
         }
 
         if (self->m_viewerModel[0] != 0) {
-            AttachAnim__Q26CChara6CModelFPQ26CChara5CAnimiii(
-                self->m_viewerModel[0], self->m_viewerAnim[0], -1, -1, -1);
-            AttachTextureSet__Q26CChara6CModelFP11CTextureSet(
-                self->m_viewerModel[0], self->m_viewerTextureSet[0]);
+            self->m_viewerModel[0]->AttachAnim(self->m_viewerAnim[0], -1, -1, -1);
+            self->m_viewerModel[0]->AttachTextureSet(self->m_viewerTextureSet[0]);
         }
     }
 
@@ -551,23 +521,20 @@ void CCharaPcs::calcViewer()
     if ((self->m_viewerModel[0] != 0) && (self->m_viewerResetIFrame != 0)) {
         if (self->m_viewerIFrameEnabled == 0) {
             self->m_viewerSavedAnimState = 0;
-            AttachAnim__Q26CChara6CModelFPQ26CChara5CAnimiii(
-                self->m_viewerModel[0], self->m_viewerAnim[0], -1, -1, 0);
+            self->m_viewerModel[0]->AttachAnim(self->m_viewerAnim[0], -1, -1, 0);
         } else {
             self->m_viewerSavedAnimState = 0;
             float frame = ViewerModelTime(self->m_viewerModel[0]);
             float animFrames = static_cast<float>(*reinterpret_cast<unsigned short*>(
                 reinterpret_cast<unsigned char*>(self->m_viewerAnim[0]) + 0x10));
             self->m_viewerSavedFrame = static_cast<float>(fmod(static_cast<double>(frame), static_cast<double>(animFrames)));
-            AttachAnim__Q26CChara6CModelFPQ26CChara5CAnimiii(
-                self->m_viewerModel[0], self->m_viewerAnim[0], -1, -1, 0);
+            self->m_viewerModel[0]->AttachAnim(self->m_viewerAnim[0], -1, -1, 0);
         }
         self->m_viewerResetIFrame = 0;
     }
 
     if (((triggerButtons & 0x1000) != 0) && (self->m_viewerSavedAnim == 0) && (self->m_viewerModel[0] != 0)) {
-        AttachAnim__Q26CChara6CModelFPQ26CChara5CAnimiii(
-            self->m_viewerModel[0], self->m_viewerAnim[0], -1, -1, -1);
+        self->m_viewerModel[0]->AttachAnim(self->m_viewerAnim[0], -1, -1, -1);
     }
 
     if ((triggerButtons & 0x800) != 0) {
@@ -630,14 +597,13 @@ void CCharaPcs::calcViewer()
         unsigned char* anim = reinterpret_cast<unsigned char*>(self->m_viewerAnim[i]);
         if (anim != 0) {
             if ((i == 0) && (self->m_viewerAnimLoadedCount != 0)) {
-                SetFrame__Q26CChara6CModelFf(ViewerModelTime(model) + frameAdvance, model);
+                model->SetFrame(ViewerModelTime(model) + frameAdvance);
                 float animFrames = (float)*(unsigned short*)(anim + 0x10);
                 if (animFrames <= ViewerModelTime(self->m_viewerModel[0])) {
                     int nextIndex = self->m_viewerAnimLoopIndex + 1;
                     int animCount = self->m_viewerAnimLoadedCount;
                     self->m_viewerAnimLoopIndex = nextIndex - (nextIndex / animCount) * animCount;
-                    AttachAnim__Q26CChara6CModelFPQ26CChara5CAnimiii(
-                        self->m_viewerModel[0], self->m_viewerAnimBank[self->m_viewerAnimLoopIndex], -1, -1, 0);
+                    self->m_viewerModel[0]->AttachAnim(self->m_viewerAnimBank[self->m_viewerAnimLoopIndex], -1, -1, 0);
                     ReleaseShared(self->m_viewerAnim[0]);
                     self->m_viewerAnim[0] = self->m_viewerAnimBank[self->m_viewerAnimLoopIndex];
                     AddSharedRef(self->m_viewerAnim[0]);
@@ -648,19 +614,17 @@ void CCharaPcs::calcViewer()
                 if (self->m_viewerSavedAnimState == 0) {
                     if (self->m_viewerSavedFrame + animFrames <= ViewerModelTime(model)) {
                         self->m_viewerSavedAnimState = 1;
-                        AttachAnim__Q26CChara6CModelFPQ26CChara5CAnimiii(
-                            model, self->m_viewerSavedAnim, -1, -1, -1);
+                        model->AttachAnim(self->m_viewerSavedAnim, -1, -1, -1);
                     }
                 } else {
                     if (animFrames <= ViewerModelTime(model)) {
                         self->m_viewerSavedAnimState = 0;
-                        AttachAnim__Q26CChara6CModelFPQ26CChara5CAnimiii(
-                            model, self->m_viewerAnim[0], -1, -1, 0);
+                        model->AttachAnim(self->m_viewerAnim[0], -1, -1, 0);
                     }
                 }
-                SetFrame__Q26CChara6CModelFf(ViewerModelTime(model) + frameAdvance, model);
+                model->SetFrame(ViewerModelTime(model) + frameAdvance);
             } else {
-                SetFrame__Q26CChara6CModelFf(ViewerModelTime(model) + frameAdvance, model);
+                model->SetFrame(ViewerModelTime(model) + frameAdvance);
             }
         }
 
@@ -693,18 +657,18 @@ void CCharaPcs::calcViewer()
 
         Mtx modelMtx;
         SRTToMatrix__5CMathFPA4_fP3SRT(&Math, modelMtx, &srt);
-        SetMatrix__Q26CChara6CModelFPA4_f(model, modelMtx);
+        model->SetMatrix(modelMtx);
 
         CStopWatch matrixWatch(const_cast<char*>(kCharaViewerNoName));
         matrixWatch.Reset();
         matrixWatch.Start();
-        CalcMatrix__Q26CChara6CModelFv(model);
+        model->CalcMatrix();
         matrixWatch.Stop();
         float matrixTime = matrixWatch.Get();
 
         matrixWatch.Reset();
         matrixWatch.Start();
-        CalcSkin__Q26CChara6CModelFv(model);
+        model->CalcSkin();
         matrixWatch.Stop();
         float skinTime = matrixWatch.Get();
 

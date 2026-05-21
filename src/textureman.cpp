@@ -34,12 +34,7 @@ private:
     int m_growCapacity;
 };
 
-extern "C" void __ct__4CRefFv(void*);
-extern "C" void __dt__4CRefFv(void*, int);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
-extern "C" void* __vt__8CPtrArrayIP8CTexture[];
-extern "C" void* __vt__8CTexture[];
-extern "C" void* __vt__11CTextureSet[];
 extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
 extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 extern "C" void _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
@@ -58,7 +53,11 @@ extern "C" unsigned short SetData__13CAmemCacheSetFPviQ210CAmemCache4TYPEi(CAmem
 extern "C" int IsEnable__13CAmemCacheSetFs(CAmemCacheSet*, short);
 extern "C" int GetData__13CAmemCacheSetFsPci(CAmemCacheSet*, short, char*, int);
 extern "C" void AddRef__13CAmemCacheSetFs(CAmemCacheSet*, short);
-extern "C" void __ct__21CPtrArray_P8CTexture_Fv(void*);
+
+inline void* operator new(unsigned long, void* ptr)
+{
+    return ptr;
+}
 
 static const char s_textureman_cpp_801D7974[] = "textureman.cpp";
 static const char s_Error_width_pctd_height_pctd_801D7984[] = "Error width=%d height=%d\n";
@@ -88,26 +87,8 @@ static inline unsigned short& U16At(void* p, unsigned int offset)
 
 static inline CTexture* AllocTexture()
 {
-    CTexture* texture = static_cast<CTexture*>(_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
-        &Memory,
-        0x80,
-        *reinterpret_cast<CMemory::CStage**>(Ptr(&TextureMan, 4)),
-        const_cast<char*>(s_textureman_cpp_801D7974),
-        0x2ED,
-        0));
-    if (texture != 0) {
-        __ct__4CRefFv(texture);
-        *reinterpret_cast<void**>(texture) = __vt__8CTexture;
-        texture->m_maxLod = 0;
-        texture->m_imageData = 0;
-        texture->m_tlutData = 0;
-        texture->m_isIntensityAlpha = 0;
-        texture->m_isAlphaLut = 0;
-        texture->m_name[0] = 0;
-        texture->m_cacheId = -1;
-        texture->m_usesExternalAddress = 0;
-    }
-    return texture;
+    return new (*reinterpret_cast<CMemory::CStage**>(Ptr(&TextureMan, 4)), const_cast<char*>(s_textureman_cpp_801D7974),
+                0x2ED) CTexture;
 }
 
 }
@@ -363,7 +344,7 @@ CTextureSet::~CTextureSet()
  */
 CTextureSet::CTextureSet()
 {
-    __ct__21CPtrArray_P8CTexture_Fv(TextureArray(m_textureArrayStorage));
+    new (TextureArray(m_textureArrayStorage)) CPtrArray<CTexture*>;
     TextureArray(m_textureArrayStorage)->SetDefaultSize(0x10);
     TextureArray(m_textureArrayStorage)->SetStage(TextureMan.m_memoryStage);
 }

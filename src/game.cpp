@@ -22,11 +22,13 @@
 #include "ffcc/cflat_runtime2.h"
 #include "ffcc/gobject.h"
 #include "ffcc/linkage.h"
+#include "ffcc/p_chara.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/p_FunnyShape.h"
 #include "ffcc/p_graphic.h"
 #include "ffcc/p_light.h"
 #include "ffcc/p_map.h"
+#include "ffcc/p_MaterialEditor.h"
 #include "ffcc/p_mc.h"
 #include "ffcc/p_menu.h"
 #include "ffcc/p_tina.h"
@@ -36,52 +38,20 @@
 
 #include <dolphin/os/OSMemory.h>
 #include <dolphin/os/OSRtc.h>
-#include <string.h>
 
 extern "C" {
-void Printf__7CSystemFPce(CSystem*, const char*, ...);
 unsigned int AddScenegraph__7CSystemFP8CProcessi(CSystem*, void*, int);
 void RemoveScenegraph__7CSystemFP8CProcessi(CSystem*, void*, int);
 void ExecScenegraph__7CSystemFv(CSystem*);
-void Quit__11CDbgMenuPcsFv(void*);
-void Quit__6CMcPcsFv(void*);
-void Quit__7CGbaPcsFv(void*);
-void Quit__8CMenuPcsFv(void*);
-void Quit__6CCharaFv(void*);
-void Quit__9CLightPcsFv(void*);
-void Quit__7CMapPcsFv(void*);
-void Quit__18CMaterialEditorPcsFv(void*);
-void Quit__14CFunnyShapePcsFv(void*);
-void Quit__11CGraphicPcsFv(void*);
-void Quit__10CCameraPcsFv(void*);
 void createLoad__8CPartPcsFv(void*);
 void pppDeleteAll__8CPartMngFv(void*);
 void pppDestroyAll__8CPartMngFv(void*);
 int pppGetIfDt__8CPartMngFs(void*, short);
 void pppEndPart__8CPartMngFi(void*, int);
-void Init__11CGraphicPcsFv(void*);
-void Init__9CLightPcsFv(void*);
-void Init__7CMapPcsFv(void*);
-void Init__18CMaterialEditorPcsFv(void*);
-void Init__14CFunnyShapePcsFv(void*);
-void Init__10CCameraPcsFv(void*);
-void Init__7CGbaPcsFv(void*);
-void Init__11CDbgMenuPcsFv(void*);
-void Init__9CCharaPcsFv(void*);
-void Init__8CMenuPcsFv(void*);
-void Init__6CCharaFv(void*);
-void Init__6CMcPcsFv(void*);
 int sprintf(char*, const char*, ...);
-int GetMapObjIdx__7CMapMngFUs(void*, unsigned short);
-void SetMapObjLMtx__7CMapMngFiPA4_f(void*, int, Mtx);
 void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
     void*, int, int, int, int, void*, void*);
 void Draw__5CWindFv(void*);
-void CheckMenu__10CGPartyObjFv();
-void CheckMenu__10CGPartyObjFv(void);
-void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-    void*, int, int, int, int, void*, void*);
-int sprintf(char*, const char*, ...);
 int rand(void);
 void* __register_global_object(void*, void*, void*);
 void __ct__12CCaravanWorkFv(void*);
@@ -106,7 +76,7 @@ const char DAT_8032f698[] = "ffcc_0";
 const char DAT_8032f6a0[] = "*\n";
 const char DAT_8032f6a4[] = "Tepa";
 const char DAT_8032f6ac[] = "Tipa";
-const char lbl_8032F6B4[] = "Game";
+const char s_GameStageName_8032F6B4[] = "Game";
 }
 extern const char s_dvd_pctscft_param_cfd_801D6054[];
 extern const char s_dvd_pctscft_c_system_cfd_801D6068[];
@@ -151,7 +121,7 @@ static const char lbl_801D626C[] = {
     0x83, 0x56, 0x81, 0x5B, 0x83, 0x93, 0x82, 0xAA, 0x88, 0xD9, 0x8F, 0xED, 0x82, 0xC5, 0x82, 0xB7,
     0x81, 0x42, 0x25, 0x64, 0x0A, 0x00, 0x00, 0x00};
 static const char s_GameDebug_801D6284[] = "GameDebug";
-extern const char lbl_8032F630[];
+extern const char s_SN_EXIT_8032F630[];
 extern const char s_SN_DUMMY_801D600C[];
 extern const char s_SN_CHARA_801D6018[];
 extern const char lbl_8032F638[];
@@ -161,7 +131,7 @@ extern const char s_SN_FUNNYSHAPE_801D6038[];
 extern const char s_SN_PARTVIEW_801D6048[];
 extern const char* s_localLangDirs[];
 static const char* m_tStatus[] = {
-    lbl_8032F630,
+    s_SN_EXIT_8032F630,
     s_SN_DUMMY_801D600C,
     s_SN_CHARA_801D6018,
     lbl_8032F638,
@@ -302,21 +272,21 @@ void CGame::Init()
         break;
     }
 
-    Init__10CCameraPcsFv(&CameraPcs);
-    Init__11CGraphicPcsFv(&GraphicPcs);
-    Init__6CCharaFv(&gChara);
-    Init__9CLightPcsFv(&LightPcs);
-    Init__9CCharaPcsFv(&CharaPcs);
-    Init__7CMapPcsFv(&MapPcs);
-    Init__18CMaterialEditorPcsFv(&MaterialEditorPcs);
-    Init__14CFunnyShapePcsFv(&FunnyShapePcs);
+    CameraPcs.Init();
+    GraphicPcs.Init();
+    gChara.Init();
+    LightPcs.Init();
+    CharaPcs.Init();
+    MapPcs.Init();
+    MaterialEditorPcs.Init();
+    FunnyShapePcs.Init();
     USBPcs.Init();
-    Init__8CMenuPcsFv(&MenuPcs);
-    Init__7CGbaPcsFv(&GbaPcs);
-    Init__6CMcPcsFv(GetMcPcsSingleton());
-    Init__11CDbgMenuPcsFv(&DbgMenuPcs);
+    MenuPcs.Init();
+    GbaPcs.Init();
+    GetMcPcsSingleton()->Init();
+    DbgMenuPcs.Init();
 
-    m_mainStage = Memory.CreateStage(0x106000, const_cast<char*>(lbl_8032F6B4), 0);
+    m_mainStage = Memory.CreateStage(0x106000, const_cast<char*>(s_GameStageName_8032F6B4), 0);
     if (OSGetConsoleSimulatedMemSize() == 0x3000000) {
         m_debugStage = Memory.CreateStage(0x220000, const_cast<char*>(s_GameDebug_801D6284), 1);
     }
@@ -349,19 +319,19 @@ void CGame::Quit()
 	}
 
 	Memory.DestroyStage(m_mainStage);
-	Quit__11CDbgMenuPcsFv(&DbgMenuPcs);
-	Quit__6CMcPcsFv(GetMcPcsSingleton());
-	Quit__7CGbaPcsFv(&GbaPcs);
-	Quit__8CMenuPcsFv(&MenuPcs);
+	DbgMenuPcs.Quit();
+	GetMcPcsSingleton()->Quit();
+	GbaPcs.Quit();
+	MenuPcs.Quit();
 	USBPcs.Quit();
-	Quit__6CCharaFv(&Chara);
+	Chara.Quit();
 	CharaPcs.Quit();
-	Quit__9CLightPcsFv(&LightPcs);
-	Quit__7CMapPcsFv(&MapPcs);
-	Quit__18CMaterialEditorPcsFv(&MaterialEditorPcs);
-	Quit__14CFunnyShapePcsFv(&FunnyShapePcs);
-	Quit__11CGraphicPcsFv(&GraphicPcs);
-	Quit__10CCameraPcsFv(&CameraPcs);
+	LightPcs.Quit();
+	MapPcs.Quit();
+	MaterialEditorPcs.Quit();
+	FunnyShapePcs.Quit();
+	GraphicPcs.Quit();
+	CameraPcs.Quit();
 }
 
 /*
@@ -588,9 +558,9 @@ void CGame::Destroy()
  */
 void CGame::InitNewGame()
 {
-    Printf__7CSystemFPce(&System, DAT_8032f6a0);
-    Printf__7CSystemFPce(&System, DAT_801d6214);
-    Printf__7CSystemFPce(&System, DAT_8032f6a0);
+    System.Printf(const_cast<char*>(DAT_8032f6a0));
+    System.Printf(const_cast<char*>(DAT_801d6214));
+    System.Printf(const_cast<char*>(DAT_8032f6a0));
 
     CGame* game = &Game;
 
@@ -802,9 +772,9 @@ void CGame::CheckScriptChange()
     if (m_nextScript.m_flags != 0) {
         CGame* game = &Game;
 
-        Printf__7CSystemFPce(&System, DAT_8032f6a0);
-        Printf__7CSystemFPce(&System, DAT_801d6214);
-        Printf__7CSystemFPce(&System, DAT_8032f6a0);
+        System.Printf(const_cast<char*>(DAT_8032f6a0));
+        System.Printf(const_cast<char*>(DAT_801d6214));
+        System.Printf(const_cast<char*>(DAT_8032f6a0));
 
         memset(&game->m_gameWork.m_gameDataStartMarker, 0, 0x13E1);
         memset(game->m_gameWork.m_wmBackupParams, 0xFF, sizeof(game->m_gameWork.m_wmBackupParams));
@@ -1054,7 +1024,7 @@ void CGame::Calc()
     reinterpret_cast<CFlatRuntime*>(CFlat)->ResetPerformance();
     reinterpret_cast<CFlatRuntime2*>(CFlat)->Frame(1, 0);
 
-    if ((m_currentMapId == 0x21) && ((mapObjIdx = GetMapObjIdx__7CMapMngFUs(&MapMng, 0)) >= 0)) {
+    if ((m_currentMapId == 0x21) && ((mapObjIdx = MapMng.GetMapObjIdx(0)) >= 0)) {
             if (!BOOL_8032ec44) {
                 BOOL_8032ec44 = true;
                 FLOAT_8032ec40 = FLOAT_8032f690;
@@ -1062,7 +1032,7 @@ void CGame::Calc()
 
             FLOAT_8032ec40 += FLOAT_8032f694;
             PSMTXRotRad(rotMtx, 'y', FLOAT_8032ec40);
-            SetMapObjLMtx__7CMapMngFiPA4_f(&MapMng, mapObjIdx, rotMtx);
+            MapMng.SetMapObjLMtx(mapObjIdx, rotMtx);
     }
 }
 
@@ -1091,7 +1061,7 @@ void CGame::Calc2()
  */
 void CGame::Calc3()
 { 
-	CheckMenu__10CGPartyObjFv();
+	CGPartyObj::CheckMenu();
 	reinterpret_cast<CFlatRuntime*>(CFlat)->AfterFrame(0);
 }
 

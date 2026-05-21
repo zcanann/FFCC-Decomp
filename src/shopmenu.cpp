@@ -9,12 +9,12 @@
 #include "ffcc/pppShape.h"
 #include "ffcc/sound.h"
 #include "ffcc/linkage.h"
+#include "ffcc/memory.h"
 #include "ffcc/p_tina.h"
 #include <string.h>
 #include <PowerPC_EABI_Support/Runtime/New.h>
 
 extern "C" {
-void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, void*, char*, int);
 void _WaitDrawDone__8CGraphicFPci(void*, char*, int);
 void SetDrawDoneDebugData__8CGraphicFSc(void*, signed char);
 void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
@@ -2833,7 +2833,7 @@ void CMenuPcs::CreateSmithMenu()
     }
 
     CShopMenu* shopMenu = reinterpret_cast<CShopMenu*>(
-        __nw__FUlPQ27CMemory6CStagePci(0x158, stage, s_shopmenu_cpp_801ded8c, 0x2E9));
+        operator new(0x158, reinterpret_cast<CMemory::CStage*>(stage), s_shopmenu_cpp_801ded8c, 0x2E9));
     *reinterpret_cast<CShopMenu**>(menuPcs + 0x878) = shopMenu;
     shopMenu = *reinterpret_cast<CShopMenu**>(menuPcs + 0x878);
 
@@ -2872,7 +2872,7 @@ void CMenuPcs::CreateShopMenu()
     }
 
     CShopMenu* shopMenu = reinterpret_cast<CShopMenu*>(
-        __nw__FUlPQ27CMemory6CStagePci(0x158, stage, s_shopmenu_cpp_801ded8c, 0x2E2));
+        operator new(0x158, reinterpret_cast<CMemory::CStage*>(stage), s_shopmenu_cpp_801ded8c, 0x2E2));
     *reinterpret_cast<CShopMenu**>(menuPcs + 0x878) = shopMenu;
     shopMenu = *reinterpret_cast<CShopMenu**>(menuPcs + 0x878);
 

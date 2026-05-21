@@ -12,7 +12,6 @@
 
 extern "C" void __ct__4CRefFv(void*);
 extern "C" void __dt__4CRefFv(void*, int);
-extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 extern "C" void* __vt__11CTexAnimSet[];
 extern "C" void* __vt__8CTexAnim[];
@@ -469,7 +468,7 @@ CTexAnimSet* CTexAnimSet::Duplicate(CMemory::CStage* stage)
 {
     CTexAnimSetStorage* self = reinterpret_cast<CTexAnimSetStorage*>(this);
     CTexAnimSetStorage* dup = reinterpret_cast<CTexAnimSetStorage*>(
-        __nw__FUlPQ27CMemory6CStagePci(0x28, stage, const_cast<char*>(s_texanim_cpp_801d7adc), 0x54));
+        operator new(0x28, stage, const_cast<char*>(s_texanim_cpp_801d7adc), 0x54));
     if (dup != 0) {
         __ct__4CRefFv(dup);
         dup->vtable = __vt__11CTexAnimSet;
@@ -481,7 +480,7 @@ CTexAnimSet* CTexAnimSet::Duplicate(CMemory::CStage* stage)
     for (unsigned int i = 0; i < static_cast<unsigned int>(self->texAnims.GetSize()); i++) {
         CTexAnimStorage* src = reinterpret_cast<CTexAnimStorage*>(self->texAnims[i]);
         CTexAnimStorage* copy = reinterpret_cast<CTexAnimStorage*>(
-            __nw__FUlPQ27CMemory6CStagePci(0x24, stage, const_cast<char*>(s_texanim_cpp_801d7adc), 0xF4));
+            operator new(0x24, stage, const_cast<char*>(s_texanim_cpp_801d7adc), 0xF4));
         if (copy != 0) {
             __ct__4CRefFv(copy);
             copy->vtable = __vt__8CTexAnim;
@@ -538,7 +537,7 @@ void CTexAnimSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
         }
 
         CTexAnimStorage* texAnim = static_cast<CTexAnimStorage*>(
-            __nw__FUlPQ27CMemory6CStagePci(0x24, stage, const_cast<char*>(s_texanim_cpp_801d7adc), 0x3F));
+            operator new(0x24, stage, const_cast<char*>(s_texanim_cpp_801d7adc), 0x3F));
         if (texAnim != 0) {
             __ct__4CRefFv(texAnim);
             texAnim->vtable = __vt__8CTexAnim;
@@ -560,7 +559,7 @@ void CTexAnimSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
             texAnim->refData = 0;
         }
         CTexAnimRefDataStorage* refData = static_cast<CTexAnimRefDataStorage*>(
-            __nw__FUlPQ27CMemory6CStagePci(300, stage, const_cast<char*>(s_texanim_cpp_801d7adc), 0xD3));
+            operator new(300, stage, const_cast<char*>(s_texanim_cpp_801d7adc), 0xD3));
         if (refData != 0) {
             __ct__4CRefFv(refData);
             *reinterpret_cast<void**>(refData) = __vt__Q28CTexAnim8CRefData;
@@ -582,7 +581,7 @@ void CTexAnimSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
             }
 
             CTexAnimSeqStorage* seq = static_cast<CTexAnimSeqStorage*>(
-                __nw__FUlPQ27CMemory6CStagePci(0x118, stage, const_cast<char*>(s_texanim_cpp_801d7adc), 0xE2));
+                operator new(0x118, stage, const_cast<char*>(s_texanim_cpp_801d7adc), 0xE2));
             if (seq != 0) {
                 __ct__4CRefFv(seq);
                 seq->vtable = __vt__11CTexAnimSeq;

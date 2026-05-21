@@ -26,7 +26,6 @@ char g_StrTmp[0x400];
 
 extern "C" unsigned long UnkMaterialSetGetter(void*);
 extern "C" void __dt__4CRefFv(void*, int);
-extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 extern "C" void __dt__8COctTreeFv(void*, int);
 extern "C" void __dt__7CMapHitFv(void*, int);

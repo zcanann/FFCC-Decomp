@@ -3,7 +3,6 @@
 #include "ffcc/memory.h"
 #include "ffcc/stopwatch.h"
 #include "ffcc/system.h"
-#include <PowerPC_EABI_Support/Runtime/MWCPlusLib.h>
 #include <string.h>
 
 extern "C" {
@@ -11,7 +10,6 @@ char DAT_80330118[];
 void* __vt__12CFlatRuntime[];
 void* __vt__Q212CFlatRuntime7CObject[];
 int __cntlzw(unsigned int);
-void Printf__7CSystemFPce(CSystem*, char*, ...);
 int sprintf(char*, const char*, ...);
 char* strcat(char*, const char*);
 double fmod(double, double);
@@ -2078,8 +2076,8 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 				char* format = strBlob + strOffs[*object->m_localBase];
 
 				if (object->m_argCount == 1) {
-					Printf__7CSystemFPce(&System, format);
-					Printf__7CSystemFPce(&System, DAT_80330118);
+					System.Printf(format);
+					System.Printf(DAT_80330118);
 				} else {
 					char spec[256];
 					char rendered[256];
@@ -2163,8 +2161,8 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 						strcat(line, rendered);
 					}
 
-					Printf__7CSystemFPce(&System, line);
-					Printf__7CSystemFPce(&System, DAT_80330118);
+					System.Printf(line);
+					System.Printf(DAT_80330118);
 				}
 			}
 

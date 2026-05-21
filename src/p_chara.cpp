@@ -38,10 +38,8 @@ u8* gCharaPartWorkPtr = 0;
 }
 
 extern "C" int __cntlzw(unsigned int);
-extern "C" void __ct__6CColorFv(void*);
 extern "C" void ReleasePdt__8CPartPcsFi(void*, int);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
-extern "C" CMemory::CStage* CreateStage__7CMemoryFUlPci(CMemory*, unsigned long, const char*, int);
 extern "C" void CopyFromAMemorySync__7CMemoryFPvPvUl(CMemory*, void*, void*, unsigned long);
 extern "C" void CopyToAMemorySync__7CMemoryFPvPvUl(CMemory*, void*, void*, unsigned long);
 extern "C" void SetStdProjectionMatrix__10CCameraPcsFv(void*);
@@ -58,11 +56,9 @@ extern "C" void SetDiffuse__9CLightPcsFUl8_GXColorP3Veci(void*, unsigned long, v
 extern "C" void SetPosition__9CLightPcsFQ29CLightPcs6TARGETP3VecUl(void*, int, Vec*, unsigned long);
 extern "C" void Create__6CCharaFv(void*);
 extern "C" void Destroy__6CCharaFv(void*);
-extern "C" void Printf__7CSystemFPce(void*, const char*, ...);
 extern "C" void Create__Q26CChara5CAnimFPvPQ27CMemory6CStage(void*, void*, void*);
 extern "C" void LoadSe__6CSoundFPv(void*, void*);
 extern "C" void LoadWave__6CSoundFPv(void*, void*);
-extern "C" void DestroyStage__7CMemoryFPQ27CMemory6CStage(void*, void*);
 extern "C" int GetBackBufferRect__8CGraphicFRiRiRiRii(CGraphic*, int&, int&, int&, int&, int);
 extern "C" unsigned char DbgMenuPcs[];
 extern unsigned char PTR_s_CCharaPcs_GAME__801fce10[];
@@ -503,7 +499,7 @@ static CCharaPcs::CLoadAnim* LoadAnimFromDisk(
     File.Close(fileHandle);
 
     if (loadAnim != 0 && System.m_execParam != 0) {
-        Printf__7CSystemFPce(&System, s_charaLoadAnimLogFmt, animName, charaKind, charaNo);
+        System.Printf(const_cast<char*>(s_charaLoadAnimLogFmt), animName, charaKind, charaNo);
     }
 
     return loadAnim;
@@ -696,7 +692,9 @@ CCharaPcs::CCharaPcs()
     new (LoadAnimArray(this)) CPtrArray<CLoadAnim*>();
     new (LoadTextureArray(this)) CPtrArray<CLoadTexture*>();
     new (LoadPdtArray(this)) CPtrArray<CLoadPdt*>();
-    __construct_array(Ptr(this, 0x12C), reinterpret_cast<ConstructorDestructor>(__ct__6CColorFv), 0, 4, 5);
+    for (int i = 0; i < 5; i++) {
+        new (&m_viewerChoiceColor[i]) CColor;
+    }
 }
 
 /*
@@ -723,9 +721,9 @@ CCharaPcs::~CCharaPcs()
  */
 void CCharaPcs::Init()
 {
-    StageAt(this, 0xC0) = CreateStage__7CMemoryFUlPci(&Memory, 0x38000, s_CCharaPcs_stage, 0);
-    StageAt(this, 0xC4) = CreateStage__7CMemoryFUlPci(&Memory, 0x380000, s_CCharaPcs_amem, 2);
-    StageAt(this, 0xC8) = CreateStage__7CMemoryFUlPci(&Memory, 0x70000, s_CCharaPcs_amemw, 2);
+    StageAt(this, 0xC0) = Memory.CreateStage(0x38000, const_cast<char*>(s_CCharaPcs_stage), 0);
+    StageAt(this, 0xC4) = Memory.CreateStage(0x380000, const_cast<char*>(s_CCharaPcs_amem), 2);
+    StageAt(this, 0xC8) = Memory.CreateStage(0x70000, const_cast<char*>(s_CCharaPcs_amemw), 2);
     CharaAmemStage() = StageAt(this, 0xC4);
 
     LoadModelArray(this)->SetStage(StageAt(this, 0xC0));
@@ -839,13 +837,13 @@ void CCharaPcs::create()
 {
     FreeMergeMask(this) = 0;
 
-    StageAt(this, 0xCC) = CreateStage__7CMemoryFUlPci(&Memory, 0x177000, s_CCharaPcs_loadModel, 0);
-    StageAt(this, 0xD0) = CreateStage__7CMemoryFUlPci(&Memory, 0x130000, s_CCharaPcs_loadTex, 0);
-    StageAt(this, 0xD8) = CreateStage__7CMemoryFUlPci(&Memory, 0x8400, s_CCharaPcs_loadWepTex, 0);
-    StageAt(this, 0xDC) = CreateStage__7CMemoryFUlPci(&Memory, 0x18000, s_CCharaPcs_loadWepModel, 0);
-    StageAt(this, 0xE0) = CreateStage__7CMemoryFUlPci(&Memory, 0x10000, s_CCharaPcs_loadFaModel, 0);
-    StageAt(this, 0xD4) = CreateStage__7CMemoryFUlPci(
-        &Memory, CurrentSceneId() == 4 ? 0x190000UL : 0x1E0000UL, s_CCharaPcs_loadAnim, 0);
+    StageAt(this, 0xCC) = Memory.CreateStage(0x177000, const_cast<char*>(s_CCharaPcs_loadModel), 0);
+    StageAt(this, 0xD0) = Memory.CreateStage(0x130000, const_cast<char*>(s_CCharaPcs_loadTex), 0);
+    StageAt(this, 0xD8) = Memory.CreateStage(0x8400, const_cast<char*>(s_CCharaPcs_loadWepTex), 0);
+    StageAt(this, 0xDC) = Memory.CreateStage(0x18000, const_cast<char*>(s_CCharaPcs_loadWepModel), 0);
+    StageAt(this, 0xE0) = Memory.CreateStage(0x10000, const_cast<char*>(s_CCharaPcs_loadFaModel), 0);
+    StageAt(this, 0xD4) =
+        Memory.CreateStage(CurrentSceneId() == 4 ? 0x190000UL : 0x1E0000UL, const_cast<char*>(s_CCharaPcs_loadAnim), 0);
 
     CHandle* sentinel = reinterpret_cast<CHandle*>(
         _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(&Memory, 0x194, StageAt(&CharaPcs, 0xC0), const_cast<char*>(s_p_chara_cpp), 0xDB, 0));
@@ -945,12 +943,12 @@ void CCharaPcs::destroy()
         *reinterpret_cast<void**>(Ptr(this, 0x4C)) = 0;
     }
 
-    DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, *reinterpret_cast<void**>(Ptr(this, 0xCC)));
-    DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, *reinterpret_cast<void**>(Ptr(this, 0xD0)));
-    DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, *reinterpret_cast<void**>(Ptr(this, 0xD8)));
-    DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, *reinterpret_cast<void**>(Ptr(this, 0xDC)));
-    DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, *reinterpret_cast<void**>(Ptr(this, 0xE0)));
-    DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, *reinterpret_cast<void**>(Ptr(this, 0xD4)));
+    Memory.DestroyStage(StageAt(this, 0xCC));
+    Memory.DestroyStage(StageAt(this, 0xD0));
+    Memory.DestroyStage(StageAt(this, 0xD8));
+    Memory.DestroyStage(StageAt(this, 0xDC));
+    Memory.DestroyStage(StageAt(this, 0xE0));
+    Memory.DestroyStage(StageAt(this, 0xD4));
     Destroy__6CCharaFv(&Chara);
 }
 
@@ -1010,7 +1008,7 @@ void CCharaPcs::Reset(CCharaPcs::RESET mode)
                 LoadAnimArray(this)->RemoveAt(static_cast<unsigned long>(i));
             }
 
-            Printf__7CSystemFPce(&System, s_charaFreeMergeFmt, releaseMask);
+            System.Printf(const_cast<char*>(s_charaFreeMergeFmt), releaseMask);
             LoadPdtArray(this)->ReleaseAndRemoveAll();
             int charaAmemSize = correctLoadAnimAmem();
             if (charaAmemSize >= 0) {
@@ -1019,7 +1017,7 @@ void CCharaPcs::Reset(CCharaPcs::RESET mode)
             }
 
             if (System.m_execParam > 1) {
-                Printf__7CSystemFPce(&System, s_charaAmemCompactFailed);
+                System.Printf(const_cast<char*>(s_charaAmemCompactFailed));
             }
         }
     }
@@ -1293,7 +1291,7 @@ int CCharaPcs::TryReleaseAnimBank(int requiredSize)
     }
 
     if (System.m_execParam > 2) {
-        Printf__7CSystemFPce(&System, s_charaReleaseAnimBankFmt, releaseSize, releaseAnim->m_name);
+        System.Printf(const_cast<char*>(s_charaReleaseAnimBankFmt), releaseSize, releaseAnim->m_name);
     }
 
     return 1;
@@ -1655,9 +1653,9 @@ void CCharaPcs::DumpLoad()
         return;
     }
 
-    Printf__7CSystemFPce(&System, s_charaDumpModelHdr1);
-    Printf__7CSystemFPce(&System, s_charaDumpModelHdr2);
-    Printf__7CSystemFPce(&System, s_charaDumpLineSep);
+    System.Printf(const_cast<char*>(s_charaDumpModelHdr1));
+    System.Printf(const_cast<char*>(s_charaDumpModelHdr2));
+    System.Printf(const_cast<char*>(s_charaDumpLineSep));
     for (int i = 0; i < LoadModelArray(this)->GetSize(); i++) {
         CLoadModel* loadModel = (*LoadModelArray(this))[static_cast<unsigned long>(i)];
         unsigned int streamAddr = 0;
@@ -1667,15 +1665,15 @@ void CCharaPcs::DumpLoad()
             streamSize = static_cast<unsigned int>(loadModel->m_streamSize);
         }
 
-        Printf__7CSystemFPce(
-            &System, s_charaDumpModelFmt, i, reinterpret_cast<int>(loadModel->m_keyTag), loadModel->m_keyId,
+        System.Printf(
+            const_cast<char*>(s_charaDumpModelFmt), i, reinterpret_cast<int>(loadModel->m_keyTag), loadModel->m_keyId,
             loadModel->m_mergeFileId, loadModel->m_mergeFlags, reinterpret_cast<unsigned int>(loadModel->m_model),
             loadModel->m_streamMode, streamAddr, streamSize);
     }
 
-    Printf__7CSystemFPce(&System, s_charaDumpTextureHdr1);
-    Printf__7CSystemFPce(&System, s_charaDumpTextureHdr2);
-    Printf__7CSystemFPce(&System, s_charaDumpLineSep);
+    System.Printf(const_cast<char*>(s_charaDumpTextureHdr1));
+    System.Printf(const_cast<char*>(s_charaDumpTextureHdr2));
+    System.Printf(const_cast<char*>(s_charaDumpLineSep));
     for (int i = 0; i < LoadTextureArray(this)->GetSize(); i++) {
         CLoadTexture* loadTexture = (*LoadTextureArray(this))[static_cast<unsigned long>(i)];
         unsigned int streamAddr = 0;
@@ -1685,26 +1683,26 @@ void CCharaPcs::DumpLoad()
             streamSize = static_cast<unsigned int>(loadTexture->m_streamSize);
         }
 
-        Printf__7CSystemFPce(
-            &System, s_charaDumpTextureFmt, i, reinterpret_cast<int>(loadTexture->m_keyTag), loadTexture->m_keyId,
+        System.Printf(
+            const_cast<char*>(s_charaDumpTextureFmt), i, reinterpret_cast<int>(loadTexture->m_keyTag), loadTexture->m_keyId,
             reinterpret_cast<int>(loadTexture->m_variantTag), loadTexture->m_mergeFileId, loadTexture->m_mergeFlags,
             reinterpret_cast<unsigned int>(loadTexture->m_textureSet), loadTexture->m_streamMode, streamAddr, streamSize);
     }
 
-    Printf__7CSystemFPce(&System, s_charaDumpPdtHdr1);
-    Printf__7CSystemFPce(&System, s_charaDumpPdtHdr2);
-    Printf__7CSystemFPce(&System, s_charaDumpLineSep);
+    System.Printf(const_cast<char*>(s_charaDumpPdtHdr1));
+    System.Printf(const_cast<char*>(s_charaDumpPdtHdr2));
+    System.Printf(const_cast<char*>(s_charaDumpLineSep));
     for (int i = 0; i < LoadPdtArray(this)->GetSize(); i++) {
         CLoadPdt* loadPdt = (*LoadPdtArray(this))[static_cast<unsigned long>(i)];
-        Printf__7CSystemFPce(
-            &System, s_charaDumpPdtFmt, i, reinterpret_cast<int>(loadPdt->m_keyTag), loadPdt->m_keyId,
+        System.Printf(
+            const_cast<char*>(s_charaDumpPdtFmt), i, reinterpret_cast<int>(loadPdt->m_keyTag), loadPdt->m_keyId,
             reinterpret_cast<int>(loadPdt->m_variantTag), loadPdt->m_pdtSlot, loadPdt->m_mergeFileId,
             loadPdt->m_mergeFlags);
     }
 
-    Printf__7CSystemFPce(&System, s_charaDumpAnimHdr1);
-    Printf__7CSystemFPce(&System, s_charaDumpAnimHdr2);
-    Printf__7CSystemFPce(&System, s_charaDumpLineSep);
+    System.Printf(const_cast<char*>(s_charaDumpAnimHdr1));
+    System.Printf(const_cast<char*>(s_charaDumpAnimHdr2));
+    System.Printf(const_cast<char*>(s_charaDumpLineSep));
     int totalBankSize = 0;
     for (int i = 0; i < LoadAnimArray(this)->GetSize(); i++) {
         CLoadAnim* loadAnim = (*LoadAnimArray(this))[static_cast<unsigned long>(i)];
@@ -1717,8 +1715,8 @@ void CCharaPcs::DumpLoad()
             bankAddr = *reinterpret_cast<unsigned int*>(Ptr(loadAnim->m_anim, 0x24));
         }
 
-        Printf__7CSystemFPce(
-            &System, s_charaDumpAnimFmt, i, reinterpret_cast<int>(loadAnim->m_keyTag), loadAnim->m_keyId,
+        System.Printf(
+            const_cast<char*>(s_charaDumpAnimFmt), i, reinterpret_cast<int>(loadAnim->m_keyTag), loadAnim->m_keyId,
             loadAnim->m_name, loadAnim->m_mergeFileId, loadAnim->m_mergeFlags, animAddr, bankSize, totalBankSize, bankAddr);
         totalBankSize += bankSize;
     }
@@ -1869,7 +1867,7 @@ void CCharaPcs::LoadMergeFile(int mergeFileId, int mergeFlags, int streamToAmem)
     }
 
     if (hasLoaded) {
-        Printf__7CSystemFPce(&System, s_charaMergeDupFmt, mergeFileId);
+        System.Printf(const_cast<char*>(s_charaMergeDupFmt), mergeFileId);
         return;
     }
 
@@ -1881,7 +1879,7 @@ void CCharaPcs::LoadMergeFile(int mergeFileId, int mergeFlags, int streamToAmem)
 
         CFile::CHandle* fileHandle = File.Open(path, 0, CFile::PRI_LOW);
         if (fileHandle == 0) {
-            Printf__7CSystemFPce(&System, s_charaMergeOpenFmt, mergeFileId);
+            System.Printf(const_cast<char*>(s_charaMergeOpenFmt), mergeFileId);
             break;
         }
 
@@ -2092,7 +2090,7 @@ void CCharaPcs::LoadMergeFile(int mergeFileId, int mergeFlags, int streamToAmem)
         File.Close(fileHandle);
     }
 
-    Printf__7CSystemFPce(&System, s_charaMergeDoneFmt, mergeFileId, mergeFlags);
+    System.Printf(const_cast<char*>(s_charaMergeDoneFmt), mergeFileId, mergeFlags);
 }
 
 /*
@@ -2346,7 +2344,7 @@ CCharaPcs::CHandle::~CHandle()
 {
     if (m_asyncFileHandle != 0) {
         if (System.m_execParam > 1) {
-            Printf__7CSystemFPce(&System, s_charaAsyncCancelFmt);
+            System.Printf(const_cast<char*>(s_charaAsyncCancelFmt));
         }
         File.Close(m_asyncFileHandle);
         m_asyncFileHandle = 0;
@@ -2777,7 +2775,7 @@ int CCharaPcs::CHandle::SetAnim(int animIndex, int startFrame, int endFrame, int
 
     if (anim == 0) {
         if (m_charaKind != 3 && System.m_execParam > 1) {
-            Printf__7CSystemFPce(&System, s_charaSetAnimMissingFmt, m_charaKind, m_charaNo, animIndex);
+            System.Printf(const_cast<char*>(s_charaSetAnimMissingFmt), m_charaKind, m_charaNo, animIndex);
         }
         return 0;
     }
@@ -3020,14 +3018,14 @@ void CCharaPcs::CHandle::LoadModelASync(int charaKind, unsigned long charaNo, un
 {
     if (System.m_execParam > 2)
     {
-        Printf__7CSystemFPce(&System, s_charaAsyncEntryFmt);
+        System.Printf(const_cast<char*>(s_charaAsyncEntryFmt));
     }
 
     if (m_asyncFileHandle != 0)
 	{
         if (System.m_execParam > 1)
         {
-            Printf__7CSystemFPce(&System, s_charaAsyncCancelFmt);
+            System.Printf(const_cast<char*>(s_charaAsyncCancelFmt));
         }
 		File.Close(m_asyncFileHandle);
 		m_asyncFileHandle = (CFile::CHandle*)0;
@@ -3141,7 +3139,7 @@ void CCharaPcs::CHandle::loadModelASyncFrame()
     if (m_asyncState == 6) {
         m_asyncState = 7;
         if (System.m_execParam > 2) {
-            Printf__7CSystemFPce(&System, s_charaAsyncCompleteFmt);
+            System.Printf(const_cast<char*>(s_charaAsyncCompleteFmt));
         }
     } else {
         m_asyncState++;

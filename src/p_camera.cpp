@@ -144,7 +144,6 @@ unsigned int PTR_s_CCameraPcs_GAME__801e915c[7][0x15C / sizeof(unsigned int)] = 
 };
 Vec g_shadow_pos;
 Vec g_shadow_refpos;
-extern "C" void Printf__7CSystemFPce(CSystem* system, char* format, ...);
 extern "C" CGObject* FindGObjFirst__13CFlatRuntime2Fv(void*);
 extern "C" CGObject* FindGObjNext__13CFlatRuntime2FP8CGObject(void*, CGObject*);
 extern "C" void SetFrustum__6CBoundFR3VecPA4_f(float* bound, Vec* point, Mtx matrix);
@@ -732,7 +731,7 @@ void CCameraPcs::calc()
 
     float fov = *reinterpret_cast<float*>(self + 0xFC);
     if (fov < FLOAT_8032fac8 && System.m_execParam != 0) {
-        Printf__7CSystemFPce(&System, DAT_801d7928);
+        System.Printf(DAT_801d7928);
         fov = FLOAT_8032fab4;
     }
     C_MTXPerspective(reinterpret_cast<Mtx44Ptr>(self + 0x94), fov, FLOAT_8032fa3c,
@@ -801,7 +800,7 @@ void CCameraPcs::SetStdProjectionMatrix()
     float fov = *reinterpret_cast<float*>(self + 0xFC);
 
     if (fov < FLOAT_8032fac8 && System.m_execParam != 0) {
-        Printf__7CSystemFPce(&System, DAT_801d7928);
+        System.Printf(DAT_801d7928);
         fov = FLOAT_8032fab4;
     }
 

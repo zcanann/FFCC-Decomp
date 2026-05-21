@@ -54,7 +54,7 @@ public:
 	int m_particleSlot;            // 0x55C
 	u16 m_createFlags;             // 0x560
 	u16 unk_0x562;                 // 0x562
-	void* m_pendingModelHandle;    // 0x564
+	CCharaPcs::CHandle* m_pendingModelHandle; // 0x564
 	float m_savedBodyRadius;       // 0x568
 	int m_itemJumpCountdown;       // 0x56C
 	int m_memoryCapsuleNameIndex;  // 0x570

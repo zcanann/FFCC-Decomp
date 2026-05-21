@@ -166,7 +166,6 @@ int GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void*);
 void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(void*, long, float&, float&, float&, float, float&, float&);
 void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 void pppHeapUseRate__FPQ27CMemory6CStage(void*);
-void SearchNode__Q26CChara6CModelFPc(CChara::CModel*, char*);
 void ConvI2FVector__5CUtilFR3Vec6S16Vecl(CUtil*, Vec*, S16Vec, unsigned long);
 void MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(void*, Mtx44, Vec4d*, Vec4d*);
 }
@@ -186,7 +185,7 @@ void pppRenderScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB*, ppp
     u8* value = (u8*)pppScreenBreak + dataOffset + 0x80;
     void* handle = GetCharaHandlePtr__FP8CGObjectl(*(void**)((u8*)pppMngStPtr + 0xD8), 0);
     int model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
-    SearchNode__Q26CChara6CModelFPc((CChara::CModel*)model, const_cast<char*>(s_f999_root_801dd4c8));
+    reinterpret_cast<CChara::CModel*>(model)->SearchNode(const_cast<char*>(s_f999_root_801dd4c8));
 
     if (value[0x24] == 0) {
         Graphic.GetBackBufferRect2(

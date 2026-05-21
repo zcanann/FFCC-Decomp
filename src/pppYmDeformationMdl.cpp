@@ -3,6 +3,7 @@
 #include "ffcc/mapmesh.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/pppYmEnv.h"
+#include "ffcc/pppTypes.h"
 
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
@@ -10,10 +11,6 @@
 
 struct pppCVECTOR {
     u8 rgba[4];
-};
-
-struct pppFMATRIX {
-    Mtx value;
 };
 
 struct pppModelSt;

@@ -651,6 +651,11 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
                         *(S16Vec*)(polygon + 0x1C) = transformed[2];
                     }
                 } else {
+                    Vec center;
+                    center.x = FLOAT_80332048;
+                    center.y = FLOAT_80332048;
+                    center.z = FLOAT_80332048;
+
                     int sumX = (int)*(short*)(polygon + 0x10) + (int)*(short*)(polygon + 0x16) + (int)*(short*)(polygon + 0x1C);
                     int sumY = (int)*(short*)(polygon + 0x12) + (int)*(short*)(polygon + 0x18) + (int)*(short*)(polygon + 0x1E);
                     int sumZ = (int)*(short*)(polygon + 0x14) + (int)*(short*)(polygon + 0x1A) + (int)*(short*)(polygon + 0x20);
@@ -670,10 +675,6 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
                         Mtx rotMtx;
                         float sinValue = FLOAT_80332048;
                         float cosValue = FLOAT_80332048;
-
-                        center.x = FLOAT_80332048;
-                        center.y = FLOAT_80332048;
-                        center.z = FLOAT_80332048;
 
                         for (int i = 0; i < 3; i++) {
                             S16Vec pos;
@@ -943,7 +944,7 @@ void CreatePolygon(POLYGON_DATA* polygonData, void* displayList, unsigned long, 
                         if (triCount <= 0) {
                             keepTri = 0;
                         }
-                        if (((u32)__cntlzw((s32)triCount) >> 5) == 0) {
+                        if ((__rlwnm(1, (u32)__cntlzw((s32)triCount), 31, 31) & 0xFF) == 0) {
                             stream = previousRestart;
                         }
                         outVertex = 0;

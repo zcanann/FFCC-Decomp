@@ -2154,18 +2154,22 @@ void CGObject::CancelMove(int moveType)
  */
 void CGObject::Move(Vec* moveVec, float moveTimer, int turnFrames, int moveMode, int useFacing, int flagA, int flagB)
 {
-    *((u8*)&m_weaponNodeFlags + 1) = (*((u8*)&m_weaponNodeFlags + 1) & 0xDF) | 0x20;
-    *((u8*)&m_weaponNodeFlags + 1) &= 0xEF;
+    const signed char moveModeFlag = static_cast<signed char>(moveMode);
+    const signed char useFacingFlag = static_cast<signed char>(useFacing);
+    const signed char flagAValue = static_cast<signed char>(flagA);
+    const signed char flagBValue = static_cast<signed char>(flagB);
+    u8* const weaponFlagsLo = reinterpret_cast<u8*>(&m_weaponNodeFlags);
+    u8* const weaponFlagsHi = weaponFlagsLo + 1;
+
+    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 5, 26, 26));
+    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 0, 4, 27, 27));
     m_turnFrames = static_cast<u32>(turnFrames);
     m_moveTarget = *moveVec;
     m_moveTimer = moveTimer;
-    *((u8*)&m_weaponNodeFlags) = (static_cast<u8>(moveMode << 1) & 2) | (*((u8*)&m_weaponNodeFlags) & 0xFD);
-    *((u8*)&m_weaponNodeFlags + 1) =
-        (static_cast<u8>(useFacing << 3) & 8) | (*((u8*)&m_weaponNodeFlags + 1) & 0xF7);
-    *((u8*)&m_weaponNodeFlags + 1) =
-        (static_cast<u8>(flagA << 1) & 2) | (*((u8*)&m_weaponNodeFlags + 1) & 0xFD);
-    *((u8*)&m_weaponNodeFlags + 1) =
-        (static_cast<u8>(flagB << 2) & 4) | (*((u8*)&m_weaponNodeFlags + 1) & 0xFB);
+    *weaponFlagsLo = static_cast<u8>(__rlwimi(*weaponFlagsLo, moveModeFlag, 1, 30, 30));
+    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, useFacingFlag, 3, 28, 28));
+    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, flagAValue, 1, 30, 30));
+    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, flagBValue, 2, 29, 29));
 }
 
 /*
@@ -2179,17 +2183,19 @@ void CGObject::Move(Vec* moveVec, float moveTimer, int turnFrames, int moveMode,
  */
 void CGObject::MoveVector(Vec* moveVec, float moveTimer, int turnFrames, int useFacing, int flagA, int flagB)
 {
-    *((u8*)&m_weaponNodeFlags + 1) = (*((u8*)&m_weaponNodeFlags + 1) & 0xDF) | 0x20;
-    *((u8*)&m_weaponNodeFlags + 1) = (*((u8*)&m_weaponNodeFlags + 1) & 0xEF) | 0x10;
+    const signed char useFacingFlag = static_cast<signed char>(useFacing);
+    const signed char flagAValue = static_cast<signed char>(flagA);
+    const signed char flagBValue = static_cast<signed char>(flagB);
+    u8* const weaponFlagsHi = reinterpret_cast<u8*>(&m_weaponNodeFlags) + 1;
+
+    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 5, 26, 26));
+    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 4, 27, 27));
     m_turnFrames = static_cast<u32>(turnFrames);
     m_moveTarget = *moveVec;
     m_moveTimer = moveTimer;
-    *((u8*)&m_weaponNodeFlags + 1) =
-        (static_cast<u8>(useFacing << 3) & 8) | (*((u8*)&m_weaponNodeFlags + 1) & 0xF7);
-    *((u8*)&m_weaponNodeFlags + 1) =
-        (static_cast<u8>(flagA << 1) & 2) | (*((u8*)&m_weaponNodeFlags + 1) & 0xFD);
-    *((u8*)&m_weaponNodeFlags + 1) =
-        (static_cast<u8>(flagB << 2) & 4) | (*((u8*)&m_weaponNodeFlags + 1) & 0xFB);
+    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, useFacingFlag, 3, 28, 28));
+    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, flagAValue, 1, 30, 30));
+    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, flagBValue, 2, 29, 29));
 }
 
 /*
@@ -2204,23 +2210,24 @@ void CGObject::MoveVector(Vec* moveVec, float moveTimer, int turnFrames, int use
 void CGObject::moveVector(Vec* moveVec, float moveTimer, int turnFrames)
 {
     Vec unitVec;
-    const double mag = static_cast<double>(PSVECMag(moveVec));
-    if (static_cast<double>(sZeroFloat) == mag) {
+    const float mag = PSVECMag(moveVec);
+    if (sZeroFloat == mag) {
         unitVec.x = sZeroFloat;
         unitVec.y = sZeroFloat;
         unitVec.z = sZeroFloat;
     } else {
-        PSVECScale(moveVec, &unitVec, static_cast<float>(static_cast<double>(sAnimFrameOffset) / mag));
+        PSVECScale(moveVec, &unitVec, sAnimFrameOffset / mag);
     }
 
-    *((u8*)&m_weaponNodeFlags + 1) = (*((u8*)&m_weaponNodeFlags + 1) & 0xDF) | 0x20;
-    *((u8*)&m_weaponNodeFlags + 1) = (*((u8*)&m_weaponNodeFlags + 1) & 0xEF) | 0x10;
+    u8* const weaponFlagsHi = reinterpret_cast<u8*>(&m_weaponNodeFlags) + 1;
+    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 5, 26, 26));
+    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 4, 27, 27));
     m_turnFrames = static_cast<u32>(turnFrames);
     m_moveTarget = unitVec;
     m_moveTimer = moveTimer;
-    *((u8*)&m_weaponNodeFlags + 1) = (*((u8*)&m_weaponNodeFlags + 1) & 0xF7) | 8;
-    *((u8*)&m_weaponNodeFlags + 1) &= 0xFD;
-    *((u8*)&m_weaponNodeFlags + 1) = (*((u8*)&m_weaponNodeFlags + 1) & 0xFB) | 4;
+    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 3, 28, 28));
+    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 0, 1, 30, 30));
+    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 2, 29, 29));
 }
 
 /*
@@ -2235,23 +2242,24 @@ void CGObject::moveVector(Vec* moveVec, float moveTimer, int turnFrames)
 void CGObject::moveVectorH(Vec* moveVec, float moveTimer, int turnFrames)
 {
     Vec unitVec;
-    const double mag = static_cast<double>(PSVECMag(moveVec));
-    if (static_cast<double>(sZeroFloat) == mag) {
+    const float mag = PSVECMag(moveVec);
+    if (sZeroFloat == mag) {
         unitVec.x = sZeroFloat;
         unitVec.y = sZeroFloat;
         unitVec.z = sZeroFloat;
     } else {
-        PSVECScale(moveVec, &unitVec, static_cast<float>(static_cast<double>(sAnimFrameOffset) / mag));
+        PSVECScale(moveVec, &unitVec, sAnimFrameOffset / mag);
     }
 
-    *((u8*)&m_weaponNodeFlags + 1) = (*((u8*)&m_weaponNodeFlags + 1) & 0xDF) | 0x20;
-    *((u8*)&m_weaponNodeFlags + 1) = (*((u8*)&m_weaponNodeFlags + 1) & 0xEF) | 0x10;
+    u8* const weaponFlagsHi = reinterpret_cast<u8*>(&m_weaponNodeFlags) + 1;
+    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 5, 26, 26));
+    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 4, 27, 27));
     m_turnFrames = static_cast<u32>(turnFrames);
     m_moveTarget = unitVec;
     m_moveTimer = moveTimer;
-    *((u8*)&m_weaponNodeFlags + 1) &= 0xF7;
-    *((u8*)&m_weaponNodeFlags + 1) &= 0xFD;
-    *((u8*)&m_weaponNodeFlags + 1) &= 0xFB;
+    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 0, 3, 28, 28));
+    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 0, 1, 30, 30));
+    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 0, 2, 29, 29));
 }
 
 /*
@@ -2265,22 +2273,23 @@ void CGObject::moveVectorH(Vec* moveVec, float moveTimer, int turnFrames)
  */
 void CGObject::moveVectorRot(float rotX, float rotY, float moveTimer, int turnFrames)
 {
-    const double cosY0 = static_cast<double>(static_cast<float>(cos(rotY)));
-    const double sinX = static_cast<double>(static_cast<float>(sin(rotX)));
-    const double sinY = static_cast<double>(static_cast<float>(sin(rotY)));
-    const double cosY1 = static_cast<double>(static_cast<float>(cos(rotY)));
-    const double cosX = static_cast<double>(static_cast<float>(cos(rotX)));
+    const float cosY0 = static_cast<float>(cos(rotY));
+    const float sinX = static_cast<float>(sin(rotX));
+    const float sinY = static_cast<float>(sin(rotY));
+    const float cosY1 = static_cast<float>(cos(rotY));
+    const float cosX = static_cast<float>(cos(rotX));
 
-    *((u8*)&m_weaponNodeFlags + 1) = (*((u8*)&m_weaponNodeFlags + 1) & 0xDF) | 0x20;
-    *((u8*)&m_weaponNodeFlags + 1) = (*((u8*)&m_weaponNodeFlags + 1) & 0xEF) | 0x10;
+    u8* const weaponFlagsHi = reinterpret_cast<u8*>(&m_weaponNodeFlags) + 1;
+    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 5, 26, 26));
+    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 4, 27, 27));
     m_turnFrames = static_cast<u32>(turnFrames);
-    m_moveTarget.x = static_cast<float>(sinX * cosY0);
-    m_moveTarget.y = static_cast<float>(sinY);
-    m_moveTarget.z = static_cast<float>(cosX * cosY1);
+    m_moveTarget.x = sinX * cosY0;
+    m_moveTarget.y = sinY;
+    m_moveTarget.z = cosX * cosY1;
     m_moveTimer = moveTimer;
-    *((u8*)&m_weaponNodeFlags + 1) = (*((u8*)&m_weaponNodeFlags + 1) & 0xF7) | 8;
-    *((u8*)&m_weaponNodeFlags + 1) &= 0xFD;
-    *((u8*)&m_weaponNodeFlags + 1) = (*((u8*)&m_weaponNodeFlags + 1) & 0xFB) | 4;
+    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 3, 28, 28));
+    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 0, 1, 30, 30));
+    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 2, 29, 29));
 }
 
 /*
@@ -2294,22 +2303,23 @@ void CGObject::moveVectorRot(float rotX, float rotY, float moveTimer, int turnFr
  */
 void CGObject::moveVectorHRot(float rotX, float rotY, float moveTimer, int turnFrames)
 {
-    const double cosY0 = static_cast<double>(static_cast<float>(cos(rotY)));
-    const double sinX = static_cast<double>(static_cast<float>(sin(rotX)));
-    const double sinY = static_cast<double>(static_cast<float>(sin(rotY)));
-    const double cosY1 = static_cast<double>(static_cast<float>(cos(rotY)));
-    const double cosX = static_cast<double>(static_cast<float>(cos(rotX)));
+    const float cosY0 = static_cast<float>(cos(rotY));
+    const float sinX = static_cast<float>(sin(rotX));
+    const float sinY = static_cast<float>(sin(rotY));
+    const float cosY1 = static_cast<float>(cos(rotY));
+    const float cosX = static_cast<float>(cos(rotX));
 
-    *((u8*)&m_weaponNodeFlags + 1) = (*((u8*)&m_weaponNodeFlags + 1) & 0xDF) | 0x20;
-    *((u8*)&m_weaponNodeFlags + 1) = (*((u8*)&m_weaponNodeFlags + 1) & 0xEF) | 0x10;
+    u8* const weaponFlagsHi = reinterpret_cast<u8*>(&m_weaponNodeFlags) + 1;
+    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 5, 26, 26));
+    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 4, 27, 27));
     m_turnFrames = static_cast<u32>(turnFrames);
-    m_moveTarget.x = static_cast<float>(sinX * cosY0);
-    m_moveTarget.y = static_cast<float>(sinY);
-    m_moveTarget.z = static_cast<float>(cosX * cosY1);
+    m_moveTarget.x = sinX * cosY0;
+    m_moveTarget.y = sinY;
+    m_moveTarget.z = cosX * cosY1;
     m_moveTimer = moveTimer;
-    *((u8*)&m_weaponNodeFlags + 1) &= 0xF7;
-    *((u8*)&m_weaponNodeFlags + 1) &= 0xFD;
-    *((u8*)&m_weaponNodeFlags + 1) &= 0xFB;
+    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 0, 3, 28, 28));
+    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 0, 1, 30, 30));
+    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 0, 2, 29, 29));
 }
 
 /*

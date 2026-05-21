@@ -212,30 +212,32 @@ void CLightPcs::create()
  */
 void CLightPcs::destroy()
 {
+    CBumpLight* light = &m_bumpLights[8];
     for (u32 i = 0; i < 8; i++) {
-        CBumpLight& light = m_bumpLights[8 + i];
-        if (light.m_textureData != 0) {
-            bool hasTexture = light.m_textureData != 0;
+        if (light->m_textureData != 0) {
+            bool hasTexture = light->m_textureData != 0;
             if (hasTexture) {
-                delete[] light.m_textureData;
-                light.m_textureData = 0;
+                delete[] light->m_textureData;
+                light->m_textureData = 0;
             }
-            light.m_hasTexture = 0;
-            light.m_useViewSpace = 0;
+            light->m_hasTexture = 0;
+            light->m_useViewSpace = 0;
         }
+        light++;
     }
 
+    light = m_bumpLights;
     for (u32 i = 0; i < 8; i++) {
-        CBumpLight& light = m_bumpLights[i];
-        if (light.m_textureData != 0) {
-            bool hasTexture = light.m_textureData != 0;
+        if (light->m_textureData != 0) {
+            bool hasTexture = light->m_textureData != 0;
             if (hasTexture) {
-                delete[] light.m_textureData;
-                light.m_textureData = 0;
+                delete[] light->m_textureData;
+                light->m_textureData = 0;
             }
-            light.m_hasTexture = 0;
-            light.m_useViewSpace = 0;
+            light->m_hasTexture = 0;
+            light->m_useViewSpace = 0;
         }
+        light++;
     }
 }
 

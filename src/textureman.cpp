@@ -642,17 +642,19 @@ void CTexture::Create(CChunkFile& chunkFile, CMemory::CStage* stage, CAmemCacheS
             break;
         case 0x494D4147:
             if (amemCacheSet != 0) {
-                u8* data = new (stage, const_cast<char*>(s_textureman_cpp_801D7974), 0x150) u8[chunk.m_size];
+                u8* data = static_cast<u8*>(_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
+                    &Memory, chunk.m_size, stage, const_cast<char*>(s_textureman_cpp_801D7974), 0x150, 0));
                 chunkFile.Get(data, chunk.m_size);
                 m_cacheId = SetData__13CAmemCacheSetFPviQ210CAmemCache4TYPEi(
                     amemCacheSet, data, chunk.m_size, static_cast<CAmemCache::TYPE>(0), cacheTag);
-                delete[] data;
+                __dl__FPv(data);
                 m_imageData = 0;
             } else {
                 if (m_usesExternalAddress != 0) {
                     m_imageData = chunkFile.GetAddress();
                 } else {
-                    m_imageData = new (stage, const_cast<char*>(s_textureman_cpp_801D7974), 0x15C) u8[chunk.m_size];
+                    m_imageData = _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
+                        &Memory, chunk.m_size, stage, const_cast<char*>(s_textureman_cpp_801D7974), 0x15C, 0);
                     chunkFile.Get(m_imageData, chunk.m_size);
                 }
                 DCFlushRange(m_imageData, chunk.m_size);
@@ -663,7 +665,8 @@ void CTexture::Create(CChunkFile& chunkFile, CMemory::CStage* stage, CAmemCacheS
             if (m_usesExternalAddress != 0) {
                 m_tlutData = chunkFile.GetAddress();
             } else {
-                m_tlutData = new (stage, const_cast<char*>(s_textureman_cpp_801D7974), 0x178) u8[chunk.m_size];
+                m_tlutData = _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
+                    &Memory, chunk.m_size, stage, const_cast<char*>(s_textureman_cpp_801D7974), 0x178, 0);
                 chunkFile.Get(m_tlutData, chunk.m_size);
             }
             DCFlushRange(m_tlutData, chunk.m_size);

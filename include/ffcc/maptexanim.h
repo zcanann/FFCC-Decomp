@@ -34,6 +34,7 @@ public:
     CMapTexAnim()
     {
         m_keyFrame.m_loop = 1;
+        m_keyFrame.m_isRun = 0;
         m_frameTable = 0;
         m_frameStep = 1.0f;
         m_currentFrame = 0.0f;

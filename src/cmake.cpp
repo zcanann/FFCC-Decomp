@@ -4,6 +4,7 @@
 #include "ffcc/fontman.h"
 #include "ffcc/game.h"
 #include "ffcc/pad.h"
+#include "ffcc/p_chara.h"
 #include "ffcc/memory.h"
 #include "ffcc/sound.h"
 #include "ffcc/system.h"
@@ -26,9 +27,6 @@ extern "C" int GetModelNo__8CMenuPcsFiii(CMenuPcs*, int, int, int);
 extern "C" float GetMaxAnimWait__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned short GetButtonRepeat__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" unsigned short GetButtonDown__8CMenuPcsFi(CMenuPcs*, int);
-extern "C" void SetMatrix__Q26CChara6CModelFPA4_f(CChara::CModel*, Mtx);
-extern "C" void CalcMatrix__Q26CChara6CModelFv(CChara::CModel*);
-extern "C" void CalcSkin__Q26CChara6CModelFv(CChara::CModel*);
 extern "C" float FLOAT_80333254;
 extern "C" float FLOAT_8033325c;
 extern "C" float FLOAT_80333260;
@@ -111,7 +109,6 @@ extern "C" void DrawWMFrame0__8CMenuPcsFif(CMenuPcs*, int, float);
 extern "C" void SetProjection__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" void SetLight__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" void RestoreProjection__8CMenuPcsFv(CMenuPcs*);
-extern "C" void Draw__Q29CCharaPcs7CHandleFi(void*, int);
 extern "C" const char* GetJobStr__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" const char* GetTribeStr__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" const char* GetHairStr__8CMenuPcsFi(CMenuPcs*, int);
@@ -162,6 +159,11 @@ static inline unsigned char& MenuU8(CMenuPcs* menu, int offset)
     return *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(menu) + offset);
 }
 
+static inline CCharaPcs::CHandle* GetCmakeCharaHandle(CMenuPcs* menu, int slot)
+{
+    return reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(menu) + 0x7F4)[slot];
+}
+
 static inline void ReleaseRefObject(void* object)
 {
     int* raw = reinterpret_cast<int*>(object);
@@ -202,8 +204,8 @@ static inline void DrawCmakePreviewCharaAlpha(CMenuPcs* menu, float alpha)
     *reinterpret_cast<unsigned short*>(modelBlock + 0x6EA) = 4;
     DrawInit__8CMenuPcsFv(menu);
 
-    int handle = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(menu) + 0x7F4 + slot * 4);
-    if (*reinterpret_cast<int*>(handle) == 3) {
+    CCharaPcs::CHandle* handle = GetCmakeCharaHandle(menu, slot);
+    if (handle->m_charaKind == 3) {
         SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcsVoid(), 0x32);
         SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(MenuPcsVoid(), 0);
         GXColor col = {0xFF, 0xFF, 0xFF, 0xFF};
@@ -215,9 +217,8 @@ static inline void DrawCmakePreviewCharaAlpha(CMenuPcs* menu, float alpha)
     } else {
         SetProjection__8CMenuPcsFi(menu, 0x16);
         SetLight__8CMenuPcsFi(menu, 2);
-        int model = *reinterpret_cast<int*>(handle + 0x168);
-        *reinterpret_cast<float*>(model + 0x9C) = alpha;
-        Draw__Q29CCharaPcs7CHandleFi(reinterpret_cast<void*>(handle), 5);
+        *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C) = alpha;
+        handle->Draw(5);
         RestoreProjection__8CMenuPcsFv(menu);
     }
 
@@ -1878,8 +1879,8 @@ void CMenuPcs::CmakeNameDraw()
         *reinterpret_cast<unsigned short*>(modelBlock + 0x6EA) = 4;
         DrawInit__8CMenuPcsFv(this);
 
-        int handle = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x7F4 + slot * 4);
-        if (*reinterpret_cast<int*>(handle) == 3) {
+        CCharaPcs::CHandle* handle = GetCmakeCharaHandle(this, slot);
+        if (handle->m_charaKind == 3) {
             SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcsVoid(), 0x32);
             SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(MenuPcsVoid(), 0);
             int previewA = static_cast<int>(static_cast<double>(FLOAT_80333240) * previewAlpha);
@@ -1892,9 +1893,8 @@ void CMenuPcs::CmakeNameDraw()
         } else {
             SetProjection__8CMenuPcsFi(this, 0x16);
             SetLight__8CMenuPcsFi(this, 2);
-            int model = *reinterpret_cast<int*>(handle + 0x168);
-            *reinterpret_cast<float*>(model + 0x9C) = previewAlpha;
-            Draw__Q29CCharaPcs7CHandleFi(reinterpret_cast<void*>(handle), 5);
+            *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C) = previewAlpha;
+            handle->Draw(5);
             RestoreProjection__8CMenuPcsFv(this);
         }
 
@@ -2088,8 +2088,8 @@ void CMenuPcs::CmakeSexDraw()
         *reinterpret_cast<unsigned short*>(modelBlock + 0x6EA) = 4;
         DrawInit__8CMenuPcsFv(this);
 
-        int handle = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x7F4 + slot * 4);
-        if (*reinterpret_cast<int*>(handle) == 3) {
+        CCharaPcs::CHandle* handle = GetCmakeCharaHandle(this, slot);
+        if (handle->m_charaKind == 3) {
             SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcsVoid(), 0x32);
             SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(MenuPcsVoid(), 0);
             GXColor previewColor = {0xFF, 0xFF, 0xFF, 0xFF};
@@ -2100,9 +2100,8 @@ void CMenuPcs::CmakeSexDraw()
         } else {
             SetProjection__8CMenuPcsFi(this, 0x16);
             SetLight__8CMenuPcsFi(this, 2);
-            int model = *reinterpret_cast<int*>(handle + 0x168);
-            *reinterpret_cast<float*>(model + 0x9C) = FLOAT_80333258;
-            Draw__Q29CCharaPcs7CHandleFi(reinterpret_cast<void*>(handle), 5);
+            *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C) = FLOAT_80333258;
+            handle->Draw(5);
             RestoreProjection__8CMenuPcsFv(this);
         }
 
@@ -2358,8 +2357,8 @@ void CMenuPcs::CmakeTribeDraw()
         *reinterpret_cast<unsigned short*>(modelBlock + 0x6EA) = 4;
         DrawInit__8CMenuPcsFv(this);
 
-        int handle = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x7F4 + slot * 4);
-        if (*reinterpret_cast<int*>(handle) == 3) {
+        CCharaPcs::CHandle* handle = GetCmakeCharaHandle(this, slot);
+        if (handle->m_charaKind == 3) {
             SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcsVoid(), 0x32);
             SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(MenuPcsVoid(), 0);
             GXColor charaColor = {0xFF, 0xFF, 0xFF, 0xFF};
@@ -2371,9 +2370,8 @@ void CMenuPcs::CmakeTribeDraw()
         } else {
             SetProjection__8CMenuPcsFi(this, 0x16);
             SetLight__8CMenuPcsFi(this, 2);
-            int model = *reinterpret_cast<int*>(handle + 0x168);
-            *reinterpret_cast<float*>(model + 0x9C) = FLOAT_80333258;
-            Draw__Q29CCharaPcs7CHandleFi(reinterpret_cast<void*>(handle), 5);
+            *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C) = FLOAT_80333258;
+            handle->Draw(5);
             RestoreProjection__8CMenuPcsFv(this);
         }
 
@@ -2693,8 +2691,8 @@ void CMenuPcs::CmakeJobDraw()
         *reinterpret_cast<unsigned short*>(modelBlock + 0x6EA) = 4;
         DrawInit__8CMenuPcsFv(this);
 
-        int handle = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x7F4 + slot * 4);
-        if (*reinterpret_cast<int*>(handle) == 3) {
+        CCharaPcs::CHandle* handle = GetCmakeCharaHandle(this, slot);
+        if (handle->m_charaKind == 3) {
             SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcsVoid(), 0x32);
             SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(MenuPcsVoid(), 0);
             GXColor charaColor = {0xFF, 0xFF, 0xFF, 0xFF};
@@ -2706,9 +2704,8 @@ void CMenuPcs::CmakeJobDraw()
         } else {
             SetProjection__8CMenuPcsFi(this, 0x16);
             SetLight__8CMenuPcsFi(this, 2);
-            int model = *reinterpret_cast<int*>(handle + 0x168);
-            *reinterpret_cast<float*>(model + 0x9C) = FLOAT_80333258;
-            Draw__Q29CCharaPcs7CHandleFi(reinterpret_cast<void*>(handle), 5);
+            *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C) = FLOAT_80333258;
+            handle->Draw(5);
             RestoreProjection__8CMenuPcsFv(this);
         }
 
@@ -2905,8 +2902,8 @@ void CMenuPcs::CmakeResultDraw()
         *reinterpret_cast<unsigned short*>(modelBlock + 0x6EA) = 4;
         DrawInit__8CMenuPcsFv(this);
 
-        int handle = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x7F4 + slot * 4);
-        if (*reinterpret_cast<int*>(handle) == 3) {
+        CCharaPcs::CHandle* handle = GetCmakeCharaHandle(this, slot);
+        if (handle->m_charaKind == 3) {
             SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcsVoid(), 0x32);
             SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(MenuPcsVoid(), 0);
             GXColor charaColor = {0xFF, 0xFF, 0xFF, 0xFF};
@@ -2918,9 +2915,8 @@ void CMenuPcs::CmakeResultDraw()
         } else {
             SetProjection__8CMenuPcsFi(this, 0x16);
             SetLight__8CMenuPcsFi(this, 2);
-            int model = *reinterpret_cast<int*>(handle + 0x168);
-            *reinterpret_cast<float*>(model + 0x9C) = FLOAT_80333258;
-            Draw__Q29CCharaPcs7CHandleFi(reinterpret_cast<void*>(handle), 5);
+            *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C) = FLOAT_80333258;
+            handle->Draw(5);
             RestoreProjection__8CMenuPcsFv(this);
         }
 
@@ -3165,8 +3161,8 @@ void CMenuPcs::CmakeResultDraw1()
         *reinterpret_cast<unsigned short*>(modelBlock + 0x6EA) = 4;
         DrawInit__8CMenuPcsFv(this);
 
-        int handle = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x7F4 + slot * 4);
-        if (*reinterpret_cast<int*>(handle) == 3) {
+        CCharaPcs::CHandle* handle = GetCmakeCharaHandle(this, slot);
+        if (handle->m_charaKind == 3) {
             SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcsVoid(), 0x32);
             SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(MenuPcsVoid(), 0);
             GXColor charaColor = {0xFF, 0xFF, 0xFF, 0xFF};
@@ -3178,9 +3174,8 @@ void CMenuPcs::CmakeResultDraw1()
         } else {
             SetProjection__8CMenuPcsFi(this, 0x16);
             SetLight__8CMenuPcsFi(this, 2);
-            int model = *reinterpret_cast<int*>(handle + 0x168);
-            *reinterpret_cast<float*>(model + 0x9C) = FLOAT_80333258;
-            Draw__Q29CCharaPcs7CHandleFi(reinterpret_cast<void*>(handle), 5);
+            *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C) = FLOAT_80333258;
+            handle->Draw(5);
             RestoreProjection__8CMenuPcsFv(this);
         }
 
@@ -3721,8 +3716,8 @@ void CMenuPcs::drawVillageMenu()
 void CMenuPcs::CalcSingleCMakeChara()
 {
     int slot = static_cast<int>(MenuS16(this, 0x86A));
-    int handle = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x7F4 + slot * 4);
-    CChara::CModel* model = *reinterpret_cast<CChara::CModel**>(reinterpret_cast<unsigned char*>(handle) + 0x168);
+    CCharaPcs::CHandle* handle = GetCmakeCharaHandle(this, slot);
+    CChara::CModel* model = handle->m_model;
     unsigned char* modelWork = reinterpret_cast<unsigned char*>(MenuS32(this, 0x814) + slot * 0x50 + 0xA00);
 
     if (model == nullptr || *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(model) + 0xB0) == 0) {
@@ -3738,7 +3733,7 @@ void CMenuPcs::CalcSingleCMakeChara()
     }
 
     *reinterpret_cast<int*>(modelWork + 0x00) = 1;
-    if (**reinterpret_cast<int**>(reinterpret_cast<unsigned char*>(this) + 0x7F4 + slot * 4) != 3) {
+    if (handle->m_charaKind != 3) {
         Mtx scaleMtx;
         Mtx rotXMtx;
         Mtx rotYMtx;
@@ -3761,9 +3756,9 @@ void CMenuPcs::CalcSingleCMakeChara()
         rotXMtx[1][3] = *reinterpret_cast<float*>(modelWork + 0x20);
         rotXMtx[2][3] = *reinterpret_cast<float*>(modelWork + 0x24);
         PSMTXConcat(rotXMtx, scaleMtx, scaleMtx);
-        SetMatrix__Q26CChara6CModelFPA4_f(model, scaleMtx);
-        CalcMatrix__Q26CChara6CModelFv(model);
-        CalcSkin__Q26CChara6CModelFv(model);
+        model->SetMatrix(scaleMtx);
+        model->CalcMatrix();
+        model->CalcSkin();
         PCAnimCtrl__8CMenuPcsFv(this);
     }
 }

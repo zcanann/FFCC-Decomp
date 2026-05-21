@@ -150,23 +150,22 @@ found_glyph:
 		}
 
 use_glyph:
-		unsigned char flags = renderFlags;
+		CFontRenderFlagBits& renderFlagBits = GetRenderFlagBits(renderFlags);
 		int drawWidth;
 		float localMargin = margin;
 		float localScaleX = scaleX;
 
-		if (GetRenderFlagBits(renderFlags).fixedWidth != 0) {
+		if (renderFlagBits.fixedWidth != 0) {
 			drawWidth = static_cast<int>(m_glyphWidth);
 		} else {
-			signed char sign = static_cast<signed char>(flags);
-			sign >>= 7;
+			signed char sign = static_cast<signed char>(renderFlagBits.shadow);
 			drawWidth = static_cast<int>(
 			    *(reinterpret_cast<unsigned char*>(glyph) +
 			      ((static_cast<unsigned int>(-static_cast<int>(sign) | static_cast<int>(sign)) >> 30 & 2) + 4)));
 		}
 
 		charWidth = localScaleX * (localMargin + static_cast<float>(drawWidth));
-		if (GetRenderFlagBits(renderFlags).snapPosition != 0) {
+		if (renderFlagBits.snapPosition != 0) {
 			charWidth = static_cast<float>(floor(charWidth));
 		}
 		goto add_width;

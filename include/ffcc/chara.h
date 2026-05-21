@@ -3,6 +3,7 @@
 
 #include "ffcc/memory.h"
 #include "ffcc/ref.h"
+#include "ffcc/vector.h"
 
 #include <dolphin/mtx.h>
 
@@ -91,7 +92,9 @@ public:
 		Mtx m_localRuntimeMtx;
 		u8 _pad44[0x28];
 		Mtx m_mtx;
-		u8 _pad9C[0x20];
+		u8 _pad9C[0x8];
+		CVector m_dynPosition;
+		CVector m_dynVel;
 		u8 m_flags;
 		u8 _padBD[3];
 	};

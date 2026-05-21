@@ -12,6 +12,7 @@
 
 #include <PowerPC_EABI_Support/Runtime/MWCPlusLib.h>
 #include <PowerPC_EABI_Support/Runtime/New.h>
+#include <PowerPC_EABI_Support/Runtime/MWCPlusLib.h>
 #include <dolphin/gx.h>
 #include <dolphin/os/OSCache.h>
 #include <dolphin/vi.h>

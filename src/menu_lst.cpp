@@ -42,28 +42,6 @@ extern const double DOUBLE_80333410;
 extern const double DOUBLE_80333418;
 extern const double DOUBLE_80333420;
 
-extern "C" const float FLOAT_80333614 = 196.0f;
-extern "C" const float FLOAT_80333618 = 168.0f;
-extern "C" const float FLOAT_8033361C = 24.0f;
-extern "C" const float FLOAT_80333620 = 20.0f;
-extern "C" const float FLOAT_80333624 = 16.0f;
-extern "C" const float FLOAT_80333628 = 564.0f;
-extern "C" const float FLOAT_8033362C = 0.07692308f;
-extern "C" const float FLOAT_80333630 = 6.923077f;
-extern "C" const float FLOAT_80333634 = 4.0f;
-extern "C" const unsigned int DOUBLE_80333638[2] = {0x43300000, 0x00000000};
-extern "C" const unsigned int DOUBLE_80333640[2] = {0x43300000, 0x80000000};
-extern "C" const float kOptionOpenAnimStep = 0.04f;
-extern "C" const float kOptionColumnAnimStep = 0.2f;
-extern "C" const float kOptionVolumeScale = 10.583333f;
-extern "C" const float FLOAT_80333654 = 25.0f;
-extern "C" const char DAT_80333658[4] = "";
-extern "C" const char DAT_8033365c[] = "%s";
-extern "C" const char DAT_80333660[] = "+1";
-extern "C" const char DAT_80333664[] = "%c%d";
-extern "C" const char DAT_8033366c[] = " ";
-extern "C" const char DAT_80333670[] = " %d";
-
 STATIC_ASSERT(offsetof(CMenuPcs, listFont) == 0x108);
 STATIC_ASSERT(offsetof(CMenuPcs, helpFont) == 0xF8);
 STATIC_ASSERT(offsetof(CMenuPcs, lstState) == 0x82C);

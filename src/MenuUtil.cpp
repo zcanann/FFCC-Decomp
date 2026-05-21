@@ -26,16 +26,29 @@ extern u32 DAT_801e36d0;
 extern u32 DAT_801e36d4;
 extern u32 DAT_801e36d8;
 extern u32 DAT_801e36dc;
-extern float FLOAT_80333654;
-extern float FLOAT_80333620;
+extern "C" const float FLOAT_80333614 = 196.0f;
+extern "C" const float FLOAT_80333618 = 168.0f;
+extern "C" const float FLOAT_8033361C = 24.0f;
+extern "C" const float FLOAT_80333620 = 20.0f;
+extern "C" const float FLOAT_80333624 = 16.0f;
+extern "C" const float FLOAT_80333628 = 564.0f;
+extern "C" const float FLOAT_8033362C = 0.07692308f;
+extern "C" const float FLOAT_80333630 = 6.923077f;
+extern "C" const float FLOAT_80333634 = 4.0f;
+extern "C" const unsigned int DOUBLE_80333638[2] = {0x43300000, 0x00000000};
+extern "C" const unsigned int DOUBLE_80333640[2] = {0x43300000, 0x80000000};
+extern "C" const float kOptionOpenAnimStep = 0.04f;
+extern "C" const float kOptionColumnAnimStep = 0.2f;
+extern "C" const float kOptionVolumeScale = 10.583333f;
+extern "C" const float FLOAT_80333654 = 25.0f;
 extern float FLOAT_8033357c;
 extern float FLOAT_803335a0;
-extern char DAT_80333658[];
-extern char DAT_8033365c[];
-extern char DAT_80333660[];
-extern char DAT_80333664[];
-extern char DAT_8033366c[];
-extern char DAT_80333670[];
+extern "C" const char DAT_80333658[4] = "";
+extern "C" const char DAT_8033365c[] = "%s";
+extern "C" const char DAT_80333660[] = "+1";
+extern "C" const char DAT_80333664[] = "%c%d";
+extern "C" const char DAT_8033366c[] = " ";
+extern "C" const char DAT_80333670[] = " %d";
 extern char lbl_80333674[];
 extern char lbl_8033367C[];
 extern char s_Strength_801E30A4[];
@@ -664,7 +677,6 @@ void CMenuPcs::GetOptionData()
 	signed char& stereoMode = *reinterpret_cast<signed char*>(self + 0x90);
 	signed char& bgmVolume = *reinterpret_cast<signed char*>(self + 0x91);
 	signed char& seVolume = *reinterpret_cast<signed char*>(self + 0x92);
-	signed char* const specialModeFlags = reinterpret_cast<signed char*>(self + 0xB5);
 
 	gameInitMode =
 	    static_cast<signed char>(static_cast<unsigned int>(__cntlzw(static_cast<unsigned int>(Game.m_gameWork.m_gameInitFlag))) >> 5);
@@ -680,13 +692,13 @@ void CMenuPcs::GetOptionData()
 	seVolume = static_cast<signed char>(value / 10);
 
 	unsigned int flag = Game.m_gameWork.m_spModeFlags[0];
-	specialModeFlags[0] = static_cast<signed char>((-flag | flag) >> 31);
+	m_specialModeFlags[0] = static_cast<signed char>((-flag | flag) >> 31);
 	flag = Game.m_gameWork.m_spModeFlags[1];
-	specialModeFlags[1] = static_cast<signed char>((-flag | flag) >> 31);
+	m_specialModeFlags[1] = static_cast<signed char>((-flag | flag) >> 31);
 	flag = Game.m_gameWork.m_spModeFlags[2];
-	specialModeFlags[2] = static_cast<signed char>((-flag | flag) >> 31);
+	m_specialModeFlags[2] = static_cast<signed char>((-flag | flag) >> 31);
 	flag = Game.m_gameWork.m_spModeFlags[3];
-	specialModeFlags[3] = static_cast<signed char>((-flag | flag) >> 31);
+	m_specialModeFlags[3] = static_cast<signed char>((-flag | flag) >> 31);
 }
 
 /*
@@ -721,7 +733,6 @@ void CMenuPcs::CalcOptionMenu()
 	signed char& rightHintTimer = *reinterpret_cast<signed char*>(self + 0x94);
 	int& specialModeEdit = *reinterpret_cast<int*>(self + 0xB0);
 	signed char& specialModeCursor = *reinterpret_cast<signed char*>(self + 0xB4);
-	signed char* const specialModeFlags = reinterpret_cast<signed char*>(self + 0xB5);
 
 	if (menuState == 0) {
 		openAnim += kOptionOpenAnimStep;
@@ -852,9 +863,9 @@ void CMenuPcs::CalcOptionMenu()
 			}
 		} else if (optionIndex == 4) {
 			if (specialModeEdit != 0) {
-				specialModeFlags[static_cast<signed char>(specialModeCursor)]--;
-				if (specialModeFlags[static_cast<signed char>(specialModeCursor)] < 0) {
-					specialModeFlags[static_cast<signed char>(specialModeCursor)] = 1;
+				m_specialModeFlags[static_cast<signed char>(specialModeCursor)]--;
+				if (m_specialModeFlags[static_cast<signed char>(specialModeCursor)] < 0) {
+					m_specialModeFlags[static_cast<signed char>(specialModeCursor)] = 1;
 				}
 			}
 		} else if (optionIndex == 3) {
@@ -890,9 +901,9 @@ void CMenuPcs::CalcOptionMenu()
 			}
 		} else if (optionIndex == 4) {
 			if (specialModeEdit != 0) {
-				specialModeFlags[static_cast<signed char>(specialModeCursor)]++;
-				if (specialModeFlags[static_cast<signed char>(specialModeCursor)] > 1) {
-					specialModeFlags[static_cast<signed char>(specialModeCursor)] = 0;
+				m_specialModeFlags[static_cast<signed char>(specialModeCursor)]++;
+				if (m_specialModeFlags[static_cast<signed char>(specialModeCursor)] > 1) {
+					m_specialModeFlags[static_cast<signed char>(specialModeCursor)] = 0;
 				}
 			}
 		} else if (optionIndex == 3) {
@@ -928,13 +939,13 @@ void CMenuPcs::CalcOptionMenu()
 				Sound.PlaySe(3, 0x40, 0x7F, 0);
 
 				Game.m_gameWork.m_spModeFlags[0] =
-				    static_cast<unsigned char>(static_cast<unsigned int>(__cntlzw(1 - specialModeFlags[0])) >> 5);
+				    static_cast<unsigned char>(static_cast<unsigned int>(__cntlzw(1 - m_specialModeFlags[0])) >> 5);
 				Game.m_gameWork.m_spModeFlags[1] =
-				    static_cast<unsigned char>(static_cast<unsigned int>(__cntlzw(1 - specialModeFlags[1])) >> 5);
+				    static_cast<unsigned char>(static_cast<unsigned int>(__cntlzw(1 - m_specialModeFlags[1])) >> 5);
 				Game.m_gameWork.m_spModeFlags[2] =
-				    static_cast<unsigned char>(static_cast<unsigned int>(__cntlzw(1 - specialModeFlags[2])) >> 5);
+				    static_cast<unsigned char>(static_cast<unsigned int>(__cntlzw(1 - m_specialModeFlags[2])) >> 5);
 				Game.m_gameWork.m_spModeFlags[3] =
-				    static_cast<unsigned char>(static_cast<unsigned int>(__cntlzw(1 - specialModeFlags[3])) >> 5);
+				    static_cast<unsigned char>(static_cast<unsigned int>(__cntlzw(1 - m_specialModeFlags[3])) >> 5);
 			} else if ((press & 8) != 0) {
 				specialModeCursor--;
 				if (specialModeCursor < 0) {

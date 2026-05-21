@@ -274,7 +274,7 @@ void CGame::Init()
 
     CameraPcs.Init();
     GraphicPcs.Init();
-    gChara.Init();
+    Chara.Init();
     LightPcs.Init();
     CharaPcs.Init();
     MapPcs.Init();
@@ -283,7 +283,7 @@ void CGame::Init()
     USBPcs.Init();
     MenuPcs.Init();
     GbaPcs.Init();
-    GetMcPcsSingleton()->Init();
+    McPcs.Init();
     DbgMenuPcs.Init();
 
     m_mainStage = Memory.CreateStage(0x106000, const_cast<char*>(s_GameStageName_8032F6B4), 0);
@@ -320,7 +320,7 @@ void CGame::Quit()
 
 	Memory.DestroyStage(m_mainStage);
 	DbgMenuPcs.Quit();
-	GetMcPcsSingleton()->Quit();
+	McPcs.Quit();
 	GbaPcs.Quit();
 	MenuPcs.Quit();
 	USBPcs.Quit();
@@ -408,7 +408,7 @@ void CGame::Exec()
 			AddScenegraph__7CSystemFP8CProcessi(&System, &PartPcs, 0);
 			AddScenegraph__7CSystemFP8CProcessi(&System, &GbaPcs, 0);
 			AddScenegraph__7CSystemFP8CProcessi(&System, &DbgMenuPcs, 0);
-			AddScenegraph__7CSystemFP8CProcessi(&System, GetMcPcsSingleton(), 0);
+			AddScenegraph__7CSystemFP8CProcessi(&System, &McPcs, 0);
 			AddScenegraph__7CSystemFP8CProcessi(&System, &SoundPcs, 0);
 			break;
 		case 5:
@@ -444,7 +444,7 @@ void CGame::Exec()
 			break;
 		case 4:
 			RemoveScenegraph__7CSystemFP8CProcessi(&System, &SoundPcs, 0);
-			RemoveScenegraph__7CSystemFP8CProcessi(&System, GetMcPcsSingleton(), 0);
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, &McPcs, 0);
 			RemoveScenegraph__7CSystemFP8CProcessi(&System, &CameraPcs, 0);
 			RemoveScenegraph__7CSystemFP8CProcessi(&System, &CameraPcs, 6);
 			RemoveScenegraph__7CSystemFP8CProcessi(&System, &MapPcs, 0);
@@ -805,7 +805,7 @@ void CGame::CheckScriptChange()
  */
 void CGame::ChangeMap(int mapId, int mapVariant, int param4, int param5)
 {
-    u32 hasParamMask;
+    int hasParamMask;
 
     if (param5 != 0) {
         Graphic._WaitDrawDone(const_cast<char*>(s_game_cpp_801d6190), 0x24E);
@@ -813,19 +813,18 @@ void CGame::ChangeMap(int mapId, int mapVariant, int param4, int param5)
 
         m_currentMapId = mapId;
         m_currentMapVariantId = mapVariant;
-        hasParamMask = (u32)((-param4 | param4) >> 31);
+        hasParamMask = (-param4 | param4) >> 31;
 
         MapPcs.LoadMap(
             mapId, mapVariant, (void*)(hasParamMask & 0x800000), hasParamMask & 0x580000, 0);
 
-        hasParamMask = (u32)((-param4 | param4) >> 31);
         PartPcs.LoadFieldPdt(
             mapId, mapVariant, (void*)(hasParamMask & 0xD80000), hasParamMask & 0x80000, 0);
 
         System.MapChanged(mapId, mapVariant, 1);
     } else {
         u8 loadStep = param4;
-        hasParamMask = (u32)((-param4 | param4) >> 31);
+        hasParamMask = (-param4 | param4) >> 31;
         MapPcs.LoadMap(
             mapId, mapVariant, (void*)(hasParamMask & 0x800000), hasParamMask & 0x580000, loadStep);
 
@@ -1108,14 +1107,19 @@ void CGame::LoadInit()
  */
 void CGame::LoadScript(char* scriptData)
 {
-    int scriptOffset = 0;
+    u8* flat = CFlat;
+    int i = 0;
     int entryOffset = 0;
 
-    for (int i = 0; i < *(int*)(CFlat + 4); i++, entryOffset += 4) {
-        if ((*(u8*)(*(int*)(CFlat + 8) + entryOffset + 1) & 0x20) != 0) {
-            *(u32*)(*(int*)(CFlat + 12) + entryOffset) = *(u32*)(scriptData + scriptOffset);
-            scriptOffset += 4;
+    while (i < *(int*)(flat + 4)) {
+        if ((*(u8*)(*(int*)(flat + 8) + entryOffset + 1) & 0x20) != 0) {
+            u32* src = reinterpret_cast<u32*>(scriptData);
+            scriptData += 4;
+            *(u32*)(*(int*)(flat + 12) + entryOffset) = *src;
         }
+
+        entryOffset += 4;
+        i++;
     }
 }
 

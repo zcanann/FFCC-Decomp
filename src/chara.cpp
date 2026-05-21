@@ -2424,18 +2424,17 @@ int CChara::CModel::GetDispIndex(CChara::CNode* node)
  */
 CChara::CNode::CNode()
 {
-	new (reinterpret_cast<void*>((u8*)this + 0xA4)) CVector;
-	new (reinterpret_cast<void*>((u8*)this + 0xB0)) CVector;
+	struct Flags {
+		u8 active : 1;
+		u8 _pad : 7;
+	};
+	int active = 1;
+
 	*(u32*)((u8*)this + 0x0) = 0;
 	*(u32*)((u8*)this + 0x4) = 0;
 	*(u32*)((u8*)this + 0x9C) = 0;
 	*(u32*)((u8*)this + 0xA0) = 0;
-	static const u8 clearMask = 0x7F;
-	static const u8 setMask = 0x80;
-	u8 flags = *(u8*)((u8*)this + 0xBC);
-	flags &= clearMask;
-	flags |= setMask;
-	*(u8*)((u8*)this + 0xBC) = flags;
+	reinterpret_cast<Flags*>(&m_flags)->active = active;
 }
 
 /*
@@ -3084,31 +3083,31 @@ CChara::CMesh::CRefData::~CRefData()
 	CCharaMeshRefRaw* ref = reinterpret_cast<CCharaMeshRefRaw*>(this);
 
 	if (ref->m_vertices != 0) {
-		operator delete(ref->m_vertices);
+		operator delete[](ref->m_vertices);
 		ref->m_vertices = 0;
 	}
 	if (ref->m_normals != 0) {
-		operator delete(ref->m_normals);
+		operator delete[](ref->m_normals);
 		ref->m_normals = 0;
 	}
 	if (ref->m_colors != 0) {
-		operator delete(ref->m_colors);
+		operator delete[](ref->m_colors);
 		ref->m_colors = 0;
 	}
 	if (ref->m_uvs != 0) {
-		operator delete(ref->m_uvs);
+		operator delete[](ref->m_uvs);
 		ref->m_uvs = 0;
 	}
 	if (ref->m_oneWeightData != 0) {
-		operator delete(ref->m_oneWeightData);
+		operator delete[](ref->m_oneWeightData);
 		ref->m_oneWeightData = 0;
 	}
 	if (ref->m_twoWeightData != 0) {
-		operator delete(ref->m_twoWeightData);
+		operator delete[](ref->m_twoWeightData);
 		ref->m_twoWeightData = 0;
 	}
 	if (ref->m_threeWeightData != 0) {
-		operator delete(ref->m_threeWeightData);
+		operator delete[](ref->m_threeWeightData);
 		ref->m_threeWeightData = 0;
 	}
 	if (ref->m_displayLists != 0) {
@@ -3150,7 +3149,7 @@ CChara::CMesh::CDisplayList::~CDisplayList()
 {
 	void** data = (void**)((u8*)this + 4);
 	if (data[0] != 0) {
-		operator delete(data[0]);
+		operator delete[](data[0]);
 		data[0] = 0;
 	}
 }

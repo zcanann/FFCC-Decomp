@@ -358,7 +358,7 @@ inline CSound::CSound()
     unsigned char* sound = reinterpret_cast<unsigned char*>(this);
 
     __ct__9CRedSoundFv(sound + 8);
-    __construct_array(sound + 0x142C, (ConstructorDestructor)__ct__9CLine, 0, 0x1cc, 8);
+    __construct_array(sound + 0x142C, reinterpret_cast<ConstructorDestructor>(__ct__9CLine), 0, 0x1cc, 8);
 }
 
 /*

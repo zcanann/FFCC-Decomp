@@ -176,6 +176,7 @@ public:
 
 	class CMesh : public CRef
 	{
+	public:
 		CMesh();
 		~CMesh();
 

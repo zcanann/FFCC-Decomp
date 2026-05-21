@@ -23,12 +23,7 @@ extern "C" void Create__Q26CChara5CNodeFR10CChunkFilePQ26CChara6CModelQ36CChara5
     void*, CChunkFile&, void*, int, CMemory::CStage*);
 extern "C" void Create__Q26CChara5CMeshFPQ26CChara6CModelR10CChunkFilePQ27CMemory6CStage(
     void*, void*, CChunkFile&, CMemory::CStage*);
-extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" CMemory::CStage* CreateStage__7CMemoryFUlPci(CMemory*, unsigned long, char*, int);
-extern "C" void __ct__Q26CChara5CNodeFv(void*);
-extern "C" void __dt__Q26CChara5CNodeFv(void*, int);
-extern "C" void __ct__Q26CChara5CMeshFv(void*);
-extern "C" void __dt__Q26CChara5CMeshFv(void*, int);
 extern "C" void __dt__Q36CChara5CNode8CRefDataFv(void*, int);
 extern "C" void __dt__Q36CChara5CMesh8CRefDataFv(void*, int);
 extern "C" void __dt__Q36CChara5CMesh12CDisplayListFv(void*, int);
@@ -879,13 +874,13 @@ CChara::CModel::~CModel()
 
 	void*& nodes = *reinterpret_cast<void**>((u8*)this + 0xA8);
 	if (nodes != 0) {
-		__destroy_new_array(nodes, reinterpret_cast<ConstructorDestructor>(__dt__Q26CChara5CNodeFv));
+		delete[] static_cast<CChara::CNode*>(nodes);
 		nodes = 0;
 	}
 
 	void*& meshes = *reinterpret_cast<void**>((u8*)this + 0xAC);
 	if (meshes != 0) {
-		__destroy_new_array(meshes, reinterpret_cast<ConstructorDestructor>(__dt__Q26CChara5CMeshFv));
+		delete[] static_cast<CChara::CMesh*>(meshes);
 		meshes = 0;
 	}
 }
@@ -1249,11 +1244,7 @@ CChara::CModel* CChara::CModel::Duplicate(CMemory::CStage* stage)
 	RetainRefCounted(ModelRef(clone));
 
 	const u16 nodeCount = ModelNodeCount(this);
-	void* nodeBlock = __nwa__FUlPQ27CMemory6CStagePci(
-	    static_cast<unsigned long>(nodeCount) * 0xC0 + 0x10, stage, const_cast<char*>("chara.cpp"), 0x263);
-	CChara::CNode* cloneNodes = reinterpret_cast<CChara::CNode*>(__construct_new_array(
-	    nodeBlock, reinterpret_cast<ConstructorDestructor>(__ct__Q26CChara5CNodeFv),
-	    reinterpret_cast<ConstructorDestructor>(__dt__Q26CChara5CNodeFv), 0xC0, nodeCount));
+	CChara::CNode* cloneNodes = new (stage, const_cast<char*>("chara.cpp"), 0x263) CChara::CNode[nodeCount];
 	*reinterpret_cast<CChara::CNode**>(ModelRaw(clone) + 0xA8) = cloneNodes;
 	for (u32 i = 0; i < nodeCount; i++) {
 		CChara::CNode* dst = &cloneNodes[i];
@@ -1271,11 +1262,7 @@ CChara::CModel* CChara::CModel::Duplicate(CMemory::CStage* stage)
 	}
 
 	const u16 meshCount = ModelMeshCount(this);
-	void* meshBlock = __nwa__FUlPQ27CMemory6CStagePci(
-	    static_cast<unsigned long>(meshCount) * 0x14 + 0x10, stage, const_cast<char*>("chara.cpp"), 0x26C);
-	CChara::CMesh* cloneMeshes = reinterpret_cast<CChara::CMesh*>(__construct_new_array(
-	    meshBlock, reinterpret_cast<ConstructorDestructor>(__ct__Q26CChara5CMeshFv),
-	    reinterpret_cast<ConstructorDestructor>(__dt__Q26CChara5CMeshFv), 0x14, meshCount));
+	CChara::CMesh* cloneMeshes = new (stage, const_cast<char*>("chara.cpp"), 0x26C) CChara::CMesh[meshCount];
 	*reinterpret_cast<CChara::CMesh**>(ModelRaw(clone) + 0xAC) = cloneMeshes;
 	for (u32 i = 0; i < meshCount; i++) {
 		CChara::CMesh* dst = &cloneMeshes[i];

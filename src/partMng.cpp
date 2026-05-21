@@ -1262,7 +1262,7 @@ unsigned int CPartMng::pppReadRsd(CChunkFile& chunkFile, pppModelSt* modelSt)
  */
 void CPartMng::pppReadShp(CChunkFile& chunkFile, pppShapeSt* shapeSt)
 {
-	char* textureNames[20];
+	char* textureNames[0x101];
 	char** textureNameIt = textureNames;
 	CChunkFile::CChunk chunk;
 	CMemory::CStage* stageLoad =

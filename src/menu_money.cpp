@@ -67,9 +67,9 @@ STATIC_ASSERT(offsetof(MoneyMenuState, selectedIndex) == 0x26);
 STATIC_ASSERT(offsetof(MoneyMenuState, subMenuIndex) == 0x28);
 STATIC_ASSERT(offsetof(MoneyMenuState, mode) == 0x30);
 STATIC_ASSERT(offsetof(MoneyMenuState, prevMode) == 0x32);
-STATIC_ASSERT(offsetof(MoneyMenuAnim, alpha) == 0x8);
-STATIC_ASSERT(offsetof(MoneyMenuAnim, scale) == 0xC);
-STATIC_ASSERT(offsetof(MoneyMenuAnim, progress) == 0x10);
+STATIC_ASSERT(offsetof(MoneyMenuAnim, u) == 0x8);
+STATIC_ASSERT(offsetof(MoneyMenuAnim, v) == 0xC);
+STATIC_ASSERT(offsetof(MoneyMenuAnim, alpha) == 0x10);
 STATIC_ASSERT(offsetof(MoneyMenuAnim, uvScale) == 0x14);
 STATIC_ASSERT(offsetof(MoneyMenuAnim, unk18) == 0x18);
 STATIC_ASSERT(offsetof(MoneyMenuAnim, tex) == 0x1C);
@@ -397,28 +397,28 @@ void CMenuPcs::MoneyDraw()
 
 	s16 selectionState = this->moneyState->listState;
 	s16 mode = this->moneyState->mode;
-	s16* entry = reinterpret_cast<s16*>(this->moneyPanel->anims);
+	MoneyMenuAnim* entry = this->moneyPanel->anims;
 
-	for (int i = 0; i < this->moneyPanel->count; i++, entry += 0x20) {
-		int tex = *(int*)(entry + 0xE);
+	for (int i = 0; i < this->moneyPanel->count; i++, entry++) {
+		int tex = entry->tex;
 		if (tex < 0) {
 			continue;
 		}
 
-		float x = (float)entry[0];
-		float y = (float)entry[1];
-		float w = (float)entry[2];
-		float h = (float)entry[3];
-		float u = *(float*)(entry + 4);
-		float v = *(float*)(entry + 6);
+		float x = (float)entry->x;
+		float y = (float)entry->y;
+		float w = (float)entry->w;
+		float h = (float)entry->h;
+		float u = entry->u;
+		float v = entry->v;
 		SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, tex);
 		GXColor color;
 		color.r = 0xFF;
 		color.g = 0xFF;
 		color.b = 0xFF;
-		color.a = (u8)(LOCAL_FLOAT_80332f60 * *(float*)(entry + 8));
+		color.a = (u8)(LOCAL_FLOAT_80332f60 * entry->alpha);
 		GXSetChanMatColor(GX_COLOR0A0, color);
-		float uvScale = *(float*)(entry + 10);
+		float uvScale = entry->uvScale;
 		DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 0, x, y, w, h, u, v, uvScale, uvScale, LOCAL_FLOAT_80332f64);
 	}
 
@@ -515,38 +515,36 @@ void CMenuPcs::MoneyDraw()
  */
 int CMenuPcs::MoneyClose()
 {
-	int finished;
-	int count;
-	int frame;
-	MoneyMenuAnim* anim;
-
-	finished = 0;
 	this->moneyState->frame++;
 
-	count = this->moneyPanel->count;
-	anim = this->moneyPanel->anims;
-	frame = this->moneyState->frame;
+	MoneyMenuAnimList* panel = this->moneyPanel;
+	MoneyMenuAnim* anim = panel->anims;
+	int finished = 0;
+	int count = panel->count;
+	int frame = this->moneyState->frame;
 
 	for (int i = 0; i < count; i++, anim++) {
-		if (!(frame < anim->startFrame)) {
-			if (anim->startFrame + anim->duration <= frame) {
-				float zero = FLOAT_80332f64;
-				finished++;
-				anim->progress = FLOAT_80332f64;
-				anim->dx = zero;
-				anim->dy = zero;
-			} else {
-				anim->frame++;
-				double one = DOUBLE_80332F90;
-				anim->progress =
-					(float)-((DOUBLE_80332F90 / (double)anim->duration) * (double)anim->frame - DOUBLE_80332F90);
-				if ((anim->flags & 2) == 0) {
-					float ratio = (float)-((one / (double)anim->duration) * (double)anim->frame - one);
-					float dx = (anim->targetX - (float)anim->x) * ratio;
-					float dy = (anim->targetY - (float)anim->y) * ratio;
-					anim->dx = dx;
-					anim->dy = dy;
-				}
+		if (frame < anim->startFrame) {
+			continue;
+		}
+
+		if (anim->startFrame + anim->duration <= frame) {
+			float zero = FLOAT_80332f64;
+			finished++;
+			anim->alpha = zero;
+			anim->dx = zero;
+			anim->dy = zero;
+		} else {
+			anim->frame++;
+			double one = DOUBLE_80332F90;
+			anim->alpha =
+				(float)-((DOUBLE_80332F90 / (double)anim->duration) * (double)anim->frame - DOUBLE_80332F90);
+			if ((anim->flags & 2) == 0) {
+				float ratio = (float)-((one / (double)anim->duration) * (double)anim->frame - one);
+				float dx = anim->targetX - (float)anim->x;
+				float dy = anim->targetY - (float)anim->y;
+				anim->dx = dx * ratio;
+				anim->dy = dy * ratio;
 			}
 		}
 	}
@@ -593,7 +591,7 @@ int CMenuPcs::MoneyCtrl()
 
 	if (result != 0) {
 		MoneyMenuAnim* anim = this->moneyPanel->anims;
-		anim->progress = FLOAT_80332f70;
+		anim->alpha = FLOAT_80332f70;
 		anim->startFrame = 0;
 		anim->duration = 10;
 		anim->frame = 0;
@@ -639,8 +637,8 @@ bool CMenuPcs::MoneyOpen()
 		firstAnim->h = 0x88;
 		firstAnim->x =
 			static_cast<short>(static_cast<int>(DOUBLE_80332F98 - (double)firstAnim->w * DOUBLE_80332FA0));
-		firstAnim->alpha = FLOAT_80332f64;
-		firstAnim->scale = FLOAT_80332f64;
+		firstAnim->u = FLOAT_80332f64;
+		firstAnim->v = FLOAT_80332f64;
 		firstAnim->uvScale = FLOAT_80332f70;
 		firstAnim->flags = 0;
 		firstAnim->duration = 10;
@@ -689,42 +687,39 @@ bool CMenuPcs::MoneyOpen()
 		this->moneyState->initialized = 1;
 	}
 
-	int iVar15 = 0;
-	this->moneyState->frame = this->moneyState->frame + 1;
-	int iVar12 = (int)this->moneyPanel->count;
-	short* psVar11 = reinterpret_cast<short*>(this->moneyPanel->anims);
-	int iVar7 = (int)this->moneyState->frame;
-	int iVar8 = iVar12;
-	if (0 < iVar12) {
-		do {
-			if (!(iVar7 < *(int *)(psVar11 + 0x12))) {
-				if (*(int *)(psVar11 + 0x12) + *(int *)(psVar11 + 0x14) <= iVar7) {
-					iVar15 = iVar15 + 1;
-					*(float *)(psVar11 + 8) = FLOAT_80332f70;
-					*(float *)(psVar11 + 0x18) = FLOAT_80332f64;
-					*(float *)(psVar11 + 0x1a) = FLOAT_80332f64;
-				} else {
-					*(int *)(psVar11 + 0x10) = *(int *)(psVar11 + 0x10) + 1;
-					float fVar1 = (float)((DOUBLE_80332F90 / (double)*(int *)(psVar11 + 0x14)) *
-					                      (double)*(int *)(psVar11 + 0x10));
-					*(float *)(psVar11 + 8) = fVar1;
-					if ((*(unsigned int *)(psVar11 + 0x16) & 2) == 0) {
-						float t = (float)((DOUBLE_80332F90 / (double)*(int *)(psVar11 + 0x14)) *
-						                  (double)*(int *)(psVar11 + 0x10));
-						float dx = *(float *)(psVar11 + 0x1c) - static_cast<float>(*psVar11);
-						float dy = *(float *)(psVar11 + 0x1e) - static_cast<float>(psVar11[1]);
-						*(float *)(psVar11 + 0x18) = dx * t;
-						*(float *)(psVar11 + 0x1a) = dy * t;
-					}
+	this->moneyState->frame++;
+
+	MoneyMenuAnimList* panel = this->moneyPanel;
+	MoneyMenuAnim* anim = panel->anims;
+	int finished = 0;
+	int count = panel->count;
+	int frame = this->moneyState->frame;
+
+	for (int i = 0; i < count; i++, anim++) {
+		if (frame >= anim->startFrame) {
+			if (anim->startFrame + anim->duration <= frame) {
+				finished++;
+				anim->alpha = FLOAT_80332f70;
+				anim->dx = FLOAT_80332f64;
+				anim->dy = FLOAT_80332f64;
+			} else {
+				anim->frame++;
+				double one = DOUBLE_80332F90;
+				anim->alpha = (float)((DOUBLE_80332F90 / (double)anim->duration) * (double)anim->frame);
+				if ((anim->flags & 2) == 0) {
+					float ratio = (float)((one / (double)anim->duration) * (double)anim->frame);
+					float dx = anim->targetX - (float)anim->x;
+					float dy = anim->targetY - (float)anim->y;
+					anim->dx = dx * ratio;
+					anim->dy = dy * ratio;
 				}
 			}
-			psVar11 = psVar11 + 0x20;
-			iVar8 = iVar8 + -1;
-		} while (iVar8 != 0);
+		}
 	}
 
-	if (iVar12 == iVar15) {
-		return true;
+	bool opened = false;
+	if (count == finished) {
+		opened = true;
 	}
-	return false;
+	return opened;
 }

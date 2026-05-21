@@ -133,7 +133,7 @@ unsigned int m_table_desc21__10CCameraPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<
 unsigned int m_table_desc22__10CCameraPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawShadowEnd__10CCameraPcsFv)};
 unsigned int m_table_desc23__10CCameraPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawShadowChrBegin__10CCameraPcsFv)};
 unsigned int m_table_desc24__10CCameraPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawShadowEndAll__10CCameraPcsFv)};
-unsigned int PTR_s_CCameraPcs_GAME__801e915c[7][0x15C / sizeof(unsigned int)] = {
+unsigned int m_table__10CCameraPcs[7][0x15C / sizeof(unsigned int)] = {
     {reinterpret_cast<unsigned int>(const_cast<char*>(s_CCameraPcs_GAME_801D7860)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x18, 0x4, 0, 0, 0, 0x3D, 0x1},
     {reinterpret_cast<unsigned int>(const_cast<char*>(s_CCameraPcs_CHARA_801D7874)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x18, 0x4},
     {reinterpret_cast<unsigned int>(const_cast<char*>(s_CCameraPcs_MAP_801D7888)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x18, 0x4},
@@ -190,7 +190,7 @@ static inline void CopyCameraState(u8* dst, u8* src)
 extern "C" void __sinit_p_camera_cpp(void)
 {
     u8* self = reinterpret_cast<u8*>(&CameraPcs);
-    unsigned int* dst = &PTR_s_CCameraPcs_GAME__801e915c[0][0];
+    unsigned int* dst = &m_table__10CCameraPcs[0][0];
 
     *reinterpret_cast<void**>(self) = __vt__8CManager;
     *reinterpret_cast<void**>(self) = __vt__8CProcess;
@@ -321,7 +321,7 @@ void CCameraPcs::Quit()
  */
 int CCameraPcs::GetTable(unsigned long tableIndex)
 {
-	return reinterpret_cast<int>(PTR_s_CCameraPcs_GAME__801e915c[tableIndex]);
+	return reinterpret_cast<int>(m_table__10CCameraPcs[tableIndex]);
 }
 
 /*

@@ -26,11 +26,7 @@ extern const float FLOAT_80330668;
 extern "C" void pppNormalize__FR3Vec3Vec(float*, Vec*);
 extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void*);
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
-extern "C" void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-    void*, void*, float, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char,
-    unsigned char);
 extern "C" void pppSetBlendMode(unsigned char);
-extern "C" void pppDrawShp__FPlsP12CMaterialSetUc(long*, short, CMaterialSet*, unsigned char);
 extern "C" const char s_pppYmMiasma_cpp_801D9CA8[] = "pppYmMiasma.cpp";
 
 struct PARTICLE_DATA : _PARTICLE_DATA {};
@@ -195,7 +191,7 @@ void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, YmMiasmaRenderStep* step, pppY
             model.value[1][3] = worldPos.y;
             model.value[2][3] = worldPos.z;
 
-            pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
+            pppSetDrawEnv(
                 0, &model, FLOAT_80330644, step->m_drawEnvB, step->m_drawEnvA, step->m_blendMode, 0, 1, 1, 0);
 
             amb.r = state->m_color.m_r;
@@ -204,8 +200,7 @@ void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, YmMiasmaRenderStep* step, pppY
             amb.a = state->m_color.m_a;
             GXSetChanAmbColor(GX_COLOR0A0, amb);
             pppSetBlendMode(step->m_blendMode);
-            pppDrawShp__FPlsP12CMaterialSetUc(
-                *shape, state->m_shapeDrawFrame, pppEnvStPtr->m_materialSetPtr, step->m_blendMode);
+            pppDrawShp(*shape, state->m_shapeDrawFrame, pppEnvStPtr->m_materialSetPtr, step->m_blendMode);
         }
 
         particleData = (PARTICLE_DATA*)((u8*)particleData + 0x50);

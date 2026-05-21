@@ -9,8 +9,6 @@
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h"
 #include <PowerPC_EABI_Support/Runtime/New.h>
 
-extern "C" void Calc__8CMapAnimFl(CMapAnim*, long);
-
 static const char s_mapanim_cpp[] = "mapanim.cpp";
 static const char s_ptrarray_grow_error[] =
     "\x83\x6F\x83\x62\x83\x74\x83\x40\x90\xAC\x92\xB7\x82\xAA\x95\x73\x8B\x96\x89\xC2\x82\xC5\x82\xB7\x81\x42\x0A";
@@ -94,7 +92,7 @@ runFrame:
     CPtrArray<CMapAnim*>* mapAnimArray =
         reinterpret_cast<CPtrArray<CMapAnim*>*>(reinterpret_cast<unsigned char*>(&MapMng) + 0x213FC);
     CMapAnim* mapAnim = (*mapAnimArray)[m_mapAnimIndex];
-    Calc__8CMapAnimFl(mapAnim, m_currentFrame);
+    mapAnim->Calc(m_currentFrame);
     if (++m_currentFrame > m_endFrame) {
         if (m_loop != 0) {
             m_currentFrame = 0;
@@ -269,7 +267,6 @@ void CMapAnimNode::Interp(int frame)
     int startFrame = m_mapAnim->startFrame;
     CMapAnimNodeTrackKey* positionKeys = m_tracks->position.keys;
     int positionTrackCount = m_tracks->position.count;
-    CMapAnimTargetNode* node = m_node;
     unsigned int loopFrameCount = static_cast<unsigned int>((m_mapAnim->endFrame - startFrame) + 1);
     Vec* positionOut = &m_node->position;
     unsigned int frameInLoop = startFrame + (frame % loopFrameCount);

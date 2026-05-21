@@ -20,10 +20,6 @@ static const float kPppKeShpTail3XDegToRad = 0.017453292f;
 
 extern "C" {
 int __cntlzw(unsigned int);
-void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(void*, void*, float, unsigned char, unsigned char,
-                                                               unsigned char, unsigned char, unsigned char,
-                                                               unsigned char, unsigned char);
-void pppDrawShp__FP13tagOAN3_SHAPEP12CMaterialSetUc(void*, void*, unsigned char);
 }
 
 struct KeShpTail3XStep {
@@ -177,8 +173,8 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* p
     float segDz;
     u16 rng;
     int life;
-    s16 shapeSetCount;
-    s16 shapeCount;
+    s32 shapeSetCount;
+    s32 shapeCount;
     float shapeScale;
     float shapeScaleStep;
     float trailStep;
@@ -326,8 +322,8 @@ draw_loop:
     drawMtx.value[2][3] = pos.z;
 
     zEnable = (u8)((u32)__cntlzw((u32)step->m_zDisable) >> 5);
-    pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-        (void*)0, &drawMtx, (step->m_useEnvDepth != 0) ? step->m_envDepth : zero, 0, step->m_drawA,
+    pppSetDrawEnv(
+        0, &drawMtx, (step->m_useEnvDepth != 0) ? step->m_envDepth : zero, 0, step->m_drawA,
         step->m_blendMode, 0, zEnable, 1, 0);
     GXLoadPosMtxImm(drawMtx.value, 0);
 
@@ -342,7 +338,7 @@ draw_loop:
     }
 
     pppSetBlendMode(step->m_blendMode);
-    pppDrawShp__FP13tagOAN3_SHAPEP12CMaterialSetUc(shapeEntry, pppEnvStPtr->m_materialSetPtr, step->m_blendMode);
+    pppDrawShp(reinterpret_cast<tagOAN3_SHAPE*>(shapeEntry), pppEnvStPtr->m_materialSetPtr, step->m_blendMode);
 
 update_step:
     count--;

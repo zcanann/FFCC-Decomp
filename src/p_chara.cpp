@@ -36,7 +36,6 @@ extern "C" {
 u8* gCharaPartWorkPtr = 0;
 }
 
-extern "C" void __dla__FPv(void*);
 extern "C" int __cntlzw(unsigned int);
 extern "C" void __ct__6CColorFv(void*);
 extern "C" void __construct_array(void*, void (*)(void*), void (*)(void*, int), unsigned long, unsigned long);

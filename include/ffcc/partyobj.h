@@ -51,7 +51,7 @@ public:
 
     void menu();
     void onFrameAlways();
-    void CheckMenu();
+    static void CheckMenu();
 
     void onFramePreCalc();
     void onFramePostCalc();

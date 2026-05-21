@@ -40,7 +40,6 @@
 #include <dolphin/os/OSRtc.h>
 
 extern "C" {
-void Printf__7CSystemFPce(CSystem*, const char*, ...);
 unsigned int AddScenegraph__7CSystemFP8CProcessi(CSystem*, void*, int);
 void RemoveScenegraph__7CSystemFP8CProcessi(CSystem*, void*, int);
 void ExecScenegraph__7CSystemFv(CSystem*);
@@ -50,12 +49,9 @@ void pppDestroyAll__8CPartMngFv(void*);
 int pppGetIfDt__8CPartMngFs(void*, short);
 void pppEndPart__8CPartMngFi(void*, int);
 int sprintf(char*, const char*, ...);
-int GetMapObjIdx__7CMapMngFUs(void*, unsigned short);
-void SetMapObjLMtx__7CMapMngFiPA4_f(void*, int, Mtx);
 void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
     void*, int, int, int, int, void*, void*);
 void Draw__5CWindFv(void*);
-void CheckMenu__10CGPartyObjFv(void);
 int rand(void);
 void* __register_global_object(void*, void*, void*);
 void __ct__12CCaravanWorkFv(void*);
@@ -562,9 +558,9 @@ void CGame::Destroy()
  */
 void CGame::InitNewGame()
 {
-    Printf__7CSystemFPce(&System, DAT_8032f6a0);
-    Printf__7CSystemFPce(&System, DAT_801d6214);
-    Printf__7CSystemFPce(&System, DAT_8032f6a0);
+    System.Printf(const_cast<char*>(DAT_8032f6a0));
+    System.Printf(const_cast<char*>(DAT_801d6214));
+    System.Printf(const_cast<char*>(DAT_8032f6a0));
 
     CGame* game = &Game;
 
@@ -776,9 +772,9 @@ void CGame::CheckScriptChange()
     if (m_nextScript.m_flags != 0) {
         CGame* game = &Game;
 
-        Printf__7CSystemFPce(&System, DAT_8032f6a0);
-        Printf__7CSystemFPce(&System, DAT_801d6214);
-        Printf__7CSystemFPce(&System, DAT_8032f6a0);
+        System.Printf(const_cast<char*>(DAT_8032f6a0));
+        System.Printf(const_cast<char*>(DAT_801d6214));
+        System.Printf(const_cast<char*>(DAT_8032f6a0));
 
         memset(&game->m_gameWork.m_gameDataStartMarker, 0, 0x13E1);
         memset(game->m_gameWork.m_wmBackupParams, 0xFF, sizeof(game->m_gameWork.m_wmBackupParams));
@@ -1028,7 +1024,7 @@ void CGame::Calc()
     reinterpret_cast<CFlatRuntime*>(CFlat)->ResetPerformance();
     reinterpret_cast<CFlatRuntime2*>(CFlat)->Frame(1, 0);
 
-    if ((m_currentMapId == 0x21) && ((mapObjIdx = GetMapObjIdx__7CMapMngFUs(&MapMng, 0)) >= 0)) {
+    if ((m_currentMapId == 0x21) && ((mapObjIdx = MapMng.GetMapObjIdx(0)) >= 0)) {
             if (!BOOL_8032ec44) {
                 BOOL_8032ec44 = true;
                 FLOAT_8032ec40 = FLOAT_8032f690;
@@ -1036,7 +1032,7 @@ void CGame::Calc()
 
             FLOAT_8032ec40 += FLOAT_8032f694;
             PSMTXRotRad(rotMtx, 'y', FLOAT_8032ec40);
-            SetMapObjLMtx__7CMapMngFiPA4_f(&MapMng, mapObjIdx, rotMtx);
+            MapMng.SetMapObjLMtx(mapObjIdx, rotMtx);
     }
 }
 
@@ -1065,7 +1061,7 @@ void CGame::Calc2()
  */
 void CGame::Calc3()
 { 
-	CheckMenu__10CGPartyObjFv();
+	CGPartyObj::CheckMenu();
 	reinterpret_cast<CFlatRuntime*>(CFlat)->AfterFrame(0);
 }
 

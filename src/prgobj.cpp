@@ -19,9 +19,9 @@ static inline float LoadFloat(const float& value)
 	return value;
 }
 
-static inline Vec* AsVec(CVector& vec)
+static inline Vec* AsVec(const CVector& vec)
 {
-	return reinterpret_cast<Vec*>(&vec);
+	return reinterpret_cast<Vec*>(const_cast<CVector*>(&vec));
 }
 
 static inline CFlatRuntime2* GetCFlatRuntime2()
@@ -225,7 +225,7 @@ void CGPrgObj::dstTargetRot(CGPrgObj* target)
 	float deltaX;
 	float deltaZ;
 	CVector targetPos(target->m_worldPosition);
-	CVector basePos(m_worldPosition);
+	const CVector& basePos = CVector(m_worldPosition);
 	CVector deltaPos;
 
 	PSVECSubtract(AsVec(basePos), AsVec(targetPos), AsVec(deltaPos));
@@ -256,7 +256,7 @@ void CGPrgObj::rotTarget(CGPrgObj* target)
 	float deltaX;
 	float deltaZ;
 	CVector targetPos(target->m_worldPosition);
-	CVector basePos(m_worldPosition);
+	const CVector& basePos = CVector(m_worldPosition);
 	CVector deltaPos;
 
 	PSVECSubtract(AsVec(basePos), AsVec(targetPos), AsVec(deltaPos));
@@ -285,7 +285,7 @@ float CGPrgObj::getTargetRot(CGPrgObj* target)
 	float deltaX;
 	float deltaZ;
 	CVector targetPos(target->m_worldPosition);
-	CVector basePos(m_worldPosition);
+	const CVector& basePos = CVector(m_worldPosition);
 	CVector deltaPos;
 
 	PSVECSubtract(AsVec(basePos), AsVec(targetPos), AsVec(deltaPos));

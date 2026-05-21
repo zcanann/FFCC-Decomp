@@ -35,17 +35,6 @@ extern "C" void calcViewer__8CPartPcsFv(CPartPcs*);
 extern "C" void drawShadowViewer__8CPartPcsFv(CPartPcs*);
 extern "C" void drawViewer__8CPartPcsFv(CPartPcs*);
 extern "C" void drawAfterViewer__8CPartPcsFv(CPartPcs*);
-extern "C" void SetRStage__13CAmemCacheSetFPQ27CMemory6CStage(void*, void*);
-extern "C" void AmemSetLock__13CAmemCacheSetFv(void*);
-extern "C" void AssertCache__13CAmemCacheSetFv(void*);
-extern "C" void Destroy__13CAmemCacheSetFv(void*);
-extern "C" void* CreateStage__7CMemoryFUlPci(void*, unsigned long, const char*, int);
-extern "C" void* Free__7CMemoryFPv(void*, void*);
-extern "C" void DestroyStage__7CMemoryFPQ27CMemory6CStage(void*, void*);
-extern "C" void DrawOt__10pppDrawMngFv(void*);
-extern "C" void SetDrawDoneDebugDataPartControl__8CGraphicFi(void*, int);
-extern "C" void SetDrawDoneDebugData__8CGraphicFSc(void*, signed char);
-extern "C" void SetFog__8CGraphicFii(void*, int, int);
 extern "C" void Init__13CAmemCacheSetFPcPQ27CMemory6CStagePQ27CMemory6CStageiPFUl_UcUlPFUl_UcUlPFUl_UcUl(
     void*,
     char*,
@@ -611,15 +600,15 @@ void CPartPcs::create()
     viewer->m_disableShokiDraw = 0;
 
     if ((int)Game.m_currentSceneId == 7) {
-        stage = CreateStage__7CMemoryFUlPci(&Memory, 0x180000, stringBase + 0x22C, 0);
+        stage = Memory.CreateStage(0x180000, stringBase + 0x22C, 0);
         viewer->m_stageLoad = stage;
         viewer->m_stageDefault = stage;
         viewer->m_stageAmem = 0;
     } else {
-        stage = CreateStage__7CMemoryFUlPci(&Memory, 0x180000, stringBase + 0x22C, 0);
+        stage = Memory.CreateStage(0x180000, stringBase + 0x22C, 0);
         viewer->m_stageLoad = stage;
         viewer->m_stageDefault = stage;
-        stage = CreateStage__7CMemoryFUlPci(&Memory, 0x400000, stringBase + 0x23C, 2);
+        stage = Memory.CreateStage(0x400000, stringBase + 0x23C, 2);
         viewer->m_stageAmem = stage;
     }
 
@@ -669,7 +658,7 @@ void CPartPcs::createLoad()
     PartMng.pppLoadPdt(stringBase + 0x284, 3, 1, 0, 0);
     PartMng.pppLoadPdt(stringBase + 0x298, 4, 1, 0, 0);
     PartMng.pppLoadPdt(stringBase + 0x2AC, 5, 1, 0, 0);
-    AmemSetLock__13CAmemCacheSetFv(&ppvAmemCacheSet);
+    ppvAmemCacheSet.AmemSetLock();
 }
 
 /*
@@ -691,15 +680,15 @@ void CPartPcs::createViewer()
     viewer->m_disableShokiDraw = 0;
 
     if ((int)Game.m_currentSceneId == 7) {
-        stage = CreateStage__7CMemoryFUlPci(&Memory, 0x180000, stringBase + 0x22C, 0);
+        stage = Memory.CreateStage(0x180000, stringBase + 0x22C, 0);
         viewer->m_stageLoad = stage;
         viewer->m_stageDefault = stage;
         viewer->m_stageAmem = 0;
     } else {
-        stage = CreateStage__7CMemoryFUlPci(&Memory, 0x180000, stringBase + 0x22C, 0);
+        stage = Memory.CreateStage(0x180000, stringBase + 0x22C, 0);
         viewer->m_stageLoad = stage;
         viewer->m_stageDefault = stage;
-        stage = CreateStage__7CMemoryFUlPci(&Memory, 0x400000, stringBase + 0x23C, 2);
+        stage = Memory.CreateStage(0x400000, stringBase + 0x23C, 2);
         viewer->m_stageAmem = stage;
     }
 
@@ -738,20 +727,20 @@ void CPartPcs::destroy()
     PartMng.Destroy();
 
     if (usb->m_stageAmem != 0) {
-        DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, usb->m_stageAmem);
+        Memory.DestroyStage(usb->m_stageAmem);
     }
 
-    AssertCache__13CAmemCacheSetFv(&ppvAmemCacheSet);
-    Destroy__13CAmemCacheSetFv(&ppvAmemCacheSet);
+    ppvAmemCacheSet.AssertCache();
+    ppvAmemCacheSet.Destroy();
 
-    DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, usb->m_stageDefault);
+    Memory.DestroyStage(usb->m_stageDefault);
 
     if (usb->m_freePtr != 0) {
-        Free__7CMemoryFPv(&Memory, usb->m_freePtr);
+        Memory.Free(usb->m_freePtr);
     }
 
     if (usb->m_stageExtra != 0) {
-        DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, usb->m_stageExtra);
+        Memory.DestroyStage(usb->m_stageExtra);
     }
 }
 
@@ -939,25 +928,25 @@ void CPartPcs::draw()
     CUSBStreamData* usb = &m_usbStreamData;
     CGame* game = &Game;
 
-    SetDrawDoneDebugDataPartControl__8CGraphicFi(&Graphic, 0x7fff);
+    Graphic.SetDrawDoneDebugDataPartControl(0x7fff);
     if (game->m_gameWork.m_gamePaused != 0) {
-        DrawOt__10pppDrawMngFv(&ppvDrawMng);
-        SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x7f);
+        ppvDrawMng.DrawOt();
+        Graphic.SetDrawDoneDebugData(0x7f);
         return;
     }
 
     if (usb->m_disableShokiDraw != 0) {
-        DrawOt__10pppDrawMngFv(&ppvDrawMng);
-        SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x7f);
+        ppvDrawMng.DrawOt();
+        Graphic.SetDrawDoneDebugData(0x7f);
         return;
     }
 
-    SetFog__8CGraphicFii(&Graphic, 1, 0);
+    Graphic.SetFog(1, 0);
     pppInitDrawEnv(0);
     PartMng.pppSetRendMatrix();
     PartMng.pppDraw();
     pppClearDrawEnv();
-    SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x7f);
+    Graphic.SetDrawDoneDebugData(0x7f);
 }
 
 /*
@@ -1456,7 +1445,7 @@ int CPartPcs::LoadMenuPdt(char* fileName)
     }
 
     m_usbStreamData.m_stageLoad = stage;
-    SetRStage__13CAmemCacheSetFPQ27CMemory6CStage(&ppvAmemCacheSet, stage);
+    ppvAmemCacheSet.SetRStage(stage);
 
     *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&PartMng) + 0x236F4) = 0;
     *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&PartMng) + 0x236F8) = 0;
@@ -1485,7 +1474,7 @@ int CPartPcs::LoadMenuPdt(char* fileName)
     }
 
     m_usbStreamData.m_stageLoad = m_usbStreamData.m_stageDefault;
-    SetRStage__13CAmemCacheSetFPQ27CMemory6CStage(&ppvAmemCacheSet, m_usbStreamData.m_stageDefault);
+    ppvAmemCacheSet.SetRStage(m_usbStreamData.m_stageDefault);
 
     return pdtSlotIndex;
 }

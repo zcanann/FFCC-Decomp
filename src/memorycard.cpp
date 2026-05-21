@@ -1013,11 +1013,13 @@ void CMemoryCardMan::MakeSaveData()
     memcpy(save + 0x10C0, gameWork + 0x10A0, 0x10);
     memcpy(save + 0x10D0, Game.m_gameWork.m_eventFlags, 0x100);
     memcpy(save + 0x11D0, Game.m_gameWork.m_eventWork, 0x200);
+    memcpy(save + 0x11D0, Game.m_gameWork.m_eventWork, 0x200);
     *reinterpret_cast<u32*>(save + 0x13D0) = *reinterpret_cast<u32*>(gameWork + 0x13E0);
     *reinterpret_cast<u32*>(save + 0x13D4) = *reinterpret_cast<u32*>(gameWork + 0x13E4);
     *reinterpret_cast<u32*>(save + 0x13D8) = *reinterpret_cast<u32*>(gameWork + 0x13D8);
     save[0x13DC] = gameWork[0x13D6];
     save[0x13DD] = Game.m_gameWork.m_bgmVolume;
+    save[0x13DE] = Game.m_gameWork.m_seVolume;
     save[0x13DE] = Game.m_gameWork.m_seVolume;
     save[0x13DF] = static_cast<u8>((0U - static_cast<u32>(__cntlzw(GetRedSoundGlobal()->GetSoundMode()) >> 5)) >> 31);
     save[0x13E0] = MakeSaveBool(Game.m_gameWork.m_gameInitFlag);

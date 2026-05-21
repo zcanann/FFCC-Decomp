@@ -3749,7 +3749,7 @@ void CPartMng::pppLoadPan(const char* baseName)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CPartMng::pppLoadPdt(const char* baseName, int pdtSlotIndex, int cachePriority, void* readBuffer, int readBufferSize)
+int CPartMng::pppLoadPdt(const char* baseName, int pdtSlotIndex, int cachePriority, void* readBuffer, int readBufferSize)
 {
     struct PppPdtSlotRaw {
         _pppDataHead* m_pppDataHead;
@@ -3782,13 +3782,13 @@ void CPartMng::pppLoadPdt(const char* baseName, int pdtSlotIndex, int cachePrior
             System.Printf(const_cast<char*>(s_CAN_NOT_READ_pcts_801d8508), pdtPath);
         }
         stageLoad->resDefaultParam();
-        return;
+        return 0;
     }
 
     // Async file mode can return sentinel 1 before data is available.
     if (pdtData == reinterpret_cast<void*>(1)) {
         stageLoad->resDefaultParam();
-        return;
+        return 1;
     }
 
     CChunkFile pdtFile;
@@ -3834,6 +3834,7 @@ void CPartMng::pppLoadPdt(const char* baseName, int pdtSlotIndex, int cachePrior
     }
 
     stageLoad->resDefaultParam();
+    return 1;
 }
 
 /*

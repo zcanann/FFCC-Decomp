@@ -35,13 +35,6 @@ extern "C" void calcViewer__8CPartPcsFv(CPartPcs*);
 extern "C" void drawShadowViewer__8CPartPcsFv(CPartPcs*);
 extern "C" void drawViewer__8CPartPcsFv(CPartPcs*);
 extern "C" void drawAfterViewer__8CPartPcsFv(CPartPcs*);
-extern "C" int pppLoadPtx__8CPartMngFPCciiPvi(CPartMng*, const char*, int, int, void*, int);
-extern "C" int pppLoadPdt__8CPartMngFPCciiPvi(CPartMng*, const char*, int, int, void*, int);
-extern "C" void pppLoadPmd__8CPartMngFPCc(CPartMng*, const char*);
-extern "C" void pppLoadPan__8CPartMngFPCc(CPartMng*, const char*);
-extern "C" int pppGetFreeDataMng__8CPartMngFv(CPartMng*);
-extern "C" void pppReleasePdt__8CPartMngFi(CPartMng*, int);
-extern "C" int pppCreate__8CPartMngFiiP14PPPCREATEPARAMi(CPartMng*, int, int, PPPCREATEPARAM*, int);
 extern "C" void SetRStage__13CAmemCacheSetFPQ27CMemory6CStage(void*, void*);
 extern "C" void AmemSetLock__13CAmemCacheSetFv(void*);
 extern "C" void AssertCache__13CAmemCacheSetFv(void*);
@@ -49,13 +42,10 @@ extern "C" void Destroy__13CAmemCacheSetFv(void*);
 extern "C" void* CreateStage__7CMemoryFUlPci(void*, unsigned long, const char*, int);
 extern "C" void* Free__7CMemoryFPv(void*, void*);
 extern "C" void DestroyStage__7CMemoryFPQ27CMemory6CStage(void*, void*);
-extern "C" void Destroy__8CPartMngFv(CPartMng*);
 extern "C" void DrawOt__10pppDrawMngFv(void*);
 extern "C" void SetDrawDoneDebugDataPartControl__8CGraphicFi(void*, int);
 extern "C" void SetDrawDoneDebugData__8CGraphicFSc(void*, signed char);
 extern "C" void SetFog__8CGraphicFii(void*, int, int);
-extern "C" void pppSetRendMatrix__8CPartMngFv(CPartMng*);
-extern "C" void pppDraw__8CPartMngFv(CPartMng*);
 extern "C" void Init__13CAmemCacheSetFPcPQ27CMemory6CStagePQ27CMemory6CStageiPFUl_UcUlPFUl_UcUlPFUl_UcUl(
     void*,
     char*,
@@ -671,14 +661,14 @@ void CPartPcs::createLoad()
     state->m_asyncHandleCount = 0;
     state->m_partLoadMode = 0;
 
-    pppLoadPtx__8CPartMngFPCciiPvi(&PartMng, stringBase + 0x24C, 1, 1, 0, 0);
-    pppLoadPmd__8CPartMngFPCc(&PartMng, stringBase + 0x24C);
-    pppLoadPan__8CPartMngFPCc(&PartMng, stringBase + 0x24C);
-    pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, stringBase + 0x25C, 1, 1, 0, 0);
-    pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, stringBase + 0x270, 2, 1, 0, 0);
-    pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, stringBase + 0x284, 3, 1, 0, 0);
-    pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, stringBase + 0x298, 4, 1, 0, 0);
-    pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, stringBase + 0x2AC, 5, 1, 0, 0);
+    PartMng.pppLoadPtx(stringBase + 0x24C, 1, 1, 0, 0);
+    PartMng.pppLoadPmd(stringBase + 0x24C);
+    PartMng.pppLoadPan(stringBase + 0x24C);
+    PartMng.pppLoadPdt(stringBase + 0x25C, 1, 1, 0, 0);
+    PartMng.pppLoadPdt(stringBase + 0x270, 2, 1, 0, 0);
+    PartMng.pppLoadPdt(stringBase + 0x284, 3, 1, 0, 0);
+    PartMng.pppLoadPdt(stringBase + 0x298, 4, 1, 0, 0);
+    PartMng.pppLoadPdt(stringBase + 0x2AC, 5, 1, 0, 0);
     AmemSetLock__13CAmemCacheSetFv(&ppvAmemCacheSet);
 }
 
@@ -745,7 +735,7 @@ void CPartPcs::destroy()
     CUSBStreamData* usb = &m_usbStreamData;
 
     USBPcs.IsBigAlloc(0);
-    Destroy__8CPartMngFv(&PartMng);
+    PartMng.Destroy();
 
     if (usb->m_stageAmem != 0) {
         DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, usb->m_stageAmem);
@@ -964,8 +954,8 @@ void CPartPcs::draw()
 
     SetFog__8CGraphicFii(&Graphic, 1, 0);
     pppInitDrawEnv(0);
-    pppSetRendMatrix__8CPartMngFv(&PartMng);
-    pppDraw__8CPartMngFv(&PartMng);
+    PartMng.pppSetRendMatrix();
+    PartMng.pppDraw();
     pppClearDrawEnv();
     SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x7f);
 }
@@ -1318,9 +1308,9 @@ void LoadFieldPdt0(int mapId, int floorId)
     DAT_8032ed38 = 0;
 
     if (GetPartMngState()->m_partLoadMode != 3) {
-        pppReleasePdt__8CPartMngFi(&PartMng, 0);
-        pppReleasePdt__8CPartMngFi(&PartMng, 6);
-        pppReleasePdt__8CPartMngFi(&PartMng, 7);
+        PartMng.pppReleasePdt(0);
+        PartMng.pppReleasePdt(6);
+        PartMng.pppReleasePdt(7);
         ppvAmemCacheSet.AmemGetLock();
         ppvAmemCacheSet.RefCnt0Compare();
     }
@@ -1328,9 +1318,9 @@ void LoadFieldPdt0(int mapId, int floorId)
     PartPcs.m_usbStreamData.m_fieldLoadReq = 1;
 
     sprintf(path, s_dvd_tina_stage_03d_fp_03d_801d7fec, mapId, floorId);
-    pdtSlot = pppLoadPtx__8CPartMngFPCciiPvi(&PartMng, path, 0, 1, 0, 0);
+    pdtSlot = PartMng.pppLoadPtx(path, 0, 1, 0, 0);
     if (pdtSlot != 0) {
-        pdtSlot = pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, path, 0, 1, 0, 0);
+        pdtSlot = PartMng.pppLoadPdt(path, 0, 1, 0, 0);
         if ((pdtSlot != 0) && (GetPartMngState()->m_partLoadMode != 2) && (GetPartMngState()->m_partLoadMode != 3)) {
             _pppDataHead* pppDataHead;
             PPPCREATEPARAM* createParam;
@@ -1343,7 +1333,7 @@ void LoadFieldPdt0(int mapId, int floorId)
             for (i = 0; i < static_cast<int>((unsigned int)pppDataHead->m_partCount); i++) {
                 if (*reinterpret_cast<int*>(&GetPartMngPdtSlots()[0].m_pppDataHead[2].m_shapeGroupCount + checkOff) !=
                     -0x1000) {
-                    pppCreate__8CPartMngFiiP14PPPCREATEPARAMi(&PartMng, 0, i, createParam, 0);
+                    PartMng.pppCreate(0, i, createParam, 0);
                 }
                 checkOff += 0x30;
             }
@@ -1421,16 +1411,16 @@ int CPartPcs::LoadMonsterPdt(int monsterId, int variant, void* pdtData, int pdtC
     reinterpret_cast<CPartMngState*>(&PartMng)->m_asyncHandleCount = 0;
     reinterpret_cast<CPartMngState*>(&PartMng)->m_partLoadMode = 0;
 
-    pdtSlotIndex = pppGetFreeDataMng__8CPartMngFv(&PartMng);
+    pdtSlotIndex = PartMng.pppGetFreeDataMng();
     if (pdtSlotIndex == -1) {
         pdtSlotIndex = -1;
     } else {
-        if (pppLoadPtx__8CPartMngFPCciiPvi(&PartMng, path, pdtSlotIndex, 1, ptxData, ptxCount) == 0) {
-            pppReleasePdt__8CPartMngFi(&PartMng, pdtSlotIndex);
+        if (PartMng.pppLoadPtx(path, pdtSlotIndex, 1, ptxData, ptxCount) == 0) {
+            PartMng.pppReleasePdt(pdtSlotIndex);
             pdtSlotIndex = -1;
         } else {
-            if (pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, path, pdtSlotIndex, 1, pdtData, pdtCount) == 0) {
-                pppReleasePdt__8CPartMngFi(&PartMng, pdtSlotIndex);
+            if (PartMng.pppLoadPdt(path, pdtSlotIndex, 1, pdtData, pdtCount) == 0) {
+                PartMng.pppReleasePdt(pdtSlotIndex);
                 pdtSlotIndex = -1;
             } else {
                 PartPcs.m_usbStreamData.m_printFreeOnNext = 1;
@@ -1475,18 +1465,18 @@ int CPartPcs::LoadMenuPdt(char* fileName)
     *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&PartMng) + 0x23704) = 0;
     *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&PartMng) + 0x23708) = 0;
 
-    pdtSlotIndex = pppGetFreeDataMng__8CPartMngFv(&PartMng);
+    pdtSlotIndex = PartMng.pppGetFreeDataMng();
     if (pdtSlotIndex == -1) {
         pdtSlotIndex = -1;
     } else {
-        loaded = pppLoadPtx__8CPartMngFPCciiPvi(&PartMng, path, pdtSlotIndex, 0, 0, 0);
+        loaded = PartMng.pppLoadPtx(path, pdtSlotIndex, 0, 0, 0);
         if (loaded == 0) {
-            pppReleasePdt__8CPartMngFi(&PartMng, pdtSlotIndex);
+            PartMng.pppReleasePdt(pdtSlotIndex);
             pdtSlotIndex = -1;
         } else {
-            loaded = pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, path, pdtSlotIndex, 0, 0, 0);
+            loaded = PartMng.pppLoadPdt(path, pdtSlotIndex, 0, 0, 0);
             if (loaded == 0) {
-                pppReleasePdt__8CPartMngFi(&PartMng, pdtSlotIndex);
+                PartMng.pppReleasePdt(pdtSlotIndex);
                 pdtSlotIndex = -1;
             } else {
                 reinterpret_cast<unsigned char*>(&PartPcs)[0x2d] = 1;
@@ -1511,7 +1501,7 @@ int CPartPcs::LoadMenuPdt(char* fileName)
  */
 void CPartPcs::ReleasePdt(int pdtSlot)
 {
-    pppReleasePdt__8CPartMngFi(&PartMng, pdtSlot);
+    PartMng.pppReleasePdt(pdtSlot);
 }
 
 /*
@@ -1530,8 +1520,8 @@ void CPartPcs::StartLocationTitle()
     CGame* game = &Game;
 
     sprintf(path, s_dvd_tina_stage_03d_title_801d7f94, game->m_currentMapId);
-    loaded = pppLoadPtx__8CPartMngFPCciiPvi(&PartMng, path, 6, 0, 0, 0);
-    if ((loaded != 0) && ((loaded = pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, path, 6, 0, 0, 0), loaded != 0))) {
+    loaded = PartMng.pppLoadPtx(path, 6, 0, 0, 0);
+    if ((loaded != 0) && ((loaded = PartMng.pppLoadPdt(path, 6, 0, 0, 0), loaded != 0))) {
         m_usbStreamData.m_blockOnFrame = 1;
     }
 }
@@ -1547,7 +1537,7 @@ void CPartPcs::StartLocationTitle()
  */
 void CPartPcs::EndLocationTitle()
 {
-    pppReleasePdt__8CPartMngFi(&PartMng, 6);
+    PartMng.pppReleasePdt(6);
     m_usbStreamData.m_blockOnFrame = 0;
 }
 
@@ -1567,8 +1557,8 @@ void CPartPcs::StartMiruraEvent()
     CGame* game = &Game;
 
     sprintf(path, s_dvd_tina_stage_03d_mirura_801d7f78, game->m_currentMapId);
-    loaded = pppLoadPtx__8CPartMngFPCciiPvi(&PartMng, path, 7, 0, 0, 0);
-    if ((loaded != 0) && ((loaded = pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, path, 7, 0, 0, 0), loaded != 0))) {
+    loaded = PartMng.pppLoadPtx(path, 7, 0, 0, 0);
+    if ((loaded != 0) && ((loaded = PartMng.pppLoadPdt(path, 7, 0, 0, 0), loaded != 0))) {
         m_usbStreamData.m_miruraEventActive = 1;
     }
 }
@@ -1584,7 +1574,7 @@ void CPartPcs::StartMiruraEvent()
  */
 void CPartPcs::EndMiruraEvent()
 {
-    pppReleasePdt__8CPartMngFi(&PartMng, 7);
+    PartMng.pppReleasePdt(7);
     m_usbStreamData.m_miruraEventActive = 0;
 }
 

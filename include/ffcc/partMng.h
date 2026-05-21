@@ -425,7 +425,7 @@ public:
     void pppLoadPmd(const char*);
     void pppLoadPan(CChunkFile&);
     void pppLoadPan(const char*);
-    void pppLoadPdt(const char*, int, int, void*, int);
+    int pppLoadPdt(const char*, int, int, void*, int);
 
     int pppGetFreeDataMng();
     PPPCREATEPARAM* pppGetDefaultCreateParam();

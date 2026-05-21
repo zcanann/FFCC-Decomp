@@ -34,7 +34,6 @@ extern int gPppHeapUseRateWords[3];
 #include <PowerPC_EABI_Support/Runtime/MWCPlusLib.h>
 #include <PowerPC_EABI_Support/Runtime/New.h>
 
-extern "C" void Printf__7CSystemFPce(CSystem*, const char*, ...);
 extern "C" void _WaitDrawDone__8CGraphicFPci(CGraphic*, const char*, int);
 extern "C" void pppCreateHeap__FP9_pppEnvStUl(_pppEnvSt*, unsigned long);
 extern "C" unsigned int CheckSum__FPvi(void*, int);
@@ -459,7 +458,7 @@ void CPartMng::pppDumpMngSt()
     PppPdtSlotRaw* pdtSlots = reinterpret_cast<PppPdtSlotRaw*>(self + 0x22E18);
 
     if (System.m_execParam != 0) {
-        Printf__7CSystemFPce(&System, s__________________________________801d8358);
+        System.Printf(const_cast<char*>(s__________________________________801d8358));
     }
 
     PppMngStDumpRaw* mng = reinterpret_cast<PppMngStDumpRaw*>(self + 0x1D4);
@@ -469,8 +468,8 @@ void CPartMng::pppDumpMngSt()
             int heapGroup = (mng->m_heapGroupRef + 0x2D) / 0x158;
             int heapSize = pppEnvStPtr->m_stagePtr->heapWalker(0, 0, static_cast<unsigned long>(heapGroup));
 
-            Printf__7CSystemFPce(
-                &System, s_prioTime__d_prio__d_heapSize__d_p_801d8454, mng->m_prioTime,
+            System.Printf(
+                const_cast<char*>(s_prioTime__d_prio__d_heapSize__d_p_801d8454), mng->m_prioTime,
                 mng->m_prio, heapSize, kind, static_cast<int>(mng->m_nodeIndex), heapGroup,
                 pdtSlots[kind].m_name);
         }
@@ -481,11 +480,11 @@ void CPartMng::pppDumpMngSt()
     pppEnvStPtr->m_stagePtr->heapInfo(heapTotal, heapUse, heapFree);
 
     if (System.m_execParam != 0) {
-        Printf__7CSystemFPce(
-            &System, s_HEAP_TOTAL__dKbyte_USE__dKbyte_F_801d84a0,
+        System.Printf(
+            const_cast<char*>(s_HEAP_TOTAL__dKbyte_USE__dKbyte_F_801d84a0),
             static_cast<int>(heapTotal >> 10), static_cast<int>(heapUse >> 10),
             static_cast<int>(heapFree >> 10));
-        Printf__7CSystemFPce(&System, s__________________________________801d8358);
+        System.Printf(const_cast<char*>(s__________________________________801d8358));
     }
 }
 

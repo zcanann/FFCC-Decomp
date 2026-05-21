@@ -10,6 +10,7 @@
 #include "ffcc/textureman.h"
 
 #include <PowerPC_EABI_Support/Runtime/MWCPlusLib.h>
+#include <PowerPC_EABI_Support/Runtime/New.h>
 #include <math.h>
 #include <string.h>
 
@@ -22,7 +23,6 @@ extern "C" void Create__Q26CChara5CNodeFR10CChunkFilePQ26CChara6CModelQ36CChara5
     void*, CChunkFile&, void*, int, CMemory::CStage*);
 extern "C" void Create__Q26CChara5CMeshFPQ26CChara6CModelR10CChunkFilePQ27CMemory6CStage(
     void*, void*, CChunkFile&, CMemory::CStage*);
-extern "C" void __dla__FPv(void*);
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" CMemory::CStage* CreateStage__7CMemoryFUlPci(CMemory*, unsigned long, char*, int);
 extern "C" void __ct__Q26CChara5CNodeFv(void*);
@@ -678,11 +678,11 @@ void CChara::Quit()
 	void** buf0 = (void**)((u8*)this + 0x2068);
 	void** buf1 = (void**)((u8*)this + 0x2070);
 	if (*buf0 != 0) {
-		__dla__FPv(*buf0);
+		delete[] static_cast<u8*>(*buf0);
 		*buf0 = 0;
 	}
 	if (*buf1 != 0) {
-		__dla__FPv(*buf1);
+		delete[] static_cast<u8*>(*buf1);
 		*buf1 = 0;
 	}
 	Memory.DestroyStage(*reinterpret_cast<CMemory::CStage**>((u8*)this + 0x2058));
@@ -791,7 +791,7 @@ CChara::CModel::CRefData::~CRefData()
 
 	ptr = reinterpret_cast<void**>(raw + 0x40);
 	if (*ptr != 0) {
-		__dla__FPv(*ptr);
+		delete[] static_cast<u8*>(*ptr);
 		*ptr = 0;
 	}
 	ptr = reinterpret_cast<void**>(raw + 0x10);
@@ -806,7 +806,7 @@ CChara::CModel::CRefData::~CRefData()
 	}
 	ptr = reinterpret_cast<void**>(raw + 0x18);
 	if (*ptr != 0) {
-		__dla__FPv(*ptr);
+		delete[] static_cast<u8*>(*ptr);
 		*ptr = 0;
 	}
 	ptr = reinterpret_cast<void**>(raw + 0x24);
@@ -1101,7 +1101,7 @@ void CChara::CModel::CreateDynamics(void* dynData, CMemory::CStage* stage)
 		}
 
 		if (ModelDynParams(this) != 0) {
-			__dla__FPv(ModelDynParams(this));
+			operator delete(ModelDynParams(this));
 			ModelDynParams(this) = 0;
 		}
 		ModelDynCount(this) = 0;
@@ -3094,31 +3094,31 @@ CChara::CMesh::CRefData::~CRefData()
 	CCharaMeshRefRaw* ref = reinterpret_cast<CCharaMeshRefRaw*>(this);
 
 	if (ref->m_vertices != 0) {
-		__dla__FPv(ref->m_vertices);
+		operator delete(ref->m_vertices);
 		ref->m_vertices = 0;
 	}
 	if (ref->m_normals != 0) {
-		__dla__FPv(ref->m_normals);
+		operator delete(ref->m_normals);
 		ref->m_normals = 0;
 	}
 	if (ref->m_colors != 0) {
-		__dla__FPv(ref->m_colors);
+		operator delete(ref->m_colors);
 		ref->m_colors = 0;
 	}
 	if (ref->m_uvs != 0) {
-		__dla__FPv(ref->m_uvs);
+		operator delete(ref->m_uvs);
 		ref->m_uvs = 0;
 	}
 	if (ref->m_oneWeightData != 0) {
-		__dla__FPv(ref->m_oneWeightData);
+		operator delete(ref->m_oneWeightData);
 		ref->m_oneWeightData = 0;
 	}
 	if (ref->m_twoWeightData != 0) {
-		__dla__FPv(ref->m_twoWeightData);
+		operator delete(ref->m_twoWeightData);
 		ref->m_twoWeightData = 0;
 	}
 	if (ref->m_threeWeightData != 0) {
-		__dla__FPv(ref->m_threeWeightData);
+		operator delete(ref->m_threeWeightData);
 		ref->m_threeWeightData = 0;
 	}
 	if (ref->m_displayLists != 0) {
@@ -3160,7 +3160,7 @@ CChara::CMesh::CDisplayList::~CDisplayList()
 {
 	void** data = (void**)((u8*)this + 4);
 	if (data[0] != 0) {
-		__dla__FPv(data[0]);
+		operator delete(data[0]);
 		data[0] = 0;
 	}
 }

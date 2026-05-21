@@ -35,18 +35,6 @@ extern "C" void calcViewer__8CPartPcsFv(CPartPcs*);
 extern "C" void drawShadowViewer__8CPartPcsFv(CPartPcs*);
 extern "C" void drawViewer__8CPartPcsFv(CPartPcs*);
 extern "C" void drawAfterViewer__8CPartPcsFv(CPartPcs*);
-extern "C" void Init__13CAmemCacheSetFPcPQ27CMemory6CStagePQ27CMemory6CStageiPFUl_UcUlPFUl_UcUlPFUl_UcUl(
-    void*,
-    char*,
-    void*,
-    void*,
-    int,
-    void*,
-    unsigned long,
-    void*,
-    unsigned long,
-    void*,
-    unsigned long);
 extern "C" unsigned int m_table_desc0__8CPartPcs[];
 extern "C" unsigned int m_table_desc1__8CPartPcs[];
 extern "C" unsigned int m_table_desc2__8CPartPcs[];
@@ -448,7 +436,7 @@ int CPartPcs::GetTable(unsigned long index)
  * Address:	TODO
  * Size:	TODO
  */
-unsigned int pppNotAllocAmemCacheRmem(unsigned long)
+unsigned char pppNotAllocAmemCacheRmem(unsigned long)
 {
 	PartMng.pppDumpMngSt();
 	return 0;
@@ -563,7 +551,7 @@ unsigned char pppAmemDeletePmng(unsigned long)
  * Address:	TODO
  * Size:	TODO
  */
-unsigned int pppAmemRefCntError(unsigned long)
+unsigned char pppAmemRefCntError(unsigned long)
 {
 	return 1;
 }
@@ -612,17 +600,16 @@ void CPartPcs::create()
         viewer->m_stageAmem = stage;
     }
 
-    Init__13CAmemCacheSetFPcPQ27CMemory6CStagePQ27CMemory6CStageiPFUl_UcUlPFUl_UcUlPFUl_UcUl(
-        &ppvAmemCacheSet,
+    ppvAmemCacheSet.Init(
         stringBase + 0x74,
         reinterpret_cast<CPartPcsViewerState*>(&PartPcs)->m_stageLoad,
         reinterpret_cast<CPartPcsViewerState*>(&PartPcs)->m_stageAmem,
         0x400,
-        reinterpret_cast<void*>(pppNotAllocAmemCacheRmem),
+        pppNotAllocAmemCacheRmem,
         0,
-        reinterpret_cast<void*>(pppAmemDeletePmng),
+        pppAmemDeletePmng,
         0,
-        reinterpret_cast<void*>(pppAmemRefCntError),
+        pppAmemRefCntError,
         0);
 
     ::memset(&PartMng, 0, 0x23FD8);
@@ -692,17 +679,16 @@ void CPartPcs::createViewer()
         viewer->m_stageAmem = stage;
     }
 
-    Init__13CAmemCacheSetFPcPQ27CMemory6CStagePQ27CMemory6CStageiPFUl_UcUlPFUl_UcUlPFUl_UcUl(
-        &ppvAmemCacheSet,
+    ppvAmemCacheSet.Init(
         stringBase + 0x74,
         reinterpret_cast<CPartPcsViewerState*>(&PartPcs)->m_stageLoad,
         reinterpret_cast<CPartPcsViewerState*>(&PartPcs)->m_stageAmem,
         0x400,
-        reinterpret_cast<void*>(pppNotAllocAmemCacheRmem),
+        pppNotAllocAmemCacheRmem,
         0,
-        reinterpret_cast<void*>(pppAmemDeletePmng),
+        pppAmemDeletePmng,
         0,
-        reinterpret_cast<void*>(pppAmemRefCntError),
+        pppAmemRefCntError,
         0);
 
     ::memset(&PartMng, 0, 0x23FD8);

@@ -1212,7 +1212,7 @@ void CPartMng::ReadTex(CChunkFile&)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CPartMng::pppReadRsd(CChunkFile& chunkFile, pppModelSt* modelSt)
+unsigned int CPartMng::pppReadRsd(CChunkFile& chunkFile, pppModelSt* modelSt)
 {
     struct PartMngResRaw {
         unsigned char m_unk0[0x7e4];
@@ -1229,6 +1229,8 @@ void CPartMng::pppReadRsd(CChunkFile& chunkFile, pppModelSt* modelSt)
     PartMngResRaw* res = reinterpret_cast<PartMngResRaw*>(this);
     PartPcsRaw* partPcs = reinterpret_cast<PartPcsRaw*>(&PartPcs);
 
+    unsigned int meshSize = 0;
+
     while (chunkFile.GetNextChunk(chunk)) {
         chunkFile.PushChunk();
         if (chunk.m_id == 'RSD ') {
@@ -1238,13 +1240,15 @@ void CPartMng::pppReadRsd(CChunkFile& chunkFile, pppModelSt* modelSt)
                         textureNames[i] = chunkFile.GetString();
                     }
                 } else if (chunk.m_id == 'MESH') {
-                    modelSt->ReadOtmMesh(chunkFile, partPcs->m_usbStreamData.m_stageLoad, 0, 0);
-                    modelSt->SetDisplayListMaterial(res->m_materialSet, textureNames, 0);
+                    meshSize = modelSt->ReadOtmMesh(chunkFile, partPcs->m_usbStreamData.m_stageLoad, 0, 0);
+                    modelSt->SetDisplayListMaterial(res->m_materialSet, textureNames, &ppvAmemCacheSet);
                 }
             }
         }
         chunkFile.PopChunk();
     }
+
+    return meshSize;
 }
 
 /*
@@ -3582,13 +3586,13 @@ void CPartMng::pppLoadPmd(const char* baseName)
                     if (targetModel != 0) {
                         CChunkFile rsdFile;
                         rsdFile.SetBuf(chunkFile.GetAddress());
-                        pppReadRsd(rsdFile, targetModel);
+                        unsigned int meshSize = pppReadRsd(rsdFile, targetModel);
                         targetModel->Ptr2Off();
 
                         void** meshDataPtr =
                             reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(targetModel) + 0x24);
                         targetModel->m_cacheId = static_cast<short>(ppvAmemCacheSet.SetData(
-                            *meshDataPtr, 0, static_cast<CAmemCache::TYPE>(1), 1));
+                            *meshDataPtr, meshSize, static_cast<CAmemCache::TYPE>(1), 1));
 
                         if (*meshDataPtr != 0) {
                             operator delete(*meshDataPtr);

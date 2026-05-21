@@ -35,7 +35,6 @@ extern const float kMapObjInitValue50;
 extern const char s_mapobj_cpp_801D70C0[];
 extern unsigned int DAT_8032e498;
 unsigned int DAT_8032E8B8 = 5;
-extern "C" void __ct__12CMapKeyFrameFv(CMapKeyFrame*);
 extern "C" int IsRun__12CMapKeyFrameFv(CMapKeyFrame*);
 extern "C" int Get__12CMapKeyFrameFRiRiRf(CMapKeyFrame*, int*, int*, float*);
 extern "C" void Calc__12CMapKeyFrameFv(CMapKeyFrame*);
@@ -43,6 +42,11 @@ extern "C" void ReadJun__12CMapKeyFrameFR10CChunkFilei(CMapKeyFrame*, CChunkFile
 extern "C" void ReadFrame__12CMapKeyFrameFR10CChunkFilei(CMapKeyFrame*, CChunkFile*);
 extern "C" void ReadKey__12CMapKeyFrameFR10CChunkFilei(CMapKeyFrame*, CChunkFile*, int);
 extern "C" void DCFlushRange(void*, unsigned long);
+
+inline void* operator new(unsigned long, void* ptr)
+{
+    return ptr;
+}
 
 namespace {
 static inline unsigned char* Ptr(CMapObj* self, unsigned int offset)
@@ -1872,7 +1876,7 @@ CMapObjAtrMime::CMapObjAtrMime()
     self->vertexListCount = 0;
     self->vertexLists = 0;
     self->vertexCount = 0;
-    __ct__12CMapKeyFrameFv(reinterpret_cast<CMapKeyFrame*>(reinterpret_cast<unsigned char*>(this) + 0x14));
+    new (&self->keyFrame) CMapKeyFrame;
 }
 
 /*

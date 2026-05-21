@@ -1164,31 +1164,31 @@ CMesMenu* CMenuPcs::GetMesMenu(int index)
  * JP Address: TODO
  * JP Size: TODO
  */
-static void InitCreateParam(PPPCREATEPARAM* createParam)
+PPPCREATEPARAM::PPPCREATEPARAM()
 {
-    createParam->m_soundEffectParams.m_soundEffectHandle = -1;
-    createParam->m_soundEffectParams.m_soundEffectSlot = -1;
-    createParam->m_soundEffectParams.m_soundEffectStopFlag = 0;
-    createParam->m_soundEffectParams.m_soundEffectKind = 1;
-    createParam->m_soundEffectParams.m_soundEffectStartFrame = 0;
-    createParam->m_soundEffectParams.m_soundEffectStartedOnce = 0;
-    createParam->m_soundEffectParams.m_soundEffectFadeFrames = 30;
-    createParam->m_hitParamA = 0;
-    createParam->m_hitParamB = 0;
-    createParam->m_hitObjectCount = 0;
-    createParam->m_hitFlags = 0;
-    createParam->m_positionOffsetPtr = 0;
-    createParam->m_rotationPtr = 0;
-    createParam->m_scalePtr = 0;
-    createParam->m_extraPositionPtr = 0;
-    createParam->m_paramA = 0;
-    createParam->m_paramB = 0;
-    createParam->m_lookTargetPtr = 0;
-    createParam->m_objectHitMask = 0;
-    createParam->m_cylinderAttribute = 0;
-    createParam->m_paramC = 1.0f;
-    createParam->m_paramD = 1.0f;
-    *reinterpret_cast<unsigned char*>(&createParam->m_owner) = 0;
+    m_soundEffectParams.m_soundEffectHandle = -1;
+    m_soundEffectParams.m_soundEffectSlot = -1;
+    m_soundEffectParams.m_soundEffectStopFlag = 0;
+    m_soundEffectParams.m_soundEffectKind = 1;
+    m_soundEffectParams.m_soundEffectStartFrame = 0;
+    m_soundEffectParams.m_soundEffectStartedOnce = 0;
+    m_soundEffectParams.m_soundEffectFadeFrames = 30;
+    m_hitParamA = 0;
+    m_hitParamB = 0;
+    m_hitObjectCount = 0;
+    m_hitFlags = 0;
+    m_positionOffsetPtr = 0;
+    m_rotationPtr = 0;
+    m_scalePtr = 0;
+    m_extraPositionPtr = 0;
+    m_paramA = 0;
+    m_paramB = 0;
+    m_lookTargetPtr = 0;
+    m_objectHitMask = 0;
+    m_cylinderAttribute = 0;
+    m_paramC = 1.0f;
+    m_paramD = 1.0f;
+    *reinterpret_cast<unsigned char*>(&m_owner) = 0;
 }
 
 /*
@@ -2413,7 +2413,6 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         return;
     case -0xBB: {
         PPPCREATEPARAM createParam;
-        InitCreateParam(&createParam);
         PartMng.pppCreate(0, *object->m_localBase, &createParam, 1);
         runtime->push(object, 0);
         outResult = 0;

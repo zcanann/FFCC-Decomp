@@ -76,8 +76,6 @@ extern "C" void SRTToMatrix__5CMathFPA4_fP3SRT(void*, Mtx, void*);
 extern "C" void Printf__8CGraphicFPce(void*, const char*, ...);
 extern "C" void Destroy__6CCharaFv(CChara*);
 extern "C" void Create__6CCharaFv(CChara*);
-extern "C" void DestroyStage__7CMemoryFPQ27CMemory6CStage(void*, void*);
-extern "C" void* CreateStage__7CMemoryFUlPci(void*, unsigned long, const char*, int);
 extern "C" void* createTextureSet__9CCharaPcsFPvi(void*, void*, int);
 extern "C" void Create__Q26CChara5CAnimFPvPQ27CMemory6CStage(void*, void*, void*);
 extern "C" float FLOAT_80330BEC;
@@ -735,9 +733,9 @@ void CCharaPcs::destroyViewer()
         j++;
     } while (j < 0x40);
 
-    DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, m_viewerModelStage);
-    DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, m_viewerTextureStage);
-    DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, m_viewerAnimStage);
+    Memory.DestroyStage(m_viewerModelStage);
+    Memory.DestroyStage(m_viewerTextureStage);
+    Memory.DestroyStage(m_viewerAnimStage);
 }
 
 /*
@@ -759,12 +757,9 @@ void CCharaPcs::createViewer()
     CFile::CHandle* fileHandle;
 
     memset(&self->m_viewerModelStage, 0, 0x18);
-    self->m_viewerModelStage =
-        reinterpret_cast<CMemory::CStage*>(CreateStage__7CMemoryFUlPci(&Memory, 0x177000, s_load_model, 0));
-    self->m_viewerTextureStage =
-        reinterpret_cast<CMemory::CStage*>(CreateStage__7CMemoryFUlPci(&Memory, 0x200000, s_load_texture, 0));
-    self->m_viewerAnimStage =
-        reinterpret_cast<CMemory::CStage*>(CreateStage__7CMemoryFUlPci(&Memory, 0x190000, s_load_anim, 0));
+    self->m_viewerModelStage = Memory.CreateStage(0x177000, const_cast<char*>(s_load_model), 0);
+    self->m_viewerTextureStage = Memory.CreateStage(0x200000, const_cast<char*>(s_load_texture), 0);
+    self->m_viewerAnimStage = Memory.CreateStage(0x190000, const_cast<char*>(s_load_anim), 0);
 
     self->m_viewerAmbientColor.r = 0x3F;
     self->m_viewerAmbientColor.g = 0x3F;

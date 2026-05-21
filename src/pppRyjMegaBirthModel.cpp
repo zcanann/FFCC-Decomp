@@ -173,15 +173,18 @@ static inline void wrap_particle_rotation_triplet(u8* particleBytes, s32 offset)
 
 static inline void wrap_particle_rotation_triplet_s32(u8* particleBytes, s32 offset)
 {
-    for (int i = 0; i < 3; i++) {
-        s32* value = s32_at(particleBytes, offset + i * 4);
+    s32 count = 3;
+    s32* value = s32_at(particleBytes, offset);
+    do {
         while (*value > 0x7FFF) {
             *value -= 0x10000;
         }
         while (*value < -0x8000) {
             *value += 0x10000;
         }
-    }
+        value++;
+        count--;
+    } while (count != 0);
 }
 
 static inline void apply_signed_randomization(u8* particleBytes, s32 offset, u8 flags)
@@ -726,7 +729,7 @@ void calc(_pppPObject* pppPObject, VRyjMegaBirthModel* vRyjMegaBirthModel,
 {
     (void)pppPObject;
 
-    u32 alpha = vColor->m_alpha;
+    int alpha = vColor->m_alpha;
     u8* payload = (u8*)pRyjMegaBirthModel;
     u8* p = (u8*)particleData;
     Vec direction;
@@ -742,24 +745,24 @@ void calc(_pppPObject* pppPObject, VRyjMegaBirthModel* vRyjMegaBirthModel,
         particleColor->m_colorFrameDeltas[1] = particleColor->m_colorFrameDeltas[1] + *f32_at(payload, 0x40);
         particleColor->m_colorFrameDeltas[2] = particleColor->m_colorFrameDeltas[2] + *f32_at(payload, 0x44);
         particleColor->m_colorFrameDeltas[3] = particleColor->m_colorFrameDeltas[3] + *f32_at(payload, 0x48);
-        alpha += (u32)(s32)particleColor->m_color[3];
+        alpha = (int)vColor->m_alpha + (int)particleColor->m_color[3];
         if (alpha > 0xFF) {
             alpha = 0xFF;
         }
     }
 
-    *s32_at(p, 0x38) = *s32_at(p, 0x38) + *s32_at(p, 0x44);
-    *s32_at(p, 0x3C) = *s32_at(p, 0x3C) + *s32_at(p, 0x48);
-    *s32_at(p, 0x40) = *s32_at(p, 0x40) + *s32_at(p, 0x4C);
+    *s32_at(p, 0x38) += *s32_at(p, 0x44);
+    *s32_at(p, 0x3C) += *s32_at(p, 0x48);
+    *s32_at(p, 0x40) += *s32_at(p, 0x4C);
 
     if ((payload[0x133] & 0x10) != 0) {
-        *s32_at(p, 0x44) = *s32_at(payload, 0x70) + *s32_at(p, 0x50) + *s32_at(p, 0x44);
-        *s32_at(p, 0x48) = *s32_at(payload, 0x74) + *s32_at(p, 0x54) + *s32_at(p, 0x48);
-        *s32_at(p, 0x4C) = *s32_at(payload, 0x78) + *s32_at(p, 0x58) + *s32_at(p, 0x4C);
+        *s32_at(p, 0x44) += *s32_at(payload, 0x70) + *s32_at(p, 0x50);
+        *s32_at(p, 0x48) += *s32_at(payload, 0x74) + *s32_at(p, 0x54);
+        *s32_at(p, 0x4C) += *s32_at(payload, 0x78) + *s32_at(p, 0x58);
     } else {
-        *s32_at(p, 0x44) = *s32_at(p, 0x44) + *s32_at(payload, 0x70);
-        *s32_at(p, 0x48) = *s32_at(p, 0x48) + *s32_at(payload, 0x74);
-        *s32_at(p, 0x4C) = *s32_at(p, 0x4C) + *s32_at(payload, 0x78);
+        *s32_at(p, 0x44) += *s32_at(payload, 0x70);
+        *s32_at(p, 0x48) += *s32_at(payload, 0x74);
+        *s32_at(p, 0x4C) += *s32_at(payload, 0x78);
     }
 
     wrap_particle_rotation_triplet_s32(p, 0x38);
@@ -769,33 +772,39 @@ void calc(_pppPObject* pppPObject, VRyjMegaBirthModel* vRyjMegaBirthModel,
     *f32_at(p, 0x64) = *f32_at(p, 0x64) + *f32_at(p, 0x70);
 
     if ((payload[0x132] & 0x10) != 0) {
-        *f32_at(p, 0x68) = *f32_at(p, 0x68) + *(float*)(payload + 0xB0) + *f32_at(p, 0x74);
-        *f32_at(p, 0x6C) = *f32_at(p, 0x6C) + *(float*)(payload + 0xB4) + *f32_at(p, 0x78);
-        *f32_at(p, 0x70) = *f32_at(p, 0x70) + *(float*)(payload + 0xB8) + *f32_at(p, 0x7C);
+        *f32_at(p, 0x68) += *(float*)(payload + 0xB0) + *f32_at(p, 0x74);
+        *f32_at(p, 0x6C) += *(float*)(payload + 0xB4) + *f32_at(p, 0x78);
+        *f32_at(p, 0x70) += *(float*)(payload + 0xB8) + *f32_at(p, 0x7C);
     } else {
-        *f32_at(p, 0x68) = *f32_at(p, 0x68) + *(float*)(payload + 0xB0);
-        *f32_at(p, 0x6C) = *f32_at(p, 0x6C) + *(float*)(payload + 0xB4);
-        *f32_at(p, 0x70) = *f32_at(p, 0x70) + *(float*)(payload + 0xB8);
+        *f32_at(p, 0x68) += *(float*)(payload + 0xB0);
+        *f32_at(p, 0x6C) += *(float*)(payload + 0xB4);
+        *f32_at(p, 0x70) += *(float*)(payload + 0xB8);
     }
 
-    *f32_at(p, 0x80) = *f32_at(p, 0x80) + *(float*)(payload + 0x10C);
+    *f32_at(p, 0x80) += *(float*)(payload + 0x10C);
     if (payload[0x13B] == 0) {
-        if (((*(float*)(payload + 0x108) < FLOAT_80330498) && (*(float*)(payload + 0x10C) < FLOAT_80330498) &&
-             (*f32_at(p, 0x80) < FLOAT_80330498)) ||
-            ((*(float*)(payload + 0x108) > FLOAT_80330498) && (FLOAT_80330498 > *(float*)(payload + 0x10C)) &&
-             (*f32_at(p, 0x80) < FLOAT_80330498))) {
-            *f32_at(p, 0x80) = FLOAT_80330498;
+        if ((FLOAT_80330498 < *(float*)(payload + 0x108)) &&
+            (*(float*)(payload + 0x10C) < FLOAT_80330498)) {
+            if (*f32_at(p, 0x80) < FLOAT_80330498) {
+                *f32_at(p, 0x80) = FLOAT_80330498;
+            }
+        } else {
+            if ((*(float*)(payload + 0x108) < FLOAT_80330498) &&
+                (FLOAT_80330498 < *(float*)(payload + 0x10C)) &&
+                (FLOAT_80330498 < *f32_at(p, 0x80))) {
+                *f32_at(p, 0x80) = FLOAT_80330498;
+            }
         }
     }
 
-    *f32_at(p, 0x84) = *f32_at(p, 0x84) + *(float*)(payload + 0x118);
+    *f32_at(p, 0x84) += *(float*)(payload + 0x118);
     direction.x = particleData->m_matrix[0][1];
     direction.y = particleData->m_matrix[1][1];
     direction.z = particleData->m_matrix[2][1];
+    pppScaleVectorXYZ(step, direction, *f32_at(p, 0x80));
     position.x = particleData->m_matrix[0][3];
     position.y = particleData->m_matrix[1][3];
     position.z = particleData->m_matrix[2][3];
-    pppScaleVectorXYZ(step, direction, *f32_at(p, 0x80));
     pppAddVector(position, position, step);
     pppScaleVectorXYZ(step, vRyjMegaBirthModel->m_accelerationAxis, *f32_at(p, 0x84));
     pppAddVector(position, position, step);
@@ -803,10 +812,10 @@ void calc(_pppPObject* pppPObject, VRyjMegaBirthModel* vRyjMegaBirthModel,
     particleData->m_matrix[1][3] = position.y;
     particleData->m_matrix[2][3] = position.z;
 
-    *f32_at(p, 0x88) = *f32_at(p, 0x88) + *f32_at(p, 0x90);
-    *f32_at(p, 0x8C) = *f32_at(p, 0x8C) + *f32_at(p, 0x94);
-    *f32_at(p, 0x90) = *f32_at(p, 0x90) + *(float*)(payload + 0xD8);
-    *f32_at(p, 0x94) = *f32_at(p, 0x94) + *(float*)(payload + 0xE4);
+    *f32_at(p, 0x88) += *f32_at(p, 0x90);
+    *f32_at(p, 0x8C) += *f32_at(p, 0x94);
+    *f32_at(p, 0x90) += *(float*)(payload + 0xD8);
+    *f32_at(p, 0x94) += *(float*)(payload + 0xE4);
 
     if (*(u16*)(payload + 0x26) != 0) {
         *u16_at(p, 0x30) = *u16_at(p, 0x30) - 1;

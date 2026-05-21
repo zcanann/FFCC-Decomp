@@ -24,7 +24,6 @@ CMapMng MapMng;
 char g_StrTmp[0x400];
 
 extern "C" unsigned long UnkMaterialSetGetter(void*);
-extern "C" void __dla__FPv(void*);
 extern "C" void __destroy_arr(void*, void*, unsigned long, unsigned long);
 extern "C" void __dt__4CRefFv(void*, int);
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
@@ -374,7 +373,7 @@ CPtrArray<CMapLightHolder*>::~CPtrArray()
     void*& items = *reinterpret_cast<void**>(self + 0x10);
 
     if (items != 0) {
-        __dla__FPv(items);
+        delete[] reinterpret_cast<void**>(items);
         items = 0;
     }
 
@@ -398,7 +397,7 @@ extern "C" CPtrArray<CMapLightHolder*>* dtor_80034414(CPtrArray<CMapLightHolder*
 
         void*& items = *reinterpret_cast<void**>(Ptr(ptrArray, 0x10));
         if (items != 0) {
-            __dla__FPv(items);
+            delete[] reinterpret_cast<void**>(items);
             items = 0;
         }
 
@@ -826,7 +825,7 @@ extern "C" CPtrArray<CMapAnimRun*>* dtor_800344C4(CPtrArray<CMapAnimRun*>* ptrAr
 
         void*& items = *reinterpret_cast<void**>(Ptr(ptrArray, 0x10));
         if (items != 0) {
-            __dla__FPv(items);
+            delete[] reinterpret_cast<void**>(items);
             items = 0;
         }
 
@@ -898,7 +897,7 @@ extern "C" CPtrArray<CMapAnim*>* dtor_80034574(CPtrArray<CMapAnim*>* ptrArray, s
 
         void*& items = *reinterpret_cast<void**>(Ptr(ptrArray, 0x10));
         if (items != 0) {
-            __dla__FPv(items);
+            delete[] reinterpret_cast<void**>(items);
             items = 0;
         }
 
@@ -970,7 +969,7 @@ extern "C" CPtrArray<CMapAnimKeyDt*>* dtor_80034624(CPtrArray<CMapAnimKeyDt*>* p
 
         void*& items = *reinterpret_cast<void**>(Ptr(ptrArray, 0x10));
         if (items != 0) {
-            __dla__FPv(items);
+            delete[] reinterpret_cast<void**>(items);
             items = 0;
         }
 
@@ -1042,7 +1041,7 @@ extern "C" CPtrArray<CMapShadow*>* dtor_800346D4(CPtrArray<CMapShadow*>* ptrArra
 
         void*& items = *reinterpret_cast<void**>(Ptr(ptrArray, 0x10));
         if (items != 0) {
-            __dla__FPv(items);
+            delete[] reinterpret_cast<void**>(items);
             items = 0;
         }
 
@@ -3829,7 +3828,7 @@ CMapMng::~CMapMng()
         *reinterpret_cast<void***>(Ptr(this, 0x21434)) = __vt__8CPtrArrayIP10CMapShadow;
         void* items = *reinterpret_cast<void**>(Ptr(this, 0x21444));
         if (items != 0) {
-            __dla__FPv(items);
+            delete[] reinterpret_cast<void**>(items);
             *reinterpret_cast<void**>(Ptr(this, 0x21444)) = 0;
         }
         *reinterpret_cast<int*>(Ptr(this, 0x2143C)) = 0;
@@ -3839,7 +3838,7 @@ CMapMng::~CMapMng()
         *reinterpret_cast<void***>(Ptr(this, 0x21418)) = __vt__8CPtrArrayIP13CMapAnimKeyDt;
         void* items = *reinterpret_cast<void**>(Ptr(this, 0x21428));
         if (items != 0) {
-            __dla__FPv(items);
+            delete[] reinterpret_cast<void**>(items);
             *reinterpret_cast<void**>(Ptr(this, 0x21428)) = 0;
         }
         *reinterpret_cast<int*>(Ptr(this, 0x21420)) = 0;
@@ -3849,7 +3848,7 @@ CMapMng::~CMapMng()
         *reinterpret_cast<void***>(Ptr(this, 0x213FC)) = __vt__8CPtrArrayIP7CMapAnim;
         void* items = *reinterpret_cast<void**>(Ptr(this, 0x2140C));
         if (items != 0) {
-            __dla__FPv(items);
+            delete[] reinterpret_cast<void**>(items);
             *reinterpret_cast<void**>(Ptr(this, 0x2140C)) = 0;
         }
         *reinterpret_cast<int*>(Ptr(this, 0x21404)) = 0;
@@ -3859,7 +3858,7 @@ CMapMng::~CMapMng()
         *reinterpret_cast<void***>(Ptr(this, 0x213E0)) = __vt__8CPtrArrayIP11CMapAnimRun;
         void* items = *reinterpret_cast<void**>(Ptr(this, 0x213F0));
         if (items != 0) {
-            __dla__FPv(items);
+            delete[] reinterpret_cast<void**>(items);
             *reinterpret_cast<void**>(Ptr(this, 0x213F0)) = 0;
         }
         *reinterpret_cast<int*>(Ptr(this, 0x213E8)) = 0;

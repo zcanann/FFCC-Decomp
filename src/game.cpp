@@ -274,7 +274,7 @@ void CGame::Init()
 
     CameraPcs.Init();
     GraphicPcs.Init();
-    gChara.Init();
+    Chara.Init();
     LightPcs.Init();
     CharaPcs.Init();
     MapPcs.Init();
@@ -283,7 +283,7 @@ void CGame::Init()
     USBPcs.Init();
     MenuPcs.Init();
     GbaPcs.Init();
-    GetMcPcsSingleton()->Init();
+    McPcs.Init();
     DbgMenuPcs.Init();
 
     m_mainStage = Memory.CreateStage(0x106000, const_cast<char*>(s_GameStageName_8032F6B4), 0);
@@ -320,7 +320,7 @@ void CGame::Quit()
 
 	Memory.DestroyStage(m_mainStage);
 	DbgMenuPcs.Quit();
-	GetMcPcsSingleton()->Quit();
+	McPcs.Quit();
 	GbaPcs.Quit();
 	MenuPcs.Quit();
 	USBPcs.Quit();
@@ -408,7 +408,7 @@ void CGame::Exec()
 			AddScenegraph__7CSystemFP8CProcessi(&System, &PartPcs, 0);
 			AddScenegraph__7CSystemFP8CProcessi(&System, &GbaPcs, 0);
 			AddScenegraph__7CSystemFP8CProcessi(&System, &DbgMenuPcs, 0);
-			AddScenegraph__7CSystemFP8CProcessi(&System, GetMcPcsSingleton(), 0);
+			AddScenegraph__7CSystemFP8CProcessi(&System, &McPcs, 0);
 			AddScenegraph__7CSystemFP8CProcessi(&System, &SoundPcs, 0);
 			break;
 		case 5:
@@ -444,7 +444,7 @@ void CGame::Exec()
 			break;
 		case 4:
 			RemoveScenegraph__7CSystemFP8CProcessi(&System, &SoundPcs, 0);
-			RemoveScenegraph__7CSystemFP8CProcessi(&System, GetMcPcsSingleton(), 0);
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, &McPcs, 0);
 			RemoveScenegraph__7CSystemFP8CProcessi(&System, &CameraPcs, 0);
 			RemoveScenegraph__7CSystemFP8CProcessi(&System, &CameraPcs, 6);
 			RemoveScenegraph__7CSystemFP8CProcessi(&System, &MapPcs, 0);

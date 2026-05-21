@@ -1446,26 +1446,29 @@ void CGoOutMenu::SetDelMode(unsigned char mode)
 {
     CMenuPcsGoOutLayout& menuPcsLayout = *reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs);
     signed char& delMode = reinterpret_cast<signed char&>(field_0x24[0]);
-    signed char& initSelChar = reinterpret_cast<signed char&>(field_0x24[2]);
+    unsigned char& initSelChar = reinterpret_cast<unsigned char&>(field_0x24[2]);
     int& selectedChara = *reinterpret_cast<int*>(&field_0x24[4]);
 
     delMode = mode;
     switch (delMode) {
-    case 1:
-        MenuGoOutState(menuPcsLayout).m_resultDir = -1;
-        MenuGoOutState(menuPcsLayout).m_waitFrames = 10;
-        break;
     case 2:
+        if (field_0x36 >= 0) {
+            MenuMcWinState(menuPcsLayout).m_mode = 2;
+            MenuGoOutState(menuPcsLayout).m_animFrame = 0;
+        }
         field_0x45 = 0;
         field_0x34 = -1;
         field_0x48 = 0;
         field_0x3c = 0;
-        field_0x40 = 0;
         if (initSelChar == 0) {
             MenuPcs.InitSaveLoadMenu();
         }
         MenuPcs.SetMenuCharaAnim(selectedChara, 0);
         initSelChar = 1;
+        break;
+    case 1:
+        MenuGoOutState(menuPcsLayout).m_resultDir = -1;
+        MenuGoOutState(menuPcsLayout).m_waitFrames = 10;
         break;
     case 3: {
         if (Game.m_caravanWorkArr[selectedChara].m_caravanLocalFlags == 0) {

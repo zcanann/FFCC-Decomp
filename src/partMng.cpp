@@ -87,10 +87,6 @@ extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 extern "C" void _pppDrawPart__FP9_pppMngSt(_pppMngSt*);
 extern "C" void Create__9CGBaseObjFv(CGBaseObj*);
 extern "C" void LoadMap__7CMapPcsFiiPvUlUc(void*, int, int, void*, unsigned long, unsigned char);
-extern "C" int SearchNodeSk__Q26CChara6CModelFPc(CChara::CModel*, char*);
-extern "C" void SetFrame__Q26CChara6CModelFf(float, CChara::CModel*);
-extern "C" void CalcMatrix__Q26CChara6CModelFv(CChara::CModel*);
-extern "C" void CalcSkin__Q26CChara6CModelFv(CChara::CModel*);
 PPPCREATEPARAM g_dcp;
 extern "C" {
 int DAT_8032ed68 = 0;
@@ -1157,8 +1153,7 @@ void CPartMng::SetFp()
             mng->m_owner = owner;
             mng->m_lookTarget = owner;
             if (owner != 0 && owner->m_charaModelHandle != 0 && owner->m_charaModelHandle->m_model != 0) {
-                int node = SearchNodeSk__Q26CChara6CModelFPc(owner->m_charaModelHandle->m_model,
-                                                             reinterpret_cast<char*>(fpBytes + 0x50));
+                int node = owner->m_charaModelHandle->m_model->SearchNodeSk(reinterpret_cast<char*>(fpBytes + 0x50));
                 if (node >= 0) {
                     mng->m_bindNode = reinterpret_cast<void*>(
                         *reinterpret_cast<int*>(*reinterpret_cast<int*>(
@@ -2239,9 +2234,9 @@ void CPartMng::pppEditPartCalc()
     OSStopStopwatch(&g_par_calc_prof);
     if (editorObj != 0 && editorObj->m_charaModelHandle != 0 && editorObj->m_charaModelHandle->m_model != 0) {
         CChara::CModel* model = editorObj->m_charaModelHandle->m_model;
-        CalcMatrix__Q26CChara6CModelFv(model);
-        CalcSkin__Q26CChara6CModelFv(model);
-        SetFrame__Q26CChara6CModelFf(*reinterpret_cast<float*>(self + 0x23564), model);
+        model->CalcMatrix();
+        model->CalcSkin();
+        model->SetFrame(*reinterpret_cast<float*>(self + 0x23564));
         if (gPppCalcDisabled == 0) {
             *reinterpret_cast<float*>(self + 0x23564) += FLOAT_8032fe18;
         }
@@ -4169,8 +4164,7 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
         *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(mng) + 0xD8) = owner;
         *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(mng) + 0xDC) = createParam->m_lookTargetPtr;
         if (owner != 0 && owner->m_charaModelHandle != 0 && owner->m_charaModelHandle->m_model != 0) {
-            int node = SearchNodeSk__Q26CChara6CModelFPc(owner->m_charaModelHandle->m_model,
-                                                         reinterpret_cast<char*>(fpData2 + 0x10));
+            int node = owner->m_charaModelHandle->m_model->SearchNodeSk(reinterpret_cast<char*>(fpData2 + 0x10));
             if (node >= 0) {
                 *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(mng) + 0xE0) = 0;
             }

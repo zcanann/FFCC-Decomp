@@ -44,6 +44,8 @@ extern "C" void destroyViewer__14CFunnyShapePcsFv(CFunnyShapePcs*);
 extern "C" void calcViewer__14CFunnyShapePcsFv(CFunnyShapePcs*);
 extern "C" void drawViewer__14CFunnyShapePcsFv(CFunnyShapePcs*);
 extern "C" void __dt__14CFunnyShapePcsFv(void*);
+extern "C" void* __ct__14CUSBStreamDataFv(void*);
+extern "C" void* __ct__11CFunnyShapeFv(void*);
 extern "C" void* __vt__8CManager[];
 extern "C" void* __vt__8CProcess[];
 extern "C" void* __vt__14CFunnyShapePcs[];
@@ -414,8 +416,8 @@ extern "C" void __sinit_p_FunnyShape_cpp(void)
     *reinterpret_cast<void**>(self) = __vt__8CProcess;
     *reinterpret_cast<void**>(self) = __vt__14CFunnyShapePcs;
 
-    new (self + 0x3C) CUSBStreamData;
-    new (self + 0x50) CFunnyShape;
+    __ct__14CUSBStreamDataFv(UsbStream(pcs));
+    __ct__11CFunnyShapeFv(FunnyShape(pcs));
     new (self + 0x61BC) CPtrArray<OSFS_TEXTURE_ST*>;
     new (self + 0x61D8) CPtrArray<_GXTexObj*>;
     __register_global_object(self, __dt__14CFunnyShapePcsFv, ARRAY_8026D728);
@@ -510,8 +512,8 @@ inline CFunnyShapePcs::CFunnyShapePcs()
 {
     u8* self = reinterpret_cast<u8*>(this);
 
-    new (self + 0x3C) CUSBStreamData;
-    new (self + 0x50) CFunnyShape;
+    __ct__14CUSBStreamDataFv(UsbStream(this));
+    __ct__11CFunnyShapeFv(FunnyShape(this));
     new (self + 0x61BC) CPtrArray<OSFS_TEXTURE_ST*>;
     new (self + 0x61D8) CPtrArray<_GXTexObj*>;
 }

@@ -64,10 +64,10 @@ union CrystalFloatBits {
     u32 bits;
 };
 
-static const CrystalTexMtx s_crystalTexMtxBase = {
+extern const CrystalTexMtx s_crystalTexMtxBase = {
     {{0.5f, 0.0f, 0.0f, 0.5f}, {0.0f, -0.5f, 0.0f, 0.5f}, {0.0f, 0.0f, 0.0f, 1.0f}}};
 
-static const CrystalIndTexMtx s_crystalIndTexMtxBase = {{{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}}};
+extern const CrystalIndTexMtx s_crystalIndTexMtxBase = {{{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}}};
 
 extern const char s_pppCrystalCpp[] = "pppCrystal.cpp";
 

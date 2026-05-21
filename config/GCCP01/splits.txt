@@ -1572,8 +1572,9 @@ astar.cpp:
 	extabindex  start:0x80010E34 end:0x80010EC4
 	.text       start:0x80141550 end:0x80143098
 	.ctors      start:0x801D5444 end:0x801D5448
+	.rodata     start:0x801DD6A8 end:0x801DD6F8
 	.bss        start:0x80309178 end:0x8030B62C
-	.sdata2     start:0x803320A0 end:0x803320C8
+	.sdata2     start:0x80332088 end:0x803320C8
 
 pppConstrainCameraDir.cpp:
 	extab       start:0x80009BFC end:0x80009C04

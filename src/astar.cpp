@@ -11,15 +11,15 @@
 #include "ffcc/partyobj.h"
 #include "ffcc/p_dbgmenu.h"
 extern "C" {
-extern char kAStarGroupDebugFormat[];
-extern char kAStarPortalDebugFormat[];
-extern char kAStarCostDebugFormat[];
-extern const float kPolyGroupBaseXZ;
-extern const float kPolyGroupBaseY;
-extern const float kPolyGroupTopOffsetY;
-extern const float kPolyGroupAabbMax;
-extern const float kPolyGroupAabbMin;
-extern const float kAStarEscapeInitialBestDist;
+extern const char kAStarGroupDebugFormat[] = "A* GROUP=%d";
+extern const char kAStarPortalDebugFormat[] = "addAStar(%.5f, %.5f, %.5f, %d, %d, 0, 0);\n";
+extern const char kAStarCostDebugFormat[0x18] = "\x8d\xc5\x92\x5a\x8c\x6f\x98\x48%d->%d=%.5fm ";
+extern const float kPolyGroupBaseXZ = 0.0f;
+extern const float kPolyGroupBaseY = -100.0f;
+extern const float kPolyGroupTopOffsetY = 5.0f;
+extern const float kPolyGroupAabbMax = 10000000000.0f;
+extern const float kPolyGroupAabbMin = -10000000000.0f;
+extern const float kAStarEscapeInitialBestDist = -1000000.0f;
 extern const char kAStarGroupDebugLabel[] = "//A*\n";
 extern const float kDrawAStarSphereRadius = 10.0f;
 extern const float kInfiniteCost = 10000000.0f;
@@ -297,7 +297,7 @@ void CAStar::addRealTime(CGPartyObj* gPartyObj)
 		m_lastSeenGroup   = static_cast<unsigned char>(gPartyObj->m_aStarGroupId);
 	}
 
-	Graphic.Printf(10, 10, kAStarGroupDebugFormat, static_cast<int>(gPartyObj->m_aStarGroupId));
+	Graphic.Printf(10, 10, const_cast<char*>(kAStarGroupDebugFormat), static_cast<int>(gPartyObj->m_aStarGroupId));
 
 	bool padBusy = false;
 
@@ -417,7 +417,7 @@ void CAStar::addRealTime(CGPartyObj* gPartyObj)
 		if (used)
 		{
 			System.Printf(
-				kAStarPortalDebugFormat,
+				const_cast<char*>(kAStarPortalDebugFormat),
 				static_cast<double>(p.m_position.x),
 				static_cast<double>(p.m_position.y),
 				static_cast<double>(p.m_position.z),

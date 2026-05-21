@@ -49,7 +49,6 @@ extern "C" int putItem__10CGPartyObjFi(CGPartyObj*, int);
 extern "C" int putGil__10CGPartyObjFi(CGPartyObj*, int);
 extern "C" int DelItem__6JoyBusFiUc(JoyBus*, int, unsigned char);
 extern "C" int GetSkillStr__8CMenuPcsFi(void*, int);
-extern "C" void Printf__7CSystemFPce(CSystem*, const char*, ...);
 extern "C" void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
 	void*, void*, int, int, int, void*, void*);
 extern "C" void* __vt__8CMonWork[];
@@ -2651,15 +2650,15 @@ void CCaravanWork::SortBeforeReturnWorldMap()
 	memset(m_commandListExtra, 0, sizeof(m_commandListExtra));
 
 	for (int i = 0; i < 0x40; i++) {
-		Printf__7CSystemFPce(&System, fmtBase + 0x64, i, m_inventoryItems[i]);
+		System.Printf(fmtBase + 0x64, i, m_inventoryItems[i]);
 	}
 
 	for (int i = 2; i < 8; i++) {
-		Printf__7CSystemFPce(&System, fmtBase + 0x74, i, m_commandListInventorySlotRef[i]);
+		System.Printf(fmtBase + 0x74, i, m_commandListInventorySlotRef[i]);
 	}
 
 	for (int i = 0; i < 4; i++) {
-		Printf__7CSystemFPce(&System, fmtBase + 0x88, i, m_equipment[i]);
+		System.Printf(fmtBase + 0x88, i, m_equipment[i]);
 	}
 
 	for (int i = 0; i < 0x3F; i++) {
@@ -2709,15 +2708,15 @@ void CCaravanWork::SortBeforeReturnWorldMap()
 	}
 
 	for (int i = 0; i < 0x40; i++) {
-		Printf__7CSystemFPce(&System, fmtBase + 0x64, i, m_inventoryItems[i]);
+		System.Printf(fmtBase + 0x64, i, m_inventoryItems[i]);
 	}
 
 	for (int i = 2; i < 8; i++) {
-		Printf__7CSystemFPce(&System, fmtBase + 0x74, i, m_commandListInventorySlotRef[i]);
+		System.Printf(fmtBase + 0x74, i, m_commandListInventorySlotRef[i]);
 	}
 
 	for (int i = 0; i < 4; i++) {
-		Printf__7CSystemFPce(&System, fmtBase + 0x88, i, m_equipment[i]);
+		System.Printf(fmtBase + 0x88, i, m_equipment[i]);
 	}
 }
 

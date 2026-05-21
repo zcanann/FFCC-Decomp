@@ -16,7 +16,6 @@ extern "C" void DrawRect__8CMenuPcsFUlfffffffff(CMenuPcs*, unsigned long, float,
 extern "C" void DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(CMenuPcs*, unsigned long, float, float, float, float, float, float, GXColor*, float, float, float);
 extern "C" void DrawSingleIcon__8CMenuPcsFiiifif(CMenuPcs*, int, int, int, float, int, float);
 extern "C" void DrawInit__8CMenuPcsFv(CMenuPcs*);
-extern "C" void Printf__7CSystemFPce(CSystem*, const char*, ...);
 extern CMenuPcs MenuPcs;
 
 extern "C" const char* GetMenuStr__8CMenuPcsFi(CMenuPcs*, int);
@@ -206,7 +205,8 @@ void CMenuPcs::CompaDraw()
 		}
 	}
 	if (familyCount > 4 && System.m_execParam >= 1) {
-		Printf__7CSystemFPce(&System, s_pcts_pctd_family_cnt_error_pctd_801DEDC8, s_menu_compa_cpp_801DEDE8, 0x1BF, familyCount);
+		System.Printf(const_cast<char*>(s_pcts_pctd_family_cnt_error_pctd_801DEDC8), s_menu_compa_cpp_801DEDE8, 0x1BF,
+		              familyCount);
 	}
 	if (familyCount > 4) {
 		familyCount = 4;
@@ -237,7 +237,8 @@ void CMenuPcs::CompaDraw()
 		const u8* compatibility = reinterpret_cast<const u8*>(&Game) + *reinterpret_cast<int*>(scriptFood + 8) * 0x208 + drawIndex + 0xA9;
 		u8 food = *compatibility;
 		if (food == 0 && System.m_execParam >= 1) {
-			Printf__7CSystemFPce(&System, s_pcts_pctd_family_cnt_error_pctd_801DEDC8, s_menu_compa_cpp_801DEDE8, 0x1E0, shown);
+			System.Printf(const_cast<char*>(s_pcts_pctd_family_cnt_error_pctd_801DEDC8), s_menu_compa_cpp_801DEDE8, 0x1E0,
+			              shown);
 		}
 		int icon = 0x1D;
 		if (food < 0x15) {

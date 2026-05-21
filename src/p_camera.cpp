@@ -4,6 +4,7 @@
 #include "ffcc/linkage.h"
 #include "ffcc/materialman.h"
 #include "ffcc/map.h"
+#include "ffcc/mapocttree.h"
 #include "ffcc/math.h"
 #include "ffcc/memory.h"
 #include "ffcc/pad.h"
@@ -146,8 +147,6 @@ Vec g_shadow_pos;
 Vec g_shadow_refpos;
 extern "C" CGObject* FindGObjFirst__13CFlatRuntime2Fv(void*);
 extern "C" CGObject* FindGObjNext__13CFlatRuntime2FP8CGObject(void*, CGObject*);
-extern "C" void SetFrustum__6CBoundFR3VecPA4_f(float* bound, Vec* point, Mtx matrix);
-extern "C" int CheckFrustum0__6CBoundFR6CBound(float* lhs, float* rhs);
 extern "C" void DrawMapShadow__7CMapMngFv(void*);
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, int, int, int, int);
@@ -1408,14 +1407,12 @@ void CCameraPcs::destroyFullShadow()
  * JP Address: TODO
  * JP Size: TODO
  */
-int CCameraPcs::GetShadowRect(CBound&)
+int CCameraPcs::GetShadowRect(CBound& shadowRectBound)
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
     int count = 0;
     Mtx invView;
     Mtx frustumMtx;
-    float cameraBound[6];
-    float* shadowRect = reinterpret_cast<float*>(self + 0x414);
 
     PSMTXInverse(reinterpret_cast<MtxPtr>(self + 0x4), invView);
     Vec eyePos;
@@ -1427,7 +1424,7 @@ int CCameraPcs::GetShadowRect(CBound&)
                     FLOAT_8032fa94 * *reinterpret_cast<float*>(self + 0x94),
                     FLOAT_8032fa98 * *reinterpret_cast<float*>(self + 0xA8),
                     FLOAT_8032fa1c);
-    SetFrustum__6CBoundFR3VecPA4_f(cameraBound, &eyePos, frustumMtx);
+    CBound::SetFrustum(eyePos, frustumMtx);
 
     for (CGObject* gObject = FindGObjFirst__13CFlatRuntime2Fv(CFlat); gObject != 0;
          gObject = FindGObjNext__13CFlatRuntime2FP8CGObject(CFlat, gObject))
@@ -1457,57 +1454,52 @@ int CCameraPcs::GetShadowRect(CBound&)
             radius = FLOAT_8032fa9c;
         }
 
-        float minX = gObject->m_worldPosition.x - radius;
-        float minY = gObject->m_worldPosition.y;
-        float minZ = gObject->m_worldPosition.z - radius;
-        float maxX = gObject->m_worldPosition.x + radius;
-        float maxY = gObject->m_worldPosition.y + radius;
-        float maxZ = gObject->m_worldPosition.z + radius;
+        float clipBoundData[6];
+        CBound* clipBound = reinterpret_cast<CBound*>(clipBoundData);
+        clipBoundData[0] = FLOAT_8032fa78;
+        clipBoundData[1] = FLOAT_8032fa78;
+        clipBoundData[2] = FLOAT_8032fa78;
+        clipBoundData[3] = FLOAT_8032fa7c;
+        clipBoundData[4] = FLOAT_8032fa7c;
+        clipBoundData[5] = FLOAT_8032fa7c;
 
-        float clipBound[6];
-        clipBound[0] = FLOAT_8032fa78;
-        clipBound[1] = FLOAT_8032fa78;
-        clipBound[2] = FLOAT_8032fa78;
-        clipBound[3] = FLOAT_8032fa7c;
-        clipBound[4] = FLOAT_8032fa7c;
-        clipBound[5] = FLOAT_8032fa7c;
+        float worldBoundData[6];
+        CBound* worldBound = reinterpret_cast<CBound*>(worldBoundData);
+        worldBoundData[0] = gObject->m_worldPosition.x - radius;
+        worldBoundData[1] = gObject->m_worldPosition.y;
+        worldBoundData[2] = gObject->m_worldPosition.z - radius;
+        worldBoundData[3] = gObject->m_worldPosition.x + radius;
+        worldBoundData[4] = gObject->m_worldPosition.y + radius;
+        worldBoundData[5] = gObject->m_worldPosition.z + radius;
 
-        float worldBound[6];
-        worldBound[0] = minX;
-        worldBound[1] = minY;
-        worldBound[2] = minZ;
-        worldBound[3] = maxX;
-        worldBound[4] = maxY;
-        worldBound[5] = maxZ;
-
-        if (CheckFrustum0__6CBoundFR6CBound(worldBound, clipBound) == 0) {
+        if (worldBound->CheckFrustum0(*clipBound) == 0) {
             continue;
         }
-        if (FLOAT_8032faa0 >= clipBound[0]) {
+        if (FLOAT_8032faa0 >= clipBoundData[0]) {
             continue;
         }
-        if ((FLOAT_8032fa48 >= (clipBound[5] - clipBound[2]) / -clipBound[0]) &&
-            (FLOAT_8032fa48 >= (clipBound[4] - clipBound[1]) / -clipBound[0])) {
+        if ((FLOAT_8032fa48 >= (clipBoundData[5] - clipBoundData[2]) / -clipBoundData[0]) &&
+            (FLOAT_8032fa48 >= (clipBoundData[4] - clipBoundData[1]) / -clipBoundData[0])) {
             continue;
         }
 
-        if (minX < shadowRect[0]) {
-            shadowRect[0] = minX;
+        if (worldBoundData[0] < shadowRectBound.m_min.x) {
+            shadowRectBound.m_min.x = worldBoundData[0];
         }
-        if (minY < shadowRect[1]) {
-            shadowRect[1] = minY;
+        if (worldBoundData[1] < shadowRectBound.m_min.y) {
+            shadowRectBound.m_min.y = worldBoundData[1];
         }
-        if (minZ < shadowRect[2]) {
-            shadowRect[2] = minZ;
+        if (worldBoundData[2] < shadowRectBound.m_min.z) {
+            shadowRectBound.m_min.z = worldBoundData[2];
         }
-        if (shadowRect[3] < maxX) {
-            shadowRect[3] = maxX;
+        if (shadowRectBound.m_max.x < worldBoundData[3]) {
+            shadowRectBound.m_max.x = worldBoundData[3];
         }
-        if (shadowRect[4] < maxY) {
-            shadowRect[4] = maxY;
+        if (shadowRectBound.m_max.y < worldBoundData[4]) {
+            shadowRectBound.m_max.y = worldBoundData[4];
         }
-        if (shadowRect[5] < maxZ) {
-            shadowRect[5] = maxZ;
+        if (shadowRectBound.m_max.z < worldBoundData[5]) {
+            shadowRectBound.m_max.z = worldBoundData[5];
         }
         count += 1;
     }

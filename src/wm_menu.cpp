@@ -9171,12 +9171,15 @@ int CMenuPcs::CheckSameMcFormatID(Mc::SaveDat* lhs, Mc::SaveDat* rhs)
 {
 	unsigned char* const a = reinterpret_cast<unsigned char*>(lhs);
 	unsigned char* const b = reinterpret_cast<unsigned char*>(rhs);
-	if (*reinterpret_cast<unsigned int*>(a + 0x13D4) != *reinterpret_cast<unsigned int*>(b + 0x13D4) ||
-	    *reinterpret_cast<unsigned int*>(a + 0x13D0) != *reinterpret_cast<unsigned int*>(b + 0x13D0) ||
-	    *reinterpret_cast<unsigned int*>(a + 0x13D8) != *reinterpret_cast<unsigned int*>(b + 0x13D8)) {
-		return 0;
+	unsigned int lhs0 = *reinterpret_cast<unsigned int*>(a + 0x13D0);
+	unsigned int rhs0 = *reinterpret_cast<unsigned int*>(b + 0x13D0);
+	unsigned int lhs1 = *reinterpret_cast<unsigned int*>(a + 0x13D4);
+	unsigned int rhs1 = *reinterpret_cast<unsigned int*>(b + 0x13D4);
+	unsigned int diff = (lhs0 ^ rhs0) | (lhs1 ^ rhs1);
+	if (diff == 0 && *reinterpret_cast<unsigned int*>(a + 0x13D8) == *reinterpret_cast<unsigned int*>(b + 0x13D8)) {
+		return 1;
 	}
-	return 1;
+	return 0;
 }
 
 /*

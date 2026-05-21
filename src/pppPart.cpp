@@ -67,7 +67,6 @@ extern "C" unsigned int DAT_8032ed80;
 extern "C" unsigned int IsEnable__13CAmemCacheSetFs(CAmemCacheSet*, short);
 extern "C" int GetData__13CAmemCacheSetFsPci(CAmemCacheSet*, short, char*, int);
 extern "C" void AddRef__13CAmemCacheSetFs(CAmemCacheSet*, short);
-extern "C" void __dl__FPv(void*);
 extern "C" void* CreateStage__7CMemoryFUlPci(void*, unsigned long, const char*, int);
 extern "C" void DestroyStage__7CMemoryFPQ27CMemory6CStage(void*, void*);
 extern "C" unsigned short SetData__13CAmemCacheSetFPviQ210CAmemCache4TYPEi(CAmemCacheSet*, void*, int, CAmemCache::TYPE,

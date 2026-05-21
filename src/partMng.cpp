@@ -31,10 +31,9 @@ extern int gPppHeapUseRateWords[3];
 
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
+#include <PowerPC_EABI_Support/Runtime/New.h>
 
 extern "C" void Printf__7CSystemFPce(CSystem*, const char*, ...);
-extern "C" void __dl__FPv(void* ptr);
-extern "C" void __dla__FPv(void* ptr);
 extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void _WaitDrawDone__8CGraphicFPci(CGraphic*, const char*, int);
@@ -193,12 +192,12 @@ pppShapeSt::pppShapeSt()
 pppShapeSt::~pppShapeSt()
 {
     if (m_animData != 0) {
-        __dl__FPv(m_animData);
+        delete[] reinterpret_cast<u8*>(m_animData);
         m_animData = 0;
     }
 
     if (m_displayListData != 0) {
-        __dl__FPv(m_displayListData);
+        delete[] reinterpret_cast<u8*>(m_displayListData);
         m_displayListData = 0;
     }
 }
@@ -370,7 +369,7 @@ void CPartMng::Destroy()
             }
         }
         __destroy_arr(res->m_pppModelStArr, reinterpret_cast<void*>(__dt__10pppModelStFv), 0x6c, 0x100);
-        __dl__FPv(res->m_pppModelStArr);
+        operator delete(res->m_pppModelStArr);
         res->m_pppModelStArr = 0;
     }
 
@@ -381,11 +380,11 @@ void CPartMng::Destroy()
                 shape->m_refCount--;
                 if (shape->m_refCount < 1) {
                     if (shape->m_animData != 0) {
-                        __dl__FPv(shape->m_animData);
+                        delete[] reinterpret_cast<u8*>(shape->m_animData);
                         shape->m_animData = 0;
                     }
                     if (shape->m_displayListData != 0) {
-                        __dl__FPv(shape->m_displayListData);
+                        delete[] reinterpret_cast<u8*>(shape->m_displayListData);
                         shape->m_displayListData = 0;
                     }
                     shape->m_refCount = 0;
@@ -394,7 +393,7 @@ void CPartMng::Destroy()
             }
         }
         __destroy_arr(res->m_pppShapeStArr, reinterpret_cast<void*>(__dt__10pppShapeStFv), 0x2c, 0x100);
-        __dl__FPv(res->m_pppShapeStArr);
+        operator delete(res->m_pppShapeStArr);
         res->m_pppShapeStArr = 0;
     }
 
@@ -423,7 +422,7 @@ void CPartMng::Destroy()
             delete handle;
             *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(res->m_editorObj) + 0xf8) = 0;
         }
-        __dl__FPv(res->m_editorObj);
+        operator delete(res->m_editorObj);
         res->m_editorObj = 0;
     }
 
@@ -612,11 +611,11 @@ void CPartMng::pppReleasePdt(int pdtSlotIndex)
         shape->m_refCount--;
         if (shape->m_refCount < 1) {
             if (shape->m_animData != 0) {
-                __dl__FPv(shape->m_animData);
+                delete[] reinterpret_cast<u8*>(shape->m_animData);
                 shape->m_animData = 0;
             }
             if (shape->m_displayListData != 0) {
-                __dl__FPv(shape->m_displayListData);
+                delete[] reinterpret_cast<u8*>(shape->m_displayListData);
                 shape->m_displayListData = 0;
             }
             shape->m_refCount = 0;
@@ -652,7 +651,7 @@ void CPartMng::pppReleasePdt(int pdtSlotIndex)
         pdt->m_cacheChunks = 0;
     }
 
-    __dl__FPv(pdtSlot->m_pppDataHead);
+    delete[] reinterpret_cast<u8*>(pdtSlot->m_pppDataHead);
     pdtSlot->m_pppDataHead = 0;
 
     _WaitDrawDone__8CGraphicFPci(&Graphic, s_partMng_cpp_801d8230, 0x182);
@@ -1388,7 +1387,7 @@ void CPartMng::pppEditAllReleaseResource()
     iter = self;
     do {
         if (*reinterpret_cast<void**>(iter + 0x1D4) != 0) {
-            __dl__FPv(*reinterpret_cast<void**>(iter + 0x1D4));
+            operator delete(*reinterpret_cast<void**>(iter + 0x1D4));
             *reinterpret_cast<void**>(iter + 0x1D4) = 0;
         }
         iVar3 = iVar3 + 1;
@@ -1399,7 +1398,7 @@ void CPartMng::pppEditAllReleaseResource()
     iter = self;
     do {
         if (*reinterpret_cast<void**>(iter + 0x1D8) != 0) {
-            __dl__FPv(*reinterpret_cast<void**>(iter + 0x1D8));
+            operator delete(*reinterpret_cast<void**>(iter + 0x1D8));
             *reinterpret_cast<void**>(iter + 0x1D8) = 0;
         }
         iVar3 = iVar3 + 1;
@@ -1410,7 +1409,7 @@ void CPartMng::pppEditAllReleaseResource()
     iter = self;
     do {
         if (*reinterpret_cast<long**>(iter + 0x1DC) != 0) {
-            __dl__FPv(*reinterpret_cast<long**>(iter + 0x1DC));
+            operator delete(*reinterpret_cast<long**>(iter + 0x1DC));
             *reinterpret_cast<long**>(iter + 0x1DC) = 0;
         }
         iVar3 = iVar3 + 1;
@@ -1455,7 +1454,7 @@ void CPartMng::pppEditAllReleaseResource()
     iter = self;
     do {
         if (*reinterpret_cast<void**>(iter + 0x1D8) != 0) {
-            __dl__FPv(*reinterpret_cast<void**>(iter + 0x1D8));
+            operator delete(*reinterpret_cast<void**>(iter + 0x1D8));
             *reinterpret_cast<void**>(iter + 0x1D8) = 0;
         }
         iVar3 = iVar3 + 1;
@@ -1463,7 +1462,7 @@ void CPartMng::pppEditAllReleaseResource()
     } while (iVar3 < 0x80);
 
     if (*reinterpret_cast<int*>(self + 0x7FC) != 0) {
-        __dl__FPv(*reinterpret_cast<void**>(self + 0x7FC));
+        operator delete(*reinterpret_cast<void**>(self + 0x7FC));
         *reinterpret_cast<int*>(self + 0x7FC) = 0;
     }
 }
@@ -1746,11 +1745,11 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
                     shapeSlot->m_refCount--;
                     if (shapeSlot->m_refCount < 1) {
                         if (shapeSlot->m_animData != 0) {
-                            __dl__FPv(shapeSlot->m_animData);
+                            delete[] reinterpret_cast<u8*>(shapeSlot->m_animData);
                             shapeSlot->m_animData = 0;
                         }
                         if (shapeSlot->m_displayListData != 0) {
-                            __dl__FPv(shapeSlot->m_displayListData);
+                            delete[] reinterpret_cast<u8*>(shapeSlot->m_displayListData);
                             shapeSlot->m_displayListData = 0;
                         }
                         shapeSlot->m_refCount = 0;
@@ -1787,11 +1786,11 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         *reinterpret_cast<int*>(self + kEditCountOffset) = 0;
         _WaitDrawDone__8CGraphicFPci(&Graphic, s_partMng_cpp_801d8230, 0x3B3);
         if (pdtSlots[0].m_pdt != 0) {
-            __dl__FPv(pdtSlots[0].m_pdt);
+            delete[] reinterpret_cast<u8*>(pdtSlots[0].m_pdt);
             pdtSlots[0].m_pdt = 0;
         }
         if (*reinterpret_cast<void**>(self + kRecvBuffOffset) != 0) {
-            __dl__FPv(*reinterpret_cast<void**>(self + kRecvBuffOffset));
+            delete[] *reinterpret_cast<u8**>(self + kRecvBuffOffset);
             *reinterpret_cast<void**>(self + kRecvBuffOffset) = 0;
         }
         pdtSlots[0].m_pdt = reinterpret_cast<_pppDataHead*>(
@@ -1849,11 +1848,11 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         int pdtCount = *reinterpret_cast<int*>(self + kPdtCountOffset);
         if (0 <= pdtCount && pdtCount < 0x18) {
             if (pdtSlots[pdtCount].m_pdt != 0) {
-                __dl__FPv(pdtSlots[pdtCount].m_pdt);
+                delete[] reinterpret_cast<u8*>(pdtSlots[pdtCount].m_pdt);
                 pdtSlots[pdtCount].m_pdt = 0;
             }
             if (*reinterpret_cast<void**>(self + kRecvBuffOffset) != 0) {
-                __dl__FPv(*reinterpret_cast<void**>(self + kRecvBuffOffset));
+                delete[] *reinterpret_cast<u8**>(self + kRecvBuffOffset);
                 *reinterpret_cast<void**>(self + kRecvBuffOffset) = 0;
             }
 
@@ -2131,7 +2130,7 @@ void CPartMng::pppEditBeforeCalc()
                 delete (*editorObj)->m_charaModelHandle;
                 (*editorObj)->m_charaModelHandle = 0;
             }
-            __dl__FPv(*editorObj);
+            operator delete(*editorObj);
             *editorObj = 0;
         }
 
@@ -3596,7 +3595,7 @@ void CPartMng::pppLoadPmd(const char* baseName)
                             *meshDataPtr, 0, static_cast<CAmemCache::TYPE>(1), 1));
 
                         if (*meshDataPtr != 0) {
-                            __dl__FPv(*meshDataPtr);
+                            operator delete(*meshDataPtr);
                             *meshDataPtr = 0;
                         }
 

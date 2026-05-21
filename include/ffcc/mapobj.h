@@ -164,7 +164,8 @@ public:
     unsigned short m_meshId;        // 0x34
     char m_pad36[0x52];
     float m_localMtx[3][4];         // 0x88
-    char m_padB8[0x38];
+    float m_worldMtx[3][4];         // 0xB8
+    char m_padE8[0x08];
 };
 
 typedef char CMapObj_size_check[(sizeof(CMapObj) == 0xF0) ? 1 : -1];

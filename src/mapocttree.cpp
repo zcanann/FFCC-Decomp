@@ -112,9 +112,9 @@ static inline unsigned char* Ptr(void* ptr, unsigned int offset)
     return reinterpret_cast<unsigned char*>(ptr) + offset;
 }
 
-static inline COctNode* GetMapObjByIndex(unsigned short index)
+static inline CMapObj* GetMapObjByIndex(unsigned short index)
 {
-    return reinterpret_cast<COctNode*>(reinterpret_cast<unsigned char*>(&MapMng) + 0x954 + (index * 0xF0));
+    return reinterpret_cast<CMapObj*>(reinterpret_cast<unsigned char*>(&MapMng) + 0x954 + (index * 0xF0));
 }
 
 }
@@ -1881,9 +1881,9 @@ int COctTree::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long 
 	CMapHit* mapHit;
 
 	if (m_type == 2) {
-		mapHit = *reinterpret_cast<CMapHit**>(reinterpret_cast<u8*>(m_mapObject) + 0xC);
+		mapHit = static_cast<CMapHit*>(m_mapObject->m_mapData);
 		if (mapHit != 0) {
-			PSMTXInverse(reinterpret_cast<MtxPtr>(reinterpret_cast<u8*>(m_mapObject) + 0xB8), inverseMtx);
+			PSMTXInverse(m_mapObject->m_worldMtx, inverseMtx);
 			PSMTXMultVec(inverseMtx, &cylinder->m_bottom, &s_cyl.m_bottom);
 			PSMTXMultVec(inverseMtx, &cylinder->m_top, &s_cyl.m_top);
 			PSMTXMultVecSR(inverseMtx, &cylinder->m_axis, &s_cyl.m_axis);
@@ -2104,9 +2104,9 @@ void COctTree::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned 
 	CMapHit* mapHit;
 
 	if (m_type == 2) {
-		mapHit = *reinterpret_cast<CMapHit**>(reinterpret_cast<u8*>(m_mapObject) + 0xC);
+		mapHit = static_cast<CMapHit*>(m_mapObject->m_mapData);
 		if (mapHit != 0) {
-			PSMTXInverse(reinterpret_cast<MtxPtr>(reinterpret_cast<u8*>(m_mapObject) + 0xB8), inverseMtx);
+			PSMTXInverse(m_mapObject->m_worldMtx, inverseMtx);
 			PSMTXMultVec(inverseMtx, &cylinder->m_bottom, &s_cyl.m_bottom);
 			PSMTXMultVec(inverseMtx, &cylinder->m_top, &s_cyl.m_top);
 			PSMTXMultVecSR(inverseMtx, &cylinder->m_axis, &s_cyl.m_axis);

@@ -12,6 +12,9 @@
 #include "ffcc/ringmenu.h"
 #include "ffcc/system.h"
 
+extern "C" double sin(double);
+extern "C" double cos(double);
+
 #include <math.h>
 
 extern "C" int IsAnimFinished__8CGObjectFi(CGObject*, int);

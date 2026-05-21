@@ -22,7 +22,6 @@ GbaQueue GbaQue;
 extern "C" int rand(void);
 extern "C" CGObject* FindGObjFirst__13CFlatRuntime2Fv(void*);
 extern "C" CGObject* FindGObjNext__13CFlatRuntime2FP8CGObject(void*, CGObject*);
-extern "C" void Printf__7CSystemFPce(CSystem*, char*, ...);
 extern "C" int memcmp(const void*, const void*, unsigned long);
 extern "C" void MakeAgbString__4CMesFPcPcii(char*, char*, int, int);
 extern "C" int AddItem__12CCaravanWorkFiPi(void*, int, int*);
@@ -2251,7 +2250,7 @@ int GbaQueue::MakeLetterList(int channel, char* outData)
 char* npcNameBuf = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp_801DB370), 0x7A7) char[0x800];
 	if (npcNameBuf == 0) {
 		if ((unsigned int)System.m_execParam >= 1) {
-Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp_801DB370), 0x7A9);
+System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp_801DB370), 0x7A9);
 		}
 		return -1;
 	}
@@ -2260,7 +2259,7 @@ Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocat
 char* subjectNameBuf = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp_801DB370), 0x7B1) char[0x1800];
 	if (subjectNameBuf == 0) {
 		if ((unsigned int)System.m_execParam >= 1) {
-Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp_801DB370), 0x7B3);
+System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp_801DB370), 0x7B3);
 		}
 		return -1;
 	}
@@ -2270,7 +2269,7 @@ unsigned int* letterEntryBuf =
 	new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp_801DB370), 0x7BB) unsigned int[0x1000];
 	if (letterEntryBuf == 0) {
 		if ((unsigned int)System.m_execParam >= 1) {
-Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp_801DB370), 0x7BD);
+System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp_801DB370), 0x7BD);
 		}
 		return -1;
 	}
@@ -2312,7 +2311,7 @@ Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocat
 
 		if (matchedNpc == -1) {
 			if (npcCount > 0x7F && (unsigned int)System.m_execParam >= 1) {
-Printf__7CSystemFPce(&System, const_cast<char*>(s_npc_max_over), const_cast<char*>(s_gbaque_cpp_801DB370), 0x7DC);
+System.Printf(const_cast<char*>(s_npc_max_over), const_cast<char*>(s_gbaque_cpp_801DB370), 0x7DC);
 			}
 
 			memset(tempName, 0, 0x20);
@@ -2328,7 +2327,7 @@ Printf__7CSystemFPce(&System, const_cast<char*>(s_npc_max_over), const_cast<char
 
 		if (matchedSubject == -1) {
 			if (subjectCount > 0xFF && (unsigned int)System.m_execParam >= 1) {
-Printf__7CSystemFPce(&System, const_cast<char*>(s_subject_max_over), const_cast<char*>(s_gbaque_cpp_801DB370), 0x7F0);
+System.Printf(const_cast<char*>(s_subject_max_over), const_cast<char*>(s_gbaque_cpp_801DB370), 0x7F0);
 			}
 
 			memset(tempName, 0, 0x20);
@@ -2363,7 +2362,7 @@ Printf__7CSystemFPce(&System, const_cast<char*>(s_subject_max_over), const_cast<
 					flags |= 0x10;
 					entryWrite[0] = SwapU32(value);
 				} else if ((unsigned int)System.m_execParam >= 1) {
-Printf__7CSystemFPce(&System, const_cast<char*>(s_letter_data_error), const_cast<char*>(s_gbaque_cpp_801DB370), 0x810, channel, i);
+System.Printf(const_cast<char*>(s_letter_data_error), const_cast<char*>(s_gbaque_cpp_801DB370), 0x810, channel, i);
 				}
 			}
 		} else if (value != 0) {
@@ -2416,7 +2415,7 @@ int GbaQueue::MakeLetterData(int channel, char* outData, int letterIndex)
 char* srcText = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp_801DB370), 0x859) char[0x400];
     if (srcText == 0) {
         if ((unsigned int)System.m_execParam >= 1) {
-Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp_801DB370), 0x85B);
+System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp_801DB370), 0x85B);
         }
         return -1;
     }
@@ -2425,7 +2424,7 @@ Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocat
 char* workText = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp_801DB370), 0x862) char[0x400];
     if (workText == 0) {
         if ((unsigned int)System.m_execParam >= 1) {
-Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp_801DB370), 0x864);
+System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp_801DB370), 0x864);
         }
         return -1;
     }
@@ -2701,7 +2700,7 @@ void GbaQueue::LoadMapObj()
 					*reinterpret_cast<unsigned int*>(mapObjWork + 4) = drawMask;
 					mapObjWork[0] = static_cast<unsigned char>(count + 1);
 				} else if (System.m_execParam > 1) {
-Printf__7CSystemFPce(&System, const_cast<char*>(s_unknown_mapobj_type_error), objType);
+System.Printf(const_cast<char*>(s_unknown_mapobj_type_error), objType);
 				}
 			}
 
@@ -3120,7 +3119,7 @@ void GbaQueue::ChkCMakeName(int channel, unsigned int value)
 		OSSignalSemaphore(semaphore);
 	} else {
 		if (System.m_execParam != 0) {
-Printf__7CSystemFPce(&System, const_cast<char*>(s_cmake_name_crc_error), const_cast<char*>(s_gbaque_cpp_801DB370), 0xAD3);
+System.Printf(const_cast<char*>(s_cmake_name_crc_error), const_cast<char*>(s_gbaque_cpp_801DB370), 0xAD3);
 		}
 		Joybus.SendResult(channel, 1, localInfo.m_resultCode, 0);
 	}
@@ -3335,7 +3334,7 @@ void GbaQueue::CMakeFavorite(int channel, unsigned int value)
 	unsigned short crc = 0xFFFF;
 	if (Joybus.Crc16(4, localInfo.m_favorite, &crc) != localInfo.m_crc) {
 		if (System.m_execParam >= 1) {
-Printf__7CSystemFPce(&System, const_cast<char*>(s_cmake_favorite_crc_error), const_cast<char*>(s_gbaque_cpp_801DB370), 0xBDC);
+System.Printf(const_cast<char*>(s_cmake_favorite_crc_error), const_cast<char*>(s_gbaque_cpp_801DB370), 0xBDC);
 		}
 		Joybus.SendResult(channel, 1, localInfo.m_resultCode, 0);
 	} else {
@@ -3423,7 +3422,7 @@ int GbaQueue::GetCompatibility(int channel, unsigned char* outCompatibility)
 	}
 
 	if ((count > 4) && (System.m_execParam != 0)) {
-		Printf__7CSystemFPce(&System, const_cast<char*>(s_compatibility_data_error));
+		System.Printf(const_cast<char*>(s_compatibility_data_error));
 	}
 
 	outCompatibility[1] = count;
@@ -3742,7 +3741,7 @@ void GbaQueue::MakeBuyData(int channel, char* outData)
 char* itemNameScratch = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp_801DB370), 0xD79) char[0x400];
 	if (itemNameScratch == 0) {
 		if (System.m_execParam >= 1) {
-Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp_801DB370), 0xD7B);
+System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp_801DB370), 0xD7B);
 		}
 		return;
 	}
@@ -3751,7 +3750,7 @@ Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocat
 char* agbStringScratch = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp_801DB370), 0xD82) char[0x400];
 	if (agbStringScratch == 0) {
 		if (System.m_execParam >= 1) {
-Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp_801DB370), 0xD84);
+System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp_801DB370), 0xD84);
 		}
 		return;
 	}
@@ -3842,7 +3841,7 @@ int GbaQueue::MakeSellData(int channel, char* outData)
 char* itemNameScratch = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp_801DB370), 0xDD5) char[0x400];
 	if (itemNameScratch == 0) {
 		if ((unsigned int)System.m_execParam >= 1) {
-Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp_801DB370), 0xDD7);
+System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp_801DB370), 0xDD7);
 		}
 		return -1;
 	}
@@ -3851,7 +3850,7 @@ Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocat
 char* agbStringScratch = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp_801DB370), 0xDDE) char[0x400];
 	if (agbStringScratch == 0) {
 		if ((unsigned int)System.m_execParam >= 1) {
-Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp_801DB370), 0xDE0);
+System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp_801DB370), 0xDE0);
 		}
 		return -1;
 	}
@@ -3950,7 +3949,7 @@ int GbaQueue::MakeSmithData(int channel, char* outData)
 		unsigned char[0x40];
 	if (smithIndices == 0) {
 		if ((unsigned int)System.m_execParam >= 1) {
-Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp_801DB370), 0xE43);
+System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp_801DB370), 0xE43);
 		}
 		return -1;
 	}
@@ -4449,8 +4448,8 @@ int GbaQueue::MakeArtiData(int channel, char* outData)
 	char* itemNameScratch = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp_801DB370), 0x100F) char[0x400];
 	if (itemNameScratch == 0) {
 		if (System.m_execParam != 0) {
-			Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp_801DB370),
-			                     0x1011);
+			System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp_801DB370),
+			              0x1011);
 		}
 		return -1;
 	}
@@ -4459,8 +4458,8 @@ int GbaQueue::MakeArtiData(int channel, char* outData)
 	char* agbStringScratch = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp_801DB370), 0x1017) char[0x400];
 	if (agbStringScratch == 0) {
 		if (System.m_execParam != 0) {
-			Printf__7CSystemFPce(&System, const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp_801DB370),
-			                     0x1019);
+			System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp_801DB370),
+			              0x1019);
 		}
 		return -1;
 	}

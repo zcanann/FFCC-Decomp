@@ -43,6 +43,8 @@ extern const f32 FLOAT_8033086C;
 #include "ffcc/fontman.h"
 
 #include <dolphin/mtx.h>
+extern "C" double sin(double);
+extern "C" double cos(double);
 #include <math.h>
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
@@ -1315,10 +1317,10 @@ void CMenuPcs::SetTexture(CMenuPcs::TEX tex)
  */
 void CMenuPcs::DrawRect(unsigned long attr, float x, float y, float w, float h, float u, float v, float us, float vs, float angle)
 {
-    if (w <= 0.0f) {
+    if (w <= LoadFloat(kMenuInitOne)) {
         return;
     }
-    if (h <= 0.0f) {
+    if (h <= LoadFloat(kMenuInitOne)) {
         return;
     }
     {
@@ -1334,19 +1336,19 @@ void CMenuPcs::DrawRect(unsigned long attr, float x, float y, float w, float h, 
         float scaledH;
 
         if ((attr & 8) != 0) {
-            u1 = u + 0.5f;
-            u0 = (u + w) - 0.5f;
+            u1 = u + LoadFloat(FLOAT_8033084C);
+            u0 = (u + w) - LoadFloat(FLOAT_8033084C);
         } else {
-            u0 = u + 0.5f;
-            u1 = (u + w) - 0.5f;
+            u0 = u + LoadFloat(FLOAT_8033084C);
+            u1 = (u + w) - LoadFloat(FLOAT_8033084C);
         }
 
         if ((attr & 4) != 0) {
-            v1 = v + 0.5f;
-            v0 = (v1 + h) - 0.5f;
+            v1 = v + LoadFloat(FLOAT_8033084C);
+            v0 = (v1 + h) - LoadFloat(FLOAT_8033084C);
         } else {
-            v0 = v + 0.5f;
-            v1 = (v + h) - 0.5f;
+            v0 = v + LoadFloat(FLOAT_8033084C);
+            v1 = (v + h) - LoadFloat(FLOAT_8033084C);
         }
 
         scaledW = w * us;
@@ -1354,19 +1356,19 @@ void CMenuPcs::DrawRect(unsigned long attr, float x, float y, float w, float h, 
 
         x0 = x;
         if ((attr & 1) != 0) {
-            x0 = -(scaledW * 0.5f - x);
+            x0 = -(scaledW * LoadFloat(FLOAT_8033084C) - x);
         }
 
         y0 = y;
         if ((attr & 2) != 0) {
-            y0 = -(scaledH * 0.5f - y);
+            y0 = -(scaledH * LoadFloat(FLOAT_8033084C) - y);
         }
 
         x1 = x0 + scaledW;
         y1 = y0 + scaledH;
 
         GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT0, 4);
-        if (0.0f != angle) {
+        if (LoadFloat(kMenuInitOne) != angle) {
             float s = static_cast<float>(sin(angle));
             float c = static_cast<float>(cos(angle));
             float xtl = ((x0 - x) * c) + x;
@@ -1378,28 +1380,28 @@ void CMenuPcs::DrawRect(unsigned long attr, float x, float y, float w, float h, 
             float tx1 = (y1 - y) * s;
             float ty1 = (y1 - y) * c;
 
-            GXPosition3f32(xtl - tx0, ytl + ty0, 0.0f);
+            GXPosition3f32(xtl - tx0, ytl + ty0, LoadFloat(kMenuInitOne));
             GXTexCoord2f32(u0, v0);
 
-            GXPosition3f32(xtr - tx0, ytr + ty0, 0.0f);
+            GXPosition3f32(xtr - tx0, ytr + ty0, LoadFloat(kMenuInitOne));
             GXTexCoord2f32(u1, v0);
 
-            GXPosition3f32(xtl - tx1, ytl + ty1, 0.0f);
+            GXPosition3f32(xtl - tx1, ytl + ty1, LoadFloat(kMenuInitOne));
             GXTexCoord2f32(u0, v1);
 
-            GXPosition3f32(xtr - tx1, ytr + ty1, 0.0f);
+            GXPosition3f32(xtr - tx1, ytr + ty1, LoadFloat(kMenuInitOne));
             GXTexCoord2f32(u1, v1);
         } else {
-            GXPosition3f32(x0, y0, 0.0f);
+            GXPosition3f32(x0, y0, LoadFloat(kMenuInitOne));
             GXTexCoord2f32(u0, v0);
 
-            GXPosition3f32(x1, y0, 0.0f);
+            GXPosition3f32(x1, y0, LoadFloat(kMenuInitOne));
             GXTexCoord2f32(u1, v0);
 
-            GXPosition3f32(x0, y1, 0.0f);
+            GXPosition3f32(x0, y1, LoadFloat(kMenuInitOne));
             GXTexCoord2f32(u0, v1);
 
-            GXPosition3f32(x1, y1, 0.0f);
+            GXPosition3f32(x1, y1, LoadFloat(kMenuInitOne));
             GXTexCoord2f32(u1, v1);
         }
     }
@@ -1416,10 +1418,10 @@ void CMenuPcs::DrawRect(unsigned long attr, float x, float y, float w, float h, 
  */
 void CMenuPcs::DrawRect(unsigned long attr, float x, float y, float w, float h, float u, float v, _GXColor* colors, float us, float vs, float angle)
 {
-    if (w <= 0.0f) {
+    if (w <= LoadFloat(kMenuInitOne)) {
         return;
     }
-    if (h <= 0.0f) {
+    if (h <= LoadFloat(kMenuInitOne)) {
         return;
     }
     {
@@ -1435,19 +1437,19 @@ void CMenuPcs::DrawRect(unsigned long attr, float x, float y, float w, float h, 
         float scaledH;
 
         if ((attr & 8) != 0) {
-            u1 = u + 0.5f;
-            u0 = (u + w) - 0.5f;
+            u1 = u + LoadFloat(FLOAT_8033084C);
+            u0 = (u + w) - LoadFloat(FLOAT_8033084C);
         } else {
-            u0 = u + 0.5f;
-            u1 = (u + w) - 0.5f;
+            u0 = u + LoadFloat(FLOAT_8033084C);
+            u1 = (u + w) - LoadFloat(FLOAT_8033084C);
         }
 
         if ((attr & 4) != 0) {
-            v1 = v + 0.5f;
-            v0 = (v1 + h) - 0.5f;
+            v1 = v + LoadFloat(FLOAT_8033084C);
+            v0 = (v1 + h) - LoadFloat(FLOAT_8033084C);
         } else {
-            v0 = v + 0.5f;
-            v1 = (v + h) - 0.5f;
+            v0 = v + LoadFloat(FLOAT_8033084C);
+            v1 = (v + h) - LoadFloat(FLOAT_8033084C);
         }
 
         scaledW = w * us;
@@ -1455,19 +1457,19 @@ void CMenuPcs::DrawRect(unsigned long attr, float x, float y, float w, float h, 
 
         x0 = x;
         if ((attr & 1) != 0) {
-            x0 = -(scaledW * 0.5f - x);
+            x0 = -(scaledW * LoadFloat(FLOAT_8033084C) - x);
         }
 
         y0 = y;
         if ((attr & 2) != 0) {
-            y0 = -(scaledH * 0.5f - y);
+            y0 = -(scaledH * LoadFloat(FLOAT_8033084C) - y);
         }
 
         x1 = x0 + scaledW;
         y1 = y0 + scaledH;
 
         GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT0, 4);
-        if (0.0f != angle) {
+        if (LoadFloat(kMenuInitOne) != angle) {
             float s = static_cast<float>(sin(angle));
             float c = static_cast<float>(cos(angle));
             float xtl = ((x0 - x) * c) + x;
@@ -1479,35 +1481,35 @@ void CMenuPcs::DrawRect(unsigned long attr, float x, float y, float w, float h, 
             float tx1 = (y1 - y) * s;
             float ty1 = (y1 - y) * c;
 
-            GXPosition3f32(xtl - tx0, ytl + ty0, 0.0f);
+            GXPosition3f32(xtl - tx0, ytl + ty0, LoadFloat(kMenuInitOne));
             GXColor1u32(*reinterpret_cast<u32*>(&colors[0]));
             GXTexCoord2f32(u0, v0);
 
-            GXPosition3f32(xtr - tx0, ytr + ty0, 0.0f);
+            GXPosition3f32(xtr - tx0, ytr + ty0, LoadFloat(kMenuInitOne));
             GXColor1u32(*reinterpret_cast<u32*>(&colors[1]));
             GXTexCoord2f32(u1, v0);
 
-            GXPosition3f32(xtl - tx1, ytl + ty1, 0.0f);
+            GXPosition3f32(xtl - tx1, ytl + ty1, LoadFloat(kMenuInitOne));
             GXColor1u32(*reinterpret_cast<u32*>(&colors[2]));
             GXTexCoord2f32(u0, v1);
 
-            GXPosition3f32(xtr - tx1, ytr + ty1, 0.0f);
+            GXPosition3f32(xtr - tx1, ytr + ty1, LoadFloat(kMenuInitOne));
             GXColor1u32(*reinterpret_cast<u32*>(&colors[3]));
             GXTexCoord2f32(u1, v1);
         } else {
-            GXPosition3f32(x0, y0, 0.0f);
+            GXPosition3f32(x0, y0, LoadFloat(kMenuInitOne));
             GXColor1u32(*reinterpret_cast<u32*>(&colors[0]));
             GXTexCoord2f32(u0, v0);
 
-            GXPosition3f32(x1, y0, 0.0f);
+            GXPosition3f32(x1, y0, LoadFloat(kMenuInitOne));
             GXColor1u32(*reinterpret_cast<u32*>(&colors[1]));
             GXTexCoord2f32(u1, v0);
 
-            GXPosition3f32(x0, y1, 0.0f);
+            GXPosition3f32(x0, y1, LoadFloat(kMenuInitOne));
             GXColor1u32(*reinterpret_cast<u32*>(&colors[2]));
             GXTexCoord2f32(u0, v1);
 
-            GXPosition3f32(x1, y1, 0.0f);
+            GXPosition3f32(x1, y1, LoadFloat(kMenuInitOne));
             GXColor1u32(*reinterpret_cast<u32*>(&colors[3]));
             GXTexCoord2f32(u1, v1);
         }

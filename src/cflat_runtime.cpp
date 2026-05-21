@@ -2,12 +2,12 @@
 #include "ffcc/chunkfile.h"
 #include "ffcc/stopwatch.h"
 #include "ffcc/system.h"
+#include <PowerPC_EABI_Support/Runtime/MWCPlusLib.h>
 #include <string.h>
 
 extern "C" {
 void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, void*, char*, int);
 void __ct__Q212CFlatRuntime6CClassFv(void*);
-void* __construct_new_array(void*, void*, void*, unsigned long, unsigned long);
 char DAT_80330118[];
 void* __vt__12CFlatRuntime[];
 void* __vt__Q212CFlatRuntime7CObject[];

@@ -28,6 +28,7 @@ extern const float FLOAT_80330320;
 
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h"
 #include <PowerPC_EABI_Support/Runtime/New.h>
+#include <PowerPC_EABI_Support/Runtime/MWCPlusLib.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
 CCharaPcs CharaPcs;
@@ -38,7 +39,6 @@ u8* gCharaPartWorkPtr = 0;
 
 extern "C" int __cntlzw(unsigned int);
 extern "C" void __ct__6CColorFv(void*);
-extern "C" void __construct_array(void*, void (*)(void*), void (*)(void*, int), unsigned long, unsigned long);
 extern "C" void ReleasePdt__8CPartPcsFi(void*, int);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 extern "C" CMemory::CStage* CreateStage__7CMemoryFUlPci(CMemory*, unsigned long, const char*, int);
@@ -696,7 +696,7 @@ CCharaPcs::CCharaPcs()
     new (LoadAnimArray(this)) CPtrArray<CLoadAnim*>();
     new (LoadTextureArray(this)) CPtrArray<CLoadTexture*>();
     new (LoadPdtArray(this)) CPtrArray<CLoadPdt*>();
-    __construct_array(Ptr(this, 0x12C), __ct__6CColorFv, 0, 4, 5);
+    __construct_array(Ptr(this, 0x12C), reinterpret_cast<ConstructorDestructor>(__ct__6CColorFv), 0, 4, 5);
 }
 
 /*

@@ -88,11 +88,6 @@ extern "C" void RestoreProjection__8CMenuPcsFv(CMenuPcs*);
 extern "C" void Draw__9CShopMenuFv(void*);
 extern "C" void Calc__9CShopMenuFv(void*);
 extern "C" void SingleDrawCtrl__8CMenuPcsFv(CMenuPcs*);
-extern "C" void SetFrame__Q26CChara6CModelFf(float, CChara::CModel*);
-extern "C" void AddFrame__Q26CChara6CModelFf(float, CChara::CModel*);
-extern "C" void SetMatrix__Q26CChara6CModelFPA4_f(CChara::CModel*, Mtx);
-extern "C" void CalcMatrix__Q26CChara6CModelFv(CChara::CModel*);
-extern "C" void CalcSkin__Q26CChara6CModelFv(CChara::CModel*);
 extern "C" void _WaitDrawDone__8CGraphicFPci(CGraphic*, const char*, int);
 extern "C" void DestroyTempBuffer__8CGraphicFv(CGraphic*);
 extern "C" int GetModelNo__8CMenuPcsFiii(CMenuPcs*, int, int, int);
@@ -1531,9 +1526,9 @@ void CMenuPcs::SingCalcChara(float frameStep)
 
     if (*reinterpret_cast<float*>(reinterpret_cast<u8*>(model) + 0x10) <=
         *reinterpret_cast<float*>(reinterpret_cast<u8*>(model) + 0x08)) {
-        SetFrame__Q26CChara6CModelFf(FLOAT_8033294c, model);
+        model->SetFrame(FLOAT_8033294c);
     } else {
-        AddFrame__Q26CChara6CModelFf(frameStep, model);
+        model->AddFrame(frameStep);
     }
 
     unsigned short modelScaleIndex = *reinterpret_cast<unsigned short*>(Game.m_scriptFoodBase[0] + 0x3E0);
@@ -1546,9 +1541,9 @@ void CMenuPcs::SingCalcChara(float frameStep)
 
     int modelPtr = *reinterpret_cast<int*>(*reinterpret_cast<int*>(self + 0x774) + 0x168);
     *reinterpret_cast<u8*>(modelPtr + 0x10C) = (*reinterpret_cast<u8*>(modelPtr + 0x10C) & 0x7F) | 0x80;
-    SetMatrix__Q26CChara6CModelFPA4_f(model, scaleMtx);
-    CalcMatrix__Q26CChara6CModelFv(model);
-    CalcSkin__Q26CChara6CModelFv(model);
+    model->SetMatrix(scaleMtx);
+    model->CalcMatrix();
+    model->CalcSkin();
 }
 
 /*
@@ -1887,9 +1882,9 @@ void CMenuPcs::SingleCalcFadeIn()
     CChara::CModel* model = *reinterpret_cast<CChara::CModel**>(*reinterpret_cast<int*>(self + 0x774) + 0x168);
     if (*reinterpret_cast<float*>(reinterpret_cast<u8*>(model) + 0x10) <=
         *reinterpret_cast<float*>(reinterpret_cast<u8*>(model) + 0x08)) {
-        SetFrame__Q26CChara6CModelFf(FLOAT_8033294c, model);
+        model->SetFrame(FLOAT_8033294c);
     } else {
-        AddFrame__Q26CChara6CModelFf(FLOAT_80332934, model);
+        model->AddFrame(FLOAT_80332934);
     }
 
     unsigned short modelScaleIndex = *reinterpret_cast<unsigned short*>(Game.m_scriptFoodBase[0] + 0x3E0);
@@ -1902,9 +1897,9 @@ void CMenuPcs::SingleCalcFadeIn()
 
     int modelPtr = *reinterpret_cast<int*>(*reinterpret_cast<int*>(self + 0x774) + 0x168);
     *reinterpret_cast<u8*>(modelPtr + 0x10C) = (*reinterpret_cast<u8*>(modelPtr + 0x10C) & 0x7F) | 0x80;
-    SetMatrix__Q26CChara6CModelFPA4_f(model, scaleMtx);
-    CalcMatrix__Q26CChara6CModelFv(model);
-    CalcSkin__Q26CChara6CModelFv(model);
+    model->SetMatrix(scaleMtx);
+    model->CalcMatrix();
+    model->CalcSkin();
 
     if (**reinterpret_cast<short**>(self + 0x850) == completed) {
         (*reinterpret_cast<short**>(self + 0x850))[3] = 1;
@@ -1993,9 +1988,9 @@ void CMenuPcs::SingleCalcFadeOut()
     CChara::CModel* model = *reinterpret_cast<CChara::CModel**>(*reinterpret_cast<int*>(self + 0x774) + 0x168);
     if (*reinterpret_cast<float*>(reinterpret_cast<u8*>(model) + 0x10) <=
         *reinterpret_cast<float*>(reinterpret_cast<u8*>(model) + 0x08)) {
-        SetFrame__Q26CChara6CModelFf(FLOAT_8033294c, model);
+        model->SetFrame(FLOAT_8033294c);
     } else {
-        AddFrame__Q26CChara6CModelFf(FLOAT_80332934, model);
+        model->AddFrame(FLOAT_80332934);
     }
 
     unsigned short modelScaleIndex = *reinterpret_cast<unsigned short*>(Game.m_scriptFoodBase[0] + 0x3E0);
@@ -2008,9 +2003,9 @@ void CMenuPcs::SingleCalcFadeOut()
 
     int modelPtr = *reinterpret_cast<int*>(*reinterpret_cast<int*>(self + 0x774) + 0x168);
     *reinterpret_cast<u8*>(modelPtr + 0x10C) = (*reinterpret_cast<u8*>(modelPtr + 0x10C) & 0x7F) | 0x80;
-    SetMatrix__Q26CChara6CModelFPA4_f(model, scaleMtx);
-    CalcMatrix__Q26CChara6CModelFv(model);
-    CalcSkin__Q26CChara6CModelFv(model);
+    model->SetMatrix(scaleMtx);
+    model->CalcMatrix();
+    model->CalcSkin();
 
     if (totalEntries == completed) {
         fadeState->done = 1;
@@ -2065,9 +2060,9 @@ void CMenuPcs::SingleCalcCtrl()
     CChara::CModel* model = *reinterpret_cast<CChara::CModel**>(*reinterpret_cast<int*>(self + 0x774) + 0x168);
     if (*reinterpret_cast<float*>(reinterpret_cast<u8*>(model) + 0x10) <=
         *reinterpret_cast<float*>(reinterpret_cast<u8*>(model) + 0x08)) {
-        SetFrame__Q26CChara6CModelFf(FLOAT_8033294c, model);
+        model->SetFrame(FLOAT_8033294c);
     } else {
-        AddFrame__Q26CChara6CModelFf(FLOAT_80332934, model);
+        model->AddFrame(FLOAT_80332934);
     }
 
     unsigned short modelScaleIndex = *reinterpret_cast<unsigned short*>(Game.m_scriptFoodBase[0] + 0x3E0);
@@ -2080,9 +2075,9 @@ void CMenuPcs::SingleCalcCtrl()
 
     int modelPtr = *reinterpret_cast<int*>(*reinterpret_cast<int*>(self + 0x774) + 0x168);
     *reinterpret_cast<u8*>(modelPtr + 0x10C) = (*reinterpret_cast<u8*>(modelPtr + 0x10C) & 0x7F) | 0x80;
-    SetMatrix__Q26CChara6CModelFPA4_f(model, scaleMtx);
-    CalcMatrix__Q26CChara6CModelFv(model);
-    CalcSkin__Q26CChara6CModelFv(model);
+    model->SetMatrix(scaleMtx);
+    model->CalcMatrix();
+    model->CalcSkin();
 
     s16 mode = *reinterpret_cast<s16*>(self + 0x864);
     s16 proc = *reinterpret_cast<s16*>(statePtr + 0x10);

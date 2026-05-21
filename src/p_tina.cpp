@@ -602,8 +602,8 @@ void CPartPcs::create()
 
     ppvAmemCacheSet.Init(
         stringBase + 0x74,
-        reinterpret_cast<CPartPcsViewerState*>(&PartPcs)->m_stageLoad,
-        reinterpret_cast<CPartPcsViewerState*>(&PartPcs)->m_stageAmem,
+        reinterpret_cast<CMemory::CStage*>(reinterpret_cast<CPartPcsViewerState*>(&PartPcs)->m_stageLoad),
+        reinterpret_cast<CMemory::CStage*>(reinterpret_cast<CPartPcsViewerState*>(&PartPcs)->m_stageAmem),
         0x400,
         pppNotAllocAmemCacheRmem,
         0,
@@ -681,8 +681,8 @@ void CPartPcs::createViewer()
 
     ppvAmemCacheSet.Init(
         stringBase + 0x74,
-        reinterpret_cast<CPartPcsViewerState*>(&PartPcs)->m_stageLoad,
-        reinterpret_cast<CPartPcsViewerState*>(&PartPcs)->m_stageAmem,
+        reinterpret_cast<CMemory::CStage*>(reinterpret_cast<CPartPcsViewerState*>(&PartPcs)->m_stageLoad),
+        reinterpret_cast<CMemory::CStage*>(reinterpret_cast<CPartPcsViewerState*>(&PartPcs)->m_stageAmem),
         0x400,
         pppNotAllocAmemCacheRmem,
         0,

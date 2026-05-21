@@ -1285,7 +1285,7 @@ void CMapObj::Calc()
                 }
 
                 calcColorKeyFrame(reinterpret_cast<CMapKeyFrame*>(attr + 0xCC), colorCurrent, colorTable);
-        } else if ((attrType == CMapObjAtr::MIME) && (KeyFrameAt(attr, 0x14).IsRun() != 0)) {
+        } else if ((attrType == CMapObjAtr::MIME) && (KeyFrameAt(reinterpret_cast<void*>(attr), 0x14).IsRun() != 0)) {
             int key0;
             int key1;
             float blend;
@@ -1293,7 +1293,7 @@ void CMapObj::Calc()
             int frameList = *reinterpret_cast<int*>(attr + 0xC);
             Vec* outVerts = *reinterpret_cast<Vec**>(reinterpret_cast<unsigned char*>(m_mapData) + 0x2C);
 
-            if (KeyFrameAt(attr, 0x14).Get(key0, key1, blend) == 0) {
+            if (KeyFrameAt(reinterpret_cast<void*>(attr), 0x14).Get(key0, key1, blend) == 0) {
                 float* src = *reinterpret_cast<float**>(frameList + key0 * 4);
                 for (int i = 0; i < vertexCount; i++) {
                     outVerts[i].x = src[0];
@@ -1315,7 +1315,7 @@ void CMapObj::Calc()
             }
 
             DCFlushRange(outVerts, static_cast<unsigned long>(vertexCount * 0xC));
-            KeyFrameAt(attr, 0x14).Calc();
+            KeyFrameAt(reinterpret_cast<void*>(attr), 0x14).Calc();
         }
     }
 }

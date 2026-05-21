@@ -76,7 +76,7 @@ const char DAT_8032f698[] = "ffcc_0";
 const char DAT_8032f6a0[] = "*\n";
 const char DAT_8032f6a4[] = "Tepa";
 const char DAT_8032f6ac[] = "Tipa";
-const char lbl_8032F6B4[] = "Game";
+const char s_GameStageName_8032F6B4[] = "Game";
 }
 extern const char s_dvd_pctscft_param_cfd_801D6054[];
 extern const char s_dvd_pctscft_c_system_cfd_801D6068[];
@@ -286,7 +286,7 @@ void CGame::Init()
     GetMcPcsSingleton()->Init();
     DbgMenuPcs.Init();
 
-    m_mainStage = Memory.CreateStage(0x106000, const_cast<char*>(lbl_8032F6B4), 0);
+    m_mainStage = Memory.CreateStage(0x106000, const_cast<char*>(s_GameStageName_8032F6B4), 0);
     if (OSGetConsoleSimulatedMemSize() == 0x3000000) {
         m_debugStage = Memory.CreateStage(0x220000, const_cast<char*>(s_GameDebug_801D6284), 1);
     }

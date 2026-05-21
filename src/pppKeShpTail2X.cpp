@@ -18,8 +18,6 @@ int __cntlzw(unsigned int);
 void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(void*, void*, float, unsigned char, unsigned char,
                                                                  unsigned char, unsigned char, unsigned char,
                                                                  unsigned char, unsigned char);
-
-void pppDrawShp__FP13tagOAN3_SHAPEP12CMaterialSetUc(void*, void*, unsigned char);
 }
 
 struct KeShpTail2XStep {
@@ -285,7 +283,7 @@ draw_loop:
     }
 
     pppSetBlendMode(step->m_blendMode);
-    pppDrawShp__FP13tagOAN3_SHAPEP12CMaterialSetUc(shapeEntry, pppEnvStPtr->m_materialSetPtr, step->m_blendMode);
+    pppDrawShp(reinterpret_cast<tagOAN3_SHAPE*>(shapeEntry), pppEnvStPtr->m_materialSetPtr, step->m_blendMode);
 
 update_step:
     count--;

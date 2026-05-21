@@ -2,6 +2,7 @@
 #include "ffcc/math.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/pppGetRotMatrixXYZ.h"
+#include "ffcc/pppShape.h"
 extern "C" {
 extern const float kPppYmMegaBirthShpTail3Zero;
 extern const float FLOAT_803305A8;
@@ -22,7 +23,6 @@ extern "C" void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
     void*, void*, float, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char,
     unsigned char);
 extern "C" void pppSetBlendMode(unsigned char);
-extern "C" void pppDrawShp__FP13tagOAN3_SHAPEP12CMaterialSetUc(void*, void*, unsigned char);
 extern "C" int rand(void);
 static pppFMATRIX g_matUnit3;
 
@@ -174,8 +174,8 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                             amb.a = 0x7F;
                         }
                         GXSetChanAmbColor(GX_COLOR0A0, amb);
-                        pppDrawShp__FP13tagOAN3_SHAPEP12CMaterialSetUc(
-                            (void*)(shapeTable + shapeOffset), pppEnvStPtr->m_materialSetPtr, payload[0x58]);
+                        pppDrawShp(
+                            reinterpret_cast<tagOAN3_SHAPE*>(shapeTable + shapeOffset), pppEnvStPtr->m_materialSetPtr, payload[0x58]);
                     }
 
                     frameCount--;

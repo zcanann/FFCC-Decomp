@@ -606,8 +606,9 @@ void CTexAnimSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
                     }
                 } else {
                     seq->keyCount = innerChunk.m_size / 0x30;
-                    seq->keys = new (stage, const_cast<char*>(s_texanim_cpp_801d7adc), 0x1D4)
-                        unsigned int[innerChunk.m_size / sizeof(unsigned int)];
+                    seq->keys = reinterpret_cast<unsigned int*>(
+                        _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(&Memory, innerChunk.m_size, stage,
+                                                                   const_cast<char*>(s_texanim_cpp_801d7adc), 0x1D4, 0));
                     memcpy(seq->keys, chunkFile.GetAddress(), innerChunk.m_size);
                 }
             }

@@ -203,23 +203,21 @@ unsigned int CMenuPcs::TmpArtiClose()
 	itemCount = (unsigned int)this->m_tmpArtiList->count;
 	entry = this->m_tmpArtiList->entries;
 	currentFrame = (int)this->m_tmpArtiState->frame;
-	if ((int)itemCount > 0) {
-		for (unsigned int remaining = itemCount; remaining != 0; remaining--) {
-			if (entry->startFrame <= currentFrame) {
-				if (entry->startFrame + entry->duration <= currentFrame) {
-					completedItems++;
+	for (int remaining = itemCount; remaining > 0; remaining--) {
+		if (entry->startFrame <= currentFrame) {
+			if (entry->startFrame + entry->duration <= currentFrame) {
+				completedItems++;
+				entry->alpha = FLOAT_80332f2c;
+			} else {
+				entry->timer = entry->timer + 1;
+				double ratio = DOUBLE_80332f48 / (double)entry->duration;
+				entry->alpha = (float)(DOUBLE_80332f48 - ratio * (double)entry->timer);
+				if ((double)entry->alpha < DOUBLE_80332f50) {
 					entry->alpha = FLOAT_80332f2c;
-				} else {
-					entry->timer = entry->timer + 1;
-					double ratio = DOUBLE_80332f48 / (double)entry->duration;
-					entry->alpha = (float)(DOUBLE_80332f48 - ratio * (double)entry->timer);
-					if ((double)entry->alpha < DOUBLE_80332f50) {
-						entry->alpha = FLOAT_80332f2c;
-					}
 				}
 			}
-			entry++;
 		}
+		entry++;
 	}
 
 	if (this->m_tmpArtiList->count == completedItems) {
@@ -466,22 +464,18 @@ unsigned int CMenuPcs::TmpArtiOpen()
 	itemCount = (unsigned int)this->m_tmpArtiList->count;
 	entry = this->m_tmpArtiList->entries;
 	currentFrame = (int)this->m_tmpArtiState->frame;
-	if ((int)itemCount > 0) {
-		unsigned int remaining = itemCount;
-		do {
-			if (entry->startFrame <= currentFrame) {
-				if (entry->startFrame + entry->duration <= currentFrame) {
-					completedItems++;
-					entry->alpha = FLOAT_80332f30;
-				} else {
-					entry->timer = entry->timer + 1;
-					double ratio = DOUBLE_80332f48 / (double)entry->duration;
-					entry->alpha = (float)(ratio * (double)entry->timer);
-				}
+	for (int remaining = itemCount; remaining > 0; remaining--) {
+		if (entry->startFrame <= currentFrame) {
+			if (entry->startFrame + entry->duration <= currentFrame) {
+				completedItems++;
+				entry->alpha = FLOAT_80332f30;
+			} else {
+				entry->timer = entry->timer + 1;
+				double ratio = DOUBLE_80332f48 / (double)entry->duration;
+				entry->alpha = (float)(ratio * (double)entry->timer);
 			}
-			entry++;
-			remaining--;
-		} while (remaining != 0);
+		}
+		entry++;
 	}
 
 	if (this->m_tmpArtiList->count == completedItems) {

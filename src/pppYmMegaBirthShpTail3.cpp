@@ -4,6 +4,7 @@
 #include "ffcc/pppGetRotMatrixXYZ.h"
 extern "C" {
 extern const float kPppYmMegaBirthShpTail3Zero;
+extern const float FLOAT_803305A0;
 extern const float FLOAT_803305A8;
 extern const float FLOAT_803305AC;
 extern const float FLOAT_803305B0;
@@ -41,7 +42,9 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
     u8* step = (u8*)stepData;
     u8* payload = step + 0x14;
     const u32 dataValIndex = *(u32*)(step + 4);
+    const s32 colorOffset = offsets->m_serializedDataOffsets[1];
     const s32 particleDataOffset = offsets->m_serializedDataOffsets[2];
+    VColor* colorWork = (VColor*)((u8*)object + 0x80 + colorOffset);
     _PARTICLE_DATA* particles = *(_PARTICLE_DATA**)((u8*)&object->field_0xbc + particleDataOffset);
     _PARTICLE_WMAT* wmats = *(_PARTICLE_WMAT**)((u8*)&object->field_0xc0 + particleDataOffset);
     _PARTICLE_COLOR* colors = *(_PARTICLE_COLOR**)((u8*)&object->field_0xc4 + particleDataOffset);
@@ -67,7 +70,6 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
         u8* particle = (u8*)particles + i * 0x1F8;
         if (*(s16*)(particle + 0x22) != 0) {
             const u16 frameCountRaw = *(u16*)(payload + 0x9C);
-            if (frameCountRaw != 0) {
                 pppFMATRIX drawMtx;
                 Vec drawPos;
                 Vec cameraPos;
@@ -79,25 +81,29 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                 const u8 trailMaxIndex = (u8)(*(u8*)(particle + 0x37) - 1);
                 u8 trailNextIndex = (u8)(trailReadIndex + 1);
                 float drawScale = *(float*)(payload + 0x5C);
+                const float alphaScale = (float)*(s16*)((u8*)colorWork + 6) / FLOAT_803305A0;
+                const float stepDivisor = (float)((s32)frameCountRaw - 1);
                 const float drawScaleStep =
-                    (drawScale - *(float*)(payload + 0x60)) /
-                    ((frameCountRaw > 1) ? (float)(frameCountRaw - 1) : FLOAT_803305B0);
-                float fadeR = (float)*(s16*)((u8*)&object->m_data[4] + particleDataOffset) * FLOAT_803305AC;
-                float fadeG = (float)*(s16*)((u8*)&object->m_data[6] + particleDataOffset) * FLOAT_803305AC;
-                float fadeB = (float)*(s16*)((u8*)&object->m_data[8] + particleDataOffset) * FLOAT_803305AC;
-                float fadeA = (float)*(s16*)((u8*)&object->m_data[10] + particleDataOffset) * FLOAT_803305AC;
-                const float fadeRStep =
-                    (fadeR - (float)*(s16*)((u8*)&object->m_data[16] + particleDataOffset) * FLOAT_803305AC) /
-                    ((frameCountRaw > 1) ? (float)(frameCountRaw - 1) : FLOAT_803305B0);
-                const float fadeGStep =
-                    (fadeG - (float)*(s16*)((u8*)&object->m_data[18] + particleDataOffset) * FLOAT_803305AC) /
-                    ((frameCountRaw > 1) ? (float)(frameCountRaw - 1) : FLOAT_803305B0);
-                const float fadeBStep =
-                    (fadeB - (float)*(s16*)((u8*)&object->m_data[20] + particleDataOffset) * FLOAT_803305AC) /
-                    ((frameCountRaw > 1) ? (float)(frameCountRaw - 1) : FLOAT_803305B0);
-                const float fadeAStep =
-                    (fadeA - (float)*(s16*)((u8*)&object->m_data[22] + particleDataOffset) * FLOAT_803305AC) /
-                    ((frameCountRaw > 1) ? (float)(frameCountRaw - 1) : FLOAT_803305B0);
+                    (drawScale - *(float*)(payload + 0x60)) / stepDivisor;
+                float fadeR = (float)(*(s16*)((u8*)&object->m_data[4] + particleDataOffset) >> 7);
+                float fadeG = (float)(*(s16*)((u8*)&object->m_data[6] + particleDataOffset) >> 7);
+                float fadeB = (float)(*(s16*)((u8*)&object->m_data[8] + particleDataOffset) >> 7);
+                float fadeA = (float)(*(s16*)((u8*)&object->m_data[10] + particleDataOffset) >> 7) * alphaScale;
+                float fadeRStep = kPppYmMegaBirthShpTail3Zero;
+                float fadeGStep = kPppYmMegaBirthShpTail3Zero;
+                float fadeBStep = kPppYmMegaBirthShpTail3Zero;
+                float fadeAStep = kPppYmMegaBirthShpTail3Zero;
+                if (stepDivisor != kPppYmMegaBirthShpTail3Zero) {
+                    fadeRStep =
+                        (fadeR - (float)(*(s16*)((u8*)&object->m_data[16] + particleDataOffset) >> 7)) / stepDivisor;
+                    fadeGStep =
+                        (fadeG - (float)(*(s16*)((u8*)&object->m_data[18] + particleDataOffset) >> 7)) / stepDivisor;
+                    fadeBStep =
+                        (fadeB - (float)(*(s16*)((u8*)&object->m_data[20] + particleDataOffset) >> 7)) / stepDivisor;
+                    fadeAStep =
+                        (fadeA - (float)(*(s16*)((u8*)&object->m_data[22] + particleDataOffset) >> 7) * alphaScale) /
+                        stepDivisor;
+                }
                 const float spacing = *(float*)(payload + 0x98);
                 Vec* history = (Vec*)(particle + 0x80);
                 Vec segVec;
@@ -229,7 +235,6 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                         drawPos.z = history[trailNextIndex].z + segVec.z * t;
                     }
                 }
-            }
         }
 
         if (wmats != 0) {

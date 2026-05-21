@@ -12,7 +12,6 @@
 
 extern "C" void ClearTextureData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialEditorPcs);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory* memory, unsigned long size, CMemory::CStage* stage, const char* file, int line, int align);
-extern "C" void Printf__7CSystemFPce(CSystem* system, const char* format, ...);
 extern "C" void ResetRsdList__18CMaterialEditorPcsFP5ZLIST(CMaterialEditorPcs* materialEditorPcs, ZLIST* zlist);
 extern "C" int AddRsdList__18CMaterialEditorPcsFP5ZLIST(CMaterialEditorPcs* materialEditorPcs, ZLIST* zlist);
 extern "C" void SetRsdIndex__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialEditorPcs);
@@ -140,7 +139,7 @@ extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialE
         void* allocData =
             new (MaterialEditorStage(), const_cast<char*>(s_ME_USB_process_cpp_801d7d78), 0x31) u8[usb.m_sizeBytes * 0xC];
         if (allocData == 0) {
-            Printf__7CSystemFPce(&System, s_MemAlloc_Error____size__d_801d7d8c, usb.m_sizeBytes * 0xC);
+            System.Printf(const_cast<char*>(s_MemAlloc_Error____size__d_801d7d8c), usb.m_sizeBytes * 0xC);
         }
         rsdItem->ptr10 = allocData;
 
@@ -181,7 +180,7 @@ extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialE
         void* allocData =
             new (MaterialEditorStage(), const_cast<char*>(s_ME_USB_process_cpp_801d7d78), 0x31) u8[usb.m_sizeBytes * 0x70];
         if (allocData == 0) {
-            Printf__7CSystemFPce(&System, s_MemAlloc_Error____size__d_801d7d8c, usb.m_sizeBytes * 0x70);
+            System.Printf(const_cast<char*>(s_MemAlloc_Error____size__d_801d7d8c), usb.m_sizeBytes * 0x70);
         }
         rsdItem->ptr18 = allocData;
 
@@ -241,7 +240,7 @@ extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialE
         void* allocData =
             new (MaterialEditorStage(), const_cast<char*>(s_ME_USB_process_cpp_801d7d78), 0x31) u8[usb.m_sizeBytes * 0xC];
         if (allocData == 0) {
-            Printf__7CSystemFPce(&System, s_MemAlloc_Error____size__d_801d7d8c, usb.m_sizeBytes * 0xC);
+            System.Printf(const_cast<char*>(s_MemAlloc_Error____size__d_801d7d8c), usb.m_sizeBytes * 0xC);
         }
         rsdItem->ptr14 = allocData;
 
@@ -300,7 +299,7 @@ extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialE
             new (MaterialEditorStage(), const_cast<char*>(s_ME_USB_process_cpp_801d7d78), 0x31) u8[usb.m_sizeBytes];
 
         if (dstBuffer == 0) {
-            Printf__7CSystemFPce(&System, s_MemAlloc_Error____size__d_801d7d8c, usb.m_sizeBytes);
+            System.Printf(const_cast<char*>(s_MemAlloc_Error____size__d_801d7d8c), usb.m_sizeBytes);
         }
 
         RSDITEM* rsdItem = materialEditorPcs->GetRsdItem()->rsdItem;
@@ -322,13 +321,13 @@ extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialE
             new (MaterialEditorStage(), const_cast<char*>(s_ME_USB_process_cpp_801d7d78), 0x31) u8[size]);
 
         if (headerBuffer == 0) {
-            Printf__7CSystemFPce(&System, s_MemAlloc_Error____size__d_801d7d8c, size);
+            System.Printf(const_cast<char*>(s_MemAlloc_Error____size__d_801d7d8c), size);
         }
 
         void* headerDst = _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
             &Memory, 0x10, MaterialEditorStage(), s_ME_USB_process_cpp_801d7d78, 0x31, 0);
         if (headerDst == 0) {
-            Printf__7CSystemFPce(&System, s_MemAlloc_Error____size__d_801d7d8c, 0x10);
+            System.Printf(const_cast<char*>(s_MemAlloc_Error____size__d_801d7d8c), 0x10);
         }
 
         materialEditorPcs->m_textureHeader[materialEditorPcs->m_loadedTextureCount] = static_cast<s16*>(headerDst);
@@ -349,7 +348,7 @@ extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialE
             void* texData = _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
                 &Memory, size - 0x10, MaterialEditorStage(), s_ME_USB_process_cpp_801d7d78, 0x31, 0);
             if (texData == 0) {
-                Printf__7CSystemFPce(&System, s_MemAlloc_Error____size__d_801d7d8c, size - 0x10);
+                System.Printf(const_cast<char*>(s_MemAlloc_Error____size__d_801d7d8c), size - 0x10);
             }
             materialEditorPcs->m_textureData[materialEditorPcs->m_loadedTextureCount] = texData;
             memcpy(texData, headerBuffer + 8, size - 0x10);
@@ -362,7 +361,7 @@ extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialE
                 &Memory, imageDataSize, MaterialEditorStage(), s_ME_USB_process_cpp_801d7d78, 0x31, 0);
 
             if (texData == 0) {
-                Printf__7CSystemFPce(&System, s_MemAlloc_Error____size__d_801d7d8c, imageDataSize);
+                System.Printf(const_cast<char*>(s_MemAlloc_Error____size__d_801d7d8c), imageDataSize);
             }
             materialEditorPcs->m_textureData[materialEditorPcs->m_loadedTextureCount] = texData;
             memcpy(texData, headerBuffer + 8, imageDataSize);
@@ -371,7 +370,7 @@ extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialE
             void* tlutData = _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
                 &Memory, tlutDataSize, MaterialEditorStage(), s_ME_USB_process_cpp_801d7d78, 0x31, 0);
             if (tlutData == 0) {
-                Printf__7CSystemFPce(&System, s_MemAlloc_Error____size__d_801d7d8c, tlutDataSize);
+                System.Printf(const_cast<char*>(s_MemAlloc_Error____size__d_801d7d8c), tlutDataSize);
             }
             materialEditorPcs->m_tlutData[materialEditorPcs->m_loadedTextureCount] = tlutData;
 
@@ -383,21 +382,21 @@ extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialE
         void* texObj = _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
             &Memory, 0x20, MaterialEditorStage(), s_ME_USB_process_cpp_801d7d78, 0x31, 0);
         if (texObj == 0) {
-            Printf__7CSystemFPce(&System, s_MemAlloc_Error____size__d_801d7d8c, 0x20);
+            System.Printf(const_cast<char*>(s_MemAlloc_Error____size__d_801d7d8c), 0x20);
         }
         materialEditorPcs->m_texObj[materialEditorPcs->m_loadedTextureCount] = static_cast<GXTexObj*>(texObj);
 
         void* tlutObj0 = _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
             &Memory, 0xC, MaterialEditorStage(), s_ME_USB_process_cpp_801d7d78, 0x31, 0);
         if (tlutObj0 == 0) {
-            Printf__7CSystemFPce(&System, s_MemAlloc_Error____size__d_801d7d8c, 0xC);
+            System.Printf(const_cast<char*>(s_MemAlloc_Error____size__d_801d7d8c), 0xC);
         }
         materialEditorPcs->m_tlutObj0[materialEditorPcs->m_loadedTextureCount] = static_cast<GXTlutObj*>(tlutObj0);
 
         void* tlutObj1 = _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
             &Memory, 0xC, MaterialEditorStage(), s_ME_USB_process_cpp_801d7d78, 0x31, 0);
         if (tlutObj1 == 0) {
-            Printf__7CSystemFPce(&System, s_MemAlloc_Error____size__d_801d7d8c, 0xC);
+            System.Printf(const_cast<char*>(s_MemAlloc_Error____size__d_801d7d8c), 0xC);
         }
         materialEditorPcs->m_tlutObj1[materialEditorPcs->m_loadedTextureCount] = static_cast<GXTlutObj*>(tlutObj1);
 

@@ -79,7 +79,6 @@ extern "C" void Create__6CCharaFv(CChara*);
 extern "C" void DestroyStage__7CMemoryFPQ27CMemory6CStage(void*, void*);
 extern "C" void* CreateStage__7CMemoryFUlPci(void*, unsigned long, const char*, int);
 extern "C" void* createTextureSet__9CCharaPcsFPvi(void*, void*, int);
-extern "C" void Printf__7CSystemFPce(void*, const char*, ...);
 extern "C" void Create__Q26CChara5CAnimFPvPQ27CMemory6CStage(void*, void*, void*);
 extern "C" float FLOAT_80330BEC;
 extern "C" float FLOAT_80330BF0;
@@ -378,7 +377,7 @@ void CCharaPcs::calcViewer()
     if ((self->m_viewerLoadModel != 0) || (self->m_viewerLoadAnim != 0) || (self->m_viewerLoadTexture != 0) ||
         (self->m_viewerLoadAnimContinuous != 0)) {
         if (self->m_viewerLoadModel != 0) {
-            Printf__7CSystemFPce(&System, s_calc_viewer_fmt, self->m_viewerModelPath);
+            System.Printf(const_cast<char*>(s_calc_viewer_fmt), self->m_viewerModelPath);
             fileHandle = File.Open(self->m_viewerModelPath, 0, CFile::PRI_LOW);
             if (fileHandle != 0) {
                 ReleaseShared(self->m_viewerModel[1]);
@@ -406,7 +405,7 @@ void CCharaPcs::calcViewer()
         }
 
         if ((self->m_viewerLoadDynamics != 0) && (self->m_viewerModel[0] != 0)) {
-            Printf__7CSystemFPce(&System, s_calc_viewer_fmt, self->m_viewerDynamicsPath);
+            System.Printf(const_cast<char*>(s_calc_viewer_fmt), self->m_viewerDynamicsPath);
             fileHandle = File.Open(self->m_viewerDynamicsPath, 0, CFile::PRI_LOW);
             if (fileHandle != 0) {
                 File.Read(fileHandle);
@@ -430,7 +429,7 @@ void CCharaPcs::calcViewer()
                 for (i = 0; i < static_cast<unsigned int>(self->m_viewerAnimRequestedCount); i++) {
                     unsigned int idx = static_cast<unsigned int>(self->m_viewerAnimLoadedCount);
                     sprintf(pathBuf, s_anim_path_fmt, self->m_viewerAnimPath, idx);
-                    Printf__7CSystemFPce(&System, s_calc_viewer_fmt, pathBuf);
+                    System.Printf(const_cast<char*>(s_calc_viewer_fmt), pathBuf);
                     fileHandle = File.Open(pathBuf, 0, CFile::PRI_LOW);
                     if (fileHandle != 0) {
                         File.Read(fileHandle);
@@ -450,7 +449,7 @@ void CCharaPcs::calcViewer()
                 }
                 self->m_viewerLoadAnimContinuous = 0;
             } else {
-                Printf__7CSystemFPce(&System, s_calc_viewer_fmt, self->m_viewerAnimPath);
+                System.Printf(const_cast<char*>(s_calc_viewer_fmt), self->m_viewerAnimPath);
                 fileHandle = File.Open(self->m_viewerAnimPath, 0, CFile::PRI_LOW);
                 if (fileHandle != 0) {
                     File.Read(fileHandle);
@@ -467,7 +466,7 @@ void CCharaPcs::calcViewer()
         }
 
         if (self->m_viewerLoadTexture != 0) {
-            Printf__7CSystemFPce(&System, s_calc_viewer_fmt, self->m_viewerTexturePath);
+            System.Printf(const_cast<char*>(s_calc_viewer_fmt), self->m_viewerTexturePath);
             fileHandle = File.Open(self->m_viewerTexturePath, 0, CFile::PRI_LOW);
             if (fileHandle != 0) {
                 ReleaseShared(self->m_viewerTextureSet[0]);

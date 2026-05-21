@@ -26,7 +26,6 @@ extern "C" int CalcHitSlide__7CMapObjFP3Vecf(void*, Vec*);
 extern "C" void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
 	void*, void*, int, int, int, void*, void*);
 extern "C" int CanCreateFromScript__9CGItemObjFv();
-extern "C" void Printf__7CSystemFPce(CSystem*, const char*, ...);
 extern "C" CGObject* FindGObjFirst__13CFlatRuntime2Fv(void*);
 extern "C" CGObject* FindGObjNext__13CFlatRuntime2FP8CGObject(void*, CGObject*);
 extern "C" void onPush__9CGBaseObjFP9CGBaseObji(CGBaseObj*, CGBaseObj*, int);
@@ -151,7 +150,7 @@ static inline void UpdateGhostPartyDamageCounters(CGPrgObj* attacker)
 		sBossGhostPartyCounters.thresholdA++;
 		sBossGhostPartyCounters.thresholdB++;
 		sBossGhostPartyCounters.thresholdC++;
-		Printf__7CSystemFPce(&System, lbl_801DCB1C,
+		System.Printf(const_cast<char*>(lbl_801DCB1C),
 		    sBossGhostPartyCounters.thresholdA, CharaGhostValue(0x2048),
 		    sBossGhostPartyCounters.thresholdB, CharaGhostValue(0x204C),
 		    sBossGhostPartyCounters.thresholdC, CharaGhostValue(0x2050));
@@ -469,7 +468,7 @@ void CGPartyObj::menu()
 		}
 
 		if (System.m_execParam > 2) {
-			Printf__7CSystemFPce(&System, "port:%d mode:%d", portIndex, Joybus.GetCtrlMode(slot));
+			System.Printf(const_cast<char*>("port:%d mode:%d"), portIndex, Joybus.GetCtrlMode(slot));
 		}
 
 		Joybus.ChgCtrlMode(reinterpret_cast<int>(portIndex));
@@ -2305,17 +2304,17 @@ void CGPartyObj::bonus(int kind, int value, CGPrgObj* source)
 
 	if (kind == 0) {
 		unsigned short count = *reinterpret_cast<unsigned short*>(script + 0xBC8);
-		Printf__7CSystemFPce(&System, s_partyBonusKind0Fmt, count + 1);
+		System.Printf(const_cast<char*>(s_partyBonusKind0Fmt), count + 1);
 		*reinterpret_cast<unsigned short*>(script + 0xBC8) = count + 1;
 	}
 	if (kind == 1) {
 		unsigned short count = *reinterpret_cast<unsigned short*>(script + 0xBC4);
-		Printf__7CSystemFPce(&System, s_partyBonusKind1Fmt, count + 1);
+		System.Printf(const_cast<char*>(s_partyBonusKind1Fmt), count + 1);
 		*reinterpret_cast<unsigned short*>(script + 0xBC4) = count + 1;
 	}
 	if (kind == 4) {
 		unsigned short count = *reinterpret_cast<unsigned short*>(script + 0xBC6);
-		Printf__7CSystemFPce(&System, s_partyBonusKind4Fmt, count + 1);
+		System.Printf(const_cast<char*>(s_partyBonusKind4Fmt), count + 1);
 		*reinterpret_cast<unsigned short*>(script + 0xBC6) = count + 1;
 	}
 
@@ -2442,7 +2441,7 @@ void CGPartyObj::bonus(int kind, int value, CGPrgObj* source)
 		}
 		break;
 	case 0x15:
-		Printf__7CSystemFPce(&System, s_partyBonusUnknownFmt);
+		System.Printf(const_cast<char*>(s_partyBonusUnknownFmt));
 		break;
 	case 0x16:
 		if (kind == 0x14) {
@@ -2468,7 +2467,7 @@ void CGPartyObj::bonus(int kind, int value, CGPrgObj* source)
 			total = 100;
 		}
 		if (bonusSlot != 0) {
-			Printf__7CSystemFPce(&System, s_partyBonusAddFmt, bonusSlot, total);
+			System.Printf(const_cast<char*>(s_partyBonusAddFmt), bonusSlot, total);
 		}
 		*reinterpret_cast<unsigned short*>(script + 0xBCA) = static_cast<unsigned short>(total);
 	}
@@ -2480,7 +2479,7 @@ void CGPartyObj::bonus(int kind, int value, CGPrgObj* source)
 		} else if (total > 100) {
 			total = 100;
 		}
-		Printf__7CSystemFPce(&System, s_partyBonusSubFmt, bonusSlot, total);
+		System.Printf(const_cast<char*>(s_partyBonusSubFmt), bonusSlot, total);
 		*reinterpret_cast<unsigned short*>(script + 0xBCC) = static_cast<unsigned short>(total);
 	}
 }
@@ -2838,7 +2837,7 @@ void CGPartyObj::SetBonusCondition(int useRandom, int bonus0, int bonus1, int bo
 		bonusCount = 4;
 	}
 
-	Printf__7CSystemFPce(&System, s_partyBonusCountFmt, bonusCount);
+	System.Printf(const_cast<char*>(s_partyBonusCountFmt), bonusCount);
 
 	int chosenBonus[5] = {};
 	int chosenCount = 0;
@@ -2869,7 +2868,7 @@ void CGPartyObj::SetBonusCondition(int useRandom, int bonus0, int bonus1, int bo
 
 			caravanWork->SetBonusCondition(bonus);
 			if ((unsigned int)System.m_execParam > 2) {
-				Printf__7CSystemFPce(&System, s_partyBonusFixedFmt, slot, bonus);
+				System.Printf(const_cast<char*>(s_partyBonusFixedFmt), slot, bonus);
 			}
 		} else {
 			int bonusIndex;
@@ -2895,7 +2894,7 @@ void CGPartyObj::SetBonusCondition(int useRandom, int bonus0, int bonus1, int bo
 			int bonus = *reinterpret_cast<unsigned short*>(stageBase + bonusIndex * 2);
 			caravanWork->SetBonusCondition(bonus);
 			if ((unsigned int)System.m_execParam > 2) {
-				Printf__7CSystemFPce(&System, s_partyBonusRandomFmt, slot, bonusIndex, bonus);
+				System.Printf(const_cast<char*>(s_partyBonusRandomFmt), slot, bonusIndex, bonus);
 			}
 		}
 
@@ -2980,7 +2979,7 @@ void CGPartyObj::ChangeCommandMode(int mode)
 			battleMenus[port]->SetBattleCommand(2, -1, -1);
 		} else {
 			if ((unsigned int)System.m_execParam >= 2) {
-				Printf__7CSystemFPce(&System, lbl_801DCB38);
+				System.Printf(const_cast<char*>(lbl_801DCB38));
 			}
 		}
 	}

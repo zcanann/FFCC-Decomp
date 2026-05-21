@@ -10,6 +10,7 @@
 #include "ffcc/system.h"
 #include "ffcc/util.h"
 
+#include <PowerPC_EABI_Support/Runtime/MWCPlusLib.h>
 #include <PowerPC_EABI_Support/Runtime/New.h>
 #include <PowerPC_EABI_Support/Runtime/MWCPlusLib.h>
 #include <dolphin/gx.h>
@@ -748,10 +749,12 @@ void CFile::Init()
     m_fatalDiskErrorFlag = 0;
     m_isDiskError = 0;
     m_readBuffer = new ((CMemory::CStage*)m_allocStage, const_cast<char*>(s_fileCpp), 0x2b) unsigned char[0x100000];
-    m_handlePoolHead.m_currentOffset =
-        (u32)__construct_new_array(operator new[](0x5610, (CMemory::CStage*)m_allocStage,
-                                                  const_cast<char*>(s_fileCpp), 0x2e),
-                                   0, 0, sizeof(CHandle), 0x80);
+    m_handlePoolHead.m_currentOffset = (u32)__construct_new_array(
+        operator new[](0x5610, (CMemory::CStage*)m_allocStage, const_cast<char*>(s_fileCpp), 0x2e),
+        0,
+        0,
+        sizeof(CHandle),
+        0x80);
     m_fileHandle.m_next = &m_fileHandle;
     m_fileHandle.m_previous = &m_fileHandle;
     m_fileHandle.m_priority = PRI_SENTINEL;

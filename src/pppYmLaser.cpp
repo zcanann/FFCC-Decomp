@@ -68,6 +68,17 @@ static inline f32 LoadLaserFloat(const f32& value)
 	return value;
 }
 
+static inline double YmLaserU32ToDouble(u32 value)
+{
+	union {
+		u64 u;
+		double d;
+	} conv;
+
+	conv.u = 0x4330000000000000ULL | value;
+	return conv.d - DOUBLE_80330DD0;
+}
+
 struct CMapCylinderRaw {
 	Vec m_bottom;
 	u8 m_pad0C[0x0C];
@@ -232,7 +243,7 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 		pppDrawShp__FPlsP12CMaterialSetUc(*shapeTable, work->m_shapeArg2, pppEnvStPtr->m_materialSetPtr, step->m_laser.m_blendMode);
 
 		count = step->m_laser.m_pointCount;
-		uvStep = FLOAT_80330DC4 / (float)count;
+		uvStep = FLOAT_80330DC4 / (float)YmLaserU32ToDouble(count);
 		if (step->m_initWOrk == 0xFFFF) {
 			_GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0xFF, 0xFF, 4);
 			_GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 4);

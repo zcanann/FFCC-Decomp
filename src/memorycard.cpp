@@ -2201,10 +2201,10 @@ void CMemoryCardMan::CalcSaveDatHpMax(Mc::SaveDat* saveDat)
                 totalHpBonus += *(unsigned short*)(itemData + equippedItems[3] * 0x48 + 6);
             }
 
-            short finalHpMax = 0x10;
+            int finalHpMax = 0x10;
             if (totalHpBonus + 8 < 0x10)
             {
-                finalHpMax = static_cast<short>(totalHpBonus + 8);
+                finalHpMax = totalHpBonus + 8;
             }
 
             *reinterpret_cast<short*>(charData + 0x06) = finalHpMax;

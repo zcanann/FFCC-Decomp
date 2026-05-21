@@ -2088,23 +2088,23 @@ void pppCalcPartStd(_pppMngSt* pppMngSt)
 		if (pDataVal != 0 && pDataVal->m_programSetDef != 0)
 		{
 			_pppProgSetDef* progSet = pDataVal->m_programSetDef;
-			u16 activeCount = pDataVal->m_activeCount;
-			DAT_8032ed80 += activeCount;
+			DAT_8032ed80 += pDataVal->m_activeCount;
 
-			if (activeCount != 0)
+			if (pDataVal->m_activeCount != 0)
 			{
 				s32 workOffsetStep = 0;
-				_pppCtrlTable* stageIter = progSet->m_stages;
+				_pppProgSetDef* stageSet = progSet;
 
 				for (s32 stage = 0; stage < progSet->m_numStages; stage++)
 				{
+					_pppCtrlTable* stageIter = stageSet->m_stages;
 					pppProg* prog = stageIter->m_prog;
 					if (prog != 0)
 					{
 						pppProgOperationCallback fn = (pppProgOperationCallback)prog->m_pppFunctionOperation;
 						if (fn != 0)
 						{
-							u16 count = activeCount;
+							u16 count = pDataVal->m_activeCount;
 							_pppPObjLink* obj = pDataVal->m_pppPObjLink;
 
 							while (count != 0)
@@ -2126,7 +2126,7 @@ void pppCalcPartStd(_pppMngSt* pppMngSt)
 						printf(s_ERROR_prog_NULL);
 					}
 
-					stageIter++;
+					stageSet = (_pppProgSetDef*)(((u8*)stageSet) + sizeof(_pppCtrlTable));
 					workOffsetStep += 4;
 				}
 			}
@@ -2134,7 +2134,7 @@ void pppCalcPartStd(_pppMngSt* pppMngSt)
 		pDataValOffset += sizeof(_pppPDataVal);
 	}
 
-	if (pppMngSt->m_prioTime != 0xFFFF)
+	if (pppMngSt->m_prioTime < 0xFFFF)
 	{
 		pppMngSt->m_prioTime++;
 	}

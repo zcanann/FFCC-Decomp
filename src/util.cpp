@@ -863,7 +863,8 @@ void CUtil::RenderColorQuad(float x, float y, float width, float height, _GXColo
     pos1.x = x2;
     pos1.y = y2;
     pos1.z = kUtilZero;
-    u32 colorValue = *reinterpret_cast<u32*>(&color);
+    GXColor quadColor = color;
+    u32 colorValue = *reinterpret_cast<u32*>(&quadColor);
     Vec v0 = pos1;
     Vec v1 = pos0;
 

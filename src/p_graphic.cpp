@@ -824,16 +824,7 @@ void CGraphicPcs::drawEnd()
 		int x = 0x10;
 		int port = 0;
 		for (; port < 4; port++) {
-			bool suppress = false;
-			if (Pad._452_4_ == 0) {
-				if (port == 0) {
-					if (Pad._448_4_ != -1) {
-						suppress = true;
-					}
-				}
-			} else {
-				suppress = true;
-			}
+			bool suppress = (Pad._452_4_ != 0) || ((port == 0) && (Pad._448_4_ != -1));
 
 			u16 buttons;
 			if (suppress) {

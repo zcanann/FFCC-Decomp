@@ -21,30 +21,20 @@ struct MonAiFuncTable {
     MonVoidFunc always;
 };
 
-static const MonVoidFunc funcsDefault_initFinished = &CGMonObj::initFinishedFuncDefault;
-static const MonVoidFunc funcsDefault_moveFrame = &CGMonObj::moveFrameFuncDefault;
-static const MonVoidFunc funcsDefault_moveCancel = &CGMonObj::moveCancelFuncDefault;
-static const MonStateFunc funcsDefault_changeStat = &CGMonObj::changeStatFuncDefault;
-static const MonVoidFunc funcsDefault_cancelStat = &CGMonObj::cancelStatFuncDefault;
-static const MonVoidFunc funcsDefault_frameStat = &CGMonObj::frameStatFuncDefault;
-static const MonVoidFunc funcsDefault_logic = &CGMonObj::logicFuncDefault;
-static const MonCalcFunc funcsDefault_calcBranch = &CGMonObj::calcBranchFuncDefault;
-static const MonVoidFunc funcsDefault_always = &CGMonObj::alwaysFuncDefault;
-
 extern "C" MonAiFuncTable funcsDefault = {
-    funcsDefault_initFinished,
-    funcsDefault_moveFrame,
-    funcsDefault_moveCancel,
-    funcsDefault_changeStat,
-    funcsDefault_cancelStat,
-    funcsDefault_frameStat,
-    funcsDefault_logic,
+    &CGMonObj::initFinishedFuncDefault,
+    &CGMonObj::moveFrameFuncDefault,
+    &CGMonObj::moveCancelFuncDefault,
+    &CGMonObj::changeStatFuncDefault,
+    &CGMonObj::cancelStatFuncDefault,
+    &CGMonObj::frameStatFuncDefault,
+    &CGMonObj::logicFuncDefault,
     0,
-    funcsDefault_calcBranch,
+    &CGMonObj::calcBranchFuncDefault,
     0,
     0,
     0,
-    funcsDefault_always,
+    &CGMonObj::alwaysFuncDefault,
 };
 
 extern "C" MonAiFuncTable funcsGiantCrab = {

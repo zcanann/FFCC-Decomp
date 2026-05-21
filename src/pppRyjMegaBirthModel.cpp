@@ -117,7 +117,7 @@ static inline unsigned char clamp_alpha_7f(int value)
     return (unsigned char)value;
 }
 
-static float calc_spawn_speed(float speedMag, u8 speedMode)
+static inline float calc_spawn_speed(float speedMag, u8 speedMode)
 {
     const float halfSpeed = MegaBirthHalf() * speedMag;
 
@@ -140,7 +140,7 @@ static float calc_spawn_speed(float speedMag, u8 speedMode)
     }
 }
 
-static void orthonormalize_particle_matrix(_PARTICLE_DATA* particleData)
+static inline void orthonormalize_particle_matrix(_PARTICLE_DATA* particleData)
 {
     pppFMATRIX model;
     Vec rowX;
@@ -159,7 +159,7 @@ static void orthonormalize_particle_matrix(_PARTICLE_DATA* particleData)
     PSMTXCopy(model.value, particleData->m_matrix);
 }
 
-static void wrap_particle_rotation_triplet(u8* particleBytes, s32 offset)
+static inline void wrap_particle_rotation_triplet(u8* particleBytes, s32 offset)
 {
     for (int i = 0; i < 3; i++) {
         float* value = f32_at(particleBytes, offset + i * 4);
@@ -172,7 +172,7 @@ static void wrap_particle_rotation_triplet(u8* particleBytes, s32 offset)
     }
 }
 
-static void wrap_particle_rotation_triplet_s32(u8* particleBytes, s32 offset)
+static inline void wrap_particle_rotation_triplet_s32(u8* particleBytes, s32 offset)
 {
     for (int i = 0; i < 3; i++) {
         s32* value = s32_at(particleBytes, offset + i * 4);
@@ -185,7 +185,7 @@ static void wrap_particle_rotation_triplet_s32(u8* particleBytes, s32 offset)
     }
 }
 
-static void apply_signed_randomization(u8* particleBytes, s32 offset, u8 flags)
+static inline void apply_signed_randomization(u8* particleBytes, s32 offset, u8 flags)
 {
     if (((flags & 1) != 0) && ((flags & 2) != 0)) {
         for (int i = 0; i < 3; i++) {
@@ -202,13 +202,13 @@ static void apply_signed_randomization(u8* particleBytes, s32 offset, u8 flags)
     }
 }
 
-static signed char random_signed_byte_span(u8 span)
+static inline signed char random_signed_byte_span(u8 span)
 {
     (void)Math.RandF();
     return (signed char)((s32)((float)(span << 1) * Math.RandF() - (float)(span >> 1)));
 }
 
-static void randomize_particle_triplet(u8* particleBytes, s32 offset, u8 flags, float rangeX, float rangeY, float rangeZ)
+static inline void randomize_particle_triplet(u8* particleBytes, s32 offset, u8 flags, float rangeX, float rangeY, float rangeZ)
 {
     if (flags == 0) {
         return;
@@ -1083,14 +1083,14 @@ void set_matrix(_pppPObject* pObject, pppFMATRIX mtxA, pppFMATRIX mtxB, PRyjMega
         PSMTXScaleApply(mtxB.value, objectMatrix->value, *f32_at(particleData, 0x5C) * pppMngStPtr->m_scale.x,
                         *f32_at(particleData, 0x60) * pppMngStPtr->m_scale.y,
                         *f32_at(particleData, 0x64) * pppMngStPtr->m_scale.z);
+        PSMTXMultVec(ppvWorldMatrix, &endPos, &endPos);
 
         pppFMATRIX rot;
 
-        PSMTXRotRad(rot.value, 'z', FLOAT_803304a8 * (float)-*s32_at(particleData, 0x40));
+        PSMTXRotRad(rot.value, 'z', FLOAT_803304a8 * (float)*s32_at(particleData, 0x40));
         pppCopyMatrix(tmp, *objectMatrix);
         pppMulMatrix(*objectMatrix, rot, tmp);
 
-        PSMTXMultVec(ppvWorldMatrix, &endPos, &endPos);
         objectMatrix->value[0][3] = endPos.x;
         objectMatrix->value[1][3] = endPos.y;
         objectMatrix->value[2][3] = endPos.z;

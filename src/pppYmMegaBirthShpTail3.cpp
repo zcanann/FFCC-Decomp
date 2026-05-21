@@ -2,6 +2,7 @@
 #include "ffcc/math.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/pppGetRotMatrixXYZ.h"
+#include "ffcc/pppShape.h"
 extern "C" {
 extern const float kPppYmMegaBirthShpTail3Zero;
 extern const float FLOAT_803305A8;
@@ -18,11 +19,7 @@ extern int gPppCalcDisabled;
 
 extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void*);
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
-extern "C" void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-    void*, void*, float, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char,
-    unsigned char);
 extern "C" void pppSetBlendMode(unsigned char);
-extern "C" void pppDrawShp__FP13tagOAN3_SHAPEP12CMaterialSetUc(void*, void*, unsigned char);
 extern "C" int rand(void);
 static pppFMATRIX g_matUnit3;
 
@@ -58,7 +55,7 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
     int shapeTable = **(int**)(*(int*)&pppEnvStPtr->m_particleColors[0] + dataValIndex * 4);
     u16 workRand = *(u16*)((u8*)object + 0x80 + particleDataOffset + 0x78);
     const u8 zEnable = (u8)(((u32)__cntlzw((u32)payload[0x55])) >> 5);
-    pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
+    pppSetDrawEnv(
         0, &object->field_0x40, *(float*)(payload + 0xA0), payload[0xA4], step[0x0C],
         payload[0x58], 0, zEnable, 1, 0);
     pppSetBlendMode(payload[0x58]);
@@ -174,8 +171,8 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                             amb.a = 0x7F;
                         }
                         GXSetChanAmbColor(GX_COLOR0A0, amb);
-                        pppDrawShp__FP13tagOAN3_SHAPEP12CMaterialSetUc(
-                            (void*)(shapeTable + shapeOffset), pppEnvStPtr->m_materialSetPtr, payload[0x58]);
+                        pppDrawShp(
+                            reinterpret_cast<tagOAN3_SHAPE*>(shapeTable + shapeOffset), pppEnvStPtr->m_materialSetPtr, payload[0x58]);
                     }
 
                     frameCount--;

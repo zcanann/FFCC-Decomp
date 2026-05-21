@@ -31,8 +31,8 @@ public:
         m_keyFrame = 0;
         m_keyValue = 0;
         m_splineTable = 0;
+        m_isRun = 0;
     }
-
     ~CMapKeyFrame()
     {
         if (m_junTable != 0) {

@@ -3,7 +3,6 @@
 #include "ffcc/memory.h"
 #include "ffcc/system.h"
 
-#include <PowerPC_EABI_Support/Runtime/MWCPlusLib.h>
 #include <string.h>
 
 extern "C" void __ct__Q26CChara9CAnimNodeFv(void*);

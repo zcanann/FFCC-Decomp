@@ -14,8 +14,6 @@
 #include <math.h>
 #include <string.h>
 
-#include "PowerPC_EABI_Support/Runtime/MWCPlusLib.h"
-
 extern "C" void create__9CLightPcsFv(CLightPcs*);
 extern "C" void destroy__9CLightPcsFv(CLightPcs*);
 extern "C" void calc__9CLightPcsFv(CLightPcs*);

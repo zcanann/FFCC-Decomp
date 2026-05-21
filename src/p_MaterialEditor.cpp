@@ -1,4 +1,3 @@
-#define FFCC_DEFINE_MATERIALEDITORPCS_STORAGE
 #include "ffcc/p_MaterialEditor.h"
 #include "ffcc/p_usb.h"
 #include "ffcc/ME_USB_process.h"
@@ -51,7 +50,7 @@ unsigned int CMaterialEditorPcs::m_table[0x15C / sizeof(unsigned int)] = {
 unsigned int s_CMaterialEditorPcsTablePad0[3] = {reinterpret_cast<unsigned int>(__RTTI__8CManager_8032E648), 0, 0};
 unsigned int s_CMaterialEditorPcsTablePad1[5] = {reinterpret_cast<unsigned int>(__RTTI__8CManager_8032E648), 0, reinterpret_cast<unsigned int>(__RTTI__8CProcess_8032E650), 0, 0};
 u8 lbl_8026D338[0xC];
-u8 MaterialEditorPcs[sizeof(CMaterialEditorPcs)];
+CMaterialEditorPcs MaterialEditorPcs;
 
 
 extern "C" void Printf__8CGraphicFPce(void*, const char*, ...);
@@ -694,14 +693,12 @@ void CMaterialEditorPcs::Init()
     self[0x8] = 0x7f;
     self[0x9] = 0x7f;
     self[0xa] = 0x7f;
-    unsigned char level = static_cast<unsigned char>(-((__cntlzw(0) >> 5) & 1));
-    level &= 0x3f;
+    unsigned char level = static_cast<unsigned char>(-((__cntlzw(0) >> 5) & 1) & 0x3f);
     self[0xb] = 0xff;
     self[0xc] = level;
     self[0xd] = level;
     self[0xe] = level;
-    level = static_cast<unsigned char>(-((__cntlzw(1) >> 5) & 1));
-    level &= 0x3f;
+    level = static_cast<unsigned char>(-((__cntlzw(1) >> 5) & 1) & 0x3f);
     self[0xf] = 0xff;
     float zero = FLOAT_8032FCD8;
     float minusOne = FLOAT_8032FCDC;
@@ -713,8 +710,7 @@ void CMaterialEditorPcs::Init()
     self[0x10] = level;
     self[0x11] = level;
     self[0x12] = level;
-    level = static_cast<unsigned char>(-((__cntlzw(2) >> 5) & 1));
-    level &= 0x3f;
+    level = static_cast<unsigned char>(-((__cntlzw(2) >> 5) & 1) & 0x3f);
     self[0x13] = 0xff;
     *reinterpret_cast<float*>(self + 0x24) = zero;
     *reinterpret_cast<float*>(self + 0x28) = zero;
@@ -820,18 +816,19 @@ extern "C" void __sinit_p_MaterialEditor_cpp(void)
     __ct__5ZLISTFv(self + 0xD8);
     __register_global_object(self, __dt__18CMaterialEditorPcsFv, lbl_8026D338);
 
-    dst[1] = desc0[0];
-    dst[2] = desc0[1];
-    dst[3] = desc0[2];
-    dst[4] = desc1[0];
-    dst[5] = desc1[1];
-    dst[6] = desc1[2];
-    dst[7] = desc2[0];
-    dst[8] = desc2[1];
-    dst[9] = desc2[2];
-    dst[12] = desc3[0];
-    dst[13] = desc3[1];
-    dst[14] = desc3[2];
+    unsigned int* table = dst + 1;
+    table[0] = desc0[0];
+    table[1] = desc0[1];
+    table[2] = desc0[2];
+    table[3] = desc1[0];
+    table[4] = desc1[1];
+    table[5] = desc1[2];
+    table[6] = desc2[0];
+    table[7] = desc2[1];
+    table[8] = desc2[2];
+    table[11] = desc3[0];
+    table[12] = desc3[1];
+    table[13] = desc3[2];
 }
 
 /*

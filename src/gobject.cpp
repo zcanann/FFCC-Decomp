@@ -2273,19 +2273,19 @@ void CGObject::moveVectorH(Vec* moveVec, float moveTimer, int turnFrames)
  */
 void CGObject::moveVectorRot(float rotX, float rotY, float moveTimer, int turnFrames)
 {
-    const double cosY0 = static_cast<double>(static_cast<float>(cos(rotY)));
-    const double sinX = static_cast<double>(static_cast<float>(sin(rotX)));
-    const double sinY = static_cast<double>(static_cast<float>(sin(rotY)));
-    const double cosY1 = static_cast<double>(static_cast<float>(cos(rotY)));
-    const double cosX = static_cast<double>(static_cast<float>(cos(rotX)));
+    const float cosY0 = static_cast<float>(cos(rotY));
+    const float sinX = static_cast<float>(sin(rotX));
+    const float sinY = static_cast<float>(sin(rotY));
+    const float cosY1 = static_cast<float>(cos(rotY));
+    const float cosX = static_cast<float>(cos(rotX));
 
     u8* const weaponFlagsHi = reinterpret_cast<u8*>(&m_weaponNodeFlags) + 1;
     *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 5, 26, 26));
     *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 4, 27, 27));
     m_turnFrames = static_cast<u32>(turnFrames);
-    m_moveTarget.x = static_cast<float>(sinX * cosY0);
-    m_moveTarget.y = static_cast<float>(sinY);
-    m_moveTarget.z = static_cast<float>(cosX * cosY1);
+    m_moveTarget.x = sinX * cosY0;
+    m_moveTarget.y = sinY;
+    m_moveTarget.z = cosX * cosY1;
     m_moveTimer = moveTimer;
     *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 3, 28, 28));
     *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 0, 1, 30, 30));
@@ -2303,19 +2303,19 @@ void CGObject::moveVectorRot(float rotX, float rotY, float moveTimer, int turnFr
  */
 void CGObject::moveVectorHRot(float rotX, float rotY, float moveTimer, int turnFrames)
 {
-    const double cosY0 = static_cast<double>(static_cast<float>(cos(rotY)));
-    const double sinX = static_cast<double>(static_cast<float>(sin(rotX)));
-    const double sinY = static_cast<double>(static_cast<float>(sin(rotY)));
-    const double cosY1 = static_cast<double>(static_cast<float>(cos(rotY)));
-    const double cosX = static_cast<double>(static_cast<float>(cos(rotX)));
+    const float cosY0 = static_cast<float>(cos(rotY));
+    const float sinX = static_cast<float>(sin(rotX));
+    const float sinY = static_cast<float>(sin(rotY));
+    const float cosY1 = static_cast<float>(cos(rotY));
+    const float cosX = static_cast<float>(cos(rotX));
 
     u8* const weaponFlagsHi = reinterpret_cast<u8*>(&m_weaponNodeFlags) + 1;
     *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 5, 26, 26));
     *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 4, 27, 27));
     m_turnFrames = static_cast<u32>(turnFrames);
-    m_moveTarget.x = static_cast<float>(sinX * cosY0);
-    m_moveTarget.y = static_cast<float>(sinY);
-    m_moveTarget.z = static_cast<float>(cosX * cosY1);
+    m_moveTarget.x = sinX * cosY0;
+    m_moveTarget.y = sinY;
+    m_moveTarget.z = cosX * cosY1;
     m_moveTimer = moveTimer;
     *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 0, 3, 28, 28));
     *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 0, 1, 30, 30));

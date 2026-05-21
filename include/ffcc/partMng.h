@@ -62,6 +62,8 @@ struct pppModelSt : public CMapMesh
 
 struct PPPCREATEPARAM
 {
+    PPPCREATEPARAM();
+
     Vec* m_positionOffsetPtr;         // 0x0
     Vec* m_rotationPtr;               // 0x4
     Vec* m_scalePtr;                  // 0x8

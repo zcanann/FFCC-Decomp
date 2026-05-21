@@ -97,12 +97,8 @@ extern "C" void _WaitDrawDone__8CGraphicFPci(CGraphic*, const char*, int);
 extern "C" void DestroyTempBuffer__8CGraphicFv(CGraphic*);
 extern "C" int GetModelNo__8CMenuPcsFiii(CMenuPcs*, int, int, int);
 extern "C" void* __nw__Q29CCharaPcs7CHandleFUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
-extern "C" void* __nw__11CTextureSetFUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" CCharaPcs::CHandle* __ct__Q29CCharaPcs7CHandleFv(CCharaPcs::CHandle*);
 extern "C" void __dt__Q29CCharaPcs7CHandleFv(void*, int);
-extern "C" CTextureSet* __ct__11CTextureSetFv(CTextureSet*);
-extern "C" void Create__11CTextureSetFPvPQ27CMemory6CStageiP13CAmemCacheSetii(CTextureSet*, void*, CMemory::CStage*, int, void*, int, int);
-extern "C" int Find__11CTextureSetFPc(CTextureSet*, char*);
 extern "C" char* GetLangString__5CGameFv(void*);
 extern "C" void loadFont__8CMenuPcsFiPcii(CMenuPcs*, int, char*, int, int);
 extern "C" void loadTexture__8CMenuPcsFPPciiPQ28CMenuPcs4CTmpiii(CMenuPcs*, char**, int, int, void*, int, int, int);
@@ -1457,11 +1453,7 @@ void CMenuPcs::loadTextureAsync(char **, int, int, CMenuPcs::CTmp*, int, int, in
                     stage = *reinterpret_cast<CMemory::CStage**>(self + 0xF4);
                 }
 
-                CTextureSet* textureSet = static_cast<CTextureSet*>(
-                    __nw__11CTextureSetFUlPQ27CMemory6CStagePci(0x24, stage, s_singmenu_cpp_801de8d4, 0x748));
-                if (textureSet != 0) {
-                    textureSet = __ct__11CTextureSetFv(textureSet);
-                }
+                CTextureSet* textureSet = new (stage, s_singmenu_cpp_801de8d4, 0x748) CTextureSet;
                 *reinterpret_cast<CTextureSet**>(self + 0x160 + loadIndex * 4) = textureSet;
 
                 stage = *reinterpret_cast<CMemory::CStage**>(self + 0xEC);
@@ -1469,7 +1461,7 @@ void CMenuPcs::loadTextureAsync(char **, int, int, CMenuPcs::CTmp*, int, int, in
                     stage = *reinterpret_cast<CMemory::CStage**>(self + 0xF4);
                 }
 
-                Create__11CTextureSetFPvPQ27CMemory6CStageiP13CAmemCacheSetii(textureSet, File.m_readBuffer, stage, 0, 0, 0, 0);
+                textureSet->Create(File.m_readBuffer, stage, 0, 0, 0, 0);
                 File.Close(gSingMenuAsyncFileHandle);
                 gSingMenuAsyncFileHandle = 0;
                 *reinterpret_cast<int*>(self + 0x860) = 0;
@@ -1482,7 +1474,7 @@ void CMenuPcs::loadTextureAsync(char **, int, int, CMenuPcs::CTmp*, int, int, in
                 SingMenuTextureRef* mapping = DAT_80214b3c;
                 for (int i = 0; i < 0x33; i++) {
                     CTextureSet* set = *reinterpret_cast<CTextureSet**>(self + 0x14C + mapping->textureSetIndex * 4);
-                    int texIdx = Find__11CTextureSetFPc(set, mapping->textureName);
+                    int texIdx = set->Find(mapping->textureName);
                     CTexture* tex = (*reinterpret_cast<CPtrArray<CTexture*>*>(reinterpret_cast<u8*>(set) + 8))[static_cast<unsigned long>(texIdx)];
                     *reinterpret_cast<CTexture**>(reinterpret_cast<u8*>(this) + 0x240 + i * 4) = tex;
                     *reinterpret_cast<int*>(reinterpret_cast<u8*>(tex) + 4) = *reinterpret_cast<int*>(reinterpret_cast<u8*>(tex) + 4) + 1;

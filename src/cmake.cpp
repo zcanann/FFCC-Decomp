@@ -557,7 +557,7 @@ void CMenuPcs::CalcSingCMake()
                 down = 0;
             } else {
                 __cntlzw(static_cast<unsigned int>(Pad._448_4_));
-                down = static_cast<unsigned short>(Pad._8_2_);
+                down = static_cast<unsigned short>(Pad.GetPadInputs()[0].buttonDown[0]);
             }
 
             if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
@@ -655,7 +655,7 @@ void CMenuPcs::CalcSingCMake()
                 down = 0;
             } else {
                 __cntlzw(static_cast<unsigned int>(Pad._448_4_));
-                down = static_cast<unsigned short>(Pad._8_2_);
+                down = static_cast<unsigned short>(Pad.GetPadInputs()[0].buttonDown[0]);
             }
 
             if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
@@ -756,7 +756,7 @@ void CMenuPcs::CalcSingCMake()
                 down = 0;
             } else {
                 __cntlzw(static_cast<unsigned int>(Pad._448_4_));
-                down = static_cast<unsigned short>(Pad._8_2_);
+                down = static_cast<unsigned short>(Pad.GetPadInputs()[0].buttonDown[0]);
             }
 
             if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
@@ -2509,7 +2509,7 @@ unsigned short CMenuPcs::CmakeJobCtrl()
         down = 0;
     } else {
         __cntlzw(static_cast<unsigned int>(Pad._448_4_));
-        down = static_cast<unsigned short>(Pad._8_2_);
+        down = static_cast<unsigned short>(Pad.GetPadInputs()[0].buttonDown[0]);
     }
 
     if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {

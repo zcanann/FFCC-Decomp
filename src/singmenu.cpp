@@ -2139,7 +2139,7 @@ void CMenuPcs::SingleCalcCtrl()
         press = 0;
     } else {
         __cntlzw((unsigned int)Pad._448_4_);
-        press = Pad._8_2_;
+        press = Pad.GetPadInputs()[0].buttonDown[0];
     }
 
     if ((press & 0x800) != 0) {

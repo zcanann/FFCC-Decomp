@@ -205,7 +205,7 @@ static inline unsigned short GetPadButtons()
         return 0;
     }
     __cntlzw(static_cast<unsigned int>(Pad._448_4_));
-    return static_cast<unsigned short>(Pad._8_2_);
+    return static_cast<unsigned short>(Pad.GetPadInputs()[0].buttonDown[0]);
 }
 
 static unsigned short GetShopMenuListButtons()
@@ -215,7 +215,7 @@ static unsigned short GetShopMenuListButtons()
             return 0;
         }
         __cntlzw(static_cast<unsigned int>(Pad._448_4_));
-        return Pad._20_2_;
+        return Pad.GetPadInputs()[0].repeatButton;
     }
 
     unsigned short buttons;
@@ -223,7 +223,7 @@ static unsigned short GetShopMenuListButtons()
         buttons = 0;
     } else {
         __cntlzw(static_cast<unsigned int>(Pad._448_4_));
-        buttons = Pad._4_2_;
+        buttons = Pad.GetPadInputs()[0].button[0];
     }
 
     if ((buttons & gShopMenuInputLatch) == 0) {
@@ -234,7 +234,7 @@ static unsigned short GetShopMenuListButtons()
         return 0;
     }
     __cntlzw(static_cast<unsigned int>(Pad._448_4_));
-    return static_cast<unsigned short>(Pad._8_2_);
+    return static_cast<unsigned short>(Pad.GetPadInputs()[0].buttonDown[0]);
 }
 
 static inline int ShopMenuCaravan(CShopMenu* shopMenu)
@@ -560,7 +560,7 @@ unsigned short getButtonRepeat(int, unsigned short noRepeatMask)
             buttons = 0;
         } else {
             __cntlzw(static_cast<unsigned int>(Pad._448_4_));
-            buttons = Pad._20_2_;
+            buttons = Pad.GetPadInputs()[0].repeatButton;
         }
     } else {
         bool hasInput = (Pad._452_4_ != 0) || (Pad._448_4_ != -1);
@@ -568,7 +568,7 @@ unsigned short getButtonRepeat(int, unsigned short noRepeatMask)
             buttons = 0;
         } else {
             __cntlzw(static_cast<unsigned int>(Pad._448_4_));
-            buttons = Pad._4_2_;
+            buttons = Pad.GetPadInputs()[0].button[0];
         }
 
         if ((buttons & gShopMenuInputLatch) == 0) {
@@ -580,7 +580,7 @@ unsigned short getButtonRepeat(int, unsigned short noRepeatMask)
             buttons = 0;
         } else {
             __cntlzw(static_cast<unsigned int>(Pad._448_4_));
-            buttons = Pad._8_2_;
+            buttons = Pad.GetPadInputs()[0].buttonDown[0];
         }
     }
 

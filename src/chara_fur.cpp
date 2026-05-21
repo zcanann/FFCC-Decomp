@@ -965,7 +965,7 @@ static inline unsigned short MogHeldButtons()
 	if (HasDebugPadOverride()) {
 		return 0;
 	}
-	return static_cast<unsigned short>(Pad._4_2_);
+	return static_cast<unsigned short>(Pad.GetPadInputs()[0].button[0]);
 }
 
 static inline unsigned short MogTriggerButtons()
@@ -973,7 +973,7 @@ static inline unsigned short MogTriggerButtons()
 	if (HasDebugPadOverride()) {
 		return 0;
 	}
-	return static_cast<unsigned short>(Pad._8_2_);
+	return static_cast<unsigned short>(Pad.GetPadInputs()[0].buttonDown[0]);
 }
 
 static inline int MogPadInt(int offset)

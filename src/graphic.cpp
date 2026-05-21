@@ -407,7 +407,7 @@ void CGraphic::BeginFrame()
     u16 buttons = 0;
     if (!useDebugPad) {
         __cntlzw(static_cast<unsigned int>(Pad._448_4_));
-        buttons = Pad._4_2_;
+        buttons = Pad.GetPadInputs()[0].button[0];
     }
 
     if ((buttons & 2) != 0) {

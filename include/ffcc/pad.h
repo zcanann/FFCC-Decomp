@@ -49,6 +49,17 @@ public:
         unsigned short button;
 	};
 
+    struct PadInputRawView
+    {
+        short _4_2_;
+        short _6_2_;
+        short _8_2_;
+        short _a_2_;
+        unsigned char _c_1_[0x14];
+        short _20_2_;
+        unsigned char _22_1_[0x186];
+    };
+
     CPad()
     {
         _1b4_4_ = 0;
@@ -59,17 +70,14 @@ public:
     void Quit();
     void Frame();
     unsigned short GetButtonDown(long);
-    PadInput* GetPadInputs() { return reinterpret_cast<PadInput*>(&_4_2_); }
-    const PadInput* GetPadInputs() const { return reinterpret_cast<const PadInput*>(&_4_2_); }
+    PadInput* GetPadInputs() { return m_padInputs; }
+    const PadInput* GetPadInputs() const { return m_padInputs; }
     PadInput* GetMergedPad() { return &GetPadInputs()[4]; }
     const PadInput* GetMergedPad() const { return &GetPadInputs()[4]; }
-    short _4_2_;
-    short _6_2_;
-    short _8_2_;
-    short _a_2_;
-    unsigned char _c_1_[0x14];
-    short _20_2_;
-    unsigned char _22_1_[0x186];
+    union {
+        PadInput m_padInputs[5];
+        PadInputRawView m_padInputsRaw;
+    };
     unsigned int _1a8_4_;
     void* _1ac_4_;
     unsigned char* _1b0_4_;

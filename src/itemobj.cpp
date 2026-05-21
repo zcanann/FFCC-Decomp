@@ -455,8 +455,10 @@ void CGItemObj::loadModel()
 				int particleNo = *(unsigned short*)(entryBase + i * 2 + 0x14);
 
 				if (particleNo != 0xFFFF) {
+					const float& particleScaleStep = FLOAT_80331b50;
+					const float& particleScaleBase = FLOAT_80331b4c;
 					float particleScale =
-					    FLOAT_80331b50 * (float)(unsigned short)*(unsigned short*)(entryBase + 0x10) + FLOAT_80331b4c;
+					    particleScaleStep * (float)(unsigned short)*(unsigned short*)(entryBase + 0x10) + particleScaleBase;
 					putParticle__8CGPrgObjFiiP8CGObjectfi(
 					    this, particleNo | 0x100, *(int*)(self + 0x55C), this, particleScale, 0);
 				}
@@ -465,7 +467,9 @@ void CGItemObj::loadModel()
 	}
 
 	if (*(int*)(self + 0x500) == 0xCB) {
-		*(float*)(self + 0x1D4) = FLOAT_80331b54 - RandF__5CMathFf(FLOAT_80331b58, &Math);
+		const float& randBase = FLOAT_80331b54;
+		const float& randRange = FLOAT_80331b58;
+		*(float*)(self + 0x1D4) = randBase - RandF__5CMathFf(randRange, &Math);
 		*(unsigned char*)(self + 0x9A) =
 		    static_cast<unsigned char>(__rlwimi(*(unsigned char*)(self + 0x9A), 0, 2, 29, 29));
 	}
@@ -563,10 +567,11 @@ void CGItemObj::onFrameAlways()
 	int countdown = *(int*)(self + 0x56C);
 
 	if (countdown != 0) {
+		const float& scale = FLOAT_80331b68;
 		int next = countdown - 1;
 		*(int*)(self + 0x56C) = next & ~(next >> 0x1F);
 		float radius = *(float*)(self + 0x568) * (float)(8 - *(int*)(self + 0x56C));
-		*(float*)(self + 0x144) = radius * FLOAT_80331b68;
+		*(float*)(self + 0x144) = radius * scale;
 	}
 
 	if (*(int*)(self + 0x500) == 0xA) {

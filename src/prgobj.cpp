@@ -284,8 +284,8 @@ float CGPrgObj::getTargetRot(CGPrgObj* target)
 	float targetRot;
 	float deltaX;
 	float deltaZ;
-	CVector basePos(m_worldPosition);
 	CVector targetPos(target->m_worldPosition);
+	CVector basePos(m_worldPosition);
 	CVector deltaPos;
 
 	PSVECSubtract(AsVec(basePos), AsVec(targetPos), AsVec(deltaPos));

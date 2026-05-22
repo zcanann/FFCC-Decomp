@@ -30,8 +30,6 @@ extern "C" void DrawSingleStat__8CMenuPcsFf(CMenuPcs*, float);
 extern "C" void DrawSingleHelpWim__8CMenuPcsFf(CMenuPcs*, float);
 extern "C" void DrawShadowFont__8CMenuPcsFP5CFontPcffii(CMenuPcs*, CFont*, const char*, float, float, int, int);
 extern "C" void DrawInit__8CMenuPcsFv(CMenuPcs*);
-extern "C" void SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(CMenuPcs*, int);
-extern "C" void SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(CMenuPcs*, int);
 extern "C" void DrawSingWin__8CMenuPcsFs(CMenuPcs*, short);
 extern "C" void DrawSingWinMess__8CMenuPcsFiii(CMenuPcs*, int, int, int);
 extern "C" int SingWinMessHeight__8CMenuPcsFv(CMenuPcs*);
@@ -1517,13 +1515,13 @@ void CMenuPcs::LetterListDraw()
 		const double markScale =
 		    static_cast<double>(static_cast<float>(DOUBLE_80333098 * static_cast<double>(absPhase) + DOUBLE_80333090));
 
-		SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
+		SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
 		const int alpha = static_cast<int>(
 		    FLOAT_803330a0 * static_cast<float>(DOUBLE_803330b0 * static_cast<double>(absPhase) + DOUBLE_803330a8));
 		GXColor markColor = {0xFF, 0xFF, 0xFF, static_cast<u8>(alpha)};
 		GXSetChanMatColor(GX_COLOR0A0, markColor);
-		SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x43);
+		SetTexture(static_cast<CMenuPcs::TEX>(0x43));
 
 		const double iconSize = static_cast<double>(FLOAT_803330b8);
 		const double iconOffset =
@@ -1583,7 +1581,7 @@ void CMenuPcs::LetterListDraw()
 void CMenuPcs::LetterMessDraw()
 {
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
+	SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
 	int caravanWork = Game.m_scriptFoodBase[0];
 	int state = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C);
@@ -1600,7 +1598,7 @@ void CMenuPcs::LetterMessDraw()
 		u8 alpha = static_cast<u8>(FLOAT_803330a0 * *reinterpret_cast<float*>(panel + 8));
 		GXColor color = {0xFF, 0xFF, 0xFF, alpha};
 		GXSetChanMatColor(GX_COLOR0A0, color);
-		SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, tex);
+		SetTexture(static_cast<CMenuPcs::TEX>(tex));
 		DrawRect__8CMenuPcsFUlfffffffff(
 		    static_cast<double>(panel[0]), static_cast<double>(panel[1]),
 		    static_cast<double>(panel[2]), static_cast<double>(panel[3]),
@@ -2154,7 +2152,7 @@ void CMenuPcs::LetterLstBaseDraw(float param_1)
 	double w = static_cast<double>(static_cast<int>(static_cast<double>(FLOAT_803330e0) - DOUBLE_803330a8));
 	double h = static_cast<double>(static_cast<int>(static_cast<double>(FLOAT_803330f0) - DOUBLE_803330e8));
 
-	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
+	SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 	GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
 	GXSetChanMatColor(GX_COLOR0A0, white);
 
@@ -2184,7 +2182,7 @@ void CMenuPcs::LetterLstBaseDraw(float param_1)
 			y = y1;
 		}
 
-		SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, tex);
+		SetTexture(static_cast<CMenuPcs::TEX>(tex));
 		DrawRect__8CMenuPcsFUlfffffffff(
 		    x, y, static_cast<double>(FLOAT_803330f4), static_cast<double>(FLOAT_803330f4),
 		    static_cast<double>(FLOAT_803330bc), static_cast<double>(FLOAT_803330bc),
@@ -2199,14 +2197,14 @@ void CMenuPcs::LetterLstBaseDraw(float param_1)
 	for (int i = 0; i < 2; ++i) {
 		int tex = (i == 0) ? 0x49 : 0x4C;
 		double y = (i == 0) ? y0 : y1;
-		SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, tex);
+		SetTexture(static_cast<CMenuPcs::TEX>(tex));
 		DrawRect__8CMenuPcsFUlfffffffff(
 		    innerX, y, innerW, static_cast<double>(FLOAT_803330f4),
 		    static_cast<double>(FLOAT_803330bc), static_cast<double>(FLOAT_803330bc),
 		    static_cast<double>(FLOAT_803330f8), static_cast<double>(FLOAT_803330f8), this, 0);
 	}
 
-	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x4A);
+	SetTexture(static_cast<CMenuPcs::TEX>(0x4A));
 	for (int i = 0; i < 2; ++i) {
 		int flip = (i == 0) ? 0 : 8;
 		double x = (i == 0) ? x0 : x1;
@@ -2216,13 +2214,13 @@ void CMenuPcs::LetterLstBaseDraw(float param_1)
 		    static_cast<double>(FLOAT_803330f8), static_cast<double>(FLOAT_803330f8), this, flip);
 	}
 
-	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x4E);
+	SetTexture(static_cast<CMenuPcs::TEX>(0x4E));
 	DrawRect__8CMenuPcsFUlfffffffff(
 	    innerX, innerY, innerW, innerH,
 	    static_cast<double>(FLOAT_803330bc), static_cast<double>(FLOAT_803330bc),
 	    static_cast<double>(FLOAT_803330f8), static_cast<double>(FLOAT_803330f8), this, 0);
 
-	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x4F);
+	SetTexture(static_cast<CMenuPcs::TEX>(0x4F));
 	double decoX0 = static_cast<double>(static_cast<float>(x0 + w - static_cast<double>(FLOAT_80333108)));
 	double decoY0 = y0 - DOUBLE_80333100;
 	double decoX1 = static_cast<double>(static_cast<float>(decoX0 + DOUBLE_80333100));
@@ -2237,7 +2235,7 @@ void CMenuPcs::LetterLstBaseDraw(float param_1)
 		    static_cast<double>(FLOAT_803330f8), static_cast<double>(FLOAT_803330f8), this, flip);
 	}
 
-	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x50);
+	SetTexture(static_cast<CMenuPcs::TEX>(0x50));
 	double barX0 = static_cast<double>(static_cast<float>(x0 - static_cast<double>(FLOAT_80333110)));
 	double barX1 = static_cast<double>(static_cast<float>(decoX0 + static_cast<double>(FLOAT_80333110)));
 	double barY0 = static_cast<double>(static_cast<float>((DOUBLE_80333118 + y0) - DOUBLE_80333100));
@@ -2259,7 +2257,7 @@ void CMenuPcs::LetterLstBaseDraw(float param_1)
 	}
 
 	if (param >= DOUBLE_803330e8) {
-		SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x3D);
+		SetTexture(static_cast<CMenuPcs::TEX>(0x3D));
 		DrawRect__8CMenuPcsFUlfffffffff(
 		    static_cast<double>(static_cast<float>(x0 - static_cast<double>(FLOAT_803330f4))),
 		    static_cast<double>(static_cast<float>(y0 - static_cast<double>(FLOAT_80333108))),

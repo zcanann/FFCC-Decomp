@@ -62,8 +62,6 @@ extern "C" unsigned int pppCreate__8CPartMngFiiP14PPPCREATEPARAMi(void*, int, in
 extern "C" void pppDeletePart__8CPartMngFi(void*, int);
 extern "C" void pppDestroyAll__8CPartMngFv(void*);
 extern "C" void* Free__7CMemoryFPv(CMemory*, void*);
-extern "C" int GetPadType__7CJoybusFi(void*, int);
-extern "C" char GetGBAConnect__7CJoybusFi(void*, int);
 extern "C" asm void MTX44MultVec4__5CMathFPA4_fP3VecP5Vec4d(register void*, register float (*)[4], register Vec*,
                                                             register void*);
 extern "C" int DAT_8021082c[];

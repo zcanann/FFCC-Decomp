@@ -30,7 +30,6 @@ extern "C" void drawBegin__11CGraphicPcsFv(CGraphicPcs*);
 extern "C" void drawWait__11CGraphicPcsFv(CGraphicPcs*);
 extern "C" void drawFlip__11CGraphicPcsFv(CGraphicPcs*);
 extern "C" void drawEnd__11CGraphicPcsFv(CGraphicPcs*);
-extern "C" void drawBar__11CGraphicPcsFv(CGraphicPcs*);
 extern "C" void drawCopy__11CGraphicPcsFv(CGraphicPcs*);
 extern "C" void setViewport__11CGraphicPcsFv(CGraphicPcs*);
 extern "C" void preDrawEnvInit__11CGraphicPcsFv(CGraphicPcs*);

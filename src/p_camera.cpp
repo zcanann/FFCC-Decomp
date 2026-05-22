@@ -49,7 +49,6 @@ extern "C" void destroyFullShadow__10CCameraPcsFv(CCameraPcs*);
 extern "C" void drawShadowBegin__10CCameraPcsFv(CCameraPcs*);
 extern "C" void drawShadowEnd__10CCameraPcsFv(CCameraPcs*);
 extern "C" void drawShadowChrBegin__10CCameraPcsFv(CCameraPcs*);
-extern "C" void SetFullScreenShadow__10CCameraPcsFPA4_fl(CCameraPcs*);
 extern "C" void drawShadowEndAll__10CCameraPcsFv(CCameraPcs*);
 
 extern "C" const char s_CCameraPcs_GAME_801D7860[] = "CCameraPcs(GAME)";

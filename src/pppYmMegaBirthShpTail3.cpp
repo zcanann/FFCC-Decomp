@@ -442,9 +442,9 @@ void pppFrameYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthShp
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void calc(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirthShpTail3,
-                     PYmMegaBirthShpTail3* pYmMegaBirthShpTail3, _PARTICLE_DATA* particleData,
-                     VColor* vColor, _PARTICLE_COLOR* particleColor)
+void calc(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirthShpTail3,
+          PYmMegaBirthShpTail3* pYmMegaBirthShpTail3, _PARTICLE_DATA* particleData,
+          VColor* vColor, _PARTICLE_COLOR* particleColor)
 {
     int alpha = vColor->m_alpha;
     u8* particleBytes = (u8*)particleData;
@@ -518,10 +518,10 @@ extern "C" void calc(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirth
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirthShpTail3,
-                      PYmMegaBirthShpTail3* pYmMegaBirthShpTail3, VColor* vColor,
-                      _PARTICLE_DATA* particleData, _PARTICLE_WMAT* particleWMat,
-                      _PARTICLE_COLOR* particleColor)
+void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirthShpTail3,
+           PYmMegaBirthShpTail3* pYmMegaBirthShpTail3, VColor* vColor,
+           _PARTICLE_DATA* particleData, _PARTICLE_WMAT* particleWMat,
+           _PARTICLE_COLOR* particleColor)
 {
     u8* paramBytes = (u8*)pYmMegaBirthShpTail3;
     u8* particleBytes = (u8*)particleData;

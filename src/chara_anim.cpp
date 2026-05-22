@@ -10,7 +10,6 @@ extern "C" const char s_charaAnimSourceFile[] = "chara_anim.cpp";
 extern "C" const char s_charaAnimAllocWarn[32] =
     "\214\303\202\242\203\101\203\152\203\201\201\133\203\126\203\207\203\223"
     "\214\140\216\256\202\305\202\267\201\102\n";
-extern "C" int TryReleaseAnimBank__9CCharaPcsFi(void*, int);
 extern const float kCharaSharedZeroF;
 extern const float kCharaSharedOneF;
 extern const double DOUBLE_80330C78 = 4503599627370496.0;
@@ -19,6 +18,12 @@ extern const float FLOAT_80330c84 = 0.01745329238474369f;
 extern const double DOUBLE_80330c88 = 4503601774854144.0;
 extern const float FLOAT_80330C90 = -1.0f;
 extern const float FLOAT_80330C94 = 360.0f;
+
+class CCharaPcs
+{
+public:
+	int TryReleaseAnimBank(int);
+};
 
 namespace {
 static inline unsigned char* Ptr(void* p, unsigned int offset)
@@ -368,7 +373,7 @@ void CChara::CAnimNode::Interp(CChara::CAnim* anim, SRT* srt, float frame)
 			if (anim->m_bank != 0) {
 				break;
 			}
-			if (TryReleaseAnimBank__9CCharaPcsFi(&CharaPcs, anim->m_bankSize) == 0) {
+			if (CharaPcs.TryReleaseAnimBank(anim->m_bankSize) == 0) {
 				return;
 			}
 		}

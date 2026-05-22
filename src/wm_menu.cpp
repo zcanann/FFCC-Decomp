@@ -31,7 +31,6 @@ extern "C" void* __vt__Q212CFlatRuntime7CObject[];
 extern "C" void* __vt__9CGBaseObj[];
 extern "C" void* __vt__8CGObject[];
 extern "C" int rand(void);
-extern "C" int GetWinMess__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" int GetMcWinMessBuff__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" void SetFog__8CGraphicFii(void*, int, int);
 extern "C" void SetAmbient__9CLightPcsF8_GXColor(void*, void*);
@@ -1288,7 +1287,7 @@ void CMenuPcs::CalcMCardMenu()
 			pFont->SetScale(FLOAT_803313e8);
 			int msgBuf = GetMcWinMessBuff__8CMenuPcsFi(this, 0);
 			iVar14 = 0;
-			int* piVar4 = reinterpret_cast<int*>(GetWinMess__8CMenuPcsFi(this, 0));
+			int* piVar4 = reinterpret_cast<int*>(GetWinMess(0));
 			int* piVar18 = piVar4;
 			for (int iVar21 = 0; iVar21 < *piVar4; iVar21++) {
 				char* pcVar10 = *reinterpret_cast<char**>(msgBuf + *reinterpret_cast<short*>(reinterpret_cast<int>(piVar18) + 4) * 4);
@@ -1363,7 +1362,7 @@ void CMenuPcs::CalcMCardMenu()
 			pFont->SetScale(FLOAT_803313e8);
 			int msgBuf = GetMcWinMessBuff__8CMenuPcsFi(this, 0);
 			iVar14 = 0;
-			int* piVar4 = reinterpret_cast<int*>(GetWinMess__8CMenuPcsFi(this, 6));
+			int* piVar4 = reinterpret_cast<int*>(GetWinMess(6));
 			int* piVar18 = piVar4;
 			for (int iVar21 = 0; iVar21 < *piVar4; iVar21++) {
 				char* pcVar10 = *reinterpret_cast<char**>(msgBuf + *reinterpret_cast<short*>(reinterpret_cast<int>(piVar18) + 4) * 4);
@@ -1448,7 +1447,7 @@ void CMenuPcs::CalcMCardMenu()
 			pFont->SetScale(FLOAT_803313e8);
 			int msgBuf = GetMcWinMessBuff__8CMenuPcsFi(this, uVar20);
 			iVar14 = 0;
-			int* piVar4 = reinterpret_cast<int*>(GetWinMess__8CMenuPcsFi(this, uVar17));
+			int* piVar4 = reinterpret_cast<int*>(GetWinMess(uVar17));
 			int* piVar18 = piVar4;
 			for (int iVar21 = 0; iVar21 < *piVar4; iVar21++) {
 				char* pcVar10 = *reinterpret_cast<char**>(msgBuf + *reinterpret_cast<short*>(reinterpret_cast<int>(piVar18) + 4) * 4);
@@ -1556,7 +1555,7 @@ void CMenuPcs::CalcMCardMenu()
 			pFont->SetScale(FLOAT_803313e8);
 			int msgBuf = GetMcWinMessBuff__8CMenuPcsFi(this, uVar20);
 			iVar14 = 0;
-			int* piVar4 = reinterpret_cast<int*>(GetWinMess__8CMenuPcsFi(this, uVar17));
+			int* piVar4 = reinterpret_cast<int*>(GetWinMess(uVar17));
 			int* piVar18 = piVar4;
 			for (int iVar21 = 0; iVar21 < *piVar4; iVar21++) {
 				char* pcVar10 = *reinterpret_cast<char**>(msgBuf + *reinterpret_cast<short*>(reinterpret_cast<int>(piVar18) + 4) * 4);
@@ -1747,7 +1746,7 @@ void CMenuPcs::CalcMCardMenu()
 			pFont->SetScale(FLOAT_803313e8);
 			int msgBuf = GetMcWinMessBuff__8CMenuPcsFi(this, uVar20);
 			iVar14 = 0;
-			int* piVar4 = reinterpret_cast<int*>(GetWinMess__8CMenuPcsFi(this, uVar17));
+			int* piVar4 = reinterpret_cast<int*>(GetWinMess(uVar17));
 			int* piVar18 = piVar4;
 			for (int iVar21 = 0; iVar21 < *piVar4; iVar21++) {
 				char* pcVar10 = *reinterpret_cast<char**>(msgBuf + *reinterpret_cast<short*>(reinterpret_cast<int>(piVar18) + 4) * 4);
@@ -2116,7 +2115,7 @@ void CMenuPcs::CalcLoadMenu()
 			pFont->SetScale(FLOAT_803313e8);
 			int msgBuf = GetMcWinMessBuff__8CMenuPcsFi(this, 0);
 			iVar14 = 0;
-			int* piVar5 = reinterpret_cast<int*>(GetWinMess__8CMenuPcsFi(this, 0));
+			int* piVar5 = reinterpret_cast<int*>(GetWinMess(0));
 			int* piVar20 = piVar5;
 			for (int iVar23 = 0; iVar23 < *piVar5; iVar23++) {
 				char* pcVar12 = *reinterpret_cast<char**>(msgBuf + *reinterpret_cast<short*>(reinterpret_cast<int>(piVar20) + 4) * 4);
@@ -2189,7 +2188,7 @@ void CMenuPcs::CalcLoadMenu()
 			pFont->SetScale(FLOAT_803313e8);
 			int msgBuf = GetMcWinMessBuff__8CMenuPcsFi(this, 0);
 			iVar14 = 0;
-			int* piVar5 = reinterpret_cast<int*>(GetWinMess__8CMenuPcsFi(this, 6));
+			int* piVar5 = reinterpret_cast<int*>(GetWinMess(6));
 			int* piVar20 = piVar5;
 			for (int iVar23 = 0; iVar23 < *piVar5; iVar23++) {
 				char* pcVar12 = *reinterpret_cast<char**>(msgBuf + *reinterpret_cast<short*>(reinterpret_cast<int>(piVar20) + 4) * 4);
@@ -2277,7 +2276,7 @@ void CMenuPcs::CalcLoadMenu()
 			pFont->SetScale(FLOAT_803313e8);
 			int msgBuf = GetMcWinMessBuff__8CMenuPcsFi(this, uVar22);
 			iVar14 = 0;
-			int* piVar5 = reinterpret_cast<int*>(GetWinMess__8CMenuPcsFi(this, uVar19));
+			int* piVar5 = reinterpret_cast<int*>(GetWinMess(uVar19));
 			int* piVar20 = piVar5;
 			for (int iVar23 = 0; iVar23 < *piVar5; iVar23++) {
 				char* pcVar12 = *reinterpret_cast<char**>(msgBuf + *reinterpret_cast<short*>(reinterpret_cast<int>(piVar20) + 4) * 4);
@@ -2373,7 +2372,7 @@ void CMenuPcs::CalcLoadMenu()
 			pFont->SetScale(FLOAT_803313e8);
 			int msgBuf = GetMcWinMessBuff__8CMenuPcsFi(this, uVar22);
 			iVar14 = 0;
-			int* piVar5 = reinterpret_cast<int*>(GetWinMess__8CMenuPcsFi(this, uVar19));
+			int* piVar5 = reinterpret_cast<int*>(GetWinMess(uVar19));
 			int* piVar20 = piVar5;
 			for (int iVar23 = 0; iVar23 < *piVar5; iVar23++) {
 				char* pcVar12 = *reinterpret_cast<char**>(msgBuf + *reinterpret_cast<short*>(reinterpret_cast<int>(piVar20) + 4) * 4);
@@ -2581,7 +2580,7 @@ void CMenuPcs::CalcLoadMenu()
 			pFont->SetScale(FLOAT_803313e8);
 			int msgBuf = GetMcWinMessBuff__8CMenuPcsFi(this, uVar22);
 			iVar14 = 0;
-			int* piVar5 = reinterpret_cast<int*>(GetWinMess__8CMenuPcsFi(this, uVar19));
+			int* piVar5 = reinterpret_cast<int*>(GetWinMess(uVar19));
 			int* piVar20 = piVar5;
 			for (int iVar23 = 0; iVar23 < *piVar5; iVar23++) {
 				char* pcVar12 = *reinterpret_cast<char**>(msgBuf + *reinterpret_cast<short*>(reinterpret_cast<int>(piVar20) + 4) * 4);
@@ -8991,7 +8990,7 @@ void CMenuPcs::DrawMcWinMess(int winType, int messType)
 	font->SetTlut(0x23);
 
 	const int msgTable = GetMcWinMessBuff__8CMenuPcsFi(this, messType);
-	const unsigned char* const winMess = reinterpret_cast<unsigned char*>(GetWinMess__8CMenuPcsFi(this, winType));
+	const unsigned char* const winMess = reinterpret_cast<unsigned char*>(GetWinMess(winType));
 	if (msgTable == 0 || winMess == 0) {
 		DrawInit();
 		return;
@@ -9049,7 +9048,7 @@ void CMenuPcs::GetWinSize(int winType, short* w, short* h, int messType)
 	font->SetScale(FLOAT_803313e8);
 
 	const int msgTable = GetMcWinMessBuff__8CMenuPcsFi(this, messType);
-	const unsigned char* const winMess = reinterpret_cast<unsigned char*>(GetWinMess__8CMenuPcsFi(this, winType));
+	const unsigned char* const winMess = reinterpret_cast<unsigned char*>(GetWinMess(winType));
 	const int count = *reinterpret_cast<const int*>(winMess);
 	int maxWidth = 0;
 

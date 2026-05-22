@@ -1,5 +1,6 @@
 #include "ffcc/pppYmChangeTex.h"
 #include "ffcc/gobject.h"
+#include "ffcc/gxfunc.h"
 #include "ffcc/linkage.h"
 #include "ffcc/mapmesh.h"
 #include "ffcc/materialman.h"
@@ -103,7 +104,6 @@ CCharaPcs::CHandle* GetCharaHandlePtr(CGObject*, long);
 
 extern "C" {
 	int GetTexture__8CMapMeshFP12CMaterialSetRi(CMapMesh*, CMaterialSet*, int&);
-	void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
 	void* GetCharaHandlePtr__FP8CGObjectl(void*, long);
 	int GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void*);
 	void* GetTextureFromRSD__FiP9_pppEnvSt(int, _pppEnvSt*);
@@ -129,7 +129,7 @@ void pppRenderYmChangeTex(pppYmChangeTex*, pppYmChangeTexStep* step, pppYmChange
 		CMapMesh* mapMesh = env->m_mapMeshPtr[step->m_dataValIndex];
 		textureIndex = 0;
 		GetTexture__8CMapMeshFP12CMaterialSetRi(mapMesh, env->m_materialSetPtr, textureIndex);
-		_GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
+		_GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
 	}
 }
 

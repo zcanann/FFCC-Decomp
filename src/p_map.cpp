@@ -69,9 +69,9 @@ unsigned int m_table_desc21__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsi
 unsigned int m_table_desc22__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__7CMapPcsFv)};
 unsigned int m_table_desc23__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawAfterViewer__7CMapPcsFv)};
 
-const char s_CMapPcs_GAME_801D76E0[] = "CMapPcs_GAME";
-const char s_CMapPcs_VIEWER_801D76F0[] = "CMapPcs_VIEWER";
-const char s_CMapPcs_PART_801D7700[] = "CMapPcs_PART";
+extern const char s_CMapPcs_GAME_801D76E0[];
+extern const char s_CMapPcs_VIEWER_801D76F0[];
+extern const char s_CMapPcs_PART_801D7700[];
 
 unsigned int m_table__7CMapPcs[3][0x414 / 3 / sizeof(unsigned int)] = {
     {
@@ -144,15 +144,9 @@ static unsigned int s_CMapPcsRttiBase1[5] = {
     0,
 };
 extern "C" void _WaitDrawDone__8CGraphicFPci(CGraphic*, const char*, int);
-static const char s_p_map_cpp_801d7728[] = "p_map.cpp";
-static const char s_map_load_ok_fmt[] =
-    "\n\n============================================================\n"
-    "                LoadMap [%s] OK\n"
-    "                 m_mapobj_n = %d\n"
-    "                m_octtree_n = %d\n"
-    "                 memFree=%d Kbyte\n"
-    "============================================================\n\n\n";
-static const char s_dvd_map_stage_map_fmt[] = "dvd/map/stg%03d/map%03d";
+extern const char s_p_map_cpp_801d7728[];
+extern const char s_map_load_ok_fmt[];
+extern const char s_dvd_map_stage_map_fmt[];
 extern "C" void Destroy__7CMapMngFv(CMapMng*);
 extern "C" void MapFileRead__7CMapMngFPcRUl(CMapMng*);
 

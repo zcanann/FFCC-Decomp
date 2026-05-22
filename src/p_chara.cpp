@@ -48,7 +48,6 @@ extern "C" void Destroy__6CCharaFv(void*);
 extern "C" void Create__Q26CChara5CAnimFPvPQ27CMemory6CStage(void*, void*, void*);
 extern "C" void LoadSe__6CSoundFPv(void*, void*);
 extern "C" void LoadWave__6CSoundFPv(void*, void*);
-extern "C" int GetBackBufferRect__8CGraphicFRiRiRiRii(CGraphic*, int&, int&, int&, int&, int);
 extern "C" unsigned char DbgMenuPcs[];
 extern unsigned char PTR_s_CCharaPcs_GAME_[];
 
@@ -2133,8 +2132,7 @@ void CCharaPcs::drawOverlap()
     int top = 0;
     int width = 0x280;
     int height = 0x1C0;
-    _GXTexObj* backBufferTex = reinterpret_cast<_GXTexObj*>(
-        GetBackBufferRect__8CGraphicFRiRiRiRii(&Graphic, left, top, width, height, 0));
+    _GXTexObj* backBufferTex = Graphic.GetBackBufferRect(left, top, width, height, 0);
 
     Mtx savedCameraMtx;
     Mtx lookAtMtx;

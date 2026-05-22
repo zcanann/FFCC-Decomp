@@ -67,7 +67,6 @@ void pppSetDrawEnv(pppCVECTOR*, pppFMATRIX*, float, unsigned char, unsigned char
                    unsigned char, unsigned char, unsigned char);
 
 extern "C" {
-GXTexObj* GetBackBufferRect__8CGraphicFRiRiRiRii(CGraphic* graphic, int& left, int& top, int& width, int& height, int copy);
 void DisableIndWarp__F13_GXTevStageID16_GXIndTexStageID(int stage, int indStage);
 void MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(void* math, Mtx44 mtx, Vec4d* src, Vec4d* dst);
 }
@@ -433,7 +432,7 @@ int RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* verti
 	height = (int)maxY - top;
 
 	pppSetBlendMode(3);
-	work->m_backBuffer = GetBackBufferRect__8CGraphicFRiRiRiRii(&Graphic, left, top, width, height, 0);
+	work->m_backBuffer = Graphic.GetBackBufferRect(left, top, width, height, 0);
 	if (work->m_backBuffer == 0) {
 		return 0;
 	}

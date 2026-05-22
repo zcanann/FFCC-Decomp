@@ -56,7 +56,6 @@ extern "C" void __ct__8CGObjectFv(CGObject*);
 extern "C" void __ct__9CGQuadObjFv(CGQuadObj*);
 extern "C" void __ct__9CGBaseObjFv(CGBaseObj*);
 extern "C" void pppCreate__8CPartMngFiiP14PPPCREATEPARAMi(CPartMng*, int, int, PPPCREATEPARAM*, int);
-extern "C" int GetBackBufferRect__8CGraphicFRiRiRiRii(CGraphic*, int&, int&, int&, int&, int);
 
 // Linkage definitions from config/GCCP01/symbols.txt.
 // Keeping these as raw byte buffers matches current decomp access patterns.
@@ -1989,9 +1988,8 @@ void CFlatRuntime2::drawLayer(
 			int rectY = by;
 			int rectW = bw;
 			int rectH = bh;
-			int backTex =
-				GetBackBufferRect__8CGraphicFRiRiRiRii(&Graphic, rectX, rectY, rectW, rectH, 0);
-			GXLoadTexObj(reinterpret_cast<_GXTexObj*>(backTex), GX_TEXMAP1);
+			_GXTexObj* backTex = Graphic.GetBackBufferRect(rectX, rectY, rectW, rectH, 0);
+			GXLoadTexObj(backTex, GX_TEXMAP1);
 
 			const float fx0 = static_cast<float>(rectX);
 			const float fy0 = static_cast<float>(rectY);

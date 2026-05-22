@@ -15,27 +15,10 @@
 #include <string.h>
 #include "ffcc/fontman.h"
 
-extern "C" void Attach__8CGObjectFP8CGObjectPcP3Vec(void*, void*, char*, Vec*);
-extern "C" void Detach__8CGObjectFv(void*);
-extern "C" void changeStat__8CGPrgObjFiii(void*, int, int, int);
-extern "C" float CalcSafePos__8CGObjectFiP8CGObjectP3Vec(void*, int, void*, Vec*);
-extern "C" void moveVectorHRot__8CGObjectFfffi(void*, float, float, float, int);
-extern "C" void LoadModel__8CGObjectFiUlUli(void*, int, unsigned long, unsigned long, int);
-extern "C" void LoadAnim__8CGObjectFPciiiUl(void*, char*, int, int, int, unsigned long);
-extern "C" void SetAnimSlot__8CGObjectFii(void*, int, int);
-extern "C" void PlayAnim__8CGObjectFiiiiiPSc(void*, int, int, int, int, int, signed char*);
-extern "C" void DispCharaParts__8CGObjectFi(void*, int);
 extern "C" void putParticle__8CGPrgObjFiiP8CGObjectfi(void*, int, int, void*, float, int);
 extern "C" void putParticleTrace__8CGPrgObjFiiP8CGObjectfi(void*, int, int, void*, float, int);
 extern "C" float RandF__5CMathFf(float, CMath*);
-extern "C" void deleteObject__12CFlatRuntimeFPQ212CFlatRuntime7CObject(void*, void*);
-extern "C" void SetParticleWorkParam__13CFlatRuntime2FiPQ212CFlatRuntime7CObject(void*, int, void*);
-extern "C" void IgnoreParticle__13CFlatRuntime2FiPQ212CFlatRuntime7CObject(void*, int, void*);
 extern "C" float RandFPM__5CMathFf(float, CMath*);
-extern "C" void SetPosBG__8CGObjectFP3Veci(void*, Vec*, int);
-extern "C" void MoveVector__8CGObjectFP3Vecfiiii(void*, Vec*, float, int, int, int, int);
-extern "C" void SetDamageCol__8CGObjectFiPcffP3Vec(void*, int, char*, float, float, Vec*);
-extern "C" void onFrame__8CGPrgObjFv(void*);
 extern "C" int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, CMapCylinder*, Vec*, unsigned int);
 extern "C" void putParticle__8CGPrgObjFiiP3Vecfi(void*, int, int, Vec*, float, int);
 extern "C" void playSe3D__8CGPrgObjFiiiiP3Vec(void*, int, int, int, int, Vec*);
@@ -420,14 +403,14 @@ void CGItemObj::loadModel()
 	}
 
 	if (modelNo >= 0) {
-		LoadModel__8CGObjectFiUlUli(this, 3, modelNo, modelVariant, modelFlag);
-		LoadAnim__8CGObjectFPciiiUl(this, standAnim, 0, 0, 3, animFlags);
-		SetAnimSlot__8CGObjectFii(this, 0, 0);
-		PlayAnim__8CGObjectFiiiiiPSc(this, 0, 1, 0, -1, -1, 0);
+		LoadModel(3, modelNo, modelVariant, modelFlag);
+		LoadAnim(standAnim, 0, 0, 3, animFlags);
+		SetAnimSlot(0, 0);
+		PlayAnim(0, 1, 0, -1, -1, 0);
 	}
 
 	if (*(int*)(self + 0x500) == 0x12) {
-		DispCharaParts__8CGObjectFi(this, 0);
+		DispCharaParts(0);
 		self[0x50] = static_cast<unsigned char>(__rlwimi(self[0x50], 1, 4, 27, 27));
 	}
 
@@ -501,7 +484,7 @@ void CGItemObj::onHitParticle(int effectIndex, int, int, int, Vec*, PPPIFPARAM* 
 			gCFlatRuntime2.ResetParticleWork(particleNo | 0x100, *(int*)(self + 0x55C));
 			gCFlatRuntime2.SetParticleWorkPos(*(Vec*)(self + 0x15C), FLOAT_80331b20);
 			gCFlatRuntime2.SetParticleWorkCol(9, 0, FLOAT_80331b18);
-			SetParticleWorkParam__13CFlatRuntime2FiPQ212CFlatRuntime7CObject(CFlat, classControl, this);
+			gCFlatRuntime2.SetParticleWorkParam(classControl, this);
 			gCFlatRuntime2.PutParticleWork();
 			*(unsigned int*)(self + 0x1C0) &= 0xFFF7FFFF;
 			addSubStat();
@@ -524,12 +507,12 @@ void CGItemObj::onHitParticle(int effectIndex, int, int, int, Vec*, PPPIFPARAM* 
 			unsigned int cid = classObj->GetCID();
 
 			if ((cid & 0x6D) == 0x6D && *(void**)(self + 0x550) == classObj) {
-				changeStat__8CGPrgObjFiii(this, 0x26, 0, 0);
+				changeStat(0x26, 0, 0);
 			}
 		}
 	}
 
-	IgnoreParticle__13CFlatRuntime2FiPQ212CFlatRuntime7CObject(CFlat, effectIndex, this);
+	gCFlatRuntime2.IgnoreParticle(effectIndex, this);
 }
 
 /*
@@ -663,12 +646,11 @@ void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 			if (useBossAttachName) {
 				attachName = DAT_80331b7c;
 			}
-			Attach__8CGObjectFP8CGObjectPcP3Vec(this, partyObj, const_cast<char*>(attachName),
-			                                    reinterpret_cast<Vec*>(&attachOffset));
-			changeStat__8CGPrgObjFiii(this, 0, 0, 0);
+			Attach(partyObj, const_cast<char*>(attachName), reinterpret_cast<Vec*>(&attachOffset));
+			changeStat(0, 0, 0);
 			*(float*)(self + 0x144) = FLOAT_80331b20;
 		} else {
-			changeStat__8CGPrgObjFiii(this, 0xB, 0, 0);
+			changeStat(0xB, 0, 0);
 		}
 	} else if (carryState == 1 || carryState == 2) {
 		bool isStageCarry = false;
@@ -694,25 +676,23 @@ void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 
 		if (carryMode == 0) {
 			Vec safePos;
-			float safeDist = CalcSafePos__8CGObjectFiP8CGObjectP3Vec(
-				this, 0x41, *(CGPartyObj**)(self + 0x550), &safePos);
+			float safeDist = CalcSafePos(0x41, *(CGPartyObj**)(self + 0x550), &safePos);
 			if (FLOAT_80331b20 < safeDist) {
 				CGPartyObj* carryObj = *(CGPartyObj**)(self + 0x550);
-				moveVectorHRot__8CGObjectFfffi(
-					carryObj,
+				carryObj->moveVectorHRot(
 					FLOAT_80331b8c + *(float*)((unsigned char*)carryObj + 0x1A8),
 					FLOAT_80331b20,
 					safeDist / FLOAT_80331b90,
 					3);
 			}
-			Detach__8CGObjectFv(this);
+			Detach();
 			*(Vec*)(self + 0x15C) = safePos;
 			*(int*)(self + 0x550) = 0;
-			changeStat__8CGPrgObjFiii(this, 0, 0, 0);
+			changeStat(0, 0, 0);
 			*(int*)(self + 0x56C) = 8;
 			*(float*)(self + 0x144) = FLOAT_80331b20;
 		} else {
-			changeStat__8CGPrgObjFiii(this, ((int)~(carryState - 1 | 1 - carryState) >> 0x1F) + 0xD, 0, 0);
+			changeStat(((int)~(carryState - 1 | 1 - carryState) >> 0x1F) + 0xD, 0, 0);
 		}
 
 		*reinterpret_cast<u32*>(self + 0x94) = 0x1194;
@@ -763,7 +743,7 @@ CGPrgObj* CGItemObj::CreateFromScript(
 		}
 
 		if (bestItemObj != 0) {
-			deleteObject__12CFlatRuntimeFPQ212CFlatRuntime7CObject(CFlat, bestItemObj);
+			reinterpret_cast<CFlatRuntime*>(CFlat)->deleteObject(reinterpret_cast<CFlatRuntime::CObject*>(bestItemObj));
 			deletedCount = 1;
 		} else {
 			if (2U < (unsigned int)System.m_execParam) {
@@ -800,7 +780,7 @@ CGPrgObj* CGItemObj::CreateFromScript(
 			newItem->m_radiusCtrl.y = FLOAT_80331b18;
 		}
 
-		changeStat__8CGPrgObjFiii(newItem, 0x1B, 0, 0);
+		newItem->changeStat(0x1B, 0, 0);
 
 		if ((createFlags & 1) != 0) {
 			float safePosDist;
@@ -811,26 +791,26 @@ CGPrgObj* CGItemObj::CreateFromScript(
 			newItem->m_worldPosition.y = FLOAT_80331b1c + owner->m_worldPosition.y;
 			newItem->m_worldPosition.z = FLOAT_80331b1c * (float)cos((double)yRot) + owner->m_worldPosition.z;
 
-			safePosDist = CalcSafePos__8CGObjectFiP8CGObjectP3Vec(newItem, 0x41, owner, &safePos);
+			safePosDist = newItem->CalcSafePos(0x41, owner, &safePos);
 			if (FLOAT_80331b20 < safePosDist) {
-				moveVectorHRot__8CGObjectFfffi(
-				    owner, FLOAT_80331b8c + owner->m_rotBaseY, FLOAT_80331b20, safePosDist / FLOAT_80331b90, 3);
+				owner->moveVectorHRot(FLOAT_80331b8c + owner->m_rotBaseY, FLOAT_80331b20,
+				                       safePosDist / FLOAT_80331b90, 3);
 			}
 
 			newItem->m_worldPosition = safePos;
-			SetPosBG__8CGObjectFP3Veci(newItem, &safePos, 1);
+			newItem->SetPosBG(&safePos, 1);
 		}
 
 		if ((createFlags & 4) != 0) {
 			newItem->m_worldPosition = owner->m_worldPosition;
-			SetPosBG__8CGObjectFP3Veci(newItem, &newItem->m_worldPosition, 1);
+			newItem->SetPosBG(&newItem->m_worldPosition, 1);
 
 			CVector moveVec((float)sin((double)launchAngle), FLOAT_80331b1c, (float)cos((double)launchAngle));
-			MoveVector__8CGObjectFP3Vecfiiii(newItem, (Vec*)&moveVec, FLOAT_80331b94, 1, 0, 1, 0);
+			newItem->MoveVector((Vec*)&moveVec, FLOAT_80331b94, 1, 0, 1, 0);
 		}
 
 		if ((createFlags & 2) != 0) {
-			changeStat__8CGPrgObjFiii(newItem, 0x23, 0, 0);
+			newItem->changeStat(0x23, 0, 0);
 			newItem->m_worldPosition.x = owner->m_worldPosition.x;
 			newItem->m_worldPosition.y = owner->m_worldPosition.y + FLOAT_80331b98;
 			newItem->m_worldPosition.z = owner->m_worldPosition.z;
@@ -908,7 +888,7 @@ int CGItemObj::DeleteOld(int deleteMask, int maxDeleteCount, CFlatRuntime::CObje
 		}
 
 		if (bestItemObj != 0) {
-			deleteObject__12CFlatRuntimeFPQ212CFlatRuntime7CObject(CFlat, bestItemObj);
+			reinterpret_cast<CFlatRuntime*>(CFlat)->deleteObject(reinterpret_cast<CFlatRuntime::CObject*>(bestItemObj));
 		} else {
 			if ((unsigned int)System.m_execParam >= 3U) {
 				System.Printf(const_cast<char*>(DAT_801dced4));
@@ -948,7 +928,7 @@ void CGItemObj::onFrameStat()
 			*(float*)(self + 0x174) = wobble;
 
 			if (*(int*)(self + 0x528) == 8) {
-				changeStat__8CGPrgObjFiii(this, 0, 0, 0);
+				changeStat(0, 0, 0);
 			}
 		}
 		break;
@@ -975,7 +955,7 @@ void CGItemObj::onFrameStat()
 				*(float*)(self + 0x4b4) = zero;
 				*(unsigned int*)(self + 0x1c0) = 1;
 				gCFlatRuntime2.EndParticle(m_charaModelHandle);
-				changeStat__8CGPrgObjFiii(this, 9, 0, 0);
+				changeStat(9, 0, 0);
 			}
 		}
 		break;
@@ -1015,9 +995,9 @@ void CGItemObj::onFrameStat()
 			if (useBossAttachName) {
 				attachName = DAT_80331b7c;
 			}
-			Attach__8CGObjectFP8CGObjectPcP3Vec(this, *(void**)(self + 0x550), const_cast<char*>(attachName),
-			                                    reinterpret_cast<Vec*>(&attachOffset));
-			changeStat__8CGPrgObjFiii(this, 0, 0, 0);
+			Attach(*reinterpret_cast<CGObject**>(self + 0x550), const_cast<char*>(attachName),
+			       reinterpret_cast<Vec*>(&attachOffset));
+			changeStat(0, 0, 0);
 			*(float*)(self + 0x144) = FLOAT_80331b20;
 		}
 		break;
@@ -1051,15 +1031,14 @@ void CGItemObj::onFrameStat()
 				launchSpeed = FLOAT_80331b90;
 			}
 
-			float safeDist = CalcSafePos__8CGObjectFiP8CGObjectP3Vec(this, 0x41, carryObj, &safePos);
+			float safeDist = CalcSafePos(0x41, carryObj, &safePos);
 
 			if (FLOAT_80331b20 < safeDist) {
-				moveVectorHRot__8CGObjectFfffi(
-				    carryObj, FLOAT_80331b8c + *(float*)((unsigned char*)carryObj + 0x1A8), FLOAT_80331b20,
-				    safeDist / FLOAT_80331b90, 3);
+				carryObj->moveVectorHRot(FLOAT_80331b8c + *(float*)((unsigned char*)carryObj + 0x1A8), FLOAT_80331b20,
+				                          safeDist / FLOAT_80331b90, 3);
 			}
 
-			Detach__8CGObjectFv(this);
+			Detach();
 			*(Vec*)(self + 0x15C) = safePos;
 
 			if (*(int*)(self + 0x520) != 0xC) {
@@ -1069,7 +1048,7 @@ void CGItemObj::onFrameStat()
 			float ownerCos = (float)cos((double)*(float*)((unsigned char*)carryObj + 0x1B4));
 			float ownerSin = (float)sin((double)*(float*)((unsigned char*)carryObj + 0x1B4));
 			CVector moveVec(ownerSin, FLOAT_80331b54, ownerCos);
-			MoveVector__8CGObjectFP3Vecfiiii(this, reinterpret_cast<Vec*>(&moveVec), launchSpeed, 1, 0, 1, 0);
+			MoveVector(reinterpret_cast<Vec*>(&moveVec), launchSpeed, 1, 0, 1, 0);
 
 			*(int*)(self + 0x550) = 0;
 			*(int*)(self + 0x56C) = 8;
@@ -1081,9 +1060,9 @@ void CGItemObj::onFrameStat()
 			bool isActive = (self[0x50] & 0x80) != 0;
 
 			if ((worldParamA == 0xD || worldParamA == 0xE) && isActive) {
-				changeStat__8CGPrgObjFiii(this, 0x1F, 0, 0);
+				changeStat(0x1F, 0, 0);
 			} else if (isActive) {
-				changeStat__8CGPrgObjFiii(this, 0, 0, 0);
+				changeStat(0, 0, 0);
 			}
 		}
 		break;
@@ -1148,8 +1127,8 @@ void CGItemObj::onFrameStat()
 			prgObj->m_bgColMask |= 0x80000;
 
 			CVector damageOffset(zero, zero, zero);
-			SetDamageCol__8CGObjectFiPcffP3Vec(this, 0, const_cast<char*>(s_f051_root_801dceb4), FLOAT_80331B78, FLOAT_80331B78,
-			                                  reinterpret_cast<Vec*>(&damageOffset));
+			SetDamageCol(0, const_cast<char*>(s_f051_root_801dceb4), FLOAT_80331B78, FLOAT_80331B78,
+			             reinterpret_cast<Vec*>(&damageOffset));
 			*reinterpret_cast<int*>(&prgObj->m_damageColliders[1].m_localPosition.x) = 9;
 		}
 		break;
@@ -1170,7 +1149,7 @@ void CGItemObj::onFrameStat()
 
 				if (*(int*)(self + 0x530) == 8) {
 					prgObj->m_bgColMask |= 0x80000;
-					changeStat__8CGPrgObjFiii(this, 0x24, 0, 0);
+					changeStat(0x24, 0, 0);
 				}
 			}
 		}
@@ -1221,7 +1200,7 @@ void CGItemObj::onFrameStat()
 
 		float distance = PSVECMag(reinterpret_cast<Vec*>(&monTarget));
 		if (distance < FLOAT_80331bb8) {
-			changeStat__8CGPrgObjFiii(this, 0x27, 0, 0);
+			changeStat(0x27, 0, 0);
 		} else if (distance <= zero) {
 			prgObj->m_groundHitOffset.z = zero;
 			prgObj->m_groundHitOffset.y = zero;
@@ -1360,9 +1339,9 @@ void CGItemObj::onFrame()
 		m_pendingModelHandle = 0;
 
 		if (m_worldParamA == 0xCB) {
-			LoadAnim__8CGObjectFPciiiUl(this, m_pendingAnimName, 0, 0, 2, m_pendingAnimFlags);
-			SetAnimSlot__8CGObjectFii(this, 0, 0);
-			PlayAnim__8CGObjectFiiiiiPSc(this, 0, 1, 0, -1, -1, 0);
+			LoadAnim(m_pendingAnimName, 0, 0, 2, m_pendingAnimFlags);
+			SetAnimSlot(0, 0);
+			PlayAnim(0, 1, 0, -1, -1, 0);
 
 			CGObject* owner = m_owner;
 			int ownerScriptSlot = *(int*)(*(int*)((unsigned char*)owner + 0x58) + 0x3B4);
@@ -1380,14 +1359,14 @@ void CGItemObj::onFrame()
 			    this, (soundEntry << 8) | ownerScriptSlot, m_particleSlot, this, particleScale, 0x12909);
 
 			CVector zero(FLOAT_80331b20, FLOAT_80331b20, FLOAT_80331b20);
-			SetDamageCol__8CGObjectFiPcffP3Vec(
-			    this, 0, const_cast<char*>(DAT_80331bc8), FLOAT_80331bb8, FLOAT_80331bb8, reinterpret_cast<Vec*>(&zero));
+			SetDamageCol(0, const_cast<char*>(DAT_80331bc8), FLOAT_80331bb8, FLOAT_80331bb8,
+			             reinterpret_cast<Vec*>(&zero));
 			*reinterpret_cast<unsigned int*>(&m_damageColliders[1].m_localPosition.x) = 8;
 			addSubStat();
 		}
 	}
 
-	onFrame__8CGPrgObjFv(this);
+	CGPrgObj::onFrame();
 }
 
 /*

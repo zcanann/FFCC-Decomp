@@ -16,8 +16,6 @@
 #include <math.h>
 #include <string.h>
 
-extern "C" void freeFurTex__6CCharaFv();
-extern "C" void makeFurTex__6CCharaFv(CChara*);
 extern "C" void Create__Q26CChara5CNodeFR10CChunkFilePQ26CChara6CModelQ36CChara5CNode4TYPEPQ27CMemory6CStage(
     void*, CChunkFile&, void*, int, CMemory::CStage*);
 extern "C" void Create__Q26CChara5CMeshFPQ26CChara6CModelR10CChunkFilePQ27CMemory6CStage(
@@ -692,7 +690,7 @@ void CChara::Quit()
  */
 void CChara::Create()
 {
-	makeFurTex__6CCharaFv(this);
+	makeFurTex();
 	InitFurTexBuffer();
 }
 
@@ -707,7 +705,7 @@ void CChara::Create()
  */
 void CChara::Destroy()
 {
-	freeFurTex__6CCharaFv();
+	freeFurTex();
 }
 
 /*

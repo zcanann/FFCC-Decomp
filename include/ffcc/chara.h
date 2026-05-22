@@ -230,6 +230,8 @@ public:
     void CalcMogScore();
     void ChangeMogMode(int);
 public:
+    void freeFurTex();
+    void makeFurTex();
     void InitFurTexBuffer();
     void SaveFurTexBuffer(unsigned short* outTexels);
     void LoadFurTexBuffer(unsigned short* inTexels);

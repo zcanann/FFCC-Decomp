@@ -667,7 +667,6 @@ void CChara::ChangeMogMode(int mogMode)
 }
 
 static const char s_chara_fur_cpp_801db72c[] = "chara_fur.cpp";
-extern "C" void makeFurTex__6CCharaFv();
 
 static bool s_mogFurBaseColorsInit;
 static bool s_mogFurNoiseColorsInit;
@@ -1663,7 +1662,7 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 	}
 
 	if (gMogFurTexBuffer == 0) {
-		makeFurTex__6CCharaFv();
+		Chara.makeFurTex();
 	}
 	if (gMogFurTexBuffer == 0) {
 		return;
@@ -1791,12 +1790,12 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void freeFurTex__6CCharaFv()
+void CChara::freeFurTex()
 {
-    if (gMogFurTexBuffer != 0) {
-        Memory.Free(gMogFurTexBuffer);
-        gMogFurTexBuffer = 0;
-    }
+	if (gMogFurTexBuffer != 0) {
+		Memory.Free(gMogFurTexBuffer);
+		gMogFurTexBuffer = 0;
+	}
 }
 
 /*
@@ -1808,7 +1807,7 @@ extern "C" void freeFurTex__6CCharaFv()
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void makeFurTex__6CCharaFv()
+void CChara::makeFurTex()
 {
 	FurInitTextureDefaults();
 	s_mogFurRand = 0;

@@ -21,8 +21,6 @@ extern "C" double sin(double);
 
 #include <math.h>
 
-extern "C" void SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(void*, int);
-extern "C" void SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(void*, int);
 extern "C" void DrawInit__8CMenuPcsFv(void*);
 extern "C" void DrawRect__8CMenuPcsFUlfffffffff(void*, unsigned long, float, float, float, float, float, float, float, float, float);
 extern "C" void SetExternalTlut__8CTextureFPvi(void*, void*, int);
@@ -229,7 +227,7 @@ void CRingMenu::DrawIcon()
 	double posY = -static_cast<double>(FLOAT_803309e8 * clampedY - FLOAT_803309e8);
 	unsigned char blinkAlpha = DAT_8020fab8[frameNibble(System.m_frameCounter)];
 
-	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcsVoid(), 0x19);
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x19));
 	int iconRow;
 	unsigned int iconCol;
 	if ((Game.m_gameWork.m_menuStageMode == 0) || (menuIndex < 1)) {
@@ -256,7 +254,7 @@ void CRingMenu::DrawIcon()
 	    static_cast<float>(iconRow * 0x38), FLOAT_803309cc, FLOAT_803309cc,
 	    0.0f);
 
-	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcsVoid(), 0x18);
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x18));
 	void* tlut = MenuPcs.m_externalFontTlut;
 	if (*reinterpret_cast<short*>(scriptFood + 0x1C) != 0) {
 		tlut = 0;
@@ -407,7 +405,7 @@ void CRingMenu::drawGBA()
 		return;
 	}
 
-	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcsVoid(), 0x16);
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x16));
 
 	double gbaAnim = static_cast<double>(
 	    sin(static_cast<double>(FLOAT_80330a0c * static_cast<float>(m_gbaAnimCounter)) / static_cast<double>(FLOAT_80330a10)));
@@ -427,7 +425,7 @@ void CRingMenu::drawGBA()
 	}
 	float posY = static_cast<float>(posYInt);
 
-	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(MenuPcsVoid(), 0);
+	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
 	const double sizePulse = static_cast<double>(FLOAT_80330a14 * static_cast<float>(static_cast<double>(FLOAT_803309cc) - gbaAnim) +
 	                                             FLOAT_803309cc);
@@ -441,7 +439,7 @@ void CRingMenu::drawGBA()
 	const double sinA = static_cast<double>(sin(angle));
 	const double sinB = static_cast<double>(sin(static_cast<double>(FLOAT_80330a30) + angle));
 
-	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcsVoid(), 0x1E);
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
 
 	const double alphaBase = static_cast<double>(FLOAT_80330a34) * gbaAnim;
 	const unsigned int alphaShadow =
@@ -467,7 +465,7 @@ void CRingMenu::drawGBA()
 	const unsigned int flatFlags = *reinterpret_cast<unsigned int*>(CFlat + 0x12A0) & *reinterpret_cast<unsigned int*>(CFlat + 0x12A4);
 	if (((flatFlags & 8) != 0) && (Joybus.GetGBAStart(menuIndex) == 0)) {
 		if (Joybus.IsInitSend(menuIndex) == 0) {
-			SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcsVoid(), 0x1D);
+			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1D));
 			const double blink = static_cast<double>(sin(static_cast<double>(FLOAT_80330a54 * static_cast<float>(m_commonFrameCounter))));
 			const unsigned int sendAlpha = static_cast<unsigned int>(
 			    static_cast<int>(static_cast<double>(FLOAT_803309c4) * (alphaLit * static_cast<double>(FLOAT_803309cc + static_cast<float>(blink)))));
@@ -483,7 +481,7 @@ void CRingMenu::drawGBA()
 			if (frameTex > 3) {
 				frameTex &= 1;
 			}
-			SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcsVoid(), 0x1D);
+			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1D));
 			DrawRect__8CMenuPcsFUlfffffffff(MenuPcsVoid(), 3, drawX, drawY, FLOAT_80330a48, FLOAT_80330a48, FLOAT_803309c0,
 			                                 static_cast<float>(frameTex * 0x30), FLOAT_803309cc, FLOAT_803309cc, 0.0f);
 		}
@@ -530,9 +528,9 @@ void CRingMenu::onDraw()
 		transitionScale = static_cast<double>(static_cast<float>(m_transitionCounter) * FLOAT_80330a08);
 	}
 
-	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcsVoid(), 0x16);
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x16));
 	sin(static_cast<double>(FLOAT_80330a0c * static_cast<float>(m_gbaAnimCounter)) / static_cast<double>(FLOAT_80330a10));
-	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(MenuPcsVoid(), 0);
+	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
 	float cycle = static_cast<float>(fmod(static_cast<double>(FLOAT_80330a18 * static_cast<float>(m_commonFrameCounter)),
 	                                      DOUBLE_80330a20));
@@ -601,7 +599,7 @@ void CRingMenu::onDraw()
 			continue;
 		}
 
-		SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcsVoid(), 0x1F);
+		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1F));
 		CColor buttonColor(
 			0xFF, 0xFF, 0xFF, static_cast<unsigned char>(static_cast<int>(buttonAlpha * alphaScaleBase)));
 		MenuPcs.SetColor(buttonColor);
@@ -763,7 +761,7 @@ void CRingMenu::onDraw()
 			DrawInit__8CMenuPcsFv(MenuPcsVoid());
 
 			if (group == 2) {
-				SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcsVoid(), 0x1F);
+				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1F));
 				CGPartyObj* partyObj = Game.m_partyObjArr[menuIndex];
 				if (partyObj != 0) {
 					CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(partyObj->m_scriptHandle);

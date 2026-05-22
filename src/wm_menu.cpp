@@ -34,7 +34,6 @@ extern "C" int rand(void);
 extern "C" void SetAmbient__9CLightPcsF8_GXColor(void*, void*);
 extern "C" void SetDiffuse__9CLightPcsFUl8_GXColorP3Veci(void*, unsigned long, void*, void*, int);
 extern "C" void Create__9CGBaseObjFv(void*);
-extern "C" void InitEnv__9CCharaPcsFi(void*, int);
 extern "C" unsigned int pppCreate__8CPartMngFiiP14PPPCREATEPARAMi(void*, int, int, void*, int);
 extern "C" void pppDeletePart__8CPartMngFi(void*, int);
 extern "C" void pppDestroyAll__8CPartMngFv(void*);
@@ -3172,7 +3171,7 @@ void CMenuPcs::DrawMCardMenu()
 				C_MTXLookAt(lookAtMtx, (Vec*)(piVar12 + 4), &up, &target);
 				PSMTXCopy(CameraPcs.m_cameraMatrix, m_cameraMatrix);
 				PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
-				InitEnv__9CCharaPcsFi(&CharaPcs, 5);
+				CharaPcs.InitEnv(5);
 				GXSetColorUpdate(0);
 				GXSetAlphaUpdate(0);
 				unsigned int clearColor = 0;
@@ -3589,7 +3588,7 @@ void CMenuPcs::DrawLoadMenu()
 				C_MTXLookAt(lookAtMtx, (Vec*)(piVar13 + 4), &up, &target);
 				PSMTXCopy(CameraPcs.m_cameraMatrix, m_cameraMatrix);
 				PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
-				InitEnv__9CCharaPcsFi(&CharaPcs, 5);
+				CharaPcs.InitEnv(5);
 				GXSetColorUpdate(0);
 				GXSetAlphaUpdate(0);
 				unsigned int clearColor = 0;
@@ -3940,7 +3939,7 @@ void CMenuPcs::DrawTitleMenu()
 		C_MTXLookAt(lookAtMtx, &eye, &up, &target);
 		PSMTXCopy(CameraPcs.m_cameraMatrix, m_cameraMatrix);
 		PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
-		InitEnv__9CCharaPcsFi(&CharaPcs, 5);
+		CharaPcs.InitEnv(5);
 		GXSetColorUpdate(0);
 		GXSetAlphaUpdate(0);
 		unsigned int clearColor = 0;
@@ -4556,7 +4555,7 @@ void CMenuPcs::SetProjection(int mode)
 	C_MTXLookAt(lookAtMtx, reinterpret_cast<Point3d*>(slot + 0x10), &up, reinterpret_cast<Point3d*>(&target));
 	PSMTXCopy(lookAtMtx, *reinterpret_cast<Mtx*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x4));
 
-	InitEnv__9CCharaPcsFi(&CharaPcs, 5);
+	CharaPcs.InitEnv(5);
 	GXSetColorUpdate(0);
 	GXSetAlphaUpdate(0);
 	_GXColor clearColor = {0, 0, 0, 0};
@@ -5309,7 +5308,7 @@ void CMenuPcs::DrawFukidashi()
 					C_MTXLookAt(lookAtMtx, &eye, &up, (Vec*)(piVar10 + 4));
 					PSMTXCopy(CameraPcs.m_cameraMatrix, m_cameraMatrix);
 					PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
-					InitEnv__9CCharaPcsFi(&CharaPcs, 5);
+					CharaPcs.InitEnv(5);
 					GXSetColorUpdate(0);
 					GXSetAlphaUpdate(0);
 					unsigned int clearColor = 0;
@@ -7972,7 +7971,7 @@ void CMenuPcs::DrawMainMenuSub()
 	PSMTX44Copy(projectionMtx, CameraPcs.m_screenMatrix);
 	C_MTXLookAt(lookAtMtx, reinterpret_cast<Point3d*>(worldObj + 0x740), &up, reinterpret_cast<Point3d*>(&target));
 	PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
-	InitEnv__9CCharaPcsFi(&CharaPcs, 5);
+	CharaPcs.InitEnv(5);
 	GXSetColorUpdate(0);
 	GXSetAlphaUpdate(0);
 	GXSetCopyClear(clearColor, 0x00FFFFFF);
@@ -8056,7 +8055,7 @@ void CMenuPcs::DrawMainMenuSub()
 		C_MTXLookAt(lookAtMtx, reinterpret_cast<Point3d*>(view + 0x10), &up, reinterpret_cast<Point3d*>(&target));
 		PSMTXCopy(savedCamera, CameraPcs.m_cameraMatrix);
 		PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
-		InitEnv__9CCharaPcsFi(&CharaPcs, 5);
+		CharaPcs.InitEnv(5);
 		GXSetColorUpdate(0);
 		GXSetAlphaUpdate(0);
 		GXSetCopyClear(clearColor, 0x00FFFFFF);
@@ -8085,7 +8084,7 @@ void CMenuPcs::DrawMainMenuSub()
 		C_MTXLookAt(lookAtMtx, reinterpret_cast<Point3d*>(view + 0x10), &up, reinterpret_cast<Point3d*>(&target));
 		PSMTXCopy(savedCamera, CameraPcs.m_cameraMatrix);
 		PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
-		InitEnv__9CCharaPcsFi(&CharaPcs, 5);
+		CharaPcs.InitEnv(5);
 		GXSetColorUpdate(0);
 		GXSetAlphaUpdate(0);
 		GXSetCopyClear(clearColor, 0x00FFFFFF);

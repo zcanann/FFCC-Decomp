@@ -40,7 +40,6 @@ u8* gCharaPartWorkPtr = 0;
 
 extern "C" int __cntlzw(unsigned int);
 extern "C" void ReleasePdt__8CPartPcsFi(void*, int);
-extern "C" void SetStdProjectionMatrix__10CCameraPcsFv(void*);
 extern "C" void SetAmbient__9CLightPcsF8_GXColor(void*, void*);
 extern "C" void SetDiffuse__9CLightPcsFUl8_GXColorP3Veci(void*, unsigned long, void*, void*, int);
 extern "C" void Create__6CCharaFv(void*);
@@ -1415,7 +1414,7 @@ void CCharaPcs::draw()
  */
 void CCharaPcs::drawBefore()
 {
-    SetStdProjectionMatrix__10CCameraPcsFv(&CameraPcs);
+    CameraPcs.SetStdProjectionMatrix();
     SetupBaseCharaLights(this);
 
     if (HandleListHead(this) == 0) {

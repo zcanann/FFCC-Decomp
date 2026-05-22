@@ -548,12 +548,6 @@ void CPartMng::pppReleasePdt(int pdtSlotIndex)
         char m_unused[0x154];
     };
 
-    struct PartMngResRaw {
-        char m_unused[0x7e4];
-        CMaterialSet* m_materialSet;
-        CTextureSet* m_textureSet;
-    };
-
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
     PppPdtSlotRaw* pdtSlots = reinterpret_cast<PppPdtSlotRaw*>(self + 0x22e18);
     PppPdtSlotRaw* pdtSlot = &pdtSlots[pdtSlotIndex];
@@ -563,9 +557,8 @@ void CPartMng::pppReleasePdt(int pdtSlotIndex)
         return;
     }
 
-    PartMngResRaw* res = reinterpret_cast<PartMngResRaw*>(self);
     Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp_801d8230), 0x158);
-    res->m_materialSet->ReleaseTag(res->m_textureSet, pdtSlotIndex, &ppvAmemCacheSet);
+    m_materialSet->ReleaseTag(m_textureSet, pdtSlotIndex, &ppvAmemCacheSet);
     Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp_801d8230), 0x13a);
 
     pppEnvStPtr = reinterpret_cast<_pppEnvSt*>(pdtSlot->m_envFields);
@@ -1212,11 +1205,6 @@ void CPartMng::ReadTex(CChunkFile&)
  */
 unsigned int CPartMng::pppReadRsd(CChunkFile& chunkFile, pppModelSt* modelSt)
 {
-    struct PartMngResRaw {
-        unsigned char m_unk0[0x7e4];
-        CMaterialSet* m_materialSet;
-    };
-
     struct PartPcsRaw {
         unsigned char m_unk0[4];
         CUSBStreamData m_usbStreamData;
@@ -1224,7 +1212,6 @@ unsigned int CPartMng::pppReadRsd(CChunkFile& chunkFile, pppModelSt* modelSt)
 
     char* textureNames[0x101];
     CChunkFile::CChunk chunk;
-    PartMngResRaw* res = reinterpret_cast<PartMngResRaw*>(this);
     PartPcsRaw* partPcs = reinterpret_cast<PartPcsRaw*>(&PartPcs);
 
     unsigned int meshSize = 0;
@@ -1239,7 +1226,7 @@ unsigned int CPartMng::pppReadRsd(CChunkFile& chunkFile, pppModelSt* modelSt)
                     }
                 } else if (chunk.m_id == 'MESH') {
                     meshSize = modelSt->ReadOtmMesh(chunkFile, partPcs->m_usbStreamData.m_stageLoad, 0, 0);
-                    modelSt->SetDisplayListMaterial(res->m_materialSet, textureNames, &ppvAmemCacheSet);
+                    modelSt->SetDisplayListMaterial(m_materialSet, textureNames, &ppvAmemCacheSet);
                 }
             }
         }
@@ -1363,8 +1350,8 @@ void CPartMng::pppEditAllReleaseResource()
     static const int kRecvBuffOffset = 0x23554;
 
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
-    CMaterialSet* materialSet = *reinterpret_cast<CMaterialSet**>(self + 0x7E4);
-    CTextureSet* textureSet = *reinterpret_cast<CTextureSet**>(self + 0x7E8);
+    CMaterialSet* materialSet = m_materialSet;
+    CTextureSet* textureSet = m_textureSet;
     int iVar3;
     unsigned char* iter;
 
@@ -1372,13 +1359,13 @@ void CPartMng::pppEditAllReleaseResource()
         if (materialSet != 0) {
             reinterpret_cast<void (*)(void*, int)>((*reinterpret_cast<void***>(materialSet))[2])(materialSet, 1);
         }
-        *reinterpret_cast<CMaterialSet**>(self + 0x7E4) = 0;
+        m_materialSet = 0;
     }
     if (textureSet != 0) {
         if (textureSet != 0) {
             reinterpret_cast<void (*)(void*, int)>((*reinterpret_cast<void***>(textureSet))[2])(textureSet, 1);
         }
-        *reinterpret_cast<CTextureSet**>(self + 0x7E8) = 0;
+        m_textureSet = 0;
     }
 
     iVar3 = 0;
@@ -3444,18 +3431,11 @@ void CPartMng::LoadPartNoSyncCalc()
  */
 int CPartMng::pppLoadPtx(const char* baseName, int pdtSlotIndex, int appendMode, void* readBuffer, int readBufferSize)
 {
-    struct PartMngResRaw {
-        unsigned char m_unk0[0x7e4];
-        CMaterialSet* m_materialSet;
-        CTextureSet* m_textureSet;
-    };
-
     static const unsigned int kChunkTSET = 0x54534554;
     static const int kEnvOffset = 0x2351c;
 
     CMemory::CStage* stageLoad =
         *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(&PartPcs) + 0x1c);
-    PartMngResRaw* res = reinterpret_cast<PartMngResRaw*>(this);
 
     ppvAmemCacheSet.CacheClear();
     stageLoad->setDefaultParam(pdtSlotIndex);
@@ -3481,20 +3461,20 @@ int CPartMng::pppLoadPtx(const char* baseName, int pdtSlotIndex, int appendMode,
         return 1;
     }
 
-    if (res->m_textureSet == 0) {
-        res->m_textureSet = new (stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0xC10) CTextureSet;
+    if (m_textureSet == 0) {
+        m_textureSet = new (stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0xC10) CTextureSet;
     }
 
-    if (res->m_materialSet == 0) {
+    if (m_materialSet == 0) {
         CMaterialSet* materialSet = new (stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0xC14) CMaterialSet;
-        res->m_materialSet = materialSet;
+        m_materialSet = materialSet;
         reinterpret_cast<_pppEnvSt*>(reinterpret_cast<unsigned char*>(this) + kEnvOffset)->m_materialSetPtr =
-            res->m_materialSet;
+            m_materialSet;
 
         CMaterial* defaultMaterial = new (stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0xC17) CMaterial;
         if (defaultMaterial != 0) {
             defaultMaterial->Create(0, static_cast<CMaterialMan::TEV_BIT>(0xFFF531F0));
-            res->m_materialSet->AddMaterial(defaultMaterial, 0);
+            m_materialSet->AddMaterial(defaultMaterial, 0);
         }
     }
 
@@ -3504,12 +3484,12 @@ int CPartMng::pppLoadPtx(const char* baseName, int pdtSlotIndex, int appendMode,
     CChunkFile::CChunk chunk;
     while (chunkFile.GetNextChunk(chunk)) {
         if (chunk.m_id == kChunkTSET) {
-            res->m_textureSet->Create(chunkFile, stageLoad, 1, &ppvAmemCacheSet, appendMode, 0);
+            m_textureSet->Create(chunkFile, stageLoad, 1, &ppvAmemCacheSet, appendMode, 0);
         }
     }
 
-    res->m_materialSet->SetPartFromTextureSet(res->m_textureSet, pdtSlotIndex);
-    res->m_materialSet->SetTextureSet(res->m_textureSet);
+    m_materialSet->SetPartFromTextureSet(m_textureSet, pdtSlotIndex);
+    m_materialSet->SetTextureSet(m_textureSet);
     stageLoad->resDefaultParam();
     return 1;
 }

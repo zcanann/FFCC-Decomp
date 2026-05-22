@@ -2,10 +2,10 @@
 #include "ffcc/fontman.h"
 #include "ffcc/game.h"
 
-extern const char lbl_803336B4[];
-extern const char lbl_803336B8[];
-extern const char lbl_803336C0[];
-extern const char lbl_803336C4[];
+extern const char s_No_803336B4[];
+extern const char s_Nein_803336B8[];
+extern const char s_Non_803336C0[];
+extern const char s_SlotB_803336C4[];
 extern const char s_Steckplatz_B_801E65E4[];
 extern const char s_Ranura_B_801E65F4[];
 
@@ -39,18 +39,18 @@ struct WinMessEntry
 };
 
 char* s_NoTextByLanguage[5] = {
-    (char*)lbl_803336B4,
-    (char*)lbl_803336B8,
-    (char*)lbl_803336B4,
-    (char*)lbl_803336C0,
-    (char*)lbl_803336B4,
+    (char*)s_No_803336B4,
+    (char*)s_Nein_803336B8,
+    (char*)s_No_803336B4,
+    (char*)s_Non_803336C0,
+    (char*)s_No_803336B4,
 };
 
 char* s_SlotBTextByLanguage[6] = {
-    (char*)lbl_803336C4,
+    (char*)s_SlotB_803336C4,
     (char*)s_Steckplatz_B_801E65E4,
-    (char*)lbl_803336C4,
-    (char*)lbl_803336C4,
+    (char*)s_SlotB_803336C4,
+    (char*)s_SlotB_803336C4,
     (char*)s_Ranura_B_801E65F4,
     0,
 };

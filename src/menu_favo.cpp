@@ -28,7 +28,7 @@ extern double DOUBLE_80333050;
 extern float FLOAT_80333058;
 extern float FLOAT_8033305C;
 extern double DOUBLE_80333060;
-extern const char lbl_80333068[];
+extern const char s_FavoRankFormat_80333068[];
 extern float FLOAT_8033306C;
 extern float FLOAT_80333070;
 extern double DOUBLE_80333078;
@@ -246,7 +246,7 @@ void CMenuPcs::FavoDraw()
 		rankFont->SetColor(
 		    CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(FLOAT_80333058 * drawEntry->alpha)).color);
 		rankFont->SetMargin(FLOAT_80333048);
-		sprintf(textBuf, lbl_80333068, static_cast<int>(*rank));
+		sprintf(textBuf, s_FavoRankFormat_80333068, static_cast<int>(*rank));
 		rankFont->SetPosX(static_cast<float>(drawEntry->x - 0xC));
 		rankFont->SetPosY(static_cast<float>(drawEntry->y) - FLOAT_8033306C);
 		rankFont->Draw(textBuf);

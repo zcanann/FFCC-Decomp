@@ -7,6 +7,7 @@
 #include "ffcc/p_minigame.h"
 #include "ffcc/partMng.h"
 #include "ffcc/p_tina.h"
+#include "ffcc/sound.h"
 #include "ffcc/system.h"
 #include "ffcc/cflat_runtime2.h"
 #include <dolphin/gx.h>
@@ -21,9 +22,6 @@ extern "C" void create__11CDbgMenuPcsFv(CDbgMenuPcs*);
 extern "C" void destroy__11CDbgMenuPcsFv(CDbgMenuPcs*);
 extern "C" void calc__11CDbgMenuPcsFv(CDbgMenuPcs*);
 extern "C" void draw__11CDbgMenuPcsFv(CDbgMenuPcs*);
-extern "C" void CheckDriver__6CSoundFi(void*, int);
-extern "C" void pppDumpMngSt__8CPartMngFv(void*);
-extern "C" void DumpLoad__9CCharaPcsFv(void*);
 
 struct DbgMenuDef {
     const char* text;
@@ -270,17 +268,17 @@ void CDbgMenuPcs::calc()
 			m_dbgFlags ^= 0x1000;
 			break;
 		case 0x74:
-			CheckDriver__6CSoundFi(&Sound, 1);
+			Sound.CheckDriver(1);
 			break;
 		case 0x75:
 			g_map_draw_prof = 1 - g_map_draw_prof;
 			break;
 		case 0x76:
 			DAT_8032e698 = 1 - DAT_8032e698;
-			pppDumpMngSt__8CPartMngFv(&PartMng);
+			PartMng.pppDumpMngSt();
 			break;
 		case 0x77:
-			DumpLoad__9CCharaPcsFv(&CharaPcs);
+			CharaPcs.DumpLoad();
 			break;
 		case 0x78:
 			m_dbgFlags ^= 0x2000;

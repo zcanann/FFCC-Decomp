@@ -904,7 +904,6 @@ void CSound::Draw()
  */
 void CSound::loadWaveFrame()
 {
-    CRedSound* redSound = RedSound(this);
     CSoundLayout& sound = SoundData(this);
     CFile::CHandle*& waveFile = sound.m_waveFile;
     int& waveRemain = sound.m_waveRemain;
@@ -932,7 +931,7 @@ void CSound::loadWaveFrame()
             waveOffset += (int)readSize;
             waveState = 1;
         } else if (waveState == 1 && File.IsCompleted(waveFile)) {
-            redSound->SetWaveData(waveID, File.m_readBuffer, (int)waveFile->m_chunkSize);
+            RedSound(this)->SetWaveData(waveID, File.m_readBuffer, (int)waveFile->m_chunkSize);
 
             while (RedSound(&Sound)->ReportStandby(0) != 0) {
             }
@@ -950,7 +949,7 @@ void CSound::loadWaveFrame()
     bool streamPlaying = false;
     int& isStreamEnabled = sound.m_streamPlaying;
     int& streamID = sound.m_streamID;
-    if (isStreamEnabled != 0 && redSound->StreamPlayState(streamID) != 0) {
+    if (isStreamEnabled != 0 && RedSound(this)->StreamPlayState(streamID) != 0) {
         streamPlaying = true;
     }
 
@@ -963,11 +962,12 @@ void CSound::loadWaveFrame()
         u8* streamBuffer = reinterpret_cast<u8*>(sound.m_streamBuffer);
 
         if (streamState == 0) {
-            int playPoint[2];
-            redSound->GetStreamPlayPoint(streamID, &playPoint[0], &playPoint[1]);
-            unsigned int curHalf = (unsigned int)(playPoint[0] >> 16);
+            int playPoint;
+            int readPoint;
+            RedSound(this)->GetStreamPlayPoint(streamID, &playPoint, &readPoint);
+            playPoint = static_cast<u32>(playPoint) >> 16;
 
-            if (streamHalf != curHalf) {
+            if (streamHalf != (u32)playPoint) {
                 int readSize = 0x10000;
                 if (streamRemain < readSize) {
                     readSize = streamRemain;
@@ -980,7 +980,7 @@ void CSound::loadWaveFrame()
 
                     streamOffset += readSize;
                     streamRemain -= readSize;
-                    streamHalf = curHalf;
+                    streamHalf = playPoint;
                     streamState = 1;
                 }
             }

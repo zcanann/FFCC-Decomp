@@ -66,7 +66,7 @@ struct MiniGameAlarm {
     OSThread* thread;
 };
 
-static void MiniGameThreadSleepTicks(OSTime ticks)
+static inline void MiniGameThreadSleepTicks(OSTime ticks)
 {
     MiniGameAlarm alarm;
     OSCreateAlarm(&alarm.alarm);
@@ -79,7 +79,7 @@ static void MiniGameThreadSleepTicks(OSTime ticks)
     OSRestoreInterrupts(interruptLevel);
 }
 
-static bool MiniGameThreadTimedOut(OSTime start, OSTime timeout)
+static inline bool MiniGameThreadTimedOut(OSTime start, OSTime timeout)
 {
     return static_cast<u64>(OSGetTime() - start) > static_cast<u64>(timeout);
 }
@@ -317,12 +317,12 @@ void CMiniGamePcs::MiniGameGo(char* managerFilePath, char* managerSpFilePath)
 
         while (self[0x649C] != 0)
         {
-            MiniGameThreadSleepTicks((OS_TIMER_CLOCK / 1000) * 100);
+            MiniGameThreadSleepTicks(OSMillisecondsToTicks(100));
         }
 
         while (OSIsThreadTerminated(reinterpret_cast<OSThread*>(self + 8)) == 0)
         {
-            MiniGameThreadSleepTicks((OS_TIMER_CLOCK / 1000) * 100);
+            MiniGameThreadSleepTicks(OSMillisecondsToTicks(100));
         }
 
         if (*reinterpret_cast<void**>(self + 0x1354) != 0)
@@ -797,14 +797,14 @@ receive_message:
 
     if (message == 1)
     {
-        MiniGameThreadSleepTicks((OS_BUS_CLOCK / 4000) * 10);
+        MiniGameThreadSleepTicks(OSMillisecondsToTicks(10));
         command = 0x80000000;
         for (int i = 0; i < 100; i++)
         {
             GBAWrite(channel, reinterpret_cast<u8*>(&command), param + 0xC0);
-            MiniGameThreadSleepTicks((OS_BUS_CLOCK / 4000) * 10);
+            MiniGameThreadSleepTicks(OSMillisecondsToTicks(10));
         }
-        MiniGameThreadSleepTicks((OS_BUS_CLOCK / 4000) * 10);
+        MiniGameThreadSleepTicks(OSMillisecondsToTicks(10));
         self[0x649D] |= static_cast<unsigned char>(1 << channel);
         OSExitThread(0);
         return;
@@ -821,15 +821,15 @@ receive_message:
     param[0xC2] = 0;
     if (message == 5)
     {
-        timeoutTicks = (OS_BUS_CLOCK / 4000) * 1000;
+        timeoutTicks = OSMillisecondsToTicks(1000);
     }
     else if (message == 3 || message == 10)
     {
-        timeoutTicks = (OS_BUS_CLOCK / 4000) * 500;
+        timeoutTicks = OSMillisecondsToTicks(500);
     }
     else
     {
-        timeoutTicks = (OS_BUS_CLOCK / 4000) * 1000;
+        timeoutTicks = OSMillisecondsToTicks(1000);
     }
     startTime = OSGetTime();
     retryLine = 0x22C;
@@ -888,7 +888,7 @@ retry_loop:
         }
         ret = 3;
         retryLine = 0x256;
-        MiniGameThreadSleepTicks(OS_BUS_CLOCK / 4000);
+        MiniGameThreadSleepTicks(OSMillisecondsToTicks(1));
         goto retry_loop;
     case 4:
         if (param[0xC4] != 0)
@@ -1015,7 +1015,7 @@ retry_loop:
             goto receive_message;
         }
         retryLine = 0x2CB;
-        MiniGameThreadSleepTicks(OS_BUS_CLOCK / 4000);
+        MiniGameThreadSleepTicks(OSMillisecondsToTicks(1));
         goto retry_loop;
     case 7:
         if (param[0xC4] != 0)
@@ -1055,7 +1055,7 @@ retry_loop:
             goto retry_loop;
         }
 
-        MiniGameThreadSleepTicks((OS_BUS_CLOCK / 4000) * 500);
+        MiniGameThreadSleepTicks(OSMillisecondsToTicks(500));
         if (ret == 3)
         {
             if ((param[0xC0] & (GBA_JSTAT_SEND | GBA_JSTAT_RECV)) == (GBA_JSTAT_SEND | GBA_JSTAT_RECV))
@@ -1133,7 +1133,7 @@ retry_loop:
             }
         }
         retryLine = 0x30F;
-        MiniGameThreadSleepTicks(OS_BUS_CLOCK / 4000);
+        MiniGameThreadSleepTicks(OSMillisecondsToTicks(1));
         goto retry_loop;
     case 8:
         if (param[0xC4] != 0)
@@ -1214,7 +1214,7 @@ retry_loop:
         {
             retryLine = 0x31A;
         }
-        MiniGameThreadSleepTicks(OS_BUS_CLOCK / 4000);
+        MiniGameThreadSleepTicks(OSMillisecondsToTicks(1));
         goto retry_loop;
     case 10:
         if (step == 0)
@@ -1241,7 +1241,7 @@ retry_loop:
                 goto retry_loop;
             }
 
-            MiniGameThreadSleepTicks(((OS_BUS_CLOCK / 500000) * 100) >> 3);
+            MiniGameThreadSleepTicks(OSMicrosecondsToTicks(100));
             retryLine = 0x333;
             goto retry_loop;
         }
@@ -1253,7 +1253,7 @@ retry_loop:
             {
                 if ((param[0xC0] & (GBA_JSTAT_SEND | GBA_JSTAT_RECV)) == GBA_JSTAT_SEND)
                 {
-                    MiniGameThreadSleepTicks(((OS_BUS_CLOCK / 500000) * 10) >> 3);
+                    MiniGameThreadSleepTicks(OSMicrosecondsToTicks(10));
                     ret = GBARead(channel, param + 0xA0, param + 0xC0);
                     if (ret != 0 || ((*reinterpret_cast<unsigned int*>(param + 0xA0) >> 24) != 0x20))
                     {
@@ -1268,14 +1268,14 @@ retry_loop:
                 goto retry_loop;
             }
 
-            MiniGameThreadSleepTicks(((OS_BUS_CLOCK / 500000) * 100) >> 3);
-            if (MiniGameThreadTimedOut(startTime, (OS_BUS_CLOCK / 4000) * 200))
+            MiniGameThreadSleepTicks(OSMicrosecondsToTicks(100));
+            if (MiniGameThreadTimedOut(startTime, OSMillisecondsToTicks(200)))
             {
                 System.Printf(const_cast<char*>(s_miniGameFlagsRetryFmt), channel);
                 command = 0x10000000;
                 GBAWrite(channel, reinterpret_cast<u8*>(&command), param + 0xC0);
                 startTime = OSGetTime();
-                MiniGameThreadSleepTicks(((OS_BUS_CLOCK / 500000) * 100) >> 3);
+                MiniGameThreadSleepTicks(OSMicrosecondsToTicks(100));
             }
             retryLine = 0x352;
             goto retry_loop;
@@ -1297,7 +1297,7 @@ retry_loop:
                 param[0xBF] = 0;
                 goto receive_message;
             }
-            if (MiniGameThreadTimedOut(startTime, (OS_BUS_CLOCK / 4000) * 200))
+            if (MiniGameThreadTimedOut(startTime, OSMillisecondsToTicks(200)))
             {
                 System.Printf(const_cast<char*>(s_miniGamePsf1RetryFmt), channel);
                 command = 0x70000000;
@@ -1310,13 +1310,13 @@ retry_loop:
                 startTime = OSGetTime();
                 step = 2;
             }
-            MiniGameThreadSleepTicks(((OS_BUS_CLOCK / 500000) * 1000) >> 3);
+            MiniGameThreadSleepTicks(OSMicrosecondsToTicks(1000));
             retryLine = 0x39E;
             goto retry_loop;
         }
 
         ret = GBAWrite(channel, param + (step - 2) * 4 + 0xA8, param + 0xC0);
-        MiniGameThreadSleepTicks(((OS_BUS_CLOCK / 500000) * 100) >> 3);
+        MiniGameThreadSleepTicks(OSMicrosecondsToTicks(100));
         if (ret == 0)
         {
             retryLine = 0x3B0;
@@ -1800,12 +1800,17 @@ void CMiniGamePcs::MngThreadMain(void*)
     int i = 0;
     do
     {
-        unsigned int imageSize = *reinterpret_cast<unsigned int*>(self + 0x1358);
-        void* imageBase = *reinterpret_cast<void**>(self + 0x1354);
+        unsigned int imageSize;
+        void* imageBase;
         if (*spMode != 0)
         {
             imageSize = *reinterpret_cast<unsigned int*>(self + 0x1360);
             imageBase = *reinterpret_cast<void**>(self + 0x135C);
+        }
+        else
+        {
+            imageSize = *reinterpret_cast<unsigned int*>(self + 0x1358);
+            imageBase = *reinterpret_cast<void**>(self + 0x1354);
         }
 
         memset(threadParam, 0, 200);
@@ -1843,7 +1848,7 @@ void CMiniGamePcs::MngThreadMain(void*)
         alarm.thread = currentThread;
 
         BOOL interruptLevel = OSDisableInterrupts();
-        OSSetAlarm(&alarm.alarm, OS_BUS_CLOCK / 4000, GbaThreadAlarmHandler);
+        OSSetAlarm(&alarm.alarm, OSMillisecondsToTicks(1), GbaThreadAlarmHandler);
         OSSuspendThread(alarm.thread);
         OSRestoreInterrupts(interruptLevel);
 
@@ -1859,7 +1864,7 @@ void CMiniGamePcs::MngThreadMain(void*)
                 currentThread = OSGetCurrentThread();
                 sleepAlarm.thread = currentThread;
                 interruptLevel = OSDisableInterrupts();
-                OSSetAlarm(&sleepAlarm.alarm, (OS_BUS_CLOCK / 4000) * 100, GbaThreadAlarmHandler);
+                OSSetAlarm(&sleepAlarm.alarm, OSMillisecondsToTicks(100), GbaThreadAlarmHandler);
                 OSSuspendThread(sleepAlarm.thread);
                 OSRestoreInterrupts(interruptLevel);
 
@@ -1873,7 +1878,7 @@ void CMiniGamePcs::MngThreadMain(void*)
             currentThread = OSGetCurrentThread();
             settleAlarm.thread = currentThread;
             interruptLevel = OSDisableInterrupts();
-            OSSetAlarm(&settleAlarm.alarm, (OS_BUS_CLOCK / 4000) * 200, GbaThreadAlarmHandler);
+            OSSetAlarm(&settleAlarm.alarm, OSMillisecondsToTicks(200), GbaThreadAlarmHandler);
             OSSuspendThread(settleAlarm.thread);
             OSRestoreInterrupts(interruptLevel);
 
@@ -1885,7 +1890,7 @@ void CMiniGamePcs::MngThreadMain(void*)
                 currentThread = OSGetCurrentThread();
                 waitAlarm.thread = currentThread;
                 interruptLevel = OSDisableInterrupts();
-                OSSetAlarm(&waitAlarm.alarm, (OS_BUS_CLOCK / 4000) * 100, GbaThreadAlarmHandler);
+                OSSetAlarm(&waitAlarm.alarm, OSMillisecondsToTicks(100), GbaThreadAlarmHandler);
                 OSSuspendThread(waitAlarm.thread);
                 OSRestoreInterrupts(interruptLevel);
             }
@@ -1911,7 +1916,7 @@ void CMiniGamePcs::MngThreadMain(void*)
                     currentThread = OSGetCurrentThread();
                     endAlarm.thread = currentThread;
                     interruptLevel = OSDisableInterrupts();
-                    OSSetAlarm(&endAlarm.alarm, (OS_BUS_CLOCK / 4000) * 100, GbaThreadAlarmHandler);
+                    OSSetAlarm(&endAlarm.alarm, OSMillisecondsToTicks(100), GbaThreadAlarmHandler);
                     OSSuspendThread(endAlarm.thread);
                     OSRestoreInterrupts(interruptLevel);
 
@@ -1986,7 +1991,7 @@ void CMiniGamePcs::MngThreadMain(void*)
                 else if (*reinterpret_cast<unsigned int*>(threadParam + 0x94) == 0 || (loopCounter & 0x1F) == 0)
                 {
                     OSTime now = OSGetTime();
-                    if ((OS_BUS_CLOCK / 4000) * 5000 < static_cast<unsigned long long>(now - startTime))
+                    if (OSMillisecondsToTicks(5000) < static_cast<unsigned long long>(now - startTime))
                     {
 disconnect_player:
                         if ((self[0x134B] & bit) != 0)

@@ -10,6 +10,7 @@
 #include "ffcc/pad.h"
 #include "ffcc/gobject.h"
 #include "ffcc/graphic.h"
+#include "ffcc/gxfunc.h"
 #include "ffcc/p_graphic.h"
 #include "ffcc/game.h"
 #include "ffcc/partMng.h"
@@ -148,7 +149,6 @@ Vec g_shadow_refpos;
 extern "C" CGObject* FindGObjFirst__13CFlatRuntime2Fv(void*);
 extern "C" CGObject* FindGObjNext__13CFlatRuntime2FP8CGObject(void*, CGObject*);
 extern "C" void DrawMapShadow__7CMapMngFv(void*);
-extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, int, int, int, int);
 extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
 extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
@@ -827,7 +827,7 @@ void CCameraPcs::draw()
     unsigned int magentaColor;
 
     if ((*reinterpret_cast<int*>(self + 0x444) == 0) || ((*reinterpret_cast<unsigned int*>(CFlat + 0x129c) & 0x1000000) != 0)) {
-        _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+        _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
         GXSetZCompLoc(0);
         _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(6, 1, 0, 7, 0);
         GXSetZMode(1, GX_LEQUAL, 1);
@@ -848,7 +848,7 @@ void CCameraPcs::draw()
 
     if (g_map_draw_prof != 0) {
         PSMTXCopy(reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(&CameraPcs) + 4), cameraMtx);
-        _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+        _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
         GXSetZCompLoc(0);
         _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(6, 1, 0, 7, 0);
         GXSetZMode(1, GX_LEQUAL, 1);
@@ -873,7 +873,7 @@ void CCameraPcs::draw()
         Graphic.DrawSphere();
 
         PSMTXCopy(reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(&CameraPcs) + 4), cameraMtx);
-        _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+        _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
         GXSetZCompLoc(0);
         _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(6, 1, 0, 7, 0);
         GXSetZMode(1, GX_LEQUAL, 1);
@@ -1647,7 +1647,7 @@ void CCameraPcs::drawShadowBegin()
     GXSetCullMode(GX_CULL_BACK);
     GXSetViewport(FLOAT_8032fa4c, FLOAT_8032fa4c, FLOAT_8032fa90, FLOAT_8032fa90, FLOAT_8032fa34, FLOAT_8032fa1c);
     GXSetScissor(2, 2, 0x1DC, 0x1DC);
-    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(0, 0, 0, 5);
+    _GXSetBlendMode(GX_BM_NONE, GX_BL_ZERO, GX_BL_ZERO, GX_LO_NOOP);
     _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(7, 0, 0, 7, 0xFF);
     GXSetZCompLoc(GX_TRUE);
     GXSetNumChans(1);
@@ -1687,7 +1687,7 @@ void CCameraPcs::drawShadowEnd()
     PSMTXIdentity(ident);
     GXLoadPosMtxImm(ident, 0);
 
-    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(0, 4, 5, 1);
+    _GXSetBlendMode(GX_BM_NONE, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(7, 1, 0, 7, 0);
     GXSetZCompLoc(GX_FALSE);
     GXSetZMode(GX_FALSE, GX_ALWAYS, GX_TRUE);

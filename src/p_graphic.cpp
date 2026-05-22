@@ -821,8 +821,9 @@ void CGraphicPcs::drawEnd()
 			Graphic.DrawDebugStringDirect(0x10, 0x11, debugPadString, 0xC);
 		}
 
-		int x = 0x10;
+		int x;
 		int port = 0;
+		x = 0x10;
 		for (; port < 4; port++) {
 			bool suppress = (Pad._452_4_ != 0) || ((port == 0) && (Pad._448_4_ != -1));
 

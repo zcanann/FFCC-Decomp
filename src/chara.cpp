@@ -16,10 +16,6 @@
 #include <math.h>
 #include <string.h>
 
-extern "C" void Create__Q26CChara5CNodeFR10CChunkFilePQ26CChara6CModelQ36CChara5CNode4TYPEPQ27CMemory6CStage(
-    void*, CChunkFile&, void*, int, CMemory::CStage*);
-extern "C" void Create__Q26CChara5CMeshFPQ26CChara6CModelR10CChunkFilePQ27CMemory6CStage(
-    void*, void*, CChunkFile&, CMemory::CStage*);
 extern "C" void __dt__Q36CChara5CNode8CRefDataFv(void*, int);
 extern "C" void __dt__Q36CChara5CMesh8CRefDataFv(void*, int);
 extern "C" void __dt__Q36CChara5CMesh12CDisplayListFv(void*, int);
@@ -1011,8 +1007,7 @@ void CChara::CModel::Create(void* fileData, CMemory::CStage* stage)
 					if (chunk.m_id == 0x4E4F4445 && *(void**)((u8*)this + 0xA8) != 0) {
 						u16 nodeCount = *(u16*)((u8*)ref + 0x08);
 						CNode* node = reinterpret_cast<CNode*>((u8*)*(void**)((u8*)this + 0xA8) + (nodeCount * 0xC0));
-						Create__Q26CChara5CNodeFR10CChunkFilePQ26CChara6CModelQ36CChara5CNode4TYPEPQ27CMemory6CStage(
-						    node, chunkFile, this, chunk.m_arg0, stage);
+						node->Create(chunkFile, this, static_cast<CChara::CNode::TYPE>(chunk.m_arg0), stage);
 						*(u16*)((u8*)ref + 0x08) = nodeCount + 1;
 					}
 				}
@@ -1037,7 +1032,7 @@ void CChara::CModel::Create(void* fileData, CMemory::CStage* stage)
 					if (chunk.m_id == 0x4D455348 && *(void**)((u8*)this + 0xAC) != 0) {
 						u16 meshCount = *(u16*)((u8*)ref + 0x0A);
 						CMesh* mesh = reinterpret_cast<CMesh*>((u8*)*(void**)((u8*)this + 0xAC) + (meshCount * 0x14));
-						Create__Q26CChara5CMeshFPQ26CChara6CModelR10CChunkFilePQ27CMemory6CStage(mesh, this, chunkFile, stage);
+						mesh->Create(this, chunkFile, stage);
 						*(u16*)((u8*)ref + 0x0A) = meshCount + 1;
 					}
 				}

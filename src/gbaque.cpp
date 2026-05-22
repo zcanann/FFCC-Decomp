@@ -3024,18 +3024,19 @@ void GbaQueue::ClrCmakeInfo(int param_2)
 void GbaQueue::ChkCMakeName(int channel, unsigned int value)
 {
 	char* obj = reinterpret_cast<char*>(this);
-	const unsigned char byte0 = static_cast<unsigned char>(value);
-	const unsigned char byte1 = static_cast<unsigned char>(value >> 8);
-	const unsigned char byte2 = static_cast<unsigned char>(value >> 16);
-	const unsigned char cmdType = static_cast<unsigned char>(value >> 24);
+	unsigned int cmdType = value >> 24;
+	unsigned int byte0 = static_cast<unsigned char>(value);
+	unsigned int byte1 = static_cast<unsigned char>(value >> 8);
+	unsigned int byte2 = static_cast<unsigned char>(value >> 16);
+	unsigned int nameCrc = value >> 8;
 	const int cmakeOffset = channel * 0x20;
 	OSSemaphore* semaphore = accessSemaphores + channel;
 
-	if ((static_cast<int>(value >> 24) >> 6) == 0) {
+	if ((static_cast<int>(cmdType) >> 6) == 0) {
 		OSWaitSemaphore(semaphore);
 		obj[0x2CB3 + cmakeOffset] = static_cast<char>(cmdType);
 		*reinterpret_cast<unsigned short*>(obj + 0x2CB4 + cmakeOffset) = 1;
-		*reinterpret_cast<short*>(obj + 0x2CB6 + cmakeOffset) = static_cast<short>(value >> 8);
+		*reinterpret_cast<short*>(obj + 0x2CB6 + cmakeOffset) = static_cast<short>(nameCrc);
 		memset(obj + 0x2CB9 + cmakeOffset, 0, 0x11);
 		obj[0x2CB9 + cmakeOffset] = static_cast<char>(byte0);
 		OSSignalSemaphore(semaphore);
@@ -3046,20 +3047,21 @@ void GbaQueue::ChkCMakeName(int channel, unsigned int value)
 
 	OSWaitSemaphore(semaphore);
 	{
-		const int writeOffset = static_cast<int>(*reinterpret_cast<short*>(obj + 0x2CB4 + cmakeOffset)) * 3;
-		*reinterpret_cast<short*>(obj + 0x2CB4 + cmakeOffset) =
-			static_cast<short>(*reinterpret_cast<short*>(obj + 0x2CB4 + cmakeOffset) + 1);
-		obj[0x2CB7 + cmakeOffset + writeOffset] = static_cast<char>(byte2);
-		obj[0x2CB8 + cmakeOffset + writeOffset] = static_cast<char>(byte1);
-		obj[0x2CB9 + cmakeOffset + writeOffset] = static_cast<char>(byte0);
+		char* cmakeBase = obj + cmakeOffset;
+		short packetCount = *reinterpret_cast<short*>(cmakeBase + 0x2CB4);
+		char* writeBase = cmakeBase + static_cast<int>(packetCount) * 3;
+		*reinterpret_cast<short*>(cmakeBase + 0x2CB4) = static_cast<short>(packetCount + 1);
+		writeBase[0x2CB7] = static_cast<char>(byte2);
+		writeBase[0x2CB8] = static_cast<char>(byte1);
+		writeBase[0x2CB9] = static_cast<char>(byte0);
 
-		if (*reinterpret_cast<short*>(obj + 0x2CB4 + cmakeOffset) > 5) {
+		if (5 < *reinterpret_cast<short*>(cmakeBase + 0x2CB4)) {
 			localInfo = *reinterpret_cast<GbaQueueCMakeInfoView*>(obj + 0x2CB2 + cmakeOffset);
 		}
 	}
 	OSSignalSemaphore(semaphore);
 
-	if (*reinterpret_cast<short*>(obj + 0x2CB4 + cmakeOffset) <= 5) {
+	if (5 >= *reinterpret_cast<short*>(obj + 0x2CB4 + cmakeOffset)) {
 		return;
 	}
 

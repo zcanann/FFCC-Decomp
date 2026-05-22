@@ -9,11 +9,24 @@ class HitEInfo;
 
 struct GbaPInfo
 {
+    unsigned char m_data[0x370];
+
     GbaPInfo &operator=(const GbaPInfo&);
 };
 
 struct GbaCMakeInfo
 {
+    unsigned char m_active;
+    unsigned char m_resultCode;
+    unsigned short m_packetCount;
+    unsigned short m_crc;
+    unsigned char m_playerSlot;
+    char m_name[0x11];
+    unsigned char m_charaType;
+    unsigned char m_favoriteLead[2];
+    unsigned char m_favorite[4];
+    unsigned char m_jobType;
+
     GbaCMakeInfo &operator=(const GbaCMakeInfo&);
 };
 

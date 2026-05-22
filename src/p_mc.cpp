@@ -26,8 +26,6 @@ unsigned int s_CMcPcsTablePad1[5] = {
 CMcPcs McPcs;
 
 extern "C" int Format__6McCtrlFi(McCtrl* mcCtrl, int slot);
-extern "C" int Rand__5CMathFUl(CMath* instance, unsigned long max);
-extern "C" void CallWorldParam__8CMenuPcsFiii(void* menu, int mode, int param, int unused);
 
 struct MenuPcsMcLayout
 {
@@ -53,7 +51,7 @@ void CMcPcs::calc()
     int result;
     int worldParam;
 
-    Rand__5CMathFUl(&Math, 0x7FFFFFFF);
+    Math.Rand(0x7FFFFFFF);
 
     if (reinterpret_cast<MenuPcsMcLayout&>(MenuPcs).field14 != 1)
     {
@@ -75,7 +73,7 @@ void CMcPcs::calc()
                     worldParam = 6;
                 }
 
-                CallWorldParam__8CMenuPcsFiii(&MenuPcs, 6, worldParam, 0);
+                MenuPcs.CallWorldParam(6, worldParam, 0);
                 reinterpret_cast<MenuPcsMcLayout&>(MenuPcs).field18 = 0;
             }
         }
@@ -103,7 +101,7 @@ void CMcPcs::calc()
                 worldParam = 6;
             }
 
-            CallWorldParam__8CMenuPcsFiii(&MenuPcs, 5, worldParam, 0);
+            MenuPcs.CallWorldParam(5, worldParam, 0);
             reinterpret_cast<MenuPcsMcLayout&>(MenuPcs).field18 = 0;
         }
     }

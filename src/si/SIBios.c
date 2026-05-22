@@ -44,34 +44,6 @@ static volatile u32 InputBufferVcount[4];
 
 u32 __PADFixBits;
 
-/*
- * TODO: Remove this note block once linkage has been resolved.
- *
- * Current blocker in this unit:
- * - baseline source already reports 100% in objdiff, but promoting SIBios.c
- *   still breaks final main.dol linkage
- * - the remaining issue is not control flow; it is object / split ownership in
- *   the small-data sections around the local cmdTypeAndStatus statics
- *
- * Most useful probe so far:
- * - the live compiled SIBios.o still emits a full 0x0C .sbss with
- *   cmdTypeAndStatus$79, cmdTypeAndStatus$375, and __PADFixBits
- * - the compared target slice only owns the 0x08 window for
- *   cmdTypeAndStatus$374 plus __PADFixBits
- * - target SIInterruptHandler still relocates through cmdTypeAndStatus$78 at
- *   0x8032F000, which sits just outside the SIBios-owned .sbss window
- * - a separate current-branch source cleanup was real here: the older
- *   file-scope `Unit01` float-pair blob did not belong in GCCP01 SIBios at
- *   all. Shared Dolphin reference sources omit it, extracted target SIBios.o
- *   does not emit it, and removing it cleanly unblocked the reclaimed
- *   `mtx/mtx.c` `.sdata` ownership work
- *
- * Why this is not keepable yet:
- * - a plain Matching flip pulls the whole live .sbss shape into the unit and
- *   loses that split ownership boundary
- * - so the remaining work is recovering the original object / split shape for
- *   these local statics, not rewriting the function bodies themselves
- */
 
 // prototypes
 static u32 CompleteTransfer();

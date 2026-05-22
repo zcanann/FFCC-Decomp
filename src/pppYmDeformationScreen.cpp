@@ -84,8 +84,6 @@ void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
     void*, int, float*, float*, float*, float, float*, float*);
 void MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(void*, Mtx44, Vec4d*, Vec4d*);
 
-int GetTexture__8CMapMeshFP12CMaterialSetRi(CMapMesh*, CMaterialSet*, int&);
-
 }
 
 /*
@@ -117,8 +115,8 @@ void pppRenderYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, 
 		return;
 	}
 
-	textureBase = GetTexture__8CMapMeshFP12CMaterialSetRi(
-		((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[step->m_dataValIndex], pppEnvStPtr->m_materialSetPtr, textureIndex);
+	textureBase = reinterpret_cast<int>(
+		((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[step->m_dataValIndex]->GetTexture(pppEnvStPtr->m_materialSetPtr, textureIndex));
 
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_ONE, GX_BL_INVSRCALPHA, GX_LO_AND);
 	GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);

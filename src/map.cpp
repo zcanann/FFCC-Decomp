@@ -27,7 +27,6 @@ char g_StrTmp[0x400];
 
 extern "C" unsigned long UnkMaterialSetGetter(void*);
 extern "C" void __dt__4CRefFv(void*, int);
-extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 extern "C" void __dt__8COctTreeFv(void*, int);
 extern "C" void __dt__7CMapHitFv(void*, int);
 extern "C" void __dt__7CMapObjFv(void*, int);
@@ -2277,8 +2276,7 @@ void CMapMng::ReadOtm(char* mapName)
 
             if (chunk.m_id == 0x4C495448) {
                 CMapLightHolder* light = reinterpret_cast<CMapLightHolder*>(
-                    _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
-                        &Memory, 0x10, *reinterpret_cast<CMemory::CStage**>(self), const_cast<char*>(s_map_cpp), 0x4D3, 0));
+                    Memory._Alloc(0x10, *reinterpret_cast<CMemory::CStage**>(self), const_cast<char*>(s_map_cpp), 0x4D3, 0));
                 if (light != 0) {
                     unsigned char* lightRaw = reinterpret_cast<unsigned char*>(light);
                     lightRaw[0] = chunkFile.Get1();

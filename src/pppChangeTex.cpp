@@ -117,16 +117,12 @@ static void ChangeTex_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int
 static void ChangeTex_AfterDrawMeshCallback(CChara::CModel*, void*, void*, int, float (*)[4]);
 
 extern "C" {
-		void SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(void*, void*, unsigned int, int, int);
-
 	void _WaitDrawDone__8CGraphicFPci(CGraphic* graphic, const char* file, int line);
 		void* GetCharaHandlePtr__FP8CGObjectl(void* obj, long index);
 		int GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void* handle);
 		void pppHeapUseRate__FPQ27CMemory6CStage(void* stage);
 		void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(_pppPObject*, long, float&, float&, float&, float, float&, float&);
 		void* GetTextureFromRSD__FiP9_pppEnvSt(int, _pppEnvSt*);
-		void ReWriteDisplayList__5CUtilFPvUlUl(CUtil*, void*, unsigned long, unsigned long);
-		void CalcBoundaryBoxQuantized__5CUtilFP3VecP3VecP6S16VecUlUl(CUtil*, Vec*, Vec*, S16Vec*, unsigned long, unsigned long);
 }
 
 /*
@@ -232,9 +228,8 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 		for (unsigned int meshIdx = 0; meshIdx < model0Raw->m_data->m_meshCount; meshIdx++) {
 			ChangeTexMeshData* meshData = meshList->m_data;
 			if (strcmp(meshData->m_name, sPppChangeTexMeshObjectName) == 0) {
-				CalcBoundaryBoxQuantized__5CUtilFP3VecP3VecP6S16VecUlUl(
-				    &gUtil, &work->m_bboxMin, &work->m_bboxMax, (S16Vec*)meshList->m_points, meshData->m_vertexCount,
-				    model0Raw->m_data->m_frameShift);
+				gUtil.CalcBoundaryBoxQuantized(&work->m_bboxMin, &work->m_bboxMax, (S16Vec*)meshList->m_points,
+				    meshData->m_vertexCount, model0Raw->m_data->m_frameShift);
 			}
 
 			*(int*)((u8*)work->m_displayListArrays + arrayOffset) = (int)pppMemAlloc(
@@ -252,7 +247,7 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 				*(int*)*dlEntry = (int)pppMemAlloc(
 				    *dlInfo, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppChangeTex_cpp_801dd660), 0x18D);
 				memcpy(*(void**)*dlEntry, (void*)dlInfo[1], dlInfo[0]);
-				ReWriteDisplayList__5CUtilFPvUlUl(&gUtil, *(void**)*dlEntry, (unsigned long)dlInfo[0], 1);
+				gUtil.ReWriteDisplayList(*(void**)*dlEntry, (unsigned long)dlInfo[0], 1);
 				dlEntry = dlEntry - 1;
 			}
 
@@ -517,8 +512,7 @@ static void ChangeTex_AfterDrawMeshCallback(CChara::CModel* model, void* param_2
 					*(int*)(MaterialManRaw() + 0x12c) = tevScale;
 					*(int*)(MaterialManRaw() + 0x130) = 0;
 					*(int*)(MaterialManRaw() + 0x40) = fullTevBits;
-					SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
-					    &MaterialMan, modelRaw->m_data->m_materialSet, displayList->m_material, 0, 0);
+					MaterialMan.SetMaterial(modelRaw->m_data->m_materialSet, displayList->m_material, 0, (_GXTevScale)0);
 					displayListPtr = *(int**)(dlArrayBase + dlOffset);
 					GXCallDisplayList((void*)displayListPtr[0], (unsigned int)displayListPtr[1]);
 					dlOffset -= 4;
@@ -578,7 +572,6 @@ static void ChangeTex_DrawMeshDLCallback(CChara::CModel* model, void* param_2, v
 		*(int*)(MaterialManRaw() + 0x40) = fullTevBits;
 	}
 
-	SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
-	    &MaterialMan, modelRaw->m_data->m_materialSet, displayList->m_material, 0, 0);
+	MaterialMan.SetMaterial(modelRaw->m_data->m_materialSet, displayList->m_material, 0, (_GXTevScale)0);
 	GXCallDisplayList(displayList->m_data, displayList->m_size);
 }

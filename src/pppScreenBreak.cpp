@@ -148,13 +148,11 @@ static inline int GraphicScreenBreakBlurEnabled() { return Graphic.m_blurActive;
 extern "C" {
 int GetBackBufferRect2__8CGraphicFPvP9_GXTexObjiiiii12_GXTexFilter9_GXTexFmti(
     CGraphic*, void*, _GXTexObj*, int, int, int, int, int, int, int, int);
-void SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(void*, void*, unsigned int, int, int);
 void SetBlurParameter__11CGraphicPcsFiUcUcUcUcUcs(CGraphicPcs*, int, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, short);
 void* GetCharaHandlePtr__FP8CGObjectl(void*, long);
 int GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void*);
 void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(void*, long, float&, float&, float&, float, float&, float&);
 void pppHeapUseRate__FPQ27CMemory6CStage(void*);
-void ConvI2FVector__5CUtilFR3Vec6S16Vecl(CUtil*, Vec*, S16Vec, unsigned long);
 void MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(void*, Mtx44, Vec4d*, Vec4d*);
 }
 
@@ -537,7 +535,7 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
         meshMax.x += sVar2;
         meshMax.y += sVar3;
         meshMax.z += minZ;
-        ConvI2FVector__5CUtilFR3Vec6S16Vecl(&gUtil, inVec + 3, meshMax, *(u32*)(ScreenBreakModelDataRaw(model) + 0x34));
+        gUtil.ConvI2FVector(*(inVec + 3), meshMax, *(u32*)(ScreenBreakModelDataRaw(model) + 0x34));
         PSVECScale(inVec + 3, inVec + 3, FLOAT_80331ccc);
 
         dVar17 = inVec[3].x;
@@ -575,7 +573,7 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
         inVec += 5;
     }
 
-    ConvI2FVector__5CUtilFR3Vec6S16Vecl(&gUtil, (Vec*)((u8*)work + 0x18), globalMax, *(u32*)(ScreenBreakModelDataRaw(model) + 0x34));
+    gUtil.ConvI2FVector(*reinterpret_cast<Vec*>((u8*)work + 0x18), globalMax, *(u32*)(ScreenBreakModelDataRaw(model) + 0x34));
 }
 
 /*

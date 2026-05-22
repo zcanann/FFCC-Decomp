@@ -18,10 +18,6 @@ extern "C" double cos(double);
 
 #include <math.h>
 
-extern "C" {
-int GetTexture__8CMapMeshFP12CMaterialSetRi(CMapMesh* mapMesh, CMaterialSet* materialSet, int& textureIndex);
-}
-
 extern const float FLOAT_80331180;
 extern const float FLOAT_80331184;
 extern const float FLOAT_80331188;
@@ -540,7 +536,7 @@ int GetTextureFromRSD(int mapMeshIndex, _pppEnvSt* env)
     mapMeshArray = ymEnv->m_mapMeshPtr;
     mapMesh = mapMeshArray[mapMeshIndex];
     textureIndex = 0;
-    return GetTexture__8CMapMeshFP12CMaterialSetRi(mapMesh, ymEnv->m_materialSetPtr, textureIndex);
+    return reinterpret_cast<int>(mapMesh->GetTexture(ymEnv->m_materialSetPtr, textureIndex));
 }
 
 /*

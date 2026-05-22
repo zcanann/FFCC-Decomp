@@ -17,8 +17,6 @@
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 CMapPcs MapPcs;
-extern void* __vt__8CManager;
-extern "C" void* __vt__7CMapPcs[];
 extern "C" void create__7CMapPcsFv(CMapPcs*);
 extern "C" void destroy__7CMapPcsFv(CMapPcs*);
 extern "C" void calcInit__7CMapPcsFv(CMapPcs*);

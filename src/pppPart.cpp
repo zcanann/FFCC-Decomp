@@ -49,7 +49,6 @@ static const double kScaleConstA = 4503601774854144.0; // DOUBLE_803304b0
 static const float kScaleConstB = 0.017453292f; // FLOAT_803304a8
 static const float kPppLocalZero = 0.0f;
 extern "C" unsigned char gPppBlendModeState;
-extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 extern "C" float FLOAT_8032ed8c;
 extern "C" double DOUBLE_8032fdf0;
 extern "C" double DOUBLE_8032fe00;
@@ -64,11 +63,6 @@ extern "C" unsigned char DAT_8032ed8a;
 extern "C" unsigned char DAT_8032ed8b;
 extern "C" int DAT_8032ed7c;
 extern "C" unsigned int DAT_8032ed80;
-extern "C" unsigned int IsEnable__13CAmemCacheSetFs(CAmemCacheSet*, short);
-extern "C" int GetData__13CAmemCacheSetFsPci(CAmemCacheSet*, short, char*, int);
-extern "C" void AddRef__13CAmemCacheSetFs(CAmemCacheSet*, short);
-extern "C" unsigned short SetData__13CAmemCacheSetFPviQ210CAmemCache4TYPEi(CAmemCacheSet*, void*, int, CAmemCache::TYPE,
-                                                                            int);
 extern "C" void SetPart__9CLightPcsFQ29CLightPcs6TARGETPvUc(CLightPcs*, int, void*, unsigned char);
 extern "C" void InitVtxFmt__12CMaterialManFi11_GXCompTypei11_GXCompTypei11_GXCompTypei(CMaterialMan*, int, _GXCompType, int, _GXCompType, int, _GXCompType, int);
 extern "C" void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
@@ -377,8 +371,7 @@ void* pppMemAlloc(unsigned long allocSize, CMemory::CStage* stage, char* file, i
 	DAT_8032ED64 = 0;
 	do
 	{
-		_pppPObjLink* allocation = (_pppPObjLink*)_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
-			&Memory, allocSize, stage, file, line, 1);
+		_pppPObjLink* allocation = (_pppPObjLink*)Memory._Alloc(allocSize, stage, file, line, 1);
 		if (allocation != 0)
 		{
 			return allocation;
@@ -499,8 +492,7 @@ extern "C" void* pppMemFree__FPv(unsigned long allocSize, CMemory::CStage* stage
 	DAT_8032ED64 = 0;
 	do
 	{
-		_pppPObjLink* allocation = (_pppPObjLink*)_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
-			&Memory, allocSize, stage, file, line, 1);
+		_pppPObjLink* allocation = (_pppPObjLink*)Memory._Alloc(allocSize, stage, file, line, 1);
 		if (allocation != 0)
 		{
 			return allocation;
@@ -771,8 +763,7 @@ _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
 	DAT_8032ED64 = 0;
 	do
 	{
-		newObj = (_pppPObjLink*)_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
-			&Memory, allocSize, stage, const_cast<char*>(s_pppPart_cpp), 0x305, 1);
+		newObj = (_pppPObjLink*)Memory._Alloc(allocSize, stage, const_cast<char*>(s_pppPart_cpp), 0x305, 1);
 		if (newObj != 0)
 		{
 			break;
@@ -1511,15 +1502,15 @@ void pppCacheLoadModel(short* modelList, _pppDataHead*)
 		CMapMesh* mapMesh = *(CMapMesh**)(*(u32*)(pppResSet + 0x14) + modelIndices[i] * 4);
 		short cacheIndex = *reinterpret_cast<short*>(reinterpret_cast<u8*>(mapMesh) + 0x46);
 
-		if (IsEnable__13CAmemCacheSetFs(&ppvAmemCacheSet, cacheIndex) == 0)
+		if (ppvAmemCacheSet.IsEnable(cacheIndex) == 0)
 		{
 			mapMesh->Ptr2Off();
 			*reinterpret_cast<int*>(reinterpret_cast<u8*>(mapMesh) + 0x24) =
-			    GetData__13CAmemCacheSetFsPci(&ppvAmemCacheSet, cacheIndex, (char*)s_pppPart_cpp, 0x4E5);
+			    ppvAmemCacheSet.GetData(cacheIndex, (char*)s_pppPart_cpp, 0x4E5);
 			mapMesh->Off2Ptr();
 		}
 
-		AddRef__13CAmemCacheSetFs(&ppvAmemCacheSet, cacheIndex);
+		ppvAmemCacheSet.AddRef(cacheIndex);
 		mapMesh->pppCacheLoadModelTexture(pppEnvStPtr->m_materialSetPtr, &ppvAmemCacheSet);
 	}
 }
@@ -1674,15 +1665,15 @@ void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
 			CMapMesh* mapMesh = *(CMapMesh**)(*(u32*)(pppResSet + 0x14) + *modelList * 4);
 			short cacheIndex = *reinterpret_cast<short*>(reinterpret_cast<u8*>(mapMesh) + 0x46);
 
-			if (IsEnable__13CAmemCacheSetFs(&ppvAmemCacheSet, cacheIndex) == 0)
+			if (ppvAmemCacheSet.IsEnable(cacheIndex) == 0)
 			{
 				mapMesh->Ptr2Off();
 				*reinterpret_cast<int*>(reinterpret_cast<u8*>(mapMesh) + 0x24) =
-				    GetData__13CAmemCacheSetFsPci(&ppvAmemCacheSet, cacheIndex, (char*)s_pppPart_cpp, 0x4E5);
+				    ppvAmemCacheSet.GetData(cacheIndex, (char*)s_pppPart_cpp, 0x4E5);
 				mapMesh->Off2Ptr();
 			}
 
-			AddRef__13CAmemCacheSetFs(&ppvAmemCacheSet, cacheIndex);
+			ppvAmemCacheSet.AddRef(cacheIndex);
 			mapMesh->pppCacheLoadModelTexture(pppEnvStPtr->m_materialSetPtr, &ppvAmemCacheSet);
 		}
 
@@ -1720,8 +1711,8 @@ void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
 		DAT_8032ED64 = 0;
 		do
 		{
-			pDataVals = (_pppPDataVal*)_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
-			    &Memory, pppMngSt->m_numPrograms << 4, stage, (char*)s_pppPart_cpp, 0x585, 1);
+			pDataVals = (_pppPDataVal*)Memory._Alloc(
+			    pppMngSt->m_numPrograms << 4, stage, (char*)s_pppPart_cpp, 0x585, 1);
 			if (pDataVals != 0)
 			{
 				goto DataValsAllocated;
@@ -2008,8 +1999,7 @@ void pppInitData(_pppDataHead* pppDataHead, pppProg* pppProg, int param_3)
 		u8* chunkData = new (stageLoad, const_cast<char*>(s_pppPart_cpp), 0x626) u8[chunkSize];
 
 		memcpy(chunkData, dataBase + chunkOffset, chunkSize);
-		cacheChunks[(i << 2)] = SetData__13CAmemCacheSetFPviQ210CAmemCache4TYPEi(
-		    &ppvAmemCacheSet, chunkData, chunkSize, static_cast<CAmemCache::TYPE>(2), param_3);
+		cacheChunks[(i << 2)] = ppvAmemCacheSet.SetData(chunkData, chunkSize, CAmemCache::PDT, param_3);
 		delete[] chunkData;
 		chunkOffsets++;
 	}

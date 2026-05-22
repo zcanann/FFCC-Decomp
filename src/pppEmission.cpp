@@ -38,10 +38,7 @@ void* GetCharaHandlePtr__FP8CGObjectl(void* obj, long index);
 int GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void* handle);
 void pppHeapUseRate__FPQ27CMemory6CStage(CMemory::CStage* stage);
 
-void SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(void*, void*, unsigned int, int, int);
-void SetObjMatrix__12CMaterialManFPA4_fPA4_f(void*, float (*)[4], float (*)[4]);
 void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(void*, long, float&, float&, float&, float, float&, float&);
-int GetTexture__8CMapMeshFP12CMaterialSetRi(CMapMesh* mapMesh, CMaterialSet* materialSet, int& textureIndex);
 }
 
 struct EmissionDisplayList {
@@ -66,7 +63,7 @@ struct EmissionMeshRef {
 
 struct EmissionModelData {
     u8 _pad0[0x24];
-    void* m_materialSet;
+    CMaterialSet* m_materialSet;
 };
 
 struct EmissionState;
@@ -185,10 +182,8 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, pppEm
         return;
     }
 
-    state->m_texture = GetTexture__8CMapMeshFP12CMaterialSetRi(
-        pppEnvStPtr->m_mapMeshPtr[param_2->m_dataValIndex],
-        pppEnvStPtr->m_materialSetPtr,
-        textureIndex);
+    state->m_texture =
+        reinterpret_cast<int>(pppEnvStPtr->m_mapMeshPtr[param_2->m_dataValIndex]->GetTexture(pppEnvStPtr->m_materialSetPtr, textureIndex));
 
     u8* payload = param_2->m_payload;
     if (payload[9] != 0) {
@@ -399,7 +394,7 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
                 PSMTXScale(objMtx0, scale, scale, scale);
                 PSMTXConcat(param_5, objMtx0, objMtx0);
                 PSMTXCopy(CameraMatrix(), viewMtx0);
-                SetObjMatrix__12CMaterialManFPA4_fPA4_f(&MaterialMan, viewMtx0, objMtx0);
+                MaterialMan.SetObjMatrix(viewMtx0, objMtx0);
 
                 displayList = meshData->m_displayLists;
                 int remaining = meshData->m_displayListCount - 1;
@@ -423,8 +418,7 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
                     *(int*)(MaterialManRaw() + 0x12C) = 0x1E;
                     *(int*)(MaterialManRaw() + 0x130) = 0;
                     *(u32*)(MaterialManRaw() + 0x40) = *(u32*)(MaterialManRaw() + 0x48);
-                    SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
-                        &MaterialMan, modelView->m_data->m_materialSet, displayList->m_material, 0, 0);
+                    MaterialMan.SetMaterial(modelView->m_data->m_materialSet, displayList->m_material, 0, (_GXTevScale)0);
 
                     if (step->m_payload[10] == 0) {
                         GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)1, (GXTexGenSrc)4, 0x3C, GX_FALSE, 0x7D);
@@ -477,8 +471,7 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
                     *(int*)(MaterialManRaw() + 0x12C) = 0x1E;
                     *(int*)(MaterialManRaw() + 0x130) = 0;
                     *(u32*)(MaterialManRaw() + 0x40) = *(u32*)(MaterialManRaw() + 0x48);
-                    SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
-                        &MaterialMan, modelView->m_data->m_materialSet, displayList->m_material, 0, 0);
+                    MaterialMan.SetMaterial(modelView->m_data->m_materialSet, displayList->m_material, 0, (_GXTevScale)0);
 
                     if (step->m_payload[10] == 0) {
                         GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)1, (GXTexGenSrc)4, 0x3C, GX_FALSE, 0x7D);
@@ -530,8 +523,7 @@ void Emission_DrawMeshDLCallback(CChara::CModel* model, void*, void*, int meshIn
         meshData->m_colors[2] = 0;
         meshData->m_colors[3] = 0;
     } else {
-        SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
-            &MaterialMan, modelView->m_data->m_materialSet, displayList->m_material, 0, 0);
+        MaterialMan.SetMaterial(modelView->m_data->m_materialSet, displayList->m_material, 0, (_GXTevScale)0);
         GXCallDisplayList(displayList->m_data, displayList->m_size);
         SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x65);
     }

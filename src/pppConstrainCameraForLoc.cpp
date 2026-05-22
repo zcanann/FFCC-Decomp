@@ -9,7 +9,6 @@ extern int gPppCalcDisabled;
 #include "ffcc/util.h"
 #include <dolphin/mtx.h>
 
-// External references
 extern "C" void GetDirectVector__5CUtilFP3VecP3Vec3Vec(void*, Vec*, Vec*, Vec);
 static inline float CameraPosX() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xE0); }
 static inline float CameraPosY() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xE4); }
@@ -19,7 +18,6 @@ static inline float CameraDirY() { return *reinterpret_cast<float*>(reinterpret_
 static inline float CameraDirZ() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xF4); }
 static inline MtxPtr CameraMatrix() { return reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x4); }
 
-// Function signatures from Ghidra decomp
 extern "C" int GetModelPtr__FP8CGObject(CGObject*);
 extern "C" void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(pppConstrainCameraForLoc*, int, float*,
                                                              float*, float*, float, float*, float*);

@@ -67,9 +67,6 @@ struct MenuFontTlutPalette
     _GXColor shadow;
     _GXColor highlight;
 };
-extern void* __vt__8CManager;
-extern "C" void* __vt__8CMenuPcs[];
-
 static const char s_win_kazari_801D9D48[] = "win_kazari";
 static const char s_dvd__smenu__s_tex_801d9d6c[] = "dvd/%smenu/%s.tex";
 static const char s_dvd__smenu_gc23_fnt_801d9d8c[] = "dvd/%smenu/gc23.fnt";
@@ -133,8 +130,6 @@ extern "C" const f32 kMenuOrthoRight = 640.0f;
 extern "C" const f32 kMenuOrthoFar = -100.0f;
 extern "C" const f32 FLOAT_8033086C = 0.125f;
 
-extern "C" void* __register_global_object(void* object, void* destructor, void* registration);
-extern "C" void __dt__8CMenuPcsFv(void*);
 extern "C" unsigned long GetInternal22Size__8CFontManFv(void*);
 extern const char __RTTI__8CManager_8032E7A8[];
 extern const char __RTTI__8CProcess_8032E7B0[];

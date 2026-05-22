@@ -9,13 +9,6 @@ extern const float FLOAT_80330108;
 
 void pppSetBlendMode(unsigned char);
 
-extern "C" {
-    unsigned int FindTexName__12CMaterialSetFPcPl(CMaterialSet* materialSet, char* textureName,
-                                                  long* outIndex);
-    void CacheLoadTexture__12CMaterialSetFiP13CAmemCacheSet(CMaterialSet* materialSet, unsigned int textureIndex,
-                                                             void* amemCacheSet);
-}
-
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
 
 class CMaterial;
@@ -151,7 +144,7 @@ void pppCacheDumpShapeTexture(pppShapeSt* shapeSt, CMaterialSet* materialSet)
     textureIndex = 0;
     do {
         if (*texturePtr != 0) {
-            CacheDumpTexture__12CMaterialSetFiP13CAmemCacheSet(materialSet, textureIndex, &ppvAmemCacheSet);
+            materialSet->CacheDumpTexture(textureIndex, &ppvAmemCacheSet);
         }
         textureIndex++;
         texturePtr++;
@@ -204,7 +197,7 @@ void pppCacheLoadShapeTexture(pppShapeSt* shapeSt, CMaterialSet* materialSet)
     textureIndex = 0;
     do {
         if (*texturePtr != 0) {
-            CacheLoadTexture__12CMaterialSetFiP13CAmemCacheSet(materialSet, textureIndex, &ppvAmemCacheSet);
+            materialSet->CacheLoadTexture(textureIndex, &ppvAmemCacheSet);
         }
         textureIndex++;
         texturePtr++;
@@ -236,7 +229,7 @@ void pppSetShapeMaterial(pppShapeSt* shapeSt, CMaterialSet* materialSet, char** 
         shapeEntry = shapeBase;
         for (shapeIndex = 0; shapeIndex < *(short*)(shapeBase + 2); shapeIndex = shapeIndex + 1) {
             *(unsigned char*)(shapeEntry + 10) =
-                FindTexName__12CMaterialSetFPcPl(materialSet, textureNames[*(unsigned char*)(shapeEntry + 10)], 0);
+                materialSet->FindTexName(textureNames[*(unsigned char*)(shapeEntry + 10)], 0);
             *(int*)(shapeEntry + 0xc) = (int)shapeSt->m_displayListData + *(int*)(shapeEntry + 0xc);
             shapeEntry = shapeEntry + 8;
         }
@@ -263,8 +256,7 @@ void pppDrawShp(tagOAN3_SHAPE* shape, CMaterialSet* materialSet, unsigned char b
     *(int*)(MaterialManRaw() + 304) = *(int*)(MaterialManRaw() + 292);
     *(int*)(MaterialManRaw() + 64) = *(int*)(MaterialManRaw() + 72);
 
-    SetMaterialPart__12CMaterialManFP12CMaterialSetii(&MaterialMan, materialSet,
-                                                      *(unsigned char*)((int)shape + 10), 0);
+    MaterialMan.SetMaterialPart(materialSet, *(unsigned char*)((int)shape + 10), 0);
 
     GXClearVtxDesc();
     GXSetVtxDesc((GXAttr)9, GX_DIRECT);
@@ -303,8 +295,7 @@ void pppDrawShp(long* animData, short frameIndex, CMaterialSet* materialSet, uns
     *(int*)(MaterialManRaw() + 304) = *(int*)(MaterialManRaw() + 292);
     *(int*)(MaterialManRaw() + 64) = *(int*)(MaterialManRaw() + 72);
 
-    SetMaterialPart__12CMaterialManFP12CMaterialSetii(&MaterialMan, materialSet,
-                                                      *(unsigned char*)(shapePtr + 10), 0);
+    MaterialMan.SetMaterialPart(materialSet, *(unsigned char*)(shapePtr + 10), 0);
 
     GXClearVtxDesc();
     GXSetVtxDesc((GXAttr)9, GX_DIRECT);

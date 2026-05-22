@@ -3,6 +3,7 @@
 #include "ffcc/render_buffers.h"
 #include "ffcc/gobject.h"
 #include "ffcc/linkage.h"
+#include "ffcc/materialman.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/game.h"
 #include "ffcc/gxfunc.h"
@@ -81,7 +82,6 @@ static inline float LoadFloat(const float& value)
 }
 
 extern "C" {
-void SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(void*, void*, unsigned int, int, int);
 void* GetCharaHandlePtr__FP8CGObjectl(void*, long);
 int GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void*);
 int GetTextureFromRSD__FiP9_pppEnvSt(int, _pppEnvSt*);
@@ -265,8 +265,8 @@ void Chara_DrawShadowMeshDLCallback(CChara::CModel* model, void* work, void* vYm
     s32 meshOffset = meshIndex * 0x14 + 8;
     s32 mesh = *(s32*)(meshData + meshOffset);
     u32* dl = (u32*)(*(s32*)(mesh + 0x50) + dlIndex * 0xC);
-    SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
-        &MaterialMan, *(void**)(*(s32*)((u8*)model + 0xA4) + 0x24), *(u16*)((u8*)dl + 8), 0, 0);
+    MaterialMan.SetMaterial(reinterpret_cast<CMaterialSet*>(*(void**)(*(s32*)((u8*)model + 0xA4) + 0x24)),
+                            *(u16*)((u8*)dl + 8), 0, (_GXTevScale)0);
     GXCallDisplayList((void*)dl[1], dl[0]);
 }
 
@@ -361,8 +361,8 @@ void Mana_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int 
             *(u32*)(MaterialManRaw() + 0xDC) = *(u32*)((u8*)work + 0x2C);
             GXSetCullMode((GXCullMode)1);
             GXSetZMode(GX_ENABLE, GX_LEQUAL, GX_DISABLE);
-            SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
-                &MaterialMan, *(void**)(*(int*)((u8*)model + 0xA4) + 0x24), *(u16*)((u8*)dl + 8), 0, 0);
+            MaterialMan.SetMaterial(reinterpret_cast<CMaterialSet*>(*(void**)(*(int*)((u8*)model + 0xA4) + 0x24)),
+                                    *(u16*)((u8*)dl + 8), 0, (_GXTevScale)0);
             SetEnvMap((PYmMana*)step, (VYmMana*)work);
             GXCallDisplayList(*(void**)(*(int*)((u8*)work + 0x60) + dlIndex * 4), dl[0]);
             for (int i = 0; i < 16; i++) {
@@ -399,8 +399,8 @@ void Mana_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int 
     GXSetZMode(GX_ENABLE, GX_LEQUAL, GX_ENABLE);
     DCFlushRange((u8*)work + 0x100, 4);
     GXSetArray((GXAttr)0xB, (u8*)work + 0x100, 4);
-    SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
-        &MaterialMan, *(void**)(*(int*)((u8*)model + 0xA4) + 0x24), *(u16*)((u8*)dl + 8), 0, 0);
+    MaterialMan.SetMaterial(reinterpret_cast<CMaterialSet*>(*(void**)(*(int*)((u8*)model + 0xA4) + 0x24)),
+                            *(u16*)((u8*)dl + 8), 0, (_GXTevScale)0);
     _GXSetBlendMode(GX_BM_NONE, GX_BL_SRCALPHA, GX_BL_ONE, GX_LO_SET);
     GXCallDisplayList((void*)dl[1], dl[0]);
 }

@@ -3,6 +3,7 @@
 #include "ffcc/render_buffers.h"
 #include "ffcc/gobject.h"
 #include "ffcc/linkage.h"
+#include "ffcc/materialman.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/game.h"
 #include "ffcc/gxfunc.h"
@@ -80,7 +81,6 @@ static inline float LoadFloat(const float& value)
 extern "C" {
 void* GetCharaHandlePtr__FP8CGObjectl(void* obj, long index);
 int GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void* handle);
-void SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(void*, void*, unsigned int, int, int);
 int GetTextureFromRSD__FiP9_pppEnvSt(int, _pppEnvSt*);
 void InitTexObj__8CTextureFv(void*);
 void genParaboloidMap__FPvPUlUs9_GXVtxFmt(void*, unsigned long*, unsigned short, GXVtxFmt);
@@ -1553,14 +1553,15 @@ void Mana2_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int
                 *(u32*)(MaterialManRaw() + 0xD0) = *(u32*)((char*)work + 0x20);
                 GXSetCullMode((GXCullMode)1);
                 GXSetZMode(GX_ENABLE, GX_LEQUAL, GX_DISABLE);
-                SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
-                    &MaterialMan, *(void**)(*(int*)((char*)model + 0xA4) + 0x24), *(u16*)((char*)dlEntry + 8), 0, 0);
+                MaterialMan.SetMaterial(
+                    reinterpret_cast<CMaterialSet*>(*(void**)(*(int*)((char*)model + 0xA4) + 0x24)),
+                    *(u16*)((char*)dlEntry + 8), 0, (_GXTevScale)0);
                 GXCallDisplayList(*(void**)(*(int*)((char*)work + 0x60) + dlIndex * 4), *dlEntry);
             }
         } else {
             GXSetZMode(GX_ENABLE, GX_LEQUAL, GX_ENABLE);
-            SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
-                &MaterialMan, *(void**)(*(int*)((char*)model + 0xA4) + 0x24), *(u16*)((char*)dlEntry + 8), 0, 0);
+            MaterialMan.SetMaterial(reinterpret_cast<CMaterialSet*>(*(void**)(*(int*)((char*)model + 0xA4) + 0x24)),
+                                    *(u16*)((char*)dlEntry + 8), 0, (_GXTevScale)0);
             GXCallDisplayList((void*)dlEntry[1], dlEntry[0]);
         }
     }

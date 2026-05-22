@@ -15,10 +15,6 @@
 #include <string.h>
 
 extern "C" {
-void __ct__5CMenuFv(void* menu);
-void __dt__5CMenuFv(void* menu, int shouldDelete);
-void __ct__4CMesFv(void* mes);
-void __dt__4CMesFv(void* mes, int shouldDelete);
 void Create__5CMenuFv(void* menu);
 void Destroy__5CMenuFv(void* menu);
 void Set__4CMesFPci(void* mes, char* script, int flags);

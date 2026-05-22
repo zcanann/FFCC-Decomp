@@ -10,7 +10,7 @@ extern const char s_CMcPcs_80331B10[];
 extern const char __RTTI__8CManager_8032E9D0[];
 extern const char __RTTI__8CProcess_8032E9D8[];
 
-unsigned int m_table__6CMcPcs[0x15C / sizeof(unsigned int)] = {
+unsigned int CMcPcs::m_table[0x15C / sizeof(unsigned int)] = {
     reinterpret_cast<unsigned int>(const_cast<char*>(s_CMcPcs_80331B10)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x1B
 };
 
@@ -148,7 +148,7 @@ void CMcPcs::create()
  */
 int CMcPcs::GetTable(unsigned long index)
 {
-	return (int)(reinterpret_cast<unsigned char*>(m_table__6CMcPcs) + (index * 0x15c));
+	return (int)(reinterpret_cast<unsigned char*>(m_table) + (index * 0x15c));
 }
 
 /*

@@ -9,7 +9,6 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
 extern "C" void DrawInit__8CMenuPcsFv(void*);
-extern "C" void SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(void*, int);
 extern "C" void DrawRect__8CMenuPcsFUlfffffffff(
     void*, unsigned long, float, float, float, float, float, float, float, float, float);
 extern float FLOAT_80330890;
@@ -667,7 +666,7 @@ void CMes::Draw()
 
 					CColor color(0xFF, 0xFF, 0xFF, 0xFF);
 					MenuPcs.SetColor(color);
-					SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x15);
+					MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x15));
 
 					DrawRect__8CMenuPcsFUlfffffffff(
 					    &MenuPcs, 0, *(float*)((char*)this + 0x3C9C) + *glyph,

@@ -32,6 +32,19 @@ struct ItemMenuState
 class CMenuPcs
 {
 public:
+    enum FMT
+    {
+        TODO_FMT
+    };
+
+    enum TEX
+    {
+        TODO_TEX
+    };
+
+    void SetAttrFmt(FMT);
+    void SetTexture(TEX);
+
     void ItemInit();
     void ItemInit1();
     bool ItemOpen();

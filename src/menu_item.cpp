@@ -18,8 +18,6 @@ extern "C" void LetterSetAttachItem__8CMenuPcsFUii(CMenuPcs*, unsigned int, unsi
 extern "C" void GetSingWinSize__8CMenuPcsFiPsPsi(CMenuPcs*, int, s16*, s16*, int);
 extern "C" void SetSingWinInfo__8CMenuPcsFiiii(CMenuPcs*, int, int, int, int);
 extern "C" void SingLifeInit__8CMenuPcsFi(CMenuPcs*, int);
-extern "C" void SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(CMenuPcs*, int);
-extern "C" void SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(CMenuPcs*, int);
 extern "C" void DrawRect__8CMenuPcsFUlfffffffff(CMenuPcs*, unsigned long, float, float, float, float, float, float, float, float, float);
 extern "C" void DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(CMenuPcs*, unsigned long, float, float, float, float, float, float, GXColor*, float, float, float);
 extern "C" void DrawSingleIcon__8CMenuPcsFiiifif(CMenuPcs*, int, int, int, float, int, float);
@@ -336,7 +334,7 @@ void CMenuPcs::ItemDraw()
     int selectedItemId = -1;
 
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-    SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(&MenuPcs, 0);
+    MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
     int caravanWork = Game.m_scriptFoodBase[0];
     ItemMenuState* itemState = this->itemMenuState;
@@ -364,8 +362,8 @@ void CMenuPcs::ItemDraw()
         float uvScale = *(float*)(entry + 10);
 
         if (i == 0) {
-            SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(&MenuPcs, 1);
-            SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, tex);
+            MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(1));
+            MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));
 
             GXColor barColors[4];
             barColors[0].r = 0xFF;
@@ -418,7 +416,7 @@ void CMenuPcs::ItemDraw()
                     &MenuPcs, 0, x, y, remainW, h, u, v, fadeColors, FLOAT_80332e64, FLOAT_80332e64, FLOAT_80332e60);
             }
 
-            SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(&MenuPcs, 0);
+            MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
         } else {
             float itemAlpha = alpha;
             if (tex == 0x37) {
@@ -445,7 +443,7 @@ void CMenuPcs::ItemDraw()
                 drawIndex++;
             }
 
-            SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, tex);
+            MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));
             GXColor color;
             color.r = 0xFF;
             color.g = 0xFF;

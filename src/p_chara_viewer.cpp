@@ -70,10 +70,7 @@ extern "C" const double kCharaSharedSignedIntBias = 4503601774854144.0;
 
 extern "C" void SRTToMatrix__5CMathFPA4_fP3SRT(void*, Mtx, void*);
 extern "C" void Printf__8CGraphicFPce(void*, const char*, ...);
-extern "C" void Destroy__6CCharaFv(CChara*);
-extern "C" void Create__6CCharaFv(CChara*);
 extern "C" void* createTextureSet__9CCharaPcsFPvi(void*, void*, int);
-extern "C" void Create__Q26CChara5CAnimFPvPQ27CMemory6CStage(void*, void*, void*);
 extern "C" float FLOAT_80330BEC;
 extern "C" float FLOAT_80330BF0;
 extern "C" double fmod(double, double);
@@ -435,8 +432,7 @@ void CCharaPcs::calcViewer()
                     CChara::CAnim* anim =
                         new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_viewer_cpp), 0x111) CChara::CAnim;
                     self->m_viewerAnim[0] = anim;
-                    Create__Q26CChara5CAnimFPvPQ27CMemory6CStage(
-                        self->m_viewerAnim[0], File.m_readBuffer, self->m_viewerAnimStage);
+                    self->m_viewerAnim[0]->Create(File.m_readBuffer, self->m_viewerAnimStage);
                     File.Close(fileHandle);
                 }
                 self->m_viewerLoadAnim = 0;
@@ -453,8 +449,7 @@ void CCharaPcs::calcViewer()
                         CChara::CAnim* anim =
                             new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_viewer_cpp), 0x124) CChara::CAnim;
                         self->m_viewerAnimBank[idx] = anim;
-                        Create__Q26CChara5CAnimFPvPQ27CMemory6CStage(
-                            self->m_viewerAnimBank[idx], File.m_readBuffer, self->m_viewerAnimStage);
+                        self->m_viewerAnimBank[idx]->Create(File.m_readBuffer, self->m_viewerAnimStage);
                         File.Close(fileHandle);
                         if (idx == 0) {
                             self->m_viewerAnim[0] = self->m_viewerAnimBank[0];
@@ -715,7 +710,7 @@ void CCharaPcs::destroyViewer()
     unsigned int i;
     unsigned int j;
 
-    Destroy__6CCharaFv(&Chara);
+    Chara.Destroy();
     LightPcs.DestroyBumpLightAll(static_cast<CLightPcs::TARGET>(0));
     gCharaPartWorkPtr = 0;
 
@@ -874,5 +869,5 @@ void CCharaPcs::createViewer()
         &bumpLight, static_cast<CLightPcs::TARGET>(0),
         *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(&Chara) + 0x2058), 4));
 
-    Create__6CCharaFv(&Chara);
+    Chara.Create();
 }

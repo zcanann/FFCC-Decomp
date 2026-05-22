@@ -4921,10 +4921,10 @@ void GbaQueue::SetControllerMode(int controllerMode)
 			} else {
 				ret = Joybus.SetMType(i, 0);
 			}
-			retries++;
 			if (ret == 0) {
 				break;
 			}
+			retries++;
 		} while (retries < 10);
 	}
 }

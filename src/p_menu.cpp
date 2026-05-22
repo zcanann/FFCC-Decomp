@@ -258,7 +258,7 @@ void CMenuPcs::Init()
     BonusInit__8CMenuPcsFv(this);
 
     self[0x8E] = 0;
-    one = kMenuInitOne;
+    one = LoadFloat(kMenuInitOne);
     i = 1;
     cardChannel = reinterpret_cast<int*>(self + 0x838);
     self[0x8F] = 0;
@@ -959,7 +959,8 @@ void CMenuPcs::draw()
 
     PSMTXIdentity(modelMtx);
     GXLoadPosMtxImm(modelMtx, 0);
-    C_MTXOrtho(orthoMtx, kMenuInitOne, kMenuOrthoBottom, kMenuInitOne, kMenuOrthoRight, kMenuInitOne, kMenuOrthoFar);
+    C_MTXOrtho(orthoMtx, LoadFloat(kMenuInitOne), LoadFloat(kMenuOrthoBottom), LoadFloat(kMenuInitOne),
+               LoadFloat(kMenuOrthoRight), LoadFloat(kMenuInitOne), LoadFloat(kMenuOrthoFar));
     GXSetProjection(orthoMtx, GX_ORTHOGRAPHIC);
     GXSetNumChans(1);
     GXSetChanCtrl(GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
@@ -1003,14 +1004,13 @@ void CMenuPcs::draw()
         CTexture* texture = *reinterpret_cast<CTexture**>(reinterpret_cast<u8*>(this) + 0x190);
         TextureMan.SetTexture(GX_TEXMAP0, texture);
 
-        if (texture != nullptr) {
-            float width = static_cast<float>(*reinterpret_cast<u32*>(reinterpret_cast<u8*>(texture) + 0x64));
-            float height = static_cast<float>(*reinterpret_cast<u32*>(reinterpret_cast<u8*>(texture) + 0x68));
-            PSMTXScale(texMtx, 1.0f / width, 1.0f / height, 1.0f);
-            GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX2x4);
-            GXSetNumTexGens(1);
-            GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
-        }
+        float width = static_cast<float>(*reinterpret_cast<u32*>(reinterpret_cast<u8*>(texture) + 0x64));
+        float height = static_cast<float>(*reinterpret_cast<u32*>(reinterpret_cast<u8*>(texture) + 0x68));
+        PSMTXScale(texMtx, LoadFloat(FLOAT_80330808) / width, LoadFloat(FLOAT_80330808) / height,
+                   LoadFloat(FLOAT_80330808));
+        GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX2x4);
+        GXSetNumTexGens(1);
+        GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
 
         TextureMan.SetTextureTev(texture);
 
@@ -1018,7 +1018,9 @@ void CMenuPcs::draw()
             int alpha = static_cast<int>(127.5f * (1.0f + sinf(System.m_frameCounter * FLOAT_80330848)));
             CColor color(0xFF, 0xFF, 0xFF, static_cast<u8>(alpha));
             GXSetChanMatColor(GX_COLOR0A0, color.color);
-            DrawRect(3, 0.0f, 0.0f, 640.0f, 480.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+            DrawRect(3, LoadFloat(FLOAT_80330810), LoadFloat(FLOAT_80330814), LoadFloat(FLOAT_80330850),
+                     LoadFloat(FLOAT_80330854), LoadFloat(kMenuInitOne), LoadFloat(kMenuInitOne),
+                     LoadFloat(FLOAT_80330808), LoadFloat(FLOAT_80330808), LoadFloat(kMenuInitOne));
         }
     }
 
@@ -1042,7 +1044,8 @@ void CMenuPcs::DrawInit()
 
     PSMTXIdentity(modelMtx);
     GXLoadPosMtxImm(modelMtx, 0);
-    C_MTXOrtho(orthoMtx, kMenuInitOne, kMenuOrthoBottom, kMenuInitOne, kMenuOrthoRight, kMenuInitOne, kMenuOrthoFar);
+    C_MTXOrtho(orthoMtx, LoadFloat(kMenuInitOne), LoadFloat(kMenuOrthoBottom), LoadFloat(kMenuInitOne),
+               LoadFloat(kMenuOrthoRight), LoadFloat(kMenuInitOne), LoadFloat(kMenuOrthoFar));
     GXSetProjection(orthoMtx, GX_ORTHOGRAPHIC);
     GXSetNumChans(1);
     GXSetChanCtrl(GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);

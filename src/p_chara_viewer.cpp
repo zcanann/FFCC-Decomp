@@ -3,6 +3,7 @@
 #include "ffcc/color.h"
 #include "ffcc/file.h"
 #include "ffcc/graphic.h"
+#include "ffcc/gxfunc.h"
 #include "ffcc/linkage.h"
 #include "ffcc/math.h"
 #include "ffcc/memory.h"
@@ -67,7 +68,6 @@ extern "C" const double kCharaSharedSignedIntBias = 4503601774854144.0;
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
-extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
 extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, unsigned char, int, int,
@@ -236,7 +236,7 @@ void CCharaPcs::drawViewer()
         PSMTXIdentity(cameraMtx);
         GXLoadPosMtxImm(cameraMtx, 0);
         GXSetCurrentMtx(0);
-        _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 1, 0, 0);
+        _GXSetBlendMode(GX_BM_BLEND, GX_BL_ONE, GX_BL_ZERO, GX_LO_CLEAR);
         GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
         GXSetNumChans(0);
         GXSetNumTevStages(1);
@@ -278,7 +278,7 @@ void CCharaPcs::drawViewer()
     GXSetProjection(projMtx, GX_PERSPECTIVE);
 
     if (self->m_viewerDrawGrid != 0) {
-        _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+        _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
         GXSetZCompLoc(GX_FALSE);
         _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(6, 1, 0, 7, 0);
         GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);

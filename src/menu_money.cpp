@@ -14,18 +14,6 @@ typedef unsigned char u8;
 typedef signed short s16;
 typedef unsigned short u16;
 
-extern "C" void SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(CMenuPcs*, int);
-extern "C" void SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(CMenuPcs*, int);
-extern "C" void DrawRect__8CMenuPcsFUlfffffffff(CMenuPcs*, unsigned long, float, float, float, float, float, float, float, float, float);
-extern "C" void DrawSingWin__8CMenuPcsFs(CMenuPcs*, short);
-extern "C" void DrawSingWinMess__8CMenuPcsFiii(CMenuPcs*, int, int, int);
-extern "C" int SingWinMessHeight__8CMenuPcsFv(CMenuPcs*);
-extern "C" void DrawCursor__8CMenuPcsFiif(CMenuPcs*, int, int, float);
-extern "C" void DrawInit__8CMenuPcsFv(CMenuPcs*);
-extern "C" void GetSingWinSize__8CMenuPcsFiPsPsi(CMenuPcs*, int, s16*, s16*, int);
-extern "C" void SetSingWinInfo__8CMenuPcsFiiii(CMenuPcs*, int, int, int, int);
-
-
 static const float LOCAL_FLOAT_80332f60 = 255.0f;
 extern const float FLOAT_80332f64;
 static const float LOCAL_FLOAT_80332f64 = 0.0f;
@@ -270,8 +258,8 @@ int CMenuPcs::MoneyCtrlCur()
 					if (reinterpret_cast<CCaravanWork*>(caravanWork)->CanPlayerPutItem() != 0) {
 						this->moneyState->messageMask = this->moneyState->messageMask | 1;
 					}
-					GetSingWinSize__8CMenuPcsFiPsPsi(this, 1, &winW, &winH, 0);
-					SetSingWinInfo__8CMenuPcsFiiii(this, 0xF0, 0xD0, winW, winH);
+					GetSingWinSize(1, &winW, &winH, 0);
+					SetSingWinInfo(0xF0, 0xD0, winW, winH);
 					this->singWindowInfo[5] = 0;
 					*(s16*)(menuState + 0x12) = 0;
 					*(s16*)(menuState + 0x30) = 1;
@@ -386,7 +374,7 @@ int CMenuPcs::MoneyCtrlCur()
 void CMenuPcs::MoneyDraw()
 {
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(&MenuPcs, 0);
+	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
 	s16 selectionState = this->moneyState->listState;
 	s16 mode = this->moneyState->mode;
@@ -404,7 +392,7 @@ void CMenuPcs::MoneyDraw()
 		float h = (float)entry->h;
 		float u = entry->u;
 		float v = entry->v;
-		SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, tex);
+		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));
 		GXColor color;
 		color.r = 0xFF;
 		color.g = 0xFF;
@@ -412,11 +400,11 @@ void CMenuPcs::MoneyDraw()
 		color.a = (u8)(LOCAL_FLOAT_80332f60 * entry->alpha);
 		GXSetChanMatColor(GX_COLOR0A0, color);
 		float uvScale = entry->uvScale;
-		DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 0, x, y, w, h, u, v, uvScale, uvScale, LOCAL_FLOAT_80332f64);
+		MenuPcs.DrawRect(0, x, y, w, h, u, v, uvScale, uvScale, LOCAL_FLOAT_80332f64);
 	}
 
 	s16* drawBase = reinterpret_cast<s16*>(this->moneyPanel->anims);
-	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x5D);
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x5D));
 	{
 		GXColor color;
 		color.r = 0xFF;
@@ -432,16 +420,16 @@ void CMenuPcs::MoneyDraw()
 		for (int j = 0; j < 8; j++) {
 			signed char digit = s_place[i * 8 + j];
 			if (digit >= 0) {
-				DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 0, x, y, LOCAL_FLOAT_80332f6c, LOCAL_FLOAT_80332f68,
-				                                LOCAL_FLOAT_80332f6c * (float)digit, LOCAL_FLOAT_80332f68 * (float)i,
-				                                LOCAL_FLOAT_80332f70, LOCAL_FLOAT_80332f70, LOCAL_FLOAT_80332f64);
+				MenuPcs.DrawRect(0, x, y, LOCAL_FLOAT_80332f6c, LOCAL_FLOAT_80332f68,
+				                 LOCAL_FLOAT_80332f6c * (float)digit, LOCAL_FLOAT_80332f68 * (float)i,
+				                 LOCAL_FLOAT_80332f70, LOCAL_FLOAT_80332f70, LOCAL_FLOAT_80332f64);
 			}
 			x += LOCAL_FLOAT_80332f74;
 		}
 	}
 
 	if ((mode == 0) && (selectionState == 1)) {
-		SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x48);
+		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x48));
 		{
 			GXColor color;
 			color.r = 0xFF;
@@ -451,10 +439,10 @@ void CMenuPcs::MoneyDraw()
 			GXSetChanMatColor(GX_COLOR0A0, color);
 		}
 
-		DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 0, (float)(drawBase[0] + (7 - this->moneyState->selectedIndex) * 0x12 + 0x24),
-		                                (float)(drawBase[1] + 0x5C), LOCAL_FLOAT_80332f78, LOCAL_FLOAT_80332f6c,
-		                                LOCAL_FLOAT_80332f64, LOCAL_FLOAT_80332f64, LOCAL_FLOAT_80332f70,
-		                                LOCAL_FLOAT_80332f70, LOCAL_FLOAT_80332f64);
+		MenuPcs.DrawRect(0, (float)(drawBase[0] + (7 - this->moneyState->selectedIndex) * 0x12 + 0x24),
+		                 (float)(drawBase[1] + 0x5C), LOCAL_FLOAT_80332f78, LOCAL_FLOAT_80332f6c,
+		                 LOCAL_FLOAT_80332f64, LOCAL_FLOAT_80332f64, LOCAL_FLOAT_80332f70,
+		                 LOCAL_FLOAT_80332f70, LOCAL_FLOAT_80332f64);
 	}
 
 	CFont* font = this->moneyFont;
@@ -476,24 +464,23 @@ void CMenuPcs::MoneyDraw()
 		font->Draw(label);
 	}
 
-	DrawInit__8CMenuPcsFv(this);
+	DrawInit();
 	if (mode == 1) {
-		DrawSingWin__8CMenuPcsFs(this, -1);
+		DrawSingWin(-1);
 		if (this->moneyState->optionState == 1) {
-			DrawSingWinMess__8CMenuPcsFiii(this, 1, (int)this->moneyState->messageMask, 0);
+			DrawSingWinMess(1, (int)this->moneyState->messageMask, 0);
 		}
 	}
 
 	if ((mode != 0) && (this->moneyState->optionState == 1)) {
 		s16* singWindow = this->singWindowInfo;
 		float cursorY = (float)(singWindow[1] + 0x20);
-		cursorY += (float)(this->moneyState->subMenuIndex * SingWinMessHeight__8CMenuPcsFv(this));
+		cursorY += (float)(this->moneyState->subMenuIndex * SingWinMessHeight());
 
 		int frame = (int)System.m_frameCounter;
 		int frameSign = frame >> 31;
 		int anim = ((frameSign * 8) | ((frame * 0x20000000 + frameSign) >> 29)) - frameSign;
-		DrawCursor__8CMenuPcsFiif(this, (int)((float)singWindow[0] + (float)anim), (int)cursorY,
-		                           LOCAL_FLOAT_80332f70);
+		DrawCursor((int)((float)singWindow[0] + (float)anim), (int)cursorY, LOCAL_FLOAT_80332f70);
 	}
 }
 

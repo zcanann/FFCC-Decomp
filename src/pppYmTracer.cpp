@@ -18,9 +18,6 @@ extern u32 DAT_803306e0;
 extern u32 DAT_803306e4;
 
 extern "C" {
-void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-    void*, void*, float, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char,
-    unsigned char);
 int GetTexture__8CMapMeshFP12CMaterialSetRi(CMapMesh*, CMaterialSet*, int&);
 void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
 void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
@@ -109,8 +106,9 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYm
 
     if (dataValIndex != 0xFFFF) {
         pppSetBlendMode(param_2->m_tracer.m_blendMode);
-        pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-            colorData + 8, (void*)&ppvCameraMatrix, FLOAT_803306e8,
+        pppSetDrawEnv(
+            reinterpret_cast<pppCVECTOR*>(colorData + 8), reinterpret_cast<pppFMATRIX*>(&ppvCameraMatrix),
+            FLOAT_803306e8,
             param_2->m_tracer.m_drawEnvColor1, param_2->m_tracer.m_drawEnvColor0,
             param_2->m_tracer.m_blendMode, 0, 1, 1, 0);
         gUtil.SetVtxFmt_POS_CLR_TEX();

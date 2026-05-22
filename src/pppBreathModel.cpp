@@ -17,7 +17,6 @@ void pppSetBlendMode(unsigned char);
 
 extern "C" {
 void pppHeapUseRate__FPQ27CMemory6CStage(void* stage);
-void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(void*, void*, float, u8, u8, u8, u8, u8, u8, u8);
 
 void pppDrawMesh__FP10pppModelStP3Veci(pppModelSt*, Vec*, int);
 
@@ -317,10 +316,10 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
     pppInitBlendMode();
     pppSetBlendMode(pBreathModel->m_blendMode);
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
-    pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-        NULL, NULL, pBreathModel->m_drawEnvScale, pBreathModel->m_drawEnvColor1, pBreathModel->m_drawEnvColor0,
-        pBreathModel->m_blendMode, pBreathModel->m_drawEnvColor2, pBreathModel->m_drawEnvColor3, 1,
-        pBreathModel->m_drawEnvColor4);
+    pppSetDrawEnv(
+        static_cast<pppCVECTOR*>(NULL), static_cast<pppFMATRIX*>(NULL), pBreathModel->m_drawEnvScale,
+        pBreathModel->m_drawEnvColor1, pBreathModel->m_drawEnvColor0, pBreathModel->m_blendMode,
+        pBreathModel->m_drawEnvColor2, pBreathModel->m_drawEnvColor3, static_cast<u8>(1), pBreathModel->m_drawEnvColor4);
 
     colorR = color->m_red;
     colorG = color->m_green;

@@ -16,11 +16,8 @@
 #include <math.h>
 #include <string.h>
 
-extern "C" void CalcBind__Q26CChara5CNodeFPQ26CChara6CModel(void*, void*);
 extern "C" void freeFurTex__6CCharaFv();
 extern "C" void makeFurTex__6CCharaFv(CChara*);
-extern "C" void gqrInit__6CCharaFUlUlUl(void*, unsigned long, unsigned long, unsigned long);
-extern "C" void Calc__Q26CChara5CMeshFPQ26CChara6CModel(void*, void*);
 extern "C" void Create__Q26CChara5CNodeFR10CChunkFilePQ26CChara6CModelQ36CChara5CNode4TYPEPQ27CMemory6CStage(
     void*, CChunkFile&, void*, int, CMemory::CStage*);
 extern "C" void Create__Q26CChara5CMeshFPQ26CChara6CModelR10CChunkFilePQ27CMemory6CStage(
@@ -1334,7 +1331,7 @@ void CChara::CModel::calcBindMatrix()
 
 	while (i < *(u32*)((u8*)*(void**)((u8*)this + 0xA4) + 8)) {
 		if (*(s16*)((u8*)*(void**)node + 0x68) < 0) {
-			CalcBind__Q26CChara5CNodeFPQ26CChara6CModel(node, this);
+			node->CalcBind(this);
 		}
 		i++;
 		node = (CNode*)((u8*)node + 0xC0);
@@ -1411,18 +1408,18 @@ void CChara::CModel::CalcMatrix()
  */
 void CChara::CModel::CalcSkin()
 {
-	void* mesh = *(void**)((u8*)this + 0xAC);
+	CMesh* mesh = *(CMesh**)((u8*)this + 0xAC);
 	u32 posQuant = ModelPosQuant(this);
 	u32 normQuant = ModelNormQuant(this);
 	u16 meshCount = ModelMeshCount(this);
 	u32 i = 0;
 
-	gqrInit__6CCharaFUlUlUl(&gChara, (posQuant << 24) | 0x70000 | (posQuant << 8) | 7,
-	                        (normQuant << 24) | 0x70000 | (normQuant << 8) | 7, 0x0C070C07);
+	gChara.gqrInit((posQuant << 24) | 0x70000 | (posQuant << 8) | 7,
+	               (normQuant << 24) | 0x70000 | (normQuant << 8) | 7, 0x0C070C07);
 
 	while (i < meshCount) {
-		Calc__Q26CChara5CMeshFPQ26CChara6CModel(mesh, this);
-		mesh = (u8*)mesh + 0x14;
+		mesh->Calc(this);
+		mesh = (CMesh*)((u8*)mesh + 0x14);
 		i++;
 	}
 }

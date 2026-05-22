@@ -5,6 +5,7 @@
 #include "ffcc/materialman.h"
 #include "ffcc/pad.h"
 #include "ffcc/game.h"
+#include "ffcc/gobjwork.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/pppShape.h"
@@ -28,7 +29,6 @@ void GetRaceStr__8CMenuPcsFiPc(void*, int, char*);
 int ChkEquipPossible__8CMenuPcsFi(void*, int);
 void GetRecipeMaterial__8CMenuPcsFiPQ28CMenuPcs12MaterialInfo(void*, int, short*);
 int CanAddGil__12CCaravanWorkFi(void*, int);
-void AddItem__12CCaravanWorkFiPi(void*, int, int*);
 void AddGil__12CCaravanWorkFi(void*, int);
 void DeleteItem__12CCaravanWorkFii(void*, int, int);
 void DeleteItemIdx__12CCaravanWorkFii(void*, int, int);
@@ -417,7 +417,7 @@ static void ExecuteShopMenuBuyConfirm(CShopMenu* shopMenu)
             return;
         }
 
-        AddItem__12CCaravanWorkFiPi(reinterpret_cast<void*>(caravan), static_cast<short>(itemId), 0);
+        reinterpret_cast<CCaravanWork*>(caravan)->AddItem(static_cast<short>(itemId), 0);
         AddGil__12CCaravanWorkFi(reinterpret_cast<void*>(caravan), -CalcShopMenuTradeGil(shopMenu, itemId));
         ++quantity;
     }
@@ -2329,7 +2329,7 @@ void CShopMenu::SelectYesNo()
                 return;
             }
 
-            AddItem__12CCaravanWorkFiPi(reinterpret_cast<void*>(caravan), static_cast<short>(itemId), 0);
+            reinterpret_cast<CCaravanWork*>(caravan)->AddItem(static_cast<short>(itemId), 0);
             AddGil__12CCaravanWorkFi(reinterpret_cast<void*>(caravan), -CalcShopMenuTradeGil(this, itemId));
             ++quantity;
         }
@@ -2787,10 +2787,8 @@ void CShopMenu::Calc()
                 }
             }
 
-            AddItem__12CCaravanWorkFiPi(
-                reinterpret_cast<void*>(ShopMenuCaravan(this)),
-                static_cast<short>(ShopMenuInt(this, 0x150)),
-                &ShopMenuInt(this, 0x154));
+            reinterpret_cast<CCaravanWork*>(ShopMenuCaravan(this))
+                ->AddItem(static_cast<short>(ShopMenuInt(this, 0x150)), &ShopMenuInt(this, 0x154));
             this->SetMode(0x10);
         }
         break;

@@ -2529,15 +2529,16 @@ void CGPartyObj::canPlayerGoMenu()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGPartyObj::useItem(int itemId)
+int CGPartyObj::useItem(int itemId)
 {
 	if (canPlayerUseItem() == 0) {
-		return;
+		return 0;
 	}
 	if (itemId >= 0) {
 		PartyData(this).weaponItem = itemId;
 	}
 	changeStat(0x1A, 0, 0);
+	return 1;
 }
 
 /*
@@ -2577,17 +2578,17 @@ int CGPartyObj::canPlayerPutItem()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGPartyObj::putItem(int)
+int CGPartyObj::putItem(int)
 {
 	if (canPlayerPutItem() == 0) {
-		return;
+		return 0;
 	}
 
 	int itemId = PartyData(this).weaponItem;
 	void* created = CreateFromScript__9CGItemObjFiiiP8CGObjectfPQ29CGItemObj4CCFS(
 	    0, 9, itemId, this, FLOAT_80331a78, (CGItemObj::CCFS*)0);
 	if (created == nullptr) {
-		return;
+		return 0;
 	}
 
 	*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(created) + 0x562) =
@@ -2595,6 +2596,7 @@ void CGPartyObj::putItem(int)
 	if (Game.m_gameWork.m_menuStageMode == 0) {
 		changeStat(0x1B, 0, 0);
 	}
+	return 1;
 }
 
 /*
@@ -2606,16 +2608,16 @@ void CGPartyObj::putItem(int)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGPartyObj::putGil(int amount)
+int CGPartyObj::putGil(int amount)
 {
 	if (canPlayerPutItem() == 0) {
-		return;
+		return 0;
 	}
 
 	void* created = CreateFromScript__9CGItemObjFiiiP8CGObjectfPQ29CGItemObj4CCFS(
 	    2, 1, amount, this, FLOAT_80331a78, (CGItemObj::CCFS*)0);
 	if (created == nullptr) {
-		return;
+		return 0;
 	}
 
 	*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(created) + 0x560) = 1;
@@ -2624,6 +2626,7 @@ void CGPartyObj::putGil(int amount)
 	if (Game.m_gameWork.m_menuStageMode == 0) {
 		changeStat(0x1B, 0, 0);
 	}
+	return 1;
 }
 
 /*

@@ -44,9 +44,6 @@ static inline float GetStatusMultiplier(int offset)
 }
 }
 
-extern "C" int useItem__10CGPartyObjFi(CGPartyObj*, int);
-extern "C" int putItem__10CGPartyObjFi(CGPartyObj*, int);
-extern "C" int putGil__10CGPartyObjFi(CGPartyObj*, int);
 extern "C" int GetSkillStr__8CMenuPcsFi(void*, int);
 extern "C" void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
 	void*, void*, int, int, int, void*, void*);
@@ -646,7 +643,7 @@ void CCaravanWork::FGLetterReply(int letterIdx, int param3, int param4, int para
  */
 void CCaravanWork::FGUseItem(int itemIdx, int updateJoybus)
 {
-	int used = useItem__10CGPartyObjFi((CGPartyObj*)m_ownerObj, (int)(short)m_inventoryItems[itemIdx]);
+	int used = static_cast<CGPartyObj*>(m_ownerObj)->useItem(static_cast<short>(m_inventoryItems[itemIdx]));
 	if ((used != 0) && ((short)m_inventoryItems[itemIdx] != -1)) {
 		m_inventoryItems[itemIdx] = 0xFFFF;
 		m_inventoryItemCount--;
@@ -667,7 +664,7 @@ void CCaravanWork::FGUseItem(int itemIdx, int updateJoybus)
  */
 void CCaravanWork::FGPutItem(int itemIdx, int updateJoybus)
 {
-	int put = putItem__10CGPartyObjFi((CGPartyObj*)m_ownerObj, (int)(short)m_inventoryItems[itemIdx]);
+	int put = static_cast<CGPartyObj*>(m_ownerObj)->putItem(static_cast<short>(m_inventoryItems[itemIdx]));
 	if ((put != 0) && ((short)m_inventoryItems[itemIdx] != -1)) {
 		m_inventoryItems[itemIdx] = 0xFFFF;
 		m_inventoryItemCount--;
@@ -688,7 +685,7 @@ void CCaravanWork::FGPutItem(int itemIdx, int updateJoybus)
  */
 void CCaravanWork::FGPutGil(int gilToRemove)
 {
-	int put = putGil__10CGPartyObjFi((CGPartyObj*)m_ownerObj, gilToRemove);
+	int put = static_cast<CGPartyObj*>(m_ownerObj)->putGil(gilToRemove);
 	if (put != 0) {
 		m_gil += -gilToRemove;
 		if (m_gil > 99999999) {

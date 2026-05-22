@@ -102,11 +102,11 @@ public:
     void bonus(int, int, CGPrgObj*);
     int canPlayerUseItem();
     void canPlayerGoMenu();
-    void useItem(int);
+    int useItem(int);
 
     int canPlayerPutItem();
-    void putItem(int);
-    void putGil(int);
+    int putItem(int);
+    int putGil(int);
 
     void statRebound();
     void statKorobi();

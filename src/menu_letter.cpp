@@ -4,6 +4,7 @@
 #include "ffcc/gxfunc.h"
 #include "ffcc/pad.h"
 #include "ffcc/game.h"
+#include "ffcc/gobjwork.h"
 #include "ffcc/sound.h"
 #include "ffcc/system.h"
 #include "ffcc/mes.h"
@@ -26,7 +27,6 @@ extern "C" void SetSingDynamicWinMessInfo__8CMenuPcsFiPcPcPcPcPcPcPcPc(CMenuPcs*
 extern "C" void GetSingWinSize__8CMenuPcsFiPsPsi(CMenuPcs*, int, s16*, s16*, int);
 extern "C" void SetMcWinInfo__8CMenuPcsFii(CMenuPcs*, int, int);
 
-extern "C" void AddItem__12CCaravanWorkFiPi(void*, int, int*);
 extern "C" void AddGil__12CCaravanWorkFi(void*, int);
 extern "C" int CanAddGil__12CCaravanWorkFi(void*, int);
 extern "C" void FGLetterReply__12CCaravanWorkFiiii(void*, int, int, int, int);
@@ -1853,7 +1853,7 @@ int CMenuPcs::LetterCtrlCur()
 					int entry = caravanWork + s_SelLetter * 0xC;
 					unsigned int value = *reinterpret_cast<u16*>(entry + 0x3EE) & 0x1FF;
 					if (((*reinterpret_cast<u8*>(entry + 0x3EC) >> 3) & 1) == 0) {
-						AddItem__12CCaravanWorkFiPi(reinterpret_cast<void*>(caravanWork), static_cast<int>(value), 0);
+						reinterpret_cast<CCaravanWork*>(caravanWork)->AddItem(static_cast<int>(value), 0);
 					} else {
 						AddGil__12CCaravanWorkFi(reinterpret_cast<void*>(caravanWork), static_cast<int>(value * 100));
 					}

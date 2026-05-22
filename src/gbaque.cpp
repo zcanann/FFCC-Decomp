@@ -22,7 +22,6 @@ GbaQueue GbaQue;
 extern "C" int rand(void);
 extern "C" int memcmp(const void*, const void*, unsigned long);
 extern "C" void MakeAgbString__4CMesFPcPcii(char*, char*, int, int);
-extern "C" int AddItem__12CCaravanWorkFiPi(void*, int, int*);
 extern "C" int AddGil__12CCaravanWorkFi(void*, int);
 extern "C" int CanAddGil__12CCaravanWorkFi(void*, int);
 extern "C" int IsOutOfShouki__12CCaravanWorkFv(void*);
@@ -2558,7 +2557,7 @@ void GbaQueue::MoveLetterItem(int channel, unsigned int value)
 		int item = *reinterpret_cast<unsigned short*>(letter + 0x3EE) & 0x1FF;
 		if (item != 0) {
 			if ((item < 1) || (item > 0x9E)) {
-				if (AddItem__12CCaravanWorkFiPi(reinterpret_cast<void*>(caravanWork), item, 0) == 0) {
+				if (caravanWork->AddItem(item, 0) == 0) {
 					result = 1;
 				} else {
 					result = 0;

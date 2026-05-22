@@ -35,7 +35,6 @@ extern "C" void changeMode__8CMenuPcsFQ28CMenuPcs8MENUMODE(CMenuPcs*, int);
 extern "C" int GetItemType__8CMenuPcsFii(CMenuPcs*, int, int);
 extern "C" unsigned int BindEffect__8CMenuPcsFiii(CMenuPcs*, int, int, int);
 extern "C" void freeTexture__8CMenuPcsFiiii(CMenuPcs*, int, int, int, int);
-extern "C" int AddItem__12CCaravanWorkFiPi(void*, int, int*);
 extern "C" int sprintf(char*, const char*, ...);
 extern "C" int rand(void);
 extern char* PTR_s_bonus_802128c0[];
@@ -710,7 +709,7 @@ static void GrantSelectedBonusArtifacts()
 				caravanWork->m_artifacts[artifactSlot] = static_cast<unsigned short>(itemId);
 			}
 		} else {
-			AddItem__12CCaravanWorkFiPi(reinterpret_cast<void*>(caravanWork), itemId, 0);
+			caravanWork->AddItem(itemId, 0);
 		}
 	}
 }

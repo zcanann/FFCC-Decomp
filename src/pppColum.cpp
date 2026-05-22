@@ -1,4 +1,5 @@
 #include "ffcc/pppColum.h"
+#include "ffcc/gxfunc.h"
 #include "ffcc/math.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
@@ -67,11 +68,6 @@ extern const float FLOAT_803310A0;
 extern const float FLOAT_803310A4;
 extern const float FLOAT_803310A8;
 
-extern "C" {
-void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
-void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
-}
-
 static inline int ColumFpClassify(float value)
 {
     ColumFloatBits bits;
@@ -128,9 +124,9 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
     if (param_2->m_dataValIndex != 0xFFFF) {
         pppShapeSt* shapeSt =
             *(pppShapeSt**)(*(int*)&pppEnvStPtr->m_particleColors[0] + param_2->m_dataValIndex * 4);
-        int texture;
+        void* texture;
 
-        texture = (int)shapeSt->GetTexture((long*)shapeSt->m_animData, pppEnvStPtr->m_materialSetPtr, textureIndex);
+        texture = shapeSt->GetTexture((long*)shapeSt->m_animData, pppEnvStPtr->m_materialSetPtr, textureIndex);
         if (positionWork->m_alpha != 0) {
             Vec cameraDelta;
             Vec center;
@@ -218,10 +214,10 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
 
                 gUtil.BeginQuadEnv();
                 gUtil.SetVtxFmt_POS_CLR_TEX();
-                _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 4);
-                _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 0);
+                _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
+                _GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
                 GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
-                GXLoadTexObj((GXTexObj*)(texture + 0x28), GX_TEXMAP0);
+                GXLoadTexObj((GXTexObj*)((u8*)texture + 0x28), GX_TEXMAP0);
                 pppSetBlendMode(param_2->m_arg3);
 
                 drawScale += values->m_scaleStep;

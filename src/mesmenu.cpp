@@ -11,16 +11,13 @@
 #include "ffcc/sound.h"
 #include "ffcc/system.h"
 #include "ffcc/cflat_runtime2.h"
+#include "ffcc/textureman.h"
 
 #include <math.h>
 #include <string.h>
 
 extern "C" {
-void Create__5CMenuFv(void* menu);
-void Destroy__5CMenuFv(void* menu);
-void SetFade__9CRingMenuFi(void* ringMenu, int fade);
 int __cntlzw(unsigned int);
-void SetExternalTlut__8CTextureFPvi(void* texture, void* tlut, int enable);
 
 static const char s_CMesMenu_801D9E90[] = "CMesMenu";
 const char DAT_801d9e9c[] =
@@ -128,8 +125,7 @@ void CMesMenu::CloseRequest(int closeReason)
             *(int*)((char*)this + 0x08) = 0;
             if (*(int*)((char*)this + 0x18) < 4) {
                 int menuIndex = *(int*)((char*)this + 0x18);
-                void** ringMenuSlots = (void**)((char*)&MenuPcs + 0x13C);
-                SetFade__9CRingMenuFi(ringMenuSlots[menuIndex], 1);
+                MenuPcs.m_battleRingMenus[menuIndex]->SetFade(1);
             }
         } else {
             *(int*)((char*)this + 0x0C) = 2;
@@ -180,7 +176,7 @@ void CMesMenu::Open(char* script, int x, int y, int flags, int unk1, int unk2, i
         *(unsigned int*)((char*)this + 0x3D50) = (unsigned int)displayOffset;
         *(unsigned int*)((char*)this + 0x3D54) = uVar2;
     } else {
-        SetFade__9CRingMenuFi(*(void**)((char*)&MenuPcs + 0x13C + *(int*)((char*)this + 0x18) * 4), 0);
+        MenuPcs.m_battleRingMenus[*(int*)((char*)this + 0x18)]->SetFade(0);
         *(float*)((char*)this + 0x3D9C) = FLOAT_803308e0;
         fVar1 = FLOAT_803308e4;
         *(float*)((char*)this + 0x3DA0) = fVar1;
@@ -277,15 +273,13 @@ void CMesMenu::onScriptChanged(char*, int)
 void CMesMenu::onScriptChanging(char*)
 {
     int menuIndex;
-    void** ringMenuSlots;
 
     m_mes.Set(0, 0);
     *(int*)((char*)this + 0x0C) = 4;
     *(int*)((char*)this + 0x08) = 0;
     menuIndex = *(int*)((char*)this + 0x18);
     if (menuIndex < 4) {
-        ringMenuSlots = (void**)((char*)&MenuPcs + 0x13C);
-        SetFade__9CRingMenuFi(ringMenuSlots[menuIndex], 1);
+        MenuPcs.m_battleRingMenus[menuIndex]->SetFade(1);
     }
 }
 
@@ -615,7 +609,7 @@ void CMesMenu::onDraw()
                     colorStorage = CColor(0xFF, 0xFF, 0xFF, (unsigned char)(int)alphaF);
                     MenuPcs.SetColor(colorStorage);
                     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x18));
-                    SetExternalTlut__8CTextureFPvi(MenuPcs.m_textures[0x18], 0, 1);
+                    MenuPcs.m_textures[0x18]->SetExternalTlut(nullptr, 1);
                     float itemX = iconX + (float)(((menuIndex & 1) != 0) ? 13 : 83);
                     int iconColumn = itemIndex % 8;
                     int iconRow = itemIndex / 8;
@@ -721,8 +715,8 @@ void CMesMenu::onDraw()
             colorStorage = CColor(0xFF, 0xFF, 0xFF, (unsigned char)(int)(FLOAT_80330908 * stageBlend));
             MenuPcs.SetColor(colorStorage);
             MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x18));
-            SetExternalTlut__8CTextureFPvi(
-                MenuPcs.m_textures[0x18], (*(short*)(scriptFood + 0x1C) == 0) ? MenuPcs.m_externalFontTlut : 0, 1);
+            MenuPcs.m_textures[0x18]->SetExternalTlut(
+                (*(short*)(scriptFood + 0x1C) == 0) ? MenuPcs.m_externalFontTlut : nullptr, 1);
             MenuPcs.DrawRect(
                 ((menuIndex & 1) == 0) ? 8 : 0, frameX + shakeX + (float)(((menuIndex & 1) != 0) ? 75 : 5),
                 frameY + shakeY + FLOAT_80330958, FLOAT_8033095C, FLOAT_80330960,
@@ -782,7 +776,7 @@ void CMesMenu::onDraw()
                     colorStorage = CColor(0xFF, 0xFF, 0xFF, (unsigned char)(int)alphaF);
                     MenuPcs.SetColor(colorStorage);
                     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x18));
-                    SetExternalTlut__8CTextureFPvi(MenuPcs.m_textures[0x18], 0, 1);
+                    MenuPcs.m_textures[0x18]->SetExternalTlut(nullptr, 1);
                     MenuPcs.DrawRect(
                         (anchorX != 0 && ((*(unsigned int*)((char*)this + 0x3D8C) & 4) == 0)) ? 8 : 0,
                         iconX + (float)(anchorX != 0 ? 13 : 83), iconY + FLOAT_80330958, FLOAT_8033095C, FLOAT_80330960,
@@ -1082,7 +1076,7 @@ void CMesMenu::onCalc()
                                 *(int*)((char*)this + 0x0C) = 4;
                                 *(int*)((char*)this + 0x08) = 0;
                                 if (*(int*)((char*)this + 0x18) < 4) {
-                                    SetFade__9CRingMenuFi(*(void**)((char*)&MenuPcs + 0x13C + *(int*)((char*)this + 0x18) * 4), 1);
+                                    MenuPcs.m_battleRingMenus[*(int*)((char*)this + 0x18)]->SetFade(1);
                                 }
                             }
                         }
@@ -1122,7 +1116,7 @@ void CMesMenu::onCalc()
             *(int*)((char*)this + 0x0C) = 4;
             *(int*)((char*)this + 0x08) = 0;
             if (*(int*)((char*)this + 0x18) < 4) {
-                SetFade__9CRingMenuFi(*(void**)((char*)&MenuPcs + 0x13C + *(int*)((char*)this + 0x18) * 4), 1);
+                MenuPcs.m_battleRingMenus[*(int*)((char*)this + 0x18)]->SetFade(1);
             }
         }
     }
@@ -1140,7 +1134,7 @@ void CMesMenu::onCalc()
 void CMesMenu::Destroy()
 {
     m_mes.Set(0, 0);
-    Destroy__5CMenuFv(this);
+    CMenu::Destroy();
 }
 
 /*
@@ -1155,7 +1149,7 @@ void CMesMenu::Destroy()
 void CMesMenu::Create()
 {
     Destroy();
-    Create__5CMenuFv(this);
+    CMenu::Create();
 
     float defaultValue = FLOAT_803308d8;
     m_offsetY = defaultValue;

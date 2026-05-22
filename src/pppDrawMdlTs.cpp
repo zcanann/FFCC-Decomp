@@ -5,11 +5,6 @@
 #include "dolphin/types.h"
 #include "ffcc/ppp_linkage.h"
 
-extern "C" {
-void pppDrawMesh__FP10pppModelStP3Veci(void*, void*, int);
-void SetTexScroll__12CMaterialManFffff(CMaterialMan*, float, float, float, float);
-}
-
 extern const float kPppKeShpTail2XZero = 0.0f;
 extern const float FLOAT_803304F0;
 
@@ -123,10 +118,9 @@ void pppDrawDrawMdlTs(struct _pppPObject* obj, struct PDrawMdlTs* data, struct _
         *(u8*)((u8*)data + 0xE));
 
     f32* texCoords = (f32*)((u8*)obj + (*(s32*)((u8*)*(s32**)((u8*)ctrl + 0xC) + 8)) + 0x80);
-    SetTexScroll__12CMaterialManFffff(&MaterialMan, texCoords[0], texCoords[3], FLOAT_803304F0, FLOAT_803304F0);
+    MaterialMan.SetTexScroll(texCoords[0], texCoords[3], FLOAT_803304F0, FLOAT_803304F0);
 
     pppSetBlendMode(*(u8*)((u8*)data + 0x9));
 
-    void** modelsArray = *(void***)((u8*)pppEnvStPtr + 0x8);
-    pppDrawMesh__FP10pppModelStP3Veci(modelsArray[*(u32*)((u8*)data + 0x4)], *(void**)((u8*)obj + 0x70), 1);
+    pppDrawMesh((pppModelSt*)pppEnvStPtr->m_mapMeshPtr[*(u32*)((u8*)data + 0x4)], obj->m_drawMatrixPtr, 1);
 }

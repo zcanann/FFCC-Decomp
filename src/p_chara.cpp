@@ -44,11 +44,6 @@ extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned lo
 extern "C" void CopyFromAMemorySync__7CMemoryFPvPvUl(CMemory*, void*, void*, unsigned long);
 extern "C" void CopyToAMemorySync__7CMemoryFPvPvUl(CMemory*, void*, void*, unsigned long);
 extern "C" void SetStdProjectionMatrix__10CCameraPcsFv(void*);
-extern "C" void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
-extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
-extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
-extern "C" void _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
-    int, int, int, int, int);
 extern "C" void SetFog__8CGraphicFii(void*, int, int);
 extern "C" void SetAmbient__9CLightPcsF8_GXColor(void*, void*);
 extern "C" void SetNumDiffuse__9CLightPcsFUl(void*, unsigned long);
@@ -403,12 +398,9 @@ static inline CMemory::CStage*& CharaAmemStage()
 
 static inline void SetupBaseCharaLights(CCharaPcs* self)
 {
-    _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
-        0, 0, 1, 2, 3);
-    _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
-        1, 0, 1, 2, 3);
-    _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
-        2, 0, 1, 2, 3);
+    _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
+    _GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
+    _GXSetTevSwapModeTable(GX_TEV_SWAP2, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
     SetFog__8CGraphicFii(&Graphic, 1, 0);
     SetAmbient__9CLightPcsF8_GXColor(&LightPcs, Ptr(self, 0xE8));
     SetNumDiffuse__9CLightPcsFUl(&LightPcs, 3);
@@ -1318,12 +1310,9 @@ void CCharaPcs::SetSpecularAlpha(int alpha)
  */
 void CCharaPcs::InitEnv(int envMode)
 {
-    _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
-        0, 0, 1, 2, 3);
-    _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
-        1, 0, 1, 2, 3);
-    _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
-        2, 0, 1, 2, 3);
+    _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
+    _GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
+    _GXSetTevSwapModeTable(GX_TEV_SWAP2, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
 
     if (envMode == 1 || envMode == 2) {
         _GXColor black = {0x00, 0x00, 0x00, 0xFF};
@@ -1468,12 +1457,9 @@ void CCharaPcs::drawMakeTexShadow()
     GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
     Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &backBufferTexObj, 0, 0, texSize, texSize, 0, GX_NEAR, GX_TF_RGBA8, 0);
 
-    _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
-        0, 0, 1, 2, 3);
-    _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
-        1, 0, 1, 2, 3);
-    _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
-        2, 0, 1, 2, 3);
+    _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
+    _GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
+    _GXSetTevSwapModeTable(GX_TEV_SWAP2, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
     SetAmbient__9CLightPcsF8_GXColor(&LightPcs, &shadowColor);
     SetNumDiffuse__9CLightPcsFUl(&LightPcs, 0);
     SetPosition__9CLightPcsFQ29CLightPcs6TARGETP3VecUl(&LightPcs, 0, 0, 0xFFFFFFFF);
@@ -1518,12 +1504,9 @@ void CCharaPcs::drawShadow()
         return;
     }
 
-    _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
-        0, 0, 1, 2, 3);
-    _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
-        1, 0, 1, 2, 3);
-    _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
-        2, 0, 1, 2, 3);
+    _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
+    _GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
+    _GXSetTevSwapModeTable(GX_TEV_SWAP2, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
 
     _GXColor shadowColor = {0x00, 0x00, 0x00, 0xFF};
     SetAmbient__9CLightPcsF8_GXColor(&LightPcs, &shadowColor);
@@ -2185,11 +2168,10 @@ void CCharaPcs::drawOverlap()
     GXSetNumTevStages(1);
     GXSetZMode(GX_TRUE, GX_ALWAYS, GX_TRUE);
     GXSetTevDirect(GX_TEVSTAGE0);
-    _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0xFF, 0xFF, 4);
-    _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 4);
-    _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
-    _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
-        0, 0, 1, 2, 3);
+    _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
+    _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
+    _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
+    _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
     SetFog__8CGraphicFii(&Graphic, 0, 0);
     PSMTXIdentity(identityMtx);
     GXLoadPosMtxImm(identityMtx, GX_PNMTX0);
@@ -2239,9 +2221,9 @@ void CCharaPcs::drawOverlap()
     GXSetNumTevStages(1);
     SetFog__8CGraphicFii(&Graphic, 0, 0);
     GXSetTevDirect(GX_TEVSTAGE0);
-    _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 4);
-    _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 4);
-    _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
+    _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
+    _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
+    _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
 
     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
     GXPosition3f32(0.0f, 0.0f, 0.0f);
@@ -2262,7 +2244,7 @@ void CCharaPcs::drawOverlap()
     GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_U16, 0);
-    _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 0);
+    _GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
 
     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
     GXPosition3f32(0.0f, 0.0f, 0.0f);

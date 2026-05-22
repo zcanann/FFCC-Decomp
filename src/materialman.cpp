@@ -18,7 +18,6 @@
 CMaterialMan MaterialMan;
 
 extern "C" unsigned long UnkMaterialSetGetter(void*);
-extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 extern "C" void __ct__6CColorFv(void*);
 extern "C" void __ct__4CRefFv(void*);
 extern "C" void __dt__4CRefFv(void*, int);
@@ -225,8 +224,7 @@ static int HighestSetBit(unsigned int value)
 static CMaterial* AllocMaterial()
 {
     unsigned char* material = reinterpret_cast<unsigned char*>(
-        _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
-            &Memory,
+        Memory._Alloc(
             0xA8,
             MaterialMan.GetMemoryStage(),
             const_cast<char*>(s_materialman_cpp),
@@ -2991,8 +2989,8 @@ void CMaterialSet::SetPartFromTextureSet(CTextureSet* textureSet, int pdtSlotInd
             }
 
             unsigned char* material = reinterpret_cast<unsigned char*>(
-                _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
-                    &Memory, 0xA8, *reinterpret_cast<CMemory::CStage**>(Ptr(&MaterialMan, 0x218)),
+                Memory._Alloc(
+                    0xA8, *reinterpret_cast<CMemory::CStage**>(Ptr(&MaterialMan, 0x218)),
                     const_cast<char*>(s_materialman_cpp), 0xEE4, 0));
             if (material != 0) {
                 __ct__4CRefFv(material);
@@ -3144,13 +3142,7 @@ void CMaterialSet::AddMaterial(CMaterial*, int)
  */
 void* CMaterial::operator new(unsigned long size, CMemory::CStage*, char* file, int line)
 {
-    return _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
-        &Memory,
-        size,
-        MaterialMan.GetMemoryStage(),
-        file,
-        line,
-        0);
+    return Memory._Alloc(size, MaterialMan.GetMemoryStage(), file, line, 0);
 }
 
 /*
@@ -3164,13 +3156,7 @@ void* CMaterial::operator new(unsigned long size, CMemory::CStage*, char* file, 
  */
 void* CMaterialSet::operator new(unsigned long size, CMemory::CStage*, char* file, int line)
 {
-    return _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
-        &Memory,
-        size,
-        MaterialMan.GetMemoryStage(),
-        file,
-        line,
-        0);
+    return Memory._Alloc(size, MaterialMan.GetMemoryStage(), file, line, 0);
 }
 
 /*

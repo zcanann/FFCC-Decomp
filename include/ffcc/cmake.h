@@ -29,6 +29,13 @@ class CMenuPcs
 	void DrawCmakeYesNo(int, float);
 	unsigned short GetButtonDown(int);
 	unsigned short GetButtonRepeat(int);
+	void InitFrame0Info();
+	void CalcWMFrame0(int);
+	void DrawWMFrame0(int, float);
+	void CallWorldParam(int, int, int);
+	void ChgModel(int, int, int, int);
+	void SetAnim(int);
+	void PCAnimCtrl();
 	int GetModelNo(int, int, int);
 	float GetMaxAnimWait();
 	char* GetMenuStr(int);

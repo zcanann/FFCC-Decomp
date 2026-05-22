@@ -24,10 +24,6 @@
 
 CCameraPcs CameraPcs;
 
-extern "C" void* __vt__8CManager[];
-extern "C" void* __vt__8CProcess[];
-extern "C" void* __vt__10CCameraPcs[];
-
 extern "C" void create__10CCameraPcsFv(CCameraPcs*);
 extern "C" void destroy__10CCameraPcsFv(CCameraPcs*);
 extern "C" void calc__10CCameraPcsFv(CCameraPcs*);
@@ -110,6 +106,12 @@ extern double DOUBLE_8032fa28;
 extern char s_p_camera_cpp_801D7918[];
 extern char DAT_801d7928[];
 extern unsigned char g_map_draw_prof;
+
+inline void* operator new(unsigned long, void* ptr)
+{
+    return ptr;
+}
+
 unsigned int m_table_desc0__10CCameraPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__10CCameraPcsFv)};
 unsigned int m_table_desc1__10CCameraPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__10CCameraPcsFv)};
 unsigned int m_table_desc2__10CCameraPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__10CCameraPcsFv)};
@@ -185,12 +187,9 @@ static inline void CopyCameraState(u8* dst, u8* src)
  */
 extern "C" void __sinit_p_camera_cpp(void)
 {
-    u8* self = reinterpret_cast<u8*>(&CameraPcs);
+    CCameraPcs* camera = new (&CameraPcs) CCameraPcs;
+    u8* self = reinterpret_cast<u8*>(camera);
     unsigned int* dst = &m_table__10CCameraPcs[0][0];
-
-    *reinterpret_cast<void**>(self) = __vt__8CManager;
-    *reinterpret_cast<void**>(self) = __vt__8CProcess;
-    *reinterpret_cast<void**>(self) = __vt__10CCameraPcs;
 
     *reinterpret_cast<float*>(self + 0x414) = FLOAT_8032fa78;
     *reinterpret_cast<float*>(self + 0x418) = FLOAT_8032fa78;

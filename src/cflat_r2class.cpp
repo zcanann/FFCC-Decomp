@@ -14,7 +14,6 @@
 
 #include <math.h>
 
-extern "C" int IsAnimFinished__8CGObjectFi(CGObject*, int);
 extern "C" void push__12CFlatRuntimeFPQ212CFlatRuntime7CObjecti(CFlatRuntime2*, CFlatRuntime::CObject*, int);
 extern const char s_CFlatRuntime2SetClassSystemValWarn_801DA778[];
 
@@ -549,7 +548,7 @@ void CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int co
 
 	switch (command) {
 		case -0x9F: {
-			unsigned int finished = static_cast<unsigned int>(IsAnimFinished__8CGObjectFi(engineObject, 0));
+			unsigned int finished = static_cast<unsigned int>(engineObject->IsAnimFinished(0));
 			int topBit = __cntlzw(finished);
 			push__12CFlatRuntimeFPQ212CFlatRuntime7CObjecti(this, object, (topBit >> 5) & 0xFF);
 			outResult = 0;

@@ -1,11 +1,8 @@
 #include "ffcc/pppYmDrawMdlTexAnm.h"
 #include "dolphin/os.h"
 #include "ffcc/mapmesh.h"
+#include "ffcc/pppPart.h"
 #include "ffcc/ppp_linkage.h"
-
-struct pppCVECTOR {
-    u8 m_rgba[4];
-};
 
 struct pppYmDrawMdlTexAnmWork {
     u32 m_frame;
@@ -84,9 +81,6 @@ void pppUnitMatrix(pppFMATRIX&);
 void pppMulMatrix(pppFMATRIX&, pppFMATRIX, pppFMATRIX);
 
 extern "C" {
-void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(pppCVECTOR* color, pppFMATRIX* matrix, f32 z, u8 a3, u8 a4,
-                                                               u8 a5, u8 a6, u8 a7, u8 a8, u8 a9);
-
 void pppDrawMesh__FP10pppModelStP3Veci(pppModelSt* model, Vec* matrixPtr, s32 flag);
 
 /*
@@ -125,9 +119,9 @@ void pppRenderYmDrawMdlTexAnm(_pppPObject* object, pppYmDrawMdlTexAnmStep* step,
 
     initBytes = (u8*)&step->m_initWOrk;
     stepBytes = (u8*)&step->m_stepValue;
-    pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc((pppCVECTOR*)(colorBase + 8), &ymDrawMdlTexAnm->m_modelViewMatrix,
-                                                               step->m_arg3, step->m_payload[0xC], initBytes[2], initBytes[1],
-                                                               initBytes[3], stepBytes[0], stepBytes[1], stepBytes[2]);
+    pppSetDrawEnv(
+        reinterpret_cast<pppCVECTOR*>(colorBase + 8), &ymDrawMdlTexAnm->m_modelViewMatrix, step->m_arg3,
+        step->m_payload[0xC], initBytes[2], initBytes[1], initBytes[3], stepBytes[0], stepBytes[1], stepBytes[2]);
 
     pppSetBlendMode(initBytes[1]);
     pppDrawMesh__FP10pppModelStP3Veci(model, ymDrawMdlTexAnm->m_drawMatrixPtr, 1);

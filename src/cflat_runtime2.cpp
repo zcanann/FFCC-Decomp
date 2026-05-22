@@ -57,7 +57,6 @@ extern "C" void __ct__9CGQuadObjFv(CGQuadObj*);
 extern "C" void __ct__9CGBaseObjFv(CGBaseObj*);
 extern "C" void pppCreate__8CPartMngFiiP14PPPCREATEPARAMi(CPartMng*, int, int, PPPCREATEPARAM*, int);
 extern "C" char* GetLangString__5CGameFv(void*);
-extern "C" void ClrBattleItem__8CMenuPcsFv(void*);
 extern "C" int GetBackBufferRect__8CGraphicFRiRiRiRii(CGraphic*, int&, int&, int&, int&, int);
 
 // Linkage definitions from config/GCCP01/symbols.txt.
@@ -2424,7 +2423,7 @@ void CFlatRuntime2::SysControl(int controlNo, int controlValue)
 	}
 
 	case 9:
-		ClrBattleItem__8CMenuPcsFv(&MenuPcs);
+		MenuPcs.ClrBattleItem();
 		break;
 
 	case 0xA:

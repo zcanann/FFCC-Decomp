@@ -1,6 +1,8 @@
 #ifndef _FFCC_MENU_LETTER_H_
 #define _FFCC_MENU_LETTER_H_
 
+class CFont;
+
 class CMenuPcs
 {
 public:
@@ -21,6 +23,15 @@ public:
     void SetSingDynamicWinMessInfo(int, char*, char*, char*, char*, char*, char*, char*, char*);
     void SetSingWinScl(float);
     void SetMcWinInfo(int, int);
+    void DrawSingleCrescent(float, float);
+    void DrawSingleStat(float);
+    void DrawSingleHelpWim(float);
+    void DrawShadowFont(CFont*, char*, float, float, int, int);
+    void DrawSingWin(short);
+    void DrawSingWinMess(int, int, int);
+    int SingWinMessHeight();
+    void SingSetLetterAttachflg(int);
+    int SingGetLetterAttachflg();
 
     void LetterInit();
     void LetterInit0();
@@ -49,7 +60,7 @@ public:
     int LetterCtrlCur();
     void LetterLstBaseDraw(float);
     void LetterSetAttachItem(unsigned int, int);
-    const char* GetMenuStr(int);
+    char* GetMenuStr(int);
 };
 
 #endif // _FFCC_MENU_LETTER_H_

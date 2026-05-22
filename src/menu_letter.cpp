@@ -17,17 +17,6 @@ typedef signed short s16;
 typedef unsigned char u8;
 typedef unsigned short u16;
 
-extern "C" int SingGetLetterAttachflg__8CMenuPcsFv(CMenuPcs*);
-extern "C" void SingSetLetterAttachflg__8CMenuPcsFi(CMenuPcs*, int);
-extern "C" void LetterInit1__8CMenuPcsFv(CMenuPcs*);
-
-extern "C" void DrawSingleCrescent__8CMenuPcsFff(CMenuPcs*, float, float);
-extern "C" void DrawSingleStat__8CMenuPcsFf(CMenuPcs*, float);
-extern "C" void DrawSingleHelpWim__8CMenuPcsFf(CMenuPcs*, float);
-extern "C" void DrawShadowFont__8CMenuPcsFP5CFontPcffii(CMenuPcs*, CFont*, const char*, float, float, int, int);
-extern "C" void DrawSingWin__8CMenuPcsFs(CMenuPcs*, short);
-extern "C" void DrawSingWinMess__8CMenuPcsFiii(CMenuPcs*, int, int, int);
-extern "C" int SingWinMessHeight__8CMenuPcsFv(CMenuPcs*);
 extern "C" void DrawRect__8CMenuPcsFUlfffffffff(double, double, double, double, double, double, double, double, CMenuPcs*, int);
 extern "C" void DrawSingleIcon__8CMenuPcsFiiifif(double, CMenuPcs*, int, int, int, float);
 extern "C" void DrawCursor__8CMenuPcsFiif(double, CMenuPcs*, int, int);
@@ -529,7 +518,7 @@ bool CMenuPcs::LetterOpen()
 		**reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850) = 2;
 		*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x22) = 0;
 		*reinterpret_cast<char*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0xB) = 1;
-		iVar4 = SingGetLetterAttachflg__8CMenuPcsFv(this);
+		iVar4 = SingGetLetterAttachflg();
 		if (iVar4 < 0) {
 			*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x26) = 0;
 			*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x28) = 0;
@@ -604,13 +593,13 @@ bool CMenuPcs::LetterOpen()
 		} while (iVar4 != 0);
 	}
 	if (iVar5 == iVar6) {
-		iVar4 = SingGetLetterAttachflg__8CMenuPcsFv(this);
+		iVar4 = SingGetLetterAttachflg();
 		if (iVar4 < 0) {
 			*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x12) = 1;
 		} else {
 			*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x12) = 0;
 			*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x30) = 1;
-			LetterInit1__8CMenuPcsFv(this);
+			LetterInit1();
 		}
 	}
 	return iVar5 == iVar6;
@@ -749,7 +738,7 @@ bool CMenuPcs::LetterClose()
 		}
 	}
 
-	if (panelCount == finished && SingGetLetterAttachflg__8CMenuPcsFv(this) >= 0) {
+	if (panelCount == finished && SingGetLetterAttachflg() >= 0) {
 		s_BackUpCur[0] = *reinterpret_cast<s16*>(state + 0x26);
 		s_BackUpTopPos = static_cast<s16>(s_SelLetter - s_BackUpCur[0]);
 		s_BackUpCur[1] = *reinterpret_cast<s16*>(state + 0x28);
@@ -845,7 +834,7 @@ void CMenuPcs::LetterLstClose()
 	}
 
 	if (panelCount == done) {
-		LetterInit1__8CMenuPcsFv(this);
+		LetterInit1();
 		*reinterpret_cast<s16*>(state + 0x30) = 1;
 		*reinterpret_cast<s16*>(state + 0x12) = 0;
 	}
@@ -896,7 +885,7 @@ void CMenuPcs::LetterMessOpen()
 	}
 
 	if (panelCount == done) {
-		if (SingGetLetterAttachflg__8CMenuPcsFv(this) < 0) {
+		if (SingGetLetterAttachflg() < 0) {
 			*reinterpret_cast<s16*>(state + 0x12) = 1;
 		} else {
 			if (s_AttachMode < 1) {
@@ -908,7 +897,7 @@ void CMenuPcs::LetterMessOpen()
 			}
 			*reinterpret_cast<s16*>(state + 0x12) = 0;
 			*reinterpret_cast<char*>(state + 0xC) = 0;
-			SingSetLetterAttachflg__8CMenuPcsFi(this, -1);
+			SingSetLetterAttachflg(-1);
 		}
 	}
 }
@@ -1252,9 +1241,9 @@ void CMenuPcs::LetterAttachWinClose()
 				*reinterpret_cast<s16*>(state + 0x12) = 0;
 			} else {
 				if (s_Attach == 0) {
-					SingSetLetterAttachflg__8CMenuPcsFi(this, 1);
+					SingSetLetterAttachflg(1);
 				} else {
-					SingSetLetterAttachflg__8CMenuPcsFi(this, 5);
+					SingSetLetterAttachflg(5);
 				}
 				*reinterpret_cast<s16*>(state + 0x30) = 1;
 				*reinterpret_cast<s16*>(state + 0x12) = 2;
@@ -1424,9 +1413,9 @@ void CMenuPcs::LetterListDraw()
 
 	if ((s_OpenClose != 0) && (*reinterpret_cast<char*>(reinterpret_cast<char*>(this) + 0x872) == '\0')) {
 		float anim = static_cast<float>(DOUBLE_803330e8 - static_cast<double>(*reinterpret_cast<float*>(menuDataBase + 0x18)));
-		DrawSingleCrescent__8CMenuPcsFff(this, FLOAT_803330f8, anim);
-		DrawSingleStat__8CMenuPcsFf(this, anim);
-		DrawSingleHelpWim__8CMenuPcsFf(this, anim);
+		DrawSingleCrescent(FLOAT_803330f8, anim);
+		DrawSingleStat(anim);
+		DrawSingleHelpWim(anim);
 	}
 
 	if (**reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850) == 1) {
@@ -1444,10 +1433,10 @@ void CMenuPcs::LetterListDraw()
 	CColor titleColor(0xFF, 0xFF, 0xFF, static_cast<u8>(FLOAT_803330a0 * *reinterpret_cast<float*>(menuDataBase + 0x58)));
 	font->SetColor(titleColor.color);
 
-	const char* menuTitle = GetMenuStr(0x1D);
+	char* menuTitle = GetMenuStr(0x1D);
 	float titleX = static_cast<float>((static_cast<double>(FLOAT_80333158) - static_cast<double>(font->GetWidth(menuTitle))) *
 	                                  DOUBLE_803330a8);
-	DrawShadowFont__8CMenuPcsFP5CFontPcffii(this, font, menuTitle, titleX, FLOAT_8033315c, 0x18, 0x12);
+	DrawShadowFont(font, menuTitle, titleX, FLOAT_8033315c, 0x18, 0x12);
 
 	if (DOUBLE_803330e8 > static_cast<double>(*reinterpret_cast<float*>(menuDataBase + 0x58))) {
 		return;
@@ -1666,14 +1655,14 @@ void CMenuPcs::LetterMessDraw()
 		return;
 	}
 
-	DrawSingWin__8CMenuPcsFs(this, -1);
+	DrawSingWin(-1);
 	if ((*reinterpret_cast<s16*>(state + 0x12) == 1) &&
 	    (*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x848) + 0xA) == 1)) {
 		int msgType = static_cast<int>(*reinterpret_cast<signed char*>(state + 9));
 		if (mode == 4) {
-			DrawSingWinMess__8CMenuPcsFiii(this, 2, msgType, 0);
+			DrawSingWinMess(2, msgType, 0);
 		} else {
-			DrawSingWinMess__8CMenuPcsFiii(this, 0, msgType, 1);
+			DrawSingWinMess(0, msgType, 1);
 		}
 
 		float cursorX;
@@ -1687,13 +1676,13 @@ void CMenuPcs::LetterMessDraw()
 				itemSel += ((s_Attach == 2) ? 1 : 0) + 4;
 			}
 			cursorX = static_cast<float>(singWin[0] + 0x14);
-			cursorY = static_cast<float>(singWin[1] + itemSel * SingWinMessHeight__8CMenuPcsFv(this) + 0x20);
+			cursorY = static_cast<float>(singWin[1] + itemSel * SingWinMessHeight() + 0x20);
 		} else {
 			cursorX = static_cast<float>(singWin[0] - 8);
 			if (mode == 4) {
 				cursorX += FLOAT_80333110;
 			}
-			cursorY = static_cast<float>(singWin[1] + *reinterpret_cast<s16*>(state + 0x28) * SingWinMessHeight__8CMenuPcsFv(this) + 0x20);
+			cursorY = static_cast<float>(singWin[1] + *reinterpret_cast<s16*>(state + 0x28) * SingWinMessHeight() + 0x20);
 		}
 
 		int frame = static_cast<int>(System.m_frameCounter);

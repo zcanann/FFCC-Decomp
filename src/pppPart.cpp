@@ -1883,13 +1883,13 @@ DataValsAllocated:
  */
 void pppInitPdt(long* progOffsetReconstructionTable, pppProg* pppProg)
 {
+	int* table = (int*)(progOffsetReconstructionTable + 6);
 	int pppProgRelocCount = *(int*)((int)progOffsetReconstructionTable + progOffsetReconstructionTable[2]);
 	int pdtRelocCount = *(int*)((int)progOffsetReconstructionTable + progOffsetReconstructionTable[3]);
 	int* pppProgRelocs = (int*)((int)progOffsetReconstructionTable + progOffsetReconstructionTable[2]) + 1;
 	int* pdtRelocs = (int*)((int)progOffsetReconstructionTable + progOffsetReconstructionTable[3]) + 1;
-	int* table = (int*)(progOffsetReconstructionTable + 6);
 
-	if (progOffsetReconstructionTable[6] == 0) {
+	if (table[0] == 0) {
 		return;
 	}
 
@@ -1911,7 +1911,7 @@ void pppInitPdt(long* progOffsetReconstructionTable, pppProg* pppProg)
 	} while (*(int*)*head != 0);
 
 	int processed = 0;
-	*entry = 0;
+	*head = 0;
 	if (pppProgRelocCount > 0) {
 		if (pppProgRelocCount > 8) {
 			unsigned int blocks = (unsigned int)(pppProgRelocCount - 1) >> 3;

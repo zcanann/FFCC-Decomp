@@ -1,6 +1,8 @@
 #include "ffcc/p_sample.h"
 
-extern const char s_CSamplePcs_801D6CC8[];
+extern const char s_CSamplePcs_801D6CC8[] = "CSamplePcs";
+extern const char s_CManager_801D6CD4[] = "CManager";
+extern const char s_CProcess_801D6CE0[] = "CProcess";
 extern "C" void create__10CSamplePcsFv(CSamplePcs*);
 extern "C" void destroy__10CSamplePcsFv(CSamplePcs*);
 extern "C" void func0__10CSamplePcsFv(CSamplePcs*);

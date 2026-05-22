@@ -53,7 +53,7 @@ extern "C" void LoadSe__6CSoundFPv(void*, void*);
 extern "C" void LoadWave__6CSoundFPv(void*, void*);
 extern "C" int GetBackBufferRect__8CGraphicFRiRiRiRii(CGraphic*, int&, int&, int&, int&, int);
 extern "C" unsigned char DbgMenuPcs[];
-extern unsigned char PTR_s_CCharaPcs_GAME__801fce10[];
+extern unsigned char PTR_s_CCharaPcs_GAME_[];
 
 inline void* operator new(unsigned long, void* ptr)
 {
@@ -812,7 +812,7 @@ void CCharaPcs::Quit()
  */
 int CCharaPcs::GetTable(unsigned long index)
 {
-    unsigned char* table = PTR_s_CCharaPcs_GAME__801fce10;
+    unsigned char* table = PTR_s_CCharaPcs_GAME_;
     unsigned long offset = index * 0x15c;
     return (int)(table + offset);
 }

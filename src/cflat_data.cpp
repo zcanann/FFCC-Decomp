@@ -20,17 +20,17 @@ void CFlatData::Destroy()
 	{
 		if (m_data[i].m_data != nullptr)
 		{
-			operator delete(m_data[i].m_data);
+			delete[] static_cast<unsigned char*>(m_data[i].m_data);
 			m_data[i].m_data = nullptr;
 		}
 		if (m_data[i].m_strings != nullptr)
 		{
-			operator delete(m_data[i].m_strings);
+			delete[] m_data[i].m_strings;
 			m_data[i].m_strings = (char**)nullptr;
 		}
 		if (m_data[i].m_stringBuf != nullptr)
 		{
-			operator delete(m_data[i].m_stringBuf);
+			delete[] m_data[i].m_stringBuf;
 			m_data[i].m_stringBuf = (char*)nullptr;
 		}
 	}
@@ -41,12 +41,12 @@ void CFlatData::Destroy()
 	{
 		if (m_tabl[i].m_strings != nullptr)
 		{
-			operator delete(m_tabl[i].m_strings);
+			delete[] m_tabl[i].m_strings;
 			m_tabl[i].m_strings = (char**)nullptr;
 		}
 		if (m_tabl[i].m_stringBuf != nullptr)
 		{
-			operator delete(m_tabl[i].m_stringBuf);
+			delete[] m_tabl[i].m_stringBuf;
 			m_tabl[i].m_stringBuf = (char*)nullptr;
 		}
 	}
@@ -55,7 +55,7 @@ void CFlatData::Destroy()
 	// Finally: free mes buffer
 	if (m_mesBuffer != nullptr)
 	{
-		operator delete(m_mesBuffer);
+		delete[] m_mesBuffer;
 		m_mesBuffer = (char*)nullptr;
 	}
 	m_mesCount = 0;
@@ -188,17 +188,17 @@ CFlatData::~CFlatData()
 	{
 		if (m_data[i].m_data != nullptr)
 		{
-			operator delete(m_data[i].m_data);
+			delete[] static_cast<unsigned char*>(m_data[i].m_data);
 			m_data[i].m_data = nullptr;
 		}
 		if (m_data[i].m_strings != nullptr)
 		{
-			operator delete(m_data[i].m_strings);
+			delete[] m_data[i].m_strings;
 			m_data[i].m_strings = (char**)nullptr;
 		}
 		if (m_data[i].m_stringBuf != nullptr)
 		{
-			operator delete(m_data[i].m_stringBuf);
+			delete[] m_data[i].m_stringBuf;
 			m_data[i].m_stringBuf = (char*)nullptr;
 		}
 	}
@@ -208,12 +208,12 @@ CFlatData::~CFlatData()
 	{
 		if (m_tabl[i].m_strings != nullptr)
 		{
-			operator delete(m_tabl[i].m_strings);
+			delete[] m_tabl[i].m_strings;
 			m_tabl[i].m_strings = (char**)nullptr;
 		}
 		if (m_tabl[i].m_stringBuf != nullptr)
 		{
-			operator delete(m_tabl[i].m_stringBuf);
+			delete[] m_tabl[i].m_stringBuf;
 			m_tabl[i].m_stringBuf = (char*)nullptr;
 		}
 	}
@@ -221,7 +221,7 @@ CFlatData::~CFlatData()
 
 	if (m_mesBuffer != nullptr)
 	{
-		operator delete(m_mesBuffer);
+		delete[] m_mesBuffer;
 		m_mesBuffer = (char*)nullptr;
 	}
 	m_mesCount = 0;

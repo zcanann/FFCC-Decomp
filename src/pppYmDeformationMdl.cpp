@@ -72,10 +72,6 @@ void pppSetDrawEnv(pppCVECTOR*, pppFMATRIX*, float, unsigned char, unsigned char
                    unsigned char, unsigned char, unsigned char);
 void pppDrawMesh(pppModelSt*, Vec*, int);
 
-extern "C" {
-int GetBackBufferRect__8CGraphicFRiRiRiRii(CGraphic*, int&, int&, int&, int&, int);
-}
-
 /*
  * --INFO--
  * PAL Address: 0x800d19f0
@@ -104,7 +100,7 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
     int top;
     int width;
     int height;
-    int backTexture;
+    _GXTexObj* backTexture;
     int textureBase;
 
     if (param_2->m_dataValIndex == 0xFFFF) {
@@ -157,7 +153,7 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
     top = 0;
     width = 0x280;
     height = 0x1c0;
-    backTexture = GetBackBufferRect__8CGraphicFRiRiRiRii(&Graphic, left, top, width, height, 0);
+    backTexture = Graphic.GetBackBufferRect(left, top, width, height, 0);
     if (backTexture != 0) {
         PSMTXIdentity(texMtx);
         PSMTX44Copy(CameraScreenMatrix(), screenMtx);
@@ -199,7 +195,7 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
         indMtx[1][2] = DeformationMdlZero();
         GXSetIndTexMtx(GX_ITM_0, indMtx, 1);
 
-        GXLoadTexObj((_GXTexObj*)backTexture, GX_TEXMAP0);
+        GXLoadTexObj(backTexture, GX_TEXMAP0);
         GXLoadTexObj((_GXTexObj*)(textureBase + 0x28), GX_TEXMAP1);
         pppDrawMesh(model, modelObject->m_drawMatrixPtr, 0);
 

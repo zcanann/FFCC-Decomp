@@ -10,6 +10,16 @@ void CFont_SetFixed(CFont*, int);
 class CMenuPcs
 {
 public:
+    enum FMT
+    {
+        TODO_FMT
+    };
+
+    enum TEX
+    {
+        TODO_TEX
+    };
+
     class CTmp
 	{
 	};
@@ -22,10 +32,23 @@ public:
     void createSingleMenu();
     void destroySingleMenu();
     void SingMenuInit();
+    void CreateShopMenu();
+    void CreateSmithMenu();
     void SingMenuEnd();
     void calcSingleMenu();
     void drawSingleMenu();
     void loadTextureAsync(char **, int, int, CTmp*, int, int, int);
+    void loadFont(int, char*, int, int);
+    void loadTexture(char**, int, int, CTmp*, int, int, int);
+    void freeTexture(int, int, int, int);
+    void SetAttrFmt(FMT);
+    void SetTexture(TEX);
+    void DrawInit();
+    void DrawRect(unsigned long, float, float, float, float, float, float, float, float, float);
+    void SetProjection(int);
+    void SetLight(int);
+    void RestoreProjection();
+    void DrawFilter(unsigned char, unsigned char, unsigned char, unsigned char);
     void SingCalcChara(float);
     void DrawSingleBase(float);
     void DrawSingleStat(float);
@@ -72,5 +95,7 @@ public:
     char* GetAttrStr(int);
     unsigned char GetItemIcon(int);
 };
+
+extern CMenuPcs MenuPcs;
 
 #endif // _FFCC_PPP_SINGMENU_H_

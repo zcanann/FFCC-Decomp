@@ -27,7 +27,6 @@ extern "C" void __ct__10CTexScrollFv(void*);
 extern "C" void __dt__10CTexScrollFv(void*, int);
 extern "C" int CheckName__8CTextureFPc(CTexture*, char*);
 extern "C" int CheckFrustum__6CBoundFR3VecPA4_ff(CBound*, Vec*, float (*)[4], float);
-extern "C" int GetBackBufferRect__8CGraphicFRiRiRiRii(CGraphic*, int*, int*, int*, int*, int);
 extern "C" void SetShadow__12CMaterialManFR10CMapShadowPA4_fiUl(
     CMaterialMan*, CMapShadow*, float (*)[4], int, unsigned long);
 class CMapKeyFrame;
@@ -1135,7 +1134,7 @@ void CMaterialMan::SetUnderWaterTex()
     int width = 0x280;
     int height = 0x1C0;
 
-    *reinterpret_cast<int*>(Ptr(this, 0xC)) = GetBackBufferRect__8CGraphicFRiRiRiRii(&Graphic, &x, &y, &width, &height, 1);
+    *reinterpret_cast<int*>(Ptr(this, 0xC)) = reinterpret_cast<int>(Graphic.GetBackBufferRect(x, y, width, height, 1));
     if (*reinterpret_cast<int*>(Ptr(this, 0xC)) == 0) {
         return;
     }

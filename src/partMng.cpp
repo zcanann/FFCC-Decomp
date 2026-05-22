@@ -35,7 +35,6 @@ extern int gPppHeapUseRateWords[3];
 #include <PowerPC_EABI_Support/Runtime/MWCPlusLib.h>
 #include <PowerPC_EABI_Support/Runtime/New.h>
 
-extern "C" void _WaitDrawDone__8CGraphicFPci(CGraphic*, const char*, int);
 extern "C" void pppCreateHeap__FP9_pppEnvStUl(_pppEnvSt*, unsigned long);
 extern "C" unsigned int CheckSum__FPvi(void*, int);
 extern "C" void pppStopSe__FP9_pppMngStP7PPPSEST(_pppMngSt*, PPPSEST*);
@@ -565,9 +564,9 @@ void CPartMng::pppReleasePdt(int pdtSlotIndex)
     }
 
     PartMngResRaw* res = reinterpret_cast<PartMngResRaw*>(self);
-    _WaitDrawDone__8CGraphicFPci(&Graphic, s_partMng_cpp_801d8230, 0x158);
+    Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp_801d8230), 0x158);
     res->m_materialSet->ReleaseTag(res->m_textureSet, pdtSlotIndex, &ppvAmemCacheSet);
-    _WaitDrawDone__8CGraphicFPci(&Graphic, s_partMng_cpp_801d8230, 0x13a);
+    Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp_801d8230), 0x13a);
 
     pppEnvStPtr = reinterpret_cast<_pppEnvSt*>(pdtSlot->m_envFields);
     PppMngStRaw* pppMngSt = reinterpret_cast<PppMngStRaw*>(self + 0x1d4);
@@ -577,7 +576,7 @@ void CPartMng::pppReleasePdt(int pdtSlotIndex)
         }
     }
 
-    _WaitDrawDone__8CGraphicFPci(&Graphic, s_partMng_cpp_801d8230, 0x149);
+    Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp_801d8230), 0x149);
 
     pppModelSt** modelNames = reinterpret_cast<pppModelSt**>(pdt->m_modelNames);
     for (int i = 0; i < pdt->m_modelCount; i++) {
@@ -649,7 +648,7 @@ void CPartMng::pppReleasePdt(int pdtSlotIndex)
     delete[] reinterpret_cast<u8*>(pdtSlot->m_pppDataHead);
     pdtSlot->m_pppDataHead = 0;
 
-    _WaitDrawDone__8CGraphicFPci(&Graphic, s_partMng_cpp_801d8230, 0x182);
+    Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp_801d8230), 0x182);
 }
 
 /*
@@ -945,7 +944,7 @@ void CPartMng::pppGet2Dpos()
         unsigned int x = raw->cursorX + 0x140;
         unsigned int y = raw->cursorY + 0xE0;
         if ((-1 < (int)x) && ((int)x < 0x27E) && (-1 < (int)y) && ((int)y < 0x1BE)) {
-            _WaitDrawDone__8CGraphicFPci(&Graphic, s_partMng_cpp_801d8230, 0x2A2);
+            Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp_801d8230), 0x2A2);
             GXPeekZ(static_cast<u16>(x & 0xFFFF), static_cast<u16>(y & 0xFFFF), reinterpret_cast<u32*>(&zAtPixel));
 
             viewPos.z = ppvScreenMatrix0[2][3]
@@ -1632,8 +1631,8 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(firstMng) + 0xE4) = 0;
         return;
     case 4:
-        _WaitDrawDone__8CGraphicFPci(&Graphic, s_partMng_cpp_801d8230, 0x554);
-        _WaitDrawDone__8CGraphicFPci(&Graphic, s_partMng_cpp_801d8230, 0x3A9);
+        Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp_801d8230), 0x554);
+        Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp_801d8230), 0x3A9);
         {
             unsigned char* mngBytes = self + kPppMngOffset;
             int editCount = *reinterpret_cast<int*>(self + kEditCountOffset);
@@ -1645,7 +1644,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
             }
         }
         *reinterpret_cast<int*>(self + kEditCountOffset) = 0;
-        _WaitDrawDone__8CGraphicFPci(&Graphic, s_partMng_cpp_801d8230, 0x3B3);
+        Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp_801d8230), 0x3B3);
         pppEditAllReleaseResource();
         DAT_8032ed68 = 1;
         self[0x800] = 0;
@@ -1770,8 +1769,8 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         if (env->m_isEditMode != 0) {
             return;
         }
-        _WaitDrawDone__8CGraphicFPci(&Graphic, s_partMng_cpp_801d8230, 0x646);
-        _WaitDrawDone__8CGraphicFPci(&Graphic, s_partMng_cpp_801d8230, 0x3A9);
+        Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp_801d8230), 0x646);
+        Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp_801d8230), 0x3A9);
         {
             unsigned char* mngBytes = self + kPppMngOffset;
             int editCount = *reinterpret_cast<int*>(self + kEditCountOffset);
@@ -1783,7 +1782,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
             }
         }
         *reinterpret_cast<int*>(self + kEditCountOffset) = 0;
-        _WaitDrawDone__8CGraphicFPci(&Graphic, s_partMng_cpp_801d8230, 0x3B3);
+        Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp_801d8230), 0x3B3);
         if (pdtSlots[0].m_pdt != 0) {
             delete[] reinterpret_cast<u8*>(pdtSlots[0].m_pdt);
             pdtSlots[0].m_pdt = 0;
@@ -1843,7 +1842,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         if (env->m_isEditMode != 0) {
             return;
         }
-        _WaitDrawDone__8CGraphicFPci(&Graphic, s_partMng_cpp_801d8230, 0x673);
+        Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp_801d8230), 0x673);
         int pdtCount = *reinterpret_cast<int*>(self + kPdtCountOffset);
         if (0 <= pdtCount && pdtCount < 0x18) {
             if (pdtSlots[pdtCount].m_pdt != 0) {
@@ -1910,7 +1909,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         if (env->m_isEditMode != 0) {
             return;
         }
-        _WaitDrawDone__8CGraphicFPci(&Graphic, s_partMng_cpp_801d8230, 0x3A9);
+        Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp_801d8230), 0x3A9);
         {
             unsigned char* mngBytes = self + kPppMngOffset;
             int editCount = *reinterpret_cast<int*>(self + kEditCountOffset);
@@ -1922,7 +1921,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
             }
         }
         *reinterpret_cast<int*>(self + kEditCountOffset) = 0;
-        _WaitDrawDone__8CGraphicFPci(&Graphic, s_partMng_cpp_801d8230, 0x3B3);
+        Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp_801d8230), 0x3B3);
         DAT_8032ed68 = 1;
         return;
     case 0x10:

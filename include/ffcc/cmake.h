@@ -10,6 +10,19 @@ void GetCharaCnt(char*);
 class CMenuPcs
 {
 public:
+	enum FMT
+	{
+		TODO_FMT
+	};
+
+	enum TEX
+	{
+		TODO_TEX
+	};
+	class CTmp
+	{
+	};
+
 	CMenuPcs();
 	~CMenuPcs();
 
@@ -39,7 +52,15 @@ public:
 	void PCAnimCtrl();
 	void SetProjection(int);
 	void SetLight(int);
+	void SetAttrFmt(FMT);
+	void SetTexture(TEX);
+	void DrawInit();
+	void DrawRect(unsigned long, float, float, float, float, float, float, float, float, float);
+	void DrawCursor(int, int, float);
 	void RestoreProjection();
+	void loadFont(int, char*, int, int);
+	void loadTexture(char**, int, int, CTmp*, int, int, int);
+	void freeTexture(int, int, int, int);
 	void SetMcWinInfo(int, int);
 	void DrawMcWin(short, short);
 	void DrawMcWinMess(int, int);

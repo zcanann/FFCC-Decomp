@@ -17,24 +17,6 @@ typedef signed short s16;
 typedef unsigned char u8;
 typedef unsigned short u16;
 
-extern "C" int SingGetLetterAttachflg__8CMenuPcsFv(CMenuPcs*);
-extern "C" void SingSetLetterAttachflg__8CMenuPcsFi(CMenuPcs*, int);
-extern "C" void LetterInit1__8CMenuPcsFv(CMenuPcs*);
-extern "C" void SetSingWinScl__8CMenuPcsFf(CMenuPcs*, float);
-extern "C" void SetSingDynamicWinMessInfo__8CMenuPcsFiPcPcPcPcPcPcPcPc(CMenuPcs*, int, char*, char*, char*, char*, char*, char*, char*, char*);
-extern "C" void GetSingWinSize__8CMenuPcsFiPsPsi(CMenuPcs*, int, s16*, s16*, int);
-extern "C" void SetMcWinInfo__8CMenuPcsFii(CMenuPcs*, int, int);
-
-extern "C" void DrawSingleCrescent__8CMenuPcsFff(CMenuPcs*, float, float);
-extern "C" void DrawSingleStat__8CMenuPcsFf(CMenuPcs*, float);
-extern "C" void DrawSingleHelpWim__8CMenuPcsFf(CMenuPcs*, float);
-extern "C" void DrawShadowFont__8CMenuPcsFP5CFontPcffii(CMenuPcs*, CFont*, const char*, float, float, int, int);
-extern "C" void DrawInit__8CMenuPcsFv(CMenuPcs*);
-extern "C" void SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(CMenuPcs*, int);
-extern "C" void SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(CMenuPcs*, int);
-extern "C" void DrawSingWin__8CMenuPcsFs(CMenuPcs*, short);
-extern "C" void DrawSingWinMess__8CMenuPcsFiii(CMenuPcs*, int, int, int);
-extern "C" int SingWinMessHeight__8CMenuPcsFv(CMenuPcs*);
 extern "C" void DrawRect__8CMenuPcsFUlfffffffff(double, double, double, double, double, double, double, double, CMenuPcs*, int);
 extern "C" void DrawSingleIcon__8CMenuPcsFiiifif(double, CMenuPcs*, int, int, int, float);
 extern "C" void DrawCursor__8CMenuPcsFiif(double, CMenuPcs*, int, int);
@@ -198,7 +180,7 @@ void CMenuPcs::LetterInit()
 	s_BackUpCur[1] = 0;
 	s_BackUpTopPos = 0;
 
-	SetSingWinScl__8CMenuPcsFf(this, FLOAT_803330f8);
+	SetSingWinScl(FLOAT_803330f8);
 }
 
 /*
@@ -227,7 +209,7 @@ void CMenuPcs::LetterInit0()
 	s_BackUpCur[1] = 0;
 	s_BackUpTopPos = 0;
 
-	SetSingWinScl__8CMenuPcsFf(this, FLOAT_803330f8);
+	SetSingWinScl(FLOAT_803330f8);
 }
 
 /*
@@ -335,9 +317,9 @@ void CMenuPcs::LetterInit2()
 	strcat(left, GetMenuStr(1), 0x10);
 	strcpy(right, "");
 	strcat(right, GetMenuStr(2), 0x10);
-	SetSingDynamicWinMessInfo__8CMenuPcsFiPcPcPcPcPcPcPcPc(this, 3, info, left, right, 0, 0, 0, 0, 0);
-	GetSingWinSize__8CMenuPcsFiPsPsi(this, 0, &winW, &winH, 1);
-	SetMcWinInfo__8CMenuPcsFii(this, static_cast<int>(winW), static_cast<int>(winH));
+	SetSingDynamicWinMessInfo(3, info, left, right, 0, 0, 0, 0, 0);
+	GetSingWinSize(0, &winW, &winH, 1);
+	SetMcWinInfo(static_cast<int>(winW), static_cast<int>(winH));
 	*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x848) + 0xA) = 0;
 	*reinterpret_cast<s16*>(state + 0x28) = 0;
 	*reinterpret_cast<char*>(state + 0xC) = 1;
@@ -398,13 +380,12 @@ void CMenuPcs::LetterInit3()
 	int closeLine = s_ReplyMax;
 	s_ReplyMax = static_cast<unsigned char>(s_ReplyMax + 1);
 	strcat(lines[closeLine], GetMenuStr(3), 0x80);
-	SetSingDynamicWinMessInfo__8CMenuPcsFiPcPcPcPcPcPcPcPc(
-	    this, s_ReplyMax, lines[0], unused0, unused1, unused2, unused3, unused4, unused5, unused6);
+	SetSingDynamicWinMessInfo(s_ReplyMax, lines[0], unused0, unused1, unused2, unused3, unused4, unused5, unused6);
 
 	s16 winW;
 	s16 winH;
-	GetSingWinSize__8CMenuPcsFiPsPsi(this, 0, &winW, &winH, 1);
-	SetMcWinInfo__8CMenuPcsFii(this, winW, winH);
+	GetSingWinSize(0, &winW, &winH, 1);
+	SetMcWinInfo(winW, winH);
 	*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x848) + 0xA) = 0;
 	*reinterpret_cast<unsigned char*>(state + 0x9) = 0xFF;
 	*reinterpret_cast<char*>(state + 0xC) = 1;
@@ -475,13 +456,12 @@ void CMenuPcs::LetterInit4()
 	strcat(lines[lineCount + 1], GetMenuStr(1), 0x80);
 	strcpy(lines[lineCount + 2], "");
 	strcat(lines[lineCount + 2], GetMenuStr(2), 0x80);
-	SetSingDynamicWinMessInfo__8CMenuPcsFiPcPcPcPcPcPcPcPc(
-	    this, lineCount + 3, lines[0], lines[1], lines[2], lines[3], lines[4], lines[5], lines[6], lines[7]);
+	SetSingDynamicWinMessInfo(lineCount + 3, lines[0], lines[1], lines[2], lines[3], lines[4], lines[5], lines[6], lines[7]);
 
 	s16 winW;
 	s16 winH;
-	GetSingWinSize__8CMenuPcsFiPsPsi(this, 0, &winW, &winH, 1);
-	SetMcWinInfo__8CMenuPcsFii(this, winW, winH);
+	GetSingWinSize(0, &winW, &winH, 1);
+	SetMcWinInfo(winW, winH);
 	*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x848) + 0xA) = 0;
 	*reinterpret_cast<s16*>(state + 0x28) = 0;
 	*reinterpret_cast<unsigned char*>(state + 0x9) = 0xFF;
@@ -538,7 +518,7 @@ bool CMenuPcs::LetterOpen()
 		**reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850) = 2;
 		*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x22) = 0;
 		*reinterpret_cast<char*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0xB) = 1;
-		iVar4 = SingGetLetterAttachflg__8CMenuPcsFv(this);
+		iVar4 = SingGetLetterAttachflg();
 		if (iVar4 < 0) {
 			*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x26) = 0;
 			*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x28) = 0;
@@ -577,7 +557,7 @@ bool CMenuPcs::LetterOpen()
 		s_BackUpCur[0] = 0;
 		s_BackUpCur[1] = 0;
 		s_BackUpTopPos = 0;
-		SetSingWinScl__8CMenuPcsFf(this, FLOAT_803330f8);
+		SetSingWinScl(FLOAT_803330f8);
 	}
 	iVar6 = 0;
 	*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x22) =
@@ -613,13 +593,13 @@ bool CMenuPcs::LetterOpen()
 		} while (iVar4 != 0);
 	}
 	if (iVar5 == iVar6) {
-		iVar4 = SingGetLetterAttachflg__8CMenuPcsFv(this);
+		iVar4 = SingGetLetterAttachflg();
 		if (iVar4 < 0) {
 			*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x12) = 1;
 		} else {
 			*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x12) = 0;
 			*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x30) = 1;
-			LetterInit1__8CMenuPcsFv(this);
+			LetterInit1();
 		}
 	}
 	return iVar5 == iVar6;
@@ -758,7 +738,7 @@ bool CMenuPcs::LetterClose()
 		}
 	}
 
-	if (panelCount == finished && SingGetLetterAttachflg__8CMenuPcsFv(this) >= 0) {
+	if (panelCount == finished && SingGetLetterAttachflg() >= 0) {
 		s_BackUpCur[0] = *reinterpret_cast<s16*>(state + 0x26);
 		s_BackUpTopPos = static_cast<s16>(s_SelLetter - s_BackUpCur[0]);
 		s_BackUpCur[1] = *reinterpret_cast<s16*>(state + 0x28);
@@ -854,7 +834,7 @@ void CMenuPcs::LetterLstClose()
 	}
 
 	if (panelCount == done) {
-		LetterInit1__8CMenuPcsFv(this);
+		LetterInit1();
 		*reinterpret_cast<s16*>(state + 0x30) = 1;
 		*reinterpret_cast<s16*>(state + 0x12) = 0;
 	}
@@ -905,7 +885,7 @@ void CMenuPcs::LetterMessOpen()
 	}
 
 	if (panelCount == done) {
-		if (SingGetLetterAttachflg__8CMenuPcsFv(this) < 0) {
+		if (SingGetLetterAttachflg() < 0) {
 			*reinterpret_cast<s16*>(state + 0x12) = 1;
 		} else {
 			if (s_AttachMode < 1) {
@@ -917,7 +897,7 @@ void CMenuPcs::LetterMessOpen()
 			}
 			*reinterpret_cast<s16*>(state + 0x12) = 0;
 			*reinterpret_cast<char*>(state + 0xC) = 0;
-			SingSetLetterAttachflg__8CMenuPcsFi(this, -1);
+			SingSetLetterAttachflg(-1);
 		}
 	}
 }
@@ -1067,9 +1047,9 @@ void CMenuPcs::LetterItemWinOpen()
 		strcat(left, GetMenuStr(1), 0x10);
 		strcpy(right, "");
 		strcat(right, GetMenuStr(2), 0x10);
-		SetSingDynamicWinMessInfo__8CMenuPcsFiPcPcPcPcPcPcPcPc(this, 3, info, left, right, 0, 0, 0, 0, 0);
-		GetSingWinSize__8CMenuPcsFiPsPsi(this, 0, &winW, &winH, 1);
-		SetMcWinInfo__8CMenuPcsFii(this, static_cast<int>(winW), static_cast<int>(winH));
+		SetSingDynamicWinMessInfo(3, info, left, right, 0, 0, 0, 0, 0);
+		GetSingWinSize(0, &winW, &winH, 1);
+		SetMcWinInfo(static_cast<int>(winW), static_cast<int>(winH));
 		*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x848) + 0xA) = 0;
 		*reinterpret_cast<s16*>(state + 0x28) = 0;
 		*reinterpret_cast<char*>(state + 0xC) = 1;
@@ -1174,9 +1154,7 @@ bool CMenuPcs::LetterReplyWinOpen()
 		s_ReplyMax = static_cast<unsigned char>(s_ReplyMax + 1);
 		strcat(lines[lineIndex], closeText, 0x80);
 
-		SetSingDynamicWinMessInfo__8CMenuPcsFiPcPcPcPcPcPcPcPc(
-			this,
-			s_ReplyMax,
+		SetSingDynamicWinMessInfo(s_ReplyMax,
 			lines[0],
 			unused0,
 			unused1,
@@ -1188,8 +1166,8 @@ bool CMenuPcs::LetterReplyWinOpen()
 
 		s16 winW;
 		s16 winH;
-		GetSingWinSize__8CMenuPcsFiPsPsi(this, 0, &winW, &winH, 1);
-		SetMcWinInfo__8CMenuPcsFii(this, winW, winH);
+		GetSingWinSize(0, &winW, &winH, 1);
+		SetMcWinInfo(winW, winH);
 		*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x848) + 0xA) = 0;
 		*reinterpret_cast<unsigned char*>(state + 0x9) = 0xFF;
 		*reinterpret_cast<char*>(state + 0xC) = 1;
@@ -1229,8 +1207,8 @@ void CMenuPcs::LetterAttachWinOpen()
 	if (*reinterpret_cast<char*>(state + 0xC) == '\0') {
 		s16 winW;
 		s16 winH;
-		GetSingWinSize__8CMenuPcsFiPsPsi(this, 2, &winW, &winH, 0);
-		SetMcWinInfo__8CMenuPcsFii(this, static_cast<int>(winW), static_cast<int>(winH));
+		GetSingWinSize(2, &winW, &winH, 0);
+		SetMcWinInfo(static_cast<int>(winW), static_cast<int>(winH));
 		*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x848) + 0xA) = 0;
 		*reinterpret_cast<s16*>(state + 0x28) = 0;
 		*reinterpret_cast<unsigned char*>(state + 9) = 0xFF;
@@ -1263,9 +1241,9 @@ void CMenuPcs::LetterAttachWinClose()
 				*reinterpret_cast<s16*>(state + 0x12) = 0;
 			} else {
 				if (s_Attach == 0) {
-					SingSetLetterAttachflg__8CMenuPcsFi(this, 1);
+					SingSetLetterAttachflg(1);
 				} else {
-					SingSetLetterAttachflg__8CMenuPcsFi(this, 5);
+					SingSetLetterAttachflg(5);
 				}
 				*reinterpret_cast<s16*>(state + 0x30) = 1;
 				*reinterpret_cast<s16*>(state + 0x12) = 2;
@@ -1355,13 +1333,12 @@ bool CMenuPcs::LetterConfirmOpen()
 		strcpy(lines[lineCount + 2], "");
 		strcat(lines[lineCount + 2], GetMenuStr(2), 0x80);
 
-		SetSingDynamicWinMessInfo__8CMenuPcsFiPcPcPcPcPcPcPcPc(
-			this, lineCount + 3, lines[0], lines[1], lines[2], lines[3], lines[4], lines[5], lines[6], lines[7]);
+		SetSingDynamicWinMessInfo(lineCount + 3, lines[0], lines[1], lines[2], lines[3], lines[4], lines[5], lines[6], lines[7]);
 
 		s16 winW;
 		s16 winH;
-		GetSingWinSize__8CMenuPcsFiPsPsi(this, 0, &winW, &winH, 1);
-		SetMcWinInfo__8CMenuPcsFii(this, winW, winH);
+		GetSingWinSize(0, &winW, &winH, 1);
+		SetMcWinInfo(winW, winH);
 		*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x848) + 0xA) = 0;
 		*reinterpret_cast<s16*>(state + 0x28) = 0;
 		*reinterpret_cast<unsigned char*>(state + 0x9) = 0xFF;
@@ -1436,9 +1413,9 @@ void CMenuPcs::LetterListDraw()
 
 	if ((s_OpenClose != 0) && (*reinterpret_cast<char*>(reinterpret_cast<char*>(this) + 0x872) == '\0')) {
 		float anim = static_cast<float>(DOUBLE_803330e8 - static_cast<double>(*reinterpret_cast<float*>(menuDataBase + 0x18)));
-		DrawSingleCrescent__8CMenuPcsFff(this, FLOAT_803330f8, anim);
-		DrawSingleStat__8CMenuPcsFf(this, anim);
-		DrawSingleHelpWim__8CMenuPcsFf(this, anim);
+		DrawSingleCrescent(FLOAT_803330f8, anim);
+		DrawSingleStat(anim);
+		DrawSingleHelpWim(anim);
 	}
 
 	if (**reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850) == 1) {
@@ -1456,10 +1433,10 @@ void CMenuPcs::LetterListDraw()
 	CColor titleColor(0xFF, 0xFF, 0xFF, static_cast<u8>(FLOAT_803330a0 * *reinterpret_cast<float*>(menuDataBase + 0x58)));
 	font->SetColor(titleColor.color);
 
-	const char* menuTitle = GetMenuStr(0x1D);
+	char* menuTitle = GetMenuStr(0x1D);
 	float titleX = static_cast<float>((static_cast<double>(FLOAT_80333158) - static_cast<double>(font->GetWidth(menuTitle))) *
 	                                  DOUBLE_803330a8);
-	DrawShadowFont__8CMenuPcsFP5CFontPcffii(this, font, menuTitle, titleX, FLOAT_8033315c, 0x18, 0x12);
+	DrawShadowFont(font, menuTitle, titleX, FLOAT_8033315c, 0x18, 0x12);
 
 	if (DOUBLE_803330e8 > static_cast<double>(*reinterpret_cast<float*>(menuDataBase + 0x58))) {
 		return;
@@ -1502,7 +1479,7 @@ void CMenuPcs::LetterListDraw()
 		y += 0x20;
 	}
 
-	DrawInit__8CMenuPcsFv(this);
+	DrawInit();
 
 	unsigned char pageMark = (*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x34) != 0) ? 1 : 0;
 	if (topRow + 9 < *reinterpret_cast<int*>(caravanWork + 1000)) {
@@ -1517,13 +1494,13 @@ void CMenuPcs::LetterListDraw()
 		const double markScale =
 		    static_cast<double>(static_cast<float>(DOUBLE_80333098 * static_cast<double>(absPhase) + DOUBLE_80333090));
 
-		SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
+		SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
 		const int alpha = static_cast<int>(
 		    FLOAT_803330a0 * static_cast<float>(DOUBLE_803330b0 * static_cast<double>(absPhase) + DOUBLE_803330a8));
 		GXColor markColor = {0xFF, 0xFF, 0xFF, static_cast<u8>(alpha)};
 		GXSetChanMatColor(GX_COLOR0A0, markColor);
-		SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x43);
+		SetTexture(static_cast<CMenuPcs::TEX>(0x43));
 
 		const double iconSize = static_cast<double>(FLOAT_803330b8);
 		const double iconOffset =
@@ -1583,7 +1560,7 @@ void CMenuPcs::LetterListDraw()
 void CMenuPcs::LetterMessDraw()
 {
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
+	SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
 	int caravanWork = Game.m_scriptFoodBase[0];
 	int state = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C);
@@ -1600,7 +1577,7 @@ void CMenuPcs::LetterMessDraw()
 		u8 alpha = static_cast<u8>(FLOAT_803330a0 * *reinterpret_cast<float*>(panel + 8));
 		GXColor color = {0xFF, 0xFF, 0xFF, alpha};
 		GXSetChanMatColor(GX_COLOR0A0, color);
-		SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, tex);
+		SetTexture(static_cast<CMenuPcs::TEX>(tex));
 		DrawRect__8CMenuPcsFUlfffffffff(
 		    static_cast<double>(panel[0]), static_cast<double>(panel[1]),
 		    static_cast<double>(panel[2]), static_cast<double>(panel[3]),
@@ -1664,7 +1641,7 @@ void CMenuPcs::LetterMessDraw()
 	delete[] srcText;
 	delete[] workText;
 
-	DrawInit__8CMenuPcsFv(this);
+	DrawInit();
 
 	int letterEntry = caravanWork + s_SelLetter * 0xC;
 	if ((*reinterpret_cast<u16*>(letterEntry + 0x3EE) & 0x1FF) != 0) {
@@ -1678,14 +1655,14 @@ void CMenuPcs::LetterMessDraw()
 		return;
 	}
 
-	DrawSingWin__8CMenuPcsFs(this, -1);
+	DrawSingWin(-1);
 	if ((*reinterpret_cast<s16*>(state + 0x12) == 1) &&
 	    (*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x848) + 0xA) == 1)) {
 		int msgType = static_cast<int>(*reinterpret_cast<signed char*>(state + 9));
 		if (mode == 4) {
-			DrawSingWinMess__8CMenuPcsFiii(this, 2, msgType, 0);
+			DrawSingWinMess(2, msgType, 0);
 		} else {
-			DrawSingWinMess__8CMenuPcsFiii(this, 0, msgType, 1);
+			DrawSingWinMess(0, msgType, 1);
 		}
 
 		float cursorX;
@@ -1699,13 +1676,13 @@ void CMenuPcs::LetterMessDraw()
 				itemSel += ((s_Attach == 2) ? 1 : 0) + 4;
 			}
 			cursorX = static_cast<float>(singWin[0] + 0x14);
-			cursorY = static_cast<float>(singWin[1] + itemSel * SingWinMessHeight__8CMenuPcsFv(this) + 0x20);
+			cursorY = static_cast<float>(singWin[1] + itemSel * SingWinMessHeight() + 0x20);
 		} else {
 			cursorX = static_cast<float>(singWin[0] - 8);
 			if (mode == 4) {
 				cursorX += FLOAT_80333110;
 			}
-			cursorY = static_cast<float>(singWin[1] + *reinterpret_cast<s16*>(state + 0x28) * SingWinMessHeight__8CMenuPcsFv(this) + 0x20);
+			cursorY = static_cast<float>(singWin[1] + *reinterpret_cast<s16*>(state + 0x28) * SingWinMessHeight() + 0x20);
 		}
 
 		int frame = static_cast<int>(System.m_frameCounter);
@@ -2154,7 +2131,7 @@ void CMenuPcs::LetterLstBaseDraw(float param_1)
 	double w = static_cast<double>(static_cast<int>(static_cast<double>(FLOAT_803330e0) - DOUBLE_803330a8));
 	double h = static_cast<double>(static_cast<int>(static_cast<double>(FLOAT_803330f0) - DOUBLE_803330e8));
 
-	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
+	SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 	GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
 	GXSetChanMatColor(GX_COLOR0A0, white);
 
@@ -2184,7 +2161,7 @@ void CMenuPcs::LetterLstBaseDraw(float param_1)
 			y = y1;
 		}
 
-		SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, tex);
+		SetTexture(static_cast<CMenuPcs::TEX>(tex));
 		DrawRect__8CMenuPcsFUlfffffffff(
 		    x, y, static_cast<double>(FLOAT_803330f4), static_cast<double>(FLOAT_803330f4),
 		    static_cast<double>(FLOAT_803330bc), static_cast<double>(FLOAT_803330bc),
@@ -2199,14 +2176,14 @@ void CMenuPcs::LetterLstBaseDraw(float param_1)
 	for (int i = 0; i < 2; ++i) {
 		int tex = (i == 0) ? 0x49 : 0x4C;
 		double y = (i == 0) ? y0 : y1;
-		SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, tex);
+		SetTexture(static_cast<CMenuPcs::TEX>(tex));
 		DrawRect__8CMenuPcsFUlfffffffff(
 		    innerX, y, innerW, static_cast<double>(FLOAT_803330f4),
 		    static_cast<double>(FLOAT_803330bc), static_cast<double>(FLOAT_803330bc),
 		    static_cast<double>(FLOAT_803330f8), static_cast<double>(FLOAT_803330f8), this, 0);
 	}
 
-	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x4A);
+	SetTexture(static_cast<CMenuPcs::TEX>(0x4A));
 	for (int i = 0; i < 2; ++i) {
 		int flip = (i == 0) ? 0 : 8;
 		double x = (i == 0) ? x0 : x1;
@@ -2216,13 +2193,13 @@ void CMenuPcs::LetterLstBaseDraw(float param_1)
 		    static_cast<double>(FLOAT_803330f8), static_cast<double>(FLOAT_803330f8), this, flip);
 	}
 
-	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x4E);
+	SetTexture(static_cast<CMenuPcs::TEX>(0x4E));
 	DrawRect__8CMenuPcsFUlfffffffff(
 	    innerX, innerY, innerW, innerH,
 	    static_cast<double>(FLOAT_803330bc), static_cast<double>(FLOAT_803330bc),
 	    static_cast<double>(FLOAT_803330f8), static_cast<double>(FLOAT_803330f8), this, 0);
 
-	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x4F);
+	SetTexture(static_cast<CMenuPcs::TEX>(0x4F));
 	double decoX0 = static_cast<double>(static_cast<float>(x0 + w - static_cast<double>(FLOAT_80333108)));
 	double decoY0 = y0 - DOUBLE_80333100;
 	double decoX1 = static_cast<double>(static_cast<float>(decoX0 + DOUBLE_80333100));
@@ -2237,7 +2214,7 @@ void CMenuPcs::LetterLstBaseDraw(float param_1)
 		    static_cast<double>(FLOAT_803330f8), static_cast<double>(FLOAT_803330f8), this, flip);
 	}
 
-	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x50);
+	SetTexture(static_cast<CMenuPcs::TEX>(0x50));
 	double barX0 = static_cast<double>(static_cast<float>(x0 - static_cast<double>(FLOAT_80333110)));
 	double barX1 = static_cast<double>(static_cast<float>(decoX0 + static_cast<double>(FLOAT_80333110)));
 	double barY0 = static_cast<double>(static_cast<float>((DOUBLE_80333118 + y0) - DOUBLE_80333100));
@@ -2259,7 +2236,7 @@ void CMenuPcs::LetterLstBaseDraw(float param_1)
 	}
 
 	if (param >= DOUBLE_803330e8) {
-		SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x3D);
+		SetTexture(static_cast<CMenuPcs::TEX>(0x3D));
 		DrawRect__8CMenuPcsFUlfffffffff(
 		    static_cast<double>(static_cast<float>(x0 - static_cast<double>(FLOAT_803330f4))),
 		    static_cast<double>(static_cast<float>(y0 - static_cast<double>(FLOAT_80333108))),

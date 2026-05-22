@@ -541,7 +541,7 @@ void CPad::Quit()
 {
 	if (_1b0_4_ != 0)
 	{
-		operator delete[](_1b0_4_);
+		delete[] _1b0_4_;
 		_1b0_4_ = 0;
 	}
 

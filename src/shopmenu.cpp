@@ -17,8 +17,6 @@
 #include <PowerPC_EABI_Support/Runtime/New.h>
 
 extern "C" {
-void _WaitDrawDone__8CGraphicFPci(void*, char*, int);
-void SetDrawDoneDebugData__8CGraphicFSc(void*, signed char);
 void SetMode__9CShopMenuFi(void*, int);
 void DrawSingleBase__8CMenuPcsFf(void*, float);
 void ReleasePdt__8CPartPcsFi(void*, int);
@@ -1634,9 +1632,9 @@ void CShopMenu::DrawMakeBase()
  */
 void CShopMenu::DrawShopBase()
 {
-    SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 1);
+    Graphic.SetDrawDoneDebugData(1);
     DrawSingleBase__8CMenuPcsFf(reinterpret_cast<CMenuPcs*>(MenuPcsVoid()), FLOAT_80332d28);
-    SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 2);
+    Graphic.SetDrawDoneDebugData(2);
     pppInitDrawEnv(0);
 
     GXSetVtxAttrFmt((GXVtxFmt)7, (GXAttr)9, (GXCompCnt)1, (GXCompType)4, 0);
@@ -1659,7 +1657,7 @@ void CShopMenu::DrawShopBase()
         panelBottom = 0x10C;
     }
 
-    SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 3);
+    Graphic.SetDrawDoneDebugData(3);
     _GXColor fadeA = {0xFF, 0xFF, 0xFF, 0x00};
     _GXColor fadeB = {0xFF, 0xFF, 0xFF, 0xFF};
     _GXColor fadeC = {0xFF, 0xFF, 0xFF, 0x00};
@@ -1678,34 +1676,34 @@ void CShopMenu::DrawShopBase()
     _GXColor endC = {0xFF, 0xFF, 0xFF, 0xFF};
     _GXColor endD = {0xFF, 0xFF, 0xFF, 0x00};
     drawShapeSeqGrouad(9, 0, x, panelBottom, FLOAT_80332d78, FLOAT_80332dc8, endA, endB, endC, endD);
-    SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 4);
+    Graphic.SetDrawDoneDebugData(4);
 
     if ((mode >= 3) && (mode < 0xC)) {
         int listX = (mode < 9) ? 0x64 : 0x118;
         for (int barX = listX + 0x48; barX < 0x244; barX += 8) {
-            SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 5);
+            Graphic.SetDrawDoneDebugData(5);
             drawShapeSeq(0x10, 0, barX, 0x11E, 0xFF, 0, 0, FLOAT_80332d9c, 0);
-            SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 6);
+            Graphic.SetDrawDoneDebugData(6);
         }
-        SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 7);
+        Graphic.SetDrawDoneDebugData(7);
         drawShapeSeq(0xD, 0, listX + 0x46, 0xA7, 0xFF, 0, 0, FLOAT_80332d9c, 0);
-        SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 8);
-        SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 9);
+        Graphic.SetDrawDoneDebugData(8);
+        Graphic.SetDrawDoneDebugData(9);
         drawShapeSeq(8, 0, 0x244, 0x11E, 0xFF, 0, 0, FLOAT_80332d9c, 0);
-        SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 10);
+        Graphic.SetDrawDoneDebugData(10);
     }
 
     if ((mode >= 3) && (mode < 9)) {
         for (int sideX = 0x4E; sideX > 0x32; sideX -= 0x10) {
-            SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0xB);
+            Graphic.SetDrawDoneDebugData(0xB);
             drawShapeSeq(0xC, 0, sideX, 0x174, 0xFF, 0, 0, FLOAT_80332d9c, 0);
-            SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0xC);
+            Graphic.SetDrawDoneDebugData(0xC);
         }
-        SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0xD);
+        Graphic.SetDrawDoneDebugData(0xD);
         drawShapeSeq(0xB, 0, 0x7E, 0x150, 0xFF, 0, 0, FLOAT_80332d9c, 0);
-        SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0xE);
+        Graphic.SetDrawDoneDebugData(0xE);
         drawShapeSeq(8, 0, 0x2E, 0x170, 0xFF, 0, 0, FLOAT_80332d9c, 0);
-        SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0xF);
+        Graphic.SetDrawDoneDebugData(0xF);
 
         int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
         CFont* font = *reinterpret_cast<CFont**>(MenuPcsRaw() + 0x264);
@@ -1719,25 +1717,25 @@ void CShopMenu::DrawShopBase()
                                                              ShopMenuMes(languageId, SHOP_MENU_TEXT_SELL);
         float confirmTextX = CalcCenteredShopMenuX(font, confirmText);
         DrawInit__5CFontFv(font);
-        SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x10);
+        Graphic.SetDrawDoneDebugData(0x10);
         SetPosX__5CFontFf(confirmTextX, font);
         SetPosY__5CFontFf(312.0f, font);
         Draw__5CFontFPc(font, confirmText);
-        SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x11);
+        Graphic.SetDrawDoneDebugData(0x11);
 
         float cancelTextX = CalcCenteredShopMenuX(font, ShopMenuMes(languageId, SHOP_MENU_TEXT_CANCEL));
         DrawInit__5CFontFv(font);
         SetPosX__5CFontFf(cancelTextX, font);
         SetPosY__5CFontFf(346.0f, font);
         Draw__5CFontFPc(font, ShopMenuMes(languageId, SHOP_MENU_TEXT_CANCEL));
-        SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x12);
+        Graphic.SetDrawDoneDebugData(0x12);
         DrawInit__8CMenuPcsFv(MenuPcsVoid());
-        SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x13);
+        Graphic.SetDrawDoneDebugData(0x13);
 
         if (ShopMenuInt(this, 0x10) == 2) {
-            SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x14);
+            Graphic.SetDrawDoneDebugData(0x14);
             DrawCursor__8CMenuPcsFiif(MenuPcsVoid(), 0x2C, ShopMenuInt(this, 0x3C) * 0x18 + 0x134, FLOAT_80332d28);
-            SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x15);
+            Graphic.SetDrawDoneDebugData(0x15);
         }
     }
 }
@@ -1748,7 +1746,7 @@ void CShopMenu::DrawShopBase()
  */
 void CShopMenu::Draw()
 {
-    SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x46);
+    Graphic.SetDrawDoneDebugData(0x46);
     pppEnvStPtr = reinterpret_cast<_pppEnvSt*>(PartMng.m_pdtSlots[ShopMenuInt(this, 0x18)].m_envFields);
 
     DrawInit__8CMenuPcsFv(MenuPcsVoid());
@@ -1779,7 +1777,7 @@ void CShopMenu::Draw()
         int fadeStep = static_cast<int>(FLOAT_80332de0 * fade);
         unsigned char alpha = static_cast<unsigned char>(0xFF - (fadeStep & 0xFF));
 
-        SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x32);
+        Graphic.SetDrawDoneDebugData(0x32);
 
         Mtx screenMtx;
         Mtx44 projectionMtx;
@@ -1819,9 +1817,9 @@ void CShopMenu::Draw()
         Vec bottomRight = {640.0f, 480.0f, 0.0f};
         Graphic.RenderNoTexQuadGrouad(topLeft, bottomRight, fadeColor, fadeColor, fadeColor, fadeColor);
 
-        SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x33);
+        Graphic.SetDrawDoneDebugData(0x33);
     }
-    SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x3C);
+    Graphic.SetDrawDoneDebugData(0x3C);
 }
 /*
  * --INFO--
@@ -2177,9 +2175,9 @@ void CShopMenu::DrawShop0()
         int y = i * 0x24 + 0x92;
         int highlight = (i == selected) ? 1 : 0;
 
-        SetDrawDoneDebugData__8CGraphicFSc(&Graphic, static_cast<signed char>(0x1E + i));
+        Graphic.SetDrawDoneDebugData(static_cast<signed char>(0x1E + i));
         drawShapeSeq(0, highlight, x, y, 0xFF, 0, 0, 0.0f, 0);
-        SetDrawDoneDebugData__8CGraphicFSc(&Graphic, static_cast<signed char>(0x21 + i));
+        Graphic.SetDrawDoneDebugData(static_cast<signed char>(0x21 + i));
         drawShapeSeq(8, highlight, x - 0x30, y, 0xFF, 0, 0, 0.0f, 0);
 
         DrawInit__5CFontFv(font);
@@ -2190,13 +2188,13 @@ void CShopMenu::DrawShop0()
         DrawInit__8CMenuPcsFv(MenuPcsVoid());
     }
 
-    SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x24);
+    Graphic.SetDrawDoneDebugData(0x24);
     DrawInit__5CFontFv(font);
     DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(
         MenuPcsVoid(), font, ShopMenuMes(languageId, SHOP_MENU_TEXT_TITLE), FLOAT_80332d54, 88.0f, 9, 0x12);
     DrawInit__8CMenuPcsFv(MenuPcsVoid());
 
-    SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x28);
+    Graphic.SetDrawDoneDebugData(0x28);
     DrawCursor__8CMenuPcsFiif(MenuPcsVoid(), 0xA8, 0x9C + selected * 0x24, 1.0f);
 }
 /*
@@ -2823,7 +2821,7 @@ void CMenuPcs::CreateSmithMenu()
     *reinterpret_cast<CShopMenu**>(menuPcs + 0x878) = shopMenu;
     shopMenu = *reinterpret_cast<CShopMenu**>(menuPcs + 0x878);
 
-    _WaitDrawDone__8CGraphicFPci(&Graphic, s_shopmenu_cpp_801ded8c, 0x2FE);
+    Graphic._WaitDrawDone(s_shopmenu_cpp_801ded8c, 0x2FE);
     *reinterpret_cast<void**>(shopMenu) = nullptr;
     *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(shopMenu) + 0x20) = Game.m_scriptFoodBase[0];
     SetMode__9CShopMenuFi(shopMenu, 9);
@@ -2862,7 +2860,7 @@ void CMenuPcs::CreateShopMenu()
     *reinterpret_cast<CShopMenu**>(menuPcs + 0x878) = shopMenu;
     shopMenu = *reinterpret_cast<CShopMenu**>(menuPcs + 0x878);
 
-    _WaitDrawDone__8CGraphicFPci(&Graphic, s_shopmenu_cpp_801ded8c, 0x2FE);
+    Graphic._WaitDrawDone(s_shopmenu_cpp_801ded8c, 0x2FE);
     *reinterpret_cast<void**>(shopMenu) = nullptr;
     *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(shopMenu) + 0x20) = Game.m_scriptFoodBase[0];
     SetMode__9CShopMenuFi(shopMenu, 0);

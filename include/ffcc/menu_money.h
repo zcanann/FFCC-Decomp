@@ -59,6 +59,27 @@ struct MoneyMenuState
 class CMenuPcs
 {
 public:
+    enum FMT
+    {
+        TODO_FMT
+    };
+
+    enum TEX
+    {
+        TODO_TEX
+    };
+
+    void DrawInit();
+    void SetAttrFmt(FMT);
+    void SetTexture(TEX);
+    void DrawRect(unsigned long, float, float, float, float, float, float, float, float, float);
+    void DrawSingWin(short);
+    void DrawSingWinMess(int, int, int);
+    int SingWinMessHeight();
+    void DrawCursor(int, int, float);
+    void GetSingWinSize(int, short*, short*, int);
+    void SetSingWinInfo(int, int, int, int);
+
     bool MoneyOpen();
     int MoneyCtrl();
     int MoneyClose();
@@ -78,5 +99,7 @@ public:
     MoneyMenuAnimList* moneyPanel;
     char pad_854[0x104];
 };
+
+extern CMenuPcs MenuPcs;
 
 #endif // _FFCC_MENU_MONEY_H_

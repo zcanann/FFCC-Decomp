@@ -3,6 +3,7 @@
 
 class CFont;
 struct ItemMenuAnimList;
+struct _GXColor;
 
 struct ItemMenuState
 {
@@ -32,6 +33,31 @@ struct ItemMenuState
 class CMenuPcs
 {
 public:
+    enum FMT
+    {
+        TODO_FMT
+    };
+
+    enum TEX
+    {
+        TODO_TEX
+    };
+
+    void SetAttrFmt(FMT);
+    void SetTexture(TEX);
+    void DrawInit();
+    void DrawRect(unsigned long, float, float, float, float, float, float, float, float, float);
+    void DrawRect(unsigned long, float, float, float, float, float, float, _GXColor*, float, float, float);
+    void DrawSingleIcon(int, int, int, float, int, float);
+    double CalcListPos(int, int, int);
+    void DrawListPosMark(float, float, float);
+    void DrawSingWin(short);
+    void DrawSingWinMess(int, int, int);
+    int SingWinMessHeight();
+    void DrawCursor(int, int, float);
+    void DrawSingLife();
+    void DrawHelpMessage(int, CFont*, int, int, _GXColor, int, float, float);
+
     void ItemInit();
     void ItemInit1();
     bool ItemOpen();
@@ -40,8 +66,12 @@ public:
     void ItemDraw();
     int ItemCtrlCur();
     void SingLifeInit(int);
+    int SingGetLetterAttachflg();
+    void LetterSetAttachItem(unsigned int, int);
     int EquipChk(int);
     int GetItemType(int, int);
+    void GetSingWinSize(int, short*, short*, int);
+    void SetSingWinInfo(int, int, int, int);
     void DrawEquipMark(int, int, float);
 
     char pad_00[0xF8];
@@ -56,5 +86,7 @@ public:
     ItemMenuAnimList* itemList;
     char pad_854[0x104];
 };
+
+extern CMenuPcs MenuPcs;
 
 #endif // _FFCC_MENU_ITEM_H_

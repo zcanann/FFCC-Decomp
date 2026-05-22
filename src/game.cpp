@@ -40,19 +40,8 @@
 #include <dolphin/os/OSRtc.h>
 
 extern "C" {
-unsigned int AddScenegraph__7CSystemFP8CProcessi(CSystem*, void*, int);
-void RemoveScenegraph__7CSystemFP8CProcessi(CSystem*, void*, int);
-void ExecScenegraph__7CSystemFv(CSystem*);
-void createLoad__8CPartPcsFv(void*);
-void pppDeleteAll__8CPartMngFv(void*);
-void pppDestroyAll__8CPartMngFv(void*);
-int pppGetIfDt__8CPartMngFs(void*, short);
-void pppEndPart__8CPartMngFi(void*, int);
 int sprintf(char*, const char*, ...);
-void Draw__5CWindFv(void*);
 int rand(void);
-void ResetNewGame__13CFlatRuntime2Fv(void*);
-void InitFurTexBuffer__6CCharaFv(void*);
 }
 
 const float FLOAT_8032f688 = 1.0E+10;
@@ -339,7 +328,7 @@ void CGame::LoadLogoWaitingData()
 	if (m_assetsLoadedFlag == 0) {
 		SoundPcs.createLoad();
 		CharaPcs.createLoad();
-		createLoad__8CPartPcsFv(&PartPcs);
+		PartPcs.createLoad();
 		m_assetsLoadedFlag = 1;
 		if ((u32)System.m_execParam < 3) {
 			return;
@@ -360,10 +349,10 @@ void CGame::LoadLogoWaitingData()
  */
 void CGame::Exec()
 {
-	AddScenegraph__7CSystemFP8CProcessi(&System, &SystemPcs, 0);
-	AddScenegraph__7CSystemFP8CProcessi(&System, &GraphicPcs, 0);
-	AddScenegraph__7CSystemFP8CProcessi(&System, &LightPcs, 0);
-	AddScenegraph__7CSystemFP8CProcessi(&System, &MiniGamePcs, 0);
+	System.AddScenegraph(reinterpret_cast<CProcess*>(&SystemPcs), 0);
+	System.AddScenegraph(reinterpret_cast<CProcess*>(&GraphicPcs), 0);
+	System.AddScenegraph(reinterpret_cast<CProcess*>(&LightPcs), 0);
+	System.AddScenegraph(reinterpret_cast<CProcess*>(&MiniGamePcs), 0);
 
 	do {
 		m_cfdLoadedFlag = 0;
@@ -385,84 +374,84 @@ void CGame::Exec()
 
 		switch (m_currentSceneId) {
 		case 2:
-			AddScenegraph__7CSystemFP8CProcessi(&System, &CameraPcs, 1);
-			AddScenegraph__7CSystemFP8CProcessi(&System, &CharaPcs, 1);
+			System.AddScenegraph(reinterpret_cast<CProcess*>(&CameraPcs), 1);
+			System.AddScenegraph(reinterpret_cast<CProcess*>(&CharaPcs), 1);
 			break;
 		case 3:
-			AddScenegraph__7CSystemFP8CProcessi(&System, &CameraPcs, 2);
-			AddScenegraph__7CSystemFP8CProcessi(&System, &MapPcs, 1);
-			AddScenegraph__7CSystemFP8CProcessi(&System, &CameraPcs, 6);
+			System.AddScenegraph(reinterpret_cast<CProcess*>(&CameraPcs), 2);
+			System.AddScenegraph(reinterpret_cast<CProcess*>(&MapPcs), 1);
+			System.AddScenegraph(reinterpret_cast<CProcess*>(&CameraPcs), 6);
 			break;
 		case 4:
-			AddScenegraph__7CSystemFP8CProcessi(&System, &MenuPcs, 0);
-			AddScenegraph__7CSystemFP8CProcessi(&System, &CameraPcs, 0);
-			AddScenegraph__7CSystemFP8CProcessi(&System, &MapPcs, 0);
-			AddScenegraph__7CSystemFP8CProcessi(&System, &CameraPcs, 6);
-			AddScenegraph__7CSystemFP8CProcessi(&System, &CharaPcs, 0);
-			AddScenegraph__7CSystemFP8CProcessi(&System, &Game, 0);
-			AddScenegraph__7CSystemFP8CProcessi(&System, &PartPcs, 0);
-			AddScenegraph__7CSystemFP8CProcessi(&System, &GbaPcs, 0);
-			AddScenegraph__7CSystemFP8CProcessi(&System, &DbgMenuPcs, 0);
-			AddScenegraph__7CSystemFP8CProcessi(&System, &McPcs, 0);
-			AddScenegraph__7CSystemFP8CProcessi(&System, &SoundPcs, 0);
+			System.AddScenegraph(reinterpret_cast<CProcess*>(&MenuPcs), 0);
+			System.AddScenegraph(reinterpret_cast<CProcess*>(&CameraPcs), 0);
+			System.AddScenegraph(reinterpret_cast<CProcess*>(&MapPcs), 0);
+			System.AddScenegraph(reinterpret_cast<CProcess*>(&CameraPcs), 6);
+			System.AddScenegraph(reinterpret_cast<CProcess*>(&CharaPcs), 0);
+			System.AddScenegraph(reinterpret_cast<CProcess*>(&Game), 0);
+			System.AddScenegraph(reinterpret_cast<CProcess*>(&PartPcs), 0);
+			System.AddScenegraph(reinterpret_cast<CProcess*>(&GbaPcs), 0);
+			System.AddScenegraph(reinterpret_cast<CProcess*>(&DbgMenuPcs), 0);
+			System.AddScenegraph(reinterpret_cast<CProcess*>(&McPcs), 0);
+			System.AddScenegraph(reinterpret_cast<CProcess*>(&SoundPcs), 0);
 			break;
 		case 5:
-			AddScenegraph__7CSystemFP8CProcessi(&System, &CameraPcs, 3);
-			AddScenegraph__7CSystemFP8CProcessi(&System, &MaterialEditorPcs, 0);
-			RemoveScenegraph__7CSystemFP8CProcessi(&System, &LightPcs, 0);
+			System.AddScenegraph(reinterpret_cast<CProcess*>(&CameraPcs), 3);
+			System.AddScenegraph(reinterpret_cast<CProcess*>(&MaterialEditorPcs), 0);
+			System.RemoveScenegraph(reinterpret_cast<CProcess*>(&LightPcs), 0);
 			break;
 		case 6:
-			AddScenegraph__7CSystemFP8CProcessi(&System, &CameraPcs, 4);
-			AddScenegraph__7CSystemFP8CProcessi(&System, &FunnyShapePcs, 0);
-			RemoveScenegraph__7CSystemFP8CProcessi(&System, &LightPcs, 0);
+			System.AddScenegraph(reinterpret_cast<CProcess*>(&CameraPcs), 4);
+			System.AddScenegraph(reinterpret_cast<CProcess*>(&FunnyShapePcs), 0);
+			System.RemoveScenegraph(reinterpret_cast<CProcess*>(&LightPcs), 0);
 			break;
 		case 7:
-			AddScenegraph__7CSystemFP8CProcessi(&System, &CameraPcs, 5);
-			AddScenegraph__7CSystemFP8CProcessi(&System, &CharaPcs, 2);
-			AddScenegraph__7CSystemFP8CProcessi(&System, &MapPcs, 1);
-			AddScenegraph__7CSystemFP8CProcessi(&System, &CameraPcs, 6);
-			AddScenegraph__7CSystemFP8CProcessi(&System, &PartPcs, 1);
+			System.AddScenegraph(reinterpret_cast<CProcess*>(&CameraPcs), 5);
+			System.AddScenegraph(reinterpret_cast<CProcess*>(&CharaPcs), 2);
+			System.AddScenegraph(reinterpret_cast<CProcess*>(&MapPcs), 1);
+			System.AddScenegraph(reinterpret_cast<CProcess*>(&CameraPcs), 6);
+			System.AddScenegraph(reinterpret_cast<CProcess*>(&PartPcs), 1);
 			break;
 		}
 
-		ExecScenegraph__7CSystemFv(&System);
+		System.ExecScenegraph();
 
 		switch (m_currentSceneId) {
 		case 2:
-			RemoveScenegraph__7CSystemFP8CProcessi(&System, &CameraPcs, 1);
-			RemoveScenegraph__7CSystemFP8CProcessi(&System, &CharaPcs, 1);
+			System.RemoveScenegraph(reinterpret_cast<CProcess*>(&CameraPcs), 1);
+			System.RemoveScenegraph(reinterpret_cast<CProcess*>(&CharaPcs), 1);
 			break;
 		case 3:
-			RemoveScenegraph__7CSystemFP8CProcessi(&System, &CameraPcs, 2);
-			RemoveScenegraph__7CSystemFP8CProcessi(&System, &CameraPcs, 6);
-			RemoveScenegraph__7CSystemFP8CProcessi(&System, &MapPcs, 1);
+			System.RemoveScenegraph(reinterpret_cast<CProcess*>(&CameraPcs), 2);
+			System.RemoveScenegraph(reinterpret_cast<CProcess*>(&CameraPcs), 6);
+			System.RemoveScenegraph(reinterpret_cast<CProcess*>(&MapPcs), 1);
 			break;
 		case 4:
-			RemoveScenegraph__7CSystemFP8CProcessi(&System, &SoundPcs, 0);
-			RemoveScenegraph__7CSystemFP8CProcessi(&System, &McPcs, 0);
-			RemoveScenegraph__7CSystemFP8CProcessi(&System, &CameraPcs, 0);
-			RemoveScenegraph__7CSystemFP8CProcessi(&System, &CameraPcs, 6);
-			RemoveScenegraph__7CSystemFP8CProcessi(&System, &MapPcs, 0);
-			RemoveScenegraph__7CSystemFP8CProcessi(&System, &CharaPcs, 0);
-			RemoveScenegraph__7CSystemFP8CProcessi(&System, &PartPcs, 0);
-			RemoveScenegraph__7CSystemFP8CProcessi(&System, &GbaPcs, 0);
-			RemoveScenegraph__7CSystemFP8CProcessi(&System, &Game, 0);
-			RemoveScenegraph__7CSystemFP8CProcessi(&System, &MenuPcs, 0);
+			System.RemoveScenegraph(reinterpret_cast<CProcess*>(&SoundPcs), 0);
+			System.RemoveScenegraph(reinterpret_cast<CProcess*>(&McPcs), 0);
+			System.RemoveScenegraph(reinterpret_cast<CProcess*>(&CameraPcs), 0);
+			System.RemoveScenegraph(reinterpret_cast<CProcess*>(&CameraPcs), 6);
+			System.RemoveScenegraph(reinterpret_cast<CProcess*>(&MapPcs), 0);
+			System.RemoveScenegraph(reinterpret_cast<CProcess*>(&CharaPcs), 0);
+			System.RemoveScenegraph(reinterpret_cast<CProcess*>(&PartPcs), 0);
+			System.RemoveScenegraph(reinterpret_cast<CProcess*>(&GbaPcs), 0);
+			System.RemoveScenegraph(reinterpret_cast<CProcess*>(&Game), 0);
+			System.RemoveScenegraph(reinterpret_cast<CProcess*>(&MenuPcs), 0);
 			break;
 		case 5:
-			RemoveScenegraph__7CSystemFP8CProcessi(&System, &CameraPcs, 3);
-			RemoveScenegraph__7CSystemFP8CProcessi(&System, &MaterialEditorPcs, 0);
+			System.RemoveScenegraph(reinterpret_cast<CProcess*>(&CameraPcs), 3);
+			System.RemoveScenegraph(reinterpret_cast<CProcess*>(&MaterialEditorPcs), 0);
 			break;
 		case 6:
-			RemoveScenegraph__7CSystemFP8CProcessi(&System, &CameraPcs, 4);
-			RemoveScenegraph__7CSystemFP8CProcessi(&System, &FunnyShapePcs, 0);
+			System.RemoveScenegraph(reinterpret_cast<CProcess*>(&CameraPcs), 4);
+			System.RemoveScenegraph(reinterpret_cast<CProcess*>(&FunnyShapePcs), 0);
 			break;
 		case 7:
-			RemoveScenegraph__7CSystemFP8CProcessi(&System, &CameraPcs, 5);
-			RemoveScenegraph__7CSystemFP8CProcessi(&System, &CameraPcs, 6);
-			RemoveScenegraph__7CSystemFP8CProcessi(&System, &CharaPcs, 2);
-			RemoveScenegraph__7CSystemFP8CProcessi(&System, &MapPcs, 1);
-			RemoveScenegraph__7CSystemFP8CProcessi(&System, &PartPcs, 1);
+			System.RemoveScenegraph(reinterpret_cast<CProcess*>(&CameraPcs), 5);
+			System.RemoveScenegraph(reinterpret_cast<CProcess*>(&CameraPcs), 6);
+			System.RemoveScenegraph(reinterpret_cast<CProcess*>(&CharaPcs), 2);
+			System.RemoveScenegraph(reinterpret_cast<CProcess*>(&MapPcs), 1);
+			System.RemoveScenegraph(reinterpret_cast<CProcess*>(&PartPcs), 1);
 			break;
 		}
 
@@ -470,10 +459,10 @@ void CGame::Exec()
 		Memory.DecHeapWalkerLevel();
 	} while (m_sceneId != 0);
 
-	RemoveScenegraph__7CSystemFP8CProcessi(&System, &MiniGamePcs, 0);
-	RemoveScenegraph__7CSystemFP8CProcessi(&System, &LightPcs, 0);
-	RemoveScenegraph__7CSystemFP8CProcessi(&System, &GraphicPcs, 0);
-	RemoveScenegraph__7CSystemFP8CProcessi(&System, &SystemPcs, 0);
+	System.RemoveScenegraph(reinterpret_cast<CProcess*>(&MiniGamePcs), 0);
+	System.RemoveScenegraph(reinterpret_cast<CProcess*>(&LightPcs), 0);
+	System.RemoveScenegraph(reinterpret_cast<CProcess*>(&GraphicPcs), 0);
+	System.RemoveScenegraph(reinterpret_cast<CProcess*>(&SystemPcs), 0);
 }
 
 /*
@@ -565,8 +554,8 @@ void CGame::InitNewGame()
     *reinterpret_cast<unsigned int*>(&game->m_gameWork.m_scriptSysVal0) = 1;
     game->m_gameWork.m_chaliceElement = 1;
     strcpy(game->m_gameWork.m_townName, game->m_gameWork.m_languageId == 3 ? DAT_8032f6a4 : DAT_8032f6ac);
-    ResetNewGame__13CFlatRuntime2Fv(CFlat);
-    InitFurTexBuffer__6CCharaFv(&Chara);
+    gCFlatRuntime2.ResetNewGame();
+    Chara.InitFurTexBuffer();
 }
 
 /*
@@ -752,7 +741,7 @@ void CGame::CheckScriptChange()
         if (m_assetsLoadedFlag == 0) {
             SoundPcs.createLoad();
             CharaPcs.createLoad();
-            createLoad__8CPartPcsFv(&PartPcs);
+            PartPcs.createLoad();
             m_assetsLoadedFlag = 1;
 
             if ((u32)System.m_execParam > 2) {
@@ -777,8 +766,8 @@ void CGame::CheckScriptChange()
         *reinterpret_cast<unsigned int*>(&game->m_gameWork.m_scriptSysVal0) = 1;
         game->m_gameWork.m_chaliceElement = 1;
         strcpy(game->m_gameWork.m_townName, game->m_gameWork.m_languageId == 3 ? DAT_8032f6a4 : DAT_8032f6ac);
-        ResetNewGame__13CFlatRuntime2Fv(CFlat);
-        InitFurTexBuffer__6CCharaFv(&Chara);
+        gCFlatRuntime2.ResetNewGame();
+        Chara.InitFurTexBuffer();
         m_nextScript.m_flags = 0;
     }
 
@@ -839,8 +828,8 @@ void CGame::ChangeMap(int mapId, int mapVariant, int param4, int param5)
  */
 void CGame::ScriptChanging(char*)
 {
-	pppDeleteAll__8CPartMngFv(&PartMng);
-	pppDestroyAll__8CPartMngFv(&PartMng);
+	PartMng.pppDeleteAll();
+	PartMng.pppDestroyAll();
 }
 
 /*
@@ -1159,22 +1148,22 @@ void CGame::SaveScript(char* scriptData)
 void CGame::ParticleFrameCallback(int effectIndex, int scriptLine, int scriptStep, int callbackType, int graphFrame, Vec*)
 {
 	char* callbackFmtBase = const_cast<char*>(s_gameAssetNameBlock_801D5FC0);
-	int ifData = pppGetIfDt__8CPartMngFs(&PartMng, (short)effectIndex);
-	*(u8*)(ifData + 7) |= 1 << callbackType;
+	PPPIFPARAM* ifData = PartMng.pppGetIfDt(static_cast<short>(effectIndex));
+	ifData->m_hitFlags |= 1 << callbackType;
 
 	if (callbackType == 0) {
 		if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
 			System.Printf(callbackFmtBase + kParticleCallbackType0Fmt, scriptLine, scriptStep, effectIndex, graphFrame);
 		}
 	} else if (callbackType == 1) {
-		*(u8*)(ifData + 7) &= ~2;
-		pppEndPart__8CPartMngFi(&PartMng, effectIndex);
+		ifData->m_hitFlags &= ~2;
+		PartMng.pppEndPart(effectIndex);
 
 		if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
 			System.Printf(callbackFmtBase + kParticleCallbackType1Fmt, scriptLine, scriptStep, effectIndex, graphFrame);
 		}
 	} else if (callbackType == 3) {
-		pppEndPart__8CPartMngFi(&PartMng, effectIndex);
+		PartMng.pppEndPart(effectIndex);
 
 		if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
 			System.Printf(callbackFmtBase + kParticleCallbackType3Fmt, scriptLine, scriptStep, effectIndex, graphFrame);

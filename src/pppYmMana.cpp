@@ -83,7 +83,6 @@ static inline float LoadFloat(const float& value)
 
 extern "C" {
 void InitTexObj__8CTextureFv(void*);
-void _WaitDrawDone__8CGraphicFPci(CGraphic*, char*, int);
 }
 
 static int CreateWaterMesh(Vec* positionsInOut, Vec* normalsOut, Vec2d* uvOut, unsigned short* indicesOut, float size);
@@ -512,7 +511,7 @@ void pppDestructYmMana(PYmMana* ymMana, pppYmManaUnkC* param_2)
     *(u32*)(model + 0xE8) = 0;
     *(u32*)(model + 0xF0) = 0;
     *(u32*)(model + 0xFC) = 0;
-    _WaitDrawDone__8CGraphicFPci(&Graphic, const_cast<char*>(s_pppYmMana_cpp_801DB4D8), 0x2CE);
+    Graphic._WaitDrawDone(const_cast<char*>(s_pppYmMana_cpp_801DB4D8), 0x2CE);
     *(u32*)(MaterialManRaw() + 0xD0) = 0;
     *(u32*)(MaterialManRaw() + 0xDC) = 0;
 

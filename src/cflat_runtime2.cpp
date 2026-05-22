@@ -56,9 +56,6 @@ extern "C" void __ct__8CGObjectFv(CGObject*);
 extern "C" void __ct__9CGQuadObjFv(CGQuadObj*);
 extern "C" void __ct__9CGBaseObjFv(CGBaseObj*);
 extern "C" void pppCreate__8CPartMngFiiP14PPPCREATEPARAMi(CPartMng*, int, int, PPPCREATEPARAM*, int);
-extern "C" char* GetLangString__5CGameFv(void*);
-extern "C" void ClrBattleItem__8CMenuPcsFv(void*);
-extern "C" int GetBackBufferRect__8CGraphicFRiRiRiRii(CGraphic*, int&, int&, int&, int&, int);
 
 // Linkage definitions from config/GCCP01/symbols.txt.
 // Keeping these as raw byte buffers matches current decomp access patterns.
@@ -1786,7 +1783,7 @@ void CFlatRuntime2::loadLayer(int layerNo, char* fileName)
 	}
 
 	char path[0x104];
-	sprintf(path, sCFlatRuntime2TexturePathFmt, GetLangString__5CGameFv(&Game), fileName);
+	sprintf(path, sCFlatRuntime2TexturePathFmt, Game.GetLangString(), fileName);
 
 	CFile::CHandle* fileHandle = File.Open(path, 0, CFile::PRI_LOW);
 	if (fileHandle != 0) {
@@ -1842,7 +1839,7 @@ void CFlatRuntime2::loadLayerASync(int layerNo, char* fileName)
 	}
 
 	char path[0x104];
-	sprintf(path, sCFlatRuntime2TexturePathFmt, GetLangString__5CGameFv(&Game), fileName);
+	sprintf(path, sCFlatRuntime2TexturePathFmt, Game.GetLangString(), fileName);
 
 	fileHandle = File.Open(path, 0, CFile::PRI_LOW);
 	*reinterpret_cast<CFile::CHandle**>(layer + 8) = fileHandle;
@@ -1991,9 +1988,8 @@ void CFlatRuntime2::drawLayer(
 			int rectY = by;
 			int rectW = bw;
 			int rectH = bh;
-			int backTex =
-				GetBackBufferRect__8CGraphicFRiRiRiRii(&Graphic, rectX, rectY, rectW, rectH, 0);
-			GXLoadTexObj(reinterpret_cast<_GXTexObj*>(backTex), GX_TEXMAP1);
+			_GXTexObj* backTex = Graphic.GetBackBufferRect(rectX, rectY, rectW, rectH, 0);
+			GXLoadTexObj(backTex, GX_TEXMAP1);
 
 			const float fx0 = static_cast<float>(rectX);
 			const float fy0 = static_cast<float>(rectY);
@@ -2424,7 +2420,7 @@ void CFlatRuntime2::SysControl(int controlNo, int controlValue)
 	}
 
 	case 9:
-		ClrBattleItem__8CMenuPcsFv(&MenuPcs);
+		MenuPcs.ClrBattleItem();
 		break;
 
 	case 0xA:

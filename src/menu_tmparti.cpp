@@ -9,20 +9,6 @@
 #include <string.h>
 
 extern "C" int __cntlzw(unsigned int);
-extern "C" void SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(CMenuPcs*, int);
-extern "C" void SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(CMenuPcs*, int);
-extern "C" void DrawRect__8CMenuPcsFUlfffffffff(CMenuPcs*, unsigned long, float, float, float, float, float, float, float, float, float);
-extern "C" void DrawSingleIcon__8CMenuPcsFiiifif(CMenuPcs*, int, int, int, float, int, float);
-extern "C" void DrawInit__8CMenuPcsFv(CMenuPcs*);
-extern "C" void SetMargin__5CFontFf(float, CFont*);
-extern "C" void SetShadow__5CFontFi(CFont*, int);
-extern "C" void SetScale__5CFontFf(float, CFont*);
-extern "C" void DrawInit__5CFontFv(CFont*);
-extern "C" float GetWidth__5CFontFPc(CFont*, const char*);
-extern "C" void SetPosX__5CFontFf(float, CFont*);
-extern "C" void SetPosY__5CFontFf(float, CFont*);
-extern "C" void Draw__5CFontFPc(CFont*, const char*);
-
 
 extern const double DOUBLE_80332f20;
 extern const float FLOAT_80332F28;
@@ -97,7 +83,7 @@ struct TmpArtiFlatData {
 void CMenuPcs::TmpArtiDraw()
 {
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(&MenuPcs, 0);
+	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
 	unsigned int scriptFood = Game.m_scriptFoodBase[0];
 	short* entry = reinterpret_cast<short*>(GetTmpArtiEntries(this));
@@ -119,7 +105,7 @@ void CMenuPcs::TmpArtiDraw()
 				alpha = (float)(DOUBLE_80332f20 * (double)alpha);
 			}
 
-			SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, tex);
+			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));
 
 			GXColor color;
 			color.r = 0xFF;
@@ -129,7 +115,7 @@ void CMenuPcs::TmpArtiDraw()
 			GXSetChanMatColor(GX_COLOR0A0, color);
 
 			float z = *(float*)(entry + 10);
-			DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 0, left, top, width, height, s, t, z, z, FLOAT_80332f2c);
+			MenuPcs.DrawRect(0, left, top, width, height, s, t, z, z, FLOAT_80332f2c);
 		}
 		foodPtr += 2;
 		entry += 0x20;
@@ -142,17 +128,17 @@ void CMenuPcs::TmpArtiDraw()
 		if (icon >= 0) {
 			int posX = (int)TmpArtiIntToDouble(entry[0] + entry[2] - 0x10);
 			int posY = (int)((float)TmpArtiIntToDouble(entry[1] + 6) - FLOAT_80332f30);
-			DrawSingleIcon__8CMenuPcsFiiifif(this, icon, posX, posY, *(float*)(entry + 8), 0, FLOAT_80332f2c);
+			DrawSingleIcon(icon, posX, posY, *(float*)(entry + 8), 0, FLOAT_80332f2c);
 		}
 		entry += 0x20;
 		foodPtr += 2;
 	}
 
 	CFont* font = GetTmpArtiFont(this);
-	SetMargin__5CFontFf(FLOAT_80332f30, font);
-	SetShadow__5CFontFi(font, 0);
-	SetScale__5CFontFf(FLOAT_80332F34, font);
-	DrawInit__5CFontFv(font);
+	font->SetMargin(FLOAT_80332f30);
+	font->SetShadow(0);
+	font->SetScale(FLOAT_80332F34);
+	font->DrawInit();
 
 	const TmpArtiFlatData* flatData = (const TmpArtiFlatData*)&Game.m_cFlatDataArr[1];
 	entry = reinterpret_cast<short*>(GetTmpArtiEntries(this));
@@ -164,20 +150,20 @@ void CMenuPcs::TmpArtiDraw()
 			font->SetColor(textColor.color);
 
 			const char* text = flatData->table[0].strings[*(short*)(foodPtr + 0x1F6) * 5 + 4];
-			float width = GetWidth__5CFontFPc(font, text);
+			float width = font->GetWidth(text);
 			float posX = (float)(((TmpArtiIntToDouble(entry[2]) - width) * DOUBLE_80332f20) +
 			                       TmpArtiIntToDouble(entry[0]));
 			double posY = TmpArtiIntToDouble(entry[1] + 11);
 
-			SetPosX__5CFontFf(posX, font);
-			SetPosY__5CFontFf((float)posY - FLOAT_80332F38, font);
-			Draw__5CFontFPc(font, text);
+			font->SetPosX(posX);
+			font->SetPosY((float)posY - FLOAT_80332F38);
+			font->Draw(text);
 		}
 		entry += 0x20;
 		foodPtr += 2;
 	}
 
-	DrawInit__8CMenuPcsFv(this);
+	DrawInit();
 }
 
 /*

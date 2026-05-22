@@ -32,8 +32,6 @@ void pppInitBlendMode(void);
 void pppSetBlendMode(unsigned char);
 
 extern "C" {
-void SetDrawDoneDebugData__8CGraphicFSc(void*, signed char);
-void _WaitDrawDone__8CGraphicFPci(CGraphic*, const char*, int);
 void* GetCharaHandlePtr__FP8CGObjectl(void* obj, long index);
 int GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void* handle);
 void pppHeapUseRate__FPQ27CMemory6CStage(CMemory::CStage* stage);
@@ -277,7 +275,7 @@ void pppDestructEmission(pppEmission* pppEmission_, pppEmissionUnkC* param_2) {
     model->m_drawMeshDlCallback = 0;
     model->m_afterDrawMeshCallback = 0;
 
-    _WaitDrawDone__8CGraphicFPci(&Graphic, const_cast<char*>(s_pppEmission_cpp_801db7e8), 0x118);
+    Graphic._WaitDrawDone(const_cast<char*>(s_pppEmission_cpp_801db7e8), 0x118);
     CMemory::CStage* stage = (CMemory::CStage*)state[0];
     if (stage != (CMemory::CStage*)0) {
         pppHeapUseRate__FPQ27CMemory6CStage(stage);
@@ -365,7 +363,7 @@ void pppConstructEmission(pppEmission* pppEmission_, pppEmissionUnkC* param_2) {
  * JP Size: TODO
  */
 void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* param_3, int meshIndex, float (*param_5)[4]) {
-    SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x66);
+    Graphic.SetDrawDoneDebugData(0x66);
 
     EmissionModelView* modelView = (EmissionModelView*)model;
     EmissionState* state = (EmissionState*)param_2;
@@ -496,7 +494,7 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
         }
 
         _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
-        SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x67);
+        Graphic.SetDrawDoneDebugData(0x67);
     }
 }
 
@@ -510,7 +508,7 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
  * JP Size: TODO
  */
 void Emission_DrawMeshDLCallback(CChara::CModel* model, void*, void*, int meshIndex, int displayListIndex, float (*)[4]) {
-    SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x64);
+    Graphic.SetDrawDoneDebugData(0x64);
 
     EmissionModelView* modelView = (EmissionModelView*)model;
     EmissionMeshData* meshData = modelView->m_meshes[meshIndex].m_data;
@@ -525,6 +523,6 @@ void Emission_DrawMeshDLCallback(CChara::CModel* model, void*, void*, int meshIn
     } else {
         MaterialMan.SetMaterial(modelView->m_data->m_materialSet, displayList->m_material, 0, (_GXTevScale)0);
         GXCallDisplayList(displayList->m_data, displayList->m_size);
-        SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x65);
+        Graphic.SetDrawDoneDebugData(0x65);
     }
 }

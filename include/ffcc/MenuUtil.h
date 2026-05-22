@@ -55,4 +55,6 @@ public:
     CFont* menuFont;
 };
 
+extern CMenuPcs MenuPcs;
+
 #endif // _FFCC_MENU_UTIL_H_

@@ -44,7 +44,6 @@ struct VtMimeEnv
 extern "C" const char s_pppVtMime_cpp[] = "pppVtMime.cpp";
 
 extern "C" {
-void _WaitDrawDone__8CGraphicFPci(void* graphic, const char* file, int line);
 void pppHeapUseRate__FPQ27CMemory6CStage(void* stage);
 void DCFlushRange(void* addr, unsigned long nBytes);
 }
@@ -63,9 +62,7 @@ void pppVtMimeDes(_pppPObjLink* object, _pppCtrlTable* ctrl)
     VtMimeState* state = (VtMimeState*)((char*)object + *ctrl->m_serializedDataOffsets + 0x80);
 
     if (state->vertexBuffer != 0) {
-        void* graphic = &Graphic;
-        const char* file = s_pppVtMime_cpp;
-        _WaitDrawDone__8CGraphicFPci(graphic, file, 0x50);
+        Graphic._WaitDrawDone(const_cast<char*>(s_pppVtMime_cpp), 0x50);
         pppHeapUseRate__FPQ27CMemory6CStage(state->vertexBuffer);
         state->vertexBuffer = 0;
     }

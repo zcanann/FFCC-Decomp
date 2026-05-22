@@ -138,17 +138,8 @@ extern "C" void destroy__8CMenuPcsFv(CMenuPcs*);
 extern "C" void calc__8CMenuPcsFv(CMenuPcs*);
 extern "C" void draw__8CMenuPcsFv(CMenuPcs*);
 extern "C" void Calc__5CMenuFv(CMenu*);
-extern "C" void CalcDiaryMenu__8CMenuPcsFv(CMenuPcs*);
-extern "C" void calcVillageMenu__8CMenuPcsFv(CMenuPcs*);
-extern "C" char* GetLangString__5CGameFv(void*);
-extern "C" void WmInit__8CMenuPcsFv(CMenuPcs*);
-extern "C" void drawVillageMenu__8CMenuPcsFv(CMenuPcs*);
-extern "C" void createSingleMenu__8CMenuPcsFv(CMenuPcs*);
-extern "C" void destroySingleMenu__8CMenuPcsFv(CMenuPcs*);
-extern "C" void destroyVillageMenu__8CMenuPcsFv(CMenuPcs*);
 extern "C" void loadTextureAsync__8CMenuPcsFPPciiPQ28CMenuPcs4CTmpiii(CMenuPcs*, char**, int, int, CMenuPcs::CTmp*, int, int, int);
 extern "C" void drawSingleMenu__8CMenuPcsFv(CMenuPcs*);
-extern "C" void _WaitDrawDone__8CGraphicFPci(void*, const char*, int);
 
 static unsigned int m_table_desc0__8CMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__8CMenuPcsFv)};
 static unsigned int m_table_desc1__8CMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__8CMenuPcsFv)};
@@ -244,7 +235,7 @@ void CMenuPcs::Init()
     *reinterpret_cast<u32*>(self + 0x850) = 0;
     *reinterpret_cast<u16*>(self + 0x864) = 0;
 
-    WmInit__8CMenuPcsFv(this);
+    WmInit();
     BonusInit();
 
     self[0x8E] = 0;
@@ -766,7 +757,7 @@ void CMenuPcs::changeMode(CMenuPcs::MENUMODE mode)
     CMenuPcs* slotMenu;
 
     if (*reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x740) != static_cast<int>(mode)) {
-        _WaitDrawDone__8CGraphicFPci(&Graphic, const_cast<char*>(s_p_menu_cpp_801d9d80), 0x1B0);
+        Graphic._WaitDrawDone(const_cast<char*>(s_p_menu_cpp_801d9d80), 0x1B0);
         currentMode = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x740);
         if (currentMode == 1) {
             destroyWorld();
@@ -846,8 +837,8 @@ void CMenuPcs::changeMode(CMenuPcs::MENUMODE mode)
                     slotMenu = reinterpret_cast<CMenuPcs*>(reinterpret_cast<u8*>(slotMenu) + 4);
                 } while (i < 12);
 
-                destroySingleMenu__8CMenuPcsFv(this);
-                destroyVillageMenu__8CMenuPcsFv(this);
+                destroySingleMenu();
+                destroyVillageMenu();
             }
         } else if (currentMode < 3) {
             destroyBonus();
@@ -860,7 +851,7 @@ void CMenuPcs::changeMode(CMenuPcs::MENUMODE mode)
         } else if (currentMode < 1) {
             if ((currentMode != -1) && (-2 < currentMode)) {
                 createBattle();
-                createSingleMenu__8CMenuPcsFv(this);
+                createSingleMenu();
             }
         } else if (currentMode < 3) {
             createBonus();
@@ -923,12 +914,12 @@ void CMenuPcs::calc()
             counter = *reinterpret_cast<u32*>(self + 0x5c) - 1;
             *reinterpret_cast<u32*>(self + 0x5c) = counter & ~((int)counter >> 31);
 
-            calcVillageMenu__8CMenuPcsFv(this);
+            calcVillageMenu();
         }
         return;
     }
 
-    CalcDiaryMenu__8CMenuPcsFv(this);
+    CalcDiaryMenu();
 }
 
 /*
@@ -983,7 +974,7 @@ void CMenuPcs::draw()
         } else if (mode < 1) {
             if (mode >= 0) {
                 drawBattle();
-                drawVillageMenu__8CMenuPcsFv(this);
+                drawVillageMenu();
             }
         } else if (mode < 3) {
             drawBonus();
@@ -1846,8 +1837,8 @@ void CMenuPcs::destroyBattle()
         *slot = nullptr;
     }
 
-    destroySingleMenu__8CMenuPcsFv(this);
-    destroyVillageMenu__8CMenuPcsFv(this);
+    destroySingleMenu();
+    destroyVillageMenu();
 }
 
 /*
@@ -1881,7 +1872,7 @@ void CMenuPcs::calcBattle()
     counter = m_battleHud.m_gaugeCounter - 1;
     m_battleHud.m_gaugeCounter = counter & ~((int)counter >> 31);
 
-    calcVillageMenu__8CMenuPcsFv(this);
+    calcVillageMenu();
 }
 
 /*
@@ -2028,7 +2019,7 @@ void CMenuPcs::ChgPlayModeFromScript(bool isScriptMode)
     const int mode = *reinterpret_cast<int*>(self + 0x740);
 
     if ((mode != 2) && (mode != 1)) {
-        destroySingleMenu__8CMenuPcsFv(this);
+        destroySingleMenu();
     }
 
     Game.m_gameWork.m_menuStageMode = static_cast<u8>(isScriptMode);

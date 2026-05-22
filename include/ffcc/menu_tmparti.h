@@ -49,6 +49,22 @@ struct TmpArtiList
 class CMenuPcs
 {
 public:
+    enum FMT
+    {
+        TODO_FMT
+    };
+
+    enum TEX
+    {
+        TODO_TEX
+    };
+
+    void DrawInit();
+    void SetAttrFmt(FMT);
+    void SetTexture(TEX);
+    void DrawRect(unsigned long, float, float, float, float, float, float, float, float, float);
+    void DrawSingleIcon(int, int, int, float, int, float);
+
     unsigned int TmpArtiOpen();
     void TmpArtiCtrl();
     unsigned int TmpArtiClose();

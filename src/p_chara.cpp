@@ -40,18 +40,13 @@ u8* gCharaPartWorkPtr = 0;
 
 extern "C" int __cntlzw(unsigned int);
 extern "C" void ReleasePdt__8CPartPcsFi(void*, int);
-extern "C" void SetStdProjectionMatrix__10CCameraPcsFv(void*);
-extern "C" void SetFog__8CGraphicFii(void*, int, int);
 extern "C" void SetAmbient__9CLightPcsF8_GXColor(void*, void*);
-extern "C" void SetNumDiffuse__9CLightPcsFUl(void*, unsigned long);
 extern "C" void SetDiffuse__9CLightPcsFUl8_GXColorP3Veci(void*, unsigned long, void*, void*, int);
-extern "C" void SetPosition__9CLightPcsFQ29CLightPcs6TARGETP3VecUl(void*, int, Vec*, unsigned long);
 extern "C" void Create__6CCharaFv(void*);
 extern "C" void Destroy__6CCharaFv(void*);
 extern "C" void Create__Q26CChara5CAnimFPvPQ27CMemory6CStage(void*, void*, void*);
 extern "C" void LoadSe__6CSoundFPv(void*, void*);
 extern "C" void LoadWave__6CSoundFPv(void*, void*);
-extern "C" int GetBackBufferRect__8CGraphicFRiRiRiRii(CGraphic*, int&, int&, int&, int&, int);
 extern "C" unsigned char DbgMenuPcs[];
 extern unsigned char PTR_s_CCharaPcs_GAME_[];
 
@@ -398,9 +393,9 @@ static inline void SetupBaseCharaLights(CCharaPcs* self)
     _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
     _GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
     _GXSetTevSwapModeTable(GX_TEV_SWAP2, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-    SetFog__8CGraphicFii(&Graphic, 1, 0);
+    Graphic.SetFog(1, 0);
     SetAmbient__9CLightPcsF8_GXColor(&LightPcs, Ptr(self, 0xE8));
-    SetNumDiffuse__9CLightPcsFUl(&LightPcs, 3);
+    LightPcs.SetNumDiffuse(3);
 
     for (unsigned long lightIndex = 0; lightIndex < 3; lightIndex++) {
         SetDiffuse__9CLightPcsFUl8_GXColorP3Veci(
@@ -1314,8 +1309,8 @@ void CCharaPcs::InitEnv(int envMode)
     if (envMode == 1 || envMode == 2) {
         _GXColor black = {0x00, 0x00, 0x00, 0xFF};
         SetAmbient__9CLightPcsF8_GXColor(&LightPcs, &black);
-        SetNumDiffuse__9CLightPcsFUl(&LightPcs, 0);
-        SetPosition__9CLightPcsFQ29CLightPcs6TARGETP3VecUl(&LightPcs, 0, 0, 0xFFFFFFFF);
+        LightPcs.SetNumDiffuse(0);
+        LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(0), 0, 0xFFFFFFFF);
     } else {
         SetupBaseCharaLights(this);
     }
@@ -1419,7 +1414,7 @@ void CCharaPcs::draw()
  */
 void CCharaPcs::drawBefore()
 {
-    SetStdProjectionMatrix__10CCameraPcsFv(&CameraPcs);
+    CameraPcs.SetStdProjectionMatrix();
     SetupBaseCharaLights(this);
 
     if (HandleListHead(this) == 0) {
@@ -1458,8 +1453,8 @@ void CCharaPcs::drawMakeTexShadow()
     _GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
     _GXSetTevSwapModeTable(GX_TEV_SWAP2, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
     SetAmbient__9CLightPcsF8_GXColor(&LightPcs, &shadowColor);
-    SetNumDiffuse__9CLightPcsFUl(&LightPcs, 0);
-    SetPosition__9CLightPcsFQ29CLightPcs6TARGETP3VecUl(&LightPcs, 0, 0, 0xFFFFFFFF);
+    LightPcs.SetNumDiffuse(0);
+    LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(0), 0, 0xFFFFFFFF);
 
     GXSetPixelFmt((GXPixelFmt)1, GX_ZC_LINEAR);
     GXSetAlphaUpdate(GX_TRUE);
@@ -1507,8 +1502,8 @@ void CCharaPcs::drawShadow()
 
     _GXColor shadowColor = {0x00, 0x00, 0x00, 0xFF};
     SetAmbient__9CLightPcsF8_GXColor(&LightPcs, &shadowColor);
-    SetNumDiffuse__9CLightPcsFUl(&LightPcs, 0);
-    SetPosition__9CLightPcsFQ29CLightPcs6TARGETP3VecUl(&LightPcs, 0, 0, 0xFFFFFFFF);
+    LightPcs.SetNumDiffuse(0);
+    LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(0), 0, 0xFFFFFFFF);
 
     if (HandleListHead(this) == 0) {
         return;
@@ -2136,8 +2131,7 @@ void CCharaPcs::drawOverlap()
     int top = 0;
     int width = 0x280;
     int height = 0x1C0;
-    _GXTexObj* backBufferTex = reinterpret_cast<_GXTexObj*>(
-        GetBackBufferRect__8CGraphicFRiRiRiRii(&Graphic, left, top, width, height, 0));
+    _GXTexObj* backBufferTex = Graphic.GetBackBufferRect(left, top, width, height, 0);
 
     Mtx savedCameraMtx;
     Mtx lookAtMtx;
@@ -2167,7 +2161,7 @@ void CCharaPcs::drawOverlap()
     _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
     _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
     _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-    SetFog__8CGraphicFii(&Graphic, 0, 0);
+    Graphic.SetFog(0, 0);
     PSMTXIdentity(identityMtx);
     GXLoadPosMtxImm(identityMtx, GX_PNMTX0);
     GXSetCullMode(GX_CULL_NONE);
@@ -2214,7 +2208,7 @@ void CCharaPcs::drawOverlap()
     GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
     GXSetNumTevStages(1);
-    SetFog__8CGraphicFii(&Graphic, 0, 0);
+    Graphic.SetFog(0, 0);
     GXSetTevDirect(GX_TEVSTAGE0);
     _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
     _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
@@ -2978,7 +2972,7 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
     }
 
     if (restoreFog) {
-        SetFog__8CGraphicFii(&Graphic, 1, 0);
+        Graphic.SetFog(1, 0);
     }
 }
 

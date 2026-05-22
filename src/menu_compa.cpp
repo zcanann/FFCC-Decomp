@@ -10,14 +10,6 @@
 
 typedef unsigned char u8;
 
-extern "C" void SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(CMenuPcs*, int);
-extern "C" void SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(CMenuPcs*, int);
-extern "C" void DrawRect__8CMenuPcsFUlfffffffff(CMenuPcs*, unsigned long, float, float, float, float, float, float, float, float, float);
-extern "C" void DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(CMenuPcs*, unsigned long, float, float, float, float, float, float, GXColor*, float, float, float);
-extern "C" void DrawSingleIcon__8CMenuPcsFiiifif(CMenuPcs*, int, int, int, float, int, float);
-extern "C" void DrawInit__8CMenuPcsFv(CMenuPcs*);
-extern CMenuPcs MenuPcs;
-
 extern "C" const float FLOAT_80332FF8;
 extern "C" const float FLOAT_80332FFC;
 extern "C" const float FLOAT_80333000;
@@ -70,9 +62,9 @@ struct CompaFlatData
 void CMenuPcs::CompaDraw()
 {
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(&MenuPcs, 0);
+	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-	unsigned int scriptFood = Game.m_scriptFoodBase[0];
+	const CCaravanWork* caravanWork = reinterpret_cast<const CCaravanWork*>(Game.m_scriptFoodBase[0]);
 	CompaOpenAnimList* compaList = this->compaList;
 	CompaOpenAnim* entry = compaList->entries;
 	int count = compaList->count;
@@ -89,8 +81,8 @@ void CMenuPcs::CompaDraw()
 			float uvScale = entry->uvScale;
 
 			if (i < 3) {
-				SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(&MenuPcs, 1);
-				SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, tex);
+				MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(1));
+				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));
 
 				GXColor colors[4];
 				colors[0].r = 0xFF;
@@ -121,15 +113,15 @@ void CMenuPcs::CompaDraw()
 							if (static_cast<float>(tileH) > FLOAT_80332FFC) {
 								tileH = 0x18;
 							}
-							DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(
-								&MenuPcs, static_cast<unsigned long>(entry->drawFlags), x, static_cast<float>(yStep),
+							MenuPcs.DrawRect(
+								static_cast<unsigned long>(entry->drawFlags), x, static_cast<float>(yStep),
 								fillW, static_cast<float>(tileH), u, v,
 								colors, uvScale, FLOAT_80333000, FLOAT_80332FF8);
 							yStep += 0x18;
 						}
 					} else {
-						DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(
-							&MenuPcs, static_cast<unsigned long>(entry->drawFlags), x, y, fillW, h, u, v,
+						MenuPcs.DrawRect(
+							static_cast<unsigned long>(entry->drawFlags), x, y, fillW, h, u, v,
 							colors, uvScale, FLOAT_80333000, FLOAT_80332FF8);
 					}
 
@@ -164,29 +156,29 @@ void CMenuPcs::CompaDraw()
 							if (static_cast<float>(tileH) > FLOAT_80332FFC) {
 								tileH = 0x18;
 							}
-							DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(
-								&MenuPcs, static_cast<unsigned long>(entry->drawFlags), x, static_cast<float>(yStep),
+							MenuPcs.DrawRect(
+								static_cast<unsigned long>(entry->drawFlags), x, static_cast<float>(yStep),
 								remainW, static_cast<float>(tileH), u, v,
 								fadeColors, uvScale, FLOAT_80333000, FLOAT_80332FF8);
 							yStep += 0x18;
 						}
 					} else {
-						DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(
-							&MenuPcs, static_cast<unsigned long>(entry->drawFlags), x, y, remainW, h, u, v,
+						MenuPcs.DrawRect(
+							static_cast<unsigned long>(entry->drawFlags), x, y, remainW, h, u, v,
 							fadeColors, uvScale, FLOAT_80333000, FLOAT_80332FF8);
 					}
 				}
 
-				SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(&MenuPcs, 0);
+				MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 			} else {
-				SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, tex);
+				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));
 				GXColor color;
 				color.r = 0xFF;
 				color.g = 0xFF;
 				color.b = 0xFF;
 				color.a = static_cast<unsigned char>(alpha * FLOAT_80333010);
 				GXSetChanMatColor(GX_COLOR0A0, color);
-				DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 0, x, y, w, h, u, v, uvScale, uvScale, FLOAT_80332FF8);
+				MenuPcs.DrawRect(0, x, y, w, h, u, v, uvScale, uvScale, FLOAT_80332FF8);
 			}
 		}
 
@@ -201,11 +193,11 @@ void CMenuPcs::CompaDraw()
 	color.b = 0xFF;
 	color.a = static_cast<unsigned char>(globalAlpha * FLOAT_80333010);
 	GXSetChanMatColor(GX_COLOR0A0, color);
-	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x3A);
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x3A));
 
 	int familyCount = 2;
 	for (int i = 2; i < 7; i++) {
-		if (*reinterpret_cast<short*>(scriptFood + 0x9CA + i * 2) > 0) {
+		if (caravanWork->m_evtWordArr[19 + i] > 0) {
 			familyCount++;
 		}
 	}
@@ -218,8 +210,8 @@ void CMenuPcs::CompaDraw()
 	}
 
 	for (int i = 0; i < familyCount; i++) {
-		DrawRect__8CMenuPcsFUlfffffffff(
-			&MenuPcs, 0,
+		MenuPcs.DrawRect(
+			0,
 			static_cast<float>(compaList->entries[0].x + 0x10),
 			static_cast<float>(compaList->entries[0].y + 0x40 + i * 0x28),
 			FLOAT_80333014, FLOAT_80333018, FLOAT_80332FF8, FLOAT_80332FF8, FLOAT_80333000,
@@ -231,7 +223,7 @@ void CMenuPcs::CompaDraw()
 	for (int i = 0; i < 8 && shown < familyCount; i++) {
 		int drawIndex = memberIndex;
 		if (memberIndex > 1) {
-			while (drawIndex < 8 && *reinterpret_cast<short*>(scriptFood + 0x9CA + drawIndex * 2) == 0) {
+			while (drawIndex < 8 && caravanWork->m_evtWordArr[19 + drawIndex] == 0) {
 				drawIndex++;
 			}
 			if (drawIndex > 7) {
@@ -239,7 +231,8 @@ void CMenuPcs::CompaDraw()
 			}
 		}
 
-		const u8* compatibility = reinterpret_cast<const u8*>(&Game) + *reinterpret_cast<int*>(scriptFood + 8) * 0x208 + drawIndex + 0xA9;
+		const u8* compatibility =
+			reinterpret_cast<const u8*>(&Game) + caravanWork->m_saveSlot * 0x208 + drawIndex + 0xA9;
 		u8 food = *compatibility;
 		if (food == 0 && System.m_execParam >= 1) {
 			System.Printf(const_cast<char*>(s_pcts_pctd_family_cnt_error_pctd_801DEDC8), s_menu_compa_cpp_801DEDE8, 0x1E0,
@@ -256,8 +249,8 @@ void CMenuPcs::CompaDraw()
 			icon = 0x1E;
 		}
 
-		DrawSingleIcon__8CMenuPcsFiiifif(
-			this, icon,
+		DrawSingleIcon(
+			icon,
 			static_cast<int>(compaList->entries[0].x + 0x128),
 			static_cast<int>(compaList->entries[0].y + 0x40 + shown * 0x28),
 			globalAlpha, 1, FLOAT_80333000);
@@ -282,7 +275,7 @@ void CMenuPcs::CompaDraw()
 	for (int i = 0; i < 8 && shown < familyCount; i++) {
 		int drawIndex = memberIndex;
 		if (memberIndex > 1) {
-			while (drawIndex < 8 && *reinterpret_cast<short*>(scriptFood + 0x9CA + drawIndex * 2) <= 0) {
+			while (drawIndex < 8 && caravanWork->m_evtWordArr[19 + drawIndex] <= 0) {
 				drawIndex++;
 			}
 			if (drawIndex > 7) {
@@ -296,7 +289,7 @@ void CMenuPcs::CompaDraw()
 		font->SetPosY(y);
 		font->Draw(name);
 
-		short food = *reinterpret_cast<short*>(scriptFood + 0x9CA + drawIndex * 2);
+		short food = caravanWork->m_evtWordArr[19 + drawIndex];
 		const char* value = flatData->table[2].strings[food];
 		font->SetPosX(static_cast<float>(compaList->entries[0].x + 0x90));
 		font->SetPosY(y);
@@ -313,13 +306,13 @@ void CMenuPcs::CompaDraw()
 	font->DrawInit();
 	font->SetColor(textColor);
 
-	const char* job = GetJobStr(*reinterpret_cast<int*>(scriptFood + 0x3AC));
+	const char* job = GetJobStr(caravanWork->unk_0x3ac);
 	font->GetWidth(job);
 	font->SetPosX(static_cast<float>(compaList->entries[0].x + 0x18));
 	font->SetPosY(static_cast<float>(compaList->entries[0].y + 0x20) - FLOAT_80333020 - FLOAT_80333028);
 	font->Draw(job);
 
-	DrawInit__8CMenuPcsFv(this);
+	DrawInit();
 }
 /*
  * --INFO--

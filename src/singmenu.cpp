@@ -40,6 +40,13 @@ extern "C" char* strcat(char*, const char*);
 typedef signed short s16;
 typedef unsigned char u8;
 
+class CShopMenu
+{
+public:
+    void Calc();
+    void Draw();
+};
+
 struct SingleFadeEntry
 {
     char pad_00[0x10];
@@ -77,35 +84,12 @@ struct SingMenuSoloNameTable
     char* entries[9];
 };
 
-extern "C" void SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(CMenuPcs*, int);
-extern "C" void SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(CMenuPcs*, int);
-extern "C" void DrawRect__8CMenuPcsFUlfffffffff(CMenuPcs*, unsigned long, float, float, float, float, float, float, float, float, float);
-extern "C" void DrawInit__8CMenuPcsFv(CMenuPcs*);
-extern "C" void DrawFilter__8CMenuPcsFUcUcUcUc(CMenuPcs*, u8, u8, u8, u8);
-extern "C" void SetProjection__8CMenuPcsFi(CMenuPcs*, int);
-extern "C" void SetLight__8CMenuPcsFi(CMenuPcs*, int);
-extern "C" void RestoreProjection__8CMenuPcsFv(CMenuPcs*);
-extern "C" void Draw__9CShopMenuFv(void*);
-extern "C" void Calc__9CShopMenuFv(void*);
-extern "C" void SingleDrawCtrl__8CMenuPcsFv(CMenuPcs*);
-extern "C" void _WaitDrawDone__8CGraphicFPci(CGraphic*, const char*, int);
-extern "C" void DestroyTempBuffer__8CGraphicFv(CGraphic*);
-extern "C" int GetModelNo__8CMenuPcsFiii(CMenuPcs*, int, int, int);
-extern "C" char* GetLangString__5CGameFv(void*);
-extern "C" void loadFont__8CMenuPcsFiPcii(CMenuPcs*, int, char*, int, int);
-extern "C" void loadTexture__8CMenuPcsFPPciiPQ28CMenuPcs4CTmpiii(CMenuPcs*, char**, int, int, void*, int, int, int);
-extern "C" void freeTexture__8CMenuPcsFiiii(CMenuPcs*, int, int, int, int);
 extern "C" void DrawHeart__8CMesMenuFffff(void*, float, float, float, float);
-extern "C" void createSingleMenu__8CMenuPcsFv(CMenuPcs*);
-extern "C" void SingMenuInit__8CMenuPcsFv(CMenuPcs*);
-extern "C" void CreateShopMenu__8CMenuPcsFv(CMenuPcs*);
-extern "C" void CreateSmithMenu__8CMenuPcsFv(CMenuPcs*);
+extern "C" int GetModelNo__8CMenuPcsFiii(CMenuPcs*, int, int, int);
 extern "C" char* s_stand_80332a24;
 char s_singmenu_cpp_801de8d4[] = "singmenu.cpp";
 extern "C" char* s_dvd__smenu__s_tex_801de8e4;
 extern "C" char s_dvd__smenu_subfont_fnt_801de8f8[];
-extern CMenuPcs MenuPcs;
-extern "C" int GetItemType__8CMenuPcsFii(CMenuPcs*, int, int);
 extern "C" char* PTR_s_Tutti_802143ec;
 extern "C" char* PTR_s_Alle_Rassen_8021430c;
 extern "C" char* PTR_s_Todos_802145ac;
@@ -965,16 +949,15 @@ void CMenuPcs::createSingleMenu()
         }
 
         char path[128];
-        sprintf(path, s_dvd__smenu_subfont_fnt_801de8f8, GetLangString__5CGameFv(&Game));
-        loadFont__8CMenuPcsFiPcii(this, 1, path, 4, -1);
+        sprintf(path, s_dvd__smenu_subfont_fnt_801de8f8, Game.GetLangString());
+        loadFont(1, path, 4, -1);
 
         self[0x85A] = 0;
         gSingMenuForcedSelection = -1;
         gSingMenuAsyncFileHandle = 0;
 
         if (Game.m_gameWork.m_menuStageMode != 0) {
-            loadTexture__8CMenuPcsFPPciiPQ28CMenuPcs4CTmpiii(
-                this, PTR_s_solo2.entries, 4, 1, &DAT_80214ab0, 0x20, 0xD, 1);
+            loadTexture(PTR_s_solo2.entries, 4, 1, reinterpret_cast<CMenuPcs::CTmp*>(&DAT_80214ab0), 0x20, 0xD, 1);
             *reinterpret_cast<int*>(self + 0x814) = 0;
             *reinterpret_cast<int*>(self + 0x850) = 0;
             *reinterpret_cast<int*>(self + 0x82C) = 0;
@@ -1013,8 +996,8 @@ void CMenuPcs::destroySingleMenu()
         *reinterpret_cast<void**>(self + 0x108) = 0;
     }
 
-    freeTexture__8CMenuPcsFiiii(this, 4, 1, 0x20, 0xD);
-    freeTexture__8CMenuPcsFiiii(this, 5, 2, 0x2D, 0x33);
+    freeTexture(4, 1, 0x20, 0xD);
+    freeTexture(5, 2, 0x2D, 0x33);
 
     *reinterpret_cast<int*>(self + 0xF0) = 0;
     self[0x85A] = 0;
@@ -1061,8 +1044,8 @@ void CMenuPcs::SingMenuInit()
 {
     u8* self = reinterpret_cast<u8*>(this);
 
-    _WaitDrawDone__8CGraphicFPci(&Graphic, s_singmenu_cpp_801de8d4, 0x5C2);
-    DestroyTempBuffer__8CGraphicFv(&Graphic);
+    Graphic._WaitDrawDone(s_singmenu_cpp_801de8d4, 0x5C2);
+    Graphic.DestroyTempBuffer();
 
     *reinterpret_cast<void**>(self + 0xF4) = *reinterpret_cast<void**>(reinterpret_cast<u8*>(&Graphic) + 8);
     memset(self + 0x85C, 0, 8);
@@ -1198,23 +1181,23 @@ void CMenuPcs::drawSingleMenu()
 
     if ((Game.m_gameWork.m_menuStageMode != 0) &&
         (Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag != 0)) {
-        DrawInit__8CMenuPcsFv(this);
-        DrawFilter__8CMenuPcsFUcUcUcUc(this, 0, 0, 0, 0xFF);
+        DrawInit();
+        DrawFilter(0, 0, 0, 0xFF);
         gUtil.ClearZBufferRect(FLOAT_8033294c, FLOAT_8033294c, FLOAT_803329a4, FLOAT_80332A20);
-        DrawInit__8CMenuPcsFv(this);
+        DrawInit();
 
         u8 menuType = *reinterpret_cast<u8*>(Game.m_scriptFoodBase[0] + 0xBE0);
         if (menuType == 1) {
             if (*reinterpret_cast<void**>(self + 0x878) != 0) {
-                Draw__9CShopMenuFv(*reinterpret_cast<void**>(self + 0x878));
+                reinterpret_cast<CShopMenu*>(*reinterpret_cast<void**>(self + 0x878))->Draw();
             }
         } else if ((menuType == 2) && (*reinterpret_cast<void**>(self + 0x878) != 0)) {
-            Draw__9CShopMenuFv(*reinterpret_cast<void**>(self + 0x878));
+            reinterpret_cast<CShopMenu*>(*reinterpret_cast<void**>(self + 0x878))->Draw();
         }
 
         if ((gSingMenuHasScriptFoodBase != 0) && (*reinterpret_cast<s16*>(*reinterpret_cast<int*>(self + 0x850) + 6) != 0)) {
             Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag = 0;
-            _WaitDrawDone__8CGraphicFPci(&Graphic, s_singmenu_cpp_801de8d4, 0x62B);
+            Graphic._WaitDrawDone(s_singmenu_cpp_801de8d4, 0x62B);
             self[0x85A] = 0;
 
             if (gSingMenuAsyncFileHandle != 0) {
@@ -1222,7 +1205,7 @@ void CMenuPcs::drawSingleMenu()
                 gSingMenuAsyncFileHandle = 0;
             }
 
-            freeTexture__8CMenuPcsFiiii(this, 5, 2, 0x2D, 0x33);
+            freeTexture(5, 2, 0x2D, 0x33);
 
             if (*reinterpret_cast<void**>(self + 0x774) != 0) {
                 delete *reinterpret_cast<CCharaPcs::CHandle**>(self + 0x774);
@@ -1262,7 +1245,7 @@ void CMenuPcs::drawSingleMenu()
 
         s16 mode = *reinterpret_cast<s16*>(self + 0x866);
         if (mode == 1) {
-            SingleDrawCtrl__8CMenuPcsFv(this);
+            SingleDrawCtrl();
             return;
         }
 
@@ -1273,46 +1256,46 @@ void CMenuPcs::drawSingleMenu()
                 if ((i == 0) || (*reinterpret_cast<s16*>(self + 0x864) != 8)) {
                     if (i == 0) {
                         float alpha = entry->alpha;
-                        DrawInit__8CMenuPcsFv(this);
+                        DrawInit();
                         _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-                        SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(&MenuPcs, 0);
+                        MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
                         _GXColor color = {0xFF, 0xFF, 0xFF, static_cast<u8>(FLOAT_80332940 * alpha)};
                         GXSetChanMatColor(GX_COLOR0A0, color);
 
-                        SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x20);
-                        DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 0, FLOAT_8033294c, FLOAT_8033294c, FLOAT_803329a4,
+                        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x20));
+                        MenuPcs.DrawRect(0, FLOAT_8033294c, FLOAT_8033294c, FLOAT_803329a4,
                                                          FLOAT_80332928, FLOAT_8033294c, FLOAT_8033294c,
                                                          FLOAT_80332934, FLOAT_80332934, 0.0f);
-                        DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 4, FLOAT_8033294c, FLOAT_803329a8, FLOAT_803329a4,
+                        MenuPcs.DrawRect(4, FLOAT_8033294c, FLOAT_803329a8, FLOAT_803329a4,
                                                          FLOAT_80332928, FLOAT_8033294c, FLOAT_8033294c,
                                                          FLOAT_80332934, FLOAT_80332934, 0.0f);
 
-                        SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x28);
+                        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x28));
                         unsigned int step = 0x20;
                         for (unsigned int y = 0x40; y < 0x180; y += step) {
                             if ((0x180 - y) < step) {
                                 step = 0x180 - y;
                             }
-                            DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 0, FLOAT_8033294c, static_cast<float>(y),
+                            MenuPcs.DrawRect(0, FLOAT_8033294c, static_cast<float>(y),
                                                              FLOAT_803329a4, static_cast<float>(step),
                                                              FLOAT_8033294c, FLOAT_8033294c, FLOAT_80332934,
                                                              FLOAT_80332934, 0.0f);
                         }
                     } else if (i == 1) {
                         float alpha = entry->alpha;
-                        DrawInit__8CMenuPcsFv(this);
+                        DrawInit();
                         _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-                        SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(&MenuPcs, 0);
+                        MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
                         _GXColor color = {0xFF, 0xFF, 0xFF, 0xFF};
                         GXSetChanMatColor(GX_COLOR0A0, color);
-                        SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x21);
-                        DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 0, -(FLOAT_803329ac * alpha - FLOAT_803329bc),
+                        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x21));
+                        MenuPcs.DrawRect(0, -(FLOAT_803329ac * alpha - FLOAT_803329bc),
                                                          FLOAT_80332948, FLOAT_803329ac, FLOAT_803329b0,
                                                          FLOAT_8033294c, FLOAT_8033294c, alpha, FLOAT_80332934,
                                                          0.0f);
-                        DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 8, FLOAT_803329b4, FLOAT_80332948, FLOAT_803329ac,
+                        MenuPcs.DrawRect(8, FLOAT_803329b4, FLOAT_80332948, FLOAT_803329ac,
                                                          FLOAT_803329b0, FLOAT_8033294c, FLOAT_8033294c, alpha,
                                                          FLOAT_80332934, 0.0f);
                     } else if (i == 2) {
@@ -1330,46 +1313,46 @@ void CMenuPcs::drawSingleMenu()
                 if ((i == 0) || (*reinterpret_cast<s16*>(self + 0x864) != 8)) {
                     if (i == 0) {
                         float alpha = entry->alpha;
-                        DrawInit__8CMenuPcsFv(this);
+                        DrawInit();
                         _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-                        SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(&MenuPcs, 0);
+                        MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
                         _GXColor color = {0xFF, 0xFF, 0xFF, static_cast<u8>(FLOAT_80332940 * alpha)};
                         GXSetChanMatColor(GX_COLOR0A0, color);
 
-                        SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x20);
-                        DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 0, FLOAT_8033294c, FLOAT_8033294c, FLOAT_803329a4,
+                        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x20));
+                        MenuPcs.DrawRect(0, FLOAT_8033294c, FLOAT_8033294c, FLOAT_803329a4,
                                                          FLOAT_80332928, FLOAT_8033294c, FLOAT_8033294c,
                                                          FLOAT_80332934, FLOAT_80332934, 0.0f);
-                        DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 4, FLOAT_8033294c, FLOAT_803329a8, FLOAT_803329a4,
+                        MenuPcs.DrawRect(4, FLOAT_8033294c, FLOAT_803329a8, FLOAT_803329a4,
                                                          FLOAT_80332928, FLOAT_8033294c, FLOAT_8033294c,
                                                          FLOAT_80332934, FLOAT_80332934, 0.0f);
 
-                        SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x28);
+                        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x28));
                         unsigned int step = 0x20;
                         for (unsigned int y = 0x40; y < 0x180; y += step) {
                             if ((0x180 - y) < step) {
                                 step = 0x180 - y;
                             }
-                            DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 0, FLOAT_8033294c, static_cast<float>(y),
+                            MenuPcs.DrawRect(0, FLOAT_8033294c, static_cast<float>(y),
                                                              FLOAT_803329a4, static_cast<float>(step),
                                                              FLOAT_8033294c, FLOAT_8033294c, FLOAT_80332934,
                                                              FLOAT_80332934, 0.0f);
                         }
                     } else if (i == 1) {
                         float alpha = entry->alpha;
-                        DrawInit__8CMenuPcsFv(this);
+                        DrawInit();
                         _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-                        SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(&MenuPcs, 0);
+                        MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
                         _GXColor color = {0xFF, 0xFF, 0xFF, 0xFF};
                         GXSetChanMatColor(GX_COLOR0A0, color);
-                        SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x21);
-                        DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 0, -(FLOAT_803329ac * alpha - FLOAT_803329bc),
+                        MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x21));
+                        MenuPcs.DrawRect(0, -(FLOAT_803329ac * alpha - FLOAT_803329bc),
                                                          FLOAT_80332948, FLOAT_803329ac, FLOAT_803329b0,
                                                          FLOAT_8033294c, FLOAT_8033294c, alpha, FLOAT_80332934,
                                                          0.0f);
-                        DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 8, FLOAT_803329b4, FLOAT_80332948, FLOAT_803329ac,
+                        MenuPcs.DrawRect(8, FLOAT_803329b4, FLOAT_80332948, FLOAT_803329ac,
                                                          FLOAT_803329b0, FLOAT_8033294c, FLOAT_8033294c, alpha,
                                                          FLOAT_80332934, 0.0f);
                     } else if (i == 2) {
@@ -1410,13 +1393,13 @@ void CMenuPcs::loadTextureAsync(char **, int, int, CMenuPcs::CTmp*, int, int, in
     }
 
     if (self[0x859] == 0) {
-        createSingleMenu__8CMenuPcsFv(this);
+        createSingleMenu();
     }
     if (Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag == 0) {
         return;
     }
     if (self[0x85A] == 0) {
-        SingMenuInit__8CMenuPcsFv(this);
+        SingMenuInit();
     }
 
     if (*reinterpret_cast<char*>(Game.m_scriptFoodBase[0] + 0xBE0) == 0) {
@@ -1424,7 +1407,7 @@ void CMenuPcs::loadTextureAsync(char **, int, int, CMenuPcs::CTmp*, int, int, in
         if (loadIndex < 2) {
             if (*reinterpret_cast<int*>(self + 0x860) == 0) {
                 char path[260];
-                char* language = GetLangString__5CGameFv(&Game);
+                const char* language = Game.GetLangString();
                 sprintf(path, s_dvd__smenu__s_tex_801de8e4, language, PTR_s_solo1_80214b18.entries[loadIndex]);
                 gSingMenuAsyncFileHandle = File.Open(path, 0, CFile::PRI_LOW);
                 File.ReadASync(gSingMenuAsyncFileHandle);
@@ -1488,15 +1471,15 @@ post_texture_load:
     char menuKind = *reinterpret_cast<char*>(Game.m_scriptFoodBase[0] + 0xBE0);
     if (menuKind == 1) {
         if (*reinterpret_cast<void**>(self + 0x878) == 0) {
-            CreateShopMenu__8CMenuPcsFv(this);
+            CreateShopMenu();
         } else {
-            Calc__9CShopMenuFv(*reinterpret_cast<void**>(self + 0x878));
+            reinterpret_cast<CShopMenu*>(*reinterpret_cast<void**>(self + 0x878))->Calc();
         }
     } else if (menuKind == 2) {
         if (*reinterpret_cast<void**>(self + 0x878) == 0) {
-            CreateSmithMenu__8CMenuPcsFv(this);
+            CreateSmithMenu();
         } else {
-            Calc__9CShopMenuFv(*reinterpret_cast<void**>(self + 0x878));
+            reinterpret_cast<CShopMenu*>(*reinterpret_cast<void**>(self + 0x878))->Calc();
         }
     }
 
@@ -1557,20 +1540,20 @@ void CMenuPcs::SingCalcChara(float frameStep)
  */
 void CMenuPcs::DrawSingleBase(float alpha)
 {
-    DrawInit__8CMenuPcsFv(this);
+    DrawInit();
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-    SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(&MenuPcs, 0);
+    MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
     _GXColor color = {0xFF, 0xFF, 0xFF, static_cast<u8>(FLOAT_80332940 * alpha)};
     GXSetChanMatColor(GX_COLOR0A0, color);
 
-    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x20);
-    DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 0, FLOAT_8033294c, FLOAT_8033294c, FLOAT_803329a4, FLOAT_80332928,
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x20));
+    MenuPcs.DrawRect(0, FLOAT_8033294c, FLOAT_8033294c, FLOAT_803329a4, FLOAT_80332928,
                                      FLOAT_8033294c, FLOAT_8033294c, FLOAT_80332934, FLOAT_80332934, 0.0f);
-    DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 4, FLOAT_8033294c, FLOAT_803329a8, FLOAT_803329a4, FLOAT_80332928,
+    MenuPcs.DrawRect(4, FLOAT_8033294c, FLOAT_803329a8, FLOAT_803329a4, FLOAT_80332928,
                                      FLOAT_8033294c, FLOAT_8033294c, FLOAT_80332934, FLOAT_80332934, 0.0f);
 
-    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x28);
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x28));
     float y = 64.0f;
     float sliceHeight = 32.0f;
     while (y < 384.0f) {
@@ -1578,7 +1561,7 @@ void CMenuPcs::DrawSingleBase(float alpha)
             sliceHeight = 384.0f - y;
         }
 
-        DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 0, FLOAT_8033294c, y, FLOAT_803329a4, sliceHeight, FLOAT_8033294c,
+        MenuPcs.DrawRect(0, FLOAT_8033294c, y, FLOAT_803329a4, sliceHeight, FLOAT_8033294c,
                                          FLOAT_8033294c, FLOAT_80332934, FLOAT_80332934, 0.0f);
         y += sliceHeight;
     }
@@ -1598,63 +1581,63 @@ void CMenuPcs::DrawSingleStat(float alpha)
     u8* self = reinterpret_cast<u8*>(this);
     u8 languageId = Game.m_gameWork.m_languageId;
 
-    DrawInit__8CMenuPcsFv(this);
+    DrawInit();
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-    SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
+    SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
     _GXColor color = {0xFF, 0xFF, 0xFF, static_cast<u8>(FLOAT_80332940 * alpha)};
     GXSetChanMatColor(GX_COLOR0A0, color);
-    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x26);
-    DrawRect__8CMenuPcsFUlfffffffff(this, 0, FLOAT_803329d4, 0.0f, FLOAT_803329d8, FLOAT_803329d0,
+    SetTexture(static_cast<CMenuPcs::TEX>(0x26));
+    DrawRect(0, FLOAT_803329d4, 0.0f, FLOAT_803329d8, FLOAT_803329d0,
                                      0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-    DrawRect__8CMenuPcsFUlfffffffff(this, 4, FLOAT_803329d4, FLOAT_803329dc, FLOAT_803329d8, FLOAT_803329d0,
+    DrawRect(4, FLOAT_803329d4, FLOAT_803329dc, FLOAT_803329d8, FLOAT_803329d0,
                                      0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
-    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x29);
+    SetTexture(static_cast<CMenuPcs::TEX>(0x29));
     for (float y = FLOAT_803329d0; y < FLOAT_803329dc; ) {
         float sliceHeight = 32.0f;
         if ((FLOAT_803329dc - y) < sliceHeight) {
             sliceHeight = FLOAT_803329dc - y;
         }
-        DrawRect__8CMenuPcsFUlfffffffff(this, 0, FLOAT_803329d4, y, FLOAT_803329a4, sliceHeight,
+        DrawRect(0, FLOAT_803329d4, y, FLOAT_803329a4, sliceHeight,
                                          0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
         y += sliceHeight;
     }
 
     color.a = static_cast<u8>(FLOAT_80332940 * static_cast<float>(DOUBLE_80332968) * alpha);
     GXSetChanMatColor(GX_COLOR0A0, color);
-    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x22);
+    SetTexture(static_cast<CMenuPcs::TEX>(0x22));
 
     unsigned short charaNo = *reinterpret_cast<unsigned short*>(Game.m_scriptFoodBase[0] + 0x3E0);
     float iconStep = FLOAT_803329e8;
     float texU = static_cast<float>(charaNo & 1) * iconStep;
     float texV = static_cast<float>(charaNo >> 1) * iconStep;
-    DrawRect__8CMenuPcsFUlfffffffff(this, 0, FLOAT_803329d4 - FLOAT_8033292c, FLOAT_803329ac, iconStep, iconStep,
+    DrawRect(0, FLOAT_803329d4 - FLOAT_8033292c, FLOAT_803329ac, iconStep, iconStep,
                                      texU, texV, 1.0f, 1.0f, 0.0f);
 
     color.a = static_cast<u8>(FLOAT_80332940 * alpha);
     GXSetChanMatColor(GX_COLOR0A0, color);
-    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x2A);
-    DrawRect__8CMenuPcsFUlfffffffff(this, 0, FLOAT_803329d4 + FLOAT_803329ec, FLOAT_803329f0, FLOAT_803329f4, FLOAT_803329f0,
+    SetTexture(static_cast<CMenuPcs::TEX>(0x2A));
+    DrawRect(0, FLOAT_803329d4 + FLOAT_803329ec, FLOAT_803329f0, FLOAT_803329f4, FLOAT_803329f0,
                                      0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
-    DrawInit__8CMenuPcsFv(this);
-    SetProjection__8CMenuPcsFi(this, 0);
-    SetLight__8CMenuPcsFi(this, 1);
+    DrawInit();
+    SetProjection(0);
+    SetLight(1);
     *reinterpret_cast<float*>(*reinterpret_cast<int*>(*reinterpret_cast<int*>(self + 0x774) + 0x168) + 0x9C) = alpha;
     (*reinterpret_cast<CCharaPcs::CHandle**>(self + 0x774))->Draw(5);
-    RestoreProjection__8CMenuPcsFv(this);
+    RestoreProjection();
 
-    DrawInit__8CMenuPcsFv(this);
+    DrawInit();
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-    SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
+    SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
     color.a = static_cast<u8>(FLOAT_80332940 * alpha);
     GXSetChanMatColor(GX_COLOR0A0, color);
-    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x2A);
-    DrawRect__8CMenuPcsFUlfffffffff(this, 0, FLOAT_803329d4 + FLOAT_803329ec, FLOAT_80332994, FLOAT_803329f4, FLOAT_803329f8,
+    SetTexture(static_cast<CMenuPcs::TEX>(0x2A));
+    DrawRect(0, FLOAT_803329d4 + FLOAT_803329ec, FLOAT_80332994, FLOAT_803329f4, FLOAT_803329f8,
                                      0.0f, FLOAT_803329f0, 1.0f, 1.0f, 0.0f);
 
-    DrawInit__8CMenuPcsFv(this);
+    DrawInit();
     CFont* font = *reinterpret_cast<CFont**>(self + 0xF8);
     font->SetMargin(0.0f);
     font->SetShadow(1);
@@ -1742,7 +1725,7 @@ void CMenuPcs::DrawSingleStat(float alpha)
 
     font->renderFlags &= 0xEF;
     font->SetMargin(FLOAT_80332934);
-    DrawInit__8CMenuPcsFv(this);
+    DrawInit();
 }
 
 /*
@@ -1756,38 +1739,38 @@ void CMenuPcs::DrawSingleStat(float alpha)
  */
 void CMenuPcs::DrawSingleHelpWim(float alpha)
 {
-    DrawInit__8CMenuPcsFv(this);
+    DrawInit();
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-    SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
+    SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
     int alphaInt = static_cast<int>(FLOAT_80332940 * alpha);
     _GXColor color = {0xFF, 0xFF, 0xFF, static_cast<u8>(alphaInt)};
     GXSetChanMatColor(GX_COLOR0A0, color);
 
-    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x23);
-    DrawRect__8CMenuPcsFUlfffffffff(this, 0, FLOAT_8033292c, FLOAT_803329c0, FLOAT_8033292c, FLOAT_8033292c, FLOAT_8033294c,
+    SetTexture(static_cast<CMenuPcs::TEX>(0x23));
+    DrawRect(0, FLOAT_8033292c, FLOAT_803329c0, FLOAT_8033292c, FLOAT_8033292c, FLOAT_8033294c,
                                     FLOAT_8033294c, FLOAT_80332934, FLOAT_80332934, 0.0f);
-    DrawRect__8CMenuPcsFUlfffffffff(this, 8, FLOAT_803329c4, FLOAT_803329c0, FLOAT_8033292c, FLOAT_8033292c, FLOAT_8033294c,
+    DrawRect(8, FLOAT_803329c4, FLOAT_803329c0, FLOAT_8033292c, FLOAT_8033292c, FLOAT_8033294c,
                                     FLOAT_8033294c, FLOAT_80332934, FLOAT_80332934, 0.0f);
-    DrawRect__8CMenuPcsFUlfffffffff(this, 4, FLOAT_8033292c, FLOAT_803329a8, FLOAT_8033292c, FLOAT_8033292c, FLOAT_8033294c,
+    DrawRect(4, FLOAT_8033292c, FLOAT_803329a8, FLOAT_8033292c, FLOAT_8033292c, FLOAT_8033294c,
                                     FLOAT_8033294c, FLOAT_80332934, FLOAT_80332934, 0.0f);
-    DrawRect__8CMenuPcsFUlfffffffff(this, 0xC, FLOAT_803329c4, FLOAT_803329a8, FLOAT_8033292c, FLOAT_8033292c, FLOAT_8033294c,
-                                    FLOAT_8033294c, FLOAT_80332934, FLOAT_80332934, 0.0f);
-
-    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x27);
-    DrawRect__8CMenuPcsFUlfffffffff(this, 0, FLOAT_80332928, FLOAT_803329c0, FLOAT_803329c8, FLOAT_8033292c, FLOAT_8033294c,
-                                    FLOAT_8033294c, FLOAT_80332934, FLOAT_80332934, 0.0f);
-    DrawRect__8CMenuPcsFUlfffffffff(this, 4, FLOAT_80332928, FLOAT_803329a8, FLOAT_803329c8, FLOAT_8033292c, FLOAT_8033294c,
+    DrawRect(0xC, FLOAT_803329c4, FLOAT_803329a8, FLOAT_8033292c, FLOAT_8033292c, FLOAT_8033294c,
                                     FLOAT_8033294c, FLOAT_80332934, FLOAT_80332934, 0.0f);
 
-    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x24);
-    DrawRect__8CMenuPcsFUlfffffffff(this, 0, FLOAT_8033292c, FLOAT_803329cc, FLOAT_8033292c, FLOAT_803329d0, FLOAT_8033294c,
+    SetTexture(static_cast<CMenuPcs::TEX>(0x27));
+    DrawRect(0, FLOAT_80332928, FLOAT_803329c0, FLOAT_803329c8, FLOAT_8033292c, FLOAT_8033294c,
                                     FLOAT_8033294c, FLOAT_80332934, FLOAT_80332934, 0.0f);
-    DrawRect__8CMenuPcsFUlfffffffff(this, 8, FLOAT_803329c4, FLOAT_803329cc, FLOAT_8033292c, FLOAT_803329d0, FLOAT_8033294c,
+    DrawRect(4, FLOAT_80332928, FLOAT_803329a8, FLOAT_803329c8, FLOAT_8033292c, FLOAT_8033294c,
                                     FLOAT_8033294c, FLOAT_80332934, FLOAT_80332934, 0.0f);
 
-    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x2B);
-    DrawRect__8CMenuPcsFUlfffffffff(this, 8, FLOAT_80332928, FLOAT_803329cc, FLOAT_803329c8, FLOAT_803329d0, FLOAT_8033294c,
+    SetTexture(static_cast<CMenuPcs::TEX>(0x24));
+    DrawRect(0, FLOAT_8033292c, FLOAT_803329cc, FLOAT_8033292c, FLOAT_803329d0, FLOAT_8033294c,
+                                    FLOAT_8033294c, FLOAT_80332934, FLOAT_80332934, 0.0f);
+    DrawRect(8, FLOAT_803329c4, FLOAT_803329cc, FLOAT_8033292c, FLOAT_803329d0, FLOAT_8033294c,
+                                    FLOAT_8033294c, FLOAT_80332934, FLOAT_80332934, 0.0f);
+
+    SetTexture(static_cast<CMenuPcs::TEX>(0x2B));
+    DrawRect(8, FLOAT_80332928, FLOAT_803329cc, FLOAT_803329c8, FLOAT_803329d0, FLOAT_8033294c,
                                     FLOAT_8033294c, FLOAT_80332934, FLOAT_80332934, 0.0f);
 }
 
@@ -1798,20 +1781,20 @@ void CMenuPcs::DrawSingleHelpWim(float alpha)
  */
 void CMenuPcs::DrawSingleCrescent(float scaleX, float alpha)
 {
-    DrawInit__8CMenuPcsFv(this);
+    DrawInit();
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-    SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(&MenuPcs, 0);
+    MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
     _GXColor color = {0xFF, 0xFF, 0xFF, static_cast<u8>(FLOAT_80332940 * alpha)};
     GXSetChanMatColor(GX_COLOR0A0, color);
 
-    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x21);
-    DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 0,
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x21));
+    MenuPcs.DrawRect(0,
                                     -(FLOAT_803329ac * scaleX - FLOAT_803329bc), FLOAT_80332948,
                                     FLOAT_803329ac, FLOAT_803329b0,
                                     FLOAT_8033294c, FLOAT_8033294c,
                                     scaleX, FLOAT_80332934, 0.0f);
-    DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 8,
+    MenuPcs.DrawRect(8,
                                     FLOAT_803329b4, FLOAT_80332948,
                                     FLOAT_803329ac, FLOAT_803329b0,
                                     FLOAT_8033294c, FLOAT_8033294c,
@@ -2160,38 +2143,38 @@ void CMenuPcs::SingleDrawCtrl()
 {
     u8* self = reinterpret_cast<u8*>(this);
 
-    DrawInit__8CMenuPcsFv(this);
+    DrawInit();
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-    SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
+    SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
     _GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
     GXSetChanMatColor(GX_COLOR0A0, white);
-    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x20);
-    DrawRect__8CMenuPcsFUlfffffffff(this, 0, FLOAT_8033294c, FLOAT_8033294c, FLOAT_803329a4, FLOAT_80332928,
+    SetTexture(static_cast<CMenuPcs::TEX>(0x20));
+    DrawRect(0, FLOAT_8033294c, FLOAT_8033294c, FLOAT_803329a4, FLOAT_80332928,
                                      FLOAT_8033294c, FLOAT_8033294c, FLOAT_80332934, FLOAT_80332934, 0.0f);
-    DrawRect__8CMenuPcsFUlfffffffff(this, 4, FLOAT_8033294c, FLOAT_803329a8, FLOAT_803329a4, FLOAT_80332928,
+    DrawRect(4, FLOAT_8033294c, FLOAT_803329a8, FLOAT_803329a4, FLOAT_80332928,
                                      FLOAT_8033294c, FLOAT_8033294c, FLOAT_80332934, FLOAT_80332934, 0.0f);
 
-    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x28);
+    SetTexture(static_cast<CMenuPcs::TEX>(0x28));
     unsigned int step = 0x20;
     for (unsigned int y = 0x40; y < 0x180; y += step) {
         if ((0x180 - y) < step) {
             step = 0x180 - y;
         }
 
-        DrawRect__8CMenuPcsFUlfffffffff(this, 0, FLOAT_8033294c, static_cast<float>(y), FLOAT_803329a4,
+        DrawRect(0, FLOAT_8033294c, static_cast<float>(y), FLOAT_803329a4,
                                          static_cast<float>(step), FLOAT_8033294c, FLOAT_8033294c,
                                          FLOAT_80332934, FLOAT_80332934, 0.0f);
     }
 
     if (*reinterpret_cast<s16*>(self + 0x864) != 8) {
-        DrawInit__8CMenuPcsFv(this);
+        DrawInit();
         _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-        SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
+        SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
         GXSetChanMatColor(GX_COLOR0A0, white);
-        SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x21);
-        DrawRect__8CMenuPcsFUlfffffffff(this, 0, FLOAT_8033292c, FLOAT_80332948, FLOAT_803329ac, FLOAT_803329b0,
+        SetTexture(static_cast<CMenuPcs::TEX>(0x21));
+        DrawRect(0, FLOAT_8033292c, FLOAT_80332948, FLOAT_803329ac, FLOAT_803329b0,
                                          FLOAT_8033294c, FLOAT_8033294c, FLOAT_80332934, FLOAT_80332934, 0.0f);
-        DrawRect__8CMenuPcsFUlfffffffff(this, 8, FLOAT_803329b4, FLOAT_80332948, FLOAT_803329ac, FLOAT_803329b0,
+        DrawRect(8, FLOAT_803329b4, FLOAT_80332948, FLOAT_803329ac, FLOAT_803329b0,
                                          FLOAT_8033294c, FLOAT_8033294c, FLOAT_80332934, FLOAT_80332934, 0.0f);
         DrawSingleStat(FLOAT_80332934);
         DrawSingleHelpWim(FLOAT_80332934);
@@ -2296,12 +2279,12 @@ void CMenuPcs::SingleDrawCtrl()
 void CMenuPcs::DrawSingleIcon(int iconNo, int posX, int posY, float alpha, int rawIcon, float uvScale)
 {
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-    SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
+    SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
     _GXColor color = {0xFF, 0xFF, 0xFF, static_cast<u8>(FLOAT_80332940 * alpha)};
     GXSetChanMatColor(GX_COLOR0A0, color);
 
-    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x25);
+    SetTexture(static_cast<CMenuPcs::TEX>(0x25));
     if (rawIcon == 0) {
         iconNo = static_cast<int>(gSingMenuItemIconByType[iconNo]);
     }
@@ -2313,8 +2296,7 @@ void CMenuPcs::DrawSingleIcon(int iconNo, int posX, int posY, float alpha, int r
         row--;
     }
 
-    DrawRect__8CMenuPcsFUlfffffffff(
-        this, 0, static_cast<float>(posX), static_cast<float>(posY), FLOAT_8033292c, FLOAT_8033292c,
+    DrawRect(0, static_cast<float>(posX), static_cast<float>(posY), FLOAT_8033292c, FLOAT_8033292c,
         static_cast<float>(col * 0x20), static_cast<float>(row * 0x20), uvScale, uvScale, FLOAT_8033294c);
 }
 
@@ -2429,14 +2411,13 @@ double CMenuPcs::CalcListPos(int listPos, int listSize, int mode)
 void CMenuPcs::DrawListPosMark(float x, float y, float z)
 {
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-    SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(&MenuPcs, 0);
+    MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
     _GXColor color = { 0xFF, 0xFF, 0xFF, 0xFF };
     GXSetChanMatColor(GX_COLOR0A0, color);
 
-    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x2E);
-    DrawRect__8CMenuPcsFUlfffffffff(
-        &MenuPcs, 0, FLOAT_80332990 + x, y + z, FLOAT_80332930, FLOAT_80332930, FLOAT_80332994,
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x2E));
+    MenuPcs.DrawRect(0, FLOAT_80332990 + x, y + z, FLOAT_80332930, FLOAT_80332930, FLOAT_80332994,
         FLOAT_80332998, FLOAT_80332934, FLOAT_80332934, 0.0f);
 }
 
@@ -2511,7 +2492,7 @@ int CMenuPcs::EquipChk(int itemNo)
 void CMenuPcs::DrawEquipMark(int x, int y, float alpha)
 {
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-    SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(&MenuPcs, 0);
+    MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
     union {
         u32 word;
@@ -2520,7 +2501,7 @@ void CMenuPcs::DrawEquipMark(int x, int y, float alpha)
     color.word = 0xFFFFFF00;
     color.color.a = static_cast<u8>(static_cast<int>(FLOAT_80332940 * alpha));
     GXSetChanMatColor(GX_COLOR0A0, color.color);
-    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x2C);
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x2C));
 
     union {
         double value;
@@ -2532,8 +2513,7 @@ void CMenuPcs::DrawEquipMark(int x, int y, float alpha)
     yPos.words[0] = 0x43300000;
     yPos.words[1] = static_cast<u32>(y) ^ 0x80000000U;
 
-    DrawRect__8CMenuPcsFUlfffffffff(
-        &MenuPcs, 0, static_cast<float>(xPos.value - DOUBLE_80332938),
+    MenuPcs.DrawRect(0, static_cast<float>(xPos.value - DOUBLE_80332938),
         static_cast<float>(yPos.value - DOUBLE_80332938), FLOAT_80332948, FLOAT_80332948, FLOAT_8033294c, FLOAT_8033294c,
         FLOAT_80332934, FLOAT_80332934, 0.0f);
 }
@@ -2591,10 +2571,10 @@ void CMenuPcs::DrawSingWin(short mode)
     float x1 = x0 + w - FLOAT_8033292c;
     float y1 = y0 + h - FLOAT_8033292c;
 
-    SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
+    SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
     _GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
     GXSetChanMatColor(GX_COLOR0A0, white);
-    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x3F);
+    SetTexture(static_cast<CMenuPcs::TEX>(0x3F));
     for (unsigned long i = 0; i < 4; i++) {
         unsigned long uvFlag = 0;
         float x = x0;
@@ -2607,10 +2587,10 @@ void CMenuPcs::DrawSingWin(short mode)
             uvFlag |= 4;
             y = y1;
         }
-        DrawRect__8CMenuPcsFUlfffffffff(this, uvFlag, x, y, FLOAT_8033292c, FLOAT_8033292c, FLOAT_8033294c, FLOAT_8033294c, FLOAT_80332934, FLOAT_80332934, 0.0f);
+        DrawRect(uvFlag, x, y, FLOAT_8033292c, FLOAT_8033292c, FLOAT_8033294c, FLOAT_8033294c, FLOAT_80332934, FLOAT_80332934, 0.0f);
     }
 
-    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x41);
+    SetTexture(static_cast<CMenuPcs::TEX>(0x41));
     float innerW = w - static_cast<float>(DOUBLE_80332988);
     float innerX = FLOAT_8033292c + x0;
     for (int i = 0; i < 2; i++) {
@@ -2620,10 +2600,10 @@ void CMenuPcs::DrawSingWin(short mode)
             uvFlag = 4;
             y = y1;
         }
-        DrawRect__8CMenuPcsFUlfffffffff(this, uvFlag, innerX, y, innerW, FLOAT_8033292c, FLOAT_8033294c, FLOAT_8033294c, FLOAT_80332934, FLOAT_80332934, 0.0f);
+        DrawRect(uvFlag, innerX, y, innerW, FLOAT_8033292c, FLOAT_8033294c, FLOAT_8033294c, FLOAT_80332934, FLOAT_80332934, 0.0f);
     }
 
-    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x40);
+    SetTexture(static_cast<CMenuPcs::TEX>(0x40));
     float innerH = h - static_cast<float>(DOUBLE_80332988);
     float innerY = FLOAT_8033292c + y0;
     for (int i = 0; i < 2; i++) {
@@ -2633,11 +2613,11 @@ void CMenuPcs::DrawSingWin(short mode)
             uvFlag = 8;
             x = x1;
         }
-        DrawRect__8CMenuPcsFUlfffffffff(this, uvFlag, x, innerY, FLOAT_8033292c, innerH, FLOAT_8033294c, FLOAT_8033294c, FLOAT_80332934, FLOAT_80332934, 0.0f);
+        DrawRect(uvFlag, x, innerY, FLOAT_8033292c, innerH, FLOAT_8033294c, FLOAT_8033294c, FLOAT_80332934, FLOAT_80332934, 0.0f);
     }
 
-    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x42);
-    DrawRect__8CMenuPcsFUlfffffffff(this, 0, innerX, innerY, innerW, innerH, FLOAT_8033294c, FLOAT_8033294c, FLOAT_80332934, FLOAT_80332934, 0.0f);
+    SetTexture(static_cast<CMenuPcs::TEX>(0x42));
+    DrawRect(0, innerX, innerY, innerW, innerH, FLOAT_8033294c, FLOAT_8033294c, FLOAT_80332934, FLOAT_80332934, 0.0f);
 
     int winStatePtr = *reinterpret_cast<int*>(self + 0x848);
     s16 state = *reinterpret_cast<s16*>(winStatePtr + 10);
@@ -2725,7 +2705,7 @@ void CMenuPcs::DrawSingWinMess(int messageNo, int activeMask, int useDynamic)
         y += static_cast<float>(lineStep);
     }
 
-    DrawInit__8CMenuPcsFv(this);
+    DrawInit();
 }
 
 /*
@@ -2977,7 +2957,7 @@ int CMenuPcs::GetSmithItem(int itemNo)
 {
     int script = Game.m_scriptFoodBase[0];
 
-    GetItemType__8CMenuPcsFii(this, itemNo, 1);
+    GetItemType(itemNo, 1);
     u16 race = *reinterpret_cast<u16*>(script + 0x3E0);
     u16 raceType = race & 3;
     int itemBase = Game.unkCFlatData0[2] + itemNo * 0x48;
@@ -3046,7 +3026,7 @@ int CMenuPcs::GetSmithItem(int itemNo)
  */
 void CMenuPcs::GetRecipeMaterial(int itemNo, CMenuPcs::MaterialInfo* materialInfo)
 {
-    GetItemType__8CMenuPcsFii(this, itemNo, 1);
+    GetItemType(itemNo, 1);
 
     u8* itemBase = reinterpret_cast<u8*>(Game.unkCFlatData0[2]) + (itemNo * 0x48);
 
@@ -3074,7 +3054,7 @@ void CMenuPcs::GetRaceStr(int itemNo, char* outText)
     char* text;
     char* suffix;
 
-    GetItemType__8CMenuPcsFii(this, itemNo, 1);
+    GetItemType(itemNo, 1);
     raceBits = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemNo * 0x48 + 4);
     outText[0] = '\0';
 
@@ -3173,22 +3153,22 @@ void CMenuPcs::GetRaceStr(int itemNo, char* outText)
 void CMenuPcs::DrawSingBar(int x, int y, int value, float alpha)
 {
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-    SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
+    SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
     unsigned char alphaU8 = static_cast<unsigned char>(FLOAT_80332940 * alpha);
     _GXColor color = {0xFF, 0xFF, 0xFF, alphaU8};
     GXSetChanMatColor(GX_COLOR0A0, color);
 
-    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x53);
-    DrawRect__8CMenuPcsFUlfffffffff(this, 0, static_cast<float>(x), static_cast<float>(y), 16.0f,
+    SetTexture(static_cast<CMenuPcs::TEX>(0x53));
+    DrawRect(0, static_cast<float>(x), static_cast<float>(y), 16.0f,
                                     FLOAT_80332948, FLOAT_8033294c, FLOAT_8033294c,
                                     FLOAT_80332934, FLOAT_80332934, 0.0f);
-    DrawRect__8CMenuPcsFUlfffffffff(this, 8, static_cast<float>(x + 0x60), static_cast<float>(y), 16.0f,
+    DrawRect(8, static_cast<float>(x + 0x60), static_cast<float>(y), 16.0f,
                                     FLOAT_80332948, FLOAT_8033294c, FLOAT_8033294c,
                                     FLOAT_80332934, FLOAT_80332934, 0.0f);
 
-    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x54);
-    DrawRect__8CMenuPcsFUlfffffffff(this, 0, static_cast<float>(x + 0x10), static_cast<float>(y),
+    SetTexture(static_cast<CMenuPcs::TEX>(0x54));
+    DrawRect(0, static_cast<float>(x + 0x10), static_cast<float>(y),
                                     FLOAT_80332950, FLOAT_80332948, FLOAT_8033294c, FLOAT_8033294c,
                                     FLOAT_80332934, FLOAT_80332934, 0.0f);
 
@@ -3205,17 +3185,17 @@ void CMenuPcs::DrawSingBar(int x, int y, int value, float alpha)
         ++bars;
     }
 
-    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, tex);
+    SetTexture(static_cast<CMenuPcs::TEX>(tex));
     int barY = y + 8;
-    DrawRect__8CMenuPcsFUlfffffffff(this, 0, static_cast<float>(x + 0x10), static_cast<float>(barY),
+    DrawRect(0, static_cast<float>(x + 0x10), static_cast<float>(barY),
                                     4.0f, 8.0f, FLOAT_8033294c, FLOAT_8033294c,
                                     FLOAT_80332934, FLOAT_80332934, 0.0f);
-    DrawRect__8CMenuPcsFUlfffffffff(this, 8, static_cast<float>(x + 0x10 + bars * 8 - 4), static_cast<float>(barY),
+    DrawRect(8, static_cast<float>(x + 0x10 + bars * 8 - 4), static_cast<float>(barY),
                                     4.0f, 8.0f, FLOAT_8033294c, FLOAT_8033294c,
                                     FLOAT_80332934, FLOAT_80332934, 0.0f);
 
-    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, tex + 1);
-    DrawRect__8CMenuPcsFUlfffffffff(this, 0, static_cast<float>(x + 0x14), static_cast<float>(barY),
+    SetTexture(static_cast<CMenuPcs::TEX>(tex + 1));
+    DrawRect(0, static_cast<float>(x + 0x14), static_cast<float>(barY),
                                     static_cast<float>(bars * 8 - 8), 8.0f, FLOAT_8033294c, FLOAT_8033294c,
                                     FLOAT_80332934, FLOAT_80332934, 0.0f);
 }

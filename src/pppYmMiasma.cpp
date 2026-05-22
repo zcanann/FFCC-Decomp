@@ -13,7 +13,6 @@
 #include <string.h>
 
 extern "C" int rand(void);
-extern CGame Game;
 extern float FLOAT_80330640;
 extern float FLOAT_80330644;
 extern const float FLOAT_80330650;

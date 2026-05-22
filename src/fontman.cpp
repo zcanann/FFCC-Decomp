@@ -763,7 +763,7 @@ CFont::~CFont()
 	}
 
 	if (m_usesEmbeddedData == 0 && m_glyphData != 0) {
-		::operator delete[](m_glyphData);
+		delete[] static_cast<unsigned char*>(m_glyphData);
 		m_glyphData = 0;
 	}
 }

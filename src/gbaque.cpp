@@ -22,8 +22,6 @@ GbaQueue GbaQue;
 extern "C" int rand(void);
 extern "C" int memcmp(const void*, const void*, unsigned long);
 
-extern CMenuPcs MenuPcs;
-
 struct GbaFlatDataTableEntryView
 {
 	int m_numEntries;

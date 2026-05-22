@@ -138,7 +138,6 @@ extern "C" void destroy__8CMenuPcsFv(CMenuPcs*);
 extern "C" void calc__8CMenuPcsFv(CMenuPcs*);
 extern "C" void draw__8CMenuPcsFv(CMenuPcs*);
 extern "C" void Calc__5CMenuFv(CMenu*);
-extern "C" char* GetLangString__5CGameFv(void*);
 extern "C" void loadTextureAsync__8CMenuPcsFPPciiPQ28CMenuPcs4CTmpiii(CMenuPcs*, char**, int, int, CMenuPcs::CTmp*, int, int, int);
 extern "C" void drawSingleMenu__8CMenuPcsFv(CMenuPcs*);
 extern "C" void _WaitDrawDone__8CGraphicFPci(void*, const char*, int);

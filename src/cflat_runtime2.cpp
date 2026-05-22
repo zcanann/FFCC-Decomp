@@ -56,7 +56,6 @@ extern "C" void __ct__8CGObjectFv(CGObject*);
 extern "C" void __ct__9CGQuadObjFv(CGQuadObj*);
 extern "C" void __ct__9CGBaseObjFv(CGBaseObj*);
 extern "C" void pppCreate__8CPartMngFiiP14PPPCREATEPARAMi(CPartMng*, int, int, PPPCREATEPARAM*, int);
-extern "C" char* GetLangString__5CGameFv(void*);
 extern "C" int GetBackBufferRect__8CGraphicFRiRiRiRii(CGraphic*, int&, int&, int&, int&, int);
 
 // Linkage definitions from config/GCCP01/symbols.txt.
@@ -1785,7 +1784,7 @@ void CFlatRuntime2::loadLayer(int layerNo, char* fileName)
 	}
 
 	char path[0x104];
-	sprintf(path, sCFlatRuntime2TexturePathFmt, GetLangString__5CGameFv(&Game), fileName);
+	sprintf(path, sCFlatRuntime2TexturePathFmt, Game.GetLangString(), fileName);
 
 	CFile::CHandle* fileHandle = File.Open(path, 0, CFile::PRI_LOW);
 	if (fileHandle != 0) {
@@ -1841,7 +1840,7 @@ void CFlatRuntime2::loadLayerASync(int layerNo, char* fileName)
 	}
 
 	char path[0x104];
-	sprintf(path, sCFlatRuntime2TexturePathFmt, GetLangString__5CGameFv(&Game), fileName);
+	sprintf(path, sCFlatRuntime2TexturePathFmt, Game.GetLangString(), fileName);
 
 	fileHandle = File.Open(path, 0, CFile::PRI_LOW);
 	*reinterpret_cast<CFile::CHandle**>(layer + 8) = fileHandle;

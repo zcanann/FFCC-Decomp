@@ -83,7 +83,6 @@ extern "C" void SingleDrawCtrl__8CMenuPcsFv(CMenuPcs*);
 extern "C" void _WaitDrawDone__8CGraphicFPci(CGraphic*, const char*, int);
 extern "C" void DestroyTempBuffer__8CGraphicFv(CGraphic*);
 extern "C" int GetModelNo__8CMenuPcsFiii(CMenuPcs*, int, int, int);
-extern "C" char* GetLangString__5CGameFv(void*);
 extern "C" void DrawHeart__8CMesMenuFffff(void*, float, float, float, float);
 extern "C" char* s_stand_80332a24;
 char s_singmenu_cpp_801de8d4[] = "singmenu.cpp";
@@ -949,7 +948,7 @@ void CMenuPcs::createSingleMenu()
         }
 
         char path[128];
-        sprintf(path, s_dvd__smenu_subfont_fnt_801de8f8, GetLangString__5CGameFv(&Game));
+        sprintf(path, s_dvd__smenu_subfont_fnt_801de8f8, Game.GetLangString());
         loadFont(1, path, 4, -1);
 
         self[0x85A] = 0;
@@ -1407,7 +1406,7 @@ void CMenuPcs::loadTextureAsync(char **, int, int, CMenuPcs::CTmp*, int, int, in
         if (loadIndex < 2) {
             if (*reinterpret_cast<int*>(self + 0x860) == 0) {
                 char path[260];
-                char* language = GetLangString__5CGameFv(&Game);
+                const char* language = Game.GetLangString();
                 sprintf(path, s_dvd__smenu__s_tex_801de8e4, language, PTR_s_solo1_80214b18.entries[loadIndex]);
                 gSingMenuAsyncFileHandle = File.Open(path, 0, CFile::PRI_LOW);
                 File.ReadASync(gSingMenuAsyncFileHandle);

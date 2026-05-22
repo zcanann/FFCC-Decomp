@@ -1,6 +1,8 @@
 #ifndef _FFCC_MENU_LST_H_
 #define _FFCC_MENU_LST_H_
 
+#include <dolphin/gx.h>
+
 class CFont;
 
 struct MenuLstState
@@ -47,6 +49,24 @@ struct MenuLstList
 class CMenuPcs
 {
 public:
+    enum FMT
+    {
+        TODO_FMT
+    };
+
+    enum TEX
+    {
+        TODO_TEX
+    };
+
+    void DrawInit();
+    void SetAttrFmt(FMT);
+    void SetTexture(TEX);
+    void DrawRect(unsigned long, float, float, float, float, float, float, float, float, float);
+    void DrawCursor(int, int, float);
+    void DrawHelpMessage(int, CFont*, int, int, _GXColor, int, float, float);
+    char* GetMenuStr(int);
+
     void MLstInit();
     void MLstInit1();
     int MLstOpen();
@@ -64,5 +84,7 @@ public:
     char pad_830[0x20];
     MenuLstList* lstData;
 };
+
+extern CMenuPcs MenuPcs;
 
 #endif // _FFCC_MENU_LST_H_

@@ -9,22 +9,6 @@
 #include <string.h>
 
 extern "C" int __cntlzw(unsigned int);
-extern "C" void SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(CMenuPcs*, int);
-extern "C" void SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(CMenuPcs*, int);
-extern "C" void DrawRect__8CMenuPcsFUlfffffffff(CMenuPcs*, unsigned long, float, float, float, float, float, float, float, float, float);
-extern "C" void DrawInit__8CMenuPcsFv(CMenuPcs*);
-extern "C" void DrawCursor__8CMenuPcsFiif(CMenuPcs*, int, int, float);
-extern "C" void DrawHelpMessage__8CMenuPcsFiP5CFontii8_GXColoriff(CMenuPcs*, int, CFont*, int, int, GXColor, int, float, float);
-extern "C" void SetMargin__5CFontFf(float, CFont*);
-extern "C" void SetShadow__5CFontFi(CFont*, int);
-extern "C" void SetScale__5CFontFf(float, CFont*);
-extern "C" void DrawInit__5CFontFv(CFont*);
-extern "C" float GetWidth__5CFontFPc(CFont*, const char*);
-extern "C" void SetPosX__5CFontFf(float, CFont*);
-extern "C" void SetPosY__5CFontFf(float, CFont*);
-extern "C" void Draw__5CFontFPc(CFont*, const char*);
-
-extern "C" const char* GetMenuStr__8CMenuPcsFi(CMenuPcs*, int);
 
 extern const float FLOAT_803333D0;
 extern const float FLOAT_803333D4;
@@ -71,7 +55,7 @@ STATIC_ASSERT(offsetof(MenuLstState, cursor) == 0x26);
 void CMenuPcs::MLstDraw()
 {
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(&MenuPcs, 0);
+	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
 	short menuMode = this->lstState->mode;
 	MenuLstEntry* item = this->lstData->entries;
@@ -86,7 +70,7 @@ void CMenuPcs::MLstDraw()
 			float alpha = item->alpha;
 			float z = item->z;
 
-			SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, tex);
+			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));
 			GXColor color;
 			color.r = 0xff;
 			color.g = 0xff;
@@ -100,17 +84,16 @@ void CMenuPcs::MLstDraw()
 				v += (float)((double)item->height);
 			}
 
-			DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 0, x, y, w, h, FLOAT_803333D0, v, z, z, FLOAT_803333D0);
+			MenuPcs.DrawRect(0, x, y, w, h, FLOAT_803333D0, v, z, z, FLOAT_803333D0);
 
-			SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x5c);
+			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x5c));
 			float iconX = (float)item->x;
 			float iconY = (float)(item->y - 6);
 			v = FLOAT_803333D0;
 			if ((menuMode == 1) && (i == this->lstState->cursor)) {
 				v += (float)((double)item->height);
 			}
-			DrawRect__8CMenuPcsFUlfffffffff(
-				&MenuPcs,
+			MenuPcs.DrawRect(
 				0,
 				(float)-(FLOAT_803333E0 * DOUBLE_803333E8 - iconX),
 				iconY,
@@ -136,7 +119,7 @@ void CMenuPcs::MLstDraw()
 		CColor color(0xff, 0xff, 0xff, (unsigned char)(FLOAT_803333D4 * item->alpha));
 		font->SetColor(color.color);
 
-		const char* text = GetMenuStr__8CMenuPcsFi(this, i + 0x2e);
+		const char* text = GetMenuStr(i + 0x2e);
 		font->GetWidth(text);
 
 		float textX = (float)(item->x + 0x28);
@@ -152,23 +135,22 @@ void CMenuPcs::MLstDraw()
 		item++;
 	}
 
-	DrawInit__8CMenuPcsFv(this);
+	DrawInit();
 	if (menuMode == 1) {
 		MenuLstEntry* curItem = &this->lstData->entries[this->lstState->cursor];
 		float cursorYOffset = (float)((double)(float)(curItem->height - 0x20) * DOUBLE_803333E8);
 		int cursorY = (int)((float)curItem->y + cursorYOffset);
 		int cursorX = (int)((float)(curItem->x - 0x38) + (float)(System.m_frameCounter % 8));
-		DrawCursor__8CMenuPcsFiif(this, cursorX, cursorY, FLOAT_803333F0);
+		DrawCursor(cursorX, cursorY, FLOAT_803333F0);
 	}
 
-	DrawInit__8CMenuPcsFv(this);
+	DrawInit();
 	int helpMessageId = this->lstState->cursor + 0x25c;
 	CFont* helpFont = this->helpFont;
 	CColor helpColor(0xff, 0xff, 0xff, (unsigned char)(FLOAT_803333D4 * this->lstData->entries[0].alpha));
 	float helpX = (float)-((FLOAT_803333E0 * (double)FLOAT_803333FC) - (double)FLOAT_803333F8);
 	float helpY = FLOAT_80333400;
-	DrawHelpMessage__8CMenuPcsFiP5CFontii8_GXColoriff(
-		this,
+	DrawHelpMessage(
 		helpMessageId,
 		helpFont,
 		(int)helpX,

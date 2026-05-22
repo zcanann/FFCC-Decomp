@@ -238,6 +238,7 @@ public:
     void WMSubMenuInit();
     void WMChgMenu();
     void GetOptionData();
+    const char* GetSkillStr(int);
     int GetItemType(int, int);
     unsigned char GetItemIcon(int);
     void ArtiInit();

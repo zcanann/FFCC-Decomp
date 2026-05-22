@@ -44,7 +44,6 @@ static inline float GetStatusMultiplier(int offset)
 }
 }
 
-extern "C" int GetSkillStr__8CMenuPcsFi(void*, int);
 extern "C" void* __vt__8CMonWork[];
 extern "C" void* __vt__12CCaravanWork[];
 extern "C" void* __vt__9CGObjWork[];
@@ -2327,7 +2326,7 @@ int CCaravanWork::GetWeaponAttrib(int cmdListIdx)
 {
 	int weaponType = GetCmdListItem(cmdListIdx);
 	if (weaponType >= 0 && weaponType < 3) {
-		return GetSkillStr__8CMenuPcsFi(&MenuPcs, weaponType);
+		return reinterpret_cast<int>(MenuPcs.GetSkillStr(weaponType));
 	}
 
 	int itemId = DelCmdListAndItem(cmdListIdx);

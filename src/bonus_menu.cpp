@@ -513,14 +513,12 @@ static void DrawBonusTexturedSprite(CMenuPcs* menu, const BonusAnimSprite* sprit
 {
 	GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(alpha * 255.0f)};
 	GXSetChanMatColor(GX_COLOR0A0, color);
-	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(menu, sprite->tex);
+	menu->SetTexture(static_cast<CMenuPcs::TEX>(sprite->tex));
 	if (sprite->tex == 0x20) {
 		GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_ONE, GX_LO_CLEAR);
 	}
-	DrawRect__8CMenuPcsFUlfffffffff(menu, 0,
-	    (float)sprite->x + sprite->mulX, (float)sprite->y + sprite->mulY,
-	    (float)sprite->w, (float)sprite->h,
-	    sprite->depth, sprite->depth, sprite->scale, sprite->scale, 0.0f);
+	menu->DrawRect(0, (float)sprite->x + sprite->mulX, (float)sprite->y + sprite->mulY, (float)sprite->w,
+	               (float)sprite->h, sprite->depth, sprite->depth, sprite->scale, sprite->scale, 0.0f);
 	if (sprite->tex == 0x20) {
 		GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
 	}
@@ -548,12 +546,11 @@ static void DrawBonusSweepSprite(CMenuPcs* menu, const BonusAnimSprite* sprite, 
 	reinterpret_cast<unsigned int*>(solidColors)[2] = solidColor;
 	reinterpret_cast<unsigned int*>(solidColors)[3] = solidColor;
 
-	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(menu, sprite->tex);
+	menu->SetTexture(static_cast<CMenuPcs::TEX>(sprite->tex));
 	GXSetChanMatColor(GX_COLOR0A0, solidColors[0]);
 
 	if (fillWidth > 0.0f) {
-		DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(menu, 0, x, y, fillWidth, height,
-		    sprite->depth, sprite->depth, solidColors, 1.0f, 1.0f, 0.0f);
+		menu->DrawRect(0, x, y, fillWidth, height, sprite->depth, sprite->depth, solidColors, 1.0f, 1.0f, 0.0f);
 		x += fillWidth;
 	}
 
@@ -563,8 +560,7 @@ static void DrawBonusSweepSprite(CMenuPcs* menu, const BonusAnimSprite* sprite, 
 		reinterpret_cast<unsigned int*>(fadeColors)[1] = 0xFFFFFF00;
 		reinterpret_cast<unsigned int*>(fadeColors)[2] = 0xFFFFFF00;
 		reinterpret_cast<unsigned int*>(fadeColors)[3] = 0xFFFFFF00;
-		DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(menu, 0, x, y, fadeWidth, height,
-		    sprite->depth, sprite->depth, fadeColors, 1.0f, 1.0f, 0.0f);
+		menu->DrawRect(0, x, y, fadeWidth, height, sprite->depth, sprite->depth, fadeColors, 1.0f, 1.0f, 0.0f);
 	}
 }
 
@@ -581,13 +577,13 @@ static void DrawBonusPartyModel(CMenuPcs* menu, int modelIndex, float alpha)
 	}
 
 	SetBonusPartyModelAlpha(menu, modelIndex, ClampBonusUnit(alpha));
-	SetProjection__8CMenuPcsFi(menu, modelIndex);
-	SetLight__8CMenuPcsFi(menu, 1);
+	menu->SetProjection(modelIndex);
+	menu->SetLight(1);
 	unsigned int oldFlags = handle->m_flags;
 	handle->m_flags = 0x300543;
 	handle->Draw(5);
 	handle->m_flags = oldFlags;
-	RestoreProjection__8CMenuPcsFv(menu);
+	menu->RestoreProjection();
 }
 
 static void SetBonusPartyModelAlpha(CMenuPcs* menu, int modelIndex, float alpha)
@@ -618,8 +614,8 @@ static void DrawBonusActiveMarks(CMenuPcs* menu, int statePtr, float alpha)
 		return;
 	}
 
-	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(menu, 0);
-	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(menu, 0x23);
+	menu->SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+	menu->SetTexture(static_cast<CMenuPcs::TEX>(0x23));
 	GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(alpha * 255.0f)};
 	GXSetChanMatColor(GX_COLOR0A0, color);
 
@@ -634,7 +630,7 @@ static void DrawBonusActiveMarks(CMenuPcs* menu, int statePtr, float alpha)
 		}
 		float x = markPos[i * 2 + 0] + 4.0f;
 		float y = markPos[i * 2 + 1] + 4.0f;
-		DrawRect__8CMenuPcsFUlfffffffff(menu, 0, x, y, 24.0f, 24.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+		menu->DrawRect(0, x, y, 24.0f, 24.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 	}
 }
 

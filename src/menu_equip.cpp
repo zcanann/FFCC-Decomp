@@ -18,14 +18,7 @@ extern "C" void DrawRect__8CMenuPcsFUlfffffffff(double, double, double, double, 
                                                  int);
 extern "C" void DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(double, double, double, double, double, double, double, double,
                                                            CMenuPcs*, int, void*);
-extern "C" void DrawSingleIcon__8CMenuPcsFiiifif(CMenuPcs*, int, int, int, float, int, float);
-extern "C" double CalcListPos__8CMenuPcsFiii(CMenuPcs*, int, int, int);
-extern "C" void DrawListPosMark__8CMenuPcsFfff(double, double, double, CMenuPcs*);
-extern "C" void DrawCursor__8CMenuPcsFiif(double, CMenuPcs*, int, int);
-extern "C" void DrawEquipMark__8CMenuPcsFiif(double, CMenuPcs*, int, int);
 extern "C" void DrawHelpMessage__8CMenuPcsFiP5CFontii8_GXColoriff(CMenuPcs*, int);
-extern "C" int GetAttrStr__8CMenuPcsFi(CMenuPcs*, int);
-extern "C" const char* GetMenuStr__8CMenuPcsFi(CMenuPcs*, int);
 extern const float FLOAT_80332eb8;
 extern const double DOUBLE_80332ec0;
 extern const double DOUBLE_80332ec8;
@@ -526,7 +519,7 @@ void CMenuPcs::EquipDraw()
 			int iconY = (int)((float)(item[1] + 6) - FLOAT_80332ee0);
 			int iconX = item[0] + item[2] - 0x10;
 			int itemIdx = *(s16*)(caravanWork + *(s16*)(caravanWork + 0xac + i * 2) * 2 + 0xb6);
-			DrawSingleIcon__8CMenuPcsFiiifif(this, itemIdx, iconX, iconY, *(float*)(item + 8), 0, FLOAT_80332ee0);
+			DrawSingleIcon(itemIdx, iconX, iconY, *(float*)(item + 8), 0, FLOAT_80332ee0);
 		}
 		item += 0x20;
 	}
@@ -544,7 +537,7 @@ void CMenuPcs::EquipDraw()
 			CColor color(0xff, 0xff, 0xff, alpha);
 			font->SetColor(color.color);
 			int itemIdx = *(s16*)(caravanWork + *(s16*)(caravanWork + 0xac + i * 2) * 2 + 0xb6);
-			const char* str = (const char*)GetAttrStr__8CMenuPcsFi(this, itemIdx);
+			const char* str = GetAttrStr(itemIdx);
 			if ((mode == 0) && (i == (int)*(s16*)(menuState + 0x26))) {
 				helpItem = itemIdx;
 			}
@@ -627,7 +620,7 @@ void CMenuPcs::EquipDraw()
 						if (equipped != 0) {
 							int markX = (int)(x - (double)FLOAT_80332ef0);
 							int markY = (int)((h - (double)FLOAT_80332ef4) * DOUBLE_80332ed0 + y);
-							DrawEquipMark__8CMenuPcsFiif((double)*(float*)(listItem + 8), this, markX, markY);
+							DrawEquipMark(markX, markY, *(float*)(listItem + 8));
 						}
 					}
 					if ((tex == 0x37) && (drawIndex == *(s16*)(menuState + 0x28))) {
@@ -676,10 +669,10 @@ void CMenuPcs::EquipDraw()
 
 			const char* str = 0;
 			if (idx == 0) {
-				str = GetMenuStr__8CMenuPcsFi(this, 0xb);
+				str = GetMenuStr(0xb);
 			} else if (letter[idx] >= 0) {
 				int itemIdx = *(s16*)(caravanWork + letter[idx] * 2 + 0xb6);
-				str = (const char*)GetAttrStr__8CMenuPcsFi(this, itemIdx);
+				str = GetAttrStr(itemIdx);
 				if (idx == (int)*(s16*)(menuState + 0x28) + (int)*(s16*)(menuState + 0x34)) {
 					helpItem = itemIdx;
 				}
@@ -703,7 +696,7 @@ void CMenuPcs::EquipDraw()
 				int iconY = (int)((float)(iconItem[1] + 6) - FLOAT_80332ee0);
 				int iconX = (int)(float)(iconItem[0] + iconItem[2] - 0x10);
 				int itemIdx = *(s16*)(caravanWork + letter[idx] * 2 + 0xb6);
-				DrawSingleIcon__8CMenuPcsFiiifif(this, itemIdx, iconX, iconY, *(float*)(listStart + 8), 0, FLOAT_80332ee0);
+				DrawSingleIcon(itemIdx, iconX, iconY, *(float*)(listStart + 8), 0, FLOAT_80332ee0);
 			}
 			iconItem += 0x20;
 		}
@@ -712,9 +705,9 @@ void CMenuPcs::EquipDraw()
 	if ((mode == 1) && (*(s16*)(menuState + 0x12) == 1)) {
 		s16* listStart = menuData + menuData[0] * 0x20 + 4;
 		s16* letter = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
-		double pos = CalcListPos__8CMenuPcsFiii(this, (int)*(s16*)(menuState + 0x34), (int)letter[0], 0);
+		double pos = CalcListPos((int)*(s16*)(menuState + 0x34), (int)letter[0], 0);
 		if (pos > (double)FLOAT_80332eb8) {
-			DrawListPosMark__8CMenuPcsFfff((double)listStart[0], (double)listStart[1], pos, this);
+			DrawListPosMark(static_cast<float>(listStart[0]), static_cast<float>(listStart[1]), static_cast<float>(pos));
 		}
 	}
 
@@ -729,7 +722,7 @@ void CMenuPcs::EquipDraw()
 		int cursorX = (int)((double)cursorItem[1] + ((double)(cursorItem[3] - 0x20) * DOUBLE_80332ed0));
 		int frame = (int)System.m_frameCounter;
 		int cursorY = (cursorItem[0] - 0x14) + (frame & 7);
-		DrawCursor__8CMenuPcsFiif((double)FLOAT_80332ee0, this, cursorY, cursorX);
+		DrawCursor(cursorY, cursorX, FLOAT_80332ee0);
 	}
 
 	if ((mode == 1) && (*(s16*)(menuState + 0x12) == 1)) {
@@ -741,7 +734,7 @@ void CMenuPcs::EquipDraw()
 				s16* markItem = listBase + *(s16*)(menuState + 0x28) * 0x20;
 				int markX = (int)((double)markItem[0] - (double)FLOAT_80332ef0);
 				int markY = (int)(((double)markItem[3] - (double)FLOAT_80332ef4) * DOUBLE_80332ed0 + (double)markItem[1]);
-				DrawEquipMark__8CMenuPcsFiif((double)*(float*)(markItem + 8), this, markX, markY);
+				DrawEquipMark(markX, markY, *(float*)(markItem + 8));
 			}
 		}
 	}

@@ -1,5 +1,6 @@
 #include "ffcc/graphic.h"
 #include "ffcc/graphic_symbols.h"
+#include "ffcc/gxfunc.h"
 #include "ffcc/render_buffers.h"
 
 extern "C" double sin(double);
@@ -90,7 +91,6 @@ static inline Mtx& CameraMatrix()
 }
 
 extern "C" {
-void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
 void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
 void _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(int, int,
@@ -766,7 +766,7 @@ void CGraphic::DrawDebugString()
     GXLoadPosMtxImm(model, 0);
     GXSetCurrentMtx(0);
 
-    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 1, 0, 0);
+    _GXSetBlendMode(GX_BM_BLEND, GX_BL_ONE, GX_BL_ZERO, GX_LO_CLEAR);
     GXSetZMode(GX_TRUE, GX_ALWAYS, GX_TRUE);
     _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(6, 0, 0, 7, 0);
     GXSetNumChans(0);
@@ -834,7 +834,7 @@ void CGraphic::InitDebugString()
     PSMTXIdentity(model);
     GXLoadPosMtxImm(model, 0);
     GXSetCurrentMtx(0);
-    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 1, 0, 0);
+    _GXSetBlendMode(GX_BM_BLEND, GX_BL_ONE, GX_BL_ZERO, GX_LO_CLEAR);
     GXSetZMode(GX_TRUE, GX_ALWAYS, GX_TRUE);
     _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(6, 0, 0, 7, 0);
     GXSetNumChans(0);
@@ -1033,7 +1033,7 @@ void CGraphic::DrawSphere(float (*mtx)[4], Vec* pos, Vec* scale, _GXColor* color
  */
 void CGraphic::DrawSphere(float (*mtx)[4], _GXColor color)
 {
-    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(0, 4, 5, 1);
+    _GXSetBlendMode(GX_BM_NONE, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     GXSetZCompLoc(GX_FALSE);
     _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(6, 1, 0, 7, 0);
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
@@ -1183,7 +1183,7 @@ void CGraphic::DrawBound(CBound& bound, _GXColor color)
     float* box = reinterpret_cast<float*>(&bound);
     Mtx cameraMtx;
 
-    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(GX_BM_NONE, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
+    _GXSetBlendMode(GX_BM_NONE, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     GXSetZCompLoc(GX_FALSE);
     _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(GX_GEQUAL, 1, GX_AOP_AND, GX_ALWAYS, 0);
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
@@ -1726,7 +1726,7 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 		GXSetChanAmbColor(GX_COLOR0A0, dofColor);
 		GXSetChanMatColor(GX_COLOR0A0, dofColor);
 
-		_GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 5);
+		_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_NOOP);
 
 		GXSetTevDirect(GX_TEVSTAGE0);
 		GXLoadTexObj(&backBufferTex, GX_TEXMAP0);
@@ -1838,7 +1838,7 @@ void CGraphic::CreateSmallBackTexture(void* src, _GXTexObj* texObj, long width, 
     _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(GX_ALWAYS, 1, GX_AOP_OR, GX_ALWAYS, 0);
     GXSetCullMode(GX_CULL_NONE);
     GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
-    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(0, 4, 5, 1);
+    _GXSetBlendMode(GX_BM_NONE, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(GX_ALWAYS, 1, GX_AOP_AND, GX_ALWAYS, 0);
     GXSetNumTevStages(1);
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
@@ -1847,7 +1847,7 @@ void CGraphic::CreateSmallBackTexture(void* src, _GXTexObj* texObj, long width, 
     GXSetNumTexGens(1);
     GXSetNumTevStages(1);
     _GXSetTevOp__F13_GXTevStageID10_GXTevMode(GX_TEVSTAGE0, GX_REPLACE);
-    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(0, 4, 5, 1);
+    _GXSetBlendMode(GX_BM_NONE, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     GXSetColorUpdate(GX_TRUE);
     GXSetAlphaUpdate(GX_FALSE);
 
@@ -1970,7 +1970,7 @@ void CGraphic::RenderBlur(int unused0, unsigned char mode, unsigned char unused2
     GXSetChanMatColor(GX_COLOR0A0, blurColor);
 
     gUtil.SetOrthoEnv();
-    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     GXSetTevDirect(GX_TEVSTAGE0);
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
     _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 4);

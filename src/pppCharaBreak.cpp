@@ -661,7 +661,6 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
 
                     if (avgX >= -0x7530 && avgX <= 0x7530 && avgY >= -0x7530 && avgY <= 0x7530 && avgZ >= -0x7530 &&
                         avgZ <= 0x7530) {
-                        Vec center;
                         Vec verts[3];
                         S16Vec normalA;
                         S16Vec normalB;

@@ -148,7 +148,6 @@ static inline int GraphicScreenBreakBlurEnabled() { return Graphic.m_blurActive;
 extern "C" {
 int GetBackBufferRect2__8CGraphicFPvP9_GXTexObjiiiii12_GXTexFilter9_GXTexFmti(
     CGraphic*, void*, _GXTexObj*, int, int, int, int, int, int, int, int);
-void SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(void*, void*, unsigned int, int, int);
 void SetBlurParameter__11CGraphicPcsFiUcUcUcUcUcs(CGraphicPcs*, int, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, short);
 void* GetCharaHandlePtr__FP8CGObjectl(void*, long);
 int GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void*);

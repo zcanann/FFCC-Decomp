@@ -103,12 +103,10 @@ CChara::CModel* GetCharaModelPtr(CCharaPcs::CHandle*);
 CCharaPcs::CHandle* GetCharaHandlePtr(CGObject*, long);
 
 extern "C" {
-	int GetTexture__8CMapMeshFP12CMaterialSetRi(CMapMesh*, CMaterialSet*, int&);
 	void* GetCharaHandlePtr__FP8CGObjectl(void*, long);
 	int GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void*);
 	void* GetTextureFromRSD__FiP9_pppEnvSt(int, _pppEnvSt*);
 	void pppHeapUseRate__FPQ27CMemory6CStage(void*);
-	void SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(void*, void*, unsigned int, int, int);
 }
 
 /*
@@ -127,7 +125,7 @@ void pppRenderYmChangeTex(pppYmChangeTex*, pppYmChangeTexStep* step, pppYmChange
 		_pppEnvSt* env = pppEnvStPtr;
 		CMapMesh* mapMesh = env->m_mapMeshPtr[step->m_dataValIndex];
 		textureIndex = 0;
-		GetTexture__8CMapMeshFP12CMaterialSetRi(mapMesh, env->m_materialSetPtr, textureIndex);
+		mapMesh->GetTexture(env->m_materialSetPtr, textureIndex);
 		_GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
 	}
 }
@@ -483,8 +481,7 @@ void ChangeTex_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void*
 					*(int*)(MaterialManRaw() + 0x130) = 0;
 					*(int*)(MaterialManRaw() + 0x40) = fullTevBits;
 
-					SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
-					    &MaterialMan, modelRaw->m_data->m_materialSet, displayList->m_material, 0, 0);
+					MaterialMan.SetMaterial(modelRaw->m_data->m_materialSet, displayList->m_material, 0, (_GXTevScale)0);
 
 					displayListPtr = *(int**)(dlArrayBase + dlOffset);
 					GXCallDisplayList((void*)displayListPtr[0], (unsigned int)displayListPtr[1]);
@@ -546,8 +543,7 @@ void ChangeTex_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void* pa
 		*(int*)(MaterialManRaw() + 0x40) = fullTevBits;
 	}
 
-	SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
-	    &MaterialMan, modelRaw->m_data->m_materialSet, displayList->m_material, 0, 0);
+	MaterialMan.SetMaterial(modelRaw->m_data->m_materialSet, displayList->m_material, 0, (_GXTevScale)0);
 
 	if ((step->m_payload[0] == 1) || (step->m_payload[0] == 0)) {
 		GXCallDisplayList(displayList->m_data, displayList->m_size);

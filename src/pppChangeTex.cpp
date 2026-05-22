@@ -117,8 +117,6 @@ static void ChangeTex_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int
 static void ChangeTex_AfterDrawMeshCallback(CChara::CModel*, void*, void*, int, float (*)[4]);
 
 extern "C" {
-		void SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(void*, void*, unsigned int, int, int);
-
 	void _WaitDrawDone__8CGraphicFPci(CGraphic* graphic, const char* file, int line);
 		void* GetCharaHandlePtr__FP8CGObjectl(void* obj, long index);
 		int GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void* handle);
@@ -514,8 +512,7 @@ static void ChangeTex_AfterDrawMeshCallback(CChara::CModel* model, void* param_2
 					*(int*)(MaterialManRaw() + 0x12c) = tevScale;
 					*(int*)(MaterialManRaw() + 0x130) = 0;
 					*(int*)(MaterialManRaw() + 0x40) = fullTevBits;
-					SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
-					    &MaterialMan, modelRaw->m_data->m_materialSet, displayList->m_material, 0, 0);
+					MaterialMan.SetMaterial(modelRaw->m_data->m_materialSet, displayList->m_material, 0, (_GXTevScale)0);
 					displayListPtr = *(int**)(dlArrayBase + dlOffset);
 					GXCallDisplayList((void*)displayListPtr[0], (unsigned int)displayListPtr[1]);
 					dlOffset -= 4;
@@ -575,7 +572,6 @@ static void ChangeTex_DrawMeshDLCallback(CChara::CModel* model, void* param_2, v
 		*(int*)(MaterialManRaw() + 0x40) = fullTevBits;
 	}
 
-	SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
-	    &MaterialMan, modelRaw->m_data->m_materialSet, displayList->m_material, 0, 0);
+	MaterialMan.SetMaterial(modelRaw->m_data->m_materialSet, displayList->m_material, 0, (_GXTevScale)0);
 	GXCallDisplayList(displayList->m_data, displayList->m_size);
 }

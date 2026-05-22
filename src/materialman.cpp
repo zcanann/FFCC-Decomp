@@ -17,6 +17,11 @@
 
 CMaterialMan MaterialMan;
 
+inline void* operator new(unsigned long, void* p)
+{
+    return p;
+}
+
 extern "C" unsigned long UnkMaterialSetGetter(void*);
 extern "C" void __ct__6CColorFv(void*);
 extern "C" void __ct__10CTexScrollFv(void*);
@@ -33,7 +38,6 @@ extern "C" void ReadFrame__12CMapKeyFrameFR10CChunkFilei(CMapKeyFrame*, CChunkFi
 extern "C" void ReadKey__12CMapKeyFrameFR10CChunkFilei(CMapKeyFrame*, CChunkFile*, int);
 extern "C" void* __vt__8CManager[];
 extern "C" void* __vt__12CMaterialMan[];
-extern "C" void __ct__22CPtrArray_P9CMaterial_Fv(void*);
 extern float FLOAT_8032faf0;
 extern float FLOAT_8032faf4;
 extern float FLOAT_8032faf8;
@@ -3138,8 +3142,8 @@ CMaterialSet::~CMaterialSet()
  */
 CMaterialSet::CMaterialSet()
 {
-    __ct__22CPtrArray_P9CMaterial_Fv(Ptr(this, 8));
-    reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(this, 8))->SetStage(MaterialMan.GetMemoryStage());
+    CPtrArray<CMaterial*>* const materials = new (Ptr(this, 8)) CPtrArray<CMaterial*>;
+    materials->SetStage(MaterialMan.GetMemoryStage());
 }
 
 /*

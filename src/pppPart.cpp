@@ -895,7 +895,12 @@ _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
 			objHead->m_next = newObj;
 			newObj->m_next = 0;
 		}
-		else if (dataVal->m_pppPObjLink == 0)
+		else if (dataVal->m_pppPObjLink != 0)
+		{
+			newObj->m_next = dataVal->m_pppPObjLink->m_next;
+			dataVal->m_pppPObjLink->m_next = newObj;
+		}
+		else
 		{
 			_pppPObjLink* prev = objHead;
 			_pppPObjLink* iter = firstObj;
@@ -915,11 +920,6 @@ _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
 			dataVal->m_pppPObjLink = newObj;
 			prev->m_next = newObj;
 			newObj->m_next = 0;
-		}
-		else
-		{
-			newObj->m_next = dataVal->m_pppPObjLink->m_next;
-			dataVal->m_pppPObjLink->m_next = newObj;
 		}
 
 	done_insert:

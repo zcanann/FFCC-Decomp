@@ -135,8 +135,8 @@ extern const float DrawRangeDefault;
 extern const float kPMapBoundMinInit;
 extern const float kPMapBoundMaxInit;
 char s_lastLoadedMapPath__7CMapPcs[0x100] = "";
-static unsigned int s_CMapPcsRttiBase0[3] = {reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CManager_8032E508)), 0, 0};
-static unsigned int s_CMapPcsRttiBase1[5] = {
+unsigned int s_CMapPcsRttiBase0[3] = {reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CManager_8032E508)), 0, 0};
+unsigned int s_CMapPcsRttiBase1[5] = {
     reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CManager_8032E508)),
     0,
     reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CProcess_8032E510)),

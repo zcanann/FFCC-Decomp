@@ -14,8 +14,8 @@ unsigned int m_table__6CMcPcs[0x15C / sizeof(unsigned int)] = {
     reinterpret_cast<unsigned int>(const_cast<char*>(s_CMcPcs_80331B10)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x1B
 };
 
-static unsigned int s_CMcPcsTablePad0[3] = {reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CManager_8032E9D0)), 0, 0};
-static unsigned int s_CMcPcsTablePad1[5] = {
+unsigned int s_CMcPcsTablePad0[3] = {reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CManager_8032E9D0)), 0, 0};
+unsigned int s_CMcPcsTablePad1[5] = {
     reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CManager_8032E9D0)),
     0,
     reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CProcess_8032E9D8)),

@@ -871,9 +871,9 @@ CGPrgObj* CGItemObj::CreateFromScript(
 				System.Printf(const_cast<char*>(DAT_801dcf64));
 			}
 
-			*(int*)(itemSelf + 0x56C) = ccfs->m_itemJumpCountdown;
-			*(char**)(itemSelf + 0x570) = ccfs->m_memoryCapsuleName;
-			*(int*)(itemSelf + 0x574) = ccfs->m_arg0;
+			reinterpret_cast<CGItemObj*>(newItem)->m_pendingAnimFlags = ccfs->m_pendingAnimFlags;
+			reinterpret_cast<CGItemObj*>(newItem)->m_pendingAnimName = ccfs->m_pendingAnimName;
+			reinterpret_cast<CGItemObj*>(newItem)->m_memoryCapsuleNameIndex = ccfs->m_memoryCapsuleNameIndex;
 		}
 	}
 

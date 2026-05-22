@@ -68,11 +68,11 @@ extern const char s_DbgMenuOn_80331CB4[] = "ON";
 extern const char s_DbgMenuOff_80331CB8[] = "OFF";
 extern const char s_DbgMenuUnknown_80331CBC[] = "?";
 
-u32 m_table_desc0__11CDbgMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(create__11CDbgMenuPcsFv)};
-u32 m_table_desc1__11CDbgMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(destroy__11CDbgMenuPcsFv)};
-u32 m_table_desc2__11CDbgMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(calc__11CDbgMenuPcsFv)};
-u32 m_table_desc3__11CDbgMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(draw__11CDbgMenuPcsFv)};
-u32 m_table__11CDbgMenuPcs[0x15C / sizeof(u32)] = {
+u32 CDbgMenuPcs::m_table_desc0[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(create__11CDbgMenuPcsFv)};
+u32 CDbgMenuPcs::m_table_desc1[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(destroy__11CDbgMenuPcsFv)};
+u32 CDbgMenuPcs::m_table_desc2[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(calc__11CDbgMenuPcsFv)};
+u32 CDbgMenuPcs::m_table_desc3[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(draw__11CDbgMenuPcsFv)};
+u32 CDbgMenuPcs::m_table[0x15C / sizeof(u32)] = {
     reinterpret_cast<u32>(const_cast<char*>(s_CDbgMenuPcs_801DD428)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x11, 0, 0, 0, 0, 0x4A, 1
 };
 
@@ -135,7 +135,7 @@ void CDbgMenuPcs::Quit()
  */
 int CDbgMenuPcs::GetTable(unsigned long index)
 {
-	return reinterpret_cast<int>(reinterpret_cast<char*>(m_table__11CDbgMenuPcs) + index * 0x15C);
+	return reinterpret_cast<int>(reinterpret_cast<char*>(m_table) + index * 0x15C);
 }
 
 /*
@@ -170,18 +170,18 @@ void CDbgMenuPcs::destroy()
 
 inline CDbgMenuPcs::CDbgMenuPcs()
 {
-    m_table__11CDbgMenuPcs[1] = m_table_desc0__11CDbgMenuPcs[0];
-    m_table__11CDbgMenuPcs[2] = m_table_desc0__11CDbgMenuPcs[1];
-    m_table__11CDbgMenuPcs[3] = m_table_desc0__11CDbgMenuPcs[2];
-    m_table__11CDbgMenuPcs[4] = m_table_desc1__11CDbgMenuPcs[0];
-    m_table__11CDbgMenuPcs[5] = m_table_desc1__11CDbgMenuPcs[1];
-    m_table__11CDbgMenuPcs[6] = m_table_desc1__11CDbgMenuPcs[2];
-    m_table__11CDbgMenuPcs[7] = m_table_desc2__11CDbgMenuPcs[0];
-    m_table__11CDbgMenuPcs[8] = m_table_desc2__11CDbgMenuPcs[1];
-    m_table__11CDbgMenuPcs[9] = m_table_desc2__11CDbgMenuPcs[2];
-    m_table__11CDbgMenuPcs[12] = m_table_desc3__11CDbgMenuPcs[0];
-    m_table__11CDbgMenuPcs[13] = m_table_desc3__11CDbgMenuPcs[1];
-    m_table__11CDbgMenuPcs[14] = m_table_desc3__11CDbgMenuPcs[2];
+    m_table[1] = m_table_desc0[0];
+    m_table[2] = m_table_desc0[1];
+    m_table[3] = m_table_desc0[2];
+    m_table[4] = m_table_desc1[0];
+    m_table[5] = m_table_desc1[1];
+    m_table[6] = m_table_desc1[2];
+    m_table[7] = m_table_desc2[0];
+    m_table[8] = m_table_desc2[1];
+    m_table[9] = m_table_desc2[2];
+    m_table[12] = m_table_desc3[0];
+    m_table[13] = m_table_desc3[1];
+    m_table[14] = m_table_desc3[2];
 }
 
 /*

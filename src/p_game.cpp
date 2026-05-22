@@ -14,7 +14,7 @@ extern const char s_CGamePcs_801D7C20[] = "CGamePcs";
 static const char s_CManager_801D7C2C[] = "CManager";
 static const char s_CProcess_801D7C38[] = "CProcess";
 
-unsigned int m_table__8CGamePcs[0x15C / sizeof(unsigned int)] = {
+unsigned int CGamePcs::m_table[0x15C / sizeof(unsigned int)] = {
     reinterpret_cast<unsigned int>(const_cast<char*>(s_CGamePcs_801D7C20)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x13, 0, 0, 0, 0, 0x17, 0, 0, 0,
     0, 0x19, 0, 0, 0, 0, 0x3A, 1, 0, 0, 0, 0x3C, 1, 0, 0, 0, 0x47, 1, 0, 0, 0, 0x4C
 };
@@ -210,7 +210,7 @@ void CGamePcs::create()
  */
 int CGamePcs::GetTable(unsigned long param)
 {
-    return (int)m_table__8CGamePcs + (int)param * 0x15C;
+    return (int)m_table + (int)param * 0x15C;
 }
 
 /*

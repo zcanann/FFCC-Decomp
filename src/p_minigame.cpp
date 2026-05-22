@@ -21,11 +21,11 @@ int g_errCt = 0;
 extern "C" void create__12CMiniGamePcsFv(CMiniGamePcs*);
 extern "C" void destroy__12CMiniGamePcsFv(CMiniGamePcs*);
 extern "C" void calc__12CMiniGamePcsFv(CMiniGamePcs*);
-unsigned int m_table_desc0__12CMiniGamePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__12CMiniGamePcsFv)};
-unsigned int m_table_desc1__12CMiniGamePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__12CMiniGamePcsFv)};
-unsigned int m_table_desc2__12CMiniGamePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__12CMiniGamePcsFv)};
+unsigned int CMiniGamePcs::m_table_desc0[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__12CMiniGamePcsFv)};
+unsigned int CMiniGamePcs::m_table_desc1[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__12CMiniGamePcsFv)};
+unsigned int CMiniGamePcs::m_table_desc2[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__12CMiniGamePcsFv)};
 extern const char s_CMiniGamePcs_GAME_801DD098[];
-unsigned int m_table__12CMiniGamePcs[0x15C / sizeof(unsigned int)] = {
+unsigned int CMiniGamePcs::m_table[0x15C / sizeof(unsigned int)] = {
     reinterpret_cast<unsigned int>(const_cast<char*>(s_CMiniGamePcs_GAME_801DD098)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x24
 };
 extern const char s_miniGameManagerTag[] = "GMGR";
@@ -220,8 +220,7 @@ void _MngThreadMain(void* param)
  */
 int CMiniGamePcs::GetTable(unsigned long index)
 {
-    return reinterpret_cast<int>(reinterpret_cast<unsigned char*>(m_table__12CMiniGamePcs) +
-                                 static_cast<int>(index) * 0x15C);
+    return reinterpret_cast<int>(reinterpret_cast<unsigned char*>(m_table) + static_cast<int>(index) * 0x15C);
 }
 
 /*

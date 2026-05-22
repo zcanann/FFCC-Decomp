@@ -51,6 +51,8 @@ public:
 	void SetLight(int);
 	void SetAttrFmt(FMT);
 	void SetTexture(TEX);
+	void DrawInit();
+	void DrawRect(unsigned long, float, float, float, float, float, float, float, float, float);
 	void RestoreProjection();
 	void SetMcWinInfo(int, int);
 	void DrawMcWin(short, short);

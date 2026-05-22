@@ -42,80 +42,80 @@ private:
     unsigned int m_data;
 };
 
-unsigned int m_table_desc0__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__7CMapPcsFv)};
-unsigned int m_table_desc1__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__7CMapPcsFv)};
-unsigned int m_table_desc2__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcInit__7CMapPcsFv)};
-unsigned int m_table_desc3__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__7CMapPcsFv)};
-unsigned int m_table_desc4__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawShadow__7CMapPcsFv)};
-unsigned int m_table_desc5__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawBefore__7CMapPcsFv)};
-unsigned int m_table_desc6__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(draw__7CMapPcsFv)};
-unsigned int m_table_desc7__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawAfter__7CMapPcsFv)};
-unsigned int m_table_desc8__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createViewer__7CMapPcsFv)};
-unsigned int m_table_desc9__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__7CMapPcsFv)};
-unsigned int m_table_desc10__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcInit__7CMapPcsFv)};
-unsigned int m_table_desc11__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__7CMapPcsFv)};
-unsigned int m_table_desc12__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawShadow__7CMapPcsFv)};
-unsigned int m_table_desc13__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawBeforeViewer__7CMapPcsFv)};
-unsigned int m_table_desc14__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__7CMapPcsFv)};
-unsigned int m_table_desc15__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawAfterViewer__7CMapPcsFv)};
-unsigned int m_table_desc16__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createViewer__7CMapPcsFv)};
-unsigned int m_table_desc17__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__7CMapPcsFv)};
-unsigned int m_table_desc18__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcInit__7CMapPcsFv)};
-unsigned int m_table_desc19__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__7CMapPcsFv)};
-unsigned int m_table_desc20__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawShadow__7CMapPcsFv)};
-unsigned int m_table_desc21__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawBeforeViewer__7CMapPcsFv)};
-unsigned int m_table_desc22__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__7CMapPcsFv)};
-unsigned int m_table_desc23__7CMapPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawAfterViewer__7CMapPcsFv)};
+unsigned int CMapPcs::m_table_desc0[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__7CMapPcsFv)};
+unsigned int CMapPcs::m_table_desc1[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__7CMapPcsFv)};
+unsigned int CMapPcs::m_table_desc2[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcInit__7CMapPcsFv)};
+unsigned int CMapPcs::m_table_desc3[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__7CMapPcsFv)};
+unsigned int CMapPcs::m_table_desc4[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawShadow__7CMapPcsFv)};
+unsigned int CMapPcs::m_table_desc5[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawBefore__7CMapPcsFv)};
+unsigned int CMapPcs::m_table_desc6[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(draw__7CMapPcsFv)};
+unsigned int CMapPcs::m_table_desc7[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawAfter__7CMapPcsFv)};
+unsigned int CMapPcs::m_table_desc8[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createViewer__7CMapPcsFv)};
+unsigned int CMapPcs::m_table_desc9[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__7CMapPcsFv)};
+unsigned int CMapPcs::m_table_desc10[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcInit__7CMapPcsFv)};
+unsigned int CMapPcs::m_table_desc11[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__7CMapPcsFv)};
+unsigned int CMapPcs::m_table_desc12[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawShadow__7CMapPcsFv)};
+unsigned int CMapPcs::m_table_desc13[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawBeforeViewer__7CMapPcsFv)};
+unsigned int CMapPcs::m_table_desc14[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__7CMapPcsFv)};
+unsigned int CMapPcs::m_table_desc15[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawAfterViewer__7CMapPcsFv)};
+unsigned int CMapPcs::m_table_desc16[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createViewer__7CMapPcsFv)};
+unsigned int CMapPcs::m_table_desc17[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__7CMapPcsFv)};
+unsigned int CMapPcs::m_table_desc18[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcInit__7CMapPcsFv)};
+unsigned int CMapPcs::m_table_desc19[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__7CMapPcsFv)};
+unsigned int CMapPcs::m_table_desc20[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawShadow__7CMapPcsFv)};
+unsigned int CMapPcs::m_table_desc21[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawBeforeViewer__7CMapPcsFv)};
+unsigned int CMapPcs::m_table_desc22[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__7CMapPcsFv)};
+unsigned int CMapPcs::m_table_desc23[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawAfterViewer__7CMapPcsFv)};
 
 extern const char s_CMapPcs_GAME_801D76E0[];
 extern const char s_CMapPcs_VIEWER_801D76F0[];
 extern const char s_CMapPcs_PART_801D7700[];
 
-unsigned int m_table__7CMapPcs[3][0x414 / 3 / sizeof(unsigned int)] = {
+unsigned int CMapPcs::m_table[3][0x414 / 3 / sizeof(unsigned int)] = {
     {
         reinterpret_cast<unsigned int>(const_cast<char*>(s_CMapPcs_GAME_801D76E0)),
-        m_table_desc0__7CMapPcs[0],  m_table_desc0__7CMapPcs[1],  m_table_desc0__7CMapPcs[2],
-        m_table_desc1__7CMapPcs[0],  m_table_desc1__7CMapPcs[1],  m_table_desc1__7CMapPcs[2],
-        m_table_desc2__7CMapPcs[0],  m_table_desc2__7CMapPcs[1],  m_table_desc2__7CMapPcs[2],
-        0x14,                        0,                           m_table_desc3__7CMapPcs[0],
-        m_table_desc3__7CMapPcs[1],  m_table_desc3__7CMapPcs[2],  0x1E,
-        0,                           m_table_desc4__7CMapPcs[0],  m_table_desc4__7CMapPcs[1],
-        m_table_desc4__7CMapPcs[2],  0x2F,                        1,
-        m_table_desc5__7CMapPcs[0],  m_table_desc5__7CMapPcs[1],  m_table_desc5__7CMapPcs[2],
-        0x35,                        1,                           m_table_desc6__7CMapPcs[0],
-        m_table_desc6__7CMapPcs[1],  m_table_desc6__7CMapPcs[2],  0x37,
-        1,                           m_table_desc7__7CMapPcs[0],  m_table_desc7__7CMapPcs[1],
-        m_table_desc7__7CMapPcs[2],  0x3F,                        1,
+        CMapPcs::m_table_desc0[0],  CMapPcs::m_table_desc0[1],  CMapPcs::m_table_desc0[2],
+        CMapPcs::m_table_desc1[0],  CMapPcs::m_table_desc1[1],  CMapPcs::m_table_desc1[2],
+        CMapPcs::m_table_desc2[0],  CMapPcs::m_table_desc2[1],  CMapPcs::m_table_desc2[2],
+        0x14,                        0,                           CMapPcs::m_table_desc3[0],
+        CMapPcs::m_table_desc3[1],  CMapPcs::m_table_desc3[2],  0x1E,
+        0,                           CMapPcs::m_table_desc4[0],  CMapPcs::m_table_desc4[1],
+        CMapPcs::m_table_desc4[2],  0x2F,                        1,
+        CMapPcs::m_table_desc5[0],  CMapPcs::m_table_desc5[1],  CMapPcs::m_table_desc5[2],
+        0x35,                        1,                           CMapPcs::m_table_desc6[0],
+        CMapPcs::m_table_desc6[1],  CMapPcs::m_table_desc6[2],  0x37,
+        1,                           CMapPcs::m_table_desc7[0],  CMapPcs::m_table_desc7[1],
+        CMapPcs::m_table_desc7[2],  0x3F,                        1,
     },
     {
         reinterpret_cast<unsigned int>(const_cast<char*>(s_CMapPcs_VIEWER_801D76F0)),
-        m_table_desc8__7CMapPcs[0],  m_table_desc8__7CMapPcs[1],  m_table_desc8__7CMapPcs[2],
-        m_table_desc9__7CMapPcs[0],  m_table_desc9__7CMapPcs[1],  m_table_desc9__7CMapPcs[2],
-        m_table_desc10__7CMapPcs[0], m_table_desc10__7CMapPcs[1], m_table_desc10__7CMapPcs[2],
-        0x14,                        0,                           m_table_desc11__7CMapPcs[0],
-        m_table_desc11__7CMapPcs[1], m_table_desc11__7CMapPcs[2], 0x1E,
-        0,                           m_table_desc12__7CMapPcs[0], m_table_desc12__7CMapPcs[1],
-        m_table_desc12__7CMapPcs[2], 0x2F,                        1,
-        m_table_desc13__7CMapPcs[0], m_table_desc13__7CMapPcs[1], m_table_desc13__7CMapPcs[2],
-        0x35,                        1,                           m_table_desc14__7CMapPcs[0],
-        m_table_desc14__7CMapPcs[1], m_table_desc14__7CMapPcs[2], 0x37,
-        1,                           m_table_desc15__7CMapPcs[0], m_table_desc15__7CMapPcs[1],
-        m_table_desc15__7CMapPcs[2], 0x3F,                        1,
+        CMapPcs::m_table_desc8[0],  CMapPcs::m_table_desc8[1],  CMapPcs::m_table_desc8[2],
+        CMapPcs::m_table_desc9[0],  CMapPcs::m_table_desc9[1],  CMapPcs::m_table_desc9[2],
+        CMapPcs::m_table_desc10[0], CMapPcs::m_table_desc10[1], CMapPcs::m_table_desc10[2],
+        0x14,                        0,                           CMapPcs::m_table_desc11[0],
+        CMapPcs::m_table_desc11[1], CMapPcs::m_table_desc11[2], 0x1E,
+        0,                           CMapPcs::m_table_desc12[0], CMapPcs::m_table_desc12[1],
+        CMapPcs::m_table_desc12[2], 0x2F,                        1,
+        CMapPcs::m_table_desc13[0], CMapPcs::m_table_desc13[1], CMapPcs::m_table_desc13[2],
+        0x35,                        1,                           CMapPcs::m_table_desc14[0],
+        CMapPcs::m_table_desc14[1], CMapPcs::m_table_desc14[2], 0x37,
+        1,                           CMapPcs::m_table_desc15[0], CMapPcs::m_table_desc15[1],
+        CMapPcs::m_table_desc15[2], 0x3F,                        1,
     },
     {
         reinterpret_cast<unsigned int>(const_cast<char*>(s_CMapPcs_PART_801D7700)),
-        m_table_desc16__7CMapPcs[0], m_table_desc16__7CMapPcs[1], m_table_desc16__7CMapPcs[2],
-        m_table_desc17__7CMapPcs[0], m_table_desc17__7CMapPcs[1], m_table_desc17__7CMapPcs[2],
-        m_table_desc18__7CMapPcs[0], m_table_desc18__7CMapPcs[1], m_table_desc18__7CMapPcs[2],
-        0x14,                        0,                           m_table_desc19__7CMapPcs[0],
-        m_table_desc19__7CMapPcs[1], m_table_desc19__7CMapPcs[2], 0x1E,
-        0,                           m_table_desc20__7CMapPcs[0], m_table_desc20__7CMapPcs[1],
-        m_table_desc20__7CMapPcs[2], 0x2F,                        1,
-        m_table_desc21__7CMapPcs[0], m_table_desc21__7CMapPcs[1], m_table_desc21__7CMapPcs[2],
-        0x35,                        1,                           m_table_desc22__7CMapPcs[0],
-        m_table_desc22__7CMapPcs[1], m_table_desc22__7CMapPcs[2], 0x37,
-        1,                           m_table_desc23__7CMapPcs[0], m_table_desc23__7CMapPcs[1],
-        m_table_desc23__7CMapPcs[2], 0x3F,                        1,
+        CMapPcs::m_table_desc16[0], CMapPcs::m_table_desc16[1], CMapPcs::m_table_desc16[2],
+        CMapPcs::m_table_desc17[0], CMapPcs::m_table_desc17[1], CMapPcs::m_table_desc17[2],
+        CMapPcs::m_table_desc18[0], CMapPcs::m_table_desc18[1], CMapPcs::m_table_desc18[2],
+        0x14,                        0,                           CMapPcs::m_table_desc19[0],
+        CMapPcs::m_table_desc19[1], CMapPcs::m_table_desc19[2], 0x1E,
+        0,                           CMapPcs::m_table_desc20[0], CMapPcs::m_table_desc20[1],
+        CMapPcs::m_table_desc20[2], 0x2F,                        1,
+        CMapPcs::m_table_desc21[0], CMapPcs::m_table_desc21[1], CMapPcs::m_table_desc21[2],
+        0x35,                        1,                           CMapPcs::m_table_desc22[0],
+        CMapPcs::m_table_desc22[1], CMapPcs::m_table_desc22[2], 0x37,
+        1,                           CMapPcs::m_table_desc23[0], CMapPcs::m_table_desc23[1],
+        CMapPcs::m_table_desc23[2], 0x3F,                        1,
     },
 };
 
@@ -172,82 +172,82 @@ struct CBoundHack {
  */
 CMapPcs::CMapPcs()
 {
-    unsigned int* table = &m_table__7CMapPcs[0][0];
+    unsigned int* table = &CMapPcs::m_table[0][0];
 
-    table[0x004 / 4] = m_table_desc0__7CMapPcs[0];
-    table[0x008 / 4] = m_table_desc0__7CMapPcs[1];
-    table[0x00C / 4] = m_table_desc0__7CMapPcs[2];
-    table[0x010 / 4] = m_table_desc1__7CMapPcs[0];
-    table[0x014 / 4] = m_table_desc1__7CMapPcs[1];
-    table[0x018 / 4] = m_table_desc1__7CMapPcs[2];
-    table[0x01C / 4] = m_table_desc2__7CMapPcs[0];
-    table[0x020 / 4] = m_table_desc2__7CMapPcs[1];
-    table[0x024 / 4] = m_table_desc2__7CMapPcs[2];
-    table[0x030 / 4] = m_table_desc3__7CMapPcs[0];
-    table[0x034 / 4] = m_table_desc3__7CMapPcs[1];
-    table[0x038 / 4] = m_table_desc3__7CMapPcs[2];
-    table[0x044 / 4] = m_table_desc4__7CMapPcs[0];
-    table[0x048 / 4] = m_table_desc4__7CMapPcs[1];
-    table[0x04C / 4] = m_table_desc4__7CMapPcs[2];
-    table[0x058 / 4] = m_table_desc5__7CMapPcs[0];
-    table[0x05C / 4] = m_table_desc5__7CMapPcs[1];
-    table[0x060 / 4] = m_table_desc5__7CMapPcs[2];
-    table[0x06C / 4] = m_table_desc6__7CMapPcs[0];
-    table[0x070 / 4] = m_table_desc6__7CMapPcs[1];
-    table[0x074 / 4] = m_table_desc6__7CMapPcs[2];
-    table[0x080 / 4] = m_table_desc7__7CMapPcs[0];
-    table[0x084 / 4] = m_table_desc7__7CMapPcs[1];
-    table[0x088 / 4] = m_table_desc7__7CMapPcs[2];
+    table[0x004 / 4] = CMapPcs::m_table_desc0[0];
+    table[0x008 / 4] = CMapPcs::m_table_desc0[1];
+    table[0x00C / 4] = CMapPcs::m_table_desc0[2];
+    table[0x010 / 4] = CMapPcs::m_table_desc1[0];
+    table[0x014 / 4] = CMapPcs::m_table_desc1[1];
+    table[0x018 / 4] = CMapPcs::m_table_desc1[2];
+    table[0x01C / 4] = CMapPcs::m_table_desc2[0];
+    table[0x020 / 4] = CMapPcs::m_table_desc2[1];
+    table[0x024 / 4] = CMapPcs::m_table_desc2[2];
+    table[0x030 / 4] = CMapPcs::m_table_desc3[0];
+    table[0x034 / 4] = CMapPcs::m_table_desc3[1];
+    table[0x038 / 4] = CMapPcs::m_table_desc3[2];
+    table[0x044 / 4] = CMapPcs::m_table_desc4[0];
+    table[0x048 / 4] = CMapPcs::m_table_desc4[1];
+    table[0x04C / 4] = CMapPcs::m_table_desc4[2];
+    table[0x058 / 4] = CMapPcs::m_table_desc5[0];
+    table[0x05C / 4] = CMapPcs::m_table_desc5[1];
+    table[0x060 / 4] = CMapPcs::m_table_desc5[2];
+    table[0x06C / 4] = CMapPcs::m_table_desc6[0];
+    table[0x070 / 4] = CMapPcs::m_table_desc6[1];
+    table[0x074 / 4] = CMapPcs::m_table_desc6[2];
+    table[0x080 / 4] = CMapPcs::m_table_desc7[0];
+    table[0x084 / 4] = CMapPcs::m_table_desc7[1];
+    table[0x088 / 4] = CMapPcs::m_table_desc7[2];
 
-    table[0x160 / 4] = m_table_desc8__7CMapPcs[0];
-    table[0x164 / 4] = m_table_desc8__7CMapPcs[1];
-    table[0x168 / 4] = m_table_desc8__7CMapPcs[2];
-    table[0x16C / 4] = m_table_desc9__7CMapPcs[0];
-    table[0x170 / 4] = m_table_desc9__7CMapPcs[1];
-    table[0x174 / 4] = m_table_desc9__7CMapPcs[2];
-    table[0x178 / 4] = m_table_desc10__7CMapPcs[0];
-    table[0x17C / 4] = m_table_desc10__7CMapPcs[1];
-    table[0x180 / 4] = m_table_desc10__7CMapPcs[2];
-    table[0x18C / 4] = m_table_desc11__7CMapPcs[0];
-    table[0x190 / 4] = m_table_desc11__7CMapPcs[1];
-    table[0x194 / 4] = m_table_desc11__7CMapPcs[2];
-    table[0x1A0 / 4] = m_table_desc12__7CMapPcs[0];
-    table[0x1A4 / 4] = m_table_desc12__7CMapPcs[1];
-    table[0x1A8 / 4] = m_table_desc12__7CMapPcs[2];
-    table[0x1B4 / 4] = m_table_desc13__7CMapPcs[0];
-    table[0x1B8 / 4] = m_table_desc13__7CMapPcs[1];
-    table[0x1BC / 4] = m_table_desc13__7CMapPcs[2];
-    table[0x1C8 / 4] = m_table_desc14__7CMapPcs[0];
-    table[0x1CC / 4] = m_table_desc14__7CMapPcs[1];
-    table[0x1D0 / 4] = m_table_desc14__7CMapPcs[2];
-    table[0x1DC / 4] = m_table_desc15__7CMapPcs[0];
-    table[0x1E0 / 4] = m_table_desc15__7CMapPcs[1];
-    table[0x1E4 / 4] = m_table_desc15__7CMapPcs[2];
+    table[0x160 / 4] = CMapPcs::m_table_desc8[0];
+    table[0x164 / 4] = CMapPcs::m_table_desc8[1];
+    table[0x168 / 4] = CMapPcs::m_table_desc8[2];
+    table[0x16C / 4] = CMapPcs::m_table_desc9[0];
+    table[0x170 / 4] = CMapPcs::m_table_desc9[1];
+    table[0x174 / 4] = CMapPcs::m_table_desc9[2];
+    table[0x178 / 4] = CMapPcs::m_table_desc10[0];
+    table[0x17C / 4] = CMapPcs::m_table_desc10[1];
+    table[0x180 / 4] = CMapPcs::m_table_desc10[2];
+    table[0x18C / 4] = CMapPcs::m_table_desc11[0];
+    table[0x190 / 4] = CMapPcs::m_table_desc11[1];
+    table[0x194 / 4] = CMapPcs::m_table_desc11[2];
+    table[0x1A0 / 4] = CMapPcs::m_table_desc12[0];
+    table[0x1A4 / 4] = CMapPcs::m_table_desc12[1];
+    table[0x1A8 / 4] = CMapPcs::m_table_desc12[2];
+    table[0x1B4 / 4] = CMapPcs::m_table_desc13[0];
+    table[0x1B8 / 4] = CMapPcs::m_table_desc13[1];
+    table[0x1BC / 4] = CMapPcs::m_table_desc13[2];
+    table[0x1C8 / 4] = CMapPcs::m_table_desc14[0];
+    table[0x1CC / 4] = CMapPcs::m_table_desc14[1];
+    table[0x1D0 / 4] = CMapPcs::m_table_desc14[2];
+    table[0x1DC / 4] = CMapPcs::m_table_desc15[0];
+    table[0x1E0 / 4] = CMapPcs::m_table_desc15[1];
+    table[0x1E4 / 4] = CMapPcs::m_table_desc15[2];
 
-    table[0x2BC / 4] = m_table_desc16__7CMapPcs[0];
-    table[0x2C0 / 4] = m_table_desc16__7CMapPcs[1];
-    table[0x2C4 / 4] = m_table_desc16__7CMapPcs[2];
-    table[0x2C8 / 4] = m_table_desc17__7CMapPcs[0];
-    table[0x2CC / 4] = m_table_desc17__7CMapPcs[1];
-    table[0x2D0 / 4] = m_table_desc17__7CMapPcs[2];
-    table[0x2D4 / 4] = m_table_desc18__7CMapPcs[0];
-    table[0x2D8 / 4] = m_table_desc18__7CMapPcs[1];
-    table[0x2DC / 4] = m_table_desc18__7CMapPcs[2];
-    table[0x2E8 / 4] = m_table_desc19__7CMapPcs[0];
-    table[0x2EC / 4] = m_table_desc19__7CMapPcs[1];
-    table[0x2F0 / 4] = m_table_desc19__7CMapPcs[2];
-    table[0x2FC / 4] = m_table_desc20__7CMapPcs[0];
-    table[0x300 / 4] = m_table_desc20__7CMapPcs[1];
-    table[0x304 / 4] = m_table_desc20__7CMapPcs[2];
-    table[0x310 / 4] = m_table_desc21__7CMapPcs[0];
-    table[0x314 / 4] = m_table_desc21__7CMapPcs[1];
-    table[0x318 / 4] = m_table_desc21__7CMapPcs[2];
-    table[0x324 / 4] = m_table_desc22__7CMapPcs[0];
-    table[0x328 / 4] = m_table_desc22__7CMapPcs[1];
-    table[0x32C / 4] = m_table_desc22__7CMapPcs[2];
-    table[0x338 / 4] = m_table_desc23__7CMapPcs[0];
-    table[0x33C / 4] = m_table_desc23__7CMapPcs[1];
-    table[0x340 / 4] = m_table_desc23__7CMapPcs[2];
+    table[0x2BC / 4] = CMapPcs::m_table_desc16[0];
+    table[0x2C0 / 4] = CMapPcs::m_table_desc16[1];
+    table[0x2C4 / 4] = CMapPcs::m_table_desc16[2];
+    table[0x2C8 / 4] = CMapPcs::m_table_desc17[0];
+    table[0x2CC / 4] = CMapPcs::m_table_desc17[1];
+    table[0x2D0 / 4] = CMapPcs::m_table_desc17[2];
+    table[0x2D4 / 4] = CMapPcs::m_table_desc18[0];
+    table[0x2D8 / 4] = CMapPcs::m_table_desc18[1];
+    table[0x2DC / 4] = CMapPcs::m_table_desc18[2];
+    table[0x2E8 / 4] = CMapPcs::m_table_desc19[0];
+    table[0x2EC / 4] = CMapPcs::m_table_desc19[1];
+    table[0x2F0 / 4] = CMapPcs::m_table_desc19[2];
+    table[0x2FC / 4] = CMapPcs::m_table_desc20[0];
+    table[0x300 / 4] = CMapPcs::m_table_desc20[1];
+    table[0x304 / 4] = CMapPcs::m_table_desc20[2];
+    table[0x310 / 4] = CMapPcs::m_table_desc21[0];
+    table[0x314 / 4] = CMapPcs::m_table_desc21[1];
+    table[0x318 / 4] = CMapPcs::m_table_desc21[2];
+    table[0x324 / 4] = CMapPcs::m_table_desc22[0];
+    table[0x328 / 4] = CMapPcs::m_table_desc22[1];
+    table[0x32C / 4] = CMapPcs::m_table_desc22[2];
+    table[0x338 / 4] = CMapPcs::m_table_desc23[0];
+    table[0x33C / 4] = CMapPcs::m_table_desc23[1];
+    table[0x340 / 4] = CMapPcs::m_table_desc23[2];
 }
 
 /*
@@ -290,7 +290,7 @@ void CMapPcs::Quit()
  */
 int CMapPcs::GetTable(unsigned long tableIndex)
 {
-	return reinterpret_cast<int>(m_table__7CMapPcs[tableIndex]);
+	return reinterpret_cast<int>(CMapPcs::m_table[tableIndex]);
 }
 
 /*

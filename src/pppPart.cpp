@@ -1645,17 +1645,17 @@ void pppCacheDumpShape(short* shapeList, _pppDataHead* pppDataHead)
 void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
 {
 	_pppProgSetDef* programSet = (_pppProgSetDef*)(pdt + 6);
+	pppMngStPtr = pppMngSt;
+	pppMngSt->m_lifeEnd = (int)pdt[0];
+	pppMngSt->m_mode = (u8)pdt[1];
 	int controlOffset = (int)pdt[2];
 	int programOffset = (int)pdt[3];
 	short* shapeIndices = (short*)((u8*)pdt + pdt[5]);
 	short* modelIndices = (short*)((u8*)pdt + pdt[4]);
 
-	pppMngStPtr = pppMngSt;
-	pppMngSt->m_lifeEnd = (int)pdt[0];
-	pppMngSt->m_mode = (u8)pdt[1];
-
 	if (Game.m_currentSceneId != 7)
 	{
+		CMaterialSet* materialSet = *reinterpret_cast<CMaterialSet**>(reinterpret_cast<u8*>(&PartMng) + 0x7E4);
 		short modelCount = *modelIndices;
 		short* modelList = modelIndices + 1;
 		u32 pppResSet = *reinterpret_cast<u32*>(pppMngSt->m_pppResSet);
@@ -1674,13 +1674,13 @@ void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
 			}
 
 			ppvAmemCacheSet.AddRef(cacheIndex);
-			mapMesh->pppCacheLoadModelTexture(pppEnvStPtr->m_materialSetPtr, &ppvAmemCacheSet);
+			mapMesh->pppCacheLoadModelTexture(materialSet, &ppvAmemCacheSet);
 		}
 
 		short shapeCount = *shapeIndices;
 		short* shapeList = shapeIndices + 1;
+		pppResSet = *reinterpret_cast<u32*>(pppMngSt->m_pppResSet);
 		u32 shapeNames = *(u32*)(pppResSet + 0x18);
-		CMaterialSet* materialSet = *reinterpret_cast<CMaterialSet**>(reinterpret_cast<u8*>(&PartMng) + 0x7E4);
 
 		for (short i = 0; i < shapeCount; i++, shapeList++)
 		{
@@ -1691,10 +1691,12 @@ void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
 	}
 
 	pppMngSt->m_isFinished = 0;
-	pppMngSt->m_numControlPrograms = *(int*)((u8*)pdt + controlOffset);
-	pppMngSt->m_pppPObjLinkHead.m_owner = (_pppPDataVal*)(((int*)((u8*)pdt + controlOffset)) + 1);
-	pppMngSt->m_numPrograms = *(int*)((u8*)pdt + programOffset);
-	pppMngSt->m_programTable = ((int*)((u8*)pdt + programOffset)) + 1;
+	int* controlPrograms = (int*)((u8*)pdt + controlOffset);
+	int* programs = (int*)((u8*)pdt + programOffset);
+	pppMngSt->m_numControlPrograms = *controlPrograms++;
+	pppMngSt->m_pppPObjLinkHead.m_owner = (_pppPDataVal*)controlPrograms;
+	pppMngSt->m_numPrograms = *programs++;
+	pppMngSt->m_programTable = programs;
 
 	if (pppMngSt->m_numPrograms == 0)
 	{

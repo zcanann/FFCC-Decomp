@@ -13,12 +13,6 @@ typedef signed short s16;
 typedef unsigned char u8;
 typedef unsigned short u16;
 
-extern "C" int GetItemType__8CMenuPcsFii(CMenuPcs*, int, int);
-extern "C" int ChkEquipPossible__8CMenuPcsFi(CMenuPcs*, int);
-extern "C" int GetEquipType__8CMenuPcsFi(CMenuPcs*, int);
-extern "C" int EquipChk__8CMenuPcsFi(CMenuPcs*, int);
-extern "C" void CmdInit1__8CMenuPcsFv(CMenuPcs*);
-extern "C" void CmdInit2__8CMenuPcsFv(CMenuPcs*);
 extern "C" int CanPlayerPutItem__12CCaravanWorkFv(void*);
 extern "C" void ChgEquipPos__12CCaravanWorkFii(void*, int, int);
 extern "C" void CalcStatus__12CCaravanWorkFv(void*);
@@ -153,9 +147,9 @@ int CMenuPcs::ChkEquipActive(int index)
 	}
 
 	int item = caravanWork->m_inventoryItems[itemEntries[index - 1]];
-	unsigned int active = ChkEquipPossible__8CMenuPcsFi(this, item);
+	unsigned int active = ChkEquipPossible(item);
 
-	if (((active & 0xff) != 0) && (GetEquipType__8CMenuPcsFi(this, item) != equipIndex)) {
+	if (((active & 0xff) != 0) && (GetEquipType(item) != equipIndex)) {
 		active = 0;
 	}
 
@@ -434,7 +428,7 @@ int CMenuPcs::EquipCtrlCur()
 				if ((press & 0x200) != 0) {
 					*reinterpret_cast<s16*>(menuState + 0x12) = *reinterpret_cast<s16*>(menuState + 0x12) + 1;
 					*reinterpret_cast<s16*>(menuState + 0x22) = 0;
-					CmdInit2__8CMenuPcsFv(this);
+					CmdInit2();
 					Sound.PlaySe(3, 0x40, 0x7f, 0);
 				}
 			} else {
@@ -456,13 +450,13 @@ int CMenuPcs::EquipCtrlCur()
 					}
 				} else {
 					int item = activeCaravanWork->m_inventoryItems[activeEntries[index]];
-					valid = ChkEquipPossible__8CMenuPcsFi(this, item);
-					if (((valid & 0xff) != 0) && (GetEquipType__8CMenuPcsFi(this, item) != equipIndex)) {
+					valid = ChkEquipPossible(item);
+					if (((valid & 0xff) != 0) && (GetEquipType(item) != equipIndex)) {
 						valid = 0;
 					}
 				}
 
-				if (((valid & 0xff) == 0) || ((index != 0) && (EquipChk__8CMenuPcsFi(this, entries[index]) != 0))) {
+				if (((valid & 0xff) == 0) || ((index != 0) && (EquipChk(entries[index]) != 0))) {
 					Sound.PlaySe(4, 0x40, 0x7f, 0);
 				} else {
 					int item;
@@ -475,7 +469,7 @@ int CMenuPcs::EquipCtrlCur()
 					CalcStatus__12CCaravanWorkFv(reinterpret_cast<void*>(caravanWork));
 					*reinterpret_cast<s16*>(menuState + 0x12) = *reinterpret_cast<s16*>(menuState + 0x12) + 1;
 					*reinterpret_cast<s16*>(menuState + 0x22) = 0;
-					CmdInit2__8CMenuPcsFv(this);
+					CmdInit2();
 					Sound.PlaySe(2, 0x40, 0x7f, 0);
 				}
 			}
@@ -632,7 +626,7 @@ void CMenuPcs::EquipDraw()
 							alpha = DOUBLE_80332ed0 * alpha;
 						}
 					} else {
-						int equipped = EquipChk__8CMenuPcsFi(this, (int)letter[idx]);
+						int equipped = EquipChk((int)letter[idx]);
 						if ((equipped == 0) && (ChkEquipActive(idx) == 0)) {
 							tex = 0x34;
 							alpha = DOUBLE_80332ed0 * alpha;
@@ -749,7 +743,7 @@ void CMenuPcs::EquipDraw()
 		s16* letter = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
 		int idx = *(s16*)(menuState + 0x28) + *(s16*)(menuState + 0x34);
 		if ((idx > 0) && (idx < letter[0]) && (letter[idx] >= 0)) {
-			if (EquipChk__8CMenuPcsFi(this, (int)letter[idx]) != 0) {
+			if (EquipChk((int)letter[idx]) != 0) {
 				s16* listBase = menuData + menuData[0] * 0x20 + 4;
 				s16* markItem = listBase + *(s16*)(menuState + 0x28) * 0x20;
 				int markX = (int)((double)markItem[0] - (double)FLOAT_80332ef0);
@@ -862,7 +856,7 @@ void CMenuPcs::EquipCtrl()
 		*reinterpret_cast<s16*>(menuState + 0x12) = 0;
 		*reinterpret_cast<s16*>(GetEquipStateBase(this) + 0x30) = 0;
 		*reinterpret_cast<s16*>(GetEquipStateBase(this) + 0x22) = 0;
-		CmdInit1__8CMenuPcsFv(this);
+		CmdInit1();
 		state = 0;
 	}
 	defaultScale = FLOAT_80332ee0;
@@ -1008,7 +1002,7 @@ int CMenuPcs::EquipOpen()
 		puVar9 = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
 		sVar10 = 0;
 		for (iVar6 = 0; iVar6 < 0x40; iVar6++) {
-			iVar11 = GetItemType__8CMenuPcsFii(this, iVar6, 0);
+			iVar11 = GetItemType(iVar6, 0);
 			if (iVar11 == 1) {
 				puVar9++;
 				*puVar9 = (s16)iVar6;

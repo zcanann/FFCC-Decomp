@@ -12,7 +12,6 @@
 
 extern "C" void __ct__4CRefFv(void*);
 extern "C" void __dt__4CRefFv(void*, int);
-extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 extern "C" void* __vt__11CTexAnimSet[];
 extern "C" void* __vt__8CTexAnim[];
 extern "C" void* __vt__11CTexAnimSeq[];
@@ -608,8 +607,7 @@ void CTexAnimSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
                 } else {
                     seq->keyCount = innerChunk.m_size / 0x30;
                     seq->keys = reinterpret_cast<unsigned int*>(
-                        _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(&Memory, innerChunk.m_size, stage,
-                                                                   const_cast<char*>(s_texanim_cpp_801d7adc), 0x1D4, 0));
+                        Memory._Alloc(innerChunk.m_size, stage, const_cast<char*>(s_texanim_cpp_801d7adc), 0x1D4, 0));
                     memcpy(seq->keys, chunkFile.GetAddress(), innerChunk.m_size);
                 }
             }
@@ -833,8 +831,8 @@ int CPtrArray<CTexAnimSeq*>::setSize(unsigned long newSize)
             m_size = m_size << 1;
         }
 
-        newItems = (CTexAnimSeq**)_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
-            &Memory, (unsigned long)(m_size << 2), m_stage, const_cast<char*>(s_collection_ptrarray_h_801D7B30), 0xFA, 0);
+        newItems = (CTexAnimSeq**)Memory._Alloc(
+            (unsigned long)(m_size << 2), m_stage, const_cast<char*>(s_collection_ptrarray_h_801D7B30), 0xFA, 0);
         if (newItems == 0) {
             return 0;
         }
@@ -1048,8 +1046,8 @@ int CPtrArray<CTexAnim*>::setSize(unsigned long newSize)
             m_size = m_size << 1;
         }
 
-        newItems = (CTexAnim**)_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
-            &Memory, (unsigned long)(m_size << 2), m_stage, const_cast<char*>(s_collection_ptrarray_h_801D7B30), 0xFA, 0);
+        newItems = (CTexAnim**)Memory._Alloc(
+            (unsigned long)(m_size << 2), m_stage, const_cast<char*>(s_collection_ptrarray_h_801D7B30), 0xFA, 0);
         if (newItems == 0) {
             return 0;
         }

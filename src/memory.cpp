@@ -1926,7 +1926,7 @@ checksum_done_copy:
  * JP Address: TODO
  * JP Size: TODO
  */
-unsigned int CAmemCacheSet::IsEnable(short index)
+int CAmemCacheSet::IsEnable(short index)
 {
     unsigned int value = reinterpret_cast<unsigned int>(cacheEntryAt(this, index).m_cacheData);
     return ((0u - value) | value) >> 31;

@@ -4,6 +4,19 @@
 class CMenuPcs
 {
 public:
+    enum FMT
+    {
+        TODO_FMT
+    };
+
+    enum TEX
+    {
+        TODO_TEX
+    };
+
+    void SetAttrFmt(FMT);
+    void SetTexture(TEX);
+
     void EquipInit1();
     int EquipOpen();
     void EquipCtrl();

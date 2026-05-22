@@ -10,6 +10,16 @@ void CFont_SetFixed(CFont*, int);
 class CMenuPcs
 {
 public:
+    enum FMT
+    {
+        TODO_FMT
+    };
+
+    enum TEX
+    {
+        TODO_TEX
+    };
+
     class CTmp
 	{
 	};
@@ -26,6 +36,8 @@ public:
     void calcSingleMenu();
     void drawSingleMenu();
     void loadTextureAsync(char **, int, int, CTmp*, int, int, int);
+    void SetAttrFmt(FMT);
+    void SetTexture(TEX);
     void SingCalcChara(float);
     void DrawSingleBase(float);
     void DrawSingleStat(float);

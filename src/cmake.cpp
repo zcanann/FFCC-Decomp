@@ -24,10 +24,6 @@ extern "C" void SetAnim__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" void PCAnimCtrl__8CMenuPcsFv(CMenuPcs*);
 extern "C" void InitFrame0Info__8CMenuPcsFv(CMenuPcs*);
 extern "C" void CalcWMFrame0__8CMenuPcsFi(CMenuPcs*, int);
-extern "C" int GetModelNo__8CMenuPcsFiii(CMenuPcs*, int, int, int);
-extern "C" float GetMaxAnimWait__8CMenuPcsFv(CMenuPcs*);
-extern "C" unsigned short GetButtonRepeat__8CMenuPcsFi(CMenuPcs*, int);
-extern "C" unsigned short GetButtonDown__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" float FLOAT_80333254;
 extern "C" float FLOAT_8033325c;
 extern "C" float FLOAT_80333260;
@@ -676,8 +672,7 @@ void CMenuPcs::CalcSingCMake()
                             *reinterpret_cast<int*>(MenuS32(this, 0x844) + MenuS16(this, 0x86A) * 0x14 + 4) = 3;
 
                             int slot = static_cast<int>(MenuS16(this, 0x86A));
-                            int modelNo = GetModelNo__8CMenuPcsFiii(
-                                this, static_cast<int>(s_CmakeInfo.m_tribe), static_cast<int>(s_CmakeInfo.m_hair),
+                            int modelNo = GetModelNo(static_cast<int>(s_CmakeInfo.m_tribe), static_cast<int>(s_CmakeInfo.m_hair),
                                 static_cast<int>(s_CmakeInfo.m_gender));
                             *reinterpret_cast<int*>(MenuS32(this, 0x824) + slot * 0x34 + 8) = modelNo;
 
@@ -703,7 +698,7 @@ void CMenuPcs::CalcSingCMake()
                             caravanWork->LoadFinished();
                             CallWorldParam__8CMenuPcsFiii(this, 0, slot, 0);
                             *reinterpret_cast<short*>(state + 0x18) =
-                                static_cast<short>(static_cast<int>(GetMaxAnimWait__8CMenuPcsFv(this)));
+                                static_cast<short>(static_cast<int>(GetMaxAnimWait()));
                         } else {
                             resultDir = -1;
                         }
@@ -1658,8 +1653,8 @@ void CMenuPcs::CmakeNameCtrl()
     short& select = *reinterpret_cast<short*>(state + 0x26);
     short& row = *reinterpret_cast<short*>(state + 0x28);
     short& table = *reinterpret_cast<short*>(state + 0x2A);
-    unsigned short repeat = GetButtonRepeat__8CMenuPcsFi(this, 0);
-    unsigned short down = GetButtonDown__8CMenuPcsFi(this, 0);
+    unsigned short repeat = GetButtonRepeat(0);
+    unsigned short down = GetButtonDown(0);
     short& mcState = *reinterpret_cast<short*>(mcWork + 10);
     char* name = GetCmakeNameBuffer();
 
@@ -1995,8 +1990,8 @@ void CMenuPcs::CmakeSexCtrl()
     short& mode = *reinterpret_cast<short*>(state + 0x10);
     short& frame = *reinterpret_cast<short*>(state + 0x22);
     short& sel = *reinterpret_cast<short*>(state + 0x26);
-    unsigned short repeat = GetButtonRepeat__8CMenuPcsFi(this, 0);
-    unsigned short down = GetButtonDown__8CMenuPcsFi(this, 0);
+    unsigned short repeat = GetButtonRepeat(0);
+    unsigned short down = GetButtonDown(0);
 
     if (mode == 1) {
         if ((repeat & 0x3) != 0) {
@@ -2180,8 +2175,8 @@ unsigned short CMenuPcs::CmakeTribeCtrl()
     short& crest = *reinterpret_cast<short*>(state + 0x28);
     short& selectField = *reinterpret_cast<short*>(state + 0x30);
     short& mcState = *reinterpret_cast<short*>(mcWork + 10);
-    unsigned short repeat = GetButtonRepeat__8CMenuPcsFi(this, 0);
-    unsigned short down = GetButtonDown__8CMenuPcsFi(this, 0);
+    unsigned short repeat = GetButtonRepeat(0);
+    unsigned short down = GetButtonDown(0);
 
     if (repeat == 0) {
         return 0;
@@ -2799,8 +2794,8 @@ void CMenuPcs::CmakeResultCtrl()
     short& sel = *reinterpret_cast<short*>(state + 0x26);
     short& resultDir = *reinterpret_cast<short*>(state + 0x1E);
     short& frame = *reinterpret_cast<short*>(state + 0x22);
-    unsigned short repeat = GetButtonRepeat__8CMenuPcsFi(this, 0);
-    unsigned short down = GetButtonDown__8CMenuPcsFi(this, 0);
+    unsigned short repeat = GetButtonRepeat(0);
+    unsigned short down = GetButtonDown(0);
 
     if (mode != 1) {
         if (frame < 10) {
@@ -3069,7 +3064,7 @@ void CMenuPcs::CmakeResultCtrl1()
     int state = MenuS32(this, 0x82C);
     short& mode = *reinterpret_cast<short*>(state + 0x10);
     short& frame = *reinterpret_cast<short*>(state + 0x22);
-    unsigned short down = GetButtonDown__8CMenuPcsFi(this, 0);
+    unsigned short down = GetButtonDown(0);
 
     if (frame < 10) {
         frame = frame + 1;
@@ -3306,8 +3301,8 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
     short& select = *reinterpret_cast<short*>(villageWork + 0x26);
     short& row = *reinterpret_cast<short*>(villageWork + 0x28);
     short& table = *reinterpret_cast<short*>(villageWork + 0x2A);
-    unsigned short repeat = GetButtonRepeat__8CMenuPcsFi(this, 0);
-    unsigned short down = GetButtonDown__8CMenuPcsFi(this, 0);
+    unsigned short repeat = GetButtonRepeat(0);
+    unsigned short down = GetButtonDown(0);
     char picked[2] = {'\0', '\0'};
     size_t len = strlen(s_CmakeInfo.m_name);
 

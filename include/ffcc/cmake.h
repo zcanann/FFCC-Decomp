@@ -27,6 +27,10 @@ class CMenuPcs
 	void DrawCmakeName(int, int, char*, float);
 	void AddNameChara(int, int, int, int);
 	void DrawCmakeYesNo(int, float);
+	unsigned short GetButtonDown(int);
+	unsigned short GetButtonRepeat(int);
+	int GetModelNo(int, int, int);
+	float GetMaxAnimWait();
 	char* GetMenuStr(int);
 	char* GetTribeStr(int);
 	char* GetJobStr(int);

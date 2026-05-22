@@ -11,17 +11,6 @@
 #include <math.h>
 #include <string.h>
 
-extern "C" void SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(CMenuPcs*, int);
-extern "C" void SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(CMenuPcs*, int);
-extern "C" void DrawRect__8CMenuPcsFUlfffffffff(CMenuPcs*, unsigned long, float, float, float, float, float, float, float, float, float);
-extern "C" void DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(CMenuPcs*, unsigned long, float, float, float, float, float, float, GXColor*, float, float, float);
-extern "C" void DrawSingleIcon__8CMenuPcsFiiifif(CMenuPcs*, int, int, int, float, int, float);
-extern "C" float CalcListPos__8CMenuPcsFiii(CMenuPcs*, int, int, int);
-extern "C" void DrawListPosMark__8CMenuPcsFfff(CMenuPcs*, float, float, float);
-extern "C" void DrawCursor__8CMenuPcsFiif(CMenuPcs*, int, int, float);
-extern "C" void DrawInit__8CMenuPcsFv(CMenuPcs*);
-extern "C" void DrawHelpMessage__8CMenuPcsFiP5CFontii8_GXColoriff(CMenuPcs*, int, CFont*, int, int, GXColor, int, float, float);
-extern "C" void DrawEquipMark__8CMenuPcsFiif(CMenuPcs*, int, int, float);
 extern "C" const char s_Pyro_Frappe_801DEAE4[];
 extern "C" const char s_Cryo_Frappe_801DEAF0[];
 extern "C" const char s_Rheo_Frappe_801DEAFC[];
@@ -1068,7 +1057,7 @@ void CMenuPcs::CmdDraw()
 	bool hasItemHelp = false;
 
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
+	SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
 	for (i = 0; i < drawList[0]; i++) {
 		const s32 tex = *reinterpret_cast<s32*>(entry + 0xE);
@@ -1080,7 +1069,7 @@ void CMenuPcs::CmdDraw()
 			float t = FLOAT_80332ad0;
 
 			if ((i > 7) || (*reinterpret_cast<s16*>(caravanIter + 0x214) == 0)) {
-				SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, tex);
+				SetTexture(static_cast<CMenuPcs::TEX>(tex));
 				if ((*reinterpret_cast<s16*>(caravanIter + 0x204) > 1) &&
 				    (*reinterpret_cast<s16*>(caravanIter + 0x204) == -1)) {
 					t += h;
@@ -1099,8 +1088,8 @@ void CMenuPcs::CmdDraw()
 				boxColor.a = static_cast<u8>(FLOAT_80332acc * *reinterpret_cast<float*>(entry + 8));
 				GXSetChanMatColor(GX_COLOR0A0, boxColor);
 
-				DrawRect__8CMenuPcsFUlfffffffff(
-				    this, 0, x, y, w, h, *reinterpret_cast<float*>(entry + 4), t,
+				DrawRect(
+				    0, x, y, w, h, *reinterpret_cast<float*>(entry + 4), t,
 				    *reinterpret_cast<float*>(entry + 10), *reinterpret_cast<float*>(entry + 10), 0.0f);
 			}
 		}
@@ -1161,15 +1150,15 @@ void CMenuPcs::CmdDraw()
 		entry += 0x20;
 	}
 
-	DrawInit__8CMenuPcsFv(this);
+	DrawInit();
 	DrawUniteList();
 
 	entry = drawList + 4;
 	caravanIter = caravanWork;
 	for (i = 0; i < *reinterpret_cast<s16*>(caravanWork + 0xBAA); i++) {
 		if ((i > 1) && (*reinterpret_cast<s16*>(caravanIter + 0x204) >= 0)) {
-			DrawSingleIcon__8CMenuPcsFiiifif(
-			    this, *reinterpret_cast<s16*>(caravanWork + *reinterpret_cast<s16*>(caravanIter + 0x204) * 2 + 0xB6),
+			DrawSingleIcon(
+			    *reinterpret_cast<s16*>(caravanWork + *reinterpret_cast<s16*>(caravanIter + 0x204) * 2 + 0xB6),
 			    entry[0] + entry[2] - 0x10, entry[1] - 2, *reinterpret_cast<float*>(entry + 8), 0, 0.0f);
 		}
 		caravanIter += 2;
@@ -1178,10 +1167,10 @@ void CMenuPcs::CmdDraw()
 
 	if ((cmdMode == 1) && (*reinterpret_cast<s16*>(reinterpret_cast<u8*>(cmdState) + 0x12) == 1)) {
 		const s16* letter = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
-		const float mark = CalcListPos__8CMenuPcsFiii(this, cmdState[0x1A], letter[0], 1);
+		const float mark = CalcListPos(cmdState[0x1A], letter[0], 1);
 		s16* listPos = drawList + drawList[0] * 0x20 + 4;
 		if (mark > FLOAT_80332ab0) {
-			DrawListPosMark__8CMenuPcsFfff(this, static_cast<float>(listPos[0]), static_cast<float>(listPos[1]), mark);
+			DrawListPosMark(static_cast<float>(listPos[0]), static_cast<float>(listPos[1]), mark);
 		}
 	}
 
@@ -1243,8 +1232,7 @@ void CMenuPcs::CmdDraw()
 		}
 
 		const s32 frame = System.m_frameCounter & 7;
-		DrawCursor__8CMenuPcsFiif(this, static_cast<s32>(cursorX + static_cast<float>(frame)), static_cast<s32>(cursorY),
-		                          FLOAT_80332a70);
+		DrawCursor(static_cast<s32>(cursorX + static_cast<float>(frame)), static_cast<s32>(cursorY), FLOAT_80332a70);
 	}
 
 	if (!hasItemHelp) {
@@ -1282,8 +1270,8 @@ void CMenuPcs::CmdDraw()
 	helpColor.g = 0xFF;
 	helpColor.b = 0xFF;
 	helpColor.a = static_cast<u8>(FLOAT_80332acc * helpAlpha);
-	DrawHelpMessage__8CMenuPcsFiP5CFontii8_GXColoriff(
-	    this, helpId, GetMenuCmdMembers(this).m_helpFont, 0, static_cast<s32>(-FLOAT_80332b28), helpColor, 0,
+	DrawHelpMessage(
+	    helpId, GetMenuCmdMembers(this).m_helpFont, 0, static_cast<s32>(-FLOAT_80332b28), helpColor, 0,
 	    FLOAT_80332a88, FLOAT_80332b08);
 }
 
@@ -2084,7 +2072,7 @@ void CMenuPcs::DrawUniteList()
 	const s16 foodCount = *reinterpret_cast<const s16*>(caravanWork + 0xBAA);
 
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
+	SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
 	DAT_8032eec8 = 0;
 	bool active = false;
@@ -2131,8 +2119,8 @@ void CMenuPcs::DrawUniteList()
 			}
 		}
 
-		SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, (groupSize == 2) ? 0x36 : 0x35);
-		DrawRect__8CMenuPcsFUlfffffffff(this, 0,
+		SetTexture(static_cast<CMenuPcs::TEX>((groupSize == 2) ? 0x36 : 0x35));
+		DrawRect(0,
 			static_cast<float>(entry[0] + 4),
 			static_cast<float>(entry[1]) - FLOAT_80332ad0,
 			static_cast<float>(entry[2]) - 8.0f,
@@ -2199,7 +2187,7 @@ void CMenuPcs::DrawUniteList()
 		font->Draw(text);
 	}
 
-	DrawInit__8CMenuPcsFv(this);
+	DrawInit();
 	DAT_8032eec8 = 0;
 	s16* const unitePanels = list + list[1] * 0x20 + 4;
 	for (s32 i = 0; i < 8; i++) {
@@ -2264,8 +2252,8 @@ void CMenuPcs::DrawUniteList()
 		s_UniteTop[DAT_8032eec8] = i;
 		DAT_8032eec8++;
 
-		SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x38);
-		DrawRect__8CMenuPcsFUlfffffffff(this, 0,
+		SetTexture(static_cast<CMenuPcs::TEX>(0x38));
+		DrawRect(0,
 			panelX,
 			panelY - FLOAT_80332AF0,
 			FLOAT_80332AEC,
@@ -2306,7 +2294,7 @@ void CMenuPcs::DrawUniteList()
 		font->Draw(text);
 	}
 
-	DrawInit__8CMenuPcsFv(this);
+	DrawInit();
 	if ((cmd[0x30 / 2] == 0) &&
 	    (*reinterpret_cast<const s16*>(caravanWork + selected * 2 + 0x214) != 0)) {
 		int helpId = *reinterpret_cast<const s16*>(caravanWork + selected * 2 + 0x214);
@@ -2320,8 +2308,8 @@ void CMenuPcs::DrawUniteList()
 		color.g = 0xFF;
 		color.b = 0xFF;
 		color.a = static_cast<u8>(FLOAT_80332acc * alpha);
-		DrawHelpMessage__8CMenuPcsFiP5CFontii8_GXColoriff(
-			this, helpId, font, 0,
+		DrawHelpMessage(
+			helpId, font, 0,
 			static_cast<int>(-(FLOAT_80332AEC * FLOAT_80332a88 - FLOAT_80332b08)),
 			color, 0, FLOAT_80332a88, FLOAT_80332b08);
 	}

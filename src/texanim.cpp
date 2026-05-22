@@ -10,14 +10,6 @@
 #include <math.h>
 #include "dolphin/mtx.h"
 
-extern "C" void __ct__4CRefFv(void*);
-extern "C" void __dt__4CRefFv(void*, int);
-extern "C" void* __vt__11CTexAnimSet[];
-extern "C" void* __vt__8CTexAnim[];
-extern "C" void* __vt__11CTexAnimSeq[];
-extern "C" void* __vt__Q28CTexAnim8CRefData[];
-extern "C" void __ct__21CPtrArray_P8CTexAnim_Fv(void*);
-extern "C" void __ct__25CPtrArray_P11CTexAnimSeq_Fv(void*);
 extern "C" const char s_texanim_cpp_801d7adc[];
 extern const float FLOAT_8032fb38 = 0.0f;
 extern const float FLOAT_8032fb3c = 1.0f;
@@ -161,6 +153,53 @@ static inline void ReleaseRef(void** slot)
     }
 }
 
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 72b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ */
+inline CTexAnimSeq::CTexAnimSeq()
+{
+    m_keyCount = 0;
+    m_keys = 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 80b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ */
+inline CTexAnim::CRefData::CRefData()
+{
+    m_material = 0;
+    m_texSrtIndex = 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 100b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ */
+inline CTexAnim::CTexAnim()
+{
+    m_refData = 0;
+    m_seqIndex = 0;
+    m_frame = FLOAT_8032fb38;
+    m_mode = -2;
+    m_texGenT = FLOAT_8032fb38;
+    m_texGenS = FLOAT_8032fb38;
+    m_chin = FLOAT_8032fb38;
 }
 
 /*
@@ -470,10 +509,7 @@ CTexAnimSet* CTexAnimSet::Duplicate(CMemory::CStage* stage)
     CTexAnimSetStorage* dup = reinterpret_cast<CTexAnimSetStorage*>(
         operator new(0x28, stage, const_cast<char*>(s_texanim_cpp_801d7adc), 0x54));
     if (dup != 0) {
-        __ct__4CRefFv(dup);
-        dup->vtable = __vt__11CTexAnimSet;
-        __ct__21CPtrArray_P8CTexAnim_Fv(&dup->texAnims);
-        dup->unk24 = FLOAT_8032fb38;
+        new (dup) CTexAnimSet;
     }
 
     dup->texAnims.SetStage(stage);
@@ -482,15 +518,7 @@ CTexAnimSet* CTexAnimSet::Duplicate(CMemory::CStage* stage)
         CTexAnimStorage* copy = reinterpret_cast<CTexAnimStorage*>(
             operator new(0x24, stage, const_cast<char*>(s_texanim_cpp_801d7adc), 0xF4));
         if (copy != 0) {
-            __ct__4CRefFv(copy);
-            copy->vtable = __vt__8CTexAnim;
-            copy->refData = 0;
-            copy->unk0C = 0;
-            copy->unk10 = FLOAT_8032fb38;
-            copy->unk14 = -2;
-            copy->unk20 = FLOAT_8032fb38;
-            copy->unk1C = FLOAT_8032fb38;
-            copy->unk18 = FLOAT_8032fb38;
+            new (copy) CTexAnim;
         }
 
         copy->refData = src->refData;
@@ -539,15 +567,7 @@ void CTexAnimSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
         CTexAnimStorage* texAnim = static_cast<CTexAnimStorage*>(
             operator new(0x24, stage, const_cast<char*>(s_texanim_cpp_801d7adc), 0x3F));
         if (texAnim != 0) {
-            __ct__4CRefFv(texAnim);
-            texAnim->vtable = __vt__8CTexAnim;
-            texAnim->refData = 0;
-            texAnim->unk0C = 0;
-            texAnim->unk10 = FLOAT_8032fb38;
-            texAnim->unk14 = -2;
-            texAnim->unk20 = FLOAT_8032fb38;
-            texAnim->unk1C = FLOAT_8032fb38;
-            texAnim->unk18 = FLOAT_8032fb38;
+            new (texAnim) CTexAnim;
         }
         int* ref = reinterpret_cast<int*>(texAnim->refData);
         if (ref != 0) {
@@ -561,11 +581,7 @@ void CTexAnimSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
         CTexAnimRefDataStorage* refData = static_cast<CTexAnimRefDataStorage*>(
             operator new(300, stage, const_cast<char*>(s_texanim_cpp_801d7adc), 0xD3));
         if (refData != 0) {
-            __ct__4CRefFv(refData);
-            *reinterpret_cast<void**>(refData) = __vt__Q28CTexAnim8CRefData;
-            __ct__25CPtrArray_P11CTexAnimSeq_Fv(&refData->texAnimSeqs);
-            refData->material = 0;
-            refData->texSrtIndex = 0;
+            new (refData) CTexAnim::CRefData;
         }
         texAnim->refData = refData;
         refData->texAnimSeqs.SetStage(stage);
@@ -583,10 +599,7 @@ void CTexAnimSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
             CTexAnimSeqStorage* seq = static_cast<CTexAnimSeqStorage*>(
                 operator new(0x118, stage, const_cast<char*>(s_texanim_cpp_801d7adc), 0xE2));
             if (seq != 0) {
-                __ct__4CRefFv(seq);
-                seq->vtable = __vt__11CTexAnimSeq;
-                seq->keyCount = 0;
-                seq->keys = 0;
+                new (seq) CTexAnimSeq;
             }
             chunkFile.PushChunk();
             char* seqName = seq->name;
@@ -648,7 +661,7 @@ CTexAnimSet::~CTexAnimSet()
 CTexAnimSet::CTexAnimSet()
 {
     const float& zero = FLOAT_8032fb38;
-    reinterpret_cast<CTexAnimSetStorage*>(this)->unk24 = zero;
+    m_chin = zero;
 }
 
 /*

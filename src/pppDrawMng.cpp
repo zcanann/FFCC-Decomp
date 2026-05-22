@@ -11,10 +11,6 @@ extern const float kPppDrawDepthScaleNear;
 extern const float kPppDrawDepthScaleFar;
 }
 
-extern "C" {
-void SetDrawDoneDebugDataPartControl__8CGraphicFi(void* graphic, int partControl);
-}
-
 /*
  * --INFO--
  * Address:	TODO
@@ -143,7 +139,7 @@ void pppDrawMng::DrawOt()
 					_pppDrawPart((_pppMngSt*)prim->m_handle);
 					break;
 				case 1:
-					SetDrawDoneDebugDataPartControl__8CGraphicFi(&Graphic, 0x7ffe);
+					Graphic.SetDrawDoneDebugDataPartControl(0x7ffe);
 
 					if (lastType != prim->m_type)
 					{
@@ -153,7 +149,7 @@ void pppDrawMng::DrawOt()
 
 					((CCharaPcs::CHandle*)prim->m_handle)->Draw(4);
 
-					SetDrawDoneDebugDataPartControl__8CGraphicFi(&Graphic, 0x7fff);
+					Graphic.SetDrawDoneDebugDataPartControl(0x7fff);
 					break;
 				default:
 					break;

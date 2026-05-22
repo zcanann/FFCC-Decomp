@@ -21,8 +21,6 @@ extern "C" double sin(double);
 
 #include <math.h>
 
-extern "C" void DrawInit__8CMenuPcsFv(void*);
-extern "C" void DrawRect__8CMenuPcsFUlfffffffff(void*, unsigned long, float, float, float, float, float, float, float, float, float);
 extern "C" void SetExternalTlut__8CTextureFPvi(void*, void*, int);
 extern "C" asm void MTX44MultVec4__5CMathFPA4_fP3VecP5Vec4d(register void*, register float (*)[4], register Vec*,
                                                             register void*);
@@ -99,11 +97,6 @@ extern double DOUBLE_80330ac8;
 extern double DOUBLE_80330ad0;
 extern double DOUBLE_80330ad8;
 extern double DOUBLE_80330ae0;
-
-static inline void* MenuPcsVoid()
-{
-    return &MenuPcs;
-}
 
 static inline unsigned char* MenuPcsRaw()
 {
@@ -243,14 +236,13 @@ void CRingMenu::DrawIcon()
 
 	CColor bgColor(0, 0, 0, 0x80);
 	MenuPcs.SetColor(bgColor);
-	DrawRect__8CMenuPcsFUlfffffffff(MenuPcsVoid(), 3, static_cast<float>(FLOAT_803309ec + posX),
+	MenuPcs.DrawRect(3, static_cast<float>(FLOAT_803309ec + posX),
 	                                 static_cast<float>(FLOAT_803309ec + posY), FLOAT_803309f0, FLOAT_803309f0,
 	                                 FLOAT_803309c0, FLOAT_803309c0, FLOAT_803309cc, FLOAT_803309cc, 0.0f);
 
 	CColor fgColor(0xFF, 0xFF, 0xFF, 0xFF);
 	MenuPcs.SetColor(fgColor);
-	DrawRect__8CMenuPcsFUlfffffffff(
-	    MenuPcsVoid(), 3, static_cast<float>(posX), static_cast<float>(posY), FLOAT_803309f0, FLOAT_803309f0, FLOAT_803309c0,
+	MenuPcs.DrawRect(3, static_cast<float>(posX), static_cast<float>(posY), FLOAT_803309f0, FLOAT_803309f0, FLOAT_803309c0,
 	    static_cast<float>(iconRow * 0x38), FLOAT_803309cc, FLOAT_803309cc,
 	    0.0f);
 
@@ -275,7 +267,7 @@ void CRingMenu::DrawIcon()
 	int colSign = signedIconCol >> 31;
 	float u = static_cast<float>((((colSign * 8) | (signedIconCol * 0x20000000 + colSign) >> 29) - colSign) * 0x30);
 	float v = static_cast<float>(((signedIconCol >> 3) + ((signedIconCol < 0) && ((iconCol & 7) != 0))) * 0x30);
-	DrawRect__8CMenuPcsFUlfffffffff(MenuPcsVoid(), 3, static_cast<float>(posX), static_cast<float>(posY), FLOAT_803309f4,
+	MenuPcs.DrawRect(3, static_cast<float>(posX), static_cast<float>(posY), FLOAT_803309f4,
 	                                 FLOAT_803309f4, u, v, FLOAT_803309f8, FLOAT_803309f8, 0.0f);
 }
 
@@ -451,7 +443,7 @@ void CRingMenu::drawGBA()
 	const float drawX = static_cast<float>(static_cast<double>(posX) + static_cast<double>(FLOAT_80330a3c * static_cast<float>(sizePulse * sinB)));
 	const float drawY = static_cast<float>(static_cast<double>(posY) - static_cast<double>(FLOAT_80330a40 * static_cast<float>(sizePulse * sinA)));
 	const float menuV = static_cast<float>(menuIndex * 0x30);
-	DrawRect__8CMenuPcsFUlfffffffff(MenuPcsVoid(), 3, FLOAT_80330a38 + drawX, FLOAT_80330a38 + drawY, FLOAT_80330a44, FLOAT_80330a48,
+	MenuPcs.DrawRect(3, FLOAT_80330a38 + drawX, FLOAT_80330a38 + drawY, FLOAT_80330a44, FLOAT_80330a48,
 	                                 FLOAT_803309c0, menuV, FLOAT_80330a4c * static_cast<float>(static_cast<double>(FLOAT_803309cc) + invSize),
 	                                 FLOAT_80330a4c * static_cast<float>(sizePulse + invSize), 0.0f);
 
@@ -459,7 +451,7 @@ void CRingMenu::drawGBA()
 	const unsigned int alphaIcon = static_cast<unsigned int>(static_cast<int>(alphaLit));
 	CColor iconColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alphaIcon));
 	MenuPcs.SetColor(iconColor);
-	DrawRect__8CMenuPcsFUlfffffffff(MenuPcsVoid(), 3, drawX, drawY, FLOAT_80330a44, FLOAT_80330a48, FLOAT_803309c0, menuV,
+	MenuPcs.DrawRect(3, drawX, drawY, FLOAT_80330a44, FLOAT_80330a48, FLOAT_803309c0, menuV,
 	                                 FLOAT_80330a4c * static_cast<float>(sizePulse), FLOAT_80330a4c * static_cast<float>(sizePulse), 0.0f);
 
 	const unsigned int flatFlags = *reinterpret_cast<unsigned int*>(CFlat + 0x12A0) & *reinterpret_cast<unsigned int*>(CFlat + 0x12A4);
@@ -471,7 +463,7 @@ void CRingMenu::drawGBA()
 			    static_cast<int>(static_cast<double>(FLOAT_803309c4) * (alphaLit * static_cast<double>(FLOAT_803309cc + static_cast<float>(blink)))));
 			CColor sendColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(sendAlpha));
 			MenuPcs.SetColor(sendColor);
-			DrawRect__8CMenuPcsFUlfffffffff(MenuPcsVoid(), 3, drawX, drawY, FLOAT_80330a48, FLOAT_80330a48, FLOAT_803309c0, FLOAT_80330a58,
+			MenuPcs.DrawRect(3, drawX, drawY, FLOAT_80330a48, FLOAT_80330a48, FLOAT_803309c0, FLOAT_80330a58,
 			                                 FLOAT_803309cc, FLOAT_803309cc, 0.0f);
 		} else {
 			int frameHalf = static_cast<int>(System.m_frameCounter) >> 1;
@@ -482,12 +474,12 @@ void CRingMenu::drawGBA()
 				frameTex &= 1;
 			}
 			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1D));
-			DrawRect__8CMenuPcsFUlfffffffff(MenuPcsVoid(), 3, drawX, drawY, FLOAT_80330a48, FLOAT_80330a48, FLOAT_803309c0,
+			MenuPcs.DrawRect(3, drawX, drawY, FLOAT_80330a48, FLOAT_80330a48, FLOAT_803309c0,
 			                                 static_cast<float>(frameTex * 0x30), FLOAT_803309cc, FLOAT_803309cc, 0.0f);
 		}
 	}
 
-	DrawInit__8CMenuPcsFv(MenuPcsVoid());
+	MenuPcs.DrawInit();
 }
 
 /*
@@ -613,17 +605,17 @@ void CRingMenu::onDraw()
 		}
 
 		if (group == 2) {
-			DrawRect__8CMenuPcsFUlfffffffff(MenuPcsVoid(), 0, posX, posY, FLOAT_80330a84, FLOAT_80330a5c, FLOAT_803309c0, FLOAT_80330a88,
+			MenuPcs.DrawRect(0, posX, posY, FLOAT_80330a84, FLOAT_80330a5c, FLOAT_803309c0, FLOAT_80330a88,
 			                                 FLOAT_803309cc, FLOAT_803309cc, 0.0f);
 		} else if (group == 1) {
-			DrawRect__8CMenuPcsFUlfffffffff(MenuPcsVoid(), 0, drawX, drawY, FLOAT_80330a7c, FLOAT_80330a80, FLOAT_803309c0, FLOAT_80330a5c,
+			MenuPcs.DrawRect(0, drawX, drawY, FLOAT_80330a7c, FLOAT_80330a80, FLOAT_803309c0, FLOAT_80330a5c,
 			                                 FLOAT_803309cc, FLOAT_803309cc, 0.0f);
-			DrawRect__8CMenuPcsFUlfffffffff(MenuPcsVoid(), 0, drawX, drawY, FLOAT_80330a80, FLOAT_80330a80, FLOAT_80330a68, FLOAT_803309f0,
+			MenuPcs.DrawRect(0, drawX, drawY, FLOAT_80330a80, FLOAT_80330a80, FLOAT_80330a68, FLOAT_803309f0,
 			                                 FLOAT_803309cc, FLOAT_803309cc, 0.0f);
 		} else {
-			DrawRect__8CMenuPcsFUlfffffffff(MenuPcsVoid(), 0, drawX, drawY, FLOAT_80330a7c, FLOAT_80330a5c, FLOAT_803309c0, FLOAT_803309c0,
+			MenuPcs.DrawRect(0, drawX, drawY, FLOAT_80330a7c, FLOAT_80330a5c, FLOAT_803309c0, FLOAT_803309c0,
 			                                 FLOAT_803309cc, FLOAT_803309cc, 0.0f);
-			DrawRect__8CMenuPcsFUlfffffffff(MenuPcsVoid(), 0, drawX, drawY, FLOAT_80330a68, FLOAT_80330a5c, FLOAT_803309c0, FLOAT_803309f0,
+			MenuPcs.DrawRect(0, drawX, drawY, FLOAT_80330a68, FLOAT_80330a5c, FLOAT_803309c0, FLOAT_803309f0,
 			                                 FLOAT_803309cc, FLOAT_803309cc, 0.0f);
 		}
 
@@ -687,7 +679,7 @@ void CRingMenu::onDraw()
 				drawCommand(menuIndex, font, posX, posY, caravanWork, next1, static_cast<float>(scroll + FLOAT_803309cc),
 				            static_cast<float>(labelAlphaScale));
 				drawCommand(menuIndex, font, posX, posY, caravanWork, cmdIndex, static_cast<float>(scroll), iconAlphaScale);
-				DrawInit__8CMenuPcsFv(MenuPcsVoid());
+				MenuPcs.DrawInit();
 			}
 		}
 
@@ -758,7 +750,7 @@ void CRingMenu::onDraw()
 			if (group != 2) {
 				font->Draw(labelId);
 			}
-			DrawInit__8CMenuPcsFv(MenuPcsVoid());
+			MenuPcs.DrawInit();
 
 			if (group == 2) {
 				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1F));
@@ -797,8 +789,7 @@ void CRingMenu::onDraw()
 								blink = static_cast<float>((System.m_frameCounter >> 2) & 1);
 							}
 
-							DrawRect__8CMenuPcsFUlfffffffff(
-								MenuPcsVoid(), 3, FLOAT_803309ec + centerBase + static_cast<float>(i * 8), barY, FLOAT_80330a38, FLOAT_80330a38,
+							MenuPcs.DrawRect(3, FLOAT_803309ec + centerBase + static_cast<float>(i * 8), barY, FLOAT_80330a38, FLOAT_80330a38,
 								FLOAT_80330a38 * (FLOAT_80330a38 + blink), FLOAT_803309f0, FLOAT_803309cc, FLOAT_803309cc, 0.0f);
 						}
 					}
@@ -807,7 +798,7 @@ void CRingMenu::onDraw()
 		}
 	}
 
-	DrawInit__8CMenuPcsFv(MenuPcsVoid());
+	MenuPcs.DrawInit();
 }
 
 /*

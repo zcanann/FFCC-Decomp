@@ -30,7 +30,6 @@ extern "C" void DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(double, double, double
                                                            CMenuPcs*, int, void*);
 extern "C" void DrawSingleIcon__8CMenuPcsFiiifif(CMenuPcs*, int, int, int, float, int, float);
 extern "C" void DrawInit__8CMenuPcsFv(CMenuPcs*);
-extern "C" s16* GetLetterBuffer__6JoyBusFi(void*, int);
 extern "C" double CalcListPos__8CMenuPcsFiii(CMenuPcs*, int, int, int);
 extern "C" void DrawListPosMark__8CMenuPcsFfff(double, double, double, CMenuPcs*);
 extern "C" void DrawCursor__8CMenuPcsFiif(double, CMenuPcs*, int, int);
@@ -136,7 +135,7 @@ static inline void* GetEquipFont(CMenuPcs* menu)
 int CMenuPcs::ChkEquipActive(int index)
 {
 	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
-	s16* entries = GetLetterBuffer__6JoyBusFi(&Joybus, 0);
+	s16* entries = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
 	int entryCount = entries[0];
 	s16* itemEntries = entries + 1;
 	int equipIndex = GetEquipState(this)[0x13];
@@ -576,7 +575,7 @@ void CMenuPcs::EquipDraw()
 		SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(&MenuPcs, 0);
 		int drawIndex = 0;
 		s16* listItem = menuData + menuData[0] * 0x20 + 4;
-		s16* letter = GetLetterBuffer__6JoyBusFi(&Joybus, 0);
+		s16* letter = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
 		int letterCount = letter[0];
 
 		for (int i = menuData[0]; i < menuData[1]; i++) {
@@ -673,7 +672,7 @@ void CMenuPcs::EquipDraw()
 		font->SetScale(FLOAT_80332ee8);
 		font->DrawInit();
 
-		s16* letter = GetLetterBuffer__6JoyBusFi(&Joybus, 0);
+		s16* letter = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
 		s16* listStart = menuData + menuData[0] * 0x20 + 4;
 		for (int i = menuData[0]; i < menuData[1]; i++) {
 			if (*reinterpret_cast<int*>(listStart + 0xe) == 0x37) {
@@ -725,7 +724,7 @@ void CMenuPcs::EquipDraw()
 
 	if ((mode == 1) && (*(s16*)(menuState + 0x12) == 1)) {
 		s16* listStart = menuData + menuData[0] * 0x20 + 4;
-		s16* letter = GetLetterBuffer__6JoyBusFi(&Joybus, 0);
+		s16* letter = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
 		double pos = CalcListPos__8CMenuPcsFiii(this, (int)*(s16*)(menuState + 0x34), (int)letter[0], 0);
 		if (pos > (double)FLOAT_80332eb8) {
 			DrawListPosMark__8CMenuPcsFfff((double)listStart[0], (double)listStart[1], pos, this);
@@ -747,7 +746,7 @@ void CMenuPcs::EquipDraw()
 	}
 
 	if ((mode == 1) && (*(s16*)(menuState + 0x12) == 1)) {
-		s16* letter = GetLetterBuffer__6JoyBusFi(&Joybus, 0);
+		s16* letter = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
 		int idx = *(s16*)(menuState + 0x28) + *(s16*)(menuState + 0x34);
 		if ((idx > 0) && (idx < letter[0]) && (letter[idx] >= 0)) {
 			if (EquipChk__8CMenuPcsFi(this, (int)letter[idx]) != 0) {
@@ -1006,7 +1005,7 @@ int CMenuPcs::EquipOpen()
 
 		*GetEquipList(this) = 4;
 		EquipInit1();
-		puVar9 = GetLetterBuffer__6JoyBusFi(&Joybus, 0);
+		puVar9 = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
 		sVar10 = 0;
 		for (iVar6 = 0; iVar6 < 0x40; iVar6++) {
 			iVar11 = GetItemType__8CMenuPcsFii(this, iVar6, 0);
@@ -1017,7 +1016,7 @@ int CMenuPcs::EquipOpen()
 			}
 		}
 
-		psVar7 = GetLetterBuffer__6JoyBusFi(&Joybus, 0);
+		psVar7 = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
 		*psVar7 = sVar10 + 1;
 		*(s16*)(GetEquipStateBase(this) + 0x26) = 0;
 		*(u8*)(GetEquipStateBase(this) + 0xb) = 1;

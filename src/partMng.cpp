@@ -1276,9 +1276,7 @@ void CPartMng::pppReadShp(CChunkFile& chunkFile, pppShapeSt* shapeSt)
 							operator new[](
 							    chunk.m_arg0, stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0x4B9);
 						chunkFile.Get(shapeSt->m_animData, chunk.m_arg0);
-						pppSetShapeMaterial(shapeSt,
-						                    *reinterpret_cast<CMaterialSet**>(reinterpret_cast<unsigned char*>(this) + 0x7E4),
-						                    textureNames);
+						pppSetShapeMaterial(shapeSt, m_materialSet, textureNames);
 					}
 				}
 				else if (chunk.m_id == 0x54584E4D) // 'TXNM'

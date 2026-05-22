@@ -15,9 +15,6 @@
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
-extern "C" void freeTexture__8CMenuPcsFiiii(CMenuPcs*, int, int, int, int);
-extern "C" void CmakeVillageDraw__8CMenuPcsFv(CMenuPcs*);
-extern "C" unsigned short CmakeVillageCtrl__8CMenuPcsFv(CMenuPcs*);
 extern "C" float FLOAT_80333254;
 extern "C" float FLOAT_8033325c;
 extern "C" float FLOAT_80333260;
@@ -87,9 +84,6 @@ extern "C" double DOUBLE_803333b8;
 extern "C" double DOUBLE_803333c0;
 extern "C" int DAT_8032ef10;
 extern "C" char* GetLangString__5CGameFv(void*);
-extern "C" void loadFont__8CMenuPcsFiPcii(CMenuPcs*, int, char*, int, int);
-extern "C" void loadTexture__8CMenuPcsFPPciiPQ28CMenuPcs4CTmpiii(CMenuPcs*, char**, int, int, void*, int, int, int);
-extern "C" void DrawCursor__8CMenuPcsFiif(CMenuPcs*, int, int, float);
 extern "C" char s_dvd__smenu_subfont_fnt_801e3020[];
 extern "C" char* PTR_s_world2_802159a4[];
 extern "C" int DAT_802159c8;
@@ -1156,7 +1150,7 @@ void CMenuPcs::DrawCmakeDecision(int yesNoSel, float alpha)
 
     if (yesNoSel != 0) {
         int frame = System.m_frameCounter & 7;
-        DrawCursor__8CMenuPcsFiif(this, static_cast<int>(tx) - 0x20 + frame, 0x188, alpha);
+        DrawCursor(static_cast<int>(tx) - 0x20 + frame, 0x188, alpha);
     }
 }
 
@@ -1458,7 +1452,7 @@ void CMenuPcs::DrawCmakeYesNo(int yesNoSel, float alpha)
     if (yesNoSel != 0) {
         float cursorBase = (yesNoSel == 1) ? yesX : noX;
         int frame = System.m_frameCounter & 7;
-        DrawCursor__8CMenuPcsFiif(this, static_cast<int>(cursorBase) - 0x24 + frame, 0x175, alpha);
+        DrawCursor(static_cast<int>(cursorBase) - 0x24 + frame, 0x175, alpha);
     }
 }
 
@@ -1916,7 +1910,7 @@ void CMenuPcs::CmakeNameDraw()
     if (mode == 1 && row < 5) {
         int cursorX = static_cast<int>(FLOAT_803332c8 + FLOAT_803332c0 * static_cast<float>(select));
         int cursorY = 112 + row * 32;
-        DrawCursor__8CMenuPcsFiif(this, cursorX + (System.m_frameCounter & 7), cursorY, FLOAT_80333258);
+        DrawCursor(cursorX + (System.m_frameCounter & 7), cursorY, FLOAT_80333258);
     }
 
     int showNameCursor = ((mode == 1) && (row < 5) && (strlen(name) <= 6)) ? 1 : 0;
@@ -2107,7 +2101,7 @@ void CMenuPcs::CmakeSexDraw()
         int frame = System.m_frameCounter & 7;
         int cursorX = static_cast<int>(FLOAT_80333288 - maxWidth * (FLOAT_80333298 + FLOAT_80333298)) + frame;
         int cursorY = 0xA4 + sel * 0x28;
-        DrawCursor__8CMenuPcsFiif(this, cursorX, cursorY, alpha);
+        DrawCursor(cursorX, cursorY, alpha);
     }
 
     DrawCmakeMcOverlay(this, 0x15);
@@ -2413,15 +2407,14 @@ void CMenuPcs::CmakeTribeDraw()
         int tribeCursorY = 0x88 + select * 0x1C;
 
         if (*reinterpret_cast<short*>(state + 0x30) == 0) {
-            DrawCursor__8CMenuPcsFiif(this, static_cast<int>(FLOAT_80333320) + frame, tribeCursorY, alpha);
+            DrawCursor(static_cast<int>(FLOAT_80333320) + frame, tribeCursorY, alpha);
         } else {
             if ((System.m_frameCounter & 1) != 0) {
-                DrawCursor__8CMenuPcsFiif(this, static_cast<int>(FLOAT_80333320), tribeCursorY, alpha);
+                DrawCursor(static_cast<int>(FLOAT_80333320), tribeCursorY, alpha);
             }
 
             int hairCursorY = 0x88 + *reinterpret_cast<short*>(state + 0x28) * 0x1C;
-            DrawCursor__8CMenuPcsFiif(
-                this, static_cast<int>(FLOAT_80333324) + frame, hairCursorY, alpha);
+            DrawCursor(static_cast<int>(FLOAT_80333324) + frame, hairCursorY, alpha);
         }
     }
 
@@ -2721,7 +2714,7 @@ void CMenuPcs::CmakeJobDraw()
         int cursorX = (sel < 4) ? 0x110 : 0x1A8;
         int cursorY = 0x70 + ((sel < 4) ? sel : (sel - 4)) * 0x28;
         int cursorFrame = System.m_frameCounter & 7;
-        DrawCursor__8CMenuPcsFiif(this, cursorX - 0x18 + cursorFrame, cursorY, alpha);
+        DrawCursor(cursorX - 0x18 + cursorFrame, cursorY, alpha);
     }
 
     short mcState = *reinterpret_cast<short*>(MenuS32(this, 0x848) + 10);
@@ -3240,7 +3233,7 @@ void CMenuPcs::CmakeResultDraw1()
     if (mode == 1) {
         int cursorX = static_cast<int>(FLOAT_80333304) + (System.m_frameCounter & 7);
         int cursorY = 0x70 + *reinterpret_cast<short*>(state + 0x26) * 0x28;
-        DrawCursor__8CMenuPcsFiif(this, cursorX, cursorY, alpha);
+        DrawCursor(cursorX, cursorY, alpha);
     }
 }
 
@@ -3487,8 +3480,7 @@ void CMenuPcs::CmakeVillageDraw()
     DrawInit();
     if (mode == 1 && row < 5) {
         int wobble = System.m_frameCounter & 7;
-        DrawCursor__8CMenuPcsFiif(this,
-            static_cast<int>(FLOAT_803332c8 + select * FLOAT_803332c0) + wobble,
+        DrawCursor(static_cast<int>(FLOAT_803332c8 + select * FLOAT_803332c0) + wobble,
             row * 0x20 + 0x70, FLOAT_80333258);
     }
 
@@ -3552,7 +3544,7 @@ void CMenuPcs::destroyVillageMenu()
             }
         }
 
-        freeTexture__8CMenuPcsFiiii(this, 8, 1, 0x60, 9);
+        freeTexture(8, 1, 0x60, 9);
 
         void*& villageWork = *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(this) + 0x830);
         if (villageWork != nullptr) {
@@ -3581,11 +3573,10 @@ void CMenuPcs::calcVillageMenu()
                 char path[128];
                 char* language = GetLangString__5CGameFv(&Game);
                 sprintf(path, s_dvd__smenu_subfont_fnt_801e3020, language);
-                loadFont__8CMenuPcsFiPcii(this, 2, path, 4, -1);
+                loadFont(2, path, 4, -1);
             }
 
-            loadTexture__8CMenuPcsFPPciiPQ28CMenuPcs4CTmpiii(
-                this, PTR_s_world2_802159a4, 8, 1, &DAT_802159c8, 0x60, 9, 3);
+            loadTexture(PTR_s_world2_802159a4, 8, 1, reinterpret_cast<CMenuPcs::CTmp*>(&DAT_802159c8), 0x60, 9, 3);
 
             CMemory::CStage* stage = *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(this) + 0xEC);
             int& villageWork = MenuS32(this, 0x830);
@@ -3608,7 +3599,7 @@ void CMenuPcs::calcVillageMenu()
                     }
                 }
 
-                freeTexture__8CMenuPcsFiiii(this, 8, 1, 0x60, 9);
+                freeTexture(8, 1, 0x60, 9);
                 int& villageWork = MenuS32(this, 0x830);
                 if (villageWork != 0) {
                     delete[] reinterpret_cast<unsigned char*>(villageWork);
@@ -3630,7 +3621,7 @@ void CMenuPcs::calcVillageMenu()
                     result = 1;
                 }
             } else if (mode == 1) {
-                result = CmakeVillageCtrl__8CMenuPcsFv(this);
+                result = CmakeVillageCtrl();
             } else if (frame < 10) {
                 frame = frame + 1;
                 result = 0;
@@ -3656,7 +3647,7 @@ void CMenuPcs::drawVillageMenu()
 {
     if (MenuS16(this, 0x86C) != 0) {
         int villageWork = MenuS32(this, 0x830);
-        CmakeVillageDraw__8CMenuPcsFv(this);
+        CmakeVillageDraw();
         if (*reinterpret_cast<short*>(villageWork + 0x2E) != 0) {
             short& mode = *reinterpret_cast<short*>(villageWork + 0x10);
             if (mode < 2) {

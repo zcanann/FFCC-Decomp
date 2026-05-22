@@ -23,7 +23,6 @@ inline void* operator new(unsigned long, void* p)
 }
 
 extern "C" unsigned long UnkMaterialSetGetter(void*);
-extern "C" void __ct__6CColorFv(void*);
 extern "C" void __ct__10CTexScrollFv(void*);
 extern "C" void __dt__10CTexScrollFv(void*, int);
 extern "C" int CheckName__8CTextureFPc(CTexture*, char*);
@@ -32,8 +31,6 @@ extern "C" int GetBackBufferRect__8CGraphicFRiRiRiRii(CGraphic*, int*, int*, int
 extern "C" void SetShadow__12CMaterialManFR10CMapShadowPA4_fiUl(
     CMaterialMan*, CMapShadow*, float (*)[4], int, unsigned long);
 class CMapKeyFrame;
-extern "C" float Get__12CMapKeyFrameFv(CMapKeyFrame*);
-extern "C" void Calc__12CMapKeyFrameFv(CMapKeyFrame*);
 extern "C" void ReadFrame__12CMapKeyFrameFR10CChunkFilei(CMapKeyFrame*, CChunkFile*);
 extern "C" void ReadKey__12CMapKeyFrameFR10CChunkFilei(CMapKeyFrame*, CChunkFile*, int);
 extern float FLOAT_8032faf0;

@@ -14,9 +14,6 @@ typedef unsigned char u8;
 typedef unsigned short u16;
 
 extern "C" int GetItemType__8CMenuPcsFii(CMenuPcs*, int, int);
-extern "C" int EquipCtrlCur__8CMenuPcsFv(CMenuPcs*);
-extern "C" bool EquipOpen0__8CMenuPcsFv(CMenuPcs*);
-extern "C" bool EquipClose0__8CMenuPcsFv(CMenuPcs*);
 extern "C" int ChkEquipPossible__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" int GetEquipType__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" int EquipChk__8CMenuPcsFi(CMenuPcs*, int);

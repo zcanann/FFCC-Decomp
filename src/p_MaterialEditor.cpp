@@ -17,7 +17,6 @@ extern const char sMaterialEditorSpinnerText[5] = "|/-\\";
 #include <string.h>
 
 extern "C" void* __register_global_object(void* object, void* destructor, void* regmem);
-extern "C" ZLIST* __dt__5ZLISTFv(ZLIST* self, short shouldDelete);
 extern "C" void createViewer__18CMaterialEditorPcsFv(CMaterialEditorPcs*);
 extern "C" void destroyViewer__18CMaterialEditorPcsFv(CMaterialEditorPcs*);
 extern "C" void calcViewer__18CMaterialEditorPcsFv(CMaterialEditorPcs*);

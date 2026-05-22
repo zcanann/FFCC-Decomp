@@ -7,7 +7,6 @@
 #include <string.h>
 #include "ffcc/ppp_linkage.h"
 
-extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" int rand(void);
 
 struct LocationTitleWork {
@@ -173,7 +172,7 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
     }
 
     if (work->m_particles == NULL) {
-        work->m_particles = pppMemAlloc__FUlPQ27CMemory6CStagePci(
+        work->m_particles = pppMemAlloc(
             param_2->m_maxCount * sizeof(LocationTitleParticle), pppEnvStPtr->m_stagePtr,
             const_cast<char*>(s_pppLocationTitle_cpp_801DB510), 0x6d);
         zero = 0.0f;

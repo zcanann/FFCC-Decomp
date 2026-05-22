@@ -88,7 +88,7 @@ struct PartyObjFlags {
 	unsigned char flag20 : 1;
 	unsigned char flag10 : 1;
 	unsigned char flag08 : 1;
-	unsigned char flag04 : 1;
+	signed char flag04 : 1;
 	unsigned char flag02 : 1;
 	unsigned char flag01 : 1;
 };
@@ -326,10 +326,10 @@ void CGPartyObj::onCreate()
  */
 void CGPartyObj::onDestroy()
 {
-	unsigned char* self = reinterpret_cast<unsigned char*>(this);
-	if ((int)(((unsigned int)self[0x6B8] << 0x1D) | ((unsigned int)self[0x6B8] >> 3)) < 0) {
+	PartyObjOverlay& party = PartyData(this);
+	if (party.flags.flag04) {
 		addHp(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1A), static_cast<CGPrgObj*>(0));
-		self[0x6B8] = self[0x6B8] & 0xFB;
+		party.flags.flag04 = 0;
 	}
 
 	CGCharaObj::onDestroy();

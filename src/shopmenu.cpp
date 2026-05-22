@@ -25,7 +25,6 @@ int LoadMenuPdt__8CPartPcsFPc(void*, char*);
 int GetItemType__8CMenuPcsFii(void*, int, int);
 const char* GetJobStr__8CMenuPcsFi(CMenuPcs*, int);
 void GetRaceStr__8CMenuPcsFiPc(void*, int, char*);
-int GetData__13CAmemCacheSetFsPci(void*, short, char*, int);
 int ChkEquipPossible__8CMenuPcsFi(void*, int);
 void GetRecipeMaterial__8CMenuPcsFiPQ28CMenuPcs12MaterialInfo(void*, int, short*);
 int CanAddGil__12CCaravanWorkFi(void*, int);
@@ -2846,7 +2845,7 @@ void CMenuPcs::CreateSmithMenu()
         *reinterpret_cast<_pppDataHead**>(reinterpret_cast<unsigned char*>(&PartMng) + 0x22E18 + slotIndex * 0x38);
     short* cacheChunks = reinterpret_cast<short*>(pppDataHead->m_cacheChunks);
     *reinterpret_cast<int*>(cacheChunks + 2) =
-        GetData__13CAmemCacheSetFsPci(&ppvAmemCacheSet, *cacheChunks, s_shopmenu_cpp_801ded8c, 0x32A);
+        ppvAmemCacheSet.GetData(*cacheChunks, s_shopmenu_cpp_801ded8c, 0x32A);
     int cacheData = *reinterpret_cast<int*>(cacheChunks + 2);
     pppCacheLoadShape__FPsP12_pppDataHead(
         reinterpret_cast<short*>(cacheData + *reinterpret_cast<int*>(cacheData + 0x14)), pppDataHead);
@@ -2885,7 +2884,7 @@ void CMenuPcs::CreateShopMenu()
         *reinterpret_cast<_pppDataHead**>(reinterpret_cast<unsigned char*>(&PartMng) + 0x22E18 + slotIndex * 0x38);
     short* cacheChunks = reinterpret_cast<short*>(pppDataHead->m_cacheChunks);
     *reinterpret_cast<int*>(cacheChunks + 2) =
-        GetData__13CAmemCacheSetFsPci(&ppvAmemCacheSet, *cacheChunks, s_shopmenu_cpp_801ded8c, 0x32A);
+        ppvAmemCacheSet.GetData(*cacheChunks, s_shopmenu_cpp_801ded8c, 0x32A);
     int cacheData = *reinterpret_cast<int*>(cacheChunks + 2);
     pppCacheLoadShape__FPsP12_pppDataHead(
         reinterpret_cast<short*>(cacheData + *reinterpret_cast<int*>(cacheData + 0x14)), pppDataHead);

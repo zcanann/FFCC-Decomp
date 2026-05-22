@@ -1,5 +1,6 @@
 #include "ffcc/menu_cmd.h"
 #include "ffcc/fontman.h"
+#include "ffcc/gxfunc.h"
 #include "ffcc/joybus.h"
 #include "ffcc/pad.h"
 #include "ffcc/game.h"
@@ -16,7 +17,6 @@ extern "C" void CalcStatus__12CCaravanWorkFv(void*);
 extern "C" void ChgCmdLst__12CCaravanWorkFii(void*, int, int);
 extern "C" void UniteComList__12CCaravanWorkFiii(void*, int, int, int);
 extern "C" void UnuniteComList__12CCaravanWorkFii(void*, int, int);
-extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 extern "C" void SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(CMenuPcs*, int);
 extern "C" void SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(CMenuPcs*, int);
 extern "C" void DrawRect__8CMenuPcsFUlfffffffff(CMenuPcs*, unsigned long, float, float, float, float, float, float, float, float, float);
@@ -1074,7 +1074,7 @@ void CMenuPcs::CmdDraw()
 	s32 helpId = -1;
 	bool hasItemHelp = false;
 
-	_GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
 
 	for (i = 0; i < drawList[0]; i++) {
@@ -2090,7 +2090,7 @@ void CMenuPcs::DrawUniteList()
 	s16 selected = cmd[0x26 / 2];
 	const s16 foodCount = *reinterpret_cast<const s16*>(caravanWork + 0xBAA);
 
-	_GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
 
 	DAT_8032eec8 = 0;

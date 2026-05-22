@@ -3,6 +3,7 @@
 #include "ffcc/gxfunc.h"
 #include "ffcc/mapmesh.h"
 #include "ffcc/p_camera.h"
+#include "ffcc/partMng.h"
 #include "ffcc/pppYmEnv.h"
 #include "ffcc/pppTypes.h"
 
@@ -43,7 +44,18 @@ struct _pppEnvStYmDeformationMdl {
     CMaterialSet* m_materialSetPtr;
     CMapMesh** m_mapMeshPtr;
 };
-extern _pppEnvStYmDeformationMdl* pppEnvStPtr;
+
+template <typename T>
+static inline T* PppWorkArea(pppYmDeformationMdl* object, pppYmDeformationMdlUnkC* ctrl, int index)
+{
+    return reinterpret_cast<T*>(reinterpret_cast<_pppPObject*>(object)->m_workArea + ctrl->m_serializedDataOffsets[index]);
+}
+
+static inline _pppEnvStYmDeformationMdl* DeformationMdlEnv()
+{
+    return reinterpret_cast<_pppEnvStYmDeformationMdl*>(pppEnvStPtr);
+}
+
 extern const float kYmDeformationMdlBackTextureWidth;
 extern const float kYmDeformationMdlBackTextureHeight;
 extern const float kYmDeformationMdlTexMtxOffset;
@@ -84,7 +96,7 @@ void pppDrawMesh(pppModelSt*, Vec*, int);
 void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDeformationMdlUnkB* param_2, pppYmDeformationMdlUnkC* param_3)
 {
     pppYmDeformationMdlLayout* modelObject = (pppYmDeformationMdlLayout*)pppYmDeformationMdl;
-    YmDeformationMdlState* state = (YmDeformationMdlState*)((u8*)pppYmDeformationMdl + param_3->m_serializedDataOffsets[2] + 0x80);
+    YmDeformationMdlState* state = PppWorkArea<YmDeformationMdlState>(pppYmDeformationMdl, param_3, 2);
     YmDeformationMdlColorInfo* colorInfo;
     pppModelSt* model;
     Mtx indWarpMtx;
@@ -107,9 +119,10 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
         return;
     }
 
-    model = (pppModelSt*)pppEnvStPtr->m_mapMeshPtr[param_2->m_dataValIndex];
-    colorInfo = (YmDeformationMdlColorInfo*)((u8*)pppYmDeformationMdl + param_3->m_serializedDataOffsets[1] + 0x80);
-    textureBase = reinterpret_cast<int>(reinterpret_cast<CMapMesh*>(model)->GetTexture(pppEnvStPtr->m_materialSetPtr, textureIndex));
+    _pppEnvStYmDeformationMdl* env = DeformationMdlEnv();
+    model = (pppModelSt*)env->m_mapMeshPtr[param_2->m_dataValIndex];
+    colorInfo = PppWorkArea<YmDeformationMdlColorInfo>(pppYmDeformationMdl, param_3, 1);
+    textureBase = reinterpret_cast<int>(reinterpret_cast<CMapMesh*>(model)->GetTexture(env->m_materialSetPtr, textureIndex));
 
     PSMTXIdentity(indWarpMtx);
     pppSetBlendMode(0);
@@ -232,7 +245,7 @@ void pppFrameYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDef
     YmDeformationMdlState* state;
 
     if ((gPppCalcDisabled == 0) &&
-        ((state = (YmDeformationMdlState*)((u8*)pppYmDeformationMdl + 0x80 + param_3->m_serializedDataOffsets[2])),
+        ((state = PppWorkArea<YmDeformationMdlState>(pppYmDeformationMdl, param_3, 2)),
          (param_2->m_dataValIndex != 0xFFFF))) {
         CalcGraphValue(
             (_pppPObject*)pppYmDeformationMdl, param_2->m_graphId, state->m_scale, state->m_values[0],
@@ -283,7 +296,7 @@ void pppDestructYmDeformationMdl(pppYmDeformationMdl*, pppYmDeformationMdlUnkC*)
 void pppConstruct2YmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl_, pppYmDeformationMdlUnkC* param_2)
 {
     const float& value = kYmDeformationMdlZero;
-    YmDeformationMdlState* state = (YmDeformationMdlState*)((u8*)pppYmDeformationMdl_ + 0x80 + param_2->m_serializedDataOffsets[2]);
+    YmDeformationMdlState* state = PppWorkArea<YmDeformationMdlState>(pppYmDeformationMdl_, param_2, 2);
 
     state->m_values[1] = value;
     state->m_values[0] = value;
@@ -305,7 +318,7 @@ void pppConstruct2YmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl_, pp
 void pppConstructYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl_, struct pppYmDeformationMdlUnkC* param_2)
 {
     const float& zero = kYmDeformationMdlZero;
-    YmDeformationMdlState* state = (YmDeformationMdlState*)((u8*)pppYmDeformationMdl_ + 0x80 + param_2->m_serializedDataOffsets[2]);
+    YmDeformationMdlState* state = PppWorkArea<YmDeformationMdlState>(pppYmDeformationMdl_, param_2, 2);
 
     state->m_angle = 0;
     state->m_direction = 1;

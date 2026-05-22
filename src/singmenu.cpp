@@ -80,8 +80,6 @@ struct SingMenuSoloNameTable
 extern "C" void Draw__9CShopMenuFv(void*);
 extern "C" void Calc__9CShopMenuFv(void*);
 extern "C" void SingleDrawCtrl__8CMenuPcsFv(CMenuPcs*);
-extern "C" void _WaitDrawDone__8CGraphicFPci(CGraphic*, const char*, int);
-extern "C" void DestroyTempBuffer__8CGraphicFv(CGraphic*);
 extern "C" int GetModelNo__8CMenuPcsFiii(CMenuPcs*, int, int, int);
 extern "C" void DrawHeart__8CMesMenuFffff(void*, float, float, float, float);
 extern "C" char* s_stand_80332a24;
@@ -1043,8 +1041,8 @@ void CMenuPcs::SingMenuInit()
 {
     u8* self = reinterpret_cast<u8*>(this);
 
-    _WaitDrawDone__8CGraphicFPci(&Graphic, s_singmenu_cpp_801de8d4, 0x5C2);
-    DestroyTempBuffer__8CGraphicFv(&Graphic);
+    Graphic._WaitDrawDone(s_singmenu_cpp_801de8d4, 0x5C2);
+    Graphic.DestroyTempBuffer();
 
     *reinterpret_cast<void**>(self + 0xF4) = *reinterpret_cast<void**>(reinterpret_cast<u8*>(&Graphic) + 8);
     memset(self + 0x85C, 0, 8);
@@ -1196,7 +1194,7 @@ void CMenuPcs::drawSingleMenu()
 
         if ((gSingMenuHasScriptFoodBase != 0) && (*reinterpret_cast<s16*>(*reinterpret_cast<int*>(self + 0x850) + 6) != 0)) {
             Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag = 0;
-            _WaitDrawDone__8CGraphicFPci(&Graphic, s_singmenu_cpp_801de8d4, 0x62B);
+            Graphic._WaitDrawDone(s_singmenu_cpp_801de8d4, 0x62B);
             self[0x85A] = 0;
 
             if (gSingMenuAsyncFileHandle != 0) {

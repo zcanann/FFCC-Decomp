@@ -140,7 +140,6 @@ extern "C" void draw__8CMenuPcsFv(CMenuPcs*);
 extern "C" void Calc__5CMenuFv(CMenu*);
 extern "C" void loadTextureAsync__8CMenuPcsFPPciiPQ28CMenuPcs4CTmpiii(CMenuPcs*, char**, int, int, CMenuPcs::CTmp*, int, int, int);
 extern "C" void drawSingleMenu__8CMenuPcsFv(CMenuPcs*);
-extern "C" void _WaitDrawDone__8CGraphicFPci(void*, const char*, int);
 
 static unsigned int m_table_desc0__8CMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__8CMenuPcsFv)};
 static unsigned int m_table_desc1__8CMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__8CMenuPcsFv)};
@@ -758,7 +757,7 @@ void CMenuPcs::changeMode(CMenuPcs::MENUMODE mode)
     CMenuPcs* slotMenu;
 
     if (*reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x740) != static_cast<int>(mode)) {
-        _WaitDrawDone__8CGraphicFPci(&Graphic, const_cast<char*>(s_p_menu_cpp_801d9d80), 0x1B0);
+        Graphic._WaitDrawDone(const_cast<char*>(s_p_menu_cpp_801d9d80), 0x1B0);
         currentMode = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x740);
         if (currentMode == 1) {
             destroyWorld();

@@ -68,10 +68,6 @@ extern "C" const double kCharaSharedSignedIntBias = 4503601774854144.0;
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
-extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
-extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
-extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, unsigned char, int, int,
-                                                                                unsigned char);
 extern "C" void SRTToMatrix__5CMathFPA4_fP3SRT(void*, Mtx, void*);
 extern "C" void Printf__8CGraphicFPce(void*, const char*, ...);
 extern "C" void Destroy__6CCharaFv(CChara*);
@@ -240,8 +236,8 @@ void CCharaPcs::drawViewer()
         GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
         GXSetNumChans(0);
         GXSetNumTevStages(1);
-        _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 3);
-        _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 0xFF);
+        _GXSetTevOp(GX_TEVSTAGE0, GX_REPLACE);
+        _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
         PSMTXIdentity(cameraMtx);
         GXLoadPosMtxImm(cameraMtx, 0);
         GXSetCullMode(GX_CULL_NONE);
@@ -280,12 +276,12 @@ void CCharaPcs::drawViewer()
     if (self->m_viewerDrawGrid != 0) {
         _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
         GXSetZCompLoc(GX_FALSE);
-        _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(6, 1, 0, 7, 0);
+        _GXSetAlphaCompare(GX_GEQUAL, 1, GX_AOP_AND, GX_ALWAYS, 0);
         GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
         GXSetCullMode(GX_CULL_FRONT);
         GXSetNumTevStages(1);
-        _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 4);
-        _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0xFF, 0xFF, 4);
+        _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
+        _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
         GXSetNumChans(1);
         GXSetChanCtrl(GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, 0, GX_DF_CLAMP, GX_AF_SPOT);
         GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, 0, GX_DF_CLAMP, GX_AF_NONE);

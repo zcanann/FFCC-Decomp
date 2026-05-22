@@ -31,8 +31,6 @@ extern "C" void* __vt__Q212CFlatRuntime7CObject[];
 extern "C" void* __vt__9CGBaseObj[];
 extern "C" void* __vt__8CGObject[];
 extern "C" int rand(void);
-extern "C" void SetAmbient__9CLightPcsF8_GXColor(void*, void*);
-extern "C" void SetDiffuse__9CLightPcsFUl8_GXColorP3Veci(void*, unsigned long, void*, void*, int);
 extern "C" void Create__9CGBaseObjFv(void*);
 extern "C" asm void MTX44MultVec4__5CMathFPA4_fP3VecP5Vec4d(register void*, register float (*)[4], register Vec*,
                                                             register void*);
@@ -3183,10 +3181,12 @@ void CMenuPcs::DrawMCardMenu()
 				GXSetScissor(piVar12[0x10], piVar12[0x11], piVar12[0x12], piVar12[0x13]);
 				Graphic.SetFog(1, 0);
 				unsigned int ambColor = DAT_80210830[0];
-				SetAmbient__9CLightPcsF8_GXColor(&LightPcs, &ambColor);
+				LightPcs.SetAmbient(*reinterpret_cast<_GXColor*>(&ambColor));
 				LightPcs.SetNumDiffuse(DAT_8021082c[0]);
 				for (int j = 0; j < DAT_8021082c[0]; j++) {
-					SetDiffuse__9CLightPcsFUl8_GXColorP3Veci(&LightPcs, j, &DAT_8021082c[j * 3 + 2], &DAT_8021082c[j * 3 + 5], 0);
+					LightPcs.SetDiffuse(
+						j, *reinterpret_cast<_GXColor*>(&DAT_8021082c[j * 3 + 2]),
+						reinterpret_cast<Vec*>(&DAT_8021082c[j * 3 + 5]), 0);
 				}
 				LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(0), 0, 0xFFFFFFFF);
 			}
@@ -3600,10 +3600,12 @@ void CMenuPcs::DrawLoadMenu()
 				GXSetScissor(piVar13[0x10], piVar13[0x11], piVar13[0x12], piVar13[0x13]);
 				Graphic.SetFog(1, 0);
 				unsigned int ambColor = DAT_80210830[0];
-				SetAmbient__9CLightPcsF8_GXColor(&LightPcs, &ambColor);
+				LightPcs.SetAmbient(*reinterpret_cast<_GXColor*>(&ambColor));
 				LightPcs.SetNumDiffuse(DAT_8021082c[0]);
 				for (int j = 0; j < DAT_8021082c[0]; j++) {
-					SetDiffuse__9CLightPcsFUl8_GXColorP3Veci(&LightPcs, j, &DAT_8021082c[j * 3 + 2], &DAT_8021082c[j * 3 + 5], 0);
+					LightPcs.SetDiffuse(
+						j, *reinterpret_cast<_GXColor*>(&DAT_8021082c[j * 3 + 2]),
+						reinterpret_cast<Vec*>(&DAT_8021082c[j * 3 + 5]), 0);
 				}
 				LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(0), 0, 0xFFFFFFFF);
 			}
@@ -5323,10 +5325,12 @@ void CMenuPcs::DrawFukidashi()
 				}
 				Graphic.SetFog(1, 0);
 				unsigned int ambColor = DAT_80210830[0];
-				SetAmbient__9CLightPcsF8_GXColor(&LightPcs, &ambColor);
+				LightPcs.SetAmbient(*reinterpret_cast<_GXColor*>(&ambColor));
 				LightPcs.SetNumDiffuse(DAT_8021082c[0]);
 				for (int j = 0; j < DAT_8021082c[0]; j++) {
-					SetDiffuse__9CLightPcsFUl8_GXColorP3Veci(&LightPcs, j, &DAT_8021082c[j * 3 + 2], &DAT_8021082c[j * 3 + 5], 0);
+					LightPcs.SetDiffuse(
+						j, *reinterpret_cast<_GXColor*>(&DAT_8021082c[j * 3 + 2]),
+						reinterpret_cast<Vec*>(&DAT_8021082c[j * 3 + 5]), 0);
 				}
 				LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(0), 0, 0xFFFFFFFF);
 			}
@@ -8063,11 +8067,12 @@ void CMenuPcs::DrawMainMenuSub()
 		GXSetScissor(*reinterpret_cast<unsigned int*>(view + 0x40), *reinterpret_cast<unsigned int*>(view + 0x44),
 		             *reinterpret_cast<unsigned int*>(view + 0x48), *reinterpret_cast<unsigned int*>(view + 0x4C));
 		Graphic.SetFog(1, 0);
-		SetAmbient__9CLightPcsF8_GXColor(&LightPcs, DAT_80210830);
+		LightPcs.SetAmbient(*reinterpret_cast<_GXColor*>(DAT_80210830));
 		LightPcs.SetNumDiffuse(DAT_8021082c[0]);
 		for (int lightIndex = 0; lightIndex < DAT_8021082c[0]; lightIndex++) {
-			SetDiffuse__9CLightPcsFUl8_GXColorP3Veci(&LightPcs, lightIndex, &DAT_8021082c[lightIndex * 3 + 2],
-			                                         reinterpret_cast<Vec*>(&DAT_8021082c[lightIndex * 3 + 5]), 0);
+			LightPcs.SetDiffuse(
+				lightIndex, *reinterpret_cast<_GXColor*>(&DAT_8021082c[lightIndex * 3 + 2]),
+				reinterpret_cast<Vec*>(&DAT_8021082c[lightIndex * 3 + 5]), 0);
 		}
 		LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(0), 0, 0xFFFFFFFF);
 		handle->Draw(5);
@@ -8599,12 +8604,14 @@ void CMenuPcs::SetLight(int mode)
 	int* const lightTable = DAT_8021082c + mode * 0xE;
 
 	Graphic.SetFog(1, 0);
-	SetAmbient__9CLightPcsF8_GXColor(&LightPcs, &DAT_80210830[mode * 0xE]);
+	LightPcs.SetAmbient(*reinterpret_cast<_GXColor*>(&DAT_80210830[mode * 0xE]));
 	LightPcs.SetNumDiffuse(static_cast<unsigned long>(lightTable[0]));
 
 	for (int i = 0; i < lightTable[0]; i++) {
 		localColor = lightTable[2 + i];
-		SetDiffuse__9CLightPcsFUl8_GXColorP3Veci(&LightPcs, static_cast<unsigned long>(i), &localColor, lightTable + 5 + i * 3, 0);
+		LightPcs.SetDiffuse(
+			static_cast<unsigned long>(i), *reinterpret_cast<_GXColor*>(&localColor),
+			reinterpret_cast<Vec*>(lightTable + 5 + i * 3), 0);
 	}
 
 	LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(0), 0, 0xFFFFFFFF);

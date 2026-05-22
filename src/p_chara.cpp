@@ -40,8 +40,6 @@ u8* gCharaPartWorkPtr = 0;
 
 extern "C" int __cntlzw(unsigned int);
 extern "C" void ReleasePdt__8CPartPcsFi(void*, int);
-extern "C" void SetAmbient__9CLightPcsF8_GXColor(void*, void*);
-extern "C" void SetDiffuse__9CLightPcsFUl8_GXColorP3Veci(void*, unsigned long, void*, void*, int);
 extern "C" void Create__6CCharaFv(void*);
 extern "C" void Destroy__6CCharaFv(void*);
 extern "C" void Create__Q26CChara5CAnimFPvPQ27CMemory6CStage(void*, void*, void*);
@@ -394,13 +392,14 @@ static inline void SetupBaseCharaLights(CCharaPcs* self)
     _GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
     _GXSetTevSwapModeTable(GX_TEV_SWAP2, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
     Graphic.SetFog(1, 0);
-    SetAmbient__9CLightPcsF8_GXColor(&LightPcs, Ptr(self, 0xE8));
+    LightPcs.SetAmbient(*reinterpret_cast<_GXColor*>(Ptr(self, 0xE8)));
     LightPcs.SetNumDiffuse(3);
 
     for (unsigned long lightIndex = 0; lightIndex < 3; lightIndex++) {
-        SetDiffuse__9CLightPcsFUl8_GXColorP3Veci(
-            &LightPcs, lightIndex, Ptr(self, 0xF0 + static_cast<unsigned int>(lightIndex) * 4),
-            Ptr(self, 0x108 + static_cast<unsigned int>(lightIndex) * 12), static_cast<int>(lightIndex == 2));
+        LightPcs.SetDiffuse(
+            lightIndex, *reinterpret_cast<_GXColor*>(Ptr(self, 0xF0 + static_cast<unsigned int>(lightIndex) * 4)),
+            reinterpret_cast<Vec*>(Ptr(self, 0x108 + static_cast<unsigned int>(lightIndex) * 12)),
+            static_cast<int>(lightIndex == 2));
     }
 }
 
@@ -1308,7 +1307,7 @@ void CCharaPcs::InitEnv(int envMode)
 
     if (envMode == 1 || envMode == 2) {
         _GXColor black = {0x00, 0x00, 0x00, 0xFF};
-        SetAmbient__9CLightPcsF8_GXColor(&LightPcs, &black);
+        LightPcs.SetAmbient(black);
         LightPcs.SetNumDiffuse(0);
         LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(0), 0, 0xFFFFFFFF);
     } else {
@@ -1452,7 +1451,7 @@ void CCharaPcs::drawMakeTexShadow()
     _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
     _GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
     _GXSetTevSwapModeTable(GX_TEV_SWAP2, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-    SetAmbient__9CLightPcsF8_GXColor(&LightPcs, &shadowColor);
+    LightPcs.SetAmbient(shadowColor);
     LightPcs.SetNumDiffuse(0);
     LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(0), 0, 0xFFFFFFFF);
 
@@ -1501,7 +1500,7 @@ void CCharaPcs::drawShadow()
     _GXSetTevSwapModeTable(GX_TEV_SWAP2, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
 
     _GXColor shadowColor = {0x00, 0x00, 0x00, 0xFF};
-    SetAmbient__9CLightPcsF8_GXColor(&LightPcs, &shadowColor);
+    LightPcs.SetAmbient(shadowColor);
     LightPcs.SetNumDiffuse(0);
     LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(0), 0, 0xFFFFFFFF);
 

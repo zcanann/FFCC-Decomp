@@ -64,7 +64,7 @@ void CMenuPcs::CompaDraw()
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-	unsigned int scriptFood = Game.m_scriptFoodBase[0];
+	const CCaravanWork* caravanWork = reinterpret_cast<const CCaravanWork*>(Game.m_scriptFoodBase[0]);
 	CompaOpenAnimList* compaList = this->compaList;
 	CompaOpenAnim* entry = compaList->entries;
 	int count = compaList->count;
@@ -197,7 +197,7 @@ void CMenuPcs::CompaDraw()
 
 	int familyCount = 2;
 	for (int i = 2; i < 7; i++) {
-		if (*reinterpret_cast<short*>(scriptFood + 0x9CA + i * 2) > 0) {
+		if (caravanWork->m_evtWordArr[19 + i] > 0) {
 			familyCount++;
 		}
 	}
@@ -223,7 +223,7 @@ void CMenuPcs::CompaDraw()
 	for (int i = 0; i < 8 && shown < familyCount; i++) {
 		int drawIndex = memberIndex;
 		if (memberIndex > 1) {
-			while (drawIndex < 8 && *reinterpret_cast<short*>(scriptFood + 0x9CA + drawIndex * 2) == 0) {
+			while (drawIndex < 8 && caravanWork->m_evtWordArr[19 + drawIndex] == 0) {
 				drawIndex++;
 			}
 			if (drawIndex > 7) {
@@ -231,7 +231,8 @@ void CMenuPcs::CompaDraw()
 			}
 		}
 
-		const u8* compatibility = reinterpret_cast<const u8*>(&Game) + *reinterpret_cast<int*>(scriptFood + 8) * 0x208 + drawIndex + 0xA9;
+		const u8* compatibility =
+			reinterpret_cast<const u8*>(&Game) + caravanWork->m_saveSlot * 0x208 + drawIndex + 0xA9;
 		u8 food = *compatibility;
 		if (food == 0 && System.m_execParam >= 1) {
 			System.Printf(const_cast<char*>(s_pcts_pctd_family_cnt_error_pctd_801DEDC8), s_menu_compa_cpp_801DEDE8, 0x1E0,
@@ -274,7 +275,7 @@ void CMenuPcs::CompaDraw()
 	for (int i = 0; i < 8 && shown < familyCount; i++) {
 		int drawIndex = memberIndex;
 		if (memberIndex > 1) {
-			while (drawIndex < 8 && *reinterpret_cast<short*>(scriptFood + 0x9CA + drawIndex * 2) <= 0) {
+			while (drawIndex < 8 && caravanWork->m_evtWordArr[19 + drawIndex] <= 0) {
 				drawIndex++;
 			}
 			if (drawIndex > 7) {
@@ -288,7 +289,7 @@ void CMenuPcs::CompaDraw()
 		font->SetPosY(y);
 		font->Draw(name);
 
-		short food = *reinterpret_cast<short*>(scriptFood + 0x9CA + drawIndex * 2);
+		short food = caravanWork->m_evtWordArr[19 + drawIndex];
 		const char* value = flatData->table[2].strings[food];
 		font->SetPosX(static_cast<float>(compaList->entries[0].x + 0x90));
 		font->SetPosY(y);
@@ -305,7 +306,7 @@ void CMenuPcs::CompaDraw()
 	font->DrawInit();
 	font->SetColor(textColor);
 
-	const char* job = GetJobStr(*reinterpret_cast<int*>(scriptFood + 0x3AC));
+	const char* job = GetJobStr(caravanWork->unk_0x3ac);
 	font->GetWidth(job);
 	font->SetPosX(static_cast<float>(compaList->entries[0].x + 0x18));
 	font->SetPosY(static_cast<float>(compaList->entries[0].y + 0x20) - FLOAT_80333020 - FLOAT_80333028);

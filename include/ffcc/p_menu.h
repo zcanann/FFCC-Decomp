@@ -17,8 +17,6 @@ class CPad;
 class CRingMenu;
 class CMesMenu;
 
-extern unsigned int m_table__8CMenuPcs[];
-
 struct McListInfo
 {
     void operator=(const McListInfo&);
@@ -27,6 +25,8 @@ struct McListInfo
 class CMenuPcs : public CProcess
 {
 public:
+    static unsigned int m_table[0x57];
+
     struct BattleHudState
     {
         int m_visible;

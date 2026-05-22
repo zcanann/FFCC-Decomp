@@ -162,7 +162,7 @@ static unsigned int m_table_desc3__8CMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_ca
 static unsigned int m_table_desc4__8CMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(loadTextureAsync__8CMenuPcsFPPciiPQ28CMenuPcs4CTmpiii)};
 static unsigned int m_table_desc5__8CMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawSingleMenu__8CMenuPcsFv)};
 
-unsigned int m_table__8CMenuPcs[0x57] = {
+unsigned int CMenuPcs::m_table[0x57] = {
     reinterpret_cast<unsigned int>(const_cast<char*>(kMenuPcsStageName)),
     m_table_desc0__8CMenuPcs[0], m_table_desc0__8CMenuPcs[1], m_table_desc0__8CMenuPcs[2],
     m_table_desc1__8CMenuPcs[0], m_table_desc1__8CMenuPcs[1], m_table_desc1__8CMenuPcs[2],
@@ -326,7 +326,7 @@ void CMenuPcs::Quit()
  */
 int CMenuPcs::GetTable(unsigned long index)
 {
-    return reinterpret_cast<int>(m_table__8CMenuPcs + index * 0x57);
+    return reinterpret_cast<int>(m_table + index * 0x57);
 }
 
 /*

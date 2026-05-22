@@ -242,6 +242,9 @@ public:
     void DrawMcWin(short, short);
     void DrawMcWinMess(int, int);
     void GetWinSize(int, short*, short*, int);
+    const char* const* GetMcWinMessBuff(int);
+    int GetWinMess(int);
+    int GetYesNoXPos(int);
     void SetTextureLoc(int);
     float GetMaxAnimWait();
     void BindMcObj();

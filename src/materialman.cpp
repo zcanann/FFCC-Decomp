@@ -1,4 +1,5 @@
 #include "ffcc/materialman.h"
+#include "ffcc/map.h"
 #include "ffcc/pad.h"
 #include "ffcc/chunkfile.h"
 #include "ffcc/linkage.h"
@@ -29,9 +30,6 @@ extern "C" int CheckName__8CTextureFPc(CTexture*, char*);
 extern "C" int CheckFrustum__6CBoundFR3VecPA4_ff(CBound*, Vec*, float (*)[4], float);
 extern "C" void SetShadow__12CMaterialManFR10CMapShadowPA4_fiUl(
     CMaterialMan*, CMapShadow*, float (*)[4], int, unsigned long);
-class CMapKeyFrame;
-extern "C" void ReadFrame__12CMapKeyFrameFR10CChunkFilei(CMapKeyFrame*, CChunkFile*);
-extern "C" void ReadKey__12CMapKeyFrameFR10CChunkFilei(CMapKeyFrame*, CChunkFile*, int);
 extern float FLOAT_8032faf0;
 extern float FLOAT_8032faf4;
 extern float FLOAT_8032faf8;
@@ -95,13 +93,6 @@ static inline void _GXSetAlphaCompare(int comp0, int ref0, int op, int comp1, in
 {
     _GXSetAlphaCompare((_GXCompare)comp0, (unsigned char)ref0, (_GXAlphaOp)op, (_GXCompare)comp1, (unsigned char)ref1);
 }
-
-class CMapKeyFrame
-{
-public:
-    float Get();
-    void Calc();
-};
 
 template <class T>
 class CPtrArray
@@ -2786,16 +2777,14 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                     while (chunkFile.GetNextChunk(chunk) != 0) {
                         if (chunk.m_id == CHUNK_UFRM) {
                             keyFrameU = AllocMapKeyFrame(0xDD3);
-                            ReadFrame__12CMapKeyFrameFR10CChunkFilei(keyFrameU, &chunkFile);
+                            keyFrameU->ReadFrame(chunkFile, 0);
                         } else if (chunk.m_id == CHUNK_VFRM) {
                             keyFrameV = AllocMapKeyFrame(0xDDD);
-                            ReadFrame__12CMapKeyFrameFR10CChunkFilei(keyFrameV, &chunkFile);
+                            keyFrameV->ReadFrame(chunkFile, 0);
                         } else if (chunk.m_id == CHUNK_UKEY) {
-                            ReadKey__12CMapKeyFrameFR10CChunkFilei(
-                                keyFrameU, &chunkFile, static_cast<char>(chunk.m_arg0));
+                            keyFrameU->ReadKey(chunkFile, static_cast<char>(chunk.m_arg0));
                         } else if (chunk.m_id == CHUNK_VKEY) {
-                            ReadKey__12CMapKeyFrameFR10CChunkFilei(
-                                keyFrameV, &chunkFile, static_cast<char>(chunk.m_arg0));
+                            keyFrameV->ReadKey(chunkFile, static_cast<char>(chunk.m_arg0));
                         } else if (chunk.m_id == CHUNK_TSDT) {
                             unsigned int slot = chunkFile.Get2() & 0xFFFF;
                             chunkFile.Get2();

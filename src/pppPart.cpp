@@ -67,7 +67,6 @@ extern "C" unsigned int DAT_8032ed80;
 extern "C" void SetPart__9CLightPcsFQ29CLightPcs6TARGETPvUc(CLightPcs*, int, void*, unsigned char);
 extern "C" void InitVtxFmt__12CMaterialManFi11_GXCompTypei11_GXCompTypei11_GXCompTypei(CMaterialMan*, int, _GXCompType, int, _GXCompType, int, _GXCompType, int);
 extern "C" void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
-extern "C" void _WaitDrawDone__8CGraphicFPci(CGraphic*, const char*, int);
 extern "C" int printf(const char*, ...);
 
 _pppEnvSt* pppEnvStPtr;
@@ -952,7 +951,7 @@ void pppDeletePObject(_pppPObject*)
  */
 void _pppAllFreePObject(_pppMngSt* pppMngSt)
 {
-	_WaitDrawDone__8CGraphicFPci(&Graphic, s_pppPart_cpp, 0x362);
+	Graphic._WaitDrawDone(const_cast<char*>(s_pppPart_cpp), 0x362);
 
 	_pppMngSt* oldMngSt = pppMngStPtr;
 	pppMngStPtr = pppMngSt;
@@ -1046,7 +1045,7 @@ void _pppAllFreePObject(_pppMngSt* pppMngSt)
 		pppMngSt->m_hasMapRef = 0;
 	}
 
-	_WaitDrawDone__8CGraphicFPci(&Graphic, s_pppPart_cpp, 0x3A1);
+	Graphic._WaitDrawDone(const_cast<char*>(s_pppPart_cpp), 0x3A1);
 	pppMngStPtr = oldMngSt;
 }
 
@@ -2840,9 +2839,9 @@ void pppHitCylinderSendSystem(_pppMngSt* pppMngSt, Vec* origin, Vec* vector, flo
 
 					if (Game.m_currentSceneId == 7)
 					{
-						_WaitDrawDone__8CGraphicFPci(&Graphic, s_pppPart_cpp, 0xADB);
+						Graphic._WaitDrawDone(const_cast<char*>(s_pppPart_cpp), 0xADB);
 						_pppAllFreePObject(pppMngSt);
-						_WaitDrawDone__8CGraphicFPci(&Graphic, s_pppPart_cpp, 0xADD);
+						Graphic._WaitDrawDone(const_cast<char*>(s_pppPart_cpp), 0xADD);
 					}
 					else
 					{

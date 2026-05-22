@@ -43,7 +43,6 @@ int rand(void);
 void* GetCharaHandlePtr__FP8CGObjectl(void*, long);
 int GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void*);
 void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(void*, long, float&, float&, float&, float, float&, float&);
-void _WaitDrawDone__8CGraphicFPci(CGraphic*, const char*, int);
 }
 
 struct POLYGON_DATA {
@@ -411,7 +410,7 @@ fail:
  */
 void pppDestructCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkC* data)
 {
-    _WaitDrawDone__8CGraphicFPci(&Graphic, const_cast<char*>(s_pppCharaBreak_cpp_801dd690), 0x319);
+    Graphic._WaitDrawDone(const_cast<char*>(s_pppCharaBreak_cpp_801dd690), 0x319);
 
     CharaBreakWork* work = (CharaBreakWork*)(charaBreak->m_workArea + data->m_serializedDataOffsets[2]);
     CChara::CModel* model = work->m_model;

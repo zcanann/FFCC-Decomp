@@ -33,7 +33,6 @@ void pppSetBlendMode(unsigned char);
 
 extern "C" {
 void SetDrawDoneDebugData__8CGraphicFSc(void*, signed char);
-void _WaitDrawDone__8CGraphicFPci(CGraphic*, const char*, int);
 void* GetCharaHandlePtr__FP8CGObjectl(void* obj, long index);
 int GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void* handle);
 void pppHeapUseRate__FPQ27CMemory6CStage(CMemory::CStage* stage);
@@ -277,7 +276,7 @@ void pppDestructEmission(pppEmission* pppEmission_, pppEmissionUnkC* param_2) {
     model->m_drawMeshDlCallback = 0;
     model->m_afterDrawMeshCallback = 0;
 
-    _WaitDrawDone__8CGraphicFPci(&Graphic, const_cast<char*>(s_pppEmission_cpp_801db7e8), 0x118);
+    Graphic._WaitDrawDone(const_cast<char*>(s_pppEmission_cpp_801db7e8), 0x118);
     CMemory::CStage* stage = (CMemory::CStage*)state[0];
     if (stage != (CMemory::CStage*)0) {
         pppHeapUseRate__FPQ27CMemory6CStage(stage);

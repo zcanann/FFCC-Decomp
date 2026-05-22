@@ -17,7 +17,6 @@
 #include <PowerPC_EABI_Support/Runtime/New.h>
 
 extern "C" {
-void _WaitDrawDone__8CGraphicFPci(void*, char*, int);
 void SetDrawDoneDebugData__8CGraphicFSc(void*, signed char);
 void SetMode__9CShopMenuFi(void*, int);
 void DrawSingleBase__8CMenuPcsFf(void*, float);
@@ -2823,7 +2822,7 @@ void CMenuPcs::CreateSmithMenu()
     *reinterpret_cast<CShopMenu**>(menuPcs + 0x878) = shopMenu;
     shopMenu = *reinterpret_cast<CShopMenu**>(menuPcs + 0x878);
 
-    _WaitDrawDone__8CGraphicFPci(&Graphic, s_shopmenu_cpp_801ded8c, 0x2FE);
+    Graphic._WaitDrawDone(s_shopmenu_cpp_801ded8c, 0x2FE);
     *reinterpret_cast<void**>(shopMenu) = nullptr;
     *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(shopMenu) + 0x20) = Game.m_scriptFoodBase[0];
     SetMode__9CShopMenuFi(shopMenu, 9);
@@ -2862,7 +2861,7 @@ void CMenuPcs::CreateShopMenu()
     *reinterpret_cast<CShopMenu**>(menuPcs + 0x878) = shopMenu;
     shopMenu = *reinterpret_cast<CShopMenu**>(menuPcs + 0x878);
 
-    _WaitDrawDone__8CGraphicFPci(&Graphic, s_shopmenu_cpp_801ded8c, 0x2FE);
+    Graphic._WaitDrawDone(s_shopmenu_cpp_801ded8c, 0x2FE);
     *reinterpret_cast<void**>(shopMenu) = nullptr;
     *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(shopMenu) + 0x20) = Game.m_scriptFoodBase[0];
     SetMode__9CShopMenuFi(shopMenu, 0);

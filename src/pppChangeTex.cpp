@@ -117,7 +117,6 @@ static void ChangeTex_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int
 static void ChangeTex_AfterDrawMeshCallback(CChara::CModel*, void*, void*, int, float (*)[4]);
 
 extern "C" {
-	void _WaitDrawDone__8CGraphicFPci(CGraphic* graphic, const char* file, int line);
 		void* GetCharaHandlePtr__FP8CGObjectl(void* obj, long index);
 		int GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void* handle);
 		void pppHeapUseRate__FPQ27CMemory6CStage(void* stage);
@@ -320,7 +319,7 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
  */
 void pppDestructChangeTex(pppChangeTex* changeTex, pppChangeTexUnkC* data)
 {
-	_WaitDrawDone__8CGraphicFPci(&Graphic, const_cast<char*>(s_pppChangeTex_cpp_801dd660), 0x9d);
+	Graphic._WaitDrawDone(const_cast<char*>(s_pppChangeTex_cpp_801dd660), 0x9d);
 	int dataOffset = data->m_serializedDataOffsets[2];
 	ChangeTexWork* work = (ChangeTexWork*)(changeTex->m_object.m_workArea + dataOffset);
 	void* handle0 = GetCharaHandlePtr__FP8CGObjectl(work->m_charaObj, 0);

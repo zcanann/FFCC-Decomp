@@ -5,6 +5,7 @@
 #include "ffcc/math.h"
 #include "ffcc/gobject.h"
 #include "ffcc/graphic.h"
+#include "ffcc/gxfunc.h"
 #include "ffcc/linkage.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/p_menu.h"
@@ -48,9 +49,6 @@ extern "C" {
 extern unsigned char m_mogWork[0x30];
 void* gMogFurTexBuffer;
 }
-extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
-extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
-extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, int, int, int, int);
 extern float FLOAT_8033110C;
 extern float FLOAT_80331138;
 extern float FLOAT_8033114C;
@@ -837,9 +835,9 @@ static void FurSetupTextureCopyEnv()
 	GXSetAlphaUpdate(GX_TRUE);
 	GXSetViewport(0.0f, 0.0f, 128.0f, 128.0f, 0.0f, 1.0f);
 	GXSetScissor(0, 0, 0x80, 0x80);
-	_GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 	GXSetZCompLoc(GX_FALSE);
-	_GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(6, 1, 0, 7, 0);
+	_GXSetAlphaCompare(GX_GEQUAL, 1, GX_AOP_AND, GX_ALWAYS, 0);
 	GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
 	GXSetCullMode(GX_CULL_NONE);
 	GXSetNumTevStages(1);
@@ -1705,9 +1703,9 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 	                                static_cast<unsigned char>(furShade), 0xFF)
 	                             .color;
 
-	_GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 	GXSetZCompLoc((u8)0);
-	_GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(6, 1, 0, 7, 0);
+	_GXSetAlphaCompare(GX_GEQUAL, 1, GX_AOP_AND, GX_ALWAYS, 0);
 	GXSetZMode((u8)1, (GXCompare)3, (u8)0);
 	GXSetCullMode(GX_CULL_BACK);
 	GXClearVtxDesc();
@@ -1826,8 +1824,7 @@ extern "C" void makeFurTex__6CCharaFv()
 	s_mogFurMaxY = 0.0f;
 
 	if (gMogFurTexBuffer == 0) {
-		gMogFurTexBuffer = _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
-			&Memory, 0x20000, 0, const_cast<char*>(s_chara_fur_cpp_801db72c), 0xE9, 0);
+		gMogFurTexBuffer = Memory._Alloc(0x20000, 0, const_cast<char*>(s_chara_fur_cpp_801db72c), 0xE9, 0);
 	}
 	if (gMogFurTexBuffer == 0) {
 		return;

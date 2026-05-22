@@ -1,6 +1,7 @@
 #define PPP_BREATHMODEL_CUSTOM_PARTICLE_TYPES
 #include "ffcc/pppBreathModel.h"
 #include "ffcc/linkage.h"
+#include "ffcc/gxfunc.h"
 #include "dolphin/mtx.h"
 #include "dolphin/gx.h"
 #include "ffcc/math.h"
@@ -18,10 +19,6 @@ void pppSetBlendMode(unsigned char);
 extern "C" {
 void pppHeapUseRate__FPQ27CMemory6CStage(void* stage);
 
-void pppDrawMesh__FP10pppModelStP3Veci(pppModelSt*, Vec*, int);
-
-void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
-void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 void DrawSphere__8CGraphicFPA4_f8_GXColor(void*, Mtx, _GXColor);
 }
 
@@ -315,7 +312,7 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
     model = reinterpret_cast<pppModelSt*>(pppEnvStPtr->m_mapMeshPtr[pBreathModel->m_stepValue]);
     pppInitBlendMode();
     pppSetBlendMode(pBreathModel->m_blendMode);
-    _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
+    _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
     pppSetDrawEnv(
         static_cast<pppCVECTOR*>(NULL), static_cast<pppFMATRIX*>(NULL), pBreathModel->m_drawEnvScale,
         pBreathModel->m_drawEnvColor1, pBreathModel->m_drawEnvColor0, pBreathModel->m_blendMode,
@@ -383,7 +380,7 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
             drawColor.b = (u8)b;
             drawColor.a = (u8)a;
             GXSetChanAmbColor(GX_COLOR0A0, drawColor);
-            pppDrawMesh__FP10pppModelStP3Veci(model, object->m_drawMatrixPtr, 1);
+            pppDrawMesh(model, object->m_drawMatrixPtr, 1);
         }
 
         if (matrixList != NULL) {
@@ -462,7 +459,7 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
         }
 
         pppInitBlendMode();
-        _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 2);
+        _GXSetTevOp(GX_TEVSTAGE0, GX_BLEND);
     }
 }
 

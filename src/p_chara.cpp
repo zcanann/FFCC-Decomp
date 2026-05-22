@@ -2,6 +2,7 @@
 #include "ffcc/chunkfile.h"
 #include "ffcc/color.h"
 #include "ffcc/graphic.h"
+#include "ffcc/gxfunc.h"
 #include "ffcc/linkage.h"
 #include "ffcc/memory.h"
 #include "ffcc/p_camera.h"
@@ -39,16 +40,7 @@ u8* gCharaPartWorkPtr = 0;
 
 extern "C" int __cntlzw(unsigned int);
 extern "C" void ReleasePdt__8CPartPcsFi(void*, int);
-extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
-extern "C" void CopyFromAMemorySync__7CMemoryFPvPvUl(CMemory*, void*, void*, unsigned long);
-extern "C" void CopyToAMemorySync__7CMemoryFPvPvUl(CMemory*, void*, void*, unsigned long);
 extern "C" void SetStdProjectionMatrix__10CCameraPcsFv(void*);
-extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
-extern "C" void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
-extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
-extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
-extern "C" void _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
-    int, int, int, int, int);
 extern "C" void SetFog__8CGraphicFii(void*, int, int);
 extern "C" void SetAmbient__9CLightPcsF8_GXColor(void*, void*);
 extern "C" void SetNumDiffuse__9CLightPcsFUl(void*, unsigned long);
@@ -403,12 +395,9 @@ static inline CMemory::CStage*& CharaAmemStage()
 
 static inline void SetupBaseCharaLights(CCharaPcs* self)
 {
-    _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
-        0, 0, 1, 2, 3);
-    _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
-        1, 0, 1, 2, 3);
-    _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
-        2, 0, 1, 2, 3);
+    _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
+    _GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
+    _GXSetTevSwapModeTable(GX_TEV_SWAP2, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
     SetFog__8CGraphicFii(&Graphic, 1, 0);
     SetAmbient__9CLightPcsF8_GXColor(&LightPcs, Ptr(self, 0xE8));
     SetNumDiffuse__9CLightPcsFUl(&LightPcs, 3);
@@ -846,7 +835,7 @@ void CCharaPcs::create()
         Memory.CreateStage(CurrentSceneId() == 4 ? 0x190000UL : 0x1E0000UL, const_cast<char*>(s_CCharaPcs_loadAnim), 0);
 
     CHandle* sentinel = reinterpret_cast<CHandle*>(
-        _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(&Memory, 0x194, StageAt(&CharaPcs, 0xC0), const_cast<char*>(s_p_chara_cpp), 0xDB, 0));
+        Memory._Alloc(0x194, StageAt(&CharaPcs, 0xC0), const_cast<char*>(s_p_chara_cpp), 0xDB, 0));
     if (sentinel != 0) {
         sentinel->m_previous = 0;
         sentinel->m_next = 0;
@@ -1041,7 +1030,7 @@ complete:
 int CCharaPcs::correctLoadAnimAmem()
 {
     unsigned char* tempBuffer = reinterpret_cast<unsigned char*>(
-        _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(&Memory, 0x80000, StageAt(this, 0xD4), const_cast<char*>(s_p_chara_cpp), 0x162, 1));
+        Memory._Alloc(0x80000, StageAt(this, 0xD4), const_cast<char*>(s_p_chara_cpp), 0x162, 1));
     if (tempBuffer == 0) {
         return -1;
     }
@@ -1092,8 +1081,8 @@ int CCharaPcs::correctLoadAnimAmem()
                 nextOffset = static_cast<int>(animEnd);
             }
 
-            CopyFromAMemorySync__7CMemoryFPvPvUl(
-                &Memory, tempBuffer + chunkSize,
+            Memory.CopyFromAMemorySync(
+                tempBuffer + chunkSize,
                 reinterpret_cast<void*>(*reinterpret_cast<int*>(Ptr(StageAt(this, 0xC4), 8)) + static_cast<int>(animOffset)),
                 static_cast<unsigned long>(animSize));
 
@@ -1102,8 +1091,8 @@ int CCharaPcs::correctLoadAnimAmem()
         }
 
         if (chunkSize != 0) {
-            CopyToAMemorySync__7CMemoryFPvPvUl(
-                &Memory, tempBuffer, reinterpret_cast<void*>(*reinterpret_cast<int*>(Ptr(StageAt(this, 0xC4), 8)) + compactedSize),
+            Memory.CopyToAMemorySync(
+                tempBuffer, reinterpret_cast<void*>(*reinterpret_cast<int*>(Ptr(StageAt(this, 0xC4), 8)) + compactedSize),
                 static_cast<unsigned long>(chunkSize));
         }
 
@@ -1318,12 +1307,9 @@ void CCharaPcs::SetSpecularAlpha(int alpha)
  */
 void CCharaPcs::InitEnv(int envMode)
 {
-    _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
-        0, 0, 1, 2, 3);
-    _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
-        1, 0, 1, 2, 3);
-    _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
-        2, 0, 1, 2, 3);
+    _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
+    _GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
+    _GXSetTevSwapModeTable(GX_TEV_SWAP2, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
 
     if (envMode == 1 || envMode == 2) {
         _GXColor black = {0x00, 0x00, 0x00, 0xFF};
@@ -1468,12 +1454,9 @@ void CCharaPcs::drawMakeTexShadow()
     GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
     Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &backBufferTexObj, 0, 0, texSize, texSize, 0, GX_NEAR, GX_TF_RGBA8, 0);
 
-    _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
-        0, 0, 1, 2, 3);
-    _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
-        1, 0, 1, 2, 3);
-    _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
-        2, 0, 1, 2, 3);
+    _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
+    _GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
+    _GXSetTevSwapModeTable(GX_TEV_SWAP2, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
     SetAmbient__9CLightPcsF8_GXColor(&LightPcs, &shadowColor);
     SetNumDiffuse__9CLightPcsFUl(&LightPcs, 0);
     SetPosition__9CLightPcsFQ29CLightPcs6TARGETP3VecUl(&LightPcs, 0, 0, 0xFFFFFFFF);
@@ -1518,12 +1501,9 @@ void CCharaPcs::drawShadow()
         return;
     }
 
-    _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
-        0, 0, 1, 2, 3);
-    _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
-        1, 0, 1, 2, 3);
-    _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
-        2, 0, 1, 2, 3);
+    _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
+    _GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
+    _GXSetTevSwapModeTable(GX_TEV_SWAP2, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
 
     _GXColor shadowColor = {0x00, 0x00, 0x00, 0xFF};
     SetAmbient__9CLightPcsF8_GXColor(&LightPcs, &shadowColor);
@@ -1964,9 +1944,8 @@ void CCharaPcs::LoadMergeFile(int mergeFileId, int mergeFlags, int streamToAmem)
                                     loadModel->m_streamMode = 1;
                                     loadModel->m_streamOffset = reinterpret_cast<void*>(LoadStreamCursor(this));
                                     loadModel->m_streamSize = rawSize;
-                                    CopyToAMemorySync__7CMemoryFPvPvUl(
-                                        &Memory, rawData,
-                                        reinterpret_cast<unsigned char*>(StageBase(StageAt(this, 0xC8))) + LoadStreamCursor(this),
+                                    Memory.CopyToAMemorySync(
+                                        rawData, reinterpret_cast<unsigned char*>(StageBase(StageAt(this, 0xC8))) + LoadStreamCursor(this),
                                         static_cast<unsigned long>(rawSize));
                                     LoadStreamCursor(this) += static_cast<unsigned int>(rawSize);
                                 }
@@ -2015,9 +1994,8 @@ void CCharaPcs::LoadMergeFile(int mergeFileId, int mergeFlags, int streamToAmem)
                                     loadTexture->m_streamMode = 1;
                                     loadTexture->m_streamOffset = reinterpret_cast<void*>(LoadStreamCursor(this));
                                     loadTexture->m_streamSize = rawSize;
-                                    CopyToAMemorySync__7CMemoryFPvPvUl(
-                                        &Memory, rawData,
-                                        reinterpret_cast<unsigned char*>(StageBase(StageAt(this, 0xC8))) + LoadStreamCursor(this),
+                                    Memory.CopyToAMemorySync(
+                                        rawData, reinterpret_cast<unsigned char*>(StageBase(StageAt(this, 0xC8))) + LoadStreamCursor(this),
                                         static_cast<unsigned long>(rawSize));
                                     LoadStreamCursor(this) += static_cast<unsigned int>(rawSize);
                                 }
@@ -2175,7 +2153,7 @@ void CCharaPcs::drawOverlap()
     GXSetNumChans(1);
     GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_SPEC);
     GXSetChanCtrl(GX_COLOR1A1, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
-    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 
     _GXColor black = {0x00, 0x00, 0x00, 0xFF};
     GXSetChanMatColor(GX_COLOR0A0, black);
@@ -2185,11 +2163,10 @@ void CCharaPcs::drawOverlap()
     GXSetNumTevStages(1);
     GXSetZMode(GX_TRUE, GX_ALWAYS, GX_TRUE);
     GXSetTevDirect(GX_TEVSTAGE0);
-    _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0xFF, 0xFF, 4);
-    _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 4);
-    _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
-    _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
-        0, 0, 1, 2, 3);
+    _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
+    _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
+    _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
+    _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
     SetFog__8CGraphicFii(&Graphic, 0, 0);
     PSMTXIdentity(identityMtx);
     GXLoadPosMtxImm(identityMtx, GX_PNMTX0);
@@ -2232,16 +2209,16 @@ void CCharaPcs::drawOverlap()
     GXLoadPosMtxImm(identityMtx, GX_PNMTX0);
     GXSetCurrentMtx(GX_PNMTX0);
     GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
-    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     GXClearVtxDesc();
     GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
     GXSetNumTevStages(1);
     SetFog__8CGraphicFii(&Graphic, 0, 0);
     GXSetTevDirect(GX_TEVSTAGE0);
-    _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 4);
-    _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 4);
-    _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
+    _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
+    _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
+    _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
 
     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
     GXPosition3f32(0.0f, 0.0f, 0.0f);
@@ -2249,7 +2226,7 @@ void CCharaPcs::drawOverlap()
     GXPosition3f32(0.0f, 448.0f, 0.0f);
     GXPosition3f32(640.0f, 448.0f, 0.0f);
 
-    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 1, 5);
+    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_ONE, GX_LO_NOOP);
     _GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
     GXSetChanMatColor(GX_COLOR0A0, white);
     GXLoadTexObj(backBufferTex, GX_TEXMAP0);
@@ -2262,7 +2239,7 @@ void CCharaPcs::drawOverlap()
     GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_U16, 0);
-    _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 0);
+    _GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
 
     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
     GXPosition3f32(0.0f, 0.0f, 0.0f);
@@ -2290,7 +2267,7 @@ void CCharaPcs::drawOverlap()
  */
 void* CCharaPcs::CHandle::operator new(unsigned long size, CMemory::CStage*, char* file, int line)
 {
-    return _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(&Memory, size, StageAt(&CharaPcs, 0xC0), file, line, 0);
+    return Memory._Alloc(size, StageAt(&CharaPcs, 0xC0), file, line, 0);
 }
 
 /*
@@ -2471,8 +2448,8 @@ void CCharaPcs::CHandle::ChangeTexture(
         File.Close(fileHandle);
     } else if (loadTexture->m_streamOffset != 0 && reinterpret_cast<int*>(loadTexture)[1] == 1) {
         File.LockBuffer();
-        CopyFromAMemorySync__7CMemoryFPvPvUl(
-            &Memory, File.m_readBuffer,
+        Memory.CopyFromAMemorySync(
+            File.m_readBuffer,
             reinterpret_cast<unsigned char*>(StageBase(StageAt(&CharaPcs, 0xC8))) +
                 reinterpret_cast<unsigned int>(loadTexture->m_streamOffset),
             static_cast<unsigned long>(loadTexture->m_streamSize));
@@ -2584,8 +2561,8 @@ void CCharaPcs::CHandle::LoadModel(
         if (reinterpret_cast<int*>(loadModel)[1] == 1) {
             if (loadModel->m_streamOffset != 0) {
                 File.LockBuffer();
-                CopyFromAMemorySync__7CMemoryFPvPvUl(
-                    &Memory, File.m_readBuffer,
+                Memory.CopyFromAMemorySync(
+                    File.m_readBuffer,
                     reinterpret_cast<unsigned char*>(StageBase(StageAt(&CharaPcs, 0xC8))) +
                         reinterpret_cast<unsigned int>(loadModel->m_streamOffset),
                     static_cast<unsigned long>(loadModel->m_streamSize));

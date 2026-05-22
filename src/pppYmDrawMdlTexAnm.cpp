@@ -81,8 +81,6 @@ void pppUnitMatrix(pppFMATRIX&);
 void pppMulMatrix(pppFMATRIX&, pppFMATRIX, pppFMATRIX);
 
 extern "C" {
-void pppDrawMesh__FP10pppModelStP3Veci(pppModelSt* model, Vec* matrixPtr, s32 flag);
-
 /*
  * --INFO--
  * PAL Address: 8008a38c
@@ -124,7 +122,7 @@ void pppRenderYmDrawMdlTexAnm(_pppPObject* object, pppYmDrawMdlTexAnmStep* step,
         step->m_payload[0xC], initBytes[2], initBytes[1], initBytes[3], stepBytes[0], stepBytes[1], stepBytes[2]);
 
     pppSetBlendMode(initBytes[1]);
-    pppDrawMesh__FP10pppModelStP3Veci(model, ymDrawMdlTexAnm->m_drawMatrixPtr, 1);
+    pppDrawMesh(model, ymDrawMdlTexAnm->m_drawMatrixPtr, 1);
 }
 
 /*

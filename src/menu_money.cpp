@@ -3,6 +3,7 @@
 #include "ffcc/fontman.h"
 #include "ffcc/gobjwork.h"
 #include "ffcc/game.h"
+#include "ffcc/gxfunc.h"
 #include "ffcc/pad.h"
 #include "ffcc/sound.h"
 #include "ffcc/system.h"
@@ -13,7 +14,6 @@ typedef unsigned char u8;
 typedef signed short s16;
 typedef unsigned short u16;
 
-extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 extern "C" void SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(CMenuPcs*, int);
 extern "C" void SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(CMenuPcs*, int);
 extern "C" void DrawRect__8CMenuPcsFUlfffffffff(CMenuPcs*, unsigned long, float, float, float, float, float, float, float, float, float);
@@ -392,7 +392,7 @@ int CMenuPcs::MoneyCtrlCur()
  */
 void CMenuPcs::MoneyDraw()
 {
-	_GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(&MenuPcs, 0);
 
 	s16 selectionState = this->moneyState->listState;

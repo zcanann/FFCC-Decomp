@@ -1,6 +1,7 @@
 #include "ffcc/fontman.h"
 #include "ffcc/chunkfile.h"
 #include "ffcc/color.h"
+#include "ffcc/gxfunc.h"
 #include "ffcc/p_camera.h"
 extern "C" {
 unsigned char g_tFont22[0x10D40] = {
@@ -11,8 +12,6 @@ unsigned char g_tFont22[0x10D40] = {
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/math.h"
 #include <dolphin/mtx.h>
 
-extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
-extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, int, int, int, int);
 extern "C" const float FLOAT_803306B8;
 extern "C" const float FLOAT_803306C8;
 extern "C" const float FLOAT_803306D8;
@@ -400,7 +399,7 @@ void CFont::DrawInit()
     GXSetZCompLoc(GX_FALSE);
     GXSetCurrentMtx(0);
 
-    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 
     signed char zCompareFlag = renderFlagBits.zCompare;
     int zFunction = 7;
@@ -412,7 +411,7 @@ void CFont::DrawInit()
     signed char zEnable = (zCompareFlag != 0 || zUpdateFlag != 0) ? 1 : 0;
     GXSetZMode(zEnable, (GXCompare)zFunction, zUpdate);
 
-    _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(6, 1, 0, 7, 0);
+    _GXSetAlphaCompare(GX_GEQUAL, 1, GX_AOP_AND, GX_ALWAYS, 0);
     PSMTXIdentity(identityMtx);
     GXLoadPosMtxImm(identityMtx, 0);
     GXSetCullMode(GX_CULL_NONE);

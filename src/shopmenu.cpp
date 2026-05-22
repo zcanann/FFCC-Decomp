@@ -1,6 +1,7 @@
 #include "ffcc/shopmenu.h"
 #include "ffcc/fontman.h"
 #include "ffcc/graphic.h"
+#include "ffcc/gxfunc.h"
 #include "ffcc/materialman.h"
 #include "ffcc/pad.h"
 #include "ffcc/game.h"
@@ -17,10 +18,6 @@
 extern "C" {
 void _WaitDrawDone__8CGraphicFPci(void*, char*, int);
 void SetDrawDoneDebugData__8CGraphicFSc(void*, signed char);
-void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
-void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, int, int, int, int);
-void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
-void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
 void SetMode__9CShopMenuFi(void*, int);
 void DrawSingleBase__8CMenuPcsFf(void*, float);
 void ReleasePdt__8CPartPcsFi(void*, int);
@@ -818,8 +815,8 @@ static void SetupShopMenuShapeDrawColor(unsigned char alpha)
     _GXColor drawColor = {0xFF, 0xFF, 0xFF, alpha};
     GXSetChanAmbColor(GX_COLOR0A0, drawColor);
     GXSetChanMatColor(GX_COLOR0A0, drawColor);
-    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 5);
-    _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(7, 0, 0, 7, 0xFF);
+    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_NOOP);
+    _GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0xFF);
     GXSetZCompLoc(GX_TRUE);
     GXSetNumChans(1);
     GXSetChanCtrl(GX_COLOR0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
@@ -1808,15 +1805,15 @@ void CShopMenu::Draw()
         _GXColor fadeColor = {0, 0, 0, alpha};
         GXSetChanAmbColor(GX_COLOR0A0, fadeColor);
         GXSetChanMatColor(GX_COLOR0A0, fadeColor);
-        _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 5);
-        _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(7, 0, 0, 7, 0xFF);
+        _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_NOOP);
+        _GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0xFF);
         GXSetZCompLoc(GX_TRUE);
         GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
         GXSetCullMode(GX_CULL_NONE);
         GXSetNumTexGens(0);
         GXSetNumTevStages(1);
-        _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 4);
-        _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0xFF, 0xFF, 4);
+        _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
+        _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
         GXSetNumChans(1);
         GXSetChanCtrl(GX_COLOR0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
         GXSetChanCtrl(GX_ALPHA0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
@@ -2975,8 +2972,8 @@ void drawShapeSeqScale(int shapeNo, int groupNo, int x, int y, float scaleX, flo
     *reinterpret_cast<unsigned int*>(&mat) = (DAT_80332D00 & 0xFFFFFF00) | alpha;
     GXSetChanMatColor(GX_COLOR0A0, mat);
 
-    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 5);
-    _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(7, 0, 0, 7, 0xFF);
+    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_NOOP);
+    _GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0xFF);
     GXSetZCompLoc(GX_TRUE);
     GXSetNumChans(1);
     GXSetChanCtrl(GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
@@ -3071,8 +3068,8 @@ void drawShapeSeq(int shapeNo, int groupNo, int x, int y, unsigned char alpha, u
     *reinterpret_cast<unsigned int*>(&mat) = (DAT_80332D00 & 0xFFFFFF00) | alpha;
     GXSetChanMatColor(GX_COLOR0A0, mat);
 
-    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 5);
-    _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(7, 0, 0, 7, 0xFF);
+    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_NOOP);
+    _GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0xFF);
     GXSetZCompLoc(GX_TRUE);
     GXSetNumChans(1);
     GXSetChanCtrl(GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);

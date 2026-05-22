@@ -2,6 +2,7 @@
 #include "ffcc/joybus.h"
 #include "ffcc/pad.h"
 #include "ffcc/game.h"
+#include "ffcc/gxfunc.h"
 #include "ffcc/sound.h"
 #include "ffcc/system.h"
 #include "ffcc/color.h"
@@ -40,7 +41,6 @@ extern "C" void DrawEquipMark__8CMenuPcsFiif(double, CMenuPcs*, int, int);
 extern "C" void DrawHelpMessage__8CMenuPcsFiP5CFontii8_GXColoriff(CMenuPcs*, int);
 extern "C" int GetAttrStr__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" const char* GetMenuStr__8CMenuPcsFi(CMenuPcs*, int);
-extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 extern CMenuPcs MenuPcs;
 
 extern const float FLOAT_80332eb8;
@@ -508,7 +508,7 @@ void CMenuPcs::EquipDraw()
 	s16* item = menuData + 4;
 	int helpItem = -1;
 
-	_GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(&MenuPcs, 0);
 
 	for (int i = 0; i < menuData[0]; i++) {

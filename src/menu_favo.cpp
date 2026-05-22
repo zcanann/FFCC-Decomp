@@ -10,7 +10,6 @@
 
 typedef signed short s16;
 
-extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 extern CMenuPcs MenuPcs;
 
 unsigned char s_rank[0x20];
@@ -83,7 +82,7 @@ struct FavoEntry {
  */
 void CMenuPcs::FavoDraw()
 {
-	_GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
 	FavoEntry* entry = reinterpret_cast<FavoEntry*>(favoList + 4);

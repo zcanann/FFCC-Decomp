@@ -71,10 +71,6 @@ extern double DOUBLE_80330d28;
 extern "C" void __ct__9CRedSoundFv(void*);
 extern "C" void __dt__6CSoundFv(void*);
 extern "C" int Printf__7CSystemFPce(CSystem*, const char*, ...);
-extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
-extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, int, int, int, int);
-extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
-extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
 CSound Sound;
 
 inline void* operator new(unsigned long, void* ptr)
@@ -853,14 +849,14 @@ void CSound::Draw()
     GXColor lineColor;
     PSMTXCopy(*reinterpret_cast<Mtx*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x4), cameraMatrix);
 
-    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     GXSetZCompLoc((u8)0);
-    _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(6, 1, 0, 7, 0);
+    _GXSetAlphaCompare(GX_GEQUAL, 1, GX_AOP_AND, GX_ALWAYS, 0);
     GXSetZMode((u8)1, (_GXCompare)3, (u8)1);
     GXSetCullMode((_GXCullMode)1);
     GXSetNumTevStages((u8)1);
-    _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 4);
-    _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0xFF, 0xFF, 4);
+    _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
+    _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
     GXSetNumChans((u8)1);
     GXSetChanCtrl((GXChannelID)0, 0, (GXColorSrc)0, (GXColorSrc)0, 0, (GXDiffuseFn)2, (GXAttnFn)1);
     GXSetChanCtrl((GXChannelID)2, 0, (GXColorSrc)0, (GXColorSrc)0, 0, (GXDiffuseFn)2, (GXAttnFn)2);

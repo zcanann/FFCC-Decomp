@@ -1,6 +1,7 @@
 #define PPP_YMBREATH_CUSTOM_PARTICLE_TYPES
 #include "ffcc/pppYmBreath.h"
 #include "ffcc/graphic.h"
+#include "ffcc/gxfunc.h"
 #include "ffcc/linkage.h"
 #include "ffcc/math.h"
 #include "ffcc/pppGetRotMatrixXYZ.h"
@@ -11,8 +12,6 @@
 #include "ffcc/pppPart.h"
 #include "ffcc/pppShape.h"
 
-extern "C" void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
-extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 extern "C" {
 extern const float FLOAT_80330c80;
 extern const float FLOAT_80330c84;
@@ -325,7 +324,7 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
     shape = *(long***)(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(pppEnvStPtr) + 0xC) +
                        params->m_shapeStepValue * 4);
     pppSetBlendMode(params->m_blendMode);
-    _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
+    _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
     pppSetDrawEnv(
         0, 0, params->m_drawEnvScale, params->m_drawEnvColor1, params->m_drawEnvColor0,
         params->m_blendMode, 0, 1, 1, 0);
@@ -476,7 +475,7 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
 
         pppSetBlendMode(1);
         pppSetBlendMode(0);
-        _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 2);
+        _GXSetTevOp(GX_TEVSTAGE0, GX_BLEND);
     }
 }
 

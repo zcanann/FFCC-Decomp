@@ -1,6 +1,7 @@
 #include "ffcc/chara.h"
 #include "ffcc/chunkfile.h"
 #include "ffcc/cflat_runtime.h"
+#include "ffcc/gxfunc.h"
 #include "ffcc/linkage.h"
 #include "ffcc/math.h"
 #include "ffcc/materialman.h"
@@ -32,8 +33,6 @@ extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned lo
 extern "C" void InitQuantize__Q26CChara5CAnimFv(void*);
 extern "C" void Interp__Q26CChara9CAnimNodeFPQ26CChara5CAnimP3SRTf(void*, void*, void*, float);
 extern "C" void SetTextureSet__12CMaterialSetFP11CTextureSet(CMaterialSet*, CTextureSet*);
-extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
-extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, int, int, int, int);
 extern "C" float FLOAT_803301b0;
 extern "C" float FLOAT_803301bc;
 extern "C" float FLOAT_803301c8;
@@ -1956,9 +1955,9 @@ void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
 	}
 
 	MaterialMan.InitVtxFmt(-1, (_GXCompType)3, ModelPosQuant(this), (_GXCompType)3, ModelNormQuant(this), (_GXCompType)3, 0xC);
-	_GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 	GXSetZCompLoc((u8)0);
-	_GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(6, 1, 0, 7, 0);
+	_GXSetAlphaCompare(GX_GEQUAL, 1, GX_AOP_AND, GX_ALWAYS, 0);
 	GXSetZMode((u8)1, (GXCompare)3, (u8)1);
 	GXSetCullMode(static_cast<GXCullMode>(cullFlag != 0 ? 2 : 1));
 	LightPcs.SetAmbientAlpha(ModelLightAlpha(this));
@@ -2075,9 +2074,9 @@ void CChara::CModel::DrawShadow(float (*view)[4], int zMode)
 	SetTextureSet__12CMaterialSetFP11CTextureSet(materialSet, m_texSet);
 	LightPcs.SetAmbientAlpha(FLOAT_803301bc);
 	MaterialMan.InitVtxFmt(-1, (_GXCompType)3, ModelPosQuant(this), (_GXCompType)3, ModelNormQuant(this), (_GXCompType)3, 0xC);
-	_GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 	GXSetZCompLoc((u8)0);
-	_GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(6, 1, 0, 7, 0);
+	_GXSetAlphaCompare(GX_GEQUAL, 1, GX_AOP_AND, GX_ALWAYS, 0);
 	GXSetZMode((u8)zMode, (GXCompare)3, (u8)zMode);
 	GXSetCullMode((GXCullMode)1);
 

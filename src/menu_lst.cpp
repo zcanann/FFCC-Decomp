@@ -1,6 +1,7 @@
 #include "ffcc/menu_lst.h"
 #include "ffcc/color.h"
 #include "ffcc/fontman.h"
+#include "ffcc/gxfunc.h"
 #include "ffcc/linkage.h"
 #include "ffcc/pad.h"
 #include "ffcc/sound.h"
@@ -8,7 +9,6 @@
 #include <string.h>
 
 extern "C" int __cntlzw(unsigned int);
-extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 extern "C" void SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(CMenuPcs*, int);
 extern "C" void SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(CMenuPcs*, int);
 extern "C" void DrawRect__8CMenuPcsFUlfffffffff(CMenuPcs*, unsigned long, float, float, float, float, float, float, float, float, float);
@@ -70,7 +70,7 @@ STATIC_ASSERT(offsetof(MenuLstState, cursor) == 0x26);
  */
 void CMenuPcs::MLstDraw()
 {
-	_GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(&MenuPcs, 0);
 
 	short menuMode = this->lstState->mode;

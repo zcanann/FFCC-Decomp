@@ -2,6 +2,7 @@
 #include "ffcc/color.h"
 #include "ffcc/file.h"
 #include "ffcc/graphic.h"
+#include "ffcc/gxfunc.h"
 #include "ffcc/linkage.h"
 #include "ffcc/map.h"
 #include "ffcc/math.h"
@@ -158,8 +159,6 @@ extern "C" void destroyVillageMenu__8CMenuPcsFv(CMenuPcs*);
 extern "C" void loadTextureAsync__8CMenuPcsFPPciiPQ28CMenuPcs4CTmpiii(CMenuPcs*, char**, int, int, CMenuPcs::CTmp*, int, int, int);
 extern "C" void drawSingleMenu__8CMenuPcsFv(CMenuPcs*);
 extern "C" void _WaitDrawDone__8CGraphicFPci(void*, const char*, int);
-extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
-extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, unsigned char, int, int, unsigned char);
 
 static unsigned int m_table_desc0__8CMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__8CMenuPcsFv)};
 static unsigned int m_table_desc1__8CMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__8CMenuPcsFv)};
@@ -971,9 +970,9 @@ void CMenuPcs::draw()
     }
     GXSetZCompLoc(GX_FALSE);
     GXSetCurrentMtx(0);
-    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
-    _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(6, 1, 0, 7, 0);
+    _GXSetAlphaCompare(GX_GEQUAL, 1, GX_AOP_AND, GX_ALWAYS, 0);
     GXSetCullMode(GX_CULL_NONE);
     GXSetNumTexGens(1);
     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
@@ -1053,9 +1052,9 @@ void CMenuPcs::DrawInit()
 
     GXSetZCompLoc(GX_FALSE);
     GXSetCurrentMtx(0);
-    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
-    _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(6, 1, 0, 7, 0);
+    _GXSetAlphaCompare(GX_GEQUAL, 1, GX_AOP_AND, GX_ALWAYS, 0);
     GXSetCullMode(GX_CULL_NONE);
     GXSetNumTexGens(1);
     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);

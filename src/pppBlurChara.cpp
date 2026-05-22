@@ -5,6 +5,7 @@
 #include "ffcc/mapmesh.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/p_chara.h"
+#include "ffcc/gxfunc.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/util.h"
@@ -102,24 +103,6 @@ int GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void* handle);
 int GetTexture__8CMapMeshFP12CMaterialSetRi(CMapMesh* mapMesh, CMaterialSet* materialSet, int& textureIndex);
 void pppHeapUseRate__FPQ27CMemory6CStage(CMemory::CStage* stage);
 
-void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int stage, int rasSel, int texSel);
-void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int stage, int mode);
-void _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
-    int tevSwapSel, int red, int green, int blue, int alpha);
-void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int stage, int texCoord, int texMap,
-                                                                                 int colorChannel);
-void _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(
-    int stage, int a, int b, int c, int d);
-void _GXSetTevColorOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(int stage, int op, int bias,
-                                                                                           int scale, int clamp,
-                                                                                           int reg);
-void _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg(
-    int stage, int a, int b, int c, int d);
-void _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(int stage, int op, int bias,
-                                                                                           int scale, int clamp,
-                                                                                           int reg);
-void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int type, int src, int dst,
-                                                                                    int op);
 void MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(CMath* math, Mtx44 mtx, Vec4d* src, Vec4d* dst);
 }
 
@@ -196,7 +179,7 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
     }
 
     pppInitBlendMode();
-    _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
+    _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
     pppSetDrawEnv(&colorData->m_color, (pppFMATRIX*)0, FLOAT_80331030, param_2->m_alpha, 0, 0, 0, 1, 1, 0);
     objPosBase = texData->m_objPosBase;
 
@@ -231,9 +214,8 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
     gUtil.SetVtxFmt_POS_CLR_TEX();
     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, 0x7d);
     GXSetTexCoordGen2(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, 0x7d);
-    _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
-        1, 0, 0, 0, 0);
-    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 1, 5, 7);
+    _GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_RED, GX_CH_RED, GX_CH_RED);
+    _GXSetBlendMode(GX_BM_BLEND, GX_BL_ONE, GX_BL_INVSRCALPHA, GX_LO_OR);
 
     GXSetChanMatColor(GX_COLOR0A0, drawColor);
     GXSetChanCtrl(GX_COLOR0A0, GX_DISABLE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
@@ -242,18 +224,16 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
     drawColor.b = colorData->m_color.rgba[2];
     drawColor.a = colorData->m_color.rgba[3];
 
-    _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 4);
-    _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 1);
+    _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
+    _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP1);
     GXLoadTexObj(texData->m_texObj, GX_TEXMAP0);
-    _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(0, 0xF, 10, 8,
-                                                                                                          0xF);
-    _GXSetTevColorOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(0, 0, 0, 0, 1, 0);
-    _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg(0, 7, 5, 4,
-                                                                                                          7);
-    _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(0, 0, 0, 0, 1, 0);
+    _GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_RASC, GX_CC_TEXC, GX_CC_ZERO);
+    _GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    _GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_RASA, GX_CA_TEXA, GX_CA_ZERO);
+    _GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
 
-    _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(1, 1, 1, 4);
-    _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(1, 0, 0);
+    _GXSetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD1, GX_TEXMAP1, GX_COLOR0A0);
+    _GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP0);
 
     if (param_2->m_textureMode == 1) {
         GXLoadTexObj((_GXTexObj*)(textureBase + 0x28), GX_TEXMAP1);
@@ -261,12 +241,10 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
         GXLoadTexObj(&smallBackTex, GX_TEXMAP1);
     }
 
-    _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(1, 0xF, 8, 1,
-                                                                                                          0xF);
-    _GXSetTevColorOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(1, 0, 0, 0, 1, 0);
-    _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg(1, 7, 5, 0,
-                                                                                                          7);
-    _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(1, 0, 0, 0, 1, 0);
+    _GXSetTevColorIn(GX_TEVSTAGE1, GX_CC_ZERO, GX_CC_TEXC, GX_CC_APREV, GX_CC_ZERO);
+    _GXSetTevColorOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    _GXSetTevAlphaIn(GX_TEVSTAGE1, GX_CA_ZERO, GX_CA_RASA, GX_CA_APREV, GX_CA_ZERO);
+    _GXSetTevAlphaOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
 
     PSMTXIdentity(identityMtx);
     GXLoadPosMtxImm(identityMtx, 0);
@@ -308,8 +286,8 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
 
     gUtil.RenderQuad(quadA, quadB, drawColor, 0, 0);
 
-    _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
-    _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(1, 0, 0);
+    _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
+    _GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP0);
     pppInitBlendMode();
 }
 
@@ -455,7 +433,7 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void
     posB.z = FLOAT_80331030;
 
     gUtil.BeginQuadEnv();
-    _GXSetTevOp__F13_GXTevStageID10_GXTevMode(GX_TEVSTAGE0, GX_PASSCLR);
+    _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
     gUtil.RenderQuadNoTex(posA, posB, white);
     gUtil.EndQuadEnv();
 
@@ -485,8 +463,8 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void
 
         gUtil.BeginQuadEnv();
         gUtil.SetVtxFmt_POS_CLR_TEX();
-        _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 4);
-        _GXSetTevOp__F13_GXTevStageID10_GXTevMode(GX_TEVSTAGE0, GX_REPLACE);
+        _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
+        _GXSetTevOp(GX_TEVSTAGE0, GX_REPLACE);
         GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, 0x7d);
         GXLoadTexObj(work->m_smallTexObj, GX_TEXMAP0);
 
@@ -503,7 +481,7 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void
         posB.y = FLOAT_80331054 - offsetY;
         posB.z = FLOAT_80331030;
 
-        _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(3, 1, 1, 7);
+        _GXSetBlendMode(GX_BM_SUBTRACT, GX_BL_ONE, GX_BL_ONE, GX_LO_OR);
         gUtil.RenderQuad(posA, posB, white, 0, 0);
         gUtil.EndQuadEnv();
 

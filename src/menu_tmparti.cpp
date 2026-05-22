@@ -1,13 +1,13 @@
 #include "ffcc/menu_tmparti.h"
 #include "ffcc/fontman.h"
 #include "ffcc/game.h"
+#include "ffcc/gxfunc.h"
 #include "ffcc/sound.h"
 #include "ffcc/pad.h"
 #include "ffcc/color.h"
 #include "ffcc/linkage.h"
 #include <string.h>
 
-extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 extern "C" int __cntlzw(unsigned int);
 extern "C" void SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(CMenuPcs*, int);
 extern "C" void SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(CMenuPcs*, int);
@@ -96,7 +96,7 @@ struct TmpArtiFlatData {
  */
 void CMenuPcs::TmpArtiDraw()
 {
-	_GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(&MenuPcs, 0);
 
 	unsigned int scriptFood = Game.m_scriptFoodBase[0];

@@ -1,6 +1,7 @@
 #include "ffcc/memory.h"
 #include "ffcc/chara.h"
 #include "ffcc/graphic.h"
+#include "ffcc/gxfunc.h"
 #include "ffcc/pad.h"
 #include "ffcc/RedSound/RedSound.h"
 #include "ffcc/sound.h"
@@ -87,12 +88,6 @@ extern unsigned int s_heapBarColors_801D64A8[];
 long long DAT_8032ec58;
 extern char DAT_8032f7e8[];
 extern char DAT_8032f808[];
-extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
-extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, int, int, int, int);
-extern "C" void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
-extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
-extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
-
 static int stageGetAllocationMode(CMemory::CStage* stage)
 {
     return stage->m_allocationMode;
@@ -575,9 +570,9 @@ void CMemory::Draw()
     C_MTXOrtho(orthoMtx, FLOAT_8032f7dc, FLOAT_8032f7fc, FLOAT_8032f7dc, FLOAT_8032f800, FLOAT_8032f7dc,
                FLOAT_8032f804);
     GXSetProjection(orthoMtx, GX_ORTHOGRAPHIC);
-    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     GXSetZCompLoc(GX_FALSE);
-    _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(6, 1, 0, 7, 0);
+    _GXSetAlphaCompare(GX_GEQUAL, 1, GX_AOP_AND, GX_ALWAYS, 0);
     GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
     GXSetCullMode(GX_CULL_NONE);
     GXSetNumTevStages(1);
@@ -585,7 +580,7 @@ void CMemory::Draw()
     GXSetNumChans(1);
     GXSetChanCtrl(GX_COLOR0A0, GX_DISABLE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
     GXSetChanCtrl(GX_COLOR1A1, GX_DISABLE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_SPEC);
-    _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
+    _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
     GXClearVtxDesc();
     GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
     GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
@@ -594,8 +589,8 @@ void CMemory::Draw()
     PSMTXIdentity(modelMtx);
     GXLoadPosMtxImm(modelMtx, GX_PNMTX0);
     GXLoadTexMtxImm(modelMtx, GX_IDENTITY, GX_MTX3x4);
-    _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0xFF, 0xFF, 4);
-    _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 4);
+    _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
+    _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
 
     for (int pass = 0; pass < 2; pass++) {
         if (pass == 1) {

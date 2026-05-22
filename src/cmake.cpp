@@ -3,6 +3,7 @@
 #include "ffcc/color.h"
 #include "ffcc/fontman.h"
 #include "ffcc/game.h"
+#include "ffcc/gxfunc.h"
 #include "ffcc/pad.h"
 #include "ffcc/p_chara.h"
 #include "ffcc/memory.h"
@@ -98,7 +99,6 @@ extern "C" int DAT_8032ef10;
 extern "C" char* GetLangString__5CGameFv(void*);
 extern "C" void loadFont__8CMenuPcsFiPcii(CMenuPcs*, int, char*, int, int);
 extern "C" void loadTexture__8CMenuPcsFPPciiPQ28CMenuPcs4CTmpiii(CMenuPcs*, char**, int, int, void*, int, int, int);
-extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 extern "C" void SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(void*, int);
 extern "C" void SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(void*, int);
 extern "C" void DrawRect__8CMenuPcsFUlfffffffff(void*, unsigned long, float, float, float, float, float, float, float, float, float);
@@ -232,7 +232,7 @@ static inline void DrawCmakePreviewChara(CMenuPcs* menu)
 
 static inline void DrawCmakeSelectionBackdrop(CMenuPcs* menu)
 {
-    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(MenuPcsVoid(), 0);
 
     GXColor col = {0xFF, 0xFF, 0xFF, 0xFF};
@@ -268,7 +268,7 @@ static inline void DrawCmakePopupPanel(CMenuPcs* menu, float alpha, float x, flo
 {
     int a = static_cast<int>(static_cast<double>(FLOAT_80333240) * alpha);
 
-    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(MenuPcsVoid(), 0);
 
     GXColor col = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a)};
@@ -842,7 +842,7 @@ void CMenuPcs::DrawSingCMake()
         float alpha = CalcCmakeFadeAlpha(this);
         DrawWMFrame0__8CMenuPcsFif(this, 1, alpha);
 
-        _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+        _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
         SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(MenuPcsVoid(), 0);
 
         int a = static_cast<int>(static_cast<double>(FLOAT_80333240) * static_cast<double>(alpha));
@@ -949,7 +949,7 @@ void CMenuPcs::DrawSingCMake()
  */
 void CMenuPcs::DrawDiaryBase(int page, float alpha)
 {
-    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(MenuPcsVoid(), 0);
 
     int a = static_cast<int>(static_cast<double>(FLOAT_80333240) * alpha);
@@ -994,7 +994,7 @@ void CMenuPcs::DrawCmakeWin(float x, float y, float alpha)
 {
     (void)y;
 
-    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(MenuPcsVoid(), 0);
 
     int a = static_cast<int>(static_cast<double>(FLOAT_80333240) * alpha);
@@ -1035,7 +1035,7 @@ void CMenuPcs::DrawCmakeWin(float x, float y, float alpha)
  */
 void CMenuPcs::DrawCmakeTitle(int page, float x, float alpha)
 {
-    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(MenuPcsVoid(), 0);
 
     int a = static_cast<int>(static_cast<double>(FLOAT_80333240) * alpha);
@@ -1085,7 +1085,7 @@ void CMenuPcs::DrawCrystal(int type, int frame, float alpha)
         index = 0;
     }
 
-    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(MenuPcsVoid(), 0);
 
     int a = static_cast<int>(static_cast<double>(FLOAT_80333240) * alpha);
@@ -1144,7 +1144,7 @@ void CMenuPcs::DrawCmakePageMark(float alpha)
  */
 void CMenuPcs::DrawCmakeDecision(int yesNoSel, float alpha)
 {
-    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(MenuPcsVoid(), 0);
 
     int a = static_cast<int>(static_cast<double>(FLOAT_80333240) * alpha);
@@ -1160,7 +1160,7 @@ void CMenuPcs::DrawCmakeDecision(int yesNoSel, float alpha)
         FLOAT_8033334c, FLOAT_80333284, FLOAT_80333258, FLOAT_80333258, 0.0f);
 
     if (yesNoSel != 0) {
-        _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+        _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
         SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(MenuPcsVoid(), 0);
         GXSetChanMatColor(GX_COLOR0A0, col);
         SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcsVoid(), (MenuS16(this, 0x86C) != 0) ? 0x64 : 0x3D);
@@ -1323,7 +1323,7 @@ void CMenuPcs::DrawCmakeCharaText(int page, float alpha)
  */
 void CMenuPcs::DrawCmakeCrest(int tribe, int x, int y, float alpha)
 {
-    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(MenuPcsVoid(), 0);
 
     int a = static_cast<int>(static_cast<double>(FLOAT_80333240) * alpha);
@@ -1357,7 +1357,7 @@ void CMenuPcs::DrawCmakeCrest(int tribe, int x, int y, float alpha)
  */
 void CMenuPcs::DrawCmakeName(int x, int y, char* text, float alpha)
 {
-    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 
     int baseY = 300;
     unsigned int nameX = static_cast<unsigned int>(
@@ -1388,7 +1388,7 @@ void CMenuPcs::DrawCmakeName(int x, int y, char* text, float alpha)
     DrawInit__8CMenuPcsFv(this);
 
     if (y != 0) {
-        _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+        _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
         SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(MenuPcsVoid(), 0);
 
         int a = static_cast<int>(static_cast<double>(FLOAT_80333240) * alpha);
@@ -1441,7 +1441,7 @@ void CMenuPcs::AddNameChara(int c, int slot, int, int)
  */
 void CMenuPcs::DrawCmakeYesNo(int yesNoSel, float alpha)
 {
-    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(MenuPcsVoid(), 0);
 
     int a = static_cast<int>(static_cast<double>(FLOAT_80333240) * alpha);
@@ -1845,7 +1845,7 @@ void CMenuPcs::CmakeNameDraw()
 
     DrawWMFrame0__8CMenuPcsFif(this, 1, FLOAT_80333258);
 
-    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(MenuPcsVoid(), 0);
 
     GXColor backdropColor = {0xFF, 0xFF, 0xFF, 0xFF};
@@ -1903,7 +1903,7 @@ void CMenuPcs::CmakeNameDraw()
 
     DrawCmakeTitle(1, titleX, titleAlpha);
 
-    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(MenuPcsVoid(), 0);
 
     int a = static_cast<int>(static_cast<double>(FLOAT_80333240) * alpha);
@@ -2059,7 +2059,7 @@ void CMenuPcs::CmakeSexDraw()
     float alpha = CalcCmakeFadeAlpha(this);
     DrawWMFrame0__8CMenuPcsFif(this, 1, FLOAT_80333258);
 
-    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(MenuPcsVoid(), 0);
     GXColor backdropColor = {0xFF, 0xFF, 0xFF, 0xFF};
     GXSetChanMatColor(GX_COLOR0A0, backdropColor);
@@ -2320,7 +2320,7 @@ void CMenuPcs::CmakeTribeDraw()
 
     DrawWMFrame0__8CMenuPcsFif(this, 1, FLOAT_80333258);
 
-    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(MenuPcsVoid(), 0);
 
     GXColor backdropColor = {0xFF, 0xFF, 0xFF, 0xFF};
@@ -2378,7 +2378,7 @@ void CMenuPcs::CmakeTribeDraw()
         DrawInit__8CMenuPcsFv(this);
     }
 
-    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(MenuPcsVoid(), 0);
 
     int a = static_cast<int>(static_cast<double>(FLOAT_80333240) * alpha);
@@ -2653,7 +2653,7 @@ void CMenuPcs::CmakeJobDraw()
 
     DrawWMFrame0__8CMenuPcsFif(this, 1, FLOAT_80333258);
 
-    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(MenuPcsVoid(), 0);
 
     GXColor backdropColor = {0xFF, 0xFF, 0xFF, 0xFF};
@@ -2719,7 +2719,7 @@ void CMenuPcs::CmakeJobDraw()
         panelAlpha = 0xFF;
     }
 
-    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(MenuPcsVoid(), 0);
 
     GXColor panelColor = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(panelAlpha)};
@@ -2865,7 +2865,7 @@ void CMenuPcs::CmakeResultDraw()
 
     DrawWMFrame0__8CMenuPcsFif(this, 1, FLOAT_80333258);
 
-    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(MenuPcsVoid(), 0);
 
     GXColor backdropColor = {0xFF, 0xFF, 0xFF, 0xFF};
@@ -3124,7 +3124,7 @@ void CMenuPcs::CmakeResultDraw1()
 
     DrawWMFrame0__8CMenuPcsFif(this, 1, FLOAT_80333258);
 
-    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(MenuPcsVoid(), 0);
 
     GXColor backdropColor = {0xFF, 0xFF, 0xFF, 0xFF};
@@ -3458,7 +3458,7 @@ void CMenuPcs::CmakeVillageDraw()
         alpha = static_cast<float>(DOUBLE_80333270 - DOUBLE_80333268 * static_cast<double>(frame));
     }
 
-    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(MenuPcsVoid(), 0);
 
     int a = static_cast<int>(static_cast<double>(FLOAT_80333240) * alpha);
@@ -3471,7 +3471,7 @@ void CMenuPcs::CmakeVillageDraw()
 
     DrawCmakeTitle(0, FLOAT_80333258, alpha);
 
-    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(MenuPcsVoid(), 0);
     GXSetChanMatColor(GX_COLOR0A0, col);
     SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcsVoid(), (MenuS16(this, 0x86C) != 0) ? 0x61 : 0x3A);
@@ -3480,7 +3480,7 @@ void CMenuPcs::CmakeVillageDraw()
         MenuPcsVoid(), 0, panelX, FLOAT_803332a0, FLOAT_80333290, FLOAT_8033327c,
         FLOAT_80333254, FLOAT_803332a4, FLOAT_80333258, FLOAT_80333258, 0.0f);
 
-    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(MenuPcsVoid(), 0);
     GXSetChanMatColor(GX_COLOR0A0, col);
     SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcsVoid(), (MenuS16(this, 0x86C) != 0) ? 0x68 : 0x41);

@@ -11,7 +11,6 @@ extern "C" double cos(double);
 #include <math.h>
 #include <string.h>
 
-extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 extern "C" s32 rand();
 
 extern const GXColor DAT_8032fd58;
@@ -159,11 +158,11 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
 
             const u8 blendMode = *reinterpret_cast<const u8*>(entry + 0x1C);
             if (blendMode == 'H') {
-                _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 1, 3);
+                _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_ONE, GX_LO_COPY);
             } else if (blendMode == 'B') {
-                _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(3, 1, 1, 3);
+                _GXSetBlendMode(GX_BM_SUBTRACT, GX_BL_ONE, GX_BL_ONE, GX_LO_COPY);
             } else if (blendMode == 0x88) {
-                _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 3);
+                _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_COPY);
             }
 
             if ((ShapeFlags(this) & 0x100) == 0) {
@@ -275,11 +274,11 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
 
             const u8 blendMode = *reinterpret_cast<const u8*>(entry + 0x1C);
             if (blendMode == 'H') {
-                _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 1, 3);
+                _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_ONE, GX_LO_COPY);
             } else if (blendMode == 'B') {
-                _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(3, 4, 1, 3);
+                _GXSetBlendMode(GX_BM_SUBTRACT, GX_BL_SRCALPHA, GX_BL_ONE, GX_LO_COPY);
             } else if (blendMode == 0x88) {
-                _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 3);
+                _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_COPY);
             }
 
             const s32 x0 = Div16Floor(S16At(entry, 0x20));
@@ -404,7 +403,7 @@ void CFunnyShape::RenderShape()
     GXSetNumTevStages(1);
     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, 0x3C, 0, 0x7D);
     _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
-    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 2, 3);
+    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_SRCCLR, GX_LO_COPY);
     GXLoadTexObj(reinterpret_cast<GXTexObj*>(m_texObjData[0]), GX_TEXMAP0);
     GXSetNumChans(1);
     GXSetChanCtrl(GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPOT);
@@ -464,7 +463,7 @@ void CFunnyShape::RenderTexture()
     _GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
     GXColor color = DAT_8032fd5c;
-    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 2, 3);
+    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_SRCCLR, GX_LO_COPY);
     GXLoadTexObj(reinterpret_cast<GXTexObj*>(m_texObjData[0]), GX_TEXMAP0);
 
     const s16 width = m_textureHeaders[0]->width;
@@ -534,7 +533,7 @@ void CFunnyShape::Render()
     GXSetNumTevStages(1);
     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, 0x3C, 0, 0x7D);
     _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
-    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 2, 3);
+    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_SRCCLR, GX_LO_COPY);
     GXLoadTexObj(reinterpret_cast<GXTexObj*>(m_texObjData[0]), GX_TEXMAP0);
     GXSetNumChans(1);
     GXSetChanCtrl(GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPOT);

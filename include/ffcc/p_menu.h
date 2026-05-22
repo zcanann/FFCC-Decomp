@@ -183,6 +183,9 @@ public:
 
     void WmInit();
     void createWorld();
+    void createSingleMenu();
+    void destroySingleMenu();
+    void destroyVillageMenu();
     void ChkNumItemAll();
     void loadData();
     void InitFrameInfo();
@@ -192,6 +195,7 @@ public:
     void InitCSelCurPos();
     void destroyWorld();
     void calcWorld();
+    void calcVillageMenu();
     void CalcMainMenu();
     void CalcDiaryMenu();
     void CalcMCardMenu();
@@ -206,6 +210,7 @@ public:
     void SetMenuCharaAnim(int, int);
     unsigned int IsMenuCharaAnimIdle(int);
     void drawWorld();
+    void drawVillageMenu();
     void DrawMainMenu();
     void DrawDiaryMenu();
     void DrawMCardMenu();

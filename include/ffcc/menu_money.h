@@ -64,6 +64,9 @@ public:
     int MoneyClose();
     void MoneyDraw();
     int MoneyCtrlCur();
+    char* GetMenuStr(int);
+    int SingGetLetterAttachflg();
+    void LetterSetAttachItem(unsigned int, int);
 
     char pad_00[0x108];
     CFont* moneyFont;

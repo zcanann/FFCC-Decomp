@@ -76,7 +76,6 @@ extern "C" void __ct__10pppModelStFv(pppModelSt* modelSt);
 extern "C" void __dt__10pppModelStFv(pppModelSt* modelSt, int);
 extern "C" void pppDestroyHeap__FP9_pppEnvSt(_pppEnvSt*);
 extern "C" void _pppDrawPart__FP9_pppMngSt(_pppMngSt*);
-extern "C" void Create__9CGBaseObjFv(CGBaseObj*);
 extern "C" void LoadMap__7CMapPcsFiiPvUlUc(void*, int, int, void*, unsigned long, unsigned char);
 PPPCREATEPARAM g_dcp;
 extern "C" {
@@ -2122,7 +2121,7 @@ void CPartMng::pppEditBeforeCalc()
         *editorObj = static_cast<CGObject*>(
             operator new(0x518, stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0x7b5));
         if (*editorObj != 0) {
-            Create__9CGBaseObjFv(*editorObj);
+            (*editorObj)->Create();
 
             CCharaPcs::CHandle* handle =
                 new (stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0x7b7) CCharaPcs::CHandle;

@@ -33,10 +33,6 @@ inline void* operator new(unsigned long, void* ptr)
 }
 
 extern "C" void StaticFrame__10CGCharaObjFv();
-extern "C" void Create__9CGBaseObjFv(CGBaseObj*);
-extern "C" void Destroy__9CGBaseObjFv(CGBaseObj*);
-extern "C" void Frame__9CGBaseObjFv(CGBaseObj*);
-extern "C" void Draw__9CGBaseObjFv(CGBaseObj*);
 extern "C" void Frame__12CFlatRuntimeFii(CFlatRuntime*, int, int);
 extern "C" void Create__12CFlatRuntimeFPv(CFlatRuntime*, void*);
 extern "C" int CreateDebug__12CFlatRuntimeFPvi(CFlatRuntime*, void*, int);
@@ -689,7 +685,7 @@ void CFlatRuntime2::onNewObject(CFlatRuntime::CObject* object)
 {
 	CGBaseObj* baseObj = reinterpret_cast<CGBaseObj*>(object);
 	baseObj->m_isActiveBits.active = 1;
-	Create__9CGBaseObjFv(baseObj);
+	baseObj->Create();
 }
 
 /*
@@ -700,7 +696,7 @@ void CFlatRuntime2::onNewObject(CFlatRuntime::CObject* object)
 void CFlatRuntime2::onDeleteObject(CFlatRuntime::CObject* object)
 {
 	CGBaseObj* baseObj = reinterpret_cast<CGBaseObj*>(object);
-	Destroy__9CGBaseObjFv(baseObj);
+	baseObj->Destroy();
 	baseObj->m_isActiveBits.active = 0;
 }
 
@@ -914,7 +910,7 @@ void CFlatRuntime2::Frame(int arg0, int mode)
 			reinterpret_cast<CFlatRuntime::CObject*>(reinterpret_cast<u8*>(this) + 0x8CC);
 		for (CGBaseObj* obj = FindNextGBaseObjByCidMask(this, root->m_next->m_next, 5); obj != 0;
 			 obj = FindNextGBaseObjByCidMask(this, reinterpret_cast<CFlatRuntime::CObject*>(obj)->m_next, 5)) {
-			Frame__9CGBaseObjFv(obj);
+			obj->Frame();
 		}
 		return;
 	}
@@ -987,7 +983,7 @@ void CFlatRuntime2::Frame(int arg0, int mode)
 		reinterpret_cast<CFlatRuntime::CObject*>(reinterpret_cast<u8*>(this) + 0x8CC);
 	for (CGBaseObj* obj = FindNextGBaseObjByCidMask(this, root->m_next->m_next, 1); obj != 0;
 		 obj = FindNextGBaseObjByCidMask(this, reinterpret_cast<CFlatRuntime::CObject*>(obj)->m_next, 1)) {
-		Draw__9CGBaseObjFv(obj);
+		obj->Draw();
 	}
 }
 

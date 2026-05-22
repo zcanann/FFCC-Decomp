@@ -34,7 +34,6 @@ void pppSetBlendMode(unsigned char);
 extern "C" {
 void* GetCharaHandlePtr__FP8CGObjectl(void* obj, long index);
 int GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void* handle);
-void pppHeapUseRate__FPQ27CMemory6CStage(CMemory::CStage* stage);
 
 void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(void*, long, float&, float&, float&, float, float&, float&);
 }
@@ -278,7 +277,7 @@ void pppDestructEmission(pppEmission* pppEmission_, pppEmissionUnkC* param_2) {
     Graphic._WaitDrawDone(const_cast<char*>(s_pppEmission_cpp_801db7e8), 0x118);
     CMemory::CStage* stage = (CMemory::CStage*)state[0];
     if (stage != (CMemory::CStage*)0) {
-        pppHeapUseRate__FPQ27CMemory6CStage(stage);
+        pppHeapUseRate(stage);
         state[0] = 0;
     }
 

@@ -99,8 +99,6 @@ static inline Mtx44& CameraScreenMatrix()
 }
 
 extern "C" {
-void pppHeapUseRate__FPQ27CMemory6CStage(CMemory::CStage* stage);
-
 void MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(CMath* math, Mtx44 mtx, Vec4d* src, Vec4d* dst);
 }
 
@@ -349,12 +347,12 @@ void pppDestructBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkC* data)
     rawModel->m_renderData = 0;
 
     if ((CMemory::CStage*)work->m_captureBuffer != 0) {
-        pppHeapUseRate__FPQ27CMemory6CStage((CMemory::CStage*)work->m_captureBuffer);
+        pppHeapUseRate((CMemory::CStage*)work->m_captureBuffer);
         work->m_captureBuffer = 0;
     }
 
     if ((CMemory::CStage*)work->m_smallTexObj != 0) {
-        pppHeapUseRate__FPQ27CMemory6CStage((CMemory::CStage*)work->m_smallTexObj);
+        pppHeapUseRate((CMemory::CStage*)work->m_smallTexObj);
         work->m_smallTexObj = 0;
     }
 

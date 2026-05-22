@@ -21,10 +21,6 @@ struct pppLerpPosUnkC {
 
 void pppSetFpMatrix(_pppMngSt*);
 
-extern "C" {
-void pppHeapUseRate__FPQ27CMemory6CStage(CMemory::CStage* stage);
-
-}
 extern const char s_pppLerpPos_cpp_801dd418[] = "pppLerpPos.cpp";
 
 /*
@@ -109,7 +105,7 @@ void pppDestructLerpPos(struct pppLerpPos* pppLerpPos, struct pppLerpPosUnkC* pa
     void** work = (void**)((u8*)pppLerpPos + 0x80 + dataOffset);
 
     if (*work != 0) {
-        pppHeapUseRate__FPQ27CMemory6CStage((CMemory::CStage*)*work);
+        pppHeapUseRate((CMemory::CStage*)*work);
         *work = 0;
     }
 }

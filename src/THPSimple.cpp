@@ -117,10 +117,10 @@ void THPAudioMixCallback()
 			CurAudioBuffer = LastAudioBuffer;
 		}
 		OldAIDCallback();
-		LastAudioBuffer = reinterpret_cast<s16*>(AIGetDMAStartAddr() + 0x80000000);
+		LastAudioBuffer = reinterpret_cast<s16*>(OSPhysicalToCached(AIGetDMAStartAddr()));
 	} else {
 		OldAIDCallback();
-		CurAudioBuffer = reinterpret_cast<s16*>(AIGetDMAStartAddr() + 0x80000000);
+		CurAudioBuffer = reinterpret_cast<s16*>(OSPhysicalToCached(AIGetDMAStartAddr()));
 	}
 
 	SoundBufferIndex ^= 1;

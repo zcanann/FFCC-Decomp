@@ -34,7 +34,6 @@ void pppSetBlendMode(unsigned char);
 static inline float YmLaserConst(const float& value) { return *reinterpret_cast<const float*>(&value); }
 
 extern "C" {
-void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
     void*, long, float&, float&, float&, float, float&, float&);
 int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, void*, void*, u32);
@@ -406,7 +405,7 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtr
 	emptyHistory = 0;
 
 	if (work->m_points == 0) {
-		work->m_points = (Vec*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+		work->m_points = (Vec*)pppMemAlloc(
 			(u32)step->m_laser.m_pointCount * 0xc, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmLaser_cpp_801DB4B0), 0x5d);
 		memset(work->m_points, 0, (u32)step->m_laser.m_pointCount * 0xc);
 		emptyHistory = 1;

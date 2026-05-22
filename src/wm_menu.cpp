@@ -31,13 +31,9 @@ extern "C" void* __vt__Q212CFlatRuntime7CObject[];
 extern "C" void* __vt__9CGBaseObj[];
 extern "C" void* __vt__8CGObject[];
 extern "C" int rand(void);
-extern "C" void SetFog__8CGraphicFii(void*, int, int);
 extern "C" void SetAmbient__9CLightPcsF8_GXColor(void*, void*);
-extern "C" void SetNumDiffuse__9CLightPcsFUl(void*, unsigned long);
 extern "C" void SetDiffuse__9CLightPcsFUl8_GXColorP3Veci(void*, unsigned long, void*, void*, int);
-extern "C" void SetPosition__9CLightPcsFQ29CLightPcs6TARGETP3VecUl(void*, int, Vec*, unsigned long);
 extern "C" void Create__9CGBaseObjFv(void*);
-extern "C" void SetViewport__8CGraphicFv(void*);
 extern "C" void InitEnv__9CCharaPcsFi(void*, int);
 extern "C" unsigned int pppCreate__8CPartMngFiiP14PPPCREATEPARAMi(void*, int, int, void*, int);
 extern "C" void pppDeletePart__8CPartMngFi(void*, int);
@@ -3190,19 +3186,19 @@ void CMenuPcs::DrawMCardMenu()
 					(float)*reinterpret_cast<short*>((int)(piVar12 + 3) + 2),
 					FLOAT_803313dc, FLOAT_803313e8);
 				GXSetScissor(piVar12[0x10], piVar12[0x11], piVar12[0x12], piVar12[0x13]);
-				SetFog__8CGraphicFii(&Graphic, 1, 0);
+				Graphic.SetFog(1, 0);
 				unsigned int ambColor = DAT_80210830[0];
 				SetAmbient__9CLightPcsF8_GXColor(&LightPcs, &ambColor);
-				SetNumDiffuse__9CLightPcsFUl(&LightPcs, DAT_8021082c[0]);
+				LightPcs.SetNumDiffuse(DAT_8021082c[0]);
 				for (int j = 0; j < DAT_8021082c[0]; j++) {
 					SetDiffuse__9CLightPcsFUl8_GXColorP3Veci(&LightPcs, j, &DAT_8021082c[j * 3 + 2], &DAT_8021082c[j * 3 + 5], 0);
 				}
-				SetPosition__9CLightPcsFQ29CLightPcs6TARGETP3VecUl(&LightPcs, 0, 0, 0xFFFFFFFF);
+				LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(0), 0, 0xFFFFFFFF);
 			}
 		}
 		DrawInit();
 		PSMTXCopy(m_cameraMatrix, CameraPcs.m_cameraMatrix);
-		SetViewport__8CGraphicFv(&Graphic);
+		Graphic.SetViewport();
 		GXSetScissor(0, 0, 0x280, 0x1C0);
 		DrawInit();
 	}
@@ -3607,19 +3603,19 @@ void CMenuPcs::DrawLoadMenu()
 					(float)*reinterpret_cast<short*>((int)(piVar13 + 3) + 2),
 					FLOAT_803313dc, FLOAT_803313e8);
 				GXSetScissor(piVar13[0x10], piVar13[0x11], piVar13[0x12], piVar13[0x13]);
-				SetFog__8CGraphicFii(&Graphic, 1, 0);
+				Graphic.SetFog(1, 0);
 				unsigned int ambColor = DAT_80210830[0];
 				SetAmbient__9CLightPcsF8_GXColor(&LightPcs, &ambColor);
-				SetNumDiffuse__9CLightPcsFUl(&LightPcs, DAT_8021082c[0]);
+				LightPcs.SetNumDiffuse(DAT_8021082c[0]);
 				for (int j = 0; j < DAT_8021082c[0]; j++) {
 					SetDiffuse__9CLightPcsFUl8_GXColorP3Veci(&LightPcs, j, &DAT_8021082c[j * 3 + 2], &DAT_8021082c[j * 3 + 5], 0);
 				}
-				SetPosition__9CLightPcsFQ29CLightPcs6TARGETP3VecUl(&LightPcs, 0, 0, 0xFFFFFFFF);
+				LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(0), 0, 0xFFFFFFFF);
 			}
 		}
 		DrawInit();
 		PSMTXCopy(m_cameraMatrix, CameraPcs.m_cameraMatrix);
-		SetViewport__8CGraphicFv(&Graphic);
+		Graphic.SetViewport();
 		GXSetScissor(0, 0, 0x280, 0x1C0);
 		DrawInit();
 	}
@@ -3961,7 +3957,7 @@ void CMenuPcs::DrawTitleMenu()
 		Mtx44 projMtx2;
 		PSMTX44Copy(CameraPcs.m_screenMatrix, projMtx2);
 		GXSetProjection(projMtx2, GX_PERSPECTIVE);
-		SetViewport__8CGraphicFv(&Graphic);
+		Graphic.SetViewport();
 		GXSetScissor(0, 0, 0x280, 0x1C0);
 		DrawInit();
 
@@ -4598,7 +4594,7 @@ void CMenuPcs::RestoreProjection()
 	GXSetCopyClear(clearColor, 0x00FFFFFF);
 	PSMTX44Copy(*reinterpret_cast<Mtx44*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x48), projectionMtx);
 	GXSetProjection(projectionMtx, GX_PERSPECTIVE);
-	SetViewport__8CGraphicFv(&Graphic);
+	Graphic.SetViewport();
 	GXSetScissor(0, 0, 0x280, 0x1C0);
 	DrawInit();
 }
@@ -5330,14 +5326,14 @@ void CMenuPcs::DrawFukidashi()
 					GXSetScissor(piVar10[0x10], piVar10[0x11], piVar10[0x12], piVar10[0x13]);
 					viewportSetup = true;
 				}
-				SetFog__8CGraphicFii(&Graphic, 1, 0);
+				Graphic.SetFog(1, 0);
 				unsigned int ambColor = DAT_80210830[0];
 				SetAmbient__9CLightPcsF8_GXColor(&LightPcs, &ambColor);
-				SetNumDiffuse__9CLightPcsFUl(&LightPcs, DAT_8021082c[0]);
+				LightPcs.SetNumDiffuse(DAT_8021082c[0]);
 				for (int j = 0; j < DAT_8021082c[0]; j++) {
 					SetDiffuse__9CLightPcsFUl8_GXColorP3Veci(&LightPcs, j, &DAT_8021082c[j * 3 + 2], &DAT_8021082c[j * 3 + 5], 0);
 				}
-				SetPosition__9CLightPcsFQ29CLightPcs6TARGETP3VecUl(&LightPcs, 0, 0, 0xFFFFFFFF);
+				LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(0), 0, 0xFFFFFFFF);
 			}
 			viewOff += 0x50;
 		}
@@ -8071,14 +8067,14 @@ void CMenuPcs::DrawMainMenuSub()
 		              FLOAT_803313dc, FLOAT_803313e8);
 		GXSetScissor(*reinterpret_cast<unsigned int*>(view + 0x40), *reinterpret_cast<unsigned int*>(view + 0x44),
 		             *reinterpret_cast<unsigned int*>(view + 0x48), *reinterpret_cast<unsigned int*>(view + 0x4C));
-		SetFog__8CGraphicFii(&Graphic, 1, 0);
+		Graphic.SetFog(1, 0);
 		SetAmbient__9CLightPcsF8_GXColor(&LightPcs, DAT_80210830);
-		SetNumDiffuse__9CLightPcsFUl(&LightPcs, DAT_8021082c[0]);
+		LightPcs.SetNumDiffuse(DAT_8021082c[0]);
 		for (int lightIndex = 0; lightIndex < DAT_8021082c[0]; lightIndex++) {
 			SetDiffuse__9CLightPcsFUl8_GXColorP3Veci(&LightPcs, lightIndex, &DAT_8021082c[lightIndex * 3 + 2],
 			                                         reinterpret_cast<Vec*>(&DAT_8021082c[lightIndex * 3 + 5]), 0);
 		}
-		SetPosition__9CLightPcsFQ29CLightPcs6TARGETP3VecUl(&LightPcs, 0, 0, 0xFFFFFFFF);
+		LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(0), 0, 0xFFFFFFFF);
 		handle->Draw(5);
 		DrawInit();
 
@@ -8111,7 +8107,7 @@ void CMenuPcs::DrawMainMenuSub()
 	}
 
 	PSMTXCopy(savedCamera, CameraPcs.m_cameraMatrix);
-	SetViewport__8CGraphicFv(&Graphic);
+	Graphic.SetViewport();
 	GXSetScissor(0, 0, 0x280, 0x1C0);
 	DrawInit();
 
@@ -8607,16 +8603,16 @@ void CMenuPcs::SetLight(int mode)
 	int localColor;
 	int* const lightTable = DAT_8021082c + mode * 0xE;
 
-	SetFog__8CGraphicFii(&Graphic, 1, 0);
+	Graphic.SetFog(1, 0);
 	SetAmbient__9CLightPcsF8_GXColor(&LightPcs, &DAT_80210830[mode * 0xE]);
-	SetNumDiffuse__9CLightPcsFUl(&LightPcs, static_cast<unsigned long>(lightTable[0]));
+	LightPcs.SetNumDiffuse(static_cast<unsigned long>(lightTable[0]));
 
 	for (int i = 0; i < lightTable[0]; i++) {
 		localColor = lightTable[2 + i];
 		SetDiffuse__9CLightPcsFUl8_GXColorP3Veci(&LightPcs, static_cast<unsigned long>(i), &localColor, lightTable + 5 + i * 3, 0);
 	}
 
-	SetPosition__9CLightPcsFQ29CLightPcs6TARGETP3VecUl(&LightPcs, 0, 0, 0xFFFFFFFF);
+	LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(0), 0, 0xFFFFFFFF);
 }
 
 /*

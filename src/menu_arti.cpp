@@ -48,15 +48,6 @@ const char s_MenuOptionOffDe[] = "AUS";
 const char s_MenuOptionStereoDe[] = "STEREO";
 }
 
-extern "C" void DrawSingleIcon__8CMenuPcsFiiifif(CMenuPcs*, int, int, int, float, int, float);
-extern "C" float CalcListPos__8CMenuPcsFiii(CMenuPcs*, int, int, int);
-extern "C" void DrawListPosMark__8CMenuPcsFfff(CMenuPcs*, float, float, float);
-extern "C" void DrawHelpMessage__8CMenuPcsFiP5CFontii8_GXColoriff(CMenuPcs*, int, CFont*, int, int, GXColor, int, float, float);
-extern "C" void DrawFont__8CMenuPcsFii8_GXColoriPcff(CMenuPcs*, int, int, GXColor, int, const char*, float, float);
-extern "C" float CalcCenteringPos__8CMenuPcsFPcP5CFont(CMenuPcs*, const char*, CFont*);
-extern "C" const char* GetMenuStr__8CMenuPcsFi(CMenuPcs*, int);
-
-
 namespace {
 struct ArtiState {
 	unsigned char pad_0000[0xB];
@@ -418,7 +409,7 @@ void CMenuPcs::ArtiDraw()
 		short itemCount = *(short*)(scriptFood + menuIndex * 2 + 0x136);
 		const char* text;
 		if (itemCount < 1) {
-			text = GetMenuStr__8CMenuPcsFi(this, 0x14);
+			text = GetMenuStr(0x14);
 		} else {
 			text = flatData->table[0].strings[itemCount * 5 + 4];
 			if (menuIndex == (int)*(short*)(GetArtiStateBase(this) + 0x26) + (int)*(short*)(GetArtiStateBase(this) + 0x34)) {
@@ -444,16 +435,16 @@ void CMenuPcs::ArtiDraw()
 		if (itemCount > 0) {
 			int iconY = (int)((float)(iconEntry[1] + 6) - FLOAT_80332fac);
 			int iconX = (int)((float)(iconEntry[0] + iconEntry[2] - 0x10));
-			DrawSingleIcon__8CMenuPcsFiiifif(this, itemCount, iconX, iconY, *(float*)(iconEntry + 8), 0, 0.0f);
+			DrawSingleIcon(itemCount, iconX, iconY, *(float*)(iconEntry + 8), 0, 0.0f);
 		}
 		iconEntry += 0x20;
 	}
 
 	if (state == 1) {
 		int menuData = GetArtiListBase(this);
-		float mark = CalcListPos__8CMenuPcsFiii(this, *(short*)(GetArtiStateBase(this) + 0x34), 0x49, 0);
+		float mark = static_cast<float>(CalcListPos(*(short*)(GetArtiStateBase(this) + 0x34), 0x49, 0));
 		if (mark > 0.0f) {
-			DrawListPosMark__8CMenuPcsFfff(this, (float)*(short*)(menuData + 8), (float)*(short*)(menuData + 10), mark);
+			DrawListPosMark((float)*(short*)(menuData + 8), (float)*(short*)(menuData + 10), mark);
 		}
 	}
 
@@ -480,17 +471,16 @@ void CMenuPcs::ArtiDraw()
 	}
 
 	if (selectedArtifactId == -1) {
-		const char* text = GetMenuStr__8CMenuPcsFi(this, 0x14);
+		const char* text = GetMenuStr(0x14);
 		CColor color(0xFF, 0xFF, 0xFF, helpAlpha);
-		int x = (int)CalcCenteringPos__8CMenuPcsFPcP5CFont(this, text, helpFont);
-		DrawFont__8CMenuPcsFii8_GXColoriPcff(
-			this, x, (int)FLOAT_80332fcc, color.color, 10, text, FLOAT_80332fac, FLOAT_80332fd0);
+		int x = (int)CalcCenteringPos(const_cast<char*>(text), helpFont);
+		DrawFont(x, (int)FLOAT_80332fcc, color.color, 10, const_cast<char*>(text), FLOAT_80332fac,
+		         FLOAT_80332fd0);
 	} else {
 		CColor helpColor(0xFF, 0xFF, 0xFF, helpAlpha);
 		int x = (int)-(helpWidth * FLOAT_80332fd8 - FLOAT_80332fd4);
-		DrawHelpMessage__8CMenuPcsFiP5CFontii8_GXColoriff(
-			this, selectedArtifactId, helpFont, x, (int)FLOAT_80332fcc, helpColor.color, 10, FLOAT_80332fac,
-			FLOAT_80332fd0);
+		DrawHelpMessage(selectedArtifactId, helpFont, x, (int)FLOAT_80332fcc, helpColor.color, 10,
+		                FLOAT_80332fac, FLOAT_80332fd0);
 	}
 }
 

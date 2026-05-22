@@ -130,6 +130,13 @@ public:
 
     void DrawBar(float, float, float, TEX, float);
     void DrawWindow(float, float, float, float, TEX, float);
+    void DrawSingleIcon(int, int, int, float, int, float);
+    double CalcListPos(int, int, int);
+    void DrawListPosMark(float, float, float);
+    float CalcCenteringPos(char*, CFont*);
+    void DrawFont(int, int, _GXColor, int, char*, float, float);
+    void DrawHelpMessage(int, CFont*, int, int, _GXColor, int, float, float);
+    char* GetMenuStr(int);
 
     void LoadExtraFont(int, char*);
     void SetExtraFontTlut(int, _GXColor);

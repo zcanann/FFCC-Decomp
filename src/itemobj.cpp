@@ -24,8 +24,6 @@ extern "C" void Detach__8CGObjectFv(void*);
 extern "C" void changeStat__8CGPrgObjFiii(void*, int, int, int);
 extern "C" float CalcSafePos__8CGObjectFiP8CGObjectP3Vec(void*, int, void*, Vec*);
 extern "C" void moveVectorHRot__8CGObjectFfffi(void*, float, float, float, int);
-extern "C" void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-    void*, int, int, int, int, void*, void*);
 extern "C" void LoadModel__8CGObjectFiUlUli(void*, int, unsigned long, unsigned long, int);
 extern "C" void LoadAnim__8CGObjectFPciiiUl(void*, char*, int, int, int, unsigned long);
 extern "C" void SetAnimSlot__8CGObjectFii(void*, int, int);
@@ -740,8 +738,7 @@ void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 		stack[0].m_word = 3;
 		stack[1].m_word = static_cast<unsigned int>((-carryState | carryState) >> 0x1F);
 		stack[2].m_word = 0;
-		SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-			&CFlat, 0, 1, 9, 3, stack, 0);
+		reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(0, 1, 9, 3, stack, 0);
 	}
 }
 
@@ -806,8 +803,7 @@ CGPrgObj* CGItemObj::CreateFromScript(
 	inStack[2].m_word = scriptArg;
 	inStack[3].m_word = owner != 0 ? owner->m_particleId : 0;
 	*reinterpret_cast<float*>(&inStack[4].m_word) = launchAngle;
-	SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-	    &CFlat, 0, 1, 7, 5, inStack, &outStack);
+	reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(0, 1, 7, 5, inStack, &outStack);
 
 	CGPrgObj* newItem = 0;
 	if (createMode != 1) {
@@ -1299,8 +1295,8 @@ void CGItemObj::onFrameStat()
 
 				CFlatRuntime::CStack stack;
 				stack.m_word = 1;
-				SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-				    &CFlat, *(int*)(self + 0x550), 2, 0x16, 1, &stack, 0);
+				reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(
+				    *reinterpret_cast<CFlatRuntime::CObject**>(self + 0x550), 2, 0x16, 1, &stack, 0);
 			}
 
 			self[0x38] = static_cast<unsigned char>(__rlwimi(self[0x38], 1, 7, 24, 24));
@@ -1338,8 +1334,8 @@ void CGItemObj::onFrameStat()
 			CFlatRuntime::CStack stack;
 			stack.m_word = 0;
 			*(int*)(m_boss__8CGMonObj + ownerSlot * 4 + 8) = 0;
-			SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-			    &CFlat, *(int*)(self + 0x550), 2, 0x16, 1, &stack, 0);
+			reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(
+			    *reinterpret_cast<CFlatRuntime::CObject**>(self + 0x550), 2, 0x16, 1, &stack, 0);
 
 			self[0x38] = static_cast<unsigned char>(__rlwimi(self[0x38], 1, 7, 24, 24));
 		}

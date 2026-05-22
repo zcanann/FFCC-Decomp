@@ -23,8 +23,6 @@ extern "C" int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, C
 extern "C" void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
 extern "C" void GetHitFaceNormal__7CMapObjFP3Vec(void*, Vec*);
 extern "C" int CalcHitSlide__7CMapObjFP3Vecf(void*, Vec*);
-extern "C" void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-	void*, void*, int, int, int, void*, void*);
 extern "C" int CanCreateFromScript__9CGItemObjFv();
 extern "C" void onPush__9CGBaseObjFP9CGBaseObji(CGBaseObj*, CGBaseObj*, int);
 extern "C" void* CreateFromScript__9CGItemObjFiiiP8CGObjectfPQ29CGItemObj4CCFS(
@@ -895,12 +893,11 @@ void CGPartyObj::command()
 				reinterpret_cast<CGObject*>(party.secondaryTarget) : party.target;
 			party.commandFlags |= 0x80;
 
-			int stack[2];
-			stack[0] = primaryCommand;
-			stack[1] = scriptTarget != nullptr ?
+			CFlatRuntime::CStack stack[2];
+			stack[0].m_word = primaryCommand;
+			stack[1].m_word = scriptTarget != nullptr ?
 				*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(scriptTarget) + 0x30) : 0;
-			SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-				&CFlat, this, 2, 0x14, 2, stack, static_cast<void*>(0));
+			reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(this, 2, 0x14, 2, stack, 0);
 			return;
 		}
 

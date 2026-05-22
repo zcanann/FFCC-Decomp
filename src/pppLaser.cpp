@@ -29,7 +29,6 @@ void pppInitBlendMode(void);
 void pppSetBlendMode(unsigned char);
 
 extern "C" {
-void pppHeapUseRate__FPQ27CMemory6CStage(void*);
 int GetParticleSpecialInfo__5CGameFR10PPPIFPARAMRiRi(CGame*, PPPIFPARAM*, int*, int*);
 void GetTargetCursor__5CGameFiR3VecR3Vec(CGame*, int, Vec*, Vec*);
 void* GetPartyObj__5CGameFi(CGame*, int);
@@ -182,7 +181,7 @@ void pppDestructLaser(struct pppLaser *pppLaser, _pppCtrlTable *param_2)
     LaserWork* work = (LaserWork*)((u8*)pppLaser + 0x80 + param_2->m_serializedDataOffsets[2]);
     void* alloc = work->m_points;
     if (alloc != 0) {
-        pppHeapUseRate__FPQ27CMemory6CStage(alloc);
+        pppHeapUseRate(static_cast<CMemory::CStage*>(alloc));
         work->m_points = 0;
     }
 }

@@ -11,10 +11,6 @@ extern "C" const char s_charaAnimAllocWarn[32] =
     "\214\303\202\242\203\101\203\152\203\201\201\133\203\126\203\207\203\223"
     "\214\140\216\256\202\305\202\267\201\102\n";
 extern "C" void gqrInit__6CCharaFUlUlUl(void*, unsigned long, unsigned long, unsigned long);
-extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
-    CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
-extern "C" void SetGroup__7CMemoryFPvi(CMemory*, void*, int);
-extern "C" void CopyFromAMemorySync__7CMemoryFPvPvUl(CMemory*, void*, void*, unsigned long);
 extern "C" int TryReleaseAnimBank__9CCharaPcsFi(void*, int);
 class CCharaPcs;
 extern CChara Chara;
@@ -381,11 +377,10 @@ void CChara::CAnimNode::Interp(CChara::CAnim* anim, SRT* srt, float frame)
 			}
 		}
 
-		SetGroup__7CMemoryFPvi(&Memory, anim->m_bank, 1);
-		CopyFromAMemorySync__7CMemoryFPvPvUl(
-		    &Memory, anim->m_bank,
-		    reinterpret_cast<void*>(anim->m_bankAddress + S32At(Chara.m_animAmemBase, 8)),
-		    anim->m_bankSize);
+		Memory.SetGroup(anim->m_bank, 1);
+		Memory.CopyFromAMemorySync(anim->m_bank,
+		                           reinterpret_cast<void*>(anim->m_bankAddress + S32At(Chara.m_animAmemBase, 8)),
+		                           anim->m_bankSize);
 	}
 
 	int frameInt = static_cast<int>(frame);

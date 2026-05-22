@@ -23,8 +23,8 @@ extern "C" void destroyViewer__18CMaterialEditorPcsFv(CMaterialEditorPcs*);
 extern "C" void calcViewer__18CMaterialEditorPcsFv(CMaterialEditorPcs*);
 extern "C" void drawViewer__18CMaterialEditorPcsFv(CMaterialEditorPcs*);
 extern "C" void __dt__18CMaterialEditorPcsFv(void* self);
-extern "C" char __RTTI__8CManager_8032E648[];
-extern "C" char __RTTI__8CProcess_8032E650[];
+extern const char __RTTI__8CManager_8032E648[];
+extern const char __RTTI__8CProcess_8032E650[];
 extern "C" unsigned int m_table_desc0__18CMaterialEditorPcs[];
 extern "C" unsigned int m_table_desc1__18CMaterialEditorPcs[];
 extern "C" unsigned int m_table_desc2__18CMaterialEditorPcs[];
@@ -49,8 +49,8 @@ unsigned int CMaterialEditorPcs::m_table_desc3[3] = {0, 0xFFFFFFFF, reinterpret_
 unsigned int CMaterialEditorPcs::m_table[0x15C / sizeof(unsigned int)] = {
     reinterpret_cast<unsigned int>(const_cast<char*>(s_CMaterialEditorPcs_VIEWER_801D7D18)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x20, 0, 0, 0, 0, 0x41, 1
 };
-unsigned int s_CMaterialEditorPcsTablePad0[3] = {reinterpret_cast<unsigned int>(__RTTI__8CManager_8032E648), 0, 0};
-unsigned int s_CMaterialEditorPcsTablePad1[5] = {reinterpret_cast<unsigned int>(__RTTI__8CManager_8032E648), 0, reinterpret_cast<unsigned int>(__RTTI__8CProcess_8032E650), 0, 0};
+unsigned int s_CMaterialEditorPcsTablePad0[3] = {reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CManager_8032E648)), 0, 0};
+unsigned int s_CMaterialEditorPcsTablePad1[5] = {reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CManager_8032E648)), 0, reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CProcess_8032E650)), 0, 0};
 u8 lbl_8026D338[0xC];
 CMaterialEditorPcs MaterialEditorPcs;
 

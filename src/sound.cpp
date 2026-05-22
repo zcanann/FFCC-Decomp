@@ -68,8 +68,6 @@ extern const char s_sound_cpp_801db2d4[] = "sound.cpp";
 
 extern double DOUBLE_80330d20;
 extern double DOUBLE_80330d28;
-extern "C" void __ct__9CRedSoundFv(void*);
-extern "C" void __dt__6CSoundFv(void*);
 extern "C" int Printf__7CSystemFPce(CSystem*, const char*, ...);
 CSound Sound;
 

@@ -53,18 +53,8 @@ void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CS
     void*, int, int, int, int, void*, void*);
 void Draw__5CWindFv(void*);
 int rand(void);
-void* __register_global_object(void*, void*, void*);
-void __ct__12CCaravanWorkFv(void*);
-void __dt__12CCaravanWorkFv(void*, int);
-void __ct__8CMonWorkFv(void*);
-void __dt__8CMonWorkFv(void*, int);
-void __ct__9CFlatDataFv(void*);
-void __dt__9CFlatDataFv(void*, int);
 void ResetNewGame__13CFlatRuntime2Fv(void*);
 void InitFurTexBuffer__6CCharaFv(void*);
-void* __vt__8CManager[];
-void __dt__5CGameFv(void*, int);
-void* __vt__5CGame[];
 }
 
 const float FLOAT_8032f688 = 1.0E+10;

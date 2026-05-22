@@ -66,12 +66,12 @@ extern const char s_CProcess_801D7C88[] = "CProcess";
 extern "C" const char s_LightTextureFullFmt_801D7C94[0x18] =
     "\x83\x89\x83\x43\x83\x67\x82\xAA\x91\xAB\x82\xE8\x82\xDC\x82\xB9\x82\xF1\x81\x42\x0A";
 
-unsigned int m_table_desc0__9CLightPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__9CLightPcsFv)};
-unsigned int m_table_desc1__9CLightPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__9CLightPcsFv)};
-unsigned int m_table_desc2__9CLightPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__9CLightPcsFv)};
-unsigned int m_table_desc3__9CLightPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(draw__9CLightPcsFv)};
-unsigned int m_table_desc4__9CLightPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(MakeLightMap__9CLightPcsFv)};
-unsigned int m_table__9CLightPcs[0x15C / sizeof(unsigned int)] = {
+unsigned int CLightPcs::m_table_desc0[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__9CLightPcsFv)};
+unsigned int CLightPcs::m_table_desc1[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__9CLightPcsFv)};
+unsigned int CLightPcs::m_table_desc2[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__9CLightPcsFv)};
+unsigned int CLightPcs::m_table_desc3[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(draw__9CLightPcsFv)};
+unsigned int CLightPcs::m_table_desc4[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(MakeLightMap__9CLightPcsFv)};
+unsigned int CLightPcs::m_table[0x15C / sizeof(unsigned int)] = {
     reinterpret_cast<unsigned int>(const_cast<char*>(s_CLightPcs_801D7C70)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x1C, 0, 0, 0, 0, 0x2A, 0, 0, 0,
     0, 0x2D, 1
 };
@@ -143,7 +143,7 @@ void CLightPcs::Quit()
  */
 int CLightPcs::GetTable(unsigned long index)
 {
-    return (int)m_table__9CLightPcs + (index * 0x15c);
+    return (int)m_table + (index * 0x15c);
 }
 
 /*

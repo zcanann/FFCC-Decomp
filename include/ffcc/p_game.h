@@ -16,14 +16,14 @@ extern "C" void draw0__8CGamePcsFv(CGamePcs*);
 extern "C" void draw1__8CGamePcsFv(CGamePcs*);
 extern "C" void draw2__8CGamePcsFv(CGamePcs*);
 
-extern unsigned int m_table__8CGamePcs[];
-
 class CGamePcs : public CProcess
 {
 public:
+    static unsigned int m_table[0x15C / sizeof(unsigned int)];
+
     CGamePcs()
     {
-        unsigned int* table = reinterpret_cast<unsigned int*>(m_table__8CGamePcs);
+        unsigned int* table = reinterpret_cast<unsigned int*>(m_table);
         static unsigned int desc0[] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__8CGamePcsFv)};
         static unsigned int desc1[] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__8CGamePcsFv)};
         static unsigned int desc2[] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcInit__8CGamePcsFv)};

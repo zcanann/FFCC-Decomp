@@ -25,14 +25,8 @@ extern "C" double cos(double);
 #include <math.h>
 #include <string.h>
 
-extern "C" void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-    void*, CGBaseObj*, int, int, int, CFlatRuntime::CStack*, CFlatRuntime::CStack*);
-extern "C" CGObject* FindGObjFirst__13CFlatRuntime2Fv(void*);
-extern "C" CGObject* FindGObjNext__13CFlatRuntime2FP8CGObject(void*, CGObject*);
-extern "C" CGQuadObj* FindGQuadObjFirst__13CFlatRuntime2Fv(void*);
 extern "C" int CrossCheckSphereVector__5CMathFP3VecPfP3VecP3VecP3Vecf(
     CMath*, Vec*, float*, Vec*, Vec*, Vec*, float, float, float);
-extern "C" CGQuadObj* FindGQuadObjNext__13CFlatRuntime2FP9CGQuadObj(void*, CGQuadObj*);
 extern "C" int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, CMapCylinder*, Vec*, u32);
 extern "C" int CalcHitSlide__7CMapObjFP3Vecf(void*, Vec*);
 extern "C" void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
@@ -555,15 +549,9 @@ void CGObject::move()
         if (((static_cast<int>(scriptMoveFlag) >= 0) && (scriptMoveEnd != 0))
             || ((static_cast<int>(scriptMoveFlag) < 0) && (scriptMoveEnd == 2))) {
             *(reinterpret_cast<u8*>(&m_weaponNodeFlags) + 1) &= 0xDF;
-            u32 stackWord = static_cast<u32>(__cntlzw(static_cast<u32>(2 - scriptMoveEnd))) >> 5;
-            SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-                CFlat,
-                this,
-                2,
-                7,
-                1,
-                reinterpret_cast<CFlatRuntime::CStack*>(&stackWord),
-                0);
+            CFlatRuntime::CStack stack;
+            stack.m_word = static_cast<u32>(__cntlzw(static_cast<u32>(2 - scriptMoveEnd))) >> 5;
+            reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(this, 2, 7, 1, &stack, 0);
         }
 
         movingWithScript = true;
@@ -809,16 +797,16 @@ void CGObject::objectCollision()
     PSVECAdd(&selfBasePos, &selfCapsuleOffset, &selfCapsulePos);
 
     if ((m_bgColMask & 0x10000) != 0) {
-        for (CGQuadObj* quad = FindGQuadObjFirst__13CFlatRuntime2Fv(CFlat); quad != 0;
-            quad = FindGQuadObjNext__13CFlatRuntime2FP9CGQuadObj(CFlat, quad)) {
+        for (CGQuadObj* quad = gCFlatRuntime2.FindGQuadObjFirst(); quad != 0;
+            quad = gCFlatRuntime2.FindGQuadObjNext(quad)) {
             if (quad->isInner(&selfBasePos)) {
                 CallOnPush(quad, this, 0);
             }
         }
     }
 
-    for (CGObject* other = FindGObjNext__13CFlatRuntime2FP8CGObject(CFlat, this); other != 0;
-         other = FindGObjNext__13CFlatRuntime2FP8CGObject(CFlat, other)) {
+    for (CGObject* other = gCFlatRuntime2.FindGObjNext(this); other != 0;
+         other = gCFlatRuntime2.FindGObjNext(other)) {
         if (((m_bgColMask & 0xE) == 0) || ((other->m_bgColMask & 0xE) == 0)) {
             continue;
         }
@@ -1356,8 +1344,8 @@ void CGObject::hit()
         return;
     }
 
-    for (CGObject* other = FindGObjFirst__13CFlatRuntime2Fv(CFlat); other != 0;
-         other = FindGObjNext__13CFlatRuntime2FP8CGObject(CFlat, other)) {
+    for (CGObject* other = gCFlatRuntime2.FindGObjFirst(); other != 0;
+         other = gCFlatRuntime2.FindGObjNext(other)) {
         if ((other == this) || ((other->m_bgColMask & 0x80000) == 0)) {
             continue;
         }
@@ -1403,8 +1391,7 @@ void CGObject::hit()
                     *reinterpret_cast<float*>(&stackIn[5].m_word) = hitPos.z;
                     stackIn[6].m_word = reinterpret_cast<u32>(m_scriptHandle);
                     CFlatRuntime::CStack stackOut;
-                    SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-                        CFlat, this, 2, 0x13, 7, stackIn, &stackOut);
+                    reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(this, 2, 0x13, 7, stackIn, &stackOut);
                     onHit(attackIndex, other, damageIndex, &hitPos);
                 }
             }
@@ -1760,8 +1747,7 @@ void CGObject::update()
                             CFlatRuntime::CStack stackIn[2];
                             stackIn[0].m_word = static_cast<unsigned int>(m_animSlotSel);
                             stackIn[1].m_word = static_cast<unsigned int>(pointValue);
-                            SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-                                CFlat, this, 2, 9, 2, stackIn, 0);
+                            reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(this, 2, 9, 2, stackIn, 0);
                             onAnimPoint(m_animSlotSel, pointValue);
                         }
                     }
@@ -1792,8 +1778,7 @@ void CGObject::update()
                         m_rotTargetY = m_rotBaseY;
                         shieldFlagsLo &= ~0x8;
                         shieldFlagsLo &= ~0x80;
-                        SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-                            CFlat, this, 2, 10, 0, 0, 0);
+                        reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(this, 2, 10, 0, 0, 0);
                     } else {
                         m_currentAnimSlot =
                             (queuedAnim >= 'A' && queuedAnim < 'A' + 4) ? m_animQueue[queuedAnim - 'A'] : queuedAnim;
@@ -1812,8 +1797,7 @@ void CGObject::update()
                     m_rotTargetY = m_rotBaseY;
                     shieldFlagsLo &= ~0x8;
                     shieldFlagsLo &= ~0x80;
-                    SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-                        CFlat, this, 2, 10, 0, 0, 0);
+                    reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(this, 2, 10, 0, 0, 0);
                 }
             }
         }
@@ -2139,8 +2123,7 @@ void CGObject::CancelMove(int moveType)
 
     CFlatRuntime::CStack arg;
     arg.m_word = static_cast<u32>(moveType);
-    SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-        CFlat, this, 2, 7, 1, &arg, 0);
+    reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(this, 2, 7, 1, &arg, 0);
 }
 
 /*
@@ -2359,8 +2342,8 @@ CGObject* CGObject::CCClass(int useBodyRadius, int classMask, float yOffset, Vec
     double bestDist = static_cast<double>(sLargeDistance);
     best = 0;
 
-    for (CGObject* other = FindGObjFirst__13CFlatRuntime2Fv(CFlat); other != 0;
-         other = FindGObjNext__13CFlatRuntime2FP8CGObject(CFlat, other)) {
+    for (CGObject* other = gCFlatRuntime2.FindGObjFirst(); other != 0;
+         other = gCFlatRuntime2.FindGObjNext(other)) {
         if (other == this) {
             continue;
         }
@@ -2674,33 +2657,20 @@ void CGObject::Turn(float targetRot, int turnFrames)
  */
 void CGObject::HitParticle(int effectIndex, int kind, int nodeIndex, int colliderIndex, Vec* pos, PPPIFPARAM* hitParam)
 {
-    struct HitParticleStack {
-        int m_effectIndex;
-        int m_kind;
-        int m_nodeIndex;
-        int m_colliderIndex;
-        float m_x;
-        float m_y;
-        float m_z;
-        int m_particleIndex;
-        int m_classId;
-    };
-
     typedef void (*OnHitParticleFn)(CGObject*, int, int, int, int, Vec*, PPPIFPARAM*);
 
-    HitParticleStack stack;
-    stack.m_effectIndex = effectIndex;
-    stack.m_kind = kind;
-    stack.m_nodeIndex = nodeIndex;
-    stack.m_colliderIndex = colliderIndex;
-    stack.m_x = pos->x;
-    stack.m_y = pos->y;
-    stack.m_z = pos->z;
-    stack.m_particleIndex = hitParam->m_particleIndex;
-    stack.m_classId = static_cast<int>(hitParam->m_classId);
+    CFlatRuntime::CStack stack[9];
+    stack[0].m_word = effectIndex;
+    stack[1].m_word = kind;
+    stack[2].m_word = nodeIndex;
+    stack[3].m_word = colliderIndex;
+    *reinterpret_cast<float*>(&stack[4].m_word) = pos->x;
+    *reinterpret_cast<float*>(&stack[5].m_word) = pos->y;
+    *reinterpret_cast<float*>(&stack[6].m_word) = pos->z;
+    stack[7].m_word = hitParam->m_particleIndex;
+    stack[8].m_word = static_cast<int>(hitParam->m_classId);
 
-    SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-        &CFlat, this, 2, 0xB, 9, reinterpret_cast<CFlatRuntime::CStack*>(&stack), 0);
+    reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(this, 2, 0xB, 9, stack, 0);
 
     OnHitParticleFn onHitParticle = *reinterpret_cast<OnHitParticleFn*>(
         *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x48) + 0x3C);

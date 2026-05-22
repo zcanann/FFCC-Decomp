@@ -8,7 +8,6 @@
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
-extern "C" int GetPadType__6JoyBusFi(void*, int);
 extern "C" void DrawInit__8CMenuPcsFv(void*);
 extern "C" void SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(void*, int);
 extern "C" void DrawRect__8CMenuPcsFUlfffffffff(
@@ -604,9 +603,9 @@ void CMes::Draw()
 					if (ch == 7)
 					{
 						unsigned int mode;
-						if ((Game.m_currentMapId == 0x21) && (GetPadType__6JoyBusFi(&Joybus, 0) != 0x40))
+						if ((Game.m_currentMapId == 0x21) && (Joybus.GetPadType(0) != 0x40))
 						{
-							int padType = GetPadType__6JoyBusFi(&Joybus, 0);
+							int padType = Joybus.GetPadType(0);
 							mode = (unsigned int)(((0x40000U - (unsigned int)padType) |
 							                       ((unsigned int)padType - 0x40000U)) >>
 							                      31);
@@ -620,9 +619,9 @@ void CMes::Draw()
 					else if (ch == 8)
 					{
 						unsigned int mode;
-						if ((Game.m_currentMapId == 0x21) && (GetPadType__6JoyBusFi(&Joybus, 0) != 0x40))
+						if ((Game.m_currentMapId == 0x21) && (Joybus.GetPadType(0) != 0x40))
 						{
-							int padType = GetPadType__6JoyBusFi(&Joybus, 0);
+							int padType = Joybus.GetPadType(0);
 							mode = (unsigned int)(((0x40000U - (unsigned int)padType) |
 							                       ((unsigned int)padType - 0x40000U)) >>
 							                      31);
@@ -636,9 +635,9 @@ void CMes::Draw()
 					else if (ch == 0x0A)
 					{
 						unsigned int mode;
-						if ((Game.m_currentMapId == 0x21) && (GetPadType__6JoyBusFi(&Joybus, 0) != 0x40))
+						if ((Game.m_currentMapId == 0x21) && (Joybus.GetPadType(0) != 0x40))
 						{
-							int padType = GetPadType__6JoyBusFi(&Joybus, 0);
+							int padType = Joybus.GetPadType(0);
 							mode = (unsigned int)(((0x40000U - (unsigned int)padType) |
 							                       ((unsigned int)padType - 0x40000U)) >>
 							                      31);
@@ -652,9 +651,9 @@ void CMes::Draw()
 					else if (ch == 0x0B)
 					{
 						unsigned int mode;
-						if ((Game.m_currentMapId == 0x21) && (GetPadType__6JoyBusFi(&Joybus, 0) != 0x40))
+						if ((Game.m_currentMapId == 0x21) && (Joybus.GetPadType(0) != 0x40))
 						{
-							int padType = GetPadType__6JoyBusFi(&Joybus, 0);
+							int padType = Joybus.GetPadType(0);
 							mode = (unsigned int)(((0x40000U - (unsigned int)padType) |
 							                       ((unsigned int)padType - 0x40000U)) >>
 							                      31);

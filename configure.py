@@ -496,7 +496,7 @@ config.libs = [
             Object(NonMatching, "astar.cpp"),
             Object(NonMatching, "baseobj.cpp"),
             Object(NonMatching, "bonus_menu.cpp"),
-            Object(Matching, "cflat_data.cpp"),
+            Object(NonMatching, "cflat_data.cpp"),
             Object(NonMatching, "cflat_r2class.cpp"),
             Object(NonMatching, "cflat_r2system.cpp"),
             Object(NonMatching, "cflat_runtime.cpp"),

@@ -17,6 +17,7 @@
 #include "ffcc/THPSimple.h"
 #include "ffcc/joybus.h"
 #include "ffcc/color.h"
+#include "ffcc/cflat_runtime2.h"
 
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
@@ -34,8 +35,6 @@ extern "C" void DrawOptionMenu__8CMenuPcsFv(CMenuPcs*);
 extern "C" void DrawSingCMake__8CMenuPcsFv(CMenuPcs*);
 extern CMenuPcs MenuPcs;
 
-extern "C" void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-    void*, void*, int, int, int, void*, void*);
 extern "C" int GetWinMess__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" int GetMcWinMessBuff__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" void SetFog__8CGraphicFii(void*, int, int);
@@ -62,8 +61,6 @@ extern "C" unsigned int pppCreate__8CPartMngFiiP14PPPCREATEPARAMi(void*, int, in
 extern "C" void pppDeletePart__8CPartMngFi(void*, int);
 extern "C" void pppDestroyAll__8CPartMngFv(void*);
 extern "C" void* Free__7CMemoryFPv(CMemory*, void*);
-extern "C" int GetPadType__7CJoybusFi(void*, int);
-extern "C" char GetGBAConnect__7CJoybusFi(void*, int);
 extern "C" asm void MTX44MultVec4__5CMathFPA4_fP3VecP5Vec4d(register void*, register float (*)[4], register Vec*,
                                                             register void*);
 extern "C" int DAT_8021082c[];
@@ -970,15 +967,14 @@ void CMenuPcs::calcWorld()
 	if (animState == 1) {
 		if (animEnd <= animTime) {
 			if (reinterpret_cast<short*>(worldState + 0x22)[0] > 9) {
-				int stackData[3];
-				stackData[0] = 2;
-				stackData[1] = 0;
-				stackData[2] = 0;
+				CFlatRuntime::CStack stackData[3];
+				stackData[0].m_word = 2;
+				stackData[1].m_word = 0;
+				stackData[2].m_word = 0;
 
 				handle->SetAnim(1, -1, -1, -1, 0);
 				reinterpret_cast<unsigned int*>(worldParams + 8)[0] = 1;
-				SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-				    CFlat, 0, 1, 4, 3, stackData, 0);
+				reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(0, 1, 4, 3, stackData, 0);
 				reinterpret_cast<short*>(worldState + 0x10)[0] = 2;
 				reinterpret_cast<short*>(worldState + 0x22)[0] = 0;
 			}
@@ -3947,12 +3943,11 @@ void CMenuPcs::DrawTitleMenu()
 			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x24) = 0;
 			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x0E) = 0;
 			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x12) = 0;
-			int flatArgs[3];
-			flatArgs[0] = 9;
-			flatArgs[1] = 0;
-			flatArgs[2] = 0;
-			SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-			    &CFlat, 0, 1, 4, 3, flatArgs, 0);
+			CFlatRuntime::CStack flatArgs[3];
+			flatArgs[0].m_word = 9;
+			flatArgs[1].m_word = 0;
+			flatArgs[2].m_word = 0;
+			reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(0, 1, 4, 3, flatArgs, 0);
 		}
 	} else {
 		// 3D viewport setup
@@ -4133,13 +4128,13 @@ void CMenuPcs::DrawTitleMenu()
 				DAT_8032e8ac = 0;
 			} else {
 				DAT_8032e8ac = 1;
-				int flatArgs2[3];
-				flatArgs2[0] = 7;
-				flatArgs2[1] = (int)*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x26);
-				flatArgs2[2] = 0;
+				CFlatRuntime::CStack flatArgs2[3];
+				flatArgs2[0].m_word = 7;
+				flatArgs2[1].m_word =
+				    static_cast<int>(*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x26));
+				flatArgs2[2].m_word = 0;
 				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x20) = 1;
-				SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-				    &CFlat, 0, 1, 4, 3, flatArgs2, 0);
+				reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(0, 1, 4, 3, flatArgs2, 0);
 				bytes[0x0D] = 0;
 			}
 			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x10) = 0;
@@ -4153,12 +4148,11 @@ void CMenuPcs::DrawTitleMenu()
 					*reinterpret_cast<short*>(worldState + 0x10) = *reinterpret_cast<short*>(worldState + 0x10) + 1;
 					*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x22) = 0;
 					*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x24) = 0;
-					int flatArgs3[3];
-					flatArgs3[0] = 9;
-					flatArgs3[1] = 1;
-					flatArgs3[2] = 0;
-					SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-					    &CFlat, 0, 1, 4, 3, flatArgs3, 0);
+					CFlatRuntime::CStack flatArgs3[3];
+					flatArgs3[0].m_word = 9;
+					flatArgs3[1].m_word = 1;
+					flatArgs3[2].m_word = 0;
+					reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(0, 1, 4, 3, flatArgs3, 0);
 				}
 			} else if (*reinterpret_cast<short*>(worldState + 0x22) > 0x991) {
 				*reinterpret_cast<short*>(worldState + 0x0E) = 0;
@@ -4166,12 +4160,11 @@ void CMenuPcs::DrawTitleMenu()
 				    *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x10) + 1;
 				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x22) = 0;
 				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x24) = 0;
-				int flatArgs4[3];
-				flatArgs4[0] = 9;
-				flatArgs4[1] = 1;
-				flatArgs4[2] = 0;
-				SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-				    &CFlat, 0, 1, 4, 3, flatArgs4, 0);
+				CFlatRuntime::CStack flatArgs4[3];
+				flatArgs4[0].m_word = 9;
+				flatArgs4[1].m_word = 1;
+				flatArgs4[2].m_word = 0;
+				reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(0, 1, 4, 3, flatArgs4, 0);
 			}
 		} else {
 			short threshold = 10;
@@ -4467,13 +4460,12 @@ void CMenuPcs::GetWorldParam(int code)
  */
 void CMenuPcs::CallWorldParam(int p0, int p1, int p2)
 {
-	int stackData[3];
-	stackData[0] = p0;
-	stackData[1] = p1;
-	stackData[2] = p2;
+	CFlatRuntime::CStack stackData[3];
+	stackData[0].m_word = p0;
+	stackData[1].m_word = p1;
+	stackData[2].m_word = p2;
 
-	SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-	    CFlat, 0, 1, 4, 3, stackData, 0);
+	reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(0, 1, 4, 3, stackData, 0);
 }
 
 /*
@@ -6556,9 +6548,11 @@ void CMenuPcs::CalcCharaSelect()
 				                 static_cast<int>(caravanWork.m_appearanceVariant));
 				caravanWork.LoadFinished();
 
-				int stackArgs[2] = {0, caravanSlot};
-				SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-				    &CFlat, 0, 1, 4, 3, stackArgs, 0);
+				CFlatRuntime::CStack stackArgs[3];
+				stackArgs[0].m_word = 0;
+				stackArgs[1].m_word = caravanSlot;
+				stackArgs[2].m_word = 0;
+				reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(0, 1, 4, 3, stackArgs, 0);
 				Sound.PlaySe(0x33, 0x40, 0x7F, 0);
 				QueueWmCharaAnimState(this, caravanSlot, 3);
 			}
@@ -7118,21 +7112,19 @@ void CMenuPcs::WMChgMenu()
 			*reinterpret_cast<short*>(worldState + 0x1C) = 0;
 			bytes[0xD] = 0;
 			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x26) = 0;
-			int stackA[3];
-			stackA[0] = 1;
-			stackA[1] = 1;
-			stackA[2] = 0;
-			SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-			    CFlat, 0, 1, 4, 3, stackA, 0);
+			CFlatRuntime::CStack stackA[3];
+			stackA[0].m_word = 1;
+			stackA[1].m_word = 1;
+			stackA[2].m_word = 0;
+			reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(0, 1, 4, 3, stackA, 0);
 		} else if (sVar2 == -1) {
 			DAT_8032ee1c = 1;
 			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1C) = 6;
-			int stackB[3];
-			stackB[0] = 1;
-			stackB[1] = 0;
-			stackB[2] = 0;
-			SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-			    CFlat, 0, 1, 4, 3, stackB, 0);
+			CFlatRuntime::CStack stackB[3];
+			stackB[0].m_word = 1;
+			stackB[1].m_word = 0;
+			stackB[2].m_word = 0;
+			reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(0, 1, 4, 3, stackB, 0);
 		}
 	} else if (iVar14 == 6) {
 		*reinterpret_cast<short*>(worldState + 0x1C) = 0;

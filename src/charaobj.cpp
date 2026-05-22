@@ -17,9 +17,6 @@
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
-extern "C" void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-	void*, int, int, int, int, void*, void*);
-extern "C" void pppEndPart__8CPartMngFi(void*, int);
 extern "C" unsigned char m_boss__8CGMonObj[];
 extern char SoundBuffer[];
 
@@ -1148,7 +1145,7 @@ void CGCharaObj::onHitParticle(int effectIndex, int, int, int colliderIndex, Vec
 
 	gCFlatRuntime2.IgnoreParticle(static_cast<short>(effectIndex), this);
 	if ((*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + (particleIndex * 0x48) + 0xC) & 0x100) != 0) {
-		pppEndPart__8CPartMngFi(&PartMng, effectIndex);
+		PartMng.pppEndPart(effectIndex);
 	}
 }
 
@@ -1876,8 +1873,9 @@ void CGCharaObj::addHp(int delta, CGPrgObj* sourceObj)
 				int stackArgs[2];
 				stackArgs[0] = -1;
 				stackArgs[1] = 0;
-				SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-					CFlat, reinterpret_cast<int>(this), 2, 0x14, 2, stackArgs, 0);
+				reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(
+					reinterpret_cast<CFlatRuntime::CObject*>(this), 2, 0x14, 2,
+					reinterpret_cast<CFlatRuntime::CStack*>(stackArgs), 0);
 			}
 			static_cast<CGPartyObj*>(this)->carry(1, 0, 1);
 		}
@@ -2997,8 +2995,9 @@ void CGCharaObj::sendCombiToScript(CGCharaObj* target, int scriptArg, int)
 		int stackArgs[2];
 		stackArgs[0] = reinterpret_cast<int>(target);
 		stackArgs[1] = scriptArg;
-		SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-			CFlat, reinterpret_cast<int>(this), 2, 0x17, 2, stackArgs, 0);
+		reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(
+			reinterpret_cast<CFlatRuntime::CObject*>(this), 2, 0x17, 2,
+			reinterpret_cast<CFlatRuntime::CStack*>(stackArgs), 0);
 	}
 }
 

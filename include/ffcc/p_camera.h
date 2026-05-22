@@ -15,32 +15,6 @@ class CGObject;
 class CPad;
 class CColor;
 
-extern unsigned int m_table__10CCameraPcs[][0x15C / sizeof(unsigned int)];
-extern unsigned int m_table_desc0__10CCameraPcs[];
-extern unsigned int m_table_desc1__10CCameraPcs[];
-extern unsigned int m_table_desc2__10CCameraPcs[];
-extern unsigned int m_table_desc3__10CCameraPcs[];
-extern unsigned int m_table_desc4__10CCameraPcs[];
-extern unsigned int m_table_desc5__10CCameraPcs[];
-extern unsigned int m_table_desc6__10CCameraPcs[];
-extern unsigned int m_table_desc7__10CCameraPcs[];
-extern unsigned int m_table_desc8__10CCameraPcs[];
-extern unsigned int m_table_desc9__10CCameraPcs[];
-extern unsigned int m_table_desc10__10CCameraPcs[];
-extern unsigned int m_table_desc11__10CCameraPcs[];
-extern unsigned int m_table_desc12__10CCameraPcs[];
-extern unsigned int m_table_desc13__10CCameraPcs[];
-extern unsigned int m_table_desc14__10CCameraPcs[];
-extern unsigned int m_table_desc15__10CCameraPcs[];
-extern unsigned int m_table_desc16__10CCameraPcs[];
-extern unsigned int m_table_desc17__10CCameraPcs[];
-extern unsigned int m_table_desc18__10CCameraPcs[];
-extern unsigned int m_table_desc19__10CCameraPcs[];
-extern unsigned int m_table_desc20__10CCameraPcs[];
-extern unsigned int m_table_desc21__10CCameraPcs[];
-extern unsigned int m_table_desc22__10CCameraPcs[];
-extern unsigned int m_table_desc23__10CCameraPcs[];
-extern unsigned int m_table_desc24__10CCameraPcs[];
 extern float FLOAT_8032fa78;
 extern float FLOAT_8032fa7c;
 
@@ -56,6 +30,33 @@ public:
     };
 
     CCameraPcs() {}
+
+    static unsigned int m_table_desc0[3];
+    static unsigned int m_table_desc1[3];
+    static unsigned int m_table_desc2[3];
+    static unsigned int m_table_desc3[3];
+    static unsigned int m_table_desc4[3];
+    static unsigned int m_table_desc5[3];
+    static unsigned int m_table_desc6[3];
+    static unsigned int m_table_desc7[3];
+    static unsigned int m_table_desc8[3];
+    static unsigned int m_table_desc9[3];
+    static unsigned int m_table_desc10[3];
+    static unsigned int m_table_desc11[3];
+    static unsigned int m_table_desc12[3];
+    static unsigned int m_table_desc13[3];
+    static unsigned int m_table_desc14[3];
+    static unsigned int m_table_desc15[3];
+    static unsigned int m_table_desc16[3];
+    static unsigned int m_table_desc17[3];
+    static unsigned int m_table_desc18[3];
+    static unsigned int m_table_desc19[3];
+    static unsigned int m_table_desc20[3];
+    static unsigned int m_table_desc21[3];
+    static unsigned int m_table_desc22[3];
+    static unsigned int m_table_desc23[3];
+    static unsigned int m_table_desc24[3];
+    static unsigned int m_table[7][0x15C / sizeof(unsigned int)];
 
     void Init();
     void Quit();

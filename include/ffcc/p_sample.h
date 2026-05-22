@@ -3,9 +3,17 @@
 
 #include "ffcc/system.h"
 
+struct CSamplePcsTable
+{
+    char* m_name;
+    unsigned int m_words[0x56];
+};
+
 class CSamplePcs : public CProcess
 {
 public:
+    static CSamplePcsTable m_table;
+
     CSamplePcs();
     void Init();
     void Quit();
@@ -18,13 +26,6 @@ public:
     void func1();
 };
 
-struct CSamplePcsTable
-{
-    char* m_name;
-    unsigned int m_words[0x56];
-};
-
 extern CSamplePcs SamplePcs;
-extern CSamplePcsTable m_table__10CSamplePcs;
 
 #endif

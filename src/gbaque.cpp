@@ -20,18 +20,7 @@
 GbaQueue GbaQue;
 
 extern "C" int rand(void);
-extern "C" CGObject* FindGObjFirst__13CFlatRuntime2Fv(void*);
-extern "C" CGObject* FindGObjNext__13CFlatRuntime2FP8CGObject(void*, CGObject*);
 extern "C" int memcmp(const void*, const void*, unsigned long);
-extern "C" void MakeAgbString__4CMesFPcPcii(char*, char*, int, int);
-extern "C" int AddItem__12CCaravanWorkFiPi(void*, int, int*);
-extern "C" int AddGil__12CCaravanWorkFi(void*, int);
-extern "C" int CanAddGil__12CCaravanWorkFi(void*, int);
-extern "C" int IsOutOfShouki__12CCaravanWorkFv(void*);
-extern "C" int CanPlayerUseItem__12CCaravanWorkFv(void*);
-extern "C" int CanPlayerPutItem__12CCaravanWorkFv(void*);
-extern "C" int GetItemType__8CMenuPcsFii(CMenuPcs*, int, int);
-extern "C" int GetItemIcon__8CMenuPcsFi(CMenuPcs*, int);
 
 extern CMenuPcs MenuPcs;
 
@@ -1490,14 +1479,14 @@ void GbaQueue::LoadPlayerStat()
 					                                             (*reinterpret_cast<void***>(partyObj))[0xB])(partyObj) != 0));
 				}
 
-				if ((IsOutOfShouki__12CCaravanWorkFv(reinterpret_cast<void*>(caravanWork)) != 0) && (entry[0x17] != 0)) {
+				if ((caravanWork->IsOutOfShouki() != 0) && (entry[0x17] != 0)) {
 					outOfShoukiMask |= (1U << i);
 				}
 
-				if (CanPlayerUseItem__12CCaravanWorkFv(reinterpret_cast<void*>(caravanWork)) != 0) {
+				if (caravanWork->CanPlayerUseItem() != 0) {
 					entry[0xD6] |= 1;
 				}
-				if (CanPlayerPutItem__12CCaravanWorkFv(reinterpret_cast<void*>(caravanWork)) != 0) {
+				if (caravanWork->CanPlayerPutItem() != 0) {
 					entry[0xD6] |= 2;
 				}
 			}
@@ -1684,7 +1673,7 @@ void GbaQueue::LoadMapItemStat()
 
 	if (reinterpret_cast<unsigned int*>(&CFlat)[0x1041] != 0) {
 		unsigned char* mapItemEntry = localMapItems;
-		object = FindGObjFirst__13CFlatRuntime2Fv(&CFlat);
+		object = gCFlatRuntime2.FindGObjFirst();
 
 		while (object != 0) {
 			if ((object->m_objectFlags & 0x100) != 0) {
@@ -1705,7 +1694,7 @@ void GbaQueue::LoadMapItemStat()
 				mapItemEntry += 0x14;
 			}
 
-			object = FindGObjNext__13CFlatRuntime2FP8CGObject(&CFlat, object);
+			object = gCFlatRuntime2.FindGObjNext(object);
 		}
 	}
 
@@ -2442,14 +2431,14 @@ System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB3
     char** mesPtr = reinterpret_cast<char**>(reinterpret_cast<char*>(&Game.m_cFlatDataArr[1]) + 0x44);
 
     strcpy(srcText, mesPtr[mesIndex]);
-    MakeAgbString__4CMesFPcPcii(workText, srcText, *reinterpret_cast<unsigned short*>(scriptFood + 0x3E2), 0);
+    CMes::MakeAgbString(workText, srcText, *reinterpret_cast<unsigned short*>(scriptFood + 0x3E2), 0);
     int totalSize = static_cast<int>(strlen(workText) + 1);
     memcpy(outData, workText, totalSize);
 
     memset(srcText, 0, 0x400);
     memset(workText, 0, 0x400);
     strcpy(srcText, mesPtr[mesIndex + 1]);
-    MakeAgbString__4CMesFPcPcii(workText, srcText, *reinterpret_cast<unsigned short*>(scriptFood + 0x3E2), 0);
+    CMes::MakeAgbString(workText, srcText, *reinterpret_cast<unsigned short*>(scriptFood + 0x3E2), 0);
     int line2Size = static_cast<int>(strlen(workText));
     memcpy(outData + totalSize, workText, line2Size + 1);
     totalSize += line2Size + 1;
@@ -2560,7 +2549,7 @@ void GbaQueue::MoveLetterItem(int channel, unsigned int value)
 		int item = *reinterpret_cast<unsigned short*>(letter + 0x3EE) & 0x1FF;
 		if (item != 0) {
 			if ((item < 1) || (item > 0x9E)) {
-				if (AddItem__12CCaravanWorkFiPi(reinterpret_cast<void*>(caravanWork), item, 0) == 0) {
+				if (caravanWork->AddItem(item, 0) == 0) {
 					result = 1;
 				} else {
 					result = 0;
@@ -2572,10 +2561,10 @@ void GbaQueue::MoveLetterItem(int channel, unsigned int value)
 		int item = *reinterpret_cast<unsigned short*>(letter + 0x3EE) & 0x1FF;
 		if (item != 0) {
 			int gil = item * 100;
-			if (CanAddGil__12CCaravanWorkFi(reinterpret_cast<void*>(caravanWork), gil) == 0) {
+			if (caravanWork->CanAddGil(gil) == 0) {
 				result = 1;
 			} else {
-				AddGil__12CCaravanWorkFi(reinterpret_cast<void*>(*scriptFoodBase), gil);
+				reinterpret_cast<CCaravanWork*>(*scriptFoodBase)->AddGil(gil);
 				result = 0;
 			}
 		}
@@ -3510,8 +3499,8 @@ int GbaQueue::GetCmdData(int channel, unsigned char* outData)
 
 	for (i = 0; i < 0x40; i++, itemPtr += 2) {
 		int itemId = *reinterpret_cast<short*>(itemPtr + 0x3A);
-		if ((GetItemType__8CMenuPcsFii(&MenuPcs, itemId, 1) == 1) &&
-		    (GetItemIcon__8CMenuPcsFi(&MenuPcs, itemId) == (localPlayerData[0xDA] & 3))) {
+		if ((MenuPcs.GetItemType(itemId, 1) == 1) &&
+		    (MenuPcs.GetItemIcon(itemId) == (localPlayerData[0xDA] & 3))) {
 			int itemBase = Game.unkCFlatData0[2] + itemId * 0x48;
 
 			cmdData[0] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 4), 0);
@@ -3810,7 +3799,7 @@ System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB3
 
 		const int itemId = *reinterpret_cast<short*>(scriptFood + i * 2 + 0xBE6);
 		strcpy(itemNameScratch, flatData->m_tabl[6].m_strings[itemId]);
-		MakeAgbString__4CMesFPcPcii(agbStringScratch, itemNameScratch, 0, 0);
+		CMes::MakeAgbString(agbStringScratch, itemNameScratch, 0, 0);
 
 		const int strSize = static_cast<int>(strlen(agbStringScratch) + 1);
 		memcpy(writePtr, agbStringScratch, strSize);
@@ -3917,7 +3906,7 @@ System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB3
 		}
 
 		strcpy(itemNameScratch, flatData->m_tabl[6].m_strings[itemId]);
-		MakeAgbString__4CMesFPcPcii(agbStringScratch, itemNameScratch, 0, 0);
+		CMes::MakeAgbString(agbStringScratch, itemNameScratch, 0, 0);
 		const int strSize = static_cast<int>(strlen(agbStringScratch) + 1);
 		memcpy(outData, agbStringScratch, strSize);
 		outData += strSize;

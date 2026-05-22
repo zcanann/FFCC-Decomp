@@ -23,11 +23,7 @@ extern "C" int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, C
 extern "C" void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
 extern "C" void GetHitFaceNormal__7CMapObjFP3Vec(void*, Vec*);
 extern "C" int CalcHitSlide__7CMapObjFP3Vecf(void*, Vec*);
-extern "C" void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-	void*, void*, int, int, int, void*, void*);
 extern "C" int CanCreateFromScript__9CGItemObjFv();
-extern "C" CGObject* FindGObjFirst__13CFlatRuntime2Fv(void*);
-extern "C" CGObject* FindGObjNext__13CFlatRuntime2FP8CGObject(void*, CGObject*);
 extern "C" void onPush__9CGBaseObjFP9CGBaseObji(CGBaseObj*, CGBaseObj*, int);
 extern "C" void* CreateFromScript__9CGItemObjFiiiP8CGObjectfPQ29CGItemObj4CCFS(
     int type, int createMode, int itemId, CGObject* owner, float arg, CGItemObj::CCFS* cfs);
@@ -897,12 +893,11 @@ void CGPartyObj::command()
 				reinterpret_cast<CGObject*>(party.secondaryTarget) : party.target;
 			party.commandFlags |= 0x80;
 
-			int stack[2];
-			stack[0] = primaryCommand;
-			stack[1] = scriptTarget != nullptr ?
+			CFlatRuntime::CStack stack[2];
+			stack[0].m_word = primaryCommand;
+			stack[1].m_word = scriptTarget != nullptr ?
 				*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(scriptTarget) + 0x30) : 0;
-			SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-				&CFlat, this, 2, 0x14, 2, stack, static_cast<void*>(0));
+			reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(this, 2, 0x14, 2, stack, 0);
 			return;
 		}
 
@@ -1432,8 +1427,7 @@ CGPrgObj* CGPartyObj::getBestAngleObject(float, float)
 	CGPrgObj* best = 0;
 	float bestAbsAngle = 0.0f;
 
-	for (CGObject* obj = FindGObjFirst__13CFlatRuntime2Fv(CFlat); obj != 0;
-	     obj = FindGObjNext__13CFlatRuntime2FP8CGObject(CFlat, obj)) {
+	for (CGObject* obj = gCFlatRuntime2.FindGObjFirst(); obj != 0; obj = gCFlatRuntime2.FindGObjNext(obj)) {
 		if (obj == this) {
 			continue;
 		}
@@ -2532,15 +2526,16 @@ void CGPartyObj::canPlayerGoMenu()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGPartyObj::useItem(int itemId)
+int CGPartyObj::useItem(int itemId)
 {
 	if (canPlayerUseItem() == 0) {
-		return;
+		return 0;
 	}
 	if (itemId >= 0) {
 		PartyData(this).weaponItem = itemId;
 	}
 	changeStat(0x1A, 0, 0);
+	return 1;
 }
 
 /*
@@ -2580,17 +2575,17 @@ int CGPartyObj::canPlayerPutItem()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGPartyObj::putItem(int)
+int CGPartyObj::putItem(int)
 {
 	if (canPlayerPutItem() == 0) {
-		return;
+		return 0;
 	}
 
 	int itemId = PartyData(this).weaponItem;
 	void* created = CreateFromScript__9CGItemObjFiiiP8CGObjectfPQ29CGItemObj4CCFS(
 	    0, 9, itemId, this, FLOAT_80331a78, (CGItemObj::CCFS*)0);
 	if (created == nullptr) {
-		return;
+		return 0;
 	}
 
 	*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(created) + 0x562) =
@@ -2598,6 +2593,7 @@ void CGPartyObj::putItem(int)
 	if (Game.m_gameWork.m_menuStageMode == 0) {
 		changeStat(0x1B, 0, 0);
 	}
+	return 1;
 }
 
 /*
@@ -2609,16 +2605,16 @@ void CGPartyObj::putItem(int)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGPartyObj::putGil(int amount)
+int CGPartyObj::putGil(int amount)
 {
 	if (canPlayerPutItem() == 0) {
-		return;
+		return 0;
 	}
 
 	void* created = CreateFromScript__9CGItemObjFiiiP8CGObjectfPQ29CGItemObj4CCFS(
 	    2, 1, amount, this, FLOAT_80331a78, (CGItemObj::CCFS*)0);
 	if (created == nullptr) {
-		return;
+		return 0;
 	}
 
 	*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(created) + 0x560) = 1;
@@ -2627,6 +2623,7 @@ void CGPartyObj::putGil(int amount)
 	if (Game.m_gameWork.m_menuStageMode == 0) {
 		changeStat(0x1B, 0, 0);
 	}
+	return 1;
 }
 
 /*

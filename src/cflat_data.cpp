@@ -6,7 +6,7 @@
 #include <string.h>
 
 void* operator new[](unsigned long, CMemory::CStage*, char*, int);
-extern "C" extern char s_cflat_data_cpp[];
+extern "C" char s_cflat_data_cpp[];
 
 /*
  * --INFO--
@@ -180,93 +180,51 @@ void CFlatData::Create(void* filePtr)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" CFlatData* __dt__9CFlatDataFv(CFlatData* flatData, short shouldDelete)
+CFlatData::~CFlatData()
 {
-	struct DataEntryLayout
-	{
-		unsigned int m_size;
-		void* m_data;
-		int m_numStrings;
-		char** m_strings;
-		char* m_stringBuf;
-	};
+	int i;
 
-	struct TableEntryLayout
+	for (i = 0; i < m_dataCount; i++)
 	{
-		int m_numEntries;
-		char** m_strings;
-		char* m_stringBuf;
-	};
-
-	struct FlatDataLayout
-	{
-		int m_dataCount;
-		DataEntryLayout m_data[5];
-		int m_tableCount;
-		TableEntryLayout m_tabl[8];
-		int m_mesCount;
-		char* m_mesBuffer;
-	};
-
-	int iVar2;
-	FlatDataLayout* dataIter;
-	FlatDataLayout* tableIter;
-
-	if (flatData != nullptr)
-	{
-		dataIter = (FlatDataLayout*)flatData;
-		for (iVar2 = 0; iVar2 < ((FlatDataLayout*)flatData)->m_dataCount; iVar2++)
+		if (m_data[i].m_data != nullptr)
 		{
-			if (dataIter->m_data[0].m_data != nullptr)
-			{
-				operator delete(dataIter->m_data[0].m_data);
-				dataIter->m_data[0].m_data = nullptr;
-			}
-			if (dataIter->m_data[0].m_strings != nullptr)
-			{
-				operator delete(dataIter->m_data[0].m_strings);
-				dataIter->m_data[0].m_strings = (char**)nullptr;
-			}
-			if (dataIter->m_data[0].m_stringBuf != nullptr)
-			{
-				operator delete(dataIter->m_data[0].m_stringBuf);
-				dataIter->m_data[0].m_stringBuf = (char*)nullptr;
-			}
-			dataIter = (FlatDataLayout*)&dataIter->m_data[0].m_stringBuf;
+			operator delete(m_data[i].m_data);
+			m_data[i].m_data = nullptr;
 		}
-		((FlatDataLayout*)flatData)->m_dataCount = 0;
-
-		tableIter = (FlatDataLayout*)flatData;
-		for (iVar2 = 0; iVar2 < ((FlatDataLayout*)flatData)->m_tableCount; iVar2++)
+		if (m_data[i].m_strings != nullptr)
 		{
-			if (tableIter->m_tabl[0].m_strings != nullptr)
-			{
-				operator delete(tableIter->m_tabl[0].m_strings);
-				tableIter->m_tabl[0].m_strings = (char**)nullptr;
-			}
-			if (tableIter->m_tabl[0].m_stringBuf != nullptr)
-			{
-				operator delete(tableIter->m_tabl[0].m_stringBuf);
-				tableIter->m_tabl[0].m_stringBuf = (char*)nullptr;
-			}
-			tableIter = (FlatDataLayout*)&tableIter->m_data[0].m_numStrings;
+			operator delete(m_data[i].m_strings);
+			m_data[i].m_strings = (char**)nullptr;
 		}
-		((FlatDataLayout*)flatData)->m_tableCount = 0;
-
-		if (((FlatDataLayout*)flatData)->m_mesBuffer != nullptr)
+		if (m_data[i].m_stringBuf != nullptr)
 		{
-			operator delete(((FlatDataLayout*)flatData)->m_mesBuffer);
-			((FlatDataLayout*)flatData)->m_mesBuffer = (char*)nullptr;
-		}
-		((FlatDataLayout*)flatData)->m_mesCount = 0;
-
-		if (0 < shouldDelete)
-		{
-			operator delete(flatData);
+			operator delete(m_data[i].m_stringBuf);
+			m_data[i].m_stringBuf = (char*)nullptr;
 		}
 	}
+	m_dataCount = 0;
 
-	return flatData;
+	for (i = 0; i < m_tableCount; i++)
+	{
+		if (m_tabl[i].m_strings != nullptr)
+		{
+			operator delete(m_tabl[i].m_strings);
+			m_tabl[i].m_strings = (char**)nullptr;
+		}
+		if (m_tabl[i].m_stringBuf != nullptr)
+		{
+			operator delete(m_tabl[i].m_stringBuf);
+			m_tabl[i].m_stringBuf = (char*)nullptr;
+		}
+	}
+	m_tableCount = 0;
+
+	if (m_mesBuffer != nullptr)
+	{
+		operator delete(m_mesBuffer);
+		m_mesBuffer = (char*)nullptr;
+	}
+	m_mesCount = 0;
 }
 
 /*

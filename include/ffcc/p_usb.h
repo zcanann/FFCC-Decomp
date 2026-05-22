@@ -5,12 +5,11 @@
 #include "ffcc/system.h"
 #include "ffcc/usb.h"
 
-extern unsigned int m_table__7CUSBPcs[];
-
 class CUSBPcs : public CProcess
 {
 public:
     class CDataHeader;
+    static unsigned int m_table[0x11C / sizeof(unsigned int)];
 
     CUSBPcs();
 

@@ -49,6 +49,7 @@ public:
     void destroyViewer();
 
     void ClearTextureData();
+    void MemFree(void*);
 
     void calcViewer();
     void drawViewer();

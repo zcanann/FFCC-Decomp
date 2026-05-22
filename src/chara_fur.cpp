@@ -3,6 +3,7 @@
 #include "ffcc/charaobj.h"
 #include "ffcc/cflat_data.h"
 #include "ffcc/math.h"
+#include "ffcc/mesmenu.h"
 #include "ffcc/gobject.h"
 #include "ffcc/graphic.h"
 #include "ffcc/gxfunc.h"
@@ -14,6 +15,7 @@
 #include "ffcc/sound.h"
 #include "ffcc/system.h"
 #include "ffcc/textureman.h"
+#include "ffcc/cflat_runtime2.h"
 
 #include <math.h>
 #include <string.h>
@@ -41,7 +43,6 @@ public:
 	T operator[](unsigned long index);
 };
 
-extern "C" void Printf__8CGraphicFUlUlPce(void*, unsigned long, unsigned long, const char*, ...);
 extern "C" char* sMogRadarTypeLabels[];
 extern "C" char sMogRadarDebugFormatBlock[];
 extern "C" char sMogFurTextureName[];
@@ -610,8 +611,7 @@ void CChara::CalcMogScore()
 
 	{
 		char** radarLabel = reinterpret_cast<char**>(sMogRadarTypeLabels);
-		Printf__8CGraphicFUlUlPce(
-		    &Graphic,
+		Graphic.Printf(
 		    5,
 		    0xB,
 		    sMogRadarDebugFormatBlock + 0x18,
@@ -626,8 +626,7 @@ void CChara::CalcMogScore()
 		    *reinterpret_cast<int*>(self + 0x2028),
 		    *reinterpret_cast<int*>(self + 0x202C));
 
-		Printf__8CGraphicFUlUlPce(
-		    &Graphic,
+		Graphic.Printf(
 		    5,
 		    0xC,
 		    sMogRadarDebugFormatBlock + 0x4C,
@@ -667,15 +666,7 @@ void CChara::ChangeMogMode(int mogMode)
 	}
 }
 
-extern "C" void CalcMogScore__6CCharaFv(CChara*);
-extern "C" int Find__11CTextureSetFPc(CTextureSet*, char*);
-extern "C" void _WaitDrawDone__8CGraphicFPci(void*, const char*, int);
-extern "C" void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-    void*, int, int, int, int, void*, void*);
-extern "C" int GetWait__4CMesFv(void*);
-extern "C" void Open__8CMesMenuFPciiiiii(void*, char*, int, int, int, int, int, int);
 static const char s_chara_fur_cpp_801db72c[] = "chara_fur.cpp";
-extern "C" void makeFurTex__6CCharaFv();
 
 static bool s_mogFurBaseColorsInit;
 static bool s_mogFurNoiseColorsInit;
@@ -1035,7 +1026,7 @@ static CTexture* FindMogFurTexture(void* model)
 	}
 
 	CPtrArray<CTexture*>* textureArray = reinterpret_cast<CPtrArray<CTexture*>*>(reinterpret_cast<char*>(textureSet) + 8);
-	unsigned int textureIdx = static_cast<unsigned int>(Find__11CTextureSetFPc(textureSet, &sMogFurTextureName[0]));
+	unsigned int textureIdx = static_cast<unsigned int>(textureSet->Find(&sMogFurTextureName[0]));
 	return (*textureArray)[textureIdx];
 }
 
@@ -1053,7 +1044,7 @@ static void CopyMogTextureFromChara(void* model)
 		return;
 	}
 
-	_WaitDrawDone__8CGraphicFPci(&Graphic, const_cast<char*>(s_chara_fur_cpp_801db72c), 0x506);
+	Graphic._WaitDrawDone(const_cast<char*>(s_chara_fur_cpp_801db72c), 0x506);
 	DCInvalidateRange(dstBuffer, texelCountBytes);
 	memcpy(dstBuffer, reinterpret_cast<unsigned char*>(&Chara) + 4, 0x2000);
 	DCFlushRange(dstBuffer, texelCountBytes);
@@ -1074,7 +1065,7 @@ static void CopyMogTextureToChara(void* model)
 		return;
 	}
 
-	_WaitDrawDone__8CGraphicFPci(&Graphic, const_cast<char*>(s_chara_fur_cpp_801db72c), 0x506);
+	Graphic._WaitDrawDone(const_cast<char*>(s_chara_fur_cpp_801db72c), 0x506);
 	memcpy(reinterpret_cast<unsigned char*>(&Chara) + 4, srcBuffer, 0x2000);
 	DCFlushRange(srcBuffer, texelCountBytes);
 	GXInvalidateTexAll();
@@ -1086,21 +1077,21 @@ static void OpenMogHintMessage(int messageId)
 		return;
 	}
 
-	void* mesMenu = *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(&MenuPcs) + 0x288);
+	CMesMenu* mesMenu = *reinterpret_cast<CMesMenu**>(reinterpret_cast<unsigned char*>(&MenuPcs) + 0x288);
 	if (mesMenu == 0) {
 		return;
 	}
 
 	const bool isBusy = (*(reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(mesMenu) + 8)) != 0) &&
 	                    (*(reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(mesMenu) + 0x0C)) < 2) &&
-	                    (GetWait__4CMesFv(reinterpret_cast<unsigned char*>(mesMenu) + 0x1C) != 4);
+	                    (reinterpret_cast<CMes*>(reinterpret_cast<unsigned char*>(mesMenu) + 0x1C)->GetWait() != 4);
 	if (isBusy) {
 		return;
 	}
 
 	CFlatData* flatData = reinterpret_cast<CFlatData*>(reinterpret_cast<unsigned char*>(&Game) + 0xCC38 + sizeof(CFlatData));
 	char** mesPtr = reinterpret_cast<char**>(reinterpret_cast<unsigned char*>(flatData) + 0xD4);
-	Open__8CMesMenuFPciiiiii(mesMenu, mesPtr[messageId + 8], 0x160, 0x20, 0x220, 0, -1, -1);
+	mesMenu->Open(mesPtr[messageId + 8], 0x160, 0x20, 0x220, 0, -1, -1);
 }
 
 } // namespace
@@ -1143,7 +1134,7 @@ extern "C" void InitFurTexBuffer__6CCharaFv(CChara* chara)
 	*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(chara) + 0x2004) = 0;
 	*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&Chara) + 0x2014) = System.m_frameCounter;
 	memset(reinterpret_cast<unsigned char*>(chara) + 0x2018, 0, 0x40);
-	CalcMogScore__6CCharaFv(chara);
+	chara->CalcMogScore();
 }
 
 /*
@@ -1172,7 +1163,7 @@ extern "C" void SaveFurTexBuffer__6CCharaFPUs(CChara*, unsigned short* outTexels
 extern "C" void LoadFurTexBuffer__6CCharaFPUs(CChara* chara, unsigned short* inTexels)
 {
 	memcpy(reinterpret_cast<unsigned char*>(&Chara) + 4, inTexels, 0x2000);
-	CalcMogScore__6CCharaFv(chara);
+	chara->CalcMogScore();
 }
 
 /*
@@ -1188,16 +1179,16 @@ void CChara::CModel::InitMogFurTex()
 {
 	CTextureSet* textureSet = *reinterpret_cast<CTextureSet**>(reinterpret_cast<char*>(this) + 0xB0);
 	CPtrArray<CTexture*>* textureArray = reinterpret_cast<CPtrArray<CTexture*>*>(reinterpret_cast<char*>(textureSet) + 8);
-	unsigned int textureIdx = static_cast<unsigned int>(Find__11CTextureSetFPc(textureSet, &sMogFurTextureName[0]));
+	unsigned int textureIdx = static_cast<unsigned int>(textureSet->Find(&sMogFurTextureName[0]));
 	CTexture* texture = (*textureArray)[textureIdx];
 
 	if ((texture != 0) && (*reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(texture) + 0x60) == 4)) {
 		*reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(texture) + 0x60) = 5;
-		_WaitDrawDone__8CGraphicFPci(&Graphic, const_cast<char*>(s_chara_fur_cpp_801db72c), 0x506);
+		Graphic._WaitDrawDone(const_cast<char*>(s_chara_fur_cpp_801db72c), 0x506);
 
 		textureSet = *reinterpret_cast<CTextureSet**>(reinterpret_cast<char*>(this) + 0xB0);
 		textureArray = reinterpret_cast<CPtrArray<CTexture*>*>(reinterpret_cast<char*>(textureSet) + 8);
-		textureIdx = static_cast<unsigned int>(Find__11CTextureSetFPc(textureSet, &sMogFurTextureName[0]));
+		textureIdx = static_cast<unsigned int>(textureSet->Find(&sMogFurTextureName[0]));
 		CTexture* textureData = (*textureArray)[textureIdx];
 		if (textureData != 0) {
 			void* dstBuffer = *reinterpret_cast<void**>(reinterpret_cast<char*>(textureData) + 0x78);
@@ -1325,7 +1316,7 @@ void CChara::CModel::MogFurFrame(CGObject* object)
 		CopyMogTextureFromChara(this);
 		int pickResult = PickFur(cameraMtx, brushColor, doPaint, eraseMode, &centerBefore, &centerAfter, &worldPos);
 		CopyMogTextureToChara(this);
-		CalcMogScore__6CCharaFv(&Chara);
+		Chara.CalcMogScore();
 
 		if (pickResult >= 0) {
 			work.m_pickTicks++;
@@ -1388,12 +1379,11 @@ void CChara::CModel::MogFurFrame(CGObject* object)
 	}
 
 	if ((triggerButtons & 0x200) != 0) {
-		int stack[3];
-		stack[0] = 2;
-		stack[1] = 0;
-		stack[2] = 0;
-		SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-		    &CFlat, 0, 1, 9, 3, stack, 0);
+		CFlatRuntime::CStack stack[3];
+		stack[0].m_word = 2;
+		stack[1].m_word = 0;
+		stack[2].m_word = 0;
+		reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(0, 1, 9, 3, stack, 0);
 	}
 
 	OpenMogHintMessage(messageId);
@@ -1672,7 +1662,7 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 	}
 
 	if (gMogFurTexBuffer == 0) {
-		makeFurTex__6CCharaFv();
+		Chara.makeFurTex();
 	}
 	if (gMogFurTexBuffer == 0) {
 		return;
@@ -1800,12 +1790,12 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void freeFurTex__6CCharaFv()
+void CChara::freeFurTex()
 {
-    if (gMogFurTexBuffer != 0) {
-        Memory.Free(gMogFurTexBuffer);
-        gMogFurTexBuffer = 0;
-    }
+	if (gMogFurTexBuffer != 0) {
+		Memory.Free(gMogFurTexBuffer);
+		gMogFurTexBuffer = 0;
+	}
 }
 
 /*
@@ -1817,7 +1807,7 @@ extern "C" void freeFurTex__6CCharaFv()
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void makeFurTex__6CCharaFv()
+void CChara::makeFurTex()
 {
 	FurInitTextureDefaults();
 	s_mogFurRand = 0;

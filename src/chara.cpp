@@ -16,22 +16,10 @@
 #include <math.h>
 #include <string.h>
 
-extern "C" void CalcBind__Q26CChara5CNodeFPQ26CChara6CModel(void*, void*);
-extern "C" void freeFurTex__6CCharaFv();
-extern "C" void makeFurTex__6CCharaFv(CChara*);
-extern "C" void gqrInit__6CCharaFUlUlUl(void*, unsigned long, unsigned long, unsigned long);
-extern "C" void Calc__Q26CChara5CMeshFPQ26CChara6CModel(void*, void*);
-extern "C" void Create__Q26CChara5CNodeFR10CChunkFilePQ26CChara6CModelQ36CChara5CNode4TYPEPQ27CMemory6CStage(
-    void*, CChunkFile&, void*, int, CMemory::CStage*);
-extern "C" void Create__Q26CChara5CMeshFPQ26CChara6CModelR10CChunkFilePQ27CMemory6CStage(
-    void*, void*, CChunkFile&, CMemory::CStage*);
 extern "C" void __dt__Q36CChara5CNode8CRefDataFv(void*, int);
 extern "C" void __dt__Q36CChara5CMesh8CRefDataFv(void*, int);
 extern "C" void __dt__Q36CChara5CMesh12CDisplayListFv(void*, int);
 extern "C" void __dt__Q26CChara5CSkinFv(void*, int);
-extern "C" void InitQuantize__Q26CChara5CAnimFv(void*);
-extern "C" void Interp__Q26CChara9CAnimNodeFPQ26CChara5CAnimP3SRTf(void*, void*, void*, float);
-extern "C" void SetTextureSet__12CMaterialSetFP11CTextureSet(CMaterialSet*, CTextureSet*);
 extern "C" float FLOAT_803301b0;
 extern "C" float FLOAT_803301bc;
 extern "C" float FLOAT_803301c8;
@@ -695,7 +683,7 @@ void CChara::Quit()
  */
 void CChara::Create()
 {
-	makeFurTex__6CCharaFv(this);
+	makeFurTex();
 	InitFurTexBuffer();
 }
 
@@ -710,7 +698,7 @@ void CChara::Create()
  */
 void CChara::Destroy()
 {
-	freeFurTex__6CCharaFv();
+	freeFurTex();
 }
 
 /*
@@ -1019,8 +1007,7 @@ void CChara::CModel::Create(void* fileData, CMemory::CStage* stage)
 					if (chunk.m_id == 0x4E4F4445 && *(void**)((u8*)this + 0xA8) != 0) {
 						u16 nodeCount = *(u16*)((u8*)ref + 0x08);
 						CNode* node = reinterpret_cast<CNode*>((u8*)*(void**)((u8*)this + 0xA8) + (nodeCount * 0xC0));
-						Create__Q26CChara5CNodeFR10CChunkFilePQ26CChara6CModelQ36CChara5CNode4TYPEPQ27CMemory6CStage(
-						    node, chunkFile, this, chunk.m_arg0, stage);
+						node->Create(chunkFile, this, static_cast<CChara::CNode::TYPE>(chunk.m_arg0), stage);
 						*(u16*)((u8*)ref + 0x08) = nodeCount + 1;
 					}
 				}
@@ -1045,7 +1032,7 @@ void CChara::CModel::Create(void* fileData, CMemory::CStage* stage)
 					if (chunk.m_id == 0x4D455348 && *(void**)((u8*)this + 0xAC) != 0) {
 						u16 meshCount = *(u16*)((u8*)ref + 0x0A);
 						CMesh* mesh = reinterpret_cast<CMesh*>((u8*)*(void**)((u8*)this + 0xAC) + (meshCount * 0x14));
-						Create__Q26CChara5CMeshFPQ26CChara6CModelR10CChunkFilePQ27CMemory6CStage(mesh, this, chunkFile, stage);
+						mesh->Create(this, chunkFile, stage);
 						*(u16*)((u8*)ref + 0x0A) = meshCount + 1;
 					}
 				}
@@ -1224,7 +1211,7 @@ void CChara::CModel::setup()
 
 	CMaterialSet* materialSet = ModelMaterialSet(this);
 	if (materialSet != 0) {
-		SetTextureSet__12CMaterialSetFP11CTextureSet(materialSet, *reinterpret_cast<CTextureSet**>((u8*)this + 0xB4));
+		materialSet->SetTextureSet(*reinterpret_cast<CTextureSet**>((u8*)this + 0xB4));
 	}
 }
 
@@ -1334,7 +1321,7 @@ void CChara::CModel::calcBindMatrix()
 
 	while (i < *(u32*)((u8*)*(void**)((u8*)this + 0xA4) + 8)) {
 		if (*(s16*)((u8*)*(void**)node + 0x68) < 0) {
-			CalcBind__Q26CChara5CNodeFPQ26CChara6CModel(node, this);
+			node->CalcBind(this);
 		}
 		i++;
 		node = (CNode*)((u8*)node + 0xC0);
@@ -1411,18 +1398,18 @@ void CChara::CModel::CalcMatrix()
  */
 void CChara::CModel::CalcSkin()
 {
-	void* mesh = *(void**)((u8*)this + 0xAC);
+	CMesh* mesh = *(CMesh**)((u8*)this + 0xAC);
 	u32 posQuant = ModelPosQuant(this);
 	u32 normQuant = ModelNormQuant(this);
 	u16 meshCount = ModelMeshCount(this);
 	u32 i = 0;
 
-	gqrInit__6CCharaFUlUlUl(&gChara, (posQuant << 24) | 0x70000 | (posQuant << 8) | 7,
-	                        (normQuant << 24) | 0x70000 | (normQuant << 8) | 7, 0x0C070C07);
+	gChara.gqrInit((posQuant << 24) | 0x70000 | (posQuant << 8) | 7,
+	               (normQuant << 24) | 0x70000 | (normQuant << 8) | 7, 0x0C070C07);
 
 	while (i < meshCount) {
-		Calc__Q26CChara5CMeshFPQ26CChara6CModel(mesh, this);
-		mesh = (u8*)mesh + 0x14;
+		mesh->Calc(this);
+		mesh = (CMesh*)((u8*)mesh + 0x14);
 		i++;
 	}
 }
@@ -1478,7 +1465,7 @@ void CChara::CModel::calcMatrix()
 {
 	calcNowFrame();
 	if (m_anim != 0) {
-		InitQuantize__Q26CChara5CAnimFv(m_anim);
+		m_anim->InitQuantize();
 	}
 
 	CNode* nodes = ModelNodes(this);
@@ -1540,7 +1527,7 @@ void CChara::CModel::calcMatrix()
 void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*out)[4])
 {
 	if (m_anim != 0) {
-		InitQuantize__Q26CChara5CAnimFv(m_anim);
+		m_anim->InitQuantize();
 	}
 
 	PSMTXIdentity(out);
@@ -1580,8 +1567,7 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 					PSMTXIdentity(localMtx);
 				}
 			} else {
-				Interp__Q26CChara9CAnimNodeFPQ26CChara5CAnimP3SRTf(parentAnimNode0, m_anim,
-				                                                   reinterpret_cast<SRT*>(&parentScaleSrt), frame);
+				parentAnimNode0->Interp(m_anim, reinterpret_cast<SRT*>(&parentScaleSrt), frame);
 				nextReuseAnimNode0Srt = true;
 				PSMTXScale(localMtx,
 				           FLOAT_803301bc / parentScaleSrt.m_scale.x,
@@ -1598,8 +1584,7 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 				Mtx animMtx;
 				Mtx invScaleMtx;
 
-				Interp__Q26CChara9CAnimNodeFPQ26CChara5CAnimP3SRTf(animNode1, m_anim,
-				                                                   reinterpret_cast<SRT*>(&srt1), frame);
+				animNode1->Interp(m_anim, reinterpret_cast<SRT*>(&srt1), frame);
 				if (AnimNodeUsesScale(animNode1)) {
 					Math.SRTToMatrix(animMtx, reinterpret_cast<SRT*>(&srt1));
 				} else {
@@ -1622,8 +1607,7 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 				if (reuseAnimNode0Srt) {
 					srt0 = cachedParentScaleSrt;
 				} else {
-					Interp__Q26CChara9CAnimNodeFPQ26CChara5CAnimP3SRTf(animNode0, m_anim,
-					                                                   reinterpret_cast<SRT*>(&srt0), frame);
+					animNode0->Interp(m_anim, reinterpret_cast<SRT*>(&srt0), frame);
 				}
 				nodeIndex = NodeRefIndex(cur);
 				if (nodeIndex == ModelChest1Index(this) || nodeIndex == ModelChest2Index(this) ||
@@ -1947,7 +1931,7 @@ void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
 		return;
 	}
 
-	SetTextureSet__12CMaterialSetFP11CTextureSet(materialSet, m_texSet);
+	materialSet->SetTextureSet(m_texSet);
 	CTexAnimSet* texAnimSet = ModelTexAnimSet(this);
 	if (texAnimSet != 0) {
 		texAnimSet->SetTexGen();
@@ -2070,7 +2054,7 @@ void CChara::CModel::DrawShadow(float (*view)[4], int zMode)
 		return;
 	}
 
-	SetTextureSet__12CMaterialSetFP11CTextureSet(materialSet, m_texSet);
+	materialSet->SetTextureSet(m_texSet);
 	LightPcs.SetAmbientAlpha(FLOAT_803301bc);
 	MaterialMan.InitVtxFmt(-1, (_GXCompType)3, ModelPosQuant(this), (_GXCompType)3, ModelNormQuant(this), (_GXCompType)3, 0xC);
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
@@ -2326,7 +2310,7 @@ void CChara::CModel::AttachTextureSet(CTextureSet* texSet)
 		}
 	}
 	if (m_data->m_materialSet != 0) {
-		SetTextureSet__12CMaterialSetFP11CTextureSet(m_data->m_materialSet, m_texSet);
+		m_data->m_materialSet->SetTextureSet(m_texSet);
 	}
 }
 

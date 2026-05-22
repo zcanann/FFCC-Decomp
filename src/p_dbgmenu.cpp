@@ -7,7 +7,9 @@
 #include "ffcc/p_minigame.h"
 #include "ffcc/partMng.h"
 #include "ffcc/p_tina.h"
+#include "ffcc/sound.h"
 #include "ffcc/system.h"
+#include "ffcc/cflat_runtime2.h"
 #include <dolphin/gx.h>
 #include <string.h>
 
@@ -20,11 +22,6 @@ extern "C" void create__11CDbgMenuPcsFv(CDbgMenuPcs*);
 extern "C" void destroy__11CDbgMenuPcsFv(CDbgMenuPcs*);
 extern "C" void calc__11CDbgMenuPcsFv(CDbgMenuPcs*);
 extern "C" void draw__11CDbgMenuPcsFv(CDbgMenuPcs*);
-extern "C" void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-    void*, int, int, int, int, void*, void*);
-extern "C" void CheckDriver__6CSoundFi(void*, int);
-extern "C" void pppDumpMngSt__8CPartMngFv(void*);
-extern "C" void DumpLoad__9CCharaPcsFv(void*);
 
 struct DbgMenuDef {
     const char* text;
@@ -69,11 +66,11 @@ extern const char s_DbgMenuOn_80331CB4[] = "ON";
 extern const char s_DbgMenuOff_80331CB8[] = "OFF";
 extern const char s_DbgMenuUnknown_80331CBC[] = "?";
 
-u32 m_table_desc0__11CDbgMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(create__11CDbgMenuPcsFv)};
-u32 m_table_desc1__11CDbgMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(destroy__11CDbgMenuPcsFv)};
-u32 m_table_desc2__11CDbgMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(calc__11CDbgMenuPcsFv)};
-u32 m_table_desc3__11CDbgMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(draw__11CDbgMenuPcsFv)};
-u32 m_table__11CDbgMenuPcs[0x15C / sizeof(u32)] = {
+u32 CDbgMenuPcs::m_table_desc0[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(create__11CDbgMenuPcsFv)};
+u32 CDbgMenuPcs::m_table_desc1[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(destroy__11CDbgMenuPcsFv)};
+u32 CDbgMenuPcs::m_table_desc2[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(calc__11CDbgMenuPcsFv)};
+u32 CDbgMenuPcs::m_table_desc3[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(draw__11CDbgMenuPcsFv)};
+u32 CDbgMenuPcs::m_table[0x15C / sizeof(u32)] = {
     reinterpret_cast<u32>(const_cast<char*>(s_CDbgMenuPcs_801DD428)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x11, 0, 0, 0, 0, 0x4A, 1
 };
 
@@ -136,7 +133,7 @@ void CDbgMenuPcs::Quit()
  */
 int CDbgMenuPcs::GetTable(unsigned long index)
 {
-	return reinterpret_cast<int>(reinterpret_cast<char*>(m_table__11CDbgMenuPcs) + index * 0x15C);
+	return reinterpret_cast<int>(reinterpret_cast<char*>(m_table) + index * 0x15C);
 }
 
 /*
@@ -171,18 +168,18 @@ void CDbgMenuPcs::destroy()
 
 inline CDbgMenuPcs::CDbgMenuPcs()
 {
-    m_table__11CDbgMenuPcs[1] = m_table_desc0__11CDbgMenuPcs[0];
-    m_table__11CDbgMenuPcs[2] = m_table_desc0__11CDbgMenuPcs[1];
-    m_table__11CDbgMenuPcs[3] = m_table_desc0__11CDbgMenuPcs[2];
-    m_table__11CDbgMenuPcs[4] = m_table_desc1__11CDbgMenuPcs[0];
-    m_table__11CDbgMenuPcs[5] = m_table_desc1__11CDbgMenuPcs[1];
-    m_table__11CDbgMenuPcs[6] = m_table_desc1__11CDbgMenuPcs[2];
-    m_table__11CDbgMenuPcs[7] = m_table_desc2__11CDbgMenuPcs[0];
-    m_table__11CDbgMenuPcs[8] = m_table_desc2__11CDbgMenuPcs[1];
-    m_table__11CDbgMenuPcs[9] = m_table_desc2__11CDbgMenuPcs[2];
-    m_table__11CDbgMenuPcs[12] = m_table_desc3__11CDbgMenuPcs[0];
-    m_table__11CDbgMenuPcs[13] = m_table_desc3__11CDbgMenuPcs[1];
-    m_table__11CDbgMenuPcs[14] = m_table_desc3__11CDbgMenuPcs[2];
+    m_table[1] = m_table_desc0[0];
+    m_table[2] = m_table_desc0[1];
+    m_table[3] = m_table_desc0[2];
+    m_table[4] = m_table_desc1[0];
+    m_table[5] = m_table_desc1[1];
+    m_table[6] = m_table_desc1[2];
+    m_table[7] = m_table_desc2[0];
+    m_table[8] = m_table_desc2[1];
+    m_table[9] = m_table_desc2[2];
+    m_table[12] = m_table_desc3[0];
+    m_table[13] = m_table_desc3[1];
+    m_table[14] = m_table_desc3[2];
 }
 
 /*
@@ -197,7 +194,7 @@ void CDbgMenuPcs::calc()
 	unsigned int padOffset;
 	int menuPtr;
 	int cursorPtr;
-	int stackData[3];
+	CFlatRuntime::CStack stackData[3];
 
 	if (m_rootMenuNode.m_firstChild == 0) {
 		return;
@@ -217,14 +214,13 @@ void CDbgMenuPcs::calc()
 			*(unsigned int*)(CFlat + 0x12A4) = ~*(unsigned int*)(CFlat + 0x12A4);
 			break;
 		case 0x65:
-			stackData[0] = 0;
-			stackData[2] = 0;
+			stackData[0].m_word = 0;
+			stackData[2].m_word = 0;
 			flags = (unsigned int)__cntlzw((int)((signed char)CFlat[0x12E4] >> 7));
 			flags = ((int)(char)(flags >> 5) & 1U) << 7 | ((unsigned char)CFlat[0x12E4] & 0x7F);
 			CFlat[0x12E4] = (unsigned char)flags;
-			stackData[1] = (int)(flags << 0x18) >> 0x1f;
-			SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-			    CFlat, 0, 1, 9, 3, stackData, 0);
+			stackData[1].m_word = (int)(flags << 0x18) >> 0x1f;
+			reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(0, 1, 9, 3, stackData, 0);
 			break;
 		case 0x66:
 			flags = (unsigned int)__cntlzw((int)(char)((int)((unsigned int)(unsigned char)CFlat[0x12E4] << 0x1d) >> 0x1f));
@@ -272,17 +268,17 @@ void CDbgMenuPcs::calc()
 			m_dbgFlags ^= 0x1000;
 			break;
 		case 0x74:
-			CheckDriver__6CSoundFi(&Sound, 1);
+			Sound.CheckDriver(1);
 			break;
 		case 0x75:
 			g_map_draw_prof = 1 - g_map_draw_prof;
 			break;
 		case 0x76:
 			DAT_8032e698 = 1 - DAT_8032e698;
-			pppDumpMngSt__8CPartMngFv(&PartMng);
+			PartMng.pppDumpMngSt();
 			break;
 		case 0x77:
-			DumpLoad__9CCharaPcsFv(&CharaPcs);
+			CharaPcs.DumpLoad();
 			break;
 		case 0x78:
 			m_dbgFlags ^= 0x2000;

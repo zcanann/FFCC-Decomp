@@ -44,13 +44,6 @@ static inline float GetStatusMultiplier(int offset)
 }
 }
 
-extern "C" int useItem__10CGPartyObjFi(CGPartyObj*, int);
-extern "C" int putItem__10CGPartyObjFi(CGPartyObj*, int);
-extern "C" int putGil__10CGPartyObjFi(CGPartyObj*, int);
-extern "C" int DelItem__6JoyBusFiUc(JoyBus*, int, unsigned char);
-extern "C" int GetSkillStr__8CMenuPcsFi(void*, int);
-extern "C" void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-	void*, void*, int, int, int, void*, void*);
 extern "C" void* __vt__8CMonWork[];
 extern "C" void* __vt__12CCaravanWork[];
 extern "C" void* __vt__9CGObjWork[];
@@ -564,15 +557,15 @@ void CCaravanWork::FGLetterOpen(int letterIdx)
 	};
 
 	CCaravanWork* self = this;
-	unsigned int stack[2];
+	CFlatRuntime::CStack stack[2];
 	int letterOffset = letterIdx * 0xC;
 	unsigned char* letter = reinterpret_cast<unsigned char*>(self) + letterOffset;
 	const int letterBase = offsetof(CCaravanWork, m_letter0);
 
-	stack[0] = (*reinterpret_cast<unsigned short*>(letter + letterBase) >> 2) & 0x1FF;
-	stack[1] = (*reinterpret_cast<unsigned int*>(letter + letterBase) >> 9) & 0x1FF;
-	SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-		CFlat, Game.m_partyObjArr[self->m_joybusCaravanId], 2, 0xF, 2, stack, 0);
+	stack[0].m_word = (*reinterpret_cast<unsigned short*>(letter + letterBase) >> 2) & 0x1FF;
+	stack[1].m_word = (*reinterpret_cast<unsigned int*>(letter + letterBase) >> 9) & 0x1FF;
+	reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(
+		Game.m_partyObjArr[self->m_joybusCaravanId], 2, 0xF, 2, stack, 0);
 
 	CMes::m_tempVar[0] = *reinterpret_cast<unsigned short*>(letter + letterBase + 4);
 	CMes::m_tempVar[1] = *reinterpret_cast<unsigned short*>(letter + letterBase + 6);
@@ -619,19 +612,19 @@ void CCaravanWork::FGLetterReply(int letterIdx, int param3, int param4, int para
 		unsigned char low : 5;
 	};
 
-	int stack[5];
+	CFlatRuntime::CStack stack[5];
 	unsigned char* letter = m_letter0 + (letterIdx * 0xC);
 	unsigned short* words16 = reinterpret_cast<unsigned short*>(letter);
 	unsigned int* words32 = reinterpret_cast<unsigned int*>(letter);
 
-	stack[0] = (words16[0] >> 2) & 0x1FF;
-	stack[1] = (words32[0] >> 9) & 0x1FF;
-	stack[2] = param3;
-	stack[3] = param4;
-	stack[4] = param5;
+	stack[0].m_word = (words16[0] >> 2) & 0x1FF;
+	stack[1].m_word = (words32[0] >> 9) & 0x1FF;
+	stack[2].m_word = param3;
+	stack[3].m_word = param4;
+	stack[4].m_word = param5;
 
-	SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-		CFlat, Game.m_partyObjArr[m_joybusCaravanId], 2, 0x10, 5, stack, 0);
+	reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(
+		Game.m_partyObjArr[m_joybusCaravanId], 2, 0x10, 5, stack, 0);
 
 	reinterpret_cast<LetterFlags*>(letter)->replied = 1;
 }
@@ -647,12 +640,12 @@ void CCaravanWork::FGLetterReply(int letterIdx, int param3, int param4, int para
  */
 void CCaravanWork::FGUseItem(int itemIdx, int updateJoybus)
 {
-	int used = useItem__10CGPartyObjFi((CGPartyObj*)m_ownerObj, (int)(short)m_inventoryItems[itemIdx]);
+	int used = static_cast<CGPartyObj*>(m_ownerObj)->useItem(static_cast<short>(m_inventoryItems[itemIdx]));
 	if ((used != 0) && ((short)m_inventoryItems[itemIdx] != -1)) {
 		m_inventoryItems[itemIdx] = 0xFFFF;
 		m_inventoryItemCount--;
 		if (updateJoybus != 0) {
-			DelItem__6JoyBusFiUc(&Joybus, m_joybusCaravanId, (char)itemIdx);
+			Joybus.DelItem(m_joybusCaravanId, static_cast<unsigned char>(itemIdx));
 		}
 	}
 }
@@ -668,12 +661,12 @@ void CCaravanWork::FGUseItem(int itemIdx, int updateJoybus)
  */
 void CCaravanWork::FGPutItem(int itemIdx, int updateJoybus)
 {
-	int put = putItem__10CGPartyObjFi((CGPartyObj*)m_ownerObj, (int)(short)m_inventoryItems[itemIdx]);
+	int put = static_cast<CGPartyObj*>(m_ownerObj)->putItem(static_cast<short>(m_inventoryItems[itemIdx]));
 	if ((put != 0) && ((short)m_inventoryItems[itemIdx] != -1)) {
 		m_inventoryItems[itemIdx] = 0xFFFF;
 		m_inventoryItemCount--;
 		if (updateJoybus != 0) {
-			DelItem__6JoyBusFiUc(&Joybus, m_joybusCaravanId, (char)itemIdx);
+			Joybus.DelItem(m_joybusCaravanId, static_cast<unsigned char>(itemIdx));
 		}
 	}
 }
@@ -689,7 +682,7 @@ void CCaravanWork::FGPutItem(int itemIdx, int updateJoybus)
  */
 void CCaravanWork::FGPutGil(int gilToRemove)
 {
-	int put = putGil__10CGPartyObjFi((CGPartyObj*)m_ownerObj, gilToRemove);
+	int put = static_cast<CGPartyObj*>(m_ownerObj)->putGil(gilToRemove);
 	if (put != 0) {
 		m_gil += -gilToRemove;
 		if (m_gil > 99999999) {
@@ -958,7 +951,7 @@ void CCaravanWork::DeleteItemIdx(int itemSlot, int updateJoybus)
 		m_inventoryItems[itemSlot] = -1;
 		m_inventoryItemCount = m_inventoryItemCount - 1;
 		if (updateJoybus != 0) {
-			DelItem__6JoyBusFiUc(&Joybus, m_joybusCaravanId, (unsigned char)itemSlot);
+			Joybus.DelItem(m_joybusCaravanId, static_cast<unsigned char>(itemSlot));
 		}
 	}
 }
@@ -1677,18 +1670,18 @@ int CCaravanWork::ShopRequest(int requestType, int param3, int param4, int param
  */
 void CCaravanWork::CallShop(int requestType, int arg0, int arg1, int arg2, int arg3)
 {
-	int args[5];
+	CFlatRuntime::CStack args[5];
 
 	if ((requestType == 0) || (requestType == 1)) {
 		m_shopRequestState = 0;
 	}
-	args[0] = requestType;
-	args[1] = arg0;
-	args[2] = arg1;
-	args[3] = arg2;
-	args[4] = arg3;
-	SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-		&CFlat, m_ownerObj, 2, 0x12, 5, args, (void*)0);
+	args[0].m_word = requestType;
+	args[1].m_word = arg0;
+	args[2].m_word = arg1;
+	args[3].m_word = arg2;
+	args[4].m_word = arg3;
+	reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(
+		reinterpret_cast<CFlatRuntime::CObject*>(m_ownerObj), 2, 0x12, 5, args, 0);
 }
 
 /*
@@ -2333,7 +2326,7 @@ int CCaravanWork::GetWeaponAttrib(int cmdListIdx)
 {
 	int weaponType = GetCmdListItem(cmdListIdx);
 	if (weaponType >= 0 && weaponType < 3) {
-		return GetSkillStr__8CMenuPcsFi(&MenuPcs, weaponType);
+		return reinterpret_cast<int>(MenuPcs.GetSkillStr(weaponType));
 	}
 
 	int itemId = DelCmdListAndItem(cmdListIdx);
@@ -2502,7 +2495,7 @@ void CCaravanWork::GetNumCombi(int cmdListIdx, int updateJoybus)
 		m_inventoryItems[inventorySlot] = 0xFFFF;
 		m_inventoryItemCount = static_cast<short>(m_inventoryItemCount - 1);
 		if (updateJoybus != 0) {
-			DelItem__6JoyBusFiUc(&Joybus, m_joybusCaravanId, static_cast<char>(inventorySlot));
+			Joybus.DelItem(m_joybusCaravanId, static_cast<unsigned char>(inventorySlot));
 		}
 	}
 

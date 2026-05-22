@@ -18,7 +18,7 @@ inline CUSBPcs::CUSBPcs()
     static unsigned int desc0[] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__7CUSBPcsFv)};
     static unsigned int desc1[] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__7CUSBPcsFv)};
     static unsigned int desc2[] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(func__7CUSBPcsFv)};
-    unsigned int* table = reinterpret_cast<unsigned int*>(&m_table__7CUSBPcs);
+    unsigned int* table = reinterpret_cast<unsigned int*>(&m_table);
 
     table[1] = desc0[0];
     table[2] = desc0[1];
@@ -31,7 +31,7 @@ inline CUSBPcs::CUSBPcs()
     table[9] = desc2[2];
 }
 
-unsigned int m_table__7CUSBPcs[0x11C / sizeof(unsigned int)] = {
+unsigned int CUSBPcs::m_table[0x11C / sizeof(unsigned int)] = {
     reinterpret_cast<unsigned int>(const_cast<char*>(s_CUSBPcs_8032f810)),
     0,
     0,
@@ -238,7 +238,7 @@ void CUSBPcs::IsBigAlloc(int param_2)
  */
 int CUSBPcs::GetTable(unsigned long param)
 {
-    return reinterpret_cast<int>(reinterpret_cast<char*>(m_table__7CUSBPcs) + (param * 0x15c));
+    return reinterpret_cast<int>(reinterpret_cast<char*>(m_table) + (param * 0x15c));
 }
 
 /*

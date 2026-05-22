@@ -51,11 +51,6 @@ struct CMapCylinderRaw
 };
 
 extern "C" {
-int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, CMapCylinder*, Vec*, unsigned long);
-void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
-int GetWait__4CMesFv(void*);
-int GetPadType__6JoyBusFi(void*, int);
-unsigned short GetButtonDown__4CPadFl(void*, long);
 int sprintf(char*, const char*, ...);
 }
 extern int gWmMenuWorkA;
@@ -341,7 +336,7 @@ void CPartPcs::pppSetDebugHide(unsigned char hide)
  */
 extern "C" void CalcHitPosition__7CMapPcsFP3Vec(CMapPcs*, Vec* hitPosition)
 {
-    CalcHitPosition__7CMapObjFP3Vec(*(void**)((char*)&MapMng + 0x22A78), hitPosition);
+    MapMng.m_hitMapObj->CalcHitPosition(hitPosition);
 }
 
 /*
@@ -369,8 +364,7 @@ extern "C" int CheckHitCylinderNear__7CMapPcsFP3VecP3VecfUl(
     cylinder.m_top = *direction;
     cylinder.m_radius = radius;
 
-    return CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
-        &MapMng, reinterpret_cast<CMapCylinder*>(&cylinder), direction, hitMask);
+    return MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&cylinder), direction, hitMask);
 }
 
 /*
@@ -384,7 +378,7 @@ extern "C" int CheckHitCylinderNear__7CMapPcsFP3VecP3VecfUl(
  */
 extern "C" unsigned char* GetTmpFrameBuffer__8CGraphicFv(CGraphic* graphic)
 {
-    return *(unsigned char**)((char*)graphic + 0x71E8);
+    return static_cast<unsigned char*>(graphic->m_scratchTextureBuffer);
 }
 
 /*
@@ -1035,8 +1029,6 @@ void CFile::CHandle::Read()
     File.Read(this);
 }
 
-extern "C" int GetWait__4CMesFv(void*);
-
 /*
  * --INFO--
  * PAL Address: 0x800B9478
@@ -1048,7 +1040,7 @@ extern "C" int GetWait__4CMesFv(void*);
  */
 extern "C" void ReqScreenCapture__11CGraphicPcsFv(void* graphicPcs)
 {
-    *(int*)((char*)graphicPcs + 0xBC) = 1;
+    static_cast<CGraphicPcs*>(graphicPcs)->m_copySaveFlag = 1;
 }
 
 /*
@@ -1064,7 +1056,7 @@ extern "C" int IsUse__8CMesMenuFv(void* mesMenu)
 {
     unsigned char result = 0;
     if (*(int*)((char*)mesMenu + 8) != 0 && *(int*)((char*)mesMenu + 0xC) <= 1 &&
-        GetWait__4CMesFv((char*)mesMenu + 0x1C) != 4) {
+        reinterpret_cast<CMes*>(reinterpret_cast<char*>(mesMenu) + 0x1C)->GetWait() != 4) {
         result = 1;
     }
 
@@ -2001,7 +1993,7 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         return;
     }
     case -0xEC: {
-        const int padType = GetPadType__6JoyBusFi(&Joybus, *object->m_localBase);
+        const int padType = Joybus.GetPadType(*object->m_localBase);
         runtime->push(object, (static_cast<unsigned int>(__cntlzw(0x40000 - padType)) >> 5) & 0xFF);
         outResult = 0;
         return;
@@ -2024,7 +2016,7 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
             _GXColor color = { 0xFF, 0xFF, 0xFF, static_cast<u8>(object->m_localBase[1]) };
 
             GXInitTexObj(
-                &backTexObj, GetTmpFrameBuffer__8CGraphicFv(&Graphic), 0x280, 0x1C0, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP,
+                &backTexObj, static_cast<unsigned char*>(Graphic.m_scratchTextureBuffer), 0x280, 0x1C0, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP,
                 GX_FALSE);
             GXInitTexObjLOD(&backTexObj, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
             gUtil.RenderTextureQuad(
@@ -2032,7 +2024,7 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         } else {
             _GXTexObj backTexObj;
             Graphic.GetBackBufferRect2(
-                GetTmpFrameBuffer__8CGraphicFv(&Graphic), &backTexObj, 0, 0, 0x280, 0x1C0, 0, GX_NEAR, GX_TF_RGBA8, 0);
+                Graphic.m_scratchTextureBuffer, &backTexObj, 0, 0, 0x280, 0x1C0, 0, GX_NEAR, GX_TF_RGBA8, 0);
         }
         runtime->push(object, 0);
         outResult = 0;
@@ -3117,7 +3109,7 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         return;
     case -0x52: {
         const int enabled = (((-*object->m_localBase) | *object->m_localBase) >> 31);
-        SetUseDOF__11CGraphicPcsFi(&GraphicPcs, enabled);
+        GraphicPcs.m_dofFlag = enabled;
         GraphicPcs.SetDOFParameter(
             static_cast<signed char>(static_cast<char>(*object->m_localBase) - 1),
             static_cast<signed char>(object->m_localBase[1]), static_cast<float>(object->m_localBase[2]),
@@ -3141,7 +3133,7 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         *reinterpret_cast<int*>(graphicsPcs + 0x36) = object->m_localBase[2];
         *reinterpret_cast<int*>(graphicsPcs + 0x40) = object->m_localBase[3];
         *reinterpret_cast<int*>(graphicsPcs + 0x8) = *reinterpret_cast<int*>(graphicsPcs + 0x4);
-        ReqScreenCapture__11CGraphicPcsFv(&GraphicPcs);
+        GraphicPcs.m_copySaveFlag = 1;
         runtime->push(object, 0);
         outResult = 0;
         return;
@@ -3278,7 +3270,7 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         outResult = 0;
         return;
     case -0x42: {
-        const int padType = GetPadType__6JoyBusFi(&Joybus, *object->m_localBase);
+        const int padType = Joybus.GetPadType(*object->m_localBase);
         runtime->push(object, (0x40U - padType | padType - 0x40U) >> 31);
         outResult = 0;
         return;
@@ -3988,7 +3980,7 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
     case -0x0B: {
         unsigned short buttons = 0;
         if (((1 << *object->m_localBase) & *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x12A8)) == 0) {
-            buttons = GetButtonDown__4CPadFl(&Pad, *object->m_localBase);
+            buttons = Pad.GetButtonDown(*object->m_localBase);
         }
         if ((DbgMenuPcs.GetDbgFlag() & 0x100) != 0) {
             buttons &= 0xF3FF;

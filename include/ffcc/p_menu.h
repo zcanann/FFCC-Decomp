@@ -17,8 +17,6 @@ class CPad;
 class CRingMenu;
 class CMesMenu;
 
-extern unsigned int m_table__8CMenuPcs[];
-
 struct McListInfo
 {
     void operator=(const McListInfo&);
@@ -27,6 +25,8 @@ struct McListInfo
 class CMenuPcs : public CProcess
 {
 public:
+    static unsigned int m_table[0x57];
+
     struct BattleHudState
     {
         int m_visible;
@@ -45,6 +45,10 @@ public:
     struct Sprt
     {
         void operator=(const Sprt&);
+    };
+    struct Sprt2
+    {
+        void operator=(const Sprt2&);
     };
     struct SPL
     {
@@ -137,6 +141,35 @@ public:
     void calcBattle();
     void drawBattle();
 
+    void BonusInit();
+    void createBonus();
+    void destroyBonus();
+    void calcBonus();
+    void drawBonus();
+
+    void CalcResultOpenAnim();
+    void DrawResultOpenAnim();
+    void CalcResultCountAnim();
+    void DrawResultCountAnim();
+    void CalcResultCloseAnim();
+    void DrawResultCloseAnim();
+
+    void CalcSelectOpenAnim();
+    void DrawSelectOpenAnim();
+    void CalcSelectWait();
+    void DrawSelectWait();
+    void CalcSelectCloseAnim();
+    void DrawSelectCloseAnim();
+
+    void DrawBonusCnt(CMenuPcs::Sprt2*, int);
+    void DrawBonusFrame(float, float, float, float, float);
+    void DrawArtiBase(CMenuPcs::Sprt2*, float);
+    void DrawBonusChkMark(float);
+    void ArtiBaseInfoInit(CMenuPcs::Sprt2*, CMenuPcs::Sprt2*);
+
+    void GetAllPadOn();
+    void ClrBattleItem();
+
     void ChgPlayModeFromScript(bool);
 
     CTexture* GetTexture(TEX);
@@ -205,6 +238,9 @@ public:
     void WMSubMenuInit();
     void WMChgMenu();
     void GetOptionData();
+    const char* GetSkillStr(int);
+    int GetItemType(int, int);
+    unsigned char GetItemIcon(int);
     void ArtiInit();
     void ArtiInit1();
     int ArtiOpen();
@@ -242,6 +278,9 @@ public:
     void DrawMcWin(short, short);
     void DrawMcWinMess(int, int);
     void GetWinSize(int, short*, short*, int);
+    const char* const* GetMcWinMessBuff(int);
+    int GetWinMess(int);
+    int GetYesNoXPos(int);
     void SetTextureLoc(int);
     float GetMaxAnimWait();
     void BindMcObj();

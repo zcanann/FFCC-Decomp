@@ -31,6 +31,7 @@ public:
     int LetterCtrlCur();
     void LetterLstBaseDraw(float);
     void LetterSetAttachItem(unsigned int, int);
+    const char* GetMenuStr(int);
 };
 
 #endif // _FFCC_MENU_LETTER_H_

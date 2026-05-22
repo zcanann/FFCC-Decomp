@@ -27,16 +27,12 @@ extern "C" void SetMcWinInfo__8CMenuPcsFii(CMenuPcs*, int, int);
 extern "C" void SetProjection__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" void SetLight__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" void RestoreProjection__8CMenuPcsFv(CMenuPcs*);
-extern "C" void DrawMenuIdx__8CPartPcsFi(CPartPcs*, int);
 extern "C" void loadTexture__8CMenuPcsFPPciiPQ28CMenuPcs4CTmpiii(CMenuPcs*, char**, int, int, void*, int, int, int);
-extern "C" char* GetLangString__5CGameFv(void*);
 extern "C" void loadFont__8CMenuPcsFiPcii(CMenuPcs*, int, char*, int, int);
 extern "C" void CallWorldParam__8CMenuPcsFiii(CMenuPcs*, int, int, int);
 extern "C" void changeMode__8CMenuPcsFQ28CMenuPcs8MENUMODE(CMenuPcs*, int);
-extern "C" int GetItemType__8CMenuPcsFii(CMenuPcs*, int, int);
 extern "C" unsigned int BindEffect__8CMenuPcsFiii(CMenuPcs*, int, int, int);
 extern "C" void freeTexture__8CMenuPcsFiiii(CMenuPcs*, int, int, int, int);
-extern "C" int AddItem__12CCaravanWorkFiPi(void*, int, int*);
 extern "C" int sprintf(char*, const char*, ...);
 extern "C" int rand(void);
 extern char* PTR_s_bonus_802128c0[];
@@ -515,14 +511,12 @@ static void DrawBonusTexturedSprite(CMenuPcs* menu, const BonusAnimSprite* sprit
 {
 	GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(alpha * 255.0f)};
 	GXSetChanMatColor(GX_COLOR0A0, color);
-	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(menu, sprite->tex);
+	menu->SetTexture(static_cast<CMenuPcs::TEX>(sprite->tex));
 	if (sprite->tex == 0x20) {
 		GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_ONE, GX_LO_CLEAR);
 	}
-	DrawRect__8CMenuPcsFUlfffffffff(menu, 0,
-	    (float)sprite->x + sprite->mulX, (float)sprite->y + sprite->mulY,
-	    (float)sprite->w, (float)sprite->h,
-	    sprite->depth, sprite->depth, sprite->scale, sprite->scale, 0.0f);
+	menu->DrawRect(0, (float)sprite->x + sprite->mulX, (float)sprite->y + sprite->mulY, (float)sprite->w,
+	               (float)sprite->h, sprite->depth, sprite->depth, sprite->scale, sprite->scale, 0.0f);
 	if (sprite->tex == 0x20) {
 		GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
 	}
@@ -550,12 +544,11 @@ static void DrawBonusSweepSprite(CMenuPcs* menu, const BonusAnimSprite* sprite, 
 	reinterpret_cast<unsigned int*>(solidColors)[2] = solidColor;
 	reinterpret_cast<unsigned int*>(solidColors)[3] = solidColor;
 
-	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(menu, sprite->tex);
+	menu->SetTexture(static_cast<CMenuPcs::TEX>(sprite->tex));
 	GXSetChanMatColor(GX_COLOR0A0, solidColors[0]);
 
 	if (fillWidth > 0.0f) {
-		DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(menu, 0, x, y, fillWidth, height,
-		    sprite->depth, sprite->depth, solidColors, 1.0f, 1.0f, 0.0f);
+		menu->DrawRect(0, x, y, fillWidth, height, sprite->depth, sprite->depth, solidColors, 1.0f, 1.0f, 0.0f);
 		x += fillWidth;
 	}
 
@@ -565,8 +558,7 @@ static void DrawBonusSweepSprite(CMenuPcs* menu, const BonusAnimSprite* sprite, 
 		reinterpret_cast<unsigned int*>(fadeColors)[1] = 0xFFFFFF00;
 		reinterpret_cast<unsigned int*>(fadeColors)[2] = 0xFFFFFF00;
 		reinterpret_cast<unsigned int*>(fadeColors)[3] = 0xFFFFFF00;
-		DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(menu, 0, x, y, fadeWidth, height,
-		    sprite->depth, sprite->depth, fadeColors, 1.0f, 1.0f, 0.0f);
+		menu->DrawRect(0, x, y, fadeWidth, height, sprite->depth, sprite->depth, fadeColors, 1.0f, 1.0f, 0.0f);
 	}
 }
 
@@ -583,13 +575,13 @@ static void DrawBonusPartyModel(CMenuPcs* menu, int modelIndex, float alpha)
 	}
 
 	SetBonusPartyModelAlpha(menu, modelIndex, ClampBonusUnit(alpha));
-	SetProjection__8CMenuPcsFi(menu, modelIndex);
-	SetLight__8CMenuPcsFi(menu, 1);
+	menu->SetProjection(modelIndex);
+	menu->SetLight(1);
 	unsigned int oldFlags = handle->m_flags;
 	handle->m_flags = 0x300543;
 	handle->Draw(5);
 	handle->m_flags = oldFlags;
-	RestoreProjection__8CMenuPcsFv(menu);
+	menu->RestoreProjection();
 }
 
 static void SetBonusPartyModelAlpha(CMenuPcs* menu, int modelIndex, float alpha)
@@ -620,8 +612,8 @@ static void DrawBonusActiveMarks(CMenuPcs* menu, int statePtr, float alpha)
 		return;
 	}
 
-	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(menu, 0);
-	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(menu, 0x23);
+	menu->SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+	menu->SetTexture(static_cast<CMenuPcs::TEX>(0x23));
 	GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(alpha * 255.0f)};
 	GXSetChanMatColor(GX_COLOR0A0, color);
 
@@ -636,7 +628,7 @@ static void DrawBonusActiveMarks(CMenuPcs* menu, int statePtr, float alpha)
 		}
 		float x = markPos[i * 2 + 0] + 4.0f;
 		float y = markPos[i * 2 + 1] + 4.0f;
-		DrawRect__8CMenuPcsFUlfffffffff(menu, 0, x, y, 24.0f, 24.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+		menu->DrawRect(0, x, y, 24.0f, 24.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 	}
 }
 
@@ -711,7 +703,7 @@ static void GrantSelectedBonusArtifacts()
 				caravanWork->m_artifacts[artifactSlot] = static_cast<unsigned short>(itemId);
 			}
 		} else {
-			AddItem__12CCaravanWorkFiPi(reinterpret_cast<void*>(caravanWork), itemId, 0);
+			caravanWork->AddItem(itemId, 0);
 		}
 	}
 }
@@ -1112,9 +1104,9 @@ void CMenuPcs::createBonus()
 		GbaQue.SetRadarMode(i, 0);
 	}
 
-	loadTexture__8CMenuPcsFPPciiPQ28CMenuPcs4CTmpiii(this, PTR_s_bonus_802128c0, 2, 1, &DAT_802128e4, 0x16, 0x12, 0);
-	sprintf(fontPath, s_dvd__smenu_subfont_fnt_801e3020, GetLangString__5CGameFv(&Game));
-	loadFont__8CMenuPcsFiPcii(this, 0, fontPath, 1, -1);
+	loadTexture(PTR_s_bonus_802128c0, 2, 1, reinterpret_cast<CMenuPcs::CTmp*>(&DAT_802128e4), 0x16, 0x12, 0);
+	sprintf(fontPath, s_dvd__smenu_subfont_fnt_801e3020, Game.GetLangString());
+	loadFont(0, fontPath, 1, -1);
 
 	if (s_bonusSummaryData == 0) {
 		s_bonusSummaryData = new BonusSummaryData;
@@ -1277,7 +1269,7 @@ void CMenuPcs::createBonus()
 					continue;
 				}
 
-				if (GetItemType__8CMenuPcsFii(this, itemId, 1) == 2) {
+				if (GetItemType(itemId, 1) == 2) {
 					int artifactSlot = itemId - 0x9F;
 					if (artifactSlot >= 0 && artifactSlot < 96 && caravanWork->m_artifacts[artifactSlot] == itemId) {
 						s_bonusSummaryData->m_party[i].m_ownedArtifactMask |= (1u << artifactIndex);
@@ -1401,7 +1393,7 @@ void CMenuPcs::createBonus()
 				}
 
 				if (modelNo == 0x79 && effectNo >= 0) {
-					BindEffect__8CMenuPcsFiii(this, handleIndex, effectNo, -1);
+					BindEffect(handleIndex, effectNo, -1);
 				}
 
 				handleIndex++;
@@ -1486,7 +1478,7 @@ void CMenuPcs::destroyBonus()
 		s_Base[0] = 0;
 	}
 
-	freeTexture__8CMenuPcsFiiii(this, 2, 1, 0x16, 0x12);
+	freeTexture(2, 1, 0x16, 0x12);
 }
 
 /*
@@ -1539,7 +1531,7 @@ void CMenuPcs::calcBonus()
 	case 5:
 		CalcSelectCloseAnim();
 		if (*(short*)(animPtr + 6) != 0) {
-			CallWorldParam__8CMenuPcsFiii(this, 8, 0, 0);
+			CallWorldParam(8, 0, 0);
 		}
 		break;
 	case 6:
@@ -1550,7 +1542,7 @@ void CMenuPcs::calcBonus()
 				caravanWork->SortBeforeReturnWorldMap();
 			}
 		}
-		changeMode__8CMenuPcsFQ28CMenuPcs8MENUMODE(this, 0);
+		changeMode(static_cast<CMenuPcs::MENUMODE>(0));
 		break;
 	default:
 		break;

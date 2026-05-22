@@ -13,6 +13,7 @@ class CMaterialSet;
 class CTextureSet;
 class CMemory;
 class CTexAnimSet;
+class SRT;
 struct _GXColor;
 struct Vec;
 
@@ -54,6 +55,7 @@ public:
         void IsBanked();
         void SetLastFrame(int);
         void SetInterp(int);
+        void InitQuantize();
 
 		u8 _pad8[0x8];
 		u16 m_frameCount;
@@ -61,10 +63,12 @@ public:
 
 	class CAnimNode
 	{
+	public:
 		CAnimNode();
 		~CAnimNode();
 
 		void IsScale();
+		void Interp(CChara::CAnim*, SRT*, float);
 	};
 
 	class CNode
@@ -230,6 +234,8 @@ public:
     void CalcMogScore();
     void ChangeMogMode(int);
 public:
+    void freeFurTex();
+    void makeFurTex();
     void InitFurTexBuffer();
     void SaveFurTexBuffer(unsigned short* outTexels);
     void LoadFurTexBuffer(unsigned short* inTexels);

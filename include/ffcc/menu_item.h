@@ -40,6 +40,9 @@ public:
     void ItemDraw();
     int ItemCtrlCur();
     void SingLifeInit(int);
+    int EquipChk(int);
+    int GetItemType(int, int);
+    void DrawEquipMark(int, int, float);
 
     char pad_00[0xF8];
     CFont* helpFont;

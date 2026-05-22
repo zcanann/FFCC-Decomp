@@ -3,8 +3,6 @@
 
 #include "ffcc/system.h"
 
-extern u32 m_table__11CDbgMenuPcs[];
-
 class CDbgMenuPcs : public CProcess
 {
 public:
@@ -63,6 +61,12 @@ public:
     };
 
     CDbgMenuPcs();
+
+    static u32 m_table_desc0[3];
+    static u32 m_table_desc1[3];
+    static u32 m_table_desc2[3];
+    static u32 m_table_desc3[3];
+    static u32 m_table[0x15C / sizeof(u32)];
 	
     void Init();
     void Quit();

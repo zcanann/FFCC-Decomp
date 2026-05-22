@@ -1,6 +1,5 @@
 #include "ffcc/p_MaterialEditor.h"
 #include "ffcc/p_usb.h"
-#include "ffcc/ME_USB_process.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/graphic.h"
 #include "ffcc/gxfunc.h"
@@ -17,7 +16,6 @@ extern const char sMaterialEditorSpinnerText[5] = "|/-\\";
 #include <string.h>
 
 extern "C" void* __register_global_object(void* object, void* destructor, void* regmem);
-extern "C" ZLIST* __dt__5ZLISTFv(ZLIST* self, short shouldDelete);
 extern "C" void createViewer__18CMaterialEditorPcsFv(CMaterialEditorPcs*);
 extern "C" void destroyViewer__18CMaterialEditorPcsFv(CMaterialEditorPcs*);
 extern "C" void calcViewer__18CMaterialEditorPcsFv(CMaterialEditorPcs*);
@@ -25,11 +23,6 @@ extern "C" void drawViewer__18CMaterialEditorPcsFv(CMaterialEditorPcs*);
 extern "C" void __dt__18CMaterialEditorPcsFv(void* self);
 extern const char __RTTI__8CManager_8032E648[];
 extern const char __RTTI__8CProcess_8032E650[];
-extern "C" unsigned int m_table_desc0__18CMaterialEditorPcs[];
-extern "C" unsigned int m_table_desc1__18CMaterialEditorPcs[];
-extern "C" unsigned int m_table_desc2__18CMaterialEditorPcs[];
-extern "C" unsigned int m_table_desc3__18CMaterialEditorPcs[];
-extern "C" unsigned int m_table__18CMaterialEditorPcs[];
 extern "C" const char s_CMaterialEditorPcs_VIEWER_801D7D18[] = "CMaterialEditorPcs(VIEWER)";
 extern "C" const char s_CMaterialEditorPcs_801D7D34[] = "CMaterialEditorPcs";
 extern "C" const char s_CManager_801D7D48[] = "CManager";
@@ -520,12 +513,12 @@ void CMaterialEditorPcs::ClearTextureData()
     m_loadedTextureCount = 0;
 
     do {
-        MemFree__18CMaterialEditorPcsFPv(this, m_textureData[i]);
-        MemFree__18CMaterialEditorPcsFPv(this, m_tlutData[i]);
-        MemFree__18CMaterialEditorPcsFPv(this, m_texObj[i]);
-        MemFree__18CMaterialEditorPcsFPv(this, m_tlutObj0[i]);
-        MemFree__18CMaterialEditorPcsFPv(this, m_tlutObj1[i]);
-        MemFree__18CMaterialEditorPcsFPv(this, m_textureHeader[i]);
+        MemFree(m_textureData[i]);
+        MemFree(m_tlutData[i]);
+        MemFree(m_texObj[i]);
+        MemFree(m_tlutObj0[i]);
+        MemFree(m_tlutObj1[i]);
+        MemFree(m_textureHeader[i]);
         i += 1;
     } while (i < 0x10);
 }
@@ -551,18 +544,18 @@ void CMaterialEditorPcs::destroyViewer()
     GXSetCopyClear(clear, 0xffffff);
 
     reinterpret_cast<CUSBStreamData*>(reinterpret_cast<unsigned char*>(this) + 0x84)->DeleteBuffer();
-    MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(this) + 0xbc)));
+    MemFree(reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(this) + 0xbc)));
     unsigned int uVar2;
     CMaterialEditorPcs* pCVar1 = this;
 
     reinterpret_cast<unsigned char*>(this)[0x3bc] = static_cast<unsigned char>(uVar2 = 0);
     do {
-        MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(pCVar1) + 0x2bc)));
-        MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(pCVar1) + 0x2fc)));
-        MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(pCVar1) + 0x23c)));
-        MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(pCVar1) + 0x33c)));
-        MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(pCVar1) + 0x37c)));
-        MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(pCVar1) + 0x27c)));
+        MemFree(reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(pCVar1) + 0x2bc)));
+        MemFree(reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(pCVar1) + 0x2fc)));
+        MemFree(reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(pCVar1) + 0x23c)));
+        MemFree(reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(pCVar1) + 0x33c)));
+        MemFree(reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(pCVar1) + 0x37c)));
+        MemFree(reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(pCVar1) + 0x27c)));
         uVar2 += 1;
         pCVar1 = reinterpret_cast<CMaterialEditorPcs*>(reinterpret_cast<unsigned char*>(pCVar1) + 4);
     } while (uVar2 < 0x10);
@@ -634,17 +627,17 @@ void CMaterialEditorPcs::Quit()
     *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(this) + 0x3BC) = static_cast<unsigned char>(i = 0);
 
     do {
-        MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(
+        MemFree(reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(
                                                    reinterpret_cast<unsigned char*>(cursor) + 0x2BC)));
-        MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(
+        MemFree(reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(
                                                    reinterpret_cast<unsigned char*>(cursor) + 0x2FC)));
-        MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(
+        MemFree(reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(
                                                    reinterpret_cast<unsigned char*>(cursor) + 0x23C)));
-        MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(
+        MemFree(reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(
                                                    reinterpret_cast<unsigned char*>(cursor) + 0x33C)));
-        MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(
+        MemFree(reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(
                                                    reinterpret_cast<unsigned char*>(cursor) + 0x37C)));
-        MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(
+        MemFree(reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(
                                                    reinterpret_cast<unsigned char*>(cursor) + 0x27C)));
         i += 1;
         cursor = reinterpret_cast<CMaterialEditorPcs*>(reinterpret_cast<unsigned char*>(cursor) + 4);
@@ -652,7 +645,7 @@ void CMaterialEditorPcs::Quit()
 
     unsigned int textureBlock = *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(this) + 0xBC);
     if (textureBlock != 0) {
-        MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(textureBlock));
+        MemFree(reinterpret_cast<void*>(textureBlock));
     }
 }
 /*
@@ -782,11 +775,11 @@ extern "C" void __sinit_p_MaterialEditor_cpp(void)
 {
     CMaterialEditorPcs* pcs = new (&MaterialEditorPcs) CMaterialEditorPcs;
     u8* self = reinterpret_cast<u8*>(pcs);
-    unsigned int* dst = m_table__18CMaterialEditorPcs;
-    unsigned int* desc0 = m_table_desc0__18CMaterialEditorPcs;
-    unsigned int* desc1 = m_table_desc1__18CMaterialEditorPcs;
-    unsigned int* desc2 = m_table_desc2__18CMaterialEditorPcs;
-    unsigned int* desc3 = m_table_desc3__18CMaterialEditorPcs;
+    unsigned int* dst = CMaterialEditorPcs::m_table;
+    unsigned int* desc0 = CMaterialEditorPcs::m_table_desc0;
+    unsigned int* desc1 = CMaterialEditorPcs::m_table_desc1;
+    unsigned int* desc2 = CMaterialEditorPcs::m_table_desc2;
+    unsigned int* desc3 = CMaterialEditorPcs::m_table_desc3;
 
     __register_global_object(self, __dt__18CMaterialEditorPcsFv, lbl_8026D338);
 

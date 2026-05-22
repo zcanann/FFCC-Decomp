@@ -51,6 +51,8 @@ public:
 		unsigned int m_flags;
 	};
 
+	void gqrInit(unsigned long, unsigned long, unsigned long);
+
 	unsigned char _pad0[0x205C];
 	void* m_animAmemBase;
 	unsigned char _pad2060[0x14];

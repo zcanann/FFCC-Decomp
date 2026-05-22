@@ -9,18 +9,19 @@ extern "C" void create__9CSoundPcsFv(CSoundPcs*);
 extern "C" void destroy__9CSoundPcsFv(CSoundPcs*);
 extern "C" void calc__9CSoundPcsFv(CSoundPcs*);
 extern "C" void draw__9CSoundPcsFv(CSoundPcs*);
-extern unsigned int m_table__9CSoundPcs[];
 
 class CSoundPcs : public CProcess
 {
 public:
+    static unsigned int m_table[0x15C / sizeof(unsigned int)];
+
     CSoundPcs()
     {
         static unsigned int desc0[] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__9CSoundPcsFv)};
         static unsigned int desc1[] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__9CSoundPcsFv)};
         static unsigned int desc2[] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__9CSoundPcsFv)};
         static unsigned int desc3[] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(draw__9CSoundPcsFv)};
-        unsigned int* table = &m_table__9CSoundPcs[1];
+        unsigned int* table = &m_table[1];
 
         table[0] = desc0[0];
         table[1] = desc0[1];

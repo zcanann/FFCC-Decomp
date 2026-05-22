@@ -1,5 +1,6 @@
 #include "ffcc/pppPart.h"
 
+#include "ffcc/cflat_runtime2.h"
 #include "ffcc/map.h"
 #include "ffcc/game.h"
 #include "ffcc/p_tina.h"
@@ -66,8 +67,6 @@ extern "C" unsigned int DAT_8032ed80;
 extern "C" void SetPart__9CLightPcsFQ29CLightPcs6TARGETPvUc(CLightPcs*, int, void*, unsigned char);
 extern "C" void InitVtxFmt__12CMaterialManFi11_GXCompTypei11_GXCompTypei11_GXCompTypei(CMaterialMan*, int, _GXCompType, int, _GXCompType, int, _GXCompType, int);
 extern "C" void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
-extern "C" CGObject* FindGObjFirst__13CFlatRuntime2Fv(void*);
-extern "C" CGObject* FindGObjNext__13CFlatRuntime2FP8CGObject(void*, CGObject*);
 extern "C" void _WaitDrawDone__8CGraphicFPci(CGraphic*, const char*, int);
 extern "C" int printf(const char*, ...);
 
@@ -2801,8 +2800,8 @@ void pppHitCylinderSendSystem(_pppMngSt* pppMngSt, Vec* origin, Vec* vector, flo
 	{
 		s32 partIndex = ((s32)((u8*)pppMngSt - ((u8*)&PartMng + 0x2A18))) / 0x158;
 
-		for (CGObject* gObject = FindGObjFirst__13CFlatRuntime2Fv(&CFlat); gObject != 0;
-			 gObject = FindGObjNext__13CFlatRuntime2FP8CGObject(&CFlat, gObject))
+		for (CGObject* gObject = gCFlatRuntime2.FindGObjFirst(); gObject != 0;
+			 gObject = gCFlatRuntime2.FindGObjNext(gObject))
 		{
 			u8 previousCount = hitRaw->m_hitParams.m_hitObjectCount;
 			u8 objectSlot = 0;

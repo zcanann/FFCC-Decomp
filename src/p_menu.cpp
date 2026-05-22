@@ -139,15 +139,10 @@ extern "C" void calc__8CMenuPcsFv(CMenuPcs*);
 extern "C" void draw__8CMenuPcsFv(CMenuPcs*);
 extern "C" void Calc__5CMenuFv(CMenu*);
 extern "C" void CalcDiaryMenu__8CMenuPcsFv(CMenuPcs*);
-extern "C" void calcBonus__8CMenuPcsFv(CMenuPcs*);
 extern "C" void calcVillageMenu__8CMenuPcsFv(CMenuPcs*);
 extern "C" char* GetLangString__5CGameFv(void*);
 extern "C" void WmInit__8CMenuPcsFv(CMenuPcs*);
-extern "C" void BonusInit__8CMenuPcsFv(CMenuPcs*);
-extern "C" void drawBonus__8CMenuPcsFv(CMenuPcs*);
 extern "C" void drawVillageMenu__8CMenuPcsFv(CMenuPcs*);
-extern "C" void createBonus__8CMenuPcsFv(CMenuPcs*);
-extern "C" void destroyBonus__8CMenuPcsFv(CMenuPcs*);
 extern "C" void createSingleMenu__8CMenuPcsFv(CMenuPcs*);
 extern "C" void destroySingleMenu__8CMenuPcsFv(CMenuPcs*);
 extern "C" void destroyVillageMenu__8CMenuPcsFv(CMenuPcs*);
@@ -162,7 +157,7 @@ static unsigned int m_table_desc3__8CMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_ca
 static unsigned int m_table_desc4__8CMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(loadTextureAsync__8CMenuPcsFPPciiPQ28CMenuPcs4CTmpiii)};
 static unsigned int m_table_desc5__8CMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawSingleMenu__8CMenuPcsFv)};
 
-unsigned int m_table__8CMenuPcs[0x57] = {
+unsigned int CMenuPcs::m_table[0x57] = {
     reinterpret_cast<unsigned int>(const_cast<char*>(kMenuPcsStageName)),
     m_table_desc0__8CMenuPcs[0], m_table_desc0__8CMenuPcs[1], m_table_desc0__8CMenuPcs[2],
     m_table_desc1__8CMenuPcs[0], m_table_desc1__8CMenuPcs[1], m_table_desc1__8CMenuPcs[2],
@@ -250,7 +245,7 @@ void CMenuPcs::Init()
     *reinterpret_cast<u16*>(self + 0x864) = 0;
 
     WmInit__8CMenuPcsFv(this);
-    BonusInit__8CMenuPcsFv(this);
+    BonusInit();
 
     self[0x8E] = 0;
     one = LoadFloat(kMenuInitOne);
@@ -326,7 +321,7 @@ void CMenuPcs::Quit()
  */
 int CMenuPcs::GetTable(unsigned long index)
 {
-    return reinterpret_cast<int>(m_table__8CMenuPcs + index * 0x57);
+    return reinterpret_cast<int>(m_table + index * 0x57);
 }
 
 /*
@@ -855,7 +850,7 @@ void CMenuPcs::changeMode(CMenuPcs::MENUMODE mode)
                 destroyVillageMenu__8CMenuPcsFv(this);
             }
         } else if (currentMode < 3) {
-            destroyBonus__8CMenuPcsFv(this);
+            destroyBonus();
         }
 
         *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x740) = static_cast<int>(mode);
@@ -868,7 +863,7 @@ void CMenuPcs::changeMode(CMenuPcs::MENUMODE mode)
                 createSingleMenu__8CMenuPcsFv(this);
             }
         } else if (currentMode < 3) {
-            createBonus__8CMenuPcsFv(this);
+            createBonus();
         }
     }
 }
@@ -890,7 +885,7 @@ void CMenuPcs::calc()
     if (mode != 1) {
         if (mode >= 1) {
             if (mode < 3) {
-                calcBonus__8CMenuPcsFv(this);
+                calcBonus();
             }
             return;
         }
@@ -991,7 +986,7 @@ void CMenuPcs::draw()
                 drawVillageMenu__8CMenuPcsFv(this);
             }
         } else if (mode < 3) {
-            drawBonus__8CMenuPcsFv(this);
+            drawBonus();
         }
     }
 

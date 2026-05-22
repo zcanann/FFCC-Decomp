@@ -55,6 +55,8 @@ public:
     void CompaCtrl();
     bool CompaClose();
     void CompaDraw();
+    char* GetMenuStr(int);
+    char* GetJobStr(int);
 
     char pad_00[0x108];
     CFont* listFont;

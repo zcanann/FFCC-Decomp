@@ -7,7 +7,7 @@ extern "C" void destroy__9CSoundPcsFv(CSoundPcs*);
 extern "C" void calc__9CSoundPcsFv(CSoundPcs*);
 extern "C" void draw__9CSoundPcsFv(CSoundPcs*);
 
-unsigned int m_table__9CSoundPcs[0x15C / sizeof(unsigned int)] = {
+unsigned int CSoundPcs::m_table[0x15C / sizeof(unsigned int)] = {
     reinterpret_cast<unsigned int>("CSoundPcs"),
     0,
     0,
@@ -114,7 +114,7 @@ void CSoundPcs::create()
  */
 int CSoundPcs::GetTable(unsigned long index)
 {
-    return reinterpret_cast<int>(reinterpret_cast<unsigned char*>(m_table__9CSoundPcs) + (index * 0x15C));
+    return reinterpret_cast<int>(reinterpret_cast<unsigned char*>(m_table) + (index * 0x15C));
 }
 
 /*

@@ -18,16 +18,6 @@
 extern "C" void freeTexture__8CMenuPcsFiiii(CMenuPcs*, int, int, int, int);
 extern "C" void CmakeVillageDraw__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned short CmakeVillageCtrl__8CMenuPcsFv(CMenuPcs*);
-extern "C" void CallWorldParam__8CMenuPcsFiii(CMenuPcs*, int, int, int);
-extern "C" void ChgModel__8CMenuPcsFiiii(CMenuPcs*, int, int, int, int);
-extern "C" void SetAnim__8CMenuPcsFi(CMenuPcs*, int);
-extern "C" void PCAnimCtrl__8CMenuPcsFv(CMenuPcs*);
-extern "C" void InitFrame0Info__8CMenuPcsFv(CMenuPcs*);
-extern "C" void CalcWMFrame0__8CMenuPcsFi(CMenuPcs*, int);
-extern "C" int GetModelNo__8CMenuPcsFiii(CMenuPcs*, int, int, int);
-extern "C" float GetMaxAnimWait__8CMenuPcsFv(CMenuPcs*);
-extern "C" unsigned short GetButtonRepeat__8CMenuPcsFi(CMenuPcs*, int);
-extern "C" unsigned short GetButtonDown__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" float FLOAT_80333254;
 extern "C" float FLOAT_8033325c;
 extern "C" float FLOAT_80333260;
@@ -103,19 +93,7 @@ extern "C" void SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(void*, int);
 extern "C" void SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(void*, int);
 extern "C" void DrawRect__8CMenuPcsFUlfffffffff(void*, unsigned long, float, float, float, float, float, float, float, float, float);
 extern "C" void DrawInit__8CMenuPcsFv(void*);
-extern "C" const char* GetMenuStr__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" void DrawCursor__8CMenuPcsFiif(CMenuPcs*, int, int, float);
-extern "C" void DrawWMFrame0__8CMenuPcsFif(CMenuPcs*, int, float);
-extern "C" void SetProjection__8CMenuPcsFi(CMenuPcs*, int);
-extern "C" void SetLight__8CMenuPcsFi(CMenuPcs*, int);
-extern "C" void RestoreProjection__8CMenuPcsFv(CMenuPcs*);
-extern "C" const char* GetJobStr__8CMenuPcsFi(CMenuPcs*, int);
-extern "C" const char* GetTribeStr__8CMenuPcsFi(CMenuPcs*, int);
-extern "C" const char* GetHairStr__8CMenuPcsFi(CMenuPcs*, int);
-extern "C" void DrawMcWin__8CMenuPcsFss(CMenuPcs*, short, short);
-extern "C" void DrawMcWinMess__8CMenuPcsFii(CMenuPcs*, int, int);
-extern "C" void GetWinSize__8CMenuPcsFiPsPsi(CMenuPcs*, int, short*, short*, int);
-extern "C" void SetMcWinInfo__8CMenuPcsFii(CMenuPcs*, int, int);
 extern "C" char s_dvd__smenu_subfont_fnt_801e3020[];
 extern "C" char* PTR_s_world2_802159a4[];
 extern "C" int DAT_802159c8;
@@ -215,11 +193,11 @@ static inline void DrawCmakePreviewCharaAlpha(CMenuPcs* menu, float alpha)
             FLOAT_80333244, FLOAT_80333248, FLOAT_8033324c, FLOAT_80333250,
             FLOAT_80333254, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, 0.0f);
     } else {
-        SetProjection__8CMenuPcsFi(menu, 0x16);
-        SetLight__8CMenuPcsFi(menu, 2);
+        menu->SetProjection(0x16);
+        menu->SetLight(2);
         *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C) = alpha;
         handle->Draw(5);
-        RestoreProjection__8CMenuPcsFv(menu);
+        menu->RestoreProjection();
     }
 
     DrawInit__8CMenuPcsFv(menu);
@@ -288,9 +266,9 @@ static inline void DrawCmakeMcOverlay(CMenuPcs* menu, int messageId)
         return;
     }
 
-    DrawMcWin__8CMenuPcsFss(menu, -1, 0);
+    menu->DrawMcWin(-1, 0);
     if (mcState == 1) {
-        DrawMcWinMess__8CMenuPcsFii(menu, messageId, 0);
+        menu->DrawMcWinMess(messageId, 0);
     }
 }
 
@@ -482,7 +460,7 @@ void CMenuPcs::CalcSingCMake()
     int state = MenuS32(this, 0x82C);
 
     if (*reinterpret_cast<unsigned char*>(state + 0x0B) == 0) {
-        InitFrame0Info__8CMenuPcsFv(this);
+        InitFrame0Info();
         memset(&s_CmakeInfo, 0, sizeof(s_CmakeInfo));
         *reinterpret_cast<unsigned char*>(state + 0x0B) = 1;
         *reinterpret_cast<unsigned char*>(state + 0x0C) = 0;
@@ -500,7 +478,7 @@ void CMenuPcs::CalcSingCMake()
     switch (step) {
     case 0:
         if (openMode == 0) {
-            CalcWMFrame0__8CMenuPcsFi(this, frame - 10);
+            CalcWMFrame0(frame - 10);
             if (frame < 10) {
                 frame = frame + 1;
             } else {
@@ -513,7 +491,7 @@ void CMenuPcs::CalcSingCMake()
         } else if (openMode == 1) {
             result = 0;
         } else {
-            CalcWMFrame0__8CMenuPcsFi(this, -frame);
+            CalcWMFrame0(-frame);
             if (frame < 10) {
                 frame = frame + 1;
             }
@@ -534,7 +512,7 @@ void CMenuPcs::CalcSingCMake()
             frame = frame + 1;
         } else {
             if (resultDir < 0) {
-                ChgModel__8CMenuPcsFiiii(this, static_cast<int>(MenuS16(this, 0x86A)), -1, -1, -1);
+                ChgModel(static_cast<int>(MenuS16(this, 0x86A)), -1, -1, -1);
             }
             result = 1;
         }
@@ -680,8 +658,7 @@ void CMenuPcs::CalcSingCMake()
                             *reinterpret_cast<int*>(MenuS32(this, 0x844) + MenuS16(this, 0x86A) * 0x14 + 4) = 3;
 
                             int slot = static_cast<int>(MenuS16(this, 0x86A));
-                            int modelNo = GetModelNo__8CMenuPcsFiii(
-                                this, static_cast<int>(s_CmakeInfo.m_tribe), static_cast<int>(s_CmakeInfo.m_hair),
+                            int modelNo = GetModelNo(static_cast<int>(s_CmakeInfo.m_tribe), static_cast<int>(s_CmakeInfo.m_hair),
                                 static_cast<int>(s_CmakeInfo.m_gender));
                             *reinterpret_cast<int*>(MenuS32(this, 0x824) + slot * 0x34 + 8) = modelNo;
 
@@ -705,9 +682,9 @@ void CMenuPcs::CalcSingCMake()
                                 reinterpret_cast<CRomWork*>(Game.unkCFlatData0[0] + baseDataIndex * 0x1D0),
                                 static_cast<int>(caravanWork->m_appearanceVariant));
                             caravanWork->LoadFinished();
-                            CallWorldParam__8CMenuPcsFiii(this, 0, slot, 0);
+                            CallWorldParam(0, slot, 0);
                             *reinterpret_cast<short*>(state + 0x18) =
-                                static_cast<short>(static_cast<int>(GetMaxAnimWait__8CMenuPcsFv(this)));
+                                static_cast<short>(static_cast<int>(GetMaxAnimWait()));
                         } else {
                             resultDir = -1;
                         }
@@ -790,8 +767,7 @@ void CMenuPcs::CalcSingCMake()
                 if ((repeat & 0xC) == 0) {
                     if ((down & 0x100) != 0) {
                         if (*reinterpret_cast<short*>(state + 0x26) < 3) {
-                            ChgModel__8CMenuPcsFiiii(
-                                this, static_cast<int>(MenuS16(this, 0x86A)), -1, -1, -1);
+                            ChgModel(static_cast<int>(MenuS16(this, 0x86A)), -1, -1, -1);
                         }
                         resultDir = 1;
                         Sound.PlaySe(2, 0x40, 0x7F, 0);
@@ -840,7 +816,7 @@ void CMenuPcs::DrawSingCMake()
     switch (step) {
     case 0: {
         float alpha = CalcCmakeFadeAlpha(this);
-        DrawWMFrame0__8CMenuPcsFif(this, 1, alpha);
+        DrawWMFrame0(1, alpha);
 
         _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
         SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(MenuPcsVoid(), 0);
@@ -1179,7 +1155,7 @@ void CMenuPcs::DrawCmakeDecision(int yesNoSel, float alpha)
     CColor rgba(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a));
     font->SetColor(rgba);
 
-    const char* txt = GetMenuStr__8CMenuPcsFi(this, 0x29);
+    const char* txt = GetMenuStr(0x29);
     float w = static_cast<float>(font->GetWidth(txt));
     float tx = (FLOAT_80333380 - w) * 0.5f + 0x178;
     font->SetPosX(tx);
@@ -1238,7 +1214,7 @@ void CMenuPcs::DrawCmakeCharaText(int page, float alpha)
 
     float labelWidths[4];
     for (int i = 0; i < 4; i++) {
-        const char* txt = GetMenuStr__8CMenuPcsFi(this, 0x2A + i);
+        const char* txt = GetMenuStr(0x2A + i);
         if (txt == 0) {
             txt = "";
         }
@@ -1265,13 +1241,13 @@ void CMenuPcs::DrawCmakeCharaText(int page, float alpha)
             txt = s_CmakeInfo.m_name;
             break;
         case 1:
-            txt = GetMenuStr__8CMenuPcsFi(this, s_CmakeInfo.m_gender + 0x11);
+            txt = GetMenuStr(s_CmakeInfo.m_gender + 0x11);
             break;
         case 2:
-            txt = GetTribeStr__8CMenuPcsFi(this, s_CmakeInfo.m_tribe);
+            txt = GetTribeStr(s_CmakeInfo.m_tribe);
             break;
         default:
-            txt = GetJobStr__8CMenuPcsFi(this, s_CmakeInfo.m_job);
+            txt = GetJobStr(s_CmakeInfo.m_job);
             break;
         }
 
@@ -1297,7 +1273,7 @@ void CMenuPcs::DrawCmakeCharaText(int page, float alpha)
                 tribeWithSep[tribeLen + 1] = '\0';
             }
 
-            const char* hairTxt = GetHairStr__8CMenuPcsFi(this, hairIndex + s_CmakeInfo.m_hair);
+            const char* hairTxt = GetHairStr(hairIndex + s_CmakeInfo.m_hair);
             if (hairTxt == 0) {
                 hairTxt = "";
             }
@@ -1473,14 +1449,14 @@ void CMenuPcs::DrawCmakeYesNo(int yesNoSel, float alpha)
     CColor rgba(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a));
     font->SetColor(rgba);
 
-    const char* yesStr = GetMenuStr__8CMenuPcsFi(this, 1);
+    const char* yesStr = GetMenuStr(1);
     float yesW = static_cast<float>(font->GetWidth(yesStr));
     float yesX = (FLOAT_803332b0 - yesW) * FLOAT_8033335c + 0x1D0;
     font->SetPosX(yesX);
     font->SetPosY(FLOAT_80333360);
     font->Draw(yesStr);
 
-    const char* noStr = GetMenuStr__8CMenuPcsFi(this, 2);
+    const char* noStr = GetMenuStr(2);
     float noW = static_cast<float>(font->GetWidth(noStr));
     float noX = (FLOAT_803332b0 - noW) * FLOAT_8033335c + 0x218;
     font->SetPosX(noX);
@@ -1662,8 +1638,8 @@ void CMenuPcs::CmakeNameCtrl()
     short& select = *reinterpret_cast<short*>(state + 0x26);
     short& row = *reinterpret_cast<short*>(state + 0x28);
     short& table = *reinterpret_cast<short*>(state + 0x2A);
-    unsigned short repeat = GetButtonRepeat__8CMenuPcsFi(this, 0);
-    unsigned short down = GetButtonDown__8CMenuPcsFi(this, 0);
+    unsigned short repeat = GetButtonRepeat(0);
+    unsigned short down = GetButtonDown(0);
     short& mcState = *reinterpret_cast<short*>(mcWork + 10);
     char* name = GetCmakeNameBuffer();
 
@@ -1723,7 +1699,7 @@ void CMenuPcs::CmakeNameCtrl()
                 resultFlag = 1;
                 mode = 2;
                 frame = 0;
-                ChgModel__8CMenuPcsFiiii(this, static_cast<int>(MenuS16(this, 0x86A)), -1, -1, -1);
+                ChgModel(static_cast<int>(MenuS16(this, 0x86A)), -1, -1, -1);
                 Sound.PlaySe(0x34, 0x40, 0x7F, 0);
             } else {
                 name[len - 1] = '\0';
@@ -1766,8 +1742,8 @@ void CMenuPcs::CmakeNameCtrl()
                 short winX = 0;
                 short winY = 0;
                 Sound.PlaySe(4, 0x40, 0x7F, 0);
-                GetWinSize__8CMenuPcsFiPsPsi(this, 0x14, &winX, &winY, 0);
-                SetMcWinInfo__8CMenuPcsFii(this, (int)winX, (int)winY);
+                GetWinSize(0x14, &winX, &winY, 0);
+                SetMcWinInfo((int)winX, (int)winY);
                 mcState = 0;
                 return;
             }
@@ -1843,7 +1819,7 @@ void CMenuPcs::CmakeNameDraw()
         select = 0xB;
     }
 
-    DrawWMFrame0__8CMenuPcsFif(this, 1, FLOAT_80333258);
+    DrawWMFrame0(1, FLOAT_80333258);
 
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(MenuPcsVoid(), 0);
@@ -1891,11 +1867,11 @@ void CMenuPcs::CmakeNameDraw()
                 FLOAT_80333244, FLOAT_80333248, FLOAT_8033324c, FLOAT_80333250,
                 FLOAT_80333254, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, 0.0f);
         } else {
-            SetProjection__8CMenuPcsFi(this, 0x16);
-            SetLight__8CMenuPcsFi(this, 2);
+            SetProjection(0x16);
+            SetLight(2);
             *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C) = previewAlpha;
             handle->Draw(5);
-            RestoreProjection__8CMenuPcsFv(this);
+            RestoreProjection();
         }
 
         DrawInit__8CMenuPcsFv(this);
@@ -1957,9 +1933,9 @@ void CMenuPcs::CmakeNameDraw()
     DrawCmakeDecision((row > 4) ? 1 : 0, alpha);
 
     if (*reinterpret_cast<short*>(MenuS32(this, 0x848) + 10) != 3) {
-        DrawMcWin__8CMenuPcsFss(this, -1, 0);
+        DrawMcWin(-1, 0);
         if (*reinterpret_cast<short*>(MenuS32(this, 0x848) + 10) == 1) {
-            DrawMcWinMess__8CMenuPcsFii(this, 0x14, 0);
+            DrawMcWinMess(0x14, 0);
         }
     }
 }
@@ -1999,8 +1975,8 @@ void CMenuPcs::CmakeSexCtrl()
     short& mode = *reinterpret_cast<short*>(state + 0x10);
     short& frame = *reinterpret_cast<short*>(state + 0x22);
     short& sel = *reinterpret_cast<short*>(state + 0x26);
-    unsigned short repeat = GetButtonRepeat__8CMenuPcsFi(this, 0);
-    unsigned short down = GetButtonDown__8CMenuPcsFi(this, 0);
+    unsigned short repeat = GetButtonRepeat(0);
+    unsigned short down = GetButtonDown(0);
 
     if (mode == 1) {
         if ((repeat & 0x3) != 0) {
@@ -2057,7 +2033,7 @@ void CMenuPcs::CmakeSexClose()
 void CMenuPcs::CmakeSexDraw()
 {
     float alpha = CalcCmakeFadeAlpha(this);
-    DrawWMFrame0__8CMenuPcsFif(this, 1, FLOAT_80333258);
+    DrawWMFrame0(1, FLOAT_80333258);
 
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(MenuPcsVoid(), 0);
@@ -2098,11 +2074,11 @@ void CMenuPcs::CmakeSexDraw()
                 MenuPcsVoid(), 0, FLOAT_80333244, FLOAT_80333248, FLOAT_8033324c, FLOAT_80333250,
                 FLOAT_80333254, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, 0.0f);
         } else {
-            SetProjection__8CMenuPcsFi(this, 0x16);
-            SetLight__8CMenuPcsFi(this, 2);
+            SetProjection(0x16);
+            SetLight(2);
             *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C) = FLOAT_80333258;
             handle->Draw(5);
-            RestoreProjection__8CMenuPcsFv(this);
+            RestoreProjection();
         }
 
         DrawInit__8CMenuPcsFv(this);
@@ -2123,7 +2099,7 @@ void CMenuPcs::CmakeSexDraw()
 
     float maxWidth = 0.0f;
     for (int i = 0; i < 2; ++i) {
-        const char* txt = GetMenuStr__8CMenuPcsFi(this, 0x11 + i);
+        const char* txt = GetMenuStr(0x11 + i);
         float width = static_cast<float>(font->GetWidth(txt));
         if (maxWidth < width) {
             maxWidth = width;
@@ -2184,8 +2160,8 @@ unsigned short CMenuPcs::CmakeTribeCtrl()
     short& crest = *reinterpret_cast<short*>(state + 0x28);
     short& selectField = *reinterpret_cast<short*>(state + 0x30);
     short& mcState = *reinterpret_cast<short*>(mcWork + 10);
-    unsigned short repeat = GetButtonRepeat__8CMenuPcsFi(this, 0);
-    unsigned short down = GetButtonDown__8CMenuPcsFi(this, 0);
+    unsigned short repeat = GetButtonRepeat(0);
+    unsigned short down = GetButtonDown(0);
 
     if (repeat == 0) {
         return 0;
@@ -2257,11 +2233,10 @@ unsigned short CMenuPcs::CmakeTribeCtrl()
             if (!duplicate) {
                 s_CmakeInfo.m_tribe = static_cast<signed char>(tribe);
                 s_CmakeInfo.m_hair = static_cast<signed char>(crest);
-                ChgModel__8CMenuPcsFiiii(this,
-                    static_cast<int>(MenuS16(this, 0x86A)),
-                    static_cast<int>(s_CmakeInfo.m_tribe),
-                    static_cast<int>(s_CmakeInfo.m_hair),
-                    static_cast<int>(s_CmakeInfo.m_gender));
+                ChgModel(static_cast<int>(MenuS16(this, 0x86A)),
+                         static_cast<int>(s_CmakeInfo.m_tribe),
+                         static_cast<int>(s_CmakeInfo.m_hair),
+                         static_cast<int>(s_CmakeInfo.m_gender));
                 resultDir = 1;
                 resultFlag = 1;
                 return 1;
@@ -2270,8 +2245,8 @@ unsigned short CMenuPcs::CmakeTribeCtrl()
             Sound.PlaySe(4, 0x40, 0x7F, 0);
             short winX = 0;
             short winY = 0;
-            GetWinSize__8CMenuPcsFiPsPsi(this, 0x15, &winX, &winY, 0);
-            SetMcWinInfo__8CMenuPcsFii(this, static_cast<int>(winX), static_cast<int>(winY));
+            GetWinSize(0x15, &winX, &winY, 0);
+            SetMcWinInfo(static_cast<int>(winX), static_cast<int>(winY));
             mcState = 0;
         }
 
@@ -2318,7 +2293,7 @@ void CMenuPcs::CmakeTribeDraw()
     float alpha = CalcCmakeFadeAlpha(this);
     int state = MenuS32(this, 0x82C);
 
-    DrawWMFrame0__8CMenuPcsFif(this, 1, FLOAT_80333258);
+    DrawWMFrame0(1, FLOAT_80333258);
 
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(MenuPcsVoid(), 0);
@@ -2368,11 +2343,11 @@ void CMenuPcs::CmakeTribeDraw()
                 FLOAT_80333244, FLOAT_80333248, FLOAT_8033324c, FLOAT_80333250,
                 FLOAT_80333254, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, 0.0f);
         } else {
-            SetProjection__8CMenuPcsFi(this, 0x16);
-            SetLight__8CMenuPcsFi(this, 2);
+            SetProjection(0x16);
+            SetLight(2);
             *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C) = FLOAT_80333258;
             handle->Draw(5);
-            RestoreProjection__8CMenuPcsFv(this);
+            RestoreProjection();
         }
 
         DrawInit__8CMenuPcsFv(this);
@@ -2407,7 +2382,7 @@ void CMenuPcs::CmakeTribeDraw()
     tribeFont->SetColor(tribeRgba);
 
     for (int i = 0; i < 4; i++) {
-        const char* txt = GetTribeStr__8CMenuPcsFi(this, i);
+        const char* txt = GetTribeStr(i);
         if (txt == 0) {
             txt = "";
         }
@@ -2430,7 +2405,7 @@ void CMenuPcs::CmakeTribeDraw()
     }
 
     for (int i = 0; i < 4; i++) {
-        const char* txt = GetHairStr__8CMenuPcsFi(this, hairBase + i);
+        const char* txt = GetHairStr(hairBase + i);
         if (txt == 0) {
             txt = "";
         }
@@ -2460,9 +2435,9 @@ void CMenuPcs::CmakeTribeDraw()
     }
 
     if (*reinterpret_cast<short*>(MenuS32(this, 0x848) + 10) != 3) {
-        DrawMcWin__8CMenuPcsFss(this, -1, 0);
+        DrawMcWin(-1, 0);
         if (*reinterpret_cast<short*>(MenuS32(this, 0x848) + 10) == 1) {
-            DrawMcWinMess__8CMenuPcsFii(this, 0x15, 0);
+            DrawMcWinMess(0x15, 0);
         }
     }
 }
@@ -2588,13 +2563,13 @@ unsigned short CMenuPcs::CmakeJobCtrl()
                     short winX = 0;
                     short winY = 0;
                     Sound.PlaySe(4, 0x40, 0x7F, 0);
-                    GetWinSize__8CMenuPcsFiPsPsi(this, 0x16, &winX, &winY, 0);
-                    SetMcWinInfo__8CMenuPcsFii(this, (int)winX, (int)winY);
+                    GetWinSize(0x16, &winX, &winY, 0);
+                    SetMcWinInfo((int)winX, (int)winY);
                     mcState = 0;
                     return 0;
                 }
             } else if ((down & 0x200) != 0) {
-                ChgModel__8CMenuPcsFiiii(this, static_cast<int>(MenuS16(this, 0x86A)), -1, -1, -1);
+                ChgModel(static_cast<int>(MenuS16(this, 0x86A)), -1, -1, -1);
                 resultDir = -1;
                 Sound.PlaySe(3, 0x40, 0x7F, 0);
                 return 1;
@@ -2651,7 +2626,7 @@ void CMenuPcs::CmakeJobDraw()
         alpha = static_cast<float>(DOUBLE_80333270 - DOUBLE_80333268 * static_cast<double>(frame));
     }
 
-    DrawWMFrame0__8CMenuPcsFif(this, 1, FLOAT_80333258);
+    DrawWMFrame0(1, FLOAT_80333258);
 
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(MenuPcsVoid(), 0);
@@ -2702,11 +2677,11 @@ void CMenuPcs::CmakeJobDraw()
                 FLOAT_80333244, FLOAT_80333248, FLOAT_8033324c, FLOAT_80333250,
                 FLOAT_80333254, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, 0.0f);
         } else {
-            SetProjection__8CMenuPcsFi(this, 0x16);
-            SetLight__8CMenuPcsFi(this, 2);
+            SetProjection(0x16);
+            SetLight(2);
             *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C) = FLOAT_80333258;
             handle->Draw(5);
-            RestoreProjection__8CMenuPcsFv(this);
+            RestoreProjection();
         }
 
         DrawInit__8CMenuPcsFv(this);
@@ -2742,7 +2717,7 @@ void CMenuPcs::CmakeJobDraw()
     font->SetColor(textColor);
 
     for (int i = 0; i < 8; ++i) {
-        const char* txt = GetJobStr__8CMenuPcsFi(this, i);
+        const char* txt = GetJobStr(i);
         int x = (i < 4) ? 0x110 : 0x1A8;
         int row = (i < 4) ? i : (i - 4);
         font->SetPosX(x);
@@ -2760,9 +2735,9 @@ void CMenuPcs::CmakeJobDraw()
 
     short mcState = *reinterpret_cast<short*>(MenuS32(this, 0x848) + 10);
     if (mcState != 3) {
-        DrawMcWin__8CMenuPcsFss(this, -1, 0);
+        DrawMcWin(-1, 0);
         if (mcState == 1) {
-            DrawMcWinMess__8CMenuPcsFii(this, 0x16, 0);
+            DrawMcWinMess(0x16, 0);
         }
     }
 }
@@ -2803,8 +2778,8 @@ void CMenuPcs::CmakeResultCtrl()
     short& sel = *reinterpret_cast<short*>(state + 0x26);
     short& resultDir = *reinterpret_cast<short*>(state + 0x1E);
     short& frame = *reinterpret_cast<short*>(state + 0x22);
-    unsigned short repeat = GetButtonRepeat__8CMenuPcsFi(this, 0);
-    unsigned short down = GetButtonDown__8CMenuPcsFi(this, 0);
+    unsigned short repeat = GetButtonRepeat(0);
+    unsigned short down = GetButtonDown(0);
 
     if (mode != 1) {
         if (frame < 10) {
@@ -2863,7 +2838,7 @@ void CMenuPcs::CmakeResultDraw()
     short resultDir = *reinterpret_cast<short*>(state + 0x1E);
     float alpha = CalcCmakeFadeAlpha(this);
 
-    DrawWMFrame0__8CMenuPcsFif(this, 1, FLOAT_80333258);
+    DrawWMFrame0(1, FLOAT_80333258);
 
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(MenuPcsVoid(), 0);
@@ -2913,11 +2888,11 @@ void CMenuPcs::CmakeResultDraw()
                 FLOAT_80333244, FLOAT_80333248, FLOAT_8033324c, FLOAT_80333250,
                 FLOAT_80333254, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, 0.0f);
         } else {
-            SetProjection__8CMenuPcsFi(this, 0x16);
-            SetLight__8CMenuPcsFi(this, 2);
+            SetProjection(0x16);
+            SetLight(2);
             *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C) = FLOAT_80333258;
             handle->Draw(5);
-            RestoreProjection__8CMenuPcsFv(this);
+            RestoreProjection();
         }
 
         DrawInit__8CMenuPcsFv(this);
@@ -2962,7 +2937,7 @@ void CMenuPcs::CmakeResultDraw()
 
     float labelWidths[4];
     for (int i = 0; i < 4; i++) {
-        const char* label = GetMenuStr__8CMenuPcsFi(this, i + 0x2A);
+        const char* label = GetMenuStr(i + 0x2A);
         if (label == 0) {
             label = "";
         }
@@ -2987,9 +2962,9 @@ void CMenuPcs::CmakeResultDraw()
         if (i == 0) {
             value = s_CmakeInfo.m_name;
         } else if (i == 1) {
-            value = GetMenuStr__8CMenuPcsFi(this, static_cast<int>(s_CmakeInfo.m_gender) + 0x11);
+            value = GetMenuStr(static_cast<int>(s_CmakeInfo.m_gender) + 0x11);
         } else if (i == 2) {
-            value = GetTribeStr__8CMenuPcsFi(this, static_cast<int>(s_CmakeInfo.m_tribe));
+            value = GetTribeStr(static_cast<int>(s_CmakeInfo.m_tribe));
             if (value == 0) {
                 value = "";
             }
@@ -3002,7 +2977,7 @@ void CMenuPcs::CmakeResultDraw()
             }
             value = tribeWithSlash;
         } else {
-            value = GetJobStr__8CMenuPcsFi(this, static_cast<int>(s_CmakeInfo.m_job));
+            value = GetJobStr(static_cast<int>(s_CmakeInfo.m_job));
         }
 
         if (value == 0) {
@@ -3022,7 +2997,7 @@ void CMenuPcs::CmakeResultDraw()
                 hairIndex += 4;
             }
 
-            const char* hair = GetHairStr__8CMenuPcsFi(this, hairIndex + static_cast<int>(s_CmakeInfo.m_hair));
+            const char* hair = GetHairStr(hairIndex + static_cast<int>(s_CmakeInfo.m_hair));
             if (hair == 0) {
                 hair = "";
             }
@@ -3073,7 +3048,7 @@ void CMenuPcs::CmakeResultCtrl1()
     int state = MenuS32(this, 0x82C);
     short& mode = *reinterpret_cast<short*>(state + 0x10);
     short& frame = *reinterpret_cast<short*>(state + 0x22);
-    unsigned short down = GetButtonDown__8CMenuPcsFi(this, 0);
+    unsigned short down = GetButtonDown(0);
 
     if (frame < 10) {
         frame = frame + 1;
@@ -3122,7 +3097,7 @@ void CMenuPcs::CmakeResultDraw1()
     float popupAlpha = (mode == 0) ? FLOAT_80333258 : alpha;
     float textAlpha = (mode == 0) ? FLOAT_80333258 : alpha;
 
-    DrawWMFrame0__8CMenuPcsFif(this, 1, FLOAT_80333258);
+    DrawWMFrame0(1, FLOAT_80333258);
 
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(MenuPcsVoid(), 0);
@@ -3172,11 +3147,11 @@ void CMenuPcs::CmakeResultDraw1()
                 FLOAT_80333244, FLOAT_80333248, FLOAT_8033324c, FLOAT_80333250,
                 FLOAT_80333254, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, 0.0f);
         } else {
-            SetProjection__8CMenuPcsFi(this, 0x16);
-            SetLight__8CMenuPcsFi(this, 2);
+            SetProjection(0x16);
+            SetLight(2);
             *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C) = FLOAT_80333258;
             handle->Draw(5);
-            RestoreProjection__8CMenuPcsFv(this);
+            RestoreProjection();
         }
 
         DrawInit__8CMenuPcsFv(this);
@@ -3199,7 +3174,7 @@ void CMenuPcs::CmakeResultDraw1()
 
     float labelWidths[4];
     for (int i = 0; i < 4; i++) {
-        const char* txt = GetMenuStr__8CMenuPcsFi(this, 0x2A + i);
+        const char* txt = GetMenuStr(0x2A + i);
         if (txt == 0) {
             txt = "";
         }
@@ -3226,13 +3201,13 @@ void CMenuPcs::CmakeResultDraw1()
             txt = s_CmakeInfo.m_name;
             break;
         case 1:
-            txt = GetMenuStr__8CMenuPcsFi(this, s_CmakeInfo.m_gender + 0x11);
+            txt = GetMenuStr(s_CmakeInfo.m_gender + 0x11);
             break;
         case 2:
-            txt = GetTribeStr__8CMenuPcsFi(this, s_CmakeInfo.m_tribe);
+            txt = GetTribeStr(s_CmakeInfo.m_tribe);
             break;
         default:
-            txt = GetJobStr__8CMenuPcsFi(this, s_CmakeInfo.m_job);
+            txt = GetJobStr(s_CmakeInfo.m_job);
             break;
         }
 
@@ -3256,7 +3231,7 @@ void CMenuPcs::CmakeResultDraw1()
             tribeWithSep[tribeLen] = '/';
             tribeWithSep[tribeLen + 1] = '\0';
 
-            const char* hairTxt = GetHairStr__8CMenuPcsFi(this, hairIndex + s_CmakeInfo.m_hair);
+            const char* hairTxt = GetHairStr(hairIndex + s_CmakeInfo.m_hair);
             if (hairTxt == 0) {
                 hairTxt = "";
             }
@@ -3310,8 +3285,8 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
     short& select = *reinterpret_cast<short*>(villageWork + 0x26);
     short& row = *reinterpret_cast<short*>(villageWork + 0x28);
     short& table = *reinterpret_cast<short*>(villageWork + 0x2A);
-    unsigned short repeat = GetButtonRepeat__8CMenuPcsFi(this, 0);
-    unsigned short down = GetButtonDown__8CMenuPcsFi(this, 0);
+    unsigned short repeat = GetButtonRepeat(0);
+    unsigned short down = GetButtonDown(0);
     char picked[2] = {'\0', '\0'};
     size_t len = strlen(s_CmakeInfo.m_name);
 
@@ -3544,8 +3519,8 @@ void CMenuPcs::CmakeVillageDraw()
 void CMenuPcs::SetSingMakeChara()
 {
     int slot = static_cast<int>(MenuS16(this, 0x86A));
-    ChgModel__8CMenuPcsFiiii(this, slot, MenuS16(this, 0x860), MenuS16(this, 0x862), MenuS16(this, 0x864));
-    SetAnim__8CMenuPcsFi(this, slot);
+    ChgModel(slot, MenuS16(this, 0x860), MenuS16(this, 0x862), MenuS16(this, 0x864));
+    SetAnim(slot);
 }
 
 /*
@@ -3697,7 +3672,7 @@ void CMenuPcs::drawVillageMenu()
                 mode = mode + 1;
             } else {
                 MenuU8(this, 0x16) = 0;
-                CallWorldParam__8CMenuPcsFiii(this, 10, 0, 0);
+                CallWorldParam(10, 0, 0);
             }
             *reinterpret_cast<short*>(villageWork + 0x22) = 0;
         }
@@ -3728,7 +3703,7 @@ void CMenuPcs::CalcSingleCMakeChara()
     unsigned char* animWork = reinterpret_cast<unsigned char*>(MenuS32(this, 0x824) + slot * 0x34);
     if (animWork[0x0C] == 1) {
         *reinterpret_cast<float*>(modelWork + 0x2C) = FLOAT_8033325c;
-        SetAnim__8CMenuPcsFi(this, slot);
+        SetAnim(slot);
         animWork[0x0C] = 0;
     }
 
@@ -3759,7 +3734,7 @@ void CMenuPcs::CalcSingleCMakeChara()
         model->SetMatrix(scaleMtx);
         model->CalcMatrix();
         model->CalcSkin();
-        PCAnimCtrl__8CMenuPcsFv(this);
+        PCAnimCtrl();
     }
 }
 

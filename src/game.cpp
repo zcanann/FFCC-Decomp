@@ -49,8 +49,6 @@ void pppDestroyAll__8CPartMngFv(void*);
 int pppGetIfDt__8CPartMngFs(void*, short);
 void pppEndPart__8CPartMngFi(void*, int);
 int sprintf(char*, const char*, ...);
-void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-    void*, int, int, int, int, void*, void*);
 void Draw__5CWindFv(void*);
 int rand(void);
 void ResetNewGame__13CFlatRuntime2Fv(void*);
@@ -1204,8 +1202,7 @@ void CGame::HitParticleBG(int effectIndex, int kind, int nodeIndex, Vec* pos, PP
 	*(float*)&stack[5].m_word = pos->z;
 	stack[6].m_word = (u32)hitParam->m_particleIndex;
 	stack[7].m_word = (u32)hitParam->m_classId;
-	SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-	    &CFlat, 0, 1, 1, 8, stack, 0);
+	reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(0, 1, 1, 8, stack, 0);
 }
 
 /*
@@ -1220,8 +1217,7 @@ void CGame::HitParticleBG(int effectIndex, int kind, int nodeIndex, Vec* pos, PP
 void CGame::Draw3()
 {
 	reinterpret_cast<CFlatRuntime2*>(CFlat)->Frame(0, 2);
-	SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-	    CFlat, 0, 1, 5, 0, 0, 0);
+	reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(0, 1, 5, 0, 0, 0);
 }
 
 /*
@@ -1250,8 +1246,7 @@ void CGame::Draw2()
  */
 void CGame::Draw()
 {
-	SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-	    CFlat, 0, 1, 6, 0, 0, 0);
+	reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(0, 1, 6, 0, 0, 0);
 }
 
 /*

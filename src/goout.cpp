@@ -8,11 +8,7 @@ CGoOutMenu g_GoOutMenu;
 CGoOutMenu* g_pGoOutMenu;
 int g_freeCaravanIdx;
 
-extern "C" int GetYesNoXPos__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" int CalcGoOutSelChar__8CMenuPcsFUcUc(CMenuPcs*, unsigned char, unsigned char);
-extern "C" void Calc__10CGoOutMenuFv(CGoOutMenu*);
-extern "C" int GetWinMess__8CMenuPcsFi(CMenuPcs*, int);
-extern "C" const char* const* GetMcWinMessBuff__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" const char* g_strGooutMes[];
 
 struct CMenuPcsGoOutLayout
@@ -180,7 +176,7 @@ void DrawGoOutMenu()
         const unsigned char cursorMode = ReadGoOutU8(goOutMenu, 0x49);
 
         if (cursorMode == 0) {
-            const int cursorX = GetYesNoXPos__8CMenuPcsFi(&MenuPcs, ReadGoOutU8(goOutMenu, 0x46));
+            const int cursorX = MenuPcs.GetYesNoXPos(ReadGoOutU8(goOutMenu, 0x46));
             MenuPcs.DrawCursor(cursorX, (int)cursorY, 1.0f);
         } else {
             const int localY = ReadGoOutS16(goOutMenu, 0x4C) + ReadGoOutU8(goOutMenu, 0x46) * 0x1E;
@@ -443,7 +439,7 @@ void CGoOutMenu::SetMenuStr(long timer, int lineCount, ...)
     short messageIndex;
 
     field_0x38 ^= 1;
-    winMessage = (int*)GetWinMess__8CMenuPcsFi(&MenuPcs, field_0x38 + 0x22);
+    winMessage = (int*)MenuPcs.GetWinMess(field_0x38 + 0x22);
     *winMessage = lineCount;
 
     leadingZeros = (unsigned int)__cntlzw((unsigned int)field_0x38);
@@ -451,7 +447,7 @@ void CGoOutMenu::SetMenuStr(long timer, int lineCount, ...)
     indexBase = 10;
     indexBase &= ~mask;
     va_start(args, lineCount);
-    winMessageBuffer = (const char**)GetMcWinMessBuff__8CMenuPcsFi(&MenuPcs, 2);
+    winMessageBuffer = (const char**)MenuPcs.GetMcWinMessBuff(2);
     for (i = 0; i < lineCount; i++) {
         winMessageBuffer[indexBase + i] = va_arg(args, const char*);
     }
@@ -1857,7 +1853,7 @@ void CGoOutMenu::Calc()
         menuPcsLayout.m_unknown_888 = 0;
         menuPcsLayout.m_saveLoadMode = 0;
         menuPcsLayout.m_unknown_88A = 0;
-        short* winMessage = reinterpret_cast<short*>(GetWinMess__8CMenuPcsFi(&MenuPcs, 0x22));
+        short* winMessage = reinterpret_cast<short*>(MenuPcs.GetWinMess(0x22));
         winMessage[0] = 0;
         winMessage[1] = 0;
         winMessage[2] = 0;
@@ -1868,7 +1864,7 @@ void CGoOutMenu::Calc()
         winMessage[7] = 5;
         winMessage[8] = 6;
         winMessage[9] = 7;
-        winMessage = reinterpret_cast<short*>(GetWinMess__8CMenuPcsFi(&MenuPcs, 0x23));
+        winMessage = reinterpret_cast<short*>(MenuPcs.GetWinMess(0x23));
         winMessage[0] = 0;
         winMessage[1] = 0;
         winMessage[2] = 10;
@@ -2071,7 +2067,7 @@ void CGoOutMenu::Calc()
 void CalcGoOutMenu()
 {
     g_pGoOutMenu = &g_GoOutMenu;
-    Calc__10CGoOutMenuFv(&g_GoOutMenu);
+    g_GoOutMenu.Calc();
 }
 
 /*
@@ -2087,7 +2083,7 @@ void CGoOutMenu::DrawSelectYesNo()
         const int cursorY = MenuMcWinState(menuPcsLayout).m_y + MenuMcWinState(menuPcsLayout).m_height - 0x3E;
 
         if (ReadGoOutU8(*this, 0x49) == 0) {
-            const int cursorX = GetYesNoXPos__8CMenuPcsFi(&MenuPcs, ReadGoOutU8(*this, 0x46));
+            const int cursorX = MenuPcs.GetYesNoXPos(ReadGoOutU8(*this, 0x46));
             MenuPcs.DrawCursor(cursorX, cursorY, 1.0f);
         } else {
             const int cursorX = MenuMcWinState(menuPcsLayout).m_x + 0x20;

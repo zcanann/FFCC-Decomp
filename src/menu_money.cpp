@@ -22,11 +22,6 @@ extern "C" void DrawSingWinMess__8CMenuPcsFiii(CMenuPcs*, int, int, int);
 extern "C" int SingWinMessHeight__8CMenuPcsFv(CMenuPcs*);
 extern "C" void DrawCursor__8CMenuPcsFiif(CMenuPcs*, int, int, float);
 extern "C" void DrawInit__8CMenuPcsFv(CMenuPcs*);
-extern "C" const char* GetMenuStr__8CMenuPcsFi(CMenuPcs*, int);
-extern "C" void FGPutGil__12CCaravanWorkFi(void*, int);
-extern "C" int SingGetLetterAttachflg__8CMenuPcsFv(CMenuPcs*);
-extern "C" void LetterSetAttachItem__8CMenuPcsFUii(CMenuPcs*, unsigned int, unsigned int);
-extern "C" int CanPlayerPutItem__12CCaravanWorkFv(void*);
 extern "C" void GetSingWinSize__8CMenuPcsFiPsPsi(CMenuPcs*, int, s16*, s16*, int);
 extern "C" void SetSingWinInfo__8CMenuPcsFiiii(CMenuPcs*, int, int, int, int);
 
@@ -141,7 +136,7 @@ int CMenuPcs::MoneyCtrlCur()
 			break;
 		}
 	}
-	int attachFlag = SingGetLetterAttachflg__8CMenuPcsFv(this);
+	int attachFlag = SingGetLetterAttachflg();
 
 	if (mode == 0) {
 		int cursor = *(s16*)(menuState + 0x26);
@@ -259,7 +254,7 @@ int CMenuPcs::MoneyCtrlCur()
 					Sound.PlaySe(3, 0x40, 0x7F, 0);
 					return 1;
 				}
-				LetterSetAttachItem__8CMenuPcsFUii(this, 0, 0xFFFFFFFF);
+				LetterSetAttachItem(0, 0xFFFFFFFF);
 				Sound.PlaySe(3, 0x40, 0x7F, 0);
 				return 1;
 			} else if ((press & 0x100) != 0) {
@@ -267,14 +262,14 @@ int CMenuPcs::MoneyCtrlCur()
 					Sound.PlaySe(4, 0x40, 0x7F, 0);
 				} else {
 					if (-1 < attachFlag) {
-						LetterSetAttachItem__8CMenuPcsFUii(this, s_Money, 1);
+						LetterSetAttachItem(s_Money, 1);
 						Sound.PlaySe(2, 0x40, 0x7F, 0);
 						return 1;
 					}
 					s16 winW;
 					s16 winH;
 					this->moneyState->messageMask = 2;
-					if (CanPlayerPutItem__12CCaravanWorkFv((void*)caravanWork) != 0) {
+					if (reinterpret_cast<CCaravanWork*>(caravanWork)->CanPlayerPutItem() != 0) {
 						this->moneyState->messageMask = this->moneyState->messageMask | 1;
 					}
 					GetSingWinSize__8CMenuPcsFiPsPsi(this, 1, &winW, &winH, 0);
@@ -314,7 +309,7 @@ int CMenuPcs::MoneyCtrlCur()
 					return 0;
 				}
 				if (*(s16*)(optBase + 0x26) == 0) {
-					FGPutGil__12CCaravanWorkFi((void*)caravanWork, (int)s_Money);
+					reinterpret_cast<CCaravanWork*>(caravanWork)->FGPutGil(static_cast<int>(s_Money));
 					s_Money = 0;
 					int iVar8 = *(int*)(Game.m_scriptFoodBase[0] + 0x200);
 					int iVar9 = 0;
@@ -475,7 +470,7 @@ void CMenuPcs::MoneyDraw()
 		font->SetColor(color.color);
 	}
 
-	const char* label = GetMenuStr__8CMenuPcsFi(this, 0x15);
+	const char* label = GetMenuStr(0x15);
 	for (int i = 0; i < 2; i++) {
 		font->SetPosX((float)(drawBase[0] + 0xB6));
 		font->SetPosY((LOCAL_FLOAT_80332f68 + ((float)(drawBase[1] + 0x18) + LOCAL_FLOAT_80332f68 * (float)i)) -

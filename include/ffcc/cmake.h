@@ -9,6 +9,7 @@ void GetCharaCnt(char*);
 
 class CMenuPcs
 {
+public:
 	CMenuPcs();
 	~CMenuPcs();
 
@@ -27,6 +28,28 @@ class CMenuPcs
 	void DrawCmakeName(int, int, char*, float);
 	void AddNameChara(int, int, int, int);
 	void DrawCmakeYesNo(int, float);
+	unsigned short GetButtonDown(int);
+	unsigned short GetButtonRepeat(int);
+	void InitFrame0Info();
+	void CalcWMFrame0(int);
+	void DrawWMFrame0(int, float);
+	void CallWorldParam(int, int, int);
+	void ChgModel(int, int, int, int);
+	void SetAnim(int);
+	void PCAnimCtrl();
+	void SetProjection(int);
+	void SetLight(int);
+	void RestoreProjection();
+	void SetMcWinInfo(int, int);
+	void DrawMcWin(short, short);
+	void DrawMcWinMess(int, int);
+	void GetWinSize(int, short*, short*, int);
+	int GetModelNo(int, int, int);
+	float GetMaxAnimWait();
+	char* GetMenuStr(int);
+	char* GetTribeStr(int);
+	char* GetJobStr(int);
+	char* GetHairStr(int);
 
 	void CmakeOpen();
 	void CmakeCtrl();

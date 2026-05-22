@@ -21,7 +21,7 @@ inline CSamplePcs::CSamplePcs()
 	static unsigned int desc1[] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__10CSamplePcsFv)};
 	static unsigned int desc2[] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(func0__10CSamplePcsFv)};
 	static unsigned int desc3[] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(func1__10CSamplePcsFv)};
-	unsigned int* table = reinterpret_cast<unsigned int*>(&m_table__10CSamplePcs);
+	unsigned int* table = reinterpret_cast<unsigned int*>(&m_table);
 
 	table[1] = desc0[0];
 	table[2] = desc0[1];
@@ -37,7 +37,7 @@ inline CSamplePcs::CSamplePcs()
 	table[14] = desc3[2];
 }
 
-CSamplePcsTable m_table__10CSamplePcs = {
+CSamplePcsTable CSamplePcs::m_table = {
     const_cast<char*>(s_CSamplePcs_801D6CC8),
     {
         0,
@@ -180,7 +180,7 @@ void CSamplePcs::create()
  */
 int CSamplePcs::GetTable(unsigned long index)
 {
-	return (int)(reinterpret_cast<unsigned char*>(&m_table__10CSamplePcs) + index * 0x15C);
+	return (int)(reinterpret_cast<unsigned char*>(&m_table) + index * 0x15C);
 }
 
 /*

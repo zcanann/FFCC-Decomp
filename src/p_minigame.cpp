@@ -5,6 +5,7 @@
 #include "ffcc/memory.h"
 #include "ffcc/p_game.h"
 #include "ffcc/p_tina.h"
+#include "ffcc/cflat_runtime2.h"
 
 #include <dolphin/gba/GBA.h>
 #include <dolphin/os.h>
@@ -20,11 +21,11 @@ int g_errCt = 0;
 extern "C" void create__12CMiniGamePcsFv(CMiniGamePcs*);
 extern "C" void destroy__12CMiniGamePcsFv(CMiniGamePcs*);
 extern "C" void calc__12CMiniGamePcsFv(CMiniGamePcs*);
-unsigned int m_table_desc0__12CMiniGamePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__12CMiniGamePcsFv)};
-unsigned int m_table_desc1__12CMiniGamePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__12CMiniGamePcsFv)};
-unsigned int m_table_desc2__12CMiniGamePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__12CMiniGamePcsFv)};
+unsigned int CMiniGamePcs::m_table_desc0[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__12CMiniGamePcsFv)};
+unsigned int CMiniGamePcs::m_table_desc1[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__12CMiniGamePcsFv)};
+unsigned int CMiniGamePcs::m_table_desc2[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__12CMiniGamePcsFv)};
 extern const char s_CMiniGamePcs_GAME_801DD098[];
-unsigned int m_table__12CMiniGamePcs[0x15C / sizeof(unsigned int)] = {
+unsigned int CMiniGamePcs::m_table[0x15C / sizeof(unsigned int)] = {
     reinterpret_cast<unsigned int>(const_cast<char*>(s_CMiniGamePcs_GAME_801DD098)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x24
 };
 extern const char s_miniGameManagerTag[] = "GMGR";
@@ -57,8 +58,6 @@ static const char s_miniGameFlagsRetryFmt[] = "GBA_JSTAT_FLAGS_MASK retry chan=%
 static const char s_miniGamePsf1RetryFmt[] = "GBA_JSTAT_PSF1 retry chan=%d\n\0\0";
 
 extern "C" int memcmp(const void* lhs, const void* rhs, unsigned long count);
-extern "C" void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-    void* flatRuntime, int object, int a, int b, int c, void* inStack, void* outStack);
 extern char g_MsgFlashy[];
 
 struct MiniGameAlarm {
@@ -221,8 +220,7 @@ void _MngThreadMain(void* param)
  */
 int CMiniGamePcs::GetTable(unsigned long index)
 {
-    return reinterpret_cast<int>(reinterpret_cast<unsigned char*>(m_table__12CMiniGamePcs) +
-                                 static_cast<int>(index) * 0x15C);
+    return reinterpret_cast<int>(reinterpret_cast<unsigned char*>(m_table) + static_cast<int>(index) * 0x15C);
 }
 
 /*
@@ -1519,7 +1517,7 @@ void CMiniGamePcs::calc(void)
 
     if (self[0x6496] != 0)
     {
-        int raceEndStack[3];
+        CFlatRuntime::CStack raceEndStack[3];
 
         System.Printf(const_cast<char*>(s_miniGameRaceHeader));
         for (int i = 0; i < 4; i++)
@@ -1528,17 +1526,16 @@ void CMiniGamePcs::calc(void)
         }
         System.Printf(const_cast<char*>(s_miniGameSeparator));
 
-        raceEndStack[0] = 0x3000;
-        raceEndStack[1] = 0;
-        raceEndStack[2] = 0;
-        SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-            &CFlat, 0, 1, 8, 3, raceEndStack, 0);
+        raceEndStack[0].m_word = 0x3000;
+        raceEndStack[1].m_word = 0;
+        raceEndStack[2].m_word = 0;
+        reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(0, 1, 8, 3, raceEndStack, 0);
         self[0x6496] = 0;
     }
 
     if (self[0x6497] != 0)
     {
-        int continueStack[3];
+        CFlatRuntime::CStack continueStack[3];
 
         self[0x6498] = 0xFF;
         self[0x6499] = 0xFF;
@@ -1549,11 +1546,10 @@ void CMiniGamePcs::calc(void)
             System.Printf(const_cast<char*>(s_miniGameContinueText));
         }
 
-        continueStack[0] = 0x3002;
-        continueStack[1] = 0;
-        continueStack[2] = 0;
-        SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-            &CFlat, 0, 1, 8, 3, continueStack, 0);
+        continueStack[0].m_word = 0x3002;
+        continueStack[1].m_word = 0;
+        continueStack[2].m_word = 0;
+        reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(0, 1, 8, 3, continueStack, 0);
         self[0x6497] = 0;
     }
 
@@ -1568,12 +1564,11 @@ void CMiniGamePcs::calc(void)
     }
 
     {
-        int mgrEndStack[3];
-        mgrEndStack[0] = 0x3001;
-        mgrEndStack[1] = 0;
-        mgrEndStack[2] = 0;
-        SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-            &CFlat, 0, 1, 8, 3, mgrEndStack, 0);
+        CFlatRuntime::CStack mgrEndStack[3];
+        mgrEndStack[0].m_word = 0x3001;
+        mgrEndStack[1].m_word = 0;
+        mgrEndStack[2].m_word = 0;
+        reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(0, 1, 8, 3, mgrEndStack, 0);
     }
 
     if (System.m_execParam != 0)

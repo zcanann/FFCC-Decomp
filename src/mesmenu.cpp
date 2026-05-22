@@ -18,16 +18,9 @@
 extern "C" {
 void Create__5CMenuFv(void* menu);
 void Destroy__5CMenuFv(void* menu);
-void Set__4CMesFPci(void* mes, char* script, int flags);
-void SetPosition__4CMesFff(void* mes, float x, float y);
 void SetFade__9CRingMenuFi(void* ringMenu, int fade);
 int __cntlzw(unsigned int);
-void Draw__4CMesFv(void* mes);
 void SetExternalTlut__8CTextureFPvi(void* texture, void* tlut, int enable);
-void Calc__4CMesFv(void* mes);
-void Next__4CMesFv(void* mes);
-int GetWait__4CMesFv(void* mes);
-int useFlag__4CMesFii(void* mes, int flag, int value);
 
 static const char s_CMesMenu_801D9E90[] = "CMesMenu";
 const char DAT_801d9e9c[] =
@@ -127,7 +120,7 @@ void CMesMenu::CloseRequest(int closeReason)
     *(int*)((char*)this + 0x3DA4) = closeReason;
     if (*(int*)((char*)this + 0x0C) <= 1) {
         if ((*(unsigned int*)((char*)this + 0x3D8C) & 0x40) != 0) {
-            Set__4CMesFPci((char*)this + 0x1C, 0, 0);
+            m_mes.Set(0, 0);
             stack[0].m_word = *(int*)((char*)this + 0x18);
             stack[1].m_word = *(int*)((char*)this + 0x3DA4);
             reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(0, 1, 3, 2, stack, 0);
@@ -196,7 +189,7 @@ void CMesMenu::Open(char* script, int x, int y, int flags, int unk1, int unk2, i
     *(int*)((char*)this + 0x3D90) = unk1;
     *(int*)((char*)this + 0x3D94) = unk2;
     *(int*)((char*)this + 0x3D98) = unk3;
-    Set__4CMesFPci((char*)this + 0x1C, script, flags & 0x20);
+    m_mes.Set(script, flags & 0x20);
 
     fVar1 = FLOAT_803308e8;
     *(float*)((char*)this + 0x3D7C) = FLOAT_803308e8 * *(float*)((char*)this + 0x3D9C) + *(float*)((char*)this + 0x3CC0);
@@ -242,7 +235,7 @@ void CMesMenu::Open(char* script, int x, int y, int flags, int unk1, int unk2, i
     } else {
         fVar1 = *(float*)((char*)this + 0x3D9C) + *(float*)((char*)this + 0x3D6C) + *(float*)((char*)this + 0x3D74);
     }
-    SetPosition__4CMesFff((char*)this + 0x1C, fVar1, (float)dVar4);
+    m_mes.SetPosition(fVar1, (float)dVar4);
 
     unsigned int state;
     if (*(int*)((char*)this + 0x18) < 4) {
@@ -286,7 +279,7 @@ void CMesMenu::onScriptChanging(char*)
     int menuIndex;
     void** ringMenuSlots;
 
-    Set__4CMesFPci((char*)this + 0x1C, 0, 0);
+    m_mes.Set(0, 0);
     *(int*)((char*)this + 0x0C) = 4;
     *(int*)((char*)this + 0x08) = 0;
     menuIndex = *(int*)((char*)this + 0x18);
@@ -582,7 +575,7 @@ void CMesMenu::onDraw()
             MenuPcs.DrawWindow(drawX, drawY, width, height, static_cast<CMenuPcs::TEX>(2), FLOAT_8033092c);
 
             if ((*(int*)((char*)this + 0x0C) == 1) && (stageBlend == FLOAT_80330914)) {
-                Draw__4CMesFv((char*)this + 0x1C);
+                m_mes.Draw();
                 MenuPcs.DrawInit();
             }
 
@@ -831,12 +824,12 @@ void CMesMenu::onDraw()
         }
 
         if (*(int*)((char*)this + 0x0C) == 1) {
-            Draw__4CMesFv((char*)this + 0x1C);
+            m_mes.Draw();
             MenuPcs.DrawInit();
         }
     }
 
-    if ((*(int*)((char*)this + 0x0C) == 1) && (GetWait__4CMesFv((char*)this + 0x1C) == 3)) {
+    if ((*(int*)((char*)this + 0x0C) == 1) && (m_mes.GetWait() == 3)) {
         MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0));
         float alphaF = FLOAT_80330908 * stageBlend;
         CColor colorStorage(0xFF, 0xFF, 0xFF, (unsigned char)(int)alphaF);
@@ -974,7 +967,7 @@ void CMesMenu::onCalc()
                       (FLOAT_80330910 * (float)*(int*)((char*)this + 0x10)) / (float)*(int*)((char*)this + 0x14));
         } else {
             *(float*)((char*)this + 0x3D84) = FLOAT_80330914;
-            Calc__4CMesFv((char*)this + 0x1C);
+            m_mes.Calc();
 
             unsigned int downMask = 0;
             unsigned int repeatMask = 0;
@@ -988,7 +981,7 @@ void CMesMenu::onCalc()
                 }
             }
 
-            int wait = GetWait__4CMesFv((char*)this + 0x1C);
+            int wait = m_mes.GetWait();
             if (wait == 3) {
                 int cursor = *(int*)((char*)this + 0x3D34);
                 int altCursor = *(int*)((char*)this + 0x3D38);
@@ -1027,8 +1020,8 @@ void CMesMenu::onCalc()
                 }
                 *(int*)((char*)this + 0x3CDC) = cursor;
             } else {
-                int wait1 = GetWait__4CMesFv((char*)this + 0x1C);
-                if (((wait1 == 1) || (GetWait__4CMesFv((char*)this + 0x1C) == 5)) &&
+                int wait1 = m_mes.GetWait();
+                if (((wait1 == 1) || (m_mes.GetWait() == 5)) &&
                     (*(int*)((char*)this + 0x3CC8) == 0)) {
                     *(int*)((char*)this + 0x3CC8) = 1;
                     *(int*)((char*)this + 0x3CD8) = 0;
@@ -1040,17 +1033,17 @@ void CMesMenu::onCalc()
                 advance = (*(int*)((char*)this + 0x3CC8) != 0) &&
                           (*(int*)((char*)this + 0x3CD8) == *(int*)((char*)this + 0x3CD4));
             } else {
-                int wait2 = GetWait__4CMesFv((char*)this + 0x1C);
+                int wait2 = m_mes.GetWait();
                 if (wait2 == 0) {
                     *(int*)((char*)this + 0x3C9C) = *(int*)((char*)this + 0x3C98) + 1000;
-                    useFlag__4CMesFii((char*)this + 0x1C, *(int*)((char*)this + 0x3C28), 1);
+                    m_mes.useFlag(*(int*)((char*)this + 0x3C28), 1);
                 } else {
-                    int wait3 = GetWait__4CMesFv((char*)this + 0x1C);
+                    int wait3 = m_mes.GetWait();
                     if ((wait3 == 3) && ((*(unsigned int*)((char*)this + 0x3D8C) & 0x4000) == 0)) {
                         Sound.PlaySe(2, 0x40, 0x7F, 0);
                     }
-                    int wait4 = GetWait__4CMesFv((char*)this + 0x1C);
-                    if ((wait4 != 1) && (GetWait__4CMesFv((char*)this + 0x1C) != 5) &&
+                    int wait4 = m_mes.GetWait();
+                    if ((wait4 != 1) && (m_mes.GetWait() != 5) &&
                         (*(int*)((char*)this + 0x3C90) == 0) && ((*(unsigned int*)((char*)this + 0x3D8C) & 0x4000) == 0)) {
                         Sound.PlaySe(0xC, 0x40, 0x7F, 0);
                     }
@@ -1066,9 +1059,9 @@ void CMesMenu::onCalc()
 
             if (advance) {
                 if (*(int*)((char*)this + 0x3C90) == 0) {
-                    Next__4CMesFv((char*)this + 0x1C);
+                    m_mes.Next();
                 } else {
-                    int wait5 = GetWait__4CMesFv((char*)this + 0x1C);
+                    int wait5 = m_mes.GetWait();
                     if (wait5 != 4) {
                         *(int*)((char*)this + 0x3DA4) = 0;
                         if (*(int*)((char*)this + 0x0C) < 2) {
@@ -1082,7 +1075,7 @@ void CMesMenu::onCalc()
                                 }
                             } else {
                                 CFlatRuntime::CStack stack[2];
-                                Set__4CMesFPci((char*)this + 0x1C, 0, 0);
+                                m_mes.Set(0, 0);
                                 stack[0].m_word = *(int*)((char*)this + 0x18);
                                 stack[1].m_word = *(int*)((char*)this + 0x3DA4);
                                 reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(0, 1, 3, 2, stack, 0);
@@ -1122,7 +1115,7 @@ void CMesMenu::onCalc()
             *(int*)((char*)this + 0x0C) = 4;
             *(int*)((char*)this + 0x10) = 0;
             *(int*)((char*)this + 0x14) = 0;
-            Set__4CMesFPci((char*)this + 0x1C, 0, 0);
+            m_mes.Set(0, 0);
             stack[0].m_word = *(int*)((char*)this + 0x18);
             stack[1].m_word = *(int*)((char*)this + 0x3DA4);
             reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(0, 1, 3, 2, stack, 0);
@@ -1146,7 +1139,7 @@ void CMesMenu::onCalc()
  */
 void CMesMenu::Destroy()
 {
-    Set__4CMesFPci((char*)this + 0x1C, 0, 0);
+    m_mes.Set(0, 0);
     Destroy__5CMenuFv(this);
 }
 

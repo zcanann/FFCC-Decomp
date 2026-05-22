@@ -24,11 +24,6 @@ extern "C" const char s_scenegraph_step_x1_8[] = "x1/8";
 extern const char s_collection_ptrarray_h_801D7B30[];
 extern const char s_ptrarray_grow_error_801D7B14[];
 
-inline void* operator new(unsigned long, void* p)
-{
-    return p;
-}
-
 namespace {
 struct RefObject
 {
@@ -507,19 +502,13 @@ CTexAnimSet* CTexAnimSet::Duplicate(CMemory::CStage* stage)
 {
     CTexAnimSetStorage* self = reinterpret_cast<CTexAnimSetStorage*>(this);
     CTexAnimSetStorage* dup = reinterpret_cast<CTexAnimSetStorage*>(
-        operator new(0x28, stage, const_cast<char*>(s_texanim_cpp_801d7adc), 0x54));
-    if (dup != 0) {
-        new (dup) CTexAnimSet;
-    }
+        new (stage, const_cast<char*>(s_texanim_cpp_801d7adc), 0x54) CTexAnimSet);
 
     dup->texAnims.SetStage(stage);
     for (unsigned int i = 0; i < static_cast<unsigned int>(self->texAnims.GetSize()); i++) {
         CTexAnimStorage* src = reinterpret_cast<CTexAnimStorage*>(self->texAnims[i]);
         CTexAnimStorage* copy = reinterpret_cast<CTexAnimStorage*>(
-            operator new(0x24, stage, const_cast<char*>(s_texanim_cpp_801d7adc), 0xF4));
-        if (copy != 0) {
-            new (copy) CTexAnim;
-        }
+            new (stage, const_cast<char*>(s_texanim_cpp_801d7adc), 0xF4) CTexAnim);
 
         copy->refData = src->refData;
         reinterpret_cast<RefObject*>(copy->refData)->refCount = reinterpret_cast<RefObject*>(copy->refData)->refCount + 1;
@@ -564,11 +553,8 @@ void CTexAnimSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
             continue;
         }
 
-        CTexAnimStorage* texAnim = static_cast<CTexAnimStorage*>(
-            operator new(0x24, stage, const_cast<char*>(s_texanim_cpp_801d7adc), 0x3F));
-        if (texAnim != 0) {
-            new (texAnim) CTexAnim;
-        }
+        CTexAnimStorage* texAnim = reinterpret_cast<CTexAnimStorage*>(
+            new (stage, const_cast<char*>(s_texanim_cpp_801d7adc), 0x3F) CTexAnim);
         int* ref = reinterpret_cast<int*>(texAnim->refData);
         if (ref != 0) {
             int nextRefCount = ref[1] - 1;
@@ -578,11 +564,8 @@ void CTexAnimSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
             }
             texAnim->refData = 0;
         }
-        CTexAnimRefDataStorage* refData = static_cast<CTexAnimRefDataStorage*>(
-            operator new(300, stage, const_cast<char*>(s_texanim_cpp_801d7adc), 0xD3));
-        if (refData != 0) {
-            new (refData) CTexAnim::CRefData;
-        }
+        CTexAnimRefDataStorage* refData = reinterpret_cast<CTexAnimRefDataStorage*>(
+            new (stage, const_cast<char*>(s_texanim_cpp_801d7adc), 0xD3) CTexAnim::CRefData);
         texAnim->refData = refData;
         refData->texAnimSeqs.SetStage(stage);
 
@@ -596,11 +579,8 @@ void CTexAnimSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
                 continue;
             }
 
-            CTexAnimSeqStorage* seq = static_cast<CTexAnimSeqStorage*>(
-                operator new(0x118, stage, const_cast<char*>(s_texanim_cpp_801d7adc), 0xE2));
-            if (seq != 0) {
-                new (seq) CTexAnimSeq;
-            }
+            CTexAnimSeqStorage* seq = reinterpret_cast<CTexAnimSeqStorage*>(
+                new (stage, const_cast<char*>(s_texanim_cpp_801d7adc), 0xE2) CTexAnimSeq);
             chunkFile.PushChunk();
             char* seqName = seq->name;
             while ((int)chunkFile.GetNextChunk(innerChunk) != 0) {

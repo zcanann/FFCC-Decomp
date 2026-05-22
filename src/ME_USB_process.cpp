@@ -1,5 +1,4 @@
 #include "ffcc/ME_USB_process.h"
-#include "ffcc/p_MaterialEditor.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/USBStreamData.h"
 #include "ffcc/memory.h"
@@ -9,12 +8,6 @@
 #include "dolphin/os/OSCache.h"
 
 #include <string.h>
-
-extern "C" void ClearTextureData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialEditorPcs);
-extern "C" void ResetRsdList__18CMaterialEditorPcsFP5ZLIST(CMaterialEditorPcs* materialEditorPcs, ZLIST* zlist);
-extern "C" int AddRsdList__18CMaterialEditorPcsFP5ZLIST(CMaterialEditorPcs* materialEditorPcs, ZLIST* zlist);
-extern "C" void SetRsdIndex__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialEditorPcs);
-extern "C" void SetRsdFlag__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialEditorPcs);
 
 extern "C" const char s_ME_USB_process_cpp_801d7d78[] = "ME_USB_process.cpp";
 extern "C" const char s_MemAlloc_Error____size__d_801d7d8c[] = "MemAlloc Error!!! size=%d\n";
@@ -98,17 +91,17 @@ static inline u16 LoadSwapU16(u16 value)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialEditorPcs)
+void CMaterialEditorPcs::SetUSBData()
 {
-    CUSBStreamData& usb = materialEditorPcs->m_usbStream;
+    CUSBStreamData& usb = m_usbStream;
 
     switch (usb.m_packetCode) {
     case 0x21:
-        materialEditorPcs->m_displayTextureEnabled = 1;
-        ClearTextureData__18CMaterialEditorPcsFv(materialEditorPcs);
+        m_displayTextureEnabled = 1;
+        ClearTextureData();
         break;
     case 0x22:
-        materialEditorPcs->m_displayTextureEnabled = 0;
+        m_displayTextureEnabled = 0;
         break;
     case 3:
         usb.m_stageDefault = reinterpret_cast<CMemory::CStage*>(1);
@@ -117,16 +110,16 @@ extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialE
         usb.m_stageDefault = 0;
         break;
     case 0x40:
-        ResetRsdList__18CMaterialEditorPcsFP5ZLIST(materialEditorPcs, &materialEditorPcs->m_zlist1);
+        ResetRsdList(&m_zlist1);
         break;
     case 0x41:
-        AddRsdList__18CMaterialEditorPcsFP5ZLIST(materialEditorPcs, &materialEditorPcs->m_zlist1);
+        AddRsdList(&m_zlist1);
         break;
     case 0x10: {
         ViewerSRT srt;
         Vec minPos;
         Vec maxPos;
-        RSDITEM* rsdItem = materialEditorPcs->GetRsdItem()->rsdItem;
+        RSDITEM* rsdItem = GetRsdItem()->rsdItem;
         u32* xyzData;
 
         if (rsdItem->ptr10 != 0) {
@@ -153,7 +146,7 @@ extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialE
         }
         DCStoreRange(rsdItem->ptr10, usb.m_sizeBytes * 0xC);
 
-        materialEditorPcs->CreateBoundaryBox(minPos, maxPos, rsdItem->countA, reinterpret_cast<const Vec*>(rsdItem->ptr10));
+        CreateBoundaryBox(minPos, maxPos, rsdItem->countA, reinterpret_cast<const Vec*>(rsdItem->ptr10));
 
         srt.transX = 0.0f;
         srt.transY = static_cast<float>(-static_cast<int>(maxPos.x - minPos.x) / 2);
@@ -168,7 +161,7 @@ extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialE
         break;
     }
     case 0x13: {
-        RSDITEM* rsdItem = materialEditorPcs->GetRsdItem()->rsdItem;
+        RSDITEM* rsdItem = GetRsdItem()->rsdItem;
 
         if (rsdItem->ptr18 != 0) {
             delete[] static_cast<u8*>(rsdItem->ptr18);
@@ -218,16 +211,16 @@ extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialE
         memcpy(&usb.m_stageLoad, usb.m_data, 4);
         usb.m_stageLoad = reinterpret_cast<CMemory::CStage*>(LoadSwap32(reinterpret_cast<u32>(usb.m_stageLoad)));
         DCStoreRange(&usb.m_stageLoad, 4);
-        SetRsdIndex__18CMaterialEditorPcsFv(materialEditorPcs);
+        SetRsdIndex();
         break;
     case 0x43:
-        memcpy(&materialEditorPcs->m_rsdFlag, usb.m_data, 4);
-        materialEditorPcs->m_rsdFlag = LoadSwap32(materialEditorPcs->m_rsdFlag);
-        SetRsdFlag__18CMaterialEditorPcsFv(materialEditorPcs);
-        DCStoreRange(&materialEditorPcs->m_rsdFlag, 4);
+        memcpy(&m_rsdFlag, usb.m_data, 4);
+        m_rsdFlag = LoadSwap32(m_rsdFlag);
+        SetRsdFlag();
+        DCStoreRange(&m_rsdFlag, 4);
         break;
     case 0x12: {
-        RSDITEM* rsdItem = materialEditorPcs->GetRsdItem()->rsdItem;
+        RSDITEM* rsdItem = GetRsdItem()->rsdItem;
         u32* xyzData;
 
         if (rsdItem->ptr14 != 0) {
@@ -256,41 +249,41 @@ extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialE
         break;
     }
     case 1: {
-        memcpy(Ptr(materialEditorPcs, 0xEC), usb.m_data, 0x120);
-        StoreSwap32(&U32At(materialEditorPcs, 0xEC));
-        StoreSwap32(&U32At(materialEditorPcs, 0xF0));
-        StoreSwap32(&U32At(materialEditorPcs, 0xF4));
-        StoreSwap32(&U32At(materialEditorPcs, 0xF8));
-        StoreSwap32(&U32At(materialEditorPcs, 0xFC));
-        StoreSwap32(&U32At(materialEditorPcs, 0x100));
-        StoreSwap32(&U32At(materialEditorPcs, 0x104));
-        StoreSwap32(&U32At(materialEditorPcs, 0x108));
-        StoreSwap32(&U32At(materialEditorPcs, 0x10C));
-        StoreSwap32(&U32At(materialEditorPcs, 0x110));
-        StoreSwap32(&U32At(materialEditorPcs, 0x114));
-        StoreSwap32(&U32At(materialEditorPcs, 0x118));
-        StoreSwap32(&U32At(materialEditorPcs, 0x11C));
-        StoreSwap32(&U32At(materialEditorPcs, 0x120));
-        StoreSwap32(&U32At(materialEditorPcs, 0x124));
-        StoreSwap32(&U32At(materialEditorPcs, 0x128));
-        StoreSwap32(&U32At(materialEditorPcs, 0x12C));
-        StoreSwap32(&U32At(materialEditorPcs, 0x130));
-        StoreSwap32(&U32At(materialEditorPcs, 0x134));
-        StoreSwap32(&U32At(materialEditorPcs, 0x138));
-        StoreSwap32(&U32At(materialEditorPcs, 0x13C));
-        StoreSwap32(&U32At(materialEditorPcs, 0x140));
-        StoreSwap32(&U32At(materialEditorPcs, 0x144));
-        StoreSwap32(&U32At(materialEditorPcs, 0x148));
-        StoreSwap32(&U32At(materialEditorPcs, 0x14C));
-        StoreSwap32(&U32At(materialEditorPcs, 0x150));
-        StoreSwap32(&U32At(materialEditorPcs, 0x154));
-        StoreSwap32(&U32At(materialEditorPcs, 0x158));
-        StoreSwap32(&U32At(materialEditorPcs, 0x15C));
-        StoreSwap32(&U32At(materialEditorPcs, 0x160));
-        StoreSwap32(&U32At(materialEditorPcs, 0x164));
-        StoreSwap32(&materialEditorPcs->field_0x168);
-        memcpy(Ptr(materialEditorPcs, 0x20C), Ptr(materialEditorPcs, 0xEC), 0x30);
-        DCStoreRange(Ptr(materialEditorPcs, 0xEC), 0x120);
+        memcpy(Ptr(this, 0xEC), usb.m_data, 0x120);
+        StoreSwap32(&U32At(this, 0xEC));
+        StoreSwap32(&U32At(this, 0xF0));
+        StoreSwap32(&U32At(this, 0xF4));
+        StoreSwap32(&U32At(this, 0xF8));
+        StoreSwap32(&U32At(this, 0xFC));
+        StoreSwap32(&U32At(this, 0x100));
+        StoreSwap32(&U32At(this, 0x104));
+        StoreSwap32(&U32At(this, 0x108));
+        StoreSwap32(&U32At(this, 0x10C));
+        StoreSwap32(&U32At(this, 0x110));
+        StoreSwap32(&U32At(this, 0x114));
+        StoreSwap32(&U32At(this, 0x118));
+        StoreSwap32(&U32At(this, 0x11C));
+        StoreSwap32(&U32At(this, 0x120));
+        StoreSwap32(&U32At(this, 0x124));
+        StoreSwap32(&U32At(this, 0x128));
+        StoreSwap32(&U32At(this, 0x12C));
+        StoreSwap32(&U32At(this, 0x130));
+        StoreSwap32(&U32At(this, 0x134));
+        StoreSwap32(&U32At(this, 0x138));
+        StoreSwap32(&U32At(this, 0x13C));
+        StoreSwap32(&U32At(this, 0x140));
+        StoreSwap32(&U32At(this, 0x144));
+        StoreSwap32(&U32At(this, 0x148));
+        StoreSwap32(&U32At(this, 0x14C));
+        StoreSwap32(&U32At(this, 0x150));
+        StoreSwap32(&U32At(this, 0x154));
+        StoreSwap32(&U32At(this, 0x158));
+        StoreSwap32(&U32At(this, 0x15C));
+        StoreSwap32(&U32At(this, 0x160));
+        StoreSwap32(&U32At(this, 0x164));
+        StoreSwap32(&this->field_0x168);
+        memcpy(Ptr(this, 0x20C), Ptr(this, 0xEC), 0x30);
+        DCStoreRange(Ptr(this, 0xEC), 0x120);
         break;
     }
     case 0x31: {
@@ -301,7 +294,7 @@ extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialE
             System.Printf(const_cast<char*>(s_MemAlloc_Error____size__d_801d7d8c), usb.m_sizeBytes);
         }
 
-        RSDITEM* rsdItem = materialEditorPcs->GetRsdItem()->rsdItem;
+        RSDITEM* rsdItem = this->GetRsdItem()->rsdItem;
         memcpy(dstBuffer, usb.m_data, usb.m_sizeBytes);
 
         u8* target = reinterpret_cast<u8*>(rsdItem->ptr18);
@@ -329,7 +322,7 @@ extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialE
             System.Printf(const_cast<char*>(s_MemAlloc_Error____size__d_801d7d8c), 0x10);
         }
 
-        materialEditorPcs->m_textureHeader[materialEditorPcs->m_loadedTextureCount] = static_cast<s16*>(headerDst);
+        this->m_textureHeader[this->m_loadedTextureCount] = static_cast<s16*>(headerDst);
         memcpy(headerBuffer, usb.m_data, size);
         headerBuffer[0] = LoadSwapU16(headerBuffer[0]);
         headerBuffer[1] = LoadSwapU16(headerBuffer[1]);
@@ -340,7 +333,7 @@ extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialE
         headerBuffer[6] = LoadSwapU16(headerBuffer[6]);
         headerBuffer[7] = LoadSwapU16(headerBuffer[7]);
         DCFlushRange(headerBuffer, 0x10);
-        memcpy(materialEditorPcs->m_textureHeader[materialEditorPcs->m_loadedTextureCount], headerBuffer, 0x10);
+        memcpy(this->m_textureHeader[this->m_loadedTextureCount], headerBuffer, 0x10);
 
         s16 format = headerBuffer[1];
         if (format == 0x20) {
@@ -349,7 +342,7 @@ extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialE
             if (texData == 0) {
                 System.Printf(const_cast<char*>(s_MemAlloc_Error____size__d_801d7d8c), size - 0x10);
             }
-            materialEditorPcs->m_textureData[materialEditorPcs->m_loadedTextureCount] = texData;
+            this->m_textureData[this->m_loadedTextureCount] = texData;
             memcpy(texData, headerBuffer + 8, size - 0x10);
             DCFlushRange(texData, size - 0x10);
         } else if ((format == 4) || (format == 8)) {
@@ -362,7 +355,7 @@ extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialE
             if (texData == 0) {
                 System.Printf(const_cast<char*>(s_MemAlloc_Error____size__d_801d7d8c), imageDataSize);
             }
-            materialEditorPcs->m_textureData[materialEditorPcs->m_loadedTextureCount] = texData;
+            this->m_textureData[this->m_loadedTextureCount] = texData;
             memcpy(texData, headerBuffer + 8, imageDataSize);
             DCFlushRange(texData, imageDataSize);
 
@@ -371,7 +364,7 @@ extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialE
             if (tlutData == 0) {
                 System.Printf(const_cast<char*>(s_MemAlloc_Error____size__d_801d7d8c), tlutDataSize);
             }
-            materialEditorPcs->m_tlutData[materialEditorPcs->m_loadedTextureCount] = tlutData;
+            this->m_tlutData[this->m_loadedTextureCount] = tlutData;
 
             int tlutOffset = format == 4 ? (headerBuffer[2] * headerBuffer[3]) / 2 : headerBuffer[2] * headerBuffer[3];
             memcpy(tlutData, reinterpret_cast<u8*>(headerBuffer) + tlutOffset + 0x10, tlutDataSize);
@@ -383,21 +376,21 @@ extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialE
         if (texObj == 0) {
             System.Printf(const_cast<char*>(s_MemAlloc_Error____size__d_801d7d8c), 0x20);
         }
-        materialEditorPcs->m_texObj[materialEditorPcs->m_loadedTextureCount] = static_cast<GXTexObj*>(texObj);
+        this->m_texObj[this->m_loadedTextureCount] = static_cast<GXTexObj*>(texObj);
 
         void* tlutObj0 =
             Memory._Alloc(0xC, MaterialEditorStage(), const_cast<char*>(s_ME_USB_process_cpp_801d7d78), 0x31, 0);
         if (tlutObj0 == 0) {
             System.Printf(const_cast<char*>(s_MemAlloc_Error____size__d_801d7d8c), 0xC);
         }
-        materialEditorPcs->m_tlutObj0[materialEditorPcs->m_loadedTextureCount] = static_cast<GXTlutObj*>(tlutObj0);
+        this->m_tlutObj0[this->m_loadedTextureCount] = static_cast<GXTlutObj*>(tlutObj0);
 
         void* tlutObj1 =
             Memory._Alloc(0xC, MaterialEditorStage(), const_cast<char*>(s_ME_USB_process_cpp_801d7d78), 0x31, 0);
         if (tlutObj1 == 0) {
             System.Printf(const_cast<char*>(s_MemAlloc_Error____size__d_801d7d8c), 0xC);
         }
-        materialEditorPcs->m_tlutObj1[materialEditorPcs->m_loadedTextureCount] = static_cast<GXTlutObj*>(tlutObj1);
+        this->m_tlutObj1[this->m_loadedTextureCount] = static_cast<GXTlutObj*>(tlutObj1);
 
         u32 widthFactor = static_cast<u32>(headerBuffer[2]);
         u32 heightFactor = static_cast<u32>(headerBuffer[3]);
@@ -414,20 +407,20 @@ extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialE
         }
 
         if (format == 0x20) {
-            GXInitTexObj(materialEditorPcs->m_texObj[materialEditorPcs->m_loadedTextureCount],
-                materialEditorPcs->m_textureData[materialEditorPcs->m_loadedTextureCount], headerBuffer[2], headerBuffer[3],
+            GXInitTexObj(this->m_texObj[this->m_loadedTextureCount],
+                this->m_textureData[this->m_loadedTextureCount], headerBuffer[2], headerBuffer[3],
                 GX_TF_RGBA8, static_cast<GXTexWrapMode>(isPowerOfTwo), static_cast<GXTexWrapMode>(isPowerOfTwo), GX_FALSE);
         } else if ((format == 4) || (format == 8)) {
             int tlutEntries = format == 4 ? 0x10 : 0x100;
 
-            GXInitTlutObj(materialEditorPcs->m_tlutObj0[materialEditorPcs->m_loadedTextureCount],
-                materialEditorPcs->m_tlutData[materialEditorPcs->m_loadedTextureCount], GX_TL_IA8, tlutEntries);
-            GXInitTlutObj(materialEditorPcs->m_tlutObj1[materialEditorPcs->m_loadedTextureCount],
-                reinterpret_cast<u8*>(materialEditorPcs->m_tlutData[materialEditorPcs->m_loadedTextureCount]) + tlutEntries * 2, GX_TL_IA8, tlutEntries);
-            GXLoadTlut(materialEditorPcs->m_tlutObj0[materialEditorPcs->m_loadedTextureCount], GX_TLUT0);
-            GXLoadTlut(materialEditorPcs->m_tlutObj1[materialEditorPcs->m_loadedTextureCount], GX_TLUT1);
-            GXInitTexObjCI(materialEditorPcs->m_texObj[materialEditorPcs->m_loadedTextureCount],
-                materialEditorPcs->m_textureData[materialEditorPcs->m_loadedTextureCount], headerBuffer[2], headerBuffer[3],
+            GXInitTlutObj(this->m_tlutObj0[this->m_loadedTextureCount],
+                this->m_tlutData[this->m_loadedTextureCount], GX_TL_IA8, tlutEntries);
+            GXInitTlutObj(this->m_tlutObj1[this->m_loadedTextureCount],
+                reinterpret_cast<u8*>(this->m_tlutData[this->m_loadedTextureCount]) + tlutEntries * 2, GX_TL_IA8, tlutEntries);
+            GXLoadTlut(this->m_tlutObj0[this->m_loadedTextureCount], GX_TLUT0);
+            GXLoadTlut(this->m_tlutObj1[this->m_loadedTextureCount], GX_TLUT1);
+            GXInitTexObjCI(this->m_texObj[this->m_loadedTextureCount],
+                this->m_textureData[this->m_loadedTextureCount], headerBuffer[2], headerBuffer[3],
                 static_cast<GXCITexFmt>(format == 4 ? GX_TF_C4 : GX_TF_C8),
                 static_cast<GXTexWrapMode>(isPowerOfTwo), static_cast<GXTexWrapMode>(isPowerOfTwo),
                 GX_FALSE, static_cast<u32>(GX_TLUT0));
@@ -436,7 +429,7 @@ extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialE
         if (headerBuffer != 0) {
             delete[] reinterpret_cast<u8*>(headerBuffer);
         }
-        S8At(materialEditorPcs, 0x3BC) = S8At(materialEditorPcs, 0x3BC) + 1;
+        S8At(this, 0x3BC) = S8At(this, 0x3BC) + 1;
         break;
     }
     }
@@ -451,7 +444,7 @@ extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialE
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void MemFree__18CMaterialEditorPcsFPv(CMaterialEditorPcs* materialEditorPcs, void* ptr)
+void CMaterialEditorPcs::MemFree(void* ptr)
 {
     if (ptr != nullptr) {
         Memory.Free(ptr);

@@ -10,6 +10,7 @@
 #include "ffcc/ringmenu.h"
 #include "ffcc/sound.h"
 #include "ffcc/system.h"
+#include "ffcc/cflat_runtime2.h"
 
 #include <math.h>
 #include <string.h>
@@ -21,8 +22,6 @@ void Set__4CMesFPci(void* mes, char* script, int flags);
 void SetPosition__4CMesFff(void* mes, float x, float y);
 void SetFade__9CRingMenuFi(void* ringMenu, int fade);
 int __cntlzw(unsigned int);
-void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-    void* flatRuntime, int object, int type, int id, int stackCount, void* stack, void* stack2);
 void SetMargin__5CFontFf(float margin, void* font);
 void SetShadow__5CFontFi(void* font, int enable);
 void SetScale__5CFontFf(float scale, void* font);
@@ -141,16 +140,15 @@ void CMesMenu::SetPos(float x, float y)
  */
 void CMesMenu::CloseRequest(int closeReason)
 {
-    int stack[2];
+    CFlatRuntime::CStack stack[2];
 
     *(int*)((char*)this + 0x3DA4) = closeReason;
     if (*(int*)((char*)this + 0x0C) <= 1) {
         if ((*(unsigned int*)((char*)this + 0x3D8C) & 0x40) != 0) {
             Set__4CMesFPci((char*)this + 0x1C, 0, 0);
-            stack[0] = *(int*)((char*)this + 0x18);
-            stack[1] = *(int*)((char*)this + 0x3DA4);
-            SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-                CFlat, 0, 1, 3, 2, stack, 0);
+            stack[0].m_word = *(int*)((char*)this + 0x18);
+            stack[1].m_word = *(int*)((char*)this + 0x3DA4);
+            reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(0, 1, 3, 2, stack, 0);
             *(int*)((char*)this + 0x0C) = 4;
             *(int*)((char*)this + 0x08) = 0;
             if (*(int*)((char*)this + 0x18) < 4) {
@@ -1102,12 +1100,11 @@ void CMesMenu::onCalc()
                                     Sound.PlaySe(6, 0x40, 0x7F, 0);
                                 }
                             } else {
-                                int stack[2];
+                                CFlatRuntime::CStack stack[2];
                                 Set__4CMesFPci((char*)this + 0x1C, 0, 0);
-                                stack[0] = *(int*)((char*)this + 0x18);
-                                stack[1] = *(int*)((char*)this + 0x3DA4);
-                                SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-                                    CFlat, 0, 1, 3, 2, stack, 0);
+                                stack[0].m_word = *(int*)((char*)this + 0x18);
+                                stack[1].m_word = *(int*)((char*)this + 0x3DA4);
+                                reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(0, 1, 3, 2, stack, 0);
                                 *(int*)((char*)this + 0x0C) = 4;
                                 *(int*)((char*)this + 0x08) = 0;
                                 if (*(int*)((char*)this + 0x18) < 4) {
@@ -1140,15 +1137,14 @@ void CMesMenu::onCalc()
                 *(int*)((char*)this + 0x14) = 0;
             }
         } else if (nextState < 4) {
-            int stack[2];
+            CFlatRuntime::CStack stack[2];
             *(int*)((char*)this + 0x0C) = 4;
             *(int*)((char*)this + 0x10) = 0;
             *(int*)((char*)this + 0x14) = 0;
             Set__4CMesFPci((char*)this + 0x1C, 0, 0);
-            stack[0] = *(int*)((char*)this + 0x18);
-            stack[1] = *(int*)((char*)this + 0x3DA4);
-            SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-                CFlat, 0, 1, 3, 2, stack, 0);
+            stack[0].m_word = *(int*)((char*)this + 0x18);
+            stack[1].m_word = *(int*)((char*)this + 0x3DA4);
+            reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(0, 1, 3, 2, stack, 0);
             *(int*)((char*)this + 0x0C) = 4;
             *(int*)((char*)this + 0x08) = 0;
             if (*(int*)((char*)this + 0x18) < 4) {

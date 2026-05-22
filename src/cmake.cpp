@@ -103,15 +103,11 @@ extern "C" void SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(void*, int);
 extern "C" void SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(void*, int);
 extern "C" void DrawRect__8CMenuPcsFUlfffffffff(void*, unsigned long, float, float, float, float, float, float, float, float, float);
 extern "C" void DrawInit__8CMenuPcsFv(void*);
-extern "C" const char* GetMenuStr__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" void DrawCursor__8CMenuPcsFiif(CMenuPcs*, int, int, float);
 extern "C" void DrawWMFrame0__8CMenuPcsFif(CMenuPcs*, int, float);
 extern "C" void SetProjection__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" void SetLight__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" void RestoreProjection__8CMenuPcsFv(CMenuPcs*);
-extern "C" const char* GetJobStr__8CMenuPcsFi(CMenuPcs*, int);
-extern "C" const char* GetTribeStr__8CMenuPcsFi(CMenuPcs*, int);
-extern "C" const char* GetHairStr__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" void DrawMcWin__8CMenuPcsFss(CMenuPcs*, short, short);
 extern "C" void DrawMcWinMess__8CMenuPcsFii(CMenuPcs*, int, int);
 extern "C" void GetWinSize__8CMenuPcsFiPsPsi(CMenuPcs*, int, short*, short*, int);
@@ -1179,7 +1175,7 @@ void CMenuPcs::DrawCmakeDecision(int yesNoSel, float alpha)
     CColor rgba(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a));
     font->SetColor(rgba);
 
-    const char* txt = GetMenuStr__8CMenuPcsFi(this, 0x29);
+    const char* txt = GetMenuStr(0x29);
     float w = static_cast<float>(font->GetWidth(txt));
     float tx = (FLOAT_80333380 - w) * 0.5f + 0x178;
     font->SetPosX(tx);
@@ -1238,7 +1234,7 @@ void CMenuPcs::DrawCmakeCharaText(int page, float alpha)
 
     float labelWidths[4];
     for (int i = 0; i < 4; i++) {
-        const char* txt = GetMenuStr__8CMenuPcsFi(this, 0x2A + i);
+        const char* txt = GetMenuStr(0x2A + i);
         if (txt == 0) {
             txt = "";
         }
@@ -1265,13 +1261,13 @@ void CMenuPcs::DrawCmakeCharaText(int page, float alpha)
             txt = s_CmakeInfo.m_name;
             break;
         case 1:
-            txt = GetMenuStr__8CMenuPcsFi(this, s_CmakeInfo.m_gender + 0x11);
+            txt = GetMenuStr(s_CmakeInfo.m_gender + 0x11);
             break;
         case 2:
-            txt = GetTribeStr__8CMenuPcsFi(this, s_CmakeInfo.m_tribe);
+            txt = GetTribeStr(s_CmakeInfo.m_tribe);
             break;
         default:
-            txt = GetJobStr__8CMenuPcsFi(this, s_CmakeInfo.m_job);
+            txt = GetJobStr(s_CmakeInfo.m_job);
             break;
         }
 
@@ -1297,7 +1293,7 @@ void CMenuPcs::DrawCmakeCharaText(int page, float alpha)
                 tribeWithSep[tribeLen + 1] = '\0';
             }
 
-            const char* hairTxt = GetHairStr__8CMenuPcsFi(this, hairIndex + s_CmakeInfo.m_hair);
+            const char* hairTxt = GetHairStr(hairIndex + s_CmakeInfo.m_hair);
             if (hairTxt == 0) {
                 hairTxt = "";
             }
@@ -1473,14 +1469,14 @@ void CMenuPcs::DrawCmakeYesNo(int yesNoSel, float alpha)
     CColor rgba(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a));
     font->SetColor(rgba);
 
-    const char* yesStr = GetMenuStr__8CMenuPcsFi(this, 1);
+    const char* yesStr = GetMenuStr(1);
     float yesW = static_cast<float>(font->GetWidth(yesStr));
     float yesX = (FLOAT_803332b0 - yesW) * FLOAT_8033335c + 0x1D0;
     font->SetPosX(yesX);
     font->SetPosY(FLOAT_80333360);
     font->Draw(yesStr);
 
-    const char* noStr = GetMenuStr__8CMenuPcsFi(this, 2);
+    const char* noStr = GetMenuStr(2);
     float noW = static_cast<float>(font->GetWidth(noStr));
     float noX = (FLOAT_803332b0 - noW) * FLOAT_8033335c + 0x218;
     font->SetPosX(noX);
@@ -2123,7 +2119,7 @@ void CMenuPcs::CmakeSexDraw()
 
     float maxWidth = 0.0f;
     for (int i = 0; i < 2; ++i) {
-        const char* txt = GetMenuStr__8CMenuPcsFi(this, 0x11 + i);
+        const char* txt = GetMenuStr(0x11 + i);
         float width = static_cast<float>(font->GetWidth(txt));
         if (maxWidth < width) {
             maxWidth = width;
@@ -2407,7 +2403,7 @@ void CMenuPcs::CmakeTribeDraw()
     tribeFont->SetColor(tribeRgba);
 
     for (int i = 0; i < 4; i++) {
-        const char* txt = GetTribeStr__8CMenuPcsFi(this, i);
+        const char* txt = GetTribeStr(i);
         if (txt == 0) {
             txt = "";
         }
@@ -2430,7 +2426,7 @@ void CMenuPcs::CmakeTribeDraw()
     }
 
     for (int i = 0; i < 4; i++) {
-        const char* txt = GetHairStr__8CMenuPcsFi(this, hairBase + i);
+        const char* txt = GetHairStr(hairBase + i);
         if (txt == 0) {
             txt = "";
         }
@@ -2742,7 +2738,7 @@ void CMenuPcs::CmakeJobDraw()
     font->SetColor(textColor);
 
     for (int i = 0; i < 8; ++i) {
-        const char* txt = GetJobStr__8CMenuPcsFi(this, i);
+        const char* txt = GetJobStr(i);
         int x = (i < 4) ? 0x110 : 0x1A8;
         int row = (i < 4) ? i : (i - 4);
         font->SetPosX(x);
@@ -2962,7 +2958,7 @@ void CMenuPcs::CmakeResultDraw()
 
     float labelWidths[4];
     for (int i = 0; i < 4; i++) {
-        const char* label = GetMenuStr__8CMenuPcsFi(this, i + 0x2A);
+        const char* label = GetMenuStr(i + 0x2A);
         if (label == 0) {
             label = "";
         }
@@ -2987,9 +2983,9 @@ void CMenuPcs::CmakeResultDraw()
         if (i == 0) {
             value = s_CmakeInfo.m_name;
         } else if (i == 1) {
-            value = GetMenuStr__8CMenuPcsFi(this, static_cast<int>(s_CmakeInfo.m_gender) + 0x11);
+            value = GetMenuStr(static_cast<int>(s_CmakeInfo.m_gender) + 0x11);
         } else if (i == 2) {
-            value = GetTribeStr__8CMenuPcsFi(this, static_cast<int>(s_CmakeInfo.m_tribe));
+            value = GetTribeStr(static_cast<int>(s_CmakeInfo.m_tribe));
             if (value == 0) {
                 value = "";
             }
@@ -3002,7 +2998,7 @@ void CMenuPcs::CmakeResultDraw()
             }
             value = tribeWithSlash;
         } else {
-            value = GetJobStr__8CMenuPcsFi(this, static_cast<int>(s_CmakeInfo.m_job));
+            value = GetJobStr(static_cast<int>(s_CmakeInfo.m_job));
         }
 
         if (value == 0) {
@@ -3022,7 +3018,7 @@ void CMenuPcs::CmakeResultDraw()
                 hairIndex += 4;
             }
 
-            const char* hair = GetHairStr__8CMenuPcsFi(this, hairIndex + static_cast<int>(s_CmakeInfo.m_hair));
+            const char* hair = GetHairStr(hairIndex + static_cast<int>(s_CmakeInfo.m_hair));
             if (hair == 0) {
                 hair = "";
             }
@@ -3199,7 +3195,7 @@ void CMenuPcs::CmakeResultDraw1()
 
     float labelWidths[4];
     for (int i = 0; i < 4; i++) {
-        const char* txt = GetMenuStr__8CMenuPcsFi(this, 0x2A + i);
+        const char* txt = GetMenuStr(0x2A + i);
         if (txt == 0) {
             txt = "";
         }
@@ -3226,13 +3222,13 @@ void CMenuPcs::CmakeResultDraw1()
             txt = s_CmakeInfo.m_name;
             break;
         case 1:
-            txt = GetMenuStr__8CMenuPcsFi(this, s_CmakeInfo.m_gender + 0x11);
+            txt = GetMenuStr(s_CmakeInfo.m_gender + 0x11);
             break;
         case 2:
-            txt = GetTribeStr__8CMenuPcsFi(this, s_CmakeInfo.m_tribe);
+            txt = GetTribeStr(s_CmakeInfo.m_tribe);
             break;
         default:
-            txt = GetJobStr__8CMenuPcsFi(this, s_CmakeInfo.m_job);
+            txt = GetJobStr(s_CmakeInfo.m_job);
             break;
         }
 
@@ -3256,7 +3252,7 @@ void CMenuPcs::CmakeResultDraw1()
             tribeWithSep[tribeLen] = '/';
             tribeWithSep[tribeLen + 1] = '\0';
 
-            const char* hairTxt = GetHairStr__8CMenuPcsFi(this, hairIndex + s_CmakeInfo.m_hair);
+            const char* hairTxt = GetHairStr(hairIndex + s_CmakeInfo.m_hair);
             if (hairTxt == 0) {
                 hairTxt = "";
             }

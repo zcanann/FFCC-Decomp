@@ -27,6 +27,10 @@ class CMenuPcs
 	void DrawCmakeName(int, int, char*, float);
 	void AddNameChara(int, int, int, int);
 	void DrawCmakeYesNo(int, float);
+	char* GetMenuStr(int);
+	char* GetTribeStr(int);
+	char* GetJobStr(int);
+	char* GetHairStr(int);
 
 	void CmakeOpen();
 	void CmakeCtrl();

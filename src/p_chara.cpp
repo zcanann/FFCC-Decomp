@@ -11,6 +11,7 @@
 #include "ffcc/p_tina.h"
 #include "ffcc/pppDrawMng.h"
 #include "ffcc/ref.h"
+#include "ffcc/sound.h"
 #include "ffcc/textureman.h"
 #include "ffcc/util.h"
 #include "ffcc/vector.h"
@@ -39,12 +40,6 @@ u8* gCharaPartWorkPtr = 0;
 }
 
 extern "C" int __cntlzw(unsigned int);
-extern "C" void ReleasePdt__8CPartPcsFi(void*, int);
-extern "C" void Create__6CCharaFv(void*);
-extern "C" void Destroy__6CCharaFv(void*);
-extern "C" void Create__Q26CChara5CAnimFPvPQ27CMemory6CStage(void*, void*, void*);
-extern "C" void LoadSe__6CSoundFPv(void*, void*);
-extern "C" void LoadWave__6CSoundFPv(void*, void*);
 extern "C" unsigned char DbgMenuPcs[];
 extern unsigned char PTR_s_CCharaPcs_GAME_[];
 
@@ -465,7 +460,7 @@ static CCharaPcs::CLoadAnim* LoadAnimFromDisk(
 
     CChara::CAnim* anim = new (StageAt(self, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x62A) CChara::CAnim;
     if (anim != 0) {
-        Create__Q26CChara5CAnimFPvPQ27CMemory6CStage(anim, File.m_readBuffer, StageAt(self, 0xD4));
+        anim->Create(File.m_readBuffer, StageAt(self, 0xD4));
     }
 
     CCharaPcs::CLoadAnim* loadAnim = new (StageAt(self, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x62D) CCharaPcs::CLoadAnim;
@@ -886,7 +881,7 @@ void CCharaPcs::create()
     gCharaPartWorkPtr = reinterpret_cast<u8*>(LightPcs.AddBump(
         &bumpLight, static_cast<CLightPcs::TARGET>(0),
         *reinterpret_cast<CMemory::CStage**>(Ptr(&Chara, 0x2058)), 4));
-    Create__6CCharaFv(&Chara);
+    Chara.Create();
 }
 
 /*
@@ -932,7 +927,7 @@ void CCharaPcs::destroy()
     Memory.DestroyStage(StageAt(this, 0xDC));
     Memory.DestroyStage(StageAt(this, 0xE0));
     Memory.DestroyStage(StageAt(this, 0xD4));
-    Destroy__6CCharaFv(&Chara);
+    Chara.Destroy();
 }
 
 /*
@@ -2010,7 +2005,7 @@ void CCharaPcs::LoadMergeFile(int mergeFileId, int mergeFlags, int streamToAmem)
                             CChara::CAnim* anim =
                                 new (StageAt(pcs, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x62A) CChara::CAnim;
                             if (anim != 0) {
-                                Create__Q26CChara5CAnimFPvPQ27CMemory6CStage(anim, rawData, StageAt(pcs, 0xD4));
+                                anim->Create(rawData, StageAt(pcs, 0xD4));
                             }
 
                             loadAnim = new (StageAt(pcs, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x62D) CLoadAnim;
@@ -2025,9 +2020,9 @@ void CCharaPcs::LoadMergeFile(int mergeFileId, int mergeFlags, int streamToAmem)
                             }
                         }
                     } else if (dataType == 3) {
-                        LoadSe__6CSoundFPv(&Sound, rawData);
+                        Sound.LoadSe(rawData);
                     } else if (dataType == 4) {
-                        LoadWave__6CSoundFPv(&Sound, rawData);
+                        Sound.LoadWave(rawData);
                     } else if (dataType == 5) {
                         CLoadPdt* loadPdt = 0;
                         for (int i = 0; i < LoadPdtArray(pcs)->GetSize(); i++) {
@@ -3242,7 +3237,7 @@ CCharaPcs::CLoadPdt::~CLoadPdt()
 {
     int& pdtSlot = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x14);
     if (pdtSlot >= 0) {
-        ReleasePdt__8CPartPcsFi(&PartPcs, pdtSlot);
+        PartPcs.ReleasePdt(pdtSlot);
         pdtSlot = -1;
     }
 }

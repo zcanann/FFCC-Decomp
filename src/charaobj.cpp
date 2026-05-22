@@ -17,7 +17,6 @@
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
-extern "C" void pppEndPart__8CPartMngFi(void*, int);
 extern "C" unsigned char m_boss__8CGMonObj[];
 extern char SoundBuffer[];
 
@@ -1146,7 +1145,7 @@ void CGCharaObj::onHitParticle(int effectIndex, int, int, int colliderIndex, Vec
 
 	gCFlatRuntime2.IgnoreParticle(static_cast<short>(effectIndex), this);
 	if ((*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + (particleIndex * 0x48) + 0xC) & 0x100) != 0) {
-		pppEndPart__8CPartMngFi(&PartMng, effectIndex);
+		PartMng.pppEndPart(effectIndex);
 	}
 }
 

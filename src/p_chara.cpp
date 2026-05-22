@@ -40,9 +40,6 @@ u8* gCharaPartWorkPtr = 0;
 
 extern "C" int __cntlzw(unsigned int);
 extern "C" void ReleasePdt__8CPartPcsFi(void*, int);
-extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
-extern "C" void CopyFromAMemorySync__7CMemoryFPvPvUl(CMemory*, void*, void*, unsigned long);
-extern "C" void CopyToAMemorySync__7CMemoryFPvPvUl(CMemory*, void*, void*, unsigned long);
 extern "C" void SetStdProjectionMatrix__10CCameraPcsFv(void*);
 extern "C" void SetFog__8CGraphicFii(void*, int, int);
 extern "C" void SetAmbient__9CLightPcsF8_GXColor(void*, void*);
@@ -838,7 +835,7 @@ void CCharaPcs::create()
         Memory.CreateStage(CurrentSceneId() == 4 ? 0x190000UL : 0x1E0000UL, const_cast<char*>(s_CCharaPcs_loadAnim), 0);
 
     CHandle* sentinel = reinterpret_cast<CHandle*>(
-        _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(&Memory, 0x194, StageAt(&CharaPcs, 0xC0), const_cast<char*>(s_p_chara_cpp), 0xDB, 0));
+        Memory._Alloc(0x194, StageAt(&CharaPcs, 0xC0), const_cast<char*>(s_p_chara_cpp), 0xDB, 0));
     if (sentinel != 0) {
         sentinel->m_previous = 0;
         sentinel->m_next = 0;
@@ -1033,7 +1030,7 @@ complete:
 int CCharaPcs::correctLoadAnimAmem()
 {
     unsigned char* tempBuffer = reinterpret_cast<unsigned char*>(
-        _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(&Memory, 0x80000, StageAt(this, 0xD4), const_cast<char*>(s_p_chara_cpp), 0x162, 1));
+        Memory._Alloc(0x80000, StageAt(this, 0xD4), const_cast<char*>(s_p_chara_cpp), 0x162, 1));
     if (tempBuffer == 0) {
         return -1;
     }
@@ -1084,8 +1081,8 @@ int CCharaPcs::correctLoadAnimAmem()
                 nextOffset = static_cast<int>(animEnd);
             }
 
-            CopyFromAMemorySync__7CMemoryFPvPvUl(
-                &Memory, tempBuffer + chunkSize,
+            Memory.CopyFromAMemorySync(
+                tempBuffer + chunkSize,
                 reinterpret_cast<void*>(*reinterpret_cast<int*>(Ptr(StageAt(this, 0xC4), 8)) + static_cast<int>(animOffset)),
                 static_cast<unsigned long>(animSize));
 
@@ -1094,8 +1091,8 @@ int CCharaPcs::correctLoadAnimAmem()
         }
 
         if (chunkSize != 0) {
-            CopyToAMemorySync__7CMemoryFPvPvUl(
-                &Memory, tempBuffer, reinterpret_cast<void*>(*reinterpret_cast<int*>(Ptr(StageAt(this, 0xC4), 8)) + compactedSize),
+            Memory.CopyToAMemorySync(
+                tempBuffer, reinterpret_cast<void*>(*reinterpret_cast<int*>(Ptr(StageAt(this, 0xC4), 8)) + compactedSize),
                 static_cast<unsigned long>(chunkSize));
         }
 
@@ -1947,9 +1944,8 @@ void CCharaPcs::LoadMergeFile(int mergeFileId, int mergeFlags, int streamToAmem)
                                     loadModel->m_streamMode = 1;
                                     loadModel->m_streamOffset = reinterpret_cast<void*>(LoadStreamCursor(this));
                                     loadModel->m_streamSize = rawSize;
-                                    CopyToAMemorySync__7CMemoryFPvPvUl(
-                                        &Memory, rawData,
-                                        reinterpret_cast<unsigned char*>(StageBase(StageAt(this, 0xC8))) + LoadStreamCursor(this),
+                                    Memory.CopyToAMemorySync(
+                                        rawData, reinterpret_cast<unsigned char*>(StageBase(StageAt(this, 0xC8))) + LoadStreamCursor(this),
                                         static_cast<unsigned long>(rawSize));
                                     LoadStreamCursor(this) += static_cast<unsigned int>(rawSize);
                                 }
@@ -1998,9 +1994,8 @@ void CCharaPcs::LoadMergeFile(int mergeFileId, int mergeFlags, int streamToAmem)
                                     loadTexture->m_streamMode = 1;
                                     loadTexture->m_streamOffset = reinterpret_cast<void*>(LoadStreamCursor(this));
                                     loadTexture->m_streamSize = rawSize;
-                                    CopyToAMemorySync__7CMemoryFPvPvUl(
-                                        &Memory, rawData,
-                                        reinterpret_cast<unsigned char*>(StageBase(StageAt(this, 0xC8))) + LoadStreamCursor(this),
+                                    Memory.CopyToAMemorySync(
+                                        rawData, reinterpret_cast<unsigned char*>(StageBase(StageAt(this, 0xC8))) + LoadStreamCursor(this),
                                         static_cast<unsigned long>(rawSize));
                                     LoadStreamCursor(this) += static_cast<unsigned int>(rawSize);
                                 }
@@ -2272,7 +2267,7 @@ void CCharaPcs::drawOverlap()
  */
 void* CCharaPcs::CHandle::operator new(unsigned long size, CMemory::CStage*, char* file, int line)
 {
-    return _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(&Memory, size, StageAt(&CharaPcs, 0xC0), file, line, 0);
+    return Memory._Alloc(size, StageAt(&CharaPcs, 0xC0), file, line, 0);
 }
 
 /*
@@ -2453,8 +2448,8 @@ void CCharaPcs::CHandle::ChangeTexture(
         File.Close(fileHandle);
     } else if (loadTexture->m_streamOffset != 0 && reinterpret_cast<int*>(loadTexture)[1] == 1) {
         File.LockBuffer();
-        CopyFromAMemorySync__7CMemoryFPvPvUl(
-            &Memory, File.m_readBuffer,
+        Memory.CopyFromAMemorySync(
+            File.m_readBuffer,
             reinterpret_cast<unsigned char*>(StageBase(StageAt(&CharaPcs, 0xC8))) +
                 reinterpret_cast<unsigned int>(loadTexture->m_streamOffset),
             static_cast<unsigned long>(loadTexture->m_streamSize));
@@ -2566,8 +2561,8 @@ void CCharaPcs::CHandle::LoadModel(
         if (reinterpret_cast<int*>(loadModel)[1] == 1) {
             if (loadModel->m_streamOffset != 0) {
                 File.LockBuffer();
-                CopyFromAMemorySync__7CMemoryFPvPvUl(
-                    &Memory, File.m_readBuffer,
+                Memory.CopyFromAMemorySync(
+                    File.m_readBuffer,
                     reinterpret_cast<unsigned char*>(StageBase(StageAt(&CharaPcs, 0xC8))) +
                         reinterpret_cast<unsigned int>(loadModel->m_streamOffset),
                     static_cast<unsigned long>(loadModel->m_streamSize));

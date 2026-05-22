@@ -9,6 +9,7 @@ void GetCharaCnt(char*);
 
 class CMenuPcs
 {
+public:
 	CMenuPcs();
 	~CMenuPcs();
 
@@ -36,6 +37,13 @@ class CMenuPcs
 	void ChgModel(int, int, int, int);
 	void SetAnim(int);
 	void PCAnimCtrl();
+	void SetProjection(int);
+	void SetLight(int);
+	void RestoreProjection();
+	void SetMcWinInfo(int, int);
+	void DrawMcWin(short, short);
+	void DrawMcWinMess(int, int);
+	void GetWinSize(int, short*, short*, int);
 	int GetModelNo(int, int, int);
 	float GetMaxAnimWait();
 	char* GetMenuStr(int);

@@ -94,13 +94,6 @@ extern "C" void SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(void*, int);
 extern "C" void DrawRect__8CMenuPcsFUlfffffffff(void*, unsigned long, float, float, float, float, float, float, float, float, float);
 extern "C" void DrawInit__8CMenuPcsFv(void*);
 extern "C" void DrawCursor__8CMenuPcsFiif(CMenuPcs*, int, int, float);
-extern "C" void SetProjection__8CMenuPcsFi(CMenuPcs*, int);
-extern "C" void SetLight__8CMenuPcsFi(CMenuPcs*, int);
-extern "C" void RestoreProjection__8CMenuPcsFv(CMenuPcs*);
-extern "C" void DrawMcWin__8CMenuPcsFss(CMenuPcs*, short, short);
-extern "C" void DrawMcWinMess__8CMenuPcsFii(CMenuPcs*, int, int);
-extern "C" void GetWinSize__8CMenuPcsFiPsPsi(CMenuPcs*, int, short*, short*, int);
-extern "C" void SetMcWinInfo__8CMenuPcsFii(CMenuPcs*, int, int);
 extern "C" char s_dvd__smenu_subfont_fnt_801e3020[];
 extern "C" char* PTR_s_world2_802159a4[];
 extern "C" int DAT_802159c8;
@@ -200,11 +193,11 @@ static inline void DrawCmakePreviewCharaAlpha(CMenuPcs* menu, float alpha)
             FLOAT_80333244, FLOAT_80333248, FLOAT_8033324c, FLOAT_80333250,
             FLOAT_80333254, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, 0.0f);
     } else {
-        SetProjection__8CMenuPcsFi(menu, 0x16);
-        SetLight__8CMenuPcsFi(menu, 2);
+        menu->SetProjection(0x16);
+        menu->SetLight(2);
         *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C) = alpha;
         handle->Draw(5);
-        RestoreProjection__8CMenuPcsFv(menu);
+        menu->RestoreProjection();
     }
 
     DrawInit__8CMenuPcsFv(menu);
@@ -273,9 +266,9 @@ static inline void DrawCmakeMcOverlay(CMenuPcs* menu, int messageId)
         return;
     }
 
-    DrawMcWin__8CMenuPcsFss(menu, -1, 0);
+    menu->DrawMcWin(-1, 0);
     if (mcState == 1) {
-        DrawMcWinMess__8CMenuPcsFii(menu, messageId, 0);
+        menu->DrawMcWinMess(messageId, 0);
     }
 }
 
@@ -1749,8 +1742,8 @@ void CMenuPcs::CmakeNameCtrl()
                 short winX = 0;
                 short winY = 0;
                 Sound.PlaySe(4, 0x40, 0x7F, 0);
-                GetWinSize__8CMenuPcsFiPsPsi(this, 0x14, &winX, &winY, 0);
-                SetMcWinInfo__8CMenuPcsFii(this, (int)winX, (int)winY);
+                GetWinSize(0x14, &winX, &winY, 0);
+                SetMcWinInfo((int)winX, (int)winY);
                 mcState = 0;
                 return;
             }
@@ -1874,11 +1867,11 @@ void CMenuPcs::CmakeNameDraw()
                 FLOAT_80333244, FLOAT_80333248, FLOAT_8033324c, FLOAT_80333250,
                 FLOAT_80333254, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, 0.0f);
         } else {
-            SetProjection__8CMenuPcsFi(this, 0x16);
-            SetLight__8CMenuPcsFi(this, 2);
+            SetProjection(0x16);
+            SetLight(2);
             *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C) = previewAlpha;
             handle->Draw(5);
-            RestoreProjection__8CMenuPcsFv(this);
+            RestoreProjection();
         }
 
         DrawInit__8CMenuPcsFv(this);
@@ -1940,9 +1933,9 @@ void CMenuPcs::CmakeNameDraw()
     DrawCmakeDecision((row > 4) ? 1 : 0, alpha);
 
     if (*reinterpret_cast<short*>(MenuS32(this, 0x848) + 10) != 3) {
-        DrawMcWin__8CMenuPcsFss(this, -1, 0);
+        DrawMcWin(-1, 0);
         if (*reinterpret_cast<short*>(MenuS32(this, 0x848) + 10) == 1) {
-            DrawMcWinMess__8CMenuPcsFii(this, 0x14, 0);
+            DrawMcWinMess(0x14, 0);
         }
     }
 }
@@ -2081,11 +2074,11 @@ void CMenuPcs::CmakeSexDraw()
                 MenuPcsVoid(), 0, FLOAT_80333244, FLOAT_80333248, FLOAT_8033324c, FLOAT_80333250,
                 FLOAT_80333254, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, 0.0f);
         } else {
-            SetProjection__8CMenuPcsFi(this, 0x16);
-            SetLight__8CMenuPcsFi(this, 2);
+            SetProjection(0x16);
+            SetLight(2);
             *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C) = FLOAT_80333258;
             handle->Draw(5);
-            RestoreProjection__8CMenuPcsFv(this);
+            RestoreProjection();
         }
 
         DrawInit__8CMenuPcsFv(this);
@@ -2252,8 +2245,8 @@ unsigned short CMenuPcs::CmakeTribeCtrl()
             Sound.PlaySe(4, 0x40, 0x7F, 0);
             short winX = 0;
             short winY = 0;
-            GetWinSize__8CMenuPcsFiPsPsi(this, 0x15, &winX, &winY, 0);
-            SetMcWinInfo__8CMenuPcsFii(this, static_cast<int>(winX), static_cast<int>(winY));
+            GetWinSize(0x15, &winX, &winY, 0);
+            SetMcWinInfo(static_cast<int>(winX), static_cast<int>(winY));
             mcState = 0;
         }
 
@@ -2350,11 +2343,11 @@ void CMenuPcs::CmakeTribeDraw()
                 FLOAT_80333244, FLOAT_80333248, FLOAT_8033324c, FLOAT_80333250,
                 FLOAT_80333254, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, 0.0f);
         } else {
-            SetProjection__8CMenuPcsFi(this, 0x16);
-            SetLight__8CMenuPcsFi(this, 2);
+            SetProjection(0x16);
+            SetLight(2);
             *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C) = FLOAT_80333258;
             handle->Draw(5);
-            RestoreProjection__8CMenuPcsFv(this);
+            RestoreProjection();
         }
 
         DrawInit__8CMenuPcsFv(this);
@@ -2442,9 +2435,9 @@ void CMenuPcs::CmakeTribeDraw()
     }
 
     if (*reinterpret_cast<short*>(MenuS32(this, 0x848) + 10) != 3) {
-        DrawMcWin__8CMenuPcsFss(this, -1, 0);
+        DrawMcWin(-1, 0);
         if (*reinterpret_cast<short*>(MenuS32(this, 0x848) + 10) == 1) {
-            DrawMcWinMess__8CMenuPcsFii(this, 0x15, 0);
+            DrawMcWinMess(0x15, 0);
         }
     }
 }
@@ -2570,8 +2563,8 @@ unsigned short CMenuPcs::CmakeJobCtrl()
                     short winX = 0;
                     short winY = 0;
                     Sound.PlaySe(4, 0x40, 0x7F, 0);
-                    GetWinSize__8CMenuPcsFiPsPsi(this, 0x16, &winX, &winY, 0);
-                    SetMcWinInfo__8CMenuPcsFii(this, (int)winX, (int)winY);
+                    GetWinSize(0x16, &winX, &winY, 0);
+                    SetMcWinInfo((int)winX, (int)winY);
                     mcState = 0;
                     return 0;
                 }
@@ -2684,11 +2677,11 @@ void CMenuPcs::CmakeJobDraw()
                 FLOAT_80333244, FLOAT_80333248, FLOAT_8033324c, FLOAT_80333250,
                 FLOAT_80333254, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, 0.0f);
         } else {
-            SetProjection__8CMenuPcsFi(this, 0x16);
-            SetLight__8CMenuPcsFi(this, 2);
+            SetProjection(0x16);
+            SetLight(2);
             *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C) = FLOAT_80333258;
             handle->Draw(5);
-            RestoreProjection__8CMenuPcsFv(this);
+            RestoreProjection();
         }
 
         DrawInit__8CMenuPcsFv(this);
@@ -2742,9 +2735,9 @@ void CMenuPcs::CmakeJobDraw()
 
     short mcState = *reinterpret_cast<short*>(MenuS32(this, 0x848) + 10);
     if (mcState != 3) {
-        DrawMcWin__8CMenuPcsFss(this, -1, 0);
+        DrawMcWin(-1, 0);
         if (mcState == 1) {
-            DrawMcWinMess__8CMenuPcsFii(this, 0x16, 0);
+            DrawMcWinMess(0x16, 0);
         }
     }
 }
@@ -2895,11 +2888,11 @@ void CMenuPcs::CmakeResultDraw()
                 FLOAT_80333244, FLOAT_80333248, FLOAT_8033324c, FLOAT_80333250,
                 FLOAT_80333254, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, 0.0f);
         } else {
-            SetProjection__8CMenuPcsFi(this, 0x16);
-            SetLight__8CMenuPcsFi(this, 2);
+            SetProjection(0x16);
+            SetLight(2);
             *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C) = FLOAT_80333258;
             handle->Draw(5);
-            RestoreProjection__8CMenuPcsFv(this);
+            RestoreProjection();
         }
 
         DrawInit__8CMenuPcsFv(this);
@@ -3154,11 +3147,11 @@ void CMenuPcs::CmakeResultDraw1()
                 FLOAT_80333244, FLOAT_80333248, FLOAT_8033324c, FLOAT_80333250,
                 FLOAT_80333254, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, 0.0f);
         } else {
-            SetProjection__8CMenuPcsFi(this, 0x16);
-            SetLight__8CMenuPcsFi(this, 2);
+            SetProjection(0x16);
+            SetLight(2);
             *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C) = FLOAT_80333258;
             handle->Draw(5);
-            RestoreProjection__8CMenuPcsFv(this);
+            RestoreProjection();
         }
 
         DrawInit__8CMenuPcsFv(this);

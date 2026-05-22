@@ -259,7 +259,7 @@ void CFunnyShapePcs::createViewer()
  */
 int CFunnyShapePcs::GetTable(unsigned long index)
 {
-    return reinterpret_cast<int>(reinterpret_cast<unsigned char*>(m_table__14CFunnyShapePcs) + index * 0x15C);
+    return reinterpret_cast<int>(reinterpret_cast<unsigned char*>(m_table) + index * 0x15C);
 }
 
 /*
@@ -401,11 +401,11 @@ extern "C" void __sinit_p_FunnyShape_cpp(void)
 {
     CFunnyShapePcs* pcs = new (&FunnyShapePcs) CFunnyShapePcs;
     u8* self = reinterpret_cast<u8*>(pcs);
-    unsigned int* dst = m_table__14CFunnyShapePcs;
-    unsigned int* desc0 = m_table_desc0__14CFunnyShapePcs;
-    unsigned int* desc1 = m_table_desc1__14CFunnyShapePcs;
-    unsigned int* desc2 = m_table_desc2__14CFunnyShapePcs;
-    unsigned int* desc3 = m_table_desc3__14CFunnyShapePcs;
+    unsigned int* dst = CFunnyShapePcs::m_table;
+    unsigned int* desc0 = CFunnyShapePcs::m_table_desc0;
+    unsigned int* desc1 = CFunnyShapePcs::m_table_desc1;
+    unsigned int* desc2 = CFunnyShapePcs::m_table_desc2;
+    unsigned int* desc3 = CFunnyShapePcs::m_table_desc3;
 
     __register_global_object(self, __dt__14CFunnyShapePcsFv, ARRAY_8026D728);
     unsigned int* table = dst + 1;
@@ -423,11 +423,11 @@ extern "C" void __sinit_p_FunnyShape_cpp(void)
     table[13] = desc3[2];
 }
 
-unsigned int m_table_desc0__14CFunnyShapePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createViewer__14CFunnyShapePcsFv)};
-unsigned int m_table_desc1__14CFunnyShapePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroyViewer__14CFunnyShapePcsFv)};
-unsigned int m_table_desc2__14CFunnyShapePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__14CFunnyShapePcsFv)};
-unsigned int m_table_desc3__14CFunnyShapePcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__14CFunnyShapePcsFv)};
-unsigned int m_table__14CFunnyShapePcs[0x15C / sizeof(unsigned int)] = {
+unsigned int CFunnyShapePcs::m_table_desc0[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createViewer__14CFunnyShapePcsFv)};
+unsigned int CFunnyShapePcs::m_table_desc1[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroyViewer__14CFunnyShapePcsFv)};
+unsigned int CFunnyShapePcs::m_table_desc2[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__14CFunnyShapePcsFv)};
+unsigned int CFunnyShapePcs::m_table_desc3[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__14CFunnyShapePcsFv)};
+unsigned int CFunnyShapePcs::m_table[0x15C / sizeof(unsigned int)] = {
     reinterpret_cast<unsigned int>(const_cast<char*>(lbl_801D7DD0)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x21, 0, 0, 0, 0,
     0x42, 1
 };

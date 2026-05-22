@@ -37,17 +37,17 @@ extern const char s_CGraphicPcs_801D7B80[];
 extern const char __RTTI__8CManager_8032E5D8[];
 extern const char __RTTI__8CProcess_8032E5E0[];
 
-u32 m_table_desc0__11CGraphicPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(create__11CGraphicPcsFv)};
-u32 m_table_desc1__11CGraphicPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(destroy__11CGraphicPcsFv)};
-u32 m_table_desc2__11CGraphicPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(calc__11CGraphicPcsFv)};
-u32 m_table_desc3__11CGraphicPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(drawWait__11CGraphicPcsFv)};
-u32 m_table_desc4__11CGraphicPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(drawFlip__11CGraphicPcsFv)};
-u32 m_table_desc5__11CGraphicPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(drawBegin__11CGraphicPcsFv)};
-u32 m_table_desc6__11CGraphicPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(drawCopy__11CGraphicPcsFv)};
-u32 m_table_desc7__11CGraphicPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(drawEnd__11CGraphicPcsFv)};
-u32 m_table_desc8__11CGraphicPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(preDrawEnvInit__11CGraphicPcsFv)};
-u32 m_table_desc9__11CGraphicPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(stdDrawEnvInit__11CGraphicPcsFv)};
-u32 m_table__11CGraphicPcs[0x15C / sizeof(u32)] = {
+u32 CGraphicPcs::m_table_desc0[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(create__11CGraphicPcsFv)};
+u32 CGraphicPcs::m_table_desc1[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(destroy__11CGraphicPcsFv)};
+u32 CGraphicPcs::m_table_desc2[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(calc__11CGraphicPcsFv)};
+u32 CGraphicPcs::m_table_desc3[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(drawWait__11CGraphicPcsFv)};
+u32 CGraphicPcs::m_table_desc4[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(drawFlip__11CGraphicPcsFv)};
+u32 CGraphicPcs::m_table_desc5[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(drawBegin__11CGraphicPcsFv)};
+u32 CGraphicPcs::m_table_desc6[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(drawCopy__11CGraphicPcsFv)};
+u32 CGraphicPcs::m_table_desc7[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(drawEnd__11CGraphicPcsFv)};
+u32 CGraphicPcs::m_table_desc8[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(preDrawEnvInit__11CGraphicPcsFv)};
+u32 CGraphicPcs::m_table_desc9[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(stdDrawEnvInit__11CGraphicPcsFv)};
+u32 CGraphicPcs::m_table[0x15C / sizeof(u32)] = {
     reinterpret_cast<u32>(const_cast<char*>(s_CGraphicPcs_801D7B80)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x22, 0x8, 0, 0, 0, 0x26, 0x9, 0, 0, 0, 0x27, 0xC, 0, 0, 0, 0x29,
     0x9, 0, 0, 0, 0x48, 1, 0, 0, 0, 0x4B, 0x9, 0, 0, 0, 0x2B, 0x9, 0, 0, 0, 0x34, 0x9
 };
@@ -1026,7 +1026,7 @@ void CGraphicPcs::create()
  */
 int CGraphicPcs::GetTable(unsigned long index)
 {
-    return reinterpret_cast<int>(reinterpret_cast<unsigned char*>(m_table__11CGraphicPcs) + index * 0x15C);
+    return reinterpret_cast<int>(reinterpret_cast<unsigned char*>(m_table) + index * 0x15C);
 }
 
 /*

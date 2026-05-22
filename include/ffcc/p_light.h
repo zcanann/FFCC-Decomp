@@ -71,6 +71,12 @@ public:
     };
 
     CLightPcs();
+    static unsigned int m_table_desc0[3];
+    static unsigned int m_table_desc1[3];
+    static unsigned int m_table_desc2[3];
+    static unsigned int m_table_desc3[3];
+    static unsigned int m_table_desc4[3];
+    static unsigned int m_table[0x15C / sizeof(unsigned int)];
 
     void Init();
     void Quit();
@@ -115,32 +121,26 @@ public:
 
 void setchanctrl(CLightPcs::TARGET, unsigned long);
 extern CLightPcs LightPcs;
-extern unsigned int m_table_desc0__9CLightPcs[];
-extern unsigned int m_table_desc1__9CLightPcs[];
-extern unsigned int m_table_desc2__9CLightPcs[];
-extern unsigned int m_table_desc3__9CLightPcs[];
-extern unsigned int m_table_desc4__9CLightPcs[];
-extern unsigned int m_table__9CLightPcs[];
 
 inline CLightPcs::CLightPcs()
 {
-    unsigned int* table = m_table__9CLightPcs;
+    unsigned int* table = m_table;
 
-    table[0x004 / 4] = m_table_desc0__9CLightPcs[0];
-    table[0x008 / 4] = m_table_desc0__9CLightPcs[1];
-    table[0x00C / 4] = m_table_desc0__9CLightPcs[2];
-    table[0x010 / 4] = m_table_desc1__9CLightPcs[0];
-    table[0x014 / 4] = m_table_desc1__9CLightPcs[1];
-    table[0x018 / 4] = m_table_desc1__9CLightPcs[2];
-    table[0x01C / 4] = m_table_desc2__9CLightPcs[0];
-    table[0x020 / 4] = m_table_desc2__9CLightPcs[1];
-    table[0x024 / 4] = m_table_desc2__9CLightPcs[2];
-    table[0x030 / 4] = m_table_desc3__9CLightPcs[0];
-    table[0x034 / 4] = m_table_desc3__9CLightPcs[1];
-    table[0x038 / 4] = m_table_desc3__9CLightPcs[2];
-    table[0x044 / 4] = m_table_desc4__9CLightPcs[0];
-    table[0x048 / 4] = m_table_desc4__9CLightPcs[1];
-    table[0x04C / 4] = m_table_desc4__9CLightPcs[2];
+    table[0x004 / 4] = m_table_desc0[0];
+    table[0x008 / 4] = m_table_desc0[1];
+    table[0x00C / 4] = m_table_desc0[2];
+    table[0x010 / 4] = m_table_desc1[0];
+    table[0x014 / 4] = m_table_desc1[1];
+    table[0x018 / 4] = m_table_desc1[2];
+    table[0x01C / 4] = m_table_desc2[0];
+    table[0x020 / 4] = m_table_desc2[1];
+    table[0x024 / 4] = m_table_desc2[2];
+    table[0x030 / 4] = m_table_desc3[0];
+    table[0x034 / 4] = m_table_desc3[1];
+    table[0x038 / 4] = m_table_desc3[2];
+    table[0x044 / 4] = m_table_desc4[0];
+    table[0x048 / 4] = m_table_desc4[1];
+    table[0x04C / 4] = m_table_desc4[2];
 }
 
 #endif // _FFCC_P_LIGHT_H_

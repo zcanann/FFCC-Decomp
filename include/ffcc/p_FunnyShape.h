@@ -7,15 +7,15 @@
 #include "ffcc/FS_USB_Process.h"
 #include "ffcc/p_usb.h"
 
-extern unsigned int m_table_desc0__14CFunnyShapePcs[];
-extern unsigned int m_table_desc1__14CFunnyShapePcs[];
-extern unsigned int m_table_desc2__14CFunnyShapePcs[];
-extern unsigned int m_table_desc3__14CFunnyShapePcs[];
-extern unsigned int m_table__14CFunnyShapePcs[];
-
 class CFunnyShapePcs : public CProcess
 {
 public:
+    static unsigned int m_table_desc0[3];
+    static unsigned int m_table_desc1[3];
+    static unsigned int m_table_desc2[3];
+    static unsigned int m_table_desc3[3];
+    static unsigned int m_table[0x15C / sizeof(unsigned int)];
+
     CFunnyShapePcs();
     ~CFunnyShapePcs();
 	

@@ -62,13 +62,12 @@ struct _pppEnvStYmDeformationShp {
 };
 
 void pppSetBlendMode(unsigned char);
+void pppSetDrawEnv(pppCVECTOR*, pppFMATRIX*, float, unsigned char, unsigned char, unsigned char, unsigned char,
+                   unsigned char, unsigned char, unsigned char);
 
 extern "C" {
 int GetTexture__8CMapMeshFP12CMaterialSetRi(CMapMesh* mapMesh, CMaterialSet* materialSet, int& textureIndex);
 
-void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-	pppCVECTOR* color, pppFMATRIX* matrix, float z, unsigned char a3, unsigned char a4, unsigned char a5, unsigned char a6,
-	unsigned char a7, unsigned char a8, unsigned char a9);
 void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int stage, int rasSel, int texSel);
 void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int comp0, int ref0, int op, int comp1, int ref1);
 void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int stage, int texCoord, int texMap, int chan);
@@ -108,7 +107,7 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 		PSMTXIdentity(rotMtx);
 		pppSetBlendMode(1);
 		_GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
-		pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
+		pppSetDrawEnv(
 			&colorInfo->m_color, &((pppYmDeformationShpLayout*)pppYmDeformationShp_)->m_modelMatrix, param_2->m_drawZ,
 			param_2->m_alpha, 0, 0, 0, 1, 1, 0);
 

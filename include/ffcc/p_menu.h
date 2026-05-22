@@ -210,9 +210,11 @@ public:
     void DrawDiaryMenu();
     void DrawMCardMenu();
     void DrawCMakeMenu();
+    void DrawSingCMake();
     void DrawMoveMenu();
     void DrawLoadMenu();
     void DrawTitleMenu();
+    void DrawOptionMenu();
     void SetWorldParam(int, int);
     void GetWorldParam(int);
     void CallWorldParam(int, int, int);

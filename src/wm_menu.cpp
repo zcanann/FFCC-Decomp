@@ -31,9 +31,6 @@ extern "C" void* __vt__Q212CFlatRuntime7CObject[];
 extern "C" void* __vt__9CGBaseObj[];
 extern "C" void* __vt__8CGObject[];
 extern "C" int rand(void);
-extern "C" void DrawOptionMenu__8CMenuPcsFv(CMenuPcs*);
-extern "C" void DrawSingCMake__8CMenuPcsFv(CMenuPcs*);
-
 extern "C" int GetWinMess__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" int GetMcWinMessBuff__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" void SetFog__8CGraphicFii(void*, int, int);
@@ -43,8 +40,6 @@ extern "C" void SetDiffuse__9CLightPcsFUl8_GXColorP3Veci(void*, unsigned long, v
 extern "C" void SetPosition__9CLightPcsFQ29CLightPcs6TARGETP3VecUl(void*, int, Vec*, unsigned long);
 extern "C" void Create__9CGBaseObjFv(void*);
 extern "C" void SetViewport__8CGraphicFv(void*);
-extern "C" void DrawInit__8CMenuPcsFv(CMenuPcs*);
-extern "C" void DrawRect__8CMenuPcsFUlfffffffff(CMenuPcs*, unsigned long, float, float, float, float, float, float, float, float, float);
 extern "C" void SetMargin__5CFontFf(float, CFont*);
 extern "C" void SetShadow__5CFontFi(CFont*, int);
 extern "C" void SetScale__5CFontFf(float, CFont*);
@@ -3040,7 +3035,7 @@ void CMenuPcs::drawWorld()
 			if (*reinterpret_cast<short*>(bytes + 0x868) == 0) {
 				DrawCMakeMenu();
 			} else {
-				DrawSingCMake__8CMenuPcsFv(this);
+				DrawSingCMake();
 			}
 			break;
 		case 4:
@@ -3053,7 +3048,7 @@ void CMenuPcs::drawWorld()
 			DrawTitleMenu();
 			break;
 		case 7:
-			DrawOptionMenu__8CMenuPcsFv(this);
+			DrawOptionMenu();
 			break;
 		case 8:
 			DrawGoOutMenu();
@@ -3216,11 +3211,11 @@ void CMenuPcs::DrawMCardMenu()
 				SetPosition__9CLightPcsFQ29CLightPcs6TARGETP3VecUl(&LightPcs, 0, 0, 0xFFFFFFFF);
 			}
 		}
-		DrawInit__8CMenuPcsFv(this);
+		DrawInit();
 		PSMTXCopy(m_cameraMatrix, CameraPcs.m_cameraMatrix);
 		SetViewport__8CGraphicFv(&Graphic);
 		GXSetScissor(0, 0, 0x280, 0x1C0);
-		DrawInit__8CMenuPcsFv(this);
+		DrawInit();
 	}
 
 	// State machine for MC operations
@@ -3633,11 +3628,11 @@ void CMenuPcs::DrawLoadMenu()
 				SetPosition__9CLightPcsFQ29CLightPcs6TARGETP3VecUl(&LightPcs, 0, 0, 0xFFFFFFFF);
 			}
 		}
-		DrawInit__8CMenuPcsFv(this);
+		DrawInit();
 		PSMTXCopy(m_cameraMatrix, CameraPcs.m_cameraMatrix);
 		SetViewport__8CGraphicFv(&Graphic);
 		GXSetScissor(0, 0, 0x280, 0x1C0);
-		DrawInit__8CMenuPcsFv(this);
+		DrawInit();
 	}
 
 	// State machine for MC operations
@@ -3979,7 +3974,7 @@ void CMenuPcs::DrawTitleMenu()
 		GXSetProjection(projMtx2, GX_PERSPECTIVE);
 		SetViewport__8CGraphicFv(&Graphic);
 		GXSetScissor(0, 0, 0x280, 0x1C0);
-		DrawInit__8CMenuPcsFv(this);
+		DrawInit();
 
 		// Fade-in overlay (state 1)
 		worldState = *reinterpret_cast<int*>(bytes + 0x82C);
@@ -4616,7 +4611,7 @@ void CMenuPcs::RestoreProjection()
 	GXSetProjection(projectionMtx, GX_PERSPECTIVE);
 	SetViewport__8CGraphicFv(&Graphic);
 	GXSetScissor(0, 0, 0x280, 0x1C0);
-	DrawInit__8CMenuPcsFv(this);
+	DrawInit();
 }
 
 /*
@@ -5309,7 +5304,7 @@ void CMenuPcs::DrawFukidashi()
 		fontFC->Draw(secondLine);
 	}
 
-	DrawInit__8CMenuPcsFv(this);
+	DrawInit();
 
 	// 3D viewport rendering
 	bool viewportSetup = false;
@@ -5361,7 +5356,7 @@ void CMenuPcs::DrawFukidashi()
 
 	if (viewportSetup) {
 		PSMTXCopy(m_cameraMatrix, CameraPcs.m_cameraMatrix);
-		DrawInit__8CMenuPcsFv(this);
+		DrawInit();
 	}
 }
 
@@ -6803,7 +6798,7 @@ void CMenuPcs::DrawCharaName()
 	SetShadow__5CFontFi(font, 0);
 	SetScale__5CFontFf(FLOAT_8033158C, font);
 	DrawInit__5CFontFv(font);
-	DrawInit__8CMenuPcsFv(this);
+	DrawInit();
 
 	CColor shade(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alpha));
 	GXSetChanMatColor(GX_COLOR0A0, shade.color);
@@ -6826,16 +6821,18 @@ void CMenuPcs::DrawCharaName()
 					xOffset = FLOAT_8033155C - static_cast<float>(static_cast<double>(width) + DOUBLE_80331510);
 				}
 				const float x = FLOAT_80331410 + static_cast<float>(col * 0x90) + xOffset * static_cast<float>(DOUBLE_803313f8);
-				DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 0, x, y, FLOAT_80331680, FLOAT_80331410,
+				MenuPcs.DrawRect(
+				    0, x, y, FLOAT_80331680, FLOAT_80331410,
 				                                FLOAT_803313dc, FLOAT_803313dc, scale, FLOAT_803313e8, 0.0f);
-				DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 8, FLOAT_80331680 * scale + x, y,
+				MenuPcs.DrawRect(
+				    8, FLOAT_80331680 * scale + x, y,
 				                                FLOAT_80331680, FLOAT_80331410, FLOAT_803313dc, FLOAT_803313dc,
 				                                scale, FLOAT_803313e8, 0.0f);
 			}
 		}
 	}
 
-	DrawInit__8CMenuPcsFv(this);
+	DrawInit();
 	SetMargin__5CFontFf(FLOAT_803313e8, font);
 	SetShadow__5CFontFi(font, 1);
 	SetScale__5CFontFf(FLOAT_8033158C, font);
@@ -6887,7 +6884,7 @@ void CMenuPcs::DrawCharaName()
 		}
 	}
 
-	DrawInit__8CMenuPcsFv(this);
+	DrawInit();
 }
 
 /*
@@ -6984,7 +6981,8 @@ void CMenuPcs::DrawCMLife()
 				yAdd = DAT_8032E91C[DAT_8032E918 * 4 - 3];
 			}
 
-			DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 0, x, yBase + yAdd, FLOAT_80331558, FLOAT_80331558,
+			MenuPcs.DrawRect(
+			    0, x, yBase + yAdd, FLOAT_80331558, FLOAT_80331558,
 			                                FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, 0.0f);
 			step += static_cast<float>(DOUBLE_80331420);
 			x += FLOAT_80331558;
@@ -6996,7 +6994,8 @@ void CMenuPcs::DrawCMLife()
 			const char flagB = work[0x1D91];
 			if (flagA != 0 || flagB != 0) {
 				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x38));
-				DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 0, xBase + static_cast<float>(DOUBLE_80331670),
+				MenuPcs.DrawRect(
+				    0, xBase + static_cast<float>(DOUBLE_80331670),
 				                                y + static_cast<float>(DOUBLE_803315C0), FLOAT_80331524,
 				                                FLOAT_80331440, FLOAT_803313dc,
 				                                flagA != 0 ? FLOAT_803313dc : FLOAT_80331440,
@@ -7006,7 +7005,8 @@ void CMenuPcs::DrawCMLife()
 			const CCaravanWork& caravanWork = Game.m_caravanWorkArr[slot];
 			if (caravanWork.m_shopBusyFlag != 0 || caravanWork.m_caravanLocalFlags != 0) {
 				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x38));
-				DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 0, xBase + static_cast<float>(DOUBLE_80331670),
+				MenuPcs.DrawRect(
+				    0, xBase + static_cast<float>(DOUBLE_80331670),
 				                                y + static_cast<float>(DOUBLE_803315C0), FLOAT_80331524,
 				                                FLOAT_80331440, FLOAT_803313dc,
 				                                caravanWork.m_shopBusyFlag != 0 ? FLOAT_803313dc : FLOAT_80331440,
@@ -8091,7 +8091,7 @@ void CMenuPcs::DrawMainMenuSub()
 		}
 		SetPosition__9CLightPcsFQ29CLightPcs6TARGETP3VecUl(&LightPcs, 0, 0, 0xFFFFFFFF);
 		handle->Draw(5);
-		DrawInit__8CMenuPcsFv(this);
+		DrawInit();
 
 		GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
 		C_MTXPerspective(projectionMtx, FLOAT_80331470, FLOAT_80331474, FLOAT_80331478, FLOAT_8033147c);
@@ -8124,7 +8124,7 @@ void CMenuPcs::DrawMainMenuSub()
 	PSMTXCopy(savedCamera, CameraPcs.m_cameraMatrix);
 	SetViewport__8CGraphicFv(&Graphic);
 	GXSetScissor(0, 0, 0x280, 0x1C0);
-	DrawInit__8CMenuPcsFv(this);
+	DrawInit();
 
 	DrawPageMark();
 	DrawWMFrame0(3, 1.0f);
@@ -8329,7 +8329,7 @@ LAB_draw:
 			}
 		}
 	}
-	DrawInit__8CMenuPcsFv(this);
+	DrawInit();
 }
 
 /*
@@ -8993,7 +8993,7 @@ void CMenuPcs::DrawMcWinMess(int winType, int messType)
 	const int msgTable = GetMcWinMessBuff__8CMenuPcsFi(this, messType);
 	const unsigned char* const winMess = reinterpret_cast<unsigned char*>(GetWinMess__8CMenuPcsFi(this, winType));
 	if (msgTable == 0 || winMess == 0) {
-		DrawInit__8CMenuPcsFv(this);
+		DrawInit();
 		return;
 	}
 
@@ -9027,7 +9027,7 @@ void CMenuPcs::DrawMcWinMess(int winType, int messType)
 		entry += 8;
 	}
 
-	DrawInit__8CMenuPcsFv(this);
+	DrawInit();
 }
 
 /*

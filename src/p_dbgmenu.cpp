@@ -78,7 +78,7 @@ u32 m_table__11CDbgMenuPcs[0x15C / sizeof(u32)] = {
     reinterpret_cast<u32>(const_cast<char*>(s_CDbgMenuPcs_801DD428)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x11, 0, 0, 0, 0, 0x4A, 1
 };
 
-DbgMenuDef PTR_DAT_80212524[] = {
+DbgMenuDef tWork[] = {
     { s_DbgMenuMenu_80331C18, 100, 2, 1 },   { s_DbgMenuShouki_80331C20, 101, 2, 1 },
     { s_DbgMenuMark_80331C28, 102, 2, 1 },   { s_DbgMenuBar_80331C30, 103, 2, 1 },
     { s_DbgMenuSpeed_80331C34, 104, 2, 1 },  { s_DbgMenuMuteki_80331C3C, 105, 2, 1 },
@@ -776,7 +776,7 @@ void CDbgMenuPcs::Add()
     Add(0, 10, param);
 
     y = 10;
-    menuDefs = PTR_DAT_80212524;
+    menuDefs = tWork;
     index = 0;
     do {
         memset(&nodeParam, 0, sizeof(nodeParam));

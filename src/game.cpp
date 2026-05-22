@@ -933,6 +933,7 @@ void CGame::loadCfd()
     {
         int m_dataCount;
         FlatDataEntry m_data[5];
+        u8 m_pad[0x14D4 - 0x68];
     };
 
     char path[0x10C];
@@ -964,7 +965,7 @@ void CGame::loadCfd()
     unkCFlatData0[0] = (unsigned int)flatData[0].m_data[0].m_data;
     unkCFlatData0[1] = (unsigned int)flatData[0].m_data[1].m_data;
     unkCFlatData0[2] = (unsigned int)flatData[0].m_data[2].m_data;
-    m_scriptFoodBase[0] = (unsigned int)flatData[2].m_data[0].m_data;
+    unkCFlatData0[3] = (unsigned int)flatData[2].m_data[0].m_data;
     unk_flat3_field_8_0xc7dc = (unsigned int)flatData[3].m_data[0].m_data;
     unk_flat3_field_1C_0xc7d8 = (unsigned int)flatData[3].m_data[1].m_data;
     unk_flat3_count_0xc7d4 = flatData[3].m_data[1].m_size / 0x1A;

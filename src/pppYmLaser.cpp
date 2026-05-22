@@ -119,10 +119,6 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 	Mtx debugMtx ATTRIBUTE_ALIGN(8);
 	Mtx pointMtx;
 	Mtx sphereMtx;
-	pppFMATRIX managerMtx;
-	pppFMATRIX localMtx;
-	pppFMATRIX cameraMtx;
-	pppFMATRIX modelMtx;
 	Vec shapePos;
 	Vec spherePos;
 	Vec debugSource;
@@ -159,12 +155,8 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 	negHalfWidth = -halfWidth;
 
 	pppUnitMatrix(unitMtx);
-	localMtx = laser->m_localMatrix;
-	managerMtx = pppMngStPtr->m_matrix;
-	pppMulMatrix(mtxOut, managerMtx, localMtx);
-	modelMtx = mtxOut;
-	cameraMtx = *(pppFMATRIX*)&ppvCameraMatrix;
-	pppMulMatrix(mtxOut, cameraMtx, modelMtx);
+	pppMulMatrix(mtxOut, pppMngStPtr->m_matrix, laser->m_localMatrix);
+	pppMulMatrix(mtxOut, *(pppFMATRIX*)&ppvCameraMatrix, mtxOut);
 	GXLoadPosMtxImm(mtxOut.value, 0);
 
 	GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT7, 4);

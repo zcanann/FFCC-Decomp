@@ -5,6 +5,7 @@
 #include "ffcc/ref.h"
 
 class CChunkFile;
+class CCharaPcs;
 class SRT;
 
 class CChara
@@ -58,5 +59,8 @@ public:
 	unsigned char _pad2060[0x14];
 	int m_animBankAddress;
 };
+
+extern CChara Chara;
+extern CCharaPcs CharaPcs;
 
 #endif // _FFCC_CHARA_ANIM_H_

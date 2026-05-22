@@ -11,9 +11,6 @@ extern "C" const char s_charaAnimAllocWarn[32] =
     "\214\303\202\242\203\101\203\152\203\201\201\133\203\126\203\207\203\223"
     "\214\140\216\256\202\305\202\267\201\102\n";
 extern "C" int TryReleaseAnimBank__9CCharaPcsFi(void*, int);
-class CCharaPcs;
-extern CChara Chara;
-extern CCharaPcs CharaPcs;
 extern const float kCharaSharedZeroF;
 extern const float kCharaSharedOneF;
 extern const double DOUBLE_80330C78 = 4503599627370496.0;

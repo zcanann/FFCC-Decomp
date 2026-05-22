@@ -100,7 +100,6 @@ static inline Mtx44& CameraScreenMatrix()
 extern "C" {
 void* GetCharaHandlePtr__FP8CGObjectl(void* obj, long index);
 int GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void* handle);
-int GetTexture__8CMapMeshFP12CMaterialSetRi(CMapMesh* mapMesh, CMaterialSet* materialSet, int& textureIndex);
 void pppHeapUseRate__FPQ27CMemory6CStage(CMemory::CStage* stage);
 
 void MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(CMath* math, Mtx44 mtx, Vec4d* src, Vec4d* dst);
@@ -171,8 +170,8 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
         if (param_2->m_initWOrk == 0xFFFF) {
             return;
         }
-        textureBase = GetTexture__8CMapMeshFP12CMaterialSetRi(
-            ((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[param_2->m_initWOrk], pppEnvStPtr->m_materialSetPtr, textureIndex);
+        textureBase = reinterpret_cast<int>(
+            ((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[param_2->m_initWOrk]->GetTexture(pppEnvStPtr->m_materialSetPtr, textureIndex));
     } else {
         Graphic.CreateSmallBackTexture(Graphic.m_scratchTextureBuffer, &smallBackTex, 0x140 / param_2->m_smallTextureDiv,
                                        0xE0 / param_2->m_smallTextureDiv, GX_LINEAR, GX_TF_RGBA8, 0);

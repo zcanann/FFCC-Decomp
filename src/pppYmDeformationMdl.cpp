@@ -73,8 +73,6 @@ void pppSetDrawEnv(pppCVECTOR*, pppFMATRIX*, float, unsigned char, unsigned char
 void pppDrawMesh(pppModelSt*, Vec*, int);
 
 extern "C" {
-int GetTexture__8CMapMeshFP12CMaterialSetRi(CMapMesh* mapMesh, CMaterialSet* materialSet, int& textureIndex);
-
 int GetBackBufferRect__8CGraphicFRiRiRiRii(CGraphic*, int&, int&, int&, int&, int);
 }
 
@@ -115,7 +113,7 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
 
     model = (pppModelSt*)pppEnvStPtr->m_mapMeshPtr[param_2->m_dataValIndex];
     colorInfo = (YmDeformationMdlColorInfo*)((u8*)pppYmDeformationMdl + param_3->m_serializedDataOffsets[1] + 0x80);
-    textureBase = GetTexture__8CMapMeshFP12CMaterialSetRi((CMapMesh*)model, pppEnvStPtr->m_materialSetPtr, textureIndex);
+    textureBase = reinterpret_cast<int>(reinterpret_cast<CMapMesh*>(model)->GetTexture(pppEnvStPtr->m_materialSetPtr, textureIndex));
 
     PSMTXIdentity(indWarpMtx);
     pppSetBlendMode(0);

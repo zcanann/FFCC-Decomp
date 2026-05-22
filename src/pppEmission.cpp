@@ -41,7 +41,6 @@ void pppHeapUseRate__FPQ27CMemory6CStage(CMemory::CStage* stage);
 void SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(void*, void*, unsigned int, int, int);
 void SetObjMatrix__12CMaterialManFPA4_fPA4_f(void*, float (*)[4], float (*)[4]);
 void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(void*, long, float&, float&, float&, float, float&, float&);
-int GetTexture__8CMapMeshFP12CMaterialSetRi(CMapMesh* mapMesh, CMaterialSet* materialSet, int& textureIndex);
 }
 
 struct EmissionDisplayList {
@@ -185,10 +184,8 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, pppEm
         return;
     }
 
-    state->m_texture = GetTexture__8CMapMeshFP12CMaterialSetRi(
-        pppEnvStPtr->m_mapMeshPtr[param_2->m_dataValIndex],
-        pppEnvStPtr->m_materialSetPtr,
-        textureIndex);
+    state->m_texture =
+        reinterpret_cast<int>(pppEnvStPtr->m_mapMeshPtr[param_2->m_dataValIndex]->GetTexture(pppEnvStPtr->m_materialSetPtr, textureIndex));
 
     u8* payload = param_2->m_payload;
     if (payload[9] != 0) {

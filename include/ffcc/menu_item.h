@@ -48,6 +48,15 @@ public:
     void DrawInit();
     void DrawRect(unsigned long, float, float, float, float, float, float, float, float, float);
     void DrawRect(unsigned long, float, float, float, float, float, float, _GXColor*, float, float, float);
+    void DrawSingleIcon(int, int, int, float, int, float);
+    double CalcListPos(int, int, int);
+    void DrawListPosMark(float, float, float);
+    void DrawSingWin(short);
+    void DrawSingWinMess(int, int, int);
+    int SingWinMessHeight();
+    void DrawCursor(int, int, float);
+    void DrawSingLife();
+    void DrawHelpMessage(int, CFont*, int, int, _GXColor, int, float, float);
 
     void ItemInit();
     void ItemInit1();
@@ -57,6 +66,8 @@ public:
     void ItemDraw();
     int ItemCtrlCur();
     void SingLifeInit(int);
+    int SingGetLetterAttachflg();
+    void LetterSetAttachItem(unsigned int, int);
     int EquipChk(int);
     int GetItemType(int, int);
     void GetSingWinSize(int, short*, short*, int);

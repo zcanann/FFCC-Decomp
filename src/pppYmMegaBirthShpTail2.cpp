@@ -19,8 +19,6 @@ extern int gPppCalcDisabled;
 
 extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void*);
 extern "C" void pppSetBlendMode(unsigned char);
-extern "C" void calc__FP11_pppPObjectP20VYmMegaBirthShpTail2P20PYmMegaBirthShpTail2P14_PARTICLE_DATAP6VColorP15_PARTICLE_COLOR(
-    _pppPObject*, VYmMegaBirthShpTail2*, PYmMegaBirthShpTail2*, _PARTICLE_DATA*, VColor*, _PARTICLE_COLOR*);
 static pppFMATRIX g_matUnit2;
 
 extern const char s_pppYmMegaBirthShpTail2_cpp_801d9c68[] = "pppYmMegaBirthShpTail2.cpp";
@@ -333,8 +331,7 @@ void pppFrameYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, PYmMegaBirthShp
 
             for (; i < work->m_maxParticles; i++) {
                 if (*(u16*)(particleData + 0x22) != 0) {
-                    calc__FP11_pppPObjectP20VYmMegaBirthShpTail2P20PYmMegaBirthShpTail2P14_PARTICLE_DATAP6VColorP15_PARTICLE_COLOR(
-                        (_pppPObject*)object, work, param, (_PARTICLE_DATA*)particleData, colorWork, particleColor);
+                    calc((_pppPObject*)object, work, param, (_PARTICLE_DATA*)particleData, colorWork, particleColor);
                 } else {
                     if ((*(u16*)((u8*)&param->m_matrix + 0x12) <= work->m_lifeLimit) &&
                         (spawnCount < *(u16*)((u8*)&param->m_matrix + 0x10))) {
@@ -369,10 +366,9 @@ void pppFrameYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, PYmMegaBirthShp
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void calc__FP11_pppPObjectP20VYmMegaBirthShpTail2P20PYmMegaBirthShpTail2P14_PARTICLE_DATAP6VColorP15_PARTICLE_COLOR(
-    _pppPObject* pppPObject, VYmMegaBirthShpTail2* vYmMegaBirthShpTail2,
-    PYmMegaBirthShpTail2* pYmMegaBirthShpTail2, _PARTICLE_DATA* particleData, VColor* vColor,
-    _PARTICLE_COLOR* particleColor)
+void calc(_pppPObject* pppPObject, VYmMegaBirthShpTail2* vYmMegaBirthShpTail2,
+          PYmMegaBirthShpTail2* pYmMegaBirthShpTail2, _PARTICLE_DATA* particleData,
+          VColor* vColor, _PARTICLE_COLOR* particleColor)
 {
     s32 alpha = ((u8*)vColor)[0xb];
     u8* color = (u8*)particleData;

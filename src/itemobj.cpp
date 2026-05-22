@@ -1493,10 +1493,9 @@ void CGItemObj::onFramePreCalc()
 void CGItemObj::onDestroy()
 {
 	unsigned char* self = (unsigned char*)this;
-	CCharaPcs::CHandle* handle = m_pendingModelHandle;
 
-	if (handle != 0) {
-		delete handle;
+	if (*(void**)(self + 0x564) != 0) {
+		delete reinterpret_cast<CCharaPcs::CHandle*>(*(void**)(self + 0x564));
 	}
 
 	DeleteParticleSlot__13CFlatRuntime2Fii(CFlat, *(int*)(self + 0x55c), 0);

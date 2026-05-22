@@ -238,6 +238,7 @@ public:
     void WMSubMenuInit();
     void WMChgMenu();
     void GetOptionData();
+    int GetItemType(int, int);
     void ArtiInit();
     void ArtiInit1();
     int ArtiOpen();

@@ -2,6 +2,7 @@
 #include "ffcc/color.h"
 #include "ffcc/fontman.h"
 #include "ffcc/gobjwork.h"
+#include "ffcc/gxfunc.h"
 #include "ffcc/joybus.h"
 #include "ffcc/linkage.h"
 #include "ffcc/math.h"
@@ -25,16 +26,6 @@ extern "C" void SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(void*, int);
 extern "C" void DrawInit__8CMenuPcsFv(void*);
 extern "C" void DrawRect__8CMenuPcsFUlfffffffff(void*, unsigned long, float, float, float, float, float, float, float, float, float);
 extern "C" void SetExternalTlut__8CTextureFPvi(void*, void*, int);
-extern "C" void _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(
-    int, int, int, int, int);
-extern "C" void _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg(
-    int, int, int, int, int);
-extern "C" void _GXSetTevColorOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(
-    int, int, int, int, int, int);
-extern "C" void _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(
-    int, int, int, int, int, int);
-extern "C" void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
-extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
 extern "C" asm void MTX44MultVec4__5CMathFPA4_fP3VecP5Vec4d(register void*, register float (*)[4], register Vec*,
                                                             register void*);
 
@@ -272,12 +263,12 @@ void CRingMenu::DrawIcon()
 	}
 	SetExternalTlut__8CTextureFPvi(MenuPcs.m_textures[0x18], tlut, 1);
 	GXSetTevDirect(GX_TEVSTAGE2);
-	_GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(2, 0xF, 0, 0xC, 0xB);
-	_GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg(2, 7, 0, 6, 7);
-	_GXSetTevColorOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(2, 0, 0, 3, 1, 0);
-	_GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(2, 0, 0, 0, 1, 0);
-	_GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(2, 0, 0);
-	_GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(2, 0xFF, 0xFF, 4);
+	_GXSetTevColorIn(GX_TEVSTAGE2, GX_CC_ZERO, GX_CC_CPREV, GX_CC_ONE, GX_CC_RASA);
+	_GXSetTevAlphaIn(GX_TEVSTAGE2, GX_CA_ZERO, GX_CA_APREV, GX_CA_KONST, GX_CA_ZERO);
+	_GXSetTevColorOp(GX_TEVSTAGE2, GX_TEV_ADD, GX_TB_ZERO, GX_CS_DIVIDE_2, GX_TRUE, GX_TEVPREV);
+	_GXSetTevAlphaOp(GX_TEVSTAGE2, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+	_GXSetTevSwapMode(GX_TEVSTAGE2, GX_TEV_SWAP0, GX_TEV_SWAP0);
+	_GXSetTevOrder(GX_TEVSTAGE2, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
 
 	CColor iconColor(0xFF, 0xFF, 0xFF, blinkAlpha);
 	MenuPcs.SetColor(iconColor);

@@ -19,8 +19,6 @@ CMaterialMan MaterialMan;
 
 extern "C" unsigned long UnkMaterialSetGetter(void*);
 extern "C" void __ct__6CColorFv(void*);
-extern "C" void __ct__4CRefFv(void*);
-extern "C" void __dt__4CRefFv(void*, int);
 extern "C" void __ct__10CTexScrollFv(void*);
 extern "C" void __dt__10CTexScrollFv(void*, int);
 extern "C" int CheckName__8CTextureFPc(CTexture*, char*);
@@ -33,10 +31,8 @@ extern "C" float Get__12CMapKeyFrameFv(CMapKeyFrame*);
 extern "C" void Calc__12CMapKeyFrameFv(CMapKeyFrame*);
 extern "C" void ReadFrame__12CMapKeyFrameFR10CChunkFilei(CMapKeyFrame*, CChunkFile*);
 extern "C" void ReadKey__12CMapKeyFrameFR10CChunkFilei(CMapKeyFrame*, CChunkFile*, int);
-extern "C" void* __vt__9CMaterial[];
 extern "C" void* __vt__8CManager[];
 extern "C" void* __vt__12CMaterialMan[];
-extern "C" void* __vt__12CMaterialSet[];
 extern "C" void __ct__22CPtrArray_P9CMaterial_Fv(void*);
 extern float FLOAT_8032faf0;
 extern float FLOAT_8032faf4;
@@ -223,37 +219,7 @@ static int HighestSetBit(unsigned int value)
 
 static CMaterial* AllocMaterial()
 {
-    unsigned char* material = reinterpret_cast<unsigned char*>(
-        Memory._Alloc(
-            0xA8,
-            MaterialMan.GetMemoryStage(),
-            const_cast<char*>(s_materialman_cpp),
-            0xCFF,
-            0));
-    if (material == 0) {
-        return 0;
-    }
-
-    __ct__4CRefFv(material);
-    *reinterpret_cast<void**>(material) = __vt__9CMaterial;
-    __construct_array(material + 0x4C, reinterpret_cast<ConstructorDestructor>(__ct__10CTexScrollFv),
-                      reinterpret_cast<ConstructorDestructor>(__dt__10CTexScrollFv), 0x14, 4);
-    memset(material + 8, 0, 0x10);
-    *reinterpret_cast<int*>(material + 0x9C) = -1;
-    material[0xA0] = 4;
-    material[0xA1] = 1;
-    material[0xA2] = 0;
-    material[0xA4] = 0;
-    *reinterpret_cast<void**>(material + 0x3C) = 0;
-    *reinterpret_cast<void**>(material + 0x40) = 0;
-    *reinterpret_cast<void**>(material + 0x44) = 0;
-    *reinterpret_cast<void**>(material + 0x48) = 0;
-    material[0x34] = 0;
-    material[0x35] = 0;
-    material[0x36] = 0;
-    material[0xA5] = 0;
-
-    return reinterpret_cast<CMaterial*>(material);
+    return new (MaterialMan.GetMemoryStage(), const_cast<char*>(s_materialman_cpp), 0xCFF) CMaterial;
 }
 
 static void AddTextureIndex(CMaterial* material, unsigned short textureIndex)
@@ -2524,8 +2490,6 @@ CTexScroll::CTexScroll()
  */
 CMaterial::~CMaterial()
 {
-    *reinterpret_cast<void**>(this) = __vt__9CMaterial;
-
     int numTexture = static_cast<int>(*reinterpret_cast<unsigned short*>(Ptr(this, 0x18)));
     for (int i = 0; i < numTexture; i++) {
         unsigned char* textureRef = Ptr(this, 0x3C + (i << 2));
@@ -2988,30 +2952,10 @@ void CMaterialSet::SetPartFromTextureSet(CTextureSet* textureSet, int pdtSlotInd
                 goto next;
             }
 
-            unsigned char* material = reinterpret_cast<unsigned char*>(
-                Memory._Alloc(
-                    0xA8, *reinterpret_cast<CMemory::CStage**>(Ptr(&MaterialMan, 0x218)),
-                    const_cast<char*>(s_materialman_cpp), 0xEE4, 0));
-            if (material != 0) {
-                __ct__4CRefFv(material);
-                *reinterpret_cast<void**>(material) = __vt__9CMaterial;
-                __construct_array(material + 0x4C, reinterpret_cast<ConstructorDestructor>(__ct__10CTexScrollFv),
-                                  reinterpret_cast<ConstructorDestructor>(__dt__10CTexScrollFv), 0x14, 4);
-                memset(material + 8, 0, 0x10);
-                *reinterpret_cast<int*>(material + 0x9C) = -1;
-                material[0xA0] = 4;
-                material[0xA1] = 1;
-                material[0xA2] = 0;
-                material[0xA4] = 0;
-                *reinterpret_cast<int*>(material + 0x3C) = 0;
-                *reinterpret_cast<void**>(material + 0x40) = 0;
-                *reinterpret_cast<int*>(material + 0x44) = 0;
-                *reinterpret_cast<void**>(material + 0x48) = 0;
-                material[0x34] = 0;
-                material[0x35] = 0;
-                material[0x36] = 0;
-                material[0xA5] = 0;
-            }
+            CMaterial* newMaterial =
+                new (*reinterpret_cast<CMemory::CStage**>(Ptr(&MaterialMan, 0x218)),
+                     const_cast<char*>(s_materialman_cpp), 0xEE4) CMaterial;
+            unsigned char* material = reinterpret_cast<unsigned char*>(newMaterial);
 
             *reinterpret_cast<int*>(material + 0x24) = -0xACE10;
             *reinterpret_cast<void**>(material + 0x28) = 0;
@@ -3171,7 +3115,6 @@ void* CMaterialSet::operator new(unsigned long size, CMemory::CStage*, char* fil
 CMaterialSet::~CMaterialSet()
 {
     CPtrArray<CMaterial*>* const materials = reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(this, 8));
-    *reinterpret_cast<void**>(this) = __vt__12CMaterialSet;
 
     for (unsigned long i = 0; i < UnkMaterialSetGetter(materials); i++) {
         CMaterial* const material = (*materials)[i];

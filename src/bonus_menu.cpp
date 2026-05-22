@@ -16,22 +16,11 @@ extern "C" void SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(CMenuPcs*, int);
 extern "C" void DrawRect__8CMenuPcsFUlfffffffff(CMenuPcs*, unsigned long, float, float, float, float, float, float, float, float, float);
 extern "C" void DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(CMenuPcs*, unsigned long, float, float, float, float, float, float, GXColor*, float, float, float);
 extern "C" void DrawInit__8CMenuPcsFv(CMenuPcs*);
-extern "C" void DrawMcWin__8CMenuPcsFss(CMenuPcs*, short, short);
-extern "C" void DrawMcWinMess__8CMenuPcsFii(CMenuPcs*, int, int);
 extern "C" int GetYesNoXPos__8CMenuPcsFi(CMenuPcs*, int);
-extern "C" void DrawCursor__8CMenuPcsFiif(CMenuPcs*, int, int, float);
-extern "C" unsigned short GetButtonDown__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" void GetSingWinSize__8CMenuPcsFiPsPsi(CMenuPcs*, short, short*, short*, int);
-extern "C" void GetWinSize__8CMenuPcsFiPsPsi(CMenuPcs*, int, short*, short*, int);
-extern "C" void SetMcWinInfo__8CMenuPcsFii(CMenuPcs*, int, int);
-extern "C" void SetProjection__8CMenuPcsFi(CMenuPcs*, int);
-extern "C" void SetLight__8CMenuPcsFi(CMenuPcs*, int);
-extern "C" void RestoreProjection__8CMenuPcsFv(CMenuPcs*);
 extern "C" void loadTexture__8CMenuPcsFPPciiPQ28CMenuPcs4CTmpiii(CMenuPcs*, char**, int, int, void*, int, int, int);
 extern "C" void loadFont__8CMenuPcsFiPcii(CMenuPcs*, int, char*, int, int);
-extern "C" void CallWorldParam__8CMenuPcsFiii(CMenuPcs*, int, int, int);
 extern "C" void changeMode__8CMenuPcsFQ28CMenuPcs8MENUMODE(CMenuPcs*, int);
-extern "C" unsigned int BindEffect__8CMenuPcsFiii(CMenuPcs*, int, int, int);
 extern "C" void freeTexture__8CMenuPcsFiiii(CMenuPcs*, int, int, int, int);
 extern "C" int sprintf(char*, const char*, ...);
 extern "C" int rand(void);
@@ -752,13 +741,13 @@ static void DrawBonusMcWinOverlay(CMenuPcs* menu, int statePtr)
 	}
 
 	DrawInit__8CMenuPcsFv(menu);
-	DrawMcWin__8CMenuPcsFss(menu, -1, 1);
+	menu->DrawMcWin(-1, 1);
 	if (*(short*)(auxPtr + 10) == 1) {
-		DrawMcWinMess__8CMenuPcsFii(menu, 0x18, 1);
+		menu->DrawMcWinMess(0x18, 1);
 		DrawInit__8CMenuPcsFv(menu);
 		int cursorX = GetYesNoXPos__8CMenuPcsFi(menu, (int)*(short*)(statePtr + 0x28));
 		float cursorY = (float)(*(short*)(auxPtr + 2) + *(short*)(auxPtr + 6) - 0x3e);
-		DrawCursor__8CMenuPcsFiif(menu, cursorX, (int)cursorY, 1.0f);
+		menu->DrawCursor(cursorX, (int)cursorY, 1.0f);
 	}
 }
 
@@ -1057,7 +1046,7 @@ static unsigned short GetBonusAdvanceButtons(CMenuPcs* menu)
 		if (Game.m_scriptFoodBase[i] == 0) {
 			continue;
 		}
-		buttons = (unsigned short)(buttons | GetButtonDown__8CMenuPcsFi(menu, i));
+		buttons = (unsigned short)(buttons | menu->GetButtonDown(i));
 	}
 	return buttons;
 }
@@ -1787,8 +1776,8 @@ void CMenuPcs::DrawResultOpenAnim()
 		if (sprite->kind == -2) {
 			CCharaPcs::CHandle* handle = GetBonusResultOpenHandle(this, modelIndex);
 			if (handle != 0) {
-				SetProjection__8CMenuPcsFi(this, modelIndex);
-				SetLight__8CMenuPcsFi(this, 1);
+				SetProjection(modelIndex);
+				SetLight(1);
 				unsigned int oldFlags = handle->m_flags;
 				handle->m_flags = 0x300543;
 				if (handle->m_model != 0) {
@@ -1796,7 +1785,7 @@ void CMenuPcs::DrawResultOpenAnim()
 				}
 				handle->Draw(5);
 				handle->m_flags = oldFlags;
-				RestoreProjection__8CMenuPcsFv(this);
+				RestoreProjection();
 			}
 			modelIndex++;
 		} else if (sprite->kind == -1) {
@@ -2382,8 +2371,8 @@ void CMenuPcs::DrawResultCloseAnim()
 		} else if (sprite->kind == -2) {
 			CCharaPcs::CHandle* handle = GetBonusResultOpenHandle(this, modelIndex);
 			if (handle != 0) {
-				SetProjection__8CMenuPcsFi(this, modelIndex);
-				SetLight__8CMenuPcsFi(this, 1);
+				SetProjection(modelIndex);
+				SetLight(1);
 				unsigned int oldFlags = handle->m_flags;
 				handle->m_flags = 0x300543;
 				if (handle->m_model != 0) {
@@ -2391,7 +2380,7 @@ void CMenuPcs::DrawResultCloseAnim()
 				}
 				handle->Draw(5);
 				handle->m_flags = oldFlags;
-				RestoreProjection__8CMenuPcsFv(this);
+				RestoreProjection();
 			} else {
 				DrawBonusCnt((CMenuPcs::Sprt2*)sprite, GetBonusResultValueByActiveIndex(digitIndex++));
 			}
@@ -2724,7 +2713,7 @@ void CMenuPcs::CalcSelectWait()
 	int activePartyCount = GetActiveBonusPartyCount();
 	BonusPartySummary* currentParty = GetBonusPartySummary(currentPartyIndex);
 	int padSlot = (currentParty != 0) ? currentParty->m_partySlot : 0;
-	unsigned short down = GetButtonDown__8CMenuPcsFi(this, padSlot);
+	unsigned short down = GetButtonDown(padSlot);
 	unsigned char unavailableMask = GetBonusUnavailableMask(statePtr, currentParty);
 
 	switch (promptMode) {
@@ -2779,8 +2768,8 @@ void CMenuPcs::CalcSelectWait()
 		} else if ((down & 0x200) != 0) {
 			short winW = 0;
 			short winH = 0;
-			GetWinSize__8CMenuPcsFiPsPsi(this, 0x18, &winW, &winH, 1);
-			SetMcWinInfo__8CMenuPcsFii(this, (int)winW, (int)winH);
+			GetWinSize(0x18, &winW, &winH, 1);
+			SetMcWinInfo((int)winW, (int)winH);
 			promptMode = 0;
 			confirmSel = 1;
 			Sound.PlaySe(3, 0x40, 0x7f, 0);

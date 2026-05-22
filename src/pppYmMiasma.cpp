@@ -23,7 +23,6 @@ extern const float FLOAT_8033065c;
 extern const float FLOAT_80330660;
 extern const float FLOAT_80330664;
 extern const float FLOAT_80330668;
-extern "C" void pppNormalize__FR3Vec3Vec(float*, Vec*);
 extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void*);
 extern "C" void pppSetBlendMode(unsigned char);
 extern "C" const char s_pppYmMiasma_cpp_801D9CA8[] = "pppYmMiasma.cpp";
@@ -566,7 +565,7 @@ void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* 
     particleData->m_matrix[0][2] = trigCos;
     particleData->m_matrix[1][2] = trigCos;
     Vec normalizedPos = *(Vec*)particleData->m_matrix[1];
-    pppNormalize__FR3Vec3Vec(particleData->m_matrix[1], &normalizedPos);
+    pppNormalize(*reinterpret_cast<Vec*>(particleData->m_matrix[1]), normalizedPos);
     if ((s32)Game.m_currentSceneId != 7) {
         basePos.x = pppMngStPtr->m_matrix.value[0][3];
         basePos.y = pppMngStPtr->m_matrix.value[1][3];

@@ -2666,7 +2666,7 @@ int CCharaPcs::CHandle::LoadAnim(
     return 1;
 }
 
-bool CCharaPcs::CHandle::IsModelLoaded(int checkModelField)
+int CCharaPcs::CHandle::IsModelLoaded(int checkModelField)
 {
 	if ((m_asyncState == 0 || m_asyncState == 7)
 		&& m_model != nullptr
@@ -3129,14 +3129,9 @@ void CCharaPcs::CHandle::loadModelASyncFrame()
  * Address:	TODO
  * Size:	TODO
  */
-bool CCharaPcs::CHandle::IsLoadModelASyncCompleted()
+int CCharaPcs::CHandle::IsLoadModelASyncCompleted()
 {
-    if (m_asyncState == 7)
-	{
-		return true;
-	}
-
-	return false;
+    return m_asyncState == 7;
 }
 
 /*

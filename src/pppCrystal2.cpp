@@ -1,5 +1,6 @@
 #include "ffcc/pppCrystal2.h"
 #include "ffcc/graphic.h"
+#include "ffcc/gxfunc.h"
 #include "ffcc/render_buffers.h"
 #include "ffcc/mapmesh.h"
 #include "ffcc/p_camera.h"
@@ -15,22 +16,6 @@ extern int __float_nan[];
 extern const double DOUBLE_80331FC0 = 2.4;
 extern const float kPppScreenQuakeZero[2] = {0.0f, 0.0f};
 extern "C" unsigned int __cvt_fp2unsigned(double);
-
-extern "C" {
-int GetTexture__8CMapMeshFP12CMaterialSetRi(CMapMesh* mapMesh, CMaterialSet* materialSet, int& textureIndex);
-
-void pppDrawMesh__FP10pppModelStP3Veci(pppModelSt*, Vec*, int);
-void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
-void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
-void _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(
-    int, int, int, int, int);
-void _GXSetTevColorOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(int, int, int, int, int,
-                                                                                           int);
-void _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg(
-    int, int, int, int, int);
-void _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(int, int, int, int, int,
-                                                                                           int);
-}
 
 struct Crystal2IndTexMtx {
     f32 value[2][3];
@@ -116,7 +101,7 @@ void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, _pppC
     pppCrystal2ColorBlock* colorBlock = (pppCrystal2ColorBlock*)((u8*)pppCrystal2 + serializedDataOffsets[1] + 0x80);
     pppCrystal2RenderObject* object;
     pppModelSt* model;
-    int sourceTex;
+    void* sourceTex;
     _GXTexObj backTexObj;
     int textureIndex;
     Crystal2IndTexMtx indTexMtx;
@@ -129,16 +114,15 @@ void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, _pppC
 
     if (dataValIndex != 0xFFFF) {
         sourceTex = 0;
-        model = (pppModelSt*)((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[dataValIndex];
+        model = (pppModelSt*)pppEnvStPtr->m_mapMeshPtr[dataValIndex];
         textureIndex = 0;
-        GetTexture__8CMapMeshFP12CMaterialSetRi((CMapMesh*)model, pppEnvStPtr->m_materialSetPtr, textureIndex);
+        ((CMapMesh*)model)->GetTexture(pppEnvStPtr->m_materialSetPtr, textureIndex);
         if (param_2->m_payload[0] == 0) {
             if (param_2->m_initWOrk == 0xFFFF) {
                 return;
             }
-            sourceTex = GetTexture__8CMapMeshFP12CMaterialSetRi(
-                ((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[param_2->m_initWOrk], pppEnvStPtr->m_materialSetPtr,
-                textureIndex);
+            sourceTex =
+                pppEnvStPtr->m_mapMeshPtr[param_2->m_initWOrk]->GetTexture(pppEnvStPtr->m_materialSetPtr, textureIndex);
         }
 
         pppSetBlendMode(0);
@@ -173,7 +157,7 @@ void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, _pppC
         PSMTXTranspose(normalMtx, normalMtx);
 
         if (param_2->m_payload[0] == 0) {
-            GXLoadTexObj((_GXTexObj*)(sourceTex + 0x28), GX_TEXMAP1);
+            GXLoadTexObj((_GXTexObj*)((u8*)sourceTex + 0x28), GX_TEXMAP1);
         } else {
             GXLoadTexObj(work->m_refractionTexObj, GX_TEXMAP1);
         }
@@ -192,14 +176,12 @@ void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, _pppC
         GXLoadTexObj(&backTexObj, GX_TEXMAP0);
         GXLoadTexMtxImm(drawMtx, 0x1E, GX_MTX3x4);
         GXSetTexCoordGen2((GXTexCoordID)1, (GXTexGenType)0, (GXTexGenSrc)0, 0x1E, GX_FALSE, 0x7D);
-        _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 1, 0, 4);
-        _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
-        _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(
-            0, 0xF, 8, 0xC, 0xA);
-        _GXSetTevColorOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(0, 0, 0, 0, 1, 0);
-        _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg(0, 7, 7,
-                                                                                                               7, 6);
-        _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(0, 0, 0, 0, 1, 0);
+        _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD1, GX_TEXMAP0, GX_COLOR0A0);
+        _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
+        _GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_TEXC, GX_CC_RASC, GX_CC_CPREV);
+        _GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+        _GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
+        _GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
         GXSetNumTevStages(1);
         GXSetNumTexGens(2);
         GXClearVtxDesc();
@@ -207,7 +189,7 @@ void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, _pppC
         GXSetVtxDesc((GXAttr)10, (GXAttrType)3);
         GXSetVtxDesc((GXAttr)0xB, (GXAttrType)3);
         GXSetVtxDesc((GXAttr)0xD, (GXAttrType)3);
-        pppDrawMesh__FP10pppModelStP3Veci(model, 0, 0);
+        pppDrawMesh(model, 0, 0);
         gUtil.DisableIndMtx();
     }
 }

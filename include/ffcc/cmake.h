@@ -10,6 +10,16 @@ void GetCharaCnt(char*);
 class CMenuPcs
 {
 public:
+	enum FMT
+	{
+		TODO_FMT
+	};
+
+	enum TEX
+	{
+		TODO_TEX
+	};
+
 	CMenuPcs();
 	~CMenuPcs();
 
@@ -39,6 +49,8 @@ public:
 	void PCAnimCtrl();
 	void SetProjection(int);
 	void SetLight(int);
+	void SetAttrFmt(FMT);
+	void SetTexture(TEX);
 	void RestoreProjection();
 	void SetMcWinInfo(int, int);
 	void DrawMcWin(short, short);

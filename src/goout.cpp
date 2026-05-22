@@ -9,7 +9,6 @@ CGoOutMenu* g_pGoOutMenu;
 int g_freeCaravanIdx;
 
 extern "C" int CalcGoOutSelChar__8CMenuPcsFUcUc(CMenuPcs*, unsigned char, unsigned char);
-extern "C" void Calc__10CGoOutMenuFv(CGoOutMenu*);
 extern "C" const char* g_strGooutMes[];
 
 struct CMenuPcsGoOutLayout
@@ -2068,7 +2067,7 @@ void CGoOutMenu::Calc()
 void CalcGoOutMenu()
 {
     g_pGoOutMenu = &g_GoOutMenu;
-    Calc__10CGoOutMenuFv(&g_GoOutMenu);
+    g_GoOutMenu.Calc();
 }
 
 /*

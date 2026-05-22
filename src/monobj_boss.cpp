@@ -38,8 +38,6 @@ extern "C" void PutParticleWork__13CFlatRuntime2Fv(void*);
 extern "C" void moveFrame__8CGMonObjFv(CGMonObj*);
 extern "C" void rotTarget__8CGMonObjFif(CGMonObj*, int, float);
 extern "C" void CGMonObj_ResetActionState(CGMonObj*);
-extern "C" CGMonObj* FindGMonObjFirst__13CFlatRuntime2Fv(void*);
-extern "C" CGMonObj* FindGMonObjNext__13CFlatRuntime2FP8CGMonObj(void*, CGMonObj*);
 extern "C" void teleport__8CGMonObjFiiiiiiiiiP3VecRiR3Vec(CGMonObj*, int, int, int, int, int, int, int, int, int,
                                                            Vec*, int&, Vec&);
 extern float FLOAT_80331dd0;
@@ -643,14 +641,14 @@ void CGMonObj::frameStatFuncOrcKing()
 		changeStat__8CGPrgObjFiii(prgObj, -9, 0, 0);
 		object->SetAnimSlot(0, 0);
 
-		CGMonObj* monObj = FindGMonObjFirst__13CFlatRuntime2Fv(CFlat);
+		CGMonObj* monObj = gCFlatRuntime2.FindGMonObjFirst();
 		while (monObj != 0) {
 			if (monObj != this) {
 				u8* monBytes = reinterpret_cast<u8*>(monObj);
 				u16* script = *reinterpret_cast<u16**>(monBytes + 0x58);
 				reinterpret_cast<CGCharaObj*>(monObj)->addHp(-script[0x1A / 2], 0);
 			}
-			monObj = FindGMonObjNext__13CFlatRuntime2FP8CGMonObj(CFlat, monObj);
+			monObj = gCFlatRuntime2.FindGMonObjNext(monObj);
 		}
 		*reinterpret_cast<int*>(SoundBuffer + 1260) = 1;
 	}

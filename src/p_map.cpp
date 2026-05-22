@@ -138,7 +138,6 @@ unsigned int s_CMapPcsRttiBase1[5] = {
     0,
     0,
 };
-extern "C" void _WaitDrawDone__8CGraphicFPci(CGraphic*, const char*, int);
 extern const char s_p_map_cpp_801d7728[];
 extern const char s_map_load_ok_fmt[];
 extern const char s_dvd_map_stage_map_fmt[];
@@ -656,7 +655,7 @@ void CMapPcs::drawBefore()
         Mtx44 screenMtx;
 
         if (static_cast<int>(Game.m_currentSceneId) == 3) {
-            _WaitDrawDone__8CGraphicFPci(&Graphic, s_p_map_cpp_801d7728, 0x298);
+            Graphic._WaitDrawDone(const_cast<char*>(s_p_map_cpp_801d7728), 0x298);
         }
 
         MaterialMan.InitVtxFmt(-1, GX_F32, 0, GX_RGBA4, 0xE, GX_RGBA4, 0xA);
@@ -690,7 +689,7 @@ void CMapPcs::drawBefore()
         MapMng.DrawBefore();
 
         if (static_cast<int>(Game.m_currentSceneId) == 3) {
-            _WaitDrawDone__8CGraphicFPci(&Graphic, s_p_map_cpp_801d7728, 0x2B2);
+            Graphic._WaitDrawDone(const_cast<char*>(s_p_map_cpp_801d7728), 0x2B2);
         }
     }
 }
@@ -712,7 +711,7 @@ void CMapPcs::draw()
         Mtx44 screenMtx;
 
         if (static_cast<int>(Game.m_currentSceneId) == 3) {
-            _WaitDrawDone__8CGraphicFPci(&Graphic, s_p_map_cpp_801d7728, 0x2C4);
+            Graphic._WaitDrawDone(const_cast<char*>(s_p_map_cpp_801d7728), 0x2C4);
         }
 
         MaterialMan.InitVtxFmt(-1, GX_F32, 0, GX_RGBA4, 0xE, GX_RGBA4, 0xA);
@@ -746,7 +745,7 @@ void CMapPcs::draw()
         MapMng.Draw();
 
         if (static_cast<int>(Game.m_currentSceneId) == 3) {
-            _WaitDrawDone__8CGraphicFPci(&Graphic, s_p_map_cpp_801d7728, 0x2E0);
+            Graphic._WaitDrawDone(const_cast<char*>(s_p_map_cpp_801d7728), 0x2E0);
         }
     }
 }
@@ -769,7 +768,7 @@ void CMapPcs::drawBeforeViewer()
         Mtx cameraMtx;
 
         if (static_cast<int>(Game.m_currentSceneId) == 3) {
-            _WaitDrawDone__8CGraphicFPci(&Graphic, s_p_map_cpp_801d7728, 0x298);
+            Graphic._WaitDrawDone(const_cast<char*>(s_p_map_cpp_801d7728), 0x298);
         }
 
         MaterialMan.InitVtxFmt(-1, GX_F32, 0, GX_RGBA4, 0xE, GX_RGBA4, 0xA);
@@ -803,7 +802,7 @@ void CMapPcs::drawBeforeViewer()
         MapMng.DrawBefore();
 
         if (static_cast<int>(Game.m_currentSceneId) == 3) {
-            _WaitDrawDone__8CGraphicFPci(&Graphic, s_p_map_cpp_801d7728, 0x2B2);
+            Graphic._WaitDrawDone(const_cast<char*>(s_p_map_cpp_801d7728), 0x2B2);
         }
     }
 }
@@ -826,7 +825,7 @@ void CMapPcs::drawViewer()
         Mtx cameraMtx;
 
         if (static_cast<int>(Game.m_currentSceneId) == 3) {
-            _WaitDrawDone__8CGraphicFPci(&Graphic, s_p_map_cpp_801d7728, 0x2C4);
+            Graphic._WaitDrawDone(const_cast<char*>(s_p_map_cpp_801d7728), 0x2C4);
         }
 
         MaterialMan.InitVtxFmt(-1, GX_F32, 0, GX_RGBA4, 0xE, GX_RGBA4, 0xA);
@@ -860,7 +859,7 @@ void CMapPcs::drawViewer()
         MapMng.Draw();
 
         if (static_cast<int>(Game.m_currentSceneId) == 3) {
-            _WaitDrawDone__8CGraphicFPci(&Graphic, s_p_map_cpp_801d7728, 0x2E0);
+            Graphic._WaitDrawDone(const_cast<char*>(s_p_map_cpp_801d7728), 0x2E0);
         }
     }
 }

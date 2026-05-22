@@ -21,8 +21,6 @@ extern "C" int SingGetLetterAttachflg__8CMenuPcsFv(CMenuPcs*);
 extern "C" void SingSetLetterAttachflg__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" void LetterInit1__8CMenuPcsFv(CMenuPcs*);
 extern "C" void SetSingWinScl__8CMenuPcsFf(CMenuPcs*, float);
-extern "C" void MakeAgbString__4CMesFPcPcii(char*, char*, int, int);
-extern "C" const char* GetMenuStr__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" void SetSingDynamicWinMessInfo__8CMenuPcsFiPcPcPcPcPcPcPcPc(CMenuPcs*, int, char*, char*, char*, char*, char*, char*, char*, char*);
 extern "C" void GetSingWinSize__8CMenuPcsFiPsPsi(CMenuPcs*, int, s16*, s16*, int);
 extern "C" void SetMcWinInfo__8CMenuPcsFii(CMenuPcs*, int, int);
@@ -317,26 +315,26 @@ void CMenuPcs::LetterInit2()
 		int value = reinterpret_cast<int*>(flatData->m_tabl[0].m_strings)[itemId];
 		if (Game.m_gameWork.m_languageId == 2) {
 			sprintf(info, s_letterItemInfoFmt,
-			        GetMenuStr__8CMenuPcsFi(this, 0x23),
+			        GetMenuStr(0x23),
 			        value,
-			        GetMenuStr__8CMenuPcsFi(this, 0x24),
-			        GetMenuStr__8CMenuPcsFi(this, 0x22));
+			        GetMenuStr(0x24),
+			        GetMenuStr(0x22));
 		} else {
-			sprintf(info, "%s%d", GetMenuStr__8CMenuPcsFi(this, 0x22), value);
+			sprintf(info, "%s%d", GetMenuStr(0x22), value);
 		}
 	} else {
 		int gil = static_cast<int>(*reinterpret_cast<u16*>(letter + 0x3EE) & 0x1FF) * 100;
 		if (Game.m_gameWork.m_languageId == 2) {
-			sprintf(info, "%d%s%s", gil, GetMenuStr__8CMenuPcsFi(this, 4), GetMenuStr__8CMenuPcsFi(this, 0x22));
+			sprintf(info, "%d%s%s", gil, GetMenuStr(4), GetMenuStr(0x22));
 		} else {
-			sprintf(info, "%s%d%s", GetMenuStr__8CMenuPcsFi(this, 0x22), gil, GetMenuStr__8CMenuPcsFi(this, 4));
+			sprintf(info, "%s%d%s", GetMenuStr(0x22), gil, GetMenuStr(4));
 		}
 	}
 
 	strcpy(left, "");
-	strcat(left, GetMenuStr__8CMenuPcsFi(this, 1), 0x10);
+	strcat(left, GetMenuStr(1), 0x10);
 	strcpy(right, "");
-	strcat(right, GetMenuStr__8CMenuPcsFi(this, 2), 0x10);
+	strcat(right, GetMenuStr(2), 0x10);
 	SetSingDynamicWinMessInfo__8CMenuPcsFiPcPcPcPcPcPcPcPc(this, 3, info, left, right, 0, 0, 0, 0, 0);
 	GetSingWinSize__8CMenuPcsFiPsPsi(this, 0, &winW, &winH, 1);
 	SetMcWinInfo__8CMenuPcsFii(this, static_cast<int>(winW), static_cast<int>(winH));
@@ -376,7 +374,7 @@ void CMenuPcs::LetterInit3()
 	unsigned short msgIndex = *reinterpret_cast<unsigned short*>(caravanWork + s_SelLetter * 0xC + 0x3EC);
 	char** mesPtr = reinterpret_cast<char**>(reinterpret_cast<char*>(&Game.m_cFlatDataArr[1]) + 0x44);
 	strcpy(srcText, mesPtr[(msgIndex & 0x7FC) >> 1]);
-	MakeAgbString__4CMesFPcPcii(workText, srcText, *reinterpret_cast<unsigned short*>(caravanWork + 0x3E2), 0);
+	CMes::MakeAgbString(workText, srcText, *reinterpret_cast<unsigned short*>(caravanWork + 0x3E2), 0);
 
 	s_ReplyMax = 0;
 	char* curLine = workText;
@@ -386,7 +384,7 @@ void CMenuPcs::LetterInit3()
 			*newline = '\0';
 		}
 
-		sprintf(lines[i], "%s%s%s", GetMenuStr__8CMenuPcsFi(this, 0x23), curLine, GetMenuStr__8CMenuPcsFi(this, 0x24));
+		sprintf(lines[i], "%s%s%s", GetMenuStr(0x23), curLine, GetMenuStr(0x24));
 		s_ReplyMax = static_cast<unsigned char>(s_ReplyMax + 1);
 		if (newline == 0) {
 			break;
@@ -399,7 +397,7 @@ void CMenuPcs::LetterInit3()
 
 	int closeLine = s_ReplyMax;
 	s_ReplyMax = static_cast<unsigned char>(s_ReplyMax + 1);
-	strcat(lines[closeLine], GetMenuStr__8CMenuPcsFi(this, 3), 0x80);
+	strcat(lines[closeLine], GetMenuStr(3), 0x80);
 	SetSingDynamicWinMessInfo__8CMenuPcsFiPcPcPcPcPcPcPcPc(
 	    this, s_ReplyMax, lines[0], unused0, unused1, unused2, unused3, unused4, unused5, unused6);
 
@@ -436,47 +434,47 @@ void CMenuPcs::LetterInit4()
 
 	const char* title = subjectTable[(letterWord >> 7) & 0x1FF];
 	if (languageId == 3) {
-		sprintf(lines[0], "%s%s", GetMenuStr__8CMenuPcsFi(this, 0x26), title);
+		sprintf(lines[0], "%s%s", GetMenuStr(0x26), title);
 	} else if (languageId == 2) {
-		sprintf(lines[0], "%s%s", title, GetMenuStr__8CMenuPcsFi(this, 0x26));
+		sprintf(lines[0], "%s%s", title, GetMenuStr(0x26));
 	} else if (languageId == 5) {
-		sprintf(lines[0], "%s%s", GetMenuStr__8CMenuPcsFi(this, 0x26), title);
+		sprintf(lines[0], "%s%s", GetMenuStr(0x26), title);
 	} else if (languageId == 4) {
-		sprintf(lines[0], "%s%s%s", GetMenuStr__8CMenuPcsFi(this, 0x26), title, GetMenuStr__8CMenuPcsFi(this, 0x25));
+		sprintf(lines[0], "%s%s%s", GetMenuStr(0x26), title, GetMenuStr(0x25));
 	} else {
-		sprintf(lines[0], "%s%s%s", GetMenuStr__8CMenuPcsFi(this, 0x25), title, GetMenuStr__8CMenuPcsFi(this, 0x26));
+		sprintf(lines[0], "%s%s%s", GetMenuStr(0x25), title, GetMenuStr(0x26));
 	}
 
-	sprintf(lines[1], "%s%s%s", GetMenuStr__8CMenuPcsFi(this, 0x23), s_ReplyStr, GetMenuStr__8CMenuPcsFi(this, 0x24));
+	sprintf(lines[1], "%s%s%s", GetMenuStr(0x23), s_ReplyStr, GetMenuStr(0x24));
 
 	int lineCount = 2;
 	if (s_Attach != 2) {
 		if (languageId == 2) {
 			if (s_Attach == 0) {
-				sprintf(lines[2], "%s%d%s", GetMenuStr__8CMenuPcsFi(this, 0x23),
+				sprintf(lines[2], "%s%d%s", GetMenuStr(0x23),
 				        reinterpret_cast<int*>(flatData->m_tabl[0].m_strings)[s_AttachItem * 5 + 4],
-				        GetMenuStr__8CMenuPcsFi(this, 0x24));
+				        GetMenuStr(0x24));
 			} else if (s_Attach == 1) {
-				sprintf(lines[2], "%d%s", s_AttachItem, GetMenuStr__8CMenuPcsFi(this, 4));
+				sprintf(lines[2], "%d%s", s_AttachItem, GetMenuStr(4));
 			}
-			strcat(lines[2], GetMenuStr__8CMenuPcsFi(this, 0x28), 0x80);
+			strcat(lines[2], GetMenuStr(0x28), 0x80);
 		} else {
-			strcpy(lines[2], GetMenuStr__8CMenuPcsFi(this, 0x28));
+			strcpy(lines[2], GetMenuStr(0x28));
 			if (s_Attach == 0) {
 				strcat(lines[2], itemTable[s_AttachItem * 5 + 4], 0x80);
 			} else if (s_Attach == 1) {
 				int offs = strlen(lines[2]);
-				sprintf(lines[2] + offs, "%d%s", s_AttachItem, GetMenuStr__8CMenuPcsFi(this, 4));
+				sprintf(lines[2] + offs, "%d%s", s_AttachItem, GetMenuStr(4));
 			}
 		}
 		lineCount = 3;
 	}
 
-	strcat(lines[lineCount], GetMenuStr__8CMenuPcsFi(this, 0x21), 0x80);
+	strcat(lines[lineCount], GetMenuStr(0x21), 0x80);
 	strcpy(lines[lineCount + 1], "");
-	strcat(lines[lineCount + 1], GetMenuStr__8CMenuPcsFi(this, 1), 0x80);
+	strcat(lines[lineCount + 1], GetMenuStr(1), 0x80);
 	strcpy(lines[lineCount + 2], "");
-	strcat(lines[lineCount + 2], GetMenuStr__8CMenuPcsFi(this, 2), 0x80);
+	strcat(lines[lineCount + 2], GetMenuStr(2), 0x80);
 	SetSingDynamicWinMessInfo__8CMenuPcsFiPcPcPcPcPcPcPcPc(
 	    this, lineCount + 3, lines[0], lines[1], lines[2], lines[3], lines[4], lines[5], lines[6], lines[7]);
 
@@ -1043,32 +1041,32 @@ void CMenuPcs::LetterItemWinOpen()
 			int value = reinterpret_cast<int*>(flatData->m_tabl[0].m_strings)[itemId];
 			if (Game.m_gameWork.m_languageId == 2) {
 				sprintf(info, s_letterItemInfoFmt,
-				        GetMenuStr__8CMenuPcsFi(this, 0x23),
+				        GetMenuStr(0x23),
 				        value,
-				        GetMenuStr__8CMenuPcsFi(this, 0x24),
-				        GetMenuStr__8CMenuPcsFi(this, 0x22));
+				        GetMenuStr(0x24),
+				        GetMenuStr(0x22));
 			} else {
-				sprintf(info, "%s%d", GetMenuStr__8CMenuPcsFi(this, 0x22), value);
+				sprintf(info, "%s%d", GetMenuStr(0x22), value);
 			}
 		} else {
 			int gil = static_cast<int>(*reinterpret_cast<u16*>(letter + 0x3EE) & 0x1FF) * 100;
 			if (Game.m_gameWork.m_languageId == 2) {
 				sprintf(info, "%d%s%s",
 				        gil,
-				        GetMenuStr__8CMenuPcsFi(this, 4),
-				        GetMenuStr__8CMenuPcsFi(this, 0x22));
+				        GetMenuStr(4),
+				        GetMenuStr(0x22));
 			} else {
 				sprintf(info, "%s%d%s",
-				        GetMenuStr__8CMenuPcsFi(this, 0x22),
+				        GetMenuStr(0x22),
 				        gil,
-				        GetMenuStr__8CMenuPcsFi(this, 4));
+				        GetMenuStr(4));
 			}
 		}
 
 		strcpy(left, "");
-		strcat(left, GetMenuStr__8CMenuPcsFi(this, 1), 0x10);
+		strcat(left, GetMenuStr(1), 0x10);
 		strcpy(right, "");
-		strcat(right, GetMenuStr__8CMenuPcsFi(this, 2), 0x10);
+		strcat(right, GetMenuStr(2), 0x10);
 		SetSingDynamicWinMessInfo__8CMenuPcsFiPcPcPcPcPcPcPcPc(this, 3, info, left, right, 0, 0, 0, 0, 0);
 		GetSingWinSize__8CMenuPcsFiPsPsi(this, 0, &winW, &winH, 1);
 		SetMcWinInfo__8CMenuPcsFii(this, static_cast<int>(winW), static_cast<int>(winH));
@@ -1143,7 +1141,7 @@ bool CMenuPcs::LetterReplyWinOpen()
 			caravanWork + s_SelLetter * 0xC + 0x3EC);
 		char** mesPtr = reinterpret_cast<char**>(reinterpret_cast<char*>(&Game.m_cFlatDataArr[1]) + 0x44);
 		strcpy(srcText, mesPtr[(msgIndex & 0x7FC) >> 1]);
-		MakeAgbString__4CMesFPcPcii(workText, srcText, *reinterpret_cast<unsigned short*>(caravanWork + 0x3E2), 0);
+		CMes::MakeAgbString(workText, srcText, *reinterpret_cast<unsigned short*>(caravanWork + 0x3E2), 0);
 
 		s_ReplyMax = 0;
 		char* curLine = workText;
@@ -1153,8 +1151,8 @@ bool CMenuPcs::LetterReplyWinOpen()
 				*newline = '\0';
 			}
 
-			const char* right = GetMenuStr__8CMenuPcsFi(this, 0x24);
-			const char* left = GetMenuStr__8CMenuPcsFi(this, 0x23);
+			const char* right = GetMenuStr(0x24);
+			const char* left = GetMenuStr(0x23);
 			if (languageId == 2) {
 				sprintf(lines[i], "%s%s%s", left, curLine, right);
 			} else {
@@ -1171,7 +1169,7 @@ bool CMenuPcs::LetterReplyWinOpen()
 		delete[] srcText;
 		delete[] workText;
 
-		const char* closeText = GetMenuStr__8CMenuPcsFi(this, 3);
+		const char* closeText = GetMenuStr(3);
 		int lineIndex = s_ReplyMax;
 		s_ReplyMax = static_cast<unsigned char>(s_ReplyMax + 1);
 		strcat(lines[lineIndex], closeText, 0x80);
@@ -1307,19 +1305,19 @@ bool CMenuPcs::LetterConfirmOpen()
 
 		const char* title = subjectTable[(letterWord >> 7) & 0x1FF];
 		if (languageId == 3) {
-			sprintf(lines[0], "%s%s", GetMenuStr__8CMenuPcsFi(this, 0x26), title);
+			sprintf(lines[0], "%s%s", GetMenuStr(0x26), title);
 		} else if (languageId == 2) {
-			sprintf(lines[0], "%s%s", title, GetMenuStr__8CMenuPcsFi(this, 0x26));
+			sprintf(lines[0], "%s%s", title, GetMenuStr(0x26));
 		} else if (languageId == 5) {
-			sprintf(lines[0], "%s%s", GetMenuStr__8CMenuPcsFi(this, 0x26), title);
+			sprintf(lines[0], "%s%s", GetMenuStr(0x26), title);
 		} else if (languageId == 4) {
-			sprintf(lines[0], "%s%s%s", GetMenuStr__8CMenuPcsFi(this, 0x26), title, GetMenuStr__8CMenuPcsFi(this, 0x25));
+			sprintf(lines[0], "%s%s%s", GetMenuStr(0x26), title, GetMenuStr(0x25));
 		} else {
-			sprintf(lines[0], "%s%s%s", GetMenuStr__8CMenuPcsFi(this, 0x25), title, GetMenuStr__8CMenuPcsFi(this, 0x26));
+			sprintf(lines[0], "%s%s%s", GetMenuStr(0x25), title, GetMenuStr(0x26));
 		}
 
-		const char* left = GetMenuStr__8CMenuPcsFi(this, 0x23);
-		const char* right = GetMenuStr__8CMenuPcsFi(this, 0x24);
+		const char* left = GetMenuStr(0x23);
+		const char* right = GetMenuStr(0x24);
 		const char* reply = "Reply";
 		if (languageId == 2) {
 			sprintf(lines[1], "%s%s%s", left, reply, right);
@@ -1336,26 +1334,26 @@ bool CMenuPcs::LetterConfirmOpen()
 									 : 0;
 					sprintf(lines[2], "%s%d%s", left, itemValue, right);
 				} else if (s_Attach == 1) {
-					sprintf(lines[2], "%d%s", s_AttachItem, GetMenuStr__8CMenuPcsFi(this, 4));
+					sprintf(lines[2], "%d%s", s_AttachItem, GetMenuStr(4));
 				}
-				strcat(lines[2], GetMenuStr__8CMenuPcsFi(this, 0x28), 0x80);
+				strcat(lines[2], GetMenuStr(0x28), 0x80);
 			} else {
-				strcpy(lines[2], GetMenuStr__8CMenuPcsFi(this, 0x28));
+				strcpy(lines[2], GetMenuStr(0x28));
 				if (s_Attach == 0) {
 					strcat(lines[2], itemTable[s_AttachItem * 5 + 4], 0x80);
 				} else if (s_Attach == 1) {
 					int offs = strlen(lines[2]);
-					sprintf(lines[2] + offs, "%d%s", s_AttachItem, GetMenuStr__8CMenuPcsFi(this, 4));
+					sprintf(lines[2] + offs, "%d%s", s_AttachItem, GetMenuStr(4));
 				}
 			}
 			lineCount = 3;
 		}
 
-		strcat(lines[lineCount], GetMenuStr__8CMenuPcsFi(this, 0x21), 0x80);
+		strcat(lines[lineCount], GetMenuStr(0x21), 0x80);
 		strcpy(lines[lineCount + 1], "");
-		strcat(lines[lineCount + 1], GetMenuStr__8CMenuPcsFi(this, 1), 0x80);
+		strcat(lines[lineCount + 1], GetMenuStr(1), 0x80);
 		strcpy(lines[lineCount + 2], "");
-		strcat(lines[lineCount + 2], GetMenuStr__8CMenuPcsFi(this, 2), 0x80);
+		strcat(lines[lineCount + 2], GetMenuStr(2), 0x80);
 
 		SetSingDynamicWinMessInfo__8CMenuPcsFiPcPcPcPcPcPcPcPc(
 			this, lineCount + 3, lines[0], lines[1], lines[2], lines[3], lines[4], lines[5], lines[6], lines[7]);
@@ -1458,7 +1456,7 @@ void CMenuPcs::LetterListDraw()
 	CColor titleColor(0xFF, 0xFF, 0xFF, static_cast<u8>(FLOAT_803330a0 * *reinterpret_cast<float*>(menuDataBase + 0x58)));
 	font->SetColor(titleColor.color);
 
-	const char* menuTitle = GetMenuStr__8CMenuPcsFi(this, 0x1D);
+	const char* menuTitle = GetMenuStr(0x1D);
 	float titleX = static_cast<float>((static_cast<double>(FLOAT_80333158) - static_cast<double>(font->GetWidth(menuTitle))) *
 	                                  DOUBLE_803330a8);
 	DrawShadowFont__8CMenuPcsFP5CFontPcffii(this, font, menuTitle, titleX, FLOAT_8033315c, 0x18, 0x12);
@@ -1639,7 +1637,7 @@ void CMenuPcs::LetterMessDraw()
 	u16 msgIndex = *reinterpret_cast<u16*>(caravanWork + s_SelLetter * 0xC + 0x3EC);
 	char** mesPtr = reinterpret_cast<char**>(reinterpret_cast<char*>(&Game.m_cFlatDataArr[1]) + 0x44);
 	strcpy(srcText, mesPtr[(msgIndex & 0x7FC) >> 1]);
-	MakeAgbString__4CMesFPcPcii(workText, srcText, *reinterpret_cast<u16*>(caravanWork + 0x3E2), 0);
+	CMes::MakeAgbString(workText, srcText, *reinterpret_cast<u16*>(caravanWork + 0x3E2), 0);
 
 	char* curLine = workText;
 	int y = 0x58;
@@ -1921,7 +1919,7 @@ int CMenuPcs::LetterCtrlCur()
 				u16 msgIndex = *reinterpret_cast<u16*>(caravanWork + s_SelLetter * 0xC + 0x3EC);
 				char** mesPtr = reinterpret_cast<char**>(reinterpret_cast<char*>(&Game.m_cFlatDataArr[1]) + 0x44);
 				strcpy(srcText, mesPtr[(msgIndex & 0x7FC) >> 1]);
-				MakeAgbString__4CMesFPcPcii(workText, srcText, *reinterpret_cast<u16*>(caravanWork + 0x3E2), 0);
+				CMes::MakeAgbString(workText, srcText, *reinterpret_cast<u16*>(caravanWork + 0x3E2), 0);
 
 				char* line = workText;
 				for (int i = 0; i < 8; ++i) {

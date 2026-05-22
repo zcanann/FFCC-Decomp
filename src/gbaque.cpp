@@ -21,9 +21,6 @@ GbaQueue GbaQue;
 
 extern "C" int rand(void);
 extern "C" int memcmp(const void*, const void*, unsigned long);
-extern "C" void MakeAgbString__4CMesFPcPcii(char*, char*, int, int);
-extern "C" int GetItemType__8CMenuPcsFii(CMenuPcs*, int, int);
-extern "C" int GetItemIcon__8CMenuPcsFi(CMenuPcs*, int);
 
 extern CMenuPcs MenuPcs;
 
@@ -2434,14 +2431,14 @@ System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB3
     char** mesPtr = reinterpret_cast<char**>(reinterpret_cast<char*>(&Game.m_cFlatDataArr[1]) + 0x44);
 
     strcpy(srcText, mesPtr[mesIndex]);
-    MakeAgbString__4CMesFPcPcii(workText, srcText, *reinterpret_cast<unsigned short*>(scriptFood + 0x3E2), 0);
+    CMes::MakeAgbString(workText, srcText, *reinterpret_cast<unsigned short*>(scriptFood + 0x3E2), 0);
     int totalSize = static_cast<int>(strlen(workText) + 1);
     memcpy(outData, workText, totalSize);
 
     memset(srcText, 0, 0x400);
     memset(workText, 0, 0x400);
     strcpy(srcText, mesPtr[mesIndex + 1]);
-    MakeAgbString__4CMesFPcPcii(workText, srcText, *reinterpret_cast<unsigned short*>(scriptFood + 0x3E2), 0);
+    CMes::MakeAgbString(workText, srcText, *reinterpret_cast<unsigned short*>(scriptFood + 0x3E2), 0);
     int line2Size = static_cast<int>(strlen(workText));
     memcpy(outData + totalSize, workText, line2Size + 1);
     totalSize += line2Size + 1;
@@ -3502,8 +3499,8 @@ int GbaQueue::GetCmdData(int channel, unsigned char* outData)
 
 	for (i = 0; i < 0x40; i++, itemPtr += 2) {
 		int itemId = *reinterpret_cast<short*>(itemPtr + 0x3A);
-		if ((GetItemType__8CMenuPcsFii(&MenuPcs, itemId, 1) == 1) &&
-		    (GetItemIcon__8CMenuPcsFi(&MenuPcs, itemId) == (localPlayerData[0xDA] & 3))) {
+		if ((MenuPcs.GetItemType(itemId, 1) == 1) &&
+		    (MenuPcs.GetItemIcon(itemId) == (localPlayerData[0xDA] & 3))) {
 			int itemBase = Game.unkCFlatData0[2] + itemId * 0x48;
 
 			cmdData[0] = __lhbrx(reinterpret_cast<unsigned short*>(itemBase + 4), 0);
@@ -3802,7 +3799,7 @@ System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB3
 
 		const int itemId = *reinterpret_cast<short*>(scriptFood + i * 2 + 0xBE6);
 		strcpy(itemNameScratch, flatData->m_tabl[6].m_strings[itemId]);
-		MakeAgbString__4CMesFPcPcii(agbStringScratch, itemNameScratch, 0, 0);
+		CMes::MakeAgbString(agbStringScratch, itemNameScratch, 0, 0);
 
 		const int strSize = static_cast<int>(strlen(agbStringScratch) + 1);
 		memcpy(writePtr, agbStringScratch, strSize);
@@ -3909,7 +3906,7 @@ System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB3
 		}
 
 		strcpy(itemNameScratch, flatData->m_tabl[6].m_strings[itemId]);
-		MakeAgbString__4CMesFPcPcii(agbStringScratch, itemNameScratch, 0, 0);
+		CMes::MakeAgbString(agbStringScratch, itemNameScratch, 0, 0);
 		const int strSize = static_cast<int>(strlen(agbStringScratch) + 1);
 		memcpy(outData, agbStringScratch, strSize);
 		outData += strSize;

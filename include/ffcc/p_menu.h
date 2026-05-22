@@ -239,6 +239,7 @@ public:
     void WMChgMenu();
     void GetOptionData();
     int GetItemType(int, int);
+    unsigned char GetItemIcon(int);
     void ArtiInit();
     void ArtiInit1();
     int ArtiOpen();

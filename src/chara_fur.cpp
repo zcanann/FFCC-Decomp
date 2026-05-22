@@ -49,7 +49,6 @@ extern "C" {
 extern unsigned char m_mogWork[0x30];
 void* gMogFurTexBuffer;
 }
-extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 extern float FLOAT_8033110C;
 extern float FLOAT_80331138;
 extern float FLOAT_8033114C;
@@ -1825,8 +1824,7 @@ extern "C" void makeFurTex__6CCharaFv()
 	s_mogFurMaxY = 0.0f;
 
 	if (gMogFurTexBuffer == 0) {
-		gMogFurTexBuffer = _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
-			&Memory, 0x20000, 0, const_cast<char*>(s_chara_fur_cpp_801db72c), 0xE9, 0);
+		gMogFurTexBuffer = Memory._Alloc(0x20000, 0, const_cast<char*>(s_chara_fur_cpp_801db72c), 0xE9, 0);
 	}
 	if (gMogFurTexBuffer == 0) {
 		return;

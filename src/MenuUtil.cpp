@@ -11,10 +11,8 @@
 #include "ffcc/fontman.h"
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
-extern "C" void pppDeletePart__8CPartMngFi(void*, int);
 extern "C" char* strcat(char*, const char*);
 extern "C" int toupper(int);
-extern "C" void MakeArtItemName__5CGameFPcii(void*, char*, int, int);
 extern "C" char s_MenuUtil_cpp_801e37fc[];
 extern u32 DAT_801e36d0;
 extern u32 DAT_801e36d4;
@@ -369,7 +367,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 		if ((msgNo == 0x209) || (msgNo == 0x20D) || (msgNo == 0x211)) {
 			itemName[0] = '\0';
 		} else {
-			MakeArtItemName__5CGameFPcii(&Game, itemName, msgNo, 1);
+			Game.MakeArtItemName(itemName, msgNo, 1);
 			if ((strlen(itemName) != 0) && (itemName[0] != '\0')) {
 				itemName[0] = static_cast<char>(toupper(static_cast<unsigned char>(itemName[0])));
 			}
@@ -604,7 +602,7 @@ void CMenuPcs::SetCrystalCageAttr()
 	CrystalState* state = reinterpret_cast<CrystalState*>(this);
 
 	if (state->m_crystalPart != -1) {
-		pppDeletePart__8CPartMngFi(&PartMng, state->m_crystalPart);
+		PartMng.pppDeletePart(state->m_crystalPart);
 	}
 
 	unsigned int chaliceElement = Game.m_gameWork.m_chaliceElement;
@@ -644,7 +642,7 @@ void CMenuPcs::SetManaWaterEffect()
 	int partNo = *reinterpret_cast<int*>(*reinterpret_cast<int*>(self + 0x840) + 0x19B8);
 
 	if (partNo != -1) {
-		pppDeletePart__8CPartMngFi(&PartMng, partNo);
+		PartMng.pppDeletePart(partNo);
 	}
 
 	BindEffect(5, Game.m_gameWork.m_timerA + 0x13, -1);
@@ -990,14 +988,14 @@ void CMenuPcs::BindMcObj(int slotNo)
 				*reinterpret_cast<unsigned char**>(self + 0x840) + (slot + 0x11) * 0x524);
 
 			if (obj[1] >= 0) {
-				pppDeletePart__8CPartMngFi(&PartMng, obj[1]);
+				PartMng.pppDeletePart(obj[1]);
 				obj[1] = -1;
 				obj[2] = -1;
 				obj[0] = -1;
 			}
 
 			if (obj[0x525] >= 0) {
-				pppDeletePart__8CPartMngFi(&PartMng, obj[0x525]);
+				PartMng.pppDeletePart(obj[0x525]);
 				obj[0x525] = -1;
 				obj[0x526] = -1;
 				obj[0x524] = -1;

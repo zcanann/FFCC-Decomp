@@ -26,7 +26,6 @@ extern "C" void __dt__Q36CChara5CMesh12CDisplayListFv(void*, int);
 extern "C" void __dt__Q26CChara5CSkinFv(void*, int);
 extern "C" void InitQuantize__Q26CChara5CAnimFv(void*);
 extern "C" void Interp__Q26CChara9CAnimNodeFPQ26CChara5CAnimP3SRTf(void*, void*, void*, float);
-extern "C" void SetTextureSet__12CMaterialSetFP11CTextureSet(CMaterialSet*, CTextureSet*);
 extern "C" float FLOAT_803301b0;
 extern "C" float FLOAT_803301bc;
 extern "C" float FLOAT_803301c8;
@@ -1219,7 +1218,7 @@ void CChara::CModel::setup()
 
 	CMaterialSet* materialSet = ModelMaterialSet(this);
 	if (materialSet != 0) {
-		SetTextureSet__12CMaterialSetFP11CTextureSet(materialSet, *reinterpret_cast<CTextureSet**>((u8*)this + 0xB4));
+		materialSet->SetTextureSet(*reinterpret_cast<CTextureSet**>((u8*)this + 0xB4));
 	}
 }
 
@@ -1942,7 +1941,7 @@ void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
 		return;
 	}
 
-	SetTextureSet__12CMaterialSetFP11CTextureSet(materialSet, m_texSet);
+	materialSet->SetTextureSet(m_texSet);
 	CTexAnimSet* texAnimSet = ModelTexAnimSet(this);
 	if (texAnimSet != 0) {
 		texAnimSet->SetTexGen();
@@ -2065,7 +2064,7 @@ void CChara::CModel::DrawShadow(float (*view)[4], int zMode)
 		return;
 	}
 
-	SetTextureSet__12CMaterialSetFP11CTextureSet(materialSet, m_texSet);
+	materialSet->SetTextureSet(m_texSet);
 	LightPcs.SetAmbientAlpha(FLOAT_803301bc);
 	MaterialMan.InitVtxFmt(-1, (_GXCompType)3, ModelPosQuant(this), (_GXCompType)3, ModelNormQuant(this), (_GXCompType)3, 0xC);
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
@@ -2321,7 +2320,7 @@ void CChara::CModel::AttachTextureSet(CTextureSet* texSet)
 		}
 	}
 	if (m_data->m_materialSet != 0) {
-		SetTextureSet__12CMaterialSetFP11CTextureSet(m_data->m_materialSet, m_texSet);
+		m_data->m_materialSet->SetTextureSet(m_texSet);
 	}
 }
 

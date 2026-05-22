@@ -959,15 +959,13 @@ void CSound::loadWaveFrame()
         int& streamRemain = sound.m_streamRemain;
         int& streamOffset = sound.m_streamOffset;
         u32& streamHalf = sound.m_streamHalf;
-        u8* streamBuffer = reinterpret_cast<u8*>(sound.m_streamBuffer);
 
         if (streamState == 0) {
-            int playPoint;
-            int readPoint;
-            RedSound(this)->GetStreamPlayPoint(streamID, &playPoint, &readPoint);
-            playPoint = static_cast<u32>(playPoint) >> 16;
+            int playPoint[2];
+            RedSound(this)->GetStreamPlayPoint(streamID, &playPoint[0], &playPoint[1]);
+            playPoint[0] = static_cast<int>(static_cast<unsigned int>(playPoint[0]) >> 16);
 
-            if (streamHalf != (u32)playPoint) {
+            if (streamHalf != static_cast<unsigned int>(playPoint[0])) {
                 int readSize = 0x10000;
                 if (streamRemain < readSize) {
                     readSize = streamRemain;
@@ -980,12 +978,12 @@ void CSound::loadWaveFrame()
 
                     streamOffset += readSize;
                     streamRemain -= readSize;
-                    streamHalf = playPoint;
+                    streamHalf = static_cast<unsigned int>(playPoint[0]);
                     streamState = 1;
                 }
             }
         } else if (File.IsCompleted(streamFile)) {
-            memcpy(streamBuffer + (1 - streamHalf) * 0x10000, File.m_readBuffer, 0x10000);
+            memcpy(reinterpret_cast<u8*>(sound.m_streamBuffer) + (1 - streamHalf) * 0x10000, File.m_readBuffer, 0x10000);
             streamState = 0;
 
             if (streamRemain == 0) {

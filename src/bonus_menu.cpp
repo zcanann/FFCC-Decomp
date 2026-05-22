@@ -11,8 +11,6 @@
 #include "ffcc/util.h"
 #include <string.h>
 
-extern "C" int GetYesNoXPos__8CMenuPcsFi(CMenuPcs*, int);
-extern "C" void GetSingWinSize__8CMenuPcsFiPsPsi(CMenuPcs*, short, short*, short*, int);
 extern "C" int sprintf(char*, const char*, ...);
 extern "C" int rand(void);
 extern char* PTR_s_bonus_802128c0[];
@@ -736,7 +734,7 @@ static void DrawBonusMcWinOverlay(CMenuPcs* menu, int statePtr)
 	if (*(short*)(auxPtr + 10) == 1) {
 		menu->DrawMcWinMess(0x18, 1);
 		menu->DrawInit();
-		int cursorX = GetYesNoXPos__8CMenuPcsFi(menu, (int)*(short*)(statePtr + 0x28));
+		int cursorX = menu->GetYesNoXPos((int)*(short*)(statePtr + 0x28));
 		float cursorY = (float)(*(short*)(auxPtr + 2) + *(short*)(auxPtr + 6) - 0x3e);
 		menu->DrawCursor(cursorX, (int)cursorY, 1.0f);
 	}

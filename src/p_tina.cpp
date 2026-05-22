@@ -178,8 +178,8 @@ int DAT_8032ed3c;
 extern "C" {
 const char* g_MaxDataSize;
 signed char g_MaxHeapSize[4];
-int lbl_8032ED48;
-signed char lbl_8032ED4C;
+int s_debugSpinnerFrameCounter;
+signed char s_debugSpinnerFrameCounterInit;
 }
 
 /*
@@ -1220,14 +1220,14 @@ void CPartPcs::drawAfterViewer()
 		g_MaxDataSize = sDebugSpinnerText;
 		g_MaxHeapSize[0] = 1;
 	}
-	if (lbl_8032ED4C == 0) {
-		lbl_8032ED48 = 0;
-		lbl_8032ED4C = 1;
+	if (s_debugSpinnerFrameCounterInit == 0) {
+		s_debugSpinnerFrameCounter = 0;
+		s_debugSpinnerFrameCounterInit = 1;
 	}
 
-	lbl_8032ED48++;
+	s_debugSpinnerFrameCounter++;
 	Graphic.Printf(
-		stringBase + 0x134, g_MaxDataSize[(lbl_8032ED48 >> 4) % 4]);
+		stringBase + 0x134, g_MaxDataSize[(s_debugSpinnerFrameCounter >> 4) % 4]);
 
 	g_par_calc_prof.ProfEnd();
 	g_par_draw_prof.ProfEnd();

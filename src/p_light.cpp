@@ -63,7 +63,7 @@ static inline MtxPtr CameraMatrix() { return reinterpret_cast<MtxPtr>(reinterpre
 extern const char s_CLightPcs_801D7C70[] = "CLightPcs";
 extern const char s_CManager_801D7C7C[] = "CManager";
 extern const char s_CProcess_801D7C88[] = "CProcess";
-extern "C" const char lbl_801D7C94[0x18] =
+extern "C" const char s_LightTextureFullFmt_801D7C94[0x18] =
     "\x83\x89\x83\x43\x83\x67\x82\xAA\x91\xAB\x82\xE8\x82\xDC\x82\xB9\x82\xF1\x81\x42\x0A";
 
 unsigned int m_table_desc0__9CLightPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__9CLightPcsFv)};
@@ -394,7 +394,7 @@ CLightPcs::CBumpLight* CLightPcs::AddBump(CLightPcs::CLight* srcLight, CLightPcs
 
     if (bumpLight == 0) {
         if (static_cast<unsigned int>(System.m_execParam) >= 1) {
-            System.Printf(const_cast<char*>(lbl_801D7C94));
+            System.Printf(const_cast<char*>(s_LightTextureFullFmt_801D7C94));
         }
         return 0;
     }

@@ -25,10 +25,10 @@ public:
     static char* MCDAT_VERSION;
 };
 
-extern const char lbl_80330CB8[];
-extern const char lbl_80330CC0[];
-extern const char lbl_80330CC4[];
-extern const char lbl_80330CC8[];
+extern const char s_CardGameCode_80330CB8[];
+extern const char s_CardMakerCode_80330CC0[];
+extern const char s_CardMachineCode_80330CC4[];
+extern const char s_CardVersion_80330CC8[];
 
 static const char lbl_801DA9C0[] = {
     0x64, 0x76, 0x64, 0x2F, 0x67, 0x62, 0x61, 0x2F, 0x00, 0x00, 0x00, 0x00,
@@ -40,12 +40,12 @@ static const char s_icon_dat_801DA9E8[] = "icon.dat";
 static const char s_FF_Crystal_Chronicles_801DA9F4[] = "FF Crystal Chronicles";
 
 char* CardConst::MC_ICONIMG_FNAME = const_cast<char*>(s_icon_dat_801DA9E8);
-char* CardConst::MC_FNAME = const_cast<char*>(lbl_80330CB8);
+char* CardConst::MC_FNAME = const_cast<char*>(s_CardGameCode_80330CB8);
 char* CardConst::MC_COMMENT = const_cast<char*>(s_FF_Crystal_Chronicles_801DA9F4);
-char* CardConst::MCDAT_MAKER = const_cast<char*>(lbl_80330CC0);
-char* CardConst::MCDAT_TITLE = const_cast<char*>(lbl_80330CB8);
-char* CardConst::MCDAT_MACHINE = const_cast<char*>(lbl_80330CC4);
-char* CardConst::MCDAT_VERSION = const_cast<char*>(lbl_80330CC8);
+char* CardConst::MCDAT_MAKER = const_cast<char*>(s_CardMakerCode_80330CC0);
+char* CardConst::MCDAT_TITLE = const_cast<char*>(s_CardGameCode_80330CB8);
+char* CardConst::MCDAT_MACHINE = const_cast<char*>(s_CardMachineCode_80330CC4);
+char* CardConst::MCDAT_VERSION = const_cast<char*>(s_CardVersion_80330CC8);
 
 CMemoryCardMan MemoryCardMan;
 

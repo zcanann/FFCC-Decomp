@@ -35,29 +35,29 @@ struct DbgMenuDef {
 };
 
 extern const char s_CDbgMenuPcs_801DD428[] = "CDbgMenuPcs";
-extern const char lbl_80331C18[] = "MENU";
-extern const char lbl_80331C20[] = "SHOUKI";
-extern const char lbl_80331C28[] = "MARK";
-extern const char lbl_80331C30[] = "BAR";
-extern const char lbl_80331C34[] = "SPEED";
-extern const char lbl_80331C3C[] = "MUTEKI";
-extern const char lbl_80331C44[] = "FOLLOW";
+extern const char s_DbgMenuMenu_80331C18[] = "MENU";
+extern const char s_DbgMenuShouki_80331C20[] = "SHOUKI";
+extern const char s_DbgMenuMark_80331C28[] = "MARK";
+extern const char s_DbgMenuBar_80331C30[] = "BAR";
+extern const char s_DbgMenuSpeed_80331C34[] = "SPEED";
+extern const char s_DbgMenuMuteki_80331C3C[] = "MUTEKI";
+extern const char s_DbgMenuFollow_80331C44[] = "FOLLOW";
 extern const char s_DISPPRINT_801DD434[] = "DISPPRINT";
-extern const char lbl_80331C4C[] = "COMBO";
-extern const char lbl_80331C54[] = "PAUSE";
-extern const char lbl_80331C5C[] = "BATTLE";
-extern const char lbl_80331C64[] = "ANALOG";
+extern const char s_DbgMenuCombo_80331C4C[] = "COMBO";
+extern const char s_DbgMenuPause_80331C54[] = "PAUSE";
+extern const char s_DbgMenuBattle_80331C5C[] = "BATTLE";
+extern const char s_DbgMenuAnalog_80331C64[] = "ANALOG";
 extern const char s_COLCHECK_801DD440[] = "COLCHECK";
-extern const char lbl_80331C6C[] = "A*";
+extern const char s_DbgMenuAsterisk_80331C6C[] = "A*";
 extern const char s_PARTICLE_801DD44C[] = "PARTICLE";
-extern const char lbl_80331C70[] = "PRINTF";
+extern const char s_DbgMenuPrintf_80331C70[] = "PRINTF";
 extern const char s_SOUND_INFO_801DD458[] = "SOUND INFO";
-extern const char lbl_80331C78[] = "SHADOW";
+extern const char s_DbgMenuShadow_80331C78[] = "SHADOW";
 extern const char s_PART_HEAP_801DD464[] = "PART HEAP";
 extern const char s_CHARA_INFO_801DD470[] = "CHARA INFO";
 extern const char s_ITEM_WEAPON_801DD47C[] = "ITEM WEAPON";
 extern const char s_SMITH_MASTER_801DD488[] = "SMITH MASTER";
-extern const char lbl_80331C80[] = "CHARA";
+extern const char s_DbgMenuChara_80331C80[] = "CHARA";
 extern const u32 DAT_80331C88 = 0x00000080;
 extern const u32 DAT_80331C8C = 0xFFFFFFFF;
 extern const char s_Debug_80331c90[] = "Debug";
@@ -66,9 +66,9 @@ extern const double DOUBLE_80331CA0 = 4503601774854144.0;
 extern const float FLOAT_80331CA8 = 640.0f;
 extern const float FLOAT_80331CAC = 448.0f;
 extern const float FLOAT_80331CB0 = 1.0f;
-extern const char lbl_80331CB4[] = "ON";
-extern const char lbl_80331CB8[] = "OFF";
-extern const char lbl_80331CBC[] = "?";
+extern const char s_DbgMenuOn_80331CB4[] = "ON";
+extern const char s_DbgMenuOff_80331CB8[] = "OFF";
+extern const char s_DbgMenuUnknown_80331CBC[] = "?";
 
 u32 m_table_desc0__11CDbgMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(create__11CDbgMenuPcsFv)};
 u32 m_table_desc1__11CDbgMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(destroy__11CDbgMenuPcsFv)};
@@ -79,14 +79,18 @@ u32 m_table__11CDbgMenuPcs[0x15C / sizeof(u32)] = {
 };
 
 DbgMenuDef PTR_DAT_80212524[] = {
-    { lbl_80331C18, 100, 2, 1 },      { lbl_80331C20, 101, 2, 1 },      { lbl_80331C28, 102, 2, 1 },
-    { lbl_80331C30, 103, 2, 1 },      { lbl_80331C34, 104, 2, 1 },      { lbl_80331C3C, 105, 2, 1 },
-    { lbl_80331C44, 106, 2, 1 },      { s_DISPPRINT_801DD434, 107, 2, 1 },
-    { lbl_80331C4C, 108, 2, 1 },      { lbl_80331C54, 109, 2, 1 },      { lbl_80331C5C, 110, 2, 1 },
-    { lbl_80331C64, 111, 2, 1 },      { s_COLCHECK_801DD440, 112, 2, 1 }, { lbl_80331C6C, 113, 2, 1 },
-    { s_PARTICLE_801DD44C, 114, 2, 1 }, { lbl_80331C70, 115, 2, 1 },    { s_SOUND_INFO_801DD458, 116, 3, 1 },
-    { lbl_80331C78, 117, 2, 1 },      { s_PART_HEAP_801DD464, 118, 2, 1 }, { s_CHARA_INFO_801DD470, 119, 3, 1 },
-    { s_ITEM_WEAPON_801DD47C, 120, 2, 1 }, { s_SMITH_MASTER_801DD488, 121, 2, 1 }, { lbl_80331C80, 122, 2, 1 },
+    { s_DbgMenuMenu_80331C18, 100, 2, 1 },   { s_DbgMenuShouki_80331C20, 101, 2, 1 },
+    { s_DbgMenuMark_80331C28, 102, 2, 1 },   { s_DbgMenuBar_80331C30, 103, 2, 1 },
+    { s_DbgMenuSpeed_80331C34, 104, 2, 1 },  { s_DbgMenuMuteki_80331C3C, 105, 2, 1 },
+    { s_DbgMenuFollow_80331C44, 106, 2, 1 }, { s_DISPPRINT_801DD434, 107, 2, 1 },
+    { s_DbgMenuCombo_80331C4C, 108, 2, 1 },  { s_DbgMenuPause_80331C54, 109, 2, 1 },
+    { s_DbgMenuBattle_80331C5C, 110, 2, 1 }, { s_DbgMenuAnalog_80331C64, 111, 2, 1 },
+    { s_COLCHECK_801DD440, 112, 2, 1 },      { s_DbgMenuAsterisk_80331C6C, 113, 2, 1 },
+    { s_PARTICLE_801DD44C, 114, 2, 1 },      { s_DbgMenuPrintf_80331C70, 115, 2, 1 },
+    { s_SOUND_INFO_801DD458, 116, 3, 1 },    { s_DbgMenuShadow_80331C78, 117, 2, 1 },
+    { s_PART_HEAP_801DD464, 118, 2, 1 },     { s_CHARA_INFO_801DD470, 119, 3, 1 },
+    { s_ITEM_WEAPON_801DD47C, 120, 2, 1 },   { s_SMITH_MASTER_801DD488, 121, 2, 1 },
+    { s_DbgMenuChara_80331C80, 122, 2, 1 },
 };
 u32 gDbgMenuWindowBorderColors[4] = {0x0000FFC0, 0x4040FFC0, 0x4040FFC0, 0x8080FFC0};
 GXColor gDbgMenuWindowFillColors[2] = {{0xFF, 0xFF, 0xFF, 0x80}, {0, 0, 0, 0x80}};
@@ -500,11 +504,11 @@ void CDbgMenuPcs::drawMenu(CDbgMenuPcs::CDM* menu)
 
 			const char* stateText;
 			if (current->m_state == 1) {
-				stateText = lbl_80331CB4;
+				stateText = s_DbgMenuOn_80331CB4;
 			} else {
-				stateText = lbl_80331CBC;
+				stateText = s_DbgMenuUnknown_80331CBC;
 				if (current->m_state == 0) {
-					stateText = lbl_80331CB8;
+					stateText = s_DbgMenuOff_80331CB8;
 				}
 			}
 

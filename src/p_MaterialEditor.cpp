@@ -3,6 +3,7 @@
 #include "ffcc/ME_USB_process.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/graphic.h"
+#include "ffcc/gxfunc.h"
 extern "C" {
 extern const unsigned int kMaterialEditorDefaultColorRgba = 0xFFFFFFFF;
 extern const float kMaterialEditorControlMaxInit = 10000.0f;
@@ -56,7 +57,6 @@ CMaterialEditorPcs MaterialEditorPcs;
 extern "C" void Printf__8CGraphicFPce(void*, const char*, ...);
 extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
 extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, unsigned char, int, int, unsigned char);
-extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 extern "C" void _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(
     int, int, int, int, int);
 extern "C" void _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg(
@@ -274,7 +274,8 @@ void CMaterialEditorPcs::drawViewer()
 
                     GXSetZCompLoc(GX_FALSE);
                     _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(7, 0, 0, 7, 0);
-                    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(blend, srcFactor, dstFactor, 3);
+                    _GXSetBlendMode(static_cast<_GXBlendMode>(blend), static_cast<_GXBlendFactor>(srcFactor),
+                                    static_cast<_GXBlendFactor>(dstFactor), GX_LO_COPY);
                     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
                     GXSetCullMode(GX_CULL_NONE);
                 } else if (pass == 0) {
@@ -283,7 +284,7 @@ void CMaterialEditorPcs::drawViewer()
                     }
 
                     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
-                    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(0, 0, 0, 7);
+                    _GXSetBlendMode(GX_BM_NONE, GX_BL_ZERO, GX_BL_ZERO, GX_LO_OR);
                 }
 
                 switch (polygon->textureMarker) {

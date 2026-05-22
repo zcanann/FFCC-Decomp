@@ -6,6 +6,7 @@
 #include "ffcc/p_camera.h"
 #include "ffcc/game.h"
 #include "ffcc/pppPart.h"
+#include "ffcc/textureman.h"
 #include "ffcc/util.h"
 
 #include <dolphin/gx.h>
@@ -23,15 +24,6 @@ struct Crystal2IndTexMtx {
 
 struct Crystal2TexMtx {
     f32 value[3][4];
-};
-
-struct pppCrystal2RenderObject {
-    u8 _pad0[0x10];
-    pppFMATRIX m_localMatrix;
-    pppFMATRIX m_drawMatrix;
-    Vec* m_drawMatrixPtr;
-    u8 _pad74[0xC];
-    Crystal2Work m_work;
 };
 
 struct pppCrystal2ColorBlock {
@@ -97,11 +89,12 @@ void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, _pppC
 {
     int* serializedDataOffsets = param_3->m_serializedDataOffsets;
     s32 dataValIndex = param_2->m_dataValIndex;
-    Crystal2Work* work = (Crystal2Work*)((u8*)pppCrystal2 + serializedDataOffsets[2] + 0x80);
-    pppCrystal2ColorBlock* colorBlock = (pppCrystal2ColorBlock*)((u8*)pppCrystal2 + serializedDataOffsets[1] + 0x80);
-    pppCrystal2RenderObject* object;
+    Crystal2Work* work =
+        reinterpret_cast<Crystal2Work*>(pppCrystal2->m_object.m_workArea + serializedDataOffsets[2]);
+    pppCrystal2ColorBlock* colorBlock =
+        reinterpret_cast<pppCrystal2ColorBlock*>(pppCrystal2->m_object.m_workArea + serializedDataOffsets[1]);
     pppModelSt* model;
-    void* sourceTex;
+    CTexture* sourceTex;
     _GXTexObj backTexObj;
     int textureIndex;
     Crystal2IndTexMtx indTexMtx;
@@ -122,14 +115,15 @@ void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, _pppC
                 return;
             }
             sourceTex =
-                pppEnvStPtr->m_mapMeshPtr[param_2->m_initWOrk]->GetTexture(pppEnvStPtr->m_materialSetPtr, textureIndex);
+                static_cast<CTexture*>(pppEnvStPtr->m_mapMeshPtr[param_2->m_initWOrk]->GetTexture(
+                    pppEnvStPtr->m_materialSetPtr, textureIndex));
         }
 
         pppSetBlendMode(0);
         Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &backTexObj, 0, 0, 0x280, 0x1C0, 0, GX_LINEAR,
                                    (_GXTexFmt)4, 0);
         pppSetDrawEnv(
-            &colorBlock->m_color, (pppFMATRIX*)((u8*)pppCrystal2 + 0x40), param_2->m_arg3,
+            &colorBlock->m_color, &pppCrystal2->m_object.m_drawMatrix, param_2->m_arg3,
             param_2->m_payload[5], param_2->m_payload[4], param_2->m_payload[1], param_2->m_payload[2], 1, 1,
             param_2->m_payload[3]);
         GXSetProjection(ppvScreenMatrix, GX_PERSPECTIVE);
@@ -139,9 +133,8 @@ void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, _pppC
         indTexMtx.value[1][1] = indTexMtx.value[0][0];
         texMtx = s_crystal2TexMtxBase;
 
-        object = (pppCrystal2RenderObject*)pppCrystal2;
         PSMTXIdentity(drawMtx);
-        PSMTXConcat(pppMngStPtr->m_matrix.value, object->m_localMatrix.value, cameraMtx);
+        PSMTXConcat(pppMngStPtr->m_matrix.value, pppCrystal2->m_object.m_localMatrix.value, cameraMtx);
         if ((int)Game.m_currentSceneId == 7) {
             f32 perspectiveScale = param_2->m_perspectiveScale;
             C_MTXLightPerspective(lightMtx, 25.0f, 1.3333334f, perspectiveScale, -perspectiveScale, 0.5f, 0.5f);
@@ -157,7 +150,7 @@ void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, _pppC
         PSMTXTranspose(normalMtx, normalMtx);
 
         if (param_2->m_payload[0] == 0) {
-            GXLoadTexObj((_GXTexObj*)((u8*)sourceTex + 0x28), GX_TEXMAP1);
+            GXLoadTexObj(&sourceTex->m_texObj, GX_TEXMAP1);
         } else {
             GXLoadTexObj(work->m_refractionTexObj, GX_TEXMAP1);
         }
@@ -222,7 +215,7 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, _pppCt
         return;
     }
 
-    work = (Crystal2Work*)((u8*)pppCrystal2 + param_3->m_serializedDataOffsets[2] + 0x80);
+    work = reinterpret_cast<Crystal2Work*>(pppCrystal2->m_object.m_workArea + param_3->m_serializedDataOffsets[2]);
     if ((param_2->m_payload[0] != 0) && (work->m_refractionMap == 0)) {
         work->m_refractionMap = (Crystal2RefractionMap*)pppMemAlloc(
             sizeof(Crystal2RefractionMap), pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppCrystal2Cpp), 0xA8);
@@ -297,15 +290,15 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, _pppCt
  */
 void pppDestructCrystal2(pppCrystal2* pppCrystal2, _pppCtrlTable* param_2)
 {
-    u32* puVar1;
     CMemory::CStage* stage;
 
-    puVar1 = (u32*)((u8*)pppCrystal2 + param_2->m_serializedDataOffsets[2] + 0x80);
-    stage = (CMemory::CStage*)puVar1[0];
+    Crystal2Work* work = reinterpret_cast<Crystal2Work*>(
+        pppCrystal2->m_object.m_workArea + param_2->m_serializedDataOffsets[2]);
+    stage = reinterpret_cast<CMemory::CStage*>(work->m_refractionMap);
 
-    if ((CMemory::CStage*)puVar1[1] != 0) {
-        pppHeapUseRate((CMemory::CStage*)puVar1[1]);
-        puVar1[1] = 0;
+    if (work->m_refractionTexObj != 0) {
+        pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(work->m_refractionTexObj));
+        work->m_refractionTexObj = 0;
     }
 
     if ((stage != 0) && (*(CMemory::CStage**)stage != 0)) {
@@ -329,9 +322,9 @@ void pppDestructCrystal2(pppCrystal2* pppCrystal2, _pppCtrlTable* param_2)
  */
 void pppConstructCrystal2(pppCrystal2* pppCrystal2, _pppCtrlTable* param_2)
 {
-    s32 iVar1 = param_2->m_serializedDataOffsets[2];
-    u32* data = (u32*)((char*)pppCrystal2 + iVar1 + 0x80);
+    Crystal2Work* work = reinterpret_cast<Crystal2Work*>(
+        pppCrystal2->m_object.m_workArea + param_2->m_serializedDataOffsets[2]);
 
-    data[0] = 0;
-    data[1] = 0;
+    work->m_refractionMap = 0;
+    work->m_refractionTexObj = 0;
 }

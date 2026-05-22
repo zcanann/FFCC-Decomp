@@ -44,7 +44,6 @@ extern "C" void SetPosition__9CLightPcsFQ29CLightPcs6TARGETP3VecUl(void*, int, V
 extern "C" void Create__9CGBaseObjFv(void*);
 extern "C" void SetViewport__8CGraphicFv(void*);
 extern "C" void DrawInit__8CMenuPcsFv(CMenuPcs*);
-extern "C" void SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(CMenuPcs*, int);
 extern "C" void DrawRect__8CMenuPcsFUlfffffffff(CMenuPcs*, unsigned long, float, float, float, float, float, float, float, float, float);
 extern "C" void SetMargin__5CFontFf(float, CFont*);
 extern "C" void SetShadow__5CFontFi(CFont*, int);
@@ -6808,7 +6807,7 @@ void CMenuPcs::DrawCharaName()
 
 	CColor shade(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alpha));
 	GXSetChanMatColor(GX_COLOR0A0, shade.color);
-	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x28);
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x28));
 	for (int row = 0; row < 2; row++) {
 		float y = FLOAT_80331478 + static_cast<float>(row * 0xB8) + FLOAT_80331684;
 		if (row != 0) {
@@ -6916,7 +6915,7 @@ void CMenuPcs::DrawCMLife()
 	}
 
 	for (int slot = 0; slot < 8; slot++) {
-		SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x27);
+		MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x27));
 
 		unsigned short life = 0;
 		bool enabled = false;
@@ -6996,7 +6995,7 @@ void CMenuPcs::DrawCMLife()
 			const char flagA = work[0x1D90];
 			const char flagB = work[0x1D91];
 			if (flagA != 0 || flagB != 0) {
-				SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x38);
+				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x38));
 				DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 0, xBase + static_cast<float>(DOUBLE_80331670),
 				                                y + static_cast<float>(DOUBLE_803315C0), FLOAT_80331524,
 				                                FLOAT_80331440, FLOAT_803313dc,
@@ -7006,7 +7005,7 @@ void CMenuPcs::DrawCMLife()
 		} else {
 			const CCaravanWork& caravanWork = Game.m_caravanWorkArr[slot];
 			if (caravanWork.m_shopBusyFlag != 0 || caravanWork.m_caravanLocalFlags != 0) {
-				SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x38);
+				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x38));
 				DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 0, xBase + static_cast<float>(DOUBLE_80331670),
 				                                y + static_cast<float>(DOUBLE_803315C0), FLOAT_80331524,
 				                                FLOAT_80331440, FLOAT_803313dc,

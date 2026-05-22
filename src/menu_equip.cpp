@@ -2,6 +2,7 @@
 #include "ffcc/joybus.h"
 #include "ffcc/pad.h"
 #include "ffcc/game.h"
+#include "ffcc/gobjwork.h"
 #include "ffcc/gxfunc.h"
 #include "ffcc/sound.h"
 #include "ffcc/system.h"
@@ -13,9 +14,6 @@ typedef signed short s16;
 typedef unsigned char u8;
 typedef unsigned short u16;
 
-extern "C" int CanPlayerPutItem__12CCaravanWorkFv(void*);
-extern "C" void ChgEquipPos__12CCaravanWorkFii(void*, int, int);
-extern "C" void CalcStatus__12CCaravanWorkFv(void*);
 extern "C" void SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(CMenuPcs*, int);
 extern "C" void SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(CMenuPcs*, int);
 extern "C" void DrawRect__8CMenuPcsFUlfffffffff(double, double, double, double, double, double, double, double, CMenuPcs*,
@@ -377,7 +375,7 @@ int CMenuPcs::EquipCtrlCur()
 					Sound.PlaySe(3, 0x40, 0x7f, 0);
 					return 1;
 				}
-			} else if (CanPlayerPutItem__12CCaravanWorkFv(reinterpret_cast<void*>(caravanWork)) == 0) {
+			} else if (reinterpret_cast<CCaravanWork*>(caravanWork)->CanPlayerPutItem() == 0) {
 				Sound.PlaySe(4, 0x40, 0x7f, 0);
 			} else {
 				*reinterpret_cast<s16*>(menuState + 0x30) = 1;
@@ -465,8 +463,8 @@ int CMenuPcs::EquipCtrlCur()
 					} else {
 						item = entries[index];
 					}
-					ChgEquipPos__12CCaravanWorkFii(reinterpret_cast<void*>(caravanWork), equipIndex, item);
-					CalcStatus__12CCaravanWorkFv(reinterpret_cast<void*>(caravanWork));
+					reinterpret_cast<CCaravanWork*>(caravanWork)->ChgEquipPos(equipIndex, item);
+					reinterpret_cast<CCaravanWork*>(caravanWork)->CalcStatus();
 					*reinterpret_cast<s16*>(menuState + 0x12) = *reinterpret_cast<s16*>(menuState + 0x12) + 1;
 					*reinterpret_cast<s16*>(menuState + 0x22) = 0;
 					CmdInit2();

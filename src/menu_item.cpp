@@ -2,6 +2,7 @@
 #include "ffcc/color.h"
 #include "ffcc/fontman.h"
 #include "ffcc/game.h"
+#include "ffcc/gobjwork.h"
 #include "ffcc/gxfunc.h"
 #include "ffcc/pad.h"
 #include "ffcc/sound.h"
@@ -14,15 +15,9 @@ typedef unsigned short u16;
 
 extern "C" int SingGetLetterAttachflg__8CMenuPcsFv(CMenuPcs*);
 extern "C" void LetterSetAttachItem__8CMenuPcsFUii(CMenuPcs*, unsigned int, unsigned int);
-extern "C" int CanPlayerUseItem__12CCaravanWorkFv(void*);
-extern "C" int CanPlayerPutItem__12CCaravanWorkFv(void*);
 extern "C" void GetSingWinSize__8CMenuPcsFiPsPsi(CMenuPcs*, int, s16*, s16*, int);
 extern "C" void SetSingWinInfo__8CMenuPcsFiiii(CMenuPcs*, int, int, int, int);
-extern "C" void FGUseItem__12CCaravanWorkFii(void*, int, int);
 extern "C" void SingLifeInit__8CMenuPcsFi(CMenuPcs*, int);
-extern "C" void CalcStatus__12CCaravanWorkFv(void*);
-extern "C" void FGPutItem__12CCaravanWorkFii(void*, int, int);
-extern "C" void DeleteItemIdx__12CCaravanWorkFii(void*, int, int);
 extern "C" void SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(CMenuPcs*, int);
 extern "C" void SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(CMenuPcs*, int);
 extern "C" void DrawRect__8CMenuPcsFUlfffffffff(CMenuPcs*, unsigned long, float, float, float, float, float, float, float, float, float);
@@ -244,10 +239,10 @@ int CMenuPcs::ItemCtrlCur()
                     this->itemMenuState->optionFlags = 0xC;
                     int itemType = GetItemType(idx, 0);
 
-                    if ((itemType == 7) && (CanPlayerUseItem__12CCaravanWorkFv((void*)caravanWork) != 0)) {
+                    if ((itemType == 7) && (reinterpret_cast<CCaravanWork*>(caravanWork)->CanPlayerUseItem() != 0)) {
                         this->itemMenuState->optionFlags = this->itemMenuState->optionFlags | 1;
                     }
-                    if ((itemType != 1) && (CanPlayerPutItem__12CCaravanWorkFv((void*)caravanWork) != 0)) {
+                    if ((itemType != 1) && (reinterpret_cast<CCaravanWork*>(caravanWork)->CanPlayerPutItem() != 0)) {
                         this->itemMenuState->optionFlags = this->itemMenuState->optionFlags | 2;
                     }
 
@@ -305,13 +300,13 @@ int CMenuPcs::ItemCtrlCur()
                     }
 
                     if (option == 0) {
-                        FGUseItem__12CCaravanWorkFii((void*)caravanWork, idx, 0);
+                        reinterpret_cast<CCaravanWork*>(caravanWork)->FGUseItem(idx, 0);
                         SingLifeInit__8CMenuPcsFi(this, 0);
-                        CalcStatus__12CCaravanWorkFv((void*)caravanWork);
+                        reinterpret_cast<CCaravanWork*>(caravanWork)->CalcStatus();
                     } else if (option == 1) {
-                        FGPutItem__12CCaravanWorkFii((void*)caravanWork, idx, 0);
+                        reinterpret_cast<CCaravanWork*>(caravanWork)->FGPutItem(idx, 0);
                     } else if (option == 2) {
-                        DeleteItemIdx__12CCaravanWorkFii((void*)caravanWork, idx, 0);
+                        reinterpret_cast<CCaravanWork*>(caravanWork)->DeleteItemIdx(idx, 0);
                     }
 
                     this->singWindowInfo[5] = 2;

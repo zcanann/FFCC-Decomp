@@ -22,11 +22,6 @@ GbaQueue GbaQue;
 extern "C" int rand(void);
 extern "C" int memcmp(const void*, const void*, unsigned long);
 extern "C" void MakeAgbString__4CMesFPcPcii(char*, char*, int, int);
-extern "C" int AddGil__12CCaravanWorkFi(void*, int);
-extern "C" int CanAddGil__12CCaravanWorkFi(void*, int);
-extern "C" int IsOutOfShouki__12CCaravanWorkFv(void*);
-extern "C" int CanPlayerUseItem__12CCaravanWorkFv(void*);
-extern "C" int CanPlayerPutItem__12CCaravanWorkFv(void*);
 extern "C" int GetItemType__8CMenuPcsFii(CMenuPcs*, int, int);
 extern "C" int GetItemIcon__8CMenuPcsFi(CMenuPcs*, int);
 
@@ -1487,14 +1482,14 @@ void GbaQueue::LoadPlayerStat()
 					                                             (*reinterpret_cast<void***>(partyObj))[0xB])(partyObj) != 0));
 				}
 
-				if ((IsOutOfShouki__12CCaravanWorkFv(reinterpret_cast<void*>(caravanWork)) != 0) && (entry[0x17] != 0)) {
+				if ((caravanWork->IsOutOfShouki() != 0) && (entry[0x17] != 0)) {
 					outOfShoukiMask |= (1U << i);
 				}
 
-				if (CanPlayerUseItem__12CCaravanWorkFv(reinterpret_cast<void*>(caravanWork)) != 0) {
+				if (caravanWork->CanPlayerUseItem() != 0) {
 					entry[0xD6] |= 1;
 				}
-				if (CanPlayerPutItem__12CCaravanWorkFv(reinterpret_cast<void*>(caravanWork)) != 0) {
+				if (caravanWork->CanPlayerPutItem() != 0) {
 					entry[0xD6] |= 2;
 				}
 			}
@@ -2569,10 +2564,10 @@ void GbaQueue::MoveLetterItem(int channel, unsigned int value)
 		int item = *reinterpret_cast<unsigned short*>(letter + 0x3EE) & 0x1FF;
 		if (item != 0) {
 			int gil = item * 100;
-			if (CanAddGil__12CCaravanWorkFi(reinterpret_cast<void*>(caravanWork), gil) == 0) {
+			if (caravanWork->CanAddGil(gil) == 0) {
 				result = 1;
 			} else {
-				AddGil__12CCaravanWorkFi(reinterpret_cast<void*>(*scriptFoodBase), gil);
+				reinterpret_cast<CCaravanWork*>(*scriptFoodBase)->AddGil(gil);
 				result = 0;
 			}
 		}

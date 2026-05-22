@@ -22,8 +22,6 @@ extern "C" void DrawSingWinMess__8CMenuPcsFiii(CMenuPcs*, int, int, int);
 extern "C" int SingWinMessHeight__8CMenuPcsFv(CMenuPcs*);
 extern "C" void DrawCursor__8CMenuPcsFiif(CMenuPcs*, int, int, float);
 extern "C" void DrawInit__8CMenuPcsFv(CMenuPcs*);
-extern "C" void FGPutGil__12CCaravanWorkFi(void*, int);
-extern "C" int CanPlayerPutItem__12CCaravanWorkFv(void*);
 extern "C" void GetSingWinSize__8CMenuPcsFiPsPsi(CMenuPcs*, int, s16*, s16*, int);
 extern "C" void SetSingWinInfo__8CMenuPcsFiiii(CMenuPcs*, int, int, int, int);
 
@@ -271,7 +269,7 @@ int CMenuPcs::MoneyCtrlCur()
 					s16 winW;
 					s16 winH;
 					this->moneyState->messageMask = 2;
-					if (CanPlayerPutItem__12CCaravanWorkFv((void*)caravanWork) != 0) {
+					if (reinterpret_cast<CCaravanWork*>(caravanWork)->CanPlayerPutItem() != 0) {
 						this->moneyState->messageMask = this->moneyState->messageMask | 1;
 					}
 					GetSingWinSize__8CMenuPcsFiPsPsi(this, 1, &winW, &winH, 0);
@@ -311,7 +309,7 @@ int CMenuPcs::MoneyCtrlCur()
 					return 0;
 				}
 				if (*(s16*)(optBase + 0x26) == 0) {
-					FGPutGil__12CCaravanWorkFi((void*)caravanWork, (int)s_Money);
+					reinterpret_cast<CCaravanWork*>(caravanWork)->FGPutGil(static_cast<int>(s_Money));
 					s_Money = 0;
 					int iVar8 = *(int*)(Game.m_scriptFoodBase[0] + 0x200);
 					int iVar9 = 0;

@@ -27,10 +27,6 @@ extern "C" void SetSingDynamicWinMessInfo__8CMenuPcsFiPcPcPcPcPcPcPcPc(CMenuPcs*
 extern "C" void GetSingWinSize__8CMenuPcsFiPsPsi(CMenuPcs*, int, s16*, s16*, int);
 extern "C" void SetMcWinInfo__8CMenuPcsFii(CMenuPcs*, int, int);
 
-extern "C" void AddGil__12CCaravanWorkFi(void*, int);
-extern "C" int CanAddGil__12CCaravanWorkFi(void*, int);
-extern "C" void FGLetterReply__12CCaravanWorkFiiii(void*, int, int, int, int);
-extern "C" void DeleteItemIdx__12CCaravanWorkFii(void*, int, int);
 extern "C" void DrawSingleCrescent__8CMenuPcsFff(CMenuPcs*, float, float);
 extern "C" void DrawSingleStat__8CMenuPcsFf(CMenuPcs*, float);
 extern "C" void DrawSingleHelpWim__8CMenuPcsFf(CMenuPcs*, float);
@@ -1774,8 +1770,7 @@ int CMenuPcs::LetterCtrlCur()
 							*reinterpret_cast<u8*>(state + 9) |= 2;
 						}
 					} else {
-						int canAdd = CanAddGil__12CCaravanWorkFi(
-						    reinterpret_cast<void*>(caravanWork),
+						int canAdd = reinterpret_cast<CCaravanWork*>(caravanWork)->CanAddGil(
 						    (*reinterpret_cast<u16*>(entry + 0x3EE) & 0x1FF) * 100);
 						if (canAdd != 0) {
 							*reinterpret_cast<u8*>(state + 9) |= 2;
@@ -1855,7 +1850,7 @@ int CMenuPcs::LetterCtrlCur()
 					if (((*reinterpret_cast<u8*>(entry + 0x3EC) >> 3) & 1) == 0) {
 						reinterpret_cast<CCaravanWork*>(caravanWork)->AddItem(static_cast<int>(value), 0);
 					} else {
-						AddGil__12CCaravanWorkFi(reinterpret_cast<void*>(caravanWork), static_cast<int>(value * 100));
+						reinterpret_cast<CCaravanWork*>(caravanWork)->AddGil(static_cast<int>(value * 100));
 					}
 					*reinterpret_cast<u8*>(entry + 0x3EC) = (*reinterpret_cast<u8*>(entry + 0x3EC) & 0xBF) | 0x40;
 				}
@@ -2023,17 +2018,15 @@ int CMenuPcs::LetterCtrlCur()
 						gilValue = s_AttachItem;
 					}
 				}
-				FGLetterReply__12CCaravanWorkFiiii(
-				    reinterpret_cast<void*>(caravanWork),
+				reinterpret_cast<CCaravanWork*>(caravanWork)->FGLetterReply(
 				    static_cast<int>(s_SelLetter),
 				    static_cast<int>(s_ReplyPos),
 				    itemValue,
 				    gilValue);
 				if (s_Attach == 0) {
-					DeleteItemIdx__12CCaravanWorkFii(
-					    reinterpret_cast<void*>(caravanWork), static_cast<int>(s_AttachItemIdx), 0);
+					reinterpret_cast<CCaravanWork*>(caravanWork)->DeleteItemIdx(static_cast<int>(s_AttachItemIdx), 0);
 				} else {
-					AddGil__12CCaravanWorkFi(reinterpret_cast<void*>(caravanWork), -gilValue);
+					reinterpret_cast<CCaravanWork*>(caravanWork)->AddGil(-gilValue);
 				}
 				*reinterpret_cast<u8*>(state + 8) = 1;
 			} else {

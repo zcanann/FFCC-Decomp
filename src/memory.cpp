@@ -75,8 +75,8 @@ extern char DAT_801d6bec[];
 extern char DAT_8032f7d4[4];
 extern char DAT_8032f7e8[];
 extern char DAT_8032f808[];
-extern const char* lbl_801E8470[];
-extern const char* lbl_8032E410[];
+extern const char* s_amemCacheTypeNames_801E8470[];
+extern const char* s_amemCacheStateNames_8032E410[];
 extern const float FLOAT_8032f7d8 = 9000.0f;
 extern const float FLOAT_8032f7dc = 0.0f;
 extern float FLOAT_8032f7fc;
@@ -125,12 +125,12 @@ static inline const CAmemCache& cacheEntryAt(const CAmemCacheSet* cacheSet, int 
 
 static inline const char* cacheStateName(const CAmemCache& entry)
 {
-    return lbl_8032E410[entry.m_inUse == 0];
+    return s_amemCacheStateNames_8032E410[entry.m_inUse == 0];
 }
 
 static inline const char* cacheTypeName(const CAmemCache& entry)
 {
-    return lbl_801E8470[entry.m_type];
+    return s_amemCacheTypeNames_801E8470[entry.m_type];
 }
 
 static inline CRedSound* RedSound(CSound* sound)
@@ -2198,7 +2198,7 @@ void CAmemCacheSet::RefCnt0Compare()
         if ((entry.m_inUse != 0 && entry.m_refCount != 0) &&
             static_cast<unsigned int>(System.m_execParam) >= 3) {
             System.Printf(
-                const_cast<char*>(dumpBase + 0xd8), i, lbl_8032E410[entry.m_inUse == 0], lbl_801E8470[entry.m_type],
+                const_cast<char*>(dumpBase + 0xd8), i, cacheStateName(entry), cacheTypeName(entry),
                 entry.m_refCount, entry.m_priority, reinterpret_cast<int>(entry.m_cacheData));
         }
     }

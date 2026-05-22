@@ -19,7 +19,6 @@ extern int gPppCalcDisabled;
 #include <string.h>
 
 extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void*);
-extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void pppSetBlendMode(unsigned char);
 extern "C" int rand(void);
 static pppFMATRIX g_matUnit3;
@@ -272,14 +271,14 @@ void pppFrameYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthShp
 
     if (work->m_particles == 0) {
         work->m_maxParticles = *(u16*)(paramPayload + 0xe);
-        work->m_particles = (_PARTICLE_DATA*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+        work->m_particles = (_PARTICLE_DATA*)pppMemAlloc(
             work->m_maxParticles * 0x1f8, pppEnvStPtr->m_stagePtr,
             const_cast<char*>(s_pppYmMegaBirthShpTail3_cpp_801D9C88), 0x2db);
         if (work->m_particles != 0) {
             memset(work->m_particles, 0, work->m_maxParticles * 0x1f8);
         }
 
-        work->m_wmats = (_PARTICLE_WMAT*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+        work->m_wmats = (_PARTICLE_WMAT*)pppMemAlloc(
             work->m_maxParticles * 0x30, pppEnvStPtr->m_stagePtr,
             const_cast<char*>(s_pppYmMegaBirthShpTail3_cpp_801D9C88), 0x2e3);
         if (work->m_wmats != 0) {

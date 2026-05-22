@@ -10,7 +10,6 @@ extern int gPppCalcDisabled;
 }
 #include <string.h>
 
-extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void*);
 extern const float FLOAT_80330458;
 extern float FLOAT_8033044C;
@@ -551,7 +550,7 @@ void pppRyjMegaBirth(_pppPObject* pObject, PRyjMegaBirth* particleData, PRyjMega
 	if (work->m_particleBlock == NULL)
 	{
 		work->m_numParticles = *(u16*)(particleDataBytes + 0x20);
-		work->m_particleBlock = (_PARTICLE_DATA*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+		work->m_particleBlock = (_PARTICLE_DATA*)pppMemAlloc(
 			work->m_numParticles * 0x60, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppRyjMegaBirth_cpp_801D9C00), 0x262);
 		if (work->m_particleBlock != NULL)
 		{
@@ -560,7 +559,7 @@ void pppRyjMegaBirth(_pppPObject* pObject, PRyjMegaBirth* particleData, PRyjMega
 
 		if ((particleDataBytes[0xEC] == 1) || (particleDataBytes[0xEC] == 2))
 		{
-			work->m_worldMatrixBlock = (PARTICLE_WMAT*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+			work->m_worldMatrixBlock = (PARTICLE_WMAT*)pppMemAlloc(
 				work->m_numParticles * 0x30, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppRyjMegaBirth_cpp_801D9C00), 0x269);
 			if (work->m_worldMatrixBlock != NULL)
 			{
@@ -570,7 +569,7 @@ void pppRyjMegaBirth(_pppPObject* pObject, PRyjMegaBirth* particleData, PRyjMega
 
 		if (particleDataBytes[0xE9] != 0)
 		{
-			work->m_colorBlock = (_PARTICLE_COLOR*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+			work->m_colorBlock = (_PARTICLE_COLOR*)pppMemAlloc(
 				work->m_numParticles << 5, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppRyjMegaBirth_cpp_801D9C00), 0x271);
 			if (work->m_colorBlock != NULL)
 			{

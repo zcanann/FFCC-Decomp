@@ -6,24 +6,12 @@
 #include "ffcc/materialman.h"
 #include "ffcc/math.h"
 #include "ffcc/p_camera.h"
+#include "ffcc/pppPart.h"
 
 #include "dolphin/gx.h"
 #include "dolphin/os/OSCache.h"
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h"
 #include "ffcc/ppp_linkage.h"
-
-struct _pppMngStEmission {
-    u8 _pad0[0xD8];
-    void* m_charaObj;
-};
-
-struct _pppEnvStEmission {
-    CMemory::CStage* m_stagePtr;
-    CMaterialSet* m_materialSetPtr;
-    CMapMesh** m_mapMeshPtr;
-};
-extern _pppMngStEmission* pppMngStPtr;
-extern _pppEnvStEmission* pppEnvStPtr;
 
 extern "C" int rand(void);
 extern const char DAT_803311fc;
@@ -52,7 +40,6 @@ void pppHeapUseRate__FPQ27CMemory6CStage(CMemory::CStage* stage);
 void SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(void*, void*, unsigned int, int, int);
 void SetObjMatrix__12CMaterialManFPA4_fPA4_f(void*, float (*)[4], float (*)[4]);
 void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
-void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(void*, long, float&, float&, float&, float, float&, float&);
 int GetTexture__8CMapMeshFP12CMaterialSetRi(CMapMesh* mapMesh, CMaterialSet* materialSet, int& textureIndex);
 }
@@ -171,7 +158,7 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, pppEm
     EmissionState* state = (EmissionState*)((u8*)pppEmission_ + 0x80 + serializedDataOffsets[2]);
     u8* dataSet = (u8*)pppEmission_ + 0x80 + serializedDataOffsets[1];
 
-    void* handle = GetCharaHandlePtr__FP8CGObjectl(pppMngStPtr->m_charaObj, 0);
+    void* handle = GetCharaHandlePtr__FP8CGObjectl(pppMngStPtr->m_owner, 0);
     EmissionModelView* model = (EmissionModelView*)GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
     model->m_state = state;
     model->m_step = param_2;
@@ -207,7 +194,7 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, pppEm
     if (payload[9] != 0) {
         if (state->m_particles == 0) {
             state->m_field1C = payload[0xB] / payload[0xC];
-            state->m_particles = pppMemAlloc__FUlPQ27CMemory6CStagePci(
+            state->m_particles = pppMemAlloc(
                 (unsigned long)param_2->m_initWOrk << 4,
                 pppEnvStPtr->m_stagePtr,
                 const_cast<char*>(s_pppEmission_cpp_801db7e8),
@@ -287,7 +274,7 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, pppEm
 void pppDestructEmission(pppEmission* pppEmission_, pppEmissionUnkC* param_2) {
     float baseScale;
     int* state = (int*)((u8*)pppEmission_ + 0x80 + param_2->m_serializedDataOffsets[2]);
-    void* handle = GetCharaHandlePtr__FP8CGObjectl(pppMngStPtr->m_charaObj, 0);
+    void* handle = GetCharaHandlePtr__FP8CGObjectl(pppMngStPtr->m_owner, 0);
     EmissionModelView* model = (EmissionModelView*)GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
 
     model->m_state = 0;
@@ -364,7 +351,7 @@ void pppConstructEmission(pppEmission* pppEmission_, pppEmissionUnkC* param_2) {
     state->field10 = baseScale;
     state->fieldC = baseScale;
 
-    void* handle = GetCharaHandlePtr__FP8CGObjectl(pppMngStPtr->m_charaObj, 0);
+    void* handle = GetCharaHandlePtr__FP8CGObjectl(pppMngStPtr->m_owner, 0);
     EmissionModelView* model = (EmissionModelView*)GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
     model->m_drawMeshDlCallback = Emission_DrawMeshDLCallback;
     model->m_afterDrawMeshCallback = Emission_AfterDrawMeshCallback;

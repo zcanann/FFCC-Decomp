@@ -6,6 +6,7 @@
 #include "ffcc/pppShape.h"
 #include "ffcc/pppYmEnv.h"
 #include "ffcc/graphic.h"
+#include "ffcc/gxfunc.h"
 #include "ffcc/linkage.h"
 extern "C" {
 extern const f32 kPppLaserZero;
@@ -33,24 +34,10 @@ int GetParticleSpecialInfo__5CGameFR10PPPIFPARAMRiRi(CGame*, PPPIFPARAM*, int*, 
 void GetTargetCursor__5CGameFiR3VecR3Vec(CGame*, int, Vec*, Vec*);
 void* GetPartyObj__5CGameFi(CGame*, int);
 void pppStopSe__FP9_pppMngStP7PPPSEST(_pppMngSt*, PPPSEST*);
-void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, void*, void*, u32);
 void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
 void ParticleFrameCallback__5CGameFiiiiiP3Vec(CGame*, int, int, int, int, int, Vec*);
 int GetTextureFromRSD__FiP9_pppEnvSt(int, _pppEnvSt*);
-
-void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
-void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, int, int, int, int);
-void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
-void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
-void _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(
-    int, int, int, int, int);
-void _GXSetTevColorOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(
-    int, int, int, int, int, int);
-void _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg(
-    int, int, int, int, int);
-void _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(
-    int, int, int, int, int, int);
 }
 
 extern "C" const char s_pppLaser_cpp_801E3048[] = "pppLaser.cpp";
@@ -236,7 +223,7 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
     }
 
     if (work->m_points == 0) {
-        work->m_points = (Vec*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+        work->m_points = (Vec*)pppMemAlloc(
             (u32)step->m_laser.m_pointCount * 0xc, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppLaser_cpp_801E3048), 0x7d);
         memset(work->m_points, 0, (u32)step->m_laser.m_pointCount * 0xc);
         emptyHistory = 1;
@@ -421,7 +408,7 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
 
     tex = GetTextureFromRSD__FiP9_pppEnvSt(dataValIndex, pppEnvStPtr);
     pppSetBlendMode(step->m_laser.m_blendMode);
-    _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(1, 0, 0);
+    _GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP0);
     pppSetDrawEnv(
         &colorData->m_color, &pppLaser->m_localMatrix, kPppLaserZero, step->m_laser.m_drawEnvColor1,
         step->m_laser.m_drawEnvColor0, step->m_laser.m_blendMode, 0, 1, 1, 0);
@@ -429,16 +416,14 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
     GXSetNumTexGens(1);
     GXSetNumChans(1);
     GXSetCullMode(GX_CULL_NONE);
-    _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(7, 0, 1, 7, 0);
+    _GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_OR, GX_ALWAYS, 0);
     color = *(_GXColor*)&colorData->m_color;
-    _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 4);
+    _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
     GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)1, (GXTexGenSrc)4, 0x3C, GX_FALSE, 0x7D);
-    _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(
-        0, 0xF, 8, 0xA, 0xF);
-    _GXSetTevColorOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(0, 0, 0, 0, 1, 0);
-    _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg(
-        0, 7, 7, 7, 5);
-    _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(0, 0, 0, 0, 1, 0);
+    _GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_TEXC, GX_CC_RASC, GX_CC_ZERO);
+    _GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    _GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_RASA);
+    _GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
     gUtil.SetVtxFmt_POS_CLR_TEX();
     GXLoadTexObj((GXTexObj*)(tex + 0x28), GX_TEXMAP0);
 
@@ -499,11 +484,11 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
         count = step->m_laser.m_pointCount;
         uvStep = FLOAT_8033342c / (float)count;
         if (step->m_initWOrk == 0xFFFF) {
-            _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0xFF, 0xFF, 4);
-            _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 4);
+            _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
+            _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
         } else {
             tex = GetTextureFromRSD__FiP9_pppEnvSt(step->m_initWOrk, pppEnvStPtr);
-            _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 0);
+            _GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
             GXLoadTexObj((GXTexObj*)(tex + 0x28), GX_TEXMAP0);
         }
 
@@ -549,8 +534,8 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
         u8* cflat = CFlat;
         if ((*reinterpret_cast<u32*>(cflat + 0x129c) & 0x200000) != 0) {
             gUtil.SetVtxFmt_POS_CLR();
-            _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0xFF, 0xFF, 4);
-            _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 4);
+            _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
+            _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
             GXSetNumTexGens(0);
             pppSetBlendMode(1);
 

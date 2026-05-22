@@ -1,4 +1,5 @@
 #include "ffcc/pppYmTracer2.h"
+#include "ffcc/gxfunc.h"
 #include "ffcc/mapmesh.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/partMng.h"
@@ -12,16 +13,6 @@ extern f32 gPppDefaultValueBuffer[];
 
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
-
-extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
-extern "C" void pppSetBlendMode(unsigned char);
-extern "C" void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-    void*, void*, float, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char,
-    unsigned char);
-extern "C" int GetTexture__8CMapMeshFP12CMaterialSetRi(CMapMesh*, CMaterialSet*, int&);
-extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
-extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
-extern "C" void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
 
 extern const float FLOAT_80331840;
 extern const float FLOAT_80331844;
@@ -122,25 +113,25 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, p
 
     if (dataValIndex != 0xFFFF) {
         pppSetBlendMode(param_2->m_tracer.m_blendMode);
-        pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-            colorData + 8, (void*)&ppvCameraMatrix, FLOAT_80331840,
+        pppSetDrawEnv(
+            reinterpret_cast<pppCVECTOR*>(colorData + 8), reinterpret_cast<pppFMATRIX*>(&ppvCameraMatrix),
+            FLOAT_80331840,
             param_2->m_tracer.m_drawEnvColor1, param_2->m_tracer.m_drawEnvColor0,
             param_2->m_tracer.m_blendMode, 0, 1, 1, 0);
         gUtil.SetVtxFmt_POS_CLR_TEX();
 
         textureIndex[0] = 0;
-        texture = (CTexture*)GetTexture__8CMapMeshFP12CMaterialSetRi(mapMesh, pppEnvStPtr->m_materialSetPtr,
-                                                                     textureIndex[0]);
+        texture = (CTexture*)mapMesh->GetTexture(pppEnvStPtr->m_materialSetPtr, textureIndex[0]);
         if (texture != 0) {
             GXLoadTexObj(&texture->m_texObj, GX_TEXMAP0);
             GXSetNumChans(1);
             GXSetNumTexGens(1);
             GXSetNumTevStages(1);
             GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
-            _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 4);
-            _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 0);
-            _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
-            _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(1, 0, 0);
+            _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
+            _GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
+            _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
+            _GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP0);
 
             u32 format = (u32)texture->m_format;
             if ((format == 8) || (format == 9)) {
@@ -148,9 +139,9 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, p
             }
 
             if (param_2->m_tracer.m_useTextureTev == 0) {
-                _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 0);
+                _GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
             } else {
-                _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 4);
+                _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
             }
 
             uvStep = FLOAT_80331844 / (f32)work->visibleCount;
@@ -258,7 +249,7 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
     if (work->entries == nullptr) {
         useFallback = 1;
         work->alphaStep = (u16)param_2->m_tracer.m_entryAlpha / param_2->m_tracer.m_entryLife;
-        work->entries = (TRACE_POLYGON*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+        work->entries = (TRACE_POLYGON*)pppMemAlloc(
             (u32)param_2->m_tracer.m_entryCount * 0x28, pppEnvStPtr->m_stagePtr,
             const_cast<char*>(s_pppYmTracer2_cpp_801dc4b8), 0xAD);
 

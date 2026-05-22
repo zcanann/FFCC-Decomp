@@ -1,7 +1,9 @@
 #include "ffcc/pppChangeTex.h"
 #include "ffcc/gobject.h"
 #include "ffcc/graphic.h"
+#include "ffcc/gxfunc.h"
 #include "ffcc/linkage.h"
+#include "ffcc/pppPart.h"
 extern "C" {
 extern const float kPppChangeTexInit;
 extern int gPppCalcDisabled;
@@ -115,8 +117,6 @@ static void ChangeTex_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int
 static void ChangeTex_AfterDrawMeshCallback(CChara::CModel*, void*, void*, int, float (*)[4]);
 
 extern "C" {
-		int GetTexture__8CMapMeshFP12CMaterialSetRi(CMapMesh* mapMesh, CMaterialSet* materialSet, int& textureIndex);
-		void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int stage, int rasSel, int texSel);
 		void SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(void*, void*, unsigned int, int, int);
 
 	void _WaitDrawDone__8CGraphicFPci(CGraphic* graphic, const char* file, int line);
@@ -125,7 +125,6 @@ extern "C" {
 		void pppHeapUseRate__FPQ27CMemory6CStage(void* stage);
 		void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(_pppPObject*, long, float&, float&, float&, float, float&, float&);
 		void* GetTextureFromRSD__FiP9_pppEnvSt(int, _pppEnvSt*);
-		void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, void*, char*, int);
 		void ReWriteDisplayList__5CUtilFPvUlUl(CUtil*, void*, unsigned long, unsigned long);
 		void CalcBoundaryBoxQuantized__5CUtilFP3VecP3VecP6S16VecUlUl(CUtil*, Vec*, Vec*, S16Vec*, unsigned long, unsigned long);
 }
@@ -147,9 +146,8 @@ void pppRenderChangeTex(pppChangeTex*, pppChangeTexUnkB* step, pppChangeTexUnkC*
 		_pppEnvSt* env = pppEnvStPtr;
 		CMapMesh* mapMesh = env->m_mapMeshPtr[step->m_dataValIndex];
 		textureIndex = 0;
-		GetTexture__8CMapMeshFP12CMaterialSetRi(
-		    mapMesh, env->m_materialSetPtr, textureIndex);
-		_GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
+		mapMesh->GetTexture(env->m_materialSetPtr, textureIndex);
+		_GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
 		pppInitBlendMode();
 	}
 }
@@ -222,10 +220,10 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 	ChangeTexMeshRef* meshList = model0Raw->m_meshes;
 	if ((work->m_meshColorArrays == 0) && (work->m_displayListArrays == 0)) {
 		work->m_cachedValue = LoadFloat(FLOAT_80332020);
-		work->m_meshColorArrays = pppMemAlloc__FUlPQ27CMemory6CStagePci(
+		work->m_meshColorArrays = pppMemAlloc(
 		    model0Raw->m_data->m_meshCount << 2, pppEnvStPtr->m_stagePtr,
 		    const_cast<char*>(s_pppChangeTex_cpp_801dd660), 0x163);
-		work->m_displayListArrays = pppMemAlloc__FUlPQ27CMemory6CStagePci(
+		work->m_displayListArrays = pppMemAlloc(
 		    model0Raw->m_data->m_meshCount << 2, pppEnvStPtr->m_stagePtr,
 		    const_cast<char*>(s_pppChangeTex_cpp_801dd660), 0x166);
 
@@ -239,7 +237,7 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 				    model0Raw->m_data->m_frameShift);
 			}
 
-			*(int*)((u8*)work->m_displayListArrays + arrayOffset) = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+			*(int*)((u8*)work->m_displayListArrays + arrayOffset) = (int)pppMemAlloc(
 			    meshList->m_data->m_displayListCount << 2, pppEnvStPtr->m_stagePtr,
 			    const_cast<char*>(s_pppChangeTex_cpp_801dd660), 0x181);
 
@@ -247,18 +245,18 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 			int* dlInfo = (int*)meshList->m_data->m_displayLists;
 			int* dlEntry = (int*)(*(int*)((u8*)work->m_displayListArrays + arrayOffset) + dlIdx * 4);
 			for (; dlIdx >= 0; dlIdx = dlIdx - 1, dlInfo = dlInfo + 3) {
-				int dlPair = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+				int dlPair = (int)pppMemAlloc(
 				    8, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppChangeTex_cpp_801dd660), 0x18B);
 				*dlEntry = dlPair;
 				*(int*)(*dlEntry + 4) = *dlInfo;
-				*(int*)*dlEntry = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+				*(int*)*dlEntry = (int)pppMemAlloc(
 				    *dlInfo, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppChangeTex_cpp_801dd660), 0x18D);
 				memcpy(*(void**)*dlEntry, (void*)dlInfo[1], dlInfo[0]);
 				ReWriteDisplayList__5CUtilFPvUlUl(&gUtil, *(void**)*dlEntry, (unsigned long)dlInfo[0], 1);
 				dlEntry = dlEntry - 1;
 			}
 
-			*meshColorArrays = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+			*meshColorArrays = (int)pppMemAlloc(
 			    meshList->m_data->m_vertexCount << 2, pppEnvStPtr->m_stagePtr,
 			    const_cast<char*>(s_pppChangeTex_cpp_801dd660), 0x196);
 			memset((void*)*meshColorArrays, 0, meshList->m_data->m_vertexCount << 2);

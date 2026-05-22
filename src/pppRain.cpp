@@ -1,5 +1,6 @@
 #include "ffcc/pppRain.h"
 #include "ffcc/memory.h"
+#include "ffcc/gxfunc.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/game.h"
 #include "ffcc/partMng.h"
@@ -17,11 +18,6 @@ extern const char s_pppRain_cpp_801DB610[] = "pppRain.cpp";
 
 extern "C" {
 int rand(void);
-void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
-void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(void*, void*, float, u8, u8, u8, u8, u8, u8, u8);
-
-void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
-void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 }
 
 struct RainColorData {
@@ -57,9 +53,9 @@ void pppRenderRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_D
     workOffset = param_3->m_serializedDataOffsets[2] + 0x80;
     colorData = (RainColorData*)((u8*)pppRain + colorOffset + 0x80);
     pppSetBlendMode(param_2->m_blendMode);
-    pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
+    pppSetDrawEnv(
         &colorData->color,
-        ppvCameraMatrix,
+        reinterpret_cast<pppFMATRIX*>(&ppvCameraMatrix),
         kPppRainTexCoordBase,
         param_2->m_lightTarget,
         param_2->m_fogIndex,
@@ -72,8 +68,8 @@ void pppRenderRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_D
     GXSetNumChans(1);
     GXSetNumTevStages(1);
     GXSetTevDirect(GX_TEVSTAGE0);
-    _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0xFF, 4);
-    _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 4);
+    _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP_NULL, GX_COLOR0A0);
+    _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
     GXSetLineWidth(param_2->m_lineWidth, GX_TO_ZERO);
     gUtil.SetVtxFmt_POS_CLR_TEX();
 
@@ -136,7 +132,7 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
     if (work->drops == 0) {
         RainDrop* dropData;
 
-        work->drops = (RainDrop*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+        work->drops = (RainDrop*)pppMemAlloc(
             param_2->m_dataValIndex * sizeof(RainDrop),
             pppEnvStPtr->m_stagePtr,
             const_cast<char*>(s_pppRain_cpp_801DB610),

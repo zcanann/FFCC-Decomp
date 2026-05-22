@@ -17,8 +17,6 @@ void pppSetBlendMode(unsigned char);
 
 extern "C" {
 void pppHeapUseRate__FPQ27CMemory6CStage(void* stage);
-void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, void*, char*, int);
-void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(void*, void*, float, u8, u8, u8, u8, u8, u8, u8);
 
 void pppDrawMesh__FP10pppModelStP3Veci(pppModelSt*, Vec*, int);
 
@@ -318,10 +316,10 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
     pppInitBlendMode();
     pppSetBlendMode(pBreathModel->m_blendMode);
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
-    pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-        NULL, NULL, pBreathModel->m_drawEnvScale, pBreathModel->m_drawEnvColor1, pBreathModel->m_drawEnvColor0,
-        pBreathModel->m_blendMode, pBreathModel->m_drawEnvColor2, pBreathModel->m_drawEnvColor3, 1,
-        pBreathModel->m_drawEnvColor4);
+    pppSetDrawEnv(
+        static_cast<pppCVECTOR*>(NULL), static_cast<pppFMATRIX*>(NULL), pBreathModel->m_drawEnvScale,
+        pBreathModel->m_drawEnvColor1, pBreathModel->m_drawEnvColor0, pBreathModel->m_blendMode,
+        pBreathModel->m_drawEnvColor2, pBreathModel->m_drawEnvColor3, static_cast<u8>(1), pBreathModel->m_drawEnvColor4);
 
     colorR = color->m_red;
     colorG = color->m_green;
@@ -520,28 +518,28 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
         work->m_groupCount = pBreathModel->m_groupCount;
 
         work->m_particleData =
-            (PARTICLE_DATA*)pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(work->m_particleCount * 0x98), pppEnvStPtr->m_stagePtr,
+            (PARTICLE_DATA*)pppMemAlloc((unsigned long)(work->m_particleCount * 0x98), pppEnvStPtr->m_stagePtr,
                                                   const_cast<char*>(s_pppBreathModel_cpp_801DB5A0), 0x257);
         if (work->m_particleData != NULL) {
             memset(work->m_particleData, 0, (unsigned long)(work->m_particleCount * 0x98));
         }
 
         work->m_particleWmats =
-            (PARTICLE_WMAT*)pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(work->m_particleCount * 0x30), pppEnvStPtr->m_stagePtr,
+            (PARTICLE_WMAT*)pppMemAlloc((unsigned long)(work->m_particleCount * 0x30), pppEnvStPtr->m_stagePtr,
                                                   const_cast<char*>(s_pppBreathModel_cpp_801DB5A0), 0x25d);
         if (work->m_particleWmats != NULL) {
             memset(work->m_particleWmats, 0, (unsigned long)(work->m_particleCount * 0x30));
         }
 
         work->m_particleColors =
-            (PARTICLE_COLOR*)pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(work->m_particleCount << 5), pppEnvStPtr->m_stagePtr,
+            (PARTICLE_COLOR*)pppMemAlloc((unsigned long)(work->m_particleCount << 5), pppEnvStPtr->m_stagePtr,
                                                   const_cast<char*>(s_pppBreathModel_cpp_801DB5A0), 0x263);
         if (work->m_particleColors != NULL) {
             memset(work->m_particleColors, 0, (unsigned long)(work->m_particleCount << 5));
         }
 
         work->m_groups =
-            (BreathParticleGroup*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+            (BreathParticleGroup*)pppMemAlloc(
                 (unsigned long)((int)pBreathModel->m_groupCount * 0x5C),
                 pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppBreathModel_cpp_801DB5A0), 0x269);
         if (work->m_groups != NULL) {
@@ -549,12 +547,12 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
 
             groupTable = work->m_groups;
             for (i = 0; i < (int)pBreathModel->m_groupCount; i++) {
-                groupTable->particleIndices = (signed char*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+                groupTable->particleIndices = (signed char*)pppMemAlloc(
                     (unsigned long)pBreathModel->m_slotCount,
                     pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppBreathModel_cpp_801DB5A0), 0x274);
                 memset(groupTable->particleIndices, -1, (unsigned long)pBreathModel->m_slotCount);
 
-                groupTable->particleStates = (signed char*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+                groupTable->particleStates = (signed char*)pppMemAlloc(
                     (unsigned long)pBreathModel->m_slotCount,
                     pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppBreathModel_cpp_801DB5A0), 0x277);
                 memset(groupTable->particleStates, -1, (unsigned long)pBreathModel->m_slotCount);

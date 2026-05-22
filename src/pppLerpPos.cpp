@@ -22,7 +22,6 @@ struct pppLerpPosUnkC {
 void pppSetFpMatrix(_pppMngSt*);
 
 extern "C" {
-void* pppMemAlloc__FUlPQ27CMemory6CStagePci(u32 size, CMemory::CStage* stage, char* file, int line);
 void pppHeapUseRate__FPQ27CMemory6CStage(CMemory::CStage* stage);
 
 }
@@ -52,7 +51,7 @@ void pppFrameLerpPos(struct pppLerpPos* pppLerpPos, struct pppLerpPosUnkB* param
         iVar2 = *param_3->m_serializedDataOffsets;
         historyPtr = (Vec**)((u8*)pppLerpPos + 0x80 + iVar2);
         if (*historyPtr == 0) {
-            *historyPtr = (Vec*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+            *historyPtr = (Vec*)pppMemAlloc(
                 (u32)(u8)param_2->m_dataValIndex * 0xc, pppEnvStPtr->m_stagePtr,
                 const_cast<char*>(s_pppLerpPos_cpp_801dd418),
                 0x37);

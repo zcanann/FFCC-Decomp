@@ -100,12 +100,8 @@ extern "C" {
 void* GetCharaHandlePtr__FP8CGObjectl(void* obj, long index);
 int GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void* handle);
 int GetTexture__8CMapMeshFP12CMaterialSetRi(CMapMesh* mapMesh, CMaterialSet* materialSet, int& textureIndex);
-int pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 void pppHeapUseRate__FPQ27CMemory6CStage(CMemory::CStage* stage);
 
-void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(pppCVECTOR*, pppFMATRIX*, float, unsigned char,
-                                                                 unsigned char, unsigned char, unsigned char,
-                                                                 unsigned char, unsigned char, unsigned char);
 void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int stage, int rasSel, int texSel);
 void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int stage, int mode);
 void _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
@@ -201,8 +197,7 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
 
     pppInitBlendMode();
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
-    pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(&colorData->m_color, (pppFMATRIX*)0, FLOAT_80331030,
-                                                               param_2->m_alpha, 0, 0, 0, 1, 1, 0);
+    pppSetDrawEnv(&colorData->m_color, (pppFMATRIX*)0, FLOAT_80331030, param_2->m_alpha, 0, 0, 0, 1, 1, 0);
     objPosBase = texData->m_objPosBase;
 
     PSMTXIdentity(identityMtx);
@@ -347,10 +342,10 @@ void pppFrameBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppBl
     if ((unsigned int)work->m_captureBuffer == 0) {
         unsigned int texBufferSize = GXGetTexBufferSize(0x140, 0xE0, GX_TF_I8, GX_FALSE, GX_FALSE);
 
-        work->m_captureBuffer = reinterpret_cast<void*>(
-            pppMemAlloc__FUlPQ27CMemory6CStagePci(texBufferSize, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppBlurChara_cpp_801DB620), 0xD5));
+        work->m_captureBuffer = pppMemAlloc(texBufferSize, pppEnvStPtr->m_stagePtr,
+                                            const_cast<char*>(s_pppBlurChara_cpp_801DB620), 0xD5);
         work->m_smallTexObj = reinterpret_cast<_GXTexObj*>(
-            pppMemAlloc__FUlPQ27CMemory6CStagePci(0x20, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppBlurChara_cpp_801DB620), 0xD7));
+            pppMemAlloc(0x20, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppBlurChara_cpp_801DB620), 0xD7));
 
         rawModel->m_work = work;
         rawModel->m_renderData = param_2;

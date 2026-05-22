@@ -67,13 +67,11 @@ static inline float DeformationMdlZero()
 
 void pppInitBlendMode(void);
 void pppSetBlendMode(unsigned char);
+void pppSetDrawEnv(pppCVECTOR*, pppFMATRIX*, float, unsigned char, unsigned char, unsigned char, unsigned char,
+                   unsigned char, unsigned char, unsigned char);
 
 extern "C" {
 int GetTexture__8CMapMeshFP12CMaterialSetRi(CMapMesh* mapMesh, CMaterialSet* materialSet, int& textureIndex);
-
-void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-    pppCVECTOR*, pppFMATRIX*, float, unsigned char, unsigned char, unsigned char, unsigned char, int, unsigned char,
-    unsigned char);
 
 void pppDrawMesh__FP10pppModelStP3Veci(pppModelSt*, Vec*, int);
 void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
@@ -135,9 +133,9 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
 
     int zEnable = (param_2->m_payloadByte2C == 0) ? 1 : 0;
-    pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
+    pppSetDrawEnv(
         &colorInfo->m_color, &modelObject->m_modelMatrix, param_2->m_payload4, param_2->m_payloadByte2B, param_2->m_payloadByte2A,
-        param_2->m_payloadByte28, param_2->m_payloadByte29, zEnable, 1, 0);
+        param_2->m_payloadByte28, param_2->m_payloadByte29, static_cast<unsigned char>(zEnable), 1, 0);
 
     GXSetNumTevStages(1);
     GXSetNumTexGens(2);

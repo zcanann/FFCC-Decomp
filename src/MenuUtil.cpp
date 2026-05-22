@@ -43,14 +43,14 @@ extern "C" const float kOptionVolumeScale = 10.583333f;
 extern "C" const float FLOAT_80333654 = 25.0f;
 extern float FLOAT_8033357c;
 extern float FLOAT_803335a0;
-extern "C" const char DAT_80333658[4] = "";
-extern "C" const char DAT_8033365c[] = "%s";
-extern "C" const char DAT_80333660[] = "+1";
-extern "C" const char DAT_80333664[] = "%c%d";
-extern "C" const char DAT_8033366c[] = " ";
-extern "C" const char DAT_80333670[] = " %d";
-extern char lbl_80333674[];
-extern char lbl_8033367C[];
+extern const char s_MenuUtilEmptyText_80333658[4] = "";
+extern const char s_MenuUtilStringFormat_8033365c[] = "%s";
+extern const char s_MenuUtilPlusOneText_80333660[] = "+1";
+extern const char s_MenuUtilSignedValueFormat_80333664[] = "%c%d";
+extern const char s_MenuUtilSpaceText_8033366c[] = " ";
+extern const char s_MenuUtilValueSuffixFormat_80333670[] = " %d";
+extern const char s_MenuUtilSignedDeltaFormat_80333674[] = " %+d";
+extern const char s_MenuUtilAttrBonusFormat_8033367C[] = " %s";
 extern char s_Strength_801E30A4[];
 extern char s_Defence_801E30B0[];
 extern char s_Position_Markers_801E30BC[];
@@ -67,13 +67,13 @@ extern char s_Enhanced_801E31DC[];
 extern char s_Standard_801E31E8[];
 extern char s_Erkennungskreisel_801E31F4[];
 extern char s_Tonausgabe_801E3208[];
-extern char lbl_801E3214[];
+extern char s_MenuOptionSoundEffectsDe_801E3214[];
 extern char s_Farbeinstellung_801E3224[];
 extern char s_Erkennungskreisel_des_Charakters_AN_AUS_schalten_801E3234[];
 extern char s_Tonausgabe_auf_Stereo_oder_Mono_schalten_801E3268[];
-extern char lbl_801E3294[];
-extern char lbl_801E32B4[];
-extern char lbl_801E32DC[];
+extern char s_Lautstaerke_der_Musik_aendern_801E3294[];
+extern char s_Lautstaerke_der_Geraeuscheffekte_aendern_801E32B4[];
+extern char s_Farbeinstellung_des_Game_Boy_Advance_aendern_801E32DC[];
 extern char s_Erweitert_801E330C[];
 extern char s_Indicatori_di_posizione_801E3318[];
 extern char s_Effetti_sonori_801E3330[];
@@ -83,31 +83,31 @@ extern char s_Scegli_tra_sonoro_mono_o_stereo_801E3390[];
 extern char s_Regola_il_volume_della_musica_801E33B4[];
 extern char s_Regola_il_volume_degli_effetti_sonori_801E33D4[];
 extern char s_Regola_il_colore_sul_Game_Boy_Advance_801E33FC[];
-extern char lbl_801E3424[];
+extern char s_ResistanceFr_801E3424[];
 extern char s_Sceau_de_position_801E3430[];
 extern char s_Signal_sonore_801E3444[];
 extern char s_Effets_sonores_801E3454[];
 extern char s_Affichage_du_GBA_801E3464[];
 extern char s_Affichage_du_sceau_de_position_aux_pieds_des_personnages_801E3478[];
-extern char lbl_801E34B4[];
-extern char lbl_801E34E0[];
-extern char lbl_801E3500[];
-extern char lbl_801E3524[];
-extern char lbl_801E355C[];
-extern char lbl_801E3568[];
-extern char lbl_801E3574[];
+extern char s_Choisissez_le_signal_sonore_stereo_ou_mono_801E34B4[];
+extern char s_Reglez_le_volume_de_la_musique_801E34E0[];
+extern char s_Reglez_le_volume_des_effets_sonores_801E3500[];
+extern char s_Reglez_le_contraste_des_couleurs_du_Game_Boy_Advance_801E3524[];
+extern char s_MenuOptionDesactive_801E355C[];
+extern char s_MenuOptionAmeliore_801E3568[];
+extern char s_Aro_de_posicion_801E3574[];
 extern char s_Tipo_de_sonido_801E3584[];
 extern char s_Efectos_de_sonido_801E3594[];
 extern char s_Color_de_la_GBA_801E35A8[];
-extern char lbl_801E35B8[];
-extern char lbl_801E35EC[];
-extern char lbl_801E3614[];
+extern char s_Senala_la_posicion_bajo_los_pies_de_cada_personaje_801E35B8[];
+extern char s_Selecciona_sonido_estereo_o_monoaural_801E35EC[];
+extern char s_Ajusta_el_volumen_de_la_musica_de_fondo_801E3614[];
 extern char s_Ajusta_el_volumen_de_los_efectos_de_sonido_801E3640[];
 extern char s_Ajusta_el_balance_del_color_de_la_Game_Boy_Advance_801E366C[];
 extern char s_Encendido_801E36A0[];
 extern char s_Monoaural_801E36AC[];
 extern char s_Mejorado_801E36B8[];
-extern char lbl_801E36C4[];
+extern char s_MenuOptionEstandar_801E36C4[];
 extern char s_MenuOptionMusic[];
 extern char s_MenuOptionOn[];
 extern char s_MenuOptionOff[];
@@ -120,15 +120,15 @@ extern char s_MenuOptionMusicDe[];
 extern char s_MenuOptionOnDe[];
 extern char s_MenuOptionOffDe[];
 extern char s_MenuOptionStereoDe[];
-extern char lbl_803334A8[];
-extern char lbl_803334B0[];
-extern char lbl_803334B8[];
-extern char lbl_803334C0[];
-extern char lbl_803334C8[];
-extern char lbl_803334D0[];
-extern char lbl_803334D8[];
-extern char lbl_803334E0[];
-extern char lbl_803334E8[];
+extern char s_MenuOptionMonoUpper_803334A8[];
+extern char s_MenuOptionNormalIt_803334B0[];
+extern char s_MenuOptionForza_803334B8[];
+extern char s_MenuOptionDifesa_803334C0[];
+extern char s_MenuOptionSonoro_803334C8[];
+extern char s_MenuOptionMusica_803334D0[];
+extern char s_MenuOptionMonoIt_803334D8[];
+extern char s_MenuOptionContr_803334E0[];
+extern char s_MenuOptionNorm_803334E8[];
 extern char s_Force_803334F0[];
 extern char s_Musique_803334F8[];
 extern char s_Active_80333500[];
@@ -137,12 +137,9 @@ extern char s_Fuerza_80333510[];
 extern char s_Defensa_80333518[];
 extern char s_Musica_80333520[];
 extern char s_Apagado_80333528[];
-extern char lbl_80333530[];
-extern char lbl_80333538[];
-extern char lbl_80333540[];
-extern "C" const char lbl_80333690[] = "Vide";
-extern "C" const char lbl_80333698[] = {'V', 'a', 'c', '\xED', 'o', '.', '\0', '\0'};
-
+extern char s_MenuOptionEstereo_80333530[];
+extern char s_MenuOptionMinEs_80333538[];
+extern char s_MenuOptionMaxEs_80333540[];
 extern "C" char* g_strMenuUtilMes[] = {
 	s_Strength_801E30A4, s_Defence_801E30B0, s_Position_Markers_801E30BC, s_Sound_Mode_801E30D0,
 	s_MenuOptionMusic, s_Sound_Effects_801E30DC, s_GBA_Colour_Balance_801E30EC,
@@ -152,30 +149,30 @@ extern "C" char* g_strMenuUtilMes[] = {
 	s_MenuOptionOn, s_MenuOptionOff, s_MenuOptionStereo, s_Monaural_801E31D0,
 	s_MenuOptionMin, s_MenuOptionMax, s_Enhanced_801E31DC, s_Standard_801E31E8,
 	s_MenuOptionStrengthDe, s_MenuOptionDefenceDe, s_Erkennungskreisel_801E31F4, s_Tonausgabe_801E3208,
-	s_MenuOptionMusicDe, lbl_801E3214, s_Farbeinstellung_801E3224,
+	s_MenuOptionMusicDe, s_MenuOptionSoundEffectsDe_801E3214, s_Farbeinstellung_801E3224,
 	s_Erkennungskreisel_des_Charakters_AN_AUS_schalten_801E3234,
-	s_Tonausgabe_auf_Stereo_oder_Mono_schalten_801E3268, lbl_801E3294, lbl_801E32B4,
-	lbl_801E32DC, s_MenuOptionOnDe, s_MenuOptionOffDe, s_MenuOptionStereoDe, lbl_803334A8,
-	s_MenuOptionMin, s_MenuOptionMax, s_Erweitert_801E330C, lbl_803334B0,
-	lbl_803334B8, lbl_803334C0, s_Indicatori_di_posizione_801E3318, lbl_803334C8,
-	lbl_803334D0, s_Effetti_sonori_801E3330, s_Bilanc_colore_GBA_801E3340,
+	s_Tonausgabe_auf_Stereo_oder_Mono_schalten_801E3268, s_Lautstaerke_der_Musik_aendern_801E3294, s_Lautstaerke_der_Geraeuscheffekte_aendern_801E32B4,
+	s_Farbeinstellung_des_Game_Boy_Advance_aendern_801E32DC, s_MenuOptionOnDe, s_MenuOptionOffDe, s_MenuOptionStereoDe, s_MenuOptionMonoUpper_803334A8,
+	s_MenuOptionMin, s_MenuOptionMax, s_Erweitert_801E330C, s_MenuOptionNormalIt_803334B0,
+	s_MenuOptionForza_803334B8, s_MenuOptionDifesa_803334C0, s_Indicatori_di_posizione_801E3318, s_MenuOptionSonoro_803334C8,
+	s_MenuOptionMusica_803334D0, s_Effetti_sonori_801E3330, s_Bilanc_colore_GBA_801E3340,
 	s_Attiva_o_disattiva_l_indicatore_ai_piedi_dei_personaggi_801E3354,
 	s_Scegli_tra_sonoro_mono_o_stereo_801E3390, s_Regola_il_volume_della_musica_801E33B4,
 	s_Regola_il_volume_degli_effetti_sonori_801E33D4, s_Regola_il_colore_sul_Game_Boy_Advance_801E33FC,
-	s_MenuOptionOn, s_MenuOptionOff, s_MenuOptionStereo, lbl_803334D8, s_MenuOptionMin, s_MenuOptionMax,
-	lbl_803334E0, lbl_803334E8,
-	s_Force_803334F0, lbl_801E3424, s_Sceau_de_position_801E3430, s_Signal_sonore_801E3444,
+	s_MenuOptionOn, s_MenuOptionOff, s_MenuOptionStereo, s_MenuOptionMonoIt_803334D8, s_MenuOptionMin, s_MenuOptionMax,
+	s_MenuOptionContr_803334E0, s_MenuOptionNorm_803334E8,
+	s_Force_803334F0, s_ResistanceFr_801E3424, s_Sceau_de_position_801E3430, s_Signal_sonore_801E3444,
 	s_Musique_803334F8, s_Effets_sonores_801E3454, s_Affichage_du_GBA_801E3464,
 	s_Affichage_du_sceau_de_position_aux_pieds_des_personnages_801E3478,
-	lbl_801E34B4, lbl_801E34E0, lbl_801E3500, lbl_801E3524, s_Active_80333500,
-	lbl_801E355C, s_Stereo_80333508, lbl_803334D8, s_MenuOptionMin, s_MenuOptionMax,
-	lbl_801E3568, s_Standard_801E31E8,
-	s_Fuerza_80333510, s_Defensa_80333518, lbl_801E3574, s_Tipo_de_sonido_801E3584,
+	s_Choisissez_le_signal_sonore_stereo_ou_mono_801E34B4, s_Reglez_le_volume_de_la_musique_801E34E0, s_Reglez_le_volume_des_effets_sonores_801E3500, s_Reglez_le_contraste_des_couleurs_du_Game_Boy_Advance_801E3524, s_Active_80333500,
+	s_MenuOptionDesactive_801E355C, s_Stereo_80333508, s_MenuOptionMonoIt_803334D8, s_MenuOptionMin, s_MenuOptionMax,
+	s_MenuOptionAmeliore_801E3568, s_Standard_801E31E8,
+	s_Fuerza_80333510, s_Defensa_80333518, s_Aro_de_posicion_801E3574, s_Tipo_de_sonido_801E3584,
 	s_Musica_80333520, s_Efectos_de_sonido_801E3594, s_Color_de_la_GBA_801E35A8,
-	lbl_801E35B8, lbl_801E35EC, lbl_801E3614, s_Ajusta_el_volumen_de_los_efectos_de_sonido_801E3640,
+	s_Senala_la_posicion_bajo_los_pies_de_cada_personaje_801E35B8, s_Selecciona_sonido_estereo_o_monoaural_801E35EC, s_Ajusta_el_volumen_de_la_musica_de_fondo_801E3614, s_Ajusta_el_volumen_de_los_efectos_de_sonido_801E3640,
 	s_Ajusta_el_balance_del_color_de_la_Game_Boy_Advance_801E366C, s_Encendido_801E36A0,
-	s_Apagado_80333528, lbl_80333530, s_Monoaural_801E36AC, lbl_80333538, lbl_80333540,
-	s_Mejorado_801E36B8, lbl_801E36C4,
+	s_Apagado_80333528, s_MenuOptionEstereo_80333530, s_Monoaural_801E36AC, s_MenuOptionMinEs_80333538, s_MenuOptionMaxEs_80333540,
+	s_Mejorado_801E36B8, s_MenuOptionEstandar_801E36C4,
 };
 
 #define PTR_s_Strength__80215a48 g_strMenuUtilMes
@@ -372,7 +369,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 		} else if (msgNo == 0x211) {
 			suffix = GetSkillStr__8CMenuPcsFi(this, 2);
 		} else {
-			suffix = DAT_80333658;
+			suffix = s_MenuUtilEmptyText_80333658;
 		}
 
 		if ((msgNo == 0x209) || (msgNo == 0x20D) || (msgNo == 0x211)) {
@@ -469,22 +466,22 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 	} else if ((flags & 0x800) != 0) {
 		strcpy(scratch, PTR_s_Defence__80215a4c[languageIndex]);
 	} else if ((flags & 0x1000) != 0) {
-		strcpy(scratch, DAT_80333658);
+		strcpy(scratch, s_MenuUtilEmptyText_80333658);
 	} else if ((flags & 0x2000) != 0) {
-		strcpy(scratch, DAT_80333658);
+		strcpy(scratch, s_MenuUtilEmptyText_80333658);
 	}
 
 	font->SetPosX(FLOAT_8033357c);
 	font->SetPosY(static_cast<float>(y));
 
 	if ((flags & 0x1000) == 0) {
-		strcat(scratch, DAT_8033366c);
+		strcat(scratch, s_MenuUtilSpaceText_8033366c);
 		font->Draw(scratch);
 
 		float valueX = FLOAT_8033357c + font->GetWidth(scratch) + FLOAT_803335a0;
 		font->SetTlut(1);
 		font->SetPosX(valueX);
-		sprintf(scratch, DAT_80333670, *reinterpret_cast<u16*>(itemBase + 6));
+		sprintf(scratch, s_MenuUtilValueSuffixFormat_80333670, *reinterpret_cast<u16*>(itemBase + 6));
 		font->Draw(scratch);
 
 		if ((*reinterpret_cast<short*>(self + 0x864) == 2) &&
@@ -528,14 +525,14 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 				} else {
 					font->SetTlut(9);
 				}
-				sprintf(scratch, lbl_80333674, delta);
+				sprintf(scratch, s_MenuUtilSignedDeltaFormat_80333674, delta);
 				if (delta != 0) {
 					font->Draw(scratch);
 				}
 			}
 		}
 
-		float attrX = font->posX + font->GetWidth(DAT_8033366c);
+		float attrX = font->posX + font->GetWidth(s_MenuUtilSpaceText_8033366c);
 		font->SetPosX(attrX);
 
 		u16 attr = *reinterpret_cast<u16*>(itemBase + 8);
@@ -545,7 +542,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 			font->Draw(scratch);
 			font->SetTlut(9);
 			if ((attr != 0) && (attr < 9)) {
-				sprintf(scratch, lbl_8033367C, DAT_80333660);
+				sprintf(scratch, s_MenuUtilAttrBonusFormat_8033367C, s_MenuUtilPlusOneText_80333660);
 				font->Draw(scratch);
 			}
 		}
@@ -560,16 +557,16 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 
 			if ((attr == 0) || (8 < attr)) {
 				if ((attr == 0xB) || (attr == 0x11) || (attr == 0x12)) {
-					sprintf(scratch, DAT_80333664, 0x2B, *reinterpret_cast<u16*>(itemBase + 6));
+					sprintf(scratch, s_MenuUtilSignedValueFormat_80333664, 0x2B, *reinterpret_cast<u16*>(itemBase + 6));
 				} else {
 					if (((attr - 9) > 1) && (attr != 0xC)) {
 						return;
 					}
-					sprintf(scratch, DAT_80333664, 0x2D, *reinterpret_cast<u16*>(itemBase + 6));
+					sprintf(scratch, s_MenuUtilSignedValueFormat_80333664, 0x2D, *reinterpret_cast<u16*>(itemBase + 6));
 					font->SetTlut(3);
 				}
 			} else {
-				sprintf(scratch, DAT_8033365c, DAT_80333660);
+				sprintf(scratch, s_MenuUtilStringFormat_8033365c, s_MenuUtilPlusOneText_80333660);
 			}
 
 			font->Draw(scratch);

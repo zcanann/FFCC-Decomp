@@ -74,38 +74,38 @@ static const char s_dvd__smenu__s_tex_801d9d6c[] = "dvd/%smenu/%s.tex";
 static const char s_dvd__smenu_gc23_fnt_801d9d8c[] = "dvd/%smenu/gc23.fnt";
 static const char s_dvd__smenu__s_fnt_801d9da0[] = "dvd/%smenu/%s.fnt";
 static const char s_dvd__smenu_gc22_fnt_801d9db4[] = "dvd/%smenu/gc22.fnt";
-static const char lbl_80330714[] = "kasoru";
-static const char lbl_8033071C[] = "pause";
-static const char lbl_80330724[] = "win1_0";
-static const char lbl_8033072C[] = "win1_1";
-static const char lbl_80330734[] = "win1_2";
-static const char lbl_8033073C[] = "win1_3";
-static const char lbl_80330744[] = "win1_4";
-static const char lbl_8033074C[] = "win1_5";
-static const char lbl_80330754[] = "win1_6";
-static const char lbl_8033075C[] = "win1_7";
-static const char lbl_80330764[] = "win1_8";
-static const char lbl_8033076C[] = "win2_0";
-static const char lbl_80330774[] = "win2_1";
-static const char lbl_8033077C[] = "win2_2";
-static const char lbl_80330784[] = "win2_3";
-static const char lbl_8033078C[] = "win2_4";
-static const char lbl_80330794[] = "win2_5";
-static const char lbl_8033079C[] = "win2_6";
-static const char lbl_803307A4[] = "win2_7";
-static const char lbl_803307AC[] = "win2_8";
-static const char lbl_803307B4[] = "button";
-static const char lbl_803307BC[] = "shibuya";
-static const char lbl_803307C4[] = "face";
-static const char lbl_803307CC[] = "battle";
-static const char lbl_803307D4[] = "heart";
-static const char lbl_803307DC[] = "navi";
-static const char lbl_803307E4[] = "hp0";
-static const char lbl_803307E8[] = "hp1";
-static const char lbl_803307EC[] = "hp2";
-static const char lbl_803307F0[] = "suna";
-static const char lbl_803307F8[] = "gba";
-static const char lbl_803307FC[] = "battle2";
+static const char s_MenuTexKasoru_80330714[] = "kasoru";
+static const char s_MenuTexPause_8033071C[] = "pause";
+static const char s_MenuTexWin1_0_80330724[] = "win1_0";
+static const char s_MenuTexWin1_1_8033072C[] = "win1_1";
+static const char s_MenuTexWin1_2_80330734[] = "win1_2";
+static const char s_MenuTexWin1_3_8033073C[] = "win1_3";
+static const char s_MenuTexWin1_4_80330744[] = "win1_4";
+static const char s_MenuTexWin1_5_8033074C[] = "win1_5";
+static const char s_MenuTexWin1_6_80330754[] = "win1_6";
+static const char s_MenuTexWin1_7_8033075C[] = "win1_7";
+static const char s_MenuTexWin1_8_80330764[] = "win1_8";
+static const char s_MenuTexWin2_0_8033076C[] = "win2_0";
+static const char s_MenuTexWin2_1_80330774[] = "win2_1";
+static const char s_MenuTexWin2_2_8033077C[] = "win2_2";
+static const char s_MenuTexWin2_3_80330784[] = "win2_3";
+static const char s_MenuTexWin2_4_8033078C[] = "win2_4";
+static const char s_MenuTexWin2_5_80330794[] = "win2_5";
+static const char s_MenuTexWin2_6_8033079C[] = "win2_6";
+static const char s_MenuTexWin2_7_803307A4[] = "win2_7";
+static const char s_MenuTexWin2_8_803307AC[] = "win2_8";
+static const char s_MenuTexButton_803307B4[] = "button";
+static const char s_MenuRegionShibuya_803307BC[] = "shibuya";
+static const char s_MenuRegionFace_803307C4[] = "face";
+static const char s_MenuTexBattle_803307CC[] = "battle";
+static const char s_MenuTexHeart_803307D4[] = "heart";
+static const char s_MenuTexNavi_803307DC[] = "navi";
+static const char s_MenuTexHp0_803307E4[] = "hp0";
+static const char s_MenuTexHp1_803307E8[] = "hp1";
+static const char s_MenuTexHp2_803307EC[] = "hp2";
+static const char s_MenuTexSuna_803307F0[] = "suna";
+static const char s_MenuTexGba_803307F8[] = "gba";
+static const char s_MenuTexBattle2_803307FC[] = "battle2";
 
 extern "C" const f32 FLOAT_80330804 = 0.015625f;
 extern "C" const f32 FLOAT_80330808 = 1.0f;
@@ -349,28 +349,28 @@ void CMenuPcs::create()
     char fontPath[0x80];
     char texPath[0x100];
     static int tTmp[] = {
-        0, reinterpret_cast<int>(const_cast<char*>(lbl_80330714)),
-        0, reinterpret_cast<int>(const_cast<char*>(lbl_8033071C)),
-        1, reinterpret_cast<int>(const_cast<char*>(lbl_80330724)),
-        1, reinterpret_cast<int>(const_cast<char*>(lbl_8033072C)),
-        1, reinterpret_cast<int>(const_cast<char*>(lbl_80330734)),
-        1, reinterpret_cast<int>(const_cast<char*>(lbl_8033073C)),
-        1, reinterpret_cast<int>(const_cast<char*>(lbl_80330744)),
-        1, reinterpret_cast<int>(const_cast<char*>(lbl_8033074C)),
-        1, reinterpret_cast<int>(const_cast<char*>(lbl_80330754)),
-        1, reinterpret_cast<int>(const_cast<char*>(lbl_8033075C)),
-        1, reinterpret_cast<int>(const_cast<char*>(lbl_80330764)),
-        1, reinterpret_cast<int>(const_cast<char*>(lbl_8033076C)),
-        1, reinterpret_cast<int>(const_cast<char*>(lbl_80330774)),
-        1, reinterpret_cast<int>(const_cast<char*>(lbl_8033077C)),
-        1, reinterpret_cast<int>(const_cast<char*>(lbl_80330784)),
-        1, reinterpret_cast<int>(const_cast<char*>(lbl_8033078C)),
-        1, reinterpret_cast<int>(const_cast<char*>(lbl_80330794)),
-        1, reinterpret_cast<int>(const_cast<char*>(lbl_8033079C)),
-        1, reinterpret_cast<int>(const_cast<char*>(lbl_803307A4)),
-        1, reinterpret_cast<int>(const_cast<char*>(lbl_803307AC)),
+        0, reinterpret_cast<int>(const_cast<char*>(s_MenuTexKasoru_80330714)),
+        0, reinterpret_cast<int>(const_cast<char*>(s_MenuTexPause_8033071C)),
+        1, reinterpret_cast<int>(const_cast<char*>(s_MenuTexWin1_0_80330724)),
+        1, reinterpret_cast<int>(const_cast<char*>(s_MenuTexWin1_1_8033072C)),
+        1, reinterpret_cast<int>(const_cast<char*>(s_MenuTexWin1_2_80330734)),
+        1, reinterpret_cast<int>(const_cast<char*>(s_MenuTexWin1_3_8033073C)),
+        1, reinterpret_cast<int>(const_cast<char*>(s_MenuTexWin1_4_80330744)),
+        1, reinterpret_cast<int>(const_cast<char*>(s_MenuTexWin1_5_8033074C)),
+        1, reinterpret_cast<int>(const_cast<char*>(s_MenuTexWin1_6_80330754)),
+        1, reinterpret_cast<int>(const_cast<char*>(s_MenuTexWin1_7_8033075C)),
+        1, reinterpret_cast<int>(const_cast<char*>(s_MenuTexWin1_8_80330764)),
+        1, reinterpret_cast<int>(const_cast<char*>(s_MenuTexWin2_0_8033076C)),
+        1, reinterpret_cast<int>(const_cast<char*>(s_MenuTexWin2_1_80330774)),
+        1, reinterpret_cast<int>(const_cast<char*>(s_MenuTexWin2_2_8033077C)),
+        1, reinterpret_cast<int>(const_cast<char*>(s_MenuTexWin2_3_80330784)),
+        1, reinterpret_cast<int>(const_cast<char*>(s_MenuTexWin2_4_8033078C)),
+        1, reinterpret_cast<int>(const_cast<char*>(s_MenuTexWin2_5_80330794)),
+        1, reinterpret_cast<int>(const_cast<char*>(s_MenuTexWin2_6_8033079C)),
+        1, reinterpret_cast<int>(const_cast<char*>(s_MenuTexWin2_7_803307A4)),
+        1, reinterpret_cast<int>(const_cast<char*>(s_MenuTexWin2_8_803307AC)),
         1, reinterpret_cast<int>(const_cast<char*>(s_win_kazari_801D9D48)),
-        0, reinterpret_cast<int>(const_cast<char*>(lbl_803307B4))
+        0, reinterpret_cast<int>(const_cast<char*>(s_MenuTexButton_803307B4))
     };
     int* textureInfo = tTmp;
     u8* self = reinterpret_cast<u8*>(this);
@@ -634,20 +634,20 @@ void CMenuPcs::loadFont(int type, char* path, int slot, int tlutMode)
 }
 
 const char* sMenuTextureRegionNameTable[] = {
-    lbl_803307BC, lbl_803307C4, 0, 0, 0, 0, 0, 0, 0
+    s_MenuRegionShibuya_803307BC, s_MenuRegionFace_803307C4, 0, 0, 0, 0, 0, 0, 0
 };
 
 int sMenuTextureInfoTable[] = {
-    2, reinterpret_cast<int>(const_cast<char*>(lbl_803307CC)),
-    2, reinterpret_cast<int>(const_cast<char*>(lbl_803307D4)),
-    3, reinterpret_cast<int>(const_cast<char*>(lbl_803307C4)),
-    2, reinterpret_cast<int>(const_cast<char*>(lbl_803307DC)),
-    2, reinterpret_cast<int>(const_cast<char*>(lbl_803307E4)),
-    2, reinterpret_cast<int>(const_cast<char*>(lbl_803307E8)),
-    2, reinterpret_cast<int>(const_cast<char*>(lbl_803307EC)),
-    2, reinterpret_cast<int>(const_cast<char*>(lbl_803307F0)),
-    2, reinterpret_cast<int>(const_cast<char*>(lbl_803307F8)),
-    2, reinterpret_cast<int>(const_cast<char*>(lbl_803307FC))
+    2, reinterpret_cast<int>(const_cast<char*>(s_MenuTexBattle_803307CC)),
+    2, reinterpret_cast<int>(const_cast<char*>(s_MenuTexHeart_803307D4)),
+    3, reinterpret_cast<int>(const_cast<char*>(s_MenuRegionFace_803307C4)),
+    2, reinterpret_cast<int>(const_cast<char*>(s_MenuTexNavi_803307DC)),
+    2, reinterpret_cast<int>(const_cast<char*>(s_MenuTexHp0_803307E4)),
+    2, reinterpret_cast<int>(const_cast<char*>(s_MenuTexHp1_803307E8)),
+    2, reinterpret_cast<int>(const_cast<char*>(s_MenuTexHp2_803307EC)),
+    2, reinterpret_cast<int>(const_cast<char*>(s_MenuTexSuna_803307F0)),
+    2, reinterpret_cast<int>(const_cast<char*>(s_MenuTexGba_803307F8)),
+    2, reinterpret_cast<int>(const_cast<char*>(s_MenuTexBattle2_803307FC))
 };
 
 unsigned int s_CMenuPcsTablePad0[3] = {

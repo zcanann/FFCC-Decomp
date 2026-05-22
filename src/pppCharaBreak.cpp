@@ -1,7 +1,9 @@
 #include "ffcc/pppCharaBreak.h"
 
 #include "ffcc/graphic.h"
+#include "ffcc/gxfunc.h"
 #include "ffcc/linkage.h"
+#include "ffcc/materialman.h"
 #include "ffcc/math.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/ppp_constants.h"
@@ -14,7 +16,6 @@
 #include <string.h>
 #include "ffcc/ppp_linkage.h"
 
-class CMaterialMan;
 extern const char s_pppCharaBreak_cpp_801dd690[] = "pppCharaBreak.cpp";
 extern float FLOAT_80332048;
 extern float FLOAT_8033204c;
@@ -31,9 +32,6 @@ extern int DAT_801dd684;
 extern int DAT_801dd688;
 extern int DAT_801dd68c;
 extern Vec kPppCharaBreakUpVector;
-extern "C" void SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(void* materialMan, void* materialSet,
-                                                                            unsigned int materialIdx, int, int);
-static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
 
 static inline Mtx& CameraMatrix()
 {
@@ -51,8 +49,6 @@ int GetNumPolygonFromDL__5CUtilFPvUl(CUtil*, void*, unsigned long);
 int IsHasDrawFmtDL__5CUtilFUc(CUtil*, unsigned char);
 void _WaitDrawDone__8CGraphicFPci(CGraphic*, const char*, int);
 
-void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
-void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 void ConvI2FVector__5CUtilFR3Vec6S16Vecl(CUtil*, Vec*, S16Vec, unsigned long);
 void ConvF2IVector__5CUtilFR6S16Vec3Vecl(CUtil*, S16Vec*, Vec, unsigned long);
 }
@@ -212,7 +208,7 @@ void pppRenderCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB*, CharaBreakU
     u8* colorWork = charaBreak->m_workArea + colorOffset;
 
     if (work->m_enabled != 0) {
-        _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
+        _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
         pppInitBlendMode();
         pppSetDrawEnv(
             (pppCVECTOR*)(colorWork + 8),
@@ -225,7 +221,7 @@ void pppRenderCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB*, CharaBreakU
             1,
             1,
             0);
-        _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(0, 2, 2, 3);
+        _GXSetBlendMode(GX_BM_NONE, GX_BL_SRCCLR, GX_BL_SRCCLR, GX_LO_COPY);
         ((u8*)work)[0] = 0xFF;
         ((u8*)work)[1] = 0xFF;
         ((u8*)work)[2] = 0xFF;
@@ -991,8 +987,8 @@ extern "C" void CharaBreak_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f(v
                 reinterpret_cast<CharaBreakDisplayListPair**>(reinterpret_cast<u8*>(*meshTable) + materialOffset);
             POLYGON_DATA* vertexData = (*displayListEntry)->m_polygonData;
 
-            SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
-                &MaterialMan, ModelData(modelPtr)->m_materialSet, materialData->m_material, 0, 0);
+            MaterialMan.SetMaterial(
+                (CMaterialSet*)ModelData(modelPtr)->m_materialSet, materialData->m_material, 0, GX_CS_SCALE_1);
 
             GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
             GXSetCullMode(GX_CULL_NONE);

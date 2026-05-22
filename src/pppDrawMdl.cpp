@@ -2,13 +2,6 @@
 #include "ffcc/pppPart.h"
 #include "dolphin/types.h"
 
-extern "C" {
-void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-    void*, void*, float, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char);
-
-void pppDrawMesh__FP10pppModelStP3Veci(void*, void*, int);
-}
-
 /*
  * --INFO--
  * Address:	TODO
@@ -37,9 +30,9 @@ void pppDrawMdl(_pppPObject* pObject, PDrawMdl* drawMdl, _pppCtrlTable* ctrlTabl
         return;
     }
 
-    pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-        (u8*)obj + *(int*)*(int**)((u8*)ctrlTable + 0xC) + 0x88,
-        (u8*)obj + 0x40,
+    pppSetDrawEnv(
+        reinterpret_cast<pppCVECTOR*>((u8*)obj + *(int*)*(int**)((u8*)ctrlTable + 0xC) + 0x88),
+        reinterpret_cast<pppFMATRIX*>((u8*)obj + 0x40),
         *(float*)((u8*)mdl + 0x10),
         *(u8*)((u8*)mdl + 0x14),
         *(u8*)((u8*)mdl + 0xA),
@@ -51,7 +44,5 @@ void pppDrawMdl(_pppPObject* pObject, PDrawMdl* drawMdl, _pppCtrlTable* ctrlTabl
 
     pppSetBlendMode(*(u8*)((u8*)mdl + 0x9));
 
-    void** modelsArray = *(void***)((u8*)pppEnvStPtr + 0x8);
-    pppDrawMesh__FP10pppModelStP3Veci(modelsArray[*(u32*)((u8*)mdl + 0x4)], *(void**)((u8*)obj + 0x70), 1);
+    pppDrawMesh((pppModelSt*)pppEnvStPtr->m_mapMeshPtr[*(u32*)((u8*)mdl + 0x4)], obj->m_drawMatrixPtr, 1);
 }
-

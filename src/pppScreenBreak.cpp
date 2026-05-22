@@ -164,7 +164,6 @@ void SetBlurParameter__11CGraphicPcsFiUcUcUcUcUcs(CGraphicPcs*, int, unsigned ch
 void* GetCharaHandlePtr__FP8CGObjectl(void*, long);
 int GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void*);
 void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(void*, long, float&, float&, float&, float, float&, float&);
-void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 void pppHeapUseRate__FPQ27CMemory6CStage(void*);
 void ConvI2FVector__5CUtilFR3Vec6S16Vecl(CUtil*, Vec*, S16Vec, unsigned long);
 void MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(void*, Mtx44, Vec4d*, Vec4d*);
@@ -235,11 +234,11 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param
 
     void* pieceStorage = *(void**)&value[3];
     if (pieceStorage == NULL) {
-        pieceStorage = pppMemAlloc__FUlPQ27CMemory6CStagePci(*(u32*)(*(u8**)(model + 0xA4) + 0xC) * 0x3C, pppEnvStPtr->m_stagePtr,
-                                                             const_cast<char*>(s_pppScreenBreak_cpp_801dd4d4), 0x25E);
+        pieceStorage = pppMemAlloc(*(u32*)(*(u8**)(model + 0xA4) + 0xC) * 0x3C, pppEnvStPtr->m_stagePtr,
+                                    const_cast<char*>(s_pppScreenBreak_cpp_801dd4d4), 0x25E);
         *(void**)&value[3] = pieceStorage;
-        *(void**)&value[4] = pppMemAlloc__FUlPQ27CMemory6CStagePci(0x20, pppEnvStPtr->m_stagePtr,
-                                                                    const_cast<char*>(s_pppScreenBreak_cpp_801dd4d4), 0x25F);
+        *(void**)&value[4] = pppMemAlloc(0x20, pppEnvStPtr->m_stagePtr,
+                                         const_cast<char*>(s_pppScreenBreak_cpp_801dd4d4), 0x25F);
         InitPieceData((CChara::CModel*)model, (PScreenBreak*)param_2, (VScreenBreak*)value);
         PSVECNormalize((Vec*)(param_2->m_payload + 0xC), (Vec*)(param_2->m_payload + 0xC));
     }

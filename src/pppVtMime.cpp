@@ -1,6 +1,7 @@
 #include "ffcc/pppVtMime.h"
 #include "ffcc/graphic.h"
 #include "ffcc/partMng.h"
+#include "ffcc/pppPart.h"
 #include "ffcc/ppp_constants.h"
 struct VtMimeCtrl
 {
@@ -43,7 +44,6 @@ struct VtMimeEnv
 extern "C" const char s_pppVtMime_cpp[] = "pppVtMime.cpp";
 
 extern "C" {
-void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long size, void* stage, const char* file, int line);
 void _WaitDrawDone__8CGraphicFPci(void* graphic, const char* file, int line);
 void pppHeapUseRate__FPQ27CMemory6CStage(void* stage);
 void DCFlushRange(void* addr, unsigned long nBytes);
@@ -142,7 +142,8 @@ void pppDrawVtMime(_pppPObject* object, void* step, _pppCtrlTable* ctrl)
     void** memPtr = &state->vertexBuffer;
 
     if (*memPtr == 0) {
-        *memPtr = pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(vertCount * 0xC), env->stage, s_pppVtMime_cpp, 0x2B);
+        *memPtr = pppMemAlloc((unsigned long)(vertCount * 0xC), reinterpret_cast<CMemory::CStage*>(env->stage),
+                              const_cast<char*>(s_pppVtMime_cpp), 0x2B);
     }
 
     float* outputVerts = (float*)*memPtr;

@@ -31,10 +31,8 @@ extern "C" CGObject* FindGObjNext__13CFlatRuntime2FP8CGObject(void*, CGObject*);
 extern "C" void onPush__9CGBaseObjFP9CGBaseObji(CGBaseObj*, CGBaseObj*, int);
 extern "C" void* CreateFromScript__9CGItemObjFiiiP8CGObjectfPQ29CGItemObj4CCFS(
     int type, int createMode, int itemId, CGObject* owner, float arg, CGItemObj::CCFS* cfs);
-extern const char lbl_801DCB1C[];
-extern const char lbl_801DCB38[];
-extern "C" int DAT_8032EE70;
-extern "C" char lbl_8032EE74;
+extern const char s_BossGhostPartyCountersFmt_801DCB1C[];
+extern const char s_MissingRingMenuFmt_801DCB38[];
 extern int __float_huge[];
 
 static const char s_partyObjStateFmt[] = "mode:%d stat:%d sub:%d frame:%d alive:%d tgt:%d ghost:%d";
@@ -150,7 +148,7 @@ static inline void UpdateGhostPartyDamageCounters(CGPrgObj* attacker)
 		sBossGhostPartyCounters.thresholdA++;
 		sBossGhostPartyCounters.thresholdB++;
 		sBossGhostPartyCounters.thresholdC++;
-		System.Printf(const_cast<char*>(lbl_801DCB1C),
+		System.Printf(const_cast<char*>(s_BossGhostPartyCountersFmt_801DCB1C),
 		    sBossGhostPartyCounters.thresholdA, CharaGhostValue(0x2048),
 		    sBossGhostPartyCounters.thresholdB, CharaGhostValue(0x204C),
 		    sBossGhostPartyCounters.thresholdC, CharaGhostValue(0x2050));
@@ -2979,7 +2977,7 @@ void CGPartyObj::ChangeCommandMode(int mode)
 			battleMenus[port]->SetBattleCommand(2, -1, -1);
 		} else {
 			if ((unsigned int)System.m_execParam >= 2) {
-				System.Printf(const_cast<char*>(lbl_801DCB38));
+				System.Printf(const_cast<char*>(s_MissingRingMenuFmt_801DCB38));
 			}
 		}
 	}

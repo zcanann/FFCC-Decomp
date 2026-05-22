@@ -108,11 +108,6 @@ struct CmakeInfo {
 static CmakeInfo s_CmakeInfo;
 static char s_CmakeVillageName[0x10];
 
-static inline void* MenuPcsVoid()
-{
-    return &MenuPcs;
-}
-
 static inline unsigned char* MenuPcsRaw()
 {
     return reinterpret_cast<unsigned char*>(&MenuPcs);

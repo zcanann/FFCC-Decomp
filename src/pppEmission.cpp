@@ -1,6 +1,7 @@
 #include "ffcc/pppEmission.h"
 
 #include "ffcc/graphic.h"
+#include "ffcc/gxfunc.h"
 #include "ffcc/linkage.h"
 #include "ffcc/mapmesh.h"
 #include "ffcc/materialman.h"
@@ -39,7 +40,6 @@ void pppHeapUseRate__FPQ27CMemory6CStage(CMemory::CStage* stage);
 
 void SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(void*, void*, unsigned int, int, int);
 void SetObjMatrix__12CMaterialManFPA4_fPA4_f(void*, float (*)[4], float (*)[4]);
-void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
 void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(void*, long, float&, float&, float&, float, float&, float&);
 int GetTexture__8CMapMeshFP12CMaterialSetRi(CMapMesh* mapMesh, CMaterialSet* materialSet, int& textureIndex);
 }
@@ -502,7 +502,7 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
             }
         }
 
-        _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
+        _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
         SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x67);
     }
 }

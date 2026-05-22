@@ -479,9 +479,8 @@ frame_input_done:
     if (activeInput) {
         trigger = 0;
     } else {
-        __cntlzw(static_cast<unsigned int>(Pad._448_4_));
-        int port = 1;
-        unsigned int clamped = (unsigned int)port & ~((int)~(Pad._448_4_ - port | port - Pad._448_4_) >> 0x1f);
+        int port = 0;
+        unsigned int clamped = (unsigned int)port & ~-((int)(__cntlzw(static_cast<unsigned int>(Pad._448_4_)) >> 5));
         trigger = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Pad) + 0x36 + clamped * 0x54);
     }
 
@@ -578,8 +577,8 @@ void CMemory::Draw()
     GXSetNumTevStages(1);
     GXSetTevDirect(GX_TEVSTAGE0);
     GXSetNumChans(1);
-    GXSetChanCtrl(GX_COLOR0A0, GX_DISABLE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
-    GXSetChanCtrl(GX_COLOR1A1, GX_DISABLE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_SPEC);
+    GXSetChanCtrl(GX_COLOR0, GX_DISABLE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPOT);
+    GXSetChanCtrl(GX_ALPHA0, GX_DISABLE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
     _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
     GXClearVtxDesc();
     GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
@@ -588,7 +587,7 @@ void CMemory::Draw()
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
     PSMTXIdentity(modelMtx);
     GXLoadPosMtxImm(modelMtx, GX_PNMTX0);
-    GXLoadTexMtxImm(modelMtx, GX_IDENTITY, GX_MTX3x4);
+    GXLoadTexMtxImm(modelMtx, GX_TEXMTX0, GX_MTX2x4);
     _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
     _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
 
@@ -612,14 +611,17 @@ void CMemory::Draw()
                     } else {
                         stage->drawHeapTitle(y);
                         if (mode == 0) {
-                            useTotalKB += (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(stage) + 0xC) -
-                                           *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(stage) + 8)) >>
-                                          10;
+                            useTotalKB +=
+                                static_cast<unsigned int>(
+                                    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(stage) + 0xC) -
+                                    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(stage) + 8)) >>
+                                10;
                             unuseTotalKB +=
-                                (*reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(stage) +
-                                                                                4) +
-                                                         8) -
-                                 *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(stage) + 0xC)) >>
+                                static_cast<unsigned int>(
+                                    *reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(stage) +
+                                                                                  4) +
+                                                           8) -
+                                    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(stage) + 0xC)) >>
                                 10;
                         }
                     }
@@ -633,12 +635,12 @@ void CMemory::Draw()
 
         if (pass == 1) {
             sprintf(line, DAT_801d6bdc, useTotalKB, unuseTotalKB);
-            Graphic.DrawDebugStringDirect(0x10, static_cast<unsigned short>(y), line, 8);
+            Graphic.DrawDebugStringDirect(0x10, y, line, 8);
 
             int amemAnim = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Chara) + 0x2074);
-            int amemAnimKB = (amemAnim >> 10) + ((amemAnim < 0) && ((amemAnim & 0x3FF) != 0));
+            int amemAnimKB = amemAnim / 1024;
             sprintf(line, DAT_801d6bec, amemAnimKB);
-            Graphic.DrawDebugStringDirect(0x10, static_cast<unsigned short>(y + 0xC), line, 8);
+            Graphic.DrawDebugStringDirect(0x10, y + 0xC, line, 8);
         }
     }
 }

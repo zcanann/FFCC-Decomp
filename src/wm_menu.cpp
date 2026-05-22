@@ -38,15 +38,6 @@ extern "C" void SetDiffuse__9CLightPcsFUl8_GXColorP3Veci(void*, unsigned long, v
 extern "C" void SetPosition__9CLightPcsFQ29CLightPcs6TARGETP3VecUl(void*, int, Vec*, unsigned long);
 extern "C" void Create__9CGBaseObjFv(void*);
 extern "C" void SetViewport__8CGraphicFv(void*);
-extern "C" void SetMargin__5CFontFf(float, CFont*);
-extern "C" void SetShadow__5CFontFi(CFont*, int);
-extern "C" void SetScale__5CFontFf(float, CFont*);
-extern "C" void SetTlut__5CFontFi(CFont*, int);
-extern "C" void DrawInit__5CFontFv(CFont*);
-extern "C" float GetWidth__5CFontFPc(CFont*, const char*);
-extern "C" void SetPosX__5CFontFf(float, CFont*);
-extern "C" void SetPosY__5CFontFf(float, CFont*);
-extern "C" void Draw__5CFontFPc(CFont*, const char*);
 extern "C" void InitEnv__9CCharaPcsFi(void*, int);
 extern "C" unsigned int pppCreate__8CPartMngFiiP14PPPCREATEPARAMi(void*, int, int, void*, int);
 extern "C" void pppDeletePart__8CPartMngFi(void*, int);
@@ -6792,10 +6783,10 @@ void CMenuPcs::DrawCharaName()
 		}
 	}
 
-	SetMargin__5CFontFf(FLOAT_803313e8, font);
-	SetShadow__5CFontFi(font, 0);
-	SetScale__5CFontFf(FLOAT_8033158C, font);
-	DrawInit__5CFontFv(font);
+	font->SetMargin(FLOAT_803313e8);
+	font->SetShadow(0);
+	font->SetScale(FLOAT_8033158C);
+	font->DrawInit();
 	DrawInit();
 
 	CColor shade(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alpha));
@@ -6812,7 +6803,7 @@ void CMenuPcs::DrawCharaName()
 				const char* const text = reinterpret_cast<const char*>(Game.m_caravanWorkArr[slot].unk_0x3ca_0x3dd);
 				float scale = FLOAT_803313e8;
 				float xOffset = -(static_cast<float>(DOUBLE_80331418 * static_cast<double>(FLOAT_80331680) - DOUBLE_80331678));
-				const float width = GetWidth__5CFontFPc(font, text);
+				const float width = font->GetWidth(text);
 				if (static_cast<double>(FLOAT_80331680) < static_cast<double>(width) * DOUBLE_803313f8) {
 					scale = static_cast<float>((static_cast<double>(width) + DOUBLE_80331510) * DOUBLE_803313f8 /
 					                          static_cast<double>(FLOAT_80331680));
@@ -6831,10 +6822,10 @@ void CMenuPcs::DrawCharaName()
 	}
 
 	DrawInit();
-	SetMargin__5CFontFf(FLOAT_803313e8, font);
-	SetShadow__5CFontFi(font, 1);
-	SetScale__5CFontFf(FLOAT_8033158C, font);
-	DrawInit__5CFontFv(font);
+	font->SetMargin(FLOAT_803313e8);
+	font->SetShadow(1);
+	font->SetScale(FLOAT_8033158C);
+	font->DrawInit();
 	font->SetColor(shade.color);
 
 	for (int row = 0; row < 2; row++) {
@@ -6850,16 +6841,16 @@ void CMenuPcs::DrawCharaName()
 			if (worldState[0x1C / 2] == 8 && cmakeWork != 0 &&
 			    *reinterpret_cast<int*>(cmakeWork + slot * 0x9C0 + 0x1A84) != 0) {
 				text = reinterpret_cast<const char*>(cmakeWork + slot * 0x9C0 + 0x15C0);
-				SetTlut__5CFontFi(font, (activeMask & (1u << slot)) != 0 ? 6 : 8);
+				font->SetTlut((activeMask & (1u << slot)) != 0 ? 6 : 8);
 			} else if (Game.m_caravanWorkArr[slot].m_shopState != 0) {
 				text = reinterpret_cast<const char*>(Game.m_caravanWorkArr[slot].unk_0x3ca_0x3dd);
-				SetTlut__5CFontFi(font, (activeMask & (1u << slot)) != 0 ? 6 : 8);
+				font->SetTlut((activeMask & (1u << slot)) != 0 ? 6 : 8);
 			} else if ((pendingMask & (1u << slot)) == 0) {
 				text = emptyText[0];
-				SetTlut__5CFontFi(font, (activeMask & (1u << slot)) != 0 ? 7 : 8);
+				font->SetTlut((activeMask & (1u << slot)) != 0 ? 7 : 8);
 			} else {
 				text = emptyText[1];
-				SetTlut__5CFontFi(font, 0x10);
+				font->SetTlut(0x10);
 				if (worldState[0x10 / 2] == 2) {
 					const int phase = static_cast<int>(System.m_frameCounter) % 20 - 10;
 					const int blink = static_cast<int>(FLOAT_80331458 *
@@ -6872,10 +6863,10 @@ void CMenuPcs::DrawCharaName()
 			}
 
 			const float x = FLOAT_80331410 + static_cast<float>(col * 0x90) +
-			                (FLOAT_8033155C - GetWidth__5CFontFPc(font, text)) * static_cast<float>(DOUBLE_803313f8);
-			SetPosX__5CFontFf(x, font);
-			SetPosY__5CFontFf(y, font);
-			Draw__5CFontFPc(font, text);
+			                (FLOAT_8033155C - font->GetWidth(text)) * static_cast<float>(DOUBLE_803313f8);
+			font->SetPosX(x);
+			font->SetPosY(y);
+			font->Draw(text);
 			if (restoreColor) {
 				font->SetColor(shade.color);
 			}

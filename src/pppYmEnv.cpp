@@ -2,6 +2,7 @@
 #include "ffcc/gobject.h"
 #include "ffcc/mapmesh.h"
 #include "ffcc/game.h"
+#include "ffcc/gxfunc.h"
 #include "ffcc/partMng.h"
 #include "ffcc/graphic.h"
 #include "ffcc/pppGetRotMatrixXYZ.h"
@@ -34,7 +35,6 @@ void _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevA
 void _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(int stage, int op, int bias,
                                                                                            int scale, int clamp,
                                                                                            int reg);
-void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int type, int src, int dst, int op);
 }
 
 extern const float FLOAT_80331180;
@@ -210,7 +210,7 @@ void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displa
     C_MTXLightFrustum(lightFrustumMtx, FLOAT_80331194, FLOAT_80331198, FLOAT_80331194, FLOAT_80331198,
                       FLOAT_80331184, FLOAT_8033119C, FLOAT_8033119C, FLOAT_8033119C, FLOAT_8033119C);
     GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
-    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 0xF);
+    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_SET);
 
     if (blendTexObj != 0) {
         _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(0, 0xF, 0xF,

@@ -6,7 +6,6 @@
 #include "types.h"
 #include "dolphin/mtx.h"
 
-extern CGame Game;
 extern const float kPppYmTraceMoveZero;
 extern const float kPppYmTraceMoveOne;
 

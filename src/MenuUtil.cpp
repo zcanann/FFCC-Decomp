@@ -11,7 +11,6 @@
 #include "ffcc/fontman.h"
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
-extern CMenuPcs MenuPcs;
 extern "C" void pppDeletePart__8CPartMngFi(void*, int);
 extern "C" char* strcat(char*, const char*);
 extern "C" int toupper(int);

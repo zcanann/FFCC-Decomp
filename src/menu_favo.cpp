@@ -10,8 +10,6 @@
 
 typedef signed short s16;
 
-extern CMenuPcs MenuPcs;
-
 unsigned char s_rank[0x20];
 
 extern float FLOAT_80333040;

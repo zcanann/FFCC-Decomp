@@ -34,8 +34,6 @@ extern "C" void DrawSingLife__8CMenuPcsFv(CMenuPcs*);
 extern "C" void DrawHelpMessage__8CMenuPcsFiP5CFontii8_GXColoriff(CMenuPcs*, int, CFont*, int, int, GXColor, int, float, float);
 extern "C" int __cntlzw(unsigned int);
 
-extern CMenuPcs MenuPcs;
-
 extern const float FLOAT_80332e60;
 extern float FLOAT_80332e64;
 extern const double DOUBLE_80332e68;

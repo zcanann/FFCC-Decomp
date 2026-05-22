@@ -79,4 +79,6 @@ public:
     char pad_854[0x104];
 };
 
+extern CMenuPcs MenuPcs;
+
 #endif // _FFCC_MENU_MONEY_H_

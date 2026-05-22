@@ -21,4 +21,6 @@ public:
     void CmdInit2();
 };
 
+extern CMenuPcs MenuPcs;
+
 #endif // _FFCC_MENU_EQUIP_H_

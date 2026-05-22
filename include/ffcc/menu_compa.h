@@ -66,4 +66,6 @@ public:
     CompaOpenAnimList* compaList;
 };
 
+extern CMenuPcs MenuPcs;
+
 #endif // _FFCC_MENU_COMPA_H_

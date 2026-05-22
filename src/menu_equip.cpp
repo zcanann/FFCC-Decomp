@@ -29,8 +29,6 @@ extern "C" void DrawEquipMark__8CMenuPcsFiif(double, CMenuPcs*, int, int);
 extern "C" void DrawHelpMessage__8CMenuPcsFiP5CFontii8_GXColoriff(CMenuPcs*, int);
 extern "C" int GetAttrStr__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" const char* GetMenuStr__8CMenuPcsFi(CMenuPcs*, int);
-extern CMenuPcs MenuPcs;
-
 extern const float FLOAT_80332eb8;
 extern const double DOUBLE_80332ec0;
 extern const double DOUBLE_80332ec8;

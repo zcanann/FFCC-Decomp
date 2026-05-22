@@ -65,4 +65,6 @@ public:
     char pad_854[0x100];
 };
 
+extern CMenuPcs MenuPcs;
+
 #endif // _FFCC_MENU_FAVO_H_

@@ -73,4 +73,6 @@ public:
     unsigned char GetItemIcon(int);
 };
 
+extern CMenuPcs MenuPcs;
+
 #endif // _FFCC_PPP_SINGMENU_H_

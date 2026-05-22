@@ -33,7 +33,6 @@ extern "C" void* __vt__8CGObject[];
 extern "C" int rand(void);
 extern "C" void DrawOptionMenu__8CMenuPcsFv(CMenuPcs*);
 extern "C" void DrawSingCMake__8CMenuPcsFv(CMenuPcs*);
-extern CMenuPcs MenuPcs;
 
 extern "C" int GetWinMess__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" int GetMcWinMessBuff__8CMenuPcsFi(CMenuPcs*, int);

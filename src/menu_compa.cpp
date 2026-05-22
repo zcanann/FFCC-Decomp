@@ -16,8 +16,6 @@ extern "C" void DrawRect__8CMenuPcsFUlfffffffff(CMenuPcs*, unsigned long, float,
 extern "C" void DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(CMenuPcs*, unsigned long, float, float, float, float, float, float, GXColor*, float, float, float);
 extern "C" void DrawSingleIcon__8CMenuPcsFiiifif(CMenuPcs*, int, int, int, float, int, float);
 extern "C" void DrawInit__8CMenuPcsFv(CMenuPcs*);
-extern CMenuPcs MenuPcs;
-
 extern "C" const float FLOAT_80332FF8;
 extern "C" const float FLOAT_80332FFC;
 extern "C" const float FLOAT_80333000;

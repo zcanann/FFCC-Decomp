@@ -42,8 +42,6 @@ extern const double DOUBLE_80332F90;
 extern const double DOUBLE_80332F98;
 extern const double DOUBLE_80332FA0;
 
-extern CMenuPcs MenuPcs;
-
 unsigned int s_Money = 0;
 signed char s_place[16];
 

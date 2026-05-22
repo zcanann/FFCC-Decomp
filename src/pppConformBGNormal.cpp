@@ -15,8 +15,6 @@ double cos(double);
 #include "dolphin/mtx.h"
 #include "dolphin/gx.h"
 
-extern CGame Game;
-
 struct ConformCylinderQuery {
     Vec m_pos;
     Vec m_fieldC;

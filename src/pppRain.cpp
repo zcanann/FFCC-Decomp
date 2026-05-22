@@ -51,7 +51,7 @@ void pppRenderRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_D
 
     colorOffset = param_3->m_serializedDataOffsets[1];
     workOffset = param_3->m_serializedDataOffsets[2] + 0x80;
-    colorData = (RainColorData*)((u8*)pppRain + colorOffset + 0x80);
+    colorData = (RainColorData*)(pppRain->m_object.m_workArea + colorOffset);
     pppSetBlendMode(param_2->m_blendMode);
     pppSetDrawEnv(
         &colorData->color,
@@ -128,7 +128,7 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
         return;
     }
 
-    work = (RainWork*)((u8*)pppRain + 0x80 + param_3->m_serializedDataOffsets[2]);
+    work = (RainWork*)(pppRain->m_object.m_workArea + param_3->m_serializedDataOffsets[2]);
     if (work->drops == 0) {
         RainDrop* dropData;
 
@@ -185,7 +185,7 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
 
     work->accelY += work->accelZ;
     work->moveY += work->accelY;
-    if (param_2->m_graphId == pppRain->m_graphId) {
+    if (param_2->m_graphId == pppRain->m_object.m_graphId) {
         work->moveY += param_2->m_moveYDelta;
         work->accelY += param_2->m_accelYDelta;
         work->accelZ += param_2->m_accelZDelta;
@@ -276,7 +276,7 @@ void pppDestructRain(struct pppRain* pppRain, struct RAIN_DATA* param_2)
 {
     RainWork* work;
 
-    work = (RainWork*)((u8*)pppRain + 0x80 + param_2->m_serializedDataOffsets[2]);
+    work = (RainWork*)(pppRain->m_object.m_workArea + param_2->m_serializedDataOffsets[2]);
     if (work->drops != 0) {
         pppHeapUseRate((CMemory::CStage*)work->drops);
         work->drops = 0;
@@ -298,7 +298,7 @@ void pppConstructRain(struct pppRain* pppRain, struct RAIN_DATA* param_2)
     RainWork* work;
 
     fVar1 = kPppRainTexCoordBase;
-    work = (RainWork*)((u8*)pppRain + 0x80 + param_2->m_serializedDataOffsets[2]);
+    work = (RainWork*)(pppRain->m_object.m_workArea + param_2->m_serializedDataOffsets[2]);
     work->drops = 0;
     work->accelZ = fVar1;
     work->accelY = fVar1;

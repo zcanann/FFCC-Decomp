@@ -1,12 +1,11 @@
 #ifndef _PPP_RAIN_H_
 #define _PPP_RAIN_H_
 
+#include "ffcc/partMng.h"
 #include <dolphin/types.h>
 
 struct pppRain {
-    u8 _pad0[0x0C];
-    s32 m_graphId;
-    u8 _pad10[0x70];
+    _pppPObject m_object;
 };
 
 struct VRain;

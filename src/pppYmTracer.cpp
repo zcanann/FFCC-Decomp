@@ -18,8 +18,6 @@ extern u32 DAT_803306e0;
 extern u32 DAT_803306e4;
 
 extern "C" {
-void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
-
 void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
     void*, void*, float, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char,
     unsigned char);
@@ -207,7 +205,7 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
     entriesPtr = work->entries;
     entries = entriesPtr;
     if (entriesPtr == 0) {
-        work->entries = (TRACE_POLYGON*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+        work->entries = (TRACE_POLYGON*)pppMemAlloc(
             (u32)param_2->m_tracer.m_entryCount * sizeof(TRACE_POLYGON), pppEnvStPtr->m_stagePtr,
             const_cast<char*>(s_pppYmTracer_cpp_801d9ce0), 0xEB);
         fVar3 = FLOAT_803306e8;

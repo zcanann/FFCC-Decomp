@@ -31,7 +31,6 @@ extern const float FLOAT_80331010;
 extern int __float_nan[];
 extern "C" unsigned int __cvt_fp2unsigned(double);
 extern "C" double fmod(double, double);
-extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, const char*, int);
 
 extern "C" {
 int GetTexture__8CMapMeshFP12CMaterialSetRi(CMapMesh* mapMesh, CMaterialSet* materialSet, int& textureIndex);
@@ -278,13 +277,13 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param
 	}
 
 	if ((param_2->m_payload[0] == 1) && (work->m_refractionMap == 0)) {
-		work->m_refractionMap = (CrystalRefractionMap*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
-			sizeof(CrystalRefractionMap), pppEnvStPtr->m_stagePtr, s_pppCrystalCpp, 0xA7);
+		work->m_refractionMap = (CrystalRefractionMap*)pppMemAlloc(
+			sizeof(CrystalRefractionMap), pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppCrystalCpp), 0xA7);
 
 		textureInfo = work->m_refractionMap;
 		textureSize = GXGetTexBufferSize(0x20, 0x20, GX_TF_IA8, GX_FALSE, 0);
-		textureInfo->m_imageData = (u8*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
-			textureSize, pppEnvStPtr->m_stagePtr, s_pppCrystalCpp, 0xAC);
+		textureInfo->m_imageData = (u8*)pppMemAlloc(
+			textureSize, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppCrystalCpp), 0xAC);
 		textureInfo->m_format = GX_TF_IA8;
 		textureInfo->m_width = 0x20;
 		textureInfo->m_height = 0x20;
@@ -337,8 +336,8 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param
 		}
 
 		DCFlushRange(textureInfo->m_imageData, textureInfo->m_bufferSize);
-		work->m_refractionTexObj = (GXTexObj*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
-			0x20, pppEnvStPtr->m_stagePtr, s_pppCrystalCpp, 0xB4);
+		work->m_refractionTexObj = (GXTexObj*)pppMemAlloc(
+			0x20, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppCrystalCpp), 0xB4);
 		GXInitTexObj(work->m_refractionTexObj, textureInfo->m_imageData,
 			(u16)textureInfo->m_width, (u16)textureInfo->m_height, GX_TF_IA8, GX_CLAMP, GX_CLAMP,
 			GX_FALSE);

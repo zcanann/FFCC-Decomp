@@ -14,7 +14,6 @@
 
 // External function declarations
 extern "C" int rand(void);
-extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, const char*, int);
 
 static inline int GetGraphFrameFromId(s32 graphId)
 {
@@ -237,8 +236,8 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
         CChara::CNode* node;
         float zOffset;
 
-        work->m_particles = pppMemAlloc__FUlPQ27CMemory6CStagePci(
-            unkB->m_maxCount * sizeof(LocationTitle2Particle), pppEnvStPtr->m_stagePtr, s_LocationTitle2_cpp,
+        work->m_particles = pppMemAlloc(
+            unkB->m_maxCount * sizeof(LocationTitle2Particle), pppEnvStPtr->m_stagePtr, const_cast<char*>(s_LocationTitle2_cpp),
             0x70);
         memset(work->m_particles, 0, unkB->m_maxCount * sizeof(LocationTitle2Particle));
 

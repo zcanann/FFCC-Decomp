@@ -25,7 +25,6 @@ extern const float FLOAT_80330664;
 extern const float FLOAT_80330668;
 extern "C" void pppNormalize__FR3Vec3Vec(float*, Vec*);
 extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void*);
-extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void pppSetBlendMode(unsigned char);
 extern "C" const char s_pppYmMiasma_cpp_801D9CA8[] = "pppYmMiasma.cpp";
 
@@ -240,7 +239,7 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, YmMiasmaFrameStep* step, pppYmM
     }
 
     if (work->m_particles == 0) {
-        work->m_particles = (PARTICLE_DATA*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+        work->m_particles = (PARTICLE_DATA*)pppMemAlloc(
             (unsigned long)step->m_particleCount * 0x50, pppEnvStPtr->m_stagePtr,
             const_cast<char*>(s_pppYmMiasma_cpp_801D9CA8),
             0x18d);

@@ -13,7 +13,6 @@ extern f32 gPppDefaultValueBuffer[];
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
-extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void pppSetBlendMode(unsigned char);
 extern "C" void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
     void*, void*, float, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char,
@@ -258,7 +257,7 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
     if (work->entries == nullptr) {
         useFallback = 1;
         work->alphaStep = (u16)param_2->m_tracer.m_entryAlpha / param_2->m_tracer.m_entryLife;
-        work->entries = (TRACE_POLYGON*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+        work->entries = (TRACE_POLYGON*)pppMemAlloc(
             (u32)param_2->m_tracer.m_entryCount * 0x28, pppEnvStPtr->m_stagePtr,
             const_cast<char*>(s_pppYmTracer2_cpp_801dc4b8), 0xAD);
 

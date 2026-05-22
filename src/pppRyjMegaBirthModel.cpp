@@ -6,7 +6,6 @@
 #include <string.h>
 #include "ffcc/ppp_linkage.h"
 
-extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void*);
 
 extern const float FLOAT_80330498;
@@ -249,7 +248,7 @@ void pppRyjMegaBirthModel(_pppPObject* pObject, PRyjMegaBirthModel* params, PRyj
 
     if (*(void**)(work + 0xC) == 0) {
         ((VRyjMegaBirthModel*)work)->m_numParticles = *(u16*)(payload + 0x20);
-        ((VRyjMegaBirthModel*)work)->m_particleBlock = (_PARTICLE_DATA*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+        ((VRyjMegaBirthModel*)work)->m_particleBlock = (_PARTICLE_DATA*)pppMemAlloc(
             ((VRyjMegaBirthModel*)work)->m_numParticles * 0xA0, pppEnvStPtr->m_stagePtr,
             const_cast<char*>(s_pppRyjMegaBirthModel_cpp_801d9c18), 0x8D);
         if (((VRyjMegaBirthModel*)work)->m_particleBlock != NULL) {
@@ -257,7 +256,7 @@ void pppRyjMegaBirthModel(_pppPObject* pObject, PRyjMegaBirthModel* params, PRyj
         }
 
         if (payload[0x136] != 0) {
-            ((VRyjMegaBirthModel*)work)->m_worldMatrixBlock = (PARTICLE_WMAT*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+            ((VRyjMegaBirthModel*)work)->m_worldMatrixBlock = (PARTICLE_WMAT*)pppMemAlloc(
                 ((VRyjMegaBirthModel*)work)->m_numParticles * 0x30, pppEnvStPtr->m_stagePtr,
                 const_cast<char*>(s_pppRyjMegaBirthModel_cpp_801d9c18), 0x97);
             if (((VRyjMegaBirthModel*)work)->m_worldMatrixBlock != NULL) {
@@ -266,7 +265,7 @@ void pppRyjMegaBirthModel(_pppPObject* pObject, PRyjMegaBirthModel* params, PRyj
         }
 
         if (payload[0x131] != 0) {
-            ((VRyjMegaBirthModel*)work)->m_colorBlock = (_PARTICLE_COLOR*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+            ((VRyjMegaBirthModel*)work)->m_colorBlock = (_PARTICLE_COLOR*)pppMemAlloc(
                 ((VRyjMegaBirthModel*)work)->m_numParticles << 5, pppEnvStPtr->m_stagePtr,
                 const_cast<char*>(s_pppRyjMegaBirthModel_cpp_801d9c18), 0xA2);
             if (((VRyjMegaBirthModel*)work)->m_colorBlock != NULL) {

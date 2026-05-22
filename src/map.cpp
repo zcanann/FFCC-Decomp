@@ -11,6 +11,7 @@
 #include "ffcc/textureman.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/game.h"
+#include "ffcc/gxfunc.h"
 #include "ffcc/p_light.h"
 #include "ffcc/p_tina.h"
 #include "ffcc/file.h"
@@ -70,10 +71,6 @@ extern "C" void* __vt__8CPtrArrayIP11CMapAnimRun[];
 extern "C" void* __vt__8CPtrArrayIP7CMapAnim[];
 extern "C" void* __vt__8CPtrArrayIP13CMapAnimKeyDt[];
 extern "C" void* __vt__8CPtrArrayIP10CMapShadow[];
-extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
-extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, int, int, int, int);
-extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
-extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 unsigned char DAT_8032ec88;
 extern const float FLOAT_8032f988 = 1.0e15f;
 extern const float FLOAT_8032f98c = -1.0f;
@@ -2892,14 +2889,14 @@ void CMapMng::Draw()
     }
 
     if ((gMapHitDrawMode.m_byte & 4) != 0) {
-        _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
-        _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(6, 1, 0, 7, 0);
+        _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
+        _GXSetAlphaCompare(GX_GEQUAL, 1, GX_AOP_AND, GX_ALWAYS, 0);
         GXSetZCompLoc(0);
         GXSetZMode(1, GX_LEQUAL, 1);
         GXSetCullMode(GX_CULL_BACK);
         GXSetNumTevStages(1);
-        _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 4);
-        _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0xFF, 0xFF, 4);
+        _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
+        _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
         GXSetNumChans(1);
         GXSetChanCtrl(GX_COLOR0A0, 0, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_SPEC);
         GXSetChanCtrl(GX_ALPHA0, 0, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);

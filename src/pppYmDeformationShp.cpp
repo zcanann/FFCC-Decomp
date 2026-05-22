@@ -1,5 +1,6 @@
 #include "ffcc/pppYmDeformationShp.h"
 #include "ffcc/graphic.h"
+#include "ffcc/gxfunc.h"
 #include "ffcc/math.h"
 #include "ffcc/mapmesh.h"
 #include "ffcc/partMng.h"
@@ -68,10 +69,6 @@ void pppSetDrawEnv(pppCVECTOR*, pppFMATRIX*, float, unsigned char, unsigned char
 extern "C" {
 int GetTexture__8CMapMeshFP12CMaterialSetRi(CMapMesh* mapMesh, CMaterialSet* materialSet, int& textureIndex);
 
-void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int stage, int rasSel, int texSel);
-void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int comp0, int ref0, int op, int comp1, int ref1);
-void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int stage, int texCoord, int texMap, int chan);
-void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int stage, int mode);
 GXTexObj* GetBackBufferRect__8CGraphicFRiRiRiRii(CGraphic* graphic, int& left, int& top, int& width, int& height, int copy);
 void DisableIndWarp__F13_GXTevStageID16_GXIndTexStageID(int stage, int indStage);
 void MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(void* math, Mtx44 mtx, Vec4d* src, Vec4d* dst);
@@ -106,7 +103,7 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 
 		PSMTXIdentity(rotMtx);
 		pppSetBlendMode(1);
-		_GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
+		_GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
 		pppSetDrawEnv(
 			&colorInfo->m_color, &((pppYmDeformationShpLayout*)pppYmDeformationShp_)->m_modelMatrix, param_2->m_drawZ,
 			param_2->m_alpha, 0, 0, 0, 1, 1, 0);
@@ -114,9 +111,9 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 		GXSetNumTevStages(1);
 		GXSetNumTexGens(2);
 		GXSetNumChans(1);
-		_GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(7, 0, 1, 7, 0);
-		_GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 4);
-		_GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 3);
+		_GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_OR, GX_ALWAYS, 0);
+		_GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
+		_GXSetTevOp(GX_TEVSTAGE0, GX_REPLACE);
 		gUtil.SetVtxFmt_POS_TEX0_TEX1();
 		GXLoadTexObj((GXTexObj*)(textureBase + 0x28), GX_TEXMAP1);
 		GXSetNumIndStages(1);

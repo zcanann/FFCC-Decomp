@@ -27,7 +27,6 @@ inline void* operator new(unsigned long, void* p)
 extern "C" unsigned long UnkMaterialSetGetter(void*);
 extern "C" void __ct__10CTexScrollFv(void*);
 extern "C" void __dt__10CTexScrollFv(void*, int);
-extern "C" int CheckName__8CTextureFPc(CTexture*, char*);
 extern float FLOAT_8032faf0;
 extern float FLOAT_8032faf4;
 extern float FLOAT_8032faf8;
@@ -3191,7 +3190,7 @@ unsigned int CMaterialSet::FindTexName(char* textureName, long* textureIndexOut)
             CMaterial* textureSlot = material;
 
             for (int slot = 0; slot < static_cast<int>(static_cast<unsigned int>(*reinterpret_cast<unsigned short*>(Ptr(material, 0x18)))); slot++) {
-                if (CheckName__8CTextureFPc(*reinterpret_cast<CTexture**>(Ptr(textureSlot, 0x3C)), textureName)) {
+                if ((*reinterpret_cast<CTexture**>(Ptr(textureSlot, 0x3C)))->CheckName(textureName)) {
                     if (textureIndexOut != 0) {
                         *textureIndexOut = slot;
                     }

@@ -1,6 +1,7 @@
 #define PPP_BREATHMODEL_CUSTOM_PARTICLE_TYPES
 #include "ffcc/pppBreathModel.h"
 #include "ffcc/linkage.h"
+#include "ffcc/graphic.h"
 #include "ffcc/gxfunc.h"
 #include "dolphin/mtx.h"
 #include "dolphin/gx.h"
@@ -18,8 +19,6 @@ void pppSetBlendMode(unsigned char);
 
 extern "C" {
 void pppHeapUseRate__FPQ27CMemory6CStage(void* stage);
-
-void DrawSphere__8CGraphicFPA4_f8_GXColor(void*, Mtx, _GXColor);
 }
 
 extern "C" const char s_pppBreathModel_cpp_801DB5A0[] = "pppBreathModel.cpp";
@@ -454,7 +453,7 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
                 sphereMtx[2][3] = debugPos.z;
 
                 pppSetBlendMode(1);
-                DrawSphere__8CGraphicFPA4_f8_GXColor(&Graphic, sphereMtx, debugColor);
+                Graphic.DrawSphere(sphereMtx, debugColor);
             }
         }
 

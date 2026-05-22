@@ -217,11 +217,11 @@ extern char DAT_80331648[];
 extern char DAT_8033164c[];
 extern char DAT_80331654[];
 extern char DAT_8033165c[];
-extern const char* lbl_8032E8F0[];
-extern const char* lbl_8032E8F8[];
-extern const char* DAT_8032E900[];
-extern const char* lbl_8032E908[];
-extern const char* lbl_8032E910[];
+extern const char* s_wmEmptyCreatingTextEn_8032E8F0[];
+extern const char* s_wmEmptyCreatingTextDe_8032E8F8[];
+extern const char* s_wmEmptyCreatingTextIt_8032E900[];
+extern const char* s_wmEmptyCreatingTextFr_8032E908[];
+extern const char* s_wmEmptyCreatingTextEs_8032E910[];
 extern int DAT_8032E918;
 extern float* DAT_8032E91C;
 char gWmMenuCursorX[2];
@@ -6776,17 +6776,17 @@ void CMenuPcs::DrawCharaName()
 	WmCharaSelectEntry* const selectEntries = GetWmCharaSelectEntries(this);
 	unsigned char* const cmakeWork = GetWmCmakeWork(this);
 
-	const char** emptyText = lbl_8032E8F0;
+	const char** emptyText = s_wmEmptyCreatingTextEn_8032E8F0;
 	if (Game.m_gameWork.m_languageId == 3) {
-		emptyText = DAT_8032E900;
+		emptyText = s_wmEmptyCreatingTextIt_8032E900;
 	} else if (Game.m_gameWork.m_languageId < 3) {
 		if (Game.m_gameWork.m_languageId != 0 && Game.m_gameWork.m_languageId != 1) {
-			emptyText = lbl_8032E8F8;
+			emptyText = s_wmEmptyCreatingTextDe_8032E8F8;
 		}
 	} else if (Game.m_gameWork.m_languageId == 5) {
-		emptyText = lbl_8032E910;
+		emptyText = s_wmEmptyCreatingTextEs_8032E910;
 	} else if (Game.m_gameWork.m_languageId < 5) {
-		emptyText = lbl_8032E908;
+		emptyText = s_wmEmptyCreatingTextFr_8032E908;
 	}
 
 	const int alpha = GetWmMenuFade(worldState[0x10 / 2], worldState[0x22 / 2]);

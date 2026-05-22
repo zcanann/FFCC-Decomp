@@ -70,7 +70,7 @@ typedef struct ActionIterator {
 } ActionIterator;
 
 #define MAXFRAGMENTS 1
-static ProcessInfo fragmentinfo[MAXFRAGMENTS];
+ProcessInfo fragmentinfo[MAXFRAGMENTS];
 
 typedef void (*DeleteFunc)(void*);
 

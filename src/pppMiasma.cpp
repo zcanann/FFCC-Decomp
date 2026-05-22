@@ -295,7 +295,8 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
     scissorHeight = (u32)FLOAT_8033192c;
     scissorWidth = (u32)FLOAT_80331928;
     yStep = FLOAT_8033192c;
-    for (slice = 0; slice < 2; slice++) {
+    slice = 0;
+    do {
         yPos = (float)slice * yStep;
         yOffset = (int)yPos;
 
@@ -658,7 +659,8 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
         }
 
         gUtil.InitConstantRegister();
-    }
+        slice++;
+    } while (slice < 2);
 
     gUtil.EndQuadEnv();
     pppInitBlendMode();

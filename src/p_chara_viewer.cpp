@@ -426,13 +426,28 @@ void CCharaPcs::calcViewer()
             self->m_viewerAnimLoopIndex = 0;
             self->m_viewerAnimLoadedCount = 0;
 
-            if (self->m_viewerLoadAnim == 0) {
+            if (self->m_viewerLoadAnim != 0) {
+                System.Printf(const_cast<char*>(s_calc_viewer_fmt), self->m_viewerAnimPath);
+                fileHandle = File.Open(self->m_viewerAnimPath, 0, CFile::PRI_LOW);
+                if (fileHandle != 0) {
+                    File.Read(fileHandle);
+                    File.SyncCompleted(fileHandle);
+                    CChara::CAnim* anim =
+                        new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_viewer_cpp), 0x111) CChara::CAnim;
+                    self->m_viewerAnim[0] = anim;
+                    Create__Q26CChara5CAnimFPvPQ27CMemory6CStage(
+                        self->m_viewerAnim[0], File.m_readBuffer, self->m_viewerAnimStage);
+                    File.Close(fileHandle);
+                }
+                self->m_viewerLoadAnim = 0;
+            } else {
                 for (i = 0; i < static_cast<unsigned int>(self->m_viewerAnimRequestedCount); i++) {
                     unsigned int idx = static_cast<unsigned int>(self->m_viewerAnimLoadedCount);
                     sprintf(pathBuf, s_anim_path_fmt, self->m_viewerAnimPath, idx);
                     System.Printf(const_cast<char*>(s_calc_viewer_fmt), pathBuf);
                     fileHandle = File.Open(pathBuf, 0, CFile::PRI_LOW);
                     if (fileHandle != 0) {
+                        ReleaseShared(self->m_viewerAnimBank[idx]);
                         File.Read(fileHandle);
                         File.SyncCompleted(fileHandle);
                         CChara::CAnim* anim =
@@ -449,20 +464,6 @@ void CCharaPcs::calcViewer()
                     }
                 }
                 self->m_viewerLoadAnimContinuous = 0;
-            } else {
-                System.Printf(const_cast<char*>(s_calc_viewer_fmt), self->m_viewerAnimPath);
-                fileHandle = File.Open(self->m_viewerAnimPath, 0, CFile::PRI_LOW);
-                if (fileHandle != 0) {
-                    File.Read(fileHandle);
-                    File.SyncCompleted(fileHandle);
-                    CChara::CAnim* anim =
-                        new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_viewer_cpp), 0x111) CChara::CAnim;
-                    self->m_viewerAnim[0] = anim;
-                    Create__Q26CChara5CAnimFPvPQ27CMemory6CStage(
-                        self->m_viewerAnim[0], File.m_readBuffer, self->m_viewerAnimStage);
-                    File.Close(fileHandle);
-                }
-                self->m_viewerLoadAnim = 0;
             }
         }
 
@@ -545,17 +546,7 @@ void CCharaPcs::calcViewer()
     }
 
     float frameAdvance;
-    if (self->m_viewerStepMode == 0) {
-        float deltaY = kCharaViewerUnitStep;
-        if ((heldButtons & 0x200) != 0) {
-            deltaY = kCharaViewerFineStep;
-        }
-        float speedScale = kCharaViewerUnitStep;
-        if ((heldButtons & 0x100) != 0) {
-            speedScale = kCharaViewerLerpScale;
-        }
-        frameAdvance = deltaY * speedScale;
-    } else {
+    if (self->m_viewerStepMode != 0) {
         float offsetA = kCharaViewerZero;
         if ((triggerButtons & 0x100) != 0) {
             offsetA = kCharaViewerUnitStep;
@@ -565,6 +556,16 @@ void CCharaPcs::calcViewer()
             offsetB = kCharaViewerFineStep;
         }
         frameAdvance = kCharaViewerZero + offsetA + offsetB;
+    } else {
+        float deltaY = kCharaViewerUnitStep;
+        if ((heldButtons & 0x200) != 0) {
+            deltaY = kCharaViewerFineStep;
+        }
+        float speedScale = kCharaViewerUnitStep;
+        if ((heldButtons & 0x100) != 0) {
+            speedScale = kCharaViewerLerpScale;
+        }
+        frameAdvance = deltaY * speedScale;
     }
 
     for (unsigned int i = 0; i < 2; i++) {

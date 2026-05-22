@@ -175,6 +175,14 @@ public:
 		void (*m_drawMeshDLCallback)(CChara::CModel*, void*, void*, int, int, float (*)[4]);
 		u8 _pad100[4];
 		void (*m_afterDrawMeshCallback)(CChara::CModel*, void*, void*, int, float (*)[4]);
+		void (*m_afterDrawModelCallback)(CChara::CModel*, void*, void*);
+		u8 m_flags10C;
+		u8 _pad10D[3];
+		float m_furStep;
+		float m_furLenScale;
+		float m_furTarget;
+		float m_furCur;
+		float m_twistAngle;
 	};
 
 	class CMesh : public CRef

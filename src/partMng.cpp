@@ -186,12 +186,12 @@ pppShapeSt::pppShapeSt()
 pppShapeSt::~pppShapeSt()
 {
     if (m_animData != 0) {
-        delete reinterpret_cast<u8*>(m_animData);
+        delete[] reinterpret_cast<u8*>(m_animData);
         m_animData = 0;
     }
 
     if (m_displayListData != 0) {
-        delete reinterpret_cast<u8*>(m_displayListData);
+        delete[] reinterpret_cast<u8*>(m_displayListData);
         m_displayListData = 0;
     }
 }
@@ -374,11 +374,11 @@ void CPartMng::Destroy()
                 shape->m_refCount--;
                 if (shape->m_refCount < 1) {
                     if (shape->m_animData != 0) {
-                        delete reinterpret_cast<u8*>(shape->m_animData);
+                        delete[] reinterpret_cast<u8*>(shape->m_animData);
                         shape->m_animData = 0;
                     }
                     if (shape->m_displayListData != 0) {
-                        delete reinterpret_cast<u8*>(shape->m_displayListData);
+                        delete[] reinterpret_cast<u8*>(shape->m_displayListData);
                         shape->m_displayListData = 0;
                     }
                     shape->m_refCount = 0;
@@ -605,11 +605,11 @@ void CPartMng::pppReleasePdt(int pdtSlotIndex)
         shape->m_refCount--;
         if (shape->m_refCount < 1) {
             if (shape->m_animData != 0) {
-                delete reinterpret_cast<u8*>(shape->m_animData);
+                delete[] reinterpret_cast<u8*>(shape->m_animData);
                 shape->m_animData = 0;
             }
             if (shape->m_displayListData != 0) {
-                delete reinterpret_cast<u8*>(shape->m_displayListData);
+                delete[] reinterpret_cast<u8*>(shape->m_displayListData);
                 shape->m_displayListData = 0;
             }
             shape->m_refCount = 0;
@@ -1743,11 +1743,11 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
                     shapeSlot->m_refCount--;
                     if (shapeSlot->m_refCount < 1) {
                         if (shapeSlot->m_animData != 0) {
-                            delete reinterpret_cast<u8*>(shapeSlot->m_animData);
+                            delete[] reinterpret_cast<u8*>(shapeSlot->m_animData);
                             shapeSlot->m_animData = 0;
                         }
                         if (shapeSlot->m_displayListData != 0) {
-                            delete reinterpret_cast<u8*>(shapeSlot->m_displayListData);
+                            delete[] reinterpret_cast<u8*>(shapeSlot->m_displayListData);
                             shapeSlot->m_displayListData = 0;
                         }
                         shapeSlot->m_refCount = 0;

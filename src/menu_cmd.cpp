@@ -29,13 +29,13 @@ extern "C" void DrawInit__8CMenuPcsFv(CMenuPcs*);
 extern "C" void DrawHelpMessage__8CMenuPcsFiP5CFontii8_GXColoriff(CMenuPcs*, int, CFont*, int, int, GXColor, int, float, float);
 extern "C" void DrawEquipMark__8CMenuPcsFiif(CMenuPcs*, int, int, float);
 extern "C" const char* GetMenuStr__8CMenuPcsFi(CMenuPcs*, int);
-extern "C" const char lbl_80332A50[];
 extern "C" const char s_Pyro_Frappe_801DEAE4[];
 extern "C" const char s_Cryo_Frappe_801DEAF0[];
-extern "C" const char lbl_801DEAFC[];
+extern "C" const char s_Rheo_Frappe_801DEAFC[];
 extern "C" const char s_Efecto_Fuego_801DEB08[];
 extern "C" const char s_Efecto_Hielo_801DEB18[];
 extern "C" const char s_Efecto_Electro_801DEB28[];
+extern "C" const char s_EmptySkillName_80332A50[];
 extern "C" const char* jumptable_80214D24[];
 extern "C" const char* s_pcts_pctd_item_pctd_m_equip_pct08x_80214D34[];
 
@@ -121,17 +121,17 @@ extern "C" const char s_Colpo_Blizzard_801DEAC4[] = "Colpo Blizzard";
 extern "C" const char* PTR_s_Pyro_Frappe[] = {
     s_Pyro_Frappe_801DEAE4,
     s_Cryo_Frappe_801DEAF0,
-    lbl_801DEAFC,
-    lbl_80332A50,
-    lbl_80332A50,
+    s_Rheo_Frappe_801DEAFC,
+    s_EmptySkillName_80332A50,
+    s_EmptySkillName_80332A50,
 };
 
 extern "C" const char* PTR_s_Efecto_Fuego[] = {
     s_Efecto_Fuego_801DEB08,
     s_Efecto_Hielo_801DEB18,
     s_Efecto_Electro_801DEB28,
-    lbl_80332A50,
-    lbl_80332A50,
+    s_EmptySkillName_80332A50,
+    s_EmptySkillName_80332A50,
     0,
 };
 

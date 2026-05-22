@@ -1,6 +1,6 @@
 // Generated from PAL main.dol wmm_str pointer tables.
 extern const char s_The_data_is_corrupt_801E3838[];
-extern const char lbl_80333680[];
+extern const char s_WmmEmptyEn_80333680[];
 extern const char s_Select_game_data_to_load_801E3850[];
 extern const char s_Select_save_location_801E386C[];
 extern const char s_Der_Spielstand_ist_fehlerhaft_801E3884[];
@@ -8,15 +8,15 @@ extern const char s_Kein_Spielstand_vorhanden_801E38A4[];
 extern const char lbl_801E38C0[];
 extern const char lbl_801E38E0[];
 extern const char s_I_dati_sono_danneggiati_801E3904[];
-extern const char lbl_80333688[];
+extern const char s_WmmEmptyIt_80333688[];
 extern const char s_Seleziona_i_dati_da_caricare_801E3920[];
 extern const char s_Seleziona_l_area_di_salvataggio_801E3940[];
 extern const char lbl_801E3964[];
-extern const char lbl_80333690[];
+extern const char s_WmmEmptyFr_80333690[];
 extern const char lbl_801E3980[];
 extern const char lbl_801E39A4[];
 extern const char lbl_801E39D8[];
-extern const char lbl_80333698[];
+extern const char s_WmmEmptyEs_80333698[];
 extern const char s_Selecciona_los_datos_que_deseas_cargar_801E39F4[];
 extern const char s_Selecciona_el_sitio_donde_deseas_guardar_801E3A1C[];
 extern const char lbl_803336A0[];
@@ -367,7 +367,7 @@ extern const char s_No_es_posible_eliminar_los_datos_801E65C0[];
 
 const char* PTR_s_The_data_is_corrupt_[] = {
     (char*)s_The_data_is_corrupt_801E3838,
-    (char*)lbl_80333680,
+    (char*)s_WmmEmptyEn_80333680,
     (char*)s_Select_game_data_to_load_801E3850,
     (char*)s_Select_save_location_801E386C,
 };
@@ -381,21 +381,21 @@ const char* PTR_s_Der_Spielstand_ist_fehlerhaft_[] = {
 
 const char* PTR_s_I_dati_sono_danneggiati_[] = {
     (char*)s_I_dati_sono_danneggiati_801E3904,
-    (char*)lbl_80333688,
+    (char*)s_WmmEmptyIt_80333688,
     (char*)s_Seleziona_i_dati_da_caricare_801E3920,
     (char*)s_Seleziona_l_area_di_salvataggio_801E3940,
 };
 
 const char* s_McStr_es[] = {
     (char*)lbl_801E3964,
-    (char*)lbl_80333690,
+    (char*)s_WmmEmptyFr_80333690,
     (char*)lbl_801E3980,
     (char*)lbl_801E39A4,
 };
 
 const char* s_McStr_fr[] = {
     (char*)lbl_801E39D8,
-    (char*)lbl_80333698,
+    (char*)s_WmmEmptyEs_80333698,
     (char*)s_Selecciona_los_datos_que_deseas_cargar_801E39F4,
     (char*)s_Selecciona_el_sitio_donde_deseas_guardar_801E3A1C,
 };

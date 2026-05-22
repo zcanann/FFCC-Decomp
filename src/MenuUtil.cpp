@@ -43,14 +43,14 @@ extern "C" const float kOptionVolumeScale = 10.583333f;
 extern "C" const float FLOAT_80333654 = 25.0f;
 extern float FLOAT_8033357c;
 extern float FLOAT_803335a0;
-extern "C" const char DAT_80333658[4] = "";
-extern "C" const char DAT_8033365c[] = "%s";
-extern "C" const char DAT_80333660[] = "+1";
-extern "C" const char DAT_80333664[] = "%c%d";
-extern "C" const char DAT_8033366c[] = " ";
-extern "C" const char DAT_80333670[] = " %d";
-extern char lbl_80333674[];
-extern char lbl_8033367C[];
+extern const char s_MenuUtilEmptyText_80333658[4] = "";
+extern const char s_MenuUtilStringFormat_8033365c[] = "%s";
+extern const char s_MenuUtilPlusOneText_80333660[] = "+1";
+extern const char s_MenuUtilSignedValueFormat_80333664[] = "%c%d";
+extern const char s_MenuUtilSpaceText_8033366c[] = " ";
+extern const char s_MenuUtilValueSuffixFormat_80333670[] = " %d";
+extern const char s_MenuUtilSignedDeltaFormat_80333674[] = " %+d";
+extern const char s_MenuUtilAttrBonusFormat_8033367C[] = " %s";
 extern char s_Strength_801E30A4[];
 extern char s_Defence_801E30B0[];
 extern char s_Position_Markers_801E30BC[];
@@ -140,9 +140,6 @@ extern char s_Apagado_80333528[];
 extern char lbl_80333530[];
 extern char lbl_80333538[];
 extern char lbl_80333540[];
-extern "C" const char lbl_80333690[] = "Vide";
-extern "C" const char lbl_80333698[] = {'V', 'a', 'c', '\xED', 'o', '.', '\0', '\0'};
-
 extern "C" char* g_strMenuUtilMes[] = {
 	s_Strength_801E30A4, s_Defence_801E30B0, s_Position_Markers_801E30BC, s_Sound_Mode_801E30D0,
 	s_MenuOptionMusic, s_Sound_Effects_801E30DC, s_GBA_Colour_Balance_801E30EC,
@@ -372,7 +369,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 		} else if (msgNo == 0x211) {
 			suffix = GetSkillStr__8CMenuPcsFi(this, 2);
 		} else {
-			suffix = DAT_80333658;
+			suffix = s_MenuUtilEmptyText_80333658;
 		}
 
 		if ((msgNo == 0x209) || (msgNo == 0x20D) || (msgNo == 0x211)) {
@@ -469,22 +466,22 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 	} else if ((flags & 0x800) != 0) {
 		strcpy(scratch, PTR_s_Defence__80215a4c[languageIndex]);
 	} else if ((flags & 0x1000) != 0) {
-		strcpy(scratch, DAT_80333658);
+		strcpy(scratch, s_MenuUtilEmptyText_80333658);
 	} else if ((flags & 0x2000) != 0) {
-		strcpy(scratch, DAT_80333658);
+		strcpy(scratch, s_MenuUtilEmptyText_80333658);
 	}
 
 	font->SetPosX(FLOAT_8033357c);
 	font->SetPosY(static_cast<float>(y));
 
 	if ((flags & 0x1000) == 0) {
-		strcat(scratch, DAT_8033366c);
+		strcat(scratch, s_MenuUtilSpaceText_8033366c);
 		font->Draw(scratch);
 
 		float valueX = FLOAT_8033357c + font->GetWidth(scratch) + FLOAT_803335a0;
 		font->SetTlut(1);
 		font->SetPosX(valueX);
-		sprintf(scratch, DAT_80333670, *reinterpret_cast<u16*>(itemBase + 6));
+		sprintf(scratch, s_MenuUtilValueSuffixFormat_80333670, *reinterpret_cast<u16*>(itemBase + 6));
 		font->Draw(scratch);
 
 		if ((*reinterpret_cast<short*>(self + 0x864) == 2) &&
@@ -528,14 +525,14 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 				} else {
 					font->SetTlut(9);
 				}
-				sprintf(scratch, lbl_80333674, delta);
+				sprintf(scratch, s_MenuUtilSignedDeltaFormat_80333674, delta);
 				if (delta != 0) {
 					font->Draw(scratch);
 				}
 			}
 		}
 
-		float attrX = font->posX + font->GetWidth(DAT_8033366c);
+		float attrX = font->posX + font->GetWidth(s_MenuUtilSpaceText_8033366c);
 		font->SetPosX(attrX);
 
 		u16 attr = *reinterpret_cast<u16*>(itemBase + 8);
@@ -545,7 +542,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 			font->Draw(scratch);
 			font->SetTlut(9);
 			if ((attr != 0) && (attr < 9)) {
-				sprintf(scratch, lbl_8033367C, DAT_80333660);
+				sprintf(scratch, s_MenuUtilAttrBonusFormat_8033367C, s_MenuUtilPlusOneText_80333660);
 				font->Draw(scratch);
 			}
 		}
@@ -560,16 +557,16 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 
 			if ((attr == 0) || (8 < attr)) {
 				if ((attr == 0xB) || (attr == 0x11) || (attr == 0x12)) {
-					sprintf(scratch, DAT_80333664, 0x2B, *reinterpret_cast<u16*>(itemBase + 6));
+					sprintf(scratch, s_MenuUtilSignedValueFormat_80333664, 0x2B, *reinterpret_cast<u16*>(itemBase + 6));
 				} else {
 					if (((attr - 9) > 1) && (attr != 0xC)) {
 						return;
 					}
-					sprintf(scratch, DAT_80333664, 0x2D, *reinterpret_cast<u16*>(itemBase + 6));
+					sprintf(scratch, s_MenuUtilSignedValueFormat_80333664, 0x2D, *reinterpret_cast<u16*>(itemBase + 6));
 					font->SetTlut(3);
 				}
 			} else {
-				sprintf(scratch, DAT_8033365c, DAT_80333660);
+				sprintf(scratch, s_MenuUtilStringFormat_8033365c, s_MenuUtilPlusOneText_80333660);
 			}
 
 			font->Draw(scratch);

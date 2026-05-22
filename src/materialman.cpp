@@ -1,5 +1,6 @@
 #include "ffcc/materialman.h"
 #include "ffcc/map.h"
+#include "ffcc/mapocttree.h"
 #include "ffcc/pad.h"
 #include "ffcc/chunkfile.h"
 #include "ffcc/linkage.h"
@@ -27,9 +28,6 @@ extern "C" unsigned long UnkMaterialSetGetter(void*);
 extern "C" void __ct__10CTexScrollFv(void*);
 extern "C" void __dt__10CTexScrollFv(void*, int);
 extern "C" int CheckName__8CTextureFPc(CTexture*, char*);
-extern "C" int CheckFrustum__6CBoundFR3VecPA4_ff(CBound*, Vec*, float (*)[4], float);
-extern "C" void SetShadow__12CMaterialManFR10CMapShadowPA4_fiUl(
-    CMaterialMan*, CMapShadow*, float (*)[4], int, unsigned long);
 extern float FLOAT_8032faf0;
 extern float FLOAT_8032faf4;
 extern float FLOAT_8032faf8;
@@ -1907,7 +1905,7 @@ void CMaterialMan::SetPosition(
                 FLOAT_8032faf0);
 
             if (*(shadowBytes + 7) == 1) {
-                SetShadow__12CMaterialManFR10CMapShadowPA4_fiUl(this, shadow, viewMtx, i, 0);
+                SetShadow(*shadow, viewMtx, i, 0);
                 continue;
             }
 
@@ -1916,11 +1914,7 @@ void CMaterialMan::SetPosition(
                 ((*(shadowBytes + 9) != 2) || (position->y <= shadowPos.y));
             if ((ignoreFrustumCheck != 0) ||
                 (yFilterPass &&
-                 (CheckFrustum__6CBoundFR3VecPA4_ff(
-                      reinterpret_cast<CBound*>(&minX),
-                      &shadowPos,
-                      scaledShadowMtx,
-                      FLOAT_8032fafc) != 0))) {
+                 (reinterpret_cast<CBound*>(&minX)->CheckFrustum(shadowPos, scaledShadowMtx, FLOAT_8032fafc) != 0))) {
                 Vec delta;
                 PSVECSubtract(&shadowPos, position, &delta);
                 candidateWrite[0] = reinterpret_cast<int>(shadow);
@@ -1944,12 +1938,7 @@ void CMaterialMan::SetPosition(
 
         if (nearest != 0) {
             nearest[1] = static_cast<int>(FLOAT_8032fb04);
-            SetShadow__12CMaterialManFR10CMapShadowPA4_fiUl(
-                this,
-                reinterpret_cast<CMapShadow*>(nearest[0]),
-                viewMtx,
-                nearest[2],
-                0xFFFFFFFF);
+            SetShadow(*reinterpret_cast<CMapShadow*>(nearest[0]), viewMtx, nearest[2], 0xFFFFFFFF);
         }
     } else {
         int targetOffset = static_cast<int>(target);
@@ -1976,12 +1965,8 @@ void CMaterialMan::SetPosition(
                 FLOAT_8032faf0);
 
             if ((*(shadowBytes + 7) == 1) ||
-                (CheckFrustum__6CBoundFR3VecPA4_ff(
-                     reinterpret_cast<CBound*>(&minX),
-                     &shadowPos,
-                     scaledShadowMtx,
-                     FLOAT_8032fafc) != 0)) {
-                SetShadow__12CMaterialManFR10CMapShadowPA4_fiUl(this, shadow, viewMtx, i, 0);
+                (reinterpret_cast<CBound*>(&minX)->CheckFrustum(shadowPos, scaledShadowMtx, FLOAT_8032fafc) != 0)) {
+                SetShadow(*shadow, viewMtx, i, 0);
             }
         }
     }
@@ -2057,11 +2042,7 @@ int CMaterialMan::GetCharaShadow(
             ((*(shadowBytes + 9) != 2) || (position->y <= shadowPos.y));
         if ((ignoreFrustumCheck != 0) ||
             (yFilterPass &&
-             (CheckFrustum__6CBoundFR3VecPA4_ff(
-                  reinterpret_cast<CBound*>(&minX),
-                  &shadowPos,
-                  scaledShadowMtx,
-                  FLOAT_8032fafc) != 0))) {
+             (reinterpret_cast<CBound*>(&minX)->CheckFrustum(shadowPos, scaledShadowMtx, FLOAT_8032fafc) != 0))) {
             Vec delta;
             PSVECSubtract(&shadowPos, position, &delta);
             candidateWrite[0] = reinterpret_cast<int>(shadow);
@@ -2126,8 +2107,8 @@ void CMaterialMan::SetShadowBound(CMapShadow::TARGET target, CBound* bound, floa
                         FLOAT_8032faf8, FLOAT_8032faf0);
 
         if ((*reinterpret_cast<unsigned char*>(Ptr(shadow, 7)) == 1) ||
-            (CheckFrustum__6CBoundFR3VecPA4_ff(bound, &position, scaledShadowMtx, FLOAT_8032fafc) != 0)) {
-            SetShadow__12CMaterialManFR10CMapShadowPA4_fiUl(this, shadow, viewMtx, i, 0xFFFFFFFF);
+            (bound->CheckFrustum(position, scaledShadowMtx, FLOAT_8032fafc) != 0)) {
+            SetShadow(*shadow, viewMtx, i, 0xFFFFFFFF);
         }
     }
 }

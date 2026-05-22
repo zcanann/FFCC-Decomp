@@ -10,9 +10,6 @@
 #include <math.h>
 #include <string.h>
 
-extern "C" int GetItemType__8CMenuPcsFii(CMenuPcs*, int, int);
-extern "C" int GetItemIcon__8CMenuPcsFi(CMenuPcs*, int);
-extern "C" int EquipChk__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" void CalcStatus__12CCaravanWorkFv(void*);
 extern "C" void ChgCmdLst__12CCaravanWorkFii(void*, int, int);
 extern "C" void UniteComList__12CCaravanWorkFiii(void*, int, int, int);
@@ -28,7 +25,6 @@ extern "C" void DrawCursor__8CMenuPcsFiif(CMenuPcs*, int, int, float);
 extern "C" void DrawInit__8CMenuPcsFv(CMenuPcs*);
 extern "C" void DrawHelpMessage__8CMenuPcsFiP5CFontii8_GXColoriff(CMenuPcs*, int, CFont*, int, int, GXColor, int, float, float);
 extern "C" void DrawEquipMark__8CMenuPcsFiif(CMenuPcs*, int, int, float);
-extern "C" const char* GetMenuStr__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" const char s_Pyro_Frappe_801DEAE4[];
 extern "C" const char s_Cryo_Frappe_801DEAF0[];
 extern "C" const char s_Rheo_Frappe_801DEAFC[];
@@ -1139,7 +1135,7 @@ void CMenuPcs::CmdDraw()
 
 			const char* text;
 			if (i < 2) {
-				text = GetMenuStr__8CMenuPcsFi(this, i + 9);
+				text = GetMenuStr(i + 9);
 			} else {
 				const s16 cmdId = *reinterpret_cast<s16*>(caravanIter + 0x204);
 				if (cmdId < 0) {
@@ -1473,7 +1469,7 @@ unsigned int CMenuPcs::CmdCtrlCur()
 					int combo[5][2];
 					canUse = static_cast<u32>(ChkUnite(menuState[0x13], combo) > 0);
 				} else {
-					canUse = static_cast<u32>(EquipChk__8CMenuPcsFi(this, static_cast<int>(list[selected - 1])) != 0);
+					canUse = static_cast<u32>(EquipChk(static_cast<int>(list[selected - 1])) != 0);
 				}
 
 				if ((canUse & 0xFF) == 0) {
@@ -1756,10 +1752,10 @@ void CMenuPcs::GetCmdItem()
 	u32 itemIndexPtr = scriptFood + 0xb6;
 
 	for (s32 i = 0; i < 0x40; i++) {
-		s32 itemType = GetItemType__8CMenuPcsFii(this, i, 0);
+		s32 itemType = GetItemType(i, 0);
 		if ((itemType != 0) && (itemType != 5) && (itemType != 6) && (itemType != 8) && (itemType != 9)) {
 			if ((itemType != 1) ||
-			    (static_cast<u32>(GetItemIcon__8CMenuPcsFi(this, *reinterpret_cast<s16*>(itemIndexPtr))) ==
+			    (static_cast<u32>(GetItemIcon(*reinterpret_cast<s16*>(itemIndexPtr))) ==
 			     (*reinterpret_cast<u16*>(scriptFood + 0x3e0) & 3))) {
 				write++;
 				*write = static_cast<s16>(i);
@@ -1830,7 +1826,7 @@ void CMenuPcs::ChkCmdActive(int itemIndex)
 		s16* list = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
 		const int index = itemIndex - 1;
 		if ((index >= 0) && (index < list[0])) {
-			active = EquipChk__8CMenuPcsFi(this, static_cast<int>(list[index])) != 0;
+			active = EquipChk(static_cast<int>(list[index])) != 0;
 		}
 	}
 
@@ -1917,7 +1913,7 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 		}
 
 		const int itemId = *reinterpret_cast<s16*>(caravanWork + itemRef * 2 + 0xb6);
-		const int icon = GetItemIcon__8CMenuPcsFi(this, itemId);
+		const int icon = GetItemIcon(itemId);
 
 		if ((itemId > 0xde) && (itemId < 0xe4)) {
 			if (itemId == 0xdf) {
@@ -2177,7 +2173,7 @@ void CMenuPcs::DrawUniteList()
 
 		const char* text = 0;
 		if (i < 2) {
-			text = GetMenuStr__8CMenuPcsFi(this, i + 9);
+			text = GetMenuStr(i + 9);
 		} else {
 			const s16 itemIdx = *reinterpret_cast<const s16*>(caravanWork + i * 2 + 0x204);
 			if (itemIdx < 0) {

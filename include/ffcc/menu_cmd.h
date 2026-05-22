@@ -31,6 +31,10 @@ public:
     unsigned int CmdClose2();
     const char* GetSkillStr(int);
     void GetFontItem();
+    int GetItemType(int, int);
+    unsigned char GetItemIcon(int);
+    int EquipChk(int);
+    char* GetMenuStr(int);
 };
 
 #endif // _FFCC_MENU_CMD_H_

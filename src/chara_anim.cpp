@@ -297,7 +297,7 @@ void CChara::CAnim::Create(void* data, CMemory::CStage* stage)
 					m_bankAddress = Chara.m_animBankAddress;
 					Chara.m_animBankAddress += m_bankSize;
 					if (m_bank != 0) {
-						delete static_cast<unsigned char*>(m_bank);
+						delete[] static_cast<unsigned char*>(m_bank);
 						m_bank = 0;
 					}
 					break;

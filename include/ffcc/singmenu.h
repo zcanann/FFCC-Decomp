@@ -38,6 +38,8 @@ public:
     void loadTextureAsync(char **, int, int, CTmp*, int, int, int);
     void SetAttrFmt(FMT);
     void SetTexture(TEX);
+    void DrawInit();
+    void DrawRect(unsigned long, float, float, float, float, float, float, float, float, float);
     void SingCalcChara(float);
     void DrawSingleBase(float);
     void DrawSingleStat(float);

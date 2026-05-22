@@ -28,9 +28,6 @@ extern "C" void DispCharaParts__8CGObjectFi(void*, int);
 extern "C" void putParticle__8CGPrgObjFiiP8CGObjectfi(void*, int, int, void*, float, int);
 extern "C" void putParticleTrace__8CGPrgObjFiiP8CGObjectfi(void*, int, int, void*, float, int);
 extern "C" float RandF__5CMathFf(float, CMath*);
-extern "C" unsigned int getNumFreeObject__13CFlatRuntime2Fi(void*, int);
-extern "C" void* FindGItemObjFirst__13CFlatRuntime2Fv(void*);
-extern "C" void* FindGItemObjNext__13CFlatRuntime2FP9CGItemObj(void*, void*);
 extern "C" void deleteObject__12CFlatRuntimeFPQ212CFlatRuntime7CObject(void*, void*);
 extern "C" void SetParticleWorkParam__13CFlatRuntime2FiPQ212CFlatRuntime7CObject(void*, int, void*);
 extern "C" void IgnoreParticle__13CFlatRuntime2FiPQ212CFlatRuntime7CObject(void*, int, void*);
@@ -212,8 +209,8 @@ int CGPrgObj::getReplaceStat(int state)
  */
 void CGItemObj::DispAllFieldItem(int show)
 {
-	for (CGItemObj* itemObj = (CGItemObj*)FindGItemObjFirst__13CFlatRuntime2Fv(CFlat); itemObj != 0;
-	     itemObj = (CGItemObj*)FindGItemObjNext__13CFlatRuntime2FP9CGItemObj(CFlat, itemObj)) {
+	for (CGItemObj* itemObj = gCFlatRuntime2.FindGItemObjFirst(); itemObj != 0;
+	     itemObj = gCFlatRuntime2.FindGItemObjNext(itemObj)) {
 		if (itemObj->m_owner == 0 &&
 		    static_cast<signed char>(
 		        static_cast<int>((static_cast<unsigned int>(itemObj->m_stateFlags0) << 28) & 0xC0000000) >> 31) != 0) {
@@ -237,8 +234,8 @@ void CGItemObj::DispAllFieldItem(int show)
  */
 void CGItemObj::DeleteAllFieldItem()
 {
-	for (CGItemObj* itemObj = (CGItemObj*)FindGItemObjFirst__13CFlatRuntime2Fv(CFlat); itemObj != 0;
-	     itemObj = (CGItemObj*)FindGItemObjNext__13CFlatRuntime2FP9CGItemObj(CFlat, itemObj)) {
+	for (CGItemObj* itemObj = gCFlatRuntime2.FindGItemObjFirst(); itemObj != 0;
+	     itemObj = gCFlatRuntime2.FindGItemObjNext(itemObj)) {
 		if (itemObj->m_owner == 0 &&
 		    static_cast<signed char>(
 		        static_cast<int>((static_cast<unsigned int>(itemObj->m_stateFlags0) << 28) & 0xC0000000) >> 31) != 0) {
@@ -258,8 +255,8 @@ void CGItemObj::DeleteAllFieldItem()
  */
 void CGItemObj::ItemJump(int state, float jump)
 {
-	for (CGItemObj* itemObj = static_cast<CGItemObj*>(FindGItemObjFirst__13CFlatRuntime2Fv(CFlat)); itemObj != 0;
-	     itemObj = static_cast<CGItemObj*>(FindGItemObjNext__13CFlatRuntime2FP9CGItemObj(CFlat, itemObj))) {
+	for (CGItemObj* itemObj = gCFlatRuntime2.FindGItemObjFirst(); itemObj != 0;
+	     itemObj = gCFlatRuntime2.FindGItemObjNext(itemObj)) {
 		CGObject* object = reinterpret_cast<CGObject*>(itemObj);
 
 		if ((object->m_objectFlags & 0x10) == 0) {
@@ -741,7 +738,7 @@ void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 CGPrgObj* CGItemObj::CreateFromScript(
     int createMode, int createFlags, int scriptArg, CGObject* owner, float launchAngle, CGItemObj::CCFS* ccfs)
 {
-	int freeItemCount = getNumFreeObject__13CFlatRuntime2Fi(CFlat, 5);
+	int freeItemCount = gCFlatRuntime2.getNumFreeObject(5);
 	System.Printf(const_cast<char*>(DAT_801dcec0), freeItemCount);
 
 	if (freeItemCount == 0) {
@@ -749,9 +746,10 @@ CGPrgObj* CGItemObj::CreateFromScript(
 		int bestScriptObjectPos = 0x00989680;
 		unsigned char* bestItemObj = 0;
 
-		for (unsigned char* itemObj = (unsigned char*)FindGItemObjFirst__13CFlatRuntime2Fv(CFlat);
-		     itemObj != 0;
-		     itemObj = (unsigned char*)FindGItemObjNext__13CFlatRuntime2FP9CGItemObj(CFlat, itemObj)) {
+		for (unsigned char* itemObj = reinterpret_cast<unsigned char*>(gCFlatRuntime2.FindGItemObjFirst());
+			 itemObj != 0;
+		     itemObj = reinterpret_cast<unsigned char*>(
+		         gCFlatRuntime2.FindGItemObjNext(reinterpret_cast<CGItemObj*>(itemObj)))) {
 			int canDelete = (itemObj[0x53] & 1) != 0;
 			int scriptObjectPos = *(int*)(itemObj + 0x94);
 
@@ -874,7 +872,7 @@ CGPrgObj* CGItemObj::CreateFromScript(
  */
 unsigned int CGItemObj::CanCreateFromScript()
 {
-	unsigned int numFreeObjects = getNumFreeObject__13CFlatRuntime2Fi(CFlat, 5);
+	unsigned int numFreeObjects = gCFlatRuntime2.getNumFreeObject(5);
 
 	return (-numFreeObjects & ~numFreeObjects) >> 31;
 }
@@ -896,9 +894,10 @@ int CGItemObj::DeleteOld(int deleteMask, int maxDeleteCount, CFlatRuntime::CObje
 		unsigned char* bestItemObj = 0;
 		int bestScriptObjectPos = 0x00989680;
 
-		for (unsigned char* itemObj = (unsigned char*)FindGItemObjFirst__13CFlatRuntime2Fv(CFlat);
+		for (unsigned char* itemObj = reinterpret_cast<unsigned char*>(gCFlatRuntime2.FindGItemObjFirst());
 			 itemObj != 0;
-			 itemObj = (unsigned char*)FindGItemObjNext__13CFlatRuntime2FP9CGItemObj(CFlat, itemObj)) {
+			 itemObj = reinterpret_cast<unsigned char*>(
+			     gCFlatRuntime2.FindGItemObjNext(reinterpret_cast<CGItemObj*>(itemObj)))) {
 			if (*(void**)(itemObj + 0x550) == 0 &&
 				static_cast<signed char>(
 				    static_cast<int>((static_cast<unsigned int>(itemObj[0x50]) << 28) & 0xC0000000) >> 31) != 0 &&

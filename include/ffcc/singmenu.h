@@ -40,6 +40,9 @@ public:
     void SetTexture(TEX);
     void DrawInit();
     void DrawRect(unsigned long, float, float, float, float, float, float, float, float, float);
+    void SetProjection(int);
+    void SetLight(int);
+    void RestoreProjection();
     void SingCalcChara(float);
     void DrawSingleBase(float);
     void DrawSingleStat(float);

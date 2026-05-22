@@ -78,9 +78,6 @@ struct SingMenuSoloNameTable
 };
 
 extern "C" void DrawFilter__8CMenuPcsFUcUcUcUc(CMenuPcs*, u8, u8, u8, u8);
-extern "C" void SetProjection__8CMenuPcsFi(CMenuPcs*, int);
-extern "C" void SetLight__8CMenuPcsFi(CMenuPcs*, int);
-extern "C" void RestoreProjection__8CMenuPcsFv(CMenuPcs*);
 extern "C" void Draw__9CShopMenuFv(void*);
 extern "C" void Calc__9CShopMenuFv(void*);
 extern "C" void SingleDrawCtrl__8CMenuPcsFv(CMenuPcs*);
@@ -1634,11 +1631,11 @@ void CMenuPcs::DrawSingleStat(float alpha)
                                      0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
     DrawInit();
-    SetProjection__8CMenuPcsFi(this, 0);
-    SetLight__8CMenuPcsFi(this, 1);
+    SetProjection(0);
+    SetLight(1);
     *reinterpret_cast<float*>(*reinterpret_cast<int*>(*reinterpret_cast<int*>(self + 0x774) + 0x168) + 0x9C) = alpha;
     (*reinterpret_cast<CCharaPcs::CHandle**>(self + 0x774))->Draw(5);
-    RestoreProjection__8CMenuPcsFv(this);
+    RestoreProjection();
 
     DrawInit();
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);

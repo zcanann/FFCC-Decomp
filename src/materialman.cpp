@@ -3091,8 +3091,7 @@ CMaterialSet::~CMaterialSet()
     for (unsigned long i = 0; i < UnkMaterialSetGetter(materials); i++) {
         CMaterial* const material = (*materials)[i];
         if (material != 0) {
-            void** const vtable = *reinterpret_cast<void***>(material);
-            reinterpret_cast<VirtualDtorFn>(vtable[2])(material, 1);
+            delete material;
         }
     }
 

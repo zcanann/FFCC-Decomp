@@ -33,17 +33,15 @@ int gGraphicDrawDonePartControlRequest = 0;
 signed char gGraphicDrawDonePartControlInit = 0;
 }
 
-extern "C" const char lbl_801D6290[];
+extern "C" const char s_CGraphic_801d6330[];
 extern "C" const char s_graphic_cpp_801d6348[];
 
-enum GraphicRodataOffset {
-    kGraphicRodataCGraphic = 0xA0,
-    kGraphicRodataFileName = 0xB8,
-    kGraphicRodataPartControlDoneFmt = 0xEC,
-    kGraphicRodataPartCharaDoneFmt = 0x130,
-    kGraphicRodataPartDoneFmt = 0x170,
-    kGraphicRodataDrawDoneFmt = 0x1AC,
-    kGraphicRodataCGraphic2 = 0x1F8,
+enum GraphicCppStringOffset {
+    kGraphicCppPartControlDoneFmt = 0x34,
+    kGraphicCppPartCharaDoneFmt = 0x78,
+    kGraphicCppPartDoneFmt = 0xB8,
+    kGraphicCppDrawDoneFmt = 0xF4,
+    kGraphicCppCGraphic2 = 0x140,
 };
 
 static inline void*& PtrAt(CGraphic* self, u32 offset) {
@@ -134,10 +132,10 @@ int checkThread(void*)
  */
 void CGraphic::Init()
 {
-    char* graphicRodata = const_cast<char*>(lbl_801D6290);
+    char* graphicFileName = const_cast<char*>(s_graphic_cpp_801d6348);
 
-    PtrAt(this, 0x4) = Memory.CreateStage(0x19C000, graphicRodata + kGraphicRodataCGraphic, 0);
-    PtrAt(this, 0x8) = Memory.CreateStage(0xD6000, graphicRodata + kGraphicRodataCGraphic2, 0);
+    PtrAt(this, 0x4) = Memory.CreateStage(0x19C000, const_cast<char*>(s_CGraphic_801d6330), 0);
+    PtrAt(this, 0x8) = Memory.CreateStage(0xD6000, graphicFileName + kGraphicCppCGraphic2, 0);
 
     S32At(this, 0x14) = 0;
     U8At(this, 0x7200) = 0;
@@ -166,21 +164,21 @@ void CGraphic::Init()
     u16 efbHeight = U16At(renderMode, 6);
     u16 xfbHeight = U16At(renderMode, 8);
 
-    PtrAt(this, 0x71E4) = new (reinterpret_cast<CMemory::CStage*>(PtrAt(this, 0x4)), graphicRodata + kGraphicRodataFileName, 0x86)
+    PtrAt(this, 0x71E4) = new (reinterpret_cast<CMemory::CStage*>(PtrAt(this, 0x4)), graphicFileName, 0x86)
         u8[alignedWidth * xfbHeight * 2];
     memset(PtrAt(this, 0x71E4), 0, 4);
 
-    PtrAt(this, 0x71EC) = new (reinterpret_cast<CMemory::CStage*>(PtrAt(this, 0x4)), graphicRodata + kGraphicRodataFileName, 0x88)
+    PtrAt(this, 0x71EC) = new (reinterpret_cast<CMemory::CStage*>(PtrAt(this, 0x4)), graphicFileName, 0x88)
         u8[alignedWidth * efbHeight * 2];
     memset(PtrAt(this, 0x71EC), 0, 4);
 
     PtrAt(this, 0x71E8) =
         Memory._Alloc(alignedWidth * efbHeight * 2 + 0x46000, reinterpret_cast<CMemory::CStage*>(PtrAt(this, 0x8)),
-                      graphicRodata + kGraphicRodataFileName, 0xB53, 0);
+                      graphicFileName, 0xB53, 0);
     memset(PtrAt(this, 0x71E8), 0, 0x46004);
 
     PtrAt(this, 0x10) =
-        new (reinterpret_cast<CMemory::CStage*>(PtrAt(this, 0x4)), graphicRodata + kGraphicRodataFileName, 0x8B) u8[0x60000];
+        new (reinterpret_cast<CMemory::CStage*>(PtrAt(this, 0x4)), graphicFileName, 0x8B) u8[0x60000];
 
     VIConfigure(reinterpret_cast<GXRenderModeObj*>(PtrAt(this, 0x71E0)));
     GXInit(PtrAt(this, 0x10), 0x60000);
@@ -223,7 +221,7 @@ void CGraphic::Init()
     m_blurBufferIndex = 0;
     m_blurTextureCount = 0;
     GXCopyDisp(PtrAt(this, 0x71E4), GX_TRUE);
-    PtrAt(this, 0x7368) = graphicRodata + kGraphicRodataFileName;
+    PtrAt(this, 0x7368) = graphicFileName;
     S32At(this, 0x736C) = 0xBE;
     S32At(this, 0x7364) = 1;
     GXSetDrawDone();
@@ -520,7 +518,7 @@ void CGraphic::Thread()
         OSThread* thread;
     };
 
-    char* debugFmtBase = const_cast<char*>(lbl_801D6290);
+    char* debugFmtBase = const_cast<char*>(s_graphic_cpp_801d6348);
     int lastCounter = -1;
     int debugCountdown = 5;
 
@@ -539,11 +537,11 @@ void CGraphic::Thread()
                 if ((drawSyncRaw & 0x8000) != 0) {
                     drawSyncPart &= 0x7FFF;
                     if (drawSyncPart == 0x7FFF) {
-                        System.Printf(debugFmtBase + kGraphicRodataPartControlDoneFmt, PtrAt(this, 0x7368), S32At(this, 0x736C));
+                        System.Printf(debugFmtBase + kGraphicCppPartControlDoneFmt, PtrAt(this, 0x7368), S32At(this, 0x736C));
                     } else if (drawSyncPart == 0x7FFE) {
-                        System.Printf(debugFmtBase + kGraphicRodataPartCharaDoneFmt, PtrAt(this, 0x7368), S32At(this, 0x736C));
+                        System.Printf(debugFmtBase + kGraphicCppPartCharaDoneFmt, PtrAt(this, 0x7368), S32At(this, 0x736C));
                     } else {
-                        System.Printf(debugFmtBase + kGraphicRodataPartDoneFmt, PtrAt(this, 0x7368), S32At(this, 0x736C),
+                        System.Printf(debugFmtBase + kGraphicCppPartDoneFmt, PtrAt(this, 0x7368), S32At(this, 0x736C),
                                       s_pppSysProgTable[drawSyncPart].m_pppName);
                     }
                 }
@@ -561,7 +559,7 @@ void CGraphic::Thread()
                 } else {
                     orderName = sGraphicUnknownOrderName;
                 }
-                System.Printf(debugFmtBase + kGraphicRodataDrawDoneFmt, PtrAt(this, 0x7368), S32At(this, 0x736C), orderName, orderIndex,
+                System.Printf(debugFmtBase + kGraphicCppDrawDoneFmt, PtrAt(this, 0x7368), S32At(this, 0x736C), orderName, orderIndex,
                               static_cast<int>(static_cast<char>(drawSyncPart)));
             }
         } else {

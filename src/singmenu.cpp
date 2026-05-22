@@ -40,6 +40,13 @@ extern "C" char* strcat(char*, const char*);
 typedef signed short s16;
 typedef unsigned char u8;
 
+class CShopMenu
+{
+public:
+    void Calc();
+    void Draw();
+};
+
 struct SingleFadeEntry
 {
     char pad_00[0x10];
@@ -77,16 +84,12 @@ struct SingMenuSoloNameTable
     char* entries[9];
 };
 
-extern "C" void Draw__9CShopMenuFv(void*);
-extern "C" void Calc__9CShopMenuFv(void*);
-extern "C" void SingleDrawCtrl__8CMenuPcsFv(CMenuPcs*);
-extern "C" int GetModelNo__8CMenuPcsFiii(CMenuPcs*, int, int, int);
 extern "C" void DrawHeart__8CMesMenuFffff(void*, float, float, float, float);
+extern "C" int GetModelNo__8CMenuPcsFiii(CMenuPcs*, int, int, int);
 extern "C" char* s_stand_80332a24;
 char s_singmenu_cpp_801de8d4[] = "singmenu.cpp";
 extern "C" char* s_dvd__smenu__s_tex_801de8e4;
 extern "C" char s_dvd__smenu_subfont_fnt_801de8f8[];
-extern "C" int GetItemType__8CMenuPcsFii(CMenuPcs*, int, int);
 extern "C" char* PTR_s_Tutti_802143ec;
 extern "C" char* PTR_s_Alle_Rassen_8021430c;
 extern "C" char* PTR_s_Todos_802145ac;
@@ -1186,10 +1189,10 @@ void CMenuPcs::drawSingleMenu()
         u8 menuType = *reinterpret_cast<u8*>(Game.m_scriptFoodBase[0] + 0xBE0);
         if (menuType == 1) {
             if (*reinterpret_cast<void**>(self + 0x878) != 0) {
-                Draw__9CShopMenuFv(*reinterpret_cast<void**>(self + 0x878));
+                reinterpret_cast<CShopMenu*>(*reinterpret_cast<void**>(self + 0x878))->Draw();
             }
         } else if ((menuType == 2) && (*reinterpret_cast<void**>(self + 0x878) != 0)) {
-            Draw__9CShopMenuFv(*reinterpret_cast<void**>(self + 0x878));
+            reinterpret_cast<CShopMenu*>(*reinterpret_cast<void**>(self + 0x878))->Draw();
         }
 
         if ((gSingMenuHasScriptFoodBase != 0) && (*reinterpret_cast<s16*>(*reinterpret_cast<int*>(self + 0x850) + 6) != 0)) {
@@ -1242,7 +1245,7 @@ void CMenuPcs::drawSingleMenu()
 
         s16 mode = *reinterpret_cast<s16*>(self + 0x866);
         if (mode == 1) {
-            SingleDrawCtrl__8CMenuPcsFv(this);
+            SingleDrawCtrl();
             return;
         }
 
@@ -1470,13 +1473,13 @@ post_texture_load:
         if (*reinterpret_cast<void**>(self + 0x878) == 0) {
             CreateShopMenu();
         } else {
-            Calc__9CShopMenuFv(*reinterpret_cast<void**>(self + 0x878));
+            reinterpret_cast<CShopMenu*>(*reinterpret_cast<void**>(self + 0x878))->Calc();
         }
     } else if (menuKind == 2) {
         if (*reinterpret_cast<void**>(self + 0x878) == 0) {
             CreateSmithMenu();
         } else {
-            Calc__9CShopMenuFv(*reinterpret_cast<void**>(self + 0x878));
+            reinterpret_cast<CShopMenu*>(*reinterpret_cast<void**>(self + 0x878))->Calc();
         }
     }
 
@@ -2954,7 +2957,7 @@ int CMenuPcs::GetSmithItem(int itemNo)
 {
     int script = Game.m_scriptFoodBase[0];
 
-    GetItemType__8CMenuPcsFii(this, itemNo, 1);
+    GetItemType(itemNo, 1);
     u16 race = *reinterpret_cast<u16*>(script + 0x3E0);
     u16 raceType = race & 3;
     int itemBase = Game.unkCFlatData0[2] + itemNo * 0x48;
@@ -3023,7 +3026,7 @@ int CMenuPcs::GetSmithItem(int itemNo)
  */
 void CMenuPcs::GetRecipeMaterial(int itemNo, CMenuPcs::MaterialInfo* materialInfo)
 {
-    GetItemType__8CMenuPcsFii(this, itemNo, 1);
+    GetItemType(itemNo, 1);
 
     u8* itemBase = reinterpret_cast<u8*>(Game.unkCFlatData0[2]) + (itemNo * 0x48);
 
@@ -3051,7 +3054,7 @@ void CMenuPcs::GetRaceStr(int itemNo, char* outText)
     char* text;
     char* suffix;
 
-    GetItemType__8CMenuPcsFii(this, itemNo, 1);
+    GetItemType(itemNo, 1);
     raceBits = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemNo * 0x48 + 4);
     outText[0] = '\0';
 

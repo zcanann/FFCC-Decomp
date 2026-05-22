@@ -536,14 +536,14 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
                       (float)(1 << modelData->m_posQuant));
 
     for (meshIndex = 0; meshIndex < modelData->m_meshCount; meshIndex++) {
-        bool needsMtxUpdate = false;
+        s32 needsMtxUpdate = 0;
         Mtx meshToWorld;
         CharaBreakMeshRef* meshRef = mesh;
         CharaBreakMeshData* meshData = meshRef->m_data;
         S16Vec* workPositions = meshRef->m_workPositions;
 
         if (meshData->m_skinCount == 0 && stepData->m_worldSpaceMode == 1) {
-            needsMtxUpdate = true;
+            needsMtxUpdate = 1;
             PSMTXConcat(ModelDrawMtx(model), *(Mtx*)((u8*)ModelNodes(model) + (meshData->m_nodeIndex * 0xC0) + 0x6C),
                         meshToWorld);
         }
@@ -592,10 +592,10 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
                             }
                         } else if (stepData->m_clipMode == 1) {
                             if (stepData->m_worldSpaceMode == 1) {
-                                if (threshold < dst->y) {
+                                if (dst->y > threshold) {
                                     flags[i] = 1;
                                 }
-                            } else if (threshold < *(short*)(polygon + 0x12 + (i * 6))) {
+                            } else if (*(short*)(polygon + 0x12 + (i * 6)) > threshold) {
                                 flags[i] = 1;
                             }
                         }
@@ -632,9 +632,9 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
                     }
                 } else {
                     Vec center;
-                    center.x = FLOAT_80332048;
-                    center.y = FLOAT_80332048;
                     center.z = FLOAT_80332048;
+                    center.y = FLOAT_80332048;
+                    center.x = FLOAT_80332048;
 
                     int sumX = (int)*(short*)(polygon + 0x10) + (int)*(short*)(polygon + 0x16) + (int)*(short*)(polygon + 0x1C);
                     int sumY = (int)*(short*)(polygon + 0x12) + (int)*(short*)(polygon + 0x18) + (int)*(short*)(polygon + 0x1E);
@@ -652,8 +652,8 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
                         Vec velocity;
                         Quaternion rotQuat;
                         Mtx rotMtx;
-                        float sinValue = FLOAT_80332048;
-                        float cosValue = FLOAT_80332048;
+                        float cosValue;
+                        float sinValue;
 
                         for (int i = 0; i < 3; i++) {
                             S16Vec pos;
@@ -679,21 +679,28 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
 
                         C_QUATRotAxisRad(&rotQuat, &axis, FLOAT_8033205c * (float)polygon[1]);
                         PSMTXQuat(rotMtx, &rotQuat);
+                        cosValue = FLOAT_80332048;
+                        sinValue = cosValue;
 
                         if (stepData->m_spinMode == 1) {
-                            int rand10 = (rand() % 10) + 10;
                             short* angleState = (short*)(polygon + 4);
                             if (*(short*)(polygon + 6) == 0) {
-                                *angleState += (short)rand10;
+                                int rand10 = (rand() % 10) + 10;
+                                *angleState += rand10;
                             } else {
-                                *angleState -= (short)rand10;
+                                int rand10 = (rand() % 10) + 10;
+                                *angleState -= rand10;
                             }
 
-                            if (*angleState > 0x168) {
-                                *angleState = (short)(*angleState - 0x168);
+                            s32 angle = *angleState;
+                            if (angle > 0x168) {
+                                angle -= 0x168;
+                                *angleState = angle;
                             }
-                            if (*angleState < 0) {
-                                *angleState = (short)(*angleState + 0x168);
+                            angle = *angleState;
+                            if (angle < 0) {
+                                angle += 0x168;
+                                *angleState = angle;
                             }
 
                             s32 sinIndex = (s32)(((float)((int)(*angleState << 15))) / FLOAT_80332060);
@@ -728,7 +735,7 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
                             gUtil.ConvF2IVector(*reinterpret_cast<S16Vec*>(polygon + 0x10 + (i * 6)), verts[i],
                                 modelData->m_posQuant);
                         }
-                        *(short*)(polygon + 2) = *(short*)(polygon + 2) + 1;
+                        *(u16*)(polygon + 2) = *(u16*)(polygon + 2) + 1;
                     }
                 }
 

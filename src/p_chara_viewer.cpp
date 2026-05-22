@@ -292,17 +292,24 @@ void CCharaPcs::drawViewer()
         GXClearVtxDesc();
         GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
         GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+        GXColor color;
+        color.r = 0x80;
+        color.g = 0x80;
+        color.b = 0x80;
+        color.a = 0x20;
         GXLoadPosMtxImm(cameraMtx, 0);
+        float gridMin = kCharaViewerGridMin;
+        float gridMax = kCharaViewerGridMax;
 
         for (int i = -10; i <= 10; i++) {
-            GXColor color = {0x80, 0x80, 0x80, static_cast<u8>((i == 0) ? 0x60 : 0x20)};
+            color.a = (i == 0) ? 0x60 : 0x20;
             GXSetChanMatColor(GX_COLOR0A0, color);
             GXBegin((GXPrimitive)0xA8, GX_VTXFMT0, 4);
             float x = (float)i * kCharaViewerGridSpacing;
-            GXPosition3f32(x, kCharaViewerZero, kCharaViewerGridMin);
-            GXPosition3f32(x, kCharaViewerZero, kCharaViewerGridMax);
-            GXPosition3f32(kCharaViewerGridMax, kCharaViewerZero, x);
-            GXPosition3f32(kCharaViewerGridMin, kCharaViewerZero, x);
+            GXPosition3f32(x, kCharaViewerZero, gridMin);
+            GXPosition3f32(x, kCharaViewerZero, gridMax);
+            GXPosition3f32(gridMax, kCharaViewerZero, x);
+            GXPosition3f32(gridMin, kCharaViewerZero, x);
         }
     }
 

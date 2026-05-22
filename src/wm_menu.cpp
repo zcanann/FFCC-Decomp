@@ -34,10 +34,6 @@ extern "C" int rand(void);
 extern "C" void SetAmbient__9CLightPcsF8_GXColor(void*, void*);
 extern "C" void SetDiffuse__9CLightPcsFUl8_GXColorP3Veci(void*, unsigned long, void*, void*, int);
 extern "C" void Create__9CGBaseObjFv(void*);
-extern "C" unsigned int pppCreate__8CPartMngFiiP14PPPCREATEPARAMi(void*, int, int, void*, int);
-extern "C" void pppDeletePart__8CPartMngFi(void*, int);
-extern "C" void pppDestroyAll__8CPartMngFv(void*);
-extern "C" void* Free__7CMemoryFPv(CMemory*, void*);
 extern "C" asm void MTX44MultVec4__5CMathFPA4_fP3VecP5Vec4d(register void*, register float (*)[4], register Vec*,
                                                             register void*);
 extern "C" int DAT_8021082c[];
@@ -889,7 +885,7 @@ void CMenuPcs::destroyWorld()
 		bool bVar1 = reinterpret_cast<void**>(bytes + 0x854)[0] != 0;
 		if (bVar1) {
 			if (bVar1) {
-				Free__7CMemoryFPv(&Memory, reinterpret_cast<void**>(bytes + 0x854)[0]);
+				Memory.Free(reinterpret_cast<void**>(bytes + 0x854)[0]);
 				reinterpret_cast<void**>(bytes + 0x854)[0] = 0;
 			}
 			reinterpret_cast<void**>(bytes + 0x854)[0] = 0;
@@ -897,7 +893,7 @@ void CMenuPcs::destroyWorld()
 		bytes[0x858] = 0;
 	}
 
-	pppDestroyAll__8CPartMngFv(&PartMng);
+	PartMng.pppDestroyAll();
 	MemoryCardMan.McEnd();
 
 	GXColor clearColor;
@@ -3909,7 +3905,7 @@ void CMenuPcs::DrawTitleMenu()
 				THPSimpleClose();
 				THPSimpleQuit();
 				if (*reinterpret_cast<int*>(bytes + 0x854) != 0) {
-					Free__7CMemoryFPv(&Memory, reinterpret_cast<void*>(*reinterpret_cast<int*>(bytes + 0x854)));
+					Memory.Free(reinterpret_cast<void*>(*reinterpret_cast<int*>(bytes + 0x854)));
 					*reinterpret_cast<int*>(bytes + 0x854) = 0;
 				}
 				bytes[0x858] = 0;
@@ -4100,7 +4096,7 @@ void CMenuPcs::DrawTitleMenu()
 		worldState = *reinterpret_cast<int*>(bytes + 0x82C);
 		state = *reinterpret_cast<short*>(worldState + 0x10);
 		if (state == 3 && *reinterpret_cast<short*>(worldState + 0x22) > 9) {
-			pppDeletePart__8CPartMngFi(&PartMng, *reinterpret_cast<int*>(*reinterpret_cast<int*>(bytes + 0x840) + 0x7640));
+			PartMng.pppDeletePart(*reinterpret_cast<int*>(*reinterpret_cast<int*>(bytes + 0x840) + 0x7640));
 			if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x0E) == 0) {
 				DAT_8032e8ac = 0;
 			} else {
@@ -8583,7 +8579,7 @@ unsigned int CMenuPcs::BindEffect(int slot, int effectNo, int cameraSlot)
 	createParam[0x5C] = 0;
 
 	const int group = (((effectNo ^ 100) >> 1) - ((effectNo ^ 100) & effectNo)) >> 31;
-	const unsigned int partId = pppCreate__8CPartMngFiiP14PPPCREATEPARAMi(&PartMng, group, effectNo, createParam, 1);
+	const unsigned int partId = PartMng.pppCreate(group, effectNo, reinterpret_cast<PPPCREATEPARAM*>(createParam), 1);
 	*reinterpret_cast<unsigned int*>(effect + 0x4) = partId;
 	return partId;
 }
@@ -9135,7 +9131,7 @@ void CMenuPcs::BindMcObj()
 	for (int i = 0; i < 4; i++) {
 		unsigned int* const effectA = reinterpret_cast<unsigned int*>(effectBase + (i + 0x11) * 0x524);
 		if (static_cast<int>(effectA[1]) >= 0) {
-			pppDeletePart__8CPartMngFi(&PartMng, static_cast<int>(effectA[1]));
+			PartMng.pppDeletePart(static_cast<int>(effectA[1]));
 			effectA[1] = 0xFFFFFFFF;
 			effectA[2] = 0xFFFFFFFF;
 			effectA[0] = 0xFFFFFFFF;
@@ -9143,7 +9139,7 @@ void CMenuPcs::BindMcObj()
 
 		unsigned int* const effectB = reinterpret_cast<unsigned int*>(effectBase + (i + 0x12) * 0x524);
 		if (static_cast<int>(effectB[1]) >= 0) {
-			pppDeletePart__8CPartMngFi(&PartMng, static_cast<int>(effectB[1]));
+			PartMng.pppDeletePart(static_cast<int>(effectB[1]));
 			effectB[1] = 0xFFFFFFFF;
 			effectB[2] = 0xFFFFFFFF;
 			effectB[0] = 0xFFFFFFFF;

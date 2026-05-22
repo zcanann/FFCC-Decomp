@@ -531,10 +531,12 @@ void CRingMenu::onDraw()
 		return;
 	}
 
-	double transitionScale = static_cast<double>(static_cast<float>(m_transitionCounter) * FLOAT_80330a08);
-	if (m_displayDirection != 0) {
+	double transitionScale;
+	if (m_animDirection != 0) {
 		transitionScale = -static_cast<double>(static_cast<float>(
 			static_cast<double>(static_cast<float>(m_transitionCounter) * FLOAT_80330a08) - FLOAT_803309cc));
+	} else {
+		transitionScale = static_cast<double>(static_cast<float>(m_transitionCounter) * FLOAT_80330a08);
 	}
 
 	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcsVoid(), 0x16);
@@ -546,6 +548,9 @@ void CRingMenu::onDraw()
 	if (cycle > FLOAT_803309cc) {
 		cycle = FLOAT_80330a28 - cycle;
 	}
+	float cycleAngle = FLOAT_80330a2c * cycle;
+	sin(static_cast<double>(cycleAngle));
+	sin(static_cast<double>(FLOAT_80330a30 + cycleAngle));
 
 	const double pulse = sin(static_cast<double>(FLOAT_80330a0c) * showScale);
 
@@ -596,11 +601,9 @@ void CRingMenu::onDraw()
 
 		if (group == 2) {
 			CGPartyObj* partyObj = Game.m_partyObjArr[menuIndex];
-			if (partyObj != 0) {
-				buttonAlpha = static_cast<double>(-static_cast<int>(
-					*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(partyObj) + 0x6F4) & 9) >>
-				                                  31);
-			}
+			buttonAlpha = static_cast<double>(-static_cast<int>(
+				*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(partyObj) + 0x6F4) & 9) >>
+			                                  31);
 		}
 
 		if (buttonAlpha == static_cast<double>(FLOAT_803309c0)) {

@@ -411,7 +411,7 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
 
     if ((*reinterpret_cast<unsigned int*>(CFlat + 0x129C) & 0x200000) != 0) {
         YmBreathParticleGroup* debugGroupData = groupData;
-        for (i = 0; i < (int)params->m_groupCount; i++) {
+        for (i = 0; i < (int)params->m_groupCount; i++, debugGroupData++) {
             if (debugGroupData->active == 1) {
                 int firstParticle;
                 int j;
@@ -472,7 +472,6 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
                 sphereMtx[2][3] = debugPos.z;
                 Graphic.DrawSphere(sphereMtx, debugColor);
             }
-            debugGroupData++;
         }
 
         pppSetBlendMode(1);
@@ -694,7 +693,7 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
                 groupCursor = vYmBreath->m_groups;
                 foundGroup = -1;
                 foundSlot = -1;
-                for (groupIndex = 0; groupIndex < (int)params->m_groupCount; groupIndex++) {
+                for (groupIndex = 0; groupIndex < (int)params->m_groupCount; groupIndex++, groupCursor++) {
                     for (slotIndex = 0; slotIndex < (int)params->m_slotCount; slotIndex++) {
                         signed char* particleIndices = groupCursor->particleIndices;
                         if ((short)i == *(signed char*)(particleIndices + (short)slotIndex)) {
@@ -704,7 +703,6 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
                             goto found_index;
                         }
                     }
-                    groupCursor++;
                 }
                 found = false;
 

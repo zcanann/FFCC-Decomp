@@ -14,8 +14,6 @@ typedef unsigned short u16;
 
 extern "C" int SingGetLetterAttachflg__8CMenuPcsFv(CMenuPcs*);
 extern "C" void LetterSetAttachItem__8CMenuPcsFUii(CMenuPcs*, unsigned int, unsigned int);
-extern "C" int EquipChk__8CMenuPcsFi(CMenuPcs*, int);
-extern "C" int GetItemType__8CMenuPcsFii(CMenuPcs*, int, int);
 extern "C" int CanPlayerUseItem__12CCaravanWorkFv(void*);
 extern "C" int CanPlayerPutItem__12CCaravanWorkFv(void*);
 extern "C" void GetSingWinSize__8CMenuPcsFiPsPsi(CMenuPcs*, int, s16*, s16*, int);
@@ -39,7 +37,6 @@ extern "C" void DrawCursor__8CMenuPcsFiif(CMenuPcs*, int, int, float);
 extern "C" void DrawInit__8CMenuPcsFv(CMenuPcs*);
 extern "C" void DrawSingLife__8CMenuPcsFv(CMenuPcs*);
 extern "C" void DrawHelpMessage__8CMenuPcsFiP5CFontii8_GXColoriff(CMenuPcs*, int, CFont*, int, int, GXColor, int, float, float);
-extern "C" void DrawEquipMark__8CMenuPcsFiif(CMenuPcs*, int, int, float);
 extern "C" int __cntlzw(unsigned int);
 
 extern CMenuPcs MenuPcs;
@@ -236,7 +233,7 @@ int CMenuPcs::ItemCtrlCur()
                 int itemEntry = caravanWork + idx * 2;
                 s16 itemId = *(s16*)(itemEntry + 0xB6);
 
-                if ((itemId < 1) || (EquipChk__8CMenuPcsFi(this, idx) != 0) ||
+                if ((itemId < 1) || (EquipChk(idx) != 0) ||
                     ((letterAttachFlg >= 0) && (itemId < 0x125))) {
                     Sound.PlaySe(4, 0x40, 0x7F, 0);
                 } else if (letterAttachFlg >= 0) {
@@ -245,7 +242,7 @@ int CMenuPcs::ItemCtrlCur()
                     return 1;
                 } else {
                     this->itemMenuState->optionFlags = 0xC;
-                    int itemType = GetItemType__8CMenuPcsFii(this, idx, 0);
+                    int itemType = GetItemType(idx, 0);
 
                     if ((itemType == 7) && (CanPlayerUseItem__12CCaravanWorkFv((void*)caravanWork) != 0)) {
                         this->itemMenuState->optionFlags = this->itemMenuState->optionFlags | 1;
@@ -438,12 +435,12 @@ void CMenuPcs::ItemDraw()
                 }
 
                 s16 itemId = *(s16*)(caravanWork + menuIndex * 2 + 0xB6);
-                if ((itemId < 1) || (EquipChk__8CMenuPcsFi(this, menuIndex) != 0) ||
+                if ((itemId < 1) || (EquipChk(menuIndex) != 0) ||
                     ((letterAttachFlg >= 0) && (itemId < 0x125))) {
-                    if (EquipChk__8CMenuPcsFi(this, menuIndex) != 0) {
+                    if (EquipChk(menuIndex) != 0) {
                         int markX = (int)(x - FLOAT_80332e70);
                         int markY = (int)((float)((h - FLOAT_80332e74) * (float)DOUBLE_80332e78) + y);
-                        DrawEquipMark__8CMenuPcsFiif(this, markX, markY, alpha);
+                        DrawEquipMark(markX, markY, alpha);
                     }
                     tex = 0x34;
                     itemAlpha = (float)((double)DOUBLE_80332e78 * (double)alpha);

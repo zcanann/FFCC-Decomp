@@ -2,6 +2,7 @@
 #include "ffcc/partMng.h"
 #include "ffcc/game.h"
 #include "ffcc/memory.h"
+#include "ffcc/mes.h"
 #include "ffcc/pad.h"
 #include "ffcc/sound.h"
 #include "ffcc/system.h"
@@ -12,13 +13,7 @@
 
 extern CMenuPcs MenuPcs;
 extern "C" void pppDeletePart__8CPartMngFi(void*, int);
-extern "C" short BindEffect__8CMenuPcsFiii(CMenuPcs*, int, int, int);
 extern "C" char* strcat(char*, const char*);
-extern "C" void MakeAgbString__4CMesFPcPcii(char*, char*, int, int);
-extern "C" int drawTagString__4CMesFP5CFontPciii(CFont*, int, int, int, int);
-extern "C" const char* GetSkillStr__8CMenuPcsFi(CMenuPcs*, int);
-extern "C" const char* GetAttrStr__8CMenuPcsFi(CMenuPcs*, int);
-extern "C" char ChkEquipActive__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" int toupper(int);
 extern "C" void MakeArtItemName__5CGameFPcii(void*, char*, int, int);
 extern "C" char s_MenuUtil_cpp_801e37fc[];
@@ -351,9 +346,9 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 	for (int i = 0; i < 3; i++) {
 		int msgId = GetMenuHelpMsgTable()[firstLine + i];
 		memset(temp, 0, 0x200);
-		MakeAgbString__4CMesFPcPcii(temp, reinterpret_cast<char*>(msgId), 0, 1);
+		CMes::MakeAgbString(temp, reinterpret_cast<char*>(msgId), 0, 1);
 		if (strlen(temp) != 0) {
-			int width = drawTagString__4CMesFP5CFontPciii(font, msgId, 0, 0, 0);
+			int width = static_cast<int>(CMes::drawTagString(font, reinterpret_cast<char*>(msgId), 0, 0, 0));
 			if (width > maxWidth) {
 				maxWidth = width;
 			}
@@ -363,11 +358,11 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 
 	if ((msgNo < 0x259) || (0x268 < msgNo)) {
 		if (msgNo == 0x209) {
-			suffix = GetSkillStr__8CMenuPcsFi(this, 0);
+			suffix = GetSkillStr(0);
 		} else if (msgNo == 0x20D) {
-			suffix = GetSkillStr__8CMenuPcsFi(this, 1);
+			suffix = GetSkillStr(1);
 		} else if (msgNo == 0x211) {
-			suffix = GetSkillStr__8CMenuPcsFi(this, 2);
+			suffix = GetSkillStr(2);
 		} else {
 			suffix = s_MenuUtilEmptyText_80333658;
 		}
@@ -409,7 +404,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 		for (int i = 0; i < 3; i++) {
 			int msgId = GetMenuHelpMsgTable()[firstLine + i];
 			memset(temp, 0, 0x200);
-			MakeAgbString__4CMesFPcPcii(temp, reinterpret_cast<char*>(msgId), 0, 1);
+			CMes::MakeAgbString(temp, reinterpret_cast<char*>(msgId), 0, 1);
 			if (strlen(temp) == 0) {
 				lineCount--;
 				if (firstNonEmptyLine == firstLine + i) {
@@ -432,7 +427,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 			int msgId = GetMenuHelpMsgTable()[firstNonEmptyLine + i];
 			font->SetPosX(static_cast<float>(0x140 - maxWidth / 2));
 			font->SetPosY(static_cast<float>(y));
-			drawTagString__4CMesFP5CFontPciii(font, msgId, 1, 0, 0);
+			CMes::drawTagString(font, reinterpret_cast<char*>(msgId), 1, 0, 0);
 			y = static_cast<u32>(static_cast<float>(y) + lineStep);
 		}
 		return;
@@ -451,7 +446,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 		int msgId = GetMenuHelpMsgTable()[firstLine + i];
 		font->SetPosX(static_cast<float>(0x140 - maxWidth / 2));
 		font->SetPosY(static_cast<float>(y));
-		drawTagString__4CMesFP5CFontPciii(font, msgId, 1, 0, 0);
+		CMes::drawTagString(font, reinterpret_cast<char*>(msgId), 1, 0, 0);
 		y = static_cast<u32>(static_cast<float>(y) + lineStep);
 	}
 
@@ -509,9 +504,8 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 			    static_cast<int>(*reinterpret_cast<short*>(Game.m_scriptFoodBase[0] + currentItem * 2 + 0xAC)) * 2 +
 			    0xB6));
 
-			if (ChkEquipActive__8CMenuPcsFi(this,
-			                                static_cast<int>(*reinterpret_cast<short*>(menuState + 0x28)) +
-			                                    static_cast<int>(*reinterpret_cast<short*>(menuState + 0x34))) != 0) {
+			if (ChkEquipActive(static_cast<int>(*reinterpret_cast<short*>(menuState + 0x28)) +
+			                   static_cast<int>(*reinterpret_cast<short*>(menuState + 0x34))) != 0) {
 				u16 currentValue = 0;
 				if (currentItem != -1) {
 					currentValue = *reinterpret_cast<u16*>(Game.unkCFlatData0[2] + currentItem * 0x48 + 6);
@@ -538,7 +532,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 		u16 attr = *reinterpret_cast<u16*>(itemBase + 8);
 		if (((flags & 0x1000) == 0) && (attr != 0) && (attr < 0x14)) {
 			font->SetTlut(4);
-			strcpy(scratch, GetAttrStr__8CMenuPcsFi(this, attr));
+			strcpy(scratch, GetAttrStr(attr));
 			font->Draw(scratch);
 			font->SetTlut(9);
 			if ((attr != 0) && (attr < 9)) {
@@ -549,7 +543,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 	} else {
 		u16 attr = *reinterpret_cast<u16*>(itemBase + 8);
 		if ((attr != 0) && (attr < 0x14)) {
-			strcpy(scratch, GetAttrStr__8CMenuPcsFi(this, attr));
+			strcpy(scratch, GetAttrStr(attr));
 			font->SetTlut(4);
 			font->Draw(scratch);
 			font->SetPosX(FLOAT_803335a0 + font->GetWidth(scratch));
@@ -654,7 +648,7 @@ void CMenuPcs::SetManaWaterEffect()
 		pppDeletePart__8CPartMngFi(&PartMng, partNo);
 	}
 
-	BindEffect__8CMenuPcsFiii(this, 5, Game.m_gameWork.m_timerA + 0x13, -1);
+	BindEffect(5, Game.m_gameWork.m_timerA + 0x13, -1);
 	*reinterpret_cast<int*>(self + 0x70) = Game.m_gameWork.m_timerA;
 }
 
@@ -1018,7 +1012,7 @@ void CMenuPcs::BindMcObj(int slotNo)
 			int iconType = *reinterpret_cast<int*>(entry + 0xC);
 
 			if (iconType != 0) {
-				BindEffect__8CMenuPcsFiii(this, slot + 0x11, iconType + 0x16, -1);
+				BindEffect(slot + 0x11, iconType + 0x16, -1);
 			}
 
 			unsigned int flags = *reinterpret_cast<unsigned int*>(entry + 0x28);
@@ -1035,7 +1029,7 @@ void CMenuPcs::BindMcObj(int slotNo)
 				iconType = 4;
 			}
 
-			BindEffect__8CMenuPcsFiii(this, slot + 0x11, iconType + 0x1A, -1);
+			BindEffect(slot + 0x11, iconType + 0x1A, -1);
 		}
 	}
 }

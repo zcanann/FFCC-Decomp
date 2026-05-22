@@ -20,6 +20,9 @@ public:
     void IsItemEquip(int);
     void SetCrystalCageAttr();
     void SetManaWaterEffect();
+    const char* GetSkillStr(int);
+    char* GetAttrStr(int);
+    int ChkEquipActive(int);
     void GetOptionData();
     void InitOptionMenuParam();
     void CalcOptionMenu();

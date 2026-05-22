@@ -3,9 +3,6 @@
 #include "dolphin/types.h"
 
 extern "C" {
-void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-    void*, void*, float, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char);
-
 void pppDrawMesh__FP10pppModelStP3Veci(void*, void*, int);
 }
 
@@ -37,9 +34,9 @@ void pppDrawMdl(_pppPObject* pObject, PDrawMdl* drawMdl, _pppCtrlTable* ctrlTabl
         return;
     }
 
-    pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-        (u8*)obj + *(int*)*(int**)((u8*)ctrlTable + 0xC) + 0x88,
-        (u8*)obj + 0x40,
+    pppSetDrawEnv(
+        reinterpret_cast<pppCVECTOR*>((u8*)obj + *(int*)*(int**)((u8*)ctrlTable + 0xC) + 0x88),
+        reinterpret_cast<pppFMATRIX*>((u8*)obj + 0x40),
         *(float*)((u8*)mdl + 0x10),
         *(u8*)((u8*)mdl + 0x14),
         *(u8*)((u8*)mdl + 0xA),

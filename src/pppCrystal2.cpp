@@ -19,8 +19,6 @@ extern "C" unsigned int __cvt_fp2unsigned(double);
 extern "C" {
 int GetTexture__8CMapMeshFP12CMaterialSetRi(CMapMesh* mapMesh, CMaterialSet* materialSet, int& textureIndex);
 
-void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-    void*, void*, float, u8, u8, u8, u8, u8, u8, u8);
 void pppDrawMesh__FP10pppModelStP3Veci(pppModelSt*, Vec*, int);
 void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
 void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
@@ -146,7 +144,7 @@ void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, _pppC
         pppSetBlendMode(0);
         Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &backTexObj, 0, 0, 0x280, 0x1C0, 0, GX_LINEAR,
                                    (_GXTexFmt)4, 0);
-        pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
+        pppSetDrawEnv(
             &colorBlock->m_color, (pppFMATRIX*)((u8*)pppCrystal2 + 0x40), param_2->m_arg3,
             param_2->m_payload[5], param_2->m_payload[4], param_2->m_payload[1], param_2->m_payload[2], 1, 1,
             param_2->m_payload[3]);

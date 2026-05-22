@@ -102,9 +102,6 @@ int GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void* handle);
 int GetTexture__8CMapMeshFP12CMaterialSetRi(CMapMesh* mapMesh, CMaterialSet* materialSet, int& textureIndex);
 void pppHeapUseRate__FPQ27CMemory6CStage(CMemory::CStage* stage);
 
-void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(pppCVECTOR*, pppFMATRIX*, float, unsigned char,
-                                                                 unsigned char, unsigned char, unsigned char,
-                                                                 unsigned char, unsigned char, unsigned char);
 void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int stage, int rasSel, int texSel);
 void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int stage, int mode);
 void _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
@@ -200,8 +197,7 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
 
     pppInitBlendMode();
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
-    pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(&colorData->m_color, (pppFMATRIX*)0, FLOAT_80331030,
-                                                               param_2->m_alpha, 0, 0, 0, 1, 1, 0);
+    pppSetDrawEnv(&colorData->m_color, (pppFMATRIX*)0, FLOAT_80331030, param_2->m_alpha, 0, 0, 0, 1, 1, 0);
     objPosBase = texData->m_objPosBase;
 
     PSMTXIdentity(identityMtx);

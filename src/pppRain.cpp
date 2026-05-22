@@ -17,7 +17,6 @@ extern const char s_pppRain_cpp_801DB610[] = "pppRain.cpp";
 
 extern "C" {
 int rand(void);
-void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(void*, void*, float, u8, u8, u8, u8, u8, u8, u8);
 
 void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
 void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
@@ -56,9 +55,9 @@ void pppRenderRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_D
     workOffset = param_3->m_serializedDataOffsets[2] + 0x80;
     colorData = (RainColorData*)((u8*)pppRain + colorOffset + 0x80);
     pppSetBlendMode(param_2->m_blendMode);
-    pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
+    pppSetDrawEnv(
         &colorData->color,
-        ppvCameraMatrix,
+        reinterpret_cast<pppFMATRIX*>(&ppvCameraMatrix),
         kPppRainTexCoordBase,
         param_2->m_lightTarget,
         param_2->m_fogIndex,

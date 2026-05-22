@@ -6,9 +6,6 @@
 #include "ffcc/ppp_linkage.h"
 
 extern "C" {
-void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-    void*, void*, float, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char);
-
 void pppDrawMesh__FP10pppModelStP3Veci(void*, void*, int);
 void SetTexScroll__12CMaterialManFffff(CMaterialMan*, float, float, float, float);
 }
@@ -113,9 +110,9 @@ void pppDrawDrawMdlTs(struct _pppPObject* obj, struct PDrawMdlTs* data, struct _
         return;
     }
 
-    pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-        (u8*)obj + *(s32*)*(s32**)((u8*)ctrl + 0xC) + 0x88,
-        (u8*)obj + 0x40,
+    pppSetDrawEnv(
+        reinterpret_cast<pppCVECTOR*>((u8*)obj + *(s32*)*(s32**)((u8*)ctrl + 0xC) + 0x88),
+        reinterpret_cast<pppFMATRIX*>((u8*)obj + 0x40),
         *(float*)((u8*)data + 0x10),
         *(u8*)((u8*)data + 0x2C),
         *(u8*)((u8*)data + 0xA),

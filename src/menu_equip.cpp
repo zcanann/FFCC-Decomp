@@ -19,7 +19,6 @@ extern "C" void DrawRect__8CMenuPcsFUlfffffffff(double, double, double, double, 
 extern "C" void DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(double, double, double, double, double, double, double, double,
                                                            CMenuPcs*, int, void*);
 extern "C" void DrawSingleIcon__8CMenuPcsFiiifif(CMenuPcs*, int, int, int, float, int, float);
-extern "C" void DrawInit__8CMenuPcsFv(CMenuPcs*);
 extern "C" double CalcListPos__8CMenuPcsFiii(CMenuPcs*, int, int, int);
 extern "C" void DrawListPosMark__8CMenuPcsFfff(double, double, double, CMenuPcs*);
 extern "C" void DrawCursor__8CMenuPcsFiif(double, CMenuPcs*, int, int);
@@ -557,7 +556,7 @@ void CMenuPcs::EquipDraw()
 		}
 		item += 0x20;
 	}
-	DrawInit__8CMenuPcsFv(this);
+	DrawInit();
 
 	if (*(s16*)(menuState + 0x32) != 0) {
 		MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
@@ -695,7 +694,7 @@ void CMenuPcs::EquipDraw()
 			textItem += 0x20;
 		}
 
-		DrawInit__8CMenuPcsFv(this);
+		DrawInit();
 
 		s16* iconItem = listStart;
 		for (int i = 0; (i < 8) && (i + *(s16*)(menuState + 0x34) < letter[0]); i++) {

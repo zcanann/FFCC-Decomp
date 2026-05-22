@@ -16,6 +16,7 @@ public:
 
     void SetAttrFmt(FMT);
     void SetTexture(TEX);
+    void DrawInit();
 
     void LetterInit();
     void LetterInit0();

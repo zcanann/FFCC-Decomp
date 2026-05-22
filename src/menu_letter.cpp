@@ -29,7 +29,6 @@ extern "C" void DrawSingleCrescent__8CMenuPcsFff(CMenuPcs*, float, float);
 extern "C" void DrawSingleStat__8CMenuPcsFf(CMenuPcs*, float);
 extern "C" void DrawSingleHelpWim__8CMenuPcsFf(CMenuPcs*, float);
 extern "C" void DrawShadowFont__8CMenuPcsFP5CFontPcffii(CMenuPcs*, CFont*, const char*, float, float, int, int);
-extern "C" void DrawInit__8CMenuPcsFv(CMenuPcs*);
 extern "C" void DrawSingWin__8CMenuPcsFs(CMenuPcs*, short);
 extern "C" void DrawSingWinMess__8CMenuPcsFiii(CMenuPcs*, int, int, int);
 extern "C" int SingWinMessHeight__8CMenuPcsFv(CMenuPcs*);
@@ -1500,7 +1499,7 @@ void CMenuPcs::LetterListDraw()
 		y += 0x20;
 	}
 
-	DrawInit__8CMenuPcsFv(this);
+	DrawInit();
 
 	unsigned char pageMark = (*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x34) != 0) ? 1 : 0;
 	if (topRow + 9 < *reinterpret_cast<int*>(caravanWork + 1000)) {
@@ -1662,7 +1661,7 @@ void CMenuPcs::LetterMessDraw()
 	delete[] srcText;
 	delete[] workText;
 
-	DrawInit__8CMenuPcsFv(this);
+	DrawInit();
 
 	int letterEntry = caravanWork + s_SelLetter * 0xC;
 	if ((*reinterpret_cast<u16*>(letterEntry + 0x3EE) & 0x1FF) != 0) {

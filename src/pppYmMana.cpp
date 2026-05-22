@@ -82,12 +82,7 @@ static inline float LoadFloat(const float& value)
 }
 
 extern "C" {
-void* GetCharaHandlePtr__FP8CGObjectl(void*, long);
-int GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void*);
-int GetTextureFromRSD__FiP9_pppEnvSt(int, _pppEnvSt*);
 void InitTexObj__8CTextureFv(void*);
-void genParaboloidMap__FPvPUlUs9_GXVtxFmt(void*, unsigned long*, unsigned short, GXVtxFmt);
-void DispCharaParts__8CGObjectFi(CGObject*, int);
 void _WaitDrawDone__8CGraphicFPci(CGraphic*, char*, int);
 }
 
@@ -420,7 +415,7 @@ void pppConstructYmMana(PYmMana* ymMana, pppYmManaUnkC* param_2)
     s32 workOffset = offsets[2];
     u32* work = (u32*)((u8*)ymMana + workOffset + 0x80);
     CGObject* gObject = *(CGObject**)((u8*)pppMngStPtr + 0xD8);
-    void* handle;
+    CCharaPcs::CHandle* handle;
     u32 model;
 
     if ((s32)Game.m_currentSceneId == 7) {
@@ -431,8 +426,8 @@ void pppConstructYmMana(PYmMana* ymMana, pppYmManaUnkC* param_2)
         gObject->m_stepSlopeLimit = LoadFloat(FLOAT_80330eb8);
     }
 
-    handle = GetCharaHandlePtr__FP8CGObjectl(gObject, 0);
-    GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
+    handle = GetCharaHandlePtr(gObject, 0);
+    GetCharaModelPtr(handle);
     model = *(u32*)((u8*)handle + 0x168);
     *(u32*)(model + 0x98) = 0x3F;
     work[1] = (u32)pppMngStPtr;
@@ -503,16 +498,16 @@ void pppDestructYmMana(PYmMana* ymMana, pppYmManaUnkC* param_2)
 {
     u32* work = (u32*)((u8*)ymMana + 0x80 + param_2->m_serializedDataOffsets[2]);
     CGObject* gObject = (CGObject*)work[0];
-    void* handle;
+    CCharaPcs::CHandle* handle;
     s32 model;
     s32 meshEntry;
     s32 step;
     u32 i;
     u32 j;
 
-    DispCharaParts__8CGObjectFi(gObject, 1);
-    handle = GetCharaHandlePtr__FP8CGObjectl(gObject, 0);
-    model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
+    gObject->DispCharaParts(1);
+    handle = GetCharaHandlePtr(gObject, 0);
+    model = reinterpret_cast<s32>(GetCharaModelPtr(handle));
     *(u32*)(model + 0xE4) = 0;
     *(u32*)(model + 0xE8) = 0;
     *(u32*)(model + 0xF0) = 0;
@@ -668,7 +663,7 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaUnkB* param_2, pppYmManaUnkC* p
     void* dstBuffer;
     u32* texList;
     s32 meshData;
-    void* handle;
+    CCharaPcs::CHandle* handle;
     s32 model;
     CGObject* gObject;
     s32 i;
@@ -687,8 +682,8 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaUnkB* param_2, pppYmManaUnkC* p
         return;
     }
 
-    handle = GetCharaHandlePtr__FP8CGObjectl(gObject, 0);
-    model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
+    handle = GetCharaHandlePtr(gObject, 0);
+    model = reinterpret_cast<s32>(GetCharaModelPtr(handle));
     work[0x1D] = (u32)param_2;
     if (Game.m_currentMapId == 0x21) {
         *((u8*)param_2 + 0x38) = 0;
@@ -718,14 +713,14 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaUnkB* param_2, pppYmManaUnkC* p
     *(u32*)(model + 0xE8) = (u32)param_2;
     *(u32*)(model + 0xF0) = (u32)Mana_BeforeDrawCallback;
     *(u32*)(model + 0xFC) = (u32)Mana_DrawMeshDLCallback;
-    work[2] = (u32)GetTextureFromRSD__FiP9_pppEnvSt(*(s32*)((u8*)param_2 + 0x0C), pppEnvStPtr);
-    work[3] = (u32)GetTextureFromRSD__FiP9_pppEnvSt(*(s32*)((u8*)param_2 + 0x08), pppEnvStPtr);
-    work[4] = (u32)GetTextureFromRSD__FiP9_pppEnvSt(*(s32*)((u8*)param_2 + 0x04), pppEnvStPtr);
-    work[5] = (u32)GetTextureFromRSD__FiP9_pppEnvSt(*(s32*)((u8*)param_2 + 0x10), pppEnvStPtr);
-    work[6] = (u32)GetTextureFromRSD__FiP9_pppEnvSt(*(s32*)((u8*)param_2 + 0x14), pppEnvStPtr);
-    work[7] = (u32)GetTextureFromRSD__FiP9_pppEnvSt(*(s32*)((u8*)param_2 + 0x18), pppEnvStPtr);
-    work[0x1F] = (u32)GetTextureFromRSD__FiP9_pppEnvSt(*(s32*)((u8*)param_2 + 0x24), pppEnvStPtr);
-    work[0x20] = (u32)GetTextureFromRSD__FiP9_pppEnvSt(*(s32*)((u8*)param_2 + 0x28), pppEnvStPtr);
+    work[2] = (u32)GetTextureFromRSD(*(s32*)((u8*)param_2 + 0x0C), pppEnvStPtr);
+    work[3] = (u32)GetTextureFromRSD(*(s32*)((u8*)param_2 + 0x08), pppEnvStPtr);
+    work[4] = (u32)GetTextureFromRSD(*(s32*)((u8*)param_2 + 0x04), pppEnvStPtr);
+    work[5] = (u32)GetTextureFromRSD(*(s32*)((u8*)param_2 + 0x10), pppEnvStPtr);
+    work[6] = (u32)GetTextureFromRSD(*(s32*)((u8*)param_2 + 0x14), pppEnvStPtr);
+    work[7] = (u32)GetTextureFromRSD(*(s32*)((u8*)param_2 + 0x18), pppEnvStPtr);
+    work[0x1F] = (u32)GetTextureFromRSD(*(s32*)((u8*)param_2 + 0x24), pppEnvStPtr);
+    work[0x20] = (u32)GetTextureFromRSD(*(s32*)((u8*)param_2 + 0x28), pppEnvStPtr);
 
     *(u32*)(work[0x1F] + 0x6C) = 0;
     InitTexObj__8CTextureFv((void*)work[0x1F]);
@@ -775,7 +770,7 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaUnkB* param_2, pppYmManaUnkC* p
 
     if (work[9] == 0) {
         work[9] = (u32)pppMemAlloc(0xA5E8, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp_801DB4D8), 0x3CB);
-        genParaboloidMap__FPvPUlUs9_GXVtxFmt((void*)work[9], &work[0x3B], 0x1E, GX_VTXFMT7);
+        genParaboloidMap((void*)work[9], &work[0x3B], 0x1E, GX_VTXFMT7);
     }
 
     meshData = *(s32*)(model + 0xAC);
@@ -975,8 +970,8 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
         return;
     }
 
-    handle = (CCharaPcs::CHandle*)GetCharaHandlePtr__FP8CGObjectl(gObject, 0);
-    model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
+    handle = GetCharaHandlePtr(gObject, 0);
+    model = reinterpret_cast<s32>(GetCharaModelPtr(handle));
 
     if ((int)Game.m_currentSceneId == 7) {
         centerPos.x = FLOAT_80330e4c;
@@ -1117,8 +1112,8 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
     }
 
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
-    handle = (CCharaPcs::CHandle*)GetCharaHandlePtr__FP8CGObjectl(gObject, 0);
-    model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
+    handle = GetCharaHandlePtr(gObject, 0);
+    model = reinterpret_cast<s32>(GetCharaModelPtr(handle));
     *(u32*)(model + 0xF0) = (u32)Mana_BeforeDrawCallback;
     *(u32*)(model + 0xFC) = (u32)Mana_DrawMeshDLCallback;
 

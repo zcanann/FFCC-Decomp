@@ -1,12 +1,7 @@
 #include "ffcc/pppCharaZEnvCtrl.h"
 #include "ffcc/partMng.h"
+#include "ffcc/pppYmEnv.h"
 #include "dolphin/gx/GXPixel.h"
-
-
-extern "C" {
-void* GetCharaHandlePtr__FP8CGObjectl(void* obj, long index);
-int GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void* handle);
-}
 
 /*
  * --INFO--
@@ -25,8 +20,8 @@ void pppFrameCharaZEnvCtrl(pppCharaZEnvCtrl* pppCharaZEnvCtrl, pppCharaZEnvCtrlU
 
 	int dataOffset = *param_3->m_serializedDataOffsets;
 	void* work = (void*)((char*)pppCharaZEnvCtrl + dataOffset + 0x80);
-	void* handle = GetCharaHandlePtr__FP8CGObjectl(pppMngStPtr->m_owner, 0);
-	int model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
+	CCharaPcs::CHandle* handle = GetCharaHandlePtr(reinterpret_cast<CGObject*>(pppMngStPtr->m_owner), 0);
+	int model = reinterpret_cast<int>(GetCharaModelPtr(handle));
 	*(void**)(model + 0xe4) = work;
 	*(pppCharaZEnvCtrlUnkB**)(model + 0xe8) = param_2;
 	*(void (**)(CChara::CModel*, void*, void*, int))(model + 0xf4) = CharaZEnvCtrl_BeforeMeshLockEnvCallback;
@@ -43,8 +38,8 @@ void pppFrameCharaZEnvCtrl(pppCharaZEnvCtrl* pppCharaZEnvCtrl, pppCharaZEnvCtrlU
  */
 void pppDesCharaZEnvCtrl(_pppPObjLink*, _pppCtrlTable*)
 {
-	void* handle = GetCharaHandlePtr__FP8CGObjectl(pppMngStPtr->m_owner, 0);
-	int model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
+	CCharaPcs::CHandle* handle = GetCharaHandlePtr(reinterpret_cast<CGObject*>(pppMngStPtr->m_owner), 0);
+	int model = reinterpret_cast<int>(GetCharaModelPtr(handle));
 	*(void**)(model + 0xe4) = 0;
 	*(void**)(model + 0xe8) = 0;
 	*(void**)(model + 0xf4) = 0;
@@ -61,8 +56,8 @@ void pppDesCharaZEnvCtrl(_pppPObjLink*, _pppCtrlTable*)
  */
 void pppConCharaZEnvCtrl(_pppPObjLink*, _pppCtrlTable*)
 {
-	void* handle = GetCharaHandlePtr__FP8CGObjectl(pppMngStPtr->m_owner, 0);
-	GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
+	CCharaPcs::CHandle* handle = GetCharaHandlePtr(reinterpret_cast<CGObject*>(pppMngStPtr->m_owner), 0);
+	GetCharaModelPtr(handle);
 }
 
 /*

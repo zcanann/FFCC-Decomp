@@ -1,6 +1,7 @@
 #include "ffcc/cflat_runtime2.h"
 #include "ffcc/astar.h"
 #include "ffcc/baseobj.h"
+#include "ffcc/cflat_data.h"
 #include "ffcc/goout.h"
 #include "ffcc/graphic.h"
 #include "ffcc/gxfunc.h"
@@ -26,6 +27,11 @@
 
 class CFont;
 
+inline void* operator new(unsigned long, void* ptr)
+{
+	return ptr;
+}
+
 extern "C" void StaticFrame__10CGCharaObjFv();
 extern "C" void Create__9CGBaseObjFv(CGBaseObj*);
 extern "C" void Destroy__9CGBaseObjFv(CGBaseObj*);
@@ -38,13 +44,11 @@ extern "C" void Destroy__12CFlatRuntimeFv(CFlatRuntime*);
 extern "C" void Destroy__9CFlatDataFv(void*);
 extern "C" void* __register_global_object(void* object, void* destructor, void* regmem);
 extern "C" void AfterFrame__12CFlatRuntimeFi(CFlatRuntime*, int);
-extern "C" void __dt__9CFlatDataFv(void*, int);
 extern "C" void __dt__12CFlatRuntimeFv(CFlatRuntime*, int);
 extern "C" void* __vt__13CFlatRuntime2[];
 extern "C" CFlatRuntime2* __ct__13CFlatRuntime2Fv(CFlatRuntime2*);
 extern "C" void __dt__13CFlatRuntime2Fv(void*);
 extern "C" CFlatRuntime* __ct__12CFlatRuntimeFv(CFlatRuntime*);
-extern "C" void __ct__9CFlatDataFv(void*);
 extern "C" void __ct__8CGMonObjFv(CGMonObj*);
 extern "C" void __ct__10CGPartyObjFv(CGPartyObj*);
 extern "C" void __ct__9CGItemObjFv(CGItemObj*);
@@ -435,7 +439,7 @@ CFlatRuntime2::CFlatRuntime2()
 		*reinterpret_cast<u32*>(runtime + 0x1BDC + i * 0xB14 + 0x18) = 0;
 	}
 
-	__ct__9CFlatDataFv(runtime + 0xCF20);
+	new (runtime + 0xCF20) CFlatData;
 	*reinterpret_cast<int*>(runtime + 0x10418) = 0;
 	*reinterpret_cast<int*>(runtime + 0x129C) = 0;
 	*reinterpret_cast<int*>(runtime + 0x12A0) = 0;
@@ -502,7 +506,7 @@ CFlatRuntime2::~CFlatRuntime2()
 	u8* runtime = reinterpret_cast<u8*>(this);
 	*reinterpret_cast<void***>(runtime) = __vt__13CFlatRuntime2;
 	AfterFrame__12CFlatRuntimeFi(reinterpret_cast<CFlatRuntime*>(this), 1);
-	__dt__9CFlatDataFv(runtime + 0xCF20, -1);
+	reinterpret_cast<CFlatData*>(runtime + 0xCF20)->~CFlatData();
 	__dt__12CFlatRuntimeFv(reinterpret_cast<CFlatRuntime*>(this), 0);
 }
 

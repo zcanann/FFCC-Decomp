@@ -20,8 +20,6 @@
 GbaQueue GbaQue;
 
 extern "C" int rand(void);
-extern "C" CGObject* FindGObjFirst__13CFlatRuntime2Fv(void*);
-extern "C" CGObject* FindGObjNext__13CFlatRuntime2FP8CGObject(void*, CGObject*);
 extern "C" int memcmp(const void*, const void*, unsigned long);
 extern "C" void MakeAgbString__4CMesFPcPcii(char*, char*, int, int);
 extern "C" int AddItem__12CCaravanWorkFiPi(void*, int, int*);
@@ -1684,7 +1682,7 @@ void GbaQueue::LoadMapItemStat()
 
 	if (reinterpret_cast<unsigned int*>(&CFlat)[0x1041] != 0) {
 		unsigned char* mapItemEntry = localMapItems;
-		object = FindGObjFirst__13CFlatRuntime2Fv(&CFlat);
+		object = gCFlatRuntime2.FindGObjFirst();
 
 		while (object != 0) {
 			if ((object->m_objectFlags & 0x100) != 0) {
@@ -1705,7 +1703,7 @@ void GbaQueue::LoadMapItemStat()
 				mapItemEntry += 0x14;
 			}
 
-			object = FindGObjNext__13CFlatRuntime2FP8CGObject(&CFlat, object);
+			object = gCFlatRuntime2.FindGObjNext(object);
 		}
 	}
 

@@ -8,6 +8,7 @@
 #include "ffcc/gxfunc.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
+#include "ffcc/pppYmEnv.h"
 #include "ffcc/util.h"
 #include "ffcc/math.h"
 
@@ -98,8 +99,6 @@ static inline Mtx44& CameraScreenMatrix()
 }
 
 extern "C" {
-void* GetCharaHandlePtr__FP8CGObjectl(void* obj, long index);
-int GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void* handle);
 void pppHeapUseRate__FPQ27CMemory6CStage(CMemory::CStage* stage);
 
 void MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(CMath* math, Mtx44 mtx, Vec4d* src, Vec4d* dst);
@@ -302,7 +301,7 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
 void pppFrameBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppBlurCharaUnkC* param_3)
 {
     pppBlurCharaWork* work;
-    void* handle;
+    CCharaPcs::CHandle* handle;
     BlurCharaModelRaw* rawModel;
 
     if (gPppCalcDisabled != 0) {
@@ -310,8 +309,8 @@ void pppFrameBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppBl
     }
 
     work = GetBlurWork(blurChara, param_3);
-    handle = GetCharaHandlePtr__FP8CGObjectl(((pppMngStBlurCharaRaw*)pppMngStPtr)->m_charaObj, 0);
-    rawModel = reinterpret_cast<BlurCharaModelRaw*>(GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle));
+    handle = GetCharaHandlePtr(reinterpret_cast<CGObject*>(((pppMngStBlurCharaRaw*)pppMngStPtr)->m_charaObj), 0);
+    rawModel = reinterpret_cast<BlurCharaModelRaw*>(GetCharaModelPtr(handle));
 
     rawModel->m_work = work;
     rawModel->m_renderData = param_2;
@@ -342,9 +341,8 @@ void pppFrameBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppBl
 void pppDestructBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkC* data)
 {
     pppBlurCharaWork* work = GetBlurWork(blurChara, data);
-    CCharaPcs::CHandle* handle =
-        reinterpret_cast<CCharaPcs::CHandle*>(GetCharaHandlePtr__FP8CGObjectl(work->m_ownerObj, 0));
-    BlurCharaModelRaw* rawModel = reinterpret_cast<BlurCharaModelRaw*>(GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle));
+    CCharaPcs::CHandle* handle = GetCharaHandlePtr(reinterpret_cast<CGObject*>(work->m_ownerObj), 0);
+    BlurCharaModelRaw* rawModel = reinterpret_cast<BlurCharaModelRaw*>(GetCharaModelPtr(handle));
 
     rawModel->m_afterDrawModelCallback = 0;
     rawModel->m_work = 0;
@@ -376,12 +374,12 @@ void pppConstructBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkC* data)
 {
     pppBlurCharaWork* work = GetBlurWork(blurChara, data);
     void* ownerObj = ((pppMngStBlurCharaRaw*)pppMngStPtr)->m_charaObj;
-    void* handle;
+    CCharaPcs::CHandle* handle;
     BlurCharaModelRaw* rawModel;
 
     work->m_ownerObj = ownerObj;
-    handle = GetCharaHandlePtr__FP8CGObjectl(ownerObj, 0);
-    rawModel = reinterpret_cast<BlurCharaModelRaw*>(GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle));
+    handle = GetCharaHandlePtr(reinterpret_cast<CGObject*>(ownerObj), 0);
+    rawModel = reinterpret_cast<BlurCharaModelRaw*>(GetCharaModelPtr(handle));
 
     rawModel->m_afterDrawModelCallback = BlurChara_AfterDrawModelCallback;
     work->m_captureBuffer = 0;
@@ -405,8 +403,7 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void
     pppBlurCharaUnkB* renderData = reinterpret_cast<pppBlurCharaUnkB*>(param_3);
     int width;
     int height;
-    CCharaPcs::CHandle* handle =
-        reinterpret_cast<CCharaPcs::CHandle*>(GetCharaHandlePtr__FP8CGObjectl(work->m_ownerObj, 0));
+    CCharaPcs::CHandle* handle = GetCharaHandlePtr(reinterpret_cast<CGObject*>(work->m_ownerObj), 0);
     _GXTexObj backTexObj;
     Vec posA;
     Vec posB;

@@ -18,7 +18,6 @@ static inline float CameraDirY() { return *reinterpret_cast<float*>(reinterpret_
 static inline float CameraDirZ() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xF4); }
 static inline MtxPtr CameraMatrix() { return reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x4); }
 
-extern "C" int GetModelPtr__FP8CGObject(CGObject*);
 extern "C" void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(pppConstrainCameraForLoc*, int, float*,
                                                              float*, float*, float, float*, float*);
 
@@ -41,7 +40,7 @@ void pppDestructConstrainCameraForLoc(pppConstrainCameraForLoc* constrainCameraF
 	if (gPppCalcDisabled == 0) {
 		value = (float*)((char*)constrainCameraForLoc + 0x80 + data->m_serializedDataOffsets[2]);
 		CGObject* obj = *(CGObject**)((u8*)pppMngStPtr + 0xD8);
-		modelPtr = GetModelPtr__FP8CGObject(obj);
+		modelPtr = reinterpret_cast<int>(GetModelPtr(obj));
 		*(float**)(modelPtr + 0xe4) = value;
 		*(pppConstrainCameraForLocParams**)(modelPtr + 0xe8) = params;
 		*(void**)(modelPtr + 0xec) = (void*)CC_BeforeCalcMatrixCallback;
@@ -60,7 +59,7 @@ void pppDestructConstrainCameraForLoc(pppConstrainCameraForLoc* constrainCameraF
 void pppConstructConstrainCameraForLoc(_pppPObjLink*, _pppCtrlTable*)
 {
 	CGObject* obj = *(CGObject**)((u8*)pppMngStPtr + 0xD8);
-	int modelPtr = GetModelPtr__FP8CGObject(obj);
+	int modelPtr = reinterpret_cast<int>(GetModelPtr(obj));
 	*(int*)(modelPtr + 0xec) = 0;
 }
 

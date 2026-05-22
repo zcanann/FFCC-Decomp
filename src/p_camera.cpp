@@ -1,5 +1,6 @@
 #include "ffcc/p_camera.h"
 
+#include "ffcc/cflat_runtime2.h"
 #include "ffcc/color.h"
 #include "ffcc/linkage.h"
 #include "ffcc/materialman.h"
@@ -148,8 +149,6 @@ unsigned int m_table__10CCameraPcs[7][0x15C / sizeof(unsigned int)] = {
 };
 Vec g_shadow_pos;
 Vec g_shadow_refpos;
-extern "C" CGObject* FindGObjFirst__13CFlatRuntime2Fv(void*);
-extern "C" CGObject* FindGObjNext__13CFlatRuntime2FP8CGObject(void*, CGObject*);
 extern "C" void DrawMapShadow__7CMapMngFv(void*);
 extern "C" void setViewport__11CGraphicPcsFv(void*);
 extern "C" int CheckHitCylinder__7CMapMngFP12CMapCylinderP3VecUl(void*, void*, Vec*, unsigned long);
@@ -1422,8 +1421,8 @@ int CCameraPcs::GetShadowRect(CBound& shadowRectBound)
                     FLOAT_8032fa1c);
     CBound::SetFrustum(eyePos, frustumMtx);
 
-    for (CGObject* gObject = FindGObjFirst__13CFlatRuntime2Fv(CFlat); gObject != 0;
-         gObject = FindGObjNext__13CFlatRuntime2FP8CGObject(CFlat, gObject))
+    for (CGObject* gObject = gCFlatRuntime2.FindGObjFirst(); gObject != 0;
+         gObject = gCFlatRuntime2.FindGObjNext(gObject))
     {
         bool include = false;
         if (gObject->m_charaModelHandle != 0) {

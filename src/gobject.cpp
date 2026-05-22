@@ -27,12 +27,8 @@ extern "C" double cos(double);
 
 extern "C" void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
     void*, CGBaseObj*, int, int, int, CFlatRuntime::CStack*, CFlatRuntime::CStack*);
-extern "C" CGObject* FindGObjFirst__13CFlatRuntime2Fv(void*);
-extern "C" CGObject* FindGObjNext__13CFlatRuntime2FP8CGObject(void*, CGObject*);
-extern "C" CGQuadObj* FindGQuadObjFirst__13CFlatRuntime2Fv(void*);
 extern "C" int CrossCheckSphereVector__5CMathFP3VecPfP3VecP3VecP3Vecf(
     CMath*, Vec*, float*, Vec*, Vec*, Vec*, float, float, float);
-extern "C" CGQuadObj* FindGQuadObjNext__13CFlatRuntime2FP9CGQuadObj(void*, CGQuadObj*);
 extern "C" int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, CMapCylinder*, Vec*, u32);
 extern "C" int CalcHitSlide__7CMapObjFP3Vecf(void*, Vec*);
 extern "C" void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
@@ -809,16 +805,16 @@ void CGObject::objectCollision()
     PSVECAdd(&selfBasePos, &selfCapsuleOffset, &selfCapsulePos);
 
     if ((m_bgColMask & 0x10000) != 0) {
-        for (CGQuadObj* quad = FindGQuadObjFirst__13CFlatRuntime2Fv(CFlat); quad != 0;
-            quad = FindGQuadObjNext__13CFlatRuntime2FP9CGQuadObj(CFlat, quad)) {
+        for (CGQuadObj* quad = gCFlatRuntime2.FindGQuadObjFirst(); quad != 0;
+            quad = gCFlatRuntime2.FindGQuadObjNext(quad)) {
             if (quad->isInner(&selfBasePos)) {
                 CallOnPush(quad, this, 0);
             }
         }
     }
 
-    for (CGObject* other = FindGObjNext__13CFlatRuntime2FP8CGObject(CFlat, this); other != 0;
-         other = FindGObjNext__13CFlatRuntime2FP8CGObject(CFlat, other)) {
+    for (CGObject* other = gCFlatRuntime2.FindGObjNext(this); other != 0;
+         other = gCFlatRuntime2.FindGObjNext(other)) {
         if (((m_bgColMask & 0xE) == 0) || ((other->m_bgColMask & 0xE) == 0)) {
             continue;
         }
@@ -1356,8 +1352,8 @@ void CGObject::hit()
         return;
     }
 
-    for (CGObject* other = FindGObjFirst__13CFlatRuntime2Fv(CFlat); other != 0;
-         other = FindGObjNext__13CFlatRuntime2FP8CGObject(CFlat, other)) {
+    for (CGObject* other = gCFlatRuntime2.FindGObjFirst(); other != 0;
+         other = gCFlatRuntime2.FindGObjNext(other)) {
         if ((other == this) || ((other->m_bgColMask & 0x80000) == 0)) {
             continue;
         }
@@ -2359,8 +2355,8 @@ CGObject* CGObject::CCClass(int useBodyRadius, int classMask, float yOffset, Vec
     double bestDist = static_cast<double>(sLargeDistance);
     best = 0;
 
-    for (CGObject* other = FindGObjFirst__13CFlatRuntime2Fv(CFlat); other != 0;
-         other = FindGObjNext__13CFlatRuntime2FP8CGObject(CFlat, other)) {
+    for (CGObject* other = gCFlatRuntime2.FindGObjFirst(); other != 0;
+         other = gCFlatRuntime2.FindGObjNext(other)) {
         if (other == this) {
             continue;
         }

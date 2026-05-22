@@ -150,6 +150,11 @@ static inline unsigned char* Ptr(void* p, unsigned int offset)
     return reinterpret_cast<unsigned char*>(p) + offset;
 }
 
+static inline CLightPcs::CBumpLight* GetMapBumpLight(int bumpIndex)
+{
+    return LightPcs.GetBumpLight(static_cast<CLightPcs::TARGET>(1), bumpIndex);
+}
+
 typedef void (*VirtualDtorFn)(void*, int);
 
 static void ReleaseRef(void* object)
@@ -565,7 +570,7 @@ void CMaterialMan::addtev_bump_st(int mode, _GXTevScale tevScale)
 {
     unsigned int tevStage = *reinterpret_cast<unsigned int*>(Ptr(this, 0x60));
 
-    GXSetIndTexMtx((GXIndTexMtxID)1, reinterpret_cast<const float(*)[3]>(0x8026901c), 0);
+    GXSetIndTexMtx((GXIndTexMtxID)1, LightPcs.GetBumpIndTexMtx(), 0);
     GXSetNumIndStages(1);
     GXSetIndTexOrder((GXIndTexStageID)0, *reinterpret_cast<GXTexCoordID*>(Ptr(this, 0x1E8)),
                      *reinterpret_cast<GXTexMapID*>(Ptr(this, 0x1C4)));
@@ -694,7 +699,7 @@ void CMaterialMan::addtev_bump_water(_GXTevScale tevScale)
     float warpMtx5 = FLOAT_8032faf4;
     int tevStage = *reinterpret_cast<int*>(Ptr(this, 0x60));
 
-    GXSetIndTexMtx((GXIndTexMtxID)1, reinterpret_cast<const float(*)[3]>(0x8026901c), 0);
+    GXSetIndTexMtx((GXIndTexMtxID)1, LightPcs.GetBumpIndTexMtx(), 0);
     GXSetIndTexMtx((GXIndTexMtxID)2, reinterpret_cast<const float(*)[3]>(&warpMtx0), 1);
     GXSetNumIndStages(2);
 
@@ -774,7 +779,7 @@ void CMaterialMan::addtev_bump_spec_col_water(_GXTevScale tevScale)
     float warpMtx5 = FLOAT_8032faf4;
     int tevStage = *reinterpret_cast<int*>(Ptr(this, 0x60));
 
-    GXSetIndTexMtx((GXIndTexMtxID)1, reinterpret_cast<const float(*)[3]>(0x8026901c), 0);
+    GXSetIndTexMtx((GXIndTexMtxID)1, LightPcs.GetBumpIndTexMtx(), 0);
     GXSetIndTexMtx((GXIndTexMtxID)2, reinterpret_cast<const float(*)[3]>(&warpMtx0), 1);
     GXSetNumIndStages(2);
 
@@ -836,7 +841,7 @@ void CMaterialMan::addtev_bump_jimen(_GXTevScale)
 {
     int tevStage = *reinterpret_cast<int*>(Ptr(this, 0x60));
 
-    GXSetIndTexMtx((GXIndTexMtxID)1, reinterpret_cast<const float(*)[3]>(0x8026901c), 0);
+    GXSetIndTexMtx((GXIndTexMtxID)1, LightPcs.GetBumpIndTexMtx(), 0);
     GXSetNumIndStages(1);
     GXSetIndTexOrder((GXIndTexStageID)0,
                      *reinterpret_cast<GXTexCoordID*>(Ptr(this, 0x1E8)),
@@ -2700,7 +2705,7 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
 
                     CLightPcs::CBumpLight* bumpLight = bumpLights;
                     if (bumpLight == 0) {
-                        bumpLight = reinterpret_cast<CLightPcs::CBumpLight*>(0x8026B584 + (bumpIndex * 0x138));
+                        bumpLight = GetMapBumpLight(bumpIndex);
                         *Ptr(material, 0xA3) = (bumpLightDirect == 0) ? 0 : 1;
                     } else {
                         *Ptr(material, 0xA3) = 1;
@@ -2733,7 +2738,7 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                     *Ptr(material, 0xA2) = 3;
 
                     CLightPcs::CBumpLight* bumpLight =
-                        reinterpret_cast<CLightPcs::CBumpLight*>(0x8026B584 + (bumpIndex * 0x138));
+                        GetMapBumpLight(bumpIndex);
                     *reinterpret_cast<CLightPcs::CBumpLight**>(Ptr(material, 0x28)) = bumpLight;
                     *Ptr(bumpLight, 0xB1) = *Ptr(material, 0xA2);
                     *reinterpret_cast<unsigned long*>(Ptr(material, 0x24)) |= 0x4000;
@@ -2760,7 +2765,7 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                     *Ptr(material, 0xA2) = 2;
 
                     CLightPcs::CBumpLight* bumpLight =
-                        reinterpret_cast<CLightPcs::CBumpLight*>(0x8026B584 + (bumpIndex * 0x138));
+                        GetMapBumpLight(bumpIndex);
                     *reinterpret_cast<CLightPcs::CBumpLight**>(Ptr(material, 0x28)) = bumpLight;
                     *Ptr(bumpLight, 0xB1) = *Ptr(material, 0xA2);
                     *Ptr(material, 0xA0) = 4;

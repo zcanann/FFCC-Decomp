@@ -26,8 +26,6 @@ extern "C" int CalcHitSlide__7CMapObjFP3Vecf(void*, Vec*);
 extern "C" void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
 	void*, void*, int, int, int, void*, void*);
 extern "C" int CanCreateFromScript__9CGItemObjFv();
-extern "C" CGObject* FindGObjFirst__13CFlatRuntime2Fv(void*);
-extern "C" CGObject* FindGObjNext__13CFlatRuntime2FP8CGObject(void*, CGObject*);
 extern "C" void onPush__9CGBaseObjFP9CGBaseObji(CGBaseObj*, CGBaseObj*, int);
 extern "C" void* CreateFromScript__9CGItemObjFiiiP8CGObjectfPQ29CGItemObj4CCFS(
     int type, int createMode, int itemId, CGObject* owner, float arg, CGItemObj::CCFS* cfs);
@@ -1432,8 +1430,7 @@ CGPrgObj* CGPartyObj::getBestAngleObject(float, float)
 	CGPrgObj* best = 0;
 	float bestAbsAngle = 0.0f;
 
-	for (CGObject* obj = FindGObjFirst__13CFlatRuntime2Fv(CFlat); obj != 0;
-	     obj = FindGObjNext__13CFlatRuntime2FP8CGObject(CFlat, obj)) {
+	for (CGObject* obj = gCFlatRuntime2.FindGObjFirst(); obj != 0; obj = gCFlatRuntime2.FindGObjNext(obj)) {
 		if (obj == this) {
 			continue;
 		}

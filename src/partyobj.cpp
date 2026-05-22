@@ -3183,11 +3183,11 @@ void CGPartyObj::setAlive(int restoreDamageCol, int keepTarget)
 void CGPartyObj::PutMemoryCapsule(int arg0, int arg1, int arg2, int arg3, char* arg4)
 {
 	CGItemObj::CCFS ccfs;
-	ccfs.m_arg0 = arg0;
+	ccfs.m_memoryCapsuleNameIndex = arg0;
 	ccfs.m_modelId = arg1;
 	ccfs.m_modelParam = arg2;
-	ccfs.m_itemJumpCountdown = arg3;
-	ccfs.m_memoryCapsuleName = arg4;
+	ccfs.m_pendingAnimFlags = arg3;
+	ccfs.m_pendingAnimName = arg4;
 	CreateFromScript__9CGItemObjFiiiP8CGObjectfPQ29CGItemObj4CCFS(0, 2, 399, this, FLOAT_80331a78, &ccfs);
 }
 

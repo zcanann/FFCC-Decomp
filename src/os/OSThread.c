@@ -3,33 +3,6 @@
 
 #include "dolphin/os/__os.h"
 
-/*
- * TODO: Remove this note block once linkage has been resolved.
- *
- * Current blocker in this unit:
- * - OSThread.c still has real text mismatches, with the first sustained miss in
- *   `__OSThreadInit` rather than a pure checksum-only hidden-link failure.
- *
- * Most useful result so far:
- * - swapping the file-scope declaration order of `IdleThread` and
- *   `DefaultThread` really does change the rebuilt object layout, but it
- *   regressed the unit instead of fixing the early `__OSThreadInit` address
- *   arithmetic block
- * - rewriting `__OSThreadInit` to use direct `DefaultThread` field accesses
- *   instead of the local `thread = &DefaultThread` alias was completely flat;
- *   MWCC still emitted the same early `RunQueue`-relative address arithmetic
- * - that means the remaining seam is not just "make DefaultThread the first
- *   local bss object"; there is still a deeper source or type-layout mismatch
- *   in this init path
- * - a broader PAL-map trim probe was also flat: deleting every map-`UNUSED`
- *   public API body in this file plus `OSCheckActiveThreads`, and pruning the
- *   matching declarations from `OSThread.h`, left rebuilt `OSThread.o`
- *   completely unchanged
- * - shared Dolphin `OSThread.c` copies in `reference_projects/*` still ship
- *   those APIs in source too, so the current blocker is not "dead PAL-only
- *   functions are bloating the object"; it remains inside the live emitted
- *   subset around `__OSThreadInit` and its surviving helpers
- */
 
 #define ENQUEUE_THREAD(thread, queue, link)       \
     do {                                          \

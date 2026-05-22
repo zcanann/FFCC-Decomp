@@ -6,52 +6,6 @@
 
 #define DVD_WATYPE_MAX 2
 
-/*
- * TODO: Remove this note block once linkage has been resolved.
- *
- * Current blocker in this unit:
- * - dvdlow.c is not currently missing obvious authored state; the remaining
- *   issue is more likely section ownership / symbol attribution than source
- *   variables
- *
- * Most useful verified result so far:
- * - shared Dolphin-family sources in reference_projects/* already use the
- *   authored state set we have here: `WorkAroundSeekLocation`,
- *   `LastReadFinished`, and `LastReadIssued` all exist without any extra
- *   `LastReadPadding`-style variable
- * - current raw rebuilt `build/GCCP01/src/dvd/dvdlow.o` already matches the
- *   extracted target `build/GCCP01/obj/dvd/dvdlow.o` at `.sbss` size `0x48`
- * - the extracted target object's only extra names in that window are
- *   synthetic `gap_04_8032F044_sbss` and `gap_08_8030C98C_bss`, so blindly
- *   adding a new source variable just to fill those slots would be a hack,
- *   not recovered authored source
- * - a follow-up probe deleting `gap_04_8032F044_sbss` from `symbols.txt` was
- *   completely unhelpful: the extractor simply regenerated a synthetic gap
- *   name for the same slot, so this is not fixable by just hiding that symbol
- * - a fresh PAL-map / current-object cross-check on this branch exposed the
- *   bigger missing lever: source `dvdlow.c` still compiles the full PAL SDK
- *   object text size `0x129c`, while the extracted linked target slice is only
- *   `0xdfc`
- * - that lines up with the PAL map marking a long list of local helpers as
- *   `UNUSED` in the linked subset (`ProcessNextCommand`, `SetTimeoutAlarm`,
- *   `AudioBufferOn`, `HitCache`, `DoJustRead`, `WaitBeforeRead`,
- *   `DVDLowSetResetCoverCallback`, `DoBreak`, `AlarmHandlerForBreak`,
- *   `SetBreakAlarm`, `DVDLowGetCoverStatus`)
- * - so this unit is not just a fake-gap problem after all; the next real pass
- *   should treat it like the other linked-subset recoveries and bias toward
- *   inlining / trimming PAL-unused helper bodies rather than padding or
- *   section-name hacks
- * - a fresh object-table comparison also exposed one especially awkward seam:
- *   rebuilt source `dvdlow.o` still defines `__DVDLowTestAlarm`, but the
- *   extracted target `dvdlow.o` no longer carries that symbol even though
- *   target `dvd.o` still imports it via `__DVDTestAlarm`
- * - that makes `__DVDLowTestAlarm` look more like a linked-subset /
- *   extracted-object attribution artifact than a simple "move this function
- *   to another C file" source fix, so follow-up here should stay cautious and
- *   avoid blind symbol shuffling
- * - if this unit needs follow-up, it should start from target object
- *   ownership/binding around those gap symbols rather than padding out the C
- */
 
 static BOOL FirstRead = TRUE;
 static volatile BOOL StopAtNextInt = FALSE;

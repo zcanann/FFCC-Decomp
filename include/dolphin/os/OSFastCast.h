@@ -85,7 +85,7 @@ static inline s8 __OSf32tos8(register f32 inF)
     asm {
         psq_st inF, 0(tmpPtr), 0x1, OS_FASTCAST_S8
         lbz out, 0(tmpPtr)
-		extsb out, out //HACK to match fast cast inlines
+		extsb out, out // Sign-extend the byte result.
     }
   // clang-format on
 

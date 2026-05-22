@@ -18,8 +18,8 @@ class CMapCylinder
 public:
     CMapCylinder()
     {
-        float max = FLOAT_8032F8F0;
         float min = FLOAT_8032F8EC;
+        float max = FLOAT_8032F8F0;
 
         m_boundsMin.z = min;
         m_boundsMin.y = min;

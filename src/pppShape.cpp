@@ -330,11 +330,11 @@ void pppDrawShp(long* animData, short frameIndex, CMaterialSet* materialSet, uns
  * JP Address: TODO
  * JP Size: TODO
  */
-void* pppShapeSt::GetTexture(long* animData, CMaterialSet* materialSet, int& textureIndex)
+CTexture* pppShapeSt::GetTexture(long* animData, CMaterialSet* materialSet, int& textureIndex)
 {
     unsigned char* shape = (unsigned char*)animData + *(short*)((int)animData + 0x10) + 8;
 
     textureIndex = shape[2];
     CMaterial* material = (*reinterpret_cast<CPtrArray<CMaterial*>*>((char*)materialSet + 8))[shape[2]];
-    return *(void**)((char*)material + 0x3C);
+    return *(CTexture**)((char*)material + 0x3C);
 }

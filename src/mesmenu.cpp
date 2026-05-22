@@ -22,15 +22,6 @@ void Set__4CMesFPci(void* mes, char* script, int flags);
 void SetPosition__4CMesFff(void* mes, float x, float y);
 void SetFade__9CRingMenuFi(void* ringMenu, int fade);
 int __cntlzw(unsigned int);
-void SetMargin__5CFontFf(float margin, void* font);
-void SetShadow__5CFontFi(void* font, int enable);
-void SetScale__5CFontFf(float scale, void* font);
-void DrawInit__5CFontFv(void* font);
-void SetTlut__5CFontFi(void* font, int tlut);
-float GetWidth__5CFontFPc(void* font, const char* text);
-void SetPosX__5CFontFf(float x, void* font);
-void SetPosY__5CFontFf(float y, void* font);
-void Draw__5CFontFPc(void* font, const char* text);
 void Draw__4CMesFv(void* mes);
 void SetExternalTlut__8CTextureFPvi(void* texture, void* tlut, int enable);
 void Calc__4CMesFv(void* mes);
@@ -529,8 +520,8 @@ void CMesMenu::onDraw()
         return;
     }
 
-    SetMargin__5CFontFf(FLOAT_803308d8, font);
-    SetShadow__5CFontFi(font, 1);
+    font->SetMargin(FLOAT_803308d8);
+    font->SetShadow(1);
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
     float stageBlend = (float)*(int*)((char*)this + 0x3DF4) * FLOAT_80330918;
@@ -612,18 +603,17 @@ void CMesMenu::onDraw()
 
                 CFlatDataView* flatData = reinterpret_cast<CFlatDataView*>(&Game.m_cFlatDataArr[1]);
                 if (*(int*)((char*)this + 0x3D98) >= 0) {
-                    SetScale__5CFontFf(FLOAT_8033094C, font);
-                    SetShadow__5CFontFi(font, 1);
-                    SetMargin__5CFontFf(FLOAT_803308d8, font);
-                    float textWidth = GetWidth__5CFontFPc(font, flatData->m_table[2].index[*(int*)((char*)this + 0x3D98)]);
-                    DrawInit__5CFontFv(font);
-                    SetTlut__5CFontFi(font, 0xF);
+                    font->SetScale(FLOAT_8033094C);
+                    font->SetShadow(1);
+                    font->SetMargin(FLOAT_803308d8);
+                    float textWidth = font->GetWidth(flatData->m_table[2].index[*(int*)((char*)this + 0x3D98)]);
+                    font->DrawInit();
+                    font->SetTlut(0xF);
                     colorStorage = CColor(0xFF, 0xFF, 0xFF, (unsigned char)(int)alphaF);
                     font->SetColor(colorStorage.color);
-                    SetPosX__5CFontFf(
-                        iconX + (((menuIndex & 1) != 0) ? FLOAT_80330950 : FLOAT_80330954 - textWidth), font);
-                    SetPosY__5CFontFf(iconY + (float)(((menuIndex & 2) != 0) ? 8 : 31), font);
-                    Draw__5CFontFPc(font, flatData->m_table[2].index[*(int*)((char*)this + 0x3D98)]);
+                    font->SetPosX(iconX + (((menuIndex & 1) != 0) ? FLOAT_80330950 : FLOAT_80330954 - textWidth));
+                    font->SetPosY(iconY + (float)(((menuIndex & 2) != 0) ? 8 : 31));
+                    font->Draw(flatData->m_table[2].index[*(int*)((char*)this + 0x3D98)]);
                     MenuPcs.DrawInit();
                 }
 
@@ -653,15 +643,15 @@ void CMesMenu::onDraw()
                 (float)(((menuIndex & 2) != 0) ? 128 : 0),
                 (float)(((menuIndex & 1) != 0) ? 56 : 0), FLOAT_80330914, FLOAT_80330914, FLOAT_803308d8);
 
-            SetScale__5CFontFf(FLOAT_8033094C, font);
-            float titleWidth = GetWidth__5CFontFPc(font, reinterpret_cast<char*>(scriptFood + 0x3CA));
-            DrawInit__5CFontFv(font);
-            SetTlut__5CFontFi(font, 0xF);
+            font->SetScale(FLOAT_8033094C);
+            float titleWidth = font->GetWidth(reinterpret_cast<char*>(scriptFood + 0x3CA));
+            font->DrawInit();
+            font->SetTlut(0xF);
             colorStorage = CColor(0xFF, 0xFF, 0xFF, (unsigned char)(int)(FLOAT_80330908 * stageBlend));
             font->SetColor(colorStorage.color);
-            SetPosX__5CFontFf(frameX + (((menuIndex & 1) != 0) ? FLOAT_80330968 - titleWidth : FLOAT_80330950), font);
-            SetPosY__5CFontFf(frameY + FLOAT_8033096C, font);
-            Draw__5CFontFPc(font, reinterpret_cast<char*>(scriptFood + 0x3CA));
+            font->SetPosX(frameX + (((menuIndex & 1) != 0) ? FLOAT_80330968 - titleWidth : FLOAT_80330950));
+            font->SetPosY(frameY + FLOAT_8033096C);
+            font->Draw(reinterpret_cast<char*>(scriptFood + 0x3CA));
             MenuPcs.DrawInit();
 
             {
@@ -780,17 +770,17 @@ void CMesMenu::onDraw()
 
                 CFlatDataView* flatData = reinterpret_cast<CFlatDataView*>(&Game.m_cFlatDataArr[1]);
                 if (*(int*)((char*)this + 0x3D98) >= 0) {
-                    SetScale__5CFontFf(FLOAT_8033094C, font);
-                    SetShadow__5CFontFi(font, 1);
-                    SetMargin__5CFontFf(FLOAT_803308d8, font);
-                    float textWidth = GetWidth__5CFontFPc(font, flatData->m_table[2].index[*(int*)((char*)this + 0x3D98)]);
-                    DrawInit__5CFontFv(font);
-                    SetTlut__5CFontFi(font, 0xF);
+                    font->SetScale(FLOAT_8033094C);
+                    font->SetShadow(1);
+                    font->SetMargin(FLOAT_803308d8);
+                    float textWidth = font->GetWidth(flatData->m_table[2].index[*(int*)((char*)this + 0x3D98)]);
+                    font->DrawInit();
+                    font->SetTlut(0xF);
                     colorStorage = CColor(0xFF, 0xFF, 0xFF, (unsigned char)(int)alphaF);
                     font->SetColor(colorStorage.color);
-                    SetPosX__5CFontFf(iconX + ((anchorX == 0) ? FLOAT_80330954 - textWidth : FLOAT_80330950), font);
-                    SetPosY__5CFontFf(iconY + (float)(anchorY != 0 ? 8 : 31), font);
-                    Draw__5CFontFPc(font, flatData->m_table[2].index[*(int*)((char*)this + 0x3D98)]);
+                    font->SetPosX(iconX + ((anchorX == 0) ? FLOAT_80330954 - textWidth : FLOAT_80330950));
+                    font->SetPosY(iconY + (float)(anchorY != 0 ? 8 : 31));
+                    font->Draw(flatData->m_table[2].index[*(int*)((char*)this + 0x3D98)]);
                     MenuPcs.DrawInit();
                 }
 

@@ -24,8 +24,6 @@ extern "C" void __dt__Q36CChara5CNode8CRefDataFv(void*, int);
 extern "C" void __dt__Q36CChara5CMesh8CRefDataFv(void*, int);
 extern "C" void __dt__Q36CChara5CMesh12CDisplayListFv(void*, int);
 extern "C" void __dt__Q26CChara5CSkinFv(void*, int);
-extern "C" void InitQuantize__Q26CChara5CAnimFv(void*);
-extern "C" void Interp__Q26CChara9CAnimNodeFPQ26CChara5CAnimP3SRTf(void*, void*, void*, float);
 extern "C" float FLOAT_803301b0;
 extern "C" float FLOAT_803301bc;
 extern "C" float FLOAT_803301c8;
@@ -1472,7 +1470,7 @@ void CChara::CModel::calcMatrix()
 {
 	calcNowFrame();
 	if (m_anim != 0) {
-		InitQuantize__Q26CChara5CAnimFv(m_anim);
+		m_anim->InitQuantize();
 	}
 
 	CNode* nodes = ModelNodes(this);
@@ -1534,7 +1532,7 @@ void CChara::CModel::calcMatrix()
 void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*out)[4])
 {
 	if (m_anim != 0) {
-		InitQuantize__Q26CChara5CAnimFv(m_anim);
+		m_anim->InitQuantize();
 	}
 
 	PSMTXIdentity(out);
@@ -1574,8 +1572,7 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 					PSMTXIdentity(localMtx);
 				}
 			} else {
-				Interp__Q26CChara9CAnimNodeFPQ26CChara5CAnimP3SRTf(parentAnimNode0, m_anim,
-				                                                   reinterpret_cast<SRT*>(&parentScaleSrt), frame);
+				parentAnimNode0->Interp(m_anim, reinterpret_cast<SRT*>(&parentScaleSrt), frame);
 				nextReuseAnimNode0Srt = true;
 				PSMTXScale(localMtx,
 				           FLOAT_803301bc / parentScaleSrt.m_scale.x,
@@ -1592,8 +1589,7 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 				Mtx animMtx;
 				Mtx invScaleMtx;
 
-				Interp__Q26CChara9CAnimNodeFPQ26CChara5CAnimP3SRTf(animNode1, m_anim,
-				                                                   reinterpret_cast<SRT*>(&srt1), frame);
+				animNode1->Interp(m_anim, reinterpret_cast<SRT*>(&srt1), frame);
 				if (AnimNodeUsesScale(animNode1)) {
 					Math.SRTToMatrix(animMtx, reinterpret_cast<SRT*>(&srt1));
 				} else {
@@ -1616,8 +1612,7 @@ void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*o
 				if (reuseAnimNode0Srt) {
 					srt0 = cachedParentScaleSrt;
 				} else {
-					Interp__Q26CChara9CAnimNodeFPQ26CChara5CAnimP3SRTf(animNode0, m_anim,
-					                                                   reinterpret_cast<SRT*>(&srt0), frame);
+					animNode0->Interp(m_anim, reinterpret_cast<SRT*>(&srt0), frame);
 				}
 				nodeIndex = NodeRefIndex(cur);
 				if (nodeIndex == ModelChest1Index(this) || nodeIndex == ModelChest2Index(this) ||

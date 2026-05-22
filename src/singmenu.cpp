@@ -77,7 +77,6 @@ struct SingMenuSoloNameTable
     char* entries[9];
 };
 
-extern "C" void DrawFilter__8CMenuPcsFUcUcUcUc(CMenuPcs*, u8, u8, u8, u8);
 extern "C" void Draw__9CShopMenuFv(void*);
 extern "C" void Calc__9CShopMenuFv(void*);
 extern "C" void SingleDrawCtrl__8CMenuPcsFv(CMenuPcs*);
@@ -85,14 +84,7 @@ extern "C" void _WaitDrawDone__8CGraphicFPci(CGraphic*, const char*, int);
 extern "C" void DestroyTempBuffer__8CGraphicFv(CGraphic*);
 extern "C" int GetModelNo__8CMenuPcsFiii(CMenuPcs*, int, int, int);
 extern "C" char* GetLangString__5CGameFv(void*);
-extern "C" void loadFont__8CMenuPcsFiPcii(CMenuPcs*, int, char*, int, int);
-extern "C" void loadTexture__8CMenuPcsFPPciiPQ28CMenuPcs4CTmpiii(CMenuPcs*, char**, int, int, void*, int, int, int);
-extern "C" void freeTexture__8CMenuPcsFiiii(CMenuPcs*, int, int, int, int);
 extern "C" void DrawHeart__8CMesMenuFffff(void*, float, float, float, float);
-extern "C" void createSingleMenu__8CMenuPcsFv(CMenuPcs*);
-extern "C" void SingMenuInit__8CMenuPcsFv(CMenuPcs*);
-extern "C" void CreateShopMenu__8CMenuPcsFv(CMenuPcs*);
-extern "C" void CreateSmithMenu__8CMenuPcsFv(CMenuPcs*);
 extern "C" char* s_stand_80332a24;
 char s_singmenu_cpp_801de8d4[] = "singmenu.cpp";
 extern "C" char* s_dvd__smenu__s_tex_801de8e4;
@@ -958,15 +950,14 @@ void CMenuPcs::createSingleMenu()
 
         char path[128];
         sprintf(path, s_dvd__smenu_subfont_fnt_801de8f8, GetLangString__5CGameFv(&Game));
-        loadFont__8CMenuPcsFiPcii(this, 1, path, 4, -1);
+        loadFont(1, path, 4, -1);
 
         self[0x85A] = 0;
         gSingMenuForcedSelection = -1;
         gSingMenuAsyncFileHandle = 0;
 
         if (Game.m_gameWork.m_menuStageMode != 0) {
-            loadTexture__8CMenuPcsFPPciiPQ28CMenuPcs4CTmpiii(
-                this, PTR_s_solo2.entries, 4, 1, &DAT_80214ab0, 0x20, 0xD, 1);
+            loadTexture(PTR_s_solo2.entries, 4, 1, reinterpret_cast<CMenuPcs::CTmp*>(&DAT_80214ab0), 0x20, 0xD, 1);
             *reinterpret_cast<int*>(self + 0x814) = 0;
             *reinterpret_cast<int*>(self + 0x850) = 0;
             *reinterpret_cast<int*>(self + 0x82C) = 0;
@@ -1005,8 +996,8 @@ void CMenuPcs::destroySingleMenu()
         *reinterpret_cast<void**>(self + 0x108) = 0;
     }
 
-    freeTexture__8CMenuPcsFiiii(this, 4, 1, 0x20, 0xD);
-    freeTexture__8CMenuPcsFiiii(this, 5, 2, 0x2D, 0x33);
+    freeTexture(4, 1, 0x20, 0xD);
+    freeTexture(5, 2, 0x2D, 0x33);
 
     *reinterpret_cast<int*>(self + 0xF0) = 0;
     self[0x85A] = 0;
@@ -1191,7 +1182,7 @@ void CMenuPcs::drawSingleMenu()
     if ((Game.m_gameWork.m_menuStageMode != 0) &&
         (Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag != 0)) {
         DrawInit();
-        DrawFilter__8CMenuPcsFUcUcUcUc(this, 0, 0, 0, 0xFF);
+        DrawFilter(0, 0, 0, 0xFF);
         gUtil.ClearZBufferRect(FLOAT_8033294c, FLOAT_8033294c, FLOAT_803329a4, FLOAT_80332A20);
         DrawInit();
 
@@ -1214,7 +1205,7 @@ void CMenuPcs::drawSingleMenu()
                 gSingMenuAsyncFileHandle = 0;
             }
 
-            freeTexture__8CMenuPcsFiiii(this, 5, 2, 0x2D, 0x33);
+            freeTexture(5, 2, 0x2D, 0x33);
 
             if (*reinterpret_cast<void**>(self + 0x774) != 0) {
                 delete *reinterpret_cast<CCharaPcs::CHandle**>(self + 0x774);
@@ -1402,13 +1393,13 @@ void CMenuPcs::loadTextureAsync(char **, int, int, CMenuPcs::CTmp*, int, int, in
     }
 
     if (self[0x859] == 0) {
-        createSingleMenu__8CMenuPcsFv(this);
+        createSingleMenu();
     }
     if (Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag == 0) {
         return;
     }
     if (self[0x85A] == 0) {
-        SingMenuInit__8CMenuPcsFv(this);
+        SingMenuInit();
     }
 
     if (*reinterpret_cast<char*>(Game.m_scriptFoodBase[0] + 0xBE0) == 0) {
@@ -1480,13 +1471,13 @@ post_texture_load:
     char menuKind = *reinterpret_cast<char*>(Game.m_scriptFoodBase[0] + 0xBE0);
     if (menuKind == 1) {
         if (*reinterpret_cast<void**>(self + 0x878) == 0) {
-            CreateShopMenu__8CMenuPcsFv(this);
+            CreateShopMenu();
         } else {
             Calc__9CShopMenuFv(*reinterpret_cast<void**>(self + 0x878));
         }
     } else if (menuKind == 2) {
         if (*reinterpret_cast<void**>(self + 0x878) == 0) {
-            CreateSmithMenu__8CMenuPcsFv(this);
+            CreateSmithMenu();
         } else {
             Calc__9CShopMenuFv(*reinterpret_cast<void**>(self + 0x878));
         }

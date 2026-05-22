@@ -32,10 +32,15 @@ public:
     void createSingleMenu();
     void destroySingleMenu();
     void SingMenuInit();
+    void CreateShopMenu();
+    void CreateSmithMenu();
     void SingMenuEnd();
     void calcSingleMenu();
     void drawSingleMenu();
     void loadTextureAsync(char **, int, int, CTmp*, int, int, int);
+    void loadFont(int, char*, int, int);
+    void loadTexture(char**, int, int, CTmp*, int, int, int);
+    void freeTexture(int, int, int, int);
     void SetAttrFmt(FMT);
     void SetTexture(TEX);
     void DrawInit();
@@ -43,6 +48,7 @@ public:
     void SetProjection(int);
     void SetLight(int);
     void RestoreProjection();
+    void DrawFilter(unsigned char, unsigned char, unsigned char, unsigned char);
     void SingCalcChara(float);
     void DrawSingleBase(float);
     void DrawSingleStat(float);

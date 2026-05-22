@@ -38,7 +38,7 @@ public:
         void ChangeTexture(int, unsigned long, unsigned long, int, int);
         void LoadModel(int, unsigned long, unsigned long, unsigned long, int, int, int);
         int LoadAnim(char*, int, int, int, int, int, int);
-        bool IsModelLoaded(int checkModelField);
+        int IsModelLoaded(int checkModelField);
         void FreeModel();
         void FreeAnim(int);
         int SetAnim(int, int, int, int, int);
@@ -48,7 +48,7 @@ public:
 
         void LoadModelASync(int, unsigned long, unsigned long);
         void loadModelASyncFrame();
-        bool IsLoadModelASyncCompleted();
+        int IsLoadModelASyncCompleted();
         void CancelLoadModelASync();
 
         int m_charaKind;                    // 0x000

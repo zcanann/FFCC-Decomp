@@ -3,6 +3,7 @@
 
 class CFont;
 struct ItemMenuAnimList;
+struct _GXColor;
 
 struct ItemMenuState
 {
@@ -44,6 +45,9 @@ public:
 
     void SetAttrFmt(FMT);
     void SetTexture(TEX);
+    void DrawInit();
+    void DrawRect(unsigned long, float, float, float, float, float, float, float, float, float);
+    void DrawRect(unsigned long, float, float, float, float, float, float, _GXColor*, float, float, float);
 
     void ItemInit();
     void ItemInit1();
@@ -55,6 +59,8 @@ public:
     void SingLifeInit(int);
     int EquipChk(int);
     int GetItemType(int, int);
+    void GetSingWinSize(int, short*, short*, int);
+    void SetSingWinInfo(int, int, int, int);
     void DrawEquipMark(int, int, float);
 
     char pad_00[0xF8];

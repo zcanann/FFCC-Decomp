@@ -15,11 +15,6 @@ typedef unsigned short u16;
 
 extern "C" int SingGetLetterAttachflg__8CMenuPcsFv(CMenuPcs*);
 extern "C" void LetterSetAttachItem__8CMenuPcsFUii(CMenuPcs*, unsigned int, unsigned int);
-extern "C" void GetSingWinSize__8CMenuPcsFiPsPsi(CMenuPcs*, int, s16*, s16*, int);
-extern "C" void SetSingWinInfo__8CMenuPcsFiiii(CMenuPcs*, int, int, int, int);
-extern "C" void SingLifeInit__8CMenuPcsFi(CMenuPcs*, int);
-extern "C" void DrawRect__8CMenuPcsFUlfffffffff(CMenuPcs*, unsigned long, float, float, float, float, float, float, float, float, float);
-extern "C" void DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(CMenuPcs*, unsigned long, float, float, float, float, float, float, GXColor*, float, float, float);
 extern "C" void DrawSingleIcon__8CMenuPcsFiiifif(CMenuPcs*, int, int, int, float, int, float);
 extern "C" float CalcListPos__8CMenuPcsFiii(CMenuPcs*, int, int, int);
 extern "C" void DrawListPosMark__8CMenuPcsFfff(CMenuPcs*, float, float, float);
@@ -27,7 +22,6 @@ extern "C" void DrawSingWin__8CMenuPcsFs(CMenuPcs*, short);
 extern "C" void DrawSingWinMess__8CMenuPcsFiii(CMenuPcs*, int, int, int);
 extern "C" int SingWinMessHeight__8CMenuPcsFv(CMenuPcs*);
 extern "C" void DrawCursor__8CMenuPcsFiif(CMenuPcs*, int, int, float);
-extern "C" void DrawInit__8CMenuPcsFv(CMenuPcs*);
 extern "C" void DrawSingLife__8CMenuPcsFv(CMenuPcs*);
 extern "C" void DrawHelpMessage__8CMenuPcsFiP5CFontii8_GXColoriff(CMenuPcs*, int, CFont*, int, int, GXColor, int, float, float);
 extern "C" int __cntlzw(unsigned int);
@@ -244,8 +238,8 @@ int CMenuPcs::ItemCtrlCur()
 
                     s16 winW;
                     s16 winH;
-                    GetSingWinSize__8CMenuPcsFiPsPsi(this, 0, &winW, &winH, 0);
-                    SetSingWinInfo__8CMenuPcsFiiii(this, 0xF0, 0xA0, winW, winH);
+                    GetSingWinSize(0, &winW, &winH, 0);
+                    SetSingWinInfo(0xF0, 0xA0, winW, winH);
 
                     this->singWindowInfo[5] = 0;
                     this->itemMenuState->optionFrame = 0;
@@ -297,7 +291,7 @@ int CMenuPcs::ItemCtrlCur()
 
                     if (option == 0) {
                         reinterpret_cast<CCaravanWork*>(caravanWork)->FGUseItem(idx, 0);
-                        SingLifeInit__8CMenuPcsFi(this, 0);
+                        SingLifeInit(0);
                         reinterpret_cast<CCaravanWork*>(caravanWork)->CalcStatus();
                     } else if (option == 1) {
                         reinterpret_cast<CCaravanWork*>(caravanWork)->FGPutItem(idx, 0);
@@ -386,8 +380,8 @@ void CMenuPcs::ItemDraw()
             GXSetChanMatColor(GX_COLOR0A0, barColors[0]);
             float fillW = alpha * w;
             if (fillW > FLOAT_80332e60) {
-                DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(
-                    &MenuPcs, 0, x, y, fillW, h, u, v, barColors, FLOAT_80332e64, FLOAT_80332e64, FLOAT_80332e60);
+                MenuPcs.DrawRect(
+                    0, x, y, fillW, h, u, v, barColors, FLOAT_80332e64, FLOAT_80332e64, FLOAT_80332e60);
                 x += fillW;
                 u += fillW;
             }
@@ -412,8 +406,8 @@ void CMenuPcs::ItemDraw()
                 fadeColors[3].a = 0;
 
                 float remainW = (float)((double)(DOUBLE_80332e68 / (double)*(int*)(entry + 0x14)) * (double)w);
-                DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(
-                    &MenuPcs, 0, x, y, remainW, h, u, v, fadeColors, FLOAT_80332e64, FLOAT_80332e64, FLOAT_80332e60);
+                MenuPcs.DrawRect(
+                    0, x, y, remainW, h, u, v, fadeColors, FLOAT_80332e64, FLOAT_80332e64, FLOAT_80332e60);
             }
 
             MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
@@ -450,7 +444,7 @@ void CMenuPcs::ItemDraw()
             color.b = 0xFF;
             color.a = (u8)(FLOAT_80332e80 * itemAlpha);
             GXSetChanMatColor(GX_COLOR0A0, color);
-            DrawRect__8CMenuPcsFUlfffffffff(&MenuPcs, 0, x, y, w, h, u, v, uvScale, uvScale, 0.0f);
+            MenuPcs.DrawRect(0, x, y, w, h, u, v, uvScale, uvScale, 0.0f);
         }
     }
 
@@ -497,7 +491,7 @@ void CMenuPcs::ItemDraw()
         }
     }
 
-    DrawInit__8CMenuPcsFv(this);
+    DrawInit();
 
     s16* iconEntry = listStart;
     for (int i = 0; i < 8; i++, iconEntry += 0x20) {
@@ -549,7 +543,7 @@ void CMenuPcs::ItemDraw()
         DrawCursor__8CMenuPcsFiif(this, (int)(cursorX + (float)cursorAnim), (int)cursorY, FLOAT_80332e64);
     }
 
-    DrawInit__8CMenuPcsFv(this);
+    DrawInit();
     DrawSingLife__8CMenuPcsFv(this);
 
     CFont* helpFont = this->helpFont;

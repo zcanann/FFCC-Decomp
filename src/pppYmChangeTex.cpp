@@ -3,6 +3,7 @@
 #include "ffcc/linkage.h"
 #include "ffcc/mapmesh.h"
 #include "ffcc/materialman.h"
+#include "ffcc/pppPart.h"
 #include "ffcc/util.h"
 #include <string.h>
 #include <dolphin/os/OSCache.h>
@@ -106,7 +107,6 @@ extern "C" {
 	void* GetCharaHandlePtr__FP8CGObjectl(void*, long);
 	int GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void*);
 	void* GetTextureFromRSD__FiP9_pppEnvSt(int, _pppEnvSt*);
-	void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, void*, char*, int);
 	void ReWriteDisplayList__5CUtilFPvUlUl(CUtil*, void*, unsigned long, unsigned long);
 	void pppHeapUseRate__FPQ27CMemory6CStage(void*);
 	void SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(void*, void*, unsigned int, int, int);
@@ -201,17 +201,17 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 
 	ChangeTexMeshRef* meshList = model0Raw->m_meshes;
 	if ((state->m_meshColorArrays == 0) && (state->m_displayListArrays == 0)) {
-		state->m_meshColorArrays = pppMemAlloc__FUlPQ27CMemory6CStagePci(
+		state->m_meshColorArrays = pppMemAlloc(
 		    model0Raw->m_data->m_meshCount << 2, pppEnvStPtr->m_stagePtr,
 		    const_cast<char*>(s_pppYmChangeTex_cpp_801db4c0), 0x15D);
-		state->m_displayListArrays = pppMemAlloc__FUlPQ27CMemory6CStagePci(
+		state->m_displayListArrays = pppMemAlloc(
 		    model0Raw->m_data->m_meshCount << 2, pppEnvStPtr->m_stagePtr,
 		    const_cast<char*>(s_pppYmChangeTex_cpp_801db4c0), 0x160);
 
 		int* meshColorArrays = (int*)state->m_meshColorArrays;
 		int arrayOffset = 0;
 		for (unsigned int meshIdx = 0; meshIdx < model0Raw->m_data->m_meshCount; meshIdx++) {
-			*(int*)((char*)state->m_displayListArrays + arrayOffset) = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+			*(int*)((char*)state->m_displayListArrays + arrayOffset) = (int)pppMemAlloc(
 			    meshList->m_data->m_displayListCount << 2, pppEnvStPtr->m_stagePtr,
 			    const_cast<char*>(s_pppYmChangeTex_cpp_801db4c0), 0x168);
 
@@ -219,11 +219,11 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 			int* dlInfo = (int*)meshList->m_data->m_displayLists;
 			int* dlEntry = (int*)(*(int*)((char*)state->m_displayListArrays + arrayOffset) + dlIdx * 4);
 			for (; dlIdx >= 0; dlIdx = dlIdx - 1, dlInfo = dlInfo + 3) {
-				int dlPair = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+				int dlPair = (int)pppMemAlloc(
 				    8, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmChangeTex_cpp_801db4c0), 0x172);
 				*dlEntry = dlPair;
 				*(int*)(*dlEntry + 4) = *dlInfo;
-				*(int*)*dlEntry = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+				*(int*)*dlEntry = (int)pppMemAlloc(
 				    *dlInfo, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmChangeTex_cpp_801db4c0), 0x174);
 				memcpy(*(void**)*dlEntry, (void*)dlInfo[1], dlInfo[0]);
 				ReWriteDisplayList__5CUtilFPvUlUl(&gUtil, *(void**)*dlEntry, (unsigned long)dlInfo[0], 1);
@@ -231,7 +231,7 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 				dlEntry = dlEntry - 1;
 			}
 
-			*meshColorArrays = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+			*meshColorArrays = (int)pppMemAlloc(
 			    meshList->m_data->m_vertexCount << 2, pppEnvStPtr->m_stagePtr,
 			    const_cast<char*>(s_pppYmChangeTex_cpp_801db4c0), 0x17F);
 			memset((void*)*meshColorArrays, 0xFF, meshList->m_data->m_vertexCount << 2);

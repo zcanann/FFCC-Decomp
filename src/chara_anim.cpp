@@ -10,7 +10,6 @@ extern "C" const char s_charaAnimSourceFile[] = "chara_anim.cpp";
 extern "C" const char s_charaAnimAllocWarn[32] =
     "\214\303\202\242\203\101\203\152\203\201\201\133\203\126\203\207\203\223"
     "\214\140\216\256\202\305\202\267\201\102\n";
-extern "C" void gqrInit__6CCharaFUlUlUl(void*, unsigned long, unsigned long, unsigned long);
 extern "C" int TryReleaseAnimBank__9CCharaPcsFi(void*, int);
 class CCharaPcs;
 extern CChara Chara;
@@ -328,7 +327,7 @@ void CChara::CAnim::InitQuantize()
 	unsigned long qy = ((unsigned long)m_quantizeY << 0x18) | 0x70000 | ((unsigned long)m_quantizeY << 8) | 7;
 	unsigned long qz = ((unsigned long)m_quantizeZ << 0x18) | 0x70000 | ((unsigned long)m_quantizeZ << 8) | 7;
 
-	gqrInit__6CCharaFUlUlUl(&Chara, qx, qy, qz);
+	Chara.gqrInit(qx, qy, qz);
 }
 
 /*

@@ -107,7 +107,6 @@ extern "C" {
 	void* GetCharaHandlePtr__FP8CGObjectl(void*, long);
 	int GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void*);
 	void* GetTextureFromRSD__FiP9_pppEnvSt(int, _pppEnvSt*);
-	void ReWriteDisplayList__5CUtilFPvUlUl(CUtil*, void*, unsigned long, unsigned long);
 	void pppHeapUseRate__FPQ27CMemory6CStage(void*);
 	void SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(void*, void*, unsigned int, int, int);
 }
@@ -226,7 +225,7 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 				*(int*)*dlEntry = (int)pppMemAlloc(
 				    *dlInfo, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmChangeTex_cpp_801db4c0), 0x174);
 				memcpy(*(void**)*dlEntry, (void*)dlInfo[1], dlInfo[0]);
-				ReWriteDisplayList__5CUtilFPvUlUl(&gUtil, *(void**)*dlEntry, (unsigned long)dlInfo[0], 1);
+				gUtil.ReWriteDisplayList(*(void**)*dlEntry, (unsigned long)dlInfo[0], 1);
 				DCFlushRange(*(void**)*dlEntry, (unsigned long)dlInfo[0]);
 				dlEntry = dlEntry - 1;
 			}

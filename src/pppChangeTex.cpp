@@ -125,8 +125,6 @@ extern "C" {
 		void pppHeapUseRate__FPQ27CMemory6CStage(void* stage);
 		void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(_pppPObject*, long, float&, float&, float&, float, float&, float&);
 		void* GetTextureFromRSD__FiP9_pppEnvSt(int, _pppEnvSt*);
-		void ReWriteDisplayList__5CUtilFPvUlUl(CUtil*, void*, unsigned long, unsigned long);
-		void CalcBoundaryBoxQuantized__5CUtilFP3VecP3VecP6S16VecUlUl(CUtil*, Vec*, Vec*, S16Vec*, unsigned long, unsigned long);
 }
 
 /*
@@ -232,9 +230,8 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 		for (unsigned int meshIdx = 0; meshIdx < model0Raw->m_data->m_meshCount; meshIdx++) {
 			ChangeTexMeshData* meshData = meshList->m_data;
 			if (strcmp(meshData->m_name, sPppChangeTexMeshObjectName) == 0) {
-				CalcBoundaryBoxQuantized__5CUtilFP3VecP3VecP6S16VecUlUl(
-				    &gUtil, &work->m_bboxMin, &work->m_bboxMax, (S16Vec*)meshList->m_points, meshData->m_vertexCount,
-				    model0Raw->m_data->m_frameShift);
+				gUtil.CalcBoundaryBoxQuantized(&work->m_bboxMin, &work->m_bboxMax, (S16Vec*)meshList->m_points,
+				    meshData->m_vertexCount, model0Raw->m_data->m_frameShift);
 			}
 
 			*(int*)((u8*)work->m_displayListArrays + arrayOffset) = (int)pppMemAlloc(
@@ -252,7 +249,7 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 				*(int*)*dlEntry = (int)pppMemAlloc(
 				    *dlInfo, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppChangeTex_cpp_801dd660), 0x18D);
 				memcpy(*(void**)*dlEntry, (void*)dlInfo[1], dlInfo[0]);
-				ReWriteDisplayList__5CUtilFPvUlUl(&gUtil, *(void**)*dlEntry, (unsigned long)dlInfo[0], 1);
+				gUtil.ReWriteDisplayList(*(void**)*dlEntry, (unsigned long)dlInfo[0], 1);
 				dlEntry = dlEntry - 1;
 			}
 

@@ -17,6 +17,10 @@ public:
     void SetAttrFmt(FMT);
     void SetTexture(TEX);
     void DrawInit();
+    void GetSingWinSize(int, short*, short*, int);
+    void SetSingDynamicWinMessInfo(int, char*, char*, char*, char*, char*, char*, char*, char*);
+    void SetSingWinScl(float);
+    void SetMcWinInfo(int, int);
 
     void LetterInit();
     void LetterInit0();

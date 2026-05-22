@@ -20,10 +20,6 @@ typedef unsigned short u16;
 extern "C" int SingGetLetterAttachflg__8CMenuPcsFv(CMenuPcs*);
 extern "C" void SingSetLetterAttachflg__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" void LetterInit1__8CMenuPcsFv(CMenuPcs*);
-extern "C" void SetSingWinScl__8CMenuPcsFf(CMenuPcs*, float);
-extern "C" void SetSingDynamicWinMessInfo__8CMenuPcsFiPcPcPcPcPcPcPcPc(CMenuPcs*, int, char*, char*, char*, char*, char*, char*, char*, char*);
-extern "C" void GetSingWinSize__8CMenuPcsFiPsPsi(CMenuPcs*, int, s16*, s16*, int);
-extern "C" void SetMcWinInfo__8CMenuPcsFii(CMenuPcs*, int, int);
 
 extern "C" void DrawSingleCrescent__8CMenuPcsFff(CMenuPcs*, float, float);
 extern "C" void DrawSingleStat__8CMenuPcsFf(CMenuPcs*, float);
@@ -195,7 +191,7 @@ void CMenuPcs::LetterInit()
 	s_BackUpCur[1] = 0;
 	s_BackUpTopPos = 0;
 
-	SetSingWinScl__8CMenuPcsFf(this, FLOAT_803330f8);
+	SetSingWinScl(FLOAT_803330f8);
 }
 
 /*
@@ -224,7 +220,7 @@ void CMenuPcs::LetterInit0()
 	s_BackUpCur[1] = 0;
 	s_BackUpTopPos = 0;
 
-	SetSingWinScl__8CMenuPcsFf(this, FLOAT_803330f8);
+	SetSingWinScl(FLOAT_803330f8);
 }
 
 /*
@@ -332,9 +328,9 @@ void CMenuPcs::LetterInit2()
 	strcat(left, GetMenuStr(1), 0x10);
 	strcpy(right, "");
 	strcat(right, GetMenuStr(2), 0x10);
-	SetSingDynamicWinMessInfo__8CMenuPcsFiPcPcPcPcPcPcPcPc(this, 3, info, left, right, 0, 0, 0, 0, 0);
-	GetSingWinSize__8CMenuPcsFiPsPsi(this, 0, &winW, &winH, 1);
-	SetMcWinInfo__8CMenuPcsFii(this, static_cast<int>(winW), static_cast<int>(winH));
+	SetSingDynamicWinMessInfo(3, info, left, right, 0, 0, 0, 0, 0);
+	GetSingWinSize(0, &winW, &winH, 1);
+	SetMcWinInfo(static_cast<int>(winW), static_cast<int>(winH));
 	*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x848) + 0xA) = 0;
 	*reinterpret_cast<s16*>(state + 0x28) = 0;
 	*reinterpret_cast<char*>(state + 0xC) = 1;
@@ -395,13 +391,12 @@ void CMenuPcs::LetterInit3()
 	int closeLine = s_ReplyMax;
 	s_ReplyMax = static_cast<unsigned char>(s_ReplyMax + 1);
 	strcat(lines[closeLine], GetMenuStr(3), 0x80);
-	SetSingDynamicWinMessInfo__8CMenuPcsFiPcPcPcPcPcPcPcPc(
-	    this, s_ReplyMax, lines[0], unused0, unused1, unused2, unused3, unused4, unused5, unused6);
+	SetSingDynamicWinMessInfo(s_ReplyMax, lines[0], unused0, unused1, unused2, unused3, unused4, unused5, unused6);
 
 	s16 winW;
 	s16 winH;
-	GetSingWinSize__8CMenuPcsFiPsPsi(this, 0, &winW, &winH, 1);
-	SetMcWinInfo__8CMenuPcsFii(this, winW, winH);
+	GetSingWinSize(0, &winW, &winH, 1);
+	SetMcWinInfo(winW, winH);
 	*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x848) + 0xA) = 0;
 	*reinterpret_cast<unsigned char*>(state + 0x9) = 0xFF;
 	*reinterpret_cast<char*>(state + 0xC) = 1;
@@ -472,13 +467,12 @@ void CMenuPcs::LetterInit4()
 	strcat(lines[lineCount + 1], GetMenuStr(1), 0x80);
 	strcpy(lines[lineCount + 2], "");
 	strcat(lines[lineCount + 2], GetMenuStr(2), 0x80);
-	SetSingDynamicWinMessInfo__8CMenuPcsFiPcPcPcPcPcPcPcPc(
-	    this, lineCount + 3, lines[0], lines[1], lines[2], lines[3], lines[4], lines[5], lines[6], lines[7]);
+	SetSingDynamicWinMessInfo(lineCount + 3, lines[0], lines[1], lines[2], lines[3], lines[4], lines[5], lines[6], lines[7]);
 
 	s16 winW;
 	s16 winH;
-	GetSingWinSize__8CMenuPcsFiPsPsi(this, 0, &winW, &winH, 1);
-	SetMcWinInfo__8CMenuPcsFii(this, winW, winH);
+	GetSingWinSize(0, &winW, &winH, 1);
+	SetMcWinInfo(winW, winH);
 	*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x848) + 0xA) = 0;
 	*reinterpret_cast<s16*>(state + 0x28) = 0;
 	*reinterpret_cast<unsigned char*>(state + 0x9) = 0xFF;
@@ -574,7 +568,7 @@ bool CMenuPcs::LetterOpen()
 		s_BackUpCur[0] = 0;
 		s_BackUpCur[1] = 0;
 		s_BackUpTopPos = 0;
-		SetSingWinScl__8CMenuPcsFf(this, FLOAT_803330f8);
+		SetSingWinScl(FLOAT_803330f8);
 	}
 	iVar6 = 0;
 	*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x22) =
@@ -1064,9 +1058,9 @@ void CMenuPcs::LetterItemWinOpen()
 		strcat(left, GetMenuStr(1), 0x10);
 		strcpy(right, "");
 		strcat(right, GetMenuStr(2), 0x10);
-		SetSingDynamicWinMessInfo__8CMenuPcsFiPcPcPcPcPcPcPcPc(this, 3, info, left, right, 0, 0, 0, 0, 0);
-		GetSingWinSize__8CMenuPcsFiPsPsi(this, 0, &winW, &winH, 1);
-		SetMcWinInfo__8CMenuPcsFii(this, static_cast<int>(winW), static_cast<int>(winH));
+		SetSingDynamicWinMessInfo(3, info, left, right, 0, 0, 0, 0, 0);
+		GetSingWinSize(0, &winW, &winH, 1);
+		SetMcWinInfo(static_cast<int>(winW), static_cast<int>(winH));
 		*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x848) + 0xA) = 0;
 		*reinterpret_cast<s16*>(state + 0x28) = 0;
 		*reinterpret_cast<char*>(state + 0xC) = 1;
@@ -1171,9 +1165,7 @@ bool CMenuPcs::LetterReplyWinOpen()
 		s_ReplyMax = static_cast<unsigned char>(s_ReplyMax + 1);
 		strcat(lines[lineIndex], closeText, 0x80);
 
-		SetSingDynamicWinMessInfo__8CMenuPcsFiPcPcPcPcPcPcPcPc(
-			this,
-			s_ReplyMax,
+		SetSingDynamicWinMessInfo(s_ReplyMax,
 			lines[0],
 			unused0,
 			unused1,
@@ -1185,8 +1177,8 @@ bool CMenuPcs::LetterReplyWinOpen()
 
 		s16 winW;
 		s16 winH;
-		GetSingWinSize__8CMenuPcsFiPsPsi(this, 0, &winW, &winH, 1);
-		SetMcWinInfo__8CMenuPcsFii(this, winW, winH);
+		GetSingWinSize(0, &winW, &winH, 1);
+		SetMcWinInfo(winW, winH);
 		*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x848) + 0xA) = 0;
 		*reinterpret_cast<unsigned char*>(state + 0x9) = 0xFF;
 		*reinterpret_cast<char*>(state + 0xC) = 1;
@@ -1226,8 +1218,8 @@ void CMenuPcs::LetterAttachWinOpen()
 	if (*reinterpret_cast<char*>(state + 0xC) == '\0') {
 		s16 winW;
 		s16 winH;
-		GetSingWinSize__8CMenuPcsFiPsPsi(this, 2, &winW, &winH, 0);
-		SetMcWinInfo__8CMenuPcsFii(this, static_cast<int>(winW), static_cast<int>(winH));
+		GetSingWinSize(2, &winW, &winH, 0);
+		SetMcWinInfo(static_cast<int>(winW), static_cast<int>(winH));
 		*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x848) + 0xA) = 0;
 		*reinterpret_cast<s16*>(state + 0x28) = 0;
 		*reinterpret_cast<unsigned char*>(state + 9) = 0xFF;
@@ -1352,13 +1344,12 @@ bool CMenuPcs::LetterConfirmOpen()
 		strcpy(lines[lineCount + 2], "");
 		strcat(lines[lineCount + 2], GetMenuStr(2), 0x80);
 
-		SetSingDynamicWinMessInfo__8CMenuPcsFiPcPcPcPcPcPcPcPc(
-			this, lineCount + 3, lines[0], lines[1], lines[2], lines[3], lines[4], lines[5], lines[6], lines[7]);
+		SetSingDynamicWinMessInfo(lineCount + 3, lines[0], lines[1], lines[2], lines[3], lines[4], lines[5], lines[6], lines[7]);
 
 		s16 winW;
 		s16 winH;
-		GetSingWinSize__8CMenuPcsFiPsPsi(this, 0, &winW, &winH, 1);
-		SetMcWinInfo__8CMenuPcsFii(this, winW, winH);
+		GetSingWinSize(0, &winW, &winH, 1);
+		SetMcWinInfo(winW, winH);
 		*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x848) + 0xA) = 0;
 		*reinterpret_cast<s16*>(state + 0x28) = 0;
 		*reinterpret_cast<unsigned char*>(state + 0x9) = 0xFF;

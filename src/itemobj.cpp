@@ -15,10 +15,6 @@
 #include <string.h>
 #include "ffcc/fontman.h"
 
-extern "C" void onCreate__8CGPrgObjFv(void*);
-extern "C" void onDestroy__8CGPrgObjFv(void*);
-extern "C" int GetFreeParticleSlot__13CFlatRuntime2Fv(void*);
-extern "C" void DeleteParticleSlot__13CFlatRuntime2Fii(void*, int, int);
 extern "C" void Attach__8CGObjectFP8CGObjectPcP3Vec(void*, void*, char*, Vec*);
 extern "C" void Detach__8CGObjectFv(void*);
 extern "C" void changeStat__8CGPrgObjFiii(void*, int, int, int);
@@ -36,25 +32,16 @@ extern "C" unsigned int getNumFreeObject__13CFlatRuntime2Fi(void*, int);
 extern "C" void* FindGItemObjFirst__13CFlatRuntime2Fv(void*);
 extern "C" void* FindGItemObjNext__13CFlatRuntime2FP9CGItemObj(void*, void*);
 extern "C" void deleteObject__12CFlatRuntimeFPQ212CFlatRuntime7CObject(void*, void*);
-extern "C" void EndParticleSlot__13CFlatRuntime2Fii(void*, int, int);
-extern "C" void ResetParticleWork__13CFlatRuntime2Fii(void*, int, int);
-extern "C" void SetParticleWorkPos__13CFlatRuntime2FR3Vecf(void*, Vec&, float);
-extern "C" void SetParticleWorkCol__13CFlatRuntime2Fiif(void*, int, int, float);
 extern "C" void SetParticleWorkParam__13CFlatRuntime2FiPQ212CFlatRuntime7CObject(void*, int, void*);
-extern "C" void PutParticleWork__13CFlatRuntime2Fv(void*);
-extern "C" void addSubStat__8CGPrgObjFv(void*);
 extern "C" void IgnoreParticle__13CFlatRuntime2FiPQ212CFlatRuntime7CObject(void*, int, void*);
-extern "C" int intToClass__13CFlatRuntime2Fi(void*, int);
 extern "C" float RandFPM__5CMathFf(float, CMath*);
 extern "C" void SetPosBG__8CGObjectFP3Veci(void*, Vec*, int);
 extern "C" void MoveVector__8CGObjectFP3Vecfiiii(void*, Vec*, float, int, int, int, int);
-extern "C" void EndParticle__13CFlatRuntime2FPQ29CCharaPcs7CHandle(void*, void*);
 extern "C" void SetDamageCol__8CGObjectFiPcffP3Vec(void*, int, char*, float, float, Vec*);
 extern "C" void onFrame__8CGPrgObjFv(void*);
 extern "C" int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, CMapCylinder*, Vec*, unsigned int);
 extern "C" void putParticle__8CGPrgObjFiiP3Vecfi(void*, int, int, Vec*, float, int);
 extern "C" void playSe3D__8CGPrgObjFiiiiP3Vec(void*, int, int, int, int, Vec*);
-extern "C" void pppSetLocSlot__8CPartMngFiP3Vec(void*, int, Vec*);
 extern float FLOAT_80331b1c;
 extern const float FLOAT_80331b18;
 extern const float FLOAT_80331b20 = 0.0f;
@@ -513,14 +500,14 @@ void CGItemObj::onHitParticle(int effectIndex, int, int, int, Vec*, PPPIFPARAM* 
 				break;
 			}
 
-			EndParticleSlot__13CFlatRuntime2Fii(CFlat, *(int*)(self + 0x55C), 0);
-			ResetParticleWork__13CFlatRuntime2Fii(CFlat, particleNo | 0x100, *(int*)(self + 0x55C));
-			SetParticleWorkPos__13CFlatRuntime2FR3Vecf(CFlat, *(Vec*)(self + 0x15C), FLOAT_80331b20);
-			SetParticleWorkCol__13CFlatRuntime2Fiif(CFlat, 9, 0, FLOAT_80331b18);
+			gCFlatRuntime2.EndParticleSlot(*(int*)(self + 0x55C), 0);
+			gCFlatRuntime2.ResetParticleWork(particleNo | 0x100, *(int*)(self + 0x55C));
+			gCFlatRuntime2.SetParticleWorkPos(*(Vec*)(self + 0x15C), FLOAT_80331b20);
+			gCFlatRuntime2.SetParticleWorkCol(9, 0, FLOAT_80331b18);
 			SetParticleWorkParam__13CFlatRuntime2FiPQ212CFlatRuntime7CObject(CFlat, classControl, this);
-			PutParticleWork__13CFlatRuntime2Fv(CFlat);
+			gCFlatRuntime2.PutParticleWork();
 			*(unsigned int*)(self + 0x1C0) &= 0xFFF7FFFF;
-			addSubStat__8CGPrgObjFv(this);
+			addSubStat();
 		}
 	} else {
 		if (((worldParamA != 0xCB) || (*(int*)(self + 0x520) != 0x24)) && *(int*)(self + 0x520) != 0x25) {
@@ -587,10 +574,10 @@ void CGItemObj::onFrameAlways()
 		}
 
 		if (canUseTrace && *(int*)(CFlat + 66604) == 0) {
-			*(int*)(CFlat + 66604) = GetFreeParticleSlot__13CFlatRuntime2Fv(CFlat);
+			*(int*)(CFlat + 66604) = gCFlatRuntime2.GetFreeParticleSlot();
 			putParticleTrace__8CGPrgObjFiiP8CGObjectfi(this, 0x141, *(int*)(CFlat + 66604), this, FLOAT_80331b18, 0);
 		} else if (!canUseTrace && *(int*)(CFlat + 66604) != 0) {
-			EndParticleSlot__13CFlatRuntime2Fii(CFlat, *(int*)(CFlat + 66604), 0);
+			gCFlatRuntime2.EndParticleSlot(*(int*)(CFlat + 66604), 0);
 			*(int*)(CFlat + 66604) = 0;
 		}
 	}
@@ -807,7 +794,7 @@ CGPrgObj* CGItemObj::CreateFromScript(
 
 	CGPrgObj* newItem = 0;
 	if (createMode != 1) {
-		newItem = (CGPrgObj*)intToClass__13CFlatRuntime2Fi(CFlat, (int)outStack.m_word);
+		newItem = (CGPrgObj*)gCFlatRuntime2.intToClass((int)outStack.m_word);
 		unsigned char* itemSelf = (unsigned char*)newItem;
 
 		if (createMode == 2) {
@@ -988,7 +975,7 @@ void CGItemObj::onFrameStat()
 				*(float*)(self + 0x4b8) = FLOAT_80331b54;
 				*(float*)(self + 0x4b4) = zero;
 				*(unsigned int*)(self + 0x1c0) = 1;
-				EndParticle__13CFlatRuntime2FPQ29CCharaPcs7CHandle(CFlat, *(void**)(self + 0xf8));
+				gCFlatRuntime2.EndParticle(m_charaModelHandle);
 				changeStat__8CGPrgObjFiii(this, 9, 0, 0);
 			}
 		}
@@ -1111,7 +1098,7 @@ void CGItemObj::onFrameStat()
 		} else if (*(int*)(self + 0x528) == 4) {
 			prgObj->m_bgDownDist = FLOAT_80331b68;
 			prgObj->m_stepSlopeLimit = zero;
-			EndParticle__13CFlatRuntime2FPQ29CCharaPcs7CHandle(CFlat, prgObj->m_charaModelHandle);
+			gCFlatRuntime2.EndParticle(prgObj->m_charaModelHandle);
 		} else if (*(int*)(self + 0x528) == 0xC) {
 			self[0x38] = static_cast<unsigned char>(__rlwimi(self[0x38], 1, 7, 24, 24));
 		}
@@ -1133,11 +1120,11 @@ void CGItemObj::onFrameStat()
 		}
 		break;
 	case 0x1F:
-		pppSetLocSlot__8CPartMngFiP3Vec(&PartMng, *(int*)(self + 0x55C), &prgObj->m_worldPosition);
+		PartMng.pppSetLocSlot(*(int*)(self + 0x55C), &prgObj->m_worldPosition);
 
 		if (*(int*)(self + 0x52C) == 1) {
 			if (*(int*)(self + 0x530) == 0x7D) {
-				EndParticleSlot__13CFlatRuntime2Fii(CFlat, *(int*)(self + 0x55C), 0);
+				gCFlatRuntime2.EndParticleSlot(*(int*)(self + 0x55C), 0);
 			}
 		} else if (*(int*)(self + 0x52C) < 1 && -1 < *(int*)(self + 0x52C) && *(int*)(self + 0x530) == 0) {
 			int particleNoA;
@@ -1258,7 +1245,7 @@ void CGItemObj::onFrameStat()
 
 		if (*(int*)(self + 0x528) == 0) {
 			prgObj->m_stepSlopeLimit = zero;
-			EndParticleSlot__13CFlatRuntime2Fii(CFlat, *(int*)(self + 0x55C), 0);
+			gCFlatRuntime2.EndParticleSlot(*(int*)(self + 0x55C), 0);
 
 			int soundEntry = *(int*)(*(int*)(*reinterpret_cast<int*>(m_boss__8CGMonObj) + 0xF8) + 0x178);
 			if (soundEntry != 0) {
@@ -1312,7 +1299,7 @@ void CGItemObj::onFrameStat()
 
 		if (*(int*)(self + 0x528) == 0) {
 			prgObj->m_stepSlopeLimit = zero;
-			EndParticleSlot__13CFlatRuntime2Fii(CFlat, *(int*)(self + 0x55C), 0);
+			gCFlatRuntime2.EndParticleSlot(*(int*)(self + 0x55C), 0);
 
 			int soundEntry = *(int*)(*(int*)(*reinterpret_cast<int*>(m_boss__8CGMonObj) + 0xF8) + 0x178);
 			if (soundEntry != 0) {
@@ -1397,7 +1384,7 @@ void CGItemObj::onFrame()
 			SetDamageCol__8CGObjectFiPcffP3Vec(
 			    this, 0, const_cast<char*>(DAT_80331bc8), FLOAT_80331bb8, FLOAT_80331bb8, reinterpret_cast<Vec*>(&zero));
 			*reinterpret_cast<unsigned int*>(&m_damageColliders[1].m_localPosition.x) = 8;
-			addSubStat__8CGPrgObjFv(this);
+			addSubStat();
 		}
 	}
 
@@ -1494,8 +1481,8 @@ void CGItemObj::onDestroy()
 		delete reinterpret_cast<CCharaPcs::CHandle*>(*(void**)(self + 0x564));
 	}
 
-	DeleteParticleSlot__13CFlatRuntime2Fii(CFlat, *(int*)(self + 0x55c), 0);
-	onDestroy__8CGPrgObjFv(self);
+	gCFlatRuntime2.DeleteParticleSlot(*(int*)(self + 0x55c), 0);
+	CGPrgObj::onDestroy();
 }
 
 /*
@@ -1509,7 +1496,7 @@ void CGItemObj::onDestroy()
  */
 void CGItemObj::onCreate()
 {
-	onCreate__8CGPrgObjFv(this);
+	CGPrgObj::onCreate();
 	m_flagBits.bits.unk0 = 0;
 	m_owner = 0;
 	m_scriptArg = 0;
@@ -1518,5 +1505,5 @@ void CGItemObj::onCreate()
 	m_pendingModelHandle = 0;
 	m_itemJumpCountdown = 0;
 	memset(&m_memoryCapsuleNameIndex, 0, 0xc);
-	m_particleSlot = GetFreeParticleSlot__13CFlatRuntime2Fv(CFlat);
+	m_particleSlot = gCFlatRuntime2.GetFreeParticleSlot();
 }

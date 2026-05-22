@@ -1,6 +1,7 @@
 #include "ffcc/mapmesh.h"
 #include "ffcc/chunkfile.h"
 #include "ffcc/linkage.h"
+#include "ffcc/materialman.h"
 
 #include <dolphin/gx.h>
 #include <dolphin/os/OSCache.h>
@@ -17,21 +18,6 @@ extern "C" const float FLOAT_8032F934;
 
 CMemory::CStage* g_pStage;
 u32 s_insertShadowNo;
-
-extern "C" {
-void SetBlendMode__12CMaterialManFP12CMaterialSeti(void* materialMan, CMaterialSet* materialSet, unsigned int materialIdx);
-void SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(void* materialMan, CMaterialSet* materialSet,
-                                                                 unsigned int materialIdx, int materialPart,
-                                                                 int tevScale);
-void SetMaterialPart__12CMaterialManFP12CMaterialSetii(void* materialMan, CMaterialSet* materialSet,
-                                                        unsigned int materialIdx, int partIdx);
-void SetMaterialCharaShadow__12CMaterialManFP9CMaterial(void* materialMan, void* material);
-unsigned int FindTexName__12CMaterialSetFPcPl(CMaterialSet* materialSet, char* textureName, long* outIndex);
-void CacheLoadTexture__12CMaterialSetFiP13CAmemCacheSet(CMaterialSet* materialSet, unsigned int materialIdx,
-                                                         CAmemCacheSet* cacheSet);
-void CacheDumpTexture__12CMaterialSetFiP13CAmemCacheSet(CMaterialSet* materialSet, unsigned int materialIdx,
-                                                         CAmemCacheSet* cacheSet);
-}
 
 template <class T>
 class CPtrArray
@@ -89,7 +75,7 @@ void CMapMesh::pppCacheDumpModelTexture(CMaterialSet* materialSet, CAmemCacheSet
             if (entry->m_materialIdx == 0xFFFF) {
                 entry->m_materialIdx = 0;
             } else {
-                CacheDumpTexture__12CMaterialSetFiP13CAmemCacheSet(materialSet, (unsigned int)entry->m_materialIdx, cacheSet);
+                materialSet->CacheDumpTexture(entry->m_materialIdx, cacheSet);
             }
         }
         entry++;
@@ -114,7 +100,7 @@ void CMapMesh::pppCacheLoadModelTexture(CMaterialSet* materialSet, CAmemCacheSet
             if (entry->m_materialIdx == 0xFFFF) {
                 entry->m_materialIdx = 0;
             } else {
-                CacheLoadTexture__12CMaterialSetFiP13CAmemCacheSet(materialSet, (unsigned int)entry->m_materialIdx, cacheSet);
+                materialSet->CacheLoadTexture(entry->m_materialIdx, cacheSet);
             }
         }
         entry++;
@@ -140,7 +126,7 @@ void CMapMesh::SetDisplayListMaterial(CMaterialSet* materialSet, char** textureN
             if (entry->m_materialIdx == 0xFFFF) {
                 entry->m_materialIdx = 0;
             } else {
-                entry->m_materialIdx = FindTexName__12CMaterialSetFPcPl(materialSet, textureNames[entry->m_materialIdx], 0);
+                entry->m_materialIdx = materialSet->FindTexName(textureNames[entry->m_materialIdx], 0);
             }
         }
         entry++;
@@ -190,7 +176,7 @@ void CMapMesh::DrawPart(CMaterialSet* materialSet, int drawMaterialPart)
     while (remaining-- != 0) {
         if (entry->m_size != 0) {
             if (drawMaterialPart != 0) {
-                SetMaterialPart__12CMaterialManFP12CMaterialSetii(&MaterialMan, materialSet, entry->m_materialIdx, 1);
+                MaterialMan.SetMaterialPart(materialSet, entry->m_materialIdx, 1);
             }
             GXCallDisplayList(entry->m_displayList, entry->m_size);
         }
@@ -218,9 +204,8 @@ void CMapMesh::Draw(CMaterialSet* materialSet)
 
     while (remaining-- != 0) {
         if (entry->m_size != 0) {
-            SetBlendMode__12CMaterialManFP12CMaterialSeti(&MaterialMan, materialSet, entry->m_materialIdx);
-            SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(&MaterialMan, materialSet, entry->m_materialIdx, 0,
-                                                                       1);
+            MaterialMan.SetBlendMode(materialSet, entry->m_materialIdx);
+            MaterialMan.SetMaterial(materialSet, entry->m_materialIdx, 0, (_GXTevScale)1);
             GXCallDisplayList(entry->m_displayList, entry->m_size);
         }
         entry++;
@@ -251,7 +236,7 @@ void CMapMesh::DrawMeshCharaShadow(unsigned short startIdx, unsigned short count
 
             if ((*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(material) + 0x24) &
                  0x100000) != 0) {
-                SetMaterialCharaShadow__12CMaterialManFP9CMaterial(&MaterialMan, material);
+                MaterialMan.SetMaterialCharaShadow(material);
                 GXCallDisplayList(entry->m_displayList, entry->m_size);
             }
         }
@@ -276,11 +261,9 @@ void CMapMesh::DrawMesh(unsigned short startIdx, unsigned short count)
 
     while (remaining-- != 0) {
         if (entry->m_size != 0) {
-            SetBlendMode__12CMaterialManFP12CMaterialSeti(
-                &MaterialMan, *reinterpret_cast<CMaterialSet**>(mapMng + 0x213D4), entry->m_materialIdx);
-            SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
-                &MaterialMan, *reinterpret_cast<CMaterialSet**>(mapMng + 0x213D4),
-                                                                       entry->m_materialIdx, 0, 1);
+            MaterialMan.SetBlendMode(*reinterpret_cast<CMaterialSet**>(mapMng + 0x213D4), entry->m_materialIdx);
+            MaterialMan.SetMaterial(*reinterpret_cast<CMaterialSet**>(mapMng + 0x213D4), entry->m_materialIdx, 0,
+                                    (_GXTevScale)1);
             GXCallDisplayList(entry->m_displayList, entry->m_size);
         }
         entry++;

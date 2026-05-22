@@ -1729,12 +1729,13 @@ void CAmemCacheSet::GetFree()
  */
 int CAmemCacheSet::GetData(short index, char* source, int line)
 {
+    int data = 0;
+
     while (true) {
         CAmemCache& entry = cacheEntryAt(this, index);
-        int data = 0;
 
         if (entry.m_cacheData == 0) {
-            if (entry.m_dmaCopy == 0) {
+            if (!entry.m_dmaCopy) {
                 entry.m_cacheData = entry.m_workData;
                 data = reinterpret_cast<int>(entry.m_cacheData);
             } else {
@@ -1749,21 +1750,19 @@ int CAmemCacheSet::GetData(short index, char* source, int line)
                 if (data != 0) {
                     int dmaId = RedSound(&Sound)->DMAEntry(0, 1, reinterpret_cast<int>(entry.m_cacheData),
                                                            reinterpret_cast<int>(entry.m_workData), entry.m_size, 0, 0);
-                    CStopWatch watch((char*)0);
+                    CStopWatch watch(0);
                     watch.Start();
                     float timeout = FLOAT_8032f7d8;
                     while (RedSound(&Sound)->DMACheck(dmaId) != 0) {
                         watch.Stop();
-                        if (watch.Get() < timeout) {
-                            watch.Start();
-                        } else {
+                        if (watch.Get() >= timeout) {
                             if (static_cast<unsigned int>(System.m_execParam) >= 1) {
                                 System.Printf(const_cast<char*>(DAT_801d669c));
                             }
                             Sound.CheckDriver(1);
                             watch.Reset();
-                            watch.Start();
                         }
+                        watch.Start();
                     }
                     data = reinterpret_cast<int>(entry.m_cacheData);
                 }

@@ -9,11 +9,6 @@
 
 CTextureMan TextureMan;
 
-inline void* operator new(unsigned long, void* ptr)
-{
-    return ptr;
-}
-
 static const char s_textureman_cpp_801D7974[] = "textureman.cpp";
 static const char s_Error_width_pctd_height_pctd_801D7984[] = "Error width=%d height=%d\n";
 static const char s_CTexture_texture_801D79A0[] = "CTexture.texture";
@@ -37,13 +32,8 @@ static inline unsigned short& U16At(void* p, unsigned int offset)
 
 static inline CTexture* AllocTexture()
 {
-    CTexture* texture = static_cast<CTexture*>(Memory._Alloc(
-        sizeof(CTexture), *reinterpret_cast<CMemory::CStage**>(Ptr(&TextureMan, 4)),
-        const_cast<char*>(s_textureman_cpp_801D7974), 0x2ED, 0));
-    if (texture != 0) {
-        ::new (static_cast<void*>(texture)) CTexture;
-    }
-    return texture;
+    return new (*reinterpret_cast<CMemory::CStage**>(Ptr(&TextureMan, 4)),
+                const_cast<char*>(s_textureman_cpp_801D7974), 0x2ED) CTexture;
 }
 
 }

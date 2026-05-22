@@ -4890,11 +4890,11 @@ bool GbaQueue::IsSingleMode(int channel)
  */
 void GbaQueue::SetControllerMode(int controllerMode)
 {
-	GbaQueue* queue;
 	int i;
+	GbaQueue* semaphoreIter;
+	GbaQueue* queue;
 	int retries;
 	int ret;
-	GbaQueue* semaphoreIter;
 
 	queue = this;
 	i = 0;

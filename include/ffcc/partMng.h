@@ -46,7 +46,7 @@ struct pppShapeSt
     pppShapeSt();
     ~pppShapeSt();
 
-    void* GetTexture(long*, CMaterialSet*, int&);
+    CTexture* GetTexture(long*, CMaterialSet*, int&);
 }; // Size 0x2c
 
 struct pppModelSt : public CMapMesh

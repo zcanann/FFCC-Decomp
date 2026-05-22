@@ -5,6 +5,7 @@
 #include "ffcc/pppPart.h"
 #include "ffcc/util.h"
 #include "ffcc/pppShape.h"
+#include "ffcc/textureman.h"
 
 struct Vec2d {
     float x;
@@ -124,7 +125,7 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
     if (param_2->m_dataValIndex != 0xFFFF) {
         pppShapeSt* shapeSt =
             *(pppShapeSt**)(*(int*)&pppEnvStPtr->m_particleColors[0] + param_2->m_dataValIndex * 4);
-        void* texture;
+        CTexture* texture;
 
         texture = shapeSt->GetTexture((long*)shapeSt->m_animData, pppEnvStPtr->m_materialSetPtr, textureIndex);
         if (positionWork->m_alpha != 0) {
@@ -217,7 +218,7 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
                 _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
                 _GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
                 GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
-                GXLoadTexObj((GXTexObj*)((u8*)texture + 0x28), GX_TEXMAP0);
+                GXLoadTexObj(&texture->m_texObj, GX_TEXMAP0);
                 pppSetBlendMode(param_2->m_arg3);
 
                 drawScale += values->m_scaleStep;

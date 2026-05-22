@@ -18,9 +18,6 @@ extern "C" void DrawSingleIcon__8CMenuPcsFiiifif(CMenuPcs*, int, int, int, float
 extern "C" void DrawInit__8CMenuPcsFv(CMenuPcs*);
 extern CMenuPcs MenuPcs;
 
-extern "C" const char* GetMenuStr__8CMenuPcsFi(CMenuPcs*, int);
-extern "C" const char* GetJobStr__8CMenuPcsFi(CMenuPcs*, int);
-
 extern "C" const float FLOAT_80332FF8;
 extern "C" const float FLOAT_80332FFC;
 extern "C" const float FLOAT_80333000;
@@ -293,7 +290,7 @@ void CMenuPcs::CompaDraw()
 			}
 		}
 
-		const char* name = GetMenuStr__8CMenuPcsFi(this, drawIndex + 0x16);
+		const char* name = GetMenuStr(drawIndex + 0x16);
 		float y = static_cast<float>(compaList->entries[0].y + 0x45 + shown * 0x28) - FLOAT_80333020;
 		font->SetPosX(static_cast<float>(compaList->entries[0].x + 0x18));
 		font->SetPosY(y);
@@ -316,7 +313,7 @@ void CMenuPcs::CompaDraw()
 	font->DrawInit();
 	font->SetColor(textColor);
 
-	const char* job = GetJobStr__8CMenuPcsFi(this, *reinterpret_cast<int*>(scriptFood + 0x3AC));
+	const char* job = GetJobStr(*reinterpret_cast<int*>(scriptFood + 0x3AC));
 	font->GetWidth(job);
 	font->SetPosX(static_cast<float>(compaList->entries[0].x + 0x18));
 	font->SetPosY(static_cast<float>(compaList->entries[0].y + 0x20) - FLOAT_80333020 - FLOAT_80333028);

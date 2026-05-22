@@ -14,6 +14,7 @@
 #include "ffcc/sound.h"
 #include "ffcc/system.h"
 #include "ffcc/textureman.h"
+#include "ffcc/cflat_runtime2.h"
 
 #include <math.h>
 #include <string.h>
@@ -670,8 +671,6 @@ void CChara::ChangeMogMode(int mogMode)
 extern "C" void CalcMogScore__6CCharaFv(CChara*);
 extern "C" int Find__11CTextureSetFPc(CTextureSet*, char*);
 extern "C" void _WaitDrawDone__8CGraphicFPci(void*, const char*, int);
-extern "C" void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-    void*, int, int, int, int, void*, void*);
 extern "C" int GetWait__4CMesFv(void*);
 extern "C" void Open__8CMesMenuFPciiiiii(void*, char*, int, int, int, int, int, int);
 static const char s_chara_fur_cpp_801db72c[] = "chara_fur.cpp";
@@ -1388,12 +1387,11 @@ void CChara::CModel::MogFurFrame(CGObject* object)
 	}
 
 	if ((triggerButtons & 0x200) != 0) {
-		int stack[3];
-		stack[0] = 2;
-		stack[1] = 0;
-		stack[2] = 0;
-		SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-		    &CFlat, 0, 1, 9, 3, stack, 0);
+		CFlatRuntime::CStack stack[3];
+		stack[0].m_word = 2;
+		stack[1].m_word = 0;
+		stack[2].m_word = 0;
+		reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(0, 1, 9, 3, stack, 0);
 	}
 
 	OpenMogHintMessage(messageId);

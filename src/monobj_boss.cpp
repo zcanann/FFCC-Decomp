@@ -6,6 +6,7 @@
 #include "ffcc/math.h"
 #include "ffcc/game.h"
 #include "ffcc/vector.h"
+#include "ffcc/cflat_runtime2.h"
 
 #include <math.h>
 #include <string.h>
@@ -34,8 +35,6 @@ extern "C" void ResetParticleWork__13CFlatRuntime2Fii(void*, int, int);
 extern "C" void SetParticleWorkTrace__13CFlatRuntime2FPQ212CFlatRuntime7CObject(void*, void*);
 extern "C" void SetParticleWorkBind__13CFlatRuntime2FPQ212CFlatRuntime7CObject(void*, void*);
 extern "C" void PutParticleWork__13CFlatRuntime2Fv(void*);
-extern "C" void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-    void*, void*, int, int, int, void*, void*);
 extern "C" void moveFrame__8CGMonObjFv(CGMonObj*);
 extern "C" void rotTarget__8CGMonObjFif(CGMonObj*, int, float);
 extern "C" void CGMonObj_ResetActionState(CGMonObj*);
@@ -1317,9 +1316,8 @@ void CGMonObj::frameStatFuncLich()
 		} else {
 			chara->statAttack();
 			if (prgObj->m_stateFrame == 0x29) {
-				int stack[3] = {10, 1, 0};
-				SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-				    CFlat, 0, 1, 9, 3, stack, 0);
+				CFlatRuntime::CStack stack[3] = {{10}, {1}, {0}};
+				reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(0, 1, 9, 3, stack, 0);
 			}
 		}
 	} else if (stat < 0x65 && stat > 99) {
@@ -1420,16 +1418,15 @@ void CGMonObj::frameStatFuncTetsukyojin()
 			changeStat__8CGPrgObjFiii(prgObj, 0, 0, 0);
 		} else {
 			if ((*reinterpret_cast<int*>(self + 0x6B4) == 1) && (prgObj->m_stateFrame == 0)) {
-				int stack[3];
+				CFlatRuntime::CStack stack[3];
 
 				object->m_bgColMask &= 0xFFF3FFFD;
 				*reinterpret_cast<int*>(self + 0x6B4) = 2;
 				*reinterpret_cast<int*>(CFlat + 4844) = 1;
-				stack[0] = 10;
-				stack[1] = 0;
-				stack[2] = 0;
-				SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-				    CFlat, 0, 1, 9, 3, stack, 0);
+				stack[0].m_word = 10;
+				stack[1].m_word = 0;
+				stack[2].m_word = 0;
+				reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(0, 1, 9, 3, stack, 0);
 			}
 
 			if (*reinterpret_cast<int*>(CFlat + 4844) == 0) {

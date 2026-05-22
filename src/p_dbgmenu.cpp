@@ -8,6 +8,7 @@
 #include "ffcc/partMng.h"
 #include "ffcc/p_tina.h"
 #include "ffcc/system.h"
+#include "ffcc/cflat_runtime2.h"
 #include <dolphin/gx.h>
 #include <string.h>
 
@@ -20,8 +21,6 @@ extern "C" void create__11CDbgMenuPcsFv(CDbgMenuPcs*);
 extern "C" void destroy__11CDbgMenuPcsFv(CDbgMenuPcs*);
 extern "C" void calc__11CDbgMenuPcsFv(CDbgMenuPcs*);
 extern "C" void draw__11CDbgMenuPcsFv(CDbgMenuPcs*);
-extern "C" void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-    void*, int, int, int, int, void*, void*);
 extern "C" void CheckDriver__6CSoundFi(void*, int);
 extern "C" void pppDumpMngSt__8CPartMngFv(void*);
 extern "C" void DumpLoad__9CCharaPcsFv(void*);
@@ -197,7 +196,7 @@ void CDbgMenuPcs::calc()
 	unsigned int padOffset;
 	int menuPtr;
 	int cursorPtr;
-	int stackData[3];
+	CFlatRuntime::CStack stackData[3];
 
 	if (m_rootMenuNode.m_firstChild == 0) {
 		return;
@@ -217,14 +216,13 @@ void CDbgMenuPcs::calc()
 			*(unsigned int*)(CFlat + 0x12A4) = ~*(unsigned int*)(CFlat + 0x12A4);
 			break;
 		case 0x65:
-			stackData[0] = 0;
-			stackData[2] = 0;
+			stackData[0].m_word = 0;
+			stackData[2].m_word = 0;
 			flags = (unsigned int)__cntlzw((int)((signed char)CFlat[0x12E4] >> 7));
 			flags = ((int)(char)(flags >> 5) & 1U) << 7 | ((unsigned char)CFlat[0x12E4] & 0x7F);
 			CFlat[0x12E4] = (unsigned char)flags;
-			stackData[1] = (int)(flags << 0x18) >> 0x1f;
-			SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
-			    CFlat, 0, 1, 9, 3, stackData, 0);
+			stackData[1].m_word = (int)(flags << 0x18) >> 0x1f;
+			reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(0, 1, 9, 3, stackData, 0);
 			break;
 		case 0x66:
 			flags = (unsigned int)__cntlzw((int)(char)((int)((unsigned int)(unsigned char)CFlat[0x12E4] << 0x1d) >> 0x1f));

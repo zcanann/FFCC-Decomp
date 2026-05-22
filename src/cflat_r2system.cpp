@@ -54,7 +54,6 @@ extern "C" {
 int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, CMapCylinder*, Vec*, unsigned long);
 void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
 int GetWait__4CMesFv(void*);
-int GetPadType__6JoyBusFi(void*, int);
 unsigned short GetButtonDown__4CPadFl(void*, long);
 int sprintf(char*, const char*, ...);
 }
@@ -2001,7 +2000,7 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         return;
     }
     case -0xEC: {
-        const int padType = GetPadType__6JoyBusFi(&Joybus, *object->m_localBase);
+        const int padType = Joybus.GetPadType(*object->m_localBase);
         runtime->push(object, (static_cast<unsigned int>(__cntlzw(0x40000 - padType)) >> 5) & 0xFF);
         outResult = 0;
         return;
@@ -3278,7 +3277,7 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         outResult = 0;
         return;
     case -0x42: {
-        const int padType = GetPadType__6JoyBusFi(&Joybus, *object->m_localBase);
+        const int padType = Joybus.GetPadType(*object->m_localBase);
         runtime->push(object, (0x40U - padType | padType - 0x40U) >> 31);
         outResult = 0;
         return;

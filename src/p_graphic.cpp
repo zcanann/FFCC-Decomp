@@ -22,7 +22,6 @@
 CGraphicPcs GraphicPcs;
 extern "C" double sin(double);
 extern "C" double cos(double);
-extern "C" int GetPadType__6JoyBusFi(void*, int);
 extern "C" void create__11CGraphicPcsFv(CGraphicPcs*);
 extern "C" void destroy__11CGraphicPcsFv(CGraphicPcs*);
 extern "C" void calc__11CGraphicPcsFv(CGraphicPcs*);
@@ -637,7 +636,7 @@ void CGraphicPcs::drawBar()
         padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad._448_4_)) & 0x20) >> 5);
         padState = *reinterpret_cast<int*>(reinterpret_cast<u8*>(&Pad) + padIndex * 0x54 + 60);
     }
-    const bool drawText = (padState != 0) && (GetPadType__6JoyBusFi(&Joybus, 0) != 0x40000);
+    const bool drawText = (padState != 0) && (Joybus.GetPadType(0) != 0x40000);
 
     GXColor backColor = s_debug_bar_color;
     GXBegin(GX_QUADS, GX_VTXFMT0, 4);

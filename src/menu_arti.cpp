@@ -3,6 +3,7 @@
 #include "ffcc/fontman.h"
 #include "ffcc/pad.h"
 #include "ffcc/game.h"
+#include "ffcc/gxfunc.h"
 #include "ffcc/sound.h"
 #include "ffcc/system.h"
 #include <string.h>
@@ -47,7 +48,6 @@ const char s_MenuOptionOffDe[] = "AUS";
 const char s_MenuOptionStereoDe[] = "STEREO";
 }
 
-extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 extern "C" void SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(CMenuPcs*, int);
 extern "C" void SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(CMenuPcs*, int);
 extern "C" void DrawRect__8CMenuPcsFUlfffffffff(CMenuPcs*, unsigned long, float, float, float, float, float, float, float, float, float);
@@ -310,7 +310,7 @@ void CMenuPcs::ArtiDraw()
 	bool hasSelectedArtifact = false;
 	int selectedArtifactId;
 
-	_GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(&MenuPcs, 0);
 
 	u32 scriptFood = Game.m_scriptFoodBase[0];

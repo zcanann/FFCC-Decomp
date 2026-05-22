@@ -1,6 +1,7 @@
 #include "ffcc/pppChangeTex.h"
 #include "ffcc/gobject.h"
 #include "ffcc/graphic.h"
+#include "ffcc/gxfunc.h"
 #include "ffcc/linkage.h"
 #include "ffcc/pppPart.h"
 extern "C" {
@@ -116,8 +117,6 @@ static void ChangeTex_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int
 static void ChangeTex_AfterDrawMeshCallback(CChara::CModel*, void*, void*, int, float (*)[4]);
 
 extern "C" {
-		int GetTexture__8CMapMeshFP12CMaterialSetRi(CMapMesh* mapMesh, CMaterialSet* materialSet, int& textureIndex);
-		void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int stage, int rasSel, int texSel);
 		void SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(void*, void*, unsigned int, int, int);
 
 	void _WaitDrawDone__8CGraphicFPci(CGraphic* graphic, const char* file, int line);
@@ -147,9 +146,8 @@ void pppRenderChangeTex(pppChangeTex*, pppChangeTexUnkB* step, pppChangeTexUnkC*
 		_pppEnvSt* env = pppEnvStPtr;
 		CMapMesh* mapMesh = env->m_mapMeshPtr[step->m_dataValIndex];
 		textureIndex = 0;
-		GetTexture__8CMapMeshFP12CMaterialSetRi(
-		    mapMesh, env->m_materialSetPtr, textureIndex);
-		_GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
+		mapMesh->GetTexture(env->m_materialSetPtr, textureIndex);
+		_GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
 		pppInitBlendMode();
 	}
 }

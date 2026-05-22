@@ -40,16 +40,8 @@
 #include <dolphin/os/OSRtc.h>
 
 extern "C" {
-void createLoad__8CPartPcsFv(void*);
-void pppDeleteAll__8CPartMngFv(void*);
-void pppDestroyAll__8CPartMngFv(void*);
-int pppGetIfDt__8CPartMngFs(void*, short);
-void pppEndPart__8CPartMngFi(void*, int);
 int sprintf(char*, const char*, ...);
-void Draw__5CWindFv(void*);
 int rand(void);
-void ResetNewGame__13CFlatRuntime2Fv(void*);
-void InitFurTexBuffer__6CCharaFv(void*);
 }
 
 const float FLOAT_8032f688 = 1.0E+10;
@@ -336,7 +328,7 @@ void CGame::LoadLogoWaitingData()
 	if (m_assetsLoadedFlag == 0) {
 		SoundPcs.createLoad();
 		CharaPcs.createLoad();
-		createLoad__8CPartPcsFv(&PartPcs);
+		PartPcs.createLoad();
 		m_assetsLoadedFlag = 1;
 		if ((u32)System.m_execParam < 3) {
 			return;
@@ -562,8 +554,8 @@ void CGame::InitNewGame()
     *reinterpret_cast<unsigned int*>(&game->m_gameWork.m_scriptSysVal0) = 1;
     game->m_gameWork.m_chaliceElement = 1;
     strcpy(game->m_gameWork.m_townName, game->m_gameWork.m_languageId == 3 ? DAT_8032f6a4 : DAT_8032f6ac);
-    ResetNewGame__13CFlatRuntime2Fv(CFlat);
-    InitFurTexBuffer__6CCharaFv(&Chara);
+    gCFlatRuntime2.ResetNewGame();
+    Chara.InitFurTexBuffer();
 }
 
 /*
@@ -749,7 +741,7 @@ void CGame::CheckScriptChange()
         if (m_assetsLoadedFlag == 0) {
             SoundPcs.createLoad();
             CharaPcs.createLoad();
-            createLoad__8CPartPcsFv(&PartPcs);
+            PartPcs.createLoad();
             m_assetsLoadedFlag = 1;
 
             if ((u32)System.m_execParam > 2) {
@@ -774,8 +766,8 @@ void CGame::CheckScriptChange()
         *reinterpret_cast<unsigned int*>(&game->m_gameWork.m_scriptSysVal0) = 1;
         game->m_gameWork.m_chaliceElement = 1;
         strcpy(game->m_gameWork.m_townName, game->m_gameWork.m_languageId == 3 ? DAT_8032f6a4 : DAT_8032f6ac);
-        ResetNewGame__13CFlatRuntime2Fv(CFlat);
-        InitFurTexBuffer__6CCharaFv(&Chara);
+        gCFlatRuntime2.ResetNewGame();
+        Chara.InitFurTexBuffer();
         m_nextScript.m_flags = 0;
     }
 
@@ -836,8 +828,8 @@ void CGame::ChangeMap(int mapId, int mapVariant, int param4, int param5)
  */
 void CGame::ScriptChanging(char*)
 {
-	pppDeleteAll__8CPartMngFv(&PartMng);
-	pppDestroyAll__8CPartMngFv(&PartMng);
+	PartMng.pppDeleteAll();
+	PartMng.pppDestroyAll();
 }
 
 /*
@@ -1156,22 +1148,22 @@ void CGame::SaveScript(char* scriptData)
 void CGame::ParticleFrameCallback(int effectIndex, int scriptLine, int scriptStep, int callbackType, int graphFrame, Vec*)
 {
 	char* callbackFmtBase = const_cast<char*>(s_gameAssetNameBlock_801D5FC0);
-	int ifData = pppGetIfDt__8CPartMngFs(&PartMng, (short)effectIndex);
-	*(u8*)(ifData + 7) |= 1 << callbackType;
+	PPPIFPARAM* ifData = PartMng.pppGetIfDt(static_cast<short>(effectIndex));
+	ifData->m_hitFlags |= 1 << callbackType;
 
 	if (callbackType == 0) {
 		if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
 			System.Printf(callbackFmtBase + kParticleCallbackType0Fmt, scriptLine, scriptStep, effectIndex, graphFrame);
 		}
 	} else if (callbackType == 1) {
-		*(u8*)(ifData + 7) &= ~2;
-		pppEndPart__8CPartMngFi(&PartMng, effectIndex);
+		ifData->m_hitFlags &= ~2;
+		PartMng.pppEndPart(effectIndex);
 
 		if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
 			System.Printf(callbackFmtBase + kParticleCallbackType1Fmt, scriptLine, scriptStep, effectIndex, graphFrame);
 		}
 	} else if (callbackType == 3) {
-		pppEndPart__8CPartMngFi(&PartMng, effectIndex);
+		PartMng.pppEndPart(effectIndex);
 
 		if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
 			System.Printf(callbackFmtBase + kParticleCallbackType3Fmt, scriptLine, scriptStep, effectIndex, graphFrame);

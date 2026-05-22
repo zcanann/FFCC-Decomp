@@ -48,15 +48,10 @@ public:
     void Frame();
     void Draw();
     void Calc(Vec*, const Vec*, int);
-    WindObject* searchFreeObj();
-    WindObject* getObj(int);
     int AddAmbient(float, float);
     int AddDiffuse(const Vec*, float, float, float);
     int AddSphere(const Vec*, float, float, int);
     void ChangePower(int, float);
-    WindGrassObject* searchFreeGrass();
-    WindGrassObject* getGrass(int);
-    int AddGrass(const Vec*);
 
 private:
     WindObject m_objects[32];

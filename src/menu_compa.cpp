@@ -38,15 +38,15 @@ extern "C" const float FLOAT_8033303C;
 extern "C" const char s_pcts_pctd_family_cnt_error_pctd_801DEDC8[] = "%s(%d):family cnt error!!(%d)\n";
 extern "C" const char s_menu_compa_cpp_801DEDE8[] = "menu_compa.cpp";
 
-extern "C" const char lbl_803334A8[] = "MONO";
-extern "C" const char lbl_803334B0[] = "Normal";
-extern "C" const char lbl_803334B8[] = "Forza";
-extern "C" const char lbl_803334C0[] = "Difesa";
-extern "C" const char lbl_803334C8[] = "Sonoro";
-extern "C" const char lbl_803334D0[] = "Musica";
-extern "C" const char lbl_803334D8[] = "Mono";
-extern "C" const char lbl_803334E0[] = "Contr.";
-extern "C" const char lbl_803334E8[] = "Norm.";
+extern "C" const char s_MenuOptionMonoUpper_803334A8[] = "MONO";
+extern "C" const char s_MenuOptionNormalIt_803334B0[] = "Normal";
+extern "C" const char s_MenuOptionForza_803334B8[] = "Forza";
+extern "C" const char s_MenuOptionDifesa_803334C0[] = "Difesa";
+extern "C" const char s_MenuOptionSonoro_803334C8[] = "Sonoro";
+extern "C" const char s_MenuOptionMusica_803334D0[] = "Musica";
+extern "C" const char s_MenuOptionMonoIt_803334D8[] = "Mono";
+extern "C" const char s_MenuOptionContr_803334E0[] = "Contr.";
+extern "C" const char s_MenuOptionNorm_803334E8[] = "Norm.";
 
 struct CompaFlatTableEntry
 {

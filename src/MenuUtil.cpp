@@ -120,15 +120,15 @@ extern char s_MenuOptionMusicDe[];
 extern char s_MenuOptionOnDe[];
 extern char s_MenuOptionOffDe[];
 extern char s_MenuOptionStereoDe[];
-extern char lbl_803334A8[];
-extern char lbl_803334B0[];
-extern char lbl_803334B8[];
-extern char lbl_803334C0[];
-extern char lbl_803334C8[];
-extern char lbl_803334D0[];
-extern char lbl_803334D8[];
-extern char lbl_803334E0[];
-extern char lbl_803334E8[];
+extern char s_MenuOptionMonoUpper_803334A8[];
+extern char s_MenuOptionNormalIt_803334B0[];
+extern char s_MenuOptionForza_803334B8[];
+extern char s_MenuOptionDifesa_803334C0[];
+extern char s_MenuOptionSonoro_803334C8[];
+extern char s_MenuOptionMusica_803334D0[];
+extern char s_MenuOptionMonoIt_803334D8[];
+extern char s_MenuOptionContr_803334E0[];
+extern char s_MenuOptionNorm_803334E8[];
 extern char s_Force_803334F0[];
 extern char s_Musique_803334F8[];
 extern char s_Active_80333500[];
@@ -155,20 +155,20 @@ extern "C" char* g_strMenuUtilMes[] = {
 	s_MenuOptionMusicDe, lbl_801E3214, s_Farbeinstellung_801E3224,
 	s_Erkennungskreisel_des_Charakters_AN_AUS_schalten_801E3234,
 	s_Tonausgabe_auf_Stereo_oder_Mono_schalten_801E3268, lbl_801E3294, lbl_801E32B4,
-	lbl_801E32DC, s_MenuOptionOnDe, s_MenuOptionOffDe, s_MenuOptionStereoDe, lbl_803334A8,
-	s_MenuOptionMin, s_MenuOptionMax, s_Erweitert_801E330C, lbl_803334B0,
-	lbl_803334B8, lbl_803334C0, s_Indicatori_di_posizione_801E3318, lbl_803334C8,
-	lbl_803334D0, s_Effetti_sonori_801E3330, s_Bilanc_colore_GBA_801E3340,
+	lbl_801E32DC, s_MenuOptionOnDe, s_MenuOptionOffDe, s_MenuOptionStereoDe, s_MenuOptionMonoUpper_803334A8,
+	s_MenuOptionMin, s_MenuOptionMax, s_Erweitert_801E330C, s_MenuOptionNormalIt_803334B0,
+	s_MenuOptionForza_803334B8, s_MenuOptionDifesa_803334C0, s_Indicatori_di_posizione_801E3318, s_MenuOptionSonoro_803334C8,
+	s_MenuOptionMusica_803334D0, s_Effetti_sonori_801E3330, s_Bilanc_colore_GBA_801E3340,
 	s_Attiva_o_disattiva_l_indicatore_ai_piedi_dei_personaggi_801E3354,
 	s_Scegli_tra_sonoro_mono_o_stereo_801E3390, s_Regola_il_volume_della_musica_801E33B4,
 	s_Regola_il_volume_degli_effetti_sonori_801E33D4, s_Regola_il_colore_sul_Game_Boy_Advance_801E33FC,
-	s_MenuOptionOn, s_MenuOptionOff, s_MenuOptionStereo, lbl_803334D8, s_MenuOptionMin, s_MenuOptionMax,
-	lbl_803334E0, lbl_803334E8,
+	s_MenuOptionOn, s_MenuOptionOff, s_MenuOptionStereo, s_MenuOptionMonoIt_803334D8, s_MenuOptionMin, s_MenuOptionMax,
+	s_MenuOptionContr_803334E0, s_MenuOptionNorm_803334E8,
 	s_Force_803334F0, lbl_801E3424, s_Sceau_de_position_801E3430, s_Signal_sonore_801E3444,
 	s_Musique_803334F8, s_Effets_sonores_801E3454, s_Affichage_du_GBA_801E3464,
 	s_Affichage_du_sceau_de_position_aux_pieds_des_personnages_801E3478,
 	lbl_801E34B4, lbl_801E34E0, lbl_801E3500, lbl_801E3524, s_Active_80333500,
-	lbl_801E355C, s_Stereo_80333508, lbl_803334D8, s_MenuOptionMin, s_MenuOptionMax,
+	lbl_801E355C, s_Stereo_80333508, s_MenuOptionMonoIt_803334D8, s_MenuOptionMin, s_MenuOptionMax,
 	lbl_801E3568, s_Standard_801E31E8,
 	s_Fuerza_80333510, s_Defensa_80333518, lbl_801E3574, s_Tipo_de_sonido_801E3584,
 	s_Musica_80333520, s_Efectos_de_sonido_801E3594, s_Color_de_la_GBA_801E35A8,

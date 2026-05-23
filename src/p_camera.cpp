@@ -1240,8 +1240,7 @@ void CCameraPcs::calcMap()
                 *reinterpret_cast<float*>(self + 0xE8) += moveDelta.z;
                 break;
             }
-            CalcHitSlide__7CMapObjFP3Vecf(
-                *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(&MapMng) + 0x22A88), &moveDelta);
+            CalcHitSlide__7CMapObjFP3Vecf(MapMng.m_hitMapObj, &moveDelta);
         }
     }
 

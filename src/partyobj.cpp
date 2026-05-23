@@ -234,7 +234,7 @@ static bool isGhostPartyTargetMode(CGPartyObj* self)
 
 static CMapObj* getMapHitObject()
 {
-	return *reinterpret_cast<CMapObj**>(reinterpret_cast<unsigned char*>(&MapMng) + 0x22A88);
+	return MapMng.m_hitMapObj;
 }
 
 /*

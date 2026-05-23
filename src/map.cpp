@@ -45,7 +45,6 @@ extern "C" void __ct__21CPtrArray_P8CMapAnim_Fv(void*);
 extern "C" void __ct__27CPtrArray_P13CMapAnimKeyDt_Fv(void*);
 extern "C" void __ct__24CPtrArray_P10CMapShadow_Fv(void*);
 extern "C" void __ct__29CPtrArray_P15CMapLightHolder_Fv(void*);
-extern "C" void* PTR_PTR_s_CMapTexAnimSet_801e896c;
 extern const float kMapViewScaleXPrimary = 0.73898232f;
 extern const float kMapViewScaleY = 0.88677877f;
 extern const float kMapViewScaleZ = 1.0f;
@@ -190,20 +189,20 @@ CMapTexAnimSet::CMapTexAnimSet()
  */
 CMapTexAnimSet::~CMapTexAnimSet()
 {
-    unsigned char* const p = reinterpret_cast<unsigned char*>(this);
-    const short count = *reinterpret_cast<short*>(p + 8);
+    struct RefCounted {
+        void* vtable;
+        int refCount;
+    };
 
-    *reinterpret_cast<void**>(p) = &PTR_PTR_s_CMapTexAnimSet_801e896c;
-
-    for (int i = 0; i < count; i++) {
-        int* entry = *reinterpret_cast<int**>(p + 0xC + (i * 4));
+    for (int i = 0; i < m_count; i++) {
+        CMapTexAnim* entry = m_anims[i];
         if (entry != 0) {
-            const int refCount = entry[1];
-            entry[1] = refCount - 1;
-            if ((refCount - 1) == 0 && entry != 0) {
-                (*reinterpret_cast<void (**)(int*, int)>(*entry + 8))(entry, 1);
+            RefCounted* ref = reinterpret_cast<RefCounted*>(entry);
+            ref->refCount--;
+            if (ref->refCount == 0) {
+                delete entry;
             }
-            *reinterpret_cast<int**>(p + 0xC + (i * 4)) = 0;
+            m_anims[i] = 0;
         }
     }
 

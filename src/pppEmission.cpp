@@ -8,6 +8,7 @@
 #include "ffcc/math.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/pppPart.h"
+#include "ffcc/pppYmEnv.h"
 
 #include "dolphin/gx.h"
 #include "dolphin/os/OSCache.h"
@@ -30,13 +31,6 @@ static inline MtxPtr CameraMatrix() { return reinterpret_cast<MtxPtr>(reinterpre
 
 void pppInitBlendMode(void);
 void pppSetBlendMode(unsigned char);
-
-extern "C" {
-void* GetCharaHandlePtr__FP8CGObjectl(void* obj, long index);
-int GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void* handle);
-
-void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(void*, long, float&, float&, float&, float, float&, float&);
-}
 
 struct EmissionDisplayList {
     u32 m_size;
@@ -152,8 +146,8 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, pppEm
     EmissionState* state = (EmissionState*)((u8*)pppEmission_ + 0x80 + serializedDataOffsets[2]);
     u8* dataSet = (u8*)pppEmission_ + 0x80 + serializedDataOffsets[1];
 
-    void* handle = GetCharaHandlePtr__FP8CGObjectl(pppMngStPtr->m_owner, 0);
-    EmissionModelView* model = (EmissionModelView*)GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
+    CCharaPcs::CHandle* handle = GetCharaHandlePtr(reinterpret_cast<CGObject*>(pppMngStPtr->m_owner), 0);
+    EmissionModelView* model = reinterpret_cast<EmissionModelView*>(GetCharaModelPtr(handle));
     model->m_state = state;
     model->m_step = param_2;
     model->m_drawMeshDlCallback = Emission_DrawMeshDLCallback;
@@ -165,8 +159,8 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, pppEm
     state->m_colorB = dataSet[0xA];
     state->m_colorA = dataSet[0xB];
 
-    CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
-        pppEmission_, param_2->m_graphId,
+    CalcGraphValue(
+        reinterpret_cast<_pppPObject*>(pppEmission_), param_2->m_graphId,
         state->m_scale0, state->m_scale1, state->m_scale2,
         param_2->m_stepValue, param_2->m_arg3, *(float*)param_2->m_payload);
 
@@ -266,8 +260,8 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, pppEm
 void pppDestructEmission(pppEmission* pppEmission_, pppEmissionUnkC* param_2) {
     float baseScale;
     int* state = (int*)((u8*)pppEmission_ + 0x80 + param_2->m_serializedDataOffsets[2]);
-    void* handle = GetCharaHandlePtr__FP8CGObjectl(pppMngStPtr->m_owner, 0);
-    EmissionModelView* model = (EmissionModelView*)GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
+    CCharaPcs::CHandle* handle = GetCharaHandlePtr(reinterpret_cast<CGObject*>(pppMngStPtr->m_owner), 0);
+    EmissionModelView* model = reinterpret_cast<EmissionModelView*>(GetCharaModelPtr(handle));
 
     model->m_state = 0;
     model->m_step = 0;
@@ -343,8 +337,8 @@ void pppConstructEmission(pppEmission* pppEmission_, pppEmissionUnkC* param_2) {
     state->field10 = baseScale;
     state->fieldC = baseScale;
 
-    void* handle = GetCharaHandlePtr__FP8CGObjectl(pppMngStPtr->m_owner, 0);
-    EmissionModelView* model = (EmissionModelView*)GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
+    CCharaPcs::CHandle* handle = GetCharaHandlePtr(reinterpret_cast<CGObject*>(pppMngStPtr->m_owner), 0);
+    EmissionModelView* model = reinterpret_cast<EmissionModelView*>(GetCharaModelPtr(handle));
     model->m_drawMeshDlCallback = Emission_DrawMeshDLCallback;
     model->m_afterDrawMeshCallback = Emission_AfterDrawMeshCallback;
     state->field0 = 0;

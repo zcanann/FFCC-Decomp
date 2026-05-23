@@ -68,7 +68,6 @@ extern "C" const double kCharaSharedSignedIntBias = 4503601774854144.0;
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
-extern "C" void* createTextureSet__9CCharaPcsFPvi(void*, void*, int);
 extern "C" float FLOAT_80330BEC;
 extern "C" float FLOAT_80330BF0;
 extern "C" double fmod(double, double);
@@ -467,8 +466,7 @@ void CCharaPcs::calcViewer()
                 ReleaseShared(self->m_viewerTextureSet[0]);
                 File.Read(fileHandle);
                 File.SyncCompleted(fileHandle);
-                self->m_viewerTextureSet[0] =
-                    reinterpret_cast<CTextureSet*>(createTextureSet__9CCharaPcsFPvi(self, File.m_readBuffer, 0));
+                self->m_viewerTextureSet[0] = createTextureSet(File.m_readBuffer, 0);
                 File.Close(fileHandle);
             }
             self->m_viewerLoadTexture = 0;
@@ -841,8 +839,7 @@ void CCharaPcs::createViewer()
     if (fileHandle != 0) {
         File.Read(fileHandle);
         File.SyncCompleted(fileHandle);
-        self->m_viewerBackTextureSet =
-            reinterpret_cast<CTextureSet*>(createTextureSet__9CCharaPcsFPvi(self, File.m_readBuffer, 0));
+        self->m_viewerBackTextureSet = createTextureSet(File.m_readBuffer, 0);
         File.Close(fileHandle);
     }
 

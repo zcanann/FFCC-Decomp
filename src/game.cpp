@@ -278,7 +278,7 @@ void CGame::Init()
     memset(m_currentScriptName, 0, sizeof(m_currentScriptName));
     memset(m_startScriptName, 0, sizeof(m_startScriptName));
     m_frameCounterEnable = 1;
-    reinterpret_cast<CFlatRuntime*>(CFlat)->Init();
+    gCFlatRuntime().Init();
     unkFloat_0xca10 = FLOAT_8032f694;
 }
 
@@ -293,7 +293,7 @@ void CGame::Init()
  */
 void CGame::Quit()
 {
-	reinterpret_cast<CFlatRuntime*>(CFlat)->Quit();
+	gCFlatRuntime().Quit();
 
 	if (m_debugStage != 0) {
 		Memory.DestroyStage(m_debugStage);
@@ -1000,9 +1000,9 @@ void CGame::Calc()
     }
 
     Wind.Frame();
-    reinterpret_cast<CFlatRuntime2*>(CFlat)->Calc();
-    reinterpret_cast<CFlatRuntime*>(CFlat)->ResetPerformance();
-    reinterpret_cast<CFlatRuntime2*>(CFlat)->Frame(1, 0);
+    CFlatRuntime2Storage().Calc();
+    gCFlatRuntime().ResetPerformance();
+    CFlatRuntime2Storage().Frame(1, 0);
 
     if ((m_currentMapId == 0x21) && ((mapObjIdx = MapMng.GetMapObjIdx(0)) >= 0)) {
             if (!BOOL_8032ec44) {
@@ -1027,7 +1027,7 @@ void CGame::Calc()
  */
 void CGame::Calc2()
 {
-	reinterpret_cast<CFlatRuntime2*>(CFlat)->Frame(0, 1);
+	CFlatRuntime2Storage().Frame(0, 1);
 }
 
 /*
@@ -1042,7 +1042,7 @@ void CGame::Calc2()
 void CGame::Calc3()
 { 
 	CGPartyObj::CheckMenu();
-	reinterpret_cast<CFlatRuntime*>(CFlat)->AfterFrame(0);
+	gCFlatRuntime().AfterFrame(0);
 }
 
 /*
@@ -1187,7 +1187,7 @@ void CGame::HitParticleBG(int effectIndex, int kind, int nodeIndex, Vec* pos, PP
 	*(float*)&stack[5].m_word = pos->z;
 	stack[6].m_word = (u32)hitParam->m_particleIndex;
 	stack[7].m_word = (u32)hitParam->m_classId;
-	reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(0, 1, 1, 8, stack, 0);
+	gCFlatRuntime().SystemCall(0, 1, 1, 8, stack, 0);
 }
 
 /*
@@ -1201,8 +1201,8 @@ void CGame::HitParticleBG(int effectIndex, int kind, int nodeIndex, Vec* pos, PP
  */
 void CGame::Draw3()
 {
-	reinterpret_cast<CFlatRuntime2*>(CFlat)->Frame(0, 2);
-	reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(0, 1, 5, 0, 0, 0);
+	CFlatRuntime2Storage().Frame(0, 2);
+	gCFlatRuntime().SystemCall(0, 1, 5, 0, 0, 0);
 }
 
 /*
@@ -1216,7 +1216,7 @@ void CGame::Draw3()
  */
 void CGame::Draw2()
 {
-	reinterpret_cast<CFlatRuntime2*>(CFlat)->Draw();
+	CFlatRuntime2Storage().Draw();
 	Wind.Draw();
 }
 
@@ -1231,7 +1231,7 @@ void CGame::Draw2()
  */
 void CGame::Draw()
 {
-	reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(0, 1, 6, 0, 0, 0);
+	gCFlatRuntime().SystemCall(0, 1, 6, 0, 0, 0);
 }
 
 /*
@@ -1336,7 +1336,7 @@ int CGame::GetParticleSpecialInfo(PPPIFPARAM& ifParam, int& particleIndex, int& 
         return 0;
     }
 
-    runtime = reinterpret_cast<CFlatRuntime2*>(CFlat);
+    runtime = &CFlatRuntime2Storage();
     baseObj = reinterpret_cast<CGBaseObj*>(runtime->intToClass((int)ifParam.m_classId));
     particleIndex = ifParam.m_particleIndex;
     if (particleIndex == 0) {

@@ -51,6 +51,7 @@ extern u32 CFlatFlags;
 extern Mtx gFlatPosMtx;
 class CFlatRuntime2;
 extern CFlatRuntime2& gCFlatRuntime2;
+class CFlatRuntime;
 class CChara;
 extern CChara& gChara;
 
@@ -80,6 +81,16 @@ enum CFlatEventFlagByte {
 static inline u32& CFlatRuntimeDebugFlags()
 {
     return *reinterpret_cast<u32*>(CFlat + 0x129C);
+}
+
+static inline CFlatRuntime& gCFlatRuntime()
+{
+    return *reinterpret_cast<CFlatRuntime*>(CFlat);
+}
+
+static inline CFlatRuntime2& CFlatRuntime2Storage()
+{
+    return *reinterpret_cast<CFlatRuntime2*>(CFlat);
 }
 
 static inline u32& CFlatEventFlags()

@@ -672,10 +672,10 @@ void CMenuPcs::GetOptionData()
 	unsigned int soundModeClz = static_cast<unsigned int>(__cntlzw(soundMode));
 	stereoMode = static_cast<signed char>(static_cast<unsigned int>(__cntlzw(soundModeClz >> 5)) >> 5);
 
-	int value = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Sound) + 0x22B0);
+	int value = Sound.GetBgmMasterVolume();
 	bgmVolume = static_cast<signed char>(value / 10);
 
-	value = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Sound) + 0x22B4);
+	value = Sound.GetSeMasterVolume();
 	seVolume = static_cast<signed char>(value / 10);
 
 	unsigned int flag = Game.m_gameWork.m_spModeFlags[0];

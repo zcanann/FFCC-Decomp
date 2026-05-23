@@ -578,7 +578,7 @@ void CGObject::move()
                 buttons |= buttonsRepeat;
             }
 
-            u32 miniGameFlags = *reinterpret_cast<u32*>(reinterpret_cast<u8*>(&MiniGamePcs) + 0x6484);
+            u32 miniGameFlags = MiniGamePcs.m_flags;
             if ((miniGameFlags & 0x100) != 0) {
                 float stickX = sZeroFloat;
                 float stickY = sZeroFloat;
@@ -620,7 +620,7 @@ void CGObject::move()
 
             if (Game.m_currentMapId == 0x21) {
                 Mtx cameraWorldMtx;
-                PSMTXCopy(reinterpret_cast<MtxPtr>(reinterpret_cast<u8*>(&CameraPcs) + 0x64), cameraWorldMtx);
+                PSMTXCopy(CameraPcs.m_cameraWorldMtx, cameraWorldMtx);
                 moveVec.x = -moveVec.x;
                 moveVec.z = -moveVec.z;
                 moveVec.y = sZeroFloat;
@@ -651,7 +651,7 @@ void CGObject::move()
 
         if (!movingWithScript) {
             double speed = static_cast<double>(m_moveBaseSpeed);
-            if (hasStickInput && ((*reinterpret_cast<u32*>(reinterpret_cast<u8*>(&MiniGamePcs) + 0x6484) & 0x200) != 0)) {
+            if (hasStickInput && ((MiniGamePcs.m_flags & 0x200) != 0)) {
                 const double mag = static_cast<double>(PSVECMag(&moveVec));
                 speed *= static_cast<double>(sAnalogSpeedScale) * mag;
             }
@@ -662,7 +662,7 @@ void CGObject::move()
             if ((static_cast<int>(static_cast<u32>(weaponFlagsHi) << 0x18) < 0)
                 && (static_cast<int>((static_cast<u32>(weaponFlagsHi) << 0x19) | (weaponFlagsHi >> 7)) < 0)
                 && (m_ownerType == 0)) {
-                if ((*reinterpret_cast<u32*>(reinterpret_cast<u8*>(&MiniGamePcs) + 0x6484) & 2) != 0) {
+                if ((MiniGamePcs.m_flags & 2) != 0) {
                     speed *= static_cast<double>(sAnalogSpeedScale);
                 }
 
@@ -1040,10 +1040,10 @@ void CGObject::bgNormalCollision()
     }
 
     const unsigned char mapGroup = gMapHitFace->m_groupIndex;
-    u8* mapGroupData = reinterpret_cast<u8*>(&MapMng) + 0x214E8 + (mapGroup * 0x14);
-    if ((*reinterpret_cast<u32*>(mapGroupData) & 0x20) == 0) {
+    CMapIdGrp* mapGroupData = MapMng.GetMapIdGrpArray() + mapGroup;
+    if ((mapGroupData->m_mask & 0x20) == 0) {
         m_stateFlags0 = (m_stateFlags0 & 0x7F) | 0x80;
-        m_radiusCtrl.x = *reinterpret_cast<float*>(mapGroupData);
+        m_radiusCtrl.x = *reinterpret_cast<float*>(&mapGroupData->m_mask);
         if (mapGroup != 0) {
             m_lastBgGroup = static_cast<short>(mapGroup);
         }
@@ -1161,10 +1161,10 @@ void CGObject::bgWorldCollision()
     m_groundHitOffset.z = newOffset.z;
 
     const unsigned char mapGroup = gMapHitFace->m_groupIndex;
-    u8* mapGroupData = reinterpret_cast<u8*>(&MapMng) + 0x214E8 + (mapGroup * 0x14);
-    if ((*reinterpret_cast<u32*>(mapGroupData) & 0x20) == 0) {
+    CMapIdGrp* mapGroupData = MapMng.GetMapIdGrpArray() + mapGroup;
+    if ((mapGroupData->m_mask & 0x20) == 0) {
         m_stateFlags0 = (m_stateFlags0 & 0x7F) | 0x80;
-        m_radiusCtrl.x = *reinterpret_cast<float*>(mapGroupData);
+        m_radiusCtrl.x = *reinterpret_cast<float*>(&mapGroupData->m_mask);
         if (mapGroup != 0) {
             m_lastBgGroup = static_cast<short>(mapGroup);
         }
@@ -1395,7 +1395,7 @@ void CGObject::hit()
  */
 void CGObject::update()
 {
-    const unsigned int miniGameFlags = *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&MiniGamePcs) + 0x6484);
+    const unsigned int miniGameFlags = MiniGamePcs.m_flags;
     const bool miniGameModelPass = (miniGameFlags & 0x8000) != 0;
     unsigned char& weaponFlagsLo = *reinterpret_cast<unsigned char*>(&m_weaponNodeFlags);
     unsigned char& weaponFlagsHi = *(reinterpret_cast<unsigned char*>(&m_weaponNodeFlags) + 1);
@@ -1494,7 +1494,7 @@ void CGObject::update()
             m_radiusCtrl.y *= 0.8f;
             rotY += m_radiusCtrl.z;
         } else if (m_worldParamA == 0x24 || m_worldParamB == 0x125) {
-            const float cameraYaw = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xF8);
+            const float cameraYaw = CameraPcs.m_yaw;
             rotY = sQuarterTurn - cameraYaw;
             rotY += cosf(sBgAttrNormal * m_radiusCtrl.y);
             modelPos.y += sAnimFrameOffset + sinf(m_radiusCtrl.y);

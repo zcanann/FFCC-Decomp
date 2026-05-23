@@ -1,9 +1,11 @@
 #include "ffcc/p_chara.h"
 #include "ffcc/chunkfile.h"
 #include "ffcc/color.h"
+#include "ffcc/game.h"
 #include "ffcc/graphic.h"
 #include "ffcc/gxfunc.h"
 #include "ffcc/linkage.h"
+#include "ffcc/map.h"
 #include "ffcc/memory.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/partMng.h"
@@ -347,37 +349,32 @@ static inline void*& CameraDataAt(CCharaPcs* self, int index)
 
 static inline CCharaPcs::CHandle*& HandleListHead(CCharaPcs* self)
 {
-    return *reinterpret_cast<CCharaPcs::CHandle**>(Ptr(self, 0x4C));
+    return self->m_handleList;
 }
 
-static inline unsigned int& FreeMergeMask(CCharaPcs* self)
+static inline u32& FreeMergeMask(CCharaPcs* self)
 {
-    return *reinterpret_cast<unsigned int*>(Ptr(self, 0x718));
+    return self->m_noFreeMergeMask;
 }
 
 static inline int& LoadStageMode(CCharaPcs* self)
 {
-    return *reinterpret_cast<int*>(Ptr(self, 0xE4));
+    return self->m_charaAllocStage;
 }
 
-static inline unsigned int& LoadStreamCursor(CCharaPcs* self)
+static inline u32& LoadStreamCursor(CCharaPcs* self)
 {
-    return *reinterpret_cast<unsigned int*>(Ptr(self, 0x714));
+    return self->m_loadStreamCursor;
 }
 
-static inline int& CurrentSceneId()
+static inline u32 CurrentSceneId()
 {
-    return *reinterpret_cast<int*>(Ptr(&Game, 0xC7F0));
+    return Game.m_currentSceneId;
 }
 
-static inline unsigned int& CharaAmemSize()
+static inline u32& CharaAmemSize()
 {
-    return *reinterpret_cast<unsigned int*>(Ptr(&Chara, 0x205C));
-}
-
-static inline CMemory::CStage*& CharaAmemStage()
-{
-    return *reinterpret_cast<CMemory::CStage**>(Ptr(&Chara, 0x2058));
+    return Chara.AmemSize();
 }
 
 static inline void SetupBaseCharaLights(CCharaPcs* self)
@@ -386,14 +383,12 @@ static inline void SetupBaseCharaLights(CCharaPcs* self)
     _GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
     _GXSetTevSwapModeTable(GX_TEV_SWAP2, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
     Graphic.SetFog(1, 0);
-    LightPcs.SetAmbient(*reinterpret_cast<_GXColor*>(Ptr(self, 0xE8)));
+    LightPcs.SetAmbient(self->m_viewerAmbientColor[0]);
     LightPcs.SetNumDiffuse(3);
 
     for (unsigned long lightIndex = 0; lightIndex < 3; lightIndex++) {
-        LightPcs.SetDiffuse(
-            lightIndex, *reinterpret_cast<_GXColor*>(Ptr(self, 0xF0 + static_cast<unsigned int>(lightIndex) * 4)),
-            reinterpret_cast<Vec*>(Ptr(self, 0x108 + static_cast<unsigned int>(lightIndex) * 12)),
-            static_cast<int>(lightIndex == 2));
+        LightPcs.SetDiffuse(lightIndex, self->m_viewerDiffuseColor[0][lightIndex],
+                            &self->m_viewerDiffusePos[lightIndex], static_cast<int>(lightIndex == 2));
     }
 }
 
@@ -646,9 +641,9 @@ CMemory::CStage* GET_CHARA_ALLOC_STAGE_S(int stageIndex, CMemory::CStage* stage)
 {
     switch (stageIndex) {
     case 1:
-        return *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(&MapMng));
+        return MapMng.m_stage;
     case 2:
-        return *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(&PartPcs) + 0x1c);
+        return PartPcs.m_usbStreamData.m_stageLoad;
     case 3:
         return PartMng.m_pppEnvSt.m_stagePtr;
     case 4:
@@ -698,36 +693,36 @@ CCharaPcs::~CCharaPcs()
  */
 void CCharaPcs::Init()
 {
-    StageAt(this, 0xC0) = Memory.CreateStage(0x38000, const_cast<char*>(s_CCharaPcs_stage), 0);
-    StageAt(this, 0xC4) = Memory.CreateStage(0x380000, const_cast<char*>(s_CCharaPcs_amem), 2);
-    StageAt(this, 0xC8) = Memory.CreateStage(0x70000, const_cast<char*>(s_CCharaPcs_amemw), 2);
-    CharaAmemStage() = StageAt(this, 0xC4);
+    m_stage = Memory.CreateStage(0x38000, const_cast<char*>(s_CCharaPcs_stage), 0);
+    m_amemStage = Memory.CreateStage(0x380000, const_cast<char*>(s_CCharaPcs_amem), 2);
+    m_amemWorkStage = Memory.CreateStage(0x70000, const_cast<char*>(s_CCharaPcs_amemw), 2);
+    Chara.SetAmemStage(m_amemStage);
 
-    LoadModelArray(this)->SetStage(StageAt(this, 0xC0));
+    LoadModelArray(this)->SetStage(m_stage);
     LoadModelArray(this)->SetDefaultSize(0x80);
     LoadModelArray(this)->SetGrow(0);
 
-    LoadAnimArray(this)->SetStage(StageAt(this, 0xC0));
+    LoadAnimArray(this)->SetStage(m_stage);
     LoadAnimArray(this)->SetDefaultSize(0x200);
     LoadAnimArray(this)->SetGrow(0);
 
-    LoadTextureArray(this)->SetStage(StageAt(this, 0xC0));
+    LoadTextureArray(this)->SetStage(m_stage);
     LoadTextureArray(this)->SetDefaultSize(0x100);
     LoadTextureArray(this)->SetGrow(0);
 
-    LoadPdtArray(this)->SetStage(StageAt(this, 0xC0));
+    LoadPdtArray(this)->SetStage(m_stage);
     LoadPdtArray(this)->SetDefaultSize(0x80);
     LoadPdtArray(this)->SetGrow(0);
 
     for (int i = 0; i < 2; i++) {
-        _GXColor& ambientColor = *reinterpret_cast<_GXColor*>(Ptr(this, 0xE8 + i * 4));
+        _GXColor& ambientColor = m_viewerAmbientColor[i];
         ambientColor.r = 0x3F;
         ambientColor.g = 0x3F;
         ambientColor.b = 0x3F;
         ambientColor.a = 0xFF;
 
         for (int lightIndex = 0; lightIndex < 3; lightIndex++) {
-            _GXColor& lightColor = *reinterpret_cast<_GXColor*>(Ptr(this, 0xF0 + i * 0x0C + lightIndex * 4));
+            _GXColor& lightColor = m_viewerDiffuseColor[i][lightIndex];
             const unsigned char intensity = static_cast<unsigned char>(lightIndex == 0 ? 0x3F : 0x00);
             lightColor.r = intensity;
             lightColor.g = intensity;
@@ -736,17 +731,16 @@ void CCharaPcs::Init()
         }
     }
 
-    reinterpret_cast<Vec*>(Ptr(this, 0x108))->x = 0.0f;
-    reinterpret_cast<Vec*>(Ptr(this, 0x108))->y = 0.0f;
-    reinterpret_cast<Vec*>(Ptr(this, 0x108))->z = 1.0f;
-    reinterpret_cast<Vec*>(Ptr(this, 0x114))->x = 0.0f;
-    reinterpret_cast<Vec*>(Ptr(this, 0x114))->y = 0.0f;
-    reinterpret_cast<Vec*>(Ptr(this, 0x114))->z = 1.0f;
-    reinterpret_cast<Vec*>(Ptr(this, 0x120))->x = 0.0f;
-    reinterpret_cast<Vec*>(Ptr(this, 0x120))->y = 0.0f;
-    reinterpret_cast<Vec*>(Ptr(this, 0x120))->z = 1.0f;
+    m_viewerDiffusePos[0].x = 0.0f;
+    m_viewerDiffusePos[0].y = 0.0f;
+    m_viewerDiffusePos[0].z = 1.0f;
+    m_viewerDiffusePos[1].x = 0.0f;
+    m_viewerDiffusePos[1].y = 0.0f;
+    m_viewerDiffusePos[1].z = 1.0f;
+    m_viewerDiffusePos[2].x = 0.0f;
+    m_viewerDiffusePos[2].y = 0.0f;
+    m_viewerDiffusePos[2].z = 1.0f;
 
-    unsigned char* fadeColor = reinterpret_cast<unsigned char*>(this);
     for (int i = 0; i < 5; i++) {
         CColor white(0xFF, 0xFF, 0xFF, 0xFF);
         CColor shade;
@@ -758,26 +752,25 @@ void CCharaPcs::Init()
         shade.color.a = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.a) * scale));
         CColor shadeCopy(shade);
 
-        fadeColor[0x12C] = shadeCopy.color.r;
-        fadeColor[0x12D] = shadeCopy.color.g;
-        fadeColor[0x12E] = shadeCopy.color.b;
-        fadeColor[0x12F] = shadeCopy.color.a;
-        fadeColor += 4;
+        m_viewerChoiceColor[i].color.r = shadeCopy.color.r;
+        m_viewerChoiceColor[i].color.g = shadeCopy.color.g;
+        m_viewerChoiceColor[i].color.b = shadeCopy.color.b;
+        m_viewerChoiceColor[i].color.a = shadeCopy.color.a;
     }
 
-    *reinterpret_cast<int*>(Ptr(this, 0xE4)) = 0;
-    *reinterpret_cast<int*>(Ptr(this, 0x24)) = 0;
+    m_charaAllocStage = 0;
+    m_overlapEnabled = 0;
     CColor baseColor(0x00, 0x00, 0x40, 0x40);
-    *reinterpret_cast<_GXColor*>(Ptr(this, 0x18C)) = baseColor.color;
+    m_texShadowColor = baseColor.color;
 
     CVector baseVec(0.0f, 10.0f, 0.0f);
     Vec* constructedVec = reinterpret_cast<Vec*>(&baseVec);
-    reinterpret_cast<Vec*>(Ptr(this, 0x17C))->x = constructedVec->x;
-    reinterpret_cast<Vec*>(Ptr(this, 0x17C))->y = constructedVec->y;
-    reinterpret_cast<Vec*>(Ptr(this, 0x17C))->z = constructedVec->z;
-    *reinterpret_cast<float*>(Ptr(this, 0x188)) = 120.0f;
-    *reinterpret_cast<int*>(Ptr(this, 0x44)) = 0x80;
-    *reinterpret_cast<int*>(Ptr(this, 0x48)) = 100;
+    m_texShadowPos.x = constructedVec->x;
+    m_texShadowPos.y = constructedVec->y;
+    m_texShadowPos.z = constructedVec->z;
+    m_texShadowRadius = 120.0f;
+    m_texShadowSize = 0x80;
+    m_texShadowDistance = 100;
 }
 
 /*
@@ -787,10 +780,10 @@ void CCharaPcs::Init()
  */
 void CCharaPcs::Quit()
 {
-    *reinterpret_cast<int*>(Ptr(&Chara, 0x205C)) = 0;
-    Memory.DestroyStage(*reinterpret_cast<CMemory::CStage**>(Ptr(this, 0xC8)));
-    Memory.DestroyStage(*reinterpret_cast<CMemory::CStage**>(Ptr(this, 0xC4)));
-    Memory.DestroyStage(*reinterpret_cast<CMemory::CStage**>(Ptr(this, 0xC0)));
+    CharaAmemSize() = 0;
+    Memory.DestroyStage(m_amemWorkStage);
+    Memory.DestroyStage(m_amemStage);
+    Memory.DestroyStage(m_stage);
 }
 
 /*
@@ -878,8 +871,7 @@ void CCharaPcs::create()
     bumpLight.m_offsetZ = FLOAT_80330288;
 
     gCharaPartWorkPtr = reinterpret_cast<u8*>(LightPcs.AddBump(
-        &bumpLight, static_cast<CLightPcs::TARGET>(0),
-        *reinterpret_cast<CMemory::CStage**>(Ptr(&Chara, 0x2058)), 4));
+        &bumpLight, static_cast<CLightPcs::TARGET>(0), Chara.GetMemoryStage(), 4));
     Chara.Create();
 }
 
@@ -894,10 +886,10 @@ void CCharaPcs::create()
  */
 void CCharaPcs::createLoad()
 {
-    *reinterpret_cast<int*>(Ptr(this, 0x714)) = 0;
-    *reinterpret_cast<int*>(Ptr(&Memory, 0x779c)) = 2;
+    m_loadStreamCursor = 0;
+    Memory.SetDefaultGroup(2);
     LoadMergeFile(0, 0x10000000, 1);
-    *reinterpret_cast<int*>(Ptr(&Memory, 0x779c)) = 0;
+    Memory.ResetDefaultGroup();
 }
 
 /*
@@ -915,9 +907,9 @@ void CCharaPcs::destroy()
     LightPcs.DestroyBumpLightAll(static_cast<CLightPcs::TARGET>(0));
     gCharaPartWorkPtr = 0;
 
-    if (*reinterpret_cast<CHandle**>(Ptr(this, 0x4C)) != 0) {
-        delete *reinterpret_cast<CHandle**>(Ptr(this, 0x4C));
-        *reinterpret_cast<void**>(Ptr(this, 0x4C)) = 0;
+    if (m_handleList != 0) {
+        delete m_handleList;
+        m_handleList = 0;
     }
 
     Memory.DestroyStage(StageAt(this, 0xCC));
@@ -1123,10 +1115,10 @@ void CCharaPcs::onScriptChanging(char*)
         fadeColor += 4;
     }
 
-    *reinterpret_cast<int*>(Ptr(this, 0x24)) = 0;
-    *reinterpret_cast<int*>(Ptr(this, 0xE4)) = 0;
-    *reinterpret_cast<int*>(Ptr(this, 0x44)) = 0x80;
-    *reinterpret_cast<int*>(Ptr(this, 0x48)) = 100;
+    m_overlapEnabled = 0;
+    m_charaAllocStage = 0;
+    m_texShadowSize = 0x80;
+    m_texShadowDistance = 100;
 }
 
 /*
@@ -1140,7 +1132,7 @@ void CCharaPcs::onScriptChanging(char*)
  */
 void CCharaPcs::calc()
 {
-    CHandle* head = *reinterpret_cast<CHandle**>(Ptr(this, 0x4c));
+    CHandle* head = m_handleList;
     CHandle* handle = head->m_next;
 
     while (head != handle) {
@@ -1352,11 +1344,9 @@ void CCharaPcs::GetTexShadow(int startIndex, int maxCount, _GXTexObj* texObjs, V
         if ((handle->m_flags & 0x200) != 0 && handle->m_shadowTexturePtr != 0) {
             if (startIndex <= shadowIndex) {
                 const int outIndex = shadowIndex - startIndex;
-                PSMTXConcat(
-                    reinterpret_cast<MtxPtr>(Ptr(this, 0x14C)), handle->m_shadowViewMtx,
-                    reinterpret_cast<MtxPtr>(shadowMatrices[outIndex]));
+                PSMTXConcat(m_texShadowProjectionMtx, handle->m_shadowViewMtx, reinterpret_cast<MtxPtr>(shadowMatrices[outIndex]));
 
-                const unsigned short texSize = static_cast<unsigned short>(*reinterpret_cast<int*>(Ptr(this, 0x44)));
+                const unsigned short texSize = static_cast<unsigned short>(m_texShadowSize);
                 GXInitTexObj(
                     &texObjs[outIndex], handle->m_shadowTexturePtr, texSize, texSize, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP,
                     GX_FALSE);
@@ -1434,7 +1424,7 @@ void CCharaPcs::drawMakeTexShadow()
         return;
     }
 
-    const int texSize = *reinterpret_cast<int*>(Ptr(this, 0x44));
+    const int texSize = m_texShadowSize;
     _GXTexObj backBufferTexObj;
     _GXColor clearColor = {0x00, 0x00, 0x00, 0x00};
     _GXColor shadowColor = {0x00, 0x00, 0x00, 0xFF};
@@ -1455,12 +1445,10 @@ void CCharaPcs::drawMakeTexShadow()
     GXSetScissor(0, 0, static_cast<unsigned int>(texSize), static_cast<unsigned int>(texSize));
     Graphic.SetCopyClear(clearColor, 0);
 
-    *reinterpret_cast<void**>(Ptr(this, 0x140)) = Graphic.m_scratchTextureBuffer;
-    *reinterpret_cast<int*>(Ptr(this, 0x144)) = 0xD2000;
-    *reinterpret_cast<int*>(Ptr(this, 0x148)) = texSize * texSize * 4;
-    C_MTXLightPerspective(
-        *reinterpret_cast<Mtx*>(Ptr(this, 0x14C)), *reinterpret_cast<float*>(Ptr(&CameraPcs, 0xFC)), 1.0f, 0.5f,
-        -0.5f, 0.5f, 0.5f);
+    m_texShadowTextureBase = Graphic.m_scratchTextureBuffer;
+    m_texShadowTextureSize = 0xD2000;
+    m_texShadowTextureOffset = texSize * texSize * 4;
+    C_MTXLightPerspective(m_texShadowProjectionMtx, CameraPcs.m_fov, 1.0f, 0.5f, -0.5f, 0.5f, 0.5f);
 
     CHandle* handle = HandleListHead(this)->m_next;
     while (handle != HandleListHead(this)) {
@@ -1485,7 +1473,7 @@ void CCharaPcs::drawMakeTexShadow()
  */
 void CCharaPcs::drawShadow()
 {
-    if (*reinterpret_cast<unsigned char*>(Ptr(&CameraPcs, 0x404)) == 0) {
+    if (CameraPcs.m_fullScreenShadowEnabled == 0) {
         return;
     }
 
@@ -2116,7 +2104,7 @@ void CCharaPcs::loadAnimBuffer(void*, char*, int, int, int, int)
  */
 void CCharaPcs::drawOverlap()
 {
-    if (*reinterpret_cast<int*>(Ptr(this, 0x24)) == 0) {
+    if (m_overlapEnabled == 0) {
         return;
     }
 
@@ -2168,7 +2156,7 @@ void CCharaPcs::drawOverlap()
     PSMTX44Copy(CameraPcs.m_screenMatrix, projectionMtx);
     GXSetProjection(projectionMtx, GX_PERSPECTIVE);
 
-    C_MTXLookAt(lookAtMtx, reinterpret_cast<Point3d*>(Ptr(this, 0x2C)), &up, reinterpret_cast<Point3d*>(Ptr(this, 0x38)));
+    C_MTXLookAt(lookAtMtx, &m_overlapEyePos, &up, &m_overlapTargetPos);
     PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
 
     SetupBaseCharaLights(this);
@@ -2185,7 +2173,7 @@ void CCharaPcs::drawOverlap()
     GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_SPEC);
     GXSetChanCtrl(GX_COLOR1A1, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
 
-    black.a = static_cast<unsigned char>(*reinterpret_cast<unsigned int*>(Ptr(this, 0x28)) & 0xFF);
+    black.a = static_cast<unsigned char>(m_overlapAlpha & 0xFF);
     GXSetChanMatColor(GX_COLOR0A0, black);
     PSMTXIdentity(identityMtx);
     GXLoadPosMtxImm(identityMtx, GX_PNMTX0);
@@ -2831,21 +2819,20 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
         _GXColor shade;
         if ((flags & 0x20000) == 0 || drawPass == 3) {
             const float blendT = phase - static_cast<float>(phaseIndex);
-            _GXColor* phaseColors = reinterpret_cast<_GXColor*>(Ptr(&CharaPcs, 0x12C));
-            shade = BlendColor(phaseColors[phaseIndex], phaseColors[phaseIndex + 1], blendT);
+            shade = BlendColor(CharaPcs.m_viewerChoiceColor[phaseIndex].color,
+                               CharaPcs.m_viewerChoiceColor[phaseIndex + 1].color, blendT);
         } else {
             shade.r = 0xFF;
             shade.g = 0xFF;
             shade.b = 0xFF;
             shade.a = 0xFF;
         }
-        const _GXColor ambientBase = *reinterpret_cast<_GXColor*>(Ptr(&CharaPcs, 0xE8 + lightBank * 4));
+        const _GXColor ambientBase = CharaPcs.m_viewerAmbientColor[lightBank];
         const _GXColor ambientColor = ModulateColor(ambientBase, shade);
         LightPcs.SetAmbient(ambientColor);
 
         for (unsigned long i = 0; i < 3; i++) {
-            const _GXColor diffuseBase =
-                *reinterpret_cast<_GXColor*>(Ptr(&CharaPcs, 0xF0 + lightBank * 0x0C + static_cast<unsigned int>(i) * 4));
+            const _GXColor diffuseBase = CharaPcs.m_viewerDiffuseColor[lightBank][i];
             LightPcs.SetDiffuseColor(i, ModulateColor(diffuseBase, shade));
         }
 
@@ -2858,7 +2845,7 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
     }
 
     Mtx viewMtx;
-    PSMTXCopy(*reinterpret_cast<Mtx*>(Ptr(&CameraPcs, 4)), viewMtx);
+    PSMTXCopy(CameraPcs.m_cameraMatrix, viewMtx);
 
     if (drawPass == 3) {
         if ((flags & 4) != 0) {
@@ -2879,7 +2866,7 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
         modelPos.y = (*modelMtx)[1][3];
         modelPos.z = (*modelMtx)[2][3];
 
-        Vec focusPos = *reinterpret_cast<Vec*>(Ptr(&CharaPcs, 0x17C));
+        Vec focusPos = CharaPcs.m_texShadowPos;
         Vec delta;
         PSVECSubtract(&focusPos, &modelPos, &delta);
         if (delta.x == 0.0f && delta.z == 0.0f) {
@@ -2887,7 +2874,7 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
         }
 
         const float distance = PSVECMag(&delta);
-        const float shadowRange = *reinterpret_cast<float*>(Ptr(&CharaPcs, 0x188));
+        const float shadowRange = CharaPcs.m_texShadowRadius;
         if (distance > shadowRange) {
             return;
         }
@@ -2899,31 +2886,31 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
         eye.y += 1.0f;
 
         Vec shadowPos;
-        PSVECScale(&delta, &shadowPos, static_cast<float>(*reinterpret_cast<int*>(Ptr(&CharaPcs, 0x48))));
+        PSVECScale(&delta, &shadowPos, static_cast<float>(CharaPcs.m_texShadowDistance));
         PSVECAdd(&modelPos, &shadowPos, &shadowPos);
         shadowPos.y += 1.0f;
 
         C_MTXLookAt(m_shadowViewMtx, reinterpret_cast<Point3d*>(&shadowPos), &up, reinterpret_cast<Point3d*>(&eye));
         PSMTXCopy(m_shadowViewMtx, viewMtx);
 
-        _GXColor shadowFog = *reinterpret_cast<_GXColor*>(Ptr(&CharaPcs, 0x18C));
+        _GXColor shadowFog = CharaPcs.m_texShadowColor;
         GXSetFog(GX_FOG_ORTHO_LIN, 0.0f, shadowRange, 0.0f, 512.0f, shadowFog);
     }
 
     bool restoreFog = false;
     if ((drawPass == 0 || drawPass == 4) && m_fogBlend > 0.0f) {
-        _GXColor fogColor = *reinterpret_cast<_GXColor*>(Ptr(&CharaPcs, 0x18C));
+        _GXColor fogColor = CharaPcs.m_texShadowColor;
         GXSetFog(GX_FOG_PERSP_LIN, m_fogBlend, m_fogBlend + 2.0f, 0.0f, 1024.0f, fogColor);
         restoreFog = true;
     }
 
     if (drawPass == 1 || drawPass == 2) {
         if (drawPass == 2) {
-            const unsigned short shadowSize = static_cast<unsigned short>(*reinterpret_cast<int*>(Ptr(&CharaPcs, 0x44)));
+            const unsigned short shadowSize = static_cast<unsigned short>(CharaPcs.m_texShadowSize);
             GXSetTexCopySrc(0, 0, shadowSize, shadowSize);
             GXSetTexCopyDst(shadowSize, shadowSize, GX_TF_I8, GX_FALSE);
-            m_shadowTexturePtr = reinterpret_cast<unsigned char*>(*reinterpret_cast<void**>(Ptr(&CharaPcs, 0x140))) +
-                                 *reinterpret_cast<unsigned int*>(Ptr(&CharaPcs, 0x148));
+            m_shadowTexturePtr = reinterpret_cast<unsigned char*>(CharaPcs.m_texShadowTextureBase) +
+                                 CharaPcs.m_texShadowTextureOffset;
             DCInvalidateRange(m_shadowTexturePtr, (shadowSize * shadowSize) / 2);
             GXCopyTex(m_shadowTexturePtr, GX_TRUE);
         }
@@ -2933,11 +2920,10 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
 
         if (drawPass == 2) {
             const unsigned int shadowBytes =
-                (static_cast<unsigned int>(*reinterpret_cast<int*>(Ptr(&CharaPcs, 0x44))) *
-                 static_cast<unsigned int>(*reinterpret_cast<int*>(Ptr(&CharaPcs, 0x44)))) /
-                2;
+                (static_cast<unsigned int>(CharaPcs.m_texShadowSize) *
+                 static_cast<unsigned int>(CharaPcs.m_texShadowSize)) / 2;
             GXCopyTex(m_shadowTexturePtr, GX_TRUE);
-            *reinterpret_cast<unsigned int*>(Ptr(&CharaPcs, 0x148)) += shadowBytes;
+            CharaPcs.m_texShadowTextureOffset += shadowBytes;
             GXPixModeSync();
         }
     } else {

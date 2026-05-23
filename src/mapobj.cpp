@@ -126,16 +126,6 @@ static inline float& F32At(CMapObj* self, unsigned int offset)
     return *reinterpret_cast<float*>(Ptr(self, offset));
 }
 
-static inline CMapObj*& ObjAt(CMapObj* self, unsigned int offset)
-{
-    return *reinterpret_cast<CMapObj**>(Ptr(self, offset));
-}
-
-static inline Mtx& MtxAt(CMapObj* self, unsigned int offset)
-{
-    return *reinterpret_cast<Mtx*>(Ptr(self, offset));
-}
-
 static inline CMapObj* NextSlot(CMapObj* obj)
 {
     return reinterpret_cast<CMapObj*>(Ptr(obj, 0xF0));
@@ -143,12 +133,12 @@ static inline CMapObj* NextSlot(CMapObj* obj)
 
 static inline CMapObj* MapObjArrayStart()
 {
-    return reinterpret_cast<CMapObj*>(reinterpret_cast<unsigned char*>(&MapMng) + 0x954);
+    return MapMng.GetMapObjArray();
 }
 
 static inline Mtx& MapObjHitDrawMtx()
 {
-    return *reinterpret_cast<Mtx*>(reinterpret_cast<unsigned char*>(&MapMng) + 0x228F8);
+    return MapMng.m_viewMtx;
 }
 
 }
@@ -483,7 +473,7 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
         } else if (chunk.m_id == CHUNK_EFID) {
             U16At(this, 0x30) = chunkFile.Get2();
         } else if (chunk.m_id == CHUNK_FSDW) {
-            *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x404) = chunkFile.Get1();
+            CameraPcs.m_fullScreenShadowEnabled = chunkFile.Get1();
         } else if (chunk.m_id == CHUNK_ID) {
             U16At(this, 0x2E) = chunkFile.Get2();
         } else if (chunk.m_id == CHUNK_MSID) {
@@ -493,10 +483,10 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             U8At(this, 0x15) = priority;
             U8At(this, 0x14) = priority;
         } else if (chunk.m_id == CHUNK_AMBI) {
-            U8At(this, 0xE8) = chunkFile.Get1();
-            U8At(this, 0xE9) = chunkFile.Get1();
-            U8At(this, 0xEA) = chunkFile.Get1();
-            U8At(this, 0xEB) = chunkFile.Get1();
+            m_ambientColor.r = chunkFile.Get1();
+            m_ambientColor.g = chunkFile.Get1();
+            m_ambientColor.b = chunkFile.Get1();
+            m_ambientColor.a = chunkFile.Get1();
             U8At(this, 0x21) = 1;
         } else if (chunk.m_id == CHUNK_GEOM) {
             F32At(this, 0x40) = chunkFile.GetF4();
@@ -542,13 +532,13 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             if (meshOrHitIdx == -1) {
                 m_mapData = 0;
             } else if (U8At(this, 0x1D) == 1) {
-                m_mapData = reinterpret_cast<unsigned char*>(&MapMng) + 0x1E954 + (meshOrHitIdx * 0x44);
+                m_mapData = MapMng.GetMapMeshArray() + meshOrHitIdx;
                 U8At(this, 0x14) = 0;
                 U8At(this, 0x15) = 0;
             } else if ((U8At(this, 0x1D) == 2) || (U8At(this, 0x1D) == 3)) {
                 if (meshOrHitIdx == -2) {
                     CMapObjAtrMeshName* meshName =
-                        new (*reinterpret_cast<CMemory::CStage**>(&MapMng), "mapobj.cpp", 0x84) CMapObjAtrMeshName();
+                        new (MapMng.m_stage, "mapobj.cpp", 0x84) CMapObjAtrMeshName();
                     PtrAt(this, 0xEC) = meshName;
                     char* name = chunkFile.GetString();
                     if (meshName != 0) {
@@ -556,7 +546,7 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                     }
                     m_mapData = 0;
                 } else {
-                    m_mapData = reinterpret_cast<unsigned char*>(&MapMng) + 0x4D4 + (meshOrHitIdx * 0x24);
+                    m_mapData = MapMng.GetMapHitArray() + meshOrHitIdx;
                 }
             }
 
@@ -598,7 +588,7 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             U8At(this, 0x1B) = 1;
         } else if (chunk.m_id == CHUNK_ANIM) {
             unsigned char* animRun = reinterpret_cast<unsigned char*>(
-                operator new(0x14, *reinterpret_cast<CMemory::CStage**>(&MapMng), "mapobj.cpp", 0x21E));
+                operator new(0x14, MapMng.m_stage, "mapobj.cpp", 0x21E));
             if (animRun != 0) {
                 *reinterpret_cast<int*>(animRun) = -1;
                 *reinterpret_cast<unsigned short*>(animRun + 0x12) = static_cast<unsigned short>(chunkFile.Get4());
@@ -611,15 +601,14 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 } else {
                     *(animRun + 0x11) = 0;
                 }
-                reinterpret_cast<CPtrArray<CMapAnimRun*>*>(reinterpret_cast<unsigned char*>(&MapMng) + 0x213E0)
-                    ->Add(reinterpret_cast<CMapAnimRun*>(animRun));
+                MapMng.GetMapAnimRunArray().Add(reinterpret_cast<CMapAnimRun*>(animRun));
             }
         } else if (chunk.m_id == CHUNK_MIME) {
             if (PtrAt(this, 0xEC) != 0) {
                 System.Printf(const_cast<char*>(s_mapobj_cpp_801D70C0 + 0xCC), objIndex);
             }
             CMapObjAtrMime* mimeAttr =
-                new (*reinterpret_cast<CMemory::CStage**>(&MapMng), "mapobj.cpp", 0x33B) CMapObjAtrMime();
+                new (MapMng.m_stage, "mapobj.cpp", 0x33B) CMapObjAtrMime();
             unsigned char* mime = reinterpret_cast<unsigned char*>(mimeAttr);
 
             if (mime != 0) {
@@ -653,7 +642,7 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                         *(mime + 0x8) = static_cast<unsigned char>(mimeChunk.m_arg0);
                         *reinterpret_cast<void**>(mime + 0xC) = operator new[](
                             static_cast<unsigned long>(*(mime + 0x8)) << 2,
-                            *reinterpret_cast<CMemory::CStage**>(&MapMng), "mapobj.cpp", 0x348);
+                            MapMng.m_stage, "mapobj.cpp", 0x348);
                     }
 
                     chunkFile.PushChunk();
@@ -663,7 +652,7 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                         if (vtxChunk.m_id == CHUNK_VTX) {
                             float* vtx = reinterpret_cast<float*>(operator new[](
                                 static_cast<unsigned long>(vtxChunk.m_arg0) * 0xC,
-                                *reinterpret_cast<CMemory::CStage**>(&MapMng), "mapobj.cpp", 0x353));
+                                MapMng.m_stage, "mapobj.cpp", 0x353));
                             if ((mime != 0) && (*reinterpret_cast<void**>(mime + 0xC) != 0)) {
                                 *reinterpret_cast<float**>(
                                     reinterpret_cast<unsigned char*>(*reinterpret_cast<void**>(mime + 0xC)) + vtxTableOffset) = vtx;
@@ -691,7 +680,7 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 System.Printf(const_cast<char*>(s_mapobj_cpp_801D70C0 + 0xCC), objIndex);
             }
             CMapObjAtrPointLight* pointLightAttr =
-                new (*reinterpret_cast<CMemory::CStage**>(&MapMng), "mapobj.cpp", 0xD4) CMapObjAtrPointLight();
+                new (MapMng.m_stage, "mapobj.cpp", 0xD4) CMapObjAtrPointLight();
             unsigned char* pointLight = reinterpret_cast<unsigned char*>(pointLightAttr);
 
             if (chunk.m_version == 2) {
@@ -750,7 +739,7 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 System.Printf(const_cast<char*>(s_mapobj_cpp_801D70C0 + 0xCC), objIndex);
             }
             CMapObjAtrSpotLight* spotLightAttr =
-                new (*reinterpret_cast<CMemory::CStage**>(&MapMng), "mapobj.cpp", 0x139) CMapObjAtrSpotLight();
+                new (MapMng.m_stage, "mapobj.cpp", 0x139) CMapObjAtrSpotLight();
             unsigned char* spotLight = reinterpret_cast<unsigned char*>(spotLightAttr);
 
             if (chunk.m_version == 6) {
@@ -826,7 +815,7 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 System.Printf(const_cast<char*>(s_mapobj_cpp_801D70C0 + 0xCC), objIndex);
             }
             CMapObjAtrPlaySta* playSta =
-                new (*reinterpret_cast<CMemory::CStage**>(&MapMng), "mapobj.cpp", 0x39B) CMapObjAtrPlaySta();
+                new (MapMng.m_stage, "mapobj.cpp", 0x39B) CMapObjAtrPlaySta();
             if (playSta != 0) {
                 *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(playSta) + 8) = chunkFile.Get1();
             }
@@ -858,22 +847,22 @@ void CMapObj::CalcMtx(float (*parentMtx)[4], unsigned char inDirty)
         if (U8At(obj, 0x1B) != 0) {
             U8At(obj, 0x1B) = 0;
             if (U8At(obj, 0x1C) != 0) {
-                PSMTXScale(MtxAt(obj, 0x88), F32At(obj, 0x7C), F32At(obj, 0x80), F32At(obj, 0x84));
+                PSMTXScale(obj->m_localMtx, F32At(obj, 0x7C), F32At(obj, 0x80), F32At(obj, 0x84));
                 PSMTXRotRad(mtx2, 'x', kMapObjDegToRad * F32At(obj, 0x70));
-                PSMTXConcat(mtx2, MtxAt(obj, 0x88), MtxAt(obj, 0x88));
+                PSMTXConcat(mtx2, obj->m_localMtx, obj->m_localMtx);
                 PSMTXRotRad(mtx2, 'y', kMapObjDegToRad * F32At(obj, 0x74));
-                PSMTXConcat(mtx2, MtxAt(obj, 0x88), MtxAt(obj, 0x88));
+                PSMTXConcat(mtx2, obj->m_localMtx, obj->m_localMtx);
                 PSMTXRotRad(mtx2, 'z', kMapObjDegToRad * F32At(obj, 0x78));
-                PSMTXConcat(mtx2, MtxAt(obj, 0x88), MtxAt(obj, 0x88));
+                PSMTXConcat(mtx2, obj->m_localMtx, obj->m_localMtx);
                 PSMTXTrans(mtx2, F32At(obj, 0x64), F32At(obj, 0x68), F32At(obj, 0x6C));
-                PSMTXConcat(mtx2, MtxAt(obj, 0x88), MtxAt(obj, 0x88));
+                PSMTXConcat(mtx2, obj->m_localMtx, obj->m_localMtx);
             }
 
             dirty = 1;
         }
 
         if (dirty != 0) {
-            PSMTXConcat(*reinterpret_cast<Mtx*>(parentMtx), MtxAt(obj, 0x88), MtxAt(obj, 0xB8));
+            PSMTXConcat(*reinterpret_cast<Mtx*>(parentMtx), obj->m_localMtx, obj->m_worldMtx);
         }
 
         for (CMapObj* child = obj->m_child; child != 0; child = child->m_next) {
@@ -882,22 +871,22 @@ void CMapObj::CalcMtx(float (*parentMtx)[4], unsigned char inDirty)
             if (U8At(child, 0x1B) != 0) {
                 U8At(child, 0x1B) = 0;
                 if (U8At(child, 0x1C) != 0) {
-                    PSMTXScale(MtxAt(child, 0x88), F32At(child, 0x7C), F32At(child, 0x80), F32At(child, 0x84));
+                    PSMTXScale(child->m_localMtx, F32At(child, 0x7C), F32At(child, 0x80), F32At(child, 0x84));
                     PSMTXRotRad(mtx1, 'x', kMapObjDegToRad * F32At(child, 0x70));
-                    PSMTXConcat(mtx1, MtxAt(child, 0x88), MtxAt(child, 0x88));
+                    PSMTXConcat(mtx1, child->m_localMtx, child->m_localMtx);
                     PSMTXRotRad(mtx1, 'y', kMapObjDegToRad * F32At(child, 0x74));
-                    PSMTXConcat(mtx1, MtxAt(child, 0x88), MtxAt(child, 0x88));
+                    PSMTXConcat(mtx1, child->m_localMtx, child->m_localMtx);
                     PSMTXRotRad(mtx1, 'z', kMapObjDegToRad * F32At(child, 0x78));
-                    PSMTXConcat(mtx1, MtxAt(child, 0x88), MtxAt(child, 0x88));
+                    PSMTXConcat(mtx1, child->m_localMtx, child->m_localMtx);
                     PSMTXTrans(mtx1, F32At(child, 0x64), F32At(child, 0x68), F32At(child, 0x6C));
-                    PSMTXConcat(mtx1, MtxAt(child, 0x88), MtxAt(child, 0x88));
+                    PSMTXConcat(mtx1, child->m_localMtx, child->m_localMtx);
                 }
 
                 childDirty = 1;
             }
 
             if (childDirty != 0) {
-                PSMTXConcat(MtxAt(obj, 0xB8), MtxAt(child, 0x88), MtxAt(child, 0xB8));
+                PSMTXConcat(obj->m_worldMtx, child->m_localMtx, child->m_worldMtx);
             }
 
             for (CMapObj* grandChild = child->m_child; grandChild != 0; grandChild = grandChild->m_next) {
@@ -907,26 +896,26 @@ void CMapObj::CalcMtx(float (*parentMtx)[4], unsigned char inDirty)
                     U8At(grandChild, 0x1B) = 0;
                     if (U8At(grandChild, 0x1C) != 0) {
                         PSMTXScale(
-                            MtxAt(grandChild, 0x88), F32At(grandChild, 0x7C), F32At(grandChild, 0x80), F32At(grandChild, 0x84));
+                            grandChild->m_localMtx, F32At(grandChild, 0x7C), F32At(grandChild, 0x80), F32At(grandChild, 0x84));
                         PSMTXRotRad(mtx0, 'x', kMapObjDegToRad * F32At(grandChild, 0x70));
-                        PSMTXConcat(mtx0, MtxAt(grandChild, 0x88), MtxAt(grandChild, 0x88));
+                        PSMTXConcat(mtx0, grandChild->m_localMtx, grandChild->m_localMtx);
                         PSMTXRotRad(mtx0, 'y', kMapObjDegToRad * F32At(grandChild, 0x74));
-                        PSMTXConcat(mtx0, MtxAt(grandChild, 0x88), MtxAt(grandChild, 0x88));
+                        PSMTXConcat(mtx0, grandChild->m_localMtx, grandChild->m_localMtx);
                         PSMTXRotRad(mtx0, 'z', kMapObjDegToRad * F32At(grandChild, 0x78));
-                        PSMTXConcat(mtx0, MtxAt(grandChild, 0x88), MtxAt(grandChild, 0x88));
+                        PSMTXConcat(mtx0, grandChild->m_localMtx, grandChild->m_localMtx);
                         PSMTXTrans(mtx0, F32At(grandChild, 0x64), F32At(grandChild, 0x68), F32At(grandChild, 0x6C));
-                        PSMTXConcat(mtx0, MtxAt(grandChild, 0x88), MtxAt(grandChild, 0x88));
+                        PSMTXConcat(mtx0, grandChild->m_localMtx, grandChild->m_localMtx);
                     }
 
                     grandChildDirty = 1;
                 }
 
                 if (grandChildDirty != 0) {
-                    PSMTXConcat(MtxAt(child, 0xB8), MtxAt(grandChild, 0x88), MtxAt(grandChild, 0xB8));
+                    PSMTXConcat(child->m_worldMtx, grandChild->m_localMtx, grandChild->m_worldMtx);
                 }
 
                 if (grandChild->m_child != 0) {
-                    grandChild->m_child->CalcMtx(reinterpret_cast<float(*)[4]>(&MtxAt(grandChild, 0xB8)), grandChildDirty);
+                    grandChild->m_child->CalcMtx(grandChild->m_worldMtx, grandChildDirty);
                 }
             }
         }
@@ -1234,7 +1223,7 @@ void CMapObj::Calc()
             pos.x = F32At(this, 0xC4);
             pos.y = F32At(this, 0xD4);
             pos.z = F32At(this, 0xE4);
-            PSMTXCopy(*reinterpret_cast<Mtx*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x4), cameraMtx);
+            PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
             PSMTXMultVec(cameraMtx, &pos, &posCam);
             posCam.z = -posCam.z;
 
@@ -1324,25 +1313,21 @@ void CMapObj::SetDrawEnv()
 {
     _GXColor mapColor;
     _GXColor lightColor = *reinterpret_cast<_GXColor*>(&DAT_8032e498);
-    unsigned char* mapMng = reinterpret_cast<unsigned char*>(&MapMng);
 
     lightColor.a = U8At(this, 0x23);
     *reinterpret_cast<_GXColor*>(&DAT_8032e498) = lightColor;
 
     if (U8At(this, 0x21) == 0) {
-        mapColor.r = mapMng[0x2298C];
-        mapColor.g = mapMng[0x2298D];
-        mapColor.b = mapMng[0x2298E];
-        mapColor.a = mapMng[0x2298F];
+        mapColor = MapMng.m_mapColor;
     } else {
-        mapColor = *reinterpret_cast<_GXColor*>(Ptr(this, 0xE8));
+        mapColor = m_ambientColor;
     }
 
-    if (mapMng[0x22989] != 0) {
-        mapColor.r = static_cast<unsigned char>((mapColor.r * mapMng[0x22990]) >> 8);
-        mapColor.g = static_cast<unsigned char>((mapColor.g * mapMng[0x22991]) >> 8);
-        mapColor.b = static_cast<unsigned char>((mapColor.b * mapMng[0x22992]) >> 8);
-        mapColor.a = static_cast<unsigned char>((mapColor.a * mapMng[0x22993]) >> 8);
+    if (MapMng.m_colorScaleEnable != 0) {
+        mapColor.r = static_cast<unsigned char>((mapColor.r * MapMng.m_colorScale.r) >> 8);
+        mapColor.g = static_cast<unsigned char>((mapColor.g * MapMng.m_colorScale.g) >> 8);
+        mapColor.b = static_cast<unsigned char>((mapColor.b * MapMng.m_colorScale.b) >> 8);
+        mapColor.a = static_cast<unsigned char>((mapColor.a * MapMng.m_colorScale.a) >> 8);
     }
 
     if (U8At(this, 0x24) != 0xFF) {
@@ -1352,7 +1337,7 @@ void CMapObj::SetDrawEnv()
         mapColor.b = static_cast<unsigned char>((mapColor.b * alphaRate) >> 8);
     }
 
-    LightPcs.SetMapColorAlpha(MtxAt(this, 0xB8), mapColor, lightColor, U8At(this, 0x26), F32At(this, 0x44), F32At(this, 0x48),
+    LightPcs.SetMapColorAlpha(m_worldMtx, mapColor, lightColor, U8At(this, 0x26), F32At(this, 0x44), F32At(this, 0x48),
                               F32At(this, 0x54), (U16At(this, 0x28) >> 7) & 0xFF);
 }
 
@@ -1384,7 +1369,6 @@ void CMapObj::Draw(unsigned char priority)
     _GXColor mapColor;
     _GXColor lightColor;
     _GXColor* worldMapColor = reinterpret_cast<_GXColor*>(&DAT_8032e498);
-    unsigned char* mapMng = reinterpret_cast<unsigned char*>(&MapMng);
     unsigned char* materialMan = reinterpret_cast<unsigned char*>(&MaterialMan);
 
     Vec lightPos;
@@ -1409,12 +1393,12 @@ void CMapObj::Draw(unsigned char priority)
     *(materialMan + 520) = 0;
 
     if (U8At(this, 0x22) != 0) {
-        CameraPcs.SetFullScreenShadow(MtxAt(this, 0xB8), 0);
+        CameraPcs.SetFullScreenShadow(m_worldMtx, 0);
     }
     if (S32At(this, 0x3C) != 0) {
         MaterialMan.SetShadowBound(static_cast<CMapShadow::TARGET>(1),
                                    reinterpret_cast<CBound*>(reinterpret_cast<unsigned char*>(m_mapData) + 0xC),
-                                   MtxAt(this, 0xB8));
+                                   m_worldMtx);
     }
 
     *reinterpret_cast<unsigned int*>(materialMan + 296) = *reinterpret_cast<unsigned int*>(materialMan + 284);
@@ -1424,19 +1408,16 @@ void CMapObj::Draw(unsigned char priority)
 
     worldMapColor->a = U8At(this, 0x23);
     if (U8At(this, 0x21) == 0) {
-        mapColor.r = mapMng[0x2298C];
-        mapColor.g = mapMng[0x2298D];
-        mapColor.b = mapMng[0x2298E];
-        mapColor.a = mapMng[0x2298F];
+        mapColor = MapMng.m_mapColor;
     } else {
-        mapColor = *reinterpret_cast<_GXColor*>(Ptr(this, 0xE8));
+        mapColor = m_ambientColor;
     }
 
-    if (mapMng[0x22989] != 0) {
-        mapColor.r = static_cast<unsigned char>((mapColor.r * mapMng[0x22990]) >> 8);
-        mapColor.g = static_cast<unsigned char>((mapColor.g * mapMng[0x22991]) >> 8);
-        mapColor.b = static_cast<unsigned char>((mapColor.b * mapMng[0x22992]) >> 8);
-        mapColor.a = static_cast<unsigned char>((mapColor.a * mapMng[0x22993]) >> 8);
+    if (MapMng.m_colorScaleEnable != 0) {
+        mapColor.r = static_cast<unsigned char>((mapColor.r * MapMng.m_colorScale.r) >> 8);
+        mapColor.g = static_cast<unsigned char>((mapColor.g * MapMng.m_colorScale.g) >> 8);
+        mapColor.b = static_cast<unsigned char>((mapColor.b * MapMng.m_colorScale.b) >> 8);
+        mapColor.a = static_cast<unsigned char>((mapColor.a * MapMng.m_colorScale.a) >> 8);
     }
 
     if (U8At(this, 0x24) != 0xFF) {
@@ -1447,9 +1428,9 @@ void CMapObj::Draw(unsigned char priority)
     }
 
     lightColor = *worldMapColor;
-    LightPcs.SetMapColorAlpha(MtxAt(this, 0xB8), mapColor, lightColor, U8At(this, 0x26), F32At(this, 0x44), F32At(this, 0x48),
+    LightPcs.SetMapColorAlpha(m_worldMtx, mapColor, lightColor, U8At(this, 0x26), F32At(this, 0x44), F32At(this, 0x48),
                               F32At(this, 0x54), (U16At(this, 0x28) >> 7) & 0xFF);
-    LightPcs.SetBumpTexMatirx(MtxAt(this, 0xB8), reinterpret_cast<CLightPcs::CBumpLight*>(PtrAt(this, 0x10)),
+    LightPcs.SetBumpTexMatirx(m_worldMtx, reinterpret_cast<CLightPcs::CBumpLight*>(PtrAt(this, 0x10)),
                               reinterpret_cast<Vec*>(Ptr(this, 0x58)), U8At(this, 0x1A));
 
     if (kMapObjOne != F32At(this, 0x40)) {
@@ -1488,10 +1469,9 @@ void CMapObj::SetDrawFlag()
         if ((static_cast<signed char>(U8At(this, 0x1F)) == -1) && ((U8At(this, 0x18) & 1) != 0)) {
             Mtx concatMtx;
 
-            PSMTXConcat(*reinterpret_cast<Mtx*>(reinterpret_cast<unsigned char*>(&MapMng) + 0x22958), MtxAt(this, 0xB8), concatMtx);
+            PSMTXConcat(MapMng.m_scaledViewMtxSecondary, m_worldMtx, concatMtx);
             if (reinterpret_cast<CBound*>(reinterpret_cast<unsigned char*>(m_mapData) + 0xC)
-                    ->CheckFrustum(*reinterpret_cast<Vec*>(reinterpret_cast<unsigned char*>(&MapMng) + 0x228EC), concatMtx,
-                                   *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&MapMng) + 0x22A74)) != 0) {
+                    ->CheckFrustum(MapMng.m_cameraPosition, concatMtx, MapMng.m_octTreeFrustumRange) != 0) {
                 U8At(this, 0x18) |= 4;
             }
         }
@@ -1510,7 +1490,7 @@ void CMapObj::SetDrawFlag()
 void CMapObj::DrawHit()
 {
     if ((U8At(this, 0x1D) == 2) && (m_mapData != 0)) {
-        MaterialMan.SetObjMatrix(MapObjHitDrawMtx(), MtxAt(this, 0xB8));
+        MaterialMan.SetObjMatrix(MapObjHitDrawMtx(), m_worldMtx);
         reinterpret_cast<CMapHit*>(m_mapData)->Draw();
     }
 }
@@ -1527,7 +1507,7 @@ void CMapObj::DrawHit()
 void CMapObj::DrawHitWire()
 {
     if ((U8At(this, 0x1D) == 2) && (m_mapData != 0)) {
-        MaterialMan.SetObjMatrix(MapObjHitDrawMtx(), MtxAt(this, 0xB8));
+        MaterialMan.SetObjMatrix(MapObjHitDrawMtx(), m_worldMtx);
         reinterpret_cast<CMapHit*>(m_mapData)->DrawWire();
     }
 }
@@ -1544,7 +1524,7 @@ void CMapObj::DrawHitWire()
 void CMapObj::DrawHitNormal()
 {
     if ((U8At(this, 0x1D) == 2) && (m_mapData != 0)) {
-        MaterialMan.SetObjMatrix(MapObjHitDrawMtx(), MtxAt(this, 0xB8));
+        MaterialMan.SetObjMatrix(MapObjHitDrawMtx(), m_worldMtx);
         reinterpret_cast<CMapHit*>(m_mapData)->DrawNormal();
     }
 }
@@ -1563,7 +1543,7 @@ int CMapObj::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long m
     if ((U8At(this, 0x1D) == 2) && (m_mapData != 0) && (S8At(this, 0x1F) == -1)) {
         Mtx inverseMtx;
 
-        PSMTXInverse(MtxAt(this, 0xB8), inverseMtx);
+        PSMTXInverse(m_worldMtx, inverseMtx);
         CMapCylinder localCylinder;
         PSMTXMultVec(inverseMtx, &cylinder->m_bottom, &localCylinder.m_bottom);
         PSMTXMultVec(inverseMtx, &cylinder->m_top, &localCylinder.m_top);
@@ -1648,7 +1628,7 @@ void CMapObj::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned l
         Mtx inverseMtx;
         Vec localMove;
 
-        PSMTXInverse(MtxAt(this, 0xB8), inverseMtx);
+        PSMTXInverse(m_worldMtx, inverseMtx);
         CMapCylinder localCylinder;
         PSMTXMultVec(inverseMtx, &cylinder->m_bottom, &localCylinder.m_bottom);
         PSMTXMultVec(inverseMtx, &cylinder->m_top, &localCylinder.m_top);
@@ -1727,7 +1707,7 @@ void CMapObj::GetHitFaceNormal(Vec* out)
 {
     CMapHit* mapHit = reinterpret_cast<CMapHit*>(m_mapData);
     mapHit->GetHitFaceNormal(out);
-    PSMTXMultVecSR(MtxAt(this, 0xB8), out, out);
+    PSMTXMultVecSR(m_worldMtx, out, out);
 }
 
 /*
@@ -1743,7 +1723,7 @@ int CMapObj::CalcHitSlide(Vec* out, float y)
 {
     CMapHit* mapHit = reinterpret_cast<CMapHit*>(m_mapData);
     int hit = mapHit->CalcHitSlide(out, y);
-    PSMTXMultVecSR(MtxAt(this, 0xB8), out, out);
+    PSMTXMultVecSR(m_worldMtx, out, out);
     return hit;
 }
 
@@ -1760,7 +1740,7 @@ void CMapObj::CalcHitPosition(Vec* out)
 {
     CMapHit* mapHit = reinterpret_cast<CMapHit*>(m_mapData);
     mapHit->CalcHitPosition(out);
-    PSMTXMultVec(MtxAt(this, 0xB8), out, out);
+    PSMTXMultVec(m_worldMtx, out, out);
 }
 
 /*

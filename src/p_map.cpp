@@ -341,25 +341,24 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
         MapMng.SetDrawRangeMapObj(DrawRangeDefault);
     }
 
-    *reinterpret_cast<void**>(reinterpret_cast<char*>(&MapMng) + 0x22994) = mapPtr;
-    *reinterpret_cast<void**>(reinterpret_cast<char*>(&MapMng) + 0x22998) = mapPtr;
-    *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(&MapMng) + 0x2299C) = mapSize;
-    *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(&MapMng) + 0x229A0) = 0;
-    *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(&MapMng) + 0x229A4) = 0;
+    MapMng.m_asyncLoadState.m_mapLoadStart = mapPtr;
+    MapMng.m_asyncLoadState.m_mapLoadCursor = mapPtr;
+    MapMng.m_asyncLoadState.m_mapLoadSize = mapSize;
+    MapMng.m_asyncLoadState.m_asyncReadIndex = 0;
+    MapMng.m_asyncLoadState.m_asyncOpenIndex = 0;
     if (mapSize != 0) {
         if (mode == 1) {
-            *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(&MapMng) + 0x229A8) = 2;
+            MapMng.m_asyncLoadState.m_mapReadMode = 2;
         } else if (mode == 2) {
-            char* mapMngBase = reinterpret_cast<char*>(&MapMng);
-            *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(&MapMng) + 0x229A8) = 3;
+            MapMng.m_asyncLoadState.m_mapReadMode = 3;
             for (int i = 0; i < 0x10; i++) {
-                *reinterpret_cast<void**>(mapMngBase + 0x22A2C + i * 4) = 0;
+                MapMng.m_asyncLoadState.m_asyncHandles[i] = 0;
             }
         } else {
-            *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(&MapMng) + 0x229A8) = 1;
+            MapMng.m_asyncLoadState.m_mapReadMode = 1;
         }
     } else {
-        *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(&MapMng) + 0x229A8) = 0;
+        MapMng.m_asyncLoadState.m_mapReadMode = 0;
     }
 
     MapMng.ReadMtx(mapPath);
@@ -371,8 +370,7 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
         if ((m_viewerMode != 0) && (strcmp(s_lastLoadedMapPath__7CMapPcs, mapPath) != 0)) {
             strcpy(s_lastLoadedMapPath__7CMapPcs, mapPath);
             if (MapMng.GetDebugPlaySta(0, &cameraPos) == 0) {
-                COctNode* rootNode =
-                    *reinterpret_cast<COctNode**>(reinterpret_cast<char*>(&MapMng) + 0x18);
+                COctNode* rootNode = MapMng.GetOctTreeArray()->GetRootNode();
                 if (rootNode != 0) {
                     float center = rootNode->m_boundMinX + rootNode->m_boundMaxX;
                     cameraPos.x = center * kMapBoundsCenterScale;
@@ -389,26 +387,25 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
                 }
             }
             cameraPos.y += kMapCameraCenterYOffset;
-            *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE0) = cameraPos.x;
-            *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE4) = cameraPos.y;
-            *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE8) = cameraPos.z;
+            CameraPcs.m_positionX = cameraPos.x;
+            CameraPcs.m_positionY = cameraPos.y;
+            CameraPcs.m_positionZ = cameraPos.z;
         }
 
         if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
             System.Printf(
                 const_cast<char*>(s_map_load_ok_fmt),
                 mapPath,
-                (int)*reinterpret_cast<short*>(reinterpret_cast<char*>(&MapMng) + 0xC),
-                (int)*reinterpret_cast<short*>(reinterpret_cast<char*>(&MapMng) + 0x8),
-                (*reinterpret_cast<CMemory::CStage**>(&MapMng))->GetHeapUnuse() / 1024);
+                static_cast<int>(MapMng.m_mapObjCount),
+                static_cast<int>(MapMng.m_octTreeCount),
+                MapMng.m_stage->GetHeapUnuse() / 1024);
         }
 
-        CPtrArray<CMapLightHolder*>& mapLightHolderArr =
-            *reinterpret_cast<CPtrArray<CMapLightHolder*>*>(reinterpret_cast<char*>(&MapMng) + 0x2146C);
+        CPtrArray<CMapLightHolder*>& mapLightHolderArr = MapMng.GetMapLightHolderArray(1);
         unsigned int mapLightHolderIndex = 0;
         if (static_cast<unsigned int>(mapLightHolderArr.GetSize()) > mapLightHolderIndex) {
             mapLightHolderArr[mapLightHolderIndex]->GetLightHolder(
-                reinterpret_cast<_GXColor*>(reinterpret_cast<char*>(&MapMng) + 0x2298C), static_cast<Vec*>(0));
+                &MapMng.m_mapColor, static_cast<Vec*>(0));
         }
     }
 
@@ -429,42 +426,42 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
  */
 unsigned long long CMapPcs::IsLoadMapCompleted()
 {
-    CMapMng* mapMng = &MapMng;
+    void** handle = MapMng.m_asyncLoadState.m_asyncHandles;
     unsigned int value = 0;
 
     for (int count = 2; count != 0; count--) {
-        if (*reinterpret_cast<CFile::CHandle**>(reinterpret_cast<char*>(mapMng) + 0x22A2C) != 0) {
+        if (*handle != 0) {
             return (unsigned long long)value;
         }
-        mapMng = reinterpret_cast<CMapMng*>(reinterpret_cast<char*>(mapMng) + 4);
-        if (*reinterpret_cast<CFile::CHandle**>(reinterpret_cast<char*>(mapMng) + 0x22A2C) != 0) {
+        handle++;
+        if (*handle != 0) {
             return (unsigned long long)value;
         }
-        mapMng = reinterpret_cast<CMapMng*>(reinterpret_cast<char*>(mapMng) + 4);
-        if (*reinterpret_cast<CFile::CHandle**>(reinterpret_cast<char*>(mapMng) + 0x22A2C) != 0) {
+        handle++;
+        if (*handle != 0) {
             return (unsigned long long)value;
         }
-        mapMng = reinterpret_cast<CMapMng*>(reinterpret_cast<char*>(mapMng) + 4);
-        if (*reinterpret_cast<CFile::CHandle**>(reinterpret_cast<char*>(mapMng) + 0x22A2C) != 0) {
+        handle++;
+        if (*handle != 0) {
             return (unsigned long long)value;
         }
-        mapMng = reinterpret_cast<CMapMng*>(reinterpret_cast<char*>(mapMng) + 4);
-        if (*reinterpret_cast<CFile::CHandle**>(reinterpret_cast<char*>(mapMng) + 0x22A2C) != 0) {
+        handle++;
+        if (*handle != 0) {
             return (unsigned long long)value;
         }
-        mapMng = reinterpret_cast<CMapMng*>(reinterpret_cast<char*>(mapMng) + 4);
-        if (*reinterpret_cast<CFile::CHandle**>(reinterpret_cast<char*>(mapMng) + 0x22A2C) != 0) {
+        handle++;
+        if (*handle != 0) {
             return (unsigned long long)value;
         }
-        mapMng = reinterpret_cast<CMapMng*>(reinterpret_cast<char*>(mapMng) + 4);
-        if (*reinterpret_cast<CFile::CHandle**>(reinterpret_cast<char*>(mapMng) + 0x22A2C) != 0) {
+        handle++;
+        if (*handle != 0) {
             return (unsigned long long)value;
         }
-        mapMng = reinterpret_cast<CMapMng*>(reinterpret_cast<char*>(mapMng) + 4);
-        if (*reinterpret_cast<CFile::CHandle**>(reinterpret_cast<char*>(mapMng) + 0x22A2C) != 0) {
+        handle++;
+        if (*handle != 0) {
             return (unsigned long long)value;
         }
-        mapMng = reinterpret_cast<CMapMng*>(reinterpret_cast<char*>(mapMng) + 4);
+        handle++;
         value += 7;
     }
 
@@ -496,7 +493,7 @@ void CMapPcs::destroy()
  */
 void CMapPcs::calcInit()
 {
-    *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(&MapMng) + 0x22989) = 0;
+    MapMng.m_colorScaleEnable = 0;
 }
 
 /*
@@ -515,18 +512,15 @@ void CMapPcs::calc()
     Mtx44 screenMtx;
 
     MapFileRead__7CMapMngFPcRUl(&MapMng);
-    *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228EC) =
-        *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE0);
-    *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F0) =
-        *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE4);
-    *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F4) =
-        *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE8);
+    MapMng.m_cameraPosition.x = CameraPcs.m_positionX;
+    MapMng.m_cameraPosition.y = CameraPcs.m_positionY;
+    MapMng.m_cameraPosition.z = CameraPcs.m_positionZ;
 
     if (m_useStoredViewMtx != 0) {
         memcpy(cameraMtx, m_viewMtx, sizeof(Mtx));
         memcpy(screenMtx, m_screenMtx, sizeof(Mtx44));
     } else {
-        PSMTXCopy(*reinterpret_cast<Mtx*>(reinterpret_cast<char*>(&CameraPcs) + 0x4), cameraMtx);
+        PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
         PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
     }
     MapMng.SetViewMtx(cameraMtx, screenMtx);
@@ -536,12 +530,12 @@ void CMapPcs::calc()
         LightPcs.DestroyBumpLightAll(static_cast<CLightPcs::TARGET>(1));
         MapMng.SetDrawRangeOctTree(DrawRangeDefault);
         MapMng.SetDrawRangeMapObj(DrawRangeDefault);
-        *reinterpret_cast<void**>(reinterpret_cast<char*>(&MapMng) + 0x22994) = 0;
-        *reinterpret_cast<void**>(reinterpret_cast<char*>(&MapMng) + 0x22998) = 0;
-        *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(&MapMng) + 0x2299C) = 0;
-        *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(&MapMng) + 0x229A0) = 0;
-        *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(&MapMng) + 0x229A4) = 0;
-        *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(&MapMng) + 0x229A8) = 0;
+        MapMng.m_asyncLoadState.m_mapLoadStart = 0;
+        MapMng.m_asyncLoadState.m_mapLoadCursor = 0;
+        MapMng.m_asyncLoadState.m_mapLoadSize = 0;
+        MapMng.m_asyncLoadState.m_asyncReadIndex = 0;
+        MapMng.m_asyncLoadState.m_asyncOpenIndex = 0;
+        MapMng.m_asyncLoadState.m_mapReadMode = 0;
         MapMng.ReadMtx(m_mapName);
         MapMng.ReadMpl(m_mapName);
         MapMng.ReadOtm(m_mapName);
@@ -550,8 +544,7 @@ void CMapPcs::calc()
             (strcmp(s_lastLoadedMapPath__7CMapPcs, m_mapName) != 0)) {
             strcpy(s_lastLoadedMapPath__7CMapPcs, m_mapName);
             if (MapMng.GetDebugPlaySta(0, &cameraPos) == 0) {
-                COctNode* rootNode =
-                    *reinterpret_cast<COctNode**>(reinterpret_cast<char*>(&MapMng) + 0x18);
+                COctNode* rootNode = MapMng.GetOctTreeArray()->GetRootNode();
                 if (rootNode != 0) {
                     float center = rootNode->m_boundMinX + rootNode->m_boundMaxX;
                     cameraPos.x = center * kMapBoundsCenterScale;
@@ -568,26 +561,25 @@ void CMapPcs::calc()
                 }
             }
             cameraPos.y += kMapCameraCenterYOffset;
-            *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE0) = cameraPos.x;
-            *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE4) = cameraPos.y;
-            *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE8) = cameraPos.z;
+            CameraPcs.m_positionX = cameraPos.x;
+            CameraPcs.m_positionY = cameraPos.y;
+            CameraPcs.m_positionZ = cameraPos.z;
         }
 
         if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
             System.Printf(
                 const_cast<char*>(s_map_load_ok_fmt),
                 m_mapName,
-                *reinterpret_cast<short*>(reinterpret_cast<char*>(&MapMng) + 0xC),
-                *reinterpret_cast<short*>(reinterpret_cast<char*>(&MapMng) + 0x8),
-                (*reinterpret_cast<CMemory::CStage**>(&MapMng))->GetHeapUnuse() / 1024);
+                MapMng.m_mapObjCount,
+                MapMng.m_octTreeCount,
+                MapMng.m_stage->GetHeapUnuse() / 1024);
         }
 
-        CPtrArray<CMapLightHolder*>* mapLightHolderArr =
-            reinterpret_cast<CPtrArray<CMapLightHolder*>*>(reinterpret_cast<char*>(&MapMng) + 0x2146C);
+        CPtrArray<CMapLightHolder*>* mapLightHolderArr = &MapMng.GetMapLightHolderArray(1);
         unsigned int mapLightHolderIndex = 0;
         if (static_cast<unsigned int>(mapLightHolderArr->GetSize()) > mapLightHolderIndex) {
             (*mapLightHolderArr)[mapLightHolderIndex]->GetLightHolder(
-                reinterpret_cast<_GXColor*>(reinterpret_cast<char*>(&MapMng) + 0x2298C), static_cast<Vec*>(0));
+                &MapMng.m_mapColor, static_cast<Vec*>(0));
         }
 
         m_forceMapReload = 0;
@@ -644,17 +636,14 @@ void CMapPcs::drawBefore()
 
         MaterialMan.InitVtxFmt(-1, GX_F32, 0, GX_RGBA4, 0xE, GX_RGBA4, 0xA);
 
-        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228EC) =
-            *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE0);
-        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F0) =
-            *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE4);
-        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F4) =
-            *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE8);
+        MapMng.m_cameraPosition.x = CameraPcs.m_positionX;
+        MapMng.m_cameraPosition.y = CameraPcs.m_positionY;
+        MapMng.m_cameraPosition.z = CameraPcs.m_positionZ;
 
-        PSMTXCopy(*reinterpret_cast<Mtx*>(reinterpret_cast<char*>(&CameraPcs) + 0x4), cameraMtx);
+        PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
         PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
         MapMng.SetViewMtx(cameraMtx, screenMtx);
-        Graphic.SetFog(*reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(&MapMng) + 0x22988), 0);
+        Graphic.SetFog(MapMng.m_fogEnable, 0);
 
         GXSetColorUpdate(GX_TRUE);
         GXSetAlphaUpdate(GX_FALSE);
@@ -700,17 +689,14 @@ void CMapPcs::draw()
 
         MaterialMan.InitVtxFmt(-1, GX_F32, 0, GX_RGBA4, 0xE, GX_RGBA4, 0xA);
 
-        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228EC) =
-            *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE0);
-        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F0) =
-            *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE4);
-        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F4) =
-            *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE8);
+        MapMng.m_cameraPosition.x = CameraPcs.m_positionX;
+        MapMng.m_cameraPosition.y = CameraPcs.m_positionY;
+        MapMng.m_cameraPosition.z = CameraPcs.m_positionZ;
 
-        PSMTXCopy(*reinterpret_cast<Mtx*>(reinterpret_cast<char*>(&CameraPcs) + 0x4), cameraMtx);
+        PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
         PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
         MapMng.SetViewMtx(cameraMtx, screenMtx);
-        Graphic.SetFog(*reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(&MapMng) + 0x22988), 0);
+        Graphic.SetFog(MapMng.m_fogEnable, 0);
 
         GXSetColorUpdate(GX_TRUE);
         GXSetAlphaUpdate(GX_FALSE);
@@ -757,17 +743,14 @@ void CMapPcs::drawBeforeViewer()
 
         MaterialMan.InitVtxFmt(-1, GX_F32, 0, GX_RGBA4, 0xE, GX_RGBA4, 0xA);
 
-        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228EC) =
-            *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE0);
-        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F0) =
-            *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE4);
-        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F4) =
-            *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE8);
+        MapMng.m_cameraPosition.x = CameraPcs.m_positionX;
+        MapMng.m_cameraPosition.y = CameraPcs.m_positionY;
+        MapMng.m_cameraPosition.z = CameraPcs.m_positionZ;
 
-        PSMTXCopy(*reinterpret_cast<Mtx*>(reinterpret_cast<char*>(&CameraPcs) + 0x4), cameraMtx);
+        PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
         PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
         MapMng.SetViewMtx(cameraMtx, screenMtx);
-        Graphic.SetFog(*reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(&MapMng) + 0x22988), 0);
+        Graphic.SetFog(MapMng.m_fogEnable, 0);
 
         GXSetColorUpdate(GX_TRUE);
         GXSetAlphaUpdate(GX_FALSE);
@@ -814,17 +797,14 @@ void CMapPcs::drawViewer()
 
         MaterialMan.InitVtxFmt(-1, GX_F32, 0, GX_RGBA4, 0xE, GX_RGBA4, 0xA);
 
-        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228EC) =
-            *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE0);
-        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F0) =
-            *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE4);
-        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F4) =
-            *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE8);
+        MapMng.m_cameraPosition.x = CameraPcs.m_positionX;
+        MapMng.m_cameraPosition.y = CameraPcs.m_positionY;
+        MapMng.m_cameraPosition.z = CameraPcs.m_positionZ;
 
-        PSMTXCopy(*reinterpret_cast<Mtx*>(reinterpret_cast<char*>(&CameraPcs) + 0x4), cameraMtx);
+        PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
         PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
         MapMng.SetViewMtx(cameraMtx, screenMtx);
-        Graphic.SetFog(*reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(&MapMng) + 0x22988), 0);
+        Graphic.SetFog(MapMng.m_fogEnable, 0);
 
         GXSetColorUpdate(GX_TRUE);
         GXSetAlphaUpdate(GX_FALSE);
@@ -866,12 +846,9 @@ void CMapPcs::drawAfter()
 
             MaterialMan.InitVtxFmt(-1, GX_F32, 0, GX_RGBA4, 0xE, GX_RGBA4, 0xA);
 
-            *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228EC) =
-                *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE0);
-            *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F0) =
-                *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE4);
-            *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F4) =
-                *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE8);
+            MapMng.m_cameraPosition.x = CameraPcs.m_positionX;
+            MapMng.m_cameraPosition.y = CameraPcs.m_positionY;
+            MapMng.m_cameraPosition.z = CameraPcs.m_positionZ;
 
             PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
             PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
@@ -919,12 +896,9 @@ void CMapPcs::drawAfterViewer()
 
             MaterialMan.InitVtxFmt(-1, GX_F32, 0, GX_RGBA4, 0xE, GX_RGBA4, 0xA);
 
-            *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228EC) =
-                *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE0);
-            *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F0) =
-                *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE4);
-            *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F4) =
-                *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE8);
+            MapMng.m_cameraPosition.x = CameraPcs.m_positionX;
+            MapMng.m_cameraPosition.y = CameraPcs.m_positionY;
+            MapMng.m_cameraPosition.z = CameraPcs.m_positionZ;
 
             PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
             PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);

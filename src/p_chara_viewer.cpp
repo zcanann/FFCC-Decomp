@@ -313,10 +313,10 @@ void CCharaPcs::drawViewer()
                 watch.Reset();
                 watch.Start();
                 Graphic.SetFog(0, 0);
-                LightPcs.SetAmbient(self->m_viewerAmbientColor);
+                LightPcs.SetAmbient(self->m_viewerAmbientColor[0]);
                 LightPcs.SetNumDiffuse(3);
                 for (unsigned int lightIndex = 0; lightIndex < 3; lightIndex++) {
-                    LightPcs.SetDiffuse(lightIndex, self->m_viewerDiffuseColor[lightIndex],
+                    LightPcs.SetDiffuse(lightIndex, self->m_viewerDiffuseColor[0][lightIndex],
                                         &self->m_viewerDiffusePos[lightIndex],
                                         (__cntlzw(2 - lightIndex) >> 5) & 0xFF);
                 }
@@ -756,18 +756,18 @@ void CCharaPcs::createViewer()
     self->m_viewerTextureStage = Memory.CreateStage(0x200000, const_cast<char*>(s_load_texture), 0);
     self->m_viewerAnimStage = Memory.CreateStage(0x190000, const_cast<char*>(s_load_anim), 0);
 
-    self->m_viewerAmbientColor.r = 0x3F;
-    self->m_viewerAmbientColor.g = 0x3F;
-    self->m_viewerAmbientColor.b = 0x3F;
-    self->m_viewerAmbientColor.a = 0xFF;
+    self->m_viewerAmbientColor[0].r = 0x3F;
+    self->m_viewerAmbientColor[0].g = 0x3F;
+    self->m_viewerAmbientColor[0].b = 0x3F;
+    self->m_viewerAmbientColor[0].a = 0xFF;
 
     for (i = 0; i < 3; i++) {
         unsigned char c = (i == 0) ? 0x3F : 0;
 
-        self->m_viewerDiffuseColor[i].r = c;
-        self->m_viewerDiffuseColor[i].g = c;
-        self->m_viewerDiffuseColor[i].b = c;
-        self->m_viewerDiffuseColor[i].a = 0xFF;
+        self->m_viewerDiffuseColor[0][i].r = c;
+        self->m_viewerDiffuseColor[0][i].g = c;
+        self->m_viewerDiffuseColor[0][i].b = c;
+        self->m_viewerDiffuseColor[0][i].a = 0xFF;
         self->m_viewerDiffusePos[i].x = kCharaViewerZero;
         self->m_viewerDiffusePos[i].y = kCharaViewerZero;
         self->m_viewerDiffusePos[i].z = kCharaViewerFineStep;
@@ -861,8 +861,7 @@ void CCharaPcs::createViewer()
     bumpLight.m_offsetX = kCharaViewerZero;
     bumpLight.m_offsetZ = kCharaViewerZero;
     gCharaPartWorkPtr = reinterpret_cast<u8*>(LightPcs.AddBump(
-        &bumpLight, static_cast<CLightPcs::TARGET>(0),
-        *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(&Chara) + 0x2058), 4));
+        &bumpLight, static_cast<CLightPcs::TARGET>(0), Chara.GetMemoryStage(), 4));
 
     Chara.Create();
 }

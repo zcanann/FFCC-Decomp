@@ -1,5 +1,6 @@
 #include "ffcc/wm_menu.h"
 
+#include "ffcc/baseobj.h"
 #include "ffcc/goout.h"
 #include "ffcc/gbaque.h"
 #include "ffcc/graphic.h"
@@ -31,7 +32,6 @@
 extern "C" void* __vt__Q212CFlatRuntime7CObject[];
 extern "C" void* __vt__9CGBaseObj[];
 extern "C" void* __vt__8CGObject[];
-extern "C" void Create__9CGBaseObjFv(void*);
 extern "C" int DAT_8021082c[];
 extern "C" int DAT_80210830[];
 extern "C" int DAT_801dc118[];
@@ -4562,7 +4562,7 @@ void CMenuPcs::SetProjection(int mode)
 
 	Mtx lookAtMtx;
 	C_MTXLookAt(lookAtMtx, reinterpret_cast<Point3d*>(slot + 0x10), &up, reinterpret_cast<Point3d*>(&target));
-	PSMTXCopy(lookAtMtx, *reinterpret_cast<Mtx*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x4));
+	PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
 
 	CharaPcs.InitEnv(5);
 	GXSetColorUpdate(0);
@@ -7468,9 +7468,9 @@ void CMenuPcs::WMChgMenu()
 
 	sVar2 = *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1C);
 	if (sVar2 == 6) {
-		*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(&MapMng) + 0x22857) = 0;
+		MapMng.GetMapIdGrpArray()[0xF7].m_primaryColor.a = 0;
 	} else if (iVar14 == 6 && sVar2 != 6) {
-		*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(&MapMng) + 0x22857) = 1;
+		MapMng.GetMapIdGrpArray()[0xF7].m_primaryColor.a = 1;
 	}
 }
 
@@ -8585,7 +8585,7 @@ unsigned int CMenuPcs::BindEffect(int slot, int effectNo, int cameraSlot)
 
 	*reinterpret_cast<unsigned int*>(effect + 0x0) = static_cast<unsigned int>(effectNo);
 	*reinterpret_cast<unsigned int*>(effect + 0x8) = static_cast<unsigned int>(slot);
-	Create__9CGBaseObjFv(effect + 0xC);
+	reinterpret_cast<CGBaseObj*>(effect + 0xC)->Create();
 	*reinterpret_cast<unsigned int*>(effect + 0x104) = *reinterpret_cast<unsigned int*>(bytes + 0x4A8 + cameraSlot * 4);
 
 	*reinterpret_cast<void**>(createParam + 0x74) = effect + 0xC;

@@ -95,11 +95,12 @@ private:
     unsigned int m_stdEnvTevBit;         // 0x40
     unsigned int m_activeEnvTevBit;      // 0x44
     unsigned int m_curEnvTevBit;         // 0x48
-    unsigned char m_alphaRef;            // 0x4C
-    unsigned char m_pad04D[0x0B];
-    unsigned int m_lockedEnvTevBit;      // 0x58
-    unsigned int m_lockedEnvUnknown5c;   // 0x5C
-    unsigned char m_pad060[0xBC];
+    unsigned char m_vtxDescMode;         // 0x4C
+    signed char m_shadowMaterialType[0x0B]; // 0x4D
+    int m_shadowMaterialCount;           // 0x58
+    int m_shadowTextureCount;            // 0x5C
+    unsigned int m_numTevStage;          // 0x60
+    unsigned char m_pad064[0xB8];
     int m_texMapIdCur;                   // 0x11C
     int m_texMtxCur;                     // 0x120
     int m_texCoordIdCur;                 // 0x124
@@ -109,12 +110,23 @@ private:
     int m_texMapIdCurShadow;             // 0x134
     int m_texMtxCurShadow;               // 0x138
     int m_texCoordIdCurShadow;           // 0x13C
-    unsigned char m_pad140[0xC5];
+    unsigned int m_unknown140;           // 0x140
+    unsigned int m_texScroll0TexMtx;     // 0x144
+    unsigned int m_texScroll0TexCoord;   // 0x148
+    unsigned int m_unknown14C;           // 0x14C
+    unsigned int m_texScroll1TexMtx;     // 0x150
+    unsigned int m_texScroll1TexCoord;   // 0x154
+    int m_shadowTexMapIds[5];            // 0x158
+    int m_shadowTexMtxIds[5];            // 0x16C
+    int m_shadowTexCoordIds[5];          // 0x180
+    unsigned char m_pad194[0x70];
+    unsigned char m_fullShadowTevColor;  // 0x204
     unsigned char m_blendMode;           // 0x205
     unsigned char m_fogEnable;           // 0x206
     unsigned char m_blendOverrideMode;   // 0x207
     unsigned char m_shadowKColorMask;    // 0x208
-    unsigned char m_pad209[0x0A];
+    unsigned char m_shadowKColorIds[5];  // 0x209
+    unsigned char m_shadowIndices[5];    // 0x20E
     CColor m_color213;                   // 0x213
     CMemory::CStage* m_materialStage;    // 0x218
 };

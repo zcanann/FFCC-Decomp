@@ -2,6 +2,7 @@
 #define _FFCC_MAP_H_
 
 #include "ffcc/mapobj.h"
+#include "ffcc/memory.h"
 
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
@@ -11,13 +12,20 @@ class CMapObj;
 class CMapHit;
 class CMapCylinder;
 class CMapLightHolder;
+class CMapMesh;
 class CMaterial;
+class CMaterialSet;
+class CMapTexAnimSet;
 class CMapAnimRun;
 class CMapAnim;
 class CMapAnimNode;
 class CMapAnimKeyDt;
 class CMapShadow;
 class CMemory;
+class CTextureSet;
+class COctTree;
+template <class T>
+class CPtrArray;
 
 void setDbgLight(int, Vec&, _GXColor&);
 void GXSetTexCoordGen();
@@ -72,11 +80,11 @@ public:
 class CMapIdGrp
 {
 public:
-    unsigned long mMask;
-    _GXColor mPrimaryColor;
-    _GXColor mSecondaryColor;
-    _GXColor mTertiaryColor;
-    _GXColor mQuaternaryColor;
+    unsigned long m_mask;
+    _GXColor m_primaryColor;
+    _GXColor m_secondaryColor;
+    _GXColor m_tertiaryColor;
+    _GXColor m_quaternaryColor;
 
     CMapIdGrp();
 };
@@ -98,8 +106,68 @@ class CMapMng
 {
 public:
     // Placeholder storage for the full map manager until concrete members are recovered.
-    unsigned char m_raw[0x22A78];
-    CMapObj* m_hitMapObj; // 0x22A78
+    CMemory::CStage* m_stage;          // 0x00000
+    int m_calcCount;                   // 0x00004
+    short m_octTreeCount;              // 0x00008
+    short m_mapHitCount;               // 0x0000A
+    short m_mapObjCount;               // 0x0000C
+    short m_mapMeshCount;              // 0x0000E
+    unsigned short m_unknown10;        // 0x00010
+    unsigned char m_pad012[0x213D4 - 0x12];
+    CMaterialSet* m_materialSet;       // 0x213D4
+    CTextureSet* m_textureSet;         // 0x213D8
+    CMapTexAnimSet* m_mapTexAnimSet;   // 0x213DC
+    unsigned char m_pad213E0[0x228E8 - 0x213E0];
+    CMapObj* m_rootMapObj;             // 0x228E8
+    Vec m_cameraPosition;              // 0x228EC
+    Mtx m_viewMtx;                     // 0x228F8
+    Mtx m_scaledViewMtxPrimary;        // 0x22928
+    Mtx m_scaledViewMtxSecondary;      // 0x22958
+    unsigned char m_fogEnable;         // 0x22988
+    unsigned char m_colorScaleEnable;  // 0x22989
+    unsigned char m_underWaterTexPending; // 0x2298A
+    unsigned char m_mapReadReady;      // 0x2298B
+    _GXColor m_mapColor;               // 0x2298C
+    _GXColor m_colorScale;             // 0x22990
+    CMapMngAsyncLoadState m_asyncLoadState; // 0x22994
+    int m_mapAnimFrame;                // 0x22A6C
+    float m_octTreeDrawMinDepth;       // 0x22A70
+    float m_octTreeFrustumRange;       // 0x22A74
+    CMapObj* m_hitMapObj;              // 0x22A78
+
+    COctTree* GetOctTreeArray() { return reinterpret_cast<COctTree*>(reinterpret_cast<unsigned char*>(this) + 0x14); }
+    CMapHit* GetMapHitArray() { return reinterpret_cast<CMapHit*>(reinterpret_cast<unsigned char*>(this) + 0x4D4); }
+    CMapObj* GetMapObjArray() { return reinterpret_cast<CMapObj*>(reinterpret_cast<unsigned char*>(this) + 0x954); }
+    CMapMesh* GetMapMeshArray() { return reinterpret_cast<CMapMesh*>(reinterpret_cast<unsigned char*>(this) + 0x1E954); }
+    CPtrArray<CMapAnimRun*>& GetMapAnimRunArray()
+    {
+        return *reinterpret_cast<CPtrArray<CMapAnimRun*>*>(reinterpret_cast<unsigned char*>(this) + 0x213E0);
+    }
+    CPtrArray<CMapAnim*>& GetMapAnimArray()
+    {
+        return *reinterpret_cast<CPtrArray<CMapAnim*>*>(reinterpret_cast<unsigned char*>(this) + 0x213FC);
+    }
+    CPtrArray<CMapAnimKeyDt*>& GetMapAnimKeyDtArray()
+    {
+        return *reinterpret_cast<CPtrArray<CMapAnimKeyDt*>*>(reinterpret_cast<unsigned char*>(this) + 0x21418);
+    }
+    CPtrArray<CMapShadow*>& GetMapShadowArray()
+    {
+        return *reinterpret_cast<CPtrArray<CMapShadow*>*>(reinterpret_cast<unsigned char*>(this) + 0x21434);
+    }
+    CPtrArray<CMapLightHolder*>& GetMapLightHolderArray(int index)
+    {
+        return *reinterpret_cast<CPtrArray<CMapLightHolder*>*>(
+            reinterpret_cast<unsigned char*>(this) + 0x21450 + (index * 0x1C));
+    }
+    CPtrArray<CMapLightHolder*>* GetMapLightHolderArrays()
+    {
+        return reinterpret_cast<CPtrArray<CMapLightHolder*>*>(reinterpret_cast<unsigned char*>(this) + 0x21450);
+    }
+    CMapIdGrp* GetMapIdGrpArray()
+    {
+        return reinterpret_cast<CMapIdGrp*>(reinterpret_cast<unsigned char*>(this) + 0x214E8);
+    }
 
     ~CMapMng();
     CMapMng();

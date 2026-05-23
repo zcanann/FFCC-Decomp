@@ -113,7 +113,7 @@ static inline unsigned char* Ptr(void* ptr, unsigned int offset)
 
 static inline CMapObj* GetMapObjByIndex(unsigned short index)
 {
-    return reinterpret_cast<CMapObj*>(reinterpret_cast<unsigned char*>(&MapMng) + 0x954 + (index * 0xF0));
+    return MapMng.GetMapObjArray() + index;
 }
 
 }
@@ -220,7 +220,7 @@ int COctTree::ReadOtmOctTree(CChunkFile& chunkFile)
             }
 
             nodeCount = m_nodeCount;
-            m_nodePool = new (*reinterpret_cast<CMemory::CStage**>(&MapMng), const_cast<char*>(s_mapocttree_cpp_801D72EC), 0x59)
+            m_nodePool = new (MapMng.m_stage, const_cast<char*>(s_mapocttree_cpp_801D72EC), 0x59)
                 COctNode[nodeCount];
             break;
         }
@@ -321,19 +321,19 @@ void COctTree::DrawTypeMeshFlag_r(COctNode* octNode)
 		env->m_lockedEnvUnknown5c = 0;
 		env->m_shadowKColorMask = 0;
 		if (*reinterpret_cast<unsigned char*>(Ptr(m_mapObject, 0x22)) != 0) {
-			CameraPcs.SetFullScreenShadow(reinterpret_cast<float(*)[4]>(Ptr(m_mapObject, 0xB8)), 0);
+			CameraPcs.SetFullScreenShadow(m_mapObject->m_worldMtx, 0);
 		}
 		if (*reinterpret_cast<unsigned long*>(Ptr(m_mapObject, 0x3C)) != 0) {
 			MaterialMan.SetShadowBit32(static_cast<CMapShadow::TARGET>(1), &octNode->m_shadowFlags,
-			                           reinterpret_cast<float(*)[4]>(Ptr(m_mapObject, 0xB8)));
+			                           m_mapObject->m_worldMtx);
 		}
 		env->m_stdTexMapId = env->m_texMapIdCur;
 		env->m_stdTexMtx = env->m_texMtxCur;
 		env->m_stdTexCoordId = env->m_texCoordIdCur;
 		env->m_stdEnvTevBit = env->m_curEnvTevBit;
 		LightPcs.SetBit32(static_cast<CLightPcs::TARGET>(1), &octNode->m_lightFlags);
-		static_cast<CMapObj*>(m_mapObject)->SetDrawEnv();
-		reinterpret_cast<CMapMesh*>(*reinterpret_cast<void**>(Ptr(m_mapObject, 0xC)))
+		m_mapObject->SetDrawEnv();
+		static_cast<CMapMesh*>(m_mapObject->m_mapData)
 			->DrawMesh(octNode->m_meshStart,
 			           octNode->m_meshCount);
 	}
@@ -362,19 +362,19 @@ void COctTree::DrawTypeMeshFlag_r(COctNode* octNode)
 			env->m_lockedEnvUnknown5c = 0;
 			env->m_shadowKColorMask = 0;
 			if (*reinterpret_cast<unsigned char*>(Ptr(m_mapObject, 0x22)) != 0) {
-				CameraPcs.SetFullScreenShadow(reinterpret_cast<float(*)[4]>(Ptr(m_mapObject, 0xB8)), 0);
+				CameraPcs.SetFullScreenShadow(m_mapObject->m_worldMtx, 0);
 			}
 			if (*reinterpret_cast<unsigned long*>(Ptr(m_mapObject, 0x3C)) != 0) {
 				MaterialMan.SetShadowBit32(static_cast<CMapShadow::TARGET>(1), &pCVar4->m_shadowFlags,
-				                           reinterpret_cast<float(*)[4]>(Ptr(m_mapObject, 0xB8)));
+				                           m_mapObject->m_worldMtx);
 			}
 			env->m_stdTexMapId = env->m_texMapIdCur;
 			env->m_stdTexMtx = env->m_texMtxCur;
 			env->m_stdTexCoordId = env->m_texCoordIdCur;
 			env->m_stdEnvTevBit = env->m_curEnvTevBit;
 			LightPcs.SetBit32(static_cast<CLightPcs::TARGET>(1), &pCVar4->m_lightFlags);
-			static_cast<CMapObj*>(m_mapObject)->SetDrawEnv();
-			reinterpret_cast<CMapMesh*>(*reinterpret_cast<void**>(Ptr(m_mapObject, 0xC)))
+			m_mapObject->SetDrawEnv();
+			static_cast<CMapMesh*>(m_mapObject->m_mapData)
 				->DrawMesh(pCVar4->m_meshStart,
 				           pCVar4->m_meshCount);
 		}
@@ -387,17 +387,17 @@ void COctTree::DrawTypeMeshFlag_r(COctNode* octNode)
 			if ((pCVar3->m_meshCount != 0) &&
 			    ((pCVar3->m_drawFlags & 1) != 0)) {
 				MaterialMan.InitEnv();
-				if (*reinterpret_cast<unsigned char*>(Ptr(*reinterpret_cast<void**>(Ptr(this, 0x8)), 0x22)) != 0) {
-					CameraPcs.SetFullScreenShadow(reinterpret_cast<float(*)[4]>(Ptr(m_mapObject, 0xB8)), 0);
+				if (*reinterpret_cast<unsigned char*>(Ptr(m_mapObject, 0x22)) != 0) {
+					CameraPcs.SetFullScreenShadow(m_mapObject->m_worldMtx, 0);
 				}
 				if (*reinterpret_cast<unsigned long*>(Ptr(m_mapObject, 0x3C)) != 0) {
 					MaterialMan.SetShadowBit32(static_cast<CMapShadow::TARGET>(1), &pCVar3->m_shadowFlags,
-					                           reinterpret_cast<float(*)[4]>(Ptr(m_mapObject, 0xB8)));
+					                           m_mapObject->m_worldMtx);
 				}
 				MaterialMan.LockEnv();
 				LightPcs.SetBit32(static_cast<CLightPcs::TARGET>(1), &pCVar3->m_lightFlags);
-				static_cast<CMapObj*>(m_mapObject)->SetDrawEnv();
-				reinterpret_cast<CMapMesh*>(*reinterpret_cast<void**>(Ptr(m_mapObject, 0xC)))
+				m_mapObject->SetDrawEnv();
+				static_cast<CMapMesh*>(m_mapObject->m_mapData)
 					->DrawMesh(pCVar3->m_meshStart,
 					           pCVar3->m_meshCount);
 			}
@@ -443,91 +443,77 @@ void COctTree::DrawCharaShadowTypeMeshFlag_r(COctNode* octNode)
 	int iVar12;
 	int iVar13;
 
-	if ((*reinterpret_cast<unsigned short*>(Ptr(octNode, 0x3C)) != 0) &&
-	    ((*reinterpret_cast<unsigned long*>(Ptr(octNode, 0x40)) & 1) != 0)) {
-		reinterpret_cast<CMapMesh*>(*reinterpret_cast<void**>(Ptr(*reinterpret_cast<void**>(Ptr(this, 0x8)), 0xC)))
-			->DrawMeshCharaShadow(*reinterpret_cast<unsigned short*>(Ptr(octNode, 0x3E)),
-			                      *reinterpret_cast<unsigned short*>(Ptr(octNode, 0x3C)));
+	if ((octNode->m_meshCount != 0) && ((octNode->m_drawFlags & 1) != 0)) {
+		static_cast<CMapMesh*>(m_mapObject->m_mapData)
+			->DrawMeshCharaShadow(octNode->m_meshStart, octNode->m_meshCount);
 	}
 
 	iVar1 = 0;
 	do {
-		pCVar3 = *reinterpret_cast<COctNode**>(Ptr(octNode, 0x1C));
+		pCVar3 = octNode->m_children[0];
 		if (pCVar3 == 0) {
 			return;
 		}
-		if ((*reinterpret_cast<unsigned short*>(Ptr(pCVar3, 0x3C)) != 0) &&
-		    ((*reinterpret_cast<unsigned long*>(Ptr(pCVar3, 0x40)) & 1) != 0)) {
-			reinterpret_cast<CMapMesh*>(*reinterpret_cast<void**>(Ptr(*reinterpret_cast<void**>(Ptr(this, 0x8)), 0xC)))
-				->DrawMeshCharaShadow(*reinterpret_cast<unsigned short*>(Ptr(pCVar3, 0x3E)),
-				                      *reinterpret_cast<unsigned short*>(Ptr(pCVar3, 0x3C)));
+		if ((pCVar3->m_meshCount != 0) && ((pCVar3->m_drawFlags & 1) != 0)) {
+			static_cast<CMapMesh*>(m_mapObject->m_mapData)
+				->DrawMeshCharaShadow(pCVar3->m_meshStart, pCVar3->m_meshCount);
 		}
 		iVar2 = 0;
 		do {
-			pCVar8 = *reinterpret_cast<COctNode**>(Ptr(pCVar3, 0x1C));
+			pCVar8 = pCVar3->m_children[0];
 			if (pCVar8 == 0) {
 				break;
 			}
-			if ((*reinterpret_cast<unsigned short*>(Ptr(pCVar8, 0x3C)) != 0) &&
-			    ((*reinterpret_cast<unsigned long*>(Ptr(pCVar8, 0x40)) & 1) != 0)) {
-				reinterpret_cast<CMapMesh*>(*reinterpret_cast<void**>(Ptr(*reinterpret_cast<void**>(Ptr(this, 0x8)), 0xC)))
-					->DrawMeshCharaShadow(*reinterpret_cast<unsigned short*>(Ptr(pCVar8, 0x3E)),
-					                      *reinterpret_cast<unsigned short*>(Ptr(pCVar8, 0x3C)));
+			if ((pCVar8->m_meshCount != 0) && ((pCVar8->m_drawFlags & 1) != 0)) {
+				static_cast<CMapMesh*>(m_mapObject->m_mapData)
+					->DrawMeshCharaShadow(pCVar8->m_meshStart, pCVar8->m_meshCount);
 			}
 			iVar13 = 0;
 			do {
-				pCVar7 = *reinterpret_cast<COctNode**>(Ptr(pCVar8, 0x1C));
+				pCVar7 = pCVar8->m_children[0];
 				if (pCVar7 == 0) {
 					break;
 				}
-				if ((*reinterpret_cast<unsigned short*>(Ptr(pCVar7, 0x3C)) != 0) &&
-				    ((*reinterpret_cast<unsigned long*>(Ptr(pCVar7, 0x40)) & 1) != 0)) {
-					reinterpret_cast<CMapMesh*>(*reinterpret_cast<void**>(Ptr(*reinterpret_cast<void**>(Ptr(this, 0x8)), 0xC)))
-						->DrawMeshCharaShadow(*reinterpret_cast<unsigned short*>(Ptr(pCVar7, 0x3E)),
-						                      *reinterpret_cast<unsigned short*>(Ptr(pCVar7, 0x3C)));
+				if ((pCVar7->m_meshCount != 0) && ((pCVar7->m_drawFlags & 1) != 0)) {
+					static_cast<CMapMesh*>(m_mapObject->m_mapData)
+						->DrawMeshCharaShadow(pCVar7->m_meshStart, pCVar7->m_meshCount);
 				}
 				iVar12 = 0;
 				do {
-					pCVar6 = *reinterpret_cast<COctNode**>(Ptr(pCVar7, 0x1C));
+					pCVar6 = pCVar7->m_children[0];
 					if (pCVar6 == 0) {
 						break;
 					}
-					if ((*reinterpret_cast<unsigned short*>(Ptr(pCVar6, 0x3C)) != 0) &&
-					    ((*reinterpret_cast<unsigned long*>(Ptr(pCVar6, 0x40)) & 1) != 0)) {
-						reinterpret_cast<CMapMesh*>(*reinterpret_cast<void**>(Ptr(*reinterpret_cast<void**>(Ptr(this, 0x8)), 0xC)))
-							->DrawMeshCharaShadow(*reinterpret_cast<unsigned short*>(Ptr(pCVar6, 0x3E)),
-							                      *reinterpret_cast<unsigned short*>(Ptr(pCVar6, 0x3C)));
+					if ((pCVar6->m_meshCount != 0) && ((pCVar6->m_drawFlags & 1) != 0)) {
+						static_cast<CMapMesh*>(m_mapObject->m_mapData)
+							->DrawMeshCharaShadow(pCVar6->m_meshStart, pCVar6->m_meshCount);
 					}
 					iVar11 = 0;
 					do {
-						pCVar5 = *reinterpret_cast<COctNode**>(Ptr(pCVar6, 0x1C));
+						pCVar5 = pCVar6->m_children[0];
 						if (pCVar5 == 0) {
 							break;
 						}
-						if ((*reinterpret_cast<unsigned short*>(Ptr(pCVar5, 0x3C)) != 0) &&
-						    ((*reinterpret_cast<unsigned long*>(Ptr(pCVar5, 0x40)) & 1) != 0)) {
-							reinterpret_cast<CMapMesh*>(*reinterpret_cast<void**>(Ptr(*reinterpret_cast<void**>(Ptr(this, 0x8)), 0xC)))
-								->DrawMeshCharaShadow(*reinterpret_cast<unsigned short*>(Ptr(pCVar5, 0x3E)),
-								                      *reinterpret_cast<unsigned short*>(Ptr(pCVar5, 0x3C)));
+						if ((pCVar5->m_meshCount != 0) && ((pCVar5->m_drawFlags & 1) != 0)) {
+							static_cast<CMapMesh*>(m_mapObject->m_mapData)
+								->DrawMeshCharaShadow(pCVar5->m_meshStart, pCVar5->m_meshCount);
 						}
 						iVar10 = 0;
 						do {
-							pCVar4 = *reinterpret_cast<COctNode**>(Ptr(pCVar5, 0x1C));
+							pCVar4 = pCVar5->m_children[0];
 							if (pCVar4 == 0) {
 								break;
 							}
-							if ((*reinterpret_cast<unsigned short*>(Ptr(pCVar4, 0x3C)) != 0) &&
-							    ((*reinterpret_cast<unsigned long*>(Ptr(pCVar4, 0x40)) & 1) != 0)) {
-								reinterpret_cast<CMapMesh*>(*reinterpret_cast<void**>(Ptr(*reinterpret_cast<void**>(Ptr(this, 0x8)), 0xC)))
-									->DrawMeshCharaShadow(*reinterpret_cast<unsigned short*>(Ptr(pCVar4, 0x3E)),
-									                      *reinterpret_cast<unsigned short*>(Ptr(pCVar4, 0x3C)));
+							if ((pCVar4->m_meshCount != 0) && ((pCVar4->m_drawFlags & 1) != 0)) {
+								static_cast<CMapMesh*>(m_mapObject->m_mapData)
+									->DrawMeshCharaShadow(pCVar4->m_meshStart, pCVar4->m_meshCount);
 							}
 							iVar9 = 0;
 							do {
-								if (*reinterpret_cast<COctNode**>(Ptr(pCVar4, 0x1C)) == 0) {
+								if (pCVar4->m_children[0] == 0) {
 									break;
 								}
-								DrawCharaShadowTypeMeshFlag_r(*reinterpret_cast<COctNode**>(Ptr(pCVar4, 0x1C)));
+								DrawCharaShadowTypeMeshFlag_r(pCVar4->m_children[0]);
 								iVar9 = iVar9 + 1;
 								pCVar4 = reinterpret_cast<COctNode*>(Ptr(pCVar4, 4));
 							} while (iVar9 < 8);
@@ -773,7 +759,7 @@ void COctTree::DrawTypeMesh_r(COctNode* octNode)
 		if (farCount >= 8) {
 			return;
 		}
-		if (maxDepth < *reinterpret_cast<float*>(Ptr(&MapMng, 0x22A70))) {
+		if (maxDepth < MapMng.m_octTreeDrawMinDepth) {
 			return;
 		}
 		if (andMask != 0) {
@@ -815,7 +801,7 @@ void COctTree::DrawTypeMesh_r(COctNode* octNode)
  */
 void COctTree::Draw(unsigned char drawType)
 {
-	void* mapObj;
+	CMapObj* mapObj;
 
 	if (m_type == 0) {
 		mapObj = m_mapObject;
@@ -823,15 +809,15 @@ void COctTree::Draw(unsigned char drawType)
 		unsigned char targetDrawType = drawType;
 		if ((mapDrawType == targetDrawType) &&
 		    ((*reinterpret_cast<unsigned char*>(Ptr(mapObj, 0x18)) & 1) != 0)) {
-			if ((*reinterpret_cast<unsigned char*>(Ptr(&MapMng, 0x2298A)) != 0) &&
+			if ((MapMng.m_underWaterTexPending != 0) &&
 			    ((*reinterpret_cast<void**>(Ptr(mapObj, 0x10)) != 0) &&
 			     (*reinterpret_cast<unsigned char*>(Ptr(*reinterpret_cast<void**>(Ptr(mapObj, 0x10)), 0xB1)) == 2))) {
 				MaterialMan.SetUnderWaterTex();
-				*reinterpret_cast<unsigned char*>(Ptr(&MapMng, 0x2298A)) = 0;
+				MapMng.m_underWaterTexPending = 0;
 			}
 
 			mapObj = m_mapObject;
-			LightPcs.SetBumpTexMatirx(reinterpret_cast<float(*)[4]>(Ptr(mapObj, 0xB8)),
+			LightPcs.SetBumpTexMatirx(mapObj->m_worldMtx,
 			                          *reinterpret_cast<CLightPcs::CBumpLight**>(Ptr(mapObj, 0x10)),
 			                          reinterpret_cast<Vec*>(Ptr(mapObj, 0x58)),
 			                          *reinterpret_cast<unsigned char*>(Ptr(mapObj, 0x1A)));
@@ -841,7 +827,7 @@ void COctTree::Draw(unsigned char drawType)
 			if (*reinterpret_cast<unsigned char*>(Ptr(m_mapObject, 0x27)) != 0) {
 				GXSetZMode(1, (GXCompare)3, 0);
 			}
-			reinterpret_cast<CMapMesh*>(*reinterpret_cast<void**>(Ptr(m_mapObject, 0xC)))->SetRenderArray();
+			static_cast<CMapMesh*>(m_mapObject->m_mapData)->SetRenderArray();
 			DrawTypeMeshFlag_r(m_nodePool);
 			if (*reinterpret_cast<unsigned char*>(Ptr(m_mapObject, 0x27)) != 0) {
 				GXSetZMode(1, (GXCompare)3, 1);
@@ -865,7 +851,7 @@ void COctTree::Draw(unsigned char drawType)
  */
 void COctTree::DrawCharaShadow(unsigned char drawType)
 {
-	void* mapObj;
+	CMapObj* mapObj;
 
 	if (m_type == 0) {
 		mapObj = m_mapObject;
@@ -875,14 +861,14 @@ void COctTree::DrawCharaShadow(unsigned char drawType)
 			return;
 		}
 
-		LightPcs.SetBumpTexMatirx(reinterpret_cast<float(*)[4]>(Ptr(mapObj, 0xB8)), 0, reinterpret_cast<Vec*>(Ptr(mapObj, 0x58)),
+		LightPcs.SetBumpTexMatirx(mapObj->m_worldMtx, 0, reinterpret_cast<Vec*>(Ptr(mapObj, 0x58)),
 		                          *reinterpret_cast<unsigned char*>(Ptr(mapObj, 0x1A)));
 
 		if (kMapOctTreeDefaultOffsetZ != *reinterpret_cast<float*>(Ptr(m_mapObject, 0x40))) {
 			CameraPcs.SetOffsetZBuff(*reinterpret_cast<float*>(Ptr(m_mapObject, 0x40)));
 		}
 
-		reinterpret_cast<CMapMesh*>(*reinterpret_cast<void**>(Ptr(m_mapObject, 0xC)))->SetRenderArray();
+		static_cast<CMapMesh*>(m_mapObject->m_mapData)->SetRenderArray();
 		DrawCharaShadowTypeMeshFlag_r(m_nodePool);
 
 		float offsetZ = *reinterpret_cast<float*>(Ptr(m_mapObject, 0x40));
@@ -906,10 +892,10 @@ void COctTree::SetDrawFlag()
 	Mtx localMtx;
 
 	if (((m_drawFlags & 1) == 0) && (*reinterpret_cast<unsigned char*>(Ptr(m_mapObject, 0x1D)) == 1)) {
-		PSMTXConcat(reinterpret_cast<float(*)[4]>(Ptr(&MapMng, 0x22928)),
-		            reinterpret_cast<float(*)[4]>(Ptr(m_mapObject, 0xB8)), reinterpret_cast<float(*)[4]>(Ptr(this, 0xC)));
-		PSMTXConcat(reinterpret_cast<float(*)[4]>(Ptr(&MapMng, 0x228F8)),
-		            reinterpret_cast<float(*)[4]>(Ptr(m_mapObject, 0xB8)), localMtx);
+		PSMTXConcat(MapMng.m_scaledViewMtxPrimary,
+		            m_mapObject->m_worldMtx, reinterpret_cast<float(*)[4]>(Ptr(this, 0xC)));
+		PSMTXConcat(MapMng.m_viewMtx,
+		            m_mapObject->m_worldMtx, localMtx);
 		PSMTXInverse(localMtx, localMtx);
 
 		m_localPosX = localMtx[0][3];
@@ -946,58 +932,58 @@ void ClearLight_r(COctNode* octNode)
 	int iVar12;
 	int iVar13;
 
-	if (*reinterpret_cast<unsigned short*>(Ptr(octNode, 0x3C)) != 0) {
-		*reinterpret_cast<unsigned long*>(Ptr(octNode, 0x44)) = 0;
+	if (octNode->m_meshCount != 0) {
+		octNode->m_lightFlags = 0;
 	}
 	iVar1 = 0;
 	nodeIter = octNode;
 	do {
-		pCVar8 = *reinterpret_cast<COctNode**>(Ptr(nodeIter, 0x1C));
+		pCVar8 = nodeIter->m_children[0];
 		if (pCVar8 == 0) {
 			return;
 		}
-		if (*reinterpret_cast<unsigned short*>(Ptr(pCVar8, 0x3C)) != 0) {
-			*reinterpret_cast<unsigned long*>(Ptr(pCVar8, 0x44)) = 0;
+		if (pCVar8->m_meshCount != 0) {
+			pCVar8->m_lightFlags = 0;
 		}
 		iVar2 = 0;
 		do {
-			pCVar7 = *reinterpret_cast<COctNode**>(Ptr(pCVar8, 0x1C));
+			pCVar7 = pCVar8->m_children[0];
 			if (pCVar7 == 0) break;
-			if (*reinterpret_cast<unsigned short*>(Ptr(pCVar7, 0x3C)) != 0) {
-				*reinterpret_cast<unsigned long*>(Ptr(pCVar7, 0x44)) = 0;
+			if (pCVar7->m_meshCount != 0) {
+				pCVar7->m_lightFlags = 0;
 			}
 			iVar13 = 0;
 			do {
-				pCVar6 = *reinterpret_cast<COctNode**>(Ptr(pCVar7, 0x1C));
+				pCVar6 = pCVar7->m_children[0];
 				if (pCVar6 == 0) break;
-				if (*reinterpret_cast<unsigned short*>(Ptr(pCVar6, 0x3C)) != 0) {
-					*reinterpret_cast<unsigned long*>(Ptr(pCVar6, 0x44)) = 0;
+				if (pCVar6->m_meshCount != 0) {
+					pCVar6->m_lightFlags = 0;
 				}
 				iVar12 = 0;
 				do {
-					pCVar5 = *reinterpret_cast<COctNode**>(Ptr(pCVar6, 0x1C));
+					pCVar5 = pCVar6->m_children[0];
 					if (pCVar5 == 0) break;
-					if (*reinterpret_cast<unsigned short*>(Ptr(pCVar5, 0x3C)) != 0) {
-						*reinterpret_cast<unsigned long*>(Ptr(pCVar5, 0x44)) = 0;
+					if (pCVar5->m_meshCount != 0) {
+						pCVar5->m_lightFlags = 0;
 					}
 					iVar11 = 0;
 					do {
-						pCVar4 = *reinterpret_cast<COctNode**>(Ptr(pCVar5, 0x1C));
+						pCVar4 = pCVar5->m_children[0];
 						if (pCVar4 == 0) break;
-						if (*reinterpret_cast<unsigned short*>(Ptr(pCVar4, 0x3C)) != 0) {
-							*reinterpret_cast<unsigned long*>(Ptr(pCVar4, 0x44)) = 0;
+						if (pCVar4->m_meshCount != 0) {
+							pCVar4->m_lightFlags = 0;
 						}
 						iVar10 = 0;
 						do {
-							pCVar3 = *reinterpret_cast<COctNode**>(Ptr(pCVar4, 0x1C));
+							pCVar3 = pCVar4->m_children[0];
 							if (pCVar3 == 0) break;
-							if (*reinterpret_cast<unsigned short*>(Ptr(pCVar3, 0x3C)) != 0) {
-								*reinterpret_cast<unsigned long*>(Ptr(pCVar3, 0x44)) = 0;
+							if (pCVar3->m_meshCount != 0) {
+								pCVar3->m_lightFlags = 0;
 							}
 							iVar9 = 0;
 							do {
-								if (*reinterpret_cast<COctNode**>(Ptr(pCVar3, 0x1C)) == 0) break;
-								ClearLight_r(*reinterpret_cast<COctNode**>(Ptr(pCVar3, 0x1C)));
+								if (pCVar3->m_children[0] == 0) break;
+								ClearLight_r(pCVar3->m_children[0]);
 								iVar9 = iVar9 + 1;
 								pCVar3 = reinterpret_cast<COctNode*>(Ptr(pCVar3, 4));
 							} while (iVar9 < 8);
@@ -1172,7 +1158,7 @@ void InsertLight_r(COctNode* node)
 
 				if ((reinterpret_cast<CBound*>(grandChild)->CheckCross(*reinterpret_cast<CBound*>(&s_bound))) != 0) {
 					if (grandChild->m_meshCount != 0) {
-						setbit32(reinterpret_cast<unsigned long*>(Ptr(grandChild, 0x44)), g_pStage);
+						setbit32(&grandChild->m_lightFlags, g_pStage);
 					}
 
 					COctNode* grandChildIter = grandChild;
@@ -1217,7 +1203,7 @@ void COctTree::InsertLight(long bitIndex, Vec& position, float radius, unsigned 
 	}
 
 	g_pStage = bitIndex;
-	PSMTXInverse(reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(m_mapObject) + 0xB8), inverseMtx);
+	PSMTXInverse(m_mapObject->m_worldMtx, inverseMtx);
 	PSMTXMultVec(inverseMtx, &position, &localPosition);
 
 	s_bound.m_min.x = localPosition.x - radius;
@@ -1256,58 +1242,58 @@ void ClearShadow_r(COctNode* node)
 	int iVar12;
 	int iVar13;
 
-	if (*reinterpret_cast<unsigned short*>(Ptr(node, 0x3C)) != 0) {
-		*reinterpret_cast<unsigned long*>(Ptr(node, 0x48)) = 0;
+	if (node->m_meshCount != 0) {
+		node->m_shadowFlags = 0;
 	}
 	iVar1 = 0;
 	nodeIter = node;
 	do {
-		pCVar8 = *reinterpret_cast<COctNode**>(Ptr(nodeIter, 0x1C));
+		pCVar8 = nodeIter->m_children[0];
 		if (pCVar8 == 0) {
 			return;
 		}
-		if (*reinterpret_cast<unsigned short*>(Ptr(pCVar8, 0x3C)) != 0) {
-			*reinterpret_cast<unsigned long*>(Ptr(pCVar8, 0x48)) = 0;
+		if (pCVar8->m_meshCount != 0) {
+			pCVar8->m_shadowFlags = 0;
 		}
 		iVar2 = 0;
 		do {
-			pCVar7 = *reinterpret_cast<COctNode**>(Ptr(pCVar8, 0x1C));
+			pCVar7 = pCVar8->m_children[0];
 			if (pCVar7 == 0) break;
-			if (*reinterpret_cast<unsigned short*>(Ptr(pCVar7, 0x3C)) != 0) {
-				*reinterpret_cast<unsigned long*>(Ptr(pCVar7, 0x48)) = 0;
+			if (pCVar7->m_meshCount != 0) {
+				pCVar7->m_shadowFlags = 0;
 			}
 			iVar13 = 0;
 			do {
-				pCVar6 = *reinterpret_cast<COctNode**>(Ptr(pCVar7, 0x1C));
+				pCVar6 = pCVar7->m_children[0];
 				if (pCVar6 == 0) break;
-				if (*reinterpret_cast<unsigned short*>(Ptr(pCVar6, 0x3C)) != 0) {
-					*reinterpret_cast<unsigned long*>(Ptr(pCVar6, 0x48)) = 0;
+				if (pCVar6->m_meshCount != 0) {
+					pCVar6->m_shadowFlags = 0;
 				}
 				iVar12 = 0;
 				do {
-					pCVar5 = *reinterpret_cast<COctNode**>(Ptr(pCVar6, 0x1C));
+					pCVar5 = pCVar6->m_children[0];
 					if (pCVar5 == 0) break;
-					if (*reinterpret_cast<unsigned short*>(Ptr(pCVar5, 0x3C)) != 0) {
-						*reinterpret_cast<unsigned long*>(Ptr(pCVar5, 0x48)) = 0;
+					if (pCVar5->m_meshCount != 0) {
+						pCVar5->m_shadowFlags = 0;
 					}
 					iVar11 = 0;
 					do {
-						pCVar4 = *reinterpret_cast<COctNode**>(Ptr(pCVar5, 0x1C));
+						pCVar4 = pCVar5->m_children[0];
 						if (pCVar4 == 0) break;
-						if (*reinterpret_cast<unsigned short*>(Ptr(pCVar4, 0x3C)) != 0) {
-							*reinterpret_cast<unsigned long*>(Ptr(pCVar4, 0x48)) = 0;
+						if (pCVar4->m_meshCount != 0) {
+							pCVar4->m_shadowFlags = 0;
 						}
 						iVar10 = 0;
 						do {
-							pCVar3 = *reinterpret_cast<COctNode**>(Ptr(pCVar4, 0x1C));
+							pCVar3 = pCVar4->m_children[0];
 							if (pCVar3 == 0) break;
-							if (*reinterpret_cast<unsigned short*>(Ptr(pCVar3, 0x3C)) != 0) {
-								*reinterpret_cast<unsigned long*>(Ptr(pCVar3, 0x48)) = 0;
+							if (pCVar3->m_meshCount != 0) {
+								pCVar3->m_shadowFlags = 0;
 							}
 							iVar9 = 0;
 							do {
-								if (*reinterpret_cast<COctNode**>(Ptr(pCVar3, 0x1C)) == 0) break;
-								ClearShadow_r(*reinterpret_cast<COctNode**>(Ptr(pCVar3, 0x1C)));
+								if (pCVar3->m_children[0] == 0) break;
+								ClearShadow_r(pCVar3->m_children[0]);
 								iVar9 = iVar9 + 1;
 								pCVar3 = reinterpret_cast<COctNode*>(Ptr(pCVar3, 4));
 							} while (iVar9 < 8);
@@ -1486,7 +1472,7 @@ void InsertShadow_r(COctNode* node)
 
 				if ((reinterpret_cast<CBound*>(grandChild)->CheckCross(*reinterpret_cast<CBound*>(&s_bound))) != 0) {
 					if ((s_light_no >= 3) && (grandChild->m_meshCount != 0)) {
-						setbit32(reinterpret_cast<unsigned long*>(Ptr(grandChild, 0x48)), s_insertShadowNo);
+						setbit32(&grandChild->m_shadowFlags, s_insertShadowNo);
 					}
 
 					COctNode* grandChildIter = grandChild;
@@ -1526,7 +1512,7 @@ void COctTree::InsertShadow(long bitIndex, Vec& position, CBound& bound)
 
 	if (m_type == 0) {
 		s_insertShadowNo = bitIndex;
-		PSMTXInverse(reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(m_mapObject) + 0xB8), inverseMtx);
+		PSMTXInverse(m_mapObject->m_worldMtx, inverseMtx);
 		PSMTXMultVec(inverseMtx, &position, &localPosition);
 
 		s_bound = bound;

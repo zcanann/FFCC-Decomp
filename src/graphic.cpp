@@ -60,27 +60,27 @@ static inline u8& U8At(CGraphic* self, u32 offset) {
 
 static inline float CameraNearZ()
 {
-    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0x100);
+    return CameraPcs.m_nearZ;
 }
 
 static inline float CameraFarZ()
 {
-    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0x104);
+    return CameraPcs.m_farZ;
 }
 
 static inline float CameraWorldX()
 {
-    return CameraPcs._224_4_;
+    return CameraPcs.m_positionX;
 }
 
 static inline float CameraWorldZ()
 {
-    return CameraPcs._232_4_;
+    return CameraPcs.m_positionZ;
 }
 
 static inline Mtx& CameraMatrix()
 {
-    return *reinterpret_cast<Mtx*>(reinterpret_cast<u8*>(&CameraPcs) + 0x4);
+    return CameraPcs.m_cameraMatrix;
 }
 
 extern "C" {

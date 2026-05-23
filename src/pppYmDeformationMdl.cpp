@@ -65,12 +65,12 @@ extern const float kYmDeformationMdlZero = 0.0f;
 
 static inline Mtx& CameraMatrix()
 {
-    return *reinterpret_cast<Mtx*>(reinterpret_cast<u8*>(&CameraPcs) + 0x4);
+    return CameraPcs.m_cameraMatrix;
 }
 
 static inline Mtx44& CameraScreenMatrix()
 {
-    return *reinterpret_cast<Mtx44*>(reinterpret_cast<u8*>(&CameraPcs) + 0x94);
+    return CameraPcs.m_screenMatrix;
 }
 
 static inline float DeformationMdlZero()

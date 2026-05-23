@@ -133,13 +133,13 @@ extern const Vec DAT_801dd4bc = { 0.0f, 1.0f, 0.0f };
 extern const char s_f999_root_801dd4c8[] = "f999_root";
 extern const char s_pppScreenBreak_cpp_801dd4d4[] = "pppScreenBreak.cpp";
 
-static inline float CameraPosX() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xE0); }
-static inline float CameraPosY() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xE4); }
-static inline float CameraPosZ() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xE8); }
-static inline float CameraDirX() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xEC); }
-static inline float CameraDirY() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xF0); }
-static inline float CameraDirZ() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xF4); }
-static inline MtxPtr CameraMatrix() { return reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x4); }
+static inline float CameraPosX() { return CameraPcs.m_positionX; }
+static inline float CameraPosY() { return CameraPcs.m_positionY; }
+static inline float CameraPosZ() { return CameraPcs.m_positionZ; }
+static inline float CameraDirX() { return CameraPcs.m_directionX; }
+static inline float CameraDirY() { return CameraPcs.m_directionY; }
+static inline float CameraDirZ() { return CameraPcs.m_directionZ; }
+static inline MtxPtr CameraMatrix() { return CameraPcs.m_cameraMatrix; }
 static inline Mtx44Ptr CameraScreenMatrix() { return reinterpret_cast<Mtx44Ptr>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x48); }
 static inline u8* ScreenBreakModelDataRaw(CChara::CModel* model) { return *(u8**)((u8*)model + 0xA4); }
 
@@ -704,12 +704,12 @@ int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void* para
     Mtx invTransMtx;
     ScreenBreakMeshRef* mesh;
 
-    cameraForward.x = CameraPcs._236_4_;
-    cameraForward.y = CameraPcs._240_4_;
-    cameraForward.z = CameraPcs._244_4_;
-    cameraPos.x = CameraPcs._224_4_;
-    cameraPos.y = CameraPcs._228_4_;
-    cameraPos.z = CameraPcs._232_4_;
+    cameraForward.x = CameraPcs.m_directionX;
+    cameraForward.y = CameraPcs.m_directionY;
+    cameraForward.z = CameraPcs.m_directionZ;
+    cameraPos.x = CameraPcs.m_positionX;
+    cameraPos.y = CameraPcs.m_positionY;
+    cameraPos.z = CameraPcs.m_positionZ;
 
     PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
     PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);

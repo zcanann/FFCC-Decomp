@@ -386,7 +386,7 @@ void CPartMng::Destroy()
         CRefRaw* textureSet = reinterpret_cast<CRefRaw*>(res->m_textureSet);
         textureSet->m_refCount--;
         if (textureSet->m_refCount == 0) {
-            reinterpret_cast<void (*)(void*, int)>(textureSet->m_vtable[2])(textureSet, 1);
+            delete res->m_textureSet;
         }
         res->m_textureSet = 0;
     }
@@ -395,7 +395,7 @@ void CPartMng::Destroy()
         CRefRaw* materialSet = reinterpret_cast<CRefRaw*>(res->m_materialSet);
         materialSet->m_refCount--;
         if (materialSet->m_refCount == 0) {
-            reinterpret_cast<void (*)(void*, int)>(materialSet->m_vtable[2])(materialSet, 1);
+            delete res->m_materialSet;
         }
         res->m_materialSet = 0;
     }
@@ -1196,14 +1196,8 @@ void CPartMng::ReadTex(CChunkFile&)
  */
 unsigned int CPartMng::pppReadRsd(CChunkFile& chunkFile, pppModelSt* modelSt)
 {
-    struct PartPcsRaw {
-        unsigned char m_unk0[4];
-        CUSBStreamData m_usbStreamData;
-    };
-
     char* textureNames[0x101];
     CChunkFile::CChunk chunk;
-    PartPcsRaw* partPcs = reinterpret_cast<PartPcsRaw*>(&PartPcs);
 
     unsigned int meshSize = 0;
 
@@ -1216,7 +1210,7 @@ unsigned int CPartMng::pppReadRsd(CChunkFile& chunkFile, pppModelSt* modelSt)
                         textureNames[i] = chunkFile.GetString();
                     }
                 } else if (chunk.m_id == 'MESH') {
-                    meshSize = modelSt->ReadOtmMesh(chunkFile, partPcs->m_usbStreamData.m_stageLoad, 0, 0);
+                    meshSize = modelSt->ReadOtmMesh(chunkFile, PartPcs.m_usbStreamData.m_stageLoad, 0, 0);
                     modelSt->SetDisplayListMaterial(m_materialSet, textureNames, &ppvAmemCacheSet);
                 }
             }
@@ -1241,8 +1235,7 @@ void CPartMng::pppReadShp(CChunkFile& chunkFile, pppShapeSt* shapeSt)
 	char* textureNames[0x101];
 	char** textureNameIt = textureNames;
 	CChunkFile::CChunk chunk;
-	CMemory::CStage* stageLoad =
-		*reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(&PartPcs) + 0x1C);
+	CMemory::CStage* stageLoad = PartPcs.m_usbStreamData.m_stageLoad;
 
 	while (chunkFile.GetNextChunk(chunk))
 	{
@@ -1345,15 +1338,11 @@ void CPartMng::pppEditAllReleaseResource()
     unsigned char* iter;
 
     if (materialSet != 0) {
-        if (materialSet != 0) {
-            reinterpret_cast<void (*)(void*, int)>((*reinterpret_cast<void***>(materialSet))[2])(materialSet, 1);
-        }
+        delete materialSet;
         m_materialSet = 0;
     }
     if (textureSet != 0) {
-        if (textureSet != 0) {
-            reinterpret_cast<void (*)(void*, int)>((*reinterpret_cast<void***>(textureSet))[2])(textureSet, 1);
-        }
+        delete textureSet;
         m_textureSet = 0;
     }
 
@@ -2101,8 +2090,7 @@ void CPartMng::pppEditBeforeCalc()
             *editorObj = 0;
         }
 
-        CMemory::CStage* stageLoad =
-            *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(&PartPcs) + 0x1c);
+        CMemory::CStage* stageLoad = PartPcs.m_usbStreamData.m_stageLoad;
         *editorObj = static_cast<CGObject*>(
             operator new(0x518, stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0x7b5));
         if (*editorObj != 0) {
@@ -2660,8 +2648,8 @@ void pppSetProjection()
  */
 void CPartMng::pppSetRendMatrix()
 {
-    PSMTX44Copy(*reinterpret_cast<Mtx44*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x94), ppvScreenMatrix);
-    PSMTXCopy(*reinterpret_cast<Mtx*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 4), ppvCameraMatrix);
+    PSMTX44Copy(CameraPcs.m_screenMatrix, ppvScreenMatrix);
+    PSMTXCopy(CameraPcs.m_cameraMatrix, ppvCameraMatrix);
     gPartScreenMatrixRow2X = ppvScreenMatrix[2][0];
     gPartScreenMatrixRow2Y = ppvScreenMatrix[2][1];
     gPartScreenMatrixRow2W = ppvScreenMatrix[2][3];
@@ -3416,8 +3404,7 @@ int CPartMng::pppLoadPtx(const char* baseName, int pdtSlotIndex, int appendMode,
     static const unsigned int kChunkTSET = 0x54534554;
     static const int kEnvOffset = 0x2351c;
 
-    CMemory::CStage* stageLoad =
-        *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(&PartPcs) + 0x1c);
+    CMemory::CStage* stageLoad = PartPcs.m_usbStreamData.m_stageLoad;
 
     ppvAmemCacheSet.CacheClear();
     stageLoad->setDefaultParam(pdtSlotIndex);
@@ -3515,8 +3502,7 @@ void CPartMng::pppLoadPmd(const char* baseName)
 
     pppModelSt** modelArrayPtr = reinterpret_cast<pppModelSt**>(reinterpret_cast<unsigned char*>(this) + 0x7ec);
     if (*modelArrayPtr == 0) {
-        CMemory::CStage* stageLoad =
-            *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(&PartPcs) + 0x1c);
+        CMemory::CStage* stageLoad = PartPcs.m_usbStreamData.m_stageLoad;
         pppModelSt* modelArray = reinterpret_cast<pppModelSt*>(
             operator new(
                 0x6c00, stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0xca9));
@@ -3635,8 +3621,7 @@ void CPartMng::pppLoadPan(const char* baseName)
 
     pppShapeSt** shapeArrayPtr = reinterpret_cast<pppShapeSt**>(reinterpret_cast<unsigned char*>(this) + 0x7f0);
     if (*shapeArrayPtr == 0) {
-        CMemory::CStage* stageLoad =
-            *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(&PartPcs) + 0x1c);
+        CMemory::CStage* stageLoad = PartPcs.m_usbStreamData.m_stageLoad;
         pppShapeSt* shapeArray = reinterpret_cast<pppShapeSt*>(
             operator new(
                 0x2c00, stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0xd0b));
@@ -3721,8 +3706,7 @@ int CPartMng::pppLoadPdt(const char* baseName, int pdtSlotIndex, int cachePriori
         char m_name[0x20];
     };
 
-    CMemory::CStage* stageLoad =
-        *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(&PartPcs) + 0x1c);
+    CMemory::CStage* stageLoad = PartPcs.m_usbStreamData.m_stageLoad;
     PppPdtSlotRaw* pdtSlots = reinterpret_cast<PppPdtSlotRaw*>(reinterpret_cast<char*>(this) + 0x22e18);
     PppPdtSlotRaw* pdtSlot = &pdtSlots[pdtSlotIndex];
 

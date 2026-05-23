@@ -49,17 +49,17 @@ extern const float FLOAT_80331904 = -1.5707964f;
 
 static inline float CameraWorldX()
 {
-    return CameraPcs._224_4_;
+    return CameraPcs.m_positionX;
 }
 
 static inline float CameraWorldY()
 {
-    return CameraPcs._228_4_;
+    return CameraPcs.m_positionY;
 }
 
 static inline float CameraWorldZ()
 {
-    return CameraPcs._232_4_;
+    return CameraPcs.m_positionZ;
 }
 
 static inline Mtx& CameraMatrix()

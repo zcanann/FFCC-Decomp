@@ -228,9 +228,14 @@ public:
 	void Destroy();
 	void FlipDBuffer();
 	void gqrInit(unsigned long, unsigned long, unsigned long);
-    void SetAmemStage(CMemory::CStage*);
-    void GetMemoryStage();
-    void ResetAmem(int);
+    void SetAmemStage(CMemory::CStage* stage) { m_amemStage = stage; }
+    CMemory::CStage* GetMemoryStage() { return m_amemStage; }
+    u32& AmemSize() { return m_amemSize; }
+    int GetDrawBufferIndex() const { return m_drawBufferIndex; }
+    u32& GetDrawBufferCursor(int index) { return m_drawBuffers[index].m_cursor; }
+    u8* GetDrawBufferBase(int index) { return m_drawBuffers[index].m_base; }
+    u32 GetAmemAnimSize() const { return m_amemAnimSize; }
+    void ResetAmem(int) { m_amemSize = 0; }
     void TimeMogFur();
     void CalcMogScore();
     void ChangeMogMode(int);
@@ -242,7 +247,18 @@ public:
     void LoadFurTexBuffer(unsigned short* inTexels);
 
 private:
-    u8 m_work[0x2074];
+    struct CDrawBuffer
+    {
+        u32 m_cursor;
+        u8* m_base;
+    };
+
+    u8 _pad004[0x2054];                       // 0x004
+    CMemory::CStage* m_amemStage;             // 0x2058
+    u32 m_amemSize;                           // 0x205C
+    int m_drawBufferIndex;                    // 0x2060
+    CDrawBuffer m_drawBuffers[2];             // 0x2064
+    u32 m_amemAnimSize;                       // 0x2074
 };
 
 extern CChara Chara;

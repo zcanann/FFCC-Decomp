@@ -1378,13 +1378,13 @@ void CFlatRuntime2::Calc()
 		u32* saveData = new (getStage(), const_cast<char*>(sCFlatRuntime2FileTag), 0x36F) u32[0x3FF];
 		u32* objectData = saveData + 8;
 
-		saveData[0] = SwapF32(CameraPcs._224_4_);
-		saveData[1] = SwapF32(CameraPcs._228_4_);
-		saveData[2] = SwapF32(CameraPcs._232_4_);
-		saveData[3] = SwapF32(CameraPcs._212_4_);
-		saveData[4] = SwapF32(CameraPcs._216_4_);
-		saveData[5] = SwapF32(CameraPcs._220_4_);
-		saveData[6] = SwapF32(CameraPcs._252_4_);
+		saveData[0] = SwapF32(CameraPcs.m_positionX);
+		saveData[1] = SwapF32(CameraPcs.m_positionY);
+		saveData[2] = SwapF32(CameraPcs.m_positionZ);
+		saveData[3] = SwapF32(CameraPcs.m_targetX);
+		saveData[4] = SwapF32(CameraPcs.m_targetY);
+		saveData[5] = SwapF32(CameraPcs.m_targetZ);
+		saveData[6] = SwapF32(CameraPcs.m_fov);
 		saveData[7] = SwapF32((180.0f * *reinterpret_cast<float*>(CameraPcsRaw() + 0x108)) / 3.1415927f);
 
 		u32 lastX = 0;

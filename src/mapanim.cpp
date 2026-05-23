@@ -2,6 +2,7 @@
 #include "ffcc/mapanim.h"
 #include "ffcc/chunkfile.h"
 #include "ffcc/linkage.h"
+#include "ffcc/map.h"
 #include "ffcc/memory.h"
 #include "ffcc/system.h"
 #include "dolphin/mtx.h"
@@ -89,8 +90,7 @@ void CMapAnimRun::Calc(long frame)
     }
 
 runFrame:
-    CPtrArray<CMapAnim*>* mapAnimArray =
-        reinterpret_cast<CPtrArray<CMapAnim*>*>(reinterpret_cast<unsigned char*>(&MapMng) + 0x213FC);
+    CPtrArray<CMapAnim*>* mapAnimArray = &MapMng.GetMapAnimArray();
     CMapAnim* mapAnim = (*mapAnimArray)[m_mapAnimIndex];
     mapAnim->Calc(m_currentFrame);
     if (++m_currentFrame > m_endFrame) {
@@ -156,14 +156,14 @@ void CMapAnim::ReadOtmAnim(CChunkFile& chunkFile)
     int nodeIdx;
 
     chunkFile.PushChunk();
-    mapAnimKeyDtArray = reinterpret_cast<CPtrArray<CMapAnimKeyDt*>*>(reinterpret_cast<unsigned char*>(&MapMng) + 0x21418);
+    mapAnimKeyDtArray = &MapMng.GetMapAnimKeyDtArray();
     while ((hasChunk = static_cast<int>(chunkFile.GetNextChunk(*reinterpret_cast<CChunkFile::CChunk*>(outerChunkData)))) != 0) {
         if (chunkId == 0x4652414D) {
             m_startFrame = static_cast<int>(chunkFile.Get4());
             m_endFrame = static_cast<int>(chunkFile.Get4());
         } else if (chunkId == 0x4E4F4445) {
             item = static_cast<int*>(
-                operator new(0xC, *reinterpret_cast<CMemory::CStage**>(&MapMng), const_cast<char*>(s_mapanim_cpp), 0xC2));
+                operator new(0xC, MapMng.m_stage, const_cast<char*>(s_mapanim_cpp), 0xC2));
             if (item != 0) {
                 item[2] = 0;
             }
@@ -173,11 +173,11 @@ void CMapAnim::ReadOtmAnim(CChunkFile& chunkFile)
             while ((hasChunk = static_cast<int>(chunkFile.GetNextChunk(*reinterpret_cast<CChunkFile::CChunk*>(innerChunkData)))) != 0) {
                 if (innerChunkId == 0x4E494458) {
                     nodeIdx = static_cast<int>(chunkFile.Get4());
-                    item[0] = reinterpret_cast<int>(reinterpret_cast<unsigned char*>(&MapMng) + (nodeIdx * 0xF0) + 0x954);
+                    item[0] = reinterpret_cast<int>(MapMng.GetMapObjArray() + nodeIdx);
                 } else if (innerChunkId == 0x5452414E) {
                     keyData = reinterpret_cast<int>(
                         operator new(
-                            0x18, *reinterpret_cast<CMemory::CStage**>(&MapMng), const_cast<char*>(s_mapanim_cpp), 0x4C));
+                            0x18, MapMng.m_stage, const_cast<char*>(s_mapanim_cpp), 0x4C));
                     if (keyData != 0) {
                         *reinterpret_cast<int*>(keyData + 0x4) = 0;
                         *reinterpret_cast<int*>(keyData + 0xC) = 0;
@@ -188,19 +188,19 @@ void CMapAnim::ReadOtmAnim(CChunkFile& chunkFile)
                     mapAnimKeyDtArray->Add(reinterpret_cast<CMapAnimKeyDt*>(item[2]));
                     *reinterpret_cast<unsigned int*>(item[2]) = innerChunkSize >> 4;
                     *reinterpret_cast<int*>(item[2] + 0x4) = reinterpret_cast<int>(
-                        new (*reinterpret_cast<CMemory::CStage**>(&MapMng), const_cast<char*>(s_mapanim_cpp), 0x4F)
+                        new (MapMng.m_stage, const_cast<char*>(s_mapanim_cpp), 0x4F)
                             CMapAnimNodeTrackKey[*reinterpret_cast<int*>(item[2])]);
                     memcpy(reinterpret_cast<void*>(*reinterpret_cast<int*>(item[2] + 0x4)), chunkFile.GetAddress(), innerChunkSize);
                 } else if (innerChunkId == 0x524F5420) {
                     *reinterpret_cast<unsigned int*>(item[2] + 0x8) = innerChunkSize >> 4;
                     *reinterpret_cast<int*>(item[2] + 0xC) = reinterpret_cast<int>(
-                        new (*reinterpret_cast<CMemory::CStage**>(&MapMng), const_cast<char*>(s_mapanim_cpp), 0x55)
+                        new (MapMng.m_stage, const_cast<char*>(s_mapanim_cpp), 0x55)
                             CMapAnimNodeTrackKey[*reinterpret_cast<int*>(item[2] + 0x8)]);
                     memcpy(reinterpret_cast<void*>(*reinterpret_cast<int*>(item[2] + 0xC)), chunkFile.GetAddress(), innerChunkSize);
                 } else if (innerChunkId == 0x5343414C) {
                     *reinterpret_cast<unsigned int*>(item[2] + 0x10) = innerChunkSize >> 4;
                     *reinterpret_cast<int*>(item[2] + 0x14) = reinterpret_cast<int>(
-                        new (*reinterpret_cast<CMemory::CStage**>(&MapMng), const_cast<char*>(s_mapanim_cpp), 0x5B)
+                        new (MapMng.m_stage, const_cast<char*>(s_mapanim_cpp), 0x5B)
                             CMapAnimNodeTrackKey[*reinterpret_cast<int*>(item[2] + 0x10)]);
                     memcpy(reinterpret_cast<void*>(*reinterpret_cast<int*>(item[2] + 0x14)), chunkFile.GetAddress(), innerChunkSize);
                 }
@@ -250,7 +250,7 @@ CMapAnim::CMapAnim()
 {
     CPtrArray<CMapAnimNode*>* nodeArray = reinterpret_cast<CPtrArray<CMapAnimNode*>*>(this);
 
-    nodeArray->SetStage(*reinterpret_cast<CMemory::CStage**>(&MapMng));
+    nodeArray->SetStage(MapMng.m_stage);
 }
 
 /*

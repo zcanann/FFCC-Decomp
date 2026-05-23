@@ -357,9 +357,9 @@ void CMemory::Init()
     OSInitAlloc(OSGetArenaLo(), reinterpret_cast<void*>(arenaLo + 0x14000), 1);
 
     unsigned char* modeBase = reinterpret_cast<unsigned char*>(this) + 4;
-    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x7794) = 0;
-    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x7798) = 0;
-    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x779C) = 0;
+    m_heapWalkerLevel = 0;
+    m_heapWalkerVisible = 0;
+    m_defaultGroup = 0;
 
     for (int pass = 0; pass < 3; pass++) {
         if ((pass != 1) || (OSGetConsoleSimulatedMemSize() == 0x3000000)) {
@@ -485,10 +485,8 @@ frame_input_done:
     }
 
     if ((trigger & 0x200) != 0) {
-        unsigned int showHeap = static_cast<unsigned int>(
-            __cntlzw(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(this) + 0x7798)));
-        *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(this) + 0x7798) =
-            (showHeap >> 5) & 0xFF;
+        unsigned int showHeap = static_cast<unsigned int>(__cntlzw(static_cast<unsigned int>(m_heapWalkerVisible)));
+        m_heapWalkerVisible = static_cast<int>((showHeap >> 5) & 0xFF);
     }
 }
 
@@ -558,7 +556,7 @@ void CMemory::HeapWalker()
  */
 void CMemory::Draw()
 {
-    if (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x7798) == 0) {
+    if (m_heapWalkerVisible == 0) {
         return;
     }
 
@@ -637,7 +635,7 @@ void CMemory::Draw()
             sprintf(line, DAT_801d6bdc, useTotalKB, unuseTotalKB);
             Graphic.DrawDebugStringDirect(0x10, y, line, 8);
 
-            int amemAnim = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Chara) + 0x2074);
+            int amemAnim = static_cast<int>(Chara.GetAmemAnimSize());
             int amemAnimKB = amemAnim / 1024;
             sprintf(line, DAT_801d6bec, amemAnimKB);
             Graphic.DrawDebugStringDirect(0x10, y + 0xC, line, 8);
@@ -871,7 +869,7 @@ void CMemory::Free(void* ptr)
  */
 void CMemory::IncHeapWalkerLevel()
 {
-    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x7794) += 1;
+    m_heapWalkerLevel += 1;
 }
 
 /*
@@ -885,7 +883,7 @@ void CMemory::IncHeapWalkerLevel()
  */
 void CMemory::DecHeapWalkerLevel()
 {
-    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x7794) -= 1;
+    m_heapWalkerLevel -= 1;
 }
 
 /*
@@ -1033,8 +1031,7 @@ void* CMemory::CStage::alloc(unsigned long size, char* source, unsigned long lin
 
                     *reinterpret_cast<unsigned short*>(node + 0x18) = static_cast<unsigned short>(line);
                     *reinterpret_cast<unsigned char*>(node + 3) =
-                        static_cast<unsigned char>(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Memory) +
-                                                                           0x7794));
+                        static_cast<unsigned char>(Memory.GetHeapWalkerLevel());
                     memset(reinterpret_cast<void*>(node + 0x1A), 0, 0x24);
 
                     if (source == (char*)nullptr) {
@@ -1046,8 +1043,7 @@ void* CMemory::CStage::alloc(unsigned long size, char* source, unsigned long lin
                     *reinterpret_cast<unsigned char*>(node + 2) = 4;
                     *reinterpret_cast<unsigned char*>(node + 2) =
                         (*reinterpret_cast<unsigned char*>(node + 2) & 0x0F) |
-                        static_cast<unsigned char>(
-                            *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Memory) + 0x779C) << 4);
+                        static_cast<unsigned char>(Memory.GetDefaultGroup() << 4);
                     *reinterpret_cast<unsigned long*>(node + 0x14) =
                         m_defaultParam;
                     *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x124) += 1;

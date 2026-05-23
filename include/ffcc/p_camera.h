@@ -135,20 +135,25 @@ public:
     void GetWorldMapInverseMatrix(float (*)[4]);
 
     Mtx m_cameraMatrix;
-    u8 _pad34[0x94 - 0x34];
+    u8 _pad34[0x64 - 0x34];
+    Mtx m_cameraWorldMtx; // 0x64
     Mtx44 m_screenMatrix;
-    float _212_4_;
-    float _216_4_;
-    float _220_4_;
-    float _224_4_;
-    float _228_4_;
-    float _232_4_;
-    float _236_4_;
-    float _240_4_;
-    float _244_4_;
-    float _248_4_;
-    float _252_4_;
-    u8 _pad100[0x4C8 - 0x100];
+    float m_targetX;
+    float m_targetY;
+    float m_targetZ;
+    float m_positionX;
+    float m_positionY;
+    float m_positionZ;
+    float m_directionX;
+    float m_directionY;
+    float m_directionZ;
+    float m_yaw;
+    float m_fov;
+    float m_nearZ;
+    float m_farZ;
+    u8 _pad108[0x404 - 0x108];
+    u8 m_fullScreenShadowEnabled; // 0x404
+    u8 _pad405[0x4C8 - 0x405];
 };
 
 extern "C" void create__10CCameraPcsFv(CCameraPcs*);

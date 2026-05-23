@@ -1,4 +1,5 @@
 #include "ffcc/materialman.h"
+#include "ffcc/game.h"
 #include "ffcc/map.h"
 #include "ffcc/mapocttree.h"
 #include "ffcc/pad.h"
@@ -24,7 +25,6 @@ inline void* operator new(unsigned long, void* p)
     return p;
 }
 
-extern "C" unsigned long UnkMaterialSetGetter(void*);
 extern "C" void __ct__10CTexScrollFv(void*);
 extern "C" void __dt__10CTexScrollFv(void*, int);
 extern float FLOAT_8032faf0;
@@ -139,6 +139,40 @@ static inline CLightPcs::CBumpLight* GetMapBumpLight(int bumpIndex)
     return LightPcs.GetBumpLight(static_cast<CLightPcs::TARGET>(1), bumpIndex);
 }
 
+static inline void DestroyTexScrollKeyFrame(void*& keyFrame)
+{
+    if (keyFrame == 0) {
+        return;
+    }
+
+    void*& table0 = *reinterpret_cast<void**>(Ptr(keyFrame, 0x18));
+    if (table0 != 0) {
+        operator delete(table0);
+        table0 = 0;
+    }
+
+    void*& table1 = *reinterpret_cast<void**>(Ptr(keyFrame, 0x1C));
+    if (table1 != 0) {
+        operator delete(table1);
+        table1 = 0;
+    }
+
+    void*& table2 = *reinterpret_cast<void**>(Ptr(keyFrame, 0x20));
+    if (table2 != 0) {
+        operator delete(table2);
+        table2 = 0;
+    }
+
+    void*& table3 = *reinterpret_cast<void**>(Ptr(keyFrame, 0x24));
+    if (table3 != 0) {
+        operator delete(table3);
+        table3 = 0;
+    }
+
+    operator delete(keyFrame);
+    keyFrame = 0;
+}
+
 typedef void (*VirtualDtorFn)(void*, int);
 
 static void ReleaseRef(void* object)
@@ -186,6 +220,12 @@ struct MaterialManTexState {
     int texMapIdCurShadow;
     int texMtxCurShadow;
     int texCoordIdCurShadow;
+    unsigned int unknown140;
+    unsigned int texScroll0TexMtx;
+    unsigned int texScroll0TexCoord;
+    unsigned int unknown14C;
+    unsigned int texScroll1TexMtx;
+    unsigned int texScroll1TexCoord;
 };
 
 static MaterialManTevState* GetMaterialManTevState(CMaterialMan* materialMan)
@@ -431,9 +471,8 @@ CMaterialMan::CMaterialMan()
  */
 void CMaterialMan::Init()
 {
-	*reinterpret_cast<CMemory::CStage**>(Ptr(this, 0x218)) =
-	    Memory.CreateStage(0x20000, const_cast<char*>(s_materialStageName), 0);
-	*Ptr(this, 0x204) = 0x30;
+	m_materialStage = Memory.CreateStage(0x20000, const_cast<char*>(s_materialStageName), 0);
+	m_fullShadowTevColor = 0x30;
 }
 
 /*
@@ -443,7 +482,7 @@ void CMaterialMan::Init()
  */
 void CMaterialMan::Quit()
 {
-	Memory.DestroyStage(*reinterpret_cast<CMemory::CStage**>(Ptr(this, 0x218)));
+	Memory.DestroyStage(m_materialStage);
 }
 
 /*
@@ -461,7 +500,7 @@ void CMaterialMan::SetBlendMode(CMaterialSet* materialSet, int materialIndex)
     CMaterial* material = (*materials)[materialIndex];
 
     unsigned char fogEnable = *Ptr(material, 0xA1);
-    if ((*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Game) + 0xC7F0) == 3) && (*Ptr(&MapMng, 0x22988) == 0)) {
+    if ((static_cast<int>(Game.m_currentSceneId) == 3) && (MapMng.m_fogEnable == 0)) {
         fogEnable = 0;
     }
 
@@ -552,7 +591,7 @@ void CMaterialMan::SetBlendMode(CMaterialSet* materialSet, int materialIndex)
  */
 void CMaterialMan::addtev_bump_st(int mode, _GXTevScale tevScale)
 {
-    unsigned int tevStage = *reinterpret_cast<unsigned int*>(Ptr(this, 0x60));
+    unsigned int tevStage = m_numTevStage;
 
     GXSetIndTexMtx((GXIndTexMtxID)1, LightPcs.GetBumpIndTexMtx(), 0);
     GXSetNumIndStages(1);
@@ -563,7 +602,7 @@ void CMaterialMan::addtev_bump_st(int mode, _GXTevScale tevScale)
 
     GXSetTevDirect(static_cast<GXTevStageID>(tevStage));
     _GXSetTevOrder(
-        tevStage, *reinterpret_cast<int*>(Ptr(this, 0x13C)), *reinterpret_cast<int*>(Ptr(this, 0x134)), 4);
+        tevStage, m_texCoordIdCurShadow, m_texMapIdCurShadow, 4);
     _GXSetTevColorIn(
         tevStage, 0xF, 8, 10, 0xF);
     _GXSetTevColorOp(tevStage, 0, 0, tevScale, 1,
@@ -585,21 +624,21 @@ void CMaterialMan::addtev_bump_st(int mode, _GXTevScale tevScale)
     GXSetTevIndirect((GXTevStageID)3, (GXIndTexStageID)0, (GXIndTexFormat)0, (GXIndTexBiasSel)0, (GXIndTexMtxID)0,
                      (GXIndTexWrap)0, (GXIndTexWrap)0, GX_TRUE, GX_FALSE, (GXIndTexAlphaSel)0);
 
-    tevStage = *reinterpret_cast<unsigned int*>(Ptr(this, 0x60));
+    tevStage = m_numTevStage;
     _GXSetTevOrder(
         tevStage, *reinterpret_cast<int*>(Ptr(this, 0x1EC)), *reinterpret_cast<int*>(Ptr(this, 0x1C8)) | 0x100,
         0xFF);
     _GXSetTevOp(tevStage, 4);
     IncNumTevStage();
 
-    tevStage = *reinterpret_cast<unsigned int*>(Ptr(this, 0x60));
+    tevStage = m_numTevStage;
     _GXSetTevOrder(
         tevStage, *reinterpret_cast<int*>(Ptr(this, 0x1F0)), *reinterpret_cast<int*>(Ptr(this, 0x1C8)) | 0x100,
         0xFF);
     _GXSetTevOp(tevStage, 4);
     IncNumTevStage();
 
-    tevStage = *reinterpret_cast<unsigned int*>(Ptr(this, 0x60));
+    tevStage = m_numTevStage;
     if (*reinterpret_cast<char*>(Ptr(this, 0xA3)) == 0) {
         _GXSetTevOrder(
             tevStage, *reinterpret_cast<int*>(Ptr(this, 0x1F4)), *reinterpret_cast<int*>(Ptr(this, 0x1C8)), 0xFF);
@@ -640,7 +679,7 @@ void CMaterialMan::addtev_bump_st(int mode, _GXTevScale tevScale)
         return;
     }
 
-    tevStage = *reinterpret_cast<unsigned int*>(Ptr(this, 0x60));
+    tevStage = m_numTevStage;
     GXSetTevDirect(static_cast<GXTevStageID>(tevStage));
     _GXSetTevOrder(
         tevStage, *reinterpret_cast<int*>(Ptr(this, 0x200)), *reinterpret_cast<int*>(Ptr(this, 0x1D0)), 0xFF);
@@ -681,7 +720,7 @@ void CMaterialMan::addtev_bump_water(_GXTevScale tevScale)
     float warpMtx3 = FLOAT_8032faf4;
     float warpMtx4 = FLOAT_8032fb20;
     float warpMtx5 = FLOAT_8032faf4;
-    int tevStage = *reinterpret_cast<int*>(Ptr(this, 0x60));
+    int tevStage = m_numTevStage;
 
     GXSetIndTexMtx((GXIndTexMtxID)1, LightPcs.GetBumpIndTexMtx(), 0);
     GXSetIndTexMtx((GXIndTexMtxID)2, reinterpret_cast<const float(*)[3]>(&warpMtx0), 1);
@@ -689,7 +728,7 @@ void CMaterialMan::addtev_bump_water(_GXTevScale tevScale)
 
     GXSetTevDirect((GXTevStageID)tevStage);
     _GXSetTevOrder(
-        tevStage, *reinterpret_cast<int*>(Ptr(this, 0x13C)), *reinterpret_cast<int*>(Ptr(this, 0x134)), 4);
+        tevStage, m_texCoordIdCurShadow, m_texMapIdCurShadow, 4);
     _GXSetTevColorIn(
         tevStage, 0xF, 8, 10, 0xF);
     _GXSetTevColorOp(tevStage, 0, 0, tevScale, 1,
@@ -707,7 +746,7 @@ void CMaterialMan::addtev_bump_water(_GXTevScale tevScale)
                      *reinterpret_cast<GXTexMapID*>(Ptr(this, 0x1C4)));
     GXSetIndTexCoordScale((GXIndTexStageID)1, (GXIndTexScale)0, (GXIndTexScale)0);
 
-    tevStage = *reinterpret_cast<int*>(Ptr(this, 0x60));
+    tevStage = m_numTevStage;
     GXSetTevIndBumpXYZ((GXTevStageID)tevStage, (GXIndTexStageID)0, (GXIndTexMtxID)1);
     _GXSetTevOrder(
         tevStage, *reinterpret_cast<int*>(Ptr(this, 0x1F4)), *reinterpret_cast<int*>(Ptr(this, 0x1C8)), 0xFF);
@@ -719,7 +758,7 @@ void CMaterialMan::addtev_bump_water(_GXTevScale tevScale)
     _GXSetTevAlphaOp(tevStage, 0, 0, 0, 1, 0);
     IncNumTevStage();
 
-    tevStage = *reinterpret_cast<int*>(Ptr(this, 0x60));
+    tevStage = m_numTevStage;
     GXSetTevIndBumpXYZ((GXTevStageID)tevStage, (GXIndTexStageID)0, (GXIndTexMtxID)1);
     _GXSetTevOrder(
         tevStage, *reinterpret_cast<int*>(Ptr(this, 0x1F8)), *reinterpret_cast<int*>(Ptr(this, 0x1C8)), 0xFF);
@@ -731,7 +770,7 @@ void CMaterialMan::addtev_bump_water(_GXTevScale tevScale)
     _GXSetTevAlphaOp(tevStage, 0, 0, 0, 1, 0);
     IncNumTevStage();
 
-    tevStage = *reinterpret_cast<int*>(Ptr(this, 0x60));
+    tevStage = m_numTevStage;
     GXSetTevIndWarp((GXTevStageID)tevStage, (GXIndTexStageID)1, GX_TRUE, GX_FALSE, (GXIndTexMtxID)2);
     _GXSetTevOrder(
         tevStage, *reinterpret_cast<int*>(Ptr(this, 0x1FC)), *reinterpret_cast<int*>(Ptr(this, 0x1CC)), 0xFF);
@@ -761,7 +800,7 @@ void CMaterialMan::addtev_bump_spec_col_water(_GXTevScale tevScale)
     float warpMtx3 = FLOAT_8032faf4;
     float warpMtx4 = FLOAT_8032fb20;
     float warpMtx5 = FLOAT_8032faf4;
-    int tevStage = *reinterpret_cast<int*>(Ptr(this, 0x60));
+    int tevStage = m_numTevStage;
 
     GXSetIndTexMtx((GXIndTexMtxID)1, LightPcs.GetBumpIndTexMtx(), 0);
     GXSetIndTexMtx((GXIndTexMtxID)2, reinterpret_cast<const float(*)[3]>(&warpMtx0), 1);
@@ -769,7 +808,7 @@ void CMaterialMan::addtev_bump_spec_col_water(_GXTevScale tevScale)
 
     GXSetTevDirect((GXTevStageID)tevStage);
     _GXSetTevOrder(
-        tevStage, *reinterpret_cast<int*>(Ptr(this, 0x13C)), *reinterpret_cast<int*>(Ptr(this, 0x134)), 4);
+        tevStage, m_texCoordIdCurShadow, m_texMapIdCurShadow, 4);
     _GXSetTevColorIn(
         tevStage, 0xF, 8, 10, 0xF);
     _GXSetTevColorOp(tevStage, 0, 0, tevScale, 1,
@@ -787,7 +826,7 @@ void CMaterialMan::addtev_bump_spec_col_water(_GXTevScale tevScale)
                      *reinterpret_cast<GXTexMapID*>(Ptr(this, 0x1C4)));
     GXSetIndTexCoordScale((GXIndTexStageID)1, (GXIndTexScale)0, (GXIndTexScale)0);
 
-    tevStage = *reinterpret_cast<int*>(Ptr(this, 0x60));
+    tevStage = m_numTevStage;
     GXSetTevIndBumpXYZ((GXTevStageID)tevStage, (GXIndTexStageID)0, (GXIndTexMtxID)1);
     _GXSetTevOrder(
         tevStage, *reinterpret_cast<int*>(Ptr(this, 0x1F8)), *reinterpret_cast<int*>(Ptr(this, 0x1C8)), 0xFF);
@@ -799,7 +838,7 @@ void CMaterialMan::addtev_bump_spec_col_water(_GXTevScale tevScale)
     _GXSetTevAlphaOp(tevStage, 0, 0, 0, 1, 0);
     IncNumTevStage();
 
-    tevStage = *reinterpret_cast<int*>(Ptr(this, 0x60));
+    tevStage = m_numTevStage;
     GXSetTevIndWarp((GXTevStageID)tevStage, (GXIndTexStageID)1, GX_TRUE, GX_FALSE, (GXIndTexMtxID)2);
     _GXSetTevOrder(
         tevStage, *reinterpret_cast<int*>(Ptr(this, 0x1FC)), *reinterpret_cast<int*>(Ptr(this, 0x1CC)), 0xFF);
@@ -823,7 +862,7 @@ void CMaterialMan::addtev_bump_spec_col_water(_GXTevScale tevScale)
  */
 void CMaterialMan::addtev_bump_jimen(_GXTevScale)
 {
-    int tevStage = *reinterpret_cast<int*>(Ptr(this, 0x60));
+    int tevStage = m_numTevStage;
 
     GXSetIndTexMtx((GXIndTexMtxID)1, LightPcs.GetBumpIndTexMtx(), 0);
     GXSetNumIndStages(1);
@@ -840,8 +879,8 @@ void CMaterialMan::addtev_bump_jimen(_GXTevScale)
         tevStage, 7, 7, 7, 0);
     _GXSetTevColorOp(tevStage, 0, 0, 0, 1, 0);
     _GXSetTevAlphaOp(tevStage, 0, 0, 0, 1, 0);
-    *reinterpret_cast<unsigned int*>(Ptr(this, 0x60)) =
-        (((*reinterpret_cast<unsigned int*>(Ptr(this, 0x60))) & 0xFF) + 1) & 0xFF;
+    m_numTevStage =
+        (((m_numTevStage) & 0xFF) + 1) & 0xFF;
 }
 
 /*
@@ -855,15 +894,14 @@ void CMaterialMan::addtev_bump_jimen(_GXTevScale)
  */
 void CMaterialMan::addtev_lightmap(long index)
 {
-    unsigned int stage = *reinterpret_cast<unsigned int*>(Ptr(this, 0x60));
+    unsigned int stage = m_numTevStage;
     unsigned char indexByte = static_cast<unsigned char>(index);
-    int stageOffset = static_cast<int>(index) * 4;
 
     if ((m_shadowKColorMask & (1 << indexByte)) == 0) {
         GXSetTevDirect(static_cast<GXTevStageID>(stage));
         _GXSetTevOrder(
-            stage, *reinterpret_cast<int*>(Ptr(this, stageOffset + 0x180)),
-            *reinterpret_cast<int*>(Ptr(this, stageOffset + 0x158)), 0xFF);
+            stage, m_shadowTexCoordIds[index],
+            m_shadowTexMapIds[index], 0xFF);
         _GXSetTevColorIn(stage,
                                                                                                               0xF, 8,
                                                                                                               9, 0);
@@ -883,8 +921,8 @@ void CMaterialMan::addtev_lightmap(long index)
 
     GXSetTevDirect(static_cast<GXTevStageID>(stage));
     _GXSetTevOrder(
-        stage, *reinterpret_cast<int*>(Ptr(this, stageOffset + 0x180)),
-        *reinterpret_cast<int*>(Ptr(this, stageOffset + 0x158)), 0xFF);
+        stage, m_shadowTexCoordIds[index],
+        m_shadowTexMapIds[index], 0xFF);
     _GXSetTevColorIn(stage, 0xF,
                                                                                                           8, 9, 0);
     _GXSetTevColorOp(stage, 0, 0, 0, 1, 2);
@@ -894,11 +932,11 @@ void CMaterialMan::addtev_lightmap(long index)
     _GXSetTevSwapMode(stage, 0, 0);
     IncNumTevStage();
 
-    stage = *reinterpret_cast<unsigned int*>(Ptr(this, 0x60));
+    stage = m_numTevStage;
     GXSetTevDirect(static_cast<GXTevStageID>(stage));
     _GXSetTevOrder(
-        stage, *reinterpret_cast<int*>(Ptr(this, stageOffset + 0x180)),
-        *reinterpret_cast<int*>(Ptr(this, stageOffset + 0x158)) + 1, 0xFF);
+        stage, m_shadowTexCoordIds[index],
+        m_shadowTexMapIds[index] + 1, 0xFF);
     _GXSetTevColorIn(stage, 0xF,
                                                                                                           8, 9, 0);
     _GXSetTevColorOp(stage, 0, 0, 0, 1, 0);
@@ -908,7 +946,7 @@ void CMaterialMan::addtev_lightmap(long index)
     _GXSetTevSwapMode(stage, 0, 0);
     IncNumTevStage();
 
-    stage = *reinterpret_cast<unsigned int*>(Ptr(this, 0x60));
+    stage = m_numTevStage;
     GXSetTevDirect(static_cast<GXTevStageID>(stage));
     GXSetTevKColorSel(static_cast<GXTevStageID>(stage), static_cast<GXTevKColorSel>(index + 0x1C));
     _GXSetTevOrder(stage, 0xFF, 0xFF, 0xFF);
@@ -933,15 +971,14 @@ void CMaterialMan::addtev_lightmap(long index)
  */
 void CMaterialMan::addtev_shadow(long index)
 {
-    unsigned int stage = *reinterpret_cast<unsigned int*>(Ptr(this, 0x60));
+    unsigned int stage = m_numTevStage;
     unsigned char indexByte = static_cast<unsigned char>(index);
-    int stageOffset = static_cast<int>(index) * 4;
 
     if ((m_shadowKColorMask & (1 << indexByte)) == 0) {
         GXSetTevDirect(static_cast<GXTevStageID>(stage));
         _GXSetTevOrder(
-            stage, *reinterpret_cast<int*>(Ptr(this, stageOffset + 0x180)),
-            *reinterpret_cast<int*>(Ptr(this, stageOffset + 0x158)), 0xFF);
+            stage, m_shadowTexCoordIds[index],
+            m_shadowTexMapIds[index], 0xFF);
         _GXSetTevColorIn(stage,
                                                                                                               0, 8,
                                                                                                               9, 0xF);
@@ -961,8 +998,8 @@ void CMaterialMan::addtev_shadow(long index)
 
     GXSetTevDirect(static_cast<GXTevStageID>(stage));
     _GXSetTevOrder(
-        stage, *reinterpret_cast<int*>(Ptr(this, stageOffset + 0x180)),
-        *reinterpret_cast<int*>(Ptr(this, stageOffset + 0x158)), 0xFF);
+        stage, m_shadowTexCoordIds[index],
+        m_shadowTexMapIds[index], 0xFF);
     _GXSetTevColorIn(stage, 0,
                                                                                                           8, 9,
                                                                                                           0xF);
@@ -973,11 +1010,11 @@ void CMaterialMan::addtev_shadow(long index)
     _GXSetTevSwapMode(stage, 0, 0);
     IncNumTevStage();
 
-    stage = *reinterpret_cast<unsigned int*>(Ptr(this, 0x60));
+    stage = m_numTevStage;
     GXSetTevDirect(static_cast<GXTevStageID>(stage));
     _GXSetTevOrder(
-        stage, *reinterpret_cast<int*>(Ptr(this, stageOffset + 0x180)),
-        *reinterpret_cast<int*>(Ptr(this, stageOffset + 0x158)) + 1, 0xFF);
+        stage, m_shadowTexCoordIds[index],
+        m_shadowTexMapIds[index] + 1, 0xFF);
     _GXSetTevColorIn(stage, 0, 8,
                                                                                                           9, 0xF);
     _GXSetTevColorOp(stage, 0, 0, 0, 1, 0);
@@ -987,7 +1024,7 @@ void CMaterialMan::addtev_shadow(long index)
     _GXSetTevSwapMode(stage, 0, 0);
     IncNumTevStage();
 
-    stage = *reinterpret_cast<unsigned int*>(Ptr(this, 0x60));
+    stage = m_numTevStage;
     GXSetTevDirect(static_cast<GXTevStageID>(stage));
     GXSetTevKColorSel(static_cast<GXTevStageID>(stage), static_cast<GXTevKColorSel>(index + 0x1C));
     _GXSetTevOrder(stage, 0xFF, 0xFF, 0xFF);
@@ -1016,9 +1053,9 @@ void CMaterialMan::addtev_stdShadow(unsigned long materialFlag)
         return;
     }
 
-    int materialNum = *reinterpret_cast<int*>(Ptr(this, 0x58));
+    int materialNum = m_shadowMaterialCount;
     for (int i = 0; i < materialNum; i++) {
-        if (*reinterpret_cast<signed char*>(Ptr(this, i + 0x4D)) == 0) {
+        if (m_shadowMaterialType[i] == 0) {
             addtev_shadow(i);
         } else {
             addtev_lightmap(i);
@@ -1062,10 +1099,10 @@ void CMaterialMan::addtev_full_shadow(long index)
                       0x7D);
 
     GXColor tevColor;
-    *reinterpret_cast<unsigned int*>(&tevColor) = static_cast<unsigned int>(*Ptr(this, 0x204));
+    *reinterpret_cast<unsigned int*>(&tevColor) = static_cast<unsigned int>(m_fullShadowTevColor);
     GXSetTevColor(static_cast<GXTevRegID>(1), tevColor);
 
-    unsigned int stage = *reinterpret_cast<unsigned int*>(Ptr(this, 0x60));
+    unsigned int stage = m_numTevStage;
     GXSetTevDirect(static_cast<GXTevStageID>(stage));
     _GXSetTevOrder(
         stage, *reinterpret_cast<int*>(Ptr(this, stageOffset + 0x1BC)),
@@ -1079,7 +1116,7 @@ void CMaterialMan::addtev_full_shadow(long index)
     _GXSetTevSwapMode(stage, 0, 0);
     IncNumTevStage();
 
-    stage = *reinterpret_cast<unsigned int*>(Ptr(this, 0x60));
+    stage = m_numTevStage;
     GXSetTevDirect(static_cast<GXTevStageID>(stage));
     _GXSetTevOrder(
         stage, *reinterpret_cast<int*>(Ptr(this, stageOffset + 0x1A4)),
@@ -1093,7 +1130,7 @@ void CMaterialMan::addtev_full_shadow(long index)
     _GXSetTevSwapMode(stage, 0, 0);
     IncNumTevStage();
 
-    stage = *reinterpret_cast<unsigned int*>(Ptr(this, 0x60));
+    stage = m_numTevStage;
     GXSetTevDirect(static_cast<GXTevStageID>(stage));
     _GXSetTevOrder(stage, 0xFF, 0xFF, 4);
     _GXSetTevColorIn(
@@ -1193,46 +1230,46 @@ void CMaterialMan::SetMaterialCharaShadow(CMaterial* material)
     unsigned char materialType = *reinterpret_cast<unsigned char*>(Ptr(material, 0xA2));
 
     if ((bumpLight != 0) && (materialType != 3) && (materialType != 2)) {
-        if (*reinterpret_cast<unsigned char*>(Ptr(this, 0x4C)) != 1) {
+        if (m_vtxDescMode != 1) {
             GXClearVtxDesc();
             GXSetVtxDesc(GX_VA_POS, GX_INDEX16);
             GXSetVtxDesc(GX_VA_NBT, GX_INDEX16);
             GXSetVtxDesc(GX_VA_CLR0, GX_INDEX16);
             GXSetVtxDesc(GX_VA_TEX0, GX_INDEX16);
-            *reinterpret_cast<unsigned char*>(Ptr(this, 0x4C)) = 1;
+            m_vtxDescMode = 1;
         }
         GXSetArray(GX_VA_NRM, *reinterpret_cast<void**>(Ptr(this, 4)), 0x12);
     } else {
         if ((tevBit & 0x20002) == 0) {
             if ((bumpLight != 0) || ((tevBit & 1) == 0)) {
-                if (*reinterpret_cast<unsigned char*>(Ptr(this, 0x4C)) != 0) {
+                if (m_vtxDescMode != 0) {
                     GXClearVtxDesc();
                     GXSetVtxDesc(GX_VA_POS, GX_INDEX16);
                     GXSetVtxDesc(GX_VA_NRM, GX_INDEX16);
                     GXSetVtxDesc(GX_VA_CLR0, GX_INDEX16);
                     GXSetVtxDesc(GX_VA_TEX0, GX_INDEX16);
-                    *reinterpret_cast<unsigned char*>(Ptr(this, 0x4C)) = 0;
+                    m_vtxDescMode = 0;
                 }
                 GXSetArray(GX_VA_NRM, *reinterpret_cast<void**>(Ptr(this, 4)), 6);
             } else {
-                if (*reinterpret_cast<unsigned char*>(Ptr(this, 0x4C)) != 3) {
+                if (m_vtxDescMode != 3) {
                     GXClearVtxDesc();
                     GXSetVtxDesc(GX_VA_POS, GX_INDEX16);
                     GXSetVtxDesc(GX_VA_NRM, GX_INDEX16);
                     GXSetVtxDesc(GX_VA_CLR0, GX_INDEX16);
-                    *reinterpret_cast<unsigned char*>(Ptr(this, 0x4C)) = 3;
+                    m_vtxDescMode = 3;
                 }
                 GXSetArray(GX_VA_NRM, *reinterpret_cast<void**>(Ptr(this, 4)), 6);
             }
         } else {
-            if (*reinterpret_cast<unsigned char*>(Ptr(this, 0x4C)) != 2) {
+            if (m_vtxDescMode != 2) {
                 GXClearVtxDesc();
                 GXSetVtxDesc(GX_VA_POS, GX_INDEX16);
                 GXSetVtxDesc(GX_VA_NRM, GX_INDEX16);
                 GXSetVtxDesc(GX_VA_CLR0, GX_INDEX16);
                 GXSetVtxDesc(GX_VA_TEX0, GX_INDEX16);
                 GXSetVtxDesc(GX_VA_TEX1, GX_INDEX16);
-                *reinterpret_cast<unsigned char*>(Ptr(this, 0x4C)) = 2;
+                m_vtxDescMode = 2;
             }
             GXSetArray(GX_VA_NRM, *reinterpret_cast<void**>(Ptr(this, 4)), 6);
         }
@@ -1272,7 +1309,7 @@ void CMaterialMan::SetMaterialPart(CMaterialSet* materialSet, int materialIndex,
         return;
     }
 
-    *reinterpret_cast<unsigned int*>(Ptr(this, 0x44)) = tevBit;
+    m_activeEnvTevBit = tevBit;
     GXSetArray(GX_VA_TEX0, *reinterpret_cast<void**>(Ptr(this, 4)), 6);
     GXSetNumIndStages(0);
     GXSetTevDirect(GX_TEVSTAGE0);
@@ -1287,14 +1324,14 @@ void CMaterialMan::SetMaterialPart(CMaterialSet* materialSet, int materialIndex,
                 0, 7, 6, 5, 7);
             _GXSetTevAlphaOp(0, 0, 0, 2, 1, 0);
             _GXSetTevSwapMode(0, 0, 0);
-            *reinterpret_cast<unsigned int*>(Ptr(this, 0x60)) = 1;
+            m_numTevStage = 1;
 
-            if ((*reinterpret_cast<unsigned char*>(Ptr(this, 0x4C)) != 3) && (setVtxDesc != 0)) {
+            if ((m_vtxDescMode != 3) && (setVtxDesc != 0)) {
                 GXClearVtxDesc();
                 GXSetVtxDesc(GX_VA_POS, GX_INDEX16);
                 GXSetVtxDesc(GX_VA_NRM, GX_INDEX16);
                 GXSetVtxDesc(GX_VA_CLR0, GX_INDEX16);
-                *reinterpret_cast<unsigned char*>(Ptr(this, 0x4C)) = 3;
+                m_vtxDescMode = 3;
             }
 
             GXSetNumTexGens(0);
@@ -1305,14 +1342,14 @@ void CMaterialMan::SetMaterialPart(CMaterialSet* materialSet, int materialIndex,
         if ((tevBit & 0x200) == 0) {
             if ((tevBit & 0x800) == 0) {
                 if ((tevBit & 0x20) == 0) {
-                    GXSetTexCoordGen2(static_cast<_GXTexCoordID>(*reinterpret_cast<int*>(Ptr(this, 0x13C))),
+                    GXSetTexCoordGen2(static_cast<_GXTexCoordID>(m_texCoordIdCurShadow),
                                       static_cast<_GXTexGenType>(1), static_cast<_GXTexGenSrc>(4), 0x3C, 0, 0x7D);
                     _GXSetTevOrder(
-                        0, *reinterpret_cast<int*>(Ptr(this, 0x13C)), *reinterpret_cast<int*>(Ptr(this, 0x134)), 4);
+                        0, m_texCoordIdCurShadow, m_texMapIdCurShadow, 4);
                 } else {
-                    *reinterpret_cast<int*>(Ptr(this, 0x124)) = *reinterpret_cast<int*>(Ptr(this, 0x124)) - 1;
+                    m_texCoordIdCur = m_texCoordIdCur - 1;
                     _GXSetTevOrder(
-                        0, *reinterpret_cast<int*>(Ptr(this, 0x148)), *reinterpret_cast<int*>(Ptr(this, 0x134)), 4);
+                        0, m_texScroll0TexCoord, m_texMapIdCurShadow, 4);
                 }
 
                 _GXSetTevColorIn(
@@ -1324,83 +1361,83 @@ void CMaterialMan::SetMaterialPart(CMaterialSet* materialSet, int materialIndex,
                 _GXSetTevAlphaOp(
                     0, 0, 0, 2, 1, 0);
                 _GXSetTevSwapMode(0, 0, 0);
-                *reinterpret_cast<unsigned int*>(Ptr(this, 0x60)) = 1;
+                m_numTevStage = 1;
 
                 if ((tevBit == 0) || ((tevBit & 2) == 0)) {
-                    if ((*reinterpret_cast<unsigned char*>(Ptr(this, 0x4C)) != 0) && (setVtxDesc != 0)) {
+                    if ((m_vtxDescMode != 0) && (setVtxDesc != 0)) {
                         GXClearVtxDesc();
                         GXSetVtxDesc(GX_VA_POS, GX_INDEX16);
                         GXSetVtxDesc(GX_VA_NRM, GX_INDEX16);
                         GXSetVtxDesc(GX_VA_CLR0, GX_INDEX16);
                         GXSetVtxDesc(GX_VA_TEX0, GX_INDEX16);
-                        *reinterpret_cast<unsigned char*>(Ptr(this, 0x4C)) = 0;
+                        m_vtxDescMode = 0;
                     }
                 } else {
-                    if ((*reinterpret_cast<unsigned char*>(Ptr(this, 0x4C)) != 2) && (setVtxDesc != 0)) {
+                    if ((m_vtxDescMode != 2) && (setVtxDesc != 0)) {
                         GXClearVtxDesc();
                         GXSetVtxDesc(GX_VA_POS, GX_INDEX16);
                         GXSetVtxDesc(GX_VA_NRM, GX_INDEX16);
                         GXSetVtxDesc(GX_VA_CLR0, GX_INDEX16);
                         GXSetVtxDesc(GX_VA_TEX0, GX_INDEX16);
                         GXSetVtxDesc(GX_VA_TEX1, GX_INDEX16);
-                        *reinterpret_cast<unsigned char*>(Ptr(this, 0x4C)) = 2;
+                        m_vtxDescMode = 2;
                     }
 
                     int texCoordId;
                     if ((tevBit & 0x40) == 0) {
-                        *reinterpret_cast<int*>(Ptr(this, 0x124)) = *reinterpret_cast<int*>(Ptr(this, 0x124)) + 1;
-                        texCoordId = *reinterpret_cast<int*>(Ptr(this, 0x124));
+                        m_texCoordIdCur = m_texCoordIdCur + 1;
+                        texCoordId = m_texCoordIdCur;
                         GXSetTexCoordGen2(static_cast<_GXTexCoordID>(texCoordId), static_cast<_GXTexGenType>(1),
                                           static_cast<_GXTexGenSrc>(5), 0x3C, 0, 0x7D);
                     } else {
-                        texCoordId = *reinterpret_cast<int*>(Ptr(this, 0x154));
+                        texCoordId = m_texScroll1TexCoord;
                     }
 
-                    *reinterpret_cast<unsigned int*>(Ptr(this, 0x60)) = 1;
-                    GXSetTevDirect(static_cast<_GXTevStageID>(*reinterpret_cast<unsigned int*>(Ptr(this, 0x60))));
+                    m_numTevStage = 1;
+                    GXSetTevDirect(static_cast<_GXTevStageID>(m_numTevStage));
                     _GXSetTevOrder(
-                        *reinterpret_cast<int*>(Ptr(this, 0x60)), texCoordId,
-                        (*reinterpret_cast<unsigned int*>(Ptr(this, 0x134)) & 0xFF) + 1, 4);
+                        m_numTevStage, texCoordId,
+                        (m_texMapIdCurShadow & 0xFF) + 1, 4);
                     _GXSetTevColorIn(
-                        *reinterpret_cast<int*>(Ptr(this, 0x60)), 0xF, 8, 0xA, 0xF);
+                        m_numTevStage, 0xF, 8, 0xA, 0xF);
                     _GXSetTevColorOp(
-                        *reinterpret_cast<int*>(Ptr(this, 0x60)), 0, 0, 1, 1, 1);
+                        m_numTevStage, 0, 0, 1, 1, 1);
                     _GXSetTevAlphaIn(
-                        *reinterpret_cast<int*>(Ptr(this, 0x60)), 7, 7, 7, 0);
+                        m_numTevStage, 7, 7, 7, 0);
                     _GXSetTevAlphaOp(
-                        *reinterpret_cast<int*>(Ptr(this, 0x60)), 0, 0, 0, 1, 0);
+                        m_numTevStage, 0, 0, 0, 1, 0);
                     _GXSetTevSwapMode(
-                        *reinterpret_cast<int*>(Ptr(this, 0x60)), 0, 0);
-                    *reinterpret_cast<unsigned int*>(Ptr(this, 0x60)) =
-                        ((*reinterpret_cast<unsigned int*>(Ptr(this, 0x60)) & 0xFF) + 1) & 0xFF;
+                        m_numTevStage, 0, 0);
+                    m_numTevStage =
+                        ((m_numTevStage & 0xFF) + 1) & 0xFF;
 
-                    GXSetTevDirect(static_cast<_GXTevStageID>(*reinterpret_cast<unsigned int*>(Ptr(this, 0x60))));
+                    GXSetTevDirect(static_cast<_GXTevStageID>(m_numTevStage));
                     _GXSetTevOrder(
-                        *reinterpret_cast<int*>(Ptr(this, 0x60)), texCoordId,
-                        (*reinterpret_cast<unsigned int*>(Ptr(this, 0x134)) & 0xFF) + 1, 0xFF);
+                        m_numTevStage, texCoordId,
+                        (m_texMapIdCurShadow & 0xFF) + 1, 0xFF);
                     _GXSetTevColorIn(
-                        *reinterpret_cast<int*>(Ptr(this, 0x60)), 0, 2, 9, 0xF);
+                        m_numTevStage, 0, 2, 9, 0xF);
                     _GXSetTevColorOp(
-                        *reinterpret_cast<int*>(Ptr(this, 0x60)), 0, 0, 1, 1, 0);
+                        m_numTevStage, 0, 0, 1, 1, 0);
                     _GXSetTevAlphaIn(
-                        *reinterpret_cast<int*>(Ptr(this, 0x60)), 7, 7, 7, 0);
+                        m_numTevStage, 7, 7, 7, 0);
                     _GXSetTevAlphaOp(
-                        *reinterpret_cast<int*>(Ptr(this, 0x60)), 0, 0, 0, 1, 0);
+                        m_numTevStage, 0, 0, 0, 1, 0);
                     _GXSetTevSwapMode(
-                        *reinterpret_cast<int*>(Ptr(this, 0x60)), 0, 0);
-                    *reinterpret_cast<unsigned int*>(Ptr(this, 0x60)) =
-                        ((*reinterpret_cast<unsigned int*>(Ptr(this, 0x60)) & 0xFF) + 1) & 0xFF;
+                        m_numTevStage, 0, 0);
+                    m_numTevStage =
+                        ((m_numTevStage & 0xFF) + 1) & 0xFF;
                 }
             } else {
                 if ((tevBit & 0x20) == 0) {
-                    GXSetTexCoordGen2(static_cast<_GXTexCoordID>(*reinterpret_cast<int*>(Ptr(this, 0x13C))),
+                    GXSetTexCoordGen2(static_cast<_GXTexCoordID>(m_texCoordIdCurShadow),
                                       static_cast<_GXTexGenType>(1), static_cast<_GXTexGenSrc>(4), 0x3C, 0, 0x7D);
                     _GXSetTevOrder(
-                        0, *reinterpret_cast<int*>(Ptr(this, 0x13C)), *reinterpret_cast<int*>(Ptr(this, 0x134)), 4);
+                        0, m_texCoordIdCurShadow, m_texMapIdCurShadow, 4);
                 } else {
-                    *reinterpret_cast<int*>(Ptr(this, 0x124)) = *reinterpret_cast<int*>(Ptr(this, 0x124)) - 1;
+                    m_texCoordIdCur = m_texCoordIdCur - 1;
                     _GXSetTevOrder(
-                        0, *reinterpret_cast<int*>(Ptr(this, 0x148)), *reinterpret_cast<int*>(Ptr(this, 0x134)), 4);
+                        0, m_texScroll0TexCoord, m_texMapIdCurShadow, 4);
                 }
 
                 _GXSetTevSwapModeTable(
@@ -1414,32 +1451,32 @@ void CMaterialMan::SetMaterialPart(CMaterialSet* materialSet, int materialIndex,
                 _GXSetTevAlphaOp(
                     0, 0, 0, 2, 1, 0);
                 _GXSetTevSwapMode(0, 0, 1);
-                *reinterpret_cast<unsigned int*>(Ptr(this, 0x60)) = 1;
+                m_numTevStage = 1;
 
-                if ((*reinterpret_cast<unsigned char*>(Ptr(this, 0x4C)) != 0) && (setVtxDesc != 0)) {
+                if ((m_vtxDescMode != 0) && (setVtxDesc != 0)) {
                     GXClearVtxDesc();
                     GXSetVtxDesc(GX_VA_POS, GX_INDEX16);
                     GXSetVtxDesc(GX_VA_NRM, GX_INDEX16);
                     GXSetVtxDesc(GX_VA_CLR0, GX_INDEX16);
                     GXSetVtxDesc(GX_VA_TEX0, GX_INDEX16);
-                    *reinterpret_cast<unsigned char*>(Ptr(this, 0x4C)) = 0;
+                    m_vtxDescMode = 0;
                 }
             }
         } else {
             GXColor tevColor2;
             GXColor tevColor3;
             *reinterpret_cast<unsigned int*>(&tevColor2) = 0xFFFF0000;
-            *reinterpret_cast<int*>(Ptr(this, 0x11C)) = *reinterpret_cast<int*>(Ptr(this, 0x11C)) + 1;
+            m_texMapIdCur = m_texMapIdCur + 1;
             *reinterpret_cast<unsigned int*>(&tevColor3) = 0x0000FFFF;
             GXSetTevColor(static_cast<_GXTevRegID>(2), tevColor2);
             GXSetTevColor(static_cast<_GXTevRegID>(3), tevColor3);
 
             if ((tevBit & 0x20) == 0) {
-                GXSetTexCoordGen2(static_cast<_GXTexCoordID>(*reinterpret_cast<int*>(Ptr(this, 0x13C))),
+                GXSetTexCoordGen2(static_cast<_GXTexCoordID>(m_texCoordIdCurShadow),
                                   static_cast<_GXTexGenType>(1), static_cast<_GXTexGenSrc>(4), 0x3C, 0, 0x7D);
             } else {
-                *reinterpret_cast<int*>(Ptr(this, 0x124)) = *reinterpret_cast<int*>(Ptr(this, 0x124)) - 1;
-                *reinterpret_cast<int*>(Ptr(this, 0x13C)) = *reinterpret_cast<int*>(Ptr(this, 0x148));
+                m_texCoordIdCur = m_texCoordIdCur - 1;
+                m_texCoordIdCurShadow = m_texScroll0TexCoord;
             }
 
             _GXSetTevSwapModeTable(
@@ -1453,7 +1490,7 @@ void CMaterialMan::SetMaterialPart(CMaterialSet* materialSet, int materialIndex,
             _GXSetTevColorOp(0, 0, 0, 0, 0, 0);
             _GXSetTevSwapMode(0, 0, 1);
             _GXSetTevOrder(
-                0, *reinterpret_cast<int*>(Ptr(this, 0x13C)), *reinterpret_cast<int*>(Ptr(this, 0x134)), 0xFF);
+                0, m_texCoordIdCurShadow, m_texMapIdCurShadow, 0xFF);
 
             GXSetTevDirect(GX_TEVSTAGE1);
             _GXSetTevColorIn(
@@ -1464,7 +1501,7 @@ void CMaterialMan::SetMaterialPart(CMaterialSet* materialSet, int materialIndex,
             _GXSetTevAlphaOp(1, 0, 0, 0, 1, 0);
             _GXSetTevSwapMode(1, 0, 2);
             _GXSetTevOrder(
-                1, *reinterpret_cast<int*>(Ptr(this, 0x13C)), *reinterpret_cast<int*>(Ptr(this, 0x134)) + 1, 0xFF);
+                1, m_texCoordIdCurShadow, m_texMapIdCurShadow + 1, 0xFF);
 
             GXSetTevDirect(GX_TEVSTAGE2);
             _GXSetTevColorIn(
@@ -1476,26 +1513,26 @@ void CMaterialMan::SetMaterialPart(CMaterialSet* materialSet, int materialIndex,
             _GXSetTevSwapMode(2, 0, 0);
             _GXSetTevOrder(2, 0xFF, 0xFF, 4);
 
-            *reinterpret_cast<unsigned int*>(Ptr(this, 0x60)) = 3;
-            if ((*reinterpret_cast<unsigned char*>(Ptr(this, 0x4C)) != 0) && (setVtxDesc != 0)) {
+            m_numTevStage = 3;
+            if ((m_vtxDescMode != 0) && (setVtxDesc != 0)) {
                 GXClearVtxDesc();
                 GXSetVtxDesc(GX_VA_POS, GX_INDEX16);
                 GXSetVtxDesc(GX_VA_NRM, GX_INDEX16);
                 GXSetVtxDesc(GX_VA_CLR0, GX_INDEX16);
                 GXSetVtxDesc(GX_VA_TEX0, GX_INDEX16);
-                *reinterpret_cast<unsigned char*>(Ptr(this, 0x4C)) = 0;
+                m_vtxDescMode = 0;
             }
         }
     } else {
         if ((tevBit & 0x20) == 0) {
-            GXSetTexCoordGen2(static_cast<_GXTexCoordID>(*reinterpret_cast<int*>(Ptr(this, 0x13C))),
+            GXSetTexCoordGen2(static_cast<_GXTexCoordID>(m_texCoordIdCurShadow),
                               static_cast<_GXTexGenType>(1), static_cast<_GXTexGenSrc>(4), 0x3C, 0, 0x7D);
             _GXSetTevOrder(
-                0, *reinterpret_cast<int*>(Ptr(this, 0x13C)), *reinterpret_cast<int*>(Ptr(this, 0x134)), 4);
+                0, m_texCoordIdCurShadow, m_texMapIdCurShadow, 4);
         } else {
-            *reinterpret_cast<int*>(Ptr(this, 0x124)) = *reinterpret_cast<int*>(Ptr(this, 0x124)) - 1;
+            m_texCoordIdCur = m_texCoordIdCur - 1;
             _GXSetTevOrder(
-                0, *reinterpret_cast<int*>(Ptr(this, 0x148)), *reinterpret_cast<int*>(Ptr(this, 0x134)), 4);
+                0, m_texScroll0TexCoord, m_texMapIdCurShadow, 4);
         }
         _GXSetTevColorIn(0, 0xF,
                                                                                                               0xC, 0xA,
@@ -1505,20 +1542,20 @@ void CMaterialMan::SetMaterialPart(CMaterialSet* materialSet, int materialIndex,
                                                                                                               5, 7);
         _GXSetTevAlphaOp(0, 0, 0, 2, 1, 0);
         _GXSetTevSwapMode(0, 0, 0);
-        *reinterpret_cast<unsigned int*>(Ptr(this, 0x60)) = 1;
+        m_numTevStage = 1;
 
-        if ((*reinterpret_cast<unsigned char*>(Ptr(this, 0x4C)) != 0) && (setVtxDesc != 0)) {
+        if ((m_vtxDescMode != 0) && (setVtxDesc != 0)) {
             GXClearVtxDesc();
             GXSetVtxDesc(GX_VA_POS, GX_INDEX16);
             GXSetVtxDesc(GX_VA_NRM, GX_INDEX16);
             GXSetVtxDesc(GX_VA_CLR0, GX_INDEX16);
             GXSetVtxDesc(GX_VA_TEX0, GX_INDEX16);
-            *reinterpret_cast<unsigned char*>(Ptr(this, 0x4C)) = 0;
+            m_vtxDescMode = 0;
         }
     }
 
-    GXSetNumTexGens(((*reinterpret_cast<unsigned int*>(Ptr(this, 0x124)) & 0xFF) + 1) & 0xFF);
-    GXSetNumTevStages(*reinterpret_cast<unsigned int*>(Ptr(this, 0x60)) & 0xFF);
+    GXSetNumTexGens(((m_texCoordIdCur & 0xFF) + 1) & 0xFF);
+    GXSetNumTevStages(m_numTevStage & 0xFF);
 }
 
 /*
@@ -1536,22 +1573,22 @@ void CMaterialMan::SetMaterialMenu(CMaterialSet* materialSet, int materialIndex,
 
     CPtrArray<CMaterial*>* materials = reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(materialSet, 8));
     CMaterial* material = (*materials)[materialIndex];
-    material->Set(static_cast<_GXTexMapID>(*reinterpret_cast<int*>(Ptr(this, 0x11C))));
+    material->Set(static_cast<_GXTexMapID>(m_texMapIdCur));
 
-    unsigned int tevBit = *reinterpret_cast<unsigned int*>(Ptr(this, 0x48)) &
+    unsigned int tevBit = m_curEnvTevBit &
                           *reinterpret_cast<unsigned int*>(Ptr(material, 0x24));
-    if (*reinterpret_cast<unsigned int*>(Ptr(this, 0x44)) == tevBit) {
+    if (m_activeEnvTevBit == tevBit) {
         if ((tevBit & 0x200) != 0) {
             _GXSetTevOrder(
                 1,
-                *reinterpret_cast<int*>(Ptr(this, 0x13C)),
-                *reinterpret_cast<int*>(Ptr(this, 0x134)) + 1,
+                m_texCoordIdCurShadow,
+                m_texMapIdCurShadow + 1,
                 0xFF);
         }
         return;
     }
 
-    *reinterpret_cast<unsigned int*>(Ptr(this, 0x44)) = tevBit;
+    m_activeEnvTevBit = tevBit;
     GXSetArray(GX_VA_TEX0, *reinterpret_cast<void**>(Ptr(this, 4)), 6);
     GXSetNumIndStages(0);
     GXSetTevDirect(GX_TEVSTAGE0);
@@ -1559,19 +1596,19 @@ void CMaterialMan::SetMaterialMenu(CMaterialSet* materialSet, int materialIndex,
     if ((tevBit & 0x200) == 0) {
         if ((tevBit & 0x800) != 0) {
             if ((tevBit & 0x20) == 0) {
-                GXSetTexCoordGen2(static_cast<_GXTexCoordID>(*reinterpret_cast<int*>(Ptr(this, 0x13C))),
+                GXSetTexCoordGen2(static_cast<_GXTexCoordID>(m_texCoordIdCurShadow),
                                   GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
                 _GXSetTevOrder(
                     0,
-                    *reinterpret_cast<int*>(Ptr(this, 0x13C)),
-                    *reinterpret_cast<int*>(Ptr(this, 0x134)),
+                    m_texCoordIdCurShadow,
+                    m_texMapIdCurShadow,
                     4);
             } else {
-                *reinterpret_cast<int*>(Ptr(this, 0x124)) = *reinterpret_cast<int*>(Ptr(this, 0x124)) - 1;
+                m_texCoordIdCur = m_texCoordIdCur - 1;
                 _GXSetTevOrder(
                     0,
-                    *reinterpret_cast<int*>(Ptr(this, 0x148)),
-                    *reinterpret_cast<int*>(Ptr(this, 0x134)),
+                    m_texScroll0TexCoord,
+                    m_texMapIdCurShadow,
                     4);
             }
 
@@ -1584,15 +1621,15 @@ void CMaterialMan::SetMaterialMenu(CMaterialSet* materialSet, int materialIndex,
                 0, 7, 4, 5, 7);
             _GXSetTevAlphaOp(0, 0, 0, 0, 1, 0);
             _GXSetTevSwapMode(0, 0, 1);
-            *reinterpret_cast<int*>(Ptr(this, 0x60)) = 1;
+            m_numTevStage = 1;
 
-            if ((*reinterpret_cast<unsigned char*>(Ptr(this, 0x4C)) != 0) && (setVtxDesc != 0)) {
+            if ((m_vtxDescMode != 0) && (setVtxDesc != 0)) {
                 GXClearVtxDesc();
                 GXSetVtxDesc(GX_VA_POS, GX_INDEX16);
                 GXSetVtxDesc(GX_VA_NRM, GX_INDEX16);
                 GXSetVtxDesc(GX_VA_CLR0, GX_INDEX16);
                 GXSetVtxDesc(GX_VA_TEX0, GX_INDEX16);
-                *reinterpret_cast<unsigned char*>(Ptr(this, 0x4C)) = 0;
+                m_vtxDescMode = 0;
             }
         }
     } else {
@@ -1637,19 +1674,19 @@ void CMaterialMan::SetMaterialMenu(CMaterialSet* materialSet, int materialIndex,
         _GXSetTevSwapMode(2, 0, 0);
         _GXSetTevOrder(2, 0xFF, 0xFF, 4);
 
-        *reinterpret_cast<int*>(Ptr(this, 0x60)) = 3;
-        if ((*reinterpret_cast<unsigned char*>(Ptr(this, 0x4C)) != 0) && (setVtxDesc != 0)) {
+        m_numTevStage = 3;
+        if ((m_vtxDescMode != 0) && (setVtxDesc != 0)) {
             GXClearVtxDesc();
             GXSetVtxDesc(GX_VA_POS, GX_INDEX16);
             GXSetVtxDesc(GX_VA_NRM, GX_INDEX16);
             GXSetVtxDesc(GX_VA_CLR0, GX_INDEX16);
             GXSetVtxDesc(GX_VA_TEX0, GX_INDEX16);
-            *reinterpret_cast<unsigned char*>(Ptr(this, 0x4C)) = 0;
+            m_vtxDescMode = 0;
         }
     }
 
-    GXSetNumTexGens(static_cast<unsigned char>((*reinterpret_cast<unsigned int*>(Ptr(this, 0x124)) & 0xFF) + 1));
-    GXSetNumTevStages(static_cast<unsigned char>(*reinterpret_cast<unsigned int*>(Ptr(this, 0x60)) & 0xFF));
+    GXSetNumTexGens(static_cast<unsigned char>((m_texCoordIdCur & 0xFF) + 1));
+    GXSetNumTevStages(static_cast<unsigned char>(m_numTevStage & 0xFF));
 }
 
 /*
@@ -1687,43 +1724,43 @@ void CMaterialMan::SetObjMatrix(float (*mtxA) [4], float (*mtxB) [4])
  */
 void CMaterialMan::SetTexScroll(float u0, float v0, float u1, float v1)
 {
-    if (((*reinterpret_cast<unsigned int*>(Ptr(this, 0x120)) & 0xFF) < 0x3C) &&
-        ((*reinterpret_cast<unsigned int*>(Ptr(this, 0x124)) & 0xFF) < 8)) {
-        *reinterpret_cast<unsigned int*>(Ptr(this, 0x48)) |= 0x20;
+    if (((static_cast<unsigned int>(m_texMtxCur) & 0xFF) < 0x3C) &&
+        ((static_cast<unsigned int>(m_texCoordIdCur) & 0xFF) < 8)) {
+        m_curEnvTevBit |= 0x20;
 
         Mtx texMtx;
         PSMTXIdentity(texMtx);
         texMtx[0][3] = u0;
         texMtx[1][3] = v0;
 
-        *reinterpret_cast<int*>(Ptr(this, 0x144)) = *reinterpret_cast<int*>(Ptr(this, 0x120));
-        *reinterpret_cast<int*>(Ptr(this, 0x148)) = *reinterpret_cast<int*>(Ptr(this, 0x124));
-        GXLoadTexMtxImm(texMtx, *reinterpret_cast<int*>(Ptr(this, 0x120)), GX_MTX2x4);
+        m_texScroll0TexMtx = m_texMtxCur;
+        m_texScroll0TexCoord = m_texCoordIdCur;
+        GXLoadTexMtxImm(texMtx, m_texMtxCur, GX_MTX2x4);
 
-        int texMtxCur = *reinterpret_cast<int*>(Ptr(this, 0x120));
-        *reinterpret_cast<int*>(Ptr(this, 0x120)) = texMtxCur + 3;
+        int texMtxCur = m_texMtxCur;
+        m_texMtxCur = texMtxCur + 3;
 
-        int texCoordCur = *reinterpret_cast<int*>(Ptr(this, 0x124));
-        *reinterpret_cast<int*>(Ptr(this, 0x124)) = texCoordCur + 1;
+        int texCoordCur = m_texCoordIdCur;
+        m_texCoordIdCur = texCoordCur + 1;
         GXSetTexCoordGen2(static_cast<GXTexCoordID>(texCoordCur), GX_TG_MTX2x4, GX_TG_TEX0, texMtxCur, GX_FALSE,
                           0x7D);
 
         if ((FLOAT_8032faf4 != u1) || (FLOAT_8032faf4 != v1)) {
-            *reinterpret_cast<unsigned int*>(Ptr(this, 0x48)) |= 0x40;
+            m_curEnvTevBit |= 0x40;
 
             PSMTXIdentity(texMtx);
             texMtx[0][3] = u1;
             texMtx[1][3] = v1;
 
-            *reinterpret_cast<int*>(Ptr(this, 0x150)) = *reinterpret_cast<int*>(Ptr(this, 0x120));
-            *reinterpret_cast<int*>(Ptr(this, 0x154)) = *reinterpret_cast<int*>(Ptr(this, 0x124));
-            GXLoadTexMtxImm(texMtx, *reinterpret_cast<int*>(Ptr(this, 0x120)), GX_MTX2x4);
+            m_texScroll1TexMtx = m_texMtxCur;
+            m_texScroll1TexCoord = m_texCoordIdCur;
+            GXLoadTexMtxImm(texMtx, m_texMtxCur, GX_MTX2x4);
 
-            texMtxCur = *reinterpret_cast<int*>(Ptr(this, 0x120));
-            *reinterpret_cast<int*>(Ptr(this, 0x120)) = texMtxCur + 3;
+            texMtxCur = m_texMtxCur;
+            m_texMtxCur = texMtxCur + 3;
 
-            texCoordCur = *reinterpret_cast<int*>(Ptr(this, 0x124));
-            *reinterpret_cast<int*>(Ptr(this, 0x124)) = texCoordCur + 1;
+            texCoordCur = m_texCoordIdCur;
+            m_texCoordIdCur = texCoordCur + 1;
             GXSetTexCoordGen2(static_cast<GXTexCoordID>(texCoordCur), GX_TG_MTX2x4, GX_TG_TEX0, texMtxCur, GX_FALSE,
                               0x7D);
         }
@@ -1741,9 +1778,9 @@ void CMaterialMan::SetTexScroll(float u0, float v0, float u1, float v1)
  */
 void CMaterialMan::SetFullScreenShadow(CFullScreenShadow& shadow, float (*viewMtx)[4], long flags)
 {
-    int cameraEnable = *(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x404);
+    int cameraEnable = CameraPcs.m_fullScreenShadowEnabled;
     if (cameraEnable != 0) {
-        *reinterpret_cast<unsigned int*>(Ptr(this, 0x48)) |= 0x80;
+        m_curEnvTevBit |= 0x80;
 
         unsigned char* shadowPtr = reinterpret_cast<unsigned char*>(&shadow);
         PSMTXConcat(reinterpret_cast<MtxPtr>(shadowPtr + 0x58), viewMtx, reinterpret_cast<MtxPtr>(Ptr(this, 0x64)));
@@ -1767,58 +1804,58 @@ void CMaterialMan::SetFullScreenShadow(CFullScreenShadow& shadow, float (*viewMt
  */
 void CMaterialMan::SetShadow(CMapShadow& shadow, float (*viewMtx) [4], int shadowIndex, unsigned long materialFlag)
 {
-    CMaterialSet* materialSet = *reinterpret_cast<CMaterialSet**>(Ptr(&MapMng, 0x213D4));
+    CMaterialSet* materialSet = MapMng.m_materialSet;
     CPtrArray<CMaterial*>* materials = reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(materialSet, 8));
     CMaterial* material = (*materials)[*reinterpret_cast<unsigned short*>(Ptr(&shadow, 4))];
 
     unsigned long useShadowBit32 = materialFlag & *reinterpret_cast<unsigned long*>(Ptr(material, 0x24)) & 0x8000;
     if (useShadowBit32 == 0) {
-        if (*reinterpret_cast<int*>(Ptr(this, 0x5C)) > 4) {
+        if (m_shadowTextureCount > 4) {
             return;
         }
-    } else if (*reinterpret_cast<int*>(Ptr(this, 0x5C)) > 3) {
+    } else if (m_shadowTextureCount > 3) {
         return;
     }
 
-    if (((*reinterpret_cast<unsigned int*>(Ptr(this, 0x11C)) & 0xFF) < 8) &&
-        ((*reinterpret_cast<unsigned int*>(Ptr(this, 0x120)) & 0xFF) < 0x3C) &&
-        ((*reinterpret_cast<unsigned int*>(Ptr(this, 0x124)) & 0xFF) < 8)) {
-        int materialNum = *reinterpret_cast<int*>(Ptr(this, 0x58));
+    if (((m_texMapIdCur & 0xFF) < 8) &&
+        ((m_texMtxCur & 0xFF) < 0x3C) &&
+        ((m_texCoordIdCur & 0xFF) < 8)) {
+        int materialNum = m_shadowMaterialCount;
 
-        *reinterpret_cast<unsigned int*>(Ptr(this, 0x48)) |= 0x10;
-        *Ptr(this, materialNum + 0x4D) = *Ptr(&shadow, 8);
-        *Ptr(this, materialNum + 0x20E) = static_cast<unsigned char>(shadowIndex);
-        *reinterpret_cast<int*>(Ptr(this, materialNum * 4 + 0x158)) = *reinterpret_cast<int*>(Ptr(this, 0x11C));
-        *reinterpret_cast<int*>(Ptr(this, materialNum * 4 + 0x16C)) = *reinterpret_cast<int*>(Ptr(this, 0x120));
-        *reinterpret_cast<int*>(Ptr(this, materialNum * 4 + 0x180)) = *reinterpret_cast<int*>(Ptr(this, 0x124));
+        m_curEnvTevBit |= 0x10;
+        m_shadowMaterialType[materialNum] = static_cast<signed char>(*Ptr(&shadow, 8));
+        m_shadowIndices[materialNum] = static_cast<unsigned char>(shadowIndex);
+        m_shadowTexMapIds[materialNum] = m_texMapIdCur;
+        m_shadowTexMtxIds[materialNum] = m_texMtxCur;
+        m_shadowTexCoordIds[materialNum] = m_texCoordIdCur;
 
         Mtx texMtx;
         PSMTXConcat(reinterpret_cast<float(*)[4]>(Ptr(&shadow, 0x78)), viewMtx, texMtx);
-        GXLoadTexMtxImm(texMtx, *reinterpret_cast<int*>(Ptr(this, 0x120)), GX_MTX2x4);
+        GXLoadTexMtxImm(texMtx, m_texMtxCur, GX_MTX2x4);
 
-        int texMtxCur = *reinterpret_cast<int*>(Ptr(this, 0x120));
-        *reinterpret_cast<int*>(Ptr(this, 0x120)) = texMtxCur + 3;
+        int texMtxCur = m_texMtxCur;
+        m_texMtxCur = texMtxCur + 3;
 
-        int texCoordCur = *reinterpret_cast<int*>(Ptr(this, 0x124));
-        *reinterpret_cast<int*>(Ptr(this, 0x124)) = texCoordCur + 1;
+        int texCoordCur = m_texCoordIdCur;
+        m_texCoordIdCur = texCoordCur + 1;
         GXSetTexCoordGen2(static_cast<GXTexCoordID>(texCoordCur), GX_TG_MTX2x4, GX_TG_TEX0, texMtxCur, GX_FALSE,
                           GX_PTIDENTITY);
 
-        int texMapCur = *reinterpret_cast<int*>(Ptr(this, 0x11C));
-        *reinterpret_cast<int*>(Ptr(this, 0x11C)) = texMapCur + 1;
+        int texMapCur = m_texMapIdCur;
+        m_texMapIdCur = texMapCur + 1;
         TextureMan.SetTexture(static_cast<_GXTexMapID>(texMapCur), *reinterpret_cast<CTexture**>(Ptr(material, 0x3C)));
 
         if (useShadowBit32 != 0) {
-            texMapCur = *reinterpret_cast<int*>(Ptr(this, 0x11C));
-            *reinterpret_cast<int*>(Ptr(this, 0x11C)) = texMapCur + 1;
+            texMapCur = m_texMapIdCur;
+            m_texMapIdCur = texMapCur + 1;
             TextureMan.SetTexture(static_cast<_GXTexMapID>(texMapCur), *reinterpret_cast<CTexture**>(Ptr(material, 0x40)));
-            *Ptr(this, materialNum + 0x209) = *Ptr(material, 0xA4);
-            *Ptr(this, 0x208) |= static_cast<unsigned char>(1 << materialNum);
-            *reinterpret_cast<int*>(Ptr(this, 0x5C)) = *reinterpret_cast<int*>(Ptr(this, 0x5C)) + 1;
+            m_shadowKColorIds[materialNum] = *Ptr(material, 0xA4);
+            m_shadowKColorMask |= static_cast<unsigned char>(1 << materialNum);
+            m_shadowTextureCount = m_shadowTextureCount + 1;
         }
 
-        *reinterpret_cast<int*>(Ptr(this, 0x58)) = materialNum + 1;
-        *reinterpret_cast<int*>(Ptr(this, 0x5C)) = *reinterpret_cast<int*>(Ptr(this, 0x5C)) + 1;
+        m_shadowMaterialCount = materialNum + 1;
+        m_shadowTextureCount = m_shadowTextureCount + 1;
     }
 }
 
@@ -1835,7 +1872,7 @@ void CMaterialMan::SetShadowBit32(CMapShadow::TARGET target, unsigned long* shad
 {
     (void)target;
 
-    CPtrArray<CMapShadow*>* mapShadowArray = reinterpret_cast<CPtrArray<CMapShadow*>*>(Ptr(&MapMng, 0x21434));
+    CPtrArray<CMapShadow*>* mapShadowArray = &MapMng.GetMapShadowArray();
     for (unsigned int i = 0; i < static_cast<unsigned int>(mapShadowArray->GetSize()); i++) {
         CMapShadow* shadow = (*mapShadowArray)[i];
         unsigned char* shadowBytes = reinterpret_cast<unsigned char*>(shadow);
@@ -1875,7 +1912,7 @@ void CMaterialMan::SetPosition(
     float maxY = minY + rangeY;
     float maxZ = position->z + rangeXZ;
 
-    CPtrArray<CMapShadow*>* mapShadowArray = reinterpret_cast<CPtrArray<CMapShadow*>*>(Ptr(&MapMng, 0x21434));
+    CPtrArray<CMapShadow*>* mapShadowArray = &MapMng.GetMapShadowArray();
     if (target == static_cast<CMapShadow::TARGET>(0)) {
         int shadowCandidates[385];
         int* candidateWrite = shadowCandidates;
@@ -1996,9 +2033,9 @@ int CMaterialMan::GetCharaShadow(
     float maxY = minY + rangeY;
     float maxZ = position->z + rangeXZ;
 
-    CMaterialSet* materialSet = *reinterpret_cast<CMaterialSet**>(Ptr(&MapMng, 0x213D4));
+    CMaterialSet* materialSet = MapMng.m_materialSet;
     CPtrArray<CMaterial*>* materials = reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(materialSet, 8));
-    CPtrArray<CMapShadow*>* mapShadowArray = reinterpret_cast<CPtrArray<CMapShadow*>*>(Ptr(&MapMng, 0x21434));
+    CPtrArray<CMapShadow*>* mapShadowArray = &MapMng.GetMapShadowArray();
 
     int shadowCandidates[384];
     int* candidateWrite = shadowCandidates;
@@ -2086,7 +2123,7 @@ int CMaterialMan::GetCharaShadow(
  */
 void CMaterialMan::SetShadowBound(CMapShadow::TARGET target, CBound* bound, float (*viewMtx) [4])
 {
-    CPtrArray<CMapShadow*>* mapShadowArray = reinterpret_cast<CPtrArray<CMapShadow*>*>(Ptr(&MapMng, 0x21434));
+    CPtrArray<CMapShadow*>* mapShadowArray = &MapMng.GetMapShadowArray();
 
     for (unsigned int i = 0; i < static_cast<unsigned int>(mapShadowArray->GetSize()); i++) {
         CMapShadow* shadow = (*mapShadowArray)[i];
@@ -2162,7 +2199,7 @@ void CMaterialMan::InitVtxFmt(
         GXSetVtxAttrFmt((_GXVtxFmt)6, (_GXAttr)11, (_GXCompCnt)1, (_GXCompType)5, 0);
     }
 
-    *reinterpret_cast<unsigned int*>(Ptr(this, 0x44)) = 0xFFFFFFFF;
+    m_activeEnvTevBit = 0xFFFFFFFF;
 }
 
 /*
@@ -2176,8 +2213,7 @@ void CMaterialMan::InitVtxFmt(
  */
 void CMaterialMan::IncNumTevStage()
 {
-    unsigned int tevStage = *reinterpret_cast<unsigned int*>(Ptr(this, 0x60));
-    *reinterpret_cast<unsigned int*>(Ptr(this, 0x60)) = ((tevStage & 0xFF) + 1) & 0xFF;
+    m_numTevStage = ((m_numTevStage & 0xFF) + 1) & 0xFF;
 }
 
 /*
@@ -2245,8 +2281,8 @@ int CMaterialMan::IncTexMtxCur()
  */
 int CMaterialMan::IncTexMapIdCur()
 {
-    int texMapId = *reinterpret_cast<int*>(Ptr(this, 0x11C));
-    *reinterpret_cast<int*>(Ptr(this, 0x11C)) = texMapId + 1;
+    int texMapId = m_texMapIdCur;
+    m_texMapIdCur = texMapId + 1;
     return texMapId;
 }
 
@@ -2365,71 +2401,11 @@ extern "C" CMaterial* __dt__Q29CMaterial25_class_529materialman_cppFv(CMaterial*
 CTexScroll::~CTexScroll()
 {
     if (m_type0 == 2) {
-        void* keyFrame0 = *reinterpret_cast<void**>(Ptr(this, 0xC));
-        if (keyFrame0 != 0) {
-            if (keyFrame0 != 0) {
-                void*& table0 = *reinterpret_cast<void**>(Ptr(keyFrame0, 0x18));
-                if (table0 != 0) {
-                    operator delete(table0);
-                    table0 = 0;
-                }
-
-                void*& table1 = *reinterpret_cast<void**>(Ptr(keyFrame0, 0x1C));
-                if (table1 != 0) {
-                    operator delete(table1);
-                    table1 = 0;
-                }
-
-                void*& table2 = *reinterpret_cast<void**>(Ptr(keyFrame0, 0x20));
-                if (table2 != 0) {
-                    operator delete(table2);
-                    table2 = 0;
-                }
-
-                void*& table3 = *reinterpret_cast<void**>(Ptr(keyFrame0, 0x24));
-                if (table3 != 0) {
-                    operator delete(table3);
-                    table3 = 0;
-                }
-
-                operator delete(keyFrame0);
-            }
-            *reinterpret_cast<void**>(Ptr(this, 0xC)) = 0;
-        }
+        DestroyTexScrollKeyFrame(*reinterpret_cast<void**>(Ptr(this, 0xC)));
     }
 
     if (m_type1 == 2) {
-        void* keyFrame1 = *reinterpret_cast<void**>(Ptr(this, 0x10));
-        if (keyFrame1 != 0) {
-            if (keyFrame1 != 0) {
-                void*& table0 = *reinterpret_cast<void**>(Ptr(keyFrame1, 0x18));
-                if (table0 != 0) {
-                    operator delete(table0);
-                    table0 = 0;
-                }
-
-                void*& table1 = *reinterpret_cast<void**>(Ptr(keyFrame1, 0x1C));
-                if (table1 != 0) {
-                    operator delete(table1);
-                    table1 = 0;
-                }
-
-                void*& table2 = *reinterpret_cast<void**>(Ptr(keyFrame1, 0x20));
-                if (table2 != 0) {
-                    operator delete(table2);
-                    table2 = 0;
-                }
-
-                void*& table3 = *reinterpret_cast<void**>(Ptr(keyFrame1, 0x24));
-                if (table3 != 0) {
-                    operator delete(table3);
-                    table3 = 0;
-                }
-
-                operator delete(keyFrame1);
-            }
-            *reinterpret_cast<void**>(Ptr(this, 0x10)) = 0;
-        }
+        DestroyTexScrollKeyFrame(*reinterpret_cast<void**>(Ptr(this, 0x10)));
     }
 }
 
@@ -2510,7 +2486,7 @@ CMaterial::CMaterial()
  */
 CMemory::CStage* CMaterialMan::GetMemoryStage()
 {
-	return *reinterpret_cast<CMemory::CStage**>(Ptr(this, 0x218));
+	return m_materialStage;
 }
 
 /*
@@ -2918,15 +2894,14 @@ void CMaterialSet::SetPartFromTextureSet(CTextureSet* textureSet, int pdtSlotInd
 
     while (textureIndex < static_cast<u32>(textureArray->GetSize())) {
         if ((*textureArray)[textureIndex] != 0) {
-            u32 materialCount = static_cast<u32>(UnkMaterialSetGetter(materialArray));
+            u32 materialCount = static_cast<u32>(materialArray->GetSize());
             u32 materialIndex = textureIndex + 1;
             if ((materialIndex < materialCount) && ((*materialArray)[materialIndex] != 0)) {
                 goto next;
             }
 
             CMaterial* newMaterial =
-                new (*reinterpret_cast<CMemory::CStage**>(Ptr(&MaterialMan, 0x218)),
-                     const_cast<char*>(s_materialman_cpp), 0xEE4) CMaterial;
+                new (MaterialMan.GetMemoryStage(), const_cast<char*>(s_materialman_cpp), 0xEE4) CMaterial;
             unsigned char* material = reinterpret_cast<unsigned char*>(newMaterial);
 
             *reinterpret_cast<int*>(material + 0x24) = -0xACE10;
@@ -2939,7 +2914,7 @@ void CMaterialSet::SetPartFromTextureSet(CTextureSet* textureSet, int pdtSlotInd
             *reinterpret_cast<unsigned short*>(material + 0x1A) = static_cast<unsigned short>(textureIndex);
             *reinterpret_cast<int*>(material + 0x9C) = pdtSlotIndex;
 
-            materialCount = static_cast<u32>(UnkMaterialSetGetter(materialArray));
+            materialCount = static_cast<u32>(materialArray->GetSize());
             if (materialIndex >= materialCount) {
                 materialArray->Add(reinterpret_cast<CMaterial*>(material));
             } else {
@@ -2977,9 +2952,8 @@ void CMaterial::Create(unsigned long tag, CMaterialMan::TEV_BIT tevBit)
  * Address:	TODO
  * Size:	TODO
  */
-void CMaterial::IncNumTexture()
+inline void CMaterial::IncNumTexture()
 {
-	// TODO
 }
 
 /*
@@ -2993,12 +2967,11 @@ void CMaterial::IncNumTexture()
  */
 void CMaterialSet::ReleaseTag(CTextureSet* textureSet, int pdtSlotIndex, CAmemCacheSet* amemCacheSet)
 {
-    void* materials = Ptr(this, 8);
+    CPtrArray<CMaterial*>* materials = reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(this, 8));
     unsigned long index = 0;
 
-    while (index < UnkMaterialSetGetter(materials)) {
-        CMaterial** materialItems = *reinterpret_cast<CMaterial***>(Ptr(materials, 0xC));
-        CMaterial* material = materialItems[index];
+    while (index < static_cast<unsigned long>(materials->GetSize())) {
+        CMaterial* material = (*materials)[index];
         if ((material != 0) && (*reinterpret_cast<int*>(Ptr(material, 0x9C)) == pdtSlotIndex)) {
             int numTexture = static_cast<int>(*reinterpret_cast<unsigned short*>(Ptr(material, 0x18)));
             unsigned char* textureIndex = Ptr(material, 0x1A);
@@ -3030,7 +3003,7 @@ void CMaterialSet::ReleaseTag(CTextureSet* textureSet, int pdtSlotIndex, CAmemCa
                 void** vtable = *reinterpret_cast<void***>(material);
                 reinterpret_cast<VirtualDtorFn>(vtable[2])(material, 1);
             }
-            materialItems[index] = 0;
+            materials->SetAt(index, 0);
         }
 
         index++;
@@ -3088,7 +3061,7 @@ CMaterialSet::~CMaterialSet()
 {
     CPtrArray<CMaterial*>* const materials = reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(this, 8));
 
-    for (unsigned long i = 0; i < UnkMaterialSetGetter(materials); i++) {
+    for (unsigned long i = 0; i < static_cast<unsigned long>(materials->GetSize()); i++) {
         CMaterial* const material = (*materials)[i];
         if (material != 0) {
             delete material;
@@ -3183,7 +3156,7 @@ unsigned int CMaterialSet::FindTexName(char* textureName, long* textureIndexOut)
     CPtrArray<CMaterial*>* materials = reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(this, 8));
     unsigned int materialIndex = 0;
 
-    while (materialIndex < UnkMaterialSetGetter(materials)) {
+    while (materialIndex < static_cast<unsigned int>(materials->GetSize())) {
         CMaterial* material = (*materials)[materialIndex];
         if (material != 0) {
             CMaterial* textureSlot = material;
@@ -3273,7 +3246,7 @@ unsigned long CMaterialSet::Find(char* name)
     CPtrArray<CMaterial*>* materialArray = reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(this, 8));
     unsigned long index = 0;
 
-    while (index < UnkMaterialSetGetter(materialArray)) {
+    while (index < static_cast<unsigned long>(materialArray->GetSize())) {
         CMaterial* material = (*materialArray)[index];
         if ((material != 0) && (strcmp(reinterpret_cast<char*>(Ptr(material, 8)), name) == 0)) {
             return index;
@@ -3297,6 +3270,8 @@ int CMaterial::Set(_GXTexMapID texMapId)
 {
     Mtx texMtx;
     PSMTXIdentity(texMtx);
+    MaterialManTexState* texState = GetMaterialManTexState(&MaterialMan);
+    MaterialManTevState* tevState = GetMaterialManTevState(&MaterialMan);
 
     bool hasDualScroll = false;
     if ((*reinterpret_cast<unsigned short*>(Ptr(this, 0x18)) == 2) &&
@@ -3319,41 +3294,37 @@ int CMaterial::Set(_GXTexMapID texMapId)
             float scrollU = *reinterpret_cast<float*>(scrollData + 4);
             float scrollV = *reinterpret_cast<float*>(scrollData + 8);
             if ((FLOAT_8032faf4 != scrollU) || ((FLOAT_8032faf4 != scrollV) || hasDualScroll)) {
-                unsigned int& texMtxCur =
-                    *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&MaterialMan) + 0x120);
-                unsigned int& texCoordCur =
-                    *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&MaterialMan) + 0x124);
                 texMtx[0][3] = scrollU;
                 texMtx[1][3] = scrollV;
 
                 if (i == 0) {
-                    *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&MaterialMan) + 0x48) |= 0x20;
-                    *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&MaterialMan) + 0x144) = texMtxCur;
-                    *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&MaterialMan) + 0x148) = texCoordCur;
-                    GXLoadTexMtxImm(texMtx, texMtxCur, GX_MTX2x4);
+                    tevState->curEnvTevBit |= 0x20;
+                    texState->texScroll0TexMtx = texState->texMtxCur;
+                    texState->texScroll0TexCoord = texState->texCoordIdCur;
+                    GXLoadTexMtxImm(texMtx, texState->texMtxCur, GX_MTX2x4);
                     GXSetTexCoordGen2(
-                        static_cast<GXTexCoordID>(texCoordCur),
+                        static_cast<GXTexCoordID>(texState->texCoordIdCur),
                         GX_TG_MTX2x4,
                         GX_TG_TEX0,
-                        texMtxCur,
+                        texState->texMtxCur,
                         GX_FALSE,
                         0x7D);
                 } else {
-                    *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&MaterialMan) + 0x48) |= 0x40;
-                    *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&MaterialMan) + 0x150) = texMtxCur;
-                    *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&MaterialMan) + 0x154) = texCoordCur;
-                    GXLoadTexMtxImm(texMtx, texMtxCur, GX_MTX2x4);
+                    tevState->curEnvTevBit |= 0x40;
+                    texState->texScroll1TexMtx = texState->texMtxCur;
+                    texState->texScroll1TexCoord = texState->texCoordIdCur;
+                    GXLoadTexMtxImm(texMtx, texState->texMtxCur, GX_MTX2x4);
                     GXSetTexCoordGen2(
-                        static_cast<GXTexCoordID>(texCoordCur),
+                        static_cast<GXTexCoordID>(texState->texCoordIdCur),
                         GX_TG_MTX2x4,
                         GX_TG_TEX1,
-                        texMtxCur,
+                        texState->texMtxCur,
                         GX_FALSE,
                         0x7D);
                 }
 
-                texMtxCur += 3;
-                texCoordCur += 1;
+                texState->texMtxCur += 3;
+                texState->texCoordIdCur += 1;
             }
         }
 
@@ -3369,9 +3340,8 @@ int CMaterial::Set(_GXTexMapID texMapId)
  * Address:	TODO
  * Size:	TODO
  */
-void CMaterial::SetTevBit(CMaterialMan::TEV_BIT)
+inline void CMaterial::SetTevBit(CMaterialMan::TEV_BIT)
 {
-	// TODO
 }
 
 /*
@@ -3379,9 +3349,8 @@ void CMaterial::SetTevBit(CMaterialMan::TEV_BIT)
  * Address:	TODO
  * Size:	TODO
  */
-void CMaterial::GetNumTexture()
+inline void CMaterial::GetNumTexture()
 {
-	// TODO
 }
 
 /*
@@ -3389,9 +3358,8 @@ void CMaterial::GetNumTexture()
  * Address:	TODO
  * Size:	TODO
  */
-void CMaterial::SetTag(int)
+inline void CMaterial::SetTag(int)
 {
-	// TODO
 }
 
 /*
@@ -3399,7 +3367,6 @@ void CMaterial::SetTag(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CMaterial::AddTextureIdx(int, int)
+inline void CMaterial::AddTextureIdx(int, int)
 {
-	// TODO
 }

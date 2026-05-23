@@ -1,5 +1,6 @@
 #include "ffcc/pppChangeBGColor.h"
 #include "ffcc/linkage.h"
+#include "ffcc/map.h"
 #include "ffcc/ppp_linkage.h"
 
 /*
@@ -15,7 +16,6 @@ void pppFrameChangeBGColor(struct pppChangeBGColor* pppChangeBGColor, struct ppp
                            _pppCtrlTable* param_3)
 {
     unsigned char* data;
-    unsigned char* mapMng;
     int dataOffset;
 
     if (gPppCalcDisabled != 0) {
@@ -24,12 +24,11 @@ void pppFrameChangeBGColor(struct pppChangeBGColor* pppChangeBGColor, struct ppp
 
     dataOffset = param_3->m_serializedDataOffsets[1];
     data = reinterpret_cast<unsigned char*>(pppChangeBGColor) + dataOffset + 0x80;
-    mapMng = reinterpret_cast<unsigned char*>(&MapMng);
-    mapMng[0x22989] = 1;
-    mapMng[0x22990] = data[8];
-    mapMng[0x22991] = data[9];
-    mapMng[0x22992] = data[10];
-    mapMng[0x22993] = data[11];
+    MapMng.m_colorScaleEnable = 1;
+    MapMng.m_colorScale.r = data[8];
+    MapMng.m_colorScale.g = data[9];
+    MapMng.m_colorScale.b = data[10];
+    MapMng.m_colorScale.a = data[11];
 }
 
 /*

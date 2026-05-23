@@ -65,7 +65,6 @@ extern "C" unsigned char DAT_8032ed8a;
 extern "C" unsigned char DAT_8032ed8b;
 extern "C" int DAT_8032ed7c;
 extern "C" unsigned int DAT_8032ed80;
-extern "C" void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
 
 _pppEnvSt* pppEnvStPtr;
 _pppMngSt* pppMngStPtr;
@@ -91,7 +90,6 @@ Vec ppvZeroVector;
 CAmemCacheSet ppvAmemCacheSet;
 
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
-static inline unsigned char* PartPcsRaw() { return reinterpret_cast<unsigned char*>(&PartPcs); }
 
 static const char s_pppPart_cpp[] = "pppPart.cpp";
 static const char s_ERROR_prog_NULL[] = "\nERROR!!!! prog=NULL\n\n";
@@ -1423,7 +1421,7 @@ void pppSetFpMatrix(_pppMngSt* pppMngSt)
 		local_50.y = local_44[1][3];
 		local_50.z = local_44[2][3];
 		PSMTXMultVecSR(ppvCameraMatrix0, &local_50, &local_50);
-		local_50.y += CameraPcs._228_4_;
+		local_50.y += CameraPcs.m_positionY;
 		ppvWorldMatrix[0][3] = local_50.x;
 		ppvWorldMatrix[1][3] = local_50.y;
 		ppvWorldMatrix[2][3] = local_50.z;
@@ -1986,7 +1984,7 @@ void pppInitData(_pppDataHead* pppDataHead, pppProg* pppProg, int param_3)
 	pppDataHead->m_shapeGroups = pppDataHead->m_shapeGroups + reinterpret_cast<u32>(dataBase);
 
 	int* chunkOffsets = reinterpret_cast<int*>(pppDataHead->m_cacheChunks);
-	CMemory::CStage* stageLoad = *reinterpret_cast<CMemory::CStage**>(PartPcsRaw() + 0x1C);
+	CMemory::CStage* stageLoad = PartPcs.m_usbStreamData.m_stageLoad;
 	s16* cacheChunks = new (stageLoad, const_cast<char*>(s_pppPart_cpp), 0x620)
 	    s16[static_cast<u32>(pppDataHead->m_cacheChunkCount) * 4];
 	pppDataHead->m_cacheChunks = reinterpret_cast<u32>(cacheChunks);
@@ -2784,7 +2782,7 @@ void pppHitCylinderSendSystem(_pppMngSt* pppMngSt, Vec* origin, Vec* vector, flo
 			else
 			{
 				Vec hitPos;
-				CalcHitPosition__7CMapObjFP3Vec(*(void**)((u8*)&MapMng + 0x22A88), &hitPos);
+				MapMng.m_hitMapObj->CalcHitPosition(&hitPos);
 				s32 partIndex = ((s32)((u8*)pppMngSt - ((u8*)&PartMng + 0x2A18))) / 0x158;
 				Game.HitParticleBG(partIndex, hitRaw->m_kind, hitRaw->m_nodeIndex, &hitPos, &hitRaw->m_hitParams);
 			}

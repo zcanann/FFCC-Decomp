@@ -204,7 +204,15 @@ public:
     void createViewer();
     void destroyViewer();
 
-    u8 _pad004[0xBC];                         // 0x004
+    u8 _pad004[0x20];                         // 0x004
+    int m_overlapEnabled;                     // 0x024
+    u32 m_overlapAlpha;                       // 0x028
+    Vec m_overlapEyePos;                      // 0x02C
+    Vec m_overlapTargetPos;                   // 0x038
+    int m_texShadowSize;                      // 0x044
+    int m_texShadowDistance;                  // 0x048
+    CHandle* m_handleList;                    // 0x04C
+    u8 _pad050[0x70];                         // 0x050
     CMemory::CStage* m_stage;                 // 0x0C0
     CMemory::CStage* m_amemStage;             // 0x0C4
     CMemory::CStage* m_amemWorkStage;         // 0x0C8
@@ -213,13 +221,14 @@ public:
     CMemory::CStage* m_viewerAnimStage;       // 0x0D4
     u8 _pad0D8[0xC];                          // 0x0D8
     int m_charaAllocStage;                    // 0x0E4
-    GXColor m_viewerAmbientColor;             // 0x0E8
-    u8 _pad0EC[4];                            // 0x0EC
-    GXColor m_viewerDiffuseColor[3];          // 0x0F0
-    u8 _pad0FC[0xC];                          // 0x0FC
+    GXColor m_viewerAmbientColor[2];          // 0x0E8
+    GXColor m_viewerDiffuseColor[2][3];       // 0x0F0
     Vec m_viewerDiffusePos[3];                // 0x108
     CColor m_viewerChoiceColor[5];            // 0x12C
-    u8 _pad140[0x3C];                         // 0x140
+    void* m_texShadowTextureBase;             // 0x140
+    u32 m_texShadowTextureSize;               // 0x144
+    u32 m_texShadowTextureOffset;             // 0x148
+    Mtx m_texShadowProjectionMtx;             // 0x14C
     Vec m_texShadowPos;                       // 0x17C
     float m_texShadowRadius;                  // 0x188
     GXColor m_texShadowColor;                 // 0x18C
@@ -251,8 +260,8 @@ public:
     int m_viewerIFrameEnabled;                // 0x708
     int m_viewerResetIFrame;                  // 0x70C
     int m_viewerLoadAnimContinuous;           // 0x710
-    u8 _pad714[4];                            // 0x714
-    int m_noFreeMergeMask;                    // 0x718
+    u32 m_loadStreamCursor;                   // 0x714
+    u32 m_noFreeMergeMask;                    // 0x718
 };
 
 extern CCharaPcs CharaPcs;

@@ -27,7 +27,7 @@ extern const float FLOAT_80331130 = 10000000.0f;
 extern const char s_pppEmission_cpp_801db7e8[] = "pppEmission.cpp";
 
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
-static inline MtxPtr CameraMatrix() { return reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x4); }
+static inline MtxPtr CameraMatrix() { return CameraPcs.m_cameraMatrix; }
 
 void pppInitBlendMode(void);
 void pppSetBlendMode(unsigned char);

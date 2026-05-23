@@ -382,7 +382,7 @@ void CCameraPcs::onScriptChanged(char*, int fromScript)
     MtxPtr mathMtx = reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(&Math) + 4);
 
     PSMTXCopy(mathMtx, reinterpret_cast<MtxPtr>(self + 0x34));
-    PSMTXInverse(mathMtx, reinterpret_cast<MtxPtr>(self + 0x64));
+    PSMTXInverse(mathMtx, m_cameraWorldMtx);
 
     float refValue = FLOAT_8032fa88;
     float zero;
@@ -707,8 +707,7 @@ void CCameraPcs::calc()
     up.y = FLOAT_8032fa1c;
     up.z = FLOAT_8032fa34;
     PSVECDistance(reinterpret_cast<Vec*>(self + 0xE0), reinterpret_cast<Vec*>(self + 0xD4));
-    C_MTXLookAt(reinterpret_cast<MtxPtr>(self + 4), reinterpret_cast<Vec*>(self + 0xE0), &up,
-                reinterpret_cast<Vec*>(self + 0xD4));
+    C_MTXLookAt(m_cameraMatrix, reinterpret_cast<Vec*>(self + 0xE0), &up, reinterpret_cast<Vec*>(self + 0xD4));
 
     if (Game.m_currentMapId == 0x21) {
         PSMTXCopy(reinterpret_cast<MtxPtr>(self + 0x34), worldMapMtx);
@@ -735,12 +734,12 @@ void CCameraPcs::calc()
                 *reinterpret_cast<short*>(self + 0x480) -= 1;
             }
         }
-        PSMTXConcat(reinterpret_cast<MtxPtr>(self + 4), worldMapMtx, reinterpret_cast<MtxPtr>(self + 4));
+        PSMTXConcat(m_cameraMatrix, worldMapMtx, m_cameraMatrix);
     }
 
     PSMTXRotRad(zRotMtx, 'z', *reinterpret_cast<float*>(self + 0x108));
-    PSMTXConcat(zRotMtx, reinterpret_cast<MtxPtr>(self + 4), reinterpret_cast<MtxPtr>(self + 4));
-    PSMTXInverse(reinterpret_cast<MtxPtr>(self + 4), invMtx);
+    PSMTXConcat(zRotMtx, m_cameraMatrix, m_cameraMatrix);
+    PSMTXInverse(m_cameraMatrix, invMtx);
 
     *reinterpret_cast<float*>(self + 0xEC) = FLOAT_8032fa34;
     *reinterpret_cast<float*>(self + 0xF0) = FLOAT_8032fa34;
@@ -807,12 +806,11 @@ void CCameraPcs::draw()
         GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
         GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
         CColor drawColor(0xFF, 0xFF, 0xFF, 0xFF);
-        Graphic.DrawSphere(reinterpret_cast<MtxPtr>(self + 4), reinterpret_cast<Vec*>(self + 0xD4), FLOAT_8032fabc,
-                           &drawColor.color);
+        Graphic.DrawSphere(m_cameraMatrix, reinterpret_cast<Vec*>(self + 0xD4), FLOAT_8032fabc, &drawColor.color);
     }
 
     if (g_map_draw_prof != 0) {
-        PSMTXCopy(reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(&CameraPcs) + 4), cameraMtx);
+        PSMTXCopy(m_cameraMatrix, cameraMtx);
         _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
         GXSetZCompLoc(0);
         _GXSetAlphaCompare(GX_GEQUAL, 1, GX_AOP_AND, GX_ALWAYS, 0);
@@ -837,7 +835,7 @@ void CCameraPcs::draw()
         GXSetChanMatColor(GX_COLOR0A0, *reinterpret_cast<_GXColor*>(&redColor));
         Graphic.DrawSphere();
 
-        PSMTXCopy(reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(&CameraPcs) + 4), cameraMtx);
+        PSMTXCopy(m_cameraMatrix, cameraMtx);
         _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
         GXSetZCompLoc(0);
         _GXSetAlphaCompare(GX_GEQUAL, 1, GX_AOP_AND, GX_ALWAYS, 0);
@@ -1038,8 +1036,8 @@ void CCameraPcs::calcChara()
     PSMTXRotRad(mtxB, 'x', *reinterpret_cast<float*>(self + 0x454));
     PSMTXConcat(mtxB, mtxA, mtxA);
     PSMTXTrans(mtxB, FLOAT_8032fa34, FLOAT_8032fa34, -*reinterpret_cast<float*>(self + 0x45C));
-    PSMTXConcat(mtxB, mtxA, reinterpret_cast<MtxPtr>(self + 4));
-    PSMTXInverse(reinterpret_cast<MtxPtr>(self + 4), mtxInv);
+    PSMTXConcat(mtxB, mtxA, m_cameraMatrix);
+    PSMTXInverse(m_cameraMatrix, mtxInv);
 
     *reinterpret_cast<float*>(self + 0xEC) = FLOAT_8032fa34;
     *reinterpret_cast<float*>(self + 0xF0) = FLOAT_8032fa34;
@@ -1240,8 +1238,7 @@ void CCameraPcs::calcMap()
                 *reinterpret_cast<float*>(self + 0xE8) += moveDelta.z;
                 break;
             }
-            CalcHitSlide__7CMapObjFP3Vecf(
-                *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(&MapMng) + 0x22A88), &moveDelta);
+            CalcHitSlide__7CMapObjFP3Vecf(MapMng.m_hitMapObj, &moveDelta);
         }
     }
 
@@ -1292,7 +1289,7 @@ void CCameraPcs::createFullShadow()
     unsigned int rampTexSize;
     unsigned int i;
     unsigned char* rampTex;
-    CMemory::CStage* stage = *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(&MapMng));
+    CMemory::CStage* stage = MapMng.m_stage;
 
     *reinterpret_cast<void**>(self + 0x31C) = 0;
     rampTexSize = GXGetTexBufferSize(0x1E0, 0x1E0, GX_TF_I8, GX_FALSE, 0);
@@ -1333,7 +1330,7 @@ void CCameraPcs::createFullShadow()
                     GX_FALSE, GX_FALSE, GX_ANISO_1);
     DCFlushRange(rampTex, rampTexSize);
 
-    self[0x404] = 1;
+    m_fullScreenShadowEnabled = 1;
     *reinterpret_cast<float*>(self + 0x364) = FLOAT_8032faa4;
     *reinterpret_cast<float*>(self + 0x368) = FLOAT_8032fa34;
     *reinterpret_cast<float*>(self + 0x370) = FLOAT_8032faa8;
@@ -1492,7 +1489,7 @@ void CCameraPcs::drawShadowBegin()
     Vec delta;
     double depth;
 
-    if (self[0x404] == 0) {
+    if (m_fullScreenShadowEnabled == 0) {
         return;
     }
 
@@ -1581,7 +1578,7 @@ void CCameraPcs::drawShadowBegin()
     PSMTXMultVecSR(rotXY, reinterpret_cast<Vec*>(self + 0x2F0), reinterpret_cast<Vec*>(self + 0x2F0));
 
     if (Game.m_currentMapId == 0x21) {
-        PSMTXCopy(reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x64), tempMtx);
+        PSMTXCopy(CameraPcs.m_cameraWorldMtx, tempMtx);
         PSMTXMultVecSR(tempMtx, reinterpret_cast<Vec*>(self + 0x2F0), reinterpret_cast<Vec*>(self + 0x2F0));
     }
 
@@ -1641,7 +1638,7 @@ void CCameraPcs::drawShadowEnd()
     int y1;
     int x2;
 
-    if (self[0x404] == 0) {
+    if (m_fullScreenShadowEnabled == 0) {
         return;
     }
 
@@ -1751,7 +1748,7 @@ void CCameraPcs::drawShadowChrBegin()
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
 
-    if (self[0x404] != 0) {
+    if (m_fullScreenShadowEnabled != 0) {
         float shadowX = *reinterpret_cast<float*>(self + 0x3E0);
         float scale = FLOAT_8032fa58;
         *reinterpret_cast<float*>(self + 0x3E0) = shadowX * scale;
@@ -1775,7 +1772,7 @@ void CCameraPcs::SetFullScreenShadow(float (*matrix)[4], long flags)
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
 
-    if (self[0x404] != 0) {
+    if (m_fullScreenShadowEnabled != 0) {
         MaterialMan.SetFullScreenShadow(*reinterpret_cast<CFullScreenShadow*>(self + 0x31C),
                                         matrix, flags);
     }
@@ -1794,7 +1791,7 @@ void CCameraPcs::drawShadowEndAll()
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
 
-    if (self[0x404] == 0) {
+    if (m_fullScreenShadowEnabled == 0) {
         return;
     }
 
@@ -1987,8 +1984,8 @@ void CCameraPcs::calcMaterialEditor()
     PSMTXRotRad(mtxB, 'x', *reinterpret_cast<float*>(self + 0x454));
     PSMTXConcat(mtxB, mtxA, mtxA);
     PSMTXTrans(mtxB, FLOAT_8032fa34, FLOAT_8032fa34, -*reinterpret_cast<float*>(self + 0x45C));
-    PSMTXConcat(mtxB, mtxA, reinterpret_cast<MtxPtr>(self + 4));
-    PSMTXInverse(reinterpret_cast<MtxPtr>(self + 4), mtxInv);
+    PSMTXConcat(mtxB, mtxA, m_cameraMatrix);
+    PSMTXInverse(m_cameraMatrix, mtxInv);
 
     *reinterpret_cast<float*>(self + 0xEC) = FLOAT_8032fa34;
     *reinterpret_cast<float*>(self + 0xF0) = FLOAT_8032fa34;
@@ -2117,8 +2114,8 @@ void CCameraPcs::calcFunnyShape()
     PSMTXRotRad(mtxB, 'x', *reinterpret_cast<float*>(self + 0x454));
     PSMTXConcat(mtxB, mtxA, mtxA);
     PSMTXTrans(mtxB, FLOAT_8032fa34, FLOAT_8032fa34, -*reinterpret_cast<float*>(self + 0x45C));
-    PSMTXConcat(mtxB, mtxA, reinterpret_cast<MtxPtr>(self + 4));
-    PSMTXInverse(reinterpret_cast<MtxPtr>(self + 4), mtxInv);
+    PSMTXConcat(mtxB, mtxA, m_cameraMatrix);
+    PSMTXInverse(m_cameraMatrix, mtxInv);
 
     *reinterpret_cast<float*>(self + 0xEC) = FLOAT_8032fa34;
     *reinterpret_cast<float*>(self + 0xF0) = FLOAT_8032fa34;
@@ -2137,7 +2134,7 @@ void CCameraPcs::calcFunnyShape()
  */
 void CCameraPcs::createPart()
 {
-    reinterpret_cast<unsigned char*>(this)[0x404] = 0;
+    m_fullScreenShadowEnabled = 0;
 }
 
 /*

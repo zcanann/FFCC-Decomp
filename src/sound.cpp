@@ -844,7 +844,7 @@ void CSound::Draw()
 {
     Mtx cameraMatrix;
     GXColor lineColor;
-    PSMTXCopy(*reinterpret_cast<Mtx*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x4), cameraMatrix);
+    PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMatrix);
 
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     GXSetZCompLoc((u8)0);
@@ -1780,7 +1780,7 @@ void CSound::calcVolumePan(CSound::CSe3D* se3D, int& outVolume, int& outPan)
     if (se3D->m_lineIndex >= 0) {
         iVar4 = Calc__9CLine(
             se3D->m_farDistance, &SoundData(this).m_lines[se3D->m_lineIndex], &nearestPoint, &nearestDistance,
-            (u32*)0, &nearestT, reinterpret_cast<const Vec*>(&CameraPcs._212_4_));
+            (u32*)0, &nearestT, reinterpret_cast<const Vec*>(&CameraPcs.m_targetX));
         if (iVar4 != 0) {
             PSMTXMultVec(CameraPcs.m_cameraMatrix, &nearestPoint, &nearestPoint);
             if (nearestDistance < se3D->m_nearDistance) {
@@ -1822,7 +1822,7 @@ void CSound::calcVolumePan(CSound::CSe3D* se3D, int& outVolume, int& outPan)
         }
 
         PSMTXMultVec(CameraPcs.m_cameraMatrix, &se3D->m_position, &nearestPoint);
-        fVar3 = fVar1 * PSVECSquareDistance(reinterpret_cast<Vec*>(&CameraPcs._212_4_), &se3D->m_position);
+        fVar3 = fVar1 * PSVECSquareDistance(reinterpret_cast<Vec*>(&CameraPcs.m_targetX), &se3D->m_position);
         fVar2 = se3D->m_farDistance * fVar1;
         fVar2 = se3D->m_farDistance * fVar2;
         fVar2 = fVar1 * fVar2;

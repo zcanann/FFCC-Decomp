@@ -122,11 +122,9 @@ void CMapHit::Draw()
     while (faceIndex < m_faceCount) {
         if ((reinterpret_cast<CMapHitFace*>(face)->m_drawFlags & 1) == 0) {
             const unsigned char groupIndex = face[0x47];
-            unsigned char* mapMngBytes = reinterpret_cast<unsigned char*>(&MapMng);
-            const u32 colorA = *reinterpret_cast<u32*>(mapMngBytes + 0x214E8 + groupIndex * 0x14 + 0x4);
-            const u32 colorB = *reinterpret_cast<u32*>(mapMngBytes + 0x214E8 + groupIndex * 0x14 + 0x8);
-            const GXColor* colorABytes = reinterpret_cast<const GXColor*>(&colorA);
-            const GXColor* colorBBytes = reinterpret_cast<const GXColor*>(&colorB);
+            const CMapIdGrp* mapIdGrp = MapMng.GetMapIdGrpArray() + groupIndex;
+            const GXColor* colorABytes = reinterpret_cast<const GXColor*>(&mapIdGrp->m_primaryColor);
+            const GXColor* colorBBytes = reinterpret_cast<const GXColor*>(&mapIdGrp->m_secondaryColor);
 
             GXBegin(GX_TRIANGLES, GX_VTXFMT7, 3);
             unsigned char* index = face + 0x48;
@@ -440,9 +438,7 @@ void CMapHit::GetHitFaceNormal(Vec* out)
  */
 int CMapHit::CheckHitFaceCylinder(unsigned long mask)
 {
-    unsigned char* mapMngBytes = reinterpret_cast<unsigned char*>(&MapMng);
-    unsigned long groupMask =
-        *reinterpret_cast<unsigned long*>(mapMngBytes + 0x214E8 + g_hit_lpface->m_groupIndex * 0x14);
+    unsigned long groupMask = MapMng.GetMapIdGrpArray()[g_hit_lpface->m_groupIndex].m_mask;
     if ((groupMask & mask) == 0) {
         return 0;
     }
@@ -651,7 +647,7 @@ int CMapHit::ReadOtmHit(CChunkFile& chunkFile)
         case 'HITV': {
             m_vertexCount = static_cast<unsigned short>(chunk.m_arg0);
             m_vertices =
-                new (*reinterpret_cast<CMemory::CStage**>(&MapMng), const_cast<char*>(s_maphit_cpp_801D7088), 0x143)
+                new (MapMng.m_stage, const_cast<char*>(s_maphit_cpp_801D7088), 0x143)
                     Vec[m_vertexCount];
 
             for (int i = 0; i < m_vertexCount; i++) {
@@ -680,7 +676,7 @@ int CMapHit::ReadOtmHit(CChunkFile& chunkFile)
         case 'HITF': {
             m_faceCount = static_cast<unsigned short>(chunk.m_arg0);
             m_faces =
-                new (*reinterpret_cast<CMemory::CStage**>(&MapMng), const_cast<char*>(s_maphit_cpp_801D7088), 0x159)
+                new (MapMng.m_stage, const_cast<char*>(s_maphit_cpp_801D7088), 0x159)
                     CMapHitFace[m_faceCount];
 
             const float offsetScale = FLOAT_8032F8F4;

@@ -286,24 +286,19 @@ static inline u8* MaterialManRaw()
 	return reinterpret_cast<u8*>(&MaterialMan);
 }
 
-static inline u8* CharaRaw()
-{
-	return reinterpret_cast<u8*>(&gChara);
-}
-
 static inline int CharaDrawBufferIndex()
 {
-	return *reinterpret_cast<int*>(CharaRaw() + 0x2060);
+	return gChara.GetDrawBufferIndex();
 }
 
 static inline u32& CharaDrawBufferCursor(int bufferIndex)
 {
-	return *reinterpret_cast<u32*>(CharaRaw() + 0x2064 + bufferIndex * 8);
+	return gChara.GetDrawBufferCursor(bufferIndex);
 }
 
 static inline u8* CharaDrawBufferBase(int bufferIndex)
 {
-	return *reinterpret_cast<u8**>(CharaRaw() + 0x2068 + bufferIndex * 8);
+	return gChara.GetDrawBufferBase(bufferIndex);
 }
 
 static inline u32 AlignCharaWorkBytes(u32 size)
@@ -634,18 +629,14 @@ void D3DXMatrixMultiplyRotate(float (*out)[4], float (*a)[4], float (*b)[4])
  */
 void CChara::Init()
 {
-	*(CMemory::CStage**)((u8*)this + 0x2058) =
-	    Memory.CreateStage(0xc0000, const_cast<char*>(s_CChara_80330220), 0);
-	*(u32*)((u8*)this + 0x205c) = 0;
-	CMemory::CStage* stage = *(CMemory::CStage**)((u8*)&Chara + 0x2058);
-	*(void**)((u8*)this + 0x2068) = new (stage, const_cast<char*>(s_chara_cpp_801d90c8), 0x3f) u8[0x58000];
-	stage = *(CMemory::CStage**)((u8*)&Chara + 0x2058);
-	*(void**)((u8*)this + 0x2070) = new (stage, const_cast<char*>(s_chara_cpp_801d90c8), 0x40) u8[0x58000];
-	*(s32*)((u8*)this + 0x2060) = 1;
-	*(s32*)((u8*)this + 0x2060) = 1 - *(s32*)((u8*)this + 0x2060);
-	u8* dbuffer = (u8*)this + *(s32*)((u8*)this + 0x2060) * 8;
-	*(u32*)(dbuffer + 0x2064) = 0;
-	*(u32*)((u8*)this + 0x2074) = 0;
+	m_amemStage = Memory.CreateStage(0xc0000, const_cast<char*>(s_CChara_80330220), 0);
+	m_amemSize = 0;
+	m_drawBuffers[0].m_base = new (m_amemStage, const_cast<char*>(s_chara_cpp_801d90c8), 0x3f) u8[0x58000];
+	m_drawBuffers[1].m_base = new (m_amemStage, const_cast<char*>(s_chara_cpp_801d90c8), 0x40) u8[0x58000];
+	m_drawBufferIndex = 1;
+	m_drawBufferIndex = 1 - m_drawBufferIndex;
+	m_drawBuffers[m_drawBufferIndex].m_cursor = 0;
+	m_amemAnimSize = 0;
 }
 
 /*
@@ -659,17 +650,15 @@ void CChara::Init()
  */
 void CChara::Quit()
 {
-	void** buf0 = (void**)((u8*)this + 0x2068);
-	void** buf1 = (void**)((u8*)this + 0x2070);
-	if (*buf0 != 0) {
-		delete[] static_cast<u8*>(*buf0);
-		*buf0 = 0;
+	if (m_drawBuffers[0].m_base != 0) {
+		delete[] m_drawBuffers[0].m_base;
+		m_drawBuffers[0].m_base = 0;
 	}
-	if (*buf1 != 0) {
-		delete[] static_cast<u8*>(*buf1);
-		*buf1 = 0;
+	if (m_drawBuffers[1].m_base != 0) {
+		delete[] m_drawBuffers[1].m_base;
+		m_drawBuffers[1].m_base = 0;
 	}
-	Memory.DestroyStage(*reinterpret_cast<CMemory::CStage**>((u8*)this + 0x2058));
+	Memory.DestroyStage(m_amemStage);
 }
 
 /*
@@ -712,12 +701,8 @@ void CChara::Destroy()
  */
 void CChara::FlipDBuffer()
 {
-	s32* dbufferIndex = (s32*)((u8*)this + 0x2060);
-	*dbufferIndex = 1 - *dbufferIndex;
-
-	u8* self = (u8*)this;
-	self += *dbufferIndex << 3;
-	*(u32*)(self + 0x2064) = 0;
+	m_drawBufferIndex = 1 - m_drawBufferIndex;
+	m_drawBuffers[m_drawBufferIndex].m_cursor = 0;
 }
 
 /*

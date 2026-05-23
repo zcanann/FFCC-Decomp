@@ -609,8 +609,7 @@ void CGame::clearWork()
 
     GameSoundData(Sound).m_seMaxVolume = 0x7F;
 
-    CPtrArray<CMapLightHolder*>* mapLightHolderArr =
-        reinterpret_cast<CPtrArray<CMapLightHolder*>*>(reinterpret_cast<u8*>(&MapMng) + 0x21450);
+    CPtrArray<CMapLightHolder*>* mapLightHolderArr = &MapMng.GetMapLightHolderArray(0);
 
     if (mapLightHolderArr->GetSize() != 0) {
         _GXColor holderColor;

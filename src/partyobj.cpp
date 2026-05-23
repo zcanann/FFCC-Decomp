@@ -234,7 +234,7 @@ static bool isGhostPartyTargetMode(CGPartyObj* self)
 
 static CMapObj* getMapHitObject()
 {
-	return *reinterpret_cast<CMapObj**>(reinterpret_cast<unsigned char*>(&MapMng) + 0x22A88);
+	return MapMng.m_hitMapObj;
 }
 
 /*
@@ -1719,7 +1719,7 @@ void CGPartyObj::checkTargetParticle()
 	input.z = 0.0f;
 
 	if (!isGhostPartyTargetMode(this)) {
-		if ((*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&MiniGamePcs) + 0x6484) & 0x100) != 0) {
+		if ((MiniGamePcs.m_flags & 0x100) != 0) {
 			input.x -= getPadAxisForSlot(static_cast<unsigned char>(m_animStateMisc), 0x24);
 			input.z += getPadAxisForSlot(static_cast<unsigned char>(m_animStateMisc), 0x28);
 		}
@@ -1768,7 +1768,7 @@ void CGPartyObj::checkTargetParticle()
 		PSVECNormalize(&input, &input);
 		PSVECScale(&input, &input, FLOAT_80331ad4);
 
-		float angle = CameraPcs._248_4_;
+		float angle = CameraPcs.m_yaw;
 		if (isGhostPartyTargetMode(this)) {
 			angle = 0.0f;
 		}

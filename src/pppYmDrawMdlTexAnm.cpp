@@ -43,7 +43,7 @@ void pppSetBlendMode(unsigned char);
 
 static inline CMapMesh** GetMapMeshTable()
 {
-    return *(CMapMesh***)((u8*)pppEnvStPtr + 8);
+    return pppEnvStPtr->m_mapMeshPtr;
 }
 
 static inline pppYmDrawMdlTexAnmWork* GetYmDrawMdlTexAnmWork(pppYmDrawMdlTexAnmObject* object, _pppCtrlTable* ctrl)

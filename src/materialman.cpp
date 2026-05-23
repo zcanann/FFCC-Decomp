@@ -592,7 +592,7 @@ void CMaterialMan::SetBlendMode(CMaterialSet* materialSet, int materialIndex)
  */
 void CMaterialMan::addtev_bump_st(int mode, _GXTevScale tevScale)
 {
-    unsigned int tevStage = *reinterpret_cast<unsigned int*>(Ptr(this, 0x60));
+    unsigned int tevStage = m_numTevStage;
 
     GXSetIndTexMtx((GXIndTexMtxID)1, LightPcs.GetBumpIndTexMtx(), 0);
     GXSetNumIndStages(1);
@@ -625,21 +625,21 @@ void CMaterialMan::addtev_bump_st(int mode, _GXTevScale tevScale)
     GXSetTevIndirect((GXTevStageID)3, (GXIndTexStageID)0, (GXIndTexFormat)0, (GXIndTexBiasSel)0, (GXIndTexMtxID)0,
                      (GXIndTexWrap)0, (GXIndTexWrap)0, GX_TRUE, GX_FALSE, (GXIndTexAlphaSel)0);
 
-    tevStage = *reinterpret_cast<unsigned int*>(Ptr(this, 0x60));
+    tevStage = m_numTevStage;
     _GXSetTevOrder(
         tevStage, *reinterpret_cast<int*>(Ptr(this, 0x1EC)), *reinterpret_cast<int*>(Ptr(this, 0x1C8)) | 0x100,
         0xFF);
     _GXSetTevOp(tevStage, 4);
     IncNumTevStage();
 
-    tevStage = *reinterpret_cast<unsigned int*>(Ptr(this, 0x60));
+    tevStage = m_numTevStage;
     _GXSetTevOrder(
         tevStage, *reinterpret_cast<int*>(Ptr(this, 0x1F0)), *reinterpret_cast<int*>(Ptr(this, 0x1C8)) | 0x100,
         0xFF);
     _GXSetTevOp(tevStage, 4);
     IncNumTevStage();
 
-    tevStage = *reinterpret_cast<unsigned int*>(Ptr(this, 0x60));
+    tevStage = m_numTevStage;
     if (*reinterpret_cast<char*>(Ptr(this, 0xA3)) == 0) {
         _GXSetTevOrder(
             tevStage, *reinterpret_cast<int*>(Ptr(this, 0x1F4)), *reinterpret_cast<int*>(Ptr(this, 0x1C8)), 0xFF);
@@ -680,7 +680,7 @@ void CMaterialMan::addtev_bump_st(int mode, _GXTevScale tevScale)
         return;
     }
 
-    tevStage = *reinterpret_cast<unsigned int*>(Ptr(this, 0x60));
+    tevStage = m_numTevStage;
     GXSetTevDirect(static_cast<GXTevStageID>(tevStage));
     _GXSetTevOrder(
         tevStage, *reinterpret_cast<int*>(Ptr(this, 0x200)), *reinterpret_cast<int*>(Ptr(this, 0x1D0)), 0xFF);
@@ -721,7 +721,7 @@ void CMaterialMan::addtev_bump_water(_GXTevScale tevScale)
     float warpMtx3 = FLOAT_8032faf4;
     float warpMtx4 = FLOAT_8032fb20;
     float warpMtx5 = FLOAT_8032faf4;
-    int tevStage = *reinterpret_cast<int*>(Ptr(this, 0x60));
+    int tevStage = m_numTevStage;
 
     GXSetIndTexMtx((GXIndTexMtxID)1, LightPcs.GetBumpIndTexMtx(), 0);
     GXSetIndTexMtx((GXIndTexMtxID)2, reinterpret_cast<const float(*)[3]>(&warpMtx0), 1);
@@ -747,7 +747,7 @@ void CMaterialMan::addtev_bump_water(_GXTevScale tevScale)
                      *reinterpret_cast<GXTexMapID*>(Ptr(this, 0x1C4)));
     GXSetIndTexCoordScale((GXIndTexStageID)1, (GXIndTexScale)0, (GXIndTexScale)0);
 
-    tevStage = *reinterpret_cast<int*>(Ptr(this, 0x60));
+    tevStage = m_numTevStage;
     GXSetTevIndBumpXYZ((GXTevStageID)tevStage, (GXIndTexStageID)0, (GXIndTexMtxID)1);
     _GXSetTevOrder(
         tevStage, *reinterpret_cast<int*>(Ptr(this, 0x1F4)), *reinterpret_cast<int*>(Ptr(this, 0x1C8)), 0xFF);
@@ -759,7 +759,7 @@ void CMaterialMan::addtev_bump_water(_GXTevScale tevScale)
     _GXSetTevAlphaOp(tevStage, 0, 0, 0, 1, 0);
     IncNumTevStage();
 
-    tevStage = *reinterpret_cast<int*>(Ptr(this, 0x60));
+    tevStage = m_numTevStage;
     GXSetTevIndBumpXYZ((GXTevStageID)tevStage, (GXIndTexStageID)0, (GXIndTexMtxID)1);
     _GXSetTevOrder(
         tevStage, *reinterpret_cast<int*>(Ptr(this, 0x1F8)), *reinterpret_cast<int*>(Ptr(this, 0x1C8)), 0xFF);
@@ -771,7 +771,7 @@ void CMaterialMan::addtev_bump_water(_GXTevScale tevScale)
     _GXSetTevAlphaOp(tevStage, 0, 0, 0, 1, 0);
     IncNumTevStage();
 
-    tevStage = *reinterpret_cast<int*>(Ptr(this, 0x60));
+    tevStage = m_numTevStage;
     GXSetTevIndWarp((GXTevStageID)tevStage, (GXIndTexStageID)1, GX_TRUE, GX_FALSE, (GXIndTexMtxID)2);
     _GXSetTevOrder(
         tevStage, *reinterpret_cast<int*>(Ptr(this, 0x1FC)), *reinterpret_cast<int*>(Ptr(this, 0x1CC)), 0xFF);
@@ -801,7 +801,7 @@ void CMaterialMan::addtev_bump_spec_col_water(_GXTevScale tevScale)
     float warpMtx3 = FLOAT_8032faf4;
     float warpMtx4 = FLOAT_8032fb20;
     float warpMtx5 = FLOAT_8032faf4;
-    int tevStage = *reinterpret_cast<int*>(Ptr(this, 0x60));
+    int tevStage = m_numTevStage;
 
     GXSetIndTexMtx((GXIndTexMtxID)1, LightPcs.GetBumpIndTexMtx(), 0);
     GXSetIndTexMtx((GXIndTexMtxID)2, reinterpret_cast<const float(*)[3]>(&warpMtx0), 1);
@@ -827,7 +827,7 @@ void CMaterialMan::addtev_bump_spec_col_water(_GXTevScale tevScale)
                      *reinterpret_cast<GXTexMapID*>(Ptr(this, 0x1C4)));
     GXSetIndTexCoordScale((GXIndTexStageID)1, (GXIndTexScale)0, (GXIndTexScale)0);
 
-    tevStage = *reinterpret_cast<int*>(Ptr(this, 0x60));
+    tevStage = m_numTevStage;
     GXSetTevIndBumpXYZ((GXTevStageID)tevStage, (GXIndTexStageID)0, (GXIndTexMtxID)1);
     _GXSetTevOrder(
         tevStage, *reinterpret_cast<int*>(Ptr(this, 0x1F8)), *reinterpret_cast<int*>(Ptr(this, 0x1C8)), 0xFF);
@@ -839,7 +839,7 @@ void CMaterialMan::addtev_bump_spec_col_water(_GXTevScale tevScale)
     _GXSetTevAlphaOp(tevStage, 0, 0, 0, 1, 0);
     IncNumTevStage();
 
-    tevStage = *reinterpret_cast<int*>(Ptr(this, 0x60));
+    tevStage = m_numTevStage;
     GXSetTevIndWarp((GXTevStageID)tevStage, (GXIndTexStageID)1, GX_TRUE, GX_FALSE, (GXIndTexMtxID)2);
     _GXSetTevOrder(
         tevStage, *reinterpret_cast<int*>(Ptr(this, 0x1FC)), *reinterpret_cast<int*>(Ptr(this, 0x1CC)), 0xFF);
@@ -863,7 +863,7 @@ void CMaterialMan::addtev_bump_spec_col_water(_GXTevScale tevScale)
  */
 void CMaterialMan::addtev_bump_jimen(_GXTevScale)
 {
-    int tevStage = *reinterpret_cast<int*>(Ptr(this, 0x60));
+    int tevStage = m_numTevStage;
 
     GXSetIndTexMtx((GXIndTexMtxID)1, LightPcs.GetBumpIndTexMtx(), 0);
     GXSetNumIndStages(1);
@@ -880,8 +880,8 @@ void CMaterialMan::addtev_bump_jimen(_GXTevScale)
         tevStage, 7, 7, 7, 0);
     _GXSetTevColorOp(tevStage, 0, 0, 0, 1, 0);
     _GXSetTevAlphaOp(tevStage, 0, 0, 0, 1, 0);
-    *reinterpret_cast<unsigned int*>(Ptr(this, 0x60)) =
-        (((*reinterpret_cast<unsigned int*>(Ptr(this, 0x60))) & 0xFF) + 1) & 0xFF;
+    m_numTevStage =
+        (((m_numTevStage) & 0xFF) + 1) & 0xFF;
 }
 
 /*
@@ -895,7 +895,7 @@ void CMaterialMan::addtev_bump_jimen(_GXTevScale)
  */
 void CMaterialMan::addtev_lightmap(long index)
 {
-    unsigned int stage = *reinterpret_cast<unsigned int*>(Ptr(this, 0x60));
+    unsigned int stage = m_numTevStage;
     unsigned char indexByte = static_cast<unsigned char>(index);
     int stageOffset = static_cast<int>(index) * 4;
 
@@ -934,7 +934,7 @@ void CMaterialMan::addtev_lightmap(long index)
     _GXSetTevSwapMode(stage, 0, 0);
     IncNumTevStage();
 
-    stage = *reinterpret_cast<unsigned int*>(Ptr(this, 0x60));
+    stage = m_numTevStage;
     GXSetTevDirect(static_cast<GXTevStageID>(stage));
     _GXSetTevOrder(
         stage, *reinterpret_cast<int*>(Ptr(this, stageOffset + 0x180)),
@@ -948,7 +948,7 @@ void CMaterialMan::addtev_lightmap(long index)
     _GXSetTevSwapMode(stage, 0, 0);
     IncNumTevStage();
 
-    stage = *reinterpret_cast<unsigned int*>(Ptr(this, 0x60));
+    stage = m_numTevStage;
     GXSetTevDirect(static_cast<GXTevStageID>(stage));
     GXSetTevKColorSel(static_cast<GXTevStageID>(stage), static_cast<GXTevKColorSel>(index + 0x1C));
     _GXSetTevOrder(stage, 0xFF, 0xFF, 0xFF);
@@ -973,7 +973,7 @@ void CMaterialMan::addtev_lightmap(long index)
  */
 void CMaterialMan::addtev_shadow(long index)
 {
-    unsigned int stage = *reinterpret_cast<unsigned int*>(Ptr(this, 0x60));
+    unsigned int stage = m_numTevStage;
     unsigned char indexByte = static_cast<unsigned char>(index);
     int stageOffset = static_cast<int>(index) * 4;
 
@@ -1013,7 +1013,7 @@ void CMaterialMan::addtev_shadow(long index)
     _GXSetTevSwapMode(stage, 0, 0);
     IncNumTevStage();
 
-    stage = *reinterpret_cast<unsigned int*>(Ptr(this, 0x60));
+    stage = m_numTevStage;
     GXSetTevDirect(static_cast<GXTevStageID>(stage));
     _GXSetTevOrder(
         stage, *reinterpret_cast<int*>(Ptr(this, stageOffset + 0x180)),
@@ -1027,7 +1027,7 @@ void CMaterialMan::addtev_shadow(long index)
     _GXSetTevSwapMode(stage, 0, 0);
     IncNumTevStage();
 
-    stage = *reinterpret_cast<unsigned int*>(Ptr(this, 0x60));
+    stage = m_numTevStage;
     GXSetTevDirect(static_cast<GXTevStageID>(stage));
     GXSetTevKColorSel(static_cast<GXTevStageID>(stage), static_cast<GXTevKColorSel>(index + 0x1C));
     _GXSetTevOrder(stage, 0xFF, 0xFF, 0xFF);
@@ -1105,7 +1105,7 @@ void CMaterialMan::addtev_full_shadow(long index)
     *reinterpret_cast<unsigned int*>(&tevColor) = static_cast<unsigned int>(*Ptr(this, 0x204));
     GXSetTevColor(static_cast<GXTevRegID>(1), tevColor);
 
-    unsigned int stage = *reinterpret_cast<unsigned int*>(Ptr(this, 0x60));
+    unsigned int stage = m_numTevStage;
     GXSetTevDirect(static_cast<GXTevStageID>(stage));
     _GXSetTevOrder(
         stage, *reinterpret_cast<int*>(Ptr(this, stageOffset + 0x1BC)),
@@ -1119,7 +1119,7 @@ void CMaterialMan::addtev_full_shadow(long index)
     _GXSetTevSwapMode(stage, 0, 0);
     IncNumTevStage();
 
-    stage = *reinterpret_cast<unsigned int*>(Ptr(this, 0x60));
+    stage = m_numTevStage;
     GXSetTevDirect(static_cast<GXTevStageID>(stage));
     _GXSetTevOrder(
         stage, *reinterpret_cast<int*>(Ptr(this, stageOffset + 0x1A4)),
@@ -1133,7 +1133,7 @@ void CMaterialMan::addtev_full_shadow(long index)
     _GXSetTevSwapMode(stage, 0, 0);
     IncNumTevStage();
 
-    stage = *reinterpret_cast<unsigned int*>(Ptr(this, 0x60));
+    stage = m_numTevStage;
     GXSetTevDirect(static_cast<GXTevStageID>(stage));
     _GXSetTevOrder(stage, 0xFF, 0xFF, 4);
     _GXSetTevColorIn(
@@ -1327,7 +1327,7 @@ void CMaterialMan::SetMaterialPart(CMaterialSet* materialSet, int materialIndex,
                 0, 7, 6, 5, 7);
             _GXSetTevAlphaOp(0, 0, 0, 2, 1, 0);
             _GXSetTevSwapMode(0, 0, 0);
-            *reinterpret_cast<unsigned int*>(Ptr(this, 0x60)) = 1;
+            m_numTevStage = 1;
 
             if ((m_vtxDescMode != 3) && (setVtxDesc != 0)) {
                 GXClearVtxDesc();
@@ -1364,7 +1364,7 @@ void CMaterialMan::SetMaterialPart(CMaterialSet* materialSet, int materialIndex,
                 _GXSetTevAlphaOp(
                     0, 0, 0, 2, 1, 0);
                 _GXSetTevSwapMode(0, 0, 0);
-                *reinterpret_cast<unsigned int*>(Ptr(this, 0x60)) = 1;
+                m_numTevStage = 1;
 
                 if ((tevBit == 0) || ((tevBit & 2) == 0)) {
                     if ((m_vtxDescMode != 0) && (setVtxDesc != 0)) {
@@ -1396,40 +1396,40 @@ void CMaterialMan::SetMaterialPart(CMaterialSet* materialSet, int materialIndex,
                         texCoordId = *reinterpret_cast<int*>(Ptr(this, 0x154));
                     }
 
-                    *reinterpret_cast<unsigned int*>(Ptr(this, 0x60)) = 1;
-                    GXSetTevDirect(static_cast<_GXTevStageID>(*reinterpret_cast<unsigned int*>(Ptr(this, 0x60))));
+                    m_numTevStage = 1;
+                    GXSetTevDirect(static_cast<_GXTevStageID>(m_numTevStage));
                     _GXSetTevOrder(
-                        *reinterpret_cast<int*>(Ptr(this, 0x60)), texCoordId,
+                        m_numTevStage, texCoordId,
                         (*reinterpret_cast<unsigned int*>(Ptr(this, 0x134)) & 0xFF) + 1, 4);
                     _GXSetTevColorIn(
-                        *reinterpret_cast<int*>(Ptr(this, 0x60)), 0xF, 8, 0xA, 0xF);
+                        m_numTevStage, 0xF, 8, 0xA, 0xF);
                     _GXSetTevColorOp(
-                        *reinterpret_cast<int*>(Ptr(this, 0x60)), 0, 0, 1, 1, 1);
+                        m_numTevStage, 0, 0, 1, 1, 1);
                     _GXSetTevAlphaIn(
-                        *reinterpret_cast<int*>(Ptr(this, 0x60)), 7, 7, 7, 0);
+                        m_numTevStage, 7, 7, 7, 0);
                     _GXSetTevAlphaOp(
-                        *reinterpret_cast<int*>(Ptr(this, 0x60)), 0, 0, 0, 1, 0);
+                        m_numTevStage, 0, 0, 0, 1, 0);
                     _GXSetTevSwapMode(
-                        *reinterpret_cast<int*>(Ptr(this, 0x60)), 0, 0);
-                    *reinterpret_cast<unsigned int*>(Ptr(this, 0x60)) =
-                        ((*reinterpret_cast<unsigned int*>(Ptr(this, 0x60)) & 0xFF) + 1) & 0xFF;
+                        m_numTevStage, 0, 0);
+                    m_numTevStage =
+                        ((m_numTevStage & 0xFF) + 1) & 0xFF;
 
-                    GXSetTevDirect(static_cast<_GXTevStageID>(*reinterpret_cast<unsigned int*>(Ptr(this, 0x60))));
+                    GXSetTevDirect(static_cast<_GXTevStageID>(m_numTevStage));
                     _GXSetTevOrder(
-                        *reinterpret_cast<int*>(Ptr(this, 0x60)), texCoordId,
+                        m_numTevStage, texCoordId,
                         (*reinterpret_cast<unsigned int*>(Ptr(this, 0x134)) & 0xFF) + 1, 0xFF);
                     _GXSetTevColorIn(
-                        *reinterpret_cast<int*>(Ptr(this, 0x60)), 0, 2, 9, 0xF);
+                        m_numTevStage, 0, 2, 9, 0xF);
                     _GXSetTevColorOp(
-                        *reinterpret_cast<int*>(Ptr(this, 0x60)), 0, 0, 1, 1, 0);
+                        m_numTevStage, 0, 0, 1, 1, 0);
                     _GXSetTevAlphaIn(
-                        *reinterpret_cast<int*>(Ptr(this, 0x60)), 7, 7, 7, 0);
+                        m_numTevStage, 7, 7, 7, 0);
                     _GXSetTevAlphaOp(
-                        *reinterpret_cast<int*>(Ptr(this, 0x60)), 0, 0, 0, 1, 0);
+                        m_numTevStage, 0, 0, 0, 1, 0);
                     _GXSetTevSwapMode(
-                        *reinterpret_cast<int*>(Ptr(this, 0x60)), 0, 0);
-                    *reinterpret_cast<unsigned int*>(Ptr(this, 0x60)) =
-                        ((*reinterpret_cast<unsigned int*>(Ptr(this, 0x60)) & 0xFF) + 1) & 0xFF;
+                        m_numTevStage, 0, 0);
+                    m_numTevStage =
+                        ((m_numTevStage & 0xFF) + 1) & 0xFF;
                 }
             } else {
                 if ((tevBit & 0x20) == 0) {
@@ -1454,7 +1454,7 @@ void CMaterialMan::SetMaterialPart(CMaterialSet* materialSet, int materialIndex,
                 _GXSetTevAlphaOp(
                     0, 0, 0, 2, 1, 0);
                 _GXSetTevSwapMode(0, 0, 1);
-                *reinterpret_cast<unsigned int*>(Ptr(this, 0x60)) = 1;
+                m_numTevStage = 1;
 
                 if ((m_vtxDescMode != 0) && (setVtxDesc != 0)) {
                     GXClearVtxDesc();
@@ -1516,7 +1516,7 @@ void CMaterialMan::SetMaterialPart(CMaterialSet* materialSet, int materialIndex,
             _GXSetTevSwapMode(2, 0, 0);
             _GXSetTevOrder(2, 0xFF, 0xFF, 4);
 
-            *reinterpret_cast<unsigned int*>(Ptr(this, 0x60)) = 3;
+            m_numTevStage = 3;
             if ((m_vtxDescMode != 0) && (setVtxDesc != 0)) {
                 GXClearVtxDesc();
                 GXSetVtxDesc(GX_VA_POS, GX_INDEX16);
@@ -1545,7 +1545,7 @@ void CMaterialMan::SetMaterialPart(CMaterialSet* materialSet, int materialIndex,
                                                                                                               5, 7);
         _GXSetTevAlphaOp(0, 0, 0, 2, 1, 0);
         _GXSetTevSwapMode(0, 0, 0);
-        *reinterpret_cast<unsigned int*>(Ptr(this, 0x60)) = 1;
+        m_numTevStage = 1;
 
         if ((m_vtxDescMode != 0) && (setVtxDesc != 0)) {
             GXClearVtxDesc();
@@ -1558,7 +1558,7 @@ void CMaterialMan::SetMaterialPart(CMaterialSet* materialSet, int materialIndex,
     }
 
     GXSetNumTexGens(((*reinterpret_cast<unsigned int*>(Ptr(this, 0x124)) & 0xFF) + 1) & 0xFF);
-    GXSetNumTevStages(*reinterpret_cast<unsigned int*>(Ptr(this, 0x60)) & 0xFF);
+    GXSetNumTevStages(m_numTevStage & 0xFF);
 }
 
 /*
@@ -1624,7 +1624,7 @@ void CMaterialMan::SetMaterialMenu(CMaterialSet* materialSet, int materialIndex,
                 0, 7, 4, 5, 7);
             _GXSetTevAlphaOp(0, 0, 0, 0, 1, 0);
             _GXSetTevSwapMode(0, 0, 1);
-            *reinterpret_cast<int*>(Ptr(this, 0x60)) = 1;
+            m_numTevStage = 1;
 
             if ((m_vtxDescMode != 0) && (setVtxDesc != 0)) {
                 GXClearVtxDesc();
@@ -1677,7 +1677,7 @@ void CMaterialMan::SetMaterialMenu(CMaterialSet* materialSet, int materialIndex,
         _GXSetTevSwapMode(2, 0, 0);
         _GXSetTevOrder(2, 0xFF, 0xFF, 4);
 
-        *reinterpret_cast<int*>(Ptr(this, 0x60)) = 3;
+        m_numTevStage = 3;
         if ((m_vtxDescMode != 0) && (setVtxDesc != 0)) {
             GXClearVtxDesc();
             GXSetVtxDesc(GX_VA_POS, GX_INDEX16);
@@ -1689,7 +1689,7 @@ void CMaterialMan::SetMaterialMenu(CMaterialSet* materialSet, int materialIndex,
     }
 
     GXSetNumTexGens(static_cast<unsigned char>((*reinterpret_cast<unsigned int*>(Ptr(this, 0x124)) & 0xFF) + 1));
-    GXSetNumTevStages(static_cast<unsigned char>(*reinterpret_cast<unsigned int*>(Ptr(this, 0x60)) & 0xFF));
+    GXSetNumTevStages(static_cast<unsigned char>(m_numTevStage & 0xFF));
 }
 
 /*

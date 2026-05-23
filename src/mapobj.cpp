@@ -473,7 +473,7 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
         } else if (chunk.m_id == CHUNK_EFID) {
             U16At(this, 0x30) = chunkFile.Get2();
         } else if (chunk.m_id == CHUNK_FSDW) {
-            *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x404) = chunkFile.Get1();
+            CameraPcs.m_fullScreenShadowEnabled = chunkFile.Get1();
         } else if (chunk.m_id == CHUNK_ID) {
             U16At(this, 0x2E) = chunkFile.Get2();
         } else if (chunk.m_id == CHUNK_MSID) {

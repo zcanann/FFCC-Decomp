@@ -150,7 +150,9 @@ public:
     float m_fov;
     float m_nearZ;
     float m_farZ;
-    u8 _pad108[0x4C8 - 0x108];
+    u8 _pad108[0x404 - 0x108];
+    u8 m_fullScreenShadowEnabled; // 0x404
+    u8 _pad405[0x4C8 - 0x405];
 };
 
 extern "C" void create__10CCameraPcsFv(CCameraPcs*);

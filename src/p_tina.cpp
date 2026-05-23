@@ -842,7 +842,7 @@ void CPartPcs::drawShadow()
     CGame* game = &Game;
 
     if (game->m_gameWork.m_gamePaused == 0 && usb->m_disableShokiDraw == 0 &&
-        static_cast<int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(&CameraPcs) + 0x404)) != 0) {
+        static_cast<int>(CameraPcs.m_fullScreenShadowEnabled) != 0) {
         Graphic.SetDrawDoneDebugDataPartControl(0x7fff);
         pppInitDrawEnv(1);
         PartMng.pppSetRendMatrix();
@@ -1022,7 +1022,7 @@ void CPartPcs::DrawShoki()
     if (usb->m_disableShokiDraw == 0 && (int)Game.m_currentSceneId == 4) {
         Graphic.SetFog(1, 0);
         if (Game.m_gameWork.m_gamePaused == 0 &&
-            (int)*reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(&CameraPcs) + 0x404) != 0) {
+            static_cast<int>(CameraPcs.m_fullScreenShadowEnabled) != 0) {
             Graphic.SetDrawDoneDebugDataPartControl(0x7fff);
             pppInitDrawEnv(1);
             PartMng.pppSetRendMatrix();

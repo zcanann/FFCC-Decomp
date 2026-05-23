@@ -1472,7 +1472,7 @@ void CCharaPcs::drawMakeTexShadow()
  */
 void CCharaPcs::drawShadow()
 {
-    if (*reinterpret_cast<unsigned char*>(Ptr(&CameraPcs, 0x404)) == 0) {
+    if (CameraPcs.m_fullScreenShadowEnabled == 0) {
         return;
     }
 

@@ -1330,7 +1330,7 @@ void CCameraPcs::createFullShadow()
                     GX_FALSE, GX_FALSE, GX_ANISO_1);
     DCFlushRange(rampTex, rampTexSize);
 
-    self[0x404] = 1;
+    m_fullScreenShadowEnabled = 1;
     *reinterpret_cast<float*>(self + 0x364) = FLOAT_8032faa4;
     *reinterpret_cast<float*>(self + 0x368) = FLOAT_8032fa34;
     *reinterpret_cast<float*>(self + 0x370) = FLOAT_8032faa8;
@@ -1489,7 +1489,7 @@ void CCameraPcs::drawShadowBegin()
     Vec delta;
     double depth;
 
-    if (self[0x404] == 0) {
+    if (m_fullScreenShadowEnabled == 0) {
         return;
     }
 
@@ -1638,7 +1638,7 @@ void CCameraPcs::drawShadowEnd()
     int y1;
     int x2;
 
-    if (self[0x404] == 0) {
+    if (m_fullScreenShadowEnabled == 0) {
         return;
     }
 
@@ -1748,7 +1748,7 @@ void CCameraPcs::drawShadowChrBegin()
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
 
-    if (self[0x404] != 0) {
+    if (m_fullScreenShadowEnabled != 0) {
         float shadowX = *reinterpret_cast<float*>(self + 0x3E0);
         float scale = FLOAT_8032fa58;
         *reinterpret_cast<float*>(self + 0x3E0) = shadowX * scale;
@@ -1772,7 +1772,7 @@ void CCameraPcs::SetFullScreenShadow(float (*matrix)[4], long flags)
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
 
-    if (self[0x404] != 0) {
+    if (m_fullScreenShadowEnabled != 0) {
         MaterialMan.SetFullScreenShadow(*reinterpret_cast<CFullScreenShadow*>(self + 0x31C),
                                         matrix, flags);
     }
@@ -1791,7 +1791,7 @@ void CCameraPcs::drawShadowEndAll()
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
 
-    if (self[0x404] == 0) {
+    if (m_fullScreenShadowEnabled == 0) {
         return;
     }
 
@@ -2134,7 +2134,7 @@ void CCameraPcs::calcFunnyShape()
  */
 void CCameraPcs::createPart()
 {
-    reinterpret_cast<unsigned char*>(this)[0x404] = 0;
+    m_fullScreenShadowEnabled = 0;
 }
 
 /*

@@ -759,13 +759,11 @@ void CPartPcs::calcInit()
  */
 void CPartPcs::calc()
 {
-	unsigned char* raw = reinterpret_cast<unsigned char*>(this);
-
 	PartMng.LoadPartNoSyncCalc();
-	if (raw[0x2D] != 0) {
+	if (m_usbStreamData.m_printFreeOnNext != 0) {
 		int freeSize;
 
-		raw[0x2D] = 0;
+		m_usbStreamData.m_printFreeOnNext = 0;
 		freeSize = ppvAmemCacheSet.AmemGetFreeSize();
 		System.Printf(const_cast<char*>(DAT_801d8068), freeSize / 1024);
 	}
@@ -1459,7 +1457,7 @@ int CPartPcs::LoadMenuPdt(char* fileName)
                 PartMng.pppReleasePdt(pdtSlotIndex);
                 pdtSlotIndex = -1;
             } else {
-                reinterpret_cast<unsigned char*>(&PartPcs)[0x2d] = 1;
+                PartPcs.m_usbStreamData.m_printFreeOnNext = 1;
             }
         }
     }

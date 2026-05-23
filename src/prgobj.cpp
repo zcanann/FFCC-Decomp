@@ -541,7 +541,7 @@ void CGPrgObj::onFrame()
 
 	if (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(&m_weaponNodeFlags)) << 24) & 0xC0000000) >> 31) != 0) {
 		if ((static_cast<unsigned short>(GetCID()) & 0x2d) == 0x2d &&
-		    static_cast<int>(reinterpret_cast<unsigned char*>(&PartPcs)[0x2e]) != 0) {
+		    static_cast<int>(PartPcs.m_usbStreamData.m_blockOnFrame) != 0) {
 			return;
 		}
 

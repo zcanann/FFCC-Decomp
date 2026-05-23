@@ -1,6 +1,7 @@
 #include <dolphin.h>
 #include <dolphin/os.h>
 
+#include "__ppc_eabi_linker.h"
 #include "dolphin/os/__os.h"
 
 
@@ -66,10 +67,6 @@
         }                                             \
         (queue)->head = __next;                       \
     } while(0);
-
-// defined in linkscript
-extern u8 _stack_end[];
-extern u8 _stack_addr[];
 
 static OSThreadQueue RunQueue[32];
 static OSThread IdleThread;

@@ -7,12 +7,12 @@
 #include "dolphin/ar.h"
 #include "dolphin/ar/__ar.h"
 #include "dolphin/os/OSReset.h"
+#include "__ppc_eabi_linker.h"
 #include "stddef.h"
 
 #define EXCEPTIONMASK_ADDR 0x80000044
 
 static u32 gTRKDBAT3StartAddress;
-extern u32 _db_stack_addr;
 
 static u32 gTRKExceptionVectorOffsets[15] = { PPC_SystemReset,
 	                               PPC_MachineCheck,
@@ -204,8 +204,6 @@ u32 TRKTargetTranslate(u32 param_0)
 
 	return param_0 & 0x3FFFFFFF | 0x80000000;
 }
-
-extern u8 gTRKInterruptVectorTable[];
 
 void __TRK_copy_vectors(void)
 {

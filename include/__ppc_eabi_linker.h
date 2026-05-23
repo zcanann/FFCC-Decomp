@@ -9,6 +9,8 @@
 
 DECL_SECTION(".init") extern char _stack_addr[];
 DECL_SECTION(".init") extern char _stack_end[];
+DECL_SECTION(".init") extern char _db_stack_addr[];
+DECL_SECTION(".init") extern char _db_stack_end[];
 DECL_SECTION(".init") extern char _heap_addr[];
 DECL_SECTION(".init") extern char _heap_end[];
 DECL_SECTION(".init") extern char __ArenaLo[];

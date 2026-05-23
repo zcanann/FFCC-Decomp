@@ -140,6 +140,40 @@ static inline CLightPcs::CBumpLight* GetMapBumpLight(int bumpIndex)
     return LightPcs.GetBumpLight(static_cast<CLightPcs::TARGET>(1), bumpIndex);
 }
 
+static inline void DestroyTexScrollKeyFrame(void*& keyFrame)
+{
+    if (keyFrame == 0) {
+        return;
+    }
+
+    void*& table0 = *reinterpret_cast<void**>(Ptr(keyFrame, 0x18));
+    if (table0 != 0) {
+        operator delete(table0);
+        table0 = 0;
+    }
+
+    void*& table1 = *reinterpret_cast<void**>(Ptr(keyFrame, 0x1C));
+    if (table1 != 0) {
+        operator delete(table1);
+        table1 = 0;
+    }
+
+    void*& table2 = *reinterpret_cast<void**>(Ptr(keyFrame, 0x20));
+    if (table2 != 0) {
+        operator delete(table2);
+        table2 = 0;
+    }
+
+    void*& table3 = *reinterpret_cast<void**>(Ptr(keyFrame, 0x24));
+    if (table3 != 0) {
+        operator delete(table3);
+        table3 = 0;
+    }
+
+    operator delete(keyFrame);
+    keyFrame = 0;
+}
+
 typedef void (*VirtualDtorFn)(void*, int);
 
 static void ReleaseRef(void* object)
@@ -2365,71 +2399,11 @@ extern "C" CMaterial* __dt__Q29CMaterial25_class_529materialman_cppFv(CMaterial*
 CTexScroll::~CTexScroll()
 {
     if (m_type0 == 2) {
-        void* keyFrame0 = *reinterpret_cast<void**>(Ptr(this, 0xC));
-        if (keyFrame0 != 0) {
-            if (keyFrame0 != 0) {
-                void*& table0 = *reinterpret_cast<void**>(Ptr(keyFrame0, 0x18));
-                if (table0 != 0) {
-                    operator delete(table0);
-                    table0 = 0;
-                }
-
-                void*& table1 = *reinterpret_cast<void**>(Ptr(keyFrame0, 0x1C));
-                if (table1 != 0) {
-                    operator delete(table1);
-                    table1 = 0;
-                }
-
-                void*& table2 = *reinterpret_cast<void**>(Ptr(keyFrame0, 0x20));
-                if (table2 != 0) {
-                    operator delete(table2);
-                    table2 = 0;
-                }
-
-                void*& table3 = *reinterpret_cast<void**>(Ptr(keyFrame0, 0x24));
-                if (table3 != 0) {
-                    operator delete(table3);
-                    table3 = 0;
-                }
-
-                operator delete(keyFrame0);
-            }
-            *reinterpret_cast<void**>(Ptr(this, 0xC)) = 0;
-        }
+        DestroyTexScrollKeyFrame(*reinterpret_cast<void**>(Ptr(this, 0xC)));
     }
 
     if (m_type1 == 2) {
-        void* keyFrame1 = *reinterpret_cast<void**>(Ptr(this, 0x10));
-        if (keyFrame1 != 0) {
-            if (keyFrame1 != 0) {
-                void*& table0 = *reinterpret_cast<void**>(Ptr(keyFrame1, 0x18));
-                if (table0 != 0) {
-                    operator delete(table0);
-                    table0 = 0;
-                }
-
-                void*& table1 = *reinterpret_cast<void**>(Ptr(keyFrame1, 0x1C));
-                if (table1 != 0) {
-                    operator delete(table1);
-                    table1 = 0;
-                }
-
-                void*& table2 = *reinterpret_cast<void**>(Ptr(keyFrame1, 0x20));
-                if (table2 != 0) {
-                    operator delete(table2);
-                    table2 = 0;
-                }
-
-                void*& table3 = *reinterpret_cast<void**>(Ptr(keyFrame1, 0x24));
-                if (table3 != 0) {
-                    operator delete(table3);
-                    table3 = 0;
-                }
-
-                operator delete(keyFrame1);
-            }
-            *reinterpret_cast<void**>(Ptr(this, 0x10)) = 0;
-        }
+        DestroyTexScrollKeyFrame(*reinterpret_cast<void**>(Ptr(this, 0x10)));
     }
 }
 

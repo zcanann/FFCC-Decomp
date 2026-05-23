@@ -15,6 +15,7 @@
 #include "ffcc/p_tina.h"
 #include <string.h>
 #include <PowerPC_EABI_Support/Runtime/New.h>
+#include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
 extern "C" {
 int __cntlzw(unsigned int);
@@ -34,7 +35,6 @@ void DrawShadowFont__8CMenuPcsFP5CFontPcffii(void*, CFont*, char*, float, float,
 void DrawSingleIcon__8CMenuPcsFiiifif(void*, int, int, int, float, float, float);
 void DrawInit__8CMenuPcsFv(void*);
 void MakeAgbString__4CMesFPcPcii(char*, char*, int, int);
-int sprintf(char*, const char*, ...);
 char* strcpy(char*, const char*);
 char* strcat(char*, const char*);
 }

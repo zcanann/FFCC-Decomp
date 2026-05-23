@@ -172,6 +172,7 @@ public:
     void SetTexShadowRadius(float);
     void SetTexShadowColor(_GXColor);
     void SetTexShadowPos(Vec*);
+    void SetMapShadeColor(int, CColor);
     void SetNoFreeMergeMask(int);
     void SetCharaAllocStage(int);
     int GetNumTexShadow();

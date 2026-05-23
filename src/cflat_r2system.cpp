@@ -519,9 +519,9 @@ CColor::operator _GXColor()
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" _GXColor* __opP8_GXColor__6CColorFv(CColor* self)
+CColor::operator _GXColor*()
 {
-    return &self->color;
+    return &color;
 }
 
 /*
@@ -866,19 +866,9 @@ done_check:
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void SetMapShadeColor__9CCharaPcsFi6CColor(void* charaPcs, int shadeIndex, const unsigned char* color)
+void CCharaPcs::SetMapShadeColor(int shadeIndex, CColor color)
 {
-    unsigned int offset = shadeIndex * 4;
-    unsigned char value1 = color[0];
-    unsigned int self = reinterpret_cast<unsigned int>(charaPcs) + offset;
-    unsigned char value2 = color[1];
-
-    *reinterpret_cast<unsigned char*>(self + 0x12C) = value1;
-    value1 = color[2];
-    *reinterpret_cast<unsigned char*>(self + 0x12D) = value2;
-    value2 = color[3];
-    *reinterpret_cast<unsigned char*>(self + 0x12E) = value1;
-    *reinterpret_cast<unsigned char*>(self + 0x12F) = value2;
+    m_viewerChoiceColor[shadeIndex] = color;
 }
 
 /*
@@ -2955,8 +2945,8 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
             static_cast<u8>(object->m_localBase[3]),
             0xFF,
         };
-        SetMapShadeColor__9CCharaPcsFi6CColor(&CharaPcs, *object->m_localBase,
-            reinterpret_cast<const unsigned char*>(&color));
+        CColor shadeColor(color);
+        CharaPcs.SetMapShadeColor(*object->m_localBase, shadeColor);
         runtime->push(object, 0);
         outResult = 0;
         return;

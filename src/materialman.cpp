@@ -431,8 +431,7 @@ CMaterialMan::CMaterialMan()
  */
 void CMaterialMan::Init()
 {
-	*reinterpret_cast<CMemory::CStage**>(Ptr(this, 0x218)) =
-	    Memory.CreateStage(0x20000, const_cast<char*>(s_materialStageName), 0);
+	m_materialStage = Memory.CreateStage(0x20000, const_cast<char*>(s_materialStageName), 0);
 	*Ptr(this, 0x204) = 0x30;
 }
 
@@ -443,7 +442,7 @@ void CMaterialMan::Init()
  */
 void CMaterialMan::Quit()
 {
-	Memory.DestroyStage(*reinterpret_cast<CMemory::CStage**>(Ptr(this, 0x218)));
+	Memory.DestroyStage(m_materialStage);
 }
 
 /*
@@ -2510,7 +2509,7 @@ CMaterial::CMaterial()
  */
 CMemory::CStage* CMaterialMan::GetMemoryStage()
 {
-	return *reinterpret_cast<CMemory::CStage**>(Ptr(this, 0x218));
+	return m_materialStage;
 }
 
 /*
@@ -2925,8 +2924,7 @@ void CMaterialSet::SetPartFromTextureSet(CTextureSet* textureSet, int pdtSlotInd
             }
 
             CMaterial* newMaterial =
-                new (*reinterpret_cast<CMemory::CStage**>(Ptr(&MaterialMan, 0x218)),
-                     const_cast<char*>(s_materialman_cpp), 0xEE4) CMaterial;
+                new (MaterialMan.GetMemoryStage(), const_cast<char*>(s_materialman_cpp), 0xEE4) CMaterial;
             unsigned char* material = reinterpret_cast<unsigned char*>(newMaterial);
 
             *reinterpret_cast<int*>(material + 0x24) = -0xACE10;

@@ -459,7 +459,7 @@ void CGPartyObj::menu()
 		}
 
 		Joybus.ChgCtrlMode(reinterpret_cast<int>(portIndex));
-		if ((CFlat[0x12A0] & 8) != 0) {
+		if ((CFlatEventFlagsByte() & CFlatEventFlagByte_GbaSound) != 0) {
 			Sound.PlaySe(8, 0x40, 0x7F, 0);
 		}
 		return;
@@ -504,10 +504,10 @@ void CGPartyObj::menu()
 	}
 
 	if (getPadConnectedForSlot(slot) == 0) {
-		if ((CFlat[0x12A0] & 8) != 0) {
+		if ((CFlatEventFlagsByte() & CFlatEventFlagByte_GbaSound) != 0) {
 			Sound.PlaySe(7, 0x40, 0x7F, 0);
 		}
-	} else if ((CFlat[0x12A0] & 8) != 0) {
+	} else if ((CFlatEventFlagsByte() & CFlatEventFlagByte_GbaSound) != 0) {
 		Sound.PlaySe(8, 0x40, 0x7F, 0);
 	}
 
@@ -3117,7 +3117,7 @@ void CGPartyObj::setAlive(int restoreDamageCol, int keepTarget)
 				SetAnimSlot(0x30, 1);
 			}
 		}
-	} else if (*reinterpret_cast<int*>(CFlat + 0x4780) == 0) {
+	} else if (CFlatItemCarryMode() == 0) {
 		if (m_lastMapIdHit == 1 && m_lastMapIdExtra == 0) {
 			SetAnimSlot(0x0B, 0);
 			SetAnimSlot(0x0C, 1);

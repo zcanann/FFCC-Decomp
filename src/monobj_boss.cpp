@@ -979,7 +979,7 @@ state100:
 
 	moveFrame();
 	const int branch = *reinterpret_cast<int*>(self + 0x6D0);
-	const int flatFlags = *reinterpret_cast<int*>(CFlat + 0x12E8);
+	const int flatFlags = CFlatBossState();
 	if ((*reinterpret_cast<volatile signed char*>(SoundBuffer_1260_ + 0x14) < 0) ||
 	    ((branch == 1) && ((flatFlags & 1) != 0)) || ((branch == 2) && ((flatFlags & 2) != 0))) {
 		reinterpret_cast<CGPrgObj*>(this)->changeStat(0, 0, 0);
@@ -1026,7 +1026,7 @@ int CGMonObj::attackCheckFuncLKShooter(int)
 	unsigned char* work = reinterpret_cast<unsigned char*>(SoundBuffer_1260_);
 
 	if (*reinterpret_cast<int*>(work + 8) == 0) {
-		if ((work[0x14] & 0x40) == 0 && (*reinterpret_cast<int*>(CFlat + 0x12E8) & 2) == 0) {
+		if ((work[0x14] & 0x40) == 0 && (CFlatBossState() & 2) == 0) {
 			CVector left(FLOAT_80331d90, FLOAT_80331cf8, FLOAT_80331d94);
 			if (PSVECDistance(reinterpret_cast<Vec*>(&left), &object->m_worldPosition) < FLOAT_80331d98 &&
 			    *reinterpret_cast<int*>(work + 0xC) == 0) {
@@ -1036,7 +1036,7 @@ int CGMonObj::attackCheckFuncLKShooter(int)
 				return 100;
 			}
 		}
-		if ((work[0x14] & 0x20) == 0 && (*reinterpret_cast<int*>(CFlat + 0x12E8) & 1) == 0) {
+		if ((work[0x14] & 0x20) == 0 && (CFlatBossState() & 1) == 0) {
 			CVector right(FLOAT_80331d9c, FLOAT_80331cf8, FLOAT_80331d9c);
 			if (PSVECDistance(reinterpret_cast<Vec*>(&right), &object->m_worldPosition) < FLOAT_80331d98 &&
 			    *reinterpret_cast<int*>(work + 0x10) == 0) {

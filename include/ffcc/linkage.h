@@ -73,6 +73,10 @@ enum CFlatGameFlag {
     CFlatGameFlag_Shouki = 0x80,
 };
 
+enum CFlatEventFlagByte {
+    CFlatEventFlagByte_GbaSound = 0x08,
+};
+
 static inline u32& CFlatRuntimeDebugFlags()
 {
     return *reinterpret_cast<u32*>(CFlat + 0x129C);
@@ -93,6 +97,11 @@ static inline u32 CFlatEnabledEventFlags()
     return CFlatEventFlags() & CFlatEventMask();
 }
 
+static inline u8& CFlatEventFlagsByte()
+{
+    return CFlat[0x12A0];
+}
+
 static inline u32& CFlatCenterState()
 {
     return *reinterpret_cast<u32*>(CFlat + 0x12AC);
@@ -111,6 +120,16 @@ static inline int& CFlatBossState()
 static inline int& CFlatBossSubState()
 {
     return *reinterpret_cast<int*>(CFlat + 0x12EC);
+}
+
+static inline int& CFlatItemCarryMode()
+{
+    return *reinterpret_cast<int*>(CFlat + 0x4780);
+}
+
+static inline int& CFlatItemTraceParticleSlot()
+{
+    return *reinterpret_cast<int*>(CFlat + 0x1042C);
 }
 
 #endif // _FFCC_LINKAGE_H_

@@ -3,16 +3,15 @@
 #include "ffcc/memory.h"
 #include "ffcc/stopwatch.h"
 #include "ffcc/system.h"
-#include <string.h>
+#include <math.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
+#include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h>
 
 extern "C" {
 char DAT_80330118[];
 void* __vt__12CFlatRuntime[];
 void* __vt__Q212CFlatRuntime7CObject[];
 int __cntlzw(unsigned int);
-char* strcat(char*, const char*);
-double fmod(double, double);
 void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
     CFlatRuntime*, CFlatRuntime::CObject*, int, int, int, CFlatRuntime::CStack*, CFlatRuntime::CStack*);
 }

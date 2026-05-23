@@ -65,12 +65,12 @@ extern "C" const double kCharaSharedSignedIntBias = 4503601774854144.0;
 #include "ffcc/textureman.h"
 #include <dolphin/gx.h>
 #include "dolphin/mtx.h"
+#include <math.h>
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
 extern "C" float FLOAT_80330BEC;
 extern "C" float FLOAT_80330BF0;
-extern "C" double fmod(double, double);
 
 struct CharaViewerSRT {
     float transX;

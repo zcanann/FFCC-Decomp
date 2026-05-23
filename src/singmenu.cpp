@@ -33,10 +33,8 @@ extern char* gSingMenuAttrTableEs[];
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include <math.h>
-#include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
-
-extern "C" char* strcat(char*, const char*);
+#include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h>
 
 typedef signed short s16;
 typedef unsigned char u8;

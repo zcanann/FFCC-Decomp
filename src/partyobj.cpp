@@ -19,10 +19,7 @@
 #include "ffcc/fontman.h"
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
-extern "C" void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
-extern "C" void GetHitFaceNormal__7CMapObjFP3Vec(void*, Vec*);
 extern "C" int CalcHitSlide__7CMapObjFP3Vecf(void*, Vec*);
-extern "C" void onPush__9CGBaseObjFP9CGBaseObji(CGBaseObj*, CGBaseObj*, int);
 extern const char s_BossGhostPartyCountersFmt_801DCB1C[];
 extern const char s_MissingRingMenuFmt_801DCB38[];
 extern int __float_huge[];
@@ -235,9 +232,9 @@ static bool isGhostPartyTargetMode(CGPartyObj* self)
 	return *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(self->m_scriptHandle) + 0x3B4) != 0;
 }
 
-static void* getMapHitObject()
+static CMapObj* getMapHitObject()
 {
-	return *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(&MapMng) + 0x22A88);
+	return *reinterpret_cast<CMapObj**>(reinterpret_cast<unsigned char*>(&MapMng) + 0x22A88);
 }
 
 /*
@@ -1614,9 +1611,9 @@ void CGPartyObj::putTargetParticle(int targetSide, int doInit)
 
 		Vec hitPos = startPos;
 		if (MapMng.CheckHitCylinderNear(&hitCylinder, &rayDir, 0x30) != 0) {
-			void* hitObj = *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(&MapMng) + 0x22A88);
-			CalcHitPosition__7CMapObjFP3Vec(hitObj, &hitPos);
-			GetHitFaceNormal__7CMapObjFP3Vec(hitObj, reinterpret_cast<Vec*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBB8));
+			CMapObj* hitObj = getMapHitObject();
+			hitObj->CalcHitPosition(&hitPos);
+			hitObj->GetHitFaceNormal(reinterpret_cast<Vec*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBB8));
 		} else {
 			PSVECAdd(&startPos, &rayDir, &hitPos);
 		}
@@ -1855,11 +1852,11 @@ void CGPartyObj::checkTargetParticle()
 		floorCylinder.m_boundsMax.x = FLOAT_80331aa0;
 
 		if (MapMng.CheckHitCylinderNear(&floorCylinder, &down, 0x30) != 0) {
-			CalcHitPosition__7CMapObjFP3Vec(getMapHitObject(), targetPos);
+			getMapHitObject()->CalcHitPosition(targetPos);
 			if (m_scriptHandle != nullptr) {
 				unsigned char* work = reinterpret_cast<unsigned char*>(m_scriptHandle);
 				*reinterpret_cast<Vec*>(work + 0xBAC) = *targetPos;
-				GetHitFaceNormal__7CMapObjFP3Vec(getMapHitObject(), reinterpret_cast<Vec*>(work + 0xBB8));
+				getMapHitObject()->GetHitFaceNormal(reinterpret_cast<Vec*>(work + 0xBB8));
 			}
 		}
 
@@ -1919,9 +1916,9 @@ void CGPartyObj::moveCenterTargetParticle()
 	hitCylinder.m_boundsMax.x = FLOAT_80331aa0;
 
 	if (MapMng.CheckHitCylinderNear(&hitCylinder, &moveVec, 0x30) != 0) {
-		void* hitObj = *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(&MapMng) + 0x22A88);
-		CalcHitPosition__7CMapObjFP3Vec(hitObj, &hitPos);
-		GetHitFaceNormal__7CMapObjFP3Vec(hitObj, &hitNormal);
+		CMapObj* hitObj = getMapHitObject();
+		hitObj->CalcHitPosition(&hitPos);
+		hitObj->GetHitFaceNormal(&hitNormal);
 
 		unsigned char* work = reinterpret_cast<unsigned char*>(m_scriptHandle);
 		*reinterpret_cast<Vec*>(work + 0xBB8) = hitNormal;
@@ -2054,7 +2051,7 @@ void CGPartyObj::statAlive()
  */
 void CGPartyObj::onPush(CGBaseObj* other, int pushType)
 {
-	onPush__9CGBaseObjFP9CGBaseObji(this, other, pushType);
+	CGBaseObj::onPush(other, pushType);
 }
 
 /*

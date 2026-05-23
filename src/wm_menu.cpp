@@ -10169,11 +10169,11 @@ int McCtrl::LoadDat()
  * JP Address: TODO
  * JP Size: TODO
  */
-void McCtrl::Format(int unmountAfter)
+int McCtrl::Format(int unmountAfter)
 {
 	if (m_state < 0) {
 		m_lastResult = -1;
-		return;
+		return -1;
 	}
 
 	m_previousState = m_state;
@@ -10197,7 +10197,7 @@ void McCtrl::Format(int unmountAfter)
 					MemoryCardMan.m_currentSlot = static_cast<char>(0xFF);
 					m_state = -1;
 					m_lastResult = -2;
-					return;
+					return -2;
 				}
 				MemoryCardMan.m_opDoneFlag = 1;
 				MemoryCardMan.m_currentSlot = static_cast<char>(0xFF);
@@ -10211,7 +10211,7 @@ void McCtrl::Format(int unmountAfter)
 			m_state = -1;
 			if (m_lastResult == -5) {
 				m_lastResult = -2;
-				return;
+				return -2;
 			}
 		} else {
 			if (unmountAfter != 0) {
@@ -10228,6 +10228,8 @@ void McCtrl::Format(int unmountAfter)
 	} else {
 		m_lastResult = 0;
 	}
+
+	return m_lastResult;
 }
 
 /*

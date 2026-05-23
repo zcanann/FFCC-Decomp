@@ -14,7 +14,8 @@
 #include "PowerPC_EABI_Support/Runtime/runtime.h"
 #include "ffcc/ppp_linkage.h"
 
-extern int __float_nan[];
+#include <math.h>
+
 extern const double DOUBLE_80331FC0 = 2.4;
 extern const float kPppScreenQuakeZero[2] = {0.0f, 0.0f};
 
@@ -246,9 +247,9 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, _pppCt
                 if (magnitude > 0.0f) {
                     magnitude = Crystal2SqrtPositive(magnitude);
                 } else if ((double)magnitude < 0.0) {
-                    magnitude = *(float*)__float_nan;
+                    magnitude = NAN;
                 } else if (Crystal2FpClassify(magnitude) == 1) {
-                    magnitude = *(float*)__float_nan;
+                    magnitude = NAN;
                 }
 
                 u32 xFine = x & 3;

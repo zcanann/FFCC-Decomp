@@ -7,6 +7,8 @@
 #include "ffcc/pppShape.h"
 #include "ffcc/textureman.h"
 
+#include <math.h>
+
 struct Vec2d {
     float x;
     float y;
@@ -57,7 +59,6 @@ extern const float FLOAT_8033103c = 1.0f;
 extern const float FLOAT_80331040 = -1.0f;
 extern const float FLOAT_80331044 = 1.3333334f;
 
-extern unsigned long __float_nan[];
 extern const float FLOAT_80331078;
 extern const float FLOAT_8033107C;
 extern const float FLOAT_80331080;
@@ -165,9 +166,9 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
             if (lengthXY > FLOAT_80331084) {
                 lengthXY = ColumSqrtPositive(lengthXY);
             } else if ((double)lengthXY < DOUBLE_80331098) {
-                lengthXY = *(float*)__float_nan;
+                lengthXY = NAN;
             } else if (ColumFpClassify(lengthXY) == 1) {
-                lengthXY = *(float*)__float_nan;
+                lengthXY = NAN;
             }
             drawScale = FLOAT_80331084;
             if (lengthXY > FLOAT_803310A0) {

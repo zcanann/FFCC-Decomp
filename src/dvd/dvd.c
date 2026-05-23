@@ -5,11 +5,6 @@
 #include "dolphin/os/__os.h"
 #include "dolphin/dvd/__dvd.h"
 
-// externs
-extern void __DVDPrintFatalMessage();
-extern int DVDCompareDiskID(const struct DVDDiskID * id1 /* r29 */, const struct DVDDiskID * id2 /* r30 */);
-extern int __DVDLowTestAlarm(const OSAlarm * alarm /* r3 */);
-
 #ifdef DEBUG
 static char s___DVDVersion[] = "<< Dolphin SDK - DVD\tdebug build: Apr  5 2004 03:56:07 (0x2301) >>";
 #else

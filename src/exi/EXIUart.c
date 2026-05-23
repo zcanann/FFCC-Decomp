@@ -11,7 +11,6 @@ static u32 BarnacleEnabled;
 int InitializeUART(void);
 int ReadUARTN(void);
 int WriteUARTN(void *buf, u32 len);
-void __OSEnableBarnacle(s32 chan, u32 dev);
 
 static BOOL ProbeBarnacle(s32 chan, u32 dev, u32* revision) {
     int err;

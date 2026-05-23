@@ -36,7 +36,6 @@ inline void* operator new(unsigned long, void* ptr)
 extern "C" void StaticFrame__10CGCharaObjFv();
 extern "C" void __dt__12CFlatRuntimeFv(CFlatRuntime*, int);
 extern "C" void* __vt__13CFlatRuntime2[];
-extern "C" CFlatRuntime2* __ct__13CFlatRuntime2Fv(CFlatRuntime2*);
 extern "C" void __dt__13CFlatRuntime2Fv(void*);
 extern "C" CFlatRuntime* __ct__12CFlatRuntimeFv(CFlatRuntime*);
 extern "C" void __ct__8CGMonObjFv(CGMonObj*);
@@ -504,7 +503,7 @@ extern "C" void __sinit_cflat_runtime2_cpp(void)
     // (and any sub-construction) into the class constructor, then delete this
     // function. The compiler will auto-generate __sinit from the global object.
 
-	__ct__13CFlatRuntime2Fv(reinterpret_cast<CFlatRuntime2*>(CFlat));
+	new (CFlat) CFlatRuntime2;
 	__register_global_object(CFlat, reinterpret_cast<void*>(__dt__13CFlatRuntime2Fv), CFlat_guard);
 
 	__construct_array(m_gBaseObjArr, reinterpret_cast<ConstructorDestructor>(__ct__9CGBaseObjFv), 0, 0x50, 0x28);

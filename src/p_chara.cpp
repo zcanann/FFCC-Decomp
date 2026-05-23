@@ -2844,7 +2844,7 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
     }
 
     Mtx viewMtx;
-    PSMTXCopy(*reinterpret_cast<Mtx*>(Ptr(&CameraPcs, 4)), viewMtx);
+    PSMTXCopy(CameraPcs.m_cameraMatrix, viewMtx);
 
     if (drawPass == 3) {
         if ((flags & 4) != 0) {

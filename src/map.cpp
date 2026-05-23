@@ -2799,7 +2799,7 @@ void CMapMng::Draw()
     LightPcs.SetNumDiffuse(0);
 
     Mtx44 projection;
-    PSMTX44Copy(reinterpret_cast<float(*)[4]>(Ptr(&CameraPcs, 0x94)), projection);
+    PSMTX44Copy(CameraPcs.m_screenMatrix, projection);
     GXSetProjection(projection, GX_ORTHOGRAPHIC);
     m_underWaterTexPending = 1;
 
@@ -2912,7 +2912,7 @@ void CMapMng::DrawAfter()
     }
 
     Mtx44 projection;
-    PSMTX44Copy(reinterpret_cast<float(*)[4]>(Ptr(&CameraPcs, 0x94)), projection);
+    PSMTX44Copy(CameraPcs.m_screenMatrix, projection);
     GXSetProjection(projection, GX_ORTHOGRAPHIC);
 
     GXSetColorUpdate(1);

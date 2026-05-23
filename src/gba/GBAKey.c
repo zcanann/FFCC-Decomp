@@ -1,6 +1,5 @@
 #include "dolphin/dsp.h"
 #include "dolphin/gba/GBAPriv.h"
-#include "GBA/GBAKey.h"
 #include <string.h>
 
 volatile u8 GBAKeyDspTaskIram[] = {

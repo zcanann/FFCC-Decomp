@@ -15,8 +15,6 @@
 
 CWind Wind;
 
-extern int __float_nan[];
-
 static inline s8 GetWindActiveFlag(const WindObject* obj)
 {
     return static_cast<s8>((((int)(obj->flags & 0xC0)) << 24) >> 31);
@@ -75,7 +73,7 @@ static inline float WindSqrtf(float x)
     }
 
     if ((double)x < DOUBLE_80330f10) {
-        return *(float*)__float_nan;
+        return NAN;
     }
 
     bits.f = x;
@@ -100,7 +98,7 @@ static inline float WindSqrtf(float x)
     }
 
     if (fpclass == 1) {
-        return *(float*)__float_nan;
+        return NAN;
     }
 
     return x;

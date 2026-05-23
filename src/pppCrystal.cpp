@@ -32,7 +32,6 @@ extern const float FLOAT_80331010;
 #define CRYSTAL_SCENE_FOVY 33.3f
 #define CRYSTAL_ASPECT 1.3333334f
 #define CRYSTAL_HALF 0.5f
-extern int __float_nan[];
 
 struct CrystalIndTexMtx {
     float value[2][3];
@@ -300,9 +299,9 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param
 				if (magnitude > FLOAT_80330FD8) {
 					magnitude = CrystalSqrtPositive(magnitude);
 				} else if ((double)magnitude < DOUBLE_80330FF0) {
-					magnitude = *(float*)__float_nan;
+					magnitude = NAN;
 				} else if (CrystalFpClassify(magnitude) == 1) {
-					magnitude = *(float*)__float_nan;
+					magnitude = NAN;
 				}
 
 				if (magnitude > maxMagnitude) {

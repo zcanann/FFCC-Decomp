@@ -23,7 +23,6 @@ extern const float FLOAT_8033065c;
 extern const float FLOAT_80330660;
 extern const float FLOAT_80330664;
 extern const float FLOAT_80330668;
-extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void*);
 extern "C" void pppSetBlendMode(unsigned char);
 extern "C" const char s_pppYmMiasma_cpp_801D9CA8[] = "pppYmMiasma.cpp";
 
@@ -335,7 +334,7 @@ void pppDestructYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkC* param_2)
     void* heap = work->m_particles;
 
     if (heap != 0) {
-        pppHeapUseRate__FPQ27CMemory6CStage(heap);
+        pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(heap));
     }
 }
 

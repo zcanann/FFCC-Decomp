@@ -14,8 +14,6 @@ extern int gPppCalcDisabled;
 
 #include <string.h>
 
-extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void* stage);
-
 extern const f32 FLOAT_80330df0[2];
 extern const f32 FLOAT_80330de0;
 extern const f32 FLOAT_80330de4;
@@ -530,7 +528,7 @@ extern "C" void pppDestructYmLaser(pppYmLaser* laser, _pppCtrlTable* ctrlTable)
 	void* stage = work->m_points;
 
 	if (stage != 0) {
-		pppHeapUseRate__FPQ27CMemory6CStage(stage);
+		pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(stage));
 		work->m_points = 0;
 	}
 }

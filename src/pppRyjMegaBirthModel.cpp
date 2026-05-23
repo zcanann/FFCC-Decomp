@@ -6,8 +6,6 @@
 #include <string.h>
 #include "ffcc/ppp_linkage.h"
 
-extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void*);
-
 extern const float FLOAT_80330498;
 extern const float FLOAT_8033049c;
 extern const float FLOAT_803304a0;
@@ -1151,17 +1149,17 @@ void pppRyjMegaBirthModelDes(_pppPObject* pObject, PRyjMegaBirthModelOffsets* of
     u8* work = pObject->m_workArea + offsets->m_serializedDataOffsets[2];
 
     if (*(void**)(work + 0xC) != 0) {
-        pppHeapUseRate__FPQ27CMemory6CStage(*(void**)(work + 0xC));
+        pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(*(void**)(work + 0xC)));
         *(void**)(work + 0xC) = 0;
     }
 
     if (*(void**)(work + 0x10) != 0) {
-        pppHeapUseRate__FPQ27CMemory6CStage(*(void**)(work + 0x10));
+        pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(*(void**)(work + 0x10)));
         *(void**)(work + 0x10) = 0;
     }
 
     if (*(void**)(work + 0x14) != 0) {
-        pppHeapUseRate__FPQ27CMemory6CStage(*(void**)(work + 0x14));
+        pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(*(void**)(work + 0x14)));
         *(void**)(work + 0x14) = 0;
     }
 }

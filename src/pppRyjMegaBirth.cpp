@@ -10,7 +10,6 @@ extern int gPppCalcDisabled;
 }
 #include <string.h>
 
-extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void*);
 extern const float FLOAT_80330458;
 extern float FLOAT_8033044C;
 extern const float FLOAT_8033045c;
@@ -233,19 +232,19 @@ void pppRyjMegaBirthDes(_pppPObject* pObject, PRyjMegaBirthOffsets* offsets)
 
 	if (*(void**)(work + 0x3C) != 0)
 	{
-		pppHeapUseRate__FPQ27CMemory6CStage(*(void**)(work + 0x3C));
+		pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(*(void**)(work + 0x3C)));
 		*(void**)(work + 0x3C) = 0;
 	}
 
 	if (*(void**)(work + 0x40) != 0)
 	{
-		pppHeapUseRate__FPQ27CMemory6CStage(*(void**)(work + 0x40));
+		pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(*(void**)(work + 0x40)));
 		*(void**)(work + 0x40) = 0;
 	}
 
 	if (*(void**)(work + 0x44) != 0)
 	{
-		pppHeapUseRate__FPQ27CMemory6CStage(*(void**)(work + 0x44));
+		pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(*(void**)(work + 0x44)));
 		*(void**)(work + 0x44) = 0;
 	}
 }

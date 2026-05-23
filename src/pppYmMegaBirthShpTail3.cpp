@@ -18,7 +18,6 @@ extern int gPppCalcDisabled;
 #include "dolphin/mtx.h"
 #include <string.h>
 
-extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void*);
 extern "C" void pppSetBlendMode(unsigned char);
 extern "C" int rand(void);
 static pppFMATRIX g_matUnit3;
@@ -768,15 +767,15 @@ void pppDestructYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* pppYmMegaBirthShpTai
     void** ptrC4 = (void**)(work + 0x44);
 
     if (*ptrBc != 0) {
-        pppHeapUseRate__FPQ27CMemory6CStage(*ptrBc);
+        pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(*ptrBc));
         *ptrBc = 0;
     }
     if (*ptrC0 != 0) {
-        pppHeapUseRate__FPQ27CMemory6CStage(*ptrC0);
+        pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(*ptrC0));
         *ptrC0 = 0;
     }
     if (*ptrC4 != 0) {
-        pppHeapUseRate__FPQ27CMemory6CStage(*ptrC4);
+        pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(*ptrC4));
         *ptrC4 = 0;
     }
 }

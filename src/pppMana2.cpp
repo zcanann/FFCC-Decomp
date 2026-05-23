@@ -9,6 +9,7 @@
 #include "ffcc/gxfunc.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/pppYmEnv.h"
+#include "ffcc/textureman.h"
 #include "ffcc/util.h"
 #include "ffcc/vector.h"
 
@@ -76,10 +77,6 @@ static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned
 static inline float LoadFloat(const float& value)
 {
     return value;
-}
-
-extern "C" {
-void InitTexObj__8CTextureFv(void*);
 }
 
 static int CreateWaterMesh(Vec* param_1, Vec* param_2, Vec2d* param_3, unsigned short* param_4, float param_5);
@@ -1073,9 +1070,9 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* para
     }
 
     *(u32*)(work[0x1E] + 0x6C) = 0;
-    InitTexObj__8CTextureFv((void*)work[0x1E]);
+    reinterpret_cast<CTexture*>(work[0x1E])->InitTexObj();
     *(u32*)(work[0x1F] + 0x6C) = 0;
-    InitTexObj__8CTextureFv((void*)work[0x1F]);
+    reinterpret_cast<CTexture*>(work[0x1F])->InitTexObj();
 
     if (work[9] == 0) {
         work[9] = (u32)pppMemAlloc(0xA5E8, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppMana2_cpp_801DC4E0), 0x211);

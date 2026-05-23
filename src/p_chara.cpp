@@ -1,6 +1,7 @@
 #include "ffcc/p_chara.h"
 #include "ffcc/chunkfile.h"
 #include "ffcc/color.h"
+#include "ffcc/game.h"
 #include "ffcc/graphic.h"
 #include "ffcc/gxfunc.h"
 #include "ffcc/linkage.h"
@@ -365,9 +366,9 @@ static inline u32& LoadStreamCursor(CCharaPcs* self)
     return self->m_loadStreamCursor;
 }
 
-static inline int& CurrentSceneId()
+static inline u32 CurrentSceneId()
 {
-    return *reinterpret_cast<int*>(Ptr(&Game, 0xC7F0));
+    return Game.m_currentSceneId;
 }
 
 static inline u32& CharaAmemSize()

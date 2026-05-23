@@ -7,6 +7,7 @@
 #include "ffcc/gxfunc.h"
 #include "ffcc/joybus.h"
 #include "ffcc/memory.h"
+#include "ffcc/mesmenu.h"
 #include "ffcc/p_chara.h"
 #include "ffcc/pad.h"
 #include "ffcc/game.h"
@@ -803,7 +804,6 @@ extern "C" unsigned int MLstOpen__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int MLstCtrl__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int MLstClose__8CMenuPcsFv(CMenuPcs*);
 extern "C" void MLstDraw__8CMenuPcsFv(CMenuPcs*);
-extern "C" void CalcHeart__8CMesMenuFv(void*);
 
 extern float FLOAT_8033292c;
 extern float FLOAT_80332930;
@@ -2111,7 +2111,7 @@ void CMenuPcs::SingleCalcCtrl()
         break;
     }
 
-    CalcHeart__8CMesMenuFv(*reinterpret_cast<void**>(self + 0x268));
+    reinterpret_cast<CMesMenu*>(*reinterpret_cast<void**>(self + 0x268))->CalcHeart();
     *reinterpret_cast<unsigned short*>(statePtr + 0x2E) = result;
 
     bool hasInput = (Pad._452_4_ != 0) || (Pad._448_4_ != -1);

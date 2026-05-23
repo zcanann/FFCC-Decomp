@@ -10,7 +10,6 @@
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/wchar_io.h"
 #include "stdarg.h"
 
-extern void __num2dec(const decform*, double, decimal*);
 extern const double printf_double_zero;
 
 #define TARGET_FLOAT_BITS           64

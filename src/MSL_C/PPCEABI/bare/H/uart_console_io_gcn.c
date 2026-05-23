@@ -10,8 +10,9 @@
  * EN Size: 
  */
 
+#include "dolphin/os.h"
+
 // External function declarations
-extern unsigned int OSGetConsoleType(void);
 extern int InitializeUART(unsigned int);
 extern int WriteUARTN(unsigned int, unsigned int);
 extern int __TRK_write_console(unsigned int, unsigned int, unsigned int *, unsigned int);

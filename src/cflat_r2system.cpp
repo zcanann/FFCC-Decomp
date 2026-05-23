@@ -1407,9 +1407,11 @@ void CVector::operator=(const CVector& other)
  */
 CVector::CVector(const CVector& other)
 {
+    float y = other.y;
     x = other.x;
-    y = other.y;
-    z = other.z;
+    float z = other.z;
+    this->y = y;
+    this->z = z;
 }
 
 /*

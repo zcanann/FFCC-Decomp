@@ -130,14 +130,12 @@ extern "C" const f32 kMenuOrthoRight = 640.0f;
 extern "C" const f32 kMenuOrthoFar = -100.0f;
 extern "C" const f32 FLOAT_8033086C = 0.125f;
 
-extern "C" unsigned long GetInternal22Size__8CFontManFv(void*);
 extern const char __RTTI__8CManager_8032E7A8[];
 extern const char __RTTI__8CProcess_8032E7B0[];
 extern "C" void create__8CMenuPcsFv(CMenuPcs*);
 extern "C" void destroy__8CMenuPcsFv(CMenuPcs*);
 extern "C" void calc__8CMenuPcsFv(CMenuPcs*);
 extern "C" void draw__8CMenuPcsFv(CMenuPcs*);
-extern "C" void Calc__5CMenuFv(CMenu*);
 extern "C" void loadTextureAsync__8CMenuPcsFPPciiPQ28CMenuPcs4CTmpiii(CMenuPcs*, char**, int, int, CMenuPcs::CTmp*, int, int, int);
 extern "C" void drawSingleMenu__8CMenuPcsFv(CMenuPcs*);
 
@@ -357,7 +355,7 @@ void CMenuPcs::create()
 
     unsigned long menuHeapSize = 0xC4000;
     if (FontMan.m_font != 0) {
-        menuHeapSize -= GetInternal22Size__8CFontManFv(&FontMan);
+        menuHeapSize -= FontMan.GetInternal22Size();
     }
 
     m_menuStage = Memory.CreateStage(menuHeapSize, const_cast<char*>(kMenuPcsStageName), 0);
@@ -885,7 +883,7 @@ void CMenuPcs::calc()
             int i = 0;
             CMenuPcs* menu = this;
             do {
-                Calc__5CMenuFv(*reinterpret_cast<CMenu**>(reinterpret_cast<u8*>(menu) + 0x13c));
+                (*reinterpret_cast<CMenu**>(reinterpret_cast<u8*>(menu) + 0x13c))->Calc();
                 i++;
                 menu = reinterpret_cast<CMenuPcs*>(reinterpret_cast<u8*>(menu) + 4);
             } while (i < 4);
@@ -893,7 +891,7 @@ void CMenuPcs::calc()
             i = 0;
             menu = this;
             do {
-                Calc__5CMenuFv(*reinterpret_cast<CMenu**>(reinterpret_cast<u8*>(menu) + 0x10c));
+                (*reinterpret_cast<CMenu**>(reinterpret_cast<u8*>(menu) + 0x10c))->Calc();
                 i++;
                 menu = reinterpret_cast<CMenuPcs*>(reinterpret_cast<u8*>(menu) + 4);
             } while (i < 0xc);
@@ -1849,11 +1847,11 @@ void CMenuPcs::destroyBattle()
 void CMenuPcs::calcBattle()
 {
     for (int i = 0; i < 4; i++) {
-        Calc__5CMenuFv(m_battleRingMenus[i]);
+        m_battleRingMenus[i]->Calc();
     }
 
     for (int i = 0; i < 0xC; i++) {
-        Calc__5CMenuFv(reinterpret_cast<CMenu*>(m_battleMesMenus[i]));
+        reinterpret_cast<CMenu*>(m_battleMesMenus[i])->Calc();
     }
 
     int limit = m_battleHud.m_gaugeTarget;

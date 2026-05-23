@@ -35,10 +35,8 @@ inline void* operator new(unsigned long, void* ptr)
 }
 
 extern "C" void StaticFrame__10CGCharaObjFv();
-extern "C" void __dt__12CFlatRuntimeFv(CFlatRuntime*, int);
 extern "C" void* __vt__13CFlatRuntime2[];
 extern "C" void __dt__13CFlatRuntime2Fv(void*);
-extern "C" CFlatRuntime* __ct__12CFlatRuntimeFv(CFlatRuntime*);
 extern "C" void __ct__8CGMonObjFv(CGMonObj*);
 extern "C" void __ct__10CGPartyObjFv(CGPartyObj*);
 extern "C" void __ct__9CGItemObjFv(CGItemObj*);
@@ -441,7 +439,7 @@ CFlatRuntime2::CFlatRuntime2()
 {
 	u8* runtime = reinterpret_cast<u8*>(this);
 
-	__ct__12CFlatRuntimeFv(reinterpret_cast<CFlatRuntime*>(this));
+	new (reinterpret_cast<CFlatRuntime*>(this)) CFlatRuntime;
 	*reinterpret_cast<void***>(runtime) = __vt__13CFlatRuntime2;
 
 	*reinterpret_cast<int*>(runtime + 0x170C) = -1;
@@ -534,7 +532,7 @@ CFlatRuntime2::~CFlatRuntime2()
 	*reinterpret_cast<void***>(runtime) = __vt__13CFlatRuntime2;
 	reinterpret_cast<CFlatRuntime*>(this)->AfterFrame(1);
 	reinterpret_cast<CFlatData*>(runtime + 0xCF20)->~CFlatData();
-	__dt__12CFlatRuntimeFv(reinterpret_cast<CFlatRuntime*>(this), 0);
+	reinterpret_cast<CFlatRuntime*>(this)->~CFlatRuntime();
 }
 
 /*

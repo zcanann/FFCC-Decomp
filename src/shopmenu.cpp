@@ -18,7 +18,6 @@
 
 extern "C" {
 int __cntlzw(unsigned int);
-void pppCacheLoadShape__FPsP12_pppDataHead(short*, _pppDataHead*);
 void SetScale__5CFontFf(float, CFont*);
 void SetScaleX__5CFontFf(float, CFont*);
 void SetScaleY__5CFontFf(float, CFont*);
@@ -2821,7 +2820,7 @@ void CMenuPcs::CreateSmithMenu()
     *reinterpret_cast<int*>(cacheChunks + 2) =
         ppvAmemCacheSet.GetData(*cacheChunks, s_shopmenu_cpp_801ded8c, 0x32A);
     int cacheData = *reinterpret_cast<int*>(cacheChunks + 2);
-    pppCacheLoadShape__FPsP12_pppDataHead(
+    pppCacheLoadShape(
         reinterpret_cast<short*>(cacheData + *reinterpret_cast<int*>(cacheData + 0x14)), pppDataHead);
 }
 /*
@@ -2860,7 +2859,7 @@ void CMenuPcs::CreateShopMenu()
     *reinterpret_cast<int*>(cacheChunks + 2) =
         ppvAmemCacheSet.GetData(*cacheChunks, s_shopmenu_cpp_801ded8c, 0x32A);
     int cacheData = *reinterpret_cast<int*>(cacheChunks + 2);
-    pppCacheLoadShape__FPsP12_pppDataHead(
+    pppCacheLoadShape(
         reinterpret_cast<short*>(cacheData + *reinterpret_cast<int*>(cacheData + 0x14)), pppDataHead);
 }
 /*

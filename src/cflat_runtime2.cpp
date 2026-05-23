@@ -237,19 +237,29 @@ static inline CFlatLayerResource* LayerResources(CFlatRuntime2* runtime)
 	return reinterpret_cast<CFlatLayerResource*>(reinterpret_cast<u8*>(runtime) + 0x1770);
 }
 
+static inline CFlatRuntime2::CParticleWork& ParticleWork(CFlatRuntime2* runtime)
+{
+	return *reinterpret_cast<CFlatRuntime2::CParticleWork*>(reinterpret_cast<u8*>(runtime) + 0x16CC);
+}
+
 static inline float& ParticleWorkSpeed(CFlatRuntime2* runtime)
 {
-	return *reinterpret_cast<float*>(reinterpret_cast<u8*>(runtime) + 0x16F0);
+	return ParticleWork(runtime).m_speed;
 }
 
 static inline float* &ParticleWorkScalePtr(CFlatRuntime2* runtime)
 {
-	return *reinterpret_cast<float**>(reinterpret_cast<u8*>(runtime) + 0x16D4);
+	return ParticleWork(runtime).m_scale;
 }
 
 static inline float& ParticleWorkScaleX(CFlatRuntime2* runtime)
 {
 	return *reinterpret_cast<float*>(reinterpret_cast<u8*>(runtime) + 0x1758);
+}
+
+static inline float* ParticleWorkScaleValues(CFlatRuntime2* runtime)
+{
+	return reinterpret_cast<float*>(reinterpret_cast<u8*>(runtime) + 0x1758);
 }
 
 static inline float& ParticleWorkScaleY(CFlatRuntime2* runtime)
@@ -264,7 +274,7 @@ static inline float& ParticleWorkScaleZ(CFlatRuntime2* runtime)
 
 static inline float* &ParticleWorkTargetPtr(CFlatRuntime2* runtime)
 {
-	return *reinterpret_cast<float**>(reinterpret_cast<u8*>(runtime) + 0x16D8);
+	return ParticleWork(runtime).m_target;
 }
 
 static inline float& ParticleWorkTargetX(CFlatRuntime2* runtime)
@@ -284,17 +294,22 @@ static inline float& ParticleWorkTargetZ(CFlatRuntime2* runtime)
 
 static inline float*& ParticleWorkPosPtr(CFlatRuntime2* runtime)
 {
-	return *reinterpret_cast<float**>(reinterpret_cast<u8*>(runtime) + 0x16CC);
+	return ParticleWork(runtime).m_pos;
 }
 
 static inline float*& ParticleWorkPosVecPtr(CFlatRuntime2* runtime)
 {
-	return *reinterpret_cast<float**>(reinterpret_cast<u8*>(runtime) + 0x16D0);
+	return ParticleWork(runtime).m_posVec;
 }
 
 static inline float& ParticleWorkPosX(CFlatRuntime2* runtime)
 {
 	return *reinterpret_cast<float*>(reinterpret_cast<u8*>(runtime) + 0x1740);
+}
+
+static inline float* ParticleWorkPosValues(CFlatRuntime2* runtime)
+{
+	return reinterpret_cast<float*>(reinterpret_cast<u8*>(runtime) + 0x1740);
 }
 
 static inline float& ParticleWorkPosY(CFlatRuntime2* runtime)
@@ -317,54 +332,59 @@ static inline float& ParticleWorkPosVecBase(CFlatRuntime2* runtime)
 	return *reinterpret_cast<float*>(reinterpret_cast<u8*>(runtime) + 0x174C);
 }
 
+static inline float* ParticleWorkPosVecValues(CFlatRuntime2* runtime)
+{
+	return reinterpret_cast<float*>(reinterpret_cast<u8*>(runtime) + 0x174C);
+}
+
 static inline CFlatRuntime::CObject*& ParticleWorkBind(CFlatRuntime2* runtime)
 {
-	return *reinterpret_cast<CFlatRuntime::CObject**>(reinterpret_cast<u8*>(runtime) + 0x16E0);
+	return ParticleWork(runtime).m_bind;
 }
 
 static inline CFlatRuntime::CObject*& ParticleWorkTrace(CFlatRuntime2* runtime)
 {
-	return *reinterpret_cast<CFlatRuntime::CObject**>(reinterpret_cast<u8*>(runtime) + 0x16E4);
+	return ParticleWork(runtime).m_trace;
 }
 
 static inline int& ParticleWorkColor0(CFlatRuntime2* runtime)
 {
-	return *reinterpret_cast<int*>(reinterpret_cast<u8*>(runtime) + 0x16E8);
+	return ParticleWork(runtime).m_color0;
 }
 
 static inline int& ParticleWorkColor1(CFlatRuntime2* runtime)
 {
-	return *reinterpret_cast<int*>(reinterpret_cast<u8*>(runtime) + 0x16EC);
+	return ParticleWork(runtime).m_color1;
 }
 
 static inline float& ParticleWorkColorLerp(CFlatRuntime2* runtime)
 {
-	return *reinterpret_cast<float*>(reinterpret_cast<u8*>(runtime) + 0x16F4);
+	return ParticleWork(runtime).m_colorLerp;
 }
 
 static inline int& ParticleWorkSeNo(CFlatRuntime2* runtime)
 {
-	return *reinterpret_cast<int*>(reinterpret_cast<u8*>(runtime) + 0x16FC);
+	return ParticleWork(runtime).m_seNo;
 }
 
 static inline u8& ParticleWorkSeKind(CFlatRuntime2* runtime)
 {
-	return *reinterpret_cast<u8*>(reinterpret_cast<u8*>(runtime) + 0x1701);
+	return ParticleWork(runtime).m_seKind;
 }
 
 static inline int& ParticleWorkSeParam(CFlatRuntime2* runtime)
 {
-	return *reinterpret_cast<int*>(reinterpret_cast<u8*>(runtime) + 0x1704);
+	return ParticleWork(runtime).m_seParam;
 }
 
 static inline int& ParticleWorkParamNo(CFlatRuntime2* runtime)
 {
-	return *reinterpret_cast<int*>(reinterpret_cast<u8*>(runtime) + 0x1710);
+	return ParticleWork(runtime).m_paramNo;
 }
 
 static inline short& ParticleWorkParamId(CFlatRuntime2* runtime)
 {
-	return *reinterpret_cast<short*>(reinterpret_cast<u8*>(runtime) + 0x1714);
+	return ParticleWork(runtime).m_paramId;
 }
 
 static inline int& ParticleWorkNoHi(CFlatRuntime2* runtime)
@@ -2044,22 +2064,22 @@ void CFlatRuntime2::drawLayer(
 void CFlatRuntime2::PutParticle(int workNo, Vec& pos, float scale)
 {
 	u8* runtime = reinterpret_cast<u8*>(this);
-	*reinterpret_cast<CParticleWork*>(runtime + 0x16CC) = CParticleWork();
+	ParticleWork(this) = CParticleWork();
 
-	runtime[0x16F8] = 1;
+	ParticleWork(this).m_enable = 1;
 	*reinterpret_cast<int*>(runtime + 0x1738) = workNo >> 8;
-	*reinterpret_cast<int*>(runtime + 0x16DC) = 0;
+	ParticleWork(this).m_arg = 0;
 	*reinterpret_cast<unsigned int*>(runtime + 0x173C) = static_cast<unsigned int>(workNo) & 0xFF;
 	*reinterpret_cast<float*>(runtime + 0x1740) = pos.x;
 	*reinterpret_cast<float*>(runtime + 0x1744) = pos.y;
 	*reinterpret_cast<float*>(runtime + 0x1748) = pos.z;
 	*reinterpret_cast<float*>(runtime + 0x1750) = 0.0f;
-	*reinterpret_cast<float**>(runtime + 0x16CC) = reinterpret_cast<float*>(runtime + 0x1740);
-	*reinterpret_cast<float**>(runtime + 0x16D0) = reinterpret_cast<float*>(runtime + 0x174C);
+	ParticleWorkPosPtr(this) = ParticleWorkPosValues(this);
+	ParticleWorkPosVecPtr(this) = ParticleWorkPosVecValues(this);
 	*reinterpret_cast<float*>(runtime + 0x1760) = scale;
 	*reinterpret_cast<float*>(runtime + 0x175C) = scale;
 	*reinterpret_cast<float*>(runtime + 0x1758) = scale;
-	*reinterpret_cast<float**>(runtime + 0x16D4) = reinterpret_cast<float*>(runtime + 0x1758);
+	ParticleWorkScalePtr(this) = ParticleWorkScaleValues(this);
 
 	PartMng.pppCreate(
 		*reinterpret_cast<int*>(runtime + 0x1738), *reinterpret_cast<unsigned int*>(runtime + 0x173C),
@@ -2094,11 +2114,11 @@ void CFlatRuntime2::PutParticleWork()
 void CFlatRuntime2::ResetParticleWork(int workNo, int arg)
 {
 	u8* runtime = reinterpret_cast<u8*>(this);
-	*reinterpret_cast<CParticleWork*>(runtime + 0x16CC) = CParticleWork();
+	ParticleWork(this) = CParticleWork();
 
-	runtime[0x16F8] = 1;
+	ParticleWork(this).m_enable = 1;
 	ParticleWorkNoHi(this) = workNo >> 8;
-	*reinterpret_cast<int*>(runtime + 0x16DC) = arg;
+	ParticleWork(this).m_arg = arg;
 	ParticleWorkNoLo(this) = static_cast<unsigned int>(workNo) & 0xFF;
 }
 
@@ -2143,11 +2163,11 @@ void CFlatRuntime2::SetParticleWorkPos(Vec& vec, float angle)
  */
 void CFlatRuntime2::SetParticleWorkTarget(Vec& vec)
 {
-	u8* self = reinterpret_cast<u8*>(this);
-	*reinterpret_cast<float*>(self + 0x1764) = vec.x;
-	*reinterpret_cast<float*>(self + 0x1768) = vec.y;
-	*reinterpret_cast<float*>(self + 0x176C) = vec.z;
-	*reinterpret_cast<float**>(self + 0x16D8) = reinterpret_cast<float*>(self + 0x1764);
+	u8* runtime = reinterpret_cast<u8*>(this);
+	ParticleWorkTargetX(this) = vec.x;
+	ParticleWorkTargetY(this) = vec.y;
+	ParticleWorkTargetZ(this) = vec.z;
+	*reinterpret_cast<float**>(runtime + 0x16D8) = reinterpret_cast<float*>(runtime + 0x1764);
 }
 
 /*
@@ -2181,11 +2201,11 @@ void CFlatRuntime2::SetParticleWorkVector(float angle1, float angle2)
  */
 void CFlatRuntime2::SetParticleWorkScale(float scale)
 {
-	u8* self = reinterpret_cast<u8*>(this);
-	*reinterpret_cast<float*>(self + 0x1760) = scale;
-	*reinterpret_cast<float*>(self + 0x175C) = scale;
-	*reinterpret_cast<float*>(self + 0x1758) = scale;
-	*reinterpret_cast<float**>(self + 0x16D4) = reinterpret_cast<float*>(self + 0x1758);
+	u8* runtime = reinterpret_cast<u8*>(this);
+	ParticleWorkScaleZ(this) = scale;
+	ParticleWorkScaleY(this) = scale;
+	ParticleWorkScaleX(this) = scale;
+	*reinterpret_cast<float**>(runtime + 0x16D4) = reinterpret_cast<float*>(runtime + 0x1758);
 }
 
 /*

@@ -28,8 +28,6 @@ extern "C" double cos(double);
 extern "C" int CrossCheckSphereVector__5CMathFP3VecPfP3VecP3VecP3Vecf(
     CMath*, Vec*, float*, Vec*, Vec*, Vec*, float, float, float);
 extern "C" int CalcHitSlide__7CMapObjFP3Vecf(void*, Vec*);
-extern "C" void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
-extern "C" void GetHitFaceNormal__7CMapObjFP3Vec(void*, Vec*);
 extern "C" void* CreateFromScript__9CGItemObjFiiiP8CGObjectfPQ29CGItemObj4CCFS(
     int, int, int, CGObject*, float, void*);
 extern double DOUBLE_803303e8;
@@ -1052,9 +1050,7 @@ void CGObject::bgNormalCollision()
         if (mapGroup != 0) {
             m_lastBgGroup = static_cast<short>(mapGroup);
         }
-        GetHitFaceNormal__7CMapObjFP3Vec(
-            MapMng.m_hitMapObj,
-            reinterpret_cast<Vec*>(&m_hitNormal.y));
+        MapMng.m_hitMapObj->GetHitFaceNormal(reinterpret_cast<Vec*>(&m_hitNormal.y));
     }
 
     if (CalcHitSlide__7CMapObjFP3Vecf(MapMng.m_hitMapObj, &move) != 0) {
@@ -1072,7 +1068,7 @@ void CGObject::bgNormalCollision()
 
         if (MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&hitCylinder), &move, hitMask) != 0) {
             Vec hitPos;
-            CalcHitPosition__7CMapObjFP3Vec(MapMng.m_hitMapObj, &hitPos);
+            MapMng.m_hitMapObj->CalcHitPosition(&hitPos);
             PSVECSubtract(&hitPos, &pos, &move);
         }
     }
@@ -1159,7 +1155,7 @@ void CGObject::bgWorldCollision()
         return;
     }
 
-    CalcHitPosition__7CMapObjFP3Vec(MapMng.m_hitMapObj, &radial);
+    MapMng.m_hitMapObj->CalcHitPosition(&radial);
     CVector hitWorldPosition(m_worldPosition);
     CVector newOffset;
     PSVECSubtract(&radial, reinterpret_cast<Vec*>(&hitWorldPosition), reinterpret_cast<Vec*>(&newOffset));
@@ -1175,9 +1171,7 @@ void CGObject::bgWorldCollision()
         if (mapGroup != 0) {
             m_lastBgGroup = static_cast<short>(mapGroup);
         }
-        GetHitFaceNormal__7CMapObjFP3Vec(
-            MapMng.m_hitMapObj,
-            reinterpret_cast<Vec*>(&m_hitNormal.y));
+        MapMng.m_hitMapObj->GetHitFaceNormal(reinterpret_cast<Vec*>(&m_hitNormal.y));
     }
 }
 
@@ -1226,7 +1220,7 @@ void CGObject::bgAttribCollision()
         if (MapMng.CheckHitCylinderNear(
                 reinterpret_cast<CMapCylinder*>(&charmCylinder), reinterpret_cast<Vec*>(&probeMove), 0x80000000) != 0) {
             Vec hitPos;
-            CalcHitPosition__7CMapObjFP3Vec(MapMng.m_hitMapObj, &hitPos);
+            MapMng.m_hitMapObj->CalcHitPosition(&hitPos);
             m_bgCharmFactor = m_worldPosition.y - hitPos.y;
             *(reinterpret_cast<u8*>(&m_shieldNodeFlags)) |= 0x20;
         }
@@ -3172,8 +3166,7 @@ void CGObject::SetPosBG(Vec* position, int useCapsuleOffset)
             u32 hitMask = m_bgHitMask;
             if (MapMng.CheckHitCylinderNear(
                     reinterpret_cast<CMapCylinder*>(&bodyCylinder), &bodyCylinder.m_direction, hitMask) != 0) {
-                CalcHitPosition__7CMapObjFP3Vec(
-                    MapMng.m_hitMapObj, &m_worldPosition);
+                MapMng.m_hitMapObj->CalcHitPosition(&m_worldPosition);
             }
         }
 
@@ -3401,8 +3394,7 @@ float CGObject::CalcSafePos(int hitMask, CGObject* other, Vec* outSafePos)
     hitCylinder.m_height2 = sZeroFloat;
 
     if (MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&hitCylinder), &hitMove, hitMask) != 0) {
-        CalcHitPosition__7CMapObjFP3Vec(MapMng.m_hitMapObj,
-                                        &centerPos);
+        MapMng.m_hitMapObj->CalcHitPosition(&centerPos);
         centerPos.y -= m_capsuleHalfHeight;
         *outSafePos = centerPos;
         safeDistance = PSVECDistance(&m_worldPosition, &centerPos);
@@ -3425,8 +3417,7 @@ float CGObject::CalcSafePos(int hitMask, CGObject* other, Vec* outSafePos)
         safeCylinder.m_height2 = sZeroFloat;
 
         if (MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&safeCylinder), &hitMove, hitMask) != 0) {
-            CalcHitPosition__7CMapObjFP3Vec(MapMng.m_hitMapObj,
-                                            &centerPos);
+            MapMng.m_hitMapObj->CalcHitPosition(&centerPos);
             safeDistance = (m_capsuleHalfHeight + other->m_capsuleHalfHeight) -
                            PSVECDistance(&m_worldPosition, &centerPos);
         }

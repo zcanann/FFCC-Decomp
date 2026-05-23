@@ -38,7 +38,6 @@ extern "C" {
 void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
     void*, long, float&, float&, float&, float, float&, float&);
 int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, void*, void*, u32);
-void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
 int GetCharaNodeFrameMatrix__FP9_pppMngStfPA4_f(_pppMngSt*, float, Mtx);
 int GetTextureFromRSD__FiP9_pppEnvSt(int, _pppEnvSt*);
 }
@@ -453,7 +452,7 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtr
 		int hit = 0;
 		if (check != 0) {
 			hit = 1;
-			CalcHitPosition__7CMapObjFP3Vec(*(void**)((u8*)&MapMng + 0x22A78), &work->m_points[i]);
+			MapMng.m_hitMapObj->CalcHitPosition(&work->m_points[i]);
 			work->m_length = PSVECDistance(&work->m_points[i], &work->m_origin);
 		} else {
 			if (i == 0) {

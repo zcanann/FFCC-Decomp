@@ -2993,14 +2993,14 @@ int CMapMng::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long m
     for (int i = 0; i < *reinterpret_cast<short*>(Ptr(this, 8)); i++) {
         COctTree* octTree = reinterpret_cast<COctTree*>(Ptr(this, 0x14 + (i * 0x4C)));
         if (octTree->CheckHitCylinder(cylinder, move, mask) != 0) {
-            *reinterpret_cast<void**>(Ptr(this, 0x22A78)) = *reinterpret_cast<void**>(Ptr(octTree, 8));
+            m_hitMapObj = *reinterpret_cast<CMapObj**>(Ptr(octTree, 8));
             return 1;
         }
     }
 
     for (int i = 0; i < *reinterpret_cast<short*>(Ptr(this, 0xC)); i++) {
         CMapObj* mapObj = reinterpret_cast<CMapObj*>(Ptr(this, 0x954 + (i * 0xF0)));
-        *reinterpret_cast<CMapObj**>(Ptr(this, 0x22A78)) = mapObj;
+        m_hitMapObj = mapObj;
         if (mapObj->CheckHitCylinder(cylinder, move, mask) != 0) {
             return 1;
         }
@@ -3050,7 +3050,7 @@ int CMapMng::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned lo
         octTree->CheckHitCylinderNear(cylinder, move, mask);
         if (DAT_8032ec88 != 0) {
             hit = 1;
-            *reinterpret_cast<void**>(Ptr(this, 0x22A78)) = *reinterpret_cast<void**>(Ptr(octTree, 8));
+            m_hitMapObj = *reinterpret_cast<CMapObj**>(Ptr(octTree, 8));
         }
     }
 
@@ -3060,7 +3060,7 @@ int CMapMng::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned lo
         mapObj->CheckHitCylinderNear(cylinder, move, mask);
         if (DAT_8032ec88 != 0) {
             hit = 1;
-            *reinterpret_cast<CMapObj**>(Ptr(this, 0x22A78)) = mapObj;
+            m_hitMapObj = mapObj;
         }
     }
 

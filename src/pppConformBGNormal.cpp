@@ -30,12 +30,6 @@ struct ConformBgNormalState {
 
 void pppSetFpMatrix(_pppMngSt*);
 
-extern "C" {
-void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
-void GetHitFaceNormal__7CMapObjFP3Vec(void*, Vec*);
-
-}
-
 struct CMapCylinderRaw {
     Vec m_bottom;
     u8 m_pad0C[0x0C];
@@ -152,8 +146,8 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
                 checkResult = MapMng.CheckHitCylinderNear((CMapCylinder*)&firstCylinder, &firstRayDirection, 0xffffffff);
                 hitFound = checkResult;
                 if (checkResult != 0) {
-                    CalcHitPosition__7CMapObjFP3Vec(*(void**)((u8*)&MapMng + 0x22A78), &local_170);
-                    GetHitFaceNormal__7CMapObjFP3Vec(*(void**)((u8*)&MapMng + 0x22A78), &local_164);
+                    MapMng.m_hitMapObj->CalcHitPosition(&local_170);
+                    MapMng.m_hitMapObj->GetHitFaceNormal(&local_164);
                     if ((matrixY - 10.0f) > local_170.y) {
                         local_170.y = matrixY;
                     }
@@ -261,7 +255,7 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
                     hitFound = MapMng.CheckHitCylinderNear(
                         (CMapCylinder*)&secondCylinder, &secondRayDirection, 0xffffffff);
                     if (hitFound != 0) {
-                        CalcHitPosition__7CMapObjFP3Vec(*(void**)((u8*)&MapMng + 0x22A78), &local_170);
+                        MapMng.m_hitMapObj->CalcHitPosition(&local_170);
                         pppMngStPtr->m_matrix.value[0][3] = local_170.x;
                         pppMngStPtr->m_matrix.value[1][3] = local_170.y;
                         pppMngStPtr->m_matrix.value[2][3] = local_170.z;

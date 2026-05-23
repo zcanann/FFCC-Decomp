@@ -762,7 +762,7 @@ void CCharaPcs::Init()
     }
 
     m_charaAllocStage = 0;
-    *reinterpret_cast<int*>(Ptr(this, 0x24)) = 0;
+    m_overlapEnabled = 0;
     CColor baseColor(0x00, 0x00, 0x40, 0x40);
     m_texShadowColor = baseColor.color;
 
@@ -1119,7 +1119,7 @@ void CCharaPcs::onScriptChanging(char*)
         fadeColor += 4;
     }
 
-    *reinterpret_cast<int*>(Ptr(this, 0x24)) = 0;
+    m_overlapEnabled = 0;
     m_charaAllocStage = 0;
     m_texShadowSize = 0x80;
     m_texShadowDistance = 100;
@@ -2109,7 +2109,7 @@ void CCharaPcs::loadAnimBuffer(void*, char*, int, int, int, int)
  */
 void CCharaPcs::drawOverlap()
 {
-    if (*reinterpret_cast<int*>(Ptr(this, 0x24)) == 0) {
+    if (m_overlapEnabled == 0) {
         return;
     }
 
@@ -2161,7 +2161,7 @@ void CCharaPcs::drawOverlap()
     PSMTX44Copy(CameraPcs.m_screenMatrix, projectionMtx);
     GXSetProjection(projectionMtx, GX_PERSPECTIVE);
 
-    C_MTXLookAt(lookAtMtx, reinterpret_cast<Point3d*>(Ptr(this, 0x2C)), &up, reinterpret_cast<Point3d*>(Ptr(this, 0x38)));
+    C_MTXLookAt(lookAtMtx, &m_overlapEyePos, &up, &m_overlapTargetPos);
     PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
 
     SetupBaseCharaLights(this);
@@ -2178,7 +2178,7 @@ void CCharaPcs::drawOverlap()
     GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_SPEC);
     GXSetChanCtrl(GX_COLOR1A1, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
 
-    black.a = static_cast<unsigned char>(*reinterpret_cast<unsigned int*>(Ptr(this, 0x28)) & 0xFF);
+    black.a = static_cast<unsigned char>(m_overlapAlpha & 0xFF);
     GXSetChanMatColor(GX_COLOR0A0, black);
     PSMTXIdentity(identityMtx);
     GXLoadPosMtxImm(identityMtx, GX_PNMTX0);

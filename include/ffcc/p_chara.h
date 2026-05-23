@@ -204,7 +204,11 @@ public:
     void createViewer();
     void destroyViewer();
 
-    u8 _pad004[0x40];                         // 0x004
+    u8 _pad004[0x20];                         // 0x004
+    int m_overlapEnabled;                     // 0x024
+    u32 m_overlapAlpha;                       // 0x028
+    Vec m_overlapEyePos;                      // 0x02C
+    Vec m_overlapTargetPos;                   // 0x038
     int m_texShadowSize;                      // 0x044
     int m_texShadowDistance;                  // 0x048
     CHandle* m_handleList;                    // 0x04C

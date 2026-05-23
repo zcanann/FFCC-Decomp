@@ -85,7 +85,6 @@ struct SingMenuSoloNameTable
     char* entries[9];
 };
 
-extern "C" void DrawHeart__8CMesMenuFffff(void*, float, float, float, float);
 extern "C" char* s_stand_80332a24;
 char s_singmenu_cpp_801de8d4[] = "singmenu.cpp";
 extern "C" char* s_dvd__smenu__s_tex_801de8e4;
@@ -3280,8 +3279,8 @@ void CMenuPcs::DrawSingLife()
 
     int halfHearts = static_cast<unsigned int>(*reinterpret_cast<unsigned short*>(scriptFood + 0x1A) >> 1);
     float x = FLOAT_80332918 + static_cast<float>(((8 - halfHearts) * 0x18) / 2);
-    DrawHeart__8CMesMenuFffff(*reinterpret_cast<void**>(reinterpret_cast<u8*>(this) + 0x268), x, y - FLOAT_80332930, FLOAT_80332934,
-                              FLOAT_80332934);
+    reinterpret_cast<CMesMenu*>(*reinterpret_cast<void**>(reinterpret_cast<u8*>(this) + 0x268))
+        ->DrawHeart(x, y - FLOAT_80332930, FLOAT_80332934, FLOAT_80332934);
 }
 
 /*

@@ -79,11 +79,7 @@ static inline float LoadFloat(const float& value)
 }
 
 extern "C" {
-void* GetCharaHandlePtr__FP8CGObjectl(void* obj, long index);
-int GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void* handle);
-int GetTextureFromRSD__FiP9_pppEnvSt(int, _pppEnvSt*);
 void InitTexObj__8CTextureFv(void*);
-void genParaboloidMap__FPvPUlUs9_GXVtxFmt(void*, unsigned long*, unsigned short, GXVtxFmt);
 }
 
 static int CreateWaterMesh(Vec* param_1, Vec* param_2, Vec2d* param_3, unsigned short* param_4, float param_5);
@@ -814,8 +810,8 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
         return;
     }
 
-    handle = GetCharaHandlePtr__FP8CGObjectl(gObject, 0);
-    model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
+    handle = GetCharaHandlePtr(gObject, 0);
+    model = reinterpret_cast<int>(GetCharaModelPtr(reinterpret_cast<CCharaPcs::CHandle*>(handle)));
     *(u32*)(model + 0xF0) = 0;
     *(u32*)(model + 0xFC) = 0;
 
@@ -948,8 +944,8 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
     }
 
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
-    handle = GetCharaHandlePtr__FP8CGObjectl(gObject, 0);
-    model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
+    handle = GetCharaHandlePtr(gObject, 0);
+    model = reinterpret_cast<int>(GetCharaModelPtr(reinterpret_cast<CCharaPcs::CHandle*>(handle)));
     *(u32*)(model + 0xF0) = (u32)Mana2_BeforeDrawCallback;
     *(u32*)(model + 0xFC) = (u32)Mana2_DrawMeshDLCallback;
 }
@@ -1010,8 +1006,8 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* para
         return;
     }
 
-    handle = GetCharaHandlePtr__FP8CGObjectl(gObject, 0);
-    model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
+    handle = GetCharaHandlePtr(gObject, 0);
+    model = reinterpret_cast<int>(GetCharaModelPtr(reinterpret_cast<CCharaPcs::CHandle*>(handle)));
     *((u8*)param_2 + 0x24) = 0;
     work[0x1C] = (u32)param_2;
     if (Game.m_currentMapId == 0x21) {
@@ -1035,14 +1031,14 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* para
     *(u32*)(model + 0xE8) = (u32)param_2;
     *(u32*)(model + 0xF0) = (u32)Mana2_BeforeDrawCallback;
     *(u32*)(model + 0xFC) = (u32)Mana2_DrawMeshDLCallback;
-    work[2] = (u32)GetTextureFromRSD__FiP9_pppEnvSt(*(s32*)((char*)param_2 + 0x8), pppEnvStPtr);
-    work[3] = (u32)GetTextureFromRSD__FiP9_pppEnvSt(*(s32*)((char*)param_2 + 0xC), pppEnvStPtr);
-    work[4] = (u32)GetTextureFromRSD__FiP9_pppEnvSt(*(s32*)((char*)param_2 + 0x10), pppEnvStPtr);
-    work[5] = (u32)GetTextureFromRSD__FiP9_pppEnvSt(*(s32*)((char*)param_2 + 0x14), pppEnvStPtr);
-    work[6] = (u32)GetTextureFromRSD__FiP9_pppEnvSt(*(s32*)((char*)param_2 + 0x18), pppEnvStPtr);
-    work[7] = (u32)GetTextureFromRSD__FiP9_pppEnvSt(*(s32*)((char*)param_2 + 0x1C), pppEnvStPtr);
-    work[0x1E] = (u32)GetTextureFromRSD__FiP9_pppEnvSt(*(s32*)((char*)param_2 + 0x28), pppEnvStPtr);
-    work[0x1F] = (u32)GetTextureFromRSD__FiP9_pppEnvSt(*(s32*)((char*)param_2 + 0x2C), pppEnvStPtr);
+    work[2] = static_cast<u32>(GetTextureFromRSD(*(s32*)((char*)param_2 + 0x8), pppEnvStPtr));
+    work[3] = static_cast<u32>(GetTextureFromRSD(*(s32*)((char*)param_2 + 0xC), pppEnvStPtr));
+    work[4] = static_cast<u32>(GetTextureFromRSD(*(s32*)((char*)param_2 + 0x10), pppEnvStPtr));
+    work[5] = static_cast<u32>(GetTextureFromRSD(*(s32*)((char*)param_2 + 0x14), pppEnvStPtr));
+    work[6] = static_cast<u32>(GetTextureFromRSD(*(s32*)((char*)param_2 + 0x18), pppEnvStPtr));
+    work[7] = static_cast<u32>(GetTextureFromRSD(*(s32*)((char*)param_2 + 0x1C), pppEnvStPtr));
+    work[0x1E] = static_cast<u32>(GetTextureFromRSD(*(s32*)((char*)param_2 + 0x28), pppEnvStPtr));
+    work[0x1F] = static_cast<u32>(GetTextureFromRSD(*(s32*)((char*)param_2 + 0x2C), pppEnvStPtr));
 
     if (work[0x1D] == 0) {
         work[0x1D] = (u32)pppMemAlloc(0xC0, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppMana2_cpp_801DC4E0), 0x1D7);
@@ -1083,7 +1079,7 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* para
 
     if (work[9] == 0) {
         work[9] = (u32)pppMemAlloc(0xA5E8, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppMana2_cpp_801DC4E0), 0x211);
-        genParaboloidMap__FPvPUlUs9_GXVtxFmt((void*)work[9], &work[0x39], 0x1E, GX_VTXFMT7);
+        genParaboloidMap((void*)work[9], &work[0x39], 0x1E, GX_VTXFMT7);
     }
 
     meshData = *(s32*)(model + 0xAC);
@@ -1236,8 +1232,8 @@ void pppDestructMana2(pppMana2* pppMana2, pppMana2UnkC* param_2)
     work = (u32*)((char*)pppMana2 + 0x80 + *(s32*)((char*)param_2 + 0xC));
     gObject = *(CGObject**)((char*)pppMngStPtr + 0xDC);
     if (gObject != NULL) {
-        handle = GetCharaHandlePtr__FP8CGObjectl(gObject, 0);
-        model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
+        handle = GetCharaHandlePtr(gObject, 0);
+        model = reinterpret_cast<int>(GetCharaModelPtr(reinterpret_cast<CCharaPcs::CHandle*>(handle)));
         *(u32*)(model + 0xE4) = 0;
         *(u32*)(model + 0xE8) = 0;
         *(u32*)(model + 0xF0) = 0;
@@ -1408,8 +1404,8 @@ void pppConstructMana2(pppMana2* pppMana2, pppMana2UnkC* param_2)
     gObject = *(CGObject**)((char*)pppMngStPtr + 0xDC);
     gObject->m_stepSlopeLimit = LoadFloat(FLOAT_803318fc);
 
-    handle = GetCharaHandlePtr__FP8CGObjectl(gObject, 0);
-    GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
+    handle = GetCharaHandlePtr(gObject, 0);
+    GetCharaModelPtr(reinterpret_cast<CCharaPcs::CHandle*>(handle));
     model = *(u32*)((char*)handle + 0x168);
     *(u32*)(model + 0x98) = 0x3F;
     work[1] = (u32)pppMngStPtr;

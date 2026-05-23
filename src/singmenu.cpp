@@ -87,8 +87,8 @@ struct SingMenuSoloNameTable
 
 extern "C" char* s_stand_80332a24;
 char s_singmenu_cpp_801de8d4[] = "singmenu.cpp";
-extern "C" char* s_dvd__smenu__s_tex_801de8e4;
-extern "C" char s_dvd__smenu_subfont_fnt_801de8f8[];
+extern "C" char* s_singMenuTexturePathFmt;
+extern "C" char s_singMenuSubfontPathFmt[];
 extern "C" char* PTR_s_Tutti_802143ec;
 extern "C" char* PTR_s_Alle_Rassen_8021430c;
 extern "C" char* PTR_s_Todos_802145ac;
@@ -937,7 +937,7 @@ void CMenuPcs::createSingleMenu()
         }
 
         char path[128];
-        sprintf(path, s_dvd__smenu_subfont_fnt_801de8f8, Game.GetLangString());
+        sprintf(path, s_singMenuSubfontPathFmt, Game.GetLangString());
         loadFont(1, path, 4, -1);
 
         self[0x85A] = 0;
@@ -1395,7 +1395,7 @@ void CMenuPcs::loadTextureAsync(char **, int, int, CMenuPcs::CTmp*, int, int, in
             if (*reinterpret_cast<int*>(self + 0x860) == 0) {
                 char path[260];
                 const char* language = Game.GetLangString();
-                sprintf(path, s_dvd__smenu__s_tex_801de8e4, language, PTR_s_solo1_80214b18.entries[loadIndex]);
+                sprintf(path, s_singMenuTexturePathFmt, language, PTR_s_solo1_80214b18.entries[loadIndex]);
                 gSingMenuAsyncFileHandle = File.Open(path, 0, CFile::PRI_LOW);
                 File.ReadASync(gSingMenuAsyncFileHandle);
                 *reinterpret_cast<int*>(self + 0x860) = *reinterpret_cast<int*>(self + 0x860) + 1;

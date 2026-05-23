@@ -2975,9 +2975,8 @@ void CMaterial::Create(unsigned long tag, CMaterialMan::TEV_BIT tevBit)
  * Address:	TODO
  * Size:	TODO
  */
-void CMaterial::IncNumTexture()
+inline void CMaterial::IncNumTexture()
 {
-	// TODO
 }
 
 /*
@@ -3367,9 +3366,8 @@ int CMaterial::Set(_GXTexMapID texMapId)
  * Address:	TODO
  * Size:	TODO
  */
-void CMaterial::SetTevBit(CMaterialMan::TEV_BIT)
+inline void CMaterial::SetTevBit(CMaterialMan::TEV_BIT)
 {
-	// TODO
 }
 
 /*
@@ -3377,9 +3375,8 @@ void CMaterial::SetTevBit(CMaterialMan::TEV_BIT)
  * Address:	TODO
  * Size:	TODO
  */
-void CMaterial::GetNumTexture()
+inline void CMaterial::GetNumTexture()
 {
-	// TODO
 }
 
 /*
@@ -3387,9 +3384,8 @@ void CMaterial::GetNumTexture()
  * Address:	TODO
  * Size:	TODO
  */
-void CMaterial::SetTag(int)
+inline void CMaterial::SetTag(int)
 {
-	// TODO
 }
 
 /*
@@ -3397,7 +3393,6 @@ void CMaterial::SetTag(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CMaterial::AddTextureIdx(int, int)
+inline void CMaterial::AddTextureIdx(int, int)
 {
-	// TODO
 }

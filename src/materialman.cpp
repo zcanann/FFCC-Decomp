@@ -473,7 +473,7 @@ CMaterialMan::CMaterialMan()
 void CMaterialMan::Init()
 {
 	m_materialStage = Memory.CreateStage(0x20000, const_cast<char*>(s_materialStageName), 0);
-	m_unknown204 = 0x30;
+	m_fullShadowTevColor = 0x30;
 }
 
 /*
@@ -1100,7 +1100,7 @@ void CMaterialMan::addtev_full_shadow(long index)
                       0x7D);
 
     GXColor tevColor;
-    *reinterpret_cast<unsigned int*>(&tevColor) = static_cast<unsigned int>(*Ptr(this, 0x204));
+    *reinterpret_cast<unsigned int*>(&tevColor) = static_cast<unsigned int>(m_fullShadowTevColor);
     GXSetTevColor(static_cast<GXTevRegID>(1), tevColor);
 
     unsigned int stage = m_numTevStage;

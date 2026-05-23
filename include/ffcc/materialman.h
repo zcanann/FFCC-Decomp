@@ -120,7 +120,7 @@ private:
     int m_shadowTexMtxIds[5];            // 0x16C
     int m_shadowTexCoordIds[5];          // 0x180
     unsigned char m_pad194[0x70];
-    unsigned char m_unknown204;          // 0x204
+    unsigned char m_fullShadowTevColor;  // 0x204
     unsigned char m_blendMode;           // 0x205
     unsigned char m_fogEnable;           // 0x206
     unsigned char m_blendOverrideMode;   // 0x207

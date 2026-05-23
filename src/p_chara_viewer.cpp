@@ -68,7 +68,6 @@ extern "C" const double kCharaSharedSignedIntBias = 4503601774854144.0;
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
-extern "C" void Printf__8CGraphicFPce(void*, const char*, ...);
 extern "C" void* createTextureSet__9CCharaPcsFPvi(void*, void*, int);
 extern "C" float FLOAT_80330BEC;
 extern "C" float FLOAT_80330BF0;
@@ -309,7 +308,7 @@ void CCharaPcs::drawViewer()
         CChara::CModel* model = self->m_viewerModel[i];
         if (model != 0) {
             if (ViewerModelTextureSet(model) == 0) {
-                Printf__8CGraphicFPce(&Graphic, s_no_texture);
+                Graphic.Printf(const_cast<char*>(s_no_texture));
             } else {
                 CStopWatch watch(const_cast<char*>(kCharaViewerNoName));
                 watch.Reset();
@@ -340,7 +339,7 @@ void CCharaPcs::drawViewer()
                 if (i == 0) {
                     float totalTime = watch.Get();
                     float gpuTime = totalTime - cpuTime;
-                    Printf__8CGraphicFPce(&Graphic, s_gpu_profile_fmt, totalTime, cpuTime, gpuTime);
+                    Graphic.Printf(const_cast<char*>(s_gpu_profile_fmt), totalTime, cpuTime, gpuTime);
                 }
             }
         }
@@ -494,9 +493,9 @@ void CCharaPcs::calcViewer()
         initAlive = 1;
     }
     alive++;
-    Printf__8CGraphicFPce(&Graphic, kCharaViewerChoiceFmt,
-                          (int)(char)pFan[(alive >> 4) % 4],
-                          USBPcs.m_rootPath);
+    Graphic.Printf(const_cast<char*>(kCharaViewerChoiceFmt),
+                   (int)(char)pFan[(alive >> 4) % 4],
+                   USBPcs.m_rootPath);
 
     unsigned short heldButtons;
     unsigned short triggerButtons;
@@ -673,7 +672,7 @@ void CCharaPcs::calcViewer()
                 float animFrames = (float)*reinterpret_cast<unsigned short*>(
                     reinterpret_cast<unsigned char*>(modelAnim) + 0x10);
                 float frame = (float)fmod((double)ViewerModelTime(model), (double)(frameAdvance + animFrames));
-                Printf__8CGraphicFPce(&Graphic, s_frame_speed_fmt, frame, frameAdvance);
+                Graphic.Printf(const_cast<char*>(s_frame_speed_fmt), frame, frameAdvance);
             }
             if (self->m_viewerSavedAnim != 0) {
                 const char* iframeMode = kCharaViewerOff;
@@ -684,13 +683,13 @@ void CCharaPcs::calcViewer()
                 if (self->m_viewerSavedAnimState == 0) {
                     iframeState = kCharaViewerOrg;
                 }
-                Printf__8CGraphicFPce(&Graphic, s_iframe_fmt, iframeMode, self->m_viewerSavedFrame, iframeState);
+                Graphic.Printf(const_cast<char*>(s_iframe_fmt), iframeMode, self->m_viewerSavedFrame, iframeState);
             }
             if (self->m_viewerAnimLoadedCount != 0) {
-                Printf__8CGraphicFPce(&Graphic, s_cont_fmt, self->m_viewerAnimLoopIndex);
+                Graphic.Printf(const_cast<char*>(s_cont_fmt), self->m_viewerAnimLoopIndex);
             }
-            Printf__8CGraphicFPce(&Graphic, s_cpu_profile_fmt, matrixTime + skinTime, matrixTime, skinTime,
-                                  ViewerModelNodeCount(model));
+            Graphic.Printf(const_cast<char*>(s_cpu_profile_fmt), matrixTime + skinTime, matrixTime, skinTime,
+                           ViewerModelNodeCount(model));
         }
     }
 }

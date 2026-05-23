@@ -1,13 +1,12 @@
 #include <dolphin.h>
 #include "global.h"
 #include "__ppc_eabi_linker.h"
+#include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/abort_exit.h"
 
 extern void InitMetroTRK();
-extern void exit(int);
 extern int main(int argc, char* argv[]);
 extern void __init_user(void);
 extern void InitMetroTRK_BBA(void);
-extern void DBInit();
 
 SECTION_INIT extern void __check_pad3(void);
 SECTION_INIT extern void __set_debug_bba(void);

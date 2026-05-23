@@ -26,9 +26,6 @@ const char* __DSPVersion = sDSPStrings.version;
 #define DSP_INIT_BUILD_DATE_MSG sDSPStrings.initMsg
 #endif
 
-extern DSPTaskInfo* __DSP_rude_task;
-extern int __DSP_rude_task_pending;
-
 static BOOL __DSP_init_flag;
 
 

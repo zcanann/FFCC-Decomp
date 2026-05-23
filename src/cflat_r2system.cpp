@@ -490,7 +490,14 @@ void CCharaPcs::SetTexShadowRadius(float texShadowRadius)
  */
 void CCharaPcs::SetTexShadowColor(_GXColor color)
 {
-    m_texShadowColor = color;
+    unsigned char r = color.r;
+    unsigned char g = color.g;
+    m_texShadowColor.r = r;
+    unsigned char b = color.b;
+    m_texShadowColor.g = g;
+    unsigned char a = color.a;
+    m_texShadowColor.b = b;
+    m_texShadowColor.a = a;
 }
 
 /*
@@ -865,7 +872,7 @@ done_check:
  */
 void CCharaPcs::SetMapShadeColor(int shadeIndex, CColor color)
 {
-    m_viewerChoiceColor[shadeIndex] = color;
+    m_viewerChoiceColor[shadeIndex].color = color.color;
 }
 
 /*

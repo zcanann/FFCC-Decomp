@@ -67,8 +67,8 @@ public:
     GXTlutObj m_tlutObj0;
     GXTlutObj m_tlutObj1;
     unsigned int m_format;
-    int m_width;
-    int m_height;
+    unsigned int m_width;
+    unsigned int m_height;
     int m_wrapMode;
     unsigned char m_isIntensityAlpha;
     unsigned char m_isAlphaLut;

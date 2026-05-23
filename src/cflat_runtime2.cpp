@@ -33,13 +33,8 @@ inline void* operator new(unsigned long, void* ptr)
 }
 
 extern "C" void StaticFrame__10CGCharaObjFv();
-extern "C" void Frame__12CFlatRuntimeFii(CFlatRuntime*, int, int);
-extern "C" void Create__12CFlatRuntimeFPv(CFlatRuntime*, void*);
-extern "C" int CreateDebug__12CFlatRuntimeFPvi(CFlatRuntime*, void*, int);
-extern "C" void Destroy__12CFlatRuntimeFv(CFlatRuntime*);
 extern "C" void Destroy__9CFlatDataFv(void*);
 extern "C" void* __register_global_object(void* object, void* destructor, void* regmem);
-extern "C" void AfterFrame__12CFlatRuntimeFi(CFlatRuntime*, int);
 extern "C" void __dt__12CFlatRuntimeFv(CFlatRuntime*, int);
 extern "C" void* __vt__13CFlatRuntime2[];
 extern "C" CFlatRuntime2* __ct__13CFlatRuntime2Fv(CFlatRuntime2*);
@@ -498,7 +493,7 @@ CFlatRuntime2::~CFlatRuntime2()
 {
 	u8* runtime = reinterpret_cast<u8*>(this);
 	*reinterpret_cast<void***>(runtime) = __vt__13CFlatRuntime2;
-	AfterFrame__12CFlatRuntimeFi(reinterpret_cast<CFlatRuntime*>(this), 1);
+	reinterpret_cast<CFlatRuntime*>(this)->AfterFrame(1);
 	reinterpret_cast<CFlatData*>(runtime + 0xCF20)->~CFlatData();
 	__dt__12CFlatRuntimeFv(reinterpret_cast<CFlatRuntime*>(this), 0);
 }
@@ -904,7 +899,7 @@ void CFlatRuntime2::Frame(int arg0, int mode)
 	if (mode == 0) {
 		StaticFrame__10CGCharaObjFv();
 		CGPartyObj::CheckGameOver();
-		Frame__12CFlatRuntimeFii(reinterpret_cast<CFlatRuntime*>(this), arg0, mode);
+		reinterpret_cast<CFlatRuntime*>(this)->Frame(arg0, mode);
 
 		CFlatRuntime::CObject* const root =
 			reinterpret_cast<CFlatRuntime::CObject*>(reinterpret_cast<u8*>(this) + 0x8CC);
@@ -1008,7 +1003,7 @@ int CFlatRuntime2::Load(char* fileName)
 
 	File.Read(fileHandle);
 	File.SyncCompleted(fileHandle);
-	Create__12CFlatRuntimeFPv(reinterpret_cast<CFlatRuntime*>(this), File.m_readBuffer);
+	reinterpret_cast<CFlatRuntime*>(this)->Create(File.m_readBuffer);
 	File.Close(fileHandle);
 
 	typedef int (*NeedDebugDataFn)(CFlatRuntime2*);
@@ -1029,8 +1024,7 @@ int CFlatRuntime2::Load(char* fileName)
 
 			File.Read(fileHandle);
 			File.SyncCompleted(fileHandle);
-			debugChunk = CreateDebug__12CFlatRuntimeFPvi(
-				reinterpret_cast<CFlatRuntime*>(this), File.m_readBuffer, debugChunk);
+			debugChunk = reinterpret_cast<CFlatRuntime*>(this)->CreateDebug(File.m_readBuffer, debugChunk);
 			File.Close(fileHandle);
 
 			if (debugChunk == -1) {
@@ -1317,7 +1311,7 @@ CGItemObj* CFlatRuntime2::FindGItemObjNext(CGItemObj* gItemObj)
  */
 void CFlatRuntime2::Destroy()
 {
-	Destroy__12CFlatRuntimeFv(reinterpret_cast<CFlatRuntime*>(this));
+	reinterpret_cast<CFlatRuntime*>(this)->Destroy();
 	Destroy__9CFlatDataFv(reinterpret_cast<u8*>(this) + 0xCF20);
 
 	CFlatRuntime2* layer = this;

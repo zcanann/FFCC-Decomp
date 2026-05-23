@@ -341,25 +341,24 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
         MapMng.SetDrawRangeMapObj(DrawRangeDefault);
     }
 
-    *reinterpret_cast<void**>(reinterpret_cast<char*>(&MapMng) + 0x22994) = mapPtr;
-    *reinterpret_cast<void**>(reinterpret_cast<char*>(&MapMng) + 0x22998) = mapPtr;
-    *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(&MapMng) + 0x2299C) = mapSize;
-    *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(&MapMng) + 0x229A0) = 0;
-    *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(&MapMng) + 0x229A4) = 0;
+    MapMng.m_asyncLoadState.m_mapLoadStart = mapPtr;
+    MapMng.m_asyncLoadState.m_mapLoadCursor = mapPtr;
+    MapMng.m_asyncLoadState.m_mapLoadSize = mapSize;
+    MapMng.m_asyncLoadState.m_asyncReadIndex = 0;
+    MapMng.m_asyncLoadState.m_asyncOpenIndex = 0;
     if (mapSize != 0) {
         if (mode == 1) {
-            *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(&MapMng) + 0x229A8) = 2;
+            MapMng.m_asyncLoadState.m_mapReadMode = 2;
         } else if (mode == 2) {
-            char* mapMngBase = reinterpret_cast<char*>(&MapMng);
-            *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(&MapMng) + 0x229A8) = 3;
+            MapMng.m_asyncLoadState.m_mapReadMode = 3;
             for (int i = 0; i < 0x10; i++) {
-                *reinterpret_cast<void**>(mapMngBase + 0x22A2C + i * 4) = 0;
+                MapMng.m_asyncLoadState.m_asyncHandles[i] = 0;
             }
         } else {
-            *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(&MapMng) + 0x229A8) = 1;
+            MapMng.m_asyncLoadState.m_mapReadMode = 1;
         }
     } else {
-        *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(&MapMng) + 0x229A8) = 0;
+        MapMng.m_asyncLoadState.m_mapReadMode = 0;
     }
 
     MapMng.ReadMtx(mapPath);
@@ -398,9 +397,9 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
             System.Printf(
                 const_cast<char*>(s_map_load_ok_fmt),
                 mapPath,
-                (int)*reinterpret_cast<short*>(reinterpret_cast<char*>(&MapMng) + 0xC),
-                (int)*reinterpret_cast<short*>(reinterpret_cast<char*>(&MapMng) + 0x8),
-                (*reinterpret_cast<CMemory::CStage**>(&MapMng))->GetHeapUnuse() / 1024);
+                static_cast<int>(MapMng.m_mapObjCount),
+                static_cast<int>(MapMng.m_octTreeCount),
+                MapMng.m_stage->GetHeapUnuse() / 1024);
         }
 
         CPtrArray<CMapLightHolder*>& mapLightHolderArr =
@@ -429,42 +428,42 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
  */
 unsigned long long CMapPcs::IsLoadMapCompleted()
 {
-    CMapMng* mapMng = &MapMng;
+    void** handle = MapMng.m_asyncLoadState.m_asyncHandles;
     unsigned int value = 0;
 
     for (int count = 2; count != 0; count--) {
-        if (*reinterpret_cast<CFile::CHandle**>(reinterpret_cast<char*>(mapMng) + 0x22A2C) != 0) {
+        if (*handle != 0) {
             return (unsigned long long)value;
         }
-        mapMng = reinterpret_cast<CMapMng*>(reinterpret_cast<char*>(mapMng) + 4);
-        if (*reinterpret_cast<CFile::CHandle**>(reinterpret_cast<char*>(mapMng) + 0x22A2C) != 0) {
+        handle++;
+        if (*handle != 0) {
             return (unsigned long long)value;
         }
-        mapMng = reinterpret_cast<CMapMng*>(reinterpret_cast<char*>(mapMng) + 4);
-        if (*reinterpret_cast<CFile::CHandle**>(reinterpret_cast<char*>(mapMng) + 0x22A2C) != 0) {
+        handle++;
+        if (*handle != 0) {
             return (unsigned long long)value;
         }
-        mapMng = reinterpret_cast<CMapMng*>(reinterpret_cast<char*>(mapMng) + 4);
-        if (*reinterpret_cast<CFile::CHandle**>(reinterpret_cast<char*>(mapMng) + 0x22A2C) != 0) {
+        handle++;
+        if (*handle != 0) {
             return (unsigned long long)value;
         }
-        mapMng = reinterpret_cast<CMapMng*>(reinterpret_cast<char*>(mapMng) + 4);
-        if (*reinterpret_cast<CFile::CHandle**>(reinterpret_cast<char*>(mapMng) + 0x22A2C) != 0) {
+        handle++;
+        if (*handle != 0) {
             return (unsigned long long)value;
         }
-        mapMng = reinterpret_cast<CMapMng*>(reinterpret_cast<char*>(mapMng) + 4);
-        if (*reinterpret_cast<CFile::CHandle**>(reinterpret_cast<char*>(mapMng) + 0x22A2C) != 0) {
+        handle++;
+        if (*handle != 0) {
             return (unsigned long long)value;
         }
-        mapMng = reinterpret_cast<CMapMng*>(reinterpret_cast<char*>(mapMng) + 4);
-        if (*reinterpret_cast<CFile::CHandle**>(reinterpret_cast<char*>(mapMng) + 0x22A2C) != 0) {
+        handle++;
+        if (*handle != 0) {
             return (unsigned long long)value;
         }
-        mapMng = reinterpret_cast<CMapMng*>(reinterpret_cast<char*>(mapMng) + 4);
-        if (*reinterpret_cast<CFile::CHandle**>(reinterpret_cast<char*>(mapMng) + 0x22A2C) != 0) {
+        handle++;
+        if (*handle != 0) {
             return (unsigned long long)value;
         }
-        mapMng = reinterpret_cast<CMapMng*>(reinterpret_cast<char*>(mapMng) + 4);
+        handle++;
         value += 7;
     }
 
@@ -533,12 +532,12 @@ void CMapPcs::calc()
         LightPcs.DestroyBumpLightAll(static_cast<CLightPcs::TARGET>(1));
         MapMng.SetDrawRangeOctTree(DrawRangeDefault);
         MapMng.SetDrawRangeMapObj(DrawRangeDefault);
-        *reinterpret_cast<void**>(reinterpret_cast<char*>(&MapMng) + 0x22994) = 0;
-        *reinterpret_cast<void**>(reinterpret_cast<char*>(&MapMng) + 0x22998) = 0;
-        *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(&MapMng) + 0x2299C) = 0;
-        *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(&MapMng) + 0x229A0) = 0;
-        *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(&MapMng) + 0x229A4) = 0;
-        *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(&MapMng) + 0x229A8) = 0;
+        MapMng.m_asyncLoadState.m_mapLoadStart = 0;
+        MapMng.m_asyncLoadState.m_mapLoadCursor = 0;
+        MapMng.m_asyncLoadState.m_mapLoadSize = 0;
+        MapMng.m_asyncLoadState.m_asyncReadIndex = 0;
+        MapMng.m_asyncLoadState.m_asyncOpenIndex = 0;
+        MapMng.m_asyncLoadState.m_mapReadMode = 0;
         MapMng.ReadMtx(m_mapName);
         MapMng.ReadMpl(m_mapName);
         MapMng.ReadOtm(m_mapName);
@@ -574,9 +573,9 @@ void CMapPcs::calc()
             System.Printf(
                 const_cast<char*>(s_map_load_ok_fmt),
                 m_mapName,
-                *reinterpret_cast<short*>(reinterpret_cast<char*>(&MapMng) + 0xC),
-                *reinterpret_cast<short*>(reinterpret_cast<char*>(&MapMng) + 0x8),
-                (*reinterpret_cast<CMemory::CStage**>(&MapMng))->GetHeapUnuse() / 1024);
+                MapMng.m_mapObjCount,
+                MapMng.m_octTreeCount,
+                MapMng.m_stage->GetHeapUnuse() / 1024);
         }
 
         CPtrArray<CMapLightHolder*>* mapLightHolderArr =

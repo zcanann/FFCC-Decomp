@@ -125,7 +125,7 @@ public:
     unsigned char m_mapReadReady;      // 0x2298B
     _GXColor m_mapColor;               // 0x2298C
     _GXColor m_colorScale;             // 0x22990
-    unsigned char m_pad22994[0x22A6C - 0x22994];
+    CMapMngAsyncLoadState m_asyncLoadState; // 0x22994
     int m_mapAnimFrame;                // 0x22A6C
     float m_octTreeDrawMinDepth;       // 0x22A70
     float m_octTreeFrustumRange;       // 0x22A74

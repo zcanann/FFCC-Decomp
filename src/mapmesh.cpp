@@ -1,6 +1,7 @@
 #include "ffcc/mapmesh.h"
 #include "ffcc/chunkfile.h"
 #include "ffcc/linkage.h"
+#include "ffcc/map.h"
 #include "ffcc/materialman.h"
 
 #include <dolphin/gx.h>
@@ -196,7 +197,7 @@ void CMapMesh::DrawPart(CMaterialSet* materialSet, int drawMaterialPart)
 void CMapMesh::Draw(CMaterialSet* materialSet)
 {
     if (materialSet == 0) {
-        materialSet = *reinterpret_cast<CMaterialSet**>(reinterpret_cast<unsigned char*>(&MapMng) + 0x213D4);
+        materialSet = MapMng.m_materialSet;
     }
 
     int remaining = static_cast<int>(m_displayListCount);
@@ -223,15 +224,13 @@ void CMapMesh::Draw(CMaterialSet* materialSet)
  */
 void CMapMesh::DrawMeshCharaShadow(unsigned short startIdx, unsigned short count)
 {
-    unsigned char* mapMng = reinterpret_cast<unsigned char*>(&MapMng);
     int remaining = count;
     CMapMeshDrawEntry* entry = m_drawEntries + startIdx;
 
     while (remaining-- != 0) {
         if (entry->m_size != 0) {
             CMaterial* material =
-                (*reinterpret_cast<CPtrArray<CMaterial*>*>(
-                    reinterpret_cast<unsigned char*>(*reinterpret_cast<CMaterialSet**>(mapMng + 0x213D4)) + 8))[
+                (*reinterpret_cast<CPtrArray<CMaterial*>*>(reinterpret_cast<unsigned char*>(MapMng.m_materialSet) + 8))[
                     entry->m_materialIdx];
 
             if ((*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(material) + 0x24) &
@@ -256,14 +255,12 @@ void CMapMesh::DrawMeshCharaShadow(unsigned short startIdx, unsigned short count
 void CMapMesh::DrawMesh(unsigned short startIdx, unsigned short count)
 {
     int remaining = count;
-    unsigned char* mapMng = reinterpret_cast<unsigned char*>(&MapMng);
     CMapMeshDrawEntry* entry = m_drawEntries + startIdx;
 
     while (remaining-- != 0) {
         if (entry->m_size != 0) {
-            MaterialMan.SetBlendMode(*reinterpret_cast<CMaterialSet**>(mapMng + 0x213D4), entry->m_materialIdx);
-            MaterialMan.SetMaterial(*reinterpret_cast<CMaterialSet**>(mapMng + 0x213D4), entry->m_materialIdx, 0,
-                                    (_GXTevScale)1);
+            MaterialMan.SetBlendMode(MapMng.m_materialSet, entry->m_materialIdx);
+            MaterialMan.SetMaterial(MapMng.m_materialSet, entry->m_materialIdx, 0, (_GXTevScale)1);
             GXCallDisplayList(entry->m_displayList, entry->m_size);
         }
         entry++;

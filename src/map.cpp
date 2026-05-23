@@ -62,7 +62,7 @@ extern const float FLOAT_8032f9a0 = 0.0f;
 
 static inline CMapMngAsyncLoadState& GetMapMngAsyncLoadState(CMapMng* mapMng)
 {
-    return *reinterpret_cast<CMapMngAsyncLoadState*>(reinterpret_cast<unsigned char*>(mapMng) + 0x22994);
+    return mapMng->m_asyncLoadState;
 }
 extern const float FLOAT_8032f9a4 = 0.0001f;
 extern const float FLOAT_8032f9a8 = -0.0001f;
@@ -1573,18 +1573,18 @@ void CMapMng::Destroy()
 void CMapMng::MapFileRead(char*, unsigned long&)
 {
     for (int i = 0; i < 0x10; i++) {
-        CFile::CHandle** handleSlot = reinterpret_cast<CFile::CHandle**>(Ptr(this, 0x22A2C + (i * 4)));
-        CFile::CHandle* handle = *handleSlot;
+        void** handleSlot = &m_asyncLoadState.m_asyncHandles[i];
+        CFile::CHandle* handle = reinterpret_cast<CFile::CHandle*>(*handleSlot);
         if (handle != 0 && File.IsCompleted(handle)) {
             int len = File.GetLength(handle);
             void* readBuffer = File.m_readBuffer;
-            void* amemCursor = *reinterpret_cast<void**>(Ptr(this, 0x22998));
+            void* amemCursor = m_asyncLoadState.m_mapLoadCursor;
 
             Memory.CopyToAMemorySync(readBuffer, amemCursor, (len + 0x1F) & ~0x1F);
-            *reinterpret_cast<int*>(Ptr(this, 0x229AC + (i * 4))) = len;
-            *reinterpret_cast<unsigned int*>(Ptr(this, 0x229EC + (i * 4))) = CheckSum(readBuffer, len);
-            (*reinterpret_cast<int*>(Ptr(this, 0x229A0)))++;
-            *reinterpret_cast<unsigned char**>(Ptr(this, 0x22998)) += len;
+            m_asyncLoadState.m_fileSizes[i] = len;
+            m_asyncLoadState.m_fileChecksums[i] = CheckSum(readBuffer, len);
+            m_asyncLoadState.m_asyncReadIndex++;
+            m_asyncLoadState.m_mapLoadCursor = reinterpret_cast<unsigned char*>(m_asyncLoadState.m_mapLoadCursor) + len;
 
             File.Close(handle);
             *handleSlot = 0;

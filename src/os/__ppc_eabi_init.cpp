@@ -1,10 +1,8 @@
 #include "global.h"
 
-extern "C" {
-extern void __OSPSInit(void);
-extern void __OSFPRInit(void);
-extern void __OSCacheInit(void);
+#include <dolphin/os.h>
 
+extern "C" {
 /*
  * --INFO--
  * PAL Address: 0x80003400

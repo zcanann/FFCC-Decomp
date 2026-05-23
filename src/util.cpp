@@ -19,12 +19,12 @@ unsigned int s_CUtilTablePad0[3] = {reinterpret_cast<unsigned int>(const_cast<ch
 
 static inline MtxPtr GetCameraMatrix()
 {
-    return reinterpret_cast<MtxPtr>(reinterpret_cast<u8*>(&CameraPcs) + 0x4);
+    return CameraPcs.m_cameraMatrix;
 }
 
 static inline Mtx44Ptr GetScreenMatrix()
 {
-    return reinterpret_cast<Mtx44Ptr>(reinterpret_cast<u8*>(&CameraPcs) + 0x94);
+    return CameraPcs.m_screenMatrix;
 }
 
 // Vec2d definition 

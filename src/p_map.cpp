@@ -526,7 +526,7 @@ void CMapPcs::calc()
         memcpy(cameraMtx, m_viewMtx, sizeof(Mtx));
         memcpy(screenMtx, m_screenMtx, sizeof(Mtx44));
     } else {
-        PSMTXCopy(*reinterpret_cast<Mtx*>(reinterpret_cast<char*>(&CameraPcs) + 0x4), cameraMtx);
+        PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
         PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
     }
     MapMng.SetViewMtx(cameraMtx, screenMtx);
@@ -651,7 +651,7 @@ void CMapPcs::drawBefore()
         *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F4) =
             *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE8);
 
-        PSMTXCopy(*reinterpret_cast<Mtx*>(reinterpret_cast<char*>(&CameraPcs) + 0x4), cameraMtx);
+        PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
         PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
         MapMng.SetViewMtx(cameraMtx, screenMtx);
         Graphic.SetFog(*reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(&MapMng) + 0x22988), 0);
@@ -707,7 +707,7 @@ void CMapPcs::draw()
         *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F4) =
             *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE8);
 
-        PSMTXCopy(*reinterpret_cast<Mtx*>(reinterpret_cast<char*>(&CameraPcs) + 0x4), cameraMtx);
+        PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
         PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
         MapMng.SetViewMtx(cameraMtx, screenMtx);
         Graphic.SetFog(*reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(&MapMng) + 0x22988), 0);
@@ -764,7 +764,7 @@ void CMapPcs::drawBeforeViewer()
         *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F4) =
             *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE8);
 
-        PSMTXCopy(*reinterpret_cast<Mtx*>(reinterpret_cast<char*>(&CameraPcs) + 0x4), cameraMtx);
+        PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
         PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
         MapMng.SetViewMtx(cameraMtx, screenMtx);
         Graphic.SetFog(*reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(&MapMng) + 0x22988), 0);
@@ -821,7 +821,7 @@ void CMapPcs::drawViewer()
         *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F4) =
             *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE8);
 
-        PSMTXCopy(*reinterpret_cast<Mtx*>(reinterpret_cast<char*>(&CameraPcs) + 0x4), cameraMtx);
+        PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
         PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
         MapMng.SetViewMtx(cameraMtx, screenMtx);
         Graphic.SetFog(*reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(&MapMng) + 0x22988), 0);

@@ -4562,7 +4562,7 @@ void CMenuPcs::SetProjection(int mode)
 
 	Mtx lookAtMtx;
 	C_MTXLookAt(lookAtMtx, reinterpret_cast<Point3d*>(slot + 0x10), &up, reinterpret_cast<Point3d*>(&target));
-	PSMTXCopy(lookAtMtx, *reinterpret_cast<Mtx*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x4));
+	PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
 
 	CharaPcs.InitEnv(5);
 	GXSetColorUpdate(0);

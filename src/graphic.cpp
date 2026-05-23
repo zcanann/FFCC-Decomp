@@ -80,7 +80,7 @@ static inline float CameraWorldZ()
 
 static inline Mtx& CameraMatrix()
 {
-    return *reinterpret_cast<Mtx*>(reinterpret_cast<u8*>(&CameraPcs) + 0x4);
+    return CameraPcs.m_cameraMatrix;
 }
 
 extern "C" {

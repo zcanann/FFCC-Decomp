@@ -2660,8 +2660,8 @@ void pppSetProjection()
  */
 void CPartMng::pppSetRendMatrix()
 {
-    PSMTX44Copy(*reinterpret_cast<Mtx44*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x94), ppvScreenMatrix);
-    PSMTXCopy(*reinterpret_cast<Mtx*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 4), ppvCameraMatrix);
+    PSMTX44Copy(CameraPcs.m_screenMatrix, ppvScreenMatrix);
+    PSMTXCopy(CameraPcs.m_cameraMatrix, ppvCameraMatrix);
     gPartScreenMatrixRow2X = ppvScreenMatrix[2][0];
     gPartScreenMatrixRow2Y = ppvScreenMatrix[2][1];
     gPartScreenMatrixRow2W = ppvScreenMatrix[2][3];

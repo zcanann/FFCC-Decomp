@@ -1234,7 +1234,7 @@ void CMapObj::Calc()
             pos.x = F32At(this, 0xC4);
             pos.y = F32At(this, 0xD4);
             pos.z = F32At(this, 0xE4);
-            PSMTXCopy(*reinterpret_cast<Mtx*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x4), cameraMtx);
+            PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
             PSMTXMultVec(cameraMtx, &pos, &posCam);
             posCam.z = -posCam.z;
 

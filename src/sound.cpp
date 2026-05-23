@@ -844,7 +844,7 @@ void CSound::Draw()
 {
     Mtx cameraMatrix;
     GXColor lineColor;
-    PSMTXCopy(*reinterpret_cast<Mtx*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x4), cameraMatrix);
+    PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMatrix);
 
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     GXSetZCompLoc((u8)0);

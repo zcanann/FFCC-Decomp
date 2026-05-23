@@ -16,7 +16,7 @@ static inline float CameraPosZ() { return *reinterpret_cast<float*>(reinterpret_
 static inline float CameraDirX() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xEC); }
 static inline float CameraDirY() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xF0); }
 static inline float CameraDirZ() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xF4); }
-static inline MtxPtr CameraMatrix() { return reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x4); }
+static inline MtxPtr CameraMatrix() { return CameraPcs.m_cameraMatrix; }
 
 /*
  * --INFO--

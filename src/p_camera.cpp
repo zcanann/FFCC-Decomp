@@ -707,8 +707,7 @@ void CCameraPcs::calc()
     up.y = FLOAT_8032fa1c;
     up.z = FLOAT_8032fa34;
     PSVECDistance(reinterpret_cast<Vec*>(self + 0xE0), reinterpret_cast<Vec*>(self + 0xD4));
-    C_MTXLookAt(reinterpret_cast<MtxPtr>(self + 4), reinterpret_cast<Vec*>(self + 0xE0), &up,
-                reinterpret_cast<Vec*>(self + 0xD4));
+    C_MTXLookAt(m_cameraMatrix, reinterpret_cast<Vec*>(self + 0xE0), &up, reinterpret_cast<Vec*>(self + 0xD4));
 
     if (Game.m_currentMapId == 0x21) {
         PSMTXCopy(reinterpret_cast<MtxPtr>(self + 0x34), worldMapMtx);
@@ -735,12 +734,12 @@ void CCameraPcs::calc()
                 *reinterpret_cast<short*>(self + 0x480) -= 1;
             }
         }
-        PSMTXConcat(reinterpret_cast<MtxPtr>(self + 4), worldMapMtx, reinterpret_cast<MtxPtr>(self + 4));
+        PSMTXConcat(m_cameraMatrix, worldMapMtx, m_cameraMatrix);
     }
 
     PSMTXRotRad(zRotMtx, 'z', *reinterpret_cast<float*>(self + 0x108));
-    PSMTXConcat(zRotMtx, reinterpret_cast<MtxPtr>(self + 4), reinterpret_cast<MtxPtr>(self + 4));
-    PSMTXInverse(reinterpret_cast<MtxPtr>(self + 4), invMtx);
+    PSMTXConcat(zRotMtx, m_cameraMatrix, m_cameraMatrix);
+    PSMTXInverse(m_cameraMatrix, invMtx);
 
     *reinterpret_cast<float*>(self + 0xEC) = FLOAT_8032fa34;
     *reinterpret_cast<float*>(self + 0xF0) = FLOAT_8032fa34;
@@ -807,12 +806,11 @@ void CCameraPcs::draw()
         GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
         GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
         CColor drawColor(0xFF, 0xFF, 0xFF, 0xFF);
-        Graphic.DrawSphere(reinterpret_cast<MtxPtr>(self + 4), reinterpret_cast<Vec*>(self + 0xD4), FLOAT_8032fabc,
-                           &drawColor.color);
+        Graphic.DrawSphere(m_cameraMatrix, reinterpret_cast<Vec*>(self + 0xD4), FLOAT_8032fabc, &drawColor.color);
     }
 
     if (g_map_draw_prof != 0) {
-        PSMTXCopy(reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(&CameraPcs) + 4), cameraMtx);
+        PSMTXCopy(m_cameraMatrix, cameraMtx);
         _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
         GXSetZCompLoc(0);
         _GXSetAlphaCompare(GX_GEQUAL, 1, GX_AOP_AND, GX_ALWAYS, 0);
@@ -837,7 +835,7 @@ void CCameraPcs::draw()
         GXSetChanMatColor(GX_COLOR0A0, *reinterpret_cast<_GXColor*>(&redColor));
         Graphic.DrawSphere();
 
-        PSMTXCopy(reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(&CameraPcs) + 4), cameraMtx);
+        PSMTXCopy(m_cameraMatrix, cameraMtx);
         _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
         GXSetZCompLoc(0);
         _GXSetAlphaCompare(GX_GEQUAL, 1, GX_AOP_AND, GX_ALWAYS, 0);
@@ -1038,8 +1036,8 @@ void CCameraPcs::calcChara()
     PSMTXRotRad(mtxB, 'x', *reinterpret_cast<float*>(self + 0x454));
     PSMTXConcat(mtxB, mtxA, mtxA);
     PSMTXTrans(mtxB, FLOAT_8032fa34, FLOAT_8032fa34, -*reinterpret_cast<float*>(self + 0x45C));
-    PSMTXConcat(mtxB, mtxA, reinterpret_cast<MtxPtr>(self + 4));
-    PSMTXInverse(reinterpret_cast<MtxPtr>(self + 4), mtxInv);
+    PSMTXConcat(mtxB, mtxA, m_cameraMatrix);
+    PSMTXInverse(m_cameraMatrix, mtxInv);
 
     *reinterpret_cast<float*>(self + 0xEC) = FLOAT_8032fa34;
     *reinterpret_cast<float*>(self + 0xF0) = FLOAT_8032fa34;
@@ -1986,8 +1984,8 @@ void CCameraPcs::calcMaterialEditor()
     PSMTXRotRad(mtxB, 'x', *reinterpret_cast<float*>(self + 0x454));
     PSMTXConcat(mtxB, mtxA, mtxA);
     PSMTXTrans(mtxB, FLOAT_8032fa34, FLOAT_8032fa34, -*reinterpret_cast<float*>(self + 0x45C));
-    PSMTXConcat(mtxB, mtxA, reinterpret_cast<MtxPtr>(self + 4));
-    PSMTXInverse(reinterpret_cast<MtxPtr>(self + 4), mtxInv);
+    PSMTXConcat(mtxB, mtxA, m_cameraMatrix);
+    PSMTXInverse(m_cameraMatrix, mtxInv);
 
     *reinterpret_cast<float*>(self + 0xEC) = FLOAT_8032fa34;
     *reinterpret_cast<float*>(self + 0xF0) = FLOAT_8032fa34;
@@ -2116,8 +2114,8 @@ void CCameraPcs::calcFunnyShape()
     PSMTXRotRad(mtxB, 'x', *reinterpret_cast<float*>(self + 0x454));
     PSMTXConcat(mtxB, mtxA, mtxA);
     PSMTXTrans(mtxB, FLOAT_8032fa34, FLOAT_8032fa34, -*reinterpret_cast<float*>(self + 0x45C));
-    PSMTXConcat(mtxB, mtxA, reinterpret_cast<MtxPtr>(self + 4));
-    PSMTXInverse(reinterpret_cast<MtxPtr>(self + 4), mtxInv);
+    PSMTXConcat(mtxB, mtxA, m_cameraMatrix);
+    PSMTXInverse(m_cameraMatrix, mtxInv);
 
     *reinterpret_cast<float*>(self + 0xEC) = FLOAT_8032fa34;
     *reinterpret_cast<float*>(self + 0xF0) = FLOAT_8032fa34;

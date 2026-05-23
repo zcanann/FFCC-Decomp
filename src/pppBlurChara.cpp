@@ -98,7 +98,7 @@ static inline Mtx44& CameraScreenMatrix()
     return *reinterpret_cast<Mtx44*>(reinterpret_cast<u8*>(&CameraPcs) + 0x48);
 }
 
-extern const char s_pppBlurChara_cpp_801DB620[] = "pppBlurChara.cpp";
+extern const char s_pppBlurChara_cpp[] = "pppBlurChara.cpp";
 
 static inline pppBlurCharaWork* GetBlurWork(pppBlurChara* blurChara, const pppBlurCharaUnkC* data) {
     return (pppBlurCharaWork*)((char*)blurChara + 0x80 + data->m_serializedDataOffsets[2]);
@@ -313,9 +313,9 @@ void pppFrameBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppBl
         unsigned int texBufferSize = GXGetTexBufferSize(0x140, 0xE0, GX_TF_I8, GX_FALSE, GX_FALSE);
 
         work->m_captureBuffer = pppMemAlloc(texBufferSize, pppEnvStPtr->m_stagePtr,
-                                            const_cast<char*>(s_pppBlurChara_cpp_801DB620), 0xD5);
+                                            const_cast<char*>(s_pppBlurChara_cpp), 0xD5);
         work->m_smallTexObj = reinterpret_cast<_GXTexObj*>(
-            pppMemAlloc(0x20, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppBlurChara_cpp_801DB620), 0xD7));
+            pppMemAlloc(0x20, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppBlurChara_cpp), 0xD7));
 
         rawModel->m_work = work;
         rawModel->m_renderData = param_2;

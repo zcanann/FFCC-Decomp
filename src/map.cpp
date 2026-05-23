@@ -1698,10 +1698,7 @@ void CMapMng::AttachMapHit(CMapHit* mapHit, char* mapHitName)
 
             MapObjAttachAttr* mapObjAtr = mapObj->attr;
             if (mapObjAtr != 0) {
-                if (mapObjAtr != 0) {
-                    typedef void (*MapObjAtrDtor)(MapObjAttachAttr*, int);
-                    reinterpret_cast<MapObjAtrDtor*>(*reinterpret_cast<void***>(mapObjAtr))[2](mapObjAtr, 1);
-                }
+                delete reinterpret_cast<CMapObjAtr*>(mapObjAtr);
                 mapObj->attr = 0;
             }
         }

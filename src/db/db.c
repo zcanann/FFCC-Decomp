@@ -4,10 +4,6 @@
 DBInterface* __DBInterface = NULL;
 int DBVerbose;
 
-extern void __DBExceptionStart();
-extern void __DBExceptionEnd();
-extern void __DBExceptionSetNumber();
-
 void DBInit(void) {
   __DBInterface = (DBInterface*)OSPhysicalToCached(OS_DBINTERFACE_ADDR);
   __DBInterface->ExceptionDestination = (void (*)())OSCachedToPhysical(__DBExceptionDestination);

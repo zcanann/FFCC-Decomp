@@ -221,6 +221,12 @@ struct MaterialManTexState {
     int texMapIdCurShadow;
     int texMtxCurShadow;
     int texCoordIdCurShadow;
+    unsigned int unknown140;
+    unsigned int texScroll0TexMtx;
+    unsigned int texScroll0TexCoord;
+    unsigned int unknown14C;
+    unsigned int texScroll1TexMtx;
+    unsigned int texScroll1TexCoord;
 };
 
 static MaterialManTevState* GetMaterialManTevState(CMaterialMan* materialMan)
@@ -3269,6 +3275,8 @@ int CMaterial::Set(_GXTexMapID texMapId)
 {
     Mtx texMtx;
     PSMTXIdentity(texMtx);
+    MaterialManTexState* texState = GetMaterialManTexState(&MaterialMan);
+    MaterialManTevState* tevState = GetMaterialManTevState(&MaterialMan);
 
     bool hasDualScroll = false;
     if ((*reinterpret_cast<unsigned short*>(Ptr(this, 0x18)) == 2) &&
@@ -3291,41 +3299,37 @@ int CMaterial::Set(_GXTexMapID texMapId)
             float scrollU = *reinterpret_cast<float*>(scrollData + 4);
             float scrollV = *reinterpret_cast<float*>(scrollData + 8);
             if ((FLOAT_8032faf4 != scrollU) || ((FLOAT_8032faf4 != scrollV) || hasDualScroll)) {
-                unsigned int& texMtxCur =
-                    *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&MaterialMan) + 0x120);
-                unsigned int& texCoordCur =
-                    *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&MaterialMan) + 0x124);
                 texMtx[0][3] = scrollU;
                 texMtx[1][3] = scrollV;
 
                 if (i == 0) {
-                    *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&MaterialMan) + 0x48) |= 0x20;
-                    *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&MaterialMan) + 0x144) = texMtxCur;
-                    *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&MaterialMan) + 0x148) = texCoordCur;
-                    GXLoadTexMtxImm(texMtx, texMtxCur, GX_MTX2x4);
+                    tevState->curEnvTevBit |= 0x20;
+                    texState->texScroll0TexMtx = texState->texMtxCur;
+                    texState->texScroll0TexCoord = texState->texCoordIdCur;
+                    GXLoadTexMtxImm(texMtx, texState->texMtxCur, GX_MTX2x4);
                     GXSetTexCoordGen2(
-                        static_cast<GXTexCoordID>(texCoordCur),
+                        static_cast<GXTexCoordID>(texState->texCoordIdCur),
                         GX_TG_MTX2x4,
                         GX_TG_TEX0,
-                        texMtxCur,
+                        texState->texMtxCur,
                         GX_FALSE,
                         0x7D);
                 } else {
-                    *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&MaterialMan) + 0x48) |= 0x40;
-                    *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&MaterialMan) + 0x150) = texMtxCur;
-                    *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&MaterialMan) + 0x154) = texCoordCur;
-                    GXLoadTexMtxImm(texMtx, texMtxCur, GX_MTX2x4);
+                    tevState->curEnvTevBit |= 0x40;
+                    texState->texScroll1TexMtx = texState->texMtxCur;
+                    texState->texScroll1TexCoord = texState->texCoordIdCur;
+                    GXLoadTexMtxImm(texMtx, texState->texMtxCur, GX_MTX2x4);
                     GXSetTexCoordGen2(
-                        static_cast<GXTexCoordID>(texCoordCur),
+                        static_cast<GXTexCoordID>(texState->texCoordIdCur),
                         GX_TG_MTX2x4,
                         GX_TG_TEX1,
-                        texMtxCur,
+                        texState->texMtxCur,
                         GX_FALSE,
                         0x7D);
                 }
 
-                texMtxCur += 3;
-                texCoordCur += 1;
+                texState->texMtxCur += 3;
+                texState->texCoordIdCur += 1;
             }
         }
 

@@ -109,7 +109,13 @@ private:
     int m_texMapIdCurShadow;             // 0x134
     int m_texMtxCurShadow;               // 0x138
     int m_texCoordIdCurShadow;           // 0x13C
-    unsigned char m_pad140[0xC5];
+    unsigned int m_unknown140;           // 0x140
+    unsigned int m_texScroll0TexMtx;     // 0x144
+    unsigned int m_texScroll0TexCoord;   // 0x148
+    unsigned int m_unknown14C;           // 0x14C
+    unsigned int m_texScroll1TexMtx;     // 0x150
+    unsigned int m_texScroll1TexCoord;   // 0x154
+    unsigned char m_pad158[0xAD];
     unsigned char m_blendMode;           // 0x205
     unsigned char m_fogEnable;           // 0x206
     unsigned char m_blendOverrideMode;   // 0x207

@@ -43,7 +43,7 @@ union ColumFloatBits {
     u32 bits;
 };
 
-extern const char s_pppColum_cpp_801DB638[] = "pppColum.cpp";
+extern const char s_pppColum_cpp[] = "pppColum.cpp";
 
 extern const float FLOAT_80331008 = 5.0f;
 extern const float FLOAT_8033100C = 128.0f;
@@ -269,7 +269,7 @@ void pppFrameColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param_
         if (work->m_values == 0) {
             work->m_values = (pppColumValue*)pppMemAlloc(
                 (unsigned long)param_2->m_count * 0xc, pppEnvStPtr->m_stagePtr,
-                const_cast<char*>(s_pppColum_cpp_801DB638), 0x7d);
+                const_cast<char*>(s_pppColum_cpp), 0x7d);
 
             values = work->m_values;
             for (i = 0; i < (int)(unsigned int)param_2->m_count; i++) {

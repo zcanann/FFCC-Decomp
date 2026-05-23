@@ -15,7 +15,7 @@ extern unsigned char gPppInConstructor;
 #include "ffcc/util.h"
 #include "dolphin/gx.h"
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
-extern const char s_pppRain_cpp_801DB610[] = "pppRain.cpp";
+extern const char s_pppRain_cpp[] = "pppRain.cpp";
 
 struct RainColorData {
     u8 pad[8];
@@ -132,7 +132,7 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
         work->drops = (RainDrop*)pppMemAlloc(
             param_2->m_dataValIndex * sizeof(RainDrop),
             pppEnvStPtr->m_stagePtr,
-            const_cast<char*>(s_pppRain_cpp_801DB610),
+            const_cast<char*>(s_pppRain_cpp),
             0x7f);
         dropData = work->drops;
         for (i = 0; i < (int)param_2->m_dataValIndex; i++) {

@@ -132,7 +132,7 @@ public:
     short m_equipment[4];                       // 0x00AC weapon[0], armor[1], tribal[2], accessory[3]
     unsigned short m_inventoryItemCount;        // 0x00B4
     short m_inventoryItems[64];                 // 0x00B6
-    unsigned short m_artifacts[96];             // 0x0136
+    short m_artifacts[96];                      // 0x0136
     short m_treasures[4];                       // 0x01F6
     unsigned char m_treasureFlags;              // 0x01FE
     unsigned char m_moneyFlags;                 // 0x01FF

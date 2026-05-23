@@ -43,6 +43,8 @@ public:
     void SetStereo(int);
     void SetBgmMasterVolume(int);
     void SetSeMasterVolume(int);
+    int GetBgmMasterVolume() const { return m_bgmMasterVolume; }
+    int GetSeMasterVolume() const { return m_seMasterVolume; }
     void SeMaxVolume(int);
     void create(int);
     void destroy();

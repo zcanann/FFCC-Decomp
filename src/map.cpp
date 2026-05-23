@@ -133,6 +133,26 @@ struct MapObjAttachObj
     char pad_10[0xDC];
     MapObjAttachAttr* attr;
 };
+
+static inline CMapObj* MapObjFromBytes(unsigned char* mapObj)
+{
+    return reinterpret_cast<CMapObj*>(mapObj);
+}
+
+static inline float MapObjWorldX(unsigned char* mapObj)
+{
+    return MapObjFromBytes(mapObj)->m_worldMtx[0][3];
+}
+
+static inline float MapObjWorldY(unsigned char* mapObj)
+{
+    return MapObjFromBytes(mapObj)->m_worldMtx[1][3];
+}
+
+static inline float MapObjWorldZ(unsigned char* mapObj)
+{
+    return MapObjFromBytes(mapObj)->m_worldMtx[2][3];
+}
 }
 
 /*
@@ -1718,9 +1738,9 @@ int CMapMng::GetDebugPlaySta(int playStaNo, Vec* vec)
     while (true) {
         unsigned char* mapObjAtr = *reinterpret_cast<unsigned char**>(mapObj + 0xEC);
         if (*(mapObjAtr + 8) == playStaNo) {
-            vec->x = *reinterpret_cast<float*>(mapObj + 0xC4);
-            vec->y = *reinterpret_cast<float*>(mapObj + 0xD4);
-            vec->z = *reinterpret_cast<float*>(mapObj + 0xE4);
+            vec->x = MapObjWorldX(mapObj);
+            vec->y = MapObjWorldY(mapObj);
+            vec->z = MapObjWorldZ(mapObj);
             return 1;
         }
         mapObj += 0xF0;
@@ -1779,18 +1799,18 @@ void CMapMng::SetLightSource()
                 if (*reinterpret_cast<int*>(atr + 0x34) == 0) {
                     CLightPcs::CLight light;
                     light.m_type = 1;
-                    light.m_position.x = *reinterpret_cast<float*>(mapObj + 0xC4);
-                    light.m_position.y = *reinterpret_cast<float*>(mapObj + 0xD4);
-                    light.m_position.z = *reinterpret_cast<float*>(mapObj + 0xE4);
+                    light.m_position.x = MapObjWorldX(mapObj);
+                    light.m_position.y = MapObjWorldY(mapObj);
+                    light.m_position.z = MapObjWorldZ(mapObj);
 
                     light.m_direction.x = 0.0f;
                     light.m_direction.y = 0.0f;
                     light.m_direction.z = 1.0f;
 
                     unsigned char* targetObj = reinterpret_cast<unsigned char*>(*reinterpret_cast<void**>(atr + 0x10));
-                    light.m_targetPosition.x = *reinterpret_cast<float*>(targetObj + 0xC4);
-                    light.m_targetPosition.y = *reinterpret_cast<float*>(targetObj + 0xD4);
-                    light.m_targetPosition.z = *reinterpret_cast<float*>(targetObj + 0xE4);
+                    light.m_targetPosition.x = MapObjWorldX(targetObj);
+                    light.m_targetPosition.y = MapObjWorldY(targetObj);
+                    light.m_targetPosition.z = MapObjWorldZ(targetObj);
 
                     PSVECSubtract(reinterpret_cast<Vec*>(&light.m_targetPosition),
                                   reinterpret_cast<Vec*>(&light.m_position),
@@ -1823,17 +1843,17 @@ void CMapMng::SetLightSource()
                     light->m_targetColor[1].g = atr[0x9];
                     light->m_targetColor[1].b = atr[0xA];
                     light->m_targetColor[1].a = atr[0xB];
-                    light->m_position.x = *reinterpret_cast<float*>(mapObj + 0xC4);
-                    light->m_position.y = *reinterpret_cast<float*>(mapObj + 0xD4);
-                    light->m_position.z = *reinterpret_cast<float*>(mapObj + 0xE4);
+                    light->m_position.x = MapObjWorldX(mapObj);
+                    light->m_position.y = MapObjWorldY(mapObj);
+                    light->m_position.z = MapObjWorldZ(mapObj);
                     light->m_direction.x = 0.0f;
                     light->m_direction.y = 0.0f;
                     light->m_direction.z = 1.0f;
 
                     unsigned char* targetObj = reinterpret_cast<unsigned char*>(*reinterpret_cast<void**>(atr + 0x10));
-                    light->m_targetPosition.x = *reinterpret_cast<float*>(targetObj + 0xC4);
-                    light->m_targetPosition.y = *reinterpret_cast<float*>(targetObj + 0xD4);
-                    light->m_targetPosition.z = *reinterpret_cast<float*>(targetObj + 0xE4);
+                    light->m_targetPosition.x = MapObjWorldX(targetObj);
+                    light->m_targetPosition.y = MapObjWorldY(targetObj);
+                    light->m_targetPosition.z = MapObjWorldZ(targetObj);
                     PSVECSubtract(reinterpret_cast<Vec*>(&light->m_targetPosition),
                                   reinterpret_cast<Vec*>(&light->m_position),
                                   reinterpret_cast<Vec*>(&light->m_direction));
@@ -1843,9 +1863,9 @@ void CMapMng::SetLightSource()
             } else if (type == CMapObjAtr::POINT_LIGHT) {
                 CLightPcs::CLight light;
                 light.m_type = 0;
-                light.m_position.x = *reinterpret_cast<float*>(mapObj + 0xC4);
-                light.m_position.y = *reinterpret_cast<float*>(mapObj + 0xD4);
-                light.m_position.z = *reinterpret_cast<float*>(mapObj + 0xE4);
+                light.m_position.x = MapObjWorldX(mapObj);
+                light.m_position.y = MapObjWorldY(mapObj);
+                light.m_position.z = MapObjWorldZ(mapObj);
                 light.m_direction.x = 0.0f;
                 light.m_direction.y = 0.0f;
                 light.m_direction.z = 1.0f;
@@ -2389,19 +2409,19 @@ void CMapMng::ReadOtm(char* mapName)
         unsigned char lightRaw[0xB0];
         __ct__Q29CLightPcs6CLightFv(lightRaw);
         *reinterpret_cast<int*>(lightRaw + 0x8) = 1;
-        *reinterpret_cast<float*>(lightRaw + 0xC) = *reinterpret_cast<float*>(obj + 0xC4);
-        *reinterpret_cast<float*>(lightRaw + 0x10) = *reinterpret_cast<float*>(obj + 0xD4);
-        *reinterpret_cast<float*>(lightRaw + 0x14) = *reinterpret_cast<float*>(obj + 0xE4);
+        *reinterpret_cast<float*>(lightRaw + 0xC) = MapObjWorldX(obj);
+        *reinterpret_cast<float*>(lightRaw + 0x10) = MapObjWorldY(obj);
+        *reinterpret_cast<float*>(lightRaw + 0x14) = MapObjWorldZ(obj);
 
         unsigned char* targetObj = reinterpret_cast<unsigned char*>(*reinterpret_cast<void**>(atr + 0x10));
         Vec source;
-        source.x = *reinterpret_cast<float*>(targetObj + 0xC4);
-        source.y = *reinterpret_cast<float*>(targetObj + 0xD4);
-        source.z = *reinterpret_cast<float*>(targetObj + 0xE4);
+        source.x = MapObjWorldX(targetObj);
+        source.y = MapObjWorldY(targetObj);
+        source.z = MapObjWorldZ(targetObj);
         Vec target;
-        target.x = *reinterpret_cast<float*>(obj + 0xC4);
-        target.y = *reinterpret_cast<float*>(obj + 0xD4);
-        target.z = *reinterpret_cast<float*>(obj + 0xE4);
+        target.x = MapObjWorldX(obj);
+        target.y = MapObjWorldY(obj);
+        target.z = MapObjWorldZ(obj);
         Vec dir;
         PSVECSubtract(&source, &target, &dir);
         PSVECNormalize(&dir, &dir);

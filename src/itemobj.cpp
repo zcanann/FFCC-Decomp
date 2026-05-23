@@ -125,7 +125,6 @@ static const char DAT_801dcfec[] = {
     (char)0x81, 0x42, (char)0x0A, (char)0x00,
 };
 static const char s_f051_root_801dceb4[] = "f051_root";
-extern "C" char m_aiWork__8CGMonObj[];
 
 struct ItemObjFlatTableEntry {
 	int count;

@@ -11,6 +11,7 @@ struct Vec;
 class CVector;
 class CMapPcs;
 
+extern "C" u8 m_aiWork__8CGMonObj[0xC];
 extern "C" u8 m_boss__8CGMonObj[0x8C];
 
 class CGMonObj : public CGCharaObj

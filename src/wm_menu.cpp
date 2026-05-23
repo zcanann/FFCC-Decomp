@@ -1,5 +1,6 @@
 #include "ffcc/wm_menu.h"
 
+#include "ffcc/baseobj.h"
 #include "ffcc/goout.h"
 #include "ffcc/gbaque.h"
 #include "ffcc/graphic.h"
@@ -31,7 +32,6 @@
 extern "C" void* __vt__Q212CFlatRuntime7CObject[];
 extern "C" void* __vt__9CGBaseObj[];
 extern "C" void* __vt__8CGObject[];
-extern "C" void Create__9CGBaseObjFv(void*);
 extern "C" int DAT_8021082c[];
 extern "C" int DAT_80210830[];
 extern "C" int DAT_801dc118[];
@@ -8585,7 +8585,7 @@ unsigned int CMenuPcs::BindEffect(int slot, int effectNo, int cameraSlot)
 
 	*reinterpret_cast<unsigned int*>(effect + 0x0) = static_cast<unsigned int>(effectNo);
 	*reinterpret_cast<unsigned int*>(effect + 0x8) = static_cast<unsigned int>(slot);
-	Create__9CGBaseObjFv(effect + 0xC);
+	reinterpret_cast<CGBaseObj*>(effect + 0xC)->Create();
 	*reinterpret_cast<unsigned int*>(effect + 0x104) = *reinterpret_cast<unsigned int*>(bytes + 0x4A8 + cameraSlot * 4);
 
 	*reinterpret_cast<void**>(createParam + 0x74) = effect + 0xC;

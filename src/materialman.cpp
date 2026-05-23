@@ -1056,7 +1056,7 @@ void CMaterialMan::addtev_stdShadow(unsigned long materialFlag)
         return;
     }
 
-    int materialNum = *reinterpret_cast<int*>(Ptr(this, 0x58));
+    int materialNum = m_shadowMaterialCount;
     for (int i = 0; i < materialNum; i++) {
         if (*reinterpret_cast<signed char*>(Ptr(this, i + 0x4D)) == 0) {
             addtev_shadow(i);
@@ -1813,17 +1813,17 @@ void CMaterialMan::SetShadow(CMapShadow& shadow, float (*viewMtx) [4], int shado
 
     unsigned long useShadowBit32 = materialFlag & *reinterpret_cast<unsigned long*>(Ptr(material, 0x24)) & 0x8000;
     if (useShadowBit32 == 0) {
-        if (*reinterpret_cast<int*>(Ptr(this, 0x5C)) > 4) {
+        if (m_shadowTextureCount > 4) {
             return;
         }
-    } else if (*reinterpret_cast<int*>(Ptr(this, 0x5C)) > 3) {
+    } else if (m_shadowTextureCount > 3) {
         return;
     }
 
     if (((m_texMapIdCur & 0xFF) < 8) &&
         ((m_texMtxCur & 0xFF) < 0x3C) &&
         ((m_texCoordIdCur & 0xFF) < 8)) {
-        int materialNum = *reinterpret_cast<int*>(Ptr(this, 0x58));
+        int materialNum = m_shadowMaterialCount;
 
         m_curEnvTevBit |= 0x10;
         *Ptr(this, materialNum + 0x4D) = *Ptr(&shadow, 8);
@@ -1853,12 +1853,12 @@ void CMaterialMan::SetShadow(CMapShadow& shadow, float (*viewMtx) [4], int shado
             m_texMapIdCur = texMapCur + 1;
             TextureMan.SetTexture(static_cast<_GXTexMapID>(texMapCur), *reinterpret_cast<CTexture**>(Ptr(material, 0x40)));
             *Ptr(this, materialNum + 0x209) = *Ptr(material, 0xA4);
-            *Ptr(this, 0x208) |= static_cast<unsigned char>(1 << materialNum);
-            *reinterpret_cast<int*>(Ptr(this, 0x5C)) = *reinterpret_cast<int*>(Ptr(this, 0x5C)) + 1;
+            m_shadowKColorMask |= static_cast<unsigned char>(1 << materialNum);
+            m_shadowTextureCount = m_shadowTextureCount + 1;
         }
 
-        *reinterpret_cast<int*>(Ptr(this, 0x58)) = materialNum + 1;
-        *reinterpret_cast<int*>(Ptr(this, 0x5C)) = *reinterpret_cast<int*>(Ptr(this, 0x5C)) + 1;
+        m_shadowMaterialCount = materialNum + 1;
+        m_shadowTextureCount = m_shadowTextureCount + 1;
     }
 }
 

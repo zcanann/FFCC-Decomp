@@ -97,8 +97,8 @@ private:
     unsigned int m_curEnvTevBit;         // 0x48
     unsigned char m_vtxDescMode;         // 0x4C
     unsigned char m_pad04D[0x0B];
-    unsigned int m_lockedEnvTevBit;      // 0x58
-    unsigned int m_lockedEnvUnknown5c;   // 0x5C
+    int m_shadowMaterialCount;           // 0x58
+    int m_shadowTextureCount;            // 0x5C
     unsigned int m_numTevStage;          // 0x60
     unsigned char m_pad064[0xB8];
     int m_texMapIdCur;                   // 0x11C

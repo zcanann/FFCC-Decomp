@@ -6,7 +6,7 @@ extern "C" {
 void* memset(void*, int, unsigned int);
 }
 
-extern const char s_ME_AppRequest_cpp_801d7da8[] = "ME_AppRequest.cpp";
+extern const char s_ME_AppRequest_cpp[] = "ME_AppRequest.cpp";
 
 struct ZCANMGRP {
     void* ptr;
@@ -108,14 +108,14 @@ int CMaterialEditorPcs::SetRsdFlag()
 int CMaterialEditorPcs::AddRsdList(ZLIST* zlist)
 {
     RSDLISTITEM* listItem =
-        new (MaterialEditorStage(), const_cast<char*>(s_ME_AppRequest_cpp_801d7da8), 0x61) RSDLISTITEM;
+        new (MaterialEditorStage(), const_cast<char*>(s_ME_AppRequest_cpp), 0x61) RSDLISTITEM;
     if (listItem == 0) {
         return 0;
     }
 
     memset(listItem, 0, 0x10);
     RSDITEM* rsdItem =
-        new (MaterialEditorStage(), const_cast<char*>(s_ME_AppRequest_cpp_801d7da8), 0x67) RSDITEM;
+        new (MaterialEditorStage(), const_cast<char*>(s_ME_AppRequest_cpp), 0x67) RSDITEM;
     if (rsdItem == 0) {
         if (listItem != 0) {
             delete listItem;

@@ -25,8 +25,8 @@ extern const char __RTTI__8CManager_8032E648[];
 extern const char __RTTI__8CProcess_8032E650[];
 extern "C" const char s_CMaterialEditorPcsViewer[] = "CMaterialEditorPcs(VIEWER)";
 extern "C" const char s_CMaterialEditorPcs[] = "CMaterialEditorPcs";
-extern "C" const char s_CManager_801D7D48[] = "CManager";
-extern "C" const char s_CProcess_801D7D54[] = "CProcess";
+extern "C" const char sMaterialEditorCManagerName[] = "CManager";
+extern "C" const char sMaterialEditorCProcessName[] = "CProcess";
 extern "C" const char s_MaterialEditorFmt[] = "MaterialEditor [%c]";
 
 inline void* operator new(unsigned long, void* ptr)

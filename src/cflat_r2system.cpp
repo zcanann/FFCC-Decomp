@@ -1202,7 +1202,7 @@ void CCameraPcs::GetWorldMapMatrix(float (*matrix)[4])
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void IsHitDrawMode__7CMapPcsFc(CMapPcs*, unsigned char drawMode)
+void CMapPcs::IsHitDrawMode(unsigned char drawMode)
 {
     gMapHitDrawMode.m_byte = drawMode;
 }
@@ -3426,7 +3426,7 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         outResult = 0;
         return;
     case -0x2E:
-        IsHitDrawMode__7CMapPcsFc(&MapPcs, static_cast<unsigned char>(*object->m_localBase));
+        MapPcs.IsHitDrawMode(static_cast<unsigned char>(*object->m_localBase));
         runtime->push(object, 0);
         outResult = 0;
         return;

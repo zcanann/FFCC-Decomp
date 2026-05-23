@@ -76,7 +76,6 @@ extern char g_MsgFlashy[];
 extern const char DAT_8032f984[] = "\n";
 extern "C" unsigned char Vec_80245758[];
 extern "C" void __ct__Q29CLightPcs6CLightFv(void*);
-extern "C" void SetLink__7CMapObjFv();
 extern "C" CPtrArray<CMapLightHolder*>* dtor_80034414(CPtrArray<CMapLightHolder*>*, short);
 
 static const char s_mapMidPathFmt[] = "%s.mid";
@@ -2389,7 +2388,7 @@ void CMapMng::ReadOtm(char* mapName)
         return;
     }
 
-    SetLink__7CMapObjFv();
+    root->SetLink();
 
     Mtx identity;
     PSMTXIdentity(identity);

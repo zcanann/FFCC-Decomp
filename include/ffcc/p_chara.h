@@ -169,6 +169,11 @@ public:
     int TryReleaseAnimBank(int);
     void SetSpecularAlpha(int);
     void InitEnv(int);
+    void SetTexShadowRadius(float);
+    void SetTexShadowColor(_GXColor);
+    void SetTexShadowPos(Vec*);
+    void SetNoFreeMergeMask(int);
+    void SetCharaAllocStage(int);
     int GetNumTexShadow();
     void GetTexShadow(int, int, _GXTexObj*, Vec*, float(*)[3][4]);
     void draw();
@@ -205,14 +210,18 @@ public:
     CMemory::CStage* m_viewerModelStage;      // 0x0CC
     CMemory::CStage* m_viewerTextureStage;    // 0x0D0
     CMemory::CStage* m_viewerAnimStage;       // 0x0D4
-    u8 _pad0D8[0x10];                         // 0x0D8
+    u8 _pad0D8[0xC];                          // 0x0D8
+    int m_charaAllocStage;                    // 0x0E4
     GXColor m_viewerAmbientColor;             // 0x0E8
     u8 _pad0EC[4];                            // 0x0EC
     GXColor m_viewerDiffuseColor[3];          // 0x0F0
     u8 _pad0FC[0xC];                          // 0x0FC
     Vec m_viewerDiffusePos[3];                // 0x108
     CColor m_viewerChoiceColor[5];            // 0x12C
-    u8 _pad140[0x50];                         // 0x140
+    u8 _pad140[0x3C];                         // 0x140
+    Vec m_texShadowPos;                       // 0x17C
+    float m_texShadowRadius;                  // 0x188
+    GXColor m_texShadowColor;                 // 0x18C
     CChara::CModel* m_viewerModel[2];         // 0x190
     CChara::CAnim* m_viewerAnim[2];           // 0x198
     CChara::CAnim* m_viewerSavedAnim;         // 0x1A0
@@ -241,7 +250,8 @@ public:
     int m_viewerIFrameEnabled;                // 0x708
     int m_viewerResetIFrame;                  // 0x70C
     int m_viewerLoadAnimContinuous;           // 0x710
-    u8 _pad714[8];                            // 0x714
+    u8 _pad714[4];                            // 0x714
+    int m_noFreeMergeMask;                    // 0x718
 };
 
 extern CCharaPcs CharaPcs;

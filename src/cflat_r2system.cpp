@@ -376,9 +376,9 @@ extern "C" int CheckHitCylinderNear__7CMapPcsFP3VecP3VecfUl(
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" unsigned char* GetTmpFrameBuffer__8CGraphicFv(CGraphic* graphic)
+unsigned char* CGraphic::GetTmpFrameBuffer()
 {
-    return static_cast<unsigned char*>(graphic->m_scratchTextureBuffer);
+    return static_cast<unsigned char*>(m_scratchTextureBuffer);
 }
 
 /*
@@ -477,9 +477,9 @@ void CCameraPcs::SetShadowAuto(int enable)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void SetTexShadowRadius__9CCharaPcsFf(void* charaPcs, float texShadowRadius)
+void CCharaPcs::SetTexShadowRadius(float texShadowRadius)
 {
-    *(float*)((char*)charaPcs + 0x188) = texShadowRadius;
+    m_texShadowRadius = texShadowRadius;
 }
 
 /*
@@ -491,20 +491,9 @@ extern "C" void SetTexShadowRadius__9CCharaPcsFf(void* charaPcs, float texShadow
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void SetTexShadowColor__9CCharaPcsF8_GXColor(void* charaPcs, const unsigned char* color)
+void CCharaPcs::SetTexShadowColor(_GXColor color)
 {
-    unsigned char* self = (unsigned char*)charaPcs;
-    unsigned char c1;
-    unsigned char c2;
-
-    c1 = color[0];
-    c2 = color[1];
-    self[0x18C] = c1;
-    c1 = color[2];
-    self[0x18D] = c2;
-    c2 = color[3];
-    self[0x18E] = c1;
-    self[0x18F] = c2;
+    m_texShadowColor = color;
 }
 
 /*
@@ -544,13 +533,9 @@ extern "C" _GXColor* __opP8_GXColor__6CColorFv(CColor* self)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void SetTexShadowPos__9CCharaPcsFP3Vec(void* charaPcs, Vec* vec)
+void CCharaPcs::SetTexShadowPos(Vec* vec)
 {
-    float* self = (float*)((char*)charaPcs + 0x17C);
-
-    self[0] = vec->x;
-    self[1] = vec->y;
-    self[2] = vec->z;
+    m_texShadowPos = *vec;
 }
 
 /*
@@ -912,9 +897,9 @@ extern "C" void SetMapShadeColor__9CCharaPcsFi6CColor(void* charaPcs, int shadeI
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void SetNoFreeMergeMask__9CCharaPcsFi(void* charaPcs, int mask)
+void CCharaPcs::SetNoFreeMergeMask(int mask)
 {
-    *(int*)((char*)charaPcs + 0x718) = mask;
+    m_noFreeMergeMask = mask;
 }
 
 /*
@@ -954,9 +939,9 @@ void CMemory::SetDefaultGroup(int group)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void SetCharaAllocStage__9CCharaPcsFi(void* charaPcs, int stage)
+void CCharaPcs::SetCharaAllocStage(int stage)
 {
-    *(int*)((char*)charaPcs + 0xE4) = stage;
+    m_charaAllocStage = stage;
 }
 
 /*
@@ -968,9 +953,9 @@ extern "C" void SetCharaAllocStage__9CCharaPcsFi(void* charaPcs, int stage)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void SetUseDOF__11CGraphicPcsFi(void* graphicPcs, int enabled)
+void CGraphicPcs::SetUseDOF(int enabled)
 {
-    *(int*)((char*)graphicPcs + 0xC0) = enabled;
+    m_dofFlag = enabled;
 }
 
 /*
@@ -1038,9 +1023,9 @@ void CFile::CHandle::Read()
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void ReqScreenCapture__11CGraphicPcsFv(void* graphicPcs)
+void CGraphicPcs::ReqScreenCapture()
 {
-    static_cast<CGraphicPcs*>(graphicPcs)->m_copySaveFlag = 1;
+    m_copySaveFlag = 1;
 }
 
 /*
@@ -2357,9 +2342,9 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
             static_cast<u8>(object->m_localBase[5]),
             static_cast<u8>(object->m_localBase[6]),
         };
-        SetTexShadowPos__9CCharaPcsFP3Vec(&CharaPcs, &position);
-        SetTexShadowColor__9CCharaPcsF8_GXColor(&CharaPcs, reinterpret_cast<const unsigned char*>(&color));
-        SetTexShadowRadius__9CCharaPcsFf(&CharaPcs, static_cast<float>(object->m_localBase[7]));
+        CharaPcs.SetTexShadowPos(&position);
+        CharaPcs.SetTexShadowColor(color);
+        CharaPcs.SetTexShadowRadius(static_cast<float>(object->m_localBase[7]));
         runtime->push(object, 0);
         outResult = 0;
         return;
@@ -2998,7 +2983,7 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         return;
     }
     case -0x62:
-        SetNoFreeMergeMask__9CCharaPcsFi(&CharaPcs, *object->m_localBase);
+        CharaPcs.SetNoFreeMergeMask(*object->m_localBase);
         runtime->push(object, 0);
         outResult = 0;
         return;
@@ -3103,7 +3088,7 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         return;
     }
     case -0x53:
-        SetCharaAllocStage__9CCharaPcsFi(&CharaPcs, *object->m_localBase);
+        CharaPcs.SetCharaAllocStage(*object->m_localBase);
         runtime->push(object, 0);
         outResult = 0;
         return;

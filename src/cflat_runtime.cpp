@@ -11,7 +11,6 @@ extern "C" {
 char DAT_80330118[];
 void* __vt__12CFlatRuntime[];
 void* __vt__Q212CFlatRuntime7CObject[];
-int __cntlzw(unsigned int);
 void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
     CFlatRuntime*, CFlatRuntime::CObject*, int, int, int, CFlatRuntime::CStack*, CFlatRuntime::CStack*);
 }

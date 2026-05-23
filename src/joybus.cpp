@@ -98,8 +98,6 @@ extern const unsigned short JoyBusCrcTable[256] =
     0x2E93, 0x3EB2, 0x0ED1, 0x1EF0
 };
 
-extern "C" int __cntlzw(unsigned int);
-
 static const char s_dvd_gba_dir[] = "dvd/gba/";
 static const char s_ffcc_cli_bin[] = "ffcc_cli.bin";
 static const char s_objdat_spt[] = "objdat.spt";

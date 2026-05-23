@@ -666,7 +666,7 @@ void CChara::ChangeMogMode(int mogMode)
 	}
 }
 
-static const char s_chara_fur_cpp_801db72c[] = "chara_fur.cpp";
+static const char s_chara_fur_cpp[] = "chara_fur.cpp";
 
 static bool s_mogFurBaseColorsInit;
 static bool s_mogFurNoiseColorsInit;
@@ -1044,7 +1044,7 @@ static void CopyMogTextureFromChara(void* model)
 		return;
 	}
 
-	Graphic._WaitDrawDone(const_cast<char*>(s_chara_fur_cpp_801db72c), 0x506);
+	Graphic._WaitDrawDone(const_cast<char*>(s_chara_fur_cpp), 0x506);
 	DCInvalidateRange(dstBuffer, texelCountBytes);
 	memcpy(dstBuffer, reinterpret_cast<unsigned char*>(&Chara) + 4, 0x2000);
 	DCFlushRange(dstBuffer, texelCountBytes);
@@ -1065,7 +1065,7 @@ static void CopyMogTextureToChara(void* model)
 		return;
 	}
 
-	Graphic._WaitDrawDone(const_cast<char*>(s_chara_fur_cpp_801db72c), 0x506);
+	Graphic._WaitDrawDone(const_cast<char*>(s_chara_fur_cpp), 0x506);
 	memcpy(reinterpret_cast<unsigned char*>(&Chara) + 4, srcBuffer, 0x2000);
 	DCFlushRange(srcBuffer, texelCountBytes);
 	GXInvalidateTexAll();
@@ -1184,7 +1184,7 @@ void CChara::CModel::InitMogFurTex()
 
 	if ((texture != 0) && (*reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(texture) + 0x60) == 4)) {
 		*reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(texture) + 0x60) = 5;
-		Graphic._WaitDrawDone(const_cast<char*>(s_chara_fur_cpp_801db72c), 0x506);
+		Graphic._WaitDrawDone(const_cast<char*>(s_chara_fur_cpp), 0x506);
 
 		textureSet = *reinterpret_cast<CTextureSet**>(reinterpret_cast<char*>(this) + 0xB0);
 		textureArray = reinterpret_cast<CPtrArray<CTexture*>*>(reinterpret_cast<char*>(textureSet) + 8);
@@ -1814,7 +1814,7 @@ void CChara::makeFurTex()
 	s_mogFurMaxY = 0.0f;
 
 	if (gMogFurTexBuffer == 0) {
-		gMogFurTexBuffer = Memory._Alloc(0x20000, 0, const_cast<char*>(s_chara_fur_cpp_801db72c), 0xE9, 0);
+		gMogFurTexBuffer = Memory._Alloc(0x20000, 0, const_cast<char*>(s_chara_fur_cpp), 0xE9, 0);
 	}
 	if (gMogFurTexBuffer == 0) {
 		return;

@@ -64,8 +64,6 @@ extern "C" unsigned char DAT_8032ed8a;
 extern "C" unsigned char DAT_8032ed8b;
 extern "C" int DAT_8032ed7c;
 extern "C" unsigned int DAT_8032ed80;
-extern "C" void SetPart__9CLightPcsFQ29CLightPcs6TARGETPvUc(CLightPcs*, int, void*, unsigned char);
-extern "C" void InitVtxFmt__12CMaterialManFi11_GXCompTypei11_GXCompTypei11_GXCompTypei(CMaterialMan*, int, _GXCompType, int, _GXCompType, int, _GXCompType, int);
 extern "C" void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
 extern "C" int printf(const char*, ...);
 
@@ -2611,7 +2609,7 @@ void pppSetDrawEnv(pppCVECTOR* pppColor, pppFMATRIX* pppMtx, float depth, unsign
 
 	if (DAT_8032ed84 != lightTarget) {
 		DAT_8032ed84 = lightTarget;
-		SetPart__9CLightPcsFQ29CLightPcs6TARGETPvUc(&LightPcs, 2, pppMngStPtr, lightTarget);
+		LightPcs.SetPart(static_cast<CLightPcs::TARGET>(2), pppMngStPtr, lightTarget);
 	}
 
 	if (pppMtx != 0) {
@@ -2682,8 +2680,7 @@ void pppSetDrawEnv(pppCVECTOR* pppColor, pppFMATRIX* pppMtx, float depth, unsign
  */
 void pppInitDrawEnv(unsigned char useZeroDepth)
 {
-	InitVtxFmt__12CMaterialManFi11_GXCompTypei11_GXCompTypei11_GXCompTypei(
-		&MaterialMan,
+	MaterialMan.InitVtxFmt(
 		-1,
 		(_GXCompType)4,
 		0,

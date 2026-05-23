@@ -532,7 +532,7 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             if (meshOrHitIdx == -1) {
                 m_mapData = 0;
             } else if (U8At(this, 0x1D) == 1) {
-                m_mapData = reinterpret_cast<unsigned char*>(&MapMng) + 0x1E954 + (meshOrHitIdx * 0x44);
+                m_mapData = MapMng.GetMapMeshArray() + meshOrHitIdx;
                 U8At(this, 0x14) = 0;
                 U8At(this, 0x15) = 0;
             } else if ((U8At(this, 0x1D) == 2) || (U8At(this, 0x1D) == 3)) {
@@ -546,7 +546,7 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                     }
                     m_mapData = 0;
                 } else {
-                    m_mapData = reinterpret_cast<unsigned char*>(&MapMng) + 0x4D4 + (meshOrHitIdx * 0x24);
+                    m_mapData = MapMng.GetMapHitArray() + meshOrHitIdx;
                 }
             }
 

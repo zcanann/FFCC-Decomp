@@ -213,10 +213,8 @@ public:
     CMemory::CStage* m_viewerAnimStage;       // 0x0D4
     u8 _pad0D8[0xC];                          // 0x0D8
     int m_charaAllocStage;                    // 0x0E4
-    GXColor m_viewerAmbientColor;             // 0x0E8
-    u8 _pad0EC[4];                            // 0x0EC
-    GXColor m_viewerDiffuseColor[3];          // 0x0F0
-    u8 _pad0FC[0xC];                          // 0x0FC
+    GXColor m_viewerAmbientColor[2];          // 0x0E8
+    GXColor m_viewerDiffuseColor[2][3];       // 0x0F0
     Vec m_viewerDiffusePos[3];                // 0x108
     CColor m_viewerChoiceColor[5];            // 0x12C
     u8 _pad140[0x3C];                         // 0x140

@@ -6,9 +6,6 @@
 #include <dolphin/mtx.h>
 
 void pppSetFpMatrix(_pppMngSt*);
-extern const float FLOAT_803320B8;
-extern const float FLOAT_803320C0;
-extern const float FLOAT_803320C4;
 
 /*
  * --INFO--
@@ -44,9 +41,9 @@ void pppFrameConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir, pp
 
             PSMTXIdentity(pppMngStPtr->m_matrix.value);
 
-            pppMngSt->m_scale.x = FLOAT_803320C0 * scale;
+            pppMngSt->m_scale.x = kConstrainCameraDirWideAspect * scale;
             pppMngSt->m_scale.y = scale;
-            pppMngSt->m_scale.z = FLOAT_803320B8;
+            pppMngSt->m_scale.z = kConstrainCameraDirScaleOne;
 
             Mtx scaleMtx;
             PSMTXScale(scaleMtx, pppMngSt->m_scale.x, pppMngSt->m_scale.y, pppMngSt->m_scale.z);
@@ -96,7 +93,7 @@ void pppDestructConstrainCameraDir(_pppPObjLink*, _pppCtrlTable*)
  */
 void pppConstruct2ConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir, _pppCtrlTable* param_2)
 {
-    float uVar1 = FLOAT_803320C4;
+    float uVar1 = kConstrainCameraDirZero;
     float* puVar2 = (float*)((char*)pppConstrainCameraDir + *param_2->m_serializedDataOffsets + 0x80);
     puVar2[2] = uVar1;
     puVar2[1] = uVar1;
@@ -114,7 +111,7 @@ void pppConstruct2ConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDi
  */
 void pppConstructConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir, _pppCtrlTable* param_2)
 {
-    float uVar1 = FLOAT_803320C4;
+    float uVar1 = kConstrainCameraDirZero;
     float* puVar2 = (float*)((char*)pppConstrainCameraDir + *param_2->m_serializedDataOffsets + 0x80);
     puVar2[2] = uVar1;
     puVar2[1] = uVar1;

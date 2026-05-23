@@ -370,14 +370,9 @@ static inline int& CurrentSceneId()
     return *reinterpret_cast<int*>(Ptr(&Game, 0xC7F0));
 }
 
-static inline unsigned int& CharaAmemSize()
+static inline u32& CharaAmemSize()
 {
-    return *reinterpret_cast<unsigned int*>(Ptr(&Chara, 0x205C));
-}
-
-static inline CMemory::CStage*& CharaAmemStage()
-{
-    return *reinterpret_cast<CMemory::CStage**>(Ptr(&Chara, 0x2058));
+    return Chara.AmemSize();
 }
 
 static inline void SetupBaseCharaLights(CCharaPcs* self)
@@ -699,7 +694,7 @@ void CCharaPcs::Init()
     m_stage = Memory.CreateStage(0x38000, const_cast<char*>(s_CCharaPcs_stage), 0);
     m_amemStage = Memory.CreateStage(0x380000, const_cast<char*>(s_CCharaPcs_amem), 2);
     m_amemWorkStage = Memory.CreateStage(0x70000, const_cast<char*>(s_CCharaPcs_amemw), 2);
-    CharaAmemStage() = m_amemStage;
+    Chara.SetAmemStage(m_amemStage);
 
     LoadModelArray(this)->SetStage(m_stage);
     LoadModelArray(this)->SetDefaultSize(0x80);
@@ -783,7 +778,7 @@ void CCharaPcs::Init()
  */
 void CCharaPcs::Quit()
 {
-    *reinterpret_cast<int*>(Ptr(&Chara, 0x205C)) = 0;
+    CharaAmemSize() = 0;
     Memory.DestroyStage(m_amemWorkStage);
     Memory.DestroyStage(m_amemStage);
     Memory.DestroyStage(m_stage);
@@ -874,8 +869,7 @@ void CCharaPcs::create()
     bumpLight.m_offsetZ = FLOAT_80330288;
 
     gCharaPartWorkPtr = reinterpret_cast<u8*>(LightPcs.AddBump(
-        &bumpLight, static_cast<CLightPcs::TARGET>(0),
-        *reinterpret_cast<CMemory::CStage**>(Ptr(&Chara, 0x2058)), 4));
+        &bumpLight, static_cast<CLightPcs::TARGET>(0), Chara.GetMemoryStage(), 4));
     Chara.Create();
 }
 

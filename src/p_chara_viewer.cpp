@@ -861,8 +861,7 @@ void CCharaPcs::createViewer()
     bumpLight.m_offsetX = kCharaViewerZero;
     bumpLight.m_offsetZ = kCharaViewerZero;
     gCharaPartWorkPtr = reinterpret_cast<u8*>(LightPcs.AddBump(
-        &bumpLight, static_cast<CLightPcs::TARGET>(0),
-        *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(&Chara) + 0x2058), 4));
+        &bumpLight, static_cast<CLightPcs::TARGET>(0), Chara.GetMemoryStage(), 4));
 
     Chara.Create();
 }

@@ -382,7 +382,7 @@ void CCameraPcs::onScriptChanged(char*, int fromScript)
     MtxPtr mathMtx = reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(&Math) + 4);
 
     PSMTXCopy(mathMtx, reinterpret_cast<MtxPtr>(self + 0x34));
-    PSMTXInverse(mathMtx, reinterpret_cast<MtxPtr>(self + 0x64));
+    PSMTXInverse(mathMtx, m_cameraWorldMtx);
 
     float refValue = FLOAT_8032fa88;
     float zero;
@@ -1578,7 +1578,7 @@ void CCameraPcs::drawShadowBegin()
     PSMTXMultVecSR(rotXY, reinterpret_cast<Vec*>(self + 0x2F0), reinterpret_cast<Vec*>(self + 0x2F0));
 
     if (Game.m_currentMapId == 0x21) {
-        PSMTXCopy(reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x64), tempMtx);
+        PSMTXCopy(CameraPcs.m_cameraWorldMtx, tempMtx);
         PSMTXMultVecSR(tempMtx, reinterpret_cast<Vec*>(self + 0x2F0), reinterpret_cast<Vec*>(self + 0x2F0));
     }
 

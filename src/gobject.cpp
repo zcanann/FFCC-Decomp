@@ -620,7 +620,7 @@ void CGObject::move()
 
             if (Game.m_currentMapId == 0x21) {
                 Mtx cameraWorldMtx;
-                PSMTXCopy(reinterpret_cast<MtxPtr>(reinterpret_cast<u8*>(&CameraPcs) + 0x64), cameraWorldMtx);
+                PSMTXCopy(CameraPcs.m_cameraWorldMtx, cameraWorldMtx);
                 moveVec.x = -moveVec.x;
                 moveVec.z = -moveVec.z;
                 moveVec.y = sZeroFloat;

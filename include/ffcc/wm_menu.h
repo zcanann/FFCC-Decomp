@@ -22,7 +22,7 @@ public:
     void SetBrokenFile(int);
     int SaveDat();
     int LoadDat();
-    void Format(int);
+    int Format(int);
     int ChkEmpty(int param_2);
     int ChkConnect(int chan);
     int ChkNowData();

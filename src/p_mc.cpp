@@ -25,8 +25,6 @@ unsigned int s_CMcPcsTablePad1[5] = {
 
 CMcPcs McPcs;
 
-extern "C" int Format__6McCtrlFi(McCtrl* mcCtrl, int slot);
-
 struct MenuPcsMcLayout
 {
     unsigned char unk14[0x14];
@@ -57,7 +55,7 @@ void CMcPcs::calc()
     {
         if (reinterpret_cast<MenuPcsMcLayout&>(MenuPcs).field18 == 0x13)
         {
-            result = Format__6McCtrlFi(&reinterpret_cast<MenuPcsMcLayout&>(MenuPcs).m_mcCtrl, 1);
+            result = reinterpret_cast<MenuPcsMcLayout&>(MenuPcs).m_mcCtrl.Format(1);
             if (result != 0)
             {
                 if (result == 1)

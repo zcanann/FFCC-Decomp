@@ -76,7 +76,6 @@ extern "C" void __ct__10pppModelStFv(pppModelSt* modelSt);
 extern "C" void __dt__10pppModelStFv(pppModelSt* modelSt, int);
 extern "C" void pppDestroyHeap__FP9_pppEnvSt(_pppEnvSt*);
 extern "C" void _pppDrawPart__FP9_pppMngSt(_pppMngSt*);
-extern "C" void LoadMap__7CMapPcsFiiPvUlUc(void*, int, int, void*, unsigned long, unsigned char);
 PPPCREATEPARAM g_dcp;
 extern "C" {
 int DAT_8032ed68 = 0;
@@ -2094,14 +2093,7 @@ void CPartMng::pppEditBeforeCalc()
     }
     case 0x18:
         Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp_801d8230), 0x7a4);
-        LoadMap__7CMapPcsFiiPvUlUc(
-            &MapPcs,
-            *reinterpret_cast<int*>(self + 0x188),
-            *reinterpret_cast<int*>(self + 0x18c),
-            0,
-            0,
-            0
-        );
+        MapPcs.LoadMap(*reinterpret_cast<int*>(self + 0x188), *reinterpret_cast<int*>(self + 0x18c), 0, 0, 0);
         *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&MapPcs) + 0x180) = 1;
         break;
     case 0x19: {

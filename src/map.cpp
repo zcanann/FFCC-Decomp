@@ -1483,8 +1483,6 @@ void CMapMng::DestroyMapLightHolder()
  */
 void CMapMng::DestroyMap()
 {
-    unsigned char* self = reinterpret_cast<unsigned char*>(this);
-
     short octTreeCount = m_octTreeCount;
     for (int i = 0; i < octTreeCount; i++) {
         __dt__8COctTreeFv(GetOctTreeArray() + i, 0xFFFF);
@@ -1509,21 +1507,18 @@ void CMapMng::DestroyMap()
     }
     m_mapMeshCount = 0;
 
-    int* materialSet = reinterpret_cast<int*>(m_materialSet);
-    if (materialSet != 0) {
-        (*reinterpret_cast<void (**)(int*, int)>(*materialSet + 8))(materialSet, 1);
+    if (m_materialSet != 0) {
+        delete m_materialSet;
         m_materialSet = 0;
     }
 
-    int* textureSet = reinterpret_cast<int*>(m_textureSet);
-    if (textureSet != 0) {
-        (*reinterpret_cast<void (**)(int*, int)>(*textureSet + 8))(textureSet, 1);
+    if (m_textureSet != 0) {
+        delete m_textureSet;
         m_textureSet = 0;
     }
 
-    int* mapTexAnimSet = reinterpret_cast<int*>(m_mapTexAnimSet);
-    if (mapTexAnimSet != 0) {
-        (*reinterpret_cast<void (**)(int*, int)>(*mapTexAnimSet + 8))(mapTexAnimSet, 1);
+    if (m_mapTexAnimSet != 0) {
+        delete m_mapTexAnimSet;
         m_mapTexAnimSet = 0;
     }
 
@@ -2747,7 +2742,6 @@ void CMapMng::Calc()
 #pragma dont_inline on
 void CMapMng::DrawMapShadow()
 {
-    unsigned char* self = reinterpret_cast<unsigned char*>(this);
     if (m_mapObjCount != 0) {
         for (unsigned int i = 0; i < static_cast<unsigned int>(GetMapShadowArray().GetSize()); i++) {
             CMapShadow* mapShadow = GetMapShadowArray()[i];

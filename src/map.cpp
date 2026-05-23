@@ -207,23 +207,23 @@ CMapTexAnimSet::~CMapTexAnimSet()
  */
 CMapIdGrp::CMapIdGrp()
 {
-    mMask = -1;
-    mPrimaryColor.r = 0x80;
-    mPrimaryColor.b = 0;
-    mPrimaryColor.g = 0;
-    mPrimaryColor.a = 0x80;
-    mSecondaryColor.r = 0;
-    mSecondaryColor.g = 0;
-    mSecondaryColor.b = 0x80;
-    mSecondaryColor.a = 0x80;
-    mTertiaryColor.r = 0xFF;
-    mTertiaryColor.g = 0x40;
-    mTertiaryColor.b = 0x40;
-    mTertiaryColor.a = 0x80;
-    mQuaternaryColor.r = 0x40;
-    mQuaternaryColor.g = 0x40;
-    mQuaternaryColor.b = 0;
-    mQuaternaryColor.a = 0x80;
+    m_mask = -1;
+    m_primaryColor.r = 0x80;
+    m_primaryColor.b = 0;
+    m_primaryColor.g = 0;
+    m_primaryColor.a = 0x80;
+    m_secondaryColor.r = 0;
+    m_secondaryColor.g = 0;
+    m_secondaryColor.b = 0x80;
+    m_secondaryColor.a = 0x80;
+    m_tertiaryColor.r = 0xFF;
+    m_tertiaryColor.g = 0x40;
+    m_tertiaryColor.b = 0x40;
+    m_tertiaryColor.a = 0x80;
+    m_quaternaryColor.r = 0x40;
+    m_quaternaryColor.g = 0x40;
+    m_quaternaryColor.b = 0;
+    m_quaternaryColor.a = 0x80;
 }
 
 /*
@@ -3121,7 +3121,7 @@ void CMapMng::SetViewMtx(float (*viewMtx)[4], float (*projMtx)[4])
  */
 void CMapMng::SetIdGrpMask(int mapIdGrpIndex, unsigned long mask)
 {
-    reinterpret_cast<CMapIdGrp*>(Ptr(this, 0x214E8))[mapIdGrpIndex].mMask = mask;
+    GetMapIdGrpArray()[mapIdGrpIndex].m_mask = mask;
 }
 
 /*
@@ -3135,57 +3135,21 @@ void CMapMng::SetIdGrpMask(int mapIdGrpIndex, unsigned long mask)
  */
 void CMapMng::SetIdGrpColor(int mapIdGrpIndex, int channelIndex, _GXColor color)
 {
-    unsigned char* colorBytes = reinterpret_cast<unsigned char*>(&color);
+    CMapIdGrp* mapIdGrp = GetMapIdGrpArray() + mapIdGrpIndex;
 
     switch (channelIndex) {
-    case 0: {
-        unsigned char red = colorBytes[0];
-        unsigned char green = colorBytes[1];
-        unsigned char* mapIdGrp = Ptr(this, 0x214E8 + (mapIdGrpIndex * 0x14));
-        unsigned char blue = colorBytes[2];
-        mapIdGrp[4] = red;
-        unsigned char alpha = colorBytes[3];
-        mapIdGrp[5] = green;
-        mapIdGrp[6] = blue;
-        mapIdGrp[7] = alpha;
+    case 0:
+        mapIdGrp->m_primaryColor = color;
         return;
-    }
-    case 1: {
-        unsigned char red = colorBytes[0];
-        unsigned char green = colorBytes[1];
-        unsigned char* mapIdGrp = Ptr(this, 0x214E8 + (mapIdGrpIndex * 0x14));
-        unsigned char blue = colorBytes[2];
-        mapIdGrp[8] = red;
-        unsigned char alpha = colorBytes[3];
-        mapIdGrp[9] = green;
-        mapIdGrp[10] = blue;
-        mapIdGrp[11] = alpha;
+    case 1:
+        mapIdGrp->m_secondaryColor = color;
         return;
-    }
-    case 2: {
-        unsigned char red = colorBytes[0];
-        unsigned char green = colorBytes[1];
-        unsigned char* mapIdGrp = Ptr(this, 0x214E8 + (mapIdGrpIndex * 0x14));
-        unsigned char blue = colorBytes[2];
-        mapIdGrp[0xC] = red;
-        unsigned char alpha = colorBytes[3];
-        mapIdGrp[0xD] = green;
-        mapIdGrp[0xE] = blue;
-        mapIdGrp[0xF] = alpha;
+    case 2:
+        mapIdGrp->m_tertiaryColor = color;
         return;
-    }
-    case 3: {
-        unsigned char red = colorBytes[0];
-        unsigned char green = colorBytes[1];
-        unsigned char* mapIdGrp = Ptr(this, 0x214E8 + (mapIdGrpIndex * 0x14));
-        unsigned char blue = colorBytes[2];
-        mapIdGrp[0x10] = red;
-        unsigned char alpha = colorBytes[3];
-        mapIdGrp[0x11] = green;
-        mapIdGrp[0x12] = blue;
-        mapIdGrp[0x13] = alpha;
+    case 3:
+        mapIdGrp->m_quaternaryColor = color;
         return;
-    }
     }
 }
 

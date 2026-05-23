@@ -1040,10 +1040,10 @@ void CGObject::bgNormalCollision()
     }
 
     const unsigned char mapGroup = gMapHitFace->m_groupIndex;
-    u8* mapGroupData = reinterpret_cast<u8*>(&MapMng) + 0x214E8 + (mapGroup * 0x14);
-    if ((*reinterpret_cast<u32*>(mapGroupData) & 0x20) == 0) {
+    CMapIdGrp* mapGroupData = MapMng.GetMapIdGrpArray() + mapGroup;
+    if ((mapGroupData->m_mask & 0x20) == 0) {
         m_stateFlags0 = (m_stateFlags0 & 0x7F) | 0x80;
-        m_radiusCtrl.x = *reinterpret_cast<float*>(mapGroupData);
+        m_radiusCtrl.x = *reinterpret_cast<float*>(&mapGroupData->m_mask);
         if (mapGroup != 0) {
             m_lastBgGroup = static_cast<short>(mapGroup);
         }
@@ -1161,10 +1161,10 @@ void CGObject::bgWorldCollision()
     m_groundHitOffset.z = newOffset.z;
 
     const unsigned char mapGroup = gMapHitFace->m_groupIndex;
-    u8* mapGroupData = reinterpret_cast<u8*>(&MapMng) + 0x214E8 + (mapGroup * 0x14);
-    if ((*reinterpret_cast<u32*>(mapGroupData) & 0x20) == 0) {
+    CMapIdGrp* mapGroupData = MapMng.GetMapIdGrpArray() + mapGroup;
+    if ((mapGroupData->m_mask & 0x20) == 0) {
         m_stateFlags0 = (m_stateFlags0 & 0x7F) | 0x80;
-        m_radiusCtrl.x = *reinterpret_cast<float*>(mapGroupData);
+        m_radiusCtrl.x = *reinterpret_cast<float*>(&mapGroupData->m_mask);
         if (mapGroup != 0) {
             m_lastBgGroup = static_cast<short>(mapGroup);
         }

@@ -80,11 +80,11 @@ public:
 class CMapIdGrp
 {
 public:
-    unsigned long mMask;
-    _GXColor mPrimaryColor;
-    _GXColor mSecondaryColor;
-    _GXColor mTertiaryColor;
-    _GXColor mQuaternaryColor;
+    unsigned long m_mask;
+    _GXColor m_primaryColor;
+    _GXColor m_secondaryColor;
+    _GXColor m_tertiaryColor;
+    _GXColor m_quaternaryColor;
 
     CMapIdGrp();
 };
@@ -160,6 +160,7 @@ public:
         return *reinterpret_cast<CPtrArray<CMapLightHolder*>*>(
             reinterpret_cast<unsigned char*>(this) + 0x21450 + (index * 0x1C));
     }
+    CMapIdGrp* GetMapIdGrpArray() { return reinterpret_cast<CMapIdGrp*>(reinterpret_cast<unsigned char*>(this) + 0x214E8); }
 
     ~CMapMng();
     CMapMng();

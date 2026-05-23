@@ -1,12 +1,6 @@
 #include "dolphin/math.h"
 #include "dolphin/mtx.h"
 
-float sqrtf(float x);
-float sinf(float x);
-float cosf(float x);
-float acosf(float x);
-float atan2f(float y, float x);
-
 void C_QUATAdd(const Quaternion* p, const Quaternion* q, Quaternion* r)
 {
     ASSERTMSGLINE(77, p, "QUATAdd():  NULL QuaternionPtr 'p' ");

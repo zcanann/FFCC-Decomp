@@ -71,6 +71,10 @@ double atan2(double y, double x);
 double fmod(double x, double y);
 double log(double x);
 double pow(double x, double y);
+float acosf(float x);
+float atan2f(float y, float x);
+float cosf(float x);
+float sinf(float x);
 float tanf(float x);
 
 #ifdef __MWERKS__

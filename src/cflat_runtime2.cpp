@@ -913,7 +913,7 @@ void CFlatRuntime2::Frame(int arg0, int mode)
 			object->move();
 		}
 		watch.Stop();
-		*reinterpret_cast<float*>(CFlat + 0x1338) += watch.Get();
+		CFlatMoveTime() += watch.Get();
 
 		watch.Reset();
 		watch.Start();
@@ -921,7 +921,7 @@ void CFlatRuntime2::Frame(int arg0, int mode)
 			object->objectCollision();
 		}
 		watch.Stop();
-		*reinterpret_cast<float*>(CFlat + 0x1340) += watch.Get();
+		CFlatObjectCollisionTime() += watch.Get();
 
 		watch.Reset();
 		watch.Start();
@@ -929,7 +929,7 @@ void CFlatRuntime2::Frame(int arg0, int mode)
 			object->bgCollision();
 		}
 		watch.Stop();
-		*reinterpret_cast<float*>(CFlat + 0x133C) += watch.Get();
+		CFlatBgCollisionTime() += watch.Get();
 
 		watch.Reset();
 		watch.Start();
@@ -937,7 +937,7 @@ void CFlatRuntime2::Frame(int arg0, int mode)
 			object->update();
 		}
 		watch.Stop();
-		*reinterpret_cast<float*>(CFlat + 0x1344) += watch.Get();
+		CFlatUpdateTime() += watch.Get();
 
 		watch.Reset();
 		watch.Start();
@@ -945,7 +945,7 @@ void CFlatRuntime2::Frame(int arg0, int mode)
 			object->hit();
 		}
 		watch.Stop();
-		*reinterpret_cast<float*>(CFlat + 0x1348) += watch.Get();
+		CFlatHitTime() += watch.Get();
 
 		for (CGObject* object = FindGObjFirst(); object != 0; object = FindGObjNext(object)) {
 			object->copy();

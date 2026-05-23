@@ -107,6 +107,11 @@ static inline u32& CFlatCenterState()
     return *reinterpret_cast<u32*>(CFlat + 0x12AC);
 }
 
+static inline float& CFlatCenterDistanceScale()
+{
+    return *reinterpret_cast<float*>(CFlat + 0x12B0);
+}
+
 static inline u8& CFlatGameFlags()
 {
     return CFlat[0x12E4];
@@ -130,6 +135,31 @@ static inline int& CFlatItemCarryMode()
 static inline int& CFlatItemTraceParticleSlot()
 {
     return *reinterpret_cast<int*>(CFlat + 0x1042C);
+}
+
+static inline float& CFlatMoveTime()
+{
+    return *reinterpret_cast<float*>(CFlat + 0x1338);
+}
+
+static inline float& CFlatBgCollisionTime()
+{
+    return *reinterpret_cast<float*>(CFlat + 0x133C);
+}
+
+static inline float& CFlatObjectCollisionTime()
+{
+    return *reinterpret_cast<float*>(CFlat + 0x1340);
+}
+
+static inline float& CFlatUpdateTime()
+{
+    return *reinterpret_cast<float*>(CFlat + 0x1344);
+}
+
+static inline float& CFlatHitTime()
+{
+    return *reinterpret_cast<float*>(CFlat + 0x1348);
 }
 
 #endif // _FFCC_LINKAGE_H_

@@ -680,7 +680,7 @@ void CGObject::move()
 
                     const double dirDot = static_cast<double>(PSVECDotProduct(&moveVec, &centerDelta));
                     if (static_cast<double>(sZeroFloat) < dirDot) {
-                        centerDist /= static_cast<double>(*reinterpret_cast<float*>(CFlat + 0x12B0));
+                        centerDist /= static_cast<double>(CFlatCenterDistanceScale());
                         double clampDist = centerDist;
                         if (static_cast<double>(sZeroFloat) <= clampDist) {
                             if (static_cast<double>(sAnimFrameOffset) < clampDist) {

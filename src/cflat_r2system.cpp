@@ -633,17 +633,16 @@ void CMes::SetTempValue(int index, int value)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" unsigned short GetGbaButtonDown__4CPadFl(void* pad, long padIndex)
+unsigned short CPad::GetGbaButtonDown(long padIndex)
 {
     bool isInvalidPad = false;
     unsigned int result;
-    CPad* self = static_cast<CPad*>(pad);
 
-    if (self->_452_4_ == 0) {
+    if (_452_4_ == 0) {
         if (padIndex != 0) {
             goto done_check;
         }
-        if (self->_448_4_ == -1) {
+        if (_448_4_ == -1) {
             goto done_check;
         }
     }
@@ -653,8 +652,8 @@ done_check:
     if (isInvalidPad) {
         result = 0;
     } else {
-        int slot = (self->_448_4_ == padIndex) ? 0 : static_cast<int>(padIndex);
-        result = self->GetPadInputs()[slot].buttonDown[1];
+        int slot = (_448_4_ == padIndex) ? 0 : static_cast<int>(padIndex);
+        result = GetPadInputs()[slot].buttonDown[1];
     }
 
     return (unsigned short)result;
@@ -669,16 +668,15 @@ done_check:
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" float GetRightStickY__4CPadFl(void* pad, long padIndex)
+float CPad::GetRightStickY(long padIndex)
 {
     bool isInvalidPad = false;
-    CPad* self = static_cast<CPad*>(pad);
 
-    if (self->_452_4_ == 0) {
+    if (_452_4_ == 0) {
         if (padIndex != 0) {
             goto done_check;
         }
-        if (self->_448_4_ == -1) {
+        if (_448_4_ == -1) {
             goto done_check;
         }
     }
@@ -689,8 +687,8 @@ done_check:
         return FLOAT_80330B30;
     }
 
-    int slot = (self->_448_4_ == padIndex) ? 0 : static_cast<int>(padIndex);
-    return self->GetPadInputs()[slot].substickYF;
+    int slot = (_448_4_ == padIndex) ? 0 : static_cast<int>(padIndex);
+    return GetPadInputs()[slot].substickYF;
 }
 
 /*
@@ -702,16 +700,15 @@ done_check:
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" float GetRightStickX__4CPadFl(void* pad, long padIndex)
+float CPad::GetRightStickX(long padIndex)
 {
     bool isInvalidPad = false;
-    CPad* self = static_cast<CPad*>(pad);
 
-    if (self->_452_4_ == 0) {
+    if (_452_4_ == 0) {
         if (padIndex != 0) {
             goto done_check;
         }
-        if (self->_448_4_ == -1) {
+        if (_448_4_ == -1) {
             goto done_check;
         }
     }
@@ -722,8 +719,8 @@ done_check:
         return FLOAT_80330B30;
     }
 
-    int slot = (self->_448_4_ == padIndex) ? 0 : static_cast<int>(padIndex);
-    return self->GetPadInputs()[slot].substickXF;
+    int slot = (_448_4_ == padIndex) ? 0 : static_cast<int>(padIndex);
+    return GetPadInputs()[slot].substickXF;
 }
 
 /*
@@ -735,16 +732,15 @@ done_check:
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" float GetLeftStickY__4CPadFl(void* pad, long padIndex)
+float CPad::GetLeftStickY(long padIndex)
 {
     bool isInvalidPad = false;
-    CPad* self = static_cast<CPad*>(pad);
 
-    if (self->_452_4_ == 0) {
+    if (_452_4_ == 0) {
         if (padIndex != 0) {
             goto done_check;
         }
-        if (self->_448_4_ == -1) {
+        if (_448_4_ == -1) {
             goto done_check;
         }
     }
@@ -755,8 +751,8 @@ done_check:
         return FLOAT_80330B30;
     }
 
-    int slot = (self->_448_4_ == padIndex) ? 0 : static_cast<int>(padIndex);
-    return self->GetPadInputs()[slot].stickYF;
+    int slot = (_448_4_ == padIndex) ? 0 : static_cast<int>(padIndex);
+    return GetPadInputs()[slot].stickYF;
 }
 
 /*
@@ -768,16 +764,15 @@ done_check:
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" float GetLeftStickX__4CPadFl(void* pad, long padIndex)
+float CPad::GetLeftStickX(long padIndex)
 {
     bool isInvalidPad = false;
-    CPad* self = static_cast<CPad*>(pad);
 
-    if (self->_452_4_ == 0) {
+    if (_452_4_ == 0) {
         if (padIndex != 0) {
             goto done_check;
         }
-        if (self->_448_4_ == -1) {
+        if (_448_4_ == -1) {
             goto done_check;
         }
     }
@@ -788,8 +783,8 @@ done_check:
         return FLOAT_80330B30;
     }
 
-    int slot = (self->_448_4_ == padIndex) ? 0 : static_cast<int>(padIndex);
-    return self->GetPadInputs()[slot].stickXF;
+    int slot = (_448_4_ == padIndex) ? 0 : static_cast<int>(padIndex);
+    return GetPadInputs()[slot].stickXF;
 }
 
 /*
@@ -801,17 +796,16 @@ done_check:
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" unsigned short GetButtonRepeat__4CPadFl(void* pad, long padIndex)
+unsigned short CPad::GetButtonRepeat(long padIndex)
 {
     bool isInvalidPad = false;
     unsigned int result;
-    CPad* self = static_cast<CPad*>(pad);
 
-    if (self->_452_4_ == 0) {
+    if (_452_4_ == 0) {
         if (padIndex != 0) {
             goto done_check;
         }
-        if (self->_448_4_ == -1) {
+        if (_448_4_ == -1) {
             goto done_check;
         }
     }
@@ -821,8 +815,8 @@ done_check:
     if (isInvalidPad) {
         result = 0;
     } else {
-        int slot = (self->_448_4_ == padIndex) ? 0 : static_cast<int>(padIndex);
-        result = self->GetPadInputs()[slot].repeatButton;
+        int slot = (_448_4_ == padIndex) ? 0 : static_cast<int>(padIndex);
+        result = GetPadInputs()[slot].repeatButton;
     }
 
     return (unsigned short)result;
@@ -837,17 +831,16 @@ done_check:
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" unsigned short GetButton__4CPadFl(void* pad, long padIndex)
+unsigned short CPad::GetButton(long padIndex)
 {
     bool isInvalidPad = false;
     unsigned int result;
-    CPad* self = static_cast<CPad*>(pad);
 
-    if (self->_452_4_ == 0) {
+    if (_452_4_ == 0) {
         if (padIndex != 0) {
             goto done_check;
         }
-        if (self->_448_4_ == -1) {
+        if (_448_4_ == -1) {
             goto done_check;
         }
     }
@@ -857,8 +850,8 @@ done_check:
     if (isInvalidPad) {
         result = 0;
     } else {
-        int slot = (self->_448_4_ == padIndex) ? 0 : static_cast<int>(padIndex);
-        result = self->GetPadInputs()[slot].button[0];
+        int slot = (_448_4_ == padIndex) ? 0 : static_cast<int>(padIndex);
+        result = GetPadInputs()[slot].button[0];
     }
 
     return (unsigned short)result;
@@ -1851,8 +1844,8 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
 
     switch (systemFunc) {
     case -0xFD: {
-        const double stickX = GetLeftStickX__4CPadFl(&Pad, *object->m_localBase);
-        const double stickY = GetLeftStickY__4CPadFl(&Pad, *object->m_localBase);
+        const double stickX = Pad.GetLeftStickX(*object->m_localBase);
+        const double stickY = Pad.GetLeftStickY(*object->m_localBase);
         *reinterpret_cast<float*>(object->m_localBase[1]) = static_cast<float>(stickX);
         *reinterpret_cast<float*>(object->m_localBase[2]) = static_cast<float>(stickY);
         runtime->push(object, 0);
@@ -2876,7 +2869,7 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         outResult = 0;
         return;
     case -0x74: {
-        unsigned short buttonDown = GetGbaButtonDown__4CPadFl(&Pad, *object->m_localBase);
+        unsigned short buttonDown = Pad.GetGbaButtonDown(*object->m_localBase);
         if ((DbgMenuPcs.GetDbgFlag() & 0x100) != 0) {
             buttonDown &= 0xF3FF;
         }
@@ -3897,9 +3890,9 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
     case -0x13:
         if ((DbgMenuPcs.GetDbgFlag() & 0x100) == 0) {
             *reinterpret_cast<float*>(object->m_localBase[1]) =
-                static_cast<float>(GetRightStickX__4CPadFl(&Pad, *object->m_localBase));
+                static_cast<float>(Pad.GetRightStickX(*object->m_localBase));
             *reinterpret_cast<float*>(object->m_localBase[2]) =
-                static_cast<float>(GetRightStickY__4CPadFl(&Pad, *object->m_localBase));
+                static_cast<float>(Pad.GetRightStickY(*object->m_localBase));
         } else {
             *reinterpret_cast<float*>(object->m_localBase[1]) = 0.0f;
             *reinterpret_cast<float*>(object->m_localBase[2]) = 0.0f;
@@ -3910,9 +3903,9 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
     case -0x12:
         if ((DbgMenuPcs.GetDbgFlag() & 0x100) == 0) {
             *reinterpret_cast<float*>(object->m_localBase[1]) =
-                static_cast<float>(GetLeftStickX__4CPadFl(&Pad, *object->m_localBase));
+                static_cast<float>(Pad.GetLeftStickX(*object->m_localBase));
             *reinterpret_cast<float*>(object->m_localBase[2]) =
-                static_cast<float>(GetLeftStickY__4CPadFl(&Pad, *object->m_localBase));
+                static_cast<float>(Pad.GetLeftStickY(*object->m_localBase));
         } else {
             *reinterpret_cast<float*>(object->m_localBase[1]) = 0.0f;
             *reinterpret_cast<float*>(object->m_localBase[2]) = 0.0f;
@@ -3952,7 +3945,7 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
     case -0x0C: {
         unsigned short buttons = 0;
         if (((1 << *object->m_localBase) & *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x12A8)) == 0) {
-            buttons = GetButtonRepeat__4CPadFl(&Pad, *object->m_localBase);
+            buttons = Pad.GetButtonRepeat(*object->m_localBase);
         }
         if ((DbgMenuPcs.GetDbgFlag() & 0x100) != 0) {
             buttons &= 0xF3FF;
@@ -4096,7 +4089,7 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
     case -5: {
         unsigned short buttons = 0;
         if (((1 << *object->m_localBase) & *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x12A8)) == 0) {
-            buttons = GetButton__4CPadFl(&Pad, *object->m_localBase);
+            buttons = Pad.GetButton(*object->m_localBase);
         }
         if ((DbgMenuPcs.GetDbgFlag() & 0x100) != 0) {
             buttons &= 0xF3FF;

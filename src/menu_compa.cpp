@@ -25,7 +25,7 @@ extern "C" const float FLOAT_80333038;
 extern "C" const float FLOAT_8033303C;
 
 extern "C" const char s_pcts_pctd_family_cnt_error_pctd_801DEDC8[] = "%s(%d):family cnt error!!(%d)\n";
-extern "C" const char s_menu_compa_cpp_801DEDE8[] = "menu_compa.cpp";
+static const char s_menu_compa_cpp[] = "menu_compa.cpp";
 
 extern "C" const char s_MenuOptionMonoUpper_803334A8[] = "MONO";
 extern "C" const char s_MenuOptionNormalIt_803334B0[] = "Normal";
@@ -202,7 +202,7 @@ void CMenuPcs::CompaDraw()
 		}
 	}
 	if (familyCount > 4 && System.m_execParam >= 1) {
-		System.Printf(const_cast<char*>(s_pcts_pctd_family_cnt_error_pctd_801DEDC8), s_menu_compa_cpp_801DEDE8, 0x1BF,
+		System.Printf(const_cast<char*>(s_pcts_pctd_family_cnt_error_pctd_801DEDC8), s_menu_compa_cpp, 0x1BF,
 		              familyCount);
 	}
 	if (familyCount > 4) {
@@ -235,7 +235,7 @@ void CMenuPcs::CompaDraw()
 			reinterpret_cast<const u8*>(&Game) + caravanWork->m_saveSlot * 0x208 + drawIndex + 0xA9;
 		u8 food = *compatibility;
 		if (food == 0 && System.m_execParam >= 1) {
-			System.Printf(const_cast<char*>(s_pcts_pctd_family_cnt_error_pctd_801DEDC8), s_menu_compa_cpp_801DEDE8, 0x1E0,
+			System.Printf(const_cast<char*>(s_pcts_pctd_family_cnt_error_pctd_801DEDC8), s_menu_compa_cpp, 0x1E0,
 			              shown);
 		}
 		int icon = 0x1D;

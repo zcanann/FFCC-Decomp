@@ -87,7 +87,7 @@ extern "C" char s_menuSubfontPathFmt[];
 extern "C" char* PTR_s_world2_802159a4[];
 extern "C" int DAT_802159c8;
 extern "C" {
-static const char s_cmake_cpp_801e3038[] = "cmake.cpp";
+static const char s_cmake_cpp[] = "cmake.cpp";
 }
 
 struct CmakeInfo {
@@ -3601,7 +3601,7 @@ void CMenuPcs::calcVillageMenu()
 
             CMemory::CStage* stage = CmakeFields(this).m_menuStage;
             void*& villageWork = CmakeFields(this).m_villageWork;
-            villageWork = operator new(0x48, stage, const_cast<char*>(s_cmake_cpp_801e3038), 0xCB3);
+            villageWork = operator new(0x48, stage, const_cast<char*>(s_cmake_cpp), 0xCB3);
             memset(villageWork, 0, 0x48);
             LoadCmakeVillageName();
             MenuS16(this, 0x86C) = 1;

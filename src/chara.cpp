@@ -589,7 +589,7 @@ static void CopyDuplicatedMeshState(CChara::CMesh* dst, CChara::CMesh* src)
 	*reinterpret_cast<void**>(dstRaw + 8) = 0;
 }
 
-static const char s_chara_cpp_801d90c8[] = "chara.cpp";
+static const char s_chara_cpp[] = "chara.cpp";
 static const char s_charaMeshWorkOverflow[] = "chara mesh work buffer overflow\n";
 static int s_charaMeshWorkWarnArmed = 1;
 static bool s_charaMeshWorkOverflowSeen = false;
@@ -631,8 +631,8 @@ void CChara::Init()
 {
 	m_amemStage = Memory.CreateStage(0xc0000, const_cast<char*>(s_CChara_80330220), 0);
 	m_amemSize = 0;
-	m_drawBuffers[0].m_base = new (m_amemStage, const_cast<char*>(s_chara_cpp_801d90c8), 0x3f) u8[0x58000];
-	m_drawBuffers[1].m_base = new (m_amemStage, const_cast<char*>(s_chara_cpp_801d90c8), 0x40) u8[0x58000];
+	m_drawBuffers[0].m_base = new (m_amemStage, const_cast<char*>(s_chara_cpp), 0x3f) u8[0x58000];
+	m_drawBuffers[1].m_base = new (m_amemStage, const_cast<char*>(s_chara_cpp), 0x40) u8[0x58000];
 	m_drawBufferIndex = 1;
 	m_drawBufferIndex = 1 - m_drawBufferIndex;
 	m_drawBuffers[m_drawBufferIndex].m_cursor = 0;
@@ -1088,7 +1088,7 @@ void CChara::CModel::CreateDynamics(void* dynData, CMemory::CStage* stage)
 
 				ModelDynCount(this) = 0;
 				ModelDynParams(this) =
-				    Memory._Alloc(chunk.m_size * 0x24, stage, const_cast<char*>(s_chara_cpp_801d90c8), 0x1E7, 0);
+				    Memory._Alloc(chunk.m_size * 0x24, stage, const_cast<char*>(s_chara_cpp), 0x1E7, 0);
 				if (ModelDynParams(this) == 0) {
 					continue;
 				}
@@ -1211,7 +1211,7 @@ void CChara::CModel::setup()
  */
 CChara::CModel* CChara::CModel::Duplicate(CMemory::CStage* stage)
 {
-	CModel* clone = new (stage, const_cast<char*>(s_chara_cpp_801d90c8), 0x25A) CModel();
+	CModel* clone = new (stage, const_cast<char*>(s_chara_cpp), 0x25A) CModel();
 
 	*reinterpret_cast<void**>(ModelRaw(clone) + 0xA4) = ModelRef(this);
 	RetainRefCounted(ModelRef(clone));
@@ -2618,7 +2618,7 @@ void CChara::CMesh::Create(CChara::CModel* model, CChunkFile& chunk, CMemory::CS
 		case 0x56455254:
 			meshRef->m_vertexCount = chunkInfo.m_size / 6;
 			meshRef->m_vertices = static_cast<S16Vec*>(
-			    Memory._Alloc(chunkInfo.m_size, stage, const_cast<char*>(s_chara_cpp_801d90c8), 0x7D6, 0));
+			    Memory._Alloc(chunkInfo.m_size, stage, const_cast<char*>(s_chara_cpp), 0x7D6, 0));
 			if (meshRef->m_vertices != 0) {
 				memcpy(meshRef->m_vertices, chunk.GetAddress(), chunkInfo.m_size);
 				DCFlushRange(meshRef->m_vertices, meshRef->m_vertexCount * 6);
@@ -2627,7 +2627,7 @@ void CChara::CMesh::Create(CChara::CModel* model, CChunkFile& chunk, CMemory::CS
 		case 0x4E4F524D:
 			meshRef->m_normalCount = chunkInfo.m_size / 6;
 			meshRef->m_normals = static_cast<S16Vec*>(
-			    Memory._Alloc(chunkInfo.m_size, stage, const_cast<char*>(s_chara_cpp_801d90c8), 0x7DE, 0));
+			    Memory._Alloc(chunkInfo.m_size, stage, const_cast<char*>(s_chara_cpp), 0x7DE, 0));
 			if (meshRef->m_normals != 0) {
 				memcpy(meshRef->m_normals, chunk.GetAddress(), chunkInfo.m_size);
 				DCFlushRange(meshRef->m_normals, meshRef->m_normalCount * 6);
@@ -2636,7 +2636,7 @@ void CChara::CMesh::Create(CChara::CModel* model, CChunkFile& chunk, CMemory::CS
 		case 0x434F4C52:
 			meshRef->m_colorCount = chunkInfo.m_size >> 2;
 			meshRef->m_colors =
-			    Memory._Alloc(chunkInfo.m_size, stage, const_cast<char*>(s_chara_cpp_801d90c8), 0x7E6, 0);
+			    Memory._Alloc(chunkInfo.m_size, stage, const_cast<char*>(s_chara_cpp), 0x7E6, 0);
 			if (meshRef->m_colors != 0) {
 				memcpy(meshRef->m_colors, chunk.GetAddress(), chunkInfo.m_size);
 				DCFlushRange(meshRef->m_colors, meshRef->m_colorCount << 2);
@@ -2645,7 +2645,7 @@ void CChara::CMesh::Create(CChara::CModel* model, CChunkFile& chunk, CMemory::CS
 		case 0x55562020:
 			meshRef->m_uvCount = chunkInfo.m_size >> 2;
 			meshRef->m_uvs =
-			    Memory._Alloc(chunkInfo.m_size, stage, const_cast<char*>(s_chara_cpp_801d90c8), 0x7EE, 0);
+			    Memory._Alloc(chunkInfo.m_size, stage, const_cast<char*>(s_chara_cpp), 0x7EE, 0);
 			if (meshRef->m_uvs != 0) {
 				memcpy(meshRef->m_uvs, chunk.GetAddress(), chunkInfo.m_size);
 				DCFlushRange(meshRef->m_uvs, meshRef->m_uvCount << 2);
@@ -2665,7 +2665,7 @@ void CChara::CMesh::Create(CChara::CModel* model, CChunkFile& chunk, CMemory::CS
 			meshRef->m_skinCount = chunkInfo.m_arg0;
 			if (meshRef->m_skinCount != 0) {
 				meshRef->m_skins = static_cast<CLightPcs::CBumpLight*>(
-				    Memory._Alloc(meshRef->m_skinCount * 0x64, stage, const_cast<char*>(s_chara_cpp_801d90c8), 0x7F8, 0));
+				    Memory._Alloc(meshRef->m_skinCount * 0x64, stage, const_cast<char*>(s_chara_cpp), 0x7F8, 0));
 				if (meshRef->m_skins != 0) {
 					memset(meshRef->m_skins, 0, meshRef->m_skinCount * 0x64);
 				}
@@ -2684,7 +2684,7 @@ void CChara::CMesh::Create(CChara::CModel* model, CChunkFile& chunk, CMemory::CS
 				case 0x4F4E4520:
 					meshRef->m_oneWeightCountOrSize = chunkInfo.m_size;
 					meshRef->m_oneWeightData =
-					    Memory._Alloc(chunkInfo.m_size, stage, const_cast<char*>(s_chara_cpp_801d90c8), 0x808, 0);
+					    Memory._Alloc(chunkInfo.m_size, stage, const_cast<char*>(s_chara_cpp), 0x808, 0);
 					if (meshRef->m_oneWeightData != 0) {
 						memcpy(meshRef->m_oneWeightData, chunk.GetAddress(), chunkInfo.m_size);
 					}
@@ -2692,7 +2692,7 @@ void CChara::CMesh::Create(CChara::CModel* model, CChunkFile& chunk, CMemory::CS
 				case 0x54574F20:
 					meshRef->m_twoWeightCountOrSize = chunkInfo.m_size;
 					meshRef->m_twoWeightData =
-					    Memory._Alloc(chunkInfo.m_size, stage, const_cast<char*>(s_chara_cpp_801d90c8), 0x80E, 0);
+					    Memory._Alloc(chunkInfo.m_size, stage, const_cast<char*>(s_chara_cpp), 0x80E, 0);
 					if (meshRef->m_twoWeightData != 0) {
 						memcpy(meshRef->m_twoWeightData, chunk.GetAddress(), chunkInfo.m_size);
 					}
@@ -2700,7 +2700,7 @@ void CChara::CMesh::Create(CChara::CModel* model, CChunkFile& chunk, CMemory::CS
 				case 0x524D494E:
 					meshRef->m_threeWeightCountOrSize = chunkInfo.m_size;
 					meshRef->m_threeWeightData =
-					    Memory._Alloc(chunkInfo.m_size, stage, const_cast<char*>(s_chara_cpp_801d90c8), 0x814, 0);
+					    Memory._Alloc(chunkInfo.m_size, stage, const_cast<char*>(s_chara_cpp), 0x814, 0);
 					if (meshRef->m_threeWeightData != 0) {
 						memcpy(meshRef->m_threeWeightData, chunk.GetAddress(), chunkInfo.m_size);
 					}
@@ -2715,7 +2715,7 @@ void CChara::CMesh::Create(CChara::CModel* model, CChunkFile& chunk, CMemory::CS
 			if (meshRef->m_displayListCount != 0) {
 				meshRef->m_displayLists = static_cast<CCharaDisplayListRaw*>(Memory._Alloc(
 				    meshRef->m_displayListCount * sizeof(CCharaDisplayListRaw), stage,
-				    const_cast<char*>(s_chara_cpp_801d90c8), 0x820, 0));
+				    const_cast<char*>(s_chara_cpp), 0x820, 0));
 				if (meshRef->m_displayLists != 0) {
 					memset(meshRef->m_displayLists, 0, meshRef->m_displayListCount * sizeof(CCharaDisplayListRaw));
 					for (u32 i = 0; i < meshRef->m_displayListCount; i++) {
@@ -2739,7 +2739,7 @@ void CChara::CMesh::Create(CChara::CModel* model, CChunkFile& chunk, CMemory::CS
 				if (displayList.m_size > 0) {
 					const unsigned int allocSize = (displayList.m_size + 0x1F) & ~0x1FU;
 					displayList.m_data =
-					    Memory._Alloc(allocSize, stage, const_cast<char*>(s_chara_cpp_801d90c8), 0x830, 0);
+					    Memory._Alloc(allocSize, stage, const_cast<char*>(s_chara_cpp), 0x830, 0);
 					if (displayList.m_data != 0) {
 						chunk.Get(displayList.m_data, displayList.m_size);
 						DCFlushRange(displayList.m_data, displayList.m_size);

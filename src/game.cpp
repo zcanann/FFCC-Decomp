@@ -79,7 +79,7 @@ enum GameAssetNameBlockOffset {
 	kParticleCallbackType3Fmt = 0x194,
 };
 
-static const char s_game_cpp_801d6190[] = "game.cpp";
+static const char s_game_cpp[] = "game.cpp";
 static const char DAT_801d619c[] = {
     0x83, 0x58, 0x83, 0x4E, 0x83, 0x8A, 0x83, 0x76, 0x83, 0x67, 0x82, 0xAA, 0x90, 0xD8, 0x82, 0xE8, 0x91, 0xD6,
     0x82, 0xED, 0x82, 0xE8, 0x82, 0xDC, 0x82, 0xB7, 0x0A, 0x00};
@@ -505,7 +505,7 @@ void CGame::Create()
         mapId = m_currentMapId;
         mapVariant = m_currentMapVariantId;
 
-        Graphic._WaitDrawDone(const_cast<char*>(s_game_cpp_801d6190), 0x24E);
+        Graphic._WaitDrawDone(const_cast<char*>(s_game_cpp), 0x24E);
         System.MapChanging(mapId, mapVariant);
 
         m_currentMapId = mapId;
@@ -715,7 +715,7 @@ void CGame::CheckScriptChange()
     }
 
     m_newGameFlag = 0;
-    Graphic._WaitDrawDone(const_cast<char*>(s_game_cpp_801d6190), 0x205);
+    Graphic._WaitDrawDone(const_cast<char*>(s_game_cpp), 0x205);
 
     if ((u32)System.m_execParam > 2) {
         System.Printf(const_cast<char*>(DAT_801d619c));
@@ -788,7 +788,7 @@ void CGame::ChangeMap(int mapId, int mapVariant, int param4, int param5)
     int hasParamMask;
 
     if (param5 != 0) {
-        Graphic._WaitDrawDone(const_cast<char*>(s_game_cpp_801d6190), 0x24E);
+        Graphic._WaitDrawDone(const_cast<char*>(s_game_cpp), 0x24E);
         System.MapChanging(mapId, mapVariant);
 
         m_currentMapId = mapId;

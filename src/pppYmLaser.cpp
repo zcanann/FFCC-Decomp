@@ -33,7 +33,7 @@ void pppSetBlendMode(unsigned char);
 
 static inline float YmLaserConst(const float& value) { return *reinterpret_cast<const float*>(&value); }
 
-extern "C" const char s_pppYmLaser_cpp_801DB4B0[] = "pppYmLaser.cpp";
+static const char s_pppYmLaser_cpp[] = "pppYmLaser.cpp";
 extern const f32 FLOAT_80330de0 = -1.0f;
 
 static inline f32 LoadLaserFloat(const f32& value)
@@ -373,7 +373,7 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtr
 
 	if (work->m_points == 0) {
 		work->m_points = (Vec*)pppMemAlloc(
-			(u32)step->m_laser.m_pointCount * 0xc, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmLaser_cpp_801DB4B0), 0x5d);
+			(u32)step->m_laser.m_pointCount * 0xc, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmLaser_cpp), 0x5d);
 		memset(work->m_points, 0, (u32)step->m_laser.m_pointCount * 0xc);
 		emptyHistory = 1;
 	}

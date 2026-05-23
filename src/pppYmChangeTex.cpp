@@ -444,7 +444,7 @@ void ChangeTex_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void*
 				}
 
 				drawTevBits = 0xACE0F;
-				fullTevBits = 0xADE0F;
+				fullTevBits = drawTevBits | 0x1000;
 				allOnes = -1;
 				u8 fullByte = 0xFF;
 				tevScale = 0x1e;
@@ -507,7 +507,7 @@ void ChangeTex_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void* pa
 	if (step->m_payload[0] == 0) {
 		int zero = 0;
 		int drawTevBits = 0xACE0F;
-		int fullTevBits = 0xADE0F;
+		int fullTevBits = drawTevBits | 0x1000;
 		int allOnes = -1;
 		int tevScale = 0x1E;
 		u8 fullByte = 0xFF;

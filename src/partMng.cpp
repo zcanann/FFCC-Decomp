@@ -36,7 +36,6 @@ extern int gPppHeapUseRateWords[3];
 #include <PowerPC_EABI_Support/Runtime/MWCPlusLib.h>
 #include <PowerPC_EABI_Support/Runtime/New.h>
 
-extern "C" unsigned long pppHeapCheckLeak__FPQ27CMemory6CStage2(CMemory::CStage*);
 extern "C" {
 extern Mtx ppvCameraMatrix;
 extern float ppvChrScl[3];

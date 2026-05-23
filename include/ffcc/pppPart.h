@@ -68,6 +68,7 @@ void* pppMemAlloc(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void* pppMemFree__FPv(unsigned long, CMemory::CStage*, char*, int);
 void pppHeapUseRate(CMemory::CStage* stage);
 void pppHeapCheckLeak(CMemory::CStage* stage);
+extern "C" unsigned long pppHeapCheckLeak__FPQ27CMemory6CStage2(CMemory::CStage* stage);
 unsigned long pppMngStHeapCheckLeak(CMemory::CStage* stage);
 void pppMngStHeapCheck(CMemory::CStage* stage);
 void callCon2Prog(_pppPObject*);

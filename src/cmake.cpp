@@ -526,7 +526,7 @@ void CMenuPcs::CalcSingCMake()
                 repeat = 0;
             } else {
                 __cntlzw(static_cast<unsigned int>(Pad._448_4_));
-                repeat = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Pad) + 0x14);
+                repeat = Pad.GetPadInputs()[0].repeatButton;
             }
 
             if (repeat == 0) {
@@ -624,7 +624,7 @@ void CMenuPcs::CalcSingCMake()
                 repeat = 0;
             } else {
                 __cntlzw(static_cast<unsigned int>(Pad._448_4_));
-                repeat = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Pad) + 0x14);
+                repeat = Pad.GetPadInputs()[0].repeatButton;
             }
 
             if (repeat == 0) {
@@ -724,7 +724,7 @@ void CMenuPcs::CalcSingCMake()
                 repeat = 0;
             } else {
                 __cntlzw(static_cast<unsigned int>(Pad._448_4_));
-                repeat = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Pad) + 0x14);
+                repeat = Pad.GetPadInputs()[0].repeatButton;
             }
 
             if (repeat == 0) {
@@ -2474,7 +2474,7 @@ unsigned short CMenuPcs::CmakeJobCtrl()
         repeat = 0;
     } else {
         __cntlzw(static_cast<unsigned int>(Pad._448_4_));
-        repeat = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Pad) + 0x14);
+        repeat = Pad.GetPadInputs()[0].repeatButton;
     }
 
     if (repeat == 0) {

@@ -15,6 +15,7 @@
 #include "ffcc/ppp_linkage.h"
 
 extern const float FLOAT_80330FD4;
+extern const float FLOAT_80330FD0;
 extern const float FLOAT_80330FD8;
 extern const double DOUBLE_80330FE0;
 extern const double DOUBLE_80330FE8;
@@ -279,8 +280,8 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param
 		textureInfo->m_imageCount = 0x100;
 		textureInfo->m_bufferSize = textureSize;
 
-		stepX = 2.0f / (float)(textureInfo->m_width - 1);
-		stepY = 2.0f / (float)(textureInfo->m_height - 1);
+		stepX = FLOAT_80330FD0 / (float)(textureInfo->m_width - 1U);
+		stepY = FLOAT_80330FD0 / (float)(textureInfo->m_height - 1U);
 		yCoord = FLOAT_80330FD4;
 		maxMagnitude = FLOAT_80330FF8;
 		coordOffset = FLOAT_8033100C;

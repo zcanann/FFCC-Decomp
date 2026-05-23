@@ -182,49 +182,7 @@ void CFlatData::Create(void* filePtr)
  */
 CFlatData::~CFlatData()
 {
-	int i;
-
-	for (i = 0; i < m_dataCount; i++)
-	{
-		if (m_data[i].m_data != nullptr)
-		{
-			delete static_cast<unsigned char*>(m_data[i].m_data);
-			m_data[i].m_data = nullptr;
-		}
-		if (m_data[i].m_strings != nullptr)
-		{
-			delete m_data[i].m_strings;
-			m_data[i].m_strings = (char**)nullptr;
-		}
-		if (m_data[i].m_stringBuf != nullptr)
-		{
-			delete m_data[i].m_stringBuf;
-			m_data[i].m_stringBuf = (char*)nullptr;
-		}
-	}
-	m_dataCount = 0;
-
-	for (i = 0; i < m_tableCount; i++)
-	{
-		if (m_tabl[i].m_strings != nullptr)
-		{
-			delete m_tabl[i].m_strings;
-			m_tabl[i].m_strings = (char**)nullptr;
-		}
-		if (m_tabl[i].m_stringBuf != nullptr)
-		{
-			delete m_tabl[i].m_stringBuf;
-			m_tabl[i].m_stringBuf = (char*)nullptr;
-		}
-	}
-	m_tableCount = 0;
-
-	if (m_mesBuffer != nullptr)
-	{
-		delete m_mesBuffer;
-		m_mesBuffer = (char*)nullptr;
-	}
-	m_mesCount = 0;
+	Destroy();
 }
 
 /*

@@ -26,7 +26,6 @@
 CMapMng MapMng;
 char g_StrTmp[0x400];
 
-extern "C" unsigned long UnkMaterialSetGetter(void*);
 extern "C" void __dt__4CRefFv(void*, int);
 extern "C" void __dt__8COctTreeFv(void*, int);
 extern "C" void __dt__7CMapHitFv(void*, int);

@@ -408,7 +408,7 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
         unsigned int mapLightHolderIndex = 0;
         if (static_cast<unsigned int>(mapLightHolderArr.GetSize()) > mapLightHolderIndex) {
             mapLightHolderArr[mapLightHolderIndex]->GetLightHolder(
-                reinterpret_cast<_GXColor*>(reinterpret_cast<char*>(&MapMng) + 0x2298C), static_cast<Vec*>(0));
+                &MapMng.m_mapColor, static_cast<Vec*>(0));
         }
     }
 
@@ -496,7 +496,7 @@ void CMapPcs::destroy()
  */
 void CMapPcs::calcInit()
 {
-    *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(&MapMng) + 0x22989) = 0;
+    MapMng.m_colorScaleEnable = 0;
 }
 
 /*
@@ -515,9 +515,9 @@ void CMapPcs::calc()
     Mtx44 screenMtx;
 
     MapFileRead__7CMapMngFPcRUl(&MapMng);
-    *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228EC) = CameraPcs.m_positionX;
-    *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F0) = CameraPcs.m_positionY;
-    *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F4) = CameraPcs.m_positionZ;
+    MapMng.m_cameraPosition.x = CameraPcs.m_positionX;
+    MapMng.m_cameraPosition.y = CameraPcs.m_positionY;
+    MapMng.m_cameraPosition.z = CameraPcs.m_positionZ;
 
     if (m_useStoredViewMtx != 0) {
         memcpy(cameraMtx, m_viewMtx, sizeof(Mtx));
@@ -584,7 +584,7 @@ void CMapPcs::calc()
         unsigned int mapLightHolderIndex = 0;
         if (static_cast<unsigned int>(mapLightHolderArr->GetSize()) > mapLightHolderIndex) {
             (*mapLightHolderArr)[mapLightHolderIndex]->GetLightHolder(
-                reinterpret_cast<_GXColor*>(reinterpret_cast<char*>(&MapMng) + 0x2298C), static_cast<Vec*>(0));
+                &MapMng.m_mapColor, static_cast<Vec*>(0));
         }
 
         m_forceMapReload = 0;
@@ -641,14 +641,14 @@ void CMapPcs::drawBefore()
 
         MaterialMan.InitVtxFmt(-1, GX_F32, 0, GX_RGBA4, 0xE, GX_RGBA4, 0xA);
 
-        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228EC) = CameraPcs.m_positionX;
-        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F0) = CameraPcs.m_positionY;
-        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F4) = CameraPcs.m_positionZ;
+        MapMng.m_cameraPosition.x = CameraPcs.m_positionX;
+        MapMng.m_cameraPosition.y = CameraPcs.m_positionY;
+        MapMng.m_cameraPosition.z = CameraPcs.m_positionZ;
 
         PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
         PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
         MapMng.SetViewMtx(cameraMtx, screenMtx);
-        Graphic.SetFog(*reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(&MapMng) + 0x22988), 0);
+        Graphic.SetFog(MapMng.m_fogEnable, 0);
 
         GXSetColorUpdate(GX_TRUE);
         GXSetAlphaUpdate(GX_FALSE);
@@ -694,14 +694,14 @@ void CMapPcs::draw()
 
         MaterialMan.InitVtxFmt(-1, GX_F32, 0, GX_RGBA4, 0xE, GX_RGBA4, 0xA);
 
-        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228EC) = CameraPcs.m_positionX;
-        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F0) = CameraPcs.m_positionY;
-        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F4) = CameraPcs.m_positionZ;
+        MapMng.m_cameraPosition.x = CameraPcs.m_positionX;
+        MapMng.m_cameraPosition.y = CameraPcs.m_positionY;
+        MapMng.m_cameraPosition.z = CameraPcs.m_positionZ;
 
         PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
         PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
         MapMng.SetViewMtx(cameraMtx, screenMtx);
-        Graphic.SetFog(*reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(&MapMng) + 0x22988), 0);
+        Graphic.SetFog(MapMng.m_fogEnable, 0);
 
         GXSetColorUpdate(GX_TRUE);
         GXSetAlphaUpdate(GX_FALSE);
@@ -748,14 +748,14 @@ void CMapPcs::drawBeforeViewer()
 
         MaterialMan.InitVtxFmt(-1, GX_F32, 0, GX_RGBA4, 0xE, GX_RGBA4, 0xA);
 
-        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228EC) = CameraPcs.m_positionX;
-        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F0) = CameraPcs.m_positionY;
-        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F4) = CameraPcs.m_positionZ;
+        MapMng.m_cameraPosition.x = CameraPcs.m_positionX;
+        MapMng.m_cameraPosition.y = CameraPcs.m_positionY;
+        MapMng.m_cameraPosition.z = CameraPcs.m_positionZ;
 
         PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
         PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
         MapMng.SetViewMtx(cameraMtx, screenMtx);
-        Graphic.SetFog(*reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(&MapMng) + 0x22988), 0);
+        Graphic.SetFog(MapMng.m_fogEnable, 0);
 
         GXSetColorUpdate(GX_TRUE);
         GXSetAlphaUpdate(GX_FALSE);
@@ -802,14 +802,14 @@ void CMapPcs::drawViewer()
 
         MaterialMan.InitVtxFmt(-1, GX_F32, 0, GX_RGBA4, 0xE, GX_RGBA4, 0xA);
 
-        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228EC) = CameraPcs.m_positionX;
-        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F0) = CameraPcs.m_positionY;
-        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F4) = CameraPcs.m_positionZ;
+        MapMng.m_cameraPosition.x = CameraPcs.m_positionX;
+        MapMng.m_cameraPosition.y = CameraPcs.m_positionY;
+        MapMng.m_cameraPosition.z = CameraPcs.m_positionZ;
 
         PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
         PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
         MapMng.SetViewMtx(cameraMtx, screenMtx);
-        Graphic.SetFog(*reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(&MapMng) + 0x22988), 0);
+        Graphic.SetFog(MapMng.m_fogEnable, 0);
 
         GXSetColorUpdate(GX_TRUE);
         GXSetAlphaUpdate(GX_FALSE);
@@ -851,9 +851,9 @@ void CMapPcs::drawAfter()
 
             MaterialMan.InitVtxFmt(-1, GX_F32, 0, GX_RGBA4, 0xE, GX_RGBA4, 0xA);
 
-            *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228EC) = CameraPcs.m_positionX;
-            *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F0) = CameraPcs.m_positionY;
-            *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F4) = CameraPcs.m_positionZ;
+            MapMng.m_cameraPosition.x = CameraPcs.m_positionX;
+            MapMng.m_cameraPosition.y = CameraPcs.m_positionY;
+            MapMng.m_cameraPosition.z = CameraPcs.m_positionZ;
 
             PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
             PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
@@ -901,9 +901,9 @@ void CMapPcs::drawAfterViewer()
 
             MaterialMan.InitVtxFmt(-1, GX_F32, 0, GX_RGBA4, 0xE, GX_RGBA4, 0xA);
 
-            *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228EC) = CameraPcs.m_positionX;
-            *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F0) = CameraPcs.m_positionY;
-            *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F4) = CameraPcs.m_positionZ;
+            MapMng.m_cameraPosition.x = CameraPcs.m_positionX;
+            MapMng.m_cameraPosition.y = CameraPcs.m_positionY;
+            MapMng.m_cameraPosition.z = CameraPcs.m_positionZ;
 
             PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
             PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);

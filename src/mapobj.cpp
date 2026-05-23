@@ -138,7 +138,7 @@ static inline CMapObj* MapObjArrayStart()
 
 static inline Mtx& MapObjHitDrawMtx()
 {
-    return *reinterpret_cast<Mtx*>(reinterpret_cast<unsigned char*>(&MapMng) + 0x228F8);
+    return MapMng.m_viewMtx;
 }
 
 }
@@ -1314,25 +1314,21 @@ void CMapObj::SetDrawEnv()
 {
     _GXColor mapColor;
     _GXColor lightColor = *reinterpret_cast<_GXColor*>(&DAT_8032e498);
-    unsigned char* mapMng = reinterpret_cast<unsigned char*>(&MapMng);
 
     lightColor.a = U8At(this, 0x23);
     *reinterpret_cast<_GXColor*>(&DAT_8032e498) = lightColor;
 
     if (U8At(this, 0x21) == 0) {
-        mapColor.r = mapMng[0x2298C];
-        mapColor.g = mapMng[0x2298D];
-        mapColor.b = mapMng[0x2298E];
-        mapColor.a = mapMng[0x2298F];
+        mapColor = MapMng.m_mapColor;
     } else {
         mapColor = m_ambientColor;
     }
 
-    if (mapMng[0x22989] != 0) {
-        mapColor.r = static_cast<unsigned char>((mapColor.r * mapMng[0x22990]) >> 8);
-        mapColor.g = static_cast<unsigned char>((mapColor.g * mapMng[0x22991]) >> 8);
-        mapColor.b = static_cast<unsigned char>((mapColor.b * mapMng[0x22992]) >> 8);
-        mapColor.a = static_cast<unsigned char>((mapColor.a * mapMng[0x22993]) >> 8);
+    if (MapMng.m_colorScaleEnable != 0) {
+        mapColor.r = static_cast<unsigned char>((mapColor.r * MapMng.m_colorScale.r) >> 8);
+        mapColor.g = static_cast<unsigned char>((mapColor.g * MapMng.m_colorScale.g) >> 8);
+        mapColor.b = static_cast<unsigned char>((mapColor.b * MapMng.m_colorScale.b) >> 8);
+        mapColor.a = static_cast<unsigned char>((mapColor.a * MapMng.m_colorScale.a) >> 8);
     }
 
     if (U8At(this, 0x24) != 0xFF) {
@@ -1374,7 +1370,6 @@ void CMapObj::Draw(unsigned char priority)
     _GXColor mapColor;
     _GXColor lightColor;
     _GXColor* worldMapColor = reinterpret_cast<_GXColor*>(&DAT_8032e498);
-    unsigned char* mapMng = reinterpret_cast<unsigned char*>(&MapMng);
     unsigned char* materialMan = reinterpret_cast<unsigned char*>(&MaterialMan);
 
     Vec lightPos;
@@ -1414,19 +1409,16 @@ void CMapObj::Draw(unsigned char priority)
 
     worldMapColor->a = U8At(this, 0x23);
     if (U8At(this, 0x21) == 0) {
-        mapColor.r = mapMng[0x2298C];
-        mapColor.g = mapMng[0x2298D];
-        mapColor.b = mapMng[0x2298E];
-        mapColor.a = mapMng[0x2298F];
+        mapColor = MapMng.m_mapColor;
     } else {
         mapColor = m_ambientColor;
     }
 
-    if (mapMng[0x22989] != 0) {
-        mapColor.r = static_cast<unsigned char>((mapColor.r * mapMng[0x22990]) >> 8);
-        mapColor.g = static_cast<unsigned char>((mapColor.g * mapMng[0x22991]) >> 8);
-        mapColor.b = static_cast<unsigned char>((mapColor.b * mapMng[0x22992]) >> 8);
-        mapColor.a = static_cast<unsigned char>((mapColor.a * mapMng[0x22993]) >> 8);
+    if (MapMng.m_colorScaleEnable != 0) {
+        mapColor.r = static_cast<unsigned char>((mapColor.r * MapMng.m_colorScale.r) >> 8);
+        mapColor.g = static_cast<unsigned char>((mapColor.g * MapMng.m_colorScale.g) >> 8);
+        mapColor.b = static_cast<unsigned char>((mapColor.b * MapMng.m_colorScale.b) >> 8);
+        mapColor.a = static_cast<unsigned char>((mapColor.a * MapMng.m_colorScale.a) >> 8);
     }
 
     if (U8At(this, 0x24) != 0xFF) {
@@ -1478,10 +1470,9 @@ void CMapObj::SetDrawFlag()
         if ((static_cast<signed char>(U8At(this, 0x1F)) == -1) && ((U8At(this, 0x18) & 1) != 0)) {
             Mtx concatMtx;
 
-            PSMTXConcat(*reinterpret_cast<Mtx*>(reinterpret_cast<unsigned char*>(&MapMng) + 0x22958), m_worldMtx, concatMtx);
+            PSMTXConcat(MapMng.m_scaledViewMtxSecondary, m_worldMtx, concatMtx);
             if (reinterpret_cast<CBound*>(reinterpret_cast<unsigned char*>(m_mapData) + 0xC)
-                    ->CheckFrustum(*reinterpret_cast<Vec*>(reinterpret_cast<unsigned char*>(&MapMng) + 0x228EC), concatMtx,
-                                   *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&MapMng) + 0x22A74)) != 0) {
+                    ->CheckFrustum(MapMng.m_cameraPosition, concatMtx, MapMng.m_octTreeFrustumRange) != 0) {
                 U8At(this, 0x18) |= 4;
             }
         }

@@ -759,7 +759,7 @@ void COctTree::DrawTypeMesh_r(COctNode* octNode)
 		if (farCount >= 8) {
 			return;
 		}
-		if (maxDepth < *reinterpret_cast<float*>(Ptr(&MapMng, 0x22A70))) {
+		if (maxDepth < MapMng.m_octTreeDrawMinDepth) {
 			return;
 		}
 		if (andMask != 0) {
@@ -809,11 +809,11 @@ void COctTree::Draw(unsigned char drawType)
 		unsigned char targetDrawType = drawType;
 		if ((mapDrawType == targetDrawType) &&
 		    ((*reinterpret_cast<unsigned char*>(Ptr(mapObj, 0x18)) & 1) != 0)) {
-			if ((*reinterpret_cast<unsigned char*>(Ptr(&MapMng, 0x2298A)) != 0) &&
+			if ((MapMng.m_underWaterTexPending != 0) &&
 			    ((*reinterpret_cast<void**>(Ptr(mapObj, 0x10)) != 0) &&
 			     (*reinterpret_cast<unsigned char*>(Ptr(*reinterpret_cast<void**>(Ptr(mapObj, 0x10)), 0xB1)) == 2))) {
 				MaterialMan.SetUnderWaterTex();
-				*reinterpret_cast<unsigned char*>(Ptr(&MapMng, 0x2298A)) = 0;
+				MapMng.m_underWaterTexPending = 0;
 			}
 
 			mapObj = m_mapObject;
@@ -892,9 +892,9 @@ void COctTree::SetDrawFlag()
 	Mtx localMtx;
 
 	if (((m_drawFlags & 1) == 0) && (*reinterpret_cast<unsigned char*>(Ptr(m_mapObject, 0x1D)) == 1)) {
-		PSMTXConcat(reinterpret_cast<float(*)[4]>(Ptr(&MapMng, 0x22928)),
+		PSMTXConcat(MapMng.m_scaledViewMtxPrimary,
 		            m_mapObject->m_worldMtx, reinterpret_cast<float(*)[4]>(Ptr(this, 0xC)));
-		PSMTXConcat(reinterpret_cast<float(*)[4]>(Ptr(&MapMng, 0x228F8)),
+		PSMTXConcat(MapMng.m_viewMtx,
 		            m_mapObject->m_worldMtx, localMtx);
 		PSMTXInverse(localMtx, localMtx);
 

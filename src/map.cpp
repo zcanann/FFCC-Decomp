@@ -1309,19 +1309,19 @@ void CMapMng::Create()
     m_mapMeshCount = 0;
     m_mapObjCount = 0;
     m_octTreeCount = 0;
-    *reinterpret_cast<unsigned char*>(Ptr(this, 0x2298C)) = 0xFF;
-    *reinterpret_cast<unsigned char*>(Ptr(this, 0x2298D)) = 0xFF;
-    *reinterpret_cast<unsigned char*>(Ptr(this, 0x2298E)) = 0xFF;
-    *reinterpret_cast<unsigned char*>(Ptr(this, 0x2298F)) = 0xFF;
+    m_mapColor.r = 0xFF;
+    m_mapColor.g = 0xFF;
+    m_mapColor.b = 0xFF;
+    m_mapColor.a = 0xFF;
 
     if (Game.m_currentSceneId == 3) {
-        *reinterpret_cast<unsigned char*>(Ptr(this, 0x22988)) = 0;
+        m_fogEnable = 0;
     } else {
-        *reinterpret_cast<unsigned char*>(Ptr(this, 0x22988)) = 1;
+        m_fogEnable = 1;
     }
 
-    *reinterpret_cast<unsigned int*>(Ptr(this, 0x22A6C)) = 0;
-    *reinterpret_cast<unsigned int*>(Ptr(this, 0x228E8)) = 0;
+    m_mapAnimFrame = 0;
+    m_rootMapObj = 0;
 
     CMemory::CStage* stage = Memory.CreateStage(0x540000, const_cast<char*>(s_map_manager_label_block), 0);
     m_stage = stage;
@@ -1543,7 +1543,7 @@ void CMapMng::DestroyMap()
     }
 
     LightPcs.DestroyBumpLightAll(static_cast<CLightPcs::TARGET>(1));
-    *reinterpret_cast<void**>(self + 0x228E8) = 0;
+    m_rootMapObj = 0;
 }
 
 /*
@@ -1911,7 +1911,7 @@ void CMapMng::ReadMtx(char* mapName)
     int loadIndex = 0;
     int append = 0;
 
-    *reinterpret_cast<unsigned char*>(self + 0x2298B) = 1;
+    m_mapReadReady = 1;
 
     if (asyncLoadState.m_mapReadMode != 2 && asyncLoadState.m_mapReadMode != 3) {
         CMemory::CStage* stage = m_stage;
@@ -2023,7 +2023,7 @@ void CMapMng::ReadMpl(char* mapName)
     CMapMngAsyncLoadState& asyncLoadState = GetMapMngAsyncLoadState(this);
     int loadIndex = 0;
 
-    *reinterpret_cast<unsigned char*>(self + 0x2298B) = 1;
+    m_mapReadReady = 1;
 
     while (true) {
         sprintf(g_StrTmp, const_cast<char*>(s_mapMplPathFmt), mapName, loadIndex);
@@ -2168,9 +2168,9 @@ void CMapMng::ReadOtm(char* mapName)
     CFile::CHandle* fileHandle = 0;
     void* filePtr = File.m_readBuffer;
 
-    *reinterpret_cast<unsigned char*>(self + 0x2298B) = 1;
+    m_mapReadReady = 1;
     sprintf(g_StrTmp, const_cast<char*>(s_mapOtmPathFmt), mapName);
-    *reinterpret_cast<int*>(self + 0x22A6C) = 0;
+    m_mapAnimFrame = 0;
 
     const int readMode = asyncLoadState.m_mapReadMode;
     if (readMode == 1) {
@@ -2366,7 +2366,7 @@ void CMapMng::ReadOtm(char* mapName)
         mapObj = reinterpret_cast<CMapObj*>(reinterpret_cast<unsigned char*>(mapObj) + 0xF0);
     }
 
-    *reinterpret_cast<CMapObj**>(self + 0x228E8) = root;
+    m_rootMapObj = root;
     if (root == 0) {
         return;
     }
@@ -2653,18 +2653,18 @@ void CMapMng::Calc()
     const int mapAnimRunCount = mapAnimRunArray->GetSize();
     for (int i = 0; i < mapAnimRunCount; i++) {
         CMapAnimRun* mapAnimRun = (*mapAnimRunArray)[i];
-        mapAnimRun->Calc(*reinterpret_cast<int*>(Ptr(this, 0x22A6C)));
+        mapAnimRun->Calc(m_mapAnimFrame);
     }
 
     Mtx identity;
     PSMTXIdentity(identity);
 
-    CMapObj* mapObj = *reinterpret_cast<CMapObj**>(Ptr(this, 0x228E8));
+    CMapObj* mapObj = m_rootMapObj;
     if (mapObj != 0) {
         mapObj->CalcMtx(identity, 0);
     }
 
-    int& mapLightId = *reinterpret_cast<int*>(Ptr(this, 0x22A6C));
+    int& mapLightId = m_mapAnimFrame;
     mapLightId += 1;
     mapLightId += 1;
     if (mapLightId != 0x1E) {
@@ -2752,7 +2752,7 @@ void setDbgLight(int, Vec&, _GXColor&)
 void CMapMng::DrawBefore()
 {
     const short mapObjCount = m_mapObjCount;
-    if ((mapObjCount == 0) || (*reinterpret_cast<unsigned char*>(Ptr(this, 0x2298B)) == 0)) {
+    if ((mapObjCount == 0) || (m_mapReadReady == 0)) {
         return;
     }
 
@@ -2790,7 +2790,7 @@ void CMapMng::DrawBefore()
 void CMapMng::Draw()
 {
     const short mapObjCount = m_mapObjCount;
-    if ((mapObjCount == 0) || (*reinterpret_cast<unsigned char*>(Ptr(this, 0x2298B)) == 0)) {
+    if ((mapObjCount == 0) || (m_mapReadReady == 0)) {
         return;
     }
 
@@ -2803,7 +2803,7 @@ void CMapMng::Draw()
     Mtx44 projection;
     PSMTX44Copy(reinterpret_cast<float(*)[4]>(Ptr(&CameraPcs, 0x94)), projection);
     GXSetProjection(projection, GX_ORTHOGRAPHIC);
-    *reinterpret_cast<unsigned char*>(Ptr(this, 0x2298A)) = 1;
+    m_underWaterTexPending = 1;
 
     if ((gMapHitDrawMode.m_byte & 8) == 0) {
         const short octTreeCount = m_octTreeCount;
@@ -2909,7 +2909,7 @@ void GXSetTexCoordGen(void)
 void CMapMng::DrawAfter()
 {
     const short mapObjCount = m_mapObjCount;
-    if ((mapObjCount == 0) || (*reinterpret_cast<unsigned char*>(Ptr(this, 0x2298B)) == 0)) {
+    if ((mapObjCount == 0) || (m_mapReadReady == 0)) {
         return;
     }
 
@@ -3083,13 +3083,13 @@ void CMapMng::SetViewMtx(float (*viewMtx)[4], float (*projMtx)[4])
     float* proj = reinterpret_cast<float*>(projMtx);
     float scaleY = kMapViewScaleY * proj[5];
     float scaleX = proj[0];
-    Mtx* viewCopy = reinterpret_cast<Mtx*>(Ptr(this, 0x228F8));
+    Mtx* viewCopy = &m_viewMtx;
 
     PSMTXCopy(viewMtx, *viewCopy);
     PSMTXScaleApply(
-        *viewCopy, *reinterpret_cast<Mtx*>(Ptr(this, 0x22928)), kMapViewScaleXPrimary * scaleX, scaleY, kMapViewScaleZ);
+        *viewCopy, m_scaledViewMtxPrimary, kMapViewScaleXPrimary * scaleX, scaleY, kMapViewScaleZ);
     PSMTXScaleApply(
-        *viewCopy, *reinterpret_cast<Mtx*>(Ptr(this, 0x22958)), kMapViewScaleXSecondary * scaleX, scaleY, kMapViewScaleZ);
+        *viewCopy, m_scaledViewMtxSecondary, kMapViewScaleXSecondary * scaleX, scaleY, kMapViewScaleZ);
 }
 
 /*
@@ -3555,7 +3555,7 @@ void CMapMng::ShowMapMeshID(int id, int show)
  */
 void CMapMng::SetDrawRangeMapObj(float drawRange)
 {
-    *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(this) + 0x22A74) = -drawRange;
+    m_octTreeFrustumRange = -drawRange;
 }
 
 /*
@@ -3569,7 +3569,7 @@ void CMapMng::SetDrawRangeMapObj(float drawRange)
  */
 void CMapMng::SetDrawRangeOctTree(float drawRange)
 {
-    *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(this) + 0x22A70) = -drawRange;
+    m_octTreeDrawMinDepth = -drawRange;
 }
 
 /*

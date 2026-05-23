@@ -113,7 +113,22 @@ public:
     CMaterialSet* m_materialSet;       // 0x213D4
     CTextureSet* m_textureSet;         // 0x213D8
     CMapTexAnimSet* m_mapTexAnimSet;   // 0x213DC
-    unsigned char m_pad213E0[0x22A78 - 0x213E0];
+    unsigned char m_pad213E0[0x228E8 - 0x213E0];
+    CMapObj* m_rootMapObj;             // 0x228E8
+    Vec m_cameraPosition;              // 0x228EC
+    Mtx m_viewMtx;                     // 0x228F8
+    Mtx m_scaledViewMtxPrimary;        // 0x22928
+    Mtx m_scaledViewMtxSecondary;      // 0x22958
+    unsigned char m_fogEnable;         // 0x22988
+    unsigned char m_colorScaleEnable;  // 0x22989
+    unsigned char m_underWaterTexPending; // 0x2298A
+    unsigned char m_mapReadReady;      // 0x2298B
+    _GXColor m_mapColor;               // 0x2298C
+    _GXColor m_colorScale;             // 0x22990
+    unsigned char m_pad22994[0x22A6C - 0x22994];
+    int m_mapAnimFrame;                // 0x22A6C
+    float m_octTreeDrawMinDepth;       // 0x22A70
+    float m_octTreeFrustumRange;       // 0x22A74
     CMapObj* m_hitMapObj;              // 0x22A78
 
     ~CMapMng();

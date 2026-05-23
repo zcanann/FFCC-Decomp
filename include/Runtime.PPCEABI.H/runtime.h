@@ -7,7 +7,11 @@
 extern "C" {
 #endif
 
+typedef void (*voidfunctionptr)(void);
+
 u32 __cvt_fp2unsigned(f64 d);
+extern voidfunctionptr _ctors[];
+extern voidfunctionptr _dtors[];
 
 #ifdef __cplusplus
 }

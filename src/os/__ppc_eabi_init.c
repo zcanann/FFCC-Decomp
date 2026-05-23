@@ -1,8 +1,5 @@
 #include "dolphin/base/PPCArch.h"
-
-typedef void (*voidfunctionptr)(void);
-
-extern voidfunctionptr _ctors[];
+#include "Runtime.PPCEABI.H/runtime.h"
 
 void __init_cpp(void);
 

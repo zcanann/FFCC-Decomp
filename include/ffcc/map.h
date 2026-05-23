@@ -103,7 +103,13 @@ class CMapMng
 public:
     // Placeholder storage for the full map manager until concrete members are recovered.
     CMemory::CStage* m_stage;          // 0x00000
-    unsigned char m_pad004[0x213D4 - 0x4];
+    int m_calcCount;                   // 0x00004
+    short m_octTreeCount;              // 0x00008
+    short m_mapHitCount;               // 0x0000A
+    short m_mapObjCount;               // 0x0000C
+    short m_mapMeshCount;              // 0x0000E
+    unsigned short m_unknown10;        // 0x00010
+    unsigned char m_pad012[0x213D4 - 0x12];
     CMaterialSet* m_materialSet;       // 0x213D4
     CTextureSet* m_textureSet;         // 0x213D8
     CMapTexAnimSet* m_mapTexAnimSet;   // 0x213DC

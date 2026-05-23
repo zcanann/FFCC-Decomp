@@ -1304,11 +1304,11 @@ void CMapKeyFrame::ReadKey(CChunkFile& chunkFile, int count)
  */
 void CMapMng::Create()
 {
-    *reinterpret_cast<unsigned int*>(Ptr(this, 4)) = 0;
-    *reinterpret_cast<unsigned short*>(Ptr(this, 0x10)) = 0;
-    *reinterpret_cast<unsigned short*>(Ptr(this, 0xE)) = 0;
-    *reinterpret_cast<unsigned short*>(Ptr(this, 0xC)) = 0;
-    *reinterpret_cast<unsigned short*>(Ptr(this, 8)) = 0;
+    m_calcCount = 0;
+    m_unknown10 = 0;
+    m_mapMeshCount = 0;
+    m_mapObjCount = 0;
+    m_octTreeCount = 0;
     *reinterpret_cast<unsigned char*>(Ptr(this, 0x2298C)) = 0xFF;
     *reinterpret_cast<unsigned char*>(Ptr(this, 0x2298D)) = 0xFF;
     *reinterpret_cast<unsigned char*>(Ptr(this, 0x2298E)) = 0xFF;
@@ -1451,29 +1451,29 @@ void CMapMng::DestroyMap()
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
 
-    short octTreeCount = *reinterpret_cast<short*>(self + 8);
+    short octTreeCount = m_octTreeCount;
     for (int i = 0; i < octTreeCount; i++) {
         __dt__8COctTreeFv(self + 0x14 + (i * 0x4C), 0xFFFF);
     }
-    *reinterpret_cast<short*>(self + 8) = 0;
+    m_octTreeCount = 0;
 
-    short mapHitCount = *reinterpret_cast<short*>(self + 0xA);
+    short mapHitCount = m_mapHitCount;
     for (int i = 0; i < mapHitCount; i++) {
         __dt__7CMapHitFv(self + 0x4D4 + (i * 0x24), 0xFFFF);
     }
-    *reinterpret_cast<short*>(self + 0xA) = 0;
+    m_mapHitCount = 0;
 
-    short mapObjCount = *reinterpret_cast<short*>(self + 0xC);
+    short mapObjCount = m_mapObjCount;
     for (int i = 0; i < mapObjCount; i++) {
         __dt__7CMapObjFv(self + 0x954 + (i * 0xF0), -1);
     }
-    *reinterpret_cast<short*>(self + 0xC) = 0;
+    m_mapObjCount = 0;
 
-    short mapMeshCount = *reinterpret_cast<short*>(self + 0xE);
+    short mapMeshCount = m_mapMeshCount;
     for (int i = 0; i < mapMeshCount; i++) {
         __dt__8CMapMeshFv(self + 0x1E954 + (i * 0x44), 0xFFFF);
     }
-    *reinterpret_cast<short*>(self + 0xE) = 0;
+    m_mapMeshCount = 0;
 
     int* materialSet = reinterpret_cast<int*>(m_materialSet);
     if (materialSet != 0) {
@@ -1623,7 +1623,7 @@ void CMapMng::LoadMapNoSyncCalc()
  */
 CMapObj* CMapMng::SearchChildMapObj(CMapObj* searchStart, CMapObj* parentObj)
 {
-    const int objCount = *reinterpret_cast<short*>(Ptr(this, 0xC));
+    const int objCount = m_mapObjCount;
     CMapObj* mapObjEnd =
         reinterpret_cast<CMapObj*>(reinterpret_cast<unsigned char*>(this) + 0x954 + objCount * 0xF0);
 
@@ -1679,7 +1679,7 @@ void CMapMng::AttachMapHit(CMapHit* mapHit, char* mapHitName)
 search:
         unsigned int stride = 0xF0;
         MapObjAttachObj* mapObjEnd =
-            reinterpret_cast<MapObjAttachObj*>(Ptr(this, 0x954 + *reinterpret_cast<short*>(Ptr(this, 0xC)) * 0xF0));
+            reinterpret_cast<MapObjAttachObj*>(Ptr(this, 0x954 + m_mapObjCount * 0xF0));
         unsigned int remaining =
             (reinterpret_cast<unsigned int>(mapObjEnd) + (stride - 1) - reinterpret_cast<unsigned int>(mapObj)) /
             stride;
@@ -1728,7 +1728,7 @@ int CMapMng::GetDebugPlaySta(int playStaNo, Vec* vec)
 
 search:
         unsigned int stride = 0xF0;
-        unsigned char* mapObjEnd = Ptr(this, 0x954 + *reinterpret_cast<short*>(Ptr(this, 0xC)) * 0xF0);
+        unsigned char* mapObjEnd = Ptr(this, 0x954 + m_mapObjCount * 0xF0);
         unsigned int remaining =
             (reinterpret_cast<unsigned int>(mapObjEnd) + (stride - 1) - reinterpret_cast<unsigned int>(mapObj)) /
             stride;
@@ -1767,7 +1767,7 @@ found:
 void CMapMng::SetLightSource()
 {
     int mapLightIndex = 0;
-    const short mapObjCount = *reinterpret_cast<short*>(Ptr(this, 0xC));
+    const short mapObjCount = m_mapObjCount;
     unsigned char* mapObj = Ptr(this, 0x954);
     unsigned char* mapObjEnd = mapObj + mapObjCount * 0xF0;
 
@@ -2126,14 +2126,14 @@ void CMapMng::ReadMpl(char* mapName)
                     CChunkFile::CChunk meshChunk;
                     while (chunkFile.GetNextChunk(meshChunk)) {
                         if (meshChunk.m_id == 0x56534554) {
-                            short& meshCount = *reinterpret_cast<short*>(self + 0xE);
+                            short& meshCount = m_mapMeshCount;
                             if (meshCount > 0x9F) {
                                 return;
                             }
                             CMapMesh* mesh = reinterpret_cast<CMapMesh*>(self + 0x16AC + (meshCount * 0x44));
                             mesh->ReadOtmMesh(chunkFile, m_stage, 1, 1);
                         } else if (meshChunk.m_id == 0x44534554) {
-                            short& meshCount = *reinterpret_cast<short*>(self + 0xE);
+                            short& meshCount = m_mapMeshCount;
                             CMapMesh* mesh = reinterpret_cast<CMapMesh*>(self + 0x16AC + (meshCount * 0x44));
                             mesh->ReadOtmMesh(chunkFile, m_stage, 1, 1);
                             meshCount += 1;
@@ -2234,7 +2234,7 @@ void CMapMng::ReadOtm(char* mapName)
         chunkFile.PushChunk();
         while (chunkFile.GetNextChunk(chunk)) {
             if (chunk.m_id == 0x4F43544D) {
-                short& octTreeCount = *reinterpret_cast<short*>(self + 0x8);
+                short& octTreeCount = m_octTreeCount;
                 if (octTreeCount > 0xF) {
                     return;
                 }
@@ -2272,7 +2272,7 @@ void CMapMng::ReadOtm(char* mapName)
             chunkFile.PushChunk();
             while (chunkFile.GetNextChunk(chunk)) {
                 if (chunk.m_id == 0x4D455348) {
-                    short& meshCount = *reinterpret_cast<short*>(self + 0xE);
+                    short& meshCount = m_mapMeshCount;
                     if (meshCount > 0x9F) {
                         return;
                     }
@@ -2302,7 +2302,7 @@ void CMapMng::ReadOtm(char* mapName)
                 }
 
                 if (chunk.m_id == 0x48495420) {
-                    short& hitCount = *reinterpret_cast<short*>(self + 0xA);
+                    short& hitCount = m_mapHitCount;
                     if (hitCount > 0x1F) {
                         return;
                     }
@@ -2313,7 +2313,7 @@ void CMapMng::ReadOtm(char* mapName)
                 }
 
                 if (chunk.m_id == 0x4E4F4445) {
-                    short& mapObjCount = *reinterpret_cast<short*>(self + 0xC);
+                    short& mapObjCount = m_mapObjCount;
                     if (mapObjCount > 0x1FF) {
                         return;
                     }
@@ -2341,7 +2341,7 @@ void CMapMng::ReadOtm(char* mapName)
         chunkFile.PopChunk();
     }
 
-    const short octTreeCount = *reinterpret_cast<short*>(self + 8);
+    const short octTreeCount = m_octTreeCount;
     for (int i = 0; i < octTreeCount; i++) {
         unsigned char* octTreeRaw = self + 0x14 + (i * 0x4C);
         if (*reinterpret_cast<void**>(octTreeRaw + 8) != 0) {
@@ -2356,7 +2356,7 @@ void CMapMng::ReadOtm(char* mapName)
     }
 
     CMapObj* mapObj = reinterpret_cast<CMapObj*>(self + 0x954);
-    CMapObj* mapObjEnd = reinterpret_cast<CMapObj*>(self + 0x954 + (*reinterpret_cast<short*>(self + 0xC) * 0xF0));
+    CMapObj* mapObjEnd = reinterpret_cast<CMapObj*>(self + 0x954 + (m_mapObjCount * 0xF0));
     CMapObj* root = 0;
     while (mapObj < mapObjEnd) {
         if (*reinterpret_cast<CMapObj**>(mapObj) != 0) {
@@ -2377,7 +2377,7 @@ void CMapMng::ReadOtm(char* mapName)
     PSMTXIdentity(identity);
     root->CalcMtx(identity, 1);
 
-    const int mapObjCount = *reinterpret_cast<short*>(self + 0xC);
+    const int mapObjCount = m_mapObjCount;
     for (int i = 0; i < mapObjCount; i++) {
         unsigned char* obj = self + 0x954 + (i * 0xF0);
         unsigned char* atr = *reinterpret_cast<unsigned char**>(obj + 0xEC);
@@ -2531,7 +2531,7 @@ int CMapMng::ReadMid(char* mapName)
                         continue;
                     }
 
-                    short& hitCount = *reinterpret_cast<short*>(self + 0xA);
+                    short& hitCount = m_mapHitCount;
                     if (hitCount > 0x1F) {
                         return 0;
                     }
@@ -2549,10 +2549,10 @@ int CMapMng::ReadMid(char* mapName)
 
             CMapObj* mapObj = nextMapObj;
             int mapObjIndex = 0;
-            while (mapObjIndex < *reinterpret_cast<short*>(self + 0xC)) {
+            while (mapObjIndex < m_mapObjCount) {
                 unsigned char* objRaw = reinterpret_cast<unsigned char*>(mapObj);
                 if (objRaw[0x1E] == 1 || objRaw[0x1E] == 2) {
-                    short& octTreeCount = *reinterpret_cast<short*>(self + 0x8);
+                    short& octTreeCount = m_octTreeCount;
                     if (octTreeCount > 0xF) {
                         return 0;
                     }
@@ -2584,7 +2584,7 @@ int CMapMng::ReadMid(char* mapName)
                 mapObjIndex += 1;
             }
 
-            if (mapObjIndex >= *reinterpret_cast<short*>(self + 0xC)) {
+            if (mapObjIndex >= m_mapObjCount) {
                 if (System.m_execParam != 0) {
                     System.Printf(const_cast<char*>(s_error_root_mapobj_not_found));
                     System.Printf(const_cast<char*>(s_read_mid_octtree_error));
@@ -2595,14 +2595,14 @@ int CMapMng::ReadMid(char* mapName)
         chunkFile.PopChunk();
     }
 
-    const int mapObjCount = *reinterpret_cast<short*>(self + 0xC);
+    const int mapObjCount = m_mapObjCount;
     for (int i = 0; i < mapObjCount; i++) {
         unsigned char* obj = self + 0x954 + (i * 0xF0);
         unsigned char type = obj[0x1D];
         CMapHit* hit = *reinterpret_cast<CMapHit**>(obj + 0xC);
         if ((type == 2 || type == 3) && hit != 0) {
             int hitIndex = (reinterpret_cast<unsigned char*>(hit) - (self + 0x4D4)) / 0x24;
-            if (*reinterpret_cast<short*>(self + 0xA) <= hitIndex) {
+            if (m_mapHitCount <= hitIndex) {
                 if (System.m_execParam != 0) {
                     System.Printf(const_cast<char*>(s_read_mid_hit_error));
                 }
@@ -2619,7 +2619,7 @@ int CMapMng::ReadMid(char* mapName)
         System.Printf(const_cast<char*>(s_read_mid_error));
     }
 
-    const short octTreeCount = *reinterpret_cast<short*>(self + 0x8);
+    const short octTreeCount = m_octTreeCount;
     for (int i = 0; i < octTreeCount; i++) {
         unsigned char* octTree = self + 0x14 + (i * 0x4C);
         unsigned char* obj = reinterpret_cast<unsigned char*>(*reinterpret_cast<void**>(octTree + 8));
@@ -2642,9 +2642,9 @@ int CMapMng::ReadMid(char* mapName)
  */
 void CMapMng::Calc()
 {
-    *reinterpret_cast<int*>(Ptr(this, 4)) += 1;
+    m_calcCount += 1;
 
-    const int mapObjCount = *reinterpret_cast<short*>(Ptr(this, 0xC));
+    const int mapObjCount = m_mapObjCount;
     if (mapObjCount == 0) {
         return;
     }
@@ -2692,7 +2692,7 @@ void CMapMng::Calc()
     CMaterialSet* materialSet = m_materialSet;
     materialSet->Calc();
 
-    const int octTreeCount = *reinterpret_cast<short*>(Ptr(this, 8));
+    const int octTreeCount = m_octTreeCount;
     for (int i = 0; i < octTreeCount; i++) {
         COctTree* octTree = reinterpret_cast<COctTree*>(Ptr(this, 0x14 + (i * 0x4C)));
         LightPcs.InsertOctTree(static_cast<CLightPcs::TARGET>(1), *octTree);
@@ -2721,7 +2721,7 @@ void CMapMng::Calc()
 void CMapMng::DrawMapShadow()
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
-    if (*reinterpret_cast<short*>(self + 0xC) != 0) {
+    if (m_mapObjCount != 0) {
         for (unsigned int i = 0; i < reinterpret_cast<CPtrArray<CMapShadow*>*>(self + 0x21434)->GetSize(); i++) {
             CMapShadow* mapShadow = (*reinterpret_cast<CPtrArray<CMapShadow*>*>(self + 0x21434))[i];
             mapShadow->Draw();
@@ -2751,7 +2751,7 @@ void setDbgLight(int, Vec&, _GXColor&)
  */
 void CMapMng::DrawBefore()
 {
-    const short mapObjCount = *reinterpret_cast<short*>(Ptr(this, 0xC));
+    const short mapObjCount = m_mapObjCount;
     if ((mapObjCount == 0) || (*reinterpret_cast<unsigned char*>(Ptr(this, 0x2298B)) == 0)) {
         return;
     }
@@ -2769,7 +2769,7 @@ void CMapMng::DrawBefore()
             mapObj = reinterpret_cast<CMapObj*>(Ptr(mapObj, 0xF0));
         }
 
-        const short octTreeCount = *reinterpret_cast<short*>(Ptr(this, 8));
+        const short octTreeCount = m_octTreeCount;
         COctTree* octTree = reinterpret_cast<COctTree*>(Ptr(this, 0x14));
         for (int i = 0; i < octTreeCount; i++) {
             octTree->Draw(0xFF);
@@ -2789,7 +2789,7 @@ void CMapMng::DrawBefore()
  */
 void CMapMng::Draw()
 {
-    const short mapObjCount = *reinterpret_cast<short*>(Ptr(this, 0xC));
+    const short mapObjCount = m_mapObjCount;
     if ((mapObjCount == 0) || (*reinterpret_cast<unsigned char*>(Ptr(this, 0x2298B)) == 0)) {
         return;
     }
@@ -2806,7 +2806,7 @@ void CMapMng::Draw()
     *reinterpret_cast<unsigned char*>(Ptr(this, 0x2298A)) = 1;
 
     if ((gMapHitDrawMode.m_byte & 8) == 0) {
-        const short octTreeCount = *reinterpret_cast<short*>(Ptr(this, 8));
+        const short octTreeCount = m_octTreeCount;
 
         COctTree* octTree = reinterpret_cast<COctTree*>(Ptr(this, 0x14));
         for (int i = 0; i < octTreeCount; i++) {
@@ -2908,7 +2908,7 @@ void GXSetTexCoordGen(void)
  */
 void CMapMng::DrawAfter()
 {
-    const short mapObjCount = *reinterpret_cast<short*>(Ptr(this, 0xC));
+    const short mapObjCount = m_mapObjCount;
     if ((mapObjCount == 0) || (*reinterpret_cast<unsigned char*>(Ptr(this, 0x2298B)) == 0)) {
         return;
     }
@@ -2925,7 +2925,7 @@ void CMapMng::DrawAfter()
 
     if (gMapHitDrawMode.m_byte == 0) {
         COctTree* octTree = reinterpret_cast<COctTree*>(Ptr(this, 0x14));
-        const short octTreeCount = *reinterpret_cast<short*>(Ptr(this, 8));
+        const short octTreeCount = m_octTreeCount;
         for (int i = 0; i < octTreeCount; i++) {
             octTree->Draw(2);
             octTree = reinterpret_cast<COctTree*>(Ptr(octTree, 0x4C));
@@ -2972,7 +2972,7 @@ int CMapMng::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long m
     g_hit_t_min = FLOAT_8032f9ac;
     PSVECAdd(&cylinder->m_bottom, move, &cylinder->m_top);
 
-    for (int i = 0; i < *reinterpret_cast<short*>(Ptr(this, 8)); i++) {
+    for (int i = 0; i < m_octTreeCount; i++) {
         COctTree* octTree = reinterpret_cast<COctTree*>(Ptr(this, 0x14 + (i * 0x4C)));
         if (octTree->CheckHitCylinder(cylinder, move, mask) != 0) {
             m_hitMapObj = *reinterpret_cast<CMapObj**>(Ptr(octTree, 8));
@@ -2980,7 +2980,7 @@ int CMapMng::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long m
         }
     }
 
-    for (int i = 0; i < *reinterpret_cast<short*>(Ptr(this, 0xC)); i++) {
+    for (int i = 0; i < m_mapObjCount; i++) {
         CMapObj* mapObj = reinterpret_cast<CMapObj*>(Ptr(this, 0x954 + (i * 0xF0)));
         m_hitMapObj = mapObj;
         if (mapObj->CheckHitCylinder(cylinder, move, mask) != 0) {
@@ -3026,7 +3026,7 @@ int CMapMng::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned lo
     g_hit_t_min = FLOAT_8032f9ac;
     PSVECAdd(&cylinder->m_bottom, move, &cylinder->m_top);
 
-    for (int i = 0; i < *reinterpret_cast<short*>(Ptr(this, 8)); i++) {
+    for (int i = 0; i < m_octTreeCount; i++) {
         COctTree* octTree = reinterpret_cast<COctTree*>(Ptr(this, 0x14 + (i * 0x4C)));
         DAT_8032ec88 = 0;
         octTree->CheckHitCylinderNear(cylinder, move, mask);
@@ -3036,7 +3036,7 @@ int CMapMng::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned lo
         }
     }
 
-    for (int i = 0; i < *reinterpret_cast<short*>(Ptr(this, 0xC)); i++) {
+    for (int i = 0; i < m_mapObjCount; i++) {
         CMapObj* mapObj = reinterpret_cast<CMapObj*>(Ptr(this, 0x954 + (i * 0xF0)));
         DAT_8032ec88 = 0;
         mapObj->CheckHitCylinderNear(cylinder, move, mask);
@@ -3186,7 +3186,7 @@ void CMapMng::SetMeshCameraSemiTransRange(unsigned short id, float nearRange, fl
     int found = 0;
     unsigned char* mapObj = reinterpret_cast<unsigned char*>(this);
 
-    for (int i = 0; i < *reinterpret_cast<short*>(Ptr(this, 0xC)); i++) {
+    for (int i = 0; i < m_mapObjCount; i++) {
         if (*reinterpret_cast<unsigned short*>(mapObj + 0x988) == id) {
             *reinterpret_cast<float*>(mapObj + 0x998) = nearRange;
             *reinterpret_cast<float*>(mapObj + 0x99C) = farRange;
@@ -3237,7 +3237,7 @@ void CMapMng::SetMeshCameraSemiTransAlpha(unsigned short id, int alpha, int fram
     int found = 0;
     unsigned char* mapObj = reinterpret_cast<unsigned char*>(this);
 
-    for (int i = 0; i < *reinterpret_cast<short*>(Ptr(this, 0xC)); i++) {
+    for (int i = 0; i < m_mapObjCount; i++) {
         if (*reinterpret_cast<unsigned short*>(mapObj + 0x988) == id) {
             *reinterpret_cast<short*>(mapObj + 0x97E) = static_cast<short>(alpha << 7);
             found = 1;

@@ -666,7 +666,7 @@ void CGObject::move()
                     speed *= static_cast<double>(sAnalogSpeedScale);
                 }
 
-                const u32 cflatCenterState = *reinterpret_cast<u32*>(CFlat + 0x12AC);
+                const u32 cflatCenterState = CFlatCenterState();
                 if (cflatCenterState == 1) {
                     Vec partyCenter;
                     partyCenter.x = (Game.m_partyMinX + Game.m_partyMaxX) * sBgAttrNormal;

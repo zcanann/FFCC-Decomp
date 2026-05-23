@@ -532,9 +532,9 @@ void CGItemObj::onFrameAlways()
 
 		if (static_cast<int>(Game.m_gameWork.m_gameInitFlag) != 0 &&
 		    static_cast<signed char>(
-		        static_cast<int>((static_cast<unsigned int>(*(unsigned char*)(CFlat + 4836)) << 28) & 0xC0000000) >> 31) != 0 &&
+		        static_cast<int>((static_cast<unsigned int>(CFlatGameFlags()) << 28) & 0xC0000000) >> 31) != 0 &&
 		    static_cast<signed char>(
-		        static_cast<int>((static_cast<unsigned int>(*(unsigned char*)(CFlat + 4836)) << 29) & 0xC0000000) >> 31) != 0 &&
+		        static_cast<int>((static_cast<unsigned int>(CFlatGameFlags()) << 29) & 0xC0000000) >> 31) != 0 &&
 		    static_cast<signed char>(
 		        static_cast<int>((static_cast<unsigned int>(*(unsigned char*)(self + 0x9A)) << 24) & 0xC0000000) >> 31) != 0 &&
 		    *(int*)(CFlat + 4780) == 0 && *(void**)(self + 0x550) == 0) {

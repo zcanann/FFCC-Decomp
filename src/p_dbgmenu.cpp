@@ -206,20 +206,21 @@ void CDbgMenuPcs::calc()
 	if ((padInput & 0x100) != 0) {
 		switch (m_selectedMenu->m_id) {
 		case 100:
-			*(unsigned int*)(CFlat + 0x12A4) = ~*(unsigned int*)(CFlat + 0x12A4);
+			CFlatEventMask() = ~CFlatEventMask();
 			break;
 		case 0x65:
 			stackData[0].m_word = 0;
 			stackData[2].m_word = 0;
-			flags = (unsigned int)__cntlzw((int)((signed char)CFlat[0x12E4] >> 7));
-			flags = ((int)(char)(flags >> 5) & 1U) << 7 | ((unsigned char)CFlat[0x12E4] & 0x7F);
-			CFlat[0x12E4] = (unsigned char)flags;
+			flags = (unsigned int)__cntlzw((int)((signed char)CFlatGameFlags() >> 7));
+			flags = ((int)(char)(flags >> 5) & 1U) << 7 | (CFlatGameFlags() & ~CFlatGameFlag_Shouki);
+			CFlatGameFlags() = (unsigned char)flags;
 			stackData[1].m_word = (int)(flags << 0x18) >> 0x1f;
 			reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(0, 1, 9, 3, stackData, 0);
 			break;
 		case 0x66:
-			flags = (unsigned int)__cntlzw((int)(char)((int)((unsigned int)(unsigned char)CFlat[0x12E4] << 0x1d) >> 0x1f));
-			CFlat[0x12E4] = (unsigned char)((((int)(char)(flags >> 5) << 2) & 4) | (CFlat[0x12E4] & 0xFB));
+			flags = (unsigned int)__cntlzw((int)(char)((int)((unsigned int)(unsigned char)CFlatGameFlags() << 0x1d) >> 0x1f));
+			CFlatGameFlags() = (unsigned char)((((int)(char)(flags >> 5) << 2) & CFlatGameFlag_Mark) |
+			                                   (CFlatGameFlags() & ~CFlatGameFlag_Mark));
 			break;
 		case 0x67:
 			m_dbgFlags ^= 1;
@@ -383,13 +384,13 @@ void CDbgMenuPcs::calcMenu(CDbgMenuPcs::CDM* menu)
 		m_currentMenu = menu;
 		switch (menu->m_id) {
 		case 100:
-			menu->m_state = *(u32*)(CFlat + 0x12A4) != 0;
+			menu->m_state = CFlatEventMask() != 0;
 			break;
 		case 0x65:
-			menu->m_state = (s8)((s32)(((u32)(u8)CFlat[0x12E4] << 0x18) & 0xC0000000) >> 0x1F) != 0;
+			menu->m_state = (s8)((s32)(((u32)(u8)CFlatGameFlags() << 0x18) & 0xC0000000) >> 0x1F) != 0;
 			break;
 		case 0x66:
-			menu->m_state = (s8)((s32)(((u32)(u8)CFlat[0x12E4] << 0x1C) & 0xC0000000) >> 0x1F) != 0;
+			menu->m_state = (s8)((s32)(((u32)(u8)CFlatGameFlags() << 0x1C) & 0xC0000000) >> 0x1F) != 0;
 			break;
 		case 0x67:
 			menu->m_state = (m_dbgFlags >> 0) & 1;

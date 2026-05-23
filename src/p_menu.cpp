@@ -971,7 +971,7 @@ void CMenuPcs::draw()
         }
     }
 
-    if (((*reinterpret_cast<unsigned int*>(CFlat + 0x12A0) & 0x10) != 0) && (System.m_scenegraphStepMode == 2)) {
+    if (((CFlatEventFlags() & 0x10) != 0) && (System.m_scenegraphStepMode == 2)) {
         CTexture* texture = *reinterpret_cast<CTexture**>(reinterpret_cast<u8*>(this) + 0x190);
         TextureMan.SetTexture(GX_TEXMAP0, texture);
 
@@ -1684,7 +1684,7 @@ void CMenuPcs::SetExtraFontTlut(int fontNo, _GXColor color)
  */
 void CMenuPcs::drawPause()
 {
-    if (((*reinterpret_cast<unsigned int*>(CFlat + 0x12A0) & 0x10) == 0) || (System.m_scenegraphStepMode != 2)) {
+    if (((CFlatEventFlags() & 0x10) == 0) || (System.m_scenegraphStepMode != 2)) {
         return;
     }
 

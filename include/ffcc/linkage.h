@@ -65,9 +65,52 @@ enum CFlatRuntimeDebugFlag {
     CFlatRuntimeDebugFlag_MapBounds = 0x02000000,
 };
 
+enum CFlatGameFlag {
+    CFlatGameFlag_Bit0 = 0x01,
+    CFlatGameFlag_Bit1 = 0x02,
+    CFlatGameFlag_Mark = 0x04,
+    CFlatGameFlag_Bit5 = 0x20,
+    CFlatGameFlag_Shouki = 0x80,
+};
+
 static inline u32& CFlatRuntimeDebugFlags()
 {
     return *reinterpret_cast<u32*>(CFlat + 0x129C);
+}
+
+static inline u32& CFlatEventFlags()
+{
+    return *reinterpret_cast<u32*>(CFlat + 0x12A0);
+}
+
+static inline u32& CFlatEventMask()
+{
+    return *reinterpret_cast<u32*>(CFlat + 0x12A4);
+}
+
+static inline u32 CFlatEnabledEventFlags()
+{
+    return CFlatEventFlags() & CFlatEventMask();
+}
+
+static inline u32& CFlatCenterState()
+{
+    return *reinterpret_cast<u32*>(CFlat + 0x12AC);
+}
+
+static inline u8& CFlatGameFlags()
+{
+    return CFlat[0x12E4];
+}
+
+static inline int& CFlatBossState()
+{
+    return *reinterpret_cast<int*>(CFlat + 0x12E8);
+}
+
+static inline int& CFlatBossSubState()
+{
+    return *reinterpret_cast<int*>(CFlat + 0x12EC);
 }
 
 #endif // _FFCC_LINKAGE_H_

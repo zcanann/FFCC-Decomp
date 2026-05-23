@@ -1489,7 +1489,7 @@ void CGMonObj::onDrawDebug(CFont* font, float posX, float& posY, float posZ)
 	charaObj->onDrawDebug(font, posX, posY, posZ);
 
 	if ((((int)((unsigned int)object->m_weaponNodeFlags << 0x18) < 0) &&
-			(*reinterpret_cast<unsigned int*>(CFlat + 0x12AC) == 0)) &&
+			(CFlatCenterState() == 0)) &&
 		((*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&DbgMenuPcs) + 0x6484) & 0x80) != 0)) {
 		char text[0x100];
 		unsigned short aiState = *reinterpret_cast<unsigned short*>(mon + 0x6E4);

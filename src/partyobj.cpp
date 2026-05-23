@@ -1077,7 +1077,7 @@ void CGPartyObj::shouki()
 	}
 
 	unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
-	const unsigned char cflatFlags = CFlat[0x12E4];
+	const unsigned char cflatFlags = CFlatGameFlags();
 	const bool cflatBit7 = static_cast<signed char>(cflatFlags) < 0;
 	const bool cflatBit4 = (cflatFlags & 0x10) != 0;
 	const bool cflatBit5 = (cflatFlags & 0x20) != 0;
@@ -2219,7 +2219,7 @@ void CGPartyObj::statPut()
 				SetAnimSlot(0x25, 0);
 				SetAnimSlot(0x30, 1);
 			}
-		} else if (*reinterpret_cast<int*>(CFlat + 0x12AC) == 0) {
+		} else if (CFlatCenterState() == 0) {
 			if (m_lastMapIdHit == 1 && m_lastMapIdExtra == 0) {
 				SetAnimSlot(0x0B, 0);
 				SetAnimSlot(0x0C, 1);

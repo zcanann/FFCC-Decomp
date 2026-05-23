@@ -547,7 +547,7 @@ void CGCharaObj::onFramePostCalc()
 			unsigned short tickDiv = *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x3A);
 			if (m_stateTick != 0 && tickDiv != 0 && (m_stateTick % static_cast<int>(tickDiv)) == 0) {
 				if (*reinterpret_cast<unsigned short*>(script + 0x1C) > 1 &&
-				    (CFlat[0x12E4] & 0x20) == 0) {
+				    (CFlatGameFlags() & CFlatGameFlag_Bit5) == 0) {
 					playSe3D(0x19, 0x32, 0x96, 0, 0);
 					addHp(-1, 0);
 				}
@@ -1842,7 +1842,7 @@ void CGCharaObj::addHp(int delta, CGPrgObj* sourceObj)
 		}
 		*hp = static_cast<unsigned short>(next);
 	} else if (hpValue != 0) {
-		if ((cid & 0x6D) == 0x6D && (CFlat[0x12E4] & 1) != 0 &&
+		if ((cid & 0x6D) == 0x6D && (CFlatGameFlags() & CFlatGameFlag_Bit0) != 0 &&
 		    static_cast<int>(hpValue + delta) < 1) {
 			delta = -(static_cast<int>(hpValue) - 1);
 		}
@@ -2032,7 +2032,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int, int, Vec* hitPos
 	unsigned char* itemData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + resolvedItemId * 0x48;
 	unsigned short itemEffect = *reinterpret_cast<unsigned short*>(itemData);
 	staType = *reinterpret_cast<unsigned short*>(itemData + 8);
-	if (staType != 0x65 && staType != 0x66 && staType != 0x67 && (CFlat[0x12E4] & 0x20) != 0) {
+	if (staType != 0x65 && staType != 0x66 && staType != 0x67 && (CFlatGameFlags() & CFlatGameFlag_Bit5) != 0) {
 		return;
 	}
 
@@ -2667,7 +2667,7 @@ int CGCharaObj::calcCastTime(int itemId)
  */
 void CGCharaObj::onDrawDebug(CFont* font, float posX, float& posY, float posZ)
 {
-	if ((((int)((unsigned int)(unsigned char)m_weaponNodeFlags << 0x18) < 0) && (*reinterpret_cast<unsigned int*>(CFlat + 0x12AC) == 0)) &&
+	if ((((int)((unsigned int)(unsigned char)m_weaponNodeFlags << 0x18) < 0) && (CFlatCenterState() == 0)) &&
 	    ((MiniGamePcs.m_flags & 0x80) != 0)) {
 		char text[0x110];
 		unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);

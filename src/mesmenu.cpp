@@ -460,7 +460,7 @@ void CMesMenu::CalcHeart()
  */
 void CMesMenu::onDraw()
 {
-    if ((*(int*)((char*)this + 0x18) == 0) && ((int)((unsigned int)*(unsigned char*)(CFlat + 0x12E4) << 30) < 0)) {
+    if ((*(int*)((char*)this + 0x18) == 0) && ((int)((unsigned int)CFlatGameFlags() << 30) < 0)) {
         int iconFrame = 0;
         int charaMode = *(int*)((char*)&Chara + 0x2004);
         if (charaMode == 2) {
@@ -854,9 +854,9 @@ void CMesMenu::onCalc()
 
     unsigned int stageBit = 0;
     if (m_menuIndex < 4) {
-        stageBit = *(unsigned int*)(CFlat + 0x12A0) & *(unsigned int*)(CFlat + 0x12A4) & 1;
+        stageBit = CFlatEnabledEventFlags() & 1;
     } else {
-        stageBit = *(unsigned int*)(CFlat + 0x12A0) & *(unsigned int*)(CFlat + 0x12A4) & 2;
+        stageBit = CFlatEnabledEventFlags() & 2;
     }
 
     unsigned int desiredStageFlag = stageBit != 0;

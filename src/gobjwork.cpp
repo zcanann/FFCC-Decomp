@@ -2,6 +2,7 @@
 #include "ffcc/cflat_runtime2.h"
 #include "ffcc/gbaque.h"
 #include "ffcc/joybus.h"
+#include "ffcc/linkage.h"
 #include "ffcc/partyobj.h"
 #include "ffcc/mes.h"
 #include "ffcc/game.h"
@@ -453,7 +454,7 @@ int CCaravanWork::IsOutOfShouki()
 	if (*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(ownerObj) + 0x5BC) >
 		FLOAT_803309a8[0] * Game.unkFloat_0xca10) {
 		if (m_hp != 0) {
-			unsigned char cflatFlag = CFlat[4836];
+			unsigned char cflatFlag = CFlatGameFlags();
 			if (((char)(((int)(((unsigned int)cflatFlag << 24) & 0xC0000000)) >> 31) != 0 ||
 				 (char)(((int)(((unsigned int)cflatFlag << 27) & 0xC0000000)) >> 31) != 0) &&
 				(char)(((int)((((unsigned int) * (unsigned char*)(reinterpret_cast<unsigned char*>(ownerObj) + 0x9B))

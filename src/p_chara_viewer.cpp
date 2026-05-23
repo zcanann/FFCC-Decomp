@@ -68,7 +68,6 @@ extern "C" const double kCharaSharedSignedIntBias = 4503601774854144.0;
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
-extern "C" void SRTToMatrix__5CMathFPA4_fP3SRT(void*, Mtx, void*);
 extern "C" void Printf__8CGraphicFPce(void*, const char*, ...);
 extern "C" void* createTextureSet__9CCharaPcsFPvi(void*, void*, int);
 extern "C" float FLOAT_80330BEC;
@@ -652,7 +651,7 @@ void CCharaPcs::calcViewer()
         srt.transX = translateX;
 
         Mtx modelMtx;
-        SRTToMatrix__5CMathFPA4_fP3SRT(&Math, modelMtx, &srt);
+        Math.SRTToMatrix(modelMtx, reinterpret_cast<SRT*>(&srt));
         model->SetMatrix(modelMtx);
 
         CStopWatch matrixWatch(const_cast<char*>(kCharaViewerNoName));

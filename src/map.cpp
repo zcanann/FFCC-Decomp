@@ -1505,7 +1505,7 @@ void CMapMng::DestroyMap()
 
     short mapMeshCount = m_mapMeshCount;
     for (int i = 0; i < mapMeshCount; i++) {
-        __dt__8CMapMeshFv(self + 0x1E954 + (i * 0x44), 0xFFFF);
+        __dt__8CMapMeshFv(GetMapMeshArray() + i, 0xFFFF);
     }
     m_mapMeshCount = 0;
 
@@ -1657,11 +1657,10 @@ void CMapMng::LoadMapNoSyncCalc()
 CMapObj* CMapMng::SearchChildMapObj(CMapObj* searchStart, CMapObj* parentObj)
 {
     const int objCount = m_mapObjCount;
-    CMapObj* mapObjEnd =
-        reinterpret_cast<CMapObj*>(reinterpret_cast<unsigned char*>(this) + 0x954 + objCount * 0xF0);
+    CMapObj* mapObjEnd = GetMapObjArray() + objCount;
 
-    for (CMapObj* obj = searchStart; obj < mapObjEnd; obj = reinterpret_cast<CMapObj*>(Ptr(obj, 0xF0))) {
-        if (*reinterpret_cast<CMapObj**>(Ptr(obj, 0x0)) == parentObj) {
+    for (CMapObj* obj = searchStart; obj < mapObjEnd; obj++) {
+        if (obj->m_parent == parentObj) {
             return obj;
         }
     }
@@ -2271,7 +2270,7 @@ void CMapMng::ReadOtm(char* mapName)
                     return;
                 }
 
-                COctTree* octTree = reinterpret_cast<COctTree*>(self + 0x14 + (octTreeCount * 0x4C));
+                COctTree* octTree = GetOctTreeArray() + octTreeCount;
                 octTree->ReadOtmOctTree(chunkFile);
                 octTreeCount += 1;
                 continue;
@@ -2588,9 +2587,9 @@ int CMapMng::ReadMid(char* mapName)
                         return 0;
                     }
 
-                    unsigned char* octTree = self + 0x14 + (octTreeCount * 0x4C);
-                    reinterpret_cast<COctTree*>(octTree)->ReadOtmOctTree(chunkFile);
-                    *reinterpret_cast<CMapObj**>(octTree + 8) = mapObj;
+                    COctTree* octTree = GetOctTreeArray() + octTreeCount;
+                    octTree->ReadOtmOctTree(chunkFile);
+                    *reinterpret_cast<CMapObj**>(Ptr(octTree, 8)) = mapObj;
 
                     if (*reinterpret_cast<int*>(objRaw + 0xC) == 0) {
                         if (System.m_execParam != 0) {

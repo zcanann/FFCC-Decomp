@@ -7,6 +7,7 @@
 #include "__ppc_eabi_linker.h"
 #include "dolphin/dvd/__dvd.h"
 #include "dolphin/os/__os.h"
+#include "dolphin/os/OSBootRegion.h"
 #include "PowerPC_EABI_Support/MetroTRK/trk_init.h"
 
 #define NOP 0x60000000
@@ -33,10 +34,6 @@ const char* __OSVersion = "<< Dolphin SDK - OS\trelease build: "BUILD_DATE" "RBU
 
 static DVDDriveInfo DriveInfo;
 static DVDCommandBlock DriveBlock;
-
-// defined in link script
-extern u32 BOOT_REGION_START AT_ADDRESS(0x812FDFF0);
-extern u32 BOOT_REGION_END AT_ADDRESS(0x812FDFEC);
 
 static OSBootInfo* BootInfo;
 static u32* BI2DebugFlag;

@@ -2,11 +2,10 @@
 #include <dolphin/os.h>
 
 #include "dolphin/os/__os.h"
+#define OS_BOOT_REGION_VOLATILE
+#include "dolphin/os/OSBootRegion.h"
+#undef OS_BOOT_REGION_VOLATILE
 #include "__dvd.h"
-
-extern volatile u32 BOOT_REGION_START AT_ADDRESS(0x812FDFF0);
-extern volatile u32 BOOT_REGION_END AT_ADDRESS(0x812FDFEC);
-extern volatile u8 g_unk_800030E2 AT_ADDRESS(0x800030E2);
 
 static int Prepared;
 

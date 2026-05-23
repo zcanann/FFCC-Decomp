@@ -44,7 +44,7 @@ extern "C" void destroyViewer__14CFunnyShapePcsFv(CFunnyShapePcs*);
 extern "C" void calcViewer__14CFunnyShapePcsFv(CFunnyShapePcs*);
 extern "C" void drawViewer__14CFunnyShapePcsFv(CFunnyShapePcs*);
 extern "C" void __dt__14CFunnyShapePcsFv(void*);
-extern "C" const char lbl_801D7DD0[] = "CFunnyShapePcs(VIEWER)";
+extern "C" const char s_CFunnyShapePcsViewer[] = "CFunnyShapePcs(VIEWER)";
 extern "C" const Vec s_funnyEye = {0.0f, 0.0f, 4.0f};
 extern "C" const Vec s_funnyAt = {0.0f, 0.0f, 0.0f};
 extern "C" const Vec s_funnyUp = {0.0f, 1.0f, 0.0f};
@@ -58,7 +58,7 @@ extern const char __RTTI__8CManager_8032E660[];
 extern const char __RTTI__8CProcess_8032E668[];
 extern u8 ARRAY_8026D728[];
 
-extern "C" const char lbl_8032FD1C[5];
+extern "C" const char s_funnyShapeSpinner[5];
 
 inline void* operator new(unsigned long, void* ptr)
 {
@@ -167,7 +167,7 @@ void CFunnyShapePcs::drawViewer()
         FunnyShape(this)->Render();
     }
 
-    static char* pFan = const_cast<char*>(lbl_8032FD1C);
+    static char* pFan = const_cast<char*>(s_funnyShapeSpinner);
     static int alive = 0;
 
     alive++;
@@ -431,7 +431,7 @@ unsigned int CFunnyShapePcs::m_table_desc1[3] = {0, 0xFFFFFFFF, reinterpret_cast
 unsigned int CFunnyShapePcs::m_table_desc2[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__14CFunnyShapePcsFv)};
 unsigned int CFunnyShapePcs::m_table_desc3[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__14CFunnyShapePcsFv)};
 unsigned int CFunnyShapePcs::m_table[0x15C / sizeof(unsigned int)] = {
-    reinterpret_cast<unsigned int>(const_cast<char*>(lbl_801D7DD0)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x21, 0, 0, 0, 0,
+    reinterpret_cast<unsigned int>(const_cast<char*>(s_CFunnyShapePcsViewer)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x21, 0, 0, 0, 0,
     0x42, 1
 };
 unsigned int lbl_801EA904[3] = {

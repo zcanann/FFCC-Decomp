@@ -1,5 +1,6 @@
 #include "ffcc/mapshadow.h"
 #include "ffcc/linkage.h"
+#include "ffcc/map.h"
 #include "ffcc/mapocttree.h"
 #include "ffcc/materialman.h"
 #include "ffcc/vector.h"
@@ -37,7 +38,7 @@ void CMapShadowInsertOctTree(CMapShadow::TARGET mapShadow, COctTree& octTree)
 
 	octTree.ClearShadow();
 	if (*(u32*)(*(u32*)((char*)&octTree + 0x8) + 0x3c) != 0) {
-		mapShadowArray = reinterpret_cast<CPtrArray<CMapShadow*>*>((char*)&MapMng + 0x21434);
+        mapShadowArray = &MapMng.GetMapShadowArray();
 		boundOffset = (u32)mapShadow * sizeof(CBound);
 		for (i = 0; i < (u32)mapShadowArray->GetSize(); i++) {
 			octTreeMask = *(u32*)(*(u32*)((char*)&octTree + 0x8) + 0x3c);

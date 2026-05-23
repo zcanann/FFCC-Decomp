@@ -1835,7 +1835,7 @@ void CMaterialMan::SetShadowBit32(CMapShadow::TARGET target, unsigned long* shad
 {
     (void)target;
 
-    CPtrArray<CMapShadow*>* mapShadowArray = reinterpret_cast<CPtrArray<CMapShadow*>*>(Ptr(&MapMng, 0x21434));
+    CPtrArray<CMapShadow*>* mapShadowArray = &MapMng.GetMapShadowArray();
     for (unsigned int i = 0; i < static_cast<unsigned int>(mapShadowArray->GetSize()); i++) {
         CMapShadow* shadow = (*mapShadowArray)[i];
         unsigned char* shadowBytes = reinterpret_cast<unsigned char*>(shadow);
@@ -1875,7 +1875,7 @@ void CMaterialMan::SetPosition(
     float maxY = minY + rangeY;
     float maxZ = position->z + rangeXZ;
 
-    CPtrArray<CMapShadow*>* mapShadowArray = reinterpret_cast<CPtrArray<CMapShadow*>*>(Ptr(&MapMng, 0x21434));
+    CPtrArray<CMapShadow*>* mapShadowArray = &MapMng.GetMapShadowArray();
     if (target == static_cast<CMapShadow::TARGET>(0)) {
         int shadowCandidates[385];
         int* candidateWrite = shadowCandidates;
@@ -1998,7 +1998,7 @@ int CMaterialMan::GetCharaShadow(
 
     CMaterialSet* materialSet = MapMng.m_materialSet;
     CPtrArray<CMaterial*>* materials = reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(materialSet, 8));
-    CPtrArray<CMapShadow*>* mapShadowArray = reinterpret_cast<CPtrArray<CMapShadow*>*>(Ptr(&MapMng, 0x21434));
+    CPtrArray<CMapShadow*>* mapShadowArray = &MapMng.GetMapShadowArray();
 
     int shadowCandidates[384];
     int* candidateWrite = shadowCandidates;
@@ -2086,7 +2086,7 @@ int CMaterialMan::GetCharaShadow(
  */
 void CMaterialMan::SetShadowBound(CMapShadow::TARGET target, CBound* bound, float (*viewMtx) [4])
 {
-    CPtrArray<CMapShadow*>* mapShadowArray = reinterpret_cast<CPtrArray<CMapShadow*>*>(Ptr(&MapMng, 0x21434));
+    CPtrArray<CMapShadow*>* mapShadowArray = &MapMng.GetMapShadowArray();
 
     for (unsigned int i = 0; i < static_cast<unsigned int>(mapShadowArray->GetSize()); i++) {
         CMapShadow* shadow = (*mapShadowArray)[i];

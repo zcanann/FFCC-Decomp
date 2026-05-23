@@ -2,6 +2,7 @@
 #include "ffcc/mapanim.h"
 #include "ffcc/chunkfile.h"
 #include "ffcc/linkage.h"
+#include "ffcc/map.h"
 #include "ffcc/memory.h"
 #include "ffcc/system.h"
 #include "dolphin/mtx.h"
@@ -89,8 +90,7 @@ void CMapAnimRun::Calc(long frame)
     }
 
 runFrame:
-    CPtrArray<CMapAnim*>* mapAnimArray =
-        reinterpret_cast<CPtrArray<CMapAnim*>*>(reinterpret_cast<unsigned char*>(&MapMng) + 0x213FC);
+    CPtrArray<CMapAnim*>* mapAnimArray = &MapMng.GetMapAnimArray();
     CMapAnim* mapAnim = (*mapAnimArray)[m_mapAnimIndex];
     mapAnim->Calc(m_currentFrame);
     if (++m_currentFrame > m_endFrame) {
@@ -156,7 +156,7 @@ void CMapAnim::ReadOtmAnim(CChunkFile& chunkFile)
     int nodeIdx;
 
     chunkFile.PushChunk();
-    mapAnimKeyDtArray = reinterpret_cast<CPtrArray<CMapAnimKeyDt*>*>(reinterpret_cast<unsigned char*>(&MapMng) + 0x21418);
+    mapAnimKeyDtArray = &MapMng.GetMapAnimKeyDtArray();
     while ((hasChunk = static_cast<int>(chunkFile.GetNextChunk(*reinterpret_cast<CChunkFile::CChunk*>(outerChunkData)))) != 0) {
         if (chunkId == 0x4652414D) {
             m_startFrame = static_cast<int>(chunkFile.Get4());
@@ -173,7 +173,7 @@ void CMapAnim::ReadOtmAnim(CChunkFile& chunkFile)
             while ((hasChunk = static_cast<int>(chunkFile.GetNextChunk(*reinterpret_cast<CChunkFile::CChunk*>(innerChunkData)))) != 0) {
                 if (innerChunkId == 0x4E494458) {
                     nodeIdx = static_cast<int>(chunkFile.Get4());
-                    item[0] = reinterpret_cast<int>(reinterpret_cast<unsigned char*>(&MapMng) + (nodeIdx * 0xF0) + 0x954);
+                    item[0] = reinterpret_cast<int>(MapMng.GetMapObjArray() + nodeIdx);
                 } else if (innerChunkId == 0x5452414E) {
                     keyData = reinterpret_cast<int>(
                         operator new(

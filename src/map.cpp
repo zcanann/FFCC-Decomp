@@ -1326,13 +1326,13 @@ void CMapMng::Create()
     CMemory::CStage* stage = Memory.CreateStage(0x540000, const_cast<char*>(s_map_manager_label_block), 0);
     m_stage = stage;
 
-    reinterpret_cast<CPtrArray<CMapAnimRun*>*>(Ptr(this, 0x213E0))->SetStage(stage);
-    reinterpret_cast<CPtrArray<CMapAnim*>*>(Ptr(this, 0x213FC))->SetStage(stage);
-    reinterpret_cast<CPtrArray<CMapAnimKeyDt*>*>(Ptr(this, 0x21418))->SetStage(stage);
-    reinterpret_cast<CPtrArray<CMapShadow*>*>(Ptr(this, 0x21434))->SetStage(stage);
+    GetMapAnimRunArray().SetStage(stage);
+    GetMapAnimArray().SetStage(stage);
+    GetMapAnimKeyDtArray().SetStage(stage);
+    GetMapShadowArray().SetStage(stage);
 
     for (int i = 0; i < 2; i++) {
-        reinterpret_cast<CPtrArray<CMapLightHolder*>*>(Ptr(this, 0x21450 + (i * 0x1C)))->SetStage(stage);
+        GetMapLightHolderArray(i).SetStage(stage);
     }
 
     gMapHitFaceFlag = 0;
@@ -1493,7 +1493,7 @@ void CMapMng::DestroyMap()
         m_mapTexAnimSet = 0;
     }
 
-    CPtrArray<CMapAnim*>* mapAnimArray = reinterpret_cast<CPtrArray<CMapAnim*>*>(self + 0x213FC);
+    CPtrArray<CMapAnim*>* mapAnimArray = &GetMapAnimArray();
     for (unsigned int i = 0; i < static_cast<unsigned int>(mapAnimArray->GetSize()); i++) {
         CMapAnim* mapAnim = (*mapAnimArray)[i];
         if (mapAnim != 0) {
@@ -1502,7 +1502,7 @@ void CMapMng::DestroyMap()
     }
     mapAnimArray->RemoveAll();
 
-    CPtrArray<CMapAnimKeyDt*>* mapAnimKeyDtArray = reinterpret_cast<CPtrArray<CMapAnimKeyDt*>*>(self + 0x21418);
+    CPtrArray<CMapAnimKeyDt*>* mapAnimKeyDtArray = &GetMapAnimKeyDtArray();
     for (unsigned int i = 0; i < static_cast<unsigned int>(mapAnimKeyDtArray->GetSize()); i++) {
         CMapAnimKeyDt* mapAnimKeyDt = (*mapAnimKeyDtArray)[i];
         if (mapAnimKeyDt != 0) {
@@ -1511,7 +1511,7 @@ void CMapMng::DestroyMap()
     }
     mapAnimKeyDtArray->RemoveAll();
 
-    CPtrArray<CMapAnimRun*>* mapAnimRunArray = reinterpret_cast<CPtrArray<CMapAnimRun*>*>(self + 0x213E0);
+    CPtrArray<CMapAnimRun*>* mapAnimRunArray = &GetMapAnimRunArray();
     for (unsigned int i = 0; i < static_cast<unsigned int>(mapAnimRunArray->GetSize()); i++) {
         CMapAnimRun* mapAnimRun = (*mapAnimRunArray)[i];
         if (mapAnimRun != 0) {
@@ -1520,7 +1520,7 @@ void CMapMng::DestroyMap()
     }
     mapAnimRunArray->RemoveAll();
 
-    CPtrArray<CMapShadow*>* mapShadowArray = reinterpret_cast<CPtrArray<CMapShadow*>*>(self + 0x21434);
+    CPtrArray<CMapShadow*>* mapShadowArray = &GetMapShadowArray();
     for (unsigned int i = 0; i < static_cast<unsigned int>(mapShadowArray->GetSize()); i++) {
         CMapShadow* mapShadow = (*mapShadowArray)[i];
         if (mapShadow != 0) {
@@ -1530,8 +1530,7 @@ void CMapMng::DestroyMap()
     mapShadowArray->RemoveAll();
 
     for (int i = 0; i < 2; i++) {
-        CPtrArray<CMapLightHolder*>* mapLightHolderArray =
-            reinterpret_cast<CPtrArray<CMapLightHolder*>*>(self + 0x21450 + (i * 0x1C));
+        CPtrArray<CMapLightHolder*>* mapLightHolderArray = &GetMapLightHolderArray(i);
 
         for (unsigned int j = 0; j < static_cast<unsigned int>(mapLightHolderArray->GetSize()); j++) {
             CMapLightHolder* holder = (*mapLightHolderArray)[j];
@@ -2258,8 +2257,7 @@ void CMapMng::ReadOtm(char* mapName)
                     *reinterpret_cast<float*>(lightRaw + 8) = chunkFile.GetF4();
                     *reinterpret_cast<float*>(lightRaw + 0xC) = chunkFile.GetF4();
 
-                    CPtrArray<CMapLightHolder*>* holderArray =
-                        reinterpret_cast<CPtrArray<CMapLightHolder*>*>(self + 0x21450 + (chunk.m_arg0 * 0x1C));
+                    CPtrArray<CMapLightHolder*>* holderArray = &GetMapLightHolderArray(chunk.m_arg0);
                     holderArray->Add(light);
                 }
                 continue;
@@ -2296,7 +2294,7 @@ void CMapMng::ReadOtm(char* mapName)
                     CMapAnim* mapAnim = new (m_stage, const_cast<char*>(s_map_cpp), 0x4BF) CMapAnim();
                     if (mapAnim != 0) {
                         mapAnim->ReadOtmAnim(chunkFile);
-                        reinterpret_cast<CPtrArray<CMapAnim*>*>(self + 0x213FC)->Add(mapAnim);
+                        GetMapAnimArray().Add(mapAnim);
                     }
                     continue;
                 }
@@ -2349,7 +2347,7 @@ void CMapMng::ReadOtm(char* mapName)
         }
     }
 
-    CPtrArray<CMapShadow*>* mapShadowArray = reinterpret_cast<CPtrArray<CMapShadow*>*>(self + 0x21434);
+    CPtrArray<CMapShadow*>* mapShadowArray = &GetMapShadowArray();
     for (unsigned int i = 0; i < static_cast<unsigned int>(mapShadowArray->GetSize()); i++) {
         CMapShadow* mapShadow = (*mapShadowArray)[i];
         mapShadow->Init();
@@ -2649,7 +2647,7 @@ void CMapMng::Calc()
         return;
     }
 
-    CPtrArray<CMapAnimRun*>* mapAnimRunArray = reinterpret_cast<CPtrArray<CMapAnimRun*>*>(Ptr(this, 0x213E0));
+    CPtrArray<CMapAnimRun*>* mapAnimRunArray = &GetMapAnimRunArray();
     const int mapAnimRunCount = mapAnimRunArray->GetSize();
     for (int i = 0; i < mapAnimRunCount; i++) {
         CMapAnimRun* mapAnimRun = (*mapAnimRunArray)[i];
@@ -2673,7 +2671,7 @@ void CMapMng::Calc()
 
     SetLightSource();
 
-    CPtrArray<CMapShadow*>* mapShadowArray = reinterpret_cast<CPtrArray<CMapShadow*>*>(Ptr(this, 0x21434));
+    CPtrArray<CMapShadow*>* mapShadowArray = &GetMapShadowArray();
     const int mapShadowCount = mapShadowArray->GetSize();
     for (int i = 0; i < mapShadowCount; i++) {
         CMapShadow* mapShadow = (*mapShadowArray)[i];
@@ -2722,8 +2720,8 @@ void CMapMng::DrawMapShadow()
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
     if (m_mapObjCount != 0) {
-        for (unsigned int i = 0; i < reinterpret_cast<CPtrArray<CMapShadow*>*>(self + 0x21434)->GetSize(); i++) {
-            CMapShadow* mapShadow = (*reinterpret_cast<CPtrArray<CMapShadow*>*>(self + 0x21434))[i];
+        for (unsigned int i = 0; i < static_cast<unsigned int>(GetMapShadowArray().GetSize()); i++) {
+            CMapShadow* mapShadow = GetMapShadowArray()[i];
             mapShadow->Draw();
         }
     }
@@ -2763,7 +2761,7 @@ void CMapMng::DrawBefore()
     LightPcs.SetNumDiffuse(0);
 
     if ((gMapHitDrawMode.m_byte & 8) == 0) {
-        CMapObj* mapObj = reinterpret_cast<CMapObj*>(Ptr(&MapMng, 0x954));
+        CMapObj* mapObj = GetMapObjArray();
         for (int i = 0; i < mapObjCount; i++) {
             mapObj->Draw(0xFE);
             mapObj = reinterpret_cast<CMapObj*>(Ptr(mapObj, 0xF0));
@@ -2814,7 +2812,7 @@ void CMapMng::Draw()
             octTree = reinterpret_cast<COctTree*>(Ptr(octTree, 0x4C));
         }
 
-        CMapObj* mapObj = reinterpret_cast<CMapObj*>(Ptr(&MapMng, 0x954));
+        CMapObj* mapObj = GetMapObjArray();
         for (int i = 0; i < mapObjCount; i++) {
             mapObj->Draw(0x40);
             mapObj = reinterpret_cast<CMapObj*>(Ptr(mapObj, 0xF0));
@@ -2828,7 +2826,7 @@ void CMapMng::Draw()
         GXSetZMode(1, GX_LEQUAL, 1);
         LightPcs.SetNumDiffuse(0);
 
-        mapObj = reinterpret_cast<CMapObj*>(Ptr(&MapMng, 0x954));
+        mapObj = GetMapObjArray();
         for (int i = 0; i < mapObjCount; i++) {
             mapObj->Draw(0);
             mapObj = reinterpret_cast<CMapObj*>(Ptr(mapObj, 0xF0));
@@ -2871,13 +2869,13 @@ void CMapMng::Draw()
 
         CameraPcs.SetOffsetZBuff(FLOAT_8032f9bc);
 
-        CMapObj* mapObj = reinterpret_cast<CMapObj*>(Ptr(&MapMng, 0x954));
+        CMapObj* mapObj = GetMapObjArray();
         for (int i = 0; i < mapObjCount; i++) {
             mapObj->DrawHitWire();
             mapObj = reinterpret_cast<CMapObj*>(Ptr(mapObj, 0xF0));
         }
 
-        mapObj = reinterpret_cast<CMapObj*>(Ptr(&MapMng, 0x954));
+        mapObj = GetMapObjArray();
         for (int i = 0; i < mapObjCount; i++) {
             mapObj->DrawHitNormal();
             mapObj = reinterpret_cast<CMapObj*>(Ptr(mapObj, 0xF0));
@@ -2931,7 +2929,7 @@ void CMapMng::DrawAfter()
             octTree = reinterpret_cast<COctTree*>(Ptr(octTree, 0x4C));
         }
 
-        CMapObj* mapObj = reinterpret_cast<CMapObj*>(Ptr(&MapMng, 0x954));
+        CMapObj* mapObj = GetMapObjArray();
         for (int i = 0; i < mapObjCount; i++) {
             mapObj->Draw(2);
             mapObj = reinterpret_cast<CMapObj*>(Ptr(mapObj, 0xF0));
@@ -3365,7 +3363,7 @@ void CMapMng::SetMapObjLMtx(int mapObjIndex, float (*source)[4])
  */
 void CMapMng::GetMapObjWMtx(int mapObjIndex, float (*destination)[4])
 {
-    CMapObj* mapObj = reinterpret_cast<CMapObj*>(reinterpret_cast<unsigned char*>(this) + (mapObjIndex * 0xF0) + 0x954);
+    CMapObj* mapObj = GetMapObjArray() + mapObjIndex;
     PSMTXCopy(*reinterpret_cast<Mtx*>(reinterpret_cast<unsigned char*>(mapObj) + 0xB8), destination);
 }
 
@@ -3376,10 +3374,10 @@ void CMapMng::GetMapObjWMtx(int mapObjIndex, float (*destination)[4])
  */
 void CMapMng::SetMapObjAnim(int mapObjIndex, int startFrame, int endFrame, int loop)
 {
-    CPtrArray<CMapAnimRun*>* mapAnimRunArray = reinterpret_cast<CPtrArray<CMapAnimRun*>*>(Ptr(this, 0x213E0));
-    CPtrArray<CMapAnim*>* mapAnimArray = reinterpret_cast<CPtrArray<CMapAnim*>*>(Ptr(this, 0x213FC));
+    CPtrArray<CMapAnimRun*>* mapAnimRunArray = &GetMapAnimRunArray();
+    CPtrArray<CMapAnim*>* mapAnimArray = &GetMapAnimArray();
     CMapAnimRun* foundMapAnimRun = 0;
-    CMapObj* mapObj = reinterpret_cast<CMapObj*>(reinterpret_cast<unsigned char*>(this) + (mapObjIndex * 0xF0) + 0x954);
+    CMapObj* mapObj = GetMapObjArray() + mapObjIndex;
     int mapAnimRunCount = mapAnimRunArray->GetSize();
 
     for (unsigned int mapAnimRunIndex = 0; mapAnimRunIndex < static_cast<unsigned int>(mapAnimRunCount); mapAnimRunIndex++) {
@@ -3412,7 +3410,7 @@ startMapObjAnim:
  */
 void CMapMng::SetMapAnimID(int animId, int startFrame, int endFrame, int loop)
 {
-    CPtrArray<CMapAnimRun*>* mapAnimRunArray = reinterpret_cast<CPtrArray<CMapAnimRun*>*>(Ptr(this, 0x213E0));
+    CPtrArray<CMapAnimRun*>* mapAnimRunArray = &GetMapAnimRunArray();
     CMapAnimRun* mapAnimRun = 0;
     int mapAnimRunCount = mapAnimRunArray->GetSize();
 

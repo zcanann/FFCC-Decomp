@@ -133,7 +133,7 @@ static inline CMapObj* NextSlot(CMapObj* obj)
 
 static inline CMapObj* MapObjArrayStart()
 {
-    return reinterpret_cast<CMapObj*>(reinterpret_cast<unsigned char*>(&MapMng) + 0x954);
+    return MapMng.GetMapObjArray();
 }
 
 static inline Mtx& MapObjHitDrawMtx()
@@ -601,8 +601,7 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 } else {
                     *(animRun + 0x11) = 0;
                 }
-                reinterpret_cast<CPtrArray<CMapAnimRun*>*>(reinterpret_cast<unsigned char*>(&MapMng) + 0x213E0)
-                    ->Add(reinterpret_cast<CMapAnimRun*>(animRun));
+                MapMng.GetMapAnimRunArray().Add(reinterpret_cast<CMapAnimRun*>(animRun));
             }
         } else if (chunk.m_id == CHUNK_MIME) {
             if (PtrAt(this, 0xEC) != 0) {

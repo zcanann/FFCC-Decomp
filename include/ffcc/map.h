@@ -12,6 +12,7 @@ class CMapObj;
 class CMapHit;
 class CMapCylinder;
 class CMapLightHolder;
+class CMapMesh;
 class CMaterial;
 class CMaterialSet;
 class CMapTexAnimSet;
@@ -22,6 +23,9 @@ class CMapAnimKeyDt;
 class CMapShadow;
 class CMemory;
 class CTextureSet;
+class COctTree;
+template <class T>
+class CPtrArray;
 
 void setDbgLight(int, Vec&, _GXColor&);
 void GXSetTexCoordGen();
@@ -130,6 +134,32 @@ public:
     float m_octTreeDrawMinDepth;       // 0x22A70
     float m_octTreeFrustumRange;       // 0x22A74
     CMapObj* m_hitMapObj;              // 0x22A78
+
+    COctTree* GetOctTreeArray() { return reinterpret_cast<COctTree*>(reinterpret_cast<unsigned char*>(this) + 0x14); }
+    CMapHit* GetMapHitArray() { return reinterpret_cast<CMapHit*>(reinterpret_cast<unsigned char*>(this) + 0x4D4); }
+    CMapObj* GetMapObjArray() { return reinterpret_cast<CMapObj*>(reinterpret_cast<unsigned char*>(this) + 0x954); }
+    CMapMesh* GetMapMeshArray() { return reinterpret_cast<CMapMesh*>(reinterpret_cast<unsigned char*>(this) + 0x1E954); }
+    CPtrArray<CMapAnimRun*>& GetMapAnimRunArray()
+    {
+        return *reinterpret_cast<CPtrArray<CMapAnimRun*>*>(reinterpret_cast<unsigned char*>(this) + 0x213E0);
+    }
+    CPtrArray<CMapAnim*>& GetMapAnimArray()
+    {
+        return *reinterpret_cast<CPtrArray<CMapAnim*>*>(reinterpret_cast<unsigned char*>(this) + 0x213FC);
+    }
+    CPtrArray<CMapAnimKeyDt*>& GetMapAnimKeyDtArray()
+    {
+        return *reinterpret_cast<CPtrArray<CMapAnimKeyDt*>*>(reinterpret_cast<unsigned char*>(this) + 0x21418);
+    }
+    CPtrArray<CMapShadow*>& GetMapShadowArray()
+    {
+        return *reinterpret_cast<CPtrArray<CMapShadow*>*>(reinterpret_cast<unsigned char*>(this) + 0x21434);
+    }
+    CPtrArray<CMapLightHolder*>& GetMapLightHolderArray(int index)
+    {
+        return *reinterpret_cast<CPtrArray<CMapLightHolder*>*>(
+            reinterpret_cast<unsigned char*>(this) + 0x21450 + (index * 0x1C));
+    }
 
     ~CMapMng();
     CMapMng();

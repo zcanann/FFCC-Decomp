@@ -1234,7 +1234,7 @@ void CMapKeyFrame::Calc()
  */
 int CMapKeyFrame::IsRun()
 {
-    return *reinterpret_cast<unsigned char*>(Ptr(this, 4));
+    return m_isRun;
 }
 
 /*
@@ -1261,13 +1261,13 @@ void CMapKeyFrame::ReadFrame(CChunkFile& chunkFile, int)
 {
     int frame = chunkFile.Get4();
 
-    *reinterpret_cast<int*>(Ptr(this, 0xC)) = frame;
-    *reinterpret_cast<int*>(Ptr(this, 8)) = frame;
+    m_startFrame = frame;
+    m_currentFrame = frame;
 
     frame = chunkFile.Get4();
-    *reinterpret_cast<int*>(Ptr(this, 0x10)) = frame;
-    *reinterpret_cast<int*>(Ptr(this, 0x14)) = frame;
-    *reinterpret_cast<unsigned char*>(Ptr(this, 0)) = static_cast<unsigned char>(chunkFile.Get4());
+    m_endFrame = frame;
+    m_frameCount = frame;
+    m_mode = static_cast<unsigned char>(chunkFile.Get4());
 }
 
 /*

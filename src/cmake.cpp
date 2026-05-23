@@ -3569,7 +3569,7 @@ void CMenuPcs::destroyVillageMenu()
 
         void*& villageWork = CmakeFields(this).m_villageWork;
         if (villageWork != nullptr) {
-            delete[] static_cast<unsigned char*>(villageWork);
+            operator delete(villageWork);
             villageWork = nullptr;
         }
 
@@ -3601,7 +3601,7 @@ void CMenuPcs::calcVillageMenu()
 
             CMemory::CStage* stage = CmakeFields(this).m_menuStage;
             void*& villageWork = CmakeFields(this).m_villageWork;
-            villageWork = new (stage, const_cast<char*>(s_cmake_cpp_801e3038), 0xCB3) unsigned char[0x48];
+            villageWork = operator new(0x48, stage, const_cast<char*>(s_cmake_cpp_801e3038), 0xCB3);
             memset(villageWork, 0, 0x48);
             LoadCmakeVillageName();
             MenuS16(this, 0x86C) = 1;
@@ -3623,7 +3623,7 @@ void CMenuPcs::calcVillageMenu()
                 freeTexture(8, 1, 0x60, 9);
                 void*& villageWork = CmakeFields(this).m_villageWork;
                 if (villageWork != nullptr) {
-                    delete[] static_cast<unsigned char*>(villageWork);
+                    operator delete(villageWork);
                     villageWork = nullptr;
                 }
                 MenuS16(this, 0x86C) = 0;

@@ -7468,9 +7468,9 @@ void CMenuPcs::WMChgMenu()
 
 	sVar2 = *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1C);
 	if (sVar2 == 6) {
-		*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(&MapMng) + 0x22857) = 0;
+		MapMng.GetMapIdGrpArray()[0xF7].m_primaryColor.a = 0;
 	} else if (iVar14 == 6 && sVar2 != 6) {
-		*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(&MapMng) + 0x22857) = 1;
+		MapMng.GetMapIdGrpArray()[0xF7].m_primaryColor.a = 1;
 	}
 }
 

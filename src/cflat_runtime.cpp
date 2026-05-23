@@ -8,14 +8,14 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h>
 
 extern "C" {
-char DAT_80330118[];
+char s_cflat_runtime_newline[];
 void* __vt__12CFlatRuntime[];
 void* __vt__Q212CFlatRuntime7CObject[];
 void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
     CFlatRuntime*, CFlatRuntime::CObject*, int, int, int, CFlatRuntime::CStack*, CFlatRuntime::CStack*);
 }
 
-extern "C" const char s_cflat_runtime_cpp_801d8ef8[] = "cflat_runtime.cpp";
+extern "C" const char s_cflat_runtime_cpp[] = "cflat_runtime.cpp";
 
 struct CFlatRuntimeLifecycleProxy
 {
@@ -91,9 +91,9 @@ void CFlatRuntime::Init()
 	CFlatRuntimeStageProxy* proxy = reinterpret_cast<CFlatRuntimeStageProxy*>(this);
 
 	m_permanentVarValues =
-	    new (reinterpret_cast<CMemory::CStage*>(proxy->GetStage()), const_cast<char*>(s_cflat_runtime_cpp_801d8ef8), 0x2A) u8[0x3000];
+	    new (reinterpret_cast<CMemory::CStage*>(proxy->GetStage()), const_cast<char*>(s_cflat_runtime_cpp), 0x2A) u8[0x3000];
 	m_initScratchA =
-	    new (reinterpret_cast<CMemory::CStage*>(proxy->GetStage()), const_cast<char*>(s_cflat_runtime_cpp_801d8ef8), 0x2B) u8[0x14880];
+	    new (reinterpret_cast<CMemory::CStage*>(proxy->GetStage()), const_cast<char*>(s_cflat_runtime_cpp), 0x2B) u8[0x14880];
 }
 
 /*
@@ -315,7 +315,7 @@ void CFlatRuntime::Create(void* filePtr)
 				*reinterpret_cast<int*>(self + 0x14) = classCount;
 
 				*reinterpret_cast<CClass**>(self + 0x18) =
-				    new (reinterpret_cast<CMemory::CStage*>(getStage(this)), const_cast<char*>(s_cflat_runtime_cpp_801d8ef8), 0x9E)
+				    new (reinterpret_cast<CMemory::CStage*>(getStage(this)), const_cast<char*>(s_cflat_runtime_cpp), 0x9E)
 				        CClass[classCount];
 
 				int classIndex = 0;
@@ -362,7 +362,7 @@ void CFlatRuntime::Create(void* filePtr)
 				const int funcCount = chunk.m_arg0;
 				*reinterpret_cast<int*>(self + 0x1C) = funcCount;
 				*reinterpret_cast<u8**>(self + 0x20) =
-				    new (reinterpret_cast<CMemory::CStage*>(getStage(this)), const_cast<char*>(s_cflat_runtime_cpp_801d8ef8), 0xD9)
+				    new (reinterpret_cast<CMemory::CStage*>(getStage(this)), const_cast<char*>(s_cflat_runtime_cpp), 0xD9)
 				        u8[funcCount * 0x50];
 
 				int funcIndex = 0;
@@ -396,7 +396,7 @@ void CFlatRuntime::Create(void* filePtr)
 								funcBase[0xD] = 0;
 							} else {
 								funcBase[0xD] = reinterpret_cast<int>(
-								    new (reinterpret_cast<CMemory::CStage*>(getStage(this)), const_cast<char*>(s_cflat_runtime_cpp_801d8ef8), 0x109)
+								    new (reinterpret_cast<CMemory::CStage*>(getStage(this)), const_cast<char*>(s_cflat_runtime_cpp), 0x109)
 								        u8[chunk.m_size]);
 								memcpy(reinterpret_cast<void*>(funcBase[0xD]), chunkFile.GetAddress(),
 								       chunk.m_size);
@@ -427,7 +427,7 @@ void CFlatRuntime::Create(void* filePtr)
 				const int variableCount = chunk.m_arg0;
 				*reinterpret_cast<int*>(self + 0x24) = variableCount;
 				*reinterpret_cast<u8**>(self + 0x28) =
-				    new (reinterpret_cast<CMemory::CStage*>(getStage(this)), const_cast<char*>(s_cflat_runtime_cpp_801d8ef8), 0x96)
+				    new (reinterpret_cast<CMemory::CStage*>(getStage(this)), const_cast<char*>(s_cflat_runtime_cpp), 0x96)
 				        u8[variableCount << 2];
 
 				u8* variableDef = *reinterpret_cast<u8**>(self + 0x28);
@@ -444,10 +444,10 @@ void CFlatRuntime::Create(void* filePtr)
 				const int strCount = chunk.m_arg0;
 				*reinterpret_cast<int*>(self + 0x30) = strCount;
 				*reinterpret_cast<u16**>(self + 0x34) =
-				    new (reinterpret_cast<CMemory::CStage*>(getStage(this)), const_cast<char*>(s_cflat_runtime_cpp_801d8ef8), 0x121)
+				    new (reinterpret_cast<CMemory::CStage*>(getStage(this)), const_cast<char*>(s_cflat_runtime_cpp), 0x121)
 				        u16[strCount];
 				*reinterpret_cast<char**>(self + 0x38) =
-				    new (reinterpret_cast<CMemory::CStage*>(getStage(this)), const_cast<char*>(s_cflat_runtime_cpp_801d8ef8), 0x122)
+				    new (reinterpret_cast<CMemory::CStage*>(getStage(this)), const_cast<char*>(s_cflat_runtime_cpp), 0x122)
 				        char[chunk.m_size];
 
 				memcpy(*reinterpret_cast<void**>(self + 0x38), chunkFile.GetAddress(), chunk.m_size);
@@ -466,10 +466,10 @@ void CFlatRuntime::Create(void* filePtr)
 				const int fstrCount = chunk.m_arg0;
 				*reinterpret_cast<int*>(self + 0x3C) = fstrCount;
 				*reinterpret_cast<u16**>(self + 0x40) =
-				    new (reinterpret_cast<CMemory::CStage*>(getStage(this)), const_cast<char*>(s_cflat_runtime_cpp_801d8ef8), 0x12F)
+				    new (reinterpret_cast<CMemory::CStage*>(getStage(this)), const_cast<char*>(s_cflat_runtime_cpp), 0x12F)
 				        u16[fstrCount];
 				*reinterpret_cast<char**>(self + 0x44) =
-				    new (reinterpret_cast<CMemory::CStage*>(getStage(this)), const_cast<char*>(s_cflat_runtime_cpp_801d8ef8), 0x130)
+				    new (reinterpret_cast<CMemory::CStage*>(getStage(this)), const_cast<char*>(s_cflat_runtime_cpp), 0x130)
 				        char[chunk.m_size];
 
 				memcpy(*reinterpret_cast<void**>(self + 0x44), chunkFile.GetAddress(), chunk.m_size);
@@ -488,10 +488,10 @@ void CFlatRuntime::Create(void* filePtr)
 				const int vstrCount = chunk.m_arg0;
 				*reinterpret_cast<int*>(self + 0x48) = vstrCount;
 				*reinterpret_cast<u16**>(self + 0x4C) =
-				    new (reinterpret_cast<CMemory::CStage*>(getStage(this)), const_cast<char*>(s_cflat_runtime_cpp_801d8ef8), 0x13D)
+				    new (reinterpret_cast<CMemory::CStage*>(getStage(this)), const_cast<char*>(s_cflat_runtime_cpp), 0x13D)
 				        u16[vstrCount];
 				*reinterpret_cast<char**>(self + 0x50) =
-				    new (reinterpret_cast<CMemory::CStage*>(getStage(this)), const_cast<char*>(s_cflat_runtime_cpp_801d8ef8), 0x13E)
+				    new (reinterpret_cast<CMemory::CStage*>(getStage(this)), const_cast<char*>(s_cflat_runtime_cpp), 0x13E)
 				        char[chunk.m_size];
 
 				memcpy(*reinterpret_cast<void**>(self + 0x50), chunkFile.GetAddress(), chunk.m_size);
@@ -569,7 +569,7 @@ int CFlatRuntime::CreateDebug(void* filePtr, int debugChunkIndex)
 											reinterpret_cast<u8*>(funcs) + blockOffset + 0x38) = chunk.m_size >> 3;
 										*reinterpret_cast<u8**>(reinterpret_cast<u8*>(funcs) + blockOffset + 0x3C)
 										    = new (reinterpret_cast<CMemory::CStage*>(getStage(this)),
-										           const_cast<char*>(s_cflat_runtime_cpp_801d8ef8), 0x181)
+										           const_cast<char*>(s_cflat_runtime_cpp), 0x181)
 										        u8[*reinterpret_cast<int*>(reinterpret_cast<u8*>(funcs) + blockOffset + 0x38)
 										           << 3];
 										memcpy(
@@ -2125,7 +2125,7 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 
 				if (object->m_argCount == 1) {
 					System.Printf(format);
-					System.Printf(DAT_80330118);
+					System.Printf(s_cflat_runtime_newline);
 				} else {
 					char spec[256];
 					char rendered[256];
@@ -2210,7 +2210,7 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
 					}
 
 					System.Printf(line);
-					System.Printf(DAT_80330118);
+					System.Printf(s_cflat_runtime_newline);
 				}
 			}
 

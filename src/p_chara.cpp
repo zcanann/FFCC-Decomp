@@ -350,19 +350,19 @@ static inline CCharaPcs::CHandle*& HandleListHead(CCharaPcs* self)
     return self->m_handleList;
 }
 
-static inline unsigned int& FreeMergeMask(CCharaPcs* self)
+static inline u32& FreeMergeMask(CCharaPcs* self)
 {
-    return *reinterpret_cast<unsigned int*>(Ptr(self, 0x718));
+    return self->m_noFreeMergeMask;
 }
 
 static inline int& LoadStageMode(CCharaPcs* self)
 {
-    return *reinterpret_cast<int*>(Ptr(self, 0xE4));
+    return self->m_charaAllocStage;
 }
 
-static inline unsigned int& LoadStreamCursor(CCharaPcs* self)
+static inline u32& LoadStreamCursor(CCharaPcs* self)
 {
-    return *reinterpret_cast<unsigned int*>(Ptr(self, 0x714));
+    return self->m_loadStreamCursor;
 }
 
 static inline int& CurrentSceneId()
@@ -890,7 +890,7 @@ void CCharaPcs::create()
  */
 void CCharaPcs::createLoad()
 {
-    *reinterpret_cast<int*>(Ptr(this, 0x714)) = 0;
+    m_loadStreamCursor = 0;
     *reinterpret_cast<int*>(Ptr(&Memory, 0x779c)) = 2;
     LoadMergeFile(0, 0x10000000, 1);
     *reinterpret_cast<int*>(Ptr(&Memory, 0x779c)) = 0;
@@ -911,9 +911,9 @@ void CCharaPcs::destroy()
     LightPcs.DestroyBumpLightAll(static_cast<CLightPcs::TARGET>(0));
     gCharaPartWorkPtr = 0;
 
-    if (*reinterpret_cast<CHandle**>(Ptr(this, 0x4C)) != 0) {
-        delete *reinterpret_cast<CHandle**>(Ptr(this, 0x4C));
-        *reinterpret_cast<void**>(Ptr(this, 0x4C)) = 0;
+    if (m_handleList != 0) {
+        delete m_handleList;
+        m_handleList = 0;
     }
 
     Memory.DestroyStage(StageAt(this, 0xCC));
@@ -1120,7 +1120,7 @@ void CCharaPcs::onScriptChanging(char*)
     }
 
     *reinterpret_cast<int*>(Ptr(this, 0x24)) = 0;
-    *reinterpret_cast<int*>(Ptr(this, 0xE4)) = 0;
+    m_charaAllocStage = 0;
     m_texShadowSize = 0x80;
     m_texShadowDistance = 100;
 }
@@ -1136,7 +1136,7 @@ void CCharaPcs::onScriptChanging(char*)
  */
 void CCharaPcs::calc()
 {
-    CHandle* head = *reinterpret_cast<CHandle**>(Ptr(this, 0x4c));
+    CHandle* head = m_handleList;
     CHandle* handle = head->m_next;
 
     while (head != handle) {

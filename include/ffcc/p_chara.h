@@ -256,8 +256,8 @@ public:
     int m_viewerIFrameEnabled;                // 0x708
     int m_viewerResetIFrame;                  // 0x70C
     int m_viewerLoadAnimContinuous;           // 0x710
-    u8 _pad714[4];                            // 0x714
-    int m_noFreeMergeMask;                    // 0x718
+    u32 m_loadStreamCursor;                   // 0x714
+    u32 m_noFreeMergeMask;                    // 0x718
 };
 
 extern CCharaPcs CharaPcs;

@@ -119,6 +119,20 @@ static inline unsigned char* Ptr(void* p, unsigned int offset)
     return reinterpret_cast<unsigned char*>(p) + offset;
 }
 
+static inline void DestroyMapPtrArray(void* ptrArray, void** vtable)
+{
+    if (ptrArray != 0) {
+        *reinterpret_cast<void***>(ptrArray) = vtable;
+        void*& items = *reinterpret_cast<void**>(Ptr(ptrArray, 0x10));
+        if (items != 0) {
+            delete[] reinterpret_cast<void**>(items);
+            items = 0;
+        }
+        *reinterpret_cast<int*>(Ptr(ptrArray, 8)) = 0;
+        *reinterpret_cast<int*>(Ptr(ptrArray, 4)) = 0;
+    }
+}
+
 struct MapObjAttachAttr
 {
     void* vtable;
@@ -3717,46 +3731,10 @@ extern "C" void __sinit_map_cpp(void)
 CMapMng::~CMapMng()
 {
     __destroy_arr(GetMapLightHolderArrays(), reinterpret_cast<ConstructorDestructor>(dtor_80034414), 0x1C, 2);
-    if (Ptr(this, 0x21434) != 0) {
-        *reinterpret_cast<void***>(Ptr(this, 0x21434)) = __vt__8CPtrArrayIP10CMapShadow;
-        void* items = *reinterpret_cast<void**>(Ptr(this, 0x21444));
-        if (items != 0) {
-            delete[] reinterpret_cast<void**>(items);
-            *reinterpret_cast<void**>(Ptr(this, 0x21444)) = 0;
-        }
-        *reinterpret_cast<int*>(Ptr(this, 0x2143C)) = 0;
-        *reinterpret_cast<int*>(Ptr(this, 0x21438)) = 0;
-    }
-    if (Ptr(this, 0x21418) != 0) {
-        *reinterpret_cast<void***>(Ptr(this, 0x21418)) = __vt__8CPtrArrayIP13CMapAnimKeyDt;
-        void* items = *reinterpret_cast<void**>(Ptr(this, 0x21428));
-        if (items != 0) {
-            delete[] reinterpret_cast<void**>(items);
-            *reinterpret_cast<void**>(Ptr(this, 0x21428)) = 0;
-        }
-        *reinterpret_cast<int*>(Ptr(this, 0x21420)) = 0;
-        *reinterpret_cast<int*>(Ptr(this, 0x2141C)) = 0;
-    }
-    if (Ptr(this, 0x213FC) != 0) {
-        *reinterpret_cast<void***>(Ptr(this, 0x213FC)) = __vt__8CPtrArrayIP7CMapAnim;
-        void* items = *reinterpret_cast<void**>(Ptr(this, 0x2140C));
-        if (items != 0) {
-            delete[] reinterpret_cast<void**>(items);
-            *reinterpret_cast<void**>(Ptr(this, 0x2140C)) = 0;
-        }
-        *reinterpret_cast<int*>(Ptr(this, 0x21404)) = 0;
-        *reinterpret_cast<int*>(Ptr(this, 0x21400)) = 0;
-    }
-    if (Ptr(this, 0x213E0) != 0) {
-        *reinterpret_cast<void***>(Ptr(this, 0x213E0)) = __vt__8CPtrArrayIP11CMapAnimRun;
-        void* items = *reinterpret_cast<void**>(Ptr(this, 0x213F0));
-        if (items != 0) {
-            delete[] reinterpret_cast<void**>(items);
-            *reinterpret_cast<void**>(Ptr(this, 0x213F0)) = 0;
-        }
-        *reinterpret_cast<int*>(Ptr(this, 0x213E8)) = 0;
-        *reinterpret_cast<int*>(Ptr(this, 0x213E4)) = 0;
-    }
+    DestroyMapPtrArray(&GetMapShadowArray(), __vt__8CPtrArrayIP10CMapShadow);
+    DestroyMapPtrArray(&GetMapAnimKeyDtArray(), __vt__8CPtrArrayIP13CMapAnimKeyDt);
+    DestroyMapPtrArray(&GetMapAnimArray(), __vt__8CPtrArrayIP7CMapAnim);
+    DestroyMapPtrArray(&GetMapAnimRunArray(), __vt__8CPtrArrayIP11CMapAnimRun);
     __destroy_arr(GetMapMeshArray(), reinterpret_cast<ConstructorDestructor>(__dt__8CMapMeshFv), 0x44, 0xA0);
     __destroy_arr(GetMapObjArray(), reinterpret_cast<ConstructorDestructor>(__dt__7CMapObjFv), 0xF0, 0x200);
     __destroy_arr(GetMapHitArray(), reinterpret_cast<ConstructorDestructor>(__dt__7CMapHitFv), 0x24, 0x20);

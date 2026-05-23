@@ -4,6 +4,8 @@
 #include <dolphin/si.h>
 #include <dolphin/db.h>
 
+#include "__ppc_eabi_linker.h"
+#include "dolphin/dvd/__dvd.h"
 #include "dolphin/os/__os.h"
 
 #define NOP 0x60000000
@@ -33,13 +35,7 @@ const char* __OSVersion = "<< Dolphin SDK - OS\trelease build: "BUILD_DATE" "RBU
 static DVDDriveInfo DriveInfo;
 static DVDCommandBlock DriveBlock;
 
-extern u32 __DVDLongFileNameFlag;
-extern u32 __PADSpec;
-
 // defined in link script
-extern u8 __ArenaLo[];
-extern char _stack_addr[];
-extern u8 __ArenaHi[];
 extern u32 BOOT_REGION_START AT_ADDRESS(0x812FDFF0);
 extern u32 BOOT_REGION_END AT_ADDRESS(0x812FDFEC);
 

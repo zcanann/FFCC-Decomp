@@ -11,6 +11,8 @@ DECL_SECTION(".init") extern char _stack_addr[];
 DECL_SECTION(".init") extern char _stack_end[];
 DECL_SECTION(".init") extern char _heap_addr[];
 DECL_SECTION(".init") extern char _heap_end[];
+DECL_SECTION(".init") extern char __ArenaLo[];
+DECL_SECTION(".init") extern char __ArenaHi[];
 DECL_SECTION(".init") extern const char _fextabindex_rom[];
 DECL_SECTION(".init") extern char _fextabindex[];
 DECL_SECTION(".init") extern char _eextabindex[];

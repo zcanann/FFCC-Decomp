@@ -79,6 +79,10 @@ private:
     u8 m_work[0x649C];
 };
 
+extern "C" void create__12CMiniGamePcsFv(CMiniGamePcs*);
+extern "C" void destroy__12CMiniGamePcsFv(CMiniGamePcs*);
+extern "C" void calc__12CMiniGamePcsFv(CMiniGamePcs*);
+
 extern CMiniGamePcs MiniGamePcs;
 
 #endif // _FFCC_P_MINIGAME_H_

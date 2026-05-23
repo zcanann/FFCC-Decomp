@@ -1,6 +1,7 @@
 #include "ffcc/pppAlignmentScale.h"
 #include "ffcc/partMng.h"
 #include "ffcc/p_camera.h"
+#include "ffcc/pppPart.h"
 
 #include <dolphin/mtx.h>
 
@@ -8,10 +9,6 @@ extern const float FLOAT_80331920;
 extern const float FLOAT_80331924;
 extern const float FLOAT_80331928 = 640.0f;
 extern const float FLOAT_8033192c = 224.0f;
-
-extern "C" {
-void* pppSetFpMatrix__FP9_pppMngSt(struct _pppMngSt*);
-}
 
 /*
  * --INFO--
@@ -73,7 +70,7 @@ struct pppAlignmentScale* pppFrameAlignmentScale(struct pppAlignmentScale* align
         pppMngStPtr->m_matrix.value[1][3] = objPos.y;
         pppMngStPtr->m_matrix.value[2][3] = objPos.z;
 
-        alignmentScale = (struct pppAlignmentScale*)pppSetFpMatrix__FP9_pppMngSt(pppMngSt);
+        pppSetFpMatrix(pppMngSt);
     }
 
     return alignmentScale;

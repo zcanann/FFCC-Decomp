@@ -547,9 +547,9 @@ void CCharaPcs::SetTexShadowPos(Vec* vec)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void SetEvtWord__12CCaravanWorkFis(CCaravanWork* caravanWork, int evtWordIndex, short evtWord)
+void CCaravanWork::SetEvtWord(int evtWordIndex, short evtWord)
 {
-    caravanWork->m_evtWordArr[evtWordIndex] = evtWord;
+    m_evtWordArr[evtWordIndex] = evtWord;
 }
 
 /*
@@ -561,9 +561,9 @@ extern "C" void SetEvtWord__12CCaravanWorkFis(CCaravanWork* caravanWork, int evt
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" int GetEvtWord__12CCaravanWorkFi(CCaravanWork* caravanWork, int evtWordIndex)
+int CCaravanWork::GetEvtWord(int evtWordIndex)
 {
-    return caravanWork->m_evtWordArr[evtWordIndex];
+    return m_evtWordArr[evtWordIndex];
 }
 
 /*
@@ -575,19 +575,19 @@ extern "C" int GetEvtWord__12CCaravanWorkFi(CCaravanWork* caravanWork, int evtWo
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void SetEvtFlag__12CCaravanWorkFii(CCaravanWork* caravanWork, int evtFlagIndex, int value)
+void CCaravanWork::SetEvtFlag(int evtFlagIndex, int value)
 {
     if (value != 0) {
         int byteIndex = evtFlagIndex / 8;
         int bit = 1 << (evtFlagIndex % 8);
-        reinterpret_cast<unsigned char*>(caravanWork->m_evtWorkArr)[byteIndex] |= bit;
+        reinterpret_cast<unsigned char*>(m_evtWorkArr)[byteIndex] |= bit;
         return;
     }
 
     {
         int byteIndex = evtFlagIndex / 8;
         int bit = 1 << (evtFlagIndex % 8);
-        reinterpret_cast<unsigned char*>(caravanWork->m_evtWorkArr)[byteIndex] &= ~bit;
+        reinterpret_cast<unsigned char*>(m_evtWorkArr)[byteIndex] &= ~bit;
     }
 }
 
@@ -600,9 +600,9 @@ extern "C" void SetEvtFlag__12CCaravanWorkFii(CCaravanWork* caravanWork, int evt
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" int GetEvtFlag__12CCaravanWorkFi(CCaravanWork* caravanWork, int evtFlagIndex)
+int CCaravanWork::GetEvtFlag(int evtFlagIndex)
 {
-    unsigned char* evtFlags = reinterpret_cast<unsigned char*>(caravanWork->m_evtWorkArr);
+    unsigned char* evtFlags = reinterpret_cast<unsigned char*>(m_evtWorkArr);
     int byteIndex = evtFlagIndex / 8;
     unsigned char value = evtFlags[byteIndex];
     int mask = 1 << (evtFlagIndex % 8);
@@ -619,9 +619,9 @@ extern "C" int GetEvtFlag__12CCaravanWorkFi(CCaravanWork* caravanWork, int evtFl
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void SetTempValue__4CMesFii(int index, int value)
+void CMes::SetTempValue(int index, int value)
 {
-    CMes::m_tempVar[index] = value;
+    m_tempVar[index] = value;
 }
 
 /*
@@ -2502,25 +2502,24 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         outResult = 0;
         return;
     case -0xA7:
-        SetEvtWord__12CCaravanWorkFis(
-            &Game.m_caravanWorkArr[*object->m_localBase], object->m_localBase[1], static_cast<short>(object->m_localBase[2]));
+        Game.m_caravanWorkArr[*object->m_localBase].SetEvtWord(object->m_localBase[1],
+            static_cast<short>(object->m_localBase[2]));
         runtime->push(object, 0);
         outResult = 0;
         return;
     case -0xA6:
         runtime->push(
-            object, GetEvtWord__12CCaravanWorkFi(&Game.m_caravanWorkArr[*object->m_localBase], object->m_localBase[1]));
+            object, Game.m_caravanWorkArr[*object->m_localBase].GetEvtWord(object->m_localBase[1]));
         outResult = 0;
         return;
     case -0xA5:
-        SetEvtFlag__12CCaravanWorkFii(
-            &Game.m_caravanWorkArr[*object->m_localBase], object->m_localBase[1], object->m_localBase[2]);
+        Game.m_caravanWorkArr[*object->m_localBase].SetEvtFlag(object->m_localBase[1], object->m_localBase[2]);
         runtime->push(object, 0);
         outResult = 0;
         return;
     case -0xA4:
         runtime->push(
-            object, GetEvtFlag__12CCaravanWorkFi(&Game.m_caravanWorkArr[*object->m_localBase], object->m_localBase[1]));
+            object, Game.m_caravanWorkArr[*object->m_localBase].GetEvtFlag(object->m_localBase[1]));
         outResult = 0;
         return;
     case -0xA3:
@@ -2872,7 +2871,7 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         outResult = 0;
         return;
     case -0x75:
-        SetTempValue__4CMesFii(*object->m_localBase, object->m_localBase[1]);
+        CMes::SetTempValue(*object->m_localBase, object->m_localBase[1]);
         runtime->push(object, 0);
         outResult = 0;
         return;

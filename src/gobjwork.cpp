@@ -3041,13 +3041,3 @@ void CMonWork::CalcStatus()
 		m_defense = (unsigned short)((float)m_defense * GetStatusMultiplier(0x44));
 	}
 }
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CCaravanWork::GetEvtFlag(int)
-{
-	// TODO
-}

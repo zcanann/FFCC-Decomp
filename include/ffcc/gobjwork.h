@@ -123,7 +123,10 @@ public:
     void BackupTutorialItem(int);
     void UniteComList(int, int, int);
     void UnuniteComList(int, int);
-    void GetEvtFlag(int);
+    void SetEvtWord(int, short);
+    int GetEvtWord(int);
+    void SetEvtFlag(int, int);
+    int GetEvtFlag(int);
     int GetArtifactIncludeHpMax();
 
     short m_equipment[4];                       // 0x00AC weapon[0], armor[1], tribal[2], accessory[3]

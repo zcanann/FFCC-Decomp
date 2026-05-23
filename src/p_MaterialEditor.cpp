@@ -23,11 +23,11 @@ extern "C" void drawViewer__18CMaterialEditorPcsFv(CMaterialEditorPcs*);
 extern "C" void __dt__18CMaterialEditorPcsFv(void* self);
 extern const char __RTTI__8CManager_8032E648[];
 extern const char __RTTI__8CProcess_8032E650[];
-extern "C" const char s_CMaterialEditorPcs_VIEWER_801D7D18[] = "CMaterialEditorPcs(VIEWER)";
-extern "C" const char s_CMaterialEditorPcs_801D7D34[] = "CMaterialEditorPcs";
+extern "C" const char s_CMaterialEditorPcsViewer[] = "CMaterialEditorPcs(VIEWER)";
+extern "C" const char s_CMaterialEditorPcs[] = "CMaterialEditorPcs";
 extern "C" const char s_CManager_801D7D48[] = "CManager";
 extern "C" const char s_CProcess_801D7D54[] = "CProcess";
-extern "C" const char s_MaterialEditor_pctc_801D7D60[] = "MaterialEditor [%c]";
+extern "C" const char s_MaterialEditorFmt[] = "MaterialEditor [%c]";
 
 inline void* operator new(unsigned long, void* ptr)
 {
@@ -40,11 +40,11 @@ unsigned int CMaterialEditorPcs::m_table_desc2[3] = {0, 0xFFFFFFFF, reinterpret_
 unsigned int CMaterialEditorPcs::m_table_desc3[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__18CMaterialEditorPcsFv)};
 
 unsigned int CMaterialEditorPcs::m_table[0x15C / sizeof(unsigned int)] = {
-    reinterpret_cast<unsigned int>(const_cast<char*>(s_CMaterialEditorPcs_VIEWER_801D7D18)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x20, 0, 0, 0, 0, 0x41, 1
+    reinterpret_cast<unsigned int>(const_cast<char*>(s_CMaterialEditorPcsViewer)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x20, 0, 0, 0, 0, 0x41, 1
 };
 unsigned int s_CMaterialEditorPcsTablePad0[3] = {reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CManager_8032E648)), 0, 0};
 unsigned int s_CMaterialEditorPcsTablePad1[5] = {reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CManager_8032E648)), 0, reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CProcess_8032E650)), 0, 0};
-u8 lbl_8026D338[0xC];
+u8 gMaterialEditorPcsGuard[0xC];
 CMaterialEditorPcs MaterialEditorPcs;
 
 
@@ -159,8 +159,6 @@ struct MaterialEditorPolygon {
 
 void CMaterialEditorPcs::drawViewer()
 {
-    unsigned char* self = reinterpret_cast<unsigned char*>(this);
-
     static char* q;
     static int color;
 
@@ -172,13 +170,13 @@ void CMaterialEditorPcs::drawViewer()
     static int pFan = 0;
     pFan++;
     char fan = q[(pFan >> 4) % 4];
-    Graphic.Printf(const_cast<char*>(s_MaterialEditor_pctc_801D7D60), (int)fan);
+    Graphic.Printf(const_cast<char*>(s_MaterialEditorFmt), (int)fan);
 
-    if (*reinterpret_cast<int*>(self + 0xE8) != 0) {
+    if (m_displayTextureEnabled != 0) {
         return;
     }
 
-    ZLIST* zlist = reinterpret_cast<ZLIST*>(self + 0xC8);
+    ZLIST* zlist = &m_zlist1;
     _ZLISTITEM* it = zlist->m_root.m_previous;
     while (it != 0) {
         int* listData = reinterpret_cast<int*>(zlist->GetDataNext(&it));
@@ -574,7 +572,7 @@ void CMaterialEditorPcs::createViewer()
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
     CMemory::CStage* stage = reinterpret_cast<CMemory::CStage*>(
-        Memory.CreateStage(0x200000, const_cast<char*>(s_CMaterialEditorPcs_801D7D34), 0));
+        Memory.CreateStage(0x200000, const_cast<char*>(s_CMaterialEditorPcs), 0));
     GXColor clear;
     float fVar1;
 
@@ -607,7 +605,7 @@ void CMaterialEditorPcs::createViewer()
  */
 int CMaterialEditorPcs::GetTable(unsigned long index)
 {
-    return reinterpret_cast<int>(reinterpret_cast<unsigned char*>(CMaterialEditorPcs::m_table) + index * 0x15C);
+    return reinterpret_cast<int>(reinterpret_cast<unsigned char*>(CMaterialEditorPcs::m_table) + index * sizeof(m_table));
 }
 /*
  * --INFO--
@@ -780,7 +778,7 @@ extern "C" void __sinit_p_MaterialEditor_cpp(void)
     unsigned int* desc2 = CMaterialEditorPcs::m_table_desc2;
     unsigned int* desc3 = CMaterialEditorPcs::m_table_desc3;
 
-    __register_global_object(self, __dt__18CMaterialEditorPcsFv, lbl_8026D338);
+    __register_global_object(self, __dt__18CMaterialEditorPcsFv, gMaterialEditorPcsGuard);
 
     unsigned int* table = dst + 1;
     table[0] = desc0[0];

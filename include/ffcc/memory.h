@@ -62,6 +62,8 @@ public:
     void DecHeapWalkerLevel();
     void ResetDefaultGroup();
     void SetDefaultGroup(int);
+    int GetHeapWalkerLevel() const { return m_heapWalkerLevel; }
+    int GetDefaultGroup() const { return m_defaultGroup; }
     void CopyToAMemory(void*, void*, unsigned long);
     void CopyFromAMemory(void*, void*, unsigned long);
     void CopyToAMemorySync(void*, void*, unsigned long);
@@ -70,7 +72,10 @@ public:
 
 private:
     // Backing storage for the recovered CMemory instance; methods access fields via known offsets.
-    u8 m_storage[0x779C];
+    u8 m_storage[0x7790];                    // 0x0004
+    int m_heapWalkerLevel;                   // 0x7794
+    int m_heapWalkerVisible;                 // 0x7798
+    int m_defaultGroup;                      // 0x779C
 };
 
 class CAmemCache

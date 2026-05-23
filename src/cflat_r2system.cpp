@@ -893,7 +893,7 @@ void CCharaPcs::SetNoFreeMergeMask(int mask)
  */
 void CMemory::ResetDefaultGroup()
 {
-    *(int*)((char*)this + 0x779C) = 0;
+    m_defaultGroup = 0;
 }
 
 /*
@@ -907,7 +907,7 @@ void CMemory::ResetDefaultGroup()
  */
 void CMemory::SetDefaultGroup(int group)
 {
-    *(int*)((char*)this + 0x779C) = group;
+    m_defaultGroup = group;
 }
 
 /*

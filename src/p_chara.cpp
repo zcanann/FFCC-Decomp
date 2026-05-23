@@ -886,9 +886,9 @@ void CCharaPcs::create()
 void CCharaPcs::createLoad()
 {
     m_loadStreamCursor = 0;
-    *reinterpret_cast<int*>(Ptr(&Memory, 0x779c)) = 2;
+    Memory.SetDefaultGroup(2);
     LoadMergeFile(0, 0x10000000, 1);
-    *reinterpret_cast<int*>(Ptr(&Memory, 0x779c)) = 0;
+    Memory.ResetDefaultGroup();
 }
 
 /*

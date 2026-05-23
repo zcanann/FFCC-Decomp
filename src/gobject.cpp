@@ -27,7 +27,6 @@ extern "C" double cos(double);
 
 extern "C" int CrossCheckSphereVector__5CMathFP3VecPfP3VecP3VecP3Vecf(
     CMath*, Vec*, float*, Vec*, Vec*, Vec*, float, float, float);
-extern "C" int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, CMapCylinder*, Vec*, u32);
 extern "C" int CalcHitSlide__7CMapObjFP3Vecf(void*, Vec*);
 extern "C" void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
 extern "C" void GetHitFaceNormal__7CMapObjFP3Vec(void*, Vec*);
@@ -992,8 +991,7 @@ void CGObject::bgNormalCollision()
         bodyCylinder.m_radius2 = m_capsuleHalfHeight;
         bodyCylinder.m_height2 = 0.0f;
 
-        if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
-                &MapMng, reinterpret_cast<CMapCylinder*>(&bodyCylinder), &move, hitMask) == 0) {
+        if (MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&bodyCylinder), &move, hitMask) == 0) {
             break;
         }
 
@@ -1039,8 +1037,7 @@ void CGObject::bgNormalCollision()
     stepCylinder.m_radius2 = m_capsuleHalfHeight;
     stepCylinder.m_height2 = 0.0f;
 
-    if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
-            &MapMng, reinterpret_cast<CMapCylinder*>(&stepCylinder), &move, hitMask) == 0) {
+    if (MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&stepCylinder), &move, hitMask) == 0) {
         pos.y -= m_capsuleHalfHeight;
         PSVECAdd(&pos, &move, &pos);
         PSVECSubtract(&pos, &m_worldPosition, &m_groundHitOffset);
@@ -1073,8 +1070,7 @@ void CGObject::bgNormalCollision()
         hitCylinder.m_radius2 = m_capsuleHalfHeight;
         hitCylinder.m_height2 = 0.0f;
 
-        if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
-                &MapMng, reinterpret_cast<CMapCylinder*>(&hitCylinder), &move, hitMask) != 0) {
+        if (MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&hitCylinder), &move, hitMask) != 0) {
             Vec hitPos;
             CalcHitPosition__7CMapObjFP3Vec(MapMng.m_hitMapObj, &hitPos);
             PSVECSubtract(&hitPos, &pos, &move);
@@ -1159,8 +1155,7 @@ void CGObject::bgWorldCollision()
     bodyCylinder.m_height2 = sZeroFloat;
 
     const u32 hitMask = m_bgHitMask;
-    if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
-            &MapMng, reinterpret_cast<CMapCylinder*>(&bodyCylinder), &hitMove, hitMask) == 0) {
+    if (MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&bodyCylinder), &hitMove, hitMask) == 0) {
         return;
     }
 
@@ -1228,9 +1223,8 @@ void CGObject::bgAttribCollision()
         charmCylinder.m_radius2 = sZeroFloat;
         charmCylinder.m_height2 = sZeroFloat;
 
-        if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
-                &MapMng, reinterpret_cast<CMapCylinder*>(&charmCylinder), reinterpret_cast<Vec*>(&probeMove),
-                0x80000000) != 0) {
+        if (MapMng.CheckHitCylinderNear(
+                reinterpret_cast<CMapCylinder*>(&charmCylinder), reinterpret_cast<Vec*>(&probeMove), 0x80000000) != 0) {
             Vec hitPos;
             CalcHitPosition__7CMapObjFP3Vec(MapMng.m_hitMapObj, &hitPos);
             m_bgCharmFactor = m_worldPosition.y - hitPos.y;
@@ -1265,8 +1259,8 @@ void CGObject::bgAttribCollision()
                 attrCylinder.m_radius2 = sZeroFloat;
                 attrCylinder.m_height2 = sZeroFloat;
 
-                if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
-                        &MapMng, reinterpret_cast<CMapCylinder*>(&attrCylinder), reinterpret_cast<Vec*>(&probeMove),
+                if (MapMng.CheckHitCylinderNear(
+                        reinterpret_cast<CMapCylinder*>(&attrCylinder), reinterpret_cast<Vec*>(&probeMove),
                         0x78000000) != 0) {
                     switch (gMapHitFace->m_groupIndex - 0x28) {
                     case 0:
@@ -3176,8 +3170,8 @@ void CGObject::SetPosBG(Vec* position, int useCapsuleOffset)
             bodyCylinder.m_height2 = 0.0f;
 
             u32 hitMask = m_bgHitMask;
-            if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
-                    &MapMng, reinterpret_cast<CMapCylinder*>(&bodyCylinder), &bodyCylinder.m_direction, hitMask) != 0) {
+            if (MapMng.CheckHitCylinderNear(
+                    reinterpret_cast<CMapCylinder*>(&bodyCylinder), &bodyCylinder.m_direction, hitMask) != 0) {
                 CalcHitPosition__7CMapObjFP3Vec(
                     MapMng.m_hitMapObj, &m_worldPosition);
             }
@@ -3198,8 +3192,8 @@ void CGObject::SetPosBG(Vec* position, int useCapsuleOffset)
             attrCylinder.m_radius2 = 0.0f;
             attrCylinder.m_height2 = 0.0f;
 
-            if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
-                    &MapMng, reinterpret_cast<CMapCylinder*>(&attrCylinder), &attrCylinder.m_direction, 0x78000000) == 0) {
+            if (MapMng.CheckHitCylinderNear(
+                    reinterpret_cast<CMapCylinder*>(&attrCylinder), &attrCylinder.m_direction, 0x78000000) == 0) {
                 m_bgAttrValue = sAnimFrameOffset;
             } else {
                 u8* hitObj = reinterpret_cast<u8*>(MapMng.m_hitMapObj);
@@ -3406,8 +3400,7 @@ float CGObject::CalcSafePos(int hitMask, CGObject* other, Vec* outSafePos)
     hitCylinder.m_radius2 = m_capsuleHalfHeight;
     hitCylinder.m_height2 = sZeroFloat;
 
-    if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
-            &MapMng, reinterpret_cast<CMapCylinder*>(&hitCylinder), &hitMove, hitMask) != 0) {
+    if (MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&hitCylinder), &hitMove, hitMask) != 0) {
         CalcHitPosition__7CMapObjFP3Vec(MapMng.m_hitMapObj,
                                         &centerPos);
         centerPos.y -= m_capsuleHalfHeight;
@@ -3431,8 +3424,7 @@ float CGObject::CalcSafePos(int hitMask, CGObject* other, Vec* outSafePos)
         safeCylinder.m_radius2 = m_capsuleHalfHeight;
         safeCylinder.m_height2 = sZeroFloat;
 
-        if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
-                &MapMng, reinterpret_cast<CMapCylinder*>(&safeCylinder), &hitMove, hitMask) != 0) {
+        if (MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&safeCylinder), &hitMove, hitMask) != 0) {
             CalcHitPosition__7CMapObjFP3Vec(MapMng.m_hitMapObj,
                                             &centerPos);
             safeDistance = (m_capsuleHalfHeight + other->m_capsuleHalfHeight) -

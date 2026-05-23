@@ -32,7 +32,6 @@ u8 m_boss__8CGMonObj[0x8C];
 extern "C" void __ptmf_scall(...);
 extern "C" int __cntlzw(unsigned int);
 extern "C" void aiAddDuct__8CGMonObjFRi(CGMonObj*, int&);
-extern "C" int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, CMapCylinder*, Vec*, unsigned int);
 extern "C" char SoundBuffer_1248_[];
 extern "C" float DAT_8032ec24;
 extern "C" float g_hit_t;
@@ -1786,8 +1785,7 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 		hitCylinder.m_boundsMax.y = FLOAT_80331A38;
 		hitCylinder.m_boundsMax.z = FLOAT_80331A3C;
 
-		int hit = CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
-			&MapMng, &hitCylinder, &move, *reinterpret_cast<unsigned short*>(baseScript + 0x1B2));
+		int hit = MapMng.CheckHitCylinderNear(&hitCylinder, &move, *reinterpret_cast<unsigned short*>(baseScript + 0x1B2));
 		if (hit != 0) {
 			if (hitScale != NULL) {
 				*hitScale = g_hit_t;
@@ -1886,9 +1884,8 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 			hitCylinder.m_boundsMax.y = FLOAT_80331A38;
 			hitCylinder.m_boundsMax.z = FLOAT_80331A3C;
 
-			int mapHit = CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
-				&MapMng, &hitCylinder, &targetDelta,
-				*reinterpret_cast<unsigned short*>(baseScript + 0x1B2));
+			int mapHit = MapMng.CheckHitCylinderNear(
+				&hitCylinder, &targetDelta, *reinterpret_cast<unsigned short*>(baseScript + 0x1B2));
 			Vec debugDelta = targetDelta;
 			if (mapHit != 0) {
 				PSVECScale(&debugDelta, &debugDelta, g_hit_t);

@@ -19,7 +19,6 @@ extern "C" void putParticle__8CGPrgObjFiiP8CGObjectfi(void*, int, int, void*, fl
 extern "C" void putParticleTrace__8CGPrgObjFiiP8CGObjectfi(void*, int, int, void*, float, int);
 extern "C" float RandF__5CMathFf(float, CMath*);
 extern "C" float RandFPM__5CMathFf(float, CMath*);
-extern "C" int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, CMapCylinder*, Vec*, unsigned int);
 extern "C" void putParticle__8CGPrgObjFiiP3Vecfi(void*, int, int, Vec*, float, int);
 extern "C" void playSe3D__8CGPrgObjFiiiiP3Vec(void*, int, int, int, int, Vec*);
 extern float FLOAT_80331b1c;
@@ -267,8 +266,7 @@ void CGItemObj::ItemJump(int state, float jump)
 			cylinder.m_boundsMax.y = FLOAT_80331b2c;
 			cylinder.m_boundsMax.z = FLOAT_80331b2c;
 
-			if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
-			        &MapMng, reinterpret_cast<CMapCylinder*>(&cylinder), &move, mapMask) != 0 &&
+			if (MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&cylinder), &move, mapMask) != 0 &&
 			    g_hit_f->m_groupIndex == state) {
 				object->m_groundHitOffset.y += jump;
 			}

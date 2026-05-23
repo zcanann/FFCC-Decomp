@@ -19,7 +19,6 @@
 #include "ffcc/fontman.h"
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
-extern "C" int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, CMapCylinder*, Vec*, unsigned int);
 extern "C" void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
 extern "C" void GetHitFaceNormal__7CMapObjFP3Vec(void*, Vec*);
 extern "C" int CalcHitSlide__7CMapObjFP3Vecf(void*, Vec*);
@@ -1617,7 +1616,7 @@ void CGPartyObj::putTargetParticle(int targetSide, int doInit)
 		hitCylinder.m_boundsMax.x = FLOAT_80331aa0;
 
 		Vec hitPos = startPos;
-		if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(&MapMng, &hitCylinder, &rayDir, 0x30) != 0) {
+		if (MapMng.CheckHitCylinderNear(&hitCylinder, &rayDir, 0x30) != 0) {
 			void* hitObj = *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(&MapMng) + 0x22A88);
 			CalcHitPosition__7CMapObjFP3Vec(hitObj, &hitPos);
 			GetHitFaceNormal__7CMapObjFP3Vec(hitObj, reinterpret_cast<Vec*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBB8));
@@ -1831,7 +1830,7 @@ void CGPartyObj::checkTargetParticle()
 			hitCylinder.m_boundsMin.z = FLOAT_80331aa0;
 			hitCylinder.m_boundsMax.x = FLOAT_80331aa0;
 
-			if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(&MapMng, &hitCylinder, &move, 0x30) == 0) {
+			if (MapMng.CheckHitCylinderNear(&hitCylinder, &move, 0x30) == 0) {
 				break;
 			}
 			if (i == 3) {
@@ -1858,7 +1857,7 @@ void CGPartyObj::checkTargetParticle()
 		floorCylinder.m_boundsMin.z = FLOAT_80331aa0;
 		floorCylinder.m_boundsMax.x = FLOAT_80331aa0;
 
-		if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(&MapMng, &floorCylinder, &down, 0x30) != 0) {
+		if (MapMng.CheckHitCylinderNear(&floorCylinder, &down, 0x30) != 0) {
 			CalcHitPosition__7CMapObjFP3Vec(getMapHitObject(), targetPos);
 			if (m_scriptHandle != nullptr) {
 				unsigned char* work = reinterpret_cast<unsigned char*>(m_scriptHandle);
@@ -1922,7 +1921,7 @@ void CGPartyObj::moveCenterTargetParticle()
 	hitCylinder.m_boundsMin.z = FLOAT_80331aa0;
 	hitCylinder.m_boundsMax.x = FLOAT_80331aa0;
 
-	if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(&MapMng, &hitCylinder, &moveVec, 0x30) != 0) {
+	if (MapMng.CheckHitCylinderNear(&hitCylinder, &moveVec, 0x30) != 0) {
 		void* hitObj = *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(&MapMng) + 0x22A88);
 		CalcHitPosition__7CMapObjFP3Vec(hitObj, &hitPos);
 		GetHitFaceNormal__7CMapObjFP3Vec(hitObj, &hitNormal);
@@ -3403,7 +3402,7 @@ void CGPartyObj::gpmCol()
 		col.m_boundsMin.z = FLOAT_80331aa0;
 		col.m_boundsMax.x = FLOAT_80331aa0;
 
-		if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(&MapMng, &col, &moveVec, m_attrFlags & ~0x10U) == 0) {
+		if (MapMng.CheckHitCylinderNear(&col, &moveVec, m_attrFlags & ~0x10U) == 0) {
 			sGhostPartyWork.activeTrailCount = i + 1;
 			sGhostPartyWork.leaderTrail[i] = leader->m_worldPosition;
 			break;

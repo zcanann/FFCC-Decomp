@@ -141,7 +141,6 @@ unsigned int s_CMapPcsRttiBase1[5] = {
 extern const char s_p_map_cpp_801d7728[];
 extern const char s_map_load_ok_fmt[];
 extern const char s_dvd_map_stage_map_fmt[];
-extern "C" void Destroy__7CMapMngFv(CMapMng*);
 extern "C" void MapFileRead__7CMapMngFPcRUl(CMapMng*);
 
 extern "C" void DrawBound__8CGraphicFR6CBound8_GXColor(CGraphic*, void*, _GXColor);
@@ -498,7 +497,7 @@ unsigned long long CMapPcs::IsLoadMapCompleted()
  */
 void CMapPcs::destroy()
 {
-    Destroy__7CMapMngFv(&MapMng);
+    MapMng.Destroy();
 }
 
 /*

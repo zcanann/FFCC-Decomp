@@ -126,11 +126,6 @@ static inline float& F32At(CMapObj* self, unsigned int offset)
     return *reinterpret_cast<float*>(Ptr(self, offset));
 }
 
-static inline CMapObj*& ObjAt(CMapObj* self, unsigned int offset)
-{
-    return *reinterpret_cast<CMapObj**>(Ptr(self, offset));
-}
-
 static inline CMapObj* NextSlot(CMapObj* obj)
 {
     return reinterpret_cast<CMapObj*>(Ptr(obj, 0xF0));

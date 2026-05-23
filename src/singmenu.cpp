@@ -761,37 +761,6 @@ extern "C" SingMenuTextureRef DAT_80214b3c[] = {
     {6, lbl_80332910},
 };
 
-extern "C" unsigned int CmdOpen__8CMenuPcsFv(CMenuPcs*);
-extern "C" unsigned int CmdCtrl__8CMenuPcsFv(CMenuPcs*);
-extern "C" unsigned int CmdClose__8CMenuPcsFv(CMenuPcs*);
-extern "C" unsigned int ItemOpen__8CMenuPcsFv(CMenuPcs*);
-extern "C" unsigned int ItemCtrl__8CMenuPcsFv(CMenuPcs*);
-extern "C" unsigned int ItemClose__8CMenuPcsFv(CMenuPcs*);
-extern "C" unsigned int EquipOpen__8CMenuPcsFv(CMenuPcs*);
-extern "C" unsigned int EquipCtrl__8CMenuPcsFv(CMenuPcs*);
-extern "C" unsigned int EquipClose__8CMenuPcsFv(CMenuPcs*);
-extern "C" bool ArtiOpen__8CMenuPcsFv(CMenuPcs*);
-extern "C" unsigned int ArtiCtrl__8CMenuPcsFv(CMenuPcs*);
-extern "C" int ArtiClose__8CMenuPcsFv(CMenuPcs*);
-extern "C" unsigned int TmpArtiOpen__8CMenuPcsFv(CMenuPcs*);
-extern "C" unsigned int TmpArtiCtrl__8CMenuPcsFv(CMenuPcs*);
-extern "C" unsigned int TmpArtiClose__8CMenuPcsFv(CMenuPcs*);
-extern "C" unsigned int MoneyOpen__8CMenuPcsFv(CMenuPcs*);
-extern "C" unsigned int MoneyCtrl__8CMenuPcsFv(CMenuPcs*);
-extern "C" int MoneyClose__8CMenuPcsFv(CMenuPcs*);
-extern "C" unsigned int FavoOpen__8CMenuPcsFv(CMenuPcs*);
-extern "C" unsigned int FavoCtrl__8CMenuPcsFv(CMenuPcs*);
-extern "C" unsigned int FavoClose__8CMenuPcsFv(CMenuPcs*);
-extern "C" unsigned int CompaOpen__8CMenuPcsFv(CMenuPcs*);
-extern "C" unsigned int CompaCtrl__8CMenuPcsFv(CMenuPcs*);
-extern "C" unsigned int CompaClose__8CMenuPcsFv(CMenuPcs*);
-extern "C" unsigned int LetterOpen__8CMenuPcsFv(CMenuPcs*);
-extern "C" unsigned int LetterCtrl__8CMenuPcsFv(CMenuPcs*);
-extern "C" unsigned int LetterClose__8CMenuPcsFv(CMenuPcs*);
-extern "C" unsigned int MLstOpen__8CMenuPcsFv(CMenuPcs*);
-extern "C" unsigned int MLstCtrl__8CMenuPcsFv(CMenuPcs*);
-extern "C" unsigned int MLstClose__8CMenuPcsFv(CMenuPcs*);
-
 extern float FLOAT_8033292c;
 extern float FLOAT_80332930;
 extern float FLOAT_80332928;
@@ -2051,12 +2020,16 @@ void CMenuPcs::SingleCalcCtrl()
     s16 proc = *reinterpret_cast<s16*>(statePtr + 0x10);
     switch (mode) {
     case 0:
-        result = (proc == 0) ? CmdOpen__8CMenuPcsFv(this)
-                             : ((proc == 1) ? CmdCtrl__8CMenuPcsFv(this) : CmdClose__8CMenuPcsFv(this));
+        if (proc == 0) {
+            CmdOpen();
+        } else if (proc == 1) {
+            CmdCtrl();
+        } else {
+            result = CmdClose();
+        }
         break;
     case 1:
-        result = (proc == 0) ? ItemOpen__8CMenuPcsFv(this)
-                             : ((proc == 1) ? ItemCtrl__8CMenuPcsFv(this) : ItemClose__8CMenuPcsFv(this));
+        result = (proc == 0) ? ItemOpen() : ((proc == 1) ? ItemCtrl() : ItemClose());
         if (*reinterpret_cast<int*>(self + 0x874) >= 0) {
             ++(*reinterpret_cast<int*>(self + 0x874));
             if (*reinterpret_cast<int*>(self + 0x874) > 0x31) {
@@ -2065,36 +2038,46 @@ void CMenuPcs::SingleCalcCtrl()
         }
         break;
     case 2:
-        result = (proc == 0) ? EquipOpen__8CMenuPcsFv(this)
-                             : ((proc == 1) ? EquipCtrl__8CMenuPcsFv(this) : EquipClose__8CMenuPcsFv(this));
+        if (proc == 0) {
+            result = EquipOpen();
+        } else if (proc == 1) {
+            EquipCtrl();
+        } else {
+            result = EquipClose();
+        }
         break;
     case 3:
-        result = (proc == 0) ? ArtiOpen__8CMenuPcsFv(this)
-                             : ((proc == 1) ? ArtiCtrl__8CMenuPcsFv(this) : ArtiClose__8CMenuPcsFv(this));
+        result = (proc == 0) ? ArtiOpen() : ((proc == 1) ? ArtiCtrl() : ArtiClose());
         break;
     case 4:
-        result = (proc == 0) ? TmpArtiOpen__8CMenuPcsFv(this)
-                             : ((proc == 1) ? TmpArtiCtrl__8CMenuPcsFv(this) : TmpArtiClose__8CMenuPcsFv(this));
+        if (proc == 0) {
+            result = TmpArtiOpen();
+        } else if (proc == 1) {
+            TmpArtiCtrl();
+        } else {
+            result = TmpArtiClose();
+        }
         break;
     case 5:
-        result = (proc == 0) ? MoneyOpen__8CMenuPcsFv(this)
-                             : ((proc == 1) ? MoneyCtrl__8CMenuPcsFv(this) : MoneyClose__8CMenuPcsFv(this));
+        result = (proc == 0) ? MoneyOpen() : ((proc == 1) ? MoneyCtrl() : MoneyClose());
         break;
     case 6:
-        result = (proc == 0) ? FavoOpen__8CMenuPcsFv(this)
-                             : ((proc == 1) ? FavoCtrl__8CMenuPcsFv(this) : FavoClose__8CMenuPcsFv(this));
+        result = (proc == 0) ? FavoOpen() : ((proc == 1) ? FavoCtrl() : FavoClose());
         break;
     case 7:
-        result = (proc == 0) ? CompaOpen__8CMenuPcsFv(this)
-                             : ((proc == 1) ? CompaCtrl__8CMenuPcsFv(this) : CompaClose__8CMenuPcsFv(this));
+        if (proc == 0) {
+            result = CompaOpen();
+        } else if (proc == 1) {
+            CompaCtrl();
+        } else {
+            result = CompaClose();
+        }
         break;
     case 8:
-        result = (proc == 0) ? LetterOpen__8CMenuPcsFv(this)
-                             : ((proc == 1) ? LetterCtrl__8CMenuPcsFv(this) : LetterClose__8CMenuPcsFv(this));
+        result = (proc == 0) ? LetterOpen() : ((proc == 1) ? LetterCtrl() : LetterClose());
         break;
     case 9:
-        result = (proc == 0) ? MLstOpen__8CMenuPcsFv(this)
-                             : ((proc == 1) ? MLstCtrl__8CMenuPcsFv(this) : MLstClose__8CMenuPcsFv(this));
+        result = (proc == 0) ? MLstOpen() : ((proc == 1) ? MLstCtrl() : MLstClose());
         break;
     }
 

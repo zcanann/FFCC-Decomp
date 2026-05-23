@@ -1,6 +1,5 @@
 #include "ffcc/stopwatch.h"
-
-extern "C" float __cvt_sll_flt(u32 lo, u32 hi);
+#include <Runtime.PPCEABI.H/runtime.h>
 
 static const float s_stopwatchScale = 100.0f;
 

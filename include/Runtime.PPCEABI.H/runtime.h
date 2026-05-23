@@ -10,6 +10,7 @@ extern "C" {
 typedef void (*voidfunctionptr)(void);
 
 u32 __cvt_fp2unsigned(f64 d);
+float __cvt_sll_flt(u32 lo, u32 hi);
 extern voidfunctionptr _ctors[];
 extern voidfunctionptr _dtors[];
 

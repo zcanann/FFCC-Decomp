@@ -1447,8 +1447,7 @@ void CCharaPcs::drawMakeTexShadow()
     m_texShadowTextureBase = Graphic.m_scratchTextureBuffer;
     m_texShadowTextureSize = 0xD2000;
     m_texShadowTextureOffset = texSize * texSize * 4;
-    C_MTXLightPerspective(m_texShadowProjectionMtx, *reinterpret_cast<float*>(Ptr(&CameraPcs, 0xFC)), 1.0f, 0.5f,
-                          -0.5f, 0.5f, 0.5f);
+    C_MTXLightPerspective(m_texShadowProjectionMtx, CameraPcs.m_fov, 1.0f, 0.5f, -0.5f, 0.5f, 0.5f);
 
     CHandle* handle = HandleListHead(this)->m_next;
     while (handle != HandleListHead(this)) {

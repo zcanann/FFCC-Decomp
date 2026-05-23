@@ -64,7 +64,7 @@ static const char s_soundSeBlockPathFmt[] = "dvd/sound/se/block/se%03d.seb";
 static const char s_soundMusicPathFmt[] = "dvd/sound/music/music%03d.bgm";
 static const char s_soundEnvSePlayFmt[] = "\x1B[32mEnvSePlay: %06d\n\x1B[0m";
 static const char s_soundEnvSeStopFmt[] = "\x1B[32mEnvSeStop: %06d\n\x1B[0m";
-extern const char s_sound_cpp_801db2d4[] = "sound.cpp";
+static const char s_sound_cpp[] = "sound.cpp";
 
 extern double DOUBLE_80330d20;
 extern double DOUBLE_80330d28;
@@ -365,8 +365,8 @@ void CSound::Init()
 {
     m_stage = Memory.CreateStage(0xA4000, const_cast<char*>(s_CSound_80330ce0), 0);
 
-    m_aramBuffer = new (m_stage, const_cast<char*>(s_sound_cpp_801db2d4), 0x2E) u8[0x80000];
-    m_streamBuffer = new (m_stage, const_cast<char*>(s_sound_cpp_801db2d4), 0x2F) u8[0x20000];
+    m_aramBuffer = new (m_stage, const_cast<char*>(s_sound_cpp), 0x2E) u8[0x80000];
+    m_streamBuffer = new (m_stage, const_cast<char*>(s_sound_cpp), 0x2F) u8[0x20000];
 
     m_bgmMasterVolume = 0x7F;
     m_seMasterVolume = 0x7F;

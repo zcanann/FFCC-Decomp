@@ -1241,8 +1241,7 @@ void CPartMng::pppReadShp(CChunkFile& chunkFile, pppShapeSt* shapeSt)
 	char* textureNames[0x101];
 	char** textureNameIt = textureNames;
 	CChunkFile::CChunk chunk;
-	CMemory::CStage* stageLoad =
-		*reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(&PartPcs) + 0x1C);
+	CMemory::CStage* stageLoad = PartPcs.m_usbStreamData.m_stageLoad;
 
 	while (chunkFile.GetNextChunk(chunk))
 	{
@@ -2101,8 +2100,7 @@ void CPartMng::pppEditBeforeCalc()
             *editorObj = 0;
         }
 
-        CMemory::CStage* stageLoad =
-            *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(&PartPcs) + 0x1c);
+        CMemory::CStage* stageLoad = PartPcs.m_usbStreamData.m_stageLoad;
         *editorObj = static_cast<CGObject*>(
             operator new(0x518, stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0x7b5));
         if (*editorObj != 0) {
@@ -3416,8 +3414,7 @@ int CPartMng::pppLoadPtx(const char* baseName, int pdtSlotIndex, int appendMode,
     static const unsigned int kChunkTSET = 0x54534554;
     static const int kEnvOffset = 0x2351c;
 
-    CMemory::CStage* stageLoad =
-        *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(&PartPcs) + 0x1c);
+    CMemory::CStage* stageLoad = PartPcs.m_usbStreamData.m_stageLoad;
 
     ppvAmemCacheSet.CacheClear();
     stageLoad->setDefaultParam(pdtSlotIndex);
@@ -3515,8 +3512,7 @@ void CPartMng::pppLoadPmd(const char* baseName)
 
     pppModelSt** modelArrayPtr = reinterpret_cast<pppModelSt**>(reinterpret_cast<unsigned char*>(this) + 0x7ec);
     if (*modelArrayPtr == 0) {
-        CMemory::CStage* stageLoad =
-            *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(&PartPcs) + 0x1c);
+        CMemory::CStage* stageLoad = PartPcs.m_usbStreamData.m_stageLoad;
         pppModelSt* modelArray = reinterpret_cast<pppModelSt*>(
             operator new(
                 0x6c00, stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0xca9));
@@ -3635,8 +3631,7 @@ void CPartMng::pppLoadPan(const char* baseName)
 
     pppShapeSt** shapeArrayPtr = reinterpret_cast<pppShapeSt**>(reinterpret_cast<unsigned char*>(this) + 0x7f0);
     if (*shapeArrayPtr == 0) {
-        CMemory::CStage* stageLoad =
-            *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(&PartPcs) + 0x1c);
+        CMemory::CStage* stageLoad = PartPcs.m_usbStreamData.m_stageLoad;
         pppShapeSt* shapeArray = reinterpret_cast<pppShapeSt*>(
             operator new(
                 0x2c00, stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0xd0b));
@@ -3721,8 +3716,7 @@ int CPartMng::pppLoadPdt(const char* baseName, int pdtSlotIndex, int cachePriori
         char m_name[0x20];
     };
 
-    CMemory::CStage* stageLoad =
-        *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(&PartPcs) + 0x1c);
+    CMemory::CStage* stageLoad = PartPcs.m_usbStreamData.m_stageLoad;
     PppPdtSlotRaw* pdtSlots = reinterpret_cast<PppPdtSlotRaw*>(reinterpret_cast<char*>(this) + 0x22e18);
     PppPdtSlotRaw* pdtSlot = &pdtSlots[pdtSlotIndex];
 

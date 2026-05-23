@@ -22,9 +22,6 @@ extern "C" double sin(double);
 
 #include <math.h>
 
-extern "C" asm void MTX44MultVec4__5CMathFPA4_fP3VecP5Vec4d(register void*, register float (*)[4], register Vec*,
-                                                            register void*);
-
 extern unsigned char DAT_8020fab8[];
 static const char DAT_801da01c[] = {
 	0x72, 0x69, 0x6E, 0x67, 0x4D, 0x65, 0x6E, 0x75,
@@ -189,7 +186,7 @@ void CRingMenu::DrawIcon()
 	Mtx44 screenMtx;
 	PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
 	Vec4d clipPos;
-	MTX44MultVec4__5CMathFPA4_fP3VecP5Vec4d(&Math, screenMtx, &viewPos, &clipPos);
+	Math.MTX44MultVec4(screenMtx, &viewPos, &clipPos);
 
 	clipPos.x = clipPos.x * (FLOAT_803309cc / clipPos.w);
 	clipPos.y = clipPos.y * (FLOAT_803309cc / clipPos.w);

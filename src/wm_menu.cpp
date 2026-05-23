@@ -32,8 +32,6 @@ extern "C" void* __vt__9CGBaseObj[];
 extern "C" void* __vt__8CGObject[];
 extern "C" int rand(void);
 extern "C" void Create__9CGBaseObjFv(void*);
-extern "C" asm void MTX44MultVec4__5CMathFPA4_fP3VecP5Vec4d(register void*, register float (*)[4], register Vec*,
-                                                            register void*);
 extern "C" int DAT_8021082c[];
 extern "C" int DAT_80210830[];
 extern "C" int DAT_801dc118[];
@@ -7990,7 +7988,7 @@ void CMenuPcs::DrawMainMenuSub()
 		Vec4d clipPos;
 		unsigned char* const view = worldObj + i * 0x50;
 		viewPos.z -= FLOAT_80331598;
-		MTX44MultVec4__5CMathFPA4_fP3VecP5Vec4d(&Math, screenMtx, &viewPos, &clipPos);
+		Math.MTX44MultVec4(screenMtx, &viewPos, &clipPos);
 		float ndcX = 0.0f;
 		float ndcY = 0.0f;
 		if (clipPos.w != 0.0f) {

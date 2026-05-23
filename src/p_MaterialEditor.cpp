@@ -14,8 +14,8 @@ extern const char sMaterialEditorSpinnerText[5] = "|/-\\";
 #include <Dolphin/gx.h>
 #include <dolphin/os/OSCache.h>
 #include <string.h>
+#include <PowerPC_EABI_Support/Runtime/NMWException.h>
 
-extern "C" void* __register_global_object(void* object, void* destructor, void* regmem);
 extern "C" void createViewer__18CMaterialEditorPcsFv(CMaterialEditorPcs*);
 extern "C" void destroyViewer__18CMaterialEditorPcsFv(CMaterialEditorPcs*);
 extern "C" void calcViewer__18CMaterialEditorPcsFv(CMaterialEditorPcs*);

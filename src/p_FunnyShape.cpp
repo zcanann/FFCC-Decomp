@@ -16,6 +16,7 @@ extern const f32 kFunnyShapeViewportHeight;
 #include "dolphin/mtx.h"
 
 #include <string.h>
+#include <PowerPC_EABI_Support/Runtime/NMWException.h>
 
 struct _GXTexObj;
 
@@ -38,7 +39,6 @@ public:
     void DeleteAndRemoveAll();
 };
 
-extern "C" void* __register_global_object(void* object, void* destructor, void* regmem);
 extern "C" void createViewer__14CFunnyShapePcsFv(CFunnyShapePcs*);
 extern "C" void destroyViewer__14CFunnyShapePcsFv(CFunnyShapePcs*);
 extern "C" void calcViewer__14CFunnyShapePcsFv(CFunnyShapePcs*);

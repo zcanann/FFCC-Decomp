@@ -1491,7 +1491,7 @@ def generate_build_ninja(
     n.comment("Split DOL into relocatable objects")
     n.rule(
         name="split",
-        command=f"{dtk} dol split $in $out_dir",
+        command=f"{dtk} dol split --no-update $in $out_dir",
         description="SPLIT $in",
         depfile="$out_dir/dep",
         deps="gcc",

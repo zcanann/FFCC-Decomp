@@ -82,7 +82,7 @@ public:
 
     bool MoneyOpen();
     int MoneyCtrl();
-    int MoneyClose();
+    bool MoneyClose();
     void MoneyDraw();
     int MoneyCtrlCur();
     char* GetMenuStr(int);

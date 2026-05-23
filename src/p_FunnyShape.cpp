@@ -44,7 +44,7 @@ extern "C" void destroyViewer__14CFunnyShapePcsFv(CFunnyShapePcs*);
 extern "C" void calcViewer__14CFunnyShapePcsFv(CFunnyShapePcs*);
 extern "C" void drawViewer__14CFunnyShapePcsFv(CFunnyShapePcs*);
 extern "C" void __dt__14CFunnyShapePcsFv(void*);
-extern "C" const char lbl_801D7DD0[] = "CFunnyShapePcs(VIEWER)";
+extern "C" const char s_CFunnyShapePcsViewer[] = "CFunnyShapePcs(VIEWER)";
 extern "C" const Vec s_funnyEye = {0.0f, 0.0f, 4.0f};
 extern "C" const Vec s_funnyAt = {0.0f, 0.0f, 0.0f};
 extern "C" const Vec s_funnyUp = {0.0f, 1.0f, 0.0f};
@@ -58,7 +58,7 @@ extern const char __RTTI__8CManager_8032E660[];
 extern const char __RTTI__8CProcess_8032E668[];
 extern u8 ARRAY_8026D728[];
 
-extern "C" const char lbl_8032FD1C[5];
+extern "C" const char s_funnyShapeSpinner[5];
 
 inline void* operator new(unsigned long, void* ptr)
 {
@@ -66,10 +66,10 @@ inline void* operator new(unsigned long, void* ptr)
 }
 
 namespace {
-static inline u8* Ptr(CFunnyShapePcs* self, u32 offset)
-{
-    return reinterpret_cast<u8*>(self) + offset;
-}
+struct CFunnyShapeViewerState {
+    GXColor m_colors[4];
+    Vec m_positions[3];
+};
 
 static inline CUSBStreamData* UsbStream(CFunnyShapePcs* self)
 {
@@ -89,6 +89,11 @@ static inline CPtrArray<OSFS_TEXTURE_ST*>* TextureHeaders(CFunnyShapePcs* self)
 static inline CPtrArray<_GXTexObj*>* TextureObjects(CFunnyShapePcs* self)
 {
     return reinterpret_cast<CPtrArray<_GXTexObj*>*>(self->m_gxTexObjPtrArrayStorage);
+}
+
+static inline CFunnyShapeViewerState* ViewerState(CFunnyShapePcs* self)
+{
+    return reinterpret_cast<CFunnyShapeViewerState*>(self->m_viewerState);
 }
 } // namespace
 
@@ -162,7 +167,7 @@ void CFunnyShapePcs::drawViewer()
         FunnyShape(this)->Render();
     }
 
-    static char* pFan = const_cast<char*>(lbl_8032FD1C);
+    static char* pFan = const_cast<char*>(s_funnyShapeSpinner);
     static int alive = 0;
 
     alive++;
@@ -184,18 +189,16 @@ void CFunnyShapePcs::drawViewer()
  */
 void CFunnyShapePcs::calcViewer()
 {
-    u8* self = reinterpret_cast<u8*>(this);
-
-    if (reinterpret_cast<CUSBStreamData*>(self + 0x3C)->IsUSBStreamDataDone()) {
+    if (UsbStream(this)->IsUSBStreamDataDone()) {
         SetUSBData();
-        reinterpret_cast<CUSBStreamData*>(self + 0x3C)->SetUSBStreamDataDone();
+        UsbStream(this)->SetUSBStreamDataDone();
     }
 
-    if ((static_cast<s8>(self[0x6124]) == 0) || (*reinterpret_cast<u32*>(self + 0x6134) == 0)) {
+    if (m_textureCount == 0 || m_anm.anmData == 0) {
         return;
     }
 
-    reinterpret_cast<CFunnyShape*>(self + 0x50)->Update();
+    FunnyShape(this)->Update();
 }
 
 /*
@@ -243,7 +246,7 @@ void CFunnyShapePcs::createViewer()
     clearColor.a = 0xFF;
     GXSetCopyClear(clearColor, 0xFFFFFF);
 
-    memset(&m_displayPending, 0, 0x40);
+    memset(&m_displayPending, 0, sizeof(m_displayPending));
     UsbStream(this)->CreateBuffer();
     m_displayTextureEnabled = 0;
 }
@@ -259,7 +262,7 @@ void CFunnyShapePcs::createViewer()
  */
 int CFunnyShapePcs::GetTable(unsigned long index)
 {
-    return reinterpret_cast<int>(reinterpret_cast<unsigned char*>(m_table) + index * 0x15C);
+    return reinterpret_cast<int>(reinterpret_cast<unsigned char*>(m_table) + index * sizeof(m_table));
 }
 
 /*
@@ -282,8 +285,8 @@ void CFunnyShapePcs::Quit()
  */
 void CFunnyShapePcs::Init()
 {
-    GXColor* colors = reinterpret_cast<GXColor*>(m_viewerState);
-    Vec* positions = reinterpret_cast<Vec*>(&m_viewerState[0x10]);
+    GXColor* colors = ViewerState(this)->m_colors;
+    Vec* positions = ViewerState(this)->m_positions;
 
     colors[0].r = 0x7F;
     colors[0].g = 0x7F;
@@ -428,7 +431,7 @@ unsigned int CFunnyShapePcs::m_table_desc1[3] = {0, 0xFFFFFFFF, reinterpret_cast
 unsigned int CFunnyShapePcs::m_table_desc2[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__14CFunnyShapePcsFv)};
 unsigned int CFunnyShapePcs::m_table_desc3[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__14CFunnyShapePcsFv)};
 unsigned int CFunnyShapePcs::m_table[0x15C / sizeof(unsigned int)] = {
-    reinterpret_cast<unsigned int>(const_cast<char*>(lbl_801D7DD0)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x21, 0, 0, 0, 0,
+    reinterpret_cast<unsigned int>(const_cast<char*>(s_CFunnyShapePcsViewer)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x21, 0, 0, 0, 0,
     0x42, 1
 };
 unsigned int lbl_801EA904[3] = {

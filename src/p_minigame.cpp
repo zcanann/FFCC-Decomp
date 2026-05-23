@@ -1525,7 +1525,7 @@ void CMiniGamePcs::calc(void)
         raceEndStack[0].m_word = 0x3000;
         raceEndStack[1].m_word = 0;
         raceEndStack[2].m_word = 0;
-        reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(0, 1, 8, 3, raceEndStack, 0);
+        gCFlatRuntime().SystemCall(0, 1, 8, 3, raceEndStack, 0);
         self[0x6496] = 0;
     }
 
@@ -1545,7 +1545,7 @@ void CMiniGamePcs::calc(void)
         continueStack[0].m_word = 0x3002;
         continueStack[1].m_word = 0;
         continueStack[2].m_word = 0;
-        reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(0, 1, 8, 3, continueStack, 0);
+        gCFlatRuntime().SystemCall(0, 1, 8, 3, continueStack, 0);
         self[0x6497] = 0;
     }
 
@@ -1564,7 +1564,7 @@ void CMiniGamePcs::calc(void)
         mgrEndStack[0].m_word = 0x3001;
         mgrEndStack[1].m_word = 0;
         mgrEndStack[2].m_word = 0;
-        reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(0, 1, 8, 3, mgrEndStack, 0);
+        gCFlatRuntime().SystemCall(0, 1, 8, 3, mgrEndStack, 0);
     }
 
     if (System.m_execParam != 0)

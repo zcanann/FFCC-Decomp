@@ -545,7 +545,7 @@ void CGObject::move()
             *(reinterpret_cast<u8*>(&m_weaponNodeFlags) + 1) &= 0xDF;
             CFlatRuntime::CStack stack;
             stack.m_word = static_cast<u32>(__cntlzw(static_cast<u32>(2 - scriptMoveEnd))) >> 5;
-            reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(this, 2, 7, 1, &stack, 0);
+            gCFlatRuntime().SystemCall(this, 2, 7, 1, &stack, 0);
         }
 
         movingWithScript = true;
@@ -666,7 +666,7 @@ void CGObject::move()
                     speed *= static_cast<double>(sAnalogSpeedScale);
                 }
 
-                const u32 cflatCenterState = *reinterpret_cast<u32*>(CFlat + 0x12AC);
+                const u32 cflatCenterState = CFlatCenterState();
                 if (cflatCenterState == 1) {
                     Vec partyCenter;
                     partyCenter.x = (Game.m_partyMinX + Game.m_partyMaxX) * sBgAttrNormal;
@@ -680,7 +680,7 @@ void CGObject::move()
 
                     const double dirDot = static_cast<double>(PSVECDotProduct(&moveVec, &centerDelta));
                     if (static_cast<double>(sZeroFloat) < dirDot) {
-                        centerDist /= static_cast<double>(*reinterpret_cast<float*>(CFlat + 0x12B0));
+                        centerDist /= static_cast<double>(CFlatCenterDistanceScale());
                         double clampDist = centerDist;
                         if (static_cast<double>(sZeroFloat) <= clampDist) {
                             if (static_cast<double>(sAnimFrameOffset) < clampDist) {
@@ -1376,7 +1376,7 @@ void CGObject::hit()
                     *reinterpret_cast<float*>(&stackIn[5].m_word) = hitPos.z;
                     stackIn[6].m_word = reinterpret_cast<u32>(m_scriptHandle);
                     CFlatRuntime::CStack stackOut;
-                    reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(this, 2, 0x13, 7, stackIn, &stackOut);
+                    gCFlatRuntime().SystemCall(this, 2, 0x13, 7, stackIn, &stackOut);
                     onHit(attackIndex, other, damageIndex, &hitPos);
                 }
             }
@@ -1732,7 +1732,7 @@ void CGObject::update()
                             CFlatRuntime::CStack stackIn[2];
                             stackIn[0].m_word = static_cast<unsigned int>(m_animSlotSel);
                             stackIn[1].m_word = static_cast<unsigned int>(pointValue);
-                            reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(this, 2, 9, 2, stackIn, 0);
+                            gCFlatRuntime().SystemCall(this, 2, 9, 2, stackIn, 0);
                             onAnimPoint(m_animSlotSel, pointValue);
                         }
                     }
@@ -1763,7 +1763,7 @@ void CGObject::update()
                         m_rotTargetY = m_rotBaseY;
                         shieldFlagsLo &= ~0x8;
                         shieldFlagsLo &= ~0x80;
-                        reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(this, 2, 10, 0, 0, 0);
+                        gCFlatRuntime().SystemCall(this, 2, 10, 0, 0, 0);
                     } else {
                         m_currentAnimSlot =
                             (queuedAnim >= 'A' && queuedAnim < 'A' + 4) ? m_animQueue[queuedAnim - 'A'] : queuedAnim;
@@ -1782,7 +1782,7 @@ void CGObject::update()
                     m_rotTargetY = m_rotBaseY;
                     shieldFlagsLo &= ~0x8;
                     shieldFlagsLo &= ~0x80;
-                    reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(this, 2, 10, 0, 0, 0);
+                    gCFlatRuntime().SystemCall(this, 2, 10, 0, 0, 0);
                 }
             }
         }
@@ -2108,7 +2108,7 @@ void CGObject::CancelMove(int moveType)
 
     CFlatRuntime::CStack arg;
     arg.m_word = static_cast<u32>(moveType);
-    reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(this, 2, 7, 1, &arg, 0);
+    gCFlatRuntime().SystemCall(this, 2, 7, 1, &arg, 0);
 }
 
 /*
@@ -2655,7 +2655,7 @@ void CGObject::HitParticle(int effectIndex, int kind, int nodeIndex, int collide
     stack[7].m_word = hitParam->m_particleIndex;
     stack[8].m_word = static_cast<int>(hitParam->m_classId);
 
-    reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(this, 2, 0xB, 9, stack, 0);
+    gCFlatRuntime().SystemCall(this, 2, 0xB, 9, stack, 0);
 
     OnHitParticleFn onHitParticle = *reinterpret_cast<OnHitParticleFn*>(
         *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x48) + 0x3C);

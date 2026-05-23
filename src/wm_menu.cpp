@@ -943,7 +943,7 @@ void CMenuPcs::calcWorld()
 
 				handle->SetAnim(1, -1, -1, -1, 0);
 				reinterpret_cast<unsigned int*>(worldParams + 8)[0] = 1;
-				reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(0, 1, 4, 3, stackData, 0);
+				gCFlatRuntime().SystemCall(0, 1, 4, 3, stackData, 0);
 				reinterpret_cast<short*>(worldState + 0x10)[0] = 2;
 				reinterpret_cast<short*>(worldState + 0x22)[0] = 0;
 			}
@@ -3933,7 +3933,7 @@ void CMenuPcs::DrawTitleMenu()
 			flatArgs[0].m_word = 9;
 			flatArgs[1].m_word = 0;
 			flatArgs[2].m_word = 0;
-			reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(0, 1, 4, 3, flatArgs, 0);
+			gCFlatRuntime().SystemCall(0, 1, 4, 3, flatArgs, 0);
 		}
 	} else {
 		// 3D viewport setup
@@ -4120,7 +4120,7 @@ void CMenuPcs::DrawTitleMenu()
 				    static_cast<int>(*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x26));
 				flatArgs2[2].m_word = 0;
 				*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x20) = 1;
-				reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(0, 1, 4, 3, flatArgs2, 0);
+				gCFlatRuntime().SystemCall(0, 1, 4, 3, flatArgs2, 0);
 				bytes[0x0D] = 0;
 			}
 			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x10) = 0;
@@ -4138,7 +4138,7 @@ void CMenuPcs::DrawTitleMenu()
 					flatArgs3[0].m_word = 9;
 					flatArgs3[1].m_word = 1;
 					flatArgs3[2].m_word = 0;
-					reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(0, 1, 4, 3, flatArgs3, 0);
+					gCFlatRuntime().SystemCall(0, 1, 4, 3, flatArgs3, 0);
 				}
 			} else if (*reinterpret_cast<short*>(worldState + 0x22) > 0x991) {
 				*reinterpret_cast<short*>(worldState + 0x0E) = 0;
@@ -4150,7 +4150,7 @@ void CMenuPcs::DrawTitleMenu()
 				flatArgs4[0].m_word = 9;
 				flatArgs4[1].m_word = 1;
 				flatArgs4[2].m_word = 0;
-				reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(0, 1, 4, 3, flatArgs4, 0);
+				gCFlatRuntime().SystemCall(0, 1, 4, 3, flatArgs4, 0);
 			}
 		} else {
 			short threshold = 10;
@@ -4451,7 +4451,7 @@ void CMenuPcs::CallWorldParam(int p0, int p1, int p2)
 	stackData[1].m_word = p1;
 	stackData[2].m_word = p2;
 
-	reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(0, 1, 4, 3, stackData, 0);
+	gCFlatRuntime().SystemCall(0, 1, 4, 3, stackData, 0);
 }
 
 /*
@@ -6540,7 +6540,7 @@ void CMenuPcs::CalcCharaSelect()
 				stackArgs[0].m_word = 0;
 				stackArgs[1].m_word = caravanSlot;
 				stackArgs[2].m_word = 0;
-				reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(0, 1, 4, 3, stackArgs, 0);
+				gCFlatRuntime().SystemCall(0, 1, 4, 3, stackArgs, 0);
 				Sound.PlaySe(0x33, 0x40, 0x7F, 0);
 				QueueWmCharaAnimState(this, caravanSlot, 3);
 			}
@@ -7109,7 +7109,7 @@ void CMenuPcs::WMChgMenu()
 			stackA[0].m_word = 1;
 			stackA[1].m_word = 1;
 			stackA[2].m_word = 0;
-			reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(0, 1, 4, 3, stackA, 0);
+			gCFlatRuntime().SystemCall(0, 1, 4, 3, stackA, 0);
 		} else if (sVar2 == -1) {
 			DAT_8032ee1c = 1;
 			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1C) = 6;
@@ -7117,7 +7117,7 @@ void CMenuPcs::WMChgMenu()
 			stackB[0].m_word = 1;
 			stackB[1].m_word = 0;
 			stackB[2].m_word = 0;
-			reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(0, 1, 4, 3, stackB, 0);
+			gCFlatRuntime().SystemCall(0, 1, 4, 3, stackB, 0);
 		}
 	} else if (iVar14 == 6) {
 		*reinterpret_cast<short*>(worldState + 0x1C) = 0;

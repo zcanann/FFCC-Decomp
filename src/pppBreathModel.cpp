@@ -387,7 +387,7 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
         particleData++;
     }
 
-    if ((*(u32*)(CFlat + 0x129C) & 0x200000) != 0) {
+    if ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_ParticleHitSpheres) != 0) {
         BreathParticleGroup* debugGroupData = groupData;
         for (i = 0; i < (int)pBreathModel->m_groupCount; i++, debugGroupData++) {
             if (debugGroupData->active == 1) {

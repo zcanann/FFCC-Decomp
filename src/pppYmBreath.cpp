@@ -408,7 +408,7 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
         particle++;
     }
 
-    if ((*reinterpret_cast<unsigned int*>(CFlat + 0x129C) & 0x200000) != 0) {
+    if ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_ParticleHitSpheres) != 0) {
         YmBreathParticleGroup* debugGroupData = groupData;
         for (i = 0; i < (int)params->m_groupCount; i++, debugGroupData++) {
             if (debugGroupData->active == 1) {

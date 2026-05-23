@@ -11,7 +11,6 @@
 #include "ffcc/math.h"
 #include "ffcc/memory.h"
 #include "ffcc/p_camera.h"
-#include "ffcc/p_dbgmenu.h"
 #include "ffcc/pad.h"
 #include "ffcc/sound.h"
 #include "types.h"
@@ -21,7 +20,7 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
 CGraphicPcs GraphicPcs;
-extern const char s_CGraphicPcs_801D7B80[];
+extern const char s_CGraphicPcs[];
 extern const char __RTTI__8CManager_8032E5D8[];
 extern const char __RTTI__8CProcess_8032E5E0[];
 
@@ -36,7 +35,7 @@ u32 CGraphicPcs::m_table_desc7[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(drawEn
 u32 CGraphicPcs::m_table_desc8[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(preDrawEnvInit__11CGraphicPcsFv)};
 u32 CGraphicPcs::m_table_desc9[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(stdDrawEnvInit__11CGraphicPcsFv)};
 u32 CGraphicPcs::m_table[0x15C / sizeof(u32)] = {
-    reinterpret_cast<u32>(const_cast<char*>(s_CGraphicPcs_801D7B80)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x22, 0x8, 0, 0, 0, 0x26, 0x9, 0, 0, 0, 0x27, 0xC, 0, 0, 0, 0x29,
+    reinterpret_cast<u32>(const_cast<char*>(s_CGraphicPcs)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x22, 0x8, 0, 0, 0, 0x26, 0x9, 0, 0, 0, 0x27, 0xC, 0, 0, 0, 0x29,
     0x9, 0, 0, 0, 0x48, 1, 0, 0, 0, 0x4B, 0x9, 0, 0, 0, 0x2B, 0x9, 0, 0, 0, 0x34, 0x9
 };
 
@@ -45,10 +44,10 @@ extern "C" float FLOAT_8032FBC0;
 extern "C" float FLOAT_8032fbfc;
 extern "C" float FLOAT_8032fc00;
 
-extern const char s_p_graphic_cpp_801d7c10[];
-extern const char s_pcts_pctd_pct_3fpctpct_801D7BA4[];
-extern const char s_MOVE_pct_1fpctpct_BG_pct_1fpctpct_OBJ_pct_1fpctpct_UP_pct_1fpctpct_HIT_pct_1fpctpct_SCR_pct_1fpctpct_801D7BB4[];
-extern const char s__c_c_c_c_c_c_c_c_c_c_801d7bf8[];
+extern const char s_p_graphic_cpp[];
+extern const char s_graphic_order_debug_fmt[];
+extern const char s_graphic_move_debug_fmt[];
+extern const char s_graphic_pad_input_fmt[];
 const char s_debug_pad_port_fmt[] = "%dP";
 const char s_debug_frame_fmt[] = "%d";
 static const GXColor s_debug_bar_color = {0x80, 0x80, 0x80, 0xFF};
@@ -749,11 +748,11 @@ void CGraphicPcs::drawBar()
 
             if (order->m_priority != 0x27) {
                 char debugString[260];
-                sprintf(debugString, const_cast<char*>(s_pcts_pctd_pct_3fpctpct_801D7BA4), order->m_debugName, order->m_insertIndex, order->m_lastTime);
+                sprintf(debugString, const_cast<char*>(s_graphic_order_debug_fmt), order->m_debugName, order->m_insertIndex, order->m_lastTime);
 
                 if (order->m_priority == 0x17) {
                     char extraString[256];
-                    sprintf(extraString, const_cast<char*>(s_MOVE_pct_1fpctpct_BG_pct_1fpctpct_OBJ_pct_1fpctpct_UP_pct_1fpctpct_HIT_pct_1fpctpct_SCR_pct_1fpctpct_801D7BB4),
+                    sprintf(extraString, const_cast<char*>(s_graphic_move_debug_fmt),
                             *reinterpret_cast<float*>(&CFlat[4920]), *reinterpret_cast<float*>(&CFlat[4924]),
                             *reinterpret_cast<float*>(&CFlat[4928]), *reinterpret_cast<float*>(&CFlat[4932]),
                             *reinterpret_cast<float*>(&CFlat[4936]), *reinterpret_cast<float*>(&CFlat[72]));
@@ -833,7 +832,7 @@ void CGraphicPcs::drawEnd()
 			const char left = ((buttons & 4) != 0) ? 'D' : ' ';
 			const char down = ((buttons & 8) != 0) ? 'U' : ' ';
 
-			sprintf(debugInputString, s__c_c_c_c_c_c_c_c_c_c_801d7bf8, down, left, l, r, b, a, start, s, z, c);
+			sprintf(debugInputString, s_graphic_pad_input_fmt, down, left, l, r, b, a, start, s, z, c);
 			Graphic.DrawDebugStringDirect(x, 0x1A8, debugInputString, 8);
 			x += 0x60;
 		}
@@ -872,7 +871,7 @@ void CGraphicPcs::drawFlip()
  */
 void CGraphicPcs::drawWait()
 {
-	Graphic._WaitDrawDone(const_cast<char*>(s_p_graphic_cpp_801d7c10), 0xDA);
+	Graphic._WaitDrawDone(const_cast<char*>(s_p_graphic_cpp), 0xDA);
 }
 
 /*
@@ -1014,7 +1013,7 @@ void CGraphicPcs::create()
  */
 int CGraphicPcs::GetTable(unsigned long index)
 {
-    return reinterpret_cast<int>(reinterpret_cast<unsigned char*>(m_table) + index * 0x15C);
+    return reinterpret_cast<int>(reinterpret_cast<unsigned char*>(m_table) + index * sizeof(m_table));
 }
 
 /*

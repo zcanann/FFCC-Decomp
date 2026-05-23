@@ -23,6 +23,11 @@
 #include <PowerPC_EABI_Support/Runtime/New.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
+inline void* operator new(unsigned long, void* ptr)
+{
+    return ptr;
+}
+
 CMapMng MapMng;
 char g_StrTmp[0x400];
 
@@ -37,10 +42,6 @@ extern "C" void __ct__7CMapHitFv(void*);
 extern "C" void __ct__7CMapObjFv(void*);
 extern "C" void __ct__8CMapMeshFv(void*);
 extern "C" void __ct__9CMapIdGrpFv(void*);
-extern "C" void __ct__25CPtrArray_P11CMapAnimRun_Fv(void*);
-extern "C" void __ct__21CPtrArray_P8CMapAnim_Fv(void*);
-extern "C" void __ct__27CPtrArray_P13CMapAnimKeyDt_Fv(void*);
-extern "C" void __ct__24CPtrArray_P10CMapShadow_Fv(void*);
 extern "C" void __ct__29CPtrArray_P15CMapLightHolder_Fv(void*);
 extern const float kMapViewScaleXPrimary = 0.73898232f;
 extern const float kMapViewScaleY = 0.88677877f;
@@ -3682,10 +3683,10 @@ extern "C" void __sinit_map_cpp(void)
                       reinterpret_cast<ConstructorDestructor>(__dt__7CMapObjFv), 0xF0, 0x200);
     __construct_array(MapMng.GetMapMeshArray(), reinterpret_cast<ConstructorDestructor>(__ct__8CMapMeshFv),
                       reinterpret_cast<ConstructorDestructor>(__dt__8CMapMeshFv), 0x44, 0xA0);
-    __ct__25CPtrArray_P11CMapAnimRun_Fv(&MapMng.GetMapAnimRunArray());
-    __ct__21CPtrArray_P8CMapAnim_Fv(&MapMng.GetMapAnimArray());
-    __ct__27CPtrArray_P13CMapAnimKeyDt_Fv(&MapMng.GetMapAnimKeyDtArray());
-    __ct__24CPtrArray_P10CMapShadow_Fv(&MapMng.GetMapShadowArray());
+    new (&MapMng.GetMapAnimRunArray()) CPtrArray<CMapAnimRun*>;
+    new (&MapMng.GetMapAnimArray()) CPtrArray<CMapAnim*>;
+    new (&MapMng.GetMapAnimKeyDtArray()) CPtrArray<CMapAnimKeyDt*>;
+    new (&MapMng.GetMapShadowArray()) CPtrArray<CMapShadow*>;
     __construct_array(
         MapMng.GetMapLightHolderArrays(),
         reinterpret_cast<ConstructorDestructor>(__ct__29CPtrArray_P15CMapLightHolder_Fv),

@@ -1459,8 +1459,8 @@ void CGMonObj::onStatDie()
 			if (option <= 8 && *reinterpret_cast<short*>(mon + 0x6D6) == 0) {
 				int shift = reinterpret_cast<int>(object->m_scriptHandle[2]);
 				unsigned long long bit = (shift < 64) ? (1ULL << shift) : 0ULL;
-				*reinterpret_cast<unsigned int*>(CFlat + 0x12F4 + option * 8) |= static_cast<unsigned int>(bit);
-				*reinterpret_cast<unsigned int*>(CFlat + 0x12F0 + option * 8) |= static_cast<unsigned int>(bit >> 32);
+				CFlatSpawnBitHi(option) |= static_cast<unsigned int>(bit);
+				CFlatSpawnBitLo(option) |= static_cast<unsigned int>(bit >> 32);
 			}
 			return;
 		}
@@ -1489,7 +1489,7 @@ void CGMonObj::onDrawDebug(CFont* font, float posX, float& posY, float posZ)
 	charaObj->onDrawDebug(font, posX, posY, posZ);
 
 	if ((((int)((unsigned int)object->m_weaponNodeFlags << 0x18) < 0) &&
-			(*reinterpret_cast<unsigned int*>(CFlat + 0x12AC) == 0)) &&
+			(CFlatCenterState() == 0)) &&
 		((*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&DbgMenuPcs) + 0x6484) & 0x80) != 0)) {
 		char text[0x100];
 		unsigned short aiState = *reinterpret_cast<unsigned short*>(mon + 0x6E4);
@@ -2476,8 +2476,8 @@ void CGMonObj::setRepop(int mode)
 		} else {
 			int shift = reinterpret_cast<int>(scriptHandle[2]);
 			unsigned long long bit = (shift < 64) ? (1ULL << shift) : 0ULL;
-			unsigned int cflatHi = *reinterpret_cast<unsigned int*>(CFlat + 0x12F4 + option * 8);
-			unsigned int cflatLo = *reinterpret_cast<unsigned int*>(CFlat + 0x12F0 + option * 8);
+			unsigned int cflatHi = CFlatSpawnBitHi(option);
+			unsigned int cflatLo = CFlatSpawnBitLo(option);
 			if ((cflatHi & static_cast<unsigned int>(bit)) == 0 &&
 				(cflatLo & static_cast<unsigned int>(bit >> 32)) == 0) {
 				allowRepop = true;

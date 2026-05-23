@@ -428,7 +428,7 @@ void CSystem::ExecScenegraph()
                 {
                     if (System.m_scenegraphStepMode != 2)
                     {
-                        if ((*(unsigned int*)(CFlat + 0x12A0) & 0x10) != 0)
+                        if ((CFlatEventFlags() & 0x10) != 0)
                         {
                             Sound.PauseAllSe(1);
                             System.m_scenegraphStepMode = 2;

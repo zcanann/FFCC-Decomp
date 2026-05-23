@@ -519,8 +519,7 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
             GXTexCoord2f32(u1, kPppLaserZero);
         }
 
-        u8* cflat = CFlat;
-        if ((*reinterpret_cast<u32*>(cflat + 0x129c) & 0x200000) != 0) {
+        if ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_ParticleHitSpheres) != 0) {
             gUtil.SetVtxFmt_POS_CLR();
             _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
             _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
@@ -561,7 +560,7 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
             GXSetPointSize(8, GX_TO_ZERO);
             GXSetZMode(1, GX_LEQUAL, 0);
 
-            if ((*reinterpret_cast<u32*>(cflat + 0x129c) & 0x200000) != 0) {
+            if ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_ParticleHitSpheres) != 0) {
                 float radius = pppMngStPtr->m_previousPosition.z * step->m_laser.m_hitScale;
                 float distance = PSVECDistance(work->m_points, &work->m_origin);
                 debugSource.x = kPppLaserZero;

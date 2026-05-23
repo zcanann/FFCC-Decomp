@@ -2,6 +2,7 @@
 #include "ffcc/cflat_runtime2.h"
 #include "ffcc/gbaque.h"
 #include "ffcc/joybus.h"
+#include "ffcc/linkage.h"
 #include "ffcc/partyobj.h"
 #include "ffcc/mes.h"
 #include "ffcc/game.h"
@@ -453,7 +454,7 @@ int CCaravanWork::IsOutOfShouki()
 	if (*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(ownerObj) + 0x5BC) >
 		FLOAT_803309a8[0] * Game.unkFloat_0xca10) {
 		if (m_hp != 0) {
-			unsigned char cflatFlag = CFlat[4836];
+			unsigned char cflatFlag = CFlatGameFlags();
 			if (((char)(((int)(((unsigned int)cflatFlag << 24) & 0xC0000000)) >> 31) != 0 ||
 				 (char)(((int)(((unsigned int)cflatFlag << 27) & 0xC0000000)) >> 31) != 0) &&
 				(char)(((int)((((unsigned int) * (unsigned char*)(reinterpret_cast<unsigned char*>(ownerObj) + 0x9B))
@@ -564,7 +565,7 @@ void CCaravanWork::FGLetterOpen(int letterIdx)
 
 	stack[0].m_word = (*reinterpret_cast<unsigned short*>(letter + letterBase) >> 2) & 0x1FF;
 	stack[1].m_word = (*reinterpret_cast<unsigned int*>(letter + letterBase) >> 9) & 0x1FF;
-	reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(
+	gCFlatRuntime().SystemCall(
 		Game.m_partyObjArr[self->m_joybusCaravanId], 2, 0xF, 2, stack, 0);
 
 	CMes::m_tempVar[0] = *reinterpret_cast<unsigned short*>(letter + letterBase + 4);
@@ -623,7 +624,7 @@ void CCaravanWork::FGLetterReply(int letterIdx, int param3, int param4, int para
 	stack[3].m_word = param4;
 	stack[4].m_word = param5;
 
-	reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(
+	gCFlatRuntime().SystemCall(
 		Game.m_partyObjArr[m_joybusCaravanId], 2, 0x10, 5, stack, 0);
 
 	reinterpret_cast<LetterFlags*>(letter)->replied = 1;
@@ -1680,7 +1681,7 @@ void CCaravanWork::CallShop(int requestType, int arg0, int arg1, int arg2, int a
 	args[2].m_word = arg1;
 	args[3].m_word = arg2;
 	args[4].m_word = arg3;
-	reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(
+	gCFlatRuntime().SystemCall(
 		reinterpret_cast<CFlatRuntime::CObject*>(m_ownerObj), 2, 0x12, 5, args, 0);
 }
 

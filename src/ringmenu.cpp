@@ -148,8 +148,7 @@ void CRingMenu::DrawIcon()
 		return;
 	}
 
-	const unsigned int flatFlags = *reinterpret_cast<unsigned int*>(CFlat + 0x12A0) &
-	                               *reinterpret_cast<unsigned int*>(CFlat + 0x12A4);
+	const unsigned int flatFlags = CFlatEnabledEventFlags();
 	if ((flatFlags & 1) == 0) {
 		return;
 	}
@@ -449,7 +448,7 @@ void CRingMenu::drawGBA()
 	MenuPcs.DrawRect(3, drawX, drawY, FLOAT_80330a44, FLOAT_80330a48, FLOAT_803309c0, menuV,
 	                                 FLOAT_80330a4c * static_cast<float>(sizePulse), FLOAT_80330a4c * static_cast<float>(sizePulse), 0.0f);
 
-	const unsigned int flatFlags = *reinterpret_cast<unsigned int*>(CFlat + 0x12A0) & *reinterpret_cast<unsigned int*>(CFlat + 0x12A4);
+	const unsigned int flatFlags = CFlatEnabledEventFlags();
 	if (((flatFlags & 8) != 0) && (Joybus.GetGBAStart(menuIndex) == 0)) {
 		if (Joybus.IsInitSend(menuIndex) == 0) {
 			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1D));
@@ -752,7 +751,7 @@ void CRingMenu::onDraw()
 				CGPartyObj* partyObj = Game.m_partyObjArr[menuIndex];
 				if (partyObj != 0) {
 					CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(partyObj->m_scriptHandle);
-					if ((caravanWork != 0) && ((*reinterpret_cast<unsigned char*>(CFlat + 0x12E4) & 2) == 0)) {
+					if ((caravanWork != 0) && ((CFlatGameFlags() & CFlatGameFlag_Bit1) == 0)) {
 						const float barY = FLOAT_80330aac + textY;
 						const float fullAlpha =
 							static_cast<float>(showScale * static_cast<double>(static_cast<float>(FLOAT_80330a34 * fade) * static_cast<float>(transitionScale)));
@@ -908,7 +907,7 @@ void CRingMenu::onCalc()
 	if ((Game.m_gameWork.m_menuStageMode == 0) || (menuIndex < 1)) {
 		const int animDirection = m_displayDirection;
 		const unsigned int targetAnimDirection =
-			((*reinterpret_cast<unsigned int*>(CFlat + 0x12A0) & *reinterpret_cast<unsigned int*>(CFlat + 0x12A4)) >> 2) & 1;
+			(CFlatEnabledEventFlags() >> 2) & 1;
 		if (animDirection != static_cast<int>(targetAnimDirection)) {
 			System.Printf(const_cast<char*>(DAT_801da01c), menuIndex);
 			m_displayDirection = (static_cast<unsigned int>(__cntlzw(static_cast<unsigned int>(animDirection))) >> 5) & 0xFF;

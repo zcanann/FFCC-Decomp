@@ -118,7 +118,7 @@ void CMesMenu::CloseRequest(int closeReason)
             m_mes.Set(0, 0);
             stack[0].m_word = *(int*)((char*)this + 0x18);
             stack[1].m_word = *(int*)((char*)this + 0x3DA4);
-            reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(0, 1, 3, 2, stack, 0);
+            gCFlatRuntime().SystemCall(0, 1, 3, 2, stack, 0);
             *(int*)((char*)this + 0x0C) = 4;
             *(int*)((char*)this + 0x08) = 0;
             if (*(int*)((char*)this + 0x18) < 4) {
@@ -460,7 +460,7 @@ void CMesMenu::CalcHeart()
  */
 void CMesMenu::onDraw()
 {
-    if ((*(int*)((char*)this + 0x18) == 0) && ((int)((unsigned int)*(unsigned char*)(CFlat + 0x12E4) << 30) < 0)) {
+    if ((*(int*)((char*)this + 0x18) == 0) && ((int)((unsigned int)CFlatGameFlags() << 30) < 0)) {
         int iconFrame = 0;
         int charaMode = *(int*)((char*)&Chara + 0x2004);
         if (charaMode == 2) {
@@ -854,9 +854,9 @@ void CMesMenu::onCalc()
 
     unsigned int stageBit = 0;
     if (m_menuIndex < 4) {
-        stageBit = *(unsigned int*)(CFlat + 0x12A0) & *(unsigned int*)(CFlat + 0x12A4) & 1;
+        stageBit = CFlatEnabledEventFlags() & 1;
     } else {
-        stageBit = *(unsigned int*)(CFlat + 0x12A0) & *(unsigned int*)(CFlat + 0x12A4) & 2;
+        stageBit = CFlatEnabledEventFlags() & 2;
     }
 
     unsigned int desiredStageFlag = stageBit != 0;
@@ -1070,7 +1070,7 @@ void CMesMenu::onCalc()
                                 m_mes.Set(0, 0);
                                 stack[0].m_word = *(int*)((char*)this + 0x18);
                                 stack[1].m_word = *(int*)((char*)this + 0x3DA4);
-                                reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(0, 1, 3, 2, stack, 0);
+                                gCFlatRuntime().SystemCall(0, 1, 3, 2, stack, 0);
                                 *(int*)((char*)this + 0x0C) = 4;
                                 *(int*)((char*)this + 0x08) = 0;
                                 if (*(int*)((char*)this + 0x18) < 4) {
@@ -1110,7 +1110,7 @@ void CMesMenu::onCalc()
             m_mes.Set(0, 0);
             stack[0].m_word = *(int*)((char*)this + 0x18);
             stack[1].m_word = *(int*)((char*)this + 0x3DA4);
-            reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(0, 1, 3, 2, stack, 0);
+            gCFlatRuntime().SystemCall(0, 1, 3, 2, stack, 0);
             *(int*)((char*)this + 0x0C) = 4;
             *(int*)((char*)this + 0x08) = 0;
             if (*(int*)((char*)this + 0x18) < 4) {

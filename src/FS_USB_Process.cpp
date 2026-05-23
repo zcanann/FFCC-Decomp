@@ -9,7 +9,7 @@
 
 #include <string.h>
 
-extern "C" const char s_FS_USB_Process_cpp_801D7E80[] = "FS_USB_Process.cpp";
+extern "C" const char s_FS_USB_Process_cpp[] = "FS_USB_Process.cpp";
 
 namespace {
 
@@ -132,10 +132,10 @@ void CFunnyShapePcs::SetUSBData()
     }
     case 5: {
         s16* tmp = reinterpret_cast<s16*>(
-            new (FunnyShapePcs.m_viewerStage, const_cast<char*>(s_FS_USB_Process_cpp_801D7E80), 0x55)
+            new (FunnyShapePcs.m_viewerStage, const_cast<char*>(s_FS_USB_Process_cpp), 0x55)
                 u8[usb->m_sizeBytes]);
         m_textureHeaders[m_textureCount] =
-            new (FunnyShapePcs.m_viewerStage, const_cast<char*>(s_FS_USB_Process_cpp_801D7E80), 0x57)
+            new (FunnyShapePcs.m_viewerStage, const_cast<char*>(s_FS_USB_Process_cpp), 0x57)
                 OSFS_TEXTURE_ST;
 
         memcpy(tmp, usb->m_data, usb->m_sizeBytes);
@@ -154,13 +154,13 @@ void CFunnyShapePcs::SetUSBData()
         memcpy(m_textureHeaders[m_textureCount], tmp, 0x30);
 
         m_textureData[m_textureCount] =
-            new (FunnyShapePcs.m_viewerStage, const_cast<char*>(s_FS_USB_Process_cpp_801D7E80), 0x6C)
+            new (FunnyShapePcs.m_viewerStage, const_cast<char*>(s_FS_USB_Process_cpp), 0x6C)
                 u8[usb->m_sizeBytes - 0x30];
         memcpy(m_textureData[m_textureCount], tmp + 0x18, usb->m_sizeBytes - 0x30);
         DCFlushRange(m_textureData[m_textureCount], usb->m_sizeBytes - 0x30);
 
         m_texObjData[m_textureCount] =
-            new (FunnyShapePcs.m_viewerStage, const_cast<char*>(s_FS_USB_Process_cpp_801D7E80), 0x73)
+            new (FunnyShapePcs.m_viewerStage, const_cast<char*>(s_FS_USB_Process_cpp), 0x73)
                 GXTexObj;
         GXInitTexObj(static_cast<GXTexObj*>(m_texObjData[m_textureCount]), m_textureData[m_textureCount], tmp[2], tmp[3], GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
 
@@ -187,7 +187,7 @@ void CFunnyShapePcs::SetUSBData()
         DCStoreRange(&m_anm, usb->m_sizeBytes);
         break;
     case 11: {
-        m_anm.anmData = new (FunnyShapePcs.m_viewerStage, const_cast<char*>(s_FS_USB_Process_cpp_801D7E80), 0x9C)
+        m_anm.anmData = new (FunnyShapePcs.m_viewerStage, const_cast<char*>(s_FS_USB_Process_cpp), 0x9C)
             u8[usb->m_sizeBytes];
 
         memcpy(AnmData(this), usb->m_data, usb->m_sizeBytes);
@@ -289,7 +289,7 @@ void CFunnyShapePcs::SetUSBData()
             m_meshData = 0;
         }
 
-        u8* meshData = new (FunnyShapePcs.m_viewerStage, const_cast<char*>(s_FS_USB_Process_cpp_801D7E80), 0x106)
+        u8* meshData = new (FunnyShapePcs.m_viewerStage, const_cast<char*>(s_FS_USB_Process_cpp), 0x106)
             u8[usb->m_sizeBytes];
         memcpy(meshData, usb->m_data, usb->m_sizeBytes);
         *reinterpret_cast<s16*>(meshData + 0x0) = LoadSwap16(*reinterpret_cast<s16*>(meshData + 0x0));

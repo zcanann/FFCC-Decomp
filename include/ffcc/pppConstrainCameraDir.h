@@ -25,6 +25,10 @@ typedef struct pppConstrainCameraDirUnkB {
 extern "C" {
 #endif
 
+extern const float kConstrainCameraDirScaleOne;
+extern const float kConstrainCameraDirWideAspect;
+extern const float kConstrainCameraDirZero;
+
 void pppConstructConstrainCameraDir(pppConstrainCameraDir* param1, _pppCtrlTable* param2);
 void pppConstruct2ConstrainCameraDir(pppConstrainCameraDir* param1, _pppCtrlTable* param2);
 void pppDestructConstrainCameraDir(_pppPObjLink*, _pppCtrlTable*);

@@ -24,11 +24,6 @@ static inline Vec* AsVec(const CVector& vec)
 	return reinterpret_cast<Vec*>(const_cast<CVector*>(&vec));
 }
 
-static inline CFlatRuntime2* GetCFlatRuntime2()
-{
-	return reinterpret_cast<CFlatRuntime2*>(CFlat);
-}
-
 /*
  * --INFO--
  * PAL Address: 0x80127008
@@ -311,13 +306,13 @@ float CGPrgObj::getTargetRot(CGPrgObj* target)
  */
 void CGPrgObj::putParticleBindTrace(int no, int dataNo, CGObject* obj, float scale, int seNo)
 {
-	GetCFlatRuntime2()->ResetParticleWork(no, dataNo);
-	GetCFlatRuntime2()->SetParticleWorkScale(scale);
-	GetCFlatRuntime2()->SetParticleWorkBind(this);
-	GetCFlatRuntime2()->SetParticleWorkTrace(obj);
-	GetCFlatRuntime2()->PutParticleWork();
+	CFlatRuntime2Storage().ResetParticleWork(no, dataNo);
+	CFlatRuntime2Storage().SetParticleWorkScale(scale);
+	CFlatRuntime2Storage().SetParticleWorkBind(this);
+	CFlatRuntime2Storage().SetParticleWorkTrace(obj);
+	CFlatRuntime2Storage().PutParticleWork();
 	if (seNo != 0) {
-		GetCFlatRuntime2()->SetParticleWorkSe(seNo, 2, 0);
+		CFlatRuntime2Storage().SetParticleWorkSe(seNo, 2, 0);
 	}
 }
 
@@ -332,12 +327,12 @@ void CGPrgObj::putParticleBindTrace(int no, int dataNo, CGObject* obj, float sca
  */
 void CGPrgObj::putParticleTrace(int no, int dataNo, CGObject* obj, float scale, int seNo)
 {
-	GetCFlatRuntime2()->ResetParticleWork(no, dataNo);
-	GetCFlatRuntime2()->SetParticleWorkScale(scale);
-	GetCFlatRuntime2()->SetParticleWorkTrace(this);
-	GetCFlatRuntime2()->PutParticleWork();
+	CFlatRuntime2Storage().ResetParticleWork(no, dataNo);
+	CFlatRuntime2Storage().SetParticleWorkScale(scale);
+	CFlatRuntime2Storage().SetParticleWorkTrace(this);
+	CFlatRuntime2Storage().PutParticleWork();
 	if (seNo != 0) {
-		GetCFlatRuntime2()->SetParticleWorkSe(seNo, 2, 0);
+		CFlatRuntime2Storage().SetParticleWorkSe(seNo, 2, 0);
 	}
 }
 
@@ -352,13 +347,13 @@ void CGPrgObj::putParticleTrace(int no, int dataNo, CGObject* obj, float scale, 
  */
 void CGPrgObj::putParticle(int no, int dataNo, CGObject* traceObj, float scale, int seNo)
 {
-	GetCFlatRuntime2()->ResetParticleWork(no, dataNo);
-	GetCFlatRuntime2()->SetParticleWorkScale(scale);
-	GetCFlatRuntime2()->SetParticleWorkBind(this);
+	CFlatRuntime2Storage().ResetParticleWork(no, dataNo);
+	CFlatRuntime2Storage().SetParticleWorkScale(scale);
+	CFlatRuntime2Storage().SetParticleWorkBind(this);
 	if (seNo != 0) {
-		GetCFlatRuntime2()->SetParticleWorkSe(seNo, 2, 0);
+		CFlatRuntime2Storage().SetParticleWorkSe(seNo, 2, 0);
 	}
-	GetCFlatRuntime2()->PutParticleWork();
+	CFlatRuntime2Storage().PutParticleWork();
 }
 
 /*
@@ -374,13 +369,13 @@ void CGPrgObj::putParticle(int no, int dataNo, Vec* pos, float scale, int seNo)
 {
 	const float* zero = &FLOAT_80331BD4;
 
-	GetCFlatRuntime2()->ResetParticleWork(no, dataNo);
-	GetCFlatRuntime2()->SetParticleWorkScale(scale);
-	GetCFlatRuntime2()->SetParticleWorkPos(*pos, *zero);
+	CFlatRuntime2Storage().ResetParticleWork(no, dataNo);
+	CFlatRuntime2Storage().SetParticleWorkScale(scale);
+	CFlatRuntime2Storage().SetParticleWorkPos(*pos, *zero);
 	if (seNo != 0) {
-		GetCFlatRuntime2()->SetParticleWorkSe(seNo, 2, 0);
+		CFlatRuntime2Storage().SetParticleWorkSe(seNo, 2, 0);
 	}
-	GetCFlatRuntime2()->PutParticleWork();
+	CFlatRuntime2Storage().PutParticleWork();
 }
 
 /*

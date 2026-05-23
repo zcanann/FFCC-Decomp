@@ -459,7 +459,7 @@ void CGPartyObj::menu()
 		}
 
 		Joybus.ChgCtrlMode(reinterpret_cast<int>(portIndex));
-		if ((CFlat[0x12A0] & 8) != 0) {
+		if ((CFlatEventFlagsByte() & CFlatEventFlagByte_GbaSound) != 0) {
 			Sound.PlaySe(8, 0x40, 0x7F, 0);
 		}
 		return;
@@ -504,10 +504,10 @@ void CGPartyObj::menu()
 	}
 
 	if (getPadConnectedForSlot(slot) == 0) {
-		if ((CFlat[0x12A0] & 8) != 0) {
+		if ((CFlatEventFlagsByte() & CFlatEventFlagByte_GbaSound) != 0) {
 			Sound.PlaySe(7, 0x40, 0x7F, 0);
 		}
-	} else if ((CFlat[0x12A0] & 8) != 0) {
+	} else if ((CFlatEventFlagsByte() & CFlatEventFlagByte_GbaSound) != 0) {
 		Sound.PlaySe(8, 0x40, 0x7F, 0);
 	}
 
@@ -890,7 +890,7 @@ void CGPartyObj::command()
 			stack[0].m_word = primaryCommand;
 			stack[1].m_word = scriptTarget != nullptr ?
 				*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(scriptTarget) + 0x30) : 0;
-			reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(this, 2, 0x14, 2, stack, 0);
+			gCFlatRuntime().SystemCall(this, 2, 0x14, 2, stack, 0);
 			return;
 		}
 
@@ -1077,7 +1077,7 @@ void CGPartyObj::shouki()
 	}
 
 	unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
-	const unsigned char cflatFlags = CFlat[0x12E4];
+	const unsigned char cflatFlags = CFlatGameFlags();
 	const bool cflatBit7 = static_cast<signed char>(cflatFlags) < 0;
 	const bool cflatBit4 = (cflatFlags & 0x10) != 0;
 	const bool cflatBit5 = (cflatFlags & 0x20) != 0;
@@ -2219,7 +2219,7 @@ void CGPartyObj::statPut()
 				SetAnimSlot(0x25, 0);
 				SetAnimSlot(0x30, 1);
 			}
-		} else if (*reinterpret_cast<int*>(CFlat + 0x12AC) == 0) {
+		} else if (CFlatCenterState() == 0) {
 			if (m_lastMapIdHit == 1 && m_lastMapIdExtra == 0) {
 				SetAnimSlot(0x0B, 0);
 				SetAnimSlot(0x0C, 1);
@@ -3117,7 +3117,7 @@ void CGPartyObj::setAlive(int restoreDamageCol, int keepTarget)
 				SetAnimSlot(0x30, 1);
 			}
 		}
-	} else if (*reinterpret_cast<int*>(CFlat + 0x4780) == 0) {
+	} else if (CFlatItemCarryMode() == 0) {
 		if (m_lastMapIdHit == 1 && m_lastMapIdExtra == 0) {
 			SetAnimSlot(0x0B, 0);
 			SetAnimSlot(0x0C, 1);

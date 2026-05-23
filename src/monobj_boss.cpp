@@ -658,7 +658,7 @@ void CGMonObj::alwaysFuncOrcKing()
 	} else if (timer == 300 && Game.m_gameWork.m_gameOverFlag == 0) {
 		prgObj->playSe3D(0x8CBF, 0x32, 0x96, 0, 0);
 		active = 0;
-		*reinterpret_cast<int*>(CFlat + 4840) = 1;
+		CFlatBossState() = 1;
 	}
 
 	if (active != 0) {
@@ -766,7 +766,7 @@ void CGMonObj::frameStatFuncGoblinKing()
  */
 int CGMonObj::calcBranchFuncGoblinKing(int)
 {
-	return *reinterpret_cast<int*>(CFlat + 4840);
+	return CFlatBossState();
 }
 
 /*
@@ -868,7 +868,7 @@ void CGMonObj::logicFuncSaw()
 {
 	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
 	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
-	int& bossState = *reinterpret_cast<int*>(CFlat + 4840);
+	int& bossState = CFlatBossState();
 	unsigned char& aiWork = mon[0x6D4];
 
 	if (bossState == 0 && (aiWork & 0x80) != 0) {
@@ -979,7 +979,7 @@ state100:
 
 	moveFrame();
 	const int branch = *reinterpret_cast<int*>(self + 0x6D0);
-	const int flatFlags = *reinterpret_cast<int*>(CFlat + 0x12E8);
+	const int flatFlags = CFlatBossState();
 	if ((*reinterpret_cast<volatile signed char*>(SoundBuffer_1260_ + 0x14) < 0) ||
 	    ((branch == 1) && ((flatFlags & 1) != 0)) || ((branch == 2) && ((flatFlags & 2) != 0))) {
 		reinterpret_cast<CGPrgObj*>(this)->changeStat(0, 0, 0);
@@ -1026,7 +1026,7 @@ int CGMonObj::attackCheckFuncLKShooter(int)
 	unsigned char* work = reinterpret_cast<unsigned char*>(SoundBuffer_1260_);
 
 	if (*reinterpret_cast<int*>(work + 8) == 0) {
-		if ((work[0x14] & 0x40) == 0 && (*reinterpret_cast<int*>(CFlat + 0x12E8) & 2) == 0) {
+		if ((work[0x14] & 0x40) == 0 && (CFlatBossState() & 2) == 0) {
 			CVector left(FLOAT_80331d90, FLOAT_80331cf8, FLOAT_80331d94);
 			if (PSVECDistance(reinterpret_cast<Vec*>(&left), &object->m_worldPosition) < FLOAT_80331d98 &&
 			    *reinterpret_cast<int*>(work + 0xC) == 0) {
@@ -1036,7 +1036,7 @@ int CGMonObj::attackCheckFuncLKShooter(int)
 				return 100;
 			}
 		}
-		if ((work[0x14] & 0x20) == 0 && (*reinterpret_cast<int*>(CFlat + 0x12E8) & 1) == 0) {
+		if ((work[0x14] & 0x20) == 0 && (CFlatBossState() & 1) == 0) {
 			CVector right(FLOAT_80331d9c, FLOAT_80331cf8, FLOAT_80331d9c);
 			if (PSVECDistance(reinterpret_cast<Vec*>(&right), &object->m_worldPosition) < FLOAT_80331d98 &&
 			    *reinterpret_cast<int*>(work + 0x10) == 0) {
@@ -1252,7 +1252,7 @@ void CGMonObj::frameStatFuncLich()
 	CGObject* object = reinterpret_cast<CGObject*>(this);
 	CGCharaObj* chara = reinterpret_cast<CGCharaObj*>(this);
 	u8& lichFlags = *reinterpret_cast<u8*>(SoundBuffer + 0x4FC);
-	const int flatFlags = *reinterpret_cast<int*>(CFlat + 4840);
+	const int flatFlags = CFlatBossState();
 
 	if (((flatFlags & 1) == 0) && (static_cast<s8>(lichFlags) < 0)) {
 		lichFlags = (lichFlags & 0x3F) | 0x40;
@@ -1285,7 +1285,7 @@ void CGMonObj::frameStatFuncLich()
 			chara->statAttack();
 			if (prgObj->m_stateFrame == 0x29) {
 				CFlatRuntime::CStack stack[3] = {{10}, {1}, {0}};
-				reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(0, 1, 9, 3, stack, 0);
+				gCFlatRuntime().SystemCall(0, 1, 9, 3, stack, 0);
 			}
 		}
 	} else if (stat < 0x65 && stat > 99) {
@@ -1305,7 +1305,7 @@ void CGMonObj::frameStatFuncLich()
  */
 int CGMonObj::calcBranchFuncLich(int)
 {
-	const int flatFlags = *reinterpret_cast<int*>(CFlat + 4840);
+	const int flatFlags = CFlatBossState();
 	return ((flatFlags >> 1) & 1) ^ 1;
 }
 
@@ -1382,7 +1382,7 @@ void CGMonObj::frameStatFuncTetsukyojin()
 	const int state = prgObj->m_lastStateId;
 
 	if (state == 0x66) {
-		if (*reinterpret_cast<int*>(CFlat + 4840) < 1) {
+		if (CFlatBossState() < 1) {
 			prgObj->changeStat(0, 0, 0);
 		} else {
 			if ((*reinterpret_cast<int*>(self + 0x6B4) == 1) && (prgObj->m_stateFrame == 0)) {
@@ -1390,14 +1390,14 @@ void CGMonObj::frameStatFuncTetsukyojin()
 
 				object->m_bgColMask &= 0xFFF3FFFD;
 				*reinterpret_cast<int*>(self + 0x6B4) = 2;
-				*reinterpret_cast<int*>(CFlat + 4844) = 1;
+				CFlatBossSubState() = 1;
 				stack[0].m_word = 10;
 				stack[1].m_word = 0;
 				stack[2].m_word = 0;
-				reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(0, 1, 9, 3, stack, 0);
+				gCFlatRuntime().SystemCall(0, 1, 9, 3, stack, 0);
 			}
 
-			if (*reinterpret_cast<int*>(CFlat + 4844) == 0) {
+			if (CFlatBossSubState() == 0) {
 				*reinterpret_cast<int*>(self + 0x6B4) = 0;
 				*reinterpret_cast<int*>(self + 0x6C8) = 0;
 				prgObj->changeStat(0, 0, 0);
@@ -1461,10 +1461,10 @@ void CGMonObj::frameStatFuncTetsukyojin()
 		}
 		reinterpret_cast<CGCharaObj*>(this)->statAttack();
 	} else if (state > 99) {
-		if ((*reinterpret_cast<int*>(CFlat + 4840) != 0) && (prgObj->m_stateFrame == 0x25)) {
-			int flatCount = *reinterpret_cast<int*>(CFlat + 4840);
+		if ((CFlatBossState() != 0) && (prgObj->m_stateFrame == 0x25)) {
+			int flatCount = CFlatBossState();
 			if (flatCount < 1) {
-				*reinterpret_cast<int*>(CFlat + 4840) = 0;
+				CFlatBossState() = 0;
 			} else if (((flatCount == 1) && (*reinterpret_cast<int*>(SoundBuffer + 0x4EC) > 0x13)) ||
 			           ((flatCount > 1) && (*reinterpret_cast<int*>(SoundBuffer + 0x4EC) > 4))) {
 				*reinterpret_cast<int*>(SoundBuffer + 0x4EC) = 0;
@@ -1477,7 +1477,7 @@ void CGMonObj::frameStatFuncTetsukyojin()
 				prgObj->putParticle((pdtNo << 8) | 0x2D, 0, object, FLOAT_80331d18, 0x101E4);
 
 				if (*reinterpret_cast<int*>(self + 0x6B4) == 0) {
-					*reinterpret_cast<int*>(CFlat + 4840) = *reinterpret_cast<int*>(CFlat + 4840) - 1;
+					CFlatBossState() = CFlatBossState() - 1;
 				}
 				*reinterpret_cast<int*>(self + 0x6B4) = 1;
 				*reinterpret_cast<int*>(self + 0x6C8) = 0;
@@ -1524,7 +1524,7 @@ void CGMonObj::damagedFuncGigasLoad()
 	case 0:
 		reinterpret_cast<CGPrgObj*>(this)->changeStat(4, 0, 0);
 		*reinterpret_cast<int*>(mon + 0x6D0) = 1;
-		*reinterpret_cast<int*>(CFlat + 4840) = 1;
+		CFlatBossState() = 1;
 		break;
 	}
 }
@@ -1562,7 +1562,7 @@ int CGMonObj::calcBranchFuncGigasLoad(int)
 	CGame* game = &Game;
 	if (((game->m_scriptWork[0][0][1] != 0) &&
 	     (1 < *reinterpret_cast<unsigned short*>(*reinterpret_cast<int*>(game->m_scriptWork[0][0][1] + 0x58) + 0x1C))) &&
-	    (*reinterpret_cast<int*>(CFlat + 4840) == 1)) {
+	    (CFlatBossState() == 1)) {
 		return 0;
 	}
 	return 1;
@@ -1836,8 +1836,8 @@ void CGMonObj::frameStatFuncMeteoParasiteC()
 				charaObj->damageDelete();
 				bossObjArr[*bossIndex]->changeStat(0x65, 0, 0);
 				prgObj->reqAnim(*bossIndex + 0x25, 0, 0);
-				CFlat[4836] = static_cast<u8>((CFlat[4836] & 0xDF) | 0x20);
-				*reinterpret_cast<int*>(CFlat + 4840) = *reinterpret_cast<int*>(CFlat + 4840) + 1;
+				CFlatGameFlags() = static_cast<u8>((CFlatGameFlags() & ~CFlatGameFlag_Bit5) | CFlatGameFlag_Bit5);
+				CFlatBossState() = CFlatBossState() + 1;
 			} else if (prgObj->isLoopAnim() != 0) {
 				object->SetAnimSlot(0, 0);
 				prgObj->changeStat(0, 0, 0);

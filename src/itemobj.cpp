@@ -537,23 +537,23 @@ void CGItemObj::onFrameAlways()
 
 		if (static_cast<int>(Game.m_gameWork.m_gameInitFlag) != 0 &&
 		    static_cast<signed char>(
-		        static_cast<int>((static_cast<unsigned int>(*(unsigned char*)(CFlat + 4836)) << 28) & 0xC0000000) >> 31) != 0 &&
+		        static_cast<int>((static_cast<unsigned int>(CFlatGameFlags()) << 28) & 0xC0000000) >> 31) != 0 &&
 		    static_cast<signed char>(
-		        static_cast<int>((static_cast<unsigned int>(*(unsigned char*)(CFlat + 4836)) << 29) & 0xC0000000) >> 31) != 0 &&
+		        static_cast<int>((static_cast<unsigned int>(CFlatGameFlags()) << 29) & 0xC0000000) >> 31) != 0 &&
 		    static_cast<signed char>(
 		        static_cast<int>((static_cast<unsigned int>(*(unsigned char*)(self + 0x9A)) << 24) & 0xC0000000) >> 31) != 0 &&
-		    *(int*)(CFlat + 4780) == 0 && *(void**)(self + 0x550) == 0) {
+		    CFlatItemCarryMode() == 0 && *(void**)(self + 0x550) == 0) {
 			canUseTrace = true;
 		} else {
 			canUseTrace = false;
 		}
 
-		if (canUseTrace && *(int*)(CFlat + 66604) == 0) {
-			*(int*)(CFlat + 66604) = ItemCFlatRuntime()->GetFreeParticleSlot();
-			putParticleTrace(0x141, *(int*)(CFlat + 66604), this, FLOAT_80331b18, 0);
-		} else if (!canUseTrace && *(int*)(CFlat + 66604) != 0) {
-			ItemCFlatRuntime()->EndParticleSlot(*(int*)(CFlat + 66604), 0);
-			*(int*)(CFlat + 66604) = 0;
+		if (canUseTrace && CFlatItemTraceParticleSlot() == 0) {
+			CFlatItemTraceParticleSlot() = ItemCFlatRuntime()->GetFreeParticleSlot();
+			putParticleTrace(0x141, CFlatItemTraceParticleSlot(), this, FLOAT_80331b18, 0);
+		} else if (!canUseTrace && CFlatItemTraceParticleSlot() != 0) {
+			ItemCFlatRuntime()->EndParticleSlot(CFlatItemTraceParticleSlot(), 0);
+			CFlatItemTraceParticleSlot() = 0;
 		}
 	}
 }
@@ -697,7 +697,7 @@ void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 		stack[0].m_word = 3;
 		stack[1].m_word = static_cast<unsigned int>((-carryState | carryState) >> 0x1F);
 		stack[2].m_word = 0;
-		reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(0, 1, 9, 3, stack, 0);
+		gCFlatRuntime().SystemCall(0, 1, 9, 3, stack, 0);
 	}
 }
 
@@ -738,7 +738,7 @@ CGPrgObj* CGItemObj::CreateFromScript(
 		}
 
 		if (bestItemObj != 0) {
-			reinterpret_cast<CFlatRuntime*>(CFlat)->deleteObject(reinterpret_cast<CFlatRuntime::CObject*>(bestItemObj));
+			gCFlatRuntime().deleteObject(reinterpret_cast<CFlatRuntime::CObject*>(bestItemObj));
 			deletedCount = 1;
 		} else {
 			if (2U < (unsigned int)System.m_execParam) {
@@ -763,7 +763,7 @@ CGPrgObj* CGItemObj::CreateFromScript(
 	inStack[2].m_word = scriptArg;
 	inStack[3].m_word = owner != 0 ? owner->m_particleId : 0;
 	*reinterpret_cast<float*>(&inStack[4].m_word) = launchAngle;
-	reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(0, 1, 7, 5, inStack, &outStack);
+	gCFlatRuntime().SystemCall(0, 1, 7, 5, inStack, &outStack);
 
 	CGPrgObj* newItem = 0;
 	if (createMode != 1) {
@@ -883,7 +883,7 @@ int CGItemObj::DeleteOld(int deleteMask, int maxDeleteCount, CFlatRuntime::CObje
 		}
 
 		if (bestItemObj != 0) {
-			reinterpret_cast<CFlatRuntime*>(CFlat)->deleteObject(reinterpret_cast<CFlatRuntime::CObject*>(bestItemObj));
+			gCFlatRuntime().deleteObject(reinterpret_cast<CFlatRuntime::CObject*>(bestItemObj));
 		} else {
 			if ((unsigned int)System.m_execParam >= 3U) {
 				System.Printf(const_cast<char*>(DAT_801dced4));
@@ -934,7 +934,7 @@ void CGItemObj::onFrameStat()
 			if (Game.unk_flat3_0xc7d0 != 0) {
 				distance = PSVECDistance((Vec*)(self + 0x15c), (Vec*)(Game.unk_flat3_0xc7d0 + 0x15c));
 			} else {
-				if (*(int*)(CFlat + 0x4780) == 1) {
+				if (CFlatItemCarryMode() == 1) {
 					Vec partyCenter;
 
 					partyCenter.x = (Game.m_partyMinX + Game.m_partyMaxX) * FLOAT_80331b3c;
@@ -1014,7 +1014,7 @@ void CGItemObj::onFrameStat()
 
 			if (useMenuLaunchSpeed) {
 				launchSpeed = FLOAT_80331b18;
-			} else if (*(int*)(CFlat + 0x4780) == 1) {
+			} else if (CFlatItemCarryMode() == 1) {
 				unsigned int carryCid = static_cast<unsigned short>(carryObj->GetCID());
 				if ((carryCid & 0x6D) == 0x6D &&
 				    1 < *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(carryObj->m_scriptHandle) + 0x3E0)) {
@@ -1253,7 +1253,7 @@ void CGItemObj::onFrameStat()
 
 				CFlatRuntime::CStack stack;
 				stack.m_word = 1;
-				reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(
+				gCFlatRuntime().SystemCall(
 				    *reinterpret_cast<CFlatRuntime::CObject**>(self + 0x550), 2, 0x16, 1, &stack, 0);
 			}
 
@@ -1291,7 +1291,7 @@ void CGItemObj::onFrameStat()
 			CFlatRuntime::CStack stack;
 			stack.m_word = 0;
 			*(int*)(m_boss__8CGMonObj + ownerSlot * 4 + 8) = 0;
-			reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(
+			gCFlatRuntime().SystemCall(
 			    *reinterpret_cast<CFlatRuntime::CObject**>(self + 0x550), 2, 0x16, 1, &stack, 0);
 
 			self[0x38] = static_cast<unsigned char>(__rlwimi(self[0x38], 1, 7, 24, 24));

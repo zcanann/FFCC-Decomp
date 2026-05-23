@@ -108,7 +108,7 @@ public:
     void IsUseCmdList(int);
     int IsSelectedCmdList(int);
     unsigned int GetMagicCharge(int, int&, int&);
-    void GetCmdListItemName(int);
+    int GetCmdListItemName(int, int*, int*);
     int GetWeaponAttrib(int);
     int GetCmdListItem(int);
     int DelCmdListAndItem(int);

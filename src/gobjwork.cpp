@@ -2246,21 +2246,30 @@ unsigned int CCaravanWork::GetMagicCharge(int cmdListIdx, int&, int&)
 	}
 }
 
-extern "C" int GetCmdListItemName__12CCaravanWorkFi(CCaravanWork* caravanWork, int cmdListIdx, int* firstCmdIdx, int* itemCmdListIdx)
+/*
+ * --INFO--
+ * PAL Address: 0x800a7e18
+ * PAL Size: 132b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CCaravanWork::GetCmdListItemName(int cmdListIdx, int* firstCmdIdx, int* itemCmdListIdx)
 {
 	int groupedCount;
 
 	if (Game.m_gameWork.m_menuStageMode == 0) {
 		groupedCount = 1;
 	} else {
-		if (caravanWork->m_commandListExtra[cmdListIdx] == 0) {
+		if (m_commandListExtra[cmdListIdx] == 0) {
 			groupedCount = 1;
 		} else {
 			int scanCount = cmdListIdx + 1;
 			int topIdx = cmdListIdx;
 			if (topIdx >= 0) {
 				for (; scanCount != 0; scanCount--) {
-					if (caravanWork->m_commandListExtra[topIdx] != -1) {
+					if (m_commandListExtra[topIdx] != -1) {
 						break;
 					}
 					topIdx--;
@@ -2268,11 +2277,11 @@ extern "C" int GetCmdListItemName__12CCaravanWorkFi(CCaravanWork* caravanWork, i
 			}
 
 			groupedCount = 1;
-			scanCount = static_cast<short>(caravanWork->m_numCmdListSlots) - (topIdx + 1);
+			scanCount = static_cast<short>(m_numCmdListSlots) - (topIdx + 1);
 			int nextIdx = topIdx + 1;
-			if (nextIdx < static_cast<short>(caravanWork->m_numCmdListSlots)) {
+			if (nextIdx < static_cast<short>(m_numCmdListSlots)) {
 				for (; scanCount != 0; scanCount--) {
-					if (caravanWork->m_commandListExtra[nextIdx] != -1) {
+					if (m_commandListExtra[nextIdx] != -1) {
 						break;
 					}
 					groupedCount++;
@@ -2286,20 +2295,20 @@ extern "C" int GetCmdListItemName__12CCaravanWorkFi(CCaravanWork* caravanWork, i
 		int scanCount = cmdListIdx + 1;
 		if (cmdListIdx >= 0) {
 			for (; scanCount != 0; scanCount--) {
-				if (caravanWork->m_commandListExtra[cmdListIdx] != -1) {
+				if (m_commandListExtra[cmdListIdx] != -1) {
 					break;
 				}
 				cmdListIdx--;
 			}
 		}
 
-		short cmdId = caravanWork->m_commandListExtra[cmdListIdx];
+		short cmdId = m_commandListExtra[cmdListIdx];
 		if (cmdId == 0x207 || cmdId == 0x20B || cmdId == 0x20F) {
 			*firstCmdIdx = cmdListIdx;
 			int i = 0;
 			for (; groupedCount != 0; groupedCount--) {
-				short invSlot = (short)caravanWork->m_commandListInventorySlotRef[cmdListIdx + i];
-				short itemId = (short)caravanWork->m_inventoryItems[invSlot];
+				short invSlot = (short)m_commandListInventorySlotRef[cmdListIdx + i];
+				short itemId = (short)m_inventoryItems[invSlot];
 				int itemType = GetItemDataPtr(itemId)[0];
 				if (itemType == 1) {
 					*itemCmdListIdx = cmdListIdx + i;
@@ -2349,7 +2358,7 @@ int CCaravanWork::GetCmdListItem(int cmdListIdx)
 	int itemCmdListIdx;
 	int result = -1;
 
-	if (GetCmdListItemName__12CCaravanWorkFi(this, cmdListIdx, &cmdTopIdx, &itemCmdListIdx) != 0) {
+	if (GetCmdListItemName(cmdListIdx, &cmdTopIdx, &itemCmdListIdx) != 0) {
 		short cmdId = m_commandListExtra[cmdTopIdx];
 		switch (cmdId) {
 		case 0x207:
@@ -2448,7 +2457,7 @@ int CCaravanWork::DelCmdListAndItem(int cmdListIdx)
 			int cmdResult = m_commandListExtra[cmdListIdx];
 			int cmdTopIdx;
 			int itemCmdListIdx;
-			if (GetCmdListItemName__12CCaravanWorkFi(this, cmdListIdx, &cmdTopIdx, &itemCmdListIdx) != 0) {
+			if (GetCmdListItemName(cmdListIdx, &cmdTopIdx, &itemCmdListIdx) != 0) {
 				cmdResult = (short)m_inventoryItems[(short)m_commandListInventorySlotRef[itemCmdListIdx]];
 			}
 			result = cmdResult;
@@ -2771,7 +2780,7 @@ void CCaravanWork::UniteComList(int startIdx, int count, int cmdId)
 	if ((m_weaponIdx >= startIdx) && (m_weaponIdx < (startIdx + count))) {
 		int cmdTopIdx;
 		int itemCmdListIdx;
-		if (GetCmdListItemName__12CCaravanWorkFi(this, startIdx, &cmdTopIdx, &itemCmdListIdx) != 0) {
+		if (GetCmdListItemName(startIdx, &cmdTopIdx, &itemCmdListIdx) != 0) {
 			m_weaponIdx = (short)itemCmdListIdx;
 		}
 	}
@@ -2791,7 +2800,7 @@ void CCaravanWork::UnuniteComList(int startIdx, int count)
 	if (m_weaponIdx == startIdx) {
 		int cmdTopIdx;
 		int itemCmdListIdx;
-		if (GetCmdListItemName__12CCaravanWorkFi(this, startIdx, &cmdTopIdx, &itemCmdListIdx) != 0) {
+		if (GetCmdListItemName(startIdx, &cmdTopIdx, &itemCmdListIdx) != 0) {
 			m_weaponIdx = (short)itemCmdListIdx;
 		}
 	}

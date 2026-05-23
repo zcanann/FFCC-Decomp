@@ -19,8 +19,6 @@
 extern "C" {
 void SetMode__9CShopMenuFi(void*, int);
 void DrawSingleBase__8CMenuPcsFf(void*, float);
-void ReleasePdt__8CPartPcsFi(void*, int);
-int LoadMenuPdt__8CPartPcsFPc(void*, char*);
 int GetItemType__8CMenuPcsFii(void*, int, int);
 const char* GetJobStr__8CMenuPcsFi(CMenuPcs*, int);
 void GetRaceStr__8CMenuPcsFiPc(void*, int, char*);
@@ -920,7 +918,7 @@ void CShopMenu::Init(int mode)
  */
 void CShopMenu::Destroy()
 {
-    ReleasePdt__8CPartPcsFi(PartPcsVoid(), ShopMenuInt(this, 0x18));
+    PartPcs.ReleasePdt(ShopMenuInt(this, 0x18));
     if (*reinterpret_cast<void**>(MenuPcsRaw() + 0x878) == this) {
         *reinterpret_cast<void**>(MenuPcsRaw() + 0x878) = nullptr;
     }
@@ -2631,7 +2629,7 @@ void CShopMenu::Calc()
             } else if (choice == 1) {
                 this->SetMode(6);
             } else if (choice == 2) {
-                ReleasePdt__8CPartPcsFi(PartPcsVoid(), ShopMenuInt(this, 0x18));
+                PartPcs.ReleasePdt(ShopMenuInt(this, 0x18));
                 reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0])->CallShop(0, 0, 0, 0, 0);
                 *reinterpret_cast<unsigned short*>(MenuPcsRaw() + 0x850 + 6) = 1;
                 operator delete(*reinterpret_cast<void**>(MenuPcsRaw() + 0x878));
@@ -2722,7 +2720,7 @@ void CShopMenu::Calc()
         ShopMenuFloat(this, 0x1C) = static_cast<float>(8 - timer) * 0.125f;
         if (timer == 8) {
             if (ShopMenuInt(this, 0x8) == -1) {
-                ReleasePdt__8CPartPcsFi(PartPcsVoid(), ShopMenuInt(this, 0x18));
+                PartPcs.ReleasePdt(ShopMenuInt(this, 0x18));
                 reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0])->CallShop(0, 0, 0, 0, 0);
                 *reinterpret_cast<unsigned short*>(MenuPcsRaw() + 0x850 + 6) = 1;
                 operator delete(*reinterpret_cast<void**>(MenuPcsRaw() + 0x878));
@@ -2826,7 +2824,7 @@ void CMenuPcs::CreateSmithMenu()
     *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(shopMenu) + 0x20) = Game.m_scriptFoodBase[0];
     SetMode__9CShopMenuFi(shopMenu, 9);
     *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(shopMenu) + 0x18) =
-        LoadMenuPdt__8CPartPcsFPc(PartPcsVoid(), DAT_80332e54);
+        PartPcs.LoadMenuPdt(DAT_80332e54);
 
     int slotIndex = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(shopMenu) + 0x18);
     _pppDataHead* pppDataHead =
@@ -2865,7 +2863,7 @@ void CMenuPcs::CreateShopMenu()
     *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(shopMenu) + 0x20) = Game.m_scriptFoodBase[0];
     SetMode__9CShopMenuFi(shopMenu, 0);
     *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(shopMenu) + 0x18) =
-        LoadMenuPdt__8CPartPcsFPc(PartPcsVoid(), DAT_80332e54);
+        PartPcs.LoadMenuPdt(DAT_80332e54);
 
     int slotIndex = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(shopMenu) + 0x18);
     _pppDataHead* pppDataHead =

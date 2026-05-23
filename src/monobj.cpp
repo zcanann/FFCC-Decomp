@@ -1,5 +1,6 @@
 #include "ffcc/monobj.h"
 #include "ffcc/charaobj.h"
+#include "ffcc/cflat_runtime2.h"
 #include "ffcc/gobjwork.h"
 #include "ffcc/itemobj.h"
 #include "ffcc/fontman.h"
@@ -31,10 +32,6 @@ u8 m_boss__8CGMonObj[0x8C];
 extern "C" void __ptmf_scall(...);
 extern "C" int __cntlzw(unsigned int);
 extern "C" void aiAddDuct__8CGMonObjFRi(CGMonObj*, int&);
-extern "C" CGMonObj* FindGMonObjFirst__13CFlatRuntime2Fv(void*);
-extern "C" CGMonObj* FindGMonObjNext__13CFlatRuntime2FP8CGMonObj(void*, CGMonObj*);
-extern "C" int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, CMapCylinder*, Vec*, unsigned int);
-extern "C" void AddDebugDrawCC__13CFlatRuntime2FP3VecP3Vecfii(void*, Vec*, Vec*, float, int, int);
 extern "C" char SoundBuffer_1248_[];
 extern "C" float DAT_8032ec24;
 extern "C" float g_hit_t;
@@ -1603,8 +1600,8 @@ skip_target_update:
 
 		unsigned short groupTag = *reinterpret_cast<unsigned short*>(mon + 0x6D4);
 		if ((groupTag & 0x7FFF) != 0) {
-			for (CGMonObj* other = FindGMonObjFirst__13CFlatRuntime2Fv(CFlat); other != nullptr;
-				other = FindGMonObjNext__13CFlatRuntime2FP8CGMonObj(CFlat, other)) {
+			for (CGMonObj* other = gCFlatRuntime2.FindGMonObjFirst(); other != nullptr;
+				other = gCFlatRuntime2.FindGMonObjNext(other)) {
 				if (other == this) {
 					continue;
 				}
@@ -1788,8 +1785,7 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 		hitCylinder.m_boundsMax.y = FLOAT_80331A38;
 		hitCylinder.m_boundsMax.z = FLOAT_80331A3C;
 
-		int hit = CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
-			&MapMng, &hitCylinder, &move, *reinterpret_cast<unsigned short*>(baseScript + 0x1B2));
+		int hit = MapMng.CheckHitCylinderNear(&hitCylinder, &move, *reinterpret_cast<unsigned short*>(baseScript + 0x1B2));
 		if (hit != 0) {
 			if (hitScale != NULL) {
 				*hitScale = g_hit_t;
@@ -1797,7 +1793,7 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 			PSVECScale(&move, &move, g_hit_t);
 			distance = static_cast<float>(static_cast<double>(distance) * static_cast<double>(g_hit_t));
 		}
-		AddDebugDrawCC__13CFlatRuntime2FP3VecP3Vecfii(CFlat, &startPos, &move, hitCylinder.m_axis.x, 1, hit);
+		gCFlatRuntime2.AddDebugDrawCC(&startPos, &move, hitCylinder.m_axis.x, 1, hit);
 	}
 
 	if ((flags & 2) != 0) {
@@ -1888,15 +1884,13 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 			hitCylinder.m_boundsMax.y = FLOAT_80331A38;
 			hitCylinder.m_boundsMax.z = FLOAT_80331A3C;
 
-			int mapHit = CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
-				&MapMng, &hitCylinder, &targetDelta,
-				*reinterpret_cast<unsigned short*>(baseScript + 0x1B2));
+			int mapHit = MapMng.CheckHitCylinderNear(
+				&hitCylinder, &targetDelta, *reinterpret_cast<unsigned short*>(baseScript + 0x1B2));
 			Vec debugDelta = targetDelta;
 			if (mapHit != 0) {
 				PSVECScale(&debugDelta, &debugDelta, g_hit_t);
 			}
-			AddDebugDrawCC__13CFlatRuntime2FP3VecP3Vecfii(
-				CFlat, &startPos, &debugDelta, hitCylinder.m_axis.x, 1, mapHit == 0);
+			gCFlatRuntime2.AddDebugDrawCC(&startPos, &debugDelta, hitCylinder.m_axis.x, 1, mapHit == 0);
 
 			if (mapHit == 0) {
 				if (hitPartyIndex != NULL) {
@@ -1909,7 +1903,7 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
 		if (static_cast<double>(FLOAT_803319D8) != static_cast<double>(halfAngle)) {
 			float debugRadius = static_cast<float>(
 				static_cast<double>(coneLength) * static_cast<double>(static_cast<float>(tan(static_cast<double>(halfAngle)))));
-			AddDebugDrawCC__13CFlatRuntime2FP3VecP3Vecfii(CFlat, &coneStart, &move, debugRadius, 0, didHit);
+			gCFlatRuntime2.AddDebugDrawCC(&coneStart, &move, debugRadius, 0, didHit);
 		}
 	}
 }

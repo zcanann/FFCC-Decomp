@@ -18,7 +18,6 @@ extern int gPppCalcDisabled;
 #include "dolphin/mtx.h"
 #include <string.h>
 
-extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void*);
 extern "C" void pppSetBlendMode(unsigned char);
 extern "C" int rand(void);
 static pppFMATRIX g_matUnit3;
@@ -442,9 +441,9 @@ void pppFrameYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthShp
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void calc(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirthShpTail3,
-                     PYmMegaBirthShpTail3* pYmMegaBirthShpTail3, _PARTICLE_DATA* particleData,
-                     VColor* vColor, _PARTICLE_COLOR* particleColor)
+void calc(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirthShpTail3,
+          PYmMegaBirthShpTail3* pYmMegaBirthShpTail3, _PARTICLE_DATA* particleData,
+          VColor* vColor, _PARTICLE_COLOR* particleColor)
 {
     int alpha = vColor->m_alpha;
     u8* particleBytes = (u8*)particleData;
@@ -518,10 +517,10 @@ extern "C" void calc(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirth
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirthShpTail3,
-                      PYmMegaBirthShpTail3* pYmMegaBirthShpTail3, VColor* vColor,
-                      _PARTICLE_DATA* particleData, _PARTICLE_WMAT* particleWMat,
-                      _PARTICLE_COLOR* particleColor)
+void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirthShpTail3,
+           PYmMegaBirthShpTail3* pYmMegaBirthShpTail3, VColor* vColor,
+           _PARTICLE_DATA* particleData, _PARTICLE_WMAT* particleWMat,
+           _PARTICLE_COLOR* particleColor)
 {
     u8* paramBytes = (u8*)pYmMegaBirthShpTail3;
     u8* particleBytes = (u8*)particleData;
@@ -768,15 +767,15 @@ void pppDestructYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* pppYmMegaBirthShpTai
     void** ptrC4 = (void**)(work + 0x44);
 
     if (*ptrBc != 0) {
-        pppHeapUseRate__FPQ27CMemory6CStage(*ptrBc);
+        pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(*ptrBc));
         *ptrBc = 0;
     }
     if (*ptrC0 != 0) {
-        pppHeapUseRate__FPQ27CMemory6CStage(*ptrC0);
+        pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(*ptrC0));
         *ptrC0 = 0;
     }
     if (*ptrC4 != 0) {
-        pppHeapUseRate__FPQ27CMemory6CStage(*ptrC4);
+        pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(*ptrC4));
         *ptrC4 = 0;
     }
 }

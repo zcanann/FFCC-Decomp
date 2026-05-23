@@ -14,6 +14,7 @@
 class CChara;
 class CChunkFile;
 class CGObject;
+class CMaterialSet;
 class CTexture;
 class CTextureSet;
 class CProfile;
@@ -453,7 +454,12 @@ public:
     void pppDeleteAll();
     void pppDestroyAll();
 
-    unsigned char m_unk0[0x2A18];
+    unsigned char m_unk0[0x7E4];
+    CMaterialSet* m_materialSet;          // 0x7E4
+    CTextureSet* m_textureSet;            // 0x7E8
+    pppModelSt* m_pppModelStArr;          // 0x7EC
+    pppShapeSt* m_pppShapeStArr;          // 0x7F0
+    unsigned char m_unk7F4[0x2224];
     _pppMngSt m_pppMng[0x180];           // 0x2A18
 
     struct PppPdtSlot

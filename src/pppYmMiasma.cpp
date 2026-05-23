@@ -4,6 +4,7 @@
 #include "ffcc/math.h"
 #include "ffcc/game.h"
 #include "ffcc/gxfunc.h"
+#include "ffcc/partMng.h"
 #include "ffcc/ppp_constants.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/pppShape.h"
@@ -22,8 +23,6 @@ extern const float FLOAT_8033065c;
 extern const float FLOAT_80330660;
 extern const float FLOAT_80330664;
 extern const float FLOAT_80330668;
-extern "C" void pppNormalize__FR3Vec3Vec(float*, Vec*);
-extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void*);
 extern "C" void pppSetBlendMode(unsigned char);
 extern "C" const char s_pppYmMiasma_cpp_801D9CA8[] = "pppYmMiasma.cpp";
 
@@ -140,6 +139,12 @@ struct YmMiasmaFrameStep : PYmMiasma {
     float m_speedDecayStep;
 };
 
+template <typename T>
+static inline T* PppWorkArea(_pppPObject* object, pppYmMiasmaUnkC* ctrl, int index)
+{
+    return reinterpret_cast<T*>(object->m_workArea + ctrl->m_serializedDataOffsets[index]);
+}
+
 /*
  * --INFO--
  * PAL Address: 0x800907c4
@@ -151,7 +156,7 @@ struct YmMiasmaFrameStep : PYmMiasma {
  */
 void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, YmMiasmaRenderStep* step, pppYmMiasmaUnkC* param_3)
 {
-    VYmMiasma* work = (VYmMiasma*)((u8*)pppYmMiasma_ + 0x80 + param_3->m_serializedDataOffsets[2]);
+    VYmMiasma* work = PppWorkArea<VYmMiasma>(reinterpret_cast<_pppPObject*>(pppYmMiasma_), param_3, 2);
     PARTICLE_DATA* particleData = work->m_particles;
     int i;
 
@@ -229,7 +234,7 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, YmMiasmaFrameStep* step, pppYmM
         return;
     }
 
-    work = (VYmMiasma*)((u8*)pppYmMiasma_ + 0x80 + param_3->m_serializedDataOffsets[2]);
+    work = PppWorkArea<VYmMiasma>(reinterpret_cast<_pppPObject*>(pppYmMiasma_), param_3, 2);
 
     if (step->m_graphId == pppYmMiasma_->m_graphId) {
         work->m_radius = work->m_radius + step->m_radiusDelta;
@@ -325,11 +330,11 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, YmMiasmaFrameStep* step, pppYmM
  */
 void pppDestructYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkC* param_2)
 {
-    VYmMiasma* work = (VYmMiasma*)((u8*)pppYmMiasma_ + 0x80 + param_2->m_serializedDataOffsets[2]);
+    VYmMiasma* work = PppWorkArea<VYmMiasma>(reinterpret_cast<_pppPObject*>(pppYmMiasma_), param_2, 2);
     void* heap = work->m_particles;
 
     if (heap != 0) {
-        pppHeapUseRate__FPQ27CMemory6CStage(heap);
+        pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(heap));
     }
 }
 
@@ -344,7 +349,7 @@ void pppDestructYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkC* param_2)
  */
 void pppConstruct2YmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkC* param_2)
 {
-    VYmMiasma* work = (VYmMiasma*)((u8*)pppYmMiasma_ + 0x80 + param_2->m_serializedDataOffsets[2]);
+    VYmMiasma* work = PppWorkArea<VYmMiasma>(reinterpret_cast<_pppPObject*>(pppYmMiasma_), param_2, 2);
     float fVar1 = FLOAT_80330644;
 
     work->m_radius = FLOAT_80330644;
@@ -363,7 +368,7 @@ void pppConstruct2YmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkC* param_2)
  */
 void pppConstructYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkC* param_2)
 {
-    VYmMiasma* work = (VYmMiasma*)((u8*)pppYmMiasma_ + 0x80 + param_2->m_serializedDataOffsets[2]);
+    VYmMiasma* work = PppWorkArea<VYmMiasma>(reinterpret_cast<_pppPObject*>(pppYmMiasma_), param_2, 2);
     float fVar1;
     float fVar2 = FLOAT_80330644;
 
@@ -394,7 +399,8 @@ void pppConstructYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkC* param_2)
  */
 void UpdateParticleData(_pppPObject* pppPObject, _pppCtrlTable* pppCtrlTable, PYmMiasma* pYmMiasma, PARTICLE_DATA* particleData)
 {
-    VYmMiasma* vData = (VYmMiasma*)((u8*)pppPObject + ((pppYmMiasmaUnkC*)pppCtrlTable)->m_serializedDataOffsets[2] + 0x80);
+    VYmMiasma* vData =
+        PppWorkArea<VYmMiasma>(pppPObject, reinterpret_cast<pppYmMiasmaUnkC*>(pppCtrlTable), 2);
     YmMiasmaParticleState* state = (YmMiasmaParticleState*)particleData;
     s16 frameCount;
     s16 decayCount;
@@ -558,7 +564,7 @@ void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* 
     particleData->m_matrix[0][2] = trigCos;
     particleData->m_matrix[1][2] = trigCos;
     Vec normalizedPos = *(Vec*)particleData->m_matrix[1];
-    pppNormalize__FR3Vec3Vec(particleData->m_matrix[1], &normalizedPos);
+    pppNormalize(*reinterpret_cast<Vec*>(particleData->m_matrix[1]), normalizedPos);
     if ((s32)Game.m_currentSceneId != 7) {
         basePos.x = pppMngStPtr->m_matrix.value[0][3];
         basePos.y = pppMngStPtr->m_matrix.value[1][3];

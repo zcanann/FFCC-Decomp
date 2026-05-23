@@ -12,6 +12,7 @@
 #include "ffcc/p_menu.h"
 #include "ffcc/pad.h"
 #include "ffcc/system.h"
+#include "ffcc/textureman.h"
 #include "ffcc/vector.h"
 
 #include <dolphin/gx.h>
@@ -20,10 +21,6 @@
 extern "C" double sin(double);
 
 #include <math.h>
-
-extern "C" void SetExternalTlut__8CTextureFPvi(void*, void*, int);
-extern "C" asm void MTX44MultVec4__5CMathFPA4_fP3VecP5Vec4d(register void*, register float (*)[4], register Vec*,
-                                                            register void*);
 
 extern unsigned char DAT_8020fab8[];
 static const char DAT_801da01c[] = {
@@ -189,7 +186,7 @@ void CRingMenu::DrawIcon()
 	Mtx44 screenMtx;
 	PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
 	Vec4d clipPos;
-	MTX44MultVec4__5CMathFPA4_fP3VecP5Vec4d(&Math, screenMtx, &viewPos, &clipPos);
+	Math.MTX44MultVec4(screenMtx, &viewPos, &clipPos);
 
 	clipPos.x = clipPos.x * (FLOAT_803309cc / clipPos.w);
 	clipPos.y = clipPos.y * (FLOAT_803309cc / clipPos.w);
@@ -251,7 +248,7 @@ void CRingMenu::DrawIcon()
 	if (*reinterpret_cast<short*>(scriptFood + 0x1C) != 0) {
 		tlut = 0;
 	}
-	SetExternalTlut__8CTextureFPvi(MenuPcs.m_textures[0x18], tlut, 1);
+	MenuPcs.m_textures[0x18]->SetExternalTlut(tlut, 1);
 	GXSetTevDirect(GX_TEVSTAGE2);
 	_GXSetTevColorIn(GX_TEVSTAGE2, GX_CC_ZERO, GX_CC_CPREV, GX_CC_ONE, GX_CC_RASA);
 	_GXSetTevAlphaIn(GX_TEVSTAGE2, GX_CA_ZERO, GX_CA_APREV, GX_CA_KONST, GX_CA_ZERO);

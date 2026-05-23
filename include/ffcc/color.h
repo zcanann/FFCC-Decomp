@@ -11,6 +11,7 @@ public:
 	CColor(CColor& other);
 	CColor(_GXColor& other);
 	operator _GXColor();
+	operator _GXColor*();
 	void Identity();
 
 	GXColor color;

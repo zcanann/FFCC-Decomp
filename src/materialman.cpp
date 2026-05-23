@@ -1,4 +1,6 @@
 #include "ffcc/materialman.h"
+#include "ffcc/map.h"
+#include "ffcc/mapocttree.h"
 #include "ffcc/pad.h"
 #include "ffcc/chunkfile.h"
 #include "ffcc/linkage.h"
@@ -25,13 +27,6 @@ inline void* operator new(unsigned long, void* p)
 extern "C" unsigned long UnkMaterialSetGetter(void*);
 extern "C" void __ct__10CTexScrollFv(void*);
 extern "C" void __dt__10CTexScrollFv(void*, int);
-extern "C" int CheckName__8CTextureFPc(CTexture*, char*);
-extern "C" int CheckFrustum__6CBoundFR3VecPA4_ff(CBound*, Vec*, float (*)[4], float);
-extern "C" void SetShadow__12CMaterialManFR10CMapShadowPA4_fiUl(
-    CMaterialMan*, CMapShadow*, float (*)[4], int, unsigned long);
-class CMapKeyFrame;
-extern "C" void ReadFrame__12CMapKeyFrameFR10CChunkFilei(CMapKeyFrame*, CChunkFile*);
-extern "C" void ReadKey__12CMapKeyFrameFR10CChunkFilei(CMapKeyFrame*, CChunkFile*, int);
 extern float FLOAT_8032faf0;
 extern float FLOAT_8032faf4;
 extern float FLOAT_8032faf8;
@@ -95,13 +90,6 @@ static inline void _GXSetAlphaCompare(int comp0, int ref0, int op, int comp1, in
 {
     _GXSetAlphaCompare((_GXCompare)comp0, (unsigned char)ref0, (_GXAlphaOp)op, (_GXCompare)comp1, (unsigned char)ref1);
 }
-
-class CMapKeyFrame
-{
-public:
-    float Get();
-    void Calc();
-};
 
 template <class T>
 class CPtrArray
@@ -1916,7 +1904,7 @@ void CMaterialMan::SetPosition(
                 FLOAT_8032faf0);
 
             if (*(shadowBytes + 7) == 1) {
-                SetShadow__12CMaterialManFR10CMapShadowPA4_fiUl(this, shadow, viewMtx, i, 0);
+                SetShadow(*shadow, viewMtx, i, 0);
                 continue;
             }
 
@@ -1925,11 +1913,7 @@ void CMaterialMan::SetPosition(
                 ((*(shadowBytes + 9) != 2) || (position->y <= shadowPos.y));
             if ((ignoreFrustumCheck != 0) ||
                 (yFilterPass &&
-                 (CheckFrustum__6CBoundFR3VecPA4_ff(
-                      reinterpret_cast<CBound*>(&minX),
-                      &shadowPos,
-                      scaledShadowMtx,
-                      FLOAT_8032fafc) != 0))) {
+                 (reinterpret_cast<CBound*>(&minX)->CheckFrustum(shadowPos, scaledShadowMtx, FLOAT_8032fafc) != 0))) {
                 Vec delta;
                 PSVECSubtract(&shadowPos, position, &delta);
                 candidateWrite[0] = reinterpret_cast<int>(shadow);
@@ -1953,12 +1937,7 @@ void CMaterialMan::SetPosition(
 
         if (nearest != 0) {
             nearest[1] = static_cast<int>(FLOAT_8032fb04);
-            SetShadow__12CMaterialManFR10CMapShadowPA4_fiUl(
-                this,
-                reinterpret_cast<CMapShadow*>(nearest[0]),
-                viewMtx,
-                nearest[2],
-                0xFFFFFFFF);
+            SetShadow(*reinterpret_cast<CMapShadow*>(nearest[0]), viewMtx, nearest[2], 0xFFFFFFFF);
         }
     } else {
         int targetOffset = static_cast<int>(target);
@@ -1985,12 +1964,8 @@ void CMaterialMan::SetPosition(
                 FLOAT_8032faf0);
 
             if ((*(shadowBytes + 7) == 1) ||
-                (CheckFrustum__6CBoundFR3VecPA4_ff(
-                     reinterpret_cast<CBound*>(&minX),
-                     &shadowPos,
-                     scaledShadowMtx,
-                     FLOAT_8032fafc) != 0)) {
-                SetShadow__12CMaterialManFR10CMapShadowPA4_fiUl(this, shadow, viewMtx, i, 0);
+                (reinterpret_cast<CBound*>(&minX)->CheckFrustum(shadowPos, scaledShadowMtx, FLOAT_8032fafc) != 0)) {
+                SetShadow(*shadow, viewMtx, i, 0);
             }
         }
     }
@@ -2066,11 +2041,7 @@ int CMaterialMan::GetCharaShadow(
             ((*(shadowBytes + 9) != 2) || (position->y <= shadowPos.y));
         if ((ignoreFrustumCheck != 0) ||
             (yFilterPass &&
-             (CheckFrustum__6CBoundFR3VecPA4_ff(
-                  reinterpret_cast<CBound*>(&minX),
-                  &shadowPos,
-                  scaledShadowMtx,
-                  FLOAT_8032fafc) != 0))) {
+             (reinterpret_cast<CBound*>(&minX)->CheckFrustum(shadowPos, scaledShadowMtx, FLOAT_8032fafc) != 0))) {
             Vec delta;
             PSVECSubtract(&shadowPos, position, &delta);
             candidateWrite[0] = reinterpret_cast<int>(shadow);
@@ -2135,8 +2106,8 @@ void CMaterialMan::SetShadowBound(CMapShadow::TARGET target, CBound* bound, floa
                         FLOAT_8032faf8, FLOAT_8032faf0);
 
         if ((*reinterpret_cast<unsigned char*>(Ptr(shadow, 7)) == 1) ||
-            (CheckFrustum__6CBoundFR3VecPA4_ff(bound, &position, scaledShadowMtx, FLOAT_8032fafc) != 0)) {
-            SetShadow__12CMaterialManFR10CMapShadowPA4_fiUl(this, shadow, viewMtx, i, 0xFFFFFFFF);
+            (bound->CheckFrustum(position, scaledShadowMtx, FLOAT_8032fafc) != 0)) {
+            SetShadow(*shadow, viewMtx, i, 0xFFFFFFFF);
         }
     }
 }
@@ -2786,16 +2757,14 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                     while (chunkFile.GetNextChunk(chunk) != 0) {
                         if (chunk.m_id == CHUNK_UFRM) {
                             keyFrameU = AllocMapKeyFrame(0xDD3);
-                            ReadFrame__12CMapKeyFrameFR10CChunkFilei(keyFrameU, &chunkFile);
+                            keyFrameU->ReadFrame(chunkFile, 0);
                         } else if (chunk.m_id == CHUNK_VFRM) {
                             keyFrameV = AllocMapKeyFrame(0xDDD);
-                            ReadFrame__12CMapKeyFrameFR10CChunkFilei(keyFrameV, &chunkFile);
+                            keyFrameV->ReadFrame(chunkFile, 0);
                         } else if (chunk.m_id == CHUNK_UKEY) {
-                            ReadKey__12CMapKeyFrameFR10CChunkFilei(
-                                keyFrameU, &chunkFile, static_cast<char>(chunk.m_arg0));
+                            keyFrameU->ReadKey(chunkFile, static_cast<char>(chunk.m_arg0));
                         } else if (chunk.m_id == CHUNK_VKEY) {
-                            ReadKey__12CMapKeyFrameFR10CChunkFilei(
-                                keyFrameV, &chunkFile, static_cast<char>(chunk.m_arg0));
+                            keyFrameV->ReadKey(chunkFile, static_cast<char>(chunk.m_arg0));
                         } else if (chunk.m_id == CHUNK_TSDT) {
                             unsigned int slot = chunkFile.Get2() & 0xFFFF;
                             chunkFile.Get2();
@@ -3122,8 +3091,7 @@ CMaterialSet::~CMaterialSet()
     for (unsigned long i = 0; i < UnkMaterialSetGetter(materials); i++) {
         CMaterial* const material = (*materials)[i];
         if (material != 0) {
-            void** const vtable = *reinterpret_cast<void***>(material);
-            reinterpret_cast<VirtualDtorFn>(vtable[2])(material, 1);
+            delete material;
         }
     }
 
@@ -3221,7 +3189,7 @@ unsigned int CMaterialSet::FindTexName(char* textureName, long* textureIndexOut)
             CMaterial* textureSlot = material;
 
             for (int slot = 0; slot < static_cast<int>(static_cast<unsigned int>(*reinterpret_cast<unsigned short*>(Ptr(material, 0x18)))); slot++) {
-                if (CheckName__8CTextureFPc(*reinterpret_cast<CTexture**>(Ptr(textureSlot, 0x3C)), textureName)) {
+                if ((*reinterpret_cast<CTexture**>(Ptr(textureSlot, 0x3C)))->CheckName(textureName)) {
                     if (textureIndexOut != 0) {
                         *textureIndexOut = slot;
                     }

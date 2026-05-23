@@ -70,6 +70,13 @@ public:
     void Quit();
     void Frame();
     unsigned short GetButtonDown(long);
+    unsigned short GetGbaButtonDown(long);
+    float GetRightStickY(long);
+    float GetRightStickX(long);
+    float GetLeftStickY(long);
+    float GetLeftStickX(long);
+    unsigned short GetButtonRepeat(long);
+    unsigned short GetButton(long);
     PadInput* GetPadInputs() { return m_padInputs; }
     const PadInput* GetPadInputs() const { return m_padInputs; }
     PadInput* GetMergedPad() { return &GetPadInputs()[4]; }

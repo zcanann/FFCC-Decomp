@@ -5,6 +5,7 @@
 #include "ffcc/p_camera.h"
 #include "ffcc/game.h"
 #include "ffcc/pppPart.h"
+#include "ffcc/textureman.h"
 
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
@@ -106,23 +107,24 @@ void pppRenderCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* para
 	float texH;
 	int* serializedDataOffsets = param_3->m_serializedDataOffsets;
 	s32 dataValIndex = param_2->m_dataValIndex;
-	CrystalWork* work = (CrystalWork*)((u8*)pppCrystal + serializedDataOffsets[2] + 0x80);
-	pppCrystalColorBlock* colorBlock = (pppCrystalColorBlock*)((u8*)pppCrystal + serializedDataOffsets[1] + 0x80);
+	CrystalWork* work = reinterpret_cast<CrystalWork*>(pppCrystal->m_object.m_workArea + serializedDataOffsets[2]);
+	pppCrystalColorBlock* colorBlock =
+		reinterpret_cast<pppCrystalColorBlock*>(pppCrystal->m_object.m_workArea + serializedDataOffsets[1]);
 
 	if (dataValIndex == 0xFFFF) {
 		return;
 	}
 
 	pppModelSt* model = (pppModelSt*)pppEnvStPtr->m_mapMeshPtr[dataValIndex];
-	void* indirectTex = 0;
+	CTexture* indirectTex = 0;
 	int texSlot = 0;
-	void* baseTex = ((CMapMesh*)model)->GetTexture(pppEnvStPtr->m_materialSetPtr, texSlot);
+	CTexture* baseTex = static_cast<CTexture*>(((CMapMesh*)model)->GetTexture(pppEnvStPtr->m_materialSetPtr, texSlot));
 	if (param_2->m_payload[0] == 0) {
 		if (param_2->m_initWOrk == 0xFFFF) {
 			return;
 		}
 		indirectTex =
-			pppEnvStPtr->m_mapMeshPtr[param_2->m_initWOrk]->GetTexture(pppEnvStPtr->m_materialSetPtr, texSlot);
+			static_cast<CTexture*>(pppEnvStPtr->m_mapMeshPtr[param_2->m_initWOrk]->GetTexture(pppEnvStPtr->m_materialSetPtr, texSlot));
 	}
 
 	int x = 0;
@@ -136,7 +138,7 @@ void pppRenderCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* para
 
 	pppSetBlendMode(param_2->m_payload[1]);
 	pppSetDrawEnv(
-		&colorBlock->m_color, (pppFMATRIX*)((u8*)pppCrystal + 0x40), param_2->m_arg3,
+		&colorBlock->m_color, &pppCrystal->m_object.m_drawMatrix, param_2->m_arg3,
 		param_2->m_payload[5], param_2->m_payload[4], param_2->m_payload[1], param_2->m_payload[2], 1, 1, param_2->m_payload[3]);
 
 	Mtx lightMtx;
@@ -147,8 +149,8 @@ void pppRenderCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* para
 		texH = CRYSTAL_REFRACTION_SIZE;
 	}
 	else {
-		texW = (float)*(u32*)((u8*)indirectTex + 0x64);
-		texH = (float)*(u32*)((u8*)indirectTex + 0x68);
+		texW = (float)indirectTex->m_width;
+		texH = (float)indirectTex->m_height;
 	}
 
 	CrystalIndTexMtx indMtx = s_crystalIndTexMtxBase;
@@ -175,7 +177,7 @@ void pppRenderCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* para
 	_GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD1, GX_TEXMAP0, GX_COLOR_NULL);
 	_GXSetTevOp(GX_TEVSTAGE0, GX_REPLACE);
 	_GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP0);
-	GXLoadTexObj((_GXTexObj*)((u8*)baseTex + 0x28), GX_TEXMAP2);
+	GXLoadTexObj(&baseTex->m_texObj, GX_TEXMAP2);
 	GXSetTexCoordGen2((GXTexCoordID)2, GX_TG_MTX2x4, GX_TG_TEX0, 0x3C, GX_FALSE, 0x7D);
 	_GXSetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD2, GX_TEXMAP2, GX_COLOR0A0);
 	_GXSetTevColorIn(GX_TEVSTAGE1, GX_CC_CPREV, GX_CC_TEXC, GX_CC_RASA, GX_CC_ZERO);
@@ -191,7 +193,7 @@ void pppRenderCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* para
 	if (param_2->m_payload[0] == 1) {
 		GXLoadTexObj(work->m_refractionTexObj, GX_TEXMAP1);
 	} else {
-		GXLoadTexObj((_GXTexObj*)((u8*)indirectTex + 0x28), GX_TEXMAP1);
+		GXLoadTexObj(&indirectTex->m_texObj, GX_TEXMAP1);
 	}
 	GXSetNumIndStages(1);
 	GXSetIndTexOrder((GXIndTexStageID)0, (GXTexCoordID)0, (GXTexMapID)1);
@@ -245,7 +247,7 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param
 		return;
 	}
 
-	work = (CrystalWork*)((u8*)pppCrystal + param_3->m_serializedDataOffsets[2] + 0x80);
+	work = reinterpret_cast<CrystalWork*>(pppCrystal->m_object.m_workArea + param_3->m_serializedDataOffsets[2]);
 	s32 dataValIndex = param_2->m_dataValIndex;
 	if (dataValIndex == 0xFFFF) {
 		return;
@@ -344,8 +346,8 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param
 void pppDestructCrystal(struct pppCrystal* pppCrystal, struct _pppCtrlTable* param_2)
 {
 	int* serializedDataOffsets = param_2->m_serializedDataOffsets;
-	u32* puVar1 = (u32*)((char*)pppCrystal + 0x80 + serializedDataOffsets[2]);
-	CMemory::CStage* stage = (CMemory::CStage*)puVar1[0];
+	CrystalWork* work = reinterpret_cast<CrystalWork*>(pppCrystal->m_object.m_workArea + serializedDataOffsets[2]);
+	CMemory::CStage* stage = reinterpret_cast<CMemory::CStage*>(work->m_refractionMap);
 
 	if ((stage != 0) && (*(CMemory::CStage**)stage != 0)) {
 		pppHeapUseRate(*(CMemory::CStage**)stage);
@@ -354,9 +356,9 @@ void pppDestructCrystal(struct pppCrystal* pppCrystal, struct _pppCtrlTable* par
 	if (stage != 0) {
 		pppHeapUseRate(stage);
 	}
-	if ((CMemory::CStage*)puVar1[1] != 0) {
-		pppHeapUseRate((CMemory::CStage*)puVar1[1]);
-		puVar1[1] = 0;
+	if (work->m_refractionTexObj != 0) {
+		pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(work->m_refractionTexObj));
+		work->m_refractionTexObj = 0;
 	}
 }
 
@@ -372,8 +374,8 @@ void pppDestructCrystal(struct pppCrystal* pppCrystal, struct _pppCtrlTable* par
 void pppConstructCrystal(struct pppCrystal* pppCrystal, struct _pppCtrlTable* param_2)
 {
 	int* serializedDataOffsets = param_2->m_serializedDataOffsets;
-	u32* data = (u32*)((char*)pppCrystal + serializedDataOffsets[2] + 0x80);
+	CrystalWork* work = reinterpret_cast<CrystalWork*>(pppCrystal->m_object.m_workArea + serializedDataOffsets[2]);
 
-	data[0] = 0;
-	data[1] = 0;
+	work->m_refractionMap = 0;
+	work->m_refractionTexObj = 0;
 }

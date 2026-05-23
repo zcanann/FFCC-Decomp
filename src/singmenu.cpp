@@ -7,6 +7,7 @@
 #include "ffcc/gxfunc.h"
 #include "ffcc/joybus.h"
 #include "ffcc/memory.h"
+#include "ffcc/mesmenu.h"
 #include "ffcc/p_chara.h"
 #include "ffcc/pad.h"
 #include "ffcc/game.h"
@@ -84,8 +85,6 @@ struct SingMenuSoloNameTable
     char* entries[9];
 };
 
-extern "C" void DrawHeart__8CMesMenuFffff(void*, float, float, float, float);
-extern "C" int GetModelNo__8CMenuPcsFiii(CMenuPcs*, int, int, int);
 extern "C" char* s_stand_80332a24;
 char s_singmenu_cpp_801de8d4[] = "singmenu.cpp";
 extern "C" char* s_dvd__smenu__s_tex_801de8e4;
@@ -804,7 +803,6 @@ extern "C" unsigned int MLstOpen__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int MLstCtrl__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int MLstClose__8CMenuPcsFv(CMenuPcs*);
 extern "C" void MLstDraw__8CMenuPcsFv(CMenuPcs*);
-extern "C" void CalcHeart__8CMesMenuFv(void*);
 
 extern float FLOAT_8033292c;
 extern float FLOAT_80332930;
@@ -1060,8 +1058,7 @@ void CMenuPcs::SingMenuInit()
     *reinterpret_cast<CCharaPcs::CHandle**>(self + 0x774) = handle;
 
     handle->Add();
-    int modelNo = GetModelNo__8CMenuPcsFiii(
-        this,
+    int modelNo = GetModelNo(
         static_cast<int>(*reinterpret_cast<u16*>(Game.m_scriptFoodBase[0] + 0x3E0)),
         static_cast<int>(*reinterpret_cast<u16*>(Game.m_scriptFoodBase[0] + 0x3E4)),
         static_cast<int>(*reinterpret_cast<u16*>(Game.m_scriptFoodBase[0] + 0x3E2)));
@@ -2113,7 +2110,7 @@ void CMenuPcs::SingleCalcCtrl()
         break;
     }
 
-    CalcHeart__8CMesMenuFv(*reinterpret_cast<void**>(self + 0x268));
+    reinterpret_cast<CMesMenu*>(*reinterpret_cast<void**>(self + 0x268))->CalcHeart();
     *reinterpret_cast<unsigned short*>(statePtr + 0x2E) = result;
 
     bool hasInput = (Pad._452_4_ != 0) || (Pad._448_4_ != -1);
@@ -3282,8 +3279,8 @@ void CMenuPcs::DrawSingLife()
 
     int halfHearts = static_cast<unsigned int>(*reinterpret_cast<unsigned short*>(scriptFood + 0x1A) >> 1);
     float x = FLOAT_80332918 + static_cast<float>(((8 - halfHearts) * 0x18) / 2);
-    DrawHeart__8CMesMenuFffff(*reinterpret_cast<void**>(reinterpret_cast<u8*>(this) + 0x268), x, y - FLOAT_80332930, FLOAT_80332934,
-                              FLOAT_80332934);
+    reinterpret_cast<CMesMenu*>(*reinterpret_cast<void**>(reinterpret_cast<u8*>(this) + 0x268))
+        ->DrawHeart(x, y - FLOAT_80332930, FLOAT_80332934, FLOAT_80332934);
 }
 
 /*

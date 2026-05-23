@@ -68,12 +68,6 @@ extern "C" const double kCharaSharedSignedIntBias = 4503601774854144.0;
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
-extern "C" void SRTToMatrix__5CMathFPA4_fP3SRT(void*, Mtx, void*);
-extern "C" void Printf__8CGraphicFPce(void*, const char*, ...);
-extern "C" void Destroy__6CCharaFv(CChara*);
-extern "C" void Create__6CCharaFv(CChara*);
-extern "C" void* createTextureSet__9CCharaPcsFPvi(void*, void*, int);
-extern "C" void Create__Q26CChara5CAnimFPvPQ27CMemory6CStage(void*, void*, void*);
 extern "C" float FLOAT_80330BEC;
 extern "C" float FLOAT_80330BF0;
 extern "C" double fmod(double, double);
@@ -313,7 +307,7 @@ void CCharaPcs::drawViewer()
         CChara::CModel* model = self->m_viewerModel[i];
         if (model != 0) {
             if (ViewerModelTextureSet(model) == 0) {
-                Printf__8CGraphicFPce(&Graphic, s_no_texture);
+                Graphic.Printf(const_cast<char*>(s_no_texture));
             } else {
                 CStopWatch watch(const_cast<char*>(kCharaViewerNoName));
                 watch.Reset();
@@ -344,7 +338,7 @@ void CCharaPcs::drawViewer()
                 if (i == 0) {
                     float totalTime = watch.Get();
                     float gpuTime = totalTime - cpuTime;
-                    Printf__8CGraphicFPce(&Graphic, s_gpu_profile_fmt, totalTime, cpuTime, gpuTime);
+                    Graphic.Printf(const_cast<char*>(s_gpu_profile_fmt), totalTime, cpuTime, gpuTime);
                 }
             }
         }
@@ -435,8 +429,7 @@ void CCharaPcs::calcViewer()
                     CChara::CAnim* anim =
                         new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_viewer_cpp), 0x111) CChara::CAnim;
                     self->m_viewerAnim[0] = anim;
-                    Create__Q26CChara5CAnimFPvPQ27CMemory6CStage(
-                        self->m_viewerAnim[0], File.m_readBuffer, self->m_viewerAnimStage);
+                    self->m_viewerAnim[0]->Create(File.m_readBuffer, self->m_viewerAnimStage);
                     File.Close(fileHandle);
                 }
                 self->m_viewerLoadAnim = 0;
@@ -453,8 +446,7 @@ void CCharaPcs::calcViewer()
                         CChara::CAnim* anim =
                             new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_viewer_cpp), 0x124) CChara::CAnim;
                         self->m_viewerAnimBank[idx] = anim;
-                        Create__Q26CChara5CAnimFPvPQ27CMemory6CStage(
-                            self->m_viewerAnimBank[idx], File.m_readBuffer, self->m_viewerAnimStage);
+                        self->m_viewerAnimBank[idx]->Create(File.m_readBuffer, self->m_viewerAnimStage);
                         File.Close(fileHandle);
                         if (idx == 0) {
                             self->m_viewerAnim[0] = self->m_viewerAnimBank[0];
@@ -474,8 +466,7 @@ void CCharaPcs::calcViewer()
                 ReleaseShared(self->m_viewerTextureSet[0]);
                 File.Read(fileHandle);
                 File.SyncCompleted(fileHandle);
-                self->m_viewerTextureSet[0] =
-                    reinterpret_cast<CTextureSet*>(createTextureSet__9CCharaPcsFPvi(self, File.m_readBuffer, 0));
+                self->m_viewerTextureSet[0] = createTextureSet(File.m_readBuffer, 0);
                 File.Close(fileHandle);
             }
             self->m_viewerLoadTexture = 0;
@@ -500,9 +491,9 @@ void CCharaPcs::calcViewer()
         initAlive = 1;
     }
     alive++;
-    Printf__8CGraphicFPce(&Graphic, kCharaViewerChoiceFmt,
-                          (int)(char)pFan[(alive >> 4) % 4],
-                          USBPcs.m_rootPath);
+    Graphic.Printf(const_cast<char*>(kCharaViewerChoiceFmt),
+                   (int)(char)pFan[(alive >> 4) % 4],
+                   USBPcs.m_rootPath);
 
     unsigned short heldButtons;
     unsigned short triggerButtons;
@@ -657,7 +648,7 @@ void CCharaPcs::calcViewer()
         srt.transX = translateX;
 
         Mtx modelMtx;
-        SRTToMatrix__5CMathFPA4_fP3SRT(&Math, modelMtx, &srt);
+        Math.SRTToMatrix(modelMtx, reinterpret_cast<SRT*>(&srt));
         model->SetMatrix(modelMtx);
 
         CStopWatch matrixWatch(const_cast<char*>(kCharaViewerNoName));
@@ -679,7 +670,7 @@ void CCharaPcs::calcViewer()
                 float animFrames = (float)*reinterpret_cast<unsigned short*>(
                     reinterpret_cast<unsigned char*>(modelAnim) + 0x10);
                 float frame = (float)fmod((double)ViewerModelTime(model), (double)(frameAdvance + animFrames));
-                Printf__8CGraphicFPce(&Graphic, s_frame_speed_fmt, frame, frameAdvance);
+                Graphic.Printf(const_cast<char*>(s_frame_speed_fmt), frame, frameAdvance);
             }
             if (self->m_viewerSavedAnim != 0) {
                 const char* iframeMode = kCharaViewerOff;
@@ -690,13 +681,13 @@ void CCharaPcs::calcViewer()
                 if (self->m_viewerSavedAnimState == 0) {
                     iframeState = kCharaViewerOrg;
                 }
-                Printf__8CGraphicFPce(&Graphic, s_iframe_fmt, iframeMode, self->m_viewerSavedFrame, iframeState);
+                Graphic.Printf(const_cast<char*>(s_iframe_fmt), iframeMode, self->m_viewerSavedFrame, iframeState);
             }
             if (self->m_viewerAnimLoadedCount != 0) {
-                Printf__8CGraphicFPce(&Graphic, s_cont_fmt, self->m_viewerAnimLoopIndex);
+                Graphic.Printf(const_cast<char*>(s_cont_fmt), self->m_viewerAnimLoopIndex);
             }
-            Printf__8CGraphicFPce(&Graphic, s_cpu_profile_fmt, matrixTime + skinTime, matrixTime, skinTime,
-                                  ViewerModelNodeCount(model));
+            Graphic.Printf(const_cast<char*>(s_cpu_profile_fmt), matrixTime + skinTime, matrixTime, skinTime,
+                           ViewerModelNodeCount(model));
         }
     }
 }
@@ -715,7 +706,7 @@ void CCharaPcs::destroyViewer()
     unsigned int i;
     unsigned int j;
 
-    Destroy__6CCharaFv(&Chara);
+    Chara.Destroy();
     LightPcs.DestroyBumpLightAll(static_cast<CLightPcs::TARGET>(0));
     gCharaPartWorkPtr = 0;
 
@@ -848,8 +839,7 @@ void CCharaPcs::createViewer()
     if (fileHandle != 0) {
         File.Read(fileHandle);
         File.SyncCompleted(fileHandle);
-        self->m_viewerBackTextureSet =
-            reinterpret_cast<CTextureSet*>(createTextureSet__9CCharaPcsFPvi(self, File.m_readBuffer, 0));
+        self->m_viewerBackTextureSet = createTextureSet(File.m_readBuffer, 0);
         File.Close(fileHandle);
     }
 
@@ -874,5 +864,5 @@ void CCharaPcs::createViewer()
         &bumpLight, static_cast<CLightPcs::TARGET>(0),
         *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(&Chara) + 0x2058), 4));
 
-    Create__6CCharaFv(&Chara);
+    Chara.Create();
 }

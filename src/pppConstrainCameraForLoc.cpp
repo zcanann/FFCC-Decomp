@@ -9,7 +9,6 @@ extern int gPppCalcDisabled;
 #include "ffcc/util.h"
 #include <dolphin/mtx.h>
 
-extern "C" void GetDirectVector__5CUtilFP3VecP3Vec3Vec(void*, Vec*, Vec*, Vec);
 static inline float CameraPosX() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xE0); }
 static inline float CameraPosY() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xE4); }
 static inline float CameraPosZ() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xE8); }
@@ -167,7 +166,7 @@ int CC_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void*)
 
     fVar3 = *(float*)(owner + 0x1c);
     fVar2 = *(float*)(owner + 0x2c);
-    GetDirectVector__5CUtilFP3VecP3Vec3Vec((void*)&gUtil, &local_c8, &local_d4, local_b0);
+    gUtil.GetDirectVector(&local_c8, &local_d4, local_b0);
 
     local_e0.x = fVar3 * local_c8.x;
     local_e0.y = fVar3 * local_c8.y;

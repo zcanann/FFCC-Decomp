@@ -334,7 +334,7 @@ void CPartPcs::pppSetDebugHide(unsigned char hide)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void CalcHitPosition__7CMapPcsFP3Vec(CMapPcs*, Vec* hitPosition)
+void CMapPcs::CalcHitPosition(Vec* hitPosition)
 {
     MapMng.m_hitMapObj->CalcHitPosition(hitPosition);
 }
@@ -348,8 +348,7 @@ extern "C" void CalcHitPosition__7CMapPcsFP3Vec(CMapPcs*, Vec* hitPosition)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" int CheckHitCylinderNear__7CMapPcsFP3VecP3VecfUl(
-    CMapPcs*, Vec* cylinderBottom, Vec* direction, float radius, unsigned long hitMask)
+int CMapPcs::CheckHitCylinderNear(Vec* cylinderBottom, Vec* direction, float radius, unsigned long hitMask)
 {
     CMapCylinderRaw cylinder;
 
@@ -376,9 +375,9 @@ extern "C" int CheckHitCylinderNear__7CMapPcsFP3VecP3VecfUl(
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" unsigned char* GetTmpFrameBuffer__8CGraphicFv(CGraphic* graphic)
+unsigned char* CGraphic::GetTmpFrameBuffer()
 {
-    return static_cast<unsigned char*>(graphic->m_scratchTextureBuffer);
+    return static_cast<unsigned char*>(m_scratchTextureBuffer);
 }
 
 /*
@@ -477,9 +476,9 @@ void CCameraPcs::SetShadowAuto(int enable)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void SetTexShadowRadius__9CCharaPcsFf(void* charaPcs, float texShadowRadius)
+void CCharaPcs::SetTexShadowRadius(float texShadowRadius)
 {
-    *(float*)((char*)charaPcs + 0x188) = texShadowRadius;
+    m_texShadowRadius = texShadowRadius;
 }
 
 /*
@@ -491,20 +490,9 @@ extern "C" void SetTexShadowRadius__9CCharaPcsFf(void* charaPcs, float texShadow
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void SetTexShadowColor__9CCharaPcsF8_GXColor(void* charaPcs, const unsigned char* color)
+void CCharaPcs::SetTexShadowColor(_GXColor color)
 {
-    unsigned char* self = (unsigned char*)charaPcs;
-    unsigned char c1;
-    unsigned char c2;
-
-    c1 = color[0];
-    c2 = color[1];
-    self[0x18C] = c1;
-    c1 = color[2];
-    self[0x18D] = c2;
-    c2 = color[3];
-    self[0x18E] = c1;
-    self[0x18F] = c2;
+    m_texShadowColor = color;
 }
 
 /*
@@ -530,9 +518,9 @@ CColor::operator _GXColor()
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" _GXColor* __opP8_GXColor__6CColorFv(CColor* self)
+CColor::operator _GXColor*()
 {
-    return &self->color;
+    return &color;
 }
 
 /*
@@ -544,13 +532,9 @@ extern "C" _GXColor* __opP8_GXColor__6CColorFv(CColor* self)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void SetTexShadowPos__9CCharaPcsFP3Vec(void* charaPcs, Vec* vec)
+void CCharaPcs::SetTexShadowPos(Vec* vec)
 {
-    float* self = (float*)((char*)charaPcs + 0x17C);
-
-    self[0] = vec->x;
-    self[1] = vec->y;
-    self[2] = vec->z;
+    m_texShadowPos = *vec;
 }
 
 /*
@@ -562,9 +546,9 @@ extern "C" void SetTexShadowPos__9CCharaPcsFP3Vec(void* charaPcs, Vec* vec)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void SetEvtWord__12CCaravanWorkFis(CCaravanWork* caravanWork, int evtWordIndex, short evtWord)
+void CCaravanWork::SetEvtWord(int evtWordIndex, short evtWord)
 {
-    caravanWork->m_evtWordArr[evtWordIndex] = evtWord;
+    m_evtWordArr[evtWordIndex] = evtWord;
 }
 
 /*
@@ -576,9 +560,9 @@ extern "C" void SetEvtWord__12CCaravanWorkFis(CCaravanWork* caravanWork, int evt
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" int GetEvtWord__12CCaravanWorkFi(CCaravanWork* caravanWork, int evtWordIndex)
+int CCaravanWork::GetEvtWord(int evtWordIndex)
 {
-    return caravanWork->m_evtWordArr[evtWordIndex];
+    return m_evtWordArr[evtWordIndex];
 }
 
 /*
@@ -590,19 +574,19 @@ extern "C" int GetEvtWord__12CCaravanWorkFi(CCaravanWork* caravanWork, int evtWo
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void SetEvtFlag__12CCaravanWorkFii(CCaravanWork* caravanWork, int evtFlagIndex, int value)
+void CCaravanWork::SetEvtFlag(int evtFlagIndex, int value)
 {
     if (value != 0) {
         int byteIndex = evtFlagIndex / 8;
         int bit = 1 << (evtFlagIndex % 8);
-        reinterpret_cast<unsigned char*>(caravanWork->m_evtWorkArr)[byteIndex] |= bit;
+        reinterpret_cast<unsigned char*>(m_evtWorkArr)[byteIndex] |= bit;
         return;
     }
 
     {
         int byteIndex = evtFlagIndex / 8;
         int bit = 1 << (evtFlagIndex % 8);
-        reinterpret_cast<unsigned char*>(caravanWork->m_evtWorkArr)[byteIndex] &= ~bit;
+        reinterpret_cast<unsigned char*>(m_evtWorkArr)[byteIndex] &= ~bit;
     }
 }
 
@@ -615,9 +599,9 @@ extern "C" void SetEvtFlag__12CCaravanWorkFii(CCaravanWork* caravanWork, int evt
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" int GetEvtFlag__12CCaravanWorkFi(CCaravanWork* caravanWork, int evtFlagIndex)
+int CCaravanWork::GetEvtFlag(int evtFlagIndex)
 {
-    unsigned char* evtFlags = reinterpret_cast<unsigned char*>(caravanWork->m_evtWorkArr);
+    unsigned char* evtFlags = reinterpret_cast<unsigned char*>(m_evtWorkArr);
     int byteIndex = evtFlagIndex / 8;
     unsigned char value = evtFlags[byteIndex];
     int mask = 1 << (evtFlagIndex % 8);
@@ -634,9 +618,9 @@ extern "C" int GetEvtFlag__12CCaravanWorkFi(CCaravanWork* caravanWork, int evtFl
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void SetTempValue__4CMesFii(int index, int value)
+void CMes::SetTempValue(int index, int value)
 {
-    CMes::m_tempVar[index] = value;
+    m_tempVar[index] = value;
 }
 
 /*
@@ -648,17 +632,16 @@ extern "C" void SetTempValue__4CMesFii(int index, int value)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" unsigned short GetGbaButtonDown__4CPadFl(void* pad, long padIndex)
+unsigned short CPad::GetGbaButtonDown(long padIndex)
 {
     bool isInvalidPad = false;
     unsigned int result;
-    CPad* self = static_cast<CPad*>(pad);
 
-    if (self->_452_4_ == 0) {
+    if (_452_4_ == 0) {
         if (padIndex != 0) {
             goto done_check;
         }
-        if (self->_448_4_ == -1) {
+        if (_448_4_ == -1) {
             goto done_check;
         }
     }
@@ -668,8 +651,8 @@ done_check:
     if (isInvalidPad) {
         result = 0;
     } else {
-        int slot = (self->_448_4_ == padIndex) ? 0 : static_cast<int>(padIndex);
-        result = self->GetPadInputs()[slot].buttonDown[1];
+        int slot = (_448_4_ == padIndex) ? 0 : static_cast<int>(padIndex);
+        result = GetPadInputs()[slot].buttonDown[1];
     }
 
     return (unsigned short)result;
@@ -684,16 +667,15 @@ done_check:
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" float GetRightStickY__4CPadFl(void* pad, long padIndex)
+float CPad::GetRightStickY(long padIndex)
 {
     bool isInvalidPad = false;
-    CPad* self = static_cast<CPad*>(pad);
 
-    if (self->_452_4_ == 0) {
+    if (_452_4_ == 0) {
         if (padIndex != 0) {
             goto done_check;
         }
-        if (self->_448_4_ == -1) {
+        if (_448_4_ == -1) {
             goto done_check;
         }
     }
@@ -704,8 +686,8 @@ done_check:
         return FLOAT_80330B30;
     }
 
-    int slot = (self->_448_4_ == padIndex) ? 0 : static_cast<int>(padIndex);
-    return self->GetPadInputs()[slot].substickYF;
+    int slot = (_448_4_ == padIndex) ? 0 : static_cast<int>(padIndex);
+    return GetPadInputs()[slot].substickYF;
 }
 
 /*
@@ -717,16 +699,15 @@ done_check:
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" float GetRightStickX__4CPadFl(void* pad, long padIndex)
+float CPad::GetRightStickX(long padIndex)
 {
     bool isInvalidPad = false;
-    CPad* self = static_cast<CPad*>(pad);
 
-    if (self->_452_4_ == 0) {
+    if (_452_4_ == 0) {
         if (padIndex != 0) {
             goto done_check;
         }
-        if (self->_448_4_ == -1) {
+        if (_448_4_ == -1) {
             goto done_check;
         }
     }
@@ -737,8 +718,8 @@ done_check:
         return FLOAT_80330B30;
     }
 
-    int slot = (self->_448_4_ == padIndex) ? 0 : static_cast<int>(padIndex);
-    return self->GetPadInputs()[slot].substickXF;
+    int slot = (_448_4_ == padIndex) ? 0 : static_cast<int>(padIndex);
+    return GetPadInputs()[slot].substickXF;
 }
 
 /*
@@ -750,16 +731,15 @@ done_check:
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" float GetLeftStickY__4CPadFl(void* pad, long padIndex)
+float CPad::GetLeftStickY(long padIndex)
 {
     bool isInvalidPad = false;
-    CPad* self = static_cast<CPad*>(pad);
 
-    if (self->_452_4_ == 0) {
+    if (_452_4_ == 0) {
         if (padIndex != 0) {
             goto done_check;
         }
-        if (self->_448_4_ == -1) {
+        if (_448_4_ == -1) {
             goto done_check;
         }
     }
@@ -770,8 +750,8 @@ done_check:
         return FLOAT_80330B30;
     }
 
-    int slot = (self->_448_4_ == padIndex) ? 0 : static_cast<int>(padIndex);
-    return self->GetPadInputs()[slot].stickYF;
+    int slot = (_448_4_ == padIndex) ? 0 : static_cast<int>(padIndex);
+    return GetPadInputs()[slot].stickYF;
 }
 
 /*
@@ -783,16 +763,15 @@ done_check:
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" float GetLeftStickX__4CPadFl(void* pad, long padIndex)
+float CPad::GetLeftStickX(long padIndex)
 {
     bool isInvalidPad = false;
-    CPad* self = static_cast<CPad*>(pad);
 
-    if (self->_452_4_ == 0) {
+    if (_452_4_ == 0) {
         if (padIndex != 0) {
             goto done_check;
         }
-        if (self->_448_4_ == -1) {
+        if (_448_4_ == -1) {
             goto done_check;
         }
     }
@@ -803,8 +782,8 @@ done_check:
         return FLOAT_80330B30;
     }
 
-    int slot = (self->_448_4_ == padIndex) ? 0 : static_cast<int>(padIndex);
-    return self->GetPadInputs()[slot].stickXF;
+    int slot = (_448_4_ == padIndex) ? 0 : static_cast<int>(padIndex);
+    return GetPadInputs()[slot].stickXF;
 }
 
 /*
@@ -816,17 +795,16 @@ done_check:
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" unsigned short GetButtonRepeat__4CPadFl(void* pad, long padIndex)
+unsigned short CPad::GetButtonRepeat(long padIndex)
 {
     bool isInvalidPad = false;
     unsigned int result;
-    CPad* self = static_cast<CPad*>(pad);
 
-    if (self->_452_4_ == 0) {
+    if (_452_4_ == 0) {
         if (padIndex != 0) {
             goto done_check;
         }
-        if (self->_448_4_ == -1) {
+        if (_448_4_ == -1) {
             goto done_check;
         }
     }
@@ -836,8 +814,8 @@ done_check:
     if (isInvalidPad) {
         result = 0;
     } else {
-        int slot = (self->_448_4_ == padIndex) ? 0 : static_cast<int>(padIndex);
-        result = self->GetPadInputs()[slot].repeatButton;
+        int slot = (_448_4_ == padIndex) ? 0 : static_cast<int>(padIndex);
+        result = GetPadInputs()[slot].repeatButton;
     }
 
     return (unsigned short)result;
@@ -852,17 +830,16 @@ done_check:
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" unsigned short GetButton__4CPadFl(void* pad, long padIndex)
+unsigned short CPad::GetButton(long padIndex)
 {
     bool isInvalidPad = false;
     unsigned int result;
-    CPad* self = static_cast<CPad*>(pad);
 
-    if (self->_452_4_ == 0) {
+    if (_452_4_ == 0) {
         if (padIndex != 0) {
             goto done_check;
         }
-        if (self->_448_4_ == -1) {
+        if (_448_4_ == -1) {
             goto done_check;
         }
     }
@@ -872,8 +849,8 @@ done_check:
     if (isInvalidPad) {
         result = 0;
     } else {
-        int slot = (self->_448_4_ == padIndex) ? 0 : static_cast<int>(padIndex);
-        result = self->GetPadInputs()[slot].button[0];
+        int slot = (_448_4_ == padIndex) ? 0 : static_cast<int>(padIndex);
+        result = GetPadInputs()[slot].button[0];
     }
 
     return (unsigned short)result;
@@ -888,19 +865,9 @@ done_check:
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void SetMapShadeColor__9CCharaPcsFi6CColor(void* charaPcs, int shadeIndex, const unsigned char* color)
+void CCharaPcs::SetMapShadeColor(int shadeIndex, CColor color)
 {
-    unsigned int offset = shadeIndex * 4;
-    unsigned char value1 = color[0];
-    unsigned int self = reinterpret_cast<unsigned int>(charaPcs) + offset;
-    unsigned char value2 = color[1];
-
-    *reinterpret_cast<unsigned char*>(self + 0x12C) = value1;
-    value1 = color[2];
-    *reinterpret_cast<unsigned char*>(self + 0x12D) = value2;
-    value2 = color[3];
-    *reinterpret_cast<unsigned char*>(self + 0x12E) = value1;
-    *reinterpret_cast<unsigned char*>(self + 0x12F) = value2;
+    m_viewerChoiceColor[shadeIndex] = color;
 }
 
 /*
@@ -912,9 +879,9 @@ extern "C" void SetMapShadeColor__9CCharaPcsFi6CColor(void* charaPcs, int shadeI
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void SetNoFreeMergeMask__9CCharaPcsFi(void* charaPcs, int mask)
+void CCharaPcs::SetNoFreeMergeMask(int mask)
 {
-    *(int*)((char*)charaPcs + 0x718) = mask;
+    m_noFreeMergeMask = mask;
 }
 
 /*
@@ -954,9 +921,9 @@ void CMemory::SetDefaultGroup(int group)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void SetCharaAllocStage__9CCharaPcsFi(void* charaPcs, int stage)
+void CCharaPcs::SetCharaAllocStage(int stage)
 {
-    *(int*)((char*)charaPcs + 0xE4) = stage;
+    m_charaAllocStage = stage;
 }
 
 /*
@@ -968,9 +935,9 @@ extern "C" void SetCharaAllocStage__9CCharaPcsFi(void* charaPcs, int stage)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void SetUseDOF__11CGraphicPcsFi(void* graphicPcs, int enabled)
+void CGraphicPcs::SetUseDOF(int enabled)
 {
-    *(int*)((char*)graphicPcs + 0xC0) = enabled;
+    m_dofFlag = enabled;
 }
 
 /*
@@ -1038,9 +1005,9 @@ void CFile::CHandle::Read()
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void ReqScreenCapture__11CGraphicPcsFv(void* graphicPcs)
+void CGraphicPcs::ReqScreenCapture()
 {
-    static_cast<CGraphicPcs*>(graphicPcs)->m_copySaveFlag = 1;
+    m_copySaveFlag = 1;
 }
 
 /*
@@ -1192,8 +1159,9 @@ PPPCREATEPARAM::PPPCREATEPARAM()
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void __opR3Vec__7CVectorFv(void)
+CVector::operator Vec&()
 {
+    return *reinterpret_cast<Vec*>(this);
 }
 
 /*
@@ -1234,7 +1202,7 @@ void CCameraPcs::GetWorldMapMatrix(float (*matrix)[4])
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void IsHitDrawMode__7CMapPcsFc(CMapPcs*, unsigned char drawMode)
+void CMapPcs::IsHitDrawMode(unsigned char drawMode)
 {
     gMapHitDrawMode.m_byte = drawMode;
 }
@@ -1390,8 +1358,9 @@ void VECMultAdd(Vec* a, Vec* b, Vec* out, float scale)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void __opP3Vec__7CVectorFv(void)
+CVector::operator Vec*()
 {
+    return reinterpret_cast<Vec*>(this);
 }
 
 /*
@@ -1866,8 +1835,8 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
 
     switch (systemFunc) {
     case -0xFD: {
-        const double stickX = GetLeftStickX__4CPadFl(&Pad, *object->m_localBase);
-        const double stickY = GetLeftStickY__4CPadFl(&Pad, *object->m_localBase);
+        const double stickX = Pad.GetLeftStickX(*object->m_localBase);
+        const double stickY = Pad.GetLeftStickY(*object->m_localBase);
         *reinterpret_cast<float*>(object->m_localBase[1]) = static_cast<float>(stickX);
         *reinterpret_cast<float*>(object->m_localBase[2]) = static_cast<float>(stickY);
         runtime->push(object, 0);
@@ -1981,11 +1950,10 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
             static_cast<float>(object->m_localBase[2]),
         };
         Vec cylinderTop = { 0.0f, 1.0f, 0.0f };
-        if (CheckHitCylinderNear__7CMapPcsFP3VecP3VecfUl(
-                &MapPcs, &hitPosition, &cylinderTop, static_cast<float>(0.0f), object->m_localBase[3]) == 0) {
+        if (MapPcs.CheckHitCylinderNear(&hitPosition, &cylinderTop, static_cast<float>(0.0f), object->m_localBase[3]) == 0) {
             runtime->push(object, 0);
         } else {
-            CalcHitPosition__7CMapPcsFP3Vec(&MapPcs, &hitPosition);
+            MapPcs.CalcHitPosition(&hitPosition);
             *reinterpret_cast<float*>(object->m_localBase[4]) = hitPosition.y;
             runtime->push(object, 1);
         }
@@ -2357,9 +2325,9 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
             static_cast<u8>(object->m_localBase[5]),
             static_cast<u8>(object->m_localBase[6]),
         };
-        SetTexShadowPos__9CCharaPcsFP3Vec(&CharaPcs, &position);
-        SetTexShadowColor__9CCharaPcsF8_GXColor(&CharaPcs, reinterpret_cast<const unsigned char*>(&color));
-        SetTexShadowRadius__9CCharaPcsFf(&CharaPcs, static_cast<float>(object->m_localBase[7]));
+        CharaPcs.SetTexShadowPos(&position);
+        CharaPcs.SetTexShadowColor(color);
+        CharaPcs.SetTexShadowRadius(static_cast<float>(object->m_localBase[7]));
         runtime->push(object, 0);
         outResult = 0;
         return;
@@ -2517,25 +2485,24 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         outResult = 0;
         return;
     case -0xA7:
-        SetEvtWord__12CCaravanWorkFis(
-            &Game.m_caravanWorkArr[*object->m_localBase], object->m_localBase[1], static_cast<short>(object->m_localBase[2]));
+        Game.m_caravanWorkArr[*object->m_localBase].SetEvtWord(object->m_localBase[1],
+            static_cast<short>(object->m_localBase[2]));
         runtime->push(object, 0);
         outResult = 0;
         return;
     case -0xA6:
         runtime->push(
-            object, GetEvtWord__12CCaravanWorkFi(&Game.m_caravanWorkArr[*object->m_localBase], object->m_localBase[1]));
+            object, Game.m_caravanWorkArr[*object->m_localBase].GetEvtWord(object->m_localBase[1]));
         outResult = 0;
         return;
     case -0xA5:
-        SetEvtFlag__12CCaravanWorkFii(
-            &Game.m_caravanWorkArr[*object->m_localBase], object->m_localBase[1], object->m_localBase[2]);
+        Game.m_caravanWorkArr[*object->m_localBase].SetEvtFlag(object->m_localBase[1], object->m_localBase[2]);
         runtime->push(object, 0);
         outResult = 0;
         return;
     case -0xA4:
         runtime->push(
-            object, GetEvtFlag__12CCaravanWorkFi(&Game.m_caravanWorkArr[*object->m_localBase], object->m_localBase[1]));
+            object, Game.m_caravanWorkArr[*object->m_localBase].GetEvtFlag(object->m_localBase[1]));
         outResult = 0;
         return;
     case -0xA3:
@@ -2887,12 +2854,12 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         outResult = 0;
         return;
     case -0x75:
-        SetTempValue__4CMesFii(*object->m_localBase, object->m_localBase[1]);
+        CMes::SetTempValue(*object->m_localBase, object->m_localBase[1]);
         runtime->push(object, 0);
         outResult = 0;
         return;
     case -0x74: {
-        unsigned short buttonDown = GetGbaButtonDown__4CPadFl(&Pad, *object->m_localBase);
+        unsigned short buttonDown = Pad.GetGbaButtonDown(*object->m_localBase);
         if ((DbgMenuPcs.GetDbgFlag() & 0x100) != 0) {
             buttonDown &= 0xF3FF;
         }
@@ -2978,8 +2945,8 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
             static_cast<u8>(object->m_localBase[3]),
             0xFF,
         };
-        SetMapShadeColor__9CCharaPcsFi6CColor(&CharaPcs, *object->m_localBase,
-            reinterpret_cast<const unsigned char*>(&color));
+        CColor shadeColor(color);
+        CharaPcs.SetMapShadeColor(*object->m_localBase, shadeColor);
         runtime->push(object, 0);
         outResult = 0;
         return;
@@ -2998,7 +2965,7 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         return;
     }
     case -0x62:
-        SetNoFreeMergeMask__9CCharaPcsFi(&CharaPcs, *object->m_localBase);
+        CharaPcs.SetNoFreeMergeMask(*object->m_localBase);
         runtime->push(object, 0);
         outResult = 0;
         return;
@@ -3103,7 +3070,7 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         return;
     }
     case -0x53:
-        SetCharaAllocStage__9CCharaPcsFi(&CharaPcs, *object->m_localBase);
+        CharaPcs.SetCharaAllocStage(*object->m_localBase);
         runtime->push(object, 0);
         outResult = 0;
         return;
@@ -3459,7 +3426,7 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         outResult = 0;
         return;
     case -0x2E:
-        IsHitDrawMode__7CMapPcsFc(&MapPcs, static_cast<unsigned char>(*object->m_localBase));
+        MapPcs.IsHitDrawMode(static_cast<unsigned char>(*object->m_localBase));
         runtime->push(object, 0);
         outResult = 0;
         return;
@@ -3913,9 +3880,9 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
     case -0x13:
         if ((DbgMenuPcs.GetDbgFlag() & 0x100) == 0) {
             *reinterpret_cast<float*>(object->m_localBase[1]) =
-                static_cast<float>(GetRightStickX__4CPadFl(&Pad, *object->m_localBase));
+                static_cast<float>(Pad.GetRightStickX(*object->m_localBase));
             *reinterpret_cast<float*>(object->m_localBase[2]) =
-                static_cast<float>(GetRightStickY__4CPadFl(&Pad, *object->m_localBase));
+                static_cast<float>(Pad.GetRightStickY(*object->m_localBase));
         } else {
             *reinterpret_cast<float*>(object->m_localBase[1]) = 0.0f;
             *reinterpret_cast<float*>(object->m_localBase[2]) = 0.0f;
@@ -3926,9 +3893,9 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
     case -0x12:
         if ((DbgMenuPcs.GetDbgFlag() & 0x100) == 0) {
             *reinterpret_cast<float*>(object->m_localBase[1]) =
-                static_cast<float>(GetLeftStickX__4CPadFl(&Pad, *object->m_localBase));
+                static_cast<float>(Pad.GetLeftStickX(*object->m_localBase));
             *reinterpret_cast<float*>(object->m_localBase[2]) =
-                static_cast<float>(GetLeftStickY__4CPadFl(&Pad, *object->m_localBase));
+                static_cast<float>(Pad.GetLeftStickY(*object->m_localBase));
         } else {
             *reinterpret_cast<float*>(object->m_localBase[1]) = 0.0f;
             *reinterpret_cast<float*>(object->m_localBase[2]) = 0.0f;
@@ -3968,7 +3935,7 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
     case -0x0C: {
         unsigned short buttons = 0;
         if (((1 << *object->m_localBase) & *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x12A8)) == 0) {
-            buttons = GetButtonRepeat__4CPadFl(&Pad, *object->m_localBase);
+            buttons = Pad.GetButtonRepeat(*object->m_localBase);
         }
         if ((DbgMenuPcs.GetDbgFlag() & 0x100) != 0) {
             buttons &= 0xF3FF;
@@ -4112,7 +4079,7 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
     case -5: {
         unsigned short buttons = 0;
         if (((1 << *object->m_localBase) & *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x12A8)) == 0) {
-            buttons = GetButton__4CPadFl(&Pad, *object->m_localBase);
+            buttons = Pad.GetButton(*object->m_localBase);
         }
         if ((DbgMenuPcs.GetDbgFlag() & 0x100) != 0) {
             buttons &= 0xF3FF;

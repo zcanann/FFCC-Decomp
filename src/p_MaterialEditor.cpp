@@ -48,7 +48,6 @@ u8 lbl_8026D338[0xC];
 CMaterialEditorPcs MaterialEditorPcs;
 
 
-extern "C" void Printf__8CGraphicFPce(void*, const char*, ...);
 extern "C" const double DOUBLE_8032FCC0 = 1.0;
 extern "C" const double DOUBLE_8032FCD0;
 extern "C" const float FLOAT_8032FCC8 = 1.0f;
@@ -173,7 +172,7 @@ void CMaterialEditorPcs::drawViewer()
     static int pFan = 0;
     pFan++;
     char fan = q[(pFan >> 4) % 4];
-    Printf__8CGraphicFPce(&Graphic, s_MaterialEditor_pctc_801D7D60, (int)fan);
+    Graphic.Printf(const_cast<char*>(s_MaterialEditor_pctc_801D7D60), (int)fan);
 
     if (*reinterpret_cast<int*>(self + 0xE8) != 0) {
         return;

@@ -14,8 +14,6 @@ extern int gPppCalcDisabled;
 
 #include <string.h>
 
-extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void* stage);
-
 extern const f32 FLOAT_80330df0[2];
 extern const f32 FLOAT_80330de0;
 extern const f32 FLOAT_80330de4;
@@ -37,8 +35,6 @@ static inline float YmLaserConst(const float& value) { return *reinterpret_cast<
 extern "C" {
 void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
     void*, long, float&, float&, float&, float, float&, float&);
-int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, void*, void*, u32);
-void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
 int GetCharaNodeFrameMatrix__FP9_pppMngStfPA4_f(_pppMngSt*, float, Mtx);
 int GetTextureFromRSD__FiP9_pppEnvSt(int, _pppEnvSt*);
 }
@@ -449,11 +445,11 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtr
 		cyl.m_direction = localA;
 		cyl.m_radius = kPppYmLaserOne;
 
-		int check = CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(&MapMng, &cyl, &localA, 0xffffffff);
+		int check = MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&cyl), &localA, 0xffffffff);
 		int hit = 0;
 		if (check != 0) {
 			hit = 1;
-			CalcHitPosition__7CMapObjFP3Vec(*(void**)((u8*)&MapMng + 0x22A78), &work->m_points[i]);
+			MapMng.m_hitMapObj->CalcHitPosition(&work->m_points[i]);
 			work->m_length = PSVECDistance(&work->m_points[i], &work->m_origin);
 		} else {
 			if (i == 0) {
@@ -532,7 +528,7 @@ extern "C" void pppDestructYmLaser(pppYmLaser* laser, _pppCtrlTable* ctrlTable)
 	void* stage = work->m_points;
 
 	if (stage != 0) {
-		pppHeapUseRate__FPQ27CMemory6CStage(stage);
+		pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(stage));
 		work->m_points = 0;
 	}
 }

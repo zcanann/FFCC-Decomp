@@ -45,6 +45,8 @@ public:
 
     void SetDOFParameter(signed char, signed char, float, float, float, float, float, int);
     void SetBlurParameter(int, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, short);
+    void SetUseDOF(int);
+    void ReqScreenCapture();
 
     void calc();
 

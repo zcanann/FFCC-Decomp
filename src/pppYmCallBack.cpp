@@ -4,10 +4,6 @@
 
 #include <dolphin/mtx.h>
 
-extern "C" {
-void ParticleFrameCallback__5CGameFiiiiiP3Vec(CGame*, int, int, int, int, int, Vec*);
-}
-
 /*
  * --INFO--
  * PAL Address: 0x800A5FCC
@@ -31,8 +27,8 @@ void pppFrameYmCallBack(pppYmCallBack* callbackObj, pppYmCallBackUnkB* param_2, 
         PSMTXMultVec(ppvWorldMatrix, &position, &position);
 
         mngStIndex = ((s32)((u8*)mngSt - (reinterpret_cast<u8*>(&PartMng) + 0x2A18))) / 0x158;
-        ParticleFrameCallback__5CGameFiiiiiP3Vec(
-            &Game, mngStIndex, (s32)mngSt->m_kind, (s32)mngSt->m_nodeIndex, (s32)param_2->m_initWOrk,
+        Game.ParticleFrameCallback(
+            mngStIndex, (s32)mngSt->m_kind, (s32)mngSt->m_nodeIndex, (s32)param_2->m_initWOrk,
             (s32)param_2->m_graphId, &position);
     }
 }

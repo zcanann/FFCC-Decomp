@@ -50,8 +50,6 @@ float FLOAT_8032ed10;
 extern double DOUBLE_8032fc68;
 extern unsigned int DAT_8032e620;
 
-extern "C" void setViewport__11CGraphicPcsFv(void*);
-
 static inline float CameraPosX() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xE0); }
 static inline float CameraPosY() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xE4); }
 static inline float CameraPosZ() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xE8); }
@@ -1054,7 +1052,7 @@ void CLightPcs::MakeLightMap()
     } while (target < 4);
 
     Graphic.SetStdPixelFmt();
-    setViewport__11CGraphicPcsFv(&GraphicPcs);
+    GraphicPcs.setViewport();
     PSMTX44Copy(CameraPcs.m_screenMatrix, projection);
     GXSetProjection(projection, GX_PERSPECTIVE);
     GXSetCullMode(GX_CULL_FRONT);

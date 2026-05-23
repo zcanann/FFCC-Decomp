@@ -3,10 +3,6 @@
 #include "ffcc/game.h"
 #include <dolphin/mtx.h>
 
-extern "C" {
-void ParticleFrameCallback__5CGameFiiiiiP3Vec(CGame*, int, int, int, int, int, Vec*);
-}
-
 /*
  * --INFO--
  * PAL Address: 0x80141204
@@ -49,8 +45,7 @@ void pppFrameCallBackDistance(pppCallBackDistance* param1, pppCallBackDistanceUn
         m_nodeIndex = (s32)*(s16*)(pppMngSt + 0x76);
         initWork = (s32)*(s16*)&param2->m_initWOrk;
 
-        ParticleFrameCallback__5CGameFiiiiiP3Vec(
-            &Game, partIndex, m_kind, m_nodeIndex, initWork, graphFrame, &local_28);
+        Game.ParticleFrameCallback(partIndex, m_kind, m_nodeIndex, initWork, graphFrame, &local_28);
     }
 }
 

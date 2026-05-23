@@ -46,6 +46,7 @@ public:
 		CAnim();
 		~CAnim();
 
+		void Create(void*, CMemory::CStage*);
         void SetAmemAddress(int);
         void GetBankSize();
         void GetAmemAddress();

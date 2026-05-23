@@ -1105,7 +1105,7 @@ static void OpenMogHintMessage(int messageId)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void InitFurTexBuffer__6CCharaFv(CChara* chara)
+void CChara::InitFurTexBuffer()
 {
 	int i = 0;
 	int row = 0;
@@ -1131,10 +1131,10 @@ extern "C" void InitFurTexBuffer__6CCharaFv(CChara* chara)
 		row += 0x40;
 	} while (i < 0x40);
 
-	*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(chara) + 0x2004) = 0;
+	*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(this) + 0x2004) = 0;
 	*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&Chara) + 0x2014) = System.m_frameCounter;
-	memset(reinterpret_cast<unsigned char*>(chara) + 0x2018, 0, 0x40);
-	chara->CalcMogScore();
+	memset(reinterpret_cast<unsigned char*>(this) + 0x2018, 0, 0x40);
+	CalcMogScore();
 }
 
 /*
@@ -1146,7 +1146,7 @@ extern "C" void InitFurTexBuffer__6CCharaFv(CChara* chara)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void SaveFurTexBuffer__6CCharaFPUs(CChara*, unsigned short* outTexels)
+void CChara::SaveFurTexBuffer(unsigned short* outTexels)
 {
 	memcpy(outTexels, reinterpret_cast<unsigned char*>(&Chara) + 4, 0x2000);
 }
@@ -1160,10 +1160,10 @@ extern "C" void SaveFurTexBuffer__6CCharaFPUs(CChara*, unsigned short* outTexels
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void LoadFurTexBuffer__6CCharaFPUs(CChara* chara, unsigned short* inTexels)
+void CChara::LoadFurTexBuffer(unsigned short* inTexels)
 {
 	memcpy(reinterpret_cast<unsigned char*>(&Chara) + 4, inTexels, 0x2000);
-	chara->CalcMogScore();
+	CalcMogScore();
 }
 
 /*

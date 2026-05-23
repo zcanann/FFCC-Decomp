@@ -5,12 +5,6 @@
 #include <dolphin/gx.h>
 #include "ffcc/ppp_linkage.h"
 
-extern "C" {
-void InitBlurParameter__8CGraphicFv(void* graphic);
-void RenderBlur__8CGraphicFiUcUcUcUcs(void* graphic, int enable, u8 r, u8 g, u8 b, u8 strength, s16 work);
-}
-
-
 /*
  * --INFO--
  * PAL Address: 0x80155504
@@ -28,8 +22,8 @@ void pppRenderScreenBlur(pppScreenBlur* blur, pppScreenBlurUnkB* blurParam, _ppp
 
     blurParam->m_blurB = 0;
     blurMask = __cntlzw((u32)blur->data[blurActiveOffset]);
-    RenderBlur__8CGraphicFiUcUcUcUcs(&Graphic, blurMask >> 5, blurParam->m_blurR, blurParam->m_blurG,
-                                     blurParam->m_blurB, blurValuePtr[0x0B], blurParam->m_initWOrk);
+    Graphic.RenderBlur(blurMask >> 5, blurParam->m_blurR, blurParam->m_blurG, blurParam->m_blurB,
+                       blurValuePtr[0x0B], blurParam->m_initWOrk);
     pppInitBlendMode();
     GXSetProjection(ppvScreenMatrix, GX_PERSPECTIVE);
     blur->data[blurActiveOffset] = 1;
@@ -63,7 +57,7 @@ void pppFrameScreenBlur(_pppPObject*, void*, _pppCtrlTable*)
  */
 void pppDesScreenBlur(_pppPObjLink*, _pppCtrlTable*)
 {
-    InitBlurParameter__8CGraphicFv(&Graphic);
+    Graphic.InitBlurParameter();
 }
 
 /*
@@ -93,6 +87,6 @@ void pppConScreenBlur(pppScreenBlur* blur, _pppCtrlTable* ctrlTable)
 {
     s32 blurOffset = ctrlTable->m_serializedDataOffsets[1] + 0x80;
 
-    InitBlurParameter__8CGraphicFv(&Graphic);
+    Graphic.InitBlurParameter();
     blur->data[blurOffset] = 0;
 }

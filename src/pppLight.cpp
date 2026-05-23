@@ -61,10 +61,6 @@ struct PppLightMngProgramInfo {
 	pppLightTarget* programInfoTable;
 };
 
-extern "C" {
-void Add__9CLightPcsFPQ29CLightPcs6CLight(void*, void*);
-}
-
 /*
  * --INFO--
  * PAL Address: 0x800dab00
@@ -249,7 +245,7 @@ void pppLight(_pppPObject* param1, void* param2, void* param3)
 				light.m_direction.y = 0.0f;
 				light.m_direction.z = 1.0f;
 				light.m_spotScale = 0.7853982f;
-				Add__9CLightPcsFPQ29CLightPcs6CLight(&LightPcs, &light);
+				LightPcs.Add(&light);
 			} else {
 				unsigned char* obj;
 
@@ -272,7 +268,7 @@ void pppLight(_pppPObject* param1, void* param2, void* param3)
 						light.m_specularMode = 1;
 					}
 
-					Add__9CLightPcsFPQ29CLightPcs6CLight(&LightPcs, &light);
+					LightPcs.Add(&light);
 				}
 		}
 	}

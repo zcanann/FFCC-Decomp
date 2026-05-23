@@ -46,24 +46,10 @@ extern "C" void __ct__27CPtrArray_P13CMapAnimKeyDt_Fv(void*);
 extern "C" void __ct__24CPtrArray_P10CMapShadow_Fv(void*);
 extern "C" void __ct__29CPtrArray_P15CMapLightHolder_Fv(void*);
 extern "C" void* PTR_PTR_s_CMapTexAnimSet_801e896c;
-extern "C" float Spline1D__5CMathFifPfPfPf(CMath*, int, float, float*, float*, float*);
-extern "C" float Line1D__5CMathFifPfPf(CMath*, int, float, float*, float*);
-extern "C" void MakeSpline1Dtable__5CMathFiPfPfPf(CMath*, int, float*, float*, float*);
 extern const float kMapViewScaleXPrimary = 0.73898232f;
 extern const float kMapViewScaleY = 0.88677877f;
 extern const float kMapViewScaleZ = 1.0f;
 extern const float kMapViewScaleXSecondary = 0.84455127f;
-extern "C" int CheckHitCylinder__8COctTreeFP12CMapCylinderP3VecUl(void*, CMapCylinder*, Vec*, unsigned long);
-extern "C" int CheckHitCylinderNear__8COctTreeFP12CMapCylinderP3VecUl(void*, CMapCylinder*, Vec*, unsigned long);
-extern "C" void SetDrawFlag__8COctTreeFv(void*);
-extern "C" void Draw__8COctTreeFUc(void*, unsigned char);
-extern "C" void Draw__7CMapObjFUc(void*, unsigned char);
-extern "C" void Calc__11CMapAnimRunFl(CMapAnimRun*, long);
-extern "C" int GetSize__25CPtrArray_P11CMapAnimRun_Fv(void*);
-extern "C" CMapAnimRun* __vc__25CPtrArray_P11CMapAnimRun_FUl(void*, unsigned long);
-extern "C" CMapAnim* __vc__21CPtrArray_P8CMapAnim_FUl(void*, unsigned long);
-extern "C" int GetSize__26CPtrArray_P12CMapAnimNode_Fv(void*);
-extern "C" CMapAnimNode* __vc__26CPtrArray_P12CMapAnimNode_FUl(void*, unsigned long);
 extern "C" unsigned int CheckSum__FPvi(void*, int);
 extern "C" void* __vt__8CPtrArrayIP14CMapLightHolder[];
 extern "C" void* __vt__8CPtrArrayIP11CMapAnimRun[];
@@ -90,8 +76,6 @@ extern char g_MsgFlashy[];
 extern const char DAT_8032f984[] = "\n";
 extern "C" unsigned char Vec_80245758[];
 extern "C" void __ct__Q29CLightPcs6CLightFv(void*);
-extern "C" void SetLink__7CMapObjFv();
-extern "C" int ReadOtmOctTree__8COctTreeFR10CChunkFile(void*, CChunkFile&);
 extern "C" CPtrArray<CMapLightHolder*>* dtor_80034414(CPtrArray<CMapLightHolder*>*, short);
 
 static const char s_mapMidPathFmt[] = "%s.mid";
@@ -232,12 +216,10 @@ float CMapKeyFrame::Get()
 {
     switch (m_mode) {
     case 1:
-        return Spline1D__5CMathFifPfPfPf(
-            &Math, static_cast<int>(m_keyCount) - 1, static_cast<float>(m_currentFrame), m_keyValue, m_keyFrame,
-            m_splineTable);
+        return Math.Spline1D(
+            static_cast<int>(m_keyCount) - 1, static_cast<float>(m_currentFrame), m_keyValue, m_keyFrame, m_splineTable);
     case 0:
-        return Line1D__5CMathFifPfPf(
-            &Math, static_cast<int>(m_keyCount) - 1, static_cast<float>(m_currentFrame), m_keyValue, m_keyFrame);
+        return Math.Line1D(static_cast<int>(m_keyCount) - 1, static_cast<float>(m_currentFrame), m_keyValue, m_keyFrame);
     default:
         return 0.0f;
     }
@@ -1189,13 +1171,12 @@ int CMapKeyFrame::Get(int& key0, int& key1, float& blend)
 {
     switch (m_mode) {
     case 1:
-        blend = Spline1D__5CMathFifPfPfPf(
-            &Math, static_cast<int>(m_keyCount) - 1, static_cast<float>(m_currentFrame), m_keyValue, m_keyFrame,
-            m_splineTable);
+        blend = Math.Spline1D(
+            static_cast<int>(m_keyCount) - 1, static_cast<float>(m_currentFrame), m_keyValue, m_keyFrame, m_splineTable);
         break;
     case 0:
-        blend =
-            Line1D__5CMathFifPfPf(&Math, static_cast<int>(m_keyCount) - 1, static_cast<float>(m_currentFrame), m_keyValue, m_keyFrame);
+        blend = Math.Line1D(
+            static_cast<int>(m_keyCount) - 1, static_cast<float>(m_currentFrame), m_keyValue, m_keyFrame);
         break;
     default:
         blend = 0.0f;
@@ -1317,7 +1298,7 @@ void CMapKeyFrame::ReadKey(CChunkFile& chunkFile, int count)
 
     if (m_mode == 1) {
         m_splineTable = new (*reinterpret_cast<CMemory::CStage**>(&MapMng), const_cast<char*>(s_map_cpp), 0xDE) float[m_keyCount];
-        MakeSpline1Dtable__5CMathFiPfPfPf(&Math, static_cast<int>(m_keyCount) - 1, m_keyValue, m_keyFrame, m_splineTable);
+        Math.MakeSpline1Dtable(static_cast<int>(m_keyCount) - 1, m_keyValue, m_keyFrame, m_splineTable);
     }
 }
 
@@ -2268,8 +2249,8 @@ void CMapMng::ReadOtm(char* mapName)
                     return;
                 }
 
-                void* octTree = self + 0x14 + (octTreeCount * 0x4C);
-                ReadOtmOctTree__8COctTreeFR10CChunkFile(octTree, chunkFile);
+                COctTree* octTree = reinterpret_cast<COctTree*>(self + 0x14 + (octTreeCount * 0x4C));
+                octTree->ReadOtmOctTree(chunkFile);
                 octTreeCount += 1;
                 continue;
             }
@@ -2407,7 +2388,7 @@ void CMapMng::ReadOtm(char* mapName)
         return;
     }
 
-    SetLink__7CMapObjFv();
+    root->SetLink();
 
     Mtx identity;
     PSMTXIdentity(identity);
@@ -2594,7 +2575,7 @@ int CMapMng::ReadMid(char* mapName)
                     }
 
                     unsigned char* octTree = self + 0x14 + (octTreeCount * 0x4C);
-                    ReadOtmOctTree__8COctTreeFR10CChunkFile(octTree, chunkFile);
+                    reinterpret_cast<COctTree*>(octTree)->ReadOtmOctTree(chunkFile);
                     *reinterpret_cast<CMapObj**>(octTree + 8) = mapObj;
 
                     if (*reinterpret_cast<int*>(objRaw + 0xC) == 0) {
@@ -2689,7 +2670,7 @@ void CMapMng::Calc()
     const int mapAnimRunCount = mapAnimRunArray->GetSize();
     for (int i = 0; i < mapAnimRunCount; i++) {
         CMapAnimRun* mapAnimRun = (*mapAnimRunArray)[i];
-        Calc__11CMapAnimRunFl(mapAnimRun, *reinterpret_cast<int*>(Ptr(this, 0x22A6C)));
+        mapAnimRun->Calc(*reinterpret_cast<int*>(Ptr(this, 0x22A6C)));
     }
 
     Mtx identity;
@@ -2740,7 +2721,7 @@ void CMapMng::Calc()
     }
 
     for (int i = 0; i < octTreeCount; i++) {
-        SetDrawFlag__8COctTreeFv(Ptr(this, 0x14 + (i * 0x4C)));
+        reinterpret_cast<COctTree*>(Ptr(this, 0x14 + (i * 0x4C)))->SetDrawFlag();
     }
 
     for (int i = 0; i < mapObjCount; i++) {
@@ -2801,15 +2782,15 @@ void CMapMng::DrawBefore()
     if ((gMapHitDrawMode.m_byte & 8) == 0) {
         CMapObj* mapObj = reinterpret_cast<CMapObj*>(Ptr(&MapMng, 0x954));
         for (int i = 0; i < mapObjCount; i++) {
-            Draw__7CMapObjFUc(mapObj, 0xFE);
+            mapObj->Draw(0xFE);
             mapObj = reinterpret_cast<CMapObj*>(Ptr(mapObj, 0xF0));
         }
 
         const short octTreeCount = *reinterpret_cast<short*>(Ptr(this, 8));
-        void* octTree = Ptr(this, 0x14);
+        COctTree* octTree = reinterpret_cast<COctTree*>(Ptr(this, 0x14));
         for (int i = 0; i < octTreeCount; i++) {
-            Draw__8COctTreeFUc(octTree, 0xFF);
-            octTree = Ptr(octTree, 0x4C);
+            octTree->Draw(0xFF);
+            octTree = reinterpret_cast<COctTree*>(Ptr(octTree, 0x4C));
         }
     }
 }
@@ -2844,15 +2825,15 @@ void CMapMng::Draw()
     if ((gMapHitDrawMode.m_byte & 8) == 0) {
         const short octTreeCount = *reinterpret_cast<short*>(Ptr(this, 8));
 
-        void* octTree = Ptr(this, 0x14);
+        COctTree* octTree = reinterpret_cast<COctTree*>(Ptr(this, 0x14));
         for (int i = 0; i < octTreeCount; i++) {
-            Draw__8COctTreeFUc(octTree, 0);
-            octTree = Ptr(octTree, 0x4C);
+            octTree->Draw(0);
+            octTree = reinterpret_cast<COctTree*>(Ptr(octTree, 0x4C));
         }
 
         CMapObj* mapObj = reinterpret_cast<CMapObj*>(Ptr(&MapMng, 0x954));
         for (int i = 0; i < mapObjCount; i++) {
-            Draw__7CMapObjFUc(mapObj, 0x40);
+            mapObj->Draw(0x40);
             mapObj = reinterpret_cast<CMapObj*>(Ptr(mapObj, 0xF0));
         }
 
@@ -2866,14 +2847,14 @@ void CMapMng::Draw()
 
         mapObj = reinterpret_cast<CMapObj*>(Ptr(&MapMng, 0x954));
         for (int i = 0; i < mapObjCount; i++) {
-            Draw__7CMapObjFUc(mapObj, 0);
+            mapObj->Draw(0);
             mapObj = reinterpret_cast<CMapObj*>(Ptr(mapObj, 0xF0));
         }
 
-        octTree = Ptr(this, 0x14);
+        octTree = reinterpret_cast<COctTree*>(Ptr(this, 0x14));
         for (int i = 0; i < octTreeCount; i++) {
-            Draw__8COctTreeFUc(octTree, 1);
-            octTree = Ptr(octTree, 0x4C);
+            octTree->Draw(1);
+            octTree = reinterpret_cast<COctTree*>(Ptr(octTree, 0x4C));
         }
     }
 
@@ -2960,16 +2941,16 @@ void CMapMng::DrawAfter()
     LightPcs.SetNumDiffuse(0);
 
     if (gMapHitDrawMode.m_byte == 0) {
-        void* octTree = Ptr(this, 0x14);
+        COctTree* octTree = reinterpret_cast<COctTree*>(Ptr(this, 0x14));
         const short octTreeCount = *reinterpret_cast<short*>(Ptr(this, 8));
         for (int i = 0; i < octTreeCount; i++) {
-            Draw__8COctTreeFUc(octTree, 2);
-            octTree = Ptr(octTree, 0x4C);
+            octTree->Draw(2);
+            octTree = reinterpret_cast<COctTree*>(Ptr(octTree, 0x4C));
         }
 
         CMapObj* mapObj = reinterpret_cast<CMapObj*>(Ptr(&MapMng, 0x954));
         for (int i = 0; i < mapObjCount; i++) {
-            Draw__7CMapObjFUc(mapObj, 2);
+            mapObj->Draw(2);
             mapObj = reinterpret_cast<CMapObj*>(Ptr(mapObj, 0xF0));
         }
     }
@@ -3009,16 +2990,16 @@ int CMapMng::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long m
     PSVECAdd(&cylinder->m_bottom, move, &cylinder->m_top);
 
     for (int i = 0; i < *reinterpret_cast<short*>(Ptr(this, 8)); i++) {
-        unsigned char* octTree = Ptr(this, 0x14 + (i * 0x4C));
-        if (CheckHitCylinder__8COctTreeFP12CMapCylinderP3VecUl(octTree, cylinder, move, mask) != 0) {
-            *reinterpret_cast<void**>(Ptr(this, 0x22A78)) = *reinterpret_cast<void**>(octTree + 8);
+        COctTree* octTree = reinterpret_cast<COctTree*>(Ptr(this, 0x14 + (i * 0x4C)));
+        if (octTree->CheckHitCylinder(cylinder, move, mask) != 0) {
+            m_hitMapObj = *reinterpret_cast<CMapObj**>(Ptr(octTree, 8));
             return 1;
         }
     }
 
     for (int i = 0; i < *reinterpret_cast<short*>(Ptr(this, 0xC)); i++) {
         CMapObj* mapObj = reinterpret_cast<CMapObj*>(Ptr(this, 0x954 + (i * 0xF0)));
-        *reinterpret_cast<CMapObj**>(Ptr(this, 0x22A78)) = mapObj;
+        m_hitMapObj = mapObj;
         if (mapObj->CheckHitCylinder(cylinder, move, mask) != 0) {
             return 1;
         }
@@ -3063,12 +3044,12 @@ int CMapMng::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned lo
     PSVECAdd(&cylinder->m_bottom, move, &cylinder->m_top);
 
     for (int i = 0; i < *reinterpret_cast<short*>(Ptr(this, 8)); i++) {
-        unsigned char* octTree = Ptr(this, 0x14 + (i * 0x4C));
+        COctTree* octTree = reinterpret_cast<COctTree*>(Ptr(this, 0x14 + (i * 0x4C)));
         DAT_8032ec88 = 0;
-        CheckHitCylinderNear__8COctTreeFP12CMapCylinderP3VecUl(octTree, cylinder, move, mask);
+        octTree->CheckHitCylinderNear(cylinder, move, mask);
         if (DAT_8032ec88 != 0) {
             hit = 1;
-            *reinterpret_cast<void**>(Ptr(this, 0x22A78)) = *reinterpret_cast<void**>(octTree + 8);
+            m_hitMapObj = *reinterpret_cast<CMapObj**>(Ptr(octTree, 8));
         }
     }
 
@@ -3078,7 +3059,7 @@ int CMapMng::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned lo
         mapObj->CheckHitCylinderNear(cylinder, move, mask);
         if (DAT_8032ec88 != 0) {
             hit = 1;
-            *reinterpret_cast<CMapObj**>(Ptr(this, 0x22A78)) = mapObj;
+            m_hitMapObj = mapObj;
         }
     }
 
@@ -3416,16 +3397,16 @@ void CMapMng::SetMapObjAnim(int mapObjIndex, int startFrame, int endFrame, int l
     CPtrArray<CMapAnim*>* mapAnimArray = reinterpret_cast<CPtrArray<CMapAnim*>*>(Ptr(this, 0x213FC));
     CMapAnimRun* foundMapAnimRun = 0;
     CMapObj* mapObj = reinterpret_cast<CMapObj*>(reinterpret_cast<unsigned char*>(this) + (mapObjIndex * 0xF0) + 0x954);
-    int mapAnimRunCount = GetSize__25CPtrArray_P11CMapAnimRun_Fv(mapAnimRunArray);
+    int mapAnimRunCount = mapAnimRunArray->GetSize();
 
     for (unsigned int mapAnimRunIndex = 0; mapAnimRunIndex < static_cast<unsigned int>(mapAnimRunCount); mapAnimRunIndex++) {
-        CMapAnimRun* mapAnimRun = __vc__25CPtrArray_P11CMapAnimRun_FUl(mapAnimRunArray, mapAnimRunIndex);
+        CMapAnimRun* mapAnimRun = (*mapAnimRunArray)[mapAnimRunIndex];
         CPtrArray<CMapAnimNode*>* mapAnimNodeArray =
-            reinterpret_cast<CPtrArray<CMapAnimNode*>*>(__vc__21CPtrArray_P8CMapAnim_FUl(mapAnimArray, mapAnimRun->m_mapAnimIndex));
-        int mapAnimNodeCount = GetSize__26CPtrArray_P12CMapAnimNode_Fv(mapAnimNodeArray);
+            reinterpret_cast<CPtrArray<CMapAnimNode*>*>((*mapAnimArray)[mapAnimRun->m_mapAnimIndex]);
+        int mapAnimNodeCount = mapAnimNodeArray->GetSize();
 
         for (int mapAnimNodeIndex = 0; mapAnimNodeIndex < mapAnimNodeCount; mapAnimNodeIndex++) {
-            CMapAnimNode* mapAnimNode = __vc__26CPtrArray_P12CMapAnimNode_FUl(mapAnimNodeArray, mapAnimNodeIndex);
+            CMapAnimNode* mapAnimNode = (*mapAnimNodeArray)[mapAnimNodeIndex];
             if (reinterpret_cast<CMapObj*>(*reinterpret_cast<int*>(mapAnimNode)) == mapObj) {
                 foundMapAnimRun = mapAnimRun;
                 goto startMapObjAnim;
@@ -3450,10 +3431,10 @@ void CMapMng::SetMapAnimID(int animId, int startFrame, int endFrame, int loop)
 {
     CPtrArray<CMapAnimRun*>* mapAnimRunArray = reinterpret_cast<CPtrArray<CMapAnimRun*>*>(Ptr(this, 0x213E0));
     CMapAnimRun* mapAnimRun = 0;
-    int mapAnimRunCount = GetSize__25CPtrArray_P11CMapAnimRun_Fv(mapAnimRunArray);
+    int mapAnimRunCount = mapAnimRunArray->GetSize();
 
     for (unsigned long i = 0; i < static_cast<unsigned long>(mapAnimRunCount); i++) {
-        CMapAnimRun* current = __vc__25CPtrArray_P11CMapAnimRun_FUl(mapAnimRunArray, i);
+        CMapAnimRun* current = (*mapAnimRunArray)[i];
         if (current->m_animId == static_cast<unsigned char>(animId)) {
             mapAnimRun = current;
             break;

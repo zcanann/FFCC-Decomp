@@ -12,6 +12,8 @@ public:
 	CVector(const Vec&);
 	CVector operator+(const CVector&) const;
 	CVector operator-(const CVector&) const;
+	operator Vec&();
+	operator Vec*();
 	void operator=(const CVector&);
 
 	void Identity();

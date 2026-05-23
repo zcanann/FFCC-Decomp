@@ -1,6 +1,7 @@
 #include "ffcc/pppLaser.h"
 #include "ffcc/math.h"
 #include "ffcc/map.h"
+#include "ffcc/game.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/pppShape.h"
@@ -29,14 +30,7 @@ void pppInitBlendMode(void);
 void pppSetBlendMode(unsigned char);
 
 extern "C" {
-void pppHeapUseRate__FPQ27CMemory6CStage(void*);
-int GetParticleSpecialInfo__5CGameFR10PPPIFPARAMRiRi(CGame*, PPPIFPARAM*, int*, int*);
-void GetTargetCursor__5CGameFiR3VecR3Vec(CGame*, int, Vec*, Vec*);
-void* GetPartyObj__5CGameFi(CGame*, int);
 void pppStopSe__FP9_pppMngStP7PPPSEST(_pppMngSt*, PPPSEST*);
-int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, void*, void*, u32);
-void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
-void ParticleFrameCallback__5CGameFiiiiiP3Vec(CGame*, int, int, int, int, int, Vec*);
 int GetTextureFromRSD__FiP9_pppEnvSt(int, _pppEnvSt*);
 }
 
@@ -121,15 +115,14 @@ void pppConstructLaser(struct pppLaser *pppLaser, _pppCtrlTable *param_2)
     work->m_shapeRotation = Math.RandF(FLOAT_8033345c);
     work->m_spawnEnabled = 1;
 
-    iVar2 = GetParticleSpecialInfo__5CGameFR10PPPIFPARAMRiRi(
-        &Game, (PPPIFPARAM*)((u8*)pppMngStPtr + 0x130), &local_24, &local_28);
+    iVar2 = Game.GetParticleSpecialInfo(*(PPPIFPARAM*)((u8*)pppMngStPtr + 0x130), local_24, local_28);
     if (iVar2 != 0) {
-        GetTargetCursor__5CGameFiR3VecR3Vec(&Game, local_28, &work->m_targetPosition, &local_20);
+        Game.GetTargetCursor(local_28, work->m_targetPosition, local_20);
 
-        iVar2 = (int)GetPartyObj__5CGameFi(&Game, local_28);
-        local_14.x = *(f32*)(iVar2 + 0x15c);
-        local_14.y = *(f32*)(iVar2 + 0x160);
-        local_14.z = *(f32*)(iVar2 + 0x164);
+        u8* partyObj = reinterpret_cast<u8*>(Game.GetPartyObj(local_28));
+        local_14.x = *(f32*)(partyObj + 0x15c);
+        local_14.y = *(f32*)(partyObj + 0x160);
+        local_14.z = *(f32*)(partyObj + 0x164);
         if (local_24 == 0x200) {
             work->m_maxLength = PSVECDistance(&work->m_targetPosition, &local_14);
         } else {
@@ -182,7 +175,7 @@ void pppDestructLaser(struct pppLaser *pppLaser, _pppCtrlTable *param_2)
     LaserWork* work = (LaserWork*)((u8*)pppLaser + 0x80 + param_2->m_serializedDataOffsets[2]);
     void* alloc = work->m_points;
     if (alloc != 0) {
-        pppHeapUseRate__FPQ27CMemory6CStage(alloc);
+        pppHeapUseRate(static_cast<CMemory::CStage*>(alloc));
         work->m_points = 0;
     }
 }
@@ -284,11 +277,11 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
         cyl.m_direction = localA;
         cyl.m_radius = kPppLaserZero;
 
-        int check = CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(&MapMng, &cyl, &localA, 0xffffffff);
+        int check = MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&cyl), &localA, 0xffffffff);
         int hit = 0;
         if (check != 0) {
             hit = 1;
-            CalcHitPosition__7CMapObjFP3Vec(*(void**)((u8*)&MapMng + 0x22A78), &work->m_points[i]);
+            MapMng.m_hitMapObj->CalcHitPosition(&work->m_points[i]);
             work->m_length = PSVECDistance(&work->m_points[i], &work->m_origin);
         } else if (i == 0) {
             if (work->m_spawnEnabled != 0) {
@@ -296,9 +289,9 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
                     _pppMngSt* mngSt = pppMngStPtr;
                     s32 partIndex = ((s32)((u8*)mngSt - (reinterpret_cast<u8*>(&PartMng) + 0x2A18))) / 0x158;
                     work->m_length = work->m_maxLength - FLOAT_80333458;
-                    ParticleFrameCallback__5CGameFiiiiiP3Vec(
-                        &Game, partIndex, (int)mngSt->m_kind, (int)mngSt->m_nodeIndex, 3,
-                        pppLaser->m_graphId / 0x1000, work->m_points);
+                    Game.ParticleFrameCallback(
+                        partIndex, (int)mngSt->m_kind, (int)mngSt->m_nodeIndex, 3, pppLaser->m_graphId / 0x1000,
+                        work->m_points);
                     work->m_spawnEnabled = 0;
                 }
             }

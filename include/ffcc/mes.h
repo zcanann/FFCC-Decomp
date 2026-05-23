@@ -31,6 +31,7 @@ public:
     void addFlag(class CFlag&);
     static void MakeAgbString(char*, char*, int, int);
     static unsigned long drawTagString(CFont*, char*, int, int, int);
+    static void SetTempValue(int, int);
     static int m_tempVar[0x14];
 
 private:

@@ -64,8 +64,6 @@ extern "C" unsigned char DAT_8032ed8a;
 extern "C" unsigned char DAT_8032ed8b;
 extern "C" int DAT_8032ed7c;
 extern "C" unsigned int DAT_8032ed80;
-extern "C" void SetPart__9CLightPcsFQ29CLightPcs6TARGETPvUc(CLightPcs*, int, void*, unsigned char);
-extern "C" void InitVtxFmt__12CMaterialManFi11_GXCompTypei11_GXCompTypei11_GXCompTypei(CMaterialMan*, int, _GXCompType, int, _GXCompType, int, _GXCompType, int);
 extern "C" void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
 extern "C" int printf(const char*, ...);
 
@@ -1533,7 +1531,7 @@ void pppCacheLoadShape(short* shapeList, _pppDataHead* pppDataHead)
 		shapeList = shapeList + 1;
 		pppCacheLoadShapeTexture(
 		    *(pppShapeSt**)(pppDataHead->m_shapeNames + shapeIndex * 4),
-		    *reinterpret_cast<CMaterialSet**>(reinterpret_cast<u8*>(&PartMng) + 0x7E4));
+		    PartMng.m_materialSet);
 		++i;
 	}
 }
@@ -1626,7 +1624,7 @@ void pppCacheDumpShape(short* shapeList, _pppDataHead* pppDataHead)
 		shapeList = shapeList + 1;
 		pppCacheDumpShapeTexture(
 		    *(pppShapeSt**)(pppDataHead->m_shapeNames + shapeIndex * 4),
-		    *reinterpret_cast<CMaterialSet**>(reinterpret_cast<u8*>(&PartMng) + 0x7E4));
+		    PartMng.m_materialSet);
 		++i;
 	}
 }
@@ -1653,7 +1651,7 @@ void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
 
 	if (Game.m_currentSceneId != 7)
 	{
-		CMaterialSet* materialSet = *reinterpret_cast<CMaterialSet**>(reinterpret_cast<u8*>(&PartMng) + 0x7E4);
+		CMaterialSet* materialSet = PartMng.m_materialSet;
 		short modelCount = *modelIndices;
 		short* modelList = modelIndices + 1;
 		u32 pppResSet = *reinterpret_cast<u32*>(pppMngSt->m_pppResSet);
@@ -2009,7 +2007,7 @@ void pppInitData(_pppDataHead* pppDataHead, pppProg* pppProg, int param_3)
 	    pppModelSt*[pppDataHead->m_modelCount];
 	pppDataHead->m_modelNames = reinterpret_cast<u32>(modelRefs);
 
-	pppModelSt* modelArray = *reinterpret_cast<pppModelSt**>(reinterpret_cast<u8*>(&PartMng) + 0x7EC);
+	pppModelSt* modelArray = PartMng.m_pppModelStArr;
 	for (int i = 0; i < pppDataHead->m_modelCount; i++) {
 		pppModelSt* model = 0;
 		for (u32 j = 0; j < 0x100; j++) {
@@ -2029,7 +2027,7 @@ void pppInitData(_pppDataHead* pppDataHead, pppProg* pppProg, int param_3)
 	    pppShapeSt*[pppDataHead->m_shapeCount];
 	pppDataHead->m_shapeNames = reinterpret_cast<u32>(shapeRefs);
 
-	pppShapeSt* shapeArray = *reinterpret_cast<pppShapeSt**>(reinterpret_cast<u8*>(&PartMng) + 0x7F0);
+	pppShapeSt* shapeArray = PartMng.m_pppShapeStArr;
 	for (int i = 0; i < pppDataHead->m_shapeCount; i++) {
 		pppShapeSt* shape = 0;
 		for (u32 j = 0; j < 0x100; j++) {
@@ -2611,7 +2609,7 @@ void pppSetDrawEnv(pppCVECTOR* pppColor, pppFMATRIX* pppMtx, float depth, unsign
 
 	if (DAT_8032ed84 != lightTarget) {
 		DAT_8032ed84 = lightTarget;
-		SetPart__9CLightPcsFQ29CLightPcs6TARGETPvUc(&LightPcs, 2, pppMngStPtr, lightTarget);
+		LightPcs.SetPart(static_cast<CLightPcs::TARGET>(2), pppMngStPtr, lightTarget);
 	}
 
 	if (pppMtx != 0) {
@@ -2682,8 +2680,7 @@ void pppSetDrawEnv(pppCVECTOR* pppColor, pppFMATRIX* pppMtx, float depth, unsign
  */
 void pppInitDrawEnv(unsigned char useZeroDepth)
 {
-	InitVtxFmt__12CMaterialManFi11_GXCompTypei11_GXCompTypei11_GXCompTypei(
-		&MaterialMan,
+	MaterialMan.InitVtxFmt(
 		-1,
 		(_GXCompType)4,
 		0,

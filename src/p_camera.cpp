@@ -148,12 +148,9 @@ unsigned int CCameraPcs::m_table[7][0x15C / sizeof(unsigned int)] = {
 };
 Vec g_shadow_pos;
 Vec g_shadow_refpos;
-extern "C" void DrawMapShadow__7CMapMngFv(void*);
-extern "C" void setViewport__11CGraphicPcsFv(void*);
 extern "C" int CheckHitCylinder__7CMapMngFP12CMapCylinderP3VecUl(void*, void*, Vec*, unsigned long);
 extern "C" void CalcHitSlide__7CMapObjFP3Vecf(void*, Vec*);
 extern "C" int rand(void);
-extern "C" float RandF__5CMathFf(float, CMath*);
 
 extern "C" {
 void pppEditGetViewPos__FP3Vec(Vec*);
@@ -562,21 +559,21 @@ void CCameraPcs::CalcQuake()
     u16 signZ = static_cast<u16>(randZ >> 0x1F);
 
     if (((randX & 1) ^ signX) == signX) {
-        jitter.x = RandF__5CMathFf(*reinterpret_cast<float*>(self + 0x4B0), &Math);
+        jitter.x = Math.RandF(*reinterpret_cast<float*>(self + 0x4B0));
     } else {
-        jitter.x = -RandF__5CMathFf(*reinterpret_cast<float*>(self + 0x4B0), &Math);
+        jitter.x = -Math.RandF(*reinterpret_cast<float*>(self + 0x4B0));
     }
 
     if (((randY & 1) ^ signY) == signY) {
-        jitter.y = RandF__5CMathFf(*reinterpret_cast<float*>(self + 0x4B4), &Math);
+        jitter.y = Math.RandF(*reinterpret_cast<float*>(self + 0x4B4));
     } else {
-        jitter.y = -RandF__5CMathFf(*reinterpret_cast<float*>(self + 0x4B4), &Math);
+        jitter.y = -Math.RandF(*reinterpret_cast<float*>(self + 0x4B4));
     }
 
     if (((randZ & 1) ^ signZ) == signZ) {
-        jitter.z = RandF__5CMathFf(*reinterpret_cast<float*>(self + 0x4B8), &Math);
+        jitter.z = Math.RandF(*reinterpret_cast<float*>(self + 0x4B8));
     } else {
-        jitter.z = -RandF__5CMathFf(*reinterpret_cast<float*>(self + 0x4B8), &Math);
+        jitter.z = -Math.RandF(*reinterpret_cast<float*>(self + 0x4B8));
     }
 
     if (self[0x490] == 2) {
@@ -1650,7 +1647,7 @@ void CCameraPcs::drawShadowBegin()
     _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
     _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
     GXSetNumTexGens(0);
-    DrawMapShadow__7CMapMngFv(&MapMng);
+    MapMng.DrawMapShadow();
 }
 
 /*
@@ -1764,7 +1761,7 @@ void CCameraPcs::drawShadowEnd()
 
     memcpy(self + 0x4, self + 0x10C, 0x108);
     GXSetProjection(reinterpret_cast<Mtx44Ptr>(self + 0x94), GX_PERSPECTIVE);
-    setViewport__11CGraphicPcsFv(&GraphicPcs);
+    GraphicPcs.setViewport();
 }
 
 /*

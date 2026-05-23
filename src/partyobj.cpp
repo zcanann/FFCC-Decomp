@@ -19,14 +19,10 @@
 #include "ffcc/fontman.h"
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
-extern "C" int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, CMapCylinder*, Vec*, unsigned int);
 extern "C" void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
 extern "C" void GetHitFaceNormal__7CMapObjFP3Vec(void*, Vec*);
 extern "C" int CalcHitSlide__7CMapObjFP3Vecf(void*, Vec*);
-extern "C" int CanCreateFromScript__9CGItemObjFv();
 extern "C" void onPush__9CGBaseObjFP9CGBaseObji(CGBaseObj*, CGBaseObj*, int);
-extern "C" void* CreateFromScript__9CGItemObjFiiiP8CGObjectfPQ29CGItemObj4CCFS(
-    int type, int createMode, int itemId, CGObject* owner, float arg, CGItemObj::CCFS* cfs);
 extern const char s_BossGhostPartyCountersFmt_801DCB1C[];
 extern const char s_MissingRingMenuFmt_801DCB38[];
 extern int __float_huge[];
@@ -1617,7 +1613,7 @@ void CGPartyObj::putTargetParticle(int targetSide, int doInit)
 		hitCylinder.m_boundsMax.x = FLOAT_80331aa0;
 
 		Vec hitPos = startPos;
-		if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(&MapMng, &hitCylinder, &rayDir, 0x30) != 0) {
+		if (MapMng.CheckHitCylinderNear(&hitCylinder, &rayDir, 0x30) != 0) {
 			void* hitObj = *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(&MapMng) + 0x22A88);
 			CalcHitPosition__7CMapObjFP3Vec(hitObj, &hitPos);
 			GetHitFaceNormal__7CMapObjFP3Vec(hitObj, reinterpret_cast<Vec*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBB8));
@@ -1831,7 +1827,7 @@ void CGPartyObj::checkTargetParticle()
 			hitCylinder.m_boundsMin.z = FLOAT_80331aa0;
 			hitCylinder.m_boundsMax.x = FLOAT_80331aa0;
 
-			if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(&MapMng, &hitCylinder, &move, 0x30) == 0) {
+			if (MapMng.CheckHitCylinderNear(&hitCylinder, &move, 0x30) == 0) {
 				break;
 			}
 			if (i == 3) {
@@ -1858,7 +1854,7 @@ void CGPartyObj::checkTargetParticle()
 		floorCylinder.m_boundsMin.z = FLOAT_80331aa0;
 		floorCylinder.m_boundsMax.x = FLOAT_80331aa0;
 
-		if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(&MapMng, &floorCylinder, &down, 0x30) != 0) {
+		if (MapMng.CheckHitCylinderNear(&floorCylinder, &down, 0x30) != 0) {
 			CalcHitPosition__7CMapObjFP3Vec(getMapHitObject(), targetPos);
 			if (m_scriptHandle != nullptr) {
 				unsigned char* work = reinterpret_cast<unsigned char*>(m_scriptHandle);
@@ -1922,7 +1918,7 @@ void CGPartyObj::moveCenterTargetParticle()
 	hitCylinder.m_boundsMin.z = FLOAT_80331aa0;
 	hitCylinder.m_boundsMax.x = FLOAT_80331aa0;
 
-	if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(&MapMng, &hitCylinder, &moveVec, 0x30) != 0) {
+	if (MapMng.CheckHitCylinderNear(&hitCylinder, &moveVec, 0x30) != 0) {
 		void* hitObj = *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(&MapMng) + 0x22A88);
 		CalcHitPosition__7CMapObjFP3Vec(hitObj, &hitPos);
 		GetHitFaceNormal__7CMapObjFP3Vec(hitObj, &hitNormal);
@@ -2557,7 +2553,7 @@ int CGPartyObj::canPlayerPutItem()
 	    (int)((unsigned int)self[0x63C] << 0x18) < 0 &&
 	    (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) &&
 	    (*reinterpret_cast<int*>(self + 0x6F0) == 0)) {
-		if (Game.m_gameWork.m_menuStageMode != 0 && CanCreateFromScript__9CGItemObjFv() == 0) {
+		if (Game.m_gameWork.m_menuStageMode != 0 && CGItemObj::CanCreateFromScript() == 0) {
 			return 0;
 		}
 		return 1;
@@ -2582,7 +2578,7 @@ int CGPartyObj::putItem(int)
 	}
 
 	int itemId = PartyData(this).weaponItem;
-	void* created = CreateFromScript__9CGItemObjFiiiP8CGObjectfPQ29CGItemObj4CCFS(
+	CGPrgObj* created = CGItemObj::CreateFromScript(
 	    0, 9, itemId, this, FLOAT_80331a78, (CGItemObj::CCFS*)0);
 	if (created == nullptr) {
 		return 0;
@@ -2611,7 +2607,7 @@ int CGPartyObj::putGil(int amount)
 		return 0;
 	}
 
-	void* created = CreateFromScript__9CGItemObjFiiiP8CGObjectfPQ29CGItemObj4CCFS(
+	CGPrgObj* created = CGItemObj::CreateFromScript(
 	    2, 1, amount, this, FLOAT_80331a78, (CGItemObj::CCFS*)0);
 	if (created == nullptr) {
 		return 0;
@@ -3185,7 +3181,7 @@ void CGPartyObj::PutMemoryCapsule(int arg0, int arg1, int arg2, int arg3, char* 
 	ccfs.m_modelParam = arg2;
 	ccfs.m_pendingAnimFlags = arg3;
 	ccfs.m_pendingAnimName = arg4;
-	CreateFromScript__9CGItemObjFiiiP8CGObjectfPQ29CGItemObj4CCFS(0, 2, 399, this, FLOAT_80331a78, &ccfs);
+	CGItemObj::CreateFromScript(0, 2, 399, this, FLOAT_80331a78, &ccfs);
 }
 
 /*
@@ -3403,7 +3399,7 @@ void CGPartyObj::gpmCol()
 		col.m_boundsMin.z = FLOAT_80331aa0;
 		col.m_boundsMax.x = FLOAT_80331aa0;
 
-		if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(&MapMng, &col, &moveVec, m_attrFlags & ~0x10U) == 0) {
+		if (MapMng.CheckHitCylinderNear(&col, &moveVec, m_attrFlags & ~0x10U) == 0) {
 			sGhostPartyWork.activeTrailCount = i + 1;
 			sGhostPartyWork.leaderTrail[i] = leader->m_worldPosition;
 			break;

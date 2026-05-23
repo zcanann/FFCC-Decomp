@@ -11,6 +11,7 @@
 #include "ffcc/p_tina.h"
 #include "ffcc/pppDrawMng.h"
 #include "ffcc/ref.h"
+#include "ffcc/sound.h"
 #include "ffcc/textureman.h"
 #include "ffcc/util.h"
 #include "ffcc/vector.h"
@@ -39,14 +40,6 @@ u8* gCharaPartWorkPtr = 0;
 }
 
 extern "C" int __cntlzw(unsigned int);
-extern "C" void ReleasePdt__8CPartPcsFi(void*, int);
-extern "C" void SetAmbient__9CLightPcsF8_GXColor(void*, void*);
-extern "C" void SetDiffuse__9CLightPcsFUl8_GXColorP3Veci(void*, unsigned long, void*, void*, int);
-extern "C" void Create__6CCharaFv(void*);
-extern "C" void Destroy__6CCharaFv(void*);
-extern "C" void Create__Q26CChara5CAnimFPvPQ27CMemory6CStage(void*, void*, void*);
-extern "C" void LoadSe__6CSoundFPv(void*, void*);
-extern "C" void LoadWave__6CSoundFPv(void*, void*);
 extern "C" unsigned char DbgMenuPcs[];
 extern unsigned char PTR_s_CCharaPcs_GAME_[];
 
@@ -394,13 +387,14 @@ static inline void SetupBaseCharaLights(CCharaPcs* self)
     _GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
     _GXSetTevSwapModeTable(GX_TEV_SWAP2, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
     Graphic.SetFog(1, 0);
-    SetAmbient__9CLightPcsF8_GXColor(&LightPcs, Ptr(self, 0xE8));
+    LightPcs.SetAmbient(*reinterpret_cast<_GXColor*>(Ptr(self, 0xE8)));
     LightPcs.SetNumDiffuse(3);
 
     for (unsigned long lightIndex = 0; lightIndex < 3; lightIndex++) {
-        SetDiffuse__9CLightPcsFUl8_GXColorP3Veci(
-            &LightPcs, lightIndex, Ptr(self, 0xF0 + static_cast<unsigned int>(lightIndex) * 4),
-            Ptr(self, 0x108 + static_cast<unsigned int>(lightIndex) * 12), static_cast<int>(lightIndex == 2));
+        LightPcs.SetDiffuse(
+            lightIndex, *reinterpret_cast<_GXColor*>(Ptr(self, 0xF0 + static_cast<unsigned int>(lightIndex) * 4)),
+            reinterpret_cast<Vec*>(Ptr(self, 0x108 + static_cast<unsigned int>(lightIndex) * 12)),
+            static_cast<int>(lightIndex == 2));
     }
 }
 
@@ -466,7 +460,7 @@ static CCharaPcs::CLoadAnim* LoadAnimFromDisk(
 
     CChara::CAnim* anim = new (StageAt(self, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x62A) CChara::CAnim;
     if (anim != 0) {
-        Create__Q26CChara5CAnimFPvPQ27CMemory6CStage(anim, File.m_readBuffer, StageAt(self, 0xD4));
+        anim->Create(File.m_readBuffer, StageAt(self, 0xD4));
     }
 
     CCharaPcs::CLoadAnim* loadAnim = new (StageAt(self, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x62D) CCharaPcs::CLoadAnim;
@@ -887,7 +881,7 @@ void CCharaPcs::create()
     gCharaPartWorkPtr = reinterpret_cast<u8*>(LightPcs.AddBump(
         &bumpLight, static_cast<CLightPcs::TARGET>(0),
         *reinterpret_cast<CMemory::CStage**>(Ptr(&Chara, 0x2058)), 4));
-    Create__6CCharaFv(&Chara);
+    Chara.Create();
 }
 
 /*
@@ -933,7 +927,7 @@ void CCharaPcs::destroy()
     Memory.DestroyStage(StageAt(this, 0xDC));
     Memory.DestroyStage(StageAt(this, 0xE0));
     Memory.DestroyStage(StageAt(this, 0xD4));
-    Destroy__6CCharaFv(&Chara);
+    Chara.Destroy();
 }
 
 /*
@@ -1308,7 +1302,7 @@ void CCharaPcs::InitEnv(int envMode)
 
     if (envMode == 1 || envMode == 2) {
         _GXColor black = {0x00, 0x00, 0x00, 0xFF};
-        SetAmbient__9CLightPcsF8_GXColor(&LightPcs, &black);
+        LightPcs.SetAmbient(black);
         LightPcs.SetNumDiffuse(0);
         LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(0), 0, 0xFFFFFFFF);
     } else {
@@ -1452,7 +1446,7 @@ void CCharaPcs::drawMakeTexShadow()
     _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
     _GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
     _GXSetTevSwapModeTable(GX_TEV_SWAP2, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-    SetAmbient__9CLightPcsF8_GXColor(&LightPcs, &shadowColor);
+    LightPcs.SetAmbient(shadowColor);
     LightPcs.SetNumDiffuse(0);
     LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(0), 0, 0xFFFFFFFF);
 
@@ -1501,7 +1495,7 @@ void CCharaPcs::drawShadow()
     _GXSetTevSwapModeTable(GX_TEV_SWAP2, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
 
     _GXColor shadowColor = {0x00, 0x00, 0x00, 0xFF};
-    SetAmbient__9CLightPcsF8_GXColor(&LightPcs, &shadowColor);
+    LightPcs.SetAmbient(shadowColor);
     LightPcs.SetNumDiffuse(0);
     LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(0), 0, 0xFFFFFFFF);
 
@@ -2011,7 +2005,7 @@ void CCharaPcs::LoadMergeFile(int mergeFileId, int mergeFlags, int streamToAmem)
                             CChara::CAnim* anim =
                                 new (StageAt(pcs, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x62A) CChara::CAnim;
                             if (anim != 0) {
-                                Create__Q26CChara5CAnimFPvPQ27CMemory6CStage(anim, rawData, StageAt(pcs, 0xD4));
+                                anim->Create(rawData, StageAt(pcs, 0xD4));
                             }
 
                             loadAnim = new (StageAt(pcs, 0xC0), const_cast<char*>(s_p_chara_cpp), 0x62D) CLoadAnim;
@@ -2026,9 +2020,9 @@ void CCharaPcs::LoadMergeFile(int mergeFileId, int mergeFlags, int streamToAmem)
                             }
                         }
                     } else if (dataType == 3) {
-                        LoadSe__6CSoundFPv(&Sound, rawData);
+                        Sound.LoadSe(rawData);
                     } else if (dataType == 4) {
-                        LoadWave__6CSoundFPv(&Sound, rawData);
+                        Sound.LoadWave(rawData);
                     } else if (dataType == 5) {
                         CLoadPdt* loadPdt = 0;
                         for (int i = 0; i < LoadPdtArray(pcs)->GetSize(); i++) {
@@ -3243,7 +3237,7 @@ CCharaPcs::CLoadPdt::~CLoadPdt()
 {
     int& pdtSlot = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x14);
     if (pdtSlot >= 0) {
-        ReleasePdt__8CPartPcsFi(&PartPcs, pdtSlot);
+        PartPcs.ReleasePdt(pdtSlot);
         pdtSlot = -1;
     }
 }

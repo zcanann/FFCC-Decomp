@@ -23,8 +23,6 @@ extern const float FLOAT_80330b18;
 
 extern "C" {
 int rand(void);
-int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, CMapCylinder*, Vec*, unsigned int);
-void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
 }
 
 struct YmMeltVertex
@@ -444,9 +442,8 @@ extern "C" void CalcPolygonHeight(
         cylinder.m_rayDirection.z = rayDirection.z;
         cylinder.m_rayPadding = zero;
 
-        if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
-                &MapMng, (CMapCylinder*)&cylinder, &rayDirection, 0xFFFFFFFF) != 0) {
-            CalcHitPosition__7CMapObjFP3Vec(*(void**)((u8*)&MapMng + 0x22A78), &vertex->m_position);
+        if (MapMng.CheckHitCylinderNear((CMapCylinder*)&cylinder, &rayDirection, 0xFFFFFFFF) != 0) {
+            MapMng.m_hitMapObj->CalcHitPosition(&vertex->m_position);
             if ((previousY - vertexData->m_maxDropDistance) > vertex->m_position.y) {
                 vertex->m_position.y = previousY;
                 if (vertexData->m_hideWhenNoGround != 0) {

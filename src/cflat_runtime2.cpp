@@ -33,17 +33,7 @@ inline void* operator new(unsigned long, void* ptr)
 }
 
 extern "C" void StaticFrame__10CGCharaObjFv();
-extern "C" void Create__9CGBaseObjFv(CGBaseObj*);
-extern "C" void Destroy__9CGBaseObjFv(CGBaseObj*);
-extern "C" void Frame__9CGBaseObjFv(CGBaseObj*);
-extern "C" void Draw__9CGBaseObjFv(CGBaseObj*);
-extern "C" void Frame__12CFlatRuntimeFii(CFlatRuntime*, int, int);
-extern "C" void Create__12CFlatRuntimeFPv(CFlatRuntime*, void*);
-extern "C" int CreateDebug__12CFlatRuntimeFPvi(CFlatRuntime*, void*, int);
-extern "C" void Destroy__12CFlatRuntimeFv(CFlatRuntime*);
-extern "C" void Destroy__9CFlatDataFv(void*);
 extern "C" void* __register_global_object(void* object, void* destructor, void* regmem);
-extern "C" void AfterFrame__12CFlatRuntimeFi(CFlatRuntime*, int);
 extern "C" void __dt__12CFlatRuntimeFv(CFlatRuntime*, int);
 extern "C" void* __vt__13CFlatRuntime2[];
 extern "C" CFlatRuntime2* __ct__13CFlatRuntime2Fv(CFlatRuntime2*);
@@ -55,7 +45,6 @@ extern "C" void __ct__9CGItemObjFv(CGItemObj*);
 extern "C" void __ct__8CGObjectFv(CGObject*);
 extern "C" void __ct__9CGQuadObjFv(CGQuadObj*);
 extern "C" void __ct__9CGBaseObjFv(CGBaseObj*);
-extern "C" void pppCreate__8CPartMngFiiP14PPPCREATEPARAMi(CPartMng*, int, int, PPPCREATEPARAM*, int);
 
 // Linkage definitions from config/GCCP01/symbols.txt.
 // Keeping these as raw byte buffers matches current decomp access patterns.
@@ -79,13 +68,6 @@ extern "C" void* __vt__9CGItemObj[];
 extern "C" void* __vt__10CGCharaObj[];
 extern "C" void* __vt__8CGMonObj[];
 extern "C" void* __vt__10CGPartyObj[];
-extern "C" void move__8CGObjectFv(CGObject*);
-extern "C" void objectCollision__8CGObjectFv(CGObject*);
-extern "C" void bgCollision__8CGObjectFv(CGObject*);
-extern "C" void update__8CGObjectFv(CGObject*);
-extern "C" void hit__8CGObjectFv(CGObject*);
-extern "C" void copy__8CGObjectFv(CGObject*);
-
 int gCFlatRuntime2DebugDrawOverflowFrame = 0;
 unsigned char gCFlatRuntime2DebugDrawOverflowInit = 0;
 const char sCFlatRuntime2DebugDrawOverflowMsg[] =
@@ -502,7 +484,7 @@ CFlatRuntime2::~CFlatRuntime2()
 {
 	u8* runtime = reinterpret_cast<u8*>(this);
 	*reinterpret_cast<void***>(runtime) = __vt__13CFlatRuntime2;
-	AfterFrame__12CFlatRuntimeFi(reinterpret_cast<CFlatRuntime*>(this), 1);
+	reinterpret_cast<CFlatRuntime*>(this)->AfterFrame(1);
 	reinterpret_cast<CFlatData*>(runtime + 0xCF20)->~CFlatData();
 	__dt__12CFlatRuntimeFv(reinterpret_cast<CFlatRuntime*>(this), 0);
 }
@@ -689,7 +671,7 @@ void CFlatRuntime2::onNewObject(CFlatRuntime::CObject* object)
 {
 	CGBaseObj* baseObj = reinterpret_cast<CGBaseObj*>(object);
 	baseObj->m_isActiveBits.active = 1;
-	Create__9CGBaseObjFv(baseObj);
+	baseObj->Create();
 }
 
 /*
@@ -700,7 +682,7 @@ void CFlatRuntime2::onNewObject(CFlatRuntime::CObject* object)
 void CFlatRuntime2::onDeleteObject(CFlatRuntime::CObject* object)
 {
 	CGBaseObj* baseObj = reinterpret_cast<CGBaseObj*>(object);
-	Destroy__9CGBaseObjFv(baseObj);
+	baseObj->Destroy();
 	baseObj->m_isActiveBits.active = 0;
 }
 
@@ -908,13 +890,13 @@ void CFlatRuntime2::Frame(int arg0, int mode)
 	if (mode == 0) {
 		StaticFrame__10CGCharaObjFv();
 		CGPartyObj::CheckGameOver();
-		Frame__12CFlatRuntimeFii(reinterpret_cast<CFlatRuntime*>(this), arg0, mode);
+		reinterpret_cast<CFlatRuntime*>(this)->Frame(arg0, mode);
 
 		CFlatRuntime::CObject* const root =
 			reinterpret_cast<CFlatRuntime::CObject*>(reinterpret_cast<u8*>(this) + 0x8CC);
 		for (CGBaseObj* obj = FindNextGBaseObjByCidMask(this, root->m_next->m_next, 5); obj != 0;
 			 obj = FindNextGBaseObjByCidMask(this, reinterpret_cast<CFlatRuntime::CObject*>(obj)->m_next, 5)) {
-			Frame__9CGBaseObjFv(obj);
+			obj->Frame();
 		}
 		return;
 	}
@@ -923,7 +905,7 @@ void CFlatRuntime2::Frame(int arg0, int mode)
 		watch.Reset();
 		watch.Start();
 		for (CGObject* object = FindGObjFirst(); object != 0; object = FindGObjNext(object)) {
-			move__8CGObjectFv(object);
+			object->move();
 		}
 		watch.Stop();
 		*reinterpret_cast<float*>(CFlat + 0x1338) += watch.Get();
@@ -931,7 +913,7 @@ void CFlatRuntime2::Frame(int arg0, int mode)
 		watch.Reset();
 		watch.Start();
 		for (CGObject* object = FindGObjFirst(); object != 0; object = FindGObjNext(object)) {
-			objectCollision__8CGObjectFv(object);
+			object->objectCollision();
 		}
 		watch.Stop();
 		*reinterpret_cast<float*>(CFlat + 0x1340) += watch.Get();
@@ -939,7 +921,7 @@ void CFlatRuntime2::Frame(int arg0, int mode)
 		watch.Reset();
 		watch.Start();
 		for (CGObject* object = FindGObjFirst(); object != 0; object = FindGObjNext(object)) {
-			bgCollision__8CGObjectFv(object);
+			object->bgCollision();
 		}
 		watch.Stop();
 		*reinterpret_cast<float*>(CFlat + 0x133C) += watch.Get();
@@ -947,7 +929,7 @@ void CFlatRuntime2::Frame(int arg0, int mode)
 		watch.Reset();
 		watch.Start();
 		for (CGObject* object = FindGObjFirst(); object != 0; object = FindGObjNext(object)) {
-			update__8CGObjectFv(object);
+			object->update();
 		}
 		watch.Stop();
 		*reinterpret_cast<float*>(CFlat + 0x1344) += watch.Get();
@@ -955,13 +937,13 @@ void CFlatRuntime2::Frame(int arg0, int mode)
 		watch.Reset();
 		watch.Start();
 		for (CGObject* object = FindGObjFirst(); object != 0; object = FindGObjNext(object)) {
-			hit__8CGObjectFv(object);
+			object->hit();
 		}
 		watch.Stop();
 		*reinterpret_cast<float*>(CFlat + 0x1348) += watch.Get();
 
 		for (CGObject* object = FindGObjFirst(); object != 0; object = FindGObjNext(object)) {
-			copy__8CGObjectFv(object);
+			object->copy();
 		}
 		return;
 	}
@@ -987,7 +969,7 @@ void CFlatRuntime2::Frame(int arg0, int mode)
 		reinterpret_cast<CFlatRuntime::CObject*>(reinterpret_cast<u8*>(this) + 0x8CC);
 	for (CGBaseObj* obj = FindNextGBaseObjByCidMask(this, root->m_next->m_next, 1); obj != 0;
 		 obj = FindNextGBaseObjByCidMask(this, reinterpret_cast<CFlatRuntime::CObject*>(obj)->m_next, 1)) {
-		Draw__9CGBaseObjFv(obj);
+		obj->Draw();
 	}
 }
 
@@ -1012,7 +994,7 @@ int CFlatRuntime2::Load(char* fileName)
 
 	File.Read(fileHandle);
 	File.SyncCompleted(fileHandle);
-	Create__12CFlatRuntimeFPv(reinterpret_cast<CFlatRuntime*>(this), File.m_readBuffer);
+	reinterpret_cast<CFlatRuntime*>(this)->Create(File.m_readBuffer);
 	File.Close(fileHandle);
 
 	typedef int (*NeedDebugDataFn)(CFlatRuntime2*);
@@ -1033,8 +1015,7 @@ int CFlatRuntime2::Load(char* fileName)
 
 			File.Read(fileHandle);
 			File.SyncCompleted(fileHandle);
-			debugChunk = CreateDebug__12CFlatRuntimeFPvi(
-				reinterpret_cast<CFlatRuntime*>(this), File.m_readBuffer, debugChunk);
+			debugChunk = reinterpret_cast<CFlatRuntime*>(this)->CreateDebug(File.m_readBuffer, debugChunk);
 			File.Close(fileHandle);
 
 			if (debugChunk == -1) {
@@ -1321,8 +1302,8 @@ CGItemObj* CFlatRuntime2::FindGItemObjNext(CGItemObj* gItemObj)
  */
 void CFlatRuntime2::Destroy()
 {
-	Destroy__12CFlatRuntimeFv(reinterpret_cast<CFlatRuntime*>(this));
-	Destroy__9CFlatDataFv(reinterpret_cast<u8*>(this) + 0xCF20);
+	reinterpret_cast<CFlatRuntime*>(this)->Destroy();
+	reinterpret_cast<CFlatData*>(reinterpret_cast<u8*>(this) + 0xCF20)->Destroy();
 
 	CFlatRuntime2* layer = this;
 	for (int i = 0; i < 8; i++, layer = reinterpret_cast<CFlatRuntime2*>(reinterpret_cast<u8*>(layer) + 0xC)) {
@@ -2062,8 +2043,8 @@ void CFlatRuntime2::PutParticle(int workNo, Vec& pos, float scale)
 	*reinterpret_cast<float*>(runtime + 0x1758) = scale;
 	*reinterpret_cast<float**>(runtime + 0x16D4) = reinterpret_cast<float*>(runtime + 0x1758);
 
-	pppCreate__8CPartMngFiiP14PPPCREATEPARAMi(
-		&PartMng, *reinterpret_cast<int*>(runtime + 0x1738), *reinterpret_cast<unsigned int*>(runtime + 0x173C),
+	PartMng.pppCreate(
+		*reinterpret_cast<int*>(runtime + 0x1738), *reinterpret_cast<unsigned int*>(runtime + 0x173C),
 		reinterpret_cast<PPPCREATEPARAM*>(runtime + 0x16CC), 1);
 }
 
@@ -2078,8 +2059,8 @@ void CFlatRuntime2::PutParticle(int workNo, Vec& pos, float scale)
  */
 void CFlatRuntime2::PutParticleWork()
 {
-	pppCreate__8CPartMngFiiP14PPPCREATEPARAMi(
-		&PartMng, ParticleWorkNoHi(this), ParticleWorkNoLo(this),
+	PartMng.pppCreate(
+		ParticleWorkNoHi(this), ParticleWorkNoLo(this),
 		reinterpret_cast<PPPCREATEPARAM*>(reinterpret_cast<u8*>(this) + 0x16CC), 1);
 }
 

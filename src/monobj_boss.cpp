@@ -11,8 +11,6 @@
 #include <math.h>
 #include <string.h>
 
-extern "C" int Rand__5CMathFUl(CMath*, unsigned long);
-extern "C" float RandFPM__5CMathFf(float, CMath*);
 extern "C" int sprintf(char*, const char*, ...);
 extern "C" void setAttackAfter__8CGMonObjFi(CGMonObj*, int);
 extern "C" void setActionParam__8CGMonObjFi(CGMonObj*, int);
@@ -23,14 +21,6 @@ extern "C" int calcBranchFuncDefault__8CGMonObjFi(CGMonObj*, int);
 extern "C" void aiTargetAttackRomMon__8CGMonObjFi(CGMonObj*, int);
 extern "C" void aiTarget__8CGMonObjFv(CGMonObj*);
 extern "C" void _aiSeq__8CGMonObjFiiiiii(CGMonObj*, int, int, int, int, int, int);
-extern "C" void reqAnim__8CGPrgObjFiii(void*, int, int, int);
-extern "C" void addSubStat__8CGPrgObjFv(void*);
-extern "C" void putParticle__8CGPrgObjFiiP8CGObjectfi(void*, int, int, void*, float, int);
-extern "C" void playSe3D__8CGPrgObjFiiiiP3Vec(void*, int, int, int, int, Vec*);
-extern "C" int isLoopAnim__8CGPrgObjFv(void*);
-extern "C" void changeStat__8CGPrgObjFiii(void*, int, int, int);
-extern "C" void Move__8CGObjectFP3Vecfiiiii(void*, Vec*, float, int, int, int, int, int);
-extern "C" void moveVectorHRot__8CGObjectFfffi(void*, float, float, float, int);
 extern "C" void ResetParticleWork__13CFlatRuntime2Fii(void*, int, int);
 extern "C" void SetParticleWorkTrace__13CFlatRuntime2FPQ212CFlatRuntime7CObject(void*, void*);
 extern "C" void SetParticleWorkBind__13CFlatRuntime2FPQ212CFlatRuntime7CObject(void*, void*);
@@ -38,8 +28,6 @@ extern "C" void PutParticleWork__13CFlatRuntime2Fv(void*);
 extern "C" void moveFrame__8CGMonObjFv(CGMonObj*);
 extern "C" void rotTarget__8CGMonObjFif(CGMonObj*, int, float);
 extern "C" void CGMonObj_ResetActionState(CGMonObj*);
-extern "C" CGMonObj* FindGMonObjFirst__13CFlatRuntime2Fv(void*);
-extern "C" CGMonObj* FindGMonObjNext__13CFlatRuntime2FP8CGMonObj(void*, CGMonObj*);
 extern "C" void teleport__8CGMonObjFiiiiiiiiiP3VecRiR3Vec(CGMonObj*, int, int, int, int, int, int, int, int, int,
                                                            Vec*, int&, Vec&);
 extern float FLOAT_80331dd0;
@@ -150,8 +138,8 @@ void CGMonObj::damagedFuncGiantCrab()
 		if (object->m_charaModelHandle != 0 && object->m_charaModelHandle->m_pdtLoadRef != 0) {
 			pdtNo = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(object->m_charaModelHandle->m_pdtLoadRef) + 0x14);
 		}
-		putParticle__8CGPrgObjFiiP8CGObjectfi(prgObj, (pdtNo << 8) | 0x0D, 0, object, FLOAT_80331d18, 0);
-		playSe3D__8CGPrgObjFiiiiP3Vec(prgObj, 0x4E37, 0x32, 500, 0, 0);
+		prgObj->putParticle((pdtNo << 8) | 0x0D, 0, object, FLOAT_80331d18, 0);
+		prgObj->playSe3D(0x4E37, 0x32, 500, 0, 0);
 	} else {
 		if (branch != 0) {
 			return;
@@ -164,11 +152,11 @@ void CGMonObj::damagedFuncGiantCrab()
 		if (object->m_charaModelHandle != 0 && object->m_charaModelHandle->m_pdtLoadRef != 0) {
 			pdtNo = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(object->m_charaModelHandle->m_pdtLoadRef) + 0x14);
 		}
-		putParticle__8CGPrgObjFiiP8CGObjectfi(prgObj, (pdtNo << 8) | 0x0C, 0, object, FLOAT_80331d18, 0);
-		playSe3D__8CGPrgObjFiiiiP3Vec(prgObj, 0x4E36, 0x32, 500, 0, 0);
+		prgObj->putParticle((pdtNo << 8) | 0x0C, 0, object, FLOAT_80331d18, 0);
+		prgObj->playSe3D(0x4E36, 0x32, 500, 0, 0);
 	}
 
-	changeStat__8CGPrgObjFiii(prgObj, 4, 0, 0);
+	prgObj->changeStat(4, 0, 0);
 	*reinterpret_cast<int*>(mon + 0x6B4) = branch + 1;
 	*reinterpret_cast<int*>(mon + 0x6C8) = 0;
 }
@@ -191,7 +179,7 @@ void CGMonObj::logicFuncGiantCrab()
 	if (*reinterpret_cast<int*>(SoundBuffer + 1260) != 0) {
 		*reinterpret_cast<int*>(SoundBuffer + 1260) = 0;
 		const int branch = *reinterpret_cast<int*>(mon + 0x6B4);
-		const unsigned int roll = Rand__5CMathFUl(&Math, 10);
+		const unsigned int roll = Math.Rand(10);
 		if ((branch == 0 && roll == 0) || (branch == 1 && roll < 2) || (branch == 2 && roll < 3)) {
 			nextState = 100;
 		}
@@ -200,7 +188,7 @@ void CGMonObj::logicFuncGiantCrab()
 	if (nextState == -1) {
 		logicFuncDefault__8CGMonObjFv(this);
 	} else {
-		changeStat__8CGPrgObjFiii(prgObj, nextState, 0, 0);
+		prgObj->changeStat(nextState, 0, 0);
 	}
 }
 
@@ -257,7 +245,7 @@ void CGMonObj::frameStatFuncGiantCrab()
 			}
 
 			*(int*)(SoundBuffer + 0x4f0) = (soundStep + 1) & 3;
-			reqAnim__8CGPrgObjFiii(self, 0xc, 0, 0);
+			reinterpret_cast<CGPrgObj*>(self)->reqAnim(0xc, 0, 0);
 
 			int pdtIndex = -1;
 			u8* charaModelHandle = *(u8**)(self + 0xf8);
@@ -267,22 +255,24 @@ void CGMonObj::frameStatFuncGiantCrab()
 					pdtIndex = *(int*)(pdtLoadRef + 0x14);
 				}
 			}
-			putParticle__8CGPrgObjFiiP8CGObjectfi(self, (pdtIndex << 8) | 6, 0, self, FLOAT_80331d18, 0);
-			putParticle__8CGPrgObjFiiP8CGObjectfi(self, (pdtIndex << 8) | 7, 0, self, FLOAT_80331d18, 0);
+			reinterpret_cast<CGPrgObj*>(self)->putParticle(
+				(pdtIndex << 8) | 6, 0, reinterpret_cast<CGObject*>(self), FLOAT_80331d18, 0);
+			reinterpret_cast<CGPrgObj*>(self)->putParticle(
+				(pdtIndex << 8) | 7, 0, reinterpret_cast<CGObject*>(self), FLOAT_80331d18, 0);
 		}
 
 		int frame = *(int*)(self + 0x528);
 		if (frame > 0x20) {
 			if (frame == 0x21) {
-				playSe3D__8CGPrgObjFiiiiP3Vec(self, 0x4e30, 0x32, 0x1c2, 0, 0);
+				reinterpret_cast<CGPrgObj*>(self)->playSe3D(0x4e30, 0x32, 0x1c2, 0, 0);
 			} else if (frame == 0x32) {
-				playSe3D__8CGPrgObjFiiiiP3Vec(self, 0x4e35, 0x32, 0x1c2, 0, 0);
+				reinterpret_cast<CGPrgObj*>(self)->playSe3D(0x4e35, 0x32, 0x1c2, 0, 0);
 			}
 
 			*(u32*)(self + 0x1c0) &= 0xfff7fffd;
 			float moveScale = PSVECDistance((Vec*)(SoundBuffer + 0x4f4), (Vec*)(self + 0x15c)) * FLOAT_80331dd4;
 			Vec moveDir = { 0.0f, 0.0f, 0.0f };
-			Move__8CGObjectFP3Vecfiiiii(self, &moveDir, moveScale, 0x10, 1, 0, 0, 0);
+			reinterpret_cast<CGObject*>(self)->Move(&moveDir, moveScale, 0x10, 1, 0, 0, 0);
 
 			int targetIdx = *(int*)(self + 0x6c4);
 			if (targetIdx > -1) {
@@ -295,8 +285,8 @@ void CGMonObj::frameStatFuncGiantCrab()
 			}
 		}
 
-		if (isLoopAnim__8CGPrgObjFv(self) != 0) {
-			changeStat__8CGPrgObjFiii(self, 0, 0, 0);
+		if (reinterpret_cast<CGPrgObj*>(self)->isLoopAnim() != 0) {
+			reinterpret_cast<CGPrgObj*>(self)->changeStat(0, 0, 0);
 			*(u32*)(self + 0x1c0) |= 0x80002;
 		}
 	} else if (state > 99 && state < 0x69) {
@@ -311,12 +301,13 @@ void CGMonObj::frameStatFuncGiantCrab()
 				animId = 0x13;
 			}
 
-			reqAnim__8CGPrgObjFiii(self, animId, 0, 0);
+			reinterpret_cast<CGPrgObj*>(self)->reqAnim(animId, 0, 0);
 			u16 scriptScale = *(u16*)(*(u8**)(self + 0x7c) + 0xd4);
 			float moveMagnitude =
 			    *(float*)(self + 0x690) *
 			    (FLOAT_80331d60 * (float)((double)scriptScale - DOUBLE_80331dc0) + FLOAT_80331db8);
-			moveVectorHRot__8CGObjectFfffi(self, *(float*)(self + 0x1b4) + turnOffset, FLOAT_80331cf8, moveMagnitude, 0x1e);
+			reinterpret_cast<CGObject*>(self)->moveVectorHRot(
+				*(float*)(self + 0x1b4) + turnOffset, FLOAT_80331cf8, moveMagnitude, 0x1e);
 
 			int targetIdx = *(int*)(self + 0x6c4);
 			if (targetIdx > -1) {
@@ -330,18 +321,18 @@ void CGMonObj::frameStatFuncGiantCrab()
 
 			u32 action = (u32) * (void**)(self + 0x68);
 			if (action == 0x63) {
-				playSe3D__8CGPrgObjFiiiiP3Vec(self, 0x8cab, 0x32, 0x1c2, 0, 0);
+				reinterpret_cast<CGPrgObj*>(self)->playSe3D(0x8cab, 0x32, 0x1c2, 0, 0);
 			} else if (action < 99) {
 				if (action == 0x5b) {
-					playSe3D__8CGPrgObjFiiiiP3Vec(self, 0x4e2a, 0x32, 0x1c2, 0, 0);
+					reinterpret_cast<CGPrgObj*>(self)->playSe3D(0x4e2a, 0x32, 0x1c2, 0, 0);
 				}
 			} else if (action == 0x6b) {
-				playSe3D__8CGPrgObjFiiiiP3Vec(self, 0xfdf3, 0x32, 0x1c2, 0, 0);
+				reinterpret_cast<CGPrgObj*>(self)->playSe3D(0xfdf3, 0x32, 0x1c2, 0, 0);
 			}
 		}
 
 		if (*(int*)(self + 0x528) == 0x19) {
-			changeStat__8CGPrgObjFiii(self, 0, 0, 0);
+			reinterpret_cast<CGPrgObj*>(self)->changeStat(0, 0, 0);
 		}
 	}
 }
@@ -424,10 +415,10 @@ void CGMonObj::frameStatFuncGolem()
 		if (state < 0x66) {
 			if (state == 100) {
 				if (reinterpret_cast<CGPrgObj*>(this)->m_stateFrame == 0) {
-					playSe3D__8CGPrgObjFiiiiP3Vec(reinterpret_cast<CGPrgObj*>(this), 0xFA17, 0x32, 0x96, 0, 0);
+					reinterpret_cast<CGPrgObj*>(this)->playSe3D(0xFA17, 0x32, 0x96, 0, 0);
 				} else if (reinterpret_cast<CGPrgObj*>(this)->m_stateFrame == 0x14) {
 					reinterpret_cast<CGObject*>(this)->DispCharaParts(1);
-					playSe3D__8CGPrgObjFiiiiP3Vec(reinterpret_cast<CGPrgObj*>(this), 0xFA18, 0x32, 0x96, 0, 0);
+					reinterpret_cast<CGPrgObj*>(this)->playSe3D(0xFA18, 0x32, 0x96, 0, 0);
 					*reinterpret_cast<int*>(self + 0x6D0) = 1;
 				}
 				reinterpret_cast<CGCharaObj*>(this)->statAttack();
@@ -438,7 +429,7 @@ void CGMonObj::frameStatFuncGolem()
 			}
 			int frame = reinterpret_cast<CGPrgObj*>(this)->m_stateFrame;
 			if (frame == 0) {
-				playSe3D__8CGPrgObjFiiiiP3Vec(reinterpret_cast<CGPrgObj*>(this), 0xFA1A, 0x32, 0x96, 0, 0);
+				reinterpret_cast<CGPrgObj*>(this)->playSe3D(0xFA1A, 0x32, 0x96, 0, 0);
 			} else if (frame == 4) {
 				reinterpret_cast<CGObject*>(this)->DispCharaParts(3);
 				*reinterpret_cast<int*>(self + 0x6D0) = 0;
@@ -455,7 +446,7 @@ void CGMonObj::frameStatFuncGolem()
 			if (reinterpret_cast<CGPrgObj*>(this)->m_stateFrame != 0x32) {
 				return;
 			}
-			changeStat__8CGPrgObjFiii(reinterpret_cast<CGPrgObj*>(this), 0, 0, 0);
+			reinterpret_cast<CGPrgObj*>(this)->changeStat(0, 0, 0);
 			return;
 		}
 	}
@@ -475,7 +466,7 @@ void CGMonObj::frameStatFuncGolem()
 			if (state == 0x68) {
 				turnOffset = FLOAT_80331d2c;
 			}
-			reqAnim__8CGPrgObjFiii(reinterpret_cast<CGPrgObj*>(this), 1, 1, 0);
+			reinterpret_cast<CGPrgObj*>(this)->reqAnim(1, 1, 0);
 			reinterpret_cast<CGObject*>(this)->m_rotTargetY =
 			    reinterpret_cast<CGPrgObj*>(this)->getTargetRot(
 			        reinterpret_cast<CGPrgObj*>(Game.m_partyObjArr[*reinterpret_cast<int*>(self + 0x6C4)]));
@@ -486,8 +477,8 @@ void CGMonObj::frameStatFuncGolem()
 		float moveSpeed =
 		    *reinterpret_cast<float*>(self + 0x690) *
 		    (FLOAT_80331d60 * (static_cast<float>(static_cast<double>(scriptScale) - DOUBLE_80331dc0)) + FLOAT_80331db8);
-		moveVectorHRot__8CGObjectFfffi(reinterpret_cast<CGObject*>(this), *reinterpret_cast<float*>(SoundBuffer + 0x4FC),
-		                               FLOAT_80331cf8, moveSpeed, 1);
+		reinterpret_cast<CGObject*>(this)->moveVectorHRot(*reinterpret_cast<float*>(SoundBuffer + 0x4FC), FLOAT_80331cf8,
+		                                                  moveSpeed, 1);
 	}
 }
 
@@ -599,9 +590,8 @@ void CGMonObj::frameStatFuncOrcKing()
 			pdtNo = -1;
 		}
 
-		putParticle__8CGPrgObjFiiP8CGObjectfi(
-			prgObj, (pdtNo << 8) | 0x18, *reinterpret_cast<int*>(self + 0x58C), object, FLOAT_80331d18, 0x8CC0);
-		reqAnim__8CGPrgObjFiii(prgObj, 0xF, 0, 0);
+		prgObj->putParticle((pdtNo << 8) | 0x18, *reinterpret_cast<int*>(self + 0x58C), object, FLOAT_80331d18, 0x8CC0);
+		prgObj->reqAnim(0xF, 0, 0);
 		object->SetAnimSlot(0x10, 0);
 		object->SetAnimSlot(0x15, 4);
 	} else if (branch == 0x96) {
@@ -613,8 +603,7 @@ void CGMonObj::frameStatFuncOrcKing()
 			pdtNo = -1;
 		}
 
-		putParticle__8CGPrgObjFiiP8CGObjectfi(
-			prgObj, (pdtNo << 8) | 0x19, *reinterpret_cast<int*>(self + 0x590), object, FLOAT_80331d18, 0x8CC1);
+		prgObj->putParticle((pdtNo << 8) | 0x19, *reinterpret_cast<int*>(self + 0x590), object, FLOAT_80331d18, 0x8CC1);
 	} else if (branch == 300) {
 		int pdtNo;
 		u8* pdtRef = reinterpret_cast<u8*>(object->m_charaModelHandle->m_pdtLoadRef);
@@ -624,8 +613,7 @@ void CGMonObj::frameStatFuncOrcKing()
 			pdtNo = -1;
 		}
 
-		putParticle__8CGPrgObjFiiP8CGObjectfi(
-			prgObj, (pdtNo << 8) | 0x1A, *reinterpret_cast<int*>(self + 0x590), object, FLOAT_80331d18, 0x8CC2);
+		prgObj->putParticle((pdtNo << 8) | 0x1A, *reinterpret_cast<int*>(self + 0x590), object, FLOAT_80331d18, 0x8CC2);
 	} else if (branch == 0x1C2) {
 		int pdtNo;
 		u8* pdtRef = reinterpret_cast<u8*>(object->m_charaModelHandle->m_pdtLoadRef);
@@ -635,22 +623,21 @@ void CGMonObj::frameStatFuncOrcKing()
 			pdtNo = -1;
 		}
 
-		putParticle__8CGPrgObjFiiP8CGObjectfi(
-			prgObj, (pdtNo << 8) | 0x1B, *reinterpret_cast<int*>(self + 0x590), object, FLOAT_80331d18, 0x8CC3);
+		prgObj->putParticle((pdtNo << 8) | 0x1B, *reinterpret_cast<int*>(self + 0x590), object, FLOAT_80331d18, 0x8CC3);
 	} else if (branch == 600) {
 		reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0xC00);
 		object->m_bgColMask &= 0xFFF7FFFF;
-		changeStat__8CGPrgObjFiii(prgObj, -9, 0, 0);
+		prgObj->changeStat(-9, 0, 0);
 		object->SetAnimSlot(0, 0);
 
-		CGMonObj* monObj = FindGMonObjFirst__13CFlatRuntime2Fv(CFlat);
+		CGMonObj* monObj = gCFlatRuntime2.FindGMonObjFirst();
 		while (monObj != 0) {
 			if (monObj != this) {
 				u8* monBytes = reinterpret_cast<u8*>(monObj);
 				u16* script = *reinterpret_cast<u16**>(monBytes + 0x58);
 				reinterpret_cast<CGCharaObj*>(monObj)->addHp(-script[0x1A / 2], 0);
 			}
-			monObj = FindGMonObjNext__13CFlatRuntime2FP8CGMonObj(CFlat, monObj);
+			monObj = gCFlatRuntime2.FindGMonObjNext(monObj);
 		}
 		*reinterpret_cast<int*>(SoundBuffer + 1260) = 1;
 	}
@@ -683,9 +670,11 @@ void CGMonObj::alwaysFuncOrcKing()
 		if (object->m_charaModelHandle->m_pdtLoadRef != 0) {
 			pdtNo = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(object->m_charaModelHandle->m_pdtLoadRef) + 0x14);
 		}
-		putParticle__8CGPrgObjFiiP8CGObjectfi(prgObj, (pdtNo << 8) | 0x1D, *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x590), object, FLOAT_80331d18, 0);
+		prgObj->putParticle(
+			(pdtNo << 8) | 0x1D, *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x590), object,
+			FLOAT_80331d18, 0);
 	} else if (timer == 300 && Game.m_gameWork.m_gameOverFlag == 0) {
-		playSe3D__8CGPrgObjFiiiiP3Vec(prgObj, 0x8CBF, 0x32, 0x96, 0, 0);
+		prgObj->playSe3D(0x8CBF, 0x32, 0x96, 0, 0);
 		active = 0;
 		*reinterpret_cast<int*>(CFlat + 4840) = 1;
 	}
@@ -837,7 +826,7 @@ void CGMonObj::frameStatFuncSaw()
 
 		if (prgObj->m_subState == 0) {
 			if (prgObj->m_subFrame == 0) {
-				reqAnim__8CGPrgObjFiii(prgObj, 10, 0, 0);
+				prgObj->reqAnim(10, 0, 0);
 
 				CRef* pdtLoadRef = object->m_charaModelHandle->m_pdtLoadRef;
 				int pdtNo;
@@ -847,18 +836,17 @@ void CGMonObj::frameStatFuncSaw()
 					pdtNo = reinterpret_cast<int*>(pdtLoadRef)[5];
 				}
 
-				putParticle__8CGPrgObjFiiP8CGObjectfi(
-				    prgObj, pdtNo << 8, *reinterpret_cast<int*>(mon + 0x564), object, FLOAT_80331d18, 0x1C52C);
-				playSe3D__8CGPrgObjFiiiiP3Vec(prgObj, 0x1C52B, 0x32, 0x96, 0, 0);
+				prgObj->putParticle(pdtNo << 8, *reinterpret_cast<int*>(mon + 0x564), object, FLOAT_80331d18, 0x1C52C);
+				prgObj->playSe3D(0x1C52B, 0x32, 0x96, 0, 0);
 				memset(mon + 0x70C, 0, 0x34);
 				*reinterpret_cast<int*>(mon + 0x70C) = 0x1402;
-			} else if (isLoopAnim__8CGPrgObjFv(prgObj) != 0) {
+			} else if (prgObj->isLoopAnim() != 0) {
 				prgObj->addSubStat();
 			}
 		} else if (prgObj->m_subState == 1) {
 			if (prgObj->m_subFrame == 0) {
 				*reinterpret_cast<int*>(mon + 0x560) = 0x495;
-				reqAnim__8CGPrgObjFiii(prgObj, 1, 1, 0);
+				prgObj->reqAnim(1, 1, 0);
 			}
 
 			if (prgObj->m_subFrame == 0x19) {
@@ -874,11 +862,11 @@ void CGMonObj::frameStatFuncSaw()
 			if (prgObj->m_subFrame == 0) {
 				(*reinterpret_cast<MonObjSawCallback*>(*reinterpret_cast<int*>(this) + 0x90))(this, 0, 0, 0);
 				mon[0x6C0] = 0;
-				reqAnim__8CGPrgObjFiii(prgObj, 0xB, 0, 0);
+				prgObj->reqAnim(0xB, 0, 0);
 				reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(1);
-				playSe3D__8CGPrgObjFiiiiP3Vec(prgObj, 0x1C52D, 0x32, 0x96, 0, 0);
-			} else if (isLoopAnim__8CGPrgObjFv(prgObj) != 0) {
-				changeStat__8CGPrgObjFiii(prgObj, 0, 0, 0);
+				prgObj->playSe3D(0x1C52D, 0x32, 0x96, 0, 0);
+			} else if (prgObj->isLoopAnim() != 0) {
+				prgObj->changeStat(0, 0, 0);
 			}
 		}
 
@@ -911,7 +899,7 @@ void CGMonObj::logicFuncSaw()
 			prgObj->addSubStat();
 		}
 	} else if (prgObj->m_lastStateId != 100) {
-		changeStat__8CGPrgObjFiii(prgObj, 100, 0, 0);
+		prgObj->changeStat(100, 0, 0);
 	}
 	int& cooldown = *reinterpret_cast<int*>(SoundBuffer + 1268);
 	cooldown = (cooldown - 1) & ~((cooldown - 1) >> 31);
@@ -1013,18 +1001,18 @@ state100:
 	const int flatFlags = *reinterpret_cast<int*>(CFlat + 0x12E8);
 	if ((*reinterpret_cast<volatile signed char*>(SoundBuffer_1260_ + 0x14) < 0) ||
 	    ((branch == 1) && ((flatFlags & 1) != 0)) || ((branch == 2) && ((flatFlags & 2) != 0))) {
-		changeStat__8CGPrgObjFiii(this, 0, 0, 0);
+		reinterpret_cast<CGPrgObj*>(this)->changeStat(0, 0, 0);
 	}
 	return;
 
 state101:
 	if (*reinterpret_cast<int*>(self + 0x528) == 0) {
-		reqAnim__8CGPrgObjFiii(this, -1, 0, 0);
+		reinterpret_cast<CGPrgObj*>(this)->reqAnim(-1, 0, 0);
 		rotTarget__8CGMonObjFif(this, *reinterpret_cast<int*>(self + 0x6C4), FLOAT_80331da4);
 	}
 	if ((*reinterpret_cast<volatile signed char*>(SoundBuffer_1260_ + 0x14) < 0) ||
 	    (*reinterpret_cast<float*>(self + 0x5D0 + *reinterpret_cast<int*>(self + 0x620) * 4) < FLOAT_80331da8)) {
-		changeStat__8CGPrgObjFiii(this, 0, 0, 0);
+		reinterpret_cast<CGPrgObj*>(this)->changeStat(0, 0, 0);
 	}
 	return;
 
@@ -1288,11 +1276,11 @@ void CGMonObj::frameStatFuncLich()
 	if (((flatFlags & 1) == 0) && (static_cast<s8>(lichFlags) < 0)) {
 		lichFlags = (lichFlags & 0x3F) | 0x40;
 		*reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x6C8) = 0;
-		playSe3D__8CGPrgObjFiiiiP3Vec(prgObj, 0x1157C, 0x32, 0x96, 0, 0);
+		prgObj->playSe3D(0x1157C, 0x32, 0x96, 0, 0);
 	} else if (((flatFlags & 1) != 0) && (static_cast<s8>(lichFlags) >= 0)) {
 		lichFlags = (lichFlags & 0x3F) | 0xC0;
 		*reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x6C8) = 0;
-		playSe3D__8CGPrgObjFiiiiP3Vec(prgObj, 0x1157D, 0x32, 0x96, 0, 0);
+		prgObj->playSe3D(0x1157D, 0x32, 0x96, 0, 0);
 	}
 
 	if ((lichFlags & 0x40) != 0) {
@@ -1302,9 +1290,8 @@ void CGMonObj::frameStatFuncLich()
 			if (object->m_charaModelHandle != 0 && object->m_charaModelHandle->m_pdtLoadRef != 0) {
 				pdtNo = *reinterpret_cast<int*>(reinterpret_cast<u8*>(object->m_charaModelHandle->m_pdtLoadRef) + 0x14);
 			}
-			putParticle__8CGPrgObjFiiP8CGObjectfi(prgObj, (pdtNo << 8) | 0x1D,
-			                                      *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x590), object,
-			                                      FLOAT_80331d18, 0);
+			prgObj->putParticle((pdtNo << 8) | 0x1D, *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x590),
+			                    object, FLOAT_80331d18, 0);
 		}
 		lichFlags &= 0xBF;
 	}
@@ -1312,7 +1299,7 @@ void CGMonObj::frameStatFuncLich()
 	const int stat = prgObj->m_lastStateId;
 	if (stat == 0x65) {
 		if (prgObj->m_stateFrame == 0 && flatFlags == 3) {
-			changeStat__8CGPrgObjFiii(prgObj, 0, 0, 0);
+			prgObj->changeStat(0, 0, 0);
 		} else {
 			chara->statAttack();
 			if (prgObj->m_stateFrame == 0x29) {
@@ -1415,7 +1402,7 @@ void CGMonObj::frameStatFuncTetsukyojin()
 
 	if (state == 0x66) {
 		if (*reinterpret_cast<int*>(CFlat + 4840) < 1) {
-			changeStat__8CGPrgObjFiii(prgObj, 0, 0, 0);
+			prgObj->changeStat(0, 0, 0);
 		} else {
 			if ((*reinterpret_cast<int*>(self + 0x6B4) == 1) && (prgObj->m_stateFrame == 0)) {
 				CFlatRuntime::CStack stack[3];
@@ -1432,7 +1419,7 @@ void CGMonObj::frameStatFuncTetsukyojin()
 			if (*reinterpret_cast<int*>(CFlat + 4844) == 0) {
 				*reinterpret_cast<int*>(self + 0x6B4) = 0;
 				*reinterpret_cast<int*>(self + 0x6C8) = 0;
-				changeStat__8CGPrgObjFiii(prgObj, 0, 0, 0);
+				prgObj->changeStat(0, 0, 0);
 			}
 		}
 	} else if (state == 100) {
@@ -1506,7 +1493,7 @@ void CGMonObj::frameStatFuncTetsukyojin()
 				if (object->m_charaModelHandle->m_pdtLoadRef != 0) {
 					pdtNo = *reinterpret_cast<int*>(reinterpret_cast<u8*>(object->m_charaModelHandle->m_pdtLoadRef) + 0x14);
 				}
-				putParticle__8CGPrgObjFiiP8CGObjectfi(prgObj, (pdtNo << 8) | 0x2D, 0, object, FLOAT_80331d18, 0x101E4);
+				prgObj->putParticle((pdtNo << 8) | 0x2D, 0, object, FLOAT_80331d18, 0x101E4);
 
 				if (*reinterpret_cast<int*>(self + 0x6B4) == 0) {
 					*reinterpret_cast<int*>(CFlat + 4840) = *reinterpret_cast<int*>(CFlat + 4840) - 1;
@@ -1554,7 +1541,7 @@ void CGMonObj::damagedFuncGigasLoad()
 	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
 	switch (*reinterpret_cast<int*>(mon + 0x6D0)) {
 	case 0:
-		changeStat__8CGPrgObjFiii(reinterpret_cast<CGPrgObj*>(this), 4, 0, 0);
+		reinterpret_cast<CGPrgObj*>(this)->changeStat(4, 0, 0);
 		*reinterpret_cast<int*>(mon + 0x6D0) = 1;
 		*reinterpret_cast<int*>(CFlat + 4840) = 1;
 		break;
@@ -1629,16 +1616,16 @@ void CGMonObj::frameStatFuncWifeLamia()
 			}
 			moveFrame__8CGMonObjFv(this);
 			if ((*reinterpret_cast<u32*>(mon + 0x710) & 1) != 0) {
-				addSubStat__8CGPrgObjFv(prgObj);
+				prgObj->addSubStat();
 			}
 		} else if (prgObj->m_subState == 1) {
 			if (prgObj->m_subFrame == 0) {
-				reqAnim__8CGPrgObjFiii(prgObj, 0x1A, 0, 0);
-			} else if (isLoopAnim__8CGPrgObjFv(prgObj) != 0) {
-				addSubStat__8CGPrgObjFv(prgObj);
+				prgObj->reqAnim(0x1A, 0, 0);
+			} else if (prgObj->isLoopAnim() != 0) {
+				prgObj->addSubStat();
 			}
 		} else if (prgObj->m_subState == 2 && prgObj->m_subFrame == 0) {
-			reqAnim__8CGPrgObjFiii(prgObj, 0x1B, 1, 0);
+			prgObj->reqAnim(0x1B, 1, 0);
 		}
 	}
 }
@@ -1659,7 +1646,7 @@ void CGMonObj::damagedFuncWifeLamia()
 	if (script[14] <= 1) {
 		reinterpret_cast<CGCharaObj*>(this)->ClearAllSta();
 		object->m_bgColMask &= 0xFFF7FFFF;
-		changeStat__8CGPrgObjFiii(reinterpret_cast<CGPrgObj*>(this), 100, 0, 0);
+		reinterpret_cast<CGPrgObj*>(this)->changeStat(100, 0, 0);
 		*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6D0) = 1;
 	}
 }
@@ -1730,8 +1717,8 @@ void CGMonObj::frameStatFuncMolbol()
 
 	if (prgObj->m_stateFrame == 0 || prgObj->m_stateFrame == 5 || prgObj->m_stateFrame == 10) {
 		CVector pos(Game.m_partyObjArr[*reinterpret_cast<int*>(self + 0x6C4)]->m_worldPosition);
-		pos.x += RandFPM__5CMathFf(static_cast<float>((prgObj->m_stateFrame == 0) ? 0 : 40), &Math);
-		pos.z += RandFPM__5CMathFf(static_cast<float>((prgObj->m_stateFrame == 0) ? 0 : 40), &Math);
+		pos.x += Math.RandFPM(static_cast<float>((prgObj->m_stateFrame == 0) ? 0 : 40));
+		pos.z += Math.RandFPM(static_cast<float>((prgObj->m_stateFrame == 0) ? 0 : 40));
 		charaObj->putParticleFromItem(charaObj->m_itemId, 3, charaObj->m_particleSlots[0], reinterpret_cast<Vec*>(&pos));
 	}
 	charaObj->statAttack();
@@ -1758,7 +1745,7 @@ void CGMonObj::initFinishedFuncMeteoParasiteC()
 		work->m_index = 3;
 		*reinterpret_cast<u16*>(reinterpret_cast<u8*>(object->m_scriptHandle) + 0x1C) = 1;
 		object->SetAnimSlot(0x35, 0);
-		reqAnim__8CGPrgObjFiii(this, 0x35, 1, 0);
+		reinterpret_cast<CGPrgObj*>(this)->reqAnim(0x35, 1, 0);
 		object->PlayAnim(0x35, 1, 0, -1, -1, 0);
 	}
 }
@@ -1783,11 +1770,11 @@ void CGMonObj::damagedFuncMeteoParasiteC()
 
 	if (script[7] < ((script[0x1A / 2] * 2) / 3)) {
 		timer = 0;
-		changeStat__8CGPrgObjFiii(reinterpret_cast<CGPrgObj*>(this), 0x66, 0, 0);
+		reinterpret_cast<CGPrgObj*>(this)->changeStat(0x66, 0, 0);
 		object->m_bgColMask &= 0xFFF7FFFF;
 	} else if (timer > 0x31) {
 		timer = 0;
-		changeStat__8CGPrgObjFiii(reinterpret_cast<CGPrgObj*>(this), 0x67, 0, 0);
+		reinterpret_cast<CGPrgObj*>(this)->changeStat(0x67, 0, 0);
 		object->m_bgColMask &= 0xFFF7FFFF;
 	}
 }
@@ -1927,7 +1914,7 @@ void CGMonObj::logicFuncMeteoParasiteC()
 		}
 	}
 	if (nextState != -1) {
-		changeStat__8CGPrgObjFiii(reinterpret_cast<CGPrgObj*>(this), nextState, 0, 0);
+		reinterpret_cast<CGPrgObj*>(this)->changeStat(nextState, 0, 0);
 	} else {
 		logicFuncDefault__8CGMonObjFv(this);
 	}
@@ -2067,15 +2054,15 @@ void CGMonObj::alwaysFuncMeteoParasite()
 		int arg1;
 		if (chara->getItemPdt(0, 0, effect, arg0, arg1) != 0) {
 			if (*reinterpret_cast<int*>(m_boss__8CGMonObj + 0x80) == 0) {
-				changeStat__8CGPrgObjFiii(prgObj, 100, 0, 0);
+				prgObj->changeStat(100, 0, 0);
 				*reinterpret_cast<int*>(mon + 0x6D0) = 0;
 			}
 			if (*reinterpret_cast<int*>(m_boss__8CGMonObj + 0x80) == 2) {
-				changeStat__8CGPrgObjFiii(prgObj, 0x65, 0, 0);
+				prgObj->changeStat(0x65, 0, 0);
 				*reinterpret_cast<int*>(mon + 0x6D0) = 2;
 			}
 			if (*reinterpret_cast<int*>(m_boss__8CGMonObj + 0x80) == 1) {
-				changeStat__8CGPrgObjFiii(prgObj, 0x66, 0, 0);
+				prgObj->changeStat(0x66, 0, 0);
 				*reinterpret_cast<int*>(mon + 0x6D0) = 1;
 			}
 			m_boss__8CGMonObj[0x7C] &= 0x7F;
@@ -2172,7 +2159,7 @@ void CGMonObj::logicFuncMeteoParasite()
 	if (nextState == -1) {
 		logicFuncDefault__8CGMonObjFv(this);
 	} else {
-		changeStat__8CGPrgObjFiii(reinterpret_cast<CGPrgObj*>(this), nextState, 0, 0);
+		reinterpret_cast<CGPrgObj*>(this)->changeStat(nextState, 0, 0);
 	}
 }
 
@@ -2220,12 +2207,12 @@ int CGMonObj::attackCheckFuncMeteoParasite(int)
  */
 void CGMonObj::aiAddDuct(int& seq)
 {
-	if (Rand__5CMathFUl(&Math, 300) == 0) {
+	if (Math.Rand(300) == 0) {
 		aiTarget__8CGMonObjFv(this);
 		_aiSeq__8CGMonObjFiiiiii(this, -14, seq, 0, 1, 100, -1);
 		_aiSeq__8CGMonObjFiiiiii(this, -13, seq, 1, 0, 100, -1);
-		const int seOffset = Rand__5CMathFUl(&Math, 3);
-		playSe3D__8CGPrgObjFiiiiP3Vec(reinterpret_cast<CGPrgObj*>(this), seOffset + 0x11D40, 0x32, 0x96, 0, 0);
+		const int seOffset = Math.Rand(3);
+		reinterpret_cast<CGPrgObj*>(this)->playSe3D(seOffset + 0x11D40, 0x32, 0x96, 0, 0);
 	}
 }
 
@@ -2265,7 +2252,7 @@ void CGMonObj::damagedFuncDuct()
 	if (pdtLoadRef != 0) {
 		pdtNo = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(pdtLoadRef) + 0x14);
 	}
-	putParticle__8CGPrgObjFiiP8CGObjectfi(reinterpret_cast<CGPrgObj*>(this), (pdtNo << 8) | 2, 0, object, FLOAT_80331d18, 0);
+	reinterpret_cast<CGPrgObj*>(this)->putParticle((pdtNo << 8) | 2, 0, object, FLOAT_80331d18, 0);
 
 	if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + 0x1C) == 0) {
 		CGObject* bossObj = *reinterpret_cast<CGObject**>(SoundBuffer_1260_ + 0x68);
@@ -2298,14 +2285,14 @@ void CGMonObj::logicFuncRamoe()
 		}
 	}
 
-	if (activeCount == 0 && Rand__5CMathFUl(&Math, 3) == 0) {
+	if (activeCount == 0 && Math.Rand(3) == 0) {
 		nextState = 100;
 	}
 
 	if (nextState == -1) {
 		logicFuncDefault__8CGMonObjFv(this);
 	} else {
-		changeStat__8CGPrgObjFiii(reinterpret_cast<CGPrgObj*>(this), nextState, 0, 0);
+		reinterpret_cast<CGPrgObj*>(this)->changeStat(nextState, 0, 0);
 	}
 }
 
@@ -2405,7 +2392,7 @@ void CGMonObj::damagedFuncLastBoss()
 	if (timer >= 100 && *reinterpret_cast<int*>(mon + 0x6D0) == 0) {
 		*reinterpret_cast<int*>(mon + 0x6D0) = 1;
 		*reinterpret_cast<int*>(mon + 0x6C8) = 0;
-		changeStat__8CGPrgObjFiii(prgObj, 100, 0, 0);
+		prgObj->changeStat(100, 0, 0);
 		object->m_bgColMask &= 0xFFF7FFFF;
 		timer = 0;
 	}
@@ -2449,7 +2436,7 @@ void CGMonObj::cancelStatFuncLastBoss()
 			if (party != 0) {
 				CGPrgObj* partyPrg = reinterpret_cast<CGPrgObj*>(party);
 				if (partyPrg->m_lastStateId == 0x25) {
-					changeStat__8CGPrgObjFiii(partyPrg, 0x24, 0, 0);
+					partyPrg->changeStat(0x24, 0, 0);
 				}
 			}
 		}
@@ -2609,7 +2596,7 @@ void CGMonObj::logicFuncLastBoss()
 	if (nextState == -1) {
 		logicFuncDefault__8CGMonObjFv(this);
 	} else {
-		changeStat__8CGPrgObjFiii(prgObj, nextState, 0, 0);
+		prgObj->changeStat(nextState, 0, 0);
 	}
 }
 
@@ -2684,7 +2671,7 @@ void CGMonObj::teleport(
 			if (stateFrame == blendStartFrame + 1) {
 				int nextIndex;
 				do {
-					nextIndex = Rand__5CMathFUl(&Math, 4);
+					nextIndex = Math.Rand(4);
 				} while (nextIndex == teleportIndex);
 
 				teleportIndex = nextIndex;
@@ -2832,7 +2819,7 @@ void CGMonObj::suikomi(int endFrame, float zOffset)
 	unsigned char* self = reinterpret_cast<unsigned char*>(this);
 
 	if (prgObj->m_stateFrame == 0) {
-		playSe3D__8CGPrgObjFiiiiP3Vec(prgObj, 0xdec0, 0x32, 0x1c2, 0, 0);
+		prgObj->playSe3D(0xdec0, 0x32, 0x1c2, 0, 0);
 		for (int i = 0; i < 4; i++) {
 			CGPartyObj* party = Game.m_partyObjArr[i];
 			if (party != 0) {

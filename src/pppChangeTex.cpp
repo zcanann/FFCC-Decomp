@@ -119,7 +119,6 @@ static void ChangeTex_AfterDrawMeshCallback(CChara::CModel*, void*, void*, int, 
 extern "C" {
 		void* GetCharaHandlePtr__FP8CGObjectl(void* obj, long index);
 		int GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void* handle);
-		void pppHeapUseRate__FPQ27CMemory6CStage(void* stage);
 		void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(_pppPObject*, long, float&, float&, float&, float, float&, float&);
 		void* GetTextureFromRSD__FiP9_pppEnvSt(int, _pppEnvSt*);
 }
@@ -368,25 +367,25 @@ freeArrays:
 	void** stageArrayOrig = stageArray;
 	for (unsigned int i = 0; i < model->m_data->m_meshCount; i++, meshList += 0x14) {
 		int meshData = *(int*)(meshList + 8);
-		void** dlEntries = (void**)*stageArray;
+			void** dlEntries = (void**)*stageArray;
 		for (unsigned int j = 0; j < *(unsigned int*)(meshData + 0x4c); j++) {
 			if (*(void**)*dlEntries != 0) {
-				pppHeapUseRate__FPQ27CMemory6CStage(*(void**)*dlEntries);
+				pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(*(void**)*dlEntries));
 				*(void**)*dlEntries = 0;
 			}
 			if (*dlEntries != 0) {
-				pppHeapUseRate__FPQ27CMemory6CStage(*dlEntries);
+				pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(*dlEntries));
 				*dlEntries = 0;
 			}
 			dlEntries++;
 		}
 
 		if (*stageArray != 0) {
-			pppHeapUseRate__FPQ27CMemory6CStage(*stageArray);
+			pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(*stageArray));
 			*stageArray = 0;
 		}
 		if (*meshArray != 0) {
-			pppHeapUseRate__FPQ27CMemory6CStage(*meshArray);
+			pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(*meshArray));
 			*meshArray = 0;
 		}
 
@@ -395,10 +394,10 @@ freeArrays:
 	}
 
 	if (stageArrayOrig != 0) {
-		pppHeapUseRate__FPQ27CMemory6CStage(stageArrayOrig);
+		pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(stageArrayOrig));
 	}
 	if (meshArrayOrig != 0) {
-		pppHeapUseRate__FPQ27CMemory6CStage(meshArrayOrig);
+		pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(meshArrayOrig));
 	}
 }
 

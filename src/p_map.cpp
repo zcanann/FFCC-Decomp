@@ -141,10 +141,7 @@ unsigned int s_CMapPcsRttiBase1[5] = {
 extern const char s_p_map_cpp_801d7728[];
 extern const char s_map_load_ok_fmt[];
 extern const char s_dvd_map_stage_map_fmt[];
-extern "C" void Destroy__7CMapMngFv(CMapMng*);
 extern "C" void MapFileRead__7CMapMngFPcRUl(CMapMng*);
-
-extern "C" void DrawBound__8CGraphicFR6CBound8_GXColor(CGraphic*, void*, _GXColor);
 
 struct CBoundHack {
     Vec m_min;
@@ -498,7 +495,7 @@ unsigned long long CMapPcs::IsLoadMapCompleted()
  */
 void CMapPcs::destroy()
 {
-    Destroy__7CMapMngFv(&MapMng);
+    MapMng.Destroy();
 }
 
 /*
@@ -911,7 +908,7 @@ void CMapPcs::drawAfter()
             if ((*reinterpret_cast<u32*>(CFlat + 0x129C) & 0x02000000) != 0) {
                 CBoundHack bound;
                 bound = *reinterpret_cast<CBoundHack*>(reinterpret_cast<char*>(&CameraPcs) + 0x414);
-                DrawBound__8CGraphicFR6CBound8_GXColor(&Graphic, &bound, CColor(0xFF, 0xFF, 0x80, 0xFF).color);
+                Graphic.DrawBound(*reinterpret_cast<CBound*>(&bound), CColor(0xFF, 0xFF, 0x80, 0xFF).color);
             }
         }
     }
@@ -966,7 +963,7 @@ void CMapPcs::drawAfterViewer()
                 bound = *reinterpret_cast<CBoundHack*>(reinterpret_cast<char*>(&CameraPcs) + 0x414);
                 const CColor& colorObj = CColor(0xFF, 0xFF, 0x80, 0xFF);
                 GXColor color = colorObj.color;
-                DrawBound__8CGraphicFR6CBound8_GXColor(&Graphic, &bound, color);
+                Graphic.DrawBound(*reinterpret_cast<CBound*>(&bound), color);
             }
         }
     }

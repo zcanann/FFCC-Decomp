@@ -62,13 +62,18 @@ struct _pppEnvStYmDeformationShp {
 	CMapMesh** m_mapMeshPtr;
 };
 
+template <typename T>
+static inline T* PppWorkArea(pppYmDeformationShp* object, pppYmDeformationShpUnkC* ctrl, int index)
+{
+	return reinterpret_cast<T*>(reinterpret_cast<_pppPObject*>(object)->m_workArea + ctrl->m_serializedDataOffsets[index]);
+}
+
 void pppSetBlendMode(unsigned char);
 void pppSetDrawEnv(pppCVECTOR*, pppFMATRIX*, float, unsigned char, unsigned char, unsigned char, unsigned char,
                    unsigned char, unsigned char, unsigned char);
 
 extern "C" {
 void DisableIndWarp__F13_GXTevStageID16_GXIndTexStageID(int stage, int indStage);
-void MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(void* math, Mtx44 mtx, Vec4d* src, Vec4d* dst);
 }
 
 /*
@@ -82,8 +87,7 @@ void MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(void* math, Mtx44 mtx, Vec4d* src
  */
 void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmDeformationShpUnkB* param_2, pppYmDeformationShpUnkC* param_3)
 {
-	VYmDeformationShp* work =
-		(VYmDeformationShp*)((u8*)pppYmDeformationShp_ + 0x80 + param_3->m_serializedDataOffsets[2]);
+	VYmDeformationShp* work = PppWorkArea<VYmDeformationShp>(pppYmDeformationShp_, param_3, 2);
 	int textureIndex = 0;
 	Vec2d uvs[4];
 	float indMtx[2][3];
@@ -93,7 +97,7 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 
 	if (param_2->m_dataValIndex != 0xFFFF) {
 		YmDeformationShpColorInfo* colorInfo =
-			(YmDeformationShpColorInfo*)((u8*)pppYmDeformationShp_ + 0x80 + param_3->m_serializedDataOffsets[1]);
+			PppWorkArea<YmDeformationShpColorInfo>(pppYmDeformationShp_, param_3, 1);
 		_pppEnvStYmDeformationShp* env = (_pppEnvStYmDeformationShp*)pppEnvStPtr;
 		int textureBase =
 			reinterpret_cast<int>(env->m_mapMeshPtr[param_2->m_dataValIndex]->GetTexture(env->m_materialSetPtr, textureIndex));
@@ -386,7 +390,7 @@ int RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* verti
 		clipPos.y = worldPos.y;
 		clipPos.z = worldPos.z;
 		clipPos.w = one;
-		MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(&Math, ppvScreenMatrix, &clipPos, &projected[i]);
+		Math.MTX44MultVec4(ppvScreenMatrix, &clipPos, &projected[i]);
 		projected[i].x = projected[i].x / projected[i].w;
 		projected[i].y = projected[i].y / projected[i].w;
 		projected[i].z = projected[i].z / projected[i].w;
@@ -564,7 +568,7 @@ void pppFrameYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmDe
 		return;
 	}
 
-	state = (VYmDeformationShp*)((u8*)pppYmDeformationShp_ + 0x80 + param_3->m_serializedDataOffsets[2]);
+	state = PppWorkArea<VYmDeformationShp>(pppYmDeformationShp_, param_3, 2);
 
 	CalcGraphValue(
 		(_pppPObject*)pppYmDeformationShp_, param_2->m_graphId, state->m_scale, state->m_values[0], state->m_values[1],
@@ -620,8 +624,7 @@ void pppDestructYmDeformationShp(pppYmDeformationShp*, pppYmDeformationShpUnkC*)
 void pppConstruct2YmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmDeformationShpUnkC* param_2)
 {
 	const float& value = kPppYmDeformationShpZero;
-	VYmDeformationShp* state =
-		(VYmDeformationShp*)((u8*)pppYmDeformationShp_ + 0x80 + param_2->m_serializedDataOffsets[2]);
+	VYmDeformationShp* state = PppWorkArea<VYmDeformationShp>(pppYmDeformationShp_, param_2, 2);
 
 	state->m_values[1] = value;
 	state->m_values[0] = value;
@@ -643,8 +646,7 @@ void pppConstruct2YmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pp
 void pppConstructYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmDeformationShpUnkC* param_2)
 {
 	const float& value = kPppYmDeformationShpZero;
-	VYmDeformationShp* state =
-		(VYmDeformationShp*)((u8*)pppYmDeformationShp_ + 0x80 + param_2->m_serializedDataOffsets[2]);
+	VYmDeformationShp* state = PppWorkArea<VYmDeformationShp>(pppYmDeformationShp_, param_2, 2);
 
 	state->m_backBuffer = 0;
 	state->m_pad0 = 0;

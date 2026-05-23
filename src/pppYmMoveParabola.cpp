@@ -18,6 +18,12 @@ struct pppYmMoveParabolaWork {
     Vec m_basePosition;
 };
 
+static inline pppYmMoveParabolaWork* ParabolaWork(pppYmMoveParabola* object, pppYmMoveParabolaUnkC* ctrl)
+{
+    return reinterpret_cast<pppYmMoveParabolaWork*>(
+        reinterpret_cast<_pppPObject*>(object)->m_workArea + *ctrl->m_serializedDataOffsets);
+}
+
 /*
  * --INFO--
  * PAL Address: 0x800d4278
@@ -33,8 +39,7 @@ extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct
         return;
     }
 
-    pppYmMoveParabolaWork* work =
-        (pppYmMoveParabolaWork*)((u8*)basePtr + *offsetData->m_serializedDataOffsets + 0x80);
+    pppYmMoveParabolaWork* work = ParabolaWork(basePtr, offsetData);
     _pppMngSt* pppMngSt = pppMngStPtr;
 
     work->m_velocity = work->m_velocity + work->m_acceleration;
@@ -102,8 +107,7 @@ extern "C" void pppConstructYmMoveParabola(struct pppYmMoveParabola* basePtr, st
 {
     const f32 zero = gPppYmMoveParabolaZero;
     _pppMngSt* pppMngSt = pppMngStPtr;
-    pppYmMoveParabolaWork* work =
-        (pppYmMoveParabolaWork*)((u8*)basePtr + *dataPtr->m_serializedDataOffsets + 0x80);
+    pppYmMoveParabolaWork* work = ParabolaWork(basePtr, dataPtr);
 
     work->m_acceleration = zero;
     work->m_velocity = zero;

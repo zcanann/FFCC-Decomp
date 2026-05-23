@@ -483,10 +483,10 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             U8At(this, 0x15) = priority;
             U8At(this, 0x14) = priority;
         } else if (chunk.m_id == CHUNK_AMBI) {
-            U8At(this, 0xE8) = chunkFile.Get1();
-            U8At(this, 0xE9) = chunkFile.Get1();
-            U8At(this, 0xEA) = chunkFile.Get1();
-            U8At(this, 0xEB) = chunkFile.Get1();
+            m_ambientColor.r = chunkFile.Get1();
+            m_ambientColor.g = chunkFile.Get1();
+            m_ambientColor.b = chunkFile.Get1();
+            m_ambientColor.a = chunkFile.Get1();
             U8At(this, 0x21) = 1;
         } else if (chunk.m_id == CHUNK_GEOM) {
             F32At(this, 0x40) = chunkFile.GetF4();
@@ -1325,7 +1325,7 @@ void CMapObj::SetDrawEnv()
         mapColor.b = mapMng[0x2298E];
         mapColor.a = mapMng[0x2298F];
     } else {
-        mapColor = *reinterpret_cast<_GXColor*>(Ptr(this, 0xE8));
+        mapColor = m_ambientColor;
     }
 
     if (mapMng[0x22989] != 0) {
@@ -1419,7 +1419,7 @@ void CMapObj::Draw(unsigned char priority)
         mapColor.b = mapMng[0x2298E];
         mapColor.a = mapMng[0x2298F];
     } else {
-        mapColor = *reinterpret_cast<_GXColor*>(Ptr(this, 0xE8));
+        mapColor = m_ambientColor;
     }
 
     if (mapMng[0x22989] != 0) {

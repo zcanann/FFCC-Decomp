@@ -1,6 +1,8 @@
 #ifndef _FFCC_MAPOBJ_H_
 #define _FFCC_MAPOBJ_H_
 
+#include <dolphin/gx/GXStruct.h>
+
 class CChunkFile;
 class CMapKeyFrame;
 class CMapCylinder;
@@ -15,7 +17,6 @@ class CMapObjAtrMeshName;
 class CMaterialMan;
 class CCameraPcs;
 struct Vec;
-struct _GXColor;
 
 void calcColorKeyFrame(CMapKeyFrame*, _GXColor&, _GXColor*);
 
@@ -165,7 +166,8 @@ public:
     char m_pad36[0x52];
     float m_localMtx[3][4];         // 0x88
     float m_worldMtx[3][4];         // 0xB8
-    char m_padE8[0x08];
+    _GXColor m_ambientColor;        // 0xE8
+    char m_padEC[0x04];
 };
 
 typedef char CMapObj_size_check[(sizeof(CMapObj) == 0xF0) ? 1 : -1];

@@ -15,10 +15,6 @@
 #include <string.h>
 #include "ffcc/fontman.h"
 
-extern "C" void putParticle__8CGPrgObjFiiP8CGObjectfi(void*, int, int, void*, float, int);
-extern "C" void putParticleTrace__8CGPrgObjFiiP8CGObjectfi(void*, int, int, void*, float, int);
-extern "C" void putParticle__8CGPrgObjFiiP3Vecfi(void*, int, int, Vec*, float, int);
-extern "C" void playSe3D__8CGPrgObjFiiiiP3Vec(void*, int, int, int, int, Vec*);
 extern float FLOAT_80331b1c;
 extern const float FLOAT_80331b18;
 extern const float FLOAT_80331b20 = 0.0f;
@@ -421,8 +417,7 @@ void CGItemObj::loadModel()
 					const float& particleScaleBase = FLOAT_80331b4c;
 					float particleScale =
 					    particleScaleStep * (float)(unsigned short)*(unsigned short*)(entryBase + 0x10) + particleScaleBase;
-					putParticle__8CGPrgObjFiiP8CGObjectfi(
-					    this, particleNo | 0x100, *(int*)(self + 0x55C), this, particleScale, 0);
+					putParticle(particleNo | 0x100, *(int*)(self + 0x55C), this, particleScale, 0);
 				}
 			}
 		}
@@ -551,7 +546,7 @@ void CGItemObj::onFrameAlways()
 
 		if (canUseTrace && *(int*)(CFlat + 66604) == 0) {
 			*(int*)(CFlat + 66604) = gCFlatRuntime2.GetFreeParticleSlot();
-			putParticleTrace__8CGPrgObjFiiP8CGObjectfi(this, 0x141, *(int*)(CFlat + 66604), this, FLOAT_80331b18, 0);
+			putParticleTrace(0x141, *(int*)(CFlat + 66604), this, FLOAT_80331b18, 0);
 		} else if (!canUseTrace && *(int*)(CFlat + 66604) != 0) {
 			gCFlatRuntime2.EndParticleSlot(*(int*)(CFlat + 66604), 0);
 			*(int*)(CFlat + 66604) = 0;
@@ -1112,10 +1107,9 @@ void CGItemObj::onFrameStat()
 				particleNoB = 0x1D;
 			}
 
-			putParticle__8CGPrgObjFiiP3Vecfi(this, particleNoA | 0x100, 0, &prgObj->m_worldPosition, FLOAT_80331b18, 0);
-			putParticle__8CGPrgObjFiiP3Vecfi(
-			    this, particleNoB | 0x100, *(int*)(self + 0x55C), &prgObj->m_worldPosition, FLOAT_80331b18, 0);
-			playSe3D__8CGPrgObjFiiiiP3Vec(this, 0x1A, 0x32, 0x96, 0, 0);
+			putParticle(particleNoA | 0x100, 0, &prgObj->m_worldPosition, FLOAT_80331b18, 0);
+			putParticle(particleNoB | 0x100, *(int*)(self + 0x55C), &prgObj->m_worldPosition, FLOAT_80331b18, 0);
+			playSe3D(0x1A, 0x32, 0x96, 0, 0);
 			prgObj->m_displayFlags &= ~1;
 			prgObj->m_bgColMask &= 0xFFFFFFF1;
 			prgObj->m_moveOffset.z = zero;
@@ -1229,8 +1223,7 @@ void CGItemObj::onFrameStat()
 			float particleScale =
 			    FLOAT_80331b50 * (float)*(unsigned short*)(Game.unkCFlatData0[2] + prgObj->m_worldParamB * 0x48 + 0x10) +
 			    FLOAT_80331b4c;
-			putParticle__8CGPrgObjFiiP8CGObjectfi(
-			    this, (pdtNo << 8) | 4, *(int*)(self + 0x55C), this, particleScale, 0x12908);
+			putParticle((pdtNo << 8) | 4, *(int*)(self + 0x55C), this, particleScale, 0x12908);
 		} else if (*(int*)(self + 0x528) == 0xD) {
 			int ownerSlot = *(int*)(*(unsigned char**)(*(unsigned char**)(self + 0x550) + 0x58) + 0x3B4);
 
@@ -1283,8 +1276,7 @@ void CGItemObj::onFrameStat()
 			float particleScale =
 			    FLOAT_80331b50 * (float)*(unsigned short*)(Game.unkCFlatData0[2] + prgObj->m_worldParamB * 0x48 + 0x10) +
 			    FLOAT_80331b4c;
-			putParticle__8CGPrgObjFiiP8CGObjectfi(
-			    this, (pdtNo << 8) | 0x13, *(int*)(self + 0x55C), this, particleScale, 0x12903);
+			putParticle((pdtNo << 8) | 0x13, *(int*)(self + 0x55C), this, particleScale, 0x12903);
 		} else if (*(int*)(self + 0x528) == 0xD) {
 			int ownerSlot = *(int*)(*(unsigned char**)(*(unsigned char**)(self + 0x550) + 0x58) + 0x3B4);
 
@@ -1351,8 +1343,7 @@ void CGItemObj::onFrame()
 			unsigned char* itemTable = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]);
 			float particleValue = static_cast<float>(*reinterpret_cast<unsigned short*>(itemTable + m_worldParamB * 0x48 + 0x10));
 			float particleScale = FLOAT_80331b50 * (float)particleValue + FLOAT_80331b4c;
-			putParticle__8CGPrgObjFiiP8CGObjectfi(
-			    this, (soundEntry << 8) | ownerScriptSlot, m_particleSlot, this, particleScale, 0x12909);
+			putParticle((soundEntry << 8) | ownerScriptSlot, m_particleSlot, this, particleScale, 0x12909);
 
 			CVector zero(FLOAT_80331b20, FLOAT_80331b20, FLOAT_80331b20);
 			SetDamageCol(0, const_cast<char*>(DAT_80331bc8), FLOAT_80331bb8, FLOAT_80331bb8,

@@ -85,7 +85,6 @@ struct SingMenuSoloNameTable
 };
 
 extern "C" void DrawHeart__8CMesMenuFffff(void*, float, float, float, float);
-extern "C" int GetModelNo__8CMenuPcsFiii(CMenuPcs*, int, int, int);
 extern "C" char* s_stand_80332a24;
 char s_singmenu_cpp_801de8d4[] = "singmenu.cpp";
 extern "C" char* s_dvd__smenu__s_tex_801de8e4;
@@ -1060,8 +1059,7 @@ void CMenuPcs::SingMenuInit()
     *reinterpret_cast<CCharaPcs::CHandle**>(self + 0x774) = handle;
 
     handle->Add();
-    int modelNo = GetModelNo__8CMenuPcsFiii(
-        this,
+    int modelNo = GetModelNo(
         static_cast<int>(*reinterpret_cast<u16*>(Game.m_scriptFoodBase[0] + 0x3E0)),
         static_cast<int>(*reinterpret_cast<u16*>(Game.m_scriptFoodBase[0] + 0x3E4)),
         static_cast<int>(*reinterpret_cast<u16*>(Game.m_scriptFoodBase[0] + 0x3E2)));

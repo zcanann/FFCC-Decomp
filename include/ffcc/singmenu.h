@@ -93,6 +93,7 @@ public:
     char* GetHairStr(int);
     char* GetMenuStr(int);
     char* GetAttrStr(int);
+    int GetModelNo(int, int, int);
     unsigned char GetItemIcon(int);
 };
 

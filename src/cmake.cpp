@@ -98,8 +98,30 @@ struct CmakeInfo {
     signed char m_job;
 };
 
+enum CmakeFontSlot {
+    CMAKE_FONT_VALUE = 0,
+    CMAKE_FONT_LABEL = 1,
+    CMAKE_FONT_VILLAGE = 4,
+};
+
+struct CmakeMenuFields {
+    unsigned char m_pad000[0xEC];
+    CMemory::CStage* m_menuStage;
+    CMemory::CStage* m_stageF0;
+    CMemory::CStage* m_stageF4;
+    CFont* m_fonts[5];
+    unsigned char m_pad10C[0x830 - 0x10C];
+    void* m_villageWork;
+};
+STATIC_ASSERT(sizeof(CmakeMenuFields) == 0x834);
+
 static CmakeInfo s_CmakeInfo;
 static char s_CmakeVillageName[0x10];
+
+static inline CmakeMenuFields& CmakeFields(CMenuPcs* menu)
+{
+    return *reinterpret_cast<CmakeMenuFields*>(menu);
+}
 
 static inline unsigned char* MenuPcsRaw()
 {
@@ -264,9 +286,9 @@ static inline unsigned char* GetCmakeRosterEntry(CMenuPcs* menu, int slot)
 static inline CFont* GetCmakeKeyboardFont(CMenuPcs* menu)
 {
     if (MenuS16(menu, 0x86C) == 0) {
-        return *reinterpret_cast<CFont**>(reinterpret_cast<unsigned char*>(menu) + 0xFC);
+        return CmakeFields(menu).m_fonts[CMAKE_FONT_LABEL];
     }
-    return *reinterpret_cast<CFont**>(reinterpret_cast<unsigned char*>(menu) + 0x108);
+    return CmakeFields(menu).m_fonts[CMAKE_FONT_VILLAGE];
 }
 
 static const char* const s_cmakeNameRows[] = {
@@ -1129,7 +1151,7 @@ void CMenuPcs::DrawCmakeDecision(int yesNoSel, float alpha)
             FLOAT_8033324c, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, 0.0f);
     }
 
-    CFont* font = *reinterpret_cast<CFont**>(reinterpret_cast<unsigned char*>(this) + 0xF8);
+    CFont* font = CmakeFields(this).m_fonts[CMAKE_FONT_VALUE];
     font->SetMargin(FLOAT_80333258);
     font->SetShadow(1);
     font->SetScale(FLOAT_80333258);
@@ -1180,7 +1202,7 @@ void CMenuPcs::DrawCmakeCharaText(int page, float alpha)
 {
     (void)page;
 
-    CFont* labelFont = *reinterpret_cast<CFont**>(reinterpret_cast<unsigned char*>(this) + 0xFC);
+    CFont* labelFont = CmakeFields(this).m_fonts[CMAKE_FONT_LABEL];
     labelFont->SetMargin(FLOAT_80333258);
     labelFont->SetShadow(0);
     labelFont->SetScale(FLOAT_80333258);
@@ -1209,7 +1231,7 @@ void CMenuPcs::DrawCmakeCharaText(int page, float alpha)
         labelFont->Draw(txt);
     }
 
-    CFont* valueFont = *reinterpret_cast<CFont**>(reinterpret_cast<unsigned char*>(this) + 0xF8);
+    CFont* valueFont = CmakeFields(this).m_fonts[CMAKE_FONT_VALUE];
     valueFont->SetMargin(FLOAT_80333258);
     valueFont->SetShadow(1);
     valueFont->SetScale(FLOAT_80333258);
@@ -1327,7 +1349,7 @@ void CMenuPcs::DrawCmakeName(int x, int y, char* text, float alpha)
         baseY = 0x130;
     }
 
-    CFont* font = *reinterpret_cast<CFont**>(reinterpret_cast<unsigned char*>(this) + 0xF8);
+    CFont* font = CmakeFields(this).m_fonts[CMAKE_FONT_VALUE];
     font->SetShadow(1);
     font->SetScale(FLOAT_80333258);
     font->DrawInit();
@@ -1423,7 +1445,7 @@ void CMenuPcs::DrawCmakeYesNo(int yesNoSel, float alpha)
             FLOAT_80333254, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, 0.0f);
     }
 
-    CFont* font = *reinterpret_cast<CFont**>(reinterpret_cast<unsigned char*>(this) + 0xF8);
+    CFont* font = CmakeFields(this).m_fonts[CMAKE_FONT_VALUE];
     font->SetMargin(FLOAT_80333258);
     font->SetShadow(1);
     font->SetScale(FLOAT_80333258);
@@ -2071,7 +2093,7 @@ void CMenuPcs::CmakeSexDraw()
     DrawCmakePopupPanel(this, alpha, FLOAT_80333278, FLOAT_8033327c, FLOAT_80333280, FLOAT_80333284, 0.85f, 0.85f);
     DrawCmakeTitle(2, FLOAT_80333258, alpha);
 
-    CFont* font = *reinterpret_cast<CFont**>(reinterpret_cast<unsigned char*>(this) + 0xFC);
+    CFont* font = CmakeFields(this).m_fonts[CMAKE_FONT_LABEL];
     font->SetMargin(FLOAT_80333258);
     font->SetShadow(0);
     font->SetScale(FLOAT_80333258);
@@ -2357,7 +2379,7 @@ void CMenuPcs::CmakeTribeDraw()
     DrawCmakeTitle(3, FLOAT_80333258, alpha);
     DrawCmakeCrest(MenuS16(this, 0x862), 0, 0, alpha);
 
-    CFont* tribeFont = *reinterpret_cast<CFont**>(reinterpret_cast<unsigned char*>(this) + 0xFC);
+    CFont* tribeFont = CmakeFields(this).m_fonts[CMAKE_FONT_LABEL];
     tribeFont->SetMargin(FLOAT_80333258);
     tribeFont->SetShadow(0);
     tribeFont->SetScale(FLOAT_80333258);
@@ -2375,7 +2397,7 @@ void CMenuPcs::CmakeTribeDraw()
         tribeFont->Draw(txt);
     }
 
-    CFont* hairFont = *reinterpret_cast<CFont**>(reinterpret_cast<unsigned char*>(this) + 0xF8);
+    CFont* hairFont = CmakeFields(this).m_fonts[CMAKE_FONT_VALUE];
     hairFont->SetMargin(FLOAT_80333258);
     hairFont->SetShadow(1);
     hairFont->SetScale(FLOAT_80333258);
@@ -2690,7 +2712,7 @@ void CMenuPcs::CmakeJobDraw()
 
     DrawCmakeTitle(5, FLOAT_80333258, alpha);
 
-    CFont* font = *reinterpret_cast<CFont**>(reinterpret_cast<unsigned char*>(this) + 0xFC);
+    CFont* font = CmakeFields(this).m_fonts[CMAKE_FONT_LABEL];
     font->SetMargin(FLOAT_80333258);
     font->SetShadow(0);
     font->SetScale(FLOAT_80333258);
@@ -2908,7 +2930,7 @@ void CMenuPcs::CmakeResultDraw()
         DrawCmakeYesNo(0, alpha);
     }
 
-    CFont* labelFont = *reinterpret_cast<CFont**>(reinterpret_cast<unsigned char*>(this) + 0xFC);
+    CFont* labelFont = CmakeFields(this).m_fonts[CMAKE_FONT_LABEL];
     labelFont->SetMargin(FLOAT_80333258);
     labelFont->SetShadow(0);
     labelFont->SetScale(FLOAT_80333258);
@@ -2931,7 +2953,7 @@ void CMenuPcs::CmakeResultDraw()
         labelFont->Draw(label);
     }
 
-    CFont* valueFont = *reinterpret_cast<CFont**>(reinterpret_cast<unsigned char*>(this) + 0xF8);
+    CFont* valueFont = CmakeFields(this).m_fonts[CMAKE_FONT_VALUE];
     valueFont->SetMargin(FLOAT_80333258);
     valueFont->SetShadow(1);
     valueFont->SetScale(FLOAT_80333258);
@@ -3145,7 +3167,7 @@ void CMenuPcs::CmakeResultDraw1()
     DrawCmakeTitle(7, FLOAT_80333258, alpha);
     DrawCmakeCrest(MenuS16(this, 0x862), 0, 0, textAlpha);
 
-    CFont* labelFont = *reinterpret_cast<CFont**>(reinterpret_cast<unsigned char*>(this) + 0xFC);
+    CFont* labelFont = CmakeFields(this).m_fonts[CMAKE_FONT_LABEL];
     labelFont->SetMargin(FLOAT_80333258);
     labelFont->SetShadow(0);
     labelFont->SetScale(FLOAT_80333258);
@@ -3168,7 +3190,7 @@ void CMenuPcs::CmakeResultDraw1()
         labelFont->Draw(txt);
     }
 
-    CFont* valueFont = *reinterpret_cast<CFont**>(reinterpret_cast<unsigned char*>(this) + 0xF8);
+    CFont* valueFont = CmakeFields(this).m_fonts[CMAKE_FONT_VALUE];
     valueFont->SetMargin(FLOAT_80333258);
     valueFont->SetShadow(1);
     valueFont->SetScale(FLOAT_80333258);
@@ -3264,7 +3286,7 @@ void CMenuPcs::CmakeVillageOpen()
  */
 unsigned short CMenuPcs::CmakeVillageCtrl()
 {
-    int villageWork = MenuS32(this, 0x830);
+    unsigned char* villageWork = static_cast<unsigned char*>(CmakeFields(this).m_villageWork);
     short& select = *reinterpret_cast<short*>(villageWork + 0x26);
     short& row = *reinterpret_cast<short*>(villageWork + 0x28);
     short& table = *reinterpret_cast<short*>(villageWork + 0x2A);
@@ -3396,7 +3418,7 @@ void CMenuPcs::CmakeVillageClose()
  */
 void CMenuPcs::CmakeVillageDraw()
 {
-    int villageWork = MenuS32(this, 0x830);
+    unsigned char* villageWork = static_cast<unsigned char*>(CmakeFields(this).m_villageWork);
     short mode = *reinterpret_cast<short*>(villageWork + 0x10);
     int frame = static_cast<int>(*reinterpret_cast<short*>(villageWork + 0x22)) - 1;
     short select = *reinterpret_cast<short*>(villageWork + 0x26);
@@ -3536,16 +3558,16 @@ void CMenuPcs::destroyVillageMenu()
 {
     if (MenuS16(this, 0x86C) != 0) {
         if (Game.m_gameWork.m_menuStageMode == 0) {
-            void*& font = *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(this) + 0x108);
-            if (font != nullptr) {
+            CFont*& font = CmakeFields(this).m_fonts[CMAKE_FONT_VILLAGE];
+            if (font != 0) {
                 ReleaseRefObject(font);
-                font = nullptr;
+                font = 0;
             }
         }
 
         freeTexture(8, 1, 0x60, 9);
 
-        void*& villageWork = *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(this) + 0x830);
+        void*& villageWork = CmakeFields(this).m_villageWork;
         if (villageWork != nullptr) {
             delete[] static_cast<unsigned char*>(villageWork);
             villageWork = nullptr;
@@ -3577,10 +3599,10 @@ void CMenuPcs::calcVillageMenu()
 
             loadTexture(PTR_s_world2_802159a4, 8, 1, reinterpret_cast<CMenuPcs::CTmp*>(&DAT_802159c8), 0x60, 9, 3);
 
-            CMemory::CStage* stage = *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(this) + 0xEC);
-            int& villageWork = MenuS32(this, 0x830);
-            villageWork = reinterpret_cast<int>(new (stage, const_cast<char*>(s_cmake_cpp_801e3038), 0xCB3) unsigned char[0x48]);
-            memset(reinterpret_cast<void*>(villageWork), 0, 0x48);
+            CMemory::CStage* stage = CmakeFields(this).m_menuStage;
+            void*& villageWork = CmakeFields(this).m_villageWork;
+            villageWork = new (stage, const_cast<char*>(s_cmake_cpp_801e3038), 0xCB3) unsigned char[0x48];
+            memset(villageWork, 0, 0x48);
             LoadCmakeVillageName();
             MenuS16(this, 0x86C) = 1;
         }
@@ -3591,23 +3613,23 @@ void CMenuPcs::calcVillageMenu()
         if (MenuU8(this, 0x16) == 0) {
             if (active != 0) {
                 if (Game.m_gameWork.m_menuStageMode == 0) {
-                    void*& font = *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(this) + 0x108);
-                    if (font != nullptr) {
+                    CFont*& font = CmakeFields(this).m_fonts[CMAKE_FONT_VILLAGE];
+                    if (font != 0) {
                         ReleaseRefObject(font);
-                        font = nullptr;
+                        font = 0;
                     }
                 }
 
                 freeTexture(8, 1, 0x60, 9);
-                int& villageWork = MenuS32(this, 0x830);
-                if (villageWork != 0) {
-                    delete[] reinterpret_cast<unsigned char*>(villageWork);
-                    villageWork = 0;
+                void*& villageWork = CmakeFields(this).m_villageWork;
+                if (villageWork != nullptr) {
+                    delete[] static_cast<unsigned char*>(villageWork);
+                    villageWork = nullptr;
                 }
                 MenuS16(this, 0x86C) = 0;
             }
         } else {
-            int villageWork = MenuS32(this, 0x830);
+            unsigned char* villageWork = static_cast<unsigned char*>(CmakeFields(this).m_villageWork);
             unsigned short result = 0;
             short& mode = *reinterpret_cast<short*>(villageWork + 0x10);
             short& frame = *reinterpret_cast<short*>(villageWork + 0x22);
@@ -3645,7 +3667,7 @@ void CMenuPcs::calcVillageMenu()
 void CMenuPcs::drawVillageMenu()
 {
     if (MenuS16(this, 0x86C) != 0) {
-        int villageWork = MenuS32(this, 0x830);
+        unsigned char* villageWork = static_cast<unsigned char*>(CmakeFields(this).m_villageWork);
         CmakeVillageDraw();
         if (*reinterpret_cast<short*>(villageWork + 0x2E) != 0) {
             short& mode = *reinterpret_cast<short*>(villageWork + 0x10);

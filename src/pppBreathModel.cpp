@@ -17,10 +17,6 @@ struct pppModelSt;
 void pppInitBlendMode(void);
 void pppSetBlendMode(unsigned char);
 
-extern "C" {
-void pppHeapUseRate__FPQ27CMemory6CStage(void* stage);
-}
-
 extern "C" const char s_pppBreathModel_cpp_801DB5A0[] = "pppBreathModel.cpp";
 
 struct pppBreathModelUnkC {
@@ -192,17 +188,17 @@ extern "C" void pppDestructBreathModel(pppBreathModel* pppBreathModel, pppBreath
     VBreathModel* state = (VBreathModel*)((unsigned char*)pppBreathModel + 0x80 + *param_2->m_serializedDataOffsets);
 
     if (state->m_particleData != NULL) {
-        pppHeapUseRate__FPQ27CMemory6CStage(state->m_particleData);
+        pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(state->m_particleData));
         state->m_particleData = 0;
     }
 
     if (state->m_particleWmats != NULL) {
-        pppHeapUseRate__FPQ27CMemory6CStage(state->m_particleWmats);
+        pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(state->m_particleWmats));
         state->m_particleWmats = 0;
     }
 
     if (state->m_particleColors != NULL) {
-        pppHeapUseRate__FPQ27CMemory6CStage(state->m_particleColors);
+        pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(state->m_particleColors));
         state->m_particleColors = 0;
     }
 
@@ -212,19 +208,19 @@ extern "C" void pppDestructBreathModel(pppBreathModel* pppBreathModel, pppBreath
 
         for (i = 0; i < state->m_groupCount; i++) {
             if (group->particleIndices != NULL) {
-                pppHeapUseRate__FPQ27CMemory6CStage(group->particleIndices);
+                pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(group->particleIndices));
                 group->particleIndices = 0;
             }
 
             if (group->particleStates != NULL) {
-                pppHeapUseRate__FPQ27CMemory6CStage(group->particleStates);
+                pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(group->particleStates));
                 group->particleStates = 0;
             }
 
             group = (BreathParticleGroup*)((unsigned char*)group + 0x5C);
         }
 
-        pppHeapUseRate__FPQ27CMemory6CStage(state->m_groups);
+        pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(state->m_groups));
         state->m_groups = 0;
     }
 }

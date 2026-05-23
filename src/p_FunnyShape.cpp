@@ -66,11 +66,6 @@ inline void* operator new(unsigned long, void* ptr)
 }
 
 namespace {
-static inline u8* Ptr(CFunnyShapePcs* self, u32 offset)
-{
-    return reinterpret_cast<u8*>(self) + offset;
-}
-
 static inline CUSBStreamData* UsbStream(CFunnyShapePcs* self)
 {
     return reinterpret_cast<CUSBStreamData*>(self->m_usbStreamDataStorage);
@@ -184,18 +179,16 @@ void CFunnyShapePcs::drawViewer()
  */
 void CFunnyShapePcs::calcViewer()
 {
-    u8* self = reinterpret_cast<u8*>(this);
-
-    if (reinterpret_cast<CUSBStreamData*>(self + 0x3C)->IsUSBStreamDataDone()) {
+    if (UsbStream(this)->IsUSBStreamDataDone()) {
         SetUSBData();
-        reinterpret_cast<CUSBStreamData*>(self + 0x3C)->SetUSBStreamDataDone();
+        UsbStream(this)->SetUSBStreamDataDone();
     }
 
-    if ((static_cast<s8>(self[0x6124]) == 0) || (*reinterpret_cast<u32*>(self + 0x6134) == 0)) {
+    if (m_textureCount == 0 || m_anm.anmData == 0) {
         return;
     }
 
-    reinterpret_cast<CFunnyShape*>(self + 0x50)->Update();
+    FunnyShape(this)->Update();
 }
 
 /*

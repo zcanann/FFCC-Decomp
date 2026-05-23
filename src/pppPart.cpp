@@ -90,7 +90,6 @@ Vec ppvZeroVector;
 CAmemCacheSet ppvAmemCacheSet;
 
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
-static inline unsigned char* PartPcsRaw() { return reinterpret_cast<unsigned char*>(&PartPcs); }
 
 static const char s_pppPart_cpp[] = "pppPart.cpp";
 static const char s_ERROR_prog_NULL[] = "\nERROR!!!! prog=NULL\n\n";
@@ -1985,7 +1984,7 @@ void pppInitData(_pppDataHead* pppDataHead, pppProg* pppProg, int param_3)
 	pppDataHead->m_shapeGroups = pppDataHead->m_shapeGroups + reinterpret_cast<u32>(dataBase);
 
 	int* chunkOffsets = reinterpret_cast<int*>(pppDataHead->m_cacheChunks);
-	CMemory::CStage* stageLoad = *reinterpret_cast<CMemory::CStage**>(PartPcsRaw() + 0x1C);
+	CMemory::CStage* stageLoad = PartPcs.m_usbStreamData.m_stageLoad;
 	s16* cacheChunks = new (stageLoad, const_cast<char*>(s_pppPart_cpp), 0x620)
 	    s16[static_cast<u32>(pppDataHead->m_cacheChunkCount) * 4];
 	pppDataHead->m_cacheChunks = reinterpret_cast<u32>(cacheChunks);

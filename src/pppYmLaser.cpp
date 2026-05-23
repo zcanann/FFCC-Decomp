@@ -37,7 +37,6 @@ static inline float YmLaserConst(const float& value) { return *reinterpret_cast<
 extern "C" {
 void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
     void*, long, float&, float&, float&, float, float&, float&);
-int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, void*, void*, u32);
 int GetCharaNodeFrameMatrix__FP9_pppMngStfPA4_f(_pppMngSt*, float, Mtx);
 int GetTextureFromRSD__FiP9_pppEnvSt(int, _pppEnvSt*);
 }
@@ -448,7 +447,7 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtr
 		cyl.m_direction = localA;
 		cyl.m_radius = kPppYmLaserOne;
 
-		int check = CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(&MapMng, &cyl, &localA, 0xffffffff);
+		int check = MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&cyl), &localA, 0xffffffff);
 		int hit = 0;
 		if (check != 0) {
 			hit = 1;

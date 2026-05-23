@@ -31,7 +31,6 @@ void pppSetBlendMode(unsigned char);
 
 extern "C" {
 void pppStopSe__FP9_pppMngStP7PPPSEST(_pppMngSt*, PPPSEST*);
-int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, void*, void*, u32);
 int GetTextureFromRSD__FiP9_pppEnvSt(int, _pppEnvSt*);
 }
 
@@ -278,7 +277,7 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
         cyl.m_direction = localA;
         cyl.m_radius = kPppLaserZero;
 
-        int check = CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(&MapMng, &cyl, &localA, 0xffffffff);
+        int check = MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&cyl), &localA, 0xffffffff);
         int hit = 0;
         if (check != 0) {
             hit = 1;

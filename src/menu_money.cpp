@@ -493,7 +493,7 @@ void CMenuPcs::MoneyDraw()
  * JP Address: TODO
  * JP Size: TODO
  */
-int CMenuPcs::MoneyClose()
+bool CMenuPcs::MoneyClose()
 {
 	this->moneyState->frame++;
 
@@ -529,9 +529,9 @@ int CMenuPcs::MoneyClose()
 		}
 	}
 
-	int result = 0;
+	bool result = false;
 	if (count == finished) {
-		result = 1;
+		result = true;
 	}
 	return result;
 }

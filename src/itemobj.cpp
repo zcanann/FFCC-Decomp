@@ -146,6 +146,11 @@ struct CMapCylinderRaw {
 	Vec m_boundsMax;
 };
 
+static inline CFlatRuntime2* ItemCFlatRuntime()
+{
+	return reinterpret_cast<CFlatRuntime2*>(CFlat);
+}
+
 /*
  * --INFO--
  * PAL Address: 0x80124b78
@@ -184,8 +189,8 @@ int CGPrgObj::getReplaceStat(int state)
  */
 void CGItemObj::DispAllFieldItem(int show)
 {
-	for (CGItemObj* itemObj = gCFlatRuntime2.FindGItemObjFirst(); itemObj != 0;
-	     itemObj = gCFlatRuntime2.FindGItemObjNext(itemObj)) {
+	for (CGItemObj* itemObj = ItemCFlatRuntime()->FindGItemObjFirst(); itemObj != 0;
+	     itemObj = ItemCFlatRuntime()->FindGItemObjNext(itemObj)) {
 		if (itemObj->m_owner == 0 &&
 		    static_cast<signed char>(
 		        static_cast<int>((static_cast<unsigned int>(itemObj->m_stateFlags0) << 28) & 0xC0000000) >> 31) != 0) {
@@ -209,8 +214,8 @@ void CGItemObj::DispAllFieldItem(int show)
  */
 void CGItemObj::DeleteAllFieldItem()
 {
-	for (CGItemObj* itemObj = gCFlatRuntime2.FindGItemObjFirst(); itemObj != 0;
-	     itemObj = gCFlatRuntime2.FindGItemObjNext(itemObj)) {
+	for (CGItemObj* itemObj = ItemCFlatRuntime()->FindGItemObjFirst(); itemObj != 0;
+	     itemObj = ItemCFlatRuntime()->FindGItemObjNext(itemObj)) {
 		if (itemObj->m_owner == 0 &&
 		    static_cast<signed char>(
 		        static_cast<int>((static_cast<unsigned int>(itemObj->m_stateFlags0) << 28) & 0xC0000000) >> 31) != 0) {
@@ -230,8 +235,8 @@ void CGItemObj::DeleteAllFieldItem()
  */
 void CGItemObj::ItemJump(int state, float jump)
 {
-	for (CGItemObj* itemObj = gCFlatRuntime2.FindGItemObjFirst(); itemObj != 0;
-	     itemObj = gCFlatRuntime2.FindGItemObjNext(itemObj)) {
+	for (CGItemObj* itemObj = ItemCFlatRuntime()->FindGItemObjFirst(); itemObj != 0;
+	     itemObj = ItemCFlatRuntime()->FindGItemObjNext(itemObj)) {
 		CGObject* object = reinterpret_cast<CGObject*>(itemObj);
 
 		if ((object->m_objectFlags & 0x10) == 0) {
@@ -470,12 +475,12 @@ void CGItemObj::onHitParticle(int effectIndex, int, int, int, Vec*, PPPIFPARAM* 
 				break;
 			}
 
-			gCFlatRuntime2.EndParticleSlot(*(int*)(self + 0x55C), 0);
-			gCFlatRuntime2.ResetParticleWork(particleNo | 0x100, *(int*)(self + 0x55C));
-			gCFlatRuntime2.SetParticleWorkPos(*(Vec*)(self + 0x15C), FLOAT_80331b20);
-			gCFlatRuntime2.SetParticleWorkCol(9, 0, FLOAT_80331b18);
-			gCFlatRuntime2.SetParticleWorkParam(classControl, this);
-			gCFlatRuntime2.PutParticleWork();
+			ItemCFlatRuntime()->EndParticleSlot(*(int*)(self + 0x55C), 0);
+			ItemCFlatRuntime()->ResetParticleWork(particleNo | 0x100, *(int*)(self + 0x55C));
+			ItemCFlatRuntime()->SetParticleWorkPos(*(Vec*)(self + 0x15C), FLOAT_80331b20);
+			ItemCFlatRuntime()->SetParticleWorkCol(9, 0, FLOAT_80331b18);
+			ItemCFlatRuntime()->SetParticleWorkParam(classControl, this);
+			ItemCFlatRuntime()->PutParticleWork();
 			*(unsigned int*)(self + 0x1C0) &= 0xFFF7FFFF;
 			addSubStat();
 		}
@@ -489,7 +494,7 @@ void CGItemObj::onHitParticle(int effectIndex, int, int, int, Vec*, PPPIFPARAM* 
 			CGObject* classObj;
 
 			if (classId != 0) {
-				classObj = reinterpret_cast<CGObject*>(gCFlatRuntime2.intToClass(classId));
+				classObj = reinterpret_cast<CGObject*>(ItemCFlatRuntime()->intToClass(classId));
 			} else {
 				classObj = 0;
 			}
@@ -502,7 +507,7 @@ void CGItemObj::onHitParticle(int effectIndex, int, int, int, Vec*, PPPIFPARAM* 
 		}
 	}
 
-	gCFlatRuntime2.IgnoreParticle(effectIndex, this);
+	ItemCFlatRuntime()->IgnoreParticle(effectIndex, this);
 }
 
 /*
@@ -544,10 +549,10 @@ void CGItemObj::onFrameAlways()
 		}
 
 		if (canUseTrace && CFlatItemTraceParticleSlot() == 0) {
-			CFlatItemTraceParticleSlot() = gCFlatRuntime2.GetFreeParticleSlot();
+			CFlatItemTraceParticleSlot() = ItemCFlatRuntime()->GetFreeParticleSlot();
 			putParticleTrace(0x141, CFlatItemTraceParticleSlot(), this, FLOAT_80331b18, 0);
 		} else if (!canUseTrace && CFlatItemTraceParticleSlot() != 0) {
-			gCFlatRuntime2.EndParticleSlot(CFlatItemTraceParticleSlot(), 0);
+			ItemCFlatRuntime()->EndParticleSlot(CFlatItemTraceParticleSlot(), 0);
 			CFlatItemTraceParticleSlot() = 0;
 		}
 	}
@@ -708,7 +713,7 @@ void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 CGPrgObj* CGItemObj::CreateFromScript(
     int createMode, int createFlags, int scriptArg, CGObject* owner, float launchAngle, CGItemObj::CCFS* ccfs)
 {
-	int freeItemCount = gCFlatRuntime2.getNumFreeObject(5);
+	int freeItemCount = ItemCFlatRuntime()->getNumFreeObject(5);
 	System.Printf(const_cast<char*>(DAT_801dcec0), freeItemCount);
 
 	if (freeItemCount == 0) {
@@ -716,10 +721,10 @@ CGPrgObj* CGItemObj::CreateFromScript(
 		int bestScriptObjectPos = 0x00989680;
 		unsigned char* bestItemObj = 0;
 
-		for (unsigned char* itemObj = reinterpret_cast<unsigned char*>(gCFlatRuntime2.FindGItemObjFirst());
+		for (unsigned char* itemObj = reinterpret_cast<unsigned char*>(ItemCFlatRuntime()->FindGItemObjFirst());
 			 itemObj != 0;
 		     itemObj = reinterpret_cast<unsigned char*>(
-		         gCFlatRuntime2.FindGItemObjNext(reinterpret_cast<CGItemObj*>(itemObj)))) {
+		         ItemCFlatRuntime()->FindGItemObjNext(reinterpret_cast<CGItemObj*>(itemObj)))) {
 			int canDelete = (itemObj[0x53] & 1) != 0;
 			int scriptObjectPos = *(int*)(itemObj + 0x94);
 
@@ -762,7 +767,7 @@ CGPrgObj* CGItemObj::CreateFromScript(
 
 	CGPrgObj* newItem = 0;
 	if (createMode != 1) {
-		newItem = (CGPrgObj*)gCFlatRuntime2.intToClass((int)outStack.m_word);
+		newItem = (CGPrgObj*)ItemCFlatRuntime()->intToClass((int)outStack.m_word);
 		unsigned char* itemSelf = (unsigned char*)newItem;
 
 		if (createMode == 2) {
@@ -842,7 +847,7 @@ CGPrgObj* CGItemObj::CreateFromScript(
  */
 unsigned int CGItemObj::CanCreateFromScript()
 {
-	unsigned int numFreeObjects = gCFlatRuntime2.getNumFreeObject(5);
+	unsigned int numFreeObjects = ItemCFlatRuntime()->getNumFreeObject(5);
 
 	return (-numFreeObjects & ~numFreeObjects) >> 31;
 }
@@ -864,10 +869,10 @@ int CGItemObj::DeleteOld(int deleteMask, int maxDeleteCount, CFlatRuntime::CObje
 		unsigned char* bestItemObj = 0;
 		int bestScriptObjectPos = 0x00989680;
 
-		for (unsigned char* itemObj = reinterpret_cast<unsigned char*>(gCFlatRuntime2.FindGItemObjFirst());
+		for (unsigned char* itemObj = reinterpret_cast<unsigned char*>(ItemCFlatRuntime()->FindGItemObjFirst());
 			 itemObj != 0;
 			 itemObj = reinterpret_cast<unsigned char*>(
-			     gCFlatRuntime2.FindGItemObjNext(reinterpret_cast<CGItemObj*>(itemObj)))) {
+			     ItemCFlatRuntime()->FindGItemObjNext(reinterpret_cast<CGItemObj*>(itemObj)))) {
 			if (*(void**)(itemObj + 0x550) == 0 &&
 				static_cast<signed char>(
 				    static_cast<int>((static_cast<unsigned int>(itemObj[0x50]) << 28) & 0xC0000000) >> 31) != 0 &&
@@ -944,7 +949,7 @@ void CGItemObj::onFrameStat()
 				*(float*)(self + 0x4b8) = FLOAT_80331b54;
 				*(float*)(self + 0x4b4) = zero;
 				*(unsigned int*)(self + 0x1c0) = 1;
-				gCFlatRuntime2.EndParticle(m_charaModelHandle);
+				ItemCFlatRuntime()->EndParticle(m_charaModelHandle);
 				changeStat(9, 0, 0);
 			}
 		}
@@ -1066,7 +1071,7 @@ void CGItemObj::onFrameStat()
 		} else if (*(int*)(self + 0x528) == 4) {
 			prgObj->m_bgDownDist = FLOAT_80331b68;
 			prgObj->m_stepSlopeLimit = zero;
-			gCFlatRuntime2.EndParticle(prgObj->m_charaModelHandle);
+			ItemCFlatRuntime()->EndParticle(prgObj->m_charaModelHandle);
 		} else if (*(int*)(self + 0x528) == 0xC) {
 			self[0x38] = static_cast<unsigned char>(__rlwimi(self[0x38], 1, 7, 24, 24));
 		}
@@ -1092,7 +1097,7 @@ void CGItemObj::onFrameStat()
 
 		if (*(int*)(self + 0x52C) == 1) {
 			if (*(int*)(self + 0x530) == 0x7D) {
-				gCFlatRuntime2.EndParticleSlot(*(int*)(self + 0x55C), 0);
+				ItemCFlatRuntime()->EndParticleSlot(*(int*)(self + 0x55C), 0);
 			}
 		} else if (*(int*)(self + 0x52C) < 1 && -1 < *(int*)(self + 0x52C) && *(int*)(self + 0x530) == 0) {
 			int particleNoA;
@@ -1212,7 +1217,7 @@ void CGItemObj::onFrameStat()
 
 		if (*(int*)(self + 0x528) == 0) {
 			prgObj->m_stepSlopeLimit = zero;
-			gCFlatRuntime2.EndParticleSlot(*(int*)(self + 0x55C), 0);
+			ItemCFlatRuntime()->EndParticleSlot(*(int*)(self + 0x55C), 0);
 
 			int soundEntry = *(int*)(*(int*)(*reinterpret_cast<int*>(m_boss__8CGMonObj) + 0xF8) + 0x178);
 			if (soundEntry != 0) {
@@ -1265,7 +1270,7 @@ void CGItemObj::onFrameStat()
 
 		if (*(int*)(self + 0x528) == 0) {
 			prgObj->m_stepSlopeLimit = zero;
-			gCFlatRuntime2.EndParticleSlot(*(int*)(self + 0x55C), 0);
+			ItemCFlatRuntime()->EndParticleSlot(*(int*)(self + 0x55C), 0);
 
 			int soundEntry = *(int*)(*(int*)(*reinterpret_cast<int*>(m_boss__8CGMonObj) + 0xF8) + 0x178);
 			if (soundEntry != 0) {
@@ -1445,7 +1450,7 @@ void CGItemObj::onDestroy()
 		delete reinterpret_cast<CCharaPcs::CHandle*>(*(void**)(self + 0x564));
 	}
 
-	gCFlatRuntime2.DeleteParticleSlot(*(int*)(self + 0x55c), 0);
+	ItemCFlatRuntime()->DeleteParticleSlot(*(int*)(self + 0x55c), 0);
 	CGPrgObj::onDestroy();
 }
 
@@ -1469,5 +1474,5 @@ void CGItemObj::onCreate()
 	m_pendingModelHandle = 0;
 	m_itemJumpCountdown = 0;
 	memset(&m_memoryCapsuleNameIndex, 0, 0xc);
-	m_particleSlot = gCFlatRuntime2.GetFreeParticleSlot();
+	m_particleSlot = ItemCFlatRuntime()->GetFreeParticleSlot();
 }

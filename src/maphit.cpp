@@ -284,8 +284,8 @@ int CMapHit::CheckHitCylinder(CMapCylinder* mapCylinder, Vec* position, unsigned
     g_hit_cyl = *mapCylinder;
     g_hit_mvec = *position;
 
-    int faceIndex = 0;
     int faceOffset = 0;
+    int faceIndex = 0;
     while (faceIndex < static_cast<int>(m_faceCount)) {
         g_hit_lpface = reinterpret_cast<CMapHitFace*>(Ptr(m_faces, faceOffset));
         g_hit_t_min = FLOAT_8032F8C0;

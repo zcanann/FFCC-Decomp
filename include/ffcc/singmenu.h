@@ -77,7 +77,7 @@ public:
     unsigned int TmpArtiClose();
     bool MoneyOpen();
     int MoneyCtrl();
-    int MoneyClose();
+    bool MoneyClose();
     bool FavoOpen();
     unsigned int FavoCtrl();
     bool FavoClose();

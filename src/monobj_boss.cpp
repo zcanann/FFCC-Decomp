@@ -117,7 +117,7 @@ void CGMonObj::damagedFuncGiantCrab()
 		}
 		object->DispCharaParts(1);
 		int pdtNo = -1;
-		if (object->m_charaModelHandle != 0 && object->m_charaModelHandle->m_pdtLoadRef != 0) {
+		if (object->m_charaModelHandle->m_pdtLoadRef != 0) {
 			pdtNo = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(object->m_charaModelHandle->m_pdtLoadRef) + 0x14);
 		}
 		prgObj->putParticle((pdtNo << 8) | 0x0D, 0, object, FLOAT_80331d18, 0);
@@ -131,7 +131,7 @@ void CGMonObj::damagedFuncGiantCrab()
 		}
 		object->DispCharaParts(3);
 		int pdtNo = -1;
-		if (object->m_charaModelHandle != 0 && object->m_charaModelHandle->m_pdtLoadRef != 0) {
+		if (object->m_charaModelHandle->m_pdtLoadRef != 0) {
 			pdtNo = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(object->m_charaModelHandle->m_pdtLoadRef) + 0x14);
 		}
 		prgObj->putParticle((pdtNo << 8) | 0x0C, 0, object, FLOAT_80331d18, 0);
@@ -1268,7 +1268,7 @@ void CGMonObj::frameStatFuncLich()
 		chara->endPSlotBit(0x800);
 		if (static_cast<s8>(lichFlags) < 0) {
 			int pdtNo = -1;
-			if (object->m_charaModelHandle != 0 && object->m_charaModelHandle->m_pdtLoadRef != 0) {
+			if (object->m_charaModelHandle->m_pdtLoadRef != 0) {
 				pdtNo = *reinterpret_cast<int*>(reinterpret_cast<u8*>(object->m_charaModelHandle->m_pdtLoadRef) + 0x14);
 			}
 			prgObj->putParticle((pdtNo << 8) | 0x1D, *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x590),
@@ -2451,7 +2451,7 @@ void CGMonObj::frameStatFuncLastBoss()
 			prgObj->reqAnim(0x19, 0, 0);
 
 			int pdtNo = -1;
-			if (object->m_charaModelHandle != 0 && object->m_charaModelHandle->m_pdtLoadRef != 0) {
+			if (object->m_charaModelHandle->m_pdtLoadRef != 0) {
 				pdtNo = reinterpret_cast<int*>(object->m_charaModelHandle->m_pdtLoadRef)[2];
 			}
 
@@ -2476,7 +2476,7 @@ void CGMonObj::frameStatFuncLastBoss()
 				prgObj->reqAnim(0x18, 0, 0);
 
 				int pdtNo = -1;
-				if (object->m_charaModelHandle != 0 && object->m_charaModelHandle->m_pdtLoadRef != 0) {
+				if (object->m_charaModelHandle->m_pdtLoadRef != 0) {
 					pdtNo = reinterpret_cast<int*>(object->m_charaModelHandle->m_pdtLoadRef)[2];
 				}
 
@@ -2496,7 +2496,7 @@ void CGMonObj::frameStatFuncLastBoss()
 	} else if (state < 0x67) {
 		if (stateFrame == 0) {
 			int pdtNo = -1;
-			if (object->m_charaModelHandle != 0 && object->m_charaModelHandle->m_pdtLoadRef != 0) {
+			if (object->m_charaModelHandle->m_pdtLoadRef != 0) {
 				pdtNo = reinterpret_cast<int*>(object->m_charaModelHandle->m_pdtLoadRef)[2];
 			}
 			prgObj->putParticle((pdtNo << 8) | 5, *reinterpret_cast<int*>(mon + 0x58C), object, 1.0f, 0x12902);

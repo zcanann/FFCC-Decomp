@@ -12,20 +12,6 @@ extern const float FLOAT_8033192c = 224.0f;
 
 /*
  * --INFO--
- * PAL Address: 0x8010992c
- * PAL Size: 4b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppConstructAlignmentScale(pppAlignmentScale*, pppAlignmentScaleData*)
-{
-    return;
-}
-
-/*
- * --INFO--
  * PAL Address: 0x80109810
  * PAL Size: 284b
  * EN Address: TODO
@@ -33,7 +19,7 @@ void pppConstructAlignmentScale(pppAlignmentScale*, pppAlignmentScaleData*)
  * JP Address: TODO
  * JP Size: TODO
  */
-struct pppAlignmentScale* pppFrameAlignmentScale(struct pppAlignmentScale* alignmentScale, struct pppAlignmentScaleData* data)
+void pppFrameAlignmentScale(struct pppAlignmentScale*, struct pppAlignmentScaleData* data)
 {
     float scale;
     struct _pppMngSt* pppMngSt;
@@ -72,6 +58,18 @@ struct pppAlignmentScale* pppFrameAlignmentScale(struct pppAlignmentScale* align
 
         pppSetFpMatrix(pppMngSt);
     }
+}
 
-    return alignmentScale;
+/*
+ * --INFO--
+ * PAL Address: 0x8010992c
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppConstructAlignmentScale(pppAlignmentScale*, pppAlignmentScaleData*)
+{
+    return;
 }

@@ -1487,19 +1487,19 @@ void CMapMng::DestroyMap()
 
     short octTreeCount = m_octTreeCount;
     for (int i = 0; i < octTreeCount; i++) {
-        __dt__8COctTreeFv(self + 0x14 + (i * 0x4C), 0xFFFF);
+        __dt__8COctTreeFv(GetOctTreeArray() + i, 0xFFFF);
     }
     m_octTreeCount = 0;
 
     short mapHitCount = m_mapHitCount;
     for (int i = 0; i < mapHitCount; i++) {
-        __dt__7CMapHitFv(self + 0x4D4 + (i * 0x24), 0xFFFF);
+        __dt__7CMapHitFv(GetMapHitArray() + i, 0xFFFF);
     }
     m_mapHitCount = 0;
 
     short mapObjCount = m_mapObjCount;
     for (int i = 0; i < mapObjCount; i++) {
-        __dt__7CMapObjFv(self + 0x954 + (i * 0xF0), -1);
+        __dt__7CMapObjFv(GetMapObjArray() + i, -1);
     }
     m_mapObjCount = 0;
 
@@ -2337,7 +2337,7 @@ void CMapMng::ReadOtm(char* mapName)
                     if (hitCount > 0x1F) {
                         return;
                     }
-                    CMapHit* hit = reinterpret_cast<CMapHit*>(self + 0x4D4 + (hitCount * 0x24));
+                    CMapHit* hit = GetMapHitArray() + hitCount;
                     hit->ReadOtmHit(chunkFile);
                     hitCount += 1;
                     continue;
@@ -2348,7 +2348,7 @@ void CMapMng::ReadOtm(char* mapName)
                     if (mapObjCount > 0x1FF) {
                         return;
                     }
-                    CMapObj* mapObj = reinterpret_cast<CMapObj*>(self + 0x954 + (mapObjCount * 0xF0));
+                    CMapObj* mapObj = GetMapObjArray() + mapObjCount;
                     mapObj->ReadOtmObj(chunkFile);
                     mapObjCount += 1;
                     continue;
@@ -2374,7 +2374,7 @@ void CMapMng::ReadOtm(char* mapName)
 
     const short octTreeCount = m_octTreeCount;
     for (int i = 0; i < octTreeCount; i++) {
-        unsigned char* octTreeRaw = self + 0x14 + (i * 0x4C);
+        unsigned char* octTreeRaw = reinterpret_cast<unsigned char*>(GetOctTreeArray() + i);
         if (*reinterpret_cast<void**>(octTreeRaw + 8) != 0) {
             *reinterpret_cast<char*>(octTreeRaw + 0x1F) = static_cast<char>(i);
         }
@@ -2386,15 +2386,15 @@ void CMapMng::ReadOtm(char* mapName)
         mapShadow->Init();
     }
 
-    CMapObj* mapObj = reinterpret_cast<CMapObj*>(self + 0x954);
-    CMapObj* mapObjEnd = reinterpret_cast<CMapObj*>(self + 0x954 + (m_mapObjCount * 0xF0));
+    CMapObj* mapObj = GetMapObjArray();
+    CMapObj* mapObjEnd = GetMapObjArray() + m_mapObjCount;
     CMapObj* root = 0;
     while (mapObj < mapObjEnd) {
-        if (*reinterpret_cast<CMapObj**>(mapObj) != 0) {
+        if (mapObj->m_parent != 0) {
             root = mapObj;
             break;
         }
-        mapObj = reinterpret_cast<CMapObj*>(reinterpret_cast<unsigned char*>(mapObj) + 0xF0);
+        mapObj++;
     }
 
     m_rootMapObj = root;
@@ -2410,7 +2410,7 @@ void CMapMng::ReadOtm(char* mapName)
 
     const int mapObjCount = m_mapObjCount;
     for (int i = 0; i < mapObjCount; i++) {
-        unsigned char* obj = self + 0x954 + (i * 0xF0);
+        unsigned char* obj = reinterpret_cast<unsigned char*>(GetMapObjArray() + i);
         unsigned char* atr = *reinterpret_cast<unsigned char**>(obj + 0xEC);
         if (atr == 0) {
             continue;
@@ -2459,7 +2459,7 @@ void CMapMng::ReadOtm(char* mapName)
         *reinterpret_cast<CLightPcs::CBumpLight**>(atr + 0x38) = bump;
 
         for (int j = 0; j < mapObjCount; j++) {
-            unsigned char* scan = self + 0x954 + (j * 0xF0);
+            unsigned char* scan = reinterpret_cast<unsigned char*>(GetMapObjArray() + j);
             if (*reinterpret_cast<short*>(scan + 0x16) == i) {
                 *reinterpret_cast<CLightPcs::CBumpLight**>(scan + 0x10) = bump;
             }
@@ -2546,7 +2546,7 @@ int CMapMng::ReadMid(char* mapName)
     CChunkFile chunkFile;
     chunkFile.SetBuf(filePtr);
 
-    CMapObj* nextMapObj = reinterpret_cast<CMapObj*>(self + 0x954);
+    CMapObj* nextMapObj = GetMapObjArray();
     CChunkFile::CChunk chunk;
     while (chunkFile.GetNextChunk(chunk)) {
         if (chunk.m_id != 0x4D494420) {
@@ -2566,7 +2566,7 @@ int CMapMng::ReadMid(char* mapName)
                     if (hitCount > 0x1F) {
                         return 0;
                     }
-                    CMapHit* hit = reinterpret_cast<CMapHit*>(self + 0x4D4 + (hitCount * 0x24));
+                    CMapHit* hit = GetMapHitArray() + hitCount;
                     hit->ReadOtmHit(chunkFile);
                     hitCount += 1;
                 }
@@ -2597,7 +2597,7 @@ int CMapMng::ReadMid(char* mapName)
                             System.Printf(const_cast<char*>(s_read_mid_mapobj_error));
                         }
                     } else if (objRaw[0x1E] == 1 || objRaw[0x1E] == 2) {
-                        nextMapObj = reinterpret_cast<CMapObj*>(objRaw + 0xF0);
+                        nextMapObj = mapObj + 1;
                         octTreeCount += 1;
                         break;
                     }
@@ -2606,12 +2606,12 @@ int CMapMng::ReadMid(char* mapName)
                         System.Printf(const_cast<char*>(s_read_mid_octtree_error));
                     }
                     ok = false;
-                    nextMapObj = reinterpret_cast<CMapObj*>(objRaw + 0xF0);
+                    nextMapObj = mapObj + 1;
                     octTreeCount += 1;
                     break;
                 }
 
-                mapObj = reinterpret_cast<CMapObj*>(objRaw + 0xF0);
+                mapObj++;
                 mapObjIndex += 1;
             }
 
@@ -2628,11 +2628,11 @@ int CMapMng::ReadMid(char* mapName)
 
     const int mapObjCount = m_mapObjCount;
     for (int i = 0; i < mapObjCount; i++) {
-        unsigned char* obj = self + 0x954 + (i * 0xF0);
+        unsigned char* obj = reinterpret_cast<unsigned char*>(GetMapObjArray() + i);
         unsigned char type = obj[0x1D];
         CMapHit* hit = *reinterpret_cast<CMapHit**>(obj + 0xC);
         if ((type == 2 || type == 3) && hit != 0) {
-            int hitIndex = (reinterpret_cast<unsigned char*>(hit) - (self + 0x4D4)) / 0x24;
+            int hitIndex = hit - GetMapHitArray();
             if (m_mapHitCount <= hitIndex) {
                 if (System.m_execParam != 0) {
                     System.Printf(const_cast<char*>(s_read_mid_hit_error));
@@ -2652,8 +2652,8 @@ int CMapMng::ReadMid(char* mapName)
 
     const short octTreeCount = m_octTreeCount;
     for (int i = 0; i < octTreeCount; i++) {
-        unsigned char* octTree = self + 0x14 + (i * 0x4C);
-        unsigned char* obj = reinterpret_cast<unsigned char*>(*reinterpret_cast<void**>(octTree + 8));
+        COctTree* octTree = GetOctTreeArray() + i;
+        unsigned char* obj = reinterpret_cast<unsigned char*>(*reinterpret_cast<void**>(Ptr(octTree, 8)));
         if (obj != 0) {
             obj[0x1F] = static_cast<unsigned char>(i);
         }
@@ -2712,7 +2712,7 @@ void CMapMng::Calc()
     }
 
     for (int i = 0; i < mapObjCount; i++) {
-        reinterpret_cast<CMapObj*>(Ptr(this, 0x954 + (i * 0xF0)))->Calc();
+        GetMapObjArray()[i].Calc();
     }
 
     CMapTexAnimSet* mapTexAnimSet = m_mapTexAnimSet;
@@ -2725,21 +2725,21 @@ void CMapMng::Calc()
 
     const int octTreeCount = m_octTreeCount;
     for (int i = 0; i < octTreeCount; i++) {
-        COctTree* octTree = reinterpret_cast<COctTree*>(Ptr(this, 0x14 + (i * 0x4C)));
+        COctTree* octTree = GetOctTreeArray() + i;
         LightPcs.InsertOctTree(static_cast<CLightPcs::TARGET>(1), *octTree);
     }
 
     for (int i = 0; i < octTreeCount; i++) {
-        COctTree* octTree = reinterpret_cast<COctTree*>(Ptr(this, 0x14 + (i * 0x4C)));
+        COctTree* octTree = GetOctTreeArray() + i;
         CMapShadowInsertOctTree(static_cast<CMapShadow::TARGET>(1), *octTree);
     }
 
     for (int i = 0; i < octTreeCount; i++) {
-        reinterpret_cast<COctTree*>(Ptr(this, 0x14 + (i * 0x4C)))->SetDrawFlag();
+        GetOctTreeArray()[i].SetDrawFlag();
     }
 
     for (int i = 0; i < mapObjCount; i++) {
-        reinterpret_cast<CMapObj*>(Ptr(this, 0x954 + (i * 0xF0)))->SetDrawFlag();
+        GetMapObjArray()[i].SetDrawFlag();
     }
 }
 
@@ -3004,7 +3004,7 @@ int CMapMng::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long m
     PSVECAdd(&cylinder->m_bottom, move, &cylinder->m_top);
 
     for (int i = 0; i < m_octTreeCount; i++) {
-        COctTree* octTree = reinterpret_cast<COctTree*>(Ptr(this, 0x14 + (i * 0x4C)));
+        COctTree* octTree = GetOctTreeArray() + i;
         if (octTree->CheckHitCylinder(cylinder, move, mask) != 0) {
             m_hitMapObj = *reinterpret_cast<CMapObj**>(Ptr(octTree, 8));
             return 1;
@@ -3012,7 +3012,7 @@ int CMapMng::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long m
     }
 
     for (int i = 0; i < m_mapObjCount; i++) {
-        CMapObj* mapObj = reinterpret_cast<CMapObj*>(Ptr(this, 0x954 + (i * 0xF0)));
+        CMapObj* mapObj = GetMapObjArray() + i;
         m_hitMapObj = mapObj;
         if (mapObj->CheckHitCylinder(cylinder, move, mask) != 0) {
             return 1;
@@ -3058,7 +3058,7 @@ int CMapMng::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned lo
     PSVECAdd(&cylinder->m_bottom, move, &cylinder->m_top);
 
     for (int i = 0; i < m_octTreeCount; i++) {
-        COctTree* octTree = reinterpret_cast<COctTree*>(Ptr(this, 0x14 + (i * 0x4C)));
+        COctTree* octTree = GetOctTreeArray() + i;
         DAT_8032ec88 = 0;
         octTree->CheckHitCylinderNear(cylinder, move, mask);
         if (DAT_8032ec88 != 0) {
@@ -3068,7 +3068,7 @@ int CMapMng::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned lo
     }
 
     for (int i = 0; i < m_mapObjCount; i++) {
-        CMapObj* mapObj = reinterpret_cast<CMapObj*>(Ptr(this, 0x954 + (i * 0xF0)));
+        CMapObj* mapObj = GetMapObjArray() + i;
         DAT_8032ec88 = 0;
         mapObj->CheckHitCylinderNear(cylinder, move, mask);
         if (DAT_8032ec88 != 0) {

@@ -1324,7 +1324,7 @@ void CMapMng::Create()
     *reinterpret_cast<unsigned int*>(Ptr(this, 0x228E8)) = 0;
 
     CMemory::CStage* stage = Memory.CreateStage(0x540000, const_cast<char*>(s_map_manager_label_block), 0);
-    *reinterpret_cast<CMemory::CStage**>(this) = stage;
+    m_stage = stage;
 
     reinterpret_cast<CPtrArray<CMapAnimRun*>*>(Ptr(this, 0x213E0))->SetStage(stage);
     reinterpret_cast<CPtrArray<CMapAnim*>*>(Ptr(this, 0x213FC))->SetStage(stage);
@@ -1558,7 +1558,7 @@ void CMapMng::DestroyMap()
 void CMapMng::Destroy()
 {
     DestroyMap();
-    Memory.DestroyStage(*reinterpret_cast<CMemory::CStage**>(this));
+    Memory.DestroyStage(m_stage);
 }
 
 /*
@@ -1914,7 +1914,7 @@ void CMapMng::ReadMtx(char* mapName)
     *reinterpret_cast<unsigned char*>(self + 0x2298B) = 1;
 
     if (asyncLoadState.m_mapReadMode != 2 && asyncLoadState.m_mapReadMode != 3) {
-        CMemory::CStage* stage = *reinterpret_cast<CMemory::CStage**>(self + 0x0);
+        CMemory::CStage* stage = m_stage;
         CTextureSet* textureSet = new (stage, const_cast<char*>(s_map_cpp), 0x3A9) CTextureSet;
         m_textureSet = textureSet;
     }
@@ -1994,7 +1994,7 @@ void CMapMng::ReadMtx(char* mapName)
             } else {
                 while (chunkFile.GetNextChunk(chunk)) {
                     if (chunk.m_id == 0x54534554) {
-                        m_textureSet->Create(chunkFile, *reinterpret_cast<CMemory::CStage**>(self + 0x0), append, 0, 0, 0);
+                        m_textureSet->Create(chunkFile, m_stage, append, 0, 0, 0);
                         append = 1;
                         if (chunk.m_arg0 == 1) {
                             return;
@@ -2131,11 +2131,11 @@ void CMapMng::ReadMpl(char* mapName)
                                 return;
                             }
                             CMapMesh* mesh = reinterpret_cast<CMapMesh*>(self + 0x16AC + (meshCount * 0x44));
-                            mesh->ReadOtmMesh(chunkFile, *reinterpret_cast<CMemory::CStage**>(self), 1, 1);
+                            mesh->ReadOtmMesh(chunkFile, m_stage, 1, 1);
                         } else if (meshChunk.m_id == 0x44534554) {
                             short& meshCount = *reinterpret_cast<short*>(self + 0xE);
                             CMapMesh* mesh = reinterpret_cast<CMapMesh*>(self + 0x16AC + (meshCount * 0x44));
-                            mesh->ReadOtmMesh(chunkFile, *reinterpret_cast<CMemory::CStage**>(self), 1, 1);
+                            mesh->ReadOtmMesh(chunkFile, m_stage, 1, 1);
                             meshCount += 1;
                         }
                     }
@@ -2247,7 +2247,7 @@ void CMapMng::ReadOtm(char* mapName)
 
             if (chunk.m_id == 0x4C495448) {
                 CMapLightHolder* light = reinterpret_cast<CMapLightHolder*>(
-                    Memory._Alloc(0x10, *reinterpret_cast<CMemory::CStage**>(self), const_cast<char*>(s_map_cpp), 0x4D3, 0));
+                    Memory._Alloc(0x10, m_stage, const_cast<char*>(s_map_cpp), 0x4D3, 0));
                 if (light != 0) {
                     unsigned char* lightRaw = reinterpret_cast<unsigned char*>(light);
                     lightRaw[0] = chunkFile.Get1();
@@ -2277,14 +2277,14 @@ void CMapMng::ReadOtm(char* mapName)
                         return;
                     }
                     CMapMesh* mesh = reinterpret_cast<CMapMesh*>(self + 0x16AC + (meshCount * 0x44));
-                    mesh->ReadOtmMesh(chunkFile, *reinterpret_cast<CMemory::CStage**>(self), 0, 1);
+                    mesh->ReadOtmMesh(chunkFile, m_stage, 0, 1);
                     meshCount += 1;
                     continue;
                 }
 
                 if (chunk.m_id == 0x41534554) {
                     CMapTexAnimSet* texAnimSet =
-                        new (*reinterpret_cast<CMemory::CStage**>(self), const_cast<char*>(s_map_cpp), 0x49A) CMapTexAnimSet();
+                        new (m_stage, const_cast<char*>(s_map_cpp), 0x49A) CMapTexAnimSet();
                     m_mapTexAnimSet = texAnimSet;
                     if (texAnimSet != 0) {
                         texAnimSet->Create(chunkFile, m_materialSet, m_textureSet);
@@ -2293,7 +2293,7 @@ void CMapMng::ReadOtm(char* mapName)
                 }
 
                 if (chunk.m_id == 0x414E494D) {
-                    CMapAnim* mapAnim = new (*reinterpret_cast<CMemory::CStage**>(self), const_cast<char*>(s_map_cpp), 0x4BF) CMapAnim();
+                    CMapAnim* mapAnim = new (m_stage, const_cast<char*>(s_map_cpp), 0x4BF) CMapAnim();
                     if (mapAnim != 0) {
                         mapAnim->ReadOtmAnim(chunkFile);
                         reinterpret_cast<CPtrArray<CMapAnim*>*>(self + 0x213FC)->Add(mapAnim);
@@ -2325,7 +2325,7 @@ void CMapMng::ReadOtm(char* mapName)
 
                 if (chunk.m_id == 0x4D534554) {
                     CMaterialSet* materialSet =
-                        new (*reinterpret_cast<CMemory::CStage**>(self), const_cast<char*>(s_map_cpp), 0x482) CMaterialSet();
+                        new (m_stage, const_cast<char*>(s_map_cpp), 0x482) CMaterialSet();
                     m_materialSet = materialSet;
                     if (materialSet != 0) {
                         reinterpret_cast<CPtrArray<CMaterial*>*>(reinterpret_cast<unsigned char*>(materialSet) + 8)
@@ -2423,7 +2423,7 @@ void CMapMng::ReadOtm(char* mapName)
         CLightPcs::CBumpLight* bump = LightPcs.AddBump(
             reinterpret_cast<CLightPcs::CLight*>(lightRaw),
             static_cast<CLightPcs::TARGET>(1),
-            *reinterpret_cast<CMemory::CStage**>(self),
+            m_stage,
             1);
         *reinterpret_cast<CLightPcs::CBumpLight**>(atr + 0x38) = bump;
 

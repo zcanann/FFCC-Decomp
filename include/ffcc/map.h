@@ -2,6 +2,7 @@
 #define _FFCC_MAP_H_
 
 #include "ffcc/mapobj.h"
+#include "ffcc/memory.h"
 
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
@@ -101,7 +102,8 @@ class CMapMng
 {
 public:
     // Placeholder storage for the full map manager until concrete members are recovered.
-    unsigned char m_pad000[0x213D4];
+    CMemory::CStage* m_stage;          // 0x00000
+    unsigned char m_pad004[0x213D4 - 0x4];
     CMaterialSet* m_materialSet;       // 0x213D4
     CTextureSet* m_textureSet;         // 0x213D8
     CMapTexAnimSet* m_mapTexAnimSet;   // 0x213DC

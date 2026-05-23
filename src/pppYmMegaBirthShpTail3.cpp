@@ -103,7 +103,7 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                 Vec* history = (Vec*)(particle + 0x80);
                 Vec segVec;
                 float segLen;
-                float segProgress = 0.0f;
+                float segProgress = kPppYmMegaBirthShpTail3Zero;
                 u16 frameCount = frameCountRaw;
                 u16 particleShapeFrame = *(u16*)(particle + 0x1C);
                 const u16 shapeFrameStep = *(u16*)(shapeTable + 0x12);
@@ -118,9 +118,9 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                 segVec.x = cameraPos.x - drawPos.x;
                 segVec.y = cameraPos.y - drawPos.y;
                 segVec.z = cameraPos.z - drawPos.z;
-                zeroVec.x = 0.0f;
-                zeroVec.y = 0.0f;
-                zeroVec.z = 0.0f;
+                zeroVec.x = kPppYmMegaBirthShpTail3Zero;
+                zeroVec.y = kPppYmMegaBirthShpTail3Zero;
+                zeroVec.z = kPppYmMegaBirthShpTail3Zero;
                 segLen = PSVECDistance(&zeroVec, &segVec);
 
                 if (payload[0x9E] == 0) {
@@ -129,7 +129,9 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
 
                 while (frameCount != 0) {
                     Vec trailPos = drawPos;
-                    bool canDraw = (trailPos.x != 0.0f) || (trailPos.y != 0.0f) || (trailPos.z != 0.0f);
+                    bool canDraw = (trailPos.x != kPppYmMegaBirthShpTail3Zero) ||
+                                   (trailPos.y != kPppYmMegaBirthShpTail3Zero) ||
+                                   (trailPos.z != kPppYmMegaBirthShpTail3Zero);
                     if (canDraw) {
                         workRand = (u16)((u32)workRand * 0x80d + 7);
                         const u32 shapeFrame = (u32)(particleShapeFrame + workRand) / shapeFrameStep;
@@ -180,7 +182,7 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                     }
 
                     frameCount--;
-                    if (frameCount == 0 || spacing <= 0.0f) {
+                    if (frameCount == 0 || spacing <= kPppYmMegaBirthShpTail3Zero) {
                         break;
                     }
 
@@ -189,12 +191,12 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                     fadeG -= fadeGStep;
                     fadeB -= fadeBStep;
                     fadeA -= fadeAStep;
-                    if (drawScale <= 0.0f) {
+                    if (drawScale <= kPppYmMegaBirthShpTail3Zero) {
                         break;
                     }
 
                     segProgress += spacing;
-                    while (segLen > 0.0f && segProgress > segLen) {
+                    while (segLen > kPppYmMegaBirthShpTail3Zero && segProgress > segLen) {
                         const float overflow = segProgress - segLen;
                         trailNextIndex++;
                         if (trailNextIndex > trailMaxIndex) {
@@ -219,7 +221,7 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                         segLen = PSVECDistance(&zeroVec, &segVec);
                         segProgress = overflow;
                     }
-                    if (frameCount == 0 || segLen <= 0.0f) {
+                    if (frameCount == 0 || segLen <= kPppYmMegaBirthShpTail3Zero) {
                         break;
                     }
 

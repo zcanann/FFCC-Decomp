@@ -4,6 +4,7 @@
 #include "ffcc/map.h"
 #include "ffcc/maphit.h"
 #include "ffcc/math.h"
+#include "ffcc/monobj.h"
 #include "ffcc/partMng.h"
 #include "ffcc/partyobj.h"
 #include "ffcc/prgobj.h"
@@ -54,7 +55,6 @@ extern const float FLOAT_80331BC4 = 1.5f;
 extern const char DAT_80331bc8[] = "hip";
 u32 gItemObjCreateFlags;
 extern char SoundBuffer[];
-extern unsigned char m_boss__8CGMonObj[];
 static const char DAT_801dcec0[] = "num free item = %d\n";
 static const char DAT_801dced4[] = {
     (char)0x8F, (char)0xC1, (char)0x82, (char)0xB9, (char)0x82, (char)0xE9, (char)0x83, 0x49,

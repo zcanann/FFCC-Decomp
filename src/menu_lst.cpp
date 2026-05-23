@@ -8,8 +8,6 @@
 #include "ffcc/system.h"
 #include <string.h>
 
-extern "C" int __cntlzw(unsigned int);
-
 extern const float FLOAT_803333D0;
 extern const float FLOAT_803333D4;
 extern const double DOUBLE_803333D8;

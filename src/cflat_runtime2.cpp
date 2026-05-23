@@ -24,6 +24,7 @@
 #include "ffcc/fontman.h"
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 #include <PowerPC_EABI_Support/Runtime/MWCPlusLib.h>
+#include <PowerPC_EABI_Support/Runtime/NMWException.h>
 
 class CFont;
 
@@ -33,7 +34,6 @@ inline void* operator new(unsigned long, void* ptr)
 }
 
 extern "C" void StaticFrame__10CGCharaObjFv();
-extern "C" void* __register_global_object(void* object, void* destructor, void* regmem);
 extern "C" void __dt__12CFlatRuntimeFv(CFlatRuntime*, int);
 extern "C" void* __vt__13CFlatRuntime2[];
 extern "C" CFlatRuntime2* __ct__13CFlatRuntime2Fv(CFlatRuntime2*);

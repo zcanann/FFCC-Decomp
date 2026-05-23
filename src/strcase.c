@@ -1,3 +1,5 @@
+#include "ffcc/strcase.h"
+
 /*
  * --INFO--
  * PAL Address: 0x80013D70

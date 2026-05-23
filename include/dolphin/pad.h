@@ -77,6 +77,8 @@ typedef struct PADClampRegion {
 
 typedef void (*PADSamplingCallback)(void);
 
+extern u32 __PADSpec;
+
 // Pad
 int PADReset(u32 mask);
 BOOL PADRecalibrate(u32 mask);

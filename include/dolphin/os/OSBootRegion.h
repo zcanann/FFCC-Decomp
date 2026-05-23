@@ -1,0 +1,28 @@
+#ifndef _DOLPHIN_OSBOOTREGION_H_
+#define _DOLPHIN_OSBOOTREGION_H_
+
+#include <dolphin/types.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#ifdef OS_BOOT_REGION_VOLATILE
+#define OS_BOOT_REGION_QUAL volatile
+#else
+#define OS_BOOT_REGION_QUAL
+#endif
+
+extern OS_BOOT_REGION_QUAL u32 BOOT_REGION_START AT_ADDRESS(0x812FDFF0);
+extern OS_BOOT_REGION_QUAL u32 BOOT_REGION_END AT_ADDRESS(0x812FDFEC);
+extern OS_BOOT_REGION_QUAL u8 g_unk_800030E2 AT_ADDRESS(0x800030E2);
+extern OS_BOOT_REGION_QUAL u32 g_unk_817FFFF8 AT_ADDRESS(0x817FFFF8);
+extern OS_BOOT_REGION_QUAL u32 g_unk_817FFFFC AT_ADDRESS(0x817FFFFC);
+
+#undef OS_BOOT_REGION_QUAL
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* _DOLPHIN_OSBOOTREGION_H_ */

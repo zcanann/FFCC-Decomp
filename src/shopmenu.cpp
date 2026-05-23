@@ -13,12 +13,11 @@
 #include "ffcc/linkage.h"
 #include "ffcc/memory.h"
 #include "ffcc/p_tina.h"
-#include <string.h>
 #include <PowerPC_EABI_Support/Runtime/New.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
+#include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h>
 
 extern "C" {
-int __cntlzw(unsigned int);
 void SetScale__5CFontFf(float, CFont*);
 void SetScaleX__5CFontFf(float, CFont*);
 void SetScaleY__5CFontFf(float, CFont*);
@@ -35,8 +34,6 @@ void DrawShadowFont__8CMenuPcsFP5CFontPcffii(void*, CFont*, char*, float, float,
 void DrawSingleIcon__8CMenuPcsFiiifif(void*, int, int, int, float, float, float);
 void DrawInit__8CMenuPcsFv(void*);
 void MakeAgbString__4CMesFPcPcii(char*, char*, int, int);
-char* strcpy(char*, const char*);
-char* strcat(char*, const char*);
 }
 
 char s_shopmenu_cpp_801ded8c[] = "shopmenu.cpp";

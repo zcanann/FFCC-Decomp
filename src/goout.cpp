@@ -8,7 +8,6 @@ CGoOutMenu g_GoOutMenu;
 CGoOutMenu* g_pGoOutMenu;
 int g_freeCaravanIdx;
 
-extern "C" int CalcGoOutSelChar__8CMenuPcsFUcUc(CMenuPcs*, unsigned char, unsigned char);
 extern "C" const char* g_strGooutMes[];
 
 struct CMenuPcsGoOutLayout
@@ -1041,7 +1040,7 @@ void CGoOutMenu::CalcGoOut()
 
     if (field_0x1d != 0) {
         const unsigned char selInit = static_cast<unsigned char>(__cntlzw(0xF - static_cast<int>(field_0x18)) >> 5 & 0xFF);
-        CalcGoOutSelChar__8CMenuPcsFUcUc(&MenuPcs, selInit, 1);
+        MenuPcs.CalcGoOutSelChar(selInit, 1);
     }
 
     switch (field_0x18) {
@@ -1582,7 +1581,7 @@ void CGoOutMenu::CalcDel()
     CMenuPcsGoOutLayout& menuPcsLayout = *reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs);
 
     const unsigned char selInit = static_cast<unsigned char>(__cntlzw(2 - static_cast<int>(delMode)) >> 5 & 0xFF);
-    const int selResult = CalcGoOutSelChar__8CMenuPcsFUcUc(&MenuPcs, selInit, 0);
+    const int selResult = MenuPcs.CalcGoOutSelChar(selInit, 0);
     unsigned short input;
     unsigned char next;
 

@@ -13,8 +13,6 @@ typedef signed short s16;
 typedef unsigned char u8;
 typedef unsigned short u16;
 
-extern "C" int __cntlzw(unsigned int);
-
 extern const float FLOAT_80332e60;
 extern float FLOAT_80332e64;
 extern const double DOUBLE_80332e68;

@@ -8,7 +8,7 @@
 #include "ffcc/sound.h"
 #include "ffcc/vector.h"
 
-extern "C" double atan2(double, double);
+#include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/math.h>
 
 extern "C" const float FLOAT_80331BD0 = 1.0f;
 extern "C" const float FLOAT_80331BD4 = 0.0f;

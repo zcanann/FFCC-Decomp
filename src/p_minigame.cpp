@@ -54,7 +54,6 @@ static const char s_miniGameRecvStatusFmt[] = "ret=%d  status=0x%02x  step=%d  c
 static const char s_miniGameFlagsRetryFmt[] = "GBA_JSTAT_FLAGS_MASK retry chan=%d\n";
 static const char s_miniGamePsf1RetryFmt[] = "GBA_JSTAT_PSF1 retry chan=%d\n\0\0";
 
-extern "C" int memcmp(const void* lhs, const void* rhs, unsigned long count);
 extern char g_MsgFlashy[];
 
 struct MiniGameAlarm {

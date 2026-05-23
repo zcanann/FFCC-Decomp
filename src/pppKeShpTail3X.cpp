@@ -17,10 +17,6 @@ static const float kPppKeShpTail3XRandomMax = 65535.0f;
 static const float kPppKeShpTail3XOne = 1.0f;
 static const float kPppKeShpTail3XDegToRad = 0.017453292f;
 
-extern "C" {
-int __cntlzw(unsigned int);
-}
-
 struct KeShpTail3XStep {
     s32 m_graphId;
     u32 m_dataValIndex;

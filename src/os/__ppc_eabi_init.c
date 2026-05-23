@@ -1,10 +1,5 @@
 #include "dolphin/base/PPCArch.h"
-
-typedef void (*voidfunctionptr)(void);
-
-extern voidfunctionptr _ctors[];
-
-void __init_cpp(void);
+#include "PowerPC_EABI_Support/Runtime/runtime.h"
 
 /*
  * --INFO--

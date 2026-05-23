@@ -19,6 +19,7 @@
 
 #include <string.h>
 #include <PowerPC_EABI_Support/Runtime/MWCPlusLib.h>
+#include <PowerPC_EABI_Support/Runtime/NMWException.h>
 #include <PowerPC_EABI_Support/Runtime/New.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
@@ -34,7 +35,6 @@ extern "C" void __dt__8CMapMeshFv(void*, int);
 extern "C" void __dt__7CMapMngFv(void*, int);
 extern "C" void __dt__8CMapAnimFv(void*, int);
 extern "C" void __dt__13CMapAnimKeyDtFv(void*, int);
-extern "C" void* __register_global_object(void*, void*, void*);
 extern "C" void __ct__8COctTreeFv(void*);
 extern "C" void __ct__7CMapHitFv(void*);
 extern "C" void __ct__7CMapObjFv(void*);

@@ -11,6 +11,7 @@ extern int gPppCalcDisabled;
 #include <dolphin/gx.h>
 #include <dolphin/gx/GXCpu2Efb.h>
 #include <dolphin/mtx.h>
+#include "PowerPC_EABI_Support/Runtime/runtime.h"
 
 struct LensFlareWork {
     u8 _pad00[0x10];
@@ -26,8 +27,6 @@ struct LensFlareWork {
     u8 _pad33;
     f32 m_dot;
 };
-
-extern "C" unsigned int __cvt_fp2unsigned(double);
 
 extern const double DOUBLE_80330FF0 = 0.0;
 extern const float FLOAT_80330FF8 = 1.0f;

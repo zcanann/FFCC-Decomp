@@ -7,12 +7,11 @@
 #include "ffcc/sound.h"
 #include "ffcc/system.h"
 #include "ffcc/RedSound/RedSound.h"
-#include <string.h>
 #include "ffcc/fontman.h"
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
+#include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/ctype.h>
 
-extern "C" char* strcat(char*, const char*);
 extern "C" char s_MenuUtil_cpp_801e37fc[];
 extern u32 DAT_801e36d0;
 extern u32 DAT_801e36d4;

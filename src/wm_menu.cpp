@@ -2853,7 +2853,7 @@ void CMenuPcs::CalcGoOutCharaSelect(unsigned char state)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::CalcGoOutSelChar(unsigned char state, unsigned char slot)
+int CMenuPcs::CalcGoOutSelChar(unsigned char state, unsigned char slot)
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	unsigned char* const worldState = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x82C)[0]);
@@ -2862,7 +2862,7 @@ void CMenuPcs::CalcGoOutSelChar(unsigned char state, unsigned char slot)
 	bytes[0x17] = state;
 
 	if (worldState == 0 || frameState == 0 || *reinterpret_cast<short*>(worldState + 0x10) >= 5) {
-		return;
+		return -1;
 	}
 
 	if (state != 0) {
@@ -2904,6 +2904,19 @@ void CMenuPcs::CalcGoOutSelChar(unsigned char state, unsigned char slot)
 	if (menuAnim > 0 && menuAnim < 4) {
 		CalcChara();
 	}
+
+	unsigned char* const selectState = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x828)[0]);
+	unsigned char* const animState = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x844)[0]);
+	if (selectState[0x0E] != 0) {
+		return -2;
+	}
+
+	const int cursor = static_cast<int>(*reinterpret_cast<short*>(selectState + 4));
+	if (selectState[0x0A] == 0 || (*reinterpret_cast<int*>(animState + cursor * 0x14) == 3 && slot != 0)) {
+		return -1;
+	}
+
+	return cursor;
 }
 
 /*

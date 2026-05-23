@@ -71,6 +71,8 @@ void __GBASyncCallback(s32 chan, s32 ret);
 s32 __GBASync(s32 chan);
 OSTime __GBASetDelay(s32 chan, OSTime delay);
 s32 __GBATransfer(s32 chan, s32 w1, s32 w2, GBATransferCallback callback);
+void __GBAX01(s32 chan, s32 ret);
+void __GBAX02(s32 chan, u8* readbuf);
 
 #ifdef __cplusplus
 }

@@ -29,8 +29,6 @@ u8 m_aiWork__8CGMonObj[0xC];
 u8 m_boss__8CGMonObj[0x8C];
 }
 
-extern "C" void __ptmf_scall(...);
-extern "C" int __cntlzw(unsigned int);
 extern "C" char SoundBuffer_1248_[];
 extern "C" float DAT_8032ec24;
 extern "C" float g_hit_t;

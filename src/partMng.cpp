@@ -31,11 +31,11 @@ extern int gPppHeapUseRateWords[3];
 #include "ffcc/stopwatch.h"
 
 #include <string.h>
+#include <dolphin/gx/GXCpu2Efb.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 #include <PowerPC_EABI_Support/Runtime/MWCPlusLib.h>
 #include <PowerPC_EABI_Support/Runtime/New.h>
 
-extern "C" unsigned long pppHeapCheckLeak__FPQ27CMemory6CStage2(CMemory::CStage*);
 extern "C" {
 extern Mtx ppvCameraMatrix;
 extern float ppvChrScl[3];
@@ -64,7 +64,6 @@ extern "C" float FLOAT_8032fe74;
 extern "C" float FLOAT_8032fe78;
 extern "C" float FLOAT_8032fe7c;
 extern "C" double DOUBLE_8032fe80;
-extern "C" void GXPeekZ(u16, u16, u32*);
 extern "C" void __ct__9_pppMngStFv(_pppMngSt* pppMngSt);
 extern "C" void __ct__10pppShapeStFv(pppShapeSt* shapeSt);
 extern "C" void __dt__10pppShapeStFv(pppShapeSt* shapeSt, int);

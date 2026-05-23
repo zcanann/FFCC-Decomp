@@ -13,10 +13,6 @@ extern int gPppCalcDisabled;
 #include <dolphin/types.h>
 #include <string.h>
 
-extern "C" {
-int __cntlzw(unsigned int);
-}
-
 struct KeShpTail2XStep {
     u8 _pad0[4];
     s32 m_dataValIndex;

@@ -61,9 +61,6 @@ const char* __EXIVersion = gEXIStringTable;
 static EXIControl Ecb[3];
 static u32 IDSerialPort1;
 
-// external functions
-extern void __OSEnableBarnacle(s32 chan, u32 dev);
-
 // prototypes
 u32 EXIClearInterrupts(s32 chan, int exi, int tc, int ext);
 static int __EXIProbe(s32 chan);

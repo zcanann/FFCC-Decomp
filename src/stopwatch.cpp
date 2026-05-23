@@ -1,6 +1,5 @@
 #include "ffcc/stopwatch.h"
-
-extern "C" float __cvt_sll_flt(u32 lo, u32 hi);
+#include <PowerPC_EABI_Support/Runtime/runtime.h>
 
 static const float s_stopwatchScale = 100.0f;
 

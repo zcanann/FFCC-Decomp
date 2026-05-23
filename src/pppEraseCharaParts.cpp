@@ -5,10 +5,7 @@
 #include "ffcc/pppYmEnv.h"
 
 #include <dolphin/gx.h>
-
-extern "C" {
-void DCFlushRange(void* ptr, unsigned long size);
-}
+#include <dolphin/os/OSCache.h>
 
 struct EraseCharaPartsDisplayList {
     u32 m_size;

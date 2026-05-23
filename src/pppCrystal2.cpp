@@ -11,12 +11,12 @@
 
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
+#include "PowerPC_EABI_Support/Runtime/runtime.h"
 #include "ffcc/ppp_linkage.h"
 
 extern int __float_nan[];
 extern const double DOUBLE_80331FC0 = 2.4;
 extern const float kPppScreenQuakeZero[2] = {0.0f, 0.0f};
-extern "C" unsigned int __cvt_fp2unsigned(double);
 
 struct Crystal2IndTexMtx {
     f32 value[2][3];

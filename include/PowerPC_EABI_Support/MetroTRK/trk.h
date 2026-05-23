@@ -6,6 +6,7 @@
 #include "PowerPC_EABI_Support/MetroTRK/trkenum.h"
 #include "PowerPC_EABI_Support/MetroTRK/trktypes.h"
 #include "PowerPC_EABI_Support/MetroTRK/ppc_reg.h"
+#include "PowerPC_EABI_Support/MetroTRK/trk_init.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -40,10 +41,6 @@ void TRKResetBuffer(TRKBuffer* msg, BOOL keepData);
 
 DSError TRKReadBuffer1_ui64(TRKBuffer* buffer, u64* data);
 DSError TRKAppendBuffer1_ui64(TRKBuffer* buffer, const u64 data);
-
-void InitMetroTRK(void);
-void InitMetroTRK_BBA(void);
-void EnableMetroTRKInterrupts(void);
 
 void TRKLoadContext(OSContext* ctx, u32);
 void TRKRestoreExtended1Block(void);

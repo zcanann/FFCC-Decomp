@@ -10,24 +10,11 @@
 const char* __DSPVersion = "<< Dolphin SDK - DSP\tdebug build: Apr  5 2004 03:56:49 (0x2301) >>";
 #define DSP_INIT_BUILD_DATE_MSG "DSPInit(): Build Date: %s %s\n"
 #else
-typedef struct DSPStrings {
-    char version[0x45];
-    char _pad0[3];
-    char initMsg[0x1E];
-    char _pad1[2];
-    char buildDate[0xC];
-    char buildTime[0x9];
-} DSPStrings;
-
-extern const DSPStrings sDSPStrings;
 const char* __DSPVersion = sDSPStrings.version;
 #define BUILD_DATE sDSPStrings.buildDate
 #define BUILD_TIME sDSPStrings.buildTime
 #define DSP_INIT_BUILD_DATE_MSG sDSPStrings.initMsg
 #endif
-
-extern DSPTaskInfo* __DSP_rude_task;
-extern int __DSP_rude_task_pending;
 
 static BOOL __DSP_init_flag;
 

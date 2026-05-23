@@ -2,13 +2,8 @@
 #include <dolphin/os.h>
 
 #include "dolphin/os/__os.h"
+#include "dolphin/os/OSBootRegion.h"
 #include <dolphin/dvd/__dvd.h>
-
-extern u32 BOOT_REGION_START AT_ADDRESS(0x812FDFF0);
-extern u32 BOOT_REGION_END AT_ADDRESS(0x812FDFEC);
-extern u8 g_unk_800030E2 AT_ADDRESS(0x800030E2);
-extern u32 g_unk_817FFFF8 AT_ADDRESS(0x817FFFF8);
-extern u32 g_unk_817FFFFC AT_ADDRESS(0x817FFFFC);
 
 int Prepared[2];
 

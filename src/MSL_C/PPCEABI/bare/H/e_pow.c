@@ -58,7 +58,6 @@
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common_Embedded/Math/fdlibm.h"
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/errno.h"
 
-extern double __fabs(double);
 inline double fabs(double f) { return __fabs(f); }
 
 #ifndef NAN

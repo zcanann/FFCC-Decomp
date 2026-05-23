@@ -39,7 +39,6 @@ extern "C" {
 u8* gCharaPartWorkPtr = 0;
 }
 
-extern "C" int __cntlzw(unsigned int);
 extern "C" unsigned char DbgMenuPcs[];
 extern unsigned char PTR_s_CCharaPcs_GAME_[];
 

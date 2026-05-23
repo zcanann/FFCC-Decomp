@@ -3,14 +3,6 @@
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/file_io.h"
 #include <string.h>
 
-extern int __position_file(__file_handle file, fpos_t* position, int mode,
-                           __idle_proc idle_proc);
-extern int __read_file(__file_handle file, unsigned char* buff, size_t* count,
-                       __idle_proc idle_proc);
-extern int __write_file(__file_handle file, unsigned char* buff, size_t* count,
-                        __idle_proc idle_proc);
-extern int __close_file(__file_handle file);
-
 static unsigned char stdin_buff[0x100];
 static unsigned char stdout_buff[0x100];
 static unsigned char stderr_buff[0x100];

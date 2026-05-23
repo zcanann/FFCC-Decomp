@@ -352,6 +352,7 @@ extern void* __memReg;
 extern void* __peReg;
 extern void* __cpReg;
 extern void* __piReg;
+extern const f32 GXIndTexMtxScale1024;
 
 // #if DEBUG
 extern GXBool __GXinBegin;

@@ -4,6 +4,7 @@
 #include "ffcc/game.h"
 #include "ffcc/p_menu.h"
 #include "ffcc/joybus.h"
+#include "ffcc/strcase.h"
 #include "ffcc/system.h"
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
@@ -19,9 +20,6 @@ extern float FLOAT_803308ac;
 extern float FLOAT_803308b0;
 // PAL map: CMes::m_tempVar in mes.o, .bss size 0x50.
 int CMes::m_tempVar[0x14];
-extern "C" void toupper(char*);
-extern "C" void tolower_name_conflict(char*);
-extern "C" int toupperLatin1(unsigned char);
 
 static const char s_mesTagUnknown[] = "Not corresponding TAG is used. %02x\n";
 static const char s_mesTagMissing[] = "This TAG is not created. %02x\n";

@@ -3,11 +3,6 @@
 
 #include "dolphin/os/__os.h"
 
-// external functions
-extern void __RAS_OSDisableInterrupts_begin();
-extern void __RAS_OSDisableInterrupts_end();
-extern void DBPrintf(char*, ...);
-
 #define HID2 920
 
 volatile OSContext* __OSCurrentContext AT_ADDRESS(OS_BASE_CACHED | 0x00D4);

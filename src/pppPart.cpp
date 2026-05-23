@@ -30,6 +30,7 @@ extern float gPartScreenMatrixRow2W;
 #include "ffcc/gxfunc.h"
 
 #include <string.h>
+#include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
 extern "C" int CrossCheckSphereVector__5CMathFP3VecPfP3VecP3VecP3Vecf(
     CMath*, Vec*, float*, Vec*, Vec*, Vec*, float, float, float);
@@ -65,7 +66,6 @@ extern "C" unsigned char DAT_8032ed8b;
 extern "C" int DAT_8032ed7c;
 extern "C" unsigned int DAT_8032ed80;
 extern "C" void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
-extern "C" int printf(const char*, ...);
 
 _pppEnvSt* pppEnvStPtr;
 _pppMngSt* pppMngStPtr;

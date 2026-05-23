@@ -6,7 +6,6 @@
 const char* __CARDVersion = "<< Dolphin SDK - CARD\tdebug build: Apr  5 2004 03:56:53 (0x2301) >>";
 u32 __CARDFreq = 0;
 #else
-extern const char gCARDVersionString[];
 const char* __CARDVersion = gCARDVersionString;
 CARDFreqData __CARDFreq = { 0 };
 #endif

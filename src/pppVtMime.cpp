@@ -3,6 +3,9 @@
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/ppp_constants.h"
+
+#include <dolphin/os/OSCache.h>
+
 struct VtMimeCtrl
 {
     unsigned char pad0[0xC];
@@ -42,10 +45,6 @@ struct VtMimeEnv
 };
 
 extern "C" const char s_pppVtMime_cpp[] = "pppVtMime.cpp";
-
-extern "C" {
-void DCFlushRange(void* addr, unsigned long nBytes);
-}
 
 /*
  * --INFO--

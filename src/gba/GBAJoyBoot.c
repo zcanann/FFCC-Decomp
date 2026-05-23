@@ -10,7 +10,6 @@ static void F23(s32 chan, s32 ret);
 static void F25(s32 chan, s32 ret);
 static void F27(s32 chan, s32 ret);
 static inline void F104(s32 chan, s32 ret);
-void __GBAX01(s32 chan, s32 ret);
 static void F31(s32 chan, s32 ret);
 static void F33(s32 chan, s32 ret);
 static void F35(s32 chan, s32 ret);

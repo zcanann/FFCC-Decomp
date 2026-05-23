@@ -31,6 +31,7 @@
 #include "ffcc/util.h"
 #include "ffcc/vector.h"
 #include "ffcc/wind.h"
+#include "ffcc/wm_menu.h"
 #include <dolphin/os.h>
 #include <math.h>
 #include <string.h>
@@ -51,7 +52,6 @@ struct CMapCylinderRaw
     Vec m_direction2;
 };
 
-extern int gWmMenuWorkA;
 extern float FLOAT_80330B30;
 extern float FLOAT_80330b74;
 extern float FLOAT_80330b54;

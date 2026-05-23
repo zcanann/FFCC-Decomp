@@ -130,8 +130,8 @@ extern const float FLOAT_80331cf4 = 0.5f;
 
 extern const Vec DAT_801dd4b0;
 extern const Vec DAT_801dd4bc = { 0.0f, 1.0f, 0.0f };
-extern const char s_f999_root_801dd4c8[] = "f999_root";
-extern const char s_pppScreenBreak_cpp_801dd4d4[] = "pppScreenBreak.cpp";
+extern const char sF999Root[] = "f999_root";
+extern const char s_pppScreenBreak_cpp[] = "pppScreenBreak.cpp";
 
 static inline float CameraPosX() { return CameraPcs.m_positionX; }
 static inline float CameraPosY() { return CameraPcs.m_positionY; }
@@ -167,7 +167,7 @@ void pppRenderScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB*, ppp
     u8* value = (u8*)pppScreenBreak + dataOffset + 0x80;
     CCharaPcs::CHandle* handle = GetCharaHandlePtr(*reinterpret_cast<CGObject**>(reinterpret_cast<u8*>(pppMngStPtr) + 0xD8), 0);
     int model = reinterpret_cast<int>(GetCharaModelPtr(handle));
-    reinterpret_cast<CChara::CModel*>(model)->SearchNode(const_cast<char*>(s_f999_root_801dd4c8));
+    reinterpret_cast<CChara::CModel*>(model)->SearchNode(const_cast<char*>(sF999Root));
 
     if (value[0x24] == 0) {
         Graphic.GetBackBufferRect2(
@@ -218,10 +218,10 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param
     void* pieceStorage = *(void**)&value[3];
     if (pieceStorage == NULL) {
         pieceStorage = pppMemAlloc(*(u32*)(*(u8**)(model + 0xA4) + 0xC) * 0x3C, pppEnvStPtr->m_stagePtr,
-                                    const_cast<char*>(s_pppScreenBreak_cpp_801dd4d4), 0x25E);
+                                    const_cast<char*>(s_pppScreenBreak_cpp), 0x25E);
         *(void**)&value[3] = pieceStorage;
         *(void**)&value[4] = pppMemAlloc(0x20, pppEnvStPtr->m_stagePtr,
-                                         const_cast<char*>(s_pppScreenBreak_cpp_801dd4d4), 0x25F);
+                                         const_cast<char*>(s_pppScreenBreak_cpp), 0x25F);
         InitPieceData((CChara::CModel*)model, (PScreenBreak*)param_2, (VScreenBreak*)value);
         PSVECNormalize((Vec*)(param_2->m_payload + 0xC), (Vec*)(param_2->m_payload + 0xC));
     }

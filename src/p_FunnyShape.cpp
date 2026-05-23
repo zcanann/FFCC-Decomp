@@ -66,6 +66,11 @@ inline void* operator new(unsigned long, void* ptr)
 }
 
 namespace {
+struct CFunnyShapeViewerState {
+    GXColor m_colors[4];
+    Vec m_positions[3];
+};
+
 static inline CUSBStreamData* UsbStream(CFunnyShapePcs* self)
 {
     return reinterpret_cast<CUSBStreamData*>(self->m_usbStreamDataStorage);
@@ -84,6 +89,11 @@ static inline CPtrArray<OSFS_TEXTURE_ST*>* TextureHeaders(CFunnyShapePcs* self)
 static inline CPtrArray<_GXTexObj*>* TextureObjects(CFunnyShapePcs* self)
 {
     return reinterpret_cast<CPtrArray<_GXTexObj*>*>(self->m_gxTexObjPtrArrayStorage);
+}
+
+static inline CFunnyShapeViewerState* ViewerState(CFunnyShapePcs* self)
+{
+    return reinterpret_cast<CFunnyShapeViewerState*>(self->m_viewerState);
 }
 } // namespace
 
@@ -236,7 +246,7 @@ void CFunnyShapePcs::createViewer()
     clearColor.a = 0xFF;
     GXSetCopyClear(clearColor, 0xFFFFFF);
 
-    memset(&m_displayPending, 0, 0x40);
+    memset(&m_displayPending, 0, sizeof(m_displayPending));
     UsbStream(this)->CreateBuffer();
     m_displayTextureEnabled = 0;
 }
@@ -252,7 +262,7 @@ void CFunnyShapePcs::createViewer()
  */
 int CFunnyShapePcs::GetTable(unsigned long index)
 {
-    return reinterpret_cast<int>(reinterpret_cast<unsigned char*>(m_table) + index * 0x15C);
+    return reinterpret_cast<int>(reinterpret_cast<unsigned char*>(m_table) + index * sizeof(m_table));
 }
 
 /*
@@ -275,8 +285,8 @@ void CFunnyShapePcs::Quit()
  */
 void CFunnyShapePcs::Init()
 {
-    GXColor* colors = reinterpret_cast<GXColor*>(m_viewerState);
-    Vec* positions = reinterpret_cast<Vec*>(&m_viewerState[0x10]);
+    GXColor* colors = ViewerState(this)->m_colors;
+    Vec* positions = ViewerState(this)->m_positions;
 
     colors[0].r = 0x7F;
     colors[0].g = 0x7F;

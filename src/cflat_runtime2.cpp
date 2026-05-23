@@ -33,7 +33,6 @@ inline void* operator new(unsigned long, void* ptr)
 }
 
 extern "C" void StaticFrame__10CGCharaObjFv();
-extern "C" void Destroy__9CFlatDataFv(void*);
 extern "C" void* __register_global_object(void* object, void* destructor, void* regmem);
 extern "C" void __dt__12CFlatRuntimeFv(CFlatRuntime*, int);
 extern "C" void* __vt__13CFlatRuntime2[];
@@ -46,7 +45,6 @@ extern "C" void __ct__9CGItemObjFv(CGItemObj*);
 extern "C" void __ct__8CGObjectFv(CGObject*);
 extern "C" void __ct__9CGQuadObjFv(CGQuadObj*);
 extern "C" void __ct__9CGBaseObjFv(CGBaseObj*);
-extern "C" void pppCreate__8CPartMngFiiP14PPPCREATEPARAMi(CPartMng*, int, int, PPPCREATEPARAM*, int);
 
 // Linkage definitions from config/GCCP01/symbols.txt.
 // Keeping these as raw byte buffers matches current decomp access patterns.
@@ -1305,7 +1303,7 @@ CGItemObj* CFlatRuntime2::FindGItemObjNext(CGItemObj* gItemObj)
 void CFlatRuntime2::Destroy()
 {
 	reinterpret_cast<CFlatRuntime*>(this)->Destroy();
-	Destroy__9CFlatDataFv(reinterpret_cast<u8*>(this) + 0xCF20);
+	reinterpret_cast<CFlatData*>(reinterpret_cast<u8*>(this) + 0xCF20)->Destroy();
 
 	CFlatRuntime2* layer = this;
 	for (int i = 0; i < 8; i++, layer = reinterpret_cast<CFlatRuntime2*>(reinterpret_cast<u8*>(layer) + 0xC)) {
@@ -2045,8 +2043,8 @@ void CFlatRuntime2::PutParticle(int workNo, Vec& pos, float scale)
 	*reinterpret_cast<float*>(runtime + 0x1758) = scale;
 	*reinterpret_cast<float**>(runtime + 0x16D4) = reinterpret_cast<float*>(runtime + 0x1758);
 
-	pppCreate__8CPartMngFiiP14PPPCREATEPARAMi(
-		&PartMng, *reinterpret_cast<int*>(runtime + 0x1738), *reinterpret_cast<unsigned int*>(runtime + 0x173C),
+	PartMng.pppCreate(
+		*reinterpret_cast<int*>(runtime + 0x1738), *reinterpret_cast<unsigned int*>(runtime + 0x173C),
 		reinterpret_cast<PPPCREATEPARAM*>(runtime + 0x16CC), 1);
 }
 
@@ -2061,8 +2059,8 @@ void CFlatRuntime2::PutParticle(int workNo, Vec& pos, float scale)
  */
 void CFlatRuntime2::PutParticleWork()
 {
-	pppCreate__8CPartMngFiiP14PPPCREATEPARAMi(
-		&PartMng, ParticleWorkNoHi(this), ParticleWorkNoLo(this),
+	PartMng.pppCreate(
+		ParticleWorkNoHi(this), ParticleWorkNoLo(this),
 		reinterpret_cast<PPPCREATEPARAM*>(reinterpret_cast<u8*>(this) + 0x16CC), 1);
 }
 

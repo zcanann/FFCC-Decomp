@@ -8,6 +8,8 @@
 extern "C" {
 #endif
 
+extern const double printf_double_zero;
+
 int fprintf(FILE* stream, const char* format, ...);
 int printf(const char* format, ...);
 int sprintf(char* s, const char* format, ...);

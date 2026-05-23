@@ -4,8 +4,6 @@
 #define K1 0x80808080
 #define K2 0xFEFEFEFF
 
-extern char msl_string_table_1[];
-
 char* strtok_null = msl_string_table_1;
 char* strtok_ptr  = msl_string_table_1;
 const unsigned char strtok_delimiter_table_init[32] = { 0 };

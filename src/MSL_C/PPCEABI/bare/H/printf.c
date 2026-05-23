@@ -10,8 +10,6 @@
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/wchar_io.h"
 #include "stdarg.h"
 
-extern const double printf_double_zero;
-
 #define TARGET_FLOAT_BITS           64
 #define TARGET_FLOAT_BYTES          (TARGET_FLOAT_BITS / 8)
 #define TARGET_FLOAT_MAX_EXP        LDBL_MAX_EXP

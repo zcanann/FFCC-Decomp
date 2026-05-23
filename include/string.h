@@ -7,6 +7,8 @@ typedef unsigned long size_t;
 extern "C" {
 #endif
 
+extern char msl_string_table_1[];
+
 void* memcpy(void* dst, const void* src, size_t n);
 void* memset(void* dst, int val, size_t n);
 

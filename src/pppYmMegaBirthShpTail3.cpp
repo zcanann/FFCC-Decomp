@@ -172,7 +172,7 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                         amb.r = (u8)fadeR;
                         amb.g = (u8)fadeG;
                         amb.b = (u8)fadeB;
-                        amb.a = (u8)(fadeA * (FLOAT_803305B0 - *(float*)(particle + 0x30)));
+                        amb.a = (u8)(fadeA * (FLOAT_803305AC * (FLOAT_803305B0 - *(float*)(particle + 0x30))));
                         if (amb.a > 0x7F) {
                             amb.a = 0x7F;
                         }

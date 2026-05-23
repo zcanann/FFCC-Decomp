@@ -20,7 +20,7 @@ extern "C" const float FLOAT_8032F8E8;
 extern "C" const float FLOAT_8032F8F4;
 extern "C" const float FLOAT_8032F8F8;
 extern "C" const double DOUBLE_8032F900;
-extern "C" const char s_old_mid_format_801D7094[];
+extern "C" const char sOldMidFormat[];
 
 CMapCylinder g_hit_cyl;
 CMapCylinder g_hit_cyl_min;
@@ -36,7 +36,7 @@ static inline unsigned char* Ptr(void* p, unsigned int offset)
 }
 }
 
-extern const char s_maphit_cpp_801D7088[] = "maphit.cpp";
+extern const char s_maphit_cpp[] = "maphit.cpp";
 
 int g_hit_edge_idx_min;
 float g_hit_edge_t;
@@ -647,7 +647,7 @@ int CMapHit::ReadOtmHit(CChunkFile& chunkFile)
         case 'HITV': {
             m_vertexCount = static_cast<unsigned short>(chunk.m_arg0);
             m_vertices =
-                new (MapMng.m_stage, const_cast<char*>(s_maphit_cpp_801D7088), 0x143)
+                new (MapMng.m_stage, const_cast<char*>(s_maphit_cpp), 0x143)
                     Vec[m_vertexCount];
 
             for (int i = 0; i < m_vertexCount; i++) {
@@ -676,7 +676,7 @@ int CMapHit::ReadOtmHit(CChunkFile& chunkFile)
         case 'HITF': {
             m_faceCount = static_cast<unsigned short>(chunk.m_arg0);
             m_faces =
-                new (MapMng.m_stage, const_cast<char*>(s_maphit_cpp_801D7088), 0x159)
+                new (MapMng.m_stage, const_cast<char*>(s_maphit_cpp), 0x159)
                     CMapHitFace[m_faceCount];
 
             const float offsetScale = FLOAT_8032F8F4;
@@ -708,7 +708,7 @@ int CMapHit::ReadOtmHit(CChunkFile& chunkFile)
 
                 if (chunk.m_version == 0) {
                     if ((unsigned int)System.m_execParam >= 1) {
-                        System.Printf(const_cast<char*>(s_old_mid_format_801D7094));
+                        System.Printf(const_cast<char*>(sOldMidFormat));
                     }
                     chunkFile.Align(4);
                     for (int i = 0; i < face.m_vertexCount; i++) {
@@ -718,7 +718,7 @@ int CMapHit::ReadOtmHit(CChunkFile& chunkFile)
                     face.m_radiusScale = FLOAT_8032F8D0;
                 } else if (chunk.m_version == 1) {
                     if ((unsigned int)System.m_execParam >= 1) {
-                        System.Printf(const_cast<char*>(s_old_mid_format_801D7094));
+                        System.Printf(const_cast<char*>(sOldMidFormat));
                     }
                     face.m_radiusScale = chunkFile.GetF4();
                     chunkFile.Align(4);

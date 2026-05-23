@@ -370,8 +370,7 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
         if ((m_viewerMode != 0) && (strcmp(s_lastLoadedMapPath__7CMapPcs, mapPath) != 0)) {
             strcpy(s_lastLoadedMapPath__7CMapPcs, mapPath);
             if (MapMng.GetDebugPlaySta(0, &cameraPos) == 0) {
-                COctNode* rootNode =
-                    *reinterpret_cast<COctNode**>(reinterpret_cast<char*>(&MapMng) + 0x18);
+                COctNode* rootNode = MapMng.GetOctTreeArray()->GetRootNode();
                 if (rootNode != 0) {
                     float center = rootNode->m_boundMinX + rootNode->m_boundMaxX;
                     cameraPos.x = center * kMapBoundsCenterScale;
@@ -545,8 +544,7 @@ void CMapPcs::calc()
             (strcmp(s_lastLoadedMapPath__7CMapPcs, m_mapName) != 0)) {
             strcpy(s_lastLoadedMapPath__7CMapPcs, m_mapName);
             if (MapMng.GetDebugPlaySta(0, &cameraPos) == 0) {
-                COctNode* rootNode =
-                    *reinterpret_cast<COctNode**>(reinterpret_cast<char*>(&MapMng) + 0x18);
+                COctNode* rootNode = MapMng.GetOctTreeArray()->GetRootNode();
                 if (rootNode != 0) {
                     float center = rootNode->m_boundMinX + rootNode->m_boundMaxX;
                     cameraPos.x = center * kMapBoundsCenterScale;

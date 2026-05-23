@@ -12,12 +12,15 @@ class CMapHit;
 class CMapCylinder;
 class CMapLightHolder;
 class CMaterial;
+class CMaterialSet;
+class CMapTexAnimSet;
 class CMapAnimRun;
 class CMapAnim;
 class CMapAnimNode;
 class CMapAnimKeyDt;
 class CMapShadow;
 class CMemory;
+class CTextureSet;
 
 void setDbgLight(int, Vec&, _GXColor&);
 void GXSetTexCoordGen();
@@ -98,8 +101,12 @@ class CMapMng
 {
 public:
     // Placeholder storage for the full map manager until concrete members are recovered.
-    unsigned char m_raw[0x22A78];
-    CMapObj* m_hitMapObj; // 0x22A78
+    unsigned char m_pad000[0x213D4];
+    CMaterialSet* m_materialSet;       // 0x213D4
+    CTextureSet* m_textureSet;         // 0x213D8
+    CMapTexAnimSet* m_mapTexAnimSet;   // 0x213DC
+    unsigned char m_pad213E0[0x22A78 - 0x213E0];
+    CMapObj* m_hitMapObj;              // 0x22A78
 
     ~CMapMng();
     CMapMng();

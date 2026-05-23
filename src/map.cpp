@@ -1475,22 +1475,22 @@ void CMapMng::DestroyMap()
     }
     *reinterpret_cast<short*>(self + 0xE) = 0;
 
-    int* materialSet = *reinterpret_cast<int**>(self + 0x213D4);
+    int* materialSet = reinterpret_cast<int*>(m_materialSet);
     if (materialSet != 0) {
         (*reinterpret_cast<void (**)(int*, int)>(*materialSet + 8))(materialSet, 1);
-        *reinterpret_cast<int**>(self + 0x213D4) = 0;
+        m_materialSet = 0;
     }
 
-    int* textureSet = *reinterpret_cast<int**>(self + 0x213D8);
+    int* textureSet = reinterpret_cast<int*>(m_textureSet);
     if (textureSet != 0) {
         (*reinterpret_cast<void (**)(int*, int)>(*textureSet + 8))(textureSet, 1);
-        *reinterpret_cast<int**>(self + 0x213D8) = 0;
+        m_textureSet = 0;
     }
 
-    int* mapTexAnimSet = *reinterpret_cast<int**>(self + 0x213DC);
+    int* mapTexAnimSet = reinterpret_cast<int*>(m_mapTexAnimSet);
     if (mapTexAnimSet != 0) {
         (*reinterpret_cast<void (**)(int*, int)>(*mapTexAnimSet + 8))(mapTexAnimSet, 1);
-        *reinterpret_cast<int**>(self + 0x213DC) = 0;
+        m_mapTexAnimSet = 0;
     }
 
     CPtrArray<CMapAnim*>* mapAnimArray = reinterpret_cast<CPtrArray<CMapAnim*>*>(self + 0x213FC);
@@ -1916,7 +1916,7 @@ void CMapMng::ReadMtx(char* mapName)
     if (asyncLoadState.m_mapReadMode != 2 && asyncLoadState.m_mapReadMode != 3) {
         CMemory::CStage* stage = *reinterpret_cast<CMemory::CStage**>(self + 0x0);
         CTextureSet* textureSet = new (stage, const_cast<char*>(s_map_cpp), 0x3A9) CTextureSet;
-        *reinterpret_cast<CTextureSet**>(self + 0x213D8) = textureSet;
+        m_textureSet = textureSet;
     }
 
     while (true) {
@@ -1994,8 +1994,7 @@ void CMapMng::ReadMtx(char* mapName)
             } else {
                 while (chunkFile.GetNextChunk(chunk)) {
                     if (chunk.m_id == 0x54534554) {
-                        (*reinterpret_cast<CTextureSet**>(self + 0x213D8))
-                            ->Create(chunkFile, *reinterpret_cast<CMemory::CStage**>(self + 0x0), append, 0, 0, 0);
+                        m_textureSet->Create(chunkFile, *reinterpret_cast<CMemory::CStage**>(self + 0x0), append, 0, 0, 0);
                         append = 1;
                         if (chunk.m_arg0 == 1) {
                             return;
@@ -2286,12 +2285,9 @@ void CMapMng::ReadOtm(char* mapName)
                 if (chunk.m_id == 0x41534554) {
                     CMapTexAnimSet* texAnimSet =
                         new (*reinterpret_cast<CMemory::CStage**>(self), const_cast<char*>(s_map_cpp), 0x49A) CMapTexAnimSet();
-                    *reinterpret_cast<CMapTexAnimSet**>(self + 0x213DC) = texAnimSet;
+                    m_mapTexAnimSet = texAnimSet;
                     if (texAnimSet != 0) {
-                        texAnimSet->Create(
-                            chunkFile,
-                            *reinterpret_cast<CMaterialSet**>(self + 0x213D4),
-                            *reinterpret_cast<CTextureSet**>(self + 0x213D8));
+                        texAnimSet->Create(chunkFile, m_materialSet, m_textureSet);
                     }
                     continue;
                 }
@@ -2330,17 +2326,13 @@ void CMapMng::ReadOtm(char* mapName)
                 if (chunk.m_id == 0x4D534554) {
                     CMaterialSet* materialSet =
                         new (*reinterpret_cast<CMemory::CStage**>(self), const_cast<char*>(s_map_cpp), 0x482) CMaterialSet();
-                    *reinterpret_cast<CMaterialSet**>(self + 0x213D4) = materialSet;
+                    m_materialSet = materialSet;
                     if (materialSet != 0) {
                         reinterpret_cast<CPtrArray<CMaterial*>*>(reinterpret_cast<unsigned char*>(materialSet) + 8)
                             ->SetDefaultSize(0x180);
                         reinterpret_cast<CPtrArray<CMaterial*>*>(reinterpret_cast<unsigned char*>(materialSet) + 8)
                             ->SetGrow(0);
-                        materialSet->Create(
-                            chunkFile,
-                            *reinterpret_cast<CTextureSet**>(self + 0x213D8),
-                            static_cast<CMaterialMan::TEV_BIT>(0xFFF53060),
-                            0);
+                        materialSet->Create(chunkFile, m_textureSet, static_cast<CMaterialMan::TEV_BIT>(0xFFF53060), 0);
                     }
                 }
             }
@@ -2692,12 +2684,12 @@ void CMapMng::Calc()
         reinterpret_cast<CMapObj*>(Ptr(this, 0x954 + (i * 0xF0)))->Calc();
     }
 
-    CMapTexAnimSet* mapTexAnimSet = *reinterpret_cast<CMapTexAnimSet**>(Ptr(this, 0x213DC));
+    CMapTexAnimSet* mapTexAnimSet = m_mapTexAnimSet;
     if (mapTexAnimSet != 0) {
         mapTexAnimSet->Calc();
     }
 
-    CMaterialSet* materialSet = *reinterpret_cast<CMaterialSet**>(Ptr(this, 0x213D4));
+    CMaterialSet* materialSet = m_materialSet;
     materialSet->Calc();
 
     const int octTreeCount = *reinterpret_cast<short*>(Ptr(this, 8));
@@ -3304,7 +3296,7 @@ int CMapMng::GetMapObjIdx(unsigned short id)
 CMaterial* CMapMng::GetMaterialID(unsigned char materialId)
 {
     unsigned long index = 0;
-    unsigned char* materialSet = *reinterpret_cast<unsigned char**>(reinterpret_cast<unsigned char*>(this) + 0x213D4);
+    unsigned char* materialSet = reinterpret_cast<unsigned char*>(m_materialSet);
     CPtrArray<CMaterial*>* materials = reinterpret_cast<CPtrArray<CMaterial*>*>(materialSet + 8);
 
     while (index < UnkMaterialSetGetter(materials)) {
@@ -3457,7 +3449,7 @@ void CMapMng::SetMapObjMime(int mapObjIndex, int mode, int target, int type)
  */
 void CMapMng::SetMapTexAnim(int materialId, int frameStart, int frameEnd, int wrapMode)
 {
-    CMapTexAnimSet* mapTexAnimSet = *reinterpret_cast<CMapTexAnimSet**>(reinterpret_cast<unsigned char*>(this) + 0x213DC);
+    CMapTexAnimSet* mapTexAnimSet = m_mapTexAnimSet;
     mapTexAnimSet->SetMapTexAnim(materialId, frameStart, frameEnd, wrapMode);
 }
 

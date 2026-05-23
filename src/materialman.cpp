@@ -1767,7 +1767,7 @@ void CMaterialMan::SetFullScreenShadow(CFullScreenShadow& shadow, float (*viewMt
  */
 void CMaterialMan::SetShadow(CMapShadow& shadow, float (*viewMtx) [4], int shadowIndex, unsigned long materialFlag)
 {
-    CMaterialSet* materialSet = *reinterpret_cast<CMaterialSet**>(Ptr(&MapMng, 0x213D4));
+    CMaterialSet* materialSet = MapMng.m_materialSet;
     CPtrArray<CMaterial*>* materials = reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(materialSet, 8));
     CMaterial* material = (*materials)[*reinterpret_cast<unsigned short*>(Ptr(&shadow, 4))];
 
@@ -1996,7 +1996,7 @@ int CMaterialMan::GetCharaShadow(
     float maxY = minY + rangeY;
     float maxZ = position->z + rangeXZ;
 
-    CMaterialSet* materialSet = *reinterpret_cast<CMaterialSet**>(Ptr(&MapMng, 0x213D4));
+    CMaterialSet* materialSet = MapMng.m_materialSet;
     CPtrArray<CMaterial*>* materials = reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(materialSet, 8));
     CPtrArray<CMapShadow*>* mapShadowArray = reinterpret_cast<CPtrArray<CMapShadow*>*>(Ptr(&MapMng, 0x21434));
 

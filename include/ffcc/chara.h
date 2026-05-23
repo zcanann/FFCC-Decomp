@@ -234,6 +234,7 @@ public:
     int GetDrawBufferIndex() const { return m_drawBufferIndex; }
     u32& GetDrawBufferCursor(int index) { return m_drawBuffers[index].m_cursor; }
     u8* GetDrawBufferBase(int index) { return m_drawBuffers[index].m_base; }
+    u32 GetAmemAnimSize() const { return m_amemAnimSize; }
     void ResetAmem(int) { m_amemSize = 0; }
     void TimeMogFur();
     void CalcMogScore();
@@ -257,7 +258,7 @@ private:
     u32 m_amemSize;                           // 0x205C
     int m_drawBufferIndex;                    // 0x2060
     CDrawBuffer m_drawBuffers[2];             // 0x2064
-    u32 m_unk2074;                            // 0x2074
+    u32 m_amemAnimSize;                       // 0x2074
 };
 
 extern CChara Chara;

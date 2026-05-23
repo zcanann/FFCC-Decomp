@@ -636,7 +636,7 @@ void CChara::Init()
 	m_drawBufferIndex = 1;
 	m_drawBufferIndex = 1 - m_drawBufferIndex;
 	m_drawBuffers[m_drawBufferIndex].m_cursor = 0;
-	m_unk2074 = 0;
+	m_amemAnimSize = 0;
 }
 
 /*

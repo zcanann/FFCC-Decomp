@@ -160,7 +160,14 @@ public:
         return *reinterpret_cast<CPtrArray<CMapLightHolder*>*>(
             reinterpret_cast<unsigned char*>(this) + 0x21450 + (index * 0x1C));
     }
-    CMapIdGrp* GetMapIdGrpArray() { return reinterpret_cast<CMapIdGrp*>(reinterpret_cast<unsigned char*>(this) + 0x214E8); }
+    CPtrArray<CMapLightHolder*>* GetMapLightHolderArrays()
+    {
+        return reinterpret_cast<CPtrArray<CMapLightHolder*>*>(reinterpret_cast<unsigned char*>(this) + 0x21450);
+    }
+    CMapIdGrp* GetMapIdGrpArray()
+    {
+        return reinterpret_cast<CMapIdGrp*>(reinterpret_cast<unsigned char*>(this) + 0x214E8);
+    }
 
     ~CMapMng();
     CMapMng();

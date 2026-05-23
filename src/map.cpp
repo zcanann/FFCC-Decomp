@@ -1676,7 +1676,7 @@ void CMapMng::SearchAtribMapObj(CMapObj*, CMapObjAtr::TYPE)
  */
 void CMapMng::AttachMapHit(CMapHit* mapHit, char* mapHitName)
 {
-    MapObjAttachObj* mapObj = reinterpret_cast<MapObjAttachObj*>(Ptr(this, 0x954));
+    MapObjAttachObj* mapObj = reinterpret_cast<MapObjAttachObj*>(GetMapObjArray());
 
     goto search;
     while (true) {
@@ -1697,8 +1697,7 @@ void CMapMng::AttachMapHit(CMapHit* mapHit, char* mapHitName)
 
 search:
         unsigned int stride = 0xF0;
-        MapObjAttachObj* mapObjEnd =
-            reinterpret_cast<MapObjAttachObj*>(Ptr(this, 0x954 + m_mapObjCount * 0xF0));
+        MapObjAttachObj* mapObjEnd = reinterpret_cast<MapObjAttachObj*>(GetMapObjArray()) + m_mapObjCount;
         unsigned int remaining =
             (reinterpret_cast<unsigned int>(mapObjEnd) + (stride - 1) - reinterpret_cast<unsigned int>(mapObj)) /
             stride;
@@ -1732,7 +1731,7 @@ found:
  */
 int CMapMng::GetDebugPlaySta(int playStaNo, Vec* vec)
 {
-    unsigned char* mapObj = Ptr(this, 0x954);
+    unsigned char* mapObj = reinterpret_cast<unsigned char*>(GetMapObjArray());
 
     goto search;
     while (true) {
@@ -1746,8 +1745,8 @@ int CMapMng::GetDebugPlaySta(int playStaNo, Vec* vec)
         mapObj += 0xF0;
 
 search:
-        unsigned int stride = 0xF0;
-        unsigned char* mapObjEnd = Ptr(this, 0x954 + m_mapObjCount * 0xF0);
+        unsigned int stride = sizeof(CMapObj);
+        unsigned char* mapObjEnd = reinterpret_cast<unsigned char*>(GetMapObjArray() + m_mapObjCount);
         unsigned int remaining =
             (reinterpret_cast<unsigned int>(mapObjEnd) + (stride - 1) - reinterpret_cast<unsigned int>(mapObj)) /
             stride;
@@ -1787,8 +1786,8 @@ void CMapMng::SetLightSource()
 {
     int mapLightIndex = 0;
     const short mapObjCount = m_mapObjCount;
-    unsigned char* mapObj = Ptr(this, 0x954);
-    unsigned char* mapObjEnd = mapObj + mapObjCount * 0xF0;
+    unsigned char* mapObj = reinterpret_cast<unsigned char*>(GetMapObjArray());
+    unsigned char* mapObjEnd = reinterpret_cast<unsigned char*>(GetMapObjArray() + mapObjCount);
 
     while (mapObj < mapObjEnd) {
         unsigned char* atr = *reinterpret_cast<unsigned char**>(mapObj + 0xEC);
@@ -2788,10 +2787,10 @@ void CMapMng::DrawBefore()
         }
 
         const short octTreeCount = m_octTreeCount;
-        COctTree* octTree = reinterpret_cast<COctTree*>(Ptr(this, 0x14));
+        COctTree* octTree = GetOctTreeArray();
         for (int i = 0; i < octTreeCount; i++) {
             octTree->Draw(0xFF);
-            octTree = reinterpret_cast<COctTree*>(Ptr(octTree, 0x4C));
+            octTree++;
         }
     }
 }
@@ -2826,10 +2825,10 @@ void CMapMng::Draw()
     if ((gMapHitDrawMode.m_byte & 8) == 0) {
         const short octTreeCount = m_octTreeCount;
 
-        COctTree* octTree = reinterpret_cast<COctTree*>(Ptr(this, 0x14));
+        COctTree* octTree = GetOctTreeArray();
         for (int i = 0; i < octTreeCount; i++) {
             octTree->Draw(0);
-            octTree = reinterpret_cast<COctTree*>(Ptr(octTree, 0x4C));
+            octTree++;
         }
 
         CMapObj* mapObj = GetMapObjArray();
@@ -2852,10 +2851,10 @@ void CMapMng::Draw()
             mapObj = reinterpret_cast<CMapObj*>(Ptr(mapObj, 0xF0));
         }
 
-        octTree = reinterpret_cast<COctTree*>(Ptr(this, 0x14));
+        octTree = GetOctTreeArray();
         for (int i = 0; i < octTreeCount; i++) {
             octTree->Draw(1);
-            octTree = reinterpret_cast<COctTree*>(Ptr(octTree, 0x4C));
+            octTree++;
         }
     }
 
@@ -2942,11 +2941,11 @@ void CMapMng::DrawAfter()
     LightPcs.SetNumDiffuse(0);
 
     if (gMapHitDrawMode.m_byte == 0) {
-        COctTree* octTree = reinterpret_cast<COctTree*>(Ptr(this, 0x14));
+        COctTree* octTree = GetOctTreeArray();
         const short octTreeCount = m_octTreeCount;
         for (int i = 0; i < octTreeCount; i++) {
             octTree->Draw(2);
-            octTree = reinterpret_cast<COctTree*>(Ptr(octTree, 0x4C));
+            octTree++;
         }
 
         CMapObj* mapObj = GetMapObjArray();
@@ -3683,30 +3682,26 @@ void CMapMng::GetFogEnable()
  */
 extern "C" void __sinit_map_cpp(void)
 {
-    // NOTE: This __sinit is compiler-generated. To match, move the vtable setup
-    // (and any sub-construction) into the class constructor, then delete this
-    // function. The compiler will auto-generate __sinit from the global object.
-
-    __construct_array(Ptr(&MapMng, 0x14), reinterpret_cast<ConstructorDestructor>(__ct__8COctTreeFv),
+    __construct_array(MapMng.GetOctTreeArray(), reinterpret_cast<ConstructorDestructor>(__ct__8COctTreeFv),
                       reinterpret_cast<ConstructorDestructor>(__dt__8COctTreeFv), 0x4C, 0x10);
-    __construct_array(Ptr(&MapMng, 0x4D4), reinterpret_cast<ConstructorDestructor>(__ct__7CMapHitFv),
+    __construct_array(MapMng.GetMapHitArray(), reinterpret_cast<ConstructorDestructor>(__ct__7CMapHitFv),
                       reinterpret_cast<ConstructorDestructor>(__dt__7CMapHitFv), 0x24, 0x20);
-    __construct_array(Ptr(&MapMng, 0x954), reinterpret_cast<ConstructorDestructor>(__ct__7CMapObjFv),
+    __construct_array(MapMng.GetMapObjArray(), reinterpret_cast<ConstructorDestructor>(__ct__7CMapObjFv),
                       reinterpret_cast<ConstructorDestructor>(__dt__7CMapObjFv), 0xF0, 0x200);
-    __construct_array(Ptr(&MapMng, 0x1E954), reinterpret_cast<ConstructorDestructor>(__ct__8CMapMeshFv),
+    __construct_array(MapMng.GetMapMeshArray(), reinterpret_cast<ConstructorDestructor>(__ct__8CMapMeshFv),
                       reinterpret_cast<ConstructorDestructor>(__dt__8CMapMeshFv), 0x44, 0xA0);
-    __ct__25CPtrArray_P11CMapAnimRun_Fv(Ptr(&MapMng, 0x213E0));
-    __ct__21CPtrArray_P8CMapAnim_Fv(Ptr(&MapMng, 0x213FC));
-    __ct__27CPtrArray_P13CMapAnimKeyDt_Fv(Ptr(&MapMng, 0x21418));
-    __ct__24CPtrArray_P10CMapShadow_Fv(Ptr(&MapMng, 0x21434));
+    __ct__25CPtrArray_P11CMapAnimRun_Fv(&MapMng.GetMapAnimRunArray());
+    __ct__21CPtrArray_P8CMapAnim_Fv(&MapMng.GetMapAnimArray());
+    __ct__27CPtrArray_P13CMapAnimKeyDt_Fv(&MapMng.GetMapAnimKeyDtArray());
+    __ct__24CPtrArray_P10CMapShadow_Fv(&MapMng.GetMapShadowArray());
     __construct_array(
-        Ptr(&MapMng, 0x21450),
+        MapMng.GetMapLightHolderArrays(),
         reinterpret_cast<ConstructorDestructor>(__ct__29CPtrArray_P15CMapLightHolder_Fv),
         reinterpret_cast<ConstructorDestructor>(dtor_80034414),
         0x1C,
         2);
 
-    __construct_array(Ptr(&MapMng, 0x214E8), reinterpret_cast<ConstructorDestructor>(__ct__9CMapIdGrpFv), 0, 0x14, 0x100);
+    __construct_array(MapMng.GetMapIdGrpArray(), reinterpret_cast<ConstructorDestructor>(__ct__9CMapIdGrpFv), 0, 0x14, 0x100);
     __register_global_object(&MapMng, reinterpret_cast<void*>(__dt__7CMapMngFv), &Vec_80245758);
 }
 
@@ -3721,7 +3716,7 @@ extern "C" void __sinit_map_cpp(void)
  */
 CMapMng::~CMapMng()
 {
-    __destroy_arr(Ptr(this, 0x21450), reinterpret_cast<ConstructorDestructor>(dtor_80034414), 0x1C, 2);
+    __destroy_arr(GetMapLightHolderArrays(), reinterpret_cast<ConstructorDestructor>(dtor_80034414), 0x1C, 2);
     if (Ptr(this, 0x21434) != 0) {
         *reinterpret_cast<void***>(Ptr(this, 0x21434)) = __vt__8CPtrArrayIP10CMapShadow;
         void* items = *reinterpret_cast<void**>(Ptr(this, 0x21444));
@@ -3762,10 +3757,10 @@ CMapMng::~CMapMng()
         *reinterpret_cast<int*>(Ptr(this, 0x213E8)) = 0;
         *reinterpret_cast<int*>(Ptr(this, 0x213E4)) = 0;
     }
-    __destroy_arr(Ptr(this, 0x1E954), reinterpret_cast<ConstructorDestructor>(__dt__8CMapMeshFv), 0x44, 0xA0);
-    __destroy_arr(Ptr(this, 0x954), reinterpret_cast<ConstructorDestructor>(__dt__7CMapObjFv), 0xF0, 0x200);
-    __destroy_arr(Ptr(this, 0x4D4), reinterpret_cast<ConstructorDestructor>(__dt__7CMapHitFv), 0x24, 0x20);
-    __destroy_arr(Ptr(this, 0x14), reinterpret_cast<ConstructorDestructor>(__dt__8COctTreeFv), 0x4C, 0x10);
+    __destroy_arr(GetMapMeshArray(), reinterpret_cast<ConstructorDestructor>(__dt__8CMapMeshFv), 0x44, 0xA0);
+    __destroy_arr(GetMapObjArray(), reinterpret_cast<ConstructorDestructor>(__dt__7CMapObjFv), 0xF0, 0x200);
+    __destroy_arr(GetMapHitArray(), reinterpret_cast<ConstructorDestructor>(__dt__7CMapHitFv), 0x24, 0x20);
+    __destroy_arr(GetOctTreeArray(), reinterpret_cast<ConstructorDestructor>(__dt__8COctTreeFv), 0x4C, 0x10);
 }
 
 /*

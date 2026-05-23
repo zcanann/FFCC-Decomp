@@ -96,7 +96,7 @@ private:
     unsigned int m_activeEnvTevBit;      // 0x44
     unsigned int m_curEnvTevBit;         // 0x48
     unsigned char m_vtxDescMode;         // 0x4C
-    unsigned char m_pad04D[0x0B];
+    signed char m_shadowMaterialType[0x0B]; // 0x4D
     int m_shadowMaterialCount;           // 0x58
     int m_shadowTextureCount;            // 0x5C
     unsigned int m_numTevStage;          // 0x60
@@ -116,13 +116,17 @@ private:
     unsigned int m_unknown14C;           // 0x14C
     unsigned int m_texScroll1TexMtx;     // 0x150
     unsigned int m_texScroll1TexCoord;   // 0x154
-    unsigned char m_pad158[0xAC];
+    int m_shadowTexMapIds[5];            // 0x158
+    int m_shadowTexMtxIds[5];            // 0x16C
+    int m_shadowTexCoordIds[5];          // 0x180
+    unsigned char m_pad194[0x70];
     unsigned char m_unknown204;          // 0x204
     unsigned char m_blendMode;           // 0x205
     unsigned char m_fogEnable;           // 0x206
     unsigned char m_blendOverrideMode;   // 0x207
     unsigned char m_shadowKColorMask;    // 0x208
-    unsigned char m_pad209[0x0A];
+    unsigned char m_shadowKColorIds[5];  // 0x209
+    unsigned char m_shadowIndices[5];    // 0x20E
     CColor m_color213;                   // 0x213
     CMemory::CStage* m_materialStage;    // 0x218
 };

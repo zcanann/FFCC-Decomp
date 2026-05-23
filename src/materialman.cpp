@@ -897,13 +897,12 @@ void CMaterialMan::addtev_lightmap(long index)
 {
     unsigned int stage = m_numTevStage;
     unsigned char indexByte = static_cast<unsigned char>(index);
-    int stageOffset = static_cast<int>(index) * 4;
 
     if ((m_shadowKColorMask & (1 << indexByte)) == 0) {
         GXSetTevDirect(static_cast<GXTevStageID>(stage));
         _GXSetTevOrder(
-            stage, *reinterpret_cast<int*>(Ptr(this, stageOffset + 0x180)),
-            *reinterpret_cast<int*>(Ptr(this, stageOffset + 0x158)), 0xFF);
+            stage, m_shadowTexCoordIds[index],
+            m_shadowTexMapIds[index], 0xFF);
         _GXSetTevColorIn(stage,
                                                                                                               0xF, 8,
                                                                                                               9, 0);
@@ -923,8 +922,8 @@ void CMaterialMan::addtev_lightmap(long index)
 
     GXSetTevDirect(static_cast<GXTevStageID>(stage));
     _GXSetTevOrder(
-        stage, *reinterpret_cast<int*>(Ptr(this, stageOffset + 0x180)),
-        *reinterpret_cast<int*>(Ptr(this, stageOffset + 0x158)), 0xFF);
+        stage, m_shadowTexCoordIds[index],
+        m_shadowTexMapIds[index], 0xFF);
     _GXSetTevColorIn(stage, 0xF,
                                                                                                           8, 9, 0);
     _GXSetTevColorOp(stage, 0, 0, 0, 1, 2);
@@ -937,8 +936,8 @@ void CMaterialMan::addtev_lightmap(long index)
     stage = m_numTevStage;
     GXSetTevDirect(static_cast<GXTevStageID>(stage));
     _GXSetTevOrder(
-        stage, *reinterpret_cast<int*>(Ptr(this, stageOffset + 0x180)),
-        *reinterpret_cast<int*>(Ptr(this, stageOffset + 0x158)) + 1, 0xFF);
+        stage, m_shadowTexCoordIds[index],
+        m_shadowTexMapIds[index] + 1, 0xFF);
     _GXSetTevColorIn(stage, 0xF,
                                                                                                           8, 9, 0);
     _GXSetTevColorOp(stage, 0, 0, 0, 1, 0);
@@ -975,13 +974,12 @@ void CMaterialMan::addtev_shadow(long index)
 {
     unsigned int stage = m_numTevStage;
     unsigned char indexByte = static_cast<unsigned char>(index);
-    int stageOffset = static_cast<int>(index) * 4;
 
     if ((m_shadowKColorMask & (1 << indexByte)) == 0) {
         GXSetTevDirect(static_cast<GXTevStageID>(stage));
         _GXSetTevOrder(
-            stage, *reinterpret_cast<int*>(Ptr(this, stageOffset + 0x180)),
-            *reinterpret_cast<int*>(Ptr(this, stageOffset + 0x158)), 0xFF);
+            stage, m_shadowTexCoordIds[index],
+            m_shadowTexMapIds[index], 0xFF);
         _GXSetTevColorIn(stage,
                                                                                                               0, 8,
                                                                                                               9, 0xF);
@@ -1001,8 +999,8 @@ void CMaterialMan::addtev_shadow(long index)
 
     GXSetTevDirect(static_cast<GXTevStageID>(stage));
     _GXSetTevOrder(
-        stage, *reinterpret_cast<int*>(Ptr(this, stageOffset + 0x180)),
-        *reinterpret_cast<int*>(Ptr(this, stageOffset + 0x158)), 0xFF);
+        stage, m_shadowTexCoordIds[index],
+        m_shadowTexMapIds[index], 0xFF);
     _GXSetTevColorIn(stage, 0,
                                                                                                           8, 9,
                                                                                                           0xF);
@@ -1016,8 +1014,8 @@ void CMaterialMan::addtev_shadow(long index)
     stage = m_numTevStage;
     GXSetTevDirect(static_cast<GXTevStageID>(stage));
     _GXSetTevOrder(
-        stage, *reinterpret_cast<int*>(Ptr(this, stageOffset + 0x180)),
-        *reinterpret_cast<int*>(Ptr(this, stageOffset + 0x158)) + 1, 0xFF);
+        stage, m_shadowTexCoordIds[index],
+        m_shadowTexMapIds[index] + 1, 0xFF);
     _GXSetTevColorIn(stage, 0, 8,
                                                                                                           9, 0xF);
     _GXSetTevColorOp(stage, 0, 0, 0, 1, 0);
@@ -1058,7 +1056,7 @@ void CMaterialMan::addtev_stdShadow(unsigned long materialFlag)
 
     int materialNum = m_shadowMaterialCount;
     for (int i = 0; i < materialNum; i++) {
-        if (*reinterpret_cast<signed char*>(Ptr(this, i + 0x4D)) == 0) {
+        if (m_shadowMaterialType[i] == 0) {
             addtev_shadow(i);
         } else {
             addtev_lightmap(i);
@@ -1826,11 +1824,11 @@ void CMaterialMan::SetShadow(CMapShadow& shadow, float (*viewMtx) [4], int shado
         int materialNum = m_shadowMaterialCount;
 
         m_curEnvTevBit |= 0x10;
-        *Ptr(this, materialNum + 0x4D) = *Ptr(&shadow, 8);
-        *Ptr(this, materialNum + 0x20E) = static_cast<unsigned char>(shadowIndex);
-        *reinterpret_cast<int*>(Ptr(this, materialNum * 4 + 0x158)) = m_texMapIdCur;
-        *reinterpret_cast<int*>(Ptr(this, materialNum * 4 + 0x16C)) = m_texMtxCur;
-        *reinterpret_cast<int*>(Ptr(this, materialNum * 4 + 0x180)) = m_texCoordIdCur;
+        m_shadowMaterialType[materialNum] = static_cast<signed char>(*Ptr(&shadow, 8));
+        m_shadowIndices[materialNum] = static_cast<unsigned char>(shadowIndex);
+        m_shadowTexMapIds[materialNum] = m_texMapIdCur;
+        m_shadowTexMtxIds[materialNum] = m_texMtxCur;
+        m_shadowTexCoordIds[materialNum] = m_texCoordIdCur;
 
         Mtx texMtx;
         PSMTXConcat(reinterpret_cast<float(*)[4]>(Ptr(&shadow, 0x78)), viewMtx, texMtx);
@@ -1852,7 +1850,7 @@ void CMaterialMan::SetShadow(CMapShadow& shadow, float (*viewMtx) [4], int shado
             texMapCur = m_texMapIdCur;
             m_texMapIdCur = texMapCur + 1;
             TextureMan.SetTexture(static_cast<_GXTexMapID>(texMapCur), *reinterpret_cast<CTexture**>(Ptr(material, 0x40)));
-            *Ptr(this, materialNum + 0x209) = *Ptr(material, 0xA4);
+            m_shadowKColorIds[materialNum] = *Ptr(material, 0xA4);
             m_shadowKColorMask |= static_cast<unsigned char>(1 << materialNum);
             m_shadowTextureCount = m_shadowTextureCount + 1;
         }

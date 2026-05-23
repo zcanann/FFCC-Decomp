@@ -2,14 +2,11 @@
 #include "PowerPC_EABI_Support/Runtime/NMWException.h"
 #include "PowerPC_EABI_Support/Runtime/MWCPlusLib.h"
 #include "PowerPC_EABI_Support/Runtime/New.h"
+#include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/abort_exit.h"
 
 #pragma exceptions on
 
 #define ARRAY_HEADER_SIZE 16
-
-extern "C" {
-extern void abort();
-}
 
 namespace std {
 /**
@@ -32,13 +29,13 @@ static unexpected_handler uhandler = duhandler;
  * @note Address: N/A
  * @note Size: 0x28
  */
-extern void terminate() { thandler(); }
+void terminate() { thandler(); }
 
 /**
  * @note Address: N/A
  * @note Size: 0x28
  */
-extern void unexpected() { uhandler(); }
+void unexpected() { uhandler(); }
 } // namespace std
 
 /*

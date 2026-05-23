@@ -205,7 +205,7 @@ public:
     void CalcLoadMenu();
     void CalcTitleMenu();
     void CalcGoOutCharaSelect(unsigned char);
-    void CalcGoOutSelChar(unsigned char, unsigned char);
+    int CalcGoOutSelChar(unsigned char, unsigned char);
     void CalcGoOutSelCharInit();
     void SetMenuCharaAnim(int, int);
     unsigned int IsMenuCharaAnimIdle(int);

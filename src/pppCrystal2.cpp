@@ -291,11 +291,9 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, _pppCt
  */
 void pppDestructCrystal2(pppCrystal2* pppCrystal2, _pppCtrlTable* param_2)
 {
-    CMemory::CStage* stage;
-
     Crystal2Work* work = reinterpret_cast<Crystal2Work*>(
         pppCrystal2->m_object.m_workArea + param_2->m_serializedDataOffsets[2]);
-    stage = reinterpret_cast<CMemory::CStage*>(work->m_refractionMap);
+    CMemory::CStage* stage = reinterpret_cast<CMemory::CStage*>(work->m_refractionMap);
 
     if (work->m_refractionTexObj != 0) {
         pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(work->m_refractionTexObj));

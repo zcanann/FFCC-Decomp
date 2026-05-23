@@ -11,6 +11,7 @@
 #include <dolphin/mtx.h>
 #include <math.h>
 #include <string.h>
+#include "Runtime.PPCEABI.H/runtime.h"
 #include "ffcc/ppp_linkage.h"
 
 extern const float FLOAT_80330FD4;
@@ -32,7 +33,6 @@ extern const float FLOAT_80331010;
 #define CRYSTAL_ASPECT 1.3333334f
 #define CRYSTAL_HALF 0.5f
 extern int __float_nan[];
-extern "C" unsigned int __cvt_fp2unsigned(double);
 
 struct CrystalIndTexMtx {
     float value[2][3];

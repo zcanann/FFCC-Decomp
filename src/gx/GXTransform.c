@@ -3,8 +3,7 @@
 #include <dolphin/os.h>
 
 #include "dolphin/gx/__gx.h"
-
-extern u32 __cvt_fp2unsigned(f64 d);
+#include "Runtime.PPCEABI.H/runtime.h"
 
 /*
  * --INFO--

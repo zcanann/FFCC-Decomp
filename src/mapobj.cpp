@@ -21,6 +21,7 @@ extern const char s_CPtrArrayFile[] = "collection_ptrarray.h";
 #include "ffcc/system.h"
 #include "ffcc/memory.h"
 #include <dolphin/mtx.h>
+#include <dolphin/os/OSCache.h>
 #include <string.h>
 #include <PowerPC_EABI_Support/Runtime/New.h>
 
@@ -36,7 +37,6 @@ extern const float kMapObjInitValue50;
 extern const char s_mapobj_cpp_801D70C0[];
 extern unsigned int DAT_8032e498;
 unsigned int DAT_8032E8B8 = 5;
-extern "C" void DCFlushRange(void*, unsigned long);
 
 inline void* operator new(unsigned long, void* ptr)
 {

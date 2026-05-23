@@ -95,7 +95,7 @@ private:
     unsigned int m_stdEnvTevBit;         // 0x40
     unsigned int m_activeEnvTevBit;      // 0x44
     unsigned int m_curEnvTevBit;         // 0x48
-    unsigned char m_alphaRef;            // 0x4C
+    unsigned char m_vtxDescMode;         // 0x4C
     unsigned char m_pad04D[0x0B];
     unsigned int m_lockedEnvTevBit;      // 0x58
     unsigned int m_lockedEnvUnknown5c;   // 0x5C

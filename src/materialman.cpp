@@ -1233,46 +1233,46 @@ void CMaterialMan::SetMaterialCharaShadow(CMaterial* material)
     unsigned char materialType = *reinterpret_cast<unsigned char*>(Ptr(material, 0xA2));
 
     if ((bumpLight != 0) && (materialType != 3) && (materialType != 2)) {
-        if (*reinterpret_cast<unsigned char*>(Ptr(this, 0x4C)) != 1) {
+        if (m_vtxDescMode != 1) {
             GXClearVtxDesc();
             GXSetVtxDesc(GX_VA_POS, GX_INDEX16);
             GXSetVtxDesc(GX_VA_NBT, GX_INDEX16);
             GXSetVtxDesc(GX_VA_CLR0, GX_INDEX16);
             GXSetVtxDesc(GX_VA_TEX0, GX_INDEX16);
-            *reinterpret_cast<unsigned char*>(Ptr(this, 0x4C)) = 1;
+            m_vtxDescMode = 1;
         }
         GXSetArray(GX_VA_NRM, *reinterpret_cast<void**>(Ptr(this, 4)), 0x12);
     } else {
         if ((tevBit & 0x20002) == 0) {
             if ((bumpLight != 0) || ((tevBit & 1) == 0)) {
-                if (*reinterpret_cast<unsigned char*>(Ptr(this, 0x4C)) != 0) {
+                if (m_vtxDescMode != 0) {
                     GXClearVtxDesc();
                     GXSetVtxDesc(GX_VA_POS, GX_INDEX16);
                     GXSetVtxDesc(GX_VA_NRM, GX_INDEX16);
                     GXSetVtxDesc(GX_VA_CLR0, GX_INDEX16);
                     GXSetVtxDesc(GX_VA_TEX0, GX_INDEX16);
-                    *reinterpret_cast<unsigned char*>(Ptr(this, 0x4C)) = 0;
+                    m_vtxDescMode = 0;
                 }
                 GXSetArray(GX_VA_NRM, *reinterpret_cast<void**>(Ptr(this, 4)), 6);
             } else {
-                if (*reinterpret_cast<unsigned char*>(Ptr(this, 0x4C)) != 3) {
+                if (m_vtxDescMode != 3) {
                     GXClearVtxDesc();
                     GXSetVtxDesc(GX_VA_POS, GX_INDEX16);
                     GXSetVtxDesc(GX_VA_NRM, GX_INDEX16);
                     GXSetVtxDesc(GX_VA_CLR0, GX_INDEX16);
-                    *reinterpret_cast<unsigned char*>(Ptr(this, 0x4C)) = 3;
+                    m_vtxDescMode = 3;
                 }
                 GXSetArray(GX_VA_NRM, *reinterpret_cast<void**>(Ptr(this, 4)), 6);
             }
         } else {
-            if (*reinterpret_cast<unsigned char*>(Ptr(this, 0x4C)) != 2) {
+            if (m_vtxDescMode != 2) {
                 GXClearVtxDesc();
                 GXSetVtxDesc(GX_VA_POS, GX_INDEX16);
                 GXSetVtxDesc(GX_VA_NRM, GX_INDEX16);
                 GXSetVtxDesc(GX_VA_CLR0, GX_INDEX16);
                 GXSetVtxDesc(GX_VA_TEX0, GX_INDEX16);
                 GXSetVtxDesc(GX_VA_TEX1, GX_INDEX16);
-                *reinterpret_cast<unsigned char*>(Ptr(this, 0x4C)) = 2;
+                m_vtxDescMode = 2;
             }
             GXSetArray(GX_VA_NRM, *reinterpret_cast<void**>(Ptr(this, 4)), 6);
         }
@@ -1329,12 +1329,12 @@ void CMaterialMan::SetMaterialPart(CMaterialSet* materialSet, int materialIndex,
             _GXSetTevSwapMode(0, 0, 0);
             *reinterpret_cast<unsigned int*>(Ptr(this, 0x60)) = 1;
 
-            if ((*reinterpret_cast<unsigned char*>(Ptr(this, 0x4C)) != 3) && (setVtxDesc != 0)) {
+            if ((m_vtxDescMode != 3) && (setVtxDesc != 0)) {
                 GXClearVtxDesc();
                 GXSetVtxDesc(GX_VA_POS, GX_INDEX16);
                 GXSetVtxDesc(GX_VA_NRM, GX_INDEX16);
                 GXSetVtxDesc(GX_VA_CLR0, GX_INDEX16);
-                *reinterpret_cast<unsigned char*>(Ptr(this, 0x4C)) = 3;
+                m_vtxDescMode = 3;
             }
 
             GXSetNumTexGens(0);
@@ -1367,23 +1367,23 @@ void CMaterialMan::SetMaterialPart(CMaterialSet* materialSet, int materialIndex,
                 *reinterpret_cast<unsigned int*>(Ptr(this, 0x60)) = 1;
 
                 if ((tevBit == 0) || ((tevBit & 2) == 0)) {
-                    if ((*reinterpret_cast<unsigned char*>(Ptr(this, 0x4C)) != 0) && (setVtxDesc != 0)) {
+                    if ((m_vtxDescMode != 0) && (setVtxDesc != 0)) {
                         GXClearVtxDesc();
                         GXSetVtxDesc(GX_VA_POS, GX_INDEX16);
                         GXSetVtxDesc(GX_VA_NRM, GX_INDEX16);
                         GXSetVtxDesc(GX_VA_CLR0, GX_INDEX16);
                         GXSetVtxDesc(GX_VA_TEX0, GX_INDEX16);
-                        *reinterpret_cast<unsigned char*>(Ptr(this, 0x4C)) = 0;
+                        m_vtxDescMode = 0;
                     }
                 } else {
-                    if ((*reinterpret_cast<unsigned char*>(Ptr(this, 0x4C)) != 2) && (setVtxDesc != 0)) {
+                    if ((m_vtxDescMode != 2) && (setVtxDesc != 0)) {
                         GXClearVtxDesc();
                         GXSetVtxDesc(GX_VA_POS, GX_INDEX16);
                         GXSetVtxDesc(GX_VA_NRM, GX_INDEX16);
                         GXSetVtxDesc(GX_VA_CLR0, GX_INDEX16);
                         GXSetVtxDesc(GX_VA_TEX0, GX_INDEX16);
                         GXSetVtxDesc(GX_VA_TEX1, GX_INDEX16);
-                        *reinterpret_cast<unsigned char*>(Ptr(this, 0x4C)) = 2;
+                        m_vtxDescMode = 2;
                     }
 
                     int texCoordId;
@@ -1456,13 +1456,13 @@ void CMaterialMan::SetMaterialPart(CMaterialSet* materialSet, int materialIndex,
                 _GXSetTevSwapMode(0, 0, 1);
                 *reinterpret_cast<unsigned int*>(Ptr(this, 0x60)) = 1;
 
-                if ((*reinterpret_cast<unsigned char*>(Ptr(this, 0x4C)) != 0) && (setVtxDesc != 0)) {
+                if ((m_vtxDescMode != 0) && (setVtxDesc != 0)) {
                     GXClearVtxDesc();
                     GXSetVtxDesc(GX_VA_POS, GX_INDEX16);
                     GXSetVtxDesc(GX_VA_NRM, GX_INDEX16);
                     GXSetVtxDesc(GX_VA_CLR0, GX_INDEX16);
                     GXSetVtxDesc(GX_VA_TEX0, GX_INDEX16);
-                    *reinterpret_cast<unsigned char*>(Ptr(this, 0x4C)) = 0;
+                    m_vtxDescMode = 0;
                 }
             }
         } else {
@@ -1517,13 +1517,13 @@ void CMaterialMan::SetMaterialPart(CMaterialSet* materialSet, int materialIndex,
             _GXSetTevOrder(2, 0xFF, 0xFF, 4);
 
             *reinterpret_cast<unsigned int*>(Ptr(this, 0x60)) = 3;
-            if ((*reinterpret_cast<unsigned char*>(Ptr(this, 0x4C)) != 0) && (setVtxDesc != 0)) {
+            if ((m_vtxDescMode != 0) && (setVtxDesc != 0)) {
                 GXClearVtxDesc();
                 GXSetVtxDesc(GX_VA_POS, GX_INDEX16);
                 GXSetVtxDesc(GX_VA_NRM, GX_INDEX16);
                 GXSetVtxDesc(GX_VA_CLR0, GX_INDEX16);
                 GXSetVtxDesc(GX_VA_TEX0, GX_INDEX16);
-                *reinterpret_cast<unsigned char*>(Ptr(this, 0x4C)) = 0;
+                m_vtxDescMode = 0;
             }
         }
     } else {
@@ -1547,13 +1547,13 @@ void CMaterialMan::SetMaterialPart(CMaterialSet* materialSet, int materialIndex,
         _GXSetTevSwapMode(0, 0, 0);
         *reinterpret_cast<unsigned int*>(Ptr(this, 0x60)) = 1;
 
-        if ((*reinterpret_cast<unsigned char*>(Ptr(this, 0x4C)) != 0) && (setVtxDesc != 0)) {
+        if ((m_vtxDescMode != 0) && (setVtxDesc != 0)) {
             GXClearVtxDesc();
             GXSetVtxDesc(GX_VA_POS, GX_INDEX16);
             GXSetVtxDesc(GX_VA_NRM, GX_INDEX16);
             GXSetVtxDesc(GX_VA_CLR0, GX_INDEX16);
             GXSetVtxDesc(GX_VA_TEX0, GX_INDEX16);
-            *reinterpret_cast<unsigned char*>(Ptr(this, 0x4C)) = 0;
+            m_vtxDescMode = 0;
         }
     }
 
@@ -1626,13 +1626,13 @@ void CMaterialMan::SetMaterialMenu(CMaterialSet* materialSet, int materialIndex,
             _GXSetTevSwapMode(0, 0, 1);
             *reinterpret_cast<int*>(Ptr(this, 0x60)) = 1;
 
-            if ((*reinterpret_cast<unsigned char*>(Ptr(this, 0x4C)) != 0) && (setVtxDesc != 0)) {
+            if ((m_vtxDescMode != 0) && (setVtxDesc != 0)) {
                 GXClearVtxDesc();
                 GXSetVtxDesc(GX_VA_POS, GX_INDEX16);
                 GXSetVtxDesc(GX_VA_NRM, GX_INDEX16);
                 GXSetVtxDesc(GX_VA_CLR0, GX_INDEX16);
                 GXSetVtxDesc(GX_VA_TEX0, GX_INDEX16);
-                *reinterpret_cast<unsigned char*>(Ptr(this, 0x4C)) = 0;
+                m_vtxDescMode = 0;
             }
         }
     } else {
@@ -1678,13 +1678,13 @@ void CMaterialMan::SetMaterialMenu(CMaterialSet* materialSet, int materialIndex,
         _GXSetTevOrder(2, 0xFF, 0xFF, 4);
 
         *reinterpret_cast<int*>(Ptr(this, 0x60)) = 3;
-        if ((*reinterpret_cast<unsigned char*>(Ptr(this, 0x4C)) != 0) && (setVtxDesc != 0)) {
+        if ((m_vtxDescMode != 0) && (setVtxDesc != 0)) {
             GXClearVtxDesc();
             GXSetVtxDesc(GX_VA_POS, GX_INDEX16);
             GXSetVtxDesc(GX_VA_NRM, GX_INDEX16);
             GXSetVtxDesc(GX_VA_CLR0, GX_INDEX16);
             GXSetVtxDesc(GX_VA_TEX0, GX_INDEX16);
-            *reinterpret_cast<unsigned char*>(Ptr(this, 0x4C)) = 0;
+            m_vtxDescMode = 0;
         }
     }
 

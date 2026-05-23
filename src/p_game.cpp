@@ -1,15 +1,5 @@
 #include "ffcc/p_game.h"
 
-extern "C" void create__8CGamePcsFv(CGamePcs*);
-extern "C" void destroy__8CGamePcsFv(CGamePcs*);
-extern "C" void calcInit__8CGamePcsFv(CGamePcs*);
-extern "C" void calc0__8CGamePcsFv(CGamePcs*);
-extern "C" void calc1__8CGamePcsFv(CGamePcs*);
-extern "C" void calc2__8CGamePcsFv(CGamePcs*);
-extern "C" void draw0__8CGamePcsFv(CGamePcs*);
-extern "C" void draw1__8CGamePcsFv(CGamePcs*);
-extern "C" void draw2__8CGamePcsFv(CGamePcs*);
-
 extern const char s_CGamePcs_801D7C20[] = "CGamePcs";
 static const char s_CManager_801D7C2C[] = "CManager";
 static const char s_CProcess_801D7C38[] = "CProcess";

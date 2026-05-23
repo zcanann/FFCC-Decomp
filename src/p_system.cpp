@@ -2,9 +2,6 @@
 #include "ffcc/pad.h"
 #include "ffcc/p_dbgmenu.h"
 
-extern "C" void create__10CSystemPcsFv(CSystemPcs*);
-extern "C" void destroy__10CSystemPcsFv(CSystemPcs*);
-extern "C" void calc__10CSystemPcsFv(CSystemPcs*);
 extern const char __RTTI__8CManager_8032E608[];
 extern const char __RTTI__8CProcess_8032E610[];
 CSystemPcs SystemPcs;

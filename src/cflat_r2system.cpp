@@ -1160,8 +1160,9 @@ PPPCREATEPARAM::PPPCREATEPARAM()
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void __opR3Vec__7CVectorFv(void)
+CVector::operator Vec&()
 {
+    return *reinterpret_cast<Vec*>(this);
 }
 
 /*
@@ -1358,8 +1359,9 @@ void VECMultAdd(Vec* a, Vec* b, Vec* out, float scale)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void __opP3Vec__7CVectorFv(void)
+CVector::operator Vec*()
 {
+    return reinterpret_cast<Vec*>(this);
 }
 
 /*

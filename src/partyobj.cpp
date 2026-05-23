@@ -1719,7 +1719,7 @@ void CGPartyObj::checkTargetParticle()
 	input.z = 0.0f;
 
 	if (!isGhostPartyTargetMode(this)) {
-		if ((*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&MiniGamePcs) + 0x6484) & 0x100) != 0) {
+		if ((MiniGamePcs.m_flags & 0x100) != 0) {
 			input.x -= getPadAxisForSlot(static_cast<unsigned char>(m_animStateMisc), 0x24);
 			input.z += getPadAxisForSlot(static_cast<unsigned char>(m_animStateMisc), 0x28);
 		}

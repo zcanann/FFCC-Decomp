@@ -76,7 +76,7 @@ static unsigned short CharaObjGetPadHeld(unsigned char slot)
 static unsigned short CharaObjGetPadStatusReduceMask(unsigned char slot)
 {
 	unsigned short mask = CharaObjGetPadState(slot, 0x8);
-	unsigned int miniGameFlags = *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&MiniGamePcs) + 0x6484);
+	unsigned int miniGameFlags = MiniGamePcs.m_flags;
 	if ((miniGameFlags & 0x100) != 0) {
 		mask |= CharaObjGetPadState(slot, 0x10);
 	}
@@ -1821,7 +1821,7 @@ void CGCharaObj::addHp(int delta, CGPrgObj* sourceObj)
 {
 	unsigned int cid = GetCID();
 	if ((cid & 0x6D) == 0x6D &&
-	    (*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&MiniGamePcs) + 0x6484) & 4) != 0) {
+	    (MiniGamePcs.m_flags & 4) != 0) {
 		return;
 	}
 
@@ -2019,7 +2019,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int, int, Vec* hitPos
 		return;
 	}
 	if (CharaObjIsPlayerCid(cid) &&
-	    (*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&MiniGamePcs) + 0x6484) & 4) != 0) {
+	    (MiniGamePcs.m_flags & 4) != 0) {
 		return;
 	}
 	if (CharaObjIsPlayerCid(cid) && static_cast<unsigned short>((m_lastMapIdExtra << 8) | m_lastMapIdHit) != 1) {
@@ -2668,7 +2668,7 @@ int CGCharaObj::calcCastTime(int itemId)
 void CGCharaObj::onDrawDebug(CFont* font, float posX, float& posY, float posZ)
 {
 	if ((((int)((unsigned int)(unsigned char)m_weaponNodeFlags << 0x18) < 0) && (*reinterpret_cast<unsigned int*>(CFlat + 0x12AC) == 0)) &&
-	    ((*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&MiniGamePcs) + 0x6484) & 0x80) != 0)) {
+	    ((MiniGamePcs.m_flags & 0x80) != 0)) {
 		char text[0x110];
 		unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
 		double posYDouble;

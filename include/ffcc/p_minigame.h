@@ -76,7 +76,13 @@ public:
     void SetNumPlayer();
 
 private:
-    u8 m_work[0x649C];
+    u8 m_work[0x6480];
+
+public:
+    unsigned int m_flags; // 0x6484
+
+private:
+    u8 m_work6488[0x649C - 0x6484];
 };
 
 extern "C" void create__12CMiniGamePcsFv(CMiniGamePcs*);

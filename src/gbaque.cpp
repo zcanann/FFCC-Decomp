@@ -20,8 +20,6 @@
 
 GbaQueue GbaQue;
 
-extern "C" int memcmp(const void*, const void*, unsigned long);
-
 struct GbaFlatDataTableEntryView
 {
 	int m_numEntries;

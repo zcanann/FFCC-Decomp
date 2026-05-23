@@ -347,7 +347,7 @@ static inline void*& CameraDataAt(CCharaPcs* self, int index)
 
 static inline CCharaPcs::CHandle*& HandleListHead(CCharaPcs* self)
 {
-    return *reinterpret_cast<CCharaPcs::CHandle**>(Ptr(self, 0x4C));
+    return self->m_handleList;
 }
 
 static inline unsigned int& FreeMergeMask(CCharaPcs* self)
@@ -772,8 +772,8 @@ void CCharaPcs::Init()
     m_texShadowPos.y = constructedVec->y;
     m_texShadowPos.z = constructedVec->z;
     m_texShadowRadius = 120.0f;
-    *reinterpret_cast<int*>(Ptr(this, 0x44)) = 0x80;
-    *reinterpret_cast<int*>(Ptr(this, 0x48)) = 100;
+    m_texShadowSize = 0x80;
+    m_texShadowDistance = 100;
 }
 
 /*
@@ -1121,8 +1121,8 @@ void CCharaPcs::onScriptChanging(char*)
 
     *reinterpret_cast<int*>(Ptr(this, 0x24)) = 0;
     *reinterpret_cast<int*>(Ptr(this, 0xE4)) = 0;
-    *reinterpret_cast<int*>(Ptr(this, 0x44)) = 0x80;
-    *reinterpret_cast<int*>(Ptr(this, 0x48)) = 100;
+    m_texShadowSize = 0x80;
+    m_texShadowDistance = 100;
 }
 
 /*
@@ -1348,11 +1348,9 @@ void CCharaPcs::GetTexShadow(int startIndex, int maxCount, _GXTexObj* texObjs, V
         if ((handle->m_flags & 0x200) != 0 && handle->m_shadowTexturePtr != 0) {
             if (startIndex <= shadowIndex) {
                 const int outIndex = shadowIndex - startIndex;
-                PSMTXConcat(
-                    reinterpret_cast<MtxPtr>(Ptr(this, 0x14C)), handle->m_shadowViewMtx,
-                    reinterpret_cast<MtxPtr>(shadowMatrices[outIndex]));
+                PSMTXConcat(m_texShadowProjectionMtx, handle->m_shadowViewMtx, reinterpret_cast<MtxPtr>(shadowMatrices[outIndex]));
 
-                const unsigned short texSize = static_cast<unsigned short>(*reinterpret_cast<int*>(Ptr(this, 0x44)));
+                const unsigned short texSize = static_cast<unsigned short>(m_texShadowSize);
                 GXInitTexObj(
                     &texObjs[outIndex], handle->m_shadowTexturePtr, texSize, texSize, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP,
                     GX_FALSE);
@@ -1430,7 +1428,7 @@ void CCharaPcs::drawMakeTexShadow()
         return;
     }
 
-    const int texSize = *reinterpret_cast<int*>(Ptr(this, 0x44));
+    const int texSize = m_texShadowSize;
     _GXTexObj backBufferTexObj;
     _GXColor clearColor = {0x00, 0x00, 0x00, 0x00};
     _GXColor shadowColor = {0x00, 0x00, 0x00, 0xFF};
@@ -1451,12 +1449,11 @@ void CCharaPcs::drawMakeTexShadow()
     GXSetScissor(0, 0, static_cast<unsigned int>(texSize), static_cast<unsigned int>(texSize));
     Graphic.SetCopyClear(clearColor, 0);
 
-    *reinterpret_cast<void**>(Ptr(this, 0x140)) = Graphic.m_scratchTextureBuffer;
-    *reinterpret_cast<int*>(Ptr(this, 0x144)) = 0xD2000;
-    *reinterpret_cast<int*>(Ptr(this, 0x148)) = texSize * texSize * 4;
-    C_MTXLightPerspective(
-        *reinterpret_cast<Mtx*>(Ptr(this, 0x14C)), *reinterpret_cast<float*>(Ptr(&CameraPcs, 0xFC)), 1.0f, 0.5f,
-        -0.5f, 0.5f, 0.5f);
+    m_texShadowTextureBase = Graphic.m_scratchTextureBuffer;
+    m_texShadowTextureSize = 0xD2000;
+    m_texShadowTextureOffset = texSize * texSize * 4;
+    C_MTXLightPerspective(m_texShadowProjectionMtx, *reinterpret_cast<float*>(Ptr(&CameraPcs, 0xFC)), 1.0f, 0.5f,
+                          -0.5f, 0.5f, 0.5f);
 
     CHandle* handle = HandleListHead(this)->m_next;
     while (handle != HandleListHead(this)) {
@@ -2894,7 +2891,7 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
         eye.y += 1.0f;
 
         Vec shadowPos;
-        PSVECScale(&delta, &shadowPos, static_cast<float>(*reinterpret_cast<int*>(Ptr(&CharaPcs, 0x48))));
+        PSVECScale(&delta, &shadowPos, static_cast<float>(CharaPcs.m_texShadowDistance));
         PSVECAdd(&modelPos, &shadowPos, &shadowPos);
         shadowPos.y += 1.0f;
 
@@ -2914,11 +2911,11 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
 
     if (drawPass == 1 || drawPass == 2) {
         if (drawPass == 2) {
-            const unsigned short shadowSize = static_cast<unsigned short>(*reinterpret_cast<int*>(Ptr(&CharaPcs, 0x44)));
+            const unsigned short shadowSize = static_cast<unsigned short>(CharaPcs.m_texShadowSize);
             GXSetTexCopySrc(0, 0, shadowSize, shadowSize);
             GXSetTexCopyDst(shadowSize, shadowSize, GX_TF_I8, GX_FALSE);
-            m_shadowTexturePtr = reinterpret_cast<unsigned char*>(*reinterpret_cast<void**>(Ptr(&CharaPcs, 0x140))) +
-                                 *reinterpret_cast<unsigned int*>(Ptr(&CharaPcs, 0x148));
+            m_shadowTexturePtr = reinterpret_cast<unsigned char*>(CharaPcs.m_texShadowTextureBase) +
+                                 CharaPcs.m_texShadowTextureOffset;
             DCInvalidateRange(m_shadowTexturePtr, (shadowSize * shadowSize) / 2);
             GXCopyTex(m_shadowTexturePtr, GX_TRUE);
         }
@@ -2928,11 +2925,10 @@ void CCharaPcs::CHandle::draw(int drawPass, int immediatePass)
 
         if (drawPass == 2) {
             const unsigned int shadowBytes =
-                (static_cast<unsigned int>(*reinterpret_cast<int*>(Ptr(&CharaPcs, 0x44))) *
-                 static_cast<unsigned int>(*reinterpret_cast<int*>(Ptr(&CharaPcs, 0x44)))) /
-                2;
+                (static_cast<unsigned int>(CharaPcs.m_texShadowSize) *
+                 static_cast<unsigned int>(CharaPcs.m_texShadowSize)) / 2;
             GXCopyTex(m_shadowTexturePtr, GX_TRUE);
-            *reinterpret_cast<unsigned int*>(Ptr(&CharaPcs, 0x148)) += shadowBytes;
+            CharaPcs.m_texShadowTextureOffset += shadowBytes;
             GXPixModeSync();
         }
     } else {

@@ -204,7 +204,11 @@ public:
     void createViewer();
     void destroyViewer();
 
-    u8 _pad004[0xBC];                         // 0x004
+    u8 _pad004[0x40];                         // 0x004
+    int m_texShadowSize;                      // 0x044
+    int m_texShadowDistance;                  // 0x048
+    CHandle* m_handleList;                    // 0x04C
+    u8 _pad050[0x70];                         // 0x050
     CMemory::CStage* m_stage;                 // 0x0C0
     CMemory::CStage* m_amemStage;             // 0x0C4
     CMemory::CStage* m_amemWorkStage;         // 0x0C8
@@ -217,7 +221,10 @@ public:
     GXColor m_viewerDiffuseColor[2][3];       // 0x0F0
     Vec m_viewerDiffusePos[3];                // 0x108
     CColor m_viewerChoiceColor[5];            // 0x12C
-    u8 _pad140[0x3C];                         // 0x140
+    void* m_texShadowTextureBase;             // 0x140
+    u32 m_texShadowTextureSize;               // 0x144
+    u32 m_texShadowTextureOffset;             // 0x148
+    Mtx m_texShadowProjectionMtx;             // 0x14C
     Vec m_texShadowPos;                       // 0x17C
     float m_texShadowRadius;                  // 0x188
     GXColor m_texShadowColor;                 // 0x18C

@@ -99,7 +99,8 @@ private:
     unsigned char m_pad04D[0x0B];
     unsigned int m_lockedEnvTevBit;      // 0x58
     unsigned int m_lockedEnvUnknown5c;   // 0x5C
-    unsigned char m_pad060[0xBC];
+    unsigned int m_numTevStage;          // 0x60
+    unsigned char m_pad064[0xB8];
     int m_texMapIdCur;                   // 0x11C
     int m_texMtxCur;                     // 0x120
     int m_texCoordIdCur;                 // 0x124
@@ -115,7 +116,8 @@ private:
     unsigned int m_unknown14C;           // 0x14C
     unsigned int m_texScroll1TexMtx;     // 0x150
     unsigned int m_texScroll1TexCoord;   // 0x154
-    unsigned char m_pad158[0xAD];
+    unsigned char m_pad158[0xAC];
+    unsigned char m_unknown204;          // 0x204
     unsigned char m_blendMode;           // 0x205
     unsigned char m_fogEnable;           // 0x206
     unsigned char m_blendOverrideMode;   // 0x207

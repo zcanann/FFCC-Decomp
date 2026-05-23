@@ -473,7 +473,7 @@ CMaterialMan::CMaterialMan()
 void CMaterialMan::Init()
 {
 	m_materialStage = Memory.CreateStage(0x20000, const_cast<char*>(s_materialStageName), 0);
-	*Ptr(this, 0x204) = 0x30;
+	m_unknown204 = 0x30;
 }
 
 /*
@@ -2202,7 +2202,7 @@ void CMaterialMan::InitVtxFmt(
         GXSetVtxAttrFmt((_GXVtxFmt)6, (_GXAttr)11, (_GXCompCnt)1, (_GXCompType)5, 0);
     }
 
-    *reinterpret_cast<unsigned int*>(Ptr(this, 0x44)) = 0xFFFFFFFF;
+    m_activeEnvTevBit = 0xFFFFFFFF;
 }
 
 /*
@@ -2216,8 +2216,7 @@ void CMaterialMan::InitVtxFmt(
  */
 void CMaterialMan::IncNumTevStage()
 {
-    unsigned int tevStage = *reinterpret_cast<unsigned int*>(Ptr(this, 0x60));
-    *reinterpret_cast<unsigned int*>(Ptr(this, 0x60)) = ((tevStage & 0xFF) + 1) & 0xFF;
+    m_numTevStage = ((m_numTevStage & 0xFF) + 1) & 0xFF;
 }
 
 /*
@@ -2285,8 +2284,8 @@ int CMaterialMan::IncTexMtxCur()
  */
 int CMaterialMan::IncTexMapIdCur()
 {
-    int texMapId = *reinterpret_cast<int*>(Ptr(this, 0x11C));
-    *reinterpret_cast<int*>(Ptr(this, 0x11C)) = texMapId + 1;
+    int texMapId = m_texMapIdCur;
+    m_texMapIdCur = texMapId + 1;
     return texMapId;
 }
 

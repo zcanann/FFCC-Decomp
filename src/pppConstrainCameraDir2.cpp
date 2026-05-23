@@ -35,19 +35,19 @@ void pppFrameConstrainCameraDir2(pppConstrainCameraDir* param_1, pppConstrainCam
         if ((gPppInConstructor != 1) && ((param_2->m_applyCameraInverse != 0 || param_2->m_applyPosition != 0))) {
             Vec resultPos;
             Vec cameraDir;
-            cameraDir.x = CameraPcs._236_4_;
-            cameraDir.y = CameraPcs._240_4_;
-            cameraDir.z = CameraPcs._244_4_;
+            cameraDir.x = CameraPcs.m_directionX;
+            cameraDir.y = CameraPcs.m_directionY;
+            cameraDir.z = CameraPcs.m_directionZ;
 
             Mtx cameraMtx;
             PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
 
-            float cameraPosX = CameraPcs._224_4_;
-            float cameraPosY = CameraPcs._228_4_;
-            float cameraPosZ = CameraPcs._232_4_;
+            float cameraPosX = CameraPcs.m_positionX;
+            float cameraPosY = CameraPcs.m_positionY;
+            float cameraPosZ = CameraPcs.m_positionZ;
             float localX;
             float localY;
-            float scale = ((CameraPcs._252_4_ - 0.8f) / 0.8f) + 64.0f;
+            float scale = ((CameraPcs.m_fov - 0.8f) / 0.8f) + 64.0f;
 
             PSMTXIdentity(pppMngStPtr->m_matrix.value);
 

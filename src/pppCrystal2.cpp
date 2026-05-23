@@ -142,7 +142,7 @@ void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, _pppC
             PSMTXConcat(ppvCameraMatrix, cameraMtx, tmpMtx);
         } else {
             f32 perspectiveScale = param_2->m_perspectiveScale;
-            C_MTXLightPerspective(lightMtx, CameraPcs._252_4_, 1.3333334f, perspectiveScale, -perspectiveScale, 0.5f,
+            C_MTXLightPerspective(lightMtx, CameraPcs.m_fov, 1.3333334f, perspectiveScale, -perspectiveScale, 0.5f,
                                   0.5f);
             PSMTXConcat(CameraPcs.m_cameraMatrix, cameraMtx, tmpMtx);
         }

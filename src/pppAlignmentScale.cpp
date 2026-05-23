@@ -43,9 +43,9 @@ struct pppAlignmentScale* pppFrameAlignmentScale(struct pppAlignmentScale* align
 
     if (gPppCalcDisabled == 0) {
         pppMngSt = pppMngStPtr;
-        cameraPos.x = CameraPcs._224_4_;
-        cameraPos.y = CameraPcs._228_4_;
-        cameraPos.z = CameraPcs._232_4_;
+        cameraPos.x = CameraPcs.m_positionX;
+        cameraPos.y = CameraPcs.m_positionY;
+        cameraPos.z = CameraPcs.m_positionZ;
 
         objPos.x = pppMngStPtr->m_matrix.value[0][3];
         objPos.y = pppMngStPtr->m_matrix.value[1][3];

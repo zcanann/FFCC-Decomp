@@ -249,9 +249,9 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
             posY = ppvCameraMatrix[1][3];
             posZ = ppvCameraMatrix[2][3];
         } else {
-            posX = CameraPcs._212_4_;
-            posY = CameraPcs._216_4_;
-            posZ = CameraPcs._220_4_;
+            posX = CameraPcs.m_targetX;
+            posY = CameraPcs.m_targetY;
+            posZ = CameraPcs.m_targetZ;
         }
         pppMngStPtr->m_matrix.value[0][3] = posX;
         pppMngStPtr->m_matrix.value[1][3] = posY;

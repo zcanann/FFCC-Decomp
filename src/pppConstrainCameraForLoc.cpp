@@ -10,12 +10,12 @@ extern int gPppCalcDisabled;
 #include "ffcc/util.h"
 #include <dolphin/mtx.h>
 
-static inline float CameraPosX() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xE0); }
-static inline float CameraPosY() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xE4); }
-static inline float CameraPosZ() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xE8); }
-static inline float CameraDirX() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xEC); }
-static inline float CameraDirY() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xF0); }
-static inline float CameraDirZ() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xF4); }
+static inline float CameraPosX() { return CameraPcs.m_positionX; }
+static inline float CameraPosY() { return CameraPcs.m_positionY; }
+static inline float CameraPosZ() { return CameraPcs.m_positionZ; }
+static inline float CameraDirX() { return CameraPcs.m_directionX; }
+static inline float CameraDirY() { return CameraPcs.m_directionY; }
+static inline float CameraDirZ() { return CameraPcs.m_directionZ; }
 static inline MtxPtr CameraMatrix() { return CameraPcs.m_cameraMatrix; }
 
 /*

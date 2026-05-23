@@ -275,9 +275,9 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
         cameraPos.z = ppvCameraMatrix[2][3];
         maxRadius = CalcSphereRadius((Vec*)model->m_vertices, model->m_vertexCount);
     } else {
-        cameraPos.x = CameraPcs._224_4_;
-        cameraPos.y = CameraPcs._228_4_;
-        cameraPos.z = CameraPcs._232_4_;
+        cameraPos.x = CameraPcs.m_positionX;
+        cameraPos.y = CameraPcs.m_positionY;
+        cameraPos.z = CameraPcs.m_positionZ;
         maxRadius = FLOAT_80331934;
     }
 

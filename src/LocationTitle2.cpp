@@ -105,9 +105,9 @@ extern "C" void pppRenderLocationTitle2(struct pppLocationTitle2* locationTitle,
         matrixPos.y = pppMngStPtr->m_matrix.value[1][3];
         matrixPos.z = pppMngStPtr->m_matrix.value[2][3];
 
-        cameraPos.x = CameraPcs._224_4_;
-        cameraPos.y = CameraPcs._228_4_;
-        cameraPos.z = CameraPcs._232_4_;
+        cameraPos.x = CameraPcs.m_positionX;
+        cameraPos.y = CameraPcs.m_positionY;
+        cameraPos.z = CameraPcs.m_positionZ;
 
         PSVECSubtract(&cameraPos, &matrixPos, &look);
         if ((look.x == 0.0f) && (look.y == 0.0f) && (look.z == 0.0f)) {

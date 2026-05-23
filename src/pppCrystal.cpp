@@ -165,7 +165,7 @@ void pppRenderCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* para
 			lightMtx, CRYSTAL_SCENE_FOVY, CRYSTAL_ASPECT, CRYSTAL_HALF, CRYSTAL_HALF_NEGATIVE, CRYSTAL_HALF, CRYSTAL_HALF);
 	} else {
 		C_MTXLightPerspective(
-			lightMtx, CameraPcs._252_4_, CRYSTAL_ASPECT, CRYSTAL_HALF, CRYSTAL_HALF_NEGATIVE, CRYSTAL_HALF, CRYSTAL_HALF);
+			lightMtx, CameraPcs.m_fov, CRYSTAL_ASPECT, CRYSTAL_HALF, CRYSTAL_HALF_NEGATIVE, CRYSTAL_HALF, CRYSTAL_HALF);
 	}
 
 	GXLoadTexMtxImm(texMtx.value, 0x40, GX_MTX3x4);

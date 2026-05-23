@@ -147,12 +147,12 @@ void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTab
 				  &work->m_projectedX, &work->m_projectedY, &work->m_projectedZ);
 
 		work->m_alpha = 0;
-		cameraPos.x = CameraPcs._224_4_;
-		cameraPos.y = CameraPcs._228_4_;
-		cameraPos.z = CameraPcs._232_4_;
-		cameraLookAt.x = CameraPcs._212_4_;
-		cameraLookAt.y = CameraPcs._216_4_;
-		cameraLookAt.z = CameraPcs._220_4_;
+		cameraPos.x = CameraPcs.m_positionX;
+		cameraPos.y = CameraPcs.m_positionY;
+		cameraPos.z = CameraPcs.m_positionZ;
+		cameraLookAt.x = CameraPcs.m_targetX;
+		cameraLookAt.y = CameraPcs.m_targetY;
+		cameraLookAt.z = CameraPcs.m_targetZ;
 		PSVECSubtract(&cameraLookAt, &cameraPos, &lookDir);
 
 		objectPos.x = pppMngStPtr->m_matrix.value[0][3];

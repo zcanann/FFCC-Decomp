@@ -1422,7 +1422,7 @@ void pppSetFpMatrix(_pppMngSt* pppMngSt)
 		local_50.y = local_44[1][3];
 		local_50.z = local_44[2][3];
 		PSMTXMultVecSR(ppvCameraMatrix0, &local_50, &local_50);
-		local_50.y += CameraPcs._228_4_;
+		local_50.y += CameraPcs.m_positionY;
 		ppvWorldMatrix[0][3] = local_50.x;
 		ppvWorldMatrix[1][3] = local_50.y;
 		ppvWorldMatrix[2][3] = local_50.z;

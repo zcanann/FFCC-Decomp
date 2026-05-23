@@ -389,9 +389,9 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
                 }
             }
             cameraPos.y += kMapCameraCenterYOffset;
-            *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE0) = cameraPos.x;
-            *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE4) = cameraPos.y;
-            *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE8) = cameraPos.z;
+            CameraPcs.m_positionX = cameraPos.x;
+            CameraPcs.m_positionY = cameraPos.y;
+            CameraPcs.m_positionZ = cameraPos.z;
         }
 
         if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
@@ -515,12 +515,9 @@ void CMapPcs::calc()
     Mtx44 screenMtx;
 
     MapFileRead__7CMapMngFPcRUl(&MapMng);
-    *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228EC) =
-        *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE0);
-    *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F0) =
-        *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE4);
-    *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F4) =
-        *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE8);
+    *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228EC) = CameraPcs.m_positionX;
+    *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F0) = CameraPcs.m_positionY;
+    *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F4) = CameraPcs.m_positionZ;
 
     if (m_useStoredViewMtx != 0) {
         memcpy(cameraMtx, m_viewMtx, sizeof(Mtx));
@@ -568,9 +565,9 @@ void CMapPcs::calc()
                 }
             }
             cameraPos.y += kMapCameraCenterYOffset;
-            *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE0) = cameraPos.x;
-            *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE4) = cameraPos.y;
-            *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE8) = cameraPos.z;
+            CameraPcs.m_positionX = cameraPos.x;
+            CameraPcs.m_positionY = cameraPos.y;
+            CameraPcs.m_positionZ = cameraPos.z;
         }
 
         if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
@@ -644,12 +641,9 @@ void CMapPcs::drawBefore()
 
         MaterialMan.InitVtxFmt(-1, GX_F32, 0, GX_RGBA4, 0xE, GX_RGBA4, 0xA);
 
-        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228EC) =
-            *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE0);
-        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F0) =
-            *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE4);
-        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F4) =
-            *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE8);
+        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228EC) = CameraPcs.m_positionX;
+        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F0) = CameraPcs.m_positionY;
+        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F4) = CameraPcs.m_positionZ;
 
         PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
         PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
@@ -700,12 +694,9 @@ void CMapPcs::draw()
 
         MaterialMan.InitVtxFmt(-1, GX_F32, 0, GX_RGBA4, 0xE, GX_RGBA4, 0xA);
 
-        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228EC) =
-            *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE0);
-        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F0) =
-            *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE4);
-        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F4) =
-            *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE8);
+        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228EC) = CameraPcs.m_positionX;
+        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F0) = CameraPcs.m_positionY;
+        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F4) = CameraPcs.m_positionZ;
 
         PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
         PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
@@ -757,12 +748,9 @@ void CMapPcs::drawBeforeViewer()
 
         MaterialMan.InitVtxFmt(-1, GX_F32, 0, GX_RGBA4, 0xE, GX_RGBA4, 0xA);
 
-        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228EC) =
-            *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE0);
-        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F0) =
-            *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE4);
-        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F4) =
-            *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE8);
+        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228EC) = CameraPcs.m_positionX;
+        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F0) = CameraPcs.m_positionY;
+        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F4) = CameraPcs.m_positionZ;
 
         PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
         PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
@@ -814,12 +802,9 @@ void CMapPcs::drawViewer()
 
         MaterialMan.InitVtxFmt(-1, GX_F32, 0, GX_RGBA4, 0xE, GX_RGBA4, 0xA);
 
-        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228EC) =
-            *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE0);
-        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F0) =
-            *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE4);
-        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F4) =
-            *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE8);
+        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228EC) = CameraPcs.m_positionX;
+        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F0) = CameraPcs.m_positionY;
+        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F4) = CameraPcs.m_positionZ;
 
         PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
         PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
@@ -866,12 +851,9 @@ void CMapPcs::drawAfter()
 
             MaterialMan.InitVtxFmt(-1, GX_F32, 0, GX_RGBA4, 0xE, GX_RGBA4, 0xA);
 
-            *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228EC) =
-                *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE0);
-            *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F0) =
-                *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE4);
-            *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F4) =
-                *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE8);
+            *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228EC) = CameraPcs.m_positionX;
+            *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F0) = CameraPcs.m_positionY;
+            *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F4) = CameraPcs.m_positionZ;
 
             PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
             PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
@@ -919,12 +901,9 @@ void CMapPcs::drawAfterViewer()
 
             MaterialMan.InitVtxFmt(-1, GX_F32, 0, GX_RGBA4, 0xE, GX_RGBA4, 0xA);
 
-            *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228EC) =
-                *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE0);
-            *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F0) =
-                *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE4);
-            *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F4) =
-                *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE8);
+            *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228EC) = CameraPcs.m_positionX;
+            *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F0) = CameraPcs.m_positionY;
+            *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F4) = CameraPcs.m_positionZ;
 
             PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
             PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);

@@ -1768,7 +1768,7 @@ void CGPartyObj::checkTargetParticle()
 		PSVECNormalize(&input, &input);
 		PSVECScale(&input, &input, FLOAT_80331ad4);
 
-		float angle = CameraPcs._248_4_;
+		float angle = CameraPcs.m_yaw;
 		if (isGhostPartyTargetMode(this)) {
 			angle = 0.0f;
 		}

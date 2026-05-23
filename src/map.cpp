@@ -1265,7 +1265,7 @@ int CMapKeyFrame::IsRun()
 void CMapKeyFrame::ReadJun(CChunkFile& chunkFile, int count)
 {
     m_junCount = static_cast<unsigned char>(count);
-    m_junTable = new (*reinterpret_cast<CMemory::CStage**>(&MapMng), const_cast<char*>(s_map_cpp), 0xC1) unsigned char[m_junCount];
+    m_junTable = new (MapMng.m_stage, const_cast<char*>(s_map_cpp), 0xC1) unsigned char[m_junCount];
 
     for (int i = 0; i < static_cast<int>(m_junCount); i++) {
         m_junTable[i] = chunkFile.Get1();
@@ -1299,8 +1299,8 @@ void CMapKeyFrame::ReadKey(CChunkFile& chunkFile, int count)
 {
     m_isRun = 1;
     m_keyCount = static_cast<unsigned char>(count);
-    m_keyFrame = new (*reinterpret_cast<CMemory::CStage**>(&MapMng), const_cast<char*>(s_map_cpp), 0xD5) float[m_keyCount];
-    m_keyValue = new (*reinterpret_cast<CMemory::CStage**>(&MapMng), const_cast<char*>(s_map_cpp), 0xD6) float[m_keyCount];
+    m_keyFrame = new (MapMng.m_stage, const_cast<char*>(s_map_cpp), 0xD5) float[m_keyCount];
+    m_keyValue = new (MapMng.m_stage, const_cast<char*>(s_map_cpp), 0xD6) float[m_keyCount];
 
     for (int i = 0; i < static_cast<int>(m_keyCount); i++) {
         m_keyFrame[i] = chunkFile.GetF4();
@@ -1308,7 +1308,7 @@ void CMapKeyFrame::ReadKey(CChunkFile& chunkFile, int count)
     }
 
     if (m_mode == 1) {
-        m_splineTable = new (*reinterpret_cast<CMemory::CStage**>(&MapMng), const_cast<char*>(s_map_cpp), 0xDE) float[m_keyCount];
+        m_splineTable = new (MapMng.m_stage, const_cast<char*>(s_map_cpp), 0xDE) float[m_keyCount];
         Math.MakeSpline1Dtable(static_cast<int>(m_keyCount) - 1, m_keyValue, m_keyFrame, m_splineTable);
     }
 }

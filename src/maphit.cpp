@@ -647,7 +647,7 @@ int CMapHit::ReadOtmHit(CChunkFile& chunkFile)
         case 'HITV': {
             m_vertexCount = static_cast<unsigned short>(chunk.m_arg0);
             m_vertices =
-                new (*reinterpret_cast<CMemory::CStage**>(&MapMng), const_cast<char*>(s_maphit_cpp_801D7088), 0x143)
+                new (MapMng.m_stage, const_cast<char*>(s_maphit_cpp_801D7088), 0x143)
                     Vec[m_vertexCount];
 
             for (int i = 0; i < m_vertexCount; i++) {
@@ -676,7 +676,7 @@ int CMapHit::ReadOtmHit(CChunkFile& chunkFile)
         case 'HITF': {
             m_faceCount = static_cast<unsigned short>(chunk.m_arg0);
             m_faces =
-                new (*reinterpret_cast<CMemory::CStage**>(&MapMng), const_cast<char*>(s_maphit_cpp_801D7088), 0x159)
+                new (MapMng.m_stage, const_cast<char*>(s_maphit_cpp_801D7088), 0x159)
                     CMapHitFace[m_faceCount];
 
             const float offsetScale = FLOAT_8032F8F4;

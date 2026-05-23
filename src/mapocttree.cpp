@@ -220,7 +220,7 @@ int COctTree::ReadOtmOctTree(CChunkFile& chunkFile)
             }
 
             nodeCount = m_nodeCount;
-            m_nodePool = new (*reinterpret_cast<CMemory::CStage**>(&MapMng), const_cast<char*>(s_mapocttree_cpp_801D72EC), 0x59)
+            m_nodePool = new (MapMng.m_stage, const_cast<char*>(s_mapocttree_cpp_801D72EC), 0x59)
                 COctNode[nodeCount];
             break;
         }

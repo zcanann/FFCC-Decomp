@@ -640,7 +640,7 @@ CMemory::CStage* GET_CHARA_ALLOC_STAGE_S(int stageIndex, CMemory::CStage* stage)
 {
     switch (stageIndex) {
     case 1:
-        return *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(&MapMng));
+        return MapMng.m_stage;
     case 2:
         return PartPcs.m_usbStreamData.m_stageLoad;
     case 3:

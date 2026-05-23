@@ -1289,7 +1289,7 @@ void CCameraPcs::createFullShadow()
     unsigned int rampTexSize;
     unsigned int i;
     unsigned char* rampTex;
-    CMemory::CStage* stage = *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(&MapMng));
+    CMemory::CStage* stage = MapMng.m_stage;
 
     *reinterpret_cast<void**>(self + 0x31C) = 0;
     rampTexSize = GXGetTexBufferSize(0x1E0, 0x1E0, GX_TF_I8, GX_FALSE, 0);

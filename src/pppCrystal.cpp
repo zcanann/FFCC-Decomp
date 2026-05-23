@@ -25,13 +25,15 @@ extern const float FLOAT_80331008;
 extern const float FLOAT_8033100C;
 extern const float FLOAT_80331010;
 
-#define CRYSTAL_REFRACTION_SIZE 32.0f
-#define CRYSTAL_HALF_NEGATIVE -0.5f
-#define CRYSTAL_SCREEN_WIDTH 640.0f
-#define CRYSTAL_SCREEN_HEIGHT 448.0f
-#define CRYSTAL_SCENE_FOVY 33.3f
-#define CRYSTAL_ASPECT 1.3333334f
-#define CRYSTAL_HALF 0.5f
+extern const float FLOAT_80330fa8 = 32.0f;
+extern const float FLOAT_80330fac = -0.5f;
+extern const float FLOAT_80330fb0 = 640.0f;
+extern const float FLOAT_80330fb4 = 448.0f;
+extern const float FLOAT_80330fb8 = 33.3f;
+extern const float FLOAT_80330fbc = 1.3333334f;
+extern const float FLOAT_80330fc0 = 0.5f;
+extern const double DOUBLE_80330FC8 = 4503599627370496.0;
+extern const float FLOAT_80330FD0 = 2.0f;
 
 struct CrystalIndTexMtx {
     float value[2][3];
@@ -144,17 +146,17 @@ void pppRenderCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* para
 	CrystalTexMtx texMtx = s_crystalTexMtxBase;
 
 	if (param_2->m_payload[0] == 1) {
-		texW = CRYSTAL_REFRACTION_SIZE;
-		texH = CRYSTAL_REFRACTION_SIZE;
+		texW = FLOAT_80330fa8;
+		texH = FLOAT_80330fa8;
 	}
 	else {
-		texW = (float)indirectTex->m_width;
-		texH = (float)indirectTex->m_height;
+		texW = (float)(u32)indirectTex->m_width;
+		texH = (float)(u32)indirectTex->m_height;
 	}
 
 	CrystalIndTexMtx indMtx = s_crystalIndTexMtxBase;
-	indMtx.value[0][0] = ((CRYSTAL_HALF_NEGATIVE * texW) / CRYSTAL_SCREEN_WIDTH) * param_2->m_stepValue;
-	indMtx.value[1][1] = ((CRYSTAL_HALF_NEGATIVE * texH) / CRYSTAL_SCREEN_HEIGHT) * param_2->m_stepValue;
+	indMtx.value[0][0] = ((FLOAT_80330fac * texW) / FLOAT_80330fb0) * param_2->m_stepValue;
+	indMtx.value[1][1] = ((FLOAT_80330fac * texH) / FLOAT_80330fb4) * param_2->m_stepValue;
 
 	_GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
 	GXSetNumTexGens(3);
@@ -162,10 +164,10 @@ void pppRenderCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* para
 
 	if ((int)Game.m_currentSceneId == 7) {
 		C_MTXLightPerspective(
-			lightMtx, CRYSTAL_SCENE_FOVY, CRYSTAL_ASPECT, CRYSTAL_HALF, CRYSTAL_HALF_NEGATIVE, CRYSTAL_HALF, CRYSTAL_HALF);
+			lightMtx, FLOAT_80330fb8, FLOAT_80330fbc, FLOAT_80330fc0, FLOAT_80330fac, FLOAT_80330fc0, FLOAT_80330fc0);
 	} else {
 		C_MTXLightPerspective(
-			lightMtx, CameraPcs.m_fov, CRYSTAL_ASPECT, CRYSTAL_HALF, CRYSTAL_HALF_NEGATIVE, CRYSTAL_HALF, CRYSTAL_HALF);
+			lightMtx, CameraPcs.m_fov, FLOAT_80330fbc, FLOAT_80330fc0, FLOAT_80330fac, FLOAT_80330fc0, FLOAT_80330fc0);
 	}
 
 	GXLoadTexMtxImm(texMtx.value, 0x40, GX_MTX3x4);
@@ -279,8 +281,8 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param
 		textureInfo->m_imageCount = 0x100;
 		textureInfo->m_bufferSize = textureSize;
 
-		stepX = 2.0f / (float)(textureInfo->m_width - 1);
-		stepY = 2.0f / (float)(textureInfo->m_height - 1);
+		stepX = FLOAT_80330FD0 / (float)(textureInfo->m_width - 1);
+		stepY = FLOAT_80330FD0 / (float)(textureInfo->m_height - 1);
 		yCoord = FLOAT_80330FD4;
 		maxMagnitude = FLOAT_80330FF8;
 		coordOffset = FLOAT_8033100C;

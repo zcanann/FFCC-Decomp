@@ -5,6 +5,10 @@
 
 #include <dolphin/mtx.h>
 
+extern "C" {
+void* pppSetFpMatrix__FP9_pppMngSt(struct _pppMngSt*);
+}
+
 extern const float FLOAT_80331920;
 extern const float FLOAT_80331924;
 extern const float FLOAT_80331928 = 640.0f;
@@ -70,7 +74,7 @@ struct pppAlignmentScale* pppFrameAlignmentScale(struct pppAlignmentScale* align
         pppMngStPtr->m_matrix.value[1][3] = objPos.y;
         pppMngStPtr->m_matrix.value[2][3] = objPos.z;
 
-        pppSetFpMatrix(pppMngSt);
+        alignmentScale = (struct pppAlignmentScale*)pppSetFpMatrix__FP9_pppMngSt(pppMngSt);
     }
 
     return alignmentScale;

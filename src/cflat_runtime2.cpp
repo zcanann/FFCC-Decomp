@@ -89,6 +89,20 @@ struct CFlatObjectFlagBits {
 	u8 m_unk1 : 4;
 };
 
+struct CFlatDebugDrawCC {
+	u8 m_flags;
+	u8 m_pad[3];
+	Vec m_from;
+	Vec m_to;
+	float m_radius;
+};
+
+struct CFlatLayerResource {
+	int m_allocStage;
+	CTextureSet* m_textureSet;
+	CFile::CHandle* m_fileHandle;
+};
+
 static CGBaseObj* FindNextGBaseObjByCidMask(CFlatRuntime2* runtime, CFlatRuntime::CObject* object, unsigned int cidMask)
 {
 	CFlatRuntime::CObject* const root =
@@ -139,38 +153,32 @@ void CLine<64>::Draw()
 
 	GXBegin((GXPrimitive)0xB0, GX_VTXFMT0, (u16)(m_numPoints & 0xFFFF));
 	u32 i = 0;
-	u8* it = reinterpret_cast<u8*>(this);
 	while (i < m_numPoints) {
-		GXWGFifo.f32 = *reinterpret_cast<float*>(it + 0x30);
-		GXWGFifo.f32 = *reinterpret_cast<float*>(it + 0x34);
-		GXWGFifo.f32 = *reinterpret_cast<float*>(it + 0x38);
-		it += 0xC;
+		GXWGFifo.f32 = m_points[i].x;
+		GXWGFifo.f32 = m_points[i].y;
+		GXWGFifo.f32 = m_points[i].z;
 		i++;
 	}
 
 	const float yOffset = 1.0f;
 	GXBegin((GXPrimitive)0xB0, GX_VTXFMT0, (u16)(m_numPoints & 0xFFFF));
 	i = 0;
-	it = reinterpret_cast<u8*>(this);
 	while (i < m_numPoints) {
-		GXWGFifo.f32 = *reinterpret_cast<float*>(it + 0x30);
-		GXWGFifo.f32 = yOffset + *reinterpret_cast<float*>(it + 0x34);
-		GXWGFifo.f32 = *reinterpret_cast<float*>(it + 0x38);
-		it += 0xC;
+		GXWGFifo.f32 = m_points[i].x;
+		GXWGFifo.f32 = yOffset + m_points[i].y;
+		GXWGFifo.f32 = m_points[i].z;
 		i++;
 	}
 
 	GXBegin((GXPrimitive)0xA8, GX_VTXFMT0, (u16)((m_numPoints & 0x7FFF) << 1));
 	i = 0;
-	it = reinterpret_cast<u8*>(this);
 	while (i < m_numPoints) {
-		GXWGFifo.f32 = *reinterpret_cast<float*>(it + 0x30);
-		GXWGFifo.f32 = *reinterpret_cast<float*>(it + 0x34);
-		GXWGFifo.f32 = *reinterpret_cast<float*>(it + 0x38);
-		GXWGFifo.f32 = *reinterpret_cast<float*>(it + 0x30);
-		GXWGFifo.f32 = yOffset + *reinterpret_cast<float*>(it + 0x34);
-		GXWGFifo.f32 = *reinterpret_cast<float*>(it + 0x38);
-		it += 0xC;
+		GXWGFifo.f32 = m_points[i].x;
+		GXWGFifo.f32 = m_points[i].y;
+		GXWGFifo.f32 = m_points[i].z;
+		GXWGFifo.f32 = m_points[i].x;
+		GXWGFifo.f32 = yOffset + m_points[i].y;
+		GXWGFifo.f32 = m_points[i].z;
 		i++;
 	}
 }
@@ -212,6 +220,21 @@ static inline u8* MiniGamePcsRaw()
 static inline u32& RuntimeDebugFlags(u8* runtime)
 {
 	return *reinterpret_cast<u32*>(runtime + 0x129C);
+}
+
+static inline int& DebugDrawCCCount(u8* runtime)
+{
+	return *reinterpret_cast<int*>(runtime + 0xCD1C);
+}
+
+static inline CFlatDebugDrawCC* DebugDrawCCEntries(u8* runtime)
+{
+	return reinterpret_cast<CFlatDebugDrawCC*>(runtime + 0xCD20);
+}
+
+static inline CFlatLayerResource* LayerResources(CFlatRuntime2* runtime)
+{
+	return reinterpret_cast<CFlatLayerResource*>(reinterpret_cast<u8*>(runtime) + 0x1770);
 }
 
 static inline float& ParticleWorkSpeed(CFlatRuntime2* runtime)
@@ -1310,18 +1333,18 @@ void CFlatRuntime2::Destroy()
 	reinterpret_cast<CFlatRuntime*>(this)->Destroy();
 	reinterpret_cast<CFlatData*>(reinterpret_cast<u8*>(this) + 0xCF20)->Destroy();
 
-	CFlatRuntime2* layer = this;
-	for (int i = 0; i < 8; i++, layer = reinterpret_cast<CFlatRuntime2*>(reinterpret_cast<u8*>(layer) + 0xC)) {
-		CFile::CHandle* fileHandle = *reinterpret_cast<CFile::CHandle**>(reinterpret_cast<u8*>(layer) + 0x1778);
+	CFlatLayerResource* layer = LayerResources(this);
+	for (int i = 0; i < 8; i++, layer++) {
+		CFile::CHandle* fileHandle = layer->m_fileHandle;
 		if (fileHandle != 0) {
 			File.Close(fileHandle);
-			*reinterpret_cast<CFile::CHandle**>(reinterpret_cast<u8*>(layer) + 0x1778) = 0;
+			layer->m_fileHandle = 0;
 		}
 
-		void* textureSet = *reinterpret_cast<void**>(reinterpret_cast<u8*>(layer) + 0x1774);
+		void* textureSet = layer->m_textureSet;
 		if (textureSet != 0) {
 			(*(void (**)(void*, int))(*reinterpret_cast<int*>(textureSet) + 8))(textureSet, 1);
-			*reinterpret_cast<void**>(reinterpret_cast<u8*>(layer) + 0x1774) = 0;
+			layer->m_textureSet = 0;
 		}
 	}
 }
@@ -1340,30 +1363,30 @@ void CFlatRuntime2::Calc()
 	u8* runtime = reinterpret_cast<u8*>(this);
 
 	for (int i = 0; i < 8; i++) {
-		u8* layer = runtime + 0x1770 + i * 0xC;
-		CFile::CHandle* fileHandle = *reinterpret_cast<CFile::CHandle**>(layer + 8);
+		CFlatLayerResource* layer = &LayerResources(this)[i];
+		CFile::CHandle* fileHandle = layer->m_fileHandle;
 		if (fileHandle == 0) {
 			continue;
 		}
 
 		if (File.IsCompleted(fileHandle)) {
-			CTextureSet* textureSet = *reinterpret_cast<CTextureSet**>(layer + 4);
+			CTextureSet* textureSet = layer->m_textureSet;
 			if (textureSet != 0) {
 				(*(void (**)(void*, int))(*reinterpret_cast<int*>(textureSet) + 8))(textureSet, 1);
-				*reinterpret_cast<CTextureSet**>(layer + 4) = 0;
+				layer->m_textureSet = 0;
 			}
 
 			textureSet = new (getStage(), const_cast<char*>(sCFlatRuntime2FileTag), 0x335) CTextureSet;
-			*reinterpret_cast<CTextureSet**>(layer + 4) = textureSet;
+			layer->m_textureSet = textureSet;
 			if (textureSet != 0) {
 				textureSet->Create(
 					File.m_readBuffer,
-					GET_CHARA_ALLOC_STAGE_S(*reinterpret_cast<int*>(layer), Game.m_mainStage),
+					GET_CHARA_ALLOC_STAGE_S(layer->m_allocStage, Game.m_mainStage),
 					0, 0, 0, 0);
 			}
 
 			File.Close(fileHandle);
-			*reinterpret_cast<CFile::CHandle**>(layer + 8) = 0;
+			layer->m_fileHandle = 0;
 		}
 	}
 
@@ -1435,7 +1458,7 @@ void CFlatRuntime2::Calc()
 		delete[] saveData;
 	}
 
-	*reinterpret_cast<int*>(runtime + 0xCD1C) = 0;
+	DebugDrawCCCount(runtime) = 0;
 	memset(runtime + 0x1338, 0, 0x14);
 }
 
@@ -1530,7 +1553,7 @@ void CFlatRuntime2::Draw()
 	const bool showDebugCC =
 		((RuntimeDebugFlags(runtime) & CFlatRuntimeDebugFlag_ParticleHitSpheres) != 0) ||
 		((MiniGamePcsRaw()[0x25732] & 0x80) != 0);
-	const int debugCount = *reinterpret_cast<int*>(runtime + 0xCD1C);
+	const int debugCount = DebugDrawCCCount(runtime);
 	if (showDebugCC && debugCount != 0) {
 		GXColor greenColor = {0x80, 0xFF, 0x80, 0xFF};
 		GXColor blueColor = {0x80, 0x80, 0xFF, 0xFF};
@@ -1538,9 +1561,9 @@ void CFlatRuntime2::Draw()
 		Vec worldUp = {0.0f, 1.0f, 0.0f};
 		float ringVerts[8][3];
 
-		u8* entry = runtime + 0xCD20;
+		CFlatDebugDrawCC* entry = DebugDrawCCEntries(runtime);
 		for (int i = 0; i < debugCount; i++) {
-			const u8 flags = entry[0];
+			const u8 flags = entry->m_flags;
 			GXColor* drawColor = &greenColor;
 			if ((flags & 0x80) != 0) {
 				drawColor = &redColor;
@@ -1549,8 +1572,8 @@ void CFlatRuntime2::Draw()
 			}
 			GXSetChanMatColor(GX_COLOR0A0, *drawColor);
 
-			Vec* start = reinterpret_cast<Vec*>(entry + 0x04);
-			Vec* end = reinterpret_cast<Vec*>(entry + 0x10);
+			Vec* start = &entry->m_from;
+			Vec* end = &entry->m_to;
 			float length = PSVECMag(end);
 
 			Mtx orientMtx;
@@ -1575,7 +1598,7 @@ void CFlatRuntime2::Draw()
 			PSMTXConcat(cameraMtx, orientMtx, orientMtx);
 			GXLoadPosMtxImm(orientMtx, GX_PNMTX0);
 
-			const float radius = *reinterpret_cast<float*>(entry + 0x1C);
+			const float radius = entry->m_radius;
 			GXBegin((GXPrimitive)0xA8, GX_VTXFMT0, 0x20);
 			for (int j = 0; j < 8; j++) {
 				const float angle = static_cast<float>(j) * 0.7853982f;
@@ -1606,7 +1629,7 @@ void CFlatRuntime2::Draw()
 				GXWGFifo.f32 = ringVerts[next][2];
 			}
 
-			entry += 0x20;
+			entry++;
 		}
 	}
 }
@@ -1623,25 +1646,19 @@ void CFlatRuntime2::Draw()
 void CFlatRuntime2::AddDebugDrawCC(Vec* from, Vec* to, float radius, int bit7, int bit6)
 {
 	u8* runtime = reinterpret_cast<u8*>(this);
-	int& count = *reinterpret_cast<int*>(runtime + 0xCD1C);
+	int& count = DebugDrawCCCount(runtime);
 
 	if (static_cast<unsigned int>(count) < 0x10U) {
-		const int slotOffset = count * 0x20;
-		u8* slot = runtime + 0xCD20 + slotOffset;
+		CFlatDebugDrawCC* slot = &DebugDrawCCEntries(runtime)[count];
+		slot->m_from = *from;
+		slot->m_to = *to;
 
-		*reinterpret_cast<float*>(slot + 0x04) = from->x;
-		*reinterpret_cast<float*>(slot + 0x08) = from->y;
-		*reinterpret_cast<float*>(slot + 0x0C) = from->z;
-		*reinterpret_cast<float*>(slot + 0x10) = to->x;
-		*reinterpret_cast<float*>(slot + 0x14) = to->y;
-		*reinterpret_cast<float*>(slot + 0x18) = to->z;
-
-		slot[0] = static_cast<u8>((bit7 << 7) | (slot[0] & 0x7F));
-		slot[0] = static_cast<u8>(((bit6 << 6) & 0x40) | (slot[0] & 0xBF));
+		slot->m_flags = static_cast<u8>((bit7 << 7) | (slot->m_flags & 0x7F));
+		slot->m_flags = static_cast<u8>(((bit6 << 6) & 0x40) | (slot->m_flags & 0xBF));
 
 		const int index = count;
 		count = index + 1;
-		*reinterpret_cast<float*>(runtime + 0xCD3C + index * 0x20) = radius;
+		slot->m_radius = radius;
 		return;
 	}
 
@@ -1759,13 +1776,12 @@ int CFlatRuntime2::CcClass2D(int flags, int classMask, Vec* center, float radius
  */
 void CFlatRuntime2::loadLayer(int layerNo, char* fileName)
 {
-	const int layerOffset = layerNo * 0xC;
-	u8* layer = reinterpret_cast<u8*>(this) + 0x1770 + layerOffset;
+	CFlatLayerResource* layer = &LayerResources(this)[layerNo];
 
-	CTextureSet* textureSet = *reinterpret_cast<CTextureSet**>(layer + 4);
+	CTextureSet* textureSet = layer->m_textureSet;
 	if (textureSet != 0) {
 		(*(void (**)(void*, int))(*reinterpret_cast<int*>(textureSet) + 8))(textureSet, 1);
-		*reinterpret_cast<CTextureSet**>(layer + 4) = 0;
+		layer->m_textureSet = 0;
 	}
 
 	char path[0x104];
@@ -1777,7 +1793,7 @@ void CFlatRuntime2::loadLayer(int layerNo, char* fileName)
 		File.SyncCompleted(fileHandle);
 
 		textureSet = new (Game.m_mainStage, const_cast<char*>(sCFlatRuntime2FileTag), 0x4F4) CTextureSet;
-		*reinterpret_cast<CTextureSet**>(layer + 4) = textureSet;
+		layer->m_textureSet = textureSet;
 		if (textureSet != 0) {
 			textureSet->Create(File.m_readBuffer, Game.m_mainStage, 0, 0, 0, 0);
 		}
@@ -1793,9 +1809,7 @@ void CFlatRuntime2::loadLayer(int layerNo, char* fileName)
  */
 unsigned int CFlatRuntime2::isLoadLayerASyncCompleted(int layerNo)
 {
-	unsigned int* layerStates = reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x1778);
-	unsigned int state = layerStates[layerNo * 3];
-	return static_cast<unsigned int>(__cntlzw(state)) >> 5;
+	return static_cast<unsigned int>(__cntlzw(reinterpret_cast<int>(LayerResources(this)[layerNo].m_fileHandle))) >> 5;
 }
 
 /*
@@ -1809,31 +1823,30 @@ unsigned int CFlatRuntime2::isLoadLayerASyncCompleted(int layerNo)
  */
 void CFlatRuntime2::loadLayerASync(int layerNo, char* fileName)
 {
-	const int layerOffset = layerNo * 0xC;
-	u8* layer = reinterpret_cast<u8*>(this) + 0x1770 + layerOffset;
+	CFlatLayerResource* layer = &LayerResources(this)[layerNo];
 
-	CFile::CHandle* fileHandle = *reinterpret_cast<CFile::CHandle**>(layer + 8);
+	CFile::CHandle* fileHandle = layer->m_fileHandle;
 	if (fileHandle != 0) {
 		File.Close(fileHandle);
-		*reinterpret_cast<CFile::CHandle**>(layer + 8) = 0;
+		layer->m_fileHandle = 0;
 	}
 
-	void* textureSet = *reinterpret_cast<void**>(layer + 4);
+	void* textureSet = layer->m_textureSet;
 	if (textureSet != 0) {
 		(*(void (**)(void*, int))(*reinterpret_cast<int*>(textureSet) + 8))(textureSet, 1);
-		*reinterpret_cast<void**>(layer + 4) = 0;
+		layer->m_textureSet = 0;
 	}
 
 	char path[0x104];
 	sprintf(path, sCFlatRuntime2TexturePathFmt, Game.GetLangString(), fileName);
 
 	fileHandle = File.Open(path, 0, CFile::PRI_LOW);
-	*reinterpret_cast<CFile::CHandle**>(layer + 8) = fileHandle;
+	layer->m_fileHandle = fileHandle;
 	if (fileHandle != 0) {
 		File.ReadASync(fileHandle);
 	}
 
-	*reinterpret_cast<int*>(layer) = *reinterpret_cast<int*>(reinterpret_cast<u8*>(&CharaPcs) + 0xE4);
+	layer->m_allocStage = *reinterpret_cast<int*>(reinterpret_cast<u8*>(&CharaPcs) + 0xE4);
 }
 
 /*
@@ -1849,7 +1862,7 @@ void CFlatRuntime2::drawLayer(
 	int layerNo, char* textureName, int x, int y, int width, int height, int texU, int texV, float scaleX,
 	float scaleY, _GXColor* color, int flags)
 {
-	CTextureSet* textureSet = *reinterpret_cast<CTextureSet**>(reinterpret_cast<u8*>(this) + 0x1774 + layerNo * 0xC);
+	CTextureSet* textureSet = LayerResources(this)[layerNo].m_textureSet;
 	if (textureSet == 0) {
 		return;
 	}

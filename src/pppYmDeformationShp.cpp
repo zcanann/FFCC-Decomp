@@ -74,7 +74,6 @@ void pppSetDrawEnv(pppCVECTOR*, pppFMATRIX*, float, unsigned char, unsigned char
 
 extern "C" {
 void DisableIndWarp__F13_GXTevStageID16_GXIndTexStageID(int stage, int indStage);
-void MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(void* math, Mtx44 mtx, Vec4d* src, Vec4d* dst);
 }
 
 /*
@@ -391,7 +390,7 @@ int RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* verti
 		clipPos.y = worldPos.y;
 		clipPos.z = worldPos.z;
 		clipPos.w = one;
-		MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(&Math, ppvScreenMatrix, &clipPos, &projected[i]);
+		Math.MTX44MultVec4(ppvScreenMatrix, &clipPos, &projected[i]);
 		projected[i].x = projected[i].x / projected[i].w;
 		projected[i].y = projected[i].y / projected[i].w;
 		projected[i].z = projected[i].z / projected[i].w;

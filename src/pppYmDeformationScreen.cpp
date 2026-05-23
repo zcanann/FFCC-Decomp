@@ -82,7 +82,6 @@ void pppSetFpMatrix(_pppMngSt*);
 extern "C" {
 void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
     void*, int, float*, float*, float*, float, float*, float*);
-void MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(void*, Mtx44, Vec4d*, Vec4d*);
 
 }
 
@@ -289,7 +288,7 @@ void pppFrameYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, v
 				inVec.y = FLOAT_80330670;
 				inVec.z = -*(float*)&step->m_payloadBytes[2];
 				inVec.w = FLOAT_8033067C;
-				MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(&Math, screenMtx, &inVec, &outVec);
+				Math.MTX44MultVec4(screenMtx, &inVec, &outVec);
 				{
 					float outW = outVec.w;
 					if (outW != FLOAT_80330670) {

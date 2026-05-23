@@ -98,10 +98,6 @@ static inline Mtx44& CameraScreenMatrix()
     return *reinterpret_cast<Mtx44*>(reinterpret_cast<u8*>(&CameraPcs) + 0x48);
 }
 
-extern "C" {
-void MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(CMath* math, Mtx44 mtx, Vec4d* src, Vec4d* dst);
-}
-
 extern const char s_pppBlurChara_cpp_801DB620[] = "pppBlurChara.cpp";
 
 static inline pppBlurCharaWork* GetBlurWork(pppBlurChara* blurChara, const pppBlurCharaUnkC* data) {
@@ -264,7 +260,7 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
     inVec.y = FLOAT_80331030;
     inVec.z = -depth;
     inVec.w = FLOAT_8033103c;
-    MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(&Math, screenMtx, &inVec, &outVec);
+    Math.MTX44MultVec4(screenMtx, &inVec, &outVec);
 
     if (outVec.w != FLOAT_80331030) {
         outVec.z = outVec.z / outVec.w;

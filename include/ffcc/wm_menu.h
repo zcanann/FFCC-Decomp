@@ -8,6 +8,8 @@ class CFont;
 class CGraphic;
 class CCameraPcs;
 
+extern int gWmMenuWorkA;
+
 class McCtrl
 {
 public:

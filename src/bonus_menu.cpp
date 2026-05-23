@@ -10,9 +10,9 @@
 #include "ffcc/system.h"
 #include "ffcc/util.h"
 #include <string.h>
+#include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
+#include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
 
-extern "C" int sprintf(char*, const char*, ...);
-extern "C" int rand(void);
 extern char* PTR_s_bonus_802128c0[];
 extern char DAT_802128e4[];
 extern char s_menuSubfontPathFmt[];

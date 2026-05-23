@@ -10,8 +10,8 @@
 
 #include <math.h>
 #include <string.h>
+#include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
-extern "C" int sprintf(char*, const char*, ...);
 extern "C" void CGMonObj_ResetActionState(CGMonObj*);
 extern float FLOAT_80331dd0;
 extern const float FLOAT_80331cf8 = 0.0f;

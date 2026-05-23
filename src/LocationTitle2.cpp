@@ -10,10 +10,8 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include <string.h>
+#include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
 #include "ffcc/ppp_linkage.h"
-
-// External function declarations
-extern "C" int rand(void);
 
 static inline int GetGraphFrameFromId(s32 graphId)
 {

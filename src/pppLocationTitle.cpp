@@ -5,9 +5,8 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include <string.h>
+#include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
 #include "ffcc/ppp_linkage.h"
-
-extern "C" int rand(void);
 
 struct LocationTitleWork {
     void* m_particles;

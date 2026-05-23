@@ -3,9 +3,6 @@
 #include "ffcc/gxfunc.h"
 #include "ffcc/render_buffers.h"
 
-extern "C" double sin(double);
-extern "C" double cos(double);
-
 #include <math.h>
 #include <stdarg.h>
 #include <string.h>

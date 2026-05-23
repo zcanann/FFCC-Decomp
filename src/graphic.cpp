@@ -21,7 +21,6 @@
 
 CGraphic Graphic;
 
-extern GXRenderModeObj gDefaultGXRenderMode;
 extern "C" {
 OSThread m_thread;
 u8 m_threadStack[0x4000] ATTRIBUTE_ALIGN(8);
@@ -30,9 +29,6 @@ signed char gGraphicDrawDoneRequestInit = 0;
 int gGraphicDrawDonePartControlRequest = 0;
 signed char gGraphicDrawDonePartControlInit = 0;
 }
-
-extern "C" const char s_CGraphic_801d6330[];
-extern "C" const char s_graphic_cpp_801d6348[];
 
 enum GraphicCppStringOffset {
     kGraphicCppPartControlDoneFmt = 0x34,

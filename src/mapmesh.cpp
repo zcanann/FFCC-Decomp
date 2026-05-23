@@ -13,7 +13,7 @@ class CMaterial;
 class CMapHitFace;
 
 extern "C" CMemory::CStage* g_hit_lpface_min;
-extern "C" char s_mapmesh_cpp_801D70B0[];
+extern "C" char s_mapmesh_cpp[];
 extern "C" const float FLOAT_8032F930;
 extern "C" const float FLOAT_8032F934;
 
@@ -356,7 +356,7 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
     while (reader.GetNextChunk(chunk)) {
         switch (chunk.m_id) {
         case 0x56455254:
-            m_meshData = new (MapMeshAllocStage(), s_mapmesh_cpp_801D70B0, 0x13A) unsigned char[workSize];
+            m_meshData = new (MapMeshAllocStage(), s_mapmesh_cpp, 0x13A) unsigned char[workSize];
 
             cursor = reinterpret_cast<unsigned char*>(m_meshData);
             m_vertexCount = static_cast<unsigned short>(chunk.m_size / 0xC);
@@ -442,7 +442,7 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
         case 0x444C4844:
             m_displayListCount = static_cast<unsigned short>(chunk.m_arg0);
             if (usePreallocated != 0) {
-                m_displayListData = new (MapMeshAllocStage(), s_mapmesh_cpp_801D70B0, 0x1D5) unsigned char[workSize];
+                m_displayListData = new (MapMeshAllocStage(), s_mapmesh_cpp, 0x1D5) unsigned char[workSize];
                 cursor = reinterpret_cast<unsigned char*>(m_displayListData);
             } else {
                 cursor = reinterpret_cast<unsigned char*>(Align32(reinterpret_cast<unsigned int>(cursor)));

@@ -333,7 +333,7 @@ void COctTree::DrawTypeMeshFlag_r(COctNode* octNode)
 		env->m_stdEnvTevBit = env->m_curEnvTevBit;
 		LightPcs.SetBit32(static_cast<CLightPcs::TARGET>(1), &octNode->m_lightFlags);
 		static_cast<CMapObj*>(m_mapObject)->SetDrawEnv();
-		reinterpret_cast<CMapMesh*>(*reinterpret_cast<void**>(Ptr(m_mapObject, 0xC)))
+		static_cast<CMapMesh*>(m_mapObject->m_mapData)
 			->DrawMesh(octNode->m_meshStart,
 			           octNode->m_meshCount);
 	}
@@ -374,7 +374,7 @@ void COctTree::DrawTypeMeshFlag_r(COctNode* octNode)
 			env->m_stdEnvTevBit = env->m_curEnvTevBit;
 			LightPcs.SetBit32(static_cast<CLightPcs::TARGET>(1), &pCVar4->m_lightFlags);
 			static_cast<CMapObj*>(m_mapObject)->SetDrawEnv();
-			reinterpret_cast<CMapMesh*>(*reinterpret_cast<void**>(Ptr(m_mapObject, 0xC)))
+			static_cast<CMapMesh*>(m_mapObject->m_mapData)
 				->DrawMesh(pCVar4->m_meshStart,
 				           pCVar4->m_meshCount);
 		}
@@ -397,7 +397,7 @@ void COctTree::DrawTypeMeshFlag_r(COctNode* octNode)
 				MaterialMan.LockEnv();
 				LightPcs.SetBit32(static_cast<CLightPcs::TARGET>(1), &pCVar3->m_lightFlags);
 				static_cast<CMapObj*>(m_mapObject)->SetDrawEnv();
-				reinterpret_cast<CMapMesh*>(*reinterpret_cast<void**>(Ptr(m_mapObject, 0xC)))
+				static_cast<CMapMesh*>(m_mapObject->m_mapData)
 					->DrawMesh(pCVar3->m_meshStart,
 					           pCVar3->m_meshCount);
 			}
@@ -841,7 +841,7 @@ void COctTree::Draw(unsigned char drawType)
 			if (*reinterpret_cast<unsigned char*>(Ptr(m_mapObject, 0x27)) != 0) {
 				GXSetZMode(1, (GXCompare)3, 0);
 			}
-			reinterpret_cast<CMapMesh*>(*reinterpret_cast<void**>(Ptr(m_mapObject, 0xC)))->SetRenderArray();
+			static_cast<CMapMesh*>(m_mapObject->m_mapData)->SetRenderArray();
 			DrawTypeMeshFlag_r(m_nodePool);
 			if (*reinterpret_cast<unsigned char*>(Ptr(m_mapObject, 0x27)) != 0) {
 				GXSetZMode(1, (GXCompare)3, 1);
@@ -882,7 +882,7 @@ void COctTree::DrawCharaShadow(unsigned char drawType)
 			CameraPcs.SetOffsetZBuff(*reinterpret_cast<float*>(Ptr(m_mapObject, 0x40)));
 		}
 
-		reinterpret_cast<CMapMesh*>(*reinterpret_cast<void**>(Ptr(m_mapObject, 0xC)))->SetRenderArray();
+		static_cast<CMapMesh*>(m_mapObject->m_mapData)->SetRenderArray();
 		DrawCharaShadowTypeMeshFlag_r(m_nodePool);
 
 		float offsetZ = *reinterpret_cast<float*>(Ptr(m_mapObject, 0x40));

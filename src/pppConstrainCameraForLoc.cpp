@@ -2,6 +2,7 @@
 #include "ffcc/game.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/partMng.h"
+#include "ffcc/pppYmEnv.h"
 extern "C" {
 extern const float kPppConstrainCameraForLocZero;
 extern int gPppCalcDisabled;
@@ -16,9 +17,6 @@ static inline float CameraDirX() { return *reinterpret_cast<float*>(reinterpret_
 static inline float CameraDirY() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xF0); }
 static inline float CameraDirZ() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0xF4); }
 static inline MtxPtr CameraMatrix() { return reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x4); }
-
-extern "C" void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(pppConstrainCameraForLoc*, int, float*,
-                                                             float*, float*, float, float*, float*);
 
 /*
  * --INFO--
@@ -44,9 +42,8 @@ void pppDestructConstrainCameraForLoc(pppConstrainCameraForLoc* constrainCameraF
 		*(pppConstrainCameraForLocParams**)(modelPtr + 0xe8) = params;
 		*(void**)(modelPtr + 0xec) = (void*)CC_BeforeCalcMatrixCallback;
 
-		CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(constrainCameraForLoc, params->m_graphId, value,
-		                                             value + 1, value + 2, params->m_dataValIndex,
-		                                             &params->m_initWork, &params->m_stepValue);
+		CalcGraphValue(reinterpret_cast<_pppPObject*>(constrainCameraForLoc), params->m_graphId, value[0],
+		               value[1], value[2], params->m_dataValIndex, params->m_initWork, params->m_stepValue);
 	}
 }
 

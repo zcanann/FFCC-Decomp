@@ -79,12 +79,6 @@ extern const float FLOAT_80330690;
 
 void pppSetFpMatrix(_pppMngSt*);
 
-extern "C" {
-void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
-    void*, int, float*, float*, float*, float, float*, float*);
-
-}
-
 /*
  * --INFO--
  * PAL Address: 0x800981a8
@@ -262,12 +256,12 @@ void pppFrameYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, v
 		serializedDataOffsets = ((YmDeformationScreenData*)param3)->m_serializedDataOffsets;
 		work = (VYmDeformationScreen*)((char*)param1 + 0x80 + serializedDataOffsets[2]);
 
-		CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
-			param1, step->m_graphId, &work->m_scale, &work->m_values[0], &work->m_values[1], step->m_initWOrk,
-			&step->m_stepValue, &step->m_arg3);
-		CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
-			param1, step->m_graphId, &work->m_values[2], &work->m_values[3], &work->m_values[4], step->m_payload0,
-			&step->m_payload1, &step->m_payload2);
+		CalcGraphValue(
+			reinterpret_cast<_pppPObject*>(param1), step->m_graphId, work->m_scale, work->m_values[0],
+			work->m_values[1], step->m_initWOrk, step->m_stepValue, step->m_arg3);
+		CalcGraphValue(
+			reinterpret_cast<_pppPObject*>(param1), step->m_graphId, work->m_values[2], work->m_values[3],
+			work->m_values[4], step->m_payload0, step->m_payload1, step->m_payload2);
 
 		if (gPppInConstructor == 0) {
 			if (work->m_direction != 0) {

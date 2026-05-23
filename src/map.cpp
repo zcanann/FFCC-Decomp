@@ -33,8 +33,6 @@ extern "C" void __dt__7CMapHitFv(void*, int);
 extern "C" void __dt__7CMapObjFv(void*, int);
 extern "C" void __dt__8CMapMeshFv(void*, int);
 extern "C" void __dt__7CMapMngFv(void*, int);
-extern "C" void __dt__8CMapAnimFv(void*, int);
-extern "C" void __dt__13CMapAnimKeyDtFv(void*, int);
 extern "C" void __ct__8COctTreeFv(void*);
 extern "C" void __ct__7CMapHitFv(void*);
 extern "C" void __ct__7CMapObjFv(void*);
@@ -1525,7 +1523,7 @@ void CMapMng::DestroyMap()
     for (unsigned int i = 0; i < static_cast<unsigned int>(mapAnimArray->GetSize()); i++) {
         CMapAnim* mapAnim = (*mapAnimArray)[i];
         if (mapAnim != 0) {
-            __dt__8CMapAnimFv(mapAnim, 1);
+            delete mapAnim;
         }
     }
     mapAnimArray->RemoveAll();
@@ -1534,7 +1532,7 @@ void CMapMng::DestroyMap()
     for (unsigned int i = 0; i < static_cast<unsigned int>(mapAnimKeyDtArray->GetSize()); i++) {
         CMapAnimKeyDt* mapAnimKeyDt = (*mapAnimKeyDtArray)[i];
         if (mapAnimKeyDt != 0) {
-            __dt__13CMapAnimKeyDtFv(mapAnimKeyDt, 1);
+            delete mapAnimKeyDt;
         }
     }
     mapAnimKeyDtArray->RemoveAll();

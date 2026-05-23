@@ -25,7 +25,6 @@ inline void* operator new(unsigned long, void* p)
     return p;
 }
 
-extern "C" unsigned long UnkMaterialSetGetter(void*);
 extern "C" void __ct__10CTexScrollFv(void*);
 extern "C" void __dt__10CTexScrollFv(void*, int);
 extern float FLOAT_8032faf0;
@@ -2895,7 +2894,7 @@ void CMaterialSet::SetPartFromTextureSet(CTextureSet* textureSet, int pdtSlotInd
 
     while (textureIndex < static_cast<u32>(textureArray->GetSize())) {
         if ((*textureArray)[textureIndex] != 0) {
-            u32 materialCount = static_cast<u32>(UnkMaterialSetGetter(materialArray));
+            u32 materialCount = static_cast<u32>(materialArray->GetSize());
             u32 materialIndex = textureIndex + 1;
             if ((materialIndex < materialCount) && ((*materialArray)[materialIndex] != 0)) {
                 goto next;
@@ -2915,7 +2914,7 @@ void CMaterialSet::SetPartFromTextureSet(CTextureSet* textureSet, int pdtSlotInd
             *reinterpret_cast<unsigned short*>(material + 0x1A) = static_cast<unsigned short>(textureIndex);
             *reinterpret_cast<int*>(material + 0x9C) = pdtSlotIndex;
 
-            materialCount = static_cast<u32>(UnkMaterialSetGetter(materialArray));
+            materialCount = static_cast<u32>(materialArray->GetSize());
             if (materialIndex >= materialCount) {
                 materialArray->Add(reinterpret_cast<CMaterial*>(material));
             } else {
@@ -2968,12 +2967,11 @@ inline void CMaterial::IncNumTexture()
  */
 void CMaterialSet::ReleaseTag(CTextureSet* textureSet, int pdtSlotIndex, CAmemCacheSet* amemCacheSet)
 {
-    void* materials = Ptr(this, 8);
+    CPtrArray<CMaterial*>* materials = reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(this, 8));
     unsigned long index = 0;
 
-    while (index < UnkMaterialSetGetter(materials)) {
-        CMaterial** materialItems = *reinterpret_cast<CMaterial***>(Ptr(materials, 0xC));
-        CMaterial* material = materialItems[index];
+    while (index < static_cast<unsigned long>(materials->GetSize())) {
+        CMaterial* material = (*materials)[index];
         if ((material != 0) && (*reinterpret_cast<int*>(Ptr(material, 0x9C)) == pdtSlotIndex)) {
             int numTexture = static_cast<int>(*reinterpret_cast<unsigned short*>(Ptr(material, 0x18)));
             unsigned char* textureIndex = Ptr(material, 0x1A);
@@ -3005,7 +3003,7 @@ void CMaterialSet::ReleaseTag(CTextureSet* textureSet, int pdtSlotIndex, CAmemCa
                 void** vtable = *reinterpret_cast<void***>(material);
                 reinterpret_cast<VirtualDtorFn>(vtable[2])(material, 1);
             }
-            materialItems[index] = 0;
+            materials->SetAt(index, 0);
         }
 
         index++;
@@ -3063,7 +3061,7 @@ CMaterialSet::~CMaterialSet()
 {
     CPtrArray<CMaterial*>* const materials = reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(this, 8));
 
-    for (unsigned long i = 0; i < UnkMaterialSetGetter(materials); i++) {
+    for (unsigned long i = 0; i < static_cast<unsigned long>(materials->GetSize()); i++) {
         CMaterial* const material = (*materials)[i];
         if (material != 0) {
             delete material;
@@ -3158,7 +3156,7 @@ unsigned int CMaterialSet::FindTexName(char* textureName, long* textureIndexOut)
     CPtrArray<CMaterial*>* materials = reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(this, 8));
     unsigned int materialIndex = 0;
 
-    while (materialIndex < UnkMaterialSetGetter(materials)) {
+    while (materialIndex < static_cast<unsigned int>(materials->GetSize())) {
         CMaterial* material = (*materials)[materialIndex];
         if (material != 0) {
             CMaterial* textureSlot = material;
@@ -3248,7 +3246,7 @@ unsigned long CMaterialSet::Find(char* name)
     CPtrArray<CMaterial*>* materialArray = reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(this, 8));
     unsigned long index = 0;
 
-    while (index < UnkMaterialSetGetter(materialArray)) {
+    while (index < static_cast<unsigned long>(materialArray->GetSize())) {
         CMaterial* material = (*materialArray)[index];
         if ((material != 0) && (strcmp(reinterpret_cast<char*>(Ptr(material, 8)), name) == 0)) {
             return index;

@@ -113,7 +113,7 @@ static inline unsigned char* Ptr(void* ptr, unsigned int offset)
 
 static inline CMapObj* GetMapObjByIndex(unsigned short index)
 {
-    return MapMng.GetMapObjArray() + index;
+    return reinterpret_cast<CMapObj*>(reinterpret_cast<unsigned char*>(&MapMng) + 0x954 + (index * sizeof(CMapObj)));
 }
 
 }
@@ -684,13 +684,12 @@ void COctTree::DrawTypeMeshFrustumIn_r(COctNode* octNode)
  */
 void COctTree::DrawTypeMesh_r(COctNode* octNode)
 {
-	float localX = m_localPosX;
 	unsigned char andMask;
 	unsigned char orMask;
 	int farCount;
 
-	if ((localX <= octNode->m_boundMaxX) && (m_localPosY <= octNode->m_boundMaxY) &&
-	    (m_localPosZ <= octNode->m_boundMaxZ) && (localX >= octNode->m_boundMinX) &&
+	if ((m_localPosX <= octNode->m_boundMaxX) && (m_localPosY <= octNode->m_boundMaxY) &&
+	    (m_localPosZ <= octNode->m_boundMaxZ) && (m_localPosX >= octNode->m_boundMinX) &&
 	    (m_localPosY >= octNode->m_boundMinY) && (m_localPosZ >= octNode->m_boundMinZ)) {
 		orMask = 0xF;
 	} else {

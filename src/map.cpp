@@ -3179,27 +3179,27 @@ void CMapMng::SetMeshCameraSemiTransRange(unsigned short id, float nearRange, fl
                                           float maxAlpha, float fadeRange)
 {
     int found = 0;
-    unsigned char* mapObj = reinterpret_cast<unsigned char*>(this);
+    CMapObj* mapObj = GetMapObjArray();
 
     for (int i = 0; i < m_mapObjCount; i++) {
-        if (*reinterpret_cast<unsigned short*>(mapObj + 0x988) == id) {
-            *reinterpret_cast<float*>(mapObj + 0x998) = nearRange;
-            *reinterpret_cast<float*>(mapObj + 0x99C) = farRange;
-            *reinterpret_cast<float*>(mapObj + 0x9A8) = fadeRange;
-            *reinterpret_cast<float*>(mapObj + 0x9A0) = minAlpha;
-            *reinterpret_cast<float*>(mapObj + 0x9A4) = maxAlpha;
-            if (*reinterpret_cast<void**>(mapObj + 0x960) != 0 && *reinterpret_cast<signed char*>(mapObj + 0x973) != -1) {
-                *reinterpret_cast<float*>(mapObj + 0x9A0) = FLOAT_8032f988;
-                *reinterpret_cast<float*>(mapObj + 0x9A4) = FLOAT_8032f98c;
-                *reinterpret_cast<unsigned char*>(mapObj + 0x969) = 2;
-                *reinterpret_cast<unsigned char*>(mapObj + 0x97A) = 1;
+        if (mapObj->m_meshId == id) {
+            *reinterpret_cast<float*>(Ptr(mapObj, 0x44)) = nearRange;
+            *reinterpret_cast<float*>(Ptr(mapObj, 0x48)) = farRange;
+            *reinterpret_cast<float*>(Ptr(mapObj, 0x54)) = fadeRange;
+            *reinterpret_cast<float*>(Ptr(mapObj, 0x4C)) = minAlpha;
+            *reinterpret_cast<float*>(Ptr(mapObj, 0x50)) = maxAlpha;
+            if (mapObj->m_mapData != 0 && *reinterpret_cast<signed char*>(Ptr(mapObj, 0x1F)) != -1) {
+                *reinterpret_cast<float*>(Ptr(mapObj, 0x4C)) = FLOAT_8032f988;
+                *reinterpret_cast<float*>(Ptr(mapObj, 0x50)) = FLOAT_8032f98c;
+                *reinterpret_cast<unsigned char*>(Ptr(mapObj, 0x15)) = 2;
+                *reinterpret_cast<unsigned char*>(Ptr(mapObj, 0x26)) = 1;
             }
-            *reinterpret_cast<short*>(mapObj + 0x97E) = 0x4000;
+            *reinterpret_cast<short*>(Ptr(mapObj, 0x2A)) = 0x4000;
             found = 1;
-            *reinterpret_cast<short*>(mapObj + 0x97C) = 0x4000;
-            *reinterpret_cast<short*>(mapObj + 0x980) = 0;
+            *reinterpret_cast<short*>(Ptr(mapObj, 0x28)) = 0x4000;
+            *reinterpret_cast<short*>(Ptr(mapObj, 0x2C)) = 0;
         }
-        mapObj += 0xF0;
+        mapObj++;
     }
 
     if (!found) {
@@ -3230,18 +3230,18 @@ void CMapMng::SetMeshCameraSemiTransRange(unsigned short id, float nearRange, fl
 void CMapMng::SetMeshCameraSemiTransAlpha(unsigned short id, int alpha, int frameCount)
 {
     int found = 0;
-    unsigned char* mapObj = reinterpret_cast<unsigned char*>(this);
+    CMapObj* mapObj = GetMapObjArray();
 
     for (int i = 0; i < m_mapObjCount; i++) {
-        if (*reinterpret_cast<unsigned short*>(mapObj + 0x988) == id) {
-            *reinterpret_cast<short*>(mapObj + 0x97E) = static_cast<short>(alpha << 7);
+        if (mapObj->m_meshId == id) {
+            *reinterpret_cast<short*>(Ptr(mapObj, 0x2A)) = static_cast<short>(alpha << 7);
             found = 1;
-            *reinterpret_cast<short*>(mapObj + 0x980) = static_cast<short>(
-                (static_cast<int>(*reinterpret_cast<short*>(mapObj + 0x97E)) -
-                 static_cast<int>(*reinterpret_cast<short*>(mapObj + 0x97C))) /
+            *reinterpret_cast<short*>(Ptr(mapObj, 0x2C)) = static_cast<short>(
+                (static_cast<int>(*reinterpret_cast<short*>(Ptr(mapObj, 0x2A))) -
+                 static_cast<int>(*reinterpret_cast<short*>(Ptr(mapObj, 0x28)))) /
                 frameCount);
         }
-        mapObj += 0xF0;
+        mapObj++;
     }
 
     if (!found) {
@@ -3267,15 +3267,15 @@ void CMapMng::SetMeshCameraSemiTransAlpha(unsigned short id, int alpha, int fram
  */
 int CMapMng::GetMapObjIdx(unsigned short id)
 {
-    int objCount = *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(this) + 0xC);
+    int objCount = m_mapObjCount;
     int objIndex = 0;
-    unsigned char* mapObj = reinterpret_cast<unsigned char*>(this);
+    CMapObj* mapObj = GetMapObjArray();
 
     while (0 < objCount) {
-        if (*reinterpret_cast<unsigned short*>(mapObj + 0x982) == id) {
+        if (mapObj->m_objId == id) {
             return objIndex;
         }
-        mapObj += 0xF0;
+        mapObj++;
         objIndex++;
         objCount--;
     }
@@ -3465,21 +3465,17 @@ void CMapMng::ShowMapObj(int, int)
  */
 void CMapMng::ShowMapObjID(int id, int show)
 {
-    CMapMng* mapMng = this;
+    CMapObj* mapObj = GetMapObjArray();
 
-    for (int i = 0; i < *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(this) + 0xC); i++) {
-        unsigned char* mapObj = reinterpret_cast<unsigned char*>(mapMng);
-
-        if (*reinterpret_cast<unsigned short*>(mapObj + 0x982) == id) {
+    for (int i = 0; i < m_mapObjCount; i++) {
+        if (mapObj->m_objId == id) {
             if (show != 0) {
-                *reinterpret_cast<unsigned char*>(mapObj + 0x96C) =
-                    static_cast<unsigned char>(*reinterpret_cast<unsigned char*>(mapObj + 0x96C) | 1);
+                mapObj->m_showFlags = static_cast<unsigned char>(mapObj->m_showFlags | 1);
             } else {
-                *reinterpret_cast<unsigned char*>(mapObj + 0x96C) =
-                    static_cast<unsigned char>(*reinterpret_cast<unsigned char*>(mapObj + 0x96C) & 0xFE);
+                mapObj->m_showFlags = static_cast<unsigned char>(mapObj->m_showFlags & 0xFE);
             }
         }
-        mapMng = reinterpret_cast<CMapMng*>(reinterpret_cast<unsigned char*>(mapMng) + 0xF0);
+        mapObj++;
     }
 }
 
@@ -3504,13 +3500,13 @@ void CMapMng::ShowMapObjChild(int, int)
  */
 void CMapMng::ShowMapObjChildID(int id, int show)
 {
-    CMapMng* mapMng = this;
+    CMapObj* mapObj = GetMapObjArray();
 
-    for (int i = 0; i < *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(this) + 0xC); i++) {
-        if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(mapMng) + 0x982) == id) {
-            reinterpret_cast<CMapObj*>(reinterpret_cast<unsigned char*>(mapMng) + 0x954)->SetShow(show);
+    for (int i = 0; i < m_mapObjCount; i++) {
+        if (mapObj->m_objId == id) {
+            mapObj->SetShow(show);
         }
-        mapMng = reinterpret_cast<CMapMng*>(reinterpret_cast<unsigned char*>(mapMng) + 0xF0);
+        mapObj++;
     }
 }
 
@@ -3521,21 +3517,17 @@ void CMapMng::ShowMapObjChildID(int id, int show)
  */
 void CMapMng::ShowMapMeshID(int id, int show)
 {
-    CMapMng* mapMng = this;
+    CMapObj* mapObj = GetMapObjArray();
 
-    for (int i = 0; i < *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(this) + 0xC); i++) {
-        unsigned char* mapObj = reinterpret_cast<unsigned char*>(mapMng);
-
-        if (*reinterpret_cast<unsigned short*>(mapObj + 0x988) == id) {
+    for (int i = 0; i < m_mapObjCount; i++) {
+        if (mapObj->m_meshId == id) {
             if (show != 0) {
-                *reinterpret_cast<unsigned char*>(mapObj + 0x96C) =
-                    static_cast<unsigned char>(*reinterpret_cast<unsigned char*>(mapObj + 0x96C) | 1);
+                mapObj->m_showFlags = static_cast<unsigned char>(mapObj->m_showFlags | 1);
             } else {
-                *reinterpret_cast<unsigned char*>(mapObj + 0x96C) =
-                    static_cast<unsigned char>(*reinterpret_cast<unsigned char*>(mapObj + 0x96C) & 0xFE);
+                mapObj->m_showFlags = static_cast<unsigned char>(mapObj->m_showFlags & 0xFE);
             }
         }
-        mapMng = reinterpret_cast<CMapMng*>(reinterpret_cast<unsigned char*>(mapMng) + 0xF0);
+        mapObj++;
     }
 }
 
@@ -3579,14 +3571,14 @@ void CMapMng::SetDrawRangeOctTree(float drawRange)
 void CMapMng::SetMapObjWorldMapLightID(int id, _GXColor color, Vec position)
 {
     int objIndex = 0;
-    int numMapObj = *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(this) + 0xC);
-    unsigned char* scan = reinterpret_cast<unsigned char*>(this);
+    int numMapObj = m_mapObjCount;
+    CMapObj* scan = GetMapObjArray();
 
     while (0 < numMapObj) {
-        if (*reinterpret_cast<unsigned short*>(scan + 0x982) == static_cast<unsigned short>(id)) {
+        if (scan->m_objId == static_cast<unsigned short>(id)) {
             goto found;
         }
-        scan += 0xF0;
+        scan++;
         objIndex++;
         numMapObj--;
     }
@@ -3597,7 +3589,7 @@ found:
     const float posX = position.x;
     const float posY = position.y;
     const float posZ = position.z;
-    unsigned char* mapObj = reinterpret_cast<unsigned char*>(this) + (objIndex * 0xF0) + 0x954;
+    unsigned char* mapObj = reinterpret_cast<unsigned char*>(GetMapObjArray() + objIndex);
     unsigned char* mapObjLight = *reinterpret_cast<unsigned char**>(mapObj + 0xEC);
 
     if (*reinterpret_cast<int*>(mapObjLight + 4) == CMapObjAtr::SPOT_LIGHT) {
@@ -3625,7 +3617,7 @@ found:
  */
 void CMapMng::SetMapObjTransRate(int mapObjIndex, float x, float y, float z)
 {
-    unsigned char* mapObj = reinterpret_cast<unsigned char*>(this) + (mapObjIndex * 0xF0) + 0x954;
+    unsigned char* mapObj = reinterpret_cast<unsigned char*>(GetMapObjArray() + mapObjIndex);
     *reinterpret_cast<float*>(mapObj + 0x58) = x;
     *reinterpret_cast<float*>(mapObj + 0x5C) = y;
     *reinterpret_cast<float*>(mapObj + 0x60) = z;
@@ -3642,15 +3634,15 @@ void CMapMng::SetMapObjTransRate(int mapObjIndex, float x, float y, float z)
  */
 void CMapMng::SetMapObjPrioID(int id, unsigned char prio)
 {
-    unsigned char* mapObj = reinterpret_cast<unsigned char*>(this);
+    CMapObj* mapObj = GetMapObjArray();
     int i = 0;
 
-    while (i < *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(this) + 0xC)) {
-        if (static_cast<int>(*reinterpret_cast<unsigned short*>(mapObj + 0x982)) == id) {
-            *reinterpret_cast<unsigned char*>(mapObj + 0x969) = prio;
-            *reinterpret_cast<unsigned char*>(mapObj + 0x968) = prio;
+    while (i < m_mapObjCount) {
+        if (static_cast<int>(mapObj->m_objId) == id) {
+            *reinterpret_cast<unsigned char*>(Ptr(mapObj, 0x15)) = prio;
+            *reinterpret_cast<unsigned char*>(Ptr(mapObj, 0x14)) = prio;
         }
-        mapObj += 0xF0;
+        mapObj++;
         i++;
     }
 }

@@ -11,7 +11,7 @@
 
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
-#include "Runtime.PPCEABI.H/runtime.h"
+#include "PowerPC_EABI_Support/Runtime/runtime.h"
 #include "ffcc/ppp_linkage.h"
 
 extern int __float_nan[];

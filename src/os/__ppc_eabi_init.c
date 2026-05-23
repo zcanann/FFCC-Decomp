@@ -1,7 +1,5 @@
 #include "dolphin/base/PPCArch.h"
-#include "Runtime.PPCEABI.H/runtime.h"
-
-void __init_cpp(void);
+#include "PowerPC_EABI_Support/Runtime/runtime.h"
 
 /*
  * --INFO--

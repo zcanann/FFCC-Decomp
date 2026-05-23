@@ -1,5 +1,5 @@
 #include "ffcc/stopwatch.h"
-#include <Runtime.PPCEABI.H/runtime.h>
+#include <PowerPC_EABI_Support/Runtime/runtime.h>
 
 static const float s_stopwatchScale = 100.0f;
 

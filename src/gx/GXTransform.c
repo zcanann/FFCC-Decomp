@@ -3,7 +3,7 @@
 #include <dolphin/os.h>
 
 #include "dolphin/gx/__gx.h"
-#include "Runtime.PPCEABI.H/runtime.h"
+#include "PowerPC_EABI_Support/Runtime/runtime.h"
 
 /*
  * --INFO--

@@ -11,7 +11,7 @@
 #include <dolphin/mtx.h>
 #include <math.h>
 #include <string.h>
-#include "Runtime.PPCEABI.H/runtime.h"
+#include "PowerPC_EABI_Support/Runtime/runtime.h"
 #include "ffcc/ppp_linkage.h"
 
 extern const float FLOAT_80330FD4;

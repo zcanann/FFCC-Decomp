@@ -11,7 +11,7 @@ extern int gPppCalcDisabled;
 #include <dolphin/gx.h>
 #include <dolphin/gx/GXCpu2Efb.h>
 #include <dolphin/mtx.h>
-#include "Runtime.PPCEABI.H/runtime.h"
+#include "PowerPC_EABI_Support/Runtime/runtime.h"
 
 struct LensFlareWork {
     u8 _pad00[0x10];

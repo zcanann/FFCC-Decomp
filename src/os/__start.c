@@ -3,9 +3,9 @@
 #include "__ppc_eabi_linker.h"
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/abort_exit.h"
 #include "PowerPC_EABI_Support/MetroTRK/trk_init.h"
+#include "PowerPC_EABI_Support/Runtime/runtime.h"
 
 extern int main(int argc, char* argv[]);
-extern void __init_user(void);
 
 SECTION_INIT extern void __check_pad3(void);
 SECTION_INIT extern void __set_debug_bba(void);

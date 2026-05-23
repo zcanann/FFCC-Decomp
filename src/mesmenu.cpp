@@ -118,7 +118,7 @@ void CMesMenu::CloseRequest(int closeReason)
             m_mes.Set(0, 0);
             stack[0].m_word = *(int*)((char*)this + 0x18);
             stack[1].m_word = *(int*)((char*)this + 0x3DA4);
-            reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(0, 1, 3, 2, stack, 0);
+            gCFlatRuntime().SystemCall(0, 1, 3, 2, stack, 0);
             *(int*)((char*)this + 0x0C) = 4;
             *(int*)((char*)this + 0x08) = 0;
             if (*(int*)((char*)this + 0x18) < 4) {
@@ -1070,7 +1070,7 @@ void CMesMenu::onCalc()
                                 m_mes.Set(0, 0);
                                 stack[0].m_word = *(int*)((char*)this + 0x18);
                                 stack[1].m_word = *(int*)((char*)this + 0x3DA4);
-                                reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(0, 1, 3, 2, stack, 0);
+                                gCFlatRuntime().SystemCall(0, 1, 3, 2, stack, 0);
                                 *(int*)((char*)this + 0x0C) = 4;
                                 *(int*)((char*)this + 0x08) = 0;
                                 if (*(int*)((char*)this + 0x18) < 4) {
@@ -1110,7 +1110,7 @@ void CMesMenu::onCalc()
             m_mes.Set(0, 0);
             stack[0].m_word = *(int*)((char*)this + 0x18);
             stack[1].m_word = *(int*)((char*)this + 0x3DA4);
-            reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(0, 1, 3, 2, stack, 0);
+            gCFlatRuntime().SystemCall(0, 1, 3, 2, stack, 0);
             *(int*)((char*)this + 0x0C) = 4;
             *(int*)((char*)this + 0x08) = 0;
             if (*(int*)((char*)this + 0x18) < 4) {

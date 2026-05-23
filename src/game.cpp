@@ -1121,9 +1121,9 @@ void CGame::SaveScript(char* scriptData)
     int entryOffset = 0;
     int i = 0;
 
-    while (i < *(int*)(CFlat + 4)) {
-        if ((*(u8*)(*(int*)(CFlat + 8) + entryOffset + 1) & 0x20) != 0) {
-            *(u32*)(scriptData + scriptOffset) = *(u32*)(*(int*)(CFlat + 12) + entryOffset);
+    while (i < CFlatPermanentVarCount()) {
+        if ((CFlatPermanentVarDefs()[entryOffset + 1] & 0x20) != 0) {
+            *(u32*)(scriptData + scriptOffset) = *reinterpret_cast<u32*>(CFlatPermanentVarValues() + entryOffset);
             scriptOffset += 4;
         }
 

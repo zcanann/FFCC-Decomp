@@ -1872,7 +1872,7 @@ void CGCharaObj::addHp(int delta, CGPrgObj* sourceObj)
 				int stackArgs[2];
 				stackArgs[0] = -1;
 				stackArgs[1] = 0;
-				reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(
+				gCFlatRuntime().SystemCall(
 					reinterpret_cast<CFlatRuntime::CObject*>(this), 2, 0x14, 2,
 					reinterpret_cast<CFlatRuntime::CStack*>(stackArgs), 0);
 			}
@@ -2994,7 +2994,7 @@ void CGCharaObj::sendCombiToScript(CGCharaObj* target, int scriptArg, int)
 		int stackArgs[2];
 		stackArgs[0] = reinterpret_cast<int>(target);
 		stackArgs[1] = scriptArg;
-		reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(
+		gCFlatRuntime().SystemCall(
 			reinterpret_cast<CFlatRuntime::CObject*>(this), 2, 0x17, 2,
 			reinterpret_cast<CFlatRuntime::CStack*>(stackArgs), 0);
 	}

@@ -890,7 +890,7 @@ void CGPartyObj::command()
 			stack[0].m_word = primaryCommand;
 			stack[1].m_word = scriptTarget != nullptr ?
 				*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(scriptTarget) + 0x30) : 0;
-			reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(this, 2, 0x14, 2, stack, 0);
+			gCFlatRuntime().SystemCall(this, 2, 0x14, 2, stack, 0);
 			return;
 		}
 

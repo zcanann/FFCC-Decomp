@@ -2216,7 +2216,7 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         outResult = 0;
         return;
     case -0xCD:
-        reinterpret_cast<CFlatRuntime*>(CFlat)->ClearParmanent();
+        gCFlatRuntime().ClearParmanent();
         runtime->push(object, 0);
         outResult = 0;
         return;
@@ -2771,8 +2771,7 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         outResult = 0;
         return;
     case -0x82:
-        *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x10408) =
-            static_cast<unsigned int>(*object->m_localBase);
+        CFlatLetterEventEnabled() = static_cast<unsigned int>(*object->m_localBase);
         runtime->push(object, 0);
         outResult = 0;
         return;

@@ -1383,7 +1383,7 @@ void CChara::CModel::MogFurFrame(CGObject* object)
 		stack[0].m_word = 2;
 		stack[1].m_word = 0;
 		stack[2].m_word = 0;
-		reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(0, 1, 9, 3, stack, 0);
+		gCFlatRuntime().SystemCall(0, 1, 9, 3, stack, 0);
 	}
 
 	OpenMogHintMessage(messageId);

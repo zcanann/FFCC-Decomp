@@ -692,7 +692,7 @@ void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 		stack[0].m_word = 3;
 		stack[1].m_word = static_cast<unsigned int>((-carryState | carryState) >> 0x1F);
 		stack[2].m_word = 0;
-		reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(0, 1, 9, 3, stack, 0);
+		gCFlatRuntime().SystemCall(0, 1, 9, 3, stack, 0);
 	}
 }
 
@@ -733,7 +733,7 @@ CGPrgObj* CGItemObj::CreateFromScript(
 		}
 
 		if (bestItemObj != 0) {
-			reinterpret_cast<CFlatRuntime*>(CFlat)->deleteObject(reinterpret_cast<CFlatRuntime::CObject*>(bestItemObj));
+			gCFlatRuntime().deleteObject(reinterpret_cast<CFlatRuntime::CObject*>(bestItemObj));
 			deletedCount = 1;
 		} else {
 			if (2U < (unsigned int)System.m_execParam) {
@@ -758,7 +758,7 @@ CGPrgObj* CGItemObj::CreateFromScript(
 	inStack[2].m_word = scriptArg;
 	inStack[3].m_word = owner != 0 ? owner->m_particleId : 0;
 	*reinterpret_cast<float*>(&inStack[4].m_word) = launchAngle;
-	reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(0, 1, 7, 5, inStack, &outStack);
+	gCFlatRuntime().SystemCall(0, 1, 7, 5, inStack, &outStack);
 
 	CGPrgObj* newItem = 0;
 	if (createMode != 1) {
@@ -878,7 +878,7 @@ int CGItemObj::DeleteOld(int deleteMask, int maxDeleteCount, CFlatRuntime::CObje
 		}
 
 		if (bestItemObj != 0) {
-			reinterpret_cast<CFlatRuntime*>(CFlat)->deleteObject(reinterpret_cast<CFlatRuntime::CObject*>(bestItemObj));
+			gCFlatRuntime().deleteObject(reinterpret_cast<CFlatRuntime::CObject*>(bestItemObj));
 		} else {
 			if ((unsigned int)System.m_execParam >= 3U) {
 				System.Printf(const_cast<char*>(DAT_801dced4));
@@ -1248,7 +1248,7 @@ void CGItemObj::onFrameStat()
 
 				CFlatRuntime::CStack stack;
 				stack.m_word = 1;
-				reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(
+				gCFlatRuntime().SystemCall(
 				    *reinterpret_cast<CFlatRuntime::CObject**>(self + 0x550), 2, 0x16, 1, &stack, 0);
 			}
 
@@ -1286,7 +1286,7 @@ void CGItemObj::onFrameStat()
 			CFlatRuntime::CStack stack;
 			stack.m_word = 0;
 			*(int*)(m_boss__8CGMonObj + ownerSlot * 4 + 8) = 0;
-			reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(
+			gCFlatRuntime().SystemCall(
 			    *reinterpret_cast<CFlatRuntime::CObject**>(self + 0x550), 2, 0x16, 1, &stack, 0);
 
 			self[0x38] = static_cast<unsigned char>(__rlwimi(self[0x38], 1, 7, 24, 24));

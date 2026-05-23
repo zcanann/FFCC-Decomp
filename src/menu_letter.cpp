@@ -1756,7 +1756,7 @@ int CMenuPcs::LetterCtrlCur()
 					return 0;
 				}
 
-				if ((*reinterpret_cast<int*>(CFlat + 0x10408) != 0) &&
+				if ((CFlatLetterEventEnabled() != 0) &&
 				    (((*reinterpret_cast<u8*>(entry + 0x3EC) >> 4) & 1) != 0) &&
 				    (((*reinterpret_cast<u8*>(entry + 0x3EC) >> 5) & 1) == 0)) {
 					*reinterpret_cast<u8*>(state + 8) = 2;
@@ -1805,7 +1805,7 @@ int CMenuPcs::LetterCtrlCur()
 					return 0;
 				}
 				u8 letterFlags = *reinterpret_cast<u8*>(caravanWork + s_SelLetter * 0xC + 0x3EC);
-				if ((*reinterpret_cast<int*>(CFlat + 0x10408) == 0) || (((letterFlags >> 4) & 1) == 0) ||
+				if ((CFlatLetterEventEnabled() == 0) || (((letterFlags >> 4) & 1) == 0) ||
 				    (((letterFlags >> 5) & 1) != 0)) {
 					*reinterpret_cast<u8*>(state + 8) = 0xFF;
 				} else {
@@ -1831,7 +1831,7 @@ int CMenuPcs::LetterCtrlCur()
 				}
 
 				u8 letterFlags = *reinterpret_cast<u8*>(caravanWork + s_SelLetter * 0xC + 0x3EC);
-				if ((*reinterpret_cast<int*>(CFlat + 0x10408) == 0) || (((letterFlags >> 4) & 1) == 0) ||
+				if ((CFlatLetterEventEnabled() == 0) || (((letterFlags >> 4) & 1) == 0) ||
 				    (((letterFlags >> 5) & 1) != 0)) {
 					*reinterpret_cast<u8*>(state + 8) = 0xFF;
 				} else {

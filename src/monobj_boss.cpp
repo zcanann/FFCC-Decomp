@@ -1285,7 +1285,7 @@ void CGMonObj::frameStatFuncLich()
 			chara->statAttack();
 			if (prgObj->m_stateFrame == 0x29) {
 				CFlatRuntime::CStack stack[3] = {{10}, {1}, {0}};
-				reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(0, 1, 9, 3, stack, 0);
+				gCFlatRuntime().SystemCall(0, 1, 9, 3, stack, 0);
 			}
 		}
 	} else if (stat < 0x65 && stat > 99) {
@@ -1394,7 +1394,7 @@ void CGMonObj::frameStatFuncTetsukyojin()
 				stack[0].m_word = 10;
 				stack[1].m_word = 0;
 				stack[2].m_word = 0;
-				reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(0, 1, 9, 3, stack, 0);
+				gCFlatRuntime().SystemCall(0, 1, 9, 3, stack, 0);
 			}
 
 			if (CFlatBossSubState() == 0) {

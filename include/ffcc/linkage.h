@@ -93,6 +93,21 @@ static inline CFlatRuntime2& CFlatRuntime2Storage()
     return *reinterpret_cast<CFlatRuntime2*>(CFlat);
 }
 
+static inline int& CFlatPermanentVarCount()
+{
+    return *reinterpret_cast<int*>(CFlat + 0x4);
+}
+
+static inline unsigned char*& CFlatPermanentVarDefs()
+{
+    return *reinterpret_cast<unsigned char**>(CFlat + 0x8);
+}
+
+static inline unsigned char*& CFlatPermanentVarValues()
+{
+    return *reinterpret_cast<unsigned char**>(CFlat + 0xC);
+}
+
 static inline u32& CFlatEventFlags()
 {
     return *reinterpret_cast<u32*>(CFlat + 0x12A0);
@@ -138,9 +153,24 @@ static inline int& CFlatBossSubState()
     return *reinterpret_cast<int*>(CFlat + 0x12EC);
 }
 
+static inline u32& CFlatSpawnBitLo(int index)
+{
+    return *reinterpret_cast<u32*>(CFlat + 0x12F0 + index * 8);
+}
+
+static inline u32& CFlatSpawnBitHi(int index)
+{
+    return *reinterpret_cast<u32*>(CFlat + 0x12F4 + index * 8);
+}
+
 static inline int& CFlatItemCarryMode()
 {
     return *reinterpret_cast<int*>(CFlat + 0x4780);
+}
+
+static inline int& CFlatLetterEventEnabled()
+{
+    return *reinterpret_cast<int*>(CFlat + 0x10408);
 }
 
 static inline int& CFlatItemTraceParticleSlot()

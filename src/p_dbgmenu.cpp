@@ -215,7 +215,7 @@ void CDbgMenuPcs::calc()
 			flags = ((int)(char)(flags >> 5) & 1U) << 7 | (CFlatGameFlags() & ~CFlatGameFlag_Shouki);
 			CFlatGameFlags() = (unsigned char)flags;
 			stackData[1].m_word = (int)(flags << 0x18) >> 0x1f;
-			reinterpret_cast<CFlatRuntime*>(CFlat)->SystemCall(0, 1, 9, 3, stackData, 0);
+			gCFlatRuntime().SystemCall(0, 1, 9, 3, stackData, 0);
 			break;
 		case 0x66:
 			flags = (unsigned int)__cntlzw((int)(char)((int)((unsigned int)(unsigned char)CFlatGameFlags() << 0x1d) >> 0x1f));

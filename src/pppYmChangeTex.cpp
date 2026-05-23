@@ -5,6 +5,7 @@
 #include "ffcc/mapmesh.h"
 #include "ffcc/materialman.h"
 #include "ffcc/pppPart.h"
+#include "ffcc/pppYmEnv.h"
 #include "ffcc/util.h"
 #include <string.h>
 #include <dolphin/os/OSCache.h>
@@ -99,15 +100,6 @@ STATIC_ASSERT(offsetof(ChangeTexModelData, m_frameShift) == 0x34);
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
 static inline float ChangeTexConst(const float& value) { return *reinterpret_cast<const float*>(&value); }
 
-CChara::CModel* GetCharaModelPtr(CCharaPcs::CHandle*);
-CCharaPcs::CHandle* GetCharaHandlePtr(CGObject*, long);
-
-extern "C" {
-	void* GetCharaHandlePtr__FP8CGObjectl(void*, long);
-	int GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void*);
-	void* GetTextureFromRSD__FiP9_pppEnvSt(int, _pppEnvSt*);
-}
-
 /*
  * --INFO--
  * PAL Address: 0x800d3854
@@ -156,7 +148,7 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 	model0Raw->m_step = step;
 	model0Raw->m_drawMeshDlCallback = ChangeTex_DrawMeshDLCallback;
 	model0Raw->m_afterDrawMeshCallback = ChangeTex_AfterDrawMeshCallback;
-	state->m_texture = GetTextureFromRSD__FiP9_pppEnvSt(step->m_dataValIndex, pppEnvStPtr);
+	state->m_texture = reinterpret_cast<void*>(GetTextureFromRSD(step->m_dataValIndex, pppEnvStPtr));
 
 	CCharaPcs::CHandle* handle1 = GetCharaHandlePtr(state->m_charaObj, 1);
 	CCharaPcs::CHandle* handle2 = GetCharaHandlePtr(state->m_charaObj, 2);
@@ -189,7 +181,7 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 		state->m_value2 = state->m_value2 + step->m_arg3;
 	}
 
-	void* texObj = GetTextureFromRSD__FiP9_pppEnvSt(step->m_dataValIndex, pppEnvStPtr);
+	void* texObj = reinterpret_cast<void*>(GetTextureFromRSD(step->m_dataValIndex, pppEnvStPtr));
 	if (texObj == 0) {
 		return;
 	}
@@ -301,13 +293,13 @@ void pppDestructYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexData* dat
 {
 	pppYmChangeTexState* state =
 	    (pppYmChangeTexState*)(ymChangeTex->m_object.m_workArea + data->m_serializedDataOffsets[2]);
-	void* handle0 = GetCharaHandlePtr__FP8CGObjectl(state->m_charaObj, 0);
-	void* handle1 = GetCharaHandlePtr__FP8CGObjectl(state->m_charaObj, 1);
-	void* handle2 = GetCharaHandlePtr__FP8CGObjectl(state->m_charaObj, 2);
+	CCharaPcs::CHandle* handle0 = GetCharaHandlePtr(state->m_charaObj, 0);
+	CCharaPcs::CHandle* handle1 = GetCharaHandlePtr(state->m_charaObj, 1);
+	CCharaPcs::CHandle* handle2 = GetCharaHandlePtr(state->m_charaObj, 2);
 	ChangeTexModelRaw* model = 0;
 
 	if (handle0 != 0) {
-		model = (ChangeTexModelRaw*)GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle0);
+		model = reinterpret_cast<ChangeTexModelRaw*>(GetCharaModelPtr(handle0));
 		model->m_state = 0;
 		model->m_step = 0;
 		model->m_beforeDrawCallback = 0;
@@ -315,7 +307,7 @@ void pppDestructYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexData* dat
 		model->m_afterDrawMeshCallback = 0;
 	}
 	ChangeTexModelRaw* model1;
-	if ((handle1 != 0) && ((model1 = (ChangeTexModelRaw*)GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle1)), model1 != 0)) {
+	if ((handle1 != 0) && ((model1 = reinterpret_cast<ChangeTexModelRaw*>(GetCharaModelPtr(handle1))), model1 != 0)) {
 		model1->m_state = 0;
 		model1->m_step = 0;
 		model1->m_beforeDrawCallback = 0;
@@ -323,7 +315,7 @@ void pppDestructYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexData* dat
 		model1->m_afterDrawMeshCallback = 0;
 	}
 	ChangeTexModelRaw* model2;
-	if ((handle2 != 0) && ((model2 = (ChangeTexModelRaw*)GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle2)), model2 != 0)) {
+	if ((handle2 != 0) && ((model2 = reinterpret_cast<ChangeTexModelRaw*>(GetCharaModelPtr(handle2))), model2 != 0)) {
 		model2->m_state = 0;
 		model2->m_step = 0;
 		model2->m_beforeDrawCallback = 0;

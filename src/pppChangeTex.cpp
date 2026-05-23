@@ -4,6 +4,7 @@
 #include "ffcc/gxfunc.h"
 #include "ffcc/linkage.h"
 #include "ffcc/pppPart.h"
+#include "ffcc/pppYmEnv.h"
 extern "C" {
 extern const float kPppChangeTexInit;
 extern int gPppCalcDisabled;
@@ -111,17 +112,8 @@ static inline float LoadFloat(const float& value)
 }
 
 void pppInitBlendMode(void);
-CChara::CModel* GetCharaModelPtr(CCharaPcs::CHandle*);
-CCharaPcs::CHandle* GetCharaHandlePtr(CGObject*, long);
 static void ChangeTex_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*)[4]);
 static void ChangeTex_AfterDrawMeshCallback(CChara::CModel*, void*, void*, int, float (*)[4]);
-
-extern "C" {
-		void* GetCharaHandlePtr__FP8CGObjectl(void* obj, long index);
-		int GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void* handle);
-		void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(_pppPObject*, long, float&, float&, float&, float, float&, float&);
-		void* GetTextureFromRSD__FiP9_pppEnvSt(int, _pppEnvSt*);
-}
 
 /*
  * --INFO--
@@ -168,7 +160,7 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 	CChara::CModel* model0 = GetCharaModelPtr(handle0);
 	ChangeTexModelRaw* model0Raw = (ChangeTexModelRaw*)model0;
 
-	CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
+	CalcGraphValue(
 	    &changeTex->m_object, step->m_graphId, work->m_value0, work->m_value1, work->m_value2, step->m_initWOrk,
 	    step->m_stepValue, step->m_arg3);
 
@@ -179,7 +171,7 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 	model0Raw->m_drawMeshDlCallback = ChangeTex_DrawMeshDLCallback;
 	model0Raw->m_afterDrawMeshCallback = ChangeTex_AfterDrawMeshCallback;
 
-	work->m_texture = GetTextureFromRSD__FiP9_pppEnvSt(step->m_dataValIndex, pppEnvStPtr);
+	work->m_texture = reinterpret_cast<void*>(GetTextureFromRSD(step->m_dataValIndex, pppEnvStPtr));
 
 	CCharaPcs::CHandle* handle1 = GetCharaHandlePtr(work->m_charaObj, 1);
 	CCharaPcs::CHandle* handle2 = GetCharaHandlePtr(work->m_charaObj, 2);
@@ -205,7 +197,7 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 		return;
 	}
 
-	void* texObj = GetTextureFromRSD__FiP9_pppEnvSt(step->m_dataValIndex, pppEnvStPtr);
+	void* texObj = reinterpret_cast<void*>(GetTextureFromRSD(step->m_dataValIndex, pppEnvStPtr));
 	if (texObj == 0) {
 		return;
 	}
@@ -321,13 +313,13 @@ void pppDestructChangeTex(pppChangeTex* changeTex, pppChangeTexUnkC* data)
 	Graphic._WaitDrawDone(const_cast<char*>(s_pppChangeTex_cpp_801dd660), 0x9d);
 	int dataOffset = data->m_serializedDataOffsets[2];
 	ChangeTexWork* work = (ChangeTexWork*)(changeTex->m_object.m_workArea + dataOffset);
-	void* handle0 = GetCharaHandlePtr__FP8CGObjectl(work->m_charaObj, 0);
-	void* handle1 = GetCharaHandlePtr__FP8CGObjectl(work->m_charaObj, 1);
-	void* handle2 = GetCharaHandlePtr__FP8CGObjectl(work->m_charaObj, 2);
+	CCharaPcs::CHandle* handle0 = GetCharaHandlePtr(work->m_charaObj, 0);
+	CCharaPcs::CHandle* handle1 = GetCharaHandlePtr(work->m_charaObj, 1);
+	CCharaPcs::CHandle* handle2 = GetCharaHandlePtr(work->m_charaObj, 2);
 	ChangeTexModelRaw* model = 0;
 
 	if (handle0 != 0) {
-		model = (ChangeTexModelRaw*)GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle0);
+		model = reinterpret_cast<ChangeTexModelRaw*>(GetCharaModelPtr(handle0));
 		model->m_state = 0;
 		model->m_step = 0;
 		model->m_beforeDrawCallback = 0;
@@ -335,7 +327,7 @@ void pppDestructChangeTex(pppChangeTex* changeTex, pppChangeTexUnkC* data)
 		model->m_afterDrawMeshCallback = 0;
 	}
 	ChangeTexModelRaw* model1;
-	if ((handle1 != 0) && ((model1 = (ChangeTexModelRaw*)GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle1)), model1 != 0)) {
+	if ((handle1 != 0) && ((model1 = reinterpret_cast<ChangeTexModelRaw*>(GetCharaModelPtr(handle1))), model1 != 0)) {
 		model1->m_state = 0;
 		model1->m_step = 0;
 		model1->m_beforeDrawCallback = 0;
@@ -343,7 +335,7 @@ void pppDestructChangeTex(pppChangeTex* changeTex, pppChangeTexUnkC* data)
 		model1->m_afterDrawMeshCallback = 0;
 	}
 	ChangeTexModelRaw* model2;
-	if ((handle2 != 0) && ((model2 = (ChangeTexModelRaw*)GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle2)), model2 != 0)) {
+	if ((handle2 != 0) && ((model2 = reinterpret_cast<ChangeTexModelRaw*>(GetCharaModelPtr(handle2))), model2 != 0)) {
 		model2->m_state = 0;
 		model2->m_step = 0;
 		model2->m_beforeDrawCallback = 0;

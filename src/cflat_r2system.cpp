@@ -334,7 +334,7 @@ void CPartPcs::pppSetDebugHide(unsigned char hide)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void CalcHitPosition__7CMapPcsFP3Vec(CMapPcs*, Vec* hitPosition)
+void CMapPcs::CalcHitPosition(Vec* hitPosition)
 {
     MapMng.m_hitMapObj->CalcHitPosition(hitPosition);
 }
@@ -348,8 +348,7 @@ extern "C" void CalcHitPosition__7CMapPcsFP3Vec(CMapPcs*, Vec* hitPosition)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" int CheckHitCylinderNear__7CMapPcsFP3VecP3VecfUl(
-    CMapPcs*, Vec* cylinderBottom, Vec* direction, float radius, unsigned long hitMask)
+int CMapPcs::CheckHitCylinderNear(Vec* cylinderBottom, Vec* direction, float radius, unsigned long hitMask)
 {
     CMapCylinderRaw cylinder;
 
@@ -1951,11 +1950,10 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
             static_cast<float>(object->m_localBase[2]),
         };
         Vec cylinderTop = { 0.0f, 1.0f, 0.0f };
-        if (CheckHitCylinderNear__7CMapPcsFP3VecP3VecfUl(
-                &MapPcs, &hitPosition, &cylinderTop, static_cast<float>(0.0f), object->m_localBase[3]) == 0) {
+        if (MapPcs.CheckHitCylinderNear(&hitPosition, &cylinderTop, static_cast<float>(0.0f), object->m_localBase[3]) == 0) {
             runtime->push(object, 0);
         } else {
-            CalcHitPosition__7CMapPcsFP3Vec(&MapPcs, &hitPosition);
+            MapPcs.CalcHitPosition(&hitPosition);
             *reinterpret_cast<float*>(object->m_localBase[4]) = hitPosition.y;
             runtime->push(object, 1);
         }

@@ -60,6 +60,8 @@ public:
     void drawViewer();
     void drawAfter();
     void drawAfterViewer();
+    void CalcHitPosition(Vec*);
+    int CheckHitCylinderNear(Vec*, Vec*, float, unsigned long);
 
 private:
     Mtx m_viewMtx;                       // 0x04

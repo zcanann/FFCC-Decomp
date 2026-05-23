@@ -103,6 +103,12 @@ struct CFlatLayerResource {
 	CFile::CHandle* m_fileHandle;
 };
 
+static inline void InitFlatObjectSlot(CGBaseObj* object, u16 particleId)
+{
+	object->m_isActive &= 0x7F;
+	object->m_particleId = particleId;
+}
+
 static CGBaseObj* FindNextGBaseObjByCidMask(CFlatRuntime2* runtime, CFlatRuntime::CObject* object, unsigned int cidMask)
 {
 	CFlatRuntime::CObject* const root =
@@ -482,44 +488,38 @@ CFlatRuntime2::CFlatRuntime2()
 
 	CGBaseObj* baseObj = reinterpret_cast<CGBaseObj*>(m_gBaseObjArr);
 	for (int i = 0; i < 0x28; i++) {
-		baseObj->m_isActive &= 0x7F;
-		baseObj->m_particleId = static_cast<u16>(i + 1);
+		InitFlatObjectSlot(baseObj, static_cast<u16>(i + 1));
 		baseObj++;
 	}
 
 	CGQuadObj* quadObj = reinterpret_cast<CGQuadObj*>(m_gObjQuadArr);
 	for (int i = 0; i < 0x18; i++) {
-		quadObj->m_isActive &= 0x7F;
-		quadObj->m_particleId = static_cast<u16>((i + 1) | 0x100);
+		InitFlatObjectSlot(quadObj, static_cast<u16>((i + 1) | 0x100));
 		quadObj++;
 	}
 
 	CGObject* gObj = reinterpret_cast<CGObject*>(m_gObjArr);
 	for (int i = 0; i < 0x38; i++) {
-		gObj->m_isActive &= 0x7F;
-		gObj->m_particleId = static_cast<u16>((i + 1) | 0x200);
+		InitFlatObjectSlot(gObj, static_cast<u16>((i + 1) | 0x200));
 		gObj++;
 	}
 
-	u8* partyObj = reinterpret_cast<u8*>(m_objParty);
+	u8* partyObjBytes = reinterpret_cast<u8*>(m_objParty);
 	for (int i = 0; i < 4; i++) {
-		partyObj[0x4C] &= 0x7F;
-		*reinterpret_cast<u16*>(partyObj + 0x30) = static_cast<u16>((i + 1) | 0x300);
-		partyObj += 0x6F8;
+		InitFlatObjectSlot(reinterpret_cast<CGPartyObj*>(partyObjBytes), static_cast<u16>((i + 1) | 0x300));
+		partyObjBytes += 0x6F8;
 	}
 
-	u8* monObj = reinterpret_cast<u8*>(m_objMon);
+	u8* monObjBytes = reinterpret_cast<u8*>(m_objMon);
 	for (int i = 0; i < 0x40; i++) {
-		monObj[0x4C] &= 0x7F;
-		*reinterpret_cast<u16*>(monObj + 0x30) = static_cast<u16>((i + 1) | 0x400);
-		monObj += 0x740;
+		InitFlatObjectSlot(reinterpret_cast<CGMonObj*>(monObjBytes), static_cast<u16>((i + 1) | 0x400));
+		monObjBytes += 0x740;
 	}
 
-	u8* itemObj = reinterpret_cast<u8*>(m_objItem);
+	u8* itemObjBytes = reinterpret_cast<u8*>(m_objItem);
 	for (int i = 0; i < 0x20; i++) {
-		itemObj[0x4C] &= 0x7F;
-		*reinterpret_cast<u16*>(itemObj + 0x30) = static_cast<u16>((i + 1) | 0x500);
-		itemObj += 0x57C;
+		InitFlatObjectSlot(reinterpret_cast<CGItemObj*>(itemObjBytes), static_cast<u16>((i + 1) | 0x500));
+		itemObjBytes += 0x57C;
 	}
 }
 

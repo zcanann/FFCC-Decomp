@@ -386,7 +386,7 @@ void CPartMng::Destroy()
         CRefRaw* textureSet = reinterpret_cast<CRefRaw*>(res->m_textureSet);
         textureSet->m_refCount--;
         if (textureSet->m_refCount == 0) {
-            reinterpret_cast<void (*)(void*, int)>(textureSet->m_vtable[2])(textureSet, 1);
+            delete res->m_textureSet;
         }
         res->m_textureSet = 0;
     }
@@ -395,7 +395,7 @@ void CPartMng::Destroy()
         CRefRaw* materialSet = reinterpret_cast<CRefRaw*>(res->m_materialSet);
         materialSet->m_refCount--;
         if (materialSet->m_refCount == 0) {
-            reinterpret_cast<void (*)(void*, int)>(materialSet->m_vtable[2])(materialSet, 1);
+            delete res->m_materialSet;
         }
         res->m_materialSet = 0;
     }
@@ -1338,15 +1338,11 @@ void CPartMng::pppEditAllReleaseResource()
     unsigned char* iter;
 
     if (materialSet != 0) {
-        if (materialSet != 0) {
-            reinterpret_cast<void (*)(void*, int)>((*reinterpret_cast<void***>(materialSet))[2])(materialSet, 1);
-        }
+        delete materialSet;
         m_materialSet = 0;
     }
     if (textureSet != 0) {
-        if (textureSet != 0) {
-            reinterpret_cast<void (*)(void*, int)>((*reinterpret_cast<void***>(textureSet))[2])(textureSet, 1);
-        }
+        delete textureSet;
         m_textureSet = 0;
     }
 

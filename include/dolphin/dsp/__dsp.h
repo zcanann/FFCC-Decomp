@@ -7,6 +7,16 @@
 extern "C" {
 #endif
 
+typedef struct DSPStrings {
+    char version[0x45];
+    char _pad0[3];
+    char initMsg[0x1E];
+    char _pad1[2];
+    char buildDate[0xC];
+    char buildTime[0x9];
+} DSPStrings;
+
+extern const DSPStrings sDSPStrings;
 extern DSPTaskInfo* __DSP_first_task;
 extern DSPTaskInfo* __DSP_last_task;
 extern DSPTaskInfo* __DSP_curr_task;

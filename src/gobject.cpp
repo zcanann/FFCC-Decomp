@@ -4,6 +4,7 @@
 #include "ffcc/cflat_runtime2.h"
 #include "ffcc/color.h"
 #include "ffcc/graphic.h"
+#include "ffcc/itemobj.h"
 #include "ffcc/linkage.h"
 #include "ffcc/math.h"
 #include "ffcc/map.h"
@@ -28,8 +29,6 @@ extern "C" double cos(double);
 extern "C" int CrossCheckSphereVector__5CMathFP3VecPfP3VecP3VecP3Vecf(
     CMath*, Vec*, float*, Vec*, Vec*, Vec*, float, float, float);
 extern "C" int CalcHitSlide__7CMapObjFP3Vecf(void*, Vec*);
-extern "C" void* CreateFromScript__9CGItemObjFiiiP8CGObjectfPQ29CGItemObj4CCFS(
-    int, int, int, CGObject*, float, void*);
 extern double DOUBLE_803303e8;
 extern double DOUBLE_80330400;
 extern const float FLOAT_80330350;
@@ -3450,13 +3449,7 @@ void CGObject::PutDropItem()
                 createMode = 0;
             }
 
-            CreateFromScript__9CGItemObjFiiiP8CGObjectfPQ29CGItemObj4CCFS(
-                createMode,
-                4,
-                dropCode,
-                this,
-                sQuarterTurn * (float)dropCount,
-                0);
+            CGItemObj::CreateFromScript(createMode, 4, dropCode, this, sQuarterTurn * (float)dropCount, 0);
             dropCount++;
         }
     }

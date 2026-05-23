@@ -22,10 +22,7 @@
 extern "C" void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
 extern "C" void GetHitFaceNormal__7CMapObjFP3Vec(void*, Vec*);
 extern "C" int CalcHitSlide__7CMapObjFP3Vecf(void*, Vec*);
-extern "C" int CanCreateFromScript__9CGItemObjFv();
 extern "C" void onPush__9CGBaseObjFP9CGBaseObji(CGBaseObj*, CGBaseObj*, int);
-extern "C" void* CreateFromScript__9CGItemObjFiiiP8CGObjectfPQ29CGItemObj4CCFS(
-    int type, int createMode, int itemId, CGObject* owner, float arg, CGItemObj::CCFS* cfs);
 extern const char s_BossGhostPartyCountersFmt_801DCB1C[];
 extern const char s_MissingRingMenuFmt_801DCB38[];
 extern int __float_huge[];
@@ -2556,7 +2553,7 @@ int CGPartyObj::canPlayerPutItem()
 	    (int)((unsigned int)self[0x63C] << 0x18) < 0 &&
 	    (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) &&
 	    (*reinterpret_cast<int*>(self + 0x6F0) == 0)) {
-		if (Game.m_gameWork.m_menuStageMode != 0 && CanCreateFromScript__9CGItemObjFv() == 0) {
+		if (Game.m_gameWork.m_menuStageMode != 0 && CGItemObj::CanCreateFromScript() == 0) {
 			return 0;
 		}
 		return 1;
@@ -2581,7 +2578,7 @@ int CGPartyObj::putItem(int)
 	}
 
 	int itemId = PartyData(this).weaponItem;
-	void* created = CreateFromScript__9CGItemObjFiiiP8CGObjectfPQ29CGItemObj4CCFS(
+	CGPrgObj* created = CGItemObj::CreateFromScript(
 	    0, 9, itemId, this, FLOAT_80331a78, (CGItemObj::CCFS*)0);
 	if (created == nullptr) {
 		return 0;
@@ -2610,7 +2607,7 @@ int CGPartyObj::putGil(int amount)
 		return 0;
 	}
 
-	void* created = CreateFromScript__9CGItemObjFiiiP8CGObjectfPQ29CGItemObj4CCFS(
+	CGPrgObj* created = CGItemObj::CreateFromScript(
 	    2, 1, amount, this, FLOAT_80331a78, (CGItemObj::CCFS*)0);
 	if (created == nullptr) {
 		return 0;
@@ -3184,7 +3181,7 @@ void CGPartyObj::PutMemoryCapsule(int arg0, int arg1, int arg2, int arg3, char* 
 	ccfs.m_modelParam = arg2;
 	ccfs.m_pendingAnimFlags = arg3;
 	ccfs.m_pendingAnimName = arg4;
-	CreateFromScript__9CGItemObjFiiiP8CGObjectfPQ29CGItemObj4CCFS(0, 2, 399, this, FLOAT_80331a78, &ccfs);
+	CGItemObj::CreateFromScript(0, 2, 399, this, FLOAT_80331a78, &ccfs);
 }
 
 /*

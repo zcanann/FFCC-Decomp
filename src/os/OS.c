@@ -7,14 +7,13 @@
 #include "__ppc_eabi_linker.h"
 #include "dolphin/dvd/__dvd.h"
 #include "dolphin/os/__os.h"
+#include "PowerPC_EABI_Support/MetroTRK/trk_init.h"
 
 #define NOP 0x60000000
 
 #ifndef __GEKKO__
 #define __GEKKO__
 #endif
-
-extern void EnableMetroTRKInterrupts(void);
 
 #define DB_EXCEPTIONRET_OFFSET 0xC
 #define DB_EXCEPTIONDEST_OFFSET 0x8

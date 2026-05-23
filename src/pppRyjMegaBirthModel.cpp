@@ -24,7 +24,7 @@ extern const float FLOAT_803304E8[2];
 PARTICLE_WMAT g_matKeep;
 PARTICLE_WMAT g_matTmp;
 
-extern const char s_pppRyjMegaBirthModel_cpp_801d9c18[] = "pppRyjMegaBirthModel.cpp";
+static const char s_pppRyjMegaBirthModel_cpp[] = "pppRyjMegaBirthModel.cpp";
 
 extern const float FLOAT_803304a8 = 0.017453292f;
 extern const double DOUBLE_803304b0 = 4503601774854144.0;
@@ -251,7 +251,7 @@ void pppRyjMegaBirthModel(_pppPObject* pObject, PRyjMegaBirthModel* params, PRyj
         ((VRyjMegaBirthModel*)work)->m_numParticles = *(u16*)(payload + 0x20);
         ((VRyjMegaBirthModel*)work)->m_particleBlock = (_PARTICLE_DATA*)pppMemAlloc(
             ((VRyjMegaBirthModel*)work)->m_numParticles * 0xA0, pppEnvStPtr->m_stagePtr,
-            const_cast<char*>(s_pppRyjMegaBirthModel_cpp_801d9c18), 0x8D);
+            const_cast<char*>(s_pppRyjMegaBirthModel_cpp), 0x8D);
         if (((VRyjMegaBirthModel*)work)->m_particleBlock != NULL) {
             memset(((VRyjMegaBirthModel*)work)->m_particleBlock, 0, ((VRyjMegaBirthModel*)work)->m_numParticles * 0xA0);
         }
@@ -259,7 +259,7 @@ void pppRyjMegaBirthModel(_pppPObject* pObject, PRyjMegaBirthModel* params, PRyj
         if (payload[0x136] != 0) {
             ((VRyjMegaBirthModel*)work)->m_worldMatrixBlock = (PARTICLE_WMAT*)pppMemAlloc(
                 ((VRyjMegaBirthModel*)work)->m_numParticles * 0x30, pppEnvStPtr->m_stagePtr,
-                const_cast<char*>(s_pppRyjMegaBirthModel_cpp_801d9c18), 0x97);
+                const_cast<char*>(s_pppRyjMegaBirthModel_cpp), 0x97);
             if (((VRyjMegaBirthModel*)work)->m_worldMatrixBlock != NULL) {
                 memset(((VRyjMegaBirthModel*)work)->m_worldMatrixBlock, 0, ((VRyjMegaBirthModel*)work)->m_numParticles * 0x30);
             }
@@ -268,7 +268,7 @@ void pppRyjMegaBirthModel(_pppPObject* pObject, PRyjMegaBirthModel* params, PRyj
         if (payload[0x131] != 0) {
             ((VRyjMegaBirthModel*)work)->m_colorBlock = (_PARTICLE_COLOR*)pppMemAlloc(
                 ((VRyjMegaBirthModel*)work)->m_numParticles << 5, pppEnvStPtr->m_stagePtr,
-                const_cast<char*>(s_pppRyjMegaBirthModel_cpp_801d9c18), 0xA2);
+                const_cast<char*>(s_pppRyjMegaBirthModel_cpp), 0xA2);
             if (((VRyjMegaBirthModel*)work)->m_colorBlock != NULL) {
                 memset(((VRyjMegaBirthModel*)work)->m_colorBlock, 0, ((VRyjMegaBirthModel*)work)->m_numParticles << 5);
             }

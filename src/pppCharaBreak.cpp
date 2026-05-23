@@ -18,7 +18,7 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
 #include "ffcc/ppp_linkage.h"
 
-extern const char s_pppCharaBreak_cpp_801dd690[] = "pppCharaBreak.cpp";
+static const char s_pppCharaBreak_cpp[] = "pppCharaBreak.cpp";
 extern float FLOAT_80332048;
 extern float FLOAT_8033204c;
 extern float FLOAT_80332050;
@@ -294,7 +294,7 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
         work->m_miscValue = FLOAT_80332050;
         work->m_meshBuffers =
             pppMemFree__FPv(ModelData(model)->m_meshCount << 2,
-                            pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppCharaBreak_cpp_801dd690), 0x3D0);
+                            pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppCharaBreak_cpp), 0x3D0);
         if (work->m_meshBuffers == NULL) {
             goto fail;
         }
@@ -316,7 +316,7 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
 
             ((u32*)work->m_meshBuffers)[i] = (u32)pppMemFree__FPv(
                 reinterpret_cast<CharaBreakMeshRef*>(mesh)->m_data->m_displayListCount << 2, pppEnvStPtr->m_stagePtr,
-                const_cast<char*>(s_pppCharaBreak_cpp_801dd690), 0x3E9);
+                const_cast<char*>(s_pppCharaBreak_cpp), 0x3E9);
             u32 meshBuffer = ((u32*)work->m_meshBuffers)[i];
             if (meshBuffer == 0) {
                 goto fail;
@@ -338,7 +338,7 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
                     (CharaBreakDisplayListPair**)(meshBuffer + (dl << 2));
                 for (; dl >= 0; dl--, displayList++) {
                     *dlEntries = (CharaBreakDisplayListPair*)pppMemFree__FPv(
-                        0x10, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppCharaBreak_cpp_801dd690), 0x3FC);
+                        0x10, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppCharaBreak_cpp), 0x3FC);
                     if (*dlEntries == NULL) {
                         goto fail;
                     }
@@ -349,7 +349,7 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
                     (*dlEntries)->m_displayListSize = displayList->m_size;
                     (*dlEntries)->m_rewrittenDisplayList = pppMemFree__FPv(
                         displayList->m_size, pppEnvStPtr->m_stagePtr,
-                        const_cast<char*>(s_pppCharaBreak_cpp_801dd690), 0x40B);
+                        const_cast<char*>(s_pppCharaBreak_cpp), 0x40B);
                     if ((*dlEntries)->m_rewrittenDisplayList == NULL) {
                         goto fail;
                     }
@@ -360,7 +360,7 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
                     u32 polygonCount = gUtil.GetNumPolygonFromDL((*dlEntries)->m_rewrittenDisplayList, displayList->m_size);
                     (*dlEntries)->m_polygonData = (POLYGON_DATA*)pppMemFree__FPv(
                         polygonCount * 0x34, pppEnvStPtr->m_stagePtr,
-                        const_cast<char*>(s_pppCharaBreak_cpp_801dd690), 0x423);
+                        const_cast<char*>(s_pppCharaBreak_cpp), 0x423);
                     if ((*dlEntries)->m_polygonData == NULL) {
                         goto fail;
                     }
@@ -405,7 +405,7 @@ fail:
  */
 void pppDestructCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkC* data)
 {
-    Graphic._WaitDrawDone(const_cast<char*>(s_pppCharaBreak_cpp_801dd690), 0x319);
+    Graphic._WaitDrawDone(const_cast<char*>(s_pppCharaBreak_cpp), 0x319);
 
     CharaBreakWork* work = (CharaBreakWork*)(charaBreak->m_workArea + data->m_serializedDataOffsets[2]);
     CChara::CModel* model = work->m_model;

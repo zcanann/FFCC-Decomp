@@ -24,7 +24,7 @@ extern const float FLOAT_8033111C = 15.0f;
 extern const float FLOAT_80331120 = 7.0f;
 extern const double DOUBLE_80331128 = 4503599627370496.0;
 extern const float FLOAT_80331130 = 10000000.0f;
-extern const char s_pppEmission_cpp_801db7e8[] = "pppEmission.cpp";
+static const char s_pppEmission_cpp[] = "pppEmission.cpp";
 
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
 static inline MtxPtr CameraMatrix() { return CameraPcs.m_cameraMatrix; }
@@ -183,7 +183,7 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, pppEm
             state->m_particles = pppMemAlloc(
                 (unsigned long)param_2->m_initWOrk << 4,
                 pppEnvStPtr->m_stagePtr,
-                const_cast<char*>(s_pppEmission_cpp_801db7e8),
+                const_cast<char*>(s_pppEmission_cpp),
                 0x16F);
 
             EmissionParticle* particle = (EmissionParticle*)state->m_particles;
@@ -268,7 +268,7 @@ void pppDestructEmission(pppEmission* pppEmission_, pppEmissionUnkC* param_2) {
     model->m_drawMeshDlCallback = 0;
     model->m_afterDrawMeshCallback = 0;
 
-    Graphic._WaitDrawDone(const_cast<char*>(s_pppEmission_cpp_801db7e8), 0x118);
+    Graphic._WaitDrawDone(const_cast<char*>(s_pppEmission_cpp), 0x118);
     CMemory::CStage* stage = (CMemory::CStage*)state[0];
     if (stage != (CMemory::CStage*)0) {
         pppHeapUseRate(stage);

@@ -333,6 +333,13 @@ public:
     unsigned char m_pad866[0x8A0 - 0x866];
 };
 
+extern "C" void create__8CMenuPcsFv(CMenuPcs*);
+extern "C" void destroy__8CMenuPcsFv(CMenuPcs*);
+extern "C" void calc__8CMenuPcsFv(CMenuPcs*);
+extern "C" void draw__8CMenuPcsFv(CMenuPcs*);
+extern "C" void loadTextureAsync__8CMenuPcsFPPciiPQ28CMenuPcs4CTmpiii(CMenuPcs*, char**, int, int, CMenuPcs::CTmp*, int, int, int);
+extern "C" void drawSingleMenu__8CMenuPcsFv(CMenuPcs*);
+
 extern CMenuPcs MenuPcs;
 extern const char* sMenuTextureRegionNameTable[];
 extern int sMenuTextureInfoTable[];

@@ -72,10 +72,6 @@ void pppSetBlendMode(unsigned char);
 void pppSetDrawEnv(pppCVECTOR*, pppFMATRIX*, float, unsigned char, unsigned char, unsigned char, unsigned char,
                    unsigned char, unsigned char, unsigned char);
 
-extern "C" {
-void DisableIndWarp__F13_GXTevStageID16_GXIndTexStageID(int stage, int indStage);
-}
-
 /*
  * --INFO--
  * PAL Address: 0x8008eec8
@@ -337,7 +333,7 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 			}
 		}
 
-		DisableIndWarp__F13_GXTevStageID16_GXIndTexStageID(1, 0);
+		DisableIndWarp(GX_TEVSTAGE1, GX_INDTEXSTAGE0);
 	}
 }
 /*

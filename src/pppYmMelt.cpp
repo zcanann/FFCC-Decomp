@@ -9,6 +9,7 @@
 #include "ffcc/maphit.h"
 #include "dolphin/mtx.h"
 #include "dolphin/os/OSCache.h"
+#include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
 extern "C" {
 extern const float kPppYmMeltZero;
 __declspec(section ".sdata2") u32 g_ymMelt;
@@ -20,10 +21,6 @@ extern const float FLOAT_80330b0c;
 extern const float FLOAT_80330b10;
 extern const float FLOAT_80330b14;
 extern const float FLOAT_80330b18;
-
-extern "C" {
-int rand(void);
-}
 
 struct YmMeltVertex
 {

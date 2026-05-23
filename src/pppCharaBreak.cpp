@@ -8,12 +8,14 @@
 #include "ffcc/p_camera.h"
 #include "ffcc/ppp_constants.h"
 #include "ffcc/pppPart.h"
+#include "ffcc/pppYmEnv.h"
 #include "ffcc/util.h"
 
 #include "dolphin/gx.h"
 #include "dolphin/mtx.h"
 
 #include <string.h>
+#include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
 #include "ffcc/ppp_linkage.h"
 
 extern const char s_pppCharaBreak_cpp_801dd690[] = "pppCharaBreak.cpp";
@@ -36,13 +38,6 @@ extern Vec kPppCharaBreakUpVector;
 static inline Mtx& CameraMatrix()
 {
     return CameraPcs.m_cameraMatrix;
-}
-
-extern "C" {
-int rand(void);
-void* GetCharaHandlePtr__FP8CGObjectl(void*, long);
-int GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void*);
-void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(void*, long, float&, float&, float&, float, float&, float&);
 }
 
 struct POLYGON_DATA {
@@ -234,7 +229,7 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
     CharaBreakStep* stepData;
     CharaBreakWork* work;
     CChara::CModel* model;
-    void* handle;
+    CGObject* handle;
     u8* mesh;
     u32 i;
 
@@ -243,17 +238,17 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
         return;
     }
 
-    handle = pppMngStPtr->m_owner;
+    handle = reinterpret_cast<CGObject*>(pppMngStPtr->m_owner);
     work = (CharaBreakWork*)(charaBreak->m_workArea + data->m_serializedDataOffsets[2]);
     if (work->m_enabled == 0) {
         return;
     }
 
-    handle = GetCharaHandlePtr__FP8CGObjectl(handle, 0);
-    model = (CChara::CModel*)GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
+    CCharaPcs::CHandle* charaHandle = GetCharaHandlePtr(handle, 0);
+    model = GetCharaModelPtr(charaHandle);
     work->m_model = model;
 
-    CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(charaBreak,
+    CalcGraphValue(reinterpret_cast<_pppPObject*>(charaBreak),
                                                  stepData->m_graphId,
                                                  work->m_value0,
                                                  work->m_value1,
@@ -262,7 +257,7 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
                                                  stepData->m_graphInit,
                                                  stepData->m_graphStep);
 
-    CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(charaBreak,
+    CalcGraphValue(reinterpret_cast<_pppPObject*>(charaBreak),
                                                  stepData->m_graphId,
                                                  work->m_value3,
                                                  work->m_value4,

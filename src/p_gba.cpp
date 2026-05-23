@@ -5,10 +5,6 @@
 #include "ffcc/system.h"
 #include <dolphin/gba/GBA.h>
 
-extern "C" void create__7CGbaPcsFv(CGbaPcs*);
-extern "C" void destroy__7CGbaPcsFv(CGbaPcs*);
-extern "C" void calc__7CGbaPcsFv(CGbaPcs*);
-extern "C" void draw__7CGbaPcsFv(CGbaPcs*);
 extern const char s_CGbaPcs_80330870[];
 extern const char s_JoyBus__LoadBin___error_801d9de0[];
 extern const char __RTTI__8CManager_8032E7C0[];

@@ -16,10 +16,10 @@
 #include <string.h>
 #include <Dolphin/os.h>
 #include <Runtime.PPCEABI.H/NMWException.h>
+#include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
 
 GbaQueue GbaQue;
 
-extern "C" int rand(void);
 extern "C" int memcmp(const void*, const void*, unsigned long);
 
 struct GbaFlatDataTableEntryView

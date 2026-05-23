@@ -2,12 +2,11 @@
 #include "ffcc/linkage.h"
 #include "ffcc/materialman.h"
 #include "ffcc/partMng.h"
+#include "ffcc/pppYmEnv.h"
 
 #include <dolphin/gx.h>
 
 extern "C" {
-void* GetCharaHandlePtr__FP8CGObjectl(void* obj, long index);
-int GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void* handle);
 void DCFlushRange(void* ptr, unsigned long size);
 }
 
@@ -52,7 +51,7 @@ struct EraseCharaPartsModelView {
 void pppFrameEraseCharaParts(pppEraseCharaParts* pppEraseCharaParts, pppEraseCharaPartsUnkB* param_2,
                              pppEraseCharaPartsUnkC* param_3)
 {
-    void* handle;
+    CCharaPcs::CHandle* handle;
     int model;
     s32* offsets;
     int colorIndex;
@@ -64,8 +63,8 @@ void pppFrameEraseCharaParts(pppEraseCharaParts* pppEraseCharaParts, pppEraseCha
         colorIndex = offsets[0];
         dstColor = (u8*)((char*)pppEraseCharaParts + 0x80 + offsets[1]);
         srcColor = (u8*)((char*)pppEraseCharaParts + 0x80 + colorIndex);
-        handle = GetCharaHandlePtr__FP8CGObjectl(pppMngStPtr->m_owner, 0);
-        model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
+        handle = GetCharaHandlePtr(reinterpret_cast<CGObject*>(pppMngStPtr->m_owner), 0);
+        model = reinterpret_cast<int>(GetCharaModelPtr(handle));
 
         *(u8**)(model + 0xE4) = dstColor;
         *(pppEraseCharaPartsUnkB**)(model + 0xE8) = param_2;
@@ -90,11 +89,11 @@ void pppFrameEraseCharaParts(pppEraseCharaParts* pppEraseCharaParts, pppEraseCha
  */
 void pppDestructEraseCharaParts(pppEraseCharaParts*, pppEraseCharaPartsUnkC*)
 {
-    void* handle;
+    CCharaPcs::CHandle* handle;
     int model;
 
-    handle = GetCharaHandlePtr__FP8CGObjectl(pppMngStPtr->m_owner, 0);
-    model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
+    handle = GetCharaHandlePtr(reinterpret_cast<CGObject*>(pppMngStPtr->m_owner), 0);
+    model = reinterpret_cast<int>(GetCharaModelPtr(handle));
     *(void**)(model + 0xE4) = 0;
     *(void**)(model + 0xE8) = 0;
     *(void**)(model + 0xFC) = 0;
@@ -112,7 +111,7 @@ void pppDestructEraseCharaParts(pppEraseCharaParts*, pppEraseCharaPartsUnkC*)
 void pppConstructEraseCharaParts(pppEraseCharaParts* pppEraseCharaParts, pppEraseCharaPartsUnkC* param_2)
 {
     s32* serializedDataOffsets;
-    void* handle;
+    CCharaPcs::CHandle* handle;
     int model;
     u8* colorPtr;
     void* gObject;
@@ -125,8 +124,8 @@ void pppConstructEraseCharaParts(pppEraseCharaParts* pppEraseCharaParts, pppEras
     colorPtr[2] = 0x80;
     colorPtr[3] = 0x80;
 
-    handle = GetCharaHandlePtr__FP8CGObjectl(gObject, 0);
-    model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
+    handle = GetCharaHandlePtr(reinterpret_cast<CGObject*>(gObject), 0);
+    model = reinterpret_cast<int>(GetCharaModelPtr(handle));
     *(void (**)(CChara::CModel*, void*, void*, int, int, float (*)[4]))(model + 0xFC) =
         EraseCharaParts_DrawMeshDLCallback;
 }

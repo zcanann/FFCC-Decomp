@@ -17,7 +17,6 @@
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
-extern "C" unsigned char m_boss__8CGMonObj[];
 extern char SoundBuffer[];
 
 extern "C" char sCharaObjDebugStatFormat[];

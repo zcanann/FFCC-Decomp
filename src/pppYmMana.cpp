@@ -9,6 +9,7 @@
 #include "ffcc/gxfunc.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/pppYmEnv.h"
+#include "ffcc/textureman.h"
 #include "ffcc/util.h"
 
 #include <string.h>
@@ -79,10 +80,6 @@ static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned
 static inline float LoadFloat(const float& value)
 {
     return value;
-}
-
-extern "C" {
-void InitTexObj__8CTextureFv(void*);
 }
 
 static int CreateWaterMesh(Vec* positionsInOut, Vec* normalsOut, Vec2d* uvOut, unsigned short* indicesOut, float size);
@@ -722,9 +719,9 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaUnkB* param_2, pppYmManaUnkC* p
     work[0x20] = (u32)GetTextureFromRSD(*(s32*)((u8*)param_2 + 0x28), pppEnvStPtr);
 
     *(u32*)(work[0x1F] + 0x6C) = 0;
-    InitTexObj__8CTextureFv((void*)work[0x1F]);
+    reinterpret_cast<CTexture*>(work[0x1F])->InitTexObj();
     *(u32*)(work[0x20] + 0x6C) = 0;
-    InitTexObj__8CTextureFv((void*)work[0x20]);
+    reinterpret_cast<CTexture*>(work[0x20])->InitTexObj();
 
     if (work[0x1E] == 0) {
         work[0x1E] = (u32)pppMemAlloc(0xC0, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp_801DB4D8), 0x38F);
@@ -756,16 +753,16 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaUnkB* param_2, pppYmManaUnkC* p
     texList = &work[2];
     for (i = 0; i < 6; i++) {
         *(u32*)(texList[0] + 0x6C) = 0;
-        InitTexObj__8CTextureFv((void*)texList[0]);
+        reinterpret_cast<CTexture*>(texList[0])->InitTexObj();
         memcpy(dstBuffer, (void*)(texList[0] + 0x28), 0x20);
         dstBuffer = (void*)((u8*)dstBuffer + 0x20);
         texList++;
     }
 
     *(u32*)(work[0x1F] + 0x6C) = 0;
-    InitTexObj__8CTextureFv((void*)work[0x1F]);
+    reinterpret_cast<CTexture*>(work[0x1F])->InitTexObj();
     *(u32*)(work[0x20] + 0x6C) = 0;
-    InitTexObj__8CTextureFv((void*)work[0x20]);
+    reinterpret_cast<CTexture*>(work[0x20])->InitTexObj();
 
     if (work[9] == 0) {
         work[9] = (u32)pppMemAlloc(0xA5E8, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmMana_cpp_801DB4D8), 0x3CB);

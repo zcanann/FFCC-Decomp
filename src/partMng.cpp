@@ -35,10 +35,6 @@ extern int gPppHeapUseRateWords[3];
 #include <PowerPC_EABI_Support/Runtime/MWCPlusLib.h>
 #include <PowerPC_EABI_Support/Runtime/New.h>
 
-extern "C" void pppCreateHeap__FP9_pppEnvStUl(_pppEnvSt*, unsigned long);
-extern "C" unsigned int CheckSum__FPvi(void*, int);
-extern "C" void pppStopSe__FP9_pppMngStP7PPPSEST(_pppMngSt*, PPPSEST*);
-extern "C" void _pppAllFreePObject__FP9_pppMngSt(_pppMngSt*);
 extern "C" unsigned long pppHeapCheckLeak__FPQ27CMemory6CStage2(CMemory::CStage*);
 extern "C" {
 extern Mtx ppvCameraMatrix;
@@ -74,8 +70,6 @@ extern "C" void __ct__10pppShapeStFv(pppShapeSt* shapeSt);
 extern "C" void __dt__10pppShapeStFv(pppShapeSt* shapeSt, int);
 extern "C" void __ct__10pppModelStFv(pppModelSt* modelSt);
 extern "C" void __dt__10pppModelStFv(pppModelSt* modelSt, int);
-extern "C" void pppDestroyHeap__FP9_pppEnvSt(_pppEnvSt*);
-extern "C" void _pppDrawPart__FP9_pppMngSt(_pppMngSt*);
 PPPCREATEPARAM g_dcp;
 extern "C" {
 int DAT_8032ed68 = 0;
@@ -261,9 +255,9 @@ void CPartMng::Create()
     DAT_8032ed74 = 0;
 
     if (Game.m_currentSceneId == 7) {
-        pppCreateHeap__FP9_pppEnvStUl(env, 0x100000);
+        pppCreateHeap(env, 0x100000);
     } else {
-        pppCreateHeap__FP9_pppEnvStUl(env, 0xC0000);
+        pppCreateHeap(env, 0xC0000);
     }
 
     pppEnvStPtr = env;
@@ -418,7 +412,7 @@ void CPartMng::Destroy()
         res->m_editorObj = 0;
     }
 
-    pppDestroyHeap__FP9_pppEnvSt(reinterpret_cast<_pppEnvSt*>(self + 0x2351c));
+    pppDestroyHeap(reinterpret_cast<_pppEnvSt*>(self + 0x2351c));
 }
 
 /*
@@ -563,7 +557,7 @@ void CPartMng::pppReleasePdt(int pdtSlotIndex)
     PppMngStRaw* pppMngSt = reinterpret_cast<PppMngStRaw*>(self + 0x1d4);
     for (int i = 0; i < 0x180; i++) {
         if (pppMngSt[i].m_pppResSet == pdtSlot) {
-            _pppAllFreePObject__FP9_pppMngSt(reinterpret_cast<_pppMngSt*>(&pppMngSt[i]));
+            _pppAllFreePObject(reinterpret_cast<_pppMngSt*>(&pppMngSt[i]));
         }
     }
 
@@ -2394,7 +2388,7 @@ void CPartMng::pppEditDrawShadow()
                     pppEnvStPtr = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<unsigned char*>(mng->m_pppResSet) + 4);
                     pppMngStPtr = reinterpret_cast<_pppMngSt*>(mng);
                     pppSetFpMatrix(pppMngStPtr);
-                    _pppDrawPart__FP9_pppMngSt(pppMngStPtr);
+                    _pppDrawPart(pppMngStPtr);
                 }
             }
             mng++;
@@ -2504,7 +2498,7 @@ void CPartMng::pppEditDraw()
                             pppMngStPtr = reinterpret_cast<_pppMngSt*>(mng);
                             pppEnvStPtr = reinterpret_cast<_pppEnvSt*>(*reinterpret_cast<char**>(mng) + 4);
                             pppSetFpMatrix(pppMngStPtr);
-                            _pppDrawPart__FP9_pppMngSt(pppMngStPtr);
+                            _pppDrawPart(pppMngStPtr);
                         }
                     }
 
@@ -2625,7 +2619,7 @@ void CPartMng::pppEditPartDrawAfter()
                             pppMngStPtr = reinterpret_cast<_pppMngSt*>(mng);
                             pppEnvStPtr = reinterpret_cast<_pppEnvSt*>(*reinterpret_cast<char**>(mng) + 4);
                             pppSetFpMatrix(pppMngStPtr);
-                            _pppDrawPart__FP9_pppMngSt(pppMngStPtr);
+                            _pppDrawPart(pppMngStPtr);
                         }
                     }
                     mng += kPppMngStride;
@@ -2883,7 +2877,7 @@ void CPartMng::pppDrawPrio(unsigned char drawMode)
                 pppEnvStPtr = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<unsigned char*>(mng->m_pppResSet) + 4);
                 pppMngStPtr = reinterpret_cast<_pppMngSt*>(mng);
                 pppSetFpMatrix(pppMngStPtr);
-                _pppDrawPart__FP9_pppMngSt(pppMngStPtr);
+                _pppDrawPart(pppMngStPtr);
             }
         }
         mng++;
@@ -2988,7 +2982,7 @@ void CPartMng::pppDrawPrioPdtFpno(unsigned char drawMode, short kind, short node
     pppEnvStPtr = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<unsigned char*>(mng->m_pppResSet) + 4);
     pppMngStPtr = reinterpret_cast<_pppMngSt*>(mng);
     pppSetFpMatrix(pppMngStPtr);
-    _pppDrawPart__FP9_pppMngSt(pppMngStPtr);
+    _pppDrawPart(pppMngStPtr);
 }
 
 /*
@@ -3066,7 +3060,7 @@ void CPartMng::pppDrawIdx(int partIndex)
     pppEnvStPtr = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<unsigned char*>(mng->m_pppResSet) + 4);
     pppMngStPtr = reinterpret_cast<_pppMngSt*>(mng);
     pppSetFpMatrix(reinterpret_cast<_pppMngSt*>(mng));
-    _pppDrawPart__FP9_pppMngSt(reinterpret_cast<_pppMngSt*>(mng));
+    _pppDrawPart(reinterpret_cast<_pppMngSt*>(mng));
 }
 
 /*
@@ -3240,7 +3234,7 @@ void CPartMng::pppPartDrawAfter()
                 pppEnvStPtr = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<unsigned char*>(mng->m_pppResSet) + 4);
                 pppMngStPtr = reinterpret_cast<_pppMngSt*>(mng);
                 pppSetFpMatrix(pppMngStPtr);
-                _pppDrawPart__FP9_pppMngSt(pppMngStPtr);
+                _pppDrawPart(pppMngStPtr);
             }
         }
         mng++;
@@ -3349,7 +3343,7 @@ void* CPartMng::pppFileRead(char* filePath, unsigned long& fileSize, void* readB
             Memory.CopyFromAMemorySync(
                 File.m_readBuffer, reinterpret_cast<void*>(loadState->m_partAMemCursor), (fileSize + 0x1f) & ~0x1f);
             loadState->m_partAMemCursor += fileSize;
-            CheckSum__FPvi(readBuffer, fileSize);
+            CheckSum(readBuffer, fileSize);
             loadState->m_partChunkIndex++;
         }
     } else if (readBuffer == 0 && (fileHandle = File.Open(filePath, 0, CFile::PRI_LOW), fileHandle == 0)) {
@@ -3372,7 +3366,7 @@ void* CPartMng::pppFileRead(char* filePath, unsigned long& fileSize, void* readB
         if (loadState->m_partLoadMode == 2) {
             Memory.CopyToAMemorySync(readBuffer, reinterpret_cast<void*>(loadState->m_partAMemCursor), fileSize);
             loadState->m_partChunkSize[loadState->m_partChunkIndex] = fileSize;
-            loadState->m_partChunkChecksum[loadState->m_partChunkIndex] = CheckSum__FPvi(readBuffer, fileSize);
+            loadState->m_partChunkChecksum[loadState->m_partChunkIndex] = CheckSum(readBuffer, fileSize);
             loadState->m_partChunkIndex++;
             loadState->m_partAMemCursor += fileSize;
         }
@@ -3398,7 +3392,7 @@ void CPartMng::LoadPartNoSyncCalc()
 
                 Memory.CopyToAMemorySync(readBuffer, amemCursor, (len + 0x1f) & ~0x1f);
                 m_partChunkSize[i] = len;
-                m_partChunkChecksum[i] = CheckSum__FPvi(readBuffer, len);
+                m_partChunkChecksum[i] = CheckSum(readBuffer, len);
                 m_partChunkIndex++;
                 m_partAMemCursor += len;
 
@@ -4205,7 +4199,7 @@ void CPartMng::pppDeleteSlot(int slot, int checkHitFlags)
             if (checkHitFlags == 0 || (*reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(pppMngSt) + 0x137) & 1) == 0) {
                 if (baseTime < 0) {
                     *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(pppMngSt) + 0xE8) = 1;
-                    pppStopSe__FP9_pppMngStP7PPPSEST(pppMngSt, &pppMngSt->m_soundEffectData);
+                    pppStopSe(pppMngSt, &pppMngSt->m_soundEffectData);
                 } else {
                     pppMngSt->m_baseTime = -0x1000;
                 }
@@ -4234,7 +4228,7 @@ void CPartMng::pppEndSlot(int slot, int checkHitFlags)
             && static_cast<int>(pppMngSt->m_paramA) == slot) {
             if (checkHitFlags == 0 || (*reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(pppMngSt) + 0x137) & 1) == 0) {
                 *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(pppMngSt) + 0xE5) = 1;
-                pppStopSe__FP9_pppMngStP7PPPSEST(pppMngSt, &pppMngSt->m_soundEffectData);
+                pppStopSe(pppMngSt, &pppMngSt->m_soundEffectData);
             }
         }
         base += 0x158;
@@ -4290,7 +4284,7 @@ void CPartMng::pppDeletePart(int index)
 
     if (baseTime < 0) {
         mng->m_deleteRequested = 1;
-        pppStopSe__FP9_pppMngStP7PPPSEST(reinterpret_cast<_pppMngSt*>(mng), &mng->m_soundEffectData);
+        pppStopSe(reinterpret_cast<_pppMngSt*>(mng), &mng->m_soundEffectData);
     } else {
         mng->m_baseTime = -0x1000;
     }
@@ -4314,7 +4308,7 @@ void CPartMng::pppEndPart(int index)
         reinterpret_cast<unsigned char*>(this) + 0x2A18 + index * 0x158);
 
     mng->m_stopRequested = 1;
-    pppStopSe__FP9_pppMngStP7PPPSEST(reinterpret_cast<_pppMngSt*>(mng), &mng->m_soundEffectData);
+    pppStopSe(reinterpret_cast<_pppMngSt*>(mng), &mng->m_soundEffectData);
 }
 
 /*
@@ -4398,7 +4392,7 @@ void CPartMng::pppFieldEndFpNo(short fieldNo)
         if ((baseTime != -0x1000) && (pppMngSt->m_kind == 0) && (pppMngSt->m_nodeIndex == fieldNo)) {
             if (baseTime < 0) {
                 pppMngSt->m_particleEnded = 1;
-                pppStopSe__FP9_pppMngStP7PPPSEST(pppMngSt, &pppMngSt->m_soundEffectData);
+                pppStopSe(pppMngSt, &pppMngSt->m_soundEffectData);
             } else {
                 pppMngSt->m_baseTime = -0x1000;
             }
@@ -4527,7 +4521,7 @@ void CPartMng::pppDeleteCHandle(CCharaPcs::CHandle* handle)
                     *reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<char*>(owner) + 0xf8) == handle) {
                     if (baseTime < 0) {
                         *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(pppMngSt) + 0xE8) = 1;
-                        pppStopSe__FP9_pppMngStP7PPPSEST(
+                        pppStopSe(
                             pppMngSt,
                             &pppMngSt->m_soundEffectData);
                     } else {
@@ -4557,7 +4551,7 @@ void CPartMng::pppEndCHandle(CCharaPcs::CHandle* handle)
                 if (owner != 0 &&
                     *reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<char*>(owner) + 0xf8) == handle) {
                     *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(pppMngSt) + 0xE5) = 1;
-                    pppStopSe__FP9_pppMngStP7PPPSEST(
+                    pppStopSe(
                         pppMngSt,
                         &pppMngSt->m_soundEffectData);
                 }
@@ -4613,7 +4607,7 @@ void CPartMng::pppDeleteAll()
         if (baseTime != -0x1000) {
             if (baseTime < 0) {
                 *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(pppMngSt) + 0xE8) = 1;
-                pppStopSe__FP9_pppMngStP7PPPSEST(
+                pppStopSe(
                     pppMngSt,
                     &pppMngSt->m_soundEffectData);
             } else {

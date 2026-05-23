@@ -34,6 +34,7 @@
 #include <dolphin/os.h>
 #include <math.h>
 #include <string.h>
+#include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
 static inline CUSBStreamData* UsbStream(CPartPcs* self)
 {
@@ -50,9 +51,6 @@ struct CMapCylinderRaw
     Vec m_direction2;
 };
 
-extern "C" {
-int sprintf(char*, const char*, ...);
-}
 extern int gWmMenuWorkA;
 extern float FLOAT_80330B30;
 extern float FLOAT_80330b74;

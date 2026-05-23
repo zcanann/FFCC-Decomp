@@ -8,8 +8,7 @@ extern int gPppCalcDisabled;
 #include <dolphin/mtx.h>
 #include <dolphin/os.h>
 #include <string.h>
-
-extern "C" int rand(void);
+#include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
 
 static const float kPppKeShpTail3XZero = 0.0f;
 static const float kPppKeShpTail3XAlphaScale = 16384.0f;

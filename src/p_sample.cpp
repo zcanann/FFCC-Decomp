@@ -1,10 +1,6 @@
 #include "ffcc/p_sample.h"
 
 extern const char s_CSamplePcs_801D6CC8[];
-extern "C" void create__10CSamplePcsFv(CSamplePcs*);
-extern "C" void destroy__10CSamplePcsFv(CSamplePcs*);
-extern "C" void func0__10CSamplePcsFv(CSamplePcs*);
-extern "C" void func1__10CSamplePcsFv(CSamplePcs*);
 
 /*
  * --INFO--

@@ -44,8 +44,6 @@ extern const f32 FLOAT_8033086C;
 #include "ffcc/fontman.h"
 
 #include <dolphin/mtx.h>
-extern "C" double sin(double);
-extern "C" double cos(double);
 #include <math.h>
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
@@ -132,12 +130,6 @@ extern "C" const f32 FLOAT_8033086C = 0.125f;
 
 extern const char __RTTI__8CManager_8032E7A8[];
 extern const char __RTTI__8CProcess_8032E7B0[];
-extern "C" void create__8CMenuPcsFv(CMenuPcs*);
-extern "C" void destroy__8CMenuPcsFv(CMenuPcs*);
-extern "C" void calc__8CMenuPcsFv(CMenuPcs*);
-extern "C" void draw__8CMenuPcsFv(CMenuPcs*);
-extern "C" void loadTextureAsync__8CMenuPcsFPPciiPQ28CMenuPcs4CTmpiii(CMenuPcs*, char**, int, int, CMenuPcs::CTmp*, int, int, int);
-extern "C" void drawSingleMenu__8CMenuPcsFv(CMenuPcs*);
 
 static unsigned int m_table_desc0__8CMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__8CMenuPcsFv)};
 static unsigned int m_table_desc1__8CMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__8CMenuPcsFv)};

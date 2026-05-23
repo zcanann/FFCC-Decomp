@@ -10,8 +10,7 @@
 
 #include "dolphin/card.h"
 #include "string.h"
-
-extern "C" int sprintf(char* s, const char* format, ...);
+#include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
 class CardConst
 {

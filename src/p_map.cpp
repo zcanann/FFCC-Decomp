@@ -17,19 +17,6 @@
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 CMapPcs MapPcs;
-extern "C" void create__7CMapPcsFv(CMapPcs*);
-extern "C" void destroy__7CMapPcsFv(CMapPcs*);
-extern "C" void calcInit__7CMapPcsFv(CMapPcs*);
-extern "C" void calc__7CMapPcsFv(CMapPcs*);
-extern "C" void drawShadow__7CMapPcsFv(CMapPcs*);
-extern "C" void drawBefore__7CMapPcsFv(CMapPcs*);
-extern "C" void draw__7CMapPcsFv(CMapPcs*);
-extern "C" void drawAfter__7CMapPcsFv(CMapPcs*);
-extern "C" void createViewer__7CMapPcsFv(CMapPcs*);
-extern "C" void calcViewer__7CMapPcsFv(CMapPcs*);
-extern "C" void drawBeforeViewer__7CMapPcsFv(CMapPcs*);
-extern "C" void drawViewer__7CMapPcsFv(CMapPcs*);
-extern "C" void drawAfterViewer__7CMapPcsFv(CMapPcs*);
 extern const char __RTTI__8CManager_8032E508[];
 extern const char __RTTI__8CProcess_8032E510[];
 

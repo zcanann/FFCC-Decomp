@@ -18,11 +18,6 @@ CDbgMenuPcs DbgMenuPcs;
 extern unsigned char DAT_8032e698;
 extern unsigned char g_map_draw_prof;
 
-extern "C" void create__11CDbgMenuPcsFv(CDbgMenuPcs*);
-extern "C" void destroy__11CDbgMenuPcsFv(CDbgMenuPcs*);
-extern "C" void calc__11CDbgMenuPcsFv(CDbgMenuPcs*);
-extern "C" void draw__11CDbgMenuPcsFv(CDbgMenuPcs*);
-
 struct DbgMenuDef {
     const char* text;
     u32 id;

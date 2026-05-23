@@ -19,37 +19,12 @@
 
 #include <math.h>
 #include <string.h>
+#include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
 
 #include <dolphin/mtx.h>
 #include <dolphin/os/OSCache.h>
 
 CCameraPcs CameraPcs;
-
-extern "C" void create__10CCameraPcsFv(CCameraPcs*);
-extern "C" void destroy__10CCameraPcsFv(CCameraPcs*);
-extern "C" void calc__10CCameraPcsFv(CCameraPcs*);
-extern "C" void draw__10CCameraPcsFv(CCameraPcs*);
-extern "C" void createChara__10CCameraPcsFv(CCameraPcs*);
-extern "C" void destroyChara__10CCameraPcsFv(CCameraPcs*);
-extern "C" void calcChara__10CCameraPcsFv(CCameraPcs*);
-extern "C" void createMap__10CCameraPcsFv(CCameraPcs*);
-extern "C" void destroyMap__10CCameraPcsFv(CCameraPcs*);
-extern "C" void calcMap__10CCameraPcsFv(CCameraPcs*);
-extern "C" void createMaterialEditor__10CCameraPcsFv(CCameraPcs*);
-extern "C" void destroyMaterialEditor__10CCameraPcsFv(CCameraPcs*);
-extern "C" void calcMaterialEditor__10CCameraPcsFv(CCameraPcs*);
-extern "C" void createFunnyShape__10CCameraPcsFv(CCameraPcs*);
-extern "C" void destroyFunnyShape__10CCameraPcsFv(CCameraPcs*);
-extern "C" void calcFunnyShape__10CCameraPcsFv(CCameraPcs*);
-extern "C" void createPart__10CCameraPcsFv(CCameraPcs*);
-extern "C" void destroyPart__10CCameraPcsFv(CCameraPcs*);
-extern "C" void calcPart__10CCameraPcsFv(CCameraPcs*);
-extern "C" void createFullShadow__10CCameraPcsFv(CCameraPcs*);
-extern "C" void destroyFullShadow__10CCameraPcsFv(CCameraPcs*);
-extern "C" void drawShadowBegin__10CCameraPcsFv(CCameraPcs*);
-extern "C" void drawShadowEnd__10CCameraPcsFv(CCameraPcs*);
-extern "C" void drawShadowChrBegin__10CCameraPcsFv(CCameraPcs*);
-extern "C" void drawShadowEndAll__10CCameraPcsFv(CCameraPcs*);
 
 extern "C" const char s_CCameraPcs_GAME_801D7860[] = "CCameraPcs(GAME)";
 extern "C" const char s_CCameraPcs_CHARA_801D7874[] = "CCameraPcs(CHARA)";
@@ -150,7 +125,6 @@ Vec g_shadow_pos;
 Vec g_shadow_refpos;
 extern "C" int CheckHitCylinder__7CMapMngFP12CMapCylinderP3VecUl(void*, void*, Vec*, unsigned long);
 extern "C" void CalcHitSlide__7CMapObjFP3Vecf(void*, Vec*);
-extern "C" int rand(void);
 
 extern "C" {
 void pppEditGetViewPos__FP3Vec(Vec*);

@@ -6,10 +6,12 @@
 class CFont;
 class CGPrgObj;
 class CGPartyObj;
+class CGObject;
 struct Vec;
 class CVector;
 class CMapPcs;
 
+extern "C" u8 m_aiWork__8CGMonObj[0xC];
 extern "C" u8 m_boss__8CGMonObj[0x8C];
 
 class CGMonObj : public CGCharaObj
@@ -91,6 +93,156 @@ public:
     void onChangePrg(int);
     void footSe();
     int GetCID();
+
+    void alwaysFuncDefault();
+    void alwaysFuncMeteoParasite();
+    void alwaysFuncOrcKing();
+    int attackCheckFuncLKShooter(int);
+    int attackCheckFuncMeteoParasite(int);
+    int attackCheckFuncMeteoParasiteC(int);
+    void attackedFuncSaw();
+    void aiAddDuct(int&);
+
+    void cancelStatFuncDefault();
+    void cancelStatFuncGiantCrab();
+    void cancelStatFuncOrcKing();
+    void cancelStatFuncGolem();
+    void cancelStatFuncArmstrong();
+    void cancelStatFuncGoblinKing();
+    void cancelStatFuncMolbol();
+    void cancelStatFuncLizardmanKing();
+    void cancelStatFuncCaveWorm();
+    void cancelStatFuncGigasLoad();
+    void cancelStatFuncMeteoParasite();
+    void cancelStatFuncMeteoParasiteC();
+    void cancelStatFuncDuct();
+    void cancelStatFuncDragonZombie();
+    void cancelStatFuncAntrion();
+    void cancelStatFuncTetsukyojin();
+    void cancelStatFuncLich();
+    void cancelStatFuncSaw();
+    void cancelStatFuncRamoe();
+    void cancelStatFuncLastBoss();
+
+    int calcBranchFuncDragonZombie(int);
+    int calcBranchFuncGiantCrab(int);
+    int calcBranchFuncGigasLoad(int);
+    int calcBranchFuncGoblinKing(int);
+    int calcBranchFuncGolem(int);
+    int calcBranchFuncLastBoss(int);
+    int calcBranchFuncLich(int);
+    int calcBranchFuncMeteoParasiteC(int);
+    int calcBranchFuncOrcKing(int);
+    int calcBranchFuncTetsukyojin(int);
+
+    void changeStatFuncDefault(int);
+    void changeStatFuncGiantCrab(int);
+    void changeStatFuncOrcKing(int);
+    void changeStatFuncGolem(int);
+    void changeStatFuncArmstrong(int);
+    void changeStatFuncGoblinKing(int);
+    void changeStatFuncMolbol(int);
+    void changeStatFuncLizardmanKing(int);
+    void changeStatFuncCaveWorm(int);
+    void changeStatFuncGigasLoad(int);
+    void changeStatFuncMeteoParasite(int);
+    void changeStatFuncMeteoParasiteC(int);
+    void changeStatFuncDuct(int);
+    void changeStatFuncDragonZombie(int);
+    void changeStatFuncAntrion(int);
+    void changeStatFuncTetsukyojin(int);
+    void changeStatFuncLich(int);
+    void changeStatFuncRamoe(int);
+    void changeStatFuncLastBoss(int);
+
+    void damagedFuncGiantCrab();
+    void damagedFuncGolem();
+    void damagedFuncGigasLoad();
+    void damagedFuncMeteoParasiteC();
+    void damagedFuncDuct();
+    void damagedFuncLastBoss();
+    void damagedFuncWifeLamia();
+
+    void frameStatFuncDefault();
+    void frameStatFuncGiantCrab();
+    void frameStatFuncOrcKing();
+    void frameStatFuncGolem();
+    void frameStatFuncArmstrong();
+    void frameStatFuncGoblinKing();
+    void frameStatFuncMolbol();
+    void frameStatFuncLizardmanKing();
+    void frameStatFuncCaveWorm();
+    void frameStatFuncGigasLoad();
+    void frameStatFuncMeteoParasite();
+    void frameStatFuncMeteoParasiteC();
+    void frameStatFuncDuct();
+    void frameStatFuncDragonZombie();
+    void frameStatFuncAntrion();
+    void frameStatFuncTetsukyojin();
+    void frameStatFuncLich();
+    void frameStatFuncSaw();
+    void frameStatFuncRamoe();
+    void frameStatFuncLastBoss();
+    void frameStatFuncWifeLamia();
+    void frameStatFuncLKShooter();
+
+    void initFinishedFuncMeteoParasite();
+    void initFinishedFuncMeteoParasiteC();
+    void initFinishedFuncDuct();
+    void initFinishedFuncLastBoss();
+
+    void logicFuncGiantCrab();
+    void logicFuncSaw();
+    void logicFuncMeteoParasite();
+    void logicFuncMeteoParasiteC();
+    void logicFuncRamoe();
+    void logicFuncLastBoss();
+
+    void moveCancelFuncDefault();
+    void moveCancelFuncGiantCrab();
+    void moveCancelFuncOrcKing();
+    void moveCancelFuncGolem();
+    void moveCancelFuncArmstrong();
+    void moveCancelFuncGoblinKing();
+    void moveCancelFuncMolbol();
+    void moveCancelFuncLizardmanKing();
+    void moveCancelFuncCaveWorm();
+    void moveCancelFuncGigasLoad();
+    void moveCancelFuncMeteoParasite();
+    void moveCancelFuncMeteoParasiteC();
+    void moveCancelFuncDuct();
+    void moveCancelFuncDragonZombie();
+    void moveCancelFuncAntrion();
+    void moveCancelFuncTetsukyojin();
+    void moveCancelFuncLich();
+    void moveCancelFuncRamoe();
+    void moveCancelFuncLastBoss();
+
+    void moveFrameFuncDefault();
+    void moveFrameFuncGiantCrab();
+    void moveFrameFuncOrcKing();
+    void moveFrameFuncGolem();
+    void moveFrameFuncArmstrong();
+    void moveFrameFuncGoblinKing();
+    void moveFrameFuncMolbol();
+    void moveFrameFuncLizardmanKing();
+    void moveFrameFuncCaveWorm();
+    void moveFrameFuncGigasLoad();
+    void moveFrameFuncMeteoParasite();
+    void moveFrameFuncMeteoParasiteC();
+    void moveFrameFuncDuct();
+    void moveFrameFuncDragonZombie();
+    void moveFrameFuncAntrion();
+    void moveFrameFuncTetsukyojin();
+    void moveFrameFuncLich();
+    void moveFrameFuncSaw();
+    void moveFrameFuncRamoe();
+    void moveFrameFuncLastBoss();
+
+    void teleport(int, int, int, int, int, int, int, int, int, Vec*, int&, Vec&);
+    void suikomiSub(CGObject*, float);
+    void suikomi(int, float);
+    int tgtFuncGigasLoad(int);
 };
 
 #endif // _FFCC_MONOBJ_H_

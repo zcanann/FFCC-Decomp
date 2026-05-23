@@ -18,8 +18,6 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
-extern "C" double sin(double);
-
 #include <math.h>
 
 extern unsigned char DAT_8020fab8[];

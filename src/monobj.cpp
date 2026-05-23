@@ -31,7 +31,6 @@ u8 m_boss__8CGMonObj[0x8C];
 
 extern "C" void __ptmf_scall(...);
 extern "C" int __cntlzw(unsigned int);
-extern "C" void aiAddDuct__8CGMonObjFRi(CGMonObj*, int&);
 extern "C" char SoundBuffer_1248_[];
 extern "C" float DAT_8032ec24;
 extern "C" float g_hit_t;
@@ -192,7 +191,7 @@ void CGMonObj::onFramePreCalc()
 		if ((reinterpret_cast<unsigned int>(object->m_scriptHandle[4]) < 0x9A) &&
 			(0x8D < reinterpret_cast<unsigned int>(object->m_scriptHandle[4]))) {
 			int aiLocal = 0;
-			aiAddDuct__8CGMonObjFRi(this, aiLocal);
+			aiAddDuct(aiLocal);
 		} else {
 			__ptmf_scall(this, mon + 0x708);
 		}

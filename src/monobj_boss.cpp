@@ -10,26 +10,9 @@
 
 #include <math.h>
 #include <string.h>
+#include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
-extern "C" int sprintf(char*, const char*, ...);
-extern "C" void setAttackAfter__8CGMonObjFi(CGMonObj*, int);
-extern "C" void setActionParam__8CGMonObjFi(CGMonObj*, int);
-extern "C" void setRepop__8CGMonObjFi(CGMonObj*, int);
-extern "C" void logicFuncDefault__8CGMonObjFv(CGMonObj*);
-extern "C" void initFinishedFuncDefault__8CGMonObjFv(CGMonObj*);
-extern "C" int calcBranchFuncDefault__8CGMonObjFi(CGMonObj*, int);
-extern "C" void aiTargetAttackRomMon__8CGMonObjFi(CGMonObj*, int);
-extern "C" void aiTarget__8CGMonObjFv(CGMonObj*);
-extern "C" void _aiSeq__8CGMonObjFiiiiii(CGMonObj*, int, int, int, int, int, int);
-extern "C" void ResetParticleWork__13CFlatRuntime2Fii(void*, int, int);
-extern "C" void SetParticleWorkTrace__13CFlatRuntime2FPQ212CFlatRuntime7CObject(void*, void*);
-extern "C" void SetParticleWorkBind__13CFlatRuntime2FPQ212CFlatRuntime7CObject(void*, void*);
-extern "C" void PutParticleWork__13CFlatRuntime2Fv(void*);
-extern "C" void moveFrame__8CGMonObjFv(CGMonObj*);
-extern "C" void rotTarget__8CGMonObjFif(CGMonObj*, int, float);
 extern "C" void CGMonObj_ResetActionState(CGMonObj*);
-extern "C" void teleport__8CGMonObjFiiiiiiiiiP3VecRiR3Vec(CGMonObj*, int, int, int, int, int, int, int, int, int,
-                                                           Vec*, int&, Vec&);
 extern float FLOAT_80331dd0;
 extern const float FLOAT_80331cf8 = 0.0f;
 extern float FLOAT_80331dcc;
@@ -76,7 +59,6 @@ extern char SoundBuffer[];
 extern char SoundBuffer_1260_[];
 extern "C" float MG_GBA_THREAD_MSG_SETPORT_ct;
 extern "C" char g_errCt;
-extern "C" unsigned char m_boss__8CGMonObj[];
 extern "C" Vec DAT_802127c0;
 extern "C" Vec DAT_802127f0[];
 
@@ -186,7 +168,7 @@ void CGMonObj::logicFuncGiantCrab()
 	}
 
 	if (nextState == -1) {
-		logicFuncDefault__8CGMonObjFv(this);
+		logicFuncDefault();
 	} else {
 		prgObj->changeStat(nextState, 0, 0);
 	}
@@ -368,10 +350,10 @@ void CGMonObj::changeStatFuncGolem(int stat)
 {
 	switch (stat) {
 	case 100:
-		setActionParam__8CGMonObjFi(this, -10);
+		setActionParam(-10);
 		break;
 	case 101:
-		setActionParam__8CGMonObjFi(this, -9);
+		setActionParam(-9);
 		break;
 	}
 }
@@ -459,7 +441,7 @@ void CGMonObj::frameStatFuncGolem()
 		reinterpret_cast<CGObject*>(this)->m_rotTargetY =
 		    reinterpret_cast<CGPrgObj*>(this)->getTargetRot(
 		        reinterpret_cast<CGPrgObj*>(Game.m_partyObjArr[*reinterpret_cast<int*>(self + 0x6C4)]));
-		setAttackAfter__8CGMonObjFi(this, *reinterpret_cast<int*>(self + 0x560));
+		setAttackAfter(*reinterpret_cast<int*>(self + 0x560));
 	} else {
 		if (reinterpret_cast<CGPrgObj*>(this)->m_stateFrame == 0) {
 			float turnOffset = FLOAT_80331cf8;
@@ -495,7 +477,7 @@ void CGMonObj::changeStatFuncArmstrong(int stat)
 {
 	switch (stat) {
 	case 100:
-		setActionParam__8CGMonObjFi(this, -14);
+		setActionParam(-14);
 		break;
 	}
 }
@@ -729,7 +711,7 @@ int CGMonObj::calcBranchFuncOrcKing(int)
 	if (script != 0 && script[7] < (script[0x1A / 2] / 5)) {
 		branch = 2;
 	} else {
-		branch = calcBranchFuncDefault__8CGMonObjFi(this, 1);
+		branch = calcBranchFuncDefault(1);
 	}
 	return branch;
 }
@@ -766,9 +748,8 @@ void CGMonObj::frameStatFuncGoblinKing()
 	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
 	switch (prgObj->m_lastStateId) {
 	case 100:
-		teleport__8CGMonObjFiiiiiiiiiP3VecRiR3Vec(
-		    this, 0, 0xd, 8, 0x42, 0xa03e, 0xa03f, 3, 4, 5, &DAT_802127c0,
-		    *reinterpret_cast<int*>(SoundBuffer_1260_), *reinterpret_cast<Vec*>(SoundBuffer_1260_ + 4));
+		teleport(0, 0xd, 8, 0x42, 0xa03e, 0xa03f, 3, 4, 5, &DAT_802127c0,
+		         *reinterpret_cast<int*>(SoundBuffer_1260_), *reinterpret_cast<Vec*>(SoundBuffer_1260_ + 4));
 		break;
 	}
 	return;
@@ -870,7 +851,7 @@ void CGMonObj::frameStatFuncSaw()
 			}
 		}
 
-		moveFrame__8CGMonObjFv(this);
+		moveFrame();
 	}
 }
 
@@ -996,7 +977,7 @@ state100:
 		*reinterpret_cast<int*>(self + 0x738) = 0x65;
 	}
 
-	moveFrame__8CGMonObjFv(this);
+	moveFrame();
 	const int branch = *reinterpret_cast<int*>(self + 0x6D0);
 	const int flatFlags = *reinterpret_cast<int*>(CFlat + 0x12E8);
 	if ((*reinterpret_cast<volatile signed char*>(SoundBuffer_1260_ + 0x14) < 0) ||
@@ -1008,7 +989,7 @@ state100:
 state101:
 	if (*reinterpret_cast<int*>(self + 0x528) == 0) {
 		reinterpret_cast<CGPrgObj*>(this)->reqAnim(-1, 0, 0);
-		rotTarget__8CGMonObjFif(this, *reinterpret_cast<int*>(self + 0x6C4), FLOAT_80331da4);
+		rotTarget(*reinterpret_cast<int*>(self + 0x6C4), FLOAT_80331da4);
 	}
 	if ((*reinterpret_cast<volatile signed char*>(SoundBuffer_1260_ + 0x14) < 0) ||
 	    (*reinterpret_cast<float*>(self + 0x5D0 + *reinterpret_cast<int*>(self + 0x620) * 4) < FLOAT_80331da8)) {
@@ -1081,7 +1062,7 @@ void CGMonObj::changeStatFuncDragonZombie(int stat)
 {
 	switch (stat) {
 	case 100:
-		setActionParam__8CGMonObjFi(this, -11);
+		setActionParam(-11);
 		break;
 	}
 }
@@ -1175,7 +1156,7 @@ void CGMonObj::changeStatFuncCaveWorm(int stat)
 {
 	switch (stat) {
 	case 100:
-		setActionParam__8CGMonObjFi(this, -8);
+		setActionParam(-8);
 		break;
 	}
 }
@@ -1230,10 +1211,10 @@ void CGMonObj::changeStatFuncLich(int stat)
 {
 	switch (stat) {
 	case 100:
-		setActionParam__8CGMonObjFi(this, -10);
+		setActionParam(-10);
 		break;
 	case 101:
-		setActionParam__8CGMonObjFi(this, -14);
+		setActionParam(-14);
 		break;
 	}
 }
@@ -1345,13 +1326,13 @@ void CGMonObj::changeStatFuncTetsukyojin(int stat)
 				return;
 			}
 		} else if (stat == 0x67) {
-			setActionParam__8CGMonObjFi(this, -12);
+			setActionParam(-12);
 			return;
 		} else {
 			return;
 		}
 	} else {
-		setActionParam__8CGMonObjFi(this, -14);
+		setActionParam(-14);
 	}
 
 	*reinterpret_cast<int*>(SoundBuffer_1260_) += 1;
@@ -1460,7 +1441,7 @@ void CGMonObj::frameStatFuncTetsukyojin()
 			*reinterpret_cast<int*>(self + 0x72C) = static_cast<int>(cappedDistance * FLOAT_80331d30);
 			*reinterpret_cast<int*>(self + 0x738) = 0x67;
 		}
-		moveFrame__8CGMonObjFv(this);
+		moveFrame();
 	} else if (state == 0x67) {
 		if (prgObj->m_stateFrame == 0x10) {
 			memset(self + 0x70C, 0, 0x34);
@@ -1476,7 +1457,7 @@ void CGMonObj::frameStatFuncTetsukyojin()
 			    static_cast<int>((FLOAT_80331d58 * (FLOAT_80331d84 - object->m_capsuleHalfHeight)) / FLOAT_80331d78);
 		}
 		if (prgObj->m_stateFrame > 0xF) {
-			moveFrame__8CGMonObjFv(this);
+			moveFrame();
 		}
 		reinterpret_cast<CGCharaObj*>(this)->statAttack();
 	} else if (state > 99) {
@@ -1560,9 +1541,9 @@ void CGMonObj::damagedFuncGigasLoad()
 int CGMonObj::tgtFuncGigasLoad(int)
 {
 	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
-	aiTargetAttackRomMon__8CGMonObjFi(this, 0x3B);
+	aiTargetAttackRomMon(0x3B);
 	if (*reinterpret_cast<int*>(mon + 0x6C4) < 0) {
-		aiTarget__8CGMonObjFv(this);
+		aiTarget();
 	}
 	return *reinterpret_cast<int*>(mon + 0x6C4);
 }
@@ -1614,7 +1595,7 @@ void CGMonObj::frameStatFuncWifeLamia()
 				*reinterpret_cast<float*>(mon + 0x724) = FLOAT_80331d78;
 				*reinterpret_cast<float*>(mon + 0x728) = reinterpret_cast<CGObject*>(this)->m_bodyEllipsoidRadius;
 			}
-			moveFrame__8CGMonObjFv(this);
+			moveFrame();
 			if ((*reinterpret_cast<u32*>(mon + 0x710) & 1) != 0) {
 				prgObj->addSubStat();
 			}
@@ -1664,10 +1645,10 @@ void CGMonObj::changeStatFuncMolbol(int stat)
 {
 	switch (stat) {
 	case 100:
-		setActionParam__8CGMonObjFi(this, -13);
+		setActionParam(-13);
 		break;
 	case 101:
-		setActionParam__8CGMonObjFi(this, -14);
+		setActionParam(-14);
 		break;
 	}
 }
@@ -1735,7 +1716,7 @@ void CGMonObj::frameStatFuncMolbol()
  */
 void CGMonObj::initFinishedFuncMeteoParasiteC()
 {
-	initFinishedFuncDefault__8CGMonObjFv(this);
+	initFinishedFuncDefault();
 	*reinterpret_cast<CGMonObj**>(m_boss__8CGMonObj + 0x74) = this;
 
 	if (strcmp(Game.m_currentScriptName, s_meteo_3_80331D64) == 0) {
@@ -1916,7 +1897,7 @@ void CGMonObj::logicFuncMeteoParasiteC()
 	if (nextState != -1) {
 		reinterpret_cast<CGPrgObj*>(this)->changeStat(nextState, 0, 0);
 	} else {
-		logicFuncDefault__8CGMonObjFv(this);
+		logicFuncDefault();
 	}
 }
 
@@ -1946,7 +1927,7 @@ int CGMonObj::attackCheckFuncMeteoParasiteC(int)
  */
 void CGMonObj::initFinishedFuncMeteoParasite()
 {
-	initFinishedFuncDefault__8CGMonObjFv(this);
+	initFinishedFuncDefault();
 
 	const int scriptKind = reinterpret_cast<int>(reinterpret_cast<CGObject*>(this)->m_scriptHandle[4]);
 	if (scriptKind == 0x85) {
@@ -1999,9 +1980,9 @@ void CGMonObj::changeStatFuncMeteoParasite(int stat)
 		if (stat == 0x67) {
 			CGMonObj* meteoC = *reinterpret_cast<CGMonObj**>(SoundBuffer_1260_ + 0x74);
 			if (*reinterpret_cast<int*>(reinterpret_cast<u8*>(meteoC) + 0x6D0) == 1) {
-				setActionParam__8CGMonObjFi(this, -13);
+				setActionParam(-13);
 			} else {
-				setActionParam__8CGMonObjFi(this, -14);
+				setActionParam(-14);
 			}
 		}
 	}
@@ -2157,7 +2138,7 @@ void CGMonObj::logicFuncMeteoParasite()
 	}
 
 	if (nextState == -1) {
-		logicFuncDefault__8CGMonObjFv(this);
+		logicFuncDefault();
 	} else {
 		reinterpret_cast<CGPrgObj*>(this)->changeStat(nextState, 0, 0);
 	}
@@ -2208,9 +2189,9 @@ int CGMonObj::attackCheckFuncMeteoParasite(int)
 void CGMonObj::aiAddDuct(int& seq)
 {
 	if (Math.Rand(300) == 0) {
-		aiTarget__8CGMonObjFv(this);
-		_aiSeq__8CGMonObjFiiiiii(this, -14, seq, 0, 1, 100, -1);
-		_aiSeq__8CGMonObjFiiiiii(this, -13, seq, 1, 0, 100, -1);
+		aiTarget();
+		aiSeq(-14, seq, 0, 1, 100, -1);
+		aiSeq(-13, seq, 1, 0, 100, -1);
 		const int seOffset = Math.Rand(3);
 		reinterpret_cast<CGPrgObj*>(this)->playSe3D(seOffset + 0x11D40, 0x32, 0x96, 0, 0);
 	}
@@ -2228,7 +2209,7 @@ void CGMonObj::aiAddDuct(int& seq)
 void CGMonObj::initFinishedFuncDuct()
 {
 	CGObject* object = reinterpret_cast<CGObject*>(this);
-	initFinishedFuncDefault__8CGMonObjFv(this);
+	initFinishedFuncDefault();
 	const int slot = static_cast<int>(reinterpret_cast<long>(object->m_scriptHandle[4])) - 0x8E;
 	reinterpret_cast<CGMonObj**>(SoundBuffer_1260_ + 0x38)[slot] = this;
 }
@@ -2290,7 +2271,7 @@ void CGMonObj::logicFuncRamoe()
 	}
 
 	if (nextState == -1) {
-		logicFuncDefault__8CGMonObjFv(this);
+		logicFuncDefault();
 	} else {
 		reinterpret_cast<CGPrgObj*>(this)->changeStat(nextState, 0, 0);
 	}
@@ -2309,7 +2290,7 @@ void CGMonObj::changeStatFuncRamoe(int stat)
 {
 	switch (stat) {
 	case 100:
-		setActionParam__8CGMonObjFi(this, -9);
+		setActionParam(-9);
 		break;
 	}
 }
@@ -2347,7 +2328,7 @@ void CGMonObj::frameStatFuncRamoe()
 				CGMonObj* monObj = reinterpret_cast<CGMonObj*>(*scriptWork);
 				CGPrgObj* monPrg = reinterpret_cast<CGPrgObj*>(monObj);
 				if (monObj != 0 && monPrg->m_lastStateId == 9 && monPrg->m_subState == 2) {
-					setRepop__8CGMonObjFi(monObj, 0);
+					monObj->setRepop(0);
 				}
 			}
 		}
@@ -2367,7 +2348,7 @@ void CGMonObj::frameStatFuncRamoe()
 void CGMonObj::initFinishedFuncLastBoss()
 {
 	CGObject* object = reinterpret_cast<CGObject*>(this);
-	initFinishedFuncDefault__8CGMonObjFv(this);
+	initFinishedFuncDefault();
 	*reinterpret_cast<CGMonObj**>(SoundBuffer + 1260) = this;
 	if (object->m_charaModelHandle != 0) {
 		*reinterpret_cast<void**>(SoundBuffer + 1264) = object->m_charaModelHandle->m_model;
@@ -2411,7 +2392,7 @@ void CGMonObj::changeStatFuncLastBoss(int stat)
 {
 	switch (stat) {
 	case 0x66:
-		setActionParam__8CGMonObjFi(this, -7);
+		setActionParam(-7);
 		break;
 	}
 }
@@ -2594,7 +2575,7 @@ void CGMonObj::logicFuncLastBoss()
 	}
 
 	if (nextState == -1) {
-		logicFuncDefault__8CGMonObjFv(this);
+		logicFuncDefault();
 	} else {
 		prgObj->changeStat(nextState, 0, 0);
 	}
@@ -2743,7 +2724,7 @@ void CGMonObj::teleport(
 
 			if (stateFrame == blendEndPlusFrame) {
 				object->m_bgColMask |= 0xC0000;
-				setAttackAfter__8CGMonObjFi(this, *reinterpret_cast<int*>(mon + 0x560));
+				setAttackAfter(*reinterpret_cast<int*>(mon + 0x560));
 			}
 		}
 	}
@@ -2823,10 +2804,10 @@ void CGMonObj::suikomi(int endFrame, float zOffset)
 		for (int i = 0; i < 4; i++) {
 			CGPartyObj* party = Game.m_partyObjArr[i];
 			if (party != 0) {
-				ResetParticleWork__13CFlatRuntime2Fii(CFlat, 0x26, *(int*)(self + 0x58c));
-				SetParticleWorkTrace__13CFlatRuntime2FPQ212CFlatRuntime7CObject(CFlat, this);
-				SetParticleWorkBind__13CFlatRuntime2FPQ212CFlatRuntime7CObject(CFlat, party);
-				PutParticleWork__13CFlatRuntime2Fv(CFlat);
+				gCFlatRuntime2.ResetParticleWork(0x26, *(int*)(self + 0x58c));
+				gCFlatRuntime2.SetParticleWorkTrace(this);
+				gCFlatRuntime2.SetParticleWorkBind(party);
+				gCFlatRuntime2.PutParticleWork();
 			}
 		}
 	}

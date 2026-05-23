@@ -1,12 +1,13 @@
 #ifndef _FFCC_PPP_SHOPMENU_H_
 #define _FFCC_PPP_SHOPMENU_H_
 
+#include "ffcc/singmenu.h"
+
 #include <dolphin/gx.h>
 
 class CFont;
 class CMaterialSet;
 class CCaravanWork;
-class CMenuPcs;
 struct tagOAN3_SHAPE;
 
 void _drawNoShadowFont(CFont*, char*, float, float, int, int);
@@ -20,13 +21,6 @@ void drawShapeSeq(int, int, int, int, unsigned char, unsigned char, unsigned cha
 void drawShapeSeqScale(int, int, int, int, float, float, unsigned char);
 void drawShapeSeqGrouad(int, int, int, int, float, float, _GXColor, _GXColor, _GXColor, _GXColor);
 void drawGrouadQuad(int, int, int, int, _GXColor, _GXColor, _GXColor, _GXColor);
-
-class CMenuPcs
-{
-public:
-    void CreateShopMenu();
-    void CreateSmithMenu();
-};
 
 class CShopMenu
 {

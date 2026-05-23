@@ -11,6 +11,7 @@ extern int gPppCalcDisabled;
 #include "ffcc/util.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/pppShape.h"
+#include "ffcc/pppYmEnv.h"
 
 #include <string.h>
 
@@ -31,13 +32,6 @@ void pppInitBlendMode(void);
 void pppSetBlendMode(unsigned char);
 
 static inline float YmLaserConst(const float& value) { return *reinterpret_cast<const float*>(&value); }
-
-extern "C" {
-void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
-    void*, long, float&, float&, float&, float, float&, float&);
-int GetCharaNodeFrameMatrix__FP9_pppMngStfPA4_f(_pppMngSt*, float, Mtx);
-int GetTextureFromRSD__FiP9_pppEnvSt(int, _pppEnvSt*);
-}
 
 extern "C" const char s_pppYmLaser_cpp_801DB4B0[] = "pppYmLaser.cpp";
 extern const f32 FLOAT_80330de0 = -1.0f;
@@ -125,7 +119,7 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 		return;
 	}
 
-	tex = GetTextureFromRSD__FiP9_pppEnvSt(dataValIndex, pppEnvStPtr);
+	tex = GetTextureFromRSD(dataValIndex, pppEnvStPtr);
 	pppSetBlendMode(step->m_laser.m_blendMode);
 	_GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP0);
 	pppSetDrawEnv(
@@ -206,7 +200,7 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 			_GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
 			_GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
 		} else {
-			tex = GetTextureFromRSD__FiP9_pppEnvSt(step->m_initWOrk, pppEnvStPtr);
+			tex = GetTextureFromRSD(step->m_initWOrk, pppEnvStPtr);
 			_GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
 			GXLoadTexObj((GXTexObj*)(tex + 0x28), GX_TEXMAP0);
 		}
@@ -385,11 +379,11 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtr
 		emptyHistory = 1;
 	}
 
-	CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
+	CalcGraphValue(
 		(_pppPObject*)laser, step->m_graphId, work->m_halfWidth, work->m_graphValue2, work->m_graphValue3,
 		step->m_laser.m_halfWidthBase,
 		step->m_laser.m_halfWidthVelocity, step->m_laser.m_halfWidthAccel);
-	CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
+	CalcGraphValue(
 		(_pppPObject*)laser, step->m_graphId, work->m_lengthStep, work->m_graphValue0, work->m_graphValue1,
 		step->m_laser.m_lengthStepBase,
 		step->m_laser.m_lengthStepVelocity, step->m_laser.m_lengthStepAccel);
@@ -423,7 +417,7 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtr
 			s32 frameCount = step->m_laser.m_historyFrameCount + 1;
 			float t = YmLaserConst(FLOAT_80330de0) / (float)frameCount;
 			t *= (float)i;
-			if (GetCharaNodeFrameMatrix__FP9_pppMngStfPA4_f(pppMngStPtr, t, charaMtx) == 0) {
+			if (GetCharaNodeFrameMatrix(pppMngStPtr, t, charaMtx) == 0) {
 				emptyHistory = 1;
 				continue;
 			} else {

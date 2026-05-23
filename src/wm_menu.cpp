@@ -25,12 +25,12 @@
 #include <PowerPC_EABI_Support/Runtime/New.h>
 #include <math.h>
 #include <string.h>
+#include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
 #include "ffcc/fontman.h"
 
 extern "C" void* __vt__Q212CFlatRuntime7CObject[];
 extern "C" void* __vt__9CGBaseObj[];
 extern "C" void* __vt__8CGObject[];
-extern "C" int rand(void);
 extern "C" void Create__9CGBaseObjFv(void*);
 extern "C" int DAT_8021082c[];
 extern "C" int DAT_80210830[];

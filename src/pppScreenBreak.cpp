@@ -10,6 +10,7 @@
 #include "ffcc/linkage.h"
 #include "ffcc/p_graphic.h"
 #include "ffcc/pppPart.h"
+#include "ffcc/pppYmEnv.h"
 #include "ffcc/render_buffers.h"
 #include "ffcc/util.h"
 
@@ -149,9 +150,6 @@ extern "C" {
 int GetBackBufferRect2__8CGraphicFPvP9_GXTexObjiiiii12_GXTexFilter9_GXTexFmti(
     CGraphic*, void*, _GXTexObj*, int, int, int, int, int, int, int, int);
 void SetBlurParameter__11CGraphicPcsFiUcUcUcUcUcs(CGraphicPcs*, int, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, short);
-void* GetCharaHandlePtr__FP8CGObjectl(void*, long);
-int GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void*);
-void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(void*, long, float&, float&, float&, float, float&, float&);
 }
 
 /*
@@ -167,8 +165,8 @@ void pppRenderScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB*, ppp
 {
     s32 dataOffset = param_3->m_serializedDataOffsets[2];
     u8* value = (u8*)pppScreenBreak + dataOffset + 0x80;
-    void* handle = GetCharaHandlePtr__FP8CGObjectl(*(void**)((u8*)pppMngStPtr + 0xD8), 0);
-    int model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
+    CCharaPcs::CHandle* handle = GetCharaHandlePtr(*reinterpret_cast<CGObject**>(reinterpret_cast<u8*>(pppMngStPtr) + 0xD8), 0);
+    int model = reinterpret_cast<int>(GetCharaModelPtr(handle));
     reinterpret_cast<CChara::CModel*>(model)->SearchNode(const_cast<char*>(s_f999_root_801dd4c8));
 
     if (value[0x24] == 0) {
@@ -200,8 +198,8 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param
     s32* serializedDataOffsets = param_3->m_serializedDataOffsets;
     float* value = (float*)((u8*)pppScreenBreak + serializedDataOffsets[2] + 0x80);
     u8* colorSource = (u8*)pppScreenBreak + serializedDataOffsets[0] + 0x80;
-    void* handle = GetCharaHandlePtr__FP8CGObjectl(*(void**)((u8*)pppMngStPtr + 0xD8), 0);
-    int model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
+    CCharaPcs::CHandle* handle = GetCharaHandlePtr(*reinterpret_cast<CGObject**>(reinterpret_cast<u8*>(pppMngStPtr) + 0xD8), 0);
+    int model = reinterpret_cast<int>(GetCharaModelPtr(handle));
     *(float**)(model + 0xE4) = value;
     *(pppScreenBreakUnkB**)(model + 0xE8) = param_2;
 
@@ -214,8 +212,8 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param
     color[3] = colorSource[11];
     DCFlushRange(value + 10, 4);
 
-    CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(&pppScreenBreak->field0_0x0, param_2->m_graphId, value[0], value[1], value[2],
-                                                 param_2->m_stepValue, param_2->m_arg3, *(float*)param_2->m_payload);
+    CalcGraphValue(reinterpret_cast<_pppPObject*>(pppScreenBreak), param_2->m_graphId, value[0], value[1], value[2],
+                   param_2->m_stepValue, param_2->m_arg3, *reinterpret_cast<float*>(param_2->m_payload));
 
     void* pieceStorage = *(void**)&value[3];
     if (pieceStorage == NULL) {
@@ -305,8 +303,8 @@ void pppDesScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkC* param_2
     s32* serializedDataOffsets = *(s32**)((u8*)param_2 + 0xC);
     s32 dataOffset = serializedDataOffsets[2];
     u8* pppData = ((u8*)pppScreenBreak + dataOffset + 0x80);
-    void* handle = GetCharaHandlePtr__FP8CGObjectl(*(void**)((u8*)pppMngStPtr + 0xD8), 0);
-    u8* model = (u8*)GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
+    CCharaPcs::CHandle* handle = GetCharaHandlePtr(*reinterpret_cast<CGObject**>(reinterpret_cast<u8*>(pppMngStPtr) + 0xD8), 0);
+    u8* model = reinterpret_cast<u8*>(GetCharaModelPtr(handle));
     if (model != 0) {
         *(void**)(model + 0xF0) = NULL;
         *(void**)(model + 0xFC) = NULL;
@@ -359,8 +357,8 @@ void pppConScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkC* param_2
     u8* pppData = (u8*)pppScreenBreak + dataOffset + 0x80;
     float* value = (float*)pppData;
     void* gObject = *(void**)((u8*)pppMngStPtr + 0xD8);
-    void* handle = GetCharaHandlePtr__FP8CGObjectl(gObject, 0);
-    int model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
+    CCharaPcs::CHandle* handle = GetCharaHandlePtr(reinterpret_cast<CGObject*>(gObject), 0);
+    int model = reinterpret_cast<int>(GetCharaModelPtr(handle));
     *(u32*)((u8*)gObject + 0x60) |= 0x40;
     *(void**)(model + 0xF0) = (void*)SB_BeforeDrawCallback;
     const float& f = FLOAT_80331cc4;

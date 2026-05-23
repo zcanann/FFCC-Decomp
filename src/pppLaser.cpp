@@ -29,11 +29,6 @@ extern const f32 FLOAT_80333430;
 void pppInitBlendMode(void);
 void pppSetBlendMode(unsigned char);
 
-extern "C" {
-void pppStopSe__FP9_pppMngStP7PPPSEST(_pppMngSt*, PPPSEST*);
-int GetTextureFromRSD__FiP9_pppEnvSt(int, _pppEnvSt*);
-}
-
 extern "C" const char s_pppLaser_cpp_801E3048[] = "pppLaser.cpp";
 
 struct CMapCylinderRaw {
@@ -131,7 +126,7 @@ void pppConstructLaser(struct pppLaser *pppLaser, _pppCtrlTable *param_2)
     } else {
         work->m_maxLength = FLOAT_80333448;
         *(u8*)((u8*)pppMngStPtr + 0xe8) = 1;
-        pppStopSe__FP9_pppMngStP7PPPSEST(pppMngStPtr, (PPPSEST*)((u8*)pppMngStPtr + 0x11c));
+        pppStopSe(pppMngStPtr, (PPPSEST*)((u8*)pppMngStPtr + 0x11c));
     }
 }
 
@@ -399,7 +394,7 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
         return;
     }
 
-    tex = GetTextureFromRSD__FiP9_pppEnvSt(dataValIndex, pppEnvStPtr);
+    tex = GetTextureFromRSD(dataValIndex, pppEnvStPtr);
     pppSetBlendMode(step->m_laser.m_blendMode);
     _GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP0);
     pppSetDrawEnv(
@@ -480,7 +475,7 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
             _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
             _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
         } else {
-            tex = GetTextureFromRSD__FiP9_pppEnvSt(step->m_initWOrk, pppEnvStPtr);
+            tex = GetTextureFromRSD(step->m_initWOrk, pppEnvStPtr);
             _GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
             GXLoadTexObj((GXTexObj*)(tex + 0x28), GX_TEXMAP0);
         }

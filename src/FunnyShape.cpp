@@ -5,13 +5,9 @@
 #include "dolphin/gx.h"
 #include "dolphin/os/OSCache.h"
 
-extern "C" double sin(double);
-extern "C" double cos(double);
-
 #include <math.h>
 #include <string.h>
-
-extern "C" s32 rand();
+#include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
 
 extern const GXColor DAT_8032fd58;
 extern const GXColor DAT_8032fd5c;

@@ -8,9 +8,6 @@
 
 int s_usbReadPollFrameCounter;
 char s_usbReadPollInitialized;
-extern "C" void create__7CUSBPcsFv(CUSBPcs*);
-extern "C" void destroy__7CUSBPcsFv(CUSBPcs*);
-extern "C" void func__7CUSBPcsFv(CUSBPcs*);
 
 extern const char s_CUSBPcs_8032f810[] = "CUSBPcs";
 inline CUSBPcs::CUSBPcs()

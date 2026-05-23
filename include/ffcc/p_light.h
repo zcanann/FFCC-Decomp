@@ -119,6 +119,12 @@ public:
     GXLightObj m_mapLightObj;        // 0x4370
 };
 
+extern "C" void create__9CLightPcsFv(CLightPcs*);
+extern "C" void destroy__9CLightPcsFv(CLightPcs*);
+extern "C" void calc__9CLightPcsFv(CLightPcs*);
+extern "C" void draw__9CLightPcsFv(CLightPcs*);
+extern "C" void MakeLightMap__9CLightPcsFv(CLightPcs*);
+
 void setchanctrl(CLightPcs::TARGET, unsigned long);
 extern CLightPcs LightPcs;
 

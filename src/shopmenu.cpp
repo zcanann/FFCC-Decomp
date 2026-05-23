@@ -15,21 +15,10 @@
 #include "ffcc/p_tina.h"
 #include <string.h>
 #include <PowerPC_EABI_Support/Runtime/New.h>
+#include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
 extern "C" {
-void SetMode__9CShopMenuFi(void*, int);
-void DrawSingleBase__8CMenuPcsFf(void*, float);
-int GetItemType__8CMenuPcsFii(void*, int, int);
-const char* GetJobStr__8CMenuPcsFi(CMenuPcs*, int);
-void GetRaceStr__8CMenuPcsFiPc(void*, int, char*);
-int ChkEquipPossible__8CMenuPcsFi(void*, int);
-void GetRecipeMaterial__8CMenuPcsFiPQ28CMenuPcs12MaterialInfo(void*, int, short*);
-char EquipChk__8CMenuPcsFi(void*, int);
-int GetSmithItem__8CMenuPcsFi(void*, int);
 int __cntlzw(unsigned int);
-void pppCacheLoadShape__FPsP12_pppDataHead(short*, _pppDataHead*);
-int GetEquipType__8CMenuPcsFi(void*, int);
-char* GetAttrStr__8CMenuPcsFi(void*, int);
 void SetScale__5CFontFf(float, CFont*);
 void SetScaleX__5CFontFf(float, CFont*);
 void SetScaleY__5CFontFf(float, CFont*);
@@ -45,9 +34,7 @@ void DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(void*, CFont*, char*, float, floa
 void DrawShadowFont__8CMenuPcsFP5CFontPcffii(void*, CFont*, char*, float, float, int, int);
 void DrawSingleIcon__8CMenuPcsFiiifif(void*, int, int, int, float, float, float);
 void DrawInit__8CMenuPcsFv(void*);
-void DrawCursor__8CMenuPcsFiif(void*, int, int, float);
 void MakeAgbString__4CMesFPcPcii(char*, char*, int, int);
-int sprintf(char*, const char*, ...);
 char* strcpy(char*, const char*);
 char* strcat(char*, const char*);
 }
@@ -374,7 +361,7 @@ static bool CanTradeShopMenuItem(CShopMenu* shopMenu, int index, int itemNo)
         return (*reinterpret_cast<unsigned int*>(caravan + ((itemNo - 0x191) >> 5) * 4 + 0xC08) & (1U << (bit & 0x1F))) != 0;
     }
 
-    if (EquipChk__8CMenuPcsFi(MenuPcsVoid(), index) != 0) {
+    if (MenuPcs.EquipChk(index) != 0) {
         return false;
     }
 
@@ -908,7 +895,7 @@ void drawGrouadQuad(int x, int y, int width, int height, _GXColor colorA, _GXCol
 void CShopMenu::Init(int mode)
 {
     gShopMenuInputLatch = 0;
-    SetMode__9CShopMenuFi(this, mode);
+    SetMode(mode);
 }
 
 /*
@@ -1005,14 +992,14 @@ void CShopMenu::DrawItemInfo(int itemNo, int x, int y, int unused0, int attrY, i
     DrawInit__5CFontFv(font);
 
     int languageId = static_cast<unsigned int>(Game.m_gameWork.m_languageId);
-    int equipType = GetEquipType__8CMenuPcsFi(MenuPcsVoid(), itemNo);
+    int equipType = MenuPcs.GetEquipType(itemNo);
     int statType;
     char* label = 0;
     if (equipType == 0) {
         statType = 0;
         label = ShopMenuMes(languageId - 1, SHOP_MENU_TEXT_STRENGTH);
     } else {
-        equipType = GetEquipType__8CMenuPcsFi(MenuPcsVoid(), itemNo);
+        equipType = MenuPcs.GetEquipType(itemNo);
         if (equipType == 3) {
             statType = 2;
         } else {
@@ -1029,7 +1016,7 @@ void CShopMenu::DrawItemInfo(int itemNo, int x, int y, int unused0, int attrY, i
     if (label == 0) {
         SetScaleX__5CFontFf(FLOAT_80332d2c, font);
         SetScaleY__5CFontFf(FLOAT_80332d28, font);
-        char* attrStr = GetAttrStr__8CMenuPcsFi(MenuPcsVoid(), attr);
+        char* attrStr = MenuPcs.GetAttrStr(attr);
         DrawInit__5CFontFv(font);
         DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(MenuPcsVoid(), font, attrStr, static_cast<float>(x + 0x40), static_cast<float>(y), 0x18, 0x12);
         DrawInit__8CMenuPcsFv(MenuPcsVoid());
@@ -1087,14 +1074,14 @@ void CShopMenu::DrawItemInfo(int itemNo, int x, int y, int unused0, int attrY, i
     if ((statType == 1) && (attr != 0)) {
         SetScaleX__5CFontFf(FLOAT_80332d2c, font);
         SetScaleY__5CFontFf(FLOAT_80332d28, font);
-        char* attrStr = GetAttrStr__8CMenuPcsFi(MenuPcsVoid(), attr);
+        char* attrStr = MenuPcs.GetAttrStr(attr);
         DrawInit__5CFontFv(font);
         DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(
             MenuPcsVoid(), font, attrStr, static_cast<float>(x + 0x40), static_cast<float>(attrY), 0x18, 0x12);
         DrawInit__8CMenuPcsFv(MenuPcsVoid());
 
         SetScaleX__5CFontFf(FLOAT_80332d28, font);
-        attrStr = GetAttrStr__8CMenuPcsFi(MenuPcsVoid(), attr);
+        attrStr = MenuPcs.GetAttrStr(attr);
         GetWidth__5CFontFPc(font, attrStr);
         if ((attr != 0) && (attr < 9)) {
             strcpy(textBuffer, DAT_80332d38);
@@ -1179,7 +1166,7 @@ void CShopMenu::DrawItemInfo0()
                 canTrade = false;
             }
         } else if (listType == 1) {
-            if (EquipChk__8CMenuPcsFi(MenuPcsVoid(), itemIndex) == 0) {
+            if (MenuPcs.EquipChk(itemIndex) == 0) {
                 canTrade = itemNo >= 0x9F;
             }
         }
@@ -1323,7 +1310,7 @@ void CShopMenu::DrawBuySellInfo()
                 unsigned int bit = static_cast<unsigned int>(itemNo - 0x191);
                 canTrade = (*reinterpret_cast<unsigned int*>(caravan + ((itemNo - 0x191) >> 5) * 4 + 0xC08) &
                             (1U << (bit & 0x1F))) != 0;
-            } else if ((listType == 1) && EquipChk__8CMenuPcsFi(MenuPcsVoid(), selected) == 0 && itemNo >= 0x9F) {
+            } else if ((listType == 1) && MenuPcs.EquipChk(selected) == 0 && itemNo >= 0x9F) {
                 canTrade = true;
             }
         }
@@ -1459,7 +1446,7 @@ void CShopMenu::DrawItemList()
                          (1U << (bit & 0x1F))) != 0) {
                         canTrade = true;
                     }
-                } else if (EquipChk__8CMenuPcsFi(MenuPcsVoid(), itemIndex) == 0 && tradeItemNo >= 0x9F) {
+                } else if (MenuPcs.EquipChk(itemIndex) == 0 && tradeItemNo >= 0x9F) {
                     canTrade = true;
                 }
             }
@@ -1476,9 +1463,9 @@ void CShopMenu::DrawItemList()
             drawShapeSeq(frame, 1, frameX, y - 4, 0xFF, 0, 0, FLOAT_80332d9c, 0);
             DrawInit__8CMenuPcsFv(MenuPcsVoid());
             if (ShopMenuInt(this, 0x10) == 0) {
-                DrawCursor__8CMenuPcsFiif(MenuPcsVoid(), 0x114 + (System.m_frameCounter & 7), y - 0x14, FLOAT_80332d28);
+                MenuPcs.DrawCursor(0x114 + (System.m_frameCounter & 7), y - 0x14, FLOAT_80332d28);
             } else if ((System.m_frameCounter & 1) == 0) {
-                DrawCursor__8CMenuPcsFiif(MenuPcsVoid(), 0x114, y - 0x14, FLOAT_80332d28);
+                MenuPcs.DrawCursor(0x114, y - 0x14, FLOAT_80332d28);
             }
         } else {
             frameX = 0x1B8;
@@ -1533,7 +1520,7 @@ void CShopMenu::DrawItemList()
  */
 void CShopMenu::DrawSoubiBase()
 {
-    DrawSingleBase__8CMenuPcsFf(reinterpret_cast<CMenuPcs*>(MenuPcsVoid()), FLOAT_80332d28);
+    MenuPcs.DrawSingleBase(FLOAT_80332d28);
     pppInitDrawEnv(0);
 
     GXSetVtxAttrFmt((GXVtxFmt)7, (GXAttr)9, (GXCompCnt)1, (GXCompType)4, 0);
@@ -1579,7 +1566,7 @@ void CShopMenu::DrawSoubiBase()
  */
 void CShopMenu::DrawMakeBase()
 {
-    DrawSingleBase__8CMenuPcsFf(reinterpret_cast<CMenuPcs*>(MenuPcsVoid()), FLOAT_80332d28);
+    MenuPcs.DrawSingleBase(FLOAT_80332d28);
     pppInitDrawEnv(0);
 
     GXSetVtxAttrFmt((GXVtxFmt)7, (GXAttr)9, (GXCompCnt)1, (GXCompType)4, 0);
@@ -1631,7 +1618,7 @@ void CShopMenu::DrawMakeBase()
 void CShopMenu::DrawShopBase()
 {
     Graphic.SetDrawDoneDebugData(1);
-    DrawSingleBase__8CMenuPcsFf(reinterpret_cast<CMenuPcs*>(MenuPcsVoid()), FLOAT_80332d28);
+    MenuPcs.DrawSingleBase(FLOAT_80332d28);
     Graphic.SetDrawDoneDebugData(2);
     pppInitDrawEnv(0);
 
@@ -1732,7 +1719,7 @@ void CShopMenu::DrawShopBase()
 
         if (ShopMenuInt(this, 0x10) == 2) {
             Graphic.SetDrawDoneDebugData(0x14);
-            DrawCursor__8CMenuPcsFiif(MenuPcsVoid(), 0x2C, ShopMenuInt(this, 0x3C) * 0x18 + 0x134, FLOAT_80332d28);
+            MenuPcs.DrawCursor(0x2C, ShopMenuInt(this, 0x3C) * 0x18 + 0x134, FLOAT_80332d28);
             Graphic.SetDrawDoneDebugData(0x15);
         }
     }
@@ -1884,7 +1871,7 @@ void CShopMenu::DrawSoubi()
     Draw__5CFontFPc(labelFont, cancelText);
     DrawInit__8CMenuPcsFv(MenuPcsVoid());
 
-    DrawCursor__8CMenuPcsFiif(MenuPcsVoid(), static_cast<int>(cancelTextX) - 0x24, ShopMenuInt(this, 0x3C) * 0x18 + 0x13C, 1.0f);
+    MenuPcs.DrawCursor(static_cast<int>(cancelTextX) - 0x24, ShopMenuInt(this, 0x3C) * 0x18 + 0x13C, 1.0f);
 }
 /*
  * --INFO--
@@ -1943,8 +1930,8 @@ void CShopMenu::DrawMake()
     DrawInit__8CMenuPcsFv(MenuPcsVoid());
 
     char raceBuffer[64];
-    GetRaceStr__8CMenuPcsFiPc(MenuPcsVoid(), resultItem, raceBuffer);
-    const int raceColor = (ChkEquipPossible__8CMenuPcsFi(MenuPcsVoid(), resultItem) != 0) ? 0x18 : 2;
+    MenuPcs.GetRaceStr(resultItem, raceBuffer);
+    const int raceColor = (MenuPcs.ChkEquipPossible(resultItem) != 0) ? 0x18 : 2;
     const char* raceText = ShopMenuMes(languageId, SHOP_MENU_TEXT_RACE);
 
     DrawInit__5CFontFv(font);
@@ -2012,7 +1999,7 @@ void CShopMenu::DrawMake()
     DrawInit__8CMenuPcsFv(MenuPcsVoid());
 
     short recipeMaterial[8];
-    GetRecipeMaterial__8CMenuPcsFiPQ28CMenuPcs12MaterialInfo(MenuPcsVoid(), selectedItem, recipeMaterial);
+    MenuPcs.GetRecipeMaterial(selectedItem, reinterpret_cast<CMenuPcs::MaterialInfo*>(recipeMaterial));
     int rowY = 300;
     for (int i = 0; i < 3; i++, rowY += 0x1E) {
         int materialItem = recipeMaterial[i];
@@ -2106,7 +2093,7 @@ void CShopMenu::DrawMake()
 
     DrawItemInfo(resultItem, 0x98, 0x7E, 0, 0x9C, 0, 0, 0);
     DrawItemHelp(ShopMenuInt(this, 0x28), 0x140, 0x172);
-    DrawCursor__8CMenuPcsFiif(MenuPcsVoid(), 0xD8, ShopMenuInt(this, 0x3C) * 0x18 + 0x14C, 1.0f);
+    MenuPcs.DrawCursor(0xD8, ShopMenuInt(this, 0x3C) * 0x18 + 0x14C, 1.0f);
 }
 /*
  * --INFO--
@@ -2137,7 +2124,7 @@ void CShopMenu::DrawSmith0()
     int caravan = ShopMenuInt(this, 0x20);
     const char* title = ShopMenuMes(languageId, SHOP_MENU_TEXT_BLACKSMITH);
     if (*reinterpret_cast<char*>(caravan + 0xBE1) != '\0') {
-        title = GetJobStr__8CMenuPcsFi(reinterpret_cast<CMenuPcs*>(MenuPcsVoid()), 1);
+        title = MenuPcs.GetJobStr(1);
     }
 
     float textX = 264.0f - GetWidth__5CFontFPc(font, title);
@@ -2193,7 +2180,7 @@ void CShopMenu::DrawShop0()
     DrawInit__8CMenuPcsFv(MenuPcsVoid());
 
     Graphic.SetDrawDoneDebugData(0x28);
-    DrawCursor__8CMenuPcsFiif(MenuPcsVoid(), 0xA8, 0x9C + selected * 0x24, 1.0f);
+    MenuPcs.DrawCursor(0xA8, 0x9C + selected * 0x24, 1.0f);
 }
 /*
  * --INFO--
@@ -2206,7 +2193,7 @@ void CShopMenu::DrawShop0()
  */
 void CShopMenu::SelectMake()
 {
-    unsigned int canSelect = ChkEquipPossible__8CMenuPcsFi(MenuPcsVoid(), ShopMenuInt(this, 0x150)) != 0;
+    unsigned int canSelect = MenuPcs.ChkEquipPossible(ShopMenuInt(this, 0x150)) != 0;
     if (canSelect != 0) {
         int selected = this->getItemNo(ShopMenuInt(this, 0x28));
         unsigned int money = *reinterpret_cast<unsigned int*>(ShopMenuCaravan(this) + 0x200);
@@ -2216,7 +2203,7 @@ void CShopMenu::SelectMake()
 
     int selected = this->getItemNo(ShopMenuInt(this, 0x28));
     short recipeMaterial[8];
-    GetRecipeMaterial__8CMenuPcsFiPQ28CMenuPcs12MaterialInfo(MenuPcsVoid(), selected, recipeMaterial);
+    MenuPcs.GetRecipeMaterial(selected, reinterpret_cast<CMenuPcs::MaterialInfo*>(recipeMaterial));
 
     short* material = recipeMaterial;
     for (int i = 0; i < 3; i++, material++) {
@@ -2254,14 +2241,14 @@ void CShopMenu::SelectMake()
                 if (reinterpret_cast<CCaravanWork*>(ShopMenuCaravan(this))->CanAddGil(-makeGil) != 0) {
                     Sound.PlaySe(0x52, 0x40, 0x7F, 0);
                     ShopMenuInt(this, 0x8) = 0xF;
-                    SetMode__9CShopMenuFi(this, 0xE);
+                    SetMode(0xE);
                     return;
                 }
             }
 
             Sound.PlaySe(4, 0x40, 0x7F, 0);
             ShopMenuInt(this, 0x8) = 9;
-            SetMode__9CShopMenuFi(this, 0xE);
+            SetMode(0xE);
         }
     } else {
         ShopMenuInt(this, 0x3C) ^= 1;
@@ -2339,7 +2326,7 @@ void CShopMenu::SelectYesNo()
                 unsigned int bit = static_cast<unsigned int>(itemId - 0x191);
                 int caravan = ShopMenuCaravan(this);
                 canTrade = (*reinterpret_cast<unsigned int*>(caravan + ((itemId - 0x191) >> 5) * 4 + 0xC08) & (1U << (bit & 0x1F))) != 0;
-            } else if (EquipChk__8CMenuPcsFi(MenuPcsVoid(), itemIndex) == 0) {
+            } else if (MenuPcs.EquipChk(itemIndex) == 0) {
                 canTrade = itemId >= 0x9F;
             }
         }
@@ -2538,7 +2525,7 @@ void CShopMenu::SelectItemIdx()
                 }
             } else if (listType == 1) {
                 if ((itemIndex != -1) && (itemNo >= 1)) {
-                    if (EquipChk__8CMenuPcsFi(MenuPcsVoid(), itemIndex) == 0) {
+                    if (MenuPcs.EquipChk(itemIndex) == 0) {
                         canSelect = itemNo >= 0x9F;
                     }
                 }
@@ -2557,8 +2544,8 @@ void CShopMenu::SelectItemIdx()
                 }
                 if (canSelect) {
                     ShopMenuInt(this, 0x8) = 0xC;
-                    ShopMenuInt(this, 0x150) = GetSmithItem__8CMenuPcsFi(MenuPcsVoid(), itemNo);
-                    SetMode__9CShopMenuFi(this, 0xB);
+                    ShopMenuInt(this, 0x150) = MenuPcs.GetSmithItem(itemNo);
+                    SetMode(0xB);
                     Sound.PlaySe(2, 0x40, 0x7F, 0);
                 } else {
                     Sound.PlaySe(4, 0x40, 0x7F, 0);
@@ -2762,7 +2749,7 @@ void CShopMenu::Calc()
             short recipeMaterial[8];
             int itemId = ResolveShopMenuSelectedItemId(this);
 
-            GetRecipeMaterial__8CMenuPcsFiPQ28CMenuPcs12MaterialInfo(MenuPcsVoid(), itemId, recipeMaterial);
+            MenuPcs.GetRecipeMaterial(itemId, reinterpret_cast<CMenuPcs::MaterialInfo*>(recipeMaterial));
             reinterpret_cast<CCaravanWork*>(ShopMenuCaravan(this))->AddGil(-CalcShopMenuMakeGil(this, itemId));
             reinterpret_cast<CCaravanWork*>(ShopMenuCaravan(this))->DeleteItem(itemId, 0);
 
@@ -2822,7 +2809,7 @@ void CMenuPcs::CreateSmithMenu()
     Graphic._WaitDrawDone(s_shopmenu_cpp_801ded8c, 0x2FE);
     *reinterpret_cast<void**>(shopMenu) = nullptr;
     *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(shopMenu) + 0x20) = Game.m_scriptFoodBase[0];
-    SetMode__9CShopMenuFi(shopMenu, 9);
+    shopMenu->SetMode(9);
     *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(shopMenu) + 0x18) =
         PartPcs.LoadMenuPdt(DAT_80332e54);
 
@@ -2833,7 +2820,7 @@ void CMenuPcs::CreateSmithMenu()
     *reinterpret_cast<int*>(cacheChunks + 2) =
         ppvAmemCacheSet.GetData(*cacheChunks, s_shopmenu_cpp_801ded8c, 0x32A);
     int cacheData = *reinterpret_cast<int*>(cacheChunks + 2);
-    pppCacheLoadShape__FPsP12_pppDataHead(
+    pppCacheLoadShape(
         reinterpret_cast<short*>(cacheData + *reinterpret_cast<int*>(cacheData + 0x14)), pppDataHead);
 }
 /*
@@ -2861,7 +2848,7 @@ void CMenuPcs::CreateShopMenu()
     Graphic._WaitDrawDone(s_shopmenu_cpp_801ded8c, 0x2FE);
     *reinterpret_cast<void**>(shopMenu) = nullptr;
     *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(shopMenu) + 0x20) = Game.m_scriptFoodBase[0];
-    SetMode__9CShopMenuFi(shopMenu, 0);
+    shopMenu->SetMode(0);
     *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(shopMenu) + 0x18) =
         PartPcs.LoadMenuPdt(DAT_80332e54);
 
@@ -2872,7 +2859,7 @@ void CMenuPcs::CreateShopMenu()
     *reinterpret_cast<int*>(cacheChunks + 2) =
         ppvAmemCacheSet.GetData(*cacheChunks, s_shopmenu_cpp_801ded8c, 0x32A);
     int cacheData = *reinterpret_cast<int*>(cacheChunks + 2);
-    pppCacheLoadShape__FPsP12_pppDataHead(
+    pppCacheLoadShape(
         reinterpret_cast<short*>(cacheData + *reinterpret_cast<int*>(cacheData + 0x14)), pppDataHead);
 }
 /*
@@ -3146,7 +3133,7 @@ mode_3_6_common:
         *reinterpret_cast<int*>(self + 0x4C) = 0;
 
         for (int i = 0; i < 0x40; i++) {
-            if (GetItemType__8CMenuPcsFii(MenuPcsVoid(), i, 0) == 9) {
+            if (MenuPcs.GetItemType(i, 0) == 9) {
                 int count = *reinterpret_cast<int*>(self + 0x4C);
                 *reinterpret_cast<int*>(self + 0x4C) = count + 1;
                 *reinterpret_cast<int*>(self + 0x50 + count * 4) = i;
@@ -3195,7 +3182,7 @@ void CShopMenu::SelectSOUBI()
     if ((buttons & 0x200) != 0) {
         Sound.PlaySe(3, 0x40, 0x7F, 0);
         ShopMenuInt(this, 0x8) = 9;
-        SetMode__9CShopMenuFi(this, 0x11);
+        SetMode(0x11);
         return;
     }
 
@@ -3205,15 +3192,15 @@ void CShopMenu::SelectSOUBI()
 
     if (ShopMenuInt(this, 0x3C) != 0) {
         ShopMenuInt(this, 0x8) = 9;
-        SetMode__9CShopMenuFi(this, 0x11);
+        SetMode(0x11);
         Sound.PlaySe(4, 0x40, 0x7F, 0);
         return;
     }
 
     ShopMenuInt(this, 0x8) = 9;
-    SetMode__9CShopMenuFi(this, 0x11);
+    SetMode(0x11);
 
-    int equipType = GetEquipType__8CMenuPcsFi(MenuPcsVoid(), ShopMenuInt(this, 0x150));
+    int equipType = MenuPcs.GetEquipType(ShopMenuInt(this, 0x150));
     reinterpret_cast<CCaravanWork*>(ShopMenuCaravan(this))->ChgEquipPos(
         equipType, static_cast<short>(ShopMenuInt(this, 0x154)));
     Sound.PlaySe(0x51, 0x40, 0x7F, 0);

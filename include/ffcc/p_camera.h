@@ -151,6 +151,32 @@ public:
     u8 _pad100[0x4C8 - 0x100];
 };
 
+extern "C" void create__10CCameraPcsFv(CCameraPcs*);
+extern "C" void destroy__10CCameraPcsFv(CCameraPcs*);
+extern "C" void calc__10CCameraPcsFv(CCameraPcs*);
+extern "C" void draw__10CCameraPcsFv(CCameraPcs*);
+extern "C" void createChara__10CCameraPcsFv(CCameraPcs*);
+extern "C" void destroyChara__10CCameraPcsFv(CCameraPcs*);
+extern "C" void calcChara__10CCameraPcsFv(CCameraPcs*);
+extern "C" void createMap__10CCameraPcsFv(CCameraPcs*);
+extern "C" void destroyMap__10CCameraPcsFv(CCameraPcs*);
+extern "C" void calcMap__10CCameraPcsFv(CCameraPcs*);
+extern "C" void createMaterialEditor__10CCameraPcsFv(CCameraPcs*);
+extern "C" void destroyMaterialEditor__10CCameraPcsFv(CCameraPcs*);
+extern "C" void calcMaterialEditor__10CCameraPcsFv(CCameraPcs*);
+extern "C" void createFunnyShape__10CCameraPcsFv(CCameraPcs*);
+extern "C" void destroyFunnyShape__10CCameraPcsFv(CCameraPcs*);
+extern "C" void calcFunnyShape__10CCameraPcsFv(CCameraPcs*);
+extern "C" void createPart__10CCameraPcsFv(CCameraPcs*);
+extern "C" void destroyPart__10CCameraPcsFv(CCameraPcs*);
+extern "C" void calcPart__10CCameraPcsFv(CCameraPcs*);
+extern "C" void createFullShadow__10CCameraPcsFv(CCameraPcs*);
+extern "C" void destroyFullShadow__10CCameraPcsFv(CCameraPcs*);
+extern "C" void drawShadowBegin__10CCameraPcsFv(CCameraPcs*);
+extern "C" void drawShadowEnd__10CCameraPcsFv(CCameraPcs*);
+extern "C" void drawShadowChrBegin__10CCameraPcsFv(CCameraPcs*);
+extern "C" void drawShadowEndAll__10CCameraPcsFv(CCameraPcs*);
+
 extern CCameraPcs CameraPcs;
 
 #endif // _FFCC_P_CAMERA_H_

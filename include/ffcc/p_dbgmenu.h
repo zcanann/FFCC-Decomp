@@ -97,6 +97,11 @@ private:
     s32 m_currentVtxFmt;                        // 0x2A68
 };
 
+extern "C" void create__11CDbgMenuPcsFv(CDbgMenuPcs*);
+extern "C" void destroy__11CDbgMenuPcsFv(CDbgMenuPcs*);
+extern "C" void calc__11CDbgMenuPcsFv(CDbgMenuPcs*);
+extern "C" void draw__11CDbgMenuPcsFv(CDbgMenuPcs*);
+
 extern CDbgMenuPcs DbgMenuPcs;
 
 #endif // _FFCC_P_DBGMENU_H_

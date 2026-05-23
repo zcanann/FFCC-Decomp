@@ -32,6 +32,10 @@ public:
     CMemory::CStage* m_smallStage; // 0x110
 };
 
+extern "C" void create__7CUSBPcsFv(CUSBPcs*);
+extern "C" void destroy__7CUSBPcsFv(CUSBPcs*);
+extern "C" void func__7CUSBPcsFv(CUSBPcs*);
+
 extern CUSBPcs USBPcs;
 extern int s_usbReadPollFrameCounter;
 extern char s_usbReadPollInitialized;

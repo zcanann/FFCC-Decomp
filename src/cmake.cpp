@@ -83,7 +83,7 @@ extern "C" double DOUBLE_803333a0;
 extern "C" double DOUBLE_803333b8;
 extern "C" double DOUBLE_803333c0;
 extern "C" int DAT_8032ef10;
-extern "C" char s_dvd__smenu_subfont_fnt_801e3020[];
+extern "C" char s_menuSubfontPathFmt[];
 extern "C" char* PTR_s_world2_802159a4[];
 extern "C" int DAT_802159c8;
 extern "C" {
@@ -3571,7 +3571,7 @@ void CMenuPcs::calcVillageMenu()
             if (Game.m_gameWork.m_menuStageMode == 0) {
                 char path[128];
                 const char* language = Game.GetLangString();
-                sprintf(path, s_dvd__smenu_subfont_fnt_801e3020, language);
+                sprintf(path, s_menuSubfontPathFmt, language);
                 loadFont(2, path, 4, -1);
             }
 

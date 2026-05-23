@@ -126,6 +126,18 @@ public:
     short m_blurScale;              // 0x0F2
 };
 
+extern "C" void create__11CGraphicPcsFv(CGraphicPcs*);
+extern "C" void destroy__11CGraphicPcsFv(CGraphicPcs*);
+extern "C" void calc__11CGraphicPcsFv(CGraphicPcs*);
+extern "C" void drawBegin__11CGraphicPcsFv(CGraphicPcs*);
+extern "C" void drawWait__11CGraphicPcsFv(CGraphicPcs*);
+extern "C" void drawFlip__11CGraphicPcsFv(CGraphicPcs*);
+extern "C" void drawEnd__11CGraphicPcsFv(CGraphicPcs*);
+extern "C" void drawCopy__11CGraphicPcsFv(CGraphicPcs*);
+extern "C" void setViewport__11CGraphicPcsFv(CGraphicPcs*);
+extern "C" void preDrawEnvInit__11CGraphicPcsFv(CGraphicPcs*);
+extern "C" void stdDrawEnvInit__11CGraphicPcsFv(CGraphicPcs*);
+
 extern CGraphicPcs GraphicPcs;
 
 #endif // _FFCC_P_GRAPHIC_H_

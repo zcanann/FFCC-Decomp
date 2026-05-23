@@ -4,13 +4,13 @@
 #include "ffcc/stopwatch.h"
 #include "ffcc/system.h"
 #include <string.h>
+#include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
 extern "C" {
 char DAT_80330118[];
 void* __vt__12CFlatRuntime[];
 void* __vt__Q212CFlatRuntime7CObject[];
 int __cntlzw(unsigned int);
-int sprintf(char*, const char*, ...);
 char* strcat(char*, const char*);
 double fmod(double, double);
 void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(

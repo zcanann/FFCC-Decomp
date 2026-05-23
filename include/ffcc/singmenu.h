@@ -60,6 +60,17 @@ public:
     void SingleDrawFadeOut();
     void SingleCalcCtrl();
     void SingleDrawCtrl();
+    void CmdDraw();
+    void ItemDraw();
+    void EquipDraw();
+    void ArtiDraw();
+    void TmpArtiDraw();
+    void MoneyDraw();
+    void FavoDraw();
+    void CompaDraw();
+    void LetterDraw();
+    void MLstDraw();
+    void DrawCursor(int, int, float);
     void DrawSingleIcon(int, int, int, float, int, float);
     void DrawShadowFont(CFont*, char*, float, float, int, int);
     void DrawNoShadowFont(CFont*, char*, float, float, int, int);

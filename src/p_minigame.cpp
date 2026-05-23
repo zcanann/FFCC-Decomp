@@ -18,9 +18,6 @@ extern "C" {
 int MG_GBA_THREAD_MSG_SETPORT_ct = 0;
 int g_errCt = 0;
 }
-extern "C" void create__12CMiniGamePcsFv(CMiniGamePcs*);
-extern "C" void destroy__12CMiniGamePcsFv(CMiniGamePcs*);
-extern "C" void calc__12CMiniGamePcsFv(CMiniGamePcs*);
 unsigned int CMiniGamePcs::m_table_desc0[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__12CMiniGamePcsFv)};
 unsigned int CMiniGamePcs::m_table_desc1[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__12CMiniGamePcsFv)};
 unsigned int CMiniGamePcs::m_table_desc2[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__12CMiniGamePcsFv)};

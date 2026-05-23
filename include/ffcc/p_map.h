@@ -76,6 +76,20 @@ private:
     u8 m_pad185[3];                      // 0x185
 };
 
+extern "C" void create__7CMapPcsFv(CMapPcs*);
+extern "C" void destroy__7CMapPcsFv(CMapPcs*);
+extern "C" void calcInit__7CMapPcsFv(CMapPcs*);
+extern "C" void calc__7CMapPcsFv(CMapPcs*);
+extern "C" void drawShadow__7CMapPcsFv(CMapPcs*);
+extern "C" void drawBefore__7CMapPcsFv(CMapPcs*);
+extern "C" void draw__7CMapPcsFv(CMapPcs*);
+extern "C" void drawAfter__7CMapPcsFv(CMapPcs*);
+extern "C" void createViewer__7CMapPcsFv(CMapPcs*);
+extern "C" void calcViewer__7CMapPcsFv(CMapPcs*);
+extern "C" void drawBeforeViewer__7CMapPcsFv(CMapPcs*);
+extern "C" void drawViewer__7CMapPcsFv(CMapPcs*);
+extern "C" void drawAfterViewer__7CMapPcsFv(CMapPcs*);
+
 extern CMapPcs MapPcs;
 
 #endif // _FFCC_P_MAP_H_

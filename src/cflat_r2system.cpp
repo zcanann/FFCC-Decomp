@@ -1,6 +1,7 @@
 #include "ffcc/cflat_r2system.h"
 #include "ffcc/astar.h"
 #include "ffcc/line_constants.h"
+#include "ffcc/linkage.h"
 #include "ffcc/color.h"
 #include "ffcc/fontman.h"
 #include "ffcc/game.h"
@@ -174,6 +175,11 @@ static inline const unsigned int* GetGameWorkScriptSysVals(const CGame::CGameWor
 static inline unsigned int& FlatLastResult(CFlatRuntime2* self)
 {
     return *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(self) + 0x96C);
+}
+
+static inline unsigned int& RuntimeDebugFlags(CFlatRuntime2* self)
+{
+    return *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(self) + 0x129C);
 }
 
 static inline const unsigned short* GetGameCFlatSystemRows()
@@ -3482,7 +3488,7 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         outResult = 0;
         return;
     case -0x27: {
-        if ((*reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x129C) & 0x100000) != 0) {
+        if ((RuntimeDebugFlags(this) & CFlatRuntimeDebugFlag_ClassCollision) != 0) {
             Mtx viewMtx;
             Mtx drawMtx;
             CameraPcs.GetViewMatrix(viewMtx);
@@ -3723,7 +3729,7 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         outResult = 0;
         return;
     case -0x1C:
-        *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x129C) = *object->m_localBase;
+        RuntimeDebugFlags(this) = *object->m_localBase;
         runtime->push(object, 0);
         outResult = 0;
         return;

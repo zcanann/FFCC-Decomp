@@ -42,7 +42,7 @@ void pppParHitSph(struct _pppPObject* param_1, int param_2)
         pppHitCylinderSendSystem(pppMngSt, &local_94, &local_88, radius, *(float*)(param_2 + 4));
     }
 
-    if ((*(unsigned int*)(CFlat + 0x129c) & 0x200000) != 0) {
+    if ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_ParticleHitSpheres) != 0) {
         local_a8.r = 0xFF;
         local_a8.g = 0xFF;
         local_a8.b = 0xFF;

@@ -869,9 +869,9 @@ void CMapPcs::drawAfter()
 
             MapMng.DrawAfter();
 
-            if ((*reinterpret_cast<u32*>(CFlat + 0x129C) & 0x02000000) != 0) {
+            if ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_MapBounds) != 0) {
                 CBoundHack bound;
-                bound = *reinterpret_cast<CBoundHack*>(reinterpret_cast<char*>(&CameraPcs) + 0x414);
+                bound = *reinterpret_cast<CBoundHack*>(&CameraPcs.m_shadowRectBound);
                 Graphic.DrawBound(*reinterpret_cast<CBound*>(&bound), CColor(0xFF, 0xFF, 0x80, 0xFF).color);
             }
         }
@@ -919,9 +919,9 @@ void CMapPcs::drawAfterViewer()
 
             MapMng.DrawAfter();
 
-            if ((*reinterpret_cast<u32*>(CFlat + 0x129C) & 0x02000000) != 0) {
+            if ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_MapBounds) != 0) {
                 CBoundHack bound;
-                bound = *reinterpret_cast<CBoundHack*>(reinterpret_cast<char*>(&CameraPcs) + 0x414);
+                bound = *reinterpret_cast<CBoundHack*>(&CameraPcs.m_shadowRectBound);
                 const CColor& colorObj = CColor(0xFF, 0xFF, 0x80, 0xFF);
                 GXColor color = colorObj.color;
                 Graphic.DrawBound(*reinterpret_cast<CBound*>(&bound), color);

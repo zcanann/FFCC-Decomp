@@ -790,7 +790,8 @@ void CCameraPcs::draw()
     unsigned int redColor;
     unsigned int magentaColor;
 
-    if ((*reinterpret_cast<int*>(self + 0x444) == 0) || ((*reinterpret_cast<unsigned int*>(CFlat + 0x129c) & 0x1000000) != 0)) {
+    if ((*reinterpret_cast<int*>(self + 0x444) == 0) ||
+        ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_Camera) != 0)) {
         _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
         GXSetZCompLoc(0);
         _GXSetAlphaCompare(GX_GEQUAL, 1, GX_AOP_AND, GX_ALWAYS, 0);

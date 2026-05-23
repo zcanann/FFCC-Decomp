@@ -2,12 +2,12 @@
 #define _FFCC_P_CAMERA_H_
 
 #include "ffcc/system.h"
+#include "ffcc/mapocttree.h"
 
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
 class SRT;
-class CBound;
 struct Vec;
 class CVector;
 class CMapPcs;
@@ -153,7 +153,9 @@ public:
     float m_farZ;
     u8 _pad108[0x404 - 0x108];
     u8 m_fullScreenShadowEnabled; // 0x404
-    u8 _pad405[0x4C8 - 0x405];
+    u8 _pad405[0x414 - 0x405];
+    CBound m_shadowRectBound; // 0x414
+    u8 _pad42C[0x4C8 - 0x42C];
 };
 
 extern "C" void create__10CCameraPcsFv(CCameraPcs*);

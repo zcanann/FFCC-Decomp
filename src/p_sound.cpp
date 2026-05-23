@@ -35,7 +35,7 @@ CSoundPcs SoundPcs;
  */
 void CSoundPcs::draw()
 {
-    if ((*(unsigned int*)(CFlat + 0x129C) & 0x400000) != 0) {
+    if ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_Sound) != 0) {
         Sound.Draw();
     }
 }

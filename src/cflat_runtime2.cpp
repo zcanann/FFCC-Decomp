@@ -6,6 +6,7 @@
 #include "ffcc/graphic.h"
 #include "ffcc/gxfunc.h"
 #include "ffcc/itemobj.h"
+#include "ffcc/linkage.h"
 #include "ffcc/monobj.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/p_dbgmenu.h"
@@ -206,6 +207,11 @@ static inline u8* DbgMenuPcsRaw()
 static inline u8* MiniGamePcsRaw()
 {
 	return reinterpret_cast<u8*>(&MiniGamePcs);
+}
+
+static inline u32& RuntimeDebugFlags(u8* runtime)
+{
+	return *reinterpret_cast<u32*>(runtime + 0x129C);
 }
 
 static inline float& ParticleWorkSpeed(CFlatRuntime2* runtime)
@@ -419,7 +425,7 @@ CFlatRuntime2::CFlatRuntime2()
 
 	new (runtime + 0xCF20) CFlatData;
 	*reinterpret_cast<int*>(runtime + 0x10418) = 0;
-	*reinterpret_cast<int*>(runtime + 0x129C) = 0;
+	RuntimeDebugFlags(runtime) = 0;
 	*reinterpret_cast<int*>(runtime + 0x12A0) = 0;
 	*reinterpret_cast<int*>(runtime + 0x12A4) = -1;
 	runtime[0x12E4] = (runtime[0x12E4] & 0xFB) | 4;
@@ -1509,7 +1515,7 @@ void CFlatRuntime2::Draw()
 	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
 
 	u8* runtime = reinterpret_cast<u8*>(this);
-	if ((*reinterpret_cast<u32*>(runtime + 0x129C) & 0x20000) != 0) {
+	if ((RuntimeDebugFlags(runtime) & CFlatRuntimeDebugFlag_ParticleLines) != 0) {
 		GXColor lineColor = {0xFF, 0x80, 0x80, 0xFF};
 		GXSetChanMatColor(GX_COLOR0A0, lineColor);
 		GXLoadPosMtxImm(cameraMtx, GX_PNMTX0);
@@ -1522,7 +1528,7 @@ void CFlatRuntime2::Draw()
 	}
 
 	const bool showDebugCC =
-		((*reinterpret_cast<u32*>(runtime + 0x129C) & 0x200000) != 0) ||
+		((RuntimeDebugFlags(runtime) & CFlatRuntimeDebugFlag_ParticleHitSpheres) != 0) ||
 		((MiniGamePcsRaw()[0x25732] & 0x80) != 0);
 	const int debugCount = *reinterpret_cast<int*>(runtime + 0xCD1C);
 	if (showDebugCC && debugCount != 0) {

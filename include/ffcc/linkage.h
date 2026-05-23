@@ -54,4 +54,20 @@ extern CFlatRuntime2& gCFlatRuntime2;
 class CChara;
 extern CChara& gChara;
 
+enum CFlatRuntimeDebugFlag {
+    CFlatRuntimeDebugFlag_QuadBounds = 0x00010000,
+    CFlatRuntimeDebugFlag_ParticleLines = 0x00020000,
+    CFlatRuntimeDebugFlag_ClassCollision = 0x00100000,
+    CFlatRuntimeDebugFlag_ParticleHitSpheres = 0x00200000,
+    CFlatRuntimeDebugFlag_Sound = 0x00400000,
+    CFlatRuntimeDebugFlag_Wind = 0x00800000,
+    CFlatRuntimeDebugFlag_Camera = 0x01000000,
+    CFlatRuntimeDebugFlag_MapBounds = 0x02000000,
+};
+
+static inline u32& CFlatRuntimeDebugFlags()
+{
+    return *reinterpret_cast<u32*>(CFlat + 0x129C);
+}
+
 #endif // _FFCC_LINKAGE_H_

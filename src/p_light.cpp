@@ -14,11 +14,6 @@
 #include <math.h>
 #include <string.h>
 
-extern "C" void create__9CLightPcsFv(CLightPcs*);
-extern "C" void destroy__9CLightPcsFv(CLightPcs*);
-extern "C" void calc__9CLightPcsFv(CLightPcs*);
-extern "C" void draw__9CLightPcsFv(CLightPcs*);
-extern "C" void MakeLightMap__9CLightPcsFv(CLightPcs*);
 extern unsigned int DAT_8032fc0c;
 extern unsigned int DAT_8032fc08;
 extern float FLOAT_8032fc10;

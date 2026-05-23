@@ -35,6 +35,11 @@ public:
     static CGbaPcsTable m_table;
 };
 
+extern "C" void create__7CGbaPcsFv(CGbaPcs*);
+extern "C" void destroy__7CGbaPcsFv(CGbaPcs*);
+extern "C" void calc__7CGbaPcsFv(CGbaPcs*);
+extern "C" void draw__7CGbaPcsFv(CGbaPcs*);
+
 extern CGbaPcs GbaPcs;
 
 #endif // _FFCC_P_GBA_H_

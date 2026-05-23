@@ -250,7 +250,7 @@ extern "C" unsigned long UnkMaterialSetGetter(void* ptrArray)
 template <>
 void CPtrArray<CMaterial*>::SetDefaultSize(unsigned long defaultSize)
 {
-    *reinterpret_cast<unsigned long*>(reinterpret_cast<unsigned char*>(this) + 0xC) = defaultSize;
+    m_defaultSize = defaultSize;
 }
 
 /*

@@ -114,10 +114,11 @@ void CMapShadow::Init()
 	float width;
 	float height;
 	CMaterial* material;
-	int materialSet;
+	CMaterialSet* materialSet;
 
-	materialSet = *(int*)((char*)&MapMng + 0x213d4);
-	material = (*reinterpret_cast<CPtrArray<CMaterial*>*>(materialSet + 8))[m_materialIndex];
+	materialSet = MapMng.m_materialSet;
+	material =
+	    (*reinterpret_cast<CPtrArray<CMaterial*>*>(reinterpret_cast<unsigned char*>(materialSet) + 8))[m_materialIndex];
 	material = *reinterpret_cast<CMaterial**>(reinterpret_cast<int>(material) + 0x3c);
 	width = (float)*reinterpret_cast<u32*>(reinterpret_cast<int>(material) + 0x64);
 	height = (float)*reinterpret_cast<u32*>(reinterpret_cast<int>(material) + 0x68);

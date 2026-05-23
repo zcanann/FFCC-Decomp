@@ -78,7 +78,7 @@ extern float FLOAT_8032fab4;
 extern float FLOAT_8032fab8;
 extern double DOUBLE_8032fa28;
 extern double DOUBLE_8032fa28;
-extern char s_p_camera_cpp_801D7918[];
+extern char s_p_camera_cpp[];
 extern char DAT_801d7928[];
 extern unsigned char g_map_draw_prof;
 
@@ -1294,10 +1294,10 @@ void CCameraPcs::createFullShadow()
 
     *reinterpret_cast<void**>(self + 0x31C) = 0;
     rampTexSize = GXGetTexBufferSize(0x1E0, 0x1E0, GX_TF_I8, GX_FALSE, 0);
-    *reinterpret_cast<void**>(self + 0x31C) = new (stage, s_p_camera_cpp_801D7918, 0x3A5) u8[rampTexSize];
+    *reinterpret_cast<void**>(self + 0x31C) = new (stage, s_p_camera_cpp, 0x3A5) u8[rampTexSize];
 
     rampTexSize = GXGetTexBufferSize(0x10, 0x10, GX_TF_I8, GX_FALSE, 0);
-    rampTex = new (stage, s_p_camera_cpp_801D7918, 0x361) u8[rampTexSize];
+    rampTex = new (stage, s_p_camera_cpp, 0x361) u8[rampTexSize];
     *reinterpret_cast<unsigned char**>(self + 0x320) = rampTex;
 
     for (i = 0; i < 0x100; i += 8) {

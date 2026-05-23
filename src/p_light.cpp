@@ -71,7 +71,7 @@ unsigned int CLightPcs::m_table[0x15C / sizeof(unsigned int)] = {
 
 CLightPcs LightPcs;
 _GXColor s_ambientAlphaColor;
-extern const char s_p_light_cpp_801D7CAC[] = "p_light.cpp";
+extern const char s_p_light_cpp[] = "p_light.cpp";
 
 static inline double U32ToDouble(unsigned int value)
 {
@@ -421,7 +421,7 @@ CLightPcs::CBumpLight* CLightPcs::AddBump(CLightPcs::CLight* srcLight, CLightPcs
     bumpLight->m_textureCount = count;
 
     int texSize = GXGetTexBufferSize(0x40, 0x40, 3, 0, 0);
-    bumpLight->m_textureData = new (stage, const_cast<char*>(s_p_light_cpp_801D7CAC), 0x13b) u8[texSize * count];
+    bumpLight->m_textureData = new (stage, const_cast<char*>(s_p_light_cpp), 0x13b) u8[texSize * count];
 
     int texOffset = 0;
     for (int i = 0; i < count; i++) {

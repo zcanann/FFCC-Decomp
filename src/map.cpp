@@ -265,7 +265,7 @@ void CPtrArray<CMaterial*>::SetDefaultSize(unsigned long defaultSize)
 template <>
 void CPtrArray<CMaterial*>::SetGrow(int growCapacity)
 {
-    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x18) = growCapacity;
+    m_growCapacity = growCapacity;
 }
 
 /*
@@ -300,16 +300,13 @@ CPtrArray<CMapLightHolder*>::CPtrArray()
 template <>
 CPtrArray<CMapLightHolder*>::~CPtrArray()
 {
-    unsigned char* self = reinterpret_cast<unsigned char*>(this);
-    void*& items = *reinterpret_cast<void**>(self + 0x10);
-
-    if (items != 0) {
-        delete[] reinterpret_cast<void**>(items);
-        items = 0;
+    if (m_items != 0) {
+        delete[] m_items;
+        m_items = 0;
     }
 
-    *reinterpret_cast<int*>(self + 8) = 0;
-    *reinterpret_cast<int*>(self + 4) = 0;
+    m_size = 0;
+    m_numItems = 0;
 }
 
 /*
@@ -382,8 +379,8 @@ void CPtrArray<CMapLightHolder*>::RemoveAll()
         delete[] m_items;
         m_items = 0;
     }
-    *reinterpret_cast<int*>(Ptr(this, 8)) = 0;
-    *reinterpret_cast<int*>(Ptr(this, 4)) = 0;
+    m_size = 0;
+    m_numItems = 0;
 }
 
 /*
@@ -394,7 +391,7 @@ void CPtrArray<CMapLightHolder*>::RemoveAll()
 template <>
 void CPtrArray<CMapLightHolder*>::SetStage(CMemory::CStage* stage)
 {
-    *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(this) + 0x14) = stage;
+    m_stage = stage;
 }
 
 /*
@@ -495,8 +492,8 @@ void CPtrArray<CMapAnim*>::RemoveAll()
         delete[] m_items;
         m_items = 0;
     }
-    *reinterpret_cast<int*>(Ptr(this, 8)) = 0;
-    *reinterpret_cast<int*>(Ptr(this, 4)) = 0;
+    m_size = 0;
+    m_numItems = 0;
 }
 
 /*
@@ -556,8 +553,7 @@ CMapAnimNode* CPtrArray<CMapAnimNode*>::operator[](unsigned long index)
 template <>
 CMapAnimNode* CPtrArray<CMapAnimNode*>::GetAt(unsigned long index)
 {
-    CMapAnimNode** items = *reinterpret_cast<CMapAnimNode***>(Ptr(this, 0x10));
-    return items[index];
+    return m_items[index];
 }
 
 /*
@@ -602,8 +598,7 @@ CMapAnimKeyDt* CPtrArray<CMapAnimKeyDt*>::operator[](unsigned long index)
 template <>
 CMapAnimKeyDt* CPtrArray<CMapAnimKeyDt*>::GetAt(unsigned long index)
 {
-    CMapAnimKeyDt** items = *reinterpret_cast<CMapAnimKeyDt***>(Ptr(this, 0x10));
-    return items[index];
+    return m_items[index];
 }
 
 /*
@@ -618,7 +613,7 @@ CMapAnimKeyDt* CPtrArray<CMapAnimKeyDt*>::GetAt(unsigned long index)
 template <>
 void CPtrArray<CMapAnimKeyDt*>::SetStage(CMemory::CStage* stage)
 {
-    *reinterpret_cast<CMemory::CStage**>(Ptr(this, 0x14)) = stage;
+    m_stage = stage;
 }
 
 /*
@@ -637,8 +632,8 @@ void CPtrArray<CMapAnimKeyDt*>::RemoveAll()
         delete[] m_items;
         m_items = 0;
     }
-    *reinterpret_cast<int*>(Ptr(this, 8)) = 0;
-    *reinterpret_cast<int*>(Ptr(this, 4)) = 0;
+    m_size = 0;
+    m_numItems = 0;
 }
 
 /*
@@ -653,7 +648,7 @@ void CPtrArray<CMapAnimKeyDt*>::RemoveAll()
 template <>
 void CPtrArray<CMapAnim*>::SetStage(CMemory::CStage* stage)
 {
-    *reinterpret_cast<CMemory::CStage**>(Ptr(this, 0x14)) = stage;
+    m_stage = stage;
 }
 
 /*
@@ -999,8 +994,7 @@ extern "C" CPtrArray<CMapShadow*>* dtor_800346D4(CPtrArray<CMapShadow*>* ptrArra
 template <>
 CMapAnim* CPtrArray<CMapAnim*>::GetAt(unsigned long index)
 {
-    CMapAnim** items = *reinterpret_cast<CMapAnim***>(Ptr(this, 0x10));
-    return items[index];
+    return m_items[index];
 }
 
 /*
@@ -1030,8 +1024,8 @@ void CPtrArray<CMapAnimRun*>::RemoveAll()
         delete[] m_items;
         m_items = 0;
     }
-    *reinterpret_cast<int*>(Ptr(this, 8)) = 0;
-    *reinterpret_cast<int*>(Ptr(this, 4)) = 0;
+    m_size = 0;
+    m_numItems = 0;
 }
 
 /*
@@ -1061,7 +1055,7 @@ CMapAnimRun* CPtrArray<CMapAnimRun*>::operator[](unsigned long index)
 template <>
 void CPtrArray<CMapAnimRun*>::SetStage(CMemory::CStage* stage)
 {
-    *reinterpret_cast<CMemory::CStage**>(Ptr(this, 0x14)) = stage;
+    m_stage = stage;
 }
 
 /*
@@ -1076,8 +1070,7 @@ void CPtrArray<CMapAnimRun*>::SetStage(CMemory::CStage* stage)
 template <>
 CMapAnimRun* CPtrArray<CMapAnimRun*>::GetAt(unsigned long index)
 {
-    CMapAnimRun** items = *reinterpret_cast<CMapAnimRun***>(Ptr(this, 0x10));
-    return items[index];
+    return m_items[index];
 }
 
 /*
@@ -1111,8 +1104,8 @@ void CPtrArray<CMapShadow*>::RemoveAll()
         delete[] m_items;
         m_items = 0;
     }
-    *reinterpret_cast<int*>(Ptr(this, 8)) = 0;
-    *reinterpret_cast<int*>(Ptr(this, 4)) = 0;
+    m_size = 0;
+    m_numItems = 0;
 }
 
 /*
@@ -1142,7 +1135,7 @@ CMapShadow* CPtrArray<CMapShadow*>::operator[](unsigned long index)
 template <>
 void CPtrArray<CMapShadow*>::SetStage(CMemory::CStage* stage)
 {
-    *reinterpret_cast<CMemory::CStage**>(Ptr(this, 0x14)) = stage;
+    m_stage = stage;
 }
 
 /*
@@ -1157,8 +1150,7 @@ void CPtrArray<CMapShadow*>::SetStage(CMemory::CStage* stage)
 template <>
 CMapShadow* CPtrArray<CMapShadow*>::GetAt(unsigned long index)
 {
-    CMapShadow** items = *reinterpret_cast<CMapShadow***>(Ptr(this, 0x10));
-    return items[index];
+    return m_items[index];
 }
 
 /*

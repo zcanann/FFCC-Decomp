@@ -68,6 +68,7 @@ s32 __CARDFreeBlock(s32 chan, u16 nBlock, CARDCallback callback);
 s32 __CARDUpdateFatBlock(s32 chan, u16* fat, CARDCallback callback);
 
 // CARDBios
+extern const char gCARDVersionString[];
 extern CARDControl __CARDBlock[2];
 
 extern DVDDiskID* __CARDDiskID;

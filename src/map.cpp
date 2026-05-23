@@ -187,23 +187,23 @@ CMapTexAnimSet::~CMapTexAnimSet()
  */
 CMapIdGrp::CMapIdGrp()
 {
-    *reinterpret_cast<int*>(Ptr(this, 0)) = -1;
-    *reinterpret_cast<unsigned char*>(Ptr(this, 4)) = 0x80;
-    *reinterpret_cast<unsigned char*>(Ptr(this, 6)) = 0;
-    *reinterpret_cast<unsigned char*>(Ptr(this, 5)) = 0;
-    *reinterpret_cast<unsigned char*>(Ptr(this, 7)) = 0x80;
-    *reinterpret_cast<unsigned char*>(Ptr(this, 8)) = 0;
-    *reinterpret_cast<unsigned char*>(Ptr(this, 9)) = 0;
-    *reinterpret_cast<unsigned char*>(Ptr(this, 10)) = 0x80;
-    *reinterpret_cast<unsigned char*>(Ptr(this, 11)) = 0x80;
-    *reinterpret_cast<unsigned char*>(Ptr(this, 12)) = 0xff;
-    *reinterpret_cast<unsigned char*>(Ptr(this, 13)) = 0x40;
-    *reinterpret_cast<unsigned char*>(Ptr(this, 14)) = 0x40;
-    *reinterpret_cast<unsigned char*>(Ptr(this, 15)) = 0x80;
-    *reinterpret_cast<unsigned char*>(Ptr(this, 16)) = 0x40;
-    *reinterpret_cast<unsigned char*>(Ptr(this, 17)) = 0x40;
-    *reinterpret_cast<unsigned char*>(Ptr(this, 18)) = 0;
-    *reinterpret_cast<unsigned char*>(Ptr(this, 19)) = 0x80;
+    mMask = -1;
+    mPrimaryColor.r = 0x80;
+    mPrimaryColor.b = 0;
+    mPrimaryColor.g = 0;
+    mPrimaryColor.a = 0x80;
+    mSecondaryColor.r = 0;
+    mSecondaryColor.g = 0;
+    mSecondaryColor.b = 0x80;
+    mSecondaryColor.a = 0x80;
+    mTertiaryColor.r = 0xFF;
+    mTertiaryColor.g = 0x40;
+    mTertiaryColor.b = 0x40;
+    mTertiaryColor.a = 0x80;
+    mQuaternaryColor.r = 0x40;
+    mQuaternaryColor.g = 0x40;
+    mQuaternaryColor.b = 0;
+    mQuaternaryColor.a = 0x80;
 }
 
 /*

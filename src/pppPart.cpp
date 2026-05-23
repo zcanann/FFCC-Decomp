@@ -65,7 +65,6 @@ extern "C" unsigned char DAT_8032ed8a;
 extern "C" unsigned char DAT_8032ed8b;
 extern "C" int DAT_8032ed7c;
 extern "C" unsigned int DAT_8032ed80;
-extern "C" void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
 
 _pppEnvSt* pppEnvStPtr;
 _pppMngSt* pppMngStPtr;
@@ -2784,7 +2783,7 @@ void pppHitCylinderSendSystem(_pppMngSt* pppMngSt, Vec* origin, Vec* vector, flo
 			else
 			{
 				Vec hitPos;
-				CalcHitPosition__7CMapObjFP3Vec(*(void**)((u8*)&MapMng + 0x22A88), &hitPos);
+				MapMng.m_hitMapObj->CalcHitPosition(&hitPos);
 				s32 partIndex = ((s32)((u8*)pppMngSt - ((u8*)&PartMng + 0x2A18))) / 0x158;
 				Game.HitParticleBG(partIndex, hitRaw->m_kind, hitRaw->m_nodeIndex, &hitPos, &hitRaw->m_hitParams);
 			}

@@ -1727,43 +1727,43 @@ void CMaterialMan::SetObjMatrix(float (*mtxA) [4], float (*mtxB) [4])
  */
 void CMaterialMan::SetTexScroll(float u0, float v0, float u1, float v1)
 {
-    if (((*reinterpret_cast<unsigned int*>(Ptr(this, 0x120)) & 0xFF) < 0x3C) &&
-        ((*reinterpret_cast<unsigned int*>(Ptr(this, 0x124)) & 0xFF) < 8)) {
-        *reinterpret_cast<unsigned int*>(Ptr(this, 0x48)) |= 0x20;
+    if (((static_cast<unsigned int>(m_texMtxCur) & 0xFF) < 0x3C) &&
+        ((static_cast<unsigned int>(m_texCoordIdCur) & 0xFF) < 8)) {
+        m_curEnvTevBit |= 0x20;
 
         Mtx texMtx;
         PSMTXIdentity(texMtx);
         texMtx[0][3] = u0;
         texMtx[1][3] = v0;
 
-        *reinterpret_cast<int*>(Ptr(this, 0x144)) = *reinterpret_cast<int*>(Ptr(this, 0x120));
-        *reinterpret_cast<int*>(Ptr(this, 0x148)) = *reinterpret_cast<int*>(Ptr(this, 0x124));
-        GXLoadTexMtxImm(texMtx, *reinterpret_cast<int*>(Ptr(this, 0x120)), GX_MTX2x4);
+        m_texScroll0TexMtx = m_texMtxCur;
+        m_texScroll0TexCoord = m_texCoordIdCur;
+        GXLoadTexMtxImm(texMtx, m_texMtxCur, GX_MTX2x4);
 
-        int texMtxCur = *reinterpret_cast<int*>(Ptr(this, 0x120));
-        *reinterpret_cast<int*>(Ptr(this, 0x120)) = texMtxCur + 3;
+        int texMtxCur = m_texMtxCur;
+        m_texMtxCur = texMtxCur + 3;
 
-        int texCoordCur = *reinterpret_cast<int*>(Ptr(this, 0x124));
-        *reinterpret_cast<int*>(Ptr(this, 0x124)) = texCoordCur + 1;
+        int texCoordCur = m_texCoordIdCur;
+        m_texCoordIdCur = texCoordCur + 1;
         GXSetTexCoordGen2(static_cast<GXTexCoordID>(texCoordCur), GX_TG_MTX2x4, GX_TG_TEX0, texMtxCur, GX_FALSE,
                           0x7D);
 
         if ((FLOAT_8032faf4 != u1) || (FLOAT_8032faf4 != v1)) {
-            *reinterpret_cast<unsigned int*>(Ptr(this, 0x48)) |= 0x40;
+            m_curEnvTevBit |= 0x40;
 
             PSMTXIdentity(texMtx);
             texMtx[0][3] = u1;
             texMtx[1][3] = v1;
 
-            *reinterpret_cast<int*>(Ptr(this, 0x150)) = *reinterpret_cast<int*>(Ptr(this, 0x120));
-            *reinterpret_cast<int*>(Ptr(this, 0x154)) = *reinterpret_cast<int*>(Ptr(this, 0x124));
-            GXLoadTexMtxImm(texMtx, *reinterpret_cast<int*>(Ptr(this, 0x120)), GX_MTX2x4);
+            m_texScroll1TexMtx = m_texMtxCur;
+            m_texScroll1TexCoord = m_texCoordIdCur;
+            GXLoadTexMtxImm(texMtx, m_texMtxCur, GX_MTX2x4);
 
-            texMtxCur = *reinterpret_cast<int*>(Ptr(this, 0x120));
-            *reinterpret_cast<int*>(Ptr(this, 0x120)) = texMtxCur + 3;
+            texMtxCur = m_texMtxCur;
+            m_texMtxCur = texMtxCur + 3;
 
-            texCoordCur = *reinterpret_cast<int*>(Ptr(this, 0x124));
-            *reinterpret_cast<int*>(Ptr(this, 0x124)) = texCoordCur + 1;
+            texCoordCur = m_texCoordIdCur;
+            m_texCoordIdCur = texCoordCur + 1;
             GXSetTexCoordGen2(static_cast<GXTexCoordID>(texCoordCur), GX_TG_MTX2x4, GX_TG_TEX0, texMtxCur, GX_FALSE,
                               0x7D);
         }

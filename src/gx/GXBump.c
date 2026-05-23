@@ -3,8 +3,6 @@
 
 #include "dolphin/gx/__gx.h"
 
-extern const f32 GXIndTexMtxScale1024;
-
 #if DEBUG
 #define GX_WRITE_SOME_REG5(a, b) \
 do { \

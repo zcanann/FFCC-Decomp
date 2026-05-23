@@ -131,11 +131,6 @@ static inline CMapObj*& ObjAt(CMapObj* self, unsigned int offset)
     return *reinterpret_cast<CMapObj**>(Ptr(self, offset));
 }
 
-static inline Mtx& MtxAt(CMapObj* self, unsigned int offset)
-{
-    return *reinterpret_cast<Mtx*>(Ptr(self, offset));
-}
-
 static inline CMapObj* NextSlot(CMapObj* obj)
 {
     return reinterpret_cast<CMapObj*>(Ptr(obj, 0xF0));
@@ -858,22 +853,22 @@ void CMapObj::CalcMtx(float (*parentMtx)[4], unsigned char inDirty)
         if (U8At(obj, 0x1B) != 0) {
             U8At(obj, 0x1B) = 0;
             if (U8At(obj, 0x1C) != 0) {
-                PSMTXScale(MtxAt(obj, 0x88), F32At(obj, 0x7C), F32At(obj, 0x80), F32At(obj, 0x84));
+                PSMTXScale(obj->m_localMtx, F32At(obj, 0x7C), F32At(obj, 0x80), F32At(obj, 0x84));
                 PSMTXRotRad(mtx2, 'x', kMapObjDegToRad * F32At(obj, 0x70));
-                PSMTXConcat(mtx2, MtxAt(obj, 0x88), MtxAt(obj, 0x88));
+                PSMTXConcat(mtx2, obj->m_localMtx, obj->m_localMtx);
                 PSMTXRotRad(mtx2, 'y', kMapObjDegToRad * F32At(obj, 0x74));
-                PSMTXConcat(mtx2, MtxAt(obj, 0x88), MtxAt(obj, 0x88));
+                PSMTXConcat(mtx2, obj->m_localMtx, obj->m_localMtx);
                 PSMTXRotRad(mtx2, 'z', kMapObjDegToRad * F32At(obj, 0x78));
-                PSMTXConcat(mtx2, MtxAt(obj, 0x88), MtxAt(obj, 0x88));
+                PSMTXConcat(mtx2, obj->m_localMtx, obj->m_localMtx);
                 PSMTXTrans(mtx2, F32At(obj, 0x64), F32At(obj, 0x68), F32At(obj, 0x6C));
-                PSMTXConcat(mtx2, MtxAt(obj, 0x88), MtxAt(obj, 0x88));
+                PSMTXConcat(mtx2, obj->m_localMtx, obj->m_localMtx);
             }
 
             dirty = 1;
         }
 
         if (dirty != 0) {
-            PSMTXConcat(*reinterpret_cast<Mtx*>(parentMtx), MtxAt(obj, 0x88), MtxAt(obj, 0xB8));
+            PSMTXConcat(*reinterpret_cast<Mtx*>(parentMtx), obj->m_localMtx, obj->m_worldMtx);
         }
 
         for (CMapObj* child = obj->m_child; child != 0; child = child->m_next) {
@@ -882,22 +877,22 @@ void CMapObj::CalcMtx(float (*parentMtx)[4], unsigned char inDirty)
             if (U8At(child, 0x1B) != 0) {
                 U8At(child, 0x1B) = 0;
                 if (U8At(child, 0x1C) != 0) {
-                    PSMTXScale(MtxAt(child, 0x88), F32At(child, 0x7C), F32At(child, 0x80), F32At(child, 0x84));
+                    PSMTXScale(child->m_localMtx, F32At(child, 0x7C), F32At(child, 0x80), F32At(child, 0x84));
                     PSMTXRotRad(mtx1, 'x', kMapObjDegToRad * F32At(child, 0x70));
-                    PSMTXConcat(mtx1, MtxAt(child, 0x88), MtxAt(child, 0x88));
+                    PSMTXConcat(mtx1, child->m_localMtx, child->m_localMtx);
                     PSMTXRotRad(mtx1, 'y', kMapObjDegToRad * F32At(child, 0x74));
-                    PSMTXConcat(mtx1, MtxAt(child, 0x88), MtxAt(child, 0x88));
+                    PSMTXConcat(mtx1, child->m_localMtx, child->m_localMtx);
                     PSMTXRotRad(mtx1, 'z', kMapObjDegToRad * F32At(child, 0x78));
-                    PSMTXConcat(mtx1, MtxAt(child, 0x88), MtxAt(child, 0x88));
+                    PSMTXConcat(mtx1, child->m_localMtx, child->m_localMtx);
                     PSMTXTrans(mtx1, F32At(child, 0x64), F32At(child, 0x68), F32At(child, 0x6C));
-                    PSMTXConcat(mtx1, MtxAt(child, 0x88), MtxAt(child, 0x88));
+                    PSMTXConcat(mtx1, child->m_localMtx, child->m_localMtx);
                 }
 
                 childDirty = 1;
             }
 
             if (childDirty != 0) {
-                PSMTXConcat(MtxAt(obj, 0xB8), MtxAt(child, 0x88), MtxAt(child, 0xB8));
+                PSMTXConcat(obj->m_worldMtx, child->m_localMtx, child->m_worldMtx);
             }
 
             for (CMapObj* grandChild = child->m_child; grandChild != 0; grandChild = grandChild->m_next) {
@@ -907,26 +902,26 @@ void CMapObj::CalcMtx(float (*parentMtx)[4], unsigned char inDirty)
                     U8At(grandChild, 0x1B) = 0;
                     if (U8At(grandChild, 0x1C) != 0) {
                         PSMTXScale(
-                            MtxAt(grandChild, 0x88), F32At(grandChild, 0x7C), F32At(grandChild, 0x80), F32At(grandChild, 0x84));
+                            grandChild->m_localMtx, F32At(grandChild, 0x7C), F32At(grandChild, 0x80), F32At(grandChild, 0x84));
                         PSMTXRotRad(mtx0, 'x', kMapObjDegToRad * F32At(grandChild, 0x70));
-                        PSMTXConcat(mtx0, MtxAt(grandChild, 0x88), MtxAt(grandChild, 0x88));
+                        PSMTXConcat(mtx0, grandChild->m_localMtx, grandChild->m_localMtx);
                         PSMTXRotRad(mtx0, 'y', kMapObjDegToRad * F32At(grandChild, 0x74));
-                        PSMTXConcat(mtx0, MtxAt(grandChild, 0x88), MtxAt(grandChild, 0x88));
+                        PSMTXConcat(mtx0, grandChild->m_localMtx, grandChild->m_localMtx);
                         PSMTXRotRad(mtx0, 'z', kMapObjDegToRad * F32At(grandChild, 0x78));
-                        PSMTXConcat(mtx0, MtxAt(grandChild, 0x88), MtxAt(grandChild, 0x88));
+                        PSMTXConcat(mtx0, grandChild->m_localMtx, grandChild->m_localMtx);
                         PSMTXTrans(mtx0, F32At(grandChild, 0x64), F32At(grandChild, 0x68), F32At(grandChild, 0x6C));
-                        PSMTXConcat(mtx0, MtxAt(grandChild, 0x88), MtxAt(grandChild, 0x88));
+                        PSMTXConcat(mtx0, grandChild->m_localMtx, grandChild->m_localMtx);
                     }
 
                     grandChildDirty = 1;
                 }
 
                 if (grandChildDirty != 0) {
-                    PSMTXConcat(MtxAt(child, 0xB8), MtxAt(grandChild, 0x88), MtxAt(grandChild, 0xB8));
+                    PSMTXConcat(child->m_worldMtx, grandChild->m_localMtx, grandChild->m_worldMtx);
                 }
 
                 if (grandChild->m_child != 0) {
-                    grandChild->m_child->CalcMtx(reinterpret_cast<float(*)[4]>(&MtxAt(grandChild, 0xB8)), grandChildDirty);
+                    grandChild->m_child->CalcMtx(grandChild->m_worldMtx, grandChildDirty);
                 }
             }
         }
@@ -1352,7 +1347,7 @@ void CMapObj::SetDrawEnv()
         mapColor.b = static_cast<unsigned char>((mapColor.b * alphaRate) >> 8);
     }
 
-    LightPcs.SetMapColorAlpha(MtxAt(this, 0xB8), mapColor, lightColor, U8At(this, 0x26), F32At(this, 0x44), F32At(this, 0x48),
+    LightPcs.SetMapColorAlpha(m_worldMtx, mapColor, lightColor, U8At(this, 0x26), F32At(this, 0x44), F32At(this, 0x48),
                               F32At(this, 0x54), (U16At(this, 0x28) >> 7) & 0xFF);
 }
 
@@ -1409,12 +1404,12 @@ void CMapObj::Draw(unsigned char priority)
     *(materialMan + 520) = 0;
 
     if (U8At(this, 0x22) != 0) {
-        CameraPcs.SetFullScreenShadow(MtxAt(this, 0xB8), 0);
+        CameraPcs.SetFullScreenShadow(m_worldMtx, 0);
     }
     if (S32At(this, 0x3C) != 0) {
         MaterialMan.SetShadowBound(static_cast<CMapShadow::TARGET>(1),
                                    reinterpret_cast<CBound*>(reinterpret_cast<unsigned char*>(m_mapData) + 0xC),
-                                   MtxAt(this, 0xB8));
+                                   m_worldMtx);
     }
 
     *reinterpret_cast<unsigned int*>(materialMan + 296) = *reinterpret_cast<unsigned int*>(materialMan + 284);
@@ -1447,9 +1442,9 @@ void CMapObj::Draw(unsigned char priority)
     }
 
     lightColor = *worldMapColor;
-    LightPcs.SetMapColorAlpha(MtxAt(this, 0xB8), mapColor, lightColor, U8At(this, 0x26), F32At(this, 0x44), F32At(this, 0x48),
+    LightPcs.SetMapColorAlpha(m_worldMtx, mapColor, lightColor, U8At(this, 0x26), F32At(this, 0x44), F32At(this, 0x48),
                               F32At(this, 0x54), (U16At(this, 0x28) >> 7) & 0xFF);
-    LightPcs.SetBumpTexMatirx(MtxAt(this, 0xB8), reinterpret_cast<CLightPcs::CBumpLight*>(PtrAt(this, 0x10)),
+    LightPcs.SetBumpTexMatirx(m_worldMtx, reinterpret_cast<CLightPcs::CBumpLight*>(PtrAt(this, 0x10)),
                               reinterpret_cast<Vec*>(Ptr(this, 0x58)), U8At(this, 0x1A));
 
     if (kMapObjOne != F32At(this, 0x40)) {
@@ -1488,7 +1483,7 @@ void CMapObj::SetDrawFlag()
         if ((static_cast<signed char>(U8At(this, 0x1F)) == -1) && ((U8At(this, 0x18) & 1) != 0)) {
             Mtx concatMtx;
 
-            PSMTXConcat(*reinterpret_cast<Mtx*>(reinterpret_cast<unsigned char*>(&MapMng) + 0x22958), MtxAt(this, 0xB8), concatMtx);
+            PSMTXConcat(*reinterpret_cast<Mtx*>(reinterpret_cast<unsigned char*>(&MapMng) + 0x22958), m_worldMtx, concatMtx);
             if (reinterpret_cast<CBound*>(reinterpret_cast<unsigned char*>(m_mapData) + 0xC)
                     ->CheckFrustum(*reinterpret_cast<Vec*>(reinterpret_cast<unsigned char*>(&MapMng) + 0x228EC), concatMtx,
                                    *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&MapMng) + 0x22A74)) != 0) {
@@ -1510,7 +1505,7 @@ void CMapObj::SetDrawFlag()
 void CMapObj::DrawHit()
 {
     if ((U8At(this, 0x1D) == 2) && (m_mapData != 0)) {
-        MaterialMan.SetObjMatrix(MapObjHitDrawMtx(), MtxAt(this, 0xB8));
+        MaterialMan.SetObjMatrix(MapObjHitDrawMtx(), m_worldMtx);
         reinterpret_cast<CMapHit*>(m_mapData)->Draw();
     }
 }
@@ -1527,7 +1522,7 @@ void CMapObj::DrawHit()
 void CMapObj::DrawHitWire()
 {
     if ((U8At(this, 0x1D) == 2) && (m_mapData != 0)) {
-        MaterialMan.SetObjMatrix(MapObjHitDrawMtx(), MtxAt(this, 0xB8));
+        MaterialMan.SetObjMatrix(MapObjHitDrawMtx(), m_worldMtx);
         reinterpret_cast<CMapHit*>(m_mapData)->DrawWire();
     }
 }
@@ -1544,7 +1539,7 @@ void CMapObj::DrawHitWire()
 void CMapObj::DrawHitNormal()
 {
     if ((U8At(this, 0x1D) == 2) && (m_mapData != 0)) {
-        MaterialMan.SetObjMatrix(MapObjHitDrawMtx(), MtxAt(this, 0xB8));
+        MaterialMan.SetObjMatrix(MapObjHitDrawMtx(), m_worldMtx);
         reinterpret_cast<CMapHit*>(m_mapData)->DrawNormal();
     }
 }
@@ -1563,7 +1558,7 @@ int CMapObj::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long m
     if ((U8At(this, 0x1D) == 2) && (m_mapData != 0) && (S8At(this, 0x1F) == -1)) {
         Mtx inverseMtx;
 
-        PSMTXInverse(MtxAt(this, 0xB8), inverseMtx);
+        PSMTXInverse(m_worldMtx, inverseMtx);
         CMapCylinder localCylinder;
         PSMTXMultVec(inverseMtx, &cylinder->m_bottom, &localCylinder.m_bottom);
         PSMTXMultVec(inverseMtx, &cylinder->m_top, &localCylinder.m_top);
@@ -1648,7 +1643,7 @@ void CMapObj::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned l
         Mtx inverseMtx;
         Vec localMove;
 
-        PSMTXInverse(MtxAt(this, 0xB8), inverseMtx);
+        PSMTXInverse(m_worldMtx, inverseMtx);
         CMapCylinder localCylinder;
         PSMTXMultVec(inverseMtx, &cylinder->m_bottom, &localCylinder.m_bottom);
         PSMTXMultVec(inverseMtx, &cylinder->m_top, &localCylinder.m_top);
@@ -1727,7 +1722,7 @@ void CMapObj::GetHitFaceNormal(Vec* out)
 {
     CMapHit* mapHit = reinterpret_cast<CMapHit*>(m_mapData);
     mapHit->GetHitFaceNormal(out);
-    PSMTXMultVecSR(MtxAt(this, 0xB8), out, out);
+    PSMTXMultVecSR(m_worldMtx, out, out);
 }
 
 /*
@@ -1743,7 +1738,7 @@ int CMapObj::CalcHitSlide(Vec* out, float y)
 {
     CMapHit* mapHit = reinterpret_cast<CMapHit*>(m_mapData);
     int hit = mapHit->CalcHitSlide(out, y);
-    PSMTXMultVecSR(MtxAt(this, 0xB8), out, out);
+    PSMTXMultVecSR(m_worldMtx, out, out);
     return hit;
 }
 
@@ -1760,7 +1755,7 @@ void CMapObj::CalcHitPosition(Vec* out)
 {
     CMapHit* mapHit = reinterpret_cast<CMapHit*>(m_mapData);
     mapHit->CalcHitPosition(out);
-    PSMTXMultVec(MtxAt(this, 0xB8), out, out);
+    PSMTXMultVec(m_worldMtx, out, out);
 }
 
 /*

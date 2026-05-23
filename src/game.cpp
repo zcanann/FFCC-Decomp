@@ -38,11 +38,8 @@
 
 #include <dolphin/os/OSMemory.h>
 #include <dolphin/os/OSRtc.h>
-
-extern "C" {
-int sprintf(char*, const char*, ...);
-int rand(void);
-}
+#include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
+#include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
 
 const float FLOAT_8032f688 = 1.0E+10;
 const float FLOAT_8032f68c = -1.0E+10;

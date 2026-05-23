@@ -44,8 +44,6 @@ extern const f32 FLOAT_8033086C;
 #include "ffcc/fontman.h"
 
 #include <dolphin/mtx.h>
-extern "C" double sin(double);
-extern "C" double cos(double);
 #include <math.h>
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>

@@ -14,11 +14,8 @@ extern unsigned char gPppInConstructor;
 }
 #include "ffcc/util.h"
 #include "dolphin/gx.h"
+#include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
 extern const char s_pppRain_cpp_801DB610[] = "pppRain.cpp";
-
-extern "C" {
-int rand(void);
-}
 
 struct RainColorData {
     u8 pad[8];

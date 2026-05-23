@@ -13,9 +13,9 @@
 #include "dolphin/gx.h"
 #include "dolphin/os/OSCache.h"
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h"
+#include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h"
 #include "ffcc/ppp_linkage.h"
 
-extern "C" int rand(void);
 extern const char DAT_803311fc;
 extern const float FLOAT_803311e0;
 extern const float FLOAT_803311e4;

@@ -16,12 +16,11 @@
 #include "ffcc/sound.h"
 #include "types.h"
 #include <dolphin/mtx.h>
+#include <math.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
 CGraphicPcs GraphicPcs;
-extern "C" double sin(double);
-extern "C" double cos(double);
 extern const char s_CGraphicPcs_801D7B80[];
 extern const char __RTTI__8CManager_8032E5D8[];
 extern const char __RTTI__8CProcess_8032E5E0[];

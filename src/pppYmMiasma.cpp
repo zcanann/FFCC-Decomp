@@ -12,8 +12,8 @@
 #include <dolphin/mtx.h>
 #include <dolphin/gx.h>
 #include <string.h>
+#include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
 
-extern "C" int rand(void);
 extern float FLOAT_80330640;
 extern float FLOAT_80330644;
 extern const float FLOAT_80330650;

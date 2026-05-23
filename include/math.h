@@ -86,8 +86,20 @@ extern inline float sqrtf(float x)
     return x;
 }
 #else
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 double sqrt(double x);
 float sqrtf(float x);
+
+#ifdef __cplusplus
+}
+#endif
+#endif
+
+#ifdef __cplusplus
+extern "C" {
 #endif
 
 double atan(double x);
@@ -107,13 +119,23 @@ double log(double x);
 double pow(double x, double y);
 float tanf(float x);
 
+#ifdef __cplusplus
+}
+#endif
+
 #ifdef __MWERKS__
 extern inline double fabs(double x)
 {
     return __fabs(x);
 }
 #else
+#ifdef __cplusplus
+extern "C" {
+#endif
 double fabs(double x);
+#ifdef __cplusplus
+}
+#endif
 #endif
 
 _MATH_INLINE float fabsf(float x)

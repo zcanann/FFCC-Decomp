@@ -19,6 +19,7 @@
 
 #include <math.h>
 #include <string.h>
+#include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
 
 #include <dolphin/mtx.h>
 #include <dolphin/os/OSCache.h>
@@ -124,7 +125,6 @@ Vec g_shadow_pos;
 Vec g_shadow_refpos;
 extern "C" int CheckHitCylinder__7CMapMngFP12CMapCylinderP3VecUl(void*, void*, Vec*, unsigned long);
 extern "C" void CalcHitSlide__7CMapObjFP3Vecf(void*, Vec*);
-extern "C" int rand(void);
 
 extern "C" {
 void pppEditGetViewPos__FP3Vec(Vec*);

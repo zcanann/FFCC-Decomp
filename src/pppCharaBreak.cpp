@@ -15,6 +15,7 @@
 #include "dolphin/mtx.h"
 
 #include <string.h>
+#include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
 #include "ffcc/ppp_linkage.h"
 
 extern const char s_pppCharaBreak_cpp_801dd690[] = "pppCharaBreak.cpp";
@@ -37,10 +38,6 @@ extern Vec kPppCharaBreakUpVector;
 static inline Mtx& CameraMatrix()
 {
     return CameraPcs.m_cameraMatrix;
-}
-
-extern "C" {
-int rand(void);
 }
 
 struct POLYGON_DATA {

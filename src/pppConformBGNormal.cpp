@@ -8,12 +8,11 @@ extern "C" {
 extern const f32 kPppConformBgNormalZero;
 extern const f32 kPppConformBgNormalOne;
 extern int gPppCalcDisabled;
-double sin(double);
-double cos(double);
 }
 
 #include "dolphin/mtx.h"
 #include "dolphin/gx.h"
+#include <math.h>
 
 struct ConformCylinderQuery {
     Vec m_pos;

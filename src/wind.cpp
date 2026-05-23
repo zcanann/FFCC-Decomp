@@ -11,12 +11,11 @@
 #include "ffcc/p_menu.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/system.h"
+#include <math.h>
 
 CWind Wind;
 
 extern int __float_nan[];
-extern "C" double cos(double);
-extern "C" double sin(double);
 
 static inline s8 GetWindActiveFlag(const WindObject* obj)
 {

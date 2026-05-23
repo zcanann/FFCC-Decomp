@@ -1482,25 +1482,25 @@ void CMapMng::DestroyMap()
 {
     short octTreeCount = m_octTreeCount;
     for (int i = 0; i < octTreeCount; i++) {
-        __dt__8COctTreeFv(GetOctTreeArray() + i, 0xFFFF);
+        GetOctTreeArray()[i].~COctTree();
     }
     m_octTreeCount = 0;
 
     short mapHitCount = m_mapHitCount;
     for (int i = 0; i < mapHitCount; i++) {
-        __dt__7CMapHitFv(GetMapHitArray() + i, 0xFFFF);
+        GetMapHitArray()[i].~CMapHit();
     }
     m_mapHitCount = 0;
 
     short mapObjCount = m_mapObjCount;
     for (int i = 0; i < mapObjCount; i++) {
-        __dt__7CMapObjFv(GetMapObjArray() + i, -1);
+        GetMapObjArray()[i].~CMapObj();
     }
     m_mapObjCount = 0;
 
     short mapMeshCount = m_mapMeshCount;
     for (int i = 0; i < mapMeshCount; i++) {
-        __dt__8CMapMeshFv(GetMapMeshArray() + i, 0xFFFF);
+        GetMapMeshArray()[i].~CMapMesh();
     }
     m_mapMeshCount = 0;
 

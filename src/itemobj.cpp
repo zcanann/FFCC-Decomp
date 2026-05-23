@@ -17,8 +17,6 @@
 
 extern "C" void putParticle__8CGPrgObjFiiP8CGObjectfi(void*, int, int, void*, float, int);
 extern "C" void putParticleTrace__8CGPrgObjFiiP8CGObjectfi(void*, int, int, void*, float, int);
-extern "C" float RandF__5CMathFf(float, CMath*);
-extern "C" float RandFPM__5CMathFf(float, CMath*);
 extern "C" void putParticle__8CGPrgObjFiiP3Vecfi(void*, int, int, Vec*, float, int);
 extern "C" void playSe3D__8CGPrgObjFiiiiP3Vec(void*, int, int, int, int, Vec*);
 extern float FLOAT_80331b1c;
@@ -433,7 +431,7 @@ void CGItemObj::loadModel()
 	if (*(int*)(self + 0x500) == 0xCB) {
 		const float& randBase = FLOAT_80331b54;
 		const float& randRange = FLOAT_80331b58;
-		*(float*)(self + 0x1D4) = randBase - RandF__5CMathFf(randRange, &Math);
+		*(float*)(self + 0x1D4) = randBase - Math.RandF(randRange);
 		*(unsigned char*)(self + 0x9A) =
 		    static_cast<unsigned char>(__rlwimi(*(unsigned char*)(self + 0x9A), 0, 2, 29, 29));
 	}
@@ -783,7 +781,7 @@ CGPrgObj* CGItemObj::CreateFromScript(
 		if ((createFlags & 1) != 0) {
 			float safePosDist;
 			Vec safePos;
-			float yRot = owner->m_rotBaseY + RandFPM__5CMathFf(FLOAT_80331b54, &Math);
+			float yRot = owner->m_rotBaseY + Math.RandFPM(FLOAT_80331b54);
 
 			newItem->m_worldPosition.x = FLOAT_80331b1c * (float)sin((double)yRot) + owner->m_worldPosition.x;
 			newItem->m_worldPosition.y = FLOAT_80331b1c + owner->m_worldPosition.y;

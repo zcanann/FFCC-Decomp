@@ -11,8 +11,6 @@
 #include <math.h>
 #include <string.h>
 
-extern "C" int Rand__5CMathFUl(CMath*, unsigned long);
-extern "C" float RandFPM__5CMathFf(float, CMath*);
 extern "C" int sprintf(char*, const char*, ...);
 extern "C" void setAttackAfter__8CGMonObjFi(CGMonObj*, int);
 extern "C" void setActionParam__8CGMonObjFi(CGMonObj*, int);
@@ -189,7 +187,7 @@ void CGMonObj::logicFuncGiantCrab()
 	if (*reinterpret_cast<int*>(SoundBuffer + 1260) != 0) {
 		*reinterpret_cast<int*>(SoundBuffer + 1260) = 0;
 		const int branch = *reinterpret_cast<int*>(mon + 0x6B4);
-		const unsigned int roll = Rand__5CMathFUl(&Math, 10);
+		const unsigned int roll = Math.Rand(10);
 		if ((branch == 0 && roll == 0) || (branch == 1 && roll < 2) || (branch == 2 && roll < 3)) {
 			nextState = 100;
 		}
@@ -1728,8 +1726,8 @@ void CGMonObj::frameStatFuncMolbol()
 
 	if (prgObj->m_stateFrame == 0 || prgObj->m_stateFrame == 5 || prgObj->m_stateFrame == 10) {
 		CVector pos(Game.m_partyObjArr[*reinterpret_cast<int*>(self + 0x6C4)]->m_worldPosition);
-		pos.x += RandFPM__5CMathFf(static_cast<float>((prgObj->m_stateFrame == 0) ? 0 : 40), &Math);
-		pos.z += RandFPM__5CMathFf(static_cast<float>((prgObj->m_stateFrame == 0) ? 0 : 40), &Math);
+		pos.x += Math.RandFPM(static_cast<float>((prgObj->m_stateFrame == 0) ? 0 : 40));
+		pos.z += Math.RandFPM(static_cast<float>((prgObj->m_stateFrame == 0) ? 0 : 40));
 		charaObj->putParticleFromItem(charaObj->m_itemId, 3, charaObj->m_particleSlots[0], reinterpret_cast<Vec*>(&pos));
 	}
 	charaObj->statAttack();
@@ -2218,11 +2216,11 @@ int CGMonObj::attackCheckFuncMeteoParasite(int)
  */
 void CGMonObj::aiAddDuct(int& seq)
 {
-	if (Rand__5CMathFUl(&Math, 300) == 0) {
+	if (Math.Rand(300) == 0) {
 		aiTarget__8CGMonObjFv(this);
 		_aiSeq__8CGMonObjFiiiiii(this, -14, seq, 0, 1, 100, -1);
 		_aiSeq__8CGMonObjFiiiiii(this, -13, seq, 1, 0, 100, -1);
-		const int seOffset = Rand__5CMathFUl(&Math, 3);
+		const int seOffset = Math.Rand(3);
 		playSe3D__8CGPrgObjFiiiiP3Vec(reinterpret_cast<CGPrgObj*>(this), seOffset + 0x11D40, 0x32, 0x96, 0, 0);
 	}
 }
@@ -2296,7 +2294,7 @@ void CGMonObj::logicFuncRamoe()
 		}
 	}
 
-	if (activeCount == 0 && Rand__5CMathFUl(&Math, 3) == 0) {
+	if (activeCount == 0 && Math.Rand(3) == 0) {
 		nextState = 100;
 	}
 
@@ -2682,7 +2680,7 @@ void CGMonObj::teleport(
 			if (stateFrame == blendStartFrame + 1) {
 				int nextIndex;
 				do {
-					nextIndex = Rand__5CMathFUl(&Math, 4);
+					nextIndex = Math.Rand(4);
 				} while (nextIndex == teleportIndex);
 
 				teleportIndex = nextIndex;

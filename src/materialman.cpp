@@ -1,4 +1,5 @@
 #include "ffcc/materialman.h"
+#include "ffcc/game.h"
 #include "ffcc/map.h"
 #include "ffcc/mapocttree.h"
 #include "ffcc/pad.h"
@@ -460,7 +461,7 @@ void CMaterialMan::SetBlendMode(CMaterialSet* materialSet, int materialIndex)
     CMaterial* material = (*materials)[materialIndex];
 
     unsigned char fogEnable = *Ptr(material, 0xA1);
-    if ((*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Game) + 0xC7F0) == 3) && (*Ptr(&MapMng, 0x22988) == 0)) {
+    if ((static_cast<int>(Game.m_currentSceneId) == 3) && (*Ptr(&MapMng, 0x22988) == 0)) {
         fogEnable = 0;
     }
 

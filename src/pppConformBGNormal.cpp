@@ -31,7 +31,6 @@ struct ConformBgNormalState {
 void pppSetFpMatrix(_pppMngSt*);
 
 extern "C" {
-s32 CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, CMapCylinder*, Vec*, u32);
 void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
 void GetHitFaceNormal__7CMapObjFP3Vec(void*, Vec*);
 
@@ -150,8 +149,7 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
                 firstCylinder.m_direction.z = kPppConformBgNormalZero;
                 firstCylinder.m_radius = kPppConformBgNormalZero;
 
-                checkResult = CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
-                    &MapMng, (CMapCylinder*)&firstCylinder, &firstRayDirection, 0xffffffff);
+                checkResult = MapMng.CheckHitCylinderNear((CMapCylinder*)&firstCylinder, &firstRayDirection, 0xffffffff);
                 hitFound = checkResult;
                 if (checkResult != 0) {
                     CalcHitPosition__7CMapObjFP3Vec(*(void**)((u8*)&MapMng + 0x22A78), &local_170);
@@ -260,8 +258,8 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
                     secondCylinder.m_direction.z = kPppConformBgNormalZero;
                     secondCylinder.m_radius = kPppConformBgNormalZero;
 
-                    hitFound = CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
-                        &MapMng, (CMapCylinder*)&secondCylinder, &secondRayDirection, 0xffffffff);
+                    hitFound = MapMng.CheckHitCylinderNear(
+                        (CMapCylinder*)&secondCylinder, &secondRayDirection, 0xffffffff);
                     if (hitFound != 0) {
                         CalcHitPosition__7CMapObjFP3Vec(*(void**)((u8*)&MapMng + 0x22A78), &local_170);
                         pppMngStPtr->m_matrix.value[0][3] = local_170.x;

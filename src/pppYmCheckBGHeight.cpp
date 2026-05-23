@@ -9,7 +9,6 @@ extern int gPppCalcDisabled;
 #include <dolphin/types.h>
 
 extern "C" {
-    int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, CMapCylinder*, Vec*, unsigned long);
     void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
     void* pppSetFpMatrix__FP9_pppMngSt(struct _pppMngSt*);
 }
@@ -78,8 +77,7 @@ struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(
         cylinder.m_direction.z = zero;
         cylinder.m_radius = zero;
 
-        if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
-                &MapMng, (CMapCylinder*)&cylinder, &direction, (unsigned long)-1) != 0) {
+        if (MapMng.CheckHitCylinderNear((CMapCylinder*)&cylinder, &direction, (unsigned long)-1) != 0) {
             CalcHitPosition__7CMapObjFP3Vec(*(void**)((u8*)&MapMng + 0x22A78), &hitPos);
             if ((nextY - param_2->m_unk0xC) > hitPos.y) {
                 finalY = nextY;

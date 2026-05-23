@@ -48,7 +48,6 @@ char* CardConst::MCDAT_VERSION = const_cast<char*>(s_CardVersion_80330CC8);
 
 CMemoryCardMan MemoryCardMan;
 
-extern "C" int memcmp(const void* lhs, const void* rhs, unsigned long count);
 extern const char sMcOdekakeReturn[];
 // CRC32 lookup table
 static const unsigned int crcTable[256] = {

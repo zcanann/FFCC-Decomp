@@ -766,43 +766,33 @@ extern "C" SingMenuTextureRef DAT_80214b3c[] = {
 extern "C" unsigned int CmdOpen__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int CmdCtrl__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int CmdClose__8CMenuPcsFv(CMenuPcs*);
-extern "C" void CmdDraw__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int ItemOpen__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int ItemCtrl__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int ItemClose__8CMenuPcsFv(CMenuPcs*);
-extern "C" void ItemDraw__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int EquipOpen__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int EquipCtrl__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int EquipClose__8CMenuPcsFv(CMenuPcs*);
-extern "C" void EquipDraw__8CMenuPcsFv(CMenuPcs*);
 extern "C" bool ArtiOpen__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int ArtiCtrl__8CMenuPcsFv(CMenuPcs*);
 extern "C" int ArtiClose__8CMenuPcsFv(CMenuPcs*);
-extern "C" void ArtiDraw__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int TmpArtiOpen__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int TmpArtiCtrl__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int TmpArtiClose__8CMenuPcsFv(CMenuPcs*);
-extern "C" void TmpArtiDraw__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int MoneyOpen__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int MoneyCtrl__8CMenuPcsFv(CMenuPcs*);
 extern "C" int MoneyClose__8CMenuPcsFv(CMenuPcs*);
-extern "C" void MoneyDraw__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int FavoOpen__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int FavoCtrl__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int FavoClose__8CMenuPcsFv(CMenuPcs*);
-extern "C" void FavoDraw__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int CompaOpen__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int CompaCtrl__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int CompaClose__8CMenuPcsFv(CMenuPcs*);
-extern "C" void CompaDraw__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int LetterOpen__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int LetterCtrl__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int LetterClose__8CMenuPcsFv(CMenuPcs*);
-extern "C" void LetterDraw__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int MLstOpen__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int MLstCtrl__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int MLstClose__8CMenuPcsFv(CMenuPcs*);
-extern "C" void MLstDraw__8CMenuPcsFv(CMenuPcs*);
 
 extern float FLOAT_8033292c;
 extern float FLOAT_80332930;
@@ -2183,34 +2173,34 @@ void CMenuPcs::SingleDrawCtrl()
 
     switch (*reinterpret_cast<s16*>(self + 0x864)) {
     case 0:
-        CmdDraw__8CMenuPcsFv(this);
+        CmdDraw();
         break;
     case 1:
-        ItemDraw__8CMenuPcsFv(this);
+        ItemDraw();
         break;
     case 2:
-        EquipDraw__8CMenuPcsFv(this);
+        EquipDraw();
         break;
     case 3:
-        ArtiDraw__8CMenuPcsFv(this);
+        ArtiDraw();
         break;
     case 4:
-        TmpArtiDraw__8CMenuPcsFv(this);
+        TmpArtiDraw();
         break;
     case 5:
-        MoneyDraw__8CMenuPcsFv(this);
+        MoneyDraw();
         break;
     case 6:
-        FavoDraw__8CMenuPcsFv(this);
+        FavoDraw();
         break;
     case 7:
-        CompaDraw__8CMenuPcsFv(this);
+        CompaDraw();
         break;
     case 8:
-        LetterDraw__8CMenuPcsFv(this);
+        LetterDraw();
         break;
     case 9:
-        MLstDraw__8CMenuPcsFv(this);
+        MLstDraw();
         break;
     }
 

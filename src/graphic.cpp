@@ -111,9 +111,9 @@ int checkThread(void*)
  */
 void CGraphic::Init()
 {
-    char* graphicFileName = const_cast<char*>(s_graphic_cpp_801d6348);
+    char* graphicFileName = const_cast<char*>(sGraphicSourceStrings);
 
-    PtrAt(this, 0x4) = Memory.CreateStage(0x19C000, const_cast<char*>(s_CGraphic_801d6330), 0);
+    PtrAt(this, 0x4) = Memory.CreateStage(0x19C000, const_cast<char*>(sGraphicStageName), 0);
     PtrAt(this, 0x8) = Memory.CreateStage(0xD6000, graphicFileName + kGraphicCppCGraphic2, 0);
 
     S32At(this, 0x14) = 0;
@@ -497,7 +497,7 @@ void CGraphic::Thread()
         OSThread* thread;
     };
 
-    char* debugFmtBase = const_cast<char*>(s_graphic_cpp_801d6348);
+    char* debugFmtBase = const_cast<char*>(sGraphicSourceStrings);
     int lastCounter = -1;
     int debugCountdown = 5;
 
@@ -641,7 +641,7 @@ void CGraphic::Flip()
 
         GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
         GXCopyDisp(PtrAt(this, 0x71E4), GX_TRUE);
-        PtrAt(this, 0x7368) = const_cast<char*>(s_graphic_cpp_801d6348);
+        PtrAt(this, 0x7368) = const_cast<char*>(sGraphicSourceStrings);
         S32At(this, 0x736C) = 0x26D;
         S32At(this, 0x7364) = 1;
         GXSetDrawDone();
@@ -1071,7 +1071,7 @@ void CGraphic::makeSphere()
 
     S32At(this, 0x71F8) = 0x880;
     PtrAt(this, 0x71FC) =
-        new (reinterpret_cast<CMemory::CStage*>(PtrAt(this, 4)), const_cast<char*>(s_graphic_cpp_801d6348), 0x41A)
+        new (reinterpret_cast<CMemory::CStage*>(PtrAt(this, 4)), const_cast<char*>(sGraphicSourceStrings), 0x41A)
         u8[S32At(this, 0x71F8)];
 
     DCInvalidateRange(PtrAt(this, 0x71FC), S32At(this, 0x71F8));
@@ -2016,7 +2016,7 @@ void CGraphic::CreateTempBuffer()
 	u32 alignedWidth = (U16At(renderMode, 4) + 0xF) & 0xFFF0;
 	PtrAt(this, 0x71E8) =
 	    Memory._Alloc(alignedWidth * (u32)efbHeight * 2 + 0x46000, reinterpret_cast<CMemory::CStage*>(PtrAt(this, 0x8)),
-	                  const_cast<char*>(s_graphic_cpp_801d6348), 0xB53, 0);
+	                  const_cast<char*>(sGraphicSourceStrings), 0xB53, 0);
 	memset(PtrAt(this, 0x71E8), 0, 0x46004);
 }
 

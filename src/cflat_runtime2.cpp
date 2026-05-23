@@ -70,13 +70,6 @@ extern "C" void* __vt__9CGItemObj[];
 extern "C" void* __vt__10CGCharaObj[];
 extern "C" void* __vt__8CGMonObj[];
 extern "C" void* __vt__10CGPartyObj[];
-extern "C" void move__8CGObjectFv(CGObject*);
-extern "C" void objectCollision__8CGObjectFv(CGObject*);
-extern "C" void bgCollision__8CGObjectFv(CGObject*);
-extern "C" void update__8CGObjectFv(CGObject*);
-extern "C" void hit__8CGObjectFv(CGObject*);
-extern "C" void copy__8CGObjectFv(CGObject*);
-
 int gCFlatRuntime2DebugDrawOverflowFrame = 0;
 unsigned char gCFlatRuntime2DebugDrawOverflowInit = 0;
 const char sCFlatRuntime2DebugDrawOverflowMsg[] =
@@ -914,7 +907,7 @@ void CFlatRuntime2::Frame(int arg0, int mode)
 		watch.Reset();
 		watch.Start();
 		for (CGObject* object = FindGObjFirst(); object != 0; object = FindGObjNext(object)) {
-			move__8CGObjectFv(object);
+			object->move();
 		}
 		watch.Stop();
 		*reinterpret_cast<float*>(CFlat + 0x1338) += watch.Get();
@@ -922,7 +915,7 @@ void CFlatRuntime2::Frame(int arg0, int mode)
 		watch.Reset();
 		watch.Start();
 		for (CGObject* object = FindGObjFirst(); object != 0; object = FindGObjNext(object)) {
-			objectCollision__8CGObjectFv(object);
+			object->objectCollision();
 		}
 		watch.Stop();
 		*reinterpret_cast<float*>(CFlat + 0x1340) += watch.Get();
@@ -930,7 +923,7 @@ void CFlatRuntime2::Frame(int arg0, int mode)
 		watch.Reset();
 		watch.Start();
 		for (CGObject* object = FindGObjFirst(); object != 0; object = FindGObjNext(object)) {
-			bgCollision__8CGObjectFv(object);
+			object->bgCollision();
 		}
 		watch.Stop();
 		*reinterpret_cast<float*>(CFlat + 0x133C) += watch.Get();
@@ -938,7 +931,7 @@ void CFlatRuntime2::Frame(int arg0, int mode)
 		watch.Reset();
 		watch.Start();
 		for (CGObject* object = FindGObjFirst(); object != 0; object = FindGObjNext(object)) {
-			update__8CGObjectFv(object);
+			object->update();
 		}
 		watch.Stop();
 		*reinterpret_cast<float*>(CFlat + 0x1344) += watch.Get();
@@ -946,13 +939,13 @@ void CFlatRuntime2::Frame(int arg0, int mode)
 		watch.Reset();
 		watch.Start();
 		for (CGObject* object = FindGObjFirst(); object != 0; object = FindGObjNext(object)) {
-			hit__8CGObjectFv(object);
+			object->hit();
 		}
 		watch.Stop();
 		*reinterpret_cast<float*>(CFlat + 0x1348) += watch.Get();
 
 		for (CGObject* object = FindGObjFirst(); object != 0; object = FindGObjNext(object)) {
-			copy__8CGObjectFv(object);
+			object->copy();
 		}
 		return;
 	}

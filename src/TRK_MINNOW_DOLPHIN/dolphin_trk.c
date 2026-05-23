@@ -13,7 +13,6 @@
 
 static u32 gTRKDBAT3StartAddress;
 extern u32 _db_stack_addr;
-extern void* TRK_memcpy(void* dst, const void* src, unsigned int n);
 
 static u32 gTRKExceptionVectorOffsets[15] = { PPC_SystemReset,
 	                               PPC_MachineCheck,

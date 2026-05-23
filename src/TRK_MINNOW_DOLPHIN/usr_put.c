@@ -1,8 +1,6 @@
 #include "TRK_MINNOW_DOLPHIN/Os/dolphin/usr_put.h"
 #include "dolphin/types.h"
 
-extern void SetTRKConnected(BOOL);
-extern BOOL GetTRKConnected(void);
 void OSReport(const char* msg);
 
 BOOL usr_puts_serial(const char* msg)

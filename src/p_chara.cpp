@@ -5,6 +5,7 @@
 #include "ffcc/graphic.h"
 #include "ffcc/gxfunc.h"
 #include "ffcc/linkage.h"
+#include "ffcc/map.h"
 #include "ffcc/memory.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/partMng.h"

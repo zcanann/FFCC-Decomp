@@ -80,6 +80,9 @@ extern "C" const char s_menu_letter_cpp[];
 
 namespace {
 static const char s_letterItemInfoFmt[] = "%s%d%s%s";
+enum {
+	kLetterTextScratchSize = 0x400,
+};
 
 struct FlatDataTableView {
 	int m_numEntries;
@@ -347,12 +350,12 @@ void CMenuPcs::LetterInit3()
 	char unused4[0x80];
 	char unused5[0x80];
 	char unused6[0x88];
-	memset(lines, 0, 0x400);
+	memset(lines, 0, sizeof(lines));
 
-	char* srcText = new (GetLetterMenuStage(this), const_cast<char*>(s_menu_letter_cpp), 0x323) char[0x400];
-	char* workText = new (GetLetterMenuStage(this), const_cast<char*>(s_menu_letter_cpp), 0x325) char[0x400];
-	memset(srcText, 0, 0x400);
-	memset(workText, 0, 0x400);
+	char* srcText = new (GetLetterMenuStage(this), const_cast<char*>(s_menu_letter_cpp), 0x323) char[kLetterTextScratchSize];
+	char* workText = new (GetLetterMenuStage(this), const_cast<char*>(s_menu_letter_cpp), 0x325) char[kLetterTextScratchSize];
+	memset(srcText, 0, kLetterTextScratchSize);
+	memset(workText, 0, kLetterTextScratchSize);
 
 	unsigned short msgIndex = *reinterpret_cast<unsigned short*>(caravanWork + s_SelLetter * 0xC + 0x3EC);
 	char** mesPtr = reinterpret_cast<char**>(reinterpret_cast<char*>(&Game.m_cFlatDataArr[1]) + 0x44);
@@ -1106,17 +1109,17 @@ bool CMenuPcs::LetterReplyWinOpen()
 		char unused4[0x80];
 		char unused5[0x80];
 		char unused6[0x88];
-		memset(lines, 0, 0x400);
+		memset(lines, 0, sizeof(lines));
 
 		CMemory::CStage* stage = *reinterpret_cast<CMemory::CStage**>(
 			reinterpret_cast<char*>(this) + (Game.m_gameWork.m_menuStageMode == '\0' ? 0xEC : 0xF4));
-		char* srcText = new (stage, const_cast<char*>(s_menu_letter_cpp), 0x323) char[0x400];
+		char* srcText = new (stage, const_cast<char*>(s_menu_letter_cpp), 0x323) char[kLetterTextScratchSize];
 		stage = *reinterpret_cast<CMemory::CStage**>(
 			reinterpret_cast<char*>(this) + (Game.m_gameWork.m_menuStageMode == '\0' ? 0xEC : 0xF4));
-		char* workText = new (stage, const_cast<char*>(s_menu_letter_cpp), 0x325) char[0x400];
+		char* workText = new (stage, const_cast<char*>(s_menu_letter_cpp), 0x325) char[kLetterTextScratchSize];
 
-		memset(srcText, 0, 0x400);
-		memset(workText, 0, 0x400);
+		memset(srcText, 0, kLetterTextScratchSize);
+		memset(workText, 0, kLetterTextScratchSize);
 
 		unsigned short msgIndex = *reinterpret_cast<unsigned short*>(
 			caravanWork + s_SelLetter * 0xC + 0x3EC);
@@ -1604,13 +1607,13 @@ void CMenuPcs::LetterMessDraw()
 
 	CMemory::CStage* stage = *reinterpret_cast<CMemory::CStage**>(
 	    reinterpret_cast<char*>(this) + (Game.m_gameWork.m_menuStageMode == '\0' ? 0xEC : 0xF4));
-	char* srcText = new (stage, const_cast<char*>(s_menu_letter_cpp), 0x535) char[0x400];
+	char* srcText = new (stage, const_cast<char*>(s_menu_letter_cpp), 0x535) char[kLetterTextScratchSize];
 	stage = *reinterpret_cast<CMemory::CStage**>(
 	    reinterpret_cast<char*>(this) + (Game.m_gameWork.m_menuStageMode == '\0' ? 0xEC : 0xF4));
-	char* workText = new (stage, const_cast<char*>(s_menu_letter_cpp), 0x537) char[0x400];
+	char* workText = new (stage, const_cast<char*>(s_menu_letter_cpp), 0x537) char[kLetterTextScratchSize];
 
-	memset(srcText, 0, 0x400);
-	memset(workText, 0, 0x400);
+	memset(srcText, 0, kLetterTextScratchSize);
+	memset(workText, 0, kLetterTextScratchSize);
 
 	u16 msgIndex = *reinterpret_cast<u16*>(caravanWork + s_SelLetter * 0xC + 0x3EC);
 	char** mesPtr = reinterpret_cast<char**>(reinterpret_cast<char*>(&Game.m_cFlatDataArr[1]) + 0x44);
@@ -1887,12 +1890,12 @@ int CMenuPcs::LetterCtrlCur()
 				s_ReplyPos = static_cast<u8>(curReply);
 				CMemory::CStage* stage = *reinterpret_cast<CMemory::CStage**>(
 				    reinterpret_cast<char*>(this) + (Game.m_gameWork.m_menuStageMode == '\0' ? 0xEC : 0xF4));
-				char* srcText = new (stage, const_cast<char*>(s_menu_letter_cpp), 0x65E) char[0x400];
+				char* srcText = new (stage, const_cast<char*>(s_menu_letter_cpp), 0x65E) char[kLetterTextScratchSize];
 				stage = *reinterpret_cast<CMemory::CStage**>(
 				    reinterpret_cast<char*>(this) + (Game.m_gameWork.m_menuStageMode == '\0' ? 0xEC : 0xF4));
-				char* workText = new (stage, const_cast<char*>(s_menu_letter_cpp), 0x660) char[0x400];
-				memset(srcText, 0, 0x400);
-				memset(workText, 0, 0x400);
+				char* workText = new (stage, const_cast<char*>(s_menu_letter_cpp), 0x660) char[kLetterTextScratchSize];
+				memset(srcText, 0, kLetterTextScratchSize);
+				memset(workText, 0, kLetterTextScratchSize);
 
 				u16 msgIndex = *reinterpret_cast<u16*>(caravanWork + s_SelLetter * 0xC + 0x3EC);
 				char** mesPtr = reinterpret_cast<char**>(reinterpret_cast<char*>(&Game.m_cFlatDataArr[1]) + 0x44);

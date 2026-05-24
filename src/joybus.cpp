@@ -3,6 +3,7 @@
 #include "ffcc/file.h"
 #include "ffcc/gbaque.h"
 #include "ffcc/system.h"
+#include "global.h"
 
 #include <dolphin/gba/GBA.h>
 #include "dolphin/os.h"
@@ -125,6 +126,9 @@ enum {
 	kJoyDataSmallPayloadClearBytes = 0x100,
 	kJoyDataFavoritePayloadClearBytes = 0x40,
 };
+
+STATIC_ASSERT(sizeof(ThreadParam) == 0x3C);
+STATIC_ASSERT(sizeof(JoyBus::JoyBusRecvBuffer) == 0x408);
 
 static inline void ClearJoyDataPacketPayload(JoyBus* joybus, int port)
 {
@@ -636,7 +640,7 @@ void JoyBus::ThreadMain(void* arg)
             {
                 if (threadParam == jb->m_threadParams)
                 {
-                    memset(threadParam, 0, 0x3c);
+                    memset(threadParam, 0, sizeof(*threadParam));
                     threadParam->m_portIndex = (int)idx;
                     break;
                 }
@@ -1470,7 +1474,7 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
             if ((header >> 6) == 0)
             {
                 OSWaitSemaphore(&m_accessSemaphores[port]);
-                memset(&m_recvBuffer[port], 0, 0x408);
+                memset(&m_recvBuffer[port], 0, sizeof(m_recvBuffer[port]));
                 OSSignalSemaphore(&m_accessSemaphores[port]);
             }
 
@@ -1489,7 +1493,7 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
                     }
 
                     OSWaitSemaphore(&m_accessSemaphores[port]);
-                    memset(&m_recvBuffer[port], 0, 0x408);
+                    memset(&m_recvBuffer[port], 0, sizeof(m_recvBuffer[port]));
                     OSSignalSemaphore(&m_accessSemaphores[port]);
                 }
             }
@@ -1561,7 +1565,7 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
                     }
 
                     OSWaitSemaphore(&m_accessSemaphores[port]);
-                    memset(&m_recvBuffer[port], 0, 0x408);
+                    memset(&m_recvBuffer[port], 0, sizeof(m_recvBuffer[port]));
                     OSSignalSemaphore(&m_accessSemaphores[port]);
                 }
             }
@@ -3014,7 +3018,7 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
             return 0;
         }
 
-        memset(posBytes, 0, 0x100);
+        memset(posBytes, 0, sizeof(m_playerPosPacketBuffer[port]));
 
         GbaQue.GetPlayerPos(port, posWords);
 
@@ -3075,7 +3079,7 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
 
     case 2:
     {
-        memset(posBytes, 0, 0x100);
+        memset(posBytes, 0, sizeof(m_playerPosPacketBuffer[port]));
         wordIndex = 0;
         mobCount = 0;
 
@@ -3147,7 +3151,7 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
 
     case 4:
     {
-        memset(posBytes, 0, 0x100);
+        memset(posBytes, 0, sizeof(m_playerPosPacketBuffer[port]));
         wordIndex = 0;
         mobCount = 0;
 

@@ -236,6 +236,12 @@ struct WmCharaSelectEntry
 
 STATIC_ASSERT(sizeof(WmCharaSelectEntry) == 0x10);
 
+static const int kWmMenuPlayerCount = 8;
+static const int kWmCharaSelectCount = kWmMenuPlayerCount;
+static const int kWmCharaSelectBytes = sizeof(WmCharaSelectEntry) * kWmCharaSelectCount;
+static const int kWmFrameInfoBytes = 0x3C;
+static const int kWmMenuCharaStateBytes = 0x120;
+
 struct WmMenuWindowState
 {
 	short x;
@@ -269,6 +275,12 @@ static inline WmCharaSelectEntry* GetWmCharaSelectEntries(CMenuPcs* menu)
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(menu);
 	return reinterpret_cast<WmCharaSelectEntry*>(reinterpret_cast<unsigned int*>(bytes + 0x828)[0]);
+}
+
+static inline unsigned char* GetWmMenuCharaState(CMenuPcs* menu)
+{
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(menu);
+	return reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x838)[0]);
 }
 
 static inline unsigned char* GetWmCharaModelData(CMenuPcs* menu)
@@ -326,7 +338,7 @@ static inline CFont* GetWmFont(CMenuPcs* menu)
 
 static inline void QueueWmCharaAnimState(CMenuPcs* menu, int slot, int state)
 {
-	if (slot < 0 || slot >= 8) {
+	if (slot < 0 || slot >= kWmMenuPlayerCount) {
 		return;
 	}
 	GetWmCharaAnimState(menu)[slot * 5 + 1] = state;
@@ -464,7 +476,7 @@ void CMenuPcs::ChkNumItemAll()
 	int selected = 0;
 	unsigned char* const modelData = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x824)[0]);
 	if (modelData != 0) {
-		for (int i = 0; i < 8; i++) {
+		for (int i = 0; i < kWmMenuPlayerCount; i++) {
 			if (modelData[i * 0x34 + 0xC] != 0) {
 				selected++;
 			}
@@ -553,20 +565,20 @@ void CMenuPcs::loadData()
 	reinterpret_cast<void**>(bytes + 0x81C)[0] = new unsigned char[0xEC];
 	memset(reinterpret_cast<void**>(bytes + 0x81C)[0], 0, 0xEC);
 
-	reinterpret_cast<void**>(bytes + 0x820)[0] = new unsigned char[0x3C];
-	memset(reinterpret_cast<void**>(bytes + 0x820)[0], 0, 0x3C);
+	reinterpret_cast<void**>(bytes + 0x820)[0] = new unsigned char[kWmFrameInfoBytes];
+	memset(reinterpret_cast<void**>(bytes + 0x820)[0], 0, kWmFrameInfoBytes);
 
 	reinterpret_cast<void**>(bytes + 0x824)[0] = new unsigned char[0x1A0];
 	memset(reinterpret_cast<void**>(bytes + 0x824)[0], 0, 0x1A0);
 
-	reinterpret_cast<void**>(bytes + 0x828)[0] = new unsigned char[sizeof(WmCharaSelectEntry) * 8];
-	memset(reinterpret_cast<void**>(bytes + 0x828)[0], 0, sizeof(WmCharaSelectEntry) * 8);
+	reinterpret_cast<void**>(bytes + 0x828)[0] = new unsigned char[kWmCharaSelectBytes];
+	memset(reinterpret_cast<void**>(bytes + 0x828)[0], 0, kWmCharaSelectBytes);
 
 	reinterpret_cast<void**>(bytes + 0x82C)[0] = new unsigned char[0x48];
 	memset(reinterpret_cast<void**>(bytes + 0x82C)[0], 0, 0x48);
 
-	reinterpret_cast<void**>(bytes + 0x838)[0] = new unsigned char[0x120];
-	memset(reinterpret_cast<void**>(bytes + 0x838)[0], 0, 0x120);
+	reinterpret_cast<void**>(bytes + 0x838)[0] = new unsigned char[kWmMenuCharaStateBytes];
+	memset(reinterpret_cast<void**>(bytes + 0x838)[0], 0, kWmMenuCharaStateBytes);
 
 	reinterpret_cast<void**>(bytes + 0x83C)[0] = new unsigned char[0x10];
 	memset(reinterpret_cast<void**>(bytes + 0x83C)[0], 0, 0x10);
@@ -742,8 +754,8 @@ void CMenuPcs::InitCharaSelectInfo()
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	unsigned char* const selectData = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x828)[0]);
 	if (selectData != 0) {
-		memset(selectData, 0, 0x80);
-		for (int i = 0; i < 8; i++) {
+		memset(selectData, 0, kWmCharaSelectBytes);
+		for (int i = 0; i < kWmCharaSelectCount; i++) {
 			unsigned char* const entry = selectData + i * 0x10;
 			*reinterpret_cast<short*>(entry + 4) = static_cast<short>(i);
 			*reinterpret_cast<short*>(entry + 6) = static_cast<short>(i);
@@ -1136,7 +1148,7 @@ void CMenuPcs::CalcDiaryMenu()
 			if (worldState[0x0C] == 0) {
 				unsigned char* const selectData = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x824)[0]);
 				if (selectData != 0) {
-					for (int i = 0; i < 8; i++) {
+					for (int i = 0; i < kWmMenuPlayerCount; i++) {
 						selectData[i * 0x34 + 0x0C] = 1;
 					}
 				}
@@ -1220,7 +1232,7 @@ void CMenuPcs::CalcMCardMenu()
 		} else {
 			mcCtrl.m_saveIndex = (int)uRam8032ee21;
 		}
-		memset(reinterpret_cast<void*>(*reinterpret_cast<int*>(bytes + 0x838)), 0, 0x120);
+		memset(GetWmMenuCharaState(this), 0, kWmMenuCharaStateBytes);
 		int iVar14 = *reinterpret_cast<int*>(bytes + 0x82C);
 		Game.m_gameWork.m_wmBackupParams[0] = (int)*reinterpret_cast<short*>(iVar14 + 0x36);
 		Game.m_gameWork.m_wmBackupParams[1] = (int)*reinterpret_cast<short*>(iVar14 + 0x38);
@@ -1315,7 +1327,7 @@ void CMenuPcs::CalcMCardMenu()
 			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 8) = 0;
 			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) = 3;
 			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) = 0;
-			memset(reinterpret_cast<void*>(*reinterpret_cast<int*>(bytes + 0x838)), 0, 0x120);
+			memset(GetWmMenuCharaState(this), 0, kWmMenuCharaStateBytes);
 			*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x82C) + 9) = 1;
 			*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x82C) + 10) = 0;
 		}
@@ -1640,7 +1652,7 @@ void CMenuPcs::CalcMCardMenu()
 	case 0xC: {
 		if (*reinterpret_cast<char*>(iVar14 + 9) == 0) {
 			*reinterpret_cast<unsigned char*>(iVar14 + 9) = 1;
-			memset(reinterpret_cast<void*>(*reinterpret_cast<int*>(bytes + 0x838)), 0, 0x120);
+			memset(GetWmMenuCharaState(this), 0, kWmMenuCharaStateBytes);
 			mcCtrl.m_previousState = 0;
 			mcCtrl.m_state = 0;
 			mcCtrl.m_lastResult = 0;
@@ -2042,7 +2054,7 @@ void CMenuPcs::CalcLoadMenu()
 		mcCtrl.m_createFlag = 0;
 		mcCtrl.m_cardChannel = 0;
 		mcCtrl.m_saveIndex = 0;
-		memset(reinterpret_cast<void*>(*reinterpret_cast<int*>(bytes + 0x838)), 0, 0x120);
+		memset(GetWmMenuCharaState(this), 0, kWmMenuCharaStateBytes);
 
 		iVar14 = *reinterpret_cast<int*>(bytes + 0x82C);
 		Game.m_gameWork.m_wmBackupParams[0] = (int)*reinterpret_cast<short*>(iVar14 + 0x36);
@@ -2143,7 +2155,7 @@ void CMenuPcs::CalcLoadMenu()
 			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 8) = 0;
 			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) = 3;
 			*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x848) + 10) = 0;
-			memset(reinterpret_cast<void*>(*reinterpret_cast<int*>(bytes + 0x838)), 0, 0x120);
+			memset(GetWmMenuCharaState(this), 0, kWmMenuCharaStateBytes);
 			*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x82C) + 9) = 1;
 			*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x82C) + 10) = 0;
 		}
@@ -2458,7 +2470,7 @@ void CMenuPcs::CalcLoadMenu()
 	case 0xC: {
 		if (*reinterpret_cast<char*>(iVar14 + 9) == 0) {
 			*reinterpret_cast<unsigned char*>(iVar14 + 9) = 1;
-			memset(reinterpret_cast<void*>(*reinterpret_cast<int*>(bytes + 0x838)), 0, 0x120);
+			memset(GetWmMenuCharaState(this), 0, kWmMenuCharaStateBytes);
 			mcCtrl.m_previousState = 0;
 			mcCtrl.m_state = 0;
 			mcCtrl.m_lastResult = 0;
@@ -3271,7 +3283,7 @@ void CMenuPcs::DrawMCardMenu()
 			break;
 		case 3:
 			if (*reinterpret_cast<short*>(worldState + 0x2E) != 1) {
-				memset(*reinterpret_cast<void**>(bytes + 0x838), 0, 0x120);
+				memset(GetWmMenuCharaState(this), 0, kWmMenuCharaStateBytes);
 				worldState = *reinterpret_cast<int*>(bytes + 0x82C);
 				short mcResult = *reinterpret_cast<short*>(worldState + 0x2E);
 				if (mcResult == -1) *reinterpret_cast<short*>(worldState + 0x16) = 5;
@@ -3690,7 +3702,7 @@ void CMenuPcs::DrawLoadMenu()
 			break;
 		case 3:
 			if (*reinterpret_cast<short*>(worldState + 0x2E) != 1) {
-				memset(*reinterpret_cast<void**>(bytes + 0x838), 0, 0x120);
+				memset(GetWmMenuCharaState(this), 0, kWmMenuCharaStateBytes);
 				worldState = *reinterpret_cast<int*>(bytes + 0x82C);
 				short mcResult = *reinterpret_cast<short*>(worldState + 0x2E);
 				if (mcResult == -1) {
@@ -6096,7 +6108,7 @@ void CMenuPcs::CalcChara()
 	CalcCharaSelect();
 
 	int* animState = GetWmCharaAnimState(this);
-	for (int i = 0; i < 8; i++, charaWork += 0x14, animState += 5, modelData += 0x34) {
+	for (int i = 0; i < kWmMenuPlayerCount; i++, charaWork += 0x14, animState += 5, modelData += 0x34) {
 		CCharaPcs::CHandle* const handle = GetWmCharaHandles(this)[i];
 		if (!handle->IsModelLoaded(1)) {
 			charaWork[0] = 0;
@@ -6244,7 +6256,7 @@ void CMenuPcs::PCAnimCtrl()
 	}
 
 	int* animState = reinterpret_cast<int*>(reinterpret_cast<unsigned int*>(bytes + 0x844)[0]);
-	for (int i = 0; i < 8; i++, animState += 5) {
+	for (int i = 0; i < kWmMenuPlayerCount; i++, animState += 5) {
 		CCharaPcs::CHandle* const handle = GetWmCharaHandles(this)[i];
 		if (handle == 0) {
 			continue;
@@ -6801,7 +6813,7 @@ void CMenuPcs::DrawCharaName()
 	unsigned int activeMask = 0;
 	unsigned int confirmedMask = 0;
 	unsigned int pendingMask = 0;
-	for (int i = 0; i < 8; i++) {
+	for (int i = 0; i < kWmCharaSelectCount; i++) {
 		const WmCharaSelectEntry& entry = selectEntries[i];
 		if (entry.m_connected != 0) {
 			const unsigned int bit = 1u << entry.m_currentSlot;
@@ -6925,7 +6937,7 @@ void CMenuPcs::DrawCMLife()
 
 	const int alpha = GetWmMenuFade(worldState[0x10 / 2], worldState[0x22 / 2]);
 	unsigned int readyMask = 0;
-	for (int i = 0; i < 8; i++) {
+	for (int i = 0; i < kWmCharaSelectCount; i++) {
 		const WmCharaSelectEntry& entry = selectEntries[i];
 		if (entry.m_connected != 0 && entry.m_cmakePending == 0 && entry.m_cmakeReady == 0) {
 			readyMask |= 1u << entry.m_currentSlot;
@@ -7322,7 +7334,7 @@ void CMenuPcs::WMChgMenu()
 			bytes[0x12] = 0;
 			bytes[0x13] = 0;
 		} else {
-			memset(*reinterpret_cast<void**>(bytes + 0x828), 0, 0x80);
+			memset(GetWmCharaSelectEntries(this), 0, kWmCharaSelectBytes);
 			unsigned char bVar7 = 0;
 			iVar8 = 0;
 			int iVar11 = 0;
@@ -7423,7 +7435,7 @@ void CMenuPcs::WMChgMenu()
 	case 4: {
 		Sound.PlaySe(0x31, 0x40, 0x7F, 0);
 		bytes[0x10] = 0;
-		memset(*reinterpret_cast<void**>(bytes + 0x828), 0, 0x80);
+		memset(GetWmCharaSelectEntries(this), 0, kWmCharaSelectBytes);
 		unsigned char bVar7 = 0;
 		iVar8 = 0;
 		int iVar11 = 0;
@@ -7517,7 +7529,7 @@ void CMenuPcs::SetParty()
 	int partyCount = 0;
 
 	if (modelData != 0) {
-		for (int i = 0; i < 8; i++) {
+		for (int i = 0; i < kWmCharaSelectCount; i++) {
 			if (modelData[i * 0x34 + 0x0C] != 0) {
 				partyCount++;
 			}
@@ -7595,7 +7607,7 @@ void CMenuPcs::ChgAllModel()
 	unsigned char* handleData = bytes;
 	int modelOffset = 0;
 
-	for (int i = 0; i < 8; i++) {
+	for (int i = 0; i < kWmMenuPlayerCount; i++) {
 		unsigned char* caravanData = gameData + 0x13F0;
 		unsigned char* modelData = reinterpret_cast<unsigned char*>(*reinterpret_cast<unsigned int*>(bytes + 0x824) + modelOffset);
 		unsigned int race;
@@ -7654,7 +7666,7 @@ void CMenuPcs::ChgAllModel2()
 	int modelOffset = 0;
 	int pdtOffset = 0;
 
-	for (int i = 0; i < 8; i++) {
+	for (int i = 0; i < kWmMenuPlayerCount; i++) {
 		unsigned char* pdtData =
 		    reinterpret_cast<unsigned char*>(*reinterpret_cast<unsigned int*>(bytes + 0x88C) + pdtOffset + 0x14D0);
 		unsigned char* modelData = reinterpret_cast<unsigned char*>(*reinterpret_cast<unsigned int*>(bytes + 0x824) + modelOffset);
@@ -7954,7 +7966,7 @@ void CMenuPcs::ChkSelectParty()
 		return;
 	}
 
-	for (int i = 0; i < 8; i++) {
+	for (int i = 0; i < kWmMenuPlayerCount; i++) {
 		if (modelData[i * 0x34 + 0xC] != 0) {
 			selected++;
 		}

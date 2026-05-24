@@ -722,7 +722,7 @@ void CMenuPcs::FavoInit()
 
 	*favoList = sVar11;
 
-	memset(s_rank, 0, 0x20);
+	memset(s_rank, 0, sizeof(s_rank));
 	iVar8 = 0;
 	puVar13 = s_rank;
 	s_rank[1] = 0;

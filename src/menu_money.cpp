@@ -63,6 +63,7 @@ STATIC_ASSERT(offsetof(MoneyMenuAnim, dy) == 0x34);
 STATIC_ASSERT(offsetof(MoneyMenuAnim, targetX) == 0x38);
 STATIC_ASSERT(offsetof(MoneyMenuAnim, targetY) == 0x3C);
 STATIC_ASSERT(sizeof(MoneyMenuAnim) == 0x40);
+STATIC_ASSERT(sizeof(MoneyMenuAnimList) == 0x1008);
 
 /*
  * --INFO--
@@ -592,7 +593,7 @@ int CMenuPcs::MoneyCtrl()
 bool CMenuPcs::MoneyOpen()
 {
 	if (this->moneyState->initialized == '\0') {
-		memset(this->moneyPanel, 0, 0x1008);
+		memset(this->moneyPanel, 0, sizeof(*this->moneyPanel));
 
 		float fVar1 = FLOAT_80332f70;
 		int iVar8 = (int)this->moneyPanel + 8;

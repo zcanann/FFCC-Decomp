@@ -11,6 +11,8 @@
 
 extern "C" const char s_ME_USB_process_cpp[] = "ME_USB_process.cpp";
 extern "C" const char sMemAllocErrorSizeFmt[] = "MemAlloc Error!!! size=%d\n";
+extern "C" const float FLOAT_8032FD00;
+extern "C" const float FLOAT_8032FD04;
 
 namespace {
 struct ViewerSRT {
@@ -148,15 +150,15 @@ void CMaterialEditorPcs::SetUSBData()
 
         CreateBoundaryBox(minPos, maxPos, rsdItem->countA, reinterpret_cast<const Vec*>(rsdItem->ptr10));
 
-        srt.transX = 0.0f;
+        srt.transX = FLOAT_8032FD00;
         srt.transY = static_cast<float>(-static_cast<int>(maxPos.x - minPos.x) / 2);
         srt.transZ = static_cast<float>(-static_cast<int>(maxPos.y - minPos.y) * (static_cast<int>(maxPos.x - minPos.x) / 0x14) - 10);
-        srt.rotX = 0.0f;
-        srt.rotY = 0.0f;
-        srt.rotZ = 0.0f;
-        srt.scaleX = 1.0f;
-        srt.scaleY = 1.0f;
-        srt.scaleZ = 1.0f;
+        srt.rotX = FLOAT_8032FD00;
+        srt.rotY = FLOAT_8032FD00;
+        srt.rotZ = FLOAT_8032FD00;
+        srt.scaleX = FLOAT_8032FD04;
+        srt.scaleY = FLOAT_8032FD04;
+        srt.scaleZ = FLOAT_8032FD04;
         CameraPcs.SetViewerSRT(reinterpret_cast<const SRT*>(&srt));
         break;
     }

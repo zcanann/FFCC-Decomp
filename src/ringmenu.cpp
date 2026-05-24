@@ -153,8 +153,7 @@ void CRingMenu::DrawIcon()
 		return;
 	}
 
-	int menuIndex = m_menuIndex;
-	CGPartyObj* partyObj = Game.m_partyObjArr[menuIndex];
+	CGPartyObj* partyObj = Game.m_partyObjArr[m_menuIndex];
 	if (partyObj == 0) {
 		return;
 	}
@@ -164,26 +163,26 @@ void CRingMenu::DrawIcon()
 		return;
 	}
 
-	unsigned int scriptFood = Game.m_scriptFoodBase[menuIndex];
+	unsigned int scriptFood = Game.m_scriptFoodBase[m_menuIndex];
 	Mtx cameraMtx;
 	PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
 
+	Vec viewPos;
+	Vec4d clipPos;
+	Vec viewInput;
 	CVector offset(FLOAT_803309c0, FLOAT_803309c4 * partyObj->unk_0x188, FLOAT_803309c0);
 	CVector baseWorldPos(partyObj->m_worldPosition);
 	CVector worldPos;
 	PSVECAdd(reinterpret_cast<Vec*>(&baseWorldPos), reinterpret_cast<Vec*>(&offset), reinterpret_cast<Vec*>(&worldPos));
 
-	Vec viewInput;
 	viewInput.x = worldPos.x;
 	viewInput.y = worldPos.y;
 	viewInput.z = worldPos.z;
-	Vec viewPos;
 	PSMTXMultVec(cameraMtx, &viewInput, &viewPos);
 	viewPos.z = (FLOAT_803309c8 < viewPos.z) ? FLOAT_803309c8 : viewPos.z;
 
 	Mtx44 screenMtx;
 	PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
-	Vec4d clipPos;
 	Math.MTX44MultVec4(screenMtx, &viewPos, &clipPos);
 
 	clipPos.x = clipPos.x * (FLOAT_803309cc / clipPos.w);
@@ -218,7 +217,7 @@ void CRingMenu::DrawIcon()
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x19));
 	int iconRow;
 	unsigned int iconCol;
-	if ((Game.m_gameWork.m_menuStageMode == 0) || (menuIndex < 1)) {
+	if ((Game.m_gameWork.m_menuStageMode == 0) || (m_menuIndex < 1)) {
 		iconRow = *reinterpret_cast<int*>(scriptFood + 0x3B4);
 		int foodProgress = static_cast<int>(*reinterpret_cast<unsigned short*>(scriptFood + 0x14));
 		int progress = foodProgress - 100;

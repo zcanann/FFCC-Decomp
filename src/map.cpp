@@ -31,7 +31,6 @@ inline void* operator new(unsigned long, void* ptr)
 CMapMng MapMng;
 char g_StrTmp[0x400];
 
-extern "C" void __dt__4CRefFv(void*, int);
 extern "C" void __dt__8COctTreeFv(void*, int);
 extern "C" void __dt__7CMapHitFv(void*, int);
 extern "C" void __dt__7CMapObjFv(void*, int);
@@ -203,8 +202,6 @@ CMapTexAnimSet::~CMapTexAnimSet()
             m_anims[i] = 0;
         }
     }
-
-    __dt__4CRefFv(this, 0);
 }
 
 /*

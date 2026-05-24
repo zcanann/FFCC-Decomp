@@ -2308,7 +2308,7 @@ int CCaravanWork::GetCmdListItemName(int cmdListIdx, int* firstCmdIdx, int* item
 		if (cmdId == 0x207 || cmdId == 0x20B || cmdId == 0x20F) {
 			*firstCmdIdx = cmdListIdx;
 			int i = 0;
-			for (; groupedCount != 0; groupedCount--) {
+			for (; groupedCount > 0; groupedCount--) {
 				short invSlot = (short)m_commandListInventorySlotRef[cmdListIdx + i];
 				short itemId = (short)m_inventoryItems[invSlot];
 				int itemType = GetItemDataPtr(itemId)[0];

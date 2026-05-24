@@ -173,11 +173,12 @@ void CRingMenu::DrawIcon()
 	CVector worldPos;
 	PSVECAdd(reinterpret_cast<Vec*>(&baseWorldPos), reinterpret_cast<Vec*>(&offset), reinterpret_cast<Vec*>(&worldPos));
 
+	Vec viewInput;
+	viewInput.x = worldPos.x;
+	viewInput.y = worldPos.y;
+	viewInput.z = worldPos.z;
 	Vec viewPos;
-	viewPos.x = worldPos.x;
-	viewPos.y = worldPos.y;
-	viewPos.z = worldPos.z;
-	PSMTXMultVec(cameraMtx, &viewPos, &viewPos);
+	PSMTXMultVec(cameraMtx, &viewInput, &viewPos);
 	viewPos.z = (FLOAT_803309c8 < viewPos.z) ? FLOAT_803309c8 : viewPos.z;
 
 	Mtx44 screenMtx;
@@ -718,7 +719,7 @@ void CRingMenu::onDraw()
 
 			const float width = static_cast<float>(font->GetWidth(labelId));
 			int alpha = static_cast<int>(showScale * static_cast<double>(static_cast<float>(FLOAT_80330a34 * fade) * static_cast<float>(transitionScale)));
-			if ((group == 2) && (m_battleButtons[6] >= 0)) {
+			if ((group == 2) && (m_battleButtons[2] >= 0)) {
 				alpha = static_cast<int>(FLOAT_80330ac0 * static_cast<float>(alpha));
 			}
 

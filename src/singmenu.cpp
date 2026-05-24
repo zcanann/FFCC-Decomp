@@ -511,8 +511,9 @@ extern char s_Artefactos_801DDD48[], s_Favoritos_801DDD54[];
 extern char s_Aufloesen_801DD908[], s_Zerstoeren_801DD92C[], s_Maennlich_801DD938[];
 extern char s_Gegenstand_beifuegen_801DD99C[], s_Gil_beifuegen_801DD9B0[], s_Nichts_beifuegen_801DD9C0[];
 extern char s_beifuegen_801DD9FC[], s_Bestaetigen_801DDA08[], s_Gegenstaende_801DDA44[];
-extern char s_Ausruesten_801DDA50[], lbl_801DDB64[], lbl_801DDB88[];
-extern char lbl_801DDBAC[], lbl_801DDC14[], lbl_801DDC20[], lbl_801DDC50[], lbl_801DDCE0[], lbl_801DDCEC[];
+extern char s_Ausruesten_801DDA50[], s_Resistance_801DDB64[], s_Defendre_801DDB88[];
+extern char s_Detruire_801DDBAC[], s_la_reponse_801DDC14[], s_Envoyer_a_801DDC20[], s_Preferences_801DDC50[];
+extern char s_Continuar_801DDCE0[], s_Extraer_801DDCEC[];
 }
 extern "C" char* PTR_s_Clavat_802140f0[] = {
     lbl_803320D8, lbl_803320E0, lbl_803320E8, lbl_803320F0,
@@ -599,19 +600,19 @@ extern "C" char* gSingMenuTextTableIt[] = {
 };
 extern "C" char* gSingMenuTextTableFr[] = {
     lbl_803321B8, lbl_80332404, lbl_80332408, lbl_8033240C,
-    lbl_80332414, lbl_8033241C, lbl_801DDB64, lbl_803322D4,
-    s_Souvenirs_801DDB70, s_Attaquer_801DDB7C, lbl_801DDB88, lbl_80332424,
+    lbl_80332414, lbl_8033241C, s_Resistance_801DDB64, lbl_803322D4,
+    s_Souvenirs_801DDB70, s_Attaquer_801DDB7C, s_Defendre_801DDB88, lbl_80332424,
     s_Fusionner_801DDB94, lbl_8033242C, s_Utiliser_801DDBA0, lbl_80332434,
-    lbl_801DDBAC, s_Masculin_801DDBB8, lbl_8033243C, lbl_80332444,
+    s_Detruire_801DDBAC, s_Masculin_801DDBB8, lbl_8033243C, lbl_80332444,
     lbl_80332230, lbl_80332234, lbl_8033244C, lbl_80332454,
     lbl_8033245C, lbl_80332464, lbl_8033245C, lbl_80332464,
     lbl_803321B8, lbl_8033246C, s_Envoyer_un_objet_801DDBC4, s_Envoyer_des_gils_801DDBD8,
     s_Ne_rien_envoyer_801DDBEC, s_Continuer_801DDBFC, s_Prendre_801DDC08, lbl_80332260,
-    lbl_80332260, lbl_801DDC14, lbl_801DDC20, lbl_803321B8,
+    lbl_80332260, s_la_reponse_801DDC14, s_Envoyer_a_801DDC20, lbl_803321B8,
     s_Joindre_801DDC2C, s_Confirmer_801DDC38, lbl_80332474, lbl_8033247C,
     lbl_80332484, lbl_8033248C, s_Commandes_801DDC44, lbl_80332494,
     lbl_8033249C, s_Artefacts_801DD8A4, lbl_803324A4, lbl_803324AC,
-    lbl_801DDC50, lbl_803324B4, lbl_8033246C, lbl_803324BC,
+    s_Preferences_801DDC50, lbl_803324B4, lbl_8033246C, lbl_803324BC,
 };
 extern "C" char* gSingMenuTextTableEs[] = {
     lbl_803321B8, lbl_803324C4, lbl_803321C0, s_Cancelar_801DDC5C,
@@ -622,7 +623,7 @@ extern "C" char* gSingMenuTextTableEs[] = {
     lbl_80332510, lbl_80332234, lbl_803323A4, lbl_803323AC,
     lbl_80332518, lbl_80332520, lbl_80332518, lbl_80332520,
     lbl_803321B8, lbl_80332528, s_Enviar_objeto_801DDCB0, s_Enviar_guiles_801DDCC0,
-    s_No_enviar_nada_801DDCD0, lbl_801DDCE0, lbl_801DDCEC, lbl_80332260,
+    s_No_enviar_nada_801DDCD0, s_Continuar_801DDCE0, s_Extraer_801DDCEC, lbl_80332260,
     lbl_80332260, lbl_80332530, s_Enviar_la_respuesta_a_801DDCF8, lbl_803321B8,
     s_Incluir_801DDD10, s_Confirmar_801DDD1C, lbl_80332534, lbl_8033253C,
     lbl_80332484, s_Oficio_familiar_801DDD28, s_Comandos_801DDD3C, lbl_80332544,

@@ -169,7 +169,7 @@ struct YmBreathParticleData {
     unsigned char _pad5C[0x04];
 };
 
-extern "C" const char s_pppYmBreath_cpp_801DA9B0[] = "pppYmBreath.cpp";
+static const char s_pppYmBreath_cpp[] = "pppYmBreath.cpp";
 
 /*
  * --INFO--
@@ -535,7 +535,7 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
         work->m_particleData =
             (PARTICLE_DATA*)pppMemAlloc((unsigned long)(work->m_particleCount * 0x60),
                                         pppEnvStPtr->m_stagePtr,
-                                        const_cast<char*>(s_pppYmBreath_cpp_801DA9B0), 0x243);
+                                        const_cast<char*>(s_pppYmBreath_cpp), 0x243);
         if (work->m_particleData != NULL) {
             memset(work->m_particleData, 0, (unsigned long)(work->m_particleCount * 0x60));
         }
@@ -543,7 +543,7 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
         work->m_particleWmats =
             (PARTICLE_WMAT*)pppMemAlloc((unsigned long)(work->m_particleCount * 0x30),
                                         pppEnvStPtr->m_stagePtr,
-                                        const_cast<char*>(s_pppYmBreath_cpp_801DA9B0), 0x249);
+                                        const_cast<char*>(s_pppYmBreath_cpp), 0x249);
         if (work->m_particleWmats != NULL) {
             memset(work->m_particleWmats, 0, (unsigned long)(work->m_particleCount * 0x30));
         }
@@ -551,7 +551,7 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
         work->m_particleColors =
             (PARTICLE_COLOR*)pppMemAlloc((unsigned long)(work->m_particleCount << 5),
                                          pppEnvStPtr->m_stagePtr,
-                                         const_cast<char*>(s_pppYmBreath_cpp_801DA9B0), 0x24F);
+                                         const_cast<char*>(s_pppYmBreath_cpp), 0x24F);
         if (work->m_particleColors != NULL) {
             memset(work->m_particleColors, 0, (unsigned long)(work->m_particleCount << 5));
         }
@@ -559,7 +559,7 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
         work->m_groups =
             (YmBreathParticleGroup*)pppMemAlloc(
                 (unsigned long)((int)params->m_groupCount * 0x5C), pppEnvStPtr->m_stagePtr,
-                const_cast<char*>(s_pppYmBreath_cpp_801DA9B0), 0x255);
+                const_cast<char*>(s_pppYmBreath_cpp), 0x255);
         if (work->m_groups != NULL) {
             memset(work->m_groups, 0, (unsigned long)((int)params->m_groupCount * 0x5C));
 
@@ -567,12 +567,12 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
             for (i = 0; i < (int)params->m_groupCount; i++) {
                 groupTable->particleIndices = (signed char*)pppMemAlloc(
                     (unsigned long)params->m_slotCount, pppEnvStPtr->m_stagePtr,
-                    const_cast<char*>(s_pppYmBreath_cpp_801DA9B0), 0x260);
+                    const_cast<char*>(s_pppYmBreath_cpp), 0x260);
                 memset(groupTable->particleIndices, -1, (unsigned long)params->m_slotCount);
 
                 groupTable->particleStates = (signed char*)pppMemAlloc(
                     (unsigned long)params->m_slotCount, pppEnvStPtr->m_stagePtr,
-                    const_cast<char*>(s_pppYmBreath_cpp_801DA9B0), 0x263);
+                    const_cast<char*>(s_pppYmBreath_cpp), 0x263);
                 memset(groupTable->particleStates, -1, (unsigned long)params->m_slotCount);
                 groupTable->active = 0;
                 groupTable++;

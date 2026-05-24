@@ -82,7 +82,7 @@ unsigned char DAT_8032ed91 = 0;
 int gPppCalcDisabled = 0;
 }
 CPartMng PartMng;
-static const char s_partMng_cpp_801d8230[] = "partMng.cpp";
+static const char s_partMng_cpp[] = "partMng.cpp";
 static const char s_pppCreate0_pdtID_d_fpno_d_mngNo_d_name_s[] =
     "pppCreate0 pdtID=%d fpno=%d mngNo=%d name=%s\n";
 static const char s_pppGetFreePppDataMngSt_CAN_NOT_ALLOC[] = "pppGetFreePppDataMngSt CAN NOT ALLOC !!!\n";
@@ -198,8 +198,8 @@ pppShapeSt::~pppShapeSt()
  */
 pppModelSt::pppModelSt()
 {
-    *(short*)((char*)this + 0x64) = 0;
-    *(unsigned char*)((char*)this + 0x68) = 0;
+    m_refCount = 0;
+    m_isUsed = 0;
 }
 
 /*
@@ -548,9 +548,9 @@ void CPartMng::pppReleasePdt(int pdtSlotIndex)
         return;
     }
 
-    Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp_801d8230), 0x158);
+    Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x158);
     m_materialSet->ReleaseTag(m_textureSet, pdtSlotIndex, &ppvAmemCacheSet);
-    Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp_801d8230), 0x13a);
+    Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x13a);
 
     pppEnvStPtr = reinterpret_cast<_pppEnvSt*>(pdtSlot->m_envFields);
     PppMngStRaw* pppMngSt = reinterpret_cast<PppMngStRaw*>(self + 0x1d4);
@@ -560,7 +560,7 @@ void CPartMng::pppReleasePdt(int pdtSlotIndex)
         }
     }
 
-    Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp_801d8230), 0x149);
+    Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x149);
 
     pppModelSt** modelNames = reinterpret_cast<pppModelSt**>(pdt->m_modelNames);
     for (int i = 0; i < pdt->m_modelCount; i++) {
@@ -632,7 +632,7 @@ void CPartMng::pppReleasePdt(int pdtSlotIndex)
     delete[] reinterpret_cast<u8*>(pdtSlot->m_pppDataHead);
     pdtSlot->m_pppDataHead = 0;
 
-    Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp_801d8230), 0x182);
+    Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x182);
 }
 
 /*
@@ -928,7 +928,7 @@ void CPartMng::pppGet2Dpos()
         unsigned int x = raw->cursorX + 0x140;
         unsigned int y = raw->cursorY + 0xE0;
         if ((-1 < (int)x) && ((int)x < 0x27E) && (-1 < (int)y) && ((int)y < 0x1BE)) {
-            Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp_801d8230), 0x2A2);
+            Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x2A2);
             GXPeekZ(static_cast<u16>(x & 0xFFFF), static_cast<u16>(y & 0xFFFF), reinterpret_cast<u32*>(&zAtPixel));
 
             viewPos.z = ppvScreenMatrix0[2][3]
@@ -1248,7 +1248,7 @@ void CPartMng::pppReadShp(CChunkFile& chunkFile, pppShapeSt* shapeSt)
 				{
 					shapeSt->m_displayListData =
 						operator new[](
-						    chunk.m_arg0, stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0x4B3);
+						    chunk.m_arg0, stageLoad, const_cast<char*>(s_partMng_cpp), 0x4B3);
 					chunkFile.Get(shapeSt->m_displayListData, chunk.m_arg0);
 					DCFlushRange(shapeSt->m_displayListData, (chunk.m_arg0 + 0x1F) & 0xFFFFFFE0);
 				}
@@ -1258,7 +1258,7 @@ void CPartMng::pppReadShp(CChunkFile& chunkFile, pppShapeSt* shapeSt)
 					{
 						shapeSt->m_animData =
 							operator new[](
-							    chunk.m_arg0, stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0x4B9);
+							    chunk.m_arg0, stageLoad, const_cast<char*>(s_partMng_cpp), 0x4B9);
 						chunkFile.Get(shapeSt->m_animData, chunk.m_arg0);
 						pppSetShapeMaterial(shapeSt, m_materialSet, textureNames);
 					}
@@ -1596,8 +1596,8 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(firstMng) + 0xE4) = 0;
         return;
     case 4:
-        Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp_801d8230), 0x554);
-        Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp_801d8230), 0x3A9);
+        Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x554);
+        Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x3A9);
         {
             unsigned char* mngBytes = self + kPppMngOffset;
             int editCount = *reinterpret_cast<int*>(self + kEditCountOffset);
@@ -1609,7 +1609,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
             }
         }
         *reinterpret_cast<int*>(self + kEditCountOffset) = 0;
-        Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp_801d8230), 0x3B3);
+        Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x3B3);
         pppEditAllReleaseResource();
         DAT_8032ed68 = 1;
         self[0x800] = 0;
@@ -1625,15 +1625,15 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         env->m_isEditMode = 0;
 
         if (res->m_textureSet == 0) {
-            res->m_textureSet = new (stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0x447) CTextureSet;
+            res->m_textureSet = new (stageLoad, const_cast<char*>(s_partMng_cpp), 0x447) CTextureSet;
         }
 
         if (res->m_materialSet == 0) {
-            CMaterialSet* materialSet = new (stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0x44B) CMaterialSet;
+            CMaterialSet* materialSet = new (stageLoad, const_cast<char*>(s_partMng_cpp), 0x44B) CMaterialSet;
             res->m_materialSet = materialSet;
             env->m_materialSetPtr = materialSet;
 
-            CMaterial* defaultMaterial = new (stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0x44E) CMaterial;
+            CMaterial* defaultMaterial = new (stageLoad, const_cast<char*>(s_partMng_cpp), 0x44E) CMaterial;
             if (defaultMaterial != 0) {
                 defaultMaterial->Create(0, static_cast<CMaterialMan::TEV_BIT>(0xFFF531F0));
                 res->m_materialSet->AddMaterial(defaultMaterial, 0);
@@ -1647,7 +1647,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         {
             pppModelSt*** modelTablePtr = reinterpret_cast<pppModelSt***>(self + kUsbMapMeshTableOffset);
             if (*modelTablePtr == 0) {
-                *modelTablePtr = new (stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0x5F8) pppModelSt*[0x88];
+                *modelTablePtr = new (stageLoad, const_cast<char*>(s_partMng_cpp), 0x5F8) pppModelSt*[0x88];
                 if (*modelTablePtr != 0) {
                     memset(*modelTablePtr, 0, sizeof(pppModelSt*) * 0x88);
                 }
@@ -1671,7 +1671,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
                     modelSlot = 0;
                 }
 
-                modelSlot = new (stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0x5FC) pppModelSt;
+                modelSlot = new (stageLoad, const_cast<char*>(s_partMng_cpp), 0x5FC) pppModelSt;
                 if (modelSlot != 0) {
                     modelSlot->m_refCount = 0;
                     modelSlot->m_cacheId = -1;
@@ -1695,7 +1695,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         {
             pppShapeSt*** shapeSlotTablePtr = reinterpret_cast<pppShapeSt***>(self + kUsbShapeSlotTableOffset);
             if (*shapeSlotTablePtr == 0) {
-                *shapeSlotTablePtr = new (stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0x60A) pppShapeSt*[0x80];
+                *shapeSlotTablePtr = new (stageLoad, const_cast<char*>(s_partMng_cpp), 0x60A) pppShapeSt*[0x80];
                 if (*shapeSlotTablePtr != 0) {
                     memset(*shapeSlotTablePtr, 0, sizeof(pppShapeSt*) * 0x80);
                 }
@@ -1721,7 +1721,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
                     shapeSlot = 0;
                 }
 
-                shapeSlot = new (stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0x610) pppShapeSt;
+                shapeSlot = new (stageLoad, const_cast<char*>(s_partMng_cpp), 0x610) pppShapeSt;
                 if (shapeSlot != 0) {
                     CChunkFile chunkFile;
                     chunkFile.SetBuf(packetWords + 0xC);
@@ -1734,8 +1734,8 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         if (env->m_isEditMode != 0) {
             return;
         }
-        Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp_801d8230), 0x646);
-        Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp_801d8230), 0x3A9);
+        Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x646);
+        Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x3A9);
         {
             unsigned char* mngBytes = self + kPppMngOffset;
             int editCount = *reinterpret_cast<int*>(self + kEditCountOffset);
@@ -1747,7 +1747,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
             }
         }
         *reinterpret_cast<int*>(self + kEditCountOffset) = 0;
-        Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp_801d8230), 0x3B3);
+        Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x3B3);
         if (pdtSlots[0].m_pdt != 0) {
             delete[] reinterpret_cast<u8*>(pdtSlots[0].m_pdt);
             pdtSlots[0].m_pdt = 0;
@@ -1758,9 +1758,9 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         }
         pdtSlots[0].m_pdt = reinterpret_cast<_pppDataHead*>(
             operator new[](
-                packetSize - 0x20, stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0x64D));
+                packetSize - 0x20, stageLoad, const_cast<char*>(s_partMng_cpp), 0x64D));
         *reinterpret_cast<u8**>(self + kRecvBuffOffset) =
-            new (stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0x64E) u8[0x3000];
+            new (stageLoad, const_cast<char*>(s_partMng_cpp), 0x64E) u8[0x3000];
         if (pdtSlots[0].m_pdt != 0) {
             memcpy(pdtSlots[0].m_pdt, payload, packetSize - 0x20);
             pppInitPdt(reinterpret_cast<long*>(pdtSlots[0].m_pdt), pppGetSysProgTable());
@@ -1807,7 +1807,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         if (env->m_isEditMode != 0) {
             return;
         }
-        Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp_801d8230), 0x673);
+        Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x673);
         int pdtCount = *reinterpret_cast<int*>(self + kPdtCountOffset);
         if (0 <= pdtCount && pdtCount < 0x18) {
             if (pdtSlots[pdtCount].m_pdt != 0) {
@@ -1821,9 +1821,9 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
 
             pdtSlots[pdtCount].m_pdt = reinterpret_cast<_pppDataHead*>(
                 operator new[](
-                    packetSize - 0x20, stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0x678));
+                    packetSize - 0x20, stageLoad, const_cast<char*>(s_partMng_cpp), 0x678));
             *reinterpret_cast<u8**>(self + kRecvBuffOffset) =
-                new (stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0x679) u8[0x3000];
+                new (stageLoad, const_cast<char*>(s_partMng_cpp), 0x679) u8[0x3000];
             if (pdtSlots[pdtCount].m_pdt != 0) {
                 memcpy(pdtSlots[pdtCount].m_pdt, payload, packetSize - 0x20);
                 pppInitPdt(reinterpret_cast<long*>(pdtSlots[pdtCount].m_pdt), pppGetSysProgTable());
@@ -1847,15 +1847,15 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
                 }
 
                 if (res->m_textureSet == 0) {
-                    res->m_textureSet = new (stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0x447) CTextureSet;
+                    res->m_textureSet = new (stageLoad, const_cast<char*>(s_partMng_cpp), 0x447) CTextureSet;
                 }
 
                 if (res->m_materialSet == 0) {
-                    CMaterialSet* materialSet = new (stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0x44B) CMaterialSet;
+                    CMaterialSet* materialSet = new (stageLoad, const_cast<char*>(s_partMng_cpp), 0x44B) CMaterialSet;
                     res->m_materialSet = materialSet;
                     env->m_materialSetPtr = materialSet;
 
-                    CMaterial* defaultMaterial = new (stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0x44E) CMaterial;
+                    CMaterial* defaultMaterial = new (stageLoad, const_cast<char*>(s_partMng_cpp), 0x44E) CMaterial;
                     if (defaultMaterial != 0) {
                         defaultMaterial->Create(0, static_cast<CMaterialMan::TEV_BIT>(0xFFF531F0));
                         res->m_materialSet->AddMaterial(defaultMaterial, 0);
@@ -1874,7 +1874,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         if (env->m_isEditMode != 0) {
             return;
         }
-        Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp_801d8230), 0x3A9);
+        Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x3A9);
         {
             unsigned char* mngBytes = self + kPppMngOffset;
             int editCount = *reinterpret_cast<int*>(self + kEditCountOffset);
@@ -1886,7 +1886,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
             }
         }
         *reinterpret_cast<int*>(self + kEditCountOffset) = 0;
-        Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp_801d8230), 0x3B3);
+        Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x3B3);
         DAT_8032ed68 = 1;
         return;
     case 0x10:
@@ -2074,12 +2074,12 @@ void CPartMng::pppEditBeforeCalc()
         break;
     }
     case 0x18:
-        Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp_801d8230), 0x7a4);
+        Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x7a4);
         MapPcs.LoadMap(*reinterpret_cast<int*>(self + 0x188), *reinterpret_cast<int*>(self + 0x18c), 0, 0, 0);
         *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&MapPcs) + 0x180) = 1;
         break;
     case 0x19: {
-        Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp_801d8230), 0x7ad);
+        Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x7ad);
 
         if (*editorObj != 0) {
             if ((*editorObj)->m_charaModelHandle != 0) {
@@ -2092,12 +2092,12 @@ void CPartMng::pppEditBeforeCalc()
 
         CMemory::CStage* stageLoad = PartPcs.m_usbStreamData.m_stageLoad;
         *editorObj = static_cast<CGObject*>(
-            operator new(0x518, stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0x7b5));
+            operator new(0x518, stageLoad, const_cast<char*>(s_partMng_cpp), 0x7b5));
         if (*editorObj != 0) {
             (*editorObj)->Create();
 
             CCharaPcs::CHandle* handle =
-                new (stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0x7b7) CCharaPcs::CHandle;
+                new (stageLoad, const_cast<char*>(s_partMng_cpp), 0x7b7) CCharaPcs::CHandle;
             (*editorObj)->m_charaModelHandle = handle;
             if (handle != 0) {
                 handle->Add();
@@ -2122,7 +2122,7 @@ void CPartMng::pppEditBeforeCalc()
     }
     case 0x1a:
         if (*editorObj != 0) {
-            Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp_801d8230), 0x7ce);
+            Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x7ce);
             if (DAT_8032ed91 == 0) {
                 DAT_8032ed90 = 0;
                 DAT_8032ed91 = 1;
@@ -2202,7 +2202,7 @@ void CPartMng::pppEditPartCalc()
         usbEdit[0x19] = 1;
         usbEdit[0x1A] = 0;
 
-        Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp_801d8230), 0x3a9);
+        Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x3a9);
         for (int i = 0; i < kPppMngCount; i++) {
             if (*reinterpret_cast<int*>(mng + 0x14) != -0x1000) {
                 _pppAllFreePObject(reinterpret_cast<_pppMngSt*>(mng));
@@ -2212,7 +2212,7 @@ void CPartMng::pppEditPartCalc()
 
         *reinterpret_cast<int*>(self + 0x2355C) = 0;
 
-        Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp_801d8230), 0x3b3);
+        Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x3b3);
         if (pdtSlots[0].m_pdt != 0) {
             unsigned char* firstMng = reinterpret_cast<unsigned char*>(self + kPppMngOffset);
             firstMng[0xE5] = 0;
@@ -2268,9 +2268,9 @@ void CPartMng::pppEditPartCalc()
         _pppDeadPart(reinterpret_cast<_pppMngSt*>(mng));
 
         if (mng[0xE6] != 0 || mng[0xE4] != 0) {
-            Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp_801d8230), (editDrawMode < 4) ? 0x827 : 0x861);
+            Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), (editDrawMode < 4) ? 0x827 : 0x861);
             _pppAllFreePObject(reinterpret_cast<_pppMngSt*>(mng));
-            Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp_801d8230), (editDrawMode < 4) ? 0x82b : 0x865);
+            Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), (editDrawMode < 4) ? 0x82b : 0x865);
             if (editDrawMode > 3) {
                 pppHeapCheckLeak(pppEnvStPtr->m_stagePtr);
             }
@@ -2740,7 +2740,7 @@ void CPartMng::pppDumpCacheIdx()
                     if ((unsigned int)cacheSet->IsEnable(partResource->m_cacheIndex) == 0) {
                         partResource->m_pdt = reinterpret_cast<long*>(
                             cacheSet->GetData(
-                                partResource->m_cacheIndex, const_cast<char*>(s_partMng_cpp_801d8230), 0x9A9));
+                                partResource->m_cacheIndex, const_cast<char*>(s_partMng_cpp), 0x9A9));
                         pppInitPdt(partResource->m_pdt, pppGetSysProgTable());
                     }
 
@@ -3246,7 +3246,7 @@ void CPartMng::pppPartDrawAfter()
  */
 void CPartMng::pppPartDead()
 {
-    Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp_801d8230), 0xb3d);
+    Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0xb3d);
 
     char* base = reinterpret_cast<char*>(this);
     for (int i = 0; i < 0x180; i++) {
@@ -3263,7 +3263,7 @@ void CPartMng::pppPartDead()
         base += 0x158;
     }
 
-    Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp_801d8230), 0xb5d);
+    Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0xb5d);
 }
 
 /*
@@ -3431,16 +3431,16 @@ int CPartMng::pppLoadPtx(const char* baseName, int pdtSlotIndex, int appendMode,
     }
 
     if (m_textureSet == 0) {
-        m_textureSet = new (stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0xC10) CTextureSet;
+        m_textureSet = new (stageLoad, const_cast<char*>(s_partMng_cpp), 0xC10) CTextureSet;
     }
 
     if (m_materialSet == 0) {
-        CMaterialSet* materialSet = new (stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0xC14) CMaterialSet;
+        CMaterialSet* materialSet = new (stageLoad, const_cast<char*>(s_partMng_cpp), 0xC14) CMaterialSet;
         m_materialSet = materialSet;
         reinterpret_cast<_pppEnvSt*>(reinterpret_cast<unsigned char*>(this) + kEnvOffset)->m_materialSetPtr =
             m_materialSet;
 
-        CMaterial* defaultMaterial = new (stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0xC17) CMaterial;
+        CMaterial* defaultMaterial = new (stageLoad, const_cast<char*>(s_partMng_cpp), 0xC17) CMaterial;
         if (defaultMaterial != 0) {
             defaultMaterial->Create(0, static_cast<CMaterialMan::TEV_BIT>(0xFFF531F0));
             m_materialSet->AddMaterial(defaultMaterial, 0);
@@ -3505,7 +3505,7 @@ void CPartMng::pppLoadPmd(const char* baseName)
         CMemory::CStage* stageLoad = PartPcs.m_usbStreamData.m_stageLoad;
         pppModelSt* modelArray = reinterpret_cast<pppModelSt*>(
             operator new(
-                0x6c00, stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0xca9));
+                0x6c00, stageLoad, const_cast<char*>(s_partMng_cpp), 0xca9));
         if (modelArray != 0) {
             __construct_array(modelArray, reinterpret_cast<ConstructorDestructor>(__ct__10pppModelStFv),
                               reinterpret_cast<ConstructorDestructor>(__dt__10pppModelStFv), 0x6c, 0x100);
@@ -3624,7 +3624,7 @@ void CPartMng::pppLoadPan(const char* baseName)
         CMemory::CStage* stageLoad = PartPcs.m_usbStreamData.m_stageLoad;
         pppShapeSt* shapeArray = reinterpret_cast<pppShapeSt*>(
             operator new(
-                0x2c00, stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0xd0b));
+                0x2c00, stageLoad, const_cast<char*>(s_partMng_cpp), 0xd0b));
         if (shapeArray != 0) {
             __construct_array(shapeArray, reinterpret_cast<ConstructorDestructor>(__ct__10pppShapeStFv),
                               reinterpret_cast<ConstructorDestructor>(__dt__10pppShapeStFv), 0x2c, 0x100);
@@ -3756,7 +3756,7 @@ int CPartMng::pppLoadPdt(const char* baseName, int pdtSlotIndex, int cachePriori
                     unsigned long copySize = sourceHead->m_partCount * 0x60 + 0x20;
                     _pppDataHead* copiedHead = static_cast<_pppDataHead*>(
                         operator new[](
-                            copySize, stageLoad, const_cast<char*>(s_partMng_cpp_801d8230), 0xd56));
+                            copySize, stageLoad, const_cast<char*>(s_partMng_cpp), 0xd56));
                     pdtSlot->m_pppDataHead = copiedHead;
 
                     if (copiedHead != 0) {
@@ -3812,7 +3812,7 @@ int CPartMng::pppGetFreeDataMng()
         if ((unsigned int)System.m_execParam >= 1) {
             System.Printf(const_cast<char*>(s_pppGetFreePppDataMngSt_CAN_NOT_ALLOC));
         }
-        OSPanic(const_cast<char*>(s_partMng_cpp_801d8230), 0xD74, "");
+        OSPanic(const_cast<char*>(s_partMng_cpp), 0xD74, "");
         return -1;
     }
 
@@ -4612,7 +4612,7 @@ void CPartMng::pppDeleteAll()
  */
 void CPartMng::pppDestroyAll()
 {
-    Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp_801d8230), 0x116f);
+    Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x116f);
 
     int mngIndex = 0;
     for (int i = 0; i < 0x180; i++) {
@@ -4623,7 +4623,7 @@ void CPartMng::pppDestroyAll()
         mngIndex++;
     }
 
-    Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp_801d8230), 0x117b);
+    Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x117b);
 }
 
 /*

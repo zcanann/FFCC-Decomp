@@ -249,7 +249,7 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
  * JP Address: TODO
  * JP Size: TODO
  */
-extern const char s_pppYmMelt_cpp_801DA048[] = "pppYmMelt.cpp";
+static const char s_pppYmMelt_cpp[] = "pppYmMelt.cpp";
 
 void pppFrameYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offsets)
 {
@@ -285,7 +285,7 @@ void pppFrameYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offse
     if (work->m_vertexData == nullptr) {
         work->m_vertexData = (YmMeltVertex*)pppMemAlloc(
             (unsigned long)vertexCount * sizeof(YmMeltVertex), pppEnvStPtr->m_stagePtr,
-            const_cast<char*>(s_pppYmMelt_cpp_801DA048),
+            const_cast<char*>(s_pppYmMelt_cpp),
             0xA9);
 
         vertexBase = work->m_vertexData;

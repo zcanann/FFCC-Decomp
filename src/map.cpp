@@ -31,7 +31,6 @@ inline void* operator new(unsigned long, void* ptr)
 CMapMng MapMng;
 char g_StrTmp[0x400];
 
-extern "C" void __dt__4CRefFv(void*, int);
 extern "C" void __dt__8COctTreeFv(void*, int);
 extern "C" void __dt__7CMapHitFv(void*, int);
 extern "C" void __dt__7CMapObjFv(void*, int);
@@ -52,7 +51,7 @@ extern "C" void* __vt__8CPtrArrayIP11CMapAnimRun[];
 extern "C" void* __vt__8CPtrArrayIP7CMapAnim[];
 extern "C" void* __vt__8CPtrArrayIP13CMapAnimKeyDt[];
 extern "C" void* __vt__8CPtrArrayIP10CMapShadow[];
-unsigned char DAT_8032ec88;
+unsigned char gMapHitFaceFlag;
 extern const float FLOAT_8032f988 = 1.0e15f;
 extern const float FLOAT_8032f98c = -1.0f;
 extern const float FLOAT_8032f9a0 = 0.0f;
@@ -69,7 +68,7 @@ extern const float FLOAT_8032F9B4 = 360.0f;
 extern const float FLOAT_8032F9B8 = 5.0e-6f;
 extern const float FLOAT_8032f9bc = -0.1f;
 extern char g_MsgFlashy[];
-extern const char DAT_8032f984[] = "\n";
+extern const char s_mapNewLine[] = "\n";
 extern "C" unsigned char Vec_80245758[];
 extern "C" void __ct__Q29CLightPcs6CLightFv(void*);
 extern "C" CPtrArray<CMapLightHolder*>* dtor_80034414(CPtrArray<CMapLightHolder*>*, short);
@@ -203,8 +202,6 @@ CMapTexAnimSet::~CMapTexAnimSet()
             m_anims[i] = 0;
         }
     }
-
-    __dt__4CRefFv(this, 0);
 }
 
 /*
@@ -3046,9 +3043,9 @@ int CMapMng::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned lo
 
     for (int i = 0; i < m_octTreeCount; i++) {
         COctTree* octTree = GetOctTreeArray() + i;
-        DAT_8032ec88 = 0;
+        gMapHitFaceFlag = 0;
         octTree->CheckHitCylinderNear(cylinder, move, mask);
-        if (DAT_8032ec88 != 0) {
+        if (gMapHitFaceFlag != 0) {
             hit = 1;
             m_hitMapObj = *reinterpret_cast<CMapObj**>(Ptr(octTree, 8));
         }
@@ -3056,9 +3053,9 @@ int CMapMng::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned lo
 
     for (int i = 0; i < m_mapObjCount; i++) {
         CMapObj* mapObj = GetMapObjArray() + i;
-        DAT_8032ec88 = 0;
+        gMapHitFaceFlag = 0;
         mapObj->CheckHitCylinderNear(cylinder, move, mask);
-        if (DAT_8032ec88 != 0) {
+        if (gMapHitFaceFlag != 0) {
             hit = 1;
             m_hitMapObj = mapObj;
         }
@@ -3200,7 +3197,7 @@ void CMapMng::SetMeshCameraSemiTransRange(unsigned short id, float nearRange, fl
             System.Printf(g_MsgFlashy);
         }
         if (System.m_execParam >= 1) {
-            System.Printf(const_cast<char*>(DAT_8032f984));
+            System.Printf(const_cast<char*>(s_mapNewLine));
         }
     }
 }
@@ -3242,7 +3239,7 @@ void CMapMng::SetMeshCameraSemiTransAlpha(unsigned short id, int alpha, int fram
             System.Printf(g_MsgFlashy);
         }
         if (System.m_execParam >= 1) {
-            System.Printf(const_cast<char*>(DAT_8032f984));
+            System.Printf(const_cast<char*>(s_mapNewLine));
         }
     }
 }

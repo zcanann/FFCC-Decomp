@@ -15,10 +15,10 @@ extern f32 gPppDefaultValueBuffer[];
 
 extern const f32 FLOAT_803306e8;
 extern const f32 FLOAT_803306ec;
-extern u32 DAT_803306e0;
-extern u32 DAT_803306e4;
+extern u32 kYmTracerTopColorBase;
+extern u32 kYmTracerBottomColorBase;
 
-extern const char s_pppYmTracer_cpp_801d9ce0[] = "pppYmTracer.cpp";
+static const char s_pppYmTracer_cpp[] = "pppYmTracer.cpp";
 
 struct TRACE_POLYGON {
     Vec from;
@@ -139,9 +139,9 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYm
                     (FLOAT_803306e8 != next->from.y) && (FLOAT_803306e8 != next->from.z)) {
                     uTop = (f32)i * uvStep;
                     uBottom = (f32)(i + 1) * uvStep;
-                    colorTop.value = DAT_803306e0;
+                    colorTop.value = kYmTracerTopColorBase;
                     colorTop.bytes[3] = poly->alpha;
-                    colorBottom.value = DAT_803306e4;
+                    colorBottom.value = kYmTracerBottomColorBase;
                     colorBottom.bytes[3] = next->alpha;
 
                     GXBegin((GXPrimitive)0x98, GX_VTXFMT7, 4);
@@ -198,7 +198,7 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
     if (entriesPtr == 0) {
         work->entries = (TRACE_POLYGON*)pppMemAlloc(
             (u32)param_2->m_tracer.m_entryCount * sizeof(TRACE_POLYGON), pppEnvStPtr->m_stagePtr,
-            const_cast<char*>(s_pppYmTracer_cpp_801d9ce0), 0xEB);
+            const_cast<char*>(s_pppYmTracer_cpp), 0xEB);
         fVar3 = FLOAT_803306e8;
         entries = work->entries;
         entry = entries;

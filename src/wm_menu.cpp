@@ -195,7 +195,7 @@ char gWmMenuCursorY[2];
 int gWmMenuWorkA;
 int gWmMenuWorkB;
 unsigned char gWmMenuScriptValueCache;
-static const char s_wm_menu_cpp_801dc418[] = "wm_menu.cpp";
+static const char s_wm_menu_cpp[] = "wm_menu.cpp";
 static const char s_SetCMakeEnd___chan____d_cur____d_801dc3b4[] = "SetCMakeEnd : chan = %d  cur = %d\n";
 static const char s_ClrCMakeFlg___chan____d_cur____d_801dc390[] = "ClrCMakeFlg : chan = %d  cur = %d\n";
 static const char s__s__d___Error_WM_menu_no_error___801dc424[] = "%s(%d): Error:WM menu no error(%d)\n";
@@ -1144,7 +1144,7 @@ void CMenuPcs::CalcDiaryMenu()
 		break;
 	default:
 		if (System.m_execParam != 0) {
-			System.Printf(const_cast<char*>(s__s__d___Error_WM_menu_no_error___801dc424), s_wm_menu_cpp_801dc418, 0x4c0);
+			System.Printf(const_cast<char*>(s__s__d___Error_WM_menu_no_error___801dc424), s_wm_menu_cpp, 0x4c0);
 		}
 		break;
 	}
@@ -3044,7 +3044,7 @@ void CMenuPcs::drawWorld()
 			break;
 		default:
 			if (System.m_execParam != 0) {
-				System.Printf(const_cast<char*>(s__s__d___Error_WM_menu_no_error___801dc424), s_wm_menu_cpp_801dc418, 0xC59);
+				System.Printf(const_cast<char*>(s__s__d___Error_WM_menu_no_error___801dc424), s_wm_menu_cpp, 0xC59);
 			}
 			break;
 		}
@@ -4247,7 +4247,7 @@ void CMenuPcs::SetWorldParam(int code, int value)
 		break;
 	default:
 		if (System.m_execParam != 0) {
-			System.Printf(const_cast<char*>(s__s__d___Error_function_code_not_f_801dc3ec), s_wm_menu_cpp_801dc418, 0x1482, code);
+			System.Printf(const_cast<char*>(s__s__d___Error_function_code_not_f_801dc3ec), s_wm_menu_cpp, 0x1482, code);
 		}
 		break;
 	case 0x12: {
@@ -4424,7 +4424,7 @@ void CMenuPcs::GetWorldParam(int code)
 	}
 	default:
 		if (System.m_execParam != 0) {
-			System.Printf(const_cast<char*>(s__s__d___Error_function_code_not_f_801dc3ec), s_wm_menu_cpp_801dc418, 0x1521, code);
+			System.Printf(const_cast<char*>(s__s__d___Error_function_code_not_f_801dc3ec), s_wm_menu_cpp, 0x1521, code);
 		}
 		break;
 	case 0x15:

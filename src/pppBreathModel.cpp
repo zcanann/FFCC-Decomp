@@ -17,7 +17,7 @@ struct pppModelSt;
 void pppInitBlendMode(void);
 void pppSetBlendMode(unsigned char);
 
-extern "C" const char s_pppBreathModel_cpp_801DB5A0[] = "pppBreathModel.cpp";
+extern "C" const char s_pppBreathModel_cpp[] = "pppBreathModel.cpp";
 
 struct pppBreathModelUnkC {
     unsigned char _pad[0xC];
@@ -511,21 +511,21 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
 
         work->m_particleData =
             (PARTICLE_DATA*)pppMemAlloc((unsigned long)(work->m_particleCount * 0x98), pppEnvStPtr->m_stagePtr,
-                                                  const_cast<char*>(s_pppBreathModel_cpp_801DB5A0), 0x257);
+                                                  const_cast<char*>(s_pppBreathModel_cpp), 0x257);
         if (work->m_particleData != NULL) {
             memset(work->m_particleData, 0, (unsigned long)(work->m_particleCount * 0x98));
         }
 
         work->m_particleWmats =
             (PARTICLE_WMAT*)pppMemAlloc((unsigned long)(work->m_particleCount * 0x30), pppEnvStPtr->m_stagePtr,
-                                                  const_cast<char*>(s_pppBreathModel_cpp_801DB5A0), 0x25d);
+                                                  const_cast<char*>(s_pppBreathModel_cpp), 0x25d);
         if (work->m_particleWmats != NULL) {
             memset(work->m_particleWmats, 0, (unsigned long)(work->m_particleCount * 0x30));
         }
 
         work->m_particleColors =
             (PARTICLE_COLOR*)pppMemAlloc((unsigned long)(work->m_particleCount << 5), pppEnvStPtr->m_stagePtr,
-                                                  const_cast<char*>(s_pppBreathModel_cpp_801DB5A0), 0x263);
+                                                  const_cast<char*>(s_pppBreathModel_cpp), 0x263);
         if (work->m_particleColors != NULL) {
             memset(work->m_particleColors, 0, (unsigned long)(work->m_particleCount << 5));
         }
@@ -533,7 +533,7 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
         work->m_groups =
             (BreathParticleGroup*)pppMemAlloc(
                 (unsigned long)((int)pBreathModel->m_groupCount * 0x5C),
-                pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppBreathModel_cpp_801DB5A0), 0x269);
+                pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppBreathModel_cpp), 0x269);
         if (work->m_groups != NULL) {
             memset(work->m_groups, 0, (unsigned long)((int)pBreathModel->m_groupCount * 0x5C));
 
@@ -541,12 +541,12 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
             for (i = 0; i < (int)pBreathModel->m_groupCount; i++) {
                 groupTable->particleIndices = (signed char*)pppMemAlloc(
                     (unsigned long)pBreathModel->m_slotCount,
-                    pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppBreathModel_cpp_801DB5A0), 0x274);
+                    pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppBreathModel_cpp), 0x274);
                 memset(groupTable->particleIndices, -1, (unsigned long)pBreathModel->m_slotCount);
 
                 groupTable->particleStates = (signed char*)pppMemAlloc(
                     (unsigned long)pBreathModel->m_slotCount,
-                    pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppBreathModel_cpp_801DB5A0), 0x277);
+                    pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppBreathModel_cpp), 0x277);
                 memset(groupTable->particleStates, -1, (unsigned long)pBreathModel->m_slotCount);
                 groupTable->active = 0;
                 groupTable++;

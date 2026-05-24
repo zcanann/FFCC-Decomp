@@ -24,7 +24,7 @@ extern const float FLOAT_80330660;
 extern const float FLOAT_80330664;
 extern const float FLOAT_80330668;
 extern "C" void pppSetBlendMode(unsigned char);
-extern "C" const char s_pppYmMiasma_cpp_801D9CA8[] = "pppYmMiasma.cpp";
+static const char s_pppYmMiasma_cpp[] = "pppYmMiasma.cpp";
 
 struct PARTICLE_DATA : _PARTICLE_DATA {};
 
@@ -245,7 +245,7 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, YmMiasmaFrameStep* step, pppYmM
     if (work->m_particles == 0) {
         work->m_particles = (PARTICLE_DATA*)pppMemAlloc(
             (unsigned long)step->m_particleCount * 0x50, pppEnvStPtr->m_stagePtr,
-            const_cast<char*>(s_pppYmMiasma_cpp_801D9CA8),
+            const_cast<char*>(s_pppYmMiasma_cpp),
             0x18d);
         particle = work->m_particles;
         for (i = 0; i < step->m_particleCount; i++) {

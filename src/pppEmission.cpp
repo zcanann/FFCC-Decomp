@@ -16,7 +16,7 @@
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h"
 #include "ffcc/ppp_linkage.h"
 
-extern const char DAT_803311fc;
+extern const char s_pppEmissionShapeObj2;
 extern const float FLOAT_803311e0;
 extern const float FLOAT_803311e4;
 extern const float FLOAT_803311f8;
@@ -24,7 +24,7 @@ extern const float FLOAT_8033111C = 15.0f;
 extern const float FLOAT_80331120 = 7.0f;
 extern const double DOUBLE_80331128 = 4503599627370496.0;
 extern const float FLOAT_80331130 = 10000000.0f;
-extern const char s_pppEmission_cpp_801db7e8[] = "pppEmission.cpp";
+static const char s_pppEmission_cpp[] = "pppEmission.cpp";
 
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
 static inline MtxPtr CameraMatrix() { return CameraPcs.m_cameraMatrix; }
@@ -183,7 +183,7 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, pppEm
             state->m_particles = pppMemAlloc(
                 (unsigned long)param_2->m_initWOrk << 4,
                 pppEnvStPtr->m_stagePtr,
-                const_cast<char*>(s_pppEmission_cpp_801db7e8),
+                const_cast<char*>(s_pppEmission_cpp),
                 0x16F);
 
             EmissionParticle* particle = (EmissionParticle*)state->m_particles;
@@ -268,7 +268,7 @@ void pppDestructEmission(pppEmission* pppEmission_, pppEmissionUnkC* param_2) {
     model->m_drawMeshDlCallback = 0;
     model->m_afterDrawMeshCallback = 0;
 
-    Graphic._WaitDrawDone(const_cast<char*>(s_pppEmission_cpp_801db7e8), 0x118);
+    Graphic._WaitDrawDone(const_cast<char*>(s_pppEmission_cpp), 0x118);
     CMemory::CStage* stage = (CMemory::CStage*)state[0];
     if (stage != (CMemory::CStage*)0) {
         pppHeapUseRate(stage);
@@ -362,7 +362,7 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
     EmissionState* state = (EmissionState*)param_2;
     pppEmissionUnkB* step = (pppEmissionUnkB*)param_3;
     EmissionMeshData* meshData = EmissionMeshAt(modelView, meshIndex);
-    if ((strcmp((const char*)meshData, &DAT_803311fc) == 0) && (state->m_colorA != 0)) {
+    if ((strcmp((const char*)meshData, &s_pppEmissionShapeObj2) == 0) && (state->m_colorA != 0)) {
         int texture = state->m_texture;
         u32 drawTevBits = 0xACE0F;
 
@@ -508,7 +508,7 @@ void Emission_DrawMeshDLCallback(CChara::CModel* model, void*, void*, int meshIn
     EmissionDisplayList* displayList = meshData->m_displayLists;
     displayList += displayListIndex;
 
-    if (strcmp((const char*)meshData, &DAT_803311fc) == 0) {
+    if (strcmp((const char*)meshData, &s_pppEmissionShapeObj2) == 0) {
         meshData->m_colors[0] = 0;
         meshData->m_colors[1] = 0;
         meshData->m_colors[2] = 0;

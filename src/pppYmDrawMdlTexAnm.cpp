@@ -31,7 +31,7 @@ extern "C" {
 extern f32 FLOAT_80330548;
 extern f32 FLOAT_8033054c;
 extern const char s_PerU___0_2f_PerV___0_2f_801d9c38[] = "PerU: %0.2f PerV: %0.2f\n";
-extern const char DAT_801d9c54[0x10] = {
+extern const char s_YmDrawMdlTexAnmConstructorJp[0x10] = {
     (char)0x83, (char)0x52, (char)0x83, (char)0x93, (char)0x83,
     (char)0x58, (char)0x83, (char)0x67, (char)0x83, (char)0x89,
     (char)0x83, (char)0x4E, (char)0x83, (char)0x5E, '\n',
@@ -264,7 +264,7 @@ void pppConstructYmDrawMdlTexAnm(_pppPObjLink* object, _pppCtrlTable* ctrl)
     work->m_frame = 0;
     work->m_wait = 0x200;
 
-    OSReport(DAT_801d9c54);
+    OSReport(s_YmDrawMdlTexAnmConstructorJp);
 
     model = (pppModelSt*)GetMapMeshTable()[0];
     per = FLOAT_8033054c;

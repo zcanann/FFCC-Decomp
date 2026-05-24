@@ -23,7 +23,7 @@ extern const float FLOAT_80330490[2];
 
 Mtx g_matUnit;
 
-extern "C" const char s_pppRyjMegaBirth_cpp_801D9C00[] = "pppRyjMegaBirth.cpp";
+static const char s_pppRyjMegaBirth_cpp[] = "pppRyjMegaBirth.cpp";
 
 extern const float FLOAT_80330458 = 360.0f;
 extern const float FLOAT_8033045c = 180.0f;
@@ -548,7 +548,7 @@ void pppRyjMegaBirth(_pppPObject* pObject, PRyjMegaBirth* particleData, PRyjMega
 	{
 		work->m_numParticles = *(u16*)(particleDataBytes + 0x20);
 		work->m_particleBlock = (_PARTICLE_DATA*)pppMemAlloc(
-			work->m_numParticles * 0x60, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppRyjMegaBirth_cpp_801D9C00), 0x262);
+			work->m_numParticles * 0x60, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppRyjMegaBirth_cpp), 0x262);
 		if (work->m_particleBlock != NULL)
 		{
 			memset(work->m_particleBlock, 0, work->m_numParticles * 0x60);
@@ -557,7 +557,7 @@ void pppRyjMegaBirth(_pppPObject* pObject, PRyjMegaBirth* particleData, PRyjMega
 		if ((particleDataBytes[0xEC] == 1) || (particleDataBytes[0xEC] == 2))
 		{
 			work->m_worldMatrixBlock = (PARTICLE_WMAT*)pppMemAlloc(
-				work->m_numParticles * 0x30, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppRyjMegaBirth_cpp_801D9C00), 0x269);
+				work->m_numParticles * 0x30, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppRyjMegaBirth_cpp), 0x269);
 			if (work->m_worldMatrixBlock != NULL)
 			{
 				memset(work->m_worldMatrixBlock, 0, work->m_numParticles * 0x30);
@@ -567,7 +567,7 @@ void pppRyjMegaBirth(_pppPObject* pObject, PRyjMegaBirth* particleData, PRyjMega
 		if (particleDataBytes[0xE9] != 0)
 		{
 			work->m_colorBlock = (_PARTICLE_COLOR*)pppMemAlloc(
-				work->m_numParticles << 5, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppRyjMegaBirth_cpp_801D9C00), 0x271);
+				work->m_numParticles << 5, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppRyjMegaBirth_cpp), 0x271);
 			if (work->m_colorBlock != NULL)
 			{
 				memset(work->m_colorBlock, 0, work->m_numParticles << 5);

@@ -29,7 +29,7 @@ extern const f32 FLOAT_80333430;
 void pppInitBlendMode(void);
 void pppSetBlendMode(unsigned char);
 
-extern "C" const char s_pppLaser_cpp_801E3048[] = "pppLaser.cpp";
+static const char s_pppLaser_cpp[] = "pppLaser.cpp";
 
 struct CMapCylinderRaw {
     Vec m_bottom;
@@ -212,7 +212,7 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
 
     if (work->m_points == 0) {
         work->m_points = (Vec*)pppMemAlloc(
-            (u32)step->m_laser.m_pointCount * 0xc, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppLaser_cpp_801E3048), 0x7d);
+            (u32)step->m_laser.m_pointCount * 0xc, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppLaser_cpp), 0x7d);
         memset(work->m_points, 0, (u32)step->m_laser.m_pointCount * 0xc);
         emptyHistory = 1;
     }

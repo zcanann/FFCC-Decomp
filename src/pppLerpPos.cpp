@@ -21,7 +21,7 @@ struct pppLerpPosUnkC {
 
 void pppSetFpMatrix(_pppMngSt*);
 
-extern const char s_pppLerpPos_cpp_801dd418[] = "pppLerpPos.cpp";
+static const char s_pppLerpPos_cpp[] = "pppLerpPos.cpp";
 
 /*
  * --INFO--
@@ -49,7 +49,7 @@ void pppFrameLerpPos(struct pppLerpPos* pppLerpPos, struct pppLerpPosUnkB* param
         if (*historyPtr == 0) {
             *historyPtr = (Vec*)pppMemAlloc(
                 (u32)(u8)param_2->m_dataValIndex * 0xc, pppEnvStPtr->m_stagePtr,
-                const_cast<char*>(s_pppLerpPos_cpp_801dd418),
+                const_cast<char*>(s_pppLerpPos_cpp),
                 0x37);
 
             for (iVar7 = 0; iVar7 < (s32)(u8)param_2->m_dataValIndex; iVar7 = iVar7 + 1) {

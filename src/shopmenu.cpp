@@ -36,7 +36,7 @@ void DrawInit__8CMenuPcsFv(void*);
 void MakeAgbString__4CMesFPcPcii(char*, char*, int, int);
 }
 
-char s_shopmenu_cpp_801ded8c[] = "shopmenu.cpp";
+char s_shopmenu_cpp[] = "shopmenu.cpp";
 extern char DAT_80332e54[];
 unsigned short gShopMenuInputLatch;
 __declspec(section ".sdata2") CShopMenu* g_shopMenu;
@@ -2799,11 +2799,11 @@ void CMenuPcs::CreateSmithMenu()
     }
 
     CShopMenu* shopMenu = reinterpret_cast<CShopMenu*>(
-        operator new(0x158, reinterpret_cast<CMemory::CStage*>(stage), s_shopmenu_cpp_801ded8c, 0x2E9));
+        operator new(0x158, reinterpret_cast<CMemory::CStage*>(stage), s_shopmenu_cpp, 0x2E9));
     *reinterpret_cast<CShopMenu**>(menuPcs + 0x878) = shopMenu;
     shopMenu = *reinterpret_cast<CShopMenu**>(menuPcs + 0x878);
 
-    Graphic._WaitDrawDone(s_shopmenu_cpp_801ded8c, 0x2FE);
+    Graphic._WaitDrawDone(s_shopmenu_cpp, 0x2FE);
     *reinterpret_cast<void**>(shopMenu) = nullptr;
     *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(shopMenu) + 0x20) = Game.m_scriptFoodBase[0];
     shopMenu->SetMode(9);
@@ -2815,7 +2815,7 @@ void CMenuPcs::CreateSmithMenu()
         *reinterpret_cast<_pppDataHead**>(reinterpret_cast<unsigned char*>(&PartMng) + 0x22E18 + slotIndex * 0x38);
     short* cacheChunks = reinterpret_cast<short*>(pppDataHead->m_cacheChunks);
     *reinterpret_cast<int*>(cacheChunks + 2) =
-        ppvAmemCacheSet.GetData(*cacheChunks, s_shopmenu_cpp_801ded8c, 0x32A);
+        ppvAmemCacheSet.GetData(*cacheChunks, s_shopmenu_cpp, 0x32A);
     int cacheData = *reinterpret_cast<int*>(cacheChunks + 2);
     pppCacheLoadShape(
         reinterpret_cast<short*>(cacheData + *reinterpret_cast<int*>(cacheData + 0x14)), pppDataHead);
@@ -2838,11 +2838,11 @@ void CMenuPcs::CreateShopMenu()
     }
 
     CShopMenu* shopMenu = reinterpret_cast<CShopMenu*>(
-        operator new(0x158, reinterpret_cast<CMemory::CStage*>(stage), s_shopmenu_cpp_801ded8c, 0x2E2));
+        operator new(0x158, reinterpret_cast<CMemory::CStage*>(stage), s_shopmenu_cpp, 0x2E2));
     *reinterpret_cast<CShopMenu**>(menuPcs + 0x878) = shopMenu;
     shopMenu = *reinterpret_cast<CShopMenu**>(menuPcs + 0x878);
 
-    Graphic._WaitDrawDone(s_shopmenu_cpp_801ded8c, 0x2FE);
+    Graphic._WaitDrawDone(s_shopmenu_cpp, 0x2FE);
     *reinterpret_cast<void**>(shopMenu) = nullptr;
     *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(shopMenu) + 0x20) = Game.m_scriptFoodBase[0];
     shopMenu->SetMode(0);
@@ -2854,7 +2854,7 @@ void CMenuPcs::CreateShopMenu()
         *reinterpret_cast<_pppDataHead**>(reinterpret_cast<unsigned char*>(&PartMng) + 0x22E18 + slotIndex * 0x38);
     short* cacheChunks = reinterpret_cast<short*>(pppDataHead->m_cacheChunks);
     *reinterpret_cast<int*>(cacheChunks + 2) =
-        ppvAmemCacheSet.GetData(*cacheChunks, s_shopmenu_cpp_801ded8c, 0x32A);
+        ppvAmemCacheSet.GetData(*cacheChunks, s_shopmenu_cpp, 0x32A);
     int cacheData = *reinterpret_cast<int*>(cacheChunks + 2);
     pppCacheLoadShape(
         reinterpret_cast<short*>(cacheData + *reinterpret_cast<int*>(cacheData + 0x14)), pppDataHead);

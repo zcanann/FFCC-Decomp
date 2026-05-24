@@ -20,7 +20,7 @@ extern int gPppCalcDisabled;
 extern "C" void pppSetBlendMode(unsigned char);
 static pppFMATRIX g_matUnit2;
 
-extern const char s_pppYmMegaBirthShpTail2_cpp_801d9c68[] = "pppYmMegaBirthShpTail2.cpp";
+static const char s_pppYmMegaBirthShpTail2_cpp[] = "pppYmMegaBirthShpTail2.cpp";
 
 static inline float LoadFloat(const float& value)
 {
@@ -239,20 +239,20 @@ void pppFrameYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, PYmMegaBirthShp
     if (work->m_particles == 0) {
         work->m_maxParticles = *(u16*)((u8*)&param->m_matrix + 0xe);
         work->m_particles = (_PARTICLE_DATA*)pppMemAlloc(
-            work->m_maxParticles * 0x1b8, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmMegaBirthShpTail2_cpp_801d9c68), 0x30e);
+            work->m_maxParticles * 0x1b8, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmMegaBirthShpTail2_cpp), 0x30e);
         if (work->m_particles != 0) {
             memset(work->m_particles, 0, work->m_maxParticles * 0x1b8);
         }
 
         work->m_wmats = (_PARTICLE_WMAT*)pppMemAlloc(
-            work->m_maxParticles * 0x30, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmMegaBirthShpTail2_cpp_801d9c68), 0x316);
+            work->m_maxParticles * 0x30, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmMegaBirthShpTail2_cpp), 0x316);
         if (work->m_wmats != 0) {
             memset(work->m_wmats, 0, work->m_maxParticles * 0x30);
         }
 
         if (paramPayload[0x69] != 0) {
             work->m_colors = (_PARTICLE_COLOR*)pppMemAlloc(
-                work->m_maxParticles << 5, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmMegaBirthShpTail2_cpp_801d9c68), 0x31e);
+                work->m_maxParticles << 5, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmMegaBirthShpTail2_cpp), 0x31e);
             if (work->m_colors != 0) {
                 memset(work->m_colors, 0, work->m_maxParticles << 5);
             }

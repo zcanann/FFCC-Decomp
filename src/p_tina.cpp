@@ -60,7 +60,7 @@ static const char s_dvd__smenu__s_801d7fb0[] = "dvd/%smenu/%s";
 static const char s_dvd_tina_mon_m_03d_801d7fc0[] = "dvd/tina/mon/m%03d";
 static const char s_dvd_tina_mon_m_03d__c_801d7fd4[] = "dvd/tina/mon/m%03d_%c";
 static const char s_dvd_tina_stage_03d_fp_03d_801d7fec[] = "dvd/tina/stage%03d/fp%03d";
-static const char s_p_tina_cpp_801d8008[] = "p_tina.cpp";
+static const char s_p_tina_cpp[] = "p_tina.cpp";
 static const char s_tina_title_fmt_801d8014[] = "Tina [%c]";
 static const char s_tina_calc_fmt_801d8020[] = "clc=%.3f%%  max=%.3f%%";
 static const char s_tina_draw_fmt_801d8038[] = "drw=%.3f%%  max=%.3f%%";
@@ -923,14 +923,14 @@ void CPartPcs::draw()
  */
 void CPartPcs::drawShadowViewer()
 {
-    Graphic._WaitDrawDone(const_cast<char*>(s_p_tina_cpp_801d8008), 0x308);
+    Graphic._WaitDrawDone(const_cast<char*>(s_p_tina_cpp), 0x308);
     reinterpret_cast<CStopWatch*>(&g_par_draw_prof)->Start();
     reinterpret_cast<CStopWatch*>(&g_par_calc_prof)->Start();
     pppSetProjection();
     pppInitDrawEnv(0);
     PartMng.pppEditDrawShadow();
     reinterpret_cast<CStopWatch*>(&g_par_calc_prof)->Stop();
-    Graphic._WaitDrawDone(const_cast<char*>(s_p_tina_cpp_801d8008), 0x30f);
+    Graphic._WaitDrawDone(const_cast<char*>(s_p_tina_cpp), 0x30f);
     reinterpret_cast<CStopWatch*>(&g_par_draw_prof)->Stop();
     pppClearDrawEnv();
 }
@@ -946,14 +946,14 @@ void CPartPcs::drawShadowViewer()
  */
 void CPartPcs::drawViewer()
 {
-    Graphic._WaitDrawDone(const_cast<char*>(s_p_tina_cpp_801d8008), 0x31a);
+    Graphic._WaitDrawDone(const_cast<char*>(s_p_tina_cpp), 0x31a);
     reinterpret_cast<CStopWatch*>(&g_par_draw_prof)->Start();
     reinterpret_cast<CStopWatch*>(&g_par_calc_prof)->Start();
     pppSetProjection();
     pppInitDrawEnv(0);
     PartMng.pppEditDraw();
     reinterpret_cast<CStopWatch*>(&g_par_calc_prof)->Stop();
-    Graphic._WaitDrawDone(const_cast<char*>(s_p_tina_cpp_801d8008), 0x322);
+    Graphic._WaitDrawDone(const_cast<char*>(s_p_tina_cpp), 0x322);
     reinterpret_cast<CStopWatch*>(&g_par_draw_prof)->Stop();
     pppClearDrawEnv();
 }

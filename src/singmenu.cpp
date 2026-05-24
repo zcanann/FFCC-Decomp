@@ -84,7 +84,7 @@ struct SingMenuSoloNameTable
 };
 
 extern "C" char* s_stand_80332a24;
-char s_singmenu_cpp_801de8d4[] = "singmenu.cpp";
+char s_singmenu_cpp[] = "singmenu.cpp";
 extern "C" char* s_singMenuTexturePathFmt;
 extern "C" char s_singMenuSubfontPathFmt[];
 extern "C" char* PTR_s_Tutti_802143ec;
@@ -999,7 +999,7 @@ void CMenuPcs::SingMenuInit()
 {
     u8* self = reinterpret_cast<u8*>(this);
 
-    Graphic._WaitDrawDone(s_singmenu_cpp_801de8d4, 0x5C2);
+    Graphic._WaitDrawDone(s_singmenu_cpp, 0x5C2);
     Graphic.DestroyTempBuffer();
 
     *reinterpret_cast<void**>(self + 0xF4) = *reinterpret_cast<void**>(reinterpret_cast<u8*>(&Graphic) + 8);
@@ -1011,7 +1011,7 @@ void CMenuPcs::SingMenuInit()
         stage = *reinterpret_cast<CMemory::CStage**>(self + 0xF4);
     }
 
-    CCharaPcs::CHandle* handle = new (stage, s_singmenu_cpp_801de8d4, 0x5CD) CCharaPcs::CHandle;
+    CCharaPcs::CHandle* handle = new (stage, s_singmenu_cpp, 0x5CD) CCharaPcs::CHandle;
     *reinterpret_cast<CCharaPcs::CHandle**>(self + 0x774) = handle;
 
     handle->Add();
@@ -1028,7 +1028,7 @@ void CMenuPcs::SingMenuInit()
     if (Game.m_gameWork.m_menuStageMode != 0) {
         stage = *reinterpret_cast<CMemory::CStage**>(self + 0xF4);
     }
-    *reinterpret_cast<void**>(self + 0x814) = new (stage, s_singmenu_cpp_801de8d4, 0x5DD) u8[0x50];
+    *reinterpret_cast<void**>(self + 0x814) = new (stage, s_singmenu_cpp, 0x5DD) u8[0x50];
 
     int state = *reinterpret_cast<int*>(self + 0x814);
     *reinterpret_cast<float*>(state + 0x24) = FLOAT_8033294c;
@@ -1069,21 +1069,21 @@ void CMenuPcs::SingMenuInit()
     if (Game.m_gameWork.m_menuStageMode != 0) {
         stage = *reinterpret_cast<CMemory::CStage**>(self + 0xF4);
     }
-    *reinterpret_cast<void**>(self + 0x850) = new (stage, s_singmenu_cpp_801de8d4, 0x605) SingleFadeState;
+    *reinterpret_cast<void**>(self + 0x850) = new (stage, s_singmenu_cpp, 0x605) SingleFadeState;
     memset(*reinterpret_cast<void**>(self + 0x850), 0, 0x1008);
 
     stage = *reinterpret_cast<CMemory::CStage**>(self + 0xEC);
     if (Game.m_gameWork.m_menuStageMode != 0) {
         stage = *reinterpret_cast<CMemory::CStage**>(self + 0xF4);
     }
-    *reinterpret_cast<void**>(self + 0x82C) = new (stage, s_singmenu_cpp_801de8d4, 0x609) u8[0x48];
+    *reinterpret_cast<void**>(self + 0x82C) = new (stage, s_singmenu_cpp, 0x609) u8[0x48];
     memset(*reinterpret_cast<void**>(self + 0x82C), 0, 0x48);
 
     stage = *reinterpret_cast<CMemory::CStage**>(self + 0xEC);
     if (Game.m_gameWork.m_menuStageMode != 0) {
         stage = *reinterpret_cast<CMemory::CStage**>(self + 0xF4);
     }
-    *reinterpret_cast<void**>(self + 0x848) = new (stage, s_singmenu_cpp_801de8d4, 0x60D) u8[0xC];
+    *reinterpret_cast<void**>(self + 0x848) = new (stage, s_singmenu_cpp, 0x60D) u8[0xC];
     memset(*reinterpret_cast<void**>(self + 0x848), 0, 0xC);
 
     *reinterpret_cast<s16*>(self + 0x866) = 0;
@@ -1151,7 +1151,7 @@ void CMenuPcs::drawSingleMenu()
 
         if ((gSingMenuHasScriptFoodBase != 0) && (*reinterpret_cast<s16*>(*reinterpret_cast<int*>(self + 0x850) + 6) != 0)) {
             Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag = 0;
-            Graphic._WaitDrawDone(s_singmenu_cpp_801de8d4, 0x62B);
+            Graphic._WaitDrawDone(s_singmenu_cpp, 0x62B);
             self[0x85A] = 0;
 
             if (gSingMenuAsyncFileHandle != 0) {
@@ -1377,7 +1377,7 @@ void CMenuPcs::loadTextureAsync(char **, int, int, CMenuPcs::CTmp*, int, int, in
                     stage = *reinterpret_cast<CMemory::CStage**>(self + 0xF4);
                 }
 
-                CTextureSet* textureSet = new (stage, s_singmenu_cpp_801de8d4, 0x748) CTextureSet;
+                CTextureSet* textureSet = new (stage, s_singmenu_cpp, 0x748) CTextureSet;
                 *reinterpret_cast<CTextureSet**>(self + 0x160 + loadIndex * 4) = textureSet;
 
                 stage = *reinterpret_cast<CMemory::CStage**>(self + 0xEC);
@@ -2896,7 +2896,7 @@ int CMenuPcs::GetEquipType(int itemNo)
             if ((flags & 0xA00) == 0) {
                 if ((flags & 0x3000) == 0) {
                     if (System.m_execParam != 0) {
-                        System.Printf((char*)"%s(%d): item = %d m_equip = %08x", s_singmenu_cpp_801de8d4, 0xD3D, itemNo, flags);
+                        System.Printf((char*)"%s(%d): item = %d m_equip = %08x", s_singmenu_cpp, 0xD3D, itemNo, flags);
                     }
                 } else {
                     equipType = 3;

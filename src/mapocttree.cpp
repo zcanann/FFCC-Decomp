@@ -100,10 +100,10 @@ unsigned long octtree_draw_node_ct = 0;
 extern unsigned long g_pStage;
 extern unsigned long s_insertShadowNo;
 
-extern "C" const char s_m_node_pctd_m_meshtype_pctd_801D7268[] =
+extern "C" const char sMapOctTreeNodeMeshTypeFmt[] =
     "\n\n===============================================\n\n\t\t\tm_node=%d   m_meshtype=%d\n\n\n"
     "===============================================\n\n";
-extern "C" const char s_mapocttree_cpp_801D72EC[] = "mapocttree.cpp";
+extern "C" const char s_mapocttree_cpp[] = "mapocttree.cpp";
 
 namespace {
 static inline unsigned char* Ptr(void* ptr, unsigned int offset)
@@ -216,11 +216,11 @@ int COctTree::ReadOtmOctTree(CChunkFile& chunkFile)
             m_nodeCount = chunkFile.Get2();
             signed char mapObjType = *reinterpret_cast<signed char*>(Ptr(m_mapObject, 0x1E));
             if ((mapObjType != 1) && (static_cast<unsigned int>(System.m_execParam) >= 3U)) {
-                System.Printf(const_cast<char*>(s_m_node_pctd_m_meshtype_pctd_801D7268), m_nodeCount, mapObjType);
+                System.Printf(const_cast<char*>(sMapOctTreeNodeMeshTypeFmt), m_nodeCount, mapObjType);
             }
 
             nodeCount = m_nodeCount;
-            m_nodePool = new (MapMng.m_stage, const_cast<char*>(s_mapocttree_cpp_801D72EC), 0x59)
+            m_nodePool = new (MapMng.m_stage, const_cast<char*>(s_mapocttree_cpp), 0x59)
                 COctNode[nodeCount];
             break;
         }

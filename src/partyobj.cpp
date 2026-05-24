@@ -20,8 +20,8 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
 extern "C" int CalcHitSlide__7CMapObjFP3Vecf(void*, Vec*);
-extern const char s_BossGhostPartyCountersFmt_801DCB1C[];
-extern const char s_MissingRingMenuFmt_801DCB38[];
+extern const char sBossGhostPartyCountersFmt[];
+extern const char sMissingRingMenuFmt[];
 extern int __float_huge[];
 
 static const char s_partyObjStateFmt[] = "mode:%d stat:%d sub:%d frame:%d alive:%d tgt:%d ghost:%d";
@@ -137,7 +137,7 @@ static inline void UpdateGhostPartyDamageCounters(CGPrgObj* attacker)
 		sBossGhostPartyCounters.thresholdA++;
 		sBossGhostPartyCounters.thresholdB++;
 		sBossGhostPartyCounters.thresholdC++;
-		System.Printf(const_cast<char*>(s_BossGhostPartyCountersFmt_801DCB1C),
+		System.Printf(const_cast<char*>(sBossGhostPartyCountersFmt),
 		    sBossGhostPartyCounters.thresholdA, CharaGhostValue(0x2048),
 		    sBossGhostPartyCounters.thresholdB, CharaGhostValue(0x204C),
 		    sBossGhostPartyCounters.thresholdC, CharaGhostValue(0x2050));
@@ -2967,7 +2967,7 @@ void CGPartyObj::ChangeCommandMode(int mode)
 			battleMenus[port]->SetBattleCommand(2, -1, -1);
 		} else {
 			if ((unsigned int)System.m_execParam >= 2) {
-				System.Printf(const_cast<char*>(s_MissingRingMenuFmt_801DCB38));
+				System.Printf(const_cast<char*>(sMissingRingMenuFmt));
 			}
 		}
 	}

@@ -17,7 +17,7 @@ extern f32 gPppDefaultValueBuffer[];
 extern const float FLOAT_80331840;
 extern const float FLOAT_80331844;
 
-extern const char s_pppYmTracer2_cpp_801dc4b8[] = "pppYmTracer2.cpp";
+static const char s_pppYmTracer2_cpp[] = "pppYmTracer2.cpp";
 
 struct TRACE_POLYGON {
     Vec pos;
@@ -251,7 +251,7 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
         work->alphaStep = (u16)param_2->m_tracer.m_entryAlpha / param_2->m_tracer.m_entryLife;
         work->entries = (TRACE_POLYGON*)pppMemAlloc(
             (u32)param_2->m_tracer.m_entryCount * 0x28, pppEnvStPtr->m_stagePtr,
-            const_cast<char*>(s_pppYmTracer2_cpp_801dc4b8), 0xAD);
+            const_cast<char*>(s_pppYmTracer2_cpp), 0xAD);
 
         fVar2 = FLOAT_80331840;
         entry = work->entries;

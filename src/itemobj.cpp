@@ -27,7 +27,7 @@ extern const float FLOAT_80331b34 = 224.0f;
 extern const float FLOAT_80331b38 = 320.0f;
 extern const float FLOAT_80331b3c = 0.5f;
 extern const float FLOAT_80331b40 = 11.0f;
-extern const char s_stand_80331B44[] = "stand";
+extern const char sStandAnim[] = "stand";
 extern const float FLOAT_80331b4c = 1.0e-7f;
 extern const float FLOAT_80331b50 = 0.01f;
 extern const float FLOAT_80331b54 = 0.1f;
@@ -36,8 +36,8 @@ extern const double DOUBLE_80331B60 = 4503599627370496.0;
 extern const float FLOAT_80331b68 = 0.125f;
 extern const double DOUBLE_80331B70 = 4503601774854144.0;
 extern const float FLOAT_80331B78 = 15.0f;
-extern const char DAT_80331b7c[] = "c_item3";
-extern const char DAT_80331b84[] = "l_item";
+extern const char s_itemAttachCenterItem3[] = "c_item3";
+extern const char s_itemAttachLeftItem[] = "l_item";
 extern const float FLOAT_80331b8c = 3.1415927410125732f;
 extern const float FLOAT_80331b90 = 3.0f;
 extern const float FLOAT_80331b94 = 8.0f;
@@ -52,10 +52,10 @@ extern const float FLOAT_80331bb8 = 20.0f;
 extern const float FLOAT_80331bbc = 0.25f;
 extern const float FLOAT_80331BC0 = 0.019999999552965164f;
 extern const float FLOAT_80331BC4 = 1.5f;
-extern const char DAT_80331bc8[] = "hip";
+extern const char s_itemDamageBoneHip[] = "hip";
 u32 gItemObjCreateFlags;
 extern char SoundBuffer[];
-static const char DAT_801dcec0[] = "num free item = %d\n";
+static const char sNumFreeItemFmt[] = "num free item = %d\n";
 static const char DAT_801dced4[] = {
     (char)0x8F, (char)0xC1, (char)0x82, (char)0xB9, (char)0x82, (char)0xE9, (char)0x83, 0x49,
     (char)0x83, 0x75, (char)0x83, 0x57, (char)0x83, 0x46, (char)0x83, 0x4E,
@@ -63,7 +63,7 @@ static const char DAT_801dced4[] = {
     (char)0x82, (char)0xDC, (char)0x82, (char)0xB9, (char)0x82, (char)0xF1, (char)0x81, 0x42,
     (char)0x0A, (char)0x00, (char)0x00, (char)0x00,
 };
-static const char DAT_801dcef8[] = "num delete item = %d\n";
+static const char sNumDeleteItemFmt[] = "num delete item = %d\n";
 static const char DAT_801dcf10[] = {
     (char)0x83, 0x41, (char)0x83, 0x43, (char)0x83, 0x65, (char)0x83, (char)0x80,
     (char)0x82, (char)0xF0, (char)0x90, (char)0xB6, (char)0x90, (char)0xAC, (char)0x82, (char)0xC5,
@@ -85,7 +85,7 @@ static const char DAT_801dcf34[] = {
     0x72, 0x74, 0x79, 0x20, 0x3D, 0x20, 0x25, 0x64,
     (char)0x0A, (char)0x00, (char)0x00, (char)0x00,
 };
-static const char DAT_801dcf58[] = "itemobj.cpp";
+static const char s_itemobj_cpp[] = "itemobj.cpp";
 static const char DAT_801dcf64[] = {
     (char)0x8E, 0x76, (char)0x82, (char)0xA2, (char)0x8F, 0x6F, (char)0x83, 0x4A,
     (char)0x83, 0x76, (char)0x83, 0x5A, (char)0x83, (char)0x8B, (char)0x94, (char)0xF1,
@@ -124,7 +124,7 @@ static const char DAT_801dcfec[] = {
     (char)0x82, (char)0xF1, (char)0x82, (char)0xC5, (char)0x82, (char)0xB5, (char)0x82, (char)0xBD,
     (char)0x81, 0x42, (char)0x0A, (char)0x00,
 };
-static const char s_f051_root_801dceb4[] = "f051_root";
+static const char sF051Root[] = "f051_root";
 
 struct ItemObjFlatTableEntry {
 	int count;
@@ -349,7 +349,7 @@ void CGItemObj::loadModel()
 	int modelVariant = 0;
 	int modelFlag = 0;
 	unsigned long animFlags = (unsigned long)-1;
-	char* standAnim = const_cast<char*>(s_stand_80331B44);
+	char* standAnim = const_cast<char*>(sStandAnim);
 	int useParticleTable = 1;
 	int itemType = *(int*)(self + 0x500);
 
@@ -637,9 +637,9 @@ void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 				}
 			}
 
-			const char* attachName = DAT_80331b84;
+			const char* attachName = s_itemAttachLeftItem;
 			if (useBossAttachName) {
-				attachName = DAT_80331b7c;
+				attachName = s_itemAttachCenterItem3;
 			}
 			Attach(partyObj, const_cast<char*>(attachName), reinterpret_cast<Vec*>(&attachOffset));
 			changeStat(0, 0, 0);
@@ -714,7 +714,7 @@ CGPrgObj* CGItemObj::CreateFromScript(
     int createMode, int createFlags, int scriptArg, CGObject* owner, float launchAngle, CGItemObj::CCFS* ccfs)
 {
 	int freeItemCount = ItemCFlatRuntime()->getNumFreeObject(5);
-	System.Printf(const_cast<char*>(DAT_801dcec0), freeItemCount);
+	System.Printf(const_cast<char*>(sNumFreeItemFmt), freeItemCount);
 
 	if (freeItemCount == 0) {
 		int deletedCount = 0;
@@ -746,7 +746,7 @@ CGPrgObj* CGItemObj::CreateFromScript(
 			}
 		}
 
-		System.Printf(const_cast<char*>(DAT_801dcef8), deletedCount);
+		System.Printf(const_cast<char*>(sNumDeleteItemFmt), deletedCount);
 		if (deletedCount == 0) {
 			if (2U < (unsigned int)System.m_execParam) {
 				System.Printf(const_cast<char*>(DAT_801dcf10));
@@ -817,7 +817,7 @@ CGPrgObj* CGItemObj::CreateFromScript(
 			}
 			*(CGPrgObj**)(m_boss__8CGMonObj + (int)ownerScriptSlot * 4 + 8) = newItem;
 
-			CCharaPcs::CHandle* handle = new (Game.m_mainStage, const_cast<char*>(DAT_801dcf58), 0x28E) CCharaPcs::CHandle;
+			CCharaPcs::CHandle* handle = new (Game.m_mainStage, const_cast<char*>(s_itemobj_cpp), 0x28E) CCharaPcs::CHandle;
 			reinterpret_cast<CGItemObj*>(newItem)->m_pendingModelHandle = handle;
 			handle->Add();
 
@@ -986,9 +986,9 @@ void CGItemObj::onFrameStat()
 				}
 			}
 
-			const char* attachName = DAT_80331b84;
+			const char* attachName = s_itemAttachLeftItem;
 			if (useBossAttachName) {
-				attachName = DAT_80331b7c;
+				attachName = s_itemAttachCenterItem3;
 			}
 			Attach(*reinterpret_cast<CGObject**>(self + 0x550), const_cast<char*>(attachName),
 			       reinterpret_cast<Vec*>(&attachOffset));
@@ -1121,7 +1121,7 @@ void CGItemObj::onFrameStat()
 			prgObj->m_bgColMask |= 0x80000;
 
 			CVector damageOffset(zero, zero, zero);
-			SetDamageCol(0, const_cast<char*>(s_f051_root_801dceb4), FLOAT_80331B78, FLOAT_80331B78,
+			SetDamageCol(0, const_cast<char*>(sF051Root), FLOAT_80331B78, FLOAT_80331B78,
 			             reinterpret_cast<Vec*>(&damageOffset));
 			*reinterpret_cast<int*>(&prgObj->m_damageColliders[1].m_localPosition.x) = 9;
 		}
@@ -1350,7 +1350,7 @@ void CGItemObj::onFrame()
 			putParticle((soundEntry << 8) | ownerScriptSlot, m_particleSlot, this, particleScale, 0x12909);
 
 			CVector zero(FLOAT_80331b20, FLOAT_80331b20, FLOAT_80331b20);
-			SetDamageCol(0, const_cast<char*>(DAT_80331bc8), FLOAT_80331bb8, FLOAT_80331bb8,
+			SetDamageCol(0, const_cast<char*>(s_itemDamageBoneHip), FLOAT_80331bb8, FLOAT_80331bb8,
 			             reinterpret_cast<Vec*>(&zero));
 			*reinterpret_cast<unsigned int*>(&m_damageColliders[1].m_localPosition.x) = 8;
 			addSubStat();

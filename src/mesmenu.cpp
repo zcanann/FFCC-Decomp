@@ -18,10 +18,10 @@
 
 extern "C" {
 static const char s_CMesMenu_801D9E90[] = "CMesMenu";
-const char DAT_801d9e9c[] =
+const char s_mesMenuOnOffChangedFmt[] =
     "mesMenu\x95\x8e\xa6on/off\x82\xaa\x95\xcf\x8d\x58\x82\xb3\x82\xea\x82\xdc\x82\xb5\x82\xbd\x81\x42%d-%d\n\0\0\0";
-int DAT_8020f998[4] = {1, 0, -1, 0};
-int DAT_8020F9A8[4] = {1, 6, 7, 6};
+int s_mesMenuShakePattern[4] = {1, 0, -1, 0};
+int s_mesMenuIconFrames[4] = {1, 6, 7, 6};
 extern float FLOAT_803308d8;
 extern float FLOAT_803308dc;
 extern float FLOAT_803308e0;
@@ -332,7 +332,7 @@ void CMesMenu::DrawHeart(float x, float y, float z, float alpha)
         if (subTimer == 0) {
             shakeX = 0;
         } else {
-            shakeX = ((int)subTimer >> 2) * DAT_8020f998[((subTimer + 1) * 4 & 0xC) / 4];
+            shakeX = ((int)subTimer >> 2) * s_mesMenuShakePattern[((subTimer + 1) * 4 & 0xC) / 4];
         }
 
         float drawX = baseX + (float)shakeX;
@@ -340,7 +340,7 @@ void CMesMenu::DrawHeart(float x, float y, float z, float alpha)
         if (subTimer == 0) {
             shakeY = 0;
         } else {
-            shakeY = ((int)subTimer >> 2) * DAT_8020f998[subTimer & 3];
+            shakeY = ((int)subTimer >> 2) * s_mesMenuShakePattern[subTimer & 3];
         }
 
         float drawY = baseY + (float)shakeY;
@@ -479,9 +479,9 @@ void CMesMenu::onDraw()
                 buttons = Pad.GetPadInputs()[__cntlzw((unsigned int)Pad._448_4_) >> 5].button[0];
             }
 
-            iconFrame = DAT_8020F9A8[0];
+            iconFrame = s_mesMenuIconFrames[0];
             if ((buttons & 0x100) != 0) {
-                iconFrame = DAT_8020F9A8[(System.m_frameCounter & 6) >> 1];
+                iconFrame = s_mesMenuIconFrames[(System.m_frameCounter & 6) >> 1];
             }
         } else if (charaMode < 4) {
             iconFrame = 2;
@@ -668,12 +668,12 @@ void CMesMenu::onDraw()
                         unsigned int heartSubTimer = *(unsigned int*)(heartTimerOffset + 0x3DD0);
                         int heartShakeX = 0;
                         if (heartSubTimer != 0) {
-                            heartShakeX = ((int)heartSubTimer >> 2) * DAT_8020f998[((heartSubTimer + 1) * 4 & 0xC) / 4];
+                            heartShakeX = ((int)heartSubTimer >> 2) * s_mesMenuShakePattern[((heartSubTimer + 1) * 4 & 0xC) / 4];
                         }
 
                         int heartShakeY = 0;
                         if (heartSubTimer != 0) {
-                            heartShakeY = ((int)heartSubTimer >> 2) * DAT_8020f998[heartSubTimer & 3];
+                            heartShakeY = ((int)heartSubTimer >> 2) * s_mesMenuShakePattern[heartSubTimer & 3];
                         }
 
                         float heartX = heartBaseX + (float)heartShakeX;
@@ -708,8 +708,8 @@ void CMesMenu::onDraw()
             int foodTier = (int)foodAmount - 100;
             foodTier = foodTier / 100 + (foodTier >> 31);
             unsigned int foodIcon = (foodAmount % 100) + (foodTier - (foodTier >> 31)) * 4;
-            float shakeX = (foodTimer != 0) ? (float)(((int)foodTimer >> 2) * DAT_8020f998[(3 - ((foodTimer + 1) & 3)) & 3]) : FLOAT_803308d8;
-            float shakeY = (foodTimer != 0) ? (float)(((int)foodTimer >> 2) * DAT_8020f998[(3 - (foodTimer & 3)) & 3]) : FLOAT_803308d8;
+            float shakeX = (foodTimer != 0) ? (float)(((int)foodTimer >> 2) * s_mesMenuShakePattern[(3 - ((foodTimer + 1) & 3)) & 3]) : FLOAT_803308d8;
+            float shakeY = (foodTimer != 0) ? (float)(((int)foodTimer >> 2) * s_mesMenuShakePattern[(3 - (foodTimer & 3)) & 3]) : FLOAT_803308d8;
             colorStorage = CColor(0xFF, 0xFF, 0xFF, (unsigned char)(int)(FLOAT_80330908 * stageBlend));
             MenuPcs.SetColor(colorStorage);
             MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x18));
@@ -861,7 +861,7 @@ void CMesMenu::onCalc()
 
     unsigned int desiredStageFlag = stageBit != 0;
     if (*(unsigned int*)((char*)this + 0x3DF8) != desiredStageFlag) {
-        System.Printf(const_cast<char*>(DAT_801d9e9c));
+        System.Printf(const_cast<char*>(s_mesMenuOnOffChangedFmt));
         *(unsigned int*)((char*)this + 0x3DF8) =
             ((unsigned int)__cntlzw(*(unsigned int*)((char*)this + 0x3DF8)) >> 5) & 0xFF;
         *(int*)((char*)this + 0x3DF4) = 0x10 - *(int*)((char*)this + 0x3DF4);

@@ -14,7 +14,7 @@
 
 #include <math.h>
 
-extern const char s_CFlatRuntime2SetClassSystemValWarn_801DA778[];
+extern const char sCFlatRuntime2SetClassSystemValWarn[];
 
 namespace {
 
@@ -172,7 +172,7 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 
 	if ((engineFlags & 5) != 5 && systemVal == -0x1B) {
 		if (static_cast<unsigned int>(System.m_execParam) >= 2) {
-			System.Printf(const_cast<char*>(s_CFlatRuntime2SetClassSystemValWarn_801DA778));
+			System.Printf(const_cast<char*>(sCFlatRuntime2SetClassSystemValWarn));
 		}
 		return;
 	}

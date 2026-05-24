@@ -10,11 +10,11 @@
 #include <math.h>
 #include "dolphin/mtx.h"
 
-extern "C" const char s_texanim_cpp_801d7adc[];
+extern "C" const char s_texanim_cpp[];
 extern const float FLOAT_8032fb38 = 0.0f;
 extern const float FLOAT_8032fb3c = 1.0f;
 extern const double DOUBLE_8032fb40 = 4503599627370496.0;
-extern const char DAT_8032fb48[] = "e1";
+extern const char s_texAnimSeqE1[] = "e1";
 extern const float FLOAT_8032fb4c = 1.25f;
 extern "C" const char s_scenegraph_step_none[4] = "";
 extern "C" const char s_scenegraph_step_x8[] = "x8";
@@ -502,13 +502,13 @@ CTexAnimSet* CTexAnimSet::Duplicate(CMemory::CStage* stage)
 {
     CTexAnimSetStorage* self = reinterpret_cast<CTexAnimSetStorage*>(this);
     CTexAnimSetStorage* dup = reinterpret_cast<CTexAnimSetStorage*>(
-        new (stage, const_cast<char*>(s_texanim_cpp_801d7adc), 0x54) CTexAnimSet);
+        new (stage, const_cast<char*>(s_texanim_cpp), 0x54) CTexAnimSet);
 
     dup->texAnims.SetStage(stage);
     for (unsigned int i = 0; i < static_cast<unsigned int>(self->texAnims.GetSize()); i++) {
         CTexAnimStorage* src = reinterpret_cast<CTexAnimStorage*>(self->texAnims[i]);
         CTexAnimStorage* copy = reinterpret_cast<CTexAnimStorage*>(
-            new (stage, const_cast<char*>(s_texanim_cpp_801d7adc), 0xF4) CTexAnim);
+            new (stage, const_cast<char*>(s_texanim_cpp), 0xF4) CTexAnim);
 
         copy->refData = src->refData;
         reinterpret_cast<RefObject*>(copy->refData)->refCount = reinterpret_cast<RefObject*>(copy->refData)->refCount + 1;
@@ -554,7 +554,7 @@ void CTexAnimSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
         }
 
         CTexAnimStorage* texAnim = reinterpret_cast<CTexAnimStorage*>(
-            new (stage, const_cast<char*>(s_texanim_cpp_801d7adc), 0x3F) CTexAnim);
+            new (stage, const_cast<char*>(s_texanim_cpp), 0x3F) CTexAnim);
         int* ref = reinterpret_cast<int*>(texAnim->refData);
         if (ref != 0) {
             int nextRefCount = ref[1] - 1;
@@ -565,7 +565,7 @@ void CTexAnimSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
             texAnim->refData = 0;
         }
         CTexAnimRefDataStorage* refData = reinterpret_cast<CTexAnimRefDataStorage*>(
-            new (stage, const_cast<char*>(s_texanim_cpp_801d7adc), 0xD3) CTexAnim::CRefData);
+            new (stage, const_cast<char*>(s_texanim_cpp), 0xD3) CTexAnim::CRefData);
         texAnim->refData = refData;
         refData->texAnimSeqs.SetStage(stage);
 
@@ -580,7 +580,7 @@ void CTexAnimSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
             }
 
             CTexAnimSeqStorage* seq = reinterpret_cast<CTexAnimSeqStorage*>(
-                new (stage, const_cast<char*>(s_texanim_cpp_801d7adc), 0xE2) CTexAnimSeq);
+                new (stage, const_cast<char*>(s_texanim_cpp), 0xE2) CTexAnimSeq);
             chunkFile.PushChunk();
             char* seqName = seq->name;
             while ((int)chunkFile.GetNextChunk(innerChunk) != 0) {
@@ -592,7 +592,7 @@ void CTexAnimSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
                         seq->flags = (unsigned char)(((int)b7 << 7) | (seq->flags & 0x7F));
                         char b6 = (char)chunkFile.Get4();
                         seq->flags = (unsigned char)((((int)b6 << 6) & 0x40) | (seq->flags & 0xBF));
-                        unsigned int eq = (unsigned int)__cntlzw((unsigned int)strcmp(seqName, DAT_8032fb48));
+                        unsigned int eq = (unsigned int)__cntlzw((unsigned int)strcmp(seqName, s_texAnimSeqE1));
                         seq->flags = (unsigned char)(((unsigned char)((int)(char)(eq >> 5) << 5) & 0x20) | (seq->flags & 0xDF));
                     } else if (((int)innerChunk.m_id >= keyTag) && ((int)innerChunk.m_id == nameTag)) {
                         strcpy(seqName, chunkFile.GetString());
@@ -600,7 +600,7 @@ void CTexAnimSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
                 } else {
                     seq->keyCount = innerChunk.m_size / 0x30;
                     seq->keys = reinterpret_cast<unsigned int*>(
-                        Memory._Alloc(innerChunk.m_size, stage, const_cast<char*>(s_texanim_cpp_801d7adc), 0x1D4, 0));
+                        Memory._Alloc(innerChunk.m_size, stage, const_cast<char*>(s_texanim_cpp), 0x1D4, 0));
                     memcpy(seq->keys, chunkFile.GetAddress(), innerChunk.m_size);
                 }
             }

@@ -90,18 +90,14 @@ extern "C" char s_singMenuSubfontPathFmt[];
 extern "C" char* PTR_s_Tutti_802143ec;
 extern "C" char* PTR_s_Alle_Rassen_8021430c;
 extern "C" char* PTR_s_Todos_802145ac;
-extern "C" char* PTR_DAT_802144cc;
-extern "C" char* PTR_DAT_8021422c;
 extern "C" char* PTR_s_Clavat_80214110[];
 extern "C" char* PTR_s_Clavat_802140f0[];
 extern "C" char* PTR_s_Clavat_80214100[];
 extern "C" char* PTR_s_Clavate[];
 extern "C" char* PTR_s_Clavat_80214120[];
 extern "C" char* PTR_s_Maschio_802143e4[];
-extern "C" char* PTR_DAT_80214304[];
 extern "C" char* PTR_s_Hombre_802145a4[];
 extern "C" char* PTR_s_Masculin_802144c4[];
-extern "C" char* PTR_DAT_80214224[];
 extern "C" char s_plural_s_80332958[];
 extern "C" char s_space_8033295c[];
 extern "C" char* PTR_s_Blacksmith[];
@@ -795,8 +791,8 @@ int gSingMenuAsyncLoadCompleted;
 int gSingMenuHasScriptFoodBase;
 int gSingMenuForcedSelection;
 extern "C" SingMenuTextureRef s_singleMenuModelTextureTable[];
-extern float DAT_801dd708[];
-extern float DAT_801dd6f8[];
+extern float gSingMenuRaceModelScales[];
+extern float gSingMenuRaceModelYOffset[];
 float FLOAT_8032ea78 = 1.0f;
 extern float FLOAT_803329d0;
 extern float FLOAT_803329d4;
@@ -1472,10 +1468,10 @@ void CMenuPcs::SingCalcChara(float frameStep)
     }
 
     unsigned short modelScaleIndex = *reinterpret_cast<unsigned short*>(Game.m_scriptFoodBase[0] + 0x3E0);
-    float modelScale = DAT_801dd708[modelScaleIndex];
+    float modelScale = gSingMenuRaceModelScales[modelScaleIndex];
     Mtx scaleMtx;
     PSMTXScale(scaleMtx, modelScale, modelScale, modelScale);
-    scaleMtx[1][3] = DAT_801dd6f8[modelScaleIndex];
+    scaleMtx[1][3] = gSingMenuRaceModelYOffset[modelScaleIndex];
     scaleMtx[0][3] = FLOAT_8033294c;
     scaleMtx[2][3] = FLOAT_8033294c;
 
@@ -1828,10 +1824,10 @@ void CMenuPcs::SingleCalcFadeIn()
     }
 
     unsigned short modelScaleIndex = *reinterpret_cast<unsigned short*>(Game.m_scriptFoodBase[0] + 0x3E0);
-    float modelScale = DAT_801dd708[modelScaleIndex];
+    float modelScale = gSingMenuRaceModelScales[modelScaleIndex];
     Mtx scaleMtx;
     PSMTXScale(scaleMtx, modelScale, modelScale, modelScale);
-    scaleMtx[1][3] = DAT_801dd6f8[modelScaleIndex];
+    scaleMtx[1][3] = gSingMenuRaceModelYOffset[modelScaleIndex];
     scaleMtx[0][3] = FLOAT_8033294c;
     scaleMtx[2][3] = FLOAT_8033294c;
 
@@ -1934,10 +1930,10 @@ void CMenuPcs::SingleCalcFadeOut()
     }
 
     unsigned short modelScaleIndex = *reinterpret_cast<unsigned short*>(Game.m_scriptFoodBase[0] + 0x3E0);
-    float modelScale = DAT_801dd708[modelScaleIndex];
+    float modelScale = gSingMenuRaceModelScales[modelScaleIndex];
     Mtx scaleMtx;
     PSMTXScale(scaleMtx, modelScale, modelScale, modelScale);
-    scaleMtx[1][3] = DAT_801dd6f8[modelScaleIndex];
+    scaleMtx[1][3] = gSingMenuRaceModelYOffset[modelScaleIndex];
     scaleMtx[0][3] = FLOAT_8033294c;
     scaleMtx[2][3] = FLOAT_8033294c;
 
@@ -2006,10 +2002,10 @@ void CMenuPcs::SingleCalcCtrl()
     }
 
     unsigned short modelScaleIndex = *reinterpret_cast<unsigned short*>(Game.m_scriptFoodBase[0] + 0x3E0);
-    float modelScale = DAT_801dd708[modelScaleIndex];
+    float modelScale = gSingMenuRaceModelScales[modelScaleIndex];
     Mtx scaleMtx;
     PSMTXScale(scaleMtx, modelScale, modelScale, modelScale);
-    scaleMtx[1][3] = DAT_801dd6f8[modelScaleIndex];
+    scaleMtx[1][3] = gSingMenuRaceModelYOffset[modelScaleIndex];
     scaleMtx[0][3] = FLOAT_8033294c;
     scaleMtx[2][3] = FLOAT_8033294c;
 

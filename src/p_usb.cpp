@@ -9,7 +9,7 @@
 int s_usbReadPollFrameCounter;
 char s_usbReadPollInitialized;
 
-extern const char s_CUSBPcs_8032f810[] = "CUSBPcs";
+extern const char sUsbPcsClassName[] = "CUSBPcs";
 inline CUSBPcs::CUSBPcs()
 {
     static unsigned int desc0[] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__7CUSBPcsFv)};
@@ -29,7 +29,7 @@ inline CUSBPcs::CUSBPcs()
 }
 
 unsigned int CUSBPcs::m_table[0x11C / sizeof(unsigned int)] = {
-    reinterpret_cast<unsigned int>(const_cast<char*>(s_CUSBPcs_8032f810)),
+    reinterpret_cast<unsigned int>(const_cast<char*>(sUsbPcsClassName)),
     0,
     0,
     0,
@@ -217,7 +217,7 @@ void CUSBPcs::create()
 void CUSBPcs::IsBigAlloc(int param_2)
 {
     if ((param_2 != 0) && (m_bigStage == (CMemory::CStage*)nullptr)) {
-        m_bigStage = Memory.CreateStage(0x100000, const_cast<char*>(s_CUSBPcs_8032f810), 0);
+        m_bigStage = Memory.CreateStage(0x100000, const_cast<char*>(sUsbPcsClassName), 0);
     } else if ((param_2 == 0) && (m_bigStage != (CMemory::CStage*)nullptr)) {
         Memory.DestroyStage(m_bigStage);
         m_bigStage = (CMemory::CStage*)nullptr;
@@ -271,7 +271,7 @@ void CUSBPcs::Init()
 {
     CMemory* memory = &Memory;
 
-	m_smallStage = memory->CreateStage(0x2000, const_cast<char*>(s_CUSBPcs_8032f810), 0);
+	m_smallStage = memory->CreateStage(0x2000, const_cast<char*>(sUsbPcsClassName), 0);
 	m_bigStage = (CMemory::CStage*)nullptr;
 
 	strcpy(m_rootPath, s_usbRootPath);

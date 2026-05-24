@@ -531,9 +531,7 @@ void CMenuPcs::CalcSingCMake()
             }
             result = (frame >= 10) ? 1 : 0;
         } else if (openMode == 1) {
-            resultFlag = 0;
-            CmakeNameCtrl();
-            result = static_cast<unsigned short>(resultFlag);
+            result = static_cast<unsigned short>(CmakeNameCtrl());
         } else if (frame < 10) {
             frame = frame + 1;
         } else {
@@ -1653,37 +1651,44 @@ void CMenuPcs::CmakeNameOpen()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::CmakeNameCtrl()
+int CMenuPcs::CmakeNameCtrl()
 {
     int state = MenuS32(this, 0x82C);
     int mcWork = MenuS32(this, 0x848);
-    short& mode = *reinterpret_cast<short*>(state + 0x10);
-    short& frame = *reinterpret_cast<short*>(state + 0x22);
     short& resultDir = *reinterpret_cast<short*>(state + 0x1E);
-    short& resultFlag = *reinterpret_cast<short*>(state + 0x2E);
     short& select = *reinterpret_cast<short*>(state + 0x26);
     short& row = *reinterpret_cast<short*>(state + 0x28);
     short& table = *reinterpret_cast<short*>(state + 0x2A);
-    unsigned short repeat = GetButtonRepeat(0);
-    unsigned short down = GetButtonDown(0);
+    unsigned short down;
+    unsigned short repeat;
     short& mcState = *reinterpret_cast<short*>(mcWork + 10);
     char* name = GetCmakeNameBuffer();
 
-    if (mode != 1) {
-        return;
+    if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+        down = 0;
+    } else {
+        __cntlzw(static_cast<unsigned int>(Pad._448_4_));
+        down = static_cast<unsigned short>(Pad.GetPadInputs()[0].buttonDown[0]);
     }
 
-    if (repeat == 0 && down == 0) {
-        return;
+    if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+        repeat = 0;
+    } else {
+        __cntlzw(static_cast<unsigned int>(Pad._448_4_));
+        repeat = Pad.GetPadInputs()[0].repeatButton;
+    }
+
+    if (repeat == 0) {
+        return 0;
     }
 
     if (mcState == 3) {
         int maxRow = (select < 10) ? 4 : 5;
-        if ((repeat & 0x4) != 0) {
-            row = (row < maxRow) ? static_cast<short>(row + 1) : 0;
-            Sound.PlaySe(1, 0x40, 0x7F, 0);
-        } else if ((repeat & 0x8) != 0) {
+        if ((repeat & 0x8) != 0) {
             row = (row > 0) ? static_cast<short>(row - 1) : static_cast<short>(maxRow);
+            Sound.PlaySe(1, 0x40, 0x7F, 0);
+        } else if ((repeat & 0x4) != 0) {
+            row = (row < maxRow) ? static_cast<short>(row + 1) : 0;
             Sound.PlaySe(1, 0x40, 0x7F, 0);
         }
 
@@ -1703,87 +1708,81 @@ void CMenuPcs::CmakeNameCtrl()
             }
         }
 
-        if ((down & 0x40) != 0) {
-            table = (table > 0) ? static_cast<short>(table - 1) : 2;
-            Sound.PlaySe(0x5A, 0x40, 0x7F, 0);
-        } else if ((down & 0x20) != 0) {
-            table = (table < 2) ? static_cast<short>(table + 1) : 0;
-            Sound.PlaySe(0x5A, 0x40, 0x7F, 0);
-        }
-
-        if ((down & 0x1000) != 0) {
-            select = 0xB;
-            row = 5;
-            Sound.PlaySe(2, 0x40, 0x7F, 0);
-            return;
-        }
-
-        if ((down & 0x200) != 0) {
-            size_t len = strlen(name);
-            if (len == 0) {
-                resultDir = -1;
-                resultFlag = 1;
-                mode = 2;
-                frame = 0;
-                ChgModel(static_cast<int>(MenuS16(this, 0x86A)), -1, -1, -1);
-                Sound.PlaySe(0x34, 0x40, 0x7F, 0);
-            } else {
-                name[len - 1] = '\0';
-                Sound.PlaySe(3, 0x40, 0x7F, 0);
-            }
-            return;
-        }
-
-        if ((down & 0x100) != 0) {
-            size_t len = strlen(name);
-            if (row < 5) {
-                if (len >= 7) {
-                    Sound.PlaySe(4, 0x40, 0x7F, 0);
-                    return;
-                }
-
-                const char* rowText = s_cmakeNameRows[table * 5 + row];
-                size_t rowLen = strlen(rowText);
-                if (select < 0 || static_cast<size_t>(select) >= rowLen || rowText[select] == '\0') {
-                    Sound.PlaySe(4, 0x40, 0x7F, 0);
-                    return;
-                }
-
-                name[len] = rowText[select];
-                name[len + 1] = '\0';
-                if (strlen(name) > 6) {
-                    select = 0xB;
-                    row = 5;
-                }
+        if ((repeat & 0xF) == 0) {
+            if ((down & 0x40) != 0) {
+                table = (table > 0) ? static_cast<short>(table - 1) : 2;
+                Sound.PlaySe(0x5A, 0x40, 0x7F, 0);
+            } else if ((down & 0x20) != 0) {
+                table = (table < 2) ? static_cast<short>(table + 1) : 0;
+                Sound.PlaySe(0x5A, 0x40, 0x7F, 0);
+            } else if ((down & 0x1000) != 0) {
+                select = 0xB;
+                row = 5;
                 Sound.PlaySe(2, 0x40, 0x7F, 0);
-                return;
-            }
+                return 0;
+            } else if ((down & 0x100) != 0) {
+                size_t len = strlen(name);
+                if (row < 5) {
+                    if (len >= 7) {
+                        Sound.PlaySe(4, 0x40, 0x7F, 0);
+                        return 0;
+                    }
 
-            if (IsCmakeNameBlank(name)) {
-                Sound.PlaySe(4, 0x40, 0x7F, 0);
-                return;
-            }
+                    const char* rowText = s_cmakeNameRows[table * 5 + row];
+                    size_t rowLen = strlen(rowText);
+                    if (select < 0 || static_cast<size_t>(select) >= rowLen || rowText[select] == '\0') {
+                        Sound.PlaySe(4, 0x40, 0x7F, 0);
+                        return 0;
+                    }
 
-            if (IsDuplicateCmakeName(this, name)) {
-                short winX = 0;
-                short winY = 0;
-                Sound.PlaySe(4, 0x40, 0x7F, 0);
-                GetWinSize(0x14, &winX, &winY, 0);
-                SetMcWinInfo((int)winX, (int)winY);
-                mcState = 0;
-                return;
-            }
+                    name[len] = rowText[select];
+                    name[len + 1] = '\0';
+                    if (strlen(name) > 6) {
+                        select = 0xB;
+                        row = 5;
+                    }
+                    Sound.PlaySe(2, 0x40, 0x7F, 0);
+                    return 0;
+                }
 
-            resultDir = 1;
-            resultFlag = 1;
-            mode = 2;
-            frame = 0;
-            Sound.PlaySe(2, 0x40, 0x7F, 0);
+                if (IsCmakeNameBlank(name)) {
+                    Sound.PlaySe(4, 0x40, 0x7F, 0);
+                    return 0;
+                }
+
+                if (IsDuplicateCmakeName(this, name)) {
+                    short winX = 0;
+                    short winY = 0;
+                    Sound.PlaySe(4, 0x40, 0x7F, 0);
+                    GetWinSize(0x14, &winX, &winY, 0);
+                    SetMcWinInfo((int)winX, (int)winY);
+                    mcState = 0;
+                    return 0;
+                }
+
+                resultDir = 1;
+                Sound.PlaySe(2, 0x40, 0x7F, 0);
+                return 1;
+            } else if ((down & 0x200) != 0) {
+                size_t len = strlen(name);
+                if (len == 0) {
+                    resultDir = -1;
+                    ChgModel(static_cast<int>(MenuS16(this, 0x86A)), -1, -1, -1);
+                    Sound.PlaySe(0x34, 0x40, 0x7F, 0);
+                    return -1;
+                } else {
+                    name[len - 1] = '\0';
+                    Sound.PlaySe(3, 0x40, 0x7F, 0);
+                }
+                return 0;
+            }
         }
     } else if (mcState == 1 && (down & 0x300) != 0) {
         Sound.PlaySe(2, 0x40, 0x7F, 0);
         mcState = 2;
     }
+
+    return 0;
 }
 
 /*

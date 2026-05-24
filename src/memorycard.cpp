@@ -1453,6 +1453,7 @@ unsigned int CMemoryCardMan::ChkCrc(Mc::SaveDat* saveData)
     unsigned char* crcData;
     int count;
     unsigned char* ptr;
+    unsigned char* ptr2;
     unsigned char* data = (unsigned char*)saveData;
 
     if (data == nullptr)
@@ -1478,12 +1479,12 @@ unsigned int CMemoryCardMan::ChkCrc(Mc::SaveDat* saveData)
         ptr++;
     }
 
-    ptr = crcData + 0x20;
+    ptr2 = crcData + 0x20;
     count = 0x8BB0;
     while (--count >= 0)
     {
-        crc = (crc << 8) ^ crcTable[(crc >> 24) ^ *ptr];
-        ptr++;
+        crc = (crc << 8) ^ crcTable[(crc >> 24) ^ *ptr2];
+        ptr2++;
     }
 
     return (unsigned int)__cntlzw((~crc) - *(unsigned int*)(data + 0x1C)) >> 5;

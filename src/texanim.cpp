@@ -582,14 +582,15 @@ void CTexAnimSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
         CTexAnimRefDataStorage* refData = reinterpret_cast<CTexAnimRefDataStorage*>(
             new (stage, const_cast<char*>(s_texanim_cpp), 0xD3) CTexAnim::CRefData);
         texAnim->refData = refData;
-        refData->texAnimSeqs.SetStage(stage);
+        reinterpret_cast<CTexAnimRefDataStorage*>(texAnim->refData)->texAnimSeqs.SetStage(stage);
 
         chunkFile.PushChunk();
         while ((int)chunkFile.GetNextChunk(middleChunk) != 0) {
             if ((int)middleChunk.m_id != seqTag) {
                 if (((int)middleChunk.m_id < seqTag) && ((int)middleChunk.m_id == nameTag)) {
-                    refData->texSrtIndex = middleChunk.m_arg0;
-                    strcpy(refData->name, chunkFile.GetString());
+                    reinterpret_cast<CTexAnimRefDataStorage*>(texAnim->refData)->texSrtIndex = middleChunk.m_arg0;
+                    strcpy(reinterpret_cast<CTexAnimRefDataStorage*>(texAnim->refData)->name,
+                           chunkFile.GetString());
                 }
                 continue;
             }
@@ -620,7 +621,8 @@ void CTexAnimSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
                 }
             }
             chunkFile.PopChunk();
-            refData->texAnimSeqs.Add(reinterpret_cast<CTexAnimSeq*>(seq));
+            reinterpret_cast<CTexAnimRefDataStorage*>(texAnim->refData)
+                ->texAnimSeqs.Add(reinterpret_cast<CTexAnimSeq*>(seq));
         }
         chunkFile.PopChunk();
         self->texAnims.Add(reinterpret_cast<CTexAnim*>(texAnim));

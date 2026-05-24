@@ -30,6 +30,10 @@ extern const float FLOAT_803311B8;
 extern const double DOUBLE_803311C0;
 extern const float FLOAT_803311C8;
 extern const char s_Exiting_803311CC[8];
+extern const u32 sYmEnvXAxisIdsWord;
+extern const u16 sYmEnvXAxisIdsTail;
+extern const u32 sYmEnvYAxisAngle0;
+extern const u32 sYmEnvYAxisAngle180;
 
 struct _pppEnvStYmEnv {
     void* m_stagePtr;
@@ -54,6 +58,16 @@ struct GraphValueState {
 struct Vec2d {
     float x;
     float y;
+};
+
+struct YmEnvPackedXAxisIds {
+    u32 m_word;
+    u16 m_tail;
+};
+
+struct YmEnvPackedYAxisAngles {
+    u32 m_zero;
+    u32 m_oneEighty;
 };
 
 struct PartMngEditRaw {
@@ -109,8 +123,13 @@ void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displa
     const unsigned char s_xAxisRotIndices[] = {0, 0, 0, 0, 1, 1, 0, 0, 2, 0};
     const unsigned char s_yAxisRotIndices[] = {1, 3, 4, 2, 1, 0, 4, 3, 0, 0};
     const float s_xAxisAngles[] = {90.0f, 180.0f, 270.0f, 180.0f, -90.0f, 90.0f};
-    const unsigned char s_xAxisIds[] = {'y', 'y', 'y', 'y', 'x', 'x'};
-    const float s_yAxisAngles[] = {0.0f, 180.0f};
+    YmEnvPackedXAxisIds s_xAxisIds;
+    YmEnvPackedYAxisAngles s_yAxisAngles;
+
+    s_xAxisIds.m_word = sYmEnvXAxisIdsWord;
+    s_xAxisIds.m_tail = sYmEnvXAxisIdsTail;
+    s_yAxisAngles.m_zero = sYmEnvYAxisAngle0;
+    s_yAxisAngles.m_oneEighty = sYmEnvYAxisAngle180;
 
     const unsigned int texWidth = GXGetTexObjWidth(targetTexObj);
     const unsigned int texHeight = GXGetTexObjHeight(targetTexObj);
@@ -236,13 +255,13 @@ void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displa
 
         PSMTXIdentity(objectMtx);
 
-        const float yAxisAngle = s_yAxisAngles[yRotIdx];
+        const float yAxisAngle = reinterpret_cast<const float*>(&s_yAxisAngles)[yRotIdx];
         if (yAxisAngle != kZero) {
             PSMTXRotRad(tempMtx, 'y', FLOAT_803311A0 * yAxisAngle);
             PSMTXConcat(objectMtx, tempMtx, objectMtx);
         }
 
-        PSMTXRotRad(tempMtx, s_xAxisIds[xRotIdx], kDegToRad * s_xAxisAngles[xRotIdx]);
+        PSMTXRotRad(tempMtx, reinterpret_cast<const char*>(&s_xAxisIds)[xRotIdx], kDegToRad * s_xAxisAngles[xRotIdx]);
         PSMTXConcat(objectMtx, tempMtx, objectMtx);
         PSMTXConcat(lightFrustumMtx, objectMtx, objectMtx);
 

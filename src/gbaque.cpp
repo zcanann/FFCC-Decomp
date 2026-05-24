@@ -114,6 +114,9 @@ STATIC_ASSERT(sizeof(GbaQueueSetQueueView) == 0x444);
 
 enum {
 	kGbaQueueScratchTextSize = 0x400,
+	kGbaQueuePlayerDataChannelCount = 4,
+	kGbaQueuePlayerDataBlockBytes = sizeof(GbaQueuePlayerDataView) * kGbaQueuePlayerDataChannelCount,
+	kGbaQueueCaravanNameBlockBytes = 0x80,
 	kGbaQueueLetterNpcNameBytes = 0x800,
 	kGbaQueueLetterSubjectNameBytes = 0x1800,
 	kGbaQueueLetterEntryAllocWords = 0x1000,
@@ -124,6 +127,9 @@ enum {
 	kGbaQueueLetterSubjectNameEntryBytes = 0x18,
 };
 
+STATIC_ASSERT(kGbaQueuePlayerDataBlockBytes == 0x370);
+STATIC_ASSERT(sizeof(GbaPInfo) == kGbaQueuePlayerDataBlockBytes);
+
 static inline GbaQueueFlagView* GetFlagView(GbaQueue* gbaQueue)
 {
 	return reinterpret_cast<GbaQueueFlagView*>(gbaQueue);
@@ -132,6 +138,11 @@ static inline GbaQueueFlagView* GetFlagView(GbaQueue* gbaQueue)
 static inline GbaQueuePlayerDataView* GetPlayerDataView(GbaQueue* gbaQueue, int channel)
 {
 	return reinterpret_cast<GbaQueuePlayerDataView*>(reinterpret_cast<unsigned char*>(gbaQueue) + channel * 0xDC + 0x454);
+}
+
+static inline GbaQueuePlayerDataView* GetPlayerDataBlock(GbaQueue* gbaQueue)
+{
+	return GetPlayerDataView(gbaQueue, 0);
 }
 
 static inline unsigned short SwapU16(unsigned short value)
@@ -203,13 +214,13 @@ void GbaQueue::Init()
 	memset(obj + 0x30, 0, 0x400);
 	memset(obj + 0x430, 0, 0x10);
 	memset(obj + 0x440, 0, 4);
-	memset(obj + 0x454, 0, 0x370);
-	memset(obj + 0x7C4, 0, 0x370);
+	memset(GetPlayerDataBlock(this), 0, kGbaQueuePlayerDataBlockBytes);
+	memset(obj + 0x7C4, 0, kGbaQueuePlayerDataBlockBytes);
 	memset(obj + 0xB34, 0, 0x500);
 	memset(obj + 0x1034, 0, 0x1400);
 	memset(obj + 0x2434, 0, 0x140);
 	memset(obj + 0x2574, 0, 0x500);
-	memset(obj + 0x2A74, 0, 0x80);
+	memset(obj + 0x2A74, 0, kGbaQueueCaravanNameBlockBytes);
 	memset(obj + 0x2B00, 0, 0x188);
 	memset(obj + 0x2C8E, 0, 8);
 	memset(cmakeInfo, 0, sizeof(cmakeInfo));
@@ -1375,8 +1386,8 @@ void GbaQueue::LoadAllStat()
  */
 void GbaQueue::LoadPlayerStat()
 {
-	unsigned char localNames[0x80];
-	unsigned char localPlayerStat[0x370];
+	unsigned char localNames[kGbaQueueCaravanNameBlockBytes];
+	unsigned char localPlayerStat[kGbaQueuePlayerDataBlockBytes];
 	GbaQueue* semaphoreIter;
 	unsigned int outOfShoukiMask;
 	int i;
@@ -1519,9 +1530,9 @@ void GbaQueue::LoadPlayerStat()
 	} while (i < 4);
 
 	obj = reinterpret_cast<char*>(this);
-	memcpy(obj + 0x7C4, obj + 0x454, 0x370);
-	memcpy(obj + 0x454, localPlayerStat, 0x370);
-	memcpy(obj + 0x2A74, localNames, 0x80);
+	memcpy(obj + 0x7C4, GetPlayerDataBlock(this), kGbaQueuePlayerDataBlockBytes);
+	memcpy(GetPlayerDataBlock(this), localPlayerStat, kGbaQueuePlayerDataBlockBytes);
+	memcpy(obj + 0x2A74, localNames, kGbaQueueCaravanNameBlockBytes);
 
 	obj[0x2D59] = obj[0x2D5A];
 	obj[0x2D5A] = static_cast<char>(outOfShoukiMask);
@@ -2050,7 +2061,7 @@ int GbaQueue::GetMapObjInfo(int channel, unsigned char* outData)
 void GbaQueue::GetPlayerStat(int channel, GbaPInfo* outInfo)
 {
 	OSWaitSemaphore(accessSemaphores + channel);
-	memcpy(outInfo, reinterpret_cast<char*>(this) + 0x454, 0x370);
+	memcpy(outInfo, GetPlayerDataBlock(this), sizeof(*outInfo));
 	OSSignalSemaphore(accessSemaphores + channel);
 }
 
@@ -2069,7 +2080,7 @@ void GbaQueue::GetCaravanName(char* outName)
 		OSWaitSemaphore(accessSemaphores + i);
 	}
 
-	memcpy(outName, reinterpret_cast<char*>(this) + 0x2A74, 0x80);
+	memcpy(outName, reinterpret_cast<char*>(this) + 0x2A74, kGbaQueueCaravanNameBlockBytes);
 
 	for (int i = 0; i < 4; i++) {
 		OSSignalSemaphore(accessSemaphores + i);

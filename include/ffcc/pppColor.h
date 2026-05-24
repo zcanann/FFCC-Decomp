@@ -1,7 +1,7 @@
 #ifndef _FFCC_PPPCOLOR_H_
 #define _FFCC_PPPCOLOR_H_
 
-
+#include "ffcc/ppp_linkage.h"
 
 struct _pppPObject;
 struct _pppCtrlTable;
@@ -22,8 +22,6 @@ struct _pppColorWork
     _pppColor result; // 0x8
 }; // Size 0xC
 
-// External data references used by pppColor
-extern int gPppCalcDisabled;
 struct _pppMngSt;
 extern _pppMngSt* pppMngStPtr;
 extern const double kPppColorScale;

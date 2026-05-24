@@ -1561,35 +1561,33 @@ inline void CSound::ChangeSePan(int, int, int)
  */
 int CSound::SetSe3DGroup(int se3dHandle, int group)
 {
-    int result;
     if (se3dHandle < 0) {
         System.Printf(const_cast<char*>(s_soundMinusOneFmt));
-        result = 0;
-    } else {
-        char* se = reinterpret_cast<char*>(this) + 0x2C;
-        char* found;
-        result = 0;
-        int count = 0x20;
-        do {
-            if ((((static_cast<u8>(*se) >> 7) & 1) != 0 &&
-                  (found = se, *reinterpret_cast<int*>(se + 4) == se3dHandle)) ||
-                 (((static_cast<u8>(*(se += 0x28)) >> 7) & 1) != 0 &&
-                  (found = se, *reinterpret_cast<int*>(se + 4) == se3dHandle)) ||
-                 (((static_cast<u8>(*(se += 0x28)) >> 7) & 1) != 0 &&
-                  (found = se, *reinterpret_cast<int*>(se + 4) == se3dHandle)) ||
-                 (((static_cast<u8>(*(se += 0x28)) >> 7) & 1) != 0 &&
-                  (found = se, *reinterpret_cast<int*>(se + 4) == se3dHandle))) {
-                goto found_se;
-            }
-            result += 3;
-            se += 0x28;
-            count--;
-        } while (count != 0);
-        found = 0;
-found_se:
-        if (found != 0) {
-            *reinterpret_cast<int*>(found + 0x24) = group;
+        return 0;
+    }
+
+    char* se = reinterpret_cast<char*>(this) + 0x2C;
+    char* found;
+    int result = 0;
+    int count;
+    for (count = 0x20; count != 0; count--) {
+        if ((((static_cast<u8>(*se) >> 7) & 1) != 0 &&
+              (found = se, *reinterpret_cast<int*>(se + 4) == se3dHandle)) ||
+             (((static_cast<u8>(*(se += 0x28)) >> 7) & 1) != 0 &&
+              (found = se, *reinterpret_cast<int*>(se + 4) == se3dHandle)) ||
+             (((static_cast<u8>(*(se += 0x28)) >> 7) & 1) != 0 &&
+              (found = se, *reinterpret_cast<int*>(se + 4) == se3dHandle)) ||
+             (((static_cast<u8>(*(se += 0x28)) >> 7) & 1) != 0 &&
+              (found = se, *reinterpret_cast<int*>(se + 4) == se3dHandle))) {
+            goto found_se;
         }
+        result += 3;
+        se += 0x28;
+    }
+    found = 0;
+found_se:
+    if (found != 0) {
+        *reinterpret_cast<int*>(found + 0x24) = group;
     }
     return result;
 }
@@ -1891,6 +1889,7 @@ void CSound::StopSe3DGroup(int group)
                 System.Printf(const_cast<char*>(s_soundMinusOneFmt));
             } else {
                 char* found = reinterpret_cast<char*>(this) + 0x2C;
+                int idx = 0;
                 int count;
 
                 for (count = 0x20; count != 0; count--) {
@@ -1921,6 +1920,7 @@ void CSound::StopSe3DGroup(int group)
                         }
                     }
 
+                    idx += 3;
                     found += 0x28;
                 }
                 found = 0;
@@ -1928,7 +1928,7 @@ found_se:
                 if (found != 0) {
                     int playId = *reinterpret_cast<int*>(found + 8);
                     if (playId < 0) {
-                        System.Printf(const_cast<char*>(s_soundMinusOneFmt));
+                        System.Printf(const_cast<char*>(s_soundMinusOneFmt), idx);
                     } else {
                         RedSound(this)->SeStop(playId);
                     }

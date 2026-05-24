@@ -22,8 +22,8 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
 extern unsigned char ARRAY_8030918c[];
-extern "C" const char DAT_803319ec[3];
-extern "C" const char DAT_80331a4c[3];
+extern "C" const char s_monObjTexAnimU1[3];
+extern "C" const char s_monObjTexAnimU0[3];
 extern "C" {
 u8 m_aiWork__8CGMonObj[0xC];
 u8 m_boss__8CGMonObj[0x8C];
@@ -282,7 +282,7 @@ void CGMonObj::undeadOff()
 	}
 
 	if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xFC) == 0xB) {
-		object->SetTexAnim(const_cast<char*>(DAT_80331a4c));
+		object->SetTexAnim(const_cast<char*>(s_monObjTexAnimU0));
 	}
 
 	mon[0x6BA] = 1;
@@ -327,7 +327,7 @@ void CGMonObj::undeadOn()
 	}
 
 	if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xFC) == 0xB) {
-		object->SetTexAnim(const_cast<char*>(DAT_803319ec));
+		object->SetTexAnim(const_cast<char*>(s_monObjTexAnimU1));
 	}
 
 	if (static_cast<int>((static_cast<unsigned int>(object->m_weaponNodeFlags) << 24)) < 0) {
@@ -2640,7 +2640,7 @@ void CGMonObj::setRepop(int mode)
 	}
 
 	if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(scriptHandle[9]) + 0xFC) == 0xB) {
-		object->SetTexAnim(const_cast<char*>(DAT_803319ec));
+		object->SetTexAnim(const_cast<char*>(s_monObjTexAnimU1));
 	}
 
 	if (static_cast<int>((static_cast<unsigned int>(object->m_weaponNodeFlags) << 24)) < 0) {

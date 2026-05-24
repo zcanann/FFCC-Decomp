@@ -16,7 +16,7 @@
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h"
 #include "ffcc/ppp_linkage.h"
 
-extern const char DAT_803311fc;
+extern const char s_pppEmissionShapeObj2;
 extern const float FLOAT_803311e0;
 extern const float FLOAT_803311e4;
 extern const float FLOAT_803311f8;
@@ -362,7 +362,7 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
     EmissionState* state = (EmissionState*)param_2;
     pppEmissionUnkB* step = (pppEmissionUnkB*)param_3;
     EmissionMeshData* meshData = EmissionMeshAt(modelView, meshIndex);
-    if ((strcmp((const char*)meshData, &DAT_803311fc) == 0) && (state->m_colorA != 0)) {
+    if ((strcmp((const char*)meshData, &s_pppEmissionShapeObj2) == 0) && (state->m_colorA != 0)) {
         int texture = state->m_texture;
         u32 drawTevBits = 0xACE0F;
 
@@ -508,7 +508,7 @@ void Emission_DrawMeshDLCallback(CChara::CModel* model, void*, void*, int meshIn
     EmissionDisplayList* displayList = meshData->m_displayLists;
     displayList += displayListIndex;
 
-    if (strcmp((const char*)meshData, &DAT_803311fc) == 0) {
+    if (strcmp((const char*)meshData, &s_pppEmissionShapeObj2) == 0) {
         meshData->m_colors[0] = 0;
         meshData->m_colors[1] = 0;
         meshData->m_colors[2] = 0;

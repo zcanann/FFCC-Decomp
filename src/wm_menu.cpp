@@ -236,6 +236,18 @@ struct WmCharaSelectEntry
 
 STATIC_ASSERT(sizeof(WmCharaSelectEntry) == 0x10);
 
+struct WmMenuWindowState
+{
+	short x;
+	short y;
+	short w;
+	short h;
+	short frame;
+	short state;
+};
+
+STATIC_ASSERT(sizeof(WmMenuWindowState) == 0x0C);
+
 struct GbaCMakeInfoRaw
 {
 	unsigned char m_active;        // 0x00
@@ -547,8 +559,8 @@ void CMenuPcs::loadData()
 	reinterpret_cast<void**>(bytes + 0x824)[0] = new unsigned char[0x1A0];
 	memset(reinterpret_cast<void**>(bytes + 0x824)[0], 0, 0x1A0);
 
-	reinterpret_cast<void**>(bytes + 0x828)[0] = new unsigned char[0x80];
-	memset(reinterpret_cast<void**>(bytes + 0x828)[0], 0, 0x80);
+	reinterpret_cast<void**>(bytes + 0x828)[0] = new unsigned char[sizeof(WmCharaSelectEntry) * 8];
+	memset(reinterpret_cast<void**>(bytes + 0x828)[0], 0, sizeof(WmCharaSelectEntry) * 8);
 
 	reinterpret_cast<void**>(bytes + 0x82C)[0] = new unsigned char[0x48];
 	memset(reinterpret_cast<void**>(bytes + 0x82C)[0], 0, 0x48);
@@ -572,8 +584,8 @@ void CMenuPcs::loadData()
 	reinterpret_cast<void**>(bytes + 0x844)[0] = new unsigned char[0xA0];
 	memset(reinterpret_cast<void**>(bytes + 0x844)[0], 0, 0xA0);
 
-	reinterpret_cast<void**>(bytes + 0x848)[0] = new unsigned char[0x0C];
-	memset(reinterpret_cast<void**>(bytes + 0x848)[0], 0, 0x0C);
+	reinterpret_cast<void**>(bytes + 0x848)[0] = new unsigned char[sizeof(WmMenuWindowState)];
+	memset(reinterpret_cast<void**>(bytes + 0x848)[0], 0, sizeof(WmMenuWindowState));
 
 	InitFrameInfo();
 	InitCharaInfo();

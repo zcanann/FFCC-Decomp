@@ -121,13 +121,13 @@ void CMenuPcs::MLstDraw()
 		font->GetWidth(text);
 
 		float textX = (float)(item->x + 0x28);
-		float textY = (float)(item->y + 3) - FLOAT_803333F4;
+		float textY = (float)(item->y + 3);
 		if ((menuMode == 1) && (i == this->lstState->cursor)) {
 			textX = (float)(textX + DOUBLE_803333D8);
 		}
 
 		font->SetPosX(textX);
-		font->SetPosY(textY);
+		font->SetPosY(textY - FLOAT_803333F4);
 		font->Draw(text);
 
 		item++;

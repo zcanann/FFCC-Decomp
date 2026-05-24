@@ -157,7 +157,7 @@ public:
 	void ResetNewGame();
 
 private:
-	void onClassSystemFunc(CFlatRuntime::CObject*, int, int, int&);
+	int onClassSystemFunc(CFlatRuntime::CObject*, int, int, int&);
 	CFlatRuntime::CVal* onClassSystemVal(CFlatRuntime::CObject*, int);
 	void onSetClassSystemVal(int, CFlatRuntime::CObject*, CFlatRuntime::CStack*, int);
 

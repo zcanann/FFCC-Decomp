@@ -368,8 +368,8 @@ void CFunnyShape::ClearAnmData()
         m_anm.anmData = 0;
     }
 
-    memset(this, 0, 0x30);
-    memset(&m_anm, 0, 0x10);
+    memset(this, 0, sizeof(CFunnyShapeAnmWork));
+    memset(&m_anm, 0, sizeof(OSFS_ANM_ST));
 }
 
 /*
@@ -756,10 +756,10 @@ CFunnyShape::~CFunnyShape()
 CFunnyShape::CFunnyShape()
 {
     m_meshData = 0;
-    memset(this, 0, 0x6000);
-    memset(&m_anm, 0, 0x10);
-    memset(&m_shape, 0, 0x10);
-    memset(&m_displayCurrent, 0, 0x40);
+    memset(this, 0, sizeof(m_anmWork));
+    memset(&m_anm, 0, sizeof(OSFS_ANM_ST));
+    memset(&m_shape, 0, sizeof(OSFS_SHAPE_ST));
+    memset(&m_displayCurrent, 0, sizeof(FS_DISPLAY_STATUS));
 
     CFunnyShape* p = this;
     for (s32 i = 2; i != 0; i--) {

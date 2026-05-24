@@ -701,9 +701,9 @@ void CMenuPcs::CalcOptionMenu()
 {
 	unsigned char* const self = reinterpret_cast<unsigned char*>(this);
 	unsigned short press;
-	bool optionChanged = false;
+	unsigned int pressRaw;
 
-	press = GetMenuPress();
+	pressRaw = GetMenuPress();
 
 	signed char& menuState = *reinterpret_cast<signed char*>(self + 0x9C);
 	float& openAnim = *reinterpret_cast<float*>(self + 0x98);
@@ -720,6 +720,8 @@ void CMenuPcs::CalcOptionMenu()
 	signed char& rightHintTimer = *reinterpret_cast<signed char*>(self + 0x94);
 	int& specialModeEdit = *reinterpret_cast<int*>(self + 0xB0);
 	signed char& specialModeCursor = *reinterpret_cast<signed char*>(self + 0xB4);
+	press = static_cast<unsigned short>(pressRaw);
+	bool optionChanged = false;
 
 	if (menuState == 0) {
 		openAnim += kOptionOpenAnimStep;

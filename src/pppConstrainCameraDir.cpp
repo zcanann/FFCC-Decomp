@@ -119,4 +119,4 @@ void pppConstructConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir
 }
 
 extern const float kConstrainCameraDirAspectScale = 1.3333f;
-extern const float FLOAT_803331ec = 0.0f;
+extern const float kConstrainCameraDirLocalZero = 0.0f;

@@ -85,7 +85,7 @@ void CFunnyShapePcs::SetUSBData()
         m_displayTextureEnabled = 0;
         break;
     case 12: {
-        memcpy(&m_displayPending, usb->m_data, 0x40);
+        memcpy(&m_displayPending, usb->m_data, sizeof(FS_DISPLAY_STATUS));
         StoreSwap32(&m_displayPending.flags);
         StoreSwap32(&m_displayPending.unk08);
         StoreSwap32(&m_displayPending.unk0C);
@@ -99,7 +99,7 @@ void CFunnyShapePcs::SetUSBData()
         m_displayPending.unk2A = LoadSwap16(m_displayPending.unk2A);
         StoreSwap32(&m_displayPending.unk2C);
         StoreSwap32(&m_displayPending.unk30);
-        DCStoreRange(&m_displayPending, 0x40);
+        DCStoreRange(&m_displayPending, sizeof(FS_DISPLAY_STATUS));
 
         GXColor clear;
         clear.r = m_displayPending.clear.r;
@@ -150,14 +150,15 @@ void CFunnyShapePcs::SetUSBData()
         reinterpret_cast<u16*>(tmp)[0x10] = LoadSwapU16(reinterpret_cast<u16*>(tmp)[0x10]);
         reinterpret_cast<u16*>(tmp)[0x11] = LoadSwapU16(reinterpret_cast<u16*>(tmp)[0x11]);
 
-        DCFlushRange(tmp, 0x30);
-        memcpy(m_textureHeaders[m_textureCount], tmp, 0x30);
+        DCFlushRange(tmp, sizeof(OSFS_TEXTURE_ST));
+        memcpy(m_textureHeaders[m_textureCount], tmp, sizeof(OSFS_TEXTURE_ST));
 
         m_textureData[m_textureCount] =
             new (FunnyShapePcs.m_viewerStage, const_cast<char*>(s_FS_USB_Process_cpp), 0x6C)
-                u8[usb->m_sizeBytes - 0x30];
-        memcpy(m_textureData[m_textureCount], tmp + 0x18, usb->m_sizeBytes - 0x30);
-        DCFlushRange(m_textureData[m_textureCount], usb->m_sizeBytes - 0x30);
+                u8[usb->m_sizeBytes - sizeof(OSFS_TEXTURE_ST)];
+        memcpy(m_textureData[m_textureCount], tmp + sizeof(OSFS_TEXTURE_ST) / sizeof(*tmp),
+               usb->m_sizeBytes - sizeof(OSFS_TEXTURE_ST));
+        DCFlushRange(m_textureData[m_textureCount], usb->m_sizeBytes - sizeof(OSFS_TEXTURE_ST));
 
         m_texObjData[m_textureCount] =
             new (FunnyShapePcs.m_viewerStage, const_cast<char*>(s_FS_USB_Process_cpp), 0x73)
@@ -176,8 +177,8 @@ void CFunnyShapePcs::SetUSBData()
             delete[] static_cast<u8*>(m_anm.anmData);
             m_anm.anmData = 0;
         }
-        memset(FunnyShape(this), 0, 0x30);
-        memcpy(&m_anm, usb->m_data, 0x10);
+        memset(FunnyShape(this), 0, sizeof(CFunnyShapeAnmWork));
+        memcpy(&m_anm, usb->m_data, sizeof(OSFS_ANM_ST));
         StoreSwap32(&m_anm.unk00);
         m_anm.unk04 = LoadSwap16(m_anm.unk04);
         m_anm.unk06 = LoadSwap16(m_anm.unk06);

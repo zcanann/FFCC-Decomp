@@ -3,9 +3,6 @@
 #include "ffcc/pppPart.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppShape.h"
-extern "C" {
-extern int gPppCalcDisabled;
-}
 #include <dolphin/mtx.h>
 #include <dolphin/os.h>
 #include <string.h>

@@ -23,8 +23,6 @@
 #include "ffcc/pppDrawMng.h"
 #include "ffcc/pppShape.h"
 extern "C" {
-extern int gPppCalcDisabled;
-extern unsigned char gPppInConstructor;
 extern float gPartScreenMatrixRow2W;
 }
 #include "ffcc/gxfunc.h"

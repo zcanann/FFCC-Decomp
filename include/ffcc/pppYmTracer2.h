@@ -11,7 +11,7 @@ struct TRACE_POLYGON;
 struct pppYmTracer2UnkB {
     s32 m_graphId;
     s32 m_dataValIndex;
-    s32 m_initWOrk;
+    s32 m_initWork;
     s32 m_stepValue;
     s32 m_arg3;
     union {

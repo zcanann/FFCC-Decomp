@@ -4,9 +4,6 @@
 #include "ffcc/pppPart.h"
 #include "ffcc/pppShape.h"
 #include "ffcc/p_camera.h"
-extern "C" {
-extern int gPppCalcDisabled;
-}
 
 #include <dolphin/gx.h>
 #include <dolphin/gx/GXCpu2Efb.h>

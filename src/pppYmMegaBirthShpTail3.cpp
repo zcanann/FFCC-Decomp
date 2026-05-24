@@ -13,7 +13,6 @@ extern const float FLOAT_803305C8;
 extern const float FLOAT_803305CC;
 extern const float FLOAT_803305D0;
 extern const float FLOAT_803305D4;
-extern int gPppCalcDisabled;
 }
 #include "dolphin/mtx.h"
 #include <string.h>
@@ -279,10 +278,10 @@ void pppFrameYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthShp
         }
 
         work->m_wmats = (_PARTICLE_WMAT*)pppMemAlloc(
-            work->m_maxParticles * 0x30, pppEnvStPtr->m_stagePtr,
+            work->m_maxParticles * sizeof(_PARTICLE_WMAT), pppEnvStPtr->m_stagePtr,
             const_cast<char*>(s_pppYmMegaBirthShpTail3_cpp), 0x2e3);
         if (work->m_wmats != 0) {
-            memset(work->m_wmats, 0, work->m_maxParticles * 0x30);
+            memset(work->m_wmats, 0, work->m_maxParticles * sizeof(_PARTICLE_WMAT));
         }
 
         work->m_tailScaleDirection = param->m_directionTail;
@@ -531,10 +530,10 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirthShpTail3,
 
     memset(particleData, 0, 0x1f8);
     if (particleWMat != 0) {
-        memset(particleWMat, 0, 0x30);
+        memset(particleWMat, 0, sizeof(_PARTICLE_WMAT));
     }
     if (particleColor != 0) {
-        memset(particleColor, 0, 0x20);
+        memset(particleColor, 0, sizeof(_PARTICLE_COLOR));
     }
 
     if (mode < 8) {

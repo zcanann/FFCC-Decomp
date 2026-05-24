@@ -25,22 +25,22 @@ static inline s8 GetGrassActiveFlag(const WindGrassObject* obj)
     return static_cast<s8>((((int)(obj->flags & 0xC0)) << 24) >> 31);
 }
 
-const float FLOAT_80330ef0 = 0.0f;
-const float FLOAT_80330ef4 = 0.0001f;
-const float FLOAT_80330ef8 = 1.0f;
-const float FLOAT_80330f20 = 0.5f;
-const float FLOAT_80330f24 = -0.25f;
-const float FLOAT_80330f28 = 0.1f;
-const float FLOAT_80330f2c = 0.2f;
-const float FLOAT_80330f30 = -0.1f;
-const float FLOAT_80330f34 = 0.25f;
-const float FLOAT_80330f38 = 0.05f;
-const float FLOAT_80330f18 = -0.5f;
-const float FLOAT_80330f1c = 255.0f;
-const double DOUBLE_80330f00 = 0.5;
-const double DOUBLE_80330f08 = 3.0;
-const double DOUBLE_80330f10 = 0.0;
-const double DOUBLE_80330f40 = 4503601774854144.0;
+const float kWindZero = 0.0f;
+const float kWindMinDistanceSq = 0.0001f;
+const float kWindOne = 1.0f;
+const float kWindHalf = 0.5f;
+const float kWindQuarterNegative = -0.25f;
+const float kWindPowerLowThreshold = 0.1f;
+const float kWindDirPositiveJitter = 0.2f;
+const float kWindDirNegativeJitter = -0.1f;
+const float kWindDirMaxOffset = 0.25f;
+const float kWindLerpRate = 0.05f;
+const float kWindVerticalBase = -0.5f;
+const float kWindAlphaScale = 255.0f;
+const double kWindSqrtNewtonHalf = 0.5;
+const double kWindSqrtNewtonThree = 3.0;
+const double kWindSqrtMinInput = 0.0;
+const double kWindSignedIntBias = 4503601774854144.0;
 extern "C" {
 const char sWindAddSphereFailedMsg[] = {
     0x95, 0x97, 0x82, 0xF0, 0x92, 0xC7, 0x89, 0xC1, 0x82, 0xC5, 0x82, 0xAB, 0x82, 0xDC, 0x82, 0xB9,
@@ -64,15 +64,15 @@ static inline float WindSqrtf(float x)
     } bits;
     int fpclass;
 
-    if (x > FLOAT_80330ef0) {
+    if (x > kWindZero) {
         double guess = __frsqrte((double)x);
-        guess = DOUBLE_80330f00 * guess * (DOUBLE_80330f08 - guess * guess * x);
-        guess = DOUBLE_80330f00 * guess * (DOUBLE_80330f08 - guess * guess * x);
-        guess = DOUBLE_80330f00 * guess * (DOUBLE_80330f08 - guess * guess * x);
+        guess = kWindSqrtNewtonHalf * guess * (kWindSqrtNewtonThree - guess * guess * x);
+        guess = kWindSqrtNewtonHalf * guess * (kWindSqrtNewtonThree - guess * guess * x);
+        guess = kWindSqrtNewtonHalf * guess * (kWindSqrtNewtonThree - guess * guess * x);
         return (float)(x * guess);
     }
 
-    if ((double)x < DOUBLE_80330f10) {
+    if ((double)x < kWindSqrtMinInput) {
         return NAN;
     }
 
@@ -414,8 +414,8 @@ void CWind::Calc(Vec* out, const Vec* pos, int randomize)
     Vec randTmp;
     Vec tmp;
     Vec tmp2;
-    zero = FLOAT_80330ef0;
-    out->z = FLOAT_80330ef0;
+    zero = kWindZero;
+    out->z = kWindZero;
     out->y = zero;
     out->x = zero;
 
@@ -438,21 +438,21 @@ void CWind::Calc(Vec* out, const Vec* pos, int randomize)
                 const float deltaZ = pos->z - obj->centerZ;
                 const float deltaX = pos->x - obj->centerX;
                 float distanceSq = deltaX * deltaX + deltaZ * deltaZ;
-                if (distanceSq < FLOAT_80330ef4) {
-                    distanceSq = FLOAT_80330ef4;
+                if (distanceSq < kWindMinDistanceSq) {
+                    distanceSq = kWindMinDistanceSq;
                 }
 
                 if (obj->type == 2) {
                     if (distanceSq < obj->radiusSq) {
-                        const float lifeScale = FLOAT_80330ef8 - obj->lifeRatio * obj->lifeRatio;
+                        const float lifeScale = kWindOne - obj->lifeRatio * obj->lifeRatio;
                         const float distance = WindSqrtf(distanceSq);
                         const float forceScale = lifeScale / distance;
                         out->x += deltaX * forceScale;
-                        out->y += (FLOAT_80330f18 + Math.RandF()) * lifeScale;
+                        out->y += (kWindVerticalBase + Math.RandF()) * lifeScale;
                         out->z += deltaZ * forceScale;
                     }
                 } else {
-                    PSVECScale(&obj->force, &tmp2, FLOAT_80330ef8 - distanceSq / obj->radiusSq);
+                    PSVECScale(&obj->force, &tmp2, kWindOne - distanceSq / obj->radiusSq);
                     PSVECAdd(out, &tmp2, out);
                 }
             }
@@ -499,13 +499,13 @@ void CWind::Draw()
                 if (obj->type == 1) {
                     const CColor& color = CColor(0xff, 0xff, 0, 0xff);
                     Graphic.DrawSphere(viewMtx,
-                                       reinterpret_cast<Vec*>(&CVector(obj->centerX, FLOAT_80330ef0, obj->centerZ)),
+                                       reinterpret_cast<Vec*>(&CVector(obj->centerX, kWindZero, obj->centerZ)),
                                        obj->radius, const_cast<_GXColor*>(&color.color));
                 } else {
-                    u8 alpha = (u8)(FLOAT_80330f1c * (FLOAT_80330ef8 - obj->lifeRatio));
+                    u8 alpha = (u8)(kWindAlphaScale * (kWindOne - obj->lifeRatio));
                     const CColor& color = CColor(0xff, 0xff, 0x80, alpha);
                     Graphic.DrawSphere(viewMtx,
-                                       reinterpret_cast<Vec*>(&CVector(obj->centerX, FLOAT_80330ef0, obj->centerZ)),
+                                       reinterpret_cast<Vec*>(&CVector(obj->centerX, kWindZero, obj->centerZ)),
                                        obj->radius, const_cast<_GXColor*>(&color.color));
                 }
             }
@@ -543,14 +543,14 @@ void CWind::Frame()
             if (rnd == 0) {
                 rnd = Math.Rand(3);
                 if (rnd == 0) {
-                    f2 = FLOAT_80330f20;
+                    f2 = kWindHalf;
                 } else {
-                    f2 = FLOAT_80330f24;
+                    f2 = kWindQuarterNegative;
                 }
 
                 obj->targetPower = f2 * obj->basePower + obj->targetPower;
                 f0 = obj->targetPower;
-                f1 = FLOAT_80330ef0;
+                f1 = kWindZero;
                 if (!(f0 < f1)) {
                     f1 = obj->basePower;
                     if (!(f1 < f0)) {
@@ -561,19 +561,19 @@ void CWind::Frame()
             }
 
             if ((((obj->type == 0) || (obj->type == 1)) && ((rnd = Math.Rand(0x1E)), rnd == 0)) &&
-                (obj->curPower < FLOAT_80330f28 * obj->basePower)) {
+                (obj->curPower < kWindPowerLowThreshold * obj->basePower)) {
                 rnd = Math.Rand(3);
                 if (rnd == 0) {
-                    f2 = FLOAT_80330f2c;
+                    f2 = kWindDirPositiveJitter;
                 } else {
-                    f2 = FLOAT_80330f30;
+                    f2 = kWindDirNegativeJitter;
                 }
 
                 obj->targetDir = f2 * obj->baseDir + obj->targetDir;
                 f0 = obj->targetDir;
                 f1 = obj->baseDir;
                 if (!(f0 < f1)) {
-                    f2 = FLOAT_80330f34 + f1;
+                    f2 = kWindDirMaxOffset + f1;
                     f1 = f0;
                     if (f2 < f0) {
                         f1 = f2;
@@ -600,16 +600,16 @@ void CWind::Frame()
 
             f0 = obj->targetPower;
             f1 = obj->curPower;
-            f2 = FLOAT_80330f38;
+            f2 = kWindLerpRate;
             obj->curPower = f2 * (f0 - f1) + f1;
             f0 = Math.RandF();
             f1 = obj->targetDir;
             f2 = obj->curDir;
-            obj->curDir = f2 + (FLOAT_80330f2c * f0 + (FLOAT_80330f38 * (f1 - f2) - FLOAT_80330f28));
+            obj->curDir = f2 + (kWindDirPositiveJitter * f0 + (kWindLerpRate * (f1 - f2) - kWindPowerLowThreshold));
 
             if ((obj->type == 0) || (obj->type == 1)) {
                 obj->force.x = obj->curPower * (float)sin((double)obj->curDir);
-                obj->force.y = obj->curPower * (FLOAT_80330f20 * Math.RandF() + FLOAT_80330f24);
+                obj->force.y = obj->curPower * (kWindHalf * Math.RandF() + kWindQuarterNegative);
                 obj->force.z = obj->curPower * (float)cos((double)obj->curDir);
             }
         }

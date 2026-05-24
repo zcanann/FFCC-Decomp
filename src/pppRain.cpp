@@ -9,8 +9,6 @@ extern "C" {
 extern const float kPppRainTexCoordBase;
 extern const float FLOAT_8033101c;
 extern const float FLOAT_80331020;
-extern int gPppCalcDisabled;
-extern unsigned char gPppInConstructor;
 }
 #include "ffcc/util.h"
 #include "dolphin/gx.h"

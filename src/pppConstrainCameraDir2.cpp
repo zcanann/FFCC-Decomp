@@ -3,10 +3,6 @@
 #include "ffcc/pppConstrainCameraDir.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/pppPart.h"
-extern "C" {
-extern int gPppCalcDisabled;
-extern unsigned char gPppInConstructor;
-}
 #include "ffcc/pppYmEnv.h"
 #include "ffcc/util.h"
 #include <dolphin/mtx.h>

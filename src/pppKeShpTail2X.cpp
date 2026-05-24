@@ -6,7 +6,6 @@ extern "C" {
 extern const float kPppKeShpTail2XZero;
 extern const float kPppKeShpTail2XAlphaScale;
 extern const float FLOAT_80330508;
-extern int gPppCalcDisabled;
 }
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>

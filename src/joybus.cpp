@@ -165,13 +165,13 @@ JoyBus::JoyBus()
     strcpy(m_pathBuf, JoyBusConst::DVD_DIR);
     strcat(m_pathBuf, JoyBusConst::CLIENT_FILE, 128UL);
 
-    memset(m_sendBuffer, 0, 0x4000);
-    memset(m_stageFlags, 0, 8);
-    memset(m_cmdQueueData, 0, 0x400);
-    memset(m_recvQueueEntriesArr, 0, 0x400);
+    memset(m_sendBuffer, 0, sizeof(m_sendBuffer));
+    memset(m_stageFlags, 0, sizeof(m_stageFlags));
+    memset(m_cmdQueueData, 0, sizeof(m_cmdQueueData));
+    memset(m_recvQueueEntriesArr, 0, sizeof(m_recvQueueEntriesArr));
     memset(m_threadParams, 0, sizeof(m_threadParams));
-    memset(m_perThreadTemp, 0, 0x60);
-    memset(m_recvBuffer, 0, 0x1020);
+    memset(m_perThreadTemp, 0, sizeof(m_perThreadTemp));
+    memset(m_recvBuffer, 0, sizeof(m_recvBuffer));
 
     m_mapId = 0xFF;
     m_stageId = 0xFF;
@@ -218,13 +218,13 @@ void JoyBus::Init()
  */
 void JoyBus::CreateInit()
 {
-    memset(m_sendBuffer, 0, 0x4000);
-    memset(m_stageFlags, 0, 8);
-    memset(m_cmdQueueData, 0, 0x400);
-    memset(m_recvQueueEntriesArr, 0, 0x400);
+    memset(m_sendBuffer, 0, sizeof(m_sendBuffer));
+    memset(m_stageFlags, 0, sizeof(m_stageFlags));
+    memset(m_cmdQueueData, 0, sizeof(m_cmdQueueData));
+    memset(m_recvQueueEntriesArr, 0, sizeof(m_recvQueueEntriesArr));
     memset(m_threadParams, 0, sizeof(m_threadParams));
-    memset(m_perThreadTemp, 0, 0x60);
-    memset(m_recvBuffer, 0, 0x1020);
+    memset(m_perThreadTemp, 0, sizeof(m_perThreadTemp));
+    memset(m_recvBuffer, 0, sizeof(m_recvBuffer));
 
     m_mapId = 0xFF;
     m_stageId = 0xFF;
@@ -367,13 +367,13 @@ void JoyBus::Destroy()
         }
     }
 
-    memset(m_sendBuffer, 0, 0x4000);
-    memset(m_stageFlags, 0, 8);
-    memset(m_cmdQueueData, 0, 0x400);
-    memset(m_recvQueueEntriesArr, 0, 0x400);
+    memset(m_sendBuffer, 0, sizeof(m_sendBuffer));
+    memset(m_stageFlags, 0, sizeof(m_stageFlags));
+    memset(m_cmdQueueData, 0, sizeof(m_cmdQueueData));
+    memset(m_recvQueueEntriesArr, 0, sizeof(m_recvQueueEntriesArr));
     memset(m_threadParams, 0, sizeof(m_threadParams));
-    memset(m_perThreadTemp, 0, 0x60);
-    memset(m_recvBuffer, 0, 0x1020);
+    memset(m_perThreadTemp, 0, sizeof(m_perThreadTemp));
+    memset(m_recvBuffer, 0, sizeof(m_recvBuffer));
 
     m_mapId = 0xFF;
     m_stageId = 0xFF;

@@ -243,65 +243,66 @@ void pppRyjMegaBirthModel(_pppPObject* pObject, PRyjMegaBirthModel* params, PRyj
     float posY;
     float posZ;
     s8 hasRequiredMemory;
-    u8* work = pObject->m_workArea + offsets->m_serializedDataOffsets[2];
-    VColor* color = (VColor*)((u8*)pObject + 0x80 + offsets->m_serializedDataOffsets[1]);
+    VRyjMegaBirthModel* work =
+        reinterpret_cast<VRyjMegaBirthModel*>(pObject->m_workArea + offsets->m_serializedDataOffsets[2]);
+    VColor* color = reinterpret_cast<VColor*>(pObject->m_workArea + offsets->m_serializedDataOffsets[1]);
     u8* payload = (u8*)params;
 
-    if (*(void**)(work + 0xC) == 0) {
-        ((VRyjMegaBirthModel*)work)->m_numParticles = *(u16*)(payload + 0x20);
-        ((VRyjMegaBirthModel*)work)->m_particleBlock = (_PARTICLE_DATA*)pppMemAlloc(
-            ((VRyjMegaBirthModel*)work)->m_numParticles * 0xA0, pppEnvStPtr->m_stagePtr,
+    if (work->m_particleBlock == 0) {
+        work->m_numParticles = *(u16*)(payload + 0x20);
+        work->m_particleBlock = (_PARTICLE_DATA*)pppMemAlloc(
+            work->m_numParticles * 0xA0, pppEnvStPtr->m_stagePtr,
             const_cast<char*>(s_pppRyjMegaBirthModel_cpp), 0x8D);
-        if (((VRyjMegaBirthModel*)work)->m_particleBlock != NULL) {
-            memset(((VRyjMegaBirthModel*)work)->m_particleBlock, 0, ((VRyjMegaBirthModel*)work)->m_numParticles * 0xA0);
+        if (work->m_particleBlock != NULL) {
+            memset(work->m_particleBlock, 0, work->m_numParticles * 0xA0);
         }
 
         if (payload[0x136] != 0) {
-            ((VRyjMegaBirthModel*)work)->m_worldMatrixBlock = (PARTICLE_WMAT*)pppMemAlloc(
-                ((VRyjMegaBirthModel*)work)->m_numParticles * 0x30, pppEnvStPtr->m_stagePtr,
+            work->m_worldMatrixBlock = (PARTICLE_WMAT*)pppMemAlloc(
+                work->m_numParticles * sizeof(PARTICLE_WMAT), pppEnvStPtr->m_stagePtr,
                 const_cast<char*>(s_pppRyjMegaBirthModel_cpp), 0x97);
-            if (((VRyjMegaBirthModel*)work)->m_worldMatrixBlock != NULL) {
-                memset(((VRyjMegaBirthModel*)work)->m_worldMatrixBlock, 0, ((VRyjMegaBirthModel*)work)->m_numParticles * 0x30);
+            if (work->m_worldMatrixBlock != NULL) {
+                memset(work->m_worldMatrixBlock, 0, work->m_numParticles * sizeof(PARTICLE_WMAT));
             }
         }
 
         if (payload[0x131] != 0) {
-            ((VRyjMegaBirthModel*)work)->m_colorBlock = (_PARTICLE_COLOR*)pppMemAlloc(
-                ((VRyjMegaBirthModel*)work)->m_numParticles << 5, pppEnvStPtr->m_stagePtr,
+            work->m_colorBlock = (_PARTICLE_COLOR*)pppMemAlloc(
+                work->m_numParticles * sizeof(_PARTICLE_COLOR), pppEnvStPtr->m_stagePtr,
                 const_cast<char*>(s_pppRyjMegaBirthModel_cpp), 0xA2);
-            if (((VRyjMegaBirthModel*)work)->m_colorBlock != NULL) {
-                memset(((VRyjMegaBirthModel*)work)->m_colorBlock, 0, ((VRyjMegaBirthModel*)work)->m_numParticles << 5);
+            if (work->m_colorBlock != NULL) {
+                memset(work->m_colorBlock, 0, work->m_numParticles * sizeof(_PARTICLE_COLOR));
             }
         }
 
-        *(float*)(work + 0x0) = *(float*)(payload + 0xF8);
-        *(float*)(work + 0x4) = *(float*)(payload + 0xFC);
-        *(float*)(work + 0x8) = *(float*)(payload + 0x100);
-        PSVECNormalize((Vec*)(work + 0x0), (Vec*)(work + 0x0));
+        work->m_accelerationAxis.x = *(float*)(payload + 0xF8);
+        work->m_accelerationAxis.y = *(float*)(payload + 0xFC);
+        work->m_accelerationAxis.z = *(float*)(payload + 0x100);
+        PSVECNormalize(&work->m_accelerationAxis, &work->m_accelerationAxis);
 
         posX = *f32_at(pObject, 0x1C);
         posY = *f32_at(pObject, 0x2C);
         posZ = *f32_at(pObject, 0x3C);
-        *(float*)(work + 0x20) = posX;
-        *(float*)(work + 0x24) = posY;
-        *(float*)(work + 0x28) = posZ;
-        *(float*)(work + 0x2C) = posX;
-        *(float*)(work + 0x30) = posY;
-        *(float*)(work + 0x34) = posZ;
+        work->m_previousPosition.x = posX;
+        work->m_previousPosition.y = posY;
+        work->m_previousPosition.z = posZ;
+        work->m_currentPosition.x = posX;
+        work->m_currentPosition.y = posY;
+        work->m_currentPosition.z = posZ;
     }
 
-    if (*(void**)(work + 0xC) == 0) {
+    if (work->m_particleBlock == 0) {
         hasRequiredMemory = false;
-    } else if ((*(u8*)(payload + 0x136) != 0) && (*(void**)(work + 0x10) == 0)) {
+    } else if ((*(u8*)(payload + 0x136) != 0) && (work->m_worldMatrixBlock == 0)) {
         hasRequiredMemory = false;
-    } else if ((*(u8*)(payload + 0x131) != 0) && (*(void**)(work + 0x14) == 0)) {
+    } else if ((*(u8*)(payload + 0x131) != 0) && (work->m_colorBlock == 0)) {
         hasRequiredMemory = false;
     } else {
         hasRequiredMemory = true;
     }
 
     if (hasRequiredMemory) {
-        calc_particle(pObject, (VRyjMegaBirthModel*)work, params, color);
+        calc_particle(pObject, work, params, color);
     }
 }
 
@@ -327,23 +328,21 @@ void calc_particle(_pppPObject* pObject, VRyjMegaBirthModel* work, PRyjMegaBirth
 
     emitted = 0;
     payload = (u8*)params;
-    particleData = *(_PARTICLE_DATA**)((u8*)work + 0xC);
-    particleWMat = *(_PARTICLE_WMAT**)((u8*)work + 0x10);
-    particleColor = *(_PARTICLE_COLOR**)((u8*)work + 0x14);
-    maxParticles = *(s32*)((u8*)work + 0x18);
-    emitTimer = (u16*)((u8*)work + 0x1C);
+    particleData = work->m_particleBlock;
+    particleWMat = reinterpret_cast<_PARTICLE_WMAT*>(work->m_worldMatrixBlock);
+    particleColor = work->m_colorBlock;
+    maxParticles = work->m_numParticles;
+    emitTimer = &work->m_emitTimer;
 
     if (gPppCalcDisabled == 0) {
         float posX = pObject->m_localMatrix.value[0][3];
         float posY = pObject->m_localMatrix.value[1][3];
         float posZ = pObject->m_localMatrix.value[2][3];
 
-        *(float*)((u8*)work + 0x20) = *(float*)((u8*)work + 0x2C);
-        *(float*)((u8*)work + 0x24) = *(float*)((u8*)work + 0x30);
-        *(float*)((u8*)work + 0x28) = *(float*)((u8*)work + 0x34);
-        *(float*)((u8*)work + 0x2C) = posX;
-        *(float*)((u8*)work + 0x30) = posY;
-        *(float*)((u8*)work + 0x34) = posZ;
+        work->m_previousPosition = work->m_currentPosition;
+        work->m_currentPosition.x = posX;
+        work->m_currentPosition.y = posY;
+        work->m_currentPosition.z = posZ;
         *emitTimer = *emitTimer + 1;
 
         for (i = 0; i < maxParticles; i = i + 1) {
@@ -357,7 +356,7 @@ void calc_particle(_pppPObject* pObject, VRyjMegaBirthModel* work, PRyjMegaBirth
             }
 
             if (particleWMat != NULL) {
-                particleWMat = (_PARTICLE_WMAT*)((u8*)particleWMat + 0x30);
+                particleWMat++;
             }
             if (particleColor != NULL) {
                 particleColor = particleColor + 1;
@@ -395,10 +394,10 @@ void birth(
 
     memset(particleData, 0, 0xA0);
     if (particleWMat != NULL) {
-        memset(particleWMat, 0, 0x30);
+        memset(particleWMat, 0, sizeof(_PARTICLE_WMAT));
     }
     if (particleColor != NULL) {
-        memset(particleColor, 0, 0x20);
+        memset(particleColor, 0, sizeof(_PARTICLE_COLOR));
     }
 
     pppUnitMatrix(*(pppFMATRIX*)&particleData->m_matrix);
@@ -967,9 +966,9 @@ void init_matrix(_pppPObject* pObject, pppFMATRIX& out, PRyjMegaBirthModel* para
         break;
     case 8:
         PSMTXIdentity(out.value);
-        out.value[0][3] = *f32_at((u8*)work, 0x2C);
-        out.value[1][3] = *f32_at((u8*)work, 0x30);
-        out.value[2][3] = *f32_at((u8*)work, 0x34);
+        out.value[0][3] = work->m_currentPosition.x;
+        out.value[1][3] = work->m_currentPosition.y;
+        out.value[2][3] = work->m_currentPosition.z;
         break;
     default:
         PSMTXCopy(pppMngStPtr->m_matrix.value, out.value);
@@ -1114,25 +1113,26 @@ void set_matrix(_pppPObject* pObject, pppFMATRIX mtxA, pppFMATRIX mtxB, PRyjMega
  */
 void pppRyjMegaBirthModelCon(_pppPObject* pObject, PRyjMegaBirthModelOffsets* offsets)
 {
-    u8* work = pObject->m_workArea + offsets->m_serializedDataOffsets[2];
+    VRyjMegaBirthModel* work =
+        reinterpret_cast<VRyjMegaBirthModel*>(pObject->m_workArea + offsets->m_serializedDataOffsets[2]);
     float value1;
     float value0;
 
-    memset((void*)work, 0, 0xC);
-    *(u32*)(work + 0xC) = 0;
+    memset(&work->m_accelerationAxis, 0, sizeof(work->m_accelerationAxis));
+    work->m_particleBlock = 0;
     value0 = FLOAT_80330498;
-    *(u32*)(work + 0x10) = 0;
+    work->m_worldMatrixBlock = 0;
     value1 = FLOAT_8033049c;
-    *(u32*)(work + 0x14) = 0;
-    *(u32*)(work + 0x18) = 0;
-    *(u16*)(work + 0x1C) = 10000;
-    *(u16*)(work + 0x1E) = 0;
-    *(float*)(work + 0x20) = value0;
-    *(float*)(work + 0x24) = value1;
-    *(float*)(work + 0x28) = value0;
-    *(float*)(work + 0x2C) = value0;
-    *(float*)(work + 0x30) = value1;
-    *(float*)(work + 0x34) = value0;
+    work->m_colorBlock = 0;
+    work->m_numParticles = 0;
+    work->m_emitTimer = 10000;
+    work->m_unused1E = 0;
+    work->m_previousPosition.x = value0;
+    work->m_previousPosition.y = value1;
+    work->m_previousPosition.z = value0;
+    work->m_currentPosition.x = value0;
+    work->m_currentPosition.y = value1;
+    work->m_currentPosition.z = value0;
 }
 
 /*
@@ -1146,20 +1146,21 @@ void pppRyjMegaBirthModelCon(_pppPObject* pObject, PRyjMegaBirthModelOffsets* of
  */
 void pppRyjMegaBirthModelDes(_pppPObject* pObject, PRyjMegaBirthModelOffsets* offsets)
 {
-    u8* work = pObject->m_workArea + offsets->m_serializedDataOffsets[2];
+    VRyjMegaBirthModel* work =
+        reinterpret_cast<VRyjMegaBirthModel*>(pObject->m_workArea + offsets->m_serializedDataOffsets[2]);
 
-    if (*(void**)(work + 0xC) != 0) {
-        pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(*(void**)(work + 0xC)));
-        *(void**)(work + 0xC) = 0;
+    if (work->m_particleBlock != 0) {
+        pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(work->m_particleBlock));
+        work->m_particleBlock = 0;
     }
 
-    if (*(void**)(work + 0x10) != 0) {
-        pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(*(void**)(work + 0x10)));
-        *(void**)(work + 0x10) = 0;
+    if (work->m_worldMatrixBlock != 0) {
+        pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(work->m_worldMatrixBlock));
+        work->m_worldMatrixBlock = 0;
     }
 
-    if (*(void**)(work + 0x14) != 0) {
-        pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(*(void**)(work + 0x14)));
-        *(void**)(work + 0x14) = 0;
+    if (work->m_colorBlock != 0) {
+        pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(work->m_colorBlock));
+        work->m_colorBlock = 0;
     }
 }

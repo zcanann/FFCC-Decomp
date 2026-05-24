@@ -4,7 +4,6 @@
 #include "ffcc/pppYmEnv.h"
 extern "C" {
 extern const float kPppScreenQuakeZero;
-extern int gPppCalcDisabled;
 }
 
 

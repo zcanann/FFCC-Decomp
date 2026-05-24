@@ -5,7 +5,6 @@ extern "C" {
 extern const float kPppFilterScreenMin;
 extern const float kPppFilterScreenMaxX;
 extern const float kPppFilterScreenMaxY;
-extern int gPppCalcDisabled;
 }
 #include "ffcc/util.h"
 #include <stddef.h>

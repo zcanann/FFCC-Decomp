@@ -13,7 +13,6 @@
 extern "C" {
 extern const float kPppYmMeltZero;
 u32 g_ymMelt;
-extern int gPppCalcDisabled;
 }
 extern const float FLOAT_80330af4;
 extern const float FLOAT_80330b08;

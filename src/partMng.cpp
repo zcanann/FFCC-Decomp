@@ -21,8 +21,6 @@
 #include "ffcc/pppShape.h"
 #include "ffcc/linkage.h"
 extern "C" {
-extern int gPppCalcDisabled;
-extern unsigned char gPppInConstructor;
 extern float gPartScreenMatrixRow2X;
 extern float gPartScreenMatrixRow2Y;
 extern float gPartScreenMatrixRow2W;
@@ -86,17 +84,27 @@ extern "C" const char s_partMng_cpp[] = "partMng.cpp";
 static const char s_pppCreate0_pdtID_d_fpno_d_mngNo_d_name_s[] =
     "pppCreate0 pdtID=%d fpno=%d mngNo=%d name=%s\n";
 static const char s_pppGetFreePppDataMngSt_CAN_NOT_ALLOC[] = "pppGetFreePppDataMngSt CAN NOT ALLOC !!!\n";
-static const char s_ReadPdt_fn_pcts_801d8544[] = "ReadPdt fn=%s\n";
-static const char s_CAN_NOT_READ_pcts_801d8508[] = "CAN NOT READ %s !!!!!!\n";
-static const char s_ReadPan_fn_pcts_801d8530[] = "ReadPan fn=%s\n";
-static const char s_ReadPmd_fn_pcts_801d851c[] = "ReadPmd fn=%s\n";
-static const char s_ReadPtx_fn_pcts_801d84f4[] = "ReadPtx fn=%s\n";
+static const char s_ReadPdtLogFormat[] = "ReadPdt fn=%s\n";
+static const char s_CanNotReadFormat[] = "CAN NOT READ %s !!!!!!\n";
+static const char s_ReadPanLogFormat[] = "ReadPan fn=%s\n";
+static const char s_ReadPmdLogFormat[] = "ReadPmd fn=%s\n";
+static const char s_ReadPtxLogFormat[] = "ReadPtx fn=%s\n";
 static const char s_CheckSum_ERROR_code_0x_x____801d82f0[] = "CheckSum ERROR code=0x%x!!!\n";
 static const char s__________________________________801d8358[] = "----------------------------------\n";
 static const char s_prioTime__d_prio__d_heapSize__d_p_801d8454[] =
     "  prioTime=%d  prio=%d  heapSize=%d  pdtID=%2d  fpno=%3d   mngNo=%d  %s\n";
 static const char s_HEAP_TOTAL__dKbyte_USE__dKbyte_F_801d84a0[] =
     "HEAP TOTAL=%dKbyte  USE=%dKbyte  FREE=%dKbyte\n";
+
+enum PppChunkId {
+    kChunkNAME = 0x4E414D45,
+    kChunkPDT = 0x50445420,
+    kChunkRSDM = 0x5253444D,
+    kChunkRSET = 0x52534554,
+    kChunkSHPM = 0x5348504D,
+    kChunkSSET = 0x53534554,
+    kChunkTSET = 0x54534554,
+};
 
 struct CPtrArrayBare {
     void* m_vtable;
@@ -236,12 +244,11 @@ CPartMng::CPartMng()
  */
 void CPartMng::Create()
 {
-    static const int kEnvOffset = 0x2351c;
     static const int kPppMngCount = 0x180;
     static const int kPppMngStride = 0x158;
 
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
-    _pppEnvSt* env = reinterpret_cast<_pppEnvSt*>(self + kEnvOffset);
+    _pppEnvSt* env = &m_pppEnvSt;
 
     C_MTXPerspective(ppvScreenMatrix, FLOAT_8032fe8c, FLOAT_8032fe90, FLOAT_8032fe94, FLOAT_8032fe58);
     PSMTX44Copy(ppvScreenMatrix, ppvScreenMatrix0);
@@ -353,7 +360,7 @@ void CPartMng::Destroy()
                 }
             }
         }
-        __destroy_arr(res->m_pppModelStArr, reinterpret_cast<ConstructorDestructor>(__dt__10pppModelStFv), 0x6c, 0x100);
+        __destroy_arr(res->m_pppModelStArr, reinterpret_cast<ConstructorDestructor>(__dt__10pppModelStFv), sizeof(pppModelSt), 0x100);
         operator delete(res->m_pppModelStArr);
         res->m_pppModelStArr = 0;
     }
@@ -377,7 +384,7 @@ void CPartMng::Destroy()
                 }
             }
         }
-        __destroy_arr(res->m_pppShapeStArr, reinterpret_cast<ConstructorDestructor>(__dt__10pppShapeStFv), 0x2c, 0x100);
+        __destroy_arr(res->m_pppShapeStArr, reinterpret_cast<ConstructorDestructor>(__dt__10pppShapeStFv), sizeof(pppShapeSt), 0x100);
         operator delete(res->m_pppShapeStArr);
         res->m_pppShapeStArr = 0;
     }
@@ -411,7 +418,7 @@ void CPartMng::Destroy()
         res->m_editorObj = 0;
     }
 
-    pppDestroyHeap(reinterpret_cast<_pppEnvSt*>(self + 0x2351c));
+    pppDestroyHeap(&m_pppEnvSt);
 }
 
 /*
@@ -1474,7 +1481,6 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
     static const int kLastEnvCmdOffset = 0x23560;
     static const int kEditFrameOffset = 0x23564;
     static const int kEditDrawModeOffset = 0x23570;
-    static const int kEnvOffset = 0x2351C;
     static const int kPppMngOffset = 0x2A18;
     static const int kPppMngStride = 0x158;
     static const int kCursorRequestOffset = 0x10;
@@ -1498,7 +1504,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
 
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
     PartMngResRaw* res = reinterpret_cast<PartMngResRaw*>(self);
-    _pppEnvSt* env = reinterpret_cast<_pppEnvSt*>(self + kEnvOffset);
+    _pppEnvSt* env = &m_pppEnvSt;
     PppPdtSlot* pdtSlots = m_pdtSlots;
     _pppMngSt* firstMng = reinterpret_cast<_pppMngSt*>(self + kPppMngOffset);
     char* payload = packet + 0x20;
@@ -3369,9 +3375,6 @@ void CPartMng::LoadPartNoSyncCalc()
  */
 int CPartMng::pppLoadPtx(const char* baseName, int pdtSlotIndex, int appendMode, void* readBuffer, int readBufferSize)
 {
-    static const unsigned int kChunkTSET = 0x54534554;
-    static const int kEnvOffset = 0x2351c;
-
     CMemory::CStage* stageLoad = PartPcs.m_usbStreamData.m_stageLoad;
 
     ppvAmemCacheSet.CacheClear();
@@ -3380,14 +3383,14 @@ int CPartMng::pppLoadPtx(const char* baseName, int pdtSlotIndex, int appendMode,
     char path[256];
     sprintf(path, "%s.ptx", baseName);
     if (System.m_execParam > 2) {
-        System.Printf(const_cast<char*>(s_ReadPtx_fn_pcts_801d84f4), path);
+        System.Printf(const_cast<char*>(s_ReadPtxLogFormat), path);
     }
 
     unsigned long fileSize = 0;
     void* fileData = pppFileRead(path, fileSize, readBuffer, readBufferSize);
     if (fileData == 0) {
         if (System.m_execParam != 0) {
-            System.Printf(const_cast<char*>(s_CAN_NOT_READ_pcts_801d8508), path);
+            System.Printf(const_cast<char*>(s_CanNotReadFormat), path);
         }
         stageLoad->resDefaultParam();
         return 0;
@@ -3405,8 +3408,7 @@ int CPartMng::pppLoadPtx(const char* baseName, int pdtSlotIndex, int appendMode,
     if (m_materialSet == 0) {
         CMaterialSet* materialSet = new (stageLoad, const_cast<char*>(s_partMng_cpp), 0xC14) CMaterialSet;
         m_materialSet = materialSet;
-        reinterpret_cast<_pppEnvSt*>(reinterpret_cast<unsigned char*>(this) + kEnvOffset)->m_materialSetPtr =
-            m_materialSet;
+        m_pppEnvSt.m_materialSetPtr = m_materialSet;
 
         CMaterial* defaultMaterial = new (stageLoad, const_cast<char*>(s_partMng_cpp), 0xC17) CMaterial;
         if (defaultMaterial != 0) {
@@ -3457,31 +3459,30 @@ void CPartMng::pppLoadPmd(const char* baseName)
 
     sprintf(path, "%s.pmd", baseName);
     if (System.m_execParam > 2) {
-        System.Printf(const_cast<char*>(s_ReadPmd_fn_pcts_801d851c), path);
+        System.Printf(const_cast<char*>(s_ReadPmdLogFormat), path);
     }
 
     void* fileData = pppFileRead(path, fileSize, 0, 0);
     if (fileData == 0) {
         if (System.m_execParam != 0) {
-            System.Printf(const_cast<char*>(s_CAN_NOT_READ_pcts_801d8508), path);
+            System.Printf(const_cast<char*>(s_CanNotReadFormat), path);
         }
         return;
     }
 
-    pppModelSt** modelArrayPtr = reinterpret_cast<pppModelSt**>(reinterpret_cast<unsigned char*>(this) + 0x7ec);
-    if (*modelArrayPtr == 0) {
+    if (m_pppModelStArr == 0) {
         CMemory::CStage* stageLoad = PartPcs.m_usbStreamData.m_stageLoad;
         pppModelSt* modelArray = reinterpret_cast<pppModelSt*>(
             operator new(
-                0x6c00, stageLoad, const_cast<char*>(s_partMng_cpp), 0xca9));
+                sizeof(pppModelSt) * 0x100, stageLoad, const_cast<char*>(s_partMng_cpp), 0xca9));
         if (modelArray != 0) {
             __construct_array(modelArray, reinterpret_cast<ConstructorDestructor>(__ct__10pppModelStFv),
-                              reinterpret_cast<ConstructorDestructor>(__dt__10pppModelStFv), 0x6c, 0x100);
+                              reinterpret_cast<ConstructorDestructor>(__dt__10pppModelStFv), sizeof(pppModelSt), 0x100);
             for (int i = 0; i < 0x100; i++) {
                 modelArray[i].m_isUsed = 0;
             }
         }
-        *modelArrayPtr = modelArray;
+        m_pppModelStArr = modelArray;
     }
 
     CChunkFile chunkFile;
@@ -3490,13 +3491,13 @@ void CPartMng::pppLoadPmd(const char* baseName)
     CChunkFile::CChunk outerChunk;
     while (chunkFile.GetNextChunk(outerChunk)) {
         chunkFile.PushChunk();
-        if (outerChunk.m_id == 0x52534554) {
-            pppModelSt* modelArray = *modelArrayPtr;
+        if (outerChunk.m_id == kChunkRSET) {
+            pppModelSt* modelArray = m_pppModelStArr;
             pppModelSt* targetModel = 0;
 
             CChunkFile::CChunk innerChunk;
             while (chunkFile.GetNextChunk(innerChunk)) {
-                if (innerChunk.m_id == 0x5253444d) {
+                if (innerChunk.m_id == kChunkRSDM) {
                     if (targetModel != 0) {
                         CChunkFile rsdFile;
                         rsdFile.SetBuf(chunkFile.GetAddress());
@@ -3516,7 +3517,7 @@ void CPartMng::pppLoadPmd(const char* baseName)
                         targetModel->m_refCount++;
                         targetModel = 0;
                     }
-                } else if (innerChunk.m_id == 0x4e414d45) {
+                } else if (innerChunk.m_id == kChunkNAME) {
                     char* name = chunkFile.GetString();
 
                     targetModel = 0;
@@ -3576,31 +3577,30 @@ void CPartMng::pppLoadPan(const char* baseName)
 
     sprintf(path, "%s.pan", baseName);
     if (System.m_execParam > 2) {
-        System.Printf(const_cast<char*>(s_ReadPan_fn_pcts_801d8530), path);
+        System.Printf(const_cast<char*>(s_ReadPanLogFormat), path);
     }
 
     void* fileData = pppFileRead(path, fileSize, 0, 0);
     if (fileData == 0) {
         if (System.m_execParam != 0) {
-            System.Printf(const_cast<char*>(s_CAN_NOT_READ_pcts_801d8508), path);
+            System.Printf(const_cast<char*>(s_CanNotReadFormat), path);
         }
         return;
     }
 
-    pppShapeSt** shapeArrayPtr = reinterpret_cast<pppShapeSt**>(reinterpret_cast<unsigned char*>(this) + 0x7f0);
-    if (*shapeArrayPtr == 0) {
+    if (m_pppShapeStArr == 0) {
         CMemory::CStage* stageLoad = PartPcs.m_usbStreamData.m_stageLoad;
         pppShapeSt* shapeArray = reinterpret_cast<pppShapeSt*>(
             operator new(
-                0x2c00, stageLoad, const_cast<char*>(s_partMng_cpp), 0xd0b));
+                sizeof(pppShapeSt) * 0x100, stageLoad, const_cast<char*>(s_partMng_cpp), 0xd0b));
         if (shapeArray != 0) {
             __construct_array(shapeArray, reinterpret_cast<ConstructorDestructor>(__ct__10pppShapeStFv),
-                              reinterpret_cast<ConstructorDestructor>(__dt__10pppShapeStFv), 0x2c, 0x100);
+                              reinterpret_cast<ConstructorDestructor>(__dt__10pppShapeStFv), sizeof(pppShapeSt), 0x100);
             for (int i = 0; i < 0x100; i++) {
                 shapeArray[i].m_inUse = 0;
             }
         }
-        *shapeArrayPtr = shapeArray;
+        m_pppShapeStArr = shapeArray;
     }
 
     CChunkFile chunkFile;
@@ -3609,13 +3609,13 @@ void CPartMng::pppLoadPan(const char* baseName)
     CChunkFile::CChunk outerChunk;
     while (chunkFile.GetNextChunk(outerChunk)) {
         chunkFile.PushChunk();
-        if (outerChunk.m_id == 0x53534554) {
-            pppShapeSt* shapeArray = *shapeArrayPtr;
+        if (outerChunk.m_id == kChunkSSET) {
+            pppShapeSt* shapeArray = m_pppShapeStArr;
             pppShapeSt* targetShape = 0;
 
             CChunkFile::CChunk innerChunk;
             while (chunkFile.GetNextChunk(innerChunk)) {
-                if (innerChunk.m_id == 0x5348504d) {
+                if (innerChunk.m_id == kChunkSHPM) {
                     if (targetShape != 0) {
                         CChunkFile shpFile;
                         shpFile.SetBuf(chunkFile.GetAddress());
@@ -3623,7 +3623,7 @@ void CPartMng::pppLoadPan(const char* baseName)
                         targetShape->m_refCount++;
                         targetShape = 0;
                     }
-                } else if (innerChunk.m_id == 0x4e414d45) {
+                } else if (innerChunk.m_id == kChunkNAME) {
                     char* name = chunkFile.GetString();
 
                     targetShape = 0;
@@ -3681,7 +3681,7 @@ int CPartMng::pppLoadPdt(const char* baseName, int pdtSlotIndex, int cachePriori
     pdtSlot->m_name[sizeof(pdtSlot->m_name) - 1] = '\0';
 
     if (System.m_execParam > 2) {
-        System.Printf(const_cast<char*>(s_ReadPdt_fn_pcts_801d8544), pdtPath);
+        System.Printf(const_cast<char*>(s_ReadPdtLogFormat), pdtPath);
     }
 
     unsigned long pdtSize = 0;
@@ -3689,7 +3689,7 @@ int CPartMng::pppLoadPdt(const char* baseName, int pdtSlotIndex, int cachePriori
     if (pdtData == 0) {
         pdtSlot->m_pppDataHead = 0;
         if (System.m_execParam != 0) {
-            System.Printf(const_cast<char*>(s_CAN_NOT_READ_pcts_801d8508), pdtPath);
+            System.Printf(const_cast<char*>(s_CanNotReadFormat), pdtPath);
         }
         stageLoad->resDefaultParam();
         return 0;
@@ -3707,7 +3707,7 @@ int CPartMng::pppLoadPdt(const char* baseName, int pdtSlotIndex, int cachePriori
     CChunkFile::CChunk parentChunk;
     while (pdtFile.GetNextChunk(parentChunk)) {
         pdtFile.PushChunk();
-        if (parentChunk.m_id == 0x50445420) { // "PDT "
+        if (parentChunk.m_id == kChunkPDT) {
             CChunkFile::CChunk childChunk;
             while (pdtFile.GetNextChunk(childChunk)) {
                 pdtFile.PushChunk();
@@ -4600,7 +4600,7 @@ extern "C" void __sinit_partMng_cpp(void)
     // delete this function so the compiler auto-generates it.
 
     __construct_array(reinterpret_cast<unsigned char*>(&PartMng) + 0x2A18,
-                      reinterpret_cast<ConstructorDestructor>(__ct__9_pppMngStFv), 0, 0x158, 0x180);
+                      reinterpret_cast<ConstructorDestructor>(__ct__9_pppMngStFv), 0, sizeof(_pppMngSt), 0x180);
 
     g_dcp.m_soundEffectParams.m_soundEffectHandle = -1;
     g_dcp.m_soundEffectParams.m_soundEffectSlot = -1;

@@ -4,7 +4,6 @@
 #include "ffcc/pppPart.h"
 #include "ffcc/textureman.h"
 extern "C" {
-extern int gPppCalcDisabled;
 extern f32 gPppDefaultValueBuffer[];
 }
 #include "ffcc/pppYmEnv.h"

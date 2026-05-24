@@ -940,8 +940,8 @@ void CChara::CModel::Init()
  */
 void CChara::CModel::Create(void* fileData, CMemory::CStage* stage)
 {
-	void* ref = new u8[0x44];
-	memset(ref, 0, 0x44);
+	void* ref = new u8[sizeof(CCharaModelRefRaw)];
+	memset(ref, 0, sizeof(CCharaModelRefRaw));
 	*(u16*)((u8*)ref + 0x16) = 0xFFFF;
 	*(u16*)((u8*)ref + 0x18) = 0xFFFF;
 	*(u16*)((u8*)ref + 0x1A) = 0xFFFF;
@@ -1029,10 +1029,10 @@ void CChara::CModel::Create(void* fileData, CMemory::CStage* stage)
 				const u32 meshCapacity = chunk.m_arg0;
 				*(u16*)((u8*)ref + 0x0A) = 0;
 				if (meshCapacity != 0) {
-					void* meshRefs = new u8[meshCapacity * 0x64];
-					void* meshes = new u8[meshCapacity * 0x14];
-					memset(meshRefs, 0, meshCapacity * 0x64);
-					memset(meshes, 0, meshCapacity * 0x14);
+					void* meshRefs = new u8[meshCapacity * sizeof(CCharaMeshRefRaw)];
+					void* meshes = new u8[meshCapacity * sizeof(CMesh)];
+					memset(meshRefs, 0, meshCapacity * sizeof(CCharaMeshRefRaw));
+					memset(meshes, 0, meshCapacity * sizeof(CMesh));
 					*(void**)((u8*)ref + 0x10) = meshRefs;
 					*(void**)((u8*)this + 0xAC) = meshes;
 				}
@@ -1041,7 +1041,7 @@ void CChara::CModel::Create(void* fileData, CMemory::CStage* stage)
 				while (chunkFile.GetNextChunk(chunk)) {
 					if (chunk.m_id == 0x4D455348 && *(void**)((u8*)this + 0xAC) != 0) {
 						u16 meshCount = *(u16*)((u8*)ref + 0x0A);
-						CMesh* mesh = reinterpret_cast<CMesh*>((u8*)*(void**)((u8*)this + 0xAC) + (meshCount * 0x14));
+						CMesh* mesh = reinterpret_cast<CMesh*>((u8*)*(void**)((u8*)this + 0xAC) + (meshCount * sizeof(CMesh)));
 						mesh->Create(this, chunkFile, stage);
 						*(u16*)((u8*)ref + 0x0A) = meshCount + 1;
 					}
@@ -1193,7 +1193,7 @@ void CChara::CModel::setup()
 		PSMTXCopy(NodeRefLocalMtx(node), NodeLocalRuntimeMtx(node));
 		s8 disp = *(s8*)((u8*)*(void**)node + 4);
 		if (disp >= 0 && static_cast<u32>(disp) < meshCount) {
-			*(void**)((u8*)node + 4) = (u8*)mesh + (disp * 0x14);
+			*(void**)((u8*)node + 4) = (u8*)mesh + (disp * sizeof(CMesh));
 		}
 		node = (CNode*)((u8*)node + 0xC0);
 	}
@@ -1419,7 +1419,7 @@ void CChara::CModel::CalcSkin()
 
 	while (i < meshCount) {
 		mesh->Calc(this);
-		mesh = (CMesh*)((u8*)mesh + 0x14);
+		mesh++;
 		i++;
 	}
 }

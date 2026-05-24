@@ -10,8 +10,6 @@ extern "C" {
 extern const float FLOAT_803305f0;
 extern const float kPppYmDeformationShpZero;
 extern const float FLOAT_803305f8;
-extern int gPppCalcDisabled;
-extern unsigned char gPppInConstructor;
 }
 #include "ffcc/util.h"
 

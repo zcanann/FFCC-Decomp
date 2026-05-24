@@ -8,7 +8,6 @@
 extern "C" {
 extern const f32 kPppConformBgNormalZero;
 extern const f32 kPppConformBgNormalOne;
-extern int gPppCalcDisabled;
 }
 
 #include "dolphin/mtx.h"

@@ -199,6 +199,21 @@ inline CTexAnim::CTexAnim()
 
 /*
  * --INFO--
+ * PAL Address: 0x80044a9c
+ * PAL Size: 76b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+CTexAnimSet::CTexAnimSet()
+{
+    const float& zero = FLOAT_8032fb38;
+    m_chin = zero;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x80043d70
  * PAL Size: 124b
  * EN Address: TODO
@@ -628,21 +643,6 @@ CTexAnimSet::~CTexAnimSet()
     reinterpret_cast<CTexAnimSetStorage*>(this)->texAnims.ReleaseAndRemoveAll();
 }
 #pragma dont_inline reset
-
-/*
- * --INFO--
- * PAL Address: 0x80044a9c
- * PAL Size: 76b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-CTexAnimSet::CTexAnimSet()
-{
-    const float& zero = FLOAT_8032fb38;
-    m_chin = zero;
-}
 
 /*
  * --INFO--

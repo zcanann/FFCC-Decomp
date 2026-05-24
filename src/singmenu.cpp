@@ -194,27 +194,27 @@ extern char s_Espiral_803326E0[];
 extern char s_Tulipan_803326E8[];
 extern char s_Cuchara_803326F0[];
 extern char s_Lobezna_803326F8[];
-extern char lbl_80332700[];
-extern char lbl_80332708[];
-extern char lbl_80332710[];
-extern char lbl_80332718[];
-extern char lbl_80332720[];
-extern char lbl_80332728[];
-extern char lbl_80332730[];
-extern char lbl_80332738[];
-extern char lbl_80332740[];
-extern char lbl_80332748[];
-extern char lbl_80332750[];
-extern char lbl_80332758[];
-extern char lbl_80332760[];
-extern char lbl_80332768[];
-extern char lbl_80332770[];
-extern char lbl_80332778[];
-extern char lbl_80332780[];
-extern char lbl_80332788[];
-extern char lbl_80332790[];
-extern char lbl_80332798[];
-extern char lbl_803327A0[];
+extern char s_Regen_80332700[];
+extern char s_Regena_80332708[];
+extern char s_Recup_80332710[];
+extern char s_solo2_80332718[];
+extern char s_solo1_80332720[];
+extern char s_solo4_80332728[];
+extern char s_solo5_80332730[];
+extern char s_solo8_80332738[];
+extern char s_solo9_80332740[];
+extern char s_solo30_80332748[];
+extern char s_solo42_80332750[];
+extern char s_solo47_80332758[];
+extern char s_solo48_80332760[];
+extern char s_solo49_80332768[];
+extern char s_solo50_80332770[];
+extern char s_solo51_80332778[];
+extern char s_solo63_80332780[];
+extern char s_solo3_80332788[];
+extern char s_solo6_80332790[];
+extern char s_solo7_80332798[];
+extern char s_solo10_803327A0[];
 extern char lbl_803327A8[];
 extern char lbl_803327B0[];
 extern char lbl_803327B8[];
@@ -685,14 +685,14 @@ extern "C" char* gSingMenuAttrTableEn[] = {
     s_Resist_slow_801DE1E0, s_Resist_prlysis_801DE1EC, s_Resist_poison_801DE1FC, s_Resist_curses_801DE20C,
     s_Resist_petrif_801DE21C, s_Casting_time_801DE22C, s_Charge_time_801DE23C, s_Spell_duration_801DE248,
     s_Spell_duration_801DE248, s_Resist_miasma_801DE258, s_Long_spell_range_801DE268, s_Long_focus_attks_801DE27C,
-    lbl_80332700, s_Focus_attacks_801DE290, s_Spell_damage_801DE2A0, s_Cannot_be_stunned_801DE2B0,
+    s_Regen_80332700, s_Focus_attacks_801DE290, s_Spell_damage_801DE2A0, s_Cannot_be_stunned_801DE2B0,
 };
 extern "C" char* gSingMenuAttrTableDe[] = {
     lbl_803321B8, s_Feuer_Res_801DE2C4, s_Eis_Resist_801DE2D0, s_Blitz_Res_801DE2E0,
     s_Gemach_R_801DE2EC, s_Stopp_Res_801DE2F8, s_Gift_Res_801DE304, s_Fluch_Res_801DE310,
     s_Stein_Res_801DE31C, s_Z_laden_801DE328, s_Sammeln_801DE334, s_Z_Wirkungszeit_801DE340,
     s_Z_Wirkungszeit_801DE340, s_Miasma_R_plus_801DE354, s_Z_Reichw_plus_801DE360, s_SA_Reichw_plus_801DE370,
-    lbl_80332708, s_Spezialattacke_801DE380, s_Zauber_Schaden_801DE390, s_Standfest_801DE3A0,
+    s_Regena_80332708, s_Spezialattacke_801DE380, s_Zauber_Schaden_801DE390, s_Standfest_801DE3A0,
 };
 extern "C" char* gSingMenuAttrTableIt[] = {
     lbl_803321B8, s_Antifuoco_801DE3AC, s_Antigelo_801DE3B8, s_Antituono_801DE3C4,
@@ -706,7 +706,7 @@ extern "C" char* gSingMenuAttrTableFr[] = {
     s_Anti_Somni_801DE4D8, s_Anti_Stop_801DE4E4, s_Anti_Poison_801DE4F0, s_Anti_Malefice_801DE4FC,
     s_Anti_Petrif_801DE50C, s_Tps_de_lancem_801DE51C, s_Tps_de_charge_801DE52C, s_Duree_sorts_801DE53C,
     s_Duree_sorts_801DE53C, s_Anti_Miasme_801DE548, s_Portee_des_sorts_801DE554, s_Portee_super_atq_801DE568,
-    lbl_80332710, s_Super_attaques_801DE57C, s_Degats_magiq_801DE58C, s_Rend_inebranlable_801DE59C,
+    s_Recup_80332710, s_Super_attaques_801DE57C, s_Degats_magiq_801DE58C, s_Rend_inebranlable_801DE59C,
 };
 extern "C" char* gSingMenuAttrTableEs[] = {
     lbl_803321B8, s_Anti_fuego_801DE5B0, s_Anti_frio_801DE5BC, s_Anti_rayos_801DE5C8,
@@ -727,31 +727,31 @@ extern "C" SingMenuStaticMessageInfo s_singleMenuStaticMessages[] = {
 };
 
 extern "C" SingMenuSoloNameTable PTR_s_solo2 = {
-    {lbl_80332718, 0, 0, 0, 0, 0, 0, 0, 0},
+    {s_solo2_80332718, 0, 0, 0, 0, 0, 0, 0, 0},
 };
 
 extern "C" CMenuPcs::CTmp s_singleMenuTextureTable[] = {
-    {4, lbl_80332720},
-    {4, lbl_80332728},
-    {4, lbl_80332730},
-    {4, lbl_80332738},
-    {4, lbl_80332740},
-    {4, lbl_80332748},
-    {4, lbl_80332750},
-    {4, lbl_80332758},
-    {4, lbl_80332760},
-    {4, lbl_80332768},
-    {4, lbl_80332770},
-    {4, lbl_80332778},
-    {4, lbl_80332780},
+    {4, s_solo1_80332720},
+    {4, s_solo4_80332728},
+    {4, s_solo5_80332730},
+    {4, s_solo8_80332738},
+    {4, s_solo9_80332740},
+    {4, s_solo30_80332748},
+    {4, s_solo42_80332750},
+    {4, s_solo47_80332758},
+    {4, s_solo48_80332760},
+    {4, s_solo49_80332768},
+    {4, s_solo50_80332770},
+    {4, s_solo51_80332778},
+    {4, s_solo63_80332780},
 };
 
 extern "C" SingMenuSoloNameTable PTR_s_solo1 = {
-    {lbl_80332720, s_sololetter_801DE8A4, 0, 0, 0, 0, 0, 0, 0},
+    {s_solo1_80332720, s_sololetter_801DE8A4, 0, 0, 0, 0, 0, 0, 0},
 };
 
 extern "C" SingMenuTextureRef s_singleMenuModelTextureTable[] = {
-    {5, lbl_80332718}, {5, lbl_80332788}, {5, lbl_80332790}, {5, lbl_80332798}, {5, lbl_803327A0},
+    {5, s_solo2_80332718}, {5, s_solo3_80332788}, {5, s_solo6_80332790}, {5, s_solo7_80332798}, {5, s_solo10_803327A0},
     {5, lbl_803327A8}, {5, lbl_803327B0}, {5, lbl_803327B8}, {5, lbl_803327C0}, {5, lbl_803327C8},
     {5, lbl_803327D0}, {5, lbl_803327D8}, {5, lbl_803327E0}, {5, lbl_803327E8}, {5, lbl_803327F0},
     {5, lbl_803327F8}, {5, lbl_80332800}, {5, lbl_80332808}, {5, lbl_80332810}, {5, lbl_80332818},

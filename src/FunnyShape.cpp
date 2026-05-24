@@ -12,22 +12,21 @@
 extern const GXColor kFunnyShapeTextureChanColor;
 extern const GXColor kFunnyShapeTextureColor;
 extern GXColor kFunnyShapeRenderColor;
-extern const double DOUBLE_8032fd88;
-extern float FLOAT_8032fd64;
-extern float FLOAT_8032fd68;
-extern float FLOAT_8032fd6c;
-extern float FLOAT_8032fd70;
-extern float FLOAT_8032fd74;
-extern float FLOAT_8032fd78;
-extern float FLOAT_8032fd7c;
-extern const float FLOAT_8032fd80;
-extern float FLOAT_8032fd90;
-extern float FLOAT_8032fd94;
-extern float FLOAT_8032fd98;
-extern const float FLOAT_8032fd9c;
-extern const float FLOAT_8032fda0;
-extern const float FLOAT_8032fda4;
-extern const float FLOAT_8032fda8;
+extern const float kFunnyShapeBoundsMinInitial;
+extern const float kFunnyShapeBoundsMaxInitial;
+extern const float kFunnyShapeZero;
+extern const float kFunnyShapeViewportScale;
+extern const float kFunnyShapeOne;
+extern const float kFunnyShapeTexCoordDivisor;
+extern const float kFunnyShapePaddingScale;
+extern const float kFunnyShapeNegativeOne;
+extern const float kFunnyShapeDefaultOffsetX;
+extern const float kFunnyShapeDefaultOffsetY;
+extern const float kFunnyShapeTextureViewportOrigin;
+extern const float kFunnyShapeAnimOffsetX;
+extern const float kFunnyShapeAnimOffsetY;
+extern const float kFunnyShapePi;
+extern const float kFunnyShapeHalfTurnDegrees;
 
 namespace {
 static inline u8* Ptr(void* self, u32 offset)
@@ -143,10 +142,10 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
             const u8* entry = shapeData + rotatedStride;
             const u32 texIndex = entry[0x38];
             const s8 numTex = m_textureCount;
-            float minX = FLOAT_8032fd64;
-            float maxX = FLOAT_8032fd68;
-            float minY = FLOAT_8032fd64;
-            float maxY = FLOAT_8032fd68;
+            float minX = kFunnyShapeBoundsMinInitial;
+            float maxX = kFunnyShapeBoundsMaxInitial;
+            float minY = kFunnyShapeBoundsMinInitial;
+            float maxY = kFunnyShapeBoundsMaxInitial;
             float drawAngle = angle;
             if ((s32)numTex > (s32)texIndex) {
                 GXLoadTexObj(reinterpret_cast<GXTexObj*>(m_texObjData[texIndex]), GX_TEXMAP0);
@@ -162,7 +161,7 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
             }
 
             if ((ShapeFlags(this) & 0x100) == 0) {
-                drawAngle = FLOAT_8032fd6c;
+                drawAngle = kFunnyShapeZero;
             }
 
             const float rx0 = RotateShapeX(entry, 0x20, 0x22, drawAngle);
@@ -224,41 +223,41 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
                 maxY = ry3;
             }
 
-            const float viewportScale = FLOAT_8032fd70;
+            const float viewportScale = kFunnyShapeViewportScale;
             const float viewportW = viewportScale * (maxX - minX);
             const float viewportH = viewportScale * (maxY - minY);
             GXSetViewport(viewportScale * minX + offsetXY[0], viewportScale * minY + offsetXY[1], viewportW,
-                          viewportH, FLOAT_8032fd6c, FLOAT_8032fd74);
+                          viewportH, kFunnyShapeZero, kFunnyShapeOne);
 
             const s16 texX = S16At(entry, 0x30);
             const s16 texY = S16At(entry, 0x32);
             const s16 texW = S16At(entry, 0x34);
             const s16 texH = S16At(entry, 0x36);
-            const float padScale = FLOAT_8032fd7c;
+            const float padScale = kFunnyShapePaddingScale;
             const float padW = viewportW * padScale * padScale;
             const float padH = viewportH * padScale * padScale;
             const float viewMaxX = maxX - padW;
             const float viewMaxY = maxY - padH;
-            const float invPadH = FLOAT_8032fd74 / padH;
-            const float invPadW = -(FLOAT_8032fd74 / padW);
+            const float invPadH = kFunnyShapeOne / padH;
+            const float invPadW = -(kFunnyShapeOne / padW);
 
-            u0 = static_cast<float>(texX) / FLOAT_8032fd78;
-            v0 = FLOAT_8032fd74 - static_cast<float>(texY) / FLOAT_8032fd78;
-            u1 = u0 + static_cast<float>(texW) / FLOAT_8032fd78;
-            v1 = v0 - static_cast<float>(texH) / FLOAT_8032fd78;
+            u0 = static_cast<float>(texX) / kFunnyShapeTexCoordDivisor;
+            v0 = kFunnyShapeOne - static_cast<float>(texY) / kFunnyShapeTexCoordDivisor;
+            u1 = u0 + static_cast<float>(texW) / kFunnyShapeTexCoordDivisor;
+            v1 = v0 - static_cast<float>(texH) / kFunnyShapeTexCoordDivisor;
 
             p0x = invPadW * (rx0 - viewMaxX);
             p0y = invPadH * (ry0 - viewMaxY);
-            p0z = FLOAT_8032fd6c;
+            p0z = kFunnyShapeZero;
             p1x = invPadW * (rx1 - viewMaxX);
             p1y = invPadH * (ry1 - viewMaxY);
-            p1z = FLOAT_8032fd6c;
+            p1z = kFunnyShapeZero;
             p2x = invPadW * (rx3 - viewMaxX);
             p2y = invPadH * (ry3 - viewMaxY);
-            p2z = FLOAT_8032fd6c;
+            p2z = kFunnyShapeZero;
             p3x = invPadW * (rx2 - viewMaxX);
             p3y = invPadH * (ry2 - viewMaxY);
-            p3z = FLOAT_8032fd6c;
+            p3z = kFunnyShapeZero;
             color = U32At(entry, 0x18);
         } else {
             const u8* entry = shapeData + packedStride;
@@ -283,29 +282,29 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
             const s32 y1 = Div16Floor(S16At(entry, 0x26));
             GXSetViewport(offsetXY[0] + static_cast<float>(x0 * 2), offsetXY[1] + static_cast<float>(y0 * 2),
                           static_cast<float>((x1 - x0) * 2), static_cast<float>((y1 - y0) * 2),
-                          FLOAT_8032fd6c, FLOAT_8032fd74);
+                          kFunnyShapeZero, kFunnyShapeOne);
 
             const s16 texX = S16At(entry, 0x28);
             const s16 texY = S16At(entry, 0x2A);
             const s16 texW = S16At(entry, 0x2C);
             const s16 texH = S16At(entry, 0x2E);
-            u0 = static_cast<float>(texX) / FLOAT_8032fd78;
-            v0 = FLOAT_8032fd74 - static_cast<float>(texY) / FLOAT_8032fd78;
-            u1 = u0 + static_cast<float>(texW) / FLOAT_8032fd78;
-            v1 = v0 - static_cast<float>(texH) / FLOAT_8032fd78;
+            u0 = static_cast<float>(texX) / kFunnyShapeTexCoordDivisor;
+            v0 = kFunnyShapeOne - static_cast<float>(texY) / kFunnyShapeTexCoordDivisor;
+            u1 = u0 + static_cast<float>(texW) / kFunnyShapeTexCoordDivisor;
+            v1 = v0 - static_cast<float>(texH) / kFunnyShapeTexCoordDivisor;
 
-            p0x = FLOAT_8032fd80;
-            p0y = FLOAT_8032fd74;
-            p0z = FLOAT_8032fd6c;
-            p1x = FLOAT_8032fd74;
-            p1y = FLOAT_8032fd74;
-            p1z = FLOAT_8032fd6c;
-            p2x = FLOAT_8032fd74;
-            p2y = FLOAT_8032fd80;
-            p2z = FLOAT_8032fd6c;
-            p3x = FLOAT_8032fd80;
-            p3y = FLOAT_8032fd80;
-            p3z = FLOAT_8032fd6c;
+            p0x = kFunnyShapeNegativeOne;
+            p0y = kFunnyShapeOne;
+            p0z = kFunnyShapeZero;
+            p1x = kFunnyShapeOne;
+            p1y = kFunnyShapeOne;
+            p1z = kFunnyShapeZero;
+            p2x = kFunnyShapeOne;
+            p2y = kFunnyShapeNegativeOne;
+            p2z = kFunnyShapeZero;
+            p3x = kFunnyShapeNegativeOne;
+            p3y = kFunnyShapeNegativeOne;
+            p3z = kFunnyShapeZero;
             color = U32At(entry, 0x18);
         }
 
@@ -418,12 +417,12 @@ void CFunnyShape::RenderShape()
 
     Vec2d offsetCopy;
     Vec2d offset;
-    offsetCopy.x = FLOAT_8032fd90;
-    offsetCopy.y = FLOAT_8032fd94;
+    offsetCopy.x = kFunnyShapeDefaultOffsetX;
+    offsetCopy.y = kFunnyShapeDefaultOffsetY;
     offset.x = offsetCopy.x;
     offset.y = offsetCopy.y;
     FS_tagOAN3_SHAPE* shape = reinterpret_cast<FS_tagOAN3_SHAPE*>(m_meshData);
-    RenderShape(shape, offsetCopy, FLOAT_8032fd6c);
+    RenderShape(shape, offsetCopy, kFunnyShapeZero);
 }
 
 /*
@@ -464,8 +463,8 @@ void CFunnyShape::RenderTexture()
 
     const s16 width = m_textureHeaders[0]->width;
     const s16 height = m_textureHeaders[0]->height;
-    GXSetViewport(FLOAT_8032fd98, FLOAT_8032fd98, static_cast<float>(width), static_cast<float>(height),
-                  FLOAT_8032fd6c, FLOAT_8032fd74);
+    GXSetViewport(kFunnyShapeTextureViewportOrigin, kFunnyShapeTextureViewportOrigin, static_cast<float>(width),
+                  static_cast<float>(height), kFunnyShapeZero, kFunnyShapeOne);
 
     GXClearVtxDesc();
     GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
@@ -477,30 +476,30 @@ void CFunnyShape::RenderTexture()
 
     GXBegin((GXPrimitive)0x80, GX_VTXFMT0, 4);
     const u32 colorWord = *reinterpret_cast<u32*>(&color);
-    GXWGFifo.f32 = FLOAT_8032fd80;
-    GXWGFifo.f32 = FLOAT_8032fd74;
-    GXWGFifo.f32 = FLOAT_8032fd6c;
+    GXWGFifo.f32 = kFunnyShapeNegativeOne;
+    GXWGFifo.f32 = kFunnyShapeOne;
+    GXWGFifo.f32 = kFunnyShapeZero;
     GXWGFifo.u32 = colorWord;
-    GXWGFifo.f32 = FLOAT_8032fd6c;
-    GXWGFifo.f32 = FLOAT_8032fd74;
-    GXWGFifo.f32 = FLOAT_8032fd74;
-    GXWGFifo.f32 = FLOAT_8032fd74;
-    GXWGFifo.f32 = FLOAT_8032fd6c;
+    GXWGFifo.f32 = kFunnyShapeZero;
+    GXWGFifo.f32 = kFunnyShapeOne;
+    GXWGFifo.f32 = kFunnyShapeOne;
+    GXWGFifo.f32 = kFunnyShapeOne;
+    GXWGFifo.f32 = kFunnyShapeZero;
     GXWGFifo.u32 = colorWord;
-    GXWGFifo.f32 = FLOAT_8032fd74;
-    GXWGFifo.f32 = FLOAT_8032fd74;
-    GXWGFifo.f32 = FLOAT_8032fd74;
-    GXWGFifo.f32 = FLOAT_8032fd80;
-    GXWGFifo.f32 = FLOAT_8032fd6c;
+    GXWGFifo.f32 = kFunnyShapeOne;
+    GXWGFifo.f32 = kFunnyShapeOne;
+    GXWGFifo.f32 = kFunnyShapeOne;
+    GXWGFifo.f32 = kFunnyShapeNegativeOne;
+    GXWGFifo.f32 = kFunnyShapeZero;
     GXWGFifo.u32 = colorWord;
-    GXWGFifo.f32 = FLOAT_8032fd74;
-    GXWGFifo.f32 = FLOAT_8032fd6c;
-    GXWGFifo.f32 = FLOAT_8032fd80;
-    GXWGFifo.f32 = FLOAT_8032fd80;
-    GXWGFifo.f32 = FLOAT_8032fd6c;
+    GXWGFifo.f32 = kFunnyShapeOne;
+    GXWGFifo.f32 = kFunnyShapeZero;
+    GXWGFifo.f32 = kFunnyShapeNegativeOne;
+    GXWGFifo.f32 = kFunnyShapeNegativeOne;
+    GXWGFifo.f32 = kFunnyShapeZero;
     GXWGFifo.u32 = colorWord;
-    GXWGFifo.f32 = FLOAT_8032fd6c;
-    GXWGFifo.f32 = FLOAT_8032fd6c;
+    GXWGFifo.f32 = kFunnyShapeZero;
+    GXWGFifo.f32 = kFunnyShapeZero;
 }
 
 /*
@@ -560,8 +559,8 @@ void CFunnyShape::Render()
     for (s32 i = 0; i < count; i++) {
         Vec2d posCopy;
         Vec2d pos;
-        posCopy.x = FLOAT_8032fd9c + work->x;
-        posCopy.y = FLOAT_8032fda0 + work->y;
+        posCopy.x = kFunnyShapeAnimOffsetX + work->x;
+        posCopy.y = kFunnyShapeAnimOffsetY + work->y;
         pos.x = posCopy.x;
         pos.y = posCopy.y;
 
@@ -610,16 +609,16 @@ void CFunnyShape::Update()
 
                 r = rand();
                 work->angle = static_cast<float>(r - (r / 0x168) * 0x168);
-                work->angle = (FLOAT_8032fda4 * work->angle) / FLOAT_8032fda8;
+                work->angle = (kFunnyShapePi * work->angle) / kFunnyShapeHalfTurnDegrees;
 
                 r = rand();
                 if ((r % 2) != 0) {
-                    work->x *= FLOAT_8032fd80;
+                    work->x *= kFunnyShapeNegativeOne;
                 }
 
                 r = rand();
                 if ((r % 2) != 0) {
-                    work->y *= FLOAT_8032fd80;
+                    work->y *= kFunnyShapeNegativeOne;
                 }
 
                 if (noSpread != 0) {
@@ -683,12 +682,12 @@ void CFunnyShape::InitAnmWork()
 
         r = rand();
         if ((r % 2) != 0) {
-            work->x *= FLOAT_8032fd80;
+            work->x *= kFunnyShapeNegativeOne;
         }
 
         r = rand();
         if ((r % 2) != 0) {
-            work->y *= FLOAT_8032fd80;
+            work->y *= kFunnyShapeNegativeOne;
         }
 
         if (noSpread != 0) {

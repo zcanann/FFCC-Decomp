@@ -443,32 +443,35 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
     }
 
     bool boundsOverlap = false;
-    bool xOverlap;
+    bool partialOverlap = false;
+    bool axisOverlap;
     if (g_hit_lpface->m_boundsMin.x < g_hit_cyl.m_boundsMin.x) {
-        xOverlap = g_hit_cyl.m_boundsMin.x <= g_hit_lpface->m_boundsMax.x;
+        axisOverlap = g_hit_cyl.m_boundsMin.x <= g_hit_lpface->m_boundsMax.x;
     } else {
-        xOverlap = g_hit_lpface->m_boundsMin.x <= g_hit_cyl.m_boundsMax.x;
+        axisOverlap = g_hit_lpface->m_boundsMin.x <= g_hit_cyl.m_boundsMax.x;
     }
 
-    if (xOverlap) {
-        bool yOverlap;
+    if (axisOverlap) {
         if (g_hit_lpface->m_boundsMin.y < g_hit_cyl.m_boundsMin.y) {
-            yOverlap = g_hit_cyl.m_boundsMin.y <= g_hit_lpface->m_boundsMax.y;
+            axisOverlap = g_hit_cyl.m_boundsMin.y <= g_hit_lpface->m_boundsMax.y;
         } else {
-            yOverlap = g_hit_lpface->m_boundsMin.y <= g_hit_cyl.m_boundsMax.y;
+            axisOverlap = g_hit_lpface->m_boundsMin.y <= g_hit_cyl.m_boundsMax.y;
         }
 
-        if (yOverlap) {
-            bool zOverlap;
-            if (g_hit_lpface->m_boundsMin.z < g_hit_cyl.m_boundsMin.z) {
-                zOverlap = g_hit_cyl.m_boundsMin.z <= g_hit_lpface->m_boundsMax.z;
-            } else {
-                zOverlap = g_hit_lpface->m_boundsMin.z <= g_hit_cyl.m_boundsMax.z;
-            }
+        if (axisOverlap) {
+            partialOverlap = true;
+        }
+    }
 
-            if (zOverlap) {
-                boundsOverlap = true;
-            }
+    if (partialOverlap) {
+        if (g_hit_lpface->m_boundsMin.z < g_hit_cyl.m_boundsMin.z) {
+            axisOverlap = g_hit_cyl.m_boundsMin.z <= g_hit_lpface->m_boundsMax.z;
+        } else {
+            axisOverlap = g_hit_lpface->m_boundsMin.z <= g_hit_cyl.m_boundsMax.z;
+        }
+
+        if (axisOverlap) {
+            boundsOverlap = true;
         }
     }
 
@@ -491,7 +494,7 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
         return 0;
     }
 
-    if (kMapHitEdgeMinT <= g_hit_edge_t && g_hit_edge_t < g_hit_t_min) {
+    if (!(g_hit_edge_t < kMapHitEdgeMinT) && g_hit_edge_t < g_hit_t_min) {
         PSVECScale(hitDirection, &g_hit_hpv, g_hit_edge_t);
         PSVECAdd(&g_hit_cyl.m_bottom, &g_hit_hpv, &g_hit_hpv);
 
@@ -642,7 +645,7 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
     g_hit_f = g_hit_lpface;
     g_hit_cyl_min = g_hit_cyl;
     if (gMapHitDrawMode.m_byte != 0) {
-        g_hit_lpface->m_drawFlags = 1;
+        g_hit_lpface->m_drawFlags = gMapHitDrawMode.m_byte;
     }
     g_hit_mvec_min = g_hit_mvec;
     g_hit_hpv_min = g_hit_hpv;
@@ -872,11 +875,12 @@ CMapHit::CMapHit()
  */
 int FindIntersection(const Vec& start, const Vec& direction, const CMapCylinder& cyl, float& outT)
 {
+    Vec orthogonal;
+    Vec bitangent;
     Vec axis = cyl.m_axis;
     const f32 axisLen = PSVECMag(&axis);
     PSVECScale(&axis, &axis, 1.0f / axisLen);
 
-    Vec orthogonal;
     if (fabsf(axis.x) < fabsf(axis.y) || fabsf(axis.x) < fabsf(axis.z)) {
         orthogonal.x = 0.0f;
         orthogonal.y = axis.z;
@@ -888,7 +892,6 @@ int FindIntersection(const Vec& start, const Vec& direction, const CMapCylinder&
     }
     PSVECNormalize(&orthogonal, &orthogonal);
 
-    Vec bitangent;
     PSVECCrossProduct(&axis, &orthogonal, &bitangent);
 
     Vec localDirection;

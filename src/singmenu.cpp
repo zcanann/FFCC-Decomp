@@ -235,32 +235,32 @@ extern char s_solo28_80332828[];
 extern char s_solo29_80332830[];
 extern char s_solo31_80332838[];
 extern char s_solo32_80332840[];
-extern char lbl_80332848[];
-extern char lbl_80332850[];
-extern char lbl_80332858[];
-extern char lbl_80332860[];
-extern char lbl_80332868[];
-extern char lbl_80332870[];
-extern char lbl_80332878[];
-extern char lbl_80332880[];
-extern char lbl_80332888[];
-extern char lbl_80332890[];
-extern char lbl_80332898[];
-extern char lbl_803328A0[];
-extern char lbl_803328A8[];
-extern char lbl_803328B0[];
-extern char lbl_803328B8[];
-extern char lbl_803328C0[];
-extern char lbl_803328C8[];
-extern char lbl_803328D0[];
-extern char lbl_803328D8[];
-extern char lbl_803328E0[];
-extern char lbl_803328E8[];
-extern char lbl_803328F0[];
-extern char lbl_803328F8[];
-extern char lbl_80332900[];
-extern char lbl_80332908[];
-extern char lbl_80332910[];
+extern char s_solo33_80332848[];
+extern char s_solo34_80332850[];
+extern char s_solo35_80332858[];
+extern char s_solo36_80332860[];
+extern char s_solo37_80332868[];
+extern char s_solo38_80332870[];
+extern char s_solo39_80332878[];
+extern char s_solo40_80332880[];
+extern char s_solo41_80332888[];
+extern char s_solo43_80332890[];
+extern char s_solo44_80332898[];
+extern char s_solo45_803328A0[];
+extern char s_solo46_803328A8[];
+extern char s_solo52_803328B0[];
+extern char s_solo53_803328B8[];
+extern char s_solo54_803328C0[];
+extern char s_solo55_803328C8[];
+extern char s_solo56_803328D0[];
+extern char s_solo57_803328D8[];
+extern char s_solo58_803328E0[];
+extern char s_solo59_803328E8[];
+extern char s_solo60_803328F0[];
+extern char s_solo61_803328F8[];
+extern char s_solo62_80332900[];
+extern char s_solo64_80332908[];
+extern char s_solo23_80332910[];
 extern char s_sololetter_801DE8A4[];
 extern char s_Blacksmith_801DD718[];
 extern char s_Fisherman_801DD724[];
@@ -756,12 +756,12 @@ extern "C" SingMenuTextureRef s_singleMenuModelTextureTable[] = {
     {5, s_solo16_803327D0}, {5, s_solo17_803327D8}, {5, s_solo18_803327E0}, {5, s_solo19_803327E8}, {5, s_solo20_803327F0},
     {5, s_solo21_803327F8}, {5, s_solo22_80332800}, {5, s_solo24_80332808}, {5, s_solo25_80332810}, {5, s_solo26_80332818},
     {5, s_solo27_80332820}, {5, s_solo28_80332828}, {5, s_solo29_80332830}, {5, s_solo31_80332838}, {5, s_solo32_80332840},
-    {5, lbl_80332848}, {5, lbl_80332850}, {5, lbl_80332858}, {5, lbl_80332860}, {5, lbl_80332868},
-    {5, lbl_80332870}, {5, lbl_80332878}, {5, lbl_80332880}, {5, lbl_80332888}, {5, lbl_80332890},
-    {5, lbl_80332898}, {5, lbl_803328A0}, {5, lbl_803328A8}, {5, lbl_803328B0}, {5, lbl_803328B8},
-    {5, lbl_803328C0}, {5, lbl_803328C8}, {5, lbl_803328D0}, {5, lbl_803328D8}, {5, lbl_803328E0},
-    {5, lbl_803328E8}, {5, lbl_803328F0}, {5, lbl_803328F8}, {5, lbl_80332900}, {5, lbl_80332908},
-    {6, lbl_80332910},
+    {5, s_solo33_80332848}, {5, s_solo34_80332850}, {5, s_solo35_80332858}, {5, s_solo36_80332860}, {5, s_solo37_80332868},
+    {5, s_solo38_80332870}, {5, s_solo39_80332878}, {5, s_solo40_80332880}, {5, s_solo41_80332888}, {5, s_solo43_80332890},
+    {5, s_solo44_80332898}, {5, s_solo45_803328A0}, {5, s_solo46_803328A8}, {5, s_solo52_803328B0}, {5, s_solo53_803328B8},
+    {5, s_solo54_803328C0}, {5, s_solo55_803328C8}, {5, s_solo56_803328D0}, {5, s_solo57_803328D8}, {5, s_solo58_803328E0},
+    {5, s_solo59_803328E8}, {5, s_solo60_803328F0}, {5, s_solo61_803328F8}, {5, s_solo62_80332900}, {5, s_solo64_80332908},
+    {6, s_solo23_80332910},
 };
 
 extern float FLOAT_8033292c;

@@ -24,7 +24,7 @@ struct CUSBCallbackEntry
     void* m_callerContext; // 0x8
 };
 
-class CUSB
+class CUSB : public CManager
 {
 public:
     virtual void Init();

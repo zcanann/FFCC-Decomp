@@ -338,9 +338,8 @@ int CMapHit::CalcHitSlide(Vec* out, float y)
             Vec previous;
             Vec current;
             if (g_hit_edge_idx_min == 0) {
-                unsigned short* indices = face->m_vertexIndices;
-                previous = m_vertices[indices[face->m_vertexCount - 1]];
-                current = m_vertices[indices[0]];
+                previous = m_vertices[face->m_vertexIndices[face->m_vertexCount - 1]];
+                current = m_vertices[face->m_vertexIndices[g_hit_edge_idx_min]];
             } else {
                 previous = m_vertices[face->m_vertexIndices[g_hit_edge_idx_min - 1]];
                 current = m_vertices[face->m_vertexIndices[g_hit_edge_idx_min]];
@@ -444,39 +443,27 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
     }
 
     bool boundsOverlap = false;
-    bool xOverlap = false;
-    if (g_hit_cyl.m_boundsMin.x <= g_hit_lpface->m_boundsMin.x) {
-        if (g_hit_lpface->m_boundsMin.x <= g_hit_cyl.m_boundsMin.x) {
-            xOverlap = true;
-        } else {
-            xOverlap = g_hit_lpface->m_boundsMin.x <= g_hit_cyl.m_boundsMax.x;
-        }
-    } else {
+    bool xOverlap;
+    if (g_hit_lpface->m_boundsMin.x < g_hit_cyl.m_boundsMin.x) {
         xOverlap = g_hit_cyl.m_boundsMin.x <= g_hit_lpface->m_boundsMax.x;
+    } else {
+        xOverlap = g_hit_lpface->m_boundsMin.x <= g_hit_cyl.m_boundsMax.x;
     }
 
     if (xOverlap) {
-        bool yOverlap = false;
-        if (g_hit_cyl.m_boundsMin.y <= g_hit_lpface->m_boundsMin.y) {
-            if (g_hit_lpface->m_boundsMin.y <= g_hit_cyl.m_boundsMin.y) {
-                yOverlap = true;
-            } else {
-                yOverlap = g_hit_lpface->m_boundsMin.y <= g_hit_cyl.m_boundsMax.y;
-            }
-        } else {
+        bool yOverlap;
+        if (g_hit_lpface->m_boundsMin.y < g_hit_cyl.m_boundsMin.y) {
             yOverlap = g_hit_cyl.m_boundsMin.y <= g_hit_lpface->m_boundsMax.y;
+        } else {
+            yOverlap = g_hit_lpface->m_boundsMin.y <= g_hit_cyl.m_boundsMax.y;
         }
 
         if (yOverlap) {
-            bool zOverlap = false;
-            if (g_hit_cyl.m_boundsMin.z <= g_hit_lpface->m_boundsMin.z) {
-                if (g_hit_lpface->m_boundsMin.z <= g_hit_cyl.m_boundsMin.z) {
-                    zOverlap = true;
-                } else {
-                    zOverlap = g_hit_lpface->m_boundsMin.z <= g_hit_cyl.m_boundsMax.z;
-                }
-            } else {
+            bool zOverlap;
+            if (g_hit_lpface->m_boundsMin.z < g_hit_cyl.m_boundsMin.z) {
                 zOverlap = g_hit_cyl.m_boundsMin.z <= g_hit_lpface->m_boundsMax.z;
+            } else {
+                zOverlap = g_hit_lpface->m_boundsMin.z <= g_hit_cyl.m_boundsMax.z;
             }
 
             if (zOverlap) {
@@ -512,64 +499,105 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
         PSVECScale(normal, &pushedHit, g_hit_cyl.m_radius);
         PSVECSubtract(&g_hit_hpv, &pushedHit, &pushedHit);
 
-        Vec previous = m_vertices[g_hit_lpface->m_vertexIndices[g_hit_lpface->m_vertexCount - 1]];
         unsigned int sideMask = 3;
-        for (int i = 0; i < static_cast<int>(g_hit_lpface->m_vertexCount); i++) {
-            Vec current = m_vertices[g_hit_lpface->m_vertexIndices[i]];
-            Vec edgeStart;
-            Vec edgeEnd;
-            Vec point;
+        Vec previous = m_vertices[g_hit_lpface->m_vertexIndices[g_hit_lpface->m_vertexCount - 1]];
+        Vec current;
+        Vec edgeStart;
+        Vec edgeEnd;
+        Vec point;
+        Vec edge;
+        Vec toPoint;
+        Vec cross;
+        if (g_hit_lpface->m_projectionAxis == 1) {
+            point.x = pushedHit.x;
+            point.y = pushedHit.z;
+            point.z = kMapHitZero;
 
-            if (g_hit_lpface->m_projectionAxis == 1) {
+            for (int i = 0; i < static_cast<int>(g_hit_lpface->m_vertexCount); i++) {
+                current = m_vertices[g_hit_lpface->m_vertexIndices[i]];
                 edgeStart.x = previous.x + g_hit_lpface->m_vertexOffsets[i][0];
                 edgeStart.y = previous.z + g_hit_lpface->m_vertexOffsets[i][1];
                 edgeStart.z = kMapHitZero;
                 edgeEnd.x = current.x + g_hit_lpface->m_vertexOffsets[i][0];
                 edgeEnd.y = current.z + g_hit_lpface->m_vertexOffsets[i][1];
                 edgeEnd.z = kMapHitZero;
-                point.x = pushedHit.x;
-                point.y = pushedHit.z;
-                point.z = kMapHitZero;
-            } else if (g_hit_lpface->m_projectionAxis == 0) {
+
+                PSVECSubtract(&edgeEnd, &edgeStart, &edge);
+                PSVECSubtract(&point, &edgeEnd, &toPoint);
+                PSVECCrossProduct(&edge, &toPoint, &cross);
+                if (cross.z < kMapHitZero) {
+                    sideMask &= 2;
+                } else {
+                    sideMask &= 1;
+                }
+
+                if (sideMask == 0) {
+                    edgeIndex = i;
+                    break;
+                }
+
+                previous = current;
+            }
+        } else if (g_hit_lpface->m_projectionAxis == 0) {
+            point.x = pushedHit.y;
+            point.y = pushedHit.z;
+            point.z = kMapHitZero;
+
+            for (int i = 0; i < static_cast<int>(g_hit_lpface->m_vertexCount); i++) {
+                current = m_vertices[g_hit_lpface->m_vertexIndices[i]];
                 edgeStart.x = previous.y + g_hit_lpface->m_vertexOffsets[i][0];
                 edgeStart.y = previous.z + g_hit_lpface->m_vertexOffsets[i][1];
                 edgeStart.z = kMapHitZero;
                 edgeEnd.x = current.y + g_hit_lpface->m_vertexOffsets[i][0];
                 edgeEnd.y = current.z + g_hit_lpface->m_vertexOffsets[i][1];
                 edgeEnd.z = kMapHitZero;
-                point.x = pushedHit.y;
-                point.y = pushedHit.z;
-                point.z = kMapHitZero;
-            } else {
+
+                PSVECSubtract(&edgeEnd, &edgeStart, &edge);
+                PSVECSubtract(&point, &edgeEnd, &toPoint);
+                PSVECCrossProduct(&edge, &toPoint, &cross);
+                if (cross.z < kMapHitZero) {
+                    sideMask &= 2;
+                } else {
+                    sideMask &= 1;
+                }
+
+                if (sideMask == 0) {
+                    edgeIndex = i;
+                    break;
+                }
+
+                previous = current;
+            }
+        } else if (g_hit_lpface->m_projectionAxis < 3) {
+            point.x = pushedHit.x;
+            point.y = pushedHit.y;
+            point.z = kMapHitZero;
+
+            for (int i = 0; i < static_cast<int>(g_hit_lpface->m_vertexCount); i++) {
+                current = m_vertices[g_hit_lpface->m_vertexIndices[i]];
                 edgeStart.x = previous.x + g_hit_lpface->m_vertexOffsets[i][0];
                 edgeStart.y = previous.y + g_hit_lpface->m_vertexOffsets[i][1];
                 edgeStart.z = kMapHitZero;
                 edgeEnd.x = current.x + g_hit_lpface->m_vertexOffsets[i][0];
                 edgeEnd.y = current.y + g_hit_lpface->m_vertexOffsets[i][1];
                 edgeEnd.z = kMapHitZero;
-                point.x = pushedHit.x;
-                point.y = pushedHit.y;
-                point.z = kMapHitZero;
-            }
 
-            Vec edge;
-            Vec toPoint;
-            Vec cross;
-            PSVECSubtract(&edgeEnd, &edgeStart, &edge);
-            PSVECSubtract(&point, &edgeEnd, &toPoint);
-            PSVECCrossProduct(&edge, &toPoint, &cross);
-            if (cross.z < kMapHitZero) {
-                sideMask &= 2;
-            } else {
-                sideMask &= 1;
-            }
+                PSVECSubtract(&edgeEnd, &edgeStart, &edge);
+                PSVECSubtract(&point, &edgeEnd, &toPoint);
+                PSVECCrossProduct(&edge, &toPoint, &cross);
+                if (cross.z < kMapHitZero) {
+                    sideMask &= 2;
+                } else {
+                    sideMask &= 1;
+                }
 
-            if (sideMask == 0) {
-                edgeIndex = i;
-                break;
-            }
+                if (sideMask == 0) {
+                    edgeIndex = i;
+                    break;
+                }
 
-            previous = current;
+                previous = current;
+            }
         }
 
         if (sideMask != 0) {
@@ -660,9 +688,9 @@ int CMapHit::ReadOtmHit(CChunkFile& chunkFile)
                 m_positionMin.y = (m_positionMin.y < v->y) ? m_positionMin.y : v->y;
                 m_positionMin.z = (m_positionMin.z < v->z) ? m_positionMin.z : v->z;
 
-                m_positionMax.x = (m_positionMax.x < v->x) ? v->x : m_positionMax.x;
-                m_positionMax.y = (m_positionMax.y < v->y) ? v->y : m_positionMax.y;
-                m_positionMax.z = (m_positionMax.z < v->z) ? v->z : m_positionMax.z;
+                m_positionMax.x = (m_positionMax.x > v->x) ? m_positionMax.x : v->x;
+                m_positionMax.y = (m_positionMax.y > v->y) ? m_positionMax.y : v->y;
+                m_positionMax.z = (m_positionMax.z > v->z) ? m_positionMax.z : v->z;
             }
 
             m_positionMin.x -= kMapHitUnitScale;
@@ -740,9 +768,9 @@ int CMapHit::ReadOtmHit(CChunkFile& chunkFile)
                     face.m_boundsMin.y = (face.m_boundsMin.y < v.y) ? face.m_boundsMin.y : v.y;
                     face.m_boundsMin.z = (face.m_boundsMin.z < v.z) ? face.m_boundsMin.z : v.z;
 
-                    face.m_boundsMax.x = (face.m_boundsMax.x < v.x) ? v.x : face.m_boundsMax.x;
-                    face.m_boundsMax.y = (face.m_boundsMax.y < v.y) ? v.y : face.m_boundsMax.y;
-                    face.m_boundsMax.z = (face.m_boundsMax.z < v.z) ? v.z : face.m_boundsMax.z;
+                    face.m_boundsMax.x = (face.m_boundsMax.x > v.x) ? face.m_boundsMax.x : v.x;
+                    face.m_boundsMax.y = (face.m_boundsMax.y > v.y) ? face.m_boundsMax.y : v.y;
+                    face.m_boundsMax.z = (face.m_boundsMax.z > v.z) ? face.m_boundsMax.z : v.z;
                 }
 
                 face.m_radiusScale *= radiusScale;

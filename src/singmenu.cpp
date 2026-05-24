@@ -187,13 +187,13 @@ extern char s_Lynx_803326A8[];
 extern char s_Castor_803326B0[];
 extern char s_Louve_803326B8[];
 extern char s_Hibou_803326C0[];
-extern char lbl_803326C8[];
-extern char lbl_803326D0[];
-extern char lbl_803326D8[];
-extern char lbl_803326E0[];
-extern char lbl_803326E8[];
-extern char lbl_803326F0[];
-extern char lbl_803326F8[];
+extern char s_Cinta_803326C8[];
+extern char s_Gorra_803326D0[];
+extern char s_Azul_803326D8[];
+extern char s_Espiral_803326E0[];
+extern char s_Tulipan_803326E8[];
+extern char s_Cuchara_803326F0[];
+extern char s_Lobezna_803326F8[];
 extern char lbl_80332700[];
 extern char lbl_80332708[];
 extern char lbl_80332710[];
@@ -671,14 +671,14 @@ extern "C" char* gSingMenuHairTableFr[] = {
     s_Louve_803326B8, s_Castor_803326B0, s_Lynx_803326A8, s_Hibou_803326C0,
 };
 extern "C" char* PTR_s_Remolino[] = {
-    s_Remolino_801DE0B0, s_Natural_8033257C, lbl_803326C8, lbl_803326D0,
+    s_Remolino_801DE0B0, s_Natural_8033257C, s_Cinta_803326C8, s_Gorra_803326D0,
     s_Cabello_Largo_801DE0BC, s_Cabello_Corto_801DE0CC, s_Chaqueta_Osc_801DE0DC, s_Gorro_Blanco_801DE0EC,
     s_Cabeza_Aire_801DE0FC, s_Yelmo_Cuerno_801DE108, s_Visor_Metalico_801DE118, s_Cabeza_Balde_801DE128,
-    s_Cabeza_Aire_801DE0FC, lbl_803326D8, s_Elegante_801DDFDC, s_Mascara_Roja_801DE138,
+    s_Cabeza_Aire_801DE0FC, s_Azul_803326D8, s_Elegante_801DDFDC, s_Mascara_Roja_801DE138,
     s_Un_Cuerno_801DE148, s_Zarandeado_801DE154, s_Pico_Largo_801DE160, s_Magia_Negra_801DE16C,
-    lbl_803326E0, lbl_803326E8, lbl_803326F0, s_Cresta_Coraz_801DE178,
-    lbl_803326F8, s_Ojos_Tiburon_801DE188, s_Bandana_80332624, s_Cola_Mapache_801DE198,
-    lbl_803326F8, s_Cola_Mapache_801DE198, s_Ojos_Tiburon_801DE188, s_Cabeza_Buho_801DE1A8,
+    s_Espiral_803326E0, s_Tulipan_803326E8, s_Cuchara_803326F0, s_Cresta_Coraz_801DE178,
+    s_Lobezna_803326F8, s_Ojos_Tiburon_801DE188, s_Bandana_80332624, s_Cola_Mapache_801DE198,
+    s_Lobezna_803326F8, s_Cola_Mapache_801DE198, s_Ojos_Tiburon_801DE188, s_Cabeza_Buho_801DE1A8,
 };
 extern "C" char* gSingMenuAttrTableEn[] = {
     lbl_803321B8, s_Resist_fire_801DE1B4, s_Resist_cold_801DE1C0, s_Resist_lightning_801DE1CC,

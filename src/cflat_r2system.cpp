@@ -496,14 +496,18 @@ void CCharaPcs::SetTexShadowRadius(float texShadowRadius)
  */
 void CCharaPcs::SetTexShadowColor(_GXColor color)
 {
-    unsigned char r = color.r;
-    unsigned char g = color.g;
-    m_texShadowColor.r = r;
-    unsigned char b = color.b;
-    m_texShadowColor.g = g;
-    unsigned char a = color.a;
-    m_texShadowColor.b = b;
-    m_texShadowColor.a = a;
+    const unsigned char* colorBytes = reinterpret_cast<const unsigned char*>(&color);
+    unsigned char c1;
+    unsigned char c2;
+
+    c1 = colorBytes[0];
+    c2 = colorBytes[1];
+    m_texShadowColor.r = c1;
+    c1 = colorBytes[2];
+    m_texShadowColor.g = c2;
+    c2 = colorBytes[3];
+    m_texShadowColor.b = c1;
+    m_texShadowColor.a = c2;
 }
 
 /*

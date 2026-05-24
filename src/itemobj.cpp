@@ -499,7 +499,7 @@ void CGItemObj::onHitParticle(int effectIndex, int, int, int, Vec*, PPPIFPARAM* 
 				classObj = 0;
 			}
 
-			unsigned int cid = classObj->GetCID();
+			unsigned short cid = classObj->GetCID();
 
 			if ((cid & 0x6D) == 0x6D && *(void**)(self + 0x550) == classObj) {
 				changeStat(0x26, 0, 0);
@@ -596,7 +596,7 @@ void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 			isMenuBossStage = true;
 		}
 		if (isMenuBossStage) {
-			unsigned int cid = static_cast<unsigned short>(partyObj->GetCID());
+			unsigned short cid = static_cast<unsigned short>(partyObj->GetCID());
 			unsigned int stageCarry = (unsigned int)__cntlzw(0x6D - (cid & 0x6D));
 			if (((stageCarry >> 5) & 0xFF) != 0) {
 				isStageCarry = true;
@@ -623,7 +623,7 @@ void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 					condC = true;
 				}
 				if (condC) {
-					unsigned int cid = static_cast<unsigned short>(partyObj->GetCID());
+					unsigned short cid = static_cast<unsigned short>(partyObj->GetCID());
 					unsigned int stageCarry = (unsigned int)__cntlzw(0x6D - (cid & 0x6D));
 					if (((stageCarry >> 5) & 0xFF) != 0) {
 						condB = true;
@@ -657,7 +657,7 @@ void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 		}
 		if (isMenuBossStage) {
 			CGPartyObj* carryObj = *(CGPartyObj**)(self + 0x550);
-			unsigned int cid = static_cast<unsigned short>(carryObj->GetCID());
+			unsigned short cid = static_cast<unsigned short>(carryObj->GetCID());
 			unsigned int stageCarry = (unsigned int)__cntlzw(0x6D - (cid & 0x6D));
 			if (((stageCarry >> 5) & 0xFF) != 0) {
 				isStageCarry = true;

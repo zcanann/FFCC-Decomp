@@ -168,25 +168,25 @@ extern char s_Cuore_80332614[];
 extern char s_Lupo_8033261C[];
 extern char s_Bandana_80332624[];
 extern char s_Lupa_8033262C[];
-extern char lbl_80332634[];
-extern char lbl_80332638[];
-extern char lbl_80332640[];
-extern char lbl_80332648[];
-extern char lbl_80332650[];
-extern char lbl_80332658[];
-extern char lbl_80332660[];
-extern char lbl_80332668[];
-extern char lbl_80332670[];
-extern char lbl_80332678[];
-extern char lbl_80332680[];
-extern char lbl_80332688[];
-extern char lbl_80332690[];
-extern char lbl_80332698[];
-extern char lbl_803326A0[];
-extern char lbl_803326A8[];
-extern char lbl_803326B0[];
-extern char lbl_803326B8[];
-extern char lbl_803326C0[];
+extern char s_Epi_80332634[];
+extern char s_Naturel_80332638[];
+extern char s_Bandeau_80332640[];
+extern char s_Chapeau_80332648[];
+extern char s_Plumes_80332650[];
+extern char s_Brune_80332658[];
+extern char s_Chatain_80332660[];
+extern char s_Cornes_80332668[];
+extern char s_Visiere_80332670[];
+extern char s_Heaume_80332678[];
+extern char s_Masquee_80332680[];
+extern char s_Bosses_80332688[];
+extern char s_Tulipe_80332690[];
+extern char s_Coeur_80332698[];
+extern char s_Loup_803326A0[];
+extern char s_Lynx_803326A8[];
+extern char s_Castor_803326B0[];
+extern char s_Louve_803326B8[];
+extern char s_Hibou_803326C0[];
 extern char lbl_803326C8[];
 extern char lbl_803326D0[];
 extern char lbl_803326D8[];
@@ -661,14 +661,14 @@ extern "C" char* PTR_s_Ciuffo_ribelle[] = {
     s_Lupa_8033262C, s_Procione_801DE04C, s_Occhi_rapaci_801DE03C, s_Testa_di_gufo_801DE058,
 };
 extern "C" char* gSingMenuHairTableFr[] = {
-    lbl_80332634, lbl_80332638, lbl_80332640, lbl_80332648,
-    lbl_80332650, lbl_80332658, lbl_80332660, lbl_80332648,
-    s_Tete_nue_801DE068, lbl_80332668, lbl_80332670, lbl_80332678,
-    s_Tete_nue_801DE068, lbl_80332678, s_Elegante_801DE074, lbl_80332680,
-    s_Unicorne_801DE080, lbl_80332688, s_Long_bec_801DE08C, s_Mage_noir_801DE098,
-    s_Spirale_8033260C, lbl_80332690, s_Cuillere_801DE0A4, lbl_80332698,
-    lbl_803326A0, lbl_803326A8, s_Bandana_80332624, lbl_803326B0,
-    lbl_803326B8, lbl_803326B0, lbl_803326A8, lbl_803326C0,
+    s_Epi_80332634, s_Naturel_80332638, s_Bandeau_80332640, s_Chapeau_80332648,
+    s_Plumes_80332650, s_Brune_80332658, s_Chatain_80332660, s_Chapeau_80332648,
+    s_Tete_nue_801DE068, s_Cornes_80332668, s_Visiere_80332670, s_Heaume_80332678,
+    s_Tete_nue_801DE068, s_Heaume_80332678, s_Elegante_801DE074, s_Masquee_80332680,
+    s_Unicorne_801DE080, s_Bosses_80332688, s_Long_bec_801DE08C, s_Mage_noir_801DE098,
+    s_Spirale_8033260C, s_Tulipe_80332690, s_Cuillere_801DE0A4, s_Coeur_80332698,
+    s_Loup_803326A0, s_Lynx_803326A8, s_Bandana_80332624, s_Castor_803326B0,
+    s_Louve_803326B8, s_Castor_803326B0, s_Lynx_803326A8, s_Hibou_803326C0,
 };
 extern "C" char* PTR_s_Remolino[] = {
     s_Remolino_801DE0B0, s_Natural_8033257C, lbl_803326C8, lbl_803326D0,

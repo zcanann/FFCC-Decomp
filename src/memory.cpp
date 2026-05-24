@@ -78,12 +78,12 @@ extern char sHeapWalkerNewline[];
 extern char sHeapWalkerSlashLine[];
 extern const char* s_amemCacheTypeNames_801E8470[];
 extern const char* s_amemCacheStateNames_8032E410[];
-extern const float FLOAT_8032f7d8 = 9000.0f;
-extern const float FLOAT_8032f7dc = 0.0f;
-extern float FLOAT_8032f7fc;
-extern float FLOAT_8032f800;
-extern float FLOAT_8032f804;
-extern const double DOUBLE_8032F7E0 = 4503601774854144.0;
+extern const float kMemoryDmaTimeout = 9000.0f;
+extern const float kMemoryDrawZero = 0.0f;
+extern float kMemoryDrawOrthoBottom;
+extern float kMemoryDrawOrthoRight;
+extern float kMemoryDrawOrthoFar;
+extern const double kMemorySignedDoubleMagic = 4503601774854144.0;
 extern unsigned int s_heapBarColors_801D64A8[];
 int g_alloc_ct;
 static int stageGetAllocationMode(CMemory::CStage* stage)
@@ -562,8 +562,8 @@ void CMemory::Draw()
     Mtx modelMtx;
     char line[0x104];
 
-    C_MTXOrtho(orthoMtx, FLOAT_8032f7dc, FLOAT_8032f7fc, FLOAT_8032f7dc, FLOAT_8032f800, FLOAT_8032f7dc,
-               FLOAT_8032f804);
+    C_MTXOrtho(orthoMtx, kMemoryDrawZero, kMemoryDrawOrthoBottom, kMemoryDrawZero, kMemoryDrawOrthoRight,
+               kMemoryDrawZero, kMemoryDrawOrthoFar);
     GXSetProjection(orthoMtx, GX_ORTHOGRAPHIC);
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     GXSetZCompLoc(GX_FALSE);
@@ -941,7 +941,7 @@ void CMemory::CopyFromAMemorySync(void* source, void* dest, unsigned long size)
     int dmaId = RedSound(&Sound)->DMAEntry(0, 1, reinterpret_cast<int>(source), reinterpret_cast<int>(dest),
                                            static_cast<int>(size), 0, 0);
     watch.Start();
-    float timeout = FLOAT_8032f7d8;
+    float timeout = kMemoryDmaTimeout;
     while (RedSound(&Sound)->DMACheck(dmaId) != 0) {
         watch.Stop();
         if (watch.Get() < timeout) {
@@ -1749,7 +1749,7 @@ int CAmemCacheSet::GetData(short index, char* source, int line)
                                                            reinterpret_cast<int>(entry.m_workData), entry.m_size, 0, 0);
                     CStopWatch watch(0);
                     watch.Start();
-                    float timeout = FLOAT_8032f7d8;
+                    float timeout = kMemoryDmaTimeout;
                     while (RedSound(&Sound)->DMACheck(dmaId) != 0) {
                         watch.Stop();
                         if (watch.Get() >= timeout) {

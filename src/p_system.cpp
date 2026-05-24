@@ -19,8 +19,8 @@ unsigned int CSystemPcs::m_table[0x15C / sizeof(unsigned int)] = {
     0x16,
     0x8
 };
-const char s_CManager_801D7C54[] = "CManager";
-const char s_CProcess_801D7C60[] = "CProcess";
+const char sSystemPcsManagerClassName[] = "CManager";
+const char sSystemPcsProcessClassName[] = "CProcess";
 unsigned int s_CSystemPcsTablePad0_801EA250[3] = {
     reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CManager_8032E608)), 0, 0};
 unsigned int s_CSystemPcsTablePad1_801EA25C[5] = {

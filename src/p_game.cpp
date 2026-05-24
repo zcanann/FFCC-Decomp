@@ -1,11 +1,11 @@
 #include "ffcc/p_game.h"
 
-extern const char s_CGamePcs_801D7C20[] = "CGamePcs";
-static const char s_CManager_801D7C2C[] = "CManager";
-static const char s_CProcess_801D7C38[] = "CProcess";
+extern const char sGamePcsClassName[] = "CGamePcs";
+static const char sGameManagerClassName[] = "CManager";
+static const char sGameProcessClassName[] = "CProcess";
 
 unsigned int CGamePcs::m_table[0x15C / sizeof(unsigned int)] = {
-    reinterpret_cast<unsigned int>(const_cast<char*>(s_CGamePcs_801D7C20)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x13, 0, 0, 0, 0, 0x17, 0, 0, 0,
+    reinterpret_cast<unsigned int>(const_cast<char*>(sGamePcsClassName)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x13, 0, 0, 0, 0, 0x17, 0, 0, 0,
     0, 0x19, 0, 0, 0, 0, 0x3A, 1, 0, 0, 0, 0x3C, 1, 0, 0, 0, 0x47, 1, 0, 0, 0, 0x4C
 };
 

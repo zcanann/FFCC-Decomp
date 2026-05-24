@@ -50,7 +50,7 @@ const char s_defaultScriptName[] = "ffcc_0";
 const char s_gameDebugMarker[] = "*\n";
 const char s_townNameTepa[] = "Tepa";
 const char s_townNameTipa[] = "Tipa";
-const char s_GameStageName_8032F6B4[] = "Game";
+const char sGameStageName[] = "Game";
 }
 extern const char s_dvd_pctscft_param_cfd_801D6054[];
 extern const char s_dvd_pctscft_c_system_cfd_801D6068[];
@@ -86,22 +86,22 @@ static const char s_ScriptWillChangeMsg_801D619C[] = {
 static const char s_ScriptResidentLoadedMsg_801D61B8[] = {
     0x83, 0x58, 0x83, 0x4E, 0x83, 0x8A, 0x83, 0x76, 0x83, 0x67, 0x82, 0xCC, 0x8F, 0xED, 0x92, 0x93, 0x82, 0xF0,
     0x93, 0xC7, 0x82, 0xDD, 0x8D, 0x9E, 0x82, 0xDD, 0x82, 0xDC, 0x82, 0xB5, 0x82, 0xBD, 0x81, 0x42, 0x0A, 0x00};
-static const char s_CoreResidentLoadedMsg_801D61DC[] = {
+static const char sCoreResidentLoadedMsg[] = {
     0x83, 0x54, 0x83, 0x45, 0x83, 0x93, 0x83, 0x68, 0x81, 0x45, 0x83, 0x4C, 0x83, 0x83, 0x83, 0x89, 0x81, 0x45,
     0x83, 0x70, 0x81, 0x5B, 0x83, 0x65, 0x83, 0x42, 0x83, 0x4E, 0x83, 0x8B, 0x82, 0xCC, 0x8F, 0xED, 0x92, 0x93,
     0x82, 0xF0, 0x93, 0xC7, 0x82, 0xDD, 0x8D, 0x9E, 0x82, 0xDD, 0x82, 0xDC, 0x82, 0xB5, 0x82, 0xBD, 0x81, 0x42,
     0x0A, 0x00};
-static const char s_NewGameInitMsg_801D6214[] = {
+static const char sNewGameInitMsg[] = {
     0x2A, 0x83, 0x6A, 0x83, 0x85, 0x81, 0x5B, 0x83, 0x51, 0x81, 0x5B, 0x83, 0x80, 0x8F, 0x89, 0x8A, 0xFA, 0x89,
     0xBB, 0x82, 0xB5, 0x82, 0xDC, 0x82, 0xB7, 0x81, 0x42, 0x0A, 0x00};
 static const char s_ScriptChangedMsg_801D6234[] = {
     0x83, 0x58, 0x83, 0x4E, 0x83, 0x8A, 0x83, 0x76, 0x83, 0x67, 0x82, 0xAA, 0x90, 0xD8, 0x82, 0xE8, 0x91, 0xD6,
     0x82, 0xED, 0x82, 0xE8, 0x82, 0xDC, 0x82, 0xB5, 0x82, 0xBD, 0x0A, 0x00};
-static const char s_CGame_Exec_scene_pcts_801D6254[] = "CGame.Exec: scene = %s\n";
-static const char s_CGameInvalidSceneFmt_801D626C[] = {
+static const char sGameExecSceneFmt[] = "CGame.Exec: scene = %s\n";
+static const char sGameInvalidSceneFmt[] = {
     0x83, 0x56, 0x81, 0x5B, 0x83, 0x93, 0x82, 0xAA, 0x88, 0xD9, 0x8F, 0xED, 0x82, 0xC5, 0x82, 0xB7,
     0x81, 0x42, 0x25, 0x64, 0x0A, 0x00, 0x00, 0x00};
-static const char s_GameDebug_801D6284[] = "GameDebug";
+static const char sGameDebugStageName[] = "GameDebug";
 extern const char s_SN_EXIT_8032F630[];
 extern const char s_SN_DUMMY_801D600C[];
 extern const char s_SN_CHARA_801D6018[];
@@ -267,9 +267,9 @@ void CGame::Init()
     McPcs.Init();
     DbgMenuPcs.Init();
 
-    m_mainStage = Memory.CreateStage(0x106000, const_cast<char*>(s_GameStageName_8032F6B4), 0);
+    m_mainStage = Memory.CreateStage(0x106000, const_cast<char*>(sGameStageName), 0);
     if (OSGetConsoleSimulatedMemSize() == 0x3000000) {
-        m_debugStage = Memory.CreateStage(0x220000, const_cast<char*>(s_GameDebug_801D6284), 1);
+        m_debugStage = Memory.CreateStage(0x220000, const_cast<char*>(sGameDebugStageName), 1);
     }
 
     m_sceneId = 4;
@@ -331,7 +331,7 @@ void CGame::LoadLogoWaitingData()
 			return;
 		}
 
-		System.Printf(const_cast<char*>(s_CoreResidentLoadedMsg_801D61DC));
+		System.Printf(const_cast<char*>(sCoreResidentLoadedMsg));
 	}
 }
 
@@ -364,9 +364,9 @@ void CGame::Exec()
 
 		int sceneId = m_currentSceneId;
 		if (sceneId >= 0 && sceneId < 9) {
-			System.Printf(const_cast<char*>(s_CGame_Exec_scene_pcts_801D6254), m_tStatus[sceneId]);
+			System.Printf(const_cast<char*>(sGameExecSceneFmt), m_tStatus[sceneId]);
 		} else {
-			System.Printf(const_cast<char*>(s_CGameInvalidSceneFmt_801D626C), sceneId);
+			System.Printf(const_cast<char*>(sGameInvalidSceneFmt), sceneId);
 		}
 
 		switch (m_currentSceneId) {
@@ -540,7 +540,7 @@ void CGame::Destroy()
 void CGame::InitNewGame()
 {
     System.Printf(const_cast<char*>(s_gameDebugMarker));
-    System.Printf(const_cast<char*>(s_NewGameInitMsg_801D6214));
+    System.Printf(const_cast<char*>(sNewGameInitMsg));
     System.Printf(const_cast<char*>(s_gameDebugMarker));
 
     CGame* game = &Game;
@@ -741,7 +741,7 @@ void CGame::CheckScriptChange()
             m_assetsLoadedFlag = 1;
 
             if ((u32)System.m_execParam > 2) {
-                System.Printf(const_cast<char*>(s_CoreResidentLoadedMsg_801D61DC));
+                System.Printf(const_cast<char*>(sCoreResidentLoadedMsg));
             }
         }
     }
@@ -753,7 +753,7 @@ void CGame::CheckScriptChange()
         CGame* game = &Game;
 
         System.Printf(const_cast<char*>(s_gameDebugMarker));
-        System.Printf(const_cast<char*>(s_NewGameInitMsg_801D6214));
+        System.Printf(const_cast<char*>(sNewGameInitMsg));
         System.Printf(const_cast<char*>(s_gameDebugMarker));
 
         memset(&game->m_gameWork.m_gameDataStartMarker, 0, 0x13E1);

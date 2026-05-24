@@ -22,7 +22,7 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
 extern const char s_CSound_80330ce0[] = "CSound";
-extern const char s_CManager_801DB0B0[] = "CManager";
+extern const char sSoundManagerClassName[] = "CManager";
 extern const float FLOAT_80330ce8 = 127.0f;
 extern const float kLineSegmentMinT = 0.0f;
 extern const float kLineSegmentMaxT = 1.0f;

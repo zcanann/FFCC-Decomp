@@ -53,10 +53,10 @@ static inline float CameraDirY() { return CameraPcs.m_directionY; }
 static inline float CameraDirZ() { return CameraPcs.m_directionZ; }
 static inline MtxPtr CameraMatrix() { return CameraPcs.m_cameraMatrix; }
 
-extern const char s_CLightPcs_801D7C70[] = "CLightPcs";
-extern const char s_CManager_801D7C7C[] = "CManager";
-extern const char s_CProcess_801D7C88[] = "CProcess";
-extern "C" const char s_LightTextureFullFmt_801D7C94[0x18] =
+extern const char sLightPcsClassName[] = "CLightPcs";
+extern const char sLightManagerClassName[] = "CManager";
+extern const char sLightProcessClassName[] = "CProcess";
+extern "C" const char sLightTextureFullMsg[0x18] =
     "\x83\x89\x83\x43\x83\x67\x82\xAA\x91\xAB\x82\xE8\x82\xDC\x82\xB9\x82\xF1\x81\x42\x0A";
 
 unsigned int CLightPcs::m_table_desc0[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__9CLightPcsFv)};
@@ -65,7 +65,7 @@ unsigned int CLightPcs::m_table_desc2[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsi
 unsigned int CLightPcs::m_table_desc3[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(draw__9CLightPcsFv)};
 unsigned int CLightPcs::m_table_desc4[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(MakeLightMap__9CLightPcsFv)};
 unsigned int CLightPcs::m_table[0x15C / sizeof(unsigned int)] = {
-    reinterpret_cast<unsigned int>(const_cast<char*>(s_CLightPcs_801D7C70)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x1C, 0, 0, 0, 0, 0x2A, 0, 0, 0,
+    reinterpret_cast<unsigned int>(const_cast<char*>(sLightPcsClassName)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x1C, 0, 0, 0, 0, 0x2A, 0, 0, 0,
     0, 0x2D, 1
 };
 
@@ -383,7 +383,7 @@ CLightPcs::CBumpLight* CLightPcs::AddBump(CLightPcs::CLight* srcLight, CLightPcs
 
     if (bumpLight == 0) {
         if (static_cast<unsigned int>(System.m_execParam) >= 1) {
-            System.Printf(const_cast<char*>(s_LightTextureFullFmt_801D7C94));
+            System.Printf(const_cast<char*>(sLightTextureFullMsg));
         }
         return 0;
     }

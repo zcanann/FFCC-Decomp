@@ -49,8 +49,8 @@ extern "C" const Vec s_funnyEye = {0.0f, 0.0f, 4.0f};
 extern "C" const Vec s_funnyAt = {0.0f, 0.0f, 0.0f};
 extern "C" const Vec s_funnyUp = {0.0f, 1.0f, 0.0f};
 const char s_CFunnyShapePcs[] = "CFunnyShapePcs";
-static const char s_CManager_801D7E1C[] = "CManager";
-static const char s_CProcess_801D7E28[] = "CProcess";
+static const char sFunnyShapePcsManagerClassName[] = "CManager";
+static const char sFunnyShapePcsProcessClassName[] = "CProcess";
 static const char s_funnyShapeFmt[] = "FunnyShape [%c]";
 static const char s_CPtrArray_OSFS_TEXTURE_ST_801D7E44[] = "CPtrArray<OSFS_TEXTURE_ST *>";
 static const char s_CPtrArray_GXTexObj[] = "CPtrArray<_GXTexObj *>";
@@ -434,9 +434,9 @@ unsigned int CFunnyShapePcs::m_table[0x15C / sizeof(unsigned int)] = {
     reinterpret_cast<unsigned int>(const_cast<char*>(s_CFunnyShapePcsViewer)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x21, 0, 0, 0, 0,
     0x42, 1
 };
-unsigned int lbl_801EA904[3] = {
+unsigned int sFunnyShapePcsTablePad0[3] = {
     reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CManager_8032E660)), 0, 0};
-unsigned int lbl_801EA910[5] = {
+unsigned int sFunnyShapePcsTablePad1[5] = {
     reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CManager_8032E660)),
     0,
     reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CProcess_8032E668)),

@@ -25,63 +25,63 @@ struct DbgMenuDef {
     u32 actionFlags;
 };
 
-extern const char s_CDbgMenuPcs_801DD428[] = "CDbgMenuPcs";
-extern const char s_DbgMenuMenu_80331C18[] = "MENU";
-extern const char s_DbgMenuShouki_80331C20[] = "SHOUKI";
-extern const char s_DbgMenuMark_80331C28[] = "MARK";
-extern const char s_DbgMenuBar_80331C30[] = "BAR";
-extern const char s_DbgMenuSpeed_80331C34[] = "SPEED";
-extern const char s_DbgMenuMuteki_80331C3C[] = "MUTEKI";
-extern const char s_DbgMenuFollow_80331C44[] = "FOLLOW";
-extern const char s_DISPPRINT_801DD434[] = "DISPPRINT";
-extern const char s_DbgMenuCombo_80331C4C[] = "COMBO";
-extern const char s_DbgMenuPause_80331C54[] = "PAUSE";
-extern const char s_DbgMenuBattle_80331C5C[] = "BATTLE";
-extern const char s_DbgMenuAnalog_80331C64[] = "ANALOG";
-extern const char s_COLCHECK_801DD440[] = "COLCHECK";
-extern const char s_DbgMenuAsterisk_80331C6C[] = "A*";
-extern const char s_PARTICLE_801DD44C[] = "PARTICLE";
-extern const char s_DbgMenuPrintf_80331C70[] = "PRINTF";
-extern const char s_SOUND_INFO_801DD458[] = "SOUND INFO";
-extern const char s_DbgMenuShadow_80331C78[] = "SHADOW";
-extern const char s_PART_HEAP_801DD464[] = "PART HEAP";
-extern const char s_CHARA_INFO_801DD470[] = "CHARA INFO";
-extern const char s_ITEM_WEAPON_801DD47C[] = "ITEM WEAPON";
-extern const char s_SMITH_MASTER_801DD488[] = "SMITH MASTER";
-extern const char s_DbgMenuChara_80331C80[] = "CHARA";
+extern const char sCDbgMenuPcs[] = "CDbgMenuPcs";
+extern const char sDbgMenuMenu[] = "MENU";
+extern const char sDbgMenuShouki[] = "SHOUKI";
+extern const char sDbgMenuMark[] = "MARK";
+extern const char sDbgMenuBar[] = "BAR";
+extern const char sDbgMenuSpeed[] = "SPEED";
+extern const char sDbgMenuMuteki[] = "MUTEKI";
+extern const char sDbgMenuFollow[] = "FOLLOW";
+extern const char sDbgMenuDispPrint[] = "DISPPRINT";
+extern const char sDbgMenuCombo[] = "COMBO";
+extern const char sDbgMenuPause[] = "PAUSE";
+extern const char sDbgMenuBattle[] = "BATTLE";
+extern const char sDbgMenuAnalog[] = "ANALOG";
+extern const char sDbgMenuColCheck[] = "COLCHECK";
+extern const char sDbgMenuAsterisk[] = "A*";
+extern const char sDbgMenuParticle[] = "PARTICLE";
+extern const char sDbgMenuPrintf[] = "PRINTF";
+extern const char sDbgMenuSoundInfo[] = "SOUND INFO";
+extern const char sDbgMenuShadow[] = "SHADOW";
+extern const char sDbgMenuPartHeap[] = "PART HEAP";
+extern const char sDbgMenuCharaInfo[] = "CHARA INFO";
+extern const char sDbgMenuItemWeapon[] = "ITEM WEAPON";
+extern const char sDbgMenuSmithMaster[] = "SMITH MASTER";
+extern const char sDbgMenuChara[] = "CHARA";
 extern const u32 kDbgMenuHighlightAlpha = 0x00000080;
 extern const u32 kDbgMenuFontColor = 0xFFFFFFFF;
-extern const char s_Debug_80331c90[] = "Debug";
+extern const char sDbgMenuDebug[] = "Debug";
 extern const float kDbgMenuViewportNear = 0.0f;
 extern const double kDbgMenuSignedIntBias = 4503601774854144.0;
 extern const float kDbgMenuViewportWidth = 640.0f;
 extern const float kDbgMenuViewportHeight = 448.0f;
 extern const float kDbgMenuViewportFar = 1.0f;
-extern const char s_DbgMenuOn_80331CB4[] = "ON";
-extern const char s_DbgMenuOff_80331CB8[] = "OFF";
-extern const char s_DbgMenuUnknown_80331CBC[] = "?";
+extern const char sDbgMenuOn[] = "ON";
+extern const char sDbgMenuOff[] = "OFF";
+extern const char sDbgMenuUnknown[] = "?";
 
 u32 CDbgMenuPcs::m_table_desc0[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(create__11CDbgMenuPcsFv)};
 u32 CDbgMenuPcs::m_table_desc1[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(destroy__11CDbgMenuPcsFv)};
 u32 CDbgMenuPcs::m_table_desc2[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(calc__11CDbgMenuPcsFv)};
 u32 CDbgMenuPcs::m_table_desc3[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(draw__11CDbgMenuPcsFv)};
 u32 CDbgMenuPcs::m_table[0x15C / sizeof(u32)] = {
-    reinterpret_cast<u32>(const_cast<char*>(s_CDbgMenuPcs_801DD428)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x11, 0, 0, 0, 0, 0x4A, 1
+    reinterpret_cast<u32>(const_cast<char*>(sCDbgMenuPcs)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x11, 0, 0, 0, 0, 0x4A, 1
 };
 
 DbgMenuDef tWork[] = {
-    { s_DbgMenuMenu_80331C18, 100, 2, 1 },   { s_DbgMenuShouki_80331C20, 101, 2, 1 },
-    { s_DbgMenuMark_80331C28, 102, 2, 1 },   { s_DbgMenuBar_80331C30, 103, 2, 1 },
-    { s_DbgMenuSpeed_80331C34, 104, 2, 1 },  { s_DbgMenuMuteki_80331C3C, 105, 2, 1 },
-    { s_DbgMenuFollow_80331C44, 106, 2, 1 }, { s_DISPPRINT_801DD434, 107, 2, 1 },
-    { s_DbgMenuCombo_80331C4C, 108, 2, 1 },  { s_DbgMenuPause_80331C54, 109, 2, 1 },
-    { s_DbgMenuBattle_80331C5C, 110, 2, 1 }, { s_DbgMenuAnalog_80331C64, 111, 2, 1 },
-    { s_COLCHECK_801DD440, 112, 2, 1 },      { s_DbgMenuAsterisk_80331C6C, 113, 2, 1 },
-    { s_PARTICLE_801DD44C, 114, 2, 1 },      { s_DbgMenuPrintf_80331C70, 115, 2, 1 },
-    { s_SOUND_INFO_801DD458, 116, 3, 1 },    { s_DbgMenuShadow_80331C78, 117, 2, 1 },
-    { s_PART_HEAP_801DD464, 118, 2, 1 },     { s_CHARA_INFO_801DD470, 119, 3, 1 },
-    { s_ITEM_WEAPON_801DD47C, 120, 2, 1 },   { s_SMITH_MASTER_801DD488, 121, 2, 1 },
-    { s_DbgMenuChara_80331C80, 122, 2, 1 },
+    { sDbgMenuMenu, 100, 2, 1 },      { sDbgMenuShouki, 101, 2, 1 },
+    { sDbgMenuMark, 102, 2, 1 },      { sDbgMenuBar, 103, 2, 1 },
+    { sDbgMenuSpeed, 104, 2, 1 },     { sDbgMenuMuteki, 105, 2, 1 },
+    { sDbgMenuFollow, 106, 2, 1 },    { sDbgMenuDispPrint, 107, 2, 1 },
+    { sDbgMenuCombo, 108, 2, 1 },     { sDbgMenuPause, 109, 2, 1 },
+    { sDbgMenuBattle, 110, 2, 1 },    { sDbgMenuAnalog, 111, 2, 1 },
+    { sDbgMenuColCheck, 112, 2, 1 },  { sDbgMenuAsterisk, 113, 2, 1 },
+    { sDbgMenuParticle, 114, 2, 1 },  { sDbgMenuPrintf, 115, 2, 1 },
+    { sDbgMenuSoundInfo, 116, 3, 1 }, { sDbgMenuShadow, 117, 2, 1 },
+    { sDbgMenuPartHeap, 118, 2, 1 },  { sDbgMenuCharaInfo, 119, 3, 1 },
+    { sDbgMenuItemWeapon, 120, 2, 1 }, { sDbgMenuSmithMaster, 121, 2, 1 },
+    { sDbgMenuChara, 122, 2, 1 },
 };
 u32 gDbgMenuWindowBorderColors[4] = {0x0000FFC0, 0x4040FFC0, 0x4040FFC0, 0x8080FFC0};
 GXColor gDbgMenuWindowFillColors[2] = {{0xFF, 0xFF, 0xFF, 0x80}, {0, 0, 0, 0x80}};
@@ -495,11 +495,11 @@ void CDbgMenuPcs::drawMenu(CDbgMenuPcs::CDM* menu)
 
 			const char* stateText;
 			if (current->m_state == 1) {
-				stateText = s_DbgMenuOn_80331CB4;
+				stateText = sDbgMenuOn;
 			} else {
-				stateText = s_DbgMenuUnknown_80331CBC;
+				stateText = sDbgMenuUnknown;
 				if (current->m_state == 0) {
-					stateText = s_DbgMenuOff_80331CB8;
+					stateText = sDbgMenuOff;
 				}
 			}
 
@@ -763,7 +763,7 @@ void CDbgMenuPcs::Add()
     rootParam.m_unk28 = 0;
     rootParam.m_unk2C = 0;
     param = rootParam;
-    param.m_text = const_cast<char*>(s_Debug_80331c90);
+    param.m_text = const_cast<char*>(sDbgMenuDebug);
     Add(0, 10, param);
 
     y = 10;

@@ -77,7 +77,7 @@ extern const unsigned char s_systemDebugResources[0x194] = {
     0x00, 0x00, 0x00, 0x00, 0x95, 0x82, 0x93, 0xAE, 0x8F, 0xAC, 0x90, 0x94,
     0x93, 0x5F, 0x97, 0xE1, 0x8A, 0x4F, 0x00, 0x00,
 };
-extern const char s_CManager_801D6F14[] = "CManager";
+extern const char sSystemManagerClassName[] = "CManager";
 extern const char s_system_cpp[12] = "system.cpp";
 extern const char s_gamePalM_map[16] = "gamePalM.map";
 extern const char s_compilerMapLoaded[] =

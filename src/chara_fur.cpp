@@ -50,10 +50,10 @@ extern "C" {
 extern unsigned char m_mogWork[0x30];
 void* gMogFurTexBuffer;
 }
-extern float FLOAT_8033110C;
-extern float FLOAT_80331138;
-extern float FLOAT_8033114C;
-extern float FLOAT_80331150;
+extern float kCharaFurDepthZero;
+extern float kCharaFurDepthScaleBase;
+extern float kCharaFurViewDepthThreshold;
+extern float kCharaFurShadeScale;
 static inline unsigned char* GameRaw() { return reinterpret_cast<unsigned char*>(&Game); }
 
 namespace {
@@ -1672,11 +1672,11 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 	if (furStep == 0.0f) {
 		furStep = 1.0f;
 	}
-	float furDepth = FLOAT_8033110C;
+	float furDepth = kCharaFurDepthZero;
 	Vec modelPos = {ModelDrawMtx(this)[0][3], ModelDrawMtx(this)[1][3], ModelDrawMtx(this)[2][3]};
 	Vec viewPos;
 	PSMTXMultVec(viewMtx, &modelPos, &viewPos);
-	if (viewPos.z < FLOAT_8033114C) {
+	if (viewPos.z < kCharaFurViewDepthThreshold) {
 		Vec4d clipPos;
 		Math.MTX44MultVec4(CameraPcs.m_screenMatrix, &viewPos, &clipPos);
 		if (clipPos.w != 0.0f) {
@@ -1684,11 +1684,11 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 		}
 	}
 
-	float furLength = ModelFurLenScale(this) * (FLOAT_80331138 - furDepth) + ModelFurLenScale(this);
+	float furLength = ModelFurLenScale(this) * (kCharaFurDepthScaleBase - furDepth) + ModelFurLenScale(this);
 	if (furLength <= 0.0f) {
 		furLength = 1.0f;
 	}
-	const int furShade = static_cast<int>(FLOAT_80331150 * ModelFurCur(this));
+	const int furShade = static_cast<int>(kCharaFurShadeScale * ModelFurCur(this));
 	const GXColor furColor = CColor(static_cast<unsigned char>(furShade), static_cast<unsigned char>(furShade),
 	                                static_cast<unsigned char>(furShade), 0xFF)
 	                             .color;

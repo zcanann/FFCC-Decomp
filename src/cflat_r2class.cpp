@@ -543,12 +543,13 @@ CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* objec
  * JP Address: TODO
  * JP Size: TODO
  */
-void CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int command, int& outResult)
+int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int command, int& outResult)
 {
 	CGObject* engineObject = reinterpret_cast<CGObject*>(object->m_engineObject);
 	CGCharaObj* charaObject = reinterpret_cast<CGCharaObj*>(object->m_engineObject);
 	CGPartyObj* partyObject = reinterpret_cast<CGPartyObj*>(object->m_engineObject);
 	unsigned int* localBase = object->m_localBase;
+	int handled = 1;
 
 	switch (command) {
 		case -0x9F: {
@@ -1001,8 +1002,11 @@ void CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int co
 			outResult = 0;
 			break;
 		default:
+			handled = 0;
 			break;
 	}
+
+	return handled;
 }
 
 /*

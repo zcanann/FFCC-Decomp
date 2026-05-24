@@ -52,11 +52,11 @@ extern const char s_DbgMenuChara_80331C80[] = "CHARA";
 extern const u32 kDbgMenuHighlightAlpha = 0x00000080;
 extern const u32 kDbgMenuFontColor = 0xFFFFFFFF;
 extern const char s_Debug_80331c90[] = "Debug";
-extern const float FLOAT_80331C98 = 0.0f;
-extern const double DOUBLE_80331CA0 = 4503601774854144.0;
-extern const float FLOAT_80331CA8 = 640.0f;
-extern const float FLOAT_80331CAC = 448.0f;
-extern const float FLOAT_80331CB0 = 1.0f;
+extern const float kDbgMenuViewportNear = 0.0f;
+extern const double kDbgMenuSignedIntBias = 4503601774854144.0;
+extern const float kDbgMenuViewportWidth = 640.0f;
+extern const float kDbgMenuViewportHeight = 448.0f;
+extern const float kDbgMenuViewportFar = 1.0f;
 extern const char s_DbgMenuOn_80331CB4[] = "ON";
 extern const char s_DbgMenuOff_80331CB8[] = "OFF";
 extern const char s_DbgMenuUnknown_80331CBC[] = "?";
@@ -475,8 +475,8 @@ void CDbgMenuPcs::drawMenu(CDbgMenuPcs::CDM* menu)
 
 	do {
 		m_currentMenu = current;
-		GXSetViewport((f32)current->m_drawX, (f32)current->m_drawY, FLOAT_80331CA8, FLOAT_80331CAC, FLOAT_80331C98,
-		              FLOAT_80331CB0);
+		GXSetViewport((f32)current->m_drawX, (f32)current->m_drawY, kDbgMenuViewportWidth, kDbgMenuViewportHeight,
+		              kDbgMenuViewportNear, kDbgMenuViewportFar);
 
 		int type = current->m_type;
 		if (type != 2) {
@@ -561,7 +561,7 @@ void CDbgMenuPcs::changeVtxFmt(int vtxFmt)
 void CDbgMenuPcs::drawWindow(int flags, int x, int y, int width, int height, char* text)
 {
 	changeVtxFmt(1);
-	float z = FLOAT_80331C98;
+	float z = kDbgMenuViewportNear;
 
 	if ((flags & 1) == 0) {
 		GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT1, 4);

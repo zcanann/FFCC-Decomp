@@ -10,16 +10,16 @@ class CBound;
 
 int FindIntersection(const Vec&, const Vec&, const CMapCylinder&, float&);
 
-extern "C" const float FLOAT_8032F8EC;
-extern "C" const float FLOAT_8032F8F0;
+extern "C" const float kMapHitBoundsMinInit;
+extern "C" const float kMapHitBoundsMaxInit;
 
 class CMapCylinder
 {
 public:
     CMapCylinder()
     {
-        float min = FLOAT_8032F8EC;
-        float max = FLOAT_8032F8F0;
+        float min = kMapHitBoundsMinInit;
+        float max = kMapHitBoundsMaxInit;
 
         m_boundsMin.z = min;
         m_boundsMin.y = min;

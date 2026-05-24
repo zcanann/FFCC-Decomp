@@ -41,10 +41,10 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
 
-const float FLOAT_8032f688 = 1.0E+10;
-const float FLOAT_8032f68c = -1.0E+10;
-const float FLOAT_8032f690 = 0.0;
-const float FLOAT_8032f694 = 0.001;
+const float kGamePartyBoundsMinInit = 1.0E+10;
+const float kGamePartyBoundsMaxInit = -1.0E+10;
+const float kGameZero = 0.0;
+const float kGameSmallDelta = 0.001;
 extern "C" {
 const char s_defaultScriptName[] = "ffcc_0";
 const char s_gameDebugMarker[] = "*\n";
@@ -163,8 +163,8 @@ static inline GameSoundLayout& GameSoundData(CSound& sound)
 CGame Game;
 
 // Uninitialized
-static float FLOAT_8032ec40;
-static s8 BOOL_8032ec44;
+static float sMapObjRotationAngle;
+static s8 sMapObjRotationInitialized;
 
 /*
  * --INFO--
@@ -201,12 +201,12 @@ CMapLightHolder* CPtrArray<CMapLightHolder*>::operator[](unsigned long index)
  * Size:	TODO
  */
 inline CGame::CGame()
-    : m_partyMinX(FLOAT_8032f688)
-    , m_partyMinY(FLOAT_8032f688)
-    , m_partyMinZ(FLOAT_8032f688)
-    , m_partyMaxX(FLOAT_8032f68c)
-    , m_partyMaxY(FLOAT_8032f68c)
-    , m_partyMaxZ(FLOAT_8032f68c)
+    : m_partyMinX(kGamePartyBoundsMinInit)
+    , m_partyMinY(kGamePartyBoundsMinInit)
+    , m_partyMinZ(kGamePartyBoundsMinInit)
+    , m_partyMaxX(kGamePartyBoundsMaxInit)
+    , m_partyMaxY(kGamePartyBoundsMaxInit)
+    , m_partyMaxZ(kGamePartyBoundsMaxInit)
 {
 	// TODO
 }
@@ -279,7 +279,7 @@ void CGame::Init()
     memset(m_startScriptName, 0, sizeof(m_startScriptName));
     m_frameCounterEnable = 1;
     gCFlatRuntime().Init();
-    unkFloat_0xca10 = FLOAT_8032f694;
+    unkFloat_0xca10 = kGameSmallDelta;
 }
 
 /*
@@ -968,12 +968,12 @@ void CGame::Calc()
         m_gameWork.m_frameCounter++;
     }
 
-    m_partyMinZ = FLOAT_8032f688;
-    m_partyMinY = FLOAT_8032f688;
-    m_partyMinX = FLOAT_8032f688;
-    m_partyMaxZ = FLOAT_8032f68c;
-    m_partyMaxY = FLOAT_8032f68c;
-    m_partyMaxX = FLOAT_8032f68c;
+    m_partyMinZ = kGamePartyBoundsMinInit;
+    m_partyMinY = kGamePartyBoundsMinInit;
+    m_partyMinX = kGamePartyBoundsMinInit;
+    m_partyMaxZ = kGamePartyBoundsMaxInit;
+    m_partyMaxY = kGamePartyBoundsMaxInit;
+    m_partyMaxX = kGamePartyBoundsMaxInit;
 
     for (int i = 0; i < 4; i++) {
         CGPartyObj* partyObj = m_partyObjArr[i];
@@ -1005,13 +1005,13 @@ void CGame::Calc()
     CFlatRuntime2Storage().Frame(1, 0);
 
     if ((m_currentMapId == 0x21) && ((mapObjIdx = MapMng.GetMapObjIdx(0)) >= 0)) {
-            if (!BOOL_8032ec44) {
-                BOOL_8032ec44 = true;
-                FLOAT_8032ec40 = FLOAT_8032f690;
+            if (!sMapObjRotationInitialized) {
+                sMapObjRotationInitialized = true;
+                sMapObjRotationAngle = kGameZero;
             }
 
-            FLOAT_8032ec40 += FLOAT_8032f694;
-            PSMTXRotRad(rotMtx, 'y', FLOAT_8032ec40);
+            sMapObjRotationAngle += kGameSmallDelta;
+            PSMTXRotRad(rotMtx, 'y', sMapObjRotationAngle);
             MapMng.SetMapObjLMtx(mapObjIdx, rotMtx);
     }
 }

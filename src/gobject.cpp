@@ -29,7 +29,6 @@ extern "C" int CrossCheckSphereVector__5CMathFP3VecPfP3VecP3VecP3Vecf(
 extern "C" int CalcHitSlide__7CMapObjFP3Vecf(void*, Vec*);
 extern double DOUBLE_803303e8;
 extern double DOUBLE_80330400;
-extern const float FLOAT_80330350;
 
 struct Vec4d {
     float x;
@@ -2715,7 +2714,7 @@ void CGObject::SetTexAnim(char* name)
     if (hasModel) {
         texAnimSet = *reinterpret_cast<CTexAnimSet**>(reinterpret_cast<unsigned char*>(handle->m_model) + 0xD4);
         if (texAnimSet != (CTexAnimSet*)0) {
-            texAnimSet->Change(name, FLOAT_80330350, (CTexAnimSet::ANIM_TYPE)-2);
+            texAnimSet->Change(name, sZeroFloat, (CTexAnimSet::ANIM_TYPE)-2);
         }
     }
 }
@@ -3022,7 +3021,7 @@ void CGObject::CancelAnim(int keepFacing)
 	*((u8*)&m_shieldNodeFlags) =
 	    static_cast<u8>(__rlwimi(*((u8*)&m_shieldNodeFlags), 0, 6, 25, 25));
 
-	m_turnSpeed = FLOAT_80330350;
+	m_turnSpeed = sZeroFloat;
 
 	if (keepFacing != 0)
 	{
@@ -3079,7 +3078,7 @@ void CGObject::PlayAnim(int slot, int param2, int param3, int param4, int param5
     flags = *reinterpret_cast<u8*>(&m_shieldNodeFlags);
     flags = static_cast<u8>(__rlwimi(flags, 1, 3, 28, 28));
     *reinterpret_cast<u8*>(&m_shieldNodeFlags) = flags;
-    m_turnSpeed = FLOAT_80330350;
+    m_turnSpeed = sZeroFloat;
 }
 
 /*

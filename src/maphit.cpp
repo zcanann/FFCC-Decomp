@@ -338,9 +338,8 @@ int CMapHit::CalcHitSlide(Vec* out, float y)
             Vec previous;
             Vec current;
             if (g_hit_edge_idx_min == 0) {
-                unsigned short* indices = face->m_vertexIndices;
-                previous = m_vertices[indices[face->m_vertexCount - 1]];
-                current = m_vertices[indices[0]];
+                previous = m_vertices[face->m_vertexIndices[face->m_vertexCount - 1]];
+                current = m_vertices[face->m_vertexIndices[g_hit_edge_idx_min]];
             } else {
                 previous = m_vertices[face->m_vertexIndices[g_hit_edge_idx_min - 1]];
                 current = m_vertices[face->m_vertexIndices[g_hit_edge_idx_min]];
@@ -660,9 +659,9 @@ int CMapHit::ReadOtmHit(CChunkFile& chunkFile)
                 m_positionMin.y = (m_positionMin.y < v->y) ? m_positionMin.y : v->y;
                 m_positionMin.z = (m_positionMin.z < v->z) ? m_positionMin.z : v->z;
 
-                m_positionMax.x = (m_positionMax.x < v->x) ? v->x : m_positionMax.x;
-                m_positionMax.y = (m_positionMax.y < v->y) ? v->y : m_positionMax.y;
-                m_positionMax.z = (m_positionMax.z < v->z) ? v->z : m_positionMax.z;
+                m_positionMax.x = (m_positionMax.x > v->x) ? m_positionMax.x : v->x;
+                m_positionMax.y = (m_positionMax.y > v->y) ? m_positionMax.y : v->y;
+                m_positionMax.z = (m_positionMax.z > v->z) ? m_positionMax.z : v->z;
             }
 
             m_positionMin.x -= kMapHitUnitScale;
@@ -740,9 +739,9 @@ int CMapHit::ReadOtmHit(CChunkFile& chunkFile)
                     face.m_boundsMin.y = (face.m_boundsMin.y < v.y) ? face.m_boundsMin.y : v.y;
                     face.m_boundsMin.z = (face.m_boundsMin.z < v.z) ? face.m_boundsMin.z : v.z;
 
-                    face.m_boundsMax.x = (face.m_boundsMax.x < v.x) ? v.x : face.m_boundsMax.x;
-                    face.m_boundsMax.y = (face.m_boundsMax.y < v.y) ? v.y : face.m_boundsMax.y;
-                    face.m_boundsMax.z = (face.m_boundsMax.z < v.z) ? v.z : face.m_boundsMax.z;
+                    face.m_boundsMax.x = (face.m_boundsMax.x > v.x) ? face.m_boundsMax.x : v.x;
+                    face.m_boundsMax.y = (face.m_boundsMax.y > v.y) ? face.m_boundsMax.y : v.y;
+                    face.m_boundsMax.z = (face.m_boundsMax.z > v.z) ? face.m_boundsMax.z : v.z;
                 }
 
                 face.m_radiusScale *= radiusScale;

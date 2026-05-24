@@ -60,6 +60,7 @@ struct pppMngStLocationTitle2Raw {
 };
 
 extern const char s_LocationTitle2_cpp[] = "LocationTitle2.cpp";
+extern float kLocationTitle2WorkZero;
 
 /*
  * --INFO--
@@ -382,11 +383,10 @@ extern "C" void pppDestructLocationTitle2(struct pppLocationTitle2* locationTitl
  */
 extern "C" void pppConstructLocationTitle2(struct pppLocationTitle2* locationTitle, struct pppLocationTitle2UnkC* unkC)
 {
-    extern float FLOAT_80330f48;
     LocationTitle2Work* work;
     f32 value;
 
-    value = FLOAT_80330f48;
+    value = kLocationTitle2WorkZero;
     work = (LocationTitle2Work*)(locationTitle->m_workArea + *unkC->m_serializedDataOffsets);
     work->m_particles = 0;
     work->m_count = 0;

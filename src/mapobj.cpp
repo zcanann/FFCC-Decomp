@@ -1229,24 +1229,25 @@ static inline void calcColorKeyFrame(CMapKeyFrame* keyFrame, _GXColor& out, _GXC
         return;
     }
 
+    float blend;
     int key0;
     int key1;
-    float blend;
-    if (keyFrame->Get(key0, key1, blend) == 0) {
-        out = colors[key0];
-    } else {
+    if (keyFrame->Get(key0, key1, blend) != 0) {
         int blendRate = static_cast<int>(kMapObjColorBlendScale * blend);
         _GXColor c0 = colors[key0];
         _GXColor c1 = colors[key1];
 
-        out.r = static_cast<unsigned char>(
+        c0.r = static_cast<unsigned char>(
             c0.r + ((blendRate * (static_cast<int>(c1.r) - static_cast<int>(c0.r))) >> 8));
-        out.g = static_cast<unsigned char>(
+        c0.g = static_cast<unsigned char>(
             c0.g + ((blendRate * (static_cast<int>(c1.g) - static_cast<int>(c0.g))) >> 8));
-        out.b = static_cast<unsigned char>(
+        c0.b = static_cast<unsigned char>(
             c0.b + ((blendRate * (static_cast<int>(c1.b) - static_cast<int>(c0.b))) >> 8));
-        out.a = static_cast<unsigned char>(
+        c0.a = static_cast<unsigned char>(
             c0.a + ((blendRate * (static_cast<int>(c1.a) - static_cast<int>(c0.a))) >> 8));
+        out = c0;
+    } else {
+        out = colors[key0];
     }
 
     keyFrame->Calc();
@@ -1254,19 +1255,23 @@ static inline void calcColorKeyFrame(CMapKeyFrame* keyFrame, _GXColor& out, _GXC
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80029538
+ * PAL Size: 2016b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMapObj::Calc()
 {
     if (S16At(this, 0x2C) != 0) {
         S16At(this, 0x28) = static_cast<short>(S16At(this, 0x28) + S16At(this, 0x2C));
-        if (S16At(this, 0x2C) <= 0) {
-            if (S16At(this, 0x28) <= S16At(this, 0x2A)) {
+        if (S16At(this, 0x2C) > 0) {
+            if (S16At(this, 0x28) >= S16At(this, 0x2A)) {
                 S16At(this, 0x28) = S16At(this, 0x2A);
                 U16At(this, 0x2C) = 0;
             }
-        } else if (S16At(this, 0x28) >= S16At(this, 0x2A)) {
+        } else if (S16At(this, 0x28) <= S16At(this, 0x2A)) {
             S16At(this, 0x28) = S16At(this, 0x2A);
             U16At(this, 0x2C) = 0;
         }
@@ -1278,10 +1283,14 @@ void CMapObj::Calc()
         }
     }
 
-    if ((static_cast<signed char>(U8At(this, 0x1D)) == 1) && (m_mapData != 0) &&
+    if ((static_cast<unsigned int>(U8At(this, 0x1D)) == 1U) && (m_mapData != 0) &&
         (static_cast<signed char>(U8At(this, 0x1F)) == -1) &&
         ((U8At(this, 0x18) & 1) != 0)) {
-        if ((kMapObjOne <= F32At(this, 0x50)) || (F32At(this, 0x4C) < kMapObjInitNegOne)) {
+        if ((F32At(this, 0x50) < kMapObjOne) && (F32At(this, 0x4C) >= kMapObjInitNegOne)) {
+            U8At(this, 0x15) = U8At(this, 0x14);
+            U8At(this, 0x25) = 1;
+            U8At(this, 0x26) = 0;
+        } else {
             Vec pos;
             Vec posCam;
             Mtx cameraMtx;
@@ -1292,25 +1301,66 @@ void CMapObj::Calc()
             PSMTXMultVec(cameraMtx, &pos, &posCam);
             posCam.z = -posCam.z;
 
-            U8At(this, 0x25) = static_cast<unsigned char>(F32At(this, 0x50) < posCam.z);
-            if (F32At(this, 0x4C) <= posCam.z) {
-                U8At(this, 0x26) = 1;
-                U8At(this, 0x15) = U8At(this, 0x14);
-            } else {
+            U8At(this, 0x25) = static_cast<unsigned char>(posCam.z > F32At(this, 0x50));
+            if (posCam.z < F32At(this, 0x4C)) {
                 U8At(this, 0x26) = 1;
                 U8At(this, 0x15) = 2;
+            } else {
+                U8At(this, 0x26) = 1;
+                U8At(this, 0x15) = U8At(this, 0x14);
             }
-        } else {
-            U8At(this, 0x15) = U8At(this, 0x14);
-            U8At(this, 0x25) = 1;
-            U8At(this, 0x26) = 0;
         }
     }
 
     CMapObjAtr* attr = reinterpret_cast<CMapObjAtr*>(PtrAt(this, 0xEC));
     if (attr != 0) {
         int attrType = reinterpret_cast<MapObjAttrBaseLayout*>(attr)->type;
-        if (attrType == CMapObjAtr::SPOT_LIGHT) {
+        switch (attrType) {
+        case CMapObjAtr::MIME:
+            if (reinterpret_cast<MapObjAttrMimeLayout*>(attr)->keyFrame.IsRun() != 0) {
+                MapObjAttrMimeLayout* mime = reinterpret_cast<MapObjAttrMimeLayout*>(attr);
+                float blend;
+                int key1;
+                int key0;
+                Vec* outVerts = *reinterpret_cast<Vec**>(reinterpret_cast<unsigned char*>(m_mapData) + 0x2C);
+
+                if (mime->keyFrame.Get(key0, key1, blend) != 0) {
+                    Vec* src0 = reinterpret_cast<Vec*>(mime->vertexLists[key0]);
+                    Vec* src1 = reinterpret_cast<Vec*>(mime->vertexLists[key1]);
+                    for (int i = 0; i < mime->vertexCount; i++) {
+                        Vec delta;
+                        PSVECSubtract(src1, src0, &delta);
+                        PSVECScale(&delta, &delta, blend);
+                        PSVECAdd(src0, &delta, &outVerts[i]);
+                        src0++;
+                        src1++;
+                    }
+                } else {
+                    float* src = mime->vertexLists[key0];
+                    for (int i = 0; i < mime->vertexCount; i++) {
+                        outVerts[i].x = src[0];
+                        outVerts[i].y = src[1];
+                        outVerts[i].z = src[2];
+                        src += 3;
+                    }
+                }
+
+                DCFlushRange(outVerts, static_cast<unsigned long>(mime->vertexCount * 0xC));
+                mime->keyFrame.Calc();
+            }
+            break;
+        case CMapObjAtr::POINT_LIGHT: {
+            MapObjAttrPointLightLayout* pointLight = reinterpret_cast<MapObjAttrPointLightLayout*>(attr);
+
+            calcColorKeyFrame(&pointLight->colorKeyFrame, pointLight->color, pointLight->colors);
+            if (pointLight->useAltColor != 0) {
+                pointLight->altColor = pointLight->color;
+            }
+
+            calcColorKeyFrame(&pointLight->altColorKeyFrame, pointLight->color, pointLight->colors);
+            break;
+        }
+        case CMapObjAtr::SPOT_LIGHT: {
             MapObjAttrSpotLightLayout* spotLight = reinterpret_cast<MapObjAttrSpotLightLayout*>(attr);
 
             calcColorKeyFrame(&spotLight->colorKeyFrame, spotLight->color, spotLight->colors);
@@ -1319,46 +1369,8 @@ void CMapObj::Calc()
             }
 
             calcColorKeyFrame(&spotLight->altColorKeyFrame, spotLight->color, spotLight->colors);
-        } else if (attrType == CMapObjAtr::POINT_LIGHT) {
-                MapObjAttrPointLightLayout* pointLight = reinterpret_cast<MapObjAttrPointLightLayout*>(attr);
-
-                calcColorKeyFrame(&pointLight->colorKeyFrame, pointLight->color, pointLight->colors);
-                if (pointLight->useAltColor != 0) {
-                    pointLight->altColor = pointLight->color;
-                }
-
-                calcColorKeyFrame(&pointLight->altColorKeyFrame, pointLight->color, pointLight->colors);
-        } else if ((attrType == CMapObjAtr::MIME) &&
-                   (reinterpret_cast<MapObjAttrMimeLayout*>(attr)->keyFrame.IsRun() != 0)) {
-            MapObjAttrMimeLayout* mime = reinterpret_cast<MapObjAttrMimeLayout*>(attr);
-            int key0;
-            int key1;
-            float blend;
-            Vec* outVerts = *reinterpret_cast<Vec**>(reinterpret_cast<unsigned char*>(m_mapData) + 0x2C);
-
-            if (mime->keyFrame.Get(key0, key1, blend) == 0) {
-                float* src = mime->vertexLists[key0];
-                for (int i = 0; i < mime->vertexCount; i++) {
-                    outVerts[i].x = src[0];
-                    outVerts[i].y = src[1];
-                    outVerts[i].z = src[2];
-                    src += 3;
-                }
-            } else {
-                Vec* src0 = reinterpret_cast<Vec*>(mime->vertexLists[key0]);
-                Vec* src1 = reinterpret_cast<Vec*>(mime->vertexLists[key1]);
-                for (int i = 0; i < mime->vertexCount; i++) {
-                    Vec delta;
-                    PSVECSubtract(src1, src0, &delta);
-                    PSVECScale(&delta, &delta, blend);
-                    PSVECAdd(src0, &delta, &outVerts[i]);
-                    src0++;
-                    src1++;
-                }
-            }
-
-            DCFlushRange(outVerts, static_cast<unsigned long>(mime->vertexCount * 0xC));
-            mime->keyFrame.Calc();
+            break;
+        }
         }
     }
 }

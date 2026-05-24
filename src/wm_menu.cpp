@@ -45,7 +45,6 @@ extern int DAT_8032e8c8;
 extern int DAT_8032e8ac;
 extern int DAT_8032ef08;
 extern int DAT_80238028;
-extern unsigned char DAT_8032ee30;
 extern char cRam8032ee21;
 
 float FLOAT_8032ee18;
@@ -5531,9 +5530,9 @@ LAB_calc:
 		cVar2 = (char)bytes[0x0B];
 	}
 	unsigned int uVar13 = *reinterpret_cast<int*>(reinterpret_cast<char*>(&Game.m_gameWork) + 8) + (int)cVar2;
-	DAT_8032ee30 = (unsigned char)uVar13;
+	gWmMenuScriptValueCache = (unsigned char)uVar13;
 	if ((int)uVar13 > 99) {
-		DAT_8032ee30 = 100;
+		gWmMenuScriptValueCache = 100;
 	}
 
 	unsigned int uVar14 = 1 - ((int)(((int)(uVar13 ^ 9) >> 1) - ((uVar13 ^ 9) & uVar13)) >> 0x1F);
@@ -5743,7 +5742,7 @@ void CMenuPcs::DrawWMFrame()
 				uAlpha);
 
 			int digitCnt = 1;
-			unsigned int lvl = (unsigned int)DAT_8032ee30;
+			unsigned int lvl = (unsigned int)gWmMenuScriptValueCache;
 			if (lvl > 99) digitCnt = 3;
 			else if (lvl > 9) digitCnt = 2;
 

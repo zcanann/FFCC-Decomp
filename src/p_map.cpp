@@ -430,29 +430,11 @@ unsigned long long CMapPcs::IsLoadMapCompleted()
     int index = 0;
 
     for (int count = 2; count != 0; count--) {
-        if (MapMng.m_asyncLoadState.m_asyncHandles[index++] != 0) {
-            return (unsigned long long)value;
-        }
-        if (MapMng.m_asyncLoadState.m_asyncHandles[index++] != 0) {
-            return (unsigned long long)value;
-        }
-        if (MapMng.m_asyncLoadState.m_asyncHandles[index++] != 0) {
-            return (unsigned long long)value;
-        }
-        if (MapMng.m_asyncLoadState.m_asyncHandles[index++] != 0) {
-            return (unsigned long long)value;
-        }
-        if (MapMng.m_asyncLoadState.m_asyncHandles[index++] != 0) {
-            return (unsigned long long)value;
-        }
-        if (MapMng.m_asyncLoadState.m_asyncHandles[index++] != 0) {
-            return (unsigned long long)value;
-        }
-        if (MapMng.m_asyncLoadState.m_asyncHandles[index++] != 0) {
-            return (unsigned long long)value;
-        }
-        if (MapMng.m_asyncLoadState.m_asyncHandles[index++] != 0) {
-            return (unsigned long long)value;
+        for (int handle = 8; handle != 0; handle--) {
+            if (MapMng.m_asyncLoadState.m_asyncHandles[index] != 0) {
+                return (unsigned long long)value;
+            }
+            index++;
         }
         value += 7;
     }

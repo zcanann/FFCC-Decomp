@@ -146,19 +146,19 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYm
 
                     GXBegin((GXPrimitive)0x98, GX_VTXFMT7, 4);
                     GXPosition3f32(poly->to.x, poly->to.y, poly->to.z);
-                    GXColor1u32(colorTop.value);
+                    GXColor1u32(*(u32*)&colorTop);
                     GXTexCoord2f32(uTop, FLOAT_803306ec);
 
                     GXPosition3f32(poly->from.x, poly->from.y, poly->from.z);
-                    GXColor1u32(colorTop.value);
+                    GXColor1u32(*(u32*)&colorTop);
                     GXTexCoord2f32(uTop, FLOAT_803306e8);
 
                     GXPosition3f32(next->to.x, next->to.y, next->to.z);
-                    GXColor1u32(colorBottom.value);
+                    GXColor1u32(*(u32*)&colorBottom);
                     GXTexCoord2f32(uBottom, FLOAT_803306ec);
 
                     GXPosition3f32(next->from.x, next->from.y, next->from.z);
-                    GXColor1u32(colorBottom.value);
+                    GXColor1u32(*(u32*)&colorBottom);
                     GXTexCoord2f32(uBottom, FLOAT_803306e8);
                 }
                 poly++;

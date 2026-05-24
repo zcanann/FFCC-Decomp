@@ -123,8 +123,8 @@ void CMapHit::Draw()
         if ((reinterpret_cast<CMapHitFace*>(face)->m_drawFlags & 1) == 0) {
             const unsigned char groupIndex = face[0x47];
             const CMapIdGrp* mapIdGrp = MapMng.GetMapIdGrpArray() + groupIndex;
-            const GXColor* colorABytes = reinterpret_cast<const GXColor*>(&mapIdGrp->m_primaryColor);
-            const GXColor* colorBBytes = reinterpret_cast<const GXColor*>(&mapIdGrp->m_secondaryColor);
+            const GXColor colorABytes = *reinterpret_cast<const GXColor*>(&mapIdGrp->m_primaryColor);
+            const GXColor colorBBytes = *reinterpret_cast<const GXColor*>(&mapIdGrp->m_secondaryColor);
 
             GXBegin(GX_TRIANGLES, GX_VTXFMT7, 3);
             unsigned char* index = face + 0x48;
@@ -134,7 +134,7 @@ void CMapHit::Draw()
                 GXPosition3f32(vertex->x, vertex->y, vertex->z);
                 GXNormal3f32(*reinterpret_cast<float*>(face + 0x00), *reinterpret_cast<float*>(face + 0x04),
                              *reinterpret_cast<float*>(face + 0x08));
-                GXColor4u8(colorABytes->r, colorABytes->g, colorABytes->b, colorABytes->a);
+                GXColor4u8(colorABytes.r, colorABytes.g, colorABytes.b, colorABytes.a);
                 i++;
                 index += 2;
             }
@@ -146,7 +146,7 @@ void CMapHit::Draw()
                 GXPosition3f32(vertex->x, vertex->y, vertex->z);
                 GXNormal3f32(*reinterpret_cast<float*>(face + 0x00), *reinterpret_cast<float*>(face + 0x04),
                              *reinterpret_cast<float*>(face + 0x08));
-                GXColor4u8(colorBBytes->r, colorBBytes->g, colorBBytes->b, colorBBytes->a);
+                GXColor4u8(colorBBytes.r, colorBBytes.g, colorBBytes.b, colorBBytes.a);
                 i--;
             }
         }

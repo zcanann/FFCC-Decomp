@@ -14,7 +14,7 @@ extern "C" const char s_texanim_cpp[];
 extern const float FLOAT_8032fb38 = 0.0f;
 extern const float FLOAT_8032fb3c = 1.0f;
 extern const double DOUBLE_8032fb40 = 4503599627370496.0;
-extern const char DAT_8032fb48[] = "e1";
+extern const char s_texAnimSeqE1[] = "e1";
 extern const float FLOAT_8032fb4c = 1.25f;
 extern "C" const char s_scenegraph_step_none[4] = "";
 extern "C" const char s_scenegraph_step_x8[] = "x8";
@@ -592,7 +592,7 @@ void CTexAnimSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
                         seq->flags = (unsigned char)(((int)b7 << 7) | (seq->flags & 0x7F));
                         char b6 = (char)chunkFile.Get4();
                         seq->flags = (unsigned char)((((int)b6 << 6) & 0x40) | (seq->flags & 0xBF));
-                        unsigned int eq = (unsigned int)__cntlzw((unsigned int)strcmp(seqName, DAT_8032fb48));
+                        unsigned int eq = (unsigned int)__cntlzw((unsigned int)strcmp(seqName, s_texAnimSeqE1));
                         seq->flags = (unsigned char)(((unsigned char)((int)(char)(eq >> 5) << 5) & 0x20) | (seq->flags & 0xDF));
                     } else if (((int)innerChunk.m_id >= keyTag) && ((int)innerChunk.m_id == nameTag)) {
                         strcpy(seqName, chunkFile.GetString());

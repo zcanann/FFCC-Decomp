@@ -27,6 +27,7 @@ inline void* operator new(unsigned long, void* p)
 
 extern "C" void __ct__10CTexScrollFv(void*);
 extern "C" void __dt__10CTexScrollFv(void*, int);
+extern "C" unsigned long UnkMaterialSetGetter(void*);
 extern float FLOAT_8032faf0;
 extern float FLOAT_8032faf4;
 extern float FLOAT_8032faf8;
@@ -2967,43 +2968,43 @@ inline void CMaterial::IncNumTexture()
  */
 void CMaterialSet::ReleaseTag(CTextureSet* textureSet, int pdtSlotIndex, CAmemCacheSet* amemCacheSet)
 {
-    CPtrArray<CMaterial*>* materials = reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(this, 8));
-    unsigned long index = 0;
+    unsigned int index = 0;
 
-    while (index < static_cast<unsigned long>(materials->GetSize())) {
-        CMaterial* material = (*materials)[index];
+    while (index < static_cast<unsigned int>(UnkMaterialSetGetter(Ptr(this, 8)))) {
+        CMaterial* material = (*reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(this, 8)))[index];
         if ((material != 0) && (*reinterpret_cast<int*>(Ptr(material, 0x9C)) == pdtSlotIndex)) {
-            int numTexture = static_cast<int>(*reinterpret_cast<unsigned short*>(Ptr(material, 0x18)));
-            unsigned char* textureIndex = Ptr(material, 0x1A);
-            unsigned char* textureRef = Ptr(material, 0x3C);
+            unsigned char* textureIndex = reinterpret_cast<unsigned char*>(material);
+            unsigned char* textureRef = reinterpret_cast<unsigned char*>(material);
 
-            for (int i = 0; i < numTexture; i++) {
-                void* object = *reinterpret_cast<void**>(textureRef);
+            for (int i = 0; i < static_cast<int>(*reinterpret_cast<unsigned short*>(Ptr(material, 0x18))); i++) {
+                void* object = *reinterpret_cast<void**>(Ptr(textureRef, 0x3C));
                 if (object != 0) {
                     int& refCount = *reinterpret_cast<int*>(Ptr(object, 4));
                     int nextRefCount = refCount - 1;
                     refCount = nextRefCount;
-                    if (nextRefCount == 0) {
+                    if ((nextRefCount == 0) && (object != 0)) {
                         void** vtable = *reinterpret_cast<void***>(object);
                         reinterpret_cast<VirtualDtorFn>(vtable[2])(object, 1);
                     }
-                    *reinterpret_cast<void**>(textureRef) = 0;
+                    *reinterpret_cast<void**>(Ptr(textureRef, 0x3C)) = 0;
                 }
 
-                textureSet->ReleaseTextureIdx(static_cast<int>(*reinterpret_cast<short*>(textureIndex)), amemCacheSet);
-                *reinterpret_cast<void**>(textureRef) = 0;
+                textureSet->ReleaseTextureIdx(static_cast<int>(*reinterpret_cast<short*>(Ptr(textureIndex, 0x1A))), amemCacheSet);
+                *reinterpret_cast<void**>(Ptr(textureRef, 0x3C)) = 0;
                 textureRef += 4;
                 textureIndex += 2;
             }
 
-            int& refCount = *reinterpret_cast<int*>(Ptr(material, 4));
-            int nextRefCount = refCount - 1;
-            refCount = nextRefCount;
-            if (nextRefCount == 0) {
-                void** vtable = *reinterpret_cast<void***>(material);
-                reinterpret_cast<VirtualDtorFn>(vtable[2])(material, 1);
+            if (material != 0) {
+                int& refCount = *reinterpret_cast<int*>(Ptr(material, 4));
+                int nextRefCount = refCount - 1;
+                refCount = nextRefCount;
+                if ((nextRefCount == 0) && (material != 0)) {
+                    void** vtable = *reinterpret_cast<void***>(material);
+                    reinterpret_cast<VirtualDtorFn>(vtable[2])(material, 1);
+                }
             }
-            materials->SetAt(index, 0);
+            reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(this, 8))->SetAt(index, 0);
         }
 
         index++;

@@ -75,22 +75,22 @@ struct CModelRaw {
     CAnimRaw* m_anim;
 };
 
-extern const float FLOAT_803310C0 = 320.0f;
-extern const float FLOAT_803310C4 = 224.0f;
-extern const float FLOAT_803310C8 = 0.0f;
-extern const float FLOAT_803310CC = 1.0f;
-extern const double DOUBLE_803310D0 = 4503599627370496.0;
+extern const float kYmEnvViewportWidth = 320.0f;
+extern const float kYmEnvViewportHeight = 224.0f;
+extern const float kYmEnvZero = 0.0f;
+extern const float kYmEnvOne = 1.0f;
+extern const double kYmEnvDoubleMagic = 4503599627370496.0;
 extern const char s_YmEnvMapLabel_803310D8[] = "MAP";
 extern const char s_YmEnvMonsterLabel_803310DC[] = "MON";
 extern const char s_YmEnvScoreLabel_803310E0[] = "SCO";
 extern const char s_YmEnvTreeLabel_803310E4[] = "TRE";
 extern const char s_YmEnvSeparator_803310E8[] = "|\n";
-extern const double DOUBLE_803310F0 = 57.295780181884766;
-extern const float FLOAT_803310F8 = 1.5f;
-extern const double DOUBLE_80331100 = 4503601774854144.0;
-extern const float FLOAT_80331108 = 0.25f;
+extern const double kYmEnvRadToDeg = 57.295780181884766;
+extern const float kYmEnvDefaultScale = 1.5f;
+extern const double kYmEnvSignedDoubleMagic = 4503601774854144.0;
+extern const float kYmEnvQuarter = 0.25f;
 extern const float kCharaFurDepthZero = 0.0f;
-extern const float FLOAT_80331110 = 10.0f;
+extern const float kYmEnvTen = 10.0f;
 extern const char sMogFurTextureName[] = "n915m_2";
 
 /*

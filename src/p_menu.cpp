@@ -215,8 +215,8 @@ void CMenuPcs::Init()
     m_stageF0 = 0;
     m_stageF4 = 0;
     memset(m_fonts, 0, sizeof(m_fonts));
-    memset(self + 0x14C, 0, 0x40);
-    memset(self + 0x18C, 0, 0x1A4);
+    memset(m_textureSets, 0, sizeof(m_textureSets));
+    memset(m_textures, 0, sizeof(m_textures));
     memset(self + 0x04, 0, 0x1C);
 
     self[0x859] = 0;
@@ -353,8 +353,8 @@ void CMenuPcs::create()
     m_menuStage = Memory.CreateStage(menuHeapSize, const_cast<char*>(kMenuPcsStageName), 0);
     *reinterpret_cast<int*>(self + 0x740) = -1;
 
-    memset(self + 0x14C, 0, 0x40);
-    memset(self + 0x18C, 0, 0x1A4);
+    memset(m_textureSets, 0, sizeof(m_textureSets));
+    memset(m_textures, 0, sizeof(m_textures));
 
     sprintf(fontPath, const_cast<char*>(s_dvd__smenu_gc22_fnt_801d9db4), Game.GetLangString());
     loadFont(0, fontPath, 0, 0);

@@ -20,8 +20,8 @@
 
 #include <math.h>
 
-extern unsigned char DAT_8020fab8[];
-static const char DAT_801da01c[] = {
+extern unsigned char sRingMenuBlinkAlphaTable[];
+static const char sRingMenuDisplayToggleChangedFmt[] = {
 	0x72, 0x69, 0x6E, 0x67, 0x4D, 0x65, 0x6E, 0x75,
 	(char)0x95, (char)0x8E, (char)0xA6, 0x6F, 0x6E, 0x2F, 0x6F, 0x66,
 	0x66, (char)0x82, (char)0xAA, (char)0x95, (char)0xCF, (char)0x8D, (char)0x58, (char)0x82,
@@ -212,7 +212,7 @@ void CRingMenu::DrawIcon()
 
 	double posX = static_cast<double>(FLOAT_803309e4 * clampedX + FLOAT_803309e4);
 	double posY = -static_cast<double>(FLOAT_803309e8 * clampedY - FLOAT_803309e8);
-	unsigned char blinkAlpha = DAT_8020fab8[frameNibble(System.m_frameCounter)];
+	unsigned char blinkAlpha = sRingMenuBlinkAlphaTable[frameNibble(System.m_frameCounter)];
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x19));
 	int iconRow;
@@ -909,7 +909,7 @@ void CRingMenu::onCalc()
 		const unsigned int targetAnimDirection =
 			(CFlatEnabledEventFlags() >> 2) & 1;
 		if (animDirection != static_cast<int>(targetAnimDirection)) {
-			System.Printf(const_cast<char*>(DAT_801da01c), menuIndex);
+			System.Printf(const_cast<char*>(sRingMenuDisplayToggleChangedFmt), menuIndex, targetAnimDirection);
 			m_displayDirection = (static_cast<unsigned int>(__cntlzw(static_cast<unsigned int>(animDirection))) >> 5) & 0xFF;
 			m_displayCounter = 0x10 - m_displayCounter;
 		}

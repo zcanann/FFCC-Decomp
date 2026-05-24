@@ -79,7 +79,7 @@ extern float FLOAT_8032fab8;
 extern double DOUBLE_8032fa28;
 extern double DOUBLE_8032fa28;
 extern char s_p_camera_cpp[];
-extern char DAT_801d7928[];
+extern char sCameraInvalidFovFmt[];
 extern unsigned char g_map_draw_prof;
 
 inline void* operator new(unsigned long, void* ptr)
@@ -695,7 +695,7 @@ void CCameraPcs::calc()
 
     float fov = *reinterpret_cast<float*>(self + 0xFC);
     if (fov < FLOAT_8032fac8 && System.m_execParam != 0) {
-        System.Printf(DAT_801d7928);
+        System.Printf(sCameraInvalidFovFmt, fov);
         fov = FLOAT_8032fab4;
     }
     C_MTXPerspective(reinterpret_cast<Mtx44Ptr>(self + 0x94), fov, FLOAT_8032fa3c,
@@ -763,7 +763,7 @@ void CCameraPcs::SetStdProjectionMatrix()
     float fov = *reinterpret_cast<float*>(self + 0xFC);
 
     if (fov < FLOAT_8032fac8 && System.m_execParam != 0) {
-        System.Printf(DAT_801d7928);
+        System.Printf(sCameraInvalidFovFmt, fov);
         fov = FLOAT_8032fab4;
     }
 

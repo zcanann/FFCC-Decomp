@@ -916,7 +916,7 @@ void CGame::loadCfd()
         u8 m_pad[0x14D4 - 0x68];
     };
 
-    char path[0x10C];
+    char path[0xFC];
 
     for (int i = 0; i < 4; i++)
     {

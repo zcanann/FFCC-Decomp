@@ -424,7 +424,7 @@ unsigned int CMenuPcs::TmpArtiOpen()
 			entry[0].width = 200;
 			entry[0].height = 0x28;
 			entry[0].x = (short)(int)-(((double)entry[0].width * half) - center);
-			entry[0].y = (short)row * (entry[0].height - 8) + 0x60;
+			entry[0].y = row * (entry[0].height - 8) + 0x60;
 			entry[0].s = zero;
 			entry[0].t = zero;
 			entry[0].startFrame = row++;
@@ -433,7 +433,7 @@ unsigned int CMenuPcs::TmpArtiOpen()
 			entry[1].width = 200;
 			entry[1].height = 0x28;
 			entry[1].x = (short)(int)-(((double)entry[1].width * half) - center);
-			entry[1].y = (short)row * (entry[1].height - 8) + 0x60;
+			entry[1].y = row * (entry[1].height - 8) + 0x60;
 			entry[1].s = zero;
 			entry[1].t = zero;
 			entry[1].startFrame = row++;

@@ -1450,9 +1450,9 @@ unsigned int CMemoryCardMan::CalcCrc(Mc::SaveDat* saveData)
 unsigned int CMemoryCardMan::ChkCrc(Mc::SaveDat* saveData)
 {
     unsigned int crc;
+    unsigned char* crcData;
     int count;
     unsigned char* ptr;
-    unsigned char* crcData;
     unsigned char* data = (unsigned char*)saveData;
 
     if (data == nullptr)

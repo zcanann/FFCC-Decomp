@@ -13,23 +13,23 @@ typedef signed short s16;
 typedef unsigned char u8;
 typedef unsigned short u16;
 
-extern const float FLOAT_80332e60;
-extern float FLOAT_80332e64;
-extern const double DOUBLE_80332e68;
-extern float FLOAT_80332e70;
-extern float FLOAT_80332e74;
-extern const double DOUBLE_80332e78;
-extern float FLOAT_80332e80;
-extern float FLOAT_80332e84;
-extern float FLOAT_80332e88;
-extern float FLOAT_80332e8c;
-extern float FLOAT_80332e90;
-extern float FLOAT_80332e94;
-extern float FLOAT_80332E98;
-extern const double DOUBLE_80332ea0;
-extern const float FLOAT_80332EA8;
-extern const float FLOAT_80332EAC;
-extern const float FLOAT_80332EB0;
+extern const float FLOAT_80332e60 = 0.0f;
+extern const float FLOAT_80332e64 = 1.0f;
+extern const double DOUBLE_80332e68 = 1.0;
+extern const float FLOAT_80332e70 = 12.0f;
+extern const float FLOAT_80332e74 = 24.0f;
+extern const double DOUBLE_80332e78 = 0.5;
+extern const float FLOAT_80332e80 = 255.0f;
+extern const float FLOAT_80332e84 = 0.9f;
+extern const float FLOAT_80332e88 = 4.0f;
+extern const float FLOAT_80332e8c = 320.0f;
+extern const float FLOAT_80332e90 = 0.5f;
+extern const float FLOAT_80332e94 = 352.0f;
+extern const float FLOAT_80332E98 = 3.0f;
+extern const double DOUBLE_80332ea0 = 4503601774854144.0;
+extern const float FLOAT_80332EA8 = 128.0f;
+extern const float FLOAT_80332EAC = 8.0f;
+extern const float FLOAT_80332EB0 = 0.75f;
 extern const double DOUBLE_80333388 = 373.0;
 extern const float FLOAT_80333390 = 214.0f;
 extern const float FLOAT_80333394 = 112.0f;
@@ -166,29 +166,29 @@ int CMenuPcs::ItemCtrlCur()
     s16 letterAttachFlg = SingGetLetterAttachflg();
 
     if (mode == 0) {
-        if ((hold & 8) == 0) {
-            if ((hold & 4) != 0) {
-                if (this->itemMenuState->selectedIndex < 7) {
-                    this->itemMenuState->selectedIndex = this->itemMenuState->selectedIndex + 1;
+        if ((hold & 8) != 0) {
+            if (this->itemMenuState->selectedIndex == 0) {
+                if (this->itemMenuState->scroll == 0) {
+                    this->itemMenuState->scroll = 0x3F;
                 } else {
-                    s16 scroll = this->itemMenuState->scroll;
-                    if (scroll > 0x3E) {
-                        this->itemMenuState->scroll = 0;
-                    } else {
-                        this->itemMenuState->scroll = scroll + 1;
-                    }
+                    this->itemMenuState->scroll = this->itemMenuState->scroll - 1;
                 }
                 Sound.PlaySe(1, 0x40, 0x7F, 0);
-            }
-        } else if (this->itemMenuState->selectedIndex == 0) {
-            if (this->itemMenuState->scroll == 0) {
-                this->itemMenuState->scroll = 0x3F;
             } else {
-                this->itemMenuState->scroll = this->itemMenuState->scroll - 1;
+                this->itemMenuState->selectedIndex = this->itemMenuState->selectedIndex - 1;
+                Sound.PlaySe(1, 0x40, 0x7F, 0);
             }
-            Sound.PlaySe(1, 0x40, 0x7F, 0);
-        } else {
-            this->itemMenuState->selectedIndex = this->itemMenuState->selectedIndex - 1;
+        } else if ((hold & 4) != 0) {
+            if (this->itemMenuState->selectedIndex < 7) {
+                this->itemMenuState->selectedIndex = this->itemMenuState->selectedIndex + 1;
+            } else {
+                s16 scroll = this->itemMenuState->scroll;
+                if (scroll > 0x3E) {
+                    this->itemMenuState->scroll = 0;
+                } else {
+                    this->itemMenuState->scroll = scroll + 1;
+                }
+            }
             Sound.PlaySe(1, 0x40, 0x7F, 0);
         }
 
@@ -258,20 +258,18 @@ int CMenuPcs::ItemCtrlCur()
     } else {
         int optBase = (int)this->itemMenuState + mode * 2;
 
-        if ((hold & 8) == 0) {
-            if ((hold & 4) != 0) {
-                if (*(s16*)(optBase + 0x26) < 3) {
-                    *(s16*)(optBase + 0x26) = *(s16*)(optBase + 0x26) + 1;
-                } else {
-                    *(s16*)(optBase + 0x26) = 0;
-                }
-                Sound.PlaySe(1, 0x40, 0x7F, 0);
-            }
-        } else {
+        if ((hold & 8) != 0) {
             if (*(s16*)(optBase + 0x26) == 0) {
                 *(s16*)(optBase + 0x26) = 3;
             } else {
                 *(s16*)(optBase + 0x26) = *(s16*)(optBase + 0x26) - 1;
+            }
+            Sound.PlaySe(1, 0x40, 0x7F, 0);
+        } else if ((hold & 4) != 0) {
+            if (*(s16*)(optBase + 0x26) < 3) {
+                *(s16*)(optBase + 0x26) = *(s16*)(optBase + 0x26) + 1;
+            } else {
+                *(s16*)(optBase + 0x26) = 0;
             }
             Sound.PlaySe(1, 0x40, 0x7F, 0);
         }

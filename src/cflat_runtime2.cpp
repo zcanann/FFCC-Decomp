@@ -1353,17 +1353,18 @@ void CFlatRuntime2::Destroy()
 	reinterpret_cast<CFlatData*>(reinterpret_cast<u8*>(this) + 0xCF20)->Destroy();
 
 	CFlatLayerResource* layer = LayerResources(this);
+	int zero = 0;
 	for (int i = 0; i < 8; i++, layer++) {
 		CFile::CHandle* fileHandle = layer->m_fileHandle;
 		if (fileHandle != 0) {
 			File.Close(fileHandle);
-			layer->m_fileHandle = 0;
+			layer->m_fileHandle = reinterpret_cast<CFile::CHandle*>(zero);
 		}
 
-		void* textureSet = layer->m_textureSet;
+		CTextureSet* textureSet = layer->m_textureSet;
 		if (textureSet != 0) {
-			(*(void (**)(void*, int))(*reinterpret_cast<int*>(textureSet) + 8))(textureSet, 1);
-			layer->m_textureSet = 0;
+			delete textureSet;
+			layer->m_textureSet = reinterpret_cast<CTextureSet*>(zero);
 		}
 	}
 }

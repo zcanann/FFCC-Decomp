@@ -135,7 +135,7 @@ static inline void AddSharedRef(T* ptr)
 
 static inline float& ViewerModelTime(CChara::CModel* model)
 {
-    return ViewerModel(model)->currentFrame;
+    return model->m_curFrame;
 }
 
 static inline CChara::CAnim*& ViewerModelAnim(CChara::CModel* model)
@@ -150,7 +150,7 @@ static inline CTexAnimSet*& ViewerModelTexAnimSet(CChara::CModel* model)
 
 static inline CTextureSet*& ViewerModelTextureSet(CChara::CModel* model)
 {
-    return ViewerModel(model)->textureSet;
+    return model->m_texSet;
 }
 
 static inline int ViewerModelNodeCount(CChara::CModel* model)
@@ -161,6 +161,11 @@ static inline int ViewerModelNodeCount(CChara::CModel* model)
 static inline int ViewerModelFrameShift(CChara::CModel* model)
 {
     return ViewerModel(model)->data->frameShift;
+}
+
+static inline float LoadFloat(const float& value)
+{
+    return value;
 }
 
 extern "C" const char s_no_texture____801da7e8[0x188] =
@@ -211,7 +216,6 @@ extern "C" const char s_no_texture____801da7e8[0x188] =
 void CCharaPcs::drawViewer()
 {
     CCharaPcs* self = this;
-    unsigned char* p = reinterpret_cast<unsigned char*>(self);
     register const char* viewerStrings = s_no_texture____801da7e8;
     Mtx cameraMtx;
     Mtx scratchMtx;
@@ -357,7 +361,6 @@ void CCharaPcs::drawViewer()
 void CCharaPcs::calcViewer()
 {
     CCharaPcs* self = this;
-    unsigned char* p = reinterpret_cast<unsigned char*>(self);
     register const char* viewerStrings = s_no_texture____801da7e8;
     char pathBuf[256];
     CFile::CHandle* fileHandle;
@@ -392,8 +395,7 @@ void CCharaPcs::calcViewer()
                     new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_viewer_cpp), 0xEA) CChara::CModel;
                 self->m_viewerModel[0] = model;
                 self->m_viewerModel[0]->Create(File.m_readBuffer, self->m_viewerModelStage);
-                *(reinterpret_cast<unsigned char*>(self->m_viewerModel[0]) + 0x10C) =
-                    (*(reinterpret_cast<unsigned char*>(self->m_viewerModel[0]) + 0x10C) & 0xBF) | 0x40;
+                self->m_viewerModel[0]->m_flags10C = (self->m_viewerModel[0]->m_flags10C & 0xBF) | 0x40;
                 File.Close(fileHandle);
             }
             self->m_viewerLoadModel = 0;
@@ -497,17 +499,25 @@ void CCharaPcs::calcViewer()
 
     unsigned short heldButtons;
     unsigned short triggerButtons;
+    bool padDisabled = false;
     if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+        padDisabled = true;
+    }
+    if (padDisabled) {
         heldButtons = 0;
     } else {
-        __cntlzw((unsigned int)Pad._448_4_);
-        heldButtons = Pad.GetPadInputs()[0].button[0];
+        int padIndex = __cntlzw((unsigned int)Pad._448_4_) >> 5;
+        heldButtons = Pad.GetPadInputs()[padIndex].button[0];
     }
+    padDisabled = false;
     if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+        padDisabled = true;
+    }
+    if (padDisabled) {
         triggerButtons = 0;
     } else {
-        __cntlzw((unsigned int)Pad._448_4_);
-        triggerButtons = Pad.GetPadInputs()[0].buttonDown[0];
+        int padIndex = __cntlzw((unsigned int)Pad._448_4_) >> 5;
+        triggerButtons = Pad.GetPadInputs()[padIndex].buttonDown[0];
     }
 
     if ((self->m_viewerModel[0] != 0) && (self->m_viewerResetIFrame != 0)) {
@@ -573,7 +583,7 @@ void CCharaPcs::calcViewer()
 
         if ((i == 0) && (self->m_viewerTexAnimDirty != 0)) {
             self->m_viewerTexAnimDirty = 0;
-            CTexAnimSet* texAnimSet = ViewerModelTexAnimSet(model);
+            CTexAnimSet* texAnimSet = ViewerModelTexAnimSet(self->m_viewerModel[i]);
             if (texAnimSet != 0) {
                 int texAnimFrame = self->m_viewerTexAnimFrame;
                 int animType = -2;
@@ -589,7 +599,7 @@ void CCharaPcs::calcViewer()
         unsigned char* anim = reinterpret_cast<unsigned char*>(self->m_viewerAnim[i]);
         if (anim != 0) {
             if ((i == 0) && (self->m_viewerAnimLoadedCount != 0)) {
-                model->SetFrame(ViewerModelTime(model) + frameAdvance);
+                self->m_viewerModel[i]->SetFrame(ViewerModelTime(self->m_viewerModel[i]) + frameAdvance);
                 float animFrames = (float)*(unsigned short*)(anim + 0x10);
                 if (animFrames <= ViewerModelTime(self->m_viewerModel[0])) {
                     int nextIndex = self->m_viewerAnimLoopIndex + 1;
@@ -604,19 +614,19 @@ void CCharaPcs::calcViewer()
                 float animFrames = static_cast<float>(*reinterpret_cast<unsigned short*>(
                     reinterpret_cast<unsigned char*>(self->m_viewerAnim[0]) + 0x10));
                 if (self->m_viewerSavedAnimState == 0) {
-                    if (self->m_viewerSavedFrame + animFrames <= ViewerModelTime(model)) {
+                    if (self->m_viewerSavedFrame + animFrames <= ViewerModelTime(self->m_viewerModel[i])) {
                         self->m_viewerSavedAnimState = 1;
-                        model->AttachAnim(self->m_viewerSavedAnim, -1, -1, -1);
+                        self->m_viewerModel[i]->AttachAnim(self->m_viewerSavedAnim, -1, -1, -1);
                     }
                 } else {
-                    if (animFrames <= ViewerModelTime(model)) {
+                    if (animFrames <= ViewerModelTime(self->m_viewerModel[i])) {
                         self->m_viewerSavedAnimState = 0;
-                        model->AttachAnim(self->m_viewerAnim[0], -1, -1, 0);
+                        self->m_viewerModel[i]->AttachAnim(self->m_viewerAnim[0], -1, -1, 0);
                     }
                 }
-                model->SetFrame(ViewerModelTime(model) + frameAdvance);
+                self->m_viewerModel[i]->SetFrame(ViewerModelTime(self->m_viewerModel[i]) + frameAdvance);
             } else {
-                model->SetFrame(ViewerModelTime(model) + frameAdvance);
+                self->m_viewerModel[i]->SetFrame(ViewerModelTime(self->m_viewerModel[i]) + frameAdvance);
             }
         }
 
@@ -745,7 +755,6 @@ void CCharaPcs::destroyViewer()
 void CCharaPcs::createViewer()
 {
     CCharaPcs* self = this;
-    unsigned char* p = reinterpret_cast<unsigned char*>(self);
     register const char* viewerStrings = s_no_texture____801da7e8;
     unsigned int i;
     char pathBuf[256];
@@ -773,7 +782,8 @@ void CCharaPcs::createViewer()
         self->m_viewerDiffusePos[i].z = kCharaViewerFineStep;
     }
 
-    for (int colorIndex = 0; colorIndex < 5; colorIndex++) {
+    CColor* choiceColor = self->m_viewerChoiceColor;
+    for (int colorIndex = 0; colorIndex < 5; colorIndex++, choiceColor++) {
         CColor white(0xFF, 0xFF, 0xFF, 0xFF);
         CColor colorTmp;
         float scale = static_cast<float>(colorIndex) * kCharaViewerLerpScale;
@@ -782,10 +792,10 @@ void CCharaPcs::createViewer()
         colorTmp.color.b = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.b) * scale));
         colorTmp.color.a = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.a) * scale));
         CColor colorCopy(colorTmp);
-        p[0x12C + colorIndex * 4 + 0] = colorCopy.color.r;
-        p[0x12C + colorIndex * 4 + 1] = colorCopy.color.g;
-        p[0x12C + colorIndex * 4 + 2] = colorCopy.color.b;
-        p[0x12C + colorIndex * 4 + 3] = colorCopy.color.a;
+        choiceColor->color.r = colorCopy.color.r;
+        choiceColor->color.g = colorCopy.color.g;
+        choiceColor->color.b = colorCopy.color.b;
+        choiceColor->color.a = colorCopy.color.a;
     }
 
     _GXColor clearColor;
@@ -845,12 +855,12 @@ void CCharaPcs::createViewer()
 
     CLightPcs::CBumpLight bumpLight;
     bumpLight.m_type = 1;
-    bumpLight.m_position.x = kCharaViewerLightPosX;
-    bumpLight.m_position.y = kCharaViewerLightPosY;
-    bumpLight.m_position.z = kCharaViewerLightPosZ;
-    bumpLight.m_targetPosition.x = kCharaViewerLightTargetX;
-    bumpLight.m_targetPosition.y = kCharaViewerLightTargetY;
-    bumpLight.m_targetPosition.z = kCharaViewerLightTargetZ;
+    bumpLight.m_position.x = LoadFloat(kCharaViewerLightPosX);
+    bumpLight.m_position.y = LoadFloat(kCharaViewerLightPosY);
+    bumpLight.m_position.z = LoadFloat(kCharaViewerLightPosZ);
+    bumpLight.m_targetPosition.x = LoadFloat(kCharaViewerLightTargetX);
+    bumpLight.m_targetPosition.y = LoadFloat(kCharaViewerLightTargetY);
+    bumpLight.m_targetPosition.z = LoadFloat(kCharaViewerLightTargetZ);
     PSVECSubtract(reinterpret_cast<Vec*>(&bumpLight.m_targetPosition), reinterpret_cast<Vec*>(&bumpLight.m_position),
                   reinterpret_cast<Vec*>(&bumpLight.m_direction));
     PSVECNormalize(reinterpret_cast<Vec*>(&bumpLight.m_direction), reinterpret_cast<Vec*>(&bumpLight.m_direction));

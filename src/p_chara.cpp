@@ -8,6 +8,7 @@
 #include "ffcc/map.h"
 #include "ffcc/memory.h"
 #include "ffcc/p_camera.h"
+#include "ffcc/p_dbgmenu.h"
 #include "ffcc/partMng.h"
 #include "ffcc/p_light.h"
 #include "ffcc/p_tina.h"
@@ -41,7 +42,6 @@ extern "C" {
 u8* gCharaPartWorkPtr = 0;
 }
 
-extern "C" unsigned char DbgMenuPcs[];
 extern unsigned char PTR_s_CCharaPcs_GAME_[];
 
 inline void* operator new(unsigned long, void* ptr)
@@ -1383,7 +1383,7 @@ void CCharaPcs::draw()
 
     CHandle* handle = HandleListHead(this)->m_next;
     while (handle != HandleListHead(this)) {
-        if ((*reinterpret_cast<unsigned int*>(DbgMenuPcs + 4) & 0x8000) != 0) {
+        if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x8000) != 0) {
             handle->draw(0, 1);
         }
         handle = handle->m_next;
@@ -1406,7 +1406,7 @@ void CCharaPcs::drawBefore()
 
     CHandle* handle = HandleListHead(this)->m_next;
     while (handle != HandleListHead(this)) {
-        if ((*reinterpret_cast<unsigned int*>(DbgMenuPcs + 4) & 0x8000) != 0) {
+        if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x8000) != 0) {
             handle->draw(3, 1);
         }
         handle = handle->m_next;
@@ -1452,7 +1452,7 @@ void CCharaPcs::drawMakeTexShadow()
 
     CHandle* handle = HandleListHead(this)->m_next;
     while (handle != HandleListHead(this)) {
-        if ((*reinterpret_cast<unsigned int*>(DbgMenuPcs + 4) & 0x8000) != 0) {
+        if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x8000) != 0) {
             handle->draw(2, 1);
         }
         handle = handle->m_next;
@@ -1492,7 +1492,7 @@ void CCharaPcs::drawShadow()
 
     CHandle* handle = HandleListHead(this)->m_next;
     while (handle != HandleListHead(this)) {
-        if ((*reinterpret_cast<unsigned int*>(DbgMenuPcs + 4) & 0x8000) != 0) {
+        if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x8000) != 0) {
             handle->draw(1, 1);
         }
         handle = handle->m_next;
@@ -2163,7 +2163,7 @@ void CCharaPcs::drawOverlap()
 
     CHandle* handle = HandleListHead(this)->m_next;
     while (handle != HandleListHead(this)) {
-        if ((*reinterpret_cast<unsigned int*>(DbgMenuPcs + 4) & 0x8000) != 0) {
+        if ((DbgMenuPcs.GetDbgFlagsRaw() & 0x8000) != 0) {
             handle->draw(0, 1);
         }
         handle = handle->m_next;
@@ -2754,7 +2754,7 @@ void CCharaPcs::CHandle::Calc()
  */
 void CCharaPcs::CHandle::Draw(int drawPass)
 {
-	unsigned int dbgMenuFlags = *reinterpret_cast<unsigned int*>(DbgMenuPcs + 4);
+	unsigned int dbgMenuFlags = DbgMenuPcs.GetDbgFlagsRaw();
 	if ((dbgMenuFlags & 0x8000) != 0) {
 		if ((drawPass == 4) && ((m_flags & 0x10000) != 0)) {
 			draw(3, 0);

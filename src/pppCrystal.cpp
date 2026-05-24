@@ -15,13 +15,12 @@
 #include "ffcc/ppp_linkage.h"
 
 extern const float FLOAT_80330FD4;
-const float FLOAT_80330FD0 = 2.0f;
 extern const float FLOAT_80330FD8;
 extern const double DOUBLE_80330FE0;
 extern const double DOUBLE_80330FE8;
-extern const double DOUBLE_80330FF0;
-extern const float FLOAT_80330FF8;
-extern const double DOUBLE_80331000;
+extern const double kPppLensFlareZeroD;
+extern const float kPppLensFlareOne;
+extern const double kPppLensFlareOcclusionStep;
 extern const float FLOAT_80331008;
 extern const float FLOAT_8033100C;
 extern const float FLOAT_80331010;
@@ -280,10 +279,10 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param
 		textureInfo->m_imageCount = 0x100;
 		textureInfo->m_bufferSize = textureSize;
 
-		stepX = FLOAT_80330FD0 / (float)(textureInfo->m_width - 1U);
-		stepY = FLOAT_80330FD0 / (float)(textureInfo->m_height - 1U);
+		stepX = 2.0f / (float)(textureInfo->m_width - 1U);
+		stepY = 2.0f / (float)(textureInfo->m_height - 1U);
 		yCoord = FLOAT_80330FD4;
-		maxMagnitude = FLOAT_80330FF8;
+		maxMagnitude = kPppLensFlareOne;
 		coordOffset = FLOAT_8033100C;
 		modulationScale = FLOAT_80331008;
 		coordScale = FLOAT_80331010;
@@ -299,7 +298,7 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param
 				magnitude = xCoord * xCoord + ySq;
 				if (magnitude > FLOAT_80330FD8) {
 					magnitude = CrystalSqrtPositive(magnitude);
-				} else if ((double)magnitude < DOUBLE_80330FF0) {
+				} else if ((double)magnitude < kPppLensFlareZeroD) {
 					magnitude = NAN;
 				} else if (CrystalFpClassify(magnitude) == 1) {
 					magnitude = NAN;
@@ -309,7 +308,7 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param
 					magnitude = maxMagnitude;
 				}
 
-				double modulation = fmod(magnitude, DOUBLE_80331000);
+				double modulation = fmod(magnitude, kPppLensFlareOcclusionStep);
 				magnitude = modulationScale * (magnitude * (float)modulation);
 				u8 nx = (u8)__cvt_fp2unsigned((double)(xCoord * magnitude * coordScale + coordOffset));
 				u8* pixel = textureInfo->m_imageData +

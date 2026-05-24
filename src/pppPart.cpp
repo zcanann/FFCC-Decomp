@@ -1438,25 +1438,21 @@ void pppSetFpMatrix(_pppMngSt* pppMngSt)
 
 	local_70.x = ppvWorldMatrix[0][1];
 	local_70.y = ppvWorldMatrix[1][1];
-	local_90.x = ppvWorldMatrix[0][1];
 	local_70.z = ppvWorldMatrix[2][1];
-	local_90.y = ppvWorldMatrix[1][1];
-	local_90.z = ppvWorldMatrix[2][1];
-	if ((ppvWorldMatrix[0][1] != FLOAT_8032fddc) || (ppvWorldMatrix[1][1] != FLOAT_8032fddc) || (ppvWorldMatrix[2][1] != FLOAT_8032fddc)) {
+	local_90 = local_70;
+	if ((local_90.x != FLOAT_8032fddc) || (local_90.y != FLOAT_8032fddc) || (local_90.z != FLOAT_8032fddc)) {
 		PSVECNormalize(&local_90, &local_70);
 	}
 
-	local_60.x = local_70.y;
-	local_9c.y = -local_70.x;
-	local_60.z = FLOAT_8032fddc;
 	local_9c.x = local_70.y;
+	local_9c.y = -local_70.x;
+	local_9c.z = FLOAT_8032fddc;
+	local_60 = local_9c;
 	ppvWorldMatrixWood[0][1] = local_70.x;
 	ppvWorldMatrixWood[1][1] = local_70.y;
 	ppvWorldMatrixWood[2][1] = local_70.z;
-	local_9c.z = FLOAT_8032fddc;
-	local_60.y = local_9c.y;
 
-	if ((local_70.y != FLOAT_8032fddc) || (local_9c.y != FLOAT_8032fddc)) {
+	if ((local_60.x != FLOAT_8032fddc) || (local_60.y != FLOAT_8032fddc) || (local_60.z != FLOAT_8032fddc)) {
 		PSVECNormalize(&local_9c, &local_60);
 	}
 
@@ -1464,11 +1460,9 @@ void pppSetFpMatrix(_pppMngSt* pppMngSt)
 	ppvWorldMatrixWood[1][0] = local_60.y;
 	ppvWorldMatrixWood[2][0] = local_60.z;
 	PSVECCrossProduct(&local_60, &local_70, &local_80);
-	local_a8.x = local_80.x;
-	local_a8.y = local_80.y;
-	local_a8.z = local_80.z;
+	local_a8 = local_80;
 
-	if ((local_80.x != FLOAT_8032fddc) || (local_80.y != FLOAT_8032fddc) || (local_80.z != FLOAT_8032fddc)) {
+	if ((local_a8.x != FLOAT_8032fddc) || (local_a8.y != FLOAT_8032fddc) || (local_a8.z != FLOAT_8032fddc)) {
 		PSVECNormalize(&local_a8, &local_80);
 	}
 

@@ -29,7 +29,15 @@ public:
         
     };
 
-    CCameraPcs() {}
+    CCameraPcs()
+    {
+        m_shadowRectBound.m_min.x = kCameraBoundsMinInitial;
+        m_shadowRectBound.m_min.y = kCameraBoundsMinInitial;
+        m_shadowRectBound.m_min.z = kCameraBoundsMinInitial;
+        m_shadowRectBound.m_max.x = kCameraBoundsMaxInitial;
+        m_shadowRectBound.m_max.y = kCameraBoundsMaxInitial;
+        m_shadowRectBound.m_max.z = kCameraBoundsMaxInitial;
+    }
 
     static unsigned int m_table_desc0[3];
     static unsigned int m_table_desc1[3];

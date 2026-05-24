@@ -412,7 +412,7 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
     s16 sVar9;
     s16* psVar11;
     s16 sVar12;
-    u32 iVar5;
+    s32 iVar5;
     s32 iVar6;
     s32 iVar14;
     u32 uVar15;
@@ -462,7 +462,7 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
         sVar9 = 0x7FFF;
         sVar4 = 0x7FFF;
 
-        for (; iVar5 != 0; iVar5--) {
+        for (; iVar5 > 0; iVar5--) {
             s16 sVar1 = *(s16*)(*(s32*)(iVar14 + 0x18) + iVar6);
             s16 globalX = globalMax.x;
             if (globalX < sVar1) {

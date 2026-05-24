@@ -36,6 +36,11 @@ struct EraseCharaPartsModelView {
     EraseCharaPartsMesh* m_meshes;
 };
 
+static inline u8* GetEraseCharaPartsWork(pppEraseCharaParts* eraseCharaParts, s32 offset)
+{
+    return eraseCharaParts->m_object.m_workArea + offset;
+}
+
 /*
  * --INFO--
  * PAL Address: 0x80103EC0
@@ -49,7 +54,7 @@ void pppFrameEraseCharaParts(pppEraseCharaParts* pppEraseCharaParts, pppEraseCha
                              pppEraseCharaPartsUnkC* param_3)
 {
     CCharaPcs::CHandle* handle;
-    int model;
+    CChara::CModel* model;
     s32* offsets;
     int colorIndex;
     u8* dstColor;
@@ -58,13 +63,12 @@ void pppFrameEraseCharaParts(pppEraseCharaParts* pppEraseCharaParts, pppEraseCha
     if (gPppCalcDisabled == 0) {
         offsets = param_3->m_serializedDataOffsets;
         colorIndex = offsets[0];
-        dstColor = (u8*)((char*)pppEraseCharaParts + 0x80 + offsets[1]);
-        srcColor = (u8*)((char*)pppEraseCharaParts + 0x80 + colorIndex);
+        dstColor = GetEraseCharaPartsWork(pppEraseCharaParts, offsets[1]);
+        srcColor = GetEraseCharaPartsWork(pppEraseCharaParts, colorIndex);
         handle = GetCharaHandlePtr(reinterpret_cast<CGObject*>(pppMngStPtr->m_owner), 0);
-        model = reinterpret_cast<int>(GetCharaModelPtr(handle));
+        model = GetCharaModelPtr(handle);
 
-        *(u8**)(model + 0xE4) = dstColor;
-        *(pppEraseCharaPartsUnkB**)(model + 0xE8) = param_2;
+        model->SetCallbackContext(dstColor, param_2);
 
         dstColor[0] = srcColor[8];
         dstColor[1] = srcColor[9];
@@ -87,13 +91,12 @@ void pppFrameEraseCharaParts(pppEraseCharaParts* pppEraseCharaParts, pppEraseCha
 void pppDestructEraseCharaParts(pppEraseCharaParts*, pppEraseCharaPartsUnkC*)
 {
     CCharaPcs::CHandle* handle;
-    int model;
+    CChara::CModel* model;
 
     handle = GetCharaHandlePtr(reinterpret_cast<CGObject*>(pppMngStPtr->m_owner), 0);
-    model = reinterpret_cast<int>(GetCharaModelPtr(handle));
-    *(void**)(model + 0xE4) = 0;
-    *(void**)(model + 0xE8) = 0;
-    *(void**)(model + 0xFC) = 0;
+    model = GetCharaModelPtr(handle);
+    model->SetCallbackContext(0, 0);
+    model->m_drawMeshDLCallback = 0;
 }
 
 /*
@@ -109,12 +112,12 @@ void pppConstructEraseCharaParts(pppEraseCharaParts* pppEraseCharaParts, pppEras
 {
     s32* serializedDataOffsets;
     CCharaPcs::CHandle* handle;
-    int model;
+    CChara::CModel* model;
     u8* colorPtr;
     void* gObject;
 
     serializedDataOffsets = param_2->m_serializedDataOffsets;
-    colorPtr = (u8*)pppEraseCharaParts + 0x80 + serializedDataOffsets[1];
+    colorPtr = GetEraseCharaPartsWork(pppEraseCharaParts, serializedDataOffsets[1]);
     gObject = pppMngStPtr->m_owner;
     colorPtr[0] = 0x80;
     colorPtr[1] = 0x80;
@@ -122,9 +125,8 @@ void pppConstructEraseCharaParts(pppEraseCharaParts* pppEraseCharaParts, pppEras
     colorPtr[3] = 0x80;
 
     handle = GetCharaHandlePtr(reinterpret_cast<CGObject*>(gObject), 0);
-    model = reinterpret_cast<int>(GetCharaModelPtr(handle));
-    *(void (**)(CChara::CModel*, void*, void*, int, int, float (*)[4]))(model + 0xFC) =
-        EraseCharaParts_DrawMeshDLCallback;
+    model = GetCharaModelPtr(handle);
+    model->m_drawMeshDLCallback = EraseCharaParts_DrawMeshDLCallback;
 }
 
 /*

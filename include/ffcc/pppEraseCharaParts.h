@@ -2,12 +2,11 @@
 #define _PPP_ERASECHARAPARTS_H_
 
 #include "ffcc/chara.h"
+#include "ffcc/partMng.h"
 #include <dolphin/types.h>
 
 struct pppEraseCharaParts {
-    u8 field0_0x0[8];
-    u8 pad_0x8[0x80];
-    u8 field_0x88[4];
+    _pppPObject m_object;
 };
 
 struct pppEraseCharaPartsUnkB {

@@ -8,7 +8,7 @@ struct pppCharaZEnvCtrlUnkB;
 
 struct pppCharaZEnvCtrl
 {
-    int field0_0x0[2];
+    _pppPObject m_object;
 };
 
 void CharaZEnvCtrl_BeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int);

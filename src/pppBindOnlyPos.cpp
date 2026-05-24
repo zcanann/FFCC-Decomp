@@ -17,7 +17,7 @@ void pppFrameBindOnlyPos(_pppPObject*, void*, _pppCtrlTable*)
 		return;
 	}
 
-	if (*(volatile unsigned int*)((char*)pppMngStPtr + 0xd8) != 0) {
+	if (pppMngStPtr->m_owner != 0) {
 		return;
 	}
 }

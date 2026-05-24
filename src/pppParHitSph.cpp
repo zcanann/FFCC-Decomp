@@ -30,10 +30,10 @@ void pppParHitSph(struct _pppPObject* param_1, int param_2)
     float radius;
 
     PSVECSubtract((Vec*)((u8*)pppMngStPtr + 0x8), (Vec*)((u8*)pppMngStPtr + 0x48), &local_88);
-    local_94.x = *(float*)((u8*)pppMngStPtr + 0x84);
-    local_94.y = *(float*)((u8*)pppMngStPtr + 0x94);
-    local_94.z = *(float*)((u8*)pppMngStPtr + 0xA4);
-    radius = *(float*)((u8*)pppMngSt + 0x64) * *(float*)(param_2 + 8);
+    local_94.x = pppMngStPtr->m_matrix.value[0][3];
+    local_94.y = pppMngStPtr->m_matrix.value[1][3];
+    local_94.z = pppMngStPtr->m_matrix.value[2][3];
+    radius = pppMngSt->m_previousPosition.z * *(float*)(param_2 + 8);
 
     if (((kPppParHitSphZero == local_88.x) && (kPppParHitSphZero == local_88.y)) &&
         (kPppParHitSphZero == local_88.z)) {

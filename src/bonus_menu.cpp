@@ -2399,14 +2399,11 @@ void CMenuPcs::DrawResultCountAnim()
 	int statePtr = GetBonusMenuMembers(this).m_bonusStatePtr;
 	int modelIndex = 0;
 
-	if (animPtr == 0 || statePtr == 0) {
-		return;
-	}
 	if (*(unsigned char*)(statePtr + 0xb) == 0) {
 		return;
 	}
 
-	int activePartyCount = GetActiveBonusPartyCount();
+	int activePartyCount = s_Rinfo->m_partyCount;
 	BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
 	BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
 
@@ -2421,10 +2418,7 @@ void CMenuPcs::DrawResultCountAnim()
 			if (kind == -2) {
 				CCharaPcs::CHandle* handle = 0;
 				if (modelIndex < activePartyCount) {
-					BonusPartySummary* summary = GetBonusPartySummary(modelIndex);
-					if (summary != 0) {
-						handle = summary->m_partyHandle;
-					}
+					handle = s_Rinfo->m_party[modelIndex].m_partyHandle;
 				} else if (modelIndex < activePartyCount * 2) {
 					handle = GetBonusDisplayHandleSlots(this)[modelIndex - activePartyCount];
 				}
@@ -2449,7 +2443,17 @@ void CMenuPcs::DrawResultCountAnim()
 					    (float)sprite->w, (float)sprite->h,
 					    sprite->mulX, sprite->mulY, sprite->depth, sprite->depth, 0.0f);
 				} else {
-					int value = GetBonusDisplayValueForFrame(statePtr, i - s_CntTop);
+					int value = s_Rinfo->m_party[i - s_CntTop].m_totalValue;
+					if (*(short*)(statePtr + 0x10) == 0) {
+						int frame = (int)*(short*)(statePtr + 0x22) - 8;
+						if (frame > 0) {
+							if (frame < value) {
+								value = frame;
+							}
+						} else {
+							value = 0;
+						}
+					}
 					int digits[3];
 					int digitCount;
 
@@ -2483,50 +2487,46 @@ void CMenuPcs::DrawResultCountAnim()
 
 	DrawInit();
 	CFont* font = GetBonusMenuMembers(this).m_font;
-	if (font != 0) {
-		font->SetMargin(1.0f);
-		font->SetShadow(1);
-		font->SetScale(0.9f);
-		font->SetTlut(7);
-		font->DrawInit();
-	}
+	font->SetMargin(1.0f);
+	font->SetShadow(1);
+	font->SetScale(0.9f);
+	font->SetTlut(7);
+	font->DrawInit();
 
 	int textIndex = 0;
 	char text[128];
 	for (int i = 0; i < (int)header->count; i++) {
 		BonusAnimSprite* sprite = &sprites[i];
-		if (sprite->kind == -1 && font != 0) {
+		if (sprite->kind == -1) {
 			_GXColor color = {0xFF, 0xFF, 0xFF, 0xFF};
 			font->SetColor(color);
 
-			const char* src = 0;
+			int partyIndex = textIndex % activePartyCount;
+			CCaravanWork* caravanWork =
+			    reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[s_Rinfo->m_party[partyIndex].m_partySlot]);
 			if (textIndex < activePartyCount) {
-				src = GetBonusPartyNameByActiveIndex(textIndex);
-			} else if (activePartyCount > 0) {
-				src = GetBonusResultLabelByActiveIndex(textIndex % activePartyCount);
+				strcpy(text, reinterpret_cast<char*>(caravanWork->unk_0x3ca_0x3dd));
+			} else {
+				BonusFlatDataRaw* flat = reinterpret_cast<BonusFlatDataRaw*>(&Game.m_cFlatDataArr[1]);
+				strcpy(text, flat->m_table[7].m_strings[(int)caravanWork->m_bonusCondition * 2 + 1]);
 			}
 
-			if (src != 0) {
-				strcpy(text, src);
-				float y = (float)sprite->y + sprite->motionY - 6.0f;
-				if (textIndex < activePartyCount) {
-					y -= 6.0f;
-				}
-				font->SetPosX((float)sprite->x + sprite->motionX);
-				font->SetPosY(y);
-				font->Draw(text);
+			float y = (float)sprite->y + sprite->motionY - 6.0f;
+			if (textIndex < activePartyCount) {
+				y -= 6.0f;
 			}
+			font->SetPosX((float)sprite->x + sprite->motionX);
+			font->SetPosY(y);
+			font->Draw(text);
 
 			textIndex++;
 			if (textIndex == activePartyCount) {
 				font = GetBonusMenuMembers(this).m_fontWide;
-				if (font != 0) {
-					font->SetMargin(1.0f);
-					font->SetScaleX(0.7f);
-					font->SetScaleY(1.0f);
-					font->SetShadow(0);
-					font->DrawInit();
-				}
+				font->SetMargin(1.0f);
+				font->SetScaleX(0.7f);
+				font->SetScaleY(1.0f);
+				font->SetShadow(0);
+				font->DrawInit();
 			}
 		}
 	}

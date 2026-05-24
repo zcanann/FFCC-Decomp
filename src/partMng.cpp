@@ -3749,24 +3749,22 @@ int CPartMng::pppLoadPdt(const char* baseName, int pdtSlotIndex, int cachePriori
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8005880c
+ * PAL Size: 212b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 int CPartMng::pppGetFreeDataMng()
 {
     PppPdtSlot* freeSlot = 0;
-    int slotIndex = 8;
-    int count = 0x18;
-
-    while (count != 0) {
+    for (int slotIndex = 8; slotIndex < 0x20; slotIndex++) {
         PppPdtSlot* slot = &m_pdtSlots[slotIndex];
         if (slot->m_pppDataHead == 0) {
             freeSlot = slot;
             break;
         }
-
-        slotIndex++;
-        count--;
     }
 
     if (freeSlot == 0) {

@@ -12,9 +12,9 @@
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
-extern const float FLOAT_80330998;
-extern const float FLOAT_8033099C;
-extern const float FLOAT_803309a8[2] = {0.95f, 0.0f};
+extern const float kGObjWorkStatusScaleBase;
+extern const float kGObjWorkStatusScaleStep;
+extern const float kCaravanShoukiLimitScale[2] = {0.95f, 0.0f};
 
 namespace {
 static inline unsigned short* GetItemDataPtr(int itemIdx)
@@ -41,7 +41,8 @@ struct ShoukiByteFlags {
 
 static inline float GetStatusMultiplier(int offset)
 {
-	return ((float)(*(unsigned short*)(Game.unk_flat3_field_8_0xc7dc + offset)) * FLOAT_8033099C) + FLOAT_80330998;
+	return ((float)(*(unsigned short*)(Game.unk_flat3_field_8_0xc7dc + offset)) * kGObjWorkStatusScaleStep) +
+		   kGObjWorkStatusScaleBase;
 }
 }
 
@@ -452,7 +453,7 @@ int CCaravanWork::IsOutOfShouki()
 	void* ownerObj = m_ownerObj;
 
 	if (*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(ownerObj) + 0x5BC) >
-		FLOAT_803309a8[0] * Game.unkFloat_0xca10) {
+		kCaravanShoukiLimitScale[0] * Game.unkFloat_0xca10) {
 		if (m_hp != 0) {
 			unsigned char cflatFlag = CFlatGameFlags();
 			if (((char)(((int)(((unsigned int)cflatFlag << 24) & 0xC0000000)) >> 31) != 0 ||
@@ -2995,7 +2996,8 @@ void CMonWork::Init(int baseDataIndex, CRomWork* romWork, int)
 		unsigned int bossArtifact = Game.m_bossArtifactBase;
 		bossArtifact += Game.m_gameWork.m_bossArtifactStageIndex * 0x168;
 		unsigned short artifactScale = *(unsigned short*)(bossArtifact + 0x60);
-		m_maxHp = (unsigned short)((float)m_maxHp * ((((float)artifactScale) * FLOAT_8033099C) + FLOAT_80330998));
+		m_maxHp = (unsigned short)((float)m_maxHp *
+								   ((((float)artifactScale) * kGObjWorkStatusScaleStep) + kGObjWorkStatusScaleBase));
 	}
 
 	m_hp = m_maxHp;

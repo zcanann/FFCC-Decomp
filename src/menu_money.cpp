@@ -14,7 +14,7 @@ typedef unsigned char u8;
 typedef signed short s16;
 typedef unsigned short u16;
 
-static const float LOCAL_FLOAT_80332f60 = 255.0f;
+extern const float FLOAT_80332f60;
 extern const float FLOAT_80332f64;
 static const float LOCAL_FLOAT_80332f64 = 0.0f;
 static const float LOCAL_FLOAT_80332f68 = 32.0f;
@@ -397,7 +397,7 @@ void CMenuPcs::MoneyDraw()
 		color.r = 0xFF;
 		color.g = 0xFF;
 		color.b = 0xFF;
-		color.a = (u8)(LOCAL_FLOAT_80332f60 * entry->alpha);
+		color.a = (u8)(FLOAT_80332f60 * entry->alpha);
 		GXSetChanMatColor(GX_COLOR0A0, color);
 		float uvScale = entry->uvScale;
 		MenuPcs.DrawRect(0, x, y, w, h, u, v, uvScale, uvScale, LOCAL_FLOAT_80332f64);
@@ -410,7 +410,7 @@ void CMenuPcs::MoneyDraw()
 		color.r = 0xFF;
 		color.g = 0xFF;
 		color.b = 0xFF;
-		color.a = (u8)(LOCAL_FLOAT_80332f60 * *(float*)(drawBase + 8));
+		color.a = (u8)(FLOAT_80332f60 * *(float*)(drawBase + 8));
 		GXSetChanMatColor(GX_COLOR0A0, color);
 	}
 
@@ -435,7 +435,7 @@ void CMenuPcs::MoneyDraw()
 			color.r = 0xFF;
 			color.g = 0xFF;
 			color.b = 0xFF;
-			color.a = (u8)(LOCAL_FLOAT_80332f60 * *(float*)(drawBase + 8));
+			color.a = (u8)(FLOAT_80332f60 * *(float*)(drawBase + 8));
 			GXSetChanMatColor(GX_COLOR0A0, color);
 		}
 
@@ -452,7 +452,7 @@ void CMenuPcs::MoneyDraw()
 	font->DrawInit();
 
 	{
-		CColor color(0xFF, 0xFF, 0xFF, (u8)(LOCAL_FLOAT_80332f60 * *(float*)(drawBase + 8)));
+		CColor color(0xFF, 0xFF, 0xFF, (u8)(FLOAT_80332f60 * *(float*)(drawBase + 8)));
 		font->SetColor(color.color);
 	}
 

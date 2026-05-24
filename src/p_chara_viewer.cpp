@@ -69,8 +69,8 @@ extern "C" const double kCharaSharedSignedIntBias = 4503601774854144.0;
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
-extern "C" float FLOAT_80330BEC;
-extern "C" float FLOAT_80330BF0;
+extern "C" const float kCharaViewerBackOrthoRight;
+extern "C" const float kCharaViewerBackOrthoBottom;
 
 struct CharaViewerSRT {
     float transX;
@@ -220,8 +220,8 @@ void CCharaPcs::drawViewer()
 
     if ((self->m_viewerBackTextureSet != 0) &&
         (reinterpret_cast<CPtrArray<CTexture*>*>(reinterpret_cast<unsigned char*>(self->m_viewerBackTextureSet) + 8)->GetSize() != 0)) {
-        C_MTXOrtho(projMtx, kCharaViewerZero, FLOAT_80330BEC, kCharaViewerZero, FLOAT_80330BF0, kCharaViewerZero,
-                   kCharaViewerGridMax);
+        C_MTXOrtho(projMtx, kCharaViewerZero, kCharaViewerBackOrthoRight, kCharaViewerZero,
+                   kCharaViewerBackOrthoBottom, kCharaViewerZero, kCharaViewerGridMax);
         GXSetProjection(projMtx, GX_ORTHOGRAPHIC);
         PSMTXIdentity(cameraMtx);
         GXLoadPosMtxImm(cameraMtx, 0);

@@ -15,8 +15,8 @@ class CGObject;
 class CPad;
 class CColor;
 
-extern float FLOAT_8032fa78;
-extern float FLOAT_8032fa7c;
+extern const float kCameraBoundsMinInitial;
+extern const float kCameraBoundsMaxInitial;
 
 void dbgDrawSphere(float, float, float, float, unsigned char, unsigned char, unsigned char);
 

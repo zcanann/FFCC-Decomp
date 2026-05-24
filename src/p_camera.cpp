@@ -77,7 +77,6 @@ extern float FLOAT_8032fab0;
 extern float FLOAT_8032fab4;
 extern float FLOAT_8032fab8;
 extern double DOUBLE_8032fa28;
-extern double DOUBLE_8032fa28;
 extern char s_p_camera_cpp[];
 extern char sCameraInvalidFovFmt[];
 extern unsigned char g_map_draw_prof;

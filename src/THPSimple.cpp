@@ -734,6 +734,8 @@ s32 THPSimpleSetBuffer(u8* buffer)
         SimpleControl.readBuffer[4].mIsValid = 0;
         SimpleControl.readBuffer[5].mIsValid = 0;
         SimpleControl.readBuffer[6].mIsValid = 0;
+        SimpleControl.readBuffer[7].mPtr = cursor;
+        cursor += frameBufferSize;
         SimpleControl.readBuffer[7].mIsValid = 0;
 
         if (SimpleControl.hasAudio != 0) {

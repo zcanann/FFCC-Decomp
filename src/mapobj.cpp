@@ -37,7 +37,7 @@ extern const float kMapObjDegToRad;
 extern const float kMapObjInitValue50;
 extern const char s_mapobj_cpp_801D70C0[];
 extern _GXColor s_mapObjLightColor;
-unsigned int DAT_8032E8B8 = 5;
+unsigned int gWmModelRotationSplineCount = 5;
 
 inline void* operator new(unsigned long, void* ptr)
 {

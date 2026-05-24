@@ -1,4 +1,5 @@
 #include "ffcc/pppKeShpTail3X.h"
+#include "global.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppShape.h"
@@ -56,6 +57,14 @@ struct KeShpTail3XWork {
     u8 m_head;
     u8 m_initialized;
 };
+STATIC_ASSERT(offsetof(KeShpTail3XWork, m_posHistory) == 0x30);
+STATIC_ASSERT(offsetof(KeShpTail3XWork, m_angles) == 0x180);
+STATIC_ASSERT(offsetof(KeShpTail3XWork, m_shapeData) == 0x1b8);
+STATIC_ASSERT(offsetof(KeShpTail3XWork, m_shapeFrame) == 0x1bc);
+STATIC_ASSERT(offsetof(KeShpTail3XWork, m_rand) == 0x1c0);
+STATIC_ASSERT(offsetof(KeShpTail3XWork, m_head) == 0x1c2);
+STATIC_ASSERT(offsetof(KeShpTail3XWork, m_initialized) == 0x1c3);
+STATIC_ASSERT(sizeof(KeShpTail3XWork) == 0x1c4);
 
 inline void S4ToF32(pppFVECTOR4* dest, s16* src)
 {
@@ -91,35 +100,32 @@ void pppKeShpTail3XDes(_pppPObjLink* obj, _pppCtrlTable* ctrlTable)
  */
 void pppKeShpTail3XCon(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkC* param_2)
 {
-    unsigned char* anglePtr;
-    unsigned char* work;
+    u16* angle;
+    Vec* pos;
+    KeShpTail3XWork* work;
     int i;
     float scale;
 
-    work = (unsigned char*)((u8*)obj + 0x80 + ((KeShpTail3XOffsets*)param_2)->m_serializedDataOffsets[0]);
-    work[0x1c3] = 0;
-    work[0x1c2] = 0;
-    *(u16*)(work + 0x1bc) = 0;
-    *(u32*)(work + 0x1b8) = 0;
-    *(u16*)(work + 0x1c0) = (u16)rand();
-    memset(work, 0, 8);
-    memset(work + 8, 0, 8);
-    memset(work + 0x10, 0, 8);
-    memset(work + 0x18, 0, 8);
-    memset(work + 0x20, 0, 8);
-    memset(work + 0x28, 0, 8);
+    work = (KeShpTail3XWork*)((u8*)obj + 0x80 + ((KeShpTail3XOffsets*)param_2)->m_serializedDataOffsets[0]);
+    work->m_initialized = 0;
+    work->m_head = 0;
+    work->m_shapeFrame = 0;
+    work->m_shapeData = 0;
+    work->m_rand = (u16)rand();
+    memset(work->m_values, 0, sizeof(work->m_values));
 
     scale = kPppKeShpTail3XZero;
     i = 0;
-    anglePtr = work;
+    angle = work->m_angles;
+    pos = work->m_posHistory;
     do {
         s32 rnd = rand();
-        *(s16*)(anglePtr + 0x180) = (s16)(rnd - (rnd / 0x168) * 0x168);
-        anglePtr += 2;
-        *(float*)(work + 0x38) = scale;
-        *(float*)(work + 0x34) = scale;
-        *(float*)(work + 0x30) = scale;
-        work += 0xc;
+        *angle = (s16)(rnd - (rnd / 0x168) * 0x168);
+        angle++;
+        pos->z = scale;
+        pos->y = scale;
+        pos->x = scale;
+        pos++;
         i++;
     } while (i < 0x1c);
 }

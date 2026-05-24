@@ -4556,7 +4556,7 @@ void CMenuPcs::SetProjection(int mode)
 	Mtx44 projectionMtx;
 	C_MTXPerspective(projectionMtx, FLOAT_80331470, FLOAT_80331474, FLOAT_80331478, FLOAT_8033147c);
 	GXSetProjection(projectionMtx, GX_PERSPECTIVE);
-	PSMTX44Copy(projectionMtx, *reinterpret_cast<Mtx44*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x48));
+	PSMTX44Copy(projectionMtx, CameraPcs.m_screenMatrix);
 
 	Vec target;
 	target.x = FLOAT_803313dc;
@@ -4607,7 +4607,7 @@ void CMenuPcs::RestoreProjection()
 	Mtx44 projectionMtx;
 	_GXColor clearColor = {0, 0, 0, 0};
 	GXSetCopyClear(clearColor, 0x00FFFFFF);
-	PSMTX44Copy(*reinterpret_cast<Mtx44*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x48), projectionMtx);
+	PSMTX44Copy(CameraPcs.m_screenMatrix, projectionMtx);
 	GXSetProjection(projectionMtx, GX_PERSPECTIVE);
 	Graphic.SetViewport();
 	GXSetScissor(0, 0, 0x280, 0x1C0);

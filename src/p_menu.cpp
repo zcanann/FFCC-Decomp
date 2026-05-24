@@ -1000,7 +1000,7 @@ void CMenuPcs::draw()
         }
     }
 
-    PSMTX44Copy(*reinterpret_cast<Mtx44*>(reinterpret_cast<u8*>(&CameraPcs) + 0x48), screenMtx);
+    PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
     GXSetProjection(screenMtx, GX_PERSPECTIVE);
 }
 

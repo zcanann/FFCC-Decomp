@@ -113,7 +113,7 @@ static inline unsigned char* Ptr(void* ptr, unsigned int offset)
 
 static inline CMapObj* GetMapObjByIndex(unsigned short index)
 {
-    return reinterpret_cast<CMapObj*>(reinterpret_cast<unsigned char*>(&MapMng) + 0x954 + (index * sizeof(CMapObj)));
+    return MapMng.GetMapObj(index);
 }
 
 }

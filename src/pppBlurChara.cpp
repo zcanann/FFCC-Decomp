@@ -34,21 +34,6 @@ struct pppBlurCharaWork {
     float m_savedModelField;
 };
 
-struct BlurCharaModelRaw {
-    u8 _pad0[0x9C];
-    float m_savedField; // 0x9C
-    u8 _padA0[0xE4 - 0xA0];
-    pppBlurCharaWork* m_work;        // 0xE4
-    pppBlurCharaUnkB* m_renderData;  // 0xE8
-    u8 _padEC[0xF4 - 0xEC];
-    void (*m_beforeMeshLockCallback)(CChara::CModel*, void*, void*, int); // 0xF4
-    u8 _padF8[0x108 - 0xF8];
-    void (*m_afterDrawModelCallback)(CChara::CModel*, void*, void*); // 0x108
-};
-STATIC_ASSERT(offsetof(BlurCharaModelRaw, m_work) == 0xE4);
-STATIC_ASSERT(offsetof(BlurCharaModelRaw, m_beforeMeshLockCallback) == 0xF4);
-STATIC_ASSERT(offsetof(BlurCharaModelRaw, m_afterDrawModelCallback) == 0x108);
-
 struct pppMngStBlurCharaRaw {
     char _padding0[0xDC];
     void* m_charaObj;
@@ -69,45 +54,10 @@ extern const double DOUBLE_80331058 = 4503599627370496.0;
 
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
 
-static inline float CameraLookAtX()
-{
-    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs));
-}
-
-static inline float CameraLookAtZ()
-{
-    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0x8);
-}
-
-static inline float CameraWorldX()
-{
-    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0xC);
-}
-
-static inline float CameraWorldZ()
-{
-    return *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0x14);
-}
-
-static inline Mtx& CameraMatrix()
-{
-    return *reinterpret_cast<Mtx*>(reinterpret_cast<u8*>(&CameraPcs) + 0x18);
-}
-
-static inline Mtx44& CameraScreenMatrix()
-{
-    return *reinterpret_cast<Mtx44*>(reinterpret_cast<u8*>(&CameraPcs) + 0x48);
-}
-
 extern const char s_pppBlurChara_cpp[] = "pppBlurChara.cpp";
 
 static inline pppBlurCharaWork* GetBlurWork(pppBlurChara* blurChara, const pppBlurCharaUnkC* data) {
     return (pppBlurCharaWork*)((char*)blurChara + 0x80 + data->m_serializedDataOffsets[2]);
-}
-
-static inline BlurCharaModelRaw* GetBlurCharaModelRaw(CChara::CModel* model)
-{
-    return reinterpret_cast<BlurCharaModelRaw*>(model);
 }
 
 struct BlurCharaColorData {
@@ -297,7 +247,7 @@ void pppFrameBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppBl
 {
     pppBlurCharaWork* work;
     CCharaPcs::CHandle* handle;
-    BlurCharaModelRaw* rawModel;
+    CChara::CModel* model;
 
     if (gPppCalcDisabled != 0) {
         return;
@@ -305,10 +255,10 @@ void pppFrameBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppBl
 
     work = GetBlurWork(blurChara, param_3);
     handle = GetCharaHandlePtr(reinterpret_cast<CGObject*>(((pppMngStBlurCharaRaw*)pppMngStPtr)->m_charaObj), 0);
-    rawModel = reinterpret_cast<BlurCharaModelRaw*>(GetCharaModelPtr(handle));
+    model = GetCharaModelPtr(handle);
 
-    rawModel->m_work = work;
-    rawModel->m_renderData = param_2;
+    model->m_callbackContext = work;
+    model->m_callbackParam = param_2;
 
     if ((unsigned int)work->m_captureBuffer == 0) {
         unsigned int texBufferSize = GXGetTexBufferSize(0x140, 0xE0, GX_TF_I8, GX_FALSE, GX_FALSE);
@@ -318,9 +268,9 @@ void pppFrameBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppBl
         work->m_smallTexObj = reinterpret_cast<_GXTexObj*>(
             pppMemAlloc(0x20, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppBlurChara_cpp), 0xD7));
 
-        rawModel->m_work = work;
-        rawModel->m_renderData = param_2;
-        rawModel->m_beforeMeshLockCallback = BlurChara_SetBeforeMeshLockEnvCallback;
+        model->m_callbackContext = work;
+        model->m_callbackParam = param_2;
+        model->m_beforeMeshLockEnvCallback = BlurChara_SetBeforeMeshLockEnvCallback;
     }
 }
 
@@ -337,11 +287,11 @@ void pppDestructBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkC* data)
 {
     pppBlurCharaWork* work = GetBlurWork(blurChara, data);
     CCharaPcs::CHandle* handle = GetCharaHandlePtr(reinterpret_cast<CGObject*>(work->m_ownerObj), 0);
-    BlurCharaModelRaw* rawModel = reinterpret_cast<BlurCharaModelRaw*>(GetCharaModelPtr(handle));
+    CChara::CModel* model = GetCharaModelPtr(handle);
 
-    rawModel->m_afterDrawModelCallback = 0;
-    rawModel->m_work = 0;
-    rawModel->m_renderData = 0;
+    model->m_afterDrawModelCallback = 0;
+    model->m_callbackContext = 0;
+    model->m_callbackParam = 0;
 
     if ((CMemory::CStage*)work->m_captureBuffer != 0) {
         pppHeapUseRate((CMemory::CStage*)work->m_captureBuffer);
@@ -353,7 +303,7 @@ void pppDestructBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkC* data)
         work->m_smallTexObj = 0;
     }
 
-    rawModel->m_savedField = work->m_savedModelField;
+    model->m_lightAlpha = work->m_savedModelField;
 }
 
 /*
@@ -370,16 +320,16 @@ void pppConstructBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkC* data)
     pppBlurCharaWork* work = GetBlurWork(blurChara, data);
     void* ownerObj = ((pppMngStBlurCharaRaw*)pppMngStPtr)->m_charaObj;
     CCharaPcs::CHandle* handle;
-    BlurCharaModelRaw* rawModel;
+    CChara::CModel* model;
 
     work->m_ownerObj = ownerObj;
     handle = GetCharaHandlePtr(reinterpret_cast<CGObject*>(ownerObj), 0);
-    rawModel = reinterpret_cast<BlurCharaModelRaw*>(GetCharaModelPtr(handle));
+    model = GetCharaModelPtr(handle);
 
-    rawModel->m_afterDrawModelCallback = BlurChara_AfterDrawModelCallback;
+    model->m_afterDrawModelCallback = BlurChara_AfterDrawModelCallback;
     work->m_captureBuffer = 0;
     work->m_smallTexObj = 0;
-    work->m_savedModelField = rawModel->m_savedField;
+    work->m_savedModelField = model->m_lightAlpha;
 }
 
 /*
@@ -393,7 +343,6 @@ void pppConstructBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkC* data)
  */
 void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void* param_3)
 {
-    BlurCharaModelRaw* rawModel = GetBlurCharaModelRaw(model);
     pppBlurCharaWork* work = reinterpret_cast<pppBlurCharaWork*>(param_2);
     pppBlurCharaUnkB* renderData = reinterpret_cast<pppBlurCharaUnkB*>(param_3);
     int width;
@@ -431,11 +380,11 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void
     GXSetViewport(FLOAT_80331030, FLOAT_80331030, FLOAT_80331050, FLOAT_80331054, FLOAT_80331030, FLOAT_8033103c);
     GXSetScissor(0, 0, (unsigned int)FLOAT_80331050, (unsigned int)FLOAT_80331054);
 
-    rawModel->m_beforeMeshLockCallback = BlurChara_SetBeforeMeshLockEnvCallback;
-    rawModel->m_afterDrawModelCallback = 0;
+    model->m_beforeMeshLockEnvCallback = BlurChara_SetBeforeMeshLockEnvCallback;
+    model->m_afterDrawModelCallback = 0;
     handle->Draw(0);
-    rawModel->m_beforeMeshLockCallback = 0;
-    rawModel->m_afterDrawModelCallback = BlurChara_AfterDrawModelCallback;
+    model->m_beforeMeshLockEnvCallback = 0;
+    model->m_afterDrawModelCallback = BlurChara_AfterDrawModelCallback;
 
     Graphic.SetViewport();
     GXSetScissor(0, 0, 0x280, 0x1C0);

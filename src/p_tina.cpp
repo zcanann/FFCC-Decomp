@@ -323,33 +323,6 @@ struct CPartPcsViewerState {
     unsigned char m_disableShokiDraw;
 };
 
-struct CPartMngState {
-    unsigned char unk0[0x236F4];
-    unsigned int m_partAMemBase;
-    unsigned int m_partAMemCursor;
-    unsigned int m_partLoadCacheParam;
-    unsigned int m_partChunkIndex;
-    unsigned int m_asyncHandleCount;
-    int m_partLoadMode;
-    unsigned int m_partChunkSize[16];
-    unsigned int m_partChunkChecksum[16];
-    CFile::CHandle* m_partAsyncBusy[16];
-};
-
-struct PppPdtSlotRaw {
-    _pppDataHead* m_pppDataHead;
-};
-
-static CPartMngState* GetPartMngState()
-{
-    return reinterpret_cast<CPartMngState*>(&PartMng);
-}
-
-static PppPdtSlotRaw* GetPartMngPdtSlots()
-{
-    return reinterpret_cast<PppPdtSlotRaw*>(reinterpret_cast<char*>(&PartMng) + 0x22E18);
-}
-
 /*
  * --INFO--
  * Address:	TODO
@@ -606,7 +579,7 @@ void CPartPcs::create()
  */
 void CPartPcs::createLoad()
 {
-    CPartMngState* state = reinterpret_cast<CPartMngState*>(&PartMng);
+    CPartMng* state = &PartMng;
     char* stringBase = const_cast<char*>(s_p_tina_rodata_801d7ee0);
 
     state->m_partAMemBase = 0;
@@ -1285,7 +1258,7 @@ void LoadFieldPdt0(int mapId, int floorId)
     g_MaxHeapSize = 0;
     g_MaxDataSize = 0;
 
-    if (GetPartMngState()->m_partLoadMode != 3) {
+    if (PartMng.m_partLoadMode != 3) {
         PartMng.pppReleasePdt(0);
         PartMng.pppReleasePdt(6);
         PartMng.pppReleasePdt(7);
@@ -1299,17 +1272,17 @@ void LoadFieldPdt0(int mapId, int floorId)
     pdtSlot = PartMng.pppLoadPtx(path, 0, 1, 0, 0);
     if (pdtSlot != 0) {
         pdtSlot = PartMng.pppLoadPdt(path, 0, 1, 0, 0);
-        if ((pdtSlot != 0) && (GetPartMngState()->m_partLoadMode != 2) && (GetPartMngState()->m_partLoadMode != 3)) {
+        if ((pdtSlot != 0) && (PartMng.m_partLoadMode != 2) && (PartMng.m_partLoadMode != 3)) {
             _pppDataHead* pppDataHead;
             PPPCREATEPARAM* createParam;
             int checkOff;
             int i;
 
-            pppDataHead = GetPartMngPdtSlots()[0].m_pppDataHead;
+            pppDataHead = PartMng.m_pdtSlots[0].m_pppDataHead;
             createParam = PartMng.pppGetDefaultCreateParam();
             checkOff = 0;
             for (i = 0; i < static_cast<int>((unsigned int)pppDataHead->m_partCount); i++) {
-                if (*reinterpret_cast<int*>(&GetPartMngPdtSlots()[0].m_pppDataHead[2].m_shapeGroupCount + checkOff) !=
+                if (*reinterpret_cast<int*>(&PartMng.m_pdtSlots[0].m_pppDataHead[2].m_shapeGroupCount + checkOff) !=
                     -0x1000) {
                     PartMng.pppCreate(0, i, createParam, 0);
                 }
@@ -1330,7 +1303,7 @@ void LoadFieldPdt0(int mapId, int floorId)
  */
 void CPartPcs::LoadFieldPdt(int mapId, int floorId, void* amemBase, unsigned long loadCacheParam, unsigned char mode)
 {
-    CPartMngState* state = GetPartMngState();
+    CPartMng* state = &PartMng;
 
     state->m_partAMemBase = reinterpret_cast<unsigned int>(amemBase);
     state->m_partAMemCursor = reinterpret_cast<unsigned int>(amemBase);
@@ -1382,12 +1355,12 @@ int CPartPcs::LoadMonsterPdt(int monsterId, int variant, void* pdtData, int pdtC
         sprintf(path, s_dvd_tina_mon_m_03d__c_801d7fd4, monsterId, variant + 0x61);
     }
 
-    reinterpret_cast<CPartMngState*>(&PartMng)->m_partAMemBase = 0;
-    reinterpret_cast<CPartMngState*>(&PartMng)->m_partAMemCursor = 0;
-    reinterpret_cast<CPartMngState*>(&PartMng)->m_partLoadCacheParam = 0;
-    reinterpret_cast<CPartMngState*>(&PartMng)->m_partChunkIndex = 0;
-    reinterpret_cast<CPartMngState*>(&PartMng)->m_asyncHandleCount = 0;
-    reinterpret_cast<CPartMngState*>(&PartMng)->m_partLoadMode = 0;
+    PartMng.m_partAMemBase = 0;
+    PartMng.m_partAMemCursor = 0;
+    PartMng.m_partLoadCacheParam = 0;
+    PartMng.m_partChunkIndex = 0;
+    PartMng.m_asyncHandleCount = 0;
+    PartMng.m_partLoadMode = 0;
 
     pdtSlotIndex = PartMng.pppGetFreeDataMng();
     if (pdtSlotIndex == -1) {
@@ -1436,12 +1409,12 @@ int CPartPcs::LoadMenuPdt(char* fileName)
     m_usbStreamData.m_stageLoad = stage;
     ppvAmemCacheSet.SetRStage(stage);
 
-    *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&PartMng) + 0x236F4) = 0;
-    *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&PartMng) + 0x236F8) = 0;
-    *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&PartMng) + 0x236FC) = 0;
-    *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&PartMng) + 0x23700) = 0;
-    *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&PartMng) + 0x23704) = 0;
-    *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&PartMng) + 0x23708) = 0;
+    PartMng.m_partAMemBase = 0;
+    PartMng.m_partAMemCursor = 0;
+    PartMng.m_partLoadCacheParam = 0;
+    PartMng.m_partChunkIndex = 0;
+    PartMng.m_asyncHandleCount = 0;
+    PartMng.m_partLoadMode = 0;
 
     pdtSlotIndex = PartMng.pppGetFreeDataMng();
     if (pdtSlotIndex == -1) {

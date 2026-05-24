@@ -12,7 +12,7 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
 extern "C" {
 extern const float kPppYmMeltZero;
-__declspec(section ".sdata2") u32 g_ymMelt;
+u32 g_ymMelt;
 extern int gPppCalcDisabled;
 }
 extern const float FLOAT_80330af4;
@@ -66,6 +66,17 @@ struct CMapCylinderRaw {
     Vec m_expandBounds;
 };
 
+static inline YmMeltWork* GetYmMeltWork(PYmMelt* ymMelt, PYmMeltDataOffsets* offsets)
+{
+    return reinterpret_cast<YmMeltWork*>(reinterpret_cast<u8*>(ymMelt) + *offsets->m_serializedDataOffsets + 0x80);
+}
+
+static inline YmMeltColorWork* GetYmMeltColorWork(PYmMelt* ymMelt, PYmMeltDataOffsets* offsets)
+{
+    return reinterpret_cast<YmMeltColorWork*>(
+        reinterpret_cast<u8*>(ymMelt) + offsets->m_serializedDataOffsets[1] + 0x80);
+}
+
 #define CalcPolygonHeight CalcPolygonHeight__FP7PYmMeltP11VERTEX_DATAP8_GXColorf
 extern "C" void CalcPolygonHeight(VERTEX_DATA*, YmMeltVertex*, _GXColor*, float);
 
@@ -80,7 +91,6 @@ extern "C" void CalcPolygonHeight(VERTEX_DATA*, YmMeltVertex*, _GXColor*, float)
  */
 void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offsets)
 {
-    s32 colorOffset;
     YmMeltWork* work;
     YmMeltVertex* vertexData;
     YmMeltColorWork* colorWork;
@@ -99,9 +109,8 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
     u32 drawColor;
     u8* drawColorBytes;
 
-    colorOffset = offsets->m_serializedDataOffsets[1];
-    work = (YmMeltWork*)((u8*)ymMelt + *offsets->m_serializedDataOffsets + 0x80);
-    colorWork = (YmMeltColorWork*)((u8*)ymMelt + colorOffset + 0x80);
+    work = GetYmMeltWork(ymMelt, offsets);
+    colorWork = GetYmMeltColorWork(ymMelt, offsets);
     if (ctrl->m_dataValIndex == 0xFFFF) {
         return;
     }
@@ -254,7 +263,6 @@ static const char s_pppYmMelt_cpp[] = "pppYmMelt.cpp";
 void pppFrameYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offsets)
 {
     s16 phaseWork;
-    int colorOffset;
     int gridCount;
     int vertexCount;
     int angleSeed;
@@ -275,9 +283,8 @@ void pppFrameYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offse
         return;
     }
 
-    work = (YmMeltWork*)((u8*)ymMelt + *offsets->m_serializedDataOffsets + 0x80);
-    colorOffset = offsets->m_serializedDataOffsets[1];
-    colorWork = (YmMeltColorWork*)((u8*)ymMelt + colorOffset + 0x80);
+    work = GetYmMeltWork(ymMelt, offsets);
+    colorWork = GetYmMeltColorWork(ymMelt, offsets);
     gridCount = ctrl->m_gridSize + 1;
     vertexCount = gridCount * gridCount;
     matrixY = pppMngStPtr->m_matrix.value[1][3];
@@ -344,12 +351,12 @@ void pppFrameYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offse
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDestructYmMelt(PYmMelt* pppYmMelt, PYmMeltDataOffsets* param_2)
+void pppDestructYmMelt(PYmMelt* ymMelt, PYmMeltDataOffsets* offsets)
 {
-    CMemory::CStage* stage =
-        *(CMemory::CStage**)((u8*)pppYmMelt + *param_2->m_serializedDataOffsets + 0x80);
-    if (stage != nullptr) {
-        pppHeapUseRate(stage);
+    YmMeltWork* work = GetYmMeltWork(ymMelt, offsets);
+
+    if (work->m_vertexData != nullptr) {
+        pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(work->m_vertexData));
     }
 }
 
@@ -362,20 +369,20 @@ void pppDestructYmMelt(PYmMelt* pppYmMelt, PYmMeltDataOffsets* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructYmMelt(PYmMelt* pppYmMelt, PYmMeltDataOffsets* param_2)
+void pppConstructYmMelt(PYmMelt* ymMelt, PYmMeltDataOffsets* offsets)
 {
     f32 value = kPppYmMeltZero;
-    u8* work = (u8*)pppYmMelt + *param_2->m_serializedDataOffsets + 0x80;
+    YmMeltWork* work = GetYmMeltWork(ymMelt, offsets);
 
-    *(u32*)(work + 0x0) = 0;
-    *(u16*)(work + 0x4) = 0;
-    *(u16*)(work + 0xA) = 0;
-    *(u16*)(work + 0x8) = 0;
-    *(u16*)(work + 0x6) = 0;
+    work->m_vertexData = 0;
+    work->m_phaseOffset = 0;
+    work->m_shapeFrameTime = 0;
+    work->m_shapeDrawFrame = 0;
+    work->m_shapeCurrentFrame = 0;
 
-    *(f32*)(work + 0x14) = value;
-    *(f32*)(work + 0x10) = value;
-    *(f32*)(work + 0xC) = value;
+    work->m_phaseAccel = value;
+    work->m_phaseVelocity = value;
+    work->m_phase = value;
 }
 
 /*

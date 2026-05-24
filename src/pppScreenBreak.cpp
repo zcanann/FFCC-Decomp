@@ -140,7 +140,7 @@ static inline float CameraDirX() { return CameraPcs.m_directionX; }
 static inline float CameraDirY() { return CameraPcs.m_directionY; }
 static inline float CameraDirZ() { return CameraPcs.m_directionZ; }
 static inline MtxPtr CameraMatrix() { return CameraPcs.m_cameraMatrix; }
-static inline Mtx44Ptr CameraScreenMatrix() { return reinterpret_cast<Mtx44Ptr>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x48); }
+static inline Mtx44Ptr CameraScreenMatrix() { return CameraPcs.m_screenMatrix; }
 static inline u8* ScreenBreakModelDataRaw(CChara::CModel* model) { return *(u8**)((u8*)model + 0xA4); }
 
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }

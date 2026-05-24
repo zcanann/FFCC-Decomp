@@ -25,7 +25,13 @@ extern const float FLOAT_80330664;
 extern const float FLOAT_80330668;
 static const char s_pppYmMiasma_cpp[] = "pppYmMiasma.cpp";
 
-struct PARTICLE_DATA : _PARTICLE_DATA {};
+struct PARTICLE_DATA {
+    Mtx m_matrix;
+    Vec m_velocity;
+    Vec m_directionTail;
+    u8 m_state[8];
+};
+STATIC_ASSERT(sizeof(PARTICLE_DATA) == 0x50);
 
 struct VYmMiasma {
     PARTICLE_DATA* m_particles;
@@ -205,7 +211,7 @@ void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, YmMiasmaRenderStep* step, pppY
             pppDrawShp(*shape, state->m_shapeDrawFrame, pppEnvStPtr->m_materialSetPtr, step->m_blendMode);
         }
 
-        particleData = (PARTICLE_DATA*)((u8*)particleData + 0x50);
+        particleData++;
     }
 }
 
@@ -243,13 +249,13 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, YmMiasmaFrameStep* step, pppYmM
 
     if (work->m_particles == 0) {
         work->m_particles = (PARTICLE_DATA*)pppMemAlloc(
-            (unsigned long)step->m_particleCount * 0x50, pppEnvStPtr->m_stagePtr,
+            (unsigned long)step->m_particleCount * sizeof(PARTICLE_DATA), pppEnvStPtr->m_stagePtr,
             const_cast<char*>(s_pppYmMiasma_cpp),
             0x18d);
         particle = work->m_particles;
         for (i = 0; i < step->m_particleCount; i++) {
             InitParticleData(work, (_pppPObject*)pppYmMiasma_, step, particle);
-            particle = (PARTICLE_DATA*)((u8*)particle + 0x50);
+            particle++;
         }
     }
 
@@ -300,7 +306,7 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, YmMiasmaFrameStep* step, pppYmM
     particle = work->m_particles;
     for (i = 0; i < step->m_particleCount; i++) {
         UpdateParticleData((_pppPObject*)pppYmMiasma_, (_pppCtrlTable*)param_3, step, particle);
-        particle = (PARTICLE_DATA*)((u8*)particle + 0x50);
+        particle++;
     }
 
     matrixPos.x = pppMngStPtr->m_matrix.value[0][3];

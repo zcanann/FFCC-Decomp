@@ -297,8 +297,7 @@ void CGItemObj::DrawOmoideName(CFont* font)
 			font->SetTlut(7);
 
 			int alphaInt = (int)(255.0f * *(float*)(self + 0x4B0));
-			CColor textColor(0xFF, 0xFF, 0xFF, alphaInt);
-			font->SetColor(textColor.color);
+			font->SetColor(CColor(0xFF, 0xFF, 0xFF, alphaInt).color);
 
 			const ItemObjFlatData* flatData = reinterpret_cast<const ItemObjFlatData*>(&Game.m_cFlatDataArr[1]);
 			const char* name = flatData->table[2].index[*(int*)(self + 0x570)];

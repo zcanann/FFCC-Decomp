@@ -127,7 +127,7 @@ public:
 	void onDeleteObject(CFlatRuntime::CObject*);
 	void onNewObject(CFlatRuntime::CObject*);
 	CFlatRuntime::CObject* getFreeObject(int);
-	CFlatRuntime::CClass* intToClass(int);
+	void* intToClass(int);
 
 	CFlatRuntime::CVal* onSystemVal(CFlatRuntime::CObject*, int);
 	CFlatRuntime::CVal* onClassSystemVal(CFlatRuntime::CObject*, int);

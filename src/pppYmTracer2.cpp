@@ -1,4 +1,5 @@
 #include "ffcc/pppYmTracer2.h"
+#include "global.h"
 #include "ffcc/gxfunc.h"
 #include "ffcc/mapmesh.h"
 #include "ffcc/pppPart.h"
@@ -30,6 +31,7 @@ struct TRACE_POLYGON {
     u8 active;
     u8 pad1[7];
 };
+STATIC_ASSERT(sizeof(TRACE_POLYGON) == 0x28);
 
 struct TracerWork {
     Vec pos;
@@ -43,18 +45,6 @@ struct TracerWork {
     u16 pad2e;
     s16 alphaStep;
     u16 pad32;
-};
-
-struct TracerDataValue {
-    u32 unk0;
-    u8* workBase;
-    u32 unk8;
-    u32 unkC;
-};
-
-struct TracerMngRaw {
-    u8 _pad[0xD4];
-    TracerDataValue* dataValues;
 };
 
 union PackedColor {
@@ -74,6 +64,12 @@ static inline void copyPolygonData(TRACE_POLYGON* dst, TRACE_POLYGON* src)
     dst->colorG = src->colorG;
     dst->colorB = src->colorB;
     dst->alpha = src->alpha;
+}
+
+static inline float* GetTracerWorkValue(int dataValueIndex, int offset)
+{
+    _pppPObject* object = reinterpret_cast<_pppPObject*>(pppMngStPtr->m_pppPDataVals[dataValueIndex].m_pppPObjLink);
+    return reinterpret_cast<float*>(object->m_workArea + offset);
 }
 
 /*
@@ -234,23 +230,19 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
     work = (TracerWork*)(pppYmTracer2->m_serializedData + *param_3->m_serializedDataOffsets);
     colorData = pppYmTracer2->m_serializedData + param_3->m_serializedDataOffsets[1];
 
-    work->initWork = (param_2->m_initWOrk == 0xffffffff)
+    work->initWork = (param_2->m_initWork == 0xffffffff)
                          ? gPppDefaultValueBuffer
-                         : reinterpret_cast<float*>(
-                               reinterpret_cast<TracerMngRaw*>(pppMngStPtr)->dataValues[param_2->m_initWOrk].workBase +
-                               0x80 + param_2->m_stepValue);
+                         : GetTracerWorkValue(param_2->m_initWork, param_2->m_stepValue);
 
     work->arg3Work = (param_2->m_arg3 == 0xffffffff)
                          ? gPppDefaultValueBuffer
-                         : reinterpret_cast<float*>(
-                               reinterpret_cast<TracerMngRaw*>(pppMngStPtr)->dataValues[param_2->m_arg3].workBase +
-                               0x80 + param_2->m_tracer.m_arg3WorkOffset);
+                         : GetTracerWorkValue(param_2->m_arg3, param_2->m_tracer.m_arg3WorkOffset);
 
     if (work->entries == nullptr) {
         useFallback = 1;
         work->alphaStep = (u16)param_2->m_tracer.m_entryAlpha / param_2->m_tracer.m_entryLife;
         work->entries = (TRACE_POLYGON*)pppMemAlloc(
-            (u32)param_2->m_tracer.m_entryCount * 0x28, pppEnvStPtr->m_stagePtr,
+            (u32)param_2->m_tracer.m_entryCount * sizeof(TRACE_POLYGON), pppEnvStPtr->m_stagePtr,
             const_cast<char*>(s_pppYmTracer2_cpp), 0xAD);
 
         fVar2 = FLOAT_80331840;
@@ -356,9 +348,8 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
 void pppDestructYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkC* param_2)
 {
     TracerWork* work = (TracerWork*)(pppYmTracer2->m_serializedData + *param_2->m_serializedDataOffsets);
-    void** memPtr = (void**)&work->entries;
-    if (*memPtr != 0) {
-        pppHeapUseRate((CMemory::CStage*)*memPtr);
+    if (work->entries != 0) {
+        pppHeapUseRate((CMemory::CStage*)work->entries);
     }
 }
 

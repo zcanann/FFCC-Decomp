@@ -481,12 +481,12 @@ extern char s_Feminin_8033243C[], s_Tous_80332444[], s_Pere_8033244C[], s_Mere_8
 extern char s_Frere_8033245C[], s_Soeur_80332464[], s_Lettres_8033246C[], s_Nom_80332474[];
 extern char s_Sexe_8033247C[], s_Tribu_80332484[], s_Metier_8033248C[], s_Objets_80332494[];
 extern char s_Equiper_8033249C[], s_Tresors_803324A4[], s_Gils_803324AC[], s_Famille_803324B4[];
-extern char s_Laisser_803324BC[], lbl_803324C4[], lbl_803324C8[], lbl_803324D0[];
-extern char lbl_803324D8[], lbl_803324E0[], lbl_803324E8[], lbl_803324F0[];
-extern char lbl_803324F8[], lbl_80332500[], lbl_80332508[], lbl_80332510[];
-extern char lbl_80332518[], lbl_80332520[], lbl_80332528[], lbl_80332530[];
-extern char lbl_80332534[], lbl_8033253C[], lbl_80332544[], lbl_8033254C[];
-extern char lbl_80332554[], lbl_8033255C[], lbl_80332564[], lbl_8033256C[];
+extern char s_Laisser_803324BC[], s_Si_803324C4[], s_guiles_803324C8[], s_Fuerza_803324D0[];
+extern char s_Defensa_803324D8[], s_Atacar_803324E0[], s_Quitar_803324E8[], s_Separar_803324F0[];
+extern char s_Hombre_803324F8[], s_Mujer_80332500[], s_Todos_80332508[], lbl_80332510[];
+extern char s_Hermano_80332518[], s_Hermana_80332520[], s_Cartas_80332528[], s_period_80332530[];
+extern char s_Nombre_80332534[], s_Sexo_8033253C[], s_Objetos_80332544[], s_Equipo_8033254C[];
+extern char s_Tesoros_80332554[], s_Dinero_8033255C[], s_Familia_80332564[], s_Hecho_8033256C[];
 extern char s_Strength_801DD814[], s_Memories_801DD820[], s_Send_item_801DD82C[], s_Send_gil_801DD838[];
 extern char s_Send_nothing_801DD844[], s_Proceed_801DD854[], s_Take_out_801DD860[], s_the_reply_801DD86C[];
 extern char s_Include_801DD878[], s_Family_Trade_801DD884[], s_Command_List_801DD894[], s_Artefacts_801DD8A4[];
@@ -615,20 +615,20 @@ extern "C" char* gSingMenuTextTableFr[] = {
     s_Preferences_801DDC50, s_Famille_803324B4, s_Lettres_8033246C, s_Laisser_803324BC,
 };
 extern "C" char* gSingMenuTextTableEs[] = {
-    lbl_803321B8, lbl_803324C4, lbl_803321C0, s_Cancelar_801DDC5C,
-    lbl_803324C8, lbl_803324D0, lbl_803324D8, s_Magia_80332350,
-    s_Memorias_801DDC68, lbl_803324E0, s_Defender_801DDC74, lbl_803324E8,
-    s_Fusionar_801DDC80, lbl_803324F0, s_Utilizar_801DDC8C, s_Descartar_801DDC98,
-    s_Destruir_801DDCA4, lbl_803324F8, lbl_80332500, lbl_80332508,
+    lbl_803321B8, s_Si_803324C4, lbl_803321C0, s_Cancelar_801DDC5C,
+    s_guiles_803324C8, s_Fuerza_803324D0, s_Defensa_803324D8, s_Magia_80332350,
+    s_Memorias_801DDC68, s_Atacar_803324E0, s_Defender_801DDC74, s_Quitar_803324E8,
+    s_Fusionar_801DDC80, s_Separar_803324F0, s_Utilizar_801DDC8C, s_Descartar_801DDC98,
+    s_Destruir_801DDCA4, s_Hombre_803324F8, s_Mujer_80332500, s_Todos_80332508,
     lbl_80332510, lbl_80332234, s_Padre_803323A4, s_Madre_803323AC,
-    lbl_80332518, lbl_80332520, lbl_80332518, lbl_80332520,
-    lbl_803321B8, lbl_80332528, s_Enviar_objeto_801DDCB0, s_Enviar_guiles_801DDCC0,
+    s_Hermano_80332518, s_Hermana_80332520, s_Hermano_80332518, s_Hermana_80332520,
+    lbl_803321B8, s_Cartas_80332528, s_Enviar_objeto_801DDCB0, s_Enviar_guiles_801DDCC0,
     s_No_enviar_nada_801DDCD0, s_Continuar_801DDCE0, s_Extraer_801DDCEC, lbl_80332260,
-    lbl_80332260, lbl_80332530, s_Enviar_la_respuesta_a_801DDCF8, lbl_803321B8,
-    s_Incluir_801DDD10, s_Confirmar_801DDD1C, lbl_80332534, lbl_8033253C,
-    s_Tribu_80332484, s_Oficio_familiar_801DDD28, s_Comandos_801DDD3C, lbl_80332544,
-    lbl_8033254C, s_Artefactos_801DDD48, lbl_80332554, lbl_8033255C,
-    s_Favoritos_801DDD54, lbl_80332564, lbl_80332528, lbl_8033256C,
+    lbl_80332260, s_period_80332530, s_Enviar_la_respuesta_a_801DDCF8, lbl_803321B8,
+    s_Incluir_801DDD10, s_Confirmar_801DDD1C, s_Nombre_80332534, s_Sexo_8033253C,
+    s_Tribu_80332484, s_Oficio_familiar_801DDD28, s_Comandos_801DDD3C, s_Objetos_80332544,
+    s_Equipo_8033254C, s_Artefactos_801DDD48, s_Tesoros_80332554, s_Dinero_8033255C,
+    s_Favoritos_801DDD54, s_Familia_80332564, s_Cartas_80332528, s_Hecho_8033256C,
 };
 extern "C" char* PTR_s_Cowlick[] = {
     lbl_80332574, lbl_8033257C, s_Headband_801DDD60, lbl_80332584,

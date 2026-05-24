@@ -463,11 +463,11 @@ extern char s_All_8033222C[], lbl_80332230[], lbl_80332234[], s_Father_80332238[
 extern char s_Mother_80332240[], s_Brother_80332248[], s_Sister_80332250[], s_Letters_80332258[];
 extern char lbl_80332260[], s_Send_80332264[], s_Confirm_8033226C[], lbl_80332274[];
 extern char s_Gender_8033227C[], s_Tribe_80332284[], s_Items_8033228C[], s_Equip_80332294[];
-extern char s_Money_8033229C[], s_Family_803322A4[], s_Done_803322AC[], lbl_803322B4[];
-extern char lbl_803322B8[], lbl_803322C0[], lbl_803322C4[], lbl_803322CC[];
-extern char lbl_803322D4[], lbl_803322DC[], lbl_803322E4[], lbl_803322E8[];
-extern char lbl_803322F0[], lbl_803322F8[], lbl_80332300[], lbl_80332308[];
-extern char lbl_8033230C[], lbl_80332314[], lbl_8033231C[], lbl_80332324[];
+extern char s_Money_8033229C[], s_Family_803322A4[], s_Done_803322AC[], s_Ja_803322B4[];
+extern char s_Nein_803322B8[], s_Gil_803322C0[], s_Staerke_803322C4[], s_Abwehr_803322CC[];
+extern char s_Magie_803322D4[], s_Ablegen_803322DC[], s_G_803322E4[], s_Vater_803322E8[];
+extern char s_Mutter_803322F0[], s_Bruder_803322F8[], s_Weiter_80332300[], lbl_80332308[];
+extern char s_Rasse_8033230C[], s_Geld_80332314[], s_Familie_8033231C[], s_Briefe_80332324[];
 extern char lbl_8033232C[], lbl_80332330[], lbl_80332338[], lbl_80332340[];
 extern char lbl_80332348[], lbl_80332350[], lbl_80332358[], lbl_80332360[];
 extern char lbl_80332368[], lbl_80332370[], lbl_80332378[], lbl_80332380[];
@@ -567,20 +567,20 @@ extern "C" char* gSingMenuTextTableEn[] = {
     s_Favourites_801DD8BC, s_Family_803322A4, s_Letters_80332258, s_Done_803322AC,
 };
 extern "C" char* gSingMenuTextTableDe[] = {
-    lbl_803321B8, lbl_803322B4, lbl_803322B8, s_Abbrechen_801DD8C8,
-    lbl_803322C0, lbl_803322C4, lbl_803322CC, lbl_803322D4,
-    s_Erinnerungen_801DD8D4, s_Angreifen_801DD8E4, s_Verteidigen_801DD8F0, lbl_803322DC,
+    lbl_803321B8, s_Ja_803322B4, s_Nein_803322B8, s_Abbrechen_801DD8C8,
+    s_Gil_803322C0, s_Staerke_803322C4, s_Abwehr_803322CC, s_Magie_803322D4,
+    s_Erinnerungen_801DD8D4, s_Angreifen_801DD8E4, s_Verteidigen_801DD8F0, s_Ablegen_803322DC,
     s_Kombinieren_801DD8FC, s_Aufloesen_801DD908, s_Benutzen_801DD914, s_Wegwerfen_801DD920,
     s_Zerstoeren_801DD92C, s_Maennlich_801DD938, s_Weiblich_801DD944, s_Alle_Rassen_801DD950,
-    lbl_80332230, lbl_803322E4, lbl_803322E8, lbl_803322F0,
-    lbl_803322F8, s_Schwester_801DD95C, s_kl_Bruder_801DD968, s_kl_Schwester_801DD974,
+    lbl_80332230, s_G_803322E4, s_Vater_803322E8, s_Mutter_803322F0,
+    s_Bruder_803322F8, s_Schwester_801DD95C, s_kl_Bruder_801DD968, s_kl_Schwester_801DD974,
     lbl_803321B8, s_Liste_erhaltener_Briefe_801DD984, s_Gegenstand_beifuegen_801DD99C, s_Gil_beifuegen_801DD9B0,
-    s_Nichts_beifuegen_801DD9C0, lbl_80332300, s_herausholen_801DD9D0, lbl_80332308,
+    s_Nichts_beifuegen_801DD9C0, s_Weiter_80332300, s_herausholen_801DD9D0, lbl_80332308,
     lbl_80332260, lbl_803321B8, s_die_Antwort_801DD9E0, s_schicken_801DD9F0,
     s_beifuegen_801DD9FC, s_Bestaetigen_801DDA08, lbl_80332274, s_Geschlecht_801DDA14,
-    lbl_8033230C, s_Elterlicher_Beruf_801DDA20, s_Kommandoliste_801DDA34, s_Gegenstaende_801DDA44,
-    s_Ausruesten_801DDA50, s_Artefakte_801DDA5C, s_Geborgtes_801DDA68, lbl_80332314,
-    s_Geschmack_801DDA74, lbl_8033231C, lbl_80332324, s_Abbrechen_801DD8C8,
+    s_Rasse_8033230C, s_Elterlicher_Beruf_801DDA20, s_Kommandoliste_801DDA34, s_Gegenstaende_801DDA44,
+    s_Ausruesten_801DDA50, s_Artefakte_801DDA5C, s_Geborgtes_801DDA68, s_Geld_80332314,
+    s_Geschmack_801DDA74, s_Familie_8033231C, s_Briefe_80332324, s_Abbrechen_801DD8C8,
 };
 extern "C" char* gSingMenuTextTableIt[] = {
     lbl_803321B8, lbl_8033232C, lbl_803321C0, lbl_80332330,
@@ -600,7 +600,7 @@ extern "C" char* gSingMenuTextTableIt[] = {
 };
 extern "C" char* gSingMenuTextTableFr[] = {
     lbl_803321B8, lbl_80332404, lbl_80332408, lbl_8033240C,
-    lbl_80332414, lbl_8033241C, s_Resistance_801DDB64, lbl_803322D4,
+    lbl_80332414, lbl_8033241C, s_Resistance_801DDB64, s_Magie_803322D4,
     s_Souvenirs_801DDB70, s_Attaquer_801DDB7C, s_Defendre_801DDB88, lbl_80332424,
     s_Fusionner_801DDB94, lbl_8033242C, s_Utiliser_801DDBA0, lbl_80332434,
     s_Detruire_801DDBAC, s_Masculin_801DDBB8, lbl_8033243C, lbl_80332444,

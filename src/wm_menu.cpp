@@ -186,8 +186,8 @@ extern const char* s_wmEmptyCreatingTextDe_8032E8F8[];
 extern const char* s_wmEmptyCreatingTextIt_8032E900[];
 extern const char* s_wmEmptyCreatingTextFr_8032E908[];
 extern const char* s_wmEmptyCreatingTextEs_8032E910[];
-extern int DAT_8032E918;
-extern float* DAT_8032E91C;
+extern int gWmLifeYOffsetSplineCount;
+extern float* gWmLifeYOffsetSpline;
 char gWmMenuCursorX[2];
 char gWmMenuCursorY[2];
 int gWmMenuWorkA;
@@ -6960,14 +6960,14 @@ void CMenuPcs::DrawCMLife()
 		for (int i = 0; i < count; i++) {
 			float yAdd = FLOAT_803313dc;
 			const float t = step / FLOAT_803314c0;
-			if (t < DAT_8032E91C[DAT_8032E918 * 4 - 4]) {
-				for (int j = 0; j < DAT_8032E918; j++) {
-					if (t <= DAT_8032E91C[j * 4]) {
+			if (t < gWmLifeYOffsetSpline[gWmLifeYOffsetSplineCount * 4 - 4]) {
+				for (int j = 0; j < gWmLifeYOffsetSplineCount; j++) {
+					if (t <= gWmLifeYOffsetSpline[j * 4]) {
 						if (j == 0) {
-							yAdd = DAT_8032E91C[1];
+							yAdd = gWmLifeYOffsetSpline[1];
 						} else {
-							float* const cur = DAT_8032E91C + j * 4;
-							float* const prev = DAT_8032E91C + (j - 1) * 4;
+							float* const cur = gWmLifeYOffsetSpline + j * 4;
+							float* const prev = gWmLifeYOffsetSpline + (j - 1) * 4;
 							const float width = cur[0] - prev[0];
 							const float u = (t - prev[0]) / width;
 							const float u2 = u * u;
@@ -6981,7 +6981,7 @@ void CMenuPcs::DrawCMLife()
 					}
 				}
 			} else {
-				yAdd = DAT_8032E91C[DAT_8032E918 * 4 - 3];
+				yAdd = gWmLifeYOffsetSpline[gWmLifeYOffsetSplineCount * 4 - 3];
 			}
 
 			MenuPcs.DrawRect(

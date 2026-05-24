@@ -184,11 +184,20 @@ struct MenuCmdMembers {
 	s16 m_cmdLayoutFlag;
 };
 
+struct CmdListStorage {
+	s16 count;
+	s16 selected;
+	unsigned char pad_0004[4];
+	unsigned char entries[64][0x40];
+};
+
 STATIC_ASSERT(offsetof(MenuCmdMembers, m_helpFont) == 0xF8);
 STATIC_ASSERT(offsetof(MenuCmdMembers, m_nameFont) == 0x108);
 STATIC_ASSERT(offsetof(MenuCmdMembers, m_cmdState) == 0x82C);
 STATIC_ASSERT(offsetof(MenuCmdMembers, m_cmdList) == 0x850);
 STATIC_ASSERT(offsetof(MenuCmdMembers, m_cmdLayoutFlag) == 0x864);
+STATIC_ASSERT(offsetof(CmdListStorage, entries) == 8);
+STATIC_ASSERT(sizeof(CmdListStorage) == 0x1008);
 
 static inline MenuCmdMembers& GetMenuCmdMembers(CMenuPcs* menu)
 {
@@ -208,6 +217,11 @@ static inline s16* GetCmdState(CMenuPcs* menu)
 static inline s16* GetCmdList(CMenuPcs* menu)
 {
 	return GetMenuCmdMembers(menu).m_cmdList;
+}
+
+static inline CmdListStorage* GetCmdListStorage(CMenuPcs* menu)
+{
+	return reinterpret_cast<CmdListStorage*>(GetCmdList(menu));
 }
 
 static inline int GetCmdStateBase(CMenuPcs* menu)
@@ -250,7 +264,7 @@ void CMenuPcs::CmdInit()
 {
 	u8* self = reinterpret_cast<u8*>(this);
 	u32 caravanWork = Game.m_scriptFoodBase[0];
-	memset(GetCmdList(this), 0, 0x1008);
+	memset(GetCmdListStorage(this), 0, sizeof(*GetCmdListStorage(this)));
 
 	float fVar2 = FLOAT_80332a70;
 	s32 iVar5 = GetCmdListBase(this) + 8;

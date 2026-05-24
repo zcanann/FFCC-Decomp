@@ -822,7 +822,7 @@ void CDbgMenuPcs::Add(int parentID, int id, CDbgMenuPcs::CDMParam& param)
 	CDM* parentMenu = reinterpret_cast<CDM*>(searchID(parentID, m_rootMenuNode));
 	CDM* menu = searchFreeCDM();
 
-	memset(&menu->m_status, 0, 0x20);
+	memset(&menu->m_status, 0, sizeof(CDM) - sizeof(CDMParam));
 	menu->m_statusBits.m_used = 1;
 
 	menu->m_type = param.m_type;
@@ -883,6 +883,6 @@ void CDbgMenuPcs::Add(int parentID, int id, CDbgMenuPcs::CDMParam& param)
  */
 CDbgMenuPcs::CDM::CDM()
 {
-	memset(this, 0, 0x34);
-	memset(reinterpret_cast<unsigned char*>(this) + 0x34, 0, 0x20);
+	memset(this, 0, sizeof(CDMParam));
+	memset(&m_status, 0, sizeof(*this) - sizeof(CDMParam));
 }

@@ -226,6 +226,7 @@ void CMapMesh::DrawMeshCharaShadow(unsigned short startIdx, unsigned short count
 {
     CMapMng* mapMng = &MapMng;
     int remaining = count;
+    CMapMng* mapMng = &MapMng;
     CMapMeshDrawEntry* entry = m_drawEntries + startIdx;
 
     while (remaining-- != 0) {
@@ -257,6 +258,7 @@ void CMapMesh::DrawMesh(unsigned short startIdx, unsigned short count)
 {
     CMapMng* mapMng = &MapMng;
     int remaining = count;
+    CMapMng* mapMng = &MapMng;
     CMapMeshDrawEntry* entry = m_drawEntries + startIdx;
 
     while (remaining-- != 0) {

@@ -14,13 +14,11 @@ extern const char sMaterialEditorSpinnerText[5] = "|/-\\";
 #include <Dolphin/gx.h>
 #include <dolphin/os/OSCache.h>
 #include <string.h>
-#include <PowerPC_EABI_Support/Runtime/NMWException.h>
 
 extern "C" void createViewer__18CMaterialEditorPcsFv(CMaterialEditorPcs*);
 extern "C" void destroyViewer__18CMaterialEditorPcsFv(CMaterialEditorPcs*);
 extern "C" void calcViewer__18CMaterialEditorPcsFv(CMaterialEditorPcs*);
 extern "C" void drawViewer__18CMaterialEditorPcsFv(CMaterialEditorPcs*);
-extern "C" void __dt__18CMaterialEditorPcsFv(void* self);
 extern const char __RTTI__8CManager_8032E648[];
 extern const char __RTTI__8CProcess_8032E650[];
 extern "C" const char s_CMaterialEditorPcsViewer[] = "CMaterialEditorPcs(VIEWER)";
@@ -40,7 +38,23 @@ unsigned int CMaterialEditorPcs::m_table_desc2[3] = {0, 0xFFFFFFFF, reinterpret_
 unsigned int CMaterialEditorPcs::m_table_desc3[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__18CMaterialEditorPcsFv)};
 
 unsigned int CMaterialEditorPcs::m_table[0x15C / sizeof(unsigned int)] = {
-    reinterpret_cast<unsigned int>(const_cast<char*>(s_CMaterialEditorPcsViewer)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x20, 0, 0, 0, 0, 0x41, 1
+    reinterpret_cast<unsigned int>(const_cast<char*>(s_CMaterialEditorPcsViewer)),
+    0,
+    0xFFFFFFFF,
+    reinterpret_cast<unsigned int>(createViewer__18CMaterialEditorPcsFv),
+    0,
+    0xFFFFFFFF,
+    reinterpret_cast<unsigned int>(destroyViewer__18CMaterialEditorPcsFv),
+    0,
+    0xFFFFFFFF,
+    reinterpret_cast<unsigned int>(calcViewer__18CMaterialEditorPcsFv),
+    0x20,
+    0,
+    0,
+    0xFFFFFFFF,
+    reinterpret_cast<unsigned int>(drawViewer__18CMaterialEditorPcsFv),
+    0x41,
+    1
 };
 unsigned int s_CMaterialEditorPcsTablePad0[3] = {reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CManager_8032E648)), 0, 0};
 unsigned int s_CMaterialEditorPcsTablePad1[5] = {reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CManager_8032E648)), 0, reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CProcess_8032E650)), 0, 0};
@@ -755,42 +769,6 @@ void CMaterialEditorPcs::Init()
 
     reinterpret_cast<unsigned char*>(this)[0x3bc] = 0;
 }
-/*
- * --INFO--
- * PAL Address: 0x8004c588
- * PAL Size: 280b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" void __sinit_p_MaterialEditor_cpp(void)
-{
-    CMaterialEditorPcs* pcs = new (&MaterialEditorPcs) CMaterialEditorPcs;
-    u8* self = reinterpret_cast<u8*>(pcs);
-    unsigned int* dst = CMaterialEditorPcs::m_table;
-    unsigned int* desc0 = CMaterialEditorPcs::m_table_desc0;
-    unsigned int* desc1 = CMaterialEditorPcs::m_table_desc1;
-    unsigned int* desc2 = CMaterialEditorPcs::m_table_desc2;
-    unsigned int* desc3 = CMaterialEditorPcs::m_table_desc3;
-
-    __register_global_object(self, __dt__18CMaterialEditorPcsFv, gMaterialEditorPcsGuard);
-
-    unsigned int* table = dst + 1;
-    table[0] = desc0[0];
-    table[1] = desc0[1];
-    table[2] = desc0[2];
-    table[3] = desc1[0];
-    table[4] = desc1[1];
-    table[5] = desc1[2];
-    table[6] = desc2[0];
-    table[7] = desc2[1];
-    table[8] = desc2[2];
-    table[11] = desc3[0];
-    table[12] = desc3[1];
-    table[13] = desc3[2];
-}
-
 /*
  * --INFO--
  * PAL Address: 0x8004c6a0

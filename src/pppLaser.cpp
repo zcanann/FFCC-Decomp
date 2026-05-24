@@ -17,12 +17,12 @@ extern int gPppCalcDisabled;
 
 #include <string.h>
 
-extern const f32 FLOAT_80333448;
-extern const f32 FLOAT_8033344c;
-extern const f32 FLOAT_80333450;
-extern const f32 FLOAT_80333454;
-extern const f32 FLOAT_80333458;
-extern const f32 FLOAT_8033345c;
+extern const f32 kMenuArtiNegativeOne;
+extern const f32 kMenuArtiDefaultScale;
+extern const f32 kMenuArtiBoundsMax;
+extern const f32 kMenuArtiBoundsMin;
+extern const f32 kMenuArtiHalfTileOffset;
+extern const f32 kMenuArtiTau;
 extern const f32 FLOAT_8033342c;
 extern const f32 FLOAT_80333430;
 
@@ -104,7 +104,7 @@ void pppConstructLaser(struct pppLaser *pppLaser, _pppCtrlTable *param_2)
     work->m_shapeArg2 = 0;
     work->m_shapeArg1 = 0;
 
-    work->m_shapeRotation = Math.RandF(FLOAT_8033345c);
+    work->m_shapeRotation = Math.RandF(kMenuArtiTau);
     work->m_spawnEnabled = 1;
 
     iVar2 = Game.GetParticleSpecialInfo(*(PPPIFPARAM*)((u8*)pppMngStPtr + 0x130), local_24, local_28);
@@ -118,10 +118,10 @@ void pppConstructLaser(struct pppLaser *pppLaser, _pppCtrlTable *param_2)
         if (local_24 == 0x200) {
             work->m_maxLength = PSVECDistance(&work->m_targetPosition, &local_14);
         } else {
-            work->m_maxLength = FLOAT_80333448;
+            work->m_maxLength = kMenuArtiNegativeOne;
         }
     } else {
-        work->m_maxLength = FLOAT_80333448;
+        work->m_maxLength = kMenuArtiNegativeOne;
         *(u8*)((u8*)pppMngStPtr + 0xe8) = 1;
         pppStopSe(pppMngStPtr, (PPPSEST*)((u8*)pppMngStPtr + 0x11c));
     }
@@ -203,7 +203,7 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
 
     work = (LaserWork*)((u8*)pppLaser + 0x80 + param_3->m_serializedDataOffsets[2]);
     emptyHistory = 0;
-    if (FLOAT_80333448 == work->m_maxLength) {
+    if (kMenuArtiNegativeOne == work->m_maxLength) {
         return;
     }
 
@@ -245,7 +245,7 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
                 continue;
             }
             s32 frameCount = step->m_laser.m_historyFrameCount + 1;
-            float t = FLOAT_80333448 / (float)frameCount;
+            float t = kMenuArtiNegativeOne / (float)frameCount;
             t *= (float)i;
             if (GetCharaNodeFrameMatrix(pppMngStPtr, t, charaMtx) == 0) {
                 emptyHistory = 1;
@@ -257,14 +257,14 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
         }
 
         pppSubVector(localA, work->m_points[i], work->m_origin);
-        PSVECScale(&localA, &localA, FLOAT_8033344c);
+        PSVECScale(&localA, &localA, kMenuArtiDefaultScale);
 
-        cyl.m_top.z = FLOAT_80333450;
-        cyl.m_top.y = FLOAT_80333450;
-        cyl.m_top.x = FLOAT_80333450;
-        cyl.m_direction2.z = FLOAT_80333454;
-        cyl.m_direction2.y = FLOAT_80333454;
-        cyl.m_direction2.x = FLOAT_80333454;
+        cyl.m_top.z = kMenuArtiBoundsMax;
+        cyl.m_top.y = kMenuArtiBoundsMax;
+        cyl.m_top.x = kMenuArtiBoundsMax;
+        cyl.m_direction2.z = kMenuArtiBoundsMin;
+        cyl.m_direction2.y = kMenuArtiBoundsMin;
+        cyl.m_direction2.x = kMenuArtiBoundsMin;
         cyl.m_bottom = work->m_origin;
         cyl.m_direction = localA;
         cyl.m_radius = kPppLaserZero;
@@ -277,10 +277,10 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
             work->m_length = PSVECDistance(&work->m_points[i], &work->m_origin);
         } else if (i == 0) {
             if (work->m_spawnEnabled != 0) {
-                if (work->m_maxLength - FLOAT_80333458 < work->m_length) {
+                if (work->m_maxLength - kMenuArtiHalfTileOffset < work->m_length) {
                     _pppMngSt* mngSt = pppMngStPtr;
                     s32 partIndex = ((s32)((u8*)mngSt - (reinterpret_cast<u8*>(&PartMng) + 0x2A18))) / 0x158;
-                    work->m_length = work->m_maxLength - FLOAT_80333458;
+                    work->m_length = work->m_maxLength - kMenuArtiHalfTileOffset;
                     Game.ParticleFrameCallback(
                         partIndex, (int)mngSt->m_kind, (int)mngSt->m_nodeIndex, 3, pppLaser->m_graphId / 0x1000,
                         work->m_points);

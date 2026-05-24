@@ -5,8 +5,6 @@
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
 extern "C" {
-extern int gPppCalcDisabled;
-extern unsigned char gPppInConstructor;
 extern u8 gPppDefaultValueBuffer[];
 }
 #include "dolphin/mtx.h"

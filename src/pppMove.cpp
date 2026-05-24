@@ -2,7 +2,6 @@
 #include "ffcc/partMng.h"
 extern "C" {
 extern const float kPppMoveZero;
-extern int gPppCalcDisabled;
 }
 
 

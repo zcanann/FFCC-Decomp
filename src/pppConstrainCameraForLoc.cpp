@@ -5,7 +5,6 @@
 #include "ffcc/pppYmEnv.h"
 extern "C" {
 extern const float kPppConstrainCameraForLocZero;
-extern int gPppCalcDisabled;
 }
 #include "ffcc/util.h"
 #include <dolphin/mtx.h>

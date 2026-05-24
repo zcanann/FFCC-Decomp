@@ -7,7 +7,6 @@
 #include "ffcc/textureman.h"
 #include "ffcc/pppYmEnv.h"
 extern "C" {
-extern int gPppCalcDisabled;
 extern f32 gPppDefaultValueBuffer[];
 }
 #include "ffcc/util.h"

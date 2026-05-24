@@ -6,7 +6,6 @@
 #include "ffcc/pppShape.h"
 extern "C" {
 extern const float kPppRyjMegaBirthZero;
-extern int gPppCalcDisabled;
 }
 #include <string.h>
 

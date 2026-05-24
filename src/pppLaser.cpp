@@ -11,7 +11,6 @@
 #include "ffcc/linkage.h"
 extern "C" {
 extern const f32 kPppLaserZero;
-extern int gPppCalcDisabled;
 }
 #include "ffcc/util.h"
 

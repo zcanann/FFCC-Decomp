@@ -2147,11 +2147,11 @@ void CMapMng::ReadMpl(char* mapName)
                             if (meshCount > 0x9F) {
                                 return;
                             }
-                            CMapMesh* mesh = reinterpret_cast<CMapMesh*>(self + 0x16AC + (meshCount * 0x44));
+                            CMapMesh* mesh = reinterpret_cast<CMapMesh*>(self + 0x16AC + (meshCount * sizeof(CMapMesh)));
                             mesh->ReadOtmMesh(chunkFile, m_stage, 1, 1);
                         } else if (meshChunk.m_id == 0x44534554) {
                             short& meshCount = m_mapMeshCount;
-                            CMapMesh* mesh = reinterpret_cast<CMapMesh*>(self + 0x16AC + (meshCount * 0x44));
+                            CMapMesh* mesh = reinterpret_cast<CMapMesh*>(self + 0x16AC + (meshCount * sizeof(CMapMesh)));
                             mesh->ReadOtmMesh(chunkFile, m_stage, 1, 1);
                             meshCount += 1;
                         }
@@ -2292,7 +2292,7 @@ void CMapMng::ReadOtm(char* mapName)
                     if (meshCount > 0x9F) {
                         return;
                     }
-                    CMapMesh* mesh = reinterpret_cast<CMapMesh*>(self + 0x16AC + (meshCount * 0x44));
+                    CMapMesh* mesh = reinterpret_cast<CMapMesh*>(self + 0x16AC + (meshCount * sizeof(CMapMesh)));
                     mesh->ReadOtmMesh(chunkFile, m_stage, 0, 1);
                     meshCount += 1;
                     continue;

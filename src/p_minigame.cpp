@@ -216,7 +216,7 @@ void _MngThreadMain(void* param)
  */
 int CMiniGamePcs::GetTable(unsigned long index)
 {
-    return reinterpret_cast<int>(reinterpret_cast<unsigned char*>(m_table) + static_cast<int>(index) * 0x15C);
+    return reinterpret_cast<int>(reinterpret_cast<unsigned char*>(m_table) + static_cast<int>(index) * sizeof(m_table));
 }
 
 /*
@@ -477,9 +477,9 @@ void CMiniGamePcs::MiniGameGo(char* managerFilePath, char* managerSpFilePath)
     u8 gbaStatus[8];
     GBAReset(0, gbaStatus);
 
-    memset(self + 8, 0, 0x318);
-    memset(self + 800, 0, 0x20);
-    memset(self + 0x340, 0, 4);
+    memset(self + 8, 0, sizeof(OSThread));
+    memset(self + 800, 0, sizeof(OSMessageQueue));
+    memset(self + 0x340, 0, sizeof(OSMessage));
     OSInitMessageQueue(reinterpret_cast<OSMessageQueue*>(self + 800),
                        reinterpret_cast<OSMessage*>(self + 0x340), 1);
     OSCreateThread(reinterpret_cast<OSThread*>(self + 8),
@@ -1810,7 +1810,7 @@ void CMiniGamePcs::MngThreadMain(void*)
         *reinterpret_cast<void**>(threadParam + 0x8C) = imageBase;
         *reinterpret_cast<unsigned int*>(threadParam + 0x90) = imageSize;
 
-        memset(threadState, 0, 0x318);
+        memset(threadState, 0, sizeof(OSThread));
         OSInitMessageQueue(reinterpret_cast<OSMessageQueue*>(threadParam),
                            reinterpret_cast<OSMessage*>(threadParam + 0x20), 1);
         OSCreateThread(reinterpret_cast<OSThread*>(threadState),
@@ -1822,7 +1822,7 @@ void CMiniGamePcs::MngThreadMain(void*)
 
         managerStackOffset += 0x1000;
         threadParam += 200;
-        threadState += 0x318;
+        threadState += sizeof(OSThread);
         spMode++;
         i++;
     } while (i < 4);
@@ -1891,7 +1891,7 @@ void CMiniGamePcs::MngThreadMain(void*)
                 bool allTerminated = true;
                 for (int i = 0; i < 4; i++)
                 {
-                    unsigned char* threadState = self + 0x1830 + i * 0x318;
+                    unsigned char* threadState = self + 0x1830 + i * sizeof(OSThread);
                     if (OSIsThreadTerminated(reinterpret_cast<OSThread*>(threadState)) == 0)
                     {
                         allTerminated = false;

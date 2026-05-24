@@ -171,8 +171,8 @@ void CMenuPcs::MLstDraw()
 int CMenuPcs::MLstClose()
 {
 	float zero;
-	int completedItems;
 	MenuLstEntry* entry;
+	int completedItems;
 	unsigned int itemCount;
 	int currentFrame;
 	unsigned int count;

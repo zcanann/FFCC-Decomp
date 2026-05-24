@@ -3403,17 +3403,19 @@ startMapObjAnim:
 void CMapMng::SetMapAnimID(int animId, int startFrame, int endFrame, int loop)
 {
     CPtrArray<CMapAnimRun*>* mapAnimRunArray = &GetMapAnimRunArray();
-    CMapAnimRun* mapAnimRun = 0;
+    CMapAnimRun* mapAnimRun;
     int mapAnimRunCount = mapAnimRunArray->GetSize();
 
-    for (unsigned long i = 0; i < static_cast<unsigned long>(mapAnimRunCount); i++) {
+    for (int i = 0; i < mapAnimRunCount; i++) {
         CMapAnimRun* current = (*mapAnimRunArray)[i];
         if (current->m_animId == static_cast<unsigned char>(animId)) {
             mapAnimRun = current;
-            break;
+            goto startMapAnim;
         }
     }
 
+    mapAnimRun = 0;
+startMapAnim:
     mapAnimRun->Start(startFrame, endFrame, loop);
 }
 

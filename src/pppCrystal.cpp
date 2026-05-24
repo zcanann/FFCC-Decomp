@@ -15,7 +15,7 @@
 #include "ffcc/ppp_linkage.h"
 
 extern const float FLOAT_80330FD4;
-extern const float FLOAT_80330FD0;
+const float FLOAT_80330FD0 = 2.0f;
 extern const float FLOAT_80330FD8;
 extern const double DOUBLE_80330FE0;
 extern const double DOUBLE_80330FE8;

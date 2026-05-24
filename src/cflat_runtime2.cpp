@@ -2186,7 +2186,7 @@ void CFlatRuntime2::SetParticleWorkVector(float angle1, float angle2)
 
 	float sinAngle2 = static_cast<float>(sin(angle2));
 	*reinterpret_cast<float*>(runtime + 0x1768) =
-		sinAngle2 + *reinterpret_cast<float*>(runtime + 0x1744);
+		*reinterpret_cast<float*>(runtime + 0x1744) + sinAngle2;
 
 	cosAngle2 = static_cast<float>(cos(angle2));
 	float cosAngle1 = static_cast<float>(cos(angle1));

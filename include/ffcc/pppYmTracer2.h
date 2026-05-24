@@ -37,11 +37,7 @@ struct pppYmTracer2UnkC {
 };
 
 struct pppYmTracer2 {
-    u8 m_header[0x10];
-    pppFMATRIX m_localMatrix;
-    pppFMATRIX m_drawMatrix;
-    u8 m_pad70[0x10];
-    u8 m_serializedData[1];
+    _pppPObject m_object;
 };
 
 #ifdef __cplusplus

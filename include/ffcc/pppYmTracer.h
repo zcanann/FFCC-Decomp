@@ -5,7 +5,7 @@
 
 #include <dolphin/types.h>
 
-struct pppYmTracerUnkB {
+struct pppYmTracerStep {
     s32 m_graphId;
     s32 m_dataValIndex;
     u32 m_initWOrk;
@@ -27,7 +27,7 @@ struct pppYmTracerUnkB {
     };
 };
 
-struct pppYmTracerUnkC {
+struct pppYmTracerCtrl {
     u8 _pad[0xC];
     s32* m_serializedDataOffsets;
 };
@@ -42,11 +42,11 @@ struct pppYmTracer {
 extern "C" {
 #endif
 
-void pppConstructYmTracer(pppYmTracer*, pppYmTracerUnkC*);
-void pppConstruct2YmTracer(pppYmTracer*, pppYmTracerUnkC*);
-void pppDestructYmTracer(pppYmTracer*, pppYmTracerUnkC*);
-void pppFrameYmTracer(pppYmTracer*, pppYmTracerUnkB*, pppYmTracerUnkC*);
-void pppRenderYmTracer(pppYmTracer*, pppYmTracerUnkB*, pppYmTracerUnkC*);
+void pppConstructYmTracer(pppYmTracer*, pppYmTracerCtrl*);
+void pppConstruct2YmTracer(pppYmTracer*, pppYmTracerCtrl*);
+void pppDestructYmTracer(pppYmTracer*, pppYmTracerCtrl*);
+void pppFrameYmTracer(pppYmTracer*, pppYmTracerStep*, pppYmTracerCtrl*);
+void pppRenderYmTracer(pppYmTracer*, pppYmTracerStep*, pppYmTracerCtrl*);
 
 #ifdef __cplusplus
 }

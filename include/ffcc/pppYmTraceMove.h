@@ -1,14 +1,15 @@
 #ifndef _FFCC_PPP_YMTRACEMOVE_H_
 #define _FFCC_PPP_YMTRACEMOVE_H_
 
+#include "ffcc/partMng.h"
+
 #include <dolphin/types.h>
 
 struct pppYmTraceMove {
-    char pad[0x0c];
-    s32 m_graphId;
+    _pppPObject m_object;
 };
 
-struct pppYmTraceMoveUnkB {
+struct pppYmTraceMoveStep {
     s32 m_graphId;
     f32 m_dataValIndex;
     f32 m_initWOrk;
@@ -17,7 +18,7 @@ struct pppYmTraceMoveUnkB {
     f32 m_payload;
 };
 
-struct pppYmTraceMoveUnkC {
+struct pppYmTraceMoveCtrl {
     char pad[0x0c];
     s32* m_serializedDataOffsets;
 };
@@ -26,8 +27,8 @@ struct pppYmTraceMoveUnkC {
 extern "C" {
 #endif
 
-void pppConstructYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkC* param_2);
-void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkB* param_2, pppYmTraceMoveUnkC* param_3);
+void pppConstructYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveCtrl* param_2);
+void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveStep* param_2, pppYmTraceMoveCtrl* param_3);
 
 #ifdef __cplusplus
 }

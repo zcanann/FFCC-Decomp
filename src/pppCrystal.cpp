@@ -15,7 +15,7 @@
 #include "ffcc/ppp_linkage.h"
 
 extern const float FLOAT_80330FD4;
-extern const float FLOAT_80330FD0;
+extern const u32 FLOAT_80330FD0;
 extern const float FLOAT_80330FD8;
 extern const double DOUBLE_80330FE0;
 extern const double DOUBLE_80330FE8;
@@ -51,6 +51,11 @@ union CrystalFloatBits {
     float value;
     u32 bits;
 };
+
+static inline float CrystalFloat(const u32& value)
+{
+	return *reinterpret_cast<const float*>(&value);
+}
 
 extern const CrystalTexMtx s_crystalTexMtxBase = {
     {{0.5f, 0.0f, 0.0f, 0.5f}, {0.0f, -0.5f, 0.0f, 0.5f}, {0.0f, 0.0f, 0.0f, 1.0f}}};
@@ -213,6 +218,8 @@ void pppRenderCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* para
 	GXSetIndTexMtx((GXIndTexMtxID)1, indMtx.value, 1);
 }
 
+extern const u32 FLOAT_80330FD0 = 0x40000000;
+
 /*
  * --INFO--
  * PAL Address: 0x800dcf44
@@ -280,8 +287,8 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param
 		textureInfo->m_imageCount = 0x100;
 		textureInfo->m_bufferSize = textureSize;
 
-		stepX = FLOAT_80330FD0 / (float)(textureInfo->m_width - 1U);
-		stepY = FLOAT_80330FD0 / (float)(textureInfo->m_height - 1U);
+		stepX = CrystalFloat(FLOAT_80330FD0) / (float)(textureInfo->m_width - 1U);
+		stepY = CrystalFloat(FLOAT_80330FD0) / (float)(textureInfo->m_height - 1U);
 		yCoord = FLOAT_80330FD4;
 		maxMagnitude = FLOAT_80330FF8;
 		coordOffset = FLOAT_8033100C;

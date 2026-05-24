@@ -793,7 +793,7 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
 {
     u32* work;
     CChara::CModel* model;
-    void* handle;
+    CCharaPcs::CHandle* handle;
     CGObject* gObject;
     Mtx identityMtx;
     Mtx savedCameraMtx;
@@ -1003,7 +1003,7 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* para
     u32* work;
     void* dstBuffer;
     u32* texList;
-    void* handle;
+    CCharaPcs::CHandle* handle;
     CChara::CModel* model;
     CGObject* gObject;
     s32 i;
@@ -1018,7 +1018,7 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* para
         return;
     }
 
-    gObject = *(CGObject**)((char*)pppMngStPtr + 0xDC);
+    gObject = (CGObject*)pppMngStPtr->m_lookTarget;
     setupOffset = *(s32*)((char*)param_3 + 8);
     work = (u32*)((char*)pppMana2 + 0x80 + *(s32*)((char*)param_3 + 0xC));
     if (gObject == NULL) {
@@ -1026,7 +1026,7 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* para
     }
 
     handle = GetCharaHandlePtr(gObject, 0);
-    model = GetCharaModelPtr(reinterpret_cast<CCharaPcs::CHandle*>(handle));
+    model = GetCharaModelPtr(handle);
     *((u8*)param_2 + 0x24) = 0;
     work[0x1C] = (u32)param_2;
     if (Game.m_currentMapId == 0x21) {
@@ -1235,7 +1235,7 @@ void pppDestructMana2(pppMana2* pppMana2, pppMana2UnkC* param_2)
 {
     u32* work;
     CGObject* gObject;
-    void* handle;
+    CCharaPcs::CHandle* handle;
     CChara::CModel* model;
     s32 meshEntry;
     s32 step;
@@ -1243,10 +1243,10 @@ void pppDestructMana2(pppMana2* pppMana2, pppMana2UnkC* param_2)
     u32 j;
 
     work = (u32*)((char*)pppMana2 + 0x80 + *(s32*)((char*)param_2 + 0xC));
-    gObject = *(CGObject**)((char*)pppMngStPtr + 0xDC);
+    gObject = (CGObject*)pppMngStPtr->m_lookTarget;
     if (gObject != NULL) {
         handle = GetCharaHandlePtr(gObject, 0);
-        model = GetCharaModelPtr(reinterpret_cast<CCharaPcs::CHandle*>(handle));
+        model = GetCharaModelPtr(handle);
         ClearMana2ModelCallbacks(model);
     }
 
@@ -1404,20 +1404,20 @@ void pppDestructMana2(pppMana2* pppMana2, pppMana2UnkC* param_2)
 void pppConstructMana2(pppMana2* pppMana2, pppMana2UnkC* param_2)
 {
     CGObject* gObject;
-    void* handle;
-    u32 model;
+    CCharaPcs::CHandle* handle;
+    CChara::CModel* model;
     u32* work;
     s32 workOffset;
 
     workOffset = param_2->m_serializedDataOffsets[2];
     work = (u32*)((char*)pppMana2 + 0x80 + workOffset);
-    gObject = *(CGObject**)((char*)pppMngStPtr + 0xDC);
+    gObject = (CGObject*)pppMngStPtr->m_lookTarget;
     gObject->m_stepSlopeLimit = LoadFloat(FLOAT_803318fc);
 
     handle = GetCharaHandlePtr(gObject, 0);
-    GetCharaModelPtr(reinterpret_cast<CCharaPcs::CHandle*>(handle));
-    model = *(u32*)((char*)handle + 0x168);
-    *(u32*)(model + 0x98) = 0x3F;
+    GetCharaModelPtr(handle);
+    model = handle->m_model;
+    model->m_meshVisibleMask = 0x3F;
     work[1] = (u32)pppMngStPtr;
 
     work[0] = 0;

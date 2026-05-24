@@ -424,9 +424,9 @@ void pppConstructYmMana(PYmMana* ymMana, pppYmManaUnkC* param_2)
     s32* offsets = param_2->m_serializedDataOffsets;
     s32 workOffset = offsets[2];
     u32* work = (u32*)((u8*)ymMana + workOffset + 0x80);
-    CGObject* gObject = *(CGObject**)((u8*)pppMngStPtr + 0xD8);
+    CGObject* gObject = (CGObject*)pppMngStPtr->m_owner;
     CCharaPcs::CHandle* handle;
-    u32 model;
+    CChara::CModel* model;
 
     if ((s32)Game.m_currentSceneId == 7) {
         gObject->m_lookAtTimer = FLOAT_80330e58;
@@ -438,8 +438,8 @@ void pppConstructYmMana(PYmMana* ymMana, pppYmManaUnkC* param_2)
 
     handle = GetCharaHandlePtr(gObject, 0);
     GetCharaModelPtr(handle);
-    model = *(u32*)((u8*)handle + 0x168);
-    *(u32*)(model + 0x98) = 0x3F;
+    model = handle->m_model;
+    model->m_meshVisibleMask = 0x3F;
     work[1] = (u32)pppMngStPtr;
 
     work[0] = 0;

@@ -446,15 +446,15 @@ extern char s_Visor_Metalico_801DE118[];
 extern char s_Mascara_Roja_801DE138[];
 extern char s_Ojos_Tiburon_801DE188[];
 extern char s_Cabeza_Buho_801DE1A8[];
-extern char lbl_801DE4FC[];
-extern char lbl_801DE50C[];
-extern char lbl_801DE53C[];
-extern char lbl_801DE554[];
-extern char lbl_801DE568[];
-extern char lbl_801DE58C[];
-extern char lbl_801DE59C[];
-extern char lbl_801DE5BC[];
-extern char lbl_801DE68C[];
+extern char s_Anti_Malefice_801DE4FC[];
+extern char s_Anti_Petrif_801DE50C[];
+extern char s_Duree_sorts_801DE53C[];
+extern char s_Portee_des_sorts_801DE554[];
+extern char s_Portee_super_atq_801DE568[];
+extern char s_Degats_magiq_801DE58C[];
+extern char s_Rend_inebranlable_801DE59C[];
+extern char s_Anti_frio_801DE5BC[];
+extern char s_Danos_magicos_801DE68C[];
 extern char lbl_803321BC[], lbl_803321C0[], lbl_803321C4[], lbl_803321CC[];
 extern char lbl_803321D0[], lbl_803321D8[], lbl_803321E0[], lbl_803321E8[];
 extern char lbl_803321F0[], lbl_803321F8[], lbl_80332200[], lbl_80332208[];
@@ -702,17 +702,17 @@ extern "C" char* gSingMenuAttrTableIt[] = {
 };
 extern "C" char* gSingMenuAttrTableFr[] = {
     lbl_803321B8, s_Anti_Feu_801DE4B4, s_Anti_Glace_801DE4C0, s_Anti_Foudre_801DE4CC,
-    s_Anti_Somni_801DE4D8, s_Anti_Stop_801DE4E4, s_Anti_Poison_801DE4F0, lbl_801DE4FC,
-    lbl_801DE50C, s_Tps_de_lancem_801DE51C, s_Tps_de_charge_801DE52C, lbl_801DE53C,
-    lbl_801DE53C, s_Anti_Miasme_801DE548, lbl_801DE554, lbl_801DE568,
-    lbl_80332710, s_Super_attaques_801DE57C, lbl_801DE58C, lbl_801DE59C,
+    s_Anti_Somni_801DE4D8, s_Anti_Stop_801DE4E4, s_Anti_Poison_801DE4F0, s_Anti_Malefice_801DE4FC,
+    s_Anti_Petrif_801DE50C, s_Tps_de_lancem_801DE51C, s_Tps_de_charge_801DE52C, s_Duree_sorts_801DE53C,
+    s_Duree_sorts_801DE53C, s_Anti_Miasme_801DE548, s_Portee_des_sorts_801DE554, s_Portee_super_atq_801DE568,
+    lbl_80332710, s_Super_attaques_801DE57C, s_Degats_magiq_801DE58C, s_Rend_inebranlable_801DE59C,
 };
 extern "C" char* gSingMenuAttrTableEs[] = {
-    lbl_803321B8, s_Anti_fuego_801DE5B0, lbl_801DE5BC, s_Anti_rayos_801DE5C8,
+    lbl_803321B8, s_Anti_fuego_801DE5B0, s_Anti_frio_801DE5BC, s_Anti_rayos_801DE5C8,
     s_Anti_Freno_801DE5D4, s_Anti_Paro_801DE5E0, s_Anti_veneno_801DE5EC, s_Anti_maldic_801DE5F8,
     s_Anti_petrif_801DE608, s_Tiempo_lanzam_801DE618, s_Tiempo_carga_801DE628, s_Durac_hechiz_801DE638,
     s_Durac_hechiz_801DE638, s_Anti_miasma_801DE648, s_Alcance_hechiz_801DE654, s_Alc_superataq_801DE664,
-    s_Revitalia_801DE674, s_Superataque_801DE680, lbl_801DE68C, s_No_se_aturde_801DE69C,
+    s_Revitalia_801DE674, s_Superataque_801DE680, s_Danos_magicos_801DE68C, s_No_se_aturde_801DE69C,
 };
 extern "C" {
 int gSingDynamicWinMessInfo[5];

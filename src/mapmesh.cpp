@@ -225,12 +225,13 @@ void CMapMesh::Draw(CMaterialSet* materialSet)
 void CMapMesh::DrawMeshCharaShadow(unsigned short startIdx, unsigned short count)
 {
     int remaining = count;
+    CMapMng* mapMng = &MapMng;
     CMapMeshDrawEntry* entry = m_drawEntries + startIdx;
 
     while (remaining-- != 0) {
         if (entry->m_size != 0) {
             CMaterial* material =
-                (*reinterpret_cast<CPtrArray<CMaterial*>*>(reinterpret_cast<unsigned char*>(MapMng.m_materialSet) + 8))[
+                (*reinterpret_cast<CPtrArray<CMaterial*>*>(reinterpret_cast<unsigned char*>(mapMng->m_materialSet) + 8))[
                     entry->m_materialIdx];
 
             if ((*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(material) + 0x24) &
@@ -255,12 +256,13 @@ void CMapMesh::DrawMeshCharaShadow(unsigned short startIdx, unsigned short count
 void CMapMesh::DrawMesh(unsigned short startIdx, unsigned short count)
 {
     int remaining = count;
+    CMapMng* mapMng = &MapMng;
     CMapMeshDrawEntry* entry = m_drawEntries + startIdx;
 
     while (remaining-- != 0) {
         if (entry->m_size != 0) {
-            MaterialMan.SetBlendMode(MapMng.m_materialSet, entry->m_materialIdx);
-            MaterialMan.SetMaterial(MapMng.m_materialSet, entry->m_materialIdx, 0, (_GXTevScale)1);
+            MaterialMan.SetBlendMode(mapMng->m_materialSet, entry->m_materialIdx);
+            MaterialMan.SetMaterial(mapMng->m_materialSet, entry->m_materialIdx, 0, (_GXTevScale)1);
             GXCallDisplayList(entry->m_displayList, entry->m_size);
         }
         entry++;

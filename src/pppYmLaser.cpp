@@ -208,7 +208,6 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 		color.b = step->m_laser.m_trailColorB;
 		color.a = alphaMax;
 		GXBegin(GX_TRIANGLES, GX_VTXFMT7, (u16)((step->m_laser.m_pointCount - 1) * 3));
-		int alpha = 0;
 		u8 trailColorR = color.r;
 		u8 trailColorG = color.g;
 		u8 trailColorB = color.b;
@@ -219,8 +218,7 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 			trailStartColor.r = trailColorR;
 			trailStartColor.g = trailColorG;
 			trailStartColor.b = trailColorB;
-			trailStartColor.a = (u8)alphaMax - alpha;
-			alpha += alphaStep;
+			trailStartColor.a = (u8)alphaMax - alphaStep * j;
 
 			GXPosition3f32(work->m_origin.x, work->m_origin.y, work->m_origin.z);
 			GXColor1u32(*(u32*)&trailStartColor);

@@ -12,10 +12,10 @@ unsigned char g_tFont22[0x10D40] = {
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/math.h"
 #include <dolphin/mtx.h>
 
-extern "C" const float FLOAT_803306B8;
-extern "C" const float FLOAT_803306C8;
-extern "C" const float FLOAT_803306D8;
-extern "C" const float FLOAT_803306DC;
+extern "C" const float kFontZero;
+extern "C" const float kFontOne;
+extern "C" const float kFontOrthoHeight;
+extern "C" const float kFontOrthoWidth;
 
 static const char s_fontman_cpp[] = "fontman.cpp";
 static const char s_CFontMan[] = "CFontMan";
@@ -107,7 +107,7 @@ found_fallback_glyph:
 	if (glyph != 0) {
 		goto found_fallback;
 	}
-	return FLOAT_803306B8;
+	return kFontZero;
 }
 
 /*
@@ -122,7 +122,7 @@ found_fallback_glyph:
 float CFont::GetWidth(char* text)
 {
 	char* textPtr = text;
-	float width = FLOAT_803306B8;
+	float width = kFontZero;
 	unsigned short ch;
 	int hasChar;
 
@@ -186,7 +186,7 @@ use_fallback_glyph:
 		if (glyph != 0) {
 			goto use_glyph;
 		}
-		charWidth = FLOAT_803306B8;
+		charWidth = kFontZero;
 
 add_width:
 		width += charWidth;
@@ -291,14 +291,14 @@ found_fallback:
 	posX += advance;
 
 	if (glyphInfo[0] == 0) {
-		u0 += FLOAT_803306C8;
+		u0 += kFontOne;
 	}
 	if (m_glyphWidth == glyphInfo[0] + glyphInfo[1]) {
-		u1 -= FLOAT_803306C8;
+		u1 -= kFontOne;
 	}
 
-	v0 += FLOAT_803306C8;
-	v1 -= FLOAT_803306C8;
+	v0 += kFontOne;
+	v1 -= kFontOne;
 
 	GXBegin(GX_QUADS, GX_VTXFMT0, 4);
 	GXPosition3f32(x0, y0, posZ);
@@ -386,11 +386,11 @@ void CFont::DrawInit()
 
     CFontRenderFlagBits& renderFlagBits = GetRenderFlagBits(renderFlags);
     if (renderFlagBits.zCompare != 0 || renderFlagBits.zUpdate != 0) {
-        C_MTXOrtho(projMtx, FLOAT_803306B8, FLOAT_803306D8, FLOAT_803306B8, FLOAT_803306DC, FLOAT_803306B8, FLOAT_803306C8);
-        projMtx[2][2] = FLOAT_803306C8;
-        projMtx[2][3] = FLOAT_803306B8;
+        C_MTXOrtho(projMtx, kFontZero, kFontOrthoHeight, kFontZero, kFontOrthoWidth, kFontZero, kFontOne);
+        projMtx[2][2] = kFontOne;
+        projMtx[2][3] = kFontZero;
     } else {
-        C_MTXOrtho(projMtx, FLOAT_803306B8, FLOAT_803306D8, FLOAT_803306B8, FLOAT_803306DC, FLOAT_803306B8, FLOAT_803306C8);
+        C_MTXOrtho(projMtx, kFontZero, kFontOrthoHeight, kFontZero, kFontOrthoWidth, kFontZero, kFontOne);
     }
     GXSetProjection(projMtx, GX_ORTHOGRAPHIC);
 
@@ -420,7 +420,7 @@ void CFont::DrawInit()
 
     float texWidth = static_cast<float>(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(texturePtr) + 0x64));
     float texHeight = static_cast<float>(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(texturePtr) + 0x68));
-    PSMTXScale(texMtx, FLOAT_803306C8 / texWidth, FLOAT_803306C8 / texHeight, FLOAT_803306C8);
+    PSMTXScale(texMtx, kFontOne / texWidth, kFontOne / texHeight, kFontOne);
     GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX2x4);
 
     GXSetNumTexGens(1);
@@ -781,14 +781,14 @@ CFont::CFont()
 {
 	m_glyphData = 0;
 	texturePtr = 0;
-	margin = FLOAT_803306B8;
-	posZ = FLOAT_803306B8;
-	posY = FLOAT_803306B8;
-	posX = FLOAT_803306B8;
+	margin = kFontZero;
+	posZ = kFontZero;
+	posY = kFontZero;
+	posX = kFontZero;
 	CFontRenderFlagBits& bits = GetRenderFlagBits(renderFlags);
 	bits.shadow = 0;
-	scaleY = FLOAT_803306C8;
-	scaleX = FLOAT_803306C8;
+	scaleY = kFontOne;
+	scaleX = kFontOne;
 	bits.snapPosition = 0;
 	m_color.r = 0xFF;
 	m_color.g = 0xFF;

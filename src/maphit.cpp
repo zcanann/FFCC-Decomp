@@ -710,10 +710,15 @@ int CMapHit::ReadOtmHit(CChunkFile& chunkFile)
                 new (MapMng.m_stage, const_cast<char*>(s_maphit_cpp), 0x159)
                     CMapHitFace[m_faceCount];
 
-            const float offsetScale = kMapHitVertexOffsetScale;
-            const float radiusScale = kMapHitRadiusScale;
-            const float zero = kMapHitZero;
-            const double radiusBase = kMapHitRadiusBase;
+            float offsetScale;
+            float radiusScale;
+            float zero;
+            double radiusBase;
+
+            zero = kMapHitZero;
+            radiusScale = kMapHitRadiusScale;
+            offsetScale = kMapHitVertexOffsetScale;
+            radiusBase = kMapHitRadiusBase;
 
             for (int faceIdx = 0; faceIdx < m_faceCount; faceIdx++) {
                 chunkFile.Align(4);

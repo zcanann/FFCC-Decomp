@@ -17,6 +17,13 @@ static inline float CameraDirY() { return CameraPcs.m_directionY; }
 static inline float CameraDirZ() { return CameraPcs.m_directionZ; }
 static inline MtxPtr CameraMatrix() { return CameraPcs.m_cameraMatrix; }
 
+static inline float* GetConstrainCameraWork(pppConstrainCameraForLoc* constrainCameraForLoc,
+                                            _pppCtrlTable* ctrl)
+{
+	return reinterpret_cast<float*>(constrainCameraForLoc->m_object.m_workArea +
+	                                ctrl->m_serializedDataOffsets[2]);
+}
+
 /*
  * --INFO--
  * PAL Address: 0x80167DD4
@@ -31,15 +38,14 @@ void pppDestructConstrainCameraForLoc(pppConstrainCameraForLoc* constrainCameraF
                                       _pppCtrlTable* data)
 {
 	float* value;
-	int modelPtr;
+	CChara::CModel* model;
 
 	if (gPppCalcDisabled == 0) {
-		value = (float*)((char*)constrainCameraForLoc + 0x80 + data->m_serializedDataOffsets[2]);
-		CGObject* obj = *(CGObject**)((u8*)pppMngStPtr + 0xD8);
-		modelPtr = reinterpret_cast<int>(GetModelPtr(obj));
-		*(float**)(modelPtr + 0xe4) = value;
-		*(pppConstrainCameraForLocParams**)(modelPtr + 0xe8) = params;
-		*(void**)(modelPtr + 0xec) = (void*)CC_BeforeCalcMatrixCallback;
+		value = GetConstrainCameraWork(constrainCameraForLoc, data);
+		CGObject* obj = reinterpret_cast<CGObject*>(pppMngStPtr->m_owner);
+		model = GetModelPtr(obj);
+		model->SetCallbackContext(value, params);
+		model->m_beforeCalcMatrixCallback = CC_BeforeCalcMatrixCallback;
 
 		CalcGraphValue(reinterpret_cast<_pppPObject*>(constrainCameraForLoc), params->m_graphId, value[0],
 		               value[1], value[2], params->m_dataValIndex, params->m_initWork, params->m_stepValue);
@@ -53,9 +59,9 @@ void pppDestructConstrainCameraForLoc(pppConstrainCameraForLoc* constrainCameraF
  */
 void pppConstructConstrainCameraForLoc(_pppPObjLink*, _pppCtrlTable*)
 {
-	CGObject* obj = *(CGObject**)((u8*)pppMngStPtr + 0xD8);
-	int modelPtr = reinterpret_cast<int>(GetModelPtr(obj));
-	*(int*)(modelPtr + 0xec) = 0;
+	CGObject* obj = reinterpret_cast<CGObject*>(pppMngStPtr->m_owner);
+	CChara::CModel* model = GetModelPtr(obj);
+	model->m_beforeCalcMatrixCallback = 0;
 }
 
 /*
@@ -71,7 +77,7 @@ void pppConstruct2ConstrainCameraForLoc(pppConstrainCameraForLoc* constrainCamer
                                         _pppCtrlTable* data)
 {
     float fVar1 = kPppConstrainCameraForLocZero;
-    float* value = (float*)((char*)constrainCameraForLoc + 0x80 + data->m_serializedDataOffsets[2]);
+    float* value = GetConstrainCameraWork(constrainCameraForLoc, data);
     value[2] = fVar1;
     value[1] = fVar1;
     value[0] = fVar1;
@@ -89,7 +95,7 @@ void pppConstruct2ConstrainCameraForLoc(pppConstrainCameraForLoc* constrainCamer
 void pppConstruct3ConstrainCameraForLoc(pppConstrainCameraForLoc* constrainCameraForLoc, _pppCtrlTable* data)
 {
     float fVar1 = kPppConstrainCameraForLocZero;
-    float* value = (float*)((char*)constrainCameraForLoc + 0x80 + data->m_serializedDataOffsets[2]);
+    float* value = GetConstrainCameraWork(constrainCameraForLoc, data);
     value[2] = fVar1;
     value[1] = fVar1;
     value[0] = fVar1;

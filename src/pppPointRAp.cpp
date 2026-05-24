@@ -45,7 +45,7 @@ void pppPointRAp(_pppPObject* pObject, void* step, _pppCtrlTable* ctrlTable)
         }
 
         _pppPObject* obj;
-        _pppPDataVal* objData = (_pppPDataVal*)((u8*)(*(u32*)((u8*)pppMngStPtr + 0xD4)) + (createId << 4));
+        _pppPDataVal* objData = pppMngStPtr->m_pppPDataVals + createId;
 
         if (objData == 0) {
             obj = 0;

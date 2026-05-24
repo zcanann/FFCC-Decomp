@@ -8,7 +8,7 @@
 class CGObject;
 
 typedef struct pppConstrainCameraForLoc {
-    float field0_0x0;
+    _pppPObject m_object;
 } pppConstrainCameraForLoc;
 
 typedef struct pppConstrainCameraForLocParams {

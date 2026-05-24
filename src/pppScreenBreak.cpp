@@ -20,12 +20,7 @@
 #include <string.h>
 
 struct PScreenBreak {
-    float field0_0x0;
-    u8 _pad0[0x84];
-    u8 field_0x88;
-    u8 field_0x89;
-    u8 field_0x8a;
-    u8 field_0x8b;
+    _pppPObject m_object;
 };
 
 struct VScreenBreak {
@@ -142,6 +137,7 @@ static inline float CameraDirZ() { return CameraPcs.m_directionZ; }
 static inline MtxPtr CameraMatrix() { return CameraPcs.m_cameraMatrix; }
 static inline Mtx44Ptr CameraScreenMatrix() { return CameraPcs.m_screenMatrix; }
 static inline u8* ScreenBreakModelDataRaw(CChara::CModel* model) { return *(u8**)((u8*)model + 0xA4); }
+static inline u8* GetScreenBreakWork(PScreenBreak* screenBreak, s32 offset) { return screenBreak->m_object.m_workArea + offset; }
 
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
 static inline int GraphicScreenBreakBlurEnabled() { return Graphic.m_blurActive; }
@@ -164,10 +160,10 @@ void SetBlurParameter__11CGraphicPcsFiUcUcUcUcUcs(CGraphicPcs*, int, unsigned ch
 void pppRenderScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB*, pppScreenBreakUnkC* param_3)
 {
     s32 dataOffset = param_3->m_serializedDataOffsets[2];
-    u8* value = (u8*)pppScreenBreak + dataOffset + 0x80;
-    CCharaPcs::CHandle* handle = GetCharaHandlePtr(*reinterpret_cast<CGObject**>(reinterpret_cast<u8*>(pppMngStPtr) + 0xD8), 0);
-    int model = reinterpret_cast<int>(GetCharaModelPtr(handle));
-    reinterpret_cast<CChara::CModel*>(model)->SearchNode(const_cast<char*>(sF999Root));
+    u8* value = GetScreenBreakWork(pppScreenBreak, dataOffset);
+    CCharaPcs::CHandle* handle = GetCharaHandlePtr(reinterpret_cast<CGObject*>(pppMngStPtr->m_owner), 0);
+    CChara::CModel* model = GetCharaModelPtr(handle);
+    model->SearchNode(const_cast<char*>(sF999Root));
 
     if (value[0x24] == 0) {
         Graphic.GetBackBufferRect2(
@@ -196,12 +192,11 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param
     }
 
     s32* serializedDataOffsets = param_3->m_serializedDataOffsets;
-    float* value = (float*)((u8*)pppScreenBreak + serializedDataOffsets[2] + 0x80);
-    u8* colorSource = (u8*)pppScreenBreak + serializedDataOffsets[0] + 0x80;
-    CCharaPcs::CHandle* handle = GetCharaHandlePtr(*reinterpret_cast<CGObject**>(reinterpret_cast<u8*>(pppMngStPtr) + 0xD8), 0);
-    int model = reinterpret_cast<int>(GetCharaModelPtr(handle));
-    *(float**)(model + 0xE4) = value;
-    *(pppScreenBreakUnkB**)(model + 0xE8) = param_2;
+    float* value = reinterpret_cast<float*>(GetScreenBreakWork(pppScreenBreak, serializedDataOffsets[2]));
+    u8* colorSource = GetScreenBreakWork(pppScreenBreak, serializedDataOffsets[0]);
+    CCharaPcs::CHandle* handle = GetCharaHandlePtr(reinterpret_cast<CGObject*>(pppMngStPtr->m_owner), 0);
+    CChara::CModel* model = GetCharaModelPtr(handle);
+    model->SetCallbackContext(value, param_2);
 
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
 
@@ -217,12 +212,12 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param
 
     void* pieceStorage = *(void**)&value[3];
     if (pieceStorage == NULL) {
-        pieceStorage = pppMemAlloc(*(u32*)(*(u8**)(model + 0xA4) + 0xC) * 0x3C, pppEnvStPtr->m_stagePtr,
+        pieceStorage = pppMemAlloc(*(u32*)(ScreenBreakModelDataRaw(model) + 0xC) * 0x3C, pppEnvStPtr->m_stagePtr,
                                     const_cast<char*>(s_pppScreenBreak_cpp), 0x25E);
         *(void**)&value[3] = pieceStorage;
         *(void**)&value[4] = pppMemAlloc(0x20, pppEnvStPtr->m_stagePtr,
                                          const_cast<char*>(s_pppScreenBreak_cpp), 0x25F);
-        InitPieceData((CChara::CModel*)model, (PScreenBreak*)param_2, (VScreenBreak*)value);
+        InitPieceData(model, (PScreenBreak*)param_2, (VScreenBreak*)value);
         PSVECNormalize((Vec*)(param_2->m_payload + 0xC), (Vec*)(param_2->m_payload + 0xC));
     }
 
@@ -230,7 +225,7 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param
     float sx = two * value[6];
     float sy = two * value[7];
     u8* piece = (u8*)*(void**)&value[3];
-    for (u32 i = 0; i < *(u32*)(*(u8**)(model + 0xA4) + 0xC); i++) {
+    for (u32 i = 0; i < *(u32*)(ScreenBreakModelDataRaw(model) + 0xC); i++) {
         switch (param_2->m_initWOrk) {
         case 0:
             piece[0x38] = 1;
@@ -302,16 +297,15 @@ void pppDesScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkC* param_2
 {
     s32* serializedDataOffsets = *(s32**)((u8*)param_2 + 0xC);
     s32 dataOffset = serializedDataOffsets[2];
-    u8* pppData = ((u8*)pppScreenBreak + dataOffset + 0x80);
-    CCharaPcs::CHandle* handle = GetCharaHandlePtr(*reinterpret_cast<CGObject**>(reinterpret_cast<u8*>(pppMngStPtr) + 0xD8), 0);
-    u8* model = reinterpret_cast<u8*>(GetCharaModelPtr(handle));
+    u8* pppData = GetScreenBreakWork(pppScreenBreak, dataOffset);
+    CCharaPcs::CHandle* handle = GetCharaHandlePtr(reinterpret_cast<CGObject*>(pppMngStPtr->m_owner), 0);
+    CChara::CModel* model = GetCharaModelPtr(handle);
     if (model != 0) {
-        *(void**)(model + 0xF0) = NULL;
-        *(void**)(model + 0xFC) = NULL;
-        *(void**)(model + 0xF4) = NULL;
-        *(void**)(model + 0xE4) = NULL;
-        *(void**)(model + 0xE8) = NULL;
-        *(void**)(model + 0xEC) = NULL;
+        model->m_afterMeshDrawCallback = 0;
+        model->m_drawMeshDLCallback = 0;
+        model->m_beforeMeshLockEnvCallback = 0;
+        model->SetCallbackContext(0, 0);
+        model->m_beforeCalcMatrixCallback = 0;
     }
     if (*(void**)(pppData + 0xC) != NULL) {
         pppHeapUseRate(static_cast<CMemory::CStage*>(*(void**)(pppData + 0xC)));
@@ -335,7 +329,7 @@ void pppDesScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkC* param_2
 void pppCon2ScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkC* param_2)
 {
     s32 dataOffset = param_2->m_serializedDataOffsets[2];
-    float* value = (float*)((u8*)pppScreenBreak + dataOffset + 0x80);
+    float* value = reinterpret_cast<float*>(GetScreenBreakWork(pppScreenBreak, dataOffset));
     const float& f = FLOAT_80331cc4;
     value[2] = f;
     value[1] = f;
@@ -354,17 +348,17 @@ void pppCon2ScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkC* param_
 void pppConScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkC* param_2)
 {
     s32 dataOffset = param_2->m_serializedDataOffsets[2];
-    u8* pppData = (u8*)pppScreenBreak + dataOffset + 0x80;
+    u8* pppData = GetScreenBreakWork(pppScreenBreak, dataOffset);
     float* value = (float*)pppData;
-    void* gObject = *(void**)((u8*)pppMngStPtr + 0xD8);
+    void* gObject = pppMngStPtr->m_owner;
     CCharaPcs::CHandle* handle = GetCharaHandlePtr(reinterpret_cast<CGObject*>(gObject), 0);
-    int model = reinterpret_cast<int>(GetCharaModelPtr(handle));
+    CChara::CModel* model = GetCharaModelPtr(handle);
     *(u32*)((u8*)gObject + 0x60) |= 0x40;
-    *(void**)(model + 0xF0) = (void*)SB_BeforeDrawCallback;
+    model->m_afterMeshDrawCallback = (CChara::CModel::AfterMeshDrawCallback)SB_BeforeDrawCallback;
     const float& f = FLOAT_80331cc4;
-    *(void**)(model + 0xFC) = (void*)SB_DrawMeshDLCallback;
-    *(void**)(model + 0xF4) = (void*)SB_BeforeMeshLockEnvCallback;
-    *(void**)(model + 0xEC) = (void*)SB_BeforeCalcMatrixCallback;
+    model->m_drawMeshDLCallback = SB_DrawMeshDLCallback;
+    model->m_beforeMeshLockEnvCallback = SB_BeforeMeshLockEnvCallback;
+    model->m_beforeCalcMatrixCallback = SB_BeforeCalcMatrixCallback;
     *(void**)(pppData + 0xC) = NULL;
     *(void**)(pppData + 0x10) = NULL;
     value[8] = f;

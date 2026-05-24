@@ -174,10 +174,10 @@ static inline CharaBreakMeshRef* ModelMeshes(CChara::CModel* model)
     return *reinterpret_cast<CharaBreakMeshRef**>(reinterpret_cast<u8*>(model) + 0xAC);
 }
 
-extern "C" void CharaBreak_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f(void*, void*, void*, s32, Mtx);
-extern "C" void CharaBreak_DrawMeshDLCallback__FPQ26CChara6CModelPvPviiPA4_f(void);
-extern "C" void CharaBreak_BeforeMeshLockEnvCallback__FPQ26CChara6CModelPvPvi(void);
-extern "C" u32 CharaBreak_BeforeCalcMatrixCallback__FPQ26CChara6CModelPvPv(u32, void*, void*);
+static void CharaBreak_AfterDrawMeshCallback(CChara::CModel*, void*, void*, int, float (*)[4]);
+static void CharaBreak_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*)[4]);
+static void CharaBreak_BeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int);
+static int CharaBreak_BeforeCalcMatrixCallback(CChara::CModel*, void*, void*);
 
 /*
  * --INFO--
@@ -266,15 +266,11 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
                                                  stepData->m_payloadGraphStep,
                                                  stepData->m_payloadGraphStepStep);
 
-    model->m_callbackContext = work;
-    model->m_callbackParam = stepData;
-    model->m_beforeMeshLockEnvCallback = (void (*)(CChara::CModel*, void*, void*, int))
-        CharaBreak_BeforeMeshLockEnvCallback__FPQ26CChara6CModelPvPvi;
-    model->m_drawMeshDLCallback = (void (*)(CChara::CModel*, void*, void*, int, int, float (*)[4]))
-        CharaBreak_DrawMeshDLCallback__FPQ26CChara6CModelPvPviiPA4_f;
-    model->m_afterDrawMeshCallback = (void (*)(CChara::CModel*, void*, void*, int, float (*)[4]))
-        CharaBreak_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f;
-    *(u32*)((u8*)model + 0xEC) = (u32)CharaBreak_BeforeCalcMatrixCallback__FPQ26CChara6CModelPvPv;
+    model->SetCallbackContext(work, stepData);
+    model->m_beforeMeshLockEnvCallback = CharaBreak_BeforeMeshLockEnvCallback;
+    model->m_drawMeshDLCallback = CharaBreak_DrawMeshDLCallback;
+    model->m_afterDrawMeshCallback = CharaBreak_AfterDrawMeshCallback;
+    model->m_beforeCalcMatrixCallback = CharaBreak_BeforeCalcMatrixCallback;
 
     if (stepData->m_graphId == charaBreak->m_graphId) {
         f32 zero = FLOAT_80332048;
@@ -386,12 +382,11 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
 
 fail:
     work->m_enabled = 0;
-    model->m_callbackContext = 0;
-    model->m_callbackParam = 0;
+    model->SetCallbackContext(0, 0);
     model->m_beforeMeshLockEnvCallback = 0;
     model->m_drawMeshDLCallback = 0;
     model->m_afterDrawMeshCallback = 0;
-    *(u32*)((u8*)model + 0xEC) = 0;
+    model->m_beforeCalcMatrixCallback = 0;
 }
 
 /*
@@ -410,12 +405,11 @@ void pppDestructCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkC* data)
     CharaBreakWork* work = (CharaBreakWork*)(charaBreak->m_workArea + data->m_serializedDataOffsets[2]);
     CChara::CModel* model = work->m_model;
 
-    model->m_callbackContext = 0;
-    model->m_callbackParam = 0;
+    model->SetCallbackContext(0, 0);
     model->m_beforeMeshLockEnvCallback = 0;
     model->m_drawMeshDLCallback = 0;
     model->m_afterDrawMeshCallback = 0;
-    *(u32*)((u8*)model + 0xEC) = 0;
+    model->m_beforeCalcMatrixCallback = 0;
 
     void** perMeshBuffers = (void**)work->m_meshBuffers;
     u8* mesh = reinterpret_cast<u8*>(ModelMeshes(model));
@@ -944,14 +938,13 @@ void CreatePolygon(POLYGON_DATA* polygonData, void* displayList, unsigned long, 
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void CharaBreak_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f(void* model, void* modelData, void*,
-                                                                                 s32 meshIndex, Mtx meshMtx)
+static void CharaBreak_AfterDrawMeshCallback(
+    CChara::CModel* modelPtr, void* modelData, void*, int meshIndex, float (*meshMtx)[4])
 {
     Mtx cameraMtx;
     Mtx drawMtx;
 
     CharaBreakWork* workData = reinterpret_cast<CharaBreakWork*>(modelData);
-    CChara::CModel* modelPtr = reinterpret_cast<CChara::CModel*>(model);
     CharaBreakMeshRef* meshArray = ModelMeshes(modelPtr);
 
     if (workData->m_enabled != 0) {
@@ -1047,7 +1040,7 @@ extern "C" void CharaBreak_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f(v
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void CharaBreak_DrawMeshDLCallback__FPQ26CChara6CModelPvPviiPA4_f(void)
+static void CharaBreak_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*)[4])
 {
 }
 
@@ -1060,7 +1053,7 @@ extern "C" void CharaBreak_DrawMeshDLCallback__FPQ26CChara6CModelPvPviiPA4_f(voi
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void CharaBreak_BeforeMeshLockEnvCallback__FPQ26CChara6CModelPvPvi(void)
+static void CharaBreak_BeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int)
 {
 }
 
@@ -1073,10 +1066,10 @@ extern "C" void CharaBreak_BeforeMeshLockEnvCallback__FPQ26CChara6CModelPvPvi(vo
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" u32 CharaBreak_BeforeCalcMatrixCallback__FPQ26CChara6CModelPvPv(u32 value, void* modelData, void* meshData)
+static int CharaBreak_BeforeCalcMatrixCallback(CChara::CModel* model, void* modelData, void* meshData)
 {
     if (*(u32*)((u8*)modelData + 0x44) == 0) {
-        return value;
+        return reinterpret_cast<int>(model);
     }
 
     return (u32)__cntlzw(1 - (u32)*((u8*)meshData + 0x42)) >> 5;

@@ -61,13 +61,6 @@ struct EmissionModelView {
     EmissionModelData* m_data;
     u8 _padA8[0x4];
     EmissionMeshRef* m_meshes;
-    u8 _padB0[0x34];
-    EmissionState* m_state;
-    pppEmissionUnkB* m_step;
-    u8 _padEC[0x10];
-    void (*m_drawMeshDlCallback)(CChara::CModel*, void*, void*, int, int, float (*)[4]);
-    u8 _pad100[0x4];
-    void (*m_afterDrawMeshCallback)(CChara::CModel*, void*, void*, int, float (*)[4]);
 };
 
 struct EmissionState {
@@ -99,10 +92,6 @@ struct EmissionParticle {
 
 STATIC_ASSERT(offsetof(EmissionModelView, m_data) == 0xA4);
 STATIC_ASSERT(offsetof(EmissionModelView, m_meshes) == 0xAC);
-STATIC_ASSERT(offsetof(EmissionModelView, m_state) == 0xE4);
-STATIC_ASSERT(offsetof(EmissionModelView, m_step) == 0xE8);
-STATIC_ASSERT(offsetof(EmissionModelView, m_drawMeshDlCallback) == 0xFC);
-STATIC_ASSERT(offsetof(EmissionModelView, m_afterDrawMeshCallback) == 0x104);
 STATIC_ASSERT(offsetof(EmissionMeshData, m_colors) == 0x28);
 STATIC_ASSERT(offsetof(EmissionMeshData, m_displayListCount) == 0x4C);
 STATIC_ASSERT(offsetof(EmissionMeshData, m_displayLists) == 0x50);
@@ -111,6 +100,20 @@ STATIC_ASSERT(offsetof(EmissionModelData, m_materialSet) == 0x24);
 static inline EmissionMeshData* EmissionMeshAt(EmissionModelView* modelView, int meshIndex)
 {
     return modelView->m_meshes[meshIndex].m_data;
+}
+
+static inline void SetEmissionModelCallbacks(CChara::CModel* model, EmissionState* state, pppEmissionUnkB* step)
+{
+    model->SetCallbackContext(state, step);
+    model->m_drawMeshDLCallback = Emission_DrawMeshDLCallback;
+    model->m_afterDrawMeshCallback = Emission_AfterDrawMeshCallback;
+}
+
+static inline void ClearEmissionModelCallbacks(CChara::CModel* model)
+{
+    model->SetCallbackContext(0, 0);
+    model->m_drawMeshDLCallback = 0;
+    model->m_afterDrawMeshCallback = 0;
 }
 
 /*
@@ -144,11 +147,8 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, pppEm
     u8* dataSet = (u8*)pppEmission_ + 0x80 + serializedDataOffsets[1];
 
     CCharaPcs::CHandle* handle = GetCharaHandlePtr(reinterpret_cast<CGObject*>(pppMngStPtr->m_owner), 0);
-    EmissionModelView* model = reinterpret_cast<EmissionModelView*>(GetCharaModelPtr(handle));
-    model->m_state = state;
-    model->m_step = param_2;
-    model->m_drawMeshDlCallback = Emission_DrawMeshDLCallback;
-    model->m_afterDrawMeshCallback = Emission_AfterDrawMeshCallback;
+    CChara::CModel* model = GetCharaModelPtr(handle);
+    SetEmissionModelCallbacks(model, state, param_2);
 
     float alphaScale = (float)dataSet[0xB] / FLOAT_803311e0;
     state->m_colorR = dataSet[8];
@@ -258,12 +258,9 @@ void pppDestructEmission(pppEmission* pppEmission_, pppEmissionUnkC* param_2) {
     float baseScale;
     int* state = (int*)((u8*)pppEmission_ + 0x80 + param_2->m_serializedDataOffsets[2]);
     CCharaPcs::CHandle* handle = GetCharaHandlePtr(reinterpret_cast<CGObject*>(pppMngStPtr->m_owner), 0);
-    EmissionModelView* model = reinterpret_cast<EmissionModelView*>(GetCharaModelPtr(handle));
+    CChara::CModel* model = GetCharaModelPtr(handle);
 
-    model->m_state = 0;
-    model->m_step = 0;
-    model->m_drawMeshDlCallback = 0;
-    model->m_afterDrawMeshCallback = 0;
+    ClearEmissionModelCallbacks(model);
 
     Graphic._WaitDrawDone(const_cast<char*>(s_pppEmission_cpp), 0x118);
     CMemory::CStage* stage = (CMemory::CStage*)state[0];
@@ -335,11 +332,11 @@ void pppConstructEmission(pppEmission* pppEmission_, pppEmissionUnkC* param_2) {
     state->fieldC = baseScale;
 
     CCharaPcs::CHandle* handle = GetCharaHandlePtr(reinterpret_cast<CGObject*>(pppMngStPtr->m_owner), 0);
-    EmissionModelView* model = reinterpret_cast<EmissionModelView*>(GetCharaModelPtr(handle));
-    model->m_drawMeshDlCallback = Emission_DrawMeshDLCallback;
+    CChara::CModel* model = GetCharaModelPtr(handle);
+    model->m_drawMeshDLCallback = Emission_DrawMeshDLCallback;
     model->m_afterDrawMeshCallback = Emission_AfterDrawMeshCallback;
     state->field0 = 0;
-    state->field18 = *(float*)((u8*)model + 0x9C);
+    state->field18 = model->m_lightAlpha;
     state->field1C = 0;
 }
 

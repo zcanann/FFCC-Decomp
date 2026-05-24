@@ -107,6 +107,12 @@ public:
 	class CModel
 	{
 	public:
+		typedef int (*BeforeCalcMatrixCallback)(CChara::CModel*, void*, void*);
+		typedef void (*AfterMeshDrawCallback)(CChara::CModel*, void*, void*, unsigned int, unsigned int, float (*)[4]);
+		typedef void (*BeforeMeshLockEnvCallback)(CChara::CModel*, void*, void*, int);
+		typedef void (*DrawMeshDLCallback)(CChara::CModel*, void*, void*, int, int, float (*)[4]);
+		typedef void (*AfterDrawMeshCallback)(CChara::CModel*, void*, void*, int, float (*)[4]);
+
 		CModel();
 		~CModel();
 
@@ -154,7 +160,11 @@ public:
 		void SetBeforeMeshLockEnvCallback(void (*)(CChara::CModel*, void*, void*, int));
 		void SetDrawMeshDLCallback(void (*)(CChara::CModel*, void*, void*, int, int, float (*)[4]));
 		void SetAfterDrawMeshCallback(void (*)(CChara::CModel*, void*, void*, int, float (*)[4]));
-		void SetCallbackContext(void*, void*);
+		void SetCallbackContext(void* context, void* param)
+		{
+			m_callbackContext = context;
+			m_callbackParam = param;
+		}
 
 	public:
 		u8 _pad0[0x68];
@@ -174,12 +184,13 @@ public:
 		u8 _padC8[0x1C];
 		void* m_callbackContext;
 		void* m_callbackParam;
-		u8 _padEC[0x8];
-		void (*m_beforeMeshLockEnvCallback)(CChara::CModel*, void*, void*, int);
-		u8 _padF8[4];
-		void (*m_drawMeshDLCallback)(CChara::CModel*, void*, void*, int, int, float (*)[4]);
-		u8 _pad100[4];
-		void (*m_afterDrawMeshCallback)(CChara::CModel*, void*, void*, int, float (*)[4]);
+		BeforeCalcMatrixCallback m_beforeCalcMatrixCallback;
+		AfterMeshDrawCallback m_afterMeshDrawCallback;
+		BeforeMeshLockEnvCallback m_beforeMeshLockEnvCallback;
+		BeforeMeshLockEnvCallback m_beforeDrawShadowLockEnvCallback;
+		DrawMeshDLCallback m_drawMeshDLCallback;
+		DrawMeshDLCallback m_drawShadowMeshDLCallback;
+		AfterDrawMeshCallback m_afterDrawMeshCallback;
 		void (*m_afterDrawModelCallback)(CChara::CModel*, void*, void*);
 		u8 m_flags10C;
 		u8 _pad10D[3];

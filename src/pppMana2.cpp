@@ -79,6 +79,20 @@ static inline float LoadFloat(const float& value)
     return value;
 }
 
+static inline void ClearMana2ModelCallbacks(CChara::CModel* model)
+{
+    model->SetCallbackContext(0, 0);
+    model->m_afterMeshDrawCallback = 0;
+    model->m_drawMeshDLCallback = 0;
+}
+
+static inline void SetMana2ModelCallbacks(CChara::CModel* model, void* work, pppMana2UnkB* step)
+{
+    model->SetCallbackContext(work, step);
+    model->m_afterMeshDrawCallback = (CChara::CModel::AfterMeshDrawCallback)Mana2_BeforeDrawCallback;
+    model->m_drawMeshDLCallback = Mana2_DrawMeshDLCallback;
+}
+
 static int CreateWaterMesh(Vec* param_1, Vec* param_2, Vec2d* param_3, unsigned short* param_4, float param_5);
 static int UpdateWaterMesh(VMana2* mana2);
 static int RenderWaterMesh(VMana2* mana2);
@@ -778,8 +792,8 @@ void CalcReflectionVector2(
 void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, float (*) [4], int)
 {
     u32* work;
-    s32 model;
-    void* handle;
+    CChara::CModel* model;
+    CCharaPcs::CHandle* handle;
     CGObject* gObject;
     Mtx identityMtx;
     Mtx savedCameraMtx;
@@ -816,9 +830,9 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
     }
 
     handle = GetCharaHandlePtr(gObject, 0);
-    model = reinterpret_cast<int>(GetCharaModelPtr(reinterpret_cast<CCharaPcs::CHandle*>(handle)));
-    *(u32*)(model + 0xF0) = 0;
-    *(u32*)(model + 0xFC) = 0;
+    model = GetCharaModelPtr(reinterpret_cast<CCharaPcs::CHandle*>(handle));
+    model->m_afterMeshDrawCallback = 0;
+    model->m_drawMeshDLCallback = 0;
 
     if ((int)Game.m_currentSceneId == 7) {
         centerPos.x = LoadFloat(FLOAT_80331898);
@@ -950,9 +964,9 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
 
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
     handle = GetCharaHandlePtr(gObject, 0);
-    model = reinterpret_cast<int>(GetCharaModelPtr(reinterpret_cast<CCharaPcs::CHandle*>(handle)));
-    *(u32*)(model + 0xF0) = (u32)Mana2_BeforeDrawCallback;
-    *(u32*)(model + 0xFC) = (u32)Mana2_DrawMeshDLCallback;
+    model = GetCharaModelPtr(reinterpret_cast<CCharaPcs::CHandle*>(handle));
+    model->m_afterMeshDrawCallback = (CChara::CModel::AfterMeshDrawCallback)Mana2_BeforeDrawCallback;
+    model->m_drawMeshDLCallback = Mana2_DrawMeshDLCallback;
 }
 
 /*
@@ -989,8 +1003,8 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* para
     u32* work;
     void* dstBuffer;
     u32* texList;
-    void* handle;
-    s32 model;
+    CCharaPcs::CHandle* handle;
+    CChara::CModel* model;
     CGObject* gObject;
     s32 i;
     s32 setupOffset;
@@ -1004,7 +1018,7 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* para
         return;
     }
 
-    gObject = *(CGObject**)((char*)pppMngStPtr + 0xDC);
+    gObject = (CGObject*)pppMngStPtr->m_lookTarget;
     setupOffset = *(s32*)((char*)param_3 + 8);
     work = (u32*)((char*)pppMana2 + 0x80 + *(s32*)((char*)param_3 + 0xC));
     if (gObject == NULL) {
@@ -1012,17 +1026,14 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* para
     }
 
     handle = GetCharaHandlePtr(gObject, 0);
-    model = reinterpret_cast<int>(GetCharaModelPtr(reinterpret_cast<CCharaPcs::CHandle*>(handle)));
+    model = GetCharaModelPtr(handle);
     *((u8*)param_2 + 0x24) = 0;
     work[0x1C] = (u32)param_2;
     if (Game.m_currentMapId == 0x21) {
         *((u8*)param_2 + 0x24) = 0;
     }
 
-    *(u32*)(model + 0xE4) = (u32)work;
-    *(u32*)(model + 0xE8) = (u32)param_2;
-    *(u32*)(model + 0xF0) = (u32)Mana2_BeforeDrawCallback;
-    *(u32*)(model + 0xFC) = (u32)Mana2_DrawMeshDLCallback;
+    SetMana2ModelCallbacks(model, work, param_2);
 
     MaterialManRaw()[0x228] = *((u8*)pppMana2 + 0x8B + setupOffset);
     *((u8*)(work + 0x38)) = MaterialManRaw()[0x228];
@@ -1032,10 +1043,7 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* para
     }
 
     work[0] = (u32)gObject;
-    *(u32*)(model + 0xE4) = (u32)work;
-    *(u32*)(model + 0xE8) = (u32)param_2;
-    *(u32*)(model + 0xF0) = (u32)Mana2_BeforeDrawCallback;
-    *(u32*)(model + 0xFC) = (u32)Mana2_DrawMeshDLCallback;
+    SetMana2ModelCallbacks(model, work, param_2);
     work[2] = static_cast<u32>(GetTextureFromRSD(*(s32*)((char*)param_2 + 0x8), pppEnvStPtr));
     work[3] = static_cast<u32>(GetTextureFromRSD(*(s32*)((char*)param_2 + 0xC), pppEnvStPtr));
     work[4] = static_cast<u32>(GetTextureFromRSD(*(s32*)((char*)param_2 + 0x10), pppEnvStPtr));
@@ -1227,22 +1235,19 @@ void pppDestructMana2(pppMana2* pppMana2, pppMana2UnkC* param_2)
 {
     u32* work;
     CGObject* gObject;
-    void* handle;
-    s32 model;
+    CCharaPcs::CHandle* handle;
+    CChara::CModel* model;
     s32 meshEntry;
     s32 step;
     u32 i;
     u32 j;
 
     work = (u32*)((char*)pppMana2 + 0x80 + *(s32*)((char*)param_2 + 0xC));
-    gObject = *(CGObject**)((char*)pppMngStPtr + 0xDC);
+    gObject = (CGObject*)pppMngStPtr->m_lookTarget;
     if (gObject != NULL) {
         handle = GetCharaHandlePtr(gObject, 0);
-        model = reinterpret_cast<int>(GetCharaModelPtr(reinterpret_cast<CCharaPcs::CHandle*>(handle)));
-        *(u32*)(model + 0xE4) = 0;
-        *(u32*)(model + 0xE8) = 0;
-        *(u32*)(model + 0xF0) = 0;
-        *(u32*)(model + 0xFC) = 0;
+        model = GetCharaModelPtr(handle);
+        ClearMana2ModelCallbacks(model);
     }
 
     if (work[10] != 0) {
@@ -1399,20 +1404,20 @@ void pppDestructMana2(pppMana2* pppMana2, pppMana2UnkC* param_2)
 void pppConstructMana2(pppMana2* pppMana2, pppMana2UnkC* param_2)
 {
     CGObject* gObject;
-    void* handle;
-    u32 model;
+    CCharaPcs::CHandle* handle;
+    CChara::CModel* model;
     u32* work;
     s32 workOffset;
 
     workOffset = param_2->m_serializedDataOffsets[2];
     work = (u32*)((char*)pppMana2 + 0x80 + workOffset);
-    gObject = *(CGObject**)((char*)pppMngStPtr + 0xDC);
+    gObject = (CGObject*)pppMngStPtr->m_lookTarget;
     gObject->m_stepSlopeLimit = LoadFloat(FLOAT_803318fc);
 
     handle = GetCharaHandlePtr(gObject, 0);
-    GetCharaModelPtr(reinterpret_cast<CCharaPcs::CHandle*>(handle));
-    model = *(u32*)((char*)handle + 0x168);
-    *(u32*)(model + 0x98) = 0x3F;
+    GetCharaModelPtr(handle);
+    model = handle->m_model;
+    model->m_meshVisibleMask = 0x3F;
     work[1] = (u32)pppMngStPtr;
 
     work[0] = 0;

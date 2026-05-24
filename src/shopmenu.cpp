@@ -89,8 +89,8 @@ extern double DOUBLE_80332DA8;
 extern double DOUBLE_80332DB0;
 extern double DOUBLE_80332DB8;
 extern double DOUBLE_80332DC0;
-extern unsigned int DAT_80332CFC;
-extern unsigned int DAT_80332D00;
+extern unsigned int gShopMenuAmbientWhite;
+extern unsigned int gShopMenuMaterialWhiteBase;
 extern char s_Slash_80332d84[];
 extern char s_DecimalFormat_80332d14[];
 extern char s_TwoDigitFormat_80332d18[];
@@ -2934,11 +2934,11 @@ void drawShapeSeqScale(int shapeNo, int groupNo, int x, int y, float scaleX, flo
     *reinterpret_cast<unsigned int*>(materialMan + 0x40) = 0xACE0F;
 
     _GXColor amb;
-    *reinterpret_cast<unsigned int*>(&amb) = DAT_80332CFC;
+    *reinterpret_cast<unsigned int*>(&amb) = gShopMenuAmbientWhite;
     GXSetChanAmbColor(GX_COLOR0A0, amb);
 
     _GXColor mat;
-    *reinterpret_cast<unsigned int*>(&mat) = (DAT_80332D00 & 0xFFFFFF00) | alpha;
+    *reinterpret_cast<unsigned int*>(&mat) = (gShopMenuMaterialWhiteBase & 0xFFFFFF00) | alpha;
     GXSetChanMatColor(GX_COLOR0A0, mat);
 
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_NOOP);
@@ -3030,11 +3030,11 @@ void drawShapeSeq(int shapeNo, int groupNo, int x, int y, unsigned char alpha, u
     *reinterpret_cast<unsigned int*>(materialMan + 0x40) = 0xACE0F;
 
     _GXColor amb;
-    *reinterpret_cast<unsigned int*>(&amb) = DAT_80332CFC;
+    *reinterpret_cast<unsigned int*>(&amb) = gShopMenuAmbientWhite;
     GXSetChanAmbColor(GX_COLOR0A0, amb);
 
     _GXColor mat;
-    *reinterpret_cast<unsigned int*>(&mat) = (DAT_80332D00 & 0xFFFFFF00) | alpha;
+    *reinterpret_cast<unsigned int*>(&mat) = (gShopMenuMaterialWhiteBase & 0xFFFFFF00) | alpha;
     GXSetChanMatColor(GX_COLOR0A0, mat);
 
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_NOOP);

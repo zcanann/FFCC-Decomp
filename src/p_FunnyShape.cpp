@@ -405,24 +405,6 @@ unsigned int CFunnyShapePcs::m_table_desc0[3] = {0, 0xFFFFFFFF, reinterpret_cast
 unsigned int CFunnyShapePcs::m_table_desc1[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroyViewer__14CFunnyShapePcsFv)};
 unsigned int CFunnyShapePcs::m_table_desc2[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__14CFunnyShapePcsFv)};
 unsigned int CFunnyShapePcs::m_table_desc3[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__14CFunnyShapePcsFv)};
-unsigned int CFunnyShapePcs::m_table[0x15C / sizeof(unsigned int)] = {
-    reinterpret_cast<unsigned int>(const_cast<char*>(s_CFunnyShapePcsViewer)),
-    0,
-    0xFFFFFFFF,
-    reinterpret_cast<unsigned int>(createViewer__14CFunnyShapePcsFv),
-    0,
-    0xFFFFFFFF,
-    reinterpret_cast<unsigned int>(destroyViewer__14CFunnyShapePcsFv),
-    0,
-    0xFFFFFFFF,
-    reinterpret_cast<unsigned int>(calcViewer__14CFunnyShapePcsFv),
-    0x21,
-    0,
-    0,
-    0xFFFFFFFF,
-    reinterpret_cast<unsigned int>(drawViewer__14CFunnyShapePcsFv),
-    0x42, 1
-};
 unsigned int sFunnyShapePcsTablePad0[3] = {
     reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CManager_8032E660)), 0, 0};
 unsigned int sFunnyShapePcsTablePad1[5] = {
@@ -434,6 +416,24 @@ unsigned int sFunnyShapePcsTablePad1[5] = {
 };
 u8 ARRAY_8026D728[0xC];
 CFunnyShapePcs FunnyShapePcs;
+unsigned int CFunnyShapePcs::m_table[0x15C / sizeof(unsigned int)] = {
+    reinterpret_cast<unsigned int>(const_cast<char*>(s_CFunnyShapePcsViewer)),
+    CFunnyShapePcs::m_table_desc0[0],
+    CFunnyShapePcs::m_table_desc0[1],
+    CFunnyShapePcs::m_table_desc0[2],
+    CFunnyShapePcs::m_table_desc1[0],
+    CFunnyShapePcs::m_table_desc1[1],
+    CFunnyShapePcs::m_table_desc1[2],
+    CFunnyShapePcs::m_table_desc2[0],
+    CFunnyShapePcs::m_table_desc2[1],
+    CFunnyShapePcs::m_table_desc2[2],
+    0x21,
+    0,
+    CFunnyShapePcs::m_table_desc3[0],
+    CFunnyShapePcs::m_table_desc3[1],
+    CFunnyShapePcs::m_table_desc3[2],
+    0x42, 1
+};
 
 /*
  * --INFO--

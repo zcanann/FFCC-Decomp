@@ -3193,39 +3193,39 @@ void CMaterialSet::Calc()
     unsigned long materialIndex = 0;
 
     while (materialIndex < static_cast<unsigned long>(materialArray->GetSize())) {
-        unsigned char* material = reinterpret_cast<unsigned char*>((*materialArray)[materialIndex]);
+        CMaterial* material = (*materialArray)[materialIndex];
         if (material != 0) {
-            unsigned char* texScroll = material + 0x4C;
+            CTexScroll* texScroll = material->GetTexScroll(0);
             for (int i = 0; i < 4; i++) {
-                if (texScroll[0] == 1) {
-                    float& offsetU = *reinterpret_cast<float*>(texScroll + 4);
-                    offsetU += *reinterpret_cast<float*>(texScroll + 0xC);
+                if (texScroll->m_type0 == 1) {
+                    float& offsetU = texScroll->m_u0;
+                    offsetU += texScroll->m_u1;
                     if (offsetU > 1.0f) {
                         offsetU -= 1.0f;
                     } else if (offsetU < 0.0f) {
                         offsetU += 1.0f;
                     }
-                } else if (texScroll[0] == 2) {
-                    CMapKeyFrame* keyFrameU = *reinterpret_cast<CMapKeyFrame**>(texScroll + 0xC);
-                    *reinterpret_cast<float*>(texScroll + 4) = keyFrameU->Get();
+                } else if (texScroll->m_type0 == 2) {
+                    CMapKeyFrame* keyFrameU = *reinterpret_cast<CMapKeyFrame**>(&texScroll->m_u1);
+                    texScroll->m_u0 = keyFrameU->Get();
                     keyFrameU->Calc();
                 }
 
-                if (texScroll[1] == 1) {
-                    float& offsetV = *reinterpret_cast<float*>(texScroll + 8);
-                    offsetV += *reinterpret_cast<float*>(texScroll + 0x10);
+                if (texScroll->m_type1 == 1) {
+                    float& offsetV = texScroll->m_v0;
+                    offsetV += texScroll->m_v1;
                     if (offsetV > 1.0f) {
                         offsetV -= 1.0f;
                     } else if (offsetV < 0.0f) {
                         offsetV += 1.0f;
                     }
-                } else if (texScroll[1] == 2) {
-                    CMapKeyFrame* keyFrameV = *reinterpret_cast<CMapKeyFrame**>(texScroll + 0x10);
-                    *reinterpret_cast<float*>(texScroll + 8) = keyFrameV->Get();
+                } else if (texScroll->m_type1 == 2) {
+                    CMapKeyFrame* keyFrameV = *reinterpret_cast<CMapKeyFrame**>(&texScroll->m_v1);
+                    texScroll->m_v0 = keyFrameV->Get();
                     keyFrameV->Calc();
                 }
 
-                texScroll += 0x14;
+                texScroll++;
             }
         }
 
@@ -3276,15 +3276,15 @@ int CMaterial::Set(_GXTexMapID texMapId)
 
     bool hasDualScroll = false;
     if ((*reinterpret_cast<unsigned short*>(Ptr(this, 0x18)) == 2) &&
-        (FLOAT_8032faf4 == *reinterpret_cast<float*>(Ptr(this, 0x50))) &&
-        (FLOAT_8032faf4 == *reinterpret_cast<float*>(Ptr(this, 0x54))) &&
-        ((FLOAT_8032faf4 != *reinterpret_cast<float*>(Ptr(this, 0x64))) ||
-         (FLOAT_8032faf4 != *reinterpret_cast<float*>(Ptr(this, 0x68))))) {
+        (FLOAT_8032faf4 == GetTexScroll(0)->m_u0) &&
+        (FLOAT_8032faf4 == GetTexScroll(0)->m_v0) &&
+        ((FLOAT_8032faf4 != GetTexScroll(1)->m_u0) ||
+         (FLOAT_8032faf4 != GetTexScroll(1)->m_v0))) {
         hasDualScroll = true;
     }
 
     unsigned char* textureSlot = Ptr(this, 0x3C);
-    unsigned char* scrollData = Ptr(this, 0x4C);
+    CTexScroll* scroll = GetTexScroll(0);
     int textureCount = static_cast<int>(*reinterpret_cast<unsigned short*>(Ptr(this, 0x18)));
     for (int i = 0; i < textureCount; i++) {
         CTexture* texture = *reinterpret_cast<CTexture**>(textureSlot);
@@ -3292,8 +3292,8 @@ int CMaterial::Set(_GXTexMapID texMapId)
             TextureMan.SetTexture(texMapId, texture);
             texMapId = static_cast<_GXTexMapID>(static_cast<int>(texMapId) + 1);
 
-            float scrollU = *reinterpret_cast<float*>(scrollData + 4);
-            float scrollV = *reinterpret_cast<float*>(scrollData + 8);
+            float scrollU = scroll->m_u0;
+            float scrollV = scroll->m_v0;
             if ((FLOAT_8032faf4 != scrollU) || ((FLOAT_8032faf4 != scrollV) || hasDualScroll)) {
                 texMtx[0][3] = scrollU;
                 texMtx[1][3] = scrollV;
@@ -3330,7 +3330,7 @@ int CMaterial::Set(_GXTexMapID texMapId)
         }
 
         textureSlot += 4;
-        scrollData += 0x14;
+        scroll++;
     }
 
     return static_cast<int>(texMapId);

@@ -3346,8 +3346,7 @@ void CMapMng::SetMapObjLMtx(int mapObjIndex, float (*source)[4])
  */
 void CMapMng::GetMapObjWMtx(int mapObjIndex, float (*destination)[4])
 {
-    CMapObj* mapObj = GetMapObjArray() + mapObjIndex;
-    PSMTXCopy(*reinterpret_cast<Mtx*>(reinterpret_cast<unsigned char*>(mapObj) + 0xB8), destination);
+    PSMTXCopy(m_mapObjArray[mapObjIndex].m_worldMtx, destination);
 }
 
 /*
@@ -3603,10 +3602,10 @@ found:
  */
 void CMapMng::SetMapObjTransRate(int mapObjIndex, float x, float y, float z)
 {
-    unsigned char* mapObj = reinterpret_cast<unsigned char*>(GetMapObjArray() + mapObjIndex);
-    *reinterpret_cast<float*>(mapObj + 0x58) = x;
-    *reinterpret_cast<float*>(mapObj + 0x5C) = y;
-    *reinterpret_cast<float*>(mapObj + 0x60) = z;
+    CMapObj& mapObj = m_mapObjArray[mapObjIndex];
+    mapObj.m_transRateX = x;
+    mapObj.m_transRateY = y;
+    mapObj.m_transRateZ = z;
 }
 
 /*

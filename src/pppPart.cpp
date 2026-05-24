@@ -48,21 +48,10 @@ static inline CChara::CModel* GetPppOwnerModel(_pppMngSt* pppMngSt)
 static const double kScaleConstA = 4503601774854144.0; // DOUBLE_803304b0
 static const float kScaleConstB = 0.017453292f; // FLOAT_803304a8
 static const float kPppLocalZero = 0.0f;
-extern "C" unsigned char s_blend_mode;
-extern "C" float s_zoff;
 extern "C" double DOUBLE_8032fdf0;
 extern "C" double DOUBLE_8032fe00;
 extern "C" float FLOAT_8032fdf8;
 extern "C" unsigned int gPppFixedWhite;
-extern "C" unsigned char s_light_mode;
-extern "C" unsigned char s_fog_mode;
-extern "C" unsigned char s_fog_blend_mode;
-extern "C" unsigned char s_cull_mode;
-extern "C" unsigned char s_ztest;
-extern "C" unsigned char s_rgbwrite;
-extern "C" unsigned char s_zwrite;
-extern "C" int DAT_8032ed7c;
-extern "C" unsigned int DAT_8032ed80;
 
 _pppEnvSt* pppEnvStPtr;
 _pppMngSt* pppMngStPtr;
@@ -71,6 +60,23 @@ float gPartScreenMatrixRow2X = 0.0f;
 float gPartScreenMatrixRow2Y = 0.0f;
 float gPartScreenMatrixRow2W = 0.0f;
 int ppvMemAllocErrorF = 0;
+int ppvSysStopPartF = 0;
+int ppvSysGoPartF = 0;
+int ppvUserStopPartF = 0;
+int ppvEmptyLoop = 0;
+unsigned char ppvIsLoopCalc = 0;
+unsigned char ppvIs2ndCalc = 0;
+void* ppvHookFuncTbl = 0;
+unsigned int pobjcounter = 0;
+unsigned char s_light_mode = 0;
+unsigned char s_blend_mode = 0;
+unsigned char s_fog_mode = 0;
+unsigned char s_fog_blend_mode = 0;
+unsigned char s_cull_mode = 0;
+unsigned char s_ztest = 0;
+unsigned char s_rgbwrite = 0;
+unsigned char s_zwrite = 0;
+float s_zoff = 0.0f;
 }
 pppDrawMng ppvDrawMng;
 Mtx ppvCameraMatrix0;
@@ -995,7 +1001,7 @@ void _pppAllFreePObject(_pppMngSt* pppMngSt)
 		pppMngSt->m_pppPDataVals = 0;
 	}
 
-	DAT_8032ed7c = 0;
+	ppvEmptyLoop = 0;
 	pppMngSt->m_baseTime = -0x1000;
 
 	if (Game.m_currentSceneId != 7)
@@ -2066,7 +2072,7 @@ void pppCalcPartStd(_pppMngSt* pppMngSt)
 		if (pDataVal != 0 && pDataVal->m_programSetDef != 0)
 		{
 			_pppProgSetDef* progSet = pDataVal->m_programSetDef;
-			DAT_8032ed80 += pDataVal->m_activeCount;
+			pobjcounter += pDataVal->m_activeCount;
 
 			if (pDataVal->m_activeCount != 0)
 			{

@@ -1753,18 +1753,18 @@ void CMapObj::CalcHitPosition(Vec* out)
  */
 void CMapObj::SetMime(int mode, int target, int type)
 {
-    unsigned char* mime = reinterpret_cast<unsigned char*>(PtrAt(this, 0xEC));
+    MapObjAttrMimeLayout* mime = reinterpret_cast<MapObjAttrMimeLayout*>(PtrAt(this, 0xEC));
 
-    *reinterpret_cast<int*>(mime + 0x20) = mode;
-    *reinterpret_cast<int*>(mime + 0x1C) = mode;
+    mime->keyFrame.m_startFrame = mode;
+    mime->keyFrame.m_currentFrame = mode;
 
-    if (target > *reinterpret_cast<int*>(mime + 0x28)) {
-        target = *reinterpret_cast<int*>(mime + 0x28);
+    if (target > mime->keyFrame.m_frameCount) {
+        target = mime->keyFrame.m_frameCount;
     }
 
-    *reinterpret_cast<int*>(mime + 0x24) = target;
-    *(mime + 0x17) = static_cast<unsigned char>(type);
-    *(mime + 0x18) = 1;
+    mime->keyFrame.m_endFrame = target;
+    mime->keyFrame.m_loop = static_cast<unsigned char>(type);
+    mime->keyFrame.m_isRun = 1;
 }
 
 /*

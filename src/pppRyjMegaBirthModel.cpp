@@ -328,23 +328,21 @@ void calc_particle(_pppPObject* pObject, VRyjMegaBirthModel* work, PRyjMegaBirth
 
     emitted = 0;
     payload = (u8*)params;
-    particleData = *(_PARTICLE_DATA**)((u8*)work + 0xC);
-    particleWMat = *(_PARTICLE_WMAT**)((u8*)work + 0x10);
-    particleColor = *(_PARTICLE_COLOR**)((u8*)work + 0x14);
-    maxParticles = *(s32*)((u8*)work + 0x18);
-    emitTimer = (u16*)((u8*)work + 0x1C);
+    particleData = work->m_particleBlock;
+    particleWMat = reinterpret_cast<_PARTICLE_WMAT*>(work->m_worldMatrixBlock);
+    particleColor = work->m_colorBlock;
+    maxParticles = work->m_numParticles;
+    emitTimer = &work->m_emitTimer;
 
     if (gPppCalcDisabled == 0) {
         float posX = pObject->m_localMatrix.value[0][3];
         float posY = pObject->m_localMatrix.value[1][3];
         float posZ = pObject->m_localMatrix.value[2][3];
 
-        *(float*)((u8*)work + 0x20) = *(float*)((u8*)work + 0x2C);
-        *(float*)((u8*)work + 0x24) = *(float*)((u8*)work + 0x30);
-        *(float*)((u8*)work + 0x28) = *(float*)((u8*)work + 0x34);
-        *(float*)((u8*)work + 0x2C) = posX;
-        *(float*)((u8*)work + 0x30) = posY;
-        *(float*)((u8*)work + 0x34) = posZ;
+        work->m_previousPosition = work->m_currentPosition;
+        work->m_currentPosition.x = posX;
+        work->m_currentPosition.y = posY;
+        work->m_currentPosition.z = posZ;
         *emitTimer = *emitTimer + 1;
 
         for (i = 0; i < maxParticles; i = i + 1) {
@@ -968,9 +966,9 @@ void init_matrix(_pppPObject* pObject, pppFMATRIX& out, PRyjMegaBirthModel* para
         break;
     case 8:
         PSMTXIdentity(out.value);
-        out.value[0][3] = *f32_at((u8*)work, 0x2C);
-        out.value[1][3] = *f32_at((u8*)work, 0x30);
-        out.value[2][3] = *f32_at((u8*)work, 0x34);
+        out.value[0][3] = work->m_currentPosition.x;
+        out.value[1][3] = work->m_currentPosition.y;
+        out.value[2][3] = work->m_currentPosition.z;
         break;
     default:
         PSMTXCopy(pppMngStPtr->m_matrix.value, out.value);

@@ -14,7 +14,7 @@ inline void* operator new(unsigned long, void* p)
     return p;
 }
 
-static const char s_textureman_cpp[] = "textureman.cpp";
+extern "C" const char s_textureman_cpp[] = "textureman.cpp";
 static const char s_Error_width_pctd_height_pctd_801D7984[] = "Error width=%d height=%d\n";
 static const char s_CTexture_texture_801D79A0[] = "CTexture.texture";
 static const char s_ptrarray_grow_error_801D79D8[] =

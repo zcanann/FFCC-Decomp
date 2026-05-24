@@ -166,7 +166,7 @@ struct YmBreathParticleData {
     unsigned char _pad5C[0x04];
 };
 
-static const char s_pppYmBreath_cpp[] = "pppYmBreath.cpp";
+extern "C" const char s_pppYmBreath_cpp[] = "pppYmBreath.cpp";
 
 /*
  * --INFO--

@@ -107,7 +107,7 @@ extern "C" CMenuPcs::CTmp s_cmakeWorldTextureTable[] = {
     {8, PTR_s_world2[8]},
 };
 extern "C" {
-static const char s_cmake_cpp[] = "cmake.cpp";
+extern "C" const char s_cmake_cpp[] = "cmake.cpp";
 }
 
 struct CmakeInfo {

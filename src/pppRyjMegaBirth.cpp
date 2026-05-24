@@ -22,7 +22,7 @@ extern const float FLOAT_80330490[2];
 
 Mtx g_matUnit;
 
-static const char s_pppRyjMegaBirth_cpp[] = "pppRyjMegaBirth.cpp";
+extern "C" const char s_pppRyjMegaBirth_cpp[] = "pppRyjMegaBirth.cpp";
 
 extern const float FLOAT_80330458 = 360.0f;
 extern const float FLOAT_8033045c = 180.0f;

@@ -17,7 +17,7 @@ extern "C" const float kFontOne;
 extern "C" const float kFontOrthoHeight;
 extern "C" const float kFontOrthoWidth;
 
-static const char s_fontman_cpp[] = "fontman.cpp";
+extern "C" const char s_fontman_cpp[] = "fontman.cpp";
 static const char s_CFontMan[] = "CFontMan";
 
 CFontMan FontMan;

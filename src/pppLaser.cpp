@@ -25,7 +25,7 @@ extern const f32 kMenuArtiTau;
 extern const f32 FLOAT_8033342c;
 extern const f32 FLOAT_80333430;
 
-static const char s_pppLaser_cpp[] = "pppLaser.cpp";
+extern "C" const char s_pppLaser_cpp[] = "pppLaser.cpp";
 
 struct CMapCylinderRaw {
     Vec m_bottom;

@@ -80,7 +80,7 @@ unsigned char gPppEditorAnimIndexInitialized = 0;
 int gPppCalcDisabled = 0;
 }
 CPartMng PartMng;
-static const char s_partMng_cpp[] = "partMng.cpp";
+extern "C" const char s_partMng_cpp[] = "partMng.cpp";
 static const char s_pppCreate0_pdtID_d_fpno_d_mngNo_d_name_s[] =
     "pppCreate0 pdtID=%d fpno=%d mngNo=%d name=%s\n";
 static const char s_pppGetFreePppDataMngSt_CAN_NOT_ALLOC[] = "pppGetFreePppDataMngSt CAN NOT ALLOC !!!\n";

@@ -100,7 +100,7 @@ STATIC_ASSERT(offsetof(ChangeTexModelData, m_frameShift) == 0x34);
 extern const float kPppChangeTexCachedValueInit = -10000.0f;
 extern const char sPppChangeTexMeshObjectName[] = "obj";
 extern const float kPppChangeTexAlphaScale = 255.0f;
-static const char s_pppChangeTex_cpp[] ATTRIBUTE_ALIGN(8) = "pppChangeTex.cpp";
+extern "C" const char s_pppChangeTex_cpp[] ATTRIBUTE_ALIGN(8) = "pppChangeTex.cpp";
 
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
 

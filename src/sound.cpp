@@ -64,7 +64,7 @@ static const char s_soundSeBlockPathFmt[] = "dvd/sound/se/block/se%03d.seb";
 static const char s_soundMusicPathFmt[] = "dvd/sound/music/music%03d.bgm";
 static const char s_soundEnvSePlayFmt[] = "\x1B[32mEnvSePlay: %06d\n\x1B[0m";
 static const char s_soundEnvSeStopFmt[] = "\x1B[32mEnvSeStop: %06d\n\x1B[0m";
-static const char s_sound_cpp[] = "sound.cpp";
+extern "C" const char s_sound_cpp[] = "sound.cpp";
 
 extern double DOUBLE_80330d20;
 extern double DOUBLE_80330d28;

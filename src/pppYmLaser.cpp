@@ -28,7 +28,7 @@ extern const f32 FLOAT_80330dec;
 
 static inline float YmLaserConst(const float& value) { return *reinterpret_cast<const float*>(&value); }
 
-static const char s_pppYmLaser_cpp[] = "pppYmLaser.cpp";
+extern "C" const char s_pppYmLaser_cpp[] = "pppYmLaser.cpp";
 
 static inline f32 LoadLaserFloat(const f32& value)
 {

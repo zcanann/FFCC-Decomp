@@ -32,7 +32,7 @@ struct LocationTitleColorBlock {
     GXColor m_color;
 };
 
-static const char s_pppLocationTitle_cpp[] = "pppLocationTitle.cpp";
+extern "C" const char s_pppLocationTitle_cpp[] = "pppLocationTitle.cpp";
 
 /*
  * --INFO--

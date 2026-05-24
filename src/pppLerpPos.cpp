@@ -19,7 +19,7 @@ struct pppLerpPosUnkC {
     s32* m_serializedDataOffsets;
 };
 
-static const char s_pppLerpPos_cpp[] = "pppLerpPos.cpp";
+extern "C" const char s_pppLerpPos_cpp[] = "pppLerpPos.cpp";
 
 /*
  * --INFO--

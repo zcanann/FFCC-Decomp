@@ -18,7 +18,7 @@ extern const float FLOAT_80330590;
 
 static pppFMATRIX g_matUnit2;
 
-static const char s_pppYmMegaBirthShpTail2_cpp[] = "pppYmMegaBirthShpTail2.cpp";
+extern "C" const char s_pppYmMegaBirthShpTail2_cpp[] = "pppYmMegaBirthShpTail2.cpp";
 
 static inline float LoadFloat(const float& value)
 {

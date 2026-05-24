@@ -36,6 +36,8 @@ inline void* operator new(unsigned long, void* ptr)
 	return ptr;
 }
 
+extern "C" const char s_chara_cpp[];
+
 namespace {
 
 struct CCharaDisplayListRaw
@@ -611,7 +613,6 @@ static void CopyDuplicatedMeshState(CChara::CMesh* dst, CChara::CMesh* src)
 	*reinterpret_cast<void**>(dstRaw + 8) = 0;
 }
 
-static const char s_chara_cpp[] = "chara.cpp";
 static const char s_charaMeshWorkOverflow[] = "chara mesh work buffer overflow\n";
 static int s_charaMeshWorkWarnArmed = 1;
 static bool s_charaMeshWorkOverflowSeen = false;

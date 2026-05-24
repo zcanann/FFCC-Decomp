@@ -141,7 +141,7 @@ static inline unsigned int SwapU32Value(unsigned int value)
 	return (value << 24) | ((value >> 8) & 0xFF00) | ((value << 8) & 0xFF0000) | (value >> 24);
 }
 
-static const char s_gbaque_cpp[] = "gbaque.cpp";
+extern "C" const char s_gbaque_cpp[] = "gbaque.cpp";
 static const char s_pcts_pctd_Error_memory_allocation_error_801DB37C[] = "%s(%d): Error: memory allocation error\n";
 static const char s_compatibility_data_error[] = "compatibility data error!!\n";
 static const char s_cmake_favorite_crc_error[] = "%s(%d): Error:CMakeFavorite() crc error!!\n";

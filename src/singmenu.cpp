@@ -152,14 +152,14 @@ extern char s_Spiral_80332598[];
 extern char s_Tulip_803325A0[];
 extern char s_Spoon_803325A8[];
 extern char s_Wolfie_803325B0[];
-extern char lbl_803325B8[];
-extern char lbl_803325C0[];
-extern char lbl_803325C8[];
-extern char lbl_803325D0[];
-extern char lbl_803325D8[];
-extern char lbl_803325E0[];
-extern char lbl_803325E8[];
-extern char lbl_803325F0[];
+extern char s_Wuschel_803325B8[];
+extern char s_normal_803325C0[];
+extern char s_fesch_803325C8[];
+extern char s_Einhorn_803325D0[];
+extern char s_Kreisel_803325D8[];
+extern char s_Tulpe_803325E0[];
+extern char s_Loeffel_803325E8[];
+extern char s_Haiauge_803325F0[];
 extern char lbl_803325F8[];
 extern char lbl_80332600[];
 extern char lbl_80332608[];
@@ -641,14 +641,14 @@ extern "C" char* PTR_s_Cowlick[] = {
     s_Wolfie_803325B0, s_Raccoon_Tail_801DDE2C, s_Shark_Eyes_801DDE14, s_Owl_Head_801DDE3C,
 };
 extern "C" char* PTR_s_Spitzschopf[] = {
-    s_Spitzschopf_801DDE48, lbl_803325B8, s_Stirnband_801DDE54, s_Kopftuch_801DDE60,
+    s_Spitzschopf_801DDE48, s_Wuschel_803325B8, s_Stirnband_801DDE54, s_Kopftuch_801DDE60,
     s_lange_Haare_801DDE6C, s_kurze_Haare_801DDE78, s_mittellang_801DDE84, s_Weisskaeppchen_801DDE90,
-    lbl_803325C0, s_Spitzhelm_801DDEA0, s_Eisenmaske_801DDEAC, s_Topfhelm_801DDEB8,
-    lbl_803325C0, s_Ritterin_801DDEC4, lbl_803325C8, s_Augenmaske_801DDED0,
-    lbl_803325D0, s_Gitterhelm_801DDEDC, s_Knollhelm_801DDEE8, s_Fluegelhelm_801DDEF4,
-    lbl_803325D8, lbl_803325E0, lbl_803325E8, s_Schleife_801DDF00,
-    s_Wolfkopf_801DDF0C, lbl_803325F0, s_Baerentatze_801DDF18, s_Otterschwanz_801DDF24,
-    s_Katzenbein_801DDF34, s_Otterschwanz_801DDF24, lbl_803325F0, s_Eulenkopf_801DDF40,
+    s_normal_803325C0, s_Spitzhelm_801DDEA0, s_Eisenmaske_801DDEAC, s_Topfhelm_801DDEB8,
+    s_normal_803325C0, s_Ritterin_801DDEC4, s_fesch_803325C8, s_Augenmaske_801DDED0,
+    s_Einhorn_803325D0, s_Gitterhelm_801DDEDC, s_Knollhelm_801DDEE8, s_Fluegelhelm_801DDEF4,
+    s_Kreisel_803325D8, s_Tulpe_803325E0, s_Loeffel_803325E8, s_Schleife_801DDF00,
+    s_Wolfkopf_801DDF0C, s_Haiauge_803325F0, s_Baerentatze_801DDF18, s_Otterschwanz_801DDF24,
+    s_Katzenbein_801DDF34, s_Otterschwanz_801DDF24, s_Haiauge_803325F0, s_Eulenkopf_801DDF40,
 };
 extern "C" char* PTR_s_Ciuffo_ribelle[] = {
     s_Ciuffo_ribelle_801DDF4C, s_Naturale_801DDF5C, lbl_803325F8, s_Cappello_801DDF68,

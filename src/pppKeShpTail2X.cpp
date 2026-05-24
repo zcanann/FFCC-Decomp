@@ -327,6 +327,9 @@ move_next_segment:
     seg.x = segDx;
     seg.y = segDy;
     seg.z = segDz;
+    zeroVec.x = zero;
+    zeroVec.y = zero;
+    zeroVec.z = zero;
     segLen = PSVECDistance(&zeroVec, &seg);
     segCursor = trailLen;
     segRemain += segLen;

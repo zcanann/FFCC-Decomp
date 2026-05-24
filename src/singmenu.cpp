@@ -136,12 +136,12 @@ extern char s_Haendler_80332168[];
 extern char s_Fabbri_80332170[];
 extern char s_Sarti_80332178[];
 extern char s_Mugnai_80332180[];
-extern char lbl_80332188[];
-extern char lbl_80332190[];
-extern char lbl_80332198[];
-extern char lbl_803321A0[];
-extern char lbl_803321A8[];
-extern char lbl_803321B0[];
+extern char s_Fermier_80332188[];
+extern char s_Eleveur_80332190[];
+extern char s_Meunier_80332198[];
+extern char s_Pecheur_803321A0[];
+extern char s_Herrero_803321A8[];
+extern char s_Sastre_803321B0[];
 extern char lbl_803321B8[];
 extern char lbl_80332574[];
 extern char lbl_8033257C[];
@@ -543,11 +543,11 @@ extern "C" char* PTR_s_Fabbri[] = {
     s_Mugnai_80332180, s_Pescatori_801DD778, s_Mercanti_801DD784, s_Alchimisti_801DD790,
 };
 extern "C" char* PTR_s_Forgeron[] = {
-    s_Forgeron_801DD79C, s_Tailleur_801DD7A8, lbl_80332188, lbl_80332190,
-    lbl_80332198, lbl_803321A0, s_Marchand_801DD7B4, s_Alchimiste_801DD7C0,
+    s_Forgeron_801DD79C, s_Tailleur_801DD7A8, s_Fermier_80332188, s_Eleveur_80332190,
+    s_Meunier_80332198, s_Pecheur_803321A0, s_Marchand_801DD7B4, s_Alchimiste_801DD7C0,
 };
 extern "C" char* PTR_s_Herrero[] = {
-    lbl_803321A8, lbl_803321B0, s_Campesino_801DD7CC, s_Granjero_801DD7D8,
+    s_Herrero_803321A8, s_Sastre_803321B0, s_Campesino_801DD7CC, s_Granjero_801DD7D8,
     s_Molinero_801DD7E4, s_Pescador_801DD7F0, s_Comerciante_801DD7FC, s_Alquimista_801DD808,
 };
 extern "C" char* gSingMenuTextTableEn[] = {

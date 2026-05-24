@@ -170,7 +170,7 @@ void CGraphic::Init()
     GXSetDispCopyDst(U16At(renderMode, 4), U16At(renderMode, 6));
     GXSetCopyFilter(reinterpret_cast<GXRenderModeObj*>(renderMode)->aa,
                     reinterpret_cast<GXRenderModeObj*>(renderMode)->sample_pattern, GX_TRUE,
-                    reinterpret_cast<GXRenderModeObj*>(renderMode)->vfilter);
+                    GXNtsc480IntDf.vfilter);
 
     if (reinterpret_cast<GXRenderModeObj*>(renderMode)->aa == 0) {
         GXSetPixelFmt(GX_PF_RGB8_Z24, GX_ZC_LINEAR);

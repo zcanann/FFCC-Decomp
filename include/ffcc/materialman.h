@@ -27,7 +27,6 @@ public:
     CTexScroll();
     ~CTexScroll();
 
-private:
     unsigned char m_type0;
     unsigned char m_type1;
     unsigned char m_pad[2];
@@ -148,6 +147,10 @@ public:
     void GetNumTexture();
     void SetTag(int);
     void AddTextureIdx(int, int);
+    CTexScroll* GetTexScroll(int index)
+    {
+        return reinterpret_cast<CTexScroll*>(reinterpret_cast<unsigned char*>(this) + 0x4C) + index;
+    }
 };
 
 class CMaterialSet : public CRef

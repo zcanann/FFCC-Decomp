@@ -91,12 +91,12 @@ static inline float CameraWorldZ()
 
 static inline Mtx& CameraMatrix()
 {
-    return *reinterpret_cast<Mtx*>(reinterpret_cast<u8*>(&CameraPcs) + 0x18);
+    return CameraPcs.m_cameraMatrix;
 }
 
 static inline Mtx44& CameraScreenMatrix()
 {
-    return *reinterpret_cast<Mtx44*>(reinterpret_cast<u8*>(&CameraPcs) + 0x48);
+    return CameraPcs.m_screenMatrix;
 }
 
 extern const char s_pppBlurChara_cpp[] = "pppBlurChara.cpp";

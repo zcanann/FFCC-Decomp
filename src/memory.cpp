@@ -40,32 +40,20 @@ static const char s_heapWalkerSeparator[] = {
     '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-',
     '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', ' ', '-'
 };
-extern const char s_AMEM_CACHE_DUMP_801D64F4[];
-extern const char s_amemCacheEntryFmt_801D6580[];
-extern const char s_refCntCompareBanner_801D65B4[];
-extern const char s_heapWalkerEntryFmt_801D68D8[];
-extern const char s_heapWalkerUseUnuseFmt_801D6958[];
-extern const char s_heapWalkerTitle_801D6BFC[];
-extern const char s_heapWalkerUseFmt_801D6C0C[];
-extern const char s_heapWalkerUnuseFmt_801D6C20[];
-extern const char s_heapWalkerTotalFmt_801D6C30[];
-extern const char s_amemCacheSeparator_8032F7C8[];
-#define s_heapWalkerTitle s_heapWalkerTitle_801D6BFC
-#define s_heapWalkerUseFmt s_heapWalkerUseFmt_801D6C0C
-#define s_heapWalkerUnuseFmt s_heapWalkerUnuseFmt_801D6C20
-#define s_heapWalkerTotalFmt s_heapWalkerTotalFmt_801D6C30
-#define s_heapWalkerBanner sHeapWalkerNewline
-#define s_heapWalkerEntryFmt s_heapWalkerEntryFmt_801D68D8
-#define s_heapWalkerUseUnuseFmt s_heapWalkerUseUnuseFmt_801D6958
-#define s_amemCacheAddRefFmt s_AMEM_CACHE_DUMP_801D64F4
-#define s_amemCacheSeparator s_amemCacheSeparator_8032F7C8
-#define s_refCntCompareBanner s_refCntCompareBanner_801D65B4
-#define s_amemCacheEntryFmt s_amemCacheEntryFmt_801D6580
-#define s_amemCacheEntryPaddedFmt s_amemCacheEntryFmt_801D6580
+extern const char sAmemCacheAddRefFmt[];
+extern const char sAmemCacheEntryFmt[];
+extern const char sRefCntCompareBanner[];
+extern const char sHeapWalkerEntryFmt[];
+extern const char sHeapWalkerUseUnuseFmt[];
+extern const char sHeapWalkerTitle[];
+extern const char sHeapWalkerUseFmt[];
+extern const char sHeapWalkerUnuseFmt[];
+extern const char sHeapWalkerTotalFmt[];
+extern const char sAmemCacheSeparator[];
 extern char sStageFreeCorruptBlockFmt[];
 extern char sStageAllocNoMemoryFmt[];
 extern char sStageQuitBlockUnfreedAllocFmt[];
-extern char s_copyFromAMemorySyncTimeout_801D6ABC[];
+extern char sCopyFromAMemorySyncTimeoutMsg[];
 extern char DAT_801d6b7c[];
 extern char DAT_801d6bb0[];
 extern char DAT_801d6c58[];
@@ -84,7 +72,7 @@ extern float kMemoryDrawOrthoBottom;
 extern float kMemoryDrawOrthoRight;
 extern float kMemoryDrawOrthoFar;
 extern const double kMemorySignedDoubleMagic = 4503601774854144.0;
-extern unsigned int s_heapBarColors_801D64A8[];
+extern unsigned int sHeapBarColors[];
 int g_alloc_ct;
 static int stageGetAllocationMode(CMemory::CStage* stage)
 {
@@ -501,7 +489,7 @@ void CMemory::HeapWalker()
 {
     System.Printf(const_cast<char*>(sHeapWalkerNewline));
     System.Printf(const_cast<char*>(sHeapWalkerSlashLine));
-    System.Printf(const_cast<char*>(s_heapWalkerTitle));
+    System.Printf(const_cast<char*>(sHeapWalkerTitle));
     System.Printf(const_cast<char*>(sHeapWalkerSlashLine));
 
     CStage* listHead = reinterpret_cast<CStage*>(reinterpret_cast<unsigned char*>(this) + 4);
@@ -523,20 +511,20 @@ void CMemory::HeapWalker()
                     *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(stage) + 0xC) -
                     *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(stage) + 8))
                     >> 10;
-                System.Printf(const_cast<char*>(s_heapWalkerUseFmt), useKB, stageGetSourceName(stage));
+                System.Printf(const_cast<char*>(sHeapWalkerUseFmt), useKB, stageGetSourceName(stage));
                 useTotal += useKB;
 
                 unsigned int unuseKB = static_cast<unsigned int>(
                     *reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(stage) + 4) + 8) -
                     *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(stage) + 0xC))
                     >> 10;
-                System.Printf(const_cast<char*>(s_heapWalkerUnuseFmt), unuseKB);
+                System.Printf(const_cast<char*>(sHeapWalkerUnuseFmt), unuseKB);
                 stage = *reinterpret_cast<CStage**>(reinterpret_cast<unsigned char*>(stage) + 4);
                 unuseTotal += unuseKB;
             }
 
             System.Printf(
-                const_cast<char*>(s_heapWalkerTotalFmt), useTotal + unuseTotal, useTotal, unuseTotal);
+                const_cast<char*>(sHeapWalkerTotalFmt), useTotal + unuseTotal, useTotal, unuseTotal);
         }
 
         listHead = reinterpret_cast<CStage*>(reinterpret_cast<unsigned char*>(listHead) + 0x27D8);
@@ -948,7 +936,7 @@ void CMemory::CopyFromAMemorySync(void* source, void* dest, unsigned long size)
             watch.Start();
         } else {
             if (static_cast<unsigned int>(System.m_execParam) >= 1) {
-                System.Printf(const_cast<char*>(s_copyFromAMemorySyncTimeout_801D6ABC));
+                System.Printf(const_cast<char*>(sCopyFromAMemorySyncTimeoutMsg));
             }
             Sound.CheckDriver(1);
             watch.Reset();
@@ -1141,7 +1129,7 @@ int CMemory::CStage::heapWalker(int flag, void*, unsigned long group)
     }
 
     if (flag == -1) {
-        System.Printf(const_cast<char*>(s_heapWalkerBanner));
+        System.Printf(const_cast<char*>(sHeapWalkerNewline));
         System.Printf(const_cast<char*>(s_heapWalkerStageNameFmt), stageGetSourceName(this));
         System.Printf(const_cast<char*>(s_heapWalkerHeaderFmt));
         System.Printf(const_cast<char*>(s_heapWalkerSeparator));
@@ -1164,7 +1152,7 @@ int CMemory::CStage::heapWalker(int flag, void*, unsigned long group)
             if (size != 0) {
                 if ((flag & 1) != 0) {
                     System.Printf(
-                        const_cast<char*>(s_heapWalkerEntryFmt), freeCount, "FREE", 0, top - blockTail, totalSize, 0, 0, 0,
+                        const_cast<char*>(sHeapWalkerEntryFmt), freeCount, "FREE", 0, top - blockTail, totalSize, 0, 0, 0,
                         "-------", 0);
                 }
                 usedSize += size;
@@ -1176,7 +1164,7 @@ int CMemory::CStage::heapWalker(int flag, void*, unsigned long group)
                 int used = *reinterpret_cast<int*>(node + 8) - *reinterpret_cast<int*>(node + 4);
                 if ((flag & 2) != 0) {
                     System.Printf(
-                        const_cast<char*>(s_heapWalkerEntryFmt), usedCount, "USED",
+                        const_cast<char*>(sHeapWalkerEntryFmt), usedCount, "USED",
                         *reinterpret_cast<unsigned char*>(node + 3), used, totalSize,
                         *reinterpret_cast<int*>(node + 4), 0, 0, reinterpret_cast<char*>(node + 0x1A),
                         *reinterpret_cast<unsigned short*>(node + 0x18));
@@ -1202,7 +1190,7 @@ int CMemory::CStage::heapWalker(int flag, void*, unsigned long group)
                     unsigned short line = isUsed ? *reinterpret_cast<unsigned short*>(node + 0x18) : 0;
                     int index = isUsed ? usedCount : freeCount;
                     System.Printf(
-                        const_cast<char*>(s_heapWalkerEntryFmt), index, kind, level, *reinterpret_cast<int*>(node + 0x10),
+                        const_cast<char*>(sHeapWalkerEntryFmt), index, kind, level, *reinterpret_cast<int*>(node + 0x10),
                         totalSize, node + 0x40, *reinterpret_cast<int*>(node + 4), *reinterpret_cast<int*>(node + 8),
                         source, line);
                 }
@@ -1225,7 +1213,7 @@ int CMemory::CStage::heapWalker(int flag, void*, unsigned long group)
 
     if (flag == -1) {
         System.Printf(const_cast<char*>(s_heapWalkerSeparator));
-        System.Printf(const_cast<char*>(s_heapWalkerUseUnuseFmt), freeSize, usedSize);
+        System.Printf(const_cast<char*>(sHeapWalkerUseUnuseFmt), freeSize, usedSize);
     }
 
     return freeSize;
@@ -1244,22 +1232,22 @@ void CMemory::CStage::drawHeapBar(int y)
 {
     _GXColor color;
     unsigned int colors[16];
-    colors[0] = s_heapBarColors_801D64A8[0];
-    colors[1] = s_heapBarColors_801D64A8[1];
-    colors[2] = s_heapBarColors_801D64A8[2];
-    colors[3] = s_heapBarColors_801D64A8[3];
-    colors[4] = s_heapBarColors_801D64A8[4];
-    colors[5] = s_heapBarColors_801D64A8[5];
-    colors[6] = s_heapBarColors_801D64A8[6];
-    colors[7] = s_heapBarColors_801D64A8[7];
-    colors[8] = s_heapBarColors_801D64A8[8];
-    colors[9] = s_heapBarColors_801D64A8[9];
-    colors[10] = s_heapBarColors_801D64A8[10];
-    colors[11] = s_heapBarColors_801D64A8[11];
-    colors[12] = s_heapBarColors_801D64A8[12];
-    colors[13] = s_heapBarColors_801D64A8[13];
-    colors[14] = s_heapBarColors_801D64A8[14];
-    colors[15] = s_heapBarColors_801D64A8[15];
+    colors[0] = sHeapBarColors[0];
+    colors[1] = sHeapBarColors[1];
+    colors[2] = sHeapBarColors[2];
+    colors[3] = sHeapBarColors[3];
+    colors[4] = sHeapBarColors[4];
+    colors[5] = sHeapBarColors[5];
+    colors[6] = sHeapBarColors[6];
+    colors[7] = sHeapBarColors[7];
+    colors[8] = sHeapBarColors[8];
+    colors[9] = sHeapBarColors[9];
+    colors[10] = sHeapBarColors[10];
+    colors[11] = sHeapBarColors[11];
+    colors[12] = sHeapBarColors[12];
+    colors[13] = sHeapBarColors[13];
+    colors[14] = sHeapBarColors[14];
+    colors[15] = sHeapBarColors[15];
 
     int prevNode;
     int node;
@@ -1960,7 +1948,7 @@ void CAmemCacheSet::AddRef(short index)
     entry.m_refCount += 1;
     if (entry.m_refCount == 0xFFFF) {
         if (2 < (unsigned int)System.m_execParam) {
-            System.Printf(const_cast<char*>(s_amemCacheAddRefFmt), static_cast<int>(index));
+            System.Printf(const_cast<char*>(sAmemCacheAddRefFmt), static_cast<int>(index));
         }
 
         for (int i = 0; i < m_cacheCount; i++) {
@@ -1969,14 +1957,14 @@ void CAmemCacheSet::AddRef(short index)
             if ((current.m_inUse != 0) || (data != 0)) {
                 if (2 < (unsigned int)System.m_execParam) {
                     System.Printf(
-                        const_cast<char*>(s_amemCacheEntryFmt), i, cacheStateName(current),
+                        const_cast<char*>(sAmemCacheEntryFmt), i, cacheStateName(current),
                         cacheTypeName(current), current.m_refCount, current.m_priority, data);
                 }
             }
         }
 
         if (2 < (unsigned int)System.m_execParam) {
-            System.Printf(const_cast<char*>(s_amemCacheSeparator));
+            System.Printf(const_cast<char*>(sAmemCacheSeparator));
         }
 
         void (*overflowHook)(int) = reinterpret_cast<void (*)(int)>(m_overflowHook);
@@ -2004,21 +1992,21 @@ void CAmemCacheSet::Release(short index)
 
     if (entry.m_refCount == 0xFFFF) {
         if (2 < (unsigned int)System.m_execParam) {
-            System.Printf(const_cast<char*>(s_amemCacheAddRefFmt));
+            System.Printf(const_cast<char*>(sAmemCacheAddRefFmt));
         }
 
         for (int i = 0; i < m_cacheCount; i++) {
             CAmemCache& cache = cacheEntryAt(this, i);
             if (((cache.m_inUse != 0) || (cache.m_cacheData != 0)) && (2 < (unsigned int)System.m_execParam)) {
                 System.Printf(
-                    const_cast<char*>(s_amemCacheEntryPaddedFmt), i, cacheStateName(cache),
+                    const_cast<char*>(sAmemCacheEntryFmt), i, cacheStateName(cache),
                     cacheTypeName(cache), cache.m_refCount,
                     cache.m_priority, reinterpret_cast<int>(cache.m_cacheData));
             }
         }
 
         if (2 < (unsigned int)System.m_execParam) {
-            System.Printf(const_cast<char*>(s_amemCacheSeparator));
+            System.Printf(const_cast<char*>(sAmemCacheSeparator));
         }
 
         void (*onUnderflow)(int) = reinterpret_cast<void (*)(int)>(m_overflowHook);
@@ -2082,7 +2070,7 @@ void CAmemCacheSet::AmemFreeLowPrio(int size)
         if (m_releaseAction == 0 || m_releaseAction(m_releaseActionArg) == 0) {
             m_releaseCheck(m_releaseCheckArg);
             if (2 < (unsigned int)System.m_execParam) {
-                System.Printf(const_cast<char*>(s_amemCacheAddRefFmt));
+                System.Printf(const_cast<char*>(sAmemCacheAddRefFmt));
             }
 
             for (int i = 0; i < m_cacheCount; i++) {
@@ -2090,13 +2078,13 @@ void CAmemCacheSet::AmemFreeLowPrio(int size)
                 int data = reinterpret_cast<int>(entry.m_cacheData);
                 if (((entry.m_inUse != 0) || (data != 0)) && (2 < (unsigned int)System.m_execParam)) {
                     System.Printf(
-                        const_cast<char*>(s_amemCacheEntryFmt), i, cacheStateName(entry),
+                        const_cast<char*>(sAmemCacheEntryFmt), i, cacheStateName(entry),
                         cacheTypeName(entry), entry.m_refCount, entry.m_priority, data);
                 }
             }
 
             if (2 < (unsigned int)System.m_execParam) {
-                System.Printf(const_cast<char*>(s_amemCacheSeparator));
+                System.Printf(const_cast<char*>(sAmemCacheSeparator));
             }
             m_stage->heapWalker(-1, nullptr, static_cast<unsigned long>(-1));
         }
@@ -2183,7 +2171,7 @@ void CAmemCacheSet::RefCnt0Clear()
  */
 void CAmemCacheSet::RefCnt0Compare()
 {
-    const char* dumpBase = reinterpret_cast<const char*>(s_heapBarColors_801D64A8);
+    const char* dumpBase = reinterpret_cast<const char*>(sHeapBarColors);
 
     if (static_cast<unsigned int>(System.m_execParam) >= 3) {
         System.Printf(const_cast<char*>(dumpBase + 0x10c));
@@ -2216,7 +2204,7 @@ void CAmemCacheSet::RefCnt0Compare()
 void CAmemCacheSet::AssertCache()
 {
     if (2 < (unsigned int)System.m_execParam) {
-        System.Printf(const_cast<char*>(s_amemCacheAddRefFmt));
+        System.Printf(const_cast<char*>(sAmemCacheAddRefFmt));
     }
 
     for (int i = 0; i < m_cacheCount; i++) {
@@ -2224,13 +2212,13 @@ void CAmemCacheSet::AssertCache()
         int data = reinterpret_cast<int>(entry.m_cacheData);
         if ((entry.m_inUse != 0 || data != 0) && (2 < (unsigned int)System.m_execParam)) {
             System.Printf(
-                const_cast<char*>(s_amemCacheEntryFmt), i, cacheStateName(entry),
+                const_cast<char*>(sAmemCacheEntryFmt), i, cacheStateName(entry),
                 cacheTypeName(entry), entry.m_refCount, entry.m_priority, data);
         }
     }
 
     if (2 < (unsigned int)System.m_execParam) {
-        System.Printf(const_cast<char*>(s_amemCacheSeparator));
+        System.Printf(const_cast<char*>(sAmemCacheSeparator));
     }
 }
 

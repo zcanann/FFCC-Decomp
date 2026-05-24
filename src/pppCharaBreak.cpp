@@ -22,7 +22,7 @@ extern Vec kPppCharaBreakUpVector;
 extern int kCharaBreakInitialVertexFlag0;
 extern int kCharaBreakInitialVertexFlag1;
 extern int kCharaBreakInitialVertexFlag2;
-extern "C" const char s_pppCharaBreak_cpp[] = "pppCharaBreak.cpp";
+extern "C" const char s_pppCharaBreak_cpp[24] = "pppCharaBreak.cpp";
 extern const float FLOAT_80332048;
 extern const float FLOAT_8033204c;
 extern const float FLOAT_80332050;

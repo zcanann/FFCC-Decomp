@@ -151,7 +151,7 @@ void CGObjWork::Init(int baseDataIndex, CRomWork* romWork, int idOffset)
 	m_romWorkPtr = reinterpret_cast<unsigned short*>(romData + 8);
 
 	memcpy(m_elementResistances, m_romWorkPtr + 0x6F, 0x16);
-	memset(m_statusTimers + 3, 0, 0x4E);
+	memset(m_statusTimers + 3, 0, sizeof(m_statusTimers) - 3 * sizeof(m_statusTimers[0]));
 	m_statusValues[0] = 0xFFFF;
 	m_statusValues[1] = 0xFFFF;
 	m_statusValues[2] = 0xFFFF;
@@ -265,22 +265,22 @@ void CCaravanWork::clearCaravanWork()
 	m_equipment[2] = -1;
 	m_equipment[3] = -1;
 	m_inventoryItemCount = 0;
-	memset(m_inventoryItems, 0xFF, 0x148);
-	memset(m_evtWorkArr, 0, 0x100);
-	memset(m_evtWordArr, 0, 0x200);
+	memset(m_inventoryItems, 0xFF, sizeof(m_backupInventoryBlock));
+	memset(m_evtWorkArr, 0, sizeof(m_evtWorkArr));
+	memset(m_evtWordArr, 0, sizeof(m_evtWordArr));
 	m_tempStatBuffTimer = 0;
 	m_tempStatBuffId = 0;
 	unk_0x3e6 = 0;
 	m_evtState0 = 0;
 	m_evtState1 = 0;
-	memset(m_commandListInventorySlotRef, 0xFF, 0x10);
-	memset(m_commandListExtra, 0, 0x10);
-	memset(&m_bonusCondition, 0, 1);
-	memset(m_equipEffectParams, 0, 7);
-	memset(&m_shopBusyFlag, 0, 1);
-	memset(&m_caravanLocalFlags, 0, 1);
+	memset(m_commandListInventorySlotRef, 0xFF, sizeof(m_commandListInventorySlotRef));
+	memset(m_commandListExtra, 0, sizeof(m_commandListExtra));
+	m_bonusCondition = 0;
+	memset(m_equipEffectParams, 0, sizeof(m_equipEffectParams) - sizeof(m_equipEffectParams[0]));
+	m_shopBusyFlag = 0;
+	m_caravanLocalFlags = 0;
 	m_inventoryItemCount = 0;
-	memset(m_inventoryItems, 0xFF, 0x148);
+	memset(m_inventoryItems, 0xFF, sizeof(m_backupInventoryBlock));
 	m_progressValue = 0;
 	m_numCmdListSlots = 4;
 	m_baseCmdListSlots = 4;
@@ -378,7 +378,7 @@ void CCaravanWork::Init(int baseDataIndex, CRomWork* romWork, int idOffset)
 	m_defense = romData[6];
 	m_romWorkPtr = romData + 8;
 	memcpy(m_elementResistances, m_romWorkPtr + 0x6F, 0x16);
-	memset(m_statusTimers + 3, 0, 0x4E);
+	memset(m_statusTimers + 3, 0, sizeof(m_statusTimers) - 3 * sizeof(m_statusTimers[0]));
 	m_statusValues[0] = 0xFFFF;
 	m_statusValues[1] = 0xFFFF;
 	m_statusValues[2] = 0xFFFF;
@@ -1845,7 +1845,7 @@ void CCaravanWork::CalcStatus()
 
 	m_equipEffectFlags = 0;
 	m_numCmdListSlots = m_baseCmdListSlots;
-	memset(m_equipEffectParams, 0, 7);
+	memset(m_equipEffectParams, 0, sizeof(m_equipEffectParams) - sizeof(m_equipEffectParams[0]));
 
 	if (m_tempStatBuffTimer != 0) {
 		int tempStatBuffId = m_tempStatBuffId;
@@ -2736,16 +2736,16 @@ void CCaravanWork::SortBeforeReturnWorldMap()
 void CCaravanWork::BackupTutorialItem(int mode)
 {
 	if (mode != 0) {
-		memcpy(m_backupInventoryBlock, m_inventoryItems, 0x148);
-		memset(m_inventoryItems, 0xFF, 0x148);
+		memcpy(m_backupInventoryBlock, m_inventoryItems, sizeof(m_backupInventoryBlock));
+		memset(m_inventoryItems, 0xFF, sizeof(m_backupInventoryBlock));
 		m_backupInventoryItemCount = m_inventoryItemCount;
 		m_inventoryItemCount = 0;
-		memcpy(m_backupCommandListInventorySlotRef, m_commandListInventorySlotRef, 0x10);
-		memset(m_commandListInventorySlotRef, 0xFF, 0x10);
-		memcpy(m_backupCmdlistExtra, m_commandListExtra, 0x10);
-		memset(m_commandListExtra, 0, 0x10);
-		memcpy(m_backupEquipment, m_equipment, 8);
-		memset(m_equipment, 0xFF, 8);
+		memcpy(m_backupCommandListInventorySlotRef, m_commandListInventorySlotRef, sizeof(m_backupCommandListInventorySlotRef));
+		memset(m_commandListInventorySlotRef, 0xFF, sizeof(m_commandListInventorySlotRef));
+		memcpy(m_backupCmdlistExtra, m_commandListExtra, sizeof(m_backupCmdlistExtra));
+		memset(m_commandListExtra, 0, sizeof(m_commandListExtra));
+		memcpy(m_backupEquipment, m_equipment, sizeof(m_backupEquipment));
+		memset(m_equipment, 0xFF, sizeof(m_equipment));
 		m_backupGil = m_gil;
 		m_gil = 0;
 		m_backupCurrentCmdListIndex = m_currentCmdListIndex;
@@ -2753,11 +2753,11 @@ void CCaravanWork::BackupTutorialItem(int mode)
 		m_backupWeaponIdx = m_weaponIdx;
 		m_weaponIdx = 0;
 	} else {
-		memcpy(m_inventoryItems, m_backupInventoryBlock, 0x148);
+		memcpy(m_inventoryItems, m_backupInventoryBlock, sizeof(m_backupInventoryBlock));
 		m_inventoryItemCount = m_backupInventoryItemCount;
-		memcpy(m_commandListInventorySlotRef, m_backupCommandListInventorySlotRef, 0x10);
-		memcpy(m_commandListExtra, m_backupCmdlistExtra, 0x10);
-		memcpy(m_equipment, m_backupEquipment, 8);
+		memcpy(m_commandListInventorySlotRef, m_backupCommandListInventorySlotRef, sizeof(m_backupCommandListInventorySlotRef));
+		memcpy(m_commandListExtra, m_backupCmdlistExtra, sizeof(m_backupCmdlistExtra));
+		memcpy(m_equipment, m_backupEquipment, sizeof(m_backupEquipment));
 		m_gil = m_backupGil;
 		m_currentCmdListIndex = m_backupCurrentCmdListIndex;
 		m_weaponIdx = m_backupWeaponIdx;
@@ -2926,7 +2926,7 @@ void CMonWork::Init(int baseDataIndex, CRomWork* romWork, int)
 	m_romWorkPtr = romData + 8;
 
 	memcpy(m_elementResistances, m_romWorkPtr + 0x6F, 0x16);
-	memset(m_statusTimers + 3, 0, 0x4E);
+	memset(m_statusTimers + 3, 0, sizeof(m_statusTimers) - 3 * sizeof(m_statusTimers[0]));
 	m_statusValues[0] = 0xFFFF;
 	m_statusValues[1] = 0xFFFF;
 	m_statusValues[2] = 0xFFFF;
@@ -2947,8 +2947,8 @@ void CMonWork::Init(int baseDataIndex, CRomWork* romWork, int)
 
 	memcpy(unk_0xac, romData + 0x56, 8);
 	memcpy(unk_0xb4, romData + 0x5A, 0x1C);
-	memset(unk_0xd0, 0, 0x20);
-	memset(unk_0xf0, 0, 0x20);
+	memset(unk_0xd0, 0, sizeof(unk_0xd0));
+	memset(unk_0xf0, 0, sizeof(unk_0xf0));
 
 	if (Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
 		int rank = Game.m_gameWork.m_bossArtifactStageTable[Game.m_gameWork.m_bossArtifactStageIndex];

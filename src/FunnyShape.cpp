@@ -9,9 +9,9 @@
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
 
-extern const GXColor DAT_8032fd58;
-extern const GXColor DAT_8032fd5c;
-extern GXColor DAT_8032fd60;
+extern const GXColor kFunnyShapeTextureChanColor;
+extern const GXColor kFunnyShapeTextureColor;
+extern GXColor kFunnyShapeRenderColor;
 extern const double DOUBLE_8032fd88;
 extern float FLOAT_8032fd64;
 extern float FLOAT_8032fd68;
@@ -412,7 +412,7 @@ void CFunnyShape::RenderShape()
     _GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_2, GX_TRUE, GX_TEVPREV);
     _GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
-    GXColor color = DAT_8032fd60;
+    GXColor color = kFunnyShapeRenderColor;
     GXSetChanAmbColor(GX_COLOR0, color);
     GXSetChanMatColor(GX_COLOR0, color);
 
@@ -445,7 +445,7 @@ void CFunnyShape::RenderTexture()
     GXSetNumTevStages(1);
     GXSetNumChans(1);
     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, 0x3C, 0, 0x7D);
-    GXColor chanColor = DAT_8032fd58;
+    GXColor chanColor = kFunnyShapeTextureChanColor;
     GXSetChanAmbColor(GX_COLOR0, chanColor);
     GXColor matColor = chanColor;
     GXSetChanMatColor(GX_COLOR0, matColor);
@@ -458,7 +458,7 @@ void CFunnyShape::RenderTexture()
     _GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_2, GX_TRUE, GX_TEVPREV);
     _GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
-    GXColor color = DAT_8032fd5c;
+    GXColor color = kFunnyShapeTextureColor;
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_SRCCLR, GX_LO_COPY);
     GXLoadTexObj(reinterpret_cast<GXTexObj*>(m_texObjData[0]), GX_TEXMAP0);
 
@@ -543,7 +543,7 @@ void CFunnyShape::Render()
     _GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
 
-    GXColor color = DAT_8032fd60;
+    GXColor color = kFunnyShapeRenderColor;
     GXSetChanAmbColor(GX_COLOR0, color);
     GXSetChanMatColor(GX_COLOR0, color);
 

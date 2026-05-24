@@ -80,7 +80,7 @@ public:
 	void CmakeDraw();
 
 	void CmakeNameOpen();
-	void CmakeNameCtrl();
+	int CmakeNameCtrl();
 	void CmakeNameClose();
 	void CmakeNameDraw();
 

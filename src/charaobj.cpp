@@ -743,7 +743,7 @@ void CGCharaObj::endPSlotBit(int slotMask)
 {
 	for (int i = 0; i < 0x16; i++) {
 		if ((static_cast<unsigned int>(slotMask) & (1U << i)) != 0) {
-			gCFlatRuntime2.EndParticleSlot(m_particleSlots[i], 1);
+			CFlatRuntime2Storage().EndParticleSlot(m_particleSlots[i], 1);
 		}
 	}
 }
@@ -761,7 +761,7 @@ void CGCharaObj::deletePSlotBit(int slotMask)
 {
 	for (int i = 0; i < 0x16; i++) {
 		if (((unsigned int)slotMask & (1U << i)) != 0) {
-			gCFlatRuntime2.DeleteParticleSlot(m_particleSlots[i], 1);
+			CFlatRuntime2Storage().DeleteParticleSlot(m_particleSlots[i], 1);
 		}
 	}
 }

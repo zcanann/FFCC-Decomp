@@ -117,6 +117,10 @@ enum {
 	kGbaQueuePlayerDataChannelCount = 4,
 	kGbaQueuePlayerDataBlockBytes = sizeof(GbaQueuePlayerDataView) * kGbaQueuePlayerDataChannelCount,
 	kGbaQueueCaravanNameBlockBytes = 0x80,
+	kGbaQueueEnemyDataBytes = 0x500,
+	kGbaQueueEnemyHistoryBlockBytes = kGbaQueueEnemyDataBytes * kGbaQueuePlayerDataChannelCount,
+	kGbaQueueMapItemDataBytes = 0x140,
+	kGbaQueueMapItemHistoryBlockBytes = kGbaQueueMapItemDataBytes * kGbaQueuePlayerDataChannelCount,
 	kGbaQueueLetterNpcNameBytes = 0x800,
 	kGbaQueueLetterSubjectNameBytes = 0x1800,
 	kGbaQueueLetterEntryAllocWords = 0x1000,
@@ -129,6 +133,8 @@ enum {
 
 STATIC_ASSERT(kGbaQueuePlayerDataBlockBytes == 0x370);
 STATIC_ASSERT(sizeof(GbaPInfo) == kGbaQueuePlayerDataBlockBytes);
+STATIC_ASSERT(kGbaQueueEnemyHistoryBlockBytes == 0x1400);
+STATIC_ASSERT(kGbaQueueMapItemHistoryBlockBytes == 0x500);
 
 static inline GbaQueueFlagView* GetFlagView(GbaQueue* gbaQueue)
 {
@@ -216,10 +222,10 @@ void GbaQueue::Init()
 	memset(obj + 0x440, 0, 4);
 	memset(GetPlayerDataBlock(this), 0, kGbaQueuePlayerDataBlockBytes);
 	memset(obj + 0x7C4, 0, kGbaQueuePlayerDataBlockBytes);
-	memset(obj + 0xB34, 0, 0x500);
-	memset(obj + 0x1034, 0, 0x1400);
-	memset(obj + 0x2434, 0, 0x140);
-	memset(obj + 0x2574, 0, 0x500);
+	memset(obj + 0xB34, 0, kGbaQueueEnemyDataBytes);
+	memset(obj + 0x1034, 0, kGbaQueueEnemyHistoryBlockBytes);
+	memset(obj + 0x2434, 0, kGbaQueueMapItemDataBytes);
+	memset(obj + 0x2574, 0, kGbaQueueMapItemHistoryBlockBytes);
 	memset(obj + 0x2A74, 0, kGbaQueueCaravanNameBlockBytes);
 	memset(obj + 0x2B00, 0, 0x188);
 	memset(obj + 0x2C8E, 0, 8);
@@ -1598,7 +1604,7 @@ void GbaQueue::LoadPlayerStat()
  */
 void GbaQueue::LoadEnemyStat()
 {
-	unsigned char localEnemyData[0x500];
+	unsigned char localEnemyData[kGbaQueueEnemyDataBytes];
 	unsigned int* enemyObjPtrs;
 	unsigned int* enemyWorkPtrs;
 	GbaQueue* semaphoreIter;
@@ -1682,7 +1688,7 @@ void GbaQueue::LoadEnemyStat()
  */
 void GbaQueue::LoadMapItemStat()
 {
-	unsigned char localMapItems[0x140];
+	unsigned char localMapItems[kGbaQueueMapItemDataBytes];
 	char numMapItems;
 	CGObject* object;
 	GbaQueue* semaphoreIter;
@@ -1860,9 +1866,9 @@ void GbaQueue::GetEnemyPos(int channel, unsigned int* outData, int* outCount)
 
     baseX = *reinterpret_cast<short*>(obj + channel * 0xDC + 0x32);
     baseZ = *reinterpret_cast<short*>(obj + channel * 0xDC + 0x34);
-    memcpy(localEnemyData, obj + 0xB34, 0x500);
+    memcpy(localEnemyData, obj + 0xB34, kGbaQueueEnemyDataBytes);
 
-    prevEntry = obj + channel * 0x500 + 0x1034;
+    prevEntry = obj + channel * kGbaQueueEnemyDataBytes + 0x1034;
     radarMode = obj[channel + 0x2D32];
     localEntry = localEnemyData;
     for (i = 0; i < 0x40; i++) {
@@ -1916,7 +1922,7 @@ void GbaQueue::GetEnemyPos(int channel, unsigned int* outData, int* outCount)
     }
 
     *outCount = count;
-    memcpy(obj + channel * 0x500 + 0x1034, localEnemyData, 0x500);
+    memcpy(obj + channel * kGbaQueueEnemyDataBytes + 0x1034, localEnemyData, kGbaQueueEnemyDataBytes);
     OSSignalSemaphore(accessSemaphores + channel);
 }
 
@@ -1931,7 +1937,7 @@ void GbaQueue::GetEnemyPos(int channel, unsigned int* outData, int* outCount)
  */
 void GbaQueue::GetTreasurePos(int channel, unsigned int* outData, int* outCount)
 {
-	char localMapItems[0x140];
+	char localMapItems[kGbaQueueMapItemDataBytes];
 	char* obj;
 	char* localEntry;
 	char* prevEntry;
@@ -1980,7 +1986,7 @@ void GbaQueue::GetTreasurePos(int channel, unsigned int* outData, int* outCount)
 
 	count = 0;
 	localEntry = localMapItems;
-	prevEntry = obj + channel * 0x140 + 0x2574;
+	prevEntry = obj + channel * kGbaQueueMapItemDataBytes + 0x2574;
 	outPtr = reinterpret_cast<unsigned char*>(outData);
 	for (i = 0; i < static_cast<unsigned char>(obj[0x2AF4]); i++) {
 		if ((localEntry[0] != 0 || prevEntry[0] != 0) && memcmp(localEntry, prevEntry, 0x14) != 0) {
@@ -1997,7 +2003,7 @@ void GbaQueue::GetTreasurePos(int channel, unsigned int* outData, int* outCount)
 	}
 
 	*outCount = count;
-	memcpy(obj + channel * 0x140 + 0x2574, localMapItems, sizeof(localMapItems));
+	memcpy(obj + channel * kGbaQueueMapItemDataBytes + 0x2574, localMapItems, sizeof(localMapItems));
 	OSSignalSemaphore(accessSemaphores + channel);
 }
 

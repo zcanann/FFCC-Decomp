@@ -360,7 +360,7 @@ void CPartMng::Destroy()
                 }
             }
         }
-        __destroy_arr(res->m_pppModelStArr, reinterpret_cast<ConstructorDestructor>(__dt__10pppModelStFv), 0x6c, 0x100);
+        __destroy_arr(res->m_pppModelStArr, reinterpret_cast<ConstructorDestructor>(__dt__10pppModelStFv), sizeof(pppModelSt), 0x100);
         operator delete(res->m_pppModelStArr);
         res->m_pppModelStArr = 0;
     }
@@ -384,7 +384,7 @@ void CPartMng::Destroy()
                 }
             }
         }
-        __destroy_arr(res->m_pppShapeStArr, reinterpret_cast<ConstructorDestructor>(__dt__10pppShapeStFv), 0x2c, 0x100);
+        __destroy_arr(res->m_pppShapeStArr, reinterpret_cast<ConstructorDestructor>(__dt__10pppShapeStFv), sizeof(pppShapeSt), 0x100);
         operator delete(res->m_pppShapeStArr);
         res->m_pppShapeStArr = 0;
     }
@@ -3474,10 +3474,10 @@ void CPartMng::pppLoadPmd(const char* baseName)
         CMemory::CStage* stageLoad = PartPcs.m_usbStreamData.m_stageLoad;
         pppModelSt* modelArray = reinterpret_cast<pppModelSt*>(
             operator new(
-                0x6c00, stageLoad, const_cast<char*>(s_partMng_cpp), 0xca9));
+                sizeof(pppModelSt) * 0x100, stageLoad, const_cast<char*>(s_partMng_cpp), 0xca9));
         if (modelArray != 0) {
             __construct_array(modelArray, reinterpret_cast<ConstructorDestructor>(__ct__10pppModelStFv),
-                              reinterpret_cast<ConstructorDestructor>(__dt__10pppModelStFv), 0x6c, 0x100);
+                              reinterpret_cast<ConstructorDestructor>(__dt__10pppModelStFv), sizeof(pppModelSt), 0x100);
             for (int i = 0; i < 0x100; i++) {
                 modelArray[i].m_isUsed = 0;
             }
@@ -3592,10 +3592,10 @@ void CPartMng::pppLoadPan(const char* baseName)
         CMemory::CStage* stageLoad = PartPcs.m_usbStreamData.m_stageLoad;
         pppShapeSt* shapeArray = reinterpret_cast<pppShapeSt*>(
             operator new(
-                0x2c00, stageLoad, const_cast<char*>(s_partMng_cpp), 0xd0b));
+                sizeof(pppShapeSt) * 0x100, stageLoad, const_cast<char*>(s_partMng_cpp), 0xd0b));
         if (shapeArray != 0) {
             __construct_array(shapeArray, reinterpret_cast<ConstructorDestructor>(__ct__10pppShapeStFv),
-                              reinterpret_cast<ConstructorDestructor>(__dt__10pppShapeStFv), 0x2c, 0x100);
+                              reinterpret_cast<ConstructorDestructor>(__dt__10pppShapeStFv), sizeof(pppShapeSt), 0x100);
             for (int i = 0; i < 0x100; i++) {
                 shapeArray[i].m_inUse = 0;
             }
@@ -4600,7 +4600,7 @@ extern "C" void __sinit_partMng_cpp(void)
     // delete this function so the compiler auto-generates it.
 
     __construct_array(reinterpret_cast<unsigned char*>(&PartMng) + 0x2A18,
-                      reinterpret_cast<ConstructorDestructor>(__ct__9_pppMngStFv), 0, 0x158, 0x180);
+                      reinterpret_cast<ConstructorDestructor>(__ct__9_pppMngStFv), 0, sizeof(_pppMngSt), 0x180);
 
     g_dcp.m_soundEffectParams.m_soundEffectHandle = -1;
     g_dcp.m_soundEffectParams.m_soundEffectSlot = -1;

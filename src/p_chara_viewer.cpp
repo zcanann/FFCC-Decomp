@@ -163,6 +163,11 @@ static inline int ViewerModelFrameShift(CChara::CModel* model)
     return ViewerModel(model)->data->frameShift;
 }
 
+static inline float LoadFloat(const float& value)
+{
+    return value;
+}
+
 extern "C" const char s_no_texture____801da7e8[0x188] =
     "no texture...\0\0\0"
     "p_chara_viewer.cpp\0\0"
@@ -845,12 +850,12 @@ void CCharaPcs::createViewer()
 
     CLightPcs::CBumpLight bumpLight;
     bumpLight.m_type = 1;
-    bumpLight.m_position.x = kCharaViewerLightPosX;
-    bumpLight.m_position.y = kCharaViewerLightPosY;
-    bumpLight.m_position.z = kCharaViewerLightPosZ;
-    bumpLight.m_targetPosition.x = kCharaViewerLightTargetX;
-    bumpLight.m_targetPosition.y = kCharaViewerLightTargetY;
-    bumpLight.m_targetPosition.z = kCharaViewerLightTargetZ;
+    bumpLight.m_position.x = LoadFloat(kCharaViewerLightPosX);
+    bumpLight.m_position.y = LoadFloat(kCharaViewerLightPosY);
+    bumpLight.m_position.z = LoadFloat(kCharaViewerLightPosZ);
+    bumpLight.m_targetPosition.x = LoadFloat(kCharaViewerLightTargetX);
+    bumpLight.m_targetPosition.y = LoadFloat(kCharaViewerLightTargetY);
+    bumpLight.m_targetPosition.z = LoadFloat(kCharaViewerLightTargetZ);
     PSVECSubtract(reinterpret_cast<Vec*>(&bumpLight.m_targetPosition), reinterpret_cast<Vec*>(&bumpLight.m_position),
                   reinterpret_cast<Vec*>(&bumpLight.m_direction));
     PSVECNormalize(reinterpret_cast<Vec*>(&bumpLight.m_direction), reinterpret_cast<Vec*>(&bumpLight.m_direction));

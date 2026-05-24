@@ -93,6 +93,7 @@ static const char s_MenuTexWin2_8_803307AC[] = "win2_8";
 static const char s_MenuTexButton_803307B4[] = "button";
 static const char s_MenuRegionShibuya_803307BC[] = "shibuya";
 static const char s_MenuRegionFace_803307C4[] = "face";
+extern const char s_common_80330708[8];
 static const char s_MenuTexBattle_803307CC[] = "battle";
 static const char s_MenuTexHeart_803307D4[] = "heart";
 static const char s_MenuTexNavi_803307DC[] = "navi";
@@ -359,8 +360,13 @@ void CMenuPcs::create()
     sprintf(fontPath, const_cast<char*>(s_dvd__smenu_gc22_fnt_801d9db4), Game.GetLangString());
     loadFont(0, fontPath, 0, 0);
 
+    static const char* tName[] = {
+        s_common_80330708,
+        s_MenuRegionShibuya_803307BC
+    };
+
     for (int i = 0; i < 2; i++) {
-        sprintf(texPath, const_cast<char*>(s_dvd__smenu__s_tex_801d9d6c), Game.GetLangString(), sMenuTextureRegionNameTable[i]);
+        sprintf(texPath, const_cast<char*>(s_dvd__smenu__s_tex_801d9d6c), Game.GetLangString(), tName[i]);
 
         CFile::CHandle* fileHandle = File.Open(texPath, 0, CFile::PRI_LOW);
         if (fileHandle != 0) {
@@ -372,9 +378,7 @@ void CMenuPcs::create()
 
             CTextureSet* textureSet = new (Game.m_mainStage, const_cast<char*>(s_p_menu_cpp), 0x182) CTextureSet;
             *reinterpret_cast<CTextureSet**>(self + 0x14C + i * 4) = textureSet;
-            if (textureSet != 0) {
-                textureSet->Create(File.m_readBuffer, reinterpret_cast<CMemory::CStage*>(stage), 0, 0, 0, 0);
-            }
+            textureSet->Create(File.m_readBuffer, reinterpret_cast<CMemory::CStage*>(stage), 0, 0, 0, 0);
 
             File.Close(fileHandle);
         }

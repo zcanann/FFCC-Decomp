@@ -903,14 +903,12 @@ void drawCommand(int state, CFont* font, float posX, float posY, CCaravanWork* c
  */
 void CRingMenu::onCalc()
 {
-	const int menuIndex = m_menuIndex;
-	if ((Game.m_gameWork.m_menuStageMode == 0) || (menuIndex < 1)) {
-		const int animDirection = m_displayDirection;
+	if ((Game.m_gameWork.m_menuStageMode == 0) || (m_menuIndex < 1)) {
 		const unsigned int targetAnimDirection =
 			(CFlatEnabledEventFlags() >> 2) & 1;
-		if (animDirection != static_cast<int>(targetAnimDirection)) {
-			System.Printf(const_cast<char*>(sRingMenuDisplayToggleChangedFmt), menuIndex, targetAnimDirection);
-			m_displayDirection = (static_cast<unsigned int>(__cntlzw(static_cast<unsigned int>(animDirection))) >> 5) & 0xFF;
+		if (m_displayDirection != static_cast<int>(targetAnimDirection)) {
+			System.Printf(const_cast<char*>(sRingMenuDisplayToggleChangedFmt), m_menuIndex, targetAnimDirection);
+			m_displayDirection = (static_cast<unsigned int>(__cntlzw(static_cast<unsigned int>(m_displayDirection))) >> 5) & 0xFF;
 			m_displayCounter = 0x10 - m_displayCounter;
 		}
 
@@ -940,14 +938,14 @@ void CRingMenu::onCalc()
 			i--;
 		}
 
-		unsigned short ctrlMode = Joybus.GetCtrlMode(menuIndex);
+		int ctrlMode = Joybus.GetCtrlMode(m_menuIndex);
 		unsigned int gbaConnected = (static_cast<unsigned int>(__cntlzw(1 - ctrlMode)) >> 5) & 0xFF;
 
-		if (!Joybus.GetGBAStart(menuIndex)) {
+		if (!Joybus.GetGBAStart(m_menuIndex)) {
 			gbaConnected = 1;
 		}
 
-		if ((Joybus.GetPadType(menuIndex) == 0x09000000) || (Joybus.GetPadType(menuIndex) == 0x8B100000)) {
+		if ((Joybus.GetPadType(m_menuIndex) == 0x09000000) || (Joybus.GetPadType(m_menuIndex) == 0x8B100000)) {
 			gbaConnected = 0;
 		}
 
@@ -957,7 +955,7 @@ void CRingMenu::onCalc()
 		}
 		m_gbaAnimCounter = clampDecToZero(m_gbaAnimCounter);
 
-		CGPartyObj* partyObj = Game.m_partyObjArr[menuIndex];
+		CGPartyObj* partyObj = Game.m_partyObjArr[m_menuIndex];
 		if (partyObj != 0) {
 			CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(partyObj->m_scriptHandle);
 			int currentCmd = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Chara) + 0x2004);
@@ -1002,10 +1000,10 @@ void CRingMenu::onCalc()
 					int dirNeg = (*trackedCmd == next) ? 1 : 0;
 					if (dirPos != 0 && dirNeg != 0) {
 						unsigned short trigger = 0;
-						if ((Pad._452_4_ == 0) && !((menuIndex == 0) && (Pad._448_4_ != -1))) {
+						if ((Pad._452_4_ == 0) && !((m_menuIndex == 0) && (Pad._448_4_ != -1))) {
 							const int idx =
-								menuIndex &
-								~(static_cast<int>(~(Pad._448_4_ - menuIndex | menuIndex - Pad._448_4_)) >> 31);
+								m_menuIndex &
+								~(static_cast<int>(~(Pad._448_4_ - m_menuIndex | m_menuIndex - Pad._448_4_)) >> 31);
 							trigger = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Pad) + 4 + idx * 0x54);
 						}
 						scrollDelta = ((trigger & 0x40) != 0) ? static_cast<double>(dirPos) : -static_cast<double>(dirNeg);

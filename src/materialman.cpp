@@ -2385,7 +2385,7 @@ void CMaterialMan::ErrorTexMapIdCur()
 extern "C" CMaterial* __dt__Q29CMaterial25_class_529materialman_cppFv(CMaterial* material, short shouldDelete)
 {
     if (material != 0) {
-        __destroy_arr(Ptr(material, 0x10), reinterpret_cast<ConstructorDestructor>(__dt__10CTexScrollFv), 0x14, 4);
+        __destroy_arr(Ptr(material, 0x10), reinterpret_cast<ConstructorDestructor>(__dt__10CTexScrollFv), sizeof(CTexScroll), 4);
         if (shouldDelete > 0) {
             operator delete(material);
         }
@@ -2448,7 +2448,7 @@ CMaterial::~CMaterial()
         *reinterpret_cast<void**>(textureRef) = 0;
     }
 
-    __destroy_arr(GetTexScroll(0), reinterpret_cast<ConstructorDestructor>(__dt__10CTexScrollFv), 0x14, 4);
+    __destroy_arr(GetTexScroll(0), reinterpret_cast<ConstructorDestructor>(__dt__10CTexScrollFv), sizeof(CTexScroll), 4);
 }
 
 /*
@@ -2463,7 +2463,7 @@ CMaterial::~CMaterial()
 CMaterial::CMaterial()
 {
     __construct_array(GetTexScroll(0), reinterpret_cast<ConstructorDestructor>(__ct__10CTexScrollFv),
-                      reinterpret_cast<ConstructorDestructor>(__dt__10CTexScrollFv), 0x14, 4);
+                      reinterpret_cast<ConstructorDestructor>(__dt__10CTexScrollFv), sizeof(CTexScroll), 4);
     memset(Ptr(this, 0x8), 0, 0x10);
     *reinterpret_cast<int*>(Ptr(this, 0x9C)) = -1;
     *Ptr(this, 0xA0) = 4;

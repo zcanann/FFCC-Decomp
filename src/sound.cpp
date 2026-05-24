@@ -167,31 +167,31 @@ extern "C" int Calc__9CLine(float maxDistance, CLine<10>* line, Vec* outPos, flo
     u32 bestIndex = 0;
     float bestT = kLineSegmentMinT;
     Vec bestPos;
-    Vec* point = line->points;
-    CLineSegment* segment = line->segments;
 
-    for (u32 i = 0; i < line->pointCount - 1; i++, point++, segment++) {
-        const Vec* candidate = point;
+    for (u32 i = 0; i + 1 < line->pointCount; i++) {
+        Vec* candidate = &line->points[i];
         float distanceSq = PSVECSquareDistance(candidate, queryPos);
         if (distanceSq < maxDistanceSq || infiniteRange) {
+            Vec candidatePosition = *candidate;
             float distance = sqrtf(distanceSq);
             if (distance < bestDistance) {
                 bestDistance = distance;
-                bestPos = *candidate;
+                bestPos = candidatePosition;
                 bestIndex = i;
                 bestT = kLineSegmentMinT;
                 found = 1;
             }
         }
 
-        if (i == line->pointCount - 2) {
-            candidate = point + 1;
+        if (i + 1 == line->pointCount - 1) {
+            candidate = &line->points[i + 1];
             distanceSq = PSVECSquareDistance(candidate, queryPos);
             if (distanceSq < maxDistanceSq || infiniteRange) {
+                Vec candidatePosition = *candidate;
                 float distance = sqrtf(distanceSq);
                 if (distance < bestDistance) {
                     bestDistance = distance;
-                    bestPos = *candidate;
+                    bestPos = candidatePosition;
                     bestIndex = i;
                     bestT = kLineSegmentMaxT;
                     found = 1;
@@ -199,14 +199,15 @@ extern "C" int Calc__9CLine(float maxDistance, CLine<10>* line, Vec* outPos, flo
             }
         }
 
-        const float dotQuery = PSVECDotProduct(queryPos, &segment->delta);
-        const float dotStart = PSVECDotProduct(point, &segment->delta);
-        const float t = (dotQuery - dotStart) / (segment->length * segment->length);
+        CLineSegment& segment = line->segments[i];
+        const float dotQuery = PSVECDotProduct(queryPos, &segment.delta);
+        const float dotStart = PSVECDotProduct(&line->points[i], &segment.delta);
+        const float t = (dotQuery - dotStart) / (segment.length * segment.length);
         if (((kLineSegmentMinT <= t) && (t <= kLineSegmentMaxT)) || infiniteRange) {
             Vec scaled;
             Vec projected;
-            PSVECScale(&segment->delta, &scaled, t);
-            PSVECAdd(point, &scaled, &projected);
+            PSVECScale(&segment.delta, &scaled, t);
+            PSVECAdd(&line->points[i], &scaled, &projected);
             const float distance = PSVECDistance(queryPos, &projected);
             if (distance < bestDistance) {
                 bestDistance = distance;

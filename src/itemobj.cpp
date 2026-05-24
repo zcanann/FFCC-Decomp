@@ -36,8 +36,8 @@ extern const double DOUBLE_80331B60 = 4503599627370496.0;
 extern const float FLOAT_80331b68 = 0.125f;
 extern const double DOUBLE_80331B70 = 4503601774854144.0;
 extern const float FLOAT_80331B78 = 15.0f;
-extern const char DAT_80331b7c[] = "c_item3";
-extern const char DAT_80331b84[] = "l_item";
+extern const char s_itemAttachCenterItem3[] = "c_item3";
+extern const char s_itemAttachLeftItem[] = "l_item";
 extern const float FLOAT_80331b8c = 3.1415927410125732f;
 extern const float FLOAT_80331b90 = 3.0f;
 extern const float FLOAT_80331b94 = 8.0f;
@@ -52,7 +52,7 @@ extern const float FLOAT_80331bb8 = 20.0f;
 extern const float FLOAT_80331bbc = 0.25f;
 extern const float FLOAT_80331BC0 = 0.019999999552965164f;
 extern const float FLOAT_80331BC4 = 1.5f;
-extern const char DAT_80331bc8[] = "hip";
+extern const char s_itemDamageBoneHip[] = "hip";
 u32 gItemObjCreateFlags;
 extern char SoundBuffer[];
 static const char sNumFreeItemFmt[] = "num free item = %d\n";
@@ -637,9 +637,9 @@ void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 				}
 			}
 
-			const char* attachName = DAT_80331b84;
+			const char* attachName = s_itemAttachLeftItem;
 			if (useBossAttachName) {
-				attachName = DAT_80331b7c;
+				attachName = s_itemAttachCenterItem3;
 			}
 			Attach(partyObj, const_cast<char*>(attachName), reinterpret_cast<Vec*>(&attachOffset));
 			changeStat(0, 0, 0);
@@ -986,9 +986,9 @@ void CGItemObj::onFrameStat()
 				}
 			}
 
-			const char* attachName = DAT_80331b84;
+			const char* attachName = s_itemAttachLeftItem;
 			if (useBossAttachName) {
-				attachName = DAT_80331b7c;
+				attachName = s_itemAttachCenterItem3;
 			}
 			Attach(*reinterpret_cast<CGObject**>(self + 0x550), const_cast<char*>(attachName),
 			       reinterpret_cast<Vec*>(&attachOffset));
@@ -1350,7 +1350,7 @@ void CGItemObj::onFrame()
 			putParticle((soundEntry << 8) | ownerScriptSlot, m_particleSlot, this, particleScale, 0x12909);
 
 			CVector zero(FLOAT_80331b20, FLOAT_80331b20, FLOAT_80331b20);
-			SetDamageCol(0, const_cast<char*>(DAT_80331bc8), FLOAT_80331bb8, FLOAT_80331bb8,
+			SetDamageCol(0, const_cast<char*>(s_itemDamageBoneHip), FLOAT_80331bb8, FLOAT_80331bb8,
 			             reinterpret_cast<Vec*>(&zero));
 			*reinterpret_cast<unsigned int*>(&m_damageColliders[1].m_localPosition.x) = 8;
 			addSubStat();

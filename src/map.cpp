@@ -3344,18 +3344,25 @@ void CMapMng::GetMapObjWMtx(int mapObjIndex, float (*destination)[4])
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8002f7a4
+ * PAL Size: 220b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
+#pragma dont_inline on
 void CMapMng::SetMapObjAnim(int mapObjIndex, int startFrame, int endFrame, int loop)
 {
-    CPtrArray<CMapAnimRun*>* mapAnimRunArray = &GetMapAnimRunArray();
-    CPtrArray<CMapAnim*>* mapAnimArray = &GetMapAnimArray();
+    CPtrArray<CMapAnimRun*>* mapAnimRunArray =
+        reinterpret_cast<CPtrArray<CMapAnimRun*>*>(reinterpret_cast<unsigned char*>(this) + 0x213E0);
+    CPtrArray<CMapAnim*>* mapAnimArray =
+        reinterpret_cast<CPtrArray<CMapAnim*>*>(reinterpret_cast<unsigned char*>(this) + 0x213FC);
     CMapAnimRun* foundMapAnimRun = 0;
-    CMapObj* mapObj = GetMapObjArray() + mapObjIndex;
+    CMapObj* mapObj = m_mapObjArray + mapObjIndex;
     int mapAnimRunCount = mapAnimRunArray->GetSize();
 
-    for (unsigned int mapAnimRunIndex = 0; mapAnimRunIndex < static_cast<unsigned int>(mapAnimRunCount); mapAnimRunIndex++) {
+    for (int mapAnimRunIndex = 0; mapAnimRunIndex < mapAnimRunCount; mapAnimRunIndex++) {
         CMapAnimRun* mapAnimRun = (*mapAnimRunArray)[mapAnimRunIndex];
         CPtrArray<CMapAnimNode*>* mapAnimNodeArray =
             reinterpret_cast<CPtrArray<CMapAnimNode*>*>((*mapAnimArray)[mapAnimRun->m_mapAnimIndex]);
@@ -3373,6 +3380,7 @@ void CMapMng::SetMapObjAnim(int mapObjIndex, int startFrame, int endFrame, int l
 startMapObjAnim:
     foundMapAnimRun->Start(startFrame, endFrame, loop);
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--

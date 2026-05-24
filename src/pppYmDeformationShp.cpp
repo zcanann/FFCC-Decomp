@@ -432,20 +432,16 @@ int RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* verti
 
 	PSMTXIdentity(texMtx);
 	texMtx[0][0] = ppvScreenMatrix[0][0];
-	texMtx[0][1] = ppvScreenMatrix[0][1];
 	texMtx[0][2] = ppvScreenMatrix[0][2];
-	texMtx[1][0] = ppvScreenMatrix[1][0];
-	texMtx[1][1] = ppvScreenMatrix[1][1];
 	texMtx[1][2] = ppvScreenMatrix[1][2];
-	texMtx[2][0] = ppvScreenMatrix[2][0];
-	texMtx[2][1] = ppvScreenMatrix[2][1];
+	texMtx[1][1] = ppvScreenMatrix[1][1];
 	texMtx[2][2] = ppvScreenMatrix[2][2];
+	texMtx[1][0] = ppvScreenMatrix[1][0];
+	texMtx[2][0] = ppvScreenMatrix[2][0];
+	texMtx[0][1] = ppvScreenMatrix[0][1];
+	texMtx[2][1] = ppvScreenMatrix[2][1];
 	texMtx[0][0] = ppvScreenMatrix[0][0] * (320.0f / (float)width);
 	texMtx[1][1] = ppvScreenMatrix[1][1] * -(224.0f / (float)height);
-	texMtx[1][0] = ppvScreenMatrix[1][0];
-	texMtx[2][0] = ppvScreenMatrix[2][0];
-	texMtx[0][1] = ppvScreenMatrix[0][1];
-	texMtx[2][1] = ppvScreenMatrix[2][1];
 	texMtx[0][2] = -0.5f;
 	texMtx[1][2] = -0.5f;
 	texMtx[2][2] = -1.0f;

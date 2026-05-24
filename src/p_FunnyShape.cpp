@@ -1,3 +1,4 @@
+#define FFCC_DEFINE_FUNNYSHAPEPCS_STORAGE
 #include "ffcc/p_FunnyShape.h"
 #include "ffcc/FunnyShape.h"
 #include "ffcc/USBStreamData.h"
@@ -57,6 +58,12 @@ static const char s_CPtrArray_GXTexObj[] = "CPtrArray<_GXTexObj *>";
 extern const char __RTTI__8CManager_8032E660[];
 extern const char __RTTI__8CProcess_8032E668[];
 extern u8 ARRAY_8026D728[];
+extern void* __vt__8CManager[];
+extern void* __vt__14CFunnyShapePcs[];
+extern "C" void __ct__14CUSBStreamDataFv(CUSBStreamData*);
+extern "C" void __ct__11CFunnyShapeFv(CFunnyShape*);
+extern "C" void __ct__29CPtrArray_P15OSFS_TEXTURE_ST_Fv(CPtrArray<OSFS_TEXTURE_ST*>*);
+extern "C" void __ct__22CPtrArray_P9_GXTexObj_Fv(CPtrArray<_GXTexObj*>*);
 
 extern "C" const char s_funnyShapeSpinner[5];
 
@@ -393,6 +400,19 @@ void CPtrArray<OSFS_TEXTURE_ST*>::RemoveAll()
 
 /*
  * --INFO--
+ * Address: TODO
+ * Size: TODO
+ */
+inline CFunnyShapePcs::CFunnyShapePcs()
+{
+    new (UsbStream(this)) CUSBStreamData;
+    new (FunnyShape(this)) CFunnyShape;
+    new (TextureHeaders(this)) CPtrArray<OSFS_TEXTURE_ST*>;
+    new (TextureObjects(this)) CPtrArray<_GXTexObj*>;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x8004e844
  * PAL Size: 288b
  * EN Address: TODO
@@ -402,14 +422,20 @@ void CPtrArray<OSFS_TEXTURE_ST*>::RemoveAll()
  */
 extern "C" void __sinit_p_FunnyShape_cpp(void)
 {
-    CFunnyShapePcs* pcs = new (&FunnyShapePcs) CFunnyShapePcs;
-    u8* self = reinterpret_cast<u8*>(pcs);
+    CFunnyShapePcs* self = reinterpret_cast<CFunnyShapePcs*>(FunnyShapePcs);
     unsigned int* dst = CFunnyShapePcs::m_table;
     unsigned int* desc0 = CFunnyShapePcs::m_table_desc0;
     unsigned int* desc1 = CFunnyShapePcs::m_table_desc1;
     unsigned int* desc2 = CFunnyShapePcs::m_table_desc2;
     unsigned int* desc3 = CFunnyShapePcs::m_table_desc3;
 
+    *reinterpret_cast<void***>(self) = __vt__8CManager;
+    *reinterpret_cast<void***>(self) = __vt__8CProcess;
+    *reinterpret_cast<void***>(self) = __vt__14CFunnyShapePcs;
+    __ct__14CUSBStreamDataFv(UsbStream(self));
+    __ct__11CFunnyShapeFv(FunnyShape(self));
+    __ct__29CPtrArray_P15OSFS_TEXTURE_ST_Fv(TextureHeaders(self));
+    __ct__22CPtrArray_P9_GXTexObj_Fv(TextureObjects(self));
     __register_global_object(self, __dt__14CFunnyShapePcsFv, ARRAY_8026D728);
     unsigned int* table = dst + 1;
     table[0] = desc0[0];
@@ -444,7 +470,7 @@ unsigned int sFunnyShapePcsTablePad1[5] = {
     0,
 };
 u8 ARRAY_8026D728[0xC];
-CFunnyShapePcs FunnyShapePcs;
+u8 FunnyShapePcs[sizeof(CFunnyShapePcs)];
 
 /*
  * --INFO--
@@ -491,17 +517,4 @@ template <>
 CPtrArray<OSFS_TEXTURE_ST*>::~CPtrArray()
 {
     RemoveAll();
-}
-
-/*
- * --INFO--
- * Address: TODO
- * Size: TODO
- */
-inline CFunnyShapePcs::CFunnyShapePcs()
-{
-    new (UsbStream(this)) CUSBStreamData;
-    new (FunnyShape(this)) CFunnyShape;
-    new (TextureHeaders(this)) CPtrArray<OSFS_TEXTURE_ST*>;
-    new (TextureObjects(this)) CPtrArray<_GXTexObj*>;
 }

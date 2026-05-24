@@ -108,6 +108,14 @@ struct BonusSummaryData {
 
 STATIC_ASSERT(sizeof(BonusSummaryData) == 0xCC);
 
+struct BonusMenuStateRaw {
+	unsigned char bytes[0x48];
+};
+
+struct BonusMenuAuxRaw {
+	unsigned char bytes[0xC];
+};
+
 struct BonusMenuMembers {
 	unsigned char pad_0000[0x8C];
 	unsigned char m_bonusAlpha;
@@ -158,8 +166,23 @@ struct BonusBoardEntryRaw {
 	int m_screenHeight;
 };
 
-static void InitBonusEffectSlotBlock(unsigned char* slotBase)
+struct BonusEffectSlotBlock {
+	unsigned char bytes[0x2920];
+};
+
+struct BonusEffectSlotList {
+	BonusEffectSlotBlock slots[5];
+	unsigned char pad_CDA0[0x10];
+};
+
+STATIC_ASSERT(sizeof(BonusMenuStateRaw) == 0x48);
+STATIC_ASSERT(sizeof(BonusMenuAuxRaw) == 0xC);
+STATIC_ASSERT(sizeof(BonusEffectSlotBlock) == 0x2920);
+STATIC_ASSERT(sizeof(BonusEffectSlotList) == 0xCDB0);
+
+static void InitBonusEffectSlotBlock(BonusEffectSlotBlock* slot)
 {
+	unsigned char* slotBase = slot->bytes;
 	static const int s_sentinelOffsets[] = {
 	    0x000, 0x004, 0x008,
 	    0x524, 0x528, 0x52C,
@@ -1096,14 +1119,14 @@ void CMenuPcs::createBonus()
 		s_bonusSummaryData = new BonusSummaryData;
 	}
 	if (s_bonusBoardState == 0) {
-		s_bonusBoardState = new unsigned char[0x48];
+		s_bonusBoardState = new unsigned char[sizeof(BonusMenuStateRaw)];
 	}
 	if (s_Base[0] == 0) {
 		s_Base[0] = new float[18];
 	}
 
 	if (statePtr == 0) {
-		statePtr = reinterpret_cast<int>(new unsigned char[0x48]);
+		statePtr = reinterpret_cast<int>(new unsigned char[sizeof(BonusMenuStateRaw)]);
 		GetBonusMenuMembers(this).m_bonusStatePtr = statePtr;
 	}
 	if (animPtr == 0) {
@@ -1111,11 +1134,11 @@ void CMenuPcs::createBonus()
 		GetBonusMenuMembers(this).m_bonusAnimPtr = animPtr;
 	}
 	if (listPtr == 0) {
-		listPtr = reinterpret_cast<int>(new unsigned char[0xCDB0]);
+		listPtr = reinterpret_cast<int>(new unsigned char[sizeof(BonusEffectSlotList)]);
 		GetBonusMenuMembers(this).m_bonusListPtr = listPtr;
 	}
 	if (auxPtr == 0) {
-		auxPtr = reinterpret_cast<int>(new unsigned char[0xC]);
+		auxPtr = reinterpret_cast<int>(new unsigned char[sizeof(BonusMenuAuxRaw)]);
 		GetBonusMenuMembers(this).m_bonusAuxPtr = auxPtr;
 	}
 	if (boardPtr == 0) {
@@ -1124,7 +1147,7 @@ void CMenuPcs::createBonus()
 	}
 
 	if (statePtr != 0) {
-		memset((void*)statePtr, 0, 0x48);
+		memset((void*)statePtr, 0, sizeof(BonusMenuStateRaw));
 		*(short*)(statePtr + 0x1c) = 0;
 		*(short*)(statePtr + 0x22) = 0;
 		*(unsigned char*)(statePtr + 0xb) = 0;
@@ -1133,13 +1156,14 @@ void CMenuPcs::createBonus()
 		memset((void*)animPtr, 0, sizeof(BonusAnimList));
 	}
 	if (listPtr != 0) {
-		memset((void*)listPtr, 0, 0xCDB0);
+		memset((void*)listPtr, 0, sizeof(BonusEffectSlotList));
+		BonusEffectSlotList* effectSlots = reinterpret_cast<BonusEffectSlotList*>(listPtr);
 		for (int i = 0; i < 5; i++) {
-			InitBonusEffectSlotBlock(reinterpret_cast<unsigned char*>(listPtr + i * 0x2920));
+			InitBonusEffectSlotBlock(&effectSlots->slots[i]);
 		}
 	}
 	if (auxPtr != 0) {
-		memset((void*)auxPtr, 0, 0xC);
+		memset((void*)auxPtr, 0, sizeof(BonusMenuAuxRaw));
 		*(short*)(auxPtr + 10) = 3;
 	}
 	if (boardPtr != 0) {
@@ -1159,7 +1183,7 @@ void CMenuPcs::createBonus()
 		}
 	}
 	if (s_bonusBoardState != 0) {
-		memset(s_bonusBoardState, 0, 0x48);
+		memset(s_bonusBoardState, 0, sizeof(BonusMenuStateRaw));
 	}
 	if (s_Base[0] != 0) {
 		memset(s_Base[0], 0, sizeof(float) * 18);

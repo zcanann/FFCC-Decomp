@@ -917,12 +917,19 @@ void CRingMenu::onCalc()
 		m_commonFrameCounter = m_commonFrameCounter + 1;
 		m_timerB = clampDecToZero(m_timerB);
 
-		for (int i = 0; i < 9; i++) {
-			m_buttonTimers[i] = clampDecToZero(m_buttonTimers[i]);
-		}
+		m_buttonTimers[0] = clampDecToZero(m_buttonTimers[0]);
+		m_buttonTimers[1] = clampDecToZero(m_buttonTimers[1]);
+		m_buttonTimers[2] = clampDecToZero(m_buttonTimers[2]);
+		m_buttonTimers[3] = clampDecToZero(m_buttonTimers[3]);
+		m_buttonTimers[4] = clampDecToZero(m_buttonTimers[4]);
+		m_buttonTimers[5] = clampDecToZero(m_buttonTimers[5]);
 
 		const float animStep = FLOAT_80330a54;
 		const float animMin = FLOAT_803309c0;
+
+		m_buttonTimers[6] = clampDecToZero(m_buttonTimers[6]);
+		m_buttonTimers[7] = clampDecToZero(m_buttonTimers[7]);
+		m_buttonTimers[8] = clampDecToZero(m_buttonTimers[8]);
 		for (int i = 0; i < 9; i++) {
 			for (int j = 0; j < 3; j++) {
 				m_animFloat[i][j] = m_animFloat[i][j] - animStep;
@@ -969,14 +976,13 @@ void CRingMenu::onCalc()
 				trackedCmd = reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Chara) + 0x2008);
 			}
 
-			double scrollDelta = 0.0;
+			float scrollDelta = FLOAT_803309c0;
 			if (*trackedCmd != currentCmd) {
 				int prev = currentCmd;
 				int next = currentCmd;
+				int nextCandidate = (currentCmd + 1) % 5;
+				int prevCandidate = (currentCmd + 4) % 5;
 				for (int step = 1; step < 4; step++) {
-					int nextCandidate = (currentCmd + step) % 5;
-					int prevCandidate = (currentCmd + 5 - step) % 5;
-
 					if (Game.m_gameWork.m_bossArtifactStageIndex != 0x19) {
 						nextCandidate = caravanWork->GetNextCmdListIdx(next, 1);
 						prevCandidate = caravanWork->GetNextCmdListIdx(prev, -1);
@@ -986,16 +992,16 @@ void CRingMenu::onCalc()
 					next = nextCandidate;
 
 					if (*trackedCmd == prevCandidate) {
-						scrollDelta = static_cast<double>(step);
+						scrollDelta = static_cast<float>(step);
 						break;
 					}
 					if (*trackedCmd == nextCandidate) {
-						scrollDelta = -static_cast<double>(step);
+						scrollDelta = -static_cast<float>(step);
 						break;
 					}
 				}
 
-				if (scrollDelta == 0.0) {
+				if (scrollDelta == FLOAT_803309c0) {
 					int dirPos = (*trackedCmd == prev) ? 1 : 0;
 					int dirNeg = (*trackedCmd == next) ? 1 : 0;
 					if (dirPos != 0 && dirNeg != 0) {
@@ -1006,11 +1012,11 @@ void CRingMenu::onCalc()
 								~(static_cast<int>(~(Pad._448_4_ - m_menuIndex | m_menuIndex - Pad._448_4_)) >> 31);
 							trigger = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Pad) + 4 + idx * 0x54);
 						}
-						scrollDelta = ((trigger & 0x40) != 0) ? static_cast<double>(dirPos) : -static_cast<double>(dirNeg);
+						scrollDelta = ((trigger & 0x40) != 0) ? static_cast<float>(dirPos) : -static_cast<float>(dirNeg);
 					} else if (dirPos != 0) {
-						scrollDelta = static_cast<double>(dirPos);
+						scrollDelta = static_cast<float>(dirPos);
 					} else if (dirNeg != 0) {
-						scrollDelta = -static_cast<double>(dirNeg);
+						scrollDelta = -static_cast<float>(dirNeg);
 					}
 				}
 			}

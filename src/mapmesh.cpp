@@ -224,10 +224,9 @@ void CMapMesh::Draw(CMaterialSet* materialSet)
  */
 void CMapMesh::DrawMeshCharaShadow(unsigned short startIdx, unsigned short count)
 {
-    int remaining = count;
     CMapMeshDrawEntry* entry = m_drawEntries + startIdx;
 
-    while (remaining-- != 0) {
+    while (count-- != 0) {
         if (entry->m_size != 0) {
             CMaterial* material =
                 (*reinterpret_cast<CPtrArray<CMaterial*>*>(reinterpret_cast<unsigned char*>(MapMng.m_materialSet) + 8))[

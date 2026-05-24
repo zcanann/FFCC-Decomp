@@ -83,8 +83,7 @@ struct PPPCREATEPARAM
     unsigned char m_hitObjectCount;   // 0x4a
     unsigned char m_hitFlags;         // 0x4b
     int m_hitObjectIds[8];            // 0x4c
-    int m_unk;                        // 0x6c
-}; // SIze 0x70
+}; // Size 0x6c
 
 extern CProfile g_par_calc_prof;
 extern CProfile g_par_draw_prof;

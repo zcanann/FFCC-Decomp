@@ -102,8 +102,8 @@ extern "C" char* PTR_DAT_80214304[];
 extern "C" char* PTR_s_Hombre_802145a4[];
 extern "C" char* PTR_s_Masculin_802144c4[];
 extern "C" char* PTR_DAT_80214224[];
-extern "C" char DAT_80332958[];
-extern "C" char DAT_8033295c[];
+extern "C" char s_plural_s_80332958[];
+extern "C" char s_space_8033295c[];
 extern "C" char* PTR_s_Blacksmith[];
 extern "C" char* PTR_s_Schmied[];
 extern "C" char* PTR_s_Fabbri[];
@@ -142,7 +142,7 @@ extern char s_Meunier_80332198[];
 extern char s_Pecheur_803321A0[];
 extern char s_Herrero_803321A8[];
 extern char s_Sastre_803321B0[];
-extern char lbl_803321B8[];
+extern char s_Empty_803321B8[];
 extern char s_Cowlick_80332574[];
 extern char s_Natural_8033257C[];
 extern char s_Cap_80332584[];
@@ -455,13 +455,13 @@ extern char s_Degats_magiq_801DE58C[];
 extern char s_Rend_inebranlable_801DE59C[];
 extern char s_Anti_frio_801DE5BC[];
 extern char s_Danos_magicos_801DE68C[];
-extern char s_Yes_803321BC[], lbl_803321C0[], s_Cancel_803321C4[], s_gil_803321CC[];
+extern char s_Yes_803321BC[], s_No_803321C0[], s_Cancel_803321C4[], s_gil_803321CC[];
 extern char s_Defence_803321D0[], s_Magic_803321D8[], s_Attack_803321E0[], s_Defend_803321E8[];
 extern char s_Remove_803321F0[], s_Fuse_803321F8[], s_Split_80332200[], s_Use_80332208[];
 extern char s_Drop_8033220C[], s_Destroy_80332214[], s_Male_8033221C[], s_Female_80332224[];
-extern char s_All_8033222C[], lbl_80332230[], lbl_80332234[], s_Father_80332238[];
+extern char s_All_8033222C[], s_QuestionMarks_80332230[], s_g_period_80332234[], s_Father_80332238[];
 extern char s_Mother_80332240[], s_Brother_80332248[], s_Sister_80332250[], s_Letters_80332258[];
-extern char lbl_80332260[], s_Send_80332264[], s_Confirm_8033226C[], lbl_80332274[];
+extern char s_Quote_80332260[], s_Send_80332264[], s_Confirm_8033226C[], s_Name_80332274[];
 extern char s_Gender_8033227C[], s_Tribe_80332284[], s_Items_8033228C[], s_Equip_80332294[];
 extern char s_Money_8033229C[], s_Family_803322A4[], s_Done_803322AC[], s_Ja_803322B4[];
 extern char s_Nein_803322B8[], s_Gil_803322C0[], s_Staerke_803322C4[], s_Abwehr_803322CC[];
@@ -551,80 +551,80 @@ extern "C" char* PTR_s_Herrero[] = {
     s_Molinero_801DD7E4, s_Pescador_801DD7F0, s_Comerciante_801DD7FC, s_Alquimista_801DD808,
 };
 extern "C" char* gSingMenuTextTableEn[] = {
-    lbl_803321B8, s_Yes_803321BC, lbl_803321C0, s_Cancel_803321C4,
+    s_Empty_803321B8, s_Yes_803321BC, s_No_803321C0, s_Cancel_803321C4,
     s_gil_803321CC, s_Strength_801DD814, s_Defence_803321D0, s_Magic_803321D8,
     s_Memories_801DD820, s_Attack_803321E0, s_Defend_803321E8, s_Remove_803321F0,
     s_Fuse_803321F8, s_Split_80332200, s_Use_80332208, s_Drop_8033220C,
     s_Destroy_80332214, s_Male_8033221C, s_Female_80332224, s_All_8033222C,
-    lbl_80332230, lbl_80332234, s_Father_80332238, s_Mother_80332240,
+    s_QuestionMarks_80332230, s_g_period_80332234, s_Father_80332238, s_Mother_80332240,
     s_Brother_80332248, s_Sister_80332250, s_Brother_80332248, s_Sister_80332250,
-    lbl_803321B8, s_Letters_80332258, s_Send_item_801DD82C, s_Send_gil_801DD838,
-    s_Send_nothing_801DD844, s_Proceed_801DD854, s_Take_out_801DD860, lbl_80332260,
-    lbl_80332260, s_Send_80332264, s_the_reply_801DD86C, lbl_803321B8,
-    s_Include_801DD878, s_Confirm_8033226C, lbl_80332274, s_Gender_8033227C,
+    s_Empty_803321B8, s_Letters_80332258, s_Send_item_801DD82C, s_Send_gil_801DD838,
+    s_Send_nothing_801DD844, s_Proceed_801DD854, s_Take_out_801DD860, s_Quote_80332260,
+    s_Quote_80332260, s_Send_80332264, s_the_reply_801DD86C, s_Empty_803321B8,
+    s_Include_801DD878, s_Confirm_8033226C, s_Name_80332274, s_Gender_8033227C,
     s_Tribe_80332284, s_Family_Trade_801DD884, s_Command_List_801DD894, s_Items_8033228C,
     s_Equip_80332294, s_Artefacts_801DD8A4, s_Treasures_801DD8B0, s_Money_8033229C,
     s_Favourites_801DD8BC, s_Family_803322A4, s_Letters_80332258, s_Done_803322AC,
 };
 extern "C" char* gSingMenuTextTableDe[] = {
-    lbl_803321B8, s_Ja_803322B4, s_Nein_803322B8, s_Abbrechen_801DD8C8,
+    s_Empty_803321B8, s_Ja_803322B4, s_Nein_803322B8, s_Abbrechen_801DD8C8,
     s_Gil_803322C0, s_Staerke_803322C4, s_Abwehr_803322CC, s_Magie_803322D4,
     s_Erinnerungen_801DD8D4, s_Angreifen_801DD8E4, s_Verteidigen_801DD8F0, s_Ablegen_803322DC,
     s_Kombinieren_801DD8FC, s_Aufloesen_801DD908, s_Benutzen_801DD914, s_Wegwerfen_801DD920,
     s_Zerstoeren_801DD92C, s_Maennlich_801DD938, s_Weiblich_801DD944, s_Alle_Rassen_801DD950,
-    lbl_80332230, s_G_803322E4, s_Vater_803322E8, s_Mutter_803322F0,
+    s_QuestionMarks_80332230, s_G_803322E4, s_Vater_803322E8, s_Mutter_803322F0,
     s_Bruder_803322F8, s_Schwester_801DD95C, s_kl_Bruder_801DD968, s_kl_Schwester_801DD974,
-    lbl_803321B8, s_Liste_erhaltener_Briefe_801DD984, s_Gegenstand_beifuegen_801DD99C, s_Gil_beifuegen_801DD9B0,
+    s_Empty_803321B8, s_Liste_erhaltener_Briefe_801DD984, s_Gegenstand_beifuegen_801DD99C, s_Gil_beifuegen_801DD9B0,
     s_Nichts_beifuegen_801DD9C0, s_Weiter_80332300, s_herausholen_801DD9D0, lbl_80332308,
-    lbl_80332260, lbl_803321B8, s_die_Antwort_801DD9E0, s_schicken_801DD9F0,
-    s_beifuegen_801DD9FC, s_Bestaetigen_801DDA08, lbl_80332274, s_Geschlecht_801DDA14,
+    s_Quote_80332260, s_Empty_803321B8, s_die_Antwort_801DD9E0, s_schicken_801DD9F0,
+    s_beifuegen_801DD9FC, s_Bestaetigen_801DDA08, s_Name_80332274, s_Geschlecht_801DDA14,
     s_Rasse_8033230C, s_Elterlicher_Beruf_801DDA20, s_Kommandoliste_801DDA34, s_Gegenstaende_801DDA44,
     s_Ausruesten_801DDA50, s_Artefakte_801DDA5C, s_Geborgtes_801DDA68, s_Geld_80332314,
     s_Geschmack_801DDA74, s_Familie_8033231C, s_Briefe_80332324, s_Abbrechen_801DD8C8,
 };
 extern "C" char* gSingMenuTextTableIt[] = {
-    lbl_803321B8, s_Si_8033232C, lbl_803321C0, s_Annulla_80332330,
+    s_Empty_803321B8, s_Si_8033232C, s_No_803321C0, s_Annulla_80332330,
     s_guil_80332338, s_Forza_80332340, s_Difesa_80332348, s_Magia_80332350,
     s_Memorie_80332358, s_Attacco_80332360, s_Difesa_80332348, s_Rimuovi_80332368,
     s_Fusione_80332370, s_Dividi_80332378, s_Usa_80332380, s_Posa_80332384,
     s_Distruggi_801DDA80, s_Maschio_8033238C, s_Femmina_80332394, s_Tutti_8033239C,
-    lbl_80332230, lbl_80332234, s_Padre_803323A4, s_Madre_803323AC,
+    s_QuestionMarks_80332230, s_g_period_80332234, s_Padre_803323A4, s_Madre_803323AC,
     s_Fratello_801DDA8C, s_Sorella_803323B4, s_Fratello_801DDA8C, s_Sorella_803323B4,
-    lbl_803321B8, s_Lettere_803323BC, s_Invia_oggetto_801DDA98, s_Invia_guil_801DDAA8,
-    s_Non_inviare_nulla_801DDAB4, s_Vuoi_procedere_801DDAC8, s_Vuoi_prendere_801DDAD8, lbl_80332260,
-    lbl_80332260, s_con_803323C4, s_Vuoi_rispondere_a_801DDAE8, lbl_803321B8,
+    s_Empty_803321B8, s_Lettere_803323BC, s_Invia_oggetto_801DDA98, s_Invia_guil_801DDAA8,
+    s_Non_inviare_nulla_801DDAB4, s_Vuoi_procedere_801DDAC8, s_Vuoi_prendere_801DDAD8, s_Quote_80332260,
+    s_Quote_80332260, s_con_803323C4, s_Vuoi_rispondere_a_801DDAE8, s_Empty_803321B8,
     s_Allegato_801DDAFC, s_Conferma_801DDB08, s_Nome_803323CC, s_Sesso_803323D4,
     s_Razza_803323DC, s_Mestiere_801DDB14, s_Lista_Comandi_801DDB20, s_Oggetti_803323E4,
     s_Equipaggiamento_801DDB30, s_Manufatti_801DDB40, s_Tesori_803323EC, s_Denaro_803323F4,
     s_Preferiti_801DDB4C, s_Famiglia_801DDB58, s_Lettere_803323BC, s_Fatto_803323FC,
 };
 extern "C" char* gSingMenuTextTableFr[] = {
-    lbl_803321B8, s_Oui_80332404, s_Non_80332408, s_Annuler_8033240C,
+    s_Empty_803321B8, s_Oui_80332404, s_Non_80332408, s_Annuler_8033240C,
     s_gils_80332414, s_Force_8033241C, s_Resistance_801DDB64, s_Magie_803322D4,
     s_Souvenirs_801DDB70, s_Attaquer_801DDB7C, s_Defendre_801DDB88, s_Retirer_80332424,
     s_Fusionner_801DDB94, s_Separer_8033242C, s_Utiliser_801DDBA0, s_Jeter_80332434,
     s_Detruire_801DDBAC, s_Masculin_801DDBB8, s_Feminin_8033243C, s_Tous_80332444,
-    lbl_80332230, lbl_80332234, s_Pere_8033244C, s_Mere_80332454,
+    s_QuestionMarks_80332230, s_g_period_80332234, s_Pere_8033244C, s_Mere_80332454,
     s_Frere_8033245C, s_Soeur_80332464, s_Frere_8033245C, s_Soeur_80332464,
-    lbl_803321B8, s_Lettres_8033246C, s_Envoyer_un_objet_801DDBC4, s_Envoyer_des_gils_801DDBD8,
-    s_Ne_rien_envoyer_801DDBEC, s_Continuer_801DDBFC, s_Prendre_801DDC08, lbl_80332260,
-    lbl_80332260, s_la_reponse_801DDC14, s_Envoyer_a_801DDC20, lbl_803321B8,
+    s_Empty_803321B8, s_Lettres_8033246C, s_Envoyer_un_objet_801DDBC4, s_Envoyer_des_gils_801DDBD8,
+    s_Ne_rien_envoyer_801DDBEC, s_Continuer_801DDBFC, s_Prendre_801DDC08, s_Quote_80332260,
+    s_Quote_80332260, s_la_reponse_801DDC14, s_Envoyer_a_801DDC20, s_Empty_803321B8,
     s_Joindre_801DDC2C, s_Confirmer_801DDC38, s_Nom_80332474, s_Sexe_8033247C,
     s_Tribu_80332484, s_Metier_8033248C, s_Commandes_801DDC44, s_Objets_80332494,
     s_Equiper_8033249C, s_Artefacts_801DD8A4, s_Tresors_803324A4, s_Gils_803324AC,
     s_Preferences_801DDC50, s_Famille_803324B4, s_Lettres_8033246C, s_Laisser_803324BC,
 };
 extern "C" char* gSingMenuTextTableEs[] = {
-    lbl_803321B8, s_Si_803324C4, lbl_803321C0, s_Cancelar_801DDC5C,
+    s_Empty_803321B8, s_Si_803324C4, s_No_803321C0, s_Cancelar_801DDC5C,
     s_guiles_803324C8, s_Fuerza_803324D0, s_Defensa_803324D8, s_Magia_80332350,
     s_Memorias_801DDC68, s_Atacar_803324E0, s_Defender_801DDC74, s_Quitar_803324E8,
     s_Fusionar_801DDC80, s_Separar_803324F0, s_Utilizar_801DDC8C, s_Descartar_801DDC98,
     s_Destruir_801DDCA4, s_Hombre_803324F8, s_Mujer_80332500, s_Todos_80332508,
-    lbl_80332510, lbl_80332234, s_Padre_803323A4, s_Madre_803323AC,
+    lbl_80332510, s_g_period_80332234, s_Padre_803323A4, s_Madre_803323AC,
     s_Hermano_80332518, s_Hermana_80332520, s_Hermano_80332518, s_Hermana_80332520,
-    lbl_803321B8, s_Cartas_80332528, s_Enviar_objeto_801DDCB0, s_Enviar_guiles_801DDCC0,
-    s_No_enviar_nada_801DDCD0, s_Continuar_801DDCE0, s_Extraer_801DDCEC, lbl_80332260,
-    lbl_80332260, s_period_80332530, s_Enviar_la_respuesta_a_801DDCF8, lbl_803321B8,
+    s_Empty_803321B8, s_Cartas_80332528, s_Enviar_objeto_801DDCB0, s_Enviar_guiles_801DDCC0,
+    s_No_enviar_nada_801DDCD0, s_Continuar_801DDCE0, s_Extraer_801DDCEC, s_Quote_80332260,
+    s_Quote_80332260, s_period_80332530, s_Enviar_la_respuesta_a_801DDCF8, s_Empty_803321B8,
     s_Incluir_801DDD10, s_Confirmar_801DDD1C, s_Nombre_80332534, s_Sexo_8033253C,
     s_Tribu_80332484, s_Oficio_familiar_801DDD28, s_Comandos_801DDD3C, s_Objetos_80332544,
     s_Equipo_8033254C, s_Artefactos_801DDD48, s_Tesoros_80332554, s_Dinero_8033255C,
@@ -681,35 +681,35 @@ extern "C" char* PTR_s_Remolino[] = {
     s_Lobezna_803326F8, s_Cola_Mapache_801DE198, s_Ojos_Tiburon_801DE188, s_Cabeza_Buho_801DE1A8,
 };
 extern "C" char* gSingMenuAttrTableEn[] = {
-    lbl_803321B8, s_Resist_fire_801DE1B4, s_Resist_cold_801DE1C0, s_Resist_lightning_801DE1CC,
+    s_Empty_803321B8, s_Resist_fire_801DE1B4, s_Resist_cold_801DE1C0, s_Resist_lightning_801DE1CC,
     s_Resist_slow_801DE1E0, s_Resist_prlysis_801DE1EC, s_Resist_poison_801DE1FC, s_Resist_curses_801DE20C,
     s_Resist_petrif_801DE21C, s_Casting_time_801DE22C, s_Charge_time_801DE23C, s_Spell_duration_801DE248,
     s_Spell_duration_801DE248, s_Resist_miasma_801DE258, s_Long_spell_range_801DE268, s_Long_focus_attks_801DE27C,
     s_Regen_80332700, s_Focus_attacks_801DE290, s_Spell_damage_801DE2A0, s_Cannot_be_stunned_801DE2B0,
 };
 extern "C" char* gSingMenuAttrTableDe[] = {
-    lbl_803321B8, s_Feuer_Res_801DE2C4, s_Eis_Resist_801DE2D0, s_Blitz_Res_801DE2E0,
+    s_Empty_803321B8, s_Feuer_Res_801DE2C4, s_Eis_Resist_801DE2D0, s_Blitz_Res_801DE2E0,
     s_Gemach_R_801DE2EC, s_Stopp_Res_801DE2F8, s_Gift_Res_801DE304, s_Fluch_Res_801DE310,
     s_Stein_Res_801DE31C, s_Z_laden_801DE328, s_Sammeln_801DE334, s_Z_Wirkungszeit_801DE340,
     s_Z_Wirkungszeit_801DE340, s_Miasma_R_plus_801DE354, s_Z_Reichw_plus_801DE360, s_SA_Reichw_plus_801DE370,
     s_Regena_80332708, s_Spezialattacke_801DE380, s_Zauber_Schaden_801DE390, s_Standfest_801DE3A0,
 };
 extern "C" char* gSingMenuAttrTableIt[] = {
-    lbl_803321B8, s_Antifuoco_801DE3AC, s_Antigelo_801DE3B8, s_Antituono_801DE3C4,
+    s_Empty_803321B8, s_Antifuoco_801DE3AC, s_Antigelo_801DE3B8, s_Antituono_801DE3C4,
     s_Antislow_801DE3D0, s_Antistop_801DE3DC, s_Antiveleno_801DE3E8, s_Antimalediz_801DE3F4,
     s_Antipietrif_801DE404, s_Carica_magia_801DE414, s_Carica_attacchi_801DE424, s_Durata_magie_801DE434,
     s_Durata_magie_801DE434, s_Antimiasma_801DE444, s_Portata_magie_801DE450, s_Portata_Super_Att_801DE460,
     s_Rigenerazione_801DE474, s_Super_Attacchi_801DE484, s_Danno_Magico_801DE494, s_Antistordimento_801DE4A4,
 };
 extern "C" char* gSingMenuAttrTableFr[] = {
-    lbl_803321B8, s_Anti_Feu_801DE4B4, s_Anti_Glace_801DE4C0, s_Anti_Foudre_801DE4CC,
+    s_Empty_803321B8, s_Anti_Feu_801DE4B4, s_Anti_Glace_801DE4C0, s_Anti_Foudre_801DE4CC,
     s_Anti_Somni_801DE4D8, s_Anti_Stop_801DE4E4, s_Anti_Poison_801DE4F0, s_Anti_Malefice_801DE4FC,
     s_Anti_Petrif_801DE50C, s_Tps_de_lancem_801DE51C, s_Tps_de_charge_801DE52C, s_Duree_sorts_801DE53C,
     s_Duree_sorts_801DE53C, s_Anti_Miasme_801DE548, s_Portee_des_sorts_801DE554, s_Portee_super_atq_801DE568,
     s_Recup_80332710, s_Super_attaques_801DE57C, s_Degats_magiq_801DE58C, s_Rend_inebranlable_801DE59C,
 };
 extern "C" char* gSingMenuAttrTableEs[] = {
-    lbl_803321B8, s_Anti_fuego_801DE5B0, s_Anti_frio_801DE5BC, s_Anti_rayos_801DE5C8,
+    s_Empty_803321B8, s_Anti_fuego_801DE5B0, s_Anti_frio_801DE5BC, s_Anti_rayos_801DE5C8,
     s_Anti_Freno_801DE5D4, s_Anti_Paro_801DE5E0, s_Anti_veneno_801DE5EC, s_Anti_maldic_801DE5F8,
     s_Anti_petrif_801DE608, s_Tiempo_lanzam_801DE618, s_Tiempo_carga_801DE628, s_Durac_hechiz_801DE638,
     s_Durac_hechiz_801DE638, s_Anti_miasma_801DE648, s_Alcance_hechiz_801DE654, s_Alc_superataq_801DE664,
@@ -3082,12 +3082,12 @@ void CMenuPcs::GetRaceStr(int itemNo, char* outText)
 
         strcpy(outText, text);
         if (Game.m_gameWork.m_languageId == 2) {
-            strcat(outText, DAT_80332958);
+            strcat(outText, s_plural_s_80332958);
         }
     }
 
     if ((raceBits & 0xF) != 0 && (raceBits & 0x30) != 0) {
-        strcpy(outText, DAT_8033295c);
+        strcpy(outText, s_space_8033295c);
     }
     if ((raceBits & 0x30) == 0) {
         return;

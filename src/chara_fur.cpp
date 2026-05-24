@@ -18,6 +18,7 @@
 #include "ffcc/cflat_runtime2.h"
 
 #include <math.h>
+#include <stddef.h>
 #include <string.h>
 
 extern const float kPppLensFlareZero = 0.0f;
@@ -141,6 +142,27 @@ struct FurProjectedVertex
     float m_u;
     float m_v;
 };
+
+struct MogWorkRaw
+{
+    int m_state;
+    int m_frameCount;
+    int m_pickTicks;
+    int m_idleTicks;
+    int m_offColorTicks;
+    int m_eraseTicks;
+    int m_prevScoreA;
+    int m_prevScoreB;
+    int m_prevScoreC;
+    int m_loopSeHandle;
+    int m_started;
+    int m_pad2C;
+};
+
+static inline MogWorkRaw& MogWork()
+{
+    return *reinterpret_cast<MogWorkRaw*>(m_mogWork);
+}
 
 static inline unsigned char* ModelRaw(void* model)
 {
@@ -652,17 +674,17 @@ void CChara::CalcMogScore()
 void CChara::ChangeMogMode(int mogMode)
 {
 	if (mogMode != 0) {
-		memset(m_mogWork, 0, 0x2C);
+		memset(m_mogWork, 0, offsetof(MogWorkRaw, m_pad2C));
 		*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(this) + 0x200c) = 0x140;
 		*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(this) + 0x2010) = 0xE0;
 		*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(this) + 0x2004) = 0;
 		return;
 	}
 
-	int* const mogSoundHandle = reinterpret_cast<int*>(m_mogWork + 0x24);
-	if (*mogSoundHandle != 0) {
-		Sound.StopSe(*mogSoundHandle);
-		*mogSoundHandle = 0;
+	int& mogSoundHandle = MogWork().m_loopSeHandle;
+	if (mogSoundHandle != 0) {
+		Sound.StopSe(mogSoundHandle);
+		mogSoundHandle = 0;
 	}
 }
 
@@ -912,27 +934,6 @@ static void FurPlotHair(unsigned short* tex, const CHairSet& hair, int layer, un
 void brush(unsigned short*, int, int, float, float, int, _GXColor, _GXColor*, _GXColor*);
 
 namespace {
-
-struct MogWorkRaw
-{
-	int m_state;
-	int m_frameCount;
-	int m_pickTicks;
-	int m_idleTicks;
-	int m_offColorTicks;
-	int m_eraseTicks;
-	int m_prevScoreA;
-	int m_prevScoreB;
-	int m_prevScoreC;
-	int m_loopSeHandle;
-	int m_started;
-	int m_pad2C;
-};
-
-static inline MogWorkRaw& MogWork()
-{
-	return *reinterpret_cast<MogWorkRaw*>(m_mogWork);
-}
 
 static inline int& CharaS32(int offset)
 {

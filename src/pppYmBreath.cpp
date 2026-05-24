@@ -18,12 +18,11 @@ extern const float FLOAT_80330c84;
 extern const float FLOAT_80330C90;
 extern const float FLOAT_80330C94;
 }
-extern const float FLOAT_80330c80;
-extern const float FLOAT_80330C98 = 180.0f;
-extern const float FLOAT_80330C9C = -180.0f;
+extern const float kYmBreathHalfCircleDegrees = 180.0f;
+extern const float kYmBreathNegativeHalfCircleDegrees = -180.0f;
 extern const double DOUBLE_80330CA0 = 4503599627370496.0;
-extern const float FLOAT_80330CA8 = 2.0f;
-extern const double DOUBLE_80330CB0 = 0.5;
+extern const float kYmBreathSpreadScale = 2.0f;
+extern const double kYmBreathHalfChance = 0.5;
 
 static inline float LoadFloat(const float& value)
 {
@@ -850,10 +849,10 @@ void UpdateParticle(VYmBreath* vYmBreath, PYmBreath* pYmBreath, PARTICLE_DATA* p
         particle->m_angleVelocity += params->m_angleAccel;
     }
 
-    while (LoadFloat(FLOAT_80330C98) <= particle->m_angle) {
+    while (LoadFloat(kYmBreathHalfCircleDegrees) <= particle->m_angle) {
         particle->m_angle -= FLOAT_80330C94;
     }
-    while (particle->m_angle < LoadFloat(FLOAT_80330C9C)) {
+    while (particle->m_angle < LoadFloat(kYmBreathNegativeHalfCircleDegrees)) {
         particle->m_angle += FLOAT_80330C94;
     }
 
@@ -919,7 +918,7 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
     u8 flags;
 
     spread = (float)(unsigned int)reinterpret_cast<YmBreathParams*>(pYmBreath)->m_spread;
-    range = LoadFloat(FLOAT_80330CA8) * spread;
+    range = LoadFloat(kYmBreathSpreadScale) * spread;
 
     memset(particleData, 0, 0x60);
     if (particleWmat != NULL) {
@@ -937,11 +936,11 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
     baseDir.z = FLOAT_80330C90;
 
     angle[0] = (int)(range * Math.RandF() - spread);
-    angle[0] = (int)((float)(angle[0] << 15) / LoadFloat(FLOAT_80330C98));
+    angle[0] = (int)((float)(angle[0] << 15) / LoadFloat(kYmBreathHalfCircleDegrees));
     angle[1] = (int)(range * Math.RandF() - spread);
-    angle[1] = (int)((float)(angle[1] << 15) / LoadFloat(FLOAT_80330C98));
+    angle[1] = (int)((float)(angle[1] << 15) / LoadFloat(kYmBreathHalfCircleDegrees));
     angle[2] = (int)(range * Math.RandF() - spread);
-    angle[2] = (int)((float)(angle[2] << 15) / LoadFloat(FLOAT_80330C98));
+    angle[2] = (int)((float)(angle[2] << 15) / LoadFloat(kYmBreathHalfCircleDegrees));
 
     pppGetRotMatrixXYZ(rotMtx, (pppIVECTOR4*)angle);
     PSMTXMultVecSR(rotMtx.value, &baseDir, &particle->m_direction);
@@ -972,7 +971,7 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
         particle->m_angleRandom = params->m_angleRandomRange * Math.RandF();
         flags = params->m_angleFlags;
         if (((flags & 1) != 0) && ((flags & 2) != 0)) {
-            if (DOUBLE_80330CB0 < Math.RandF()) {
+            if (kYmBreathHalfChance < Math.RandF()) {
                 particle->m_angleRandom *= FLOAT_80330C90;
             }
         } else if ((flags & 2) != 0) {
@@ -987,10 +986,10 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
         particle->m_angleVelocity += particle->m_angleRandom;
     }
 
-    while (LoadFloat(FLOAT_80330C98) <= particle->m_angle) {
+    while (LoadFloat(kYmBreathHalfCircleDegrees) <= particle->m_angle) {
         particle->m_angle -= FLOAT_80330C94;
     }
-    while (particle->m_angle < LoadFloat(FLOAT_80330C9C)) {
+    while (particle->m_angle < LoadFloat(kYmBreathNegativeHalfCircleDegrees)) {
         particle->m_angle += FLOAT_80330C94;
     }
 
@@ -1005,7 +1004,7 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
             particle->m_rotationAccelY = rotationAccel;
             particle->m_rotationAccelX = rotationAccel;
             if (((params->m_rotationFlags & 1) != 0) && ((params->m_rotationFlags & 2) != 0)) {
-                if (DOUBLE_80330CB0 < Math.RandF()) {
+                if (kYmBreathHalfChance < Math.RandF()) {
                     particle->m_rotationAccelX *= FLOAT_80330C90;
                     particle->m_rotationAccelY *= FLOAT_80330C90;
                 }
@@ -1017,10 +1016,10 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
             particle->m_rotationAccelX = params->m_rotationRandomX * Math.RandF();
             particle->m_rotationAccelY = params->m_rotationRandomY * Math.RandF();
             if (((params->m_rotationFlags & 1) != 0) && ((params->m_rotationFlags & 2) != 0)) {
-                if (DOUBLE_80330CB0 < Math.RandF()) {
+                if (kYmBreathHalfChance < Math.RandF()) {
                     particle->m_rotationAccelX *= FLOAT_80330C90;
                 }
-                if (DOUBLE_80330CB0 < Math.RandF()) {
+                if (kYmBreathHalfChance < Math.RandF()) {
                     particle->m_rotationAccelY *= FLOAT_80330C90;
                 }
             } else if ((params->m_rotationFlags & 2) != 0) {
@@ -1042,7 +1041,7 @@ void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VCo
     particle->m_scale = params->m_groupSpeed;
     if (params->m_scaleRandomRange != FLOAT_80330c80) {
         float rand = Math.RandF();
-        float scaledRange = LoadFloat(FLOAT_80330CA8) * params->m_scaleRandomRange;
+        float scaledRange = LoadFloat(kYmBreathSpreadScale) * params->m_scaleRandomRange;
         particle->m_scale += scaledRange * rand - params->m_scaleRandomRange;
     }
 

@@ -70,24 +70,10 @@ struct ChangeTexModelRaw {
 	ChangeTexModelData* m_data;
 	u8 _padA8[0x4];
 	ChangeTexMeshRef* m_meshes;
-	u8 _padB0[0x34];
-	ChangeTexWork* m_state;
-	pppChangeTexUnkB* m_step;
-	u8 _padEC[0x8];
-	void* m_beforeDrawCallback;
-	u8 _padF8[0x4];
-	void (*m_drawMeshDlCallback)(CChara::CModel*, void*, void*, int, int, float (*)[4]);
-	u8 _pad100[0x4];
-	void (*m_afterDrawMeshCallback)(CChara::CModel*, void*, void*, int, float (*)[4]);
 };
 
 STATIC_ASSERT(offsetof(ChangeTexModelRaw, m_data) == 0xA4);
 STATIC_ASSERT(offsetof(ChangeTexModelRaw, m_meshes) == 0xAC);
-STATIC_ASSERT(offsetof(ChangeTexModelRaw, m_state) == 0xE4);
-STATIC_ASSERT(offsetof(ChangeTexModelRaw, m_step) == 0xE8);
-STATIC_ASSERT(offsetof(ChangeTexModelRaw, m_beforeDrawCallback) == 0xF4);
-STATIC_ASSERT(offsetof(ChangeTexModelRaw, m_drawMeshDlCallback) == 0xFC);
-STATIC_ASSERT(offsetof(ChangeTexModelRaw, m_afterDrawMeshCallback) == 0x104);
 STATIC_ASSERT(offsetof(ChangeTexMeshData, m_vertexCount) == 0x14);
 STATIC_ASSERT(offsetof(ChangeTexMeshData, m_normals) == 0x20);
 STATIC_ASSERT(offsetof(ChangeTexMeshData, m_displayListCount) == 0x4C);
@@ -111,6 +97,21 @@ static inline float LoadFloat(const float& value)
 
 static void ChangeTex_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*)[4]);
 static void ChangeTex_AfterDrawMeshCallback(CChara::CModel*, void*, void*, int, float (*)[4]);
+
+static inline void SetChangeTexModelCallbacks(CChara::CModel* model, ChangeTexWork* work, pppChangeTexUnkB* step)
+{
+	model->SetCallbackContext(work, step);
+	model->m_drawMeshDLCallback = ChangeTex_DrawMeshDLCallback;
+	model->m_afterDrawMeshCallback = ChangeTex_AfterDrawMeshCallback;
+}
+
+static inline void ClearChangeTexModelCallbacks(CChara::CModel* model)
+{
+	model->SetCallbackContext(0, 0);
+	model->m_beforeMeshLockEnvCallback = 0;
+	model->m_drawMeshDLCallback = 0;
+	model->m_afterDrawMeshCallback = 0;
+}
 
 /*
  * --INFO--
@@ -163,10 +164,7 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 
 	work->m_charaObj = (CGObject*)pppMngStPtr->m_owner;
 	work->m_context = pppEnvStPtr;
-	model0Raw->m_state = work;
-	model0Raw->m_step = step;
-	model0Raw->m_drawMeshDlCallback = ChangeTex_DrawMeshDLCallback;
-	model0Raw->m_afterDrawMeshCallback = ChangeTex_AfterDrawMeshCallback;
+	SetChangeTexModelCallbacks(model0, work, step);
 
 	work->m_texture = reinterpret_cast<void*>(GetTextureFromRSD(step->m_dataValIndex, pppEnvStPtr));
 
@@ -175,19 +173,11 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 
 	CChara::CModel* model;
 	if ((handle1 != 0) && ((model = GetCharaModelPtr(handle1)), model != 0)) {
-		ChangeTexModelRaw* modelRaw = (ChangeTexModelRaw*)model;
-		modelRaw->m_state = work;
-		modelRaw->m_step = step;
-		modelRaw->m_drawMeshDlCallback = ChangeTex_DrawMeshDLCallback;
-		modelRaw->m_afterDrawMeshCallback = ChangeTex_AfterDrawMeshCallback;
+		SetChangeTexModelCallbacks(model, work, step);
 	}
 
 	if ((handle2 != 0) && ((model = GetCharaModelPtr(handle2)), model != 0)) {
-		ChangeTexModelRaw* modelRaw = (ChangeTexModelRaw*)model;
-		modelRaw->m_state = work;
-		modelRaw->m_step = step;
-		modelRaw->m_drawMeshDlCallback = ChangeTex_DrawMeshDLCallback;
-		modelRaw->m_afterDrawMeshCallback = ChangeTex_AfterDrawMeshCallback;
+		SetChangeTexModelCallbacks(model, work, step);
 	}
 
 	if (step->m_payload[0] == 0) {
@@ -317,28 +307,17 @@ void pppDestructChangeTex(pppChangeTex* changeTex, pppChangeTexUnkC* data)
 	ChangeTexModelRaw* model = 0;
 
 	if (handle0 != 0) {
-		model = reinterpret_cast<ChangeTexModelRaw*>(GetCharaModelPtr(handle0));
-		model->m_state = 0;
-		model->m_step = 0;
-		model->m_beforeDrawCallback = 0;
-		model->m_drawMeshDlCallback = 0;
-		model->m_afterDrawMeshCallback = 0;
+		CChara::CModel* modelBase = GetCharaModelPtr(handle0);
+		model = reinterpret_cast<ChangeTexModelRaw*>(modelBase);
+		ClearChangeTexModelCallbacks(modelBase);
 	}
-	ChangeTexModelRaw* model1;
-	if ((handle1 != 0) && ((model1 = reinterpret_cast<ChangeTexModelRaw*>(GetCharaModelPtr(handle1))), model1 != 0)) {
-		model1->m_state = 0;
-		model1->m_step = 0;
-		model1->m_beforeDrawCallback = 0;
-		model1->m_drawMeshDlCallback = 0;
-		model1->m_afterDrawMeshCallback = 0;
+	CChara::CModel* model1;
+	if ((handle1 != 0) && ((model1 = GetCharaModelPtr(handle1)), model1 != 0)) {
+		ClearChangeTexModelCallbacks(model1);
 	}
-	ChangeTexModelRaw* model2;
-	if ((handle2 != 0) && ((model2 = reinterpret_cast<ChangeTexModelRaw*>(GetCharaModelPtr(handle2))), model2 != 0)) {
-		model2->m_state = 0;
-		model2->m_step = 0;
-		model2->m_beforeDrawCallback = 0;
-		model2->m_drawMeshDlCallback = 0;
-		model2->m_afterDrawMeshCallback = 0;
+	CChara::CModel* model2;
+	if ((handle2 != 0) && ((model2 = GetCharaModelPtr(handle2)), model2 != 0)) {
+		ClearChangeTexModelCallbacks(model2);
 	}
 
 	void** stageArray = (void**)work->m_displayListArrays;

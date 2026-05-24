@@ -130,23 +130,14 @@ void CMenuPcs::CompaDraw()
 				}
 
 				if (fillW > FLOAT_80332FF8 && fillW < w) {
-					GXColor fadeColors[4];
-					fadeColors[0].r = 0xFF;
-					fadeColors[0].g = 0xFF;
-					fadeColors[0].b = 0xFF;
-					fadeColors[0].a = 0;
-					fadeColors[1].r = 0xFF;
-					fadeColors[1].g = 0xFF;
-					fadeColors[1].b = 0xFF;
-					fadeColors[1].a = 0;
-					fadeColors[2].r = 0xFF;
-					fadeColors[2].g = 0xFF;
-					fadeColors[2].b = 0xFF;
-					fadeColors[2].a = 0;
-					fadeColors[3].r = 0xFF;
-					fadeColors[3].g = 0xFF;
-					fadeColors[3].b = 0xFF;
-					fadeColors[3].a = 0;
+					colors[1].r = 0xFF;
+					colors[1].g = 0xFF;
+					colors[1].b = 0xFF;
+					colors[1].a = 0;
+					colors[3].r = 0xFF;
+					colors[3].g = 0xFF;
+					colors[3].b = 0xFF;
+					colors[3].a = 0;
 					float remainW = (static_cast<float>(DOUBLE_80333008) / static_cast<float>(entry->duration)) * w;
 					if (tex == 0x51) {
 						int yStep = static_cast<int>(y);
@@ -159,13 +150,13 @@ void CMenuPcs::CompaDraw()
 							MenuPcs.DrawRect(
 								static_cast<unsigned long>(entry->drawFlags), x, static_cast<float>(yStep),
 								remainW, static_cast<float>(tileH), u, v,
-								fadeColors, uvScale, FLOAT_80333000, FLOAT_80332FF8);
+								colors, uvScale, FLOAT_80333000, FLOAT_80332FF8);
 							yStep += 0x18;
 						}
 					} else {
 						MenuPcs.DrawRect(
 							static_cast<unsigned long>(entry->drawFlags), x, y, remainW, h, u, v,
-							fadeColors, uvScale, FLOAT_80333000, FLOAT_80332FF8);
+							colors, uvScale, FLOAT_80333000, FLOAT_80332FF8);
 					}
 				}
 

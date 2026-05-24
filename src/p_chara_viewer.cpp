@@ -527,8 +527,7 @@ void CCharaPcs::calcViewer()
         } else {
             self->m_viewerSavedAnimState = 0;
             float frame = ViewerModelTime(self->m_viewerModel[0]);
-            float animFrames = static_cast<float>(*reinterpret_cast<unsigned short*>(
-                reinterpret_cast<unsigned char*>(self->m_viewerAnim[0]) + 0x10));
+            float animFrames = static_cast<float>(self->m_viewerAnim[0]->m_frameCount);
             self->m_viewerSavedFrame = static_cast<float>(fmod(static_cast<double>(frame), static_cast<double>(animFrames)));
             self->m_viewerModel[0]->AttachAnim(self->m_viewerAnim[0], -1, -1, 0);
         }
@@ -596,11 +595,11 @@ void CCharaPcs::calcViewer()
             }
         }
 
-        unsigned char* anim = reinterpret_cast<unsigned char*>(self->m_viewerAnim[i]);
+        CChara::CAnim* anim = self->m_viewerAnim[i];
         if (anim != 0) {
             if ((i == 0) && (self->m_viewerAnimLoadedCount != 0)) {
                 self->m_viewerModel[i]->SetFrame(ViewerModelTime(self->m_viewerModel[i]) + frameAdvance);
-                float animFrames = (float)*(unsigned short*)(anim + 0x10);
+                float animFrames = static_cast<float>(anim->m_frameCount);
                 if (animFrames <= ViewerModelTime(self->m_viewerModel[0])) {
                     int nextIndex = self->m_viewerAnimLoopIndex + 1;
                     int animCount = self->m_viewerAnimLoadedCount;
@@ -611,8 +610,7 @@ void CCharaPcs::calcViewer()
                     AddSharedRef(self->m_viewerAnim[0]);
                 }
             } else if ((i == 0) && (self->m_viewerIFrameEnabled != 0)) {
-                float animFrames = static_cast<float>(*reinterpret_cast<unsigned short*>(
-                    reinterpret_cast<unsigned char*>(self->m_viewerAnim[0]) + 0x10));
+                float animFrames = static_cast<float>(self->m_viewerAnim[0]->m_frameCount);
                 if (self->m_viewerSavedAnimState == 0) {
                     if (self->m_viewerSavedFrame + animFrames <= ViewerModelTime(self->m_viewerModel[i])) {
                         self->m_viewerSavedAnimState = 1;
@@ -677,8 +675,7 @@ void CCharaPcs::calcViewer()
         if (i == 0) {
             CChara::CAnim* modelAnim = ViewerModelAnim(model);
             if (modelAnim != 0) {
-                float animFrames = (float)*reinterpret_cast<unsigned short*>(
-                    reinterpret_cast<unsigned char*>(modelAnim) + 0x10);
+                float animFrames = static_cast<float>(modelAnim->m_frameCount);
                 float frame = (float)fmod((double)ViewerModelTime(model), (double)(frameAdvance + animFrames));
                 Graphic.Printf(const_cast<char*>(s_frame_speed_fmt), frame, frameAdvance);
             }
@@ -784,8 +781,7 @@ void CCharaPcs::createViewer()
         self->m_viewerDiffusePos[i].z = kCharaViewerFineStep;
     }
 
-    CColor* choiceColor = self->m_viewerChoiceColor;
-    for (int colorIndex = 0; colorIndex < 5; colorIndex++, choiceColor++) {
+    for (int colorIndex = 0; colorIndex < 5; colorIndex++) {
         CColor white(0xFF, 0xFF, 0xFF, 0xFF);
         CColor colorTmp;
         float scale = static_cast<float>(colorIndex) * kCharaViewerLerpScale;
@@ -794,10 +790,10 @@ void CCharaPcs::createViewer()
         colorTmp.color.b = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.b) * scale));
         colorTmp.color.a = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.a) * scale));
         CColor colorCopy(colorTmp);
-        choiceColor->color.r = colorCopy.color.r;
-        choiceColor->color.g = colorCopy.color.g;
-        choiceColor->color.b = colorCopy.color.b;
-        choiceColor->color.a = colorCopy.color.a;
+        self->m_viewerChoiceColor[colorIndex].color.r = colorCopy.color.r;
+        self->m_viewerChoiceColor[colorIndex].color.g = colorCopy.color.g;
+        self->m_viewerChoiceColor[colorIndex].color.b = colorCopy.color.b;
+        self->m_viewerChoiceColor[colorIndex].color.a = colorCopy.color.a;
     }
 
     _GXColor clearColor;

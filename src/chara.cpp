@@ -88,6 +88,28 @@ struct CCharaMeshRaw
 	u8 _padC[8];
 };
 
+struct CCharaModelRefRaw
+{
+	u8 _pad0[0x8];
+	u16 m_nodeCount;
+	u16 m_meshCount;
+	u8 _padC[0xA];
+	u16 m_headNodeIndex;
+	u16 m_chest3NodeIndex;
+	u16 m_chest2NodeIndex;
+	u16 m_chest1NodeIndex;
+	CMaterialSet* m_materialSet;
+	void* m_textureAnimSet;
+	float m_baseScale;
+	u32 m_positionQuantize;
+	u32 m_normalQuantize;
+	void* m_dynParams;
+	u32 m_dynCount;
+	u8 _pad3C[0x8];
+};
+
+STATIC_ASSERT(sizeof(CCharaModelRefRaw) == 0x44);
+
 typedef void (*BeforeDrawModelCallback)(CChara::CModel*, void*, void*, float (*)[4], unsigned int);
 typedef void (*AfterDrawModelCallback)(CChara::CModel*, void*, void*);
 typedef int (*BeforeCalcMatrixCallback)(CChara::CModel*, void*, void*);
@@ -734,14 +756,16 @@ void CChara::gqrInit(unsigned long, unsigned long, unsigned long)
  */
 CChara::CModel::CRefData::CRefData()
 {
-	memset(this, 0, 0x44);
-	*(u16*)((u8*)this + 0x16) = 0xFFFF;
-	*(u16*)((u8*)this + 0x18) = 0xFFFF;
-	*(u16*)((u8*)this + 0x1A) = 0xFFFF;
-	*(u16*)((u8*)this + 0x1C) = 0xFFFF;
-	*(float*)((u8*)this + 0x28) = 1.0f;
-	*(u32*)((u8*)this + 0x2C) = 7;
-	*(u32*)((u8*)this + 0x30) = 0xC;
+	CCharaModelRefRaw* ref = reinterpret_cast<CCharaModelRefRaw*>(this);
+
+	memset(ref, 0, sizeof(CCharaModelRefRaw));
+	ref->m_headNodeIndex = 0xFFFF;
+	ref->m_chest3NodeIndex = 0xFFFF;
+	ref->m_chest2NodeIndex = 0xFFFF;
+	ref->m_chest1NodeIndex = 0xFFFF;
+	ref->m_baseScale = 1.0f;
+	ref->m_positionQuantize = 7;
+	ref->m_normalQuantize = 0xC;
 }
 
 /*

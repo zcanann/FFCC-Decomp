@@ -212,7 +212,7 @@ extern "C" void pppDestructBreathModel(pppBreathModel* pppBreathModel, pppBreath
                 group->particleStates = 0;
             }
 
-            group = (BreathParticleGroup*)((unsigned char*)group + 0x5C);
+            group++;
         }
 
         pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(state->m_groups));
@@ -505,32 +505,32 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
         work->m_groupCount = pBreathModel->m_groupCount;
 
         work->m_particleData =
-            (PARTICLE_DATA*)pppMemAlloc((unsigned long)(work->m_particleCount * 0x98), pppEnvStPtr->m_stagePtr,
+            (PARTICLE_DATA*)pppMemAlloc((unsigned long)(work->m_particleCount * sizeof(PARTICLE_DATA)), pppEnvStPtr->m_stagePtr,
                                                   const_cast<char*>(s_pppBreathModel_cpp), 0x257);
         if (work->m_particleData != NULL) {
-            memset(work->m_particleData, 0, (unsigned long)(work->m_particleCount * 0x98));
+            memset(work->m_particleData, 0, (unsigned long)(work->m_particleCount * sizeof(PARTICLE_DATA)));
         }
 
         work->m_particleWmats =
-            (PARTICLE_WMAT*)pppMemAlloc((unsigned long)(work->m_particleCount * 0x30), pppEnvStPtr->m_stagePtr,
+            (PARTICLE_WMAT*)pppMemAlloc((unsigned long)(work->m_particleCount * sizeof(PARTICLE_WMAT)), pppEnvStPtr->m_stagePtr,
                                                   const_cast<char*>(s_pppBreathModel_cpp), 0x25d);
         if (work->m_particleWmats != NULL) {
-            memset(work->m_particleWmats, 0, (unsigned long)(work->m_particleCount * 0x30));
+            memset(work->m_particleWmats, 0, (unsigned long)(work->m_particleCount * sizeof(PARTICLE_WMAT)));
         }
 
         work->m_particleColors =
-            (PARTICLE_COLOR*)pppMemAlloc((unsigned long)(work->m_particleCount << 5), pppEnvStPtr->m_stagePtr,
+            (PARTICLE_COLOR*)pppMemAlloc((unsigned long)(work->m_particleCount * sizeof(PARTICLE_COLOR)), pppEnvStPtr->m_stagePtr,
                                                   const_cast<char*>(s_pppBreathModel_cpp), 0x263);
         if (work->m_particleColors != NULL) {
-            memset(work->m_particleColors, 0, (unsigned long)(work->m_particleCount << 5));
+            memset(work->m_particleColors, 0, (unsigned long)(work->m_particleCount * sizeof(PARTICLE_COLOR)));
         }
 
         work->m_groups =
             (BreathParticleGroup*)pppMemAlloc(
-                (unsigned long)((int)pBreathModel->m_groupCount * 0x5C),
+                (unsigned long)((int)pBreathModel->m_groupCount * sizeof(BreathParticleGroup)),
                 pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppBreathModel_cpp), 0x269);
         if (work->m_groups != NULL) {
-            memset(work->m_groups, 0, (unsigned long)((int)pBreathModel->m_groupCount * 0x5C));
+            memset(work->m_groups, 0, (unsigned long)((int)pBreathModel->m_groupCount * sizeof(BreathParticleGroup)));
 
             groupTable = work->m_groups;
             for (i = 0; i < (int)pBreathModel->m_groupCount; i++) {
@@ -584,7 +584,7 @@ group_ready:
             scaleMtx[0][0] = scaledOwner;
             scaleMtx[1][1] = scaledOwner;
             scaleMtx[2][2] = scaledOwner;
-            particleMtx = (Mtx*)((unsigned char*)particleWMat + firstParticle * 0x30);
+            particleMtx = (Mtx*)((unsigned char*)particleWMat + firstParticle * sizeof(PARTICLE_WMAT));
             PSMTXConcat(*particleMtx, object->m_localMatrix.value, worldMtx);
             PSMTXMultVec(worldMtx, &groupData->position, &origin);
             pppCopyMatrix(rotMtx, *reinterpret_cast<pppFMATRIX*>(particleMtx));
@@ -884,12 +884,12 @@ void BirthParticle(
     Vec jitter;
     Vec pos;
 
-    memset(particleData, 0, 0x98);
+    memset(particleData, 0, sizeof(PARTICLE_DATA));
     if (particleWmat != NULL) {
-        memset(particleWmat, 0, 0x30);
+        memset(particleWmat, 0, sizeof(PARTICLE_WMAT));
     }
     if (particleColor != NULL) {
-        memset(particleColor, 0, 0x20);
+        memset(particleColor, 0, sizeof(PARTICLE_COLOR));
     }
 
     Math.RandF();

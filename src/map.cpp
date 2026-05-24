@@ -3253,17 +3253,10 @@ void CMapMng::SetMeshCameraSemiTransAlpha(unsigned short id, int alpha, int fram
  */
 int CMapMng::GetMapObjIdx(unsigned short id)
 {
-    int objCount = m_mapObjCount;
-    int objIndex = 0;
-    CMapObj* mapObj = GetMapObjArray();
-
-    while (0 < objCount) {
-        if (mapObj->m_objId == id) {
-            return objIndex;
+    for (int i = 0; i < m_mapObjCount; i++) {
+        if (m_mapObjArray[i].m_objId == id) {
+            return i;
         }
-        mapObj++;
-        objIndex++;
-        objCount--;
     }
 
     return -1;

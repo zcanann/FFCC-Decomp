@@ -66,6 +66,21 @@ struct SingleFadeState
     SingleFadeEntry entries[64];
 };
 
+struct SingleMenuStateRaw
+{
+    u8 bytes[0x48];
+};
+
+struct SingleMenuWindowRaw
+{
+    u8 bytes[0x0C];
+};
+
+STATIC_ASSERT(sizeof(SingleFadeEntry) == 0x40);
+STATIC_ASSERT(sizeof(SingleFadeState) == 0x1008);
+STATIC_ASSERT(sizeof(SingleMenuStateRaw) == 0x48);
+STATIC_ASSERT(sizeof(SingleMenuWindowRaw) == 0x0C);
+
 struct SingMenuStaticMessageInfo
 {
     int lineCount;
@@ -1069,21 +1084,21 @@ void CMenuPcs::SingMenuInit()
         stage = *reinterpret_cast<CMemory::CStage**>(self + 0xF4);
     }
     *reinterpret_cast<void**>(self + 0x850) = new (stage, s_singmenu_cpp, 0x605) SingleFadeState;
-    memset(*reinterpret_cast<void**>(self + 0x850), 0, 0x1008);
+    memset(*reinterpret_cast<void**>(self + 0x850), 0, sizeof(SingleFadeState));
 
     stage = *reinterpret_cast<CMemory::CStage**>(self + 0xEC);
     if (Game.m_gameWork.m_menuStageMode != 0) {
         stage = *reinterpret_cast<CMemory::CStage**>(self + 0xF4);
     }
-    *reinterpret_cast<void**>(self + 0x82C) = new (stage, s_singmenu_cpp, 0x609) u8[0x48];
-    memset(*reinterpret_cast<void**>(self + 0x82C), 0, 0x48);
+    *reinterpret_cast<void**>(self + 0x82C) = new (stage, s_singmenu_cpp, 0x609) u8[sizeof(SingleMenuStateRaw)];
+    memset(*reinterpret_cast<void**>(self + 0x82C), 0, sizeof(SingleMenuStateRaw));
 
     stage = *reinterpret_cast<CMemory::CStage**>(self + 0xEC);
     if (Game.m_gameWork.m_menuStageMode != 0) {
         stage = *reinterpret_cast<CMemory::CStage**>(self + 0xF4);
     }
-    *reinterpret_cast<void**>(self + 0x848) = new (stage, s_singmenu_cpp, 0x60D) u8[0xC];
-    memset(*reinterpret_cast<void**>(self + 0x848), 0, 0xC);
+    *reinterpret_cast<void**>(self + 0x848) = new (stage, s_singmenu_cpp, 0x60D) u8[sizeof(SingleMenuWindowRaw)];
+    memset(*reinterpret_cast<void**>(self + 0x848), 0, sizeof(SingleMenuWindowRaw));
 
     *reinterpret_cast<s16*>(self + 0x866) = 0;
     if (gSingMenuForcedSelection >= 0) {
@@ -1768,7 +1783,7 @@ void CMenuPcs::SingleCalcFadeIn()
     u8* self = reinterpret_cast<u8*>(this);
     if (*(short*)(*reinterpret_cast<int*>(self + 0x850) + 4) == 0) {
         Sound.PlaySe(0xE, 0x40, 0x7F, 0);
-        memset(*reinterpret_cast<void**>(self + 0x850), 0, 0x1008);
+        memset(*reinterpret_cast<void**>(self + 0x850), 0, sizeof(SingleFadeState));
 
         int fadePtr = *reinterpret_cast<int*>(self + 0x850);
         int phase = (*reinterpret_cast<s16*>(self + 0x864) == 8) ? 10 : 0;
@@ -2229,7 +2244,7 @@ void CMenuPcs::SingleDrawCtrl()
         }
     }
 
-    memset(reinterpret_cast<void*>(statePtr), 0, 0x48);
+    memset(reinterpret_cast<void*>(statePtr), 0, sizeof(SingleMenuStateRaw));
     FLOAT_8032ea78 = FLOAT_803329b8;
     *reinterpret_cast<s16*>(statePtr + 0x26) = previousMode;
 }

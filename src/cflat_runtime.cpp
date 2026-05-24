@@ -1868,7 +1868,7 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 				reinterpret_cast<SetSystemValFn>((*reinterpret_cast<void***>(this))[12])(
 				    this, static_cast<int>(systemValue) >> 13, reinterpret_cast<CStack*>(sp), setMode);
 			} else {
-				typedef CClass* (*IntToClassFn)(CFlatRuntime*, int);
+				typedef void* (*IntToClassFn)(CFlatRuntime*, int);
 				typedef void (*SetClassSystemValFn)(CFlatRuntime*, int, CObject*, CStack*, int);
 				CObject* target = reinterpret_cast<CObject*>(
 				    reinterpret_cast<IntToClassFn>((*reinterpret_cast<void***>(this))[15])(this, systemValue & 0xFFF));
@@ -1984,7 +1984,7 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 			const u32 returnValue = *object->m_sp;
 			--object->m_sp;
 			const u32 classWord = *object->m_sp;
-			typedef CClass* (*IntToClassFn)(CFlatRuntime*, int);
+			typedef void* (*IntToClassFn)(CFlatRuntime*, int);
 			CObject* target = reinterpret_cast<CObject*>(
 			    reinterpret_cast<IntToClassFn>((*reinterpret_cast<void***>(this))[15])(this, classWord >> 16));
 			object->m_engineObject = target;
@@ -2432,9 +2432,9 @@ CFlatRuntime::CObject* CFlatRuntime::getFreeObject(int)
  * Address:	TODO
  * Size:	TODO
  */
-CFlatRuntime::CClass* CFlatRuntime::intToClass(int)
+void* CFlatRuntime::intToClass(int)
 {
-    return 0;
+	return 0;
 }
 
 /*

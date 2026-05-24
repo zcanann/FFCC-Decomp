@@ -89,7 +89,7 @@ extern const double DOUBLE_803310F0 = 57.295780181884766;
 extern const float FLOAT_803310F8 = 1.5f;
 extern const double DOUBLE_80331100 = 4503601774854144.0;
 extern const float FLOAT_80331108 = 0.25f;
-extern const float FLOAT_8033110C = 0.0f;
+extern const float kCharaFurDepthZero = 0.0f;
 extern const float FLOAT_80331110 = 10.0f;
 extern const char sMogFurTextureName[] = "n915m_2";
 

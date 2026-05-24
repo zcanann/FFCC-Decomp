@@ -266,15 +266,15 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
                                                  stepData->m_payloadGraphStep,
                                                  stepData->m_payloadGraphStepStep);
 
-    model->m_callbackContext = work;
-    model->m_callbackParam = stepData;
+    model->SetCallbackContext(work, stepData);
     model->m_beforeMeshLockEnvCallback = (void (*)(CChara::CModel*, void*, void*, int))
         CharaBreak_BeforeMeshLockEnvCallback__FPQ26CChara6CModelPvPvi;
     model->m_drawMeshDLCallback = (void (*)(CChara::CModel*, void*, void*, int, int, float (*)[4]))
         CharaBreak_DrawMeshDLCallback__FPQ26CChara6CModelPvPviiPA4_f;
     model->m_afterDrawMeshCallback = (void (*)(CChara::CModel*, void*, void*, int, float (*)[4]))
         CharaBreak_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f;
-    *(u32*)((u8*)model + 0xEC) = (u32)CharaBreak_BeforeCalcMatrixCallback__FPQ26CChara6CModelPvPv;
+    model->m_beforeCalcMatrixCallback = (CChara::CModel::BeforeCalcMatrixCallback)
+        CharaBreak_BeforeCalcMatrixCallback__FPQ26CChara6CModelPvPv;
 
     if (stepData->m_graphId == charaBreak->m_graphId) {
         f32 zero = FLOAT_80332048;
@@ -386,12 +386,11 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
 
 fail:
     work->m_enabled = 0;
-    model->m_callbackContext = 0;
-    model->m_callbackParam = 0;
+    model->SetCallbackContext(0, 0);
     model->m_beforeMeshLockEnvCallback = 0;
     model->m_drawMeshDLCallback = 0;
     model->m_afterDrawMeshCallback = 0;
-    *(u32*)((u8*)model + 0xEC) = 0;
+    model->m_beforeCalcMatrixCallback = 0;
 }
 
 /*
@@ -410,12 +409,11 @@ void pppDestructCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkC* data)
     CharaBreakWork* work = (CharaBreakWork*)(charaBreak->m_workArea + data->m_serializedDataOffsets[2]);
     CChara::CModel* model = work->m_model;
 
-    model->m_callbackContext = 0;
-    model->m_callbackParam = 0;
+    model->SetCallbackContext(0, 0);
     model->m_beforeMeshLockEnvCallback = 0;
     model->m_drawMeshDLCallback = 0;
     model->m_afterDrawMeshCallback = 0;
-    *(u32*)((u8*)model + 0xEC) = 0;
+    model->m_beforeCalcMatrixCallback = 0;
 
     void** perMeshBuffers = (void**)work->m_meshBuffers;
     u8* mesh = reinterpret_cast<u8*>(ModelMeshes(model));

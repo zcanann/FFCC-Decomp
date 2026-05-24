@@ -138,6 +138,10 @@ public:
     COctTree* GetOctTreeArray() { return reinterpret_cast<COctTree*>(reinterpret_cast<unsigned char*>(this) + 0x14); }
     CMapHit* GetMapHitArray() { return reinterpret_cast<CMapHit*>(reinterpret_cast<unsigned char*>(this) + 0x4D4); }
     CMapObj* GetMapObjArray() { return reinterpret_cast<CMapObj*>(reinterpret_cast<unsigned char*>(this) + 0x954); }
+    CMapObj* GetMapObj(int index)
+    {
+        return reinterpret_cast<CMapObj*>(reinterpret_cast<unsigned char*>(this) + 0x954 + index * sizeof(CMapObj));
+    }
     CMapMesh* GetMapMeshArray() { return reinterpret_cast<CMapMesh*>(reinterpret_cast<unsigned char*>(this) + 0x1E954); }
     CPtrArray<CMapAnimRun*>& GetMapAnimRunArray()
     {

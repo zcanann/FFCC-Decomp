@@ -173,7 +173,7 @@ void CMapAnim::ReadOtmAnim(CChunkFile& chunkFile)
             while ((hasChunk = static_cast<int>(chunkFile.GetNextChunk(*reinterpret_cast<CChunkFile::CChunk*>(innerChunkData)))) != 0) {
                 if (innerChunkId == 0x4E494458) {
                     nodeIdx = static_cast<int>(chunkFile.Get4());
-                    item[0] = reinterpret_cast<int>(MapMng.GetMapObjArray() + nodeIdx);
+                    item[0] = reinterpret_cast<int>(MapMng.GetMapObj(nodeIdx));
                 } else if (innerChunkId == 0x5452414E) {
                     keyData = reinterpret_cast<int>(
                         operator new(

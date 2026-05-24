@@ -629,16 +629,16 @@ void CalcReflectionVector2(
     cameraPos.z = CameraWorldZ();
 
     PSMTXCopy(matrix, nodeMtx);
-    nodeOffset.x = *(float*)((char*)node + 0x78);
-    nodeOffset.y = *(float*)((char*)node + 0x88);
-    nodeOffset.z = *(float*)((char*)node + 0x98);
+    nodeOffset.x = node->m_mtx[0][3];
+    nodeOffset.y = node->m_mtx[1][3];
+    nodeOffset.z = node->m_mtx[2][3];
 
     worldPos.x = nodeMtx[0][3];
     worldPos.y = nodeMtx[1][3];
     worldPos.z = nodeMtx[2][3];
     PSVECAdd(&nodeOffset, &worldPos, &worldPos);
 
-    PSMTXCopy((float(*)[4])((char*)node + 0x6C), matrix);
+    PSMTXCopy(node->m_mtx, matrix);
     matrix[0][3] = worldPos.x;
     matrix[1][3] = worldPos.y;
     matrix[2][3] = worldPos.z;

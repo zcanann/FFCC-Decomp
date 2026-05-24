@@ -436,16 +436,16 @@ extern char s_Revitalia_801DE674[];
 extern char s_Superataque_801DE680[];
 extern char s_No_se_aturde_801DE69C[];
 extern char s_Viehzuechter_801DD754[];
-extern char lbl_801DDE90[];
-extern char lbl_801DDEF4[];
-extern char lbl_801DDF18[];
-extern char lbl_801DE068[];
-extern char lbl_801DE074[];
-extern char lbl_801DE0A4[];
-extern char lbl_801DE118[];
-extern char lbl_801DE138[];
-extern char lbl_801DE188[];
-extern char lbl_801DE1A8[];
+extern char s_Weisskaeppchen_801DDE90[];
+extern char s_Fluegelhelm_801DDEF4[];
+extern char s_Baerentatze_801DDF18[];
+extern char s_Tete_nue_801DE068[];
+extern char s_Elegante_801DE074[];
+extern char s_Cuillere_801DE0A4[];
+extern char s_Visor_Metalico_801DE118[];
+extern char s_Mascara_Roja_801DE138[];
+extern char s_Ojos_Tiburon_801DE188[];
+extern char s_Cabeza_Buho_801DE1A8[];
 extern char lbl_801DE4FC[];
 extern char lbl_801DE50C[];
 extern char lbl_801DE53C[];
@@ -641,12 +641,12 @@ extern "C" char* PTR_s_Cowlick[] = {
 };
 extern "C" char* PTR_s_Spitzschopf[] = {
     s_Spitzschopf_801DDE48, lbl_803325B8, s_Stirnband_801DDE54, s_Kopftuch_801DDE60,
-    s_lange_Haare_801DDE6C, s_kurze_Haare_801DDE78, s_mittellang_801DDE84, lbl_801DDE90,
+    s_lange_Haare_801DDE6C, s_kurze_Haare_801DDE78, s_mittellang_801DDE84, s_Weisskaeppchen_801DDE90,
     lbl_803325C0, s_Spitzhelm_801DDEA0, s_Eisenmaske_801DDEAC, s_Topfhelm_801DDEB8,
     lbl_803325C0, s_Ritterin_801DDEC4, lbl_803325C8, s_Augenmaske_801DDED0,
-    lbl_803325D0, s_Gitterhelm_801DDEDC, s_Knollhelm_801DDEE8, lbl_801DDEF4,
+    lbl_803325D0, s_Gitterhelm_801DDEDC, s_Knollhelm_801DDEE8, s_Fluegelhelm_801DDEF4,
     lbl_803325D8, lbl_803325E0, lbl_803325E8, s_Schleife_801DDF00,
-    s_Wolfkopf_801DDF0C, lbl_803325F0, lbl_801DDF18, s_Otterschwanz_801DDF24,
+    s_Wolfkopf_801DDF0C, lbl_803325F0, s_Baerentatze_801DDF18, s_Otterschwanz_801DDF24,
     s_Katzenbein_801DDF34, s_Otterschwanz_801DDF24, lbl_803325F0, s_Eulenkopf_801DDF40,
 };
 extern "C" char* PTR_s_Ciuffo_ribelle[] = {
@@ -662,22 +662,22 @@ extern "C" char* PTR_s_Ciuffo_ribelle[] = {
 extern "C" char* gSingMenuHairTableFr[] = {
     lbl_80332634, lbl_80332638, lbl_80332640, lbl_80332648,
     lbl_80332650, lbl_80332658, lbl_80332660, lbl_80332648,
-    lbl_801DE068, lbl_80332668, lbl_80332670, lbl_80332678,
-    lbl_801DE068, lbl_80332678, lbl_801DE074, lbl_80332680,
+    s_Tete_nue_801DE068, lbl_80332668, lbl_80332670, lbl_80332678,
+    s_Tete_nue_801DE068, lbl_80332678, s_Elegante_801DE074, lbl_80332680,
     s_Unicorne_801DE080, lbl_80332688, s_Long_bec_801DE08C, s_Mage_noir_801DE098,
-    lbl_8033260C, lbl_80332690, lbl_801DE0A4, lbl_80332698,
+    lbl_8033260C, lbl_80332690, s_Cuillere_801DE0A4, lbl_80332698,
     lbl_803326A0, lbl_803326A8, lbl_80332624, lbl_803326B0,
     lbl_803326B8, lbl_803326B0, lbl_803326A8, lbl_803326C0,
 };
 extern "C" char* PTR_s_Remolino[] = {
     s_Remolino_801DE0B0, lbl_8033257C, lbl_803326C8, lbl_803326D0,
     s_Cabello_Largo_801DE0BC, s_Cabello_Corto_801DE0CC, s_Chaqueta_Osc_801DE0DC, s_Gorro_Blanco_801DE0EC,
-    s_Cabeza_Aire_801DE0FC, s_Yelmo_Cuerno_801DE108, lbl_801DE118, s_Cabeza_Balde_801DE128,
-    s_Cabeza_Aire_801DE0FC, lbl_803326D8, s_Elegante_801DDFDC, lbl_801DE138,
+    s_Cabeza_Aire_801DE0FC, s_Yelmo_Cuerno_801DE108, s_Visor_Metalico_801DE118, s_Cabeza_Balde_801DE128,
+    s_Cabeza_Aire_801DE0FC, lbl_803326D8, s_Elegante_801DDFDC, s_Mascara_Roja_801DE138,
     s_Un_Cuerno_801DE148, s_Zarandeado_801DE154, s_Pico_Largo_801DE160, s_Magia_Negra_801DE16C,
     lbl_803326E0, lbl_803326E8, lbl_803326F0, s_Cresta_Coraz_801DE178,
-    lbl_803326F8, lbl_801DE188, lbl_80332624, s_Cola_Mapache_801DE198,
-    lbl_803326F8, s_Cola_Mapache_801DE198, lbl_801DE188, lbl_801DE1A8,
+    lbl_803326F8, s_Ojos_Tiburon_801DE188, lbl_80332624, s_Cola_Mapache_801DE198,
+    lbl_803326F8, s_Cola_Mapache_801DE198, s_Ojos_Tiburon_801DE188, s_Cabeza_Buho_801DE1A8,
 };
 extern "C" char* gSingMenuAttrTableEn[] = {
     lbl_803321B8, s_Resist_fire_801DE1B4, s_Resist_cold_801DE1C0, s_Resist_lightning_801DE1CC,

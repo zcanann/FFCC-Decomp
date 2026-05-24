@@ -175,9 +175,10 @@ void CMesMenu::Open(char* script, int x, int y, int flags, int unk1, int unk2, i
         *(unsigned int*)((char*)this + 0x3D54) = uVar2;
     } else {
         MenuPcs.m_battleRingMenus[*(int*)((char*)this + 0x18)]->SetFade(0);
-        *(float*)((char*)this + 0x3D9C) = FLOAT_803308e0;
-        fVar1 = FLOAT_803308e4;
-        *(float*)((char*)this + 0x3DA0) = fVar1;
+        fVar1 = FLOAT_803308e0;
+        float scaleY = FLOAT_803308e4;
+        *(float*)((char*)this + 0x3D9C) = fVar1;
+        *(float*)((char*)this + 0x3DA0) = scaleY;
     }
 
     *(int*)((char*)this + 0x3D90) = unk1;
@@ -208,15 +209,17 @@ void CMesMenu::Open(char* script, int x, int y, int flags, int unk1, int unk2, i
     uVar2 = (unsigned int)*(int*)((char*)this + 0x18);
     if ((int)uVar2 < 4) {
         if ((uVar2 & 2) != 0) {
-            dVar4 = (double)((*(float*)((char*)this + 0x3DA0) + (*(float*)((char*)this + 0x3D70) - FLOAT_803308f4) +
-                              *(float*)((char*)this + 0x3D78)) -
+            dVar4 = (double)(((*(float*)((char*)this + 0x3D70) - FLOAT_803308f4) +
+                              *(float*)((char*)this + 0x3D78) + *(float*)((char*)this + 0x3DA0)) -
                              *(float*)((char*)this + 0x3D80));
         } else {
-            dVar4 = (double)(FLOAT_803308f8 + *(float*)((char*)this + 0x3DA0) + *(float*)((char*)this + 0x3D70) +
-                             *(float*)((char*)this + 0x3D78));
+            dVar4 = (double)((*(float*)((char*)this + 0x3D70) + *(float*)((char*)this + 0x3D78) +
+                              *(float*)((char*)this + 0x3DA0)) +
+                             FLOAT_803308f8);
         }
     } else {
-        dVar4 = (double)(*(float*)((char*)this + 0x3DA0) + *(float*)((char*)this + 0x3D70) + *(float*)((char*)this + 0x3D78));
+        dVar4 = (double)((*(float*)((char*)this + 0x3D70) + *(float*)((char*)this + 0x3D78)) +
+                         *(float*)((char*)this + 0x3DA0));
     }
 
     bVar3 = false;
@@ -224,10 +227,12 @@ void CMesMenu::Open(char* script, int x, int y, int flags, int unk1, int unk2, i
         bVar3 = true;
     }
     if (bVar3) {
-        fVar1 = (*(float*)((char*)this + 0x3D9C) + *(float*)((char*)this + 0x3D6C) + *(float*)((char*)this + 0x3D74)) -
+        fVar1 = ((*(float*)((char*)this + 0x3D6C) + *(float*)((char*)this + 0x3D74)) +
+                 *(float*)((char*)this + 0x3D9C)) -
                 *(float*)((char*)this + 0x3D7C);
     } else {
-        fVar1 = *(float*)((char*)this + 0x3D9C) + *(float*)((char*)this + 0x3D6C) + *(float*)((char*)this + 0x3D74);
+        fVar1 = (*(float*)((char*)this + 0x3D6C) + *(float*)((char*)this + 0x3D74)) +
+                *(float*)((char*)this + 0x3D9C);
     }
     m_mes.SetPosition(fVar1, (float)dVar4);
 

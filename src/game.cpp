@@ -82,6 +82,7 @@ enum GameAssetNameBlockOffset {
 enum {
 	kGameWorkDataClearSize =
 	    sizeof(CGame::CGameWork) - offsetof(CGame::CGameWork, m_gameDataStartMarker),
+	kGameScriptSaveDataSize = 0x800,
 };
 
 STATIC_ASSERT(kGameWorkDataClearSize == 0x13E1);
@@ -1122,7 +1123,7 @@ void CGame::LoadScript(char* scriptData)
  */
 void CGame::SaveScript(char* scriptData)
 {
-    memset(scriptData, 0, 0x800);
+    memset(scriptData, 0, kGameScriptSaveDataSize);
 
     int scriptOffset = 0;
     int entryOffset = 0;

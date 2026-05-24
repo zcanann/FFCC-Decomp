@@ -706,9 +706,9 @@ s32 THPSimpleSetBuffer(u8* buffer)
         cursor += chromaSize;
 
         frameBufferSize = (SimpleControl.header.mBufferSize + 0x1F) & ~0x1F;
-        SimpleControl.readBuffer[0].mIsValid = 0;
         SimpleControl.readBuffer[0].mPtr = cursor;
         cursor += frameBufferSize;
+        SimpleControl.readBuffer[0].mIsValid = 0;
 
         SimpleControl.readBuffer[1].mPtr = cursor;
         cursor += frameBufferSize;
@@ -726,6 +726,9 @@ s32 THPSimpleSetBuffer(u8* buffer)
         cursor += frameBufferSize;
 
         SimpleControl.readBuffer[6].mPtr = cursor;
+        cursor += frameBufferSize;
+
+        SimpleControl.readBuffer[7].mPtr = cursor;
         cursor += frameBufferSize;
 
         SimpleControl.readBuffer[1].mIsValid = 0;

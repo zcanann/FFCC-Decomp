@@ -150,7 +150,7 @@ static const char s_unknown_mapobj_type_error[] = "Error:Unknown mapobj type(%d)
 static const char s_npc_max_over[] = "%s(%d): Error: NPC max over!!\n";
 static const char s_subject_max_over[] = "%s(%d): Error: Subject max over!!\n";
 static const char s_letter_data_error[] = "%s(%d): Error: Letter data error(chan:%d  idx:%d)\n";
-extern float FLOAT_80330D54;
+extern float kGbaQueueMapCoordScale;
 
 /*
  * --INFO--
@@ -1618,9 +1618,9 @@ void GbaQueue::LoadEnemyStat()
 				    *reinterpret_cast<unsigned short*>(reinterpret_cast<char*>(enemyObj) + 0x514);
 				*reinterpret_cast<unsigned short*>(enemyEntry + 0x12) =
 				    *reinterpret_cast<unsigned short*>(reinterpret_cast<char*>(enemyObj) + 0x516);
-				long long posX = static_cast<int>(enemyObj->m_worldPosition.x / FLOAT_80330D54);
+				long long posX = static_cast<int>(enemyObj->m_worldPosition.x / kGbaQueueMapCoordScale);
 				*reinterpret_cast<short*>(enemyEntry + 8) = static_cast<short>(posX);
-				long long posZ = static_cast<int>(enemyObj->m_worldPosition.z / FLOAT_80330D54);
+				long long posZ = static_cast<int>(enemyObj->m_worldPosition.z / kGbaQueueMapCoordScale);
 				*reinterpret_cast<short*>(enemyEntry + 0xA) = static_cast<short>(posZ);
 			}
 
@@ -2670,10 +2670,14 @@ void GbaQueue::LoadMapObj()
 					unsigned int entryBase = count * 0xC;
 
 					mapObjWork[8 + entryBase] = static_cast<unsigned char>(objType);
-					*reinterpret_cast<short*>(mapObjWork + 0xC + entryBase) = static_cast<short>((int)(x / FLOAT_80330D54));
-					*reinterpret_cast<short*>(mapObjWork + 0xE + entryBase) = static_cast<short>((int)(y / FLOAT_80330D54));
-					*reinterpret_cast<short*>(mapObjWork + 0x10 + entryBase) = static_cast<short>((int)(z / FLOAT_80330D54));
-					*reinterpret_cast<short*>(mapObjWork + 0x12 + entryBase) = static_cast<short>((int)(r / FLOAT_80330D54));
+					*reinterpret_cast<short*>(mapObjWork + 0xC + entryBase) =
+						static_cast<short>((int)(x / kGbaQueueMapCoordScale));
+					*reinterpret_cast<short*>(mapObjWork + 0xE + entryBase) =
+						static_cast<short>((int)(y / kGbaQueueMapCoordScale));
+					*reinterpret_cast<short*>(mapObjWork + 0x10 + entryBase) =
+						static_cast<short>((int)(z / kGbaQueueMapCoordScale));
+					*reinterpret_cast<short*>(mapObjWork + 0x12 + entryBase) =
+						static_cast<short>((int)(r / kGbaQueueMapCoordScale));
 
 					unsigned int mask = 1U << count;
 					unsigned int drawMask = *reinterpret_cast<unsigned int*>(mapObjWork + 4);

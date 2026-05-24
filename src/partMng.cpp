@@ -77,8 +77,8 @@ int DAT_8032ed74 = 0;
 unsigned char gPppInConstructor = 0;
 unsigned char gPppInSubFrameCalc = 0;
 int DAT_8032ed7c = 0;
-unsigned char DAT_8032ed90 = 0;
-unsigned char DAT_8032ed91 = 0;
+unsigned char gPppEditorAnimIndex = 0;
+unsigned char gPppEditorAnimIndexInitialized = 0;
 int gPppCalcDisabled = 0;
 }
 CPartMng PartMng;
@@ -2123,16 +2123,16 @@ void CPartMng::pppEditBeforeCalc()
     case 0x1a:
         if (*editorObj != 0) {
             Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x7ce);
-            if (DAT_8032ed91 == 0) {
-                DAT_8032ed90 = 0;
-                DAT_8032ed91 = 1;
+            if (gPppEditorAnimIndexInitialized == 0) {
+                gPppEditorAnimIndex = 0;
+                gPppEditorAnimIndexInitialized = 1;
             }
 
             CCharaPcs::CHandle* handle = (*editorObj)->m_charaModelHandle;
             if (handle != 0) {
-                handle->LoadAnim(reinterpret_cast<char*>(self + 0x19c), DAT_8032ed90, 0, -1, -1, -1, 0);
-                handle->SetAnim(DAT_8032ed90, -1, -1, -1, 0);
-                DAT_8032ed90++;
+                handle->LoadAnim(reinterpret_cast<char*>(self + 0x19c), gPppEditorAnimIndex, 0, -1, -1, -1, 0);
+                handle->SetAnim(gPppEditorAnimIndex, -1, -1, -1, 0);
+                gPppEditorAnimIndex++;
             }
         }
         break;

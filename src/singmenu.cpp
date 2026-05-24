@@ -143,15 +143,15 @@ extern char s_Pecheur_803321A0[];
 extern char s_Herrero_803321A8[];
 extern char s_Sastre_803321B0[];
 extern char lbl_803321B8[];
-extern char lbl_80332574[];
-extern char lbl_8033257C[];
-extern char lbl_80332584[];
-extern char lbl_80332588[];
-extern char lbl_80332590[];
-extern char lbl_80332598[];
-extern char lbl_803325A0[];
-extern char lbl_803325A8[];
-extern char lbl_803325B0[];
+extern char s_Cowlick_80332574[];
+extern char s_Natural_8033257C[];
+extern char s_Cap_80332584[];
+extern char s_Elegant_80332588[];
+extern char s_Bumpy_80332590[];
+extern char s_Spiral_80332598[];
+extern char s_Tulip_803325A0[];
+extern char s_Spoon_803325A8[];
+extern char s_Wolfie_803325B0[];
 extern char lbl_803325B8[];
 extern char lbl_803325C0[];
 extern char lbl_803325C8[];
@@ -631,14 +631,14 @@ extern "C" char* gSingMenuTextTableEs[] = {
     s_Favoritos_801DDD54, s_Familia_80332564, s_Cartas_80332528, s_Hecho_8033256C,
 };
 extern "C" char* PTR_s_Cowlick[] = {
-    lbl_80332574, lbl_8033257C, s_Headband_801DDD60, lbl_80332584,
+    s_Cowlick_80332574, s_Natural_8033257C, s_Headband_801DDD60, s_Cap_80332584,
     s_Long_Hair_801DDD6C, s_Short_Hair_801DDD78, s_Dark_Coat_801DDD84, s_White_Cap_801DDD90,
     s_Bare_Head_801DDD9C, s_Horned_Helm_801DDDA8, s_Steel_Visor_801DDDB4, s_Bucket_Head_801DDDC0,
-    s_Bare_Head_801DDD9C, s_Blue_Armor_801DDDCC, lbl_80332588, s_Red_Mask_801DDDD8,
-    s_One_Horn_801DDDE4, lbl_80332590, s_Long_Beak_801DDDF0, s_Black_Mage_801DDDFC,
-    lbl_80332598, lbl_803325A0, lbl_803325A8, s_Heart_Top_801DDE08,
-    lbl_803325B0, s_Shark_Eyes_801DDE14, s_Bandanna_801DDE20, s_Raccoon_Tail_801DDE2C,
-    lbl_803325B0, s_Raccoon_Tail_801DDE2C, s_Shark_Eyes_801DDE14, s_Owl_Head_801DDE3C,
+    s_Bare_Head_801DDD9C, s_Blue_Armor_801DDDCC, s_Elegant_80332588, s_Red_Mask_801DDDD8,
+    s_One_Horn_801DDDE4, s_Bumpy_80332590, s_Long_Beak_801DDDF0, s_Black_Mage_801DDDFC,
+    s_Spiral_80332598, s_Tulip_803325A0, s_Spoon_803325A8, s_Heart_Top_801DDE08,
+    s_Wolfie_803325B0, s_Shark_Eyes_801DDE14, s_Bandanna_801DDE20, s_Raccoon_Tail_801DDE2C,
+    s_Wolfie_803325B0, s_Raccoon_Tail_801DDE2C, s_Shark_Eyes_801DDE14, s_Owl_Head_801DDE3C,
 };
 extern "C" char* PTR_s_Spitzschopf[] = {
     s_Spitzschopf_801DDE48, lbl_803325B8, s_Stirnband_801DDE54, s_Kopftuch_801DDE60,
@@ -671,7 +671,7 @@ extern "C" char* gSingMenuHairTableFr[] = {
     lbl_803326B8, lbl_803326B0, lbl_803326A8, lbl_803326C0,
 };
 extern "C" char* PTR_s_Remolino[] = {
-    s_Remolino_801DE0B0, lbl_8033257C, lbl_803326C8, lbl_803326D0,
+    s_Remolino_801DE0B0, s_Natural_8033257C, lbl_803326C8, lbl_803326D0,
     s_Cabello_Largo_801DE0BC, s_Cabello_Corto_801DE0CC, s_Chaqueta_Osc_801DE0DC, s_Gorro_Blanco_801DE0EC,
     s_Cabeza_Aire_801DE0FC, s_Yelmo_Cuerno_801DE108, s_Visor_Metalico_801DE118, s_Cabeza_Balde_801DE128,
     s_Cabeza_Aire_801DE0FC, lbl_803326D8, s_Elegante_801DDFDC, s_Mascara_Roja_801DE138,

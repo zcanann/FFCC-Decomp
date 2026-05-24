@@ -50,7 +50,7 @@ extern const f32 FLOAT_8033104c;
 extern const f32 FLOAT_80331050;
 extern const f32 FLOAT_80331054;
 extern const double DOUBLE_80330FE8 = 3.0;
-extern const double DOUBLE_80331058 = 4503599627370496.0;
+extern const double DOUBLE_80331058;
 
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
 

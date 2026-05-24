@@ -22,7 +22,7 @@ extern float FLOAT_80330e48;
 extern float FLOAT_80330e4c;
 extern float FLOAT_80330e58;
 extern float FLOAT_80330e5c;
-extern const char DAT_80330e50[];
+extern const char s_ymManaRuin2Name[];
 
 extern const float FLOAT_80330e60 = 2.0f;
 extern const float FLOAT_80330e64 = 0.015625f;
@@ -993,7 +993,7 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
             cameraUp.z = FLOAT_80330e4c;
 
             bool useDefaultCamera = true;
-            if (strcmp(DAT_80330e50, compareName) == 0) {
+            if (strcmp(s_ymManaRuin2Name, compareName) == 0) {
                 if (i == 0) {
                     cameraPos.z -= FLOAT_80330e58;
                     useDefaultCamera = false;
@@ -1702,7 +1702,7 @@ void CalcReflectionVector2(
             PSVECSubtract(&position, &cameraPos, &eyeToPos);
             C_VECReflect(&eyeToPos, &normal, &reflectionVec[posIndex]);
 
-            if (strcmp(DAT_80330e50, compareName) == 0) {
+            if (strcmp(s_ymManaRuin2Name, compareName) == 0) {
                 PSMTXMultVec(rotateMtx, &reflectionVec[posIndex], &reflectionVec[posIndex]);
             }
 

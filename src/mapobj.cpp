@@ -36,7 +36,7 @@ extern const float kMapObjColorBlendScale;
 extern const float kMapObjDegToRad;
 extern const float kMapObjInitValue50;
 extern const char s_mapobj_cpp_801D70C0[];
-extern unsigned int DAT_8032e498;
+extern _GXColor s_mapObjLightColor;
 unsigned int DAT_8032E8B8 = 5;
 
 inline void* operator new(unsigned long, void* ptr)
@@ -1355,10 +1355,10 @@ void CMapObj::Calc()
 void CMapObj::SetDrawEnv()
 {
     _GXColor mapColor;
-    _GXColor lightColor = *reinterpret_cast<_GXColor*>(&DAT_8032e498);
+    _GXColor lightColor = s_mapObjLightColor;
 
     lightColor.a = U8At(this, 0x23);
-    *reinterpret_cast<_GXColor*>(&DAT_8032e498) = lightColor;
+    s_mapObjLightColor = lightColor;
 
     if (U8At(this, 0x21) == 0) {
         mapColor = MapMng.m_mapColor;
@@ -1411,7 +1411,7 @@ void CMapObj::Draw(unsigned char priority)
 
     _GXColor mapColor;
     _GXColor lightColor;
-    _GXColor* worldMapColor = reinterpret_cast<_GXColor*>(&DAT_8032e498);
+    _GXColor* worldMapColor = &s_mapObjLightColor;
     unsigned char* materialMan = reinterpret_cast<unsigned char*>(&MaterialMan);
 
     Vec lightPos;

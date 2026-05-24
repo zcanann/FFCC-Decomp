@@ -169,14 +169,14 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, p
 
                     colorTop = g_pppYmTracer2_1;
                     colorBottom = g_pppYmTracer2_2;
+                    colorTop.bytes[3] = (u8)(alphaScale * (f32)current->alpha);
+                    colorBottom.bytes[3] = (u8)(alphaScale * (f32)next->alpha);
                     colorTop.bytes[0] = current->colorR;
                     colorTop.bytes[1] = current->colorG;
                     colorTop.bytes[2] = current->colorB;
-                    colorTop.bytes[3] = (u8)(alphaScale * (f32)current->alpha);
                     colorBottom.bytes[0] = next->colorR;
                     colorBottom.bytes[1] = next->colorG;
                     colorBottom.bytes[2] = next->colorB;
-                    colorBottom.bytes[3] = (u8)(alphaScale * (f32)next->alpha);
 
                     GXPosition3f32(current->targetPos.x, current->targetPos.y, current->targetPos.z);
                     GXColor1u32(*(u32*)&colorTop);

@@ -175,14 +175,14 @@ extern float FLOAT_803317e8;
 extern double DOUBLE_803313f8;
 extern double DOUBLE_80331408;
 extern double DOUBLE_803314e8;
-extern unsigned char DAT_80331758;
-extern unsigned char DAT_8033175c;
-extern char s_stand_80331638[];
-extern char DAT_80331640[];
-extern char DAT_80331648[];
-extern char DAT_8033164c[];
-extern char DAT_80331654[];
-extern char DAT_8033165c[];
+extern unsigned char s_wmWorldParamPrimaryDirtyMask;
+extern unsigned char s_wmWorldParamSecondaryDirtyMask;
+extern char s_wmCharaAnimStand[];
+extern char s_wmCharaAnimWalk[];
+extern char s_wmCharaAnimRun[];
+extern char s_wmCharaAnimGlad[];
+extern char s_wmCharaAnimSleep[];
+extern char s_wmCharaAnimAngry[];
 extern const char* s_wmEmptyCreatingTextEn_8032E8F0[];
 extern const char* s_wmEmptyCreatingTextDe_8032E8F8[];
 extern const char* s_wmEmptyCreatingTextIt_8032E900[];
@@ -4190,7 +4190,7 @@ void CMenuPcs::SetWorldParam(int code, int value)
 	case 0:
 		bytes[5] = bytes[4];
 		bytes[4] = bVar6;
-		bytes[0xA] = bytes[0xA] | DAT_80331758;
+		bytes[0xA] = bytes[0xA] | s_wmWorldParamPrimaryDirtyMask;
 		break;
 	case 1:
 		bytes[6] = bVar6;
@@ -4216,7 +4216,7 @@ void CMenuPcs::SetWorldParam(int code, int value)
 	case 8:
 		bytes[0xB] = bytes[0xC];
 		bytes[0xC] = bVar6;
-		bytes[0xA] = bytes[0xA] | DAT_8033175c;
+		bytes[0xA] = bytes[0xA] | s_wmWorldParamSecondaryDirtyMask;
 		break;
 	case 9:
 		if (static_cast<int>(static_cast<signed char>(bytes[0xD])) != value) {
@@ -6084,12 +6084,12 @@ void CMenuPcs::CalcChara()
 				const unsigned int charaBase = static_cast<unsigned int>(loadHandle->m_charaNo) / 100;
 				const int modelNo = charaBase * 100;
 				const int baseAnim = (charaBase - 1) * 6;
-				loadHandle->LoadAnim(s_stand_80331638, baseAnim, 1, 0, modelNo, -1, 0);
-				loadHandle->LoadAnim(DAT_80331640, baseAnim + 1, 1, 0, modelNo, -1, 0);
-				loadHandle->LoadAnim(DAT_80331648, baseAnim + 2, 1, 0, modelNo, -1, 0);
-				loadHandle->LoadAnim(DAT_8033164c, baseAnim + 3, 3, 0, modelNo, -1, 0);
-				loadHandle->LoadAnim(DAT_80331654, baseAnim + 4, 1, 0, modelNo, -1, 0);
-				loadHandle->LoadAnim(DAT_8033165c, baseAnim + 5, 1, 0, modelNo, -1, 0);
+				loadHandle->LoadAnim(s_wmCharaAnimStand, baseAnim, 1, 0, modelNo, -1, 0);
+				loadHandle->LoadAnim(s_wmCharaAnimWalk, baseAnim + 1, 1, 0, modelNo, -1, 0);
+				loadHandle->LoadAnim(s_wmCharaAnimRun, baseAnim + 2, 1, 0, modelNo, -1, 0);
+				loadHandle->LoadAnim(s_wmCharaAnimGlad, baseAnim + 3, 3, 0, modelNo, -1, 0);
+				loadHandle->LoadAnim(s_wmCharaAnimSleep, baseAnim + 4, 1, 0, modelNo, -1, 0);
+				loadHandle->LoadAnim(s_wmCharaAnimAngry, baseAnim + 5, 1, 0, modelNo, -1, 0);
 				animState[0] = 0;
 				animState[1] = -1;
 				animState[2] = rand() % 250;
@@ -7773,12 +7773,12 @@ void CMenuPcs::SetAnim(int anim)
 	const int modelBase = static_cast<int>(charaNo / 100) * 100;
 	const int animBase = (static_cast<int>(charaNo / 100) - 1) * 6;
 
-	handle->LoadAnim(s_stand_80331638, animBase + 0, 1, 0, modelBase, -1, 0);
-	handle->LoadAnim(DAT_80331640, animBase + 1, 1, 0, modelBase, -1, 0);
-	handle->LoadAnim(DAT_80331648, animBase + 2, 1, 0, modelBase, -1, 0);
-	handle->LoadAnim(DAT_8033164c, animBase + 3, 3, 0, modelBase, -1, 0);
-	handle->LoadAnim(DAT_80331654, animBase + 4, 1, 0, modelBase, -1, 0);
-	handle->LoadAnim(DAT_8033165c, animBase + 5, 1, 0, modelBase, -1, 0);
+	handle->LoadAnim(s_wmCharaAnimStand, animBase + 0, 1, 0, modelBase, -1, 0);
+	handle->LoadAnim(s_wmCharaAnimWalk, animBase + 1, 1, 0, modelBase, -1, 0);
+	handle->LoadAnim(s_wmCharaAnimRun, animBase + 2, 1, 0, modelBase, -1, 0);
+	handle->LoadAnim(s_wmCharaAnimGlad, animBase + 3, 3, 0, modelBase, -1, 0);
+	handle->LoadAnim(s_wmCharaAnimSleep, animBase + 4, 1, 0, modelBase, -1, 0);
+	handle->LoadAnim(s_wmCharaAnimAngry, animBase + 5, 1, 0, modelBase, -1, 0);
 
 	int* const animState = reinterpret_cast<int*>(reinterpret_cast<unsigned int*>(bytes + 0x844)[0]) + anim * 5;
 	animState[0] = 0;

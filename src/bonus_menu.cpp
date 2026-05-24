@@ -2094,97 +2094,178 @@ void CMenuPcs::DrawResultCloseAnim()
 {
 	int animPtr = GetBonusMenuMembers(this).m_bonusAnimPtr;
 	int statePtr = GetBonusMenuMembers(this).m_bonusStatePtr;
-	int digitIndex = 0;
-	int nameIndex = 0;
 	int modelIndex = 0;
-	int lastTexturedKind = -1;
+	int lastKind = 0;
 
-	if (animPtr == 0 || statePtr == 0) {
-		return;
-	}
 	if (*(unsigned char*)(statePtr + 0xb) == 0) {
 		return;
 	}
 
+	int activePartyCount = s_Rinfo->m_partyCount;
 	BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
 	BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
-	float strongest = 0.0f;
-	CFont* font = GetBonusMenuMembers(this).m_font;
 
 	DrawInit();
 	SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
 	for (int i = 0; i < (int)header->count; i++) {
 		BonusAnimSprite* sprite = &sprites[i];
-		float alpha = sprite->alpha;
-		if (alpha < 0.0f) {
-			alpha = 0.0f;
-		} else if (alpha > 1.0f) {
-			alpha = 1.0f;
-		}
+		int kind = sprite->kind;
 
-		if (sprite->kind == 0x17 && lastTexturedKind != 0x17) {
-			SetAttrFmt(static_cast<CMenuPcs::FMT>(1));
-		} else if (sprite->kind != 0x17 && lastTexturedKind == 0x17) {
-			SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-		}
-		lastTexturedKind = sprite->kind;
-
-		if (sprite->kind == -3) {
-			DrawBonusFrame((float)sprite->x, (float)sprite->y, (float)sprite->w, (float)sprite->h, alpha);
-		} else if (sprite->kind == -4) {
-			DrawArtiBase((CMenuPcs::Sprt2*)sprite, alpha);
-		} else if (sprite->kind == -2) {
-			CCharaPcs::CHandle* handle = GetBonusResultOpenHandle(this, modelIndex);
-			if (handle != 0) {
-				SetProjection(modelIndex);
-				SetLight(1);
-				unsigned int oldFlags = handle->m_flags;
-				handle->m_flags = 0x300543;
-				if (handle->m_model != 0) {
-					*(float*)((char*)handle->m_model + 0x9C) = alpha;
+		if (kind >= 0 || kind == -2) {
+			if (kind == -2) {
+				CCharaPcs::CHandle* handle = 0;
+				if (modelIndex < activePartyCount) {
+					handle = s_Rinfo->m_party[modelIndex].m_partyHandle;
+				} else if (modelIndex / activePartyCount <= 1) {
+					handle = GetBonusDisplayHandleSlots(this)[modelIndex - activePartyCount];
 				}
-				handle->Draw(5);
-				handle->m_flags = oldFlags;
-				RestoreProjection();
+
+				if (handle != 0 && handle->m_model != 0 &&
+				    0.0f < *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C)) {
+					SetProjection(modelIndex);
+					SetLight(1);
+					unsigned int oldFlags = handle->m_flags;
+					handle->m_flags = 0x300543;
+					handle->Draw(5);
+					handle->m_flags = oldFlags;
+					RestoreProjection();
+				}
+				modelIndex++;
 			} else {
-				DrawBonusCnt((CMenuPcs::Sprt2*)sprite, GetBonusResultValueByActiveIndex(digitIndex++));
-			}
-			modelIndex++;
-		} else if (sprite->kind == -1) {
-			if (font != 0) {
-				const char* partyName = GetBonusPartyNameByActiveIndex(nameIndex++);
-				if (partyName != 0 && *partyName != '\0') {
-					_GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(alpha * 255.0f)};
-					font->SetMargin(1.0f);
-					font->SetShadow(1);
-					font->SetScale(0.9f);
-					font->SetTlut(7);
-					font->SetColor(color);
-					font->DrawInit();
-					font->SetPosX((float)sprite->x + sprite->mulX);
-					font->SetPosY((float)sprite->y + sprite->mulY);
-					font->Draw(const_cast<char*>(partyName));
+				if (lastKind < 0) {
+					DrawInit();
 				}
+				if (lastKind != 0x17 && kind == 0x17) {
+					SetAttrFmt(static_cast<CMenuPcs::FMT>(1));
+				} else if (lastKind == 0x17 && kind != 0x17) {
+					SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+				}
+
+				if (kind == 0x17) {
+					_GXColor colors[4] = {
+					    {0xFF, 0xFF, 0xFF, 0xFF},
+					    {0xFF, 0xFF, 0xFF, 0xFF},
+					    {0xFF, 0xFF, 0xFF, 0xFF},
+					    {0xFF, 0xFF, 0xFF, 0xFF},
+					};
+					_GXColor color = {0xFF, 0xFF, 0xFF, 0xFF};
+					GXSetChanMatColor(GX_COLOR0A0, color);
+					SetTexture(static_cast<CMenuPcs::TEX>(kind));
+
+					if (sprite->timer < sprite->duration) {
+						float progress = 0.0f;
+						if (sprite->timer < sprite->duration) {
+							progress = 1.0f - ((float)(sprite->timer - 1) / (float)sprite->duration);
+							if (progress < 0.0f) {
+								progress = 0.0f;
+							}
+						}
+						float fillWidth = progress * (float)sprite->w;
+						float x = (float)sprite->x;
+						float y = (float)sprite->y;
+						if (fillWidth > 0.0f) {
+							DrawRect(0, x, y, fillWidth, (float)sprite->h,
+							    sprite->mulX, sprite->mulY, colors, 1.0f, 1.0f, 0.0f);
+							x += fillWidth;
+						}
+						if (fillWidth < (float)sprite->w) {
+							colors[0].a = 0;
+							colors[3].a = 0;
+							DrawRect(0, x, y, (float)sprite->w / (float)sprite->duration, (float)sprite->h,
+							    fillWidth, sprite->mulY, colors, 1.0f, 1.0f, 0.0f);
+						}
+					}
+				} else {
+					_GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(sprite->alpha * 255.0f)};
+					GXSetChanMatColor(GX_COLOR0A0, color);
+					SetTexture(static_cast<CMenuPcs::TEX>(kind));
+
+					if (i < s_CntTop || i >= s_CntTop + activePartyCount) {
+						DrawRect(0, (float)sprite->x + sprite->motionX, (float)sprite->y + sprite->motionY,
+						    (float)sprite->w, (float)sprite->h,
+						    sprite->mulX, sprite->mulY, sprite->depth, sprite->depth, 0.0f);
+					} else {
+						int value = s_Rinfo->m_party[i - s_CntTop].m_totalValue;
+						int digits[3];
+						int digitCount;
+
+						if (value >= 100) {
+							digitCount = 3;
+							digits[0] = value / 100;
+							value -= digits[0] * 100;
+							digits[1] = value / 10;
+							digits[2] = value - digits[1] * 10;
+						} else if (value >= 10) {
+							digitCount = 2;
+							digits[0] = value / 10;
+							digits[1] = value - digits[0] * 10;
+						} else {
+							digitCount = 1;
+							digits[0] = value;
+						}
+
+						float digitW = (float)sprite->w;
+						float digitX = ((3.0f * digitW) - ((float)digitCount * digitW)) * 0.5f + (float)sprite->x;
+						for (int digitIndex = 0; digitIndex < digitCount; digitIndex++) {
+							DrawRect(0, digitX, (float)sprite->y, digitW, (float)sprite->h,
+							    digitW * (float)digits[digitIndex], sprite->mulY,
+							    sprite->depth, sprite->depth, 0.0f);
+							digitX += digitW;
+						}
+					}
+				}
+				lastKind = kind;
 			}
-		} else if (sprite->kind == 0x17) {
-			DrawBonusSweepSprite(this, sprite, alpha, false);
-		} else {
-			DrawBonusTexturedSprite(this, sprite, alpha);
-		}
-
-		if (strongest < alpha) {
-			strongest = alpha;
 		}
 	}
-	if (lastTexturedKind == 0x17) {
-		SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-	}
 
-	if (*(unsigned char*)(statePtr + 8) != 0 && strongest > 0.0f) {
-		DrawBonusChkMark(strongest);
+	DrawInit();
+	CFont* font = GetBonusMenuMembers(this).m_font;
+	font->SetMargin(1.0f);
+	font->SetShadow(1);
+	font->SetScale(0.9f);
+	font->SetTlut(7);
+	font->DrawInit();
+
+	int textIndex = 0;
+	char text[128];
+	for (int i = 0; i < (int)header->count; i++) {
+		BonusAnimSprite* sprite = &sprites[i];
+		if (sprite->kind == -1) {
+			_GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(sprite->alpha * 255.0f)};
+			font->SetColor(color);
+
+			int partyIndex = textIndex % activePartyCount;
+			CCaravanWork* caravanWork =
+			    reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[s_Rinfo->m_party[partyIndex].m_partySlot]);
+			if (textIndex < activePartyCount) {
+				strcpy(text, reinterpret_cast<char*>(caravanWork->unk_0x3ca_0x3dd));
+			} else {
+				BonusFlatDataRaw* flat = reinterpret_cast<BonusFlatDataRaw*>(&Game.m_cFlatDataArr[1]);
+				strcpy(text, flat->m_table[7].m_strings[(int)caravanWork->m_bonusCondition * 2 + 1]);
+			}
+
+			float y = (float)sprite->y + sprite->motionY - 6.0f;
+			if (textIndex < activePartyCount) {
+				y -= 6.0f;
+			}
+			font->SetPosX((float)sprite->x + sprite->motionX);
+			font->SetPosY(y);
+			font->Draw(text);
+
+			textIndex++;
+			if (textIndex == activePartyCount) {
+				font = GetBonusMenuMembers(this).m_fontWide;
+				font->SetMargin(1.0f);
+				font->SetShadow(0);
+				font->SetScaleX(0.7f);
+				font->SetScaleY(1.0f);
+				font->DrawInit();
+			}
+		}
 	}
-	GetBonusMenuMembers(this).m_bonusAlpha = (unsigned char)(strongest * 255.0f);
+	DrawInit();
 }
 
 /*

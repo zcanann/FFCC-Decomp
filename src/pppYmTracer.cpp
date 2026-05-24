@@ -15,8 +15,8 @@ extern f32 gPppDefaultValueBuffer[];
 
 extern const f32 FLOAT_803306e8;
 extern const f32 FLOAT_803306ec;
-extern u32 DAT_803306e0;
-extern u32 DAT_803306e4;
+extern u32 kYmTracerTopColorBase;
+extern u32 kYmTracerBottomColorBase;
 
 static const char s_pppYmTracer_cpp[] = "pppYmTracer.cpp";
 
@@ -139,9 +139,9 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYm
                     (FLOAT_803306e8 != next->from.y) && (FLOAT_803306e8 != next->from.z)) {
                     uTop = (f32)i * uvStep;
                     uBottom = (f32)(i + 1) * uvStep;
-                    colorTop.value = DAT_803306e0;
+                    colorTop.value = kYmTracerTopColorBase;
                     colorTop.bytes[3] = poly->alpha;
-                    colorBottom.value = DAT_803306e4;
+                    colorBottom.value = kYmTracerBottomColorBase;
                     colorBottom.bytes[3] = next->alpha;
 
                     GXBegin((GXPrimitive)0x98, GX_VTXFMT7, 4);

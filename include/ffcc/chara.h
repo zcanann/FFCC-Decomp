@@ -187,9 +187,9 @@ public:
 		BeforeCalcMatrixCallback m_beforeCalcMatrixCallback;
 		AfterMeshDrawCallback m_afterMeshDrawCallback;
 		BeforeMeshLockEnvCallback m_beforeMeshLockEnvCallback;
-		u8 _padF8[4];
+		BeforeMeshLockEnvCallback m_beforeDrawShadowLockEnvCallback;
 		DrawMeshDLCallback m_drawMeshDLCallback;
-		u8 _pad100[4];
+		DrawMeshDLCallback m_drawShadowMeshDLCallback;
 		AfterDrawMeshCallback m_afterDrawMeshCallback;
 		void (*m_afterDrawModelCallback)(CChara::CModel*, void*, void*);
 		u8 m_flags10C;

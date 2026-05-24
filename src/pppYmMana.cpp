@@ -1054,16 +1054,14 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
                 CCharaPcs::CHandle* owner = gObject->m_attachOwner->m_charaModelHandle;
                 CChara::CModel* ownerModel = owner->m_model;
 
-                *(u32*)((u8*)ownerModel + 0xE4) = (u32)work;
-                *(u32*)((u8*)ownerModel + 0xE8) = (u32)step;
-                *(u32*)((u8*)owner->m_model + 0xF8) = (u32)Mana_BeforeDrawShadowLockEnvCallback;
-                *(u32*)((u8*)owner->m_model + 0x100) = (u32)Chara_DrawShadowMeshDLCallback;
+                ownerModel->SetCallbackContext(work, step);
+                ownerModel->m_beforeDrawShadowLockEnvCallback = Mana_BeforeDrawShadowLockEnvCallback;
+                ownerModel->m_drawShadowMeshDLCallback = Chara_DrawShadowMeshDLCallback;
                 owner->Draw(1);
                 ownerModel = owner->m_model;
-                *(u32*)((u8*)ownerModel + 0xE4) = 0;
-                *(u32*)((u8*)ownerModel + 0xE8) = 0;
-                *(u32*)((u8*)owner->m_model + 0xF8) = 0;
-                *(u32*)((u8*)owner->m_model + 0x100) = 0;
+                ownerModel->SetCallbackContext(0, 0);
+                ownerModel->m_beforeDrawShadowLockEnvCallback = 0;
+                ownerModel->m_drawShadowMeshDLCallback = 0;
             }
 
             Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, (_GXTexObj*)sourceTexObjs, 0, 0, 0x80, 0x80, depthTexSize,

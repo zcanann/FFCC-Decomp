@@ -1263,6 +1263,7 @@ void CMemory::CStage::drawHeapBar(int y)
     colors[14] = s_heapBarColors_801D64A8[14];
     colors[15] = s_heapBarColors_801D64A8[15];
 
+    int prevNode;
     int node;
     if (m_allocationMode == 2) {
         node = stageGetHeapHead(this);
@@ -1270,20 +1271,16 @@ void CMemory::CStage::drawHeapBar(int y)
         node = *reinterpret_cast<int*>(stageGetHeapHead(this) + 8);
     }
 
-    int prevNode = *reinterpret_cast<int*>(node + 4);
+    prevNode = *reinterpret_cast<int*>(node + 4);
     unsigned char heapBar[0x17D];
     memset(heapBar, 0xFF, 0x17D);
 
     int heapTop = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 8);
     int heapSpan = (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0xC) - 0x40) - heapTop;
 
-    while (true) {
+    while ((*reinterpret_cast<unsigned char*>(node + 2) & 2) == 0) {
         int curNode = node;
         unsigned char flags = *reinterpret_cast<unsigned char*>(curNode + 2);
-        if ((flags & 2) != 0) {
-            break;
-        }
-
         bool isUsed = false;
         if (((flags & 4) != 0) && ((flags & 3) == 0)) {
             isUsed = true;
@@ -1326,25 +1323,20 @@ void CMemory::CStage::drawHeapBar(int y)
         }
 
 checkHeapNode:
-        if (*reinterpret_cast<int*>(curNode + 0x10) != *reinterpret_cast<int*>(curNode + 8) - (curNode + 0x40)) {
-            if (0 < static_cast<unsigned int>(System.m_execParam)) {
+        if ((static_cast<unsigned int>(*reinterpret_cast<int*>(curNode + 0x10)) !=
+             static_cast<unsigned int>(*reinterpret_cast<int*>(curNode + 8) - (curNode + 0x40))) ||
+            (static_cast<unsigned int>(*reinterpret_cast<int*>(curNode + 4)) != static_cast<unsigned int>(prevNode))) {
+            if (static_cast<unsigned int>(System.m_execParam) >= 1) {
                 System.Printf(const_cast<char*>(DAT_801d67d8));
             }
             return;
         }
 
-        bool linkMismatch = *reinterpret_cast<int*>(curNode + 4) != prevNode;
-        node = *reinterpret_cast<int*>(curNode + 8);
         prevNode = curNode;
-        if (linkMismatch) {
-            if (0 < static_cast<unsigned int>(System.m_execParam)) {
-                System.Printf(const_cast<char*>(DAT_801d67d8));
-            }
-            return;
-        }
+        node = *reinterpret_cast<int*>(curNode + 8);
     }
 
-    unsigned int drawColor = static_cast<unsigned int>(heapBar[0]);
+    int drawColor = heapBar[0];
     unsigned char* colorPtr = heapBar;
     int segmentStart = 0;
     int x = 0;
@@ -1353,14 +1345,28 @@ checkHeapNode:
         if ((drawColor != *colorPtr) || (x == 0x17B)) {
             if (drawColor == 0xFF) {
                 if (stageGetAllocationMode(this) == 0) {
-                    *reinterpret_cast<u32*>(&color) = 0x4080;
+                    color.r = 0;
+                    color.g = 0;
+                    color.b = 0x40;
+                    color.a = 0x80;
                 } else {
-                    *reinterpret_cast<u32*>(&color) = 0x400080;
+                    color.r = 0;
+                    color.g = 0x40;
+                    color.b = 0;
+                    color.a = 0x80;
                 }
             } else if (stageGetAllocationMode(this) == 0) {
-                *reinterpret_cast<u32*>(&color) = colors[drawColor];
+                u8* colorSrc = reinterpret_cast<u8*>(colors) + drawColor * 4;
+                color.r = colorSrc[0];
+                color.g = colorSrc[1];
+                color.b = colorSrc[2];
+                color.a = colorSrc[3];
             } else {
-                *reinterpret_cast<u32*>(&color) = colors[drawColor];
+                u8* colorSrc = reinterpret_cast<u8*>(colors) + drawColor * 4;
+                color.r = colorSrc[0];
+                color.g = colorSrc[1];
+                color.b = colorSrc[2];
+                color.a = colorSrc[3];
             }
 
             GXBegin(static_cast<GXPrimitive>(0x98), GX_VTXFMT0, 4);
@@ -1373,7 +1379,7 @@ checkHeapNode:
             GXPosition3f32(static_cast<float>(x + 0x80), static_cast<float>(y + 8), 0.0f);
             GXColor1u32(*reinterpret_cast<u32*>(&color));
 
-            drawColor = static_cast<unsigned int>(*colorPtr);
+            drawColor = *colorPtr;
             segmentStart = x;
         }
 

@@ -30,7 +30,6 @@ u8 m_boss__8CGMonObj[0x8C];
 }
 
 extern "C" char SoundBuffer_1248_[];
-extern "C" float DAT_8032ec24;
 extern "C" float g_hit_t;
 extern float FLOAT_803319C0;
 extern float FLOAT_803319D8;
@@ -1684,7 +1683,7 @@ void CGMonObj::link(CGPartyObj*, CGMonObj*)
  */
 void CGMonObj::aiTarget()
 {
-	int partyIndex = getNearParty(0, 7, 0.0f, DAT_8032ec24, -1);
+	int partyIndex = getNearParty(0, 7, 0.0f, INFINITY, -1);
 	if (partyIndex >= 0) {
 		*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6C4) = partyIndex;
 	}

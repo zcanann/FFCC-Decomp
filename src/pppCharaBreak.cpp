@@ -30,9 +30,9 @@ extern float FLOAT_80332078;
 extern double DOUBLE_80332068;
 extern double DOUBLE_80332070;
 extern const char sPppCharaBreakObjMeshName[4];
-extern int DAT_801dd684;
-extern int DAT_801dd688;
-extern int DAT_801dd68c;
+extern int kCharaBreakInitialVertexFlag0;
+extern int kCharaBreakInitialVertexFlag1;
+extern int kCharaBreakInitialVertexFlag2;
 extern Vec kPppCharaBreakUpVector;
 
 static inline Mtx& CameraMatrix()
@@ -555,9 +555,9 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
 
                 if (polygon[0] == 0) {
                     int flags[3];
-                    flags[0] = DAT_801dd684;
-                    flags[1] = DAT_801dd688;
-                    flags[2] = DAT_801dd68c;
+                    flags[0] = kCharaBreakInitialVertexFlag0;
+                    flags[1] = kCharaBreakInitialVertexFlag1;
+                    flags[2] = kCharaBreakInitialVertexFlag2;
 
                     for (int i = 0; i < 3; i++) {
                         S16Vec* dst = &transformed[i];

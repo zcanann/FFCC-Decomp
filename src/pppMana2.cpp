@@ -38,13 +38,13 @@ extern const float FLOAT_803318c4 = 5.0f;
 extern const float FLOAT_803318c8 = 128.0f;
 extern const float FLOAT_803318cc = 90.0f;
 extern const float FLOAT_803318d0 = 10000.0f;
-extern const char DAT_803318d4[] = "obj5";
-extern const char DAT_803318dc[] = "obj3";
-extern const char DAT_803318e4[] = "obj1";
-extern const char DAT_803318ec[] = "obj4";
-extern const char DAT_803318f4[] = "obj2";
+extern const char s_manaShapeObj5[] = "obj5";
+extern const char s_manaShapeObj3[] = "obj3";
+extern const char s_manaShapeObj1[] = "obj1";
+extern const char s_manaShapeObj4[] = "obj4";
+extern const char s_manaShapeObj2[] = "obj2";
 extern const float FLOAT_803318fc = 0.99999f;
-extern const char DAT_80331900[] = "obj";
+extern const char s_manaShapeObj[] = "obj";
 extern const float FLOAT_80331904 = -1.5707964f;
 
 static inline float CameraWorldX()
@@ -1085,9 +1085,9 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* para
             meshShape = *(s32*)(meshData + 8);
             u8 type = *(u8*)((u8*)param_2 + 0x1C);
 
-            if (((type == 1) && strcmp((char*)meshShape, DAT_803318d4) == 0) ||
-                ((type == 2) && strcmp((char*)meshShape, DAT_803318dc) == 0) ||
-                ((type == 3) && strcmp((char*)meshShape, DAT_803318e4) == 0)) {
+            if (((type == 1) && strcmp((char*)meshShape, s_manaShapeObj5) == 0) ||
+                ((type == 2) && strcmp((char*)meshShape, s_manaShapeObj3) == 0) ||
+                ((type == 3) && strcmp((char*)meshShape, s_manaShapeObj1) == 0)) {
                 if (work[0x19] == 0) {
                     work[0x19] =
                         (u32)pppMemAlloc(*(s32*)(meshShape + 0x14) * 0xC, pppEnvStPtr->m_stagePtr,
@@ -1145,8 +1145,8 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* para
                 }
             }
 
-            if (((type == 1) && strcmp((char*)meshShape, DAT_803318ec) == 0) ||
-                ((type == 2) && strcmp((char*)meshShape, DAT_803318f4) == 0)) {
+            if (((type == 1) && strcmp((char*)meshShape, s_manaShapeObj4) == 0) ||
+                ((type == 2) && strcmp((char*)meshShape, s_manaShapeObj2) == 0)) {
                 work[0xF] = (u32)pppMemAlloc(0xD8C, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x26A);
                 work[0x10] = (u32)pppMemAlloc(0xD8C, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x26B);
                 work[0x17] = (u32)pppMemAlloc(0x484, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x26C);
@@ -1187,9 +1187,9 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* para
             meshShape = *(s32*)(meshData + 8);
             u8 type = *(u8*)((u8*)param_2 + 0x1C);
 
-            if (((type == 1) && strcmp((char*)meshShape, DAT_803318d4) == 0) ||
-                ((type == 2) && strcmp((char*)meshShape, DAT_803318dc) == 0) ||
-                ((type == 3) && strcmp((char*)meshShape, DAT_803318e4) == 0)) {
+            if (((type == 1) && strcmp((char*)meshShape, s_manaShapeObj5) == 0) ||
+                ((type == 2) && strcmp((char*)meshShape, s_manaShapeObj3) == 0) ||
+                ((type == 3) && strcmp((char*)meshShape, s_manaShapeObj1) == 0)) {
                 dlOffset = (*(s32*)(meshShape + 0x4C) - 1) * 4;
                 for (s32 dlIndex = *(s32*)(meshShape + 0x4C) - 1; dlIndex >= 0; dlIndex--) {
                     CalcReflectionVector2(
@@ -1337,7 +1337,7 @@ void pppDestructMana2(pppMana2* pppMana2, pppMana2UnkC* param_2)
         s32 shape = *(s32*)(meshEntry + 8);
 
         if (stepType == 1) {
-            if (strcmp((char*)shape, DAT_803318d4) == 0) {
+            if (strcmp((char*)shape, s_manaShapeObj5) == 0) {
                 for (j = 0; j < *(u32*)(shape + 0x4C); j++) {
                     if (work[0x18] != 0 && *(CMemory::CStage**)(work[0x18] + j * 4) != NULL) {
                         pppHeapUseRate(*(CMemory::CStage**)(work[0x18] + j * 4));
@@ -1350,7 +1350,7 @@ void pppDestructMana2(pppMana2* pppMana2, pppMana2UnkC* param_2)
                 }
             }
         } else if (stepType == 2) {
-            if (strcmp((char*)shape, DAT_803318dc) == 0) {
+            if (strcmp((char*)shape, s_manaShapeObj3) == 0) {
                 for (j = 0; j < *(u32*)(shape + 0x4C); j++) {
                     if (work[0x18] != 0 && *(CMemory::CStage**)(work[0x18] + j * 4) != NULL) {
                         pppHeapUseRate(*(CMemory::CStage**)(work[0x18] + j * 4));
@@ -1362,7 +1362,7 @@ void pppDestructMana2(pppMana2* pppMana2, pppMana2UnkC* param_2)
                     work[0x18] = 0;
                 }
             }
-        } else if (stepType == 3 && strcmp((char*)shape, DAT_803318e4) == 0) {
+        } else if (stepType == 3 && strcmp((char*)shape, s_manaShapeObj1) == 0) {
             for (j = 0; j < *(u32*)(shape + 0x4C); j++) {
                 if (work[0x18] != 0 && *(CMemory::CStage**)(work[0x18] + j * 4) != NULL) {
                     pppHeapUseRate(*(CMemory::CStage**)(work[0x18] + j * 4));
@@ -1467,23 +1467,23 @@ void Mana2_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int
     bool draw = false;
 
     if (type == 2) {
-        if (strcmp((char*)shape, DAT_80331900) == 0 || strcmp((char*)shape, DAT_803318dc) == 0) {
+        if (strcmp((char*)shape, s_manaShapeObj) == 0 || strcmp((char*)shape, s_manaShapeObj3) == 0) {
             draw = true;
         }
     } else if (type < 2) {
         if (type == 0) {
-            if (strcmp((char*)shape, DAT_80331900) == 0) {
+            if (strcmp((char*)shape, s_manaShapeObj) == 0) {
                 draw = true;
             }
-        } else if (strcmp((char*)shape, DAT_80331900) == 0 || strcmp((char*)shape, DAT_803318d4) == 0) {
+        } else if (strcmp((char*)shape, s_manaShapeObj) == 0 || strcmp((char*)shape, s_manaShapeObj5) == 0) {
             draw = true;
         }
-    } else if (type < 4 && (strcmp((char*)shape, DAT_80331900) == 0 || strcmp((char*)shape, DAT_803318e4) == 0)) {
+    } else if (type < 4 && (strcmp((char*)shape, s_manaShapeObj) == 0 || strcmp((char*)shape, s_manaShapeObj1) == 0)) {
         draw = true;
     }
 
-    int waterCmp = strcmp((char*)shape, DAT_803318ec);
-    if ((waterCmp == 0 && type == 1) || (strcmp((char*)shape, DAT_803318f4) == 0 && type == 2)) {
+    int waterCmp = strcmp((char*)shape, s_manaShapeObj4);
+    if ((waterCmp == 0 && type == 1) || (strcmp((char*)shape, s_manaShapeObj2) == 0 && type == 2)) {
         Mtx cameraMtx;
         Mtx rotMtx;
         Mtx posMtx;
@@ -1517,7 +1517,7 @@ void Mana2_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int
     }
 
     if (draw) {
-        if (strcmp((char*)shape, DAT_80331900) != 0) {
+        if (strcmp((char*)shape, s_manaShapeObj) != 0) {
             PSMTXCopy(mtx, (float(*)[4])((char*)work + 0xB0));
             if (*(char*)((char*)work + 0xEC) != 0) {
                 *(u8*)((char*)work + 0x38) = **(u8**)(shape + 0x28);

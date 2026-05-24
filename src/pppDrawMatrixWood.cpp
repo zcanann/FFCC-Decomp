@@ -18,9 +18,9 @@ void pppDrawMatrixWood(_pppPObject* object, void*, _pppCtrlTable*) {
     PSMTXScaleApply(
         *(Mtx*)(p + 0x10),
         *(Mtx*)(p + 0x40),
-        *(float*)((char*)pppMngStPtr + 0x28),
-        *(float*)((char*)pppMngStPtr + 0x2C),
-        *(float*)((char*)pppMngStPtr + 0x30)
+        pppMngStPtr->m_scale.x,
+        pppMngStPtr->m_scale.y,
+        pppMngStPtr->m_scale.z
     );
 
     *(float*)(p + 0x4C) = *(float*)(p + 0x1C);

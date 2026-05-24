@@ -627,7 +627,7 @@ void CMenuPcs::CompaInit()
 	compaList = this->compaList;
 	setupEntry = &compaList->entries[entryIndex++];
 	setupEntry->flags = 2;
-	setupEntry->drawFlags = 0x2e;
+	setupEntry->tex = 0x2e;
 	setupEntry->x = 0x10;
 	setupEntry->y = 8;
 	setupEntry->w = 0x30;

@@ -54,7 +54,6 @@ static const char s_CPtrArray_OSFS_TEXTURE_ST_801D7E44[] = "CPtrArray<OSFS_TEXTU
 static const char s_CPtrArray_GXTexObj[] = "CPtrArray<_GXTexObj *>";
 extern const char __RTTI__8CManager_8032E660[];
 extern const char __RTTI__8CProcess_8032E668[];
-extern u8 ARRAY_8026D728[];
 extern "C" const char s_funnyShapeSpinner[5];
 
 inline void* operator new(unsigned long, void* ptr)
@@ -405,22 +404,23 @@ unsigned int CFunnyShapePcs::m_table_desc0[3] = {0, 0xFFFFFFFF, reinterpret_cast
 unsigned int CFunnyShapePcs::m_table_desc1[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroyViewer__14CFunnyShapePcsFv)};
 unsigned int CFunnyShapePcs::m_table_desc2[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__14CFunnyShapePcsFv)};
 unsigned int CFunnyShapePcs::m_table_desc3[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__14CFunnyShapePcsFv)};
+CFunnyShapePcs FunnyShapePcs;
 unsigned int CFunnyShapePcs::m_table[0x15C / sizeof(unsigned int)] = {
     reinterpret_cast<unsigned int>(const_cast<char*>(s_CFunnyShapePcsViewer)),
-    0,
-    0xFFFFFFFF,
-    reinterpret_cast<unsigned int>(createViewer__14CFunnyShapePcsFv),
-    0,
-    0xFFFFFFFF,
-    reinterpret_cast<unsigned int>(destroyViewer__14CFunnyShapePcsFv),
-    0,
-    0xFFFFFFFF,
-    reinterpret_cast<unsigned int>(calcViewer__14CFunnyShapePcsFv),
+    m_table_desc0[0],
+    m_table_desc0[1],
+    m_table_desc0[2],
+    m_table_desc1[0],
+    m_table_desc1[1],
+    m_table_desc1[2],
+    m_table_desc2[0],
+    m_table_desc2[1],
+    m_table_desc2[2],
     0x21,
     0,
-    0,
-    0xFFFFFFFF,
-    reinterpret_cast<unsigned int>(drawViewer__14CFunnyShapePcsFv),
+    m_table_desc3[0],
+    m_table_desc3[1],
+    m_table_desc3[2],
     0x42, 1
 };
 unsigned int sFunnyShapePcsTablePad0[3] = {
@@ -432,8 +432,6 @@ unsigned int sFunnyShapePcsTablePad1[5] = {
     0,
     0,
 };
-u8 ARRAY_8026D728[0xC];
-CFunnyShapePcs FunnyShapePcs;
 
 /*
  * --INFO--

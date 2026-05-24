@@ -699,8 +699,8 @@ void COctTree::DrawTypeMesh_r(COctNode* octNode)
 		float minDepth = kOctTreeBoundMaxInit;
 
 		andMask = 0xF;
-		farCount = 0;
 		orMask = 0;
+		farCount = 0;
 
 		for (int x = 0; x < 2; x++) {
 			localCorner.x = (x == 0) ? octNode->m_boundMinX : octNode->m_boundMaxX;

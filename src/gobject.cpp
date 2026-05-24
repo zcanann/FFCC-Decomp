@@ -175,7 +175,7 @@ static inline float WrapAnimFrame(float value, float span)
 
 static const float sBgDefaultGravityY = 0.0;
 static bool sBgCollisionActive;
-static const char s_gobject_cpp[] = "gobject.cpp";
+extern "C" const char s_gobject_cpp[] = "gobject.cpp";
 static const char s_l_item2[] = "l_item2";
 static const char s_r_item[] = "r_item";
 static const float sAnimFrameOffset = 1.0f;           // FLOAT_80330338

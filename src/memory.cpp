@@ -16,7 +16,7 @@
 
 CMemory Memory;
 
-static const char s_memory_cpp[] = "memory.cpp";
+extern "C" const char s_memory_cpp[] = "memory.cpp";
 extern "C" const char sGetDataTimeoutBanner[] =
     "===================================================================\n"
     "===================================================================\n"

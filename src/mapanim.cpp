@@ -10,7 +10,7 @@
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h"
 #include <PowerPC_EABI_Support/Runtime/New.h>
 
-static const char s_mapanim_cpp[] = "mapanim.cpp";
+extern "C" const char s_mapanim_cpp[] = "mapanim.cpp";
 static const char s_ptrarray_grow_error[] =
     "\x83\x6F\x83\x62\x83\x74\x83\x40\x90\xAC\x92\xB7\x82\xAA\x95\x73\x8B\x96\x89\xC2\x82\xC5\x82\xB7\x81\x42\x0A";
 static const char s_collection_ptrarray_h[] = "collection_ptrarray.h";

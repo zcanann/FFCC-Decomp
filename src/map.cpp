@@ -75,7 +75,7 @@ extern "C" CPtrArray<CMapLightHolder*>* dtor_80034414(CPtrArray<CMapLightHolder*
 
 static const char s_mapMidPathFmt[] = "%s.mid";
 static const char s_mapOtmPathFmt[] = "%s.otm";
-static const char s_map_cpp[] = "map.cpp";
+extern "C" const char s_map_cpp[] = "map.cpp";
 static const char s_set_bg_camera_semi_trans_missing_fmt[] =
     "SET_BG_CAMERA_SEMI_TRANS  mesh_id=%d  "
     "\x82\xaa\x94\xad\x8c\xa9\x82\xc5\x82\xab\x82\xc8\x82\xa2\x81\x42\n";

@@ -258,7 +258,7 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
  * JP Address: TODO
  * JP Size: TODO
  */
-static const char s_pppYmMelt_cpp[] = "pppYmMelt.cpp";
+extern "C" const char s_pppYmMelt_cpp[] = "pppYmMelt.cpp";
 
 void pppFrameYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offsets)
 {

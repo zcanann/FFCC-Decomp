@@ -18,7 +18,7 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
 #include "ffcc/ppp_linkage.h"
 
-static const char s_pppCharaBreak_cpp[] = "pppCharaBreak.cpp";
+extern "C" const char s_pppCharaBreak_cpp[] = "pppCharaBreak.cpp";
 extern float FLOAT_80332048;
 extern float FLOAT_8033204c;
 extern float FLOAT_80332050;

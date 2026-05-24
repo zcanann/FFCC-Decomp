@@ -21,7 +21,7 @@ extern int gPppCalcDisabled;
 
 static pppFMATRIX g_matUnit3;
 
-static const char s_pppYmMegaBirthShpTail3_cpp[] = "pppYmMegaBirthShpTail3.cpp";
+extern "C" const char s_pppYmMegaBirthShpTail3_cpp[] = "pppYmMegaBirthShpTail3.cpp";
 /*
  * --INFO--
  * PAL Address: 8008ca98

@@ -3256,7 +3256,7 @@ int CMapMng::GetMapObjIdx(unsigned short id)
 {
     int objCount = m_mapObjCount;
     int objIndex = 0;
-    CMapObj* mapObj = GetMapObjArray();
+    CMapObj* mapObj = m_mapObjArray;
 
     while (0 < objCount) {
         if (mapObj->m_objId == id) {
@@ -3347,8 +3347,8 @@ void CMapMng::SetMapObjLMtx(int mapObjIndex, float (*source)[4])
  */
 void CMapMng::GetMapObjWMtx(int mapObjIndex, float (*destination)[4])
 {
-    CMapObj* mapObj = GetMapObjArray() + mapObjIndex;
-    PSMTXCopy(*reinterpret_cast<Mtx*>(reinterpret_cast<unsigned char*>(mapObj) + 0xB8), destination);
+    CMapObj* mapObj = &m_mapObjArray[mapObjIndex];
+    PSMTXCopy(mapObj->m_worldMtx, destination);
 }
 
 /*
@@ -3604,10 +3604,10 @@ found:
  */
 void CMapMng::SetMapObjTransRate(int mapObjIndex, float x, float y, float z)
 {
-    unsigned char* mapObj = reinterpret_cast<unsigned char*>(GetMapObjArray() + mapObjIndex);
-    *reinterpret_cast<float*>(mapObj + 0x58) = x;
-    *reinterpret_cast<float*>(mapObj + 0x5C) = y;
-    *reinterpret_cast<float*>(mapObj + 0x60) = z;
+    CMapObj* mapObj = &m_mapObjArray[mapObjIndex];
+    mapObj->m_translationRate.x = x;
+    mapObj->m_translationRate.y = y;
+    mapObj->m_translationRate.z = z;
 }
 
 /*
@@ -3621,13 +3621,13 @@ void CMapMng::SetMapObjTransRate(int mapObjIndex, float x, float y, float z)
  */
 void CMapMng::SetMapObjPrioID(int id, unsigned char prio)
 {
-    CMapObj* mapObj = GetMapObjArray();
+    CMapObj* mapObj = m_mapObjArray;
     int i = 0;
 
     while (i < m_mapObjCount) {
         if (static_cast<int>(mapObj->m_objId) == id) {
-            *reinterpret_cast<unsigned char*>(Ptr(mapObj, 0x15)) = prio;
-            *reinterpret_cast<unsigned char*>(Ptr(mapObj, 0x14)) = prio;
+            mapObj->m_priorityId2 = prio;
+            mapObj->m_priorityId = prio;
         }
         mapObj++;
         i++;

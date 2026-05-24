@@ -2,6 +2,7 @@
 #define _FFCC_MAPOBJ_H_
 
 #include <dolphin/gx/GXStruct.h>
+#include <dolphin/mtx.h>
 
 class CChunkFile;
 class CMapKeyFrame;
@@ -154,7 +155,10 @@ public:
     CMapObj* m_child;             // 0x04
     CMapObj* m_next;              // 0x08
     void* m_mapData;              // 0x0C
-    char m_pad10[0x08];
+    char m_pad10[0x04];
+    unsigned char m_priorityId;   // 0x14
+    unsigned char m_priorityId2;  // 0x15
+    char m_pad16[0x02];
     unsigned char m_showFlags;      // 0x18
     char m_pad19[2];
     unsigned char m_calcMtxPending; // 0x1B
@@ -163,7 +167,9 @@ public:
     unsigned short m_objId;         // 0x2E
     char m_pad30[4];
     unsigned short m_meshId;        // 0x34
-    char m_pad36[0x52];
+    char m_pad36[0x22];
+    Vec m_translationRate;          // 0x58
+    char m_pad64[0x24];
     float m_localMtx[3][4];         // 0x88
     float m_worldMtx[3][4];         // 0xB8
     _GXColor m_ambientColor;        // 0xE8

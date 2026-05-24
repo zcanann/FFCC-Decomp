@@ -113,7 +113,9 @@ public:
     short m_mapObjCount;               // 0x0000C
     short m_mapMeshCount;              // 0x0000E
     unsigned short m_unknown10;        // 0x00010
-    unsigned char m_pad012[0x213D4 - 0x12];
+    unsigned char m_pad012[0x954 - 0x12];
+    CMapObj m_mapObjArray[0x200];      // 0x00954
+    unsigned char m_pad1E954[0x213D4 - 0x1E954];
     CMaterialSet* m_materialSet;       // 0x213D4
     CTextureSet* m_textureSet;         // 0x213D8
     CMapTexAnimSet* m_mapTexAnimSet;   // 0x213DC
@@ -137,7 +139,7 @@ public:
 
     COctTree* GetOctTreeArray() { return reinterpret_cast<COctTree*>(reinterpret_cast<unsigned char*>(this) + 0x14); }
     CMapHit* GetMapHitArray() { return reinterpret_cast<CMapHit*>(reinterpret_cast<unsigned char*>(this) + 0x4D4); }
-    CMapObj* GetMapObjArray() { return reinterpret_cast<CMapObj*>(reinterpret_cast<unsigned char*>(this) + 0x954); }
+    CMapObj* GetMapObjArray() { return m_mapObjArray; }
     CMapMesh* GetMapMeshArray() { return reinterpret_cast<CMapMesh*>(reinterpret_cast<unsigned char*>(this) + 0x1E954); }
     CPtrArray<CMapAnimRun*>& GetMapAnimRunArray()
     {

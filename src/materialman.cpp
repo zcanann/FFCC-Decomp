@@ -2402,11 +2402,11 @@ extern "C" CMaterial* __dt__Q29CMaterial25_class_529materialman_cppFv(CMaterial*
 CTexScroll::~CTexScroll()
 {
     if (m_type0 == 2) {
-        DestroyTexScrollKeyFrame(*reinterpret_cast<void**>(Ptr(this, 0xC)));
+        DestroyTexScrollKeyFrame(*reinterpret_cast<void**>(&m_u1));
     }
 
     if (m_type1 == 2) {
-        DestroyTexScrollKeyFrame(*reinterpret_cast<void**>(Ptr(this, 0x10)));
+        DestroyTexScrollKeyFrame(*reinterpret_cast<void**>(&m_v1));
     }
 }
 
@@ -2448,7 +2448,7 @@ CMaterial::~CMaterial()
         *reinterpret_cast<void**>(textureRef) = 0;
     }
 
-    __destroy_arr(Ptr(this, 0x4C), reinterpret_cast<ConstructorDestructor>(__dt__10CTexScrollFv), 0x14, 4);
+    __destroy_arr(GetTexScroll(0), reinterpret_cast<ConstructorDestructor>(__dt__10CTexScrollFv), 0x14, 4);
 }
 
 /*
@@ -2462,7 +2462,7 @@ CMaterial::~CMaterial()
  */
 CMaterial::CMaterial()
 {
-    __construct_array(Ptr(this, 0x4C), reinterpret_cast<ConstructorDestructor>(__ct__10CTexScrollFv),
+    __construct_array(GetTexScroll(0), reinterpret_cast<ConstructorDestructor>(__ct__10CTexScrollFv),
                       reinterpret_cast<ConstructorDestructor>(__dt__10CTexScrollFv), 0x14, 4);
     memset(Ptr(this, 0x8), 0, 0x10);
     *reinterpret_cast<int*>(Ptr(this, 0x9C)) = -1;
@@ -2745,25 +2745,26 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                         } else if (chunk.m_id == CHUNK_TSDT) {
                             unsigned int slot = chunkFile.Get2() & 0xFFFF;
                             chunkFile.Get2();
+                            CTexScroll* texScroll = material->GetTexScroll(slot);
 
                             if (keyFrameU == 0) {
                                 float valueU = chunkFile.GetF4();
-                                *reinterpret_cast<float*>(Ptr(material, 0x58 + (slot * 0x14))) = valueU;
-                                *Ptr(material, 0x4C + (slot * 0x14)) = (valueU == FLOAT_8032faf4) ? 0 : 1;
+                                texScroll->m_u1 = valueU;
+                                texScroll->m_type0 = (valueU == FLOAT_8032faf4) ? 0 : 1;
                             } else {
                                 chunkFile.GetF4();
-                                *reinterpret_cast<CMapKeyFrame**>(Ptr(material, 0x58 + (slot * 0x14))) = keyFrameU;
-                                *Ptr(material, 0x4C + (slot * 0x14)) = 2;
+                                *reinterpret_cast<CMapKeyFrame**>(&texScroll->m_u1) = keyFrameU;
+                                texScroll->m_type0 = 2;
                             }
 
                             if (keyFrameV == 0) {
                                 float valueV = chunkFile.GetF4();
-                                *reinterpret_cast<float*>(Ptr(material, 0x5C + (slot * 0x14))) = valueV;
-                                *Ptr(material, 0x4D + (slot * 0x14)) = (valueV == FLOAT_8032faf4) ? 0 : 1;
+                                texScroll->m_v1 = valueV;
+                                texScroll->m_type1 = (valueV == FLOAT_8032faf4) ? 0 : 1;
                             } else {
                                 chunkFile.GetF4();
-                                *reinterpret_cast<CMapKeyFrame**>(Ptr(material, 0x5C + (slot * 0x14))) = keyFrameV;
-                                *Ptr(material, 0x4D + (slot * 0x14)) = 2;
+                                *reinterpret_cast<CMapKeyFrame**>(&texScroll->m_v1) = keyFrameV;
+                                texScroll->m_type1 = 2;
                             }
                         }
                     }
@@ -2773,14 +2774,15 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                     chunkFile.Get2();
                     float valueU = chunkFile.GetF4();
                     float valueV = chunkFile.GetF4();
+                    CTexScroll* texScroll = material->GetTexScroll(slot);
 
-                    *reinterpret_cast<float*>(Ptr(material, 0x58 + (slot * 0x14))) = valueU;
-                    *reinterpret_cast<float*>(Ptr(material, 0x5C + (slot * 0x14))) = valueV;
+                    texScroll->m_u1 = valueU;
+                    texScroll->m_v1 = valueV;
                     if (FLOAT_8032faf4 != valueU) {
-                        *Ptr(material, 0x4C + (slot * 0x14)) = 1;
+                        texScroll->m_type0 = 1;
                     }
                     if (FLOAT_8032faf4 != valueV) {
-                        *Ptr(material, 0x4D + (slot * 0x14)) = 1;
+                        texScroll->m_type1 = 1;
                     }
                 }
             }

@@ -388,33 +388,6 @@ CMapObj::~CMapObj()
 
 /*
  * --INFO--
- * PAL Address: 0x8002BE7C
- * PAL Size: 128b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" CMapObj* dtor_8002BE7C(CMapObj* mapObj, short param_2)
-{
-    if (mapObj != 0) {
-        CMapObjAtr* attr = reinterpret_cast<CMapObjAtr*>(PtrAt(mapObj, 0xEC));
-        if (attr != 0) {
-            delete attr;
-            PtrAt(mapObj, 0xEC) = 0;
-        }
-
-        mapObj->Init();
-        if (0 < param_2) {
-            operator delete(mapObj);
-        }
-    }
-
-    return mapObj;
-}
-
-/*
- * --INFO--
  * PAL Address: 0x8002BF2C
  * PAL Size: 196b
  * EN Address: TODO
@@ -467,6 +440,58 @@ void CMapObj::Init()
     U8At(this, 0x25) = 1;
     U8At(this, 0x26) = 0;
     S32At(this, 0x38) = -1;
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+inline CMapObjAtr::CMapObjAtr()
+{
+    reinterpret_cast<MapObjAttrBaseLayout*>(this)->type = -1;
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+inline CMapObjAtrPlaySta::CMapObjAtrPlaySta()
+{
+    MapObjAttrPlayStaLayout* self = reinterpret_cast<MapObjAttrPlayStaLayout*>(this);
+
+    self->type = CMapObjAtr::PLAY_STA;
+    self->playStaNo = 0;
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+inline CMapObjAtrMime::CMapObjAtrMime()
+{
+    MapObjAttrMimeLayout* self = reinterpret_cast<MapObjAttrMimeLayout*>(this);
+
+    self->type = CMapObjAtr::MIME;
+    self->vertexListCount = 0;
+    self->vertexLists = 0;
+    self->vertexCount = 0;
+    new (&self->keyFrame) CMapKeyFrame;
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+inline CMapObjAtrMeshName::CMapObjAtrMeshName()
+{
+    MapObjAttrMeshNameLayout* self = reinterpret_cast<MapObjAttrMeshNameLayout*>(this);
+
+    self->type = CMapObjAtr::MESH_NAME;
+    memset(self->name, 0, sizeof(self->name));
 }
 
 /*
@@ -1198,12 +1223,7 @@ void CMapObj::SetLink()
     m_child = head0;
 }
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void calcColorKeyFrame(CMapKeyFrame* keyFrame, _GXColor& out, _GXColor* colors)
+static inline void calcColorKeyFrame(CMapKeyFrame* keyFrame, _GXColor& out, _GXColor* colors)
 {
     if (keyFrame->IsRun() == 0) {
         return;
@@ -1382,16 +1402,6 @@ void CMapObj::SetDrawEnv()
 
     LightPcs.SetMapColorAlpha(m_worldMtx, mapColor, lightColor, U8At(this, 0x26), F32At(this, 0x44), F32At(this, 0x48),
                               F32At(this, 0x54), (U16At(this, 0x28) >> 7) & 0xFF);
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMapObj::IsDrawAlphaLight()
-{
-	// TODO
 }
 
 /*
@@ -1844,120 +1854,15 @@ static inline void FreeFloatArrayAndClear(void* base, unsigned int offset)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-CMapObjAtrPlaySta::CMapObjAtrPlaySta()
-{
-    MapObjAttrPlayStaLayout* self = reinterpret_cast<MapObjAttrPlayStaLayout*>(this);
-
-    self->type = CMapObjAtr::PLAY_STA;
-    self->playStaNo = 0;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-CMapObjAtr::CMapObjAtr()
-{
-    reinterpret_cast<MapObjAttrBaseLayout*>(this)->type = -1;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-CMapObjAtrMime::CMapObjAtrMime()
-{
-    MapObjAttrMimeLayout* self = reinterpret_cast<MapObjAttrMimeLayout*>(this);
-
-    self->type = CMapObjAtr::MIME;
-    self->vertexListCount = 0;
-    self->vertexLists = 0;
-    self->vertexCount = 0;
-    new (&self->keyFrame) CMapKeyFrame;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMapObj::SetCalcMtx()
-{
-    m_calcMtxPending = 1;
-    m_localMtxDirty = 1;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-CMapObjAtrMeshName::CMapObjAtrMeshName()
-{
-    MapObjAttrMeshNameLayout* self = reinterpret_cast<MapObjAttrMeshNameLayout*>(this);
-
-    self->type = CMapObjAtr::MESH_NAME;
-    memset(self->name, 0, sizeof(self->name));
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8002C3E8
+ * PAL Address: 0x8002BFF0
  * PAL Size: 92b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-CMapObjAtrMeshName::~CMapObjAtrMeshName()
+CMapObjAtrPlaySta::~CMapObjAtrPlaySta()
 {
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8002C2AC
- * PAL Size: 316b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-CMapObjAtrPointLight::~CMapObjAtrPointLight()
-{
-    FreeByteArrayAndClear(this, 0xE4);
-    FreeFloatArrayAndClear(this, 0xE8);
-    FreeFloatArrayAndClear(this, 0xEC);
-    FreeFloatArrayAndClear(this, 0xF0);
-    FreeByteArrayAndClear(this, 0xBC);
-    FreeFloatArrayAndClear(this, 0xC0);
-    FreeFloatArrayAndClear(this, 0xC4);
-    FreeFloatArrayAndClear(this, 0xC8);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8002C170
- * PAL Size: 316b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-CMapObjAtrSpotLight::~CMapObjAtrSpotLight()
-{
-    FreeByteArrayAndClear(this, 0x100);
-    FreeFloatArrayAndClear(this, 0x104);
-    FreeFloatArrayAndClear(this, 0x108);
-    FreeFloatArrayAndClear(this, 0x10C);
-    FreeByteArrayAndClear(this, 0xD8);
-    FreeFloatArrayAndClear(this, 0xDC);
-    FreeFloatArrayAndClear(this, 0xE0);
-    FreeFloatArrayAndClear(this, 0xE4);
 }
 
 /*
@@ -1999,13 +1904,55 @@ CMapObjAtrMime::~CMapObjAtrMime()
 
 /*
  * --INFO--
- * PAL Address: 0x8002BFF0
+ * PAL Address: 0x8002C170
+ * PAL Size: 316b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+CMapObjAtrSpotLight::~CMapObjAtrSpotLight()
+{
+    FreeByteArrayAndClear(this, 0x100);
+    FreeFloatArrayAndClear(this, 0x104);
+    FreeFloatArrayAndClear(this, 0x108);
+    FreeFloatArrayAndClear(this, 0x10C);
+    FreeByteArrayAndClear(this, 0xD8);
+    FreeFloatArrayAndClear(this, 0xDC);
+    FreeFloatArrayAndClear(this, 0xE0);
+    FreeFloatArrayAndClear(this, 0xE4);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8002C2AC
+ * PAL Size: 316b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+CMapObjAtrPointLight::~CMapObjAtrPointLight()
+{
+    FreeByteArrayAndClear(this, 0xE4);
+    FreeFloatArrayAndClear(this, 0xE8);
+    FreeFloatArrayAndClear(this, 0xEC);
+    FreeFloatArrayAndClear(this, 0xF0);
+    FreeByteArrayAndClear(this, 0xBC);
+    FreeFloatArrayAndClear(this, 0xC0);
+    FreeFloatArrayAndClear(this, 0xC4);
+    FreeFloatArrayAndClear(this, 0xC8);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8002C3E8
  * PAL Size: 92b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-CMapObjAtrPlaySta::~CMapObjAtrPlaySta()
+CMapObjAtrMeshName::~CMapObjAtrMeshName()
 {
 }

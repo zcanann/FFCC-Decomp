@@ -18,8 +18,6 @@ class CMaterialMan;
 class CCameraPcs;
 struct Vec;
 
-void calcColorKeyFrame(CMapKeyFrame*, _GXColor&, _GXColor*);
-
 class CMapObjAtr
 {
 public:

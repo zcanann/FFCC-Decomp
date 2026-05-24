@@ -114,28 +114,28 @@ extern "C" char* PTR_s_Spitzschopf[];
 extern "C" char* PTR_s_Ciuffo_ribelle[];
 extern "C" char* PTR_s_Remolino[];
 extern "C" {
-extern char lbl_803320D8[];
-extern char lbl_803320E0[];
-extern char lbl_803320E8[];
-extern char lbl_803320F0[];
-extern char lbl_803320F8[];
-extern char lbl_80332100[];
-extern char lbl_80332108[];
-extern char lbl_80332110[];
-extern char lbl_80332118[];
-extern char lbl_80332120[];
-extern char lbl_80332128[];
-extern char lbl_80332130[];
-extern char lbl_80332138[];
-extern char lbl_80332140[];
-extern char lbl_80332148[];
-extern char lbl_80332150[];
-extern char lbl_80332158[];
-extern char lbl_80332160[];
-extern char lbl_80332168[];
-extern char lbl_80332170[];
-extern char lbl_80332178[];
-extern char lbl_80332180[];
+extern char s_Clavat_803320D8[];
+extern char s_Lilty_803320E0[];
+extern char s_Yuke_803320E8[];
+extern char s_Selkie_803320F0[];
+extern char s_Lility_803320F8[];
+extern char s_Seliky_80332100[];
+extern char s_Clavate_80332108[];
+extern char s_Lilti_80332110[];
+extern char s_Yuko_80332118[];
+extern char s_Selki_80332120[];
+extern char s_Tailor_80332128[];
+extern char s_Farmer_80332130[];
+extern char s_Rancher_80332138[];
+extern char s_Miller_80332140[];
+extern char s_Schmied_80332148[];
+extern char s_Bauer_80332150[];
+extern char s_Moeller_80332158[];
+extern char s_Fischer_80332160[];
+extern char s_Haendler_80332168[];
+extern char s_Fabbri_80332170[];
+extern char s_Sarti_80332178[];
+extern char s_Mugnai_80332180[];
 extern char lbl_80332188[];
 extern char lbl_80332190[];
 extern char lbl_80332198[];
@@ -516,31 +516,31 @@ extern char s_Detruire_801DDBAC[], s_la_reponse_801DDC14[], s_Envoyer_a_801DDC20
 extern char s_Continuar_801DDCE0[], s_Extraer_801DDCEC[];
 }
 extern "C" char* PTR_s_Clavat_802140f0[] = {
-    lbl_803320D8, lbl_803320E0, lbl_803320E8, lbl_803320F0,
+    s_Clavat_803320D8, s_Lilty_803320E0, s_Yuke_803320E8, s_Selkie_803320F0,
 };
 extern "C" char* PTR_s_Clavat_80214100[] = {
-    lbl_803320D8, lbl_803320E0, lbl_803320E8, lbl_803320F0,
+    s_Clavat_803320D8, s_Lilty_803320E0, s_Yuke_803320E8, s_Selkie_803320F0,
 };
 extern "C" char* PTR_s_Clavat_80214110[] = {
-    lbl_803320D8, lbl_803320F8, lbl_803320E8, lbl_80332100,
+    s_Clavat_803320D8, s_Lility_803320F8, s_Yuke_803320E8, s_Seliky_80332100,
 };
 extern "C" char* PTR_s_Clavat_80214120[] = {
-    lbl_803320D8, lbl_803320E0, lbl_803320E8, lbl_803320F0,
+    s_Clavat_803320D8, s_Lilty_803320E0, s_Yuke_803320E8, s_Selkie_803320F0,
 };
 extern "C" char* PTR_s_Clavate[] = {
-    lbl_80332108, lbl_80332110, lbl_80332118, lbl_80332120,
+    s_Clavate_80332108, s_Lilti_80332110, s_Yuko_80332118, s_Selki_80332120,
 };
 extern "C" char* PTR_s_Blacksmith[] = {
-    s_Blacksmith_801DD718, lbl_80332128, lbl_80332130, lbl_80332138,
-    lbl_80332140, s_Fisherman_801DD724, s_Merchant_801DD730, s_Alchemist_801DD73C,
+    s_Blacksmith_801DD718, s_Tailor_80332128, s_Farmer_80332130, s_Rancher_80332138,
+    s_Miller_80332140, s_Fisherman_801DD724, s_Merchant_801DD730, s_Alchemist_801DD73C,
 };
 extern "C" char* PTR_s_Schmied[] = {
-    lbl_80332148, s_Schneider_801DD748, lbl_80332150, s_Viehzuechter_801DD754,
-    lbl_80332158, lbl_80332160, lbl_80332168, s_Alchemist_801DD73C,
+    s_Schmied_80332148, s_Schneider_801DD748, s_Bauer_80332150, s_Viehzuechter_801DD754,
+    s_Moeller_80332158, s_Fischer_80332160, s_Haendler_80332168, s_Alchemist_801DD73C,
 };
 extern "C" char* PTR_s_Fabbri[] = {
-    lbl_80332170, lbl_80332178, s_Agricoltori_801DD760, s_Allevatori_801DD76C,
-    lbl_80332180, s_Pescatori_801DD778, s_Mercanti_801DD784, s_Alchimisti_801DD790,
+    s_Fabbri_80332170, s_Sarti_80332178, s_Agricoltori_801DD760, s_Allevatori_801DD76C,
+    s_Mugnai_80332180, s_Pescatori_801DD778, s_Mercanti_801DD784, s_Alchimisti_801DD790,
 };
 extern "C" char* PTR_s_Forgeron[] = {
     s_Forgeron_801DD79C, s_Tailleur_801DD7A8, lbl_80332188, lbl_80332190,

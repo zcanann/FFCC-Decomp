@@ -54,9 +54,6 @@ extern char sStageFreeCorruptBlockFmt[];
 extern char sStageAllocNoMemoryFmt[];
 extern char sStageQuitBlockUnfreedAllocFmt[];
 extern char sCopyFromAMemorySyncTimeoutMsg[];
-extern char DAT_801d6b7c[];
-extern char DAT_801d6bb0[];
-extern char DAT_801d6c58[];
 extern char sCurrentMemoryStageName[];
 extern char sMainMemoryStageName[];
 extern char sDrawHeapUseUnuseFmt[];
@@ -74,6 +71,10 @@ extern float kMemoryDrawOrthoFar;
 extern const double kMemorySignedDoubleMagic = 4503601774854144.0;
 extern unsigned int sHeapBarColors[];
 int g_alloc_ct;
+
+static const int kStagePoolFullMsgOffset = 0xC0;
+static const int kStageAllocFailedMsgOffset = 0xF4;
+static const int kStageDestroyingMsgOffset = 0x28;
 static int stageGetAllocationMode(CMemory::CStage* stage)
 {
     return stage->m_allocationMode;
@@ -424,7 +425,7 @@ void CMemory::Quit()
                 CStage* next = *reinterpret_cast<CStage**>(reinterpret_cast<unsigned char*>(stage) + 4);
                 if ((pass != 0) ||
                     (stage != *reinterpret_cast<CStage**>(reinterpret_cast<unsigned char*>(this) + 0x778C))) {
-                    System.Printf(const_cast<char*>(DAT_801d6c58), stageGetSourceName(stage));
+                    System.Printf(const_cast<char*>(sHeapWalkerTotalFmt + kStageDestroyingMsgOffset), stageGetSourceName(stage));
                     stageDestroyInternal(stage);
                     stageMoveToPoolList(this, stage);
                 }
@@ -662,7 +663,7 @@ CMemory::CStage* CMemory::CreateStage(unsigned long size, char* source, int mode
         unsigned char* list = modeBase;
 
         if (stage == reinterpret_cast<CStage*>(modeBase + 300)) {
-            System.Printf(const_cast<char*>(DAT_801d6b7c));
+            System.Printf(const_cast<char*>(sCopyFromAMemorySyncTimeoutMsg + kStagePoolFullMsgOffset));
         } else {
             do {
                 unsigned char* next = *reinterpret_cast<unsigned char**>(list + 4);
@@ -742,7 +743,7 @@ CMemory::CStage* CMemory::CreateStage(unsigned long size, char* source, int mode
                 list = next;
             } while (list != modeBase);
 
-            System.Printf(const_cast<char*>(DAT_801d6bb0));
+            System.Printf(const_cast<char*>(sCopyFromAMemorySyncTimeoutMsg + kStageAllocFailedMsgOffset));
             HeapWalker();
         }
     }

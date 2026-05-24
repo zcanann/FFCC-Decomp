@@ -1095,6 +1095,7 @@ memorycard.cpp:
 	.data       start:0x8021054C end:0x8021056C
 	.bss        start:0x802F2628 end:0x802F26C4
 	.sdata      start:0x8032E850 end:0x8032E880
+	.sdata2     start:0x80330CD0 end:0x80330CD8
 
 pppWDrawMatrixLoop.cpp:
 	extab       start:0x800084E0 end:0x800084E8

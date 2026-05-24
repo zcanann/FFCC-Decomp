@@ -59,8 +59,14 @@ struct BonusAnimSprite {
 	unsigned char pad[0x10];
 };
 
+struct BonusAnimList {
+	BonusAnimHeader header;
+	BonusAnimSprite sprites[64];
+};
+
 STATIC_ASSERT(sizeof(BonusAnimHeader) == 8);
 STATIC_ASSERT(sizeof(BonusAnimSprite) == 0x40);
+STATIC_ASSERT(sizeof(BonusAnimList) == 0x1008);
 
 struct BonusFlatTableRaw {
 	int m_numEntries;
@@ -1101,7 +1107,7 @@ void CMenuPcs::createBonus()
 		GetBonusMenuMembers(this).m_bonusStatePtr = statePtr;
 	}
 	if (animPtr == 0) {
-		animPtr = reinterpret_cast<int>(new unsigned char[0x1008]);
+		animPtr = reinterpret_cast<int>(new unsigned char[sizeof(BonusAnimList)]);
 		GetBonusMenuMembers(this).m_bonusAnimPtr = animPtr;
 	}
 	if (listPtr == 0) {
@@ -1124,7 +1130,7 @@ void CMenuPcs::createBonus()
 		*(unsigned char*)(statePtr + 0xb) = 0;
 	}
 	if (animPtr != 0) {
-		memset((void*)animPtr, 0, 0x1008);
+		memset((void*)animPtr, 0, sizeof(BonusAnimList));
 	}
 	if (listPtr != 0) {
 		memset((void*)listPtr, 0, 0xCDB0);
@@ -1598,7 +1604,7 @@ void CMenuPcs::CalcResultOpenAnim()
 	if (*(unsigned char*)(statePtr + 0xb) == 0) {
 		Sound.PlaySe(0x46, 0x40, 0x7f, 0);
 		GetBonusMenuMembers(this).m_bonusAlpha = 0;
-		memset((void*)animPtr, 0, 0x1008);
+		memset((void*)animPtr, 0, sizeof(BonusAnimList));
 
 		header->count = (short)(1 + activePartyCount * 6);
 		header->unk02 = 0;
@@ -2439,7 +2445,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 
 		GetBonusMenuMembers(this).m_bonusCursorFlag = 0;
 		Sound.PlaySe(0x4c, 0x40, 0x7f, 0);
-		memset((void*)animPtr, 0, 0x1008);
+		memset((void*)animPtr, 0, sizeof(BonusAnimList));
 		*(short*)(statePtr + 0x22) = 0;
 
 		header->count = (short)(12 + activePartyCount * 5);

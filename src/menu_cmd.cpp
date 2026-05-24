@@ -55,10 +55,10 @@ extern "C" const double DOUBLE_80332AE0;
 extern "C" const double DOUBLE_80332af8;
 extern "C" const double DOUBLE_80332B00;
 extern "C" const double DOUBLE_80332b20;
-s32 DAT_8032eec8;
+s32 s_unitePanelCount;
 s32 s_UniteTop[3];
 
-extern "C" const s16 DAT_801de910[] = {
+extern "C" const s16 s_uniteRecipePatterns[] = {
     0x0000, 0x022A, 0x0003, 0x0107, 0x0105, 0x0105,
     0x0001, 0x0207, 0x0002, 0x0100, 0x03E7, 0x0000,
     0x0001, 0x020B, 0x0002, 0x0101, 0x03E7, 0x0000,
@@ -1186,7 +1186,7 @@ void CMenuPcs::CmdDraw()
 				cursorEntry = reinterpret_cast<s16*>(GetCmdListBase(this) + index * 0x40 + 8);
 			} else {
 				s32 uniteIdx = 0;
-				while ((uniteIdx < DAT_8032eec8) && (s_UniteTop[uniteIdx] != index)) {
+				while ((uniteIdx < s_unitePanelCount) && (s_UniteTop[uniteIdx] != index)) {
 					uniteIdx++;
 				}
 				cursorEntry = reinterpret_cast<s16*>(
@@ -1923,7 +1923,7 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 	if (itemKinds[selected] > 0) {
 		if ((itemKinds[selected] == 999) && (selected > 2)) {
 			int patIdx = 0;
-			for (const s16* pat = DAT_801de910; pat[1] >= 0; pat += 6, patIdx++) {
+			for (const s16* pat = s_uniteRecipePatterns; pat[1] >= 0; pat += 6, patIdx++) {
 				if ((pat[0] == 0) || ((pat[2] == 2) && (static_cast<s32>(selectedNegMask) < 0))) {
 					continue;
 				}
@@ -1944,7 +1944,7 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 				}
 			}
 		} else if (static_cast<s32>(selectedNegMask) >= 0) {
-			const int baseLen = static_cast<int>(DAT_801de910[2]);
+			const int baseLen = static_cast<int>(s_uniteRecipePatterns[2]);
 			int start = selected - (baseLen - 1);
 			for (int i = 0; i < baseLen; i++, start++) {
 				int ok = 0;
@@ -1953,7 +1953,7 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 					if (candidates[slot] != 0) {
 						break;
 					}
-					if (DAT_801de910[3 + k] == itemKinds[slot]) {
+					if (s_uniteRecipePatterns[3 + k] == itemKinds[slot]) {
 						ok++;
 					}
 				}
@@ -1967,7 +1967,7 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 
 		int group = 1;
 		int* matchWrite = matches + matchCount * 2;
-		for (const s16* pat = DAT_801de910 + 6; pat[1] >= 0; pat += 6, group++) {
+		for (const s16* pat = s_uniteRecipePatterns + 6; pat[1] >= 0; pat += 6, group++) {
 			if (((pat[0] != 0) && (itemKinds[selected] == 999) && (selected >= 3)) ||
 			    ((pat[2] == 2) && (static_cast<s32>(selectedNegMask) < 0))) {
 				continue;
@@ -2005,7 +2005,7 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 			int (*dst)[2] = comboOut;
 			for (int i = 0; i < matchCount; i++) {
 				const int* m = &matches[i * 2];
-				if (rank + 2 == DAT_801de910[2 + m[0] * 6]) {
+				if (rank + 2 == s_uniteRecipePatterns[2 + m[0] * 6]) {
 					dst[0][0] = m[0];
 					dst[0][1] = m[1];
 					dst++;
@@ -2074,7 +2074,7 @@ void CMenuPcs::DrawUniteList()
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 	SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-	DAT_8032eec8 = 0;
+	s_unitePanelCount = 0;
 	bool active = false;
 	for (s32 i = 0; i < 8; i++) {
 		const s32 slotType = *reinterpret_cast<const s16*>(caravanWork + i * 2 + 0x214);
@@ -2188,7 +2188,7 @@ void CMenuPcs::DrawUniteList()
 	}
 
 	DrawInit();
-	DAT_8032eec8 = 0;
+	s_unitePanelCount = 0;
 	s16* const unitePanels = list + list[1] * 0x20 + 4;
 	for (s32 i = 0; i < 8; i++) {
 		if (i >= foodCount) {
@@ -2212,7 +2212,7 @@ void CMenuPcs::DrawUniteList()
 			}
 		}
 
-		if (DAT_8032eec8 >= 3) {
+		if (s_unitePanelCount >= 3) {
 			continue;
 		}
 
@@ -2241,7 +2241,7 @@ void CMenuPcs::DrawUniteList()
 		color.a = static_cast<u8>(FLOAT_80332acc * panelAlpha);
 		GXSetChanMatColor((_GXChannelID)4, color);
 
-		s16* const panel = unitePanels + DAT_8032eec8 * 0x20;
+		s16* const panel = unitePanels + s_unitePanelCount * 0x20;
 		panel[0] = static_cast<s16>(panelX);
 		panel[1] = static_cast<s16>(panelY);
 		panel[2] = static_cast<s16>(FLOAT_80332AEC);
@@ -2249,8 +2249,8 @@ void CMenuPcs::DrawUniteList()
 		*reinterpret_cast<float*>(panel + 4) = FLOAT_80332ab0;
 		*reinterpret_cast<float*>(panel + 6) = panelTone;
 		*reinterpret_cast<float*>(panel + 8) = panelAlpha;
-		s_UniteTop[DAT_8032eec8] = i;
-		DAT_8032eec8++;
+		s_UniteTop[s_unitePanelCount] = i;
+		s_unitePanelCount++;
 
 		SetTexture(static_cast<CMenuPcs::TEX>(0x38));
 		DrawRect(0,
@@ -2271,7 +2271,7 @@ void CMenuPcs::DrawUniteList()
 	font->DrawInit();
 	font->SetTlut(6);
 
-	for (s32 i = 0; i < DAT_8032eec8; i++) {
+	for (s32 i = 0; i < s_unitePanelCount; i++) {
 		s16* const panel = unitePanels + i * 0x20;
 		const float alpha = (cmd[0x30 / 2] == 3) ? FLOAT_80332a70 : *reinterpret_cast<float*>(panel + 8);
 		GXColor color;
@@ -2326,7 +2326,7 @@ void CMenuPcs::DrawUniteList()
  */
 int CMenuPcs::UniteOpenAnim(int topIdx)
 {
-	if (DAT_8032eec8 == 0) {
+	if (s_unitePanelCount == 0) {
 		return 1;
 	}
 
@@ -2362,7 +2362,7 @@ int CMenuPcs::UniteOpenAnim(int topIdx)
 		int finished = 0;
 		float targetX = FLOAT_80332ac8 + baseX;
 		s32* top = s_UniteTop;
-		for (int i = 0; i < DAT_8032eec8; i++) {
+		for (int i = 0; i < s_unitePanelCount; i++) {
 			int j = 0;
 			int k = 3;
 			do {
@@ -2390,7 +2390,7 @@ int CMenuPcs::UniteOpenAnim(int topIdx)
 			} while (k != 0);
 			top++;
 		}
-		if (finished == DAT_8032eec8) {
+		if (finished == s_unitePanelCount) {
 			return 1;
 		}
 	}
@@ -2409,7 +2409,7 @@ int CMenuPcs::UniteOpenAnim(int topIdx)
  */
 int CMenuPcs::UniteCloseAnim(int topIdx)
 {
-	if (DAT_8032eec8 == 0) {
+	if (s_unitePanelCount == 0) {
 		return 1;
 	}
 
@@ -2441,7 +2441,7 @@ int CMenuPcs::UniteCloseAnim(int topIdx)
 	} else {
 		int finished = 0;
 		s32* top = s_UniteTop;
-		for (int i = 0; i < DAT_8032eec8; i++) {
+		for (int i = 0; i < s_unitePanelCount; i++) {
 			for (int j = 0; j < 3; j++) {
 				int idx = j + *top;
 				int entryOffset = idx * 0x40 + 8;
@@ -2462,7 +2462,7 @@ int CMenuPcs::UniteCloseAnim(int topIdx)
 			}
 			top++;
 		}
-		if (finished == DAT_8032eec8) {
+		if (finished == s_unitePanelCount) {
 			return 1;
 		}
 	}

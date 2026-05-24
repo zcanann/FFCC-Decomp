@@ -34,10 +34,10 @@ extern "C" void* __vt__9CGBaseObj[];
 extern "C" void* __vt__8CGObject[];
 extern "C" int DAT_801dc118[];
 extern "C" int DAT_801dc140;
-extern float* DAT_8032e8b4;
-extern int DAT_8032e8b0;
-extern float* DAT_8032e8bc;
-extern int DAT_8032e8b8;
+extern float* gWmModelYOffsetSpline;
+extern int gWmModelYOffsetSplineCount;
+extern float* gWmModelRotationSpline;
+extern int gWmModelRotationSplineCount;
 extern float* DAT_8032e8c4;
 extern int DAT_8032e8c0;
 extern float* DAT_8032e8cc;
@@ -4932,18 +4932,18 @@ void CMenuPcs::CalcFukidashi()
 		// Spline evaluation for Y position
 		float t = (float)(puVar20[1]) / FLOAT_803314c0;
 		float yResult = fVar1;
-		if (t < DAT_8032e8b4[DAT_8032e8b0 * 4 - 4]) {
+		if (t < gWmModelYOffsetSpline[gWmModelYOffsetSplineCount * 4 - 4]) {
 			int idx = 0;
-			float* pf = DAT_8032e8b4;
-			int splineCnt = DAT_8032e8b0;
+			float* pf = gWmModelYOffsetSpline;
+			int splineCnt = gWmModelYOffsetSplineCount;
 			if (splineCnt > 0) {
 				do {
 					if (t <= *pf) {
 						if (idx == 0) {
-							yResult = DAT_8032e8b4[1];
+							yResult = gWmModelYOffsetSpline[1];
 						} else {
-							float* cur = DAT_8032e8b4 + idx * 4;
-							float* prev = DAT_8032e8b4 + (idx - 1) * 4;
+							float* cur = gWmModelYOffsetSpline + idx * 4;
+							float* prev = gWmModelYOffsetSpline + (idx - 1) * 4;
 							float dt2 = *cur - *prev;
 							float u = (t - *prev) / dt2;
 							float u2 = u * u;
@@ -4960,25 +4960,25 @@ void CMenuPcs::CalcFukidashi()
 				} while (splineCnt != 0);
 			}
 		} else {
-			yResult = DAT_8032e8b4[DAT_8032e8b0 * 4 - 3];
+			yResult = gWmModelYOffsetSpline[gWmModelYOffsetSplineCount * 4 - 3];
 		}
 		*reinterpret_cast<float*>(puVar20 + 8) = *reinterpret_cast<float*>(puVar20 + 8) + yResult;
 
 		// Spline evaluation for rotation
 		float rotResult = FLOAT_803313dc;
 		t = (float)(puVar20[1]) / FLOAT_803314c0;
-		if (t < DAT_8032e8bc[DAT_8032e8b8 * 4 - 4]) {
+		if (t < gWmModelRotationSpline[gWmModelRotationSplineCount * 4 - 4]) {
 			int idx = 0;
-			float* pf = DAT_8032e8bc;
-			int splineCnt = DAT_8032e8b8;
+			float* pf = gWmModelRotationSpline;
+			int splineCnt = gWmModelRotationSplineCount;
 			if (splineCnt > 0) {
 				do {
 					if (t <= *pf) {
 						if (idx == 0) {
-							rotResult = DAT_8032e8bc[1];
+							rotResult = gWmModelRotationSpline[1];
 						} else {
-							float* cur = DAT_8032e8bc + idx * 4;
-							float* prev = DAT_8032e8bc + (idx - 1) * 4;
+							float* cur = gWmModelRotationSpline + idx * 4;
+							float* prev = gWmModelRotationSpline + (idx - 1) * 4;
 							float dt2 = *cur - *prev;
 							float u = (t - *prev) / dt2;
 							float u2 = u * u;
@@ -4995,7 +4995,7 @@ void CMenuPcs::CalcFukidashi()
 				} while (splineCnt != 0);
 			}
 		} else {
-			rotResult = DAT_8032e8bc[DAT_8032e8b8 * 4 - 3];
+			rotResult = gWmModelRotationSpline[gWmModelRotationSplineCount * 4 - 3];
 		}
 		*reinterpret_cast<float*>(puVar20 + 0xB) = FLOAT_803314bc * rotResult;
 		*reinterpret_cast<float*>(puVar20 + 0xA) = FLOAT_803315d0;
@@ -5018,7 +5018,7 @@ void CMenuPcs::CalcFukidashi()
 		modelPtr->CalcSkin();
 
 		puVar20[1] = puVar20[1] + 1;
-		if ((double)(DOUBLE_803314a8 * (double)DAT_8032e8b4[DAT_8032e8b0 * 4 - 4]) <=
+		if ((double)(DOUBLE_803314a8 * (double)gWmModelYOffsetSpline[gWmModelYOffsetSplineCount * 4 - 4]) <=
 		    (double)(float)(puVar20[1]) / FLOAT_803314c0) {
 			puVar20[1] = 0;
 		}
@@ -5062,18 +5062,18 @@ void CMenuPcs::CalcFukidashi()
 				// Spline Y for player models
 				float t2 = (float)(puVar20[1]) / FLOAT_803314c0;
 				float yRes2 = FLOAT_803313dc;
-				if (t2 < DAT_8032e8b4[DAT_8032e8b0 * 4 - 4]) {
+				if (t2 < gWmModelYOffsetSpline[gWmModelYOffsetSplineCount * 4 - 4]) {
 					int si = 0;
-					float* spf = DAT_8032e8b4;
-					int sc = DAT_8032e8b0;
+					float* spf = gWmModelYOffsetSpline;
+					int sc = gWmModelYOffsetSplineCount;
 					if (sc > 0) {
 						do {
 							if (t2 <= *spf) {
 								if (si == 0) {
-									yRes2 = DAT_8032e8b4[1];
+									yRes2 = gWmModelYOffsetSpline[1];
 								} else {
-									float* cr = DAT_8032e8b4 + si * 4;
-									float* pr = DAT_8032e8b4 + (si - 1) * 4;
+									float* cr = gWmModelYOffsetSpline + si * 4;
+									float* pr = gWmModelYOffsetSpline + (si - 1) * 4;
 									float d = *cr - *pr;
 									float u = (t2 - *pr) / d;
 									float u2 = u * u;
@@ -5090,25 +5090,25 @@ void CMenuPcs::CalcFukidashi()
 						} while (sc != 0);
 					}
 				} else {
-					yRes2 = DAT_8032e8b4[DAT_8032e8b0 * 4 - 3];
+					yRes2 = gWmModelYOffsetSpline[gWmModelYOffsetSplineCount * 4 - 3];
 				}
 				*reinterpret_cast<float*>(puVar20 + 8) = *reinterpret_cast<float*>(puVar20 + 8) + yRes2;
 
 				// Spline rotation for player models
 				float rotRes2 = FLOAT_803313dc;
 				t2 = (float)(puVar20[1]) / FLOAT_803314c0;
-				if (t2 < DAT_8032e8bc[DAT_8032e8b8 * 4 - 4]) {
+				if (t2 < gWmModelRotationSpline[gWmModelRotationSplineCount * 4 - 4]) {
 					int si = 0;
-					float* spf = DAT_8032e8bc;
-					int sc = DAT_8032e8b8;
+					float* spf = gWmModelRotationSpline;
+					int sc = gWmModelRotationSplineCount;
 					if (sc > 0) {
 						do {
 							if (t2 <= *spf) {
 								if (si == 0) {
-									rotRes2 = DAT_8032e8bc[1];
+									rotRes2 = gWmModelRotationSpline[1];
 								} else {
-									float* cr = DAT_8032e8bc + si * 4;
-									float* pr = DAT_8032e8bc + (si - 1) * 4;
+									float* cr = gWmModelRotationSpline + si * 4;
+									float* pr = gWmModelRotationSpline + (si - 1) * 4;
 									float d = *cr - *pr;
 									float u = (t2 - *pr) / d;
 									float u2 = u * u;
@@ -5125,7 +5125,7 @@ void CMenuPcs::CalcFukidashi()
 						} while (sc != 0);
 					}
 				} else {
-					rotRes2 = DAT_8032e8bc[DAT_8032e8b8 * 4 - 3];
+					rotRes2 = gWmModelRotationSpline[gWmModelRotationSplineCount * 4 - 3];
 				}
 				*reinterpret_cast<float*>(puVar20 + 0xB) = FLOAT_803314bc * rotRes2;
 				if (playerCount == 1) {
@@ -5151,7 +5151,7 @@ void CMenuPcs::CalcFukidashi()
 				mdl->CalcSkin();
 
 				puVar20[1] = puVar20[1] + 1;
-				if ((double)(DOUBLE_803314a8 * (double)DAT_8032e8b4[DAT_8032e8b0 * 4 - 4]) <=
+				if ((double)(DOUBLE_803314a8 * (double)gWmModelYOffsetSpline[gWmModelYOffsetSplineCount * 4 - 4]) <=
 				    (double)(float)(puVar20[1]) / FLOAT_803314c0) {
 					puVar20[1] = 0;
 				}

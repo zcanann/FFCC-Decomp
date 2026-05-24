@@ -10,6 +10,9 @@ class CTextureSet;
 class CTexture;
 class CMapTexAnim;
 
+extern "C" float FLOAT_8032fd48;
+extern "C" float FLOAT_8032fd4c;
+
 class CMapTexAnimSet : public CRef
 {
 public:
@@ -28,20 +31,96 @@ private:
     CTextureSet* m_textureSet;
 };
 
+class CMapKeyFrameData
+{
+public:
+    float Get()
+    {
+        return reinterpret_cast<CMapKeyFrame*>(this)->Get();
+    }
+
+    int Get(int& key0, int& key1, float& blend)
+    {
+        return reinterpret_cast<CMapKeyFrame*>(this)->Get(key0, key1, blend);
+    }
+
+    void Calc()
+    {
+        reinterpret_cast<CMapKeyFrame*>(this)->Calc();
+    }
+
+    int IsRun()
+    {
+        return reinterpret_cast<CMapKeyFrame*>(this)->IsRun();
+    }
+
+    void ReadJun(CChunkFile& chunkFile, int count)
+    {
+        reinterpret_cast<CMapKeyFrame*>(this)->ReadJun(chunkFile, count);
+    }
+
+    void ReadFrame(CChunkFile& chunkFile, int count)
+    {
+        reinterpret_cast<CMapKeyFrame*>(this)->ReadFrame(chunkFile, count);
+    }
+
+    void ReadKey(CChunkFile& chunkFile, int count)
+    {
+        reinterpret_cast<CMapKeyFrame*>(this)->ReadKey(chunkFile, count);
+    }
+
+    void Destroy()
+    {
+        if (m_junTable != 0) {
+            delete m_junTable;
+            m_junTable = 0;
+        }
+        if (m_keyFrame != 0) {
+            delete m_keyFrame;
+            m_keyFrame = 0;
+        }
+        if (m_keyValue != 0) {
+            delete m_keyValue;
+            m_keyValue = 0;
+        }
+        if (m_splineTable != 0) {
+            delete m_splineTable;
+            m_splineTable = 0;
+        }
+    }
+
+    unsigned char m_mode;
+    unsigned char m_junCount;
+    unsigned char m_keyCount;
+    unsigned char m_loop;
+    unsigned char m_isRun;
+    unsigned char m_pad05[3];
+    int m_currentFrame;
+    int m_startFrame;
+    int m_endFrame;
+    int m_frameCount;
+    unsigned char* m_junTable;
+    float* m_keyFrame;
+    float* m_keyValue;
+    float* m_splineTable;
+};
+
 class CMapTexAnim : public CRef
 {
 public:
     CMapTexAnim()
     {
+        float frameStep = FLOAT_8032fd48;
         m_keyFrame.m_junTable = 0;
+        float currentFrame = FLOAT_8032fd4c;
         m_keyFrame.m_keyFrame = 0;
         m_keyFrame.m_keyValue = 0;
         m_keyFrame.m_splineTable = 0;
         m_keyFrame.m_loop = 1;
         m_keyFrame.m_isRun = 0;
         m_frameTable = 0;
-        m_frameStep = 1.0f;
-        m_currentFrame = 0.0f;
+        m_frameStep = frameStep;
+        m_currentFrame = currentFrame;
         m_usesBlendTexture = 0;
         m_usesKeyFrame = 0;
         m_materialId = -1;
@@ -91,7 +170,7 @@ private:
     float m_frameStep;
     float m_currentFrame;
     unsigned short* m_frameTable;
-    CMapKeyFrame m_keyFrame;
+    CMapKeyFrameData m_keyFrame;
 };
 
 #endif // _FFCC_MAPTEXANIM_H_

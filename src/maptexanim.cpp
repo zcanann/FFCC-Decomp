@@ -317,4 +317,7 @@ CMapTexAnim::~CMapTexAnim()
 {
     delete m_frameTable;
     m_frameTable = 0;
+    if (static_cast<void*>(&m_keyFrame) != 0) {
+        m_keyFrame.Destroy();
+    }
 }

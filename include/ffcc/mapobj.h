@@ -161,7 +161,11 @@ public:
     unsigned short m_objId;         // 0x2E
     char m_pad30[4];
     unsigned short m_meshId;        // 0x34
-    char m_pad36[0x52];
+    char m_pad36[0x22];
+    float m_transRateX;             // 0x58
+    float m_transRateY;             // 0x5C
+    float m_transRateZ;             // 0x60
+    char m_pad64[0x24];
     float m_localMtx[3][4];         // 0x88
     float m_worldMtx[3][4];         // 0xB8
     _GXColor m_ambientColor;        // 0xE8

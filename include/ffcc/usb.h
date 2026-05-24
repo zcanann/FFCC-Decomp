@@ -24,11 +24,11 @@ struct CUSBCallbackEntry
     void* m_callerContext; // 0x8
 };
 
-class CUSB : public CManager
+class CUSB
 {
 public:
-    void Init();
-    void Quit();
+    virtual void Init();
+    virtual void Quit();
     void Connect();
     void Disconnect();
     void Frame();

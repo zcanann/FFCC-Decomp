@@ -1,6 +1,6 @@
 #include "ffcc/p_sample.h"
 
-extern const char s_CSamplePcs_801D6CC8[];
+extern const char sSamplePcsClassName[] = "CSamplePcs";
 
 /*
  * --INFO--
@@ -34,7 +34,7 @@ inline CSamplePcs::CSamplePcs()
 }
 
 CSamplePcsTable CSamplePcs::m_table = {
-    const_cast<char*>(s_CSamplePcs_801D6CC8),
+    const_cast<char*>(sSamplePcsClassName),
     {
         0,
         0,

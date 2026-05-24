@@ -1104,72 +1104,6 @@ void CPartPcs::GetParLocIdx(int index, Vec& location)
 
 /*
  * --INFO--
- * PAL Address: 0x80052990
- * PAL Size: 140b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CPartPcs::SetParColIdx(int index, pppFVECTOR4& color)
-{
-	struct PartMngColorView {
-		u8 pad[0x2A50];
-		float r;
-		float g;
-		float b;
-		float a;
-	};
-	PartMngColorView* pppMngSt =
-	    reinterpret_cast<PartMngColorView*>(reinterpret_cast<u8*>(&PartMng) + (index * 0x158));
-	float one = 1.0f;
-
-	pppMngSt->r = color.x;
-	pppMngSt->g = color.y;
-	pppMngSt->b = color.z;
-	pppMngSt->a = color.w;
-
-	if (one == color.x && one == color.y && one == color.z && one == color.w) {
-		PartMng.m_pppMng[index].m_useOwnerScaleSign = 0;
-		return;
-	}
-
-	PartMng.m_pppMng[index].m_useOwnerScaleSign = 1;
-	PartMng.m_pppMng[index].m_nodeScaleInitialized = 1;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8005295c
- * PAL Size: 52b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CPartPcs::GetParColIdx(int index, pppFVECTOR4& color)
-{
-	struct PartMngColorView {
-		u8 pad[0x2A50];
-		float r;
-		float g;
-		float b;
-		float a;
-	};
-	PartMngColorView* pppMngSt =
-	    reinterpret_cast<PartMngColorView*>(reinterpret_cast<u8*>(&PartMng) + (index * 0x158));
-	color.x = pppMngSt->r;
-	color.y = pppMngSt->g;
-	color.z = pppMngSt->b;
-	color.w = pppMngSt->a;
-}
-
-extern "C" {
-const char s_no_name_8032fdcc[] = "no name";
-}
-
-/*
- * --INFO--
  * PAL Address: 0x80052764
  * PAL Size: 504b
  * EN Address: TODO
@@ -1220,6 +1154,72 @@ void CPartPcs::drawAfterViewer()
 		stringBase + 0x170,
 		(double)((float)gPppHeapUseRateWords[0] / kPppHeapUseRateDivisor),
 		(double)((float)gPppHeapUseRateWords[1] / kPppHeapUseRateDivisor));
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80052990
+ * PAL Size: 140b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CPartPcs::SetParColIdx(int index, pppFVECTOR4& color)
+{
+	struct PartMngColorView {
+		u8 pad[0x2A50];
+		float r;
+		float g;
+		float b;
+		float a;
+	};
+	PartMngColorView* pppMngSt =
+	    reinterpret_cast<PartMngColorView*>(reinterpret_cast<u8*>(&PartMng) + (index * 0x158));
+	float one = 1.0f;
+
+	pppMngSt->r = color.x;
+	pppMngSt->g = color.y;
+	pppMngSt->b = color.z;
+	pppMngSt->a = color.w;
+
+	if (one == color.x && one == color.y && one == color.z && one == color.w) {
+		PartMng.m_pppMng[index].m_useOwnerScaleSign = 0;
+		return;
+	}
+
+	PartMng.m_pppMng[index].m_useOwnerScaleSign = 1;
+	PartMng.m_pppMng[index].m_nodeScaleInitialized = 1;
+}
+
+extern "C" {
+const char s_no_name_8032fdcc[] = "no name";
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8005295c
+ * PAL Size: 52b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CPartPcs::GetParColIdx(int index, pppFVECTOR4& color)
+{
+	struct PartMngColorView {
+		u8 pad[0x2A50];
+		float r;
+		float g;
+		float b;
+		float a;
+	};
+	PartMngColorView* pppMngSt =
+	    reinterpret_cast<PartMngColorView*>(reinterpret_cast<u8*>(&PartMng) + (index * 0x158));
+	color.x = pppMngSt->r;
+	color.y = pppMngSt->g;
+	color.z = pppMngSt->b;
+	color.w = pppMngSt->a;
 }
 
 /*

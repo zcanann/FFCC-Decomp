@@ -426,42 +426,34 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
  */
 unsigned long long CMapPcs::IsLoadMapCompleted()
 {
-    void** handle = MapMng.m_asyncLoadState.m_asyncHandles;
     unsigned int value = 0;
+    int index = 0;
 
     for (int count = 2; count != 0; count--) {
-        if (*handle != 0) {
+        if (MapMng.m_asyncLoadState.m_asyncHandles[index++] != 0) {
             return (unsigned long long)value;
         }
-        handle++;
-        if (*handle != 0) {
+        if (MapMng.m_asyncLoadState.m_asyncHandles[index++] != 0) {
             return (unsigned long long)value;
         }
-        handle++;
-        if (*handle != 0) {
+        if (MapMng.m_asyncLoadState.m_asyncHandles[index++] != 0) {
             return (unsigned long long)value;
         }
-        handle++;
-        if (*handle != 0) {
+        if (MapMng.m_asyncLoadState.m_asyncHandles[index++] != 0) {
             return (unsigned long long)value;
         }
-        handle++;
-        if (*handle != 0) {
+        if (MapMng.m_asyncLoadState.m_asyncHandles[index++] != 0) {
             return (unsigned long long)value;
         }
-        handle++;
-        if (*handle != 0) {
+        if (MapMng.m_asyncLoadState.m_asyncHandles[index++] != 0) {
             return (unsigned long long)value;
         }
-        handle++;
-        if (*handle != 0) {
+        if (MapMng.m_asyncLoadState.m_asyncHandles[index++] != 0) {
             return (unsigned long long)value;
         }
-        handle++;
-        if (*handle != 0) {
+        if (MapMng.m_asyncLoadState.m_asyncHandles[index++] != 0) {
             return (unsigned long long)value;
         }
-        handle++;
         value += 7;
     }
 

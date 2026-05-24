@@ -77,8 +77,6 @@ extern const float FLOAT_80330688;
 extern const float FLOAT_8033068C;
 extern const float FLOAT_80330690;
 
-void pppSetFpMatrix(_pppMngSt*);
-
 /*
  * --INFO--
  * PAL Address: 0x800981a8

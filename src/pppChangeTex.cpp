@@ -111,7 +111,6 @@ static inline float LoadFloat(const float& value)
 	return value;
 }
 
-void pppInitBlendMode(void);
 static void ChangeTex_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*)[4]);
 static void ChangeTex_AfterDrawMeshCallback(CChara::CModel*, void*, void*, int, float (*)[4]);
 

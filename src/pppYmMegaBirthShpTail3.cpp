@@ -19,7 +19,6 @@ extern int gPppCalcDisabled;
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
 
-extern "C" void pppSetBlendMode(unsigned char);
 static pppFMATRIX g_matUnit3;
 
 static const char s_pppYmMegaBirthShpTail3_cpp[] = "pppYmMegaBirthShpTail3.cpp";

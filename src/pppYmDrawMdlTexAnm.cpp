@@ -39,8 +39,6 @@ extern const char s_YmDrawMdlTexAnmConstructorJp[0x10] = {
 };
 }
 
-void pppSetBlendMode(unsigned char);
-
 static inline CMapMesh** GetMapMeshTable()
 {
     return pppEnvStPtr->m_mapMeshPtr;

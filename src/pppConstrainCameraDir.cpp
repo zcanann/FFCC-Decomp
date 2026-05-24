@@ -1,11 +1,10 @@
 #include "ffcc/pppConstrainCameraDir.h"
 #include "ffcc/partMng.h"
 #include "ffcc/p_camera.h"
+#include "ffcc/pppPart.h"
 #include "ffcc/ppp_linkage.h"
 #include "ffcc/pppYmEnv.h"
 #include <dolphin/mtx.h>
-
-void pppSetFpMatrix(_pppMngSt*);
 
 /*
  * --INFO--

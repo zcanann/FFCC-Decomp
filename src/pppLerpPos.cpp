@@ -19,8 +19,6 @@ struct pppLerpPosUnkC {
     s32* m_serializedDataOffsets;
 };
 
-void pppSetFpMatrix(_pppMngSt*);
-
 static const char s_pppLerpPos_cpp[] = "pppLerpPos.cpp";
 
 /*

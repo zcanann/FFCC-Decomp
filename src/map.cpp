@@ -104,7 +104,7 @@ static const char s_mapReadMplFmt[] = "ReadMpl fn=%s\n";
 static const char s_mapMtxPathFmt[] = "%s_%d.mtx";
 static const char s_mapReadMtxFmt[] = "ReadMtx fn=%s\n";
 static const char s_map_manager_label_block[] = "CMapMng.mapmng\0\0CMapObjAtr\0";
-static const char s_CMapTexAnimSet[] = "CMapTexAnimSet";
+extern const char s_CMapTexAnimSet[] = "CMapTexAnimSet";
 static const char s_map_ptrarray_grow_error[] =
     "\x83\x6f\x83\x62\x83\x74\x83\x40\x90\xac\x92\xb7\x82\xaa\x95\x73\x8b\x96\x89\xc2\x82\xc5\x82\xb7\x81\x42\n";
 static const char s_map_collection_ptrarray_h[] = "collection_ptrarray.h";

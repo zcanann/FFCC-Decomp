@@ -12,12 +12,12 @@ extern "C" const char s_charaAnimAllocWarn[32] =
     "\214\140\216\256\202\305\202\267\201\102\n";
 extern const float kCharaSharedZeroF;
 extern const float kCharaSharedOneF;
-extern const double DOUBLE_80330C78 = 4503599627370496.0;
-extern const float FLOAT_80330c80 = 0.0f;
-extern const float FLOAT_80330c84 = 0.01745329238474369f;
-extern const double DOUBLE_80330c88 = 4503601774854144.0;
-extern const float FLOAT_80330C90 = -1.0f;
-extern const float FLOAT_80330C94 = 360.0f;
+extern const double kCharaAnimDoubleMagic = 4503599627370496.0;
+extern const float kCharaAnimZero = 0.0f;
+extern const float kCharaAnimDegToRad = 0.01745329238474369f;
+extern const double kCharaAnimSignedDoubleMagic = 4503601774854144.0;
+extern const float kCharaAnimNegativeOne = -1.0f;
+extern const float kCharaAnimFullTurnDegrees = 360.0f;
 
 class CCharaPcs
 {

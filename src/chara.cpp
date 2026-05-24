@@ -28,7 +28,7 @@ extern "C" float FLOAT_803301d0;
 extern "C" float FLOAT_803301e4;
 extern "C" float FLOAT_803301e8;
 extern "C" float FLOAT_803301f8;
-extern "C" CLightPcs::CBumpLight* DAT_8032edc0;
+extern "C" CLightPcs::CBumpLight* gCharaPartWorkPtr;
 extern const char s_CChara_80330220[];
 
 inline void* operator new(unsigned long, void* ptr)
@@ -984,7 +984,7 @@ void CChara::CModel::Create(void* fileData, CMemory::CStage* stage)
 				    new(stage, const_cast<char*>("src/chara.cpp"), 0x132) CMaterialSet();
 				*(CMaterialSet**)((u8*)ref + 0x20) = materialSet;
 				if (materialSet != 0) {
-					materialSet->Create(chunkFile, 0, static_cast<CMaterialMan::TEV_BIT>(0xFFF531F0), DAT_8032edc0);
+					materialSet->Create(chunkFile, 0, static_cast<CMaterialMan::TEV_BIT>(0xFFF531F0), gCharaPartWorkPtr);
 				}
 				break;
 			}
@@ -2011,7 +2011,7 @@ void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
 
 		CopyCharaMaterialEnv();
 		if (mesh->m_data->m_infoWord1 != 0) {
-			LightPcs.SetBumpTexMatirx(meshMtx, DAT_8032edc0, 0, 0);
+			LightPcs.SetBumpTexMatirx(meshMtx, gCharaPartWorkPtr, 0, 0);
 		}
 		MaterialMan.SetObjMatrix(view, meshMtx);
 		GXSetArray((GXAttr)9, mesh->m_workPositions, 6);

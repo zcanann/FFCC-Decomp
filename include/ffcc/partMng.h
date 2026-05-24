@@ -468,8 +468,8 @@ public:
         char m_name[0x20];                // 0x18
     }; // Size 0x38
 
-    PppPdtSlot m_pdtSlots[0x18];          // 0x22E18
-    unsigned char m_unk23358[0x1C4];      // 0x23358
+    PppPdtSlot m_pdtSlots[0x20];          // 0x22E18
+    unsigned char m_unk23518[0x4];        // 0x23518
     _pppEnvSt m_pppEnvSt;                 // 0x2351C
     unsigned char m_unk235A8[0x14C];      // 0x235A8
     unsigned int m_partAMemBase;          // 0x236F4

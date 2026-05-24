@@ -3015,7 +3015,7 @@ void GbaQueue::InitCmakeInfo(int channel, int value)
 
 	OSWaitSemaphore(accessSemaphores + channel);
 	memset(&cmakeInfo[channel], 0, sizeof(cmakeInfo[channel]));
-	cmakeInfo[channel][0] = 1;
+	cmakeInfo[channel].m_active = 1;
 	obj[channel * 0x20 + 0x2CCA] = 0xFF;
 	obj[channel * 0x20 + 0x2CD1] = 0xFF;
 	obj[channel * 0x20 + 0x2CB8] = static_cast<unsigned char>(value);
@@ -3036,7 +3036,7 @@ void GbaQueue::InitCmakeInfo(int channel, int value)
 void GbaQueue::ClrCmakeInfo(int param_2)
 {
 	BlockSem(param_2);
-	if (cmakeInfo[param_2][0] != '\0') {
+	if (cmakeInfo[param_2].m_active != 0) {
 		memset(&cmakeInfo[param_2], 0, sizeof(cmakeInfo[param_2]));
 	}
 	ReleaseSem(param_2);
@@ -3109,7 +3109,7 @@ void GbaQueue::ChkCMakeName(int channel, unsigned int value)
 
 		for (int i = 0; i < 4; i++) {
 			const int otherOffset = i * 0x20;
-			if ((channel != i) && (cmakeInfo[i][0] != '\0') &&
+			if ((channel != i) && (cmakeInfo[i].m_active != 0) &&
 			    (strcmp(obj + 0x2CB9 + otherOffset, localInfo.m_name) == 0)) {
 				memset(obj + 0x2CB9 + cmakeOffset, 0, 0x11);
 				for (int j = 0; j < 4; j++) {
@@ -3190,7 +3190,7 @@ void GbaQueue::ChkCMakeCharaType(int channel, unsigned int value)
 	unsigned char playerSlot = static_cast<unsigned char>(obj[0x2CB8 + cmakeOffset]);
 	for (int i = 0; i < 4; i++) {
 		int otherOffset = i * 0x20;
-		if ((channel != i) && (cmakeInfo[i][0] != '\0') &&
+		if ((channel != i) && (cmakeInfo[i].m_active != 0) &&
 		    (static_cast<unsigned char>(obj[0x2CCA + otherOffset]) == charaType)) {
 			Joybus.SendResult(channel, 1, resultCode, 0);
 			foundDuplicate = true;
@@ -3264,7 +3264,7 @@ void GbaQueue::ChkCMakeJob(int channel, unsigned int value)
 	unsigned char playerSlot = static_cast<unsigned char>(obj[0x2CB8 + cmakeOffset]);
 	for (int i = 0; i < 4; i++) {
 		int otherOffset = i * 0x20;
-		if ((channel != i) && (cmakeInfo[i][0] != '\0') &&
+		if ((channel != i) && (cmakeInfo[i].m_active != 0) &&
 		    (static_cast<unsigned char>(obj[0x2CD1 + otherOffset]) == jobType)) {
 			Joybus.SendResult(channel, 1, resultCode, 0);
 			foundDuplicate = true;

@@ -181,7 +181,7 @@ private:
     unsigned char _pad30[0x2C59];    // 0x0030
     unsigned char m_letterFlags;      // 0x2C89
     unsigned char _pad2C8A[0x28];     // 0x2C8A
-    char cmakeInfo[4][0x20];          // 0x2CB2
+    GbaCMakeInfo cmakeInfo[4];        // 0x2CB2
     unsigned char _pad2D32[0x12];     // 0x2D32
     GbaQueueHitInfo m_hitInfo[4];      // 0x2D44
     unsigned char m_chgHitFlags;      // 0x2D54

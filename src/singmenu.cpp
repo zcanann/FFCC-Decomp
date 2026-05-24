@@ -468,13 +468,13 @@ extern char s_Nein_803322B8[], s_Gil_803322C0[], s_Staerke_803322C4[], s_Abwehr_
 extern char s_Magie_803322D4[], s_Ablegen_803322DC[], s_G_803322E4[], s_Vater_803322E8[];
 extern char s_Mutter_803322F0[], s_Bruder_803322F8[], s_Weiter_80332300[], lbl_80332308[];
 extern char s_Rasse_8033230C[], s_Geld_80332314[], s_Familie_8033231C[], s_Briefe_80332324[];
-extern char lbl_8033232C[], lbl_80332330[], lbl_80332338[], lbl_80332340[];
-extern char lbl_80332348[], lbl_80332350[], lbl_80332358[], lbl_80332360[];
-extern char lbl_80332368[], lbl_80332370[], lbl_80332378[], lbl_80332380[];
-extern char lbl_80332384[], lbl_8033238C[], lbl_80332394[], lbl_8033239C[];
-extern char lbl_803323A4[], lbl_803323AC[], lbl_803323B4[], lbl_803323BC[];
-extern char lbl_803323C4[], lbl_803323CC[], lbl_803323D4[], lbl_803323DC[];
-extern char lbl_803323E4[], lbl_803323EC[], lbl_803323F4[], lbl_803323FC[];
+extern char s_Si_8033232C[], s_Annulla_80332330[], s_guil_80332338[], s_Forza_80332340[];
+extern char s_Difesa_80332348[], s_Magia_80332350[], s_Memorie_80332358[], s_Attacco_80332360[];
+extern char s_Rimuovi_80332368[], s_Fusione_80332370[], s_Dividi_80332378[], s_Usa_80332380[];
+extern char s_Posa_80332384[], s_Maschio_8033238C[], s_Femmina_80332394[], s_Tutti_8033239C[];
+extern char s_Padre_803323A4[], s_Madre_803323AC[], s_Sorella_803323B4[], s_Lettere_803323BC[];
+extern char s_con_803323C4[], s_Nome_803323CC[], s_Sesso_803323D4[], s_Razza_803323DC[];
+extern char s_Oggetti_803323E4[], s_Tesori_803323EC[], s_Denaro_803323F4[], s_Fatto_803323FC[];
 extern char lbl_80332404[], lbl_80332408[], lbl_8033240C[], lbl_80332414[];
 extern char lbl_8033241C[], lbl_80332424[], lbl_8033242C[], lbl_80332434[];
 extern char lbl_8033243C[], lbl_80332444[], lbl_8033244C[], lbl_80332454[];
@@ -583,20 +583,20 @@ extern "C" char* gSingMenuTextTableDe[] = {
     s_Geschmack_801DDA74, s_Familie_8033231C, s_Briefe_80332324, s_Abbrechen_801DD8C8,
 };
 extern "C" char* gSingMenuTextTableIt[] = {
-    lbl_803321B8, lbl_8033232C, lbl_803321C0, lbl_80332330,
-    lbl_80332338, lbl_80332340, lbl_80332348, lbl_80332350,
-    lbl_80332358, lbl_80332360, lbl_80332348, lbl_80332368,
-    lbl_80332370, lbl_80332378, lbl_80332380, lbl_80332384,
-    s_Distruggi_801DDA80, lbl_8033238C, lbl_80332394, lbl_8033239C,
-    lbl_80332230, lbl_80332234, lbl_803323A4, lbl_803323AC,
-    s_Fratello_801DDA8C, lbl_803323B4, s_Fratello_801DDA8C, lbl_803323B4,
-    lbl_803321B8, lbl_803323BC, s_Invia_oggetto_801DDA98, s_Invia_guil_801DDAA8,
+    lbl_803321B8, s_Si_8033232C, lbl_803321C0, s_Annulla_80332330,
+    s_guil_80332338, s_Forza_80332340, s_Difesa_80332348, s_Magia_80332350,
+    s_Memorie_80332358, s_Attacco_80332360, s_Difesa_80332348, s_Rimuovi_80332368,
+    s_Fusione_80332370, s_Dividi_80332378, s_Usa_80332380, s_Posa_80332384,
+    s_Distruggi_801DDA80, s_Maschio_8033238C, s_Femmina_80332394, s_Tutti_8033239C,
+    lbl_80332230, lbl_80332234, s_Padre_803323A4, s_Madre_803323AC,
+    s_Fratello_801DDA8C, s_Sorella_803323B4, s_Fratello_801DDA8C, s_Sorella_803323B4,
+    lbl_803321B8, s_Lettere_803323BC, s_Invia_oggetto_801DDA98, s_Invia_guil_801DDAA8,
     s_Non_inviare_nulla_801DDAB4, s_Vuoi_procedere_801DDAC8, s_Vuoi_prendere_801DDAD8, lbl_80332260,
-    lbl_80332260, lbl_803323C4, s_Vuoi_rispondere_a_801DDAE8, lbl_803321B8,
-    s_Allegato_801DDAFC, s_Conferma_801DDB08, lbl_803323CC, lbl_803323D4,
-    lbl_803323DC, s_Mestiere_801DDB14, s_Lista_Comandi_801DDB20, lbl_803323E4,
-    s_Equipaggiamento_801DDB30, s_Manufatti_801DDB40, lbl_803323EC, lbl_803323F4,
-    s_Preferiti_801DDB4C, s_Famiglia_801DDB58, lbl_803323BC, lbl_803323FC,
+    lbl_80332260, s_con_803323C4, s_Vuoi_rispondere_a_801DDAE8, lbl_803321B8,
+    s_Allegato_801DDAFC, s_Conferma_801DDB08, s_Nome_803323CC, s_Sesso_803323D4,
+    s_Razza_803323DC, s_Mestiere_801DDB14, s_Lista_Comandi_801DDB20, s_Oggetti_803323E4,
+    s_Equipaggiamento_801DDB30, s_Manufatti_801DDB40, s_Tesori_803323EC, s_Denaro_803323F4,
+    s_Preferiti_801DDB4C, s_Famiglia_801DDB58, s_Lettere_803323BC, s_Fatto_803323FC,
 };
 extern "C" char* gSingMenuTextTableFr[] = {
     lbl_803321B8, lbl_80332404, lbl_80332408, lbl_8033240C,
@@ -616,11 +616,11 @@ extern "C" char* gSingMenuTextTableFr[] = {
 };
 extern "C" char* gSingMenuTextTableEs[] = {
     lbl_803321B8, lbl_803324C4, lbl_803321C0, s_Cancelar_801DDC5C,
-    lbl_803324C8, lbl_803324D0, lbl_803324D8, lbl_80332350,
+    lbl_803324C8, lbl_803324D0, lbl_803324D8, s_Magia_80332350,
     s_Memorias_801DDC68, lbl_803324E0, s_Defender_801DDC74, lbl_803324E8,
     s_Fusionar_801DDC80, lbl_803324F0, s_Utilizar_801DDC8C, s_Descartar_801DDC98,
     s_Destruir_801DDCA4, lbl_803324F8, lbl_80332500, lbl_80332508,
-    lbl_80332510, lbl_80332234, lbl_803323A4, lbl_803323AC,
+    lbl_80332510, lbl_80332234, s_Padre_803323A4, s_Madre_803323AC,
     lbl_80332518, lbl_80332520, lbl_80332518, lbl_80332520,
     lbl_803321B8, lbl_80332528, s_Enviar_objeto_801DDCB0, s_Enviar_guiles_801DDCC0,
     s_No_enviar_nada_801DDCD0, s_Continuar_801DDCE0, s_Extraer_801DDCEC, lbl_80332260,

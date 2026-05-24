@@ -29,9 +29,6 @@ static const char s_pppEmission_cpp[] = "pppEmission.cpp";
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
 static inline MtxPtr CameraMatrix() { return CameraPcs.m_cameraMatrix; }
 
-void pppInitBlendMode(void);
-void pppSetBlendMode(unsigned char);
-
 struct EmissionDisplayList {
     u32 m_size;
     void* m_data;

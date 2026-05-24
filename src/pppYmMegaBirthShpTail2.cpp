@@ -17,7 +17,6 @@ extern int gPppCalcDisabled;
 #include <dolphin/mtx.h>
 #include <string.h>
 
-extern "C" void pppSetBlendMode(unsigned char);
 static pppFMATRIX g_matUnit2;
 
 static const char s_pppYmMegaBirthShpTail2_cpp[] = "pppYmMegaBirthShpTail2.cpp";

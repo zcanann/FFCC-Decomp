@@ -65,7 +65,7 @@ static const char s_tina_title_fmt_801d8014[] = "Tina [%c]";
 static const char s_tina_calc_fmt_801d8020[] = "clc=%.3f%%  max=%.3f%%";
 static const char s_tina_draw_fmt_801d8038[] = "drw=%.3f%%  max=%.3f%%";
 static const char s_tina_heap_fmt_801d8050[] = "hpm=%.3f%%  max=%.3f%%";
-static const char DAT_801d8068[] = {
+static const char sTinaParticleAMemFreeFmt[] = {
     (char)0x0A, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D,
     (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D,
     (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D,
@@ -97,7 +97,7 @@ static const char s_dvd_tina_chobit_2_801d8164[] = "dvd/tina/chobit_2";
 static const char s_dvd_tina_chobit_3_801d8178[] = "dvd/tina/chobit_3";
 static const char s_dvd_tina_chobit_4_801d818c[] = "dvd/tina/chobit_4";
 static const char s_tina_prio_time_fmt_801d81a0[] = "  prioTime=%d  prio=%d  pdtID=%2d  fpno=%3d   %s\n";
-static const char DAT_801d81d4[] = {
+static const char sTinaDeleteNoticeMsg[] = {
     (char)0x20, (char)0x20, (char)0x20, (char)0x20, (char)0x20, (char)0x20, (char)0x20, (char)0x20,
     (char)0x20, (char)0x20, (char)0x20, (char)0x20, (char)0x20, (char)0x20, (char)0x20, (char)0x20,
     (char)0x82, (char)0xF0, (char)0x8D, (char)0xED, (char)0x8F, (char)0x9C, (char)0x82, (char)0xB5,
@@ -152,11 +152,11 @@ char g_MsgFlashy[0x36] =
     "\x81\x9A\x81\x99\x81\x9A\x81\x99\x81\x9A\x81\x99\x81\x9A\x81\x99"
     "\x81\x9A\x81\x99\x81\x9A\x81\x99\x81\x9A\x81\x99\x81\x9A\x81\x99"
     "\x81\x9A\x81\x99\x0A";
-int DAT_8032ed38;
-int DAT_8032ed3c;
+int g_MaxDataSize;
+int g_MaxHeapSize;
 extern "C" {
-const char* g_MaxDataSize;
-signed char g_MaxHeapSize[4];
+const char* sDebugSpinnerTextPtr;
+signed char sDebugSpinnerTextPtrInit;
 int s_debugSpinnerFrameCounter;
 signed char s_debugSpinnerFrameCounterInit;
 }
@@ -765,7 +765,7 @@ void CPartPcs::calc()
 
 		m_usbStreamData.m_printFreeOnNext = 0;
 		freeSize = ppvAmemCacheSet.AmemGetFreeSize();
-		System.Printf(const_cast<char*>(DAT_801d8068), freeSize / 1024);
+		System.Printf(const_cast<char*>(sTinaParticleAMemFreeFmt), freeSize / 1024);
 	}
 	ppvAmemCacheSet.CalcPrio();
 	PartMng.pppDumpCacheIdx();
@@ -1127,9 +1127,9 @@ void CPartPcs::drawAfterViewer()
 	PartMng.pppGet2Dpos();
 	pppClearDrawEnv();
 
-	if (g_MaxHeapSize[0] == 0) {
-		g_MaxDataSize = sDebugSpinnerText;
-		g_MaxHeapSize[0] = 1;
+	if (sDebugSpinnerTextPtrInit == 0) {
+		sDebugSpinnerTextPtr = sDebugSpinnerText;
+		sDebugSpinnerTextPtrInit = 1;
 	}
 	if (s_debugSpinnerFrameCounterInit == 0) {
 		s_debugSpinnerFrameCounter = 0;
@@ -1138,7 +1138,7 @@ void CPartPcs::drawAfterViewer()
 
 	s_debugSpinnerFrameCounter++;
 	Graphic.Printf(
-		stringBase + 0x134, g_MaxDataSize[(s_debugSpinnerFrameCounter >> 4) % 4]);
+		stringBase + 0x134, sDebugSpinnerTextPtr[(s_debugSpinnerFrameCounter >> 4) % 4]);
 
 	g_par_calc_prof.ProfEnd();
 	g_par_draw_prof.ProfEnd();
@@ -1282,8 +1282,8 @@ void LoadFieldPdt0(int mapId, int floorId)
     int pdtSlot;
     char path[1024];
 
-    DAT_8032ed3c = 0;
-    DAT_8032ed38 = 0;
+    g_MaxHeapSize = 0;
+    g_MaxDataSize = 0;
 
     if (GetPartMngState()->m_partLoadMode != 3) {
         PartMng.pppReleasePdt(0);

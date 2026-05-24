@@ -20,13 +20,13 @@
 #include <math.h>
 #include <string.h>
 
-extern const float FLOAT_80331060 = 0.0f;
-extern const float FLOAT_80331064 = 0.0078125f;
-extern const float FLOAT_80331068 = -1.0f;
-extern const float FLOAT_8033106C = 16777215.0f;
-extern const double DOUBLE_80331070 = 4503599627370496.0;
-__declspec(section ".sdata2") unsigned long long g_chara_fur_1;
-__declspec(section ".sdata2") unsigned long long g_chara_fur_2;
+extern const float kPppLensFlareZero = 0.0f;
+extern const float kPppLensFlareAlphaScale = 0.0078125f;
+extern const float kPppLensFlareNegate = -1.0f;
+extern const float kPppLensFlareZScale = 16777215.0f;
+extern const double kPppLensFlareDoubleMagic = 4503599627370496.0;
+unsigned long long g_chara_fur_1;
+unsigned long long g_chara_fur_2;
 
 struct Vec4d
 {

@@ -52,21 +52,21 @@ extern "C" void* __vt__8CPtrArrayIP7CMapAnim[];
 extern "C" void* __vt__8CPtrArrayIP13CMapAnimKeyDt[];
 extern "C" void* __vt__8CPtrArrayIP10CMapShadow[];
 unsigned char gMapHitFaceFlag;
-extern const float FLOAT_8032f988 = 1.0e15f;
-extern const float FLOAT_8032f98c = -1.0f;
-extern const float FLOAT_8032f9a0 = 0.0f;
+extern const float kMapCameraSemiTransMinSentinel = 1.0e15f;
+extern const float kMapCameraSemiTransMaxSentinel = -1.0f;
+extern const float kMapZero = 0.0f;
 
 static inline CMapMngAsyncLoadState& GetMapMngAsyncLoadState(CMapMng* mapMng)
 {
     return mapMng->m_asyncLoadState;
 }
-extern const float FLOAT_8032f9a4 = 0.0001f;
-extern const float FLOAT_8032f9a8 = -0.0001f;
-extern const float FLOAT_8032f9ac = 10.0f;
-extern const float FLOAT_8032F9B0 = 100000.0f;
-extern const float FLOAT_8032F9B4 = 360.0f;
-extern const float FLOAT_8032F9B8 = 5.0e-6f;
-extern const float FLOAT_8032f9bc = -0.1f;
+extern const float kMapHitMoveEpsilon = 0.0001f;
+extern const float kMapHitMoveNegEpsilon = -0.0001f;
+extern const float kMapHitTInitial = 10.0f;
+extern const float kMapLargeDistance = 100000.0f;
+extern const float kMapFullTurnDegrees = 360.0f;
+extern const float kMapTinyEpsilon = 5.0e-6f;
+extern const float kMapHitWireZOffset = -0.1f;
 extern char g_MsgFlashy[];
 extern const char s_mapNewLine[] = "\n";
 extern "C" unsigned char Vec_80245758[];
@@ -1764,9 +1764,9 @@ search:
         mapObj = 0;
 found:
         if (mapObj == 0) {
-            vec->z = FLOAT_8032f9a0;
-            vec->y = FLOAT_8032f9a0;
-            vec->x = FLOAT_8032f9a0;
+            vec->z = kMapZero;
+            vec->y = kMapZero;
+            vec->x = kMapZero;
             return 0;
         }
     }
@@ -2884,7 +2884,7 @@ void CMapMng::Draw()
         wireColor.a = 0x80;
         GXSetChanMatColor(GX_COLOR0A0, wireColor);
 
-        CameraPcs.SetOffsetZBuff(FLOAT_8032f9bc);
+        CameraPcs.SetOffsetZBuff(kMapHitWireZOffset);
 
         CMapObj* mapObj = GetMapObjArray();
         for (int i = 0; i < mapObjCount; i++) {
@@ -2898,7 +2898,7 @@ void CMapMng::Draw()
             mapObj = reinterpret_cast<CMapObj*>(Ptr(mapObj, 0xF0));
         }
 
-        CameraPcs.SetOffsetZBuff(FLOAT_8032f9a0);
+        CameraPcs.SetOffsetZBuff(kMapZero);
     }
 }
 
@@ -2965,12 +2965,13 @@ void CMapMng::DrawAfter()
  */
 int CMapMng::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long mask)
 {
-    if ((FLOAT_8032f9a0 == move->x) && (FLOAT_8032f9a0 == move->y) && (FLOAT_8032f9a0 == move->z)) {
+    if ((kMapZero == move->x) && (kMapZero == move->y) && (kMapZero == move->z)) {
         return 0;
     }
 
-    if ((move->x <= FLOAT_8032f9a4) && (FLOAT_8032f9a8 <= move->x) && (move->y <= FLOAT_8032f9a4) &&
-        (FLOAT_8032f9a8 <= move->y) && (move->z <= FLOAT_8032f9a4) && (FLOAT_8032f9a8 <= move->z)) {
+    if ((move->x <= kMapHitMoveEpsilon) && (kMapHitMoveNegEpsilon <= move->x) &&
+        (move->y <= kMapHitMoveEpsilon) && (kMapHitMoveNegEpsilon <= move->y) &&
+        (move->z <= kMapHitMoveEpsilon) && (kMapHitMoveNegEpsilon <= move->z)) {
         if (static_cast<unsigned int>(System.m_execParam) > 1) {
             System.Printf(g_MsgFlashy);
         }
@@ -2984,7 +2985,7 @@ int CMapMng::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long m
     }
 
     g_hit_edge_idx_min = -2;
-    g_hit_t_min = FLOAT_8032f9ac;
+    g_hit_t_min = kMapHitTInitial;
     PSVECAdd(&cylinder->m_bottom, move, &cylinder->m_top);
 
     for (int i = 0; i < m_octTreeCount; i++) {
@@ -3019,12 +3020,13 @@ int CMapMng::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned lo
 {
     int hit = 0;
 
-    if ((FLOAT_8032f9a0 == move->x) && (FLOAT_8032f9a0 == move->y) && (FLOAT_8032f9a0 == move->z)) {
+    if ((kMapZero == move->x) && (kMapZero == move->y) && (kMapZero == move->z)) {
         return 0;
     }
 
-    if ((move->x <= FLOAT_8032f9a4) && (FLOAT_8032f9a8 <= move->x) && (move->y <= FLOAT_8032f9a4) &&
-        (FLOAT_8032f9a8 <= move->y) && (move->z <= FLOAT_8032f9a4) && (FLOAT_8032f9a8 <= move->z)) {
+    if ((move->x <= kMapHitMoveEpsilon) && (kMapHitMoveNegEpsilon <= move->x) &&
+        (move->y <= kMapHitMoveEpsilon) && (kMapHitMoveNegEpsilon <= move->y) &&
+        (move->z <= kMapHitMoveEpsilon) && (kMapHitMoveNegEpsilon <= move->z)) {
         if (static_cast<unsigned int>(System.m_execParam) > 1) {
             System.Printf(g_MsgFlashy);
         }
@@ -3038,7 +3040,7 @@ int CMapMng::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned lo
     }
 
     g_hit_edge_idx_min = -2;
-    g_hit_t_min = FLOAT_8032f9ac;
+    g_hit_t_min = kMapHitTInitial;
     PSVECAdd(&cylinder->m_bottom, move, &cylinder->m_top);
 
     for (int i = 0; i < m_octTreeCount; i++) {
@@ -3173,8 +3175,8 @@ void CMapMng::SetMeshCameraSemiTransRange(unsigned short id, float nearRange, fl
             *reinterpret_cast<float*>(Ptr(mapObj, 0x4C)) = minAlpha;
             *reinterpret_cast<float*>(Ptr(mapObj, 0x50)) = maxAlpha;
             if (mapObj->m_mapData != 0 && *reinterpret_cast<signed char*>(Ptr(mapObj, 0x1F)) != -1) {
-                *reinterpret_cast<float*>(Ptr(mapObj, 0x4C)) = FLOAT_8032f988;
-                *reinterpret_cast<float*>(Ptr(mapObj, 0x50)) = FLOAT_8032f98c;
+                *reinterpret_cast<float*>(Ptr(mapObj, 0x4C)) = kMapCameraSemiTransMinSentinel;
+                *reinterpret_cast<float*>(Ptr(mapObj, 0x50)) = kMapCameraSemiTransMaxSentinel;
                 *reinterpret_cast<unsigned char*>(Ptr(mapObj, 0x15)) = 2;
                 *reinterpret_cast<unsigned char*>(Ptr(mapObj, 0x26)) = 1;
             }

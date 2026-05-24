@@ -99,9 +99,9 @@ STATIC_ASSERT(offsetof(ChangeTexModelData, m_meshCount) == 0xC);
 STATIC_ASSERT(offsetof(ChangeTexModelData, m_materialSet) == 0x24);
 STATIC_ASSERT(offsetof(ChangeTexModelData, m_frameShift) == 0x34);
 
-extern const float FLOAT_80332020 = -10000.0f;
+extern const float kPppChangeTexCachedValueInit = -10000.0f;
 extern const char sPppChangeTexMeshObjectName[] = "obj";
-extern const float FLOAT_80332028 = 255.0f;
+extern const float kPppChangeTexAlphaScale = 255.0f;
 static const char s_pppChangeTex_cpp[] ATTRIBUTE_ALIGN(8) = "pppChangeTex.cpp";
 
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
@@ -111,7 +111,6 @@ static inline float LoadFloat(const float& value)
 	return value;
 }
 
-void pppInitBlendMode(void);
 static void ChangeTex_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*)[4]);
 static void ChangeTex_AfterDrawMeshCallback(CChara::CModel*, void*, void*, int, float (*)[4]);
 
@@ -205,7 +204,7 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 
 	ChangeTexMeshRef* meshList = model0Raw->m_meshes;
 	if ((work->m_meshColorArrays == 0) && (work->m_displayListArrays == 0)) {
-		work->m_cachedValue = LoadFloat(FLOAT_80332020);
+		work->m_cachedValue = LoadFloat(kPppChangeTexCachedValueInit);
 		work->m_meshColorArrays = pppMemAlloc(
 		    model0Raw->m_data->m_meshCount << 2, pppEnvStPtr->m_stagePtr,
 		    const_cast<char*>(s_pppChangeTex_cpp), 0x163);
@@ -265,7 +264,8 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 
 	work->m_cachedValue = currentValue;
 
-	double alphaBase = (double)(LoadFloat(FLOAT_80332028) * ((float)colorData[0xB] / LoadFloat(FLOAT_80332028)));
+	double alphaBase =
+	    (double)(LoadFloat(kPppChangeTexAlphaScale) * ((float)colorData[0xB] / LoadFloat(kPppChangeTexAlphaScale)));
 
 	int arrayOffset = 0;
 	meshList = model0Raw->m_meshes;

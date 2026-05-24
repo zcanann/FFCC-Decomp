@@ -14,9 +14,6 @@ extern int gPppCalcDisabled;
 
 struct pppModelSt;
 
-void pppInitBlendMode(void);
-void pppSetBlendMode(unsigned char);
-
 extern "C" const char s_pppBreathModel_cpp[] = "pppBreathModel.cpp";
 
 struct pppBreathModelUnkC {

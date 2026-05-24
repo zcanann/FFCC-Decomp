@@ -50,19 +50,19 @@ static inline CChara::CModel* GetPppOwnerModel(_pppMngSt* pppMngSt)
 static const double kScaleConstA = 4503601774854144.0; // DOUBLE_803304b0
 static const float kScaleConstB = 0.017453292f; // FLOAT_803304a8
 static const float kPppLocalZero = 0.0f;
-extern "C" unsigned char gPppBlendModeState;
-extern "C" float FLOAT_8032ed8c;
+extern "C" unsigned char s_blend_mode;
+extern "C" float s_zoff;
 extern "C" double DOUBLE_8032fdf0;
 extern "C" double DOUBLE_8032fe00;
 extern "C" float FLOAT_8032fdf8;
 extern "C" unsigned int DAT_8032fdd8;
-extern "C" unsigned char DAT_8032ed84;
-extern "C" unsigned char DAT_8032ed86;
-extern "C" unsigned char DAT_8032ed87;
-extern "C" unsigned char DAT_8032ed88;
-extern "C" unsigned char DAT_8032ed89;
-extern "C" unsigned char DAT_8032ed8a;
-extern "C" unsigned char DAT_8032ed8b;
+extern "C" unsigned char s_light_mode;
+extern "C" unsigned char s_fog_mode;
+extern "C" unsigned char s_fog_blend_mode;
+extern "C" unsigned char s_cull_mode;
+extern "C" unsigned char s_ztest;
+extern "C" unsigned char s_rgbwrite;
+extern "C" unsigned char s_zwrite;
 extern "C" int DAT_8032ed7c;
 extern "C" unsigned int DAT_8032ed80;
 
@@ -72,7 +72,7 @@ extern "C" {
 float gPartScreenMatrixRow2X = 0.0f;
 float gPartScreenMatrixRow2Y = 0.0f;
 float gPartScreenMatrixRow2W = 0.0f;
-int DAT_8032ED64 = 0;
+int ppvMemAllocErrorF = 0;
 }
 pppDrawMng ppvDrawMng;
 Mtx ppvCameraMatrix0;
@@ -362,7 +362,7 @@ void* pppMemAlloc(unsigned long allocSize, CMemory::CStage* stage, char* file, i
 	bool canRetry = true;
 	u8 denied[0x180];
 
-	DAT_8032ED64 = 0;
+	ppvMemAllocErrorF = 0;
 	do
 	{
 		_pppPObjLink* allocation = (_pppPObjLink*)Memory._Alloc(allocSize, stage, file, line, 1);
@@ -464,7 +464,7 @@ void* pppMemAlloc(unsigned long allocSize, CMemory::CStage* stage, char* file, i
 
 	pppEnvStPtr->m_stagePtr->heapWalker(2, 0, 0xFFFFFFFF);
 	PartMng.pppDumpMngSt();
-	DAT_8032ED64 = 1;
+	ppvMemAllocErrorF = 1;
 	return 0;
 }
 
@@ -483,7 +483,7 @@ extern "C" void* pppMemFree__FPv(unsigned long allocSize, CMemory::CStage* stage
 	bool canRetry = true;
 	u8 denied[0x180];
 
-	DAT_8032ED64 = 0;
+	ppvMemAllocErrorF = 0;
 	do
 	{
 		_pppPObjLink* allocation = (_pppPObjLink*)Memory._Alloc(allocSize, stage, file, line, 1);
@@ -584,7 +584,7 @@ extern "C" void* pppMemFree__FPv(unsigned long allocSize, CMemory::CStage* stage
 	}
 	while (canRetry);
 
-	DAT_8032ED64 = 1;
+	ppvMemAllocErrorF = 1;
 	return 0;
 }
 
@@ -754,7 +754,7 @@ _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
 	bool canRetry = true;
 	u8 denied[0x180];
 
-	DAT_8032ED64 = 0;
+	ppvMemAllocErrorF = 0;
 	do
 	{
 		newObj = (_pppPObjLink*)Memory._Alloc(allocSize, stage, const_cast<char*>(s_pppPart_cpp), 0x305, 1);
@@ -861,7 +861,7 @@ _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
 	{
 		pppEnvStPtr->m_stagePtr->heapWalker(2, 0, 0xFFFFFFFF);
 		PartMng.pppDumpMngSt();
-		DAT_8032ED64 = 1;
+		ppvMemAllocErrorF = 1;
 	}
 	else
 	{
@@ -1704,7 +1704,7 @@ void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
 		_pppPDataVal* pDataVals = 0;
 		u8 denied[0x180];
 
-		DAT_8032ED64 = 0;
+		ppvMemAllocErrorF = 0;
 		do
 		{
 			pDataVals = (_pppPDataVal*)Memory._Alloc(
@@ -1808,7 +1808,7 @@ void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
 
 		pppEnvStPtr->m_stagePtr->heapWalker(2, 0, 0xFFFFFFFF);
 		PartMng.pppDumpMngSt();
-		DAT_8032ED64 = 1;
+		ppvMemAllocErrorF = 1;
 DataValsAllocated:
 		pppMngSt->m_pppPDataVals = pDataVals;
 	}
@@ -2507,7 +2507,7 @@ void pppDrawMesh(pppModelSt* model, Vec* positions, int usePartMaterial)
  */
 void pppInitBlendMode()
 {
-	gPppBlendModeState = 0xFF;
+	s_blend_mode = 0xFF;
 }
 
 /*
@@ -2521,9 +2521,9 @@ void pppInitBlendMode()
  */
 void pppSetBlendMode(unsigned char blendMode)
 {
-	if ((blendMode != 0xFF) && (gPppBlendModeState != blendMode))
+	if ((blendMode != 0xFF) && (s_blend_mode != blendMode))
 	{
-		gPppBlendModeState = blendMode;
+		s_blend_mode = blendMode;
 		switch (blendMode) {
 		case 0:
 			_GXSetBlendMode((_GXBlendMode)1, (_GXBlendFactor)4, (_GXBlendFactor)5, (_GXLogicOp)5);
@@ -2560,8 +2560,8 @@ void pppSetBlendMode(unsigned char blendMode)
  */
 void pppClearDrawEnv()
 {
-	if (FLOAT_8032fddc != FLOAT_8032ed8c) {
-		FLOAT_8032ed8c = FLOAT_8032fddc;
+	if (FLOAT_8032fddc != s_zoff) {
+		s_zoff = FLOAT_8032fddc;
 		ppvScreenMatrix[2][3] = gPartScreenMatrixRow2W;
 		GXSetProjection(ppvScreenMatrix, GX_PERSPECTIVE);
 	}
@@ -2583,8 +2583,8 @@ void pppSetDrawEnv(pppCVECTOR* pppColor, pppFMATRIX* pppMtx, float depth, unsign
 		depth = (depth * FLOAT_8032fdf8) / -sortDepth;
 	}
 
-	if ((double)FLOAT_8032ed8c != (double)depth) {
-		FLOAT_8032ed8c = depth;
+	if ((double)s_zoff != (double)depth) {
+		s_zoff = depth;
 		ppvScreenMatrix[2][3] = gPartScreenMatrixRow2W + depth;
 		GXSetProjection(ppvScreenMatrix, GX_PERSPECTIVE);
 	}
@@ -2605,8 +2605,8 @@ void pppSetDrawEnv(pppCVECTOR* pppColor, pppFMATRIX* pppMtx, float depth, unsign
 	*(u32*)(MaterialManRaw() + 0x130) = 0;
 	*(u32*)(MaterialManRaw() + 0x40) = 0x000ACE0F;
 
-	if (DAT_8032ed84 != lightTarget) {
-		DAT_8032ed84 = lightTarget;
+	if (s_light_mode != lightTarget) {
+		s_light_mode = lightTarget;
 		LightPcs.SetPart(static_cast<CLightPcs::TARGET>(2), pppMngStPtr, lightTarget);
 	}
 
@@ -2644,25 +2644,25 @@ void pppSetDrawEnv(pppCVECTOR* pppColor, pppFMATRIX* pppMtx, float depth, unsign
 		GXSetChanAmbColor(GX_COLOR0A0, fixedColor);
 	}
 
-	if ((DAT_8032ed86 != fogIndex) || (DAT_8032ed87 != fogParam)) {
-		DAT_8032ed86 = fogIndex;
-		DAT_8032ed87 = fogParam;
+	if ((s_fog_mode != fogIndex) || (s_fog_blend_mode != fogParam)) {
+		s_fog_mode = fogIndex;
+		s_fog_blend_mode = fogParam;
 		Graphic.SetFog((int)fogIndex, fogParam != 0);
 	}
 
-	if (DAT_8032ed88 != cullMode) {
-		DAT_8032ed88 = cullMode;
+	if (s_cull_mode != cullMode) {
+		s_cull_mode = cullMode;
 		GXSetCullMode((GXCullMode)cullMode);
 	}
 
-	if ((DAT_8032ed89 != zEnable) || (DAT_8032ed8b != zWrite)) {
-		DAT_8032ed89 = zEnable;
-		DAT_8032ed8b = zWrite;
+	if ((s_ztest != zEnable) || (s_zwrite != zWrite)) {
+		s_ztest = zEnable;
+		s_zwrite = zWrite;
 		GXSetZMode((GXBool)zEnable, GX_LEQUAL, (GXBool)zWrite);
 	}
 
-	if (DAT_8032ed8a != colorUpdate) {
-		DAT_8032ed8a = colorUpdate;
+	if (s_rgbwrite != colorUpdate) {
+		s_rgbwrite = colorUpdate;
 		GXSetColorUpdate((GXBool)colorUpdate);
 	}
 }
@@ -2688,21 +2688,21 @@ void pppInitDrawEnv(unsigned char useZeroDepth)
 		10
 	);
 
-	DAT_8032ed84 = 0xFF;
-	gPppBlendModeState = 0xFF;
-	DAT_8032ed86 = 0xFF;
-	DAT_8032ed88 = 0xFF;
-	DAT_8032ed89 = 0xFF;
-	DAT_8032ed8a = 0xFF;
-	DAT_8032ed8b = 0xFF;
+	s_light_mode = 0xFF;
+	s_blend_mode = 0xFF;
+	s_fog_mode = 0xFF;
+	s_cull_mode = 0xFF;
+	s_ztest = 0xFF;
+	s_rgbwrite = 0xFF;
+	s_zwrite = 0xFF;
 
 	if (useZeroDepth != 0)
 	{
-		FLOAT_8032ed8c = FLOAT_8032fddc;
+		s_zoff = FLOAT_8032fddc;
 	}
 	else
 	{
-		FLOAT_8032ed8c = FLOAT_8032FDE8;
+		s_zoff = FLOAT_8032FDE8;
 	}
 
 	LightPcs.SetNumDiffuse(0);

@@ -26,9 +26,6 @@ extern const f32 FLOAT_8033345c;
 extern const f32 FLOAT_8033342c;
 extern const f32 FLOAT_80333430;
 
-void pppInitBlendMode(void);
-void pppSetBlendMode(unsigned char);
-
 static const char s_pppLaser_cpp[] = "pppLaser.cpp";
 
 struct CMapCylinderRaw {

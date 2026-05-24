@@ -3,6 +3,7 @@
 #include "ffcc/game.h"
 #include "ffcc/map.h"
 #include "ffcc/partMng.h"
+#include "ffcc/pppPart.h"
 #include "ffcc/gobject.h"
 extern "C" {
 extern const f32 kPppConformBgNormalZero;
@@ -26,8 +27,6 @@ struct ConformBgNormalState {
     Vec m_normal;
     u8 m_initialized;
 };
-
-void pppSetFpMatrix(_pppMngSt*);
 
 struct CMapCylinderRaw {
     Vec m_bottom;

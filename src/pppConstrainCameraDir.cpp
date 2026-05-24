@@ -1,11 +1,10 @@
 #include "ffcc/pppConstrainCameraDir.h"
 #include "ffcc/partMng.h"
 #include "ffcc/p_camera.h"
+#include "ffcc/pppPart.h"
 #include "ffcc/ppp_linkage.h"
 #include "ffcc/pppYmEnv.h"
 #include <dolphin/mtx.h>
-
-void pppSetFpMatrix(_pppMngSt*);
 
 /*
  * --INFO--
@@ -119,4 +118,4 @@ void pppConstructConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir
 }
 
 extern const float kConstrainCameraDirAspectScale = 1.3333f;
-extern const float FLOAT_803331ec = 0.0f;
+extern const float kConstrainCameraDirLocalZero = 0.0f;

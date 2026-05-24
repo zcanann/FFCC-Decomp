@@ -4,6 +4,7 @@
 #include "ffcc/math.h"
 #include "ffcc/mapmesh.h"
 #include "ffcc/partMng.h"
+#include "ffcc/pppPart.h"
 #include "ffcc/pppYmEnv.h"
 extern "C" {
 extern const float FLOAT_803305f0;
@@ -27,10 +28,6 @@ struct Vec4d {
 	float y;
 	float z;
 	float w;
-};
-
-struct pppCVECTOR {
-	u8 rgba[4];
 };
 
 struct YmDeformationShpColorInfo {
@@ -67,10 +64,6 @@ static inline T* PppWorkArea(pppYmDeformationShp* object, pppYmDeformationShpUnk
 {
 	return reinterpret_cast<T*>(reinterpret_cast<_pppPObject*>(object)->m_workArea + ctrl->m_serializedDataOffsets[index]);
 }
-
-void pppSetBlendMode(unsigned char);
-void pppSetDrawEnv(pppCVECTOR*, pppFMATRIX*, float, unsigned char, unsigned char, unsigned char, unsigned char,
-                   unsigned char, unsigned char, unsigned char);
 
 /*
  * --INFO--

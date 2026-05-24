@@ -717,7 +717,7 @@ int gSingDynamicWinMessInfo[5];
 char s_DynamicMessStr[0x404];
 }
 
-extern "C" SingMenuStaticMessageInfo DAT_80214a50[] = {
+extern "C" SingMenuStaticMessageInfo s_singleMenuStaticMessages[] = {
     {4, {14, 15, 16, 3, 0, 0, 0, 0}},
     {2, {15, 3, 0, 0, 0, 0, 0, 0}},
     {4, {30, 31, 32, 3, 0, 0, 0, 0}},
@@ -727,7 +727,7 @@ extern "C" SingMenuSoloNameTable PTR_s_solo2 = {
     {lbl_80332718, 0, 0, 0, 0, 0, 0, 0, 0},
 };
 
-extern "C" SingMenuTextureRef DAT_80214ab0[] = {
+extern "C" CMenuPcs::CTmp s_singleMenuTextureTable[] = {
     {4, lbl_80332720},
     {4, lbl_80332728},
     {4, lbl_80332730},
@@ -743,11 +743,11 @@ extern "C" SingMenuTextureRef DAT_80214ab0[] = {
     {4, lbl_80332780},
 };
 
-extern "C" SingMenuSoloNameTable PTR_s_solo1_80214b18 = {
+extern "C" SingMenuSoloNameTable PTR_s_solo1 = {
     {lbl_80332720, s_sololetter_801DE8A4, 0, 0, 0, 0, 0, 0, 0},
 };
 
-extern "C" SingMenuTextureRef DAT_80214b3c[] = {
+extern "C" SingMenuTextureRef s_singleMenuModelTextureTable[] = {
     {5, lbl_80332718}, {5, lbl_80332788}, {5, lbl_80332790}, {5, lbl_80332798}, {5, lbl_803327A0},
     {5, lbl_803327A8}, {5, lbl_803327B0}, {5, lbl_803327B8}, {5, lbl_803327C0}, {5, lbl_803327C8},
     {5, lbl_803327D0}, {5, lbl_803327D8}, {5, lbl_803327E0}, {5, lbl_803327E8}, {5, lbl_803327F0},
@@ -791,7 +791,7 @@ CFile::CHandle* gSingMenuAsyncFileHandle;
 int gSingMenuAsyncLoadCompleted;
 int gSingMenuHasScriptFoodBase;
 int gSingMenuForcedSelection;
-extern "C" SingMenuTextureRef DAT_80214b3c[];
+extern "C" SingMenuTextureRef s_singleMenuModelTextureTable[];
 extern float DAT_801dd708[];
 extern float DAT_801dd6f8[];
 float FLOAT_8032ea78 = 1.0f;
@@ -912,7 +912,7 @@ void CMenuPcs::createSingleMenu()
         gSingMenuAsyncFileHandle = 0;
 
         if (Game.m_gameWork.m_menuStageMode != 0) {
-            loadTexture(PTR_s_solo2.entries, 4, 1, reinterpret_cast<CMenuPcs::CTmp*>(&DAT_80214ab0), 0x20, 0xD, 1);
+            loadTexture(PTR_s_solo2.entries, 4, 1, s_singleMenuTextureTable, 0x20, 0xD, 1);
             *reinterpret_cast<int*>(self + 0x814) = 0;
             *reinterpret_cast<int*>(self + 0x850) = 0;
             *reinterpret_cast<int*>(self + 0x82C) = 0;
@@ -1362,7 +1362,7 @@ void CMenuPcs::loadTextureAsync(char **, int, int, CMenuPcs::CTmp*, int, int, in
             if (*reinterpret_cast<int*>(self + 0x860) == 0) {
                 char path[260];
                 const char* language = Game.GetLangString();
-                sprintf(path, s_singMenuTexturePathFmt, language, PTR_s_solo1_80214b18.entries[loadIndex]);
+                sprintf(path, s_singMenuTexturePathFmt, language, PTR_s_solo1.entries[loadIndex]);
                 gSingMenuAsyncFileHandle = File.Open(path, 0, CFile::PRI_LOW);
                 File.ReadASync(gSingMenuAsyncFileHandle);
                 *reinterpret_cast<int*>(self + 0x860) = *reinterpret_cast<int*>(self + 0x860) + 1;
@@ -1395,7 +1395,7 @@ void CMenuPcs::loadTextureAsync(char **, int, int, CMenuPcs::CTmp*, int, int, in
             if (*reinterpret_cast<int*>(self + 0x85C) < 2) {
                 gSingMenuAsyncLoadCompleted = 0;
             } else {
-                SingMenuTextureRef* mapping = DAT_80214b3c;
+                SingMenuTextureRef* mapping = s_singleMenuModelTextureTable;
                 for (int i = 0; i < 0x33; i++) {
                     CTextureSet* set = *reinterpret_cast<CTextureSet**>(self + 0x14C + mapping->textureSetIndex * 4);
                     int texIdx = set->Find(mapping->textureName);
@@ -2629,7 +2629,7 @@ void CMenuPcs::DrawSingWinMess(int messageNo, int activeMask, int useDynamic)
     font->SetColor(color.color);
 
     int lineCount = gSingDynamicWinMessInfo[0];
-    const SingMenuStaticMessageInfo& staticMessage = DAT_80214a50[messageNo];
+    const SingMenuStaticMessageInfo& staticMessage = s_singleMenuStaticMessages[messageNo];
     if (useDynamic == 0) {
         lineCount = staticMessage.lineCount;
     }
@@ -2693,7 +2693,7 @@ void CMenuPcs::GetSingWinSize(int messageNo, short* outWidth, short* outHeight, 
     font->SetScale(FLOAT_8032ea78);
 
     int lineCount = gSingDynamicWinMessInfo[0];
-    const SingMenuStaticMessageInfo& staticMessage = DAT_80214a50[messageNo];
+    const SingMenuStaticMessageInfo& staticMessage = s_singleMenuStaticMessages[messageNo];
     if (useDynamic == 0) {
         lineCount = staticMessage.lineCount;
     }

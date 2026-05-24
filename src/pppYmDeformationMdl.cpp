@@ -4,19 +4,13 @@
 #include "ffcc/mapmesh.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/partMng.h"
+#include "ffcc/pppPart.h"
 #include "ffcc/pppYmEnv.h"
 #include "ffcc/pppTypes.h"
 
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include "ffcc/ppp_linkage.h"
-
-struct pppCVECTOR {
-    u8 rgba[4];
-};
-
-struct pppModelSt;
-struct _pppPObject;
 
 struct YmDeformationMdlColorInfo {
     u32 m_unk0;
@@ -77,12 +71,6 @@ static inline float DeformationMdlZero()
 {
     return *reinterpret_cast<const float*>(&kYmDeformationMdlZero);
 }
-
-void pppInitBlendMode(void);
-void pppSetBlendMode(unsigned char);
-void pppSetDrawEnv(pppCVECTOR*, pppFMATRIX*, float, unsigned char, unsigned char, unsigned char, unsigned char,
-                   unsigned char, unsigned char, unsigned char);
-void pppDrawMesh(pppModelSt*, Vec*, int);
 
 /*
  * --INFO--

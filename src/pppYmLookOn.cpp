@@ -1,11 +1,8 @@
 #include "ffcc/pppYmLookOn.h"
 #include "ffcc/partMng.h"
+#include "ffcc/pppPart.h"
 #include "ffcc/ppp_constants.h"
 #include <dolphin/mtx.h>
-
-void pppSetFpMatrix(_pppMngSt*);
-
-extern "C" void pppSetFpMatrix(struct _pppMngSt*);
 
 /*
  * --INFO--

@@ -22,14 +22,10 @@ extern const f32 FLOAT_80330de8;
 extern const f32 FLOAT_80330dec;
 extern const f32 FLOAT_80330DC4;
 extern const f32 FLOAT_80330DC8;
-extern "C" const f64 DOUBLE_80330DD0;
 extern const f32 FLOAT_80330de0;
 extern const f32 FLOAT_80330de4;
 extern const f32 FLOAT_80330de8;
 extern const f32 FLOAT_80330dec;
-
-void pppInitBlendMode(void);
-void pppSetBlendMode(unsigned char);
 
 static inline float YmLaserConst(const float& value) { return *reinterpret_cast<const float*>(&value); }
 

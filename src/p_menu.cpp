@@ -643,7 +643,6 @@ void CMenuPcs::loadTexture(char** paths, int textureSetStart, int textureSetCoun
                            int textureStart, int textureCount, int stageSelect)
 {
     char texPath[0x10C];
-    int* tmpInfo = reinterpret_cast<int*>(tmp);
     u8* self = reinterpret_cast<u8*>(this);
 
     for (int i = 0; i < textureSetCount; i++) {
@@ -679,13 +678,13 @@ void CMenuPcs::loadTexture(char** paths, int textureSetStart, int textureSetCoun
     }
 
     for (int i = 0; i < textureCount; i++) {
-        CTextureSet* textureSet = *reinterpret_cast<CTextureSet**>(self + 0x14C + tmpInfo[0] * 4);
-        const unsigned long textureIndex = static_cast<unsigned long>(textureSet->Find(reinterpret_cast<char*>(tmpInfo[1])));
+        CTextureSet* textureSet = *reinterpret_cast<CTextureSet**>(self + 0x14C + tmp->m_textureSetIndex * 4);
+        const unsigned long textureIndex = static_cast<unsigned long>(textureSet->Find(tmp->m_textureName));
         CTexture* texture = (*reinterpret_cast<CPtrArray<CTexture*>*>(reinterpret_cast<u8*>(textureSet) + 8))[textureIndex];
         *reinterpret_cast<int*>(reinterpret_cast<u8*>(texture) + 4) =
             *reinterpret_cast<int*>(reinterpret_cast<u8*>(texture) + 4) + 1;
         *reinterpret_cast<CTexture**>(self + 0x18C + (textureStart + i) * 4) = texture;
-        tmpInfo += 2;
+        tmp++;
     }
 }
 

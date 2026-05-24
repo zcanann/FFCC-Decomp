@@ -16,7 +16,7 @@
 
 #include <math.h>
 
-extern const double DOUBLE_80331FC0 = 2.4;
+extern const double kPppCrystal2RefractionScale = 2.4;
 extern const float kPppScreenQuakeZero[2] = {0.0f, 0.0f};
 
 struct Crystal2IndTexMtx {

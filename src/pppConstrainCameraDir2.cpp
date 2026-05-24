@@ -2,6 +2,7 @@
 #include "ffcc/partMng.h"
 #include "ffcc/pppConstrainCameraDir.h"
 #include "ffcc/p_camera.h"
+#include "ffcc/pppPart.h"
 extern "C" {
 extern int gPppCalcDisabled;
 extern unsigned char gPppInConstructor;
@@ -10,8 +11,6 @@ extern unsigned char gPppInConstructor;
 #include "ffcc/util.h"
 #include <dolphin/mtx.h>
 #include "ffcc/ppp_linkage.h"
-
-void pppSetFpMatrix(_pppMngSt*);
 
 /*
  * --INFO--

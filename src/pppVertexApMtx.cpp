@@ -1,6 +1,7 @@
 #include "ffcc/pppVertexApMtx.h"
 #include "ffcc/math.h"
 #include "ffcc/partMng.h"
+#include "ffcc/pppPart.h"
 
 #include <dolphin/mtx.h>
 #include <dolphin/types.h>
@@ -57,12 +58,8 @@ struct VertexApMtxObject
 	Mtx localMatrix;
 };
 
-struct _pppPDataVal;
-
-_pppPObject* pppCreatePObject(_pppMngSt*, _pppPDataVal*);
-
 extern const double kPppYmSharedDoubleBias;
-extern "C" const f64 DOUBLE_80330DD0 = 4503599627370496.0;
+extern "C" const f64 kPppVertexApMtxDoubleBias = 4503599627370496.0;
 
 /*
  * --INFO--

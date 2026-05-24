@@ -84,8 +84,8 @@ extern "C" double DOUBLE_803333b8;
 extern "C" double DOUBLE_803333c0;
 extern "C" int DAT_8032ef10;
 extern "C" char s_menuSubfontPathFmt[];
-extern "C" char* PTR_s_world2_802159a4[];
-extern "C" int DAT_802159c8;
+extern "C" char* PTR_s_world2[];
+extern "C" CMenuPcs::CTmp s_cmakeWorldTextureTable[];
 extern "C" {
 static const char s_cmake_cpp[] = "cmake.cpp";
 }
@@ -3597,7 +3597,7 @@ void CMenuPcs::calcVillageMenu()
                 loadFont(2, path, 4, -1);
             }
 
-            loadTexture(PTR_s_world2_802159a4, 8, 1, reinterpret_cast<CMenuPcs::CTmp*>(&DAT_802159c8), 0x60, 9, 3);
+            loadTexture(PTR_s_world2, 8, 1, s_cmakeWorldTextureTable, 0x60, 9, 3);
 
             CMemory::CStage* stage = CmakeFields(this).m_menuStage;
             void*& villageWork = CmakeFields(this).m_villageWork;

@@ -17,13 +17,13 @@
 CMemory Memory;
 
 static const char s_memory_cpp[] = "memory.cpp";
-extern "C" const char DAT_801d669c[] =
+extern "C" const char sGetDataTimeoutBanner[] =
     "===================================================================\n"
     "===================================================================\n"
     "                          GetData  TimeOut\n"
     "===================================================================\n"
     "===================================================================\n";
-extern "C" const char DAT_801d67d8[40] =
+extern "C" const char sHeapCorruptAbortDrawMsg[40] =
     "\x83\x71\x81\x5b\x83\x76\x82\xaa\x88\xd9\x8f\xed\x82\xc8\x82\xcc"
     "\x82\xc5\x95\x60\x89\xe6\x82\xf0\x92\x86\x8e\x7e\x82\xb5\x82\xdc"
     "\x82\xb7\x81\x42\n";
@@ -54,7 +54,7 @@ extern const char s_amemCacheSeparator_8032F7C8[];
 #define s_heapWalkerUseFmt s_heapWalkerUseFmt_801D6C0C
 #define s_heapWalkerUnuseFmt s_heapWalkerUnuseFmt_801D6C20
 #define s_heapWalkerTotalFmt s_heapWalkerTotalFmt_801D6C30
-#define s_heapWalkerBanner DAT_8032f7e8
+#define s_heapWalkerBanner sHeapWalkerNewline
 #define s_heapWalkerEntryFmt s_heapWalkerEntryFmt_801D68D8
 #define s_heapWalkerUseUnuseFmt s_heapWalkerUseUnuseFmt_801D6958
 #define s_amemCacheAddRefFmt s_AMEM_CACHE_DUMP_801D64F4
@@ -62,32 +62,30 @@ extern const char s_amemCacheSeparator_8032F7C8[];
 #define s_refCntCompareBanner s_refCntCompareBanner_801D65B4
 #define s_amemCacheEntryFmt s_amemCacheEntryFmt_801D6580
 #define s_amemCacheEntryPaddedFmt s_amemCacheEntryFmt_801D6580
-extern char DAT_801d6648[];
-extern char DAT_801d6a24[];
-extern char DAT_801d6a7c[];
+extern char sStageFreeCorruptBlockFmt[];
+extern char sStageAllocNoMemoryFmt[];
+extern char sStageQuitBlockUnfreedAllocFmt[];
 extern char s_copyFromAMemorySyncTimeout_801D6ABC[];
 extern char DAT_801d6b7c[];
 extern char DAT_801d6bb0[];
 extern char DAT_801d6c58[];
-extern char DAT_801d6c88[];
-extern char DAT_801d6c98[];
-extern char DAT_801d6bdc[];
-extern char DAT_801d6bec[];
-extern char DAT_8032f7d4[4];
-extern char DAT_8032f7e8[];
-extern char DAT_8032f808[];
+extern char sCurrentMemoryStageName[];
+extern char sMainMemoryStageName[];
+extern char sDrawHeapUseUnuseFmt[];
+extern char sDrawHeapAmemAnimFmt[];
+extern char sEmptyAllocSourceName[4];
+extern char sHeapWalkerNewline[];
+extern char sHeapWalkerSlashLine[];
 extern const char* s_amemCacheTypeNames_801E8470[];
 extern const char* s_amemCacheStateNames_8032E410[];
-extern const float FLOAT_8032f7d8 = 9000.0f;
-extern const float FLOAT_8032f7dc = 0.0f;
-extern float FLOAT_8032f7fc;
-extern float FLOAT_8032f800;
-extern float FLOAT_8032f804;
-extern const double DOUBLE_8032F7E0 = 4503601774854144.0;
+extern const float kMemoryDmaTimeout = 9000.0f;
+extern const float kMemoryDrawZero = 0.0f;
+extern float kMemoryDrawOrthoBottom;
+extern float kMemoryDrawOrthoRight;
+extern float kMemoryDrawOrthoFar;
+extern const double kMemorySignedDoubleMagic = 4503601774854144.0;
 extern unsigned int s_heapBarColors_801D64A8[];
-long long DAT_8032ec58;
-extern char DAT_8032f7e8[];
-extern char DAT_8032f808[];
+int g_alloc_ct;
 static int stageGetAllocationMode(CMemory::CStage* stage)
 {
     return stage->m_allocationMode;
@@ -177,7 +175,7 @@ static void stageDestroyInternal(CMemory::CStage* stage)
     }
 
     if (stageHasUnfreedBlocks(stage)) {
-        System.Printf(const_cast<char*>(DAT_801d6a7c), stageGetSourceName(stage));
+        System.Printf(const_cast<char*>(sStageQuitBlockUnfreedAllocFmt), stageGetSourceName(stage));
         stage->heapWalker(-1, nullptr, static_cast<unsigned long>(-1));
     }
 }
@@ -193,7 +191,7 @@ static void stageDestroyInternal(CMemory::CStage* stage)
  */
 void* operator new(unsigned long size, CMemory::CStage* stage, char* file, int line)
 {
-    return stage->alloc(size, file != (char*)nullptr ? file : DAT_8032f7d4, line, 0);
+    return stage->alloc(size, file != (char*)nullptr ? file : sEmptyAllocSourceName, line, 0);
 }
 
 /*
@@ -207,7 +205,7 @@ void* operator new(unsigned long size, CMemory::CStage* stage, char* file, int l
  */
 void* operator new[](unsigned long size, CMemory::CStage* stage, char* file, int line)
 {
-    return stage->alloc(size, file != (char*)nullptr ? file : DAT_8032f7d4, line, 0);
+    return stage->alloc(size, file != (char*)nullptr ? file : sEmptyAllocSourceName, line, 0);
 }
 
 /*
@@ -225,7 +223,7 @@ void operator delete(void* ptr)
         int mem = reinterpret_cast<int>(ptr);
         if ((*reinterpret_cast<short*>(mem - 0x40) != 0x4b41) ||
             (*reinterpret_cast<short*>(mem - 2) != 0x4d49)) {
-            System.Printf(const_cast<char*>(DAT_801d6648), ptr, mem - 0x26, *reinterpret_cast<unsigned short*>(mem - 0x28));
+            System.Printf(const_cast<char*>(sStageFreeCorruptBlockFmt), ptr, mem - 0x26, *reinterpret_cast<unsigned short*>(mem - 0x28));
         }
 
         *reinterpret_cast<unsigned char*>(mem - 0x3e) &= 0xfb;
@@ -268,7 +266,7 @@ void operator delete[](void* ptr)
         int mem = reinterpret_cast<int>(ptr);
         if ((*reinterpret_cast<short*>(mem - 0x40) != 0x4b41) ||
             (*reinterpret_cast<short*>(mem - 2) != 0x4d49)) {
-            System.Printf(const_cast<char*>(DAT_801d6648), ptr, mem - 0x26, *reinterpret_cast<unsigned short*>(mem - 0x28));
+            System.Printf(const_cast<char*>(sStageFreeCorruptBlockFmt), ptr, mem - 0x26, *reinterpret_cast<unsigned short*>(mem - 0x28));
         }
 
         *reinterpret_cast<unsigned char*>(mem - 0x3e) &= 0xfb;
@@ -406,10 +404,10 @@ void CMemory::Init()
         modeBase += 0x27D8;
     }
 
-    CStage* stage = CreateStage(0x2000, DAT_801d6c88, 0);
+    CStage* stage = CreateStage(0x2000, sCurrentMemoryStageName, 0);
     *reinterpret_cast<CStage**>(reinterpret_cast<unsigned char*>(this) + 0x778C) = stage;
 
-    stage = CreateStage(0x4000, DAT_801d6c98, 0);
+    stage = CreateStage(0x4000, sMainMemoryStageName, 0);
     *reinterpret_cast<CStage**>(reinterpret_cast<unsigned char*>(this) + 0x7790) = stage;
 }
 
@@ -501,10 +499,10 @@ frame_input_done:
  */
 void CMemory::HeapWalker()
 {
-    System.Printf(const_cast<char*>(DAT_8032f7e8));
-    System.Printf(const_cast<char*>(DAT_8032f808));
+    System.Printf(const_cast<char*>(sHeapWalkerNewline));
+    System.Printf(const_cast<char*>(sHeapWalkerSlashLine));
     System.Printf(const_cast<char*>(s_heapWalkerTitle));
-    System.Printf(const_cast<char*>(DAT_8032f808));
+    System.Printf(const_cast<char*>(sHeapWalkerSlashLine));
 
     CStage* listHead = reinterpret_cast<CStage*>(reinterpret_cast<unsigned char*>(this) + 4);
     for (int mode = 0; mode < 3; mode++) {
@@ -515,7 +513,7 @@ void CMemory::HeapWalker()
                 stage = *reinterpret_cast<CStage**>(reinterpret_cast<unsigned char*>(stage) + 4);
             }
 
-            System.Printf(const_cast<char*>(DAT_8032f7e8));
+            System.Printf(const_cast<char*>(sHeapWalkerNewline));
 
             stage = *reinterpret_cast<CStage**>(reinterpret_cast<unsigned char*>(listHead) + 4);
             int useTotal = 0;
@@ -564,8 +562,8 @@ void CMemory::Draw()
     Mtx modelMtx;
     char line[0x104];
 
-    C_MTXOrtho(orthoMtx, FLOAT_8032f7dc, FLOAT_8032f7fc, FLOAT_8032f7dc, FLOAT_8032f800, FLOAT_8032f7dc,
-               FLOAT_8032f804);
+    C_MTXOrtho(orthoMtx, kMemoryDrawZero, kMemoryDrawOrthoBottom, kMemoryDrawZero, kMemoryDrawOrthoRight,
+               kMemoryDrawZero, kMemoryDrawOrthoFar);
     GXSetProjection(orthoMtx, GX_ORTHOGRAPHIC);
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     GXSetZCompLoc(GX_FALSE);
@@ -632,12 +630,12 @@ void CMemory::Draw()
         }
 
         if (pass == 1) {
-            sprintf(line, DAT_801d6bdc, useTotalKB, unuseTotalKB);
+            sprintf(line, sDrawHeapUseUnuseFmt, useTotalKB, unuseTotalKB);
             Graphic.DrawDebugStringDirect(0x10, y, line, 8);
 
             int amemAnim = static_cast<int>(Chara.GetAmemAnimSize());
             int amemAnimKB = amemAnim / 1024;
-            sprintf(line, DAT_801d6bec, amemAnimKB);
+            sprintf(line, sDrawHeapAmemAnimFmt, amemAnimKB);
             Graphic.DrawDebugStringDirect(0x10, y + 0xC, line, 8);
         }
     }
@@ -697,7 +695,7 @@ CMemory::CStage* CMemory::CreateStage(unsigned long size, char* source, int mode
                         *reinterpret_cast<unsigned int*>(stageBytes + 8) + alignedSize;
 
                     if (source == (char*)nullptr) {
-                        source = DAT_8032f7d4;
+                        source = sEmptyAllocSourceName;
                     }
                     strcpy(reinterpret_cast<char*>(stageBytes + 0x10), source);
                     stage->m_allocationMode = mode;
@@ -779,7 +777,7 @@ void CMemory::DestroyStage(CMemory::CStage* stage)
 
     if (mode != 2) {
         if (stageHasUnfreedBlocks(stage)) {
-            System.Printf(const_cast<char*>(DAT_801d6a7c), stageGetSourceName(stage));
+            System.Printf(const_cast<char*>(sStageQuitBlockUnfreedAllocFmt), stageGetSourceName(stage));
             stage->heapWalker(-1, nullptr, static_cast<unsigned long>(-1));
         }
     } else {
@@ -812,7 +810,7 @@ void CMemory::DestroyStage(CMemory::CStage* stage)
  */
 void* CMemory::_Alloc(unsigned long size, CMemory::CStage* stage, char* source, int line, int noError)
 {
-    return stage->alloc(size, source != (char*)nullptr ? source : DAT_8032f7d4, line, noError);
+    return stage->alloc(size, source != (char*)nullptr ? source : sEmptyAllocSourceName, line, noError);
 }
 
 /*
@@ -830,7 +828,7 @@ void CMemory::Free(void* ptr)
         int mem = reinterpret_cast<int>(ptr);
         if ((*reinterpret_cast<short*>(mem - 0x40) != 0x4b41) ||
             (*reinterpret_cast<short*>(mem - 2) != 0x4d49)) {
-            System.Printf(const_cast<char*>(DAT_801d6648), ptr, mem - 0x26, *reinterpret_cast<unsigned short*>(mem - 0x28));
+            System.Printf(const_cast<char*>(sStageFreeCorruptBlockFmt), ptr, mem - 0x26, *reinterpret_cast<unsigned short*>(mem - 0x28));
         }
 
         *reinterpret_cast<unsigned char*>(mem - 0x3e) &= 0xfb;
@@ -943,7 +941,7 @@ void CMemory::CopyFromAMemorySync(void* source, void* dest, unsigned long size)
     int dmaId = RedSound(&Sound)->DMAEntry(0, 1, reinterpret_cast<int>(source), reinterpret_cast<int>(dest),
                                            static_cast<int>(size), 0, 0);
     watch.Start();
-    float timeout = FLOAT_8032f7d8;
+    float timeout = kMemoryDmaTimeout;
     while (RedSound(&Sound)->DMACheck(dmaId) != 0) {
         watch.Stop();
         if (watch.Get() < timeout) {
@@ -1000,7 +998,7 @@ void CMemory::CStage::quitBlock()
  */
 void* CMemory::CStage::alloc(unsigned long size, char* source, unsigned long line, int noError)
 {
-    DAT_8032ec58 += 1;
+    g_alloc_ct += 1;
     if (size == 0) {
         size = 0x40;
     }
@@ -1035,7 +1033,7 @@ void* CMemory::CStage::alloc(unsigned long size, char* source, unsigned long lin
                     memset(reinterpret_cast<void*>(node + 0x1A), 0, 0x24);
 
                     if (source == (char*)nullptr) {
-                        source = DAT_8032f7d4;
+                        source = sEmptyAllocSourceName;
                     }
                     strncpy(reinterpret_cast<char*>(node + 0x1A), source, 0x23);
 
@@ -1064,10 +1062,10 @@ void* CMemory::CStage::alloc(unsigned long size, char* source, unsigned long lin
 
     if ((noError == 0) && (allocated == 0)) {
         if (source == (char*)nullptr) {
-            source = DAT_8032f7d4;
+            source = sEmptyAllocSourceName;
         }
         System.Printf(
-            const_cast<char*>(DAT_801d6a24), stageGetSourceName(this), allocSize, source, line);
+            const_cast<char*>(sStageAllocNoMemoryFmt), stageGetSourceName(this), allocSize, source, line);
         heapWalker(-1, nullptr, static_cast<unsigned long>(-1));
     }
 
@@ -1327,7 +1325,7 @@ checkHeapNode:
              static_cast<unsigned int>(*reinterpret_cast<int*>(curNode + 8) - (curNode + 0x40))) ||
             (static_cast<unsigned int>(*reinterpret_cast<int*>(curNode + 4)) != static_cast<unsigned int>(prevNode))) {
             if (static_cast<unsigned int>(System.m_execParam) >= 1) {
-                System.Printf(const_cast<char*>(DAT_801d67d8));
+                System.Printf(const_cast<char*>(sHeapCorruptAbortDrawMsg));
             }
             return;
         }
@@ -1420,7 +1418,7 @@ void CMemory::CStage::drawHeapTitle(int y)
         if ((*reinterpret_cast<int*>(node + 0x10) != *reinterpret_cast<int*>(node + 8) - (node + 0x40)) ||
             (*reinterpret_cast<int*>(node + 4) != prev)) {
             if (static_cast<unsigned int>(System.m_execParam) >= 1) {
-                System.Printf(const_cast<char*>(DAT_801d67d8));
+                System.Printf(const_cast<char*>(sHeapCorruptAbortDrawMsg));
             }
             return;
         }
@@ -1574,7 +1572,7 @@ static inline void freeAmemCacheBlock(unsigned long ptr)
     unsigned char* block = reinterpret_cast<unsigned char*>(ptr - 0x40);
     if ((*reinterpret_cast<unsigned short*>(block) != 0x4b41) ||
         (*reinterpret_cast<unsigned short*>(block + 0x3E) != 0x4d49)) {
-        System.Printf(const_cast<char*>(DAT_801d6648), ptr, block + 0x1A, *reinterpret_cast<unsigned short*>(block + 0x18));
+        System.Printf(const_cast<char*>(sStageFreeCorruptBlockFmt), ptr, block + 0x1A, *reinterpret_cast<unsigned short*>(block + 0x18));
     }
 
     block[2] &= 0xfb;
@@ -1740,7 +1738,7 @@ int CAmemCacheSet::GetData(short index, char* source, int line)
             } else {
                 char* allocSource = source;
                 if (allocSource == 0) {
-                    allocSource = DAT_8032f7d4;
+                    allocSource = sEmptyAllocSourceName;
                 }
 
                 data = reinterpret_cast<int>(
@@ -1751,12 +1749,12 @@ int CAmemCacheSet::GetData(short index, char* source, int line)
                                                            reinterpret_cast<int>(entry.m_workData), entry.m_size, 0, 0);
                     CStopWatch watch(0);
                     watch.Start();
-                    float timeout = FLOAT_8032f7d8;
+                    float timeout = kMemoryDmaTimeout;
                     while (RedSound(&Sound)->DMACheck(dmaId) != 0) {
                         watch.Stop();
                         if (watch.Get() >= timeout) {
                             if (static_cast<unsigned int>(System.m_execParam) >= 1) {
-                                System.Printf(const_cast<char*>(DAT_801d669c));
+                                System.Printf(const_cast<char*>(sGetDataTimeoutBanner));
                             }
                             Sound.CheckDriver(1);
                             watch.Reset();

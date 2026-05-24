@@ -60,8 +60,6 @@ extern float FLOAT_8032fa84;
 extern float FLOAT_8032fa88;
 extern float FLOAT_8032fa90;
 extern float FLOAT_8032fa8c;
-extern float FLOAT_8032fa78;
-extern float FLOAT_8032fa7c;
 extern float FLOAT_8032fa94;
 extern float FLOAT_8032fa98;
 extern float FLOAT_8032fa9c;
@@ -77,9 +75,8 @@ extern float FLOAT_8032fab0;
 extern float FLOAT_8032fab4;
 extern float FLOAT_8032fab8;
 extern double DOUBLE_8032fa28;
-extern double DOUBLE_8032fa28;
 extern char s_p_camera_cpp[];
-extern char DAT_801d7928[];
+extern char sCameraInvalidFovFmt[];
 extern unsigned char g_map_draw_prof;
 
 inline void* operator new(unsigned long, void* ptr)
@@ -157,15 +154,14 @@ static inline void CopyCameraState(u8* dst, u8* src)
 extern "C" void __sinit_p_camera_cpp(void)
 {
     CCameraPcs* camera = new (&CameraPcs) CCameraPcs;
-    u8* self = reinterpret_cast<u8*>(camera);
     unsigned int* dst = &CCameraPcs::m_table[0][0];
 
-    *reinterpret_cast<float*>(self + 0x414) = FLOAT_8032fa78;
-    *reinterpret_cast<float*>(self + 0x418) = FLOAT_8032fa78;
-    *reinterpret_cast<float*>(self + 0x41C) = FLOAT_8032fa78;
-    *reinterpret_cast<float*>(self + 0x420) = FLOAT_8032fa7c;
-    *reinterpret_cast<float*>(self + 0x424) = FLOAT_8032fa7c;
-    *reinterpret_cast<float*>(self + 0x428) = FLOAT_8032fa7c;
+    camera->m_shadowRectBound.m_min.x = kCameraBoundsMinInitial;
+    camera->m_shadowRectBound.m_min.y = kCameraBoundsMinInitial;
+    camera->m_shadowRectBound.m_min.z = kCameraBoundsMinInitial;
+    camera->m_shadowRectBound.m_max.x = kCameraBoundsMaxInitial;
+    camera->m_shadowRectBound.m_max.y = kCameraBoundsMaxInitial;
+    camera->m_shadowRectBound.m_max.z = kCameraBoundsMaxInitial;
 
     dst[0x004 / 4] = CCameraPcs::m_table_desc0[0];
     dst[0x008 / 4] = CCameraPcs::m_table_desc0[1];
@@ -695,7 +691,7 @@ void CCameraPcs::calc()
 
     float fov = *reinterpret_cast<float*>(self + 0xFC);
     if (fov < FLOAT_8032fac8 && System.m_execParam != 0) {
-        System.Printf(DAT_801d7928);
+        System.Printf(sCameraInvalidFovFmt, fov);
         fov = FLOAT_8032fab4;
     }
     C_MTXPerspective(reinterpret_cast<Mtx44Ptr>(self + 0x94), fov, FLOAT_8032fa3c,
@@ -763,7 +759,7 @@ void CCameraPcs::SetStdProjectionMatrix()
     float fov = *reinterpret_cast<float*>(self + 0xFC);
 
     if (fov < FLOAT_8032fac8 && System.m_execParam != 0) {
-        System.Printf(DAT_801d7928);
+        System.Printf(sCameraInvalidFovFmt, fov);
         fov = FLOAT_8032fab4;
     }
 
@@ -1226,9 +1222,9 @@ void CCameraPcs::calcMap()
 
     if ((moveDelta.x != FLOAT_8032fa34) || (moveDelta.y != FLOAT_8032fa34) || (moveDelta.z != FLOAT_8032fa34)) {
         for (i = 0; i < 4; i++) {
-            hitCylinder.radiusXZ = FLOAT_8032fa78;
-            hitCylinder.radiusY = FLOAT_8032fa78;
-            hitCylinder.height = FLOAT_8032fa78;
+            hitCylinder.radiusXZ = kCameraBoundsMinInitial;
+            hitCylinder.radiusY = kCameraBoundsMinInitial;
+            hitCylinder.height = kCameraBoundsMinInitial;
             hitCylinder.unk = FLOAT_8032fa8c;
             hitCylinder.center = *reinterpret_cast<Vec*>(self + 0xE0);
             hitCylinder.delta = moveDelta;
@@ -1419,12 +1415,12 @@ int CCameraPcs::GetShadowRect(CBound& shadowRectBound)
 
         float clipBoundData[6];
         CBound* clipBound = reinterpret_cast<CBound*>(clipBoundData);
-        clipBoundData[0] = FLOAT_8032fa78;
-        clipBoundData[1] = FLOAT_8032fa78;
-        clipBoundData[2] = FLOAT_8032fa78;
-        clipBoundData[3] = FLOAT_8032fa7c;
-        clipBoundData[4] = FLOAT_8032fa7c;
-        clipBoundData[5] = FLOAT_8032fa7c;
+        clipBoundData[0] = kCameraBoundsMinInitial;
+        clipBoundData[1] = kCameraBoundsMinInitial;
+        clipBoundData[2] = kCameraBoundsMinInitial;
+        clipBoundData[3] = kCameraBoundsMaxInitial;
+        clipBoundData[4] = kCameraBoundsMaxInitial;
+        clipBoundData[5] = kCameraBoundsMaxInitial;
 
         float worldBoundData[6];
         CBound* worldBound = reinterpret_cast<CBound*>(worldBoundData);
@@ -1519,12 +1515,12 @@ void CCameraPcs::drawShadowBegin()
     PSMTXConcat(rotY, rotX, rotXY);
 
     if (Game.m_currentSceneId == 4) {
-        *reinterpret_cast<float*>(self + 0x414) = FLOAT_8032fa78;
-        *reinterpret_cast<float*>(self + 0x418) = FLOAT_8032fa78;
-        *reinterpret_cast<float*>(self + 0x41C) = FLOAT_8032fa78;
-        *reinterpret_cast<float*>(self + 0x420) = FLOAT_8032fa7c;
-        *reinterpret_cast<float*>(self + 0x424) = FLOAT_8032fa7c;
-        *reinterpret_cast<float*>(self + 0x428) = FLOAT_8032fa7c;
+        m_shadowRectBound.m_min.x = kCameraBoundsMinInitial;
+        m_shadowRectBound.m_min.y = kCameraBoundsMinInitial;
+        m_shadowRectBound.m_min.z = kCameraBoundsMinInitial;
+        m_shadowRectBound.m_max.x = kCameraBoundsMaxInitial;
+        m_shadowRectBound.m_max.y = kCameraBoundsMaxInitial;
+        m_shadowRectBound.m_max.z = kCameraBoundsMaxInitial;
 
         if (*reinterpret_cast<int*>(self + 0x434) == 1 && GetShadowRect(*reinterpret_cast<CBound*>(self + 0x414)) != 0) {
             *reinterpret_cast<float*>(self + 0xD4) = (*reinterpret_cast<float*>(self + 0x414) +

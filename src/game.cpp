@@ -41,10 +41,10 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
 
-const float FLOAT_8032f688 = 1.0E+10;
-const float FLOAT_8032f68c = -1.0E+10;
-const float FLOAT_8032f690 = 0.0;
-const float FLOAT_8032f694 = 0.001;
+const float kGamePartyBoundsMinInit = 1.0E+10;
+const float kGamePartyBoundsMaxInit = -1.0E+10;
+const float kGameZero = 0.0;
+const float kGameSmallDelta = 0.001;
 extern "C" {
 const char s_defaultScriptName[] = "ffcc_0";
 const char s_gameDebugMarker[] = "*\n";
@@ -80,21 +80,21 @@ enum GameAssetNameBlockOffset {
 };
 
 static const char s_game_cpp[] = "game.cpp";
-static const char DAT_801d619c[] = {
+static const char s_ScriptWillChangeMsg_801D619C[] = {
     0x83, 0x58, 0x83, 0x4E, 0x83, 0x8A, 0x83, 0x76, 0x83, 0x67, 0x82, 0xAA, 0x90, 0xD8, 0x82, 0xE8, 0x91, 0xD6,
     0x82, 0xED, 0x82, 0xE8, 0x82, 0xDC, 0x82, 0xB7, 0x0A, 0x00};
-static const char DAT_801d61b8[] = {
+static const char s_ScriptResidentLoadedMsg_801D61B8[] = {
     0x83, 0x58, 0x83, 0x4E, 0x83, 0x8A, 0x83, 0x76, 0x83, 0x67, 0x82, 0xCC, 0x8F, 0xED, 0x92, 0x93, 0x82, 0xF0,
     0x93, 0xC7, 0x82, 0xDD, 0x8D, 0x9E, 0x82, 0xDD, 0x82, 0xDC, 0x82, 0xB5, 0x82, 0xBD, 0x81, 0x42, 0x0A, 0x00};
-static const char DAT_801d61dc[] = {
+static const char s_CoreResidentLoadedMsg_801D61DC[] = {
     0x83, 0x54, 0x83, 0x45, 0x83, 0x93, 0x83, 0x68, 0x81, 0x45, 0x83, 0x4C, 0x83, 0x83, 0x83, 0x89, 0x81, 0x45,
     0x83, 0x70, 0x81, 0x5B, 0x83, 0x65, 0x83, 0x42, 0x83, 0x4E, 0x83, 0x8B, 0x82, 0xCC, 0x8F, 0xED, 0x92, 0x93,
     0x82, 0xF0, 0x93, 0xC7, 0x82, 0xDD, 0x8D, 0x9E, 0x82, 0xDD, 0x82, 0xDC, 0x82, 0xB5, 0x82, 0xBD, 0x81, 0x42,
     0x0A, 0x00};
-static const char DAT_801d6214[] = {
+static const char s_NewGameInitMsg_801D6214[] = {
     0x2A, 0x83, 0x6A, 0x83, 0x85, 0x81, 0x5B, 0x83, 0x51, 0x81, 0x5B, 0x83, 0x80, 0x8F, 0x89, 0x8A, 0xFA, 0x89,
     0xBB, 0x82, 0xB5, 0x82, 0xDC, 0x82, 0xB7, 0x81, 0x42, 0x0A, 0x00};
-static const char DAT_801d6234[] = {
+static const char s_ScriptChangedMsg_801D6234[] = {
     0x83, 0x58, 0x83, 0x4E, 0x83, 0x8A, 0x83, 0x76, 0x83, 0x67, 0x82, 0xAA, 0x90, 0xD8, 0x82, 0xE8, 0x91, 0xD6,
     0x82, 0xED, 0x82, 0xE8, 0x82, 0xDC, 0x82, 0xB5, 0x82, 0xBD, 0x0A, 0x00};
 static const char s_CGame_Exec_scene_pcts_801D6254[] = "CGame.Exec: scene = %s\n";
@@ -163,8 +163,8 @@ static inline GameSoundLayout& GameSoundData(CSound& sound)
 CGame Game;
 
 // Uninitialized
-static float FLOAT_8032ec40;
-static s8 BOOL_8032ec44;
+static float sMapObjRotationAngle;
+static s8 sMapObjRotationInitialized;
 
 /*
  * --INFO--
@@ -201,12 +201,12 @@ CMapLightHolder* CPtrArray<CMapLightHolder*>::operator[](unsigned long index)
  * Size:	TODO
  */
 inline CGame::CGame()
-    : m_partyMinX(FLOAT_8032f688)
-    , m_partyMinY(FLOAT_8032f688)
-    , m_partyMinZ(FLOAT_8032f688)
-    , m_partyMaxX(FLOAT_8032f68c)
-    , m_partyMaxY(FLOAT_8032f68c)
-    , m_partyMaxZ(FLOAT_8032f68c)
+    : m_partyMinX(kGamePartyBoundsMinInit)
+    , m_partyMinY(kGamePartyBoundsMinInit)
+    , m_partyMinZ(kGamePartyBoundsMinInit)
+    , m_partyMaxX(kGamePartyBoundsMaxInit)
+    , m_partyMaxY(kGamePartyBoundsMaxInit)
+    , m_partyMaxZ(kGamePartyBoundsMaxInit)
 {
 	// TODO
 }
@@ -279,7 +279,7 @@ void CGame::Init()
     memset(m_startScriptName, 0, sizeof(m_startScriptName));
     m_frameCounterEnable = 1;
     gCFlatRuntime().Init();
-    unkFloat_0xca10 = FLOAT_8032f694;
+    unkFloat_0xca10 = kGameSmallDelta;
 }
 
 /*
@@ -331,7 +331,7 @@ void CGame::LoadLogoWaitingData()
 			return;
 		}
 
-		System.Printf(const_cast<char*>(DAT_801d61dc));
+		System.Printf(const_cast<char*>(s_CoreResidentLoadedMsg_801D61DC));
 	}
 }
 
@@ -540,7 +540,7 @@ void CGame::Destroy()
 void CGame::InitNewGame()
 {
     System.Printf(const_cast<char*>(s_gameDebugMarker));
-    System.Printf(const_cast<char*>(DAT_801d6214));
+    System.Printf(const_cast<char*>(s_NewGameInitMsg_801D6214));
     System.Printf(const_cast<char*>(s_gameDebugMarker));
 
     CGame* game = &Game;
@@ -718,7 +718,7 @@ void CGame::CheckScriptChange()
     Graphic._WaitDrawDone(const_cast<char*>(s_game_cpp), 0x205);
 
     if ((u32)System.m_execParam > 2) {
-        System.Printf(const_cast<char*>(DAT_801d619c));
+        System.Printf(const_cast<char*>(s_ScriptWillChangeMsg_801D619C));
     }
 
     System.ScriptChanging(m_nextScript.m_name);
@@ -730,7 +730,7 @@ void CGame::CheckScriptChange()
             m_cfdLoadedFlag = 1;
 
             if ((u32)System.m_execParam > 2) {
-                System.Printf(const_cast<char*>(DAT_801d61b8));
+                System.Printf(const_cast<char*>(s_ScriptResidentLoadedMsg_801D61B8));
             }
         }
 
@@ -741,7 +741,7 @@ void CGame::CheckScriptChange()
             m_assetsLoadedFlag = 1;
 
             if ((u32)System.m_execParam > 2) {
-                System.Printf(const_cast<char*>(DAT_801d61dc));
+                System.Printf(const_cast<char*>(s_CoreResidentLoadedMsg_801D61DC));
             }
         }
     }
@@ -753,7 +753,7 @@ void CGame::CheckScriptChange()
         CGame* game = &Game;
 
         System.Printf(const_cast<char*>(s_gameDebugMarker));
-        System.Printf(const_cast<char*>(DAT_801d6214));
+        System.Printf(const_cast<char*>(s_NewGameInitMsg_801D6214));
         System.Printf(const_cast<char*>(s_gameDebugMarker));
 
         memset(&game->m_gameWork.m_gameDataStartMarker, 0, 0x13E1);
@@ -770,7 +770,7 @@ void CGame::CheckScriptChange()
     System.ScriptChanged(m_nextScript.m_name, scriptResult);
 
     if ((u32)System.m_execParam > 2) {
-        System.Printf(const_cast<char*>(DAT_801d6234));
+        System.Printf(const_cast<char*>(s_ScriptChangedMsg_801D6234));
     }
 }
 
@@ -968,12 +968,12 @@ void CGame::Calc()
         m_gameWork.m_frameCounter++;
     }
 
-    m_partyMinZ = FLOAT_8032f688;
-    m_partyMinY = FLOAT_8032f688;
-    m_partyMinX = FLOAT_8032f688;
-    m_partyMaxZ = FLOAT_8032f68c;
-    m_partyMaxY = FLOAT_8032f68c;
-    m_partyMaxX = FLOAT_8032f68c;
+    m_partyMinZ = kGamePartyBoundsMinInit;
+    m_partyMinY = kGamePartyBoundsMinInit;
+    m_partyMinX = kGamePartyBoundsMinInit;
+    m_partyMaxZ = kGamePartyBoundsMaxInit;
+    m_partyMaxY = kGamePartyBoundsMaxInit;
+    m_partyMaxX = kGamePartyBoundsMaxInit;
 
     for (int i = 0; i < 4; i++) {
         CGPartyObj* partyObj = m_partyObjArr[i];
@@ -1005,13 +1005,13 @@ void CGame::Calc()
     CFlatRuntime2Storage().Frame(1, 0);
 
     if ((m_currentMapId == 0x21) && ((mapObjIdx = MapMng.GetMapObjIdx(0)) >= 0)) {
-            if (!BOOL_8032ec44) {
-                BOOL_8032ec44 = true;
-                FLOAT_8032ec40 = FLOAT_8032f690;
+            if (!sMapObjRotationInitialized) {
+                sMapObjRotationInitialized = true;
+                sMapObjRotationAngle = kGameZero;
             }
 
-            FLOAT_8032ec40 += FLOAT_8032f694;
-            PSMTXRotRad(rotMtx, 'y', FLOAT_8032ec40);
+            sMapObjRotationAngle += kGameSmallDelta;
+            PSMTXRotRad(rotMtx, 'y', sMapObjRotationAngle);
             MapMng.SetMapObjLMtx(mapObjIdx, rotMtx);
     }
 }

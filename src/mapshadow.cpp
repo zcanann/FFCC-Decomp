@@ -14,8 +14,8 @@ public:
 	T operator[](unsigned long index);
 };
 
-extern const double DOUBLE_8032fce8;
-extern const float FLOAT_8032fcf0;
+extern const double kMapShadowDepthBias;
+extern const float kMapShadowScaleStep;
 
 /*
  * --INFO--
@@ -125,14 +125,14 @@ void CMapShadow::Init()
 	m_materialMode = *reinterpret_cast<u32*>(reinterpret_cast<int>(material) + 0x6c);
 	if (m_useFrustum != 0) {
 		float scale = m_shadowScale;
-		double scaleBias = DOUBLE_8032fce8;
-		float scaleStep = FLOAT_8032fcf0;
+		double scaleBias = kMapShadowDepthBias;
+		float scaleStep = kMapShadowScaleStep;
 		C_MTXLightFrustum(m_lightMtx, -height, height, -width, width, m_frustumNear,
 		                  (float)(scaleBias * (double)scale), scaleStep * scale, scaleStep, scaleStep);
 	} else {
 		float scale = m_shadowScale;
-		double scaleBias = DOUBLE_8032fce8;
-		float scaleStep = FLOAT_8032fcf0;
+		double scaleBias = kMapShadowDepthBias;
+		float scaleStep = kMapShadowScaleStep;
 		C_MTXLightOrtho(m_lightMtx, -height, height, -width, width,
 		                (float)(scaleBias * (double)scale), scaleStep * scale, scaleStep, scaleStep);
 	}

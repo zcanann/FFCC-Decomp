@@ -20,9 +20,11 @@ public:
         TODO_TEX
     };
 
-    class CTmp
-	{
-	};
+    struct CTmp
+    {
+        int m_textureSetIndex;
+        char* m_textureName;
+    };
     struct MaterialInfo
 	{
         short m_itemNo[3];

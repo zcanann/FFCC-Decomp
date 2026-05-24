@@ -14,8 +14,8 @@
 #include <math.h>
 #include <string.h>
 
-extern unsigned int DAT_8032fc0c;
-extern unsigned int DAT_8032fc08;
+extern const _GXColor kBumpLightMapColor;
+extern const _GXColor kLightDefaultMaterialColor;
 extern float FLOAT_8032fc10;
 extern float FLOAT_8032fc14;
 extern float FLOAT_8032fc18;
@@ -43,7 +43,7 @@ extern float FLOAT_8032fc8c;
 extern float FLOAT_8032fc94;
 float FLOAT_8032ed10;
 extern double DOUBLE_8032fc68;
-extern unsigned int DAT_8032e620;
+extern _GXColor s_mapLightAlphaColor;
 
 static inline float CameraPosX() { return CameraPcs.m_positionX; }
 static inline float CameraPosY() { return CameraPcs.m_positionY; }
@@ -472,8 +472,8 @@ void CLightPcs::SetMapColorAlpha(float (*) [4], _GXColor mapColor, _GXColor ambC
         GXInitLightSpot(&m_mapLightObj, spot, (GXSpotFn)4);
         GXInitLightAttnK(&m_mapLightObj, FLOAT_8032fc84 / dist, FLOAT_8032fc88 / atten, FLOAT_8032fc8c / atten);
 
-        reinterpret_cast<unsigned char*>(&DAT_8032e620)[3] = alpha;
-        GXInitLightColor(&m_mapLightObj, *reinterpret_cast<_GXColor*>(&DAT_8032e620));
+        s_mapLightAlphaColor.a = alpha;
+        GXInitLightColor(&m_mapLightObj, s_mapLightAlphaColor);
 
         if (m_loadedLightCount >= 8) {
             m_loadedLightCount = 7;
@@ -652,7 +652,7 @@ void CLightPcs::SetPosition(CLightPcs::TARGET target, Vec* pos, unsigned long ma
             GXSetChanCtrl((GXChannelID)0, (u8)1, (GXColorSrc)0, (GXColorSrc)1, chanMask, (GXDiffuseFn)2, (GXAttnFn)1);
             GXSetChanCtrl((GXChannelID)2, (u8)1, (GXColorSrc)0, (GXColorSrc)1, 0, (GXDiffuseFn)0, (GXAttnFn)2);
 
-            GXSetChanMatColor((GXChannelID)4, *reinterpret_cast<_GXColor*>(&DAT_8032fc08));
+            GXSetChanMatColor((GXChannelID)4, kLightDefaultMaterialColor);
         }
         return;
     }
@@ -687,7 +687,7 @@ void CLightPcs::SetPosition(CLightPcs::TARGET target, Vec* pos, unsigned long ma
         GXSetChanCtrl((GXChannelID)0, (u8)1, (GXColorSrc)0, (GXColorSrc)1, chanMask, (GXDiffuseFn)2, (GXAttnFn)1);
         GXSetChanCtrl((GXChannelID)2, (u8)1, (GXColorSrc)0, (GXColorSrc)1, 0, (GXDiffuseFn)0, (GXAttnFn)2);
 
-        GXSetChanMatColor((GXChannelID)4, *reinterpret_cast<_GXColor*>(&DAT_8032fc08));
+        GXSetChanMatColor((GXChannelID)4, kLightDefaultMaterialColor);
     }
 }
 
@@ -898,7 +898,7 @@ void CLightPcs::CBumpLight::MakeLightMap()
     }
 
     int copySize = GXGetTexBufferSize(0x40, 0x40, 3, 0, 0);
-    unsigned int packedColor = DAT_8032fc0c;
+    _GXColor lightColor = kBumpLightMapColor;
     double dScale = (double)FLOAT_8032fc40;
     double dHalf = (double)FLOAT_8032fc1c;
     static float tParam[4] = {48.0f, 128.0f, 256.0f, 512.0f};
@@ -913,8 +913,6 @@ void CLightPcs::CBumpLight::MakeLightMap()
         GXLightObj lightObj;
         GXInitSpecularDir(&lightObj, eyeDir.x, eyeDir.y, eyeDir.z);
 
-        _GXColor lightColor;
-        *reinterpret_cast<unsigned int*>(&lightColor) = packedColor;
         GXInitLightColor(&lightObj, lightColor);
 
         if (m_target == 1) {

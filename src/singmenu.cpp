@@ -215,26 +215,26 @@ extern char s_solo3_80332788[];
 extern char s_solo6_80332790[];
 extern char s_solo7_80332798[];
 extern char s_solo10_803327A0[];
-extern char lbl_803327A8[];
-extern char lbl_803327B0[];
-extern char lbl_803327B8[];
-extern char lbl_803327C0[];
-extern char lbl_803327C8[];
-extern char lbl_803327D0[];
-extern char lbl_803327D8[];
-extern char lbl_803327E0[];
-extern char lbl_803327E8[];
-extern char lbl_803327F0[];
-extern char lbl_803327F8[];
-extern char lbl_80332800[];
-extern char lbl_80332808[];
-extern char lbl_80332810[];
-extern char lbl_80332818[];
-extern char lbl_80332820[];
-extern char lbl_80332828[];
-extern char lbl_80332830[];
-extern char lbl_80332838[];
-extern char lbl_80332840[];
+extern char s_solo11_803327A8[];
+extern char s_solo12_803327B0[];
+extern char s_solo13_803327B8[];
+extern char s_solo14_803327C0[];
+extern char s_solo15_803327C8[];
+extern char s_solo16_803327D0[];
+extern char s_solo17_803327D8[];
+extern char s_solo18_803327E0[];
+extern char s_solo19_803327E8[];
+extern char s_solo20_803327F0[];
+extern char s_solo21_803327F8[];
+extern char s_solo22_80332800[];
+extern char s_solo24_80332808[];
+extern char s_solo25_80332810[];
+extern char s_solo26_80332818[];
+extern char s_solo27_80332820[];
+extern char s_solo28_80332828[];
+extern char s_solo29_80332830[];
+extern char s_solo31_80332838[];
+extern char s_solo32_80332840[];
 extern char lbl_80332848[];
 extern char lbl_80332850[];
 extern char lbl_80332858[];
@@ -752,10 +752,10 @@ extern "C" SingMenuSoloNameTable PTR_s_solo1 = {
 
 extern "C" SingMenuTextureRef s_singleMenuModelTextureTable[] = {
     {5, s_solo2_80332718}, {5, s_solo3_80332788}, {5, s_solo6_80332790}, {5, s_solo7_80332798}, {5, s_solo10_803327A0},
-    {5, lbl_803327A8}, {5, lbl_803327B0}, {5, lbl_803327B8}, {5, lbl_803327C0}, {5, lbl_803327C8},
-    {5, lbl_803327D0}, {5, lbl_803327D8}, {5, lbl_803327E0}, {5, lbl_803327E8}, {5, lbl_803327F0},
-    {5, lbl_803327F8}, {5, lbl_80332800}, {5, lbl_80332808}, {5, lbl_80332810}, {5, lbl_80332818},
-    {5, lbl_80332820}, {5, lbl_80332828}, {5, lbl_80332830}, {5, lbl_80332838}, {5, lbl_80332840},
+    {5, s_solo11_803327A8}, {5, s_solo12_803327B0}, {5, s_solo13_803327B8}, {5, s_solo14_803327C0}, {5, s_solo15_803327C8},
+    {5, s_solo16_803327D0}, {5, s_solo17_803327D8}, {5, s_solo18_803327E0}, {5, s_solo19_803327E8}, {5, s_solo20_803327F0},
+    {5, s_solo21_803327F8}, {5, s_solo22_80332800}, {5, s_solo24_80332808}, {5, s_solo25_80332810}, {5, s_solo26_80332818},
+    {5, s_solo27_80332820}, {5, s_solo28_80332828}, {5, s_solo29_80332830}, {5, s_solo31_80332838}, {5, s_solo32_80332840},
     {5, lbl_80332848}, {5, lbl_80332850}, {5, lbl_80332858}, {5, lbl_80332860}, {5, lbl_80332868},
     {5, lbl_80332870}, {5, lbl_80332878}, {5, lbl_80332880}, {5, lbl_80332888}, {5, lbl_80332890},
     {5, lbl_80332898}, {5, lbl_803328A0}, {5, lbl_803328A8}, {5, lbl_803328B0}, {5, lbl_803328B8},

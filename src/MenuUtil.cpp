@@ -34,14 +34,14 @@ extern "C" const float kOptionVolumeScale = 10.583333f;
 extern "C" const float FLOAT_80333654 = 25.0f;
 extern float FLOAT_8033357c;
 extern float FLOAT_803335a0;
-extern const char s_MenuUtilEmptyText_80333658[4] = "";
-extern const char s_MenuUtilStringFormat_8033365c[] = "%s";
-extern const char s_MenuUtilPlusOneText_80333660[] = "+1";
-extern const char s_MenuUtilSignedValueFormat_80333664[] = "%c%d";
-extern const char s_MenuUtilSpaceText_8033366c[] = " ";
-extern const char s_MenuUtilValueSuffixFormat_80333670[] = " %d";
-extern const char s_MenuUtilSignedDeltaFormat_80333674[] = " %+d";
-extern const char s_MenuUtilAttrBonusFormat_8033367C[] = " %s";
+extern const char sMenuUtilEmptyText[4] = "";
+extern const char sMenuUtilStringFormat[] = "%s";
+extern const char sMenuUtilPlusOneText[] = "+1";
+extern const char sMenuUtilSignedValueFormat[] = "%c%d";
+extern const char sMenuUtilSpaceText[] = " ";
+extern const char sMenuUtilValueSuffixFormat[] = " %d";
+extern const char sMenuUtilSignedDeltaFormat[] = " %+d";
+extern const char sMenuUtilAttrBonusFormat[] = " %s";
 extern char s_Strength_801E30A4[];
 extern char s_Defence_801E30B0[];
 extern char s_Position_Markers_801E30BC[];
@@ -360,7 +360,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 		} else if (msgNo == 0x211) {
 			suffix = GetSkillStr(2);
 		} else {
-			suffix = s_MenuUtilEmptyText_80333658;
+			suffix = sMenuUtilEmptyText;
 		}
 
 		if ((msgNo == 0x209) || (msgNo == 0x20D) || (msgNo == 0x211)) {
@@ -457,22 +457,22 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 	} else if ((flags & 0x800) != 0) {
 		strcpy(scratch, PTR_s_Defence__80215a4c[languageIndex]);
 	} else if ((flags & 0x1000) != 0) {
-		strcpy(scratch, s_MenuUtilEmptyText_80333658);
+		strcpy(scratch, sMenuUtilEmptyText);
 	} else if ((flags & 0x2000) != 0) {
-		strcpy(scratch, s_MenuUtilEmptyText_80333658);
+		strcpy(scratch, sMenuUtilEmptyText);
 	}
 
 	font->SetPosX(FLOAT_8033357c);
 	font->SetPosY(static_cast<float>(y));
 
 	if ((flags & 0x1000) == 0) {
-		strcat(scratch, s_MenuUtilSpaceText_8033366c);
+		strcat(scratch, sMenuUtilSpaceText);
 		font->Draw(scratch);
 
 		float valueX = FLOAT_8033357c + font->GetWidth(scratch) + FLOAT_803335a0;
 		font->SetTlut(1);
 		font->SetPosX(valueX);
-		sprintf(scratch, s_MenuUtilValueSuffixFormat_80333670, *reinterpret_cast<u16*>(itemBase + 6));
+		sprintf(scratch, sMenuUtilValueSuffixFormat, *reinterpret_cast<u16*>(itemBase + 6));
 		font->Draw(scratch);
 
 		if ((*reinterpret_cast<short*>(self + 0x864) == 2) &&
@@ -515,14 +515,14 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 				} else {
 					font->SetTlut(9);
 				}
-				sprintf(scratch, s_MenuUtilSignedDeltaFormat_80333674, delta);
+				sprintf(scratch, sMenuUtilSignedDeltaFormat, delta);
 				if (delta != 0) {
 					font->Draw(scratch);
 				}
 			}
 		}
 
-		float attrX = font->posX + font->GetWidth(s_MenuUtilSpaceText_8033366c);
+		float attrX = font->posX + font->GetWidth(sMenuUtilSpaceText);
 		font->SetPosX(attrX);
 
 		u16 attr = *reinterpret_cast<u16*>(itemBase + 8);
@@ -532,7 +532,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 			font->Draw(scratch);
 			font->SetTlut(9);
 			if ((attr != 0) && (attr < 9)) {
-				sprintf(scratch, s_MenuUtilAttrBonusFormat_8033367C, s_MenuUtilPlusOneText_80333660);
+				sprintf(scratch, sMenuUtilAttrBonusFormat, sMenuUtilPlusOneText);
 				font->Draw(scratch);
 			}
 		}
@@ -547,16 +547,16 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 
 			if ((attr == 0) || (8 < attr)) {
 				if ((attr == 0xB) || (attr == 0x11) || (attr == 0x12)) {
-					sprintf(scratch, s_MenuUtilSignedValueFormat_80333664, 0x2B, *reinterpret_cast<u16*>(itemBase + 6));
+					sprintf(scratch, sMenuUtilSignedValueFormat, 0x2B, *reinterpret_cast<u16*>(itemBase + 6));
 				} else {
 					if (((attr - 9) > 1) && (attr != 0xC)) {
 						return;
 					}
-					sprintf(scratch, s_MenuUtilSignedValueFormat_80333664, 0x2D, *reinterpret_cast<u16*>(itemBase + 6));
+					sprintf(scratch, sMenuUtilSignedValueFormat, 0x2D, *reinterpret_cast<u16*>(itemBase + 6));
 					font->SetTlut(3);
 				}
 			} else {
-				sprintf(scratch, s_MenuUtilStringFormat_8033365c, s_MenuUtilPlusOneText_80333660);
+				sprintf(scratch, sMenuUtilStringFormat, sMenuUtilPlusOneText);
 			}
 
 			font->Draw(scratch);

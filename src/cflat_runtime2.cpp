@@ -2177,17 +2177,22 @@ void CFlatRuntime2::SetParticleWorkTarget(Vec& vec)
  */
 void CFlatRuntime2::SetParticleWorkVector(float angle1, float angle2)
 {
-	double cosAngle2 = cos(angle2);
-	double sinAngle1 = sin(angle1);
-	ParticleWorkTargetX(this) = static_cast<float>(sinAngle1 * static_cast<double>(static_cast<float>(cosAngle2))) + ParticleWorkPosX(this);
+	u8* runtime = reinterpret_cast<u8*>(this);
+	float* target = reinterpret_cast<float*>(runtime + 0x1764);
+	float cosAngle2 = static_cast<float>(cos(angle2));
+	float sinAngle1 = static_cast<float>(sin(angle1));
+	*reinterpret_cast<float*>(runtime + 0x1764) =
+		sinAngle1 * cosAngle2 + *reinterpret_cast<float*>(runtime + 0x1740);
 
-	double sinAngle2 = sin(angle2);
-	ParticleWorkTargetY(this) = ParticleWorkPosY(this) + static_cast<float>(sinAngle2);
+	float sinAngle2 = static_cast<float>(sin(angle2));
+	*reinterpret_cast<float*>(runtime + 0x1768) =
+		*reinterpret_cast<float*>(runtime + 0x1744) + sinAngle2;
 
-	cosAngle2 = cos(angle2);
-	double cosAngle1 = cos(angle1);
-	ParticleWorkTargetZ(this) = static_cast<float>(cosAngle1 * static_cast<double>(static_cast<float>(cosAngle2))) + ParticleWorkPosZ(this);
-	ParticleWorkTargetPtr(this) = &ParticleWorkTargetX(this);
+	cosAngle2 = static_cast<float>(cos(angle2));
+	float cosAngle1 = static_cast<float>(cos(angle1));
+	*reinterpret_cast<float*>(runtime + 0x176C) =
+		cosAngle1 * cosAngle2 + *reinterpret_cast<float*>(runtime + 0x1748);
+	*reinterpret_cast<float**>(runtime + 0x16D8) = target;
 }
 
 /*

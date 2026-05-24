@@ -153,8 +153,7 @@ void CRingMenu::DrawIcon()
 		return;
 	}
 
-	int menuIndex = m_menuIndex;
-	CGPartyObj* partyObj = Game.m_partyObjArr[menuIndex];
+	CGPartyObj* partyObj = Game.m_partyObjArr[m_menuIndex];
 	if (partyObj == 0) {
 		return;
 	}
@@ -164,25 +163,26 @@ void CRingMenu::DrawIcon()
 		return;
 	}
 
-	unsigned int scriptFood = Game.m_scriptFoodBase[menuIndex];
+	unsigned int scriptFood = Game.m_scriptFoodBase[m_menuIndex];
 	Mtx cameraMtx;
 	PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
 
+	Vec viewPos;
+	Vec4d clipPos;
+	Vec viewInput;
 	CVector offset(FLOAT_803309c0, FLOAT_803309c4 * partyObj->unk_0x188, FLOAT_803309c0);
 	CVector baseWorldPos(partyObj->m_worldPosition);
 	CVector worldPos;
 	PSVECAdd(reinterpret_cast<Vec*>(&baseWorldPos), reinterpret_cast<Vec*>(&offset), reinterpret_cast<Vec*>(&worldPos));
 
-	Vec viewPos;
-	viewPos.x = worldPos.x;
-	viewPos.y = worldPos.y;
-	viewPos.z = worldPos.z;
-	PSMTXMultVec(cameraMtx, &viewPos, &viewPos);
+	viewInput.x = worldPos.x;
+	viewInput.y = worldPos.y;
+	viewInput.z = worldPos.z;
+	PSMTXMultVec(cameraMtx, &viewInput, &viewPos);
 	viewPos.z = (FLOAT_803309c8 < viewPos.z) ? FLOAT_803309c8 : viewPos.z;
 
 	Mtx44 screenMtx;
 	PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
-	Vec4d clipPos;
 	Math.MTX44MultVec4(screenMtx, &viewPos, &clipPos);
 
 	clipPos.x = clipPos.x * (FLOAT_803309cc / clipPos.w);
@@ -217,7 +217,7 @@ void CRingMenu::DrawIcon()
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x19));
 	int iconRow;
 	unsigned int iconCol;
-	if ((Game.m_gameWork.m_menuStageMode == 0) || (menuIndex < 1)) {
+	if ((Game.m_gameWork.m_menuStageMode == 0) || (m_menuIndex < 1)) {
 		iconRow = *reinterpret_cast<int*>(scriptFood + 0x3B4);
 		int foodProgress = static_cast<int>(*reinterpret_cast<unsigned short*>(scriptFood + 0x14));
 		int progress = foodProgress - 100;
@@ -718,7 +718,7 @@ void CRingMenu::onDraw()
 
 			const float width = static_cast<float>(font->GetWidth(labelId));
 			int alpha = static_cast<int>(showScale * static_cast<double>(static_cast<float>(FLOAT_80330a34 * fade) * static_cast<float>(transitionScale)));
-			if ((group == 2) && (m_battleButtons[6] >= 0)) {
+			if ((group == 2) && (m_battleButtons[2] >= 0)) {
 				alpha = static_cast<int>(FLOAT_80330ac0 * static_cast<float>(alpha));
 			}
 
@@ -917,12 +917,19 @@ void CRingMenu::onCalc()
 		m_commonFrameCounter = m_commonFrameCounter + 1;
 		m_timerB = clampDecToZero(m_timerB);
 
-		for (int i = 0; i < 9; i++) {
-			m_buttonTimers[i] = clampDecToZero(m_buttonTimers[i]);
-		}
+		m_buttonTimers[0] = clampDecToZero(m_buttonTimers[0]);
+		m_buttonTimers[1] = clampDecToZero(m_buttonTimers[1]);
+		m_buttonTimers[2] = clampDecToZero(m_buttonTimers[2]);
+		m_buttonTimers[3] = clampDecToZero(m_buttonTimers[3]);
+		m_buttonTimers[4] = clampDecToZero(m_buttonTimers[4]);
+		m_buttonTimers[5] = clampDecToZero(m_buttonTimers[5]);
 
 		const float animStep = FLOAT_80330a54;
 		const float animMin = FLOAT_803309c0;
+
+		m_buttonTimers[6] = clampDecToZero(m_buttonTimers[6]);
+		m_buttonTimers[7] = clampDecToZero(m_buttonTimers[7]);
+		m_buttonTimers[8] = clampDecToZero(m_buttonTimers[8]);
 		for (int i = 0; i < 9; i++) {
 			for (int j = 0; j < 3; j++) {
 				m_animFloat[i][j] = m_animFloat[i][j] - animStep;
@@ -969,14 +976,13 @@ void CRingMenu::onCalc()
 				trackedCmd = reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Chara) + 0x2008);
 			}
 
-			double scrollDelta = 0.0;
+			float scrollDelta = FLOAT_803309c0;
 			if (*trackedCmd != currentCmd) {
 				int prev = currentCmd;
 				int next = currentCmd;
+				int nextCandidate = (currentCmd + 1) % 5;
+				int prevCandidate = (currentCmd + 4) % 5;
 				for (int step = 1; step < 4; step++) {
-					int nextCandidate = (currentCmd + step) % 5;
-					int prevCandidate = (currentCmd + 5 - step) % 5;
-
 					if (Game.m_gameWork.m_bossArtifactStageIndex != 0x19) {
 						nextCandidate = caravanWork->GetNextCmdListIdx(next, 1);
 						prevCandidate = caravanWork->GetNextCmdListIdx(prev, -1);
@@ -986,16 +992,16 @@ void CRingMenu::onCalc()
 					next = nextCandidate;
 
 					if (*trackedCmd == prevCandidate) {
-						scrollDelta = static_cast<double>(step);
+						scrollDelta = static_cast<float>(step);
 						break;
 					}
 					if (*trackedCmd == nextCandidate) {
-						scrollDelta = -static_cast<double>(step);
+						scrollDelta = -static_cast<float>(step);
 						break;
 					}
 				}
 
-				if (scrollDelta == 0.0) {
+				if (scrollDelta == FLOAT_803309c0) {
 					int dirPos = (*trackedCmd == prev) ? 1 : 0;
 					int dirNeg = (*trackedCmd == next) ? 1 : 0;
 					if (dirPos != 0 && dirNeg != 0) {
@@ -1006,11 +1012,11 @@ void CRingMenu::onCalc()
 								~(static_cast<int>(~(Pad._448_4_ - m_menuIndex | m_menuIndex - Pad._448_4_)) >> 31);
 							trigger = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Pad) + 4 + idx * 0x54);
 						}
-						scrollDelta = ((trigger & 0x40) != 0) ? static_cast<double>(dirPos) : -static_cast<double>(dirNeg);
+						scrollDelta = ((trigger & 0x40) != 0) ? static_cast<float>(dirPos) : -static_cast<float>(dirNeg);
 					} else if (dirPos != 0) {
-						scrollDelta = static_cast<double>(dirPos);
+						scrollDelta = static_cast<float>(dirPos);
 					} else if (dirNeg != 0) {
-						scrollDelta = -static_cast<double>(dirNeg);
+						scrollDelta = -static_cast<float>(dirNeg);
 					}
 				}
 			}

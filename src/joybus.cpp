@@ -5646,7 +5646,7 @@ int JoyBus::SetCtrlMode(int portIndex, int controlMode)
  * Address:	TODO
  * Size:	TODO
  */
-unsigned short JoyBus::GetCtrlMode(int portIndex)
+int JoyBus::GetCtrlMode(int portIndex)
 {
     bool single = GbaQue.IsSingleMode(portIndex);
 

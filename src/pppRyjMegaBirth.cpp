@@ -408,6 +408,7 @@ void pppRyjDrawMegaBirth(_pppPObject* obj, void* stepData, _pppCtrlTable* ctrlTa
 			int green;
 			int blue;
 			int alpha;
+			pppFMATRIX viewMatrix;
 
 			PSMTXIdentity(drawMatrix);
 			drawMatrix[0][0] = *f32_at(particle, 0x34) * pppMngStPtr->m_scale.x;
@@ -446,7 +447,6 @@ void pppRyjDrawMegaBirth(_pppPObject* obj, void* stepData, _pppCtrlTable* ctrlTa
 				break;
 			}
 			case 1: {
-				pppFMATRIX viewMatrix;
 				Vec viewPos;
 
 				PSMTXConcat(*(Mtx*)particleWorldMat, obj->m_localMatrix.value, viewMatrix.value);
@@ -461,7 +461,6 @@ void pppRyjDrawMegaBirth(_pppPObject* obj, void* stepData, _pppCtrlTable* ctrlTa
 				break;
 			}
 			case 2: {
-				pppFMATRIX viewMatrix;
 				Vec viewPos;
 
 				PSMTXConcat(work->m_worldMatrix, *(Mtx*)particleWorldMat, viewMatrix.value);

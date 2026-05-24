@@ -198,7 +198,7 @@ int CMenuPcs::ArtiCtrlCur()
 {
 	int sVar1;
 	bool bVar2;
-	int uVar4;
+	u16 uVar4;
 	int uVar3;
 	int iVar5;
 	int iVar6;

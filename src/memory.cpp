@@ -1948,7 +1948,7 @@ void CAmemCacheSet::AddRef(short index)
 
     entry.m_refCount += 1;
     if (entry.m_refCount == 0xFFFF) {
-        if (2 < (unsigned int)System.m_execParam) {
+        if (static_cast<unsigned int>(System.m_execParam) >= 3) {
             System.Printf(const_cast<char*>(sAmemCacheAddRefFmt), static_cast<int>(index));
         }
 
@@ -1956,7 +1956,7 @@ void CAmemCacheSet::AddRef(short index)
             CAmemCache& current = cacheEntryAt(this, i);
             int data = reinterpret_cast<int>(current.m_cacheData);
             if ((current.m_inUse != 0) || (data != 0)) {
-                if (2 < (unsigned int)System.m_execParam) {
+                if (static_cast<unsigned int>(System.m_execParam) >= 3) {
                     System.Printf(
                         const_cast<char*>(sAmemCacheEntryFmt), i, cacheStateName(current),
                         cacheTypeName(current), current.m_refCount, current.m_priority, data);
@@ -1964,7 +1964,7 @@ void CAmemCacheSet::AddRef(short index)
             }
         }
 
-        if (2 < (unsigned int)System.m_execParam) {
+        if (static_cast<unsigned int>(System.m_execParam) >= 3) {
             System.Printf(const_cast<char*>(sAmemCacheSeparator));
         }
 
@@ -1992,13 +1992,13 @@ void CAmemCacheSet::Release(short index)
     entry.m_refCount -= 1;
 
     if (entry.m_refCount == 0xFFFF) {
-        if (2 < (unsigned int)System.m_execParam) {
+        if (static_cast<unsigned int>(System.m_execParam) >= 3) {
             System.Printf(const_cast<char*>(sAmemCacheAddRefFmt));
         }
 
         for (int i = 0; i < m_cacheCount; i++) {
             CAmemCache& cache = cacheEntryAt(this, i);
-            if (((cache.m_inUse != 0) || (cache.m_cacheData != 0)) && (2 < (unsigned int)System.m_execParam)) {
+            if (((cache.m_inUse != 0) || (cache.m_cacheData != 0)) && (static_cast<unsigned int>(System.m_execParam) >= 3)) {
                 System.Printf(
                     const_cast<char*>(sAmemCacheEntryFmt), i, cacheStateName(cache),
                     cacheTypeName(cache), cache.m_refCount,
@@ -2006,7 +2006,7 @@ void CAmemCacheSet::Release(short index)
             }
         }
 
-        if (2 < (unsigned int)System.m_execParam) {
+        if (static_cast<unsigned int>(System.m_execParam) >= 3) {
             System.Printf(const_cast<char*>(sAmemCacheSeparator));
         }
 
@@ -2070,24 +2070,24 @@ void CAmemCacheSet::AmemFreeLowPrio(int size)
 
         if (m_releaseAction == 0 || m_releaseAction(m_releaseActionArg) == 0) {
             m_releaseCheck(m_releaseCheckArg);
-            if (2 < (unsigned int)System.m_execParam) {
+            if (static_cast<unsigned int>(System.m_execParam) >= 3) {
                 System.Printf(const_cast<char*>(sAmemCacheAddRefFmt));
             }
 
             for (int i = 0; i < m_cacheCount; i++) {
                 CAmemCache& entry = cacheEntryAt(this, i);
                 int data = reinterpret_cast<int>(entry.m_cacheData);
-                if (((entry.m_inUse != 0) || (data != 0)) && (2 < (unsigned int)System.m_execParam)) {
+                if (((entry.m_inUse != 0) || (data != 0)) && (static_cast<unsigned int>(System.m_execParam) >= 3)) {
                     System.Printf(
                         const_cast<char*>(sAmemCacheEntryFmt), i, cacheStateName(entry),
                         cacheTypeName(entry), entry.m_refCount, entry.m_priority, data);
                 }
             }
 
-            if (2 < (unsigned int)System.m_execParam) {
+            if (static_cast<unsigned int>(System.m_execParam) >= 3) {
                 System.Printf(const_cast<char*>(sAmemCacheSeparator));
             }
-            m_stage->heapWalker(-1, nullptr, static_cast<unsigned long>(-1));
+            m_rStage->heapWalker(-1, nullptr, static_cast<unsigned long>(-1));
         }
     }
 }
@@ -2204,21 +2204,21 @@ void CAmemCacheSet::RefCnt0Compare()
  */
 void CAmemCacheSet::AssertCache()
 {
-    if (2 < (unsigned int)System.m_execParam) {
+    if (static_cast<unsigned int>(System.m_execParam) >= 3) {
         System.Printf(const_cast<char*>(sAmemCacheAddRefFmt));
     }
 
     for (int i = 0; i < m_cacheCount; i++) {
         CAmemCache& entry = cacheEntryAt(this, i);
         int data = reinterpret_cast<int>(entry.m_cacheData);
-        if ((entry.m_inUse != 0 || data != 0) && (2 < (unsigned int)System.m_execParam)) {
+        if ((entry.m_inUse != 0 || data != 0) && (static_cast<unsigned int>(System.m_execParam) >= 3)) {
             System.Printf(
                 const_cast<char*>(sAmemCacheEntryFmt), i, cacheStateName(entry),
                 cacheTypeName(entry), entry.m_refCount, entry.m_priority, data);
         }
     }
 
-    if (2 < (unsigned int)System.m_execParam) {
+    if (static_cast<unsigned int>(System.m_execParam) >= 3) {
         System.Printf(const_cast<char*>(sAmemCacheSeparator));
     }
 }

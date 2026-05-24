@@ -36,30 +36,30 @@ unsigned int CMaterialEditorPcs::m_table_desc0[3] = {0, 0xFFFFFFFF, reinterpret_
 unsigned int CMaterialEditorPcs::m_table_desc1[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroyViewer__18CMaterialEditorPcsFv)};
 unsigned int CMaterialEditorPcs::m_table_desc2[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__18CMaterialEditorPcsFv)};
 unsigned int CMaterialEditorPcs::m_table_desc3[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__18CMaterialEditorPcsFv)};
+u8 gMaterialEditorPcsGuard[0xC];
+CMaterialEditorPcs MaterialEditorPcs;
 
 unsigned int CMaterialEditorPcs::m_table[0x15C / sizeof(unsigned int)] = {
     reinterpret_cast<unsigned int>(const_cast<char*>(s_CMaterialEditorPcsViewer)),
-    0,
-    0xFFFFFFFF,
-    reinterpret_cast<unsigned int>(createViewer__18CMaterialEditorPcsFv),
-    0,
-    0xFFFFFFFF,
-    reinterpret_cast<unsigned int>(destroyViewer__18CMaterialEditorPcsFv),
-    0,
-    0xFFFFFFFF,
-    reinterpret_cast<unsigned int>(calcViewer__18CMaterialEditorPcsFv),
+    m_table_desc0[0],
+    m_table_desc0[1],
+    m_table_desc0[2],
+    m_table_desc1[0],
+    m_table_desc1[1],
+    m_table_desc1[2],
+    m_table_desc2[0],
+    m_table_desc2[1],
+    m_table_desc2[2],
     0x20,
     0,
-    0,
-    0xFFFFFFFF,
-    reinterpret_cast<unsigned int>(drawViewer__18CMaterialEditorPcsFv),
+    m_table_desc3[0],
+    m_table_desc3[1],
+    m_table_desc3[2],
     0x41,
     1
 };
 unsigned int s_CMaterialEditorPcsTablePad0[3] = {reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CManager_8032E648)), 0, 0};
 unsigned int s_CMaterialEditorPcsTablePad1[5] = {reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CManager_8032E648)), 0, reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CProcess_8032E650)), 0, 0};
-u8 gMaterialEditorPcsGuard[0xC];
-CMaterialEditorPcs MaterialEditorPcs;
 
 
 extern "C" const double DOUBLE_8032FCC0 = 1.0;

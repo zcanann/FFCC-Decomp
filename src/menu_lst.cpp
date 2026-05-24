@@ -263,7 +263,7 @@ int CMenuPcs::MLstCtrl()
 	bool blocked;
 	float one;
 	unsigned int press;
-	unsigned int hold;
+	u16 hold;
 	unsigned int itemCount;
 	unsigned int chunkCount;
 	int i;

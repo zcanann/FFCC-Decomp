@@ -421,7 +421,8 @@ CLightPcs::CBumpLight* CLightPcs::AddBump(CLightPcs::CLight* srcLight, CLightPcs
     bumpLight->m_textureCount = count;
 
     int texSize = GXGetTexBufferSize(0x40, 0x40, 3, 0, 0);
-    bumpLight->m_textureData = new (stage, const_cast<char*>(s_p_light_cpp), 0x13b) u8[texSize * count];
+    bumpLight->m_textureData =
+        static_cast<u8*>(Memory._Alloc(texSize * count, stage, const_cast<char*>(s_p_light_cpp), 0x13b, 0));
 
     int texOffset = 0;
     for (int i = 0; i < count; i++) {
@@ -814,6 +815,7 @@ void CLightPcs::CBumpLight::MakeLightMap()
     _GXColor chanMat;
     _GXColor chanAmb2;
     _GXColor chanMat2;
+    _GXColor lightColor = kBumpLightMapColor;
 
     unsigned char u0 = m_bumpShade[0];
     unsigned char u1 = m_bumpShade[1];
@@ -898,7 +900,6 @@ void CLightPcs::CBumpLight::MakeLightMap()
     }
 
     int copySize = GXGetTexBufferSize(0x40, 0x40, 3, 0, 0);
-    _GXColor lightColor = kBumpLightMapColor;
     double dScale = (double)FLOAT_8032fc40;
     double dHalf = (double)FLOAT_8032fc1c;
     static float tParam[4] = {48.0f, 128.0f, 256.0f, 512.0f};

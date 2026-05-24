@@ -642,7 +642,7 @@ unsigned int s_CMenuPcsTablePad1[5] = {
 void CMenuPcs::loadTexture(char** paths, int textureSetStart, int textureSetCount, CMenuPcs::CTmp* tmp,
                            int textureStart, int textureCount, int stageSelect)
 {
-    char texPath[0x10C];
+    char texPath[0x104];
     u8* self = reinterpret_cast<u8*>(this);
 
     for (int i = 0; i < textureSetCount; i++) {
@@ -654,7 +654,9 @@ void CMenuPcs::loadTexture(char** paths, int textureSetStart, int textureSetCoun
             File.SyncCompleted(fileHandle);
 
             CMemory::CStage* stage;
-            if ((*reinterpret_cast<int*>(self + 0x740) == 1) || (stageSelect == 3)) {
+            if (*reinterpret_cast<int*>(self + 0x740) == 1) {
+                stage = MapMng.m_stage;
+            } else if (stageSelect == 3) {
                 stage = MapMng.m_stage;
             } else {
                 if ((Game.m_gameWork.m_menuStageMode == 0) || (stageSelect == 0)) {
@@ -666,10 +668,11 @@ void CMenuPcs::loadTexture(char** paths, int textureSetStart, int textureSetCoun
                 }
             }
 
-            CTextureSet* textureSet = new (MenuPcs.m_menuStage, const_cast<char*>(s_p_menu_cpp), 0x182) CTextureSet;
-            *reinterpret_cast<CTextureSet**>(self + 0x14C + (textureSetStart + i) * 4) = textureSet;
+            *reinterpret_cast<CTextureSet**>(self + 0x14C + (textureSetStart + i) * 4) =
+                new (MenuPcs.m_menuStage, const_cast<char*>(s_p_menu_cpp), 0x182) CTextureSet;
 
-            textureSet->Create(File.m_readBuffer, stage, 0, 0, 0, 0);
+            (*reinterpret_cast<CTextureSet**>(self + 0x14C + (textureSetStart + i) * 4))
+                ->Create(File.m_readBuffer, stage, 0, 0, 0, 0);
 
             File.Close(fileHandle);
         }
@@ -678,9 +681,12 @@ void CMenuPcs::loadTexture(char** paths, int textureSetStart, int textureSetCoun
     }
 
     for (int i = 0; i < textureCount; i++) {
-        CTextureSet* textureSet = *reinterpret_cast<CTextureSet**>(self + 0x14C + tmp->m_textureSetIndex * 4);
-        const unsigned long textureIndex = static_cast<unsigned long>(textureSet->Find(tmp->m_textureName));
-        CTexture* texture = (*reinterpret_cast<CPtrArray<CTexture*>*>(reinterpret_cast<u8*>(textureSet) + 8))[textureIndex];
+        const unsigned long textureIndex =
+            static_cast<unsigned long>((*reinterpret_cast<CTextureSet**>(self + 0x14C + tmp->m_textureSetIndex * 4))
+                                           ->Find(tmp->m_textureName));
+        CTexture* texture =
+            (*reinterpret_cast<CPtrArray<CTexture*>*>(
+                reinterpret_cast<u8*>(*reinterpret_cast<CTextureSet**>(self + 0x14C + tmp->m_textureSetIndex * 4)) + 8))[textureIndex];
         *reinterpret_cast<int*>(reinterpret_cast<u8*>(texture) + 4) =
             *reinterpret_cast<int*>(reinterpret_cast<u8*>(texture) + 4) + 1;
         *reinterpret_cast<CTexture**>(self + 0x18C + (textureStart + i) * 4) = texture;
@@ -1923,8 +1929,7 @@ void CMenuPcs::drawBattle()
             const float left = screenX - static_cast<float>(halfWidth);
             const float bodyLeft = left + LoadFloat(FLOAT_80330820);
             const float alphaF = LoadFloat(FLOAT_80330824) * fade;
-            const u8 alpha = static_cast<u8>(alphaF);
-            const CColor frameColor(0xFF, 0xFF, 0xFF, alpha);
+            const CColor frameColor(0xFF, 0xFF, 0xFF, static_cast<u8>(alphaF));
             GXSetChanMatColor(GX_COLOR0A0, frameColor.color);
 
             if (LoadFloat(kMenuInitOne) < static_cast<float>(totalWidth)) {
@@ -1970,14 +1975,14 @@ void CMenuPcs::drawBattle()
                 MenuPcs.DrawRect(0, (left + static_cast<float>(totalWidth)) - LoadFloat(FLOAT_80330820), screenY, LoadFloat(FLOAT_80330820), LoadFloat(FLOAT_80330820), LoadFloat(kMenuInitOne), LoadFloat(kMenuInitOne), LoadFloat(FLOAT_80330808), LoadFloat(FLOAT_80330808), LoadFloat(kMenuInitOne));
             }
 
-            const u8 gauge = static_cast<u8>((m_battleHud.m_gaugeCounter * 0xFF) >> 4);
-            const CColor fillTop(0xFF, gauge, gauge, alpha);
+            const u8 gauge = static_cast<u8>((m_battleHud.m_gaugeCounter * 0xFF) / 16);
+            const CColor fillTop(0xFF, gauge, gauge, static_cast<u8>(alphaF));
             GXSetChanMatColor(GX_COLOR0A0, fillTop.color);
             TextureMan.SetTextureTev(0);
-            DrawRect(0, bodyLeft, screenY + LoadFloat(FLOAT_80330830), static_cast<float>(fillWidth), LoadFloat(FLOAT_8033082C), LoadFloat(kMenuInitOne), LoadFloat(kMenuInitOne), LoadFloat(FLOAT_80330808), LoadFloat(FLOAT_80330808), LoadFloat(kMenuInitOne));
+            DrawRect(0, bodyLeft, (screenY + LoadFloat(FLOAT_80330828)) - LoadFloat(FLOAT_80330808), static_cast<float>(fillWidth), LoadFloat(FLOAT_8033082C), LoadFloat(kMenuInitOne), LoadFloat(kMenuInitOne), LoadFloat(FLOAT_80330808), LoadFloat(FLOAT_80330808), LoadFloat(kMenuInitOne));
 
-            const u8 gaugeTop = static_cast<u8>(((m_battleHud.m_gaugeCounter * 0x7F) >> 4) + 0x80);
-            const CColor fillBottom(0xFF, gaugeTop, gauge, alpha);
+            const u8 gaugeTop = static_cast<u8>(((m_battleHud.m_gaugeCounter * 0x7F) / 16) + 0x80);
+            const CColor fillBottom(0xFF, gaugeTop, gauge, static_cast<u8>(alphaF));
             GXSetChanMatColor(GX_COLOR0A0, fillBottom.color);
             DrawRect(0, bodyLeft, screenY + LoadFloat(FLOAT_80330828), static_cast<float>(fillWidth), LoadFloat(FLOAT_80330830), LoadFloat(kMenuInitOne), LoadFloat(kMenuInitOne), LoadFloat(FLOAT_80330808), LoadFloat(FLOAT_80330808), LoadFloat(kMenuInitOne));
         }

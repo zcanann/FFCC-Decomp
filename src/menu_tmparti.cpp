@@ -60,7 +60,7 @@ static inline CFont* GetTmpArtiFont(CMenuPcs* menu)
 
 struct TmpArtiTableEntry {
     int count;
-    const char** strings;
+    char** strings;
     char* stringBuf;
 };
 
@@ -84,19 +84,19 @@ void CMenuPcs::TmpArtiDraw()
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
 	unsigned int scriptFood = Game.m_scriptFoodBase[0];
-	short* entry = reinterpret_cast<short*>(GetTmpArtiEntries(this));
+	TmpArtiEntry* entry = GetTmpArtiEntries(this);
 	unsigned int foodPtr = scriptFood;
 
 	for (int i = 0; i < GetTmpArtiList(this)->count; i++) {
-		int tex = *(int*)(entry + 0xE);
+		int tex = entry->tex;
 		if (tex >= 0) {
-			float alpha = *(float*)(entry + 8);
-			float left = (float)entry[0];
-			float top = (float)entry[1];
-			float width = (float)entry[2];
-			float height = (float)entry[3];
-			float s = *(float*)(entry + 4);
-			float t = *(float*)(entry + 6);
+			float alpha = entry->alpha;
+			float left = (float)entry->x;
+			float top = (float)entry->y;
+			float width = (float)entry->width;
+			float height = (float)entry->height;
+			float s = entry->s;
+			float t = entry->t;
 
 			if (*(short*)(foodPtr + 0x1F6) < 0) {
 				tex = 0x34;
@@ -112,23 +112,23 @@ void CMenuPcs::TmpArtiDraw()
 			color.a = (unsigned char)(int)(FLOAT_80332F28 * alpha);
 			GXSetChanMatColor(GX_COLOR0A0, color);
 
-			float z = *(float*)(entry + 10);
+			float z = entry->z;
 			MenuPcs.DrawRect(0, left, top, width, height, s, t, z, z, FLOAT_80332f2c);
 		}
 		foodPtr += 2;
-		entry += 0x20;
+		entry++;
 	}
 
-	entry = reinterpret_cast<short*>(GetTmpArtiEntries(this));
+	entry = GetTmpArtiEntries(this);
 	foodPtr = scriptFood;
 	for (int i = 0; i < 4; i++) {
 		short icon = *(short*)(foodPtr + 0x1F6);
 		if (icon >= 0) {
-			int posX = (int)TmpArtiIntToDouble(entry[0] + entry[2] - 0x10);
-			int posY = (int)((float)TmpArtiIntToDouble(entry[1] + 6) - FLOAT_80332f30);
-			DrawSingleIcon(icon, posX, posY, *(float*)(entry + 8), 0, FLOAT_80332f2c);
+			int posX = (int)TmpArtiIntToDouble(entry->x + entry->width - 0x10);
+			int posY = (int)((float)TmpArtiIntToDouble(entry->y + 6) - FLOAT_80332f30);
+			DrawSingleIcon(icon, posX, posY, entry->alpha, 0, FLOAT_80332f2c);
 		}
-		entry += 0x20;
+		entry++;
 		foodPtr += 2;
 	}
 
@@ -139,25 +139,25 @@ void CMenuPcs::TmpArtiDraw()
 	font->DrawInit();
 
 	const TmpArtiFlatData* flatData = (const TmpArtiFlatData*)&Game.m_cFlatDataArr[1];
-	entry = reinterpret_cast<short*>(GetTmpArtiEntries(this));
+	entry = GetTmpArtiEntries(this);
 	foodPtr = scriptFood;
 	for (int i = 0; i < 4; i++) {
 		if (*(short*)(foodPtr + 0x1F6) >= 0) {
-			float alpha = *(float*)(entry + 8);
+			float alpha = entry->alpha;
 			CColor textColor(0xFF, 0xFF, 0xFF, (unsigned char)(int)(FLOAT_80332F28 * alpha));
 			font->SetColor(textColor.color);
 
 			const char* text = flatData->table[0].strings[*(short*)(foodPtr + 0x1F6) * 5 + 4];
 			float width = font->GetWidth(text);
-			float posX = (float)(((TmpArtiIntToDouble(entry[2]) - width) * DOUBLE_80332f20) +
-			                       TmpArtiIntToDouble(entry[0]));
-			double posY = TmpArtiIntToDouble(entry[1] + 11);
+			float posX = (float)(((TmpArtiIntToDouble(entry->width) - width) * DOUBLE_80332f20) +
+			                       TmpArtiIntToDouble(entry->x));
+			double posY = TmpArtiIntToDouble(entry->y + 11);
 
 			font->SetPosX(posX);
 			font->SetPosY((float)posY - FLOAT_80332F38);
 			font->Draw(text);
 		}
-		entry += 0x20;
+		entry++;
 		foodPtr += 2;
 	}
 
@@ -181,6 +181,7 @@ unsigned int CMenuPcs::TmpArtiClose()
 	unsigned int itemCount;
 	int currentFrame;
 	unsigned int count;
+	unsigned int result;
 
 	completedItems = 0;
 	this->m_tmpArtiState->frame = this->m_tmpArtiState->frame + 1;
@@ -204,6 +205,7 @@ unsigned int CMenuPcs::TmpArtiClose()
 		entry++;
 	}
 
+	result = 0;
 	if (this->m_tmpArtiList->count == completedItems) {
 		zero = FLOAT_80332f2c;
 		entry = this->m_tmpArtiList->entries;
@@ -247,10 +249,10 @@ unsigned int CMenuPcs::TmpArtiClose()
 				} while (itemCount != 0);
 			}
 		}
-		return 1;
+		result = 1;
 	}
 
-	return 0;
+	return result;
 }
 
 /*
@@ -391,6 +393,7 @@ unsigned int CMenuPcs::TmpArtiOpen()
 	unsigned int itemCount;
 	int currentFrame;
 	unsigned int count;
+	unsigned int result;
 
 	if (this->m_tmpArtiState->initialized == '\0') {
 		memset(this->m_tmpArtiList, 0, sizeof(TmpArtiList));
@@ -462,6 +465,7 @@ unsigned int CMenuPcs::TmpArtiOpen()
 		entry++;
 	}
 
+	result = 0;
 	if (this->m_tmpArtiList->count == completedItems) {
 		one = FLOAT_80332f30;
 		entry = this->m_tmpArtiList->entries;
@@ -505,8 +509,8 @@ unsigned int CMenuPcs::TmpArtiOpen()
 				} while (itemCount != 0);
 			}
 		}
-		return 1;
+		result = 1;
 	}
 
-	return 0;
+	return result;
 }

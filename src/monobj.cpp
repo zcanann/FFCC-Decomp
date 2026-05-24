@@ -3541,39 +3541,51 @@ void CGMonObj::onChangePrg(int value)
 	CGObject* object = reinterpret_cast<CGObject*>(this);
 	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
 
-	if ((((char)object->m_weaponNodeFlags) >> 7) != value &&
+	unsigned int weaponModeBits = (static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(&object->m_weaponNodeFlags)) << 24) & 0xC0000000;
+	if ((static_cast<int>(weaponModeBits) >> 31) != value &&
 		(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xFC) == 0xB)) {
+		unsigned int isUndead =
+			(static_cast<unsigned int>(
+				 __cntlzw(0xB - *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xFC))) >>
+			 5) &
+			0xFF;
+		unsigned int isNormal = (static_cast<unsigned int>(__cntlzw(mon[0x6BA])) >> 5) & 0xFF;
+		int mode = value;
+		if (isUndead == 0) {
+			mode = 1;
+		}
+
 		reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x1000);
 
-		unsigned short count = *reinterpret_cast<unsigned short*>(
-			reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + (value != 0 ? 0x1AC : 0x1AE)
-		);
-		int particleBase = (value != 0) ? 0x46 : 0x3C;
-
-		void* pdtLoadRef = nullptr;
-		if (object->m_charaModelHandle != nullptr) {
-			pdtLoadRef = object->m_charaModelHandle->m_pdtLoadRef;
+		int count = (mode != 0) ?
+			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1AC) :
+			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1AE);
+		int particleBase = 0x3C;
+		if (mode != 0) {
+			particleBase = 0x46;
 		}
-		int dataNo = (pdtLoadRef != nullptr) ? reinterpret_cast<int*>(pdtLoadRef)[5] : -1;
-		int modelSlot = *reinterpret_cast<int*>(mon + 0x594);
 
-		if (mon[0x6BA] != 0) {
-			if (count != 0) {
+		if (isNormal == 0) {
+			if ((isUndead != 0) && (count != 0)) {
+				void* pdtLoadRef = object->m_charaModelHandle->m_pdtLoadRef;
+				int dataNo = (pdtLoadRef != nullptr) ? reinterpret_cast<int*>(pdtLoadRef)[5] : -1;
 				reinterpret_cast<CGPrgObj*>(this)->putParticleBindTrace(
 					(particleBase + 9) | (dataNo << 8),
-					modelSlot,
+					*reinterpret_cast<int*>(mon + 0x594),
 					object,
-					0.0f,
+					FLOAT_803319C0,
 					0
 				);
 			}
 		} else {
-			for (int i = 0; i < (int)count; i++) {
+			for (int i = 0; i < static_cast<int>(count); i++) {
+				void* pdtLoadRef = object->m_charaModelHandle->m_pdtLoadRef;
+				int dataNo = (pdtLoadRef != nullptr) ? reinterpret_cast<int*>(pdtLoadRef)[5] : -1;
 				reinterpret_cast<CGPrgObj*>(this)->putParticleBindTrace(
 					(particleBase + i) | (dataNo << 8),
-					modelSlot,
+					*reinterpret_cast<int*>(mon + 0x594),
 					object,
-					0.0f,
+					FLOAT_803319C0,
 					0
 				);
 			}

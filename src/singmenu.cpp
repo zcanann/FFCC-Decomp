@@ -455,15 +455,15 @@ extern char s_Degats_magiq_801DE58C[];
 extern char s_Rend_inebranlable_801DE59C[];
 extern char s_Anti_frio_801DE5BC[];
 extern char s_Danos_magicos_801DE68C[];
-extern char lbl_803321BC[], lbl_803321C0[], lbl_803321C4[], lbl_803321CC[];
-extern char lbl_803321D0[], lbl_803321D8[], lbl_803321E0[], lbl_803321E8[];
-extern char lbl_803321F0[], lbl_803321F8[], lbl_80332200[], lbl_80332208[];
-extern char lbl_8033220C[], lbl_80332214[], lbl_8033221C[], lbl_80332224[];
-extern char lbl_8033222C[], lbl_80332230[], lbl_80332234[], lbl_80332238[];
-extern char lbl_80332240[], lbl_80332248[], lbl_80332250[], lbl_80332258[];
-extern char lbl_80332260[], lbl_80332264[], lbl_8033226C[], lbl_80332274[];
-extern char lbl_8033227C[], lbl_80332284[], lbl_8033228C[], lbl_80332294[];
-extern char lbl_8033229C[], lbl_803322A4[], lbl_803322AC[], lbl_803322B4[];
+extern char s_Yes_803321BC[], lbl_803321C0[], s_Cancel_803321C4[], s_gil_803321CC[];
+extern char s_Defence_803321D0[], s_Magic_803321D8[], s_Attack_803321E0[], s_Defend_803321E8[];
+extern char s_Remove_803321F0[], s_Fuse_803321F8[], s_Split_80332200[], s_Use_80332208[];
+extern char s_Drop_8033220C[], s_Destroy_80332214[], s_Male_8033221C[], s_Female_80332224[];
+extern char s_All_8033222C[], lbl_80332230[], lbl_80332234[], s_Father_80332238[];
+extern char s_Mother_80332240[], s_Brother_80332248[], s_Sister_80332250[], s_Letters_80332258[];
+extern char lbl_80332260[], s_Send_80332264[], s_Confirm_8033226C[], lbl_80332274[];
+extern char s_Gender_8033227C[], s_Tribe_80332284[], s_Items_8033228C[], s_Equip_80332294[];
+extern char s_Money_8033229C[], s_Family_803322A4[], s_Done_803322AC[], lbl_803322B4[];
 extern char lbl_803322B8[], lbl_803322C0[], lbl_803322C4[], lbl_803322CC[];
 extern char lbl_803322D4[], lbl_803322DC[], lbl_803322E4[], lbl_803322E8[];
 extern char lbl_803322F0[], lbl_803322F8[], lbl_80332300[], lbl_80332308[];
@@ -551,20 +551,20 @@ extern "C" char* PTR_s_Herrero[] = {
     s_Molinero_801DD7E4, s_Pescador_801DD7F0, s_Comerciante_801DD7FC, s_Alquimista_801DD808,
 };
 extern "C" char* gSingMenuTextTableEn[] = {
-    lbl_803321B8, lbl_803321BC, lbl_803321C0, lbl_803321C4,
-    lbl_803321CC, s_Strength_801DD814, lbl_803321D0, lbl_803321D8,
-    s_Memories_801DD820, lbl_803321E0, lbl_803321E8, lbl_803321F0,
-    lbl_803321F8, lbl_80332200, lbl_80332208, lbl_8033220C,
-    lbl_80332214, lbl_8033221C, lbl_80332224, lbl_8033222C,
-    lbl_80332230, lbl_80332234, lbl_80332238, lbl_80332240,
-    lbl_80332248, lbl_80332250, lbl_80332248, lbl_80332250,
-    lbl_803321B8, lbl_80332258, s_Send_item_801DD82C, s_Send_gil_801DD838,
+    lbl_803321B8, s_Yes_803321BC, lbl_803321C0, s_Cancel_803321C4,
+    s_gil_803321CC, s_Strength_801DD814, s_Defence_803321D0, s_Magic_803321D8,
+    s_Memories_801DD820, s_Attack_803321E0, s_Defend_803321E8, s_Remove_803321F0,
+    s_Fuse_803321F8, s_Split_80332200, s_Use_80332208, s_Drop_8033220C,
+    s_Destroy_80332214, s_Male_8033221C, s_Female_80332224, s_All_8033222C,
+    lbl_80332230, lbl_80332234, s_Father_80332238, s_Mother_80332240,
+    s_Brother_80332248, s_Sister_80332250, s_Brother_80332248, s_Sister_80332250,
+    lbl_803321B8, s_Letters_80332258, s_Send_item_801DD82C, s_Send_gil_801DD838,
     s_Send_nothing_801DD844, s_Proceed_801DD854, s_Take_out_801DD860, lbl_80332260,
-    lbl_80332260, lbl_80332264, s_the_reply_801DD86C, lbl_803321B8,
-    s_Include_801DD878, lbl_8033226C, lbl_80332274, lbl_8033227C,
-    lbl_80332284, s_Family_Trade_801DD884, s_Command_List_801DD894, lbl_8033228C,
-    lbl_80332294, s_Artefacts_801DD8A4, s_Treasures_801DD8B0, lbl_8033229C,
-    s_Favourites_801DD8BC, lbl_803322A4, lbl_80332258, lbl_803322AC,
+    lbl_80332260, s_Send_80332264, s_the_reply_801DD86C, lbl_803321B8,
+    s_Include_801DD878, s_Confirm_8033226C, lbl_80332274, s_Gender_8033227C,
+    s_Tribe_80332284, s_Family_Trade_801DD884, s_Command_List_801DD894, s_Items_8033228C,
+    s_Equip_80332294, s_Artefacts_801DD8A4, s_Treasures_801DD8B0, s_Money_8033229C,
+    s_Favourites_801DD8BC, s_Family_803322A4, s_Letters_80332258, s_Done_803322AC,
 };
 extern "C" char* gSingMenuTextTableDe[] = {
     lbl_803321B8, lbl_803322B4, lbl_803322B8, s_Abbrechen_801DD8C8,

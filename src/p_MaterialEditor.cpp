@@ -1,3 +1,4 @@
+#define FFCC_DEFINE_MATERIALEDITORPCS_STORAGE
 #include "ffcc/p_MaterialEditor.h"
 #include "ffcc/p_usb.h"
 #include "ffcc/p_camera.h"
@@ -21,6 +22,8 @@ extern "C" void destroyViewer__18CMaterialEditorPcsFv(CMaterialEditorPcs*);
 extern "C" void calcViewer__18CMaterialEditorPcsFv(CMaterialEditorPcs*);
 extern "C" void drawViewer__18CMaterialEditorPcsFv(CMaterialEditorPcs*);
 extern "C" void __dt__18CMaterialEditorPcsFv(void* self);
+extern void* __vt__8CManager[];
+extern void* __vt__18CMaterialEditorPcs[];
 extern const char __RTTI__8CManager_8032E648[];
 extern const char __RTTI__8CProcess_8032E650[];
 extern "C" const char s_CMaterialEditorPcsViewer[] = "CMaterialEditorPcs(VIEWER)";
@@ -45,7 +48,7 @@ unsigned int CMaterialEditorPcs::m_table[0x15C / sizeof(unsigned int)] = {
 unsigned int s_CMaterialEditorPcsTablePad0[3] = {reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CManager_8032E648)), 0, 0};
 unsigned int s_CMaterialEditorPcsTablePad1[5] = {reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CManager_8032E648)), 0, reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CProcess_8032E650)), 0, 0};
 u8 gMaterialEditorPcsGuard[0xC];
-CMaterialEditorPcs MaterialEditorPcs;
+u8 MaterialEditorPcs[sizeof(CMaterialEditorPcs)];
 
 
 extern "C" const double DOUBLE_8032FCC0 = 1.0;
@@ -766,8 +769,13 @@ void CMaterialEditorPcs::Init()
  */
 extern "C" void __sinit_p_MaterialEditor_cpp(void)
 {
-    CMaterialEditorPcs* pcs = new (&MaterialEditorPcs) CMaterialEditorPcs;
-    u8* self = reinterpret_cast<u8*>(pcs);
+    u8* self = MaterialEditorPcs;
+    *reinterpret_cast<void***>(self) = __vt__8CManager;
+    *reinterpret_cast<void***>(self) = __vt__8CProcess;
+    *reinterpret_cast<void***>(self) = __vt__18CMaterialEditorPcs;
+    new (self + 0x84) CUSBStreamData;
+    new (self + 0xC8) ZLIST;
+    new (self + 0xD8) ZLIST;
     unsigned int* dst = CMaterialEditorPcs::m_table;
     unsigned int* desc0 = CMaterialEditorPcs::m_table_desc0;
     unsigned int* desc1 = CMaterialEditorPcs::m_table_desc1;

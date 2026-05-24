@@ -450,8 +450,8 @@ void pppDestructCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkC* data)
                 pppHeapUseRate((CMemory::CStage*)*meshBufferSlot);
                 *meshBufferSlot = NULL;
             }
-            meshBufferSlot++;
             mesh += 0x14;
+            meshBufferSlot++;
         }
     }
 

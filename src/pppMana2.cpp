@@ -1237,18 +1237,15 @@ void pppDestructMana2(pppMana2* pppMana2, pppMana2UnkC* param_2)
     CGObject* gObject;
     CCharaPcs::CHandle* handle;
     CChara::CModel* model;
+    u8* modelBytes;
     s32 meshEntry;
     s32 step;
     u32 i;
     u32 j;
 
-    work = (u32*)((char*)pppMana2 + 0x80 + *(s32*)((char*)param_2 + 0xC));
-    gObject = (CGObject*)pppMngStPtr->m_lookTarget;
-    if (gObject != NULL) {
-        handle = GetCharaHandlePtr(gObject, 0);
-        model = GetCharaModelPtr(handle);
-        ClearMana2ModelCallbacks(model);
-    }
+    work = (u32*)((char*)pppMana2 + 0x80 + param_2->m_serializedDataOffsets[2]);
+    *(u32*)(MaterialManRaw() + 0xD0) = 0;
+    *(u32*)(MaterialManRaw() + 0xDC) = 0;
 
     if (work[10] != 0) {
         pppHeapUseRate((CMemory::CStage*)work[10]);
@@ -1298,10 +1295,6 @@ void pppDestructMana2(pppMana2* pppMana2, pppMana2UnkC* param_2)
         pppHeapUseRate((CMemory::CStage*)work[22]);
         work[22] = 0;
     }
-    if (work[23] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[23]);
-        work[23] = 0;
-    }
     if (work[29] != 0) {
         pppHeapUseRate((CMemory::CStage*)work[29]);
         work[29] = 0;
@@ -1309,6 +1302,10 @@ void pppDestructMana2(pppMana2* pppMana2, pppMana2UnkC* param_2)
     if (work[9] != 0) {
         pppHeapUseRate((CMemory::CStage*)work[9]);
         work[9] = 0;
+    }
+    if (work[23] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[23]);
+        work[23] = 0;
     }
     if (work[17] != 0) {
         pppHeapUseRate((CMemory::CStage*)work[17]);
@@ -1326,26 +1323,15 @@ void pppDestructMana2(pppMana2* pppMana2, pppMana2UnkC* param_2)
         pppHeapUseRate((CMemory::CStage*)work[27]);
         work[27] = 0;
     }
-    if (work[28] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[28]);
-        work[28] = 0;
-    }
-    if (work[30] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[30]);
-        work[30] = 0;
-    }
-    if (work[31] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[31]);
-        work[31] = 0;
-    }
-    if (work[0x1D] != 0) {
-        pppHeapUseRate((CMemory::CStage*)work[0x1D]);
-        work[0x1D] = 0;
-    }
-
-    meshEntry = *(s32*)(model + 0xAC);
+    gObject = (CGObject*)pppMngStPtr->m_lookTarget;
+    handle = GetCharaHandlePtr(gObject, 0);
+    model = GetCharaModelPtr(handle);
+    modelBytes = reinterpret_cast<u8*>(model);
+    model->m_afterMeshDrawCallback = 0;
+    model->m_drawMeshDLCallback = 0;
+    meshEntry = *(s32*)(modelBytes + 0xAC);
     step = work[0x1C];
-    for (i = 0; i < *(u32*)(*(s32*)(model + 0xA4) + 0xC); i++) {
+    for (i = 0; i < *(u32*)(*(s32*)(modelBytes + 0xA4) + 0xC); i++) {
         u8 stepType = *(u8*)(step + 0x1C);
         s32 shape = *(s32*)(meshEntry + 8);
 

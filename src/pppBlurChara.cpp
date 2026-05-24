@@ -134,8 +134,7 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
     cameraTarget.x = CameraPcs.m_targetX;
     cameraTarget.y = CameraPcs.m_targetY;
     cameraTarget.z = CameraPcs.m_targetZ;
-    cameraPos.y = FLOAT_80331030;
-    cameraTarget.y = FLOAT_80331030;
+    cameraTarget.y = cameraPos.y = FLOAT_80331030;
     PSVECSubtract(&cameraTarget, &cameraPos, &cameraDir);
     cameraDir.y = FLOAT_80331030;
 
@@ -194,11 +193,11 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
     GXSetCurrentMtx(0);
 
     PSMTX44Identity(projection);
-    projection[2][2] = FLOAT_8033103c;
     projection[0][0] = FLOAT_80331034;
     projection[1][1] = FLOAT_80331038;
+    projection[2][2] = FLOAT_8033103c;
     projection[0][3] = FLOAT_80331040;
-    projection[1][3] = FLOAT_8033103c;
+    projection[1][3] = projection[2][2];
     projection[2][3] = FLOAT_80331030;
     GXSetProjection(projection, GX_ORTHOGRAPHIC);
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);

@@ -1213,7 +1213,7 @@ void CCameraPcs::GetWorldMapMatrix(float (*matrix)[4])
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMapPcs::IsHitDrawMode(unsigned char drawMode)
+void CMapPcs::IsHitDrawMode(char drawMode)
 {
     gMapHitDrawMode.m_byte = drawMode;
 }

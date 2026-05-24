@@ -62,7 +62,7 @@ public:
     void drawAfterViewer();
     void CalcHitPosition(Vec*);
     int CheckHitCylinderNear(Vec*, Vec*, float, unsigned long);
-    void IsHitDrawMode(unsigned char);
+    void IsHitDrawMode(char);
 
 private:
     Mtx m_viewMtx;                       // 0x04

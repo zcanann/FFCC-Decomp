@@ -551,23 +551,21 @@ void CMaterialEditorPcs::destroyViewer()
     GXSetCopyClear(clear, 0xffffff);
 
     m_usbStream.DeleteBuffer();
-    MemFree(reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(this) + 0xbc)));
-    unsigned int uVar2;
-    CMaterialEditorPcs* pCVar1 = this;
+    MemFree(reinterpret_cast<void*>(m_rsdIndex));
+    m_loadedTextureCount = 0;
 
-    reinterpret_cast<unsigned char*>(this)[0x3bc] = static_cast<unsigned char>(uVar2 = 0);
+    unsigned int textureIndex = 0;
     do {
-        MemFree(reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(pCVar1) + 0x2bc)));
-        MemFree(reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(pCVar1) + 0x2fc)));
-        MemFree(reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(pCVar1) + 0x23c)));
-        MemFree(reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(pCVar1) + 0x33c)));
-        MemFree(reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(pCVar1) + 0x37c)));
-        MemFree(reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(pCVar1) + 0x27c)));
-        uVar2 += 1;
-        pCVar1 = reinterpret_cast<CMaterialEditorPcs*>(reinterpret_cast<unsigned char*>(pCVar1) + 4);
-    } while (uVar2 < 0x10);
+        MemFree(m_textureData[textureIndex]);
+        MemFree(m_tlutData[textureIndex]);
+        MemFree(m_texObj[textureIndex]);
+        MemFree(m_tlutObj0[textureIndex]);
+        MemFree(m_tlutObj1[textureIndex]);
+        MemFree(m_textureHeader[textureIndex]);
+        textureIndex += 1;
+    } while (textureIndex < 0x10);
 
-    Memory.DestroyStage(reinterpret_cast<CMemory::CStage*>(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(this) + 0x4)));
+    Memory.DestroyStage(m_stage);
 }
 /*
  * --INFO--
@@ -628,31 +626,21 @@ int CMaterialEditorPcs::GetTable(unsigned long index)
  */
 void CMaterialEditorPcs::Quit()
 {
-    unsigned int i;
-    CMaterialEditorPcs* cursor = this;
-
-    *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(this) + 0x3BC) = static_cast<unsigned char>(i = 0);
+    unsigned int textureIndex;
+    m_loadedTextureCount = static_cast<s8>(textureIndex = 0);
 
     do {
-        MemFree(reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(
-                                                   reinterpret_cast<unsigned char*>(cursor) + 0x2BC)));
-        MemFree(reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(
-                                                   reinterpret_cast<unsigned char*>(cursor) + 0x2FC)));
-        MemFree(reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(
-                                                   reinterpret_cast<unsigned char*>(cursor) + 0x23C)));
-        MemFree(reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(
-                                                   reinterpret_cast<unsigned char*>(cursor) + 0x33C)));
-        MemFree(reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(
-                                                   reinterpret_cast<unsigned char*>(cursor) + 0x37C)));
-        MemFree(reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(
-                                                   reinterpret_cast<unsigned char*>(cursor) + 0x27C)));
-        i += 1;
-        cursor = reinterpret_cast<CMaterialEditorPcs*>(reinterpret_cast<unsigned char*>(cursor) + 4);
-    } while (i < 0x10);
+        MemFree(m_textureData[textureIndex]);
+        MemFree(m_tlutData[textureIndex]);
+        MemFree(m_texObj[textureIndex]);
+        MemFree(m_tlutObj0[textureIndex]);
+        MemFree(m_tlutObj1[textureIndex]);
+        MemFree(m_textureHeader[textureIndex]);
+        textureIndex += 1;
+    } while (textureIndex < 0x10);
 
-    unsigned int textureBlock = *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(this) + 0xBC);
-    if (textureBlock != 0) {
-        MemFree(reinterpret_cast<void*>(textureBlock));
+    if (m_rsdIndex != 0) {
+        MemFree(reinterpret_cast<void*>(m_rsdIndex));
     }
 }
 /*

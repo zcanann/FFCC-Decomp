@@ -141,6 +141,9 @@ static const char* l_tError[4][6][3] = {
     },
 };
 
+extern const char __RTTI__8CManager_8032E3C0[];
+unsigned int s_CManagerTablePad0[3] = {reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CManager_8032E3C0)), 0, 0};
+
 /*
  * --INFO--
  * Address:	TODO

@@ -9,7 +9,7 @@ class CUSBPcs : public CProcess
 {
 public:
     class CDataHeader;
-    static unsigned int m_table[0x15C / sizeof(unsigned int)];
+    static unsigned int m_table[0x11C / sizeof(unsigned int)];
 
     CUSBPcs();
 

@@ -9,6 +9,7 @@ extern const char s_CPtrArrayFile[] = "collection_ptrarray.h";
 #undef FFCC_PTRARRAY_FILE
 
 #include "ffcc/map.h"
+#include "ffcc/mapanim.h"
 #include "ffcc/chunkfile.h"
 #include "ffcc/maphit.h"
 #include "ffcc/mapmesh.h"
@@ -640,21 +641,21 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             U8At(this, 0x1C) = 1;
             U8At(this, 0x1B) = 1;
         } else if (chunk.m_id == CHUNK_ANIM) {
-            unsigned char* animRun = reinterpret_cast<unsigned char*>(
-                operator new(0x14, MapMng.m_stage, "mapobj.cpp", 0x21E));
+            CMapAnimRun* animRun = static_cast<CMapAnimRun*>(
+                operator new(sizeof(CMapAnimRun), MapMng.m_stage, "mapobj.cpp", 0x21E));
             if (animRun != 0) {
-                *reinterpret_cast<int*>(animRun) = -1;
-                *reinterpret_cast<unsigned short*>(animRun + 0x12) = static_cast<unsigned short>(chunkFile.Get4());
-                *reinterpret_cast<int*>(animRun + 0x4) = static_cast<int>(chunkFile.Get4());
-                *reinterpret_cast<int*>(animRun + 0x8) = static_cast<int>(chunkFile.Get4());
-                *reinterpret_cast<int*>(animRun + 0xC) = static_cast<int>(chunkFile.Get4());
-                *(animRun + 0x10) = chunkFile.Get1();
+                animRun->m_currentFrame = -1;
+                animRun->m_mapAnimIndex = static_cast<unsigned short>(chunkFile.Get4());
+                animRun->m_startFrame = static_cast<int>(chunkFile.Get4());
+                animRun->m_endFrame = static_cast<int>(chunkFile.Get4());
+                animRun->m_triggerFrame = static_cast<int>(chunkFile.Get4());
+                animRun->m_loop = chunkFile.Get1();
                 if (chunk.m_version == 1) {
-                    *(animRun + 0x11) = chunkFile.Get1();
+                    animRun->m_animId = chunkFile.Get1();
                 } else {
-                    *(animRun + 0x11) = 0;
+                    animRun->m_animId = 0;
                 }
-                MapMng.GetMapAnimRunArray().Add(reinterpret_cast<CMapAnimRun*>(animRun));
+                MapMng.GetMapAnimRunArray().Add(animRun);
             }
         } else if (chunk.m_id == CHUNK_MIME) {
             if (PtrAt(this, 0xEC) != 0) {

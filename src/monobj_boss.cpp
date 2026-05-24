@@ -59,8 +59,8 @@ extern char SoundBuffer[];
 extern char SoundBuffer_1260_[];
 extern "C" float MG_GBA_THREAD_MSG_SETPORT_ct;
 extern "C" char g_errCt;
-extern "C" Vec DAT_802127c0;
-extern "C" Vec DAT_802127f0[];
+extern "C" Vec gGoblinKingTeleportPoints;
+extern "C" Vec gLichTeleportPoints[];
 
 static const char s_to_a_obj_801dd4e8[] = "to_a_obj";
 static const char s_to_b_obj_801dd4f4[] = "to_b_obj";
@@ -748,7 +748,7 @@ void CGMonObj::frameStatFuncGoblinKing()
 	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
 	switch (prgObj->m_lastStateId) {
 	case 100:
-		teleport(0, 0xd, 8, 0x42, 0xa03e, 0xa03f, 3, 4, 5, &DAT_802127c0,
+		teleport(0, 0xd, 8, 0x42, 0xa03e, 0xa03f, 3, 4, 5, &gGoblinKingTeleportPoints,
 		         *reinterpret_cast<int*>(SoundBuffer_1260_), *reinterpret_cast<Vec*>(SoundBuffer_1260_ + 4));
 		break;
 	}
@@ -1289,7 +1289,7 @@ void CGMonObj::frameStatFuncLich()
 			}
 		}
 	} else if (stat < 0x65 && stat > 99) {
-		teleport(1, 0x0E, 0x29, 100, 0x11578, 0x11579, 0x2D, 0x2B, 0x2C, DAT_802127f0,
+		teleport(1, 0x0E, 0x29, 100, 0x11578, 0x11579, 0x2D, 0x2B, 0x2C, gLichTeleportPoints,
 		         *reinterpret_cast<int*>(SoundBuffer_1260_), *reinterpret_cast<Vec*>(SoundBuffer_1260_ + 4));
 	}
 }

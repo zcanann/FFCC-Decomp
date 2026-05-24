@@ -82,7 +82,7 @@ extern "C" double DOUBLE_80333298;
 extern "C" double DOUBLE_803333a0;
 extern "C" double DOUBLE_803333b8;
 extern "C" double DOUBLE_803333c0;
-extern "C" int DAT_8032ef10;
+extern "C" int gCmakePreviousStep;
 extern "C" char s_menuSubfontPathFmt[];
 extern "C" char* PTR_s_world2[];
 extern "C" CMenuPcs::CTmp s_cmakeWorldTextureTable[];
@@ -470,7 +470,7 @@ void CMenuPcs::CalcSingCMake()
         memset(&s_CmakeInfo, 0, sizeof(s_CmakeInfo));
         *reinterpret_cast<unsigned char*>(state + 0x0B) = 1;
         *reinterpret_cast<unsigned char*>(state + 0x0C) = 0;
-        DAT_8032ef10 = -1;
+        gCmakePreviousStep = -1;
         *reinterpret_cast<short*>(MenuS32(this, 0x848) + 10) = 3;
     }
 
@@ -895,7 +895,7 @@ void CMenuPcs::DrawSingCMake()
         return;
     }
 
-    DAT_8032ef10 = static_cast<int>(step);
+    gCmakePreviousStep = static_cast<int>(step);
 
     if (step == 6) {
         step = static_cast<short>(*reinterpret_cast<short*>(state + 0x26) + 1);
@@ -1546,7 +1546,7 @@ void CMenuPcs::CmakeCtrl()
         return;
     }
 
-    DAT_8032ef10 = static_cast<int>(step);
+    gCmakePreviousStep = static_cast<int>(step);
 
     if (step == 6) {
         step = static_cast<short>(*reinterpret_cast<short*>(state + 0x26) + 1);
@@ -1806,7 +1806,7 @@ void CMenuPcs::CmakeNameDraw()
     float previewAlpha = alpha;
     float titleX = FLOAT_80333258;
     float titleAlpha = alpha;
-    if (((DAT_8032ef10 == 2) && (mode == 0)) || ((mode == 2) && (resultDir > 0))) {
+    if (((gCmakePreviousStep == 2) && (mode == 0)) || ((mode == 2) && (resultDir > 0))) {
         previewAlpha = FLOAT_80333258;
     }
     if ((mode == 2) && (resultDir > 0)) {

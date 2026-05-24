@@ -37,7 +37,7 @@ void MakeAgbString__4CMesFPcPcii(char*, char*, int, int);
 }
 
 char s_shopmenu_cpp[] = "shopmenu.cpp";
-extern char DAT_80332e54[];
+extern char s_shop_80332e54[];
 unsigned short gShopMenuInputLatch;
 __declspec(section ".sdata2") CShopMenu* g_shopMenu;
 extern float FLOAT_80332d28;
@@ -89,17 +89,17 @@ extern double DOUBLE_80332DA8;
 extern double DOUBLE_80332DB0;
 extern double DOUBLE_80332DB8;
 extern double DOUBLE_80332DC0;
-extern unsigned int DAT_80332CFC;
-extern unsigned int DAT_80332D00;
-extern char DAT_80332d84[];
-extern char DAT_80332d14[];
-extern char DAT_80332d18[];
-extern char DAT_80332d30[];
-extern char DAT_80332d38[];
-extern char DAT_80332d40[];
-extern char DAT_80332d44[];
-extern char DAT_80332d4c[];
-extern char DAT_80332d50[];
+extern unsigned int gShopMenuAmbientWhite;
+extern unsigned int gShopMenuMaterialWhiteBase;
+extern char s_Slash_80332d84[];
+extern char s_DecimalFormat_80332d14[];
+extern char s_TwoDigitFormat_80332d18[];
+extern char s_Colon_80332d30[];
+extern char s_PlusOne_80332d38[];
+extern char s_StringFormat_80332d40[];
+extern char s_StringDecimalFormat_80332d44[];
+extern char s_Plus_80332d4c[];
+extern char s_Minus_80332d50[];
 extern "C" char* g_strShopMenuMes[];
 
 enum ShopMenuTextIndex {
@@ -443,7 +443,7 @@ static void SetupShopMenuAmountFont(CFont* font, _GXColor* color)
 static void DrawShopMenuAmount(CFont* font, int value, float rightEdge, float y, int tlut)
 {
     char amountBuffer[64];
-    sprintf(amountBuffer, DAT_80332d14, value);
+    sprintf(amountBuffer, s_DecimalFormat_80332d14, value);
     float amountWidth = GetWidth__5CFontFPc(font, amountBuffer);
     DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(MenuPcsVoid(), font, amountBuffer, rightEdge - amountWidth, y, tlut, 0x12);
     DrawInit__8CMenuPcsFv(MenuPcsVoid());
@@ -1021,16 +1021,16 @@ void CShopMenu::DrawItemInfo(int itemNo, int x, int y, int unused0, int attrY, i
         int fontColor = 9;
         if ((attr == 0) || (attr > 8)) {
             if ((attr == 0xB) || (attr == 0x11) || (attr == 0x12)) {
-                sprintf(textBuffer, DAT_80332d44, DAT_80332d4c, statValue);
+                sprintf(textBuffer, s_StringDecimalFormat_80332d44, s_Plus_80332d4c, statValue);
             } else {
                 if ((attr != 9) && (attr != 10) && (attr != 0xC)) {
                     return;
                 }
-                sprintf(textBuffer, DAT_80332d44, DAT_80332d50, statValue);
+                sprintf(textBuffer, s_StringDecimalFormat_80332d44, s_Minus_80332d50, statValue);
                 fontColor = 3;
             }
         } else {
-            sprintf(textBuffer, DAT_80332d40, DAT_80332d38);
+            sprintf(textBuffer, s_StringFormat_80332d40, s_PlusOne_80332d38);
         }
 
         SetScaleX__5CFontFf(FLOAT_80332d28, font);
@@ -1043,7 +1043,7 @@ void CShopMenu::DrawItemInfo(int itemNo, int x, int y, int unused0, int attrY, i
     }
 
     strcpy(textBuffer, label);
-    strcat(textBuffer, DAT_80332d30);
+    strcat(textBuffer, s_Colon_80332d30);
     DrawInit__5CFontFv(font);
     DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(
         MenuPcsVoid(), font, textBuffer, static_cast<float>(x + 0x40), static_cast<float>(y), 0x18, 0x12);
@@ -1058,7 +1058,7 @@ void CShopMenu::DrawItemInfo(int itemNo, int x, int y, int unused0, int attrY, i
     SetMargin__5CFontFf(FLOAT_80332d34, font);
 
     char valueBuffer[64];
-    sprintf(valueBuffer, DAT_80332d14, statValue);
+    sprintf(valueBuffer, s_DecimalFormat_80332d14, statValue);
     float valueWidth = GetWidth__5CFontFPc(font, valueBuffer);
     DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(
         MenuPcsVoid(), font, valueBuffer, static_cast<float>(valueRightX) - valueWidth, static_cast<float>(y), 0x1A, 0x12);
@@ -1081,7 +1081,7 @@ void CShopMenu::DrawItemInfo(int itemNo, int x, int y, int unused0, int attrY, i
         attrStr = MenuPcs.GetAttrStr(attr);
         GetWidth__5CFontFPc(font, attrStr);
         if ((attr != 0) && (attr < 9)) {
-            strcpy(textBuffer, DAT_80332d38);
+            strcpy(textBuffer, s_PlusOne_80332d38);
             valueWidth = GetWidth__5CFontFPc(font, textBuffer);
             DrawInit__5CFontFv(font);
             DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(
@@ -1227,7 +1227,7 @@ void CShopMenu::DrawItemInfo0()
         reinterpret_cast<unsigned char*>(font)[0x24] = (reinterpret_cast<unsigned char*>(font)[0x24] & 0xEF) | 0x10;
         SetMargin__5CFontFf(FLOAT_80332d34, font);
         char countBuffer[64];
-        sprintf(countBuffer, DAT_80332d18, amount);
+        sprintf(countBuffer, s_TwoDigitFormat_80332d18, amount);
         float countRightX = FLOAT_80332d70 - GetWidth__5CFontFPc(font, countBuffer);
         DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(MenuPcsVoid(), font, countBuffer, countRightX, FLOAT_80332d6c, 4, 0x12);
         DrawInit__8CMenuPcsFv(MenuPcsVoid());
@@ -1269,11 +1269,11 @@ void CShopMenu::DrawBuySellInfo()
 
     DrawInit__5CFontFv(font);
     DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(
-        MenuPcsVoid(), font, DAT_80332d84, FLOAT_80332d7c, FLOAT_80332d80, 0x18, 0x12);
+        MenuPcsVoid(), font, s_Slash_80332d84, FLOAT_80332d7c, FLOAT_80332d80, 0x18, 0x12);
     DrawInit__8CMenuPcsFv(MenuPcsVoid());
 
     char* moneyText = ShopMenuMes(languageId, SHOP_MENU_TEXT_MONEY);
-    float separatorWidth = GetWidth__5CFontFPc(font, DAT_80332d84);
+    float separatorWidth = GetWidth__5CFontFPc(font, s_Slash_80332d84);
     DrawInit__5CFontFv(font);
     DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(
         MenuPcsVoid(), font, moneyText, FLOAT_80332d7c + separatorWidth, FLOAT_80332d80, 0x14, 0x12);
@@ -1357,7 +1357,7 @@ void CShopMenu::DrawBuySellInfo()
 
     DrawInit__5CFontFv(font);
     DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(
-        MenuPcsVoid(), font, DAT_80332d84, FLOAT_80332d7c, FLOAT_80332d98, 0x1B, 0x12);
+        MenuPcsVoid(), font, s_Slash_80332d84, FLOAT_80332d7c, FLOAT_80332d98, 0x1B, 0x12);
     DrawInit__8CMenuPcsFv(MenuPcsVoid());
 
     DrawInit__5CFontFv(font);
@@ -1947,7 +1947,7 @@ void CShopMenu::DrawMake()
 
     DrawInit__5CFontFv(font);
     DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(
-        MenuPcsVoid(), font, DAT_80332d84, FLOAT_80332e14, FLOAT_80332e20, 0x1B, 0x12);
+        MenuPcsVoid(), font, s_Slash_80332d84, FLOAT_80332e14, FLOAT_80332e20, 0x1B, 0x12);
     DrawInit__8CMenuPcsFv(MenuPcsVoid());
 
     DrawInit__5CFontFv(font);
@@ -2008,7 +2008,7 @@ void CShopMenu::DrawMake()
         const char* materialName = GetItemName(materialItem);
         char neededBuffer[64];
         char ownedBuffer[64];
-        sprintf(neededBuffer, DAT_80332d14, neededCount);
+        sprintf(neededBuffer, s_DecimalFormat_80332d14, neededCount);
 
         SetMargin__5CFontFf(FLOAT_80332d28, font);
         SetShadow__5CFontFi(font, 1);
@@ -2016,7 +2016,7 @@ void CShopMenu::DrawMake()
         font->SetColor(white);
 
         DrawInit__5CFontFv(font);
-        DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(MenuPcsVoid(), font, DAT_80332d84, 60.0f, rowY, 0x1B, 0x12);
+        DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(MenuPcsVoid(), font, s_Slash_80332d84, 60.0f, rowY, 0x1B, 0x12);
         DrawInit__8CMenuPcsFv(MenuPcsVoid());
 
         SetupShopMenuAmountFont(font, &white);
@@ -2067,7 +2067,7 @@ void CShopMenu::DrawMake()
                 ++ownedCount;
             }
         }
-        sprintf(ownedBuffer, DAT_80332d18, ownedCount);
+        sprintf(ownedBuffer, s_TwoDigitFormat_80332d18, ownedCount);
 
         SetupShopMenuAmountFont(font, &white);
         float ownedX = 356.0f - GetWidth__5CFontFPc(font, ownedBuffer);
@@ -2808,7 +2808,7 @@ void CMenuPcs::CreateSmithMenu()
     *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(shopMenu) + 0x20) = Game.m_scriptFoodBase[0];
     shopMenu->SetMode(9);
     *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(shopMenu) + 0x18) =
-        PartPcs.LoadMenuPdt(DAT_80332e54);
+        PartPcs.LoadMenuPdt(s_shop_80332e54);
 
     int slotIndex = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(shopMenu) + 0x18);
     _pppDataHead* pppDataHead =
@@ -2847,7 +2847,7 @@ void CMenuPcs::CreateShopMenu()
     *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(shopMenu) + 0x20) = Game.m_scriptFoodBase[0];
     shopMenu->SetMode(0);
     *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(shopMenu) + 0x18) =
-        PartPcs.LoadMenuPdt(DAT_80332e54);
+        PartPcs.LoadMenuPdt(s_shop_80332e54);
 
     int slotIndex = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(shopMenu) + 0x18);
     _pppDataHead* pppDataHead =
@@ -2934,11 +2934,11 @@ void drawShapeSeqScale(int shapeNo, int groupNo, int x, int y, float scaleX, flo
     *reinterpret_cast<unsigned int*>(materialMan + 0x40) = 0xACE0F;
 
     _GXColor amb;
-    *reinterpret_cast<unsigned int*>(&amb) = DAT_80332CFC;
+    *reinterpret_cast<unsigned int*>(&amb) = gShopMenuAmbientWhite;
     GXSetChanAmbColor(GX_COLOR0A0, amb);
 
     _GXColor mat;
-    *reinterpret_cast<unsigned int*>(&mat) = (DAT_80332D00 & 0xFFFFFF00) | alpha;
+    *reinterpret_cast<unsigned int*>(&mat) = (gShopMenuMaterialWhiteBase & 0xFFFFFF00) | alpha;
     GXSetChanMatColor(GX_COLOR0A0, mat);
 
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_NOOP);
@@ -3030,11 +3030,11 @@ void drawShapeSeq(int shapeNo, int groupNo, int x, int y, unsigned char alpha, u
     *reinterpret_cast<unsigned int*>(materialMan + 0x40) = 0xACE0F;
 
     _GXColor amb;
-    *reinterpret_cast<unsigned int*>(&amb) = DAT_80332CFC;
+    *reinterpret_cast<unsigned int*>(&amb) = gShopMenuAmbientWhite;
     GXSetChanAmbColor(GX_COLOR0A0, amb);
 
     _GXColor mat;
-    *reinterpret_cast<unsigned int*>(&mat) = (DAT_80332D00 & 0xFFFFFF00) | alpha;
+    *reinterpret_cast<unsigned int*>(&mat) = (gShopMenuMaterialWhiteBase & 0xFFFFFF00) | alpha;
     GXSetChanMatColor(GX_COLOR0A0, mat);
 
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_NOOP);

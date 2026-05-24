@@ -55,7 +55,7 @@ extern "C" float s_zoff;
 extern "C" double DOUBLE_8032fdf0;
 extern "C" double DOUBLE_8032fe00;
 extern "C" float FLOAT_8032fdf8;
-extern "C" unsigned int DAT_8032fdd8;
+extern "C" unsigned int gPppFixedWhite;
 extern "C" unsigned char s_light_mode;
 extern "C" unsigned char s_fog_mode;
 extern "C" unsigned char s_fog_blend_mode;
@@ -2631,7 +2631,7 @@ void pppSetDrawEnv(pppCVECTOR* pppColor, pppFMATRIX* pppMtx, float depth, unsign
 	}
 
 	_GXColor fixedColor;
-	*(u32*)&fixedColor = DAT_8032fdd8;
+	*(u32*)&fixedColor = gPppFixedWhite;
 	if (lightTarget < 2) {
 		if (pppColor != 0) {
 			GXSetChanAmbColor(GX_COLOR0A0, *(_GXColor*)pppColor->rgba);

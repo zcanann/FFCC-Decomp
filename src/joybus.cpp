@@ -13,7 +13,7 @@
 
 JoyBus Joybus;
 
-int DAT_8032edb8 = 0;
+int gJoyBusThreadExitValue = 0;
 
 extern const unsigned short JoyBusCrcTable[256] =
 {
@@ -639,7 +639,7 @@ void JoyBus::ThreadMain(void* arg)
         {
             m_threadRunningMask = (unsigned char)(m_threadRunningMask & ~(unsigned char)(1 << port));
             m_stageFlags[port] = 0;
-            OSExitThread(&DAT_8032edb8);
+            OSExitThread(&gJoyBusThreadExitValue);
         }
 
         {

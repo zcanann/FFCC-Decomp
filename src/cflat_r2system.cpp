@@ -1402,11 +1402,12 @@ CVector CVector::operator+(const CVector& other) const
  */
 void CVector::operator=(const CVector& other)
 {
-    float y = other.y;
-    x = other.x;
-    float z = other.z;
-    this->y = y;
-    this->z = z;
+    float xValue = other.x;
+    float yValue = other.y;
+    x = xValue;
+    float zValue = other.z;
+    y = yValue;
+    z = zValue;
 }
 
 /*
@@ -1420,9 +1421,11 @@ void CVector::operator=(const CVector& other)
  */
 CVector::CVector(const CVector& other)
 {
-    x = other.x;
-    y = other.y;
-    z = other.z;
+    float xValue = other.x, yValue = other.y;
+    x = xValue;
+    float zValue = other.z;
+    y = yValue;
+    z = zValue;
 }
 
 /*

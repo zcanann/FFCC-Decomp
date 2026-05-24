@@ -4,6 +4,11 @@
 #include "ffcc/ppp_constants.h"
 #include <dolphin/mtx.h>
 
+static inline u8** GetYmLookOnWork(pppYmLookOn* lookOn, pppYmLookOnCtrl* ctrl)
+{
+    return reinterpret_cast<u8**>(lookOn->m_object.m_workArea + *ctrl->m_serializedDataOffsets);
+}
+
 /*
  * --INFO--
  * PAL Address: 0x800d88c8
@@ -13,10 +18,9 @@
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameYmLookOn(struct pppYmLookOn* pppYmLookOn, struct pppYmLookOnUnkB* param_2, struct pppYmLookOnUnkC* param_3)
+void pppFrameYmLookOn(struct pppYmLookOn* pppYmLookOn, struct pppYmLookOnStep* param_2, struct pppYmLookOnCtrl* param_3)
 {
     struct _pppMngSt* pppMngSt;
-    int workOffset;
     u8* owner;
     u8** work;
     Vec local_44;
@@ -31,9 +35,8 @@ void pppFrameYmLookOn(struct pppYmLookOn* pppYmLookOn, struct pppYmLookOnUnkB* p
     }
 
     pppMngSt = pppMngStPtr;
-    owner = *(u8**)((u8*)pppMngSt + 0xdc);
-    workOffset = *param_3->m_serializedDataOffsets;
-    work = (u8**)((u8*)pppYmLookOn + workOffset + 0x80);
+    owner = reinterpret_cast<u8*>(pppMngSt->m_lookTarget);
+    work = GetYmLookOnWork(pppYmLookOn, param_3);
     if (owner == nullptr) {
         if (*work == nullptr) {
             return;
@@ -48,9 +51,9 @@ void pppFrameYmLookOn(struct pppYmLookOn* pppYmLookOn, struct pppYmLookOnUnkB* p
     local_4c.y = *(f32*)(owner + 0x160);
     local_4c.z = *(f32*)(owner + 0x164);
     local_4c.y += param_2->m_dataValIndex;
-    local_58.x = *(f32*)((u8*)pppMngStPtr + 0x84);
-    local_58.y = *(f32*)((u8*)pppMngStPtr + 0x94);
-    local_58.z = *(f32*)((u8*)pppMngStPtr + 0xa4);
+    local_58.x = pppMngStPtr->m_matrix.value[0][3];
+    local_58.y = pppMngStPtr->m_matrix.value[1][3];
+    local_58.z = pppMngStPtr->m_matrix.value[2][3];
     PSVECSubtract(&local_58, &local_4c, &local_44);
 
     if (((gPppYmLookOnZero != local_44.x) || (gPppYmLookOnZero != local_44.y)) || (gPppYmLookOnZero != local_44.z)) {
@@ -71,15 +74,15 @@ void pppFrameYmLookOn(struct pppYmLookOn* pppYmLookOn, struct pppYmLookOnUnkB* p
             PSVECCrossProduct(&local_40, &local_28, &local_34);
             PSVECNormalize(&local_34, &local_34);
         }
-        *(f32*)((u8*)pppMngStPtr + 0x78) = local_28.x;
-        *(f32*)((u8*)pppMngStPtr + 0x88) = local_28.y;
-        *(f32*)((u8*)pppMngStPtr + 0x98) = local_28.z;
-        *(f32*)((u8*)pppMngStPtr + 0x7c) = local_34.x;
-        *(f32*)((u8*)pppMngStPtr + 0x8c) = local_34.y;
-        *(f32*)((u8*)pppMngStPtr + 0x9c) = local_34.z;
-        *(f32*)((u8*)pppMngStPtr + 0x80) = local_40.x;
-        *(f32*)((u8*)pppMngStPtr + 0x90) = local_40.y;
-        *(f32*)((u8*)pppMngStPtr + 0xa0) = local_40.z;
+        pppMngStPtr->m_matrix.value[0][0] = local_28.x;
+        pppMngStPtr->m_matrix.value[1][0] = local_28.y;
+        pppMngStPtr->m_matrix.value[2][0] = local_28.z;
+        pppMngStPtr->m_matrix.value[0][1] = local_34.x;
+        pppMngStPtr->m_matrix.value[1][1] = local_34.y;
+        pppMngStPtr->m_matrix.value[2][1] = local_34.z;
+        pppMngStPtr->m_matrix.value[0][2] = local_40.x;
+        pppMngStPtr->m_matrix.value[1][2] = local_40.y;
+        pppMngStPtr->m_matrix.value[2][2] = local_40.z;
         pppSetFpMatrix(pppMngSt);
     }
 }
@@ -93,8 +96,7 @@ void pppFrameYmLookOn(struct pppYmLookOn* pppYmLookOn, struct pppYmLookOnUnkB* p
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructYmLookOn(struct pppYmLookOn* pppYmLookOn, struct pppYmLookOnUnkC* param_2)
+void pppConstructYmLookOn(struct pppYmLookOn* pppYmLookOn, struct pppYmLookOnCtrl* param_2)
 {
-    int dataOffset = *param_2->m_serializedDataOffsets;
-    *(int*)((char*)pppYmLookOn + dataOffset + 0x80) = 0;
+    *GetYmLookOnWork(pppYmLookOn, param_2) = 0;
 }

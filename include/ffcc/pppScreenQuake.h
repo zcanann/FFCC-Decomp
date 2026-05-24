@@ -1,12 +1,14 @@
 #ifndef _PPP_SCREENQUAKE_H_
 #define _PPP_SCREENQUAKE_H_
 
+#include "ffcc/partMng.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 typedef struct {
-    char field0_0x0[128];
+    _pppPObject m_object;
 } pppScreenQuake;
 
 typedef struct {
@@ -23,20 +25,20 @@ typedef struct {
     float m_quakeParam0;
     float m_quakeParam1;
     float m_quakeParam2;
-} pppScreenQuakeUnkB;
+} pppScreenQuakeStep;
 
 typedef struct {
     int m_unk0;
     int m_unk4;
     int m_unk8;
     int *m_serializedDataOffsets;
-} pppScreenQuakeUnkC;
+} pppScreenQuakeCtrl;
 
-void pppConScreenQuake(pppScreenQuake *quake, pppScreenQuakeUnkC *param2);
-void pppCon2ScreenQuake(pppScreenQuake *quake, pppScreenQuakeUnkC *param2);
-void pppDesScreenQuake(pppScreenQuake* quake, pppScreenQuakeUnkC* param2);
-void pppFrameScreenQuake(pppScreenQuake *quake, pppScreenQuakeUnkB *param2, pppScreenQuakeUnkC *param3);
-void pppRenderScreenQuake(pppScreenQuake* quake, pppScreenQuakeUnkB* param2, pppScreenQuakeUnkC* param3);
+void pppConScreenQuake(pppScreenQuake *quake, pppScreenQuakeCtrl *param2);
+void pppCon2ScreenQuake(pppScreenQuake *quake, pppScreenQuakeCtrl *param2);
+void pppDesScreenQuake(pppScreenQuake* quake, pppScreenQuakeCtrl* param2);
+void pppFrameScreenQuake(pppScreenQuake *quake, pppScreenQuakeStep *param2, pppScreenQuakeCtrl *param3);
+void pppRenderScreenQuake(pppScreenQuake* quake, pppScreenQuakeStep* param2, pppScreenQuakeCtrl* param3);
 
 #ifdef __cplusplus
 }

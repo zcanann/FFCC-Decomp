@@ -101,6 +101,7 @@ struct GbaQueueCMakeInfoView
 	unsigned char m_jobType;
 };
 STATIC_ASSERT(sizeof(GbaQueueCMakeInfoView) == 0x20);
+STATIC_ASSERT(sizeof(GbaCMakeInfo) == 0x20);
 
 struct GbaQueueSetQueueView
 {
@@ -111,6 +112,31 @@ struct GbaQueueSetQueueView
 };
 STATIC_ASSERT(sizeof(GbaQueueSetQueueView) == 0x444);
 
+enum {
+	kGbaQueueScratchTextSize = 0x400,
+	kGbaQueuePlayerDataChannelCount = 4,
+	kGbaQueuePlayerDataBlockBytes = sizeof(GbaQueuePlayerDataView) * kGbaQueuePlayerDataChannelCount,
+	kGbaQueueCaravanNameBlockBytes = 0x80,
+	kGbaQueueEnemyDataBytes = 0x500,
+	kGbaQueueEnemyHistoryBlockBytes = kGbaQueueEnemyDataBytes * kGbaQueuePlayerDataChannelCount,
+	kGbaQueueMapItemDataBytes = 0x140,
+	kGbaQueueMapItemHistoryBlockBytes = kGbaQueueMapItemDataBytes * kGbaQueuePlayerDataChannelCount,
+	kGbaQueueMapObjWorkBytes = 0x188,
+	kGbaQueueLetterNpcNameBytes = 0x800,
+	kGbaQueueLetterSubjectNameBytes = 0x1800,
+	kGbaQueueLetterEntryAllocWords = 0x1000,
+	kGbaQueueLetterEntryBytes = 0x800,
+	kGbaQueueLetterTempNameBytes = 0x20,
+	kGbaQueueLetterHeaderBytes = 0x10,
+	kGbaQueueLetterNpcNameEntryBytes = 0x10,
+	kGbaQueueLetterSubjectNameEntryBytes = 0x18,
+};
+
+STATIC_ASSERT(kGbaQueuePlayerDataBlockBytes == 0x370);
+STATIC_ASSERT(sizeof(GbaPInfo) == kGbaQueuePlayerDataBlockBytes);
+STATIC_ASSERT(kGbaQueueEnemyHistoryBlockBytes == 0x1400);
+STATIC_ASSERT(kGbaQueueMapItemHistoryBlockBytes == 0x500);
+
 static inline GbaQueueFlagView* GetFlagView(GbaQueue* gbaQueue)
 {
 	return reinterpret_cast<GbaQueueFlagView*>(gbaQueue);
@@ -119,6 +145,16 @@ static inline GbaQueueFlagView* GetFlagView(GbaQueue* gbaQueue)
 static inline GbaQueuePlayerDataView* GetPlayerDataView(GbaQueue* gbaQueue, int channel)
 {
 	return reinterpret_cast<GbaQueuePlayerDataView*>(reinterpret_cast<unsigned char*>(gbaQueue) + channel * 0xDC + 0x454);
+}
+
+static inline GbaQueuePlayerDataView* GetPlayerDataBlock(GbaQueue* gbaQueue)
+{
+	return GetPlayerDataView(gbaQueue, 0);
+}
+
+static inline GbaQueueSetQueueView* GetSetQueueView(GbaQueue* gbaQueue)
+{
+	return reinterpret_cast<GbaQueueSetQueueView*>(gbaQueue);
 }
 
 static inline unsigned short SwapU16(unsigned short value)
@@ -186,21 +222,22 @@ void GbaQueue::Init()
 	GbaQueue* osSemaphore;
 	int i;
 	char* obj = reinterpret_cast<char*>(this);
+	GbaQueueSetQueueView* queue = GetSetQueueView(this);
 
-	memset(obj + 0x30, 0, 0x400);
-	memset(obj + 0x430, 0, 0x10);
-	memset(obj + 0x440, 0, 4);
-	memset(obj + 0x454, 0, 0x370);
-	memset(obj + 0x7C4, 0, 0x370);
-	memset(obj + 0xB34, 0, 0x500);
-	memset(obj + 0x1034, 0, 0x1400);
-	memset(obj + 0x2434, 0, 0x140);
-	memset(obj + 0x2574, 0, 0x500);
-	memset(obj + 0x2A74, 0, 0x80);
-	memset(obj + 0x2B00, 0, 0x188);
+	memset(queue->m_queue, 0, sizeof(queue->m_queue));
+	memset(queue->m_queueCount, 0, sizeof(queue->m_queueCount));
+	memset(queue->m_queueFull, 0, sizeof(queue->m_queueFull));
+	memset(GetPlayerDataBlock(this), 0, kGbaQueuePlayerDataBlockBytes);
+	memset(obj + 0x7C4, 0, kGbaQueuePlayerDataBlockBytes);
+	memset(obj + 0xB34, 0, kGbaQueueEnemyDataBytes);
+	memset(obj + 0x1034, 0, kGbaQueueEnemyHistoryBlockBytes);
+	memset(obj + 0x2434, 0, kGbaQueueMapItemDataBytes);
+	memset(obj + 0x2574, 0, kGbaQueueMapItemHistoryBlockBytes);
+	memset(obj + 0x2A74, 0, kGbaQueueCaravanNameBlockBytes);
+	memset(obj + 0x2B00, 0, kGbaQueueMapObjWorkBytes);
 	memset(obj + 0x2C8E, 0, 8);
-	memset(obj + 0x2CB2, 0, 0x80);
-	memset(obj + 0x2D44, 0xFF, 0x10);
+	memset(cmakeInfo, 0, sizeof(cmakeInfo));
+	memset(m_hitInfo, 0xFF, sizeof(m_hitInfo));
 
 	i = 0;
 	osSemaphore = this;
@@ -621,13 +658,13 @@ int GbaQueue::SetQueue(int channel, unsigned int value)
  */
 void GbaQueue::ResetQueue()
 {
-	char* obj = reinterpret_cast<char*>(this);
+	GbaQueueSetQueueView* queue = GetSetQueueView(this);
 
 	for (int channel = 0; channel < 4; channel++) {
 		OSWaitSemaphore(accessSemaphores + channel);
-		memset(obj + 0x30 + channel * 0x100, 0, 0x100);
-		*reinterpret_cast<int*>(obj + 0x430 + channel * 4) = 0;
-		obj[0x440 + channel] = 0;
+		memset(queue->m_queue[channel], 0, sizeof(queue->m_queue[channel]));
+		queue->m_queueCount[channel] = 0;
+		queue->m_queueFull[channel] = 0;
 		OSSignalSemaphore(accessSemaphores + channel);
 	}
 }
@@ -645,6 +682,7 @@ void GbaQueue::ExecutQueue()
 {
 	unsigned int localQueueData[4][64];
 	int localQueueCount[4];
+	GbaQueueSetQueueView* queue = GetSetQueueView(this);
 	char* obj;
 	int scriptFoodBase[4];
 	unsigned int channel;
@@ -653,10 +691,10 @@ void GbaQueue::ExecutQueue()
 		OSWaitSemaphore(accessSemaphores + channel);
 	}
 
-	memcpy(localQueueData, reinterpret_cast<char*>(this) + 0x30, sizeof(localQueueData));
-	memcpy(localQueueCount, reinterpret_cast<char*>(this) + 0x430, sizeof(localQueueCount));
-	memset(reinterpret_cast<char*>(this) + 0x30, 0, sizeof(localQueueData));
-	memset(reinterpret_cast<char*>(this) + 0x430, 0, sizeof(localQueueCount));
+	memcpy(localQueueData, queue->m_queue, sizeof(localQueueData));
+	memcpy(localQueueCount, queue->m_queueCount, sizeof(localQueueCount));
+	memset(queue->m_queue, 0, sizeof(localQueueData));
+	memset(queue->m_queueCount, 0, sizeof(localQueueCount));
 
 	for (channel = 0; channel < 4; channel++) {
 		OSSignalSemaphore(accessSemaphores + channel);
@@ -673,7 +711,7 @@ void GbaQueue::ExecutQueue()
 		CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(scriptFoodBase[channel]);
 		int i;
 
-		if (obj[0x440 + channel] != 0) {
+		if (queue->m_queueFull[channel] != 0) {
 			continue;
 		}
 
@@ -1097,7 +1135,7 @@ void GbaQueue::SetStageNo(int stageId, int mapId)
     obj[0x2D61] = 0;
     *reinterpret_cast<int*>(obj + 0x2AF8) = 0;
     obj[0x2C88] = 0;
-    memset(obj + 0x2B00, 0, 0x188);
+    memset(obj + 0x2B00, 0, kGbaQueueMapObjWorkBytes);
 
     if ((*reinterpret_cast<int*>(obj + 0x444) != stageId) || (*reinterpret_cast<int*>(obj + 0x448) != mapId)) {
         obj[0x44C] = 0xF;
@@ -1137,7 +1175,7 @@ void GbaQueue::SetStageNo(int stageId, int mapId)
         } while (loadSignalIndex < 4);
     }
 
-    memset(obj + 0x2D44, 0xFF, 0x10);
+    memset(m_hitInfo, 0xFF, sizeof(m_hitInfo));
     obj[0x2D54] = 0;
 }
 
@@ -1362,8 +1400,8 @@ void GbaQueue::LoadAllStat()
  */
 void GbaQueue::LoadPlayerStat()
 {
-	unsigned char localNames[0x80];
-	unsigned char localPlayerStat[0x370];
+	unsigned char localNames[kGbaQueueCaravanNameBlockBytes];
+	unsigned char localPlayerStat[kGbaQueuePlayerDataBlockBytes];
 	GbaQueue* semaphoreIter;
 	unsigned int outOfShoukiMask;
 	int i;
@@ -1506,9 +1544,9 @@ void GbaQueue::LoadPlayerStat()
 	} while (i < 4);
 
 	obj = reinterpret_cast<char*>(this);
-	memcpy(obj + 0x7C4, obj + 0x454, 0x370);
-	memcpy(obj + 0x454, localPlayerStat, 0x370);
-	memcpy(obj + 0x2A74, localNames, 0x80);
+	memcpy(obj + 0x7C4, GetPlayerDataBlock(this), kGbaQueuePlayerDataBlockBytes);
+	memcpy(GetPlayerDataBlock(this), localPlayerStat, kGbaQueuePlayerDataBlockBytes);
+	memcpy(obj + 0x2A74, localNames, kGbaQueueCaravanNameBlockBytes);
 
 	obj[0x2D59] = obj[0x2D5A];
 	obj[0x2D5A] = static_cast<char>(outOfShoukiMask);
@@ -1574,7 +1612,7 @@ void GbaQueue::LoadPlayerStat()
  */
 void GbaQueue::LoadEnemyStat()
 {
-	unsigned char localEnemyData[0x500];
+	unsigned char localEnemyData[kGbaQueueEnemyDataBytes];
 	unsigned int* enemyObjPtrs;
 	unsigned int* enemyWorkPtrs;
 	GbaQueue* semaphoreIter;
@@ -1658,7 +1696,7 @@ void GbaQueue::LoadEnemyStat()
  */
 void GbaQueue::LoadMapItemStat()
 {
-	unsigned char localMapItems[0x140];
+	unsigned char localMapItems[kGbaQueueMapItemDataBytes];
 	char numMapItems;
 	CGObject* object;
 	GbaQueue* semaphoreIter;
@@ -1836,9 +1874,9 @@ void GbaQueue::GetEnemyPos(int channel, unsigned int* outData, int* outCount)
 
     baseX = *reinterpret_cast<short*>(obj + channel * 0xDC + 0x32);
     baseZ = *reinterpret_cast<short*>(obj + channel * 0xDC + 0x34);
-    memcpy(localEnemyData, obj + 0xB34, 0x500);
+    memcpy(localEnemyData, obj + 0xB34, kGbaQueueEnemyDataBytes);
 
-    prevEntry = obj + channel * 0x500 + 0x1034;
+    prevEntry = obj + channel * kGbaQueueEnemyDataBytes + 0x1034;
     radarMode = obj[channel + 0x2D32];
     localEntry = localEnemyData;
     for (i = 0; i < 0x40; i++) {
@@ -1892,7 +1930,7 @@ void GbaQueue::GetEnemyPos(int channel, unsigned int* outData, int* outCount)
     }
 
     *outCount = count;
-    memcpy(obj + channel * 0x500 + 0x1034, localEnemyData, 0x500);
+    memcpy(obj + channel * kGbaQueueEnemyDataBytes + 0x1034, localEnemyData, kGbaQueueEnemyDataBytes);
     OSSignalSemaphore(accessSemaphores + channel);
 }
 
@@ -1907,7 +1945,7 @@ void GbaQueue::GetEnemyPos(int channel, unsigned int* outData, int* outCount)
  */
 void GbaQueue::GetTreasurePos(int channel, unsigned int* outData, int* outCount)
 {
-	char localMapItems[0x140];
+	char localMapItems[kGbaQueueMapItemDataBytes];
 	char* obj;
 	char* localEntry;
 	char* prevEntry;
@@ -1956,7 +1994,7 @@ void GbaQueue::GetTreasurePos(int channel, unsigned int* outData, int* outCount)
 
 	count = 0;
 	localEntry = localMapItems;
-	prevEntry = obj + channel * 0x140 + 0x2574;
+	prevEntry = obj + channel * kGbaQueueMapItemDataBytes + 0x2574;
 	outPtr = reinterpret_cast<unsigned char*>(outData);
 	for (i = 0; i < static_cast<unsigned char>(obj[0x2AF4]); i++) {
 		if ((localEntry[0] != 0 || prevEntry[0] != 0) && memcmp(localEntry, prevEntry, 0x14) != 0) {
@@ -1973,7 +2011,7 @@ void GbaQueue::GetTreasurePos(int channel, unsigned int* outData, int* outCount)
 	}
 
 	*outCount = count;
-	memcpy(obj + channel * 0x140 + 0x2574, localMapItems, sizeof(localMapItems));
+	memcpy(obj + channel * kGbaQueueMapItemDataBytes + 0x2574, localMapItems, sizeof(localMapItems));
 	OSSignalSemaphore(accessSemaphores + channel);
 }
 
@@ -2037,7 +2075,7 @@ int GbaQueue::GetMapObjInfo(int channel, unsigned char* outData)
 void GbaQueue::GetPlayerStat(int channel, GbaPInfo* outInfo)
 {
 	OSWaitSemaphore(accessSemaphores + channel);
-	memcpy(outInfo, reinterpret_cast<char*>(this) + 0x454, 0x370);
+	memcpy(outInfo, GetPlayerDataBlock(this), sizeof(*outInfo));
 	OSSignalSemaphore(accessSemaphores + channel);
 }
 
@@ -2056,7 +2094,7 @@ void GbaQueue::GetCaravanName(char* outName)
 		OSWaitSemaphore(accessSemaphores + i);
 	}
 
-	memcpy(outName, reinterpret_cast<char*>(this) + 0x2A74, 0x80);
+	memcpy(outName, reinterpret_cast<char*>(this) + 0x2A74, kGbaQueueCaravanNameBlockBytes);
 
 	for (int i = 0; i < 4; i++) {
 		OSSignalSemaphore(accessSemaphores + i);
@@ -2232,33 +2270,35 @@ int GbaQueue::MakeLetterList(int channel, char* outData)
 		return 0;
 	}
 
-char* npcNameBuf = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0x7A7) char[0x800];
+char* npcNameBuf =
+	new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0x7A7) char[kGbaQueueLetterNpcNameBytes];
 	if (npcNameBuf == 0) {
 		if ((unsigned int)System.m_execParam >= 1) {
 System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp), 0x7A9);
 		}
 		return -1;
 	}
-	memset(npcNameBuf, 0, 0x800);
+	memset(npcNameBuf, 0, kGbaQueueLetterNpcNameBytes);
 
-char* subjectNameBuf = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0x7B1) char[0x1800];
+char* subjectNameBuf =
+	new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0x7B1) char[kGbaQueueLetterSubjectNameBytes];
 	if (subjectNameBuf == 0) {
 		if ((unsigned int)System.m_execParam >= 1) {
 System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp), 0x7B3);
 		}
 		return -1;
 	}
-	memset(subjectNameBuf, 0, 0x1800);
+	memset(subjectNameBuf, 0, kGbaQueueLetterSubjectNameBytes);
 
 unsigned int* letterEntryBuf =
-	new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0x7BB) unsigned int[0x1000];
+	new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0x7BB) unsigned int[kGbaQueueLetterEntryAllocWords];
 	if (letterEntryBuf == 0) {
 		if ((unsigned int)System.m_execParam >= 1) {
 System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp), 0x7BD);
 		}
 		return -1;
 	}
-	memset(letterEntryBuf, 0, 0x800);
+	memset(letterEntryBuf, 0, kGbaQueueLetterEntryBytes);
 
 	const CCaravanWork* caravanWork = reinterpret_cast<const CCaravanWork*>(scriptFood);
 	const unsigned int letterCount = static_cast<unsigned int>(caravanWork->m_letterCount);
@@ -2271,7 +2311,7 @@ System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB3
 	unsigned int* entryWrite = letterEntryBuf;
 
 	GbaFlatDataView* flatData = reinterpret_cast<GbaFlatDataView*>(&Game.m_cFlatDataArr[1]);
-	char tempName[0x20];
+	char tempName[kGbaQueueLetterTempNameBytes];
 
 	for (int i = 0; i < static_cast<int>(letterCount); i++) {
 		int matchedSubject = -1;
@@ -2299,10 +2339,10 @@ System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB3
 System.Printf(const_cast<char*>(s_npc_max_over), const_cast<char*>(s_gbaque_cpp), 0x7DC);
 			}
 
-			memset(tempName, 0, 0x20);
+			memset(tempName, 0, sizeof(tempName));
 			strcpy(tempName, flatData->m_tabl[2].m_strings[(curWord >> 9) & 0x1FF]);
-			memcpy(npcWrite, tempName, 0x10);
-			npcWrite += 0x10;
+			memcpy(npcWrite, tempName, kGbaQueueLetterNpcNameEntryBytes);
+			npcWrite += kGbaQueueLetterNpcNameEntryBytes;
 			(reinterpret_cast<unsigned char*>(entryWrite))[5] = static_cast<unsigned char>(npcCount);
 			npcCount++;
 		} else {
@@ -2315,10 +2355,10 @@ System.Printf(const_cast<char*>(s_npc_max_over), const_cast<char*>(s_gbaque_cpp)
 System.Printf(const_cast<char*>(s_subject_max_over), const_cast<char*>(s_gbaque_cpp), 0x7F0);
 			}
 
-			memset(tempName, 0, 0x20);
+			memset(tempName, 0, sizeof(tempName));
 			strcpy(tempName, flatData->m_tabl[5].m_strings[(curHalf >> 2) & 0x1FF]);
-			memcpy(subjectWrite, tempName, 0x18);
-			subjectWrite += 0x18;
+			memcpy(subjectWrite, tempName, kGbaQueueLetterSubjectNameEntryBytes);
+			subjectWrite += kGbaQueueLetterSubjectNameEntryBytes;
 			(reinterpret_cast<unsigned char*>(entryWrite))[4] = static_cast<unsigned char>(subjectCount);
 			subjectCount++;
 		} else {
@@ -2360,23 +2400,24 @@ System.Printf(const_cast<char*>(s_letter_data_error), const_cast<char*>(s_gbaque
 	}
 
 	unsigned int header[4];
-	memset(header, 0, 0x10);
+	memset(header, 0, sizeof(header));
 	header[0] = SwapU32(letterCount);
 	header[1] = SwapU32(subjectCount);
 	header[2] = SwapU32(npcCount);
 	header[3] = reinterpret_cast<unsigned int*>(&CFlat)[0x1042];
 
-	memcpy(outData, header, 0x10);
+	memcpy(outData, header, sizeof(header));
 
 	const int entriesSize = static_cast<int>(letterCount * 8);
-	memcpy(outData + 0x10, letterEntryBuf, entriesSize);
+	memcpy(outData + kGbaQueueLetterHeaderBytes, letterEntryBuf, entriesSize);
 
-	char* dst = outData + 0x10 + entriesSize;
-	const int subjectSize = static_cast<int>(subjectCount * 0x18);
+	char* dst = outData + kGbaQueueLetterHeaderBytes + entriesSize;
+	const int subjectSize = static_cast<int>(subjectCount * kGbaQueueLetterSubjectNameEntryBytes);
 	memcpy(dst, subjectNameBuf, subjectSize);
-	memcpy(dst + subjectSize, npcNameBuf, static_cast<int>(npcCount * 0x10));
+	memcpy(dst + subjectSize, npcNameBuf, static_cast<int>(npcCount * kGbaQueueLetterNpcNameEntryBytes));
 
-	const int totalSize = entriesSize + 0x10 + subjectSize + static_cast<int>(npcCount * 0x10);
+	const int totalSize = entriesSize + kGbaQueueLetterHeaderBytes + subjectSize +
+	                      static_cast<int>(npcCount * kGbaQueueLetterNpcNameEntryBytes);
 
 	delete[] letterEntryBuf;
 	delete[] subjectNameBuf;
@@ -2397,23 +2438,23 @@ System.Printf(const_cast<char*>(s_letter_data_error), const_cast<char*>(s_gbaque
  */
 int GbaQueue::MakeLetterData(int channel, char* outData, int letterIndex)
 {
-char* srcText = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0x859) char[0x400];
+char* srcText = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0x859) char[kGbaQueueScratchTextSize];
     if (srcText == 0) {
         if ((unsigned int)System.m_execParam >= 1) {
 System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp), 0x85B);
         }
         return -1;
     }
-    memset(srcText, 0, 0x400);
+    memset(srcText, 0, kGbaQueueScratchTextSize);
 
-char* workText = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0x862) char[0x400];
+char* workText = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0x862) char[kGbaQueueScratchTextSize];
     if (workText == 0) {
         if ((unsigned int)System.m_execParam >= 1) {
 System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp), 0x864);
         }
         return -1;
     }
-    memset(workText, 0, 0x400);
+    memset(workText, 0, kGbaQueueScratchTextSize);
 
     unsigned int scriptFood = Game.m_scriptFoodBase[channel];
     int entry = scriptFood + letterIndex * 0xC;
@@ -2431,8 +2472,8 @@ System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB3
     int totalSize = static_cast<int>(strlen(workText) + 1);
     memcpy(outData, workText, totalSize);
 
-    memset(srcText, 0, 0x400);
-    memset(workText, 0, 0x400);
+    memset(srcText, 0, kGbaQueueScratchTextSize);
+    memset(workText, 0, kGbaQueueScratchTextSize);
     strcpy(srcText, mesPtr[mesIndex + 1]);
     CMes::MakeAgbString(workText, srcText, *reinterpret_cast<unsigned short*>(scriptFood + 0x3E2), 0);
     int line2Size = static_cast<int>(strlen(workText));
@@ -2643,7 +2684,7 @@ void GbaQueue::LoadMapObj()
 		} while (i < 4);
 
 		if (obj[0x2B00] != 0) {
-			memset(obj + 0x2B00, 0, 0x188);
+			memset(obj + 0x2B00, 0, kGbaQueueMapObjWorkBytes);
 		}
 
 		i = 0;
@@ -2654,7 +2695,7 @@ void GbaQueue::LoadMapObj()
 			semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
 		} while (i < 4);
 	} else {
-		unsigned char mapObjWork[0x188];
+		unsigned char mapObjWork[kGbaQueueMapObjWorkBytes];
 		memset(mapObjWork, 0, sizeof(mapObjWork));
 
 		char* mapObjBase = reinterpret_cast<char*>(&CFlat) + 0x134C;
@@ -2727,7 +2768,7 @@ System.Printf(const_cast<char*>(s_unknown_mapobj_type_error), objType);
  */
 int GbaQueue::GetMapObj(unsigned char* outData)
 {
-	unsigned char mapObjWork[0x188];
+	unsigned char mapObjWork[kGbaQueueMapObjWorkBytes];
 	unsigned char* workEntry;
 	GbaQueue* semaphoreIter;
 	int i;
@@ -2973,7 +3014,7 @@ void GbaQueue::InitCmakeInfo(int channel, int value)
 	unsigned char* obj = reinterpret_cast<unsigned char*>(this);
 
 	OSWaitSemaphore(accessSemaphores + channel);
-	memset(&cmakeInfo[channel], 0, 0x20);
+	memset(&cmakeInfo[channel], 0, sizeof(cmakeInfo[channel]));
 	cmakeInfo[channel][0] = 1;
 	obj[channel * 0x20 + 0x2CCA] = 0xFF;
 	obj[channel * 0x20 + 0x2CD1] = 0xFF;
@@ -2995,8 +3036,8 @@ void GbaQueue::InitCmakeInfo(int channel, int value)
 void GbaQueue::ClrCmakeInfo(int param_2)
 {
 	BlockSem(param_2);
-	if (cmakeInfo[param_2 * 0x20] != '\0') {
-		memset(&cmakeInfo[param_2 * 0x20], 0, 0x20);
+	if (cmakeInfo[param_2][0] != '\0') {
+		memset(&cmakeInfo[param_2], 0, sizeof(cmakeInfo[param_2]));
 	}
 	ReleaseSem(param_2);
 }
@@ -3457,10 +3498,9 @@ int GbaQueue::GetCompatibility(int channel, unsigned char* outCompatibility)
 void GbaQueue::GetCMakeInfo(int channel, GbaCMakeInfo* outInfo)
 {
 	OSSemaphore* sem = accessSemaphores + channel;
-	void* src = reinterpret_cast<char*>(this) + channel * 0x20 + 0x2CB2;
 
 	OSWaitSemaphore(sem);
-	memcpy(outInfo, src, 0x20);
+	memcpy(outInfo, &cmakeInfo[channel], sizeof(*outInfo));
 	OSSignalSemaphore(sem);
 }
 
@@ -3729,23 +3769,23 @@ void GbaQueue::SmithEnd(int channel)
  */
 void GbaQueue::MakeBuyData(int channel, char* outData)
 {
-char* itemNameScratch = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0xD79) char[0x400];
+char* itemNameScratch = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0xD79) char[kGbaQueueScratchTextSize];
 	if (itemNameScratch == 0) {
 		if (System.m_execParam >= 1) {
 System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp), 0xD7B);
 		}
 		return;
 	}
-	memset(itemNameScratch, 0, 0x400);
+	memset(itemNameScratch, 0, kGbaQueueScratchTextSize);
 
-char* agbStringScratch = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0xD82) char[0x400];
+char* agbStringScratch = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0xD82) char[kGbaQueueScratchTextSize];
 	if (agbStringScratch == 0) {
 		if (System.m_execParam >= 1) {
 System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp), 0xD84);
 		}
 		return;
 	}
-	memset(agbStringScratch, 0, 0x400);
+	memset(agbStringScratch, 0, kGbaQueueScratchTextSize);
 
 	const unsigned int scriptFood = Game.m_scriptFoodBase[channel];
 	const unsigned int flatBase = Game.unkCFlatData0[2];
@@ -3794,8 +3834,8 @@ System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB3
 
 	GbaFlatDataView* flatData = reinterpret_cast<GbaFlatDataView*>(&Game.m_cFlatDataArr[1]);
 	for (unsigned int i = 0; i < itemCount; i++) {
-		memset(itemNameScratch, 0, 0x400);
-		memset(agbStringScratch, 0, 0x400);
+		memset(itemNameScratch, 0, kGbaQueueScratchTextSize);
+		memset(agbStringScratch, 0, kGbaQueueScratchTextSize);
 
 		const int itemId = *reinterpret_cast<short*>(scriptFood + i * 2 + 0xBE6);
 		strcpy(itemNameScratch, flatData->m_tabl[6].m_strings[itemId]);
@@ -3829,23 +3869,23 @@ System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB3
  */
 int GbaQueue::MakeSellData(int channel, char* outData)
 {
-char* itemNameScratch = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0xDD5) char[0x400];
+char* itemNameScratch = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0xDD5) char[kGbaQueueScratchTextSize];
 	if (itemNameScratch == 0) {
 		if ((unsigned int)System.m_execParam >= 1) {
 System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp), 0xDD7);
 		}
 		return -1;
 	}
-	memset(itemNameScratch, 0, 0x400);
+	memset(itemNameScratch, 0, kGbaQueueScratchTextSize);
 
-char* agbStringScratch = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0xDDE) char[0x400];
+char* agbStringScratch = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0xDDE) char[kGbaQueueScratchTextSize];
 	if (agbStringScratch == 0) {
 		if ((unsigned int)System.m_execParam >= 1) {
 System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp), 0xDE0);
 		}
 		return -1;
 	}
-	memset(agbStringScratch, 0, 0x400);
+	memset(agbStringScratch, 0, kGbaQueueScratchTextSize);
 
 	const unsigned int scriptFood = Game.m_scriptFoodBase[channel];
 	const unsigned int flatBase = Game.unkCFlatData0[2];
@@ -3894,8 +3934,8 @@ System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB3
 
 	GbaFlatDataView* flatData = reinterpret_cast<GbaFlatDataView*>(&Game.m_cFlatDataArr[1]);
 	for (int i = 0; i < 0x40; i++) {
-		memset(itemNameScratch, 0, 0x400);
-		memset(agbStringScratch, 0, 0x400);
+		memset(itemNameScratch, 0, kGbaQueueScratchTextSize);
+		memset(agbStringScratch, 0, kGbaQueueScratchTextSize);
 
 		const int itemId = *reinterpret_cast<short*>(scriptFood + i * 2 + 0xB6);
 		if (itemId < 1) {
@@ -4436,7 +4476,7 @@ void GbaQueue::ClrArtiDatFlg(int channel)
  */
 int GbaQueue::MakeArtiData(int channel, char* outData)
 {
-	char* itemNameScratch = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0x100F) char[0x400];
+	char* itemNameScratch = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0x100F) char[kGbaQueueScratchTextSize];
 	if (itemNameScratch == 0) {
 		if (System.m_execParam != 0) {
 			System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp),
@@ -4444,9 +4484,9 @@ int GbaQueue::MakeArtiData(int channel, char* outData)
 		}
 		return -1;
 	}
-	memset(itemNameScratch, 0, 0x400);
+	memset(itemNameScratch, 0, kGbaQueueScratchTextSize);
 
-	char* agbStringScratch = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0x1017) char[0x400];
+	char* agbStringScratch = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0x1017) char[kGbaQueueScratchTextSize];
 	if (agbStringScratch == 0) {
 		if (System.m_execParam != 0) {
 			System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp),
@@ -4454,7 +4494,7 @@ int GbaQueue::MakeArtiData(int channel, char* outData)
 		}
 		return -1;
 	}
-	memset(agbStringScratch, 0, 0x400);
+	memset(agbStringScratch, 0, kGbaQueueScratchTextSize);
 
 	char* compatibilityStr = reinterpret_cast<char*>(this) + 0x458;
 	unsigned int artifactData[3];

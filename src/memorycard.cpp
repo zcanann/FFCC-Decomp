@@ -189,6 +189,11 @@ static const char sDebugReadWriteFailedMsg[] = {
 #define sMcCreateErrorFmt (sMemoryAllocationError + 0x58)
 #define sMcGetStatErrorFmt (sMemoryAllocationError + 0x70)
 
+enum {
+    kMemoryCardStageSize = 0x16000,
+    kMemoryCardSaveBufferSize = 0xA000,
+};
+
 static inline CChara* GetCharaGlobal()
 {
     return &gChara;
@@ -285,9 +290,10 @@ void CMemoryCardMan::Init()
     m_currentSlot = -1;
     m_state = 0;
     m_saveBuffer = (char*)nullptr;
-    m_stage = reinterpret_cast<CStage*>(Memory.CreateStage(0x16000, const_cast<char*>(sMemoryCardManagerName), 0));
+    m_stage = reinterpret_cast<CStage*>(Memory.CreateStage(kMemoryCardStageSize, const_cast<char*>(sMemoryCardManagerName), 0));
     m_mountWorkArea =
-        new (reinterpret_cast<CMemory::CStage*>(m_stage), const_cast<char*>(sMemoryCardSourceFile), 0x88) char[0xA000];
+        new (reinterpret_cast<CMemory::CStage*>(m_stage), const_cast<char*>(sMemoryCardSourceFile), 0x88)
+            char[kMemoryCardSaveBufferSize];
 
     m_currentSlot = -1;
 }
@@ -591,7 +597,7 @@ void CMemoryCardMan::CreateMcBuff()
     if (m_saveBuffer == 0)
     {
         m_saveBuffer = new (reinterpret_cast<CMemory::CStage*>(m_stage), const_cast<char*>(sMemoryCardSourceFile), 0x2AB)
-            char[0xA000];
+            char[kMemoryCardSaveBufferSize];
 
         if (m_saveBuffer == 0 && static_cast<unsigned int>(System.m_execParam) >= 1)
         {
@@ -600,7 +606,7 @@ void CMemoryCardMan::CreateMcBuff()
     }
 
     // Zero buffer every call, allocated or not
-    memset(m_saveBuffer, 0, 0xA000);
+    memset(m_saveBuffer, 0, kMemoryCardSaveBufferSize);
 }
 
 /*
@@ -676,7 +682,7 @@ void CMemoryCardMan::SetMcIconImage()
         if (m_saveBuffer == (char*)nullptr)
         {
             m_saveBuffer = new (reinterpret_cast<CMemory::CStage*>(m_stage), const_cast<char*>(sMemoryCardSourceFile), 0x2AB)
-                char[0xA000];
+                char[kMemoryCardSaveBufferSize];
 
             if (m_saveBuffer == (char*)nullptr && static_cast<unsigned int>(System.m_execParam) >= 1)
             {
@@ -684,7 +690,7 @@ void CMemoryCardMan::SetMcIconImage()
             }
         }
 
-        memset(m_saveBuffer, 0, 0xA000);
+        memset(m_saveBuffer, 0, kMemoryCardSaveBufferSize);
     }
 	
     char path[136];
@@ -930,14 +936,14 @@ void CMemoryCardMan::MakeSaveData()
     if (m_saveBuffer == (char*)nullptr)
     {
         m_saveBuffer = new (reinterpret_cast<CMemory::CStage*>(m_stage), const_cast<char*>(sMemoryCardSourceFile), 0x2AB)
-            char[0xA000];
+            char[kMemoryCardSaveBufferSize];
         if (m_saveBuffer == (char*)nullptr && static_cast<unsigned int>(System.m_execParam) >= 1)
         {
             System.Printf(const_cast<char*>(sMemoryAllocationError), const_cast<char*>(sMemoryCardSourceFile), 0x2AD);
         }
     }
 
-    memset(m_saveBuffer, 0, 0xA000);
+    memset(m_saveBuffer, 0, kMemoryCardSaveBufferSize);
 
     u8* save = reinterpret_cast<u8*>(m_saveBuffer);
     u8* game = reinterpret_cast<u8*>(&Game);
@@ -1636,7 +1642,7 @@ int CMemoryCardMan::DummySave()
         if (m_saveBuffer == 0)
         {
             m_saveBuffer = new (reinterpret_cast<CMemory::CStage*>(m_stage), const_cast<char*>(sMemoryCardSourceFile), 0x2AB)
-                char[0xA000];
+                char[kMemoryCardSaveBufferSize];
 
             if (m_saveBuffer == 0 && static_cast<unsigned int>(System.m_execParam) >= 1)
             {
@@ -1644,7 +1650,7 @@ int CMemoryCardMan::DummySave()
             }
         }
 
-        memset(m_saveBuffer, 0, 0xA000);
+        memset(m_saveBuffer, 0, kMemoryCardSaveBufferSize);
 		
         SetMcIconImage();
 
@@ -1723,7 +1729,7 @@ int CMemoryCardMan::DummySave()
         if (m_saveBuffer == 0)
         {
             m_saveBuffer = new (reinterpret_cast<CMemory::CStage*>(m_stage), const_cast<char*>(sMemoryCardSourceFile), 0x2AB)
-                char[0xA000];
+                char[kMemoryCardSaveBufferSize];
 
             if (m_saveBuffer == 0 && static_cast<unsigned int>(System.m_execParam) >= 1)
             {
@@ -1731,7 +1737,7 @@ int CMemoryCardMan::DummySave()
             }
         }
 
-        memset(m_saveBuffer, 0, 0xA000);
+        memset(m_saveBuffer, 0, kMemoryCardSaveBufferSize);
     }
 
     MakeSaveData();
@@ -1742,7 +1748,7 @@ int CMemoryCardMan::DummySave()
     result = CARDWriteAsync(
         &m_fileInfo,
         m_saveBuffer,
-        0xA000,
+        kMemoryCardSaveBufferSize,
         0x4000,
         &Attach
     );
@@ -1896,7 +1902,7 @@ int CMemoryCardMan::DummyLoad()
     if (m_saveBuffer == 0)
     {
         m_saveBuffer = new (reinterpret_cast<CMemory::CStage*>(m_stage), const_cast<char*>(sMemoryCardSourceFile), 0x2AB)
-            char[0xA000];
+            char[kMemoryCardSaveBufferSize];
 
         if (m_saveBuffer == 0 && static_cast<unsigned int>(System.m_execParam) >= 1)
         {
@@ -1904,14 +1910,14 @@ int CMemoryCardMan::DummyLoad()
         }
     }
 
-    memset(m_saveBuffer, 0, 0xA000);
+    memset(m_saveBuffer, 0, kMemoryCardSaveBufferSize);
     m_opDoneFlag = 0;
     m_state = 8;
 
     result = CARDReadAsync(
         &m_fileInfo,
         m_saveBuffer,
-        0xA000,
+        kMemoryCardSaveBufferSize,
         0x4000,
         &Attach
     );

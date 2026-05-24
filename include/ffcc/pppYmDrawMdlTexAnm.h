@@ -4,7 +4,7 @@
 #include "ffcc/partMng.h"
 
 struct pppYmDrawMdlTexAnm {
-    _pppPObject field0_0x0;
+    _pppPObject m_object;
 };
 
 struct pppYmDrawMdlTexAnmStep {

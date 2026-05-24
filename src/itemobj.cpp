@@ -1473,6 +1473,7 @@ void CGItemObj::onCreate()
 	unk_0x562 = 0;
 	m_pendingModelHandle = 0;
 	m_itemJumpCountdown = 0;
-	memset(&m_memoryCapsuleNameIndex, 0, 0xc);
+	memset(&m_memoryCapsuleNameIndex, 0,
+	       sizeof(m_memoryCapsuleNameIndex) + sizeof(m_pendingAnimFlags) + sizeof(m_pendingAnimName));
 	m_particleSlot = ItemCFlatRuntime()->GetFreeParticleSlot();
 }

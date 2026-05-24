@@ -58,6 +58,21 @@ unsigned char m_objParty[0x1BE0];
 unsigned char m_objMon[0x1D000];
 u32 CFlatFlags;
 Mtx gFlatPosMtx;
+
+enum {
+	kFlatBaseObjCount = sizeof(m_objBase) / sizeof(CGBaseObj),
+	kFlatQuadObjCount = sizeof(m_objQuad) / sizeof(CGQuadObj),
+	kFlatObjectCount = sizeof(m_obj) / sizeof(CGObject),
+	kFlatItemObjCount = sizeof(m_objItem) / sizeof(CGItemObj),
+	kFlatLayerResourceCount = 8,
+	kFlatSpawnBitCount = 9,
+};
+
+STATIC_ASSERT(sizeof(m_objBase) == sizeof(CGBaseObj) * kFlatBaseObjCount);
+STATIC_ASSERT(sizeof(m_objQuad) == sizeof(CGQuadObj) * kFlatQuadObjCount);
+STATIC_ASSERT(sizeof(m_obj) == sizeof(CGObject) * kFlatObjectCount);
+STATIC_ASSERT(sizeof(m_objItem) == sizeof(CGItemObj) * kFlatItemObjCount);
+
 extern "C" void* __vt__Q212CFlatRuntime7CObject[];
 extern "C" void* __vt__9CGBaseObj[];
 extern "C" void* __vt__9CGQuadObj[];
@@ -101,6 +116,8 @@ struct CFlatLayerResource {
 	CTextureSet* m_textureSet;
 	CFile::CHandle* m_fileHandle;
 };
+
+STATIC_ASSERT(sizeof(CFlatLayerResource) * kFlatLayerResourceCount == 0x60);
 
 static inline void InitFlatObjectSlot(CGBaseObj* object, u16 particleId)
 {
@@ -480,10 +497,10 @@ CFlatRuntime2::CFlatRuntime2()
 	*reinterpret_cast<int*>(runtime + 0x10400) = 0;
 	*reinterpret_cast<int*>(runtime + 0x10408) = 0;
 	memset(runtime + 0x15CC, 0, 0x100);
-	memset(runtime + 0x1770, 0, 0x60);
+	memset(LayerResources(this), 0, sizeof(CFlatLayerResource) * kFlatLayerResourceCount);
 
 	resetChangeScript();
-	memset(runtime + 0x12F0, 0, 0x48);
+	memset(runtime + 0x12F0, 0, sizeof(u32) * 2 * kFlatSpawnBitCount);
 
 	CGBaseObj* baseObj = reinterpret_cast<CGBaseObj*>(m_objBase);
 	for (int i = 0; i < 0x28; i++) {
@@ -554,10 +571,10 @@ extern "C" void __sinit_cflat_runtime2_cpp(void)
 	new (CFlat) CFlatRuntime2;
 	__register_global_object(CFlat, reinterpret_cast<void*>(__dt__13CFlatRuntime2Fv), CFlat_guard);
 
-	__construct_array(m_objBase, reinterpret_cast<ConstructorDestructor>(__ct__9CGBaseObjFv), 0, 0x50, 0x28);
-	__construct_array(m_objQuad, reinterpret_cast<ConstructorDestructor>(__ct__9CGQuadObjFv), 0, 0xAC, 0x18);
-	__construct_array(m_obj, reinterpret_cast<ConstructorDestructor>(__ct__8CGObjectFv), 0, 0x518, 0x38);
-	__construct_array(m_objItem, reinterpret_cast<ConstructorDestructor>(__ct__9CGItemObjFv), 0, 0x57C, 0x20);
+	__construct_array(m_objBase, reinterpret_cast<ConstructorDestructor>(__ct__9CGBaseObjFv), 0, sizeof(CGBaseObj), kFlatBaseObjCount);
+	__construct_array(m_objQuad, reinterpret_cast<ConstructorDestructor>(__ct__9CGQuadObjFv), 0, sizeof(CGQuadObj), kFlatQuadObjCount);
+	__construct_array(m_obj, reinterpret_cast<ConstructorDestructor>(__ct__8CGObjectFv), 0, sizeof(CGObject), kFlatObjectCount);
+	__construct_array(m_objItem, reinterpret_cast<ConstructorDestructor>(__ct__9CGItemObjFv), 0, sizeof(CGItemObj), kFlatItemObjCount);
 	__construct_array(m_objParty, reinterpret_cast<ConstructorDestructor>(__ct__10CGPartyObjFv), 0, 0x6F8, 4);
 	__construct_array(m_objMon, reinterpret_cast<ConstructorDestructor>(__ct__8CGMonObjFv), 0, 0x740, 0x40);
 }
@@ -2373,7 +2390,7 @@ void CFlatRuntime2::IgnoreParticle(int slotNo, CFlatRuntime::CObject* object)
  */
 void CFlatRuntime2::initAllFinished()
 {
-	memset(&CGPartyObj::m_ghostWork, 0, 0x90);
+	memset(CGPartyObj::m_ghostWork, 0, sizeof(CGPartyObj::m_ghostWork));
 }
 
 /*
@@ -2545,7 +2562,7 @@ int CFlatRuntime2::GetSysControl(int controlNo)
 void CFlatRuntime2::resetSpawnBit(int spawnBit)
 {
 	if (spawnBit == -1) {
-		memset(reinterpret_cast<u8*>(this) + 0x12F0, 0, 0x48);
+		memset(reinterpret_cast<u8*>(this) + 0x12F0, 0, sizeof(u32) * 2 * kFlatSpawnBitCount);
 		return;
 	}
 
@@ -2664,5 +2681,5 @@ void CFlatRuntime2::resetChangeScript()
 void CFlatRuntime2::ResetNewGame()
 {
 	resetChangeScript();
-	memset(reinterpret_cast<u8*>(this) + 0x12F0, 0, 0x48);
+	memset(reinterpret_cast<u8*>(this) + 0x12F0, 0, sizeof(u32) * 2 * kFlatSpawnBitCount);
 }

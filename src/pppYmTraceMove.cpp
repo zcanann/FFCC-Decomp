@@ -29,6 +29,11 @@ struct pppYmTraceMoveMngStRaw {
 	void* m_owner;
 };
 
+static inline pppYmTraceMoveWork* GetYmTraceMoveWork(pppYmTraceMove* traceMove, pppYmTraceMoveCtrl* ctrl)
+{
+	return reinterpret_cast<pppYmTraceMoveWork*>(traceMove->m_object.m_workArea + *ctrl->m_serializedDataOffsets);
+}
+
 /*
  * --INFO--
  * PAL Address: 0x800d4828
@@ -38,15 +43,14 @@ struct pppYmTraceMoveMngStRaw {
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkB* param_2, pppYmTraceMoveUnkC* param_3)
+void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveStep* param_2, pppYmTraceMoveCtrl* param_3)
 {
 	if (gPppCalcDisabled != 0) {
 		return;
 	}
 
 	pppYmTraceMoveMngStRaw* pppMngSt = (pppYmTraceMoveMngStRaw*)pppMngStPtr;
-	pppYmTraceMoveWork* work =
-		(pppYmTraceMoveWork*)((u8*)pppYmTraceMove + 0x80 + *param_3->m_serializedDataOffsets);
+	pppYmTraceMoveWork* work = GetYmTraceMoveWork(pppYmTraceMove, param_3);
 	void* owner = pppMngSt->m_owner;
 	Vec local_20;
 	Vec local_2c;
@@ -60,7 +64,7 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkB* par
 	work->m_velocity = work->m_velocity + work->m_acceleration;
 	work->m_distance = work->m_distance + work->m_velocity;
 
-	if (param_2->m_graphId == pppYmTraceMove->m_graphId) {
+	if (param_2->m_graphId == pppYmTraceMove->m_object.m_graphId) {
 		work->m_distance = work->m_distance + param_2->m_initWOrk;
 		work->m_velocity = work->m_velocity + param_2->m_stepValue;
 		work->m_acceleration = work->m_acceleration + param_2->m_arg3;
@@ -123,9 +127,9 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkB* par
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkC* param_2)
+void pppConstructYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveCtrl* param_2)
 {
-	pppYmTraceMoveWork* work = (pppYmTraceMoveWork*)((u8*)pppYmTraceMove + 0x80 + *param_2->m_serializedDataOffsets);
+	pppYmTraceMoveWork* work = GetYmTraceMoveWork(pppYmTraceMove, param_2);
 	pppYmTraceMoveMngStRaw* pppMngSt = (pppYmTraceMoveMngStRaw*)pppMngStPtr;
 	f32 zero;
 

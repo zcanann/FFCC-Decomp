@@ -79,6 +79,14 @@ enum GameAssetNameBlockOffset {
 	kParticleCallbackType3Fmt = 0x194,
 };
 
+enum {
+	kGameWorkDataClearSize =
+	    sizeof(CGame::CGameWork) - offsetof(CGame::CGameWork, m_gameDataStartMarker),
+	kGameScriptSaveDataSize = 0x800,
+};
+
+STATIC_ASSERT(kGameWorkDataClearSize == 0x13E1);
+
 extern "C" const char s_game_cpp[];
 static const char s_ScriptWillChangeMsg_801D619C[] = {
     0x83, 0x58, 0x83, 0x4E, 0x83, 0x8A, 0x83, 0x76, 0x83, 0x67, 0x82, 0xAA, 0x90, 0xD8, 0x82, 0xE8, 0x91, 0xD6,
@@ -480,7 +488,7 @@ void CGame::Create()
     m_nextScript.m_flags = 1;
     clearWork();
 
-    memset(&m_gameWork.m_gameDataStartMarker, 0, 0x13E1);
+    memset(&m_gameWork.m_gameDataStartMarker, 0, kGameWorkDataClearSize);
     memset(m_gameWork.m_wmBackupParams, 0xFF, sizeof(m_gameWork.m_wmBackupParams));
 
     *reinterpret_cast<u32*>(&m_gameWork.m_scriptSysVal0) = 1;
@@ -545,7 +553,7 @@ void CGame::InitNewGame()
 
     CGame* game = &Game;
 
-    memset(&game->m_gameWork.m_gameDataStartMarker, 0, 0x13E1);
+    memset(&game->m_gameWork.m_gameDataStartMarker, 0, kGameWorkDataClearSize);
     memset(game->m_gameWork.m_wmBackupParams, 0xFF, sizeof(game->m_gameWork.m_wmBackupParams));
 
     *reinterpret_cast<unsigned int*>(&game->m_gameWork.m_scriptSysVal0) = 1;
@@ -756,7 +764,7 @@ void CGame::CheckScriptChange()
         System.Printf(const_cast<char*>(sNewGameInitMsg));
         System.Printf(const_cast<char*>(s_gameDebugMarker));
 
-        memset(&game->m_gameWork.m_gameDataStartMarker, 0, 0x13E1);
+        memset(&game->m_gameWork.m_gameDataStartMarker, 0, kGameWorkDataClearSize);
         memset(game->m_gameWork.m_wmBackupParams, 0xFF, sizeof(game->m_gameWork.m_wmBackupParams));
 
         *reinterpret_cast<unsigned int*>(&game->m_gameWork.m_scriptSysVal0) = 1;
@@ -1115,7 +1123,7 @@ void CGame::LoadScript(char* scriptData)
  */
 void CGame::SaveScript(char* scriptData)
 {
-    memset(scriptData, 0, 0x800);
+    memset(scriptData, 0, kGameScriptSaveDataSize);
 
     int scriptOffset = 0;
     int entryOffset = 0;
@@ -1608,7 +1616,7 @@ inline void CGame::CGameWork::ClearEvtWork()
  */
 inline void CGame::CGameWork::Init()
 {
-    memset(&m_gameDataStartMarker, 0, 0x13E1);
+    memset(&m_gameDataStartMarker, 0, kGameWorkDataClearSize);
     memset(m_wmBackupParams, 0xFF, sizeof(m_wmBackupParams));
 
     *reinterpret_cast<unsigned int*>(&m_scriptSysVal0) = 1;
@@ -1790,7 +1798,7 @@ inline char* CGame::GetMonName(int monIndex, int count)
  */
 inline CGame::CGameWork::CGameWork()
 {
-    memset(&m_gameDataStartMarker, 0, 0x13E1);
+    memset(&m_gameDataStartMarker, 0, kGameWorkDataClearSize);
     memset(m_wmBackupParams, 0xFF, sizeof(m_wmBackupParams));
 
     *reinterpret_cast<unsigned int*>(&m_scriptSysVal0) = 1;

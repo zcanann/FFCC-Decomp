@@ -3,6 +3,7 @@
 #include "ffcc/file.h"
 #include "ffcc/gbaque.h"
 #include "ffcc/system.h"
+#include "global.h"
 
 #include <dolphin/gba/GBA.h>
 #include "dolphin/os.h"
@@ -115,6 +116,23 @@ namespace JoyBusConst {
 char* DVD_DIR = const_cast<char*>(s_dvd_gba_dir);
 char* CLIENT_FILE = const_cast<char*>(s_ffcc_cli_bin);
 char* OBJ_FILE = const_cast<char*>(s_objdat_spt);
+}
+
+enum {
+	kJoyDataPacketHeaderBytes = 2,
+	kJoyDataPacketPayloadBytes = 0x400,
+	kJoyDataLargePayloadClearBytes = 0x300,
+	kJoyDataMapPayloadClearBytes = 0x200,
+	kJoyDataSmallPayloadClearBytes = 0x100,
+	kJoyDataFavoritePayloadClearBytes = 0x40,
+};
+
+STATIC_ASSERT(sizeof(ThreadParam) == 0x3C);
+STATIC_ASSERT(sizeof(JoyBus::JoyBusRecvBuffer) == 0x408);
+
+static inline void ClearJoyDataPacketPayload(JoyBus* joybus, int port)
+{
+	memset(joybus->m_joyDataPacketBuffer[port] + kJoyDataPacketHeaderBytes, 0, kJoyDataPacketPayloadBytes);
 }
 
 inline unsigned int MakeJoyCmd32(unsigned char op, unsigned char a, unsigned char b, unsigned char c)
@@ -622,7 +640,7 @@ void JoyBus::ThreadMain(void* arg)
             {
                 if (threadParam == jb->m_threadParams)
                 {
-                    memset(threadParam, 0, 0x3c);
+                    memset(threadParam, 0, sizeof(*threadParam));
                     threadParam->m_portIndex = (int)idx;
                     break;
                 }
@@ -1456,7 +1474,7 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
             if ((header >> 6) == 0)
             {
                 OSWaitSemaphore(&m_accessSemaphores[port]);
-                memset(&m_recvBuffer[port], 0, 0x408);
+                memset(&m_recvBuffer[port], 0, sizeof(m_recvBuffer[port]));
                 OSSignalSemaphore(&m_accessSemaphores[port]);
             }
 
@@ -1475,7 +1493,7 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
                     }
 
                     OSWaitSemaphore(&m_accessSemaphores[port]);
-                    memset(&m_recvBuffer[port], 0, 0x408);
+                    memset(&m_recvBuffer[port], 0, sizeof(m_recvBuffer[port]));
                     OSSignalSemaphore(&m_accessSemaphores[port]);
                 }
             }
@@ -1547,7 +1565,7 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
                     }
 
                     OSWaitSemaphore(&m_accessSemaphores[port]);
-                    memset(&m_recvBuffer[port], 0, 0x408);
+                    memset(&m_recvBuffer[port], 0, sizeof(m_recvBuffer[port]));
                     OSSignalSemaphore(&m_accessSemaphores[port]);
                 }
             }
@@ -3000,7 +3018,7 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
             return 0;
         }
 
-        memset(posBytes, 0, 0x100);
+        memset(posBytes, 0, sizeof(m_playerPosPacketBuffer[port]));
 
         GbaQue.GetPlayerPos(port, posWords);
 
@@ -3061,7 +3079,7 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
 
     case 2:
     {
-        memset(posBytes, 0, 0x100);
+        memset(posBytes, 0, sizeof(m_playerPosPacketBuffer[port]));
         wordIndex = 0;
         mobCount = 0;
 
@@ -3133,7 +3151,7 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
 
     case 4:
     {
-        memset(posBytes, 0, 0x100);
+        memset(posBytes, 0, sizeof(m_playerPosPacketBuffer[port]));
         wordIndex = 0;
         mobCount = 0;
 
@@ -3394,7 +3412,7 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
             unsigned char payload[0x300];
             memset(payload, 0, sizeof(payload));
 
-            memset(m_joyDataPacketBuffer[port] + 2, 0, 0x400);
+            ClearJoyDataPacketPayload(this, port);
 
             payload[0] = 1;
 
@@ -3629,9 +3647,9 @@ int JoyBus::SendItemAll(ThreadParam* threadParam)
 
         unsigned char payload[780];
 
-        memset(payload, 0, 0x300);
+        memset(payload, 0, kJoyDataLargePayloadClearBytes);
 
-        memset(m_joyDataPacketBuffer[port] + 2, 0, 0x400);
+        ClearJoyDataPacketPayload(this, port);
 
         payload[0] = 2;
 
@@ -3753,7 +3771,7 @@ int JoyBus::SendMapObj(ThreadParam* threadParam)
 
         unsigned char payload[524];
 
-        memset(payload, 0, 0x200);
+        memset(payload, 0, kJoyDataMapPayloadClearBytes);
 
         payload[0] = 3;
 
@@ -3874,7 +3892,7 @@ int JoyBus::SendCompatibility(ThreadParam* threadParam)
 
         memset(payload, 0, sizeof(payload));
 
-        memset(m_joyDataPacketBuffer[port] + 2, 0, 0x400);
+        ClearJoyDataPacketPayload(this, port);
         payload[0] = 5;
 
         unsigned char* compatBuf = &payload[1];
@@ -4109,8 +4127,8 @@ int JoyBus::SendFavorite(ThreadParam* threadParam)
         unsigned char payload[1 + 75];
         unsigned int port = threadParam->m_portIndex;
 
-        memset(payload, 0, 0x40);
-        memset(m_joyDataPacketBuffer[port] + 2, 0, 0x400);
+        memset(payload, 0, kJoyDataFavoritePayloadClearBytes);
+        ClearJoyDataPacketPayload(this, port);
 
         payload[0] = 4;
 
@@ -4380,8 +4398,8 @@ int JoyBus::SendEquip(ThreadParam* threadParam)
 
         unsigned char payload[1 + 779];
 
-        memset(payload, 0, 0x300);
-        memset(m_joyDataPacketBuffer[port] + 2, 0, 0x400);
+        memset(payload, 0, kJoyDataLargePayloadClearBytes);
+        ClearJoyDataPacketPayload(this, port);
 
         payload[0] = 6;
 
@@ -4501,8 +4519,8 @@ int JoyBus::SendCmd(ThreadParam* threadParam)
 
         unsigned char payload[1 + 779];
 
-        memset(payload, 0, 0x300);
-        memset(m_joyDataPacketBuffer[port] + 2, 0, 0x400);
+        memset(payload, 0, kJoyDataLargePayloadClearBytes);
+        ClearJoyDataPacketPayload(this, port);
 
         payload[0] = 0x0c;
 
@@ -4622,8 +4640,8 @@ int JoyBus::SendBonusStr(ThreadParam* threadParam)
 
         unsigned char payload[1 + 1 + 258];
 
-        memset(payload, 0, 0x100);
-        memset(m_joyDataPacketBuffer[port] + 2, 0, 0x400);
+        memset(payload, 0, kJoyDataSmallPayloadClearBytes);
+        ClearJoyDataPacketPayload(this, port);
 
         payload[0] = 7;
 
@@ -4734,8 +4752,8 @@ int JoyBus::SendArtifact(ThreadParam* threadParam)
 
         unsigned char payload[1 + 267];
 
-        memset(payload, 0, 0x100);
-        memset(m_joyDataPacketBuffer[port] + 2, 0, 0x400);
+        memset(payload, 0, kJoyDataSmallPayloadClearBytes);
+        ClearJoyDataPacketPayload(this, port);
 
         payload[0] = 8;
 
@@ -4854,8 +4872,8 @@ int JoyBus::SendTmpArtifact(ThreadParam* threadParam)
 
         unsigned char payload[1 + 267];
 
-        memset(payload, 0, 0x100);
-        memset(m_joyDataPacketBuffer[port] + 2, 0, 0x400);
+        memset(payload, 0, kJoyDataSmallPayloadClearBytes);
+        ClearJoyDataPacketPayload(this, port);
 
         payload[0] = 9;
 
@@ -4975,8 +4993,8 @@ int JoyBus::SendMapObjInfo(ThreadParam* threadParam)
 
         unsigned char payload[268];
 
-        memset(payload, 0, 0x100);
-        memset(m_joyDataPacketBuffer[port] + 2, 0, 0x400);
+        memset(payload, 0, kJoyDataSmallPayloadClearBytes);
+        ClearJoyDataPacketPayload(this, port);
 
         payload[0] = 10;
 
@@ -5212,7 +5230,7 @@ int JoyBus::SendScouInfo(ThreadParam* threadParam)
         unsigned char payload[0x400];
         memset(payload, 0, sizeof(payload));
 
-        memset(m_joyDataPacketBuffer[port] + 2, 0, 0x400);
+        ClearJoyDataPacketPayload(this, port);
 
         payload[0] = 0x0B;
 

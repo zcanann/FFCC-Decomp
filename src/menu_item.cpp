@@ -107,6 +107,7 @@ STATIC_ASSERT(offsetof(MenuItemOpenAnim, dy) == 0x34);
 STATIC_ASSERT(offsetof(MenuItemOpenAnim, targetX) == 0x38);
 STATIC_ASSERT(offsetof(MenuItemOpenAnim, targetY) == 0x3C);
 STATIC_ASSERT(sizeof(MenuItemOpenAnim) == 0x40);
+STATIC_ASSERT(sizeof(ItemMenuAnimList) == 0x1008);
 
 static inline ItemMenuAnimList* GetItemOpenAnimList(CMenuPcs* menu)
 {
@@ -835,7 +836,7 @@ void CMenuPcs::ItemInit()
     MenuItemOpenAnim* entry;
     ItemMenuAnimList* itemList;
 
-    memset(this->itemList, 0, 0x1008);
+    memset(this->itemList, 0, sizeof(*this->itemList));
     float one = FLOAT_80332e64;
     entry = this->itemList->anims;
     int initCount = 8;

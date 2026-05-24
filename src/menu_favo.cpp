@@ -69,6 +69,16 @@ struct FavoEntry {
 	float targetY;
 };
 
+struct FavoListStorage {
+	short count;
+	short selected;
+	unsigned char pad_0004[4];
+	FavoEntry entries[64];
+};
+
+STATIC_ASSERT(sizeof(FavoEntry) == 0x40);
+STATIC_ASSERT(sizeof(FavoListStorage) == 0x1008);
+
 /*
  * --INFO--
  * PAL Address: 0x80162360
@@ -581,7 +591,7 @@ void CMenuPcs::FavoInit()
 	int iVar17;
 
 	uVar3 = Game.m_scriptFoodBase[0];
-	memset(favoList, 0, 0x1008);
+	memset(reinterpret_cast<FavoListStorage*>(favoList), 0, sizeof(FavoListStorage));
 	fVar4 = FLOAT_80333048;
 	iVar8 = (int)favoList + 8;
 	iVar16 = 8;
@@ -722,7 +732,7 @@ void CMenuPcs::FavoInit()
 
 	*favoList = sVar11;
 
-	memset(s_rank, 0, 0x20);
+	memset(s_rank, 0, sizeof(s_rank));
 	iVar8 = 0;
 	puVar13 = s_rank;
 	s_rank[1] = 0;

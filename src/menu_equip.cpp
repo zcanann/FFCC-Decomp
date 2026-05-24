@@ -68,9 +68,18 @@ struct MenuEquipMembers {
 	s16* m_equipList;
 };
 
+struct EquipListStorage {
+	s16 count;
+	s16 selected;
+	unsigned char pad_0004[4];
+	unsigned char entries[64][0x40];
+};
+
 STATIC_ASSERT(offsetof(MenuEquipMembers, m_equipFont) == 0x108);
 STATIC_ASSERT(offsetof(MenuEquipMembers, m_equipState) == 0x82C);
 STATIC_ASSERT(offsetof(MenuEquipMembers, m_equipList) == 0x850);
+STATIC_ASSERT(offsetof(EquipListStorage, entries) == 8);
+STATIC_ASSERT(sizeof(EquipListStorage) == 0x1008);
 
 static inline MenuEquipMembers& GetMenuEquipMembers(CMenuPcs* menu)
 {
@@ -85,6 +94,11 @@ static inline s16* GetEquipState(CMenuPcs* menu)
 static inline s16* GetEquipList(CMenuPcs* menu)
 {
 	return GetMenuEquipMembers(menu).m_equipList;
+}
+
+static inline EquipListStorage* GetEquipListStorage(CMenuPcs* menu)
+{
+	return reinterpret_cast<EquipListStorage*>(GetEquipList(menu));
 }
 
 static inline int GetEquipStateBase(CMenuPcs* menu)
@@ -934,7 +948,7 @@ int CMenuPcs::EquipOpen()
 	double dVar20;
 
 	if (*(char*)(GetEquipStateBase(this) + 0xb) == '\0') {
-		memset((void*)GetEquipList(this), 0, 0x1008);
+		memset(GetEquipListStorage(this), 0, sizeof(*GetEquipListStorage(this)));
 		fVar5 = FLOAT_80332ee0;
 		iVar6 = GetEquipListBase(this) + 8;
 		iVar11 = 8;

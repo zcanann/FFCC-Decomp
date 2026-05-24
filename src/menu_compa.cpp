@@ -50,6 +50,8 @@ struct CompaFlatData
 	CompaFlatTableEntry table[8];
 };
 
+STATIC_ASSERT(sizeof(CompaOpenAnimList) == 0x1008);
+
 /*
  * --INFO--
  * PAL Address: 0x80160edc
@@ -539,7 +541,7 @@ bool CMenuPcs::CompaOpen()
  */
 void CMenuPcs::CompaInit()
 {
-	memset(this->compaList, 0, 0x1008);
+	memset(this->compaList, 0, sizeof(*this->compaList));
 
 	CompaOpenAnim* entry = this->compaList->entries;
 	int count = 8;

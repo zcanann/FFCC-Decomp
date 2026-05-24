@@ -758,7 +758,7 @@ void CMenuPcs::ArtiInit()
 	int iVar10;
 	int iVar11;
 
-	memset((void*)GetArtiList(this), 0, 0x1008);
+	memset(GetArtiOpenAnimList(this), 0, sizeof(*GetArtiOpenAnimList(this)));
 	fVar2 = FLOAT_80332fac;
 	iVar5 = GetArtiListBase(this) + 8;
 	iVar10 = 8;

@@ -6,6 +6,10 @@ extern "C" {
 extern const float kPppScreenQuakeZero;
 }
 
+static inline float* GetScreenQuakeWork(pppScreenQuake* quake, pppScreenQuakeCtrl* ctrl)
+{
+    return reinterpret_cast<float*>(quake->m_object.m_workArea + *ctrl->m_serializedDataOffsets);
+}
 
 /*
  * --INFO--
@@ -16,7 +20,7 @@ extern const float kPppScreenQuakeZero;
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderScreenQuake(pppScreenQuake*, pppScreenQuakeUnkB*, pppScreenQuakeUnkC*)
+void pppRenderScreenQuake(pppScreenQuake*, pppScreenQuakeStep*, pppScreenQuakeCtrl*)
 {
 }
 
@@ -29,14 +33,14 @@ void pppRenderScreenQuake(pppScreenQuake*, pppScreenQuakeUnkB*, pppScreenQuakeUn
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameScreenQuake(pppScreenQuake *quake, pppScreenQuakeUnkB *param2, pppScreenQuakeUnkC *param3)
+void pppFrameScreenQuake(pppScreenQuake *quake, pppScreenQuakeStep *param2, pppScreenQuakeCtrl *param3)
 {
     if (gPppCalcDisabled == 0) {
-        float *value = (float *)((char *)quake + 0x80 + *param3->m_serializedDataOffsets);
+        float *value = GetScreenQuakeWork(quake, param3);
 
-        CalcGraphValue((_pppPObject *)&quake->field0_0x0, param2->m_graphId, value[0], value[1], value[2], param2->m_dataValIndex, param2->m_initWOrk, param2->m_stepValue);
-        CalcGraphValue((_pppPObject *)&quake->field0_0x0, param2->m_graphId, value[3], value[4], value[5], param2->m_arg3, param2->m_initWOrk2, param2->m_stepValue2);
-        CalcGraphValue((_pppPObject *)&quake->field0_0x0, param2->m_graphId, value[6], value[7], value[8], param2->m_arg4, param2->m_initWOrk3, param2->m_stepValue3);
+        CalcGraphValue(&quake->m_object, param2->m_graphId, value[0], value[1], value[2], param2->m_dataValIndex, param2->m_initWOrk, param2->m_stepValue);
+        CalcGraphValue(&quake->m_object, param2->m_graphId, value[3], value[4], value[5], param2->m_arg3, param2->m_initWOrk2, param2->m_stepValue2);
+        CalcGraphValue(&quake->m_object, param2->m_graphId, value[6], value[7], value[8], param2->m_arg4, param2->m_initWOrk3, param2->m_stepValue3);
 
         CameraPcs.SetQuakeParameter(
             1,
@@ -62,7 +66,7 @@ void pppFrameScreenQuake(pppScreenQuake *quake, pppScreenQuakeUnkB *param2, pppS
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDesScreenQuake(pppScreenQuake*, pppScreenQuakeUnkC*)
+void pppDesScreenQuake(pppScreenQuake*, pppScreenQuakeCtrl*)
 {
     float val = kPppScreenQuakeZero;
 
@@ -89,10 +93,10 @@ void pppDesScreenQuake(pppScreenQuake*, pppScreenQuakeUnkC*)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppCon2ScreenQuake(pppScreenQuake *quake, pppScreenQuakeUnkC *param2)
+void pppCon2ScreenQuake(pppScreenQuake *quake, pppScreenQuakeCtrl *param2)
 {
     float val = kPppScreenQuakeZero;
-    float *data = (float *)((char *)&quake->field0_0x0 + 128 + *param2->m_serializedDataOffsets);
+    float *data = GetScreenQuakeWork(quake, param2);
 
     data[2] = val;
     data[1] = val;
@@ -114,10 +118,10 @@ void pppCon2ScreenQuake(pppScreenQuake *quake, pppScreenQuakeUnkC *param2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConScreenQuake(pppScreenQuake *quake, pppScreenQuakeUnkC *param2)
+void pppConScreenQuake(pppScreenQuake *quake, pppScreenQuakeCtrl *param2)
 {
     float val = kPppScreenQuakeZero;
-    float *data = (float *)((char *)&quake->field0_0x0 + 128 + *param2->m_serializedDataOffsets);
+    float *data = GetScreenQuakeWork(quake, param2);
 
     data[2] = val;
     data[1] = val;

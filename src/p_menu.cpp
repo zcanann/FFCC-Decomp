@@ -1744,9 +1744,10 @@ void CMenuPcs::createBattle()
 
     int* textureInfo = sMenuTextureInfoTable;
     for (int i = 0; i < 10; i++) {
-        CTextureSet* textureSet = m_textureSets[textureInfo[0]];
-        const unsigned long textureIndex = static_cast<unsigned long>(textureSet->Find(reinterpret_cast<char*>(textureInfo[1])));
-        CTexture* texture = (*reinterpret_cast<CPtrArray<CTexture*>*>(reinterpret_cast<u8*>(textureSet) + 8))[textureIndex];
+        const unsigned long textureIndex =
+            static_cast<unsigned long>(m_textureSets[textureInfo[0]]->Find(reinterpret_cast<char*>(textureInfo[1])));
+        CTexture* texture =
+            (*reinterpret_cast<CPtrArray<CTexture*>*>(reinterpret_cast<u8*>(m_textureSets[textureInfo[0]]) + 8))[textureIndex];
         *reinterpret_cast<int*>(reinterpret_cast<u8*>(texture) + 4) =
             *reinterpret_cast<int*>(reinterpret_cast<u8*>(texture) + 4) + 1;
         m_textures[i + 0x16] = texture;
@@ -1774,21 +1775,21 @@ void CMenuPcs::createBattle()
     for (int i = 0; i < 0x100; i++) {
         _GXColor color = m_textures[0x18]->GetTlutColor(i);
         const int avg2 = (((int)color.r + (int)color.g + (int)color.b) / 3) * 2;
-        _GXColor outColor;
-        outColor.r = static_cast<u8>(((int)color.r + avg2) / 3);
-        outColor.g = static_cast<u8>(((int)color.g + avg2) / 3);
-        outColor.b = static_cast<u8>(((int)color.b + avg2) / 3);
-        outColor.a = color.a;
+        color.r = static_cast<u8>(((int)color.r + avg2) / 3);
+        color.g = static_cast<u8>(((int)color.g + avg2) / 3);
+        color.b = static_cast<u8>(((int)color.b + avg2) / 3);
 
         const unsigned long tlutFmt = *reinterpret_cast<unsigned long*>(reinterpret_cast<u8*>(m_textures[0x18]) + 0x60);
-        int tlutOffset = 0;
+        int tlutOffset;
         if (tlutFmt == 9) {
             tlutOffset = 0x100;
         } else if (tlutFmt == 8) {
             tlutOffset = 0x10;
+        } else {
+            tlutOffset = 0;
         }
 
-        CTexture::SetExternalTlutColor(m_externalFontTlut, tlutOffset, i, outColor);
+        CTexture::SetExternalTlutColor(m_externalFontTlut, tlutOffset, i, color);
     }
 
     m_textures[0x18]->FlushExternalTlut(m_externalFontTlut);

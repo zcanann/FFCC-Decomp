@@ -296,7 +296,7 @@ int CMenuPcs::ArtiCtrlCur()
  */
 void CMenuPcs::ArtiDraw()
 {
-	bool hasSelectedArtifact = false;
+	int hasSelectedArtifact = 0;
 	int selectedArtifactId;
 
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
@@ -418,7 +418,7 @@ void CMenuPcs::ArtiDraw()
 		} else {
 			text = flatData->table[0].strings[itemCount * 5 + 4];
 			if (menuIndex == (int)*(short*)(GetArtiStateBase(this) + 0x26) + (int)*(short*)(GetArtiStateBase(this) + 0x34)) {
-				hasSelectedArtifact = true;
+				hasSelectedArtifact = 1;
 				selectedArtifactId = itemCount;
 			}
 		}
@@ -723,15 +723,16 @@ void CMenuPcs::ArtiInit1()
 				uVar5 = uVar5 - 1;
 			} while (uVar5 != 0);
 			uVar4 = uVar4 & 7;
+			if (uVar4 == 0) {
+				return;
+			}
 		}
-		if (uVar4 != 0) {
-			do {
-				entry->step = 0;
-				entry->alpha = fVar1;
-				entry++;
-				uVar4 = uVar4 - 1;
-			} while (uVar4 != 0);
-		}
+		do {
+			entry->step = 0;
+			entry->alpha = fVar1;
+			entry++;
+			uVar4 = uVar4 - 1;
+		} while (uVar4 != 0);
 	}
 }
 

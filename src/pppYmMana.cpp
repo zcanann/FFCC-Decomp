@@ -1656,8 +1656,8 @@ void CalcReflectionVector2(
     cameraPos.z = CameraWorldZ();
 
     PSMTXCopy(matrix, matrixCopy);
-    PSMTXCopy((float (*)[4])((u8*)node + 0x14), nodeOffsetMtx);
-    PSMTXCopy((float (*)[4])((u8*)node + 0x6C), workMtx);
+    PSMTXCopy(node->m_localRuntimeMtx, nodeOffsetMtx);
+    PSMTXCopy(node->m_mtx, workMtx);
 
     nodePos.x = workMtx[0][3];
     nodePos.y = workMtx[1][3];

@@ -443,7 +443,7 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
     dVar24 = FLOAT_80331cc0;
     dVar25 = FLOAT_80331cd8;
 
-    for (uVar15 = 0; uVar15 < *(u32*)(ScreenBreakModelDataRaw(model) + 0xC); uVar15++) {
+    for (uVar15 = 0; uVar15 < *(u32*)(ScreenBreakModelDataRaw(model) + 0xC);) {
         iVar14 = *(s32*)(iVar16 + 8);
         iVar5 = *(s32*)((u8*)model + 0xA8) + (*(s32*)(iVar14 + 0x5C) * 0xC0);
         ((ScreenBreakNode*)iVar5)->m_disabled = 0;
@@ -564,6 +564,7 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
         uStack_b4 = (u32)*(u8*)((u8*)step + 0x34);
         dVar17 = Math.RandF((float)uStack_b4);
         iVar16 += 0x14;
+        uVar15++;
         inVec[4].y = dVar25 * (dVar24 + dVar17);
         *(u8*)&inVec[4].z = 0;
         inVec += 5;

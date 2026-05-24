@@ -2811,8 +2811,7 @@ void CMenuPcs::CreateSmithMenu()
         PartPcs.LoadMenuPdt(s_shop_80332e54);
 
     int slotIndex = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(shopMenu) + 0x18);
-    _pppDataHead* pppDataHead =
-        *reinterpret_cast<_pppDataHead**>(reinterpret_cast<unsigned char*>(&PartMng) + 0x22E18 + slotIndex * 0x38);
+    _pppDataHead* pppDataHead = PartMng.m_pdtSlots[slotIndex].m_pppDataHead;
     short* cacheChunks = reinterpret_cast<short*>(pppDataHead->m_cacheChunks);
     *reinterpret_cast<int*>(cacheChunks + 2) =
         ppvAmemCacheSet.GetData(*cacheChunks, s_shopmenu_cpp, 0x32A);
@@ -2850,8 +2849,7 @@ void CMenuPcs::CreateShopMenu()
         PartPcs.LoadMenuPdt(s_shop_80332e54);
 
     int slotIndex = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(shopMenu) + 0x18);
-    _pppDataHead* pppDataHead =
-        *reinterpret_cast<_pppDataHead**>(reinterpret_cast<unsigned char*>(&PartMng) + 0x22E18 + slotIndex * 0x38);
+    _pppDataHead* pppDataHead = PartMng.m_pdtSlots[slotIndex].m_pppDataHead;
     short* cacheChunks = reinterpret_cast<short*>(pppDataHead->m_cacheChunks);
     *reinterpret_cast<int*>(cacheChunks + 2) =
         ppvAmemCacheSet.GetData(*cacheChunks, s_shopmenu_cpp, 0x32A);

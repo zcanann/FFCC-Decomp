@@ -421,12 +421,6 @@ void CPartMng::Destroy()
  */
 void CPartMng::pppDumpMngSt()
 {
-    struct PppPdtSlotRaw {
-        _pppDataHead* m_pdt;
-        unsigned int m_envFields[5];
-        char m_name[0x20];
-    };
-
     struct PppMngStDumpRaw {
         void* m_pppResSet;                 // 0x00
         unsigned char m_pad04[0x74 - 0x4];
@@ -444,7 +438,7 @@ void CPartMng::pppDumpMngSt()
     unsigned long heapUse;
     unsigned long heapFree;
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
-    PppPdtSlotRaw* pdtSlots = reinterpret_cast<PppPdtSlotRaw*>(self + 0x22E18);
+    PppPdtSlot* pdtSlots = m_pdtSlots;
 
     if (System.m_execParam != 0) {
         System.Printf(const_cast<char*>(s__________________________________801d8358));
@@ -528,20 +522,14 @@ void CPartMng::pppReleasePmng(int)
  */
 void CPartMng::pppReleasePdt(int pdtSlotIndex)
 {
-    struct PppPdtSlotRaw {
-        _pppDataHead* m_pppDataHead;
-        unsigned int m_envFields[5];
-        char m_name[0x20];
-    };
-
     struct PppMngStRaw {
         void* m_pppResSet;
         char m_unused[0x154];
     };
 
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
-    PppPdtSlotRaw* pdtSlots = reinterpret_cast<PppPdtSlotRaw*>(self + 0x22e18);
-    PppPdtSlotRaw* pdtSlot = &pdtSlots[pdtSlotIndex];
+    PppPdtSlot* pdtSlots = m_pdtSlots;
+    PppPdtSlot* pdtSlot = &pdtSlots[pdtSlotIndex];
     _pppDataHead* pdt = pdtSlot->m_pppDataHead;
 
     if (pdt == 0) {
@@ -1477,12 +1465,6 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         CTextureSet* m_textureSet;
     };
 
-    struct PppPdtSlotRaw {
-        _pppDataHead* m_pdt;
-        unsigned int m_envFields[5];
-        char m_name[0x20];
-    };
-
     static const int kUsbMapMeshTableOffset = 0x7F4;
     static const int kUsbShapeSlotTableOffset = 0x7F8;
     static const int kRecvWriteOffset = 0x23550;
@@ -1495,7 +1477,6 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
     static const int kEnvOffset = 0x2351C;
     static const int kPppMngOffset = 0x2A18;
     static const int kPppMngStride = 0x158;
-    static const int kPdtSlotsOffset = 0x22E18;
     static const int kCursorRequestOffset = 0x10;
     static const int kCursorXOffset = 0x28;
     static const int kCursorYOffset = 0x2C;
@@ -1518,7 +1499,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
     PartMngResRaw* res = reinterpret_cast<PartMngResRaw*>(self);
     _pppEnvSt* env = reinterpret_cast<_pppEnvSt*>(self + kEnvOffset);
-    PppPdtSlotRaw* pdtSlots = reinterpret_cast<PppPdtSlotRaw*>(self + kPdtSlotsOffset);
+    PppPdtSlot* pdtSlots = m_pdtSlots;
     _pppMngSt* firstMng = reinterpret_cast<_pppMngSt*>(self + kPppMngOffset);
     char* payload = packet + 0x20;
     float* payloadFloats = reinterpret_cast<float*>(payload);
@@ -1748,22 +1729,22 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         }
         *reinterpret_cast<int*>(self + kEditCountOffset) = 0;
         Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x3B3);
-        if (pdtSlots[0].m_pdt != 0) {
-            delete[] reinterpret_cast<u8*>(pdtSlots[0].m_pdt);
-            pdtSlots[0].m_pdt = 0;
+        if (pdtSlots[0].m_pppDataHead != 0) {
+            delete[] reinterpret_cast<u8*>(pdtSlots[0].m_pppDataHead);
+            pdtSlots[0].m_pppDataHead = 0;
         }
         if (*reinterpret_cast<void**>(self + kRecvBuffOffset) != 0) {
             delete[] *reinterpret_cast<u8**>(self + kRecvBuffOffset);
             *reinterpret_cast<void**>(self + kRecvBuffOffset) = 0;
         }
-        pdtSlots[0].m_pdt = reinterpret_cast<_pppDataHead*>(
+        pdtSlots[0].m_pppDataHead = reinterpret_cast<_pppDataHead*>(
             operator new[](
                 packetSize - 0x20, stageLoad, const_cast<char*>(s_partMng_cpp), 0x64D));
         *reinterpret_cast<u8**>(self + kRecvBuffOffset) =
             new (stageLoad, const_cast<char*>(s_partMng_cpp), 0x64E) u8[0x3000];
-        if (pdtSlots[0].m_pdt != 0) {
-            memcpy(pdtSlots[0].m_pdt, payload, packetSize - 0x20);
-            pppInitPdt(reinterpret_cast<long*>(pdtSlots[0].m_pdt), pppGetSysProgTable());
+        if (pdtSlots[0].m_pppDataHead != 0) {
+            memcpy(pdtSlots[0].m_pppDataHead, payload, packetSize - 0x20);
+            pppInitPdt(reinterpret_cast<long*>(pdtSlots[0].m_pppDataHead), pppGetSysProgTable());
         }
 
         if (*reinterpret_cast<void**>(self + kRecvBuffOffset) != 0) {
@@ -1810,23 +1791,23 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x673);
         int pdtCount = *reinterpret_cast<int*>(self + kPdtCountOffset);
         if (0 <= pdtCount && pdtCount < 0x18) {
-            if (pdtSlots[pdtCount].m_pdt != 0) {
-                delete[] reinterpret_cast<u8*>(pdtSlots[pdtCount].m_pdt);
-                pdtSlots[pdtCount].m_pdt = 0;
+            if (pdtSlots[pdtCount].m_pppDataHead != 0) {
+                delete[] reinterpret_cast<u8*>(pdtSlots[pdtCount].m_pppDataHead);
+                pdtSlots[pdtCount].m_pppDataHead = 0;
             }
             if (*reinterpret_cast<void**>(self + kRecvBuffOffset) != 0) {
                 delete[] *reinterpret_cast<u8**>(self + kRecvBuffOffset);
                 *reinterpret_cast<void**>(self + kRecvBuffOffset) = 0;
             }
 
-            pdtSlots[pdtCount].m_pdt = reinterpret_cast<_pppDataHead*>(
+            pdtSlots[pdtCount].m_pppDataHead = reinterpret_cast<_pppDataHead*>(
                 operator new[](
                     packetSize - 0x20, stageLoad, const_cast<char*>(s_partMng_cpp), 0x678));
             *reinterpret_cast<u8**>(self + kRecvBuffOffset) =
                 new (stageLoad, const_cast<char*>(s_partMng_cpp), 0x679) u8[0x3000];
-            if (pdtSlots[pdtCount].m_pdt != 0) {
-                memcpy(pdtSlots[pdtCount].m_pdt, payload, packetSize - 0x20);
-                pppInitPdt(reinterpret_cast<long*>(pdtSlots[pdtCount].m_pdt), pppGetSysProgTable());
+            if (pdtSlots[pdtCount].m_pppDataHead != 0) {
+                memcpy(pdtSlots[pdtCount].m_pppDataHead, payload, packetSize - 0x20);
+                pppInitPdt(reinterpret_cast<long*>(pdtSlots[pdtCount].m_pppDataHead), pppGetSysProgTable());
             }
             *reinterpret_cast<int*>(self + kPdtCountOffset) = pdtCount + 1;
         }
@@ -2167,23 +2148,16 @@ void CPartMng::pppEditBeforeCalc()
  */
 void CPartMng::pppEditPartCalc()
 {
-    struct PppPdtSlotRaw {
-        _pppDataHead* m_pdt;
-        int m_refCount;
-        char m_name[0x30];
-    };
-
     static const int kUsbEditOffset = 0x7F0;
     static const int kPppMngOffset = 0x2A18;
     static const int kPppMngCount = 0x180;
     static const int kPppMngStride = 0x158;
-    static const int kPdtSlotsOffset = 0x22E18;
 
     char* self = reinterpret_cast<char*>(this);
     unsigned char* usbEdit = reinterpret_cast<unsigned char*>(self + kUsbEditOffset);
     CGObject* editorObj = *reinterpret_cast<CGObject**>(usbEdit + 0x1C);
     unsigned char* mng = reinterpret_cast<unsigned char*>(self + kPppMngOffset);
-    PppPdtSlotRaw* pdtSlots = reinterpret_cast<PppPdtSlotRaw*>(self + kPdtSlotsOffset);
+    PppPdtSlot* pdtSlots = m_pdtSlots;
 
     OSStopStopwatch(&g_par_calc_prof);
     if (editorObj != 0 && editorObj->m_charaModelHandle != 0 && editorObj->m_charaModelHandle->m_model != 0) {
@@ -2213,18 +2187,18 @@ void CPartMng::pppEditPartCalc()
         *reinterpret_cast<int*>(self + 0x2355C) = 0;
 
         Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x3b3);
-        if (pdtSlots[0].m_pdt != 0) {
+        if (pdtSlots[0].m_pppDataHead != 0) {
             unsigned char* firstMng = reinterpret_cast<unsigned char*>(self + kPppMngOffset);
             firstMng[0xE5] = 0;
             firstMng[0xA8] = *reinterpret_cast<unsigned char*>(self + 0x158);
             firstMng[0xA9] = *reinterpret_cast<unsigned char*>(self + 0x159);
             firstMng[0xAA] = *reinterpret_cast<unsigned char*>(self + 0x15A);
             firstMng[0xAB] = *reinterpret_cast<unsigned char*>(self + 0x15B);
-            _pppStartPart(reinterpret_cast<_pppMngSt*>(firstMng), reinterpret_cast<long*>(pdtSlots[0].m_pdt), 1);
+            _pppStartPart(reinterpret_cast<_pppMngSt*>(firstMng), reinterpret_cast<long*>(pdtSlots[0].m_pppDataHead), 1);
         }
     }
 
-    if (DAT_8032ed68 != 0 || pdtSlots[0].m_pdt == 0) {
+    if (DAT_8032ed68 != 0 || pdtSlots[0].m_pppDataHead == 0) {
         return;
     }
 
@@ -2257,7 +2231,7 @@ void CPartMng::pppEditPartCalc()
                 mng[0xA9] = *reinterpret_cast<unsigned char*>(self + 0x159);
                 mng[0xAA] = *reinterpret_cast<unsigned char*>(self + 0x15A);
                 mng[0xAB] = *reinterpret_cast<unsigned char*>(self + 0x15B);
-                _pppStartPart(reinterpret_cast<_pppMngSt*>(mng), reinterpret_cast<long*>(pdtSlots[0].m_pdt), 1);
+                _pppStartPart(reinterpret_cast<_pppMngSt*>(mng), reinterpret_cast<long*>(pdtSlots[0].m_pppDataHead), 1);
             }
         }
 
@@ -2294,12 +2268,6 @@ void CPartMng::pppEditPartCalc()
  */
 void CPartMng::pppEditDrawShadow()
 {
-    struct PppPdtSlotRaw {
-        _pppDataHead* m_pdt;
-        int m_refCount;
-        char m_name[0x30];
-    };
-
     struct PppMngStDrawRaw {
         void* m_pppResSet;                   // 0x00
         int m_partIndex;                     // 0x04
@@ -2335,8 +2303,8 @@ void CPartMng::pppEditDrawShadow()
     }
 
     char* self = reinterpret_cast<char*>(this);
-    PppPdtSlotRaw* pdtSlots = reinterpret_cast<PppPdtSlotRaw*>(self + 0x22E18);
-    if (pdtSlots[0].m_pdt != 0 && *reinterpret_cast<int*>(self + 0x23570) < 4) {
+    PppPdtSlot* pdtSlots = m_pdtSlots;
+    if (pdtSlots[0].m_pppDataHead != 0 && *reinterpret_cast<int*>(self + 0x23570) < 4) {
         Mtx invCamera;
         Vec cameraPos;
         Vec partPos;
@@ -3700,15 +3668,9 @@ void CPartMng::pppLoadPan(const char* baseName)
  */
 int CPartMng::pppLoadPdt(const char* baseName, int pdtSlotIndex, int cachePriority, void* readBuffer, int readBufferSize)
 {
-    struct PppPdtSlotRaw {
-        _pppDataHead* m_pppDataHead;
-        unsigned int m_envFields[5];
-        char m_name[0x20];
-    };
-
     CMemory::CStage* stageLoad = PartPcs.m_usbStreamData.m_stageLoad;
-    PppPdtSlotRaw* pdtSlots = reinterpret_cast<PppPdtSlotRaw*>(reinterpret_cast<char*>(this) + 0x22e18);
-    PppPdtSlotRaw* pdtSlot = &pdtSlots[pdtSlotIndex];
+    PppPdtSlot* pdtSlots = m_pdtSlots;
+    PppPdtSlot* pdtSlot = &pdtSlots[pdtSlotIndex];
 
     ppvAmemCacheSet.CacheClear();
     stageLoad->setDefaultParam(pdtSlotIndex);
@@ -3792,15 +3754,14 @@ int CPartMng::pppLoadPdt(const char* baseName, int pdtSlotIndex, int cachePriori
  */
 int CPartMng::pppGetFreeDataMng()
 {
-    char* self = reinterpret_cast<char*>(this);
-    char* freeSlot = 0;
+    PppPdtSlot* freeSlot = 0;
     int slotIndex = 8;
     int count = 0x18;
 
     while (count != 0) {
-        char* slot = self + 0x22E18 + slotIndex * 0x38;
-        if (*reinterpret_cast<_pppDataHead**>(slot) == 0) {
-            freeSlot = self + 0x22E18 + slotIndex * 0x38;
+        PppPdtSlot* slot = &m_pdtSlots[slotIndex];
+        if (slot->m_pppDataHead == 0) {
+            freeSlot = slot;
             break;
         }
 
@@ -3816,9 +3777,7 @@ int CPartMng::pppGetFreeDataMng()
         return -1;
     }
 
-    int index = freeSlot - (self + 0x22E18);
-    index = index / 0x38 + (index >> 0x1f);
-    return index - (index >> 0x1f);
+    return freeSlot - m_pdtSlots;
 }
 
 /*
@@ -3935,8 +3894,8 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
     };
 
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
-    unsigned char* slot = self + 0x22E18 + pdtSlotIndex * 0x38;
-    _pppDataHead* pdt = *reinterpret_cast<_pppDataHead**>(slot + 0x0);
+    PppPdtSlot* slot = &m_pdtSlots[pdtSlotIndex];
+    _pppDataHead* pdt = slot->m_pppDataHead;
     if (pdt == 0) {
         return -1;
     }
@@ -3956,7 +3915,7 @@ int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam
     PppMngStCreateRaw* mng = reinterpret_cast<PppMngStCreateRaw*>(self + 0x1D4 + freeIdx * 0x158);
     if (System.m_execParam != 0) {
         System.Printf(const_cast<char*>(s_pppCreate0_pdtID_d_fpno_d_mngNo_d_name_s), pdtSlotIndex, fpNo, freeIdx,
-                      slot + 0x18);
+                      slot->m_name);
     }
 
     unsigned char* fpData = reinterpret_cast<unsigned char*>(pdt) + 0x20 + fpNo * 0x60;

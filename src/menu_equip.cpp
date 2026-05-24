@@ -613,14 +613,14 @@ void CMenuPcs::EquipDraw()
 						}
 					} else {
 						int equipped = EquipChk((int)letter[idx]);
-						if ((equipped == 0) && (ChkEquipActive(idx) == 0)) {
+						if ((equipped != 0) || (ChkEquipActive(idx) == 0)) {
+							if (equipped != 0) {
+								int markX = (int)(x - (double)FLOAT_80332ef0);
+								int markY = (int)((h - (double)FLOAT_80332ef4) * DOUBLE_80332ed0 + y);
+								DrawEquipMark(markX, markY, *(float*)(listItem + 8));
+							}
 							tex = 0x34;
 							alpha = DOUBLE_80332ed0 * alpha;
-						}
-						if (equipped != 0) {
-							int markX = (int)(x - (double)FLOAT_80332ef0);
-							int markY = (int)((h - (double)FLOAT_80332ef4) * DOUBLE_80332ed0 + y);
-							DrawEquipMark(markX, markY, *(float*)(listItem + 8));
 						}
 					}
 					if ((tex == 0x37) && (drawIndex == *(s16*)(menuState + 0x28))) {
@@ -717,26 +717,18 @@ void CMenuPcs::EquipDraw()
 			cursorItem = (s16*)((char*)menuData + *(s16*)(menuState + 0x26) * 0x40 + 8);
 		} else {
 			s16* listBase = menuData + menuData[0] * 0x20 + 4;
+			for (int i = menuData[0]; i < menuData[1]; i++) {
+				if (*reinterpret_cast<int*>(listBase + 0xe) == 0x37) {
+					break;
+				}
+				listBase += 0x20;
+			}
 			cursorItem = listBase + *(s16*)(menuState + 0x28) * 0x20;
 		}
 		int cursorX = (int)((double)cursorItem[1] + ((double)(cursorItem[3] - 0x20) * DOUBLE_80332ed0));
 		int frame = (int)System.m_frameCounter;
 		int cursorY = (cursorItem[0] - 0x14) + (frame & 7);
 		DrawCursor(cursorY, cursorX, FLOAT_80332ee0);
-	}
-
-	if ((mode == 1) && (*(s16*)(menuState + 0x12) == 1)) {
-		s16* letter = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
-		int idx = *(s16*)(menuState + 0x28) + *(s16*)(menuState + 0x34);
-		if ((idx > 0) && (idx < letter[0]) && (letter[idx] >= 0)) {
-			if (EquipChk((int)letter[idx]) != 0) {
-				s16* listBase = menuData + menuData[0] * 0x20 + 4;
-				s16* markItem = listBase + *(s16*)(menuState + 0x28) * 0x20;
-				int markX = (int)((double)markItem[0] - (double)FLOAT_80332ef0);
-				int markY = (int)(((double)markItem[3] - (double)FLOAT_80332ef4) * DOUBLE_80332ed0 + (double)markItem[1]);
-				DrawEquipMark(markX, markY, *(float*)(markItem + 8));
-			}
-		}
 	}
 
 	int listIndex = (int)*(s16*)(menuState + mode * 2 + 0x26) + (int)*(s16*)(menuState + 0x34);

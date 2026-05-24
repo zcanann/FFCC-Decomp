@@ -74,17 +74,6 @@ struct CTexAnimSeqStorage
     unsigned int* keys;
 };
 
-struct CTexScrollStorage
-{
-    unsigned char type0;
-    unsigned char type1;
-    unsigned char pad[2];
-    float u0;
-    float v0;
-    float u1;
-    float v1;
-};
-
 struct CMaterialSetStorage
 {
     void* vtable;
@@ -303,24 +292,24 @@ void CTexAnimSet::SetTexGen()
     for (unsigned int i = 0; i < static_cast<unsigned int>(self->texAnims.GetSize()); i++) {
         CTexAnimStorage* texAnim = reinterpret_cast<CTexAnimStorage*>(self->texAnims[i]);
         CTexAnimRefDataStorage* refData = reinterpret_cast<CTexAnimRefDataStorage*>(texAnim->refData);
-        int* material = reinterpret_cast<int*>(refData->material);
+        CMaterial* material = reinterpret_cast<CMaterial*>(refData->material);
         if (material != 0) {
-            CTexScrollStorage* texScroll = reinterpret_cast<CTexScrollStorage*>(Ptr(material, 0x4C)) + refData->texSrtIndex;
+            CTexScroll* texScroll = material->GetTexScroll(refData->texSrtIndex);
             const float texGenS = F32At(texAnim, 0x18);
             const float texGenT = F32At(texAnim, 0x1C);
-            texScroll->u0 = texGenS;
-            texScroll->v0 = texGenT;
-            texScroll->u1 = zero;
-            texScroll->v1 = zero;
-            if (zero == texScroll->u1) {
-                texScroll->type0 = 0;
+            texScroll->m_u0 = texGenS;
+            texScroll->m_v0 = texGenT;
+            texScroll->m_u1 = zero;
+            texScroll->m_v1 = zero;
+            if (zero == texScroll->m_u1) {
+                texScroll->m_type0 = 0;
             } else {
-                texScroll->type0 = 1;
+                texScroll->m_type0 = 1;
             }
-            if (zero == texScroll->v1) {
-                texScroll->type1 = 0;
+            if (zero == texScroll->m_v1) {
+                texScroll->m_type1 = 0;
             } else {
-                texScroll->type1 = 1;
+                texScroll->m_type1 = 1;
             }
         }
     }

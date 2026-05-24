@@ -13,7 +13,6 @@ extern const float FLOAT_803305C8;
 extern const float FLOAT_803305CC;
 extern const float FLOAT_803305D0;
 extern const float FLOAT_803305D4;
-extern int gPppCalcDisabled;
 }
 #include "dolphin/mtx.h"
 #include <string.h>

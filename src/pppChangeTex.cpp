@@ -7,8 +7,6 @@
 #include "ffcc/pppYmEnv.h"
 extern "C" {
 extern const float kPppChangeTexInit;
-extern int gPppCalcDisabled;
-extern unsigned char gPppInConstructor;
 }
 #include "ffcc/util.h"
 #include "dolphin/gx.h"

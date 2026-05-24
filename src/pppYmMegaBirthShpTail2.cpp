@@ -12,7 +12,6 @@ extern const float FLOAT_80330570 = 127.0f;
 extern const float FLOAT_80330588;
 extern const float FLOAT_8033058C;
 extern const float FLOAT_80330590;
-extern int gPppCalcDisabled;
 }
 #include <dolphin/mtx.h>
 #include <string.h>

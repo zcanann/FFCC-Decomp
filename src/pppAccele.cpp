@@ -1,7 +1,7 @@
 #include "ffcc/pppAccele.h"
+#include "ffcc/ppp_linkage.h"
 extern "C" {
 extern const float kPppAcceleZero;
-extern int gPppCalcDisabled;
 }
 
 

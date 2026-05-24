@@ -2,9 +2,6 @@
 #include "ffcc/map.h"
 #include "ffcc/maphit.h"
 #include "ffcc/pppPart.h"
-extern "C" {
-extern int gPppCalcDisabled;
-}
 
 #include <dolphin/types.h>
 

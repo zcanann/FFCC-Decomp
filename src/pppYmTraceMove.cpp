@@ -1,8 +1,8 @@
 #include "ffcc/pppYmTraceMove.h"
+#include "ffcc/ppp_linkage.h"
 extern "C" {
 extern const float kPppYmTraceMoveZero;
 extern const float kPppYmTraceMoveOne;
-extern int gPppCalcDisabled;
 }
 #include "ffcc/pppPart.h"
 #include "dolphin/mtx.h"

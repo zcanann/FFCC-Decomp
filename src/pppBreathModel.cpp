@@ -6,9 +6,7 @@
 #include "dolphin/mtx.h"
 #include "dolphin/gx.h"
 #include "ffcc/math.h"
-extern "C" {
-extern int gPppCalcDisabled;
-}
+#include "ffcc/ppp_linkage.h"
 #include "ffcc/pppPart.h"
 #include <string.h>
 

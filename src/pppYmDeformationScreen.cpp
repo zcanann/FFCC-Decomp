@@ -143,11 +143,11 @@ void pppRenderYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, 
 		GXSetCurrentMtx(0);
 
 		PSMTX44Identity(orthoMtx);
-		orthoMtx[2][2] = kYmDeformationScreenOne;
 		orthoMtx[0][0] = kYmDeformationScreenOrthoScaleX;
 		orthoMtx[1][1] = kYmDeformationScreenOrthoScaleY;
+		orthoMtx[2][2] = kYmDeformationScreenOne;
 		orthoMtx[0][3] = kYmDeformationScreenOrthoOffsetX;
-		orthoMtx[1][3] = kYmDeformationScreenOne;
+		orthoMtx[1][3] = orthoMtx[2][2];
 		orthoMtx[2][3] = kYmDeformationScreenZero;
 		GXSetProjection(orthoMtx, GX_ORTHOGRAPHIC);
 

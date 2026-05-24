@@ -100,8 +100,6 @@ void pppKeShpTail3XDes(_pppPObjLink* obj, _pppCtrlTable* ctrlTable)
  */
 void pppKeShpTail3XCon(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkC* param_2)
 {
-    u16* angle;
-    Vec* pos;
     KeShpTail3XWork* work;
     int i;
     float scale;
@@ -112,20 +110,21 @@ void pppKeShpTail3XCon(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkC* pa
     work->m_shapeFrame = 0;
     work->m_shapeData = 0;
     work->m_rand = (u16)rand();
-    memset(work->m_values, 0, sizeof(work->m_values));
+    memset(work->m_values, 0, 8);
+    memset(&work->m_values[4], 0, 8);
+    memset(&work->m_values[8], 0, 8);
+    memset(&work->m_values[12], 0, 8);
+    memset(&work->m_values[16], 0, 8);
+    memset(&work->m_values[20], 0, 8);
 
     scale = kPppKeShpTail3XZero;
     i = 0;
-    angle = work->m_angles;
-    pos = work->m_posHistory;
     do {
         s32 rnd = rand();
-        *angle = (s16)(rnd - (rnd / 0x168) * 0x168);
-        angle++;
-        pos->z = scale;
-        pos->y = scale;
-        pos->x = scale;
-        pos++;
+        work->m_angles[i] = (s16)(rnd - (rnd / 0x168) * 0x168);
+        work->m_posHistory[i].z = scale;
+        work->m_posHistory[i].y = scale;
+        work->m_posHistory[i].x = scale;
         i++;
     } while (i < 0x1c);
 }

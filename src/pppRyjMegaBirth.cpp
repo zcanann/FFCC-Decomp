@@ -227,24 +227,25 @@ static inline void apply_signed_randomization_2(u8* particle, s32 offset, u8 fla
  */
 void pppRyjMegaBirthDes(_pppPObject* pObject, PRyjMegaBirthOffsets* offsets)
 {
-	u8* work = pObject->m_workArea + offsets->m_serializedDataOffsets[2];
+	VRyjMegaBirth* work =
+		reinterpret_cast<VRyjMegaBirth*>(pObject->m_workArea + offsets->m_serializedDataOffsets[2]);
 
-	if (*(void**)(work + 0x3C) != 0)
+	if (work->m_particleBlock != 0)
 	{
-		pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(*(void**)(work + 0x3C)));
-		*(void**)(work + 0x3C) = 0;
+		pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(work->m_particleBlock));
+		work->m_particleBlock = 0;
 	}
 
-	if (*(void**)(work + 0x40) != 0)
+	if (work->m_worldMatrixBlock != 0)
 	{
-		pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(*(void**)(work + 0x40)));
-		*(void**)(work + 0x40) = 0;
+		pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(work->m_worldMatrixBlock));
+		work->m_worldMatrixBlock = 0;
 	}
 
-	if (*(void**)(work + 0x44) != 0)
+	if (work->m_colorBlock != 0)
 	{
-		pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(*(void**)(work + 0x44)));
-		*(void**)(work + 0x44) = 0;
+		pppHeapUseRate(reinterpret_cast<CMemory::CStage*>(work->m_colorBlock));
+		work->m_colorBlock = 0;
 	}
 }
 
@@ -537,8 +538,8 @@ void pppRyjMegaBirth(_pppPObject* pObject, PRyjMegaBirth* particleData, PRyjMega
 	serializedDataOffsets = offsets->m_serializedDataOffsets;
 	workOffset = serializedDataOffsets[2];
 	colorOffset = serializedDataOffsets[1];
-	work = (VRyjMegaBirth*)((u8*)pObject + 0x80 + workOffset);
-	color = (VColor*)((u8*)pObject + 0x80 + colorOffset);
+	work = reinterpret_cast<VRyjMegaBirth*>(pObject->m_workArea + workOffset);
+	color = reinterpret_cast<VColor*>(pObject->m_workArea + colorOffset);
 
 	if (work->m_particleBlock == NULL)
 	{

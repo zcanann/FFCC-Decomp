@@ -100,11 +100,11 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, p
 
     dataValIndex = param_2->m_dataValIndex;
     dataOffset = *param_3->m_serializedDataOffsets;
-    work = (TracerWork*)(pppYmTracer2->m_serializedData + dataOffset);
+    work = (TracerWork*)(pppYmTracer2->m_object.m_workArea + dataOffset);
     colorOffset = param_3->m_serializedDataOffsets[1];
     poly = work->entries;
     mapMesh = pppEnvStPtr->m_mapMeshPtr[dataValIndex];
-    colorData = pppYmTracer2->m_serializedData + colorOffset;
+    colorData = pppYmTracer2->m_object.m_workArea + colorOffset;
 
     if (dataValIndex != 0xFFFF) {
         pppSetBlendMode(param_2->m_tracer.m_blendMode);
@@ -226,8 +226,8 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
     }
 
     useFallback = 0;
-    work = (TracerWork*)(pppYmTracer2->m_serializedData + *param_3->m_serializedDataOffsets);
-    colorData = pppYmTracer2->m_serializedData + param_3->m_serializedDataOffsets[1];
+    work = (TracerWork*)(pppYmTracer2->m_object.m_workArea + *param_3->m_serializedDataOffsets);
+    colorData = pppYmTracer2->m_object.m_workArea + param_3->m_serializedDataOffsets[1];
 
     work->initWork = (param_2->m_initWork == 0xffffffff)
                          ? gPppDefaultValueBuffer
@@ -292,7 +292,7 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
         entry->colorB = colorData[10];
 
         if (i == 0) {
-            PSMTXConcat(pppMngStPtr->m_matrix.value, pppYmTracer2->m_localMatrix.value, MStack_78);
+            PSMTXConcat(pppMngStPtr->m_matrix.value, pppYmTracer2->m_object.m_localMatrix.value, MStack_78);
             PSMTXMultVec(MStack_78, &entries[0].pos, &entries[0].pos);
             PSMTXMultVec(MStack_78, &entries[0].targetPos, &entries[0].targetPos);
         } else if (!useFallback) {
@@ -300,7 +300,7 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
             if (GetCharaNodeFrameMatrix(pppMngStPtr, frameT, MStack_78) == 0) {
                 useFallback = 1;
             } else {
-                PSMTXConcat(MStack_78, pppYmTracer2->m_localMatrix.value, MStack_78);
+                PSMTXConcat(MStack_78, pppYmTracer2->m_object.m_localMatrix.value, MStack_78);
                 PSMTXMultVec(MStack_78, &entry->pos, &entry->pos);
                 PSMTXMultVec(MStack_78, &entry->targetPos, &entry->targetPos);
             }
@@ -346,7 +346,7 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
  */
 void pppDestructYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkC* param_2)
 {
-    TracerWork* work = (TracerWork*)(pppYmTracer2->m_serializedData + *param_2->m_serializedDataOffsets);
+    TracerWork* work = (TracerWork*)(pppYmTracer2->m_object.m_workArea + *param_2->m_serializedDataOffsets);
     if (work->entries != 0) {
         pppHeapUseRate((CMemory::CStage*)work->entries);
     }
@@ -363,7 +363,7 @@ void pppDestructYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkC* param_2)
  */
 void pppConstruct2YmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkC* param_2)
 {
-    TracerWork* work = (TracerWork*)(pppYmTracer2->m_serializedData + *param_2->m_serializedDataOffsets);
+    TracerWork* work = (TracerWork*)(pppYmTracer2->m_object.m_workArea + *param_2->m_serializedDataOffsets);
 
     work->pad2e = 0;
     work->visibleCount = 0;
@@ -382,7 +382,7 @@ void pppConstruct2YmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkC* param_
 void pppConstructYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkC* param_2)
 {
     float fVar1 = FLOAT_80331840;
-    TracerWork* work = (TracerWork*)(pppYmTracer2->m_serializedData + *param_2->m_serializedDataOffsets);
+    TracerWork* work = (TracerWork*)(pppYmTracer2->m_object.m_workArea + *param_2->m_serializedDataOffsets);
 
     work->entries = 0;
     work->arg3Work = 0;

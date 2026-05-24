@@ -13,8 +13,8 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
 
-extern char* PTR_s_bonus_802128c0[];
-extern char DAT_802128e4[];
+extern char* PTR_s_bonus[];
+extern CMenuPcs::CTmp s_bonusTextureTable[];
 extern char s_menuSubfontPathFmt[];
 extern const double DOUBLE_80331FC0;
 #pragma force_active on
@@ -1082,7 +1082,7 @@ void CMenuPcs::createBonus()
 		GbaQue.SetRadarMode(i, 0);
 	}
 
-	loadTexture(PTR_s_bonus_802128c0, 2, 1, reinterpret_cast<CMenuPcs::CTmp*>(&DAT_802128e4), 0x16, 0x12, 0);
+	loadTexture(PTR_s_bonus, 2, 1, s_bonusTextureTable, 0x16, 0x12, 0);
 	sprintf(fontPath, s_menuSubfontPathFmt, Game.GetLangString());
 	loadFont(0, fontPath, 1, -1);
 

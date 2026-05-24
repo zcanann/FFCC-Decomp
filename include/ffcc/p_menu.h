@@ -40,8 +40,10 @@ public:
     };
 
     struct CTmp
-	{
-	};
+    {
+        int m_textureSetIndex;
+        char* m_textureName;
+    };
     struct Sprt
     {
         void operator=(const Sprt&);

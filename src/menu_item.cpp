@@ -108,6 +108,17 @@ STATIC_ASSERT(offsetof(MenuItemOpenAnim, targetX) == 0x38);
 STATIC_ASSERT(offsetof(MenuItemOpenAnim, targetY) == 0x3C);
 STATIC_ASSERT(sizeof(MenuItemOpenAnim) == 0x40);
 
+static inline ItemMenuAnimList* GetItemOpenAnimList(CMenuPcs* menu)
+{
+    return reinterpret_cast<ItemMenuAnimList*>(menu->itemList);
+}
+
+static inline MenuItemOpenAnim* GetItemOpenAnim(CMenuPcs* menu, int index)
+{
+    return reinterpret_cast<MenuItemOpenAnim*>(
+        reinterpret_cast<unsigned char*>(GetItemOpenAnimList(menu)) + 8 + index * sizeof(MenuItemOpenAnim));
+}
+
 /*
  * --INFO--
  * PAL Address: 0x80159654
@@ -705,118 +716,107 @@ bool CMenuPcs::ItemOpen()
 void CMenuPcs::ItemInit1()
 {
     float progress;
-    ItemMenuAnimList* itemList;
-    short* entry;
     unsigned int count;
     unsigned int blocks;
     int index;
+    MenuItemOpenAnim* entry;
+    ItemMenuAnimList* itemList;
 
     index = 0;
-    itemList = this->itemList;
-    itemList->anims[index].tex = 0x2E;
-    itemList->anims[index].startFrame = 2;
-    itemList->anims[index].duration = 5;
-    index = 1;
-    itemList = this->itemList;
-    itemList->anims[index].tex = 0x47;
-    itemList->anims[index].startFrame = 7;
-    itemList->anims[index].duration = 5;
-    index = 2;
-    itemList = this->itemList;
-    itemList->anims[index].tex = 0x47;
-    itemList->anims[index].startFrame = 7;
-    itemList->anims[index].duration = 5;
-    index = 3;
-    itemList = this->itemList;
-    itemList->anims[index].flags = 2;
-    itemList->anims[index].tex = 0x2E;
-    itemList->anims[index].startFrame = 7;
-    itemList->anims[index].duration = 5;
-    index = 4;
-    itemList = this->itemList;
-    itemList->anims[index].flags = 2;
-    itemList->anims[index].tex = 0x37;
-    itemList->anims[index].startFrame = 0;
-    itemList->anims[index].duration = 5;
-    index = 5;
-    itemList = this->itemList;
-    itemList->anims[index].flags = 2;
-    itemList->anims[index].tex = 0x37;
-    itemList->anims[index].startFrame = 0;
-    itemList->anims[index].duration = 5;
-    index = 6;
-    itemList = this->itemList;
-    itemList->anims[index].flags = 2;
-    itemList->anims[index].tex = 0x37;
-    itemList->anims[index].startFrame = 0;
-    itemList->anims[index].duration = 5;
-    index = 7;
-    itemList = this->itemList;
-    itemList->anims[index].flags = 2;
-    itemList->anims[index].tex = 0x37;
+    entry = GetItemOpenAnim(this, index++);
+    entry->tex = 0x2E;
+    entry->startFrame = 2;
+    entry->duration = 5;
+    entry = GetItemOpenAnim(this, index++);
+    entry->tex = 0x47;
+    entry->startFrame = 7;
+    entry->duration = 5;
+    entry = GetItemOpenAnim(this, index++);
+    entry->tex = 0x47;
+    entry->startFrame = 7;
+    entry->duration = 5;
+    entry = GetItemOpenAnim(this, index++);
+    entry->flags = 2;
+    entry->tex = 0x2E;
+    entry->startFrame = 7;
+    entry->duration = 5;
+    entry = GetItemOpenAnim(this, index++);
+    entry->flags = 2;
+    entry->tex = 0x37;
+    entry->startFrame = 0;
+    entry->duration = 5;
+    entry = GetItemOpenAnim(this, index++);
+    entry->flags = 2;
+    entry->tex = 0x37;
+    entry->startFrame = 0;
+    entry->duration = 5;
+    entry = GetItemOpenAnim(this, index++);
+    entry->flags = 2;
+    entry->tex = 0x37;
+    entry->startFrame = 0;
+    entry->duration = 5;
+    entry = GetItemOpenAnim(this, index++);
+    entry->flags = 2;
+    entry->tex = 0x37;
     progress = FLOAT_80332e64;
-    itemList->anims[index].startFrame = 0;
-    itemList->anims[index].duration = 5;
-    index = 8;
-    itemList = this->itemList;
-    itemList->anims[index].flags = 2;
-    itemList->anims[index].tex = 0x37;
-    itemList->anims[index].startFrame = 0;
-    itemList->anims[index].duration = 5;
-    index = 9;
-    itemList = this->itemList;
-    itemList->anims[index].flags = 2;
-    itemList->anims[index].tex = 0x37;
-    itemList->anims[index].startFrame = 0;
-    itemList->anims[index].duration = 5;
-    index = 10;
-    itemList = this->itemList;
-    itemList->anims[index].flags = 2;
-    itemList->anims[index].tex = 0x37;
-    itemList->anims[index].startFrame = 0;
-    itemList->anims[index].duration = 5;
-    index = 11;
-    itemList = this->itemList;
-    itemList->anims[index].flags = 2;
-    itemList->anims[index].tex = 0x37;
-    itemList->anims[index].startFrame = 0;
-    itemList->anims[index].duration = 5;
-    count = (unsigned int)this->itemList->count;
-    entry = (short*)this->itemList + 4;
+    entry->startFrame = 0;
+    entry->duration = 5;
+    entry = GetItemOpenAnim(this, index++);
+    entry->flags = 2;
+    entry->tex = 0x37;
+    entry->startFrame = 0;
+    entry->duration = 5;
+    entry = GetItemOpenAnim(this, index++);
+    entry->flags = 2;
+    entry->tex = 0x37;
+    entry->startFrame = 0;
+    entry->duration = 5;
+    entry = GetItemOpenAnim(this, index++);
+    entry->flags = 2;
+    entry->tex = 0x37;
+    entry->startFrame = 0;
+    entry->duration = 5;
+    entry = GetItemOpenAnim(this, index);
+    entry->flags = 2;
+    entry->tex = 0x37;
+    entry->startFrame = 0;
+    entry->duration = 5;
+    itemList = GetItemOpenAnimList(this);
+    count = (unsigned int)itemList->count;
+    entry = itemList->anims;
     if (0 < (int)count) {
         blocks = count >> 3;
         if (blocks != 0) {
             do {
-                *(int*)(entry + 0x10) = 0;
-                *(float*)(entry + 8) = progress;
-                *(int*)(entry + 0x30) = 0;
-                *(float*)(entry + 0x28) = progress;
-                *(int*)(entry + 0x50) = 0;
-                *(float*)(entry + 0x48) = progress;
-                *(int*)(entry + 0x70) = 0;
-                *(float*)(entry + 0x68) = progress;
-                *(int*)(entry + 0x90) = 0;
-                *(float*)(entry + 0x88) = progress;
-                *(int*)(entry + 0xB0) = 0;
-                *(float*)(entry + 0xA8) = progress;
-                *(int*)(entry + 0xD0) = 0;
-                *(float*)(entry + 200) = progress;
-                *(int*)(entry + 0xF0) = 0;
-                *(float*)(entry + 0xE8) = progress;
-                entry = entry + 0x100;
+                entry[0].frame = 0;
+                entry[0].progress = progress;
+                entry[1].frame = 0;
+                entry[1].progress = progress;
+                entry[2].frame = 0;
+                entry[2].progress = progress;
+                entry[3].frame = 0;
+                entry[3].progress = progress;
+                entry[4].frame = 0;
+                entry[4].progress = progress;
+                entry[5].frame = 0;
+                entry[5].progress = progress;
+                entry[6].frame = 0;
+                entry[6].progress = progress;
+                entry[7].frame = 0;
+                entry[7].progress = progress;
+                entry += 8;
                 blocks--;
             } while (blocks != 0);
             count &= 7;
-            if (count == 0) {
-                return;
-            }
         }
-        do {
-            *(int*)(entry + 0x10) = 0;
-            *(float*)(entry + 8) = progress;
-            entry = entry + 0x20;
-            count--;
-        } while (count != 0);
+        if (count != 0) {
+            do {
+                entry->frame = 0;
+                entry->progress = progress;
+                entry++;
+                count--;
+            } while (count != 0);
+        }
     }
 }
 

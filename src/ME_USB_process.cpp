@@ -37,21 +37,6 @@ static inline u32& U32At(CMaterialEditorPcs* self, u32 offset)
     return *reinterpret_cast<u32*>(Ptr(self, offset));
 }
 
-static inline u16& U16At(CMaterialEditorPcs* self, u32 offset)
-{
-    return *reinterpret_cast<u16*>(Ptr(self, offset));
-}
-
-static inline s16& S16At(CMaterialEditorPcs* self, u32 offset)
-{
-    return *reinterpret_cast<s16*>(Ptr(self, offset));
-}
-
-static inline char& S8At(CMaterialEditorPcs* self, u32 offset)
-{
-    return *reinterpret_cast<char*>(Ptr(self, offset));
-}
-
 static inline CMemory::CStage* MaterialEditorStage()
 {
     return MaterialEditorPcs.m_stage;
@@ -431,7 +416,7 @@ void CMaterialEditorPcs::SetUSBData()
         if (headerBuffer != 0) {
             delete[] reinterpret_cast<u8*>(headerBuffer);
         }
-        S8At(this, 0x3BC) = S8At(this, 0x3BC) + 1;
+        m_loadedTextureCount++;
         break;
     }
     }

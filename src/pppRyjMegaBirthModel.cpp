@@ -259,19 +259,19 @@ void pppRyjMegaBirthModel(_pppPObject* pObject, PRyjMegaBirthModel* params, PRyj
 
         if (payload[0x136] != 0) {
             work->m_worldMatrixBlock = (PARTICLE_WMAT*)pppMemAlloc(
-                work->m_numParticles * 0x30, pppEnvStPtr->m_stagePtr,
+                work->m_numParticles * sizeof(PARTICLE_WMAT), pppEnvStPtr->m_stagePtr,
                 const_cast<char*>(s_pppRyjMegaBirthModel_cpp), 0x97);
             if (work->m_worldMatrixBlock != NULL) {
-                memset(work->m_worldMatrixBlock, 0, work->m_numParticles * 0x30);
+                memset(work->m_worldMatrixBlock, 0, work->m_numParticles * sizeof(PARTICLE_WMAT));
             }
         }
 
         if (payload[0x131] != 0) {
             work->m_colorBlock = (_PARTICLE_COLOR*)pppMemAlloc(
-                work->m_numParticles << 5, pppEnvStPtr->m_stagePtr,
+                work->m_numParticles * sizeof(_PARTICLE_COLOR), pppEnvStPtr->m_stagePtr,
                 const_cast<char*>(s_pppRyjMegaBirthModel_cpp), 0xA2);
             if (work->m_colorBlock != NULL) {
-                memset(work->m_colorBlock, 0, work->m_numParticles << 5);
+                memset(work->m_colorBlock, 0, work->m_numParticles * sizeof(_PARTICLE_COLOR));
             }
         }
 
@@ -356,7 +356,7 @@ void calc_particle(_pppPObject* pObject, VRyjMegaBirthModel* work, PRyjMegaBirth
             }
 
             if (particleWMat != NULL) {
-                particleWMat = (_PARTICLE_WMAT*)((u8*)particleWMat + 0x30);
+                particleWMat++;
             }
             if (particleColor != NULL) {
                 particleColor = particleColor + 1;
@@ -394,10 +394,10 @@ void birth(
 
     memset(particleData, 0, 0xA0);
     if (particleWMat != NULL) {
-        memset(particleWMat, 0, 0x30);
+        memset(particleWMat, 0, sizeof(_PARTICLE_WMAT));
     }
     if (particleColor != NULL) {
-        memset(particleColor, 0, 0x20);
+        memset(particleColor, 0, sizeof(_PARTICLE_COLOR));
     }
 
     pppUnitMatrix(*(pppFMATRIX*)&particleData->m_matrix);

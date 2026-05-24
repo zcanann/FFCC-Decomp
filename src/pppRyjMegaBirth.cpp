@@ -554,20 +554,20 @@ void pppRyjMegaBirth(_pppPObject* pObject, PRyjMegaBirth* particleData, PRyjMega
 		if ((particleData->m_matrixMode == 1) || (particleData->m_matrixMode == 2))
 		{
 			work->m_worldMatrixBlock = (PARTICLE_WMAT*)pppMemAlloc(
-				work->m_numParticles * 0x30, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppRyjMegaBirth_cpp), 0x269);
+				work->m_numParticles * sizeof(PARTICLE_WMAT), pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppRyjMegaBirth_cpp), 0x269);
 			if (work->m_worldMatrixBlock != NULL)
 			{
-				memset(work->m_worldMatrixBlock, 0, work->m_numParticles * 0x30);
+				memset(work->m_worldMatrixBlock, 0, work->m_numParticles * sizeof(PARTICLE_WMAT));
 			}
 		}
 
 		if (particleData->m_enableParticleColor != 0)
 		{
 			work->m_colorBlock = (_PARTICLE_COLOR*)pppMemAlloc(
-				work->m_numParticles << 5, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppRyjMegaBirth_cpp), 0x271);
+				work->m_numParticles * sizeof(_PARTICLE_COLOR), pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppRyjMegaBirth_cpp), 0x271);
 			if (work->m_colorBlock != NULL)
 			{
-				memset(work->m_colorBlock, 0, work->m_numParticles << 5);
+				memset(work->m_colorBlock, 0, work->m_numParticles * sizeof(_PARTICLE_COLOR));
 			}
 		}
 
@@ -882,10 +882,10 @@ void birth(
 
 	memset(particle, 0, 0x60);
 	if (worldMat != NULL) {
-		memset(worldMat, 0, 0x30);
+		memset(worldMat, 0, sizeof(_PARTICLE_WMAT));
 	}
 	if (colorData != NULL) {
-		memset(colorData, 0, 0x20);
+		memset(colorData, 0, sizeof(_PARTICLE_COLOR));
 	}
 
 	if (*(s8*)(payload + 0x2A) < 8) {

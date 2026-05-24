@@ -60,7 +60,7 @@ static const char s_dvd__smenu__s_801d7fb0[] = "dvd/%smenu/%s";
 static const char s_dvd_tina_mon_m_03d_801d7fc0[] = "dvd/tina/mon/m%03d";
 static const char s_dvd_tina_mon_m_03d__c_801d7fd4[] = "dvd/tina/mon/m%03d_%c";
 static const char s_dvd_tina_stage_03d_fp_03d_801d7fec[] = "dvd/tina/stage%03d/fp%03d";
-static const char s_p_tina_cpp[] = "p_tina.cpp";
+extern "C" const char s_p_tina_cpp[];
 static const char s_tina_title_fmt_801d8014[] = "Tina [%c]";
 static const char s_tina_calc_fmt_801d8020[] = "clc=%.3f%%  max=%.3f%%";
 static const char s_tina_draw_fmt_801d8038[] = "drw=%.3f%%  max=%.3f%%";

@@ -25,7 +25,7 @@ extern "C" const float FLOAT_80333038;
 extern "C" const float FLOAT_8033303C;
 
 extern "C" const char s_pcts_pctd_family_cnt_error_pctd_801DEDC8[] = "%s(%d):family cnt error!!(%d)\n";
-static const char s_menu_compa_cpp[] = "menu_compa.cpp";
+extern "C" const char s_menu_compa_cpp[] = "menu_compa.cpp";
 
 extern "C" const char s_MenuOptionMonoUpper_803334A8[] = "MONO";
 extern "C" const char s_MenuOptionNormalIt_803334B0[] = "Normal";

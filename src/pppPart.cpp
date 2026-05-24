@@ -91,7 +91,7 @@ CAmemCacheSet ppvAmemCacheSet;
 
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
 
-static const char s_pppPart_cpp[] = "pppPart.cpp";
+extern "C" const char s_pppPart_cpp[];
 static const char s_ERROR_prog_NULL[] = "\nERROR!!!! prog=NULL\n\n";
 static const char s_CPartPcs_heap_801D821C[] = "CPartPcs.heap";
 extern "C" const float FLOAT_8032fddc;

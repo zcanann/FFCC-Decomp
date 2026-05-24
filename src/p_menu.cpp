@@ -50,7 +50,7 @@ extern const f32 FLOAT_8033086C;
 
 CMenuPcs MenuPcs ATTRIBUTE_ALIGN(32);
 static const char kMenuPcsStageName[] = "CMenuPcs";
-static const char s_p_menu_cpp[] = "p_menu.cpp";
+extern "C" const char s_p_menu_cpp[];
 
 struct Vec4d
 {

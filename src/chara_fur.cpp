@@ -666,7 +666,7 @@ void CChara::ChangeMogMode(int mogMode)
 	}
 }
 
-static const char s_chara_fur_cpp[] = "chara_fur.cpp";
+extern "C" const char s_chara_fur_cpp[] = "chara_fur.cpp";
 
 static bool s_mogFurBaseColorsInit;
 static bool s_mogFurNoiseColorsInit;

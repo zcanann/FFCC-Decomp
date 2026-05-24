@@ -17,7 +17,7 @@ extern f32 gPppDefaultValueBuffer[];
 extern const float FLOAT_80331840;
 extern const float FLOAT_80331844;
 
-static const char s_pppYmTracer2_cpp[] = "pppYmTracer2.cpp";
+extern "C" const char s_pppYmTracer2_cpp[] = "pppYmTracer2.cpp";
 
 struct TRACE_POLYGON {
     Vec pos;

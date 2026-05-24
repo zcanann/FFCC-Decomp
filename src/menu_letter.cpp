@@ -76,8 +76,9 @@ static int s_BackUpCur[2];
 static int s_BackUpTopPos = 0;
 static char s_ReplyStr[0x80];
 
+extern "C" const char s_menu_letter_cpp[];
+
 namespace {
-static const char s_menu_letter_cpp[] = "menu_letter.cpp";
 static const char s_letterItemInfoFmt[] = "%s%d%s%s";
 
 struct FlatDataTableView {

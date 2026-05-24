@@ -23,7 +23,7 @@ extern const float FLOAT_8033065c;
 extern const float FLOAT_80330660;
 extern const float FLOAT_80330664;
 extern const float FLOAT_80330668;
-static const char s_pppYmMiasma_cpp[] = "pppYmMiasma.cpp";
+extern "C" const char s_pppYmMiasma_cpp[] = "pppYmMiasma.cpp";
 
 struct PARTICLE_DATA : _PARTICLE_DATA {};
 

@@ -192,7 +192,7 @@ char gWmMenuCursorY[2];
 int gWmMenuWorkA;
 int gWmMenuWorkB;
 unsigned char gWmMenuScriptValueCache;
-static const char s_wm_menu_cpp[] = "wm_menu.cpp";
+extern "C" const char s_wm_menu_cpp[] = "wm_menu.cpp";
 static const char s_SetCMakeEnd___chan____d_cur____d_801dc3b4[] = "SetCMakeEnd : chan = %d  cur = %d\n";
 static const char s_ClrCMakeFlg___chan____d_cur____d_801dc390[] = "ClrCMakeFlg : chan = %d  cur = %d\n";
 static const char s__s__d___Error_WM_menu_no_error___801dc424[] = "%s(%d): Error:WM menu no error(%d)\n";

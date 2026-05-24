@@ -23,7 +23,7 @@ public:
 };
 
 extern "C" {
-static const char s_maptexanim_cpp[] = "maptexanim.cpp";
+extern "C" const char s_maptexanim_cpp[] = "maptexanim.cpp";
 const char s_CMapTexAnim[] = "CMapTexAnim";
 char s_SetMapTexAnim_MaterialIdNotFound[];
 }

@@ -121,6 +121,7 @@ enum {
 	kGbaQueueEnemyHistoryBlockBytes = kGbaQueueEnemyDataBytes * kGbaQueuePlayerDataChannelCount,
 	kGbaQueueMapItemDataBytes = 0x140,
 	kGbaQueueMapItemHistoryBlockBytes = kGbaQueueMapItemDataBytes * kGbaQueuePlayerDataChannelCount,
+	kGbaQueueMapObjWorkBytes = 0x188,
 	kGbaQueueLetterNpcNameBytes = 0x800,
 	kGbaQueueLetterSubjectNameBytes = 0x1800,
 	kGbaQueueLetterEntryAllocWords = 0x1000,
@@ -149,6 +150,11 @@ static inline GbaQueuePlayerDataView* GetPlayerDataView(GbaQueue* gbaQueue, int 
 static inline GbaQueuePlayerDataView* GetPlayerDataBlock(GbaQueue* gbaQueue)
 {
 	return GetPlayerDataView(gbaQueue, 0);
+}
+
+static inline GbaQueueSetQueueView* GetSetQueueView(GbaQueue* gbaQueue)
+{
+	return reinterpret_cast<GbaQueueSetQueueView*>(gbaQueue);
 }
 
 static inline unsigned short SwapU16(unsigned short value)
@@ -216,10 +222,11 @@ void GbaQueue::Init()
 	GbaQueue* osSemaphore;
 	int i;
 	char* obj = reinterpret_cast<char*>(this);
+	GbaQueueSetQueueView* queue = GetSetQueueView(this);
 
-	memset(obj + 0x30, 0, 0x400);
-	memset(obj + 0x430, 0, 0x10);
-	memset(obj + 0x440, 0, 4);
+	memset(queue->m_queue, 0, sizeof(queue->m_queue));
+	memset(queue->m_queueCount, 0, sizeof(queue->m_queueCount));
+	memset(queue->m_queueFull, 0, sizeof(queue->m_queueFull));
 	memset(GetPlayerDataBlock(this), 0, kGbaQueuePlayerDataBlockBytes);
 	memset(obj + 0x7C4, 0, kGbaQueuePlayerDataBlockBytes);
 	memset(obj + 0xB34, 0, kGbaQueueEnemyDataBytes);
@@ -227,7 +234,7 @@ void GbaQueue::Init()
 	memset(obj + 0x2434, 0, kGbaQueueMapItemDataBytes);
 	memset(obj + 0x2574, 0, kGbaQueueMapItemHistoryBlockBytes);
 	memset(obj + 0x2A74, 0, kGbaQueueCaravanNameBlockBytes);
-	memset(obj + 0x2B00, 0, 0x188);
+	memset(obj + 0x2B00, 0, kGbaQueueMapObjWorkBytes);
 	memset(obj + 0x2C8E, 0, 8);
 	memset(cmakeInfo, 0, sizeof(cmakeInfo));
 	memset(m_hitInfo, 0xFF, sizeof(m_hitInfo));
@@ -651,13 +658,13 @@ int GbaQueue::SetQueue(int channel, unsigned int value)
  */
 void GbaQueue::ResetQueue()
 {
-	char* obj = reinterpret_cast<char*>(this);
+	GbaQueueSetQueueView* queue = GetSetQueueView(this);
 
 	for (int channel = 0; channel < 4; channel++) {
 		OSWaitSemaphore(accessSemaphores + channel);
-		memset(obj + 0x30 + channel * 0x100, 0, 0x100);
-		*reinterpret_cast<int*>(obj + 0x430 + channel * 4) = 0;
-		obj[0x440 + channel] = 0;
+		memset(queue->m_queue[channel], 0, sizeof(queue->m_queue[channel]));
+		queue->m_queueCount[channel] = 0;
+		queue->m_queueFull[channel] = 0;
 		OSSignalSemaphore(accessSemaphores + channel);
 	}
 }
@@ -675,6 +682,7 @@ void GbaQueue::ExecutQueue()
 {
 	unsigned int localQueueData[4][64];
 	int localQueueCount[4];
+	GbaQueueSetQueueView* queue = GetSetQueueView(this);
 	char* obj;
 	int scriptFoodBase[4];
 	unsigned int channel;
@@ -683,10 +691,10 @@ void GbaQueue::ExecutQueue()
 		OSWaitSemaphore(accessSemaphores + channel);
 	}
 
-	memcpy(localQueueData, reinterpret_cast<char*>(this) + 0x30, sizeof(localQueueData));
-	memcpy(localQueueCount, reinterpret_cast<char*>(this) + 0x430, sizeof(localQueueCount));
-	memset(reinterpret_cast<char*>(this) + 0x30, 0, sizeof(localQueueData));
-	memset(reinterpret_cast<char*>(this) + 0x430, 0, sizeof(localQueueCount));
+	memcpy(localQueueData, queue->m_queue, sizeof(localQueueData));
+	memcpy(localQueueCount, queue->m_queueCount, sizeof(localQueueCount));
+	memset(queue->m_queue, 0, sizeof(localQueueData));
+	memset(queue->m_queueCount, 0, sizeof(localQueueCount));
 
 	for (channel = 0; channel < 4; channel++) {
 		OSSignalSemaphore(accessSemaphores + channel);
@@ -703,7 +711,7 @@ void GbaQueue::ExecutQueue()
 		CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(scriptFoodBase[channel]);
 		int i;
 
-		if (obj[0x440 + channel] != 0) {
+		if (queue->m_queueFull[channel] != 0) {
 			continue;
 		}
 
@@ -1127,7 +1135,7 @@ void GbaQueue::SetStageNo(int stageId, int mapId)
     obj[0x2D61] = 0;
     *reinterpret_cast<int*>(obj + 0x2AF8) = 0;
     obj[0x2C88] = 0;
-    memset(obj + 0x2B00, 0, 0x188);
+    memset(obj + 0x2B00, 0, kGbaQueueMapObjWorkBytes);
 
     if ((*reinterpret_cast<int*>(obj + 0x444) != stageId) || (*reinterpret_cast<int*>(obj + 0x448) != mapId)) {
         obj[0x44C] = 0xF;
@@ -2676,7 +2684,7 @@ void GbaQueue::LoadMapObj()
 		} while (i < 4);
 
 		if (obj[0x2B00] != 0) {
-			memset(obj + 0x2B00, 0, 0x188);
+			memset(obj + 0x2B00, 0, kGbaQueueMapObjWorkBytes);
 		}
 
 		i = 0;
@@ -2687,7 +2695,7 @@ void GbaQueue::LoadMapObj()
 			semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
 		} while (i < 4);
 	} else {
-		unsigned char mapObjWork[0x188];
+		unsigned char mapObjWork[kGbaQueueMapObjWorkBytes];
 		memset(mapObjWork, 0, sizeof(mapObjWork));
 
 		char* mapObjBase = reinterpret_cast<char*>(&CFlat) + 0x134C;
@@ -2760,7 +2768,7 @@ System.Printf(const_cast<char*>(s_unknown_mapobj_type_error), objType);
  */
 int GbaQueue::GetMapObj(unsigned char* outData)
 {
-	unsigned char mapObjWork[0x188];
+	unsigned char mapObjWork[kGbaQueueMapObjWorkBytes];
 	unsigned char* workEntry;
 	GbaQueue* semaphoreIter;
 	int i;

@@ -84,11 +84,12 @@ static inline float LoadFloat(const float& value)
 static inline double S16ToDouble(s16 value)
 {
     union {
-        unsigned long long bits;
+        u32 words[2];
         double value;
     } conv;
 
-    conv.bits = 0x4330000000000000ULL | static_cast<unsigned int>(value ^ 0x80000000U);
+    conv.words[0] = 0x43300000;
+    conv.words[1] = static_cast<unsigned int>(value ^ 0x80000000U);
     return conv.value - DOUBLE_8032FCD0;
 }
 

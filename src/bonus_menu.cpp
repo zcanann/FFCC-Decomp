@@ -16,7 +16,7 @@
 extern char* PTR_s_bonus[];
 extern CMenuPcs::CTmp s_bonusTextureTable[];
 extern char s_menuSubfontPathFmt[];
-extern const double DOUBLE_80331FC0;
+extern const double kPppCrystal2RefractionScale;
 #pragma force_active on
 extern "C" {
 int gBonusMenuWork0 = 0;
@@ -1479,7 +1479,7 @@ void CMenuPcs::calcBonus()
 	}
 
 	*reinterpret_cast<float*>(statePtr) =
-	    static_cast<float>((double)*reinterpret_cast<float*>(statePtr) - DOUBLE_80331FC0);
+	    static_cast<float>((double)*reinterpret_cast<float*>(statePtr) - kPppCrystal2RefractionScale);
 
 	if (*(short*)(animPtr + 6) != 0) {
 		*(short*)(statePtr + 0x1c) = *(short*)(statePtr + 0x1c) + 1;

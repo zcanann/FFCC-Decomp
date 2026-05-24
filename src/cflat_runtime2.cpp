@@ -37,6 +37,7 @@ inline void* operator new(unsigned long, void* ptr)
 extern "C" void StaticFrame__10CGCharaObjFv();
 extern "C" void* __vt__13CFlatRuntime2[];
 extern "C" void __dt__13CFlatRuntime2Fv(void*);
+extern "C" void __dt__12CFlatRuntimeFv(CFlatRuntime*, short);
 extern "C" void __ct__8CGMonObjFv(CGMonObj*);
 extern "C" void __ct__10CGPartyObjFv(CGPartyObj*);
 extern "C" void __ct__9CGItemObjFv(CGItemObj*);
@@ -49,9 +50,9 @@ extern "C" void __ct__9CGBaseObjFv(CGBaseObj*);
 unsigned char CFlat_guard[0x20];
 unsigned char CFlat[0x10440];
 CFlatRuntime2& gCFlatRuntime2 = *reinterpret_cast<CFlatRuntime2*>(CFlat);
-unsigned char m_gBaseObjArr[0xC80];
-unsigned char m_gObjQuadArr[0x1020];
-unsigned char m_gObjArr[0x11D40];
+unsigned char m_objBase[0xC80];
+unsigned char m_objQuad[0x1020];
+unsigned char m_obj[0x11D40];
 unsigned char m_objItem[0xAF80];
 unsigned char m_objParty[0x1BE0];
 unsigned char m_objMon[0x1D000];
@@ -484,19 +485,19 @@ CFlatRuntime2::CFlatRuntime2()
 	resetChangeScript();
 	memset(runtime + 0x12F0, 0, 0x48);
 
-	CGBaseObj* baseObj = reinterpret_cast<CGBaseObj*>(m_gBaseObjArr);
+	CGBaseObj* baseObj = reinterpret_cast<CGBaseObj*>(m_objBase);
 	for (int i = 0; i < 0x28; i++) {
 		InitFlatObjectSlot(baseObj, static_cast<u16>(i + 1));
 		baseObj++;
 	}
 
-	CGQuadObj* quadObj = reinterpret_cast<CGQuadObj*>(m_gObjQuadArr);
+	CGQuadObj* quadObj = reinterpret_cast<CGQuadObj*>(m_objQuad);
 	for (int i = 0; i < 0x18; i++) {
 		InitFlatObjectSlot(quadObj, static_cast<u16>((i + 1) | 0x100));
 		quadObj++;
 	}
 
-	CGObject* gObj = reinterpret_cast<CGObject*>(m_gObjArr);
+	CGObject* gObj = reinterpret_cast<CGObject*>(m_obj);
 	for (int i = 0; i < 0x38; i++) {
 		InitFlatObjectSlot(gObj, static_cast<u16>((i + 1) | 0x200));
 		gObj++;
@@ -532,7 +533,7 @@ CFlatRuntime2::~CFlatRuntime2()
 	*reinterpret_cast<void***>(runtime) = __vt__13CFlatRuntime2;
 	reinterpret_cast<CFlatRuntime*>(this)->AfterFrame(1);
 	reinterpret_cast<CFlatData*>(runtime + 0xCF20)->~CFlatData();
-	reinterpret_cast<CFlatRuntime*>(this)->~CFlatRuntime();
+	__dt__12CFlatRuntimeFv(reinterpret_cast<CFlatRuntime*>(this), 0);
 }
 
 /*
@@ -553,9 +554,9 @@ extern "C" void __sinit_cflat_runtime2_cpp(void)
 	new (CFlat) CFlatRuntime2;
 	__register_global_object(CFlat, reinterpret_cast<void*>(__dt__13CFlatRuntime2Fv), CFlat_guard);
 
-	__construct_array(m_gBaseObjArr, reinterpret_cast<ConstructorDestructor>(__ct__9CGBaseObjFv), 0, 0x50, 0x28);
-	__construct_array(m_gObjQuadArr, reinterpret_cast<ConstructorDestructor>(__ct__9CGQuadObjFv), 0, 0xAC, 0x18);
-	__construct_array(m_gObjArr, reinterpret_cast<ConstructorDestructor>(__ct__8CGObjectFv), 0, 0x518, 0x38);
+	__construct_array(m_objBase, reinterpret_cast<ConstructorDestructor>(__ct__9CGBaseObjFv), 0, 0x50, 0x28);
+	__construct_array(m_objQuad, reinterpret_cast<ConstructorDestructor>(__ct__9CGQuadObjFv), 0, 0xAC, 0x18);
+	__construct_array(m_obj, reinterpret_cast<ConstructorDestructor>(__ct__8CGObjectFv), 0, 0x518, 0x38);
 	__construct_array(m_objItem, reinterpret_cast<ConstructorDestructor>(__ct__9CGItemObjFv), 0, 0x57C, 0x20);
 	__construct_array(m_objParty, reinterpret_cast<ConstructorDestructor>(__ct__10CGPartyObjFv), 0, 0x6F8, 4);
 	__construct_array(m_objMon, reinterpret_cast<ConstructorDestructor>(__ct__8CGMonObjFv), 0, 0x740, 0x40);
@@ -747,7 +748,7 @@ unsigned int CFlatRuntime2::getNumFreeObject(int classType)
 
 	switch (classType) {
 	case 0: {
-		signed char* obj = reinterpret_cast<signed char*>(m_gBaseObjArr);
+		signed char* obj = reinterpret_cast<signed char*>(m_objBase);
 		for (int i = 0; i < 40; i++) {
 			if (obj[0x4C] >= 0) {
 				count++;
@@ -757,7 +758,7 @@ unsigned int CFlatRuntime2::getNumFreeObject(int classType)
 		return count;
 	}
 	case 1: {
-		signed char* obj = reinterpret_cast<signed char*>(m_gObjQuadArr);
+		signed char* obj = reinterpret_cast<signed char*>(m_objQuad);
 		for (int i = 0; i < 24; i++) {
 			if (obj[0x4C] >= 0) {
 				count++;
@@ -767,7 +768,7 @@ unsigned int CFlatRuntime2::getNumFreeObject(int classType)
 		return count;
 	}
 	case 2: {
-		signed char* obj = reinterpret_cast<signed char*>(m_gObjArr);
+		signed char* obj = reinterpret_cast<signed char*>(m_obj);
 		for (int i = 0; i < 56; i++) {
 			if (obj[0x4C] >= 0) {
 				count++;
@@ -824,30 +825,30 @@ CGObject* CFlatRuntime2::getFreeObject(int classType)
 {
 	switch (classType) {
 	case 0: {
-		unsigned char* obj = m_gBaseObjArr;
+		unsigned char* obj = m_objBase;
 		for (int i = 0; i < 0x28; i++) {
 			if (static_cast<signed char>(obj[0x4C]) >= 0) {
-				return reinterpret_cast<CGObject*>(m_gBaseObjArr + i * 0x50);
+				return reinterpret_cast<CGObject*>(m_objBase + i * 0x50);
 			}
 			obj += 0x50;
 		}
 		return 0;
 	}
 	case 1: {
-		unsigned char* obj = m_gObjQuadArr;
+		unsigned char* obj = m_objQuad;
 		for (int i = 0; i < 0x18; i++) {
 			if (static_cast<signed char>(obj[0x4C]) >= 0) {
-				return reinterpret_cast<CGObject*>(m_gObjQuadArr + i * 0xAC);
+				return reinterpret_cast<CGObject*>(m_objQuad + i * 0xAC);
 			}
 			obj += 0xAC;
 		}
 		return 0;
 	}
 	case 2: {
-		unsigned char* obj = m_gObjArr;
+		unsigned char* obj = m_obj;
 		for (int i = 0; i < 0x38; i++) {
 			if (static_cast<signed char>(obj[0x4C]) >= 0) {
-				return reinterpret_cast<CGObject*>(m_gObjArr + i * 0x518);
+				return reinterpret_cast<CGObject*>(m_obj + i * 0x518);
 			}
 			obj += 0x518;
 		}
@@ -904,11 +905,11 @@ void* CFlatRuntime2::intToClass(int classId)
 
 	switch (classType) {
 	case 0:
-		return m_gBaseObjArr + (slot - 1) * 0x50;
+		return m_objBase + (slot - 1) * 0x50;
 	case 1:
-		return m_gObjQuadArr + (slot - 1) * 0xAC;
+		return m_objQuad + (slot - 1) * 0xAC;
 	case 2:
-		return m_gObjArr + (slot - 1) * 0x518;
+		return m_obj + (slot - 1) * 0x518;
 	case 3:
 		return m_objParty + (slot - 1) * 0x6F8;
 	case 4:

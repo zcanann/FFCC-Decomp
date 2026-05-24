@@ -48,7 +48,7 @@ char* CardConst::MCDAT_VERSION = const_cast<char*>(s_CardVersion_80330CC8);
 
 CMemoryCardMan MemoryCardMan;
 
-extern const char sMcOdekakeReturn[];
+extern const char sMcOdekakeReturn[8] = "\202\250\213A\202\350";
 // CRC32 lookup table
 static const unsigned int crcTable[256] = {
     0x00000000, 0x04c11db7, 0x09823b6e, 0x0d4326d9,
@@ -2229,12 +2229,7 @@ void CMemoryCardMan::Odekake(int mode, Mc::SaveDat& srcSave, int srcChar, Mc::Sa
 {
     if (static_cast<unsigned int>(System.m_execParam) >= 3)
     {
-        const char* label = sMcOdekakeReturn;
-        if (mode != 0)
-        {
-            label = sMcOdekakeOut;
-        }
-        System.Printf(const_cast<char*>(sMcOdekakeFmt), srcChar, dstChar, label);
+        System.Printf(const_cast<char*>(sMcOdekakeFmt), srcChar, dstChar, mode != 0 ? sMcOdekakeOut : sMcOdekakeReturn);
     }
 
     u8* srcSaveData = reinterpret_cast<u8*>(&srcSave);

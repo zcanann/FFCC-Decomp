@@ -101,6 +101,7 @@ struct GbaQueueCMakeInfoView
 	unsigned char m_jobType;
 };
 STATIC_ASSERT(sizeof(GbaQueueCMakeInfoView) == 0x20);
+STATIC_ASSERT(sizeof(GbaCMakeInfo) == 0x20);
 
 struct GbaQueueSetQueueView
 {
@@ -199,8 +200,8 @@ void GbaQueue::Init()
 	memset(obj + 0x2A74, 0, 0x80);
 	memset(obj + 0x2B00, 0, 0x188);
 	memset(obj + 0x2C8E, 0, 8);
-	memset(obj + 0x2CB2, 0, 0x80);
-	memset(obj + 0x2D44, 0xFF, 0x10);
+	memset(cmakeInfo, 0, sizeof(cmakeInfo));
+	memset(m_hitInfo, 0xFF, sizeof(m_hitInfo));
 
 	i = 0;
 	osSemaphore = this;
@@ -1137,7 +1138,7 @@ void GbaQueue::SetStageNo(int stageId, int mapId)
         } while (loadSignalIndex < 4);
     }
 
-    memset(obj + 0x2D44, 0xFF, 0x10);
+    memset(m_hitInfo, 0xFF, sizeof(m_hitInfo));
     obj[0x2D54] = 0;
 }
 
@@ -2973,7 +2974,7 @@ void GbaQueue::InitCmakeInfo(int channel, int value)
 	unsigned char* obj = reinterpret_cast<unsigned char*>(this);
 
 	OSWaitSemaphore(accessSemaphores + channel);
-	memset(&cmakeInfo[channel], 0, 0x20);
+	memset(&cmakeInfo[channel], 0, sizeof(cmakeInfo[channel]));
 	cmakeInfo[channel][0] = 1;
 	obj[channel * 0x20 + 0x2CCA] = 0xFF;
 	obj[channel * 0x20 + 0x2CD1] = 0xFF;
@@ -2995,8 +2996,8 @@ void GbaQueue::InitCmakeInfo(int channel, int value)
 void GbaQueue::ClrCmakeInfo(int param_2)
 {
 	BlockSem(param_2);
-	if (cmakeInfo[param_2 * 0x20] != '\0') {
-		memset(&cmakeInfo[param_2 * 0x20], 0, 0x20);
+	if (cmakeInfo[param_2][0] != '\0') {
+		memset(&cmakeInfo[param_2], 0, sizeof(cmakeInfo[param_2]));
 	}
 	ReleaseSem(param_2);
 }
@@ -3457,10 +3458,9 @@ int GbaQueue::GetCompatibility(int channel, unsigned char* outCompatibility)
 void GbaQueue::GetCMakeInfo(int channel, GbaCMakeInfo* outInfo)
 {
 	OSSemaphore* sem = accessSemaphores + channel;
-	void* src = reinterpret_cast<char*>(this) + channel * 0x20 + 0x2CB2;
 
 	OSWaitSemaphore(sem);
-	memcpy(outInfo, src, 0x20);
+	memcpy(outInfo, &cmakeInfo[channel], sizeof(*outInfo));
 	OSSignalSemaphore(sem);
 }
 

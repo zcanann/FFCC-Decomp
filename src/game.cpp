@@ -46,10 +46,10 @@ const float FLOAT_8032f68c = -1.0E+10;
 const float FLOAT_8032f690 = 0.0;
 const float FLOAT_8032f694 = 0.001;
 extern "C" {
-const char DAT_8032f698[] = "ffcc_0";
-const char DAT_8032f6a0[] = "*\n";
-const char DAT_8032f6a4[] = "Tepa";
-const char DAT_8032f6ac[] = "Tipa";
+const char s_defaultScriptName[] = "ffcc_0";
+const char s_gameDebugMarker[] = "*\n";
+const char s_townNameTepa[] = "Tepa";
+const char s_townNameTipa[] = "Tipa";
 const char s_GameStageName_8032F6B4[] = "Game";
 }
 extern const char s_dvd_pctscft_param_cfd_801D6054[];
@@ -485,7 +485,7 @@ void CGame::Create()
 
     *reinterpret_cast<u32*>(&m_gameWork.m_scriptSysVal0) = 1;
     m_gameWork.m_chaliceElement = 1;
-    strcpy(m_gameWork.m_townName, m_gameWork.m_languageId == 3 ? DAT_8032f6a4 : DAT_8032f6ac);
+    strcpy(m_gameWork.m_townName, m_gameWork.m_languageId == 3 ? s_townNameTepa : s_townNameTipa);
 
     m_gameWork.m_gameInitFlag = 1;
 
@@ -539,9 +539,9 @@ void CGame::Destroy()
  */
 void CGame::InitNewGame()
 {
-    System.Printf(const_cast<char*>(DAT_8032f6a0));
+    System.Printf(const_cast<char*>(s_gameDebugMarker));
     System.Printf(const_cast<char*>(DAT_801d6214));
-    System.Printf(const_cast<char*>(DAT_8032f6a0));
+    System.Printf(const_cast<char*>(s_gameDebugMarker));
 
     CGame* game = &Game;
 
@@ -550,7 +550,7 @@ void CGame::InitNewGame()
 
     *reinterpret_cast<unsigned int*>(&game->m_gameWork.m_scriptSysVal0) = 1;
     game->m_gameWork.m_chaliceElement = 1;
-    strcpy(game->m_gameWork.m_townName, game->m_gameWork.m_languageId == 3 ? DAT_8032f6a4 : DAT_8032f6ac);
+    strcpy(game->m_gameWork.m_townName, game->m_gameWork.m_languageId == 3 ? s_townNameTepa : s_townNameTipa);
     gCFlatRuntime2.ResetNewGame();
     Chara.InitFurTexBuffer();
 }
@@ -723,7 +723,7 @@ void CGame::CheckScriptChange()
 
     System.ScriptChanging(m_nextScript.m_name);
 
-    if (strcmp(m_nextScript.m_name, DAT_8032f698) != 0) {
+    if (strcmp(m_nextScript.m_name, s_defaultScriptName) != 0) {
         if (m_cfdLoadedFlag == 0) {
             gCFlatRuntime2.Destroy();
             loadCfd();
@@ -752,16 +752,16 @@ void CGame::CheckScriptChange()
     if (m_nextScript.m_flags != 0) {
         CGame* game = &Game;
 
-        System.Printf(const_cast<char*>(DAT_8032f6a0));
+        System.Printf(const_cast<char*>(s_gameDebugMarker));
         System.Printf(const_cast<char*>(DAT_801d6214));
-        System.Printf(const_cast<char*>(DAT_8032f6a0));
+        System.Printf(const_cast<char*>(s_gameDebugMarker));
 
         memset(&game->m_gameWork.m_gameDataStartMarker, 0, 0x13E1);
         memset(game->m_gameWork.m_wmBackupParams, 0xFF, sizeof(game->m_gameWork.m_wmBackupParams));
 
         *reinterpret_cast<unsigned int*>(&game->m_gameWork.m_scriptSysVal0) = 1;
         game->m_gameWork.m_chaliceElement = 1;
-        strcpy(game->m_gameWork.m_townName, game->m_gameWork.m_languageId == 3 ? DAT_8032f6a4 : DAT_8032f6ac);
+        strcpy(game->m_gameWork.m_townName, game->m_gameWork.m_languageId == 3 ? s_townNameTepa : s_townNameTipa);
         gCFlatRuntime2.ResetNewGame();
         Chara.InitFurTexBuffer();
         m_nextScript.m_flags = 0;
@@ -1613,7 +1613,7 @@ inline void CGame::CGameWork::Init()
 
     *reinterpret_cast<unsigned int*>(&m_scriptSysVal0) = 1;
     m_chaliceElement = 1;
-    strcpy(m_townName, m_languageId == 3 ? DAT_8032f6a4 : DAT_8032f6ac);
+    strcpy(m_townName, m_languageId == 3 ? s_townNameTepa : s_townNameTipa);
     m_gameInitFlag = 1;
 }
 
@@ -1795,6 +1795,6 @@ inline CGame::CGameWork::CGameWork()
 
     *reinterpret_cast<unsigned int*>(&m_scriptSysVal0) = 1;
     m_chaliceElement = 1;
-    strcpy(m_townName, m_languageId == 3 ? DAT_8032f6a4 : DAT_8032f6ac);
+    strcpy(m_townName, m_languageId == 3 ? s_townNameTepa : s_townNameTipa);
     m_gameInitFlag = 1;
 }

@@ -373,12 +373,11 @@ void CRingMenu::onScriptChanging(char*)
  */
 void CRingMenu::drawGBA()
 {
-	const int menuIndex = m_menuIndex;
-	if (!((Game.m_gameWork.m_menuStageMode == 0) || (menuIndex < 1))) {
+	if (!((Game.m_gameWork.m_menuStageMode == 0) || (m_menuIndex < 1))) {
 		return;
 	}
 
-	const unsigned int scriptFood = Game.m_scriptFoodBase[menuIndex];
+	const unsigned int scriptFood = Game.m_scriptFoodBase[m_menuIndex];
 	if (scriptFood == 0) {
 		return;
 	}
@@ -400,13 +399,13 @@ void CRingMenu::drawGBA()
 	}
 
 	int posXInt = 0x30;
-	if ((menuIndex & 1) != 0) {
+	if ((m_menuIndex & 1) != 0) {
 		posXInt = 0x250;
 	}
 	float posX = static_cast<float>(posXInt);
 
 	int posYInt = 0x30;
-	if ((menuIndex & 2) != 0) {
+	if ((m_menuIndex & 2) != 0) {
 		posYInt = 400;
 	}
 	float posY = static_cast<float>(posYInt);
@@ -436,7 +435,7 @@ void CRingMenu::drawGBA()
 	const double invSize = static_cast<double>(FLOAT_803309cc) - sizePulse;
 	const float drawX = static_cast<float>(static_cast<double>(posX) + static_cast<double>(FLOAT_80330a3c * static_cast<float>(sizePulse * sinB)));
 	const float drawY = static_cast<float>(static_cast<double>(posY) - static_cast<double>(FLOAT_80330a40 * static_cast<float>(sizePulse * sinA)));
-	const float menuV = static_cast<float>(menuIndex * 0x30);
+	const float menuV = static_cast<float>(m_menuIndex * 0x30);
 	MenuPcs.DrawRect(3, FLOAT_80330a38 + drawX, FLOAT_80330a38 + drawY, FLOAT_80330a44, FLOAT_80330a48,
 	                                 FLOAT_803309c0, menuV, FLOAT_80330a4c * static_cast<float>(static_cast<double>(FLOAT_803309cc) + invSize),
 	                                 FLOAT_80330a4c * static_cast<float>(sizePulse + invSize), 0.0f);
@@ -449,8 +448,8 @@ void CRingMenu::drawGBA()
 	                                 FLOAT_80330a4c * static_cast<float>(sizePulse), FLOAT_80330a4c * static_cast<float>(sizePulse), 0.0f);
 
 	const unsigned int flatFlags = CFlatEnabledEventFlags();
-	if (((flatFlags & 8) != 0) && (Joybus.GetGBAStart(menuIndex) == 0)) {
-		if (Joybus.IsInitSend(menuIndex) == 0) {
+	if (((flatFlags & 8) != 0) && (Joybus.GetGBAStart(m_menuIndex) == 0)) {
+		if (Joybus.IsInitSend(m_menuIndex) == 0) {
 			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1D));
 			const double blink = static_cast<double>(sin(static_cast<double>(FLOAT_80330a54 * static_cast<float>(m_commonFrameCounter))));
 			const unsigned int sendAlpha = static_cast<unsigned int>(

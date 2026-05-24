@@ -53,8 +53,8 @@ extern "C" double DOUBLE_8032fe00;
 extern "C" float FLOAT_8032fdf8;
 extern "C" unsigned int gPppFixedWhite;
 
-_pppEnvSt* pppEnvStPtr;
 _pppMngSt* pppMngStPtr;
+_pppEnvSt* pppEnvStPtr;
 extern "C" {
 float gPartScreenMatrixRow2X = 0.0f;
 float gPartScreenMatrixRow2Y = 0.0f;

@@ -3372,7 +3372,7 @@ void CMapMng::SetMapObjAnim(int mapObjIndex, int startFrame, int endFrame, int l
     CMapObj* mapObj = GetMapObjArray() + mapObjIndex;
     int mapAnimRunCount = mapAnimRunArray->GetSize();
 
-    for (unsigned int mapAnimRunIndex = 0; mapAnimRunIndex < static_cast<unsigned int>(mapAnimRunCount); mapAnimRunIndex++) {
+    for (int mapAnimRunIndex = 0; mapAnimRunIndex < mapAnimRunCount; mapAnimRunIndex++) {
         CMapAnimRun* mapAnimRun = (*mapAnimRunArray)[mapAnimRunIndex];
         CPtrArray<CMapAnimNode*>* mapAnimNodeArray =
             reinterpret_cast<CPtrArray<CMapAnimNode*>*>((*mapAnimArray)[mapAnimRun->m_mapAnimIndex]);

@@ -177,13 +177,14 @@ inline CTexAnim::CRefData::CRefData()
  */
 inline CTexAnim::CTexAnim()
 {
+    const float& zero = FLOAT_8032fb38;
     m_refData = 0;
     m_seqIndex = 0;
-    m_frame = FLOAT_8032fb38;
+    m_frame = zero;
     m_mode = -2;
-    m_chin = FLOAT_8032fb38;
-    m_texGenT = FLOAT_8032fb38;
-    m_texGenS = FLOAT_8032fb38;
+    m_chin = zero;
+    m_texGenT = zero;
+    m_texGenS = zero;
 }
 
 /*

@@ -15,7 +15,6 @@
 #include <dolphin/mtx.h>
 #include "ffcc/ppp_linkage.h"
 
-struct pppYmDeformationScreen;
 struct YmDeformationScreenOffsetData {
 	int unk0;
 	int unk1;
@@ -67,15 +66,15 @@ struct _pppEnvStYmDeformationScreen {
 	CMapMesh** m_mapMeshPtr;
 };
 
-extern const float FLOAT_80330670;
-extern const float FLOAT_80330674;
-extern const float FLOAT_80330678;
-extern const float FLOAT_8033067C;
-extern const float FLOAT_80330680;
-extern const float FLOAT_80330684;
-extern const float FLOAT_80330688;
-extern const float FLOAT_8033068C;
-extern const float FLOAT_80330690;
+extern const float kYmDeformationScreenZero;
+extern const float kYmDeformationScreenOrthoScaleX;
+extern const float kYmDeformationScreenOrthoScaleY;
+extern const float kYmDeformationScreenOne;
+extern const float kYmDeformationScreenOrthoOffsetX;
+extern const float kYmDeformationScreenAngleToRad;
+extern const float kYmDeformationScreenQuadRight;
+extern const float kYmDeformationScreenQuadMiddleY;
+extern const float kYmDeformationScreenQuadBottom;
 
 /*
  * --INFO--
@@ -117,7 +116,7 @@ void pppRenderYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, 
 	color.rgba[2] = 0x40;
 	color.rgba[3] = 0x40;
 	pppSetBlendMode(0);
-	pppSetDrawEnv(&color, (pppFMATRIX*)0, FLOAT_80330670, (u8)0, (u8)0, (u8)0, (u8)0, (u8)1, (u8)1, (u8)0);
+	pppSetDrawEnv(&color, (pppFMATRIX*)0, kYmDeformationScreenZero, (u8)0, (u8)0, (u8)0, (u8)0, (u8)1, (u8)1, (u8)0);
 	_GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
 	GXSetNumTexGens(2);
 	GXSetNumChans(1);
@@ -144,12 +143,12 @@ void pppRenderYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, 
 		GXSetCurrentMtx(0);
 
 		PSMTX44Identity(orthoMtx);
-		orthoMtx[2][2] = FLOAT_8033067C;
-		orthoMtx[0][0] = FLOAT_80330674;
-		orthoMtx[1][1] = FLOAT_80330678;
-		orthoMtx[0][3] = FLOAT_80330680;
-		orthoMtx[1][3] = FLOAT_8033067C;
-		orthoMtx[2][3] = FLOAT_80330670;
+		orthoMtx[2][2] = kYmDeformationScreenOne;
+		orthoMtx[0][0] = kYmDeformationScreenOrthoScaleX;
+		orthoMtx[1][1] = kYmDeformationScreenOrthoScaleY;
+		orthoMtx[0][3] = kYmDeformationScreenOrthoOffsetX;
+		orthoMtx[1][3] = kYmDeformationScreenOne;
+		orthoMtx[2][3] = kYmDeformationScreenZero;
 		GXSetProjection(orthoMtx, GX_ORTHOGRAPHIC);
 
 		GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
@@ -167,7 +166,7 @@ void pppRenderYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, 
 			work->m_angle = 1;
 		}
 
-		PSMTXRotRad(rot, 'z', FLOAT_80330684 * (float)work->m_angle);
+		PSMTXRotRad(rot, 'z', kYmDeformationScreenAngleToRad * (float)work->m_angle);
 		indMtx[0][0] = rot[0][0] * work->m_scale;
 		indMtx[0][1] = rot[0][1] * work->m_scale;
 		indMtx[0][2] = 0.0f;
@@ -184,43 +183,43 @@ void pppRenderYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, 
 	GXLoadTexObj(&backTexObj, GX_TEXMAP0);
 	GXLoadTexObj((GXTexObj*)(textureBase + 0x28), GX_TEXMAP1);
 	GXBegin(GX_QUADS, GX_VTXFMT7, 4);
-	GXPosition3f32(FLOAT_80330670, FLOAT_80330670, depth);
+	GXPosition3f32(kYmDeformationScreenZero, kYmDeformationScreenZero, depth);
 	GXColor1u32(*(u32*)color.rgba);
-	GXTexCoord2f32(FLOAT_80330670, FLOAT_80330670);
-	GXTexCoord2f32(FLOAT_80330670, FLOAT_80330670);
-	GXPosition3f32(FLOAT_80330688, FLOAT_80330670, depth);
+	GXTexCoord2f32(kYmDeformationScreenZero, kYmDeformationScreenZero);
+	GXTexCoord2f32(kYmDeformationScreenZero, kYmDeformationScreenZero);
+	GXPosition3f32(kYmDeformationScreenQuadRight, kYmDeformationScreenZero, depth);
 	GXColor1u32(*(u32*)color.rgba);
-	GXTexCoord2f32(FLOAT_8033067C, FLOAT_80330670);
-	GXTexCoord2f32(texU, FLOAT_80330670);
-	GXPosition3f32(FLOAT_80330688, FLOAT_8033068C, depth);
+	GXTexCoord2f32(kYmDeformationScreenOne, kYmDeformationScreenZero);
+	GXTexCoord2f32(texU, kYmDeformationScreenZero);
+	GXPosition3f32(kYmDeformationScreenQuadRight, kYmDeformationScreenQuadMiddleY, depth);
 	GXColor1u32(*(u32*)color.rgba);
-	GXTexCoord2f32(FLOAT_8033067C, FLOAT_8033067C);
+	GXTexCoord2f32(kYmDeformationScreenOne, kYmDeformationScreenOne);
 	GXTexCoord2f32(texU, texV);
-	GXPosition3f32(FLOAT_80330670, FLOAT_8033068C, depth);
+	GXPosition3f32(kYmDeformationScreenZero, kYmDeformationScreenQuadMiddleY, depth);
 	GXColor1u32(*(u32*)color.rgba);
-	GXTexCoord2f32(FLOAT_80330670, FLOAT_8033067C);
-	GXTexCoord2f32(FLOAT_80330670, texV);
+	GXTexCoord2f32(kYmDeformationScreenZero, kYmDeformationScreenOne);
+	GXTexCoord2f32(kYmDeformationScreenZero, texV);
 
 	Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &backTexObj, 0, 224, 640, 224, 0, GX_LINEAR, GX_TF_RGBA8, 0);
 	GXLoadTexObj(&backTexObj, GX_TEXMAP0);
 	depth = work->m_depth;
 	GXBegin(GX_QUADS, GX_VTXFMT7, 4);
-	GXPosition3f32(FLOAT_80330670, FLOAT_8033068C, depth);
+	GXPosition3f32(kYmDeformationScreenZero, kYmDeformationScreenQuadMiddleY, depth);
 	GXColor1u32(*(u32*)color.rgba);
-	GXTexCoord2f32(FLOAT_80330670, FLOAT_80330670);
-	GXTexCoord2f32(FLOAT_80330670, FLOAT_80330670);
-	GXPosition3f32(FLOAT_80330688, FLOAT_8033068C, depth);
+	GXTexCoord2f32(kYmDeformationScreenZero, kYmDeformationScreenZero);
+	GXTexCoord2f32(kYmDeformationScreenZero, kYmDeformationScreenZero);
+	GXPosition3f32(kYmDeformationScreenQuadRight, kYmDeformationScreenQuadMiddleY, depth);
 	GXColor1u32(*(u32*)color.rgba);
-	GXTexCoord2f32(FLOAT_8033067C, FLOAT_80330670);
-	GXTexCoord2f32(texU, FLOAT_80330670);
-	GXPosition3f32(FLOAT_80330688, FLOAT_80330690, depth);
+	GXTexCoord2f32(kYmDeformationScreenOne, kYmDeformationScreenZero);
+	GXTexCoord2f32(texU, kYmDeformationScreenZero);
+	GXPosition3f32(kYmDeformationScreenQuadRight, kYmDeformationScreenQuadBottom, depth);
 	GXColor1u32(*(u32*)color.rgba);
-	GXTexCoord2f32(FLOAT_8033067C, FLOAT_8033067C);
+	GXTexCoord2f32(kYmDeformationScreenOne, kYmDeformationScreenOne);
 	GXTexCoord2f32(texU, texV);
-	GXPosition3f32(FLOAT_80330670, FLOAT_80330690, depth);
+	GXPosition3f32(kYmDeformationScreenZero, kYmDeformationScreenQuadBottom, depth);
 	GXColor1u32(*(u32*)color.rgba);
-	GXTexCoord2f32(FLOAT_80330670, FLOAT_8033067C);
-	GXTexCoord2f32(FLOAT_80330670, texV);
+	GXTexCoord2f32(kYmDeformationScreenZero, kYmDeformationScreenOne);
+	GXTexCoord2f32(kYmDeformationScreenZero, texV);
 
 	gUtil.EndQuadEnv();
 	DisableIndWarp(GX_TEVSTAGE1, GX_INDTEXSTAGE0);
@@ -276,14 +275,14 @@ void pppFrameYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, v
 
 			if (*(s32*)((u8*)param1 + 0xC) == 0) {
 				PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
-				inVec.x = FLOAT_80330670;
-				inVec.y = FLOAT_80330670;
+				inVec.x = kYmDeformationScreenZero;
+				inVec.y = kYmDeformationScreenZero;
 				inVec.z = -*(float*)&step->m_payloadBytes[2];
-				inVec.w = FLOAT_8033067C;
+				inVec.w = kYmDeformationScreenOne;
 				Math.MTX44MultVec4(screenMtx, &inVec, &outVec);
 				{
 					float outW = outVec.w;
-					if (outW != FLOAT_80330670) {
+					if (outW != kYmDeformationScreenZero) {
 						outVec.z /= outW;
 					}
 				}
@@ -332,7 +331,7 @@ void pppDestructYmDeformationScreen(pppYmDeformationScreen*, void*)
  */
 void pppConstruct2YmDeformationScreen(pppYmDeformationScreen* obj, void* param2)
 {
-	float zero = FLOAT_80330670;
+	float zero = kYmDeformationScreenZero;
 	VYmDeformationScreen* work =
 		(VYmDeformationScreen*)((char*)obj + ((YmDeformationScreenParam*)param2)->offsetData->offset + 0x80);
 
@@ -358,7 +357,7 @@ void pppConstructYmDeformationScreen(pppYmDeformationScreen* obj, void* param2)
 	YmDeformationScreenOffsetData* offsetData = ((YmDeformationScreenParam*)param2)->offsetData;
 	short angle = 0;
 	char direction = 1;
-	float zero = FLOAT_80330670;
+	float zero = kYmDeformationScreenZero;
 	VYmDeformationScreen* work = (VYmDeformationScreen*)((char*)obj + offsetData->offset + 0x80);
 
 	work->m_angle = angle;

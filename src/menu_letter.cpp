@@ -97,9 +97,23 @@ struct FlatDataView {
 	FlatDataTableView m_tabl[8];
 };
 
+struct LetterAnimStorage {
+	s16 count;
+	s16 pad_02;
+	unsigned char pad_04[4];
+	unsigned char entries[64][0x40];
+};
+
+STATIC_ASSERT(sizeof(LetterAnimStorage) == 0x1008);
+
 static inline int GetLetterStateBase(CMenuPcs* menu)
 {
 	return *reinterpret_cast<int*>(reinterpret_cast<char*>(menu) + 0x82C);
+}
+
+static inline LetterAnimStorage* GetLetterAnimStorage(CMenuPcs* menu)
+{
+	return *reinterpret_cast<LetterAnimStorage**>(reinterpret_cast<char*>(menu) + 0x850);
 }
 
 static inline int GetLetterAnimBase(CMenuPcs* menu)
@@ -125,7 +139,7 @@ static inline void ResetLetterPanelProgress(CMenuPcs* menu)
 
 static inline void ClearLetterAnimStorage(CMenuPcs* menu)
 {
-	memset(*reinterpret_cast<void**>(reinterpret_cast<char*>(menu) + 0x850), 0, 0x1008);
+	memset(GetLetterAnimStorage(menu), 0, sizeof(*GetLetterAnimStorage(menu)));
 	int anim = GetLetterAnimBase(menu) + 8;
 	for (int i = 0; i < 8; ++i) {
 		*reinterpret_cast<float*>(anim + 0x14) = FLOAT_803330f8;
@@ -231,7 +245,7 @@ void CMenuPcs::LetterInit1()
 	int iVar5;
 	float fVar1;
 
-	memset(*reinterpret_cast<void**>(reinterpret_cast<char*>(this) + 0x850), 0, 0x1008);
+	memset(GetLetterAnimStorage(this), 0, sizeof(*GetLetterAnimStorage(this)));
 	fVar1 = FLOAT_803330f8;
 	iVar4 = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + 8;
 	iVar5 = 8;
@@ -492,7 +506,7 @@ bool CMenuPcs::LetterOpen()
 
 	s_OpenClose = 1;
 	if (*reinterpret_cast<char*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0xB) == '\0') {
-		memset(*reinterpret_cast<void**>(reinterpret_cast<char*>(this) + 0x850), 0, 0x1008);
+		memset(GetLetterAnimStorage(this), 0, sizeof(*GetLetterAnimStorage(this)));
 		iVar4 = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + 8;
 		iVar8 = 8;
 		do {
@@ -532,7 +546,7 @@ bool CMenuPcs::LetterOpen()
 			s_Attach = 2;
 			s_SelLetter = 0;
 		} else {
-			memset(*reinterpret_cast<void**>(reinterpret_cast<char*>(this) + 0x850), 0, 0x1008);
+			memset(GetLetterAnimStorage(this), 0, sizeof(*GetLetterAnimStorage(this)));
 			iVar4 = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + 8;
 			iVar8 = 8;
 			do {
@@ -953,7 +967,7 @@ int CMenuPcs::LetterMessClose()
 
 		if (panelCount == done) {
 			if (s_Attach == 2) {
-				memset(*reinterpret_cast<void**>(reinterpret_cast<char*>(this) + 0x850), 0, 0x1008);
+				memset(GetLetterAnimStorage(this), 0, sizeof(*GetLetterAnimStorage(this)));
 				int anim = GetLetterAnimBase(this) + 8;
 				for (int i = 0; i < 8; ++i) {
 					*reinterpret_cast<float*>(anim + 0x14) = FLOAT_803330f8;

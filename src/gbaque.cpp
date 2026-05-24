@@ -114,6 +114,14 @@ STATIC_ASSERT(sizeof(GbaQueueSetQueueView) == 0x444);
 
 enum {
 	kGbaQueueScratchTextSize = 0x400,
+	kGbaQueueLetterNpcNameBytes = 0x800,
+	kGbaQueueLetterSubjectNameBytes = 0x1800,
+	kGbaQueueLetterEntryAllocWords = 0x1000,
+	kGbaQueueLetterEntryBytes = 0x800,
+	kGbaQueueLetterTempNameBytes = 0x20,
+	kGbaQueueLetterHeaderBytes = 0x10,
+	kGbaQueueLetterNpcNameEntryBytes = 0x10,
+	kGbaQueueLetterSubjectNameEntryBytes = 0x18,
 };
 
 static inline GbaQueueFlagView* GetFlagView(GbaQueue* gbaQueue)
@@ -2237,33 +2245,35 @@ int GbaQueue::MakeLetterList(int channel, char* outData)
 		return 0;
 	}
 
-char* npcNameBuf = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0x7A7) char[0x800];
+char* npcNameBuf =
+	new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0x7A7) char[kGbaQueueLetterNpcNameBytes];
 	if (npcNameBuf == 0) {
 		if ((unsigned int)System.m_execParam >= 1) {
 System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp), 0x7A9);
 		}
 		return -1;
 	}
-	memset(npcNameBuf, 0, 0x800);
+	memset(npcNameBuf, 0, kGbaQueueLetterNpcNameBytes);
 
-char* subjectNameBuf = new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0x7B1) char[0x1800];
+char* subjectNameBuf =
+	new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0x7B1) char[kGbaQueueLetterSubjectNameBytes];
 	if (subjectNameBuf == 0) {
 		if ((unsigned int)System.m_execParam >= 1) {
 System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp), 0x7B3);
 		}
 		return -1;
 	}
-	memset(subjectNameBuf, 0, 0x1800);
+	memset(subjectNameBuf, 0, kGbaQueueLetterSubjectNameBytes);
 
 unsigned int* letterEntryBuf =
-	new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0x7BB) unsigned int[0x1000];
+	new (GbaPcs.m_stage, const_cast<char*>(s_gbaque_cpp), 0x7BB) unsigned int[kGbaQueueLetterEntryAllocWords];
 	if (letterEntryBuf == 0) {
 		if ((unsigned int)System.m_execParam >= 1) {
 System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB37C), const_cast<char*>(s_gbaque_cpp), 0x7BD);
 		}
 		return -1;
 	}
-	memset(letterEntryBuf, 0, 0x800);
+	memset(letterEntryBuf, 0, kGbaQueueLetterEntryBytes);
 
 	const CCaravanWork* caravanWork = reinterpret_cast<const CCaravanWork*>(scriptFood);
 	const unsigned int letterCount = static_cast<unsigned int>(caravanWork->m_letterCount);
@@ -2276,7 +2286,7 @@ System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB3
 	unsigned int* entryWrite = letterEntryBuf;
 
 	GbaFlatDataView* flatData = reinterpret_cast<GbaFlatDataView*>(&Game.m_cFlatDataArr[1]);
-	char tempName[0x20];
+	char tempName[kGbaQueueLetterTempNameBytes];
 
 	for (int i = 0; i < static_cast<int>(letterCount); i++) {
 		int matchedSubject = -1;
@@ -2304,10 +2314,10 @@ System.Printf(const_cast<char*>(s_pcts_pctd_Error_memory_allocation_error_801DB3
 System.Printf(const_cast<char*>(s_npc_max_over), const_cast<char*>(s_gbaque_cpp), 0x7DC);
 			}
 
-			memset(tempName, 0, 0x20);
+			memset(tempName, 0, sizeof(tempName));
 			strcpy(tempName, flatData->m_tabl[2].m_strings[(curWord >> 9) & 0x1FF]);
-			memcpy(npcWrite, tempName, 0x10);
-			npcWrite += 0x10;
+			memcpy(npcWrite, tempName, kGbaQueueLetterNpcNameEntryBytes);
+			npcWrite += kGbaQueueLetterNpcNameEntryBytes;
 			(reinterpret_cast<unsigned char*>(entryWrite))[5] = static_cast<unsigned char>(npcCount);
 			npcCount++;
 		} else {
@@ -2320,10 +2330,10 @@ System.Printf(const_cast<char*>(s_npc_max_over), const_cast<char*>(s_gbaque_cpp)
 System.Printf(const_cast<char*>(s_subject_max_over), const_cast<char*>(s_gbaque_cpp), 0x7F0);
 			}
 
-			memset(tempName, 0, 0x20);
+			memset(tempName, 0, sizeof(tempName));
 			strcpy(tempName, flatData->m_tabl[5].m_strings[(curHalf >> 2) & 0x1FF]);
-			memcpy(subjectWrite, tempName, 0x18);
-			subjectWrite += 0x18;
+			memcpy(subjectWrite, tempName, kGbaQueueLetterSubjectNameEntryBytes);
+			subjectWrite += kGbaQueueLetterSubjectNameEntryBytes;
 			(reinterpret_cast<unsigned char*>(entryWrite))[4] = static_cast<unsigned char>(subjectCount);
 			subjectCount++;
 		} else {
@@ -2365,23 +2375,24 @@ System.Printf(const_cast<char*>(s_letter_data_error), const_cast<char*>(s_gbaque
 	}
 
 	unsigned int header[4];
-	memset(header, 0, 0x10);
+	memset(header, 0, sizeof(header));
 	header[0] = SwapU32(letterCount);
 	header[1] = SwapU32(subjectCount);
 	header[2] = SwapU32(npcCount);
 	header[3] = reinterpret_cast<unsigned int*>(&CFlat)[0x1042];
 
-	memcpy(outData, header, 0x10);
+	memcpy(outData, header, sizeof(header));
 
 	const int entriesSize = static_cast<int>(letterCount * 8);
-	memcpy(outData + 0x10, letterEntryBuf, entriesSize);
+	memcpy(outData + kGbaQueueLetterHeaderBytes, letterEntryBuf, entriesSize);
 
-	char* dst = outData + 0x10 + entriesSize;
-	const int subjectSize = static_cast<int>(subjectCount * 0x18);
+	char* dst = outData + kGbaQueueLetterHeaderBytes + entriesSize;
+	const int subjectSize = static_cast<int>(subjectCount * kGbaQueueLetterSubjectNameEntryBytes);
 	memcpy(dst, subjectNameBuf, subjectSize);
-	memcpy(dst + subjectSize, npcNameBuf, static_cast<int>(npcCount * 0x10));
+	memcpy(dst + subjectSize, npcNameBuf, static_cast<int>(npcCount * kGbaQueueLetterNpcNameEntryBytes));
 
-	const int totalSize = entriesSize + 0x10 + subjectSize + static_cast<int>(npcCount * 0x10);
+	const int totalSize = entriesSize + kGbaQueueLetterHeaderBytes + subjectSize +
+	                      static_cast<int>(npcCount * kGbaQueueLetterNpcNameEntryBytes);
 
 	delete[] letterEntryBuf;
 	delete[] subjectNameBuf;

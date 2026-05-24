@@ -215,10 +215,7 @@ static inline int ShopMenuCaravan(CShopMenu* shopMenu)
 
 static float CalcCenteredShopMenuX(CFont* font, const char* text)
 {
-    if (text == 0) {
-        return 0.0f;
-    }
-    return (464.0f - GetWidth__5CFontFPc(font, text)) * 0.5f;
+    return static_cast<float>(static_cast<int>((464.0f - GetWidth__5CFontFPc(font, text)) * 0.5f + 80.0f));
 }
 
 static int ResolveShopMenuItemCount(CShopMenu* shopMenu)
@@ -1615,6 +1612,7 @@ void CShopMenu::DrawMakeBase()
 void CShopMenu::DrawShopBase()
 {
     Graphic.SetDrawDoneDebugData(1);
+    int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
     MenuPcs.DrawSingleBase(FLOAT_80332d28);
     Graphic.SetDrawDoneDebugData(2);
     pppInitDrawEnv(0);
@@ -1630,13 +1628,15 @@ void CShopMenu::DrawShopBase()
     GXSetColorUpdate(GX_TRUE);
 
     int mode = ShopMenuInt(this, 0x0);
-    int panelBottom = 0x108;
-    if ((mode >= 3) && (mode < 9)) {
-        panelBottom = 0x176;
-    } else if ((mode >= 9) && (mode < 0xC)) {
-        panelBottom = 0x13A;
-    } else if (mode >= 0xC) {
-        panelBottom = 0x10C;
+    int panelY;
+    if (mode < 3) {
+        panelY = 0xE6;
+    } else if (mode < 9) {
+        panelY = 0x154;
+    } else if (mode < 0xC) {
+        panelY = 0x118;
+    } else {
+        panelY = 0xEA;
     }
 
     Graphic.SetDrawDoneDebugData(3);
@@ -1644,12 +1644,12 @@ void CShopMenu::DrawShopBase()
     _GXColor fadeB = {0xFF, 0xFF, 0xFF, 0xFF};
     _GXColor fadeC = {0xFF, 0xFF, 0xFF, 0x00};
     _GXColor fadeD = {0xFF, 0xFF, 0xFF, 0xFF};
-    drawShapeSeqGrouad(9, 0, 0x1C, panelBottom, FLOAT_80332d78, FLOAT_80332dc8, fadeA, fadeB, fadeC, fadeD);
+    drawShapeSeqGrouad(9, 0, 0x1C, panelY + 0x22, FLOAT_80332d78, FLOAT_80332dc8, fadeA, fadeB, fadeC, fadeD);
 
     _GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
     int x = 0x3C;
     while (x < 0x25C) {
-        drawShapeSeqGrouad(9, 0, x, panelBottom, FLOAT_80332d78, FLOAT_80332dc8, white, white, white, white);
+        drawShapeSeqGrouad(9, 0, x, panelY + 0x22, FLOAT_80332d78, FLOAT_80332dc8, white, white, white, white);
         x += 0x20;
     }
 
@@ -1657,7 +1657,7 @@ void CShopMenu::DrawShopBase()
     _GXColor endB = {0xFF, 0xFF, 0xFF, 0x00};
     _GXColor endC = {0xFF, 0xFF, 0xFF, 0xFF};
     _GXColor endD = {0xFF, 0xFF, 0xFF, 0x00};
-    drawShapeSeqGrouad(9, 0, x, panelBottom, FLOAT_80332d78, FLOAT_80332dc8, endA, endB, endC, endD);
+    drawShapeSeqGrouad(9, 0, x, panelY + 0x22, FLOAT_80332d78, FLOAT_80332dc8, endA, endB, endC, endD);
     Graphic.SetDrawDoneDebugData(4);
 
     if ((mode >= 3) && (mode < 0xC)) {
@@ -1686,8 +1686,6 @@ void CShopMenu::DrawShopBase()
         Graphic.SetDrawDoneDebugData(0xE);
         drawShapeSeq(8, 0, 0x2E, 0x170, 0xFF, 0, 0, FLOAT_80332d9c, 0);
         Graphic.SetDrawDoneDebugData(0xF);
-
-        int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
         CFont* font = *reinterpret_cast<CFont**>(MenuPcsRaw() + 0x264);
         SetMargin__5CFontFf(FLOAT_80332d28, font);
         SetShadow__5CFontFi(font, 0);
@@ -1695,21 +1693,19 @@ void CShopMenu::DrawShopBase()
         SetScaleY__5CFontFf(FLOAT_80332d28, font);
         font->SetColor(white);
 
-        char* confirmText = (ShopMenuInt(this, 0x14) == 0) ? ShopMenuMes(languageId, SHOP_MENU_TEXT_BUY) :
-                                                             ShopMenuMes(languageId, SHOP_MENU_TEXT_SELL);
-        float confirmTextX = CalcCenteredShopMenuX(font, confirmText);
         DrawInit__5CFontFv(font);
         Graphic.SetDrawDoneDebugData(0x10);
-        SetPosX__5CFontFf(confirmTextX, font);
+        char* confirmText = (ShopMenuInt(this, 0x14) == 0) ? ShopMenuMes(languageId, SHOP_MENU_TEXT_BUY) :
+                                                             ShopMenuMes(languageId, SHOP_MENU_TEXT_SELL);
+        SetPosX__5CFontFf(CalcCenteredShopMenuX(font, confirmText), font);
         SetPosY__5CFontFf(312.0f, font);
         Draw__5CFontFPc(font, confirmText);
         Graphic.SetDrawDoneDebugData(0x11);
 
-        float cancelTextX = CalcCenteredShopMenuX(font, ShopMenuMes(languageId, SHOP_MENU_TEXT_CANCEL));
-        DrawInit__5CFontFv(font);
-        SetPosX__5CFontFf(cancelTextX, font);
+        char* cancelText = ShopMenuMes(languageId, SHOP_MENU_TEXT_CANCEL);
+        SetPosX__5CFontFf(CalcCenteredShopMenuX(font, cancelText), font);
         SetPosY__5CFontFf(346.0f, font);
-        Draw__5CFontFPc(font, ShopMenuMes(languageId, SHOP_MENU_TEXT_CANCEL));
+        Draw__5CFontFPc(font, cancelText);
         Graphic.SetDrawDoneDebugData(0x12);
         DrawInit__8CMenuPcsFv(MenuPcsVoid());
         Graphic.SetDrawDoneDebugData(0x13);

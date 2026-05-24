@@ -23,17 +23,17 @@ extern int kCharaBreakInitialVertexFlag0 = 0;
 extern int kCharaBreakInitialVertexFlag1 = 0;
 extern int kCharaBreakInitialVertexFlag2 = 0;
 extern "C" const char s_pppCharaBreak_cpp[] = "pppCharaBreak.cpp";
-extern const float FLOAT_80332048 = 0.0f;
-extern const float FLOAT_8033204c = 1.0f;
-extern const float FLOAT_80332050 = -10000.0f;
-extern const char sPppCharaBreakObjMeshName[4] = "obj";
-extern const float FLOAT_80332058 = 0.333333313f;
-extern const float FLOAT_8033205c = 0.017453292f;
-extern const float FLOAT_80332060 = 180.0f;
-extern const float FLOAT_80332064 = 0.8f;
-extern const double DOUBLE_80332068 = 4503601774854144.0;
-extern const double DOUBLE_80332070 = 4503599627370496.0;
-extern const float FLOAT_80332078 = -1.0f;
+extern const float FLOAT_80332048;
+extern const float FLOAT_8033204c;
+extern const float FLOAT_80332050;
+extern const char sPppCharaBreakObjMeshName[4];
+extern const float FLOAT_80332058;
+extern const float FLOAT_8033205c;
+extern const float FLOAT_80332060;
+extern const float FLOAT_80332064;
+extern const double DOUBLE_80332068;
+extern const double DOUBLE_80332070;
+extern const float FLOAT_80332078;
 
 static inline Mtx& CameraMatrix()
 {

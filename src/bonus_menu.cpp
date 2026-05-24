@@ -166,6 +166,11 @@ struct BonusBoardEntryRaw {
 	int m_screenHeight;
 };
 
+struct BonusBoardEntryList {
+	BonusBoardEntryRaw entries[0x18];
+	unsigned char pad_0660[0x120];
+};
+
 struct BonusEffectSlotBlock {
 	unsigned char bytes[0x2920];
 };
@@ -177,6 +182,8 @@ struct BonusEffectSlotList {
 
 STATIC_ASSERT(sizeof(BonusMenuStateRaw) == 0x48);
 STATIC_ASSERT(sizeof(BonusMenuAuxRaw) == 0xC);
+STATIC_ASSERT(sizeof(BonusBoardEntryRaw) == 0x44);
+STATIC_ASSERT(sizeof(BonusBoardEntryList) == 0x780);
 STATIC_ASSERT(sizeof(BonusEffectSlotBlock) == 0x2920);
 STATIC_ASSERT(sizeof(BonusEffectSlotList) == 0xCDB0);
 
@@ -1142,7 +1149,7 @@ void CMenuPcs::createBonus()
 		GetBonusMenuMembers(this).m_bonusAuxPtr = auxPtr;
 	}
 	if (boardPtr == 0) {
-		boardPtr = reinterpret_cast<int>(new unsigned char[0x780]);
+		boardPtr = reinterpret_cast<int>(new unsigned char[sizeof(BonusBoardEntryList)]);
 		GetBonusMenuMembers(this).m_bonusBoardPtr = boardPtr;
 	}
 
@@ -1167,9 +1174,10 @@ void CMenuPcs::createBonus()
 		*(short*)(auxPtr + 10) = 3;
 	}
 	if (boardPtr != 0) {
-		memset((void*)boardPtr, 0, 0x780);
+		memset((void*)boardPtr, 0, sizeof(BonusBoardEntryList));
+		BonusBoardEntryList* boardEntries = reinterpret_cast<BonusBoardEntryList*>(boardPtr);
 		for (int i = 0; i < 0x18; i++) {
-			InitBonusBoardEntry(reinterpret_cast<BonusBoardEntryRaw*>(boardPtr + i * sizeof(BonusBoardEntryRaw)));
+			InitBonusBoardEntry(&boardEntries->entries[i]);
 		}
 	}
 	if (s_bonusSummaryData != 0) {
@@ -1189,7 +1197,7 @@ void CMenuPcs::createBonus()
 		memset(s_Base[0], 0, sizeof(float) * 18);
 	}
 
-	memset(reinterpret_cast<unsigned char*>(this) + 0x774, 0, 0x60);
+	memset(GetBonusDisplayHandleSlots(this), 0, sizeof(CCharaPcs::CHandle*) * 0x18);
 
 	if (s_bonusSummaryData != 0) {
 		int activeCount = 0;
@@ -1435,9 +1443,9 @@ void CMenuPcs::destroyBonus()
 	}
 
 	for (int i = 0; i < 0x18; i++) {
-		void** handleSlot = reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(this) + 0x774 + i * 4);
+		CCharaPcs::CHandle** handleSlot = &GetBonusDisplayHandleSlots(this)[i];
 		if (*handleSlot != 0) {
-			delete reinterpret_cast<CCharaPcs::CHandle*>(*handleSlot);
+			delete *handleSlot;
 			*handleSlot = 0;
 		}
 	}

@@ -1705,7 +1705,7 @@ int CMenuPcs::LetterCtrlCur()
 {
 	bool blocked = false;
 	unsigned int press;
-	unsigned int hold;
+	u16 hold;
 	int caravanWork = Game.m_scriptFoodBase[0];
 
 	if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {

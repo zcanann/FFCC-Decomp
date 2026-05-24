@@ -84,8 +84,28 @@ extern "C" double DOUBLE_803333b8;
 extern "C" double DOUBLE_803333c0;
 extern "C" int gCmakePreviousStep;
 extern "C" char s_menuSubfontPathFmt[];
-extern "C" char* PTR_s_world2[];
-extern "C" CMenuPcs::CTmp s_cmakeWorldTextureTable[];
+extern "C" char* PTR_s_world2[] = {
+    const_cast<char*>("world2"),
+    const_cast<char*>("world27"),
+    const_cast<char*>("world28"),
+    const_cast<char*>("world29"),
+    const_cast<char*>("world44"),
+    const_cast<char*>("world45"),
+    const_cast<char*>("world48"),
+    const_cast<char*>("world49"),
+    const_cast<char*>("world51"),
+};
+extern "C" CMenuPcs::CTmp s_cmakeWorldTextureTable[] = {
+    {8, PTR_s_world2[0]},
+    {8, PTR_s_world2[1]},
+    {8, PTR_s_world2[2]},
+    {8, PTR_s_world2[3]},
+    {8, PTR_s_world2[4]},
+    {8, PTR_s_world2[5]},
+    {8, PTR_s_world2[6]},
+    {8, PTR_s_world2[7]},
+    {8, PTR_s_world2[8]},
+};
 extern "C" {
 static const char s_cmake_cpp[] = "cmake.cpp";
 }

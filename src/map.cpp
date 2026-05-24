@@ -3443,9 +3443,8 @@ void CMapMng::ShowMapObj(int, int)
  */
 void CMapMng::ShowMapObjID(int id, int show)
 {
-    CMapObj* mapObj = GetMapObjArray();
-
     for (int i = 0; i < m_mapObjCount; i++) {
+        CMapObj* mapObj = &m_mapObjArray[i];
         if (mapObj->m_objId == id) {
             if (show != 0) {
                 mapObj->m_showFlags = static_cast<unsigned char>(mapObj->m_showFlags | 1);
@@ -3453,7 +3452,6 @@ void CMapMng::ShowMapObjID(int id, int show)
                 mapObj->m_showFlags = static_cast<unsigned char>(mapObj->m_showFlags & 0xFE);
             }
         }
-        mapObj++;
     }
 }
 
@@ -3495,9 +3493,8 @@ void CMapMng::ShowMapObjChildID(int id, int show)
  */
 void CMapMng::ShowMapMeshID(int id, int show)
 {
-    CMapObj* mapObj = GetMapObjArray();
-
     for (int i = 0; i < m_mapObjCount; i++) {
+        CMapObj* mapObj = &m_mapObjArray[i];
         if (mapObj->m_meshId == id) {
             if (show != 0) {
                 mapObj->m_showFlags = static_cast<unsigned char>(mapObj->m_showFlags | 1);
@@ -3505,7 +3502,6 @@ void CMapMng::ShowMapMeshID(int id, int show)
                 mapObj->m_showFlags = static_cast<unsigned char>(mapObj->m_showFlags & 0xFE);
             }
         }
-        mapObj++;
     }
 }
 
@@ -3612,16 +3608,12 @@ void CMapMng::SetMapObjTransRate(int mapObjIndex, float x, float y, float z)
  */
 void CMapMng::SetMapObjPrioID(int id, unsigned char prio)
 {
-    CMapObj* mapObj = GetMapObjArray();
-    int i = 0;
-
-    while (i < m_mapObjCount) {
+    for (int i = 0; i < m_mapObjCount; i++) {
+        CMapObj* mapObj = &m_mapObjArray[i];
         if (static_cast<int>(mapObj->m_objId) == id) {
             *reinterpret_cast<unsigned char*>(Ptr(mapObj, 0x15)) = prio;
             *reinterpret_cast<unsigned char*>(Ptr(mapObj, 0x14)) = prio;
         }
-        mapObj++;
-        i++;
     }
 }
 

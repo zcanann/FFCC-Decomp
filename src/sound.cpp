@@ -289,6 +289,9 @@ extern "C" void Draw__9CLine(CLine<10>* line)
 
 extern "C" void CalcBound__9CLine2(CLine<10>* line)
 {
+    Vec* point = line->points;
+    CLineSegment* segment = line->segments;
+
     line->min.x = kLineBoundsInitMin;
     line->min.y = kLineBoundsInitMin;
     line->min.z = kLineBoundsInitMin;
@@ -297,9 +300,8 @@ extern "C" void CalcBound__9CLine2(CLine<10>* line)
     line->max.z = kLineBoundsInitMax;
     line->totalLength = kLineSegmentMinT;
 
-    Vec* point = line->points;
-    CLineSegment* segment = line->segments;
-    for (u32 i = 0; i < line->pointCount; i++, point++, segment++) {
+    u32 i = 0;
+    while (i < line->pointCount) {
 
         if (point->x < line->min.x) {
             line->min.x = point->x;
@@ -331,6 +333,10 @@ extern "C" void CalcBound__9CLine2(CLine<10>* line)
                 PSVECNormalize(&prevSegment->delta, &prevSegment->normal);
             }
         }
+
+        point++;
+        segment++;
+        i++;
     }
 }
 

@@ -1,7 +1,5 @@
 #include "ffcc/p_sample.h"
 
-extern const char sSamplePcsClassName[] = "CSamplePcs";
-
 /*
  * --INFO--
  * PAL Address: 0x8001FEB0
@@ -34,7 +32,7 @@ inline CSamplePcs::CSamplePcs()
 }
 
 CSamplePcsTable CSamplePcs::m_table = {
-    const_cast<char*>(sSamplePcsClassName),
+    const_cast<char*>("CSamplePcs"),
     {
         0,
         0,

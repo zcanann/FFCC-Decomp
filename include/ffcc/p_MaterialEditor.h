@@ -1,7 +1,7 @@
 #ifndef _FFCC_P_MATERIALEDITOR_H_
 #define _FFCC_P_MATERIALEDITOR_H_
 
-#include "ffcc/p_sample.h"
+#include "ffcc/system.h"
 #include "ffcc/memory.h"
 #include "ffcc/pppTypes.h"
 #include "ffcc/USBStreamData.h"
@@ -29,7 +29,7 @@ struct RSDLISTITEM {
     int flag;
 };
 
-class CMaterialEditorPcs : public CSamplePcs
+class CMaterialEditorPcs : public CProcess
 {
 public:
     static unsigned int m_table_desc0[3];

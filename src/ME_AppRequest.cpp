@@ -9,7 +9,7 @@ void* memset(void*, int, unsigned int);
 extern const char s_ME_AppRequest_cpp[] = "ME_AppRequest.cpp";
 
 struct ZCANMGRP {
-    void* ptr;
+    u8* ptr;
     int unk4;
     int unk8;
     int unkC;
@@ -147,9 +147,9 @@ void CMaterialEditorPcs::DeleteColAnmData(ZCANMGRP** colAnmData, int colAnmCount
     if (entry != (ZCANMGRP*)0) {
         int i = 0;
         while (i < colAnmCount) {
-            if (entry->ptr != (void*)0) {
-                delete[] static_cast<u8*>(entry->ptr);
-                entry->ptr = (void*)0;
+            if (entry->ptr != (u8*)0) {
+                delete[] entry->ptr;
+                entry->ptr = (u8*)0;
             }
             entry = entry + 1;
             i = i + 1;
@@ -265,9 +265,9 @@ void CMaterialEditorPcs::ResetRsdList(ZLIST* zlist)
         colAnmData = listItem->colAnmData;
         if (colAnmData != (ZCANMGRP*)0) {
             for (i = 0; i < colAnmCount; colAnmData++, i++) {
-                if (colAnmData->ptr != (void*)0) {
-                    delete[] static_cast<u8*>(colAnmData->ptr);
-                    colAnmData->ptr = (void*)0;
+                if (colAnmData->ptr != (u8*)0) {
+                    delete[] colAnmData->ptr;
+                    colAnmData->ptr = (u8*)0;
                 }
             }
             if (listItem->colAnmData != (ZCANMGRP*)0) {

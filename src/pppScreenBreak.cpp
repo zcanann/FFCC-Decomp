@@ -128,8 +128,8 @@ extern const float FLOAT_80331cec = 4.0f;
 extern const float FLOAT_80331cf0 = -3.0f;
 extern const float FLOAT_80331cf4 = 0.5f;
 
-extern const Vec DAT_801dd4b0;
-extern const Vec DAT_801dd4bc = { 0.0f, 1.0f, 0.0f };
+extern const Vec kScreenBreakCameraUpVector;
+extern const Vec kScreenBreakPieceUpVector = { 0.0f, 1.0f, 0.0f };
 extern const char sF999Root[] = "f999_root";
 extern const char s_pppScreenBreak_cpp[] = "pppScreenBreak.cpp";
 
@@ -547,7 +547,7 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
         inVec->z = dVar21;
         PSVECNormalize(inVec, inVec);
         Vec upVec;
-        const volatile RawVec* upRaw = (const volatile RawVec*)&DAT_801dd4bc;
+        const volatile RawVec* upRaw = (const volatile RawVec*)&kScreenBreakPieceUpVector;
         ((RawVec*)&upVec)->x = upRaw->x;
         ((RawVec*)&upVec)->y = upRaw->y;
         ((RawVec*)&upVec)->z = upRaw->z;

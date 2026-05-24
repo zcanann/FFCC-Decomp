@@ -15,7 +15,7 @@
 
 CDbgMenuPcs DbgMenuPcs;
 
-extern unsigned char DAT_8032e698;
+extern unsigned char gDbgMenuPartHeapDumpEnabled;
 extern unsigned char g_map_draw_prof;
 
 struct DbgMenuDef {
@@ -49,8 +49,8 @@ extern const char s_CHARA_INFO_801DD470[] = "CHARA INFO";
 extern const char s_ITEM_WEAPON_801DD47C[] = "ITEM WEAPON";
 extern const char s_SMITH_MASTER_801DD488[] = "SMITH MASTER";
 extern const char s_DbgMenuChara_80331C80[] = "CHARA";
-extern const u32 DAT_80331C88 = 0x00000080;
-extern const u32 DAT_80331C8C = 0xFFFFFFFF;
+extern const u32 kDbgMenuHighlightAlpha = 0x00000080;
+extern const u32 kDbgMenuFontColor = 0xFFFFFFFF;
 extern const char s_Debug_80331c90[] = "Debug";
 extern const float FLOAT_80331C98 = 0.0f;
 extern const double DOUBLE_80331CA0 = 4503601774854144.0;
@@ -270,7 +270,7 @@ void CDbgMenuPcs::calc()
 			g_map_draw_prof = 1 - g_map_draw_prof;
 			break;
 		case 0x76:
-			DAT_8032e698 = 1 - DAT_8032e698;
+			gDbgMenuPartHeapDumpEnabled = 1 - gDbgMenuPartHeapDumpEnabled;
 			PartMng.pppDumpMngSt();
 			break;
 		case 0x77:
@@ -435,7 +435,7 @@ void CDbgMenuPcs::calcMenu(CDbgMenuPcs::CDM* menu)
 			menu->m_state = g_map_draw_prof != 0;
 			break;
 		case 0x76:
-			menu->m_state = DAT_8032e698 != 0;
+			menu->m_state = gDbgMenuPartHeapDumpEnabled != 0;
 			break;
 		case 0x78:
 			menu->m_state = (m_dbgFlags >> 13) & 1;
@@ -618,7 +618,7 @@ void CDbgMenuPcs::drawWindow(int flags, int x, int y, int width, int height, cha
 			alpha = 0xFF;
 		}
 
-		GXColor highlightColor = {0, 0, 0, static_cast<u8>(DAT_80331C88)};
+		GXColor highlightColor = {0, 0, 0, static_cast<u8>(kDbgMenuHighlightAlpha)};
 		highlightColor.r = alpha;
 		highlightColor.g = alpha;
 		highlightColor.b = alpha;
@@ -654,7 +654,7 @@ void CDbgMenuPcs::drawFont(int flags, int x, int y, char* text)
 {
 	changeVtxFmt(0);
 
-	GXColor mainColor = *reinterpret_cast<const GXColor*>(&DAT_80331C8C);
+	GXColor mainColor = *reinterpret_cast<const GXColor*>(&kDbgMenuFontColor);
 	if ((flags & 2) != 0) {
 		mainColor.b = 0;
 		mainColor.g = 0;

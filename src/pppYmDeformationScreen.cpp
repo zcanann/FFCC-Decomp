@@ -98,10 +98,10 @@ void pppRenderYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, 
 	float depth;
 	float texU;
 	float texV;
-	float zero;
+	float quadMiddleY;
 	float one;
 	float quadRight;
-	float quadMiddleY;
+	float zero;
 	float quadBottom;
 	pppCVECTOR color;
 	int textureBase;

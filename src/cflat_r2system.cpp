@@ -4051,9 +4051,9 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         return;
     case -0xE3: {
         unsigned int flags = 0;
-        if ((object->m_localBase[1] & 2) != 0 &&
-            Game.m_caravanWorkArr[object->m_localBase[0]].FindItem(object->m_localBase[2]) >= 0) {
-            flags = 2;
+        if ((object->m_localBase[1] & 2) != 0) {
+            const int itemIndex = Game.m_caravanWorkArr[object->m_localBase[0]].FindItem(object->m_localBase[2]);
+            flags = (0xffffffffU - (itemIndex >> 31)) & 2;
         }
         runtime->push(object, flags);
         outResult = 0;

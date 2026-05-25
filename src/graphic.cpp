@@ -1528,6 +1528,7 @@ void CGraphic::RenderNoTexQuadGrouad(Vec pos1, Vec pos2, _GXColor color1, _GXCol
 {
 	GXBegin(GX_QUADS, GX_VTXFMT6, 4);
 
+	float x2;
 	float x1 = pos1.x;
 	float y1 = pos1.y;
 
@@ -1537,7 +1538,7 @@ void CGraphic::RenderNoTexQuadGrouad(Vec pos1, Vec pos2, _GXColor color1, _GXCol
 	u32 rgba1 = *(u32*)&color1;
 	GXWGFifo.f32 = z1;
 
-	float x2 = pos2.x;
+	x2 = pos2.x;
 	GXWGFifo.u32 = rgba1;
 	u32 rgba2 = *(u32*)&color2;
 	GXWGFifo.f32 = x2;

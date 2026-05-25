@@ -1126,7 +1126,7 @@ void CMenuPcs::DrawOptionMenu()
 		CTextureSet* textureSet = GetMenuTextureSet(this, 0xBC);
 		CTexture* sideTexture = GetTextureSetTexture(textureSet, 1);
 		CTexture* selectorTexture = GetTextureSetTexture(textureSet, 4);
-		bool secondValue = (m_optionIndex == 0) ? (m_gameInitMode != 0) : (m_stereoMode != 0);
+		int secondValue = (m_optionIndex == 0) ? (m_gameInitMode != 0) : (m_stereoMode != 0);
 		char* firstText = g_strMenuUtilMes[languageBase + ((m_optionIndex == 0) ? 12 : 14)];
 		char* secondText = g_strMenuUtilMes[languageBase + ((m_optionIndex == 0) ? 13 : 15)];
 		float leftX = 328.0f;

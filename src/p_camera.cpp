@@ -1306,6 +1306,7 @@ void CCameraPcs::createFullShadow()
     rampTexSize = GXGetTexBufferSize(0x1E0, 0x1E0, GX_TF_I8, GX_FALSE, 0);
     *reinterpret_cast<void**>(self + 0x31C) = new (stage, s_p_camera_cpp, 0x3A5) u8[rampTexSize];
 
+    *reinterpret_cast<void**>(self + 0x320) = 0;
     rampTexSize = GXGetTexBufferSize(0x10, 0x10, GX_TF_I8, GX_FALSE, 0);
     rampTex = new (stage, s_p_camera_cpp, 0x361) u8[rampTexSize];
     *reinterpret_cast<unsigned char**>(self + 0x320) = rampTex;

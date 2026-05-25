@@ -2332,13 +2332,12 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         outResult = 0;
         return;
     case -0x20: {
-        _GXColor color = {
+        CColor color(
             static_cast<u8>(object->m_localBase[1]),
             static_cast<u8>(object->m_localBase[2]),
             static_cast<u8>(object->m_localBase[3]),
-            0xFF,
-        };
-        SetAmbient__9CCharaPcsFiP8_GXColor(&CharaPcs, *object->m_localBase, &color);
+            0xFF);
+        SetAmbient__9CCharaPcsFiP8_GXColor(&CharaPcs, *object->m_localBase, color);
         runtime->push(object, 0);
         outResult = 0;
         return;

@@ -238,6 +238,12 @@ static inline CTexture* GetTextureSetTexture(CTextureSet* set, int index)
 	CTexture** textures = *reinterpret_cast<CTexture***>(ptrArray + 0x10);
 	return textures[index];
 }
+
+static inline void SetUv(Vec2d& uv, float u, float v)
+{
+	uv.x = u;
+	uv.y = v;
+}
 }
 
 static inline unsigned short GetMenuPress()
@@ -1111,7 +1117,52 @@ void CMenuPcs::DrawOptionMenu()
 	          static_cast<int>(FLOAT_80333590), color, 7, helpText[m_optionIndex], 0.8f,
 	          kOptionAnimMax, kOptionAnimMax);
 
-	if ((m_optionIndex == 2) || (m_optionIndex == 3)) {
+	if ((m_optionIndex == 0) || (m_optionIndex == 1)) {
+		CTextureSet* textureSet = GetMenuTextureSet(this, 0xBC);
+		CTexture* sideTexture = GetTextureSetTexture(textureSet, 1);
+		CTexture* selectorTexture = GetTextureSetTexture(textureSet, 4);
+		bool secondValue = (m_optionIndex == 0) ? (m_gameInitMode != 0) : (m_stereoMode != 0);
+		char* firstText = g_strMenuUtilMes[languageBase + ((m_optionIndex == 0) ? 12 : 14)];
+		char* secondText = g_strMenuUtilMes[languageBase + ((m_optionIndex == 0) ? 13 : 15)];
+		float leftX = 328.0f;
+		float rightX = (m_optionIndex == 0) ? 544.0f : 552.0f;
+		float selectorX = (m_optionIndex == 0) ? 368.0f : 360.0f;
+		float secondOffset = (m_optionIndex == 0) ? 96.0f : 112.0f;
+
+		SetUv(uv0, kOptionAnimMin, kOptionAnimMin);
+		SetUv(uv1, kMenuCenteringHalfWidth, kOptionAnimMax);
+		gUtil.RenderTextureQuad(leftX, 172.0f, static_cast<float>(sideTexture->m_width) * kMenuCenteringHalfWidth,
+		                        static_cast<float>(sideTexture->m_height), sideTexture, &uv0, &uv1, &color,
+		                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
+		SetUv(uv0, kMenuCenteringHalfWidth, kOptionAnimMin);
+		SetUv(uv1, kOptionAnimMax, kOptionAnimMax);
+		gUtil.RenderTextureQuad(rightX, 186.0f, static_cast<float>(sideTexture->m_width) * kMenuCenteringHalfWidth,
+		                        static_cast<float>(sideTexture->m_height), sideTexture, &uv0, &uv1, &color,
+		                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
+
+		color.a = static_cast<unsigned char>(static_cast<int>(FLOAT_80333550 * m_optionColumnAnim));
+		gUtil.CalcUV(uv0.x, uv0.y, 0, 0, selectorTexture->m_width, selectorTexture->m_height);
+		gUtil.CalcUV(uv1.x, uv1.y, 0x78, 0x30, selectorTexture->m_width, selectorTexture->m_height);
+		gUtil.RenderTextureQuad(selectorX + (secondValue ? secondOffset : kOptionAnimMin), 176.0f, 120.0f, 48.0f,
+		                        selectorTexture, &uv0, &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
+
+		float firstScale = secondValue ? 0.8f : 1.46f;
+		float secondScale = secondValue ? 1.46f : 0.8f;
+		float firstY = secondValue ? 185.0f : 183.0f;
+		float secondY = secondValue ? 183.0f : 185.0f;
+		int firstTlut = secondValue ? 6 : 0x17;
+		int secondTlut = secondValue ? 0x17 : 6;
+
+		font->SetScale(firstScale);
+		DrawFont2(static_cast<int>(selectorX + (120.0f - font->GetWidth(firstText)) * kMenuCenteringHalfWidth),
+		          static_cast<int>(firstY), color, firstTlut, firstText, firstScale, kOptionAnimMax,
+		          kOptionAnimMax);
+		font->SetScale(secondScale);
+		DrawFont2(static_cast<int>(selectorX + secondOffset + (120.0f - font->GetWidth(secondText)) *
+		                                                  kMenuCenteringHalfWidth),
+		          static_cast<int>(secondY), color, secondTlut, secondText, secondScale, kOptionAnimMax,
+		          kOptionAnimMax);
+	} else if ((m_optionIndex == 2) || (m_optionIndex == 3)) {
 		CTexture* meterTexture = GetTextureSetTexture(GetMenuTextureSet(this, 0xBC), 3);
 		signed char volume = (m_optionIndex == 2) ? m_bgmVolume : m_seVolume;
 		unsigned long iconLeftU = (m_optionIndex == 2) ? 0 : 0x18;

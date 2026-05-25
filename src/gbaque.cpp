@@ -3647,7 +3647,8 @@ void GbaQueue::SetShopFlg(int channel)
 	u8* flags = reinterpret_cast<u8*>(this) + 0x2D38;
 
 	OSWaitSemaphore(semaphore);
-	int mask = 1 << channel;
+	int mask = 1;
+	mask <<= channel;
 	*flags = static_cast<u8>(*flags | mask);
 	OSSignalSemaphore(semaphore);
 
@@ -3695,7 +3696,8 @@ void GbaQueue::SetSmithFlg(int channel)
 	u8* flags = reinterpret_cast<u8*>(this) + 0x2D38;
 
 	OSWaitSemaphore(semaphore);
-	int mask = 0x10 << channel;
+	int mask = 0x10;
+	mask <<= channel;
 	*flags = static_cast<u8>(*flags | mask);
 	OSSignalSemaphore(semaphore);
 

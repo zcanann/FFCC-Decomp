@@ -115,7 +115,7 @@ struct Vec4d
 static inline unsigned int frameNibble(int value)
 {
 	int sign = value >> 31;
-	return static_cast<unsigned int>((sign * 0x10 | (value * 0x10000000 + sign) >> 28) - sign);
+	return static_cast<unsigned int>(((sign << 4) | (((value << 28) + sign) >> 28)) - sign);
 }
 
 struct RingMenuFlatTableEntry
@@ -210,8 +210,8 @@ void CRingMenu::DrawIcon()
 
 	(void)atan2(static_cast<double>(clampedX), static_cast<double>(clampedY));
 
-	double posX = static_cast<double>(FLOAT_803309e4 * clampedX + FLOAT_803309e4);
-	double posY = -static_cast<double>(FLOAT_803309e8 * clampedY - FLOAT_803309e8);
+	float posX = FLOAT_803309e4 * clampedX + FLOAT_803309e4;
+	float posY = -(FLOAT_803309e8 * clampedY - FLOAT_803309e8);
 	unsigned char blinkAlpha = sRingMenuBlinkAlphaTable[frameNibble(System.m_frameCounter)];
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x19));
@@ -230,13 +230,13 @@ void CRingMenu::DrawIcon()
 
 	CColor bgColor(0, 0, 0, 0x80);
 	MenuPcs.SetColor(bgColor);
-	MenuPcs.DrawRect(3, static_cast<float>(FLOAT_803309ec + posX),
-	                                 static_cast<float>(FLOAT_803309ec + posY), FLOAT_803309f0, FLOAT_803309f0,
+	MenuPcs.DrawRect(3, FLOAT_803309ec + posX,
+	                                 FLOAT_803309ec + posY, FLOAT_803309f0, FLOAT_803309f0,
 	                                 FLOAT_803309c0, FLOAT_803309c0, FLOAT_803309cc, FLOAT_803309cc, 0.0f);
 
 	CColor fgColor(0xFF, 0xFF, 0xFF, 0xFF);
 	MenuPcs.SetColor(fgColor);
-	MenuPcs.DrawRect(3, static_cast<float>(posX), static_cast<float>(posY), FLOAT_803309f0, FLOAT_803309f0, FLOAT_803309c0,
+	MenuPcs.DrawRect(3, posX, posY, FLOAT_803309f0, FLOAT_803309f0, FLOAT_803309c0,
 	    static_cast<float>(iconRow * 0x38), FLOAT_803309cc, FLOAT_803309cc,
 	    0.0f);
 

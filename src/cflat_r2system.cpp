@@ -3902,17 +3902,18 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
             kMaxCcClass2DResults = 64,
         };
 
+        const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
         Vec center = {
-            static_cast<float>(object->m_localBase[2]),
-            static_cast<float>(object->m_localBase[3]),
-            static_cast<float>(object->m_localBase[4]),
+            localFloats[2],
+            localFloats[3],
+            localFloats[4],
         };
         CGObject* foundObjects[kMaxCcClass2DResults];
         int maxCount = object->m_localBase[7];
 
         int foundCount = this->CcClass2D(
-            *object->m_localBase, object->m_localBase[1], &center, static_cast<float>(object->m_localBase[5]),
-            static_cast<float>(object->m_localBase[6]), maxCount, foundObjects);
+            *object->m_localBase, object->m_localBase[1], &center, localFloats[5],
+            localFloats[6], maxCount, foundObjects);
         int* outIds = reinterpret_cast<int*>(object->m_localBase[8]);
         for (int i = 0; i < foundCount; i++) {
             outIds[i] = reinterpret_cast<CFlatRuntime::CObject*>(foundObjects[i])->m_particleId;

@@ -96,7 +96,7 @@ void pppDestructEraseCharaParts(pppEraseCharaParts*, pppEraseCharaPartsUnkC*)
     handle = GetCharaHandlePtr(reinterpret_cast<CGObject*>(pppMngStPtr->m_owner), 0);
     model = GetCharaModelPtr(handle);
     model->SetCallbackContext(0, 0);
-    model->m_drawMeshDLCallback = 0;
+    model->SetDrawMeshDLCallback(0);
 }
 
 /*
@@ -126,7 +126,7 @@ void pppConstructEraseCharaParts(pppEraseCharaParts* pppEraseCharaParts, pppEras
 
     handle = GetCharaHandlePtr(reinterpret_cast<CGObject*>(gObject), 0);
     model = GetCharaModelPtr(handle);
-    model->m_drawMeshDLCallback = EraseCharaParts_DrawMeshDLCallback;
+    model->SetDrawMeshDLCallback(EraseCharaParts_DrawMeshDLCallback);
 }
 
 /*

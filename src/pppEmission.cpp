@@ -105,15 +105,15 @@ static inline EmissionMeshData* EmissionMeshAt(EmissionModelView* modelView, int
 static inline void SetEmissionModelCallbacks(CChara::CModel* model, EmissionState* state, pppEmissionUnkB* step)
 {
     model->SetCallbackContext(state, step);
-    model->m_drawMeshDLCallback = Emission_DrawMeshDLCallback;
-    model->m_afterDrawMeshCallback = Emission_AfterDrawMeshCallback;
+    model->SetDrawMeshDLCallback(Emission_DrawMeshDLCallback);
+    model->SetAfterDrawMeshCallback(Emission_AfterDrawMeshCallback);
 }
 
 static inline void ClearEmissionModelCallbacks(CChara::CModel* model)
 {
     model->SetCallbackContext(0, 0);
-    model->m_drawMeshDLCallback = 0;
-    model->m_afterDrawMeshCallback = 0;
+    model->SetDrawMeshDLCallback(0);
+    model->SetAfterDrawMeshCallback(0);
 }
 
 /*
@@ -333,8 +333,8 @@ void pppConstructEmission(pppEmission* pppEmission_, pppEmissionUnkC* param_2) {
 
     CCharaPcs::CHandle* handle = GetCharaHandlePtr(reinterpret_cast<CGObject*>(pppMngStPtr->m_owner), 0);
     CChara::CModel* model = GetCharaModelPtr(handle);
-    model->m_drawMeshDLCallback = Emission_DrawMeshDLCallback;
-    model->m_afterDrawMeshCallback = Emission_AfterDrawMeshCallback;
+    model->SetDrawMeshDLCallback(Emission_DrawMeshDLCallback);
+    model->SetAfterDrawMeshCallback(Emission_AfterDrawMeshCallback);
     state->field0 = 0;
     state->field18 = model->m_lightAlpha;
     state->field1C = 0;

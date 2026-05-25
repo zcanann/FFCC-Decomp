@@ -101,16 +101,16 @@ static void ChangeTex_AfterDrawMeshCallback(CChara::CModel*, void*, void*, int, 
 static inline void SetChangeTexModelCallbacks(CChara::CModel* model, ChangeTexWork* work, pppChangeTexUnkB* step)
 {
 	model->SetCallbackContext(work, step);
-	model->m_drawMeshDLCallback = ChangeTex_DrawMeshDLCallback;
-	model->m_afterDrawMeshCallback = ChangeTex_AfterDrawMeshCallback;
+	model->SetDrawMeshDLCallback(ChangeTex_DrawMeshDLCallback);
+	model->SetAfterDrawMeshCallback(ChangeTex_AfterDrawMeshCallback);
 }
 
 static inline void ClearChangeTexModelCallbacks(CChara::CModel* model)
 {
 	model->SetCallbackContext(0, 0);
-	model->m_beforeMeshLockEnvCallback = 0;
-	model->m_drawMeshDLCallback = 0;
-	model->m_afterDrawMeshCallback = 0;
+	model->SetBeforeMeshLockEnvCallback(0);
+	model->SetDrawMeshDLCallback(0);
+	model->SetAfterDrawMeshCallback(0);
 }
 
 /*

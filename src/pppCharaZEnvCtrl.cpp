@@ -23,7 +23,7 @@ void pppFrameCharaZEnvCtrl(pppCharaZEnvCtrl* pppCharaZEnvCtrl, pppCharaZEnvCtrlU
 	CCharaPcs::CHandle* handle = GetCharaHandlePtr(reinterpret_cast<CGObject*>(pppMngStPtr->m_owner), 0);
 	CChara::CModel* model = GetCharaModelPtr(handle);
 	model->SetCallbackContext(work, param_2);
-	model->m_beforeMeshLockEnvCallback = CharaZEnvCtrl_BeforeMeshLockEnvCallback;
+	model->SetBeforeMeshLockEnvCallback(CharaZEnvCtrl_BeforeMeshLockEnvCallback);
 }
 
 /*
@@ -40,7 +40,7 @@ void pppDesCharaZEnvCtrl(_pppPObjLink*, _pppCtrlTable*)
 	CCharaPcs::CHandle* handle = GetCharaHandlePtr(reinterpret_cast<CGObject*>(pppMngStPtr->m_owner), 0);
 	CChara::CModel* model = GetCharaModelPtr(handle);
 	model->SetCallbackContext(0, 0);
-	model->m_beforeMeshLockEnvCallback = 0;
+	model->SetBeforeMeshLockEnvCallback(0);
 }
 
 /*

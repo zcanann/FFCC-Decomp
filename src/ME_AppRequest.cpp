@@ -6,7 +6,7 @@ extern "C" {
 void* memset(void*, int, unsigned int);
 }
 
-extern const char s_ME_AppRequest_cpp[] = "ME_AppRequest.cpp";
+extern const char s_ME_AppRequest_cpp[] __attribute__((aligned(8))) = "ME_AppRequest.cpp";
 
 struct ZCANMGRP {
     u8* ptr;

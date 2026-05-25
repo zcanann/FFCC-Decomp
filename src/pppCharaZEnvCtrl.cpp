@@ -20,7 +20,7 @@ void pppFrameCharaZEnvCtrl(pppCharaZEnvCtrl* pppCharaZEnvCtrl, pppCharaZEnvCtrlU
 
 	int dataOffset = *param_3->m_serializedDataOffsets;
 	void* work = pppCharaZEnvCtrl->m_object.m_workArea + dataOffset;
-	CCharaPcs::CHandle* handle = GetCharaHandlePtr(reinterpret_cast<CGObject*>(pppMngStPtr->m_owner), 0);
+	CCharaPcs::CHandle* handle = GetCharaHandlePtr(reinterpret_cast<CGObject*>(ppvMng->m_owner), 0);
 	CChara::CModel* model = GetCharaModelPtr(handle);
 	model->SetCallbackContext(work, param_2);
 	model->SetBeforeMeshLockEnvCallback(CharaZEnvCtrl_BeforeMeshLockEnvCallback);
@@ -37,7 +37,7 @@ void pppFrameCharaZEnvCtrl(pppCharaZEnvCtrl* pppCharaZEnvCtrl, pppCharaZEnvCtrlU
  */
 void pppDesCharaZEnvCtrl(_pppPObjLink*, _pppCtrlTable*)
 {
-	CCharaPcs::CHandle* handle = GetCharaHandlePtr(reinterpret_cast<CGObject*>(pppMngStPtr->m_owner), 0);
+	CCharaPcs::CHandle* handle = GetCharaHandlePtr(reinterpret_cast<CGObject*>(ppvMng->m_owner), 0);
 	CChara::CModel* model = GetCharaModelPtr(handle);
 	model->SetCallbackContext(0, 0);
 	model->SetBeforeMeshLockEnvCallback(0);
@@ -54,7 +54,7 @@ void pppDesCharaZEnvCtrl(_pppPObjLink*, _pppCtrlTable*)
  */
 void pppConCharaZEnvCtrl(_pppPObjLink*, _pppCtrlTable*)
 {
-	CCharaPcs::CHandle* handle = GetCharaHandlePtr(reinterpret_cast<CGObject*>(pppMngStPtr->m_owner), 0);
+	CCharaPcs::CHandle* handle = GetCharaHandlePtr(reinterpret_cast<CGObject*>(ppvMng->m_owner), 0);
 	GetCharaModelPtr(handle);
 }
 

@@ -20,7 +20,7 @@ void pppFrameYmCallBack(pppYmCallBack* callbackObj, pppYmCallBackUnkB* param_2, 
     s32 mngStIndex;
 
     if (((s32)callbackObj->m_graphId / 0x1000) == (s32)param_2->m_graphId) {
-        mngSt = pppMngStPtr;
+        mngSt = ppvMng;
         position.x = mngSt->m_matrix.value[0][3];
         position.y = mngSt->m_matrix.value[1][3];
         position.z = mngSt->m_matrix.value[2][3];

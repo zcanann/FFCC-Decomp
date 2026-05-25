@@ -114,7 +114,7 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
         return;
     }
 
-    shape = *(pppShapeSt**)(*(u32*)&pppEnvStPtr->m_particleColors[0] + ctrl->m_dataValIndex * 4);
+    shape = *(pppShapeSt**)(*(u32*)&ppvEnv->m_particleColors[0] + ctrl->m_dataValIndex * 4);
 
     pppSetDrawEnv(&colorWork->m_color, (pppFMATRIX*)&ppvCameraMatrix, kPppYmMeltZero, ctrl->m_payload[0x19],
                   ctrl->m_payload[0x18], ctrl->m_blendMode, 2, 1, 1, 0);
@@ -129,7 +129,7 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
     GXSetVtxAttrFmt(GX_VTXFMT7, (GXAttr)0xd, (GXCompCnt)1, (GXCompType)4, 0);
 
     textureIndex = 0;
-    texture = (CTexture*)shape->GetTexture((long*)shape->m_animData, pppEnvStPtr->m_materialSetPtr, textureIndex);
+    texture = (CTexture*)shape->GetTexture((long*)shape->m_animData, ppvEnv->m_materialSetPtr, textureIndex);
     if (texture == nullptr) {
         return;
     }
@@ -155,9 +155,9 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
     drawColorBytes[2] = colorWork->m_color.rgba[2];
     drawColorBytes[3] = colorWork->m_color.rgba[3];
     vertexData = work->m_vertexData;
-    worldX = pppMngStPtr->m_matrix.value[0][3];
-    worldY = pppMngStPtr->m_matrix.value[1][3];
-    worldZ = pppMngStPtr->m_matrix.value[2][3];
+    worldX = ppvMng->m_matrix.value[0][3];
+    worldY = ppvMng->m_matrix.value[1][3];
+    worldZ = ppvMng->m_matrix.value[2][3];
     pppGetShapeUV((long*)shape->m_animData, work->m_shapeDrawFrame, uvMin, uvMax, 0);
 
     uStep = uvMax.x - uvMin.x;
@@ -286,11 +286,11 @@ void pppFrameYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offse
     colorWork = GetYmMeltColorWork(ymMelt, offsets);
     gridCount = ctrl->m_gridSize + 1;
     vertexCount = gridCount * gridCount;
-    matrixY = pppMngStPtr->m_matrix.value[1][3];
+    matrixY = ppvMng->m_matrix.value[1][3];
 
     if (work->m_vertexData == nullptr) {
         work->m_vertexData = (YmMeltVertex*)pppMemAlloc(
-            (unsigned long)vertexCount * sizeof(YmMeltVertex), pppEnvStPtr->m_stagePtr,
+            (unsigned long)vertexCount * sizeof(YmMeltVertex), ppvEnv->m_stagePtr,
             const_cast<char*>(s_pppYmMelt_cpp),
             0xA9);
 
@@ -335,7 +335,7 @@ void pppFrameYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offse
     }
 
     if (ctrl->m_dataValIndex != 0xFFFF) {
-        long* animData = **(long***)(*(u32*)&pppEnvStPtr->m_particleColors[0] + ctrl->m_dataValIndex * 4);
+        long* animData = **(long***)(*(u32*)&ppvEnv->m_particleColors[0] + ctrl->m_dataValIndex * 4);
         pppCalcFrameShape(animData, work->m_shapeCurrentFrame, work->m_shapeDrawFrame,
                                       work->m_shapeFrameTime, ctrl->m_shapeFrameStep);
     }
@@ -411,7 +411,7 @@ extern "C" void CalcPolygonHeight(
 
     pointCount = vertexData->m_gridSize + 1;
     pointCount *= pointCount;
-    previousY = pppMngStPtr->m_previousPosition.x;
+    previousY = ppvMng->m_previousPosition.x;
     zero = kPppYmMeltZero;
     rayY = FLOAT_80330b10;
     top = FLOAT_80330b14;
@@ -424,9 +424,9 @@ extern "C" void CalcPolygonHeight(
         vertex->m_color.m_bytes[2] = colorBytes[2];
         vertex->m_color.m_bytes[3] = colorBytes[3];
 
-        worldBase.x = pppMngStPtr->m_matrix.value[0][3];
-        worldBase.y = pppMngStPtr->m_matrix.value[1][3];
-        worldBase.z = pppMngStPtr->m_matrix.value[2][3];
+        worldBase.x = ppvMng->m_matrix.value[0][3];
+        worldBase.y = ppvMng->m_matrix.value[1][3];
+        worldBase.z = ppvMng->m_matrix.value[2][3];
         worldBase.y += vertexData->m_collisionYOffset;
         rayDirection.x = zero;
         rayDirection.y = rayY;

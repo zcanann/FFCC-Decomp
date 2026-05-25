@@ -17,7 +17,7 @@ void pppFrameBindOnlyPos(_pppPObject*, void*, _pppCtrlTable*)
 		return;
 	}
 
-	if (pppMngStPtr->m_owner != 0) {
+	if (ppvMng->m_owner != 0) {
 		return;
 	}
 }

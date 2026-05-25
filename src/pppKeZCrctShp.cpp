@@ -31,9 +31,9 @@ void pppKeZCrctShpDraw(_pppPObject* object, pppKeZCrctShpStep* stepData, _pppCtr
     (void)ctrlTable;
 
     pppGetRowVector(object->m_localMatrix, rowX, rowY, rowZ, rowPos);
-    pppScaleVector(scaledX, rowX, pppMngStPtr->m_scale.x);
-    pppScaleVector(scaledY, rowY, pppMngStPtr->m_scale.y);
-    pppScaleVector(scaledZ, rowZ, pppMngStPtr->m_scale.z);
+    pppScaleVector(scaledX, rowX, ppvMng->m_scale.x);
+    pppScaleVector(scaledY, rowY, ppvMng->m_scale.y);
+    pppScaleVector(scaledZ, rowZ, ppvMng->m_scale.z);
 
     zeroVec.z = FLOAT_803304F8;
     zeroVec.y = FLOAT_803304F8;
@@ -69,10 +69,10 @@ void pppKeZCrctShpDraw(_pppPObject* object, pppKeZCrctShpStep* stepData, _pppCtr
         transformMatrix.value[2][3] = zeroVec.z;
         break;
     case 2:
-        pppApplyMatrix(zeroVec, pppMngStPtr->m_matrix, transformedPos);
-        zeroVec.x += stepData->m_offset.x * pppMngStPtr->m_scale.x;
-        zeroVec.y += stepData->m_offset.y * pppMngStPtr->m_scale.y;
-        zeroVec.z += stepData->m_offset.z * pppMngStPtr->m_scale.z;
+        pppApplyMatrix(zeroVec, ppvMng->m_matrix, transformedPos);
+        zeroVec.x += stepData->m_offset.x * ppvMng->m_scale.x;
+        zeroVec.y += stepData->m_offset.y * ppvMng->m_scale.y;
+        zeroVec.z += stepData->m_offset.z * ppvMng->m_scale.z;
         pppApplyMatrix(zeroVec, *(pppFMATRIX*)&ppvCameraMatrix, zeroVec);
 
         transformMatrix.value[0][3] = zeroVec.x;

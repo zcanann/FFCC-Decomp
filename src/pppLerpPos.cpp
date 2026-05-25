@@ -41,19 +41,19 @@ void pppFrameLerpPos(struct pppLerpPos* pppLerpPos, struct pppLerpPosUnkB* param
     u32 count;
 
     if (gPppCalcDisabled == 0) {
-        pppMngSt = pppMngStPtr;
+        pppMngSt = ppvMng;
         iVar2 = *param_3->m_serializedDataOffsets;
         historyPtr = (Vec**)((u8*)pppLerpPos + 0x80 + iVar2);
         if (*historyPtr == 0) {
             *historyPtr = (Vec*)pppMemAlloc(
-                (u32)(u8)param_2->m_dataValIndex * 0xc, pppEnvStPtr->m_stagePtr,
+                (u32)(u8)param_2->m_dataValIndex * 0xc, ppvEnv->m_stagePtr,
                 const_cast<char*>(s_pppLerpPos_cpp),
                 0x37);
 
             for (iVar7 = 0; iVar7 < (s32)(u8)param_2->m_dataValIndex; iVar7 = iVar7 + 1) {
-                (*historyPtr)[iVar7].x = pppMngStPtr->m_matrix.value[0][3];
-                (*historyPtr)[iVar7].y = pppMngStPtr->m_matrix.value[1][3];
-                (*historyPtr)[iVar7].z = pppMngStPtr->m_matrix.value[2][3];
+                (*historyPtr)[iVar7].x = ppvMng->m_matrix.value[0][3];
+                (*historyPtr)[iVar7].y = ppvMng->m_matrix.value[1][3];
+                (*historyPtr)[iVar7].z = ppvMng->m_matrix.value[2][3];
             }
         } else {
             local_2c.z = 0.0f;
@@ -70,9 +70,9 @@ void pppFrameLerpPos(struct pppLerpPos* pppLerpPos, struct pppLerpPosUnkB* param
 
             iVar5 = 0;
             iVar7 = iVar5;
-            (*historyPtr)->x = pppMngStPtr->m_matrix.value[0][3];
-            *(f32*)((u8*)*historyPtr + 4) = pppMngStPtr->m_matrix.value[1][3];
-            *(f32*)((u8*)*historyPtr + 8) = pppMngStPtr->m_matrix.value[2][3];
+            (*historyPtr)->x = ppvMng->m_matrix.value[0][3];
+            *(f32*)((u8*)*historyPtr + 4) = ppvMng->m_matrix.value[1][3];
+            *(f32*)((u8*)*historyPtr + 8) = ppvMng->m_matrix.value[2][3];
 
             for (; count = (u32)(u8)param_2->m_dataValIndex, iVar5 < (s32)count; iVar5 = iVar5 + 1) {
                 PSVECAdd((Vec*)((u8*)*historyPtr + iVar7), &local_2c, &local_2c);
@@ -80,9 +80,9 @@ void pppFrameLerpPos(struct pppLerpPos* pppLerpPos, struct pppLerpPosUnkB* param
             }
 
             PSVECScale(&local_2c, &local_2c, 1.0f / (f32)count);
-            pppMngStPtr->m_matrix.value[0][3] = local_2c.x;
-            pppMngStPtr->m_matrix.value[1][3] = local_2c.y;
-            pppMngStPtr->m_matrix.value[2][3] = local_2c.z;
+            ppvMng->m_matrix.value[0][3] = local_2c.x;
+            ppvMng->m_matrix.value[1][3] = local_2c.y;
+            ppvMng->m_matrix.value[2][3] = local_2c.z;
             pppSetFpMatrix(pppMngSt);
         }
     }

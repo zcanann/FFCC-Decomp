@@ -207,7 +207,7 @@ void pppLight(_pppPObject* param1, void* param2, void* param3)
 		light.m_position.x = *(f32*)(pObject + 0x1c);
 		light.m_position.y = *(f32*)(pObject + 0x2c);
 		light.m_position.z = *(f32*)(pObject + 0x3c);
-		PSMTXMultVec(pppMngStPtr->m_matrix.value, (Vec*)&light.m_position, (Vec*)&light.m_position);
+		PSMTXMultVec(ppvMng->m_matrix.value, (Vec*)&light.m_position, (Vec*)&light.m_position);
 
 		light.m_attenRadius = work->attenRadius;
 		light.m_attenFalloff = work->attenFalloff;
@@ -218,7 +218,7 @@ void pppLight(_pppPObject* param1, void* param2, void* param3)
 		light.m_targetColor[0].a = (u8)(work->color0A >> 7);
 		light.m_radius = 1.0f;
 		*(u32*)&light.m_bumpShade[0] = 0;
-		light.m_part = pppMngStPtr;
+		light.m_part = ppvMng;
 
 		if (step->color1Enabled != 0) {
 			light.m_targetColor[1] = light.m_targetColor[0];
@@ -250,12 +250,12 @@ void pppLight(_pppPObject* param1, void* param2, void* param3)
 				light.m_type = 1;
 				obj = (step->targetIndex == 0xFFFFFFFF)
 						  ? &gPppDefaultValueBuffer[0]
-						  : ((PppLightMngProgramInfo*)pppMngStPtr)->programInfoTable[step->targetIndex].obj;
+						  : ((PppLightMngProgramInfo*)ppvMng)->programInfoTable[step->targetIndex].obj;
 
 					light.m_targetPosition.x = *(f32*)(obj + 0x1c);
 					light.m_targetPosition.y = *(f32*)(obj + 0x2c);
 					light.m_targetPosition.z = *(f32*)(obj + 0x3c);
-					PSMTXMultVec(pppMngStPtr->m_matrix.value, (Vec*)&light.m_targetPosition, (Vec*)&light.m_targetPosition);
+					PSMTXMultVec(ppvMng->m_matrix.value, (Vec*)&light.m_targetPosition, (Vec*)&light.m_targetPosition);
 
 					PSVECSubtract((Vec*)&light.m_targetPosition, (Vec*)&light.m_position, (Vec*)&light.m_direction);
 					PSVECNormalize((Vec*)&light.m_direction, (Vec*)&light.m_direction);

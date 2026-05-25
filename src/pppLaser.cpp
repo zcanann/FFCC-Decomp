@@ -106,7 +106,7 @@ void pppConstructLaser(struct pppLaser *pppLaser, _pppCtrlTable *param_2)
     work->m_shapeRotation = Math.RandF(kMenuArtiTau);
     work->m_spawnEnabled = 1;
 
-    iVar2 = Game.GetParticleSpecialInfo(*(PPPIFPARAM*)((u8*)pppMngStPtr + 0x130), local_24, local_28);
+    iVar2 = Game.GetParticleSpecialInfo(*(PPPIFPARAM*)((u8*)ppvMng + 0x130), local_24, local_28);
     if (iVar2 != 0) {
         Game.GetTargetCursor(local_28, work->m_targetPosition, local_20);
 
@@ -121,8 +121,8 @@ void pppConstructLaser(struct pppLaser *pppLaser, _pppCtrlTable *param_2)
         }
     } else {
         work->m_maxLength = kMenuArtiNegativeOne;
-        *(u8*)((u8*)pppMngStPtr + 0xe8) = 1;
-        pppStopSe(pppMngStPtr, (PPPSEST*)((u8*)pppMngStPtr + 0x11c));
+        *(u8*)((u8*)ppvMng + 0xe8) = 1;
+        pppStopSe(ppvMng, (PPPSEST*)((u8*)ppvMng + 0x11c));
     }
 }
 
@@ -208,7 +208,7 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
 
     if (work->m_points == 0) {
         work->m_points = (Vec*)pppMemAlloc(
-            (u32)step->m_laser.m_pointCount * 0xc, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppLaser_cpp), 0x7d);
+            (u32)step->m_laser.m_pointCount * 0xc, ppvEnv->m_stagePtr, const_cast<char*>(s_pppLaser_cpp), 0x7d);
         memset(work->m_points, 0, (u32)step->m_laser.m_pointCount * 0xc);
         emptyHistory = 1;
     }
@@ -219,7 +219,7 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
         step->m_laser.m_lengthStepBase, step->m_laser.m_lengthStepVelocity, step->m_laser.m_lengthStepAccel);
 
     pppCalcFrameShape(
-        **(long***)(*(u32*)&pppEnvStPtr->m_particleColors[0] + (u32)step->m_stepValue * 4), work->m_shapeArg1,
+        **(long***)(*(u32*)&ppvEnv->m_particleColors[0] + (u32)step->m_stepValue * 4), work->m_shapeArg1,
         work->m_shapeArg2, work->m_shapeArg0, step->m_laser.m_shapeFrameStep);
 
     for (int i = 0; i < (int)(u32)(step->m_laser.m_historyFrameCount + 1); i++) {
@@ -234,7 +234,7 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
         localB.z = work->m_length;
 
         if (i == 0) {
-            PSMTXConcat(pppMngStPtr->m_matrix.value, pppLaser->m_localMatrix.value, tempMtx);
+            PSMTXConcat(ppvMng->m_matrix.value, pppLaser->m_localMatrix.value, tempMtx);
             work->m_origin.x = tempMtx[0][3];
             work->m_origin.y = tempMtx[1][3];
             work->m_origin.z = tempMtx[2][3];
@@ -246,7 +246,7 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
             s32 frameCount = step->m_laser.m_historyFrameCount + 1;
             float t = kMenuArtiNegativeOne / (float)frameCount;
             t *= (float)i;
-            if (GetCharaNodeFrameMatrix(pppMngStPtr, t, charaMtx) == 0) {
+            if (GetCharaNodeFrameMatrix(ppvMng, t, charaMtx) == 0) {
                 emptyHistory = 1;
                 continue;
             } else {
@@ -277,7 +277,7 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
         } else if (i == 0) {
             if (work->m_spawnEnabled != 0) {
                 if (work->m_maxLength - kMenuArtiHalfTileOffset < work->m_length) {
-                    _pppMngSt* mngSt = pppMngStPtr;
+                    _pppMngSt* mngSt = ppvMng;
                     s32 partIndex = ((s32)((u8*)mngSt - (reinterpret_cast<u8*>(&PartMng) + 0x2A18))) / 0x158;
                     work->m_length = work->m_maxLength - kMenuArtiHalfTileOffset;
                     Game.ParticleFrameCallback(
@@ -300,8 +300,8 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
 
         if (step->m_laser.m_disableHitCylinder == 0) {
             pppHitCylinderSendSystem(
-                pppMngStPtr, &work->m_origin, &localA,
-                pppMngStPtr->m_previousPosition.z * step->m_laser.m_hitScale,
+                ppvMng, &work->m_origin, &localA,
+                ppvMng->m_previousPosition.z * step->m_laser.m_hitScale,
                 step->m_laser.m_hitRadius);
         }
 
@@ -322,12 +322,12 @@ extern "C" void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *pa
             }
 
             if (createHitObject != 0) {
-                _pppPDataVal* dataVal = pppMngStPtr->m_pppPDataVals + step->m_arg3;
+                _pppPDataVal* dataVal = ppvMng->m_pppPDataVals + step->m_arg3;
                 _pppPObject* created;
                 if (dataVal == 0) {
                     created = 0;
                 } else {
-                    created = pppCreatePObject(pppMngStPtr, dataVal);
+                    created = pppCreatePObject(ppvMng, dataVal);
                     *(_pppPObject**)((u8*)created + 4) = (_pppPObject*)pppLaser;
                 }
 
@@ -390,7 +390,7 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
         return;
     }
 
-    tex = GetTextureFromRSD(dataValIndex, pppEnvStPtr);
+    tex = GetTextureFromRSD(dataValIndex, ppvEnv);
     pppSetBlendMode(step->m_laser.m_blendMode);
     _GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP0);
     pppSetDrawEnv(
@@ -416,7 +416,7 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
     negHalfWidth = -halfWidth;
 
     pppUnitMatrix(unitMtx);
-    pppMulMatrix(mtxOut, pppMngStPtr->m_matrix, pppLaser->m_localMatrix);
+    pppMulMatrix(mtxOut, ppvMng->m_matrix, pppLaser->m_localMatrix);
     pppMulMatrix(mtxOut, *(pppFMATRIX*)&ppvCameraMatrix, mtxOut);
     GXLoadPosMtxImm(mtxOut.value, 0);
 
@@ -449,10 +449,10 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
     GXTexCoord2f32(FLOAT_8033342c, work->m_length);
 
     if (step->m_stepValue != 0xFFFF) {
-        long** shapeTable = *(long***)(*(u32*)&pppEnvStPtr->m_particleColors[0] + (u32)step->m_stepValue * 4);
+        long** shapeTable = *(long***)(*(u32*)&ppvEnv->m_particleColors[0] + (u32)step->m_stepValue * 4);
         PSMTXIdentity(shapeMtx);
-        shapeMtx[0][0] = step->m_laser.m_shapeScale * pppMngStPtr->m_scale.x;
-        shapeMtx[1][1] = step->m_laser.m_shapeScale * pppMngStPtr->m_scale.y;
+        shapeMtx[0][0] = step->m_laser.m_shapeScale * ppvMng->m_scale.x;
+        shapeMtx[1][1] = step->m_laser.m_shapeScale * ppvMng->m_scale.y;
         shapeMtx[2][2] = shapeMtx[0][0];
         if (kPppLaserZero != work->m_shapeRotation) {
             PSMTXRotRad(rotateMtx, 'z', work->m_shapeRotation);
@@ -463,7 +463,7 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
         shapeMtx[1][3] = shapePos.y;
         shapeMtx[2][3] = shapePos.z;
         GXLoadPosMtxImm(shapeMtx, GX_PNMTX0);
-        pppDrawShp(*shapeTable, work->m_shapeArg2, pppEnvStPtr->m_materialSetPtr, step->m_laser.m_blendMode);
+        pppDrawShp(*shapeTable, work->m_shapeArg2, ppvEnv->m_materialSetPtr, step->m_laser.m_blendMode);
 
         count = step->m_laser.m_pointCount;
         uvStep = FLOAT_8033342c / (float)count;
@@ -471,7 +471,7 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
             _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
             _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
         } else {
-            tex = GetTextureFromRSD(step->m_initWOrk, pppEnvStPtr);
+            tex = GetTextureFromRSD(step->m_initWOrk, ppvEnv);
             _GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
             GXLoadTexObj((GXTexObj*)(tex + 0x28), GX_TEXMAP0);
         }
@@ -557,7 +557,7 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
             GXSetZMode(1, GX_LEQUAL, 0);
 
             if ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_ParticleHitSpheres) != 0) {
-                float radius = pppMngStPtr->m_previousPosition.z * step->m_laser.m_hitScale;
+                float radius = ppvMng->m_previousPosition.z * step->m_laser.m_hitScale;
                 float distance = PSVECDistance(work->m_points, &work->m_origin);
                 debugSource.x = kPppLaserZero;
                 debugSource.y = kPppLaserZero;
@@ -571,7 +571,7 @@ extern "C" void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *p
                 debugMtx[1][1] = radius;
                 debugMtx[2][2] = distance;
                 PSMTXConcat(pppLaser->m_localMatrix.value, debugMtx, debugMtx);
-                PSMTXConcat(pppMngStPtr->m_matrix.value, debugMtx, debugMtx);
+                PSMTXConcat(ppvMng->m_matrix.value, debugMtx, debugMtx);
                 PSMTXConcat(ppvCameraMatrix, debugMtx, debugMtx);
                 PSMTXMultVec(debugMtx, &debugSource, &spherePos);
                 debugMtx[0][3] = spherePos.x;

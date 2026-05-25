@@ -26,7 +26,7 @@ void pppPObjPoint(_pppPObject* pObject, pppPObjPointStep* step, _pppCtrlTable* c
     if (step->m_graphId == pObject->m_graphId) {
         Vec* source = (step->m_createProgramIndex == -1)
                           ? (Vec*)gPppDefaultValueBuffer
-                          : (Vec*)((u8*)pppMngStPtr->m_pppPDataVals[step->m_createProgramIndex].m_pppPObjLink
+                          : (Vec*)((u8*)ppvMng->m_pppPDataVals[step->m_createProgramIndex].m_pppPObjLink
                                   + step->m_sourceOffset + 0x80);
 
         objPtr->m_source = source;

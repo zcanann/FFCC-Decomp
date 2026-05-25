@@ -47,7 +47,7 @@ static inline T* PppWorkArea(pppYmDeformationMdl* object, pppYmDeformationMdlUnk
 
 static inline _pppEnvStYmDeformationMdl* DeformationMdlEnv()
 {
-    return reinterpret_cast<_pppEnvStYmDeformationMdl*>(pppEnvStPtr);
+    return reinterpret_cast<_pppEnvStYmDeformationMdl*>(ppvEnv);
 }
 
 extern const float kYmDeformationMdlBackTextureWidth;

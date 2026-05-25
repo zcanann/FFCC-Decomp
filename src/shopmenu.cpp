@@ -752,7 +752,7 @@ int CShopMenu::getItemHaveCnt(int itemNo)
 
 static long* GetShopMenuShapeAnimData(int shapeNo)
 {
-    int shapeTableBase = *reinterpret_cast<int*>(&pppEnvStPtr->m_particleColors[0]);
+    int shapeTableBase = *reinterpret_cast<int*>(&ppvEnv->m_particleColors[0]);
     if (shapeTableBase == 0) {
         return 0;
     }
@@ -1725,7 +1725,7 @@ void CShopMenu::DrawShopBase()
 void CShopMenu::Draw()
 {
     Graphic.SetDrawDoneDebugData(0x46);
-    pppEnvStPtr = reinterpret_cast<_pppEnvSt*>(PartMng.m_pdtSlots[ShopMenuInt(this, 0x18)].m_envFields);
+    ppvEnv = reinterpret_cast<_pppEnvSt*>(PartMng.m_pdtSlots[ShopMenuInt(this, 0x18)].m_envFields);
 
     DrawInit__8CMenuPcsFv(MenuPcsVoid());
 
@@ -2870,7 +2870,7 @@ void drawShapeSeqGrouad(int shapeNo, int groupNo, int x, int y, float scaleX, fl
     setOrtho(x, y, scaleX, scaleY, 0.0f);
     SetupShopMenuShapeDrawColor(0xFF);
     MaterialMan.SetMaterialMenu(
-        pppEnvStPtr->m_materialSetPtr,
+        ppvEnv->m_materialSetPtr,
         static_cast<int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(shape) + 10)), 0);
     GXClearVtxDesc();
     GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
@@ -2906,7 +2906,7 @@ void drawShapeSeqScale(int shapeNo, int groupNo, int x, int y, float scaleX, flo
     projectionMtx[2][3] += FLOAT_80332d9c;
     GXSetProjection(projectionMtx, GX_ORTHOGRAPHIC);
 
-    int shapeData = **reinterpret_cast<int**>(*reinterpret_cast<int*>(&pppEnvStPtr->m_particleColors[0]) + shapeNo * 4);
+    int shapeData = **reinterpret_cast<int**>(*reinterpret_cast<int*>(&ppvEnv->m_particleColors[0]) + shapeNo * 4);
     tagOAN3_SHAPE* shape =
         reinterpret_cast<tagOAN3_SHAPE*>(shapeData + *reinterpret_cast<short*>(shapeData + groupNo * 8 + 0x10));
 
@@ -2948,7 +2948,7 @@ void drawShapeSeqScale(int shapeNo, int groupNo, int x, int y, float scaleX, flo
     *reinterpret_cast<unsigned int*>(materialMan + 0x40) = *reinterpret_cast<unsigned int*>(materialMan + 0x48);
 
     MaterialMan.SetMaterialMenu(
-        pppEnvStPtr->m_materialSetPtr,
+        ppvEnv->m_materialSetPtr,
         static_cast<int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(shape) + 10)), 0);
     GXClearVtxDesc();
     GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
@@ -3002,7 +3002,7 @@ void drawShapeSeq(int shapeNo, int groupNo, int x, int y, unsigned char alpha, u
     projectionMtx[2][3] += zOffset;
     GXSetProjection(projectionMtx, GX_ORTHOGRAPHIC);
 
-    int shapeData = **reinterpret_cast<int**>(*reinterpret_cast<int*>(&pppEnvStPtr->m_particleColors[0]) + shapeNo * 4);
+    int shapeData = **reinterpret_cast<int**>(*reinterpret_cast<int*>(&ppvEnv->m_particleColors[0]) + shapeNo * 4);
     tagOAN3_SHAPE* shape =
         reinterpret_cast<tagOAN3_SHAPE*>(shapeData + *reinterpret_cast<short*>(shapeData + groupNo * 8 + 0x10));
 
@@ -3044,7 +3044,7 @@ void drawShapeSeq(int shapeNo, int groupNo, int x, int y, unsigned char alpha, u
     *reinterpret_cast<unsigned int*>(materialMan + 0x40) = *reinterpret_cast<unsigned int*>(materialMan + 0x48);
 
     MaterialMan.SetMaterialMenu(
-        pppEnvStPtr->m_materialSetPtr,
+        ppvEnv->m_materialSetPtr,
         static_cast<int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(shape) + 10)), 0);
     GXClearVtxDesc();
     GXSetVtxDesc(GX_VA_POS, GX_DIRECT);

@@ -67,7 +67,7 @@ static inline void copyPolygonData(TRACE_POLYGON* dst, TRACE_POLYGON* src)
 
 static inline float* GetTracerWorkValue(int dataValueIndex, int offset)
 {
-    _pppPObject* object = reinterpret_cast<_pppPObject*>(pppMngStPtr->m_pppPDataVals[dataValueIndex].m_pppPObjLink);
+    _pppPObject* object = reinterpret_cast<_pppPObject*>(ppvMng->m_pppPDataVals[dataValueIndex].m_pppPObjLink);
     return reinterpret_cast<float*>(object->m_workArea + offset);
 }
 
@@ -103,7 +103,7 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, p
     work = (TracerWork*)(pppYmTracer2->m_object.m_workArea + dataOffset);
     colorOffset = param_3->m_serializedDataOffsets[1];
     poly = work->entries;
-    mapMesh = pppEnvStPtr->m_mapMeshPtr[dataValIndex];
+    mapMesh = ppvEnv->m_mapMeshPtr[dataValIndex];
     colorData = pppYmTracer2->m_object.m_workArea + colorOffset;
 
     if (dataValIndex != 0xFFFF) {
@@ -116,7 +116,7 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, p
         gUtil.SetVtxFmt_POS_CLR_TEX();
 
         textureIndex[0] = 0;
-        texture = (CTexture*)mapMesh->GetTexture(pppEnvStPtr->m_materialSetPtr, textureIndex[0]);
+        texture = (CTexture*)mapMesh->GetTexture(ppvEnv->m_materialSetPtr, textureIndex[0]);
         if (texture != 0) {
             GXLoadTexObj(&texture->m_texObj, GX_TEXMAP0);
             GXSetNumChans(1);
@@ -241,7 +241,7 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
         useFallback = 1;
         work->alphaStep = (u16)param_2->m_tracer.m_entryAlpha / param_2->m_tracer.m_entryLife;
         work->entries = (TRACE_POLYGON*)pppMemAlloc(
-            (u32)param_2->m_tracer.m_entryCount * sizeof(TRACE_POLYGON), pppEnvStPtr->m_stagePtr,
+            (u32)param_2->m_tracer.m_entryCount * sizeof(TRACE_POLYGON), ppvEnv->m_stagePtr,
             const_cast<char*>(s_pppYmTracer2_cpp), 0xAD);
 
         fVar2 = FLOAT_80331840;
@@ -292,12 +292,12 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
         entry->colorB = colorData[10];
 
         if (i == 0) {
-            PSMTXConcat(pppMngStPtr->m_matrix.value, pppYmTracer2->m_object.m_localMatrix.value, MStack_78);
+            PSMTXConcat(ppvMng->m_matrix.value, pppYmTracer2->m_object.m_localMatrix.value, MStack_78);
             PSMTXMultVec(MStack_78, &entries[0].pos, &entries[0].pos);
             PSMTXMultVec(MStack_78, &entries[0].targetPos, &entries[0].targetPos);
         } else if (!useFallback) {
             frameT = (-1.0f / (f32)((s32)param_2->m_tracer.m_historyFrameCount + 1)) * (f32)(s32)i;
-            if (GetCharaNodeFrameMatrix(pppMngStPtr, frameT, MStack_78) == 0) {
+            if (GetCharaNodeFrameMatrix(ppvMng, frameT, MStack_78) == 0) {
                 useFallback = 1;
             } else {
                 PSMTXConcat(MStack_78, pppYmTracer2->m_object.m_localMatrix.value, MStack_78);

@@ -44,7 +44,7 @@ extern "C" void pppFrameYmMoveCircle(_pppPObject* basePtr, pppYmMoveCircleStep* 
 
     serializedDataOffsets = offsetData->m_serializedDataOffsets;
     work = (pppYmMoveCircleWork*)(basePtr->m_workArea + serializedDataOffsets[0]);
-    pppMngSt = pppMngStPtr;
+    pppMngSt = ppvMng;
 
     work->m_radiusStep += work->m_radiusStepStep;
     work->m_radius += work->m_radiusStep;
@@ -86,9 +86,9 @@ extern "C" void pppFrameYmMoveCircle(_pppPObject* basePtr, pppYmMoveCircleStep* 
     pppCopyVector(*(Vec*)&pppMngSt->m_userFloat0, pppMngSt->m_position);
     pppCopyVector(pppMngSt->m_position, nextPos);
 
-    pppMngStPtr->m_matrix.value[0][3] = nextPos.x;
-    pppMngStPtr->m_matrix.value[1][3] = nextPos.y;
-    pppMngStPtr->m_matrix.value[2][3] = nextPos.z;
+    ppvMng->m_matrix.value[0][3] = nextPos.x;
+    ppvMng->m_matrix.value[1][3] = nextPos.y;
+    ppvMng->m_matrix.value[2][3] = nextPos.z;
     pppSetFpMatrix((_pppMngSt*)pppMngSt);
 }
 
@@ -109,7 +109,7 @@ extern "C" void pppConstructYmMoveCircle(_pppPObject* basePtr, _pppCtrlTable* of
     s32 offset;
     pppYmMoveCircleWork* work;
 
-    pppMngSt = pppMngStPtr;
+    pppMngSt = ppvMng;
     offset = offsetData->m_serializedDataOffsets[0];
     work = (pppYmMoveCircleWork*)(basePtr->m_workArea + offset);
 

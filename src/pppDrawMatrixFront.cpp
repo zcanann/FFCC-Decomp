@@ -19,9 +19,9 @@ void pppDrawMatrixFront(_pppPObject* object, void*, _pppCtrlTable*)
     PSMTXScaleApply(
         *(Mtx*)((char*)object + 0x10),
         *(Mtx*)((char*)object + 0x40),
-        pppMngStPtr->m_scale.x,
-        pppMngStPtr->m_scale.y,
-        pppMngStPtr->m_scale.z
+        ppvMng->m_scale.x,
+        ppvMng->m_scale.y,
+        ppvMng->m_scale.z
     );
 
     localPos.x = *(float*)((char*)object + 0x1c);

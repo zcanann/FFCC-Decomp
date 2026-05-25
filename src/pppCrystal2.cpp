@@ -108,16 +108,16 @@ void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, _pppC
 
     if (dataValIndex != 0xFFFF) {
         sourceTex = 0;
-        model = (pppModelSt*)pppEnvStPtr->m_mapMeshPtr[dataValIndex];
+        model = (pppModelSt*)ppvEnv->m_mapMeshPtr[dataValIndex];
         textureIndex = 0;
-        ((CMapMesh*)model)->GetTexture(pppEnvStPtr->m_materialSetPtr, textureIndex);
+        ((CMapMesh*)model)->GetTexture(ppvEnv->m_materialSetPtr, textureIndex);
         if (param_2->m_payload[0] == 0) {
             if (param_2->m_initWOrk == 0xFFFF) {
                 return;
             }
             sourceTex =
-                static_cast<CTexture*>(pppEnvStPtr->m_mapMeshPtr[param_2->m_initWOrk]->GetTexture(
-                    pppEnvStPtr->m_materialSetPtr, textureIndex));
+                static_cast<CTexture*>(ppvEnv->m_mapMeshPtr[param_2->m_initWOrk]->GetTexture(
+                    ppvEnv->m_materialSetPtr, textureIndex));
         }
 
         pppSetBlendMode(0);
@@ -135,7 +135,7 @@ void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, _pppC
         texMtx = s_crystal2TexMtxBase;
 
         PSMTXIdentity(drawMtx);
-        PSMTXConcat(pppMngStPtr->m_matrix.value, pppCrystal2->m_object.m_localMatrix.value, cameraMtx);
+        PSMTXConcat(ppvMng->m_matrix.value, pppCrystal2->m_object.m_localMatrix.value, cameraMtx);
         if ((int)Game.m_currentSceneId == 7) {
             f32 perspectiveScale = param_2->m_perspectiveScale;
             C_MTXLightPerspective(lightMtx, 25.0f, 1.3333334f, perspectiveScale, -perspectiveScale, 0.5f, 0.5f);
@@ -219,12 +219,12 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, _pppCt
     work = reinterpret_cast<Crystal2Work*>(pppCrystal2->m_object.m_workArea + param_3->m_serializedDataOffsets[2]);
     if ((param_2->m_payload[0] != 0) && (work->m_refractionMap == 0)) {
         work->m_refractionMap = (Crystal2RefractionMap*)pppMemAlloc(
-            sizeof(Crystal2RefractionMap), pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppCrystal2Cpp), 0xA8);
+            sizeof(Crystal2RefractionMap), ppvEnv->m_stagePtr, const_cast<char*>(s_pppCrystal2Cpp), 0xA8);
 
         textureInfo = work->m_refractionMap;
         textureSize = GXGetTexBufferSize(0x20, 0x20, GX_TF_IA8, GX_FALSE, 0);
         textureInfo->m_imageData = (u8*)pppMemAlloc(
-            textureSize, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppCrystal2Cpp), 0xAD);
+            textureSize, ppvEnv->m_stagePtr, const_cast<char*>(s_pppCrystal2Cpp), 0xAD);
         textureInfo->m_format = GX_TF_IA8;
         textureInfo->m_width = 0x20;
         textureInfo->m_height = 0x20;
@@ -274,7 +274,7 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, _pppCt
 
         DCFlushRange(textureInfo->m_imageData, textureInfo->m_bufferSize);
         work->m_refractionTexObj = (GXTexObj*)pppMemAlloc(
-            0x20, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppCrystal2Cpp), 0xB5);
+            0x20, ppvEnv->m_stagePtr, const_cast<char*>(s_pppCrystal2Cpp), 0xB5);
         GXInitTexObj(work->m_refractionTexObj, textureInfo->m_imageData, (u16)textureInfo->m_width,
                      (u16)textureInfo->m_height, GX_TF_IA8, GX_REPEAT, GX_REPEAT, GX_FALSE);
     }

@@ -23,8 +23,8 @@ void pppParMoveLine(_pppPObject* param_1, int param_2)
     float fVar1;
     float x;
 
-    pppMngSt = pppMngStPtr;
-    PSVECSubtract((Vec*)((char*)pppMngStPtr + 0x68), (Vec*)((char*)pppMngStPtr + 0x58), &local_1c);
+    pppMngSt = ppvMng;
+    PSVECSubtract((Vec*)((char*)ppvMng + 0x68), (Vec*)((char*)ppvMng + 0x58), &local_1c);
 
     x = pppMngSt->m_position.x;
     fVar1 = FLOAT_80330638;
@@ -38,9 +38,9 @@ void pppParMoveLine(_pppPObject* param_1, int param_2)
         PSVECAdd(&local_1c, &pppMngSt->m_position, &pppMngSt->m_position);
     }
 
-    pppMngStPtr->m_matrix.value[0][3] = pppMngSt->m_position.x;
-    pppMngStPtr->m_matrix.value[1][3] = pppMngSt->m_position.y;
-    pppMngStPtr->m_matrix.value[2][3] = pppMngSt->m_position.z;
+    ppvMng->m_matrix.value[0][3] = pppMngSt->m_position.x;
+    ppvMng->m_matrix.value[1][3] = pppMngSt->m_position.y;
+    ppvMng->m_matrix.value[2][3] = pppMngSt->m_position.z;
 
     pppSetFpMatrix(pppMngSt);
 }

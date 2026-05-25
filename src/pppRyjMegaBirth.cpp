@@ -291,14 +291,14 @@ static inline void init_matrix(_pppPObject* pObject, pppFMATRIX& out, PRyjMegaBi
 
 	if ((mode == 1) || (mode == 3) || (mode == 5) || (mode == 7) || (mode == 9)) {
 		PSMTXIdentity(out.value);
-		out.value[0][0] = pppMngStPtr->m_scale.x;
-		out.value[1][1] = pppMngStPtr->m_scale.y;
-		out.value[2][2] = pppMngStPtr->m_scale.z;
-		out.value[0][3] = pppMngStPtr->m_position.x;
-		out.value[1][3] = pppMngStPtr->m_position.y;
-		out.value[2][3] = pppMngStPtr->m_position.z;
+		out.value[0][0] = ppvMng->m_scale.x;
+		out.value[1][1] = ppvMng->m_scale.y;
+		out.value[2][2] = ppvMng->m_scale.z;
+		out.value[0][3] = ppvMng->m_position.x;
+		out.value[1][3] = ppvMng->m_position.y;
+		out.value[2][3] = ppvMng->m_position.z;
 	} else {
-		PSMTXCopy(pppMngStPtr->m_matrix.value, out.value);
+		PSMTXCopy(ppvMng->m_matrix.value, out.value);
 	}
 
 	if (work != NULL) {
@@ -386,7 +386,7 @@ void pppRyjDrawMegaBirth(_pppPObject* obj, void* stepData, _pppCtrlTable* ctrlTa
 		break;
 	}
 
-	long** animDataSet = *(long***)(*(u32*)&pppEnvStPtr->m_particleColors[0] + params->m_shapeIndex * 4);
+	long** animDataSet = *(long***)(*(u32*)&ppvEnv->m_particleColors[0] + params->m_shapeIndex * 4);
 	int useTexture = params->m_textureMode == 0;
 	float drawScale = params->m_drawDepthEnabled != 0 ? params->m_drawDepth : kPppRyjMegaBirthZero;
 
@@ -411,8 +411,8 @@ void pppRyjDrawMegaBirth(_pppPObject* obj, void* stepData, _pppCtrlTable* ctrlTa
 			pppFMATRIX viewMatrix;
 
 			PSMTXIdentity(drawMatrix);
-			drawMatrix[0][0] = *f32_at(particle, 0x34) * pppMngStPtr->m_scale.x;
-			drawMatrix[1][1] = *f32_at(particle, 0x38) * pppMngStPtr->m_scale.y;
+			drawMatrix[0][0] = *f32_at(particle, 0x34) * ppvMng->m_scale.x;
+			drawMatrix[1][1] = *f32_at(particle, 0x38) * ppvMng->m_scale.y;
 			drawMatrix[2][2] = drawMatrix[0][0];
 
 			if (*f32_at(particle, 0x28) != kPppRyjMegaBirthZero) {
@@ -503,7 +503,7 @@ void pppRyjDrawMegaBirth(_pppPObject* obj, void* stepData, _pppCtrlTable* ctrlTa
 
 			GXSetChanAmbColor(GX_COLOR0A0, *(_GXColor*)drawColor.rgba);
 			pppSetBlendMode(params->m_blendMode);
-			pppDrawShp(shape, pppEnvStPtr->m_materialSetPtr, params->m_blendMode);
+			pppDrawShp(shape, ppvEnv->m_materialSetPtr, params->m_blendMode);
 		}
 
 		if (particleWorldMat != NULL) {
@@ -545,7 +545,7 @@ void pppRyjMegaBirth(_pppPObject* pObject, PRyjMegaBirth* particleData, PRyjMega
 	{
 		work->m_numParticles = particleData->m_maxParticles;
 		work->m_particleBlock = (_PARTICLE_DATA*)pppMemAlloc(
-			work->m_numParticles * 0x60, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppRyjMegaBirth_cpp), 0x262);
+			work->m_numParticles * 0x60, ppvEnv->m_stagePtr, const_cast<char*>(s_pppRyjMegaBirth_cpp), 0x262);
 		if (work->m_particleBlock != NULL)
 		{
 			memset(work->m_particleBlock, 0, work->m_numParticles * 0x60);
@@ -554,7 +554,7 @@ void pppRyjMegaBirth(_pppPObject* pObject, PRyjMegaBirth* particleData, PRyjMega
 		if ((particleData->m_matrixMode == 1) || (particleData->m_matrixMode == 2))
 		{
 			work->m_worldMatrixBlock = (PARTICLE_WMAT*)pppMemAlloc(
-				work->m_numParticles * sizeof(PARTICLE_WMAT), pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppRyjMegaBirth_cpp), 0x269);
+				work->m_numParticles * sizeof(PARTICLE_WMAT), ppvEnv->m_stagePtr, const_cast<char*>(s_pppRyjMegaBirth_cpp), 0x269);
 			if (work->m_worldMatrixBlock != NULL)
 			{
 				memset(work->m_worldMatrixBlock, 0, work->m_numParticles * sizeof(PARTICLE_WMAT));
@@ -564,7 +564,7 @@ void pppRyjMegaBirth(_pppPObject* pObject, PRyjMegaBirth* particleData, PRyjMega
 		if (particleData->m_enableParticleColor != 0)
 		{
 			work->m_colorBlock = (_PARTICLE_COLOR*)pppMemAlloc(
-				work->m_numParticles * sizeof(_PARTICLE_COLOR), pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppRyjMegaBirth_cpp), 0x271);
+				work->m_numParticles * sizeof(_PARTICLE_COLOR), ppvEnv->m_stagePtr, const_cast<char*>(s_pppRyjMegaBirth_cpp), 0x271);
 			if (work->m_colorBlock != NULL)
 			{
 				memset(work->m_colorBlock, 0, work->m_numParticles * sizeof(_PARTICLE_COLOR));
@@ -605,15 +605,15 @@ void pppRyjMegaBirth(_pppPObject* pObject, PRyjMegaBirth* particleData, PRyjMega
 		case 7:
 		case 9:
 			PSMTXIdentity(work->m_worldMatrix);
-			work->m_worldMatrix[0][0] = pppMngStPtr->m_scale.x;
-			work->m_worldMatrix[1][1] = pppMngStPtr->m_scale.y;
-			work->m_worldMatrix[2][2] = pppMngStPtr->m_scale.z;
-			work->m_worldMatrix[0][3] = pppMngStPtr->m_position.x;
-			work->m_worldMatrix[1][3] = pppMngStPtr->m_position.y;
-			work->m_worldMatrix[2][3] = pppMngStPtr->m_position.z;
+			work->m_worldMatrix[0][0] = ppvMng->m_scale.x;
+			work->m_worldMatrix[1][1] = ppvMng->m_scale.y;
+			work->m_worldMatrix[2][2] = ppvMng->m_scale.z;
+			work->m_worldMatrix[0][3] = ppvMng->m_position.x;
+			work->m_worldMatrix[1][3] = ppvMng->m_position.y;
+			work->m_worldMatrix[2][3] = ppvMng->m_position.z;
 			break;
 		default:
-			PSMTXCopy(pppMngStPtr->m_matrix.value, work->m_worldMatrix);
+			PSMTXCopy(ppvMng->m_matrix.value, work->m_worldMatrix);
 			break;
 		}
 
@@ -661,7 +661,7 @@ void calc_particle(_pppPObject* pObject, VRyjMegaBirth* work, PRyjMegaBirth* par
 				calc(work, param, particle, color, colorData);
 
 				frame = *(u16*)((u8*)particle + 0x1E);
-				colorSet = (s32)**(s32***)(*(s32*)&pppEnvStPtr->m_particleColors[0] + param->m_shapeIndex * 4);
+				colorSet = (s32)**(s32***)(*(s32*)&ppvEnv->m_particleColors[0] + param->m_shapeIndex * 4);
 				*(u16*)((u8*)particle + 0x20) = frame;
 				frameData = colorSet + (u32)frame * 8 + 0x10;
 
@@ -939,10 +939,10 @@ void birth(
 		Vec* pathBase = *(Vec**)((u8*)pObject + 0x70);
 
 		if (pathIndex >= 0) {
-			s16* pathInfo = (s16*)(*(int*)&pppEnvStPtr->m_particleColors[1] + pathIndex * 8);
+			s16* pathInfo = (s16*)(*(int*)&ppvEnv->m_particleColors[1] + pathIndex * 8);
 
 			if (pathBase == NULL) {
-				pathBase = (Vec*)pppEnvStPtr->m_mapMeshPtr[pathInfo[0]]->m_vertices;
+				pathBase = (Vec*)ppvEnv->m_mapMeshPtr[pathInfo[0]]->m_vertices;
 			}
 
 			if (pathBase != NULL) {

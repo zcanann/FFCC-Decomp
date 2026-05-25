@@ -34,7 +34,7 @@ void pppFrameYmLookOn(struct pppYmLookOn* pppYmLookOn, struct pppYmLookOnStep* p
         return;
     }
 
-    pppMngSt = pppMngStPtr;
+    pppMngSt = ppvMng;
     owner = reinterpret_cast<u8*>(pppMngSt->m_lookTarget);
     work = GetYmLookOnWork(pppYmLookOn, param_3);
     if (owner == nullptr) {
@@ -51,9 +51,9 @@ void pppFrameYmLookOn(struct pppYmLookOn* pppYmLookOn, struct pppYmLookOnStep* p
     local_4c.y = *(f32*)(owner + 0x160);
     local_4c.z = *(f32*)(owner + 0x164);
     local_4c.y += param_2->m_dataValIndex;
-    local_58.x = pppMngStPtr->m_matrix.value[0][3];
-    local_58.y = pppMngStPtr->m_matrix.value[1][3];
-    local_58.z = pppMngStPtr->m_matrix.value[2][3];
+    local_58.x = ppvMng->m_matrix.value[0][3];
+    local_58.y = ppvMng->m_matrix.value[1][3];
+    local_58.z = ppvMng->m_matrix.value[2][3];
     PSVECSubtract(&local_58, &local_4c, &local_44);
 
     if (((gPppYmLookOnZero != local_44.x) || (gPppYmLookOnZero != local_44.y)) || (gPppYmLookOnZero != local_44.z)) {
@@ -74,15 +74,15 @@ void pppFrameYmLookOn(struct pppYmLookOn* pppYmLookOn, struct pppYmLookOnStep* p
             PSVECCrossProduct(&local_40, &local_28, &local_34);
             PSVECNormalize(&local_34, &local_34);
         }
-        pppMngStPtr->m_matrix.value[0][0] = local_28.x;
-        pppMngStPtr->m_matrix.value[1][0] = local_28.y;
-        pppMngStPtr->m_matrix.value[2][0] = local_28.z;
-        pppMngStPtr->m_matrix.value[0][1] = local_34.x;
-        pppMngStPtr->m_matrix.value[1][1] = local_34.y;
-        pppMngStPtr->m_matrix.value[2][1] = local_34.z;
-        pppMngStPtr->m_matrix.value[0][2] = local_40.x;
-        pppMngStPtr->m_matrix.value[1][2] = local_40.y;
-        pppMngStPtr->m_matrix.value[2][2] = local_40.z;
+        ppvMng->m_matrix.value[0][0] = local_28.x;
+        ppvMng->m_matrix.value[1][0] = local_28.y;
+        ppvMng->m_matrix.value[2][0] = local_28.z;
+        ppvMng->m_matrix.value[0][1] = local_34.x;
+        ppvMng->m_matrix.value[1][1] = local_34.y;
+        ppvMng->m_matrix.value[2][1] = local_34.z;
+        ppvMng->m_matrix.value[0][2] = local_40.x;
+        ppvMng->m_matrix.value[1][2] = local_40.y;
+        ppvMng->m_matrix.value[2][2] = local_40.z;
         pppSetFpMatrix(pppMngSt);
     }
 }

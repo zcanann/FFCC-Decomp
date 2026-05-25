@@ -251,7 +251,7 @@ void pppRyjMegaBirthModel(_pppPObject* pObject, PRyjMegaBirthModel* params, PRyj
     if (work->m_particleBlock == 0) {
         work->m_numParticles = *(u16*)(payload + 0x20);
         work->m_particleBlock = (_PARTICLE_DATA*)pppMemAlloc(
-            work->m_numParticles * 0xA0, pppEnvStPtr->m_stagePtr,
+            work->m_numParticles * 0xA0, ppvEnv->m_stagePtr,
             const_cast<char*>(s_pppRyjMegaBirthModel_cpp), 0x8D);
         if (work->m_particleBlock != NULL) {
             memset(work->m_particleBlock, 0, work->m_numParticles * 0xA0);
@@ -259,7 +259,7 @@ void pppRyjMegaBirthModel(_pppPObject* pObject, PRyjMegaBirthModel* params, PRyj
 
         if (payload[0x136] != 0) {
             work->m_worldMatrixBlock = (PARTICLE_WMAT*)pppMemAlloc(
-                work->m_numParticles * sizeof(PARTICLE_WMAT), pppEnvStPtr->m_stagePtr,
+                work->m_numParticles * sizeof(PARTICLE_WMAT), ppvEnv->m_stagePtr,
                 const_cast<char*>(s_pppRyjMegaBirthModel_cpp), 0x97);
             if (work->m_worldMatrixBlock != NULL) {
                 memset(work->m_worldMatrixBlock, 0, work->m_numParticles * sizeof(PARTICLE_WMAT));
@@ -268,7 +268,7 @@ void pppRyjMegaBirthModel(_pppPObject* pObject, PRyjMegaBirthModel* params, PRyj
 
         if (payload[0x131] != 0) {
             work->m_colorBlock = (_PARTICLE_COLOR*)pppMemAlloc(
-                work->m_numParticles * sizeof(_PARTICLE_COLOR), pppEnvStPtr->m_stagePtr,
+                work->m_numParticles * sizeof(_PARTICLE_COLOR), ppvEnv->m_stagePtr,
                 const_cast<char*>(s_pppRyjMegaBirthModel_cpp), 0xA2);
             if (work->m_colorBlock != NULL) {
                 memset(work->m_colorBlock, 0, work->m_numParticles * sizeof(_PARTICLE_COLOR));
@@ -534,7 +534,7 @@ void birth(
     }
 
     if (particleWMat != NULL) {
-        PSMTXCopy(pppMngStPtr->m_matrix.value, *(Mtx*)particleWMat);
+        PSMTXCopy(ppvMng->m_matrix.value, *(Mtx*)particleWMat);
     }
 
     if (particleColor != NULL) {
@@ -936,7 +936,7 @@ void pppRyjDrawMegaBirthModel(_pppPObject* obj, void* stepData, _pppCtrlTable* c
                                  *f32_at(particle, 0x8C) + *f32_at(particle, 0x94),
                                  FLOAT_80330498, FLOAT_80330498);
         pppSetBlendMode(payload[0x13C]);
-        pppDrawMesh((pppModelSt*)pppEnvStPtr->m_mapMeshPtr[modelIndex], obj->m_drawMatrixPtr, 1);
+        pppDrawMesh((pppModelSt*)ppvEnv->m_mapMeshPtr[modelIndex], obj->m_drawMatrixPtr, 1);
         pppCopyMatrix(obj->m_localMatrix, *(pppFMATRIX*)&g_matTmp);
     }
 }
@@ -957,12 +957,12 @@ void init_matrix(_pppPObject* pObject, pppFMATRIX& out, PRyjMegaBirthModel* para
     case 7:
     case 9:
         PSMTXIdentity(out.value);
-        out.value[0][0] = pppMngStPtr->m_scale.x;
-        out.value[1][1] = pppMngStPtr->m_scale.y;
-        out.value[2][2] = pppMngStPtr->m_scale.z;
-        out.value[0][3] = pppMngStPtr->m_position.x;
-        out.value[1][3] = pppMngStPtr->m_position.y;
-        out.value[2][3] = pppMngStPtr->m_position.z;
+        out.value[0][0] = ppvMng->m_scale.x;
+        out.value[1][1] = ppvMng->m_scale.y;
+        out.value[2][2] = ppvMng->m_scale.z;
+        out.value[0][3] = ppvMng->m_position.x;
+        out.value[1][3] = ppvMng->m_position.y;
+        out.value[2][3] = ppvMng->m_position.z;
         break;
     case 8:
         PSMTXIdentity(out.value);
@@ -971,7 +971,7 @@ void init_matrix(_pppPObject* pObject, pppFMATRIX& out, PRyjMegaBirthModel* para
         out.value[2][3] = work->m_currentPosition.z;
         break;
     default:
-        PSMTXCopy(pppMngStPtr->m_matrix.value, out.value);
+        PSMTXCopy(ppvMng->m_matrix.value, out.value);
         break;
     }
 }
@@ -1055,7 +1055,7 @@ void set_matrix(_pppPObject* pObject, pppFMATRIX mtxA, pppFMATRIX mtxB, PRyjMega
             pppMulMatrix(mtxB, *(pppFMATRIX*)particleWMat, tmp);
         } else {
             pppCopyMatrix(tmp, mtxB);
-            pppMulMatrix(mtxB, pppMngStPtr->m_matrix, tmp);
+            pppMulMatrix(mtxB, ppvMng->m_matrix, tmp);
             copyOutMatrix = false;
         }
         break;
@@ -1085,9 +1085,9 @@ void set_matrix(_pppPObject* pObject, pppFMATRIX mtxA, pppFMATRIX mtxB, PRyjMega
         pppAddVector(endPos, endPos, objectPos);
 
         pppUnitMatrix(mtxB);
-        PSMTXScaleApply(mtxB.value, objectMatrix->value, *f32_at(particleData, 0x5C) * pppMngStPtr->m_scale.x,
-                        *f32_at(particleData, 0x60) * pppMngStPtr->m_scale.y,
-                        *f32_at(particleData, 0x64) * pppMngStPtr->m_scale.z);
+        PSMTXScaleApply(mtxB.value, objectMatrix->value, *f32_at(particleData, 0x5C) * ppvMng->m_scale.x,
+                        *f32_at(particleData, 0x60) * ppvMng->m_scale.y,
+                        *f32_at(particleData, 0x64) * ppvMng->m_scale.z);
         PSMTXMultVec(ppvWorldMatrix, &endPos, &endPos);
 
         pppFMATRIX rot;

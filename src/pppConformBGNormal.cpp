@@ -95,7 +95,7 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
         return;
     }
 
-    pppMngSt = pppMngStPtr;
+    pppMngSt = ppvMng;
     owner = (CGObject*)pppMngSt->m_lookTarget;
     hitFound = 0;
     matrixX = pppMngSt->m_matrix.value[0][3];
@@ -119,7 +119,7 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
                 }
             } else if (mode == 1) {
                 hitFound = 1;
-                Game.GetTargetCursor(*(s32*)((u8*)pppMngStPtr + 0x130), local_170, local_164);
+                Game.GetTargetCursor(*(s32*)((u8*)ppvMng + 0x130), local_170, local_164);
             } else if (mode == 2) {
                 firstRayDirection.x = kPppConformBgNormalZero;
                 firstRayDirection.y = -2000.0f;
@@ -210,23 +210,23 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
             basisMtx[2][1] = local_14c.z;
             basisMtx[2][2] = local_158.z;
 
-            PSMTXCopy(basisMtx, pppMngStPtr->m_matrix.value);
-            PSMTXScale(scaleMtx, pppMngStPtr->m_scale.x, pppMngStPtr->m_scale.y, pppMngStPtr->m_scale.z);
-            PSMTXConcat(scaleMtx, pppMngStPtr->m_matrix.value, pppMngStPtr->m_matrix.value);
+            PSMTXCopy(basisMtx, ppvMng->m_matrix.value);
+            PSMTXScale(scaleMtx, ppvMng->m_scale.x, ppvMng->m_scale.y, ppvMng->m_scale.z);
+            PSMTXConcat(scaleMtx, ppvMng->m_matrix.value, ppvMng->m_matrix.value);
 
             mode = param2->m_stepValue;
             if (mode == 0) {
                 if ((s8)((s32)((u32)(owner->m_stateFlags0 & 0xc0) << 24) >> 31) != 0) {
-                    pppMngStPtr->m_matrix.value[0][3] = owner->m_worldPosition.x;
-                    pppMngStPtr->m_matrix.value[1][3] = owner->m_worldPosition.y;
-                    pppMngStPtr->m_matrix.value[2][3] = owner->m_worldPosition.z;
+                    ppvMng->m_matrix.value[0][3] = owner->m_worldPosition.x;
+                    ppvMng->m_matrix.value[1][3] = owner->m_worldPosition.y;
+                    ppvMng->m_matrix.value[2][3] = owner->m_worldPosition.z;
                 } else if ((((WeaponNodeFlagBits*)&owner->m_weaponNodeFlags)->m_unk01 != 0) && (owner->m_attachOwner != NULL)) {
                     ownerX = owner->m_worldPosition.x;
                     ownerY = owner->m_attachOwner->m_worldPosition.y;
                     ownerZ = owner->m_worldPosition.z;
-                    pppMngStPtr->m_matrix.value[0][3] = ownerX;
-                    pppMngStPtr->m_matrix.value[1][3] = ownerY;
-                    pppMngStPtr->m_matrix.value[2][3] = ownerZ;
+                    ppvMng->m_matrix.value[0][3] = ownerX;
+                    ppvMng->m_matrix.value[1][3] = ownerY;
+                    ppvMng->m_matrix.value[2][3] = ownerZ;
                 } else {
                     bottomX = owner->m_worldPosition.x;
                     bottomY = owner->m_worldPosition.y;
@@ -253,34 +253,34 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
                         (CMapCylinder*)&secondCylinder, &secondRayDirection, 0xffffffff);
                     if (hitFound != 0) {
                         MapMng.m_hitMapObj->CalcHitPosition(&local_170);
-                        pppMngStPtr->m_matrix.value[0][3] = local_170.x;
-                        pppMngStPtr->m_matrix.value[1][3] = local_170.y;
-                        pppMngStPtr->m_matrix.value[2][3] = local_170.z;
+                        ppvMng->m_matrix.value[0][3] = local_170.x;
+                        ppvMng->m_matrix.value[1][3] = local_170.y;
+                        ppvMng->m_matrix.value[2][3] = local_170.z;
                     } else {
                         ownerZ = owner->m_worldPosition.z;
                         ownerX = owner->m_worldPosition.x;
-                        pppMngStPtr->m_matrix.value[0][3] = ownerX;
-                        pppMngStPtr->m_matrix.value[1][3] = matrixY;
-                        pppMngStPtr->m_matrix.value[2][3] = ownerZ;
+                        ppvMng->m_matrix.value[0][3] = ownerX;
+                        ppvMng->m_matrix.value[1][3] = matrixY;
+                        ppvMng->m_matrix.value[2][3] = ownerZ;
                     }
                 }
             } else if (mode == 1) {
                 if (hitFound != 0) {
-                    pppMngStPtr->m_matrix.value[0][3] = local_170.x;
-                    pppMngStPtr->m_matrix.value[1][3] = local_170.y;
-                    pppMngStPtr->m_matrix.value[2][3] = local_170.z;
+                    ppvMng->m_matrix.value[0][3] = local_170.x;
+                    ppvMng->m_matrix.value[1][3] = local_170.y;
+                    ppvMng->m_matrix.value[2][3] = local_170.z;
                 } else {
-                    pppMngStPtr->m_matrix.value[0][3] = matrixX;
-                    pppMngStPtr->m_matrix.value[1][3] = matrixY;
-                    pppMngStPtr->m_matrix.value[2][3] = matrixZ;
+                    ppvMng->m_matrix.value[0][3] = matrixX;
+                    ppvMng->m_matrix.value[1][3] = matrixY;
+                    ppvMng->m_matrix.value[2][3] = matrixZ;
                 }
             } else if (mode == 2) {
-                pppMngStPtr->m_matrix.value[0][3] = local_170.x;
-                pppMngStPtr->m_matrix.value[1][3] = local_170.y;
-                pppMngStPtr->m_matrix.value[2][3] = local_170.z;
+                ppvMng->m_matrix.value[0][3] = local_170.x;
+                ppvMng->m_matrix.value[1][3] = local_170.y;
+                ppvMng->m_matrix.value[2][3] = local_170.z;
             }
 
-            pppMngStPtr->m_matrix.value[1][3] += param2->m_dataValIndex;
+            ppvMng->m_matrix.value[1][3] += param2->m_dataValIndex;
             pppSetFpMatrix(pppMngSt);
     }
 }

@@ -52,7 +52,7 @@ void pppRenderLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTa
 	s32 dataValIndex = unkB->m_dataValIndex;
 
 	if (dataValIndex != 0xFFFF) {
-		long** shapeTable = *(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + dataValIndex * 4);
+		long** shapeTable = *(long***)(*(int*)&ppvEnv->m_particleColors[0] + dataValIndex * 4);
 		if (shapeBase[0x32] != 0) {
 			pppCVECTOR local_70;
 			Vec local_60;
@@ -61,13 +61,13 @@ void pppRenderLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTa
 
 			PSMTXIdentity(local_54);
 			scale = *(float*)&unkB->m_stepValue;
-			local_54[0][0] = (pppMngStPtr->m_scale.x * *(float*)(objBytes + 0x40)) * scale;
-			local_54[1][1] = (pppMngStPtr->m_scale.y * *(float*)(objBytes + 0x54)) * scale;
-			local_54[2][2] = (pppMngStPtr->m_scale.z * *(float*)(objBytes + 0x68)) * scale;
+			local_54[0][0] = (ppvMng->m_scale.x * *(float*)(objBytes + 0x40)) * scale;
+			local_54[1][1] = (ppvMng->m_scale.y * *(float*)(objBytes + 0x54)) * scale;
+			local_54[2][2] = (ppvMng->m_scale.z * *(float*)(objBytes + 0x68)) * scale;
 
-			local_60.x = pppMngStPtr->m_matrix.value[0][3];
-			local_60.y = pppMngStPtr->m_matrix.value[1][3];
-			local_60.z = pppMngStPtr->m_matrix.value[2][3];
+			local_60.x = ppvMng->m_matrix.value[0][3];
+			local_60.y = ppvMng->m_matrix.value[1][3];
+			local_60.z = ppvMng->m_matrix.value[2][3];
 
 			PSMTXMultVec(ppvCameraMatrix, &local_60, &local_60);
 
@@ -88,7 +88,7 @@ void pppRenderLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTa
 						  1, 1, 0);
 
 			pppSetBlendMode(unkB->m_unk12);
-			pppDrawShp(*shapeTable, *(s16*)(shapeBase + 0x2e), pppEnvStPtr->m_materialSetPtr, unkB->m_unk12);
+			pppDrawShp(*shapeTable, *(s16*)(shapeBase + 0x2e), ppvEnv->m_materialSetPtr, unkB->m_unk12);
 			pppSetBlendMode(3);
 		}
 	}
@@ -112,9 +112,9 @@ void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTab
 		u8* colorBase = objBytes + colorOffset;
 		LensFlareWork* work = (LensFlareWork*)(objBytes + shapeOffset + 0x80);
 		u8 sourceAlpha = colorBase[0x8B];
-		float projX = pppMngStPtr->m_matrix.value[0][3];
-		float projY = pppMngStPtr->m_matrix.value[1][3];
-		float projZ = pppMngStPtr->m_matrix.value[2][3];
+		float projX = ppvMng->m_matrix.value[0][3];
+		float projY = ppvMng->m_matrix.value[1][3];
+		float projZ = ppvMng->m_matrix.value[2][3];
 		u32 zAtPixel;
 		Vec cameraPos;
 		Vec cameraLookAt;
@@ -152,9 +152,9 @@ void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTab
 		cameraLookAt.z = CameraPcs.m_targetZ;
 		PSVECSubtract(&cameraLookAt, &cameraPos, &lookDir);
 
-		objectPos.x = pppMngStPtr->m_matrix.value[0][3];
-		objectPos.y = pppMngStPtr->m_matrix.value[1][3];
-		objectPos.z = pppMngStPtr->m_matrix.value[2][3];
+		objectPos.x = ppvMng->m_matrix.value[0][3];
+		objectPos.y = ppvMng->m_matrix.value[1][3];
+		objectPos.z = ppvMng->m_matrix.value[2][3];
 		PSVECSubtract(&cameraPos, &objectPos, &cameraToObject);
 		PSVECScale(&cameraToObject, &cameraToObject, kPppLensFlareNegate);
 		PSVECNormalize(&lookDir, &lookDir);
@@ -203,7 +203,7 @@ void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTab
 
 		work->m_alpha = (u8)(int)((float)(u8)work->m_alpha * alphaScale);
 		if (unkB->m_dataValIndex != 0xffff) {
-			long** shapeTable = *(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + unkB->m_dataValIndex * 4);
+			long** shapeTable = *(long***)(*(int*)&ppvEnv->m_particleColors[0] + unkB->m_dataValIndex * 4);
 			pppCalcFrameShape(*shapeTable, work->m_shapeFrame0, work->m_shapeFrame1, work->m_shapeFrame2,
 							  unkB->m_initWOrk);
 		}

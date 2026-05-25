@@ -51,7 +51,7 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
         return;
     }
 
-    int shapeTable = **(int**)(*(int*)&pppEnvStPtr->m_particleColors[0] + dataValIndex * 4);
+    int shapeTable = **(int**)(*(int*)&ppvEnv->m_particleColors[0] + dataValIndex * 4);
     u16 workRand = *(u16*)((u8*)object + 0x80 + particleDataOffset + 0x78);
     const u8 zEnable = (u8)(((u32)__cntlzw((u32)payload[0x55])) >> 5);
     pppSetDrawEnv(
@@ -136,9 +136,9 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                         const s16 shapeOffset = *(s16*)(shapeTable + (shapeFrame % (u32)shapeFrameCount) * 8 + 0x10);
 
                         pppUnitMatrix(drawMtx);
-                        drawMtx.value[0][0] = drawScale * pppMngStPtr->m_scale.x;
-                        drawMtx.value[1][1] = drawScale * pppMngStPtr->m_scale.y;
-                        drawMtx.value[2][2] = drawScale * pppMngStPtr->m_scale.z;
+                        drawMtx.value[0][0] = drawScale * ppvMng->m_scale.x;
+                        drawMtx.value[1][1] = drawScale * ppvMng->m_scale.y;
+                        drawMtx.value[2][2] = drawScale * ppvMng->m_scale.z;
 
                         if (*(s16*)(payload + 0x94) != 0) {
                             pppFMATRIX rotMtx;
@@ -153,9 +153,9 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                         if (payload[0xA5] == 0) {
                             PSMTXMultVec(ppvWorldMatrix, &trailPos, &cameraPos);
                         } else if (payload[0xA5] == 1) {
-                            managerPos.x = pppMngStPtr->m_matrix.value[0][3];
-                            managerPos.y = pppMngStPtr->m_matrix.value[1][3];
-                            managerPos.z = pppMngStPtr->m_matrix.value[2][3];
+                            managerPos.x = ppvMng->m_matrix.value[0][3];
+                            managerPos.y = ppvMng->m_matrix.value[1][3];
+                            managerPos.z = ppvMng->m_matrix.value[2][3];
                             PSVECAdd(&trailPos, &managerPos, &trailPos);
                             PSMTXMultVec(ppvCameraMatrix, &trailPos, &cameraPos);
                         } else {
@@ -176,7 +176,7 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                         }
                         GXSetChanAmbColor(GX_COLOR0A0, amb);
                         pppDrawShp(
-                            reinterpret_cast<tagOAN3_SHAPE*>(shapeTable + shapeOffset), pppEnvStPtr->m_materialSetPtr, payload[0x58]);
+                            reinterpret_cast<tagOAN3_SHAPE*>(shapeTable + shapeOffset), ppvEnv->m_materialSetPtr, payload[0x58]);
                     }
 
                     frameCount--;
@@ -271,14 +271,14 @@ void pppFrameYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthShp
     if (work->m_particles == 0) {
         work->m_maxParticles = *(u16*)(paramPayload + 0xe);
         work->m_particles = (_PARTICLE_DATA*)pppMemAlloc(
-            work->m_maxParticles * 0x1f8, pppEnvStPtr->m_stagePtr,
+            work->m_maxParticles * 0x1f8, ppvEnv->m_stagePtr,
             const_cast<char*>(s_pppYmMegaBirthShpTail3_cpp), 0x2db);
         if (work->m_particles != 0) {
             memset(work->m_particles, 0, work->m_maxParticles * 0x1f8);
         }
 
         work->m_wmats = (_PARTICLE_WMAT*)pppMemAlloc(
-            work->m_maxParticles * sizeof(_PARTICLE_WMAT), pppEnvStPtr->m_stagePtr,
+            work->m_maxParticles * sizeof(_PARTICLE_WMAT), ppvEnv->m_stagePtr,
             const_cast<char*>(s_pppYmMegaBirthShpTail3_cpp), 0x2e3);
         if (work->m_wmats != 0) {
             memset(work->m_wmats, 0, work->m_maxParticles * sizeof(_PARTICLE_WMAT));
@@ -367,7 +367,7 @@ void pppFrameYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthShp
             firstCol.x = work->m_emitterMatrix.value[0][0];
             firstCol.y = work->m_emitterMatrix.value[1][0];
             firstCol.z = work->m_emitterMatrix.value[2][0];
-            PSVECScale(&firstCol, &firstCol, pppMngStPtr->m_scale.x);
+            PSVECScale(&firstCol, &firstCol, ppvMng->m_scale.x);
             work->m_emitterMatrix.value[0][0] = firstCol.x;
             work->m_emitterMatrix.value[1][0] = firstCol.y;
             work->m_emitterMatrix.value[2][0] = firstCol.z;
@@ -375,7 +375,7 @@ void pppFrameYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthShp
             secondCol.x = work->m_emitterMatrix.value[0][1];
             secondCol.y = work->m_emitterMatrix.value[1][1];
             secondCol.z = work->m_emitterMatrix.value[2][1];
-            PSVECScale(&secondCol, &secondCol, pppMngStPtr->m_scale.x);
+            PSVECScale(&secondCol, &secondCol, ppvMng->m_scale.x);
             work->m_emitterMatrix.value[0][1] = secondCol.x;
             work->m_emitterMatrix.value[1][1] = secondCol.y;
             work->m_emitterMatrix.value[2][1] = secondCol.z;
@@ -383,18 +383,18 @@ void pppFrameYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthShp
             thirdCol.x = work->m_emitterMatrix.value[0][2];
             thirdCol.y = work->m_emitterMatrix.value[1][2];
             thirdCol.z = work->m_emitterMatrix.value[2][2];
-            PSVECScale(&thirdCol, &thirdCol, pppMngStPtr->m_scale.x);
+            PSVECScale(&thirdCol, &thirdCol, ppvMng->m_scale.x);
             work->m_emitterMatrix.value[0][2] = thirdCol.x;
             work->m_emitterMatrix.value[1][2] = thirdCol.y;
             work->m_emitterMatrix.value[2][2] = thirdCol.z;
 
-            work->m_emitterMatrix.value[0][3] = pppMngStPtr->m_position.x;
-            work->m_emitterMatrix.value[1][3] = pppMngStPtr->m_position.y;
-            work->m_emitterMatrix.value[2][3] = pppMngStPtr->m_position.z;
+            work->m_emitterMatrix.value[0][3] = ppvMng->m_position.x;
+            work->m_emitterMatrix.value[1][3] = ppvMng->m_position.y;
+            work->m_emitterMatrix.value[2][3] = ppvMng->m_position.z;
             break;
         }
         default:
-            pppCopyMatrix(work->m_emitterMatrix, pppMngStPtr->m_matrix);
+            pppCopyMatrix(work->m_emitterMatrix, ppvMng->m_matrix);
             break;
         }
 
@@ -616,10 +616,10 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirthShpTail3,
         float* pathBase = *reinterpret_cast<float**>((u8*)pppPObject + 0x70);
 
         if (pYmMegaBirthShpTail3->m_pathIndex >= 0) {
-            short* pathInfo = (short*)(*(int*)&pppEnvStPtr->m_particleColors[1] + pYmMegaBirthShpTail3->m_pathIndex * 8);
+            short* pathInfo = (short*)(*(int*)&ppvEnv->m_particleColors[1] + pYmMegaBirthShpTail3->m_pathIndex * 8);
 
             if (pathBase == 0) {
-                pathBase = (float*)((u8*)pppEnvStPtr->m_mapMeshPtr[*pathInfo] + 0x2C);
+                pathBase = (float*)((u8*)ppvEnv->m_mapMeshPtr[*pathInfo] + 0x2C);
             }
 
             if (pathBase != 0) {

@@ -197,7 +197,7 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XUnkB* param_2,
     colorStepA = colorStep.w;
 
     work = (KeShpTail2XWork*)((u8*)obj + 0x80 + param_3->m_serializedDataOffsets[0]);
-    shapeTable = *(long***)(*(u32*)&pppEnvStPtr->m_particleColors[0] + dataValIndex * 4);
+    shapeTable = *(long***)(*(u32*)&ppvEnv->m_particleColors[0] + dataValIndex * 4);
     shapeEntry = (long*)((u8*)*shapeTable + *(s16*)((u8*)*shapeTable + (work->m_shapePrevFrame << 3) + 0x10));
 
     pppCopyMatrix(localBase, obj->pppPObject.m_localMatrix);
@@ -205,7 +205,7 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XUnkB* param_2,
 
     drawScale = step->m_scaleStart;
     scaleStepDelta = (step->m_scaleStart - step->m_scaleEnd) / invCountMinusOne;
-    trailStep = step->m_stepDistance * pppMngStPtr->m_scale.x;
+    trailStep = step->m_stepDistance * ppvMng->m_scale.x;
 
     curIndex = work->m_head;
     nextIndex = curIndex + 1;
@@ -243,16 +243,16 @@ draw_loop:
 
     if (step->m_worldSpaceMode == 0) {
         PSMTXScaleApply(obj->pppPObject.m_localMatrix.value, obj->field_0x40.value,
-                        localBase.value[0][0] * (drawScale * pppMngStPtr->m_scale.x),
-                        localBase.value[1][1] * (drawScale * pppMngStPtr->m_scale.y),
-                        localBase.value[2][2] * (drawScale * pppMngStPtr->m_scale.z));
+                        localBase.value[0][0] * (drawScale * ppvMng->m_scale.x),
+                        localBase.value[1][1] * (drawScale * ppvMng->m_scale.y),
+                        localBase.value[2][2] * (drawScale * ppvMng->m_scale.z));
         PSMTXMultVec(ppvWorldMatrix, &pos, &pos);
         PSMTXCopy(obj->field_0x40.value, drawMtx.value);
     } else if (step->m_worldSpaceMode == 1) {
         pppUnitMatrix(drawMtx);
-        drawMtx.value[0][0] = drawScale * (localBase.value[0][0] * pppMngStPtr->m_scale.x);
-        drawMtx.value[1][1] = drawScale * (localBase.value[1][1] * pppMngStPtr->m_scale.y);
-        drawMtx.value[2][2] = drawScale * (localBase.value[2][2] * pppMngStPtr->m_scale.z);
+        drawMtx.value[0][0] = drawScale * (localBase.value[0][0] * ppvMng->m_scale.x);
+        drawMtx.value[1][1] = drawScale * (localBase.value[1][1] * ppvMng->m_scale.y);
+        drawMtx.value[2][2] = drawScale * (localBase.value[2][2] * ppvMng->m_scale.z);
         PSMTXMultVec(ppvCameraMatrix, &pos, &pos);
     }
 
@@ -274,7 +274,7 @@ draw_loop:
     }
 
     pppSetBlendMode(step->m_blendMode);
-    pppDrawShp(reinterpret_cast<tagOAN3_SHAPE*>(shapeEntry), pppEnvStPtr->m_materialSetPtr, step->m_blendMode);
+    pppDrawShp(reinterpret_cast<tagOAN3_SHAPE*>(shapeEntry), ppvEnv->m_materialSetPtr, step->m_blendMode);
 
 update_step:
     count--;
@@ -366,7 +366,7 @@ void pppKeShpTail2X(struct pppKeShpTail2X* obj, pppKeShpTail2XUnkB* param_2, _pp
             initPos.y = obj->pppPObject.m_localMatrix.value[1][3];
             initPos.z = obj->pppPObject.m_localMatrix.value[2][3];
         } else if (step->m_worldSpaceMode == 1) {
-            pppMulMatrix(outMatrix, pppMngStPtr->m_matrix, obj->pppPObject.m_localMatrix);
+            pppMulMatrix(outMatrix, ppvMng->m_matrix, obj->pppPObject.m_localMatrix);
             initPos.x = outMatrix.value[0][3];
             initPos.y = outMatrix.value[1][3];
             initPos.z = outMatrix.value[2][3];
@@ -392,7 +392,7 @@ void pppKeShpTail2X(struct pppKeShpTail2X* obj, pppKeShpTail2XUnkB* param_2, _pp
         pos.y = obj->pppPObject.m_localMatrix.value[1][3];
         pos.z = obj->pppPObject.m_localMatrix.value[2][3];
     } else if (step->m_worldSpaceMode == 1) {
-        pppMulMatrix(outMatrix, pppMngStPtr->m_matrix, obj->pppPObject.m_localMatrix);
+        pppMulMatrix(outMatrix, ppvMng->m_matrix, obj->pppPObject.m_localMatrix);
         pos.x = outMatrix.value[0][3];
         pos.y = outMatrix.value[1][3];
         pos.z = outMatrix.value[2][3];
@@ -401,7 +401,7 @@ void pppKeShpTail2X(struct pppKeShpTail2X* obj, pppKeShpTail2XUnkB* param_2, _pp
     pppCopyVector(work->m_posHistory[work->m_head], pos);
 
     {
-        long** shapeTable = *(long***)(*(u32*)&pppEnvStPtr->m_particleColors[0] + step->m_dataValIndex * 4);
+        long** shapeTable = *(long***)(*(u32*)&ppvEnv->m_particleColors[0] + step->m_dataValIndex * 4);
         u8* shape = (u8*)*shapeTable;
         u16 shapeFrame;
         KeShpTail2XShapeFrame* frameEntry;

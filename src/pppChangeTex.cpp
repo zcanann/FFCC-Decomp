@@ -127,7 +127,7 @@ void pppRenderChangeTex(pppChangeTex*, pppChangeTexUnkB* step, pppChangeTexUnkC*
 	int textureIndex;
 
 	if (step->m_dataValIndex != 0xffff) {
-		_pppEnvSt* env = pppEnvStPtr;
+		_pppEnvSt* env = ppvEnv;
 		CMapMesh* mapMesh = env->m_mapMeshPtr[step->m_dataValIndex];
 		textureIndex = 0;
 		mapMesh->GetTexture(env->m_materialSetPtr, textureIndex);
@@ -154,7 +154,7 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 	s32* serializedDataOffsets = data->m_serializedDataOffsets;
 	ChangeTexWork* work = (ChangeTexWork*)(changeTex->m_object.m_workArea + serializedDataOffsets[2]);
 	u8* colorData = changeTex->m_object.m_workArea + serializedDataOffsets[1];
-	CCharaPcs::CHandle* handle0 = GetCharaHandlePtr((CGObject*)pppMngStPtr->m_owner, 0);
+	CCharaPcs::CHandle* handle0 = GetCharaHandlePtr((CGObject*)ppvMng->m_owner, 0);
 	CChara::CModel* model0 = GetCharaModelPtr(handle0);
 	ChangeTexModelRaw* model0Raw = (ChangeTexModelRaw*)model0;
 
@@ -162,11 +162,11 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 	    &changeTex->m_object, step->m_graphId, work->m_value0, work->m_value1, work->m_value2, step->m_initWOrk,
 	    step->m_stepValue, step->m_arg3);
 
-	work->m_charaObj = (CGObject*)pppMngStPtr->m_owner;
-	work->m_context = pppEnvStPtr;
+	work->m_charaObj = (CGObject*)ppvMng->m_owner;
+	work->m_context = ppvEnv;
 	SetChangeTexModelCallbacks(model0, work, step);
 
-	work->m_texture = reinterpret_cast<void*>(GetTextureFromRSD(step->m_dataValIndex, pppEnvStPtr));
+	work->m_texture = reinterpret_cast<void*>(GetTextureFromRSD(step->m_dataValIndex, ppvEnv));
 
 	CCharaPcs::CHandle* handle1 = GetCharaHandlePtr(work->m_charaObj, 1);
 	CCharaPcs::CHandle* handle2 = GetCharaHandlePtr(work->m_charaObj, 2);
@@ -184,7 +184,7 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 		return;
 	}
 
-	void* texObj = reinterpret_cast<void*>(GetTextureFromRSD(step->m_dataValIndex, pppEnvStPtr));
+	void* texObj = reinterpret_cast<void*>(GetTextureFromRSD(step->m_dataValIndex, ppvEnv));
 	if (texObj == 0) {
 		return;
 	}
@@ -194,10 +194,10 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 	if ((work->m_meshColorArrays == 0) && (work->m_displayListArrays == 0)) {
 		work->m_cachedValue = LoadFloat(kPppChangeTexCachedValueInit);
 		work->m_meshColorArrays = pppMemAlloc(
-		    model0Raw->m_data->m_meshCount << 2, pppEnvStPtr->m_stagePtr,
+		    model0Raw->m_data->m_meshCount << 2, ppvEnv->m_stagePtr,
 		    const_cast<char*>(s_pppChangeTex_cpp), 0x163);
 		work->m_displayListArrays = pppMemAlloc(
-		    model0Raw->m_data->m_meshCount << 2, pppEnvStPtr->m_stagePtr,
+		    model0Raw->m_data->m_meshCount << 2, ppvEnv->m_stagePtr,
 		    const_cast<char*>(s_pppChangeTex_cpp), 0x166);
 
 		int* meshColorArrays = (int*)work->m_meshColorArrays;
@@ -210,7 +210,7 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 			}
 
 			*(int*)((u8*)work->m_displayListArrays + arrayOffset) = (int)pppMemAlloc(
-			    meshList->m_data->m_displayListCount << 2, pppEnvStPtr->m_stagePtr,
+			    meshList->m_data->m_displayListCount << 2, ppvEnv->m_stagePtr,
 			    const_cast<char*>(s_pppChangeTex_cpp), 0x181);
 
 			int dlIdx = meshList->m_data->m_displayListCount - 1;
@@ -218,18 +218,18 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 			int* dlEntry = (int*)(*(int*)((u8*)work->m_displayListArrays + arrayOffset) + dlIdx * 4);
 			for (; dlIdx >= 0; dlIdx = dlIdx - 1, dlInfo = dlInfo + 3) {
 				int dlPair = (int)pppMemAlloc(
-				    8, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppChangeTex_cpp), 0x18B);
+				    8, ppvEnv->m_stagePtr, const_cast<char*>(s_pppChangeTex_cpp), 0x18B);
 				*dlEntry = dlPair;
 				*(int*)(*dlEntry + 4) = *dlInfo;
 				*(int*)*dlEntry = (int)pppMemAlloc(
-				    *dlInfo, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppChangeTex_cpp), 0x18D);
+				    *dlInfo, ppvEnv->m_stagePtr, const_cast<char*>(s_pppChangeTex_cpp), 0x18D);
 				memcpy(*(void**)*dlEntry, (void*)dlInfo[1], dlInfo[0]);
 				gUtil.ReWriteDisplayList(*(void**)*dlEntry, (unsigned long)dlInfo[0], 1);
 				dlEntry = dlEntry - 1;
 			}
 
 			*meshColorArrays = (int)pppMemAlloc(
-			    meshList->m_data->m_vertexCount << 2, pppEnvStPtr->m_stagePtr,
+			    meshList->m_data->m_vertexCount << 2, ppvEnv->m_stagePtr,
 			    const_cast<char*>(s_pppChangeTex_cpp), 0x196);
 			memset((void*)*meshColorArrays, 0, meshList->m_data->m_vertexCount << 2);
 
@@ -407,7 +407,7 @@ void pppConstructChangeTex(pppChangeTex* changeTex, pppChangeTexUnkC* data)
 	work->m_value2 = init;
 	work->m_value1 = init;
 	work->m_charaObj = 0;
-	work->m_context = pppMngStPtr;
+	work->m_context = ppvMng;
 	work->m_texture = 0;
 	work->m_meshColorArrays = 0;
 	work->m_displayListArrays = 0;

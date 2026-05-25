@@ -85,7 +85,7 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 	if (param_2->m_dataValIndex != 0xFFFF) {
 		YmDeformationShpColorInfo* colorInfo =
 			PppWorkArea<YmDeformationShpColorInfo>(pppYmDeformationShp_, param_3, 1);
-		_pppEnvStYmDeformationShp* env = (_pppEnvStYmDeformationShp*)pppEnvStPtr;
+		_pppEnvStYmDeformationShp* env = (_pppEnvStYmDeformationShp*)ppvEnv;
 		int textureBase =
 			reinterpret_cast<int>(env->m_mapMeshPtr[param_2->m_dataValIndex]->GetTexture(env->m_materialSetPtr, textureIndex));
 

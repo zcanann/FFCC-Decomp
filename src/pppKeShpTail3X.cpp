@@ -226,7 +226,7 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* p
     colorStepB = colorStep.z;
     colorStepA = colorStep.w;
 
-    shapeTable = *(long***)(*(u32*)&pppEnvStPtr->m_particleColors[0] + dataValIndex * 4);
+    shapeTable = *(long***)(*(u32*)&ppvEnv->m_particleColors[0] + dataValIndex * 4);
     shapeData = (u8*)*shapeTable;
 
     pppCopyMatrix(localBase, obj->pppPObject.m_localMatrix);
@@ -234,7 +234,7 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* p
 
     shapeScale = (float)step->m_stepValue;
     shapeScaleStep = (shapeScale - (float)step->m_arg3) / invCountMinusOne;
-    trailStep = step->m_stepDistance * pppMngStPtr->m_scale.x;
+    trailStep = step->m_stepDistance * ppvMng->m_scale.x;
     trailStepDelta = trailStep * (shapeScaleStep / shapeScale);
     if (trailStep == zero) {
         count = 0;
@@ -291,9 +291,9 @@ draw_loop:
 
     if (step->m_worldSpaceMode == 0) {
         PSMTXScaleApply(obj->pppPObject.m_localMatrix.value, obj->field_0x40.value,
-                        localBase.value[0][0] * (drawScale * pppMngStPtr->m_scale.x),
-                        localBase.value[1][1] * (drawScale * pppMngStPtr->m_scale.y),
-                        localBase.value[2][2] * (drawScale * pppMngStPtr->m_scale.z));
+                        localBase.value[0][0] * (drawScale * ppvMng->m_scale.x),
+                        localBase.value[1][1] * (drawScale * ppvMng->m_scale.y),
+                        localBase.value[2][2] * (drawScale * ppvMng->m_scale.z));
         if ((step->m_rotateEnabled != 0) && (count != 0)) {
             PSMTXRotRad(rotMtx.value, 'z', kPppKeShpTail3XDegToRad * (float)work->m_angles[count]);
             tmpMtx = obj->field_0x40;
@@ -303,9 +303,9 @@ draw_loop:
         PSMTXCopy(obj->field_0x40.value, drawMtx.value);
     } else if (step->m_worldSpaceMode == 1) {
         pppUnitMatrix(drawMtx);
-        drawMtx.value[0][0] = drawScale * (localBase.value[0][0] * pppMngStPtr->m_scale.x);
-        drawMtx.value[1][1] = drawScale * (localBase.value[1][1] * pppMngStPtr->m_scale.y);
-        drawMtx.value[2][2] = drawScale * (localBase.value[2][2] * pppMngStPtr->m_scale.z);
+        drawMtx.value[0][0] = drawScale * (localBase.value[0][0] * ppvMng->m_scale.x);
+        drawMtx.value[1][1] = drawScale * (localBase.value[1][1] * ppvMng->m_scale.y);
+        drawMtx.value[2][2] = drawScale * (localBase.value[2][2] * ppvMng->m_scale.z);
         if ((step->m_rotateEnabled != 0) && (count != 0)) {
             PSMTXRotRad(rotMtx.value, 'z', kPppKeShpTail3XDegToRad * (float)work->m_angles[count]);
             tmpMtx = drawMtx;
@@ -335,7 +335,7 @@ draw_loop:
     }
 
     pppSetBlendMode(step->m_blendMode);
-    pppDrawShp(reinterpret_cast<tagOAN3_SHAPE*>(shapeEntry), pppEnvStPtr->m_materialSetPtr, step->m_blendMode);
+    pppDrawShp(reinterpret_cast<tagOAN3_SHAPE*>(shapeEntry), ppvEnv->m_materialSetPtr, step->m_blendMode);
 
 update_step:
     count--;
@@ -429,7 +429,7 @@ void pppKeShpTail3X(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* param
             initPos.y = obj->pppPObject.m_localMatrix.value[1][3];
             initPos.z = obj->pppPObject.m_localMatrix.value[2][3];
         } else if (step->m_worldSpaceMode == 1) {
-            pppMulMatrix(outMatrix, pppMngStPtr->m_matrix, obj->pppPObject.m_localMatrix);
+            pppMulMatrix(outMatrix, ppvMng->m_matrix, obj->pppPObject.m_localMatrix);
             initPos.x = outMatrix.value[0][3];
             initPos.y = outMatrix.value[1][3];
             initPos.z = outMatrix.value[2][3];
@@ -455,7 +455,7 @@ void pppKeShpTail3X(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* param
         pos.y = obj->pppPObject.m_localMatrix.value[1][3];
         pos.z = obj->pppPObject.m_localMatrix.value[2][3];
     } else if (step->m_worldSpaceMode == 1) {
-        pppMulMatrix(outMatrix, pppMngStPtr->m_matrix, obj->pppPObject.m_localMatrix);
+        pppMulMatrix(outMatrix, ppvMng->m_matrix, obj->pppPObject.m_localMatrix);
         pos.x = outMatrix.value[0][3];
         pos.y = outMatrix.value[1][3];
         pos.z = outMatrix.value[2][3];

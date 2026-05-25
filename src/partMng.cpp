@@ -21,9 +21,9 @@
 #include "ffcc/pppShape.h"
 #include "ffcc/linkage.h"
 extern "C" {
-extern float gPartScreenMatrixRow2X;
-extern float gPartScreenMatrixRow2Y;
-extern float gPartScreenMatrixRow2W;
+extern float ppvScreenMatrixXbuff;
+extern float ppvScreenMatrixYbuff;
+extern float ppvScreenMatrixZbuff;
 extern int gPppHeapUseRateWords[3];
 }
 #include "ffcc/stopwatch.h"
@@ -266,7 +266,7 @@ void CPartMng::Create()
         pppCreateHeap(env, 0xC0000);
     }
 
-    pppEnvStPtr = env;
+    ppvEnv = env;
     DAT_8032ed7c = 0;
 
     PSMTXIdentity(ppvUnitMatrix);
@@ -456,7 +456,7 @@ void CPartMng::pppDumpMngSt()
         if (mng->m_prioTime != -0x1000 && System.m_execParam != 0) {
             int kind = static_cast<int>(mng->m_kind);
             int heapGroup = (mng->m_heapGroupRef + 0x2D) / 0x158;
-            int heapSize = pppEnvStPtr->m_stagePtr->heapWalker(0, 0, static_cast<unsigned long>(heapGroup));
+            int heapSize = ppvEnv->m_stagePtr->heapWalker(0, 0, static_cast<unsigned long>(heapGroup));
 
             System.Printf(
                 const_cast<char*>(s_prioTime__d_prio__d_heapSize__d_p_801d8454), mng->m_prioTime,
@@ -467,7 +467,7 @@ void CPartMng::pppDumpMngSt()
         mng = reinterpret_cast<PppMngStDumpRaw*>(reinterpret_cast<unsigned char*>(mng) + 0x158);
     }
 
-    pppEnvStPtr->m_stagePtr->heapInfo(heapTotal, heapUse, heapFree);
+    ppvEnv->m_stagePtr->heapInfo(heapTotal, heapUse, heapFree);
 
     if (System.m_execParam != 0) {
         System.Printf(
@@ -547,7 +547,7 @@ void CPartMng::pppReleasePdt(int pdtSlotIndex)
     m_materialSet->ReleaseTag(m_textureSet, pdtSlotIndex, &ppvAmemCacheSet);
     Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x13a);
 
-    pppEnvStPtr = reinterpret_cast<_pppEnvSt*>(pdtSlot->m_envFields);
+    ppvEnv = reinterpret_cast<_pppEnvSt*>(pdtSlot->m_envFields);
     PppMngStRaw* pppMngSt = reinterpret_cast<PppMngStRaw*>(self + 0x1d4);
     for (int i = 0; i < 0x180; i++) {
         if (pppMngSt[i].m_pppResSet == pdtSlot) {
@@ -971,7 +971,7 @@ void CPartMng::setProcSpeed(ProcSpdSt*, int)
  */
 void CPartMng::drawEnd()
 {
-    gPppHeapUseRateWords[0] = pppHeapCheckLeak__FPQ27CMemory6CStage2(pppEnvStPtr->m_stagePtr);
+    gPppHeapUseRateWords[0] = pppHeapCheckLeak__FPQ27CMemory6CStage2(ppvEnv->m_stagePtr);
     int heapCheckCount = gPppHeapUseRateWords[2];
     gPppHeapUseRateWords[2] = heapCheckCount - 1;
     if ((heapCheckCount == 0) || (gPppHeapUseRateWords[0] > gPppHeapUseRateWords[1])) {
@@ -2022,9 +2022,9 @@ void CPartMng::pppEditBeforeCalc()
 
         PSMTXCopy(reinterpret_cast<float(*)[4]>(self + 0x40), ppvCameraMatrix);
         C_MTXPerspective(ppvScreenMatrix, FLOAT_8032fe4c, FLOAT_8032fe50, FLOAT_8032fe54, FLOAT_8032fe58);
-        gPartScreenMatrixRow2X = ppvScreenMatrix[2][0];
-        gPartScreenMatrixRow2Y = ppvScreenMatrix[2][1];
-        gPartScreenMatrixRow2W = ppvScreenMatrix[2][3];
+        ppvScreenMatrixXbuff = ppvScreenMatrix[2][0];
+        ppvScreenMatrixYbuff = ppvScreenMatrix[2][1];
+        ppvScreenMatrixZbuff = ppvScreenMatrix[2][3];
         PSMTXCopy(ppvCameraMatrix, ppvCameraMatrix0);
         PSMTX44Copy(ppvScreenMatrix, ppvScreenMatrix0);
 
@@ -2218,7 +2218,7 @@ void CPartMng::pppEditPartCalc()
     mng = reinterpret_cast<unsigned char*>(self + kPppMngOffset);
     for (int i = 0; i < loopCount; i++) {
         int baseTime = *reinterpret_cast<int*>(mng + 0x14);
-        pppMngStPtr = reinterpret_cast<_pppMngSt*>(mng);
+        ppvMng = reinterpret_cast<_pppMngSt*>(mng);
         if (baseTime == -0x1000) {
             mng += kPppMngStride;
             continue;
@@ -2242,7 +2242,7 @@ void CPartMng::pppEditPartCalc()
             }
         }
 
-        pppEnvStPtr = reinterpret_cast<_pppEnvSt*>(*reinterpret_cast<char**>(mng) + 4);
+        ppvEnv = reinterpret_cast<_pppEnvSt*>(*reinterpret_cast<char**>(mng) + 4);
         pppSetMatrix(reinterpret_cast<_pppMngSt*>(mng));
         pppSetFpMatrix(reinterpret_cast<_pppMngSt*>(mng));
         _pppCalcPart(reinterpret_cast<_pppMngSt*>(mng));
@@ -2253,7 +2253,7 @@ void CPartMng::pppEditPartCalc()
             _pppAllFreePObject(reinterpret_cast<_pppMngSt*>(mng));
             Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), (editDrawMode < 4) ? 0x82b : 0x865);
             if (editDrawMode > 3) {
-                pppHeapCheckLeak(pppEnvStPtr->m_stagePtr);
+                pppHeapCheckLeak(ppvEnv->m_stagePtr);
             }
             if (i == 0) {
                 usbEdit[0x1A] = 1;
@@ -2347,17 +2347,17 @@ void CPartMng::pppEditDrawShadow()
                 if (shouldDraw) {
                     PSMTXMultVec(ppvCameraMatrix0, &partPos, &viewPos);
                     mng->m_sortDepth = viewPos.z;
-                    pppEnvStPtr = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<unsigned char*>(mng->m_pppResSet) + 4);
-                    pppMngStPtr = reinterpret_cast<_pppMngSt*>(mng);
-                    pppSetFpMatrix(pppMngStPtr);
-                    _pppDrawPart(pppMngStPtr);
+                    ppvEnv = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<unsigned char*>(mng->m_pppResSet) + 4);
+                    ppvMng = reinterpret_cast<_pppMngSt*>(mng);
+                    pppSetFpMatrix(ppvMng);
+                    _pppDrawPart(ppvMng);
                 }
             }
             mng++;
         }
     }
 
-    ppvScreenMatrix[2][3] = gPartScreenMatrixRow2W;
+    ppvScreenMatrix[2][3] = ppvScreenMatrixZbuff;
     GXSetProjection(ppvScreenMatrix, GX_PERSPECTIVE);
 }
 
@@ -2457,10 +2457,10 @@ void CPartMng::pppEditDraw()
                             PSMTXMultVec(ppvCameraMatrix0, &partPos, &viewPos);
                             *reinterpret_cast<float*>(mng + kSortDepthOffset) = viewPos.z;
 
-                            pppMngStPtr = reinterpret_cast<_pppMngSt*>(mng);
-                            pppEnvStPtr = reinterpret_cast<_pppEnvSt*>(*reinterpret_cast<char**>(mng) + 4);
-                            pppSetFpMatrix(pppMngStPtr);
-                            _pppDrawPart(pppMngStPtr);
+                            ppvMng = reinterpret_cast<_pppMngSt*>(mng);
+                            ppvEnv = reinterpret_cast<_pppEnvSt*>(*reinterpret_cast<char**>(mng) + 4);
+                            pppSetFpMatrix(ppvMng);
+                            _pppDrawPart(ppvMng);
                         }
                     }
 
@@ -2472,7 +2472,7 @@ void CPartMng::pppEditDraw()
             int editCount = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + kEditCountOffset);
             for (int i = 0; i < editCount; i++) {
                 int baseTime = *reinterpret_cast<int*>(mng + kBaseTimeOffset);
-                pppMngStPtr = reinterpret_cast<_pppMngSt*>(mng);
+                ppvMng = reinterpret_cast<_pppMngSt*>(mng);
                 if (baseTime != -0x1000 && baseTime < 0) {
                     partPos.x = *reinterpret_cast<float*>(mng + kMatrixOffset + 0xc);
                     partPos.y = *reinterpret_cast<float*>(mng + kMatrixOffset + 0x1c);
@@ -2496,7 +2496,7 @@ void CPartMng::pppEditDraw()
         render3Dcursor();
     }
 
-    ppvScreenMatrix[2][3] = gPartScreenMatrixRow2W;
+    ppvScreenMatrix[2][3] = ppvScreenMatrixZbuff;
     GXSetProjection(ppvScreenMatrix, GX_PERSPECTIVE);
 }
 
@@ -2578,10 +2578,10 @@ void CPartMng::pppEditPartDrawAfter()
                             PSMTXMultVec(ppvCameraMatrix0, &partPos, &viewPos);
                             *reinterpret_cast<float*>(mng + kSortDepthOffset) = viewPos.z;
 
-                            pppMngStPtr = reinterpret_cast<_pppMngSt*>(mng);
-                            pppEnvStPtr = reinterpret_cast<_pppEnvSt*>(*reinterpret_cast<char**>(mng) + 4);
-                            pppSetFpMatrix(pppMngStPtr);
-                            _pppDrawPart(pppMngStPtr);
+                            ppvMng = reinterpret_cast<_pppMngSt*>(mng);
+                            ppvEnv = reinterpret_cast<_pppEnvSt*>(*reinterpret_cast<char**>(mng) + 4);
+                            pppSetFpMatrix(ppvMng);
+                            _pppDrawPart(ppvMng);
                         }
                     }
                     mng += kPppMngStride;
@@ -2590,7 +2590,7 @@ void CPartMng::pppEditPartDrawAfter()
         }
     }
 
-    gPppHeapUseRateWords[0] = pppHeapCheckLeak__FPQ27CMemory6CStage2(pppEnvStPtr->m_stagePtr);
+    gPppHeapUseRateWords[0] = pppHeapCheckLeak__FPQ27CMemory6CStage2(ppvEnv->m_stagePtr);
     if (gPppHeapUseRateWords[2] == 0
         || (--gPppHeapUseRateWords[2], gPppHeapUseRateWords[1] < gPppHeapUseRateWords[0])) {
         gPppHeapUseRateWords[2] = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + kHeapCheckIntervalOffset) << 1;
@@ -2625,9 +2625,9 @@ void CPartMng::pppSetRendMatrix()
 {
     PSMTX44Copy(CameraPcs.m_screenMatrix, ppvScreenMatrix);
     PSMTXCopy(CameraPcs.m_cameraMatrix, ppvCameraMatrix);
-    gPartScreenMatrixRow2X = ppvScreenMatrix[2][0];
-    gPartScreenMatrixRow2Y = ppvScreenMatrix[2][1];
-    gPartScreenMatrixRow2W = ppvScreenMatrix[2][3];
+    ppvScreenMatrixXbuff = ppvScreenMatrix[2][0];
+    ppvScreenMatrixYbuff = ppvScreenMatrix[2][1];
+    ppvScreenMatrixZbuff = ppvScreenMatrix[2][3];
 }
 
 /*
@@ -2700,8 +2700,8 @@ void CPartMng::pppDumpCacheIdx()
     for (int i = 0; i < 0x180; i++) {
         if ((Game.m_gameWork.m_gamePaused == 0 || (mng->m_drawVariant > 5 && mng->m_drawVariant < 8)) &&
             mng->m_baseTime != -0x1000 && mng->m_endRequested == 0) {
-            pppMngStPtr = reinterpret_cast<_pppMngSt*>(mng);
-            pppEnvStPtr = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<unsigned char*>(mng->m_pppResSet) + 4);
+            ppvMng = reinterpret_cast<_pppMngSt*>(mng);
+            ppvEnv = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<unsigned char*>(mng->m_pppResSet) + 4);
 
             if (mng->m_baseTime >= 0) {
                 mng->m_baseTime--;
@@ -2836,10 +2836,10 @@ void CPartMng::pppDrawPrio(unsigned char drawMode)
             if (shouldDraw) {
                 PSMTXMultVec(ppvCameraMatrix0, &partPos, &viewPos);
                 mng->m_sortDepth = viewPos.z;
-                pppEnvStPtr = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<unsigned char*>(mng->m_pppResSet) + 4);
-                pppMngStPtr = reinterpret_cast<_pppMngSt*>(mng);
-                pppSetFpMatrix(pppMngStPtr);
-                _pppDrawPart(pppMngStPtr);
+                ppvEnv = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<unsigned char*>(mng->m_pppResSet) + 4);
+                ppvMng = reinterpret_cast<_pppMngSt*>(mng);
+                pppSetFpMatrix(ppvMng);
+                _pppDrawPart(ppvMng);
             }
         }
         mng++;
@@ -2920,7 +2920,7 @@ void CPartMng::pppDrawPrioPdtFpno(unsigned char drawMode, short kind, short node
     partPos.x = mng->m_matrix.value[0][3];
     partPos.y = mng->m_matrix.value[1][3];
     partPos.z = mng->m_matrix.value[2][3];
-    pppMngStPtr = reinterpret_cast<_pppMngSt*>(mng);
+    ppvMng = reinterpret_cast<_pppMngSt*>(mng);
 
     if ((double)mng->m_cullRadiusSq != 0.0) {
         CBound bound;
@@ -2941,10 +2941,10 @@ void CPartMng::pppDrawPrioPdtFpno(unsigned char drawMode, short kind, short node
 
     PSMTXMultVec(ppvCameraMatrix0, &partPos, &viewPos);
     mng->m_sortDepth = viewPos.z;
-    pppEnvStPtr = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<unsigned char*>(mng->m_pppResSet) + 4);
-    pppMngStPtr = reinterpret_cast<_pppMngSt*>(mng);
-    pppSetFpMatrix(pppMngStPtr);
-    _pppDrawPart(pppMngStPtr);
+    ppvEnv = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<unsigned char*>(mng->m_pppResSet) + 4);
+    ppvMng = reinterpret_cast<_pppMngSt*>(mng);
+    pppSetFpMatrix(ppvMng);
+    _pppDrawPart(ppvMng);
 }
 
 /*
@@ -2999,7 +2999,7 @@ void CPartMng::pppDrawIdx(int partIndex)
     partPos.x = mng->m_matrix.value[0][3];
     partPos.y = mng->m_matrix.value[1][3];
     partPos.z = mng->m_matrix.value[2][3];
-    pppMngStPtr = reinterpret_cast<_pppMngSt*>(mng);
+    ppvMng = reinterpret_cast<_pppMngSt*>(mng);
 
     if ((double)mng->m_cullRadiusSq != 0.0) {
         PSVECSubtract(&cameraPos, &partPos, &cameraDelta);
@@ -3019,8 +3019,8 @@ void CPartMng::pppDrawIdx(int partIndex)
 
     PSMTXMultVec(ppvCameraMatrix, &partPos, &viewPos);
     mng->m_sortDepth = viewPos.z;
-    pppEnvStPtr = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<unsigned char*>(mng->m_pppResSet) + 4);
-    pppMngStPtr = reinterpret_cast<_pppMngSt*>(mng);
+    ppvEnv = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<unsigned char*>(mng->m_pppResSet) + 4);
+    ppvMng = reinterpret_cast<_pppMngSt*>(mng);
     pppSetFpMatrix(reinterpret_cast<_pppMngSt*>(mng));
     _pppDrawPart(reinterpret_cast<_pppMngSt*>(mng));
 }
@@ -3193,16 +3193,16 @@ void CPartMng::pppPartDrawAfter()
             if (shouldDraw) {
                 PSMTXMultVec(ppvCameraMatrix0, &partPos, &viewPos);
                 mng->m_sortDepth = viewPos.z;
-                pppEnvStPtr = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<unsigned char*>(mng->m_pppResSet) + 4);
-                pppMngStPtr = reinterpret_cast<_pppMngSt*>(mng);
-                pppSetFpMatrix(pppMngStPtr);
-                _pppDrawPart(pppMngStPtr);
+                ppvEnv = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<unsigned char*>(mng->m_pppResSet) + 4);
+                ppvMng = reinterpret_cast<_pppMngSt*>(mng);
+                pppSetFpMatrix(ppvMng);
+                _pppDrawPart(ppvMng);
             }
         }
         mng++;
     }
 
-    gPppHeapUseRateWords[0] = pppHeapCheckLeak__FPQ27CMemory6CStage2(pppEnvStPtr->m_stagePtr);
+    gPppHeapUseRateWords[0] = pppHeapCheckLeak__FPQ27CMemory6CStage2(ppvEnv->m_stagePtr);
     if ((gPppHeapUseRateWords[2] == 0)
         || ((gPppHeapUseRateWords[2] = gPppHeapUseRateWords[2] - 1), gPppHeapUseRateWords[1] < gPppHeapUseRateWords[0])) {
         gPppHeapUseRateWords[2] = *(int*)((char*)this + 0x16C) << 1;
@@ -3230,8 +3230,8 @@ void CPartMng::pppPartDead()
         if (baseTime != -0x1000 && baseTime < 0) {
             unsigned char isFinished = *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(pppMngSt) + 0xE6);
             if (isFinished != 0 || *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(pppMngSt) + 0xE8) != 0) {
-                pppEnvStPtr = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<char*>(pppMngSt->m_pppResSet) + 4);
-                pppMngStPtr = pppMngSt;
+                ppvEnv = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<char*>(pppMngSt->m_pppResSet) + 4);
+                ppvMng = pppMngSt;
                 _pppAllFreePObject(pppMngSt);
             }
         }
@@ -3726,10 +3726,10 @@ int CPartMng::pppLoadPdt(const char* baseName, int pdtSlotIndex, int cachePriori
                         memcpy(copiedHead, sourceHead, copySize);
                     }
 
-                    pppEnvStPtr = reinterpret_cast<_pppEnvSt*>(pdtSlot->m_envFields);
+                    ppvEnv = reinterpret_cast<_pppEnvSt*>(pdtSlot->m_envFields);
                     pdtSlot->m_envFields[0] = reinterpret_cast<unsigned int>(stageLoad);
-                    pdtSlot->m_envFields[1] = pppEnvStPtr != 0
-                                                  ? reinterpret_cast<unsigned int>(pppEnvStPtr->m_materialSetPtr)
+                    pdtSlot->m_envFields[1] = ppvEnv != 0
+                                                  ? reinterpret_cast<unsigned int>(ppvEnv->m_materialSetPtr)
                                                   : 0;
 
                     if (copiedHead != 0) {

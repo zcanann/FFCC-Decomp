@@ -42,7 +42,7 @@ void pppDestructConstrainCameraForLoc(pppConstrainCameraForLoc* constrainCameraF
 
 	if (gPppCalcDisabled == 0) {
 		value = GetConstrainCameraWork(constrainCameraForLoc, data);
-		CGObject* obj = reinterpret_cast<CGObject*>(pppMngStPtr->m_owner);
+		CGObject* obj = reinterpret_cast<CGObject*>(ppvMng->m_owner);
 		model = GetModelPtr(obj);
 		model->SetCallbackContext(value, params);
 		model->m_beforeCalcMatrixCallback = CC_BeforeCalcMatrixCallback;
@@ -59,7 +59,7 @@ void pppDestructConstrainCameraForLoc(pppConstrainCameraForLoc* constrainCameraF
  */
 void pppConstructConstrainCameraForLoc(_pppPObjLink*, _pppCtrlTable*)
 {
-	CGObject* obj = reinterpret_cast<CGObject*>(pppMngStPtr->m_owner);
+	CGObject* obj = reinterpret_cast<CGObject*>(ppvMng->m_owner);
 	CChara::CModel* model = GetModelPtr(obj);
 	model->m_beforeCalcMatrixCallback = 0;
 }

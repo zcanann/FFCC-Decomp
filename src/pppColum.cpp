@@ -125,10 +125,10 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
 
     if (param_2->m_dataValIndex != 0xFFFF) {
         pppShapeSt* shapeSt =
-            *(pppShapeSt**)(*(int*)&pppEnvStPtr->m_particleColors[0] + param_2->m_dataValIndex * 4);
+            *(pppShapeSt**)(*(int*)&ppvEnv->m_particleColors[0] + param_2->m_dataValIndex * 4);
         CTexture* texture;
 
-        texture = shapeSt->GetTexture((long*)shapeSt->m_animData, pppEnvStPtr->m_materialSetPtr, textureIndex);
+        texture = shapeSt->GetTexture((long*)shapeSt->m_animData, ppvEnv->m_materialSetPtr, textureIndex);
         if (positionWork->m_alpha != 0) {
             Vec cameraDelta;
             Vec center;
@@ -268,7 +268,7 @@ void pppFrameColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param_
         work = (pppColumFrameWork*)((char*)column + 0x80 + serializedDataOffsets[3]);
         if (work->m_values == 0) {
             work->m_values = (pppColumValue*)pppMemAlloc(
-                (unsigned long)param_2->m_count * 0xc, pppEnvStPtr->m_stagePtr,
+                (unsigned long)param_2->m_count * 0xc, ppvEnv->m_stagePtr,
                 const_cast<char*>(s_pppColum_cpp), 0x7d);
 
             values = work->m_values;
@@ -286,7 +286,7 @@ void pppFrameColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param_
 
         if (param_2->m_dataValIndex != 0xFFFF) {
             long* animData =
-                **(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + param_2->m_dataValIndex * 4);
+                **(long***)(*(int*)&ppvEnv->m_particleColors[0] + param_2->m_dataValIndex * 4);
             pppCalcFrameShape(
                 animData,
                 work->m_shapeA, work->m_shapeB, work->m_shapeC, param_2->m_initWOrk);

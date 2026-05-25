@@ -299,7 +299,7 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
         return;
     }
 
-    model = reinterpret_cast<pppModelSt*>(pppEnvStPtr->m_mapMeshPtr[pBreathModel->m_stepValue]);
+    model = reinterpret_cast<pppModelSt*>(ppvEnv->m_mapMeshPtr[pBreathModel->m_stepValue]);
     pppInitBlendMode();
     pppSetBlendMode(pBreathModel->m_blendMode);
     _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
@@ -320,9 +320,9 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
             int b;
             int a;
 
-            PSMTXScale(drawMtx, pppMngStPtr->m_scale.x * particleData->m_rotationX,
-                       pppMngStPtr->m_scale.y * particleData->m_rotationY,
-                       pppMngStPtr->m_scale.z * particleData->m_rotationZ);
+            PSMTXScale(drawMtx, ppvMng->m_scale.x * particleData->m_rotationX,
+                       ppvMng->m_scale.y * particleData->m_rotationY,
+                       ppvMng->m_scale.z * particleData->m_rotationZ);
             PSMTXConcat(particleData->m_modelMtx, drawMtx, tempMtx);
             PSMTXConcat(ppvCameraMatrix, tempMtx, tempMtx);
             PSMTXConcat(ppvCameraMatrix, particleData->m_modelMtx, cameraMtx);
@@ -491,7 +491,7 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
     _pppPObject* object = reinterpret_cast<_pppPObject*>(breathModel);
 
     dataOffsets = offsets->m_serializedDataOffsets;
-    mngSt = pppMngStPtr;
+    mngSt = ppvMng;
     colorOffset = dataOffsets[1];
     work = reinterpret_cast<VBreathModel*>(reinterpret_cast<unsigned char*>(breathModel) + 0x80 + dataOffsets[0]);
     color = (VColor*)(reinterpret_cast<unsigned char*>(breathModel) + 0x80 + colorOffset);
@@ -505,21 +505,21 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
         work->m_groupCount = pBreathModel->m_groupCount;
 
         work->m_particleData =
-            (PARTICLE_DATA*)pppMemAlloc((unsigned long)(work->m_particleCount * sizeof(PARTICLE_DATA)), pppEnvStPtr->m_stagePtr,
+            (PARTICLE_DATA*)pppMemAlloc((unsigned long)(work->m_particleCount * sizeof(PARTICLE_DATA)), ppvEnv->m_stagePtr,
                                                   const_cast<char*>(s_pppBreathModel_cpp), 0x257);
         if (work->m_particleData != NULL) {
             memset(work->m_particleData, 0, (unsigned long)(work->m_particleCount * sizeof(PARTICLE_DATA)));
         }
 
         work->m_particleWmats =
-            (PARTICLE_WMAT*)pppMemAlloc((unsigned long)(work->m_particleCount * sizeof(PARTICLE_WMAT)), pppEnvStPtr->m_stagePtr,
+            (PARTICLE_WMAT*)pppMemAlloc((unsigned long)(work->m_particleCount * sizeof(PARTICLE_WMAT)), ppvEnv->m_stagePtr,
                                                   const_cast<char*>(s_pppBreathModel_cpp), 0x25d);
         if (work->m_particleWmats != NULL) {
             memset(work->m_particleWmats, 0, (unsigned long)(work->m_particleCount * sizeof(PARTICLE_WMAT)));
         }
 
         work->m_particleColors =
-            (PARTICLE_COLOR*)pppMemAlloc((unsigned long)(work->m_particleCount * sizeof(PARTICLE_COLOR)), pppEnvStPtr->m_stagePtr,
+            (PARTICLE_COLOR*)pppMemAlloc((unsigned long)(work->m_particleCount * sizeof(PARTICLE_COLOR)), ppvEnv->m_stagePtr,
                                                   const_cast<char*>(s_pppBreathModel_cpp), 0x263);
         if (work->m_particleColors != NULL) {
             memset(work->m_particleColors, 0, (unsigned long)(work->m_particleCount * sizeof(PARTICLE_COLOR)));
@@ -528,7 +528,7 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
         work->m_groups =
             (BreathParticleGroup*)pppMemAlloc(
                 (unsigned long)((int)pBreathModel->m_groupCount * sizeof(BreathParticleGroup)),
-                pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppBreathModel_cpp), 0x269);
+                ppvEnv->m_stagePtr, const_cast<char*>(s_pppBreathModel_cpp), 0x269);
         if (work->m_groups != NULL) {
             memset(work->m_groups, 0, (unsigned long)((int)pBreathModel->m_groupCount * sizeof(BreathParticleGroup)));
 
@@ -536,12 +536,12 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
             for (i = 0; i < (int)pBreathModel->m_groupCount; i++) {
                 groupTable->particleIndices = (signed char*)pppMemAlloc(
                     (unsigned long)pBreathModel->m_slotCount,
-                    pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppBreathModel_cpp), 0x274);
+                    ppvEnv->m_stagePtr, const_cast<char*>(s_pppBreathModel_cpp), 0x274);
                 memset(groupTable->particleIndices, -1, (unsigned long)pBreathModel->m_slotCount);
 
                 groupTable->particleStates = (signed char*)pppMemAlloc(
                     (unsigned long)pBreathModel->m_slotCount,
-                    pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppBreathModel_cpp), 0x277);
+                    ppvEnv->m_stagePtr, const_cast<char*>(s_pppBreathModel_cpp), 0x277);
                 memset(groupTable->particleStates, -1, (unsigned long)pBreathModel->m_slotCount);
                 groupTable->active = 0;
                 groupTable++;
@@ -554,7 +554,7 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
         PSVECNormalize(&work->m_direction, &work->m_direction);
     }
 
-    PSMTXCopy(pppMngStPtr->m_matrix.value, work->m_matrix);
+    PSMTXCopy(ppvMng->m_matrix.value, work->m_matrix);
     UpdateAllParticle(reinterpret_cast<_pppPObject*>(breathModel), work, pBreathModel, color);
 
     particleWMat = reinterpret_cast<Mtx*>(work->m_particleWmats);
@@ -755,7 +755,7 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
                 groupData->position.z = 0.0f;
                 groupData->position.y = 0.0f;
                 groupData->position.x = 0.0f;
-                PSMTXCopy(pppMngStPtr->m_matrix.value, groupData->matrix);
+                PSMTXCopy(ppvMng->m_matrix.value, groupData->matrix);
                 groupData->active = 1;
             }
             groupData += 1;

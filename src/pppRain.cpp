@@ -70,9 +70,9 @@ void pppRenderRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_D
 
     work = (RainWork*)((u8*)pppRain + workOffset);
     drop = work->drops;
-    baseX = pppMngStPtr->m_matrix.value[0][3];
-    baseY = pppMngStPtr->m_matrix.value[1][3];
-    baseZ = pppMngStPtr->m_matrix.value[2][3];
+    baseX = ppvMng->m_matrix.value[0][3];
+    baseY = ppvMng->m_matrix.value[1][3];
+    baseZ = ppvMng->m_matrix.value[2][3];
     tex0 = kPppRainTexCoordBase;
     GXBegin((GXPrimitive)0xA8, GX_VTXFMT7, (u16)((param_2->m_dataValIndex & 0x7fff) << 1));
     tex0 = kPppRainTexCoordBase;
@@ -129,7 +129,7 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
 
         work->drops = (RainDrop*)pppMemAlloc(
             param_2->m_dataValIndex * sizeof(RainDrop),
-            pppEnvStPtr->m_stagePtr,
+            ppvEnv->m_stagePtr,
             const_cast<char*>(s_pppRain_cpp),
             0x7f);
         dropData = work->drops;
@@ -251,10 +251,10 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
             posY = CameraPcs.m_targetY;
             posZ = CameraPcs.m_targetZ;
         }
-        pppMngStPtr->m_matrix.value[0][3] = posX;
-        pppMngStPtr->m_matrix.value[1][3] = posY;
-        pppMngStPtr->m_matrix.value[2][3] = posZ;
-        pppSetFpMatrix(pppMngStPtr);
+        ppvMng->m_matrix.value[0][3] = posX;
+        ppvMng->m_matrix.value[1][3] = posY;
+        ppvMng->m_matrix.value[2][3] = posZ;
+        pppSetFpMatrix(ppvMng);
     }
 }
 

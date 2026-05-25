@@ -43,11 +43,11 @@ void pppPointApMtx(_pppPObject* pObject, void* step, _pppCtrlTable* ctrlTable)
 			return;
 		}
 
-		objectData = pppMngStPtr->m_pppPDataVals + objectId;
+		objectData = ppvMng->m_pppPDataVals + objectId;
 		if (objectData == 0) {
 			object = 0;
 		} else {
-			object = (_pppPObject*)pppCreatePObject(pppMngStPtr, objectData);
+			object = (_pppPObject*)pppCreatePObject(ppvMng, objectData);
 			*(_pppPObject**)((u8*)object + 4) = pObject;
 		}
 
@@ -58,8 +58,8 @@ void pppPointApMtx(_pppPObject* pObject, void* step, _pppCtrlTable* ctrlTable)
 			(*matrix)[1][3] = source->x;
 			(*matrix)[2][3] = source->x;
 		} else {
-			PSMTXCopy(pppMngStPtr->m_matrix.value, *matrix);
-			PSMTXMultVec(pppMngStPtr->m_matrix.value, source, &pos);
+			PSMTXCopy(ppvMng->m_matrix.value, *matrix);
+			PSMTXMultVec(ppvMng->m_matrix.value, source, &pos);
 			(*matrix)[0][3] = pos.x;
 			(*matrix)[1][3] = pos.y;
 			(*matrix)[2][3] = pos.z;

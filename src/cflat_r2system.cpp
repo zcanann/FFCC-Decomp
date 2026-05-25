@@ -2964,9 +2964,12 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         GraphicPcs.m_dofFlag = enabled;
         GraphicPcs.SetDOFParameter(
             static_cast<signed char>(static_cast<char>(*object->m_localBase) - 1),
-            static_cast<signed char>(object->m_localBase[1]), static_cast<float>(object->m_localBase[2]),
-            static_cast<float>(object->m_localBase[3]), static_cast<float>(object->m_localBase[4]),
-            static_cast<float>(object->m_localBase[5]), static_cast<float>(object->m_localBase[6]),
+            static_cast<signed char>(object->m_localBase[1]),
+            *reinterpret_cast<float*>(object->m_localBase + 2),
+            *reinterpret_cast<float*>(object->m_localBase + 3),
+            *reinterpret_cast<float*>(object->m_localBase + 4),
+            *reinterpret_cast<float*>(object->m_localBase + 5),
+            *reinterpret_cast<float*>(object->m_localBase + 6),
             object->m_localBase[7]);
         runtime->push(object, 0);
         outResult = 0;

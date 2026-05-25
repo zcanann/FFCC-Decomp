@@ -117,12 +117,13 @@ void CMapHit::Draw()
     GXSetVtxDesc(GX_VA_NRM, GX_DIRECT);
     GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
 
+    CMapIdGrp* mapIdGrps = MapMng.GetMapIdGrpArray();
     unsigned char* face = reinterpret_cast<unsigned char*>(m_faces);
     int faceIndex = 0;
     while (faceIndex < m_faceCount) {
-        if ((reinterpret_cast<CMapHitFace*>(face)->m_drawFlags & 1) == 0) {
-            const unsigned char groupIndex = face[0x47];
-            const CMapIdGrp* mapIdGrp = MapMng.GetMapIdGrpArray() + groupIndex;
+        CMapHitFace* hitFace = reinterpret_cast<CMapHitFace*>(face);
+        if ((hitFace->m_drawFlags & 1) == 0) {
+            const CMapIdGrp* mapIdGrp = mapIdGrps + hitFace->m_groupIndex;
             const GXColor colorABytes = *reinterpret_cast<const GXColor*>(&mapIdGrp->m_primaryColor);
             const GXColor colorBBytes = *reinterpret_cast<const GXColor*>(&mapIdGrp->m_secondaryColor);
 
@@ -609,6 +610,10 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
     }
 
     if (edgeIndex != -1 || g_hit_edge_t < kMapHitEdgeMinT || g_hit_t_min <= g_hit_edge_t) {
+        if (gMapHitDrawMode.m_byte != 0) {
+            g_hit_lpface->m_drawFlags = gMapHitDrawMode.m_byte;
+        }
+
         Vec previous = m_vertices[g_hit_lpface->m_vertexIndices[g_hit_lpface->m_vertexCount - 1]];
         for (int i = 0; i < static_cast<int>(g_hit_lpface->m_vertexCount); i++) {
             Vec current = m_vertices[g_hit_lpface->m_vertexIndices[i]];
@@ -641,7 +646,6 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
 
     g_hit_t = g_hit_edge_t;
     g_hit_t_min = g_hit_edge_t;
-    g_hit_edge_idx_min = edgeIndex;
     g_hit_f = g_hit_lpface;
     g_hit_cyl_min = g_hit_cyl;
     if (gMapHitDrawMode.m_byte != 0) {
@@ -650,6 +654,7 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
     g_hit_mvec_min = g_hit_mvec;
     g_hit_hpv_min = g_hit_hpv;
     gMapHitFaceFlag = 1;
+    g_hit_edge_idx_min = edgeIndex;
     return 1;
 }
 
@@ -881,14 +886,14 @@ int FindIntersection(const Vec& start, const Vec& direction, const CMapCylinder&
     const f32 axisLen = PSVECMag(&axis);
     PSVECScale(&axis, &axis, 1.0f / axisLen);
 
-    if (fabsf(axis.x) < fabsf(axis.y) || fabsf(axis.x) < fabsf(axis.z)) {
-        orthogonal.x = 0.0f;
-        orthogonal.y = axis.z;
-        orthogonal.z = -axis.y;
-    } else {
+    if (fabsf(axis.x) >= fabsf(axis.y) && fabsf(axis.x) >= fabsf(axis.z)) {
         orthogonal.x = -axis.y;
         orthogonal.y = axis.x;
         orthogonal.z = 0.0f;
+    } else {
+        orthogonal.x = 0.0f;
+        orthogonal.y = axis.z;
+        orthogonal.z = -axis.y;
     }
     PSVECNormalize(&orthogonal, &orthogonal);
 

@@ -22,8 +22,8 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
 extern unsigned char ARRAY_8030918c[];
-extern "C" const char s_monObjTexAnimU1[3];
-extern "C" const char s_monObjTexAnimU0[3];
+extern "C" const char s_monObjTexAnimU1[3] = "u1";
+extern "C" const char s_monObjTexAnimU0[3] = "u0";
 extern "C" {
 u8 m_aiWork__8CGMonObj[0xC];
 u8 m_boss__8CGMonObj[0x8C];

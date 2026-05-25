@@ -15,7 +15,7 @@ extern const f32 kPppYmLaserOne;
 #include <string.h>
 
 extern const f32 FLOAT_80330df0[2];
-extern const f32 FLOAT_80330de0;
+extern const f32 FLOAT_80330de0 = -1.0f;
 extern const f32 FLOAT_80330de4;
 extern const f32 FLOAT_80330de8;
 extern const f32 FLOAT_80330dec;
@@ -330,7 +330,6 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 	}
 }
 
-extern const f32 FLOAT_80330de0 = -1.0f;
 extern const f32 FLOAT_80330de4 = 1.2f;
 extern const f32 FLOAT_80330de8 = 10000000000.0f;
 extern const f32 FLOAT_80330dec = -10000000000.0f;

@@ -13,9 +13,11 @@ struct PYmMegaBirthShpTail2
     float m_speedRandRange;       // 0x54
     float field_0x58;             // 0x58
     Vec m_speedScale;             // 0x5c
-    unsigned char m_pad0x68[0x6a - 0x68];
-    short m_tail2PathIndex;       // 0x6a
-    unsigned char m_pad0x6c[0xb9 - 0x6c];
+    unsigned char m_randType;     // 0x68
+    unsigned char m_enableParticleColor; // 0x69
+    unsigned char m_pad0x6a[0x6c - 0x6a];
+    short m_tail2PathIndex;       // 0x6c
+    unsigned char m_pad0x6e[0xb9 - 0x6e];
     unsigned char m_tail2MatrixMode;  // 0xb9
 };
 

@@ -12,10 +12,14 @@ unsigned char g_tFont22[0x10D40] = {
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/math.h"
 #include <dolphin/mtx.h>
 
-extern "C" const float kFontZero;
-extern "C" const float kFontOne;
-extern "C" const float kFontOrthoHeight;
-extern "C" const float kFontOrthoWidth;
+extern "C" const float kFontZero = 0.0f;
+extern "C" const float kFontOne = 1.0f;
+extern "C" const float kFontOrthoHeight = 448.0f;
+extern "C" const float kFontOrthoWidth = 640.0f;
+extern "C" const unsigned int kYmTracerTopColorBase = 0xFFFFFF00;
+extern "C" const unsigned int kYmTracerBottomColorBase = 0xFFFFFF00;
+extern "C" const float FLOAT_803306e8 = 0.0f;
+extern "C" const float FLOAT_803306ec = 1.0f;
 
 extern "C" const char s_fontman_cpp[] = "fontman.cpp";
 static const char s_CFontMan[] = "CFontMan";

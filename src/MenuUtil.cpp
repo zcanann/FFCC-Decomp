@@ -1219,6 +1219,57 @@ void CMenuPcs::DrawOptionMenu()
 		DrawFont(static_cast<int>(FLOAT_80333628 - font->GetWidth(g_strMenuUtilMes[languageBase + 17])),
 		         static_cast<int>(FLOAT_80333618), color, 7, g_strMenuUtilMes[languageBase + 17],
 		         kOptionAnimMax, kOptionAnimMax);
+	} else if (m_optionIndex == 4) {
+		CTextureSet* textureSet = GetMenuTextureSet(this, 0xBC);
+		CTexture* cursorPanel = GetTextureSetTexture(textureSet, 4);
+		CTexture* modePanel = GetTextureSetTexture(textureSet, 7);
+		color.a = static_cast<unsigned char>(static_cast<int>(FLOAT_80333550 * m_optionColumnAnim));
+
+		for (int i = 0, y = 0, uvY = 0, modeU = 0x280; i < 4; i++, y += 0x28, uvY += 0x20, modeU += 0x40) {
+			if ((m_specialModeEdit != 0) && (m_specialModeCursor == i)) {
+				gUtil.CalcUV(uv0.x, uv0.y, cursorPanel->m_width - 0x30, 0, cursorPanel->m_width,
+				             cursorPanel->m_height);
+				gUtil.CalcUV(uv1.x, uv1.y, cursorPanel->m_width, 0x28, cursorPanel->m_width,
+				             cursorPanel->m_height);
+				gUtil.RenderTextureQuad(326.0f, 128.0f + static_cast<float>(y), 48.0f, FLOAT_80333588,
+				                        cursorPanel, &uv0, &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
+
+				gUtil.CalcUV(uv0.x, uv0.y, 0, 0x30, cursorPanel->m_width, cursorPanel->m_height);
+				gUtil.CalcUV(uv1.x, uv1.y, cursorPanel->m_width, cursorPanel->m_height, cursorPanel->m_width,
+				             cursorPanel->m_height);
+				gUtil.RenderTextureQuad(300.0f, 160.0f + static_cast<float>(y),
+				                        static_cast<float>(cursorPanel->m_width), FLOAT_80333624, cursorPanel,
+				                        &uv0, &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
+			}
+
+			gUtil.CalcUV(uv0.x, uv0.y, modePanel->m_width - 0x30, uvY, modePanel->m_width, modePanel->m_height);
+			gUtil.CalcUV(uv1.x, uv1.y, modePanel->m_width, uvY + 0x18, modePanel->m_width, modePanel->m_height);
+			gUtil.RenderTextureQuad(330.0f, 138.0f + static_cast<float>(y), FLOAT_80333588, FLOAT_8033361C,
+			                        modePanel, &uv0, &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
+
+			char* modeText = g_strMenuUtilMes[languageBase + 18];
+			float textPanelX = 492.0f;
+			float textY = 132.0f;
+			float textPanelWidth = 112.0f;
+			if (m_specialModeFlags[i] == 0) {
+				modeText = g_strMenuUtilMes[languageBase + 19];
+				textPanelX = 372.0f;
+				textY = 136.0f;
+				textPanelWidth = 120.0f;
+				gUtil.CalcUV(uv0.x, uv0.y, 0, uvY, modePanel->m_width, modePanel->m_height);
+				gUtil.CalcUV(uv1.x, uv1.y, 0x78, uvY + 0x20, modePanel->m_width, modePanel->m_height);
+			} else {
+				gUtil.CalcUV(uv0.x, uv0.y, 0x78, uvY, modePanel->m_width, modePanel->m_height);
+				gUtil.CalcUV(uv1.x, uv1.y, 0xE0, uvY + 0x20, modePanel->m_width, modePanel->m_height);
+			}
+
+			gUtil.RenderTextureQuad(textPanelX, textY + static_cast<float>(y), textPanelWidth, FLOAT_80333570,
+			                        modePanel, &uv0, &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
+			DrawFont(static_cast<int>(textPanelX + (textPanelWidth - font->GetWidth(modeText)) *
+			                                         kMenuCenteringHalfWidth),
+			         static_cast<int>(textY + FLOAT_80333580 + FLOAT_80333634 + static_cast<float>(y)), color, 7,
+			         modeText, kOptionAnimMax, kOptionAnimMax);
+		}
 	}
 }
 

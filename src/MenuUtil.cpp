@@ -1169,12 +1169,12 @@ void CMenuPcs::DrawOptionMenu()
 		          kOptionAnimMax);
 	} else if (m_optionIndex < 4) {
 		CTexture* meterTexture = GetTextureSetTexture(GetMenuTextureSet(this, 0xBC), 3);
-		signed char volume = (m_optionIndex == 2) ? m_bgmVolume : m_seVolume;
-		unsigned long iconLeftU = (m_optionIndex == 2) ? 0 : 0x18;
-		unsigned long iconRightU = (m_optionIndex == 2) ? 0 : 0x28;
-		unsigned long leftArrowY = (m_optionIndex == 2) ? 0x58 : 0x40;
-		unsigned long rightArrowY = (m_optionIndex == 2) ? 0x5C : 0x3C;
-		unsigned long barU = (m_optionIndex == 2) ? 0x40 : 0x30;
+		signed char volume = (m_optionIndex <= 2) ? m_bgmVolume : m_seVolume;
+		unsigned long iconLeftU = (m_optionIndex <= 2) ? 0 : 0x18;
+		unsigned long iconRightU = (m_optionIndex <= 2) ? 0 : 0x28;
+		unsigned long leftArrowY = (m_optionIndex <= 2) ? 0x58 : 0x40;
+		unsigned long rightArrowY = (m_optionIndex <= 2) ? 0x5C : 0x3C;
+		unsigned long barU = (m_optionIndex <= 2) ? 0x40 : 0x30;
 
 		gUtil.CalcUV(uv0.x, uv0.y, iconLeftU, 0x28, meterTexture->m_width, meterTexture->m_height);
 		gUtil.CalcUV(uv1.x, uv1.y, iconLeftU + 0x18, 0x40, meterTexture->m_width, meterTexture->m_height);

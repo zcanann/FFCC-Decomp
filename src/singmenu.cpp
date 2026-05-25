@@ -987,13 +987,13 @@ void CMenuPcs::destroySingleMenu()
 
     ptr = *reinterpret_cast<void**>(self + 0x82C);
     if (ptr != 0) {
-        delete[] static_cast<u8*>(ptr);
+        delete static_cast<SingleMenuStateRaw*>(ptr);
         *reinterpret_cast<void**>(self + 0x82C) = 0;
     }
 
     ptr = *reinterpret_cast<void**>(self + 0x848);
     if (ptr != 0) {
-        delete[] static_cast<u8*>(ptr);
+        delete static_cast<SingleMenuWindowRaw*>(ptr);
         *reinterpret_cast<void**>(self + 0x848) = 0;
     }
 
@@ -1090,14 +1090,14 @@ void CMenuPcs::SingMenuInit()
     if (Game.m_gameWork.m_menuStageMode != 0) {
         stage = *reinterpret_cast<CMemory::CStage**>(self + 0xF4);
     }
-    *reinterpret_cast<void**>(self + 0x82C) = new (stage, s_singmenu_cpp, 0x609) u8[sizeof(SingleMenuStateRaw)];
+    *reinterpret_cast<void**>(self + 0x82C) = new (stage, s_singmenu_cpp, 0x609) SingleMenuStateRaw;
     memset(*reinterpret_cast<void**>(self + 0x82C), 0, sizeof(SingleMenuStateRaw));
 
     stage = *reinterpret_cast<CMemory::CStage**>(self + 0xEC);
     if (Game.m_gameWork.m_menuStageMode != 0) {
         stage = *reinterpret_cast<CMemory::CStage**>(self + 0xF4);
     }
-    *reinterpret_cast<void**>(self + 0x848) = new (stage, s_singmenu_cpp, 0x60D) u8[sizeof(SingleMenuWindowRaw)];
+    *reinterpret_cast<void**>(self + 0x848) = new (stage, s_singmenu_cpp, 0x60D) SingleMenuWindowRaw;
     memset(*reinterpret_cast<void**>(self + 0x848), 0, sizeof(SingleMenuWindowRaw));
 
     *reinterpret_cast<s16*>(self + 0x866) = 0;
@@ -1186,7 +1186,7 @@ void CMenuPcs::drawSingleMenu()
             }
 
             if (*reinterpret_cast<void**>(self + 0x82C) != 0) {
-                delete[] static_cast<u8*>(*reinterpret_cast<void**>(self + 0x82C));
+                delete static_cast<SingleMenuStateRaw*>(*reinterpret_cast<void**>(self + 0x82C));
                 *reinterpret_cast<void**>(self + 0x82C) = 0;
             }
 
@@ -1196,7 +1196,7 @@ void CMenuPcs::drawSingleMenu()
             }
 
             if (*reinterpret_cast<void**>(self + 0x848) != 0) {
-                delete[] static_cast<u8*>(*reinterpret_cast<void**>(self + 0x848));
+                delete static_cast<SingleMenuWindowRaw*>(*reinterpret_cast<void**>(self + 0x848));
                 *reinterpret_cast<void**>(self + 0x848) = 0;
             }
 

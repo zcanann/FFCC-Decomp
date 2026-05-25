@@ -947,10 +947,10 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
     u32 depthTexSize;
     u32 texBufferStride;
     u32 sourceTexObjs;
+    u32 captureTexObjs;
     u32 targetTexObjs;
     s32 i;
     f32 savedViewport[6];
-    char* compareName = Game.m_currentScriptName;
 
     if (pass != 0 || *(u8*)((u8*)step + 0x1C) == 0) {
         return;
@@ -986,8 +986,10 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
     depthTexSize = GXGetTexBufferSize(0x80, 0x80, GX_TF_RGBA8, GX_FALSE, 0);
     texBufferStride = GXGetTexBufferSize(0x80, 0x80, GX_TF_RGB565, GX_FALSE, 0);
     sourceTexObjs = work[8];
+    captureTexObjs = work[0x1E];
 
     if (*(u8*)((u8*)step + 0x38) != 0) {
+        char* compareName = Game.m_currentScriptName;
         C_MTXPerspective(projectionMtx, FLOAT_80330E7C, FLOAT_80330e58, FLOAT_80330e58, FLOAT_80330E80);
         GXSetProjection(projectionMtx, (_GXProjectionType)0);
 
@@ -1055,19 +1057,20 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
                 CChara::CModel* ownerModel = owner->m_model;
 
                 ownerModel->SetCallbackContext(work, step);
-                ownerModel->m_beforeDrawShadowLockEnvCallback = Mana_BeforeDrawShadowLockEnvCallback;
-                ownerModel->m_drawShadowMeshDLCallback = Chara_DrawShadowMeshDLCallback;
+                owner->m_model->m_beforeDrawShadowLockEnvCallback = Mana_BeforeDrawShadowLockEnvCallback;
+                owner->m_model->m_drawShadowMeshDLCallback = Chara_DrawShadowMeshDLCallback;
                 owner->Draw(1);
                 ownerModel = owner->m_model;
                 ownerModel->SetCallbackContext(0, 0);
-                ownerModel->m_beforeDrawShadowLockEnvCallback = 0;
-                ownerModel->m_drawShadowMeshDLCallback = 0;
+                owner->m_model->m_beforeDrawShadowLockEnvCallback = 0;
+                owner->m_model->m_drawShadowMeshDLCallback = 0;
             }
 
-            Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, (_GXTexObj*)sourceTexObjs, 0, 0, 0x80, 0x80, depthTexSize,
-                                       GX_NEAR, GX_TF_RGBA8, 0);
+            Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, (_GXTexObj*)captureTexObjs, 0, 0, 0x80, 0x80, depthTexSize,
+                                       GX_LINEAR, GX_TF_RGB565, 0);
             depthTexSize += texBufferStride;
             sourceTexObjs += 0x20;
+            captureTexObjs += 0x20;
         }
 
         PSMTXCopy(savedCameraMtx, CameraMatrix());
@@ -1084,8 +1087,8 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
     targetTexObjs = work[0x1F];
     if (*(u8*)((u8*)step + 0x38) == 0) {
         if (*((u8*)work + 0xF4) == 0) {
-            GXInitTexObj((GXTexObj*)work[10], (void*)work[12], 0x80, 0x80, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
-            GXInitTexObj((GXTexObj*)work[11], (void*)work[13], 0x80, 0x80, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
+            GXInitTexObj((GXTexObj*)work[10], (void*)work[12], 0x80, 0x80, GX_TF_RGB565, GX_CLAMP, GX_CLAMP, GX_FALSE);
+            GXInitTexObj((GXTexObj*)work[11], (void*)work[13], 0x80, 0x80, GX_TF_RGB565, GX_CLAMP, GX_CLAMP, GX_FALSE);
             drawParaboloidMap((GXTexObj*)work[8], (GXTexObj*)work[11], (void*)work[9], work[0x3B],
                               (GXTexObj*)(targetTexObjs + 0x28), 1);
             drawParaboloidMap((GXTexObj*)work[8], (GXTexObj*)work[10], (void*)work[9], work[0x3B],
@@ -1095,9 +1098,9 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
             *((u8*)work + 0xF4) = 1;
         }
     } else {
-        GXInitTexObj((GXTexObj*)work[10], (void*)work[12], 0x80, 0x80, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
+        GXInitTexObj((GXTexObj*)work[10], (void*)work[12], 0x80, 0x80, GX_TF_RGB565, GX_CLAMP, GX_CLAMP, GX_FALSE);
         GXInitTexObjLOD((GXTexObj*)work[10], GX_LINEAR, GX_LINEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
-        GXInitTexObj((GXTexObj*)work[11], (void*)work[13], 0x80, 0x80, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
+        GXInitTexObj((GXTexObj*)work[11], (void*)work[13], 0x80, 0x80, GX_TF_RGB565, GX_CLAMP, GX_CLAMP, GX_FALSE);
         GXInitTexObjLOD((GXTexObj*)work[11], GX_LINEAR, GX_LINEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
         drawParaboloidMap((GXTexObj*)work[0x1E], (GXTexObj*)work[11], (void*)work[9], work[0x3B],
                           (GXTexObj*)(targetTexObjs + 0x28), 1);

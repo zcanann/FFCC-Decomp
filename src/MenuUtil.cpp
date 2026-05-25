@@ -57,6 +57,8 @@ extern float FLOAT_80333584;
 extern float FLOAT_80333588;
 extern float FLOAT_80333590;
 extern float FLOAT_803335a0;
+extern float FLOAT_803335B0;
+extern float FLOAT_803335B4;
 extern const char sMenuUtilEmptyText[4] = "";
 extern const char sMenuUtilStringFormat[] = "%s";
 extern const char sMenuUtilPlusOneText[] = "+1";
@@ -1145,8 +1147,9 @@ void CMenuPcs::DrawOptionMenu()
 		color.a = static_cast<unsigned char>(static_cast<int>(FLOAT_80333550 * m_optionColumnAnim));
 		gUtil.CalcUV(uv0.x, uv0.y, 0, 0, selectorTexture->m_width, selectorTexture->m_height);
 		gUtil.CalcUV(uv1.x, uv1.y, 0x78, 0x30, selectorTexture->m_width, selectorTexture->m_height);
-		gUtil.RenderTextureQuad(selectorX + (secondValue ? secondOffset : kOptionAnimMin), 176.0f, 120.0f, 48.0f,
-		                        selectorTexture, &uv0, &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
+		gUtil.RenderTextureQuad(selectorX + (secondValue ? secondOffset : kOptionAnimMin), 176.0f,
+		                        FLOAT_803335B0, FLOAT_803335B4, selectorTexture, &uv0, &uv1, &color,
+		                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
 		float firstScale = secondValue ? 0.8f : 1.46f;
 		float secondScale = secondValue ? 1.46f : 0.8f;
@@ -1156,11 +1159,11 @@ void CMenuPcs::DrawOptionMenu()
 		int secondTlut = secondValue ? 0x17 : 6;
 
 		font->SetScale(firstScale);
-		DrawFont2(static_cast<int>(selectorX + (120.0f - font->GetWidth(firstText)) * kMenuCenteringHalfWidth),
+		DrawFont2(static_cast<int>(selectorX + (FLOAT_803335B0 - font->GetWidth(firstText)) * kMenuCenteringHalfWidth),
 		          static_cast<int>(firstY), color, firstTlut, firstText, firstScale, kOptionAnimMax,
 		          kOptionAnimMax);
 		font->SetScale(secondScale);
-		DrawFont2(static_cast<int>(selectorX + secondOffset + (120.0f - font->GetWidth(secondText)) *
+		DrawFont2(static_cast<int>(selectorX + secondOffset + (FLOAT_803335B0 - font->GetWidth(secondText)) *
 		                                                  kMenuCenteringHalfWidth),
 		          static_cast<int>(secondY), color, secondTlut, secondText, secondScale, kOptionAnimMax,
 		          kOptionAnimMax);

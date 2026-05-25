@@ -325,7 +325,7 @@ void CLine<10>::CalcBound()
 
         if (i != 0) {
             CLineSegment* prevSegment = segment - 1;
-            PSVECSubtract(point, &line->points[i - 1], &prevSegment->delta);
+            PSVECSubtract(point, point - 1, &prevSegment->delta);
             prevSegment->length = PSVECMag(&prevSegment->delta);
             prevSegment->startLength = totalLength;
             totalLength += prevSegment->length;

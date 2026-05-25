@@ -31,11 +31,13 @@ signed char gGraphicDrawDonePartControlInit = 0;
 }
 
 enum GraphicCppStringOffset {
+    kGraphicInitCGraphic = 0xA0,
+    kGraphicInitSource = 0xB8,
+    kGraphicInitCGraphic2 = 0x1F8,
     kGraphicCppPartControlDoneFmt = 0x34,
     kGraphicCppPartCharaDoneFmt = 0x78,
     kGraphicCppPartDoneFmt = 0xB8,
     kGraphicCppDrawDoneFmt = 0xF4,
-    kGraphicCppCGraphic2 = 0x140,
 };
 
 static inline void*& PtrAt(CGraphic* self, u32 offset) {
@@ -111,10 +113,11 @@ int checkThread(void*)
  */
 void CGraphic::Init()
 {
-    char* graphicFileName = const_cast<char*>(sGraphicSourceStrings);
+    char* graphicInitData = const_cast<char*>(graphicInitData_801D6290);
+    char* graphicFileName = graphicInitData + kGraphicInitSource;
 
-    PtrAt(this, 0x4) = Memory.CreateStage(0x19C000, const_cast<char*>(sGraphicStageName), 0);
-    PtrAt(this, 0x8) = Memory.CreateStage(0xD6000, graphicFileName + kGraphicCppCGraphic2, 0);
+    PtrAt(this, 0x4) = Memory.CreateStage(0x19C000, graphicInitData + kGraphicInitCGraphic, 0);
+    PtrAt(this, 0x8) = Memory.CreateStage(0xD6000, graphicInitData + kGraphicInitCGraphic2, 0);
 
     S32At(this, 0x14) = 0;
     U8At(this, 0x7200) = 0;
@@ -1065,11 +1068,11 @@ void CGraphic::makeSphere()
         }
     }
 
+    S32At(this, 0x71F8) = 0x880;
     vertices[vertexCount * 3 + 0] = kGraphicOneF;
     vertices[vertexCount * 3 + 1] = kGraphicZeroF;
     vertices[vertexCount * 3 + 2] = kGraphicZeroF;
 
-    S32At(this, 0x71F8) = 0x880;
     PtrAt(this, 0x71FC) =
         new (reinterpret_cast<CMemory::CStage*>(PtrAt(this, 4)), const_cast<char*>(sGraphicSourceStrings), 0x41A)
         u8[S32At(this, 0x71F8)];
@@ -1417,15 +1420,13 @@ void CGraphic::GetBackBufferRect2(void* dstBuffer, _GXTexObj* texObj, int x, int
     if ((xEnd >= 0) && (yEnd >= 0) && (copyX <= U16At(PtrAt(this, 0x71E0), 4)) &&
         ((yEnd >= 0) && (copyY <= U16At(PtrAt(this, 0x71E0), 6))) &&
         ((copyWidth > 0) && ((copyHeight > 0) && (xEnd != copyX))) && (yEnd != copyY)) {
-        u16 texWidth = copyWidth & 0xFFFF;
-        u16 texHeight = copyHeight & 0xFFFF;
-        int textureSize = GXGetTexBufferSize(texWidth, texHeight, copyFormat, GX_FALSE, GX_FALSE);
+        int textureSize = GXGetTexBufferSize((u16)copyWidth, (u16)copyHeight, copyFormat, GX_FALSE, GX_FALSE);
         void* textureBase =
             reinterpret_cast<void*>((reinterpret_cast<u32>(dstBuffer) + ((dstOffset + 0x1F) & 0xFFFFFFE0) + 0x1F) &
                                     0xFFFFFFE0);
 
-        GXSetTexCopySrc(copyX & 0xFFFF, copyY & 0xFFFF, texWidth, texHeight);
-        GXSetTexCopyDst(texWidth, texHeight, copyFormat, GX_FALSE);
+        GXSetTexCopySrc(copyX & 0xFFFF, copyY & 0xFFFF, (u16)copyWidth, (u16)copyHeight);
+        GXSetTexCopyDst((u16)copyWidth, (u16)copyHeight, copyFormat, GX_FALSE);
         DCInvalidateRange(textureBase, textureSize);
         GXCopyTex(textureBase, copyClear);
         GXPixModeSync();
@@ -1452,7 +1453,7 @@ void CGraphic::GetBackBufferRect2(void* dstBuffer, _GXTexObj* texObj, int x, int
         }
 
         if (texObj != nullptr) {
-            GXInitTexObj(texObj, textureBase, texWidth, texHeight, copyFormat, GX_CLAMP, GX_CLAMP,
+            GXInitTexObj(texObj, textureBase, (u16)copyWidth, (u16)copyHeight, copyFormat, GX_CLAMP, GX_CLAMP,
                          GX_FALSE);
             float zero = LoadFloat(kGraphicZeroF);
             GXInitTexObjLOD(texObj, copyFilter, copyFilter, zero, zero, zero, GX_FALSE, GX_FALSE,

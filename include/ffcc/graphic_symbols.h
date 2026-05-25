@@ -14,6 +14,7 @@ extern int gGraphicDrawDonePartControlRequest;
 extern signed char gGraphicDrawDonePartControlInit;
 extern GXRenderModeObj gDefaultGXRenderMode;
 extern _GXColor gGraphicDefaultClearColor;
+extern const char graphicInitData_801D6290[];
 extern const char sGraphicStageName[];
 extern const char sGraphicSourceStrings[];
 extern char sGraphicUnknownOrderName[];

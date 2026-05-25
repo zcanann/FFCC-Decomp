@@ -2680,11 +2680,10 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         return;
     case -0x38: {
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
-        Vec position = {
+        CVector position(
             localFloats[0],
             localFloats[1],
-            localFloats[2],
-        };
+            localFloats[2]);
         this->SetParticleWorkPos(position, localFloats[3]);
         runtime->push(object, 0);
         outResult = 0;

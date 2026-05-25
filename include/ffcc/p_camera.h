@@ -163,7 +163,7 @@ public:
     u8 m_fullScreenShadowEnabled; // 0x404
     u8 _pad405[0x414 - 0x405];
     CBound m_shadowRectBound; // 0x414
-    u8 _pad42C[0x4C8 - 0x42C];
+    u8 _pad42C[0x4C4 - 0x42C];
 };
 
 extern "C" void create__10CCameraPcsFv(CCameraPcs*);

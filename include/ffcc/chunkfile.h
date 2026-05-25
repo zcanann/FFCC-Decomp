@@ -28,6 +28,7 @@ public:
 	float GetF4();
 	char* GetString();
 	void Align(unsigned long);
+	void Skip(unsigned long);
 
 private:
 	struct ChunkScope {

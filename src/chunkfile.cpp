@@ -17,6 +17,20 @@ void CChunkFile::Align(unsigned long alignment)
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 16b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CChunkFile::Skip(unsigned long size)
+{
+    m_cursor += size;
+}
+
+/*
+ * --INFO--
  * Address: TODO
  * Size: TODO
  */

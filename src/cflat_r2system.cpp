@@ -3849,10 +3849,10 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         outResult = 0;
         return;
     case -0xC9: {
+        const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
         int mapObjIndex = MapMng.GetMapObjIdx(static_cast<unsigned short>(*object->m_localBase));
         MapMng.SetMapObjTransRate(
-            mapObjIndex, static_cast<float>(object->m_localBase[1]), static_cast<float>(object->m_localBase[2]),
-            static_cast<float>(object->m_localBase[3]));
+            mapObjIndex, localFloats[1], localFloats[2], localFloats[3]);
         runtime->push(object, 0);
         outResult = 0;
         return;

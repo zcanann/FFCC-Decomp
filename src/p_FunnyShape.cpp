@@ -69,7 +69,7 @@ struct CFunnyShapeViewerState {
 
 static inline CUSBStreamData* UsbStream(CFunnyShapePcs* self)
 {
-    return reinterpret_cast<CUSBStreamData*>(self->m_usbStreamDataStorage);
+    return reinterpret_cast<CUSBStreamData*>(&self->m_usbStreamDataStorage);
 }
 
 static inline CFunnyShape* FunnyShape(CFunnyShapePcs* self)
@@ -441,7 +441,11 @@ CFunnyShapePcs::~CFunnyShapePcs()
 {
     TextureObjects(this)->CPtrArray<_GXTexObj*>::~CPtrArray();
     TextureHeaders(this)->CPtrArray<OSFS_TEXTURE_ST*>::~CPtrArray();
-    UsbStream(this)->~CUSBStreamData();
+}
+
+CUSBStreamDataStorage::~CUSBStreamDataStorage()
+{
+    reinterpret_cast<CUSBStreamData*>(this)->~CUSBStreamData();
 }
 
 template <>

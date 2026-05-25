@@ -26,7 +26,7 @@ struct DisplayTail {
 };
 
 static inline CUSBStreamDataHeader* UsbStream(CFunnyShapePcs* self) {
-    return reinterpret_cast<CUSBStreamDataHeader*>(self->m_usbStreamDataStorage);
+    return reinterpret_cast<CUSBStreamDataHeader*>(&self->m_usbStreamDataStorage);
 }
 
 static inline CFunnyShape* FunnyShape(CFunnyShapePcs* self) {

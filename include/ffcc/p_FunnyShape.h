@@ -7,6 +7,13 @@
 #include "ffcc/system.h"
 #include "ffcc/FS_USB_Process.h"
 
+struct CUSBStreamDataStorage
+{
+    ~CUSBStreamDataStorage();
+
+    u8 m_storage[0x14];
+};
+
 class CFunnyShapePcs : public CProcess
 {
 public:
@@ -33,7 +40,7 @@ public:
 
     CMemory::CStage* m_viewerStage;        // 0x04
     u8 m_viewerState[0x34];                // 0x08
-    u8 m_usbStreamDataStorage[0x14];       // 0x3C
+    CUSBStreamDataStorage m_usbStreamDataStorage; // 0x3C
     CFunnyShape m_funnyShape;              // 0x50
     FS_DISPLAY_STATUS m_displayPending;    // 0x6178
     u32 m_displayTextureEnabled;           // 0x61B8

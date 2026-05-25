@@ -3969,17 +3969,18 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         outResult = 0;
         return;
     case -0xD6: {
+        const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
         _GXColor color = {
-            static_cast<u8>(255.0f * static_cast<float>(object->m_localBase[10])),
-            static_cast<u8>(255.0f * static_cast<float>(object->m_localBase[10])),
-            static_cast<u8>(255.0f * static_cast<float>(object->m_localBase[10])),
-            static_cast<u8>(255.0f * static_cast<float>(object->m_localBase[11])),
+            static_cast<u8>(255.0f * localFloats[10]),
+            static_cast<u8>(255.0f * localFloats[10]),
+            static_cast<u8>(255.0f * localFloats[10]),
+            static_cast<u8>(255.0f * localFloats[11]),
         };
         this->drawLayer(
             *object->m_localBase, strBlob + strOffs[object->m_localBase[1]], object->m_localBase[2],
             object->m_localBase[3], object->m_localBase[4], object->m_localBase[5],
             static_cast<short>(object->m_localBase[6]), static_cast<short>(object->m_localBase[7]),
-            static_cast<float>(object->m_localBase[8]), static_cast<float>(object->m_localBase[9]), &color,
+            localFloats[8], localFloats[9], &color,
             object->m_localBase[12]);
         runtime->push(object, 0);
         outResult = 0;

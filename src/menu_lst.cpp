@@ -8,22 +8,6 @@
 #include "ffcc/system.h"
 #include <string.h>
 
-extern const float FLOAT_803333D0;
-extern const float FLOAT_803333D4;
-extern const double DOUBLE_803333D8;
-extern const float FLOAT_803333E0;
-extern const double DOUBLE_803333E8;
-extern const float FLOAT_803333F0;
-extern const float FLOAT_803333F4;
-extern const float FLOAT_803333F8;
-extern const float FLOAT_803333FC;
-extern const float FLOAT_80333400;
-extern const float FLOAT_80333404;
-extern const double DOUBLE_80333408;
-extern const double DOUBLE_80333410;
-extern const double DOUBLE_80333418;
-extern const double DOUBLE_80333420;
-
 STATIC_ASSERT(offsetof(CMenuPcs, listFont) == 0x108);
 STATIC_ASSERT(offsetof(CMenuPcs, helpFont) == 0xF8);
 STATIC_ASSERT(offsetof(CMenuPcs, lstState) == 0x82C);
@@ -73,48 +57,48 @@ void CMenuPcs::MLstDraw()
 			color.r = 0xff;
 			color.g = 0xff;
 			color.b = 0xff;
-			color.a = (unsigned char)(FLOAT_803333D4 * alpha);
+			color.a = (unsigned char)(255.0f * alpha);
 			GXSetChanMatColor(GX_COLOR0A0, color);
 
-			float v = FLOAT_803333D0;
+			float v = 0.0f;
 			if ((menuMode == 1) && (i == this->lstState->cursor)) {
-				x = (float)(x + DOUBLE_803333D8);
+				x = (float)(x + 20.0);
 				v += (float)((double)item->height);
 			}
 
-			MenuPcs.DrawRect(0, x, y, w, h, FLOAT_803333D0, v, z, z, FLOAT_803333D0);
+			MenuPcs.DrawRect(0, x, y, w, h, 0.0f, v, z, z, 0.0f);
 
 			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x5c));
 			float iconX = (float)item->x;
 			float iconY = (float)(item->y - 6);
-			v = FLOAT_803333D0;
+			v = 0.0f;
 			if ((menuMode == 1) && (i == this->lstState->cursor)) {
 				v += (float)((double)item->height);
 			}
 			MenuPcs.DrawRect(
 				0,
-				(float)-(FLOAT_803333E0 * DOUBLE_803333E8 - iconX),
+				(float)-(40.0f * 0.5 - iconX),
 				iconY,
-				FLOAT_803333E0,
-				FLOAT_803333E0,
-				FLOAT_803333D0,
+				40.0f,
+				40.0f,
+				0.0f,
 				v,
 				z,
 				z,
-				FLOAT_803333D0);
+				0.0f);
 		}
 		item++;
 	}
 
 	CFont* font = this->listFont;
-	font->SetMargin(FLOAT_803333F0);
+	font->SetMargin(1.0f);
 	font->SetShadow(0);
-	font->SetScale(FLOAT_803333F0);
+	font->SetScale(1.0f);
 	font->DrawInit();
 
 	item = this->lstData->entries;
 	for (int i = 0; i < this->lstData->count; i++) {
-		CColor color(0xff, 0xff, 0xff, (unsigned char)(FLOAT_803333D4 * item->alpha));
+		CColor color(0xff, 0xff, 0xff, (unsigned char)(255.0f * item->alpha));
 		font->SetColor(color.color);
 
 		const char* text = GetMenuStr(i + 0x2e);
@@ -123,11 +107,11 @@ void CMenuPcs::MLstDraw()
 		float textX = (float)(item->x + 0x28);
 		float textY = (float)(item->y + 3);
 		if ((menuMode == 1) && (i == this->lstState->cursor)) {
-			textX = (float)(textX + DOUBLE_803333D8);
+			textX = (float)(textX + 20.0);
 		}
 
 		font->SetPosX(textX);
-		font->SetPosY(textY - FLOAT_803333F4);
+		font->SetPosY(textY - 4.0f);
 		font->Draw(text);
 
 		item++;
@@ -136,18 +120,18 @@ void CMenuPcs::MLstDraw()
 	DrawInit();
 	if (menuMode == 1) {
 		MenuLstEntry* curItem = &this->lstData->entries[this->lstState->cursor];
-		float cursorYOffset = (float)((double)(float)(curItem->height - 0x20) * DOUBLE_803333E8);
+		float cursorYOffset = (float)((double)(float)(curItem->height - 0x20) * 0.5);
 		int cursorY = (int)((float)curItem->y + cursorYOffset);
 		int cursorX = (int)((float)(curItem->x - 0x38) + (float)(System.m_frameCounter % 8));
-		DrawCursor(cursorX, cursorY, FLOAT_803333F0);
+		DrawCursor(cursorX, cursorY, 1.0f);
 	}
 
 	DrawInit();
 	int helpMessageId = this->lstState->cursor + 0x25c;
 	CFont* helpFont = this->helpFont;
-	CColor helpColor(0xff, 0xff, 0xff, (unsigned char)(FLOAT_803333D4 * this->lstData->entries[0].alpha));
-	float helpX = (float)-((FLOAT_803333E0 * (double)FLOAT_803333FC) - (double)FLOAT_803333F8);
-	float helpY = FLOAT_80333400;
+	CColor helpColor(0xff, 0xff, 0xff, (unsigned char)(255.0f * this->lstData->entries[0].alpha));
+	float helpX = (float)-((40.0f * (double)0.5f) - (double)320.0f);
+	float helpY = 352.0f;
 	DrawHelpMessage(
 		helpMessageId,
 		helpFont,
@@ -155,8 +139,8 @@ void CMenuPcs::MLstDraw()
 		(int)helpY,
 		helpColor.color,
 		0x0a,
-		FLOAT_803333F0,
-		FLOAT_80333404);
+		1.0f,
+		3.0f);
 }
 
 /*
@@ -187,13 +171,13 @@ int CMenuPcs::MLstClose()
 		if (entry->startFrame <= currentFrame) {
 			if (entry->startFrame + entry->duration <= currentFrame) {
 				completedItems++;
-				entry->alpha = FLOAT_803333D0;
+				entry->alpha = 0.0f;
 			} else {
 				entry->timer = entry->timer + 1;
-				double ratio = DOUBLE_80333410 / (double)entry->duration;
-				entry->alpha = (float)(DOUBLE_80333410 - ratio * (double)entry->timer);
-				if ((double)entry->alpha < DOUBLE_80333418) {
-					entry->alpha = FLOAT_803333D0;
+				double ratio = 1.0 / (double)entry->duration;
+				entry->alpha = (float)(1.0 - ratio * (double)entry->timer);
+				if ((double)entry->alpha < 0.0) {
+					entry->alpha = 0.0f;
 				}
 			}
 		}
@@ -201,7 +185,7 @@ int CMenuPcs::MLstClose()
 	}
 	result = 0;
 	if (this->lstData->count == completedItems) {
-		zero = FLOAT_803333D0;
+		zero = 0.0f;
 		entry = this->lstData->entries;
 		if ((int)itemCount > 0) {
 			count = itemCount >> 3;
@@ -333,7 +317,7 @@ int CMenuPcs::MLstCtrl()
 	}
 
 	if (result != 0) {
-		one = FLOAT_803333F0;
+		one = 1.0f;
 		MenuLstEntry* entry = this->lstData->entries;
 		for (i = 0; (itemCount = (unsigned int)this->lstData->count), i < (int)itemCount; i++) {
 			entry->alpha = one;
@@ -379,7 +363,7 @@ int CMenuPcs::MLstOpen()
 		short yPos;
 
 		memset(this->lstData, 0, sizeof(MenuLstList));
-		one = FLOAT_803333F0;
+		one = 1.0f;
 		entry = this->lstData->entries;
 		i = 8;
 		do {
@@ -395,7 +379,7 @@ int CMenuPcs::MLstOpen()
 			i--;
 		} while (i != 0);
 
-		zero = FLOAT_803333D0;
+		zero = 0.0f;
 		initializedCount = 0;
 		yPos = 0x18;
 		for (i = 0; i < 9; i++) {
@@ -405,7 +389,7 @@ int CMenuPcs::MLstOpen()
 			entry->tex = 0x5B;
 			entry->width = 0xE0;
 			entry->height = 0x28;
-			entry->x = (short)(int)-(((double)entry->width * DOUBLE_803333E8) - DOUBLE_80333420);
+			entry->x = (short)(int)-(((double)entry->width * 0.5) - 216.0);
 			entry->y = yPos;
 			yPos += 0x20;
 			entry->s = zero;
@@ -426,10 +410,10 @@ int CMenuPcs::MLstOpen()
 		if (entry->startFrame <= currentFrame) {
 			if (entry->startFrame + entry->duration <= currentFrame) {
 				completedItems++;
-				entry->alpha = FLOAT_803333F0;
+				entry->alpha = 1.0f;
 			} else {
 				entry->timer = entry->timer + 1;
-				double ratio = DOUBLE_80333410 / (double)entry->duration;
+				double ratio = 1.0 / (double)entry->duration;
 				entry->alpha = (float)(ratio * (double)entry->timer);
 			}
 		}
@@ -438,7 +422,7 @@ int CMenuPcs::MLstOpen()
 
 	int result = 0;
 	if (this->lstData->count == completedItems) {
-		one = FLOAT_803333F0;
+		one = 1.0f;
 		entry = this->lstData->entries;
 		if ((int)itemCount > 0) {
 			count = itemCount >> 3;

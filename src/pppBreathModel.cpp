@@ -268,11 +268,11 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
     int colorOffset;
     VBreathModel* work;
     VColor* color;
-    unsigned char colorR;
-    unsigned char colorG;
+    int i;
+    int colorR;
+    int colorG;
     unsigned char colorB;
     unsigned char colorA;
-    int i;
     pppModelSt* model;
     _GXColor drawColor;
     _GXColor debugColor;

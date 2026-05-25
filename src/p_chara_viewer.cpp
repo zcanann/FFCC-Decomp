@@ -754,7 +754,7 @@ void CCharaPcs::destroyViewer()
 void CCharaPcs::createViewer()
 {
     CCharaPcs* self = this;
-    register const char* viewerStrings = s_no_texture____801da7e8;
+    register char* viewerStrings = const_cast<char*>(s_no_texture____801da7e8);
     unsigned int i;
     char pathBuf[256];
     CFile::CHandle* fileHandle;
@@ -762,9 +762,9 @@ void CCharaPcs::createViewer()
     memset(&self->m_viewerModelStage, 0,
            sizeof(self->m_viewerModelStage) + sizeof(self->m_viewerTextureStage) + sizeof(self->m_viewerAnimStage) +
                sizeof(self->_pad0D8));
-    self->m_viewerModelStage = Memory.CreateStage(0x177000, const_cast<char*>(s_load_model), 0);
-    self->m_viewerTextureStage = Memory.CreateStage(0x200000, const_cast<char*>(s_load_texture), 0);
-    self->m_viewerAnimStage = Memory.CreateStage(0x190000, const_cast<char*>(s_load_anim), 0);
+    self->m_viewerModelStage = Memory.CreateStage(0x177000, s_load_model, 0);
+    self->m_viewerTextureStage = Memory.CreateStage(0x200000, s_load_texture, 0);
+    self->m_viewerAnimStage = Memory.CreateStage(0x190000, s_load_anim, 0);
 
     self->m_viewerAmbientColor[0].r = 0x3F;
     self->m_viewerAmbientColor[0].g = 0x3F;

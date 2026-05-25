@@ -262,6 +262,7 @@ extern "C" const char s_pppYmMelt_cpp[] = "pppYmMelt.cpp";
 void pppFrameYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offsets)
 {
     s16 phaseWork;
+    int colorOffset;
     int gridCount;
     int vertexCount;
     int angleSeed;
@@ -283,7 +284,8 @@ void pppFrameYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offse
     }
 
     work = GetYmMeltWork(ymMelt, offsets);
-    colorWork = GetYmMeltColorWork(ymMelt, offsets);
+    colorOffset = offsets->m_serializedDataOffsets[1];
+    colorWork = reinterpret_cast<YmMeltColorWork*>(reinterpret_cast<u8*>(ymMelt) + colorOffset + 0x80);
     gridCount = ctrl->m_gridSize + 1;
     vertexCount = gridCount * gridCount;
     matrixY = ppvMng->m_matrix.value[1][3];

@@ -2691,11 +2691,10 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
     }
     case -0x39: {
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
-        Vec target = {
+        CVector target(
             localFloats[0],
             localFloats[1],
-            localFloats[2],
-        };
+            localFloats[2]);
         this->SetParticleWorkTarget(target);
         runtime->push(object, 0);
         outResult = 0;

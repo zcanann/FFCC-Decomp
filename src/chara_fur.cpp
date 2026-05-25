@@ -350,21 +350,15 @@ static inline void FurInterpolateHit(Vec& outViewPos, float& outU, float& outV, 
     PSMTX44Copy(screenMtx, invScreenMtx);
     C_MTX44Inverse(invScreenMtx, invScreenMtx);
 
-    Vec rayStart;
-    rayStart.x = (cursorX - FLOAT_8033113C) / FLOAT_8033113C;
-    rayStart.y = -(cursorY - FLOAT_80331134) / FLOAT_80331134;
-    rayStart.z = kCharaFurDepthZero;
+    CVector rayStart((cursorX - FLOAT_8033113C) / FLOAT_8033113C,
+                     -(cursorY - FLOAT_80331134) / FLOAT_80331134, kCharaFurDepthZero);
+    CVector rayEnd(rayStart.x, rayStart.y, FLOAT_80331144);
 
-    Vec rayEnd;
-    rayEnd.x = rayStart.x;
-    rayEnd.y = rayStart.y;
-    rayEnd.z = FLOAT_80331144;
-
-    PSMTX44MultVec(invScreenMtx, &rayStart, &rayStart);
-    PSMTX44MultVec(invScreenMtx, &rayEnd, &rayEnd);
+    PSMTX44MultVec(invScreenMtx, reinterpret_cast<Vec*>(&rayStart), reinterpret_cast<Vec*>(&rayStart));
+    PSMTX44MultVec(invScreenMtx, reinterpret_cast<Vec*>(&rayEnd), reinterpret_cast<Vec*>(&rayEnd));
 
     Vec ray;
-    PSVECSubtract(&rayEnd, &rayStart, &ray);
+    PSVECSubtract(reinterpret_cast<Vec*>(&rayEnd), reinterpret_cast<Vec*>(&rayStart), &ray);
 
     Vec normalA;
     Vec normalB;
@@ -375,10 +369,10 @@ static inline void FurInterpolateHit(Vec& outViewPos, float& outU, float& outV, 
     PSVECNormalize(&normal, &normal);
 
     Vec planeDelta;
-    PSVECSubtract(&a.m_viewPos, &rayStart, &planeDelta);
+    PSVECSubtract(&a.m_viewPos, reinterpret_cast<Vec*>(&rayStart), &planeDelta);
     Vec scaledRay;
     PSVECScale(&ray, &scaledRay, PSVECDotProduct(&normal, &planeDelta) / PSVECDotProduct(&normal, &ray));
-    PSVECAdd(&rayStart, &scaledRay, &outViewPos);
+    PSVECAdd(reinterpret_cast<Vec*>(&rayStart), &scaledRay, &outViewPos);
 
     Vec hitToA;
     Vec hitToB;

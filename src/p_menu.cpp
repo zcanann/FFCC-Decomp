@@ -1538,8 +1538,12 @@ void CMenuPcs::DrawBar(float x, float y, float width, CMenuPcs::TEX texBase, flo
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80094bec
+ * PAL Size: 2544b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::DrawWindow(float x, float y, float width, float height, CMenuPcs::TEX texBase, float corner)
 {
@@ -1550,17 +1554,13 @@ void CMenuPcs::DrawWindow(float x, float y, float width, float height, CMenuPcs:
 	const float twoCorner = corner * 2.0f;
 	float midW = width - twoCorner;
 	float midH = height - twoCorner;
-	float overW = twoCorner - width;
-	float overH = twoCorner - height;
-	float uOff = 0.0f;
-	float vOff = 0.0f;
+	float overW;
+	float overH;
+	float uOff;
+	float vOff;
 	const int tex = static_cast<int>(texBase);
 	const float xL = x;
 	const float yT = y;
-	const float xM = x + corner;
-	const float yM = y + corner;
-	const float xR = (x + width) - corner;
-	const float yB = (y + height) - corner;
 
 	if (midW < 0.0f) {
 		midW = 0.0f;
@@ -1568,43 +1568,48 @@ void CMenuPcs::DrawWindow(float x, float y, float width, float height, CMenuPcs:
 	if (midH < 0.0f) {
 		midH = 0.0f;
 	}
+
+	overW = twoCorner - width;
 	if (overW < 0.0f) {
 		overW = 0.0f;
 	}
+
+	overH = twoCorner - height;
 	if (overH < 0.0f) {
 		overH = 0.0f;
 	}
-	if (corner > 0.0f) {
-		uOff = overW / twoCorner;
-		vOff = overH / twoCorner;
-	}
+	uOff = overW * 0.5f;
+	vOff = overH * 0.5f;
+
+	const float cornerW = corner - uOff;
+	const float cornerH = corner - vOff;
 
 	SetTexture(static_cast<CMenuPcs::TEX>(tex));
-	DrawRect(0, xL, yT, corner, corner, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+	DrawRect(0, xL, yT, cornerW, cornerH, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
 	SetTexture(static_cast<CMenuPcs::TEX>(tex + 1));
-	DrawRect(0, xM, yT, midW, corner, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+	DrawRect(0, x + corner, yT, midW, cornerH, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
 	SetTexture(static_cast<CMenuPcs::TEX>(tex + 2));
-	DrawRect(0, xR, yT, corner, corner, uOff, 0.0f, 1.0f, 1.0f, 0.0f);
+	DrawRect(0, ((x + width) - corner) + uOff, yT, cornerW, cornerH, uOff, 0.0f, 1.0f, 1.0f, 0.0f);
 
 	SetTexture(static_cast<CMenuPcs::TEX>(tex + 3));
-	DrawRect(0, xL, yM, corner, midH, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+	DrawRect(0, xL, y + corner, corner, midH, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
 	SetTexture(static_cast<CMenuPcs::TEX>(tex + 4));
-	DrawRect(0, xM, yM, midW, midH, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+	DrawRect(0, x + corner, y + corner, midW, midH, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
 	SetTexture(static_cast<CMenuPcs::TEX>(tex + 5));
-	DrawRect(0, xR, yM, corner, midH, uOff, 0.0f, 1.0f, 1.0f, 0.0f);
+	DrawRect(0, (x + width) - corner, y + corner, corner, midH, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
 	SetTexture(static_cast<CMenuPcs::TEX>(tex + 6));
-	DrawRect(0, xL, yB, corner, corner, 0.0f, vOff, 1.0f, 1.0f, 0.0f);
+	DrawRect(0, xL, ((y + height) - corner) + vOff, cornerW, cornerH, 0.0f, vOff, 1.0f, 1.0f, 0.0f);
 
 	SetTexture(static_cast<CMenuPcs::TEX>(tex + 7));
-	DrawRect(0, xM, yB, midW, corner, 0.0f, vOff, 1.0f, 1.0f, 0.0f);
+	DrawRect(0, x + corner, ((y + height) - corner) + vOff, midW, cornerH, 0.0f, vOff, 1.0f, 1.0f, 0.0f);
 
 	SetTexture(static_cast<CMenuPcs::TEX>(tex + 8));
-	DrawRect(0, xR, yB, corner, corner, uOff, vOff, 1.0f, 1.0f, 0.0f);
+	DrawRect(0, ((x + width) - corner) + uOff, ((y + height) - corner) + vOff, cornerW, cornerH, uOff, vOff, 1.0f, 1.0f, 0.0f);
 }
 
 /*

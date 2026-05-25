@@ -123,7 +123,7 @@ extern const float FLOAT_80331cec = 4.0f;
 extern const float FLOAT_80331cf0 = -3.0f;
 extern const float FLOAT_80331cf4 = 0.5f;
 
-extern const Vec kScreenBreakCameraUpVector;
+extern const Vec kScreenBreakCameraUpVector = { 0.0f, 1.0f, 0.0f };
 extern const Vec kScreenBreakPieceUpVector = { 0.0f, 1.0f, 0.0f };
 extern const char sF999Root[] = "f999_root";
 extern const char s_pppScreenBreak_cpp[] = "pppScreenBreak.cpp";

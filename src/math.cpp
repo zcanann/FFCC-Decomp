@@ -742,7 +742,8 @@ int CBound::CheckFrustum0(CBound& outBound)
                     } else {
                         clipMask = 0x10;
                     }
-                    if (transformed.y > -transformed.z) {
+                    viewZ = transformed.z;
+                    if (transformed.y > -viewZ) {
                         clipMask = (unsigned char)(clipMask | 0x14);
                     } else if (transformed.y < viewZ) {
                         clipMask = (unsigned char)(clipMask | 0x18);
@@ -755,7 +756,8 @@ int CBound::CheckFrustum0(CBound& outBound)
                     } else {
                         clipMask = 0;
                     }
-                    if (transformed.y > -transformed.z) {
+                    viewZ = transformed.z;
+                    if (transformed.y > -viewZ) {
                         clipMask = (unsigned char)(clipMask | 4);
                     } else if (transformed.y < viewZ) {
                         clipMask = (unsigned char)(clipMask | 8);

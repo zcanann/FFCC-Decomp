@@ -1460,38 +1460,39 @@ void pppConstructMana2(pppMana2* pppMana2, pppMana2UnkC* param_2)
  */
 void Mana2_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int partIndex, int dlIndex, float (*mtx)[4])
 {
-    u8 type = *(u8*)((char*)step + 0x1C);
+    int type = *(u8*)((char*)step + 0x1C);
     int shape = *(int*)(*(int*)((char*)model + 0xAC) + partIndex * 0x14 + 8);
     u32* dlEntry = (u32*)(*(int*)(shape + 0x50) + dlIndex * 0xC);
-    bool draw = false;
+    int draw = 0;
 
     if (type == 2) {
         if (strcmp((char*)shape, s_manaShapeObj) == 0 || strcmp((char*)shape, s_manaShapeObj3) == 0) {
-            draw = true;
+            draw = 1;
         }
     } else if (type < 2) {
         if (type == 0) {
             if (strcmp((char*)shape, s_manaShapeObj) == 0) {
-                draw = true;
+                draw = 1;
             }
         } else if (strcmp((char*)shape, s_manaShapeObj) == 0 || strcmp((char*)shape, s_manaShapeObj5) == 0) {
-            draw = true;
+            draw = 1;
         }
     } else if (type < 4 && (strcmp((char*)shape, s_manaShapeObj) == 0 || strcmp((char*)shape, s_manaShapeObj1) == 0)) {
-        draw = true;
+        draw = 1;
     }
 
     int waterCmp = strcmp((char*)shape, s_manaShapeObj4);
-    if ((waterCmp == 0 && type == 1) || (strcmp((char*)shape, s_manaShapeObj2) == 0 && type == 2)) {
+    if ((waterCmp == 0 && *(u8*)((char*)step + 0x1C) == 1) ||
+        (strcmp((char*)shape, s_manaShapeObj2) == 0 && *(u8*)((char*)step + 0x1C) == 2)) {
         Mtx cameraMtx;
         Mtx rotMtx;
         Mtx posMtx;
         Vec offset;
-        double x = (double)mtx[0][3];
-        double y = (double)mtx[1][3];
-        double z = (double)mtx[2][3];
+        float x = mtx[0][3];
+        float y = mtx[1][3];
+        float z = mtx[2][3];
 
-        PSMTXCopy(ppvCameraMatrix0, cameraMtx);
+        PSMTXCopy(CameraMatrix(), cameraMtx);
         PSMTXRotRad(rotMtx, 'z', LoadFloat(FLOAT_80331904));
         mtx[0][3] = LoadFloat(FLOAT_80331898);
         mtx[1][3] = LoadFloat(FLOAT_80331898);
@@ -1503,9 +1504,9 @@ void Mana2_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int
         offset.z = LoadFloat(FLOAT_80331898);
         PSMTXMultVec(mtx, &offset, &offset);
 
-        mtx[0][3] = (float)x;
-        mtx[1][3] = (float)(y - (double)offset.y);
-        mtx[2][3] = (float)z;
+        mtx[0][3] = x;
+        mtx[1][3] = y - offset.y;
+        mtx[2][3] = z;
 
         PSMTXConcat(cameraMtx, mtx, posMtx);
         GXLoadPosMtxImm(posMtx, 0);

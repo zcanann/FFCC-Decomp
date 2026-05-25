@@ -326,7 +326,7 @@ extern "C" void CalcBound__9CLine2(CLine<10>* line)
 
         if (i != 0) {
             CLineSegment* prevSegment = segment - 1;
-            PSVECSubtract(point, point - 1, &prevSegment->delta);
+            PSVECSubtract(point, &line->points[i - 1], &prevSegment->delta);
             prevSegment->length = PSVECMag(&prevSegment->delta);
             prevSegment->startLength = line->totalLength;
             line->totalLength += prevSegment->length;

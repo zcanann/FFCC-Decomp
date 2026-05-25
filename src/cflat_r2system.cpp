@@ -2644,8 +2644,8 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         return;
     }
     case -0x34: {
-        Vec axis = {cosf(static_cast<float>(object->m_localBase[1])), 0.0f,
-                    sinf(static_cast<float>(object->m_localBase[1]))};
+        const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
+        Vec axis = {cosf(localFloats[1]), 0.0f, sinf(localFloats[1])};
         Mtx matrix;
         Mtx rotation;
 
@@ -2654,13 +2654,13 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
             PSMTXIdentity(matrix);
         }
 
-        PSMTXRotAxisRad(rotation, &axis, static_cast<float>(object->m_localBase[2]));
+        PSMTXRotAxisRad(rotation, &axis, localFloats[2]);
         PSMTXConcat(rotation, matrix, matrix);
 
         axis.x = 0.0f;
         axis.y = 1.0f;
         axis.z = 0.0f;
-        PSMTXRotAxisRad(rotation, &axis, static_cast<float>(object->m_localBase[3]));
+        PSMTXRotAxisRad(rotation, &axis, localFloats[3]);
         PSMTXConcat(rotation, matrix, matrix);
         CameraPcs.SetWorldMapMatrix(matrix);
 

@@ -3797,10 +3797,11 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         outResult = 0;
         return;
     case -0xC5: {
+        const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
         Vec position = {
-            static_cast<float>(object->m_localBase[4]),
-            static_cast<float>(object->m_localBase[5]),
-            static_cast<float>(object->m_localBase[6]),
+            localFloats[4],
+            localFloats[5],
+            localFloats[6],
         };
         _GXColor color = {
             static_cast<u8>(object->m_localBase[1]),

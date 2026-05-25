@@ -659,7 +659,7 @@ config.libs = [
             Object(Matching, "pppParMatrix.cpp"),
             Object(Matching, "pppParMoveLine.cpp"),
             Object(Matching, "pppParMoveMatrix.cpp"),
-            Object(NonMatching, "pppPart.cpp"),
+            Object(NonMatching, "pppPart.cpp", extra_cflags=["-inline auto,deferred"]),
             Object(Matching, "pppPObjPoint.cpp"),
             Object(Matching, "pppPoint.cpp"),
             Object(Matching, "pppPointAp.cpp"),

@@ -227,7 +227,7 @@ void CGPrgObj::dstTargetRot(CGPrgObj* target)
 	deltaX = deltaPos.x;
 	deltaZ = deltaPos.z;
 	if ((deltaX == FLOAT_80331BD4) || (deltaZ == FLOAT_80331BD4)) {
-		targetRot = FLOAT_80331BD4;
+		targetRot = LoadFloat(FLOAT_80331BD4);
 	} else {
 		targetRot = (float)atan2(-(double)deltaX, -(double)deltaZ);
 	}
@@ -258,7 +258,7 @@ void CGPrgObj::rotTarget(CGPrgObj* target)
 	deltaX = deltaPos.x;
 	deltaZ = deltaPos.z;
 	if ((deltaX == FLOAT_80331BD4) || (deltaZ == FLOAT_80331BD4)) {
-		targetRot = FLOAT_80331BD4;
+		targetRot = LoadFloat(FLOAT_80331BD4);
 	} else {
 		targetRot = (float)atan2(-(double)deltaX, -(double)deltaZ);
 	}
@@ -287,7 +287,7 @@ float CGPrgObj::getTargetRot(CGPrgObj* target)
 	deltaX = deltaPos.x;
 	deltaZ = deltaPos.z;
 	if ((deltaX == FLOAT_80331BD4) || (deltaZ == FLOAT_80331BD4)) {
-		targetRot = FLOAT_80331BD4;
+		targetRot = LoadFloat(FLOAT_80331BD4);
 	} else {
 		targetRot = (float)atan2(-(double)deltaX, -(double)deltaZ);
 	}

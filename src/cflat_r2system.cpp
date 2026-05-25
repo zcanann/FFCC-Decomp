@@ -4231,7 +4231,7 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         outResult = 0;
         return;
     case -0xF9:
-        CameraPcs.SetFullScreenShadowCamLen(static_cast<float>(*object->m_localBase));
+        CameraPcs.SetFullScreenShadowCamLen(*reinterpret_cast<float*>(object->m_localBase));
         runtime->push(object, 0);
         outResult = 0;
         return;

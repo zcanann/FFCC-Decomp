@@ -3054,11 +3054,11 @@ void GbaQueue::ClrCmakeInfo(int param_2)
 void GbaQueue::ChkCMakeName(int channel, unsigned int value)
 {
 	char* obj = reinterpret_cast<char*>(this);
-	unsigned int cmdType = value >> 24;
-	unsigned int byte0 = static_cast<unsigned char>(value);
-	unsigned int byte1 = static_cast<unsigned char>(value >> 8);
-	unsigned int byte2 = static_cast<unsigned char>(value >> 16);
-	unsigned int nameCrc = value >> 8;
+	unsigned char cmdType = value >> 24;
+	unsigned char byte0 = value;
+	unsigned char byte1 = value >> 8;
+	unsigned char byte2 = value >> 16;
+	unsigned short nameCrc = value >> 8;
 	const int cmakeOffset = channel * 0x20;
 	OSSemaphore* semaphore = accessSemaphores + channel;
 

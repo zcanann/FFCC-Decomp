@@ -48,34 +48,6 @@ struct FavoFlatData
 	FavoFlatTableEntry table[8];
 };
 
-struct FavoEntry {
-	short x;
-	short y;
-	short w;
-	short h;
-	float u;
-	float v;
-	float alpha;
-	float uvScale;
-	int drawFlags;
-	int tex;
-	int step;
-	int startFrame;
-	int duration;
-	unsigned int flags;
-	float dx;
-	float dy;
-	float targetX;
-	float targetY;
-};
-
-struct FavoListStorage {
-	short count;
-	short selected;
-	unsigned char pad_0004[4];
-	FavoEntry entries[64];
-};
-
 STATIC_ASSERT(sizeof(FavoEntry) == 0x40);
 STATIC_ASSERT(sizeof(FavoListStorage) == 0x1008);
 
@@ -93,8 +65,8 @@ void CMenuPcs::FavoDraw()
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-	FavoEntry* entry = reinterpret_cast<FavoEntry*>(favoList + 4);
-	int count = *favoList;
+	FavoEntry* entry = favoList->entries;
+	int count = favoList->count;
 	for (int i = 0; i < count; i++) {
 		int tex = entry->tex;
 		if (tex >= 0) {
@@ -196,7 +168,7 @@ void CMenuPcs::FavoDraw()
 		entry++;
 	}
 
-	FavoEntry* rankEntry = reinterpret_cast<FavoEntry*>(favoList + 4);
+	FavoEntry* rankEntry = favoList->entries;
 	int remaining = count;
 	while (0 < remaining) {
 		if (rankEntry->tex == 0x37) {
@@ -284,49 +256,45 @@ void CMenuPcs::FavoDraw()
  */
 bool CMenuPcs::FavoClose()
 {
-    int finishedCount;
-    int count;
-    int frame;
-    FavoEntry* entry;
+	FavoEntry* entry;
+	int finishedCount;
+	int count;
+	int frame;
 
-    finishedCount = 0;
-	singMenuState->frame = singMenuState->frame + 1;
-    count = *favoList;
-    entry = reinterpret_cast<FavoEntry*>(favoList + 4);
-    frame = singMenuState->frame;
-    int remaining = count;
-    if (0 < count) {
-        do {
-            if (frame >= entry->startFrame) {
-                if (entry->startFrame + entry->duration <= frame) {
-                    float step = FLOAT_80333040;
-                    finishedCount = finishedCount + 1;
-                    entry->alpha = step;
-                    entry->dx = step;
-                    entry->dy = step;
-                } else {
-                    entry->step = entry->step + 1;
-                    entry->alpha =
-                        (float)(DOUBLE_80333050 - (DOUBLE_80333050 / (double)entry->duration) * (double)entry->step);
-                    if ((entry->flags & 2) == 0) {
-                        float step =
-                            (float)(DOUBLE_80333050 - (DOUBLE_80333050 / (double)entry->duration) * (double)entry->step);
-                        entry->dx = (entry->targetX - (float)entry->x) * step;
-                        entry->dy = (entry->targetY - (float)entry->y) * step;
-                    }
-                }
-            }
-            entry++;
-            remaining = remaining - 1;
-        } while (remaining != 0);
-    }
-
-	bool finished = false;
-	if (count == finishedCount) {
-		finished = true;
+	finishedCount = 0;
+	this->singMenuState->frame = this->singMenuState->frame + 1;
+	count = this->favoList->count;
+	entry = this->favoList->entries;
+	frame = this->singMenuState->frame;
+	for (int i = 0; i < count; i++) {
+		if (frame >= entry->startFrame) {
+			if (entry->startFrame + entry->duration <= frame) {
+				finishedCount = finishedCount + 1;
+				entry->alpha = FLOAT_80333040;
+				entry->dx = FLOAT_80333040;
+				entry->dy = FLOAT_80333040;
+			} else {
+				entry->step = entry->step + 1;
+				entry->alpha =
+				    (float)(DOUBLE_80333050 - (DOUBLE_80333050 / (double)entry->duration) * (double)entry->step);
+				if ((entry->flags & 2) == 0) {
+					float step =
+					    (float)(DOUBLE_80333050 - (DOUBLE_80333050 / (double)entry->duration) * (double)entry->step);
+					float dx = entry->targetX - (float)entry->x;
+					float dy = entry->targetY - (float)entry->y;
+					entry->dx = dx * step;
+					entry->dy = dy * step;
+				}
+			}
+		}
+		entry++;
 	}
 
-	return finished;
+	bool result = false;
+	if (count == finishedCount) {
+		result = true;
+	}
+	return result;
 }
 
 /*
@@ -406,51 +374,47 @@ noReset:
  */
 bool CMenuPcs::FavoOpen()
 {
-    int finishedCount;
-    int count;
-    int frame;
-    FavoEntry* entry;
+	FavoEntry* entry;
+	int finishedCount;
+	int count;
+	int frame;
 
-	if (singMenuState->initialized == 0) {
+	if (this->singMenuState->initialized == '\0') {
 		FavoInit();
 	}
 
-    finishedCount = 0;
-	singMenuState->frame = singMenuState->frame + 1;
-    count = *favoList;
-    entry = reinterpret_cast<FavoEntry*>(favoList + 4);
-    frame = singMenuState->frame;
-    int remaining = count;
-    if (0 < count) {
-        do {
-            if (frame >= entry->startFrame) {
-                if (entry->startFrame + entry->duration <= frame) {
-                    finishedCount = finishedCount + 1;
-                    float resetStep = FLOAT_80333040;
-                    entry->alpha = FLOAT_80333048;
-                    entry->dx = resetStep;
-                    entry->dy = resetStep;
-                } else {
-                    entry->step = entry->step + 1;
-                    entry->alpha = (float)((DOUBLE_80333050 / (double)entry->duration) * (double)entry->step);
-                    if ((entry->flags & 2) == 0) {
-                        float step = (float)((DOUBLE_80333050 / (double)entry->duration) * (double)entry->step);
-                        entry->dx = (entry->targetX - (float)entry->x) * step;
-                        entry->dy = (entry->targetY - (float)entry->y) * step;
-                    }
-                }
-            }
-            entry++;
-            remaining = remaining - 1;
-        } while (remaining != 0);
-    }
-
-	bool finished = false;
-	if (count == finishedCount) {
-		finished = true;
+	finishedCount = 0;
+	this->singMenuState->frame = this->singMenuState->frame + 1;
+	count = this->favoList->count;
+	entry = this->favoList->entries;
+	frame = this->singMenuState->frame;
+	for (int i = 0; i < count; i++) {
+		if (frame >= entry->startFrame) {
+			if (entry->startFrame + entry->duration <= frame) {
+				finishedCount = finishedCount + 1;
+				entry->alpha = FLOAT_80333048;
+				entry->dx = FLOAT_80333040;
+				entry->dy = FLOAT_80333040;
+			} else {
+				entry->step = entry->step + 1;
+				entry->alpha = (float)((DOUBLE_80333050 / (double)entry->duration) * (double)entry->step);
+				if ((entry->flags & 2) == 0) {
+					float step = (float)((DOUBLE_80333050 / (double)entry->duration) * (double)entry->step);
+					float dx = entry->targetX - (float)entry->x;
+					float dy = entry->targetY - (float)entry->y;
+					entry->dx = dx * step;
+					entry->dy = dy * step;
+				}
+			}
+		}
+		entry++;
 	}
 
-	return finished;
+	bool result = false;
+	if (count == finishedCount) {
+		result = true;
+	}
+	return result;
 }
 
 /*
@@ -523,8 +487,8 @@ void CMenuPcs::FavoInit0()
 	*reinterpret_cast<int*>(list + 0x36C) = 0;
 	*reinterpret_cast<int*>(list + 0x370) = 5;
 
-	count = (unsigned int)*favoList;
-	entry = reinterpret_cast<FavoEntry*>(favoList + 4);
+	count = (unsigned int)favoList->count;
+	entry = favoList->entries;
 	if (0 < (int)count) {
 		blockCount = count >> 3;
 		if (blockCount != 0) {
@@ -585,152 +549,138 @@ void CMenuPcs::FavoInit()
 	short sVar11;
 	unsigned char* puVar12;
 	unsigned char* puVar13;
-	short* psVar14;
-	int iVar15;
 	int iVar16;
 	int iVar17;
 
 	uVar3 = Game.m_scriptFoodBase[0];
-	memset(reinterpret_cast<FavoListStorage*>(favoList), 0, sizeof(FavoListStorage));
-	fVar4 = FLOAT_80333048;
-	iVar8 = (int)favoList + 8;
+	memset(favoList, 0, sizeof(*favoList));
+	FavoEntry* entry = favoList->entries;
 	iVar16 = 8;
 	do {
-		*(float*)(iVar8 + 0x14) = fVar4;
-		*(float*)(iVar8 + 0x54) = fVar4;
-		*(float*)(iVar8 + 0x94) = fVar4;
-		*(float*)(iVar8 + 0xd4) = fVar4;
-		*(float*)(iVar8 + 0x114) = fVar4;
-		*(float*)(iVar8 + 0x154) = fVar4;
-		*(float*)(iVar8 + 0x194) = fVar4;
-		*(float*)(iVar8 + 0x1d4) = fVar4;
-		iVar8 = iVar8 + 0x200;
+		entry[0].uvScale = FLOAT_80333048;
+		entry[1].uvScale = FLOAT_80333048;
+		entry[2].uvScale = FLOAT_80333048;
+		entry[3].uvScale = FLOAT_80333048;
+		entry[4].uvScale = FLOAT_80333048;
+		entry[5].uvScale = FLOAT_80333048;
+		entry[6].uvScale = FLOAT_80333048;
+		entry[7].uvScale = FLOAT_80333048;
+		entry += 8;
 		iVar16 = iVar16 - 1;
 	} while (iVar16 != 0);
 
-	iVar8 = (int)favoList;
-	*(int*)(iVar8 + 0x24) = 0x33;
-	*(int*)(iVar8 + 0x20) = 4;
-	*(short*)(iVar8 + 8) = 0x30;
 	fVar4 = 0.0f;
-	*(short*)(iVar8 + 10) = 0x28;
 	fVar5 = FLOAT_80333080;
-	*(short*)(iVar8 + 0xc) = 0x158;
-	*(short*)(iVar8 + 0xe) = 0x20;
-	*(float*)(iVar8 + 0x10) = fVar4;
-	*(float*)(iVar8 + 0x14) = fVar4;
-	*(float*)(iVar8 + 0x1c) = fVar5 / (float)*(short*)(iVar8 + 0xc);
-	*(int*)(iVar8 + 0x2c) = 5;
-	*(int*)(iVar8 + 0x30) = 5;
+	FavoEntry* setupEntry = &favoList->entries[0];
+	setupEntry->tex = 0x33;
+	setupEntry->drawFlags = 4;
+	setupEntry->x = 0x30;
+	setupEntry->y = 0x28;
+	setupEntry->w = 0x158;
+	setupEntry->h = 0x20;
+	setupEntry->u = fVar4;
+	setupEntry->v = fVar4;
+	setupEntry->uvScale = fVar5 / (float)setupEntry->w;
+	setupEntry->startFrame = 5;
+	setupEntry->duration = 5;
 
-	iVar8 = (int)favoList;
-	*(int*)(iVar8 + 100) = 0x32;
-	*(short*)(iVar8 + 0x48) = 0x30;
-	*(short*)(iVar8 + 0x4a) = 0x48;
-	*(short*)(iVar8 + 0x4c) = 0x158;
-	*(short*)(iVar8 + 0x4e) = 200;
-	*(float*)(iVar8 + 0x50) = fVar4;
-	*(float*)(iVar8 + 0x54) = fVar4;
-	*(float*)(iVar8 + 0x5c) = fVar5 / (float)*(short*)(iVar8 + 0x4c);
-	*(int*)(iVar8 + 0x6c) = 5;
-	*(int*)(iVar8 + 0x70) = 5;
+	setupEntry = &favoList->entries[1];
+	setupEntry->tex = 0x32;
+	setupEntry->x = 0x30;
+	setupEntry->y = 0x48;
+	setupEntry->w = 0x158;
+	setupEntry->h = 200;
+	setupEntry->u = fVar4;
+	setupEntry->v = fVar4;
+	setupEntry->uvScale = fVar5 / (float)setupEntry->w;
+	setupEntry->startFrame = 5;
+	setupEntry->duration = 5;
 
-	iVar8 = (int)favoList;
-	*(int*)(iVar8 + 0xa4) = 0x33;
-	*(short*)(iVar8 + 0x88) = 0x30;
-	*(short*)(iVar8 + 0x8a) = 0x110;
-	*(short*)(iVar8 + 0x8c) = 0x158;
-	*(short*)(iVar8 + 0x8e) = 0x20;
-	*(float*)(iVar8 + 0x90) = fVar4;
-	*(float*)(iVar8 + 0x94) = fVar4;
-	*(float*)(iVar8 + 0x9c) = fVar5 / (float)*(short*)(iVar8 + 0x8c);
-	*(int*)(iVar8 + 0xac) = 5;
-	*(int*)(iVar8 + 0xb0) = 5;
+	setupEntry = &favoList->entries[2];
+	setupEntry->tex = 0x33;
+	setupEntry->x = 0x30;
+	setupEntry->y = 0x110;
+	setupEntry->w = 0x158;
+	setupEntry->h = 0x20;
+	setupEntry->u = fVar4;
+	setupEntry->v = fVar4;
+	setupEntry->uvScale = fVar5 / (float)setupEntry->w;
+	setupEntry->startFrame = 5;
+	setupEntry->duration = 5;
 
-	iVar8 = (int)favoList;
-	*(int*)(iVar8 + 0xe4) = 0x45;
-	fVar5 = FLOAT_80333048;
 	sVar9 = 0;
-	*(short*)(iVar8 + 200) = 0x18;
 	fVar7 = FLOAT_80333084;
 	sVar11 = 6;
-	*(short*)(iVar8 + 0xca) = 0xe;
-	*(short*)(iVar8 + 0xcc) = 0x30;
-	iVar16 = 0x180;
-	*(short*)(iVar8 + 0xce) = 0x30;
-	*(float*)(iVar8 + 0xd0) = fVar4;
-	*(float*)(iVar8 + 0xd4) = fVar4;
-	*(float*)(iVar8 + 0xdc) = fVar5;
-	*(int*)(iVar8 + 0xec) = 0;
-	*(int*)(iVar8 + 0xf0) = 5;
+	setupEntry = &favoList->entries[3];
+	setupEntry->tex = 0x45;
+	setupEntry->x = 0x18;
+	setupEntry->y = 0xe;
+	setupEntry->w = 0x30;
+	setupEntry->h = 0x30;
+	setupEntry->u = fVar4;
+	setupEntry->v = fVar4;
+	setupEntry->uvScale = FLOAT_80333048;
+	setupEntry->startFrame = 0;
+	setupEntry->duration = 5;
 
-	iVar8 = (int)favoList;
-	*(int*)(iVar8 + 0x124) = 0x45;
-	*(short*)(iVar8 + 0x108) = 0x1d;
-	*(short*)(iVar8 + 0x10c) = 0x30;
-	*(short*)(iVar8 + 0x10e) = 0x30;
-	*(short*)(iVar8 + 0x10a) = 0x150 - *(short*)(iVar8 + 0x10e);
-	*(float*)(iVar8 + 0x110) = fVar4;
-	*(float*)(iVar8 + 0x114) = fVar4;
-	*(float*)(iVar8 + 0x11c) = fVar7;
-	*(int*)(iVar8 + 300) = 0;
-	*(int*)(iVar8 + 0x130) = 5;
+	setupEntry = &favoList->entries[4];
+	setupEntry->tex = 0x45;
+	setupEntry->x = 0x1d;
+	setupEntry->w = 0x30;
+	setupEntry->h = 0x30;
+	setupEntry->y = static_cast<short>(0x150 - setupEntry->h);
+	setupEntry->u = fVar4;
+	setupEntry->v = fVar4;
+	setupEntry->uvScale = fVar7;
+	setupEntry->startFrame = 0;
+	setupEntry->duration = 5;
 
-	iVar8 = (int)favoList;
-	*(int*)(iVar8 + 0x174) = 2;
-	*(int*)(iVar8 + 0x164) = 0x2e;
-	*(short*)(iVar8 + 0x148) = 0x18;
-	*(short*)(iVar8 + 0x14a) = 8;
-	*(short*)(iVar8 + 0x14c) = 0x48;
-	*(short*)(iVar8 + 0x14e) = 0x140;
-	*(float*)(iVar8 + 0x150) = fVar4;
-	*(float*)(iVar8 + 0x154) = fVar4;
-	*(int*)(iVar8 + 0x16c) = 0;
-	*(int*)(iVar8 + 0x170) = 5;
+	setupEntry = &favoList->entries[5];
+	setupEntry->flags = 2;
+	setupEntry->tex = 0x2e;
+	setupEntry->x = 0x18;
+	setupEntry->y = 8;
+	setupEntry->w = 0x48;
+	setupEntry->h = 0x140;
+	setupEntry->u = fVar4;
+	setupEntry->v = fVar4;
+	setupEntry->startFrame = 0;
+	setupEntry->duration = 5;
 
-	iVar8 = (int)favoList;
+	FavoEntry* firstEntry = favoList->entries;
+	setupEntry = &favoList->entries[6];
 	iVar17 = 4;
 	do {
-		psVar14 = (short*)((int)favoList + iVar16 + 8);
-		psVar14[0x16] = 0;
-		psVar14[0x17] = 2;
-		psVar14[0xe] = 0;
-		psVar14[0xf] = 0x37;
+		setupEntry->flags = 2;
+		setupEntry->tex = 0x37;
 		sVar11 = sVar11 + 2;
-		*psVar14 = *(short*)(iVar8 + 8) + 0x28;
+		setupEntry->x = firstEntry->x + 0x28;
 		sVar10 = sVar9 + 0x20;
-		psVar14[1] = *(short*)(iVar8 + 10) + sVar9;
-		psVar14[2] = 200;
-		psVar14[3] = 0x28;
-		*(float*)(psVar14 + 4) = fVar4;
-		*(float*)(psVar14 + 6) = fVar4;
-		psVar14[0x12] = 0;
-		psVar14[0x13] = 7;
-		psVar14[0x14] = 0;
-		psVar14[0x15] = 5;
+		setupEntry->y = firstEntry->y + sVar9;
+		setupEntry->w = 200;
+		setupEntry->h = 0x28;
+		setupEntry->u = fVar4;
+		setupEntry->v = fVar4;
+		setupEntry->startFrame = 7;
+		setupEntry->duration = 5;
+		setupEntry++;
 
-		iVar15 = iVar16 + 0x48;
-		iVar16 = iVar16 + 0x80;
-		psVar14 = (short*)((int)favoList + iVar15);
-		psVar14[0x16] = 0;
-		psVar14[0x17] = 2;
-		psVar14[0xe] = 0;
-		psVar14[0xf] = 0x37;
-		*psVar14 = *(short*)(iVar8 + 8) + 0x28;
+		setupEntry->flags = 2;
+		setupEntry->tex = 0x37;
+		setupEntry->x = firstEntry->x + 0x28;
 		sVar9 = sVar9 + 0x40;
-		psVar14[1] = *(short*)(iVar8 + 10) + sVar10;
-		psVar14[2] = 200;
-		psVar14[3] = 0x28;
-		*(float*)(psVar14 + 4) = fVar4;
-		*(float*)(psVar14 + 6) = fVar4;
-		psVar14[0x12] = 0;
-		psVar14[0x13] = 7;
-		psVar14[0x14] = 0;
-		psVar14[0x15] = 5;
+		setupEntry->y = firstEntry->y + sVar10;
+		setupEntry->w = 200;
+		setupEntry->h = 0x28;
+		setupEntry->u = fVar4;
+		setupEntry->v = fVar4;
+		setupEntry->startFrame = 7;
+		setupEntry->duration = 5;
+		setupEntry++;
 		iVar17 = iVar17 - 1;
 	} while (iVar17 != 0);
 
-	*favoList = sVar11;
+	favoList->count = sVar11;
 
 	memset(s_rank, 0, sizeof(s_rank));
 	iVar8 = 0;

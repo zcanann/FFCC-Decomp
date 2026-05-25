@@ -10,6 +10,36 @@ class FoodRank
 public:
 };
 
+struct FavoEntry
+{
+    short x;
+    short y;
+    short w;
+    short h;
+    float u;
+    float v;
+    float alpha;
+    float uvScale;
+    int drawFlags;
+    int tex;
+    int step;
+    int startFrame;
+    int duration;
+    unsigned int flags;
+    float dx;
+    float dy;
+    float targetX;
+    float targetY;
+};
+
+struct FavoListStorage
+{
+    short count;
+    short selected;
+    int pad_04;
+    FavoEntry entries[64];
+};
+
 struct SingMenuState
 {
     char pad_00[0x0B];
@@ -61,7 +91,7 @@ public:
     char pad_830[0x18];
     short* singWindowInfo;
     char pad_84c[0x4];
-    short* favoList;
+    FavoListStorage* favoList;
     char pad_854[0x100];
 };
 

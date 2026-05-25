@@ -807,6 +807,7 @@ void drawCommand(int state, CFont* font, float posX, float posY, CCaravanWork* c
 {
 	float fVar1;
 	bool reverseDir;
+	int waveDirection;
 	float clampedAlpha;
 	int tlut;
 	int* cmdNameTable;
@@ -815,11 +816,13 @@ void drawCommand(int state, CFont* font, float posX, float posY, CCaravanWork* c
 	double waveY;
 	double textWidth;
 	double textHeight;
+	float waveSinY;
 
-	cmdNameTable = reinterpret_cast<int*>(reinterpret_cast<RingMenuFlatData*>(&Game.m_cFlatDataArr[1])->table[4].strings);
 	if (Game.m_gameWork.m_bossArtifactStageIndex == 0x19) {
+		cmdNameTable = reinterpret_cast<int*>(reinterpret_cast<RingMenuFlatData*>(&Game.m_cFlatDataArr[1])->table[4].strings);
 		commandLabel = cmdNameTable[cmdIndex + 0x1E];
 	} else if (cmdIndex < 2) {
+		cmdNameTable = reinterpret_cast<int*>(reinterpret_cast<RingMenuFlatData*>(&Game.m_cFlatDataArr[1])->table[4].strings);
 		tlut = 9;
 		if (cmdIndex == 0) {
 			tlut = 1;
@@ -852,16 +855,16 @@ void drawCommand(int state, CFont* font, float posX, float posY, CCaravanWork* c
 	}
 
 	waveX = static_cast<double>(FLOAT_80330ac4 * static_cast<float>(sin(static_cast<double>(angle))));
+	waveSinY = static_cast<float>(sin(static_cast<double>(angle)));
 	reverseDir = false;
 	if ((state == 0) || (state == 3)) {
 		reverseDir = true;
 	}
-
-	waveY = 1.0;
+	waveDirection = 1;
 	if (reverseDir) {
-		waveY = -1.0;
+		waveDirection = -1;
 	}
-	waveY = static_cast<double>(static_cast<float>(waveY) * FLOAT_80330a40 * static_cast<float>(sin(static_cast<double>(angle))));
+	waveY = static_cast<double>(static_cast<float>(waveDirection) * FLOAT_80330a40 * waveSinY);
 	if (Game.m_gameWork.m_bossArtifactStageIndex == 0x19) {
 		waveY = static_cast<double>(static_cast<float>(waveY + static_cast<double>(FLOAT_80330a28)));
 	}
@@ -869,7 +872,7 @@ void drawCommand(int state, CFont* font, float posX, float posY, CCaravanWork* c
 	font->SetScale(static_cast<float>(-(DOUBLE_80330ad0 * fabs(static_cast<double>(angle)) - DOUBLE_80330ac8)));
 	textWidth = static_cast<double>(font->GetWidth(reinterpret_cast<const char*>(commandLabel)));
 	fVar1 = static_cast<float>(-(DOUBLE_80330ad8 * fabs(static_cast<double>(angle)) - DOUBLE_80330a98));
-	textHeight = static_cast<double>(static_cast<float>(font->m_glyphWidth) * font->scaleY);
+	textHeight = static_cast<double>(static_cast<float>(font->m_glyphHeight) * font->scaleY);
 
 	clampedAlpha = FLOAT_803309c0;
 	if ((FLOAT_803309c0 <= fVar1) && ((clampedAlpha = fVar1), (FLOAT_803309cc < fVar1))) {

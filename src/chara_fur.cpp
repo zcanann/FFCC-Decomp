@@ -5,6 +5,7 @@
 #include "ffcc/math.h"
 #include "ffcc/mesmenu.h"
 #include "ffcc/gobject.h"
+#include "ffcc/game.h"
 #include "ffcc/graphic.h"
 #include "ffcc/gxfunc.h"
 #include "ffcc/linkage.h"
@@ -61,7 +62,6 @@ extern float kCharaFurViewDepthThreshold;
 extern float kCharaFurShadeScale;
 extern float FLOAT_80331154;
 extern float FLOAT_80331158;
-static inline unsigned char* GameRaw() { return reinterpret_cast<unsigned char*>(&Game); }
 
 namespace {
 
@@ -626,14 +626,14 @@ void CChara::CalcMogScore()
 		const int b1 = *reinterpret_cast<int*>(self + 0x201C);
 		const int b2 = *reinterpret_cast<int*>(self + 0x2020);
 
-		if (b0 > 2 && static_cast<float>(b0) > 0.75f * static_cast<float>(b1 + b2)) {
-			GameRaw()[0x13E9] = 1;
-		} else if (b1 > 2 && static_cast<float>(b1) > 0.75f * static_cast<float>(b0 + b2)) {
-			GameRaw()[0x13E9] = 2;
-		} else if (b2 > 2 && static_cast<float>(b2) > 0.75f * static_cast<float>(b0 + b1)) {
-			GameRaw()[0x13E9] = 3;
+		if (b0 > 2 && 0.75f * static_cast<float>(b1 + b2) < static_cast<float>(b0)) {
+			Game.m_gameWork.m_mogScoreRadarType = 1;
+		} else if (b1 > 2 && 0.75f * static_cast<float>(b0 + b2) < static_cast<float>(b1)) {
+			Game.m_gameWork.m_mogScoreRadarType = 2;
+		} else if (b2 > 2 && 0.75f * static_cast<float>(b0 + b1) < static_cast<float>(b2)) {
+			Game.m_gameWork.m_mogScoreRadarType = 3;
 		} else {
-			GameRaw()[0x13E9] = 0;
+			Game.m_gameWork.m_mogScoreRadarType = 0;
 		}
 	}
 
@@ -664,7 +664,7 @@ void CChara::CalcMogScore()
 		    *reinterpret_cast<int*>(self + 0x203C),
 		    *reinterpret_cast<int*>(self + 0x2040),
 		    *reinterpret_cast<int*>(self + 0x2044),
-		    radarLabel[GameRaw()[0x13E9]]);
+		    radarLabel[Game.m_gameWork.m_mogScoreRadarType]);
 	}
 }
 
@@ -970,7 +970,7 @@ static inline int MogPadInt(int offset)
 
 static inline unsigned char MogRadarType()
 {
-	return GameRaw()[0x13E9];
+	return Game.m_gameWork.m_mogScoreRadarType;
 }
 
 static inline _GXColor MogBrushColor(unsigned char radarType)

@@ -1361,12 +1361,12 @@ void CCameraPcs::destroyFullShadow()
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
 
     if (*reinterpret_cast<void**>(self + 0x31C) != 0) {
-        delete[] static_cast<u8*>(*reinterpret_cast<void**>(self + 0x31C));
+        delete static_cast<u8*>(*reinterpret_cast<void**>(self + 0x31C));
         *reinterpret_cast<void**>(self + 0x31C) = 0;
     }
 
     if (*reinterpret_cast<void**>(self + 0x320) != 0) {
-        delete[] static_cast<u8*>(*reinterpret_cast<void**>(self + 0x320));
+        delete static_cast<u8*>(*reinterpret_cast<void**>(self + 0x320));
         *reinterpret_cast<void**>(self + 0x320) = 0;
     }
 }

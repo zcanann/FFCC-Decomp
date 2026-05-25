@@ -42,6 +42,10 @@ extern "C" void createViewer__14CFunnyShapePcsFv(CFunnyShapePcs*);
 extern "C" void destroyViewer__14CFunnyShapePcsFv(CFunnyShapePcs*);
 extern "C" void calcViewer__14CFunnyShapePcsFv(CFunnyShapePcs*);
 extern "C" void drawViewer__14CFunnyShapePcsFv(CFunnyShapePcs*);
+extern "C" void __ct__14CUSBStreamDataFv(void*);
+extern "C" void __ct__11CFunnyShapeFv(void*);
+extern "C" void __ct__29CPtrArray_P15OSFS_TEXTURE_ST_Fv(void*);
+extern "C" void __ct__22CPtrArray_P9_GXTexObj_Fv(void*);
 extern "C" const char s_CFunnyShapePcsViewer[] = "CFunnyShapePcs(VIEWER)";
 extern "C" const Vec s_funnyEye = {0.0f, 0.0f, 4.0f};
 extern "C" const Vec s_funnyAt = {0.0f, 0.0f, 0.0f};
@@ -394,10 +398,12 @@ void CPtrArray<OSFS_TEXTURE_ST*>::RemoveAll()
  */
 inline CFunnyShapePcs::CFunnyShapePcs()
 {
-    new (UsbStream(this)) CUSBStreamData;
-    new (FunnyShape(this)) CFunnyShape;
-    new (TextureHeaders(this)) CPtrArray<OSFS_TEXTURE_ST*>;
-    new (TextureObjects(this)) CPtrArray<_GXTexObj*>;
+    CFunnyShapePcs* self = this;
+
+    __ct__14CUSBStreamDataFv(UsbStream(self));
+    __ct__11CFunnyShapeFv(FunnyShape(self));
+    __ct__29CPtrArray_P15OSFS_TEXTURE_ST_Fv(TextureHeaders(self));
+    __ct__22CPtrArray_P9_GXTexObj_Fv(TextureObjects(self));
 }
 
 unsigned int CFunnyShapePcs::m_table_desc0[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createViewer__14CFunnyShapePcsFv)};
@@ -457,3 +463,6 @@ CPtrArray<OSFS_TEXTURE_ST*>::~CPtrArray()
 {
     RemoveAll();
 }
+
+template class CPtrArray<OSFS_TEXTURE_ST*>;
+template class CPtrArray<_GXTexObj*>;

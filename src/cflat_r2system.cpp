@@ -3905,12 +3905,6 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         };
         CGObject* foundObjects[kMaxCcClass2DResults];
         int maxCount = object->m_localBase[7];
-        if (maxCount > kMaxCcClass2DResults) {
-            maxCount = kMaxCcClass2DResults;
-        }
-        if (maxCount < 0) {
-            maxCount = 0;
-        }
 
         int foundCount = this->CcClass2D(
             *object->m_localBase, object->m_localBase[1], &center, static_cast<float>(object->m_localBase[5]),

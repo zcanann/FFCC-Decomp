@@ -1,3 +1,4 @@
+#define FFCC_MAP_DEFINE_MNG_LAYOUT
 #include "ffcc/map.h"
 #include "ffcc/chunkfile.h"
 #include "ffcc/math.h"
@@ -3660,40 +3661,6 @@ void CMapMng::GetFogEnable()
 
 /*
  * --INFO--
- * PAL Address: 0x800342a0
- * PAL Size: 320b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" void __sinit_map_cpp(void)
-{
-    __construct_array(MapMng.GetOctTreeArray(), reinterpret_cast<ConstructorDestructor>(__ct__8COctTreeFv),
-                      reinterpret_cast<ConstructorDestructor>(__dt__8COctTreeFv), sizeof(COctTree), 0x10);
-    __construct_array(MapMng.GetMapHitArray(), reinterpret_cast<ConstructorDestructor>(__ct__7CMapHitFv),
-                      reinterpret_cast<ConstructorDestructor>(__dt__7CMapHitFv), sizeof(CMapHit), 0x20);
-    __construct_array(MapMng.GetMapObjArray(), reinterpret_cast<ConstructorDestructor>(__ct__7CMapObjFv),
-                      reinterpret_cast<ConstructorDestructor>(__dt__7CMapObjFv), sizeof(CMapObj), 0x200);
-    __construct_array(MapMng.GetMapMeshArray(), reinterpret_cast<ConstructorDestructor>(__ct__8CMapMeshFv),
-                      reinterpret_cast<ConstructorDestructor>(__dt__8CMapMeshFv), sizeof(CMapMesh), 0xA0);
-    new (&MapMng.GetMapAnimRunArray()) CPtrArray<CMapAnimRun*>;
-    new (&MapMng.GetMapAnimArray()) CPtrArray<CMapAnim*>;
-    new (&MapMng.GetMapAnimKeyDtArray()) CPtrArray<CMapAnimKeyDt*>;
-    new (&MapMng.GetMapShadowArray()) CPtrArray<CMapShadow*>;
-    __construct_array(
-        MapMng.GetMapLightHolderArrays(),
-        reinterpret_cast<ConstructorDestructor>(__ct__29CPtrArray_P15CMapLightHolder_Fv),
-        reinterpret_cast<ConstructorDestructor>(dtor_80034414),
-        sizeof(CPtrArray<CMapLightHolder*>),
-        2);
-
-    __construct_array(MapMng.GetMapIdGrpArray(), reinterpret_cast<ConstructorDestructor>(__ct__9CMapIdGrpFv), 0, sizeof(CMapIdGrp), 0x100);
-    __register_global_object(&MapMng, reinterpret_cast<void*>(__dt__7CMapMngFv), &Vec_80245758);
-}
-
-/*
- * --INFO--
  * PAL Address: 0x80034750
  * PAL Size: 476b
  * EN Address: TODO
@@ -3712,14 +3679,4 @@ CMapMng::~CMapMng()
     __destroy_arr(GetMapObjArray(), reinterpret_cast<ConstructorDestructor>(__dt__7CMapObjFv), sizeof(CMapObj), 0x200);
     __destroy_arr(GetMapHitArray(), reinterpret_cast<ConstructorDestructor>(__dt__7CMapHitFv), sizeof(CMapHit), 0x20);
     __destroy_arr(GetOctTreeArray(), reinterpret_cast<ConstructorDestructor>(__dt__8COctTreeFv), sizeof(COctTree), 0x10);
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-CMapMng::CMapMng()
-{
-	// TODO
 }

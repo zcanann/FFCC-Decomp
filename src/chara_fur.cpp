@@ -978,32 +978,19 @@ static inline unsigned char MogRadarType()
 static inline _GXColor MogBrushColor(unsigned char radarType)
 {
 	switch (radarType) {
-	case 1:
+	case 0:
 		return CColor(0xF, 4, 4, 2).color;
+	case 1:
+		return CColor(4, 8, 0xF, 2).color;
 	case 2:
 		return CColor(4, 0xF, 4, 2).color;
 	case 3:
-		return CColor(4, 8, 0xF, 2).color;
+		return CColor(0xF, 0xF, 0xF, 4).color;
 	case 4:
 		return CColor(0, 0, 0, 2).color;
 	default:
-		return CColor(0xF, 0xF, 0xF, 4).color;
+		return CColor(0xF, 4, 4, 2).color;
 	}
-}
-
-static inline bool MogColorChanged(const _GXColor& a, const _GXColor& b)
-{
-	return a.r != b.r || a.g != b.g || a.b != b.b || a.a != b.a;
-}
-
-static inline bool MogColorNear(const _GXColor& a, const _GXColor& b, int threshold)
-{
-	const int dr = static_cast<int>(a.r) - static_cast<int>(b.r);
-	const int dg = static_cast<int>(a.g) - static_cast<int>(b.g);
-	const int db = static_cast<int>(a.b) - static_cast<int>(b.b);
-	const int da = static_cast<int>(a.a) - static_cast<int>(b.a);
-	const int total = (dr < 0 ? -dr : dr) + (dg < 0 ? -dg : dg) + (db < 0 ? -db : db) + (da < 0 ? -da : da);
-	return total <= threshold;
 }
 
 static inline void StopMogLoopSe(MogWorkRaw& work)
@@ -1240,41 +1227,39 @@ void CChara::CModel::MogFurFrame(CGObject* object)
 		work.m_prevScoreC = CharaS32(0x2020);
 	}
 
-	if (gObject != 0) {
-		if (work.m_state == 0) {
-			if ((rotateButtons & 1) != 0) {
-				gObject->m_rotTargetY -= 0.03125f;
-				if (gObject->m_currentAnimSlot < 0) {
-					gObject->PlayAnim(1, 0, 0, -1, -1, 0);
-				}
-			} else if ((rotateButtons & 2) != 0) {
-				gObject->m_rotTargetY += 0.03125f;
-				if (gObject->m_currentAnimSlot < 0) {
-					gObject->PlayAnim(1, 0, 0, -1, -1, 0);
-				}
-			} else if (gObject->m_currentAnimSlot >= 0) {
-				gObject->CancelAnim(1);
+	if (work.m_state == 0) {
+		if ((rotateButtons & 1) != 0) {
+			gObject->m_rotTargetY -= 0.03125f;
+			if (gObject->m_currentAnimSlot < 0) {
+				gObject->PlayAnim(1, 0, 0, -1, -1, 0);
 			}
+		} else if ((rotateButtons & 2) != 0) {
+			gObject->m_rotTargetY += 0.03125f;
+			if (gObject->m_currentAnimSlot < 0) {
+				gObject->PlayAnim(1, 0, 0, -1, -1, 0);
+			}
+		} else if (gObject->m_currentAnimSlot >= 0) {
+			gObject->CancelAnim(1);
+		}
 
-			if ((rotateButtons & 8) != 0) {
-				work.m_state = 1;
-				gObject->PlayAnim(0x37, 1, 0, -1, -1, 0);
-				messageId = 7;
+		if ((rotateButtons & 8) != 0) {
+			work.m_state = 1;
+			gObject->PlayAnim(0x37, 1, 0, -1, -1, 0);
+			messageId = 7;
+		}
+	} else if (work.m_state == 1) {
+		unsigned char* objectBytes = reinterpret_cast<unsigned char*>(gObject);
+		if (gObject->m_currentAnimSlot == static_cast<char>(objectBytes[0xD4])) {
+			if (gObject->IsLoopAnim(1) != 0) {
+				gObject->PlayAnim(0x38, 1, 0, -1, -1, 0);
 			}
-		} else if (work.m_state == 1) {
-			unsigned char* objectBytes = reinterpret_cast<unsigned char*>(gObject);
-			if (gObject->m_currentAnimSlot == static_cast<char>(objectBytes[0xD4])) {
-				if (gObject->IsLoopAnim(1) != 0) {
-					gObject->PlayAnim(0x38, 1, 0, -1, -1, 0);
-				}
-			} else if (gObject->m_currentAnimSlot == static_cast<char>(objectBytes[0xD5])) {
-				if ((rotateButtons & 4) != 0) {
-					gObject->PlayAnim(0x39, 1, 0, -1, -1, 0);
-				}
-			} else if (gObject->IsLoopAnim(1) != 0) {
-				gObject->CancelAnim(1);
-				work.m_state = 0;
+		} else if (gObject->m_currentAnimSlot == static_cast<char>(objectBytes[0xD5])) {
+			if ((rotateButtons & 4) != 0) {
+				gObject->PlayAnim(0x39, 1, 0, -1, -1, 0);
 			}
+		} else if (gObject->IsLoopAnim(1) != 0) {
+			gObject->CancelAnim(1);
+			work.m_state = 0;
 		}
 	}
 
@@ -1318,16 +1303,30 @@ void CChara::CModel::MogFurFrame(CGObject* object)
 		if (pickResult >= 0) {
 			work.m_pickTicks++;
 
-			const int scoreDeltaA = CharaS32(0x2018) - work.m_prevScoreA;
-			const int scoreDeltaB = CharaS32(0x201C) - work.m_prevScoreB;
-			const int scoreDeltaC = CharaS32(0x2020) - work.m_prevScoreC;
-			if (((scoreDeltaA < 0 ? -scoreDeltaA : scoreDeltaA) >= 5) ||
-			    ((scoreDeltaB < 0 ? -scoreDeltaB : scoreDeltaB) >= 5) ||
-			    ((scoreDeltaC < 0 ? -scoreDeltaC : scoreDeltaC) >= 5)) {
+			if (CharaS32(0x2018) >= work.m_prevScoreA + 5) {
 				work.m_prevScoreA = CharaS32(0x2018);
 				work.m_prevScoreB = CharaS32(0x201C);
 				work.m_prevScoreC = CharaS32(0x2020);
 				messageId = 1;
+			} else if (CharaS32(0x2018) < work.m_prevScoreA - 5) {
+				work.m_prevScoreA = CharaS32(0x2018);
+				work.m_prevScoreB = CharaS32(0x201C);
+				work.m_prevScoreC = CharaS32(0x2020);
+				messageId = 6;
+			}
+			if (CharaS32(0x201C) >= work.m_prevScoreB + 5) {
+				work.m_prevScoreB = CharaS32(0x201C);
+				messageId = 1;
+			} else if (CharaS32(0x201C) < work.m_prevScoreB - 5) {
+				work.m_prevScoreB = CharaS32(0x201C);
+				messageId = 6;
+			}
+			if (CharaS32(0x2020) >= work.m_prevScoreC + 5) {
+				work.m_prevScoreC = CharaS32(0x2020);
+				messageId = 1;
+			} else if (CharaS32(0x2020) < work.m_prevScoreC - 5) {
+				work.m_prevScoreC = CharaS32(0x2020);
+				messageId = 6;
 			}
 
 			if (pickResult == 0) {
@@ -1347,20 +1346,24 @@ void CChara::CModel::MogFurFrame(CGObject* object)
 					work.m_eraseTicks++;
 					if (work.m_eraseTicks == 10 && messageId < 0) {
 						messageId = 5;
+						work.m_eraseTicks = 0x0B;
 					} else if (work.m_eraseTicks == 0x32 && messageId < 0) {
 						messageId = 6;
+						work.m_eraseTicks = 0x33;
 					}
 				}
-			} else {
+			} else if (radarType == 3) {
 				work.m_eraseTicks = 0;
-				if ((centerAfter.a != 0) && !MogColorNear(centerAfter, brushColor, 8)) {
+				if ((((centerAfter.r < 0x0D) || (centerAfter.g < 0x0D)) || (centerAfter.b < 0x0D)) && (centerAfter.a != 0)) {
 					work.m_offColorTicks++;
 					if (work.m_offColorTicks == 10 && messageId < 0) {
 						messageId = 2;
+						work.m_offColorTicks = 0x0B;
 					}
-				} else {
-					work.m_offColorTicks = 0;
 				}
+			} else {
+				work.m_offColorTicks = 0;
+				work.m_eraseTicks = 0;
 			}
 		}
 

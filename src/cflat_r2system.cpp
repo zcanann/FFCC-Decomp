@@ -4236,7 +4236,7 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         outResult = 0;
         return;
     case -0xFA:
-        CGItemObj::ItemJump(*object->m_localBase, static_cast<float>(object->m_localBase[1]));
+        CGItemObj::ItemJump(*object->m_localBase, *reinterpret_cast<float*>(object->m_localBase + 1));
         runtime->push(object, 0);
         outResult = 0;
         return;

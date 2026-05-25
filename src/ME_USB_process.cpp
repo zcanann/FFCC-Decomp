@@ -323,9 +323,12 @@ void CMaterialEditorPcs::SetUSBData()
         RSDITEM* rsdItem = this->GetRsdItem()->rsdItem;
         memcpy(dstBuffer, usb.m_data, usb.m_sizeBytes);
 
-        u8* target = reinterpret_cast<u8*>(rsdItem->ptr18);
+        u32 offset = 0;
+        u8* src = dstBuffer;
         for (u32 i = 0; i < usb.m_sizeBytes; i++) {
-            target[i * 0x70 + 0x1A] = dstBuffer[i];
+            static_cast<u8*>(rsdItem->ptr18)[offset + 0x1A] = *src;
+            offset += 0x70;
+            src++;
         }
 
         if (dstBuffer != 0) {
@@ -360,8 +363,7 @@ void CMaterialEditorPcs::SetUSBData()
         DCFlushRange(headerBuffer, 0x10);
         memcpy(this->m_textureHeader[this->m_loadedTextureCount], headerBuffer, 0x10);
 
-        s16 format = headerBuffer[1];
-        if (format == 0x20) {
+        if (headerBuffer[1] == 0x20) {
             void* texData = Memory._Alloc(
                 usb.m_sizeBytes - 0x10, MaterialEditorStage(), const_cast<char*>(s_ME_USB_process_cpp), 0x31, 0);
             if (texData == 0) {
@@ -370,8 +372,8 @@ void CMaterialEditorPcs::SetUSBData()
             this->m_textureData[this->m_loadedTextureCount] = texData;
             memcpy(this->m_textureData[this->m_loadedTextureCount], headerBuffer + 8, usb.m_sizeBytes - 0x10);
             DCFlushRange(this->m_textureData[this->m_loadedTextureCount], usb.m_sizeBytes - 0x10);
-        } else if ((format == 4) || (format == 8)) {
-            int tlutEntries = format == 4 ? 0x10 : 0x100;
+        } else if ((headerBuffer[1] == 4) || (headerBuffer[1] == 8)) {
+            int tlutEntries = headerBuffer[1] == 4 ? 0x10 : 0x100;
             int tlutDataSize = tlutEntries * 4;
             int imageDataSize = static_cast<int>(usb.m_sizeBytes) - 0x10 - tlutDataSize;
             void* texData = Memory._Alloc(
@@ -391,7 +393,7 @@ void CMaterialEditorPcs::SetUSBData()
             }
             this->m_tlutData[this->m_loadedTextureCount] = tlutData;
 
-            int tlutOffset = format == 4 ? (headerBuffer[2] * headerBuffer[3]) / 2 : headerBuffer[2] * headerBuffer[3];
+            int tlutOffset = headerBuffer[1] == 4 ? (headerBuffer[2] * headerBuffer[3]) / 2 : headerBuffer[2] * headerBuffer[3];
             memcpy(this->m_tlutData[this->m_loadedTextureCount], reinterpret_cast<u8*>(headerBuffer) + tlutOffset + 0x10, tlutDataSize);
             DCFlushRange(this->m_tlutData[this->m_loadedTextureCount], tlutDataSize);
         }
@@ -419,24 +421,30 @@ void CMaterialEditorPcs::SetUSBData()
 
         u32 widthFactor = static_cast<u32>(headerBuffer[2]);
         u32 heightFactor = static_cast<u32>(headerBuffer[3]);
-        GXBool isPowerOfTwo = GX_TRUE;
+        int isPowerOfTwo = 1;
 
-        while ((widthFactor & 1) == 0) {
+        for (;;) {
+            if ((widthFactor & 1) != 0) {
+                break;
+            }
             widthFactor >>= 1;
         }
-        while ((heightFactor & 1) == 0) {
+        for (;;) {
+            if ((heightFactor & 1) != 0) {
+                break;
+            }
             heightFactor >>= 1;
         }
         if ((heightFactor != 1) || (heightFactor != 1)) {
-            isPowerOfTwo = GX_FALSE;
+            isPowerOfTwo = 0;
         }
 
-        if (format == 0x20) {
+        if (headerBuffer[1] == 0x20) {
             GXInitTexObj(this->m_texObj[this->m_loadedTextureCount],
                 this->m_textureData[this->m_loadedTextureCount], headerBuffer[2], headerBuffer[3],
                 GX_TF_RGBA8, static_cast<GXTexWrapMode>(isPowerOfTwo), static_cast<GXTexWrapMode>(isPowerOfTwo), GX_FALSE);
-        } else if ((format == 4) || (format == 8)) {
-            int tlutEntries = format == 4 ? 0x10 : 0x100;
+        } else if ((headerBuffer[1] == 4) || (headerBuffer[1] == 8)) {
+            int tlutEntries = headerBuffer[1] == 4 ? 0x10 : 0x100;
 
             GXInitTlutObj(this->m_tlutObj0[this->m_loadedTextureCount],
                 this->m_tlutData[this->m_loadedTextureCount], GX_TL_IA8, tlutEntries);

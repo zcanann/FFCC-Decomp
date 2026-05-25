@@ -4137,10 +4137,11 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         return;
     }
     case -0xED: {
+        const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
         Vec hitPosition = {
-            static_cast<float>(object->m_localBase[0]),
-            static_cast<float>(object->m_localBase[1]),
-            static_cast<float>(object->m_localBase[2]),
+            localFloats[0],
+            localFloats[1],
+            localFloats[2],
         };
         Vec cylinderTop = { 0.0f, 1.0f, 0.0f };
         if (MapPcs.CheckHitCylinderNear(&hitPosition, &cylinderTop, static_cast<float>(0.0f), object->m_localBase[3]) == 0) {
@@ -4169,17 +4170,10 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         outResult = 0;
         return;
     case -0xF0: {
-        unsigned int flags = 0;
-        int spawnGroup = *object->m_localBase;
-        int spawnBit = object->m_localBase[1];
-
-        if (spawnGroup >= 0 && spawnGroup <= 8 && spawnBit >= 0 && spawnBit < 32) {
-            flags =
-                *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x12F4 + spawnGroup * 8) &
-                (1u << spawnBit);
-        }
-
-        runtime->push(object, flags);
+        runtime->push(
+            object,
+            *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x12F4 + *object->m_localBase * 8) &
+                (1u << object->m_localBase[1]));
         outResult = 0;
         return;
     }

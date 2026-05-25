@@ -1281,7 +1281,7 @@ pppRain.cpp:
 	extab       start:0x80008C94 end:0x80008CAC
 	extabindex  start:0x8000F7A8 end:0x8000F7CC
 	.text       start:0x800DD424 end:0x800DDAF8
-	.rodata     start:0x801DB610 end:0x801DB620
+	.rodata     start:0x801DB610 end:0x801DB61C
 	.sdata2     start:0x80330FD4 end:0x80330FE8
 
 pppBlurChara.cpp:

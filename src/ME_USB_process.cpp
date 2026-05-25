@@ -71,6 +71,11 @@ static inline u16 LoadSwapU16(u16 value)
     return __lhbrx(&value, 0);
 }
 
+static inline s16 LoadSwapS16(s16 value)
+{
+    return __lhbrx(&value, 0);
+}
+
 static inline f32 S32ToFloat(s32 value)
 {
     union {
@@ -138,15 +143,14 @@ void CMaterialEditorPcs::SetUSBData()
         }
         rsdItem->ptr10 = allocData;
 
-        memcpy(rsdItem->ptr10, usb.m_data, allocSize);
+        memcpy(rsdItem->ptr10, usb.m_data, usb.m_sizeBytes * 0xC);
 
         for (u32 i = 0, offset = 0; i < usb.m_sizeBytes; i++, offset += 0xC) {
-            u32* item = reinterpret_cast<u32*>(reinterpret_cast<u8*>(rsdItem->ptr10) + offset);
-            StoreSwapFloat(reinterpret_cast<f32*>(item + 0));
-            StoreSwapNegFloat(reinterpret_cast<f32*>(item + 1));
-            StoreSwapNegFloat(reinterpret_cast<f32*>(item + 2));
+            StoreSwapFloat(reinterpret_cast<f32*>(reinterpret_cast<u8*>(rsdItem->ptr10) + offset + 0x0));
+            StoreSwapNegFloat(reinterpret_cast<f32*>(reinterpret_cast<u8*>(rsdItem->ptr10) + offset + 0x4));
+            StoreSwapNegFloat(reinterpret_cast<f32*>(reinterpret_cast<u8*>(rsdItem->ptr10) + offset + 0x8));
         }
-        DCStoreRange(rsdItem->ptr10, allocSize);
+        DCStoreRange(rsdItem->ptr10, usb.m_sizeBytes * 0xC);
 
         CreateBoundaryBox(minPos, maxPos, rsdItem->countA, reinterpret_cast<const Vec*>(rsdItem->ptr10));
 
@@ -182,35 +186,53 @@ void CMaterialEditorPcs::SetUSBData()
         }
         rsdItem->ptr18 = allocData;
 
-        memset(rsdItem->ptr18, 0, allocSize);
-        memcpy(rsdItem->ptr18, usb.m_data, allocSize);
+        memset(rsdItem->ptr18, 0, usb.m_sizeBytes * 0x70);
+        memcpy(rsdItem->ptr18, usb.m_data, usb.m_sizeBytes * 0x70);
 
-        for (u32 i = 0; i < usb.m_sizeBytes; i++) {
-            u8* data = reinterpret_cast<u8*>(rsdItem->ptr18) + i * 0x70;
-
-            *reinterpret_cast<u16*>(data + 0x00) = LoadSwapU16(*reinterpret_cast<u16*>(data + 0x00));
-            *reinterpret_cast<u16*>(data + 0x02) = LoadSwapU16(*reinterpret_cast<u16*>(data + 0x02));
-            StoreSwap32(reinterpret_cast<u32*>(data + 0x04));
-            *reinterpret_cast<u16*>(data + 0x08) = LoadSwapU16(*reinterpret_cast<u16*>(data + 0x08));
-            *reinterpret_cast<u16*>(data + 0x0A) = LoadSwapU16(*reinterpret_cast<u16*>(data + 0x0A));
-            *reinterpret_cast<u16*>(data + 0x0C) = LoadSwapU16(*reinterpret_cast<u16*>(data + 0x0C));
-            *reinterpret_cast<u16*>(data + 0x0E) = LoadSwapU16(*reinterpret_cast<u16*>(data + 0x0E));
-            *reinterpret_cast<u16*>(data + 0x10) = LoadSwapU16(*reinterpret_cast<u16*>(data + 0x10));
-            *reinterpret_cast<u16*>(data + 0x12) = LoadSwapU16(*reinterpret_cast<u16*>(data + 0x12));
-            *reinterpret_cast<u16*>(data + 0x14) = LoadSwapU16(*reinterpret_cast<u16*>(data + 0x14));
-            *reinterpret_cast<u16*>(data + 0x16) = LoadSwapU16(*reinterpret_cast<u16*>(data + 0x16));
-            *reinterpret_cast<u16*>(data + 0x1C) = LoadSwapU16(*reinterpret_cast<u16*>(data + 0x1C));
-            *reinterpret_cast<u16*>(data + 0x1E) = LoadSwapU16(*reinterpret_cast<u16*>(data + 0x1E));
-            *reinterpret_cast<u16*>(data + 0x20) = LoadSwapU16(*reinterpret_cast<u16*>(data + 0x20));
-            *reinterpret_cast<u16*>(data + 0x22) = LoadSwapU16(*reinterpret_cast<u16*>(data + 0x22));
-            *reinterpret_cast<u16*>(data + 0x24) = LoadSwapU16(*reinterpret_cast<u16*>(data + 0x24));
-            *reinterpret_cast<u16*>(data + 0x26) = LoadSwapU16(*reinterpret_cast<u16*>(data + 0x26));
-            *reinterpret_cast<u16*>(data + 0x28) = LoadSwapU16(*reinterpret_cast<u16*>(data + 0x28));
-            *reinterpret_cast<u16*>(data + 0x2A) = LoadSwapU16(*reinterpret_cast<u16*>(data + 0x2A));
-            *reinterpret_cast<u16*>(data + 0x2C) = LoadSwapU16(*reinterpret_cast<u16*>(data + 0x2C));
-            *reinterpret_cast<u16*>(data + 0x2E) = LoadSwapU16(*reinterpret_cast<u16*>(data + 0x2E));
+        for (u32 i = 0, offset = 0; i < usb.m_sizeBytes; i++, offset += 0x70) {
+            *reinterpret_cast<s16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x00) =
+                LoadSwapS16(*reinterpret_cast<s16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x00));
+            *reinterpret_cast<u16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x02) =
+                LoadSwapU16(*reinterpret_cast<u16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x02));
+            StoreSwap32(reinterpret_cast<u32*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x04));
+            *reinterpret_cast<u16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x08) =
+                LoadSwapU16(*reinterpret_cast<u16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x08));
+            *reinterpret_cast<u16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x0A) =
+                LoadSwapU16(*reinterpret_cast<u16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x0A));
+            *reinterpret_cast<u16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x0C) =
+                LoadSwapU16(*reinterpret_cast<u16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x0C));
+            *reinterpret_cast<u16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x0E) =
+                LoadSwapU16(*reinterpret_cast<u16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x0E));
+            *reinterpret_cast<u16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x10) =
+                LoadSwapU16(*reinterpret_cast<u16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x10));
+            *reinterpret_cast<u16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x12) =
+                LoadSwapU16(*reinterpret_cast<u16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x12));
+            *reinterpret_cast<u16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x14) =
+                LoadSwapU16(*reinterpret_cast<u16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x14));
+            *reinterpret_cast<u16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x16) =
+                LoadSwapU16(*reinterpret_cast<u16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x16));
+            *reinterpret_cast<s16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x1C) =
+                LoadSwapS16(*reinterpret_cast<s16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x1C));
+            *reinterpret_cast<s16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x1E) =
+                LoadSwapS16(*reinterpret_cast<s16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x1E));
+            *reinterpret_cast<s16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x20) =
+                LoadSwapS16(*reinterpret_cast<s16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x20));
+            *reinterpret_cast<s16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x22) =
+                LoadSwapS16(*reinterpret_cast<s16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x22));
+            *reinterpret_cast<s16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x24) =
+                LoadSwapS16(*reinterpret_cast<s16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x24));
+            *reinterpret_cast<s16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x26) =
+                LoadSwapS16(*reinterpret_cast<s16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x26));
+            *reinterpret_cast<s16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x28) =
+                LoadSwapS16(*reinterpret_cast<s16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x28));
+            *reinterpret_cast<s16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x2A) =
+                LoadSwapS16(*reinterpret_cast<s16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x2A));
+            *reinterpret_cast<s16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x2C) =
+                LoadSwapS16(*reinterpret_cast<s16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x2C));
+            *reinterpret_cast<s16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x2E) =
+                LoadSwapS16(*reinterpret_cast<s16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x2E));
         }
-        DCStoreRange(rsdItem->ptr18, allocSize);
+        DCStoreRange(rsdItem->ptr18, usb.m_sizeBytes * 0x70);
         break;
     }
     case 0x42:
@@ -242,15 +264,14 @@ void CMaterialEditorPcs::SetUSBData()
         }
         rsdItem->ptr14 = allocData;
 
-        memcpy(rsdItem->ptr14, usb.m_data, allocSize);
+        memcpy(rsdItem->ptr14, usb.m_data, usb.m_sizeBytes * 0xC);
 
         for (u32 i = 0, offset = 0; i < usb.m_sizeBytes; i++, offset += 0xC) {
-            u32* item = reinterpret_cast<u32*>(reinterpret_cast<u8*>(rsdItem->ptr14) + offset);
-            StoreSwapFloat(reinterpret_cast<f32*>(item + 0));
-            StoreSwapNegFloat(reinterpret_cast<f32*>(item + 1));
-            StoreSwapNegFloat(reinterpret_cast<f32*>(item + 2));
+            StoreSwapFloat(reinterpret_cast<f32*>(reinterpret_cast<u8*>(rsdItem->ptr14) + offset + 0x0));
+            StoreSwapNegFloat(reinterpret_cast<f32*>(reinterpret_cast<u8*>(rsdItem->ptr14) + offset + 0x4));
+            StoreSwapNegFloat(reinterpret_cast<f32*>(reinterpret_cast<u8*>(rsdItem->ptr14) + offset + 0x8));
         }
-        DCStoreRange(rsdItem->ptr14, allocSize);
+        DCStoreRange(rsdItem->ptr14, usb.m_sizeBytes * 0xC);
         break;
     }
     case 1: {
@@ -313,12 +334,11 @@ void CMaterialEditorPcs::SetUSBData()
         break;
     }
     case 0x20: {
-        u32 size = usb.m_sizeBytes;
         s16* headerBuffer = static_cast<s16*>(
-            Memory._Alloc(size, MaterialEditorStage(), const_cast<char*>(s_ME_USB_process_cpp), 0x31, 0));
+            Memory._Alloc(usb.m_sizeBytes, MaterialEditorStage(), const_cast<char*>(s_ME_USB_process_cpp), 0x31, 0));
 
         if (headerBuffer == 0) {
-            System.Printf(const_cast<char*>(sMemAllocErrorSizeFmt), size);
+            System.Printf(const_cast<char*>(sMemAllocErrorSizeFmt), usb.m_sizeBytes);
         }
 
         void* headerDst =
@@ -328,7 +348,7 @@ void CMaterialEditorPcs::SetUSBData()
         }
 
         this->m_textureHeader[this->m_loadedTextureCount] = static_cast<s16*>(headerDst);
-        memcpy(headerBuffer, usb.m_data, size);
+        memcpy(headerBuffer, usb.m_data, usb.m_sizeBytes);
         headerBuffer[0] = LoadSwapU16(headerBuffer[0]);
         headerBuffer[1] = LoadSwapU16(headerBuffer[1]);
         headerBuffer[2] = LoadSwapU16(headerBuffer[2]);
@@ -343,17 +363,17 @@ void CMaterialEditorPcs::SetUSBData()
         s16 format = headerBuffer[1];
         if (format == 0x20) {
             void* texData = Memory._Alloc(
-                size - 0x10, MaterialEditorStage(), const_cast<char*>(s_ME_USB_process_cpp), 0x31, 0);
+                usb.m_sizeBytes - 0x10, MaterialEditorStage(), const_cast<char*>(s_ME_USB_process_cpp), 0x31, 0);
             if (texData == 0) {
-                System.Printf(const_cast<char*>(sMemAllocErrorSizeFmt), size - 0x10);
+                System.Printf(const_cast<char*>(sMemAllocErrorSizeFmt), usb.m_sizeBytes - 0x10);
             }
             this->m_textureData[this->m_loadedTextureCount] = texData;
-            memcpy(texData, headerBuffer + 8, size - 0x10);
-            DCFlushRange(texData, size - 0x10);
+            memcpy(this->m_textureData[this->m_loadedTextureCount], headerBuffer + 8, usb.m_sizeBytes - 0x10);
+            DCFlushRange(this->m_textureData[this->m_loadedTextureCount], usb.m_sizeBytes - 0x10);
         } else if ((format == 4) || (format == 8)) {
             int tlutEntries = format == 4 ? 0x10 : 0x100;
             int tlutDataSize = tlutEntries * 4;
-            int imageDataSize = static_cast<int>(size) - 0x10 - tlutDataSize;
+            int imageDataSize = static_cast<int>(usb.m_sizeBytes) - 0x10 - tlutDataSize;
             void* texData = Memory._Alloc(
                 imageDataSize, MaterialEditorStage(), const_cast<char*>(s_ME_USB_process_cpp), 0x31, 0);
 
@@ -361,8 +381,8 @@ void CMaterialEditorPcs::SetUSBData()
                 System.Printf(const_cast<char*>(sMemAllocErrorSizeFmt), imageDataSize);
             }
             this->m_textureData[this->m_loadedTextureCount] = texData;
-            memcpy(texData, headerBuffer + 8, imageDataSize);
-            DCFlushRange(texData, imageDataSize);
+            memcpy(this->m_textureData[this->m_loadedTextureCount], headerBuffer + 8, imageDataSize);
+            DCFlushRange(this->m_textureData[this->m_loadedTextureCount], imageDataSize);
 
             void* tlutData = Memory._Alloc(
                 tlutDataSize, MaterialEditorStage(), const_cast<char*>(s_ME_USB_process_cpp), 0x31, 0);
@@ -372,8 +392,8 @@ void CMaterialEditorPcs::SetUSBData()
             this->m_tlutData[this->m_loadedTextureCount] = tlutData;
 
             int tlutOffset = format == 4 ? (headerBuffer[2] * headerBuffer[3]) / 2 : headerBuffer[2] * headerBuffer[3];
-            memcpy(tlutData, reinterpret_cast<u8*>(headerBuffer) + tlutOffset + 0x10, tlutDataSize);
-            DCFlushRange(tlutData, tlutDataSize);
+            memcpy(this->m_tlutData[this->m_loadedTextureCount], reinterpret_cast<u8*>(headerBuffer) + tlutOffset + 0x10, tlutDataSize);
+            DCFlushRange(this->m_tlutData[this->m_loadedTextureCount], tlutDataSize);
         }
 
         void* texObj =
@@ -426,7 +446,7 @@ void CMaterialEditorPcs::SetUSBData()
             GXLoadTlut(this->m_tlutObj1[this->m_loadedTextureCount], GX_TLUT1);
             GXInitTexObjCI(this->m_texObj[this->m_loadedTextureCount],
                 this->m_textureData[this->m_loadedTextureCount], headerBuffer[2], headerBuffer[3],
-                static_cast<GXCITexFmt>(format == 4 ? GX_TF_C4 : GX_TF_C8),
+                static_cast<GXCITexFmt>(headerBuffer[1] == 4 ? GX_TF_C4 : GX_TF_C8),
                 static_cast<GXTexWrapMode>(isPowerOfTwo), static_cast<GXTexWrapMode>(isPowerOfTwo),
                 GX_FALSE, static_cast<u32>(GX_TLUT0));
         }

@@ -494,7 +494,7 @@ int RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* verti
 			projectedOffsetX = texScaleX * (((float)left + (float)width) - projected[maxIndex].x);
 			texMtx[0][2] = texMtx[0][2] + (projectedObj[maxIndex].x + projectedOffsetX - FLOAT_803305f8);
 		}
-	} else if ((left + width) <= 640) {
+	} else if (640 < (left + width)) {
 		texMtx[0][2] = texMtx[0][2] + offsetX;
 	} else {
 		texMtx[0][2] = texMtx[0][2] + offsetX;

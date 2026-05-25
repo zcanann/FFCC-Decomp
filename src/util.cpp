@@ -1226,6 +1226,7 @@ void CUtil::RenderQuad(Vec pos1, Vec pos2, _GXColor color, Vec2d* uv1, Vec2d* uv
 void CUtil::RenderQuadNoTex(Vec pos1, Vec pos2, _GXColor color)
 {
     GXBegin(GX_QUADS, GX_VTXFMT7, 4);
+    f32 x2;
     f32 x1 = pos1.x;
     f32 y1 = pos1.y;
 
@@ -1234,7 +1235,7 @@ void CUtil::RenderQuadNoTex(Vec pos1, Vec pos2, _GXColor color)
     GXWGFifo.f32 = y1;
     u32 rgba = *reinterpret_cast<u32*>(&color);
     GXWGFifo.f32 = z1;
-    f32 x2 = pos2.x;
+    x2 = pos2.x;
     GXWGFifo.u32 = rgba;
     f32 y2 = pos2.y;
 

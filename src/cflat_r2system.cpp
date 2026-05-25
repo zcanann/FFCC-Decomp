@@ -1910,22 +1910,17 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         return;
     case -4:
         if (CameraPcs.IsAbsolute() != 0) {
-            Vec refPosition;
-            *reinterpret_cast<unsigned int*>(&refPosition.x) = object->m_localBase[0];
-            *reinterpret_cast<unsigned int*>(&refPosition.y) = object->m_localBase[1];
-            *reinterpret_cast<unsigned int*>(&refPosition.z) = object->m_localBase[2];
+            const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
+            CVector refPosition(localFloats[0], localFloats[1], localFloats[2]);
             if (*reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x10414) == 0) {
-                CameraPcs.SetRefPosition(&refPosition);
+                CameraPcs.SetRefPosition(refPosition);
             } else {
                 *reinterpret_cast<Vec*>(reinterpret_cast<u8*>(&CharaPcs) + 0x38) = refPosition;
             }
 
-            Vec position;
-            *reinterpret_cast<unsigned int*>(&position.x) = object->m_localBase[3];
-            *reinterpret_cast<unsigned int*>(&position.y) = object->m_localBase[4];
-            *reinterpret_cast<unsigned int*>(&position.z) = object->m_localBase[5];
+            CVector position(localFloats[3], localFloats[4], localFloats[5]);
             if (*reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x10414) == 0) {
-                CameraPcs.SetPosition(&position);
+                CameraPcs.SetPosition(position);
             } else {
                 *reinterpret_cast<Vec*>(reinterpret_cast<u8*>(&CharaPcs) + 0x2C) = position;
             }

@@ -275,10 +275,10 @@ void CCaravanWork::clearCaravanWork()
 	m_evtState1 = 0;
 	memset(m_commandListInventorySlotRef, 0xFF, sizeof(m_commandListInventorySlotRef));
 	memset(m_commandListExtra, 0, sizeof(m_commandListExtra));
-	m_bonusCondition = 0;
+	memset(&m_bonusCondition, 0, 1);
 	memset(m_equipEffectParams, 0, sizeof(m_equipEffectParams) - sizeof(m_equipEffectParams[0]));
-	m_shopBusyFlag = 0;
-	m_caravanLocalFlags = 0;
+	memset(&m_shopBusyFlag, 0, 1);
+	memset(&m_caravanLocalFlags, 0, 1);
 	m_inventoryItemCount = 0;
 	memset(m_inventoryItems, 0xFF, sizeof(m_backupInventoryBlock));
 	m_progressValue = 0;

@@ -2920,10 +2920,12 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
     }
     case -0x4F:
         MapMng.SetMeshCameraSemiTransRange(
-            static_cast<unsigned short>(*object->m_localBase), static_cast<float>(object->m_localBase[1]),
-            static_cast<float>(object->m_localBase[2]), static_cast<float>(object->m_localBase[3]),
-            static_cast<float>(object->m_localBase[4]),
-            (60.0f * 1000.0f * static_cast<float>(object->m_localBase[5])) / 180.0f);
+            static_cast<unsigned short>(*object->m_localBase),
+            *reinterpret_cast<float*>(object->m_localBase + 1),
+            *reinterpret_cast<float*>(object->m_localBase + 2),
+            *reinterpret_cast<float*>(object->m_localBase + 3),
+            *reinterpret_cast<float*>(object->m_localBase + 4),
+            (60.0f * 1000.0f * *reinterpret_cast<float*>(object->m_localBase + 5)) / 180.0f);
         runtime->push(object, 0);
         outResult = 0;
         return;

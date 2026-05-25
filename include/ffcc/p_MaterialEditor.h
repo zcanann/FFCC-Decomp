@@ -84,7 +84,22 @@ public:
     ZLIST m_zlist2; // 0xD8
 
     u32 m_displayTextureEnabled; // 0xE8
-    unsigned char _padEC[0x40];
+    float field_0xec; // 0xEC
+    float field_0xf0;
+    float field_0xf4;
+    float field_0xf8;
+    float field_0xfc;
+    float field_0x100;
+    float field_0x104;
+    float field_0x108;
+    float field_0x10c;
+    float field_0x110;
+    float field_0x114;
+    float field_0x118;
+    float field_0x11c;
+    float field_0x120;
+    float field_0x124;
+    float field_0x128;
 
     // Raw float words consumed by calcViewer (0x12C - 0x158)
     float field_0x12c;
@@ -101,7 +116,7 @@ public:
     float field_0x158;
 
     Vec field268_0x15c; // 0x15C
-    u32 field_0x168; // 0x168
+    float field_0x168; // 0x168
     unsigned char _pad16C[0xA0];
     pppFMATRIX m_unkMatrix; // 0x20C
     GXTexObj* m_texObj[16]; // 0x23C

@@ -13,6 +13,7 @@ extern "C" const char s_ME_USB_process_cpp[] = "ME_USB_process.cpp";
 extern "C" const char sMemAllocErrorSizeFmt[] = "MemAlloc Error!!! size=%d\n";
 extern "C" const float FLOAT_8032FD00;
 extern "C" const float FLOAT_8032FD04;
+extern "C" const double DOUBLE_8032FD08;
 
 namespace {
 struct ViewerSRT {
@@ -32,11 +33,6 @@ static inline u8* Ptr(CMaterialEditorPcs* self, u32 offset)
     return reinterpret_cast<u8*>(self) + offset;
 }
 
-static inline u32& U32At(CMaterialEditorPcs* self, u32 offset)
-{
-    return *reinterpret_cast<u32*>(Ptr(self, offset));
-}
-
 static inline CMemory::CStage* MaterialEditorStage()
 {
     return MaterialEditorPcs.m_stage;
@@ -54,6 +50,14 @@ static inline void StoreSwap32(u32* value)
     *value = __lwbrx(&raw, 0);
 }
 
+static inline void StoreSwapFloat(f32* value)
+{
+    f32 raw = *value;
+    u32 swapped = __lwbrx(&raw, 0);
+
+    *value = *reinterpret_cast<f32*>(&swapped);
+}
+
 static inline void StoreSwapNegFloat(f32* value)
 {
     f32 raw = *value;
@@ -65,6 +69,18 @@ static inline void StoreSwapNegFloat(f32* value)
 static inline u16 LoadSwapU16(u16 value)
 {
     return __lhbrx(&value, 0);
+}
+
+static inline f32 S32ToFloat(s32 value)
+{
+    union {
+        u32 words[2];
+        double value;
+    } conv;
+
+    conv.words[0] = 0x43300000;
+    conv.words[1] = static_cast<u32>(value ^ 0x80000000);
+    return static_cast<f32>(conv.value - DOUBLE_8032FD08);
 }
 
 }
@@ -107,7 +123,6 @@ void CMaterialEditorPcs::SetUSBData()
         Vec minPos;
         Vec maxPos;
         RSDITEM* rsdItem = GetRsdItem()->rsdItem;
-        u32* xyzData;
 
         if (rsdItem->ptr10 != 0) {
             delete[] static_cast<u8*>(rsdItem->ptr10);
@@ -115,29 +130,32 @@ void CMaterialEditorPcs::SetUSBData()
         }
 
         rsdItem->countA = usb.m_sizeBytes;
+        u32 allocSize = usb.m_sizeBytes * 0xC;
         void* allocData = Memory._Alloc(
-            usb.m_sizeBytes * 0xC, MaterialEditorStage(), const_cast<char*>(s_ME_USB_process_cpp), 0x31, 0);
+            allocSize, MaterialEditorStage(), const_cast<char*>(s_ME_USB_process_cpp), 0x31, 0);
         if (allocData == 0) {
-            System.Printf(const_cast<char*>(sMemAllocErrorSizeFmt), usb.m_sizeBytes * 0xC);
+            System.Printf(const_cast<char*>(sMemAllocErrorSizeFmt), allocSize);
         }
         rsdItem->ptr10 = allocData;
 
-        memcpy(rsdItem->ptr10, usb.m_data, usb.m_sizeBytes * 0xC);
+        memcpy(rsdItem->ptr10, usb.m_data, allocSize);
 
-        xyzData = reinterpret_cast<u32*>(rsdItem->ptr10);
         for (u32 i = 0, offset = 0; i < usb.m_sizeBytes; i++, offset += 0xC) {
-            u32* item = reinterpret_cast<u32*>(reinterpret_cast<u8*>(xyzData) + offset);
-            StoreSwap32(item + 0);
+            u32* item = reinterpret_cast<u32*>(reinterpret_cast<u8*>(rsdItem->ptr10) + offset);
+            StoreSwapFloat(reinterpret_cast<f32*>(item + 0));
             StoreSwapNegFloat(reinterpret_cast<f32*>(item + 1));
             StoreSwapNegFloat(reinterpret_cast<f32*>(item + 2));
         }
-        DCStoreRange(rsdItem->ptr10, usb.m_sizeBytes * 0xC);
+        DCStoreRange(rsdItem->ptr10, allocSize);
 
         CreateBoundaryBox(minPos, maxPos, rsdItem->countA, reinterpret_cast<const Vec*>(rsdItem->ptr10));
 
+        s32 xDiff = static_cast<s32>(maxPos.x - minPos.x);
+        s32 yDiff = static_cast<s32>(maxPos.y - minPos.y);
+
         srt.transX = FLOAT_8032FD00;
-        srt.transY = static_cast<float>(-static_cast<int>(maxPos.x - minPos.x) / 2);
-        srt.transZ = static_cast<float>(-static_cast<int>(maxPos.y - minPos.y) * (static_cast<int>(maxPos.x - minPos.x) / 0x14) - 10);
+        srt.transY = S32ToFloat(-xDiff / 2);
+        srt.transZ = S32ToFloat(-yDiff * (xDiff / 0x14) - 10);
         srt.rotX = FLOAT_8032FD00;
         srt.rotY = FLOAT_8032FD00;
         srt.rotZ = FLOAT_8032FD00;
@@ -156,15 +174,16 @@ void CMaterialEditorPcs::SetUSBData()
         }
 
         rsdItem->countC = usb.m_sizeBytes;
+        u32 allocSize = usb.m_sizeBytes * 0x70;
         void* allocData = Memory._Alloc(
-            usb.m_sizeBytes * 0x70, MaterialEditorStage(), const_cast<char*>(s_ME_USB_process_cpp), 0x31, 0);
+            allocSize, MaterialEditorStage(), const_cast<char*>(s_ME_USB_process_cpp), 0x31, 0);
         if (allocData == 0) {
-            System.Printf(const_cast<char*>(sMemAllocErrorSizeFmt), usb.m_sizeBytes * 0x70);
+            System.Printf(const_cast<char*>(sMemAllocErrorSizeFmt), allocSize);
         }
         rsdItem->ptr18 = allocData;
 
-        memset(rsdItem->ptr18, 0, usb.m_sizeBytes * 0x70);
-        memcpy(rsdItem->ptr18, usb.m_data, usb.m_sizeBytes * 0x70);
+        memset(rsdItem->ptr18, 0, allocSize);
+        memcpy(rsdItem->ptr18, usb.m_data, allocSize);
 
         for (u32 i = 0; i < usb.m_sizeBytes; i++) {
             u8* data = reinterpret_cast<u8*>(rsdItem->ptr18) + i * 0x70;
@@ -191,7 +210,7 @@ void CMaterialEditorPcs::SetUSBData()
             *reinterpret_cast<u16*>(data + 0x2C) = LoadSwapU16(*reinterpret_cast<u16*>(data + 0x2C));
             *reinterpret_cast<u16*>(data + 0x2E) = LoadSwapU16(*reinterpret_cast<u16*>(data + 0x2E));
         }
-        DCStoreRange(rsdItem->ptr18, usb.m_sizeBytes * 0x70);
+        DCStoreRange(rsdItem->ptr18, allocSize);
         break;
     }
     case 0x42:
@@ -208,7 +227,6 @@ void CMaterialEditorPcs::SetUSBData()
         break;
     case 0x12: {
         RSDITEM* rsdItem = GetRsdItem()->rsdItem;
-        u32* xyzData;
 
         if (rsdItem->ptr14 != 0) {
             delete[] static_cast<u8*>(rsdItem->ptr14);
@@ -216,61 +234,61 @@ void CMaterialEditorPcs::SetUSBData()
         }
 
         rsdItem->countB = usb.m_sizeBytes;
+        u32 allocSize = usb.m_sizeBytes * 0xC;
         void* allocData = Memory._Alloc(
-            usb.m_sizeBytes * 0xC, MaterialEditorStage(), const_cast<char*>(s_ME_USB_process_cpp), 0x31, 0);
+            allocSize, MaterialEditorStage(), const_cast<char*>(s_ME_USB_process_cpp), 0x31, 0);
         if (allocData == 0) {
-            System.Printf(const_cast<char*>(sMemAllocErrorSizeFmt), usb.m_sizeBytes * 0xC);
+            System.Printf(const_cast<char*>(sMemAllocErrorSizeFmt), allocSize);
         }
         rsdItem->ptr14 = allocData;
 
-        memcpy(rsdItem->ptr14, usb.m_data, usb.m_sizeBytes * 0xC);
+        memcpy(rsdItem->ptr14, usb.m_data, allocSize);
 
-        xyzData = reinterpret_cast<u32*>(rsdItem->ptr14);
         for (u32 i = 0, offset = 0; i < usb.m_sizeBytes; i++, offset += 0xC) {
-            u32* item = reinterpret_cast<u32*>(reinterpret_cast<u8*>(xyzData) + offset);
-            StoreSwap32(item + 0);
+            u32* item = reinterpret_cast<u32*>(reinterpret_cast<u8*>(rsdItem->ptr14) + offset);
+            StoreSwapFloat(reinterpret_cast<f32*>(item + 0));
             StoreSwapNegFloat(reinterpret_cast<f32*>(item + 1));
             StoreSwapNegFloat(reinterpret_cast<f32*>(item + 2));
         }
-        DCStoreRange(rsdItem->ptr14, usb.m_sizeBytes * 0xC);
+        DCStoreRange(rsdItem->ptr14, allocSize);
         break;
     }
     case 1: {
-        memcpy(Ptr(this, 0xEC), usb.m_data, 0x120);
-        StoreSwap32(&U32At(this, 0xEC));
-        StoreSwap32(&U32At(this, 0xF0));
-        StoreSwap32(&U32At(this, 0xF4));
-        StoreSwap32(&U32At(this, 0xF8));
-        StoreSwap32(&U32At(this, 0xFC));
-        StoreSwap32(&U32At(this, 0x100));
-        StoreSwap32(&U32At(this, 0x104));
-        StoreSwap32(&U32At(this, 0x108));
-        StoreSwap32(&U32At(this, 0x10C));
-        StoreSwap32(&U32At(this, 0x110));
-        StoreSwap32(&U32At(this, 0x114));
-        StoreSwap32(&U32At(this, 0x118));
-        StoreSwap32(&U32At(this, 0x11C));
-        StoreSwap32(&U32At(this, 0x120));
-        StoreSwap32(&U32At(this, 0x124));
-        StoreSwap32(&U32At(this, 0x128));
-        StoreSwap32(&U32At(this, 0x12C));
-        StoreSwap32(&U32At(this, 0x130));
-        StoreSwap32(&U32At(this, 0x134));
-        StoreSwap32(&U32At(this, 0x138));
-        StoreSwap32(&U32At(this, 0x13C));
-        StoreSwap32(&U32At(this, 0x140));
-        StoreSwap32(&U32At(this, 0x144));
-        StoreSwap32(&U32At(this, 0x148));
-        StoreSwap32(&U32At(this, 0x14C));
-        StoreSwap32(&U32At(this, 0x150));
-        StoreSwap32(&U32At(this, 0x154));
-        StoreSwap32(&U32At(this, 0x158));
-        StoreSwap32(&U32At(this, 0x15C));
-        StoreSwap32(&U32At(this, 0x160));
-        StoreSwap32(&U32At(this, 0x164));
-        StoreSwap32(&this->field_0x168);
-        memcpy(Ptr(this, 0x20C), Ptr(this, 0xEC), 0x30);
-        DCStoreRange(Ptr(this, 0xEC), 0x120);
+        memcpy(&field_0xec, usb.m_data, 0x120);
+        StoreSwapFloat(&field_0xec);
+        StoreSwapFloat(&field_0xf0);
+        StoreSwapFloat(&field_0xf4);
+        StoreSwapFloat(&field_0xf8);
+        StoreSwapFloat(&field_0xfc);
+        StoreSwapFloat(&field_0x100);
+        StoreSwapFloat(&field_0x104);
+        StoreSwapFloat(&field_0x108);
+        StoreSwapFloat(&field_0x10c);
+        StoreSwapFloat(&field_0x110);
+        StoreSwapFloat(&field_0x114);
+        StoreSwapFloat(&field_0x118);
+        StoreSwapFloat(&field_0x11c);
+        StoreSwapFloat(&field_0x120);
+        StoreSwapFloat(&field_0x124);
+        StoreSwapFloat(&field_0x128);
+        StoreSwapFloat(&field_0x12c);
+        StoreSwapFloat(&field_0x130);
+        StoreSwapFloat(&field_0x134);
+        StoreSwapFloat(&field_0x138);
+        StoreSwapFloat(&field_0x13c);
+        StoreSwapFloat(&field_0x140);
+        StoreSwapFloat(&field_0x144);
+        StoreSwapFloat(&field_0x148);
+        StoreSwapFloat(&field_0x14c);
+        StoreSwapFloat(&field_0x150);
+        StoreSwapFloat(&field_0x154);
+        StoreSwapFloat(&field_0x158);
+        StoreSwapFloat(&field268_0x15c.x);
+        StoreSwapFloat(&field268_0x15c.y);
+        StoreSwapFloat(&field268_0x15c.z);
+        StoreSwapFloat(&field_0x168);
+        memcpy(&m_unkMatrix, &field_0xec, 0x30);
+        DCStoreRange(&field_0xec, 0x120);
         break;
     }
     case 0x31: {

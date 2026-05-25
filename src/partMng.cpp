@@ -185,12 +185,12 @@ pppShapeSt::pppShapeSt()
 pppShapeSt::~pppShapeSt()
 {
     if (m_animData != 0) {
-        delete[] reinterpret_cast<u8*>(m_animData);
+        delete reinterpret_cast<u8*>(m_animData);
         m_animData = 0;
     }
 
     if (m_displayListData != 0) {
-        delete[] reinterpret_cast<u8*>(m_displayListData);
+        delete reinterpret_cast<u8*>(m_displayListData);
         m_displayListData = 0;
     }
 }

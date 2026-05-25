@@ -1871,6 +1871,7 @@ void CMenuPcs::DrawSelectOpenAnim()
 	float strongest = 0.0f;
 	float artiAlpha = 0.0f;
 	int modelIndex = 0;
+	int lastKind = 0;
 	int activePartyCount = s_Rinfo->m_partyCount;
 
 	DrawInit();
@@ -1884,15 +1885,18 @@ void CMenuPcs::DrawSelectOpenAnim()
 		} else if (alpha > 1.0f) {
 			alpha = 1.0f;
 		}
-		switch (sprite->kind) {
+		int kind = sprite->kind;
+		switch (kind) {
 		case -4:
 			DrawArtiBase((CMenuPcs::Sprt2*)sprite, alpha);
 			if (artiAlpha < alpha) {
 				artiAlpha = alpha;
 			}
+			lastKind = kind;
 			break;
 		case -3:
 			DrawBonusFrame((float)sprite->x, (float)sprite->y, (float)sprite->w, (float)sprite->h, alpha);
+			lastKind = kind;
 			break;
 		case -2:
 			{
@@ -1927,9 +1931,14 @@ void CMenuPcs::DrawSelectOpenAnim()
 				RestoreProjection();
 			}
 			modelIndex++;
+			lastKind = kind;
 			break;
 		default:
 			{
+				if (lastKind < 0) {
+					DrawInit();
+					SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+				}
 				GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(alpha * 255.0f)};
 				GXSetChanMatColor(GX_COLOR0A0, color);
 				SetTexture(static_cast<CMenuPcs::TEX>(sprite->tex));
@@ -1943,6 +1952,7 @@ void CMenuPcs::DrawSelectOpenAnim()
 				if (sprite->tex == 0x20) {
 					GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
 				}
+				lastKind = kind;
 			}
 			break;
 		}
@@ -2021,6 +2031,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 
 		for (int i = 0; i < activePartyCount; i++) {
 			InitAnimSprite(&sprites[idx], -2, 0, 0, 0, 0, sprites[iconBase + i].startFrame, 8);
+			sprites[idx].tex = 0;
 			sprites[idx].motionX = 100.0f;
 			sprites[idx].motionY = 0.0f;
 			sprites[idx].targetX = (float)sprites[idx].x + sprites[idx].motionX;
@@ -2031,6 +2042,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 		for (int i = 0; i < 8; i++) {
 			int start = (int)((float)(10 + i * 5) * 0.6f);
 			InitAnimSprite(&sprites[idx], -2, 0, 0, 0, 0, start, 0x21);
+			sprites[idx].tex = 0;
 			BonusSpriteFlags(&sprites[idx]) = 1;
 			idx++;
 		}
@@ -2041,8 +2053,6 @@ void CMenuPcs::CalcSelectOpenAnim()
 			sprites[idx].y = (short)(sprites[idx].y + 0x20);
 			sprites[idx].w = 0xA8;
 			sprites[idx].h = 0x38;
-			sprites[idx].startFrame = sprites[iconBase + i].startFrame + 6;
-			sprites[idx].duration = 8;
 			sprites[idx].alpha = 0.0f;
 			sprites[idx].mulX = 0.0f;
 			sprites[idx].mulY = 56.0f;
@@ -2322,8 +2332,8 @@ void CMenuPcs::CalcResultCloseAnim()
 
 		for (int i = 0; i < (int)header->count; i++) {
 			sprites[i].timer = 0;
-			sprites[i].targetX = 0.0f;
-			sprites[i].targetY = 0.0f;
+			sprites[i].motionX = 0.0f;
+			sprites[i].motionY = 0.0f;
 		}
 
 		sprites[0].startFrame = 9999;

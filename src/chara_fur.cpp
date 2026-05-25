@@ -585,35 +585,34 @@ void CChara::CalcMogScore()
 
 	*reinterpret_cast<int*>(self + 0x2054) = (*reinterpret_cast<int*>(self + 0x2054) * 100) / 0x7000;
 
-	const int bitDiv = bitCount / 3;
-	const int lineDiv = lineCount / 3;
-	const int circleDiv = circleCount / 3;
-
-	*reinterpret_cast<int*>(self + 0x2024) = (*reinterpret_cast<int*>(self + 0x2024) * 100) / bitDiv;
-	*reinterpret_cast<int*>(self + 0x203C) = (*reinterpret_cast<int*>(self + 0x203C) * 100) / circleDiv;
-	*reinterpret_cast<int*>(self + 0x2030) = (*reinterpret_cast<int*>(self + 0x2030) * 100) / lineDiv;
-	*reinterpret_cast<int*>(self + 0x2028) = (*reinterpret_cast<int*>(self + 0x2028) * 100) / bitDiv;
-	*reinterpret_cast<int*>(self + 0x2040) = (*reinterpret_cast<int*>(self + 0x2040) * 100) / circleDiv;
-	*reinterpret_cast<int*>(self + 0x2034) = (*reinterpret_cast<int*>(self + 0x2034) * 100) / lineDiv;
-	*reinterpret_cast<int*>(self + 0x202C) = (*reinterpret_cast<int*>(self + 0x202C) * 100) / bitDiv;
-	*reinterpret_cast<int*>(self + 0x2044) = (*reinterpret_cast<int*>(self + 0x2044) * 100) / circleDiv;
-	*reinterpret_cast<int*>(self + 0x2038) = (*reinterpret_cast<int*>(self + 0x2038) * 100) / lineDiv;
+	bitCount /= 3;
+	*reinterpret_cast<int*>(self + 0x2024) = (*reinterpret_cast<int*>(self + 0x2024) * 100) / bitCount;
+	circleCount /= 3;
+	*reinterpret_cast<int*>(self + 0x203C) = (*reinterpret_cast<int*>(self + 0x203C) * 100) / circleCount;
+	lineCount /= 3;
+	*reinterpret_cast<int*>(self + 0x2030) = (*reinterpret_cast<int*>(self + 0x2030) * 100) / lineCount;
+	*reinterpret_cast<int*>(self + 0x2028) = (*reinterpret_cast<int*>(self + 0x2028) * 100) / bitCount;
+	*reinterpret_cast<int*>(self + 0x2040) = (*reinterpret_cast<int*>(self + 0x2040) * 100) / circleCount;
+	*reinterpret_cast<int*>(self + 0x2034) = (*reinterpret_cast<int*>(self + 0x2034) * 100) / lineCount;
+	*reinterpret_cast<int*>(self + 0x202C) = (*reinterpret_cast<int*>(self + 0x202C) * 100) / bitCount;
+	*reinterpret_cast<int*>(self + 0x2044) = (*reinterpret_cast<int*>(self + 0x2044) * 100) / circleCount;
+	*reinterpret_cast<int*>(self + 0x2038) = (*reinterpret_cast<int*>(self + 0x2038) * 100) / lineCount;
 
 	for (int i = 0; i < 3; i++) {
+		int* scorePtr = reinterpret_cast<int*>(self + 0x2018 + i * 4);
 		const int bit = *reinterpret_cast<int*>(self + 0x2024 + i * 4);
 		const int line = *reinterpret_cast<int*>(self + 0x2030 + i * 4);
 		const int circle = *reinterpret_cast<int*>(self + 0x203C + i * 4);
-		int score = (line + circle * 2 - bit * 2) / 3;
 		int level;
 
-		if (score < 0) {
-			score = 0;
-		} else if (score > 100) {
-			score = 100;
+		*scorePtr = (line + circle * 2 - bit * 2) / 3;
+		if (*scorePtr < 0) {
+			*scorePtr = 0;
+		} else if (*scorePtr > 100) {
+			*scorePtr = 100;
 		}
-		*reinterpret_cast<int*>(self + 0x2018 + i * 4) = score;
 
-		level = (100 - score) / 5;
+		level = (100 - *scorePtr) / 5;
 		if (level < 5) {
 			level = 5;
 		} else if (level > 0xF) {
@@ -623,20 +622,19 @@ void CChara::CalcMogScore()
 	}
 
 	{
-		const unsigned int b0 = *reinterpret_cast<unsigned int*>(self + 0x2018);
-		const unsigned int b1 = *reinterpret_cast<unsigned int*>(self + 0x201C);
-		const unsigned int b2 = *reinterpret_cast<unsigned int*>(self + 0x2020);
-		unsigned char radarType = 0;
+		const int b0 = *reinterpret_cast<int*>(self + 0x2018);
+		const int b1 = *reinterpret_cast<int*>(self + 0x201C);
+		const int b2 = *reinterpret_cast<int*>(self + 0x2020);
 
-		if (b0 > 2 && b0 > static_cast<unsigned int>(0.75f * static_cast<float>(b1 + b2))) {
-			radarType = 1;
-		} else if (b1 > 2 && b1 > static_cast<unsigned int>(0.75f * static_cast<float>(b0 + b2))) {
-			radarType = 2;
-		} else if (b2 > 2 && b2 > static_cast<unsigned int>(0.75f * static_cast<float>(b0 + b1))) {
-			radarType = 3;
+		if (b0 > 2 && static_cast<float>(b0) > 0.75f * static_cast<float>(b1 + b2)) {
+			GameRaw()[0x13E9] = 1;
+		} else if (b1 > 2 && static_cast<float>(b1) > 0.75f * static_cast<float>(b0 + b2)) {
+			GameRaw()[0x13E9] = 2;
+		} else if (b2 > 2 && static_cast<float>(b2) > 0.75f * static_cast<float>(b0 + b1)) {
+			GameRaw()[0x13E9] = 3;
+		} else {
+			GameRaw()[0x13E9] = 0;
 		}
-
-		GameRaw()[0x13E9] = radarType;
 	}
 
 	{

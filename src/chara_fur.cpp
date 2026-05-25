@@ -1403,55 +1403,20 @@ void CChara::CModel::MogFurFrame(CGObject* object)
 int CChara::CModel::PickFur(
     Mtx param_2, _GXColor brushColor, int doPaint, int mode, _GXColor* centerBefore, _GXColor* centerAfter, Vec* worldPos)
 {
-	if ((ModelFlags10C(this) & 0x40) == 0) {
+	if (static_cast<int>((static_cast<unsigned int>(m_flags10C) << 25) | (static_cast<unsigned int>(m_flags10C) >> 7)) >= 0) {
 		return -1;
-	}
-
-	if (centerBefore != 0) {
-		centerBefore->r = 0;
-		centerBefore->g = 0;
-		centerBefore->b = 0;
-		centerBefore->a = 0;
-	}
-	if (centerAfter != 0) {
-		centerAfter->r = 0;
-		centerAfter->g = 0;
-		centerAfter->b = 0;
-		centerAfter->a = 0;
-	}
-	if (worldPos != 0) {
-		worldPos->x = 0.0f;
-		worldPos->y = 0.0f;
-		worldPos->z = 0.0f;
-	}
-
-	CTexture* texture = FindMogFurTexture(this);
-	if (texture == 0) {
-		return 0;
-	}
-
-	const unsigned int format = *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(texture) + 0x60);
-	if (format != 5) {
-		return 0;
-	}
-
-	unsigned short* dstPixels = *reinterpret_cast<unsigned short**>(reinterpret_cast<unsigned char*>(texture) + 0x78);
-	const int width = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(texture) + 0x64);
-	const int height = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(texture) + 0x68);
-	if ((dstPixels == 0) || (width <= 0) || (height <= 0)) {
-		return 0;
 	}
 
 	CMaterialSet* materialSet = ModelMaterialSet(this);
 	FurMeshRaw* mesh = ModelMeshes(this);
 	void* nodes = ModelNodes(this);
 	if (materialSet == 0 || mesh == 0 || nodes == 0) {
-		return 0;
+		return -1;
 	}
 
 	FurMaterialSetRaw* materialSetRaw = reinterpret_cast<FurMaterialSetRaw*>(materialSet);
 	if (materialSetRaw->m_materials.m_items == 0 || materialSetRaw->m_materials.m_numItems == 0) {
-		return 0;
+		return -1;
 	}
 
 	const unsigned short meshCount = ModelMeshCount(this);
@@ -1493,10 +1458,10 @@ int CChara::CModel::PickFur(
 
 			FurMaterialRaw* material =
 			    reinterpret_cast<FurMaterialRaw*>(materialSetRaw->m_materials.m_items[displayList->m_material]);
-			if (material == 0 || material->m_furEnable == 0 || material->m_textures[0] == 0 ||
-			    *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(material->m_textures[0]) + 0x60) != 5) {
+			if (material == 0) {
 				continue;
 			}
+			const bool furMaterial = material->m_furEnable != 0;
 
 			const unsigned char* cursor = reinterpret_cast<const unsigned char*>(displayList->m_data);
 			int remaining = displayList->m_size;
@@ -1543,7 +1508,7 @@ int CChara::CModel::PickFur(
 									float uvV;
 									FurInterpolateHit(viewHit, uvU, uvV, a, b, current, w0, w1, w2);
 									const float depth = -viewHit.z;
-									if (depth < nearestDepth) {
+									if (furMaterial && depth < nearestDepth) {
 										nearestDepth = depth;
 										hitViewPos = viewHit;
 										hitU = uvU;
@@ -1567,7 +1532,7 @@ int CChara::CModel::PickFur(
 								float uvV;
 								FurInterpolateHit(viewHit, uvU, uvV, a, b, current, w0, w1, w2);
 								const float depth = -viewHit.z;
-								if (depth < nearestDepth) {
+								if (furMaterial && depth < nearestDepth) {
 									nearestDepth = depth;
 									hitViewPos = viewHit;
 									hitU = uvU;
@@ -1588,7 +1553,7 @@ int CChara::CModel::PickFur(
 	}
 
 	if (!hitFound) {
-		return 0;
+		return -1;
 	}
 
 	if (worldPos != 0) {
@@ -1599,6 +1564,23 @@ int CChara::CModel::PickFur(
 	}
 
 	if (doPaint == 0) {
+		return 1;
+	}
+
+	CTexture* texture = FindMogFurTexture(this);
+	if (texture == 0) {
+		return 1;
+	}
+
+	const unsigned int format = *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(texture) + 0x60);
+	if (format != 5) {
+		return 1;
+	}
+
+	unsigned short* dstPixels = *reinterpret_cast<unsigned short**>(reinterpret_cast<unsigned char*>(texture) + 0x78);
+	const int width = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(texture) + 0x64);
+	const int height = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(texture) + 0x68);
+	if ((dstPixels == 0) || (width <= 0) || (height <= 0)) {
 		return 1;
 	}
 
@@ -1614,9 +1596,6 @@ int CChara::CModel::PickFur(
 	}
 
 	brush(dstPixels, width, height, hitU, hitV, mode, brushColor, centerBefore, centerAfter);
-	if (centerBefore != 0 && centerAfter != 0 && !MogColorChanged(*centerBefore, *centerAfter)) {
-		return 0;
-	}
 	return 1;
 }
 
@@ -1631,24 +1610,15 @@ int CChara::CModel::PickFur(
  */
 void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 {
-	if ((ModelFlags10C(this) & 0x40) == 0) {
-		return;
-	}
-	if ((shadowPass != 0) && ((ModelFlags10C(this) & 0x80) == 0)) {
+	if (static_cast<int>((static_cast<unsigned int>(m_flags10C) << 25) | (static_cast<unsigned int>(m_flags10C) >> 7)) >= 0) {
 		return;
 	}
 
 	CMaterialSet* materialSet = ModelMaterialSet(this);
 	FurMeshRaw* mesh = ModelMeshes(this);
 	void* nodes = ModelNodes(this);
-	if (materialSet == 0 || mesh == 0 || nodes == 0) {
-		return;
-	}
 
 	FurMaterialSetRaw* materialSetRaw = reinterpret_cast<FurMaterialSetRaw*>(materialSet);
-	if (materialSetRaw->m_materials.m_items == 0 || materialSetRaw->m_materials.m_numItems == 0) {
-		return;
-	}
 
 	bool hasFurMaterial = false;
 	for (unsigned int i = 0; i < materialSetRaw->m_materials.m_numItems; i++) {
@@ -1659,13 +1629,6 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 		}
 	}
 	if (!hasFurMaterial) {
-		return;
-	}
-
-	if (gMogFurTexBuffer == 0) {
-		Chara.makeFurTex();
-	}
-	if (gMogFurTexBuffer == 0) {
 		return;
 	}
 

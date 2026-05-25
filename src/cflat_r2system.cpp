@@ -2352,15 +2352,14 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         const float sinPitch = sinf(pitch);
         const float cosPitch = cosf(pitch);
         Vec direction = {-sinYaw * cosPitch, -sinPitch, -cosYaw * cosPitch};
-        _GXColor color = {
+        CColor color(
             static_cast<u8>(object->m_localBase[2]),
             static_cast<u8>(object->m_localBase[3]),
             static_cast<u8>(object->m_localBase[4]),
-            0xFF,
-        };
+            0xFF);
 
         SetDiffuse__9CCharaPcsFiUlP8_GXColorP3Vec(
-            &CharaPcs, *object->m_localBase, object->m_localBase[1], &color, &direction);
+            &CharaPcs, *object->m_localBase, object->m_localBase[1], color, &direction);
         runtime->push(object, 0);
         outResult = 0;
         return;

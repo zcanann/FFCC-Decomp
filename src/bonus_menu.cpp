@@ -312,7 +312,7 @@ static CCharaPcs::CHandle* GetBonusResultOpenHandle(CMenuPcs* menu, int modelInd
 
 static const char* GetBonusResultOpenText(int textIndex)
 {
-	const int activePartyCount = GetActiveBonusPartyCount();
+	const int activePartyCount = s_Rinfo->m_partyCount;
 	if (textIndex < 0) {
 		return 0;
 	}
@@ -755,7 +755,7 @@ static void GrantSelectedBonusArtifacts()
 static void DrawBonusPartyNames(CMenuPcs* menu, BonusAnimHeader* header, BonusAnimSprite* sprites)
 {
 	CFont* font = GetBonusMenuMembers(menu).m_font;
-	int activePartyCount = GetActiveBonusPartyCount();
+	int activePartyCount = s_Rinfo->m_partyCount;
 
 	if (font == 0 || activePartyCount <= 0) {
 		return;
@@ -1508,7 +1508,7 @@ void CMenuPcs::CalcSelectCloseAnim()
 	BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
 
 	if (*(unsigned char*)(statePtr + 0xb) == 0) {
-		int activePartyCount = GetActiveBonusPartyCount();
+		int activePartyCount = s_Rinfo->m_partyCount;
 		int iconBase = 4;
 		int nameBase = iconBase + activePartyCount;
 		int slotBase = nameBase + activePartyCount;
@@ -1756,7 +1756,7 @@ void CMenuPcs::CalcSelectWait()
 	short& selection = *(short*)(statePtr + 0x26);
 	short& confirmSel = *(short*)(statePtr + 0x28);
 	short& delay = *(short*)(statePtr + 0x1a);
-	int activePartyCount = GetActiveBonusPartyCount();
+	int activePartyCount = s_Rinfo->m_partyCount;
 	BonusPartySummary* currentParty = GetBonusPartySummary(currentPartyIndex);
 	int padSlot = (currentParty != 0) ? currentParty->m_partySlot : 0;
 	unsigned short down = GetButtonDown(padSlot);
@@ -1885,22 +1885,12 @@ void CMenuPcs::DrawSelectOpenAnim()
 		return;
 	}
 
-	unsigned int* scriptFoodBase = Game.m_scriptFoodBase;
 	BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
 	BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
 	float strongest = 0.0f;
 	float artiAlpha = 0.0f;
 	int modelIndex = 0;
-	int activePartyCount = 0;
-
-	for (int i = 0; i < 4; i++) {
-		if (scriptFoodBase[i] != 0) {
-			activePartyCount++;
-		}
-	}
-	if (activePartyCount <= 0) {
-		activePartyCount = 1;
-	}
+	int activePartyCount = s_Rinfo->m_partyCount;
 
 	DrawInit();
 	SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
@@ -1985,7 +1975,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 	BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
 
 	if (*(unsigned char*)(statePtr + 0xb) == 0) {
-		int activePartyCount = GetActiveBonusPartyCount();
+		int activePartyCount = s_Rinfo->m_partyCount;
 		int idx;
 		int iconBase;
 		int detailBase;
@@ -2306,7 +2296,7 @@ void CMenuPcs::CalcResultCloseAnim()
 
 	BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
 	BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
-	const int activePartyCount = GetActiveBonusPartyCount();
+	const int activePartyCount = s_Rinfo->m_partyCount;
 	const int baseCount = 1 + activePartyCount * 3;
 	const int frameBase = 1;
 	const int iconBase = frameBase + activePartyCount;
@@ -2602,7 +2592,7 @@ void CMenuPcs::CalcResultCountAnim()
 
 	BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
 	BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
-	const int activePartyCount = GetActiveBonusPartyCount();
+	const int activePartyCount = s_Rinfo->m_partyCount;
 
 	if (*(unsigned char*)(statePtr + 0xb) == 0) {
 		*(short*)(statePtr + 0x22) = 0;
@@ -2886,7 +2876,7 @@ void CMenuPcs::CalcResultOpenAnim()
 
 	BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
 	BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
-	const int activePartyCount = GetActiveBonusPartyCount();
+	const int activePartyCount = s_Rinfo->m_partyCount;
 	const int frameBase = 1;
 	const int iconBase = frameBase + activePartyCount;
 	const int modelBase = iconBase + activePartyCount;

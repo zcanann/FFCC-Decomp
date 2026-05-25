@@ -754,7 +754,7 @@ void CCharaPcs::destroyViewer()
 void CCharaPcs::createViewer()
 {
     CCharaPcs* self = this;
-    register const char* viewerStrings = s_no_texture____801da7e8;
+    register char* viewerStrings = const_cast<char*>(s_no_texture____801da7e8);
     unsigned int i;
     char pathBuf[256];
     CFile::CHandle* fileHandle;
@@ -784,7 +784,7 @@ void CCharaPcs::createViewer()
     }
 
     for (int colorIndex = 0; colorIndex < 5; colorIndex++) {
-        CColor white(0xFF, 0xFF, 0xFF, 0xFF);
+        const CColor& white = CColor(0xFF, 0xFF, 0xFF, 0xFF);
         CColor colorTmp;
         float scale = static_cast<float>(colorIndex) * kCharaViewerLerpScale;
         colorTmp.color.r = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.r) * scale));

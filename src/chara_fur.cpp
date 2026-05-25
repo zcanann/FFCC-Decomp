@@ -1410,14 +1410,8 @@ int CChara::CModel::PickFur(
 	CMaterialSet* materialSet = ModelMaterialSet(this);
 	FurMeshRaw* mesh = ModelMeshes(this);
 	void* nodes = ModelNodes(this);
-	if (materialSet == 0 || mesh == 0 || nodes == 0) {
-		return -1;
-	}
 
 	FurMaterialSetRaw* materialSetRaw = reinterpret_cast<FurMaterialSetRaw*>(materialSet);
-	if (materialSetRaw->m_materials.m_items == 0 || materialSetRaw->m_materials.m_numItems == 0) {
-		return -1;
-	}
 
 	const unsigned short meshCount = ModelMeshCount(this);
 	const int posQuant = ModelPosQuant(this) & 0xFF;
@@ -1430,7 +1424,7 @@ int CChara::CModel::PickFur(
 	Vec hitViewPos;
 
 	for (unsigned int meshIndex = 0; meshIndex < meshCount; meshIndex++, mesh++) {
-		if (mesh->m_data == 0 || mesh->m_workPositions == 0 || mesh->m_data->m_uvs == 0) {
+		if (mesh->m_workPositions == 0) {
 			continue;
 		}
 		if (((ModelMeshVisibleMask(this) >> meshIndex) & 1) == 0) {
@@ -1451,16 +1445,8 @@ int CChara::CModel::PickFur(
 
 		FurDisplayListRaw* displayList = mesh->m_data->m_displayLists;
 		for (unsigned int displayIndex = 0; displayIndex < mesh->m_data->m_displayListCount; displayIndex++, displayList++) {
-			if (displayList == 0 || displayList->m_data == 0 || displayList->m_size <= 0 ||
-			    displayList->m_material >= materialSetRaw->m_materials.m_numItems) {
-				continue;
-			}
-
 			FurMaterialRaw* material =
 			    reinterpret_cast<FurMaterialRaw*>(materialSetRaw->m_materials.m_items[displayList->m_material]);
-			if (material == 0) {
-				continue;
-			}
 			const bool furMaterial = material->m_furEnable != 0;
 
 			const unsigned char* cursor = reinterpret_cast<const unsigned char*>(displayList->m_data);
@@ -1580,20 +1566,6 @@ int CChara::CModel::PickFur(
 	unsigned short* dstPixels = *reinterpret_cast<unsigned short**>(reinterpret_cast<unsigned char*>(texture) + 0x78);
 	const int width = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(texture) + 0x64);
 	const int height = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(texture) + 0x68);
-	if ((dstPixels == 0) || (width <= 0) || (height <= 0)) {
-		return 1;
-	}
-
-	if (hitU < 0.0f) {
-		hitU = 0.0f;
-	} else if (hitU > 1.0f) {
-		hitU = 1.0f;
-	}
-	if (hitV < 0.0f) {
-		hitV = 0.0f;
-	} else if (hitV > 1.0f) {
-		hitV = 1.0f;
-	}
 
 	brush(dstPixels, width, height, hitU, hitV, mode, brushColor, centerBefore, centerAfter);
 	return 1;
@@ -1777,9 +1749,7 @@ void CChara::makeFurTex()
 	s_mogFurRand = 0;
 	s_mogFurMaxY = 0.0f;
 
-	if (gMogFurTexBuffer == 0) {
-		gMogFurTexBuffer = Memory._Alloc(0x20000, 0, const_cast<char*>(s_chara_fur_cpp), 0xE9, 0);
-	}
+	gMogFurTexBuffer = Memory._Alloc(0x20000, 0, const_cast<char*>(s_chara_fur_cpp), 0xE9, 0);
 	if (gMogFurTexBuffer == 0) {
 		return;
 	}
@@ -1819,7 +1789,6 @@ void CChara::makeFurTex()
 		}
 	}
 
-	s_mogFurRand = rng;
 	DCFlushRange(gMogFurTexBuffer, 0x20000);
 	GXInvalidateTexAll();
 }

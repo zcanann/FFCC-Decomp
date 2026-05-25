@@ -36,7 +36,7 @@ void pppFrameConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir, pp
             float cameraPosX = CameraPcs.m_positionX;
             float cameraPosY = CameraPcs.m_positionY;
             float cameraPosZ = CameraPcs.m_positionZ;
-            float scale = 1.0f + ((CameraPcs.m_fov - 25.0f) / 25.0f);
+            float scale = kConstrainCameraDirScaleOne + ((CameraPcs.m_fov - 25.0f) / 25.0f);
 
             PSMTXIdentity(ppvMng->m_matrix.value);
 

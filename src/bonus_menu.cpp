@@ -1257,13 +1257,13 @@ void CMenuPcs::DrawArtiBase(CMenuPcs::Sprt2* sprt, float alpha)
 	float width = (float)sprite->w;
 	float height = (float)sprite->h;
 
-	SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-	SetTexture(static_cast<CMenuPcs::TEX>(0x1A));
-
 	if (*(short*)(statePtr + 0x1c) != 4) {
 		_GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(alpha * 255.0f)};
 		GXSetChanMatColor(GX_COLOR0A0, color);
 	}
+
+	SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+	SetTexture(static_cast<CMenuPcs::TEX>(0x1A));
 
 	int partyIndex = 0;
 	for (int i = 0; i < s_Rinfo->m_partyCount; i++) {
@@ -1276,7 +1276,7 @@ void CMenuPcs::DrawArtiBase(CMenuPcs::Sprt2* sprt, float alpha)
 	for (int i = 0; i < 8; i++) {
 		if (*(short*)(statePtr + 0x1c) == 4) {
 			float rgb = 1.0f;
-			if ((((int)s_Rinfo->m_missingArtifactMask | (int)s_Rinfo->m_party[partyIndex].m_ownedArtifactMask) & (1 << i)) != 0) {
+			if ((((int)s_Rinfo->pad_0008 | (int)s_Rinfo->m_missingArtifactMask | (int)s_Rinfo->m_party[partyIndex].m_ownedArtifactMask) & (1 << i)) != 0) {
 				rgb = 0.5f;
 			}
 			_GXColor color = {
@@ -2057,7 +2057,6 @@ void CMenuPcs::CalcSelectOpenAnim()
 		}
 
 		*(unsigned char*)(statePtr + 0xb) = 1;
-		return;
 	}
 
 	*(short*)(statePtr + 0x22) = *(short*)(statePtr + 0x22) + 1;

@@ -1342,10 +1342,13 @@ void CCameraPcs::createFullShadow()
                     GX_FALSE, GX_FALSE, GX_ANISO_1);
     DCFlushRange(rampTex, rampTexSize);
 
+    f32 shadowAlpha = FLOAT_8032faa4;
     m_fullScreenShadowEnabled = 1;
-    *reinterpret_cast<float*>(self + 0x364) = FLOAT_8032faa4;
-    *reinterpret_cast<float*>(self + 0x368) = FLOAT_8032fa34;
-    *reinterpret_cast<float*>(self + 0x370) = FLOAT_8032faa8;
+    f32 zero = FLOAT_8032fa34;
+    *reinterpret_cast<float*>(self + 0x364) = shadowAlpha;
+    shadowAlpha = FLOAT_8032faa8;
+    *reinterpret_cast<float*>(self + 0x368) = zero;
+    *reinterpret_cast<float*>(self + 0x370) = shadowAlpha;
 }
 
 /*

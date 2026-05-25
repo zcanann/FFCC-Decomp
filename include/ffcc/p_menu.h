@@ -223,7 +223,7 @@ public:
     void DrawTitleMenu();
     void DrawOptionMenu();
     void SetWorldParam(int, int);
-    void GetWorldParam(int);
+    unsigned int GetWorldParam(int);
     void CallWorldParam(int, int, int);
     void CalcSpl(SPL*, SPL*, float);
     double GetFcvValue(FCV, float);

@@ -4361,7 +4361,7 @@ void CMenuPcs::SetWorldParam(int code, int value)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::GetWorldParam(int code)
+unsigned int CMenuPcs::GetWorldParam(int code)
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	unsigned int result = 0;
@@ -4470,7 +4470,7 @@ void CMenuPcs::GetWorldParam(int code)
 		break;
 	}
 
-	gWmMenuWorkA = static_cast<int>(result);
+	return result;
 }
 
 /*

@@ -36,7 +36,6 @@ unsigned int CMaterialEditorPcs::m_table_desc0[3] = {0, 0xFFFFFFFF, reinterpret_
 unsigned int CMaterialEditorPcs::m_table_desc1[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroyViewer__18CMaterialEditorPcsFv)};
 unsigned int CMaterialEditorPcs::m_table_desc2[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__18CMaterialEditorPcsFv)};
 unsigned int CMaterialEditorPcs::m_table_desc3[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__18CMaterialEditorPcsFv)};
-u8 gMaterialEditorPcsGuard[0xC];
 CMaterialEditorPcs MaterialEditorPcs;
 
 unsigned int CMaterialEditorPcs::m_table[0x15C / sizeof(unsigned int)] = {

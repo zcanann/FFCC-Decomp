@@ -419,6 +419,11 @@ static void InitSelectOpenPartyIcon(BonusAnimSprite* sprite, int slotIndex, shor
 	ResetAnimSpriteMotion(sprite);
 	sprite->mulX = (float)sprite->w;
 	sprite->mulY = (float)sprite->h;
+	sprite->depth = 1.0f;
+	sprite->motionX = 100.0f;
+	sprite->motionY = 0.0f;
+	sprite->targetX = (float)sprite->x + sprite->motionX;
+	sprite->targetY = (float)sprite->y + sprite->motionY;
 }
 
 static void InitSelectOpenPartyName(BonusAnimSprite* sprite, const BonusAnimSprite* iconSprite, short xOffset, short yOffset, int startFrame)
@@ -426,6 +431,11 @@ static void InitSelectOpenPartyName(BonusAnimSprite* sprite, const BonusAnimSpri
 	InitAnimSprite(sprite, -1, (short)(iconSprite->x + xOffset), (short)(iconSprite->y + yOffset), 0, 0, startFrame, 8);
 	ResetAnimSpriteMotion(sprite);
 	sprite->mulX = 24.0f;
+	sprite->depth = 1.0f;
+	sprite->motionX = 100.0f;
+	sprite->motionY = 0.0f;
+	sprite->targetX = (float)sprite->x + sprite->motionX;
+	sprite->targetY = (float)sprite->y + sprite->motionY;
 }
 
 static void ApplySelectOpenSpriteMotion(BonusAnimSprite* sprite, int frame)
@@ -1928,9 +1938,9 @@ void CMenuPcs::DrawSelectOpenAnim()
 					GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_ONE, GX_LO_CLEAR);
 				}
 				DrawRect(0,
-				    (float)sprite->x + sprite->mulX, (float)sprite->y + sprite->mulY,
+				    (float)sprite->x + sprite->motionX, (float)sprite->y + sprite->motionY,
 				    (float)sprite->w, (float)sprite->h,
-				    sprite->depth, sprite->depth, sprite->scale, sprite->scale, 0.0f);
+				    sprite->mulX, sprite->mulY, sprite->depth, sprite->depth, 0.0f);
 				if (sprite->tex == 0x20) {
 					GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
 				}
@@ -2038,6 +2048,11 @@ void CMenuPcs::CalcSelectOpenAnim()
 			sprites[idx].mulX = 0.0f;
 			sprites[idx].mulY = 56.0f;
 			sprites[idx].scale = 1.0f;
+			sprites[idx].depth = 1.0f;
+			sprites[idx].motionX = 100.0f;
+			sprites[idx].motionY = 0.0f;
+			sprites[idx].targetX = (float)sprites[idx].x + sprites[idx].motionX;
+			sprites[idx].targetY = (float)sprites[idx].y + sprites[idx].motionY;
 			idx++;
 		}
 
@@ -2069,10 +2084,12 @@ void CMenuPcs::CalcSelectOpenAnim()
 			continue;
 		}
 
+		if (sprite->startFrame + sprite->duration <= frame || sprite->startFrame > 9998) {
+			doneCount++;
+		}
+
 		if (frame < sprite->startFrame + sprite->duration) {
 			sprite->timer++;
-		} else {
-			doneCount++;
 		}
 
 		ApplySelectOpenSpriteMotion(sprite, frame);

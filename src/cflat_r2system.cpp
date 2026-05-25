@@ -4169,7 +4169,7 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         runtime->push(
             object,
             *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x12F4 + *object->m_localBase * 8) &
-                (1u << object->m_localBase[1]));
+                static_cast<unsigned int>(1ULL << object->m_localBase[1]));
         outResult = 0;
         return;
     }

@@ -49,6 +49,8 @@ extern float FLOAT_80333560;
 extern float FLOAT_80333564;
 extern float FLOAT_80333568;
 extern float FLOAT_80333570;
+extern float FLOAT_80333574;
+extern float FLOAT_80333578;
 extern float FLOAT_8033357c;
 extern float FLOAT_80333580;
 extern float FLOAT_80333584;
@@ -1078,11 +1080,11 @@ void CMenuPcs::DrawOptionMenu()
 	                        GX_BL_INVSRCALPHA);
 
 	CTexture* marker = GetMenuTexture(this, 0xC8);
-	gUtil.RenderTextureQuad(64.0f, static_cast<float>(m_optionIndex * 0x28 + 0x70),
+	gUtil.RenderTextureQuad(FLOAT_80333574, static_cast<float>(m_optionIndex * 0x28 + 0x70),
 	                        static_cast<float>(marker->m_width), static_cast<float>(marker->m_height), marker, 0, 0,
 	                        &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
-	font->SetScaleX(0.8f);
+	font->SetScaleX(FLOAT_80333578);
 	for (int i = 0, rowY = 0x70, selectedY = 0x73, normalY = 0x75; i < 5;
 	     i++, rowY += 0x28, selectedY += 0x28, normalY += 0x28) {
 		CTexture* row = GetMenuTexture(this, 0xC0);
@@ -1110,11 +1112,11 @@ void CMenuPcs::DrawOptionMenu()
 
 	font->SetShadow(1);
 	font->SetMargin(kOptionAnimMax);
-	font->SetScaleX(0.8f);
+	font->SetScaleX(FLOAT_80333578);
 	font->SetScaleY(kOptionAnimMax);
 	DrawFont2(static_cast<int>(-(font->GetWidth(helpText[m_optionIndex]) * kMenuCenteringHalfWidth -
 	                            kMenuCenteringOffset)),
-	          static_cast<int>(FLOAT_80333590), color, 7, helpText[m_optionIndex], 0.8f,
+	          static_cast<int>(FLOAT_80333590), color, 7, helpText[m_optionIndex], FLOAT_80333578,
 	          kOptionAnimMax, kOptionAnimMax);
 
 	if ((m_optionIndex == 0) || (m_optionIndex == 1)) {

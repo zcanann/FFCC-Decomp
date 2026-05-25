@@ -3391,13 +3391,15 @@ startMapObjAnim:
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma dont_inline on
 void CMapMng::SetMapAnimID(int animId, int startFrame, int endFrame, int loop)
 {
-    CPtrArray<CMapAnimRun*>* mapAnimRunArray = &GetMapAnimRunArray();
+    CPtrArray<CMapAnimRun*>* mapAnimRunArray =
+        reinterpret_cast<CPtrArray<CMapAnimRun*>*>(reinterpret_cast<unsigned char*>(this) + 0x213E0);
     CMapAnimRun* mapAnimRun = 0;
     int mapAnimRunCount = mapAnimRunArray->GetSize();
 
-    for (unsigned long i = 0; i < static_cast<unsigned long>(mapAnimRunCount); i++) {
+    for (int i = 0; i < mapAnimRunCount; i++) {
         CMapAnimRun* current = (*mapAnimRunArray)[i];
         if (current->m_animId == static_cast<unsigned char>(animId)) {
             mapAnimRun = current;
@@ -3407,6 +3409,7 @@ void CMapMng::SetMapAnimID(int animId, int startFrame, int endFrame, int loop)
 
     mapAnimRun->Start(startFrame, endFrame, loop);
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--

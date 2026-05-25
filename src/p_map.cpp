@@ -427,15 +427,42 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
 unsigned long long CMapPcs::IsLoadMapCompleted()
 {
     unsigned int value = 0;
-    int index = 0;
+    CMapMng* map = &MapMng;
 
     for (int count = 2; count != 0; count--) {
-        for (int handle = 8; handle != 0; handle--) {
-            if (MapMng.m_asyncLoadState.m_asyncHandles[index] != 0) {
-                return (unsigned long long)value;
-            }
-            index++;
+        if (map->m_asyncLoadState.m_asyncHandles[0] != 0) {
+            return (unsigned long long)value;
         }
+        map = reinterpret_cast<CMapMng*>(reinterpret_cast<unsigned char*>(map) + 4);
+        if (map->m_asyncLoadState.m_asyncHandles[0] != 0) {
+            return (unsigned long long)value;
+        }
+        map = reinterpret_cast<CMapMng*>(reinterpret_cast<unsigned char*>(map) + 4);
+        if (map->m_asyncLoadState.m_asyncHandles[0] != 0) {
+            return (unsigned long long)value;
+        }
+        map = reinterpret_cast<CMapMng*>(reinterpret_cast<unsigned char*>(map) + 4);
+        if (map->m_asyncLoadState.m_asyncHandles[0] != 0) {
+            return (unsigned long long)value;
+        }
+        map = reinterpret_cast<CMapMng*>(reinterpret_cast<unsigned char*>(map) + 4);
+        if (map->m_asyncLoadState.m_asyncHandles[0] != 0) {
+            return (unsigned long long)value;
+        }
+        map = reinterpret_cast<CMapMng*>(reinterpret_cast<unsigned char*>(map) + 4);
+        if (map->m_asyncLoadState.m_asyncHandles[0] != 0) {
+            return (unsigned long long)value;
+        }
+        map = reinterpret_cast<CMapMng*>(reinterpret_cast<unsigned char*>(map) + 4);
+        if (map->m_asyncLoadState.m_asyncHandles[0] != 0) {
+            return (unsigned long long)value;
+        }
+        map = reinterpret_cast<CMapMng*>(reinterpret_cast<unsigned char*>(map) + 4);
+        if (map->m_asyncLoadState.m_asyncHandles[0] != 0) {
+            return (unsigned long long)value;
+        }
+
+        map = reinterpret_cast<CMapMng*>(reinterpret_cast<unsigned char*>(map) + 4);
         value += 7;
     }
 

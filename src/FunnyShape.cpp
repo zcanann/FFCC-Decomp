@@ -27,6 +27,8 @@ extern const float kFunnyShapeAnimOffsetX;
 extern const float kFunnyShapeAnimOffsetY;
 extern const float kFunnyShapePi;
 extern const float kFunnyShapeHalfTurnDegrees;
+extern const char sDebugSpinnerText[5];
+extern const float kPppHeapUseRateDivisor;
 
 namespace {
 static inline u8* Ptr(void* self, u32 offset)
@@ -793,3 +795,6 @@ CFunnyShape::CFunnyShape()
 
     m_textureCount = 0;
 }
+
+extern const char sDebugSpinnerText[5] = "|/-\\";
+extern const float kPppHeapUseRateDivisor = 100.0f;

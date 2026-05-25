@@ -1778,12 +1778,6 @@ void CChara::makeFurTex()
 	s_mogFurRand = 0;
 	s_mogFurMaxY = 0.0f;
 
-	gMogFurTexBuffer = Memory._Alloc(0x20000, 0, const_cast<char*>(s_chara_fur_cpp), 0xE9, 0);
-	if (gMogFurTexBuffer == 0) {
-		return;
-	}
-
-	unsigned short* tex = reinterpret_cast<unsigned short*>(gMogFurTexBuffer);
 	CHairSet hairSet[0x20];
 	unsigned int rng = s_mogFurRand;
 
@@ -1792,6 +1786,9 @@ void CChara::makeFurTex()
 	}
 
 	FurSetupTextureCopyEnv();
+
+	gMogFurTexBuffer = Memory._Alloc(0x20000, 0, const_cast<char*>(s_chara_fur_cpp), 0xE9, 0);
+	unsigned short* tex = reinterpret_cast<unsigned short*>(gMogFurTexBuffer);
 
 	for (int layer = 0; layer < 8; layer++) {
 		unsigned short* layerTex = tex + (layer * 0x4000 / 2);

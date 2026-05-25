@@ -4083,7 +4083,7 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
     case -0xE7:
         *reinterpret_cast<int*>(reinterpret_cast<u8*>(&CharaPcs) + 0x68) = *object->m_localBase;
         *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CharaPcs) + 0x72) =
-            static_cast<float>(object->m_localBase[1]);
+            *reinterpret_cast<float*>(object->m_localBase + 1);
         runtime->push(object, 0);
         outResult = 0;
         return;

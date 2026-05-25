@@ -678,13 +678,13 @@ bool CMenuPcs::ItemOpen()
         if (frame >= anim->startFrame) {
             if (anim->startFrame + anim->duration <= frame) {
                 finished++;
-                anim->progress = FLOAT_80332e64;
-                anim->dx = FLOAT_80332e60;
-                anim->dy = FLOAT_80332e60;
+                anim->progress = 1.0f;
+                anim->dx = 0.0f;
+                anim->dy = 0.0f;
             } else {
                 anim->frame++;
-                double one = DOUBLE_80332e68;
-                anim->progress = (float)((DOUBLE_80332e68 / (double)anim->duration) * (double)anim->frame);
+                double one = 1.0;
+                anim->progress = (float)((1.0 / (double)anim->duration) * (double)anim->frame);
                 if ((anim->flags & 2) == 0) {
                     float ratio = (float)((one / (double)anim->duration) * (double)anim->frame);
                     float dx = anim->targetX - (float)anim->x;

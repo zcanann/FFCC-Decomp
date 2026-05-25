@@ -1652,6 +1652,8 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 	const unsigned short meshCount = ModelMeshCount(this);
 	const int posQuant = ModelPosQuant(this) & 0xFF;
 	const int normQuant = ModelNormQuant(this) & 0xFF;
+	unsigned int prevExtraTexture = 0xFFFFFFFF;
+	int prevExtraTextureFormat = -1;
 
 	for (unsigned int meshIndex = 0; meshIndex < meshCount; meshIndex++, mesh++) {
 		if (mesh->m_workPositions == 0) {
@@ -1712,14 +1714,80 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 			}
 
 			TextureMan.SetTexture(GX_TEXMAP0, material->m_textures[0]);
+			unsigned int hasExtraTexture = 0;
+			int extraTextureFormat = -1;
 			if (material->m_extraTextureIndex != -1) {
 				TextureMan.SetTexture(GX_TEXMAP2, material->m_textures[1]);
+				hasExtraTexture = 1;
+				extraTextureFormat = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(material->m_textures[1]) + 0x60);
 			}
-			GXSetNumTexGens(static_cast<u8>(shadowCount + ((material->m_extraTextureIndex != -1) ? 3 : 2)));
-			GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, 0x3C, GX_FALSE, GX_PTIDENTITY);
-			GXSetTexCoordGen2(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX0, 0x1E, GX_FALSE, GX_PTIDENTITY);
-			if (material->m_extraTextureIndex != -1) {
-				GXSetTexCoordGen2(GX_TEXCOORD2, GX_TG_MTX2x4, GX_TG_TEX0, 0x3C, GX_FALSE, GX_PTIDENTITY);
+
+			if (prevExtraTexture != hasExtraTexture || prevExtraTextureFormat != extraTextureFormat) {
+				GXSetTevDirect(GX_TEVSTAGE0);
+				_GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
+				_GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_RASC, GX_CC_TEXC, GX_CC_ZERO);
+				_GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_RASA, GX_CA_TEXA, GX_CA_ZERO);
+				_GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+				_GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+				_GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
+
+				int tevStage = 1;
+				for (int shadowStage = 0; shadowStage < shadowCount; shadowStage++, tevStage++) {
+					GXSetTevDirect(static_cast<GXTevStageID>(tevStage));
+					_GXSetTevSwapMode(static_cast<GXTevStageID>(tevStage), GX_TEV_SWAP0, GX_TEV_SWAP0);
+					_GXSetTevColorIn(static_cast<GXTevStageID>(tevStage), GX_CC_ZERO, GX_CC_RASC, GX_CC_C1, GX_CC_ZERO);
+					_GXSetTevAlphaIn(static_cast<GXTevStageID>(tevStage), GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_TEXA);
+					_GXSetTevColorOp(static_cast<GXTevStageID>(tevStage), GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE,
+					                 GX_TEVPREV);
+					_GXSetTevAlphaOp(static_cast<GXTevStageID>(tevStage), GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE,
+					                 GX_TEVPREV);
+					_GXSetTevOrder(static_cast<GXTevStageID>(tevStage), static_cast<GXTexCoordID>(shadowStage + 3),
+					               static_cast<GXTexMapID>(shadowStage + 3), GX_COLOR_NULL);
+				}
+
+				GXSetTevDirect(static_cast<GXTevStageID>(tevStage));
+				_GXSetTevSwapMode(static_cast<GXTevStageID>(tevStage), GX_TEV_SWAP0, GX_TEV_SWAP0);
+				_GXSetTevColorIn(static_cast<GXTevStageID>(tevStage), GX_CC_ZERO, GX_CC_TEXC, GX_CC_RASC, GX_CC_ZERO);
+				_GXSetTevAlphaIn(static_cast<GXTevStageID>(tevStage), GX_CA_ZERO, GX_CA_TEXA, GX_CA_APREV, GX_CA_ZERO);
+				_GXSetTevColorOp(static_cast<GXTevStageID>(tevStage), GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_2, GX_TRUE,
+				                 GX_TEVPREV);
+				_GXSetTevAlphaOp(static_cast<GXTevStageID>(tevStage), GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE,
+				                 GX_TEVPREV);
+				_GXSetTevOrder(static_cast<GXTevStageID>(tevStage), GX_TEXCOORD1, GX_TEXMAP1, GX_COLOR_NULL);
+
+				int tevStageCount = tevStage + 1;
+				if (hasExtraTexture == 0) {
+					GXSetNumTexGens(static_cast<u8>(shadowCount + 2));
+					GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, 0x3C, GX_FALSE, GX_PTIDENTITY);
+					GXSetTexCoordGen2(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX0, 0x1E, GX_FALSE, GX_PTIDENTITY);
+				} else {
+					GXSetTevDirect(static_cast<GXTevStageID>(tevStageCount));
+					_GXSetTevSwapMode(static_cast<GXTevStageID>(tevStageCount), GX_TEV_SWAP0, GX_TEV_SWAP0);
+					if (extraTextureFormat == 5) {
+						_GXSetTevColorIn(static_cast<GXTevStageID>(tevStageCount), GX_CC_ZERO, GX_CC_TEXC, GX_CC_RASC,
+						                 GX_CC_ZERO);
+						_GXSetTevAlphaIn(static_cast<GXTevStageID>(tevStageCount), GX_CA_ZERO, GX_CA_TEXA, GX_CA_APREV,
+						                 GX_CA_ZERO);
+					} else {
+						_GXSetTevColorIn(static_cast<GXTevStageID>(tevStageCount), GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO,
+						                 GX_CC_TEXC);
+						_GXSetTevAlphaIn(static_cast<GXTevStageID>(tevStageCount), GX_CA_ZERO, GX_CA_TEXA, GX_CA_APREV,
+						                 GX_CA_ZERO);
+					}
+					_GXSetTevColorOp(static_cast<GXTevStageID>(tevStageCount), GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE,
+					                 GX_TEVPREV);
+					_GXSetTevAlphaOp(static_cast<GXTevStageID>(tevStageCount), GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE,
+					                 GX_TEVPREV);
+					_GXSetTevOrder(static_cast<GXTevStageID>(tevStageCount), GX_TEXCOORD2, GX_TEXMAP2, GX_COLOR_NULL);
+					tevStageCount++;
+					GXSetNumTexGens(static_cast<u8>(shadowCount + 3));
+					GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, 0x3C, GX_FALSE, GX_PTIDENTITY);
+					GXSetTexCoordGen2(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX0, 0x1E, GX_FALSE, GX_PTIDENTITY);
+					GXSetTexCoordGen2(GX_TEXCOORD2, GX_TG_MTX2x4, GX_TG_TEX0, 0x3C, GX_FALSE, GX_PTIDENTITY);
+				}
+				GXSetNumTevStages(static_cast<u8>(tevStageCount));
+				prevExtraTexture = hasExtraTexture;
+				prevExtraTextureFormat = extraTextureFormat;
 			}
 
 			for (unsigned int layer = 0; layer < 8; layer++) {

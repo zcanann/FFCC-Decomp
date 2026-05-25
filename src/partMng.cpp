@@ -185,12 +185,12 @@ pppShapeSt::pppShapeSt()
 pppShapeSt::~pppShapeSt()
 {
     if (m_animData != 0) {
-        delete[] reinterpret_cast<u8*>(m_animData);
+        delete reinterpret_cast<u8*>(m_animData);
         m_animData = 0;
     }
 
     if (m_displayListData != 0) {
-        delete[] reinterpret_cast<u8*>(m_displayListData);
+        delete reinterpret_cast<u8*>(m_displayListData);
         m_displayListData = 0;
     }
 }
@@ -4286,39 +4286,42 @@ void CPartMng::pppShowIdx(short index, unsigned char visible)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80057D6C
+ * PAL Size: 192b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CPartMng::pppFieldShowFpNo(short fieldNo, unsigned char visible)
 {
-    char* pppMngSt = reinterpret_cast<char*>(this);
-    int i = 0x60;
+    CPartMng* partMng = this;
+    int fieldNoInt = fieldNo;
 
-    do {
-        if ((*reinterpret_cast<int*>(pppMngSt + 0x14 + (0x158 * 0)) != -0x1000) &&
-            (*reinterpret_cast<short*>(pppMngSt + 0x74 + (0x158 * 0)) == 0) &&
-            (*reinterpret_cast<short*>(pppMngSt + 0x76 + (0x158 * 0)) == fieldNo)) {
-            *reinterpret_cast<unsigned char*>(pppMngSt + 0xe9 + (0x158 * 0)) = visible;
+    for (int i = 0; i < 0x120; i += 3) {
+        if ((partMng->m_pppMng[0].m_baseTime != -0x1000) &&
+            (partMng->m_pppMng[0].m_kind == 0) &&
+            (partMng->m_pppMng[0].m_nodeIndex == fieldNoInt)) {
+            partMng->m_pppMng[0].m_slotVisible = visible;
         }
-        if ((*reinterpret_cast<int*>(pppMngSt + 0x14 + (0x158 * 1)) != -0x1000) &&
-            (*reinterpret_cast<short*>(pppMngSt + 0x74 + (0x158 * 1)) == 0) &&
-            (*reinterpret_cast<short*>(pppMngSt + 0x76 + (0x158 * 1)) == fieldNo)) {
-            *reinterpret_cast<unsigned char*>(pppMngSt + 0xe9 + (0x158 * 1)) = visible;
+        if ((partMng->m_pppMng[1].m_baseTime != -0x1000) &&
+            (partMng->m_pppMng[1].m_kind == 0) &&
+            (partMng->m_pppMng[1].m_nodeIndex == fieldNoInt)) {
+            partMng->m_pppMng[1].m_slotVisible = visible;
         }
-        if ((*reinterpret_cast<int*>(pppMngSt + 0x14 + (0x158 * 2)) != -0x1000) &&
-            (*reinterpret_cast<short*>(pppMngSt + 0x74 + (0x158 * 2)) == 0) &&
-            (*reinterpret_cast<short*>(pppMngSt + 0x76 + (0x158 * 2)) == fieldNo)) {
-            *reinterpret_cast<unsigned char*>(pppMngSt + 0xe9 + (0x158 * 2)) = visible;
+        if ((partMng->m_pppMng[2].m_baseTime != -0x1000) &&
+            (partMng->m_pppMng[2].m_kind == 0) &&
+            (partMng->m_pppMng[2].m_nodeIndex == fieldNoInt)) {
+            partMng->m_pppMng[2].m_slotVisible = visible;
         }
-        if ((*reinterpret_cast<int*>(pppMngSt + 0x14 + (0x158 * 3)) != -0x1000) &&
-            (*reinterpret_cast<short*>(pppMngSt + 0x74 + (0x158 * 3)) == 0) &&
-            (*reinterpret_cast<short*>(pppMngSt + 0x76 + (0x158 * 3)) == fieldNo)) {
-            *reinterpret_cast<unsigned char*>(pppMngSt + 0xe9 + (0x158 * 3)) = visible;
+        if ((partMng->m_pppMng[3].m_baseTime != -0x1000) &&
+            (partMng->m_pppMng[3].m_kind == 0) &&
+            (partMng->m_pppMng[3].m_nodeIndex == fieldNoInt)) {
+            partMng->m_pppMng[3].m_slotVisible = visible;
         }
 
-        pppMngSt += 0x560;
-        i--;
-    } while (i != 0);
+        partMng = reinterpret_cast<CPartMng*>(reinterpret_cast<char*>(partMng) + 0x560);
+    }
 }
 
 /*

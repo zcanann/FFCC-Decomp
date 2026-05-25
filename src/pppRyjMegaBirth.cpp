@@ -486,7 +486,8 @@ void pppRyjDrawMegaBirth(_pppPObject* obj, void* stepData, _pppCtrlTable* ctrlTa
 			red = baseRed + (int)*(s8*)((u8*)particle + 0x24);
 			green = baseGreen + (int)*(s8*)((u8*)particle + 0x25);
 			blue = baseBlue + (int)*(s8*)((u8*)particle + 0x26);
-			alpha = baseAlpha + (int)*(s8*)((u8*)particle + 0x27) - (int)*f32_at(particle, 0x54);
+			alpha = (int)(
+				(float)(baseAlpha + (int)*(s8*)((u8*)particle + 0x27)) - *f32_at(particle, 0x54));
 
 			if (colorData != NULL) {
 				red += (int)colorData->m_color[0];

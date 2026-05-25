@@ -3672,13 +3672,14 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         return;
     case -0xB4:
         PartMng.pppSetDeltaSlot(
-            *object->m_localBase, static_cast<long>(0.25f * static_cast<float>(object->m_localBase[1])));
+            *object->m_localBase, static_cast<long>(0.25f * *reinterpret_cast<float*>(object->m_localBase + 1)));
         runtime->push(object, 0);
         outResult = 0;
         return;
     case -0xB5:
         PartMng.pppSetDeltaIdx(
-            static_cast<short>(*object->m_localBase), static_cast<long>(0.25f * static_cast<float>(object->m_localBase[1])));
+            static_cast<short>(*object->m_localBase),
+            static_cast<long>(0.25f * *reinterpret_cast<float*>(object->m_localBase + 1)));
         runtime->push(object, 0);
         outResult = 0;
         return;

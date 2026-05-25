@@ -321,13 +321,13 @@ void CMiniGamePcs::MiniGameGo(char* managerFilePath, char* managerSpFilePath)
 
         if (*reinterpret_cast<void**>(self + 0x1354) != 0)
         {
-            delete[] static_cast<u8*>(*reinterpret_cast<void**>(self + 0x1354));
+            delete static_cast<u8*>(*reinterpret_cast<void**>(self + 0x1354));
             *reinterpret_cast<void**>(self + 0x1354) = 0;
         }
 
         if (*reinterpret_cast<void**>(self + 0x135C) != 0)
         {
-            delete[] static_cast<u8*>(*reinterpret_cast<void**>(self + 0x135C));
+            delete static_cast<u8*>(*reinterpret_cast<void**>(self + 0x135C));
             *reinterpret_cast<void**>(self + 0x135C) = 0;
         }
     }
@@ -1608,13 +1608,13 @@ void CMiniGamePcs::calc(void)
 
         if (*reinterpret_cast<void**>(self + 0x1354) != 0)
         {
-            delete[] static_cast<u8*>(*reinterpret_cast<void**>(self + 0x1354));
+            delete static_cast<u8*>(*reinterpret_cast<void**>(self + 0x1354));
             *reinterpret_cast<void**>(self + 0x1354) = 0;
         }
 
         if (*reinterpret_cast<void**>(self + 0x135C) != 0)
         {
-            delete[] static_cast<u8*>(*reinterpret_cast<void**>(self + 0x135C));
+            delete static_cast<u8*>(*reinterpret_cast<void**>(self + 0x135C));
             *reinterpret_cast<void**>(self + 0x135C) = 0;
         }
     }

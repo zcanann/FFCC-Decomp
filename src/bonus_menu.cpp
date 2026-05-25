@@ -1895,8 +1895,36 @@ void CMenuPcs::DrawSelectOpenAnim()
 			DrawBonusFrame((float)sprite->x, (float)sprite->y, (float)sprite->w, (float)sprite->h, alpha);
 			break;
 		case -2:
-			if (modelIndex < activePartyCount) {
-				DrawBonusPartyModel(this, modelIndex, alpha);
+			{
+				CCharaPcs::CHandle* handle = 0;
+				int projectionIndex = modelIndex;
+				if (modelIndex < activePartyCount) {
+					for (int j = 0; j < activePartyCount; j++) {
+						if (s_Rinfo->m_party[j].m_rank == modelIndex) {
+							handle = s_Rinfo->m_party[j].m_partyHandle;
+							break;
+						}
+					}
+				} else {
+					projectionIndex = modelIndex + activePartyCount;
+					handle = GetBonusDisplayHandleSlots(this)[projectionIndex];
+					if (handle == 0) {
+						modelIndex++;
+						break;
+					}
+				}
+
+				SetProjection(projectionIndex);
+				SetLight(1);
+				unsigned int oldFlags = handle->m_flags;
+				handle->m_flags = 0x300543;
+				handle->Draw(5);
+				handle->m_flags = oldFlags;
+				if (modelIndex >= activePartyCount) {
+					int listPtr = GetBonusMenuMembers(this).m_bonusListPtr;
+					PartPcs.DrawMenuIdx(*reinterpret_cast<int*>(listPtr + projectionIndex * 0x524 + 4));
+				}
+				RestoreProjection();
 			}
 			modelIndex++;
 			break;
@@ -1967,9 +1995,6 @@ void CMenuPcs::CalcSelectOpenAnim()
 		*(short*)(statePtr + 0x22) = 0;
 
 		header->count = (short)(12 + activePartyCount * 5);
-		header->unk02 = 0;
-		header->unk04 = 0;
-		header->finished = 0;
 
 		idx = 0;
 		InitAnimSprite(&sprites[idx++], 0x16, 0, 0, 0x280, 0x1c0, 0, 0);
@@ -1995,15 +2020,18 @@ void CMenuPcs::CalcSelectOpenAnim()
 		}
 
 		for (int i = 0; i < activePartyCount; i++) {
-			InitSelectOpenPartyName(&sprites[idx], &sprites[iconBase + i], 0x50, 0x18, sprites[iconBase + i].startFrame + 2);
+			InitAnimSprite(&sprites[idx], -2, 0, 0, 0, 0, sprites[iconBase + i].startFrame, 8);
+			sprites[idx].motionX = 100.0f;
+			sprites[idx].motionY = 0.0f;
+			sprites[idx].targetX = (float)sprites[idx].x + sprites[idx].motionX;
+			sprites[idx].targetY = (float)sprites[idx].y + sprites[idx].motionY;
 			idx++;
 		}
 
 		for (int i = 0; i < 8; i++) {
 			int start = (int)((float)(10 + i * 5) * 0.6f);
 			InitAnimSprite(&sprites[idx], -2, 0, 0, 0, 0, start, 0x21);
-			sprites[idx].alpha = 0.0f;
-			sprites[idx].scale = 0.75f;
+			BonusSpriteFlags(&sprites[idx]) = 1;
 			idx++;
 		}
 

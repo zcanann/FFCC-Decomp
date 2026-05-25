@@ -133,8 +133,8 @@ void pppDrawMng::DrawOt()
 						pppInitDrawEnv(0);
 					}
 
-					pppEnvStPtr = (_pppEnvSt*)((char*)(*(void**)prim->m_handle) + 4);
-					pppMngStPtr = (_pppMngSt*)prim->m_handle;
+					ppvEnv = (_pppEnvSt*)((char*)(*(void**)prim->m_handle) + 4);
+					ppvMng = (_pppMngSt*)prim->m_handle;
 					pppSetFpMatrix((_pppMngSt*)prim->m_handle);
 					_pppDrawPart((_pppMngSt*)prim->m_handle);
 					break;

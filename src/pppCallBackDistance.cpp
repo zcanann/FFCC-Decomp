@@ -14,7 +14,7 @@
  */
 void pppFrameCallBackDistance(pppCallBackDistance* param1, pppCallBackDistanceUnkB* param2, pppCallBackDistanceUnkC* param3)
 {
-    u8* pppMngSt = (u8*)pppMngStPtr;
+    u8* pppMngSt = (u8*)ppvMng;
     s32 distanceOffset = *param3->m_serializedDataOffsets + 0x80;
     f32 distance;
     Vec local_1c;
@@ -33,7 +33,7 @@ void pppFrameCallBackDistance(pppCallBackDistance* param1, pppCallBackDistanceUn
         s32 m_nodeIndex;
         s32 initWork;
 
-        pppMngSt = (u8*)pppMngStPtr;
+        pppMngSt = (u8*)ppvMng;
         local_28.x = *(f32*)(pppMngSt + 0x84);
         local_28.y = *(f32*)(pppMngSt + 0x94);
         local_28.z = *(f32*)(pppMngSt + 0xA4);
@@ -80,7 +80,7 @@ void pppConstructCallBackDistance(pppCallBackDistance* param1, pppCallBackDistan
     s32 dataOffset;
     f32* distancePtr;
 
-    pppMngSt = (u8*)pppMngStPtr;
+    pppMngSt = (u8*)ppvMng;
     dataOffset = *param2->m_serializedDataOffsets;
     distancePtr = (f32*)((u8*)param1 + dataOffset + 0x80);
     objPosBase = *(u8**)(pppMngSt + 0xDC);

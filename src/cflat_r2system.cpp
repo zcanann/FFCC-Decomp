@@ -3417,12 +3417,12 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         return;
     case -0x94: {
         float* bounds = reinterpret_cast<float*>(object->m_localBase);
-        pppEnvStPtr->m_boxMinX = bounds[0];
-        pppEnvStPtr->m_boxMaxX = bounds[1];
-        pppEnvStPtr->m_boxMinY = bounds[2];
-        pppEnvStPtr->m_boxMaxY = bounds[3];
-        pppEnvStPtr->m_boxMinZ = bounds[4];
-        pppEnvStPtr->m_boxMaxZ = bounds[5];
+        ppvEnv->m_boxMinX = bounds[0];
+        ppvEnv->m_boxMaxX = bounds[1];
+        ppvEnv->m_boxMinY = bounds[2];
+        ppvEnv->m_boxMaxY = bounds[3];
+        ppvEnv->m_boxMinZ = bounds[4];
+        ppvEnv->m_boxMaxZ = bounds[5];
         runtime->push(object, 0);
         outResult = 0;
         return;

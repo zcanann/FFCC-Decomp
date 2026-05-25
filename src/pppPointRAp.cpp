@@ -45,12 +45,12 @@ void pppPointRAp(_pppPObject* pObject, void* step, _pppCtrlTable* ctrlTable)
         }
 
         _pppPObject* obj;
-        _pppPDataVal* objData = pppMngStPtr->m_pppPDataVals + createId;
+        _pppPDataVal* objData = ppvMng->m_pppPDataVals + createId;
 
         if (objData == 0) {
             obj = 0;
         } else {
-            obj = (_pppPObject*)pppCreatePObject(pppMngStPtr, objData);
+            obj = (_pppPObject*)pppCreatePObject(ppvMng, objData);
             *(_pppPObject**)((u8*)obj + 0x4) = pObject;
         }
 

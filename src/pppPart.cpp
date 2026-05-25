@@ -23,7 +23,7 @@
 #include "ffcc/pppDrawMng.h"
 #include "ffcc/pppShape.h"
 extern "C" {
-extern float gPartScreenMatrixRow2W;
+extern float ppvScreenMatrixZbuff;
 }
 #include "ffcc/gxfunc.h"
 
@@ -53,12 +53,12 @@ extern "C" double DOUBLE_8032fe00;
 extern "C" float FLOAT_8032fdf8;
 extern "C" unsigned int gPppFixedWhite;
 
-_pppMngSt* pppMngStPtr;
-_pppEnvSt* pppEnvStPtr;
+_pppMngSt* ppvMng;
+_pppEnvSt* ppvEnv;
 extern "C" {
-float gPartScreenMatrixRow2X = 0.0f;
-float gPartScreenMatrixRow2Y = 0.0f;
-float gPartScreenMatrixRow2W = 0.0f;
+float ppvScreenMatrixXbuff = 0.0f;
+float ppvScreenMatrixYbuff = 0.0f;
+float ppvScreenMatrixZbuff = 0.0f;
 int ppvMemAllocErrorF = 0;
 int ppvSysStopPartF = 0;
 int ppvSysGoPartF = 0;
@@ -380,7 +380,7 @@ void* pppMemAlloc(unsigned long allocSize, CMemory::CStage* stage, char* file, i
 			firstAllocFailure = false;
 			memset(denied, 0, sizeof(denied));
 
-			s32 currentIdx = pppMngStPtr - PartMng.m_pppMng;
+			s32 currentIdx = ppvMng - PartMng.m_pppMng;
 			denied[currentIdx] = 1;
 		}
 
@@ -466,7 +466,7 @@ void* pppMemAlloc(unsigned long allocSize, CMemory::CStage* stage, char* file, i
 	}
 	while (canRetry);
 
-	pppEnvStPtr->m_stagePtr->heapWalker(2, 0, 0xFFFFFFFF);
+	ppvEnv->m_stagePtr->heapWalker(2, 0, 0xFFFFFFFF);
 	PartMng.pppDumpMngSt();
 	ppvMemAllocErrorF = 1;
 	return 0;
@@ -501,7 +501,7 @@ extern "C" void* pppMemFree__FPv(unsigned long allocSize, CMemory::CStage* stage
 			firstAllocFailure = false;
 			memset(denied, 0, sizeof(denied));
 
-			s32 currentIdx = pppMngStPtr - PartMng.m_pppMng;
+			s32 currentIdx = ppvMng - PartMng.m_pppMng;
 			denied[currentIdx] = 1;
 		}
 
@@ -752,7 +752,7 @@ _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
 	_pppProgSetDef* programSet = dataVal->m_programSetDef;
 	s16 numStages = programSet->m_numStages;
 	u32 allocSize = programSet->m_workBaseOffset + ((u32)numStages * sizeof(u32));
-	CMemory::CStage* stage = pppEnvStPtr->m_stagePtr;
+	CMemory::CStage* stage = ppvEnv->m_stagePtr;
 	_pppPObjLink* newObj = 0;
 	bool firstFailure = true;
 	bool canRetry = true;
@@ -772,7 +772,7 @@ _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
 			firstFailure = false;
 			memset(denied, 0, sizeof(denied));
 
-			s32 currentIdx = pppMngStPtr - PartMng.m_pppMng;
+			s32 currentIdx = ppvMng - PartMng.m_pppMng;
 			denied[currentIdx] = 1;
 		}
 
@@ -863,7 +863,7 @@ _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
 
 	if (newObj == 0)
 	{
-		pppEnvStPtr->m_stagePtr->heapWalker(2, 0, 0xFFFFFFFF);
+		ppvEnv->m_stagePtr->heapWalker(2, 0, 0xFFFFFFFF);
 		PartMng.pppDumpMngSt();
 		ppvMemAllocErrorF = 1;
 	}
@@ -953,8 +953,8 @@ void _pppAllFreePObject(_pppMngSt* pppMngSt)
 {
 	Graphic._WaitDrawDone(const_cast<char*>(s_pppPart_cpp), 0x362);
 
-	_pppMngSt* oldMngSt = pppMngStPtr;
-	pppMngStPtr = pppMngSt;
+	_pppMngSt* oldMngSt = ppvMng;
+	ppvMng = pppMngSt;
 
 	if (pppMngSt->m_soundEffectData.m_soundEffectSlot >= 0 &&
 		pppMngSt->m_soundEffectData.m_soundEffectHandle >= 0)
@@ -1028,7 +1028,7 @@ void _pppAllFreePObject(_pppMngSt* pppMngSt)
 				for (s16 i = 0; i < mapMeshCount; i++)
 				{
 					CMapMesh* mapMesh = *(CMapMesh**)(*(u32*)(pppResSet + 0x14) + mapMeshIndices[i] * 4);
-					mapMesh->pppCacheDumpModelTexture(pppEnvStPtr->m_materialSetPtr, &ppvAmemCacheSet);
+					mapMesh->pppCacheDumpModelTexture(ppvEnv->m_materialSetPtr, &ppvAmemCacheSet);
 				}
 
 				s16 shapeCount = *shapeIndices;
@@ -1036,7 +1036,7 @@ void _pppAllFreePObject(_pppMngSt* pppMngSt)
 				for (s16 i = 0; i < shapeCount; i++)
 				{
 					pppShapeSt* shape = *(pppShapeSt**)(*(u32*)(pppResSet + 0x18) + shapeIndices[i] * 4);
-					pppCacheDumpShapeTexture(shape, pppEnvStPtr->m_materialSetPtr);
+					pppCacheDumpShapeTexture(shape, ppvEnv->m_materialSetPtr);
 				}
 			}
 		}
@@ -1046,7 +1046,7 @@ void _pppAllFreePObject(_pppMngSt* pppMngSt)
 	}
 
 	Graphic._WaitDrawDone(const_cast<char*>(s_pppPart_cpp), 0x3A1);
-	pppMngStPtr = oldMngSt;
+	ppvMng = oldMngSt;
 }
 
 /*
@@ -1071,22 +1071,22 @@ void pppSetMatrix(_pppMngSt* pppMngSt)
 
 	switch (pppMngSt->m_rotationOrder) {
 	case 0:
-		pppGetRotMatrixXYZ(pppMngStPtr->m_matrix, &pppMngSt->m_rotation);
+		pppGetRotMatrixXYZ(ppvMng->m_matrix, &pppMngSt->m_rotation);
 		break;
 	case 1:
-		pppGetRotMatrixXZY(pppMngStPtr->m_matrix, &pppMngSt->m_rotation);
+		pppGetRotMatrixXZY(ppvMng->m_matrix, &pppMngSt->m_rotation);
 		break;
 	case 2:
-		pppGetRotMatrixYXZ(pppMngStPtr->m_matrix, &pppMngSt->m_rotation);
+		pppGetRotMatrixYXZ(ppvMng->m_matrix, &pppMngSt->m_rotation);
 		break;
 	case 3:
-		pppGetRotMatrixYZX(pppMngStPtr->m_matrix, &pppMngSt->m_rotation);
+		pppGetRotMatrixYZX(ppvMng->m_matrix, &pppMngSt->m_rotation);
 		break;
 	case 4:
-		pppGetRotMatrixZXY(pppMngStPtr->m_matrix, &pppMngSt->m_rotation);
+		pppGetRotMatrixZXY(ppvMng->m_matrix, &pppMngSt->m_rotation);
 		break;
 	case 5:
-		pppGetRotMatrixZYX(pppMngStPtr->m_matrix, &pppMngSt->m_rotation);
+		pppGetRotMatrixZYX(ppvMng->m_matrix, &pppMngSt->m_rotation);
 		break;
 	default:
 		break;
@@ -1115,11 +1115,11 @@ MatrixMode2:
 		goto LocalOnly;
 	}
 	MapMng.GetMapObjWMtx(pppMngSt->m_mapObjIndex, nodeMtx);
-	PSMTXMultVecSR(nodeMtx, &pppMngStPtr->m_position, &tmpPos);
+	PSMTXMultVecSR(nodeMtx, &ppvMng->m_position, &tmpPos);
 	nodeMtx[0][3] += tmpPos.x;
 	nodeMtx[1][3] += tmpPos.y;
 	nodeMtx[2][3] += tmpPos.z;
-	PSMTXConcat(nodeMtx, pppMngStPtr->m_matrix.value, pppMngStPtr->m_matrix.value);
+	PSMTXConcat(nodeMtx, ppvMng->m_matrix.value, ppvMng->m_matrix.value);
 	goto ScaleOnly;
 
 MatrixMode3:
@@ -1165,19 +1165,19 @@ MatrixMode3:
 
 	GetPppOwnerModel(pppMngSt)->CalcSafeNodeWorldMatrix(nodeMtx, pppMngSt->m_bindNode);
 
-	PSMTXMultVecSR(nodeMtx, &pppMngStPtr->m_position, &tmpPos);
+	PSMTXMultVecSR(nodeMtx, &ppvMng->m_position, &tmpPos);
 	nodeMtx[0][3] += tmpPos.x;
 	nodeMtx[1][3] += tmpPos.y;
 	nodeMtx[2][3] += tmpPos.z;
-	PSMTXConcat(nodeMtx, pppMngStPtr->m_matrix.value, pppMngStPtr->m_matrix.value);
+	PSMTXConcat(nodeMtx, ppvMng->m_matrix.value, ppvMng->m_matrix.value);
 	goto ScaleOnly;
 
 MatrixMode4:
 	MapMng.GetMapObjWMtx(pppMngSt->m_mapObjIndex, nodeMtx);
-	nodeMtx[0][3] += pppMngStPtr->m_position.x;
-	nodeMtx[1][3] += pppMngStPtr->m_position.y;
-	nodeMtx[2][3] += pppMngStPtr->m_position.z;
-	PSMTXConcat(nodeMtx, pppMngStPtr->m_matrix.value, pppMngStPtr->m_matrix.value);
+	nodeMtx[0][3] += ppvMng->m_position.x;
+	nodeMtx[1][3] += ppvMng->m_position.y;
+	nodeMtx[2][3] += ppvMng->m_position.z;
+	PSMTXConcat(nodeMtx, ppvMng->m_matrix.value, ppvMng->m_matrix.value);
 	goto ScaleOnly;
 
 MatrixMode5:
@@ -1223,10 +1223,10 @@ MatrixMode5:
 
 	GetPppOwnerModel(pppMngSt)->CalcSafeNodeWorldMatrix(nodeMtx, pppMngSt->m_bindNode);
 
-	nodeMtx[0][3] += pppMngStPtr->m_position.x;
-	nodeMtx[1][3] += pppMngStPtr->m_position.y;
-	nodeMtx[2][3] += pppMngStPtr->m_position.z;
-	PSMTXConcat(nodeMtx, pppMngStPtr->m_matrix.value, pppMngStPtr->m_matrix.value);
+	nodeMtx[0][3] += ppvMng->m_position.x;
+	nodeMtx[1][3] += ppvMng->m_position.y;
+	nodeMtx[2][3] += ppvMng->m_position.z;
+	PSMTXConcat(nodeMtx, ppvMng->m_matrix.value, ppvMng->m_matrix.value);
 	goto ScaleOnly;
 
 MatrixModeHigh:
@@ -1278,11 +1278,11 @@ MatrixModeHigh:
 	PSVECNormalize(reinterpret_cast<Vec*>(nodeMtx[0]), reinterpret_cast<Vec*>(nodeMtx[0]));
 	PSVECNormalize(reinterpret_cast<Vec*>(nodeMtx[1]), reinterpret_cast<Vec*>(nodeMtx[1]));
 	PSVECNormalize(reinterpret_cast<Vec*>(nodeMtx[2]), reinterpret_cast<Vec*>(nodeMtx[2]));
-	PSMTXMultVecSR(nodeMtx, &pppMngStPtr->m_position, &tmpPos);
+	PSMTXMultVecSR(nodeMtx, &ppvMng->m_position, &tmpPos);
 	nodeMtx[0][3] += tmpPos.x;
 	nodeMtx[1][3] += tmpPos.y;
 	nodeMtx[2][3] += tmpPos.z;
-	PSMTXConcat(nodeMtx, pppMngStPtr->m_matrix.value, pppMngStPtr->m_matrix.value);
+	PSMTXConcat(nodeMtx, ppvMng->m_matrix.value, ppvMng->m_matrix.value);
 	goto ScaleOnly;
 
 MatrixMode7:
@@ -1328,74 +1328,74 @@ MatrixMode7:
 
 	GetPppOwnerModel(pppMngSt)->CalcSafeNodeWorldMatrix(nodeMtx, pppMngSt->m_bindNode);
 
-	PSMTXMultVecSR(nodeMtx, &pppMngStPtr->m_position, &tmpPos);
-	pppMngStPtr->m_matrix.value[0][3] = nodeMtx[0][3] + tmpPos.x;
-	pppMngStPtr->m_matrix.value[1][3] = nodeMtx[1][3] + tmpPos.y;
-	pppMngStPtr->m_matrix.value[2][3] = nodeMtx[2][3] + tmpPos.z;
+	PSMTXMultVecSR(nodeMtx, &ppvMng->m_position, &tmpPos);
+	ppvMng->m_matrix.value[0][3] = nodeMtx[0][3] + tmpPos.x;
+	ppvMng->m_matrix.value[1][3] = nodeMtx[1][3] + tmpPos.y;
+	ppvMng->m_matrix.value[2][3] = nodeMtx[2][3] + tmpPos.z;
 	goto ScaleOnly;
 
 ScaleOnly:
 	if (pppMngSt->m_scale.x != FLOAT_8032fdfc) {
-		scaleAxis0.x = pppMngStPtr->m_matrix.value[0][0];
-		scaleAxis0.y = pppMngStPtr->m_matrix.value[1][0];
-		scaleAxis0.z = pppMngStPtr->m_matrix.value[2][0];
+		scaleAxis0.x = ppvMng->m_matrix.value[0][0];
+		scaleAxis0.y = ppvMng->m_matrix.value[1][0];
+		scaleAxis0.z = ppvMng->m_matrix.value[2][0];
 		PSVECScale(&scaleAxis0, &scaleAxis0, pppMngSt->m_scale.x);
-		pppMngStPtr->m_matrix.value[0][0] = scaleAxis0.x;
-		pppMngStPtr->m_matrix.value[1][0] = scaleAxis0.y;
-		pppMngStPtr->m_matrix.value[2][0] = scaleAxis0.z;
+		ppvMng->m_matrix.value[0][0] = scaleAxis0.x;
+		ppvMng->m_matrix.value[1][0] = scaleAxis0.y;
+		ppvMng->m_matrix.value[2][0] = scaleAxis0.z;
 	}
 
 	if (pppMngSt->m_scale.y != FLOAT_8032fdfc) {
-		scaleAxis1.x = pppMngStPtr->m_matrix.value[0][1];
-		scaleAxis1.y = pppMngStPtr->m_matrix.value[1][1];
-		scaleAxis1.z = pppMngStPtr->m_matrix.value[2][1];
+		scaleAxis1.x = ppvMng->m_matrix.value[0][1];
+		scaleAxis1.y = ppvMng->m_matrix.value[1][1];
+		scaleAxis1.z = ppvMng->m_matrix.value[2][1];
 		PSVECScale(&scaleAxis1, &scaleAxis1, pppMngSt->m_scale.y);
-		pppMngStPtr->m_matrix.value[0][1] = scaleAxis1.x;
-		pppMngStPtr->m_matrix.value[1][1] = scaleAxis1.y;
-		pppMngStPtr->m_matrix.value[2][1] = scaleAxis1.z;
+		ppvMng->m_matrix.value[0][1] = scaleAxis1.x;
+		ppvMng->m_matrix.value[1][1] = scaleAxis1.y;
+		ppvMng->m_matrix.value[2][1] = scaleAxis1.z;
 	}
 
 	if (pppMngSt->m_scale.z == FLOAT_8032fdfc) {
 		return;
 	}
 
-	scaleAxis2.x = pppMngStPtr->m_matrix.value[0][2];
-	scaleAxis2.y = pppMngStPtr->m_matrix.value[1][2];
-	scaleAxis2.z = pppMngStPtr->m_matrix.value[2][2];
+	scaleAxis2.x = ppvMng->m_matrix.value[0][2];
+	scaleAxis2.y = ppvMng->m_matrix.value[1][2];
+	scaleAxis2.z = ppvMng->m_matrix.value[2][2];
 	PSVECScale(&scaleAxis2, &scaleAxis2, pppMngSt->m_scale.z);
-	pppMngStPtr->m_matrix.value[0][2] = scaleAxis2.x;
-	pppMngStPtr->m_matrix.value[1][2] = scaleAxis2.y;
-	pppMngStPtr->m_matrix.value[2][2] = scaleAxis2.z;
+	ppvMng->m_matrix.value[0][2] = scaleAxis2.x;
+	ppvMng->m_matrix.value[1][2] = scaleAxis2.y;
+	ppvMng->m_matrix.value[2][2] = scaleAxis2.z;
 	return;
 
 LocalOnly:
-	localAxis0.x = pppMngStPtr->m_matrix.value[0][0];
-	localAxis0.y = pppMngStPtr->m_matrix.value[1][0];
-	localAxis0.z = pppMngStPtr->m_matrix.value[2][0];
+	localAxis0.x = ppvMng->m_matrix.value[0][0];
+	localAxis0.y = ppvMng->m_matrix.value[1][0];
+	localAxis0.z = ppvMng->m_matrix.value[2][0];
 	PSVECScale(&localAxis0, &localAxis0, pppMngSt->m_scale.x);
-	pppMngStPtr->m_matrix.value[0][0] = localAxis0.x;
-	pppMngStPtr->m_matrix.value[1][0] = localAxis0.y;
-	pppMngStPtr->m_matrix.value[2][0] = localAxis0.z;
+	ppvMng->m_matrix.value[0][0] = localAxis0.x;
+	ppvMng->m_matrix.value[1][0] = localAxis0.y;
+	ppvMng->m_matrix.value[2][0] = localAxis0.z;
 
-	localAxis1.x = pppMngStPtr->m_matrix.value[0][1];
-	localAxis1.y = pppMngStPtr->m_matrix.value[1][1];
-	localAxis1.z = pppMngStPtr->m_matrix.value[2][1];
+	localAxis1.x = ppvMng->m_matrix.value[0][1];
+	localAxis1.y = ppvMng->m_matrix.value[1][1];
+	localAxis1.z = ppvMng->m_matrix.value[2][1];
 	PSVECScale(&localAxis1, &localAxis1, pppMngSt->m_scale.y);
-	pppMngStPtr->m_matrix.value[0][1] = localAxis1.x;
-	pppMngStPtr->m_matrix.value[1][1] = localAxis1.y;
-	pppMngStPtr->m_matrix.value[2][1] = localAxis1.z;
+	ppvMng->m_matrix.value[0][1] = localAxis1.x;
+	ppvMng->m_matrix.value[1][1] = localAxis1.y;
+	ppvMng->m_matrix.value[2][1] = localAxis1.z;
 
-	localAxis2.x = pppMngStPtr->m_matrix.value[0][2];
-	localAxis2.y = pppMngStPtr->m_matrix.value[1][2];
-	localAxis2.z = pppMngStPtr->m_matrix.value[2][2];
+	localAxis2.x = ppvMng->m_matrix.value[0][2];
+	localAxis2.y = ppvMng->m_matrix.value[1][2];
+	localAxis2.z = ppvMng->m_matrix.value[2][2];
 	PSVECScale(&localAxis2, &localAxis2, pppMngSt->m_scale.z);
-	pppMngStPtr->m_matrix.value[0][2] = localAxis2.x;
-	pppMngStPtr->m_matrix.value[1][2] = localAxis2.y;
-	pppMngStPtr->m_matrix.value[2][2] = localAxis2.z;
+	ppvMng->m_matrix.value[0][2] = localAxis2.x;
+	ppvMng->m_matrix.value[1][2] = localAxis2.y;
+	ppvMng->m_matrix.value[2][2] = localAxis2.z;
 
-	pppMngStPtr->m_matrix.value[0][3] = pppMngSt->m_position.x;
-	pppMngStPtr->m_matrix.value[1][3] = pppMngSt->m_position.y;
-	pppMngStPtr->m_matrix.value[2][3] = pppMngSt->m_position.z;
+	ppvMng->m_matrix.value[0][3] = pppMngSt->m_position.x;
+	ppvMng->m_matrix.value[1][3] = pppMngSt->m_position.y;
+	ppvMng->m_matrix.value[2][3] = pppMngSt->m_position.z;
 }
 
 /*
@@ -1418,9 +1418,9 @@ void pppSetFpMatrix(_pppMngSt* pppMngSt)
 	Vec local_50;
 	Mtx local_44;
 
-	PSMTXCopy(pppMngStPtr->m_matrix.value, local_44);
+	PSMTXCopy(ppvMng->m_matrix.value, local_44);
 	if (pppMngSt->m_fpBillboard != 0) {
-		PSMTXConcat(ppvCameraMatrix0, pppMngStPtr->m_matrix.value, ppvWorldMatrix);
+		PSMTXConcat(ppvCameraMatrix0, ppvMng->m_matrix.value, ppvWorldMatrix);
 		local_50.x = local_44[0][3];
 		local_50.y = local_44[1][3];
 		local_50.z = local_44[2][3];
@@ -1430,7 +1430,7 @@ void pppSetFpMatrix(_pppMngSt* pppMngSt)
 		ppvWorldMatrix[1][3] = local_50.y;
 		ppvWorldMatrix[2][3] = local_50.z;
 	} else {
-		PSMTXConcat(ppvCameraMatrix0, pppMngStPtr->m_matrix.value, ppvWorldMatrix);
+		PSMTXConcat(ppvCameraMatrix0, ppvMng->m_matrix.value, ppvWorldMatrix);
 		local_50.x = local_44[0][3];
 		local_50.y = local_44[1][3];
 		local_50.z = local_44[2][3];
@@ -1487,7 +1487,7 @@ void pppCacheLoadModel(short* modelList, _pppDataHead*)
 {
 	short* modelIndices = modelList + 1;
 	short modelCount = *modelList;
-	u32 pppResSet = *reinterpret_cast<u32*>(pppMngStPtr->m_pppResSet);
+	u32 pppResSet = *reinterpret_cast<u32*>(ppvMng->m_pppResSet);
 
 	for (short i = 0; i < modelCount; i++)
 	{
@@ -1503,7 +1503,7 @@ void pppCacheLoadModel(short* modelList, _pppDataHead*)
 		}
 
 		ppvAmemCacheSet.AddRef(cacheIndex);
-		mapMesh->pppCacheLoadModelTexture(pppEnvStPtr->m_materialSetPtr, &ppvAmemCacheSet);
+		mapMesh->pppCacheLoadModelTexture(ppvEnv->m_materialSetPtr, &ppvAmemCacheSet);
 	}
 }
 
@@ -1586,7 +1586,7 @@ void pppCacheDumpModel(short* modelList, _pppDataHead*)
 	short modelCount = *modelList;
 	short i = 0;
 	modelList = modelList + 1;
-	u32 pppResSet = *reinterpret_cast<u32*>(pppMngStPtr->m_pppResSet);
+	u32 pppResSet = *reinterpret_cast<u32*>(ppvMng->m_pppResSet);
 
 	while (i < modelCount) {
 		short modelIndex = *modelList;
@@ -1595,7 +1595,7 @@ void pppCacheDumpModel(short* modelList, _pppDataHead*)
 		short cacheIndex = *reinterpret_cast<short*>(reinterpret_cast<u8*>(mapMesh) + 0x46);
 
 		ppvAmemCacheSet.Release(cacheIndex);
-		mapMesh->pppCacheDumpModelTexture(pppEnvStPtr->m_materialSetPtr, &ppvAmemCacheSet);
+		mapMesh->pppCacheDumpModelTexture(ppvEnv->m_materialSetPtr, &ppvAmemCacheSet);
 		++i;
 	}
 }
@@ -1637,7 +1637,7 @@ void pppCacheDumpShape(short* shapeList, _pppDataHead* pppDataHead)
 void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
 {
 	_pppProgSetDef* programSet = (_pppProgSetDef*)(pdt + 6);
-	pppMngStPtr = pppMngSt;
+	ppvMng = pppMngSt;
 	pppMngSt->m_lifeEnd = (int)pdt[0];
 	pppMngSt->m_mode = (u8)pdt[1];
 	int controlOffset = (int)pdt[2];
@@ -1696,7 +1696,7 @@ void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
 	}
 	else
 	{
-		CMemory::CStage* stage = pppEnvStPtr->m_stagePtr;
+		CMemory::CStage* stage = ppvEnv->m_stagePtr;
 		bool firstAllocFailure = true;
 		bool canRetry = true;
 		_pppPDataVal* pDataVals = 0;
@@ -1716,7 +1716,7 @@ void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
 			{
 				firstAllocFailure = false;
 				memset(denied, 0, sizeof(denied));
-				int currentIdx = pppMngStPtr - PartMng.m_pppMng;
+				int currentIdx = ppvMng - PartMng.m_pppMng;
 				denied[currentIdx] = 1;
 			}
 
@@ -1804,7 +1804,7 @@ void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
 		}
 		while (canRetry);
 
-		pppEnvStPtr->m_stagePtr->heapWalker(2, 0, 0xFFFFFFFF);
+		ppvEnv->m_stagePtr->heapWalker(2, 0, 0xFFFFFFFF);
 		PartMng.pppDumpMngSt();
 		ppvMemAllocErrorF = 1;
 DataValsAllocated:
@@ -2396,7 +2396,7 @@ void _pppCalcPart(_pppMngSt* pppMngSt)
 	PPPSEST* se = &pppMngSt->m_soundEffectData;
 	pppFMATRIX* mtx = &pppMngSt->m_matrix;
 
-	pppMngStPtr = pppMngSt;
+	ppvMng = pppMngSt;
 	if (se->m_soundEffectSlot >= 0 &&
 		se->m_soundEffectStartFrame <= pppMngSt->m_currentFrame &&
 		se->m_soundEffectStopFlag == 0)
@@ -2413,8 +2413,8 @@ void _pppCalcPart(_pppMngSt* pppMngSt)
 				u32 soundTableIndex = (u32)se->m_soundEffectKind - 3;
 				se->m_soundEffectHandle = Sound.PlaySe3D(
 					se->m_soundEffectSlot, &soundPos,
-					pppEnvStPtr->m_soundVolumeTable[soundTableIndex],
-					pppEnvStPtr->m_soundPitchTable[soundTableIndex], 0);
+					ppvEnv->m_soundVolumeTable[soundTableIndex],
+					ppvEnv->m_soundPitchTable[soundTableIndex], 0);
 				se->m_soundEffectStartedOnce = 1;
 			}
 		}
@@ -2456,7 +2456,7 @@ void _pppCalcPart(_pppMngSt* pppMngSt)
  */
 void _pppDrawPart(_pppMngSt* pppMngSt)
 {
-	pppMngStPtr = pppMngSt;
+	ppvMng = pppMngSt;
 	pppDrawPartStd(pppMngSt);
 }
 
@@ -2495,7 +2495,7 @@ void pppDrawMesh(pppModelSt* model, Vec* positions, int usePartMaterial)
 		GXSetArray((GXAttr)10, *(void**)(MaterialManRaw() + 4), 6);
 	}
 
-	model->DrawPart(pppEnvStPtr->m_materialSetPtr, usePartMaterial);
+	model->DrawPart(ppvEnv->m_materialSetPtr, usePartMaterial);
 }
 
 /*
@@ -2560,7 +2560,7 @@ void pppClearDrawEnv()
 {
 	if (FLOAT_8032fddc != s_zoff) {
 		s_zoff = FLOAT_8032fddc;
-		ppvScreenMatrix[2][3] = gPartScreenMatrixRow2W;
+		ppvScreenMatrix[2][3] = ppvScreenMatrixZbuff;
 		GXSetProjection(ppvScreenMatrix, GX_PERSPECTIVE);
 	}
 }
@@ -2577,13 +2577,13 @@ void pppClearDrawEnv()
 void pppSetDrawEnv(pppCVECTOR* pppColor, pppFMATRIX* pppMtx, float depth, unsigned char lightTarget, unsigned char fogIndex, unsigned char fogParam, unsigned char cullMode, unsigned char zEnable, unsigned char colorUpdate, unsigned char zWrite)
 {
 	if (DOUBLE_8032fdf0 != (double)depth) {
-		float sortDepth = *(float*)((u8*)pppMngStPtr + 0x114);
+		float sortDepth = *(float*)((u8*)ppvMng + 0x114);
 		depth = (depth * FLOAT_8032fdf8) / -sortDepth;
 	}
 
 	if ((double)s_zoff != (double)depth) {
 		s_zoff = depth;
-		ppvScreenMatrix[2][3] = gPartScreenMatrixRow2W + depth;
+		ppvScreenMatrix[2][3] = ppvScreenMatrixZbuff + depth;
 		GXSetProjection(ppvScreenMatrix, GX_PERSPECTIVE);
 	}
 
@@ -2605,7 +2605,7 @@ void pppSetDrawEnv(pppCVECTOR* pppColor, pppFMATRIX* pppMtx, float depth, unsign
 
 	if (s_light_mode != lightTarget) {
 		s_light_mode = lightTarget;
-		LightPcs.SetPart(static_cast<CLightPcs::TARGET>(2), pppMngStPtr, lightTarget);
+		LightPcs.SetPart(static_cast<CLightPcs::TARGET>(2), ppvMng, lightTarget);
 	}
 
 	if (pppMtx != 0) {

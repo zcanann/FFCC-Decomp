@@ -44,7 +44,7 @@ struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(
     float bottomZ;
 
     if (gPppCalcDisabled == 0) {
-        pppMngSt = pppMngStPtr;
+        pppMngSt = ppvMng;
         zero = 0.0f;
         probeY = -2000.0f;
         scale = 10000000000.0f;
@@ -53,11 +53,11 @@ struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(
         direction.y = probeY;
         direction.z = zero;
 
-        bottomY = pppMngStPtr->m_matrix.value[1][3];
+        bottomY = ppvMng->m_matrix.value[1][3];
         nextY = bottomY;
         float finalY = nextY;
-        bottomX = pppMngStPtr->m_matrix.value[0][3];
-        bottomZ = pppMngStPtr->m_matrix.value[2][3];
+        bottomX = ppvMng->m_matrix.value[0][3];
+        bottomZ = ppvMng->m_matrix.value[2][3];
         bottomY += param_2->m_unk0x4;
         cylinder.m_top.z = scale;
         cylinder.m_top.y = scale;
@@ -89,9 +89,9 @@ struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(
         ((Vec*)((u8*)pppMngSt + 0x68))->y = finalY;
         ((Vec*)((u8*)pppMngSt + 0x48))->y = finalY;
 
-        pppMngStPtr->m_matrix.value[0][3] = pppMngSt->m_position.x;
-        pppMngStPtr->m_matrix.value[1][3] = pppMngSt->m_position.y;
-        pppMngStPtr->m_matrix.value[2][3] = pppMngSt->m_position.z;
+        ppvMng->m_matrix.value[0][3] = pppMngSt->m_position.x;
+        ppvMng->m_matrix.value[1][3] = pppMngSt->m_position.y;
+        ppvMng->m_matrix.value[2][3] = pppMngSt->m_position.z;
 
         pppYmCheckBGHeight = (struct pppYmCheckBGHeight*)pppSetFpMatrix__FP9_pppMngSt(pppMngSt);
     }

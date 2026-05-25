@@ -28,14 +28,14 @@ void pppFrameAlignmentScale(struct pppAlignmentScale*, struct pppAlignmentScaleD
     Mtx scaleMtx;
 
     if (gPppCalcDisabled == 0) {
-        pppMngSt = pppMngStPtr;
+        pppMngSt = ppvMng;
         cameraPos.x = CameraPcs.m_positionX;
         cameraPos.y = CameraPcs.m_positionY;
         cameraPos.z = CameraPcs.m_positionZ;
 
-        objPos.x = pppMngStPtr->m_matrix.value[0][3];
-        objPos.y = pppMngStPtr->m_matrix.value[1][3];
-        objPos.z = pppMngStPtr->m_matrix.value[2][3];
+        objPos.x = ppvMng->m_matrix.value[0][3];
+        objPos.y = ppvMng->m_matrix.value[1][3];
+        objPos.z = ppvMng->m_matrix.value[2][3];
 
         scale = PSVECDistance(&cameraPos, &objPos) / data->m_unk0x4;
         if (scale <= FLOAT_80331920) {
@@ -48,13 +48,13 @@ void pppFrameAlignmentScale(struct pppAlignmentScale*, struct pppAlignmentScaleD
 
         PSMTXScale(scaleMtx, scale, scale, scale);
 
-        pppMngStPtr->m_matrix.value[0][3] = FLOAT_80331924;
-        pppMngStPtr->m_matrix.value[1][3] = FLOAT_80331924;
-        pppMngStPtr->m_matrix.value[2][3] = FLOAT_80331924;
-        PSMTXConcat(scaleMtx, pppMngStPtr->m_matrix.value, pppMngStPtr->m_matrix.value);
-        pppMngStPtr->m_matrix.value[0][3] = objPos.x;
-        pppMngStPtr->m_matrix.value[1][3] = objPos.y;
-        pppMngStPtr->m_matrix.value[2][3] = objPos.z;
+        ppvMng->m_matrix.value[0][3] = FLOAT_80331924;
+        ppvMng->m_matrix.value[1][3] = FLOAT_80331924;
+        ppvMng->m_matrix.value[2][3] = FLOAT_80331924;
+        PSMTXConcat(scaleMtx, ppvMng->m_matrix.value, ppvMng->m_matrix.value);
+        ppvMng->m_matrix.value[0][3] = objPos.x;
+        ppvMng->m_matrix.value[1][3] = objPos.y;
+        ppvMng->m_matrix.value[2][3] = objPos.z;
 
         pppSetFpMatrix(pppMngSt);
     }

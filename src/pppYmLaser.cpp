@@ -113,7 +113,7 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 		return;
 	}
 
-	tex = GetTextureFromRSD(dataValIndex, pppEnvStPtr);
+	tex = GetTextureFromRSD(dataValIndex, ppvEnv);
 	pppSetBlendMode(step->m_laser.m_blendMode);
 	_GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP0);
 	pppSetDrawEnv(
@@ -139,7 +139,7 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 	negHalfWidth = -halfWidth;
 
 	pppUnitMatrix(unitMtx);
-	pppMulMatrix(mtxOut, pppMngStPtr->m_matrix, laser->m_localMatrix);
+	pppMulMatrix(mtxOut, ppvMng->m_matrix, laser->m_localMatrix);
 	pppMulMatrix(mtxOut, *(pppFMATRIX*)&ppvCameraMatrix, mtxOut);
 	GXLoadPosMtxImm(mtxOut.value, 0);
 
@@ -172,10 +172,10 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 	GXTexCoord2f32(FLOAT_80330DC4, work->m_length);
 
 	if (step->m_stepValue != 0xFFFF) {
-		long** shapeTable = *(long***)(*(u32*)&pppEnvStPtr->m_particleColors[0] + (u32)step->m_stepValue * 4);
+		long** shapeTable = *(long***)(*(u32*)&ppvEnv->m_particleColors[0] + (u32)step->m_stepValue * 4);
 		PSMTXIdentity(shapeMtx);
-		shapeMtx[0][0] = step->m_laser.m_shapeScale * pppMngStPtr->m_scale.x;
-		shapeMtx[1][1] = step->m_laser.m_shapeScale * pppMngStPtr->m_scale.y;
+		shapeMtx[0][0] = step->m_laser.m_shapeScale * ppvMng->m_scale.x;
+		shapeMtx[1][1] = step->m_laser.m_shapeScale * ppvMng->m_scale.y;
 		shapeMtx[2][2] = shapeMtx[0][0];
 		if (kPppYmLaserOne != work->m_shapeRotation) {
 			PSMTXRotRad(rotateMtx, 'z', work->m_shapeRotation);
@@ -186,7 +186,7 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 		shapeMtx[1][3] = shapePos.y;
 		shapeMtx[2][3] = shapePos.z;
 		GXLoadPosMtxImm(shapeMtx, GX_PNMTX0);
-		pppDrawShp(*shapeTable, work->m_shapeArg2, pppEnvStPtr->m_materialSetPtr, step->m_laser.m_blendMode);
+		pppDrawShp(*shapeTable, work->m_shapeArg2, ppvEnv->m_materialSetPtr, step->m_laser.m_blendMode);
 
 		count = step->m_laser.m_pointCount;
 		uvStep = FLOAT_80330DC4 / (float)count;
@@ -194,7 +194,7 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 			_GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
 			_GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
 		} else {
-			tex = GetTextureFromRSD(step->m_initWOrk, pppEnvStPtr);
+			tex = GetTextureFromRSD(step->m_initWOrk, ppvEnv);
 			_GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
 			GXLoadTexObj((GXTexObj*)(tex + 0x28), GX_TEXMAP0);
 		}
@@ -279,7 +279,7 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 			GXSetZMode(1, GX_LEQUAL, 0);
 
 			if ((CFlatRuntimeDebugFlags() & CFlatRuntimeDebugFlag_ParticleHitSpheres) != 0) {
-				float radius = pppMngStPtr->m_previousPosition.z * step->m_laser.m_hitScale;
+				float radius = ppvMng->m_previousPosition.z * step->m_laser.m_hitScale;
 				float distance = PSVECDistance(work->m_points, &work->m_origin);
 				debugSource.x = kPppYmLaserOne;
 				debugSource.y = kPppYmLaserOne;
@@ -293,7 +293,7 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 				debugMtx[1][1] = radius;
 				debugMtx[2][2] = distance;
 				PSMTXConcat(laser->m_localMatrix.value, debugMtx, debugMtx);
-				PSMTXConcat(pppMngStPtr->m_matrix.value, debugMtx, debugMtx);
+				PSMTXConcat(ppvMng->m_matrix.value, debugMtx, debugMtx);
 				PSMTXConcat(ppvCameraMatrix, debugMtx, debugMtx);
 				PSMTXMultVec(debugMtx, &debugSource, &spherePos);
 				debugMtx[0][3] = spherePos.x;
@@ -366,7 +366,7 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtr
 
 	if (work->m_points == 0) {
 		work->m_points = (Vec*)pppMemAlloc(
-			(u32)step->m_laser.m_pointCount * 0xc, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppYmLaser_cpp), 0x5d);
+			(u32)step->m_laser.m_pointCount * 0xc, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmLaser_cpp), 0x5d);
 		memset(work->m_points, 0, (u32)step->m_laser.m_pointCount * 0xc);
 		emptyHistory = 1;
 	}
@@ -381,7 +381,7 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtr
 		step->m_laser.m_lengthStepVelocity, step->m_laser.m_lengthStepAccel);
 
 	pppCalcFrameShape(
-		**(long***)(*(u32*)&pppEnvStPtr->m_particleColors[0] + (u32)step->m_stepValue * 4), work->m_shapeArg1,
+		**(long***)(*(u32*)&ppvEnv->m_particleColors[0] + (u32)step->m_stepValue * 4), work->m_shapeArg1,
 		work->m_shapeArg2, work->m_shapeArg0, step->m_laser.m_shapeFrameStep);
 
 	for (int i = 0; i < (int)((u32)step->m_laser.m_historyFrameCount + 1); i++) {
@@ -396,7 +396,7 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtr
 		localB.z = work->m_length;
 
 		if (i == 0) {
-			PSMTXConcat(pppMngStPtr->m_matrix.value, laser->m_localMatrix.value, tempMtx);
+			PSMTXConcat(ppvMng->m_matrix.value, laser->m_localMatrix.value, tempMtx);
 			work->m_origin.x = tempMtx[0][3];
 			work->m_origin.y = tempMtx[1][3];
 			work->m_origin.z = tempMtx[2][3];
@@ -409,7 +409,7 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtr
 			s32 frameCount = step->m_laser.m_historyFrameCount + 1;
 			float t = YmLaserConst(FLOAT_80330de0) / (float)frameCount;
 			t *= (float)i;
-			if (GetCharaNodeFrameMatrix(pppMngStPtr, t, charaMtx) == 0) {
+			if (GetCharaNodeFrameMatrix(ppvMng, t, charaMtx) == 0) {
 				emptyHistory = 1;
 				continue;
 			} else {
@@ -452,8 +452,8 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtr
 
 		if (step->m_laser.m_disableHitCylinder == 0) {
 			pppHitCylinderSendSystem(
-				pppMngStPtr, &work->m_origin, &localA,
-				pppMngStPtr->m_previousPosition.z * step->m_laser.m_hitScale,
+				ppvMng, &work->m_origin, &localA,
+				ppvMng->m_previousPosition.z * step->m_laser.m_hitScale,
 				step->m_laser.m_hitRadius);
 		}
 
@@ -474,12 +474,12 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtr
 			}
 
 			if (createHitObject != 0) {
-				_pppPDataVal* dataVal = pppMngStPtr->m_pppPDataVals + step->m_arg3;
+				_pppPDataVal* dataVal = ppvMng->m_pppPDataVals + step->m_arg3;
 				_pppPObject* created;
 				if (dataVal == 0) {
 					created = 0;
 				} else {
-					created = pppCreatePObject(pppMngStPtr, dataVal);
+					created = pppCreatePObject(ppvMng, dataVal);
 					*(_pppPObject**)((u8*)created + 4) = (_pppPObject*)laser;
 				}
 

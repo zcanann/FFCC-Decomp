@@ -44,5 +44,5 @@ void pppDrawMdl(_pppPObject* pObject, PDrawMdl* drawMdl, _pppCtrlTable* ctrlTabl
 
     pppSetBlendMode(*(u8*)((u8*)mdl + 0x9));
 
-    pppDrawMesh((pppModelSt*)pppEnvStPtr->m_mapMeshPtr[*(u32*)((u8*)mdl + 0x4)], obj->m_drawMatrixPtr, 1);
+    pppDrawMesh((pppModelSt*)ppvEnv->m_mapMeshPtr[*(u32*)((u8*)mdl + 0x4)], obj->m_drawMatrixPtr, 1);
 }

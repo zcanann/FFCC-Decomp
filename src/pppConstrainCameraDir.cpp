@@ -19,7 +19,7 @@ void pppFrameConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir, pp
                                 _pppCtrlTable* param_3)
 {
     if (gPppCalcDisabled == 0) {
-        _pppMngSt* pppMngSt = pppMngStPtr;
+        _pppMngSt* pppMngSt = ppvMng;
         float* value = (float*)((char*)pppConstrainCameraDir + *param_3->m_serializedDataOffsets + 0x80);
 
         CalcGraphValue((_pppPObject*)pppConstrainCameraDir, param_2->m_graphId, value[0], value[1], value[2],
@@ -38,7 +38,7 @@ void pppFrameConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir, pp
             float cameraPosZ = CameraPcs.m_positionZ;
             float scale = 1.0f + ((CameraPcs.m_fov - 25.0f) / 25.0f);
 
-            PSMTXIdentity(pppMngStPtr->m_matrix.value);
+            PSMTXIdentity(ppvMng->m_matrix.value);
 
             pppMngSt->m_scale.x = kConstrainCameraDirWideAspect * scale;
             pppMngSt->m_scale.y = scale;
@@ -48,18 +48,18 @@ void pppFrameConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir, pp
             PSMTXScale(scaleMtx, pppMngSt->m_scale.x, pppMngSt->m_scale.y, pppMngSt->m_scale.z);
 
             if (param_2->m_applyCameraInverse != 0) {
-                PSMTXInverse(cameraMtx, pppMngStPtr->m_matrix.value);
+                PSMTXInverse(cameraMtx, ppvMng->m_matrix.value);
             }
 
-            PSMTXConcat(scaleMtx, pppMngStPtr->m_matrix.value, pppMngStPtr->m_matrix.value);
+            PSMTXConcat(scaleMtx, ppvMng->m_matrix.value, ppvMng->m_matrix.value);
 
             if (param_2->m_applyPosition != 0) {
                 float resultZ = cameraDirZ * *value + cameraPosZ;
                 float resultY = cameraDirY * *value + cameraPosY;
                 float resultX = cameraDirX * *value + cameraPosX;
-                pppMngStPtr->m_matrix.value[0][3] = resultX;
-                pppMngStPtr->m_matrix.value[1][3] = resultY;
-                pppMngStPtr->m_matrix.value[2][3] = resultZ;
+                ppvMng->m_matrix.value[0][3] = resultX;
+                ppvMng->m_matrix.value[1][3] = resultY;
+                ppvMng->m_matrix.value[2][3] = resultZ;
             }
 
             pppSetFpMatrix(pppMngSt);

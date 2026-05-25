@@ -689,7 +689,7 @@ int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)
     switch (mngSt->m_matrixMode) {
     case 3:
         if (mngSt->m_bindNode != 0) {
-            PSMTXMultVecSR(outMatrix, &pppMngStPtr->m_position, &local88);
+            PSMTXMultVecSR(outMatrix, &ppvMng->m_position, &local88);
             outMatrix[0][3] += local88.x;
             outMatrix[1][3] += local88.y;
             outMatrix[2][3] += local88.z;
@@ -723,9 +723,9 @@ int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)
         break;
     case 5:
         if (mngSt->m_bindNode != 0) {
-            outMatrix[0][3] += pppMngStPtr->m_position.x;
-            outMatrix[1][3] += pppMngStPtr->m_position.y;
-            outMatrix[2][3] += pppMngStPtr->m_position.z;
+            outMatrix[0][3] += ppvMng->m_position.x;
+            outMatrix[1][3] += ppvMng->m_position.y;
+            outMatrix[2][3] += ppvMng->m_position.z;
             PSMTXConcat(outMatrix, localMatrix.value, localMatrix.value);
 
             if (FLOAT_80331184 != mngSt->m_scale.x) {
@@ -763,7 +763,7 @@ int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)
             PSVECNormalize((Vec*)outMatrix, (Vec*)outMatrix);
             PSVECNormalize((Vec*)&outMatrix[1][0], (Vec*)&outMatrix[1][0]);
             PSVECNormalize((Vec*)&outMatrix[2][0], (Vec*)&outMatrix[2][0]);
-            PSMTXMultVecSR(outMatrix, &pppMngStPtr->m_position, &local88);
+            PSMTXMultVecSR(outMatrix, &ppvMng->m_position, &local88);
             PSMTXConcat(outMatrix, localMatrix.value, localMatrix.value);
 
             if (FLOAT_80331184 != mngSt->m_scale.x) {

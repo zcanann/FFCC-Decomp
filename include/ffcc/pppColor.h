@@ -23,7 +23,7 @@ struct _pppColorWork
 }; // Size 0xC
 
 struct _pppMngSt;
-extern _pppMngSt* pppMngStPtr;
+extern _pppMngSt* ppvMng;
 extern const double kPppColorScale;
 
 #ifdef __cplusplus

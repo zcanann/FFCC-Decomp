@@ -53,7 +53,7 @@ void pppDrawShape2(void* param1, ShapeControlData* param2, void* param3){
         return;
     }
 
-    void** shapeTables = *(void***)((u8*)pppEnvStPtr + 0xC);
+    void** shapeTables = *(void***)((u8*)ppvEnv + 0xC);
     void* shapeSpec = *(void**)shapeTables[type];
     ShapeSpecEntry* shape = (ShapeSpecEntry*)((u8*)shapeSpec + ((u32)shapeData->currentId << 3) + 0x10);
     void* drawShape = (u8*)shapeSpec + shape->offset;
@@ -72,7 +72,7 @@ void pppDrawShape2(void* param1, ShapeControlData* param2, void* param3){
     );
 
     pppSetBlendMode(param2->blendMode);
-    pppDrawShp((tagOAN3_SHAPE*)drawShape, *(CMaterialSet**)((u8*)pppEnvStPtr + 0x4), param2->blendMode);
+    pppDrawShp((tagOAN3_SHAPE*)drawShape, *(CMaterialSet**)((u8*)ppvEnv + 0x4), param2->blendMode);
 }
 
 
@@ -98,7 +98,7 @@ void pppCalcShape2(void* param1, ShapeControlData* param2, void* param3){
         return;
     }
 
-    void** shapeTables = *(void***)((u8*)pppEnvStPtr + 0xC);
+    void** shapeTables = *(void***)((u8*)ppvEnv + 0xC);
     void* shapeSpec = *(void**)shapeTables[type];
     ShapeSpecEntry* shape = (ShapeSpecEntry*)((u8*)shapeSpec + ((u32)shapeData->counter << 3) + 0x10);
 

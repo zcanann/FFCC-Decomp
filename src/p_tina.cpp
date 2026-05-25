@@ -408,7 +408,7 @@ unsigned int pppFreeMngStPrioForData()
 	char* stringBase = const_cast<char*>(s_p_tina_rodata_801d7ee0);
 	_pppMngSt* selectedMngSt = 0;
 	char* partMngBase = reinterpret_cast<char*>(&PartMng);
-	_pppMngSt* currentMngSt = pppMngStPtr;
+	_pppMngSt* currentMngSt = ppvMng;
 	int selectedPrio = 1;
 	unsigned int selectedPrioTime;
 	int index = 0;

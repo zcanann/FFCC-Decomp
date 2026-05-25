@@ -27,7 +27,7 @@ void pppParHitSphMat(struct _pppPObject* param_1, int param_2, int param_3)
     Mtx sphereMtx;
     Mtx cameraMtx ATTRIBUTE_ALIGN(8);
     _GXColor local_a8;
-    _pppMngSt* pppMngSt = (_pppMngSt*)pppMngStPtr;
+    _pppMngSt* pppMngSt = (_pppMngSt*)ppvMng;
     float radius;
 
     local_88.z = kPppParHitSphMatZero;
@@ -39,9 +39,9 @@ void pppParHitSphMat(struct _pppPObject* param_1, int param_2, int param_3)
         Vec* src = (Vec*)((u8*)param_1 + offsets[1] + 0x80);
         PSMTXMultVec(pppMngSt->m_matrix.value, src, &local_94);
     } else {
-        local_94.x = *(float*)((u8*)pppMngStPtr + 0x84);
-        local_94.y = *(float*)((u8*)pppMngStPtr + 0x94);
-        local_94.z = *(float*)((u8*)pppMngStPtr + 0xA4);
+        local_94.x = *(float*)((u8*)ppvMng + 0x84);
+        local_94.y = *(float*)((u8*)ppvMng + 0x94);
+        local_94.z = *(float*)((u8*)ppvMng + 0xA4);
         s32* offsets = *(s32**)(param_3 + 0xC);
         Vec* src = (Vec*)((u8*)param_1 + offsets[1] + 0x80);
         local_94.x += src->x;

@@ -170,7 +170,7 @@ void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, YmMiasmaRenderStep* step, pppY
     for (i = 0; i < (int)step->m_particleCount; i++) {
         if (step->m_dataValIndex != 0xffff) {
             YmMiasmaRenderParticleState* state = (YmMiasmaRenderParticleState*)particleData;
-            long** shape = *(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + step->m_dataValIndex * 4);
+            long** shape = *(long***)(*(int*)&ppvEnv->m_particleColors[0] + step->m_dataValIndex * 4);
             pppFMATRIX model;
             pppFMATRIX rotMatrix;
             Vec worldPos;
@@ -180,9 +180,9 @@ void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, YmMiasmaRenderStep* step, pppY
 
             pppUnitMatrix(model);
             scale = state->m_speed;
-            model.value[0][0] = pppMngStPtr->m_scale.x * scale;
-            model.value[1][1] = pppMngStPtr->m_scale.y * scale;
-            model.value[2][2] = pppMngStPtr->m_scale.z * scale;
+            model.value[0][0] = ppvMng->m_scale.x * scale;
+            model.value[1][1] = ppvMng->m_scale.y * scale;
+            model.value[2][2] = ppvMng->m_scale.z * scale;
 
             shapeAngle = state->m_shapeAngle;
             PSMTXRotRad(rotMatrix.value, 'z', FLOAT_80330640 * (float)shapeAngle);
@@ -208,7 +208,7 @@ void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, YmMiasmaRenderStep* step, pppY
             amb.a = state->m_color.m_a;
             GXSetChanAmbColor(GX_COLOR0A0, amb);
             pppSetBlendMode(step->m_blendMode);
-            pppDrawShp(*shape, state->m_shapeDrawFrame, pppEnvStPtr->m_materialSetPtr, step->m_blendMode);
+            pppDrawShp(*shape, state->m_shapeDrawFrame, ppvEnv->m_materialSetPtr, step->m_blendMode);
         }
 
         particleData++;
@@ -249,7 +249,7 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, YmMiasmaFrameStep* step, pppYmM
 
     if (work->m_particles == 0) {
         work->m_particles = (PARTICLE_DATA*)pppMemAlloc(
-            (unsigned long)step->m_particleCount * sizeof(PARTICLE_DATA), pppEnvStPtr->m_stagePtr,
+            (unsigned long)step->m_particleCount * sizeof(PARTICLE_DATA), ppvEnv->m_stagePtr,
             const_cast<char*>(s_pppYmMiasma_cpp),
             0x18d);
         particle = work->m_particles;
@@ -309,9 +309,9 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, YmMiasmaFrameStep* step, pppYmM
         particle++;
     }
 
-    matrixPos.x = pppMngStPtr->m_matrix.value[0][3];
-    matrixPos.y = pppMngStPtr->m_matrix.value[1][3];
-    matrixPos.z = pppMngStPtr->m_matrix.value[2][3];
+    matrixPos.x = ppvMng->m_matrix.value[0][3];
+    matrixPos.y = ppvMng->m_matrix.value[1][3];
+    matrixPos.z = ppvMng->m_matrix.value[2][3];
 
     pppSubVector(delta, matrixPos, work->m_prevPosition);
     distance = PSVECDistance(&matrixPos, &work->m_prevPosition);
@@ -474,9 +474,9 @@ void UpdateParticleData(_pppPObject* pppPObject, _pppCtrlTable* pppCtrlTable, PY
     PSMTXMultVec(ppvWorldMatrix, &worldPos, &worldPos);
 
     if ((s32)Game.m_currentSceneId != 7) {
-        basePos.x = pppMngStPtr->m_matrix.value[0][3];
-        basePos.y = pppMngStPtr->m_matrix.value[1][3];
-        basePos.z = pppMngStPtr->m_matrix.value[2][3];
+        basePos.x = ppvMng->m_matrix.value[0][3];
+        basePos.y = ppvMng->m_matrix.value[1][3];
+        basePos.z = ppvMng->m_matrix.value[2][3];
         PSMTXMultVec(ppvWorldMatrix, &basePos, &basePos);
     }
 
@@ -507,7 +507,7 @@ void UpdateParticleData(_pppPObject* pppPObject, _pppCtrlTable* pppCtrlTable, PY
     }
 
     if (pYmMiasma->m_dataValIndex != 0xffff) {
-        long** shapeTable = *(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + pYmMiasma->m_dataValIndex * 4);
+        long** shapeTable = *(long***)(*(int*)&ppvEnv->m_particleColors[0] + pYmMiasma->m_dataValIndex * 4);
 
         pppCalcFrameShape(*shapeTable, state->m_shapeCurrentFrame, state->m_shapeDrawFrame, state->m_shapeFrameTime,
             (short)pYmMiasma->m_shapeFrameStep);
@@ -548,7 +548,7 @@ void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* 
 
     randomValue = rand();
     randomScale = FLOAT_8033065c * (float)randomValue;
-    shape = **(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + pYmMiasma->m_dataValIndex * 4);
+    shape = **(long***)(*(int*)&ppvEnv->m_particleColors[0] + pYmMiasma->m_dataValIndex * 4);
     shapeRandom = rand();
     shapeCount = *(short*)((u8*)shape + 6);
     angle = (s32)(FLOAT_80330650 * (FLOAT_80330654 * (FLOAT_80330660 * randomScale)) - FLOAT_80330664);
@@ -571,9 +571,9 @@ void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* 
     Vec normalizedPos = *(Vec*)particleData->m_matrix[1];
     pppNormalize(*reinterpret_cast<Vec*>(particleData->m_matrix[1]), normalizedPos);
     if ((s32)Game.m_currentSceneId != 7) {
-        basePos.x = pppMngStPtr->m_matrix.value[0][3];
-        basePos.y = pppMngStPtr->m_matrix.value[1][3];
-        basePos.z = pppMngStPtr->m_matrix.value[2][3];
+        basePos.x = ppvMng->m_matrix.value[0][3];
+        basePos.y = ppvMng->m_matrix.value[1][3];
+        basePos.z = ppvMng->m_matrix.value[2][3];
         pppAddVector(*(Vec*)particleData, *(Vec*)particleData->m_matrix[0], basePos);
     }
     lifeRange = pYmMiasma->m_lifeRange;

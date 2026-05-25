@@ -65,7 +65,7 @@ void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitle
     fadeDivisor = -1;
     particles = (LocationTitleParticle*)work->m_particles;
     shapeTable =
-        *(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + (dataValIndex * 4));
+        *(long***)(*(int*)&ppvEnv->m_particleColors[0] + (dataValIndex * 4));
     graphFrame = pppLocationTitle->m_graphId / 0x1000;
 
     if ((int)param_2->m_fadeStartFrame <= graphFrame) {
@@ -79,9 +79,9 @@ void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitle
         Vec worldPos;
 
         PSMTXIdentity(model);
-        model[0][0] = pppMngStPtr->m_scale.x * particle->m_frame;
-        model[1][1] = pppMngStPtr->m_scale.y * particle->m_frame;
-        model[2][2] = pppMngStPtr->m_scale.z * particle->m_frame;
+        model[0][0] = ppvMng->m_scale.x * particle->m_frame;
+        model[1][1] = ppvMng->m_scale.y * particle->m_frame;
+        model[2][2] = ppvMng->m_scale.z * particle->m_frame;
 
         PSMTXMultVec(ppvCameraMatrix, &particle->m_pos, &worldPos);
         model[0][3] = worldPos.x;
@@ -102,7 +102,7 @@ void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitle
         GXSetChanMatColor(GX_COLOR0A0, *(GXColor*)&particle->m_color);
         GXLoadPosMtxImm(model, 0);
         pppSetBlendMode(param_2->m_blendMode);
-        pppDrawShp(*shapeTable, particle->m_shapeB, pppEnvStPtr->m_materialSetPtr, param_2->m_blendMode);
+        pppDrawShp(*shapeTable, particle->m_shapeB, ppvEnv->m_materialSetPtr, param_2->m_blendMode);
         particle++;
     }
 }
@@ -160,7 +160,7 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
         return;
     }
 
-    shapeTable = **(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + (param_2->m_dataValIndex * 4));
+    shapeTable = **(long***)(*(int*)&ppvEnv->m_particleColors[0] + (param_2->m_dataValIndex * 4));
     work->m_vel += work->m_acc;
     work->m_cur += work->m_vel;
 
@@ -172,7 +172,7 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
 
     if (work->m_particles == NULL) {
         work->m_particles = pppMemAlloc(
-            param_2->m_maxCount * sizeof(LocationTitleParticle), pppEnvStPtr->m_stagePtr,
+            param_2->m_maxCount * sizeof(LocationTitleParticle), ppvEnv->m_stagePtr,
             const_cast<char*>(s_pppLocationTitle_cpp), 0x6d);
         zero = 0.0f;
         particle = (LocationTitleParticle*)work->m_particles;
@@ -199,7 +199,7 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleU
     if (work->m_count + 1 < param_2->m_maxCount) {
         graphFrame = pppLocationTitle->m_graphId / 0x1000;
         if (graphFrame >= (int)param_2->m_spawnFrame) {
-            pppMulMatrix(resultMatrix, pppMngStPtr->m_matrix, pppLocationTitle->m_localMatrix);
+            pppMulMatrix(resultMatrix, ppvMng->m_matrix, pppLocationTitle->m_localMatrix);
 
             particles[work->m_count].m_pos.x = resultMatrix.value[0][3];
             particles[work->m_count].m_pos.y = resultMatrix.value[1][3];

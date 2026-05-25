@@ -32,7 +32,7 @@ extern const char s_YmDrawMdlTexAnmConstructorJp[0x10] = {
 
 static inline CMapMesh** GetMapMeshTable()
 {
-    return pppEnvStPtr->m_mapMeshPtr;
+    return ppvEnv->m_mapMeshPtr;
 }
 
 static inline pppYmDrawMdlTexAnmWork* GetYmDrawMdlTexAnmWork(_pppPObject* object, _pppCtrlTable* ctrl)

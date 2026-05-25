@@ -249,8 +249,8 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
 
     textureIndex = 0;
     slice = 0;
-    model = (pppModelSt*)(((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[param_2->m_dataValIndex]);
-    ((CMapMesh*)model)->GetTexture(pppEnvStPtr->m_materialSetPtr, textureIndex);
+    model = (pppModelSt*)(((CMapMesh**)ppvEnv->m_mapMeshPtr)[param_2->m_dataValIndex]);
+    ((CMapMesh*)model)->GetTexture(ppvEnv->m_materialSetPtr, textureIndex);
 
     if (param_2->m_payload[0x1E] == 0xFF) {
         param_2->m_payload[0x1E] = 0xFE;
@@ -265,9 +265,9 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
     i4TexSize = GXGetTexBufferSize((int)FLOAT_80331928, (int)FLOAT_8033192c, (GXTexFmt)6, GX_FALSE, 0);
     rgba8TexSize = GXGetTexBufferSize((int)FLOAT_80331928, (int)FLOAT_8033192c, (GXTexFmt)0x28, GX_FALSE, 0);
 
-    managerPos.x = pppMngStPtr->m_matrix.value[0][3];
-    managerPos.y = pppMngStPtr->m_matrix.value[1][3];
-    managerPos.z = pppMngStPtr->m_matrix.value[2][3];
+    managerPos.x = ppvMng->m_matrix.value[0][3];
+    managerPos.y = ppvMng->m_matrix.value[1][3];
+    managerPos.z = ppvMng->m_matrix.value[2][3];
 
     isCameraInside = 0;
     if ((s32)Game.m_currentSceneId == 7) {

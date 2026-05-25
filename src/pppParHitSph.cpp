@@ -26,13 +26,13 @@ void pppParHitSph(struct _pppPObject* param_1, int param_2)
     Mtx sphereMtx;
     Mtx cameraMtx ATTRIBUTE_ALIGN(8);
     _GXColor local_a8;
-    _pppMngSt* pppMngSt = (_pppMngSt*)pppMngStPtr;
+    _pppMngSt* pppMngSt = (_pppMngSt*)ppvMng;
     float radius;
 
-    PSVECSubtract((Vec*)((u8*)pppMngStPtr + 0x8), (Vec*)((u8*)pppMngStPtr + 0x48), &local_88);
-    local_94.x = pppMngStPtr->m_matrix.value[0][3];
-    local_94.y = pppMngStPtr->m_matrix.value[1][3];
-    local_94.z = pppMngStPtr->m_matrix.value[2][3];
+    PSVECSubtract((Vec*)((u8*)ppvMng + 0x8), (Vec*)((u8*)ppvMng + 0x48), &local_88);
+    local_94.x = ppvMng->m_matrix.value[0][3];
+    local_94.y = ppvMng->m_matrix.value[1][3];
+    local_94.z = ppvMng->m_matrix.value[2][3];
     radius = pppMngSt->m_previousPosition.z * *(float*)(param_2 + 8);
 
     if (((kPppParHitSphZero == local_88.x) && (kPppParHitSphZero == local_88.y)) &&

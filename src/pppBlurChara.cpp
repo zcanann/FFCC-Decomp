@@ -115,7 +115,7 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
             return;
         }
         textureBase = reinterpret_cast<int>(
-            ((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[param_2->m_initWOrk]->GetTexture(pppEnvStPtr->m_materialSetPtr, textureIndex));
+            ((CMapMesh**)ppvEnv->m_mapMeshPtr)[param_2->m_initWOrk]->GetTexture(ppvEnv->m_materialSetPtr, textureIndex));
     } else {
         Graphic.CreateSmallBackTexture(Graphic.m_scratchTextureBuffer, &smallBackTex, 0x140 / param_2->m_smallTextureDiv,
                                        0xE0 / param_2->m_smallTextureDiv, GX_LINEAR, GX_TF_RGBA8, 0);
@@ -253,7 +253,7 @@ void pppFrameBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppBl
     }
 
     work = GetBlurWork(blurChara, param_3);
-    handle = GetCharaHandlePtr(reinterpret_cast<CGObject*>(((pppMngStBlurCharaRaw*)pppMngStPtr)->m_charaObj), 0);
+    handle = GetCharaHandlePtr(reinterpret_cast<CGObject*>(((pppMngStBlurCharaRaw*)ppvMng)->m_charaObj), 0);
     model = GetCharaModelPtr(handle);
 
     model->m_callbackContext = work;
@@ -262,10 +262,10 @@ void pppFrameBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppBl
     if ((unsigned int)work->m_captureBuffer == 0) {
         unsigned int texBufferSize = GXGetTexBufferSize(0x140, 0xE0, GX_TF_I8, GX_FALSE, GX_FALSE);
 
-        work->m_captureBuffer = pppMemAlloc(texBufferSize, pppEnvStPtr->m_stagePtr,
+        work->m_captureBuffer = pppMemAlloc(texBufferSize, ppvEnv->m_stagePtr,
                                             const_cast<char*>(s_pppBlurChara_cpp), 0xD5);
         work->m_smallTexObj = reinterpret_cast<_GXTexObj*>(
-            pppMemAlloc(0x20, pppEnvStPtr->m_stagePtr, const_cast<char*>(s_pppBlurChara_cpp), 0xD7));
+            pppMemAlloc(0x20, ppvEnv->m_stagePtr, const_cast<char*>(s_pppBlurChara_cpp), 0xD7));
 
         model->m_callbackContext = work;
         model->m_callbackParam = param_2;
@@ -317,7 +317,7 @@ void pppDestructBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkC* data)
 void pppConstructBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkC* data)
 {
     pppBlurCharaWork* work = GetBlurWork(blurChara, data);
-    void* ownerObj = ((pppMngStBlurCharaRaw*)pppMngStPtr)->m_charaObj;
+    void* ownerObj = ((pppMngStBlurCharaRaw*)ppvMng)->m_charaObj;
     CCharaPcs::CHandle* handle;
     CChara::CModel* model;
 

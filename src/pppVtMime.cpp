@@ -126,7 +126,7 @@ void pppDrawVtMime(_pppPObject* object, void* step, _pppCtrlTable* ctrl)
     }
 
     VtMimeState* state = (VtMimeState*)(object->m_workArea + *ctrl->m_serializedDataOffsets);
-    VtMimeEnv* env = (VtMimeEnv*)pppEnvStPtr;
+    VtMimeEnv* env = (VtMimeEnv*)ppvEnv;
     void** sourceTable = env->sourceTable;
     int vertIdx2 = data->sourceB;
     VtMimeSource* vert1Data = (VtMimeSource*)sourceTable[vertIdx1];

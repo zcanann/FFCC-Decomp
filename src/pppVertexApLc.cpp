@@ -75,7 +75,7 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
 
     if (state->countdown == 0) {
         int count;
-        VertexApLcEnv* env = (VertexApLcEnv*)pppEnvStPtr;
+        VertexApLcEnv* env = (VertexApLcEnv*)ppvEnv;
         VertexApLcEntry* entry;
         Vec* points = *(Vec**)((u8*)parent + 0x70);
         entry = &env->entries[data->entryIndex];
@@ -106,12 +106,12 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
                 if ((data->childId + 0x10000) != 0xFFFF) {
                     _pppPObject* child;
                     s32 childId = data->childId;
-                    _pppPDataVal* childData = pppMngStPtr->m_pppPDataVals + childId;
+                    _pppPDataVal* childData = ppvMng->m_pppPDataVals + childId;
 
                     if (childData == 0) {
                         child = 0;
                     } else {
-                        child = pppCreatePObject(pppMngStPtr, childData);
+                        child = pppCreatePObject(ppvMng, childData);
                         *(void**)((u8*)child + 0x4) = parent;
                     }
 
@@ -137,12 +137,12 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
                 if ((data->childId + 0x10000) != 0xFFFF) {
                     _pppPObject* child;
                     s32 childId = data->childId;
-                    _pppPDataVal* childData = pppMngStPtr->m_pppPDataVals + childId;
+                    _pppPDataVal* childData = ppvMng->m_pppPDataVals + childId;
 
                     if (childData == 0) {
                         child = 0;
                     } else {
-                        child = pppCreatePObject(pppMngStPtr, childData);
+                        child = pppCreatePObject(ppvMng, childData);
                         *(void**)((u8*)child + 0x4) = parent;
                     }
 

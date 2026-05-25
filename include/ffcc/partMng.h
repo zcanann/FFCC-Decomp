@@ -497,8 +497,8 @@ extern float ppvChrScl[3];
 extern float ppvSinTbl[];
 extern CPartMng PartMng;
 
-extern _pppEnvSt* pppEnvStPtr;
-extern _pppMngSt* pppMngStPtr;
+extern _pppEnvSt* ppvEnv;
+extern _pppMngSt* ppvMng;
 extern int gPppCalcDisabled;
 extern unsigned char gPppInConstructor;
 

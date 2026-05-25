@@ -47,12 +47,12 @@ void pppPointAp(_pppPObject* pObject, void* step, _pppCtrlTable* ctrlTable)
         }
 
         _pppPObject* obj;
-        _pppPDataVal* objData = pppMngStPtr->m_pppPDataVals + payload->m_createProgramIndex;
+        _pppPDataVal* objData = ppvMng->m_pppPDataVals + payload->m_createProgramIndex;
 
         if (objData == 0) {
             obj = 0;
         } else {
-            obj = pppCreatePObject(pppMngStPtr, objData);
+            obj = pppCreatePObject(ppvMng, objData);
             *(_pppPObject**)((u8*)obj + 4) = pObject;
         }
 
@@ -62,7 +62,7 @@ void pppPointAp(_pppPObject* pObject, void* step, _pppCtrlTable* ctrlTable)
             dst->y = src->y;
             dst->z = src->z;
         } else {
-            PSMTXMultVec(pppMngStPtr->m_matrix.value, src, dst);
+            PSMTXMultVec(ppvMng->m_matrix.value, src, dst);
         }
 
         target[1] = payload->m_cooldown;

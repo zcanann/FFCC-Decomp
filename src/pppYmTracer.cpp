@@ -70,7 +70,7 @@ static inline TracerWork* GetYmTracerWork(pppYmTracer* tracer, pppYmTracerCtrl* 
 static inline float* GetYmTracerDataValueWork(int dataValueIndex, int offset)
 {
     return reinterpret_cast<float*>(
-        reinterpret_cast<_pppPObject*>(pppMngStPtr->m_pppPDataVals[dataValueIndex].m_pppPObjLink)->m_workArea +
+        reinterpret_cast<_pppPObject*>(ppvMng->m_pppPDataVals[dataValueIndex].m_pppPObjLink)->m_workArea +
         offset);
 }
 
@@ -104,7 +104,7 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerStep* param_2, pppYm
     work = GetYmTracerWork(pppYmTracer, param_3);
     colorOffset = param_3->m_serializedDataOffsets[1];
     poly = work->entries;
-    mapMesh = pppEnvStPtr->m_mapMeshPtr[dataValIndex];
+    mapMesh = ppvEnv->m_mapMeshPtr[dataValIndex];
     colorData = pppYmTracer->m_object.m_workArea + colorOffset;
 
     if (dataValIndex != 0xFFFF) {
@@ -117,7 +117,7 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerStep* param_2, pppYm
         gUtil.SetVtxFmt_POS_CLR_TEX();
 
         textureIndex[0] = 0;
-        texture = (CTexture*)mapMesh->GetTexture(pppEnvStPtr->m_materialSetPtr, textureIndex[0]);
+        texture = (CTexture*)mapMesh->GetTexture(ppvEnv->m_materialSetPtr, textureIndex[0]);
         if (texture != 0) {
             GXLoadTexObj(&texture->m_texObj, GX_TEXMAP0);
             GXSetNumChans(1);
@@ -206,7 +206,7 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerStep* param_2, pppYmT
     entries = entriesPtr;
     if (entriesPtr == 0) {
         work->entries = (TRACE_POLYGON*)pppMemAlloc(
-            (u32)param_2->m_tracer.m_entryCount * sizeof(TRACE_POLYGON), pppEnvStPtr->m_stagePtr,
+            (u32)param_2->m_tracer.m_entryCount * sizeof(TRACE_POLYGON), ppvEnv->m_stagePtr,
             const_cast<char*>(s_pppYmTracer_cpp), 0xEB);
         fVar3 = FLOAT_803306e8;
         entries = work->entries;
@@ -279,7 +279,7 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerStep* param_2, pppYmT
         {
             pppFMATRIX result;
 
-            pppMulMatrix(result, pppMngStPtr->m_matrix, pppYmTracer->m_object.m_localMatrix);
+            pppMulMatrix(result, ppvMng->m_matrix, pppYmTracer->m_object.m_localMatrix);
             PSMTXMultVec(result.value, &entries[0].from, &entries[0].from);
             PSMTXMultVec(result.value, &entries[0].to, &entries[0].to);
         }

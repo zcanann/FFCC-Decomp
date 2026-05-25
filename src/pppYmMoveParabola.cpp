@@ -40,7 +40,7 @@ extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct
     }
 
     pppYmMoveParabolaWork* work = ParabolaWork(basePtr, offsetData);
-    _pppMngSt* pppMngSt = pppMngStPtr;
+    _pppMngSt* pppMngSt = ppvMng;
 
     work->m_velocity = work->m_velocity + work->m_acceleration;
     work->m_distance = work->m_distance + work->m_velocity;
@@ -87,9 +87,9 @@ extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct
     pppCopyVector(*(Vec*)((u8*)pppMngSt + 0x48), oldPosition);
     pppCopyVector(pppMngSt->m_position, newPosition);
 
-    pppMngStPtr->m_matrix.value[0][3] = newPosition.x;
-    pppMngStPtr->m_matrix.value[1][3] = newPosition.y;
-    pppMngStPtr->m_matrix.value[2][3] = newPosition.z;
+    ppvMng->m_matrix.value[0][3] = newPosition.x;
+    ppvMng->m_matrix.value[1][3] = newPosition.y;
+    ppvMng->m_matrix.value[2][3] = newPosition.z;
     pppSetFpMatrix(pppMngSt);
     work->m_frame = work->m_frame + 1;
 }
@@ -106,7 +106,7 @@ extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct
 extern "C" void pppConstructYmMoveParabola(struct pppYmMoveParabola* basePtr, struct pppYmMoveParabolaUnkC* dataPtr)
 {
     const f32 zero = gPppYmMoveParabolaZero;
-    _pppMngSt* pppMngSt = pppMngStPtr;
+    _pppMngSt* pppMngSt = ppvMng;
     pppYmMoveParabolaWork* work = ParabolaWork(basePtr, dataPtr);
 
     work->m_acceleration = zero;
@@ -119,9 +119,9 @@ extern "C" void pppConstructYmMoveParabola(struct pppYmMoveParabola* basePtr, st
 
         pppCopyVector(work->m_basePosition, *(Vec*)((u8*)pppMngSt + 0x58));
 
-        matrixOffset.x = pppMngStPtr->m_matrix.value[0][3];
-        matrixOffset.y = pppMngStPtr->m_matrix.value[1][3];
-        matrixOffset.z = pppMngStPtr->m_matrix.value[2][3];
+        matrixOffset.x = ppvMng->m_matrix.value[0][3];
+        matrixOffset.y = ppvMng->m_matrix.value[1][3];
+        matrixOffset.z = ppvMng->m_matrix.value[2][3];
 
         pppAddVector(work->m_basePosition, work->m_basePosition, matrixOffset);
         pppCopyVector(pppMngSt->m_paramVec0, work->m_basePosition);

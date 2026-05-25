@@ -15,7 +15,7 @@
 void pppDrawMatrixFrontLnr(_pppPObject* object, void*, _pppCtrlTable*)
 {
     Vec local_18;
-    _pppMngSt* mng = (_pppMngSt*)pppMngStPtr;
+    _pppMngSt* mng = (_pppMngSt*)ppvMng;
     
     PSMTXScaleApply(
         *(Mtx*)((char*)object + 0x10),

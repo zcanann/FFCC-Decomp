@@ -69,7 +69,7 @@ void pppVertexApAt(_pppPObject* parent, PVertexApAt* data, void* ctrl)
 
     if (state->countdown == 0) {
         int count = vtxData->spawnCount;
-        VertexApAtEnv* env = (VertexApAtEnv*)pppEnvStPtr;
+        VertexApAtEnv* env = (VertexApAtEnv*)ppvEnv;
         VertexApAtEntry* entry = &env->entries[vtxData->entryIndex];
 
         switch (vtxData->mode) {
@@ -84,13 +84,13 @@ void pppVertexApAt(_pppPObject* parent, PVertexApAt* data, void* ctrl)
 
                 if ((vtxData->childId + 0x10000) != 0xFFFF) {
                     s32 childId = vtxData->childId;
-                    _pppPDataVal* childData = pppMngStPtr->m_pppPDataVals + childId;
+                    _pppPDataVal* childData = ppvMng->m_pppPDataVals + childId;
                     _pppPObject* child;
 
                     if (childData == 0) {
                         child = 0;
                     } else {
-                        child = pppCreatePObject(pppMngStPtr, childData);
+                        child = pppCreatePObject(ppvMng, childData);
                         *(void**)((u8*)child + 0x4) = parent;
                     }
 
@@ -107,13 +107,13 @@ void pppVertexApAt(_pppPObject* parent, PVertexApAt* data, void* ctrl)
 
                 if ((vtxData->childId + 0x10000) != 0xFFFF) {
                     s32 childId = vtxData->childId;
-                    _pppPDataVal* childData = pppMngStPtr->m_pppPDataVals + childId;
+                    _pppPDataVal* childData = ppvMng->m_pppPDataVals + childId;
                     _pppPObject* child;
 
                     if (childData == 0) {
                         child = 0;
                     } else {
-                        child = pppCreatePObject(pppMngStPtr, childData);
+                        child = pppCreatePObject(ppvMng, childData);
                         *(void**)((u8*)child + 0x4) = parent;
                     }
 

@@ -72,7 +72,7 @@ void pppRenderCorona(pppCorona* param1, CoronaParam* param2, pppCoronaUnkC* para
         return;
     }
 
-    shape = *(long***)(*(u32*)((u8*)pppEnvStPtr + 0xC) + shapeId * 4);
+    shape = *(long***)(*(u32*)((u8*)ppvEnv + 0xC) + shapeId * 4);
 
     PSMTXIdentity(mtx.value);
 
@@ -89,9 +89,9 @@ void pppRenderCorona(pppCorona* param1, CoronaParam* param2, pppCoronaUnkC* para
         scale = param2->m_distMin + distScale;
     }
 
-    mtx.value[0][0] = pppMngStPtr->m_scale.x * *(float*)((u8*)param1 + 0x40) * scale;
-    mtx.value[1][1] = pppMngStPtr->m_scale.y * *(float*)((u8*)param1 + 0x54) * scale;
-    mtx.value[2][2] = pppMngStPtr->m_scale.z * *(float*)((u8*)param1 + 0x68) * scale;
+    mtx.value[0][0] = ppvMng->m_scale.x * *(float*)((u8*)param1 + 0x40) * scale;
+    mtx.value[1][1] = ppvMng->m_scale.y * *(float*)((u8*)param1 + 0x54) * scale;
+    mtx.value[2][2] = ppvMng->m_scale.z * *(float*)((u8*)param1 + 0x68) * scale;
     mtx.value[0][3] = vecWork->m_translate.x;
     mtx.value[1][3] = vecWork->m_translate.y;
     mtx.value[2][3] = vecWork->m_translate.z;
@@ -108,7 +108,7 @@ void pppRenderCorona(pppCorona* param1, CoronaParam* param2, pppCoronaUnkC* para
     pppSetDrawEnv(&color, (pppFMATRIX*)0, kYmEnvZero, param2->m_drawA, param2->m_drawB, param2->m_blendMode, 0, 1,
                   1, 0);
     pppSetBlendMode(param2->m_blendMode);
-    pppDrawShp(*shape, work->m_shapeY, pppEnvStPtr->m_materialSetPtr, param2->m_blendMode);
+    pppDrawShp(*shape, work->m_shapeY, ppvEnv->m_materialSetPtr, param2->m_blendMode);
 }
 
 /*
@@ -139,7 +139,7 @@ void pppFrameCorona(pppCorona* param1, CoronaParam* param2, pppCoronaUnkC* param
         return;
     }
 
-    shape = *(long***)(*(u32*)((u8*)pppEnvStPtr + 0xC) + shapeId * 4);
+    shape = *(long***)(*(u32*)((u8*)ppvEnv + 0xC) + shapeId * 4);
     pppCalcFrameShape(*shape, work->m_shapeX, work->m_shapeY, work->m_shapeZ, param2->m_shapeStep);
 
     if (param2->m_graphId == *(s32*)((u8*)param1 + 0xC)) {

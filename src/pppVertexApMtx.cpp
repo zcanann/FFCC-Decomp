@@ -88,7 +88,7 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 
 	if (state->countdown == 0) {
 		int count;
-		VertexApMtxEnv* env = (VertexApMtxEnv*)pppEnvStPtr;
+		VertexApMtxEnv* env = (VertexApMtxEnv*)ppvEnv;
 		VertexApMtxEntry* entry;
 		Vec* points = *(Vec**)((u8*)parent + 0x70);
 		entry = &env->entries[data->entryIndex];
@@ -123,7 +123,7 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 
 				if ((data->childId + 0x10000) != 0xFFFF) {
 					s32 childId = data->childId;
-					_pppPDataVal* childData = pppMngStPtr->m_pppPDataVals + childId;
+					_pppPDataVal* childData = ppvMng->m_pppPDataVals + childId;
 					Vec worldPos;
 					Vec pos;
 					Mtx* outMtx;
@@ -132,7 +132,7 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 					if (childData == 0) {
 						child = 0;
 					} else {
-						child = pppCreatePObject(pppMngStPtr, childData);
+						child = pppCreatePObject(ppvMng, childData);
 						*(void**)((u8*)child + 0x4) = parent;
 					}
 
@@ -147,8 +147,8 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 						(*outMtx)[1][3] = pos.y;
 						(*outMtx)[2][3] = pos.z;
 					} else {
-						PSMTXCopy(pppMngStPtr->m_matrix.value, *outMtx);
-						PSMTXMultVec(pppMngStPtr->m_matrix.value, &pos, &worldPos);
+						PSMTXCopy(ppvMng->m_matrix.value, *outMtx);
+						PSMTXMultVec(ppvMng->m_matrix.value, &pos, &worldPos);
 						(*outMtx)[0][3] = worldPos.x;
 						(*outMtx)[1][3] = worldPos.y;
 						(*outMtx)[2][3] = worldPos.z;
@@ -176,7 +176,7 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 
 				if ((data->childId + 0x10000) != 0xFFFF) {
 					s32 childId = data->childId;
-					_pppPDataVal* childData = pppMngStPtr->m_pppPDataVals + childId;
+					_pppPDataVal* childData = ppvMng->m_pppPDataVals + childId;
 					Vec worldPos;
 					Vec pos;
 					Mtx* outMtx;
@@ -185,7 +185,7 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 					if (childData == 0) {
 						child = 0;
 					} else {
-						child = pppCreatePObject(pppMngStPtr, childData);
+						child = pppCreatePObject(ppvMng, childData);
 						*(void**)((u8*)child + 0x4) = parent;
 					}
 
@@ -200,8 +200,8 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 						(*outMtx)[1][3] = pos.y;
 						(*outMtx)[2][3] = pos.z;
 					} else {
-						PSMTXCopy(pppMngStPtr->m_matrix.value, *outMtx);
-						PSMTXMultVec(pppMngStPtr->m_matrix.value, &pos, &worldPos);
+						PSMTXCopy(ppvMng->m_matrix.value, *outMtx);
+						PSMTXMultVec(ppvMng->m_matrix.value, &pos, &worldPos);
 						(*outMtx)[0][3] = worldPos.x;
 						(*outMtx)[1][3] = worldPos.y;
 						(*outMtx)[2][3] = worldPos.z;

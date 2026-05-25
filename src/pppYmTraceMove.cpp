@@ -49,7 +49,7 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveStep* par
 		return;
 	}
 
-	pppYmTraceMoveMngStRaw* pppMngSt = (pppYmTraceMoveMngStRaw*)pppMngStPtr;
+	pppYmTraceMoveMngStRaw* pppMngSt = (pppYmTraceMoveMngStRaw*)ppvMng;
 	pppYmTraceMoveWork* work = GetYmTraceMoveWork(pppYmTraceMove, param_3);
 	void* owner = pppMngSt->m_owner;
 	Vec local_20;
@@ -113,9 +113,9 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveStep* par
 	pppCopyVector(pppMngSt->m_previousPosition, pppMngSt->m_position);
 	pppCopyVector(pppMngSt->m_position, local_ec);
 
-	pppMngStPtr->m_matrix.value[0][3] = local_ec.x;
-	pppMngStPtr->m_matrix.value[1][3] = local_ec.y;
-	pppMngStPtr->m_matrix.value[2][3] = local_ec.z;
+	ppvMng->m_matrix.value[0][3] = local_ec.x;
+	ppvMng->m_matrix.value[1][3] = local_ec.y;
+	ppvMng->m_matrix.value[2][3] = local_ec.z;
 }
 
 /*
@@ -130,7 +130,7 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveStep* par
 void pppConstructYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveCtrl* param_2)
 {
 	pppYmTraceMoveWork* work = GetYmTraceMoveWork(pppYmTraceMove, param_2);
-	pppYmTraceMoveMngStRaw* pppMngSt = (pppYmTraceMoveMngStRaw*)pppMngStPtr;
+	pppYmTraceMoveMngStRaw* pppMngSt = (pppYmTraceMoveMngStRaw*)ppvMng;
 	f32 zero;
 
 	pppSubVector(work->m_previousDirection, pppMngSt->m_paramVec0, pppMngSt->m_basePosition);

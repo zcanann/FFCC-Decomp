@@ -8,6 +8,7 @@
 #include "ffcc/graphic.h"
 #include "ffcc/gxfunc.h"
 #include "ffcc/linkage.h"
+#include "ffcc/materialman.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/p_menu.h"
 #include "ffcc/p_light.h"
@@ -58,6 +59,8 @@ extern float kCharaFurDepthZero;
 extern float kCharaFurDepthScaleBase;
 extern float kCharaFurViewDepthThreshold;
 extern float kCharaFurShadeScale;
+extern float FLOAT_80331154;
+extern float FLOAT_80331158;
 static inline unsigned char* GameRaw() { return reinterpret_cast<unsigned char*>(&Game); }
 
 namespace {
@@ -1674,6 +1677,23 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 			            meshMtx);
 		} else {
 			PSMTXCopy(ModelDrawMtx(this), meshMtx);
+		}
+
+		int shadowCount = 0;
+		CMaterial* shadowMaterials[2];
+		MtxPtr shadowMatrices[2];
+		if (shadowPass != 0) {
+			shadowCount = MaterialMan.GetCharaShadow(2, shadowMaterials, shadowMatrices, &modelPos, FLOAT_80331154, FLOAT_80331158, 0);
+			for (int shadowIndex = 0; shadowIndex < shadowCount; shadowIndex++) {
+				FurMaterialRaw* shadowMaterial = reinterpret_cast<FurMaterialRaw*>(shadowMaterials[shadowIndex]);
+				TextureMan.SetTexture(static_cast<GXTexMapID>(shadowIndex + 3), shadowMaterial->m_textures[0]);
+
+				Mtx shadowTexMtx;
+				PSMTXConcat(shadowMatrices[shadowIndex], meshMtx, shadowTexMtx);
+				GXLoadTexMtxImm(shadowTexMtx, 0x21 + shadowIndex * 3, GX_MTX3x4);
+				GXSetTexCoordGen2(static_cast<GXTexCoordID>(shadowIndex + 3), GX_TG_MTX3x4, GX_TG_POS,
+				                  0x21 + shadowIndex * 3, GX_FALSE, GX_PTIDENTITY);
+			}
 		}
 
 		Mtx modelViewMtx;

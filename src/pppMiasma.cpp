@@ -228,8 +228,8 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
     int slice;
     int tevSwapChannel;
     int tevAlphaScale;
-    u8 tevStageCount;
-    u8 texGenCount;
+    int tevStageCount;
+    int texGenCount;
     int isCameraInside;
     GXTexObj backI4Tex;
     GXTexObj backRgba8Tex;

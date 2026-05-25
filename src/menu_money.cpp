@@ -518,10 +518,15 @@ bool CMenuPcs::MoneyClose()
 		} else {
 			anim->frame++;
 			double one = DOUBLE_80332F90;
-			anim->alpha =
-				(float)-((DOUBLE_80332F90 / (double)anim->duration) * (double)anim->frame - DOUBLE_80332F90);
+			double duration = (double)anim->duration;
+			double animFrame = (double)anim->frame;
+			double rate = DOUBLE_80332F90 / duration;
+			anim->alpha = (float)(DOUBLE_80332F90 - rate * animFrame);
 			if ((anim->flags & 2) == 0) {
-				float ratio = (float)-((one / (double)anim->duration) * (double)anim->frame - one);
+				duration = (double)anim->duration;
+				animFrame = (double)anim->frame;
+				rate = one / duration;
+				float ratio = (float)(one - rate * animFrame);
 				float dx = anim->targetX - (float)anim->x;
 				float dy = anim->targetY - (float)anim->y;
 				anim->dx = dx * ratio;
@@ -686,9 +691,15 @@ bool CMenuPcs::MoneyOpen()
 			} else {
 				anim->frame++;
 				double one = DOUBLE_80332F90;
-				anim->alpha = (float)((DOUBLE_80332F90 / (double)anim->duration) * (double)anim->frame);
+				double duration = (double)anim->duration;
+				double animFrame = (double)anim->frame;
+				double rate = DOUBLE_80332F90 / duration;
+				anim->alpha = (float)(rate * animFrame);
 				if ((anim->flags & 2) == 0) {
-					float ratio = (float)((one / (double)anim->duration) * (double)anim->frame);
+					duration = (double)anim->duration;
+					animFrame = (double)anim->frame;
+					rate = one / duration;
+					float ratio = (float)(rate * animFrame);
 					float dx = anim->targetX - (float)anim->x;
 					float dy = anim->targetY - (float)anim->y;
 					anim->dx = dx * ratio;

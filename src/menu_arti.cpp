@@ -25,7 +25,7 @@ extern const float FLOAT_80332fd4;
 extern const float FLOAT_80332fd8;
 extern const float FLOAT_80332fe8;
 extern const float FLOAT_80332fec;
-static const float FLOAT_80332ff0 = 0.75f;
+extern const float FLOAT_80332ff0;
 
 extern "C" {
 extern const float kMenuArtiNegativeOne = -1.0f;

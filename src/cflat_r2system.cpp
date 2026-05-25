@@ -3956,9 +3956,9 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         return;
     case -0xD4:
         if (*object->m_localBase == 0) {
-            MapMng.SetDrawRangeMapObj(static_cast<float>(object->m_localBase[1]));
+            MapMng.SetDrawRangeMapObj(*reinterpret_cast<float*>(object->m_localBase + 1));
         } else {
-            MapMng.SetDrawRangeOctTree(static_cast<float>(object->m_localBase[1]));
+            MapMng.SetDrawRangeOctTree(*reinterpret_cast<float*>(object->m_localBase + 1));
         }
         runtime->push(object, 0);
         outResult = 0;

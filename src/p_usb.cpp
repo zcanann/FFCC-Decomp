@@ -8,6 +8,9 @@
 
 int s_usbReadPollFrameCounter;
 char s_usbReadPollInitialized;
+char s_usbReadPollPad0;
+char s_usbReadPollPad1;
+char s_usbReadPollPad2;
 
 extern const char sUsbPcsClassName[] = "CUSBPcs";
 inline CUSBPcs::CUSBPcs()

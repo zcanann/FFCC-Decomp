@@ -665,9 +665,10 @@ int CBound::CheckFrustum0(CBound& outBound)
 {
     float maxInit;
     float minInit;
-    unsigned char clipMask;
-    unsigned int insideMask;
+    int xIndex;
+    unsigned int clipMask;
     unsigned int outsideMask;
+    unsigned int insideMask;
     float viewZ;
     float zero;
     Vec vertex;
@@ -712,7 +713,7 @@ int CBound::CheckFrustum0(CBound& outBound)
     zero = 0.0;
     insideMask = 0xF;
     outsideMask = 0;
-    for (int xIndex = 0; xIndex < 2; xIndex++) {
+    for (xIndex = 0; xIndex < 2; xIndex++) {
         if (xIndex == 0) {
             vertex.x = m_min.x;
         } else {
@@ -733,32 +734,30 @@ int CBound::CheckFrustum0(CBound& outBound)
 
                 viewZ = transformed.z;
                 if (viewZ > zero) {
-                    float negViewZ = -viewZ;
-                    if (negViewZ < transformed.x) {
+                    if (transformed.x > -transformed.z) {
                         clipMask = 0x11;
                     } else if (transformed.x < viewZ) {
                         clipMask = 0x12;
                     } else {
                         clipMask = 0x10;
                     }
-                    if (negViewZ < transformed.y) {
-                        clipMask = clipMask | 0x14;
+                    if (transformed.y > -transformed.z) {
+                        clipMask = (unsigned char)(clipMask | 0x14);
                     } else if (transformed.y < viewZ) {
-                        clipMask = clipMask | 0x18;
+                        clipMask = (unsigned char)(clipMask | 0x18);
                     }
                 } else {
-                    float negViewZ = -viewZ;
-                    if (negViewZ < transformed.x) {
+                    if (transformed.x > -transformed.z) {
                         clipMask = 1;
                     } else if (transformed.x < viewZ) {
                         clipMask = 2;
                     } else {
                         clipMask = 0;
                     }
-                    if (negViewZ < transformed.y) {
-                        clipMask = clipMask | 4;
+                    if (transformed.y > -transformed.z) {
+                        clipMask = (unsigned char)(clipMask | 4);
                     } else if (transformed.y < viewZ) {
-                        clipMask = clipMask | 8;
+                        clipMask = (unsigned char)(clipMask | 8);
                     }
                 }
                 insideMask = insideMask & clipMask;

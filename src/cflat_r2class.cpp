@@ -590,6 +590,17 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
+		case -0x91: {
+			float furTarget = static_cast<float>(localBase[0]);
+			CChara::CModel* model = engineObject->m_charaModelHandle->m_model;
+			model->m_furTarget = furTarget;
+			if (static_cast<float>(localBase[1]) != 0.0f) {
+				model->m_furCur = furTarget;
+			}
+			PushValue(this, object, 0);
+			outResult = 0;
+			break;
+		}
 		case -0x90:
 			engineObject->m_lookAtAccumYaw = static_cast<float>(localBase[0]);
 			engineObject->m_lookAtAccumPitch = static_cast<float>(localBase[1]);
@@ -621,6 +632,32 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			outResult = 0;
 			break;
 		}
+		case -0x87: {
+			CChara::CModel* model = engineObject->m_charaModelHandle->m_model;
+			model->m_furLenScale = static_cast<float>(localBase[0]);
+			model->m_furStep = static_cast<float>(localBase[1]);
+			PushValue(this, object, 0);
+			outResult = 0;
+			break;
+		}
+		case -0x86: {
+			CChara::CModel* model = engineObject->m_charaModelHandle->m_model;
+			model->m_flags10C = static_cast<unsigned char>((static_cast<signed char>(localBase[0]) << 6) & 0x40) |
+			    (model->m_flags10C & 0xBF);
+			PushValue(this, object, 0);
+			outResult = 0;
+			break;
+		}
+		case -0x83:
+			engineObject->PlayAnim(static_cast<int>(localBase[0]), 1, 1, -1, -1, 0);
+			PushValue(this, object, 0);
+			outResult = 0;
+			break;
+		case -0x82:
+			engineObject->PlayAnim(static_cast<int>(localBase[0]), 0, 1, -1, -1, 0);
+			PushValue(this, object, 0);
+			outResult = 0;
+			break;
 		case -0x7D:
 			if (localBase[0] == 1) {
 				engineObject->m_bodyEllipsoidAspect = static_cast<float>(localBase[1]);
@@ -998,6 +1035,98 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 		}
 		case -0x41:
 			engineObject->m_bgDownDist = 0.5f / static_cast<float>(localBase[0]);
+			PushValue(this, object, 0);
+			outResult = 0;
+			break;
+		case -0x3C:
+			engineObject->m_frontHitAngle = static_cast<float>(localBase[0]);
+			PushValue(this, object, 0);
+			outResult = 0;
+			break;
+		case -0x3A:
+			engineObject->FreeAnim(static_cast<int>(localBase[0]));
+			PushValue(this, object, 0);
+			outResult = 0;
+			break;
+		case -0x39:
+			engineObject->m_pushParamA = static_cast<unsigned char>(localBase[0]);
+			PushValue(this, object, 0);
+			outResult = 0;
+			break;
+		case -0x38:
+			engineObject->PlayAnim(static_cast<int>(localBase[0]), 1, 0, -1, -1, 0);
+			PushValue(this, object, 0);
+			outResult = 0;
+			break;
+		case -0x33: {
+			float rotY = static_cast<float>(localBase[0]);
+			engineObject->m_rotTargetY = rotY;
+			engineObject->m_rotBaseY = rotY;
+			PushValue(this, object, 0);
+			outResult = 0;
+			break;
+		}
+		case -0x22:
+			engineObject->m_attrFlags = localBase[0];
+			PushValue(this, object, 0);
+			outResult = 0;
+			break;
+		case -0x1D:
+			engineObject->CancelMove(1);
+			PushValue(this, object, 0);
+			outResult = 0;
+			break;
+		case -0x1A:
+			engineObject->Turn(static_cast<float>(localBase[0]), static_cast<int>(localBase[1]));
+			PushValue(this, object, 0);
+			outResult = 0;
+			break;
+		case -0x18:
+			engineObject->m_rotationX = static_cast<float>(localBase[0]);
+			engineObject->m_rotationY = static_cast<float>(localBase[1]);
+			engineObject->m_rotationZ = static_cast<float>(localBase[2]);
+			PushValue(this, object, 0);
+			outResult = 0;
+			break;
+		case -0x17:
+			engineObject->m_displayFlags = localBase[0];
+			PushValue(this, object, 0);
+			outResult = 0;
+			break;
+		case -0x13:
+			engineObject->m_bgColMask = localBase[0];
+			PushValue(this, object, 0);
+			outResult = 0;
+			break;
+		case -0x12:
+			engineObject->CancelAnim(1);
+			PushValue(this, object, 0);
+			outResult = 0;
+			break;
+		case -0x10:
+			engineObject->PlayAnim(static_cast<int>(localBase[0]), 0, 0, -1, -1, 0);
+			PushValue(this, object, 0);
+			outResult = 0;
+			break;
+		case -0xF:
+			engineObject->SetAnimSlot(static_cast<int>(localBase[0]), static_cast<int>(localBase[1]));
+			PushValue(this, object, 0);
+			outResult = 0;
+			break;
+		case -0xA:
+			engineObject->m_rotTargetY = static_cast<float>(localBase[0]);
+			PushValue(this, object, 0);
+			outResult = 0;
+			break;
+		case -9:
+			engineObject->m_moveBaseSpeed = static_cast<float>(localBase[0]);
+			PushValue(this, object, 0);
+			outResult = 0;
+			break;
+		case -8:
+			engineObject->m_weaponNodeFlags =
+			    static_cast<unsigned short>((static_cast<signed char>(localBase[0]) << 7) & 0x80) |
+			    (engineObject->m_weaponNodeFlags & 0xFF7F);
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;

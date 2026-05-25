@@ -58,6 +58,12 @@ struct CMapCylinderRaw {
     float m_height2;
 };
 
+struct GObjectSRT {
+    Vec m_trans;
+    Vec m_rot;
+    Vec m_scale;
+};
+
 static inline CModelAnimState& ModelAnimState(CChara::CModel* model)
 {
     return *reinterpret_cast<CModelAnimState*>(model);
@@ -1396,16 +1402,15 @@ void CGObject::hit()
 void CGObject::update()
 {
     const unsigned int miniGameFlags = MiniGamePcs.m_flags;
-    const bool miniGameModelPass = (miniGameFlags & 0x8000) != 0;
+    const unsigned int miniGameModelPass = (static_cast<unsigned int>(__cntlzw(miniGameFlags & 0x8000)) >> 5) & 0xFF;
     unsigned char& weaponFlagsLo = *reinterpret_cast<unsigned char*>(&m_weaponNodeFlags);
     unsigned char& weaponFlagsHi = *(reinterpret_cast<unsigned char*>(&m_weaponNodeFlags) + 1);
     unsigned char& shieldFlagsLo = *reinterpret_cast<unsigned char*>(&m_shieldNodeFlags);
     unsigned char& shieldFlagsHi = *(reinterpret_cast<unsigned char*>(&m_shieldNodeFlags) + 1);
     const float lastBgAttr = m_lastBgAttr;
 
-    if (m_dispItemTimer != 0) {
-        m_dispItemTimer--;
-    }
+    int dispItemTimer = static_cast<signed char>(m_dispItemTimer) - 1;
+    m_dispItemTimer = dispItemTimer & ~(dispItemTimer >> 31);
 
     if (HasLoadedModel(m_charaModelHandle)) {
         for (int i = 0; i < 8; i++) {
@@ -1426,7 +1431,7 @@ void CGObject::update()
             endFrame = -1;
         }
 
-        const int blendMode = (shieldFlagsLo & 0x2) != 0 ? -1 : 0;
+        const int blendMode = (shieldFlagsLo & 0x2) == 0 ? -1 : 0;
         const int forceSet = (shieldFlagsLo & 0x8) != 0 ? 1 : 0;
         if (m_charaModelHandle->SetAnim(animIndex, startFrame, endFrame, blendMode, forceSet) != 0 &&
             m_currentAnimSlot != -1) {
@@ -1457,18 +1462,13 @@ void CGObject::update()
         Mtx yawMtx;
         Mtx pitchMtx;
         Mtx rotMtx;
-        Vec mapUp = {0.0f, 1.0f, 0.0f};
-        Vec worldNorm = m_worldPosition;
+        Vec mapUp = sMap21WorldUpAxis;
+        Vec worldNorm;
 
         PSMTXRotRad(yawMtx, 'y', atan2f(m_worldPosition.x, m_worldPosition.z));
-        if (PSVECMag(&worldNorm) > sZeroFloat) {
-            PSVECNormalize(&worldNorm, &worldNorm);
-            float upDot = ClampFloat(PSVECDotProduct(&mapUp, &worldNorm), sNegativeOne, sAnimFrameOffset);
-            PSMTXRotRad(pitchMtx, 'x', acosf(upDot));
-            PSMTXConcat(yawMtx, pitchMtx, modelMtx);
-        } else {
-            PSMTXCopy(yawMtx, modelMtx);
-        }
+        PSVECNormalize(&m_worldPosition, &worldNorm);
+        PSMTXRotRad(pitchMtx, 'x', acosf(PSVECDotProduct(&mapUp, &worldNorm)));
+        PSMTXConcat(yawMtx, pitchMtx, modelMtx);
 
         PSMTXRotRad(rotMtx, 'y', m_rotBaseY);
         PSMTXConcat(modelMtx, rotMtx, modelMtx);
@@ -1477,42 +1477,36 @@ void CGObject::update()
         modelMtx[1][3] = m_worldPosition.y;
         modelMtx[2][3] = m_worldPosition.z;
     } else {
-        Vec modelPos = m_worldPosition;
-        PSVECAdd(&modelPos, &m_extraMoveVec, &modelPos);
+        GObjectSRT srt = {
+            {sZeroFloat, sZeroFloat, sZeroFloat},
+            {sZeroFloat, sZeroFloat, sZeroFloat},
+            {sAnimFrameOffset, sAnimFrameOffset, sAnimFrameOffset},
+        };
+        srt.m_trans = m_worldPosition;
+        PSVECAdd(&srt.m_trans, &m_extraMoveVec, &srt.m_trans);
 
-        float rotX = m_rotBaseX;
-        float rotY = m_rotBaseY;
-        float rotZ = m_rotBaseZ;
-        float scaleX = m_rotationX;
-        float scaleY = m_rotationY;
-        float scaleZ = m_rotationZ;
+        srt.m_rot.x = m_rotBaseX;
+        srt.m_rot.y = m_rotBaseY;
+        srt.m_rot.z = m_rotBaseZ;
+        srt.m_scale.x = m_rotationX;
+        srt.m_scale.y = m_rotationY;
+        srt.m_scale.z = m_rotationZ;
 
         if (m_worldParamA == 0x20 || m_worldParamA == 0x13 || m_worldParamA == 0x14 ||
             m_worldParamA == 0x15 || m_worldParamA == 0x16 || m_worldParamA == 0x17) {
             const float wobbleBias = m_worldParamA == 0x20 ? -0.125f : -0.0625f;
             m_radiusCtrl.z += (-0.5f * m_radiusCtrl.y) + wobbleBias;
             m_radiusCtrl.y *= 0.8f;
-            rotY += m_radiusCtrl.z;
+            srt.m_rot.y += m_radiusCtrl.z;
         } else if (m_worldParamA == 0x24 || m_worldParamB == 0x125) {
             const float cameraYaw = CameraPcs.m_yaw;
-            rotY = sQuarterTurn - cameraYaw;
-            rotY += cosf(sBgAttrNormal * m_radiusCtrl.y);
-            modelPos.y += sAnimFrameOffset + sinf(m_radiusCtrl.y);
+            srt.m_rot.y = sQuarterTurn - cameraYaw;
+            srt.m_rot.y += cosf(sBgAttrNormal * m_radiusCtrl.y);
+            srt.m_trans.y += sAnimFrameOffset + sinf(m_radiusCtrl.y);
             m_radiusCtrl.y += 0.125f;
         }
 
-        Mtx rotXMat;
-        Mtx rotYMat;
-        Mtx rotZMat;
-        PSMTXRotRad(rotXMat, 'x', rotX);
-        PSMTXRotRad(rotYMat, 'y', rotY);
-        PSMTXRotRad(rotZMat, 'z', rotZ);
-        PSMTXConcat(rotYMat, rotXMat, modelMtx);
-        PSMTXConcat(modelMtx, rotZMat, modelMtx);
-        PSMTXScaleApply(modelMtx, modelMtx, scaleX, scaleY, scaleZ);
-        modelMtx[0][3] = modelPos.x;
-        modelMtx[1][3] = modelPos.y;
-        modelMtx[2][3] = modelPos.z;
+        Math.SRTToMatrix(modelMtx, reinterpret_cast<SRT*>(&srt));
 
         if ((m_stateFlags0 & 0x10) != 0) {
             Mtx tiltMtx;

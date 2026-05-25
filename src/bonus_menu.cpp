@@ -1502,9 +1502,9 @@ void CMenuPcs::CalcSelectCloseAnim()
 
 		for (int i = 0; i < (int)header->count; i++) {
 			BonusAnimSprite* sprite = &sprites[i];
-			sprite->alpha = 0.0f;
+			sprite->alpha = 1.0f;
 			sprite->timer = 0;
-			BonusSpriteFlags(sprite) = 0;
+			sprite->motionY = 0.0f;
 		}
 
 		if (header->count > 0) {

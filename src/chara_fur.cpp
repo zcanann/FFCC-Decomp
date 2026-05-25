@@ -1558,19 +1558,20 @@ int CChara::CModel::PickFur(
 								const FurProjectedVertex& a = prev2;
 								const FurProjectedVertex& b = prev1;
 								if (FurPointInTriangle(cursorX, cursorY, a, b, current)) {
-									Vec viewHit;
-									float uvU;
-									float uvV;
-									FurInterpolateHit(viewHit, uvU, uvV, screenMtx, cursorX, cursorY, a, b, current);
 									const float depth = FurHitDepth(a, b, current);
-									hitAny = 1;
-									hitViewPos = viewHit;
-									if (furMaterial && depth < nearestDepth) {
-										nearestDepth = depth;
+									if (depth < nearestDepth) {
+										Vec viewHit;
+										float uvU;
+										float uvV;
+										FurInterpolateHit(viewHit, uvU, uvV, screenMtx, cursorX, cursorY, a, b, current);
+										hitAny = 1;
 										hitViewPos = viewHit;
-										hitU = uvU;
-										hitV = uvV;
-										hitPaintable = paintableMaterial;
+										if (furMaterial) {
+											nearestDepth = depth;
+											hitU = uvU;
+											hitV = uvV;
+											hitPaintable = paintableMaterial;
+										}
 									}
 								}
 							}
@@ -1581,19 +1582,20 @@ int CChara::CModel::PickFur(
 							const FurProjectedVertex& a = odd ? prev1 : prev2;
 							const FurProjectedVertex& b = odd ? prev2 : prev1;
 							if (FurPointInTriangle(cursorX, cursorY, a, b, current)) {
-								Vec viewHit;
-								float uvU;
-								float uvV;
-								FurInterpolateHit(viewHit, uvU, uvV, screenMtx, cursorX, cursorY, a, b, current);
 								const float depth = FurHitDepth(a, b, current);
-								hitAny = 1;
-								hitViewPos = viewHit;
-								if (furMaterial && depth < nearestDepth) {
-									nearestDepth = depth;
+								if (depth < nearestDepth) {
+									Vec viewHit;
+									float uvU;
+									float uvV;
+									FurInterpolateHit(viewHit, uvU, uvV, screenMtx, cursorX, cursorY, a, b, current);
+									hitAny = 1;
 									hitViewPos = viewHit;
-									hitU = uvU;
-									hitV = uvV;
-									hitPaintable = paintableMaterial;
+									if (furMaterial) {
+										nearestDepth = depth;
+										hitU = uvU;
+										hitV = uvV;
+										hitPaintable = paintableMaterial;
+									}
 								}
 							}
 						}

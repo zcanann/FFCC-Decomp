@@ -1986,10 +1986,6 @@ void CMenuPcs::CalcSelectOpenAnim()
 	int statePtr = GetBonusMenuMembers(this).m_bonusStatePtr;
 	int animPtr = GetBonusMenuMembers(this).m_bonusAnimPtr;
 
-	if (statePtr == 0 || animPtr == 0) {
-		return;
-	}
-
 	BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
 	BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
 
@@ -2003,8 +1999,6 @@ void CMenuPcs::CalcSelectOpenAnim()
 		Sound.PlaySe(0x4c, 0x40, 0x7f, 0);
 		memset((void*)animPtr, 0, sizeof(BonusAnimList));
 		*(short*)(statePtr + 0x22) = 0;
-
-		header->count = (short)(12 + activePartyCount * 5);
 
 		idx = 0;
 		InitAnimSprite(&sprites[idx++], 0x16, 0, 0, 0x280, 0x1c0, 0, 0);
@@ -2020,6 +2014,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 		sprites[2].alpha = 0.0f;
 		InitAnimSprite(&sprites[idx++], -4, 0, 0, 0x70, 0x68, 0, 8);
 		ResetAnimSpriteMotion(&sprites[3]);
+		sprites[3].depth = 1.0f;
 
 		iconBase = idx;
 		short y = 0x28;
@@ -2080,6 +2075,8 @@ void CMenuPcs::CalcSelectOpenAnim()
 			idx++;
 		}
 
+		header->count = (short)idx;
+		header->finished = 0;
 		*(unsigned char*)(statePtr + 0xb) = 1;
 	}
 
@@ -2888,10 +2885,6 @@ void CMenuPcs::CalcResultOpenAnim()
 {
 	int statePtr = GetBonusMenuMembers(this).m_bonusStatePtr;
 	int animPtr = GetBonusMenuMembers(this).m_bonusAnimPtr;
-
-	if (statePtr == 0 || animPtr == 0) {
-		return;
-	}
 
 	BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
 	BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);

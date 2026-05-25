@@ -258,7 +258,7 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
             p3x = invPadW * (rx2 - viewMaxX);
             p3y = invPadH * (ry2 - viewMaxY);
             p3z = kFunnyShapeZero;
-            color = U32At(entry, 0x18);
+            memcpy(&color, entry + 0x18, sizeof(color));
         } else {
             const u8* entry = shapeData + packedStride;
             const u32 texIndex = entry[0x30];
@@ -305,7 +305,7 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
             p3x = kFunnyShapeNegativeOne;
             p3y = kFunnyShapeNegativeOne;
             p3z = kFunnyShapeZero;
-            color = U32At(entry, 0x18);
+            memcpy(&color, entry + 0x18, sizeof(color));
         }
 
         DCStoreRange(&color, 4);

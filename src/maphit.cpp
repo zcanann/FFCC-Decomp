@@ -536,7 +536,6 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
                 }
 
                 if (sideMask == 0) {
-                    edgeIndex = i;
                     break;
                 }
 
@@ -566,7 +565,6 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
                 }
 
                 if (sideMask == 0) {
-                    edgeIndex = i;
                     break;
                 }
 
@@ -596,7 +594,6 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
                 }
 
                 if (sideMask == 0) {
-                    edgeIndex = i;
                     break;
                 }
 

@@ -541,7 +541,7 @@ void CGItemObj::onFrameAlways()
 		        static_cast<int>((static_cast<unsigned int>(CFlatGameFlags()) << 29) & 0xC0000000) >> 31) != 0 &&
 		    static_cast<signed char>(
 		        static_cast<int>((static_cast<unsigned int>(*(unsigned char*)(self + 0x9A)) << 24) & 0xC0000000) >> 31) != 0 &&
-		    CFlatItemCarryMode() == 0 && *(void**)(self + 0x550) == 0) {
+		    static_cast<int>(CFlatCenterState()) == 0 && *(void**)(self + 0x550) == 0) {
 			canUseTrace = true;
 		} else {
 			canUseTrace = false;
@@ -933,7 +933,7 @@ void CGItemObj::onFrameStat()
 			if (Game.unk_flat3_0xc7d0 != 0) {
 				distance = PSVECDistance((Vec*)(self + 0x15c), (Vec*)(Game.unk_flat3_0xc7d0 + 0x15c));
 			} else {
-				if (CFlatItemCarryMode() == 1) {
+				if (static_cast<int>(CFlatCenterState()) == 1) {
 					Vec partyCenter;
 
 					partyCenter.x = (Game.m_partyMinX + Game.m_partyMaxX) * FLOAT_80331b3c;
@@ -1013,7 +1013,7 @@ void CGItemObj::onFrameStat()
 
 			if (useMenuLaunchSpeed) {
 				launchSpeed = FLOAT_80331b18;
-			} else if (CFlatItemCarryMode() == 1) {
+			} else if (static_cast<int>(CFlatCenterState()) == 1) {
 				unsigned int carryCid = static_cast<unsigned short>(carryObj->GetCID());
 				if ((carryCid & 0x6D) == 0x6D &&
 				    1 < *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(carryObj->m_scriptHandle) + 0x3E0)) {

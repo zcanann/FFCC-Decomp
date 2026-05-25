@@ -69,6 +69,7 @@ public:
     void CopyToAMemorySync(void*, void*, unsigned long);
     void CopyFromAMemorySync(void*, void*, unsigned long);
     void IsCopyCompleted(int);
+    int& DefaultGroup() { return m_defaultGroup; }
 
 private:
     // Backing storage for the recovered CMemory instance; methods access fields via known offsets.

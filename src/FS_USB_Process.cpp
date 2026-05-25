@@ -30,11 +30,11 @@ static inline CUSBStreamDataHeader* UsbStream(CFunnyShapePcs* self) {
 }
 
 static inline CFunnyShape* FunnyShape(CFunnyShapePcs* self) {
-    return reinterpret_cast<CFunnyShape*>(self->m_funnyShapeStorage);
+    return &self->m_funnyShape;
 }
 
 static inline u8* AnmData(CFunnyShapePcs* self) {
-    return static_cast<u8*>(self->m_anm.anmData);
+    return static_cast<u8*>(self->m_funnyShape.m_anm.anmData);
 }
 
 static inline u32 LoadSwap32(u32 value) {
@@ -108,25 +108,25 @@ void CFunnyShapePcs::SetUSBData()
         clear.a = m_displayPending.clear.a;
         GXSetCopyClear(clear, 0xFFFFFF);
         FS_DISPLAY_STATUS display = m_displayPending;
-        m_displayCurrent.flags = display.flags;
-        m_displayCurrent.clear.r = display.clear.r;
-        m_displayCurrent.clear.g = display.clear.g;
-        m_displayCurrent.clear.b = display.clear.b;
-        m_displayCurrent.clear.a = display.clear.a;
-        m_displayCurrent.unk08 = display.unk08;
-        m_displayCurrent.unk0C = display.unk0C;
-        m_displayCurrent.unk10 = display.unk10;
-        m_displayCurrent.unk14 = display.unk14;
-        m_displayCurrent.unk18 = display.unk18;
-        m_displayCurrent.unk1C = display.unk1C;
-        m_displayCurrent.unk20 = display.unk20;
-        m_displayCurrent.unk24 = display.unk24;
-        m_displayCurrent.unk28 = display.unk28;
-        m_displayCurrent.unk2A = display.unk2A;
-        m_displayCurrent.unk2C = display.unk2C;
-        m_displayCurrent.unk30 = display.unk30;
-        m_displayCurrent.unk34[0] = display.unk34[0];
-        *reinterpret_cast<DisplayTail*>(&m_displayCurrent.unk34[1]) =
+        m_funnyShape.m_displayCurrent.flags = display.flags;
+        m_funnyShape.m_displayCurrent.clear.r = display.clear.r;
+        m_funnyShape.m_displayCurrent.clear.g = display.clear.g;
+        m_funnyShape.m_displayCurrent.clear.b = display.clear.b;
+        m_funnyShape.m_displayCurrent.clear.a = display.clear.a;
+        m_funnyShape.m_displayCurrent.unk08 = display.unk08;
+        m_funnyShape.m_displayCurrent.unk0C = display.unk0C;
+        m_funnyShape.m_displayCurrent.unk10 = display.unk10;
+        m_funnyShape.m_displayCurrent.unk14 = display.unk14;
+        m_funnyShape.m_displayCurrent.unk18 = display.unk18;
+        m_funnyShape.m_displayCurrent.unk1C = display.unk1C;
+        m_funnyShape.m_displayCurrent.unk20 = display.unk20;
+        m_funnyShape.m_displayCurrent.unk24 = display.unk24;
+        m_funnyShape.m_displayCurrent.unk28 = display.unk28;
+        m_funnyShape.m_displayCurrent.unk2A = display.unk2A;
+        m_funnyShape.m_displayCurrent.unk2C = display.unk2C;
+        m_funnyShape.m_displayCurrent.unk30 = display.unk30;
+        m_funnyShape.m_displayCurrent.unk34[0] = display.unk34[0];
+        *reinterpret_cast<DisplayTail*>(&m_funnyShape.m_displayCurrent.unk34[1]) =
             *reinterpret_cast<DisplayTail*>(&display.unk34[1]);
         break;
     }
@@ -134,7 +134,7 @@ void CFunnyShapePcs::SetUSBData()
         s16* tmp = reinterpret_cast<s16*>(
             new (FunnyShapePcs.m_viewerStage, const_cast<char*>(s_FS_USB_Process_cpp), 0x55)
                 u8[usb->m_sizeBytes]);
-        m_textureHeaders[m_textureCount] =
+        m_funnyShape.m_textureHeaders[m_funnyShape.m_textureCount] =
             new (FunnyShapePcs.m_viewerStage, const_cast<char*>(s_FS_USB_Process_cpp), 0x57)
                 OSFS_TEXTURE_ST;
 
@@ -151,21 +151,21 @@ void CFunnyShapePcs::SetUSBData()
         reinterpret_cast<u16*>(tmp)[0x11] = LoadSwapU16(reinterpret_cast<u16*>(tmp)[0x11]);
 
         DCFlushRange(tmp, sizeof(OSFS_TEXTURE_ST));
-        memcpy(m_textureHeaders[m_textureCount], tmp, sizeof(OSFS_TEXTURE_ST));
+        memcpy(m_funnyShape.m_textureHeaders[m_funnyShape.m_textureCount], tmp, sizeof(OSFS_TEXTURE_ST));
 
-        m_textureData[m_textureCount] =
+        m_funnyShape.m_textureData[m_funnyShape.m_textureCount] =
             new (FunnyShapePcs.m_viewerStage, const_cast<char*>(s_FS_USB_Process_cpp), 0x6C)
                 u8[usb->m_sizeBytes - sizeof(OSFS_TEXTURE_ST)];
-        memcpy(m_textureData[m_textureCount], tmp + sizeof(OSFS_TEXTURE_ST) / sizeof(*tmp),
+        memcpy(m_funnyShape.m_textureData[m_funnyShape.m_textureCount], tmp + sizeof(OSFS_TEXTURE_ST) / sizeof(*tmp),
                usb->m_sizeBytes - sizeof(OSFS_TEXTURE_ST));
-        DCFlushRange(m_textureData[m_textureCount], usb->m_sizeBytes - sizeof(OSFS_TEXTURE_ST));
+        DCFlushRange(m_funnyShape.m_textureData[m_funnyShape.m_textureCount], usb->m_sizeBytes - sizeof(OSFS_TEXTURE_ST));
 
-        m_texObjData[m_textureCount] =
+        m_funnyShape.m_texObjData[m_funnyShape.m_textureCount] =
             new (FunnyShapePcs.m_viewerStage, const_cast<char*>(s_FS_USB_Process_cpp), 0x73)
                 GXTexObj;
-        GXInitTexObj(static_cast<GXTexObj*>(m_texObjData[m_textureCount]), m_textureData[m_textureCount], tmp[2], tmp[3], GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
+        GXInitTexObj(static_cast<GXTexObj*>(m_funnyShape.m_texObjData[m_funnyShape.m_textureCount]), m_funnyShape.m_textureData[m_funnyShape.m_textureCount], tmp[2], tmp[3], GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
 
-        m_textureCount++;
+        m_funnyShape.m_textureCount++;
         if (tmp != 0) {
             delete[] reinterpret_cast<u8*>(tmp);
         }
@@ -173,22 +173,22 @@ void CFunnyShapePcs::SetUSBData()
     }
     case 10:
         FunnyShape(this)->ClearAnmData();
-        if (m_anm.anmData != 0) {
-            delete[] static_cast<u8*>(m_anm.anmData);
-            m_anm.anmData = 0;
+        if (m_funnyShape.m_anm.anmData != 0) {
+            delete[] static_cast<u8*>(m_funnyShape.m_anm.anmData);
+            m_funnyShape.m_anm.anmData = 0;
         }
         memset(FunnyShape(this), 0, sizeof(CFunnyShapeAnmWork));
-        memcpy(&m_anm, usb->m_data, sizeof(OSFS_ANM_ST));
-        StoreSwap32(&m_anm.unk00);
-        m_anm.unk04 = LoadSwap16(m_anm.unk04);
-        m_anm.unk06 = LoadSwap16(m_anm.unk06);
-        m_anm.unk08 = LoadSwap16(m_anm.unk08);
-        m_anm.unk0A = LoadSwap16(m_anm.unk0A);
-        m_anm.anmData = 0;
-        DCStoreRange(&m_anm, usb->m_sizeBytes);
+        memcpy(&m_funnyShape.m_anm, usb->m_data, sizeof(OSFS_ANM_ST));
+        StoreSwap32(&m_funnyShape.m_anm.unk00);
+        m_funnyShape.m_anm.unk04 = LoadSwap16(m_funnyShape.m_anm.unk04);
+        m_funnyShape.m_anm.unk06 = LoadSwap16(m_funnyShape.m_anm.unk06);
+        m_funnyShape.m_anm.unk08 = LoadSwap16(m_funnyShape.m_anm.unk08);
+        m_funnyShape.m_anm.unk0A = LoadSwap16(m_funnyShape.m_anm.unk0A);
+        m_funnyShape.m_anm.anmData = 0;
+        DCStoreRange(&m_funnyShape.m_anm, usb->m_sizeBytes);
         break;
     case 11: {
-        m_anm.anmData = new (FunnyShapePcs.m_viewerStage, const_cast<char*>(s_FS_USB_Process_cpp), 0x9C)
+        m_funnyShape.m_anm.anmData = new (FunnyShapePcs.m_viewerStage, const_cast<char*>(s_FS_USB_Process_cpp), 0x9C)
             u8[usb->m_sizeBytes];
 
         memcpy(AnmData(this), usb->m_data, usb->m_sizeBytes);
@@ -270,7 +270,7 @@ void CFunnyShapePcs::SetUSBData()
             }
             groupOffset += 8;
         }
-        DCStoreRange(m_anm.anmData, usb->m_sizeBytes);
+        DCStoreRange(m_funnyShape.m_anm.anmData, usb->m_sizeBytes);
         FunnyShape(this)->InitAnmWork();
         break;
     }
@@ -281,13 +281,13 @@ void CFunnyShapePcs::SetUSBData()
         shape.flags = LoadSwap16(shape.flags);
         shape.count = LoadSwap16(shape.count);
         shape.unk08 = LoadSwap16(shape.unk08);
-        m_shape = shape;
+        m_funnyShape.m_shape = shape;
         break;
     }
     case 16: {
-        if (m_meshData != 0) {
-            delete[] static_cast<u8*>(m_meshData);
-            m_meshData = 0;
+        if (m_funnyShape.m_meshData != 0) {
+            delete[] static_cast<u8*>(m_funnyShape.m_meshData);
+            m_funnyShape.m_meshData = 0;
         }
 
         u8* meshData = new (FunnyShapePcs.m_viewerStage, const_cast<char*>(s_FS_USB_Process_cpp), 0x106)
@@ -301,9 +301,9 @@ void CFunnyShapePcs::SetUSBData()
         int i = 0;
         int dst24 = 0;
         int dst2c = 0;
-        for (; i < m_shape.count;
+        for (; i < m_funnyShape.m_shape.count;
              src2c += 0x2C, src24 += 0x24, i++, dst24 += 0x24, dst2c += 0x2C) {
-            if ((m_shape.flags & 8) != 0) {
+            if ((m_funnyShape.m_shape.flags & 8) != 0) {
                 u8* src = meshData + 0x10;
                 src += src2c;
                 u32* p32 = reinterpret_cast<u32*>(src);
@@ -349,8 +349,8 @@ void CFunnyShapePcs::SetUSBData()
 
         }
 
-        m_meshData = meshData;
-        DCStoreRange(m_meshData, usb->m_sizeBytes);
+        m_funnyShape.m_meshData = meshData;
+        DCStoreRange(m_funnyShape.m_meshData, usb->m_sizeBytes);
         break;
     }
     }

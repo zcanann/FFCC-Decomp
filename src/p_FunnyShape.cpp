@@ -74,7 +74,7 @@ static inline CUSBStreamData* UsbStream(CFunnyShapePcs* self)
 
 static inline CFunnyShape* FunnyShape(CFunnyShapePcs* self)
 {
-    return reinterpret_cast<CFunnyShape*>(self->m_funnyShapeStorage);
+    return &self->m_funnyShape;
 }
 
 static inline CPtrArray<OSFS_TEXTURE_ST*>* TextureHeaders(CFunnyShapePcs* self)
@@ -190,7 +190,7 @@ void CFunnyShapePcs::calcViewer()
         UsbStream(this)->SetUSBStreamDataDone();
     }
 
-    if (m_textureCount == 0 || m_anm.anmData == 0) {
+    if (m_funnyShape.m_textureCount == 0 || m_funnyShape.m_anm.anmData == 0) {
         return;
     }
 
@@ -394,15 +394,9 @@ void CPtrArray<OSFS_TEXTURE_ST*>::RemoveAll()
  */
 inline CFunnyShapePcs::CFunnyShapePcs()
 {
-    CUSBStreamData& usbStream = *UsbStream(this);
-    CFunnyShape& funnyShape = *FunnyShape(this);
-    CPtrArray<OSFS_TEXTURE_ST*>& textureHeaders = *TextureHeaders(this);
-    CPtrArray<_GXTexObj*>& textureObjects = *TextureObjects(this);
-
-    new (&usbStream) CUSBStreamData;
-    new (&funnyShape) CFunnyShape;
-    new (&textureHeaders) CPtrArray<OSFS_TEXTURE_ST*>;
-    new (&textureObjects) CPtrArray<_GXTexObj*>;
+    new (UsbStream(this)) CUSBStreamData;
+    new (TextureHeaders(this)) CPtrArray<OSFS_TEXTURE_ST*>;
+    new (TextureObjects(this)) CPtrArray<_GXTexObj*>;
 }
 
 unsigned int CFunnyShapePcs::m_table_desc0[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createViewer__14CFunnyShapePcsFv)};
@@ -447,7 +441,6 @@ CFunnyShapePcs::~CFunnyShapePcs()
 {
     TextureObjects(this)->CPtrArray<_GXTexObj*>::~CPtrArray();
     TextureHeaders(this)->CPtrArray<OSFS_TEXTURE_ST*>::~CPtrArray();
-    FunnyShape(this)->~CFunnyShape();
     UsbStream(this)->~CUSBStreamData();
 }
 

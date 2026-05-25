@@ -9,6 +9,7 @@ CGoOutMenu* g_pGoOutMenu;
 int g_freeCaravanIdx;
 
 extern "C" const char* g_strGooutMes[];
+extern "C" void SetMenuCharaAnim__8CMenuPcsFii2(CMenuPcs*);
 
 struct CMenuPcsGoOutLayout
 {
@@ -116,6 +117,21 @@ static inline int FindFreeCaravanIdx(Mc::SaveDat* saveData)
     }
 
     return -1;
+}
+
+static inline unsigned char MenuPcsLoadFinished(CMenuPcsGoOutLayout& layout)
+{
+    return *(reinterpret_cast<unsigned char*>(&layout) + 0x86E);
+}
+
+static inline signed short MenuPcsLoadResult(CMenuPcsGoOutLayout& layout)
+{
+    return *reinterpret_cast<signed short*>(reinterpret_cast<unsigned char*>(&layout) + 0x870);
+}
+
+static inline char SaveCaravanFlag(Mc::SaveDat* saveData, int index, int offset)
+{
+    return *(reinterpret_cast<char*>(saveData) + 0x1A84 + index * 0x9C0 + offset);
 }
 
 /*
@@ -1013,6 +1029,7 @@ void CGoOutMenu::CalcGoOut()
     McCtrl& mcCtrl = menuPcsLayout.m_mcCtrl;
     unsigned short input;
     unsigned char next;
+    int selResult = -1;
 
     if (field_0x1c != 0 && field_0x30 > 0x13 && (field_0x30 & 0xF) == 0) {
         const int cardStatus = ((field_0x30 & 0x10) == 0) ? mcCtrl.ChkConnect(1) : mcCtrl.ChkConnect(0);
@@ -1040,7 +1057,7 @@ void CGoOutMenu::CalcGoOut()
 
     if (field_0x1d != 0) {
         const unsigned char selInit = static_cast<unsigned char>(__cntlzw(0xF - static_cast<int>(field_0x18)) >> 5 & 0xFF);
-        MenuPcs.CalcGoOutSelChar(selInit, 1);
+        selResult = MenuPcs.CalcGoOutSelChar(selInit, 1);
     }
 
     switch (field_0x18) {
@@ -1241,6 +1258,116 @@ void CGoOutMenu::CalcGoOut()
                 field_0x2 = static_cast<char>(mcCtrl.m_cardChannel);
                 field_0x3 = static_cast<char>(field_0x10);
                 SetGoOutMode(10);
+            }
+        }
+        break;
+    case 0xE:
+        if (MenuPcsLoadFinished(menuPcsLayout) != 0) {
+            if (MenuPcsLoadResult(menuPcsLayout) == 4) {
+                MenuGoOutState(menuPcsLayout).m_resultSelect = 0;
+                MenuPcs.InitSaveLoadMenu();
+                SetMenuCharaAnim__8CMenuPcsFii2(&MenuPcs);
+                if (MenuPcs.CheckSameMcFormatID(menuPcsLayout.m_transferSaveData,
+                                                static_cast<Mc::SaveDat*>(menuPcsLayout.m_transferWork)) != 0) {
+                    int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
+                    SetMenuStr(0, 2,
+                               GetGoOutMessageLine(languageId, 48),
+                               GetGoOutMessageLine(languageId, 49));
+                    field_0x19 = -1;
+                    SetGoOutMode(0);
+                    return;
+                }
+
+                int odekakeX;
+                int odekakeY;
+                MenuPcs.GetMcOdekakePos(&odekakeX, &odekakeY);
+                field_0x1a = static_cast<char>(odekakeX);
+                field_0x1b = static_cast<char>(odekakeY);
+                SetGoOutMode(0xF);
+                field_0x1c = 1;
+            } else if (MenuPcsLoadResult(menuPcsLayout) == 1) {
+                SetMainMode(1);
+            } else {
+                MenuGoOutState(menuPcsLayout).m_resultSelect = 0;
+                MenuPcs.InitSaveLoadMenu();
+                SetMenuCharaAnim__8CMenuPcsFii2(&MenuPcs);
+                int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
+                SetMenuStr(0, 7,
+                           GetGoOutMessageLine(languageId, 50),
+                           GetGoOutMessageLine(languageId, 51),
+                           GetGoOutMessageLine(languageId, 52),
+                           GetGoOutMessageLine(languageId, 53),
+                           GetGoOutMessageLine(languageId, 54),
+                           GetGoOutMessageLine(languageId, 55),
+                           GetGoOutMessageLine(languageId, 56));
+                field_0x19 = -1;
+                SetGoOutMode(0);
+            }
+        }
+        if (field_0x36 == -1) {
+            MenuPcs.CalcLoadMenu();
+        }
+        break;
+    case 0xF:
+        field_0x20 = selResult;
+        if (field_0x20 == -2) {
+            SetGoOutMode(1);
+            return;
+        }
+        if (field_0x20 != -1) {
+            Mc::SaveDat* transferWork = static_cast<Mc::SaveDat*>(menuPcsLayout.m_transferWork);
+            if (SaveCaravanFlag(transferWork, field_0x20, 0x30C) == 0) {
+                field_0x1e = 0;
+                if (SaveCaravanFlag(transferWork, field_0x20, 0x30D) == 0) {
+                    int sameChara = MenuPcs.GetSameCharaData(menuPcsLayout.m_transferSaveData, transferWork, field_0x20, 1);
+                    if (sameChara == -3) {
+                        field_0x19 = 0xF;
+                        field_0x18 = 0;
+                        int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
+                        SetMenuStr(0, 3,
+                                   GetGoOutMessageLine(languageId, 59),
+                                   GetGoOutMessageLine(languageId, 60),
+                                   GetGoOutMessageLine(languageId, 61));
+                        break;
+                    }
+
+                    g_freeCaravanIdx = FindFreeCaravanIdx(menuPcsLayout.m_transferSaveData);
+                    if (g_freeCaravanIdx < 0) {
+                        field_0x19 = 0xF;
+                        field_0x18 = 0;
+                        int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
+                        SetMenuStr(0, 6,
+                                   GetGoOutMessageLine(languageId, 62),
+                                   GetGoOutMessageLine(languageId, 63),
+                                   GetGoOutMessageLine(languageId, 64),
+                                   GetGoOutMessageLine(languageId, 65),
+                                   GetGoOutMessageLine(languageId, 66),
+                                   GetGoOutMessageLine(languageId, 67));
+                        break;
+                    }
+                } else {
+                    g_freeCaravanIdx = MenuPcs.GetSameCharaData(menuPcsLayout.m_transferSaveData, transferWork, field_0x20, 0);
+                    if (g_freeCaravanIdx < 0) {
+                        field_0x19 = 0xF;
+                        field_0x18 = 0;
+                        field_0x19 = 0xF;
+                        field_0x18 = 0;
+                        int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
+                        SetMenuStr(0, 2,
+                                   GetGoOutMessageLine(languageId, 68),
+                                   GetGoOutMessageLine(languageId, 69));
+                        break;
+                    }
+                    field_0x1e = 1;
+                }
+                SetGoOutMode(0x10);
+            } else {
+                int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
+                SetMenuStr(0, 2,
+                           GetGoOutMessageLine(languageId, 57),
+                           GetGoOutMessageLine(languageId, 58));
+                field_0x19 = 0xF;
+                SetGoOutMode(0);
             }
         }
         break;

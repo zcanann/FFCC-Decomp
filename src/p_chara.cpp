@@ -813,7 +813,7 @@ void CCharaPcs::create()
     StageAt(this, 0xDC) = Memory.CreateStage(0x18000, const_cast<char*>(s_CCharaPcs_loadWepModel), 0);
     StageAt(this, 0xE0) = Memory.CreateStage(0x10000, const_cast<char*>(s_CCharaPcs_loadFaModel), 0);
     StageAt(this, 0xD4) =
-        Memory.CreateStage(CurrentSceneId() == 4 ? 0x190000UL : 0x1E0000UL, const_cast<char*>(s_CCharaPcs_loadAnim), 0);
+        Memory.CreateStage((s32)CurrentSceneId() == 4 ? 0x190000UL : 0x1E0000UL, const_cast<char*>(s_CCharaPcs_loadAnim), 0);
 
     CHandle* sentinel = reinterpret_cast<CHandle*>(
         Memory._Alloc(0x194, StageAt(&CharaPcs, 0xC0), const_cast<char*>(s_p_chara_cpp), 0xDB, 0));

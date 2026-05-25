@@ -4134,16 +4134,15 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
     }
     case -0xED: {
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
-        Vec hitPosition = {
+        CVector hitPosition(
             localFloats[0],
             localFloats[1],
-            localFloats[2],
-        };
+            localFloats[2]);
         Vec cylinderTop = { 0.0f, 1.0f, 0.0f };
-        if (MapPcs.CheckHitCylinderNear(&hitPosition, &cylinderTop, static_cast<float>(0.0f), object->m_localBase[3]) == 0) {
+        if (MapPcs.CheckHitCylinderNear(hitPosition, &cylinderTop, static_cast<float>(0.0f), object->m_localBase[3]) == 0) {
             runtime->push(object, 0);
         } else {
-            MapPcs.CalcHitPosition(&hitPosition);
+            MapPcs.CalcHitPosition(hitPosition);
             *reinterpret_cast<float*>(object->m_localBase[4]) = hitPosition.y;
             runtime->push(object, 1);
         }

@@ -397,11 +397,10 @@ static void DrawFurDisplayListShell(const FurMeshRaw* mesh, const FurDisplayList
  */
 void CChara::TimeMogFur()
 {
-	unsigned int* const timeStamp = reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(this) + 0x2014);
-	unsigned short* const texels = reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(this) + 4);
+	int* const timeStamp = reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x2014);
 
-	if (*timeStamp + 0x1A5E0 < System.m_frameCounter) {
-		*timeStamp = System.m_frameCounter;
+	if (*timeStamp + 0x1A5E0 < static_cast<int>(System.m_frameCounter)) {
+		*timeStamp = static_cast<int>(System.m_frameCounter);
 		if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
 			System.Printf("");
 		}
@@ -413,6 +412,7 @@ void CChara::TimeMogFur()
 		}
 	}
 
+	unsigned short* const texels = reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(this) + 4);
 	memset(reinterpret_cast<unsigned char*>(this) + 0x2018, 0, 0x40);
 
 	for (int y = 0; y < 0x40; y++) {
@@ -432,20 +432,28 @@ void CChara::TimeMogFur()
 			g = light + ((packed >> 4) & 0xF) + 4;
 			b = light + (packed & 0xF) + 4;
 
-			if (r > 0xF) {
-				r = 0xF;
+			int clampedR = 0xF;
+			if (r < 0xF) {
+				clampedR = r;
 			}
-			if (g > 0xF) {
-				g = 0xF;
+			r = clampedR;
+			int clampedG = 0xF;
+			if (g < 0xF) {
+				clampedG = g;
 			}
-			if (b > 0xF) {
-				b = 0xF;
+			g = clampedG;
+			int clampedB = 0xF;
+			if (b < 0xF) {
+				clampedB = b;
 			}
+			b = clampedB;
 
 			newA = static_cast<unsigned int>(a + 2);
-			if (newA > 7) {
-				newA = 7;
+			unsigned int clampedA = 7;
+			if (newA < 7) {
+				clampedA = newA;
 			}
+			newA = clampedA;
 
 			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(texels) + tileIndex) =
 			    static_cast<unsigned short>((b & 0xF) | ((g & 0xF) << 4) | ((r & 0xF) << 8) | ((newA & 7) << 12));

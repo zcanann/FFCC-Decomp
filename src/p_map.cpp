@@ -26,7 +26,7 @@ public:
     ~CRelProfile();
 
 private:
-    unsigned int m_data;
+    unsigned char m_data;
 };
 
 unsigned int CMapPcs::m_table_desc0[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__7CMapPcsFv)};

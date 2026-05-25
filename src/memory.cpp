@@ -215,12 +215,13 @@ void operator delete(void* ptr)
             System.Printf(const_cast<char*>(sStageFreeCorruptBlockFmt), ptr, mem - 0x26, *reinterpret_cast<unsigned short*>(mem - 0x28));
         }
 
-        *reinterpret_cast<unsigned char*>(mem - 0x3e) &= 0xfb;
+        *reinterpret_cast<unsigned char*>(mem - 0x3e) =
+            static_cast<unsigned char>(*reinterpret_cast<unsigned char*>(mem - 0x3e) & 0xfb);
 
         if ((*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(mem - 0x38) + 2) & 4) == 0) {
             *reinterpret_cast<int*>(mem - 0x30) =
-                *reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x38) + 0x10) +
-                *reinterpret_cast<int*>(mem - 0x30) + 0x40;
+                *reinterpret_cast<int*>(mem - 0x30) + 0x40 +
+                *reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x38) + 0x10);
             *reinterpret_cast<int*>(*reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x38) + 8) + 4) =
                 mem - 0x40;
             *reinterpret_cast<int*>(mem - 0x38) =
@@ -230,8 +231,8 @@ void operator delete(void* ptr)
         int blockNext = *reinterpret_cast<int*>(mem - 0x3c);
         if ((*reinterpret_cast<unsigned char*>(blockNext + 2) & 4) == 0) {
             *reinterpret_cast<int*>(blockNext + 0x10) =
-                *reinterpret_cast<int*>(mem - 0x30) +
-                *reinterpret_cast<int*>(blockNext + 0x10) + 0x40;
+                *reinterpret_cast<int*>(blockNext + 0x10) + 0x40 +
+                *reinterpret_cast<int*>(mem - 0x30);
             *reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x3c) + 8) = *reinterpret_cast<int*>(mem - 0x38);
             *reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x38) + 4) = *reinterpret_cast<int*>(mem - 0x3c);
         }
@@ -258,12 +259,13 @@ void operator delete[](void* ptr)
             System.Printf(const_cast<char*>(sStageFreeCorruptBlockFmt), ptr, mem - 0x26, *reinterpret_cast<unsigned short*>(mem - 0x28));
         }
 
-        *reinterpret_cast<unsigned char*>(mem - 0x3e) &= 0xfb;
+        *reinterpret_cast<unsigned char*>(mem - 0x3e) =
+            static_cast<unsigned char>(*reinterpret_cast<unsigned char*>(mem - 0x3e) & 0xfb);
 
         if ((*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(mem - 0x38) + 2) & 4) == 0) {
             *reinterpret_cast<int*>(mem - 0x30) =
-                *reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x38) + 0x10) +
-                *reinterpret_cast<int*>(mem - 0x30) + 0x40;
+                *reinterpret_cast<int*>(mem - 0x30) + 0x40 +
+                *reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x38) + 0x10);
             *reinterpret_cast<int*>(*reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x38) + 8) + 4) =
                 mem - 0x40;
             *reinterpret_cast<int*>(mem - 0x38) =
@@ -273,8 +275,8 @@ void operator delete[](void* ptr)
         int blockNext = *reinterpret_cast<int*>(mem - 0x3c);
         if ((*reinterpret_cast<unsigned char*>(blockNext + 2) & 4) == 0) {
             *reinterpret_cast<int*>(blockNext + 0x10) =
-                *reinterpret_cast<int*>(mem - 0x30) +
-                *reinterpret_cast<int*>(blockNext + 0x10) + 0x40;
+                *reinterpret_cast<int*>(blockNext + 0x10) + 0x40 +
+                *reinterpret_cast<int*>(mem - 0x30);
             *reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x3c) + 8) = *reinterpret_cast<int*>(mem - 0x38);
             *reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x38) + 4) = *reinterpret_cast<int*>(mem - 0x3c);
         }
@@ -820,12 +822,13 @@ void CMemory::Free(void* ptr)
             System.Printf(const_cast<char*>(sStageFreeCorruptBlockFmt), ptr, mem - 0x26, *reinterpret_cast<unsigned short*>(mem - 0x28));
         }
 
-        *reinterpret_cast<unsigned char*>(mem - 0x3e) &= 0xfb;
+        *reinterpret_cast<unsigned char*>(mem - 0x3e) =
+            static_cast<unsigned char>(*reinterpret_cast<unsigned char*>(mem - 0x3e) & 0xfb);
 
         if ((*reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(mem - 0x38) + 2) & 4) == 0) {
             *reinterpret_cast<int*>(mem - 0x30) =
-                *reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x38) + 0x10) +
-                *reinterpret_cast<int*>(mem - 0x30) + 0x40;
+                *reinterpret_cast<int*>(mem - 0x30) + 0x40 +
+                *reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x38) + 0x10);
             *reinterpret_cast<int*>(*reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x38) + 8) + 4) =
                 mem - 0x40;
             *reinterpret_cast<int*>(mem - 0x38) =
@@ -835,8 +838,8 @@ void CMemory::Free(void* ptr)
         int blockNext = *reinterpret_cast<int*>(mem - 0x3c);
         if ((*reinterpret_cast<unsigned char*>(blockNext + 2) & 4) == 0) {
             *reinterpret_cast<int*>(blockNext + 0x10) =
-                *reinterpret_cast<int*>(mem - 0x30) +
-                *reinterpret_cast<int*>(blockNext + 0x10) + 0x40;
+                *reinterpret_cast<int*>(blockNext + 0x10) + 0x40 +
+                *reinterpret_cast<int*>(mem - 0x30);
             *reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x3c) + 8) = *reinterpret_cast<int*>(mem - 0x38);
             *reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x38) + 4) = *reinterpret_cast<int*>(mem - 0x3c);
         }
@@ -1564,13 +1567,13 @@ static inline void freeAmemCacheBlock(unsigned long ptr)
         System.Printf(const_cast<char*>(sStageFreeCorruptBlockFmt), ptr, block + 0x1A, *reinterpret_cast<unsigned short*>(block + 0x18));
     }
 
-    block[2] &= 0xfb;
+    block[2] = static_cast<unsigned char>(block[2] & 0xfb);
 
     int blockPrev = *reinterpret_cast<int*>(block + 8);
     if ((*(reinterpret_cast<unsigned char*>(blockPrev) + 2) & 4) == 0) {
         *reinterpret_cast<int*>(block + 0x10) =
-            *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(blockPrev) + 0x10) +
-            *reinterpret_cast<int*>(block + 0x10) + 0x40;
+            *reinterpret_cast<int*>(block + 0x10) + 0x40 +
+            *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(blockPrev) + 0x10);
         *reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(blockPrev) + 8) + 4) =
             reinterpret_cast<int>(block);
         *reinterpret_cast<int*>(block + 8) =
@@ -1580,8 +1583,8 @@ static inline void freeAmemCacheBlock(unsigned long ptr)
     int blockNext = *reinterpret_cast<int*>(block + 4);
     if ((*(reinterpret_cast<unsigned char*>(blockNext) + 2) & 4) == 0) {
         *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(blockNext) + 0x10) =
-            *reinterpret_cast<int*>(block + 0x10) +
-            *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(blockNext) + 0x10) + 0x40;
+            *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(blockNext) + 0x10) + 0x40 +
+            *reinterpret_cast<int*>(block + 0x10);
         *reinterpret_cast<int*>(*reinterpret_cast<int*>(block + 4) + 8) = *reinterpret_cast<int*>(block + 8);
         *reinterpret_cast<int*>(*reinterpret_cast<int*>(block + 8) + 4) = *reinterpret_cast<int*>(block + 4);
     }

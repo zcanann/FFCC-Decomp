@@ -115,8 +115,6 @@ extern "C" const f32 FLOAT_80330824 = 255.0f;
 extern "C" const f32 FLOAT_80330828 = 3.0f;
 extern "C" const f32 FLOAT_8033082C = 4.0f;
 extern "C" const f32 FLOAT_80330830 = 2.0f;
-extern "C" const double DOUBLE_80330838 = 4503601774854144.0;
-extern "C" const double DOUBLE_80330840 = 4503599627370496.0;
 extern "C" const f32 FLOAT_80330848 = 0.1f;
 extern "C" const f32 FLOAT_8033084C = 0.5f;
 extern "C" const f32 FLOAT_80330850 = 120.0f;
@@ -1669,11 +1667,12 @@ void CMenuPcs::LoadExtraFont(int fontNo, char* fileName)
  */
 void CMenuPcs::SetExtraFontTlut(int fontNo, _GXColor color)
 {
-    u8* fontSlot = reinterpret_cast<u8*>(this) + 0x100 + fontNo * 4;
+    fontNo *= 4;
+    u8* fontSlot = reinterpret_cast<u8*>(this) + 0x100 + fontNo;
+    CTexture* texture;
 
     for (int i = 0; i < 0x10; i++) {
-        CTexture* texture =
-            *reinterpret_cast<CTexture**>(*reinterpret_cast<u32*>(fontSlot) + 0x34);
+        texture = *reinterpret_cast<CTexture**>(*reinterpret_cast<u32*>(fontSlot) + 0x34);
         _GXColor out = texture->GetTlutColor(i);
 
         if (i < 9) {
@@ -1690,7 +1689,8 @@ void CMenuPcs::SetExtraFontTlut(int fontNo, _GXColor color)
         texture->SetTlutColor(i, out);
     }
 
-    (*reinterpret_cast<CTexture**>(*reinterpret_cast<u32*>(fontSlot) + 0x34))->FlushTlut();
+    texture = *reinterpret_cast<CTexture**>(*reinterpret_cast<u32*>(fontSlot) + 0x34);
+    texture->FlushTlut();
 }
 
 /*

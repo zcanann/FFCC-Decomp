@@ -2758,12 +2758,11 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
     }
     case -0x41: {
         const unsigned int* localBase = object->m_localBase;
+        const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
         float alpha = static_cast<float>(static_cast<int>(localBase[1])) /
                       static_cast<float>(static_cast<int>(localBase[2]));
-        Quaternion start = {static_cast<float>(localBase[3]), static_cast<float>(localBase[4]),
-                            static_cast<float>(localBase[5]), static_cast<float>(localBase[6])};
-        Quaternion end = {static_cast<float>(localBase[7]), static_cast<float>(localBase[8]),
-                          static_cast<float>(localBase[9]), static_cast<float>(localBase[10])};
+        Quaternion start = {localFloats[3], localFloats[4], localFloats[5], localFloats[6]};
+        Quaternion end = {localFloats[7], localFloats[8], localFloats[9], localFloats[10]};
         Quaternion rotation;
 
         switch (*localBase & 3) {

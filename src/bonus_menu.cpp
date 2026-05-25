@@ -253,7 +253,6 @@ static inline void ReleaseBonusRefObject(void* object)
 }
 
 static float CalcBonusSpriteProgress(const BonusAnimSprite* sprite, int frame);
-static int GetActiveBonusPartyCount();
 static float ClampBonusUnit(float value);
 static const char* GetBonusPartyNameByActiveIndex(int activeIndex);
 static CCaravanWork* GetBonusActiveCaravanByActiveIndex(int activeIndex);
@@ -886,24 +885,6 @@ static void TickAnimSprites(int statePtr, int animPtr, int fadeDir)
 	if (doneCount == (int)header->count) {
 		header->finished = 1;
 	}
-}
-
-static int GetActiveBonusPartyCount()
-{
-	if (s_Rinfo != 0 && s_Rinfo->m_partyCount > 0) {
-		return s_Rinfo->m_partyCount;
-	}
-
-	unsigned int* scriptFoodBase = Game.m_scriptFoodBase;
-	int activePartyCount = 0;
-
-	for (int i = 0; i < 4; i++) {
-		if (scriptFoodBase[i] != 0) {
-			activePartyCount++;
-		}
-	}
-
-	return (activePartyCount > 0) ? activePartyCount : 1;
 }
 
 static float ClampBonusUnit(float value)
@@ -2885,8 +2866,8 @@ void CMenuPcs::CalcResultOpenAnim()
 	const int labelBase = nameBase + activePartyCount;
 
 	if (*(unsigned char*)(statePtr + 0xb) == 0) {
-		Sound.PlaySe(0x46, 0x40, 0x7f, 0);
 		GetBonusMenuMembers(this).m_bonusAlpha = 0;
+		Sound.PlaySe(0x46, 0x40, 0x7f, 0);
 		memset((void*)animPtr, 0, sizeof(BonusAnimList));
 
 		header->count = (short)(1 + activePartyCount * 6);

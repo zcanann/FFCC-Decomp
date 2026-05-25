@@ -269,7 +269,7 @@ void pppFrameBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppBl
 
         model->m_callbackContext = work;
         model->m_callbackParam = param_2;
-        model->m_beforeMeshLockEnvCallback = BlurChara_SetBeforeMeshLockEnvCallback;
+        model->SetBeforeMeshLockEnvCallback(BlurChara_SetBeforeMeshLockEnvCallback);
     }
 }
 
@@ -379,10 +379,10 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void
     GXSetViewport(FLOAT_80331030, FLOAT_80331030, FLOAT_80331050, FLOAT_80331054, FLOAT_80331030, FLOAT_8033103c);
     GXSetScissor(0, 0, (unsigned int)FLOAT_80331050, (unsigned int)FLOAT_80331054);
 
-    model->m_beforeMeshLockEnvCallback = BlurChara_SetBeforeMeshLockEnvCallback;
+    model->SetBeforeMeshLockEnvCallback(BlurChara_SetBeforeMeshLockEnvCallback);
     model->m_afterDrawModelCallback = 0;
     handle->Draw(0);
-    model->m_beforeMeshLockEnvCallback = 0;
+    model->SetBeforeMeshLockEnvCallback(0);
     model->m_afterDrawModelCallback = BlurChara_AfterDrawModelCallback;
 
     Graphic.SetViewport();

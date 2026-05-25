@@ -302,8 +302,8 @@ void pppDesScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkC* param_2
     CChara::CModel* model = GetCharaModelPtr(handle);
     if (model != 0) {
         model->m_afterMeshDrawCallback = 0;
-        model->m_drawMeshDLCallback = 0;
-        model->m_beforeMeshLockEnvCallback = 0;
+        model->SetDrawMeshDLCallback(0);
+        model->SetBeforeMeshLockEnvCallback(0);
         model->SetCallbackContext(0, 0);
         model->m_beforeCalcMatrixCallback = 0;
     }
@@ -356,8 +356,8 @@ void pppConScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkC* param_2
     *(u32*)((u8*)gObject + 0x60) |= 0x40;
     model->m_afterMeshDrawCallback = (CChara::CModel::AfterMeshDrawCallback)SB_BeforeDrawCallback;
     const float& f = FLOAT_80331cc4;
-    model->m_drawMeshDLCallback = SB_DrawMeshDLCallback;
-    model->m_beforeMeshLockEnvCallback = SB_BeforeMeshLockEnvCallback;
+    model->SetDrawMeshDLCallback(SB_DrawMeshDLCallback);
+    model->SetBeforeMeshLockEnvCallback(SB_BeforeMeshLockEnvCallback);
     model->m_beforeCalcMatrixCallback = SB_BeforeCalcMatrixCallback;
     *(void**)(pppData + 0xC) = NULL;
     *(void**)(pppData + 0x10) = NULL;

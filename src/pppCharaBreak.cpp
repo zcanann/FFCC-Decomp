@@ -267,9 +267,9 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
                                                  stepData->m_payloadGraphStepStep);
 
     model->SetCallbackContext(work, stepData);
-    model->m_beforeMeshLockEnvCallback = CharaBreak_BeforeMeshLockEnvCallback;
-    model->m_drawMeshDLCallback = CharaBreak_DrawMeshDLCallback;
-    model->m_afterDrawMeshCallback = CharaBreak_AfterDrawMeshCallback;
+    model->SetBeforeMeshLockEnvCallback(CharaBreak_BeforeMeshLockEnvCallback);
+    model->SetDrawMeshDLCallback(CharaBreak_DrawMeshDLCallback);
+    model->SetAfterDrawMeshCallback(CharaBreak_AfterDrawMeshCallback);
     model->m_beforeCalcMatrixCallback = CharaBreak_BeforeCalcMatrixCallback;
 
     if (stepData->m_graphId == charaBreak->m_graphId) {
@@ -383,9 +383,9 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
 fail:
     work->m_enabled = 0;
     model->SetCallbackContext(0, 0);
-    model->m_beforeMeshLockEnvCallback = 0;
-    model->m_drawMeshDLCallback = 0;
-    model->m_afterDrawMeshCallback = 0;
+    model->SetBeforeMeshLockEnvCallback(0);
+    model->SetDrawMeshDLCallback(0);
+    model->SetAfterDrawMeshCallback(0);
     model->m_beforeCalcMatrixCallback = 0;
 }
 
@@ -406,9 +406,9 @@ void pppDestructCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkC* data)
     CChara::CModel* model = work->m_model;
 
     model->SetCallbackContext(0, 0);
-    model->m_beforeMeshLockEnvCallback = 0;
-    model->m_drawMeshDLCallback = 0;
-    model->m_afterDrawMeshCallback = 0;
+    model->SetBeforeMeshLockEnvCallback(0);
+    model->SetDrawMeshDLCallback(0);
+    model->SetAfterDrawMeshCallback(0);
     model->m_beforeCalcMatrixCallback = 0;
 
     void** perMeshBuffers = (void**)work->m_meshBuffers;

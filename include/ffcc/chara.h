@@ -157,9 +157,18 @@ public:
 		void GetMatrix();
 		void GetMatrix(float(*)[4]);
 		void GetMatrixT(float (*)[4]);
-		void SetBeforeMeshLockEnvCallback(void (*)(CChara::CModel*, void*, void*, int));
-		void SetDrawMeshDLCallback(void (*)(CChara::CModel*, void*, void*, int, int, float (*)[4]));
-		void SetAfterDrawMeshCallback(void (*)(CChara::CModel*, void*, void*, int, float (*)[4]));
+		void SetBeforeMeshLockEnvCallback(void (*callback)(CChara::CModel*, void*, void*, int))
+		{
+			m_beforeMeshLockEnvCallback = callback;
+		}
+		void SetDrawMeshDLCallback(void (*callback)(CChara::CModel*, void*, void*, int, int, float (*)[4]))
+		{
+			m_drawMeshDLCallback = callback;
+		}
+		void SetAfterDrawMeshCallback(void (*callback)(CChara::CModel*, void*, void*, int, float (*)[4]))
+		{
+			m_afterDrawMeshCallback = callback;
+		}
 		void SetCallbackContext(void* context, void* param)
 		{
 			m_callbackContext = context;

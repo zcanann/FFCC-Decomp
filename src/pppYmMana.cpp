@@ -86,14 +86,14 @@ static inline void ClearManaModelCallbacks(CChara::CModel* model)
 {
     model->SetCallbackContext(0, 0);
     model->m_afterMeshDrawCallback = 0;
-    model->m_drawMeshDLCallback = 0;
+    model->SetDrawMeshDLCallback(0);
 }
 
 static inline void SetManaModelCallbacks(CChara::CModel* model, void* work, pppYmManaUnkB* step)
 {
     model->SetCallbackContext(work, step);
     model->m_afterMeshDrawCallback = (CChara::CModel::AfterMeshDrawCallback)Mana_BeforeDrawCallback;
-    model->m_drawMeshDLCallback = Mana_DrawMeshDLCallback;
+    model->SetDrawMeshDLCallback(Mana_DrawMeshDLCallback);
 }
 
 static int CreateWaterMesh(Vec* positionsInOut, Vec* normalsOut, Vec2d* uvOut, unsigned short* indicesOut, float size);
@@ -1114,7 +1114,7 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
     handle = GetCharaHandlePtr(gObject, 0);
     model = GetCharaModelPtr(handle);
     model->m_afterMeshDrawCallback = (CChara::CModel::AfterMeshDrawCallback)Mana_BeforeDrawCallback;
-    model->m_drawMeshDLCallback = Mana_DrawMeshDLCallback;
+    model->SetDrawMeshDLCallback(Mana_DrawMeshDLCallback);
 
     if (Game.m_currentMapId == 0x21) {
         GXSetViewport(savedViewport[0], savedViewport[1], savedViewport[2], savedViewport[3], savedViewport[4],

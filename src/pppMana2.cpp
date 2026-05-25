@@ -83,14 +83,14 @@ static inline void ClearMana2ModelCallbacks(CChara::CModel* model)
 {
     model->SetCallbackContext(0, 0);
     model->m_afterMeshDrawCallback = 0;
-    model->m_drawMeshDLCallback = 0;
+    model->SetDrawMeshDLCallback(0);
 }
 
 static inline void SetMana2ModelCallbacks(CChara::CModel* model, void* work, pppMana2UnkB* step)
 {
     model->SetCallbackContext(work, step);
     model->m_afterMeshDrawCallback = (CChara::CModel::AfterMeshDrawCallback)Mana2_BeforeDrawCallback;
-    model->m_drawMeshDLCallback = Mana2_DrawMeshDLCallback;
+    model->SetDrawMeshDLCallback(Mana2_DrawMeshDLCallback);
 }
 
 static int CreateWaterMesh(Vec* param_1, Vec* param_2, Vec2d* param_3, unsigned short* param_4, float param_5);
@@ -832,7 +832,7 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
     handle = GetCharaHandlePtr(gObject, 0);
     model = GetCharaModelPtr(reinterpret_cast<CCharaPcs::CHandle*>(handle));
     model->m_afterMeshDrawCallback = 0;
-    model->m_drawMeshDLCallback = 0;
+    model->SetDrawMeshDLCallback(0);
 
     if ((int)Game.m_currentSceneId == 7) {
         centerPos.x = LoadFloat(FLOAT_80331898);
@@ -966,7 +966,7 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
     handle = GetCharaHandlePtr(gObject, 0);
     model = GetCharaModelPtr(reinterpret_cast<CCharaPcs::CHandle*>(handle));
     model->m_afterMeshDrawCallback = (CChara::CModel::AfterMeshDrawCallback)Mana2_BeforeDrawCallback;
-    model->m_drawMeshDLCallback = Mana2_DrawMeshDLCallback;
+    model->SetDrawMeshDLCallback(Mana2_DrawMeshDLCallback);
 }
 
 /*
@@ -1328,7 +1328,7 @@ void pppDestructMana2(pppMana2* pppMana2, pppMana2UnkC* param_2)
     model = GetCharaModelPtr(handle);
     modelBytes = reinterpret_cast<u8*>(model);
     model->m_afterMeshDrawCallback = 0;
-    model->m_drawMeshDLCallback = 0;
+    model->SetDrawMeshDLCallback(0);
     meshEntry = *(s32*)(modelBytes + 0xAC);
     step = work[0x1C];
     for (i = 0; i < *(u32*)(*(s32*)(modelBytes + 0xA4) + 0xC); i++) {

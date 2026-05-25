@@ -553,9 +553,9 @@ void CMaterialEditorPcs::destroyViewer()
 
     m_usbStream.DeleteBuffer();
     MemFree(reinterpret_cast<void*>(m_rsdIndex));
-    m_loadedTextureCount = 0;
 
-    unsigned int textureIndex = 0;
+    unsigned int textureIndex;
+    m_loadedTextureCount = static_cast<s8>(textureIndex = 0);
     CMaterialEditorPcs* iter = this;
     do {
         MemFree(iter->m_textureData[0]);

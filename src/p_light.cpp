@@ -371,6 +371,7 @@ void CLightPcs::Add(CLightPcs::CLight* light)
 CLightPcs::CBumpLight* CLightPcs::AddBump(CLightPcs::CLight* srcLight, CLightPcs::TARGET target,
                                           CMemory::CStage* stage, int count)
 {
+    float minFalloff = FLOAT_8032fc10;
     CBumpLight* bumpLight = 0;
     CBumpLight* bumpLights = &m_bumpLights[target * 8];
 
@@ -390,7 +391,7 @@ CLightPcs::CBumpLight* CLightPcs::AddBump(CLightPcs::CLight* srcLight, CLightPcs
 
     *static_cast<CLight*>(bumpLight) = *srcLight;
 
-    if (FLOAT_8032fc10 <= bumpLight->m_attenFalloff) {
+    if (minFalloff <= bumpLight->m_attenFalloff) {
         bumpLight->m_attenFalloff = bumpLight->m_attenRadius;
     }
 

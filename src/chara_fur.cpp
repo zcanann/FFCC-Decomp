@@ -84,7 +84,9 @@ struct FurMaterialSetRaw
 
 struct FurMaterialRaw
 {
-    unsigned char m_pad0[0x3C];
+    unsigned char m_pad0[0x1C];
+    short m_extraTextureIndex;
+    unsigned char m_pad1E[0x1E];
     CTexture* m_textures[4];
     unsigned char m_pad4C[0x5B];
     unsigned char m_furEnable;
@@ -1629,16 +1631,26 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
 	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_NRM, GX_NRM_XYZ, GX_S16, ModelNormQuant(this) & 0xFF);
 	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_U16, 0x0C);
-	GXSetNumTexGens(1);
-	GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
-	GXSetNumTevStages(1);
-	GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
-	GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
-	GXSetChanMatColor(GX_COLOR0A0, furColor);
 	LightPcs.EnableLight(1, 1);
 	GXSetZMode((u8)1, (GXCompare)3, (u8)0);
+	GXSetChanMatColor(GX_COLOR0A0, furColor);
 	LightPcs.SetAmbientAlpha(ModelLightAlpha(this));
 	GXSetNumIndStages(0);
+	GXSetNumTevStages(2);
+	GXSetTevDirect(GX_TEVSTAGE0);
+	_GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
+	_GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_RASC, GX_CC_TEXC, GX_CC_ZERO);
+	_GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_RASA, GX_CA_TEXA, GX_CA_ZERO);
+	_GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+	_GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+	_GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
+	GXSetTevDirect(GX_TEVSTAGE1);
+	_GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP0);
+	_GXSetTevColorIn(GX_TEVSTAGE1, GX_CC_ZERO, GX_CC_TEXC, GX_CC_CPREV, GX_CC_ZERO);
+	_GXSetTevAlphaIn(GX_TEVSTAGE1, GX_CA_ZERO, GX_CA_TEXA, GX_CA_APREV, GX_CA_ZERO);
+	_GXSetTevColorOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+	_GXSetTevAlphaOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+	_GXSetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD1, GX_TEXMAP1, GX_COLOR0A0);
 
 	Mtx texMtx;
 	PSMTXIdentity(texMtx);
@@ -1697,22 +1709,33 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 		GXSetArray(GX_VA_NRM, mesh->m_workNormals, 6);
 		GXSetArray(GX_VA_TEX0, mesh->m_data->m_uvs, 4);
 
+		unsigned int posGqr = ModelPosQuant(this);
+		unsigned int normGqr = ModelNormQuant(this);
 		FurDisplayListRaw* displayList = mesh->m_data->m_displayLists;
+		Chara.gqrInit(posGqr << 0x18 | 0x70000 | posGqr << 8 | 7, normGqr << 0x18 | 0x70000 | normGqr << 8 | 7,
+		              0xC070C07);
 		for (unsigned int displayIndex = 0; displayIndex < mesh->m_data->m_displayListCount; displayIndex++, displayList++) {
-			if (displayList->m_material >= materialCount) {
+			FurMaterialRaw* material = reinterpret_cast<FurMaterialRaw*>((*materials)[displayList->m_material]);
+			if (material->m_furEnable == 0) {
 				continue;
 			}
 
-			FurMaterialRaw* material = reinterpret_cast<FurMaterialRaw*>((*materials)[displayList->m_material]);
-			if (material == 0 || material->m_furEnable == 0) {
-				continue;
+			TextureMan.SetTexture(GX_TEXMAP0, material->m_textures[0]);
+			if (material->m_extraTextureIndex != -1) {
+				TextureMan.SetTexture(GX_TEXMAP2, material->m_textures[1]);
+			}
+			GXSetNumTexGens(static_cast<u8>(shadowCount + ((material->m_extraTextureIndex != -1) ? 3 : 2)));
+			GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, 0x3C, GX_FALSE, GX_PTIDENTITY);
+			GXSetTexCoordGen2(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX0, 0x1E, GX_FALSE, GX_PTIDENTITY);
+			if (material->m_extraTextureIndex != -1) {
+				GXSetTexCoordGen2(GX_TEXCOORD2, GX_TG_MTX2x4, GX_TG_TEX0, 0x3C, GX_FALSE, GX_PTIDENTITY);
 			}
 
 			for (unsigned int layer = 0; layer < 8; layer++) {
 				GXTexObj texObj;
 				void* texData = reinterpret_cast<unsigned char*>(gMogFurTexBuffer) + (layer * 0x4000);
 				GXInitTexObj(&texObj, texData, 0x80, 0x80, GX_TF_RGB5A3, GX_CLAMP, GX_CLAMP, GX_FALSE);
-				GXLoadTexObj(&texObj, GX_TEXMAP0);
+				GXLoadTexObj(&texObj, GX_TEXMAP1);
 
 				const float shellOffset = furLength * (static_cast<float>(layer) * 0.125f);
 				DrawFurDisplayListShell(mesh, displayList, shellOffset, posQuant, normQuant);

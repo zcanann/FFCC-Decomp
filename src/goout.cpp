@@ -707,11 +707,11 @@ void CGoOutMenu::Destroy()
     CMenuPcsGoOutLayout& menuPcsLayout = *reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs);
 
     if (menuPcsLayout.m_transferSaveData != 0) {
-        delete[] reinterpret_cast<unsigned char*>(menuPcsLayout.m_transferSaveData);
+        delete reinterpret_cast<unsigned char*>(menuPcsLayout.m_transferSaveData);
         menuPcsLayout.m_transferSaveData = 0;
     }
     if (menuPcsLayout.m_transferWork != 0) {
-        delete[] static_cast<unsigned char*>(menuPcsLayout.m_transferWork);
+        delete static_cast<unsigned char*>(menuPcsLayout.m_transferWork);
         menuPcsLayout.m_transferWork = 0;
     }
 
@@ -1846,34 +1846,34 @@ void CGoOutMenu::Calc()
         field_0x38 = 0;
         SetMainMode(1);
         menuPcsLayout.m_transferSaveData =
-            reinterpret_cast<Mc::SaveDat*>(new (MenuPcs.m_menuStage, const_cast<char*>(s_gooutCpp), 0x32B) unsigned char[0x8BD0]);
-        menuPcsLayout.m_transferWork = new (MenuPcs.m_menuStage, const_cast<char*>(s_gooutCpp), 0x32D) unsigned char[0x8BD0];
+            static_cast<Mc::SaveDat*>(operator new(0x8BD0, MenuPcs.m_menuStage, const_cast<char*>(s_gooutCpp), 0x32B));
+        menuPcsLayout.m_transferWork = operator new(0x8BD0, MenuPcs.m_menuStage, const_cast<char*>(s_gooutCpp), 0x32D);
         menuPcsLayout.m_transferWorkActive = 0;
         menuPcsLayout.m_unknown_888 = 0;
         menuPcsLayout.m_saveLoadMode = 0;
         menuPcsLayout.m_unknown_88A = 0;
-        short* winMessage = reinterpret_cast<short*>(MenuPcs.GetWinMess(0x22));
-        winMessage[0] = 0;
-        winMessage[1] = 0;
-        winMessage[2] = 0;
-        winMessage[3] = 1;
-        winMessage[4] = 2;
-        winMessage[5] = 3;
-        winMessage[6] = 4;
-        winMessage[7] = 5;
-        winMessage[8] = 6;
-        winMessage[9] = 7;
-        winMessage = reinterpret_cast<short*>(MenuPcs.GetWinMess(0x23));
-        winMessage[0] = 0;
-        winMessage[1] = 0;
-        winMessage[2] = 10;
-        winMessage[3] = 11;
-        winMessage[4] = 12;
-        winMessage[5] = 13;
-        winMessage[6] = 14;
-        winMessage[7] = 15;
-        winMessage[8] = 16;
-        winMessage[9] = 17;
+        int* winMessage = reinterpret_cast<int*>(MenuPcs.GetWinMess(0x22));
+        *winMessage = 0;
+        short* winMessageEntries = reinterpret_cast<short*>(winMessage + 1);
+        winMessageEntries[0] = 0;
+        winMessageEntries[1] = 1;
+        winMessageEntries[2] = 2;
+        winMessageEntries[3] = 3;
+        winMessageEntries[4] = 4;
+        winMessageEntries[5] = 5;
+        winMessageEntries[6] = 6;
+        winMessageEntries[7] = 7;
+        winMessage = reinterpret_cast<int*>(MenuPcs.GetWinMess(0x23));
+        *winMessage = 0;
+        winMessageEntries = reinterpret_cast<short*>(winMessage + 1);
+        winMessageEntries[0] = 10;
+        winMessageEntries[1] = 11;
+        winMessageEntries[2] = 12;
+        winMessageEntries[3] = 13;
+        winMessageEntries[4] = 14;
+        winMessageEntries[5] = 15;
+        winMessageEntries[6] = 16;
+        winMessageEntries[7] = 17;
         MenuMcWinState(menuPcsLayout).m_mode = 3;
         field_0x44 = 1;
     }
@@ -1900,11 +1900,11 @@ void CGoOutMenu::Calc()
                     MenuGoOutState(menuPcsLayout).m_resultSelect = -1;
 
                     if (menuPcsLayout.m_transferSaveData != 0) {
-                        delete[] reinterpret_cast<unsigned char*>(menuPcsLayout.m_transferSaveData);
+                        delete reinterpret_cast<unsigned char*>(menuPcsLayout.m_transferSaveData);
                         menuPcsLayout.m_transferSaveData = 0;
                     }
                     if (menuPcsLayout.m_transferWork != 0) {
-                        delete[] static_cast<unsigned char*>(menuPcsLayout.m_transferWork);
+                        delete static_cast<unsigned char*>(menuPcsLayout.m_transferWork);
                         menuPcsLayout.m_transferWork = 0;
                     }
 

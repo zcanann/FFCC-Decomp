@@ -919,57 +919,6 @@ static float CalcBonusSpriteProgress(const BonusAnimSprite* sprite, int frame)
 	return ClampBonusUnit((float)(frame - sprite->startFrame + 1) / (float)sprite->duration);
 }
 
-static void BuildDefaultResultSprites(BonusAnimSprite* sprites, int activePartyCount)
-{
-	InitAnimSprite(&sprites[0], 0x16, 0, 0, 0x280, 0x1c0, 0, 8);
-	sprites[0].depth = 0.0f;
-	sprites[0].scale = 3.0f;
-	sprites[0].alpha = 1.0f;
-
-	for (int i = 0; i < activePartyCount; i++) {
-		int frameIdx = i + 1;
-		int iconIdx = 1 + activePartyCount + i;
-		int digitIdx = 1 + activePartyCount + activePartyCount + i;
-
-		InitAnimSprite(&sprites[frameIdx], 0x17, 0x80, (short)(0x38 + i * 0x60), 0x1a0, 0x40, 0x16 + i * 3, 8);
-		sprites[frameIdx].alpha = 1.0f;
-
-		InitAnimSprite(&sprites[iconIdx], 0x18, 0x48, (short)(0x28 + i * 0x60), 0x60, 0x58, 0x40 + i * 3, 8);
-		sprites[iconIdx].alpha = 1.0f;
-
-		InitAnimSprite(&sprites[digitIdx], -2, (short)(0x1b8 + i * 8), (short)(0x4c + i * 0x60), 0x18, 0x18, 0x58 + i * 2, 8);
-		sprites[digitIdx].alpha = 1.0f;
-	}
-}
-
-static const BonusAnimSprite* GetResultCloseSourceSprite(
-    const BonusAnimSprite* originals, int originalCount, int primaryIndex, int secondaryIndex, const BonusAnimSprite* fallback)
-{
-	if (primaryIndex >= 0 && primaryIndex < originalCount) {
-		return &originals[primaryIndex];
-	}
-	if (secondaryIndex >= 0 && secondaryIndex < originalCount) {
-		return &originals[secondaryIndex];
-	}
-	return fallback;
-}
-
-static void InitResultCloseSprite(BonusAnimSprite* sprite, const BonusAnimSprite* source, int startFrame, int duration, float alpha)
-{
-	if (source != 0) {
-		*sprite = *source;
-	}
-	sprite->timer = 0;
-	sprite->startFrame = startFrame;
-	sprite->duration = duration;
-	sprite->alpha = alpha;
-	sprite->mulX = 0.0f;
-	sprite->mulY = 0.0f;
-	if (sprite->scale <= 0.0f) {
-		sprite->scale = 1.0f;
-	}
-}
-
 static int GetBonusPartySlotByActiveIndex(int activeIndex)
 {
 	unsigned int* scriptFoodBase = Game.m_scriptFoodBase;
@@ -2351,94 +2300,75 @@ void CMenuPcs::CalcResultCloseAnim()
 	const int closeCount = nameBase + activePartyCount;
 
 	if (*(unsigned char*)(statePtr + 0xb) == 0) {
-		BonusAnimSprite originals[0x20];
-		BonusAnimSprite defaults[0x20];
-		int originalCount = header->count;
-		const int resultCountNameBase = 1 + activePartyCount * 3;
-		const int resultCountDigitBase = 1 + activePartyCount * 5;
-
-		memset(originals, 0, sizeof(originals));
-		memset(defaults, 0, sizeof(defaults));
-		BuildDefaultResultSprites(defaults, activePartyCount);
-		if (originalCount <= 0 || originalCount > (int)(sizeof(originals) / sizeof(originals[0]))) {
-			originalCount = baseCount;
-		}
-		for (int i = 0; i < originalCount; i++) {
-			originals[i] = sprites[i];
-		}
-		if (originalCount == baseCount && originals[0].w == 0) {
-			BuildDefaultResultSprites(originals, activePartyCount);
-		}
-
 		*(short*)(statePtr + 0x22) = 0;
 		header->finished = 0;
-		memset((void*)sprites, 0, sizeof(BonusAnimSprite) * closeCount);
-		header->count = (short)closeCount;
-		header->unk02 = 0;
-		header->unk04 = 0;
 
-		InitResultCloseSprite(&sprites[0], &originals[0], 0, 14, 1.0f);
-		if (sprites[0].scale < 3.0f) {
-			sprites[0].scale = 3.0f;
+		for (int i = 0; i < (int)header->count; i++) {
+			sprites[i].timer = 0;
+			sprites[i].targetX = 0.0f;
+			sprites[i].targetY = 0.0f;
+		}
+
+		sprites[0].startFrame = 9999;
+		BonusSpriteFlags(&sprites[0]) = 3;
+
+		for (int i = 0; i < activePartyCount; i++) {
+			sprites[frameBase + i].startFrame = 0x10;
 		}
 
 		for (int i = 0; i < activePartyCount; i++) {
-			const BonusAnimSprite* frameSource = GetResultCloseSourceSprite(originals, originalCount, frameBase + i, -1, &defaults[frameBase + i]);
-			const BonusAnimSprite* iconSource = GetResultCloseSourceSprite(originals, originalCount, iconBase + i, -1, &defaults[iconBase + i]);
-			const BonusAnimSprite* digitSource = GetResultCloseSourceSprite(
-			    originals, originalCount, resultCountDigitBase + i, digitBase + i, &defaults[digitBase + i]);
-			const BonusAnimSprite* nameSource = GetResultCloseSourceSprite(
-			    originals, originalCount, resultCountNameBase + i, -1, 0);
+			BonusAnimSprite* sprite = &sprites[iconBase + i];
+			BonusAnimSprite* source = &sprites[frameBase + i];
+			sprite->startFrame = source->startFrame + source->duration;
+			BonusSpriteFlags(sprite) = 1;
+			sprite->targetX = (float)sprite->x;
+			sprite->motionX = 100.0f;
+			sprite->x = (short)((float)sprite->x - sprite->motionX);
+		}
 
-			InitResultCloseSprite(&sprites[frameBase + i], frameSource, i * 2, 12, 1.0f);
-			sprites[frameBase + i].kind = 0x17;
-			sprites[frameBase + i].tex = 0x17;
+		for (int i = 0; i < activePartyCount; i++) {
+			BonusAnimSprite* sprite = &sprites[digitBase + i];
+			BonusAnimSprite* source = &sprites[iconBase + i];
+			sprite->startFrame = source->startFrame + source->duration;
+			BonusSpriteFlags(sprite) = 1;
+		}
 
-			InitResultCloseSprite(&sprites[iconBase + i], iconSource, sprites[frameBase + i].startFrame + 2, 10, 1.0f);
-			sprites[iconBase + i].kind = 0x18;
-			sprites[iconBase + i].tex = 0x18;
+		for (int i = 0; i < activePartyCount; i++) {
+			sprites[frameEchoBase + i].startFrame = 0;
+		}
 
-			InitResultCloseSprite(&sprites[digitBase + i], digitSource, sprites[iconBase + i].startFrame + 2, 12, 1.0f);
-			sprites[digitBase + i].kind = -2;
-			sprites[digitBase + i].tex = -2;
-			if (sprites[digitBase + i].w == 0) {
-				sprites[digitBase + i].w = 0x18;
-			}
-			if (sprites[digitBase + i].h == 0) {
-				sprites[digitBase + i].h = 0x18;
-			}
+		for (int i = 0; i < activePartyCount; i++) {
+			sprites[iconEchoBase + i].startFrame = 9999;
+			BonusSpriteFlags(&sprites[iconEchoBase + i]) = 3;
+		}
 
-			InitResultCloseSprite(
-			    &sprites[frameEchoBase + i], &sprites[frameBase + i],
-			    sprites[frameBase + i].startFrame + sprites[frameBase + i].duration, 8, 0.9f);
+		for (int i = 0; i < activePartyCount; i++) {
+			BonusAnimSprite* sprite = &sprites[digitEchoBase + i];
+			BonusAnimSprite* source = &sprites[digitBase + i];
+			sprite->startFrame = source->startFrame;
+			BonusSpriteFlags(sprite) = 1;
+			sprite->targetX = (float)sprite->x;
+			sprite->motionX = 100.0f;
+			sprite->x = (short)((float)sprite->x - sprite->motionX);
+		}
 
-			InitResultCloseSprite(
-			    &sprites[iconEchoBase + i], &sprites[iconBase + i],
-			    sprites[iconBase + i].startFrame + sprites[iconBase + i].duration, 8, 0.8f);
+		int countTop = digitEchoBase + activePartyCount + 1;
+		if (digitEchoBase + activePartyCount < (int)header->count) {
+			sprites[digitEchoBase + activePartyCount].startFrame = sprites[1].startFrame;
+		}
+		if (countTop + activePartyCount > (int)header->count) {
+			countTop = (int)header->count - activePartyCount;
+		}
+		s_CntTop = (unsigned char)countTop;
 
-			InitResultCloseSprite(
-			    &sprites[digitEchoBase + i], &sprites[digitBase + i],
-			    sprites[digitBase + i].startFrame + sprites[digitBase + i].duration, 10, 0.75f);
-
-			if (nameSource != 0) {
-				InitResultCloseSprite(
-				    &sprites[nameBase + i], nameSource,
-				    sprites[digitEchoBase + i].startFrame + sprites[digitEchoBase + i].duration, 12, 1.0f);
-			} else {
-				InitAnimSprite(
-				    &sprites[nameBase + i], -1, 0x108, (short)(0x6c + i * 0x60), 0, 0,
-				    sprites[digitEchoBase + i].startFrame + sprites[digitEchoBase + i].duration, 12);
-				sprites[nameBase + i].timer = 0;
-				sprites[nameBase + i].depth = 0.0f;
-				sprites[nameBase + i].alpha = 1.0f;
-				sprites[nameBase + i].scale = 1.0f;
-				sprites[nameBase + i].mulX = 0.0f;
-				sprites[nameBase + i].mulY = 0.0f;
-			}
-			sprites[nameBase + i].kind = -1;
+		for (int i = 0; i < activePartyCount; i++) {
+			BonusAnimSprite* sprite = &sprites[(int)s_CntTop + i];
+			sprite->startFrame = 8;
+			sprite->duration = 8;
 		}
 
 		Sound.PlaySe(0x4a, 0x40, 0x7f, 0);
+		*(short*)(animPtr + 6) = 0;
 		*(unsigned char*)(statePtr + 0xb) = 1;
 	}
 

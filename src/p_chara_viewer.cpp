@@ -481,21 +481,23 @@ void CCharaPcs::calcViewer()
     }
 
     static const char* pFan;
-    static char initFan;
-    static int alive;
-    static char initAlive;
-    if (initFan == 0) {
+    static char init;
+    if (init == 0) {
         pFan = kCharaViewerSpinner;
-        initFan = 1;
+        init = 1;
     }
-    if (initAlive == 0) {
-        alive = 0;
-        initAlive = 1;
+    {
+        static int alive;
+        static char init;
+        if (init == 0) {
+            alive = 0;
+            init = 1;
+        }
+        alive++;
+        Graphic.Printf(const_cast<char*>(kCharaViewerChoiceFmt),
+                       (int)(char)pFan[(alive >> 4) % 4],
+                       USBPcs.m_rootPath);
     }
-    alive++;
-    Graphic.Printf(const_cast<char*>(kCharaViewerChoiceFmt),
-                   (int)(char)pFan[(alive >> 4) % 4],
-                   USBPcs.m_rootPath);
 
     unsigned short heldButtons;
     unsigned short triggerButtons;

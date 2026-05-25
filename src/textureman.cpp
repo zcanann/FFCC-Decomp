@@ -17,9 +17,8 @@ inline void* operator new(unsigned long, void* p)
 extern "C" const char s_textureman_cpp[] = "textureman.cpp";
 static const char s_Error_width_pctd_height_pctd_801D7984[] = "Error width=%d height=%d\n";
 static const char s_CTexture_texture_801D79A0[] = "CTexture.texture";
-static const char s_ptrarray_grow_error_801D79D8[] =
-    "\x83\x6F\x83\x62\x83\x74\x83\x40\x90\xAC\x92\xB7\x82\xAA\x95\x73\x8B\x96\x89\xC2\x82\xC5\x82\xB7\x81\x42\x0A";
-static const char s_collection_ptrarray_h_801D79F4[] = "collection_ptrarray.h";
+extern const char s_ptrarray_grow_error_801D79D8[];
+extern const char s_collection_ptrarray_h_801D79F4[];
 extern const char s_CRef_8032FAE8[];
 extern const float FLOAT_8032faf0;
 extern const float FLOAT_8032faf4;

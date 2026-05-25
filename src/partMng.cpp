@@ -3759,13 +3759,17 @@ int CPartMng::pppLoadPdt(const char* baseName, int pdtSlotIndex, int cachePriori
 int CPartMng::pppGetFreeDataMng()
 {
     PppPdtSlot* freeSlot = 0;
-    for (int slotIndex = 8; slotIndex < 0x20; slotIndex++) {
-        PppPdtSlot* slot = &m_pdtSlots[slotIndex];
+    PppPdtSlot* slot = &m_pdtSlots[8];
+    int slotIndex = 8;
+    int count = 0x18;
+    do {
         if (slot->m_pppDataHead == 0) {
-            freeSlot = slot;
+            freeSlot = &m_pdtSlots[slotIndex];
             break;
         }
-    }
+        slot++;
+        slotIndex++;
+    } while (--count != 0);
 
     if (freeSlot == 0) {
         if ((unsigned int)System.m_execParam >= 1) {

@@ -674,7 +674,7 @@ void SB_BeforeDrawCallback(CChara::CModel*, void*, void*, float (*) [4], int)
 int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void* param_3)
 {
     ScreenBreakModelView* modelView = (ScreenBreakModelView*)model;
-    float zero = 0.0f;
+    const float& zero = FLOAT_80331cc4;
     float* pieceData = *(float**)((u8*)param_2 + 0xC);
     Vec translation;
     Vec cameraForward;

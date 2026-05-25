@@ -676,7 +676,7 @@ void CMaterialEditorPcs::Init()
     self[0xf] = 0xff;
     float minusOne = FLOAT_8032FCDC;
     float zero = FLOAT_8032FCD8;
-    float one = FLOAT_8032FCC8;
+    float one = LoadFloat(FLOAT_8032FCC8);
 
     *reinterpret_cast<float*>(self + 0x18) = zero;
     *reinterpret_cast<float*>(self + 0x1c) = zero;

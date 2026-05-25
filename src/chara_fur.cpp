@@ -11,6 +11,7 @@
 #include "ffcc/linkage.h"
 #include "ffcc/materialman.h"
 #include "ffcc/p_camera.h"
+#include "ffcc/p_chara.h"
 #include "ffcc/p_menu.h"
 #include "ffcc/p_light.h"
 #include "ffcc/pad.h"
@@ -19,7 +20,6 @@
 #include "ffcc/textureman.h"
 #include "ffcc/cflat_runtime2.h"
 
-#include <math.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -28,6 +28,10 @@ extern const float kPppLensFlareAlphaScale = 0.0078125f;
 extern const float kPppLensFlareNegate = -1.0f;
 extern const float kPppLensFlareZScale = 16777215.0f;
 extern const double kPppLensFlareDoubleMagic = 4503599627370496.0;
+extern "C" {
+double atan2(double, double);
+double sqrt(double);
+}
 unsigned long long g_chara_fur_1;
 unsigned long long g_chara_fur_2;
 
@@ -1008,9 +1012,6 @@ static CTexture* FindMogFurTexture(void* model)
 {
 	unsigned char* modelBytes = reinterpret_cast<unsigned char*>(model);
 	CTextureSet* textureSet = *reinterpret_cast<CTextureSet**>(modelBytes + 0xB0);
-	if (textureSet == 0) {
-		return 0;
-	}
 
 	CPtrArray<CTexture*>* textureArray = reinterpret_cast<CPtrArray<CTexture*>*>(reinterpret_cast<char*>(textureSet) + 8);
 	unsigned int textureIdx = static_cast<unsigned int>(textureSet->Find(&sMogFurTextureName[0]));
@@ -1027,9 +1028,6 @@ static void CopyMogTextureFromChara(void* model)
 	void* dstBuffer = *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(texture) + 0x78);
 	const int texelCountBytes = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(texture) + 0x64) *
 	                            *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(texture) + 0x68) * 2;
-	if (dstBuffer == 0 || texelCountBytes <= 0) {
-		return;
-	}
 
 	Graphic._WaitDrawDone(const_cast<char*>(s_chara_fur_cpp), 0x506);
 	DCInvalidateRange(dstBuffer, texelCountBytes);
@@ -1048,9 +1046,6 @@ static void CopyMogTextureToChara(void* model)
 	void* srcBuffer = *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(texture) + 0x78);
 	const int texelCountBytes = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(texture) + 0x64) *
 	                            *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(texture) + 0x68) * 2;
-	if (srcBuffer == 0 || texelCountBytes <= 0) {
-		return;
-	}
 
 	Graphic._WaitDrawDone(const_cast<char*>(s_chara_fur_cpp), 0x506);
 	memcpy(reinterpret_cast<unsigned char*>(&Chara) + 4, srcBuffer, 0x2000);
@@ -1217,6 +1212,7 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 	}
 
 	if (work.m_frameCount == 0) {
+		messageId = 0;
 		work.m_prevScoreA = CharaS32(0x2018);
 		work.m_prevScoreB = CharaS32(0x201C);
 		work.m_prevScoreC = CharaS32(0x2020);
@@ -1279,6 +1275,9 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 		CharaU32(0x2010) = static_cast<unsigned int>(cursorY);
 	}
 
+	Mtx cameraMtx;
+	PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
+
 	if ((heldButtons & 0x100) != 0) {
 		const unsigned char radarType = MogRadarType();
 		const _GXColor brushColor = MogBrushColor(radarType);
@@ -1287,9 +1286,7 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 		_GXColor centerBefore = CColor(0xF, 0xF, 0xF, 0).color;
 		_GXColor centerAfter = centerBefore;
 		Vec worldPos;
-		Mtx cameraMtx;
 
-		PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
 		CopyMogTextureFromChara(this);
 		int pickResult = PickFur(cameraMtx, brushColor, doPaint, eraseMode, &centerBefore, &centerAfter, &worldPos);
 		CopyMogTextureToChara(this);
@@ -1849,7 +1846,8 @@ void CChara::makeFurTex()
 
 	FurSetupTextureCopyEnv();
 
-	gMogFurTexBuffer = Memory._Alloc(0x20000, 0, const_cast<char*>(s_chara_fur_cpp), 0xE9, 0);
+	gMogFurTexBuffer = Memory._Alloc(0x20000, CharaPcs.m_viewerAnimStage, const_cast<char*>(s_chara_fur_cpp), 0xE9, 0);
+	DCInvalidateRange(gMogFurTexBuffer, 0x20000);
 	unsigned short* tex = reinterpret_cast<unsigned short*>(gMogFurTexBuffer);
 
 	for (int layer = 0; layer < 8; layer++) {
@@ -1879,6 +1877,11 @@ void CChara::makeFurTex()
 
 	DCFlushRange(gMogFurTexBuffer, 0x20000);
 	GXInvalidateTexAll();
+	GXPixModeSync();
+	Graphic.SetViewport();
+	Graphic.SetStdPixelFmt();
+	GXSetAlphaUpdate(GX_FALSE);
+	Graphic._WaitDrawDone(const_cast<char*>(s_chara_fur_cpp), 0x138);
 }
 
 /*

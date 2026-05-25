@@ -588,7 +588,6 @@ void CFunnyShape::Update()
     }
 
     CFunnyShapeAnmWork* work = m_anmWork;
-    const float zero = 0.0f;
     const bool noSpread = ((ShapeFlags(this) & 0x80) == 0);
     for (s32 i = 0; i < ShapeCount(this); i++) {
         work->delay = static_cast<s16>(work->delay - 0x200);
@@ -602,10 +601,10 @@ void CFunnyShape::Update()
 
                 r = rand();
                 work->y = static_cast<float>(r % ShapeRange(this));
-                work->z = zero;
+                work->z = kFunnyShapeZero;
                 work->delay = 0x200;
-                work->viewportY = zero;
-                work->viewportX = zero;
+                work->viewportY = kFunnyShapeZero;
+                work->viewportX = kFunnyShapeZero;
 
                 r = rand();
                 work->angle = static_cast<float>(r - (r / 0x168) * 0x168);
@@ -623,13 +622,15 @@ void CFunnyShape::Update()
 
                 if (noSpread != 0) {
                     work->frame = 0;
-                    work->y = zero;
-                    work->x = zero;
+                    work->y = kFunnyShapeZero;
+                    work->x = kFunnyShapeZero;
                 }
             }
 
-            work->delay =
-                reinterpret_cast<const s16*>(reinterpret_cast<u8*>(AnimData(this)) + 0x12)[work->frame * 4];
+            const u8* frameData = reinterpret_cast<const u8*>(AnimData(this)) + 0x10;
+            s16 frame = work->frame;
+            frameData += frame * 8;
+            work->delay = *reinterpret_cast<const s16*>(frameData + 2);
         }
 
         if (noSpread != 0) {

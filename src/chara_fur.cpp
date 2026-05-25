@@ -159,7 +159,10 @@ struct FurProjectedVertex
 {
     unsigned char m_valid;
     Vec m_viewPos;
+    float m_clipX;
+    float m_clipY;
     float m_clipZ;
+    float m_clipW;
     float m_screenX;
     float m_screenY;
     float m_u;
@@ -313,7 +316,10 @@ static inline bool ProjectFurVertex(FurProjectedVertex& out, const FurMeshRaw* m
     Math.MTX44MultVec4(screenMtx, &out.m_viewPos, &clipPos);
 
     const float invW = kCharaFurDepthScaleBase / clipPos.w;
+    out.m_clipX = clipPos.x;
+    out.m_clipY = clipPos.y;
     out.m_clipZ = clipPos.z;
+    out.m_clipW = clipPos.w;
     out.m_screenX = clipPos.x * invW * FLOAT_8033113C + FLOAT_8033113C;
     out.m_screenY = FLOAT_80331134 - clipPos.y * invW * FLOAT_80331134;
     LoadFurTexCoord(&out.m_u, &uv);
@@ -341,7 +347,7 @@ static inline bool FurPointInTriangle(float px, float py, const FurProjectedVert
 
 static inline float FurHitDepth(const FurProjectedVertex& a, const FurProjectedVertex& b, const FurProjectedVertex& c)
 {
-    return (a.m_clipZ + b.m_clipZ + c.m_clipZ) / FLOAT_80331140;
+    return (a.m_clipW + b.m_clipW + c.m_clipW) / FLOAT_80331140;
 }
 
 static inline void FurInterpolateHit(Vec& outViewPos, float& outU, float& outV, Mtx44 screenMtx, float cursorX,
@@ -1541,6 +1547,9 @@ int CChara::CModel::PickFur(
 				const unsigned short count = *reinterpret_cast<const unsigned short*>(cursor + 1);
 				cursor += 3;
 				remaining -= static_cast<int>(count) * 8 + 3;
+				if (primitive != 0x90 && primitive != 0x98) {
+					break;
+				}
 
 				FurProjectedVertex prev2;
 				FurProjectedVertex prev1;
@@ -1560,12 +1569,13 @@ int CChara::CModel::PickFur(
 								if (FurPointInTriangle(cursorX, cursorY, a, b, current)) {
 									const float depth = FurHitDepth(a, b, current);
 									if (depth < nearestDepth) {
-										Vec viewHit;
 										float uvU;
 										float uvV;
-										FurInterpolateHit(viewHit, uvU, uvV, screenMtx, cursorX, cursorY, a, b, current);
+										FurInterpolateHit(hitViewPos, uvU, uvV, screenMtx, cursorX, cursorY, a, b, current);
 										hitAny = 1;
-										hitViewPos = viewHit;
+										if (outWorldPos != 0) {
+											*outWorldPos = hitViewPos;
+										}
 										if (furMaterial) {
 											nearestDepth = depth;
 											hitU = uvU;
@@ -1584,12 +1594,13 @@ int CChara::CModel::PickFur(
 							if (FurPointInTriangle(cursorX, cursorY, a, b, current)) {
 								const float depth = FurHitDepth(a, b, current);
 								if (depth < nearestDepth) {
-									Vec viewHit;
 									float uvU;
 									float uvV;
-									FurInterpolateHit(viewHit, uvU, uvV, screenMtx, cursorX, cursorY, a, b, current);
+									FurInterpolateHit(hitViewPos, uvU, uvV, screenMtx, cursorX, cursorY, a, b, current);
 									hitAny = 1;
-									hitViewPos = viewHit;
+									if (outWorldPos != 0) {
+										*outWorldPos = hitViewPos;
+									}
 									if (furMaterial) {
 										nearestDepth = depth;
 										hitU = uvU;
@@ -1628,13 +1639,12 @@ int CChara::CModel::PickFur(
 	}
 
 	if (outWorldPos != 0) {
-		*outWorldPos = hitViewPos;
 		Mtx invViewMtx;
 		PSMTXInverse(param_2, invViewMtx);
 		PSMTXMultVec(invViewMtx, outWorldPos, outWorldPos);
 	}
 
-	return nearestDepth == FLOAT_80331130 ? -((hitAny == 0) ? 1 : 0) : 1;
+	return nearestDepth == FLOAT_80331130 ? -(hitAny == 0) : 1;
 }
 
 /*

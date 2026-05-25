@@ -178,6 +178,7 @@ static bool sBgCollisionActive;
 extern "C" const char s_gobject_cpp[] = "gobject.cpp";
 static const char s_l_item2[] = "l_item2";
 static const char s_r_item[] = "r_item";
+extern "C" float FLOAT_80330338;
 static const float sAnimFrameOffset = 1.0f;           // FLOAT_80330338
 static const float sHugeCylinderExtent = 10000000000.0f; // FLOAT_8033033c
 static const float sNegHugeCylinderExtent = -10000000000.0f; // FLOAT_80330340
@@ -3496,7 +3497,7 @@ void CGObject::onAnimPoint(int, int)
  */
 float CGObject::onAlphaUpdate()
 {
-	return sAnimFrameOffset;
+	return FLOAT_80330338;
 }
 
 /*

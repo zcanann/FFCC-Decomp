@@ -394,10 +394,15 @@ void CPtrArray<OSFS_TEXTURE_ST*>::RemoveAll()
  */
 inline CFunnyShapePcs::CFunnyShapePcs()
 {
-    new (UsbStream(this)) CUSBStreamData;
-    new (FunnyShape(this)) CFunnyShape;
-    new (TextureHeaders(this)) CPtrArray<OSFS_TEXTURE_ST*>;
-    new (TextureObjects(this)) CPtrArray<_GXTexObj*>;
+    CUSBStreamData& usbStream = *UsbStream(this);
+    CFunnyShape& funnyShape = *FunnyShape(this);
+    CPtrArray<OSFS_TEXTURE_ST*>& textureHeaders = *TextureHeaders(this);
+    CPtrArray<_GXTexObj*>& textureObjects = *TextureObjects(this);
+
+    new (&usbStream) CUSBStreamData;
+    new (&funnyShape) CFunnyShape;
+    new (&textureHeaders) CPtrArray<OSFS_TEXTURE_ST*>;
+    new (&textureObjects) CPtrArray<_GXTexObj*>;
 }
 
 unsigned int CFunnyShapePcs::m_table_desc0[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createViewer__14CFunnyShapePcsFv)};

@@ -967,14 +967,16 @@ void CRingMenu::onCalc()
 		CGPartyObj* partyObj = Game.m_partyObjArr[m_menuIndex];
 		if (partyObj != 0) {
 			CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(partyObj->m_scriptHandle);
-			int currentCmd = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Chara) + 0x2004);
-
-			if (Game.m_gameWork.m_bossArtifactStageIndex != 0x19) {
+			int currentCmd;
+			if (Game.m_gameWork.m_bossArtifactStageIndex == 0x19) {
+				currentCmd = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Chara) + 0x2004);
+			} else {
 				currentCmd = caravanWork->GetIdxCmdList();
 			}
 
+			int mogStage = (Game.m_gameWork.m_bossArtifactStageIndex == 0x19);
 			int* trackedCmd = &m_currentCommandIndex;
-			if (Game.m_gameWork.m_bossArtifactStageIndex == 0x19) {
+			if (mogStage != 0) {
 				trackedCmd = reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Chara) + 0x2008);
 			}
 

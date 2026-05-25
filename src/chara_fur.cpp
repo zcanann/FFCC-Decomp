@@ -1198,14 +1198,8 @@ void CChara::CModel::InitMogFurTex()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CChara::CModel::MogFurFrame(CGObject* object)
+void CChara::CModel::MogFurFrame(CGObject* gObject)
 {
-	unsigned char* modelBytes = reinterpret_cast<unsigned char*>(this);
-	if ((modelBytes[0x10C] & 0x40) == 0) {
-		return;
-	}
-
-	CGObject* gObject = object;
 	MogWorkRaw& work = MogWork();
 	const unsigned short heldButtons = MogHeldButtons();
 	const unsigned short triggerButtons = MogTriggerButtons();
@@ -1303,13 +1297,9 @@ void CChara::CModel::MogFurFrame(CGObject* object)
 
 			if (CharaS32(0x2018) >= work.m_prevScoreA + 5) {
 				work.m_prevScoreA = CharaS32(0x2018);
-				work.m_prevScoreB = CharaS32(0x201C);
-				work.m_prevScoreC = CharaS32(0x2020);
 				messageId = 1;
 			} else if (CharaS32(0x2018) < work.m_prevScoreA - 5) {
 				work.m_prevScoreA = CharaS32(0x2018);
-				work.m_prevScoreB = CharaS32(0x201C);
-				work.m_prevScoreC = CharaS32(0x2020);
 				messageId = 6;
 			}
 			if (CharaS32(0x201C) >= work.m_prevScoreB + 5) {

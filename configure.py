@@ -581,7 +581,7 @@ config.libs = [
             Object(NonMatching, "partMng.cpp"),
             Object(NonMatching, "partyobj.cpp"),
             Object(Matching, "pppAccele.cpp"),
-            Object(NonMatching, "pppAlignmentScale.cpp"),
+            Object(Matching, "pppAlignmentScale.cpp"),
             Object(Matching, "pppAngAccele.cpp"),
             Object(Matching, "pppAngle.cpp"),
             Object(Matching, "pppAngMove.cpp"),

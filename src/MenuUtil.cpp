@@ -1121,7 +1121,7 @@ void CMenuPcs::DrawOptionMenu()
 	          static_cast<int>(FLOAT_80333590), color, 7, helpText[m_optionIndex], FLOAT_80333578,
 	          kOptionAnimMax, kOptionAnimMax);
 
-	if (m_optionIndex < 2) {
+	if (m_optionIndex <= 1) {
 		CTextureSet* textureSet = GetMenuTextureSet(this, 0xBC);
 		CTexture* sideTexture = GetTextureSetTexture(textureSet, 1);
 		CTexture* selectorTexture = GetTextureSetTexture(textureSet, 4);

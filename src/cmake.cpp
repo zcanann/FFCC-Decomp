@@ -2180,13 +2180,26 @@ unsigned short CMenuPcs::CmakeTribeCtrl()
     int state = MenuS32(this, 0x82C);
     int mcWork = MenuS32(this, 0x848);
     short& resultDir = *reinterpret_cast<short*>(state + 0x1E);
-    short& resultFlag = *reinterpret_cast<short*>(state + 0x2E);
     short& tribe = *reinterpret_cast<short*>(state + 0x26);
     short& crest = *reinterpret_cast<short*>(state + 0x28);
     short& selectField = *reinterpret_cast<short*>(state + 0x30);
     short& mcState = *reinterpret_cast<short*>(mcWork + 10);
-    unsigned short repeat = GetButtonRepeat(0);
-    unsigned short down = GetButtonDown(0);
+    unsigned short down;
+    unsigned short repeat;
+
+    if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+        down = 0;
+    } else {
+        __cntlzw(static_cast<unsigned int>(Pad._448_4_));
+        down = static_cast<unsigned short>(Pad.GetPadInputs()[0].buttonDown[0]);
+    }
+
+    if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+        repeat = 0;
+    } else {
+        __cntlzw(static_cast<unsigned int>(Pad._448_4_));
+        repeat = Pad.GetPadInputs()[0].repeatButton;
+    }
 
     if (repeat == 0) {
         return 0;
@@ -2211,7 +2224,6 @@ unsigned short CMenuPcs::CmakeTribeCtrl()
             Sound.PlaySe(3, 0x40, 0x7F, 0);
             if (selectField == 0) {
                 resultDir = -1;
-                resultFlag = 1;
                 return 1;
             }
 
@@ -2227,13 +2239,8 @@ unsigned short CMenuPcs::CmakeTribeCtrl()
             }
 
             bool duplicate = false;
-            int activeSlot = static_cast<int>(MenuS16(this, 0x86A));
 
             for (int slot = 0; slot < 8; ++slot) {
-                if (slot == activeSlot) {
-                    continue;
-                }
-
                 unsigned char* entry = GetCmakeRosterEntry(this, slot);
                 if (*reinterpret_cast<int*>(entry + 0x1794) == 0) {
                     continue;
@@ -2263,7 +2270,6 @@ unsigned short CMenuPcs::CmakeTribeCtrl()
                          static_cast<int>(s_CmakeInfo.m_hair),
                          static_cast<int>(s_CmakeInfo.m_gender));
                 resultDir = 1;
-                resultFlag = 1;
                 return 1;
             }
 
@@ -3309,10 +3315,28 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
     short& select = *reinterpret_cast<short*>(villageWork + 0x26);
     short& row = *reinterpret_cast<short*>(villageWork + 0x28);
     short& table = *reinterpret_cast<short*>(villageWork + 0x2A);
-    unsigned short repeat = GetButtonRepeat(0);
-    unsigned short down = GetButtonDown(0);
+    unsigned short down;
+    unsigned short repeat;
     char picked[2] = {'\0', '\0'};
     size_t len = strlen(s_CmakeInfo.m_name);
+
+    if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+        down = 0;
+    } else {
+        __cntlzw(static_cast<unsigned int>(Pad._448_4_));
+        down = static_cast<unsigned short>(Pad.GetPadInputs()[0].buttonDown[0]);
+    }
+
+    if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+        repeat = 0;
+    } else {
+        __cntlzw(static_cast<unsigned int>(Pad._448_4_));
+        repeat = Pad.GetPadInputs()[0].repeatButton;
+    }
+
+    if (repeat == 0) {
+        return 0;
+    }
 
     int maxRow = (select < 10) ? 4 : 5;
     if ((repeat & 0x4) != 0) {
@@ -3337,6 +3361,10 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
         } else {
             Sound.PlaySe(4, 0x40, 0x7f, 0);
         }
+    }
+
+    if ((repeat & 0xF) != 0) {
+        return 0;
     }
 
     if ((down & 0x40) != 0) {

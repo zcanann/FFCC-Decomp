@@ -289,8 +289,8 @@ void CLine<10>::Draw()
 
 void CLine<10>::CalcBound()
 {
-    Vec* point = points;
-    CLineSegment* segment = segments;
+    Vec* point;
+    CLineSegment* segment;
 
     min.x = kLineBoundsInitMin;
     min.y = kLineBoundsInitMin;
@@ -299,6 +299,9 @@ void CLine<10>::CalcBound()
     max.y = kLineBoundsInitMax;
     max.z = kLineBoundsInitMax;
     totalLength = kLineSegmentMinT;
+
+    point = points;
+    segment = segments;
 
     u32 i = 0;
     while (i < pointCount) {
@@ -325,7 +328,7 @@ void CLine<10>::CalcBound()
 
         if (i != 0) {
             CLineSegment* prevSegment = segment - 1;
-            PSVECSubtract(point, &line->points[i - 1], &prevSegment->delta);
+            PSVECSubtract(point, point - 1, &prevSegment->delta);
             prevSegment->length = PSVECMag(&prevSegment->delta);
             prevSegment->startLength = totalLength;
             totalLength += prevSegment->length;

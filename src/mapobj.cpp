@@ -1387,15 +1387,13 @@ void CMapObj::Calc()
 void CMapObj::SetDrawEnv()
 {
     _GXColor mapColor;
-    _GXColor lightColor = s_mapObjLightColor;
 
-    lightColor.a = U8At(this, 0x23);
-    s_mapObjLightColor = lightColor;
+    s_mapObjLightColor.a = U8At(this, 0x23);
 
-    if (U8At(this, 0x21) == 0) {
-        mapColor = MapMng.m_mapColor;
-    } else {
+    if (U8At(this, 0x21) != 0) {
         mapColor = m_ambientColor;
+    } else {
+        mapColor = MapMng.m_mapColor;
     }
 
     if (MapMng.m_colorScaleEnable != 0) {
@@ -1406,14 +1404,15 @@ void CMapObj::SetDrawEnv()
     }
 
     if (U8At(this, 0x24) != 0xFF) {
-        unsigned int alphaRate = U8At(this, 0x24);
+        int alphaRate = U8At(this, 0x24);
         mapColor.r = static_cast<unsigned char>((mapColor.r * alphaRate) >> 8);
         mapColor.g = static_cast<unsigned char>((mapColor.g * alphaRate) >> 8);
         mapColor.b = static_cast<unsigned char>((mapColor.b * alphaRate) >> 8);
     }
 
+    _GXColor lightColor = s_mapObjLightColor;
     LightPcs.SetMapColorAlpha(m_worldMtx, mapColor, lightColor, U8At(this, 0x26), F32At(this, 0x44), F32At(this, 0x48),
-                              F32At(this, 0x54), (U16At(this, 0x28) >> 7) & 0xFF);
+                              F32At(this, 0x54), (S16At(this, 0x28) >> 7) & 0xFF);
 }
 
 /*

@@ -522,6 +522,25 @@ static void ApplySelectCloseSpriteMotion(BonusAnimSprite* sprite, int frame)
 	}
 }
 
+static inline int& BonusSpriteFlags(BonusAnimSprite* sprite)
+{
+	return *reinterpret_cast<int*>(&sprite->scale);
+}
+
+static void SetupSelectCloseSpriteMotion(BonusAnimSprite* sprite)
+{
+	sprite->timer = 0;
+	sprite->startFrame = 0;
+	sprite->duration = 8;
+	sprite->depth = 1.0f;
+	sprite->x = (short)(int)sprite->targetX;
+	sprite->y = (short)(int)sprite->targetY;
+	sprite->motionX = 100.0f;
+	sprite->motionY = 0.0f;
+	sprite->targetX = (float)sprite->x + sprite->motionX;
+	sprite->targetY = (float)sprite->y + sprite->motionY;
+}
+
 static void DrawBonusTexturedSprite(CMenuPcs* menu, const BonusAnimSprite* sprite, float alpha)
 {
 	GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(alpha * 255.0f)};
@@ -1536,58 +1555,63 @@ void CMenuPcs::CalcSelectCloseAnim()
 		int markBase = detailBase + activePartyCount;
 		int lowerNameBase = markBase + activePartyCount;
 
-		*(short*)(statePtr + 0x22) = 0;
 		header->finished = 0;
-		if (header->count > 0) {
-			header->count = (short)(header->count - 1);
-		}
+		header->count = (short)(header->count - 1);
 
 		for (int i = 0; i < (int)header->count; i++) {
 			BonusAnimSprite* sprite = &sprites[i];
-			sprite->x = (short)((float)sprite->x + sprite->mulX);
-			sprite->y = (short)((float)sprite->y + sprite->mulY);
-			sprite->mulX = 0.0f;
-			sprite->mulY = 0.0f;
-			sprite->alpha = 1.0f;
+			sprite->alpha = 0.0f;
 			sprite->timer = 0;
-			sprite->startFrame = 0;
-			sprite->duration = 8;
-			if (sprite->scale <= 0.0f) {
-				sprite->scale = 1.0f;
-			}
+			BonusSpriteFlags(sprite) = 0;
 		}
 
 		if (header->count > 0) {
+			sprites[0].kind = 0x16;
+			sprites[0].startFrame = 0;
 			sprites[0].duration = 8;
 		}
 		if (header->count > 1) {
+			sprites[1].startFrame = 0;
 			sprites[1].duration = 8;
 		}
 		if (header->count > 2) {
+			sprites[2].kind = 0x1f;
+			sprites[2].mulX = 0.0f;
+			sprites[2].mulY = 0.0f;
+			sprites[2].startFrame = 0;
 			sprites[2].duration = 2;
 		}
 		if (header->count > 3) {
+			sprites[3].kind = -4;
+			sprites[3].startFrame = 0;
 			sprites[3].duration = 8;
-			GetBonusArtiBasePositions(&sprites[3]);
 		}
 
 		if (activePartyCount > 0) {
 			for (int i = 0; i < activePartyCount; i++) {
-				sprites[iconBase + i].timer = 0;
-				sprites[iconBase + i].startFrame = 0;
-				sprites[iconBase + i].duration = 8;
-				sprites[nameBase + i].timer = 0;
-				sprites[nameBase + i].startFrame = 0;
-				sprites[nameBase + i].duration = 8;
-				sprites[detailBase + i].timer = 0;
-				sprites[detailBase + i].startFrame = 0;
-				sprites[detailBase + i].duration = 8;
-				sprites[markBase + i].timer = 0;
-				sprites[markBase + i].startFrame = 0;
-				sprites[markBase + i].duration = 8;
-				sprites[lowerNameBase + i].timer = 0;
-				sprites[lowerNameBase + i].startFrame = 0;
-				sprites[lowerNameBase + i].duration = 8;
+				SetupSelectCloseSpriteMotion(&sprites[iconBase + i]);
+			}
+
+			s_PlayerTop = (unsigned char)nameBase;
+			for (int i = 0; i < activePartyCount; i++) {
+				SetupSelectCloseSpriteMotion(&sprites[nameBase + i]);
+			}
+		}
+
+		s_ArtiTop = (unsigned char)slotBase;
+		for (int i = 0; i < 8; i++) {
+			sprites[slotBase + i].timer = 0;
+			sprites[slotBase + i].startFrame = 0;
+			sprites[slotBase + i].duration = 8;
+		}
+
+		if (activePartyCount > 0) {
+			for (int i = 0; i < activePartyCount; i++) {
+				SetupSelectCloseSpriteMotion(&sprites[detailBase + i]);
+			}
+
+			for (int i = 0; i < activePartyCount; i++) {
+				SetupSelectCloseSpriteMotion(&sprites[markBase + i]);
 			}
 
 			for (int i = 0; i < activePartyCount; i++) {
@@ -1595,15 +1619,18 @@ void CMenuPcs::CalcSelectCloseAnim()
 				BonusAnimSprite* nameSprite = &sprites[lowerNameBase + i];
 				nameSprite->x = (short)(iconSprite->x + 0x50);
 				nameSprite->y = (short)(iconSprite->y + 0x48);
+				nameSprite->startFrame = iconSprite->startFrame;
+				nameSprite->timer = 0;
+				nameSprite->duration = 8;
+				nameSprite->depth = 1.0f;
+				nameSprite->motionX = 100.0f;
+				nameSprite->motionY = 0.0f;
+				nameSprite->targetX = (float)nameSprite->x + nameSprite->motionX;
+				nameSprite->targetY = (float)nameSprite->y + nameSprite->motionY;
 			}
 		}
 
-		for (int i = 0; i < 8; i++) {
-			sprites[slotBase + i].timer = 0;
-			sprites[slotBase + i].startFrame = 0;
-			sprites[slotBase + i].duration = 8;
-		}
-
+		*(short*)(animPtr + 6) = 0;
 		*(unsigned char*)(statePtr + 0xb) = 1;
 	}
 
@@ -1613,17 +1640,34 @@ void CMenuPcs::CalcSelectCloseAnim()
 
 	for (int i = 0; i < (int)header->count; i++) {
 		BonusAnimSprite* sprite = &sprites[i];
-		if (frame < sprite->startFrame) {
-			continue;
+		int flags = BonusSpriteFlags(sprite);
+
+		if ((flags & 1) == 0) {
+			if (frame < sprite->startFrame) {
+				sprite->alpha = 0.0f;
+			}
+			if (frame < sprite->startFrame + sprite->duration) {
+				sprite->alpha = 1.0f - ((float)sprite->timer / (float)sprite->duration);
+			} else {
+				sprite->alpha = 0.0f;
+			}
+		} else {
+			sprite->alpha = 0.0f;
 		}
 
-		if (frame < sprite->startFrame + sprite->duration) {
-			sprite->timer++;
-		} else {
+		if (sprite->startFrame + sprite->duration <= frame || sprite->startFrame > 9998) {
 			doneCount++;
 		}
 
-		ApplySelectCloseSpriteMotion(sprite, frame);
+		if ((flags & 2) == 0 && (sprite->motionX != 0.0f || sprite->motionY != 0.0f)) {
+			float progress = 1.0f - ((float)sprite->timer / (float)sprite->duration);
+			sprite->motionX = (sprite->targetX - (float)sprite->x) * progress;
+			sprite->motionY = (sprite->targetY - (float)sprite->y) * progress;
+		}
+
+		if (sprite->startFrame < frame && frame <= sprite->startFrame + sprite->duration) {
+			sprite->timer++;
+		}
 	}
 
 	if (doneCount == (int)header->count) {
@@ -2404,64 +2448,33 @@ void CMenuPcs::CalcResultCloseAnim()
 
 	for (int i = 0; i < (int)header->count; i++) {
 		BonusAnimSprite* sprite = &sprites[i];
-		float progress = CalcBonusSpriteProgress(sprite, frame);
-		float fade;
+		int flags = BonusSpriteFlags(sprite);
 
-		if (progress < 0.0f) {
-			continue;
-		}
-
-		sprite->timer = frame - sprite->startFrame + 1;
-		fade = 1.0f - progress;
-		if (i >= frameEchoBase) {
-			fade *= 0.8f;
-		}
-		sprite->alpha = ClampBonusUnit(fade);
-
-		if (i == 0) {
-			sprite->mulX = 0.0f;
-			sprite->mulY = 0.0f;
-			sprite->scale = 3.0f - progress * 1.5f;
-		} else if (i >= frameBase && i < iconBase) {
-			float dir = (i & 1) ? 1.0f : -1.0f;
-			sprite->mulX = (-36.0f - i * 2.0f) * progress;
-			sprite->mulY = dir * 6.0f * progress;
-			sprite->scale = 1.0f - progress * 0.08f;
-		} else if (i >= iconBase && i < digitBase) {
-			float dir = (i & 1) ? -1.0f : 1.0f;
-			sprite->mulX = (42.0f + i * 3.0f) * dir * progress;
-			sprite->mulY = -24.0f * progress;
-			sprite->scale = 1.0f - progress * 0.12f;
-		} else if (i >= digitBase && i < frameEchoBase) {
-			sprite->mulX = 10.0f * progress;
-			sprite->mulY = -38.0f * progress;
-			sprite->scale = 1.0f - progress * 0.2f;
-		} else if (i >= frameEchoBase && i < iconEchoBase) {
-			sprite->mulX = -64.0f * progress;
-			sprite->mulY = 18.0f * progress;
-			sprite->scale = 0.96f - progress * 0.18f;
-		} else if (i >= iconEchoBase && i < digitEchoBase) {
-			sprite->mulX = 64.0f * progress;
-			sprite->mulY = 10.0f * progress;
-			sprite->scale = 0.92f - progress * 0.15f;
-		} else if (i >= digitEchoBase && i < nameBase) {
-			sprite->mulX = 18.0f * progress;
-			sprite->mulY = -52.0f * progress;
-			sprite->scale = 0.9f - progress * 0.2f;
+		if ((flags & 1) == 0) {
+			if (frame < sprite->startFrame) {
+				sprite->alpha = 0.0f;
+			}
+			if (frame < sprite->startFrame + sprite->duration) {
+				sprite->alpha = 1.0f - ((float)sprite->timer / (float)sprite->duration);
+			} else {
+				sprite->alpha = 0.0f;
+			}
 		} else {
-			sprite->mulX = 18.0f * progress;
-			sprite->mulY = 4.0f * progress;
-			sprite->scale = 1.0f;
+			sprite->alpha = 0.0f;
 		}
 
-		if (sprite->scale < 0.0f) {
-			sprite->scale = 0.0f;
-		}
-		if (progress >= 1.0f) {
+		if (sprite->startFrame + sprite->duration <= frame || sprite->startFrame > 9998) {
 			doneCount++;
 		}
-		if (sprite->timer == 1 && (i == frameBase || i == frameEchoBase)) {
-			Sound.PlaySe(0x49, 0x40, 0x7f, 0);
+
+		if ((flags & 2) == 0 && (sprite->motionX != 0.0f || sprite->motionY != 0.0f)) {
+			float progress = 1.0f - ((float)sprite->timer / (float)sprite->duration);
+			sprite->motionX = (sprite->targetX - (float)sprite->x) * progress;
+			sprite->motionY = (sprite->targetY - (float)sprite->y) * progress;
+		}
+
+		if (sprite->startFrame < frame && frame <= sprite->startFrame + sprite->duration) {
+			sprite->timer++;
 		}
 	}
 

@@ -2423,9 +2423,7 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
                     CLineSegment64& segment = line->m_segments[i];
                     if (segment.startLength <= distance && distance < segment.startLength + segment.length) {
                         const float t = (distance - segment.startLength) / segment.length;
-                        position.x = line->m_points[i].x + (line->m_points[i + 1].x - line->m_points[i].x) * t;
-                        position.y = line->m_points[i].y + (line->m_points[i + 1].y - line->m_points[i].y) * t;
-                        position.z = line->m_points[i].z + (line->m_points[i + 1].z - line->m_points[i].z) * t;
+                        VECLerp(&line->m_points[i], &line->m_points[i + 1], &position, t);
                         break;
                     }
                 }

@@ -423,8 +423,7 @@ void CChara::TimeMogFur()
 			int b;
 			int a;
 			unsigned int newA;
-			unsigned int tileIndex = ((((x >> 2) & 1) + (((y >> 2) & 1) * 4) + (x >> 3) * 0x10 + (y >> 3) * 0x100) * 2) +
-			                         (((x & 3) + ((y & 3) * 4)) * 2);
+			unsigned int tileIndex = ((x % 4) + ((y % 4) * 4) + (x / 4) * 0x10 + (y / 4) * 0x100) * 2;
 			unsigned short packed = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(texels) + tileIndex);
 
 			a = (packed >> 12) & 7;
@@ -485,9 +484,7 @@ void CChara::CalcMogScore()
 				continue;
 			}
 
-			const int tileIndex =
-			    ((((x >> 2) & 1) + (((y >> 2) & 1) * 4) + (x >> 3) * 0x10 + (y >> 3) * 0x100) * 2) +
-			    (((x & 3) + ((y & 3) * 4)) * 2);
+			const int tileIndex = ((x % 4) + ((y % 4) * 4) + (x / 4) * 0x10 + (y / 4) * 0x100) * 2;
 
 			const unsigned short packed = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(texels) + tileIndex);
 			const int a = (packed >> 12) & 7;
@@ -1094,8 +1091,7 @@ void CChara::InitFurTexBuffer()
 	do {
 		int inner = 0;
 		int idx0 = row << 1;
-		int count = 8;
-		do {
+		for (int count = 8; count != 0; count--) {
 			int idxBase = inner + row;
 			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Chara) + idx0 + 4) = 0x7FFF;
 			idx0 += 0x10;
@@ -1107,8 +1103,7 @@ void CChara::InitFurTexBuffer()
 			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Chara) + ((idxBase + 5) << 1) + 4) = 0x7FFF;
 			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Chara) + ((idxBase + 6) << 1) + 4) = 0x7FFF;
 			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Chara) + ((idxBase + 7) << 1) + 4) = 0x7FFF;
-			count--;
-		} while (count != 0);
+		}
 		i++;
 		row += 0x40;
 	} while (i < 0x40);
@@ -1920,8 +1915,7 @@ void brush(unsigned short* pixels, int width, int height, float fx, float fy, in
 			distance = (dx < 0 ? -dx : dx) + (dy < 0 ? -dy : dy);
 			unsigned int ux = px;
 			unsigned int uy = py;
-			tileIndex = ((((ux >> 2) & 1) + (((uy >> 2) & 1) * 4) + (ux >> 3) * 0x10 + (uy >> 3) * width * 4) * 2) +
-			            (((ux & 3) + ((uy & 3) * 4)) * 2);
+			tileIndex = ((ux & 3) + ((uy & 3) * 4) + (ux >> 2) * 0x10 + (uy >> 2) * width * 4) * 2;
 			packed = *(unsigned short*)(((char*)pixels) + tileIndex);
 
 			b = packed & 0x0f;

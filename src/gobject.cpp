@@ -3330,11 +3330,9 @@ void CGObject::AddAnimPoint(int slot, int pointType, int pointFrame)
 
     u8* animRefBytes = reinterpret_cast<u8*>(animRef);
     u16* count = reinterpret_cast<u16*>(animRefBytes + 0x2C);
-    u8* point = animRefBytes + *count * 4;
 
-    *reinterpret_cast<u16*>(point + 0x2E) = static_cast<u16>(pointFrame);
-    point = animRefBytes + *count * 4;
-    *reinterpret_cast<u16*>(point + 0x30) = static_cast<u16>(pointType);
+    reinterpret_cast<u16*>(animRefBytes + 0x2E)[*count * 2] = static_cast<u16>(pointFrame);
+    reinterpret_cast<u16*>(animRefBytes + 0x30)[*count * 2] = static_cast<u16>(pointType);
     *count = static_cast<u16>(*count + 1);
 }
 

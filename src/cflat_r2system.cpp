@@ -4154,16 +4154,18 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         outResult = 0;
         return;
     }
-    case -0xEE:
+    case -0xEE: {
+        const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
         AStar.addAstar(
-            static_cast<float>(object->m_localBase[0]),
-            static_cast<float>(object->m_localBase[1]),
-            static_cast<float>(object->m_localBase[2]),
+            localFloats[0],
+            localFloats[1],
+            localFloats[2],
             object->m_localBase[3],
             object->m_localBase[4]);
         runtime->push(object, 0);
         outResult = 0;
         return;
+    }
     case -0xEF:
         AStar.calcAStar();
         runtime->push(object, 0);

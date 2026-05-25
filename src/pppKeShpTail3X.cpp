@@ -354,19 +354,17 @@ update_step:
         return;
     }
 
-    if (segRemain < trailLen) {
-        goto advance_segment;
+    if (segRemain >= trailLen) {
+        pos.x = segDx * (segCursor / segLen) + segBaseX;
+        pos.y = segDy * (segCursor / segLen) + segBaseY;
+        pos.z = segDz * (segCursor / segLen) + segBaseZ;
+        segCursor += trailLen;
+        segRemain -= trailLen;
+        segBaseX = pos.x;
+        segBaseY = pos.y;
+        segBaseZ = pos.z;
+        goto draw_loop;
     }
-
-    pos.x = segDx * (segCursor / segLen) + segBaseX;
-    pos.y = segDy * (segCursor / segLen) + segBaseY;
-    pos.z = segDz * (segCursor / segLen) + segBaseZ;
-    segCursor += trailLen;
-    segRemain -= trailLen;
-    segBaseX = pos.x;
-    segBaseY = pos.y;
-    segBaseZ = pos.z;
-    goto draw_loop;
 
 advance_segment:
     nextIndex++;

@@ -796,26 +796,14 @@ static void FurWriteTexel(unsigned short* tex, int x, int y, int r, int g, int b
 static void FurInitTextureDefaults()
 {
 	if (!s_mogFurBaseColorsInit) {
-		s_mogFurBaseColor.r = 0x80;
-		s_mogFurBaseColor.g = 0x80;
-		s_mogFurBaseColor.b = 0x80;
-		s_mogFurBaseColor.a = 0xFF;
-		s_mogFurTipColor.r = 0xF0;
-		s_mogFurTipColor.g = 0xF0;
-		s_mogFurTipColor.b = 0xF0;
-		s_mogFurTipColor.a = 0;
+		s_mogFurBaseColor = CColor(0x80, 0x80, 0x80, 0xFF).color;
+		s_mogFurTipColor = CColor(0xF0, 0xF0, 0xF0, 0).color;
 		s_mogFurBaseColorsInit = true;
 	}
 
 	if (!s_mogFurNoiseColorsInit) {
-		s_mogFurNoiseBaseColor.r = 0;
-		s_mogFurNoiseBaseColor.g = 0;
-		s_mogFurNoiseBaseColor.b = 0;
-		s_mogFurNoiseBaseColor.a = 0;
-		s_mogFurNoiseRangeColor.r = 8;
-		s_mogFurNoiseRangeColor.g = 8;
-		s_mogFurNoiseRangeColor.b = 8;
-		s_mogFurNoiseRangeColor.a = 0;
+		s_mogFurNoiseBaseColor = CColor(0, 0, 0, 0).color;
+		s_mogFurNoiseRangeColor = CColor(8, 8, 8, 0).color;
 		s_mogFurNoiseColorsInit = true;
 	}
 

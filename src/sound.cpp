@@ -289,6 +289,7 @@ void CLine<10>::Draw()
 
 void CLine<10>::CalcBound()
 {
+    CLine<10>* line = this;
     Vec* point = points;
     CLineSegment* segment = segments;
 

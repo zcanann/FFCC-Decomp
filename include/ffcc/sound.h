@@ -19,6 +19,9 @@ struct CLineSegment {
 template <int PointCount>
 struct CLine {
     CLine();
+    int Calc(Vec*, float*, unsigned long*, float*, Vec*, float);
+    void Draw();
+    void CalcBound();
 
     Vec min;
     Vec max;

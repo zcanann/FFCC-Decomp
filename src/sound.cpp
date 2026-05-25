@@ -151,8 +151,7 @@ CLine<PointCount>::CLine()
     pointCount = 0;
 }
 
-extern "C" int Calc__9CLine(float maxDistance, CLine<10>* line, Vec* outPos, float* outDistance, u32* outIndex,
-                             float* outT, const Vec* queryPos)
+int CLine<10>::Calc(Vec* outPos, float* outDistance, u32* outIndex, float* outT, Vec* queryPos, float maxDistance)
 {
     const float zero = kLineSegmentMinT;
     const bool infiniteRange = (zero == maxDistance);
@@ -168,8 +167,8 @@ extern "C" int Calc__9CLine(float maxDistance, CLine<10>* line, Vec* outPos, flo
     float bestT = kLineSegmentMinT;
     Vec bestPos;
 
-    for (u32 i = 0; i + 1 < line->pointCount; i++) {
-        Vec* candidate = &line->points[i];
+    for (u32 i = 0; i + 1 < pointCount; i++) {
+        Vec* candidate = &points[i];
         float distanceSq = PSVECSquareDistance(candidate, queryPos);
         if (distanceSq < maxDistanceSq || infiniteRange) {
             Vec candidatePosition = *candidate;
@@ -183,8 +182,8 @@ extern "C" int Calc__9CLine(float maxDistance, CLine<10>* line, Vec* outPos, flo
             }
         }
 
-        if (i + 1 == line->pointCount - 1) {
-            candidate = &line->points[i + 1];
+        if (i + 1 == pointCount - 1) {
+            candidate = &points[i + 1];
             distanceSq = PSVECSquareDistance(candidate, queryPos);
             if (distanceSq < maxDistanceSq || infiniteRange) {
                 Vec candidatePosition = *candidate;
@@ -199,15 +198,15 @@ extern "C" int Calc__9CLine(float maxDistance, CLine<10>* line, Vec* outPos, flo
             }
         }
 
-        CLineSegment& segment = line->segments[i];
+        CLineSegment& segment = segments[i];
         const float dotQuery = PSVECDotProduct(queryPos, &segment.delta);
-        const float dotStart = PSVECDotProduct(&line->points[i], &segment.delta);
+        const float dotStart = PSVECDotProduct(&points[i], &segment.delta);
         const float t = (dotQuery - dotStart) / (segment.length * segment.length);
         if (((kLineSegmentMinT <= t) && (t <= kLineSegmentMaxT)) || infiniteRange) {
             Vec scaled;
             Vec projected;
             PSVECScale(&segment.delta, &scaled, t);
-            PSVECAdd(&line->points[i], &scaled, &projected);
+            PSVECAdd(&points[i], &scaled, &projected);
             const float distance = PSVECDistance(queryPos, &projected);
             if (distance < bestDistance) {
                 bestDistance = distance;
@@ -237,50 +236,50 @@ extern "C" int Calc__9CLine(float maxDistance, CLine<10>* line, Vec* outPos, flo
     return found;
 }
 
-extern "C" void Draw__9CLine(CLine<10>* line)
+void CLine<10>::Draw()
 {
-    if (line->pointCount == 0) {
+    if (pointCount == 0) {
         return;
     }
 
-    GXBegin((GXPrimitive)0xB0, GX_VTXFMT0, (u16)(line->pointCount & 0xFFFF));
-    for (u32 i = 0; i < line->pointCount; i++) {
+    GXBegin((GXPrimitive)0xB0, GX_VTXFMT0, (u16)(pointCount & 0xFFFF));
+    for (u32 i = 0; i < pointCount; i++) {
         float x;
         float y;
         float z;
-        z = line->points[i].z;
-        y = line->points[i].y;
-        x = line->points[i].x;
+        z = points[i].z;
+        y = points[i].y;
+        x = points[i].x;
         GXWGFifo.f32 = x;
         GXWGFifo.f32 = y;
         GXWGFifo.f32 = z;
     }
 
-    GXBegin((GXPrimitive)0xB0, GX_VTXFMT0, (u16)(line->pointCount & 0xFFFF));
-    for (u32 i = 0; i < line->pointCount; i++) {
-        float x = line->points[i].x;
-        float y = FLOAT_80330cf4 + line->points[i].y;
-        float z = line->points[i].z;
+    GXBegin((GXPrimitive)0xB0, GX_VTXFMT0, (u16)(pointCount & 0xFFFF));
+    for (u32 i = 0; i < pointCount; i++) {
+        float x = points[i].x;
+        float y = FLOAT_80330cf4 + points[i].y;
+        float z = points[i].z;
         GXWGFifo.f32 = x;
         GXWGFifo.f32 = y;
         GXWGFifo.f32 = z;
     }
 
-    GXBegin((GXPrimitive)0xA8, GX_VTXFMT0, (u16)((line->pointCount & 0x7FFF) << 1));
-    for (u32 i = 0; i < line->pointCount; i++) {
+    GXBegin((GXPrimitive)0xA8, GX_VTXFMT0, (u16)((pointCount & 0x7FFF) << 1));
+    for (u32 i = 0; i < pointCount; i++) {
         float x;
         float y;
         float z;
-        z = line->points[i].z;
-        y = line->points[i].y;
-        x = line->points[i].x;
+        z = points[i].z;
+        y = points[i].y;
+        x = points[i].x;
         GXWGFifo.f32 = x;
         GXWGFifo.f32 = y;
         GXWGFifo.f32 = z;
         {
-            float raisedY = FLOAT_80330cf4 + line->points[i].y;
-            float raisedZ = line->points[i].z;
-            float raisedX = line->points[i].x;
+            float raisedY = FLOAT_80330cf4 + points[i].y;
+            float raisedZ = points[i].z;
+            float raisedX = points[i].x;
             GXWGFifo.f32 = raisedX;
             GXWGFifo.f32 = raisedY;
             GXWGFifo.f32 = raisedZ;
@@ -288,48 +287,48 @@ extern "C" void Draw__9CLine(CLine<10>* line)
     }
 }
 
-extern "C" void CalcBound__9CLine2(CLine<10>* line)
+void CLine<10>::CalcBound()
 {
-    Vec* point = line->points;
-    CLineSegment* segment = line->segments;
+    Vec* point = points;
+    CLineSegment* segment = segments;
 
-    line->min.x = kLineBoundsInitMin;
-    line->min.y = kLineBoundsInitMin;
-    line->min.z = kLineBoundsInitMin;
-    line->max.x = kLineBoundsInitMax;
-    line->max.y = kLineBoundsInitMax;
-    line->max.z = kLineBoundsInitMax;
-    line->totalLength = kLineSegmentMinT;
+    min.x = kLineBoundsInitMin;
+    min.y = kLineBoundsInitMin;
+    min.z = kLineBoundsInitMin;
+    max.x = kLineBoundsInitMax;
+    max.y = kLineBoundsInitMax;
+    max.z = kLineBoundsInitMax;
+    totalLength = kLineSegmentMinT;
 
     u32 i = 0;
-    while (i < line->pointCount) {
+    while (i < pointCount) {
 
-        if (point->x < line->min.x) {
-            line->min.x = point->x;
+        if (point->x < min.x) {
+            min.x = point->x;
         }
-        if (point->y < line->min.y) {
-            line->min.y = point->y;
+        if (point->y < min.y) {
+            min.y = point->y;
         }
-        if (point->z < line->min.z) {
-            line->min.z = point->z;
+        if (point->z < min.z) {
+            min.z = point->z;
         }
 
-        if (point->x > line->max.x) {
-            line->max.x = point->x;
+        if (point->x > max.x) {
+            max.x = point->x;
         }
-        if (point->y > line->max.y) {
-            line->max.y = point->y;
+        if (point->y > max.y) {
+            max.y = point->y;
         }
-        if (point->z > line->max.z) {
-            line->max.z = point->z;
+        if (point->z > max.z) {
+            max.z = point->z;
         }
 
         if (i != 0) {
             CLineSegment* prevSegment = segment - 1;
             PSVECSubtract(point, point - 1, &prevSegment->delta);
             prevSegment->length = PSVECMag(&prevSegment->delta);
-            prevSegment->startLength = line->totalLength;
-            line->totalLength += prevSegment->length;
+            prevSegment->startLength = totalLength;
+            totalLength += prevSegment->length;
             if (prevSegment->length != kLineSegmentMinT) {
                 PSVECNormalize(&prevSegment->delta, &prevSegment->normal);
             }
@@ -889,7 +888,7 @@ void CSound::Draw()
     GXLoadPosMtxImm(cameraMatrix, 0);
 
     for (u32 i = 0; i < 8; i++) {
-        Draw__9CLine(&sound.m_lines[i]);
+        sound.m_lines[i].Draw();
     }
 }
 
@@ -1783,9 +1782,9 @@ void CSound::calcVolumePan(CSound::CSe3D* se3D, int& outVolume, int& outPan)
     Vec nearestPoint;
 
     if (se3D->m_lineIndex >= 0) {
-        iVar4 = Calc__9CLine(
-            se3D->m_farDistance, &SoundData(this).m_lines[se3D->m_lineIndex], &nearestPoint, &nearestDistance,
-            (u32*)0, &nearestT, reinterpret_cast<const Vec*>(&CameraPcs.m_targetX));
+        iVar4 = SoundData(this).m_lines[se3D->m_lineIndex].Calc(
+            &nearestPoint, &nearestDistance, (u32*)0, &nearestT, reinterpret_cast<Vec*>(&CameraPcs.m_targetX),
+            se3D->m_farDistance);
         if (iVar4 != 0) {
             PSMTXMultVec(CameraPcs.m_cameraMatrix, &nearestPoint, &nearestPoint);
             if (nearestDistance < se3D->m_nearDistance) {
@@ -2239,7 +2238,7 @@ void CSound::Add3DLine(int lineIndex, Vec* position)
     if (pointCount < 10) {
         sound.m_lines[lineIndex].pointCount = pointCount + 1;
         sound.m_lines[lineIndex].points[pointCount] = *position;
-        CalcBound__9CLine2(&sound.m_lines[lineIndex]);
+        sound.m_lines[lineIndex].CalcBound();
     } else {
         System.Printf(const_cast<char*>(s_soundLineTableFullFmt));
     }

@@ -174,6 +174,11 @@ static inline CharaBreakMeshRef* ModelMeshes(CChara::CModel* model)
     return *reinterpret_cast<CharaBreakMeshRef**>(reinterpret_cast<u8*>(model) + 0xAC);
 }
 
+static inline CharaBreakMeshData* MeshData(CChara::CMesh* mesh)
+{
+    return reinterpret_cast<CharaBreakMeshData*>(mesh->m_data);
+}
+
 static void CharaBreak_AfterDrawMeshCallback(CChara::CModel*, void*, void*, int, float (*)[4]);
 static void CharaBreak_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*)[4]);
 static void CharaBreak_BeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int);
@@ -230,7 +235,7 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
     CharaBreakWork* work;
     CChara::CModel* model;
     CGObject* handle;
-    u8* mesh;
+    CChara::CMesh* mesh;
     u32 i;
 
     stepData = (CharaBreakStep*)step;
@@ -284,7 +289,7 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
         }
     }
 
-    mesh = reinterpret_cast<u8*>(ModelMeshes(model));
+    mesh = model->m_meshes;
 
     if (work->m_meshBuffers == NULL) {
         work->m_miscValue = FLOAT_80332050;
@@ -301,17 +306,17 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
 
         for (i = 0; i < ModelData(model)->m_meshCount; i++) {
             {
-                CharaBreakMeshData* meshData = reinterpret_cast<CharaBreakMeshRef*>(mesh)->m_data;
+                CharaBreakMeshData* meshData = MeshData(mesh);
 
                 if (strcmp(meshData->m_name, sPppCharaBreakObjMeshName) == 0) {
                     gUtil.CalcBoundaryBoxQuantized(&work->m_bboxMin, &work->m_bboxMax,
-                        reinterpret_cast<CharaBreakMeshRef*>(mesh)->m_workPositions, meshData->m_vertexCount,
+                        mesh->m_workPositions, meshData->m_vertexCount,
                         ModelData(model)->m_posQuant);
                 }
             }
 
             ((u32*)work->m_meshBuffers)[i] = (u32)pppMemFree__FPv(
-                reinterpret_cast<CharaBreakMeshRef*>(mesh)->m_data->m_displayListCount << 2, ppvEnv->m_stagePtr,
+                MeshData(mesh)->m_displayListCount << 2, ppvEnv->m_stagePtr,
                 const_cast<char*>(s_pppCharaBreak_cpp), 0x3E9);
             u32 meshBuffer = ((u32*)work->m_meshBuffers)[i];
             if (meshBuffer == 0) {
@@ -319,7 +324,7 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
             }
 
             {
-                int displayListCount = reinterpret_cast<CharaBreakMeshRef*>(mesh)->m_data->m_displayListCount;
+                int displayListCount = MeshData(mesh)->m_displayListCount;
                 int* dlEntries = (int*)meshBuffer;
                 for (int dl = displayListCount - 1; dl >= 0; dl--) {
                     dlEntries[dl] = 0;
@@ -327,8 +332,8 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
             }
 
             {
-                int displayListCount = reinterpret_cast<CharaBreakMeshRef*>(mesh)->m_data->m_displayListCount;
-                CharaBreakDisplayList* displayList = reinterpret_cast<CharaBreakMeshRef*>(mesh)->m_data->m_displayLists;
+                int displayListCount = MeshData(mesh)->m_displayListCount;
+                CharaBreakDisplayList* displayList = MeshData(mesh)->m_displayLists;
                 int dl = displayListCount - 1;
                 CharaBreakDisplayListPair** dlEntries =
                     (CharaBreakDisplayListPair**)(meshBuffer + (dl << 2));
@@ -363,15 +368,15 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
                     (*dlEntries)->m_polygonCount = (u16)polygonCount;
 
                     CreatePolygon((*dlEntries)->m_polygonData, displayList->m_data, displayList->m_size,
-                                  model, (CChara::CMesh*)mesh);
+                                  model, mesh);
                     InitPolygonParameter((PCharaBreak*)stepData, (VCharaBreak*)work, (*dlEntries)->m_polygonData,
-                                         (*dlEntries)->m_polygonCount, model, (CChara::CMesh*)mesh);
+                                         (*dlEntries)->m_polygonCount, model, mesh);
 
                     dlEntries--;
                 }
             }
 
-            mesh += 0x14;
+            mesh++;
         }
     }
 
@@ -516,7 +521,7 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
     CharaBreakStep* stepData = (CharaBreakStep*)step;
     CharaBreakWork* workData = (CharaBreakWork*)work;
     CharaBreakModelData* modelData = reinterpret_cast<CharaBreakModelData*>(model->m_data);
-    CharaBreakMeshRef* mesh = reinterpret_cast<CharaBreakMeshRef*>(model->m_meshes);
+    CChara::CMesh* mesh = model->m_meshes;
     u32 meshIndex;
     s16 threshold;
 
@@ -526,14 +531,13 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
     for (meshIndex = 0; meshIndex < modelData->m_meshCount; meshIndex++) {
         s32 needsMtxUpdate = 0;
         Mtx meshToWorld;
-        CharaBreakMeshRef* meshRef = mesh;
-        CharaBreakMeshData* meshData = meshRef->m_data;
+        CChara::CMesh* meshRef = mesh;
+        CharaBreakMeshData* meshData = MeshData(meshRef);
         S16Vec* workPositions = meshRef->m_workPositions;
 
         if (meshData->m_skinCount == 0 && stepData->m_worldSpaceMode == 1) {
             needsMtxUpdate = 1;
-            PSMTXConcat(model->m_matrix, *(Mtx*)((u8*)model->m_nodes + (meshData->m_nodeIndex * 0xC0) + 0x6C),
-                        meshToWorld);
+            PSMTXConcat(model->m_matrix, model->m_nodes[meshData->m_nodeIndex].m_mtx, meshToWorld);
         }
 
         for (int dl = meshData->m_displayListCount - 1; dl >= 0; dl--) {
@@ -541,12 +545,12 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
                 reinterpret_cast<CharaBreakDisplayListPair**>(
                     reinterpret_cast<void**>(workData->m_meshBuffers)[meshIndex]);
             CharaBreakDisplayListPair* displayListPair = displayListPairs[dl];
-            u8* polygon = reinterpret_cast<u8*>(displayListPair->m_polygonData);
+            POLYGON_DATA* polygon = displayListPair->m_polygonData;
 
             for (u32 polyIndex = 0; polyIndex < displayListPair->m_polygonCount; polyIndex++) {
                 S16Vec transformed[3];
 
-                if (polygon[0] == 0) {
+                if (polygon->m_enabled == 0) {
                     int flags[3];
                     flags[0] = kCharaBreakInitialVertexFlag0;
                     flags[1] = kCharaBreakInitialVertexFlag1;
@@ -554,7 +558,7 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
 
                     for (int i = 0; i < 3; i++) {
                         S16Vec* dst = &transformed[i];
-                        S16Vec* srcPos = workPositions + *(u16*)(polygon + 0x22 + (i * 2));
+                        S16Vec* srcPos = workPositions + polygon->m_posIndices[i];
 
                         if (needsMtxUpdate) {
                             S16Vec worldPos;
@@ -574,7 +578,7 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
                                 if (dst->y < threshold) {
                                     flags[i] = 1;
                                 }
-                            } else if (*(short*)(polygon + 0x12 + (i * 6)) < threshold) {
+                            } else if ((&polygon->m_pos0)[i].y < threshold) {
                                 flags[i] = 1;
                             }
                         } else if (stepData->m_clipMode == 1) {
@@ -582,40 +586,40 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
                                 if (dst->y > threshold) {
                                     flags[i] = 1;
                                 }
-                            } else if (*(short*)(polygon + 0x12 + (i * 6)) > threshold) {
+                            } else if ((&polygon->m_pos0)[i].y > threshold) {
                                 flags[i] = 1;
                             }
                         }
                     }
 
                     if (flags[0] == 0) {
-                        polygon[0] = 0;
+                        polygon->m_enabled = 0;
                     } else {
-                        polygon[0] = 1;
+                        polygon->m_enabled = 1;
                         if (flags[1] == 0) {
-                            polygon[0] = 0;
+                            polygon->m_enabled = 0;
                         } else {
-                            polygon[0] = 1;
+                            polygon->m_enabled = 1;
                             if (flags[2] == 0) {
-                                polygon[0] = 0;
+                                polygon->m_enabled = 0;
                             } else {
-                                polygon[0] = 1;
+                                polygon->m_enabled = 1;
                             }
                         }
                     }
 
-                    if (stepData->m_worldSpaceMode == 1 && polygon[0] != 0) {
-                        *(S16Vec*)(polygon + 0x10) = transformed[0];
-                        *(S16Vec*)(polygon + 0x16) = transformed[1];
-                        *(S16Vec*)(polygon + 0x1C) = transformed[2];
+                    if (stepData->m_worldSpaceMode == 1 && polygon->m_enabled != 0) {
+                        polygon->m_pos0 = transformed[0];
+                        polygon->m_pos1 = transformed[1];
+                        polygon->m_pos2 = transformed[2];
                     }
                 }
 
-                if (polygon[0] == 0) {
+                if (polygon->m_enabled == 0) {
                     if (stepData->m_worldSpaceMode == 1) {
-                        *(S16Vec*)(polygon + 0x10) = transformed[0];
-                        *(S16Vec*)(polygon + 0x16) = transformed[1];
-                        *(S16Vec*)(polygon + 0x1C) = transformed[2];
+                        polygon->m_pos0 = transformed[0];
+                        polygon->m_pos1 = transformed[1];
+                        polygon->m_pos2 = transformed[2];
                     }
                 } else {
                     Vec center;
@@ -623,9 +627,9 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
                     center.y = FLOAT_80332048;
                     center.x = FLOAT_80332048;
 
-                    int sumX = (int)*(short*)(polygon + 0x10) + (int)*(short*)(polygon + 0x16) + (int)*(short*)(polygon + 0x1C);
-                    int sumY = (int)*(short*)(polygon + 0x12) + (int)*(short*)(polygon + 0x18) + (int)*(short*)(polygon + 0x1E);
-                    int sumZ = (int)*(short*)(polygon + 0x14) + (int)*(short*)(polygon + 0x1A) + (int)*(short*)(polygon + 0x20);
+                    int sumX = (int)polygon->m_pos0.x + (int)polygon->m_pos1.x + (int)polygon->m_pos2.x;
+                    int sumY = (int)polygon->m_pos0.y + (int)polygon->m_pos1.y + (int)polygon->m_pos2.y;
+                    int sumZ = (int)polygon->m_pos0.z + (int)polygon->m_pos1.z + (int)polygon->m_pos2.z;
                     short avgX = (short)(sumX / 3);
                     short avgY = (short)(sumY / 3);
                     short avgZ = (short)(sumZ / 3);
@@ -643,28 +647,28 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
                         float sinValue;
 
                         for (int i = 0; i < 3; i++) {
-                            S16Vec pos = *reinterpret_cast<S16Vec*>(polygon + 0x10 + (i * 6));
+                            S16Vec pos = (&polygon->m_pos0)[i];
                             gUtil.ConvI2FVector(verts[i], pos, modelData->m_posQuant);
                             PSVECAdd(&center, &verts[i], &center);
                         }
 
                         PSVECScale(&center, &center, FLOAT_80332058);
 
-                        normalB = *reinterpret_cast<S16Vec*>(polygon + 0xA);
+                        normalB = polygon->m_normalB;
                         gUtil.ConvI2FVector(axis, normalB, modelData->m_normQuant);
 
-                        normalA = *reinterpret_cast<S16Vec*>(polygon + 4);
+                        normalA = polygon->m_normalA;
                         gUtil.ConvI2FVector(velocity, normalA, modelData->m_normQuant);
                         PSVECScale(&velocity, &velocity, stepData->m_velocityBase + Math.RandF(stepData->m_velocityRange));
 
-                        C_QUATRotAxisRad(&rotQuat, &axis, FLOAT_8033205c * (float)polygon[1]);
+                        C_QUATRotAxisRad(&rotQuat, &axis, FLOAT_8033205c * (float)polygon->m_alpha);
                         PSMTXQuat(rotMtx, &rotQuat);
                         cosValue = FLOAT_80332048;
                         sinValue = cosValue;
 
                         if (stepData->m_spinMode == 1) {
-                            short* angleState = (short*)(polygon + 4);
-                            if (*(short*)(polygon + 6) == 0) {
+                            short* angleState = &polygon->m_normalA.x;
+                            if (polygon->m_normalA.y == 0) {
                                 int rand10 = (rand() % 10) + 10;
                                 *angleState += rand10;
                             } else {
@@ -698,12 +702,12 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
 
                             if (stepData->m_spinMode == 0) {
                                 verts[i].x += velocity.x;
-                                verts[i].y += velocity.y - stepData->m_gravity * (float)*(u16*)(polygon + 2);
+                                verts[i].y += velocity.y - stepData->m_gravity * (float)polygon->_pad2;
                                 verts[i].z += velocity.z;
                             } else if (stepData->m_spinMode == 1) {
                                 wobbleScale = FLOAT_8033204c + Math.RandF(FLOAT_80332064);
                                 verts[i].x += cosValue * wobbleScale;
-                                verts[i].y += velocity.y - stepData->m_gravity * (float)*(u16*)(polygon + 2);
+                                verts[i].y += velocity.y - stepData->m_gravity * (float)polygon->_pad2;
                                 wobbleScale = FLOAT_8033204c + Math.RandF(FLOAT_80332064);
                                 verts[i].z += sinValue * wobbleScale;
                             }
@@ -712,14 +716,13 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
                             verts[i].y += stepData->m_direction.y * workData->m_value3;
                             verts[i].z += stepData->m_direction.z * workData->m_value3;
 
-                            gUtil.ConvF2IVector(*reinterpret_cast<S16Vec*>(polygon + 0x10 + (i * 6)), verts[i],
-                                modelData->m_posQuant);
+                            gUtil.ConvF2IVector((&polygon->m_pos0)[i], verts[i], modelData->m_posQuant);
                         }
-                        *(u16*)(polygon + 2) = *(u16*)(polygon + 2) + 1;
+                        polygon->_pad2++;
                     }
                 }
 
-                polygon += 0x34;
+                polygon++;
             }
         }
 
@@ -740,8 +743,7 @@ void InitPolygonParameter(PCharaBreak* charaBreak, VCharaBreak*, POLYGON_DATA* p
                           CChara::CModel* model, CChara::CMesh* mesh)
 {
     CharaBreakStep* stepData = (CharaBreakStep*)charaBreak;
-    CharaBreakMeshRef* meshRef = reinterpret_cast<CharaBreakMeshRef*>(mesh);
-    S16Vec* workNormals = meshRef->m_workNormals;
+    S16Vec* workNormals = mesh->m_workNormals;
     u32 count = polygonCount;
     CChara::CModel* modelPtr = model;
     POLYGON_DATA* polygon = polygonData;
@@ -765,7 +767,7 @@ void InitPolygonParameter(PCharaBreak* charaBreak, VCharaBreak*, POLYGON_DATA* p
             polygon->m_enabled = 1;
         }
 
-        if (meshRef->m_data->m_skinCount == 0) {
+        if (MeshData(mesh)->m_skinCount == 0) {
             normal.x = Math.RandF(FLOAT_8033204c);
             normal.y = Math.RandF(FLOAT_8033204c);
             normal.z = Math.RandF(FLOAT_8033204c);
@@ -819,8 +821,7 @@ void InitPolygonParameter(PCharaBreak* charaBreak, VCharaBreak*, POLYGON_DATA* p
 void CreatePolygon(POLYGON_DATA* polygonData, void* displayList, unsigned long, CChara::CModel* model, CChara::CMesh* mesh)
 {
     u8* polygonBytes = (u8*)polygonData;
-    CharaBreakMeshRef* meshRef = reinterpret_cast<CharaBreakMeshRef*>(mesh);
-    CharaBreakMeshData* meshData = meshRef->m_data;
+    CharaBreakMeshData* meshData = MeshData(mesh);
     s32 isRigid = 0;
     S16Vec* workPositions;
     BOOL transformPositions = FALSE;
@@ -828,10 +829,9 @@ void CreatePolygon(POLYGON_DATA* polygonData, void* displayList, unsigned long, 
 
     if (meshData->m_skinCount == 0) {
         isRigid = 1;
-        PSMTXConcat(ModelDrawMtx(model), *(Mtx*)((u8*)ModelNodes(model) + (meshData->m_nodeIndex * 0xC0) + 0x6C),
-                    meshMtx);
+        PSMTXConcat(ModelDrawMtx(model), model->m_nodes[meshData->m_nodeIndex].m_mtx, meshMtx);
     }
-    workPositions = meshRef->m_workPositions;
+    workPositions = mesh->m_workPositions;
     u16* stream = (u16*)displayList;
 
     s32 keepReading = 1;
@@ -937,11 +937,11 @@ static void CharaBreak_AfterDrawMeshCallback(
     Mtx drawMtx;
 
     CharaBreakWork* workData = reinterpret_cast<CharaBreakWork*>(modelData);
-    CharaBreakMeshRef* meshArray = ModelMeshes(modelPtr);
+    CChara::CMesh* meshArray = modelPtr->m_meshes;
 
     if (workData->m_enabled != 0) {
-        CharaBreakMeshRef* meshRef = &meshArray[meshIndex];
-        CharaBreakMeshData* meshData = meshRef->m_data;
+        CChara::CMesh* meshRef = &meshArray[meshIndex];
+        CharaBreakMeshData* meshData = MeshData(meshRef);
         CharaBreakDisplayList* materialData = meshData->m_displayLists;
         PSMTXCopy(CameraMatrix(), cameraMtx);
 
@@ -972,7 +972,7 @@ static void CharaBreak_AfterDrawMeshCallback(
             GXSetVtxAttrFmt((GXVtxFmt)7, (GXAttr)13, GX_TEX_ST, GX_S16, 0xC);
             GXSetVtxAttrFmt((GXVtxFmt)7, (GXAttr)14, GX_TEX_ST, GX_S16, 0xC);
 
-            if (meshRef->m_data->m_skinCount == 0) {
+            if (MeshData(meshRef)->m_skinCount == 0) {
                 GXLoadPosMtxImm(cameraMtx, 0);
             } else {
                 PSMTXConcat(cameraMtx, meshMtx, drawMtx);

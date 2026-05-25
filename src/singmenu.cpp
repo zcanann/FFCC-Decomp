@@ -987,13 +987,13 @@ void CMenuPcs::destroySingleMenu()
 
     ptr = *reinterpret_cast<void**>(self + 0x82C);
     if (ptr != 0) {
-        delete[] static_cast<u8*>(ptr);
+        delete static_cast<u8*>(ptr);
         *reinterpret_cast<void**>(self + 0x82C) = 0;
     }
 
     ptr = *reinterpret_cast<void**>(self + 0x848);
     if (ptr != 0) {
-        delete[] static_cast<u8*>(ptr);
+        delete static_cast<u8*>(ptr);
         *reinterpret_cast<void**>(self + 0x848) = 0;
     }
 
@@ -1196,7 +1196,7 @@ void CMenuPcs::drawSingleMenu()
             }
 
             if (*reinterpret_cast<void**>(self + 0x848) != 0) {
-                delete[] static_cast<u8*>(*reinterpret_cast<void**>(self + 0x848));
+                delete static_cast<u8*>(*reinterpret_cast<void**>(self + 0x848));
                 *reinterpret_cast<void**>(self + 0x848) = 0;
             }
 

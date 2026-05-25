@@ -1671,10 +1671,10 @@ void CMenuPcs::SetExtraFontTlut(int fontNo, _GXColor color)
             out.g = color.g;
             out.b = color.b;
         } else {
-            float blend = 1.0f - static_cast<float>(i - 9) / 10.0f;
-            out.r = static_cast<u8>(245.5f - static_cast<float>(0xF5 - color.r) * blend);
-            out.g = static_cast<u8>(245.5f - static_cast<float>(0xF5 - color.g) * blend);
-            out.b = static_cast<u8>(245.5f - static_cast<float>(0xF5 - color.b) * blend);
+            float blend = FLOAT_80330808 - static_cast<float>(i - 9) / FLOAT_80330858;
+            out.r = static_cast<u8>(-(static_cast<float>(0xF5 - color.r) * blend - FLOAT_8033085C));
+            out.g = static_cast<u8>(-(static_cast<float>(0xF5 - color.g) * blend - FLOAT_8033085C));
+            out.b = static_cast<u8>(-(static_cast<float>(0xF5 - color.b) * blend - FLOAT_8033085C));
         }
 
         texture->SetTlutColor(i, out);

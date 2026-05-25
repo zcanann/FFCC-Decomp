@@ -1414,8 +1414,15 @@ void CChara::CModel::CalcSkin()
 	u16 meshCount = ModelMeshCount(this);
 	u32 i = 0;
 
-	gChara.gqrInit((posQuant << 24) | 0x70000 | (posQuant << 8) | 7,
-	               (normQuant << 24) | 0x70000 | (normQuant << 8) | 7, 0x0C070C07);
+	register u32 posGqr = (posQuant << 24) | 0x70000 | (posQuant << 8) | 7;
+	register u32 normGqr = (normQuant << 24) | 0x70000 | (normQuant << 8) | 7;
+	register u32 weightGqr = 0x0C070C07;
+
+	asm {
+		mtspr GQR5, posGqr
+		mtspr GQR6, normGqr
+		mtspr GQR7, weightGqr
+	}
 
 	while (i < meshCount) {
 		mesh->Calc(this);

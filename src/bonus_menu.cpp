@@ -1247,45 +1247,47 @@ void CMenuPcs::DrawBonusChkMark(float alpha)
  */
 void CMenuPcs::DrawArtiBase(CMenuPcs::Sprt2* sprt, float alpha)
 {
-	if (sprt == 0 || alpha <= 0.0f) {
+	if (alpha <= 0.0f) {
 		return;
 	}
 
 	BonusAnimSprite* sprite = reinterpret_cast<BonusAnimSprite*>(sprt);
 	float* pos = s_Base[0];
 	int statePtr = GetBonusMenuMembers(this).m_bonusStatePtr;
-	int selectedSlot = -1;
-	unsigned char activeMask = 0;
 	float width = (float)sprite->w;
 	float height = (float)sprite->h;
-
-	if (pos == 0) {
-		return;
-	}
-
-	if (statePtr != 0) {
-		selectedSlot = (*(short*)(statePtr + 0x26)) & 7;
-		activeMask = *(unsigned char*)(statePtr + 9);
-	}
 
 	SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 	SetTexture(static_cast<CMenuPcs::TEX>(0x1A));
 
-	for (int i = 0; i < 8; i++) {
-		float slotAlpha = ClampBonusUnit(alpha);
-
-		if ((activeMask & (1 << i)) != 0) {
-			slotAlpha = ClampBonusUnit(slotAlpha * 0.85f + 0.15f);
-		} else {
-			slotAlpha *= 0.65f;
-		}
-		if (i == selectedSlot) {
-			slotAlpha = ClampBonusUnit(alpha * 1.2f);
-		}
-
-		_GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(slotAlpha * 255.0f)};
+	if (*(short*)(statePtr + 0x1c) != 4) {
+		_GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(alpha * 255.0f)};
 		GXSetChanMatColor(GX_COLOR0A0, color);
-		DrawRect(0, pos[i * 2 + 0], pos[i * 2 + 1], width, height,
+	}
+
+	int partyIndex = 0;
+	for (int i = 0; i < s_Rinfo->m_partyCount; i++) {
+		if ((int)*(short*)(statePtr + 0xe) == s_Rinfo->m_party[i].m_rank) {
+			partyIndex = i;
+			break;
+		}
+	}
+
+	for (int i = 0; i < 8; i++) {
+		if (*(short*)(statePtr + 0x1c) == 4) {
+			float rgb = 1.0f;
+			if ((((int)s_Rinfo->m_missingArtifactMask | (int)s_Rinfo->m_party[partyIndex].m_ownedArtifactMask) & (1 << i)) != 0) {
+				rgb = 0.5f;
+			}
+			_GXColor color = {
+			    (unsigned char)(rgb * 255.0f),
+			    (unsigned char)(rgb * 255.0f),
+			    (unsigned char)(rgb * 255.0f),
+			    (unsigned char)(alpha * 255.0f),
+			};
+			GXSetChanMatColor(GX_COLOR0A0, color);
+		}
+		DrawRect(0, pos[i * 2 + 2], pos[i * 2 + 3], width, height,
 		    0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 	}
 }
@@ -3211,76 +3213,46 @@ void CMenuPcs::createBonus()
 	s_ArtiTop = 0;
 	s_PlayerTop = 0;
 
-	if (s_Rinfo == 0) {
-		s_Rinfo = new BonusSummaryData;
-	}
-	if (s_Base[0] == 0) {
-		s_Base[0] = new float[18];
-	}
-
-	if (statePtr == 0) {
-		statePtr = reinterpret_cast<int>(new unsigned char[sizeof(BonusMenuStateRaw)]);
-		GetBonusMenuMembers(this).m_bonusStatePtr = statePtr;
-	}
-	if (animPtr == 0) {
-		animPtr = reinterpret_cast<int>(new unsigned char[sizeof(BonusAnimList)]);
-		GetBonusMenuMembers(this).m_bonusAnimPtr = animPtr;
-	}
-	if (listPtr == 0) {
-		listPtr = reinterpret_cast<int>(new unsigned char[sizeof(BonusEffectSlotList)]);
-		GetBonusMenuMembers(this).m_bonusListPtr = listPtr;
-	}
-	if (auxPtr == 0) {
-		auxPtr = reinterpret_cast<int>(new unsigned char[sizeof(BonusMenuAuxRaw)]);
-		GetBonusMenuMembers(this).m_bonusAuxPtr = auxPtr;
-	}
-	if (boardPtr == 0) {
-		boardPtr = reinterpret_cast<int>(new unsigned char[sizeof(BonusBoardEntryList)]);
-		GetBonusMenuMembers(this).m_bonusBoardPtr = boardPtr;
+	s_Rinfo = new BonusSummaryData;
+	s_Base[0] = new float[18];
+	memset(s_Rinfo, 0, sizeof(*s_Rinfo));
+	for (int i = 0; i < 4; i++) {
+		s_Rinfo->m_tempArtifacts[i] = -1;
+		s_Rinfo->m_bossArtifacts[i] = -1;
+		s_Rinfo->m_party[i].m_partySlot = -1;
+		s_Rinfo->m_party[i].m_selectedItemId = -1;
+		s_Rinfo->m_party[i].m_selectedSlot = -1;
 	}
 
-	if (statePtr != 0) {
-		memset((void*)statePtr, 0, sizeof(BonusMenuStateRaw));
-		*(short*)(statePtr + 0x1c) = 0;
-		*(short*)(statePtr + 0x22) = 0;
-		*(unsigned char*)(statePtr + 0xb) = 0;
-	}
-	if (animPtr != 0) {
-		memset((void*)animPtr, 0, sizeof(BonusAnimList));
-	}
-	if (listPtr != 0) {
-		memset((void*)listPtr, 0, sizeof(BonusEffectSlotList));
-		BonusEffectSlotList* effectSlots = reinterpret_cast<BonusEffectSlotList*>(listPtr);
-		for (int i = 0; i < 5; i++) {
-			InitBonusEffectSlotBlock(&effectSlots->slots[i]);
-		}
-	}
-	if (auxPtr != 0) {
-		memset((void*)auxPtr, 0, sizeof(BonusMenuAuxRaw));
-		*(short*)(auxPtr + 10) = 3;
-	}
-	if (boardPtr != 0) {
-		memset((void*)boardPtr, 0, sizeof(BonusBoardEntryList));
-		BonusBoardEntryList* boardEntries = reinterpret_cast<BonusBoardEntryList*>(boardPtr);
-		for (int i = 0; i < 0x18; i++) {
-			InitBonusBoardEntry(&boardEntries->entries[i]);
-		}
-	}
-	if (s_Rinfo != 0) {
-		memset(s_Rinfo, 0, sizeof(*s_Rinfo));
-		for (int i = 0; i < 4; i++) {
-			s_Rinfo->m_tempArtifacts[i] = -1;
-			s_Rinfo->m_bossArtifacts[i] = -1;
-			s_Rinfo->m_party[i].m_partySlot = -1;
-			s_Rinfo->m_party[i].m_selectedItemId = -1;
-			s_Rinfo->m_party[i].m_selectedSlot = -1;
-		}
-	}
-	if (s_Base[0] != 0) {
-		memset(s_Base[0], 0, sizeof(float) * 18);
-	}
+	statePtr = reinterpret_cast<int>(new unsigned char[sizeof(BonusMenuStateRaw)]);
+	GetBonusMenuMembers(this).m_bonusStatePtr = statePtr;
+	animPtr = reinterpret_cast<int>(new unsigned char[sizeof(BonusAnimList)]);
+	GetBonusMenuMembers(this).m_bonusAnimPtr = animPtr;
+	listPtr = reinterpret_cast<int>(new unsigned char[sizeof(BonusEffectSlotList)]);
+	GetBonusMenuMembers(this).m_bonusListPtr = listPtr;
+	auxPtr = reinterpret_cast<int>(new unsigned char[sizeof(BonusMenuAuxRaw)]);
+	GetBonusMenuMembers(this).m_bonusAuxPtr = auxPtr;
+	boardPtr = reinterpret_cast<int>(new unsigned char[sizeof(BonusBoardEntryList)]);
+	GetBonusMenuMembers(this).m_bonusBoardPtr = boardPtr;
 
-	memset(GetBonusDisplayHandleSlots(this), 0, sizeof(CCharaPcs::CHandle*) * 0x18);
+	memset((void*)statePtr, 0, sizeof(BonusMenuStateRaw));
+	*(short*)(statePtr + 0x1c) = 0;
+	*(short*)(statePtr + 0x22) = 0;
+	*(unsigned char*)(statePtr + 0xb) = 0;
+	memset((void*)animPtr, 0, sizeof(BonusAnimList));
+	memset((void*)listPtr, 0, sizeof(BonusEffectSlotList));
+	BonusEffectSlotList* effectSlots = reinterpret_cast<BonusEffectSlotList*>(listPtr);
+	for (int i = 0; i < 5; i++) {
+		InitBonusEffectSlotBlock(&effectSlots->slots[i]);
+	}
+	memset((void*)auxPtr, 0, sizeof(BonusMenuAuxRaw));
+	*(short*)(auxPtr + 10) = 3;
+	memset((void*)boardPtr, 0, sizeof(BonusBoardEntryList));
+	BonusBoardEntryList* boardEntries = reinterpret_cast<BonusBoardEntryList*>(boardPtr);
+	for (int i = 0; i < 0x18; i++) {
+		InitBonusBoardEntry(&boardEntries->entries[i]);
+	}
+	memset(s_Base[0], 0, sizeof(float) * 18);
 
 	if (s_Rinfo != 0) {
 		int activeCount = 0;
@@ -3332,13 +3304,9 @@ void CMenuPcs::createBonus()
 
 		s_Rinfo->m_partyCount = activeCount;
 
-		if (activeCount > 0) {
-			short* bossArtifact = reinterpret_cast<short*>(Game.GetBossArtifact(activeCount, totalValue));
-			if (bossArtifact != 0) {
-				for (int i = 0; i < 4; i++) {
-					s_Rinfo->m_bossArtifacts[i] = bossArtifact[i];
-				}
-			}
+		short* bossArtifact = reinterpret_cast<short*>(Game.GetBossArtifact(activeCount, totalValue));
+		for (int i = 0; i < 4; i++) {
+			s_Rinfo->m_bossArtifacts[i] = bossArtifact[i];
 		}
 
 		s_Rinfo->m_missingArtifactMask = 0;
@@ -3414,6 +3382,8 @@ void CMenuPcs::createBonus()
 			}
 		}
 
+		memset(GetBonusDisplayHandleSlots(this), 0, sizeof(CCharaPcs::CHandle*) * 0x18);
+
 		if (listPtr != 0) {
 			CMemory::CStage* stage = GetBonusAllocStage(this);
 			CCharaPcs::CHandle** displaySlots = GetBonusDisplayHandleSlots(this);
@@ -3427,10 +3397,7 @@ void CMenuPcs::createBonus()
 					handle->Add();
 					handle->LoadModel(3, modelCode & 0xFFF, (modelCode >> 12) & 0xF, 0, -1, 0, 0);
 					handle->m_flags = 0x300543;
-					entry.m_partyHandle = handle;
-					int slotPtr = listPtr + i * 0x524;
-					*reinterpret_cast<CCharaPcs::CHandle**>(slotPtr) = handle;
-					*reinterpret_cast<int*>(slotPtr + 4) = -1;
+					displaySlots[i] = handle;
 				}
 
 				if (displaySlots != 0) {

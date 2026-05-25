@@ -11,15 +11,16 @@
 #include "ffcc/linkage.h"
 #include "ffcc/materialman.h"
 #include "ffcc/p_camera.h"
+#include "ffcc/p_chara.h"
 #include "ffcc/p_menu.h"
 #include "ffcc/p_light.h"
 #include "ffcc/pad.h"
+#include "ffcc/render_buffers.h"
 #include "ffcc/sound.h"
 #include "ffcc/system.h"
 #include "ffcc/textureman.h"
 #include "ffcc/cflat_runtime2.h"
 
-#include <math.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -28,6 +29,10 @@ extern const float kPppLensFlareAlphaScale = 0.0078125f;
 extern const float kPppLensFlareNegate = -1.0f;
 extern const float kPppLensFlareZScale = 16777215.0f;
 extern const double kPppLensFlareDoubleMagic = 4503599627370496.0;
+extern "C" {
+double atan2(double, double);
+double sqrt(double);
+}
 unsigned long long g_chara_fur_1;
 unsigned long long g_chara_fur_2;
 
@@ -54,10 +59,17 @@ extern "C" char sMogRadarDebugFormatBlock[];
 extern "C" char sMogFurTextureName[];
 extern "C" {
 extern unsigned char m_mogWork[0x30];
+void* DAT_8032EDEC;
 void* gMogFurTexBuffer;
 }
 extern float kCharaFurDepthZero;
 extern float kCharaFurDepthScaleBase;
+extern float FLOAT_80331130;
+extern float FLOAT_80331134;
+extern float FLOAT_8033113C;
+extern float FLOAT_80331140;
+extern float FLOAT_80331144;
+extern float FLOAT_80331148;
 extern float kCharaFurViewDepthThreshold;
 extern float kCharaFurShadeScale;
 extern float FLOAT_80331154;
@@ -87,7 +99,9 @@ struct FurMaterialRaw
     unsigned char m_pad0[0x1C];
     short m_extraTextureIndex;
     unsigned char m_pad1E[0x1E];
-    CTexture* m_textures[4];
+    CTexture* m_texture0;
+    CTexture* m_pickTexture;
+    CTexture* m_textures[2];
     unsigned char m_pad4C[0x5B];
     unsigned char m_furEnable;
 };
@@ -143,8 +157,12 @@ struct FurTexCoordRaw
 
 struct FurProjectedVertex
 {
-    bool m_valid;
+    unsigned char m_valid;
     Vec m_viewPos;
+    float m_clipX;
+    float m_clipY;
+    float m_clipZ;
+    float m_clipW;
     float m_screenX;
     float m_screenY;
     float m_u;
@@ -255,74 +273,138 @@ static inline float QuantizedToFloat(short value, int frac)
     return static_cast<float>(value) / static_cast<float>(1 << frac);
 }
 
-static bool ProjectFurVertex(FurProjectedVertex& out, const FurMeshRaw* mesh, const Mtx modelViewMtx, unsigned short posIdx,
-                             unsigned short uvIdx, int posQuant)
+static inline void LoadFurPosition(register Vec* out, register const S16Vec* in)
 {
-    out.m_valid = false;
-    if (mesh == 0 || mesh->m_data == 0 || mesh->m_workPositions == 0 || mesh->m_data->m_uvs == 0) {
-        return false;
-    }
-    if (posIdx >= mesh->m_data->m_vertexCount || uvIdx >= mesh->m_data->m_uvCount) {
-        return false;
-    }
+	register float xy;
+	register float z;
+
+	asm {
+		psq_l xy, 0(in), 0, 5
+		psq_l z, 4(in), 1, 5
+		psq_st xy, 0(out), 0, 0
+		psq_st z, 8(out), 1, 0
+	}
+}
+
+static inline void LoadFurTexCoord(register float* out, register const FurTexCoordRaw* in)
+{
+	register float st;
+
+	asm {
+		psq_l st, 0(in), 0, 7
+		psq_st st, 0(out), 0, 0
+	}
+}
+
+static inline bool ProjectFurVertex(FurProjectedVertex& out, const FurMeshRaw* mesh, const Mtx modelViewMtx, Mtx44 screenMtx,
+                                    unsigned short posIdx, unsigned short uvIdx, int posQuant)
+{
+    static_cast<void>(posQuant);
+    out.m_valid = 0;
 
     const S16Vec& pos = mesh->m_workPositions[posIdx];
     const FurTexCoordRaw& uv = reinterpret_cast<FurTexCoordRaw*>(mesh->m_data->m_uvs)[uvIdx];
     Vec localPos;
-    localPos.x = QuantizedToFloat(pos.x, posQuant);
-    localPos.y = QuantizedToFloat(pos.y, posQuant);
-    localPos.z = QuantizedToFloat(pos.z, posQuant);
+    LoadFurPosition(&localPos, &pos);
     PSMTXMultVec(modelViewMtx, &localPos, &out.m_viewPos);
 
-    if (out.m_viewPos.z >= -0.0001f) {
+    if (out.m_viewPos.z >= 0.0f) {
         return false;
     }
 
     Vec4d clipPos;
-    Math.MTX44MultVec4(CameraPcs.m_screenMatrix, &out.m_viewPos, &clipPos);
-    if (clipPos.w == 0.0f) {
-        return false;
-    }
+    Math.MTX44MultVec4(screenMtx, &out.m_viewPos, &clipPos);
 
-    const float invW = 1.0f / clipPos.w;
-    out.m_screenX = clipPos.x * invW * 320.0f + 320.0f;
-    out.m_screenY = 224.0f - clipPos.y * invW * 224.0f;
-    out.m_u = static_cast<float>(uv.s) / 4096.0f;
-    out.m_v = static_cast<float>(uv.t) / 4096.0f;
-    out.m_valid = true;
+    const float invW = kCharaFurDepthScaleBase / clipPos.w;
+    out.m_clipX = clipPos.x;
+    out.m_clipY = clipPos.y;
+    out.m_clipZ = clipPos.z;
+    out.m_clipW = clipPos.w;
+    out.m_screenX = clipPos.x * invW * FLOAT_8033113C + FLOAT_8033113C;
+    out.m_screenY = FLOAT_80331134 - clipPos.y * invW * FLOAT_80331134;
+    LoadFurTexCoord(&out.m_u, &uv);
+    out.m_valid = 0x80;
     return true;
 }
 
-static bool FurPointInTriangle(float px, float py, const FurProjectedVertex& a, const FurProjectedVertex& b,
-                               const FurProjectedVertex& c, float& outW0, float& outW1, float& outW2)
+static inline bool FurPointInTriangle(float px, float py, const FurProjectedVertex& a, const FurProjectedVertex& b,
+                                      const FurProjectedVertex& c)
 {
-    const float v0x = b.m_screenX - a.m_screenX;
-    const float v0y = b.m_screenY - a.m_screenY;
-    const float v1x = c.m_screenX - a.m_screenX;
-    const float v1y = c.m_screenY - a.m_screenY;
-    const float v2x = px - a.m_screenX;
-    const float v2y = py - a.m_screenY;
-    const float denom = v0x * v1y - v1x * v0y;
-
-    if (denom > -0.0001f && denom < 0.0001f) {
+    const float edge0 = (py - a.m_screenY) * (b.m_screenX - a.m_screenX) -
+                        (px - a.m_screenX) * (b.m_screenY - a.m_screenY);
+    if (edge0 > 0.0f) {
         return false;
     }
-
-    const float invDenom = 1.0f / denom;
-    outW1 = (v2x * v1y - v1x * v2y) * invDenom;
-    outW2 = (v0x * v2y - v2x * v0y) * invDenom;
-    outW0 = 1.0f - outW1 - outW2;
-    return outW0 >= 0.0f && outW1 >= 0.0f && outW2 >= 0.0f;
+    const float edge1 = (py - b.m_screenY) * (c.m_screenX - b.m_screenX) -
+                        (px - b.m_screenX) * (c.m_screenY - b.m_screenY);
+    if (edge1 > 0.0f) {
+        return false;
+    }
+    const float edge2 = (py - c.m_screenY) * (a.m_screenX - c.m_screenX) -
+                        (px - c.m_screenX) * (a.m_screenY - c.m_screenY);
+    return edge2 <= 0.0f;
 }
 
-static void FurInterpolateHit(Vec& outViewPos, float& outU, float& outV, const FurProjectedVertex& a,
-                              const FurProjectedVertex& b, const FurProjectedVertex& c, float w0, float w1, float w2)
+static inline float FurHitDepth(const FurProjectedVertex& a, const FurProjectedVertex& b, const FurProjectedVertex& c)
 {
-    outViewPos.x = a.m_viewPos.x * w0 + b.m_viewPos.x * w1 + c.m_viewPos.x * w2;
-    outViewPos.y = a.m_viewPos.y * w0 + b.m_viewPos.y * w1 + c.m_viewPos.y * w2;
-    outViewPos.z = a.m_viewPos.z * w0 + b.m_viewPos.z * w1 + c.m_viewPos.z * w2;
-    outU = a.m_u * w0 + b.m_u * w1 + c.m_u * w2;
-    outV = a.m_v * w0 + b.m_v * w1 + c.m_v * w2;
+    return (a.m_clipW + b.m_clipW + c.m_clipW) / FLOAT_80331140;
+}
+
+static inline void FurInterpolateHit(Vec& outViewPos, float& outU, float& outV, Mtx44 screenMtx, float cursorX,
+                                     float cursorY, const FurProjectedVertex& a, const FurProjectedVertex& b,
+                                     const FurProjectedVertex& c)
+{
+    Mtx44 invScreenMtx;
+    PSMTX44Copy(screenMtx, invScreenMtx);
+    C_MTX44Inverse(invScreenMtx, invScreenMtx);
+
+    CVector rayStart((cursorX - FLOAT_8033113C) / FLOAT_8033113C,
+                     -(cursorY - FLOAT_80331134) / FLOAT_80331134, kCharaFurDepthZero);
+    CVector rayEnd(rayStart.x, rayStart.y, FLOAT_80331144);
+
+    PSMTX44MultVec(invScreenMtx, reinterpret_cast<Vec*>(&rayStart), reinterpret_cast<Vec*>(&rayStart));
+    PSMTX44MultVec(invScreenMtx, reinterpret_cast<Vec*>(&rayEnd), reinterpret_cast<Vec*>(&rayEnd));
+
+    Vec ray;
+    PSVECSubtract(reinterpret_cast<Vec*>(&rayEnd), reinterpret_cast<Vec*>(&rayStart), &ray);
+
+    Vec normalA;
+    Vec normalB;
+    Vec normal;
+    PSVECCrossProduct(&b.m_viewPos, &a.m_viewPos, &normalA);
+    PSVECCrossProduct(&c.m_viewPos, &a.m_viewPos, &normalB);
+    PSVECCrossProduct(&normalA, &normalB, &normal);
+    PSVECNormalize(&normal, &normal);
+
+    Vec planeDelta;
+    PSVECSubtract(&a.m_viewPos, reinterpret_cast<Vec*>(&rayStart), &planeDelta);
+    Vec scaledRay;
+    PSVECScale(&ray, &scaledRay, PSVECDotProduct(&normal, &planeDelta) / PSVECDotProduct(&normal, &ray));
+    PSVECAdd(reinterpret_cast<Vec*>(&rayStart), &scaledRay, &outViewPos);
+
+    Vec hitToA;
+    Vec hitToB;
+    Vec hitToC;
+    PSVECSubtract(&a.m_viewPos, &outViewPos, &hitToA);
+    PSVECSubtract(&b.m_viewPos, &outViewPos, &hitToB);
+    PSVECSubtract(&c.m_viewPos, &outViewPos, &hitToC);
+
+    Vec areaAB;
+    Vec areaBC;
+    Vec areaCA;
+    PSVECCrossProduct(&hitToA, &hitToB, &areaAB);
+    PSVECCrossProduct(&hitToB, &hitToC, &areaBC);
+    PSVECCrossProduct(&hitToC, &hitToA, &areaCA);
+
+    Vec weights;
+    weights.x = PSVECMag(&areaBC);
+    weights.y = PSVECMag(&areaCA);
+    weights.z = PSVECMag(&areaAB);
+    PSVECScale(&weights, &weights, FLOAT_80331148);
+    PSVECScale(&weights, &weights, kCharaFurDepthScaleBase / (weights.x + weights.y + weights.z));
+
+    outU = a.m_u * weights.x + b.m_u * weights.y + c.m_u * weights.z;
+    outV = a.m_v * weights.x + b.m_v * weights.y + c.m_v * weights.z;
 }
 
 static void DrawFurDisplayListShell(const FurMeshRaw* mesh, const FurDisplayListRaw* displayList, float shellOffset,
@@ -872,27 +954,31 @@ static void FurSetupTextureCopyEnv()
 
 static void FurInitHairSet(CHairSet& hair, unsigned int& rng)
 {
-	hair.m_vec0.x = 64.0f + (FurRand01(rng) - 0.5f) * 56.0f;
-	hair.m_vec0.y = 72.0f + FurRand01(rng) * 40.0f;
-	hair.m_vec0.z = 0.0f;
-	hair.m_vec1.x = s_mogFurVelocity.x + s_mogFurVelocityRand.x * FurRandSigned(rng);
-	hair.m_vec1.y = -(0.6f + s_mogFurVelocity.y + s_mogFurVelocityRand.y * FurRand01(rng));
-	hair.m_vec1.z = s_mogFurVelocity.z + s_mogFurVelocityRand.z * FurRandSigned(rng);
-	hair.m_colors[0].color = CColor(
-	    static_cast<unsigned char>((s_mogFurBaseColor.r >> 4) + s_mogFurNoiseBaseColor.r +
-	                               static_cast<int>(FurRand01(rng) * s_mogFurNoiseRangeColor.r)),
-	    static_cast<unsigned char>((s_mogFurBaseColor.g >> 4) + s_mogFurNoiseBaseColor.g +
-	                               static_cast<int>(FurRand01(rng) * s_mogFurNoiseRangeColor.g)),
-	    static_cast<unsigned char>((s_mogFurBaseColor.b >> 4) + s_mogFurNoiseBaseColor.b +
-	                               static_cast<int>(FurRand01(rng) * s_mogFurNoiseRangeColor.b)),
-	    s_mogFurBaseColor.a).color;
-	hair.m_colors[1].color = CColor(
-	    static_cast<unsigned char>((s_mogFurTipColor.r >> 4) + static_cast<int>(FurRand01(rng) * 2.0f)),
-	    static_cast<unsigned char>((s_mogFurTipColor.g >> 4) + static_cast<int>(FurRand01(rng) * 2.0f)),
-	    static_cast<unsigned char>((s_mogFurTipColor.b >> 4) + static_cast<int>(FurRand01(rng) * 2.0f)),
-	    s_mogFurTipColor.a).color;
+	float velocityScale = FurRandSigned(rng);
+	hair.m_vec0.x = s_mogFurVelocity.x + s_mogFurVelocityRand.x * velocityScale;
+	hair.m_vec0.y = s_mogFurVelocity.y + s_mogFurVelocityRand.y * velocityScale;
+	hair.m_vec0.z = s_mogFurVelocity.z + s_mogFurVelocityRand.z * velocityScale;
 
-	float endY = hair.m_vec0.y + hair.m_vec1.y;
+	float accelScale = FurRandSigned(rng);
+	hair.m_vec1.x = s_mogFurAccel.x + s_mogFurAccelRand.x * accelScale;
+	hair.m_vec1.y = s_mogFurAccel.y + s_mogFurAccelRand.y * accelScale;
+	hair.m_vec1.z = s_mogFurAccel.z + s_mogFurAccelRand.z * accelScale;
+
+	float baseColorScale = FurRandSigned(rng);
+	hair.m_colors[0].color = CColor(
+	    static_cast<unsigned char>(s_mogFurBaseColor.r + static_cast<int>(s_mogFurNoiseBaseColor.r * baseColorScale)),
+	    static_cast<unsigned char>(s_mogFurBaseColor.g + static_cast<int>(s_mogFurNoiseBaseColor.g * baseColorScale)),
+	    static_cast<unsigned char>(s_mogFurBaseColor.b + static_cast<int>(s_mogFurNoiseBaseColor.b * baseColorScale)),
+	    static_cast<unsigned char>(s_mogFurBaseColor.a + static_cast<int>(s_mogFurNoiseBaseColor.a * baseColorScale))).color;
+
+	float tipColorScale = FurRandSigned(rng);
+	hair.m_colors[1].color = CColor(
+	    static_cast<unsigned char>(s_mogFurTipColor.r + static_cast<int>(s_mogFurNoiseRangeColor.r * tipColorScale)),
+	    static_cast<unsigned char>(s_mogFurTipColor.g + static_cast<int>(s_mogFurNoiseRangeColor.g * tipColorScale)),
+	    static_cast<unsigned char>(s_mogFurTipColor.b + static_cast<int>(s_mogFurNoiseRangeColor.b * tipColorScale)),
+	    static_cast<unsigned char>(s_mogFurTipColor.a + static_cast<int>(s_mogFurNoiseRangeColor.a * tipColorScale))).color;
+
+	float endY = hair.m_vec0.y + FLOAT_80331148 * hair.m_vec1.y;
 	if (s_mogFurMaxY < endY) {
 		s_mogFurMaxY = endY;
 	}
@@ -1008,9 +1094,6 @@ static CTexture* FindMogFurTexture(void* model)
 {
 	unsigned char* modelBytes = reinterpret_cast<unsigned char*>(model);
 	CTextureSet* textureSet = *reinterpret_cast<CTextureSet**>(modelBytes + 0xB0);
-	if (textureSet == 0) {
-		return 0;
-	}
 
 	CPtrArray<CTexture*>* textureArray = reinterpret_cast<CPtrArray<CTexture*>*>(reinterpret_cast<char*>(textureSet) + 8);
 	unsigned int textureIdx = static_cast<unsigned int>(textureSet->Find(&sMogFurTextureName[0]));
@@ -1027,9 +1110,6 @@ static void CopyMogTextureFromChara(void* model)
 	void* dstBuffer = *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(texture) + 0x78);
 	const int texelCountBytes = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(texture) + 0x64) *
 	                            *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(texture) + 0x68) * 2;
-	if (dstBuffer == 0 || texelCountBytes <= 0) {
-		return;
-	}
 
 	Graphic._WaitDrawDone(const_cast<char*>(s_chara_fur_cpp), 0x506);
 	DCInvalidateRange(dstBuffer, texelCountBytes);
@@ -1048,9 +1128,6 @@ static void CopyMogTextureToChara(void* model)
 	void* srcBuffer = *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(texture) + 0x78);
 	const int texelCountBytes = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(texture) + 0x64) *
 	                            *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(texture) + 0x68) * 2;
-	if (srcBuffer == 0 || texelCountBytes <= 0) {
-		return;
-	}
 
 	Graphic._WaitDrawDone(const_cast<char*>(s_chara_fur_cpp), 0x506);
 	memcpy(reinterpret_cast<unsigned char*>(&Chara) + 4, srcBuffer, 0x2000);
@@ -1217,6 +1294,7 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 	}
 
 	if (work.m_frameCount == 0) {
+		messageId = 0;
 		work.m_prevScoreA = CharaS32(0x2018);
 		work.m_prevScoreB = CharaS32(0x201C);
 		work.m_prevScoreC = CharaS32(0x2020);
@@ -1279,6 +1357,9 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 		CharaU32(0x2010) = static_cast<unsigned int>(cursorY);
 	}
 
+	Mtx cameraMtx;
+	PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
+
 	if ((heldButtons & 0x100) != 0) {
 		const unsigned char radarType = MogRadarType();
 		const _GXColor brushColor = MogBrushColor(radarType);
@@ -1287,9 +1368,7 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 		_GXColor centerBefore = CColor(0xF, 0xF, 0xF, 0).color;
 		_GXColor centerAfter = centerBefore;
 		Vec worldPos;
-		Mtx cameraMtx;
 
-		PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
 		CopyMogTextureFromChara(this);
 		int pickResult = PickFur(cameraMtx, brushColor, doPaint, eraseMode, &centerBefore, &centerAfter, &worldPos);
 		CopyMogTextureToChara(this);
@@ -1396,6 +1475,7 @@ int CChara::CModel::PickFur(
 	if (static_cast<signed char>(m_flags10C << 1) >= 0) {
 		return -1;
 	}
+	register Vec* outWorldPos = worldPos;
 
 	CMaterialSet* materialSet = ModelMaterialSet(this);
 	FurMeshRaw* mesh = ModelMeshes(this);
@@ -1404,14 +1484,17 @@ int CChara::CModel::PickFur(
 	FurMaterialSetRaw* materialSetRaw = reinterpret_cast<FurMaterialSetRaw*>(materialSet);
 
 	const unsigned short meshCount = ModelMeshCount(this);
-	const int posQuant = ModelPosQuant(this) & 0xFF;
 	const float cursorX = static_cast<float>(CharaU32(0x200C));
 	const float cursorY = static_cast<float>(CharaU32(0x2010));
 	float hitU = 0.0f;
 	float hitV = 0.0f;
-	float nearestDepth = 1000000.0f;
-	bool hitFound = false;
-	Vec hitViewPos;
+	float nearestDepth = FLOAT_80331130;
+	int hitAny = 0;
+	int hitPaintable = 0;
+	CVector hitViewPos;
+	hitViewPos.Identity();
+	Mtx44 screenMtx;
+	PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
 
 	for (unsigned int meshIndex = 0; meshIndex < meshCount; meshIndex++, mesh++) {
 		if (mesh->m_workPositions == 0) {
@@ -1432,27 +1515,39 @@ int CChara::CModel::PickFur(
 
 		Mtx modelViewMtx;
 		PSMTXConcat(reinterpret_cast<MtxPtr>(param_2), meshMtx, modelViewMtx);
+		const unsigned int posGqr = ModelPosQuant(this);
+		const unsigned int normGqr = ModelNormQuant(this);
+		Chara.gqrInit(posGqr << 0x18 | 0x70000 | posGqr << 8 | 7,
+		              normGqr << 0x18 | 0x70000 | normGqr << 8 | 7, 0xc070c07);
 
 		FurDisplayListRaw* displayList = mesh->m_data->m_displayLists;
-		for (unsigned int displayIndex = 0; displayIndex < mesh->m_data->m_displayListCount; displayIndex++, displayList++) {
+		int displayCount = mesh->m_data->m_displayListCount;
+		while (--displayCount >= 0) {
 			CPtrArray<CMaterial*>* materials = reinterpret_cast<CPtrArray<CMaterial*>*>(&materialSetRaw->m_materials);
 			FurMaterialRaw* material = reinterpret_cast<FurMaterialRaw*>((*materials)[displayList->m_material]);
-			const bool furMaterial = material->m_furEnable != 0;
+			int paintableMaterial = 0;
+			if (material->m_pickTexture != 0 && material->m_pickTexture->m_format == 5) {
+				paintableMaterial = 1;
+			}
+			const int furMaterial = material->m_furEnable != 0;
 
 			const unsigned char* cursor = reinterpret_cast<const unsigned char*>(displayList->m_data);
 			int remaining = displayList->m_size;
+			if ((cursor[0] & 7) != 0) {
+				displayList++;
+				continue;
+			}
 			while (remaining > 0) {
 				const unsigned char command = cursor[0];
-				if ((command & 0xF8) == 0 || remaining < 3) {
+				if ((command & 0xF8) == 0) {
 					break;
 				}
 
 				const unsigned char primitive = command & 0xF8;
 				const unsigned short count = *reinterpret_cast<const unsigned short*>(cursor + 1);
 				cursor += 3;
-				remaining -= 3;
-
-				if (remaining < static_cast<int>(count) * 8) {
+				remaining -= static_cast<int>(count) * 8 + 3;
+				if (primitive != 0x90 && primitive != 0x98) {
 					break;
 				}
 
@@ -1464,32 +1559,29 @@ int CChara::CModel::PickFur(
 				for (unsigned short vertexIndex = 0; vertexIndex < count; vertexIndex++) {
 					const unsigned short* indices = reinterpret_cast<const unsigned short*>(cursor);
 					FurProjectedVertex current;
-					ProjectFurVertex(current, mesh, modelViewMtx, indices[0], indices[3], posQuant);
+					ProjectFurVertex(current, mesh, modelViewMtx, screenMtx, indices[0], indices[3], posGqr);
 
 					if (primitive == 0x90) {
 						if ((vertexIndex % 3) == 2) {
-							const unsigned short* triIndices = reinterpret_cast<const unsigned short*>(cursor - 16);
-							FurProjectedVertex a;
-							FurProjectedVertex b;
-							ProjectFurVertex(a, mesh, modelViewMtx, triIndices[0], triIndices[3], posQuant);
-							ProjectFurVertex(b, mesh, modelViewMtx, triIndices[4], triIndices[7], posQuant);
-
-							if (a.m_valid && b.m_valid && current.m_valid) {
-								float w0;
-								float w1;
-								float w2;
-								if (FurPointInTriangle(cursorX, cursorY, a, b, current, w0, w1, w2)) {
-									Vec viewHit;
-									float uvU;
-									float uvV;
-									FurInterpolateHit(viewHit, uvU, uvV, a, b, current, w0, w1, w2);
-									const float depth = -viewHit.z;
-									if (furMaterial && depth < nearestDepth) {
-										nearestDepth = depth;
-										hitViewPos = viewHit;
-										hitU = uvU;
-										hitV = uvV;
-										hitFound = true;
+							if (prev2.m_valid && prev1.m_valid && current.m_valid) {
+								const FurProjectedVertex& a = prev2;
+								const FurProjectedVertex& b = prev1;
+								if (FurPointInTriangle(cursorX, cursorY, a, b, current)) {
+									const float depth = FurHitDepth(a, b, current);
+									if (depth < nearestDepth) {
+										float uvU;
+										float uvV;
+										FurInterpolateHit(hitViewPos, uvU, uvV, screenMtx, cursorX, cursorY, a, b, current);
+										hitAny = 1;
+										if (outWorldPos != 0) {
+											*outWorldPos = hitViewPos;
+										}
+										if (furMaterial) {
+											nearestDepth = depth;
+											hitU = uvU;
+											hitV = uvV;
+											hitPaintable = paintableMaterial;
+										}
 									}
 								}
 							}
@@ -1499,66 +1591,60 @@ int CChara::CModel::PickFur(
 							const bool odd = (vertexIndex & 1) != 0;
 							const FurProjectedVertex& a = odd ? prev1 : prev2;
 							const FurProjectedVertex& b = odd ? prev2 : prev1;
-							float w0;
-							float w1;
-							float w2;
-							if (FurPointInTriangle(cursorX, cursorY, a, b, current, w0, w1, w2)) {
-								Vec viewHit;
-								float uvU;
-								float uvV;
-								FurInterpolateHit(viewHit, uvU, uvV, a, b, current, w0, w1, w2);
-								const float depth = -viewHit.z;
-								if (furMaterial && depth < nearestDepth) {
-									nearestDepth = depth;
-									hitViewPos = viewHit;
-									hitU = uvU;
-									hitV = uvV;
-									hitFound = true;
+							if (FurPointInTriangle(cursorX, cursorY, a, b, current)) {
+								const float depth = FurHitDepth(a, b, current);
+								if (depth < nearestDepth) {
+									float uvU;
+									float uvV;
+									FurInterpolateHit(hitViewPos, uvU, uvV, screenMtx, cursorX, cursorY, a, b, current);
+									hitAny = 1;
+									if (outWorldPos != 0) {
+										*outWorldPos = hitViewPos;
+									}
+									if (furMaterial) {
+										nearestDepth = depth;
+										hitU = uvU;
+										hitV = uvV;
+										hitPaintable = paintableMaterial;
+									}
 								}
 							}
 						}
-						prev2 = prev1;
-						prev1 = current;
 					}
 
+					prev2 = prev1;
+					prev1 = current;
 					cursor += 8;
-					remaining -= 8;
 				}
+			}
+			displayList++;
+		}
+	}
+
+	if (doPaint != 0 && hitPaintable != 0) {
+		CTexture* texture = FindMogFurTexture(this);
+		if (texture != 0 && texture->m_format == 5 && nearestDepth != kCharaFurDepthZero) {
+			_GXColor paintColor = brushColor;
+			_GXColor before;
+			_GXColor after;
+			brush(reinterpret_cast<unsigned short*>(texture->m_imageData), texture->m_width, texture->m_height, hitU, hitV, mode,
+			      paintColor, &before, &after);
+			if (centerBefore != 0) {
+				*centerBefore = before;
+			}
+			if (centerAfter != 0) {
+				*centerAfter = after;
 			}
 		}
 	}
 
-	if (!hitFound) {
-		return -1;
-	}
-
-	if (worldPos != 0) {
-		*worldPos = hitViewPos;
+	if (outWorldPos != 0) {
 		Mtx invViewMtx;
 		PSMTXInverse(param_2, invViewMtx);
-		PSMTXMultVec(invViewMtx, worldPos, worldPos);
+		PSMTXMultVec(invViewMtx, outWorldPos, outWorldPos);
 	}
 
-	if (doPaint == 0) {
-		return 1;
-	}
-
-	CTexture* texture = FindMogFurTexture(this);
-	if (texture == 0) {
-		return 1;
-	}
-
-	const unsigned int format = *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(texture) + 0x60);
-	if (format != 5) {
-		return 1;
-	}
-
-	unsigned short* dstPixels = *reinterpret_cast<unsigned short**>(reinterpret_cast<unsigned char*>(texture) + 0x78);
-	const int width = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(texture) + 0x64);
-	const int height = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(texture) + 0x68);
-
-	brush(dstPixels, width, height, hitU, hitV, mode, brushColor, centerBefore, centerAfter);
-	return 1;
+	return nearestDepth == FLOAT_80331130 ? -(hitAny == 0) : 1;
 }
 
 /*
@@ -1836,20 +1922,23 @@ void CChara::freeFurTex()
  */
 void CChara::makeFurTex()
 {
+	CHairSet hairSet[0x20];
+
 	FurInitTextureDefaults();
 	s_mogFurRand = 0;
 	s_mogFurMaxY = 0.0f;
 
-	CHairSet hairSet[0x20];
 	unsigned int rng = s_mogFurRand;
 
 	for (int i = 0; i < 0x20; i++) {
 		FurInitHairSet(hairSet[i], rng);
 	}
 
+	_GXColor savedCopyClear = Graphic.m_defaultCopyClearColor;
 	FurSetupTextureCopyEnv();
 
-	gMogFurTexBuffer = Memory._Alloc(0x20000, 0, const_cast<char*>(s_chara_fur_cpp), 0xE9, 0);
+	gMogFurTexBuffer = Memory._Alloc(0x20000, CharaPcs.m_viewerAnimStage, const_cast<char*>(s_chara_fur_cpp), 0xE9, 0);
+	DCInvalidateRange(gMogFurTexBuffer, 0x20000);
 	unsigned short* tex = reinterpret_cast<unsigned short*>(gMogFurTexBuffer);
 
 	for (int layer = 0; layer < 8; layer++) {
@@ -1879,6 +1968,19 @@ void CChara::makeFurTex()
 
 	DCFlushRange(gMogFurTexBuffer, 0x20000);
 	GXInvalidateTexAll();
+	GXPixModeSync();
+	Graphic.SetViewport();
+	Graphic.SetCopyClear(savedCopyClear, 0);
+	GXSetTexCopySrc(0, 0, 0x280, 0x1C0);
+	GXCopyTex(gRenderScratchTextureBuffer, GX_TRUE);
+	Graphic._WaitDrawDone(const_cast<char*>(s_chara_fur_cpp), 0x138);
+	if (DAT_8032EDEC != 0) {
+		Memory.Free(DAT_8032EDEC);
+		DAT_8032EDEC = 0;
+	}
+	Graphic.SetViewport();
+	Graphic.SetStdPixelFmt();
+	GXSetAlphaUpdate(GX_FALSE);
 }
 
 /*

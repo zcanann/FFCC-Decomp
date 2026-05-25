@@ -39,9 +39,11 @@ struct PYmMegaBirthShpTail3
     float m_speedRandRange;        // 0x54
     float field_0x58;              // 0x58
     Vec m_speedScale;              // 0x5c
-    unsigned char m_pad0x68[0x6A - 0x68];
-    short m_pathIndex;             // 0x6a
-    unsigned char m_pad0x6C[0xB9 - 0x6C];
+    unsigned char m_randType;       // 0x68
+    unsigned char m_enableParticleColor; // 0x69
+    unsigned char m_pad0x6a[0x6C - 0x6A];
+    short m_pathIndex;             // 0x6c
+    unsigned char m_pad0x6e[0xB9 - 0x6E];
     unsigned char m_wmatCopyMode;  // 0xb9
 };
 

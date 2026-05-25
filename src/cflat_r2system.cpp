@@ -3690,10 +3690,11 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         outResult = 0;
         return;
     case -0xB8: {
+        const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
         Vec position = {
-            static_cast<float>(object->m_localBase[1]),
-            static_cast<float>(object->m_localBase[2]),
-            static_cast<float>(object->m_localBase[3]),
+            localFloats[1],
+            localFloats[2],
+            localFloats[3],
         };
         Sound.ChangeSe3DPos(*object->m_localBase, &position);
         runtime->push(object, 0);
@@ -3855,16 +3856,16 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         return;
     }
     case -0xCA: {
+        const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
         Vec position = {
-            static_cast<float>(object->m_localBase[1]),
-            static_cast<float>(object->m_localBase[2]),
-            static_cast<float>(object->m_localBase[3]),
+            localFloats[1],
+            localFloats[2],
+            localFloats[3],
         };
         runtime->push(
             object,
             Sound.PlaySe3D(
-                *object->m_localBase, &position, static_cast<float>(object->m_localBase[4]),
-                static_cast<float>(object->m_localBase[5]), object->m_localBase[6]));
+                *object->m_localBase, &position, localFloats[4], localFloats[5], object->m_localBase[6]));
         outResult = 0;
         return;
     }

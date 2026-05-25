@@ -215,7 +215,7 @@ void operator delete(void* ptr)
             System.Printf(const_cast<char*>(sStageFreeCorruptBlockFmt), ptr, block + 0x1A, *reinterpret_cast<unsigned short*>(block + 0x18));
         }
 
-        block[2] &= 0xfb;
+        block[2] &= ~4;
 
         int blockPrev = *reinterpret_cast<int*>(block + 8);
         if ((*reinterpret_cast<unsigned char*>(blockPrev + 2) & 4) == 0) {
@@ -259,7 +259,7 @@ void operator delete[](void* ptr)
             System.Printf(const_cast<char*>(sStageFreeCorruptBlockFmt), ptr, block + 0x1A, *reinterpret_cast<unsigned short*>(block + 0x18));
         }
 
-        block[2] &= 0xfb;
+        block[2] &= ~4;
 
         int blockPrev = *reinterpret_cast<int*>(block + 8);
         if ((*reinterpret_cast<unsigned char*>(blockPrev + 2) & 4) == 0) {
@@ -822,7 +822,7 @@ void CMemory::Free(void* ptr)
             System.Printf(const_cast<char*>(sStageFreeCorruptBlockFmt), ptr, block + 0x1A, *reinterpret_cast<unsigned short*>(block + 0x18));
         }
 
-        block[2] &= 0xfb;
+        block[2] &= ~4;
 
         int blockPrev = *reinterpret_cast<int*>(block + 8);
         if ((*reinterpret_cast<unsigned char*>(blockPrev + 2) & 4) == 0) {
@@ -1567,7 +1567,7 @@ static inline void freeAmemCacheBlock(unsigned long ptr)
         System.Printf(const_cast<char*>(sStageFreeCorruptBlockFmt), ptr, block + 0x1A, *reinterpret_cast<unsigned short*>(block + 0x18));
     }
 
-    block[2] &= 0xfb;
+    block[2] &= ~4;
 
     int blockPrev = *reinterpret_cast<int*>(block + 8);
     if ((*(reinterpret_cast<unsigned char*>(blockPrev) + 2) & 4) == 0) {

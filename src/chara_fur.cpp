@@ -1600,7 +1600,7 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 	bool hasFurMaterial = false;
 	for (int i = 0; i < materialCount; i++) {
 		FurMaterialRaw* material = reinterpret_cast<FurMaterialRaw*>((*materials)[i]);
-		if (material != 0 && material->m_furEnable != 0) {
+		if (material->m_furEnable != 0) {
 			hasFurMaterial = true;
 			break;
 		}
@@ -1660,7 +1660,7 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 	const int normQuant = ModelNormQuant(this) & 0xFF;
 
 	for (unsigned int meshIndex = 0; meshIndex < meshCount; meshIndex++, mesh++) {
-		if (mesh->m_data == 0 || mesh->m_workPositions == 0 || mesh->m_workNormals == 0) {
+		if (mesh->m_workPositions == 0) {
 			continue;
 		}
 		if (((ModelMeshVisibleMask(this) >> meshIndex) & 1) == 0) {

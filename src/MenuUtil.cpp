@@ -1220,11 +1220,12 @@ void CMenuPcs::DrawOptionMenu()
 			}
 		}
 
-		DrawFont(static_cast<int>(FLOAT_80333614), static_cast<int>(FLOAT_80333618), color, 7,
-		         g_strMenuUtilMes[languageBase + 16], kOptionAnimMax, kOptionAnimMax);
-		DrawFont(static_cast<int>(FLOAT_80333628 - font->GetWidth(g_strMenuUtilMes[languageBase + 17])),
-		         static_cast<int>(FLOAT_80333618), color, 7, g_strMenuUtilMes[languageBase + 17],
+		char* minText = g_strMenuUtilMes[languageBase + 16];
+		char* maxText = g_strMenuUtilMes[languageBase + 17];
+		DrawFont(static_cast<int>(FLOAT_80333614), static_cast<int>(FLOAT_80333618), color, 7, minText,
 		         kOptionAnimMax, kOptionAnimMax);
+		DrawFont(static_cast<int>(FLOAT_80333628 - font->GetWidth(maxText)), static_cast<int>(FLOAT_80333618),
+		         color, 7, maxText, kOptionAnimMax, kOptionAnimMax);
 	} else if (m_optionIndex == 4) {
 		CTextureSet* textureSet = GetMenuTextureSet(this, 0xBC);
 		CTexture* cursorPanel = GetTextureSetTexture(textureSet, 4);

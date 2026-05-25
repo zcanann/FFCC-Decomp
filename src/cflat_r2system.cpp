@@ -3065,7 +3065,7 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         outResult = 0;
         return;
     case -0x60: {
-        const int alpha = static_cast<int>(FLOAT_80330b74 * static_cast<float>(object->m_localBase[3])) & 0xFF;
+        const int alpha = static_cast<int>(FLOAT_80330b74 * *reinterpret_cast<float*>(object->m_localBase + 3)) & 0xFF;
         const unsigned int blurA = (static_cast<unsigned int>(__cntlzw(object->m_localBase[4])) >> 5) & 0xFF;
         const unsigned int blurB = (static_cast<unsigned int>(__cntlzw(object->m_localBase[5])) >> 5) & 0xFF;
         GraphicPcs.SetBlurParameter(*object->m_localBase, static_cast<unsigned char>(object->m_localBase[1]),

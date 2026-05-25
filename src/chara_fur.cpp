@@ -37,10 +37,13 @@ struct Vec4d
 	float w;
 };
 
+class CMaterial;
+
 template <class T>
 class CPtrArray
 {
 public:
+	int GetSize();
 	T operator[](unsigned long index);
 };
 
@@ -1403,7 +1406,7 @@ void CChara::CModel::MogFurFrame(CGObject* object)
 int CChara::CModel::PickFur(
     Mtx param_2, _GXColor brushColor, int doPaint, int mode, _GXColor* centerBefore, _GXColor* centerAfter, Vec* worldPos)
 {
-	if (static_cast<int>((static_cast<unsigned int>(m_flags10C) << 25) | (static_cast<unsigned int>(m_flags10C) >> 7)) >= 0) {
+	if (static_cast<signed char>(m_flags10C << 1) >= 0) {
 		return -1;
 	}
 
@@ -1445,8 +1448,8 @@ int CChara::CModel::PickFur(
 
 		FurDisplayListRaw* displayList = mesh->m_data->m_displayLists;
 		for (unsigned int displayIndex = 0; displayIndex < mesh->m_data->m_displayListCount; displayIndex++, displayList++) {
-			FurMaterialRaw* material =
-			    reinterpret_cast<FurMaterialRaw*>(materialSetRaw->m_materials.m_items[displayList->m_material]);
+			CPtrArray<CMaterial*>* materials = reinterpret_cast<CPtrArray<CMaterial*>*>(&materialSetRaw->m_materials);
+			FurMaterialRaw* material = reinterpret_cast<FurMaterialRaw*>((*materials)[displayList->m_material]);
 			const bool furMaterial = material->m_furEnable != 0;
 
 			const unsigned char* cursor = reinterpret_cast<const unsigned char*>(displayList->m_data);
@@ -1582,7 +1585,7 @@ int CChara::CModel::PickFur(
  */
 void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 {
-	if (static_cast<int>((static_cast<unsigned int>(m_flags10C) << 25) | (static_cast<unsigned int>(m_flags10C) >> 7)) >= 0) {
+	if (static_cast<signed char>(m_flags10C << 1) >= 0) {
 		return;
 	}
 
@@ -1591,10 +1594,12 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 	void* nodes = ModelNodes(this);
 
 	FurMaterialSetRaw* materialSetRaw = reinterpret_cast<FurMaterialSetRaw*>(materialSet);
+	CPtrArray<CMaterial*>* materials = reinterpret_cast<CPtrArray<CMaterial*>*>(&materialSetRaw->m_materials);
+	const int materialCount = materials->GetSize();
 
 	bool hasFurMaterial = false;
-	for (unsigned int i = 0; i < materialSetRaw->m_materials.m_numItems; i++) {
-		FurMaterialRaw* material = reinterpret_cast<FurMaterialRaw*>(materialSetRaw->m_materials.m_items[i]);
+	for (int i = 0; i < materialCount; i++) {
+		FurMaterialRaw* material = reinterpret_cast<FurMaterialRaw*>((*materials)[i]);
 		if (material != 0 && material->m_furEnable != 0) {
 			hasFurMaterial = true;
 			break;
@@ -1605,9 +1610,6 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 	}
 
 	float furStep = ModelFurStep(this);
-	if (furStep == 0.0f) {
-		furStep = 1.0f;
-	}
 	float furDepth = kCharaFurDepthZero;
 	Vec modelPos = {ModelDrawMtx(this)[0][3], ModelDrawMtx(this)[1][3], ModelDrawMtx(this)[2][3]};
 	Vec viewPos;
@@ -1615,15 +1617,10 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 	if (viewPos.z < kCharaFurViewDepthThreshold) {
 		Vec4d clipPos;
 		Math.MTX44MultVec4(CameraPcs.m_screenMatrix, &viewPos, &clipPos);
-		if (clipPos.w != 0.0f) {
-			furDepth = -clipPos.z / clipPos.w;
-		}
+		furDepth = -clipPos.z / clipPos.w;
 	}
 
 	float furLength = ModelFurLenScale(this) * (kCharaFurDepthScaleBase - furDepth) + ModelFurLenScale(this);
-	if (furLength <= 0.0f) {
-		furLength = 1.0f;
-	}
 	const int furShade = static_cast<int>(kCharaFurShadeScale * ModelFurCur(this));
 	const GXColor furColor = CColor(static_cast<unsigned char>(furShade), static_cast<unsigned char>(furShade),
 	                                static_cast<unsigned char>(furShade), 0xFF)
@@ -1648,7 +1645,9 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 	GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
 	GXSetChanMatColor(GX_COLOR0A0, furColor);
 	LightPcs.EnableLight(1, 1);
+	GXSetZMode((u8)1, (GXCompare)3, (u8)0);
 	LightPcs.SetAmbientAlpha(ModelLightAlpha(this));
+	GXSetNumIndStages(0);
 
 	Mtx texMtx;
 	PSMTXIdentity(texMtx);
@@ -1692,12 +1691,11 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 
 		FurDisplayListRaw* displayList = mesh->m_data->m_displayLists;
 		for (unsigned int displayIndex = 0; displayIndex < mesh->m_data->m_displayListCount; displayIndex++, displayList++) {
-			if (displayList->m_material >= materialSetRaw->m_materials.m_numItems) {
+			if (displayList->m_material >= materialCount) {
 				continue;
 			}
 
-			FurMaterialRaw* material =
-			    reinterpret_cast<FurMaterialRaw*>(materialSetRaw->m_materials.m_items[displayList->m_material]);
+			FurMaterialRaw* material = reinterpret_cast<FurMaterialRaw*>((*materials)[displayList->m_material]);
 			if (material == 0 || material->m_furEnable == 0) {
 				continue;
 			}

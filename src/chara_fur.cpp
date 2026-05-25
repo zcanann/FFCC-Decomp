@@ -155,7 +155,7 @@ struct FurTexCoordRaw
 
 struct FurProjectedVertex
 {
-    bool m_valid;
+    unsigned char m_valid;
     Vec m_viewPos;
     float m_clipZ;
     float m_screenX;
@@ -295,7 +295,7 @@ static inline bool ProjectFurVertex(FurProjectedVertex& out, const FurMeshRaw* m
                                     unsigned short posIdx, unsigned short uvIdx, int posQuant)
 {
     static_cast<void>(posQuant);
-    out.m_valid = false;
+    out.m_valid = 0;
 
     const S16Vec& pos = mesh->m_workPositions[posIdx];
     const FurTexCoordRaw& uv = reinterpret_cast<FurTexCoordRaw*>(mesh->m_data->m_uvs)[uvIdx];
@@ -310,35 +310,31 @@ static inline bool ProjectFurVertex(FurProjectedVertex& out, const FurMeshRaw* m
     Vec4d clipPos;
     Math.MTX44MultVec4(screenMtx, &out.m_viewPos, &clipPos);
 
-    const float invW = 1.0f / clipPos.w;
+    const float invW = kCharaFurDepthScaleBase / clipPos.w;
     out.m_clipZ = clipPos.z;
-    out.m_screenX = clipPos.x * invW * 320.0f + 320.0f;
-    out.m_screenY = 224.0f - clipPos.y * invW * 224.0f;
+    out.m_screenX = clipPos.x * invW * FLOAT_8033113C + FLOAT_8033113C;
+    out.m_screenY = FLOAT_80331134 - clipPos.y * invW * FLOAT_80331134;
     LoadFurTexCoord(&out.m_u, &uv);
-    out.m_valid = true;
+    out.m_valid = 0x80;
     return true;
 }
 
 static inline bool FurPointInTriangle(float px, float py, const FurProjectedVertex& a, const FurProjectedVertex& b,
-                                      const FurProjectedVertex& c, float& outW0, float& outW1, float& outW2)
+                                      const FurProjectedVertex& c)
 {
-    const float v0x = b.m_screenX - a.m_screenX;
-    const float v0y = b.m_screenY - a.m_screenY;
-    const float v1x = c.m_screenX - a.m_screenX;
-    const float v1y = c.m_screenY - a.m_screenY;
-    const float v2x = px - a.m_screenX;
-    const float v2y = py - a.m_screenY;
-    const float denom = v0x * v1y - v1x * v0y;
-
-    if (denom > -0.0001f && denom < 0.0001f) {
+    const float edge0 = (py - a.m_screenY) * (b.m_screenX - a.m_screenX) -
+                        (px - a.m_screenX) * (b.m_screenY - a.m_screenY);
+    if (edge0 > 0.0f) {
         return false;
     }
-
-    const float invDenom = 1.0f / denom;
-    outW1 = (v2x * v1y - v1x * v2y) * invDenom;
-    outW2 = (v0x * v2y - v2x * v0y) * invDenom;
-    outW0 = 1.0f - outW1 - outW2;
-    return outW0 >= 0.0f && outW1 >= 0.0f && outW2 >= 0.0f;
+    const float edge1 = (py - b.m_screenY) * (c.m_screenX - b.m_screenX) -
+                        (px - b.m_screenX) * (c.m_screenY - b.m_screenY);
+    if (edge1 > 0.0f) {
+        return false;
+    }
+    const float edge2 = (py - c.m_screenY) * (a.m_screenX - c.m_screenX) -
+                        (px - c.m_screenX) * (a.m_screenY - c.m_screenY);
+    return edge2 <= 0.0f;
 }
 
 static inline float FurHitDepth(const FurProjectedVertex& a, const FurProjectedVertex& b, const FurProjectedVertex& c)
@@ -1482,9 +1478,6 @@ int CChara::CModel::PickFur(
 	FurMaterialSetRaw* materialSetRaw = reinterpret_cast<FurMaterialSetRaw*>(materialSet);
 
 	const unsigned short meshCount = ModelMeshCount(this);
-	const int posQuant = ModelPosQuant(this) & 0xFF;
-	const unsigned int posGqr = ModelPosQuant(this);
-	const unsigned int normGqr = ModelNormQuant(this);
 	const float cursorX = static_cast<float>(CharaU32(0x200C));
 	const float cursorY = static_cast<float>(CharaU32(0x2010));
 	float hitU = 0.0f;
@@ -1516,6 +1509,8 @@ int CChara::CModel::PickFur(
 
 		Mtx modelViewMtx;
 		PSMTXConcat(reinterpret_cast<MtxPtr>(param_2), meshMtx, modelViewMtx);
+		const unsigned int posGqr = ModelPosQuant(this);
+		const unsigned int normGqr = ModelNormQuant(this);
 		Chara.gqrInit(posGqr << 0x18 | 0x70000 | posGqr << 8 | 7,
 		              normGqr << 0x18 | 0x70000 | normGqr << 8 | 7, 0xc070c07);
 
@@ -1533,6 +1528,7 @@ int CChara::CModel::PickFur(
 			const unsigned char* cursor = reinterpret_cast<const unsigned char*>(displayList->m_data);
 			int remaining = displayList->m_size;
 			if ((cursor[0] & 7) != 0) {
+				displayList++;
 				continue;
 			}
 			while (remaining > 0) {
@@ -1554,17 +1550,14 @@ int CChara::CModel::PickFur(
 				for (unsigned short vertexIndex = 0; vertexIndex < count; vertexIndex++) {
 					const unsigned short* indices = reinterpret_cast<const unsigned short*>(cursor);
 					FurProjectedVertex current;
-					ProjectFurVertex(current, mesh, modelViewMtx, screenMtx, indices[0], indices[3], posQuant);
+					ProjectFurVertex(current, mesh, modelViewMtx, screenMtx, indices[0], indices[3], posGqr);
 
 					if (primitive == 0x90) {
 						if ((vertexIndex % 3) == 2) {
 							if (prev2.m_valid && prev1.m_valid && current.m_valid) {
 								const FurProjectedVertex& a = prev2;
 								const FurProjectedVertex& b = prev1;
-								float w0;
-								float w1;
-								float w2;
-								if (FurPointInTriangle(cursorX, cursorY, a, b, current, w0, w1, w2)) {
+								if (FurPointInTriangle(cursorX, cursorY, a, b, current)) {
 									Vec viewHit;
 									float uvU;
 									float uvV;
@@ -1587,10 +1580,7 @@ int CChara::CModel::PickFur(
 							const bool odd = (vertexIndex & 1) != 0;
 							const FurProjectedVertex& a = odd ? prev1 : prev2;
 							const FurProjectedVertex& b = odd ? prev2 : prev1;
-							float w0;
-							float w1;
-							float w2;
-							if (FurPointInTriangle(cursorX, cursorY, a, b, current, w0, w1, w2)) {
+							if (FurPointInTriangle(cursorX, cursorY, a, b, current)) {
 								Vec viewHit;
 								float uvU;
 								float uvV;
@@ -1621,8 +1611,17 @@ int CChara::CModel::PickFur(
 	if (doPaint != 0 && hitPaintable != 0) {
 		CTexture* texture = FindMogFurTexture(this);
 		if (texture != 0 && texture->m_format == 5 && nearestDepth != kCharaFurDepthZero) {
+			_GXColor paintColor = brushColor;
+			_GXColor before;
+			_GXColor after;
 			brush(reinterpret_cast<unsigned short*>(texture->m_imageData), texture->m_width, texture->m_height, hitU, hitV, mode,
-			      brushColor, centerBefore, centerAfter);
+			      paintColor, &before, &after);
+			if (centerBefore != 0) {
+				*centerBefore = before;
+			}
+			if (centerAfter != 0) {
+				*centerAfter = after;
+			}
 		}
 	}
 

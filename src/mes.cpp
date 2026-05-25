@@ -556,16 +556,24 @@ void CMes::SetPosition(float x, float y)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80098c90
+ * PAL Size: 1600b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMes::Draw()
 {
 	if (*(int*)((char*)this + 8) != 0)
 	{
-		unsigned char* menuPcs = reinterpret_cast<unsigned char*>(&MenuPcs);
 		int globalAlpha;
+		bool fading = false;
 		if ((*(int*)((char*)this + 0x3CAC) != 0) && (*(int*)((char*)this + 0x3CB8) != 0))
+		{
+			fading = true;
+		}
+		if (fading)
 		{
 			globalAlpha = 0xFF - (*(int*)((char*)this + 0x3CBC) * 0xFF) / *(int*)((char*)this + 0x3CB8);
 		}
@@ -574,6 +582,7 @@ void CMes::Draw()
 			globalAlpha = 0xFF;
 		}
 
+		unsigned char* menuPcs = reinterpret_cast<unsigned char*>(&MenuPcs);
 		float* glyph = (float*)((char*)this + 0x0C);
 		CFont* font = 0;
 		unsigned int activeTlut = 0xFFFFFFFF;
@@ -582,7 +591,7 @@ void CMes::Draw()
 		for (int i = 0; i < *(int*)((char*)this + 8); i++)
 		{
 			CFont* nextFont = font;
-			if ((int)(unsigned int)*(unsigned short*)((char*)glyph + 0x0C) <= *(int*)((char*)this + 0x3C80))
+			if (*(int*)((char*)this + 0x3C80) >= (int)(unsigned int)*(unsigned short*)((char*)glyph + 0x0C))
 			{
 				unsigned int ch = (unsigned int)*(unsigned char*)(glyph + 4);
 				if (ch < 0x20)
@@ -594,10 +603,17 @@ void CMes::Draw()
 					MenuPcs.DrawInit();
 
 					unsigned int iconId = ch;
-					if (ch == 7)
+					switch (ch + 0x48)
+					{
+					case 0x4F:
 					{
 						unsigned int mode;
+						bool specialPad = false;
 						if ((Game.m_currentMapId == 0x21) && (Joybus.GetPadType(0) != 0x40))
+						{
+							specialPad = true;
+						}
+						if (specialPad)
 						{
 							int padType = Joybus.GetPadType(0);
 							mode = (unsigned int)(((0x40000U - (unsigned int)padType) |
@@ -609,11 +625,17 @@ void CMes::Draw()
 							mode = (unsigned int)Game.m_gameWork.m_menuStageMode;
 						}
 						iconId = (mode != 0) ? 7 : 0x0B;
+						break;
 					}
-					else if (ch == 8)
+					case 0x50:
 					{
 						unsigned int mode;
+						bool specialPad = false;
 						if ((Game.m_currentMapId == 0x21) && (Joybus.GetPadType(0) != 0x40))
+						{
+							specialPad = true;
+						}
+						if (specialPad)
 						{
 							int padType = Joybus.GetPadType(0);
 							mode = (unsigned int)(((0x40000U - (unsigned int)padType) |
@@ -625,11 +647,17 @@ void CMes::Draw()
 							mode = (unsigned int)Game.m_gameWork.m_menuStageMode;
 						}
 						iconId = (mode != 0) ? 8 : 0x0C;
+						break;
 					}
-					else if (ch == 0x0A)
+					case 0x52:
 					{
 						unsigned int mode;
+						bool specialPad = false;
 						if ((Game.m_currentMapId == 0x21) && (Joybus.GetPadType(0) != 0x40))
+						{
+							specialPad = true;
+						}
+						if (specialPad)
 						{
 							int padType = Joybus.GetPadType(0);
 							mode = (unsigned int)(((0x40000U - (unsigned int)padType) |
@@ -641,11 +669,17 @@ void CMes::Draw()
 							mode = (unsigned int)Game.m_gameWork.m_menuStageMode;
 						}
 						iconId = (mode != 0) ? 9 : 0x0D;
+						break;
 					}
-					else if (ch == 0x0B)
+					case 0x53:
 					{
 						unsigned int mode;
+						bool specialPad = false;
 						if ((Game.m_currentMapId == 0x21) && (Joybus.GetPadType(0) != 0x40))
+						{
+							specialPad = true;
+						}
+						if (specialPad)
 						{
 							int padType = Joybus.GetPadType(0);
 							mode = (unsigned int)(((0x40000U - (unsigned int)padType) |
@@ -657,6 +691,8 @@ void CMes::Draw()
 							mode = (unsigned int)Game.m_gameWork.m_menuStageMode;
 						}
 						iconId = (mode != 0) ? 0x0A : 0x0E;
+						break;
+					}
 					}
 
 					CColor color(0xFF, 0xFF, 0xFF, 0xFF);

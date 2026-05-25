@@ -25,6 +25,8 @@
 #include <dolphin/os/OSCache.h>
 
 CCameraPcs CameraPcs;
+extern const char __RTTI__8CManager_8032E520[];
+extern const char __RTTI__8CProcess_8032E528[];
 
 extern "C" const char s_CCameraPcs_GAME_801D7860[] = "CCameraPcs(GAME)";
 extern "C" const char s_CCameraPcs_CHARA_801D7874[] = "CCameraPcs(CHARA)";
@@ -229,6 +231,14 @@ unsigned int CCameraPcs::m_table[7][0x15C / sizeof(unsigned int)] = {
         0x43,
         0x1,
     }
+};
+unsigned int s_CCameraPcsRttiBase0[3] = {reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CManager_8032E520)), 0, 0};
+unsigned int s_CCameraPcsRttiBase1[5] = {
+    reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CManager_8032E520)),
+    0,
+    reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CProcess_8032E528)),
+    0,
+    0,
 };
 Vec g_shadow_pos;
 Vec g_shadow_refpos;

@@ -69,12 +69,12 @@ extern "C" void __ct__10pppModelStFv(pppModelSt* modelSt);
 extern "C" void __dt__10pppModelStFv(pppModelSt* modelSt, int);
 PPPCREATEPARAM g_dcp;
 extern "C" {
-int DAT_8032ed68 = 0;
-int DAT_8032ed6c = 0;
-int DAT_8032ed74 = 0;
+int ppvSysStopPartF = 0;
+int ppvSysGoPartF = 0;
+int ppvUserStopPartF = 0;
 unsigned char gPppInConstructor = 0;
 unsigned char gPppInSubFrameCalc = 0;
-int DAT_8032ed7c = 0;
+int ppvEmptyLoop = 0;
 unsigned char gPppEditorAnimIndex = 0;
 unsigned char gPppEditorAnimIndexInitialized = 0;
 int gPppCalcDisabled = 0;
@@ -255,10 +255,10 @@ void CPartMng::Create()
 
     memset(self + 0x10, 0, 0x108);
 
-    DAT_8032ed68 = 1;
-    DAT_8032ed6c = 0;
+    ppvSysStopPartF = 1;
+    ppvSysGoPartF = 0;
     gPppCalcDisabled = 0;
-    DAT_8032ed74 = 0;
+    ppvUserStopPartF = 0;
 
     if (Game.m_currentSceneId == 7) {
         pppCreateHeap(env, 0x100000);
@@ -267,7 +267,7 @@ void CPartMng::Create()
     }
 
     ppvEnv = env;
-    DAT_8032ed7c = 0;
+    ppvEmptyLoop = 0;
 
     PSMTXIdentity(ppvUnitMatrix);
     ppvZeroVector.x = FLOAT_8032fe5c;
@@ -1599,7 +1599,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         *reinterpret_cast<int*>(self + kEditCountOffset) = 0;
         Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x3B3);
         pppEditAllReleaseResource();
-        DAT_8032ed68 = 1;
+        ppvSysStopPartF = 1;
         self[0x800] = 0;
         self[0x801] = 0;
         self[0x802] = 0;
@@ -1875,7 +1875,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         }
         *reinterpret_cast<int*>(self + kEditCountOffset) = 0;
         Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), 0x3B3);
-        DAT_8032ed68 = 1;
+        ppvSysStopPartF = 1;
         return;
     case 0x10:
         if (env->m_isEditMode != 0) {
@@ -2058,7 +2058,7 @@ void CPartMng::pppEditBeforeCalc()
             Graphic.SetFogParam(FLOAT_8032fe5c, FLOAT_8032fe5c);
         }
 
-        DAT_8032ed6c = 1;
+        ppvSysGoPartF = 1;
         break;
     }
     case 0x18:
@@ -2205,7 +2205,7 @@ void CPartMng::pppEditPartCalc()
         }
     }
 
-    if (DAT_8032ed68 != 0 || pdtSlots[0].m_pppDataHead == 0) {
+    if (ppvSysStopPartF != 0 || pdtSlots[0].m_pppDataHead == 0) {
         return;
     }
 
@@ -2305,7 +2305,7 @@ void CPartMng::pppEditDrawShadow()
         float m_sortDepth;                   // 0x114
     };
 
-    if (DAT_8032ed68 != 0) {
+    if (ppvSysStopPartF != 0) {
         return;
     }
 
@@ -2391,7 +2391,7 @@ void CPartMng::pppEditDraw()
     static const int kCullYOffsetOffset = 0x110;
     static const int kSortDepthOffset = 0x114;
 
-    if (DAT_8032ed68 != 0) {
+    if (ppvSysStopPartF != 0) {
         return;
     }
 
@@ -2526,7 +2526,7 @@ void CPartMng::pppEditPartDrawAfter()
     static const int kCullYOffsetOffset = 0x110;
     static const int kSortDepthOffset = 0x114;
 
-    if (DAT_8032ed68 == 0) {
+    if (ppvSysStopPartF == 0) {
         m_pppEnvSt.m_debugCounter = 0;
         if (m_pdtSlots[0].m_pppDataHead != 0
             && *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + kEditDrawModeOffset) < 4) {

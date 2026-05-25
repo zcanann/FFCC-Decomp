@@ -685,8 +685,9 @@ int CBound::CheckFrustum0(CBound& outBound)
 
     if ((s_f_vpos.x <= m_max.x) && (s_f_vpos.y <= m_max.y) && (s_f_vpos.z <= m_max.z) &&
         (s_f_vpos.x >= m_min.x) && (s_f_vpos.y >= m_min.y) && (s_f_vpos.z >= m_min.z)) {
+        int zIndex;
         int yIndex;
-        for (int xIndex = 0; xIndex < 2; xIndex++) {
+        for (xIndex = 0; xIndex < 2; xIndex++) {
             if (xIndex == 0) {
                 vertex.x = m_min.x;
             } else {
@@ -694,7 +695,7 @@ int CBound::CheckFrustum0(CBound& outBound)
             }
             for (yIndex = 0; yIndex < 2; yIndex++) {
                 vertex.y = (yIndex == 0) ? m_min.y : m_max.y;
-                for (int zIndex = 0; zIndex < 2; zIndex++) {
+                for (zIndex = 0; zIndex < 2; zIndex++) {
                     vertex.z = (zIndex == 0) ? m_min.z : m_max.z;
                     PSMTXMultVec(s_f_lvmtx, &vertex, &transformed);
 

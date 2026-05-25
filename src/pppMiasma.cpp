@@ -248,6 +248,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
     radiusWork = (MiasmaRadiusWork*)(pppMiasma->m_object.m_workArea + param_3->m_serializedDataOffsets[3]);
 
     textureIndex = 0;
+    slice = 0;
     model = (pppModelSt*)(((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[param_2->m_dataValIndex]);
     ((CMapMesh*)model)->GetTexture(pppEnvStPtr->m_materialSetPtr, textureIndex);
 
@@ -295,7 +296,6 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
     scissorHeight = (u32)FLOAT_8033192c;
     scissorWidth = (u32)FLOAT_80331928;
     yStep = FLOAT_8033192c;
-    slice = 0;
     do {
         yPos = (float)slice * yStep;
         yOffset = (int)yPos;

@@ -2284,11 +2284,10 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
     }
     case -0x1B: {
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
-        Vec position = {
+        CVector position(
             localFloats[2],
             localFloats[3],
-            localFloats[4],
-        };
+            localFloats[4]);
         this->PutParticle((*object->m_localBase << 8) | object->m_localBase[1], position, localFloats[5]);
         runtime->push(object, 0);
         outResult = 0;

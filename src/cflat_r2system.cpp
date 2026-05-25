@@ -3060,8 +3060,8 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         return;
     case -0x5F:
         runtime->push(object, static_cast<int>(Math.DstRot(
-                                  static_cast<float>(*object->m_localBase),
-                                  static_cast<float>(object->m_localBase[1]))));
+                                  *reinterpret_cast<float*>(object->m_localBase),
+                                  *reinterpret_cast<float*>(object->m_localBase + 1))));
         outResult = 0;
         return;
     case -0x60: {

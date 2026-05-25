@@ -1226,6 +1226,7 @@ void CUtil::RenderQuad(Vec pos1, Vec pos2, _GXColor color, Vec2d* uv1, Vec2d* uv
 void CUtil::RenderQuadNoTex(Vec pos1, Vec pos2, _GXColor color)
 {
     GXBegin(GX_QUADS, GX_VTXFMT7, 4);
+    f32 x2;
     f32 x1 = pos1.x;
     f32 y1 = pos1.y;
 
@@ -1234,7 +1235,7 @@ void CUtil::RenderQuadNoTex(Vec pos1, Vec pos2, _GXColor color)
     GXWGFifo.f32 = y1;
     u32 rgba = *reinterpret_cast<u32*>(&color);
     GXWGFifo.f32 = z1;
-    f32 x2 = pos2.x;
+    x2 = pos2.x;
     GXWGFifo.u32 = rgba;
     f32 y2 = pos2.y;
 
@@ -1338,10 +1339,13 @@ void CUtil::GetSplinePos(Vec& out, Vec p0, Vec p1, Vec p2, Vec p3, float t, floa
 	t2 = t * t;
 	t3 = t2 * t;
 
-	float k3t2 = kUtilHermiteCoeff3 * t2;
-	hermite[1] = k3t2 + (kUtilHermiteCoeffNeg2 * t3);
-	hermite[0] = kUtilOne + ((kUtilHermiteCoeff2 * t3) - k3t2);
-	hermite[2] = t + (t3 - (kUtilHermiteCoeff2 * t2));
+	float coeff3 = kUtilHermiteCoeff3;
+	float coeffNeg2 = kUtilHermiteCoeffNeg2;
+	float coeff2 = kUtilHermiteCoeff2;
+	float k3t2 = coeff3 * t2;
+	hermite[1] = k3t2 + (coeffNeg2 * t3);
+	hermite[0] = kUtilOne + ((coeff2 * t3) - k3t2);
+	hermite[2] = t + (t3 - (coeff2 * t2));
 	hermite[3] = t3 - t2;
 
 	float pos = hermite[1] * p2.x;

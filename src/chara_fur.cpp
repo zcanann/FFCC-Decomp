@@ -5,9 +5,11 @@
 #include "ffcc/math.h"
 #include "ffcc/mesmenu.h"
 #include "ffcc/gobject.h"
+#include "ffcc/game.h"
 #include "ffcc/graphic.h"
 #include "ffcc/gxfunc.h"
 #include "ffcc/linkage.h"
+#include "ffcc/materialman.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/p_menu.h"
 #include "ffcc/p_light.h"
@@ -37,10 +39,13 @@ struct Vec4d
 	float w;
 };
 
+class CMaterial;
+
 template <class T>
 class CPtrArray
 {
 public:
+	int GetSize();
 	T operator[](unsigned long index);
 };
 
@@ -55,7 +60,8 @@ extern float kCharaFurDepthZero;
 extern float kCharaFurDepthScaleBase;
 extern float kCharaFurViewDepthThreshold;
 extern float kCharaFurShadeScale;
-static inline unsigned char* GameRaw() { return reinterpret_cast<unsigned char*>(&Game); }
+extern float FLOAT_80331154;
+extern float FLOAT_80331158;
 
 namespace {
 
@@ -78,7 +84,9 @@ struct FurMaterialSetRaw
 
 struct FurMaterialRaw
 {
-    unsigned char m_pad0[0x3C];
+    unsigned char m_pad0[0x1C];
+    short m_extraTextureIndex;
+    unsigned char m_pad1E[0x1E];
     CTexture* m_textures[4];
     unsigned char m_pad4C[0x5B];
     unsigned char m_furEnable;
@@ -389,11 +397,10 @@ static void DrawFurDisplayListShell(const FurMeshRaw* mesh, const FurDisplayList
  */
 void CChara::TimeMogFur()
 {
-	unsigned int* const timeStamp = reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(this) + 0x2014);
-	unsigned short* const texels = reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(this) + 4);
+	int* const timeStamp = reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x2014);
 
-	if (*timeStamp + 0x1A5E0 < System.m_frameCounter) {
-		*timeStamp = System.m_frameCounter;
+	if (*timeStamp + 0x1A5E0 < static_cast<int>(System.m_frameCounter)) {
+		*timeStamp = static_cast<int>(System.m_frameCounter);
 		if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
 			System.Printf("");
 		}
@@ -405,6 +412,7 @@ void CChara::TimeMogFur()
 		}
 	}
 
+	unsigned short* const texels = reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(this) + 4);
 	memset(reinterpret_cast<unsigned char*>(this) + 0x2018, 0, 0x40);
 
 	for (int y = 0; y < 0x40; y++) {
@@ -415,8 +423,7 @@ void CChara::TimeMogFur()
 			int b;
 			int a;
 			unsigned int newA;
-			unsigned int tileIndex = ((((x >> 2) & 1) + (((y >> 2) & 1) * 4) + (x >> 3) * 0x10 + (y >> 3) * 0x100) * 2) +
-			                         (((x & 3) + ((y & 3) * 4)) * 2);
+			unsigned int tileIndex = ((x % 4) + ((y % 4) * 4) + (x / 4) * 0x10 + (y / 4) * 0x100) * 2;
 			unsigned short packed = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(texels) + tileIndex);
 
 			a = (packed >> 12) & 7;
@@ -425,20 +432,28 @@ void CChara::TimeMogFur()
 			g = light + ((packed >> 4) & 0xF) + 4;
 			b = light + (packed & 0xF) + 4;
 
-			if (r > 0xF) {
-				r = 0xF;
+			int clampedR = 0xF;
+			if (r < 0xF) {
+				clampedR = r;
 			}
-			if (g > 0xF) {
-				g = 0xF;
+			r = clampedR;
+			int clampedG = 0xF;
+			if (g < 0xF) {
+				clampedG = g;
 			}
-			if (b > 0xF) {
-				b = 0xF;
+			g = clampedG;
+			int clampedB = 0xF;
+			if (b < 0xF) {
+				clampedB = b;
 			}
+			b = clampedB;
 
 			newA = static_cast<unsigned int>(a + 2);
-			if (newA > 7) {
-				newA = 7;
+			unsigned int clampedA = 7;
+			if (newA < 7) {
+				clampedA = newA;
 			}
+			newA = clampedA;
 
 			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(texels) + tileIndex) =
 			    static_cast<unsigned short>((b & 0xF) | ((g & 0xF) << 4) | ((r & 0xF) << 8) | ((newA & 7) << 12));
@@ -477,9 +492,7 @@ void CChara::CalcMogScore()
 				continue;
 			}
 
-			const int tileIndex =
-			    ((((x >> 2) & 1) + (((y >> 2) & 1) * 4) + (x >> 3) * 0x10 + (y >> 3) * 0x100) * 2) +
-			    (((x & 3) + ((y & 3) * 4)) * 2);
+			const int tileIndex = ((x % 4) + ((y % 4) * 4) + (x / 4) * 0x10 + (y / 4) * 0x100) * 2;
 
 			const unsigned short packed = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(texels) + tileIndex);
 			const int a = (packed >> 12) & 7;
@@ -577,35 +590,34 @@ void CChara::CalcMogScore()
 
 	*reinterpret_cast<int*>(self + 0x2054) = (*reinterpret_cast<int*>(self + 0x2054) * 100) / 0x7000;
 
-	const int bitDiv = bitCount / 3;
-	const int lineDiv = lineCount / 3;
-	const int circleDiv = circleCount / 3;
-
-	*reinterpret_cast<int*>(self + 0x2024) = (*reinterpret_cast<int*>(self + 0x2024) * 100) / bitDiv;
-	*reinterpret_cast<int*>(self + 0x203C) = (*reinterpret_cast<int*>(self + 0x203C) * 100) / circleDiv;
-	*reinterpret_cast<int*>(self + 0x2030) = (*reinterpret_cast<int*>(self + 0x2030) * 100) / lineDiv;
-	*reinterpret_cast<int*>(self + 0x2028) = (*reinterpret_cast<int*>(self + 0x2028) * 100) / bitDiv;
-	*reinterpret_cast<int*>(self + 0x2040) = (*reinterpret_cast<int*>(self + 0x2040) * 100) / circleDiv;
-	*reinterpret_cast<int*>(self + 0x2034) = (*reinterpret_cast<int*>(self + 0x2034) * 100) / lineDiv;
-	*reinterpret_cast<int*>(self + 0x202C) = (*reinterpret_cast<int*>(self + 0x202C) * 100) / bitDiv;
-	*reinterpret_cast<int*>(self + 0x2044) = (*reinterpret_cast<int*>(self + 0x2044) * 100) / circleDiv;
-	*reinterpret_cast<int*>(self + 0x2038) = (*reinterpret_cast<int*>(self + 0x2038) * 100) / lineDiv;
+	bitCount /= 3;
+	*reinterpret_cast<int*>(self + 0x2024) = (*reinterpret_cast<int*>(self + 0x2024) * 100) / bitCount;
+	circleCount /= 3;
+	*reinterpret_cast<int*>(self + 0x203C) = (*reinterpret_cast<int*>(self + 0x203C) * 100) / circleCount;
+	lineCount /= 3;
+	*reinterpret_cast<int*>(self + 0x2030) = (*reinterpret_cast<int*>(self + 0x2030) * 100) / lineCount;
+	*reinterpret_cast<int*>(self + 0x2028) = (*reinterpret_cast<int*>(self + 0x2028) * 100) / bitCount;
+	*reinterpret_cast<int*>(self + 0x2040) = (*reinterpret_cast<int*>(self + 0x2040) * 100) / circleCount;
+	*reinterpret_cast<int*>(self + 0x2034) = (*reinterpret_cast<int*>(self + 0x2034) * 100) / lineCount;
+	*reinterpret_cast<int*>(self + 0x202C) = (*reinterpret_cast<int*>(self + 0x202C) * 100) / bitCount;
+	*reinterpret_cast<int*>(self + 0x2044) = (*reinterpret_cast<int*>(self + 0x2044) * 100) / circleCount;
+	*reinterpret_cast<int*>(self + 0x2038) = (*reinterpret_cast<int*>(self + 0x2038) * 100) / lineCount;
 
 	for (int i = 0; i < 3; i++) {
+		int* scorePtr = reinterpret_cast<int*>(self + 0x2018 + i * 4);
 		const int bit = *reinterpret_cast<int*>(self + 0x2024 + i * 4);
 		const int line = *reinterpret_cast<int*>(self + 0x2030 + i * 4);
 		const int circle = *reinterpret_cast<int*>(self + 0x203C + i * 4);
-		int score = (line + circle * 2 - bit * 2) / 3;
 		int level;
 
-		if (score < 0) {
-			score = 0;
-		} else if (score > 100) {
-			score = 100;
+		*scorePtr = (line + circle * 2 - bit * 2) / 3;
+		if (*scorePtr < 0) {
+			*scorePtr = 0;
+		} else if (*scorePtr > 100) {
+			*scorePtr = 100;
 		}
-		*reinterpret_cast<int*>(self + 0x2018 + i * 4) = score;
 
-		level = (100 - score) / 5;
+		level = (100 - *scorePtr) / 5;
 		if (level < 5) {
 			level = 5;
 		} else if (level > 0xF) {
@@ -615,20 +627,19 @@ void CChara::CalcMogScore()
 	}
 
 	{
-		const unsigned int b0 = *reinterpret_cast<unsigned int*>(self + 0x2018);
-		const unsigned int b1 = *reinterpret_cast<unsigned int*>(self + 0x201C);
-		const unsigned int b2 = *reinterpret_cast<unsigned int*>(self + 0x2020);
-		unsigned char radarType = 0;
+		const int b0 = *reinterpret_cast<int*>(self + 0x2018);
+		const int b1 = *reinterpret_cast<int*>(self + 0x201C);
+		const int b2 = *reinterpret_cast<int*>(self + 0x2020);
 
-		if (b0 > 2 && b0 > static_cast<unsigned int>(0.75f * static_cast<float>(b1 + b2))) {
-			radarType = 1;
-		} else if (b1 > 2 && b1 > static_cast<unsigned int>(0.75f * static_cast<float>(b0 + b2))) {
-			radarType = 2;
-		} else if (b2 > 2 && b2 > static_cast<unsigned int>(0.75f * static_cast<float>(b0 + b1))) {
-			radarType = 3;
+		if (b0 > 2 && 0.75f * static_cast<float>(b1 + b2) < static_cast<float>(b0)) {
+			Game.m_gameWork.m_mogScoreRadarType = 1;
+		} else if (b1 > 2 && 0.75f * static_cast<float>(b0 + b2) < static_cast<float>(b1)) {
+			Game.m_gameWork.m_mogScoreRadarType = 2;
+		} else if (b2 > 2 && 0.75f * static_cast<float>(b0 + b1) < static_cast<float>(b2)) {
+			Game.m_gameWork.m_mogScoreRadarType = 3;
+		} else {
+			Game.m_gameWork.m_mogScoreRadarType = 0;
 		}
-
-		GameRaw()[0x13E9] = radarType;
 	}
 
 	{
@@ -658,7 +669,7 @@ void CChara::CalcMogScore()
 		    *reinterpret_cast<int*>(self + 0x203C),
 		    *reinterpret_cast<int*>(self + 0x2040),
 		    *reinterpret_cast<int*>(self + 0x2044),
-		    radarLabel[GameRaw()[0x13E9]]);
+		    radarLabel[Game.m_gameWork.m_mogScoreRadarType]);
 	}
 }
 
@@ -790,26 +801,14 @@ static void FurWriteTexel(unsigned short* tex, int x, int y, int r, int g, int b
 static void FurInitTextureDefaults()
 {
 	if (!s_mogFurBaseColorsInit) {
-		s_mogFurBaseColor.r = 0x80;
-		s_mogFurBaseColor.g = 0x80;
-		s_mogFurBaseColor.b = 0x80;
-		s_mogFurBaseColor.a = 0xFF;
-		s_mogFurTipColor.r = 0xF0;
-		s_mogFurTipColor.g = 0xF0;
-		s_mogFurTipColor.b = 0xF0;
-		s_mogFurTipColor.a = 0;
+		s_mogFurBaseColor = CColor(0x80, 0x80, 0x80, 0xFF).color;
+		s_mogFurTipColor = CColor(0xF0, 0xF0, 0xF0, 0).color;
 		s_mogFurBaseColorsInit = true;
 	}
 
 	if (!s_mogFurNoiseColorsInit) {
-		s_mogFurNoiseBaseColor.r = 0;
-		s_mogFurNoiseBaseColor.g = 0;
-		s_mogFurNoiseBaseColor.b = 0;
-		s_mogFurNoiseBaseColor.a = 0;
-		s_mogFurNoiseRangeColor.r = 8;
-		s_mogFurNoiseRangeColor.g = 8;
-		s_mogFurNoiseRangeColor.b = 8;
-		s_mogFurNoiseRangeColor.a = 0;
+		s_mogFurNoiseBaseColor = CColor(0, 0, 0, 0).color;
+		s_mogFurNoiseRangeColor = CColor(8, 8, 8, 0).color;
 		s_mogFurNoiseColorsInit = true;
 	}
 
@@ -976,38 +975,25 @@ static inline int MogPadInt(int offset)
 
 static inline unsigned char MogRadarType()
 {
-	return GameRaw()[0x13E9];
+	return Game.m_gameWork.m_mogScoreRadarType;
 }
 
 static inline _GXColor MogBrushColor(unsigned char radarType)
 {
 	switch (radarType) {
-	case 1:
+	case 0:
 		return CColor(0xF, 4, 4, 2).color;
+	case 1:
+		return CColor(4, 8, 0xF, 2).color;
 	case 2:
 		return CColor(4, 0xF, 4, 2).color;
 	case 3:
-		return CColor(4, 8, 0xF, 2).color;
+		return CColor(0xF, 0xF, 0xF, 4).color;
 	case 4:
 		return CColor(0, 0, 0, 2).color;
 	default:
-		return CColor(0xF, 0xF, 0xF, 4).color;
+		return CColor(0xF, 4, 4, 2).color;
 	}
-}
-
-static inline bool MogColorChanged(const _GXColor& a, const _GXColor& b)
-{
-	return a.r != b.r || a.g != b.g || a.b != b.b || a.a != b.a;
-}
-
-static inline bool MogColorNear(const _GXColor& a, const _GXColor& b, int threshold)
-{
-	const int dr = static_cast<int>(a.r) - static_cast<int>(b.r);
-	const int dg = static_cast<int>(a.g) - static_cast<int>(b.g);
-	const int db = static_cast<int>(a.b) - static_cast<int>(b.b);
-	const int da = static_cast<int>(a.a) - static_cast<int>(b.a);
-	const int total = (dr < 0 ? -dr : dr) + (dg < 0 ? -dg : dg) + (db < 0 ? -db : db) + (da < 0 ? -da : da);
-	return total <= threshold;
 }
 
 static inline void StopMogLoopSe(MogWorkRaw& work)
@@ -1113,8 +1099,7 @@ void CChara::InitFurTexBuffer()
 	do {
 		int inner = 0;
 		int idx0 = row << 1;
-		int count = 8;
-		do {
+		for (int count = 8; count != 0; count--) {
 			int idxBase = inner + row;
 			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Chara) + idx0 + 4) = 0x7FFF;
 			idx0 += 0x10;
@@ -1126,8 +1111,7 @@ void CChara::InitFurTexBuffer()
 			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Chara) + ((idxBase + 5) << 1) + 4) = 0x7FFF;
 			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Chara) + ((idxBase + 6) << 1) + 4) = 0x7FFF;
 			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Chara) + ((idxBase + 7) << 1) + 4) = 0x7FFF;
-			count--;
-		} while (count != 0);
+		}
 		i++;
 		row += 0x40;
 	} while (i < 0x40);
@@ -1217,14 +1201,8 @@ void CChara::CModel::InitMogFurTex()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CChara::CModel::MogFurFrame(CGObject* object)
+void CChara::CModel::MogFurFrame(CGObject* gObject)
 {
-	unsigned char* modelBytes = reinterpret_cast<unsigned char*>(this);
-	if ((modelBytes[0x10C] & 0x40) == 0) {
-		return;
-	}
-
-	CGObject* gObject = object;
 	MogWorkRaw& work = MogWork();
 	const unsigned short heldButtons = MogHeldButtons();
 	const unsigned short triggerButtons = MogTriggerButtons();
@@ -1244,41 +1222,39 @@ void CChara::CModel::MogFurFrame(CGObject* object)
 		work.m_prevScoreC = CharaS32(0x2020);
 	}
 
-	if (gObject != 0) {
-		if (work.m_state == 0) {
-			if ((rotateButtons & 1) != 0) {
-				gObject->m_rotTargetY -= 0.03125f;
-				if (gObject->m_currentAnimSlot < 0) {
-					gObject->PlayAnim(1, 0, 0, -1, -1, 0);
-				}
-			} else if ((rotateButtons & 2) != 0) {
-				gObject->m_rotTargetY += 0.03125f;
-				if (gObject->m_currentAnimSlot < 0) {
-					gObject->PlayAnim(1, 0, 0, -1, -1, 0);
-				}
-			} else if (gObject->m_currentAnimSlot >= 0) {
-				gObject->CancelAnim(1);
+	if (work.m_state == 0) {
+		if ((rotateButtons & 1) != 0) {
+			gObject->m_rotTargetY -= 0.03125f;
+			if (gObject->m_currentAnimSlot < 0) {
+				gObject->PlayAnim(1, 0, 0, -1, -1, 0);
 			}
+		} else if ((rotateButtons & 2) != 0) {
+			gObject->m_rotTargetY += 0.03125f;
+			if (gObject->m_currentAnimSlot < 0) {
+				gObject->PlayAnim(1, 0, 0, -1, -1, 0);
+			}
+		} else if (gObject->m_currentAnimSlot >= 0) {
+			gObject->CancelAnim(1);
+		}
 
-			if ((rotateButtons & 8) != 0) {
-				work.m_state = 1;
-				gObject->PlayAnim(0x37, 1, 0, -1, -1, 0);
-				messageId = 7;
+		if ((rotateButtons & 8) != 0) {
+			work.m_state = 1;
+			gObject->PlayAnim(0x37, 1, 0, -1, -1, 0);
+			messageId = 7;
+		}
+	} else if (work.m_state == 1) {
+		unsigned char* objectBytes = reinterpret_cast<unsigned char*>(gObject);
+		if (gObject->m_currentAnimSlot == static_cast<char>(objectBytes[0xD4])) {
+			if (gObject->IsLoopAnim(1) != 0) {
+				gObject->PlayAnim(0x38, 1, 0, -1, -1, 0);
 			}
-		} else if (work.m_state == 1) {
-			unsigned char* objectBytes = reinterpret_cast<unsigned char*>(gObject);
-			if (gObject->m_currentAnimSlot == static_cast<char>(objectBytes[0xD4])) {
-				if (gObject->IsLoopAnim(1) != 0) {
-					gObject->PlayAnim(0x38, 1, 0, -1, -1, 0);
-				}
-			} else if (gObject->m_currentAnimSlot == static_cast<char>(objectBytes[0xD5])) {
-				if ((rotateButtons & 4) != 0) {
-					gObject->PlayAnim(0x39, 1, 0, -1, -1, 0);
-				}
-			} else if (gObject->IsLoopAnim(1) != 0) {
-				gObject->CancelAnim(1);
-				work.m_state = 0;
+		} else if (gObject->m_currentAnimSlot == static_cast<char>(objectBytes[0xD5])) {
+			if ((rotateButtons & 4) != 0) {
+				gObject->PlayAnim(0x39, 1, 0, -1, -1, 0);
 			}
+		} else if (gObject->IsLoopAnim(1) != 0) {
+			gObject->CancelAnim(1);
+			work.m_state = 0;
 		}
 	}
 
@@ -1322,16 +1298,26 @@ void CChara::CModel::MogFurFrame(CGObject* object)
 		if (pickResult >= 0) {
 			work.m_pickTicks++;
 
-			const int scoreDeltaA = CharaS32(0x2018) - work.m_prevScoreA;
-			const int scoreDeltaB = CharaS32(0x201C) - work.m_prevScoreB;
-			const int scoreDeltaC = CharaS32(0x2020) - work.m_prevScoreC;
-			if (((scoreDeltaA < 0 ? -scoreDeltaA : scoreDeltaA) >= 5) ||
-			    ((scoreDeltaB < 0 ? -scoreDeltaB : scoreDeltaB) >= 5) ||
-			    ((scoreDeltaC < 0 ? -scoreDeltaC : scoreDeltaC) >= 5)) {
+			if (CharaS32(0x2018) >= work.m_prevScoreA + 5) {
 				work.m_prevScoreA = CharaS32(0x2018);
+				messageId = 1;
+			} else if (CharaS32(0x2018) < work.m_prevScoreA - 5) {
+				work.m_prevScoreA = CharaS32(0x2018);
+				messageId = 6;
+			}
+			if (CharaS32(0x201C) >= work.m_prevScoreB + 5) {
 				work.m_prevScoreB = CharaS32(0x201C);
+				messageId = 1;
+			} else if (CharaS32(0x201C) < work.m_prevScoreB - 5) {
+				work.m_prevScoreB = CharaS32(0x201C);
+				messageId = 6;
+			}
+			if (CharaS32(0x2020) >= work.m_prevScoreC + 5) {
 				work.m_prevScoreC = CharaS32(0x2020);
 				messageId = 1;
+			} else if (CharaS32(0x2020) < work.m_prevScoreC - 5) {
+				work.m_prevScoreC = CharaS32(0x2020);
+				messageId = 6;
 			}
 
 			if (pickResult == 0) {
@@ -1351,20 +1337,24 @@ void CChara::CModel::MogFurFrame(CGObject* object)
 					work.m_eraseTicks++;
 					if (work.m_eraseTicks == 10 && messageId < 0) {
 						messageId = 5;
+						work.m_eraseTicks = 0x0B;
 					} else if (work.m_eraseTicks == 0x32 && messageId < 0) {
 						messageId = 6;
+						work.m_eraseTicks = 0x33;
 					}
 				}
-			} else {
+			} else if (radarType == 3) {
 				work.m_eraseTicks = 0;
-				if ((centerAfter.a != 0) && !MogColorNear(centerAfter, brushColor, 8)) {
+				if ((((centerAfter.r < 0x0D) || (centerAfter.g < 0x0D)) || (centerAfter.b < 0x0D)) && (centerAfter.a != 0)) {
 					work.m_offColorTicks++;
 					if (work.m_offColorTicks == 10 && messageId < 0) {
 						messageId = 2;
+						work.m_offColorTicks = 0x0B;
 					}
-				} else {
-					work.m_offColorTicks = 0;
 				}
+			} else {
+				work.m_offColorTicks = 0;
+				work.m_eraseTicks = 0;
 			}
 		}
 
@@ -1403,56 +1393,15 @@ void CChara::CModel::MogFurFrame(CGObject* object)
 int CChara::CModel::PickFur(
     Mtx param_2, _GXColor brushColor, int doPaint, int mode, _GXColor* centerBefore, _GXColor* centerAfter, Vec* worldPos)
 {
-	if ((ModelFlags10C(this) & 0x40) == 0) {
+	if (static_cast<signed char>(m_flags10C << 1) >= 0) {
 		return -1;
-	}
-
-	if (centerBefore != 0) {
-		centerBefore->r = 0;
-		centerBefore->g = 0;
-		centerBefore->b = 0;
-		centerBefore->a = 0;
-	}
-	if (centerAfter != 0) {
-		centerAfter->r = 0;
-		centerAfter->g = 0;
-		centerAfter->b = 0;
-		centerAfter->a = 0;
-	}
-	if (worldPos != 0) {
-		worldPos->x = 0.0f;
-		worldPos->y = 0.0f;
-		worldPos->z = 0.0f;
-	}
-
-	CTexture* texture = FindMogFurTexture(this);
-	if (texture == 0) {
-		return 0;
-	}
-
-	const unsigned int format = *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(texture) + 0x60);
-	if (format != 5) {
-		return 0;
-	}
-
-	unsigned short* dstPixels = *reinterpret_cast<unsigned short**>(reinterpret_cast<unsigned char*>(texture) + 0x78);
-	const int width = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(texture) + 0x64);
-	const int height = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(texture) + 0x68);
-	if ((dstPixels == 0) || (width <= 0) || (height <= 0)) {
-		return 0;
 	}
 
 	CMaterialSet* materialSet = ModelMaterialSet(this);
 	FurMeshRaw* mesh = ModelMeshes(this);
 	void* nodes = ModelNodes(this);
-	if (materialSet == 0 || mesh == 0 || nodes == 0) {
-		return 0;
-	}
 
 	FurMaterialSetRaw* materialSetRaw = reinterpret_cast<FurMaterialSetRaw*>(materialSet);
-	if (materialSetRaw->m_materials.m_items == 0 || materialSetRaw->m_materials.m_numItems == 0) {
-		return 0;
-	}
 
 	const unsigned short meshCount = ModelMeshCount(this);
 	const int posQuant = ModelPosQuant(this) & 0xFF;
@@ -1465,7 +1414,7 @@ int CChara::CModel::PickFur(
 	Vec hitViewPos;
 
 	for (unsigned int meshIndex = 0; meshIndex < meshCount; meshIndex++, mesh++) {
-		if (mesh->m_data == 0 || mesh->m_workPositions == 0 || mesh->m_data->m_uvs == 0) {
+		if (mesh->m_workPositions == 0) {
 			continue;
 		}
 		if (((ModelMeshVisibleMask(this) >> meshIndex) & 1) == 0) {
@@ -1486,17 +1435,9 @@ int CChara::CModel::PickFur(
 
 		FurDisplayListRaw* displayList = mesh->m_data->m_displayLists;
 		for (unsigned int displayIndex = 0; displayIndex < mesh->m_data->m_displayListCount; displayIndex++, displayList++) {
-			if (displayList == 0 || displayList->m_data == 0 || displayList->m_size <= 0 ||
-			    displayList->m_material >= materialSetRaw->m_materials.m_numItems) {
-				continue;
-			}
-
-			FurMaterialRaw* material =
-			    reinterpret_cast<FurMaterialRaw*>(materialSetRaw->m_materials.m_items[displayList->m_material]);
-			if (material == 0 || material->m_furEnable == 0 || material->m_textures[0] == 0 ||
-			    *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(material->m_textures[0]) + 0x60) != 5) {
-				continue;
-			}
+			CPtrArray<CMaterial*>* materials = reinterpret_cast<CPtrArray<CMaterial*>*>(&materialSetRaw->m_materials);
+			FurMaterialRaw* material = reinterpret_cast<FurMaterialRaw*>((*materials)[displayList->m_material]);
+			const bool furMaterial = material->m_furEnable != 0;
 
 			const unsigned char* cursor = reinterpret_cast<const unsigned char*>(displayList->m_data);
 			int remaining = displayList->m_size;
@@ -1543,7 +1484,7 @@ int CChara::CModel::PickFur(
 									float uvV;
 									FurInterpolateHit(viewHit, uvU, uvV, a, b, current, w0, w1, w2);
 									const float depth = -viewHit.z;
-									if (depth < nearestDepth) {
+									if (furMaterial && depth < nearestDepth) {
 										nearestDepth = depth;
 										hitViewPos = viewHit;
 										hitU = uvU;
@@ -1567,7 +1508,7 @@ int CChara::CModel::PickFur(
 								float uvV;
 								FurInterpolateHit(viewHit, uvU, uvV, a, b, current, w0, w1, w2);
 								const float depth = -viewHit.z;
-								if (depth < nearestDepth) {
+								if (furMaterial && depth < nearestDepth) {
 									nearestDepth = depth;
 									hitViewPos = viewHit;
 									hitU = uvU;
@@ -1588,7 +1529,7 @@ int CChara::CModel::PickFur(
 	}
 
 	if (!hitFound) {
-		return 0;
+		return -1;
 	}
 
 	if (worldPos != 0) {
@@ -1602,21 +1543,21 @@ int CChara::CModel::PickFur(
 		return 1;
 	}
 
-	if (hitU < 0.0f) {
-		hitU = 0.0f;
-	} else if (hitU > 1.0f) {
-		hitU = 1.0f;
-	}
-	if (hitV < 0.0f) {
-		hitV = 0.0f;
-	} else if (hitV > 1.0f) {
-		hitV = 1.0f;
+	CTexture* texture = FindMogFurTexture(this);
+	if (texture == 0) {
+		return 1;
 	}
 
-	brush(dstPixels, width, height, hitU, hitV, mode, brushColor, centerBefore, centerAfter);
-	if (centerBefore != 0 && centerAfter != 0 && !MogColorChanged(*centerBefore, *centerAfter)) {
-		return 0;
+	const unsigned int format = *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(texture) + 0x60);
+	if (format != 5) {
+		return 1;
 	}
+
+	unsigned short* dstPixels = *reinterpret_cast<unsigned short**>(reinterpret_cast<unsigned char*>(texture) + 0x78);
+	const int width = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(texture) + 0x64);
+	const int height = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(texture) + 0x68);
+
+	brush(dstPixels, width, height, hitU, hitV, mode, brushColor, centerBefore, centerAfter);
 	return 1;
 }
 
@@ -1631,29 +1572,22 @@ int CChara::CModel::PickFur(
  */
 void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 {
-	if ((ModelFlags10C(this) & 0x40) == 0) {
-		return;
-	}
-	if ((shadowPass != 0) && ((ModelFlags10C(this) & 0x80) == 0)) {
+	if (static_cast<signed char>(m_flags10C << 1) >= 0) {
 		return;
 	}
 
 	CMaterialSet* materialSet = ModelMaterialSet(this);
 	FurMeshRaw* mesh = ModelMeshes(this);
 	void* nodes = ModelNodes(this);
-	if (materialSet == 0 || mesh == 0 || nodes == 0) {
-		return;
-	}
 
 	FurMaterialSetRaw* materialSetRaw = reinterpret_cast<FurMaterialSetRaw*>(materialSet);
-	if (materialSetRaw->m_materials.m_items == 0 || materialSetRaw->m_materials.m_numItems == 0) {
-		return;
-	}
+	CPtrArray<CMaterial*>* materials = reinterpret_cast<CPtrArray<CMaterial*>*>(&materialSetRaw->m_materials);
+	const int materialCount = materials->GetSize();
 
 	bool hasFurMaterial = false;
-	for (unsigned int i = 0; i < materialSetRaw->m_materials.m_numItems; i++) {
-		FurMaterialRaw* material = reinterpret_cast<FurMaterialRaw*>(materialSetRaw->m_materials.m_items[i]);
-		if (material != 0 && material->m_furEnable != 0) {
+	for (int i = 0; i < materialCount; i++) {
+		FurMaterialRaw* material = reinterpret_cast<FurMaterialRaw*>((*materials)[i]);
+		if (material->m_furEnable != 0) {
 			hasFurMaterial = true;
 			break;
 		}
@@ -1662,17 +1596,7 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 		return;
 	}
 
-	if (gMogFurTexBuffer == 0) {
-		Chara.makeFurTex();
-	}
-	if (gMogFurTexBuffer == 0) {
-		return;
-	}
-
 	float furStep = ModelFurStep(this);
-	if (furStep == 0.0f) {
-		furStep = 1.0f;
-	}
 	float furDepth = kCharaFurDepthZero;
 	Vec modelPos = {ModelDrawMtx(this)[0][3], ModelDrawMtx(this)[1][3], ModelDrawMtx(this)[2][3]};
 	Vec viewPos;
@@ -1680,15 +1604,10 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 	if (viewPos.z < kCharaFurViewDepthThreshold) {
 		Vec4d clipPos;
 		Math.MTX44MultVec4(CameraPcs.m_screenMatrix, &viewPos, &clipPos);
-		if (clipPos.w != 0.0f) {
-			furDepth = -clipPos.z / clipPos.w;
-		}
+		furDepth = -clipPos.z / clipPos.w;
 	}
 
 	float furLength = ModelFurLenScale(this) * (kCharaFurDepthScaleBase - furDepth) + ModelFurLenScale(this);
-	if (furLength <= 0.0f) {
-		furLength = 1.0f;
-	}
 	const int furShade = static_cast<int>(kCharaFurShadeScale * ModelFurCur(this));
 	const GXColor furColor = CColor(static_cast<unsigned char>(furShade), static_cast<unsigned char>(furShade),
 	                                static_cast<unsigned char>(furShade), 0xFF)
@@ -1706,14 +1625,26 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
 	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_NRM, GX_NRM_XYZ, GX_S16, ModelNormQuant(this) & 0xFF);
 	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_U16, 0x0C);
-	GXSetNumTexGens(1);
-	GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
-	GXSetNumTevStages(1);
-	GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
-	GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
-	GXSetChanMatColor(GX_COLOR0A0, furColor);
 	LightPcs.EnableLight(1, 1);
+	GXSetZMode((u8)1, (GXCompare)3, (u8)0);
+	GXSetChanMatColor(GX_COLOR0A0, furColor);
 	LightPcs.SetAmbientAlpha(ModelLightAlpha(this));
+	GXSetNumIndStages(0);
+	GXSetNumTevStages(2);
+	GXSetTevDirect(GX_TEVSTAGE0);
+	_GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
+	_GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_RASC, GX_CC_TEXC, GX_CC_ZERO);
+	_GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_RASA, GX_CA_TEXA, GX_CA_ZERO);
+	_GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+	_GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+	_GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
+	GXSetTevDirect(GX_TEVSTAGE1);
+	_GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP0);
+	_GXSetTevColorIn(GX_TEVSTAGE1, GX_CC_ZERO, GX_CC_TEXC, GX_CC_CPREV, GX_CC_ZERO);
+	_GXSetTevAlphaIn(GX_TEVSTAGE1, GX_CA_ZERO, GX_CA_TEXA, GX_CA_APREV, GX_CA_ZERO);
+	_GXSetTevColorOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+	_GXSetTevAlphaOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+	_GXSetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD1, GX_TEXMAP1, GX_COLOR0A0);
 
 	Mtx texMtx;
 	PSMTXIdentity(texMtx);
@@ -1724,9 +1655,11 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 	const unsigned short meshCount = ModelMeshCount(this);
 	const int posQuant = ModelPosQuant(this) & 0xFF;
 	const int normQuant = ModelNormQuant(this) & 0xFF;
+	unsigned int prevExtraTexture = 0xFFFFFFFF;
+	int prevExtraTextureFormat = -1;
 
 	for (unsigned int meshIndex = 0; meshIndex < meshCount; meshIndex++, mesh++) {
-		if (mesh->m_data == 0 || mesh->m_workPositions == 0 || mesh->m_workNormals == 0) {
+		if (mesh->m_workPositions == 0) {
 			continue;
 		}
 		if (((ModelMeshVisibleMask(this) >> meshIndex) & 1) == 0) {
@@ -1742,6 +1675,23 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 			PSMTXCopy(ModelDrawMtx(this), meshMtx);
 		}
 
+		int shadowCount = 0;
+		CMaterial* shadowMaterials[2];
+		MtxPtr shadowMatrices[2];
+		if (shadowPass != 0) {
+			shadowCount = MaterialMan.GetCharaShadow(2, shadowMaterials, shadowMatrices, &modelPos, FLOAT_80331154, FLOAT_80331158, 0);
+			for (int shadowIndex = 0; shadowIndex < shadowCount; shadowIndex++) {
+				FurMaterialRaw* shadowMaterial = reinterpret_cast<FurMaterialRaw*>(shadowMaterials[shadowIndex]);
+				TextureMan.SetTexture(static_cast<GXTexMapID>(shadowIndex + 3), shadowMaterial->m_textures[0]);
+
+				Mtx shadowTexMtx;
+				PSMTXConcat(shadowMatrices[shadowIndex], meshMtx, shadowTexMtx);
+				GXLoadTexMtxImm(shadowTexMtx, 0x21 + shadowIndex * 3, GX_MTX3x4);
+				GXSetTexCoordGen2(static_cast<GXTexCoordID>(shadowIndex + 3), GX_TG_MTX3x4, GX_TG_POS,
+				                  0x21 + shadowIndex * 3, GX_FALSE, GX_PTIDENTITY);
+			}
+		}
+
 		Mtx modelViewMtx;
 		PSMTXConcat(viewMtx, meshMtx, modelViewMtx);
 		GXLoadPosMtxImm(modelViewMtx, GX_PNMTX0);
@@ -1755,23 +1705,99 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 		GXSetArray(GX_VA_NRM, mesh->m_workNormals, 6);
 		GXSetArray(GX_VA_TEX0, mesh->m_data->m_uvs, 4);
 
+		unsigned int posGqr = ModelPosQuant(this);
+		unsigned int normGqr = ModelNormQuant(this);
 		FurDisplayListRaw* displayList = mesh->m_data->m_displayLists;
+		Chara.gqrInit(posGqr << 0x18 | 0x70000 | posGqr << 8 | 7, normGqr << 0x18 | 0x70000 | normGqr << 8 | 7,
+		              0xC070C07);
 		for (unsigned int displayIndex = 0; displayIndex < mesh->m_data->m_displayListCount; displayIndex++, displayList++) {
-			if (displayList->m_material >= materialSetRaw->m_materials.m_numItems) {
+			FurMaterialRaw* material = reinterpret_cast<FurMaterialRaw*>((*materials)[displayList->m_material]);
+			if (material->m_furEnable == 0) {
 				continue;
 			}
 
-			FurMaterialRaw* material =
-			    reinterpret_cast<FurMaterialRaw*>(materialSetRaw->m_materials.m_items[displayList->m_material]);
-			if (material == 0 || material->m_furEnable == 0) {
-				continue;
+			TextureMan.SetTexture(GX_TEXMAP0, material->m_textures[0]);
+			unsigned int hasExtraTexture = 0;
+			int extraTextureFormat = -1;
+			if (material->m_extraTextureIndex != -1) {
+				TextureMan.SetTexture(GX_TEXMAP2, material->m_textures[1]);
+				hasExtraTexture = 1;
+				extraTextureFormat = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(material->m_textures[1]) + 0x60);
+			}
+
+			if (prevExtraTexture != hasExtraTexture || prevExtraTextureFormat != extraTextureFormat) {
+				GXSetTevDirect(GX_TEVSTAGE0);
+				_GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
+				_GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_RASC, GX_CC_TEXC, GX_CC_ZERO);
+				_GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_RASA, GX_CA_TEXA, GX_CA_ZERO);
+				_GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+				_GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+				_GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
+
+				int tevStage = 1;
+				for (int shadowStage = 0; shadowStage < shadowCount; shadowStage++, tevStage++) {
+					GXSetTevDirect(static_cast<GXTevStageID>(tevStage));
+					_GXSetTevSwapMode(static_cast<GXTevStageID>(tevStage), GX_TEV_SWAP0, GX_TEV_SWAP0);
+					_GXSetTevColorIn(static_cast<GXTevStageID>(tevStage), GX_CC_ZERO, GX_CC_RASC, GX_CC_C1, GX_CC_ZERO);
+					_GXSetTevAlphaIn(static_cast<GXTevStageID>(tevStage), GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_TEXA);
+					_GXSetTevColorOp(static_cast<GXTevStageID>(tevStage), GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE,
+					                 GX_TEVPREV);
+					_GXSetTevAlphaOp(static_cast<GXTevStageID>(tevStage), GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE,
+					                 GX_TEVPREV);
+					_GXSetTevOrder(static_cast<GXTevStageID>(tevStage), static_cast<GXTexCoordID>(shadowStage + 3),
+					               static_cast<GXTexMapID>(shadowStage + 3), GX_COLOR_NULL);
+				}
+
+				GXSetTevDirect(static_cast<GXTevStageID>(tevStage));
+				_GXSetTevSwapMode(static_cast<GXTevStageID>(tevStage), GX_TEV_SWAP0, GX_TEV_SWAP0);
+				_GXSetTevColorIn(static_cast<GXTevStageID>(tevStage), GX_CC_ZERO, GX_CC_TEXC, GX_CC_RASC, GX_CC_ZERO);
+				_GXSetTevAlphaIn(static_cast<GXTevStageID>(tevStage), GX_CA_ZERO, GX_CA_TEXA, GX_CA_APREV, GX_CA_ZERO);
+				_GXSetTevColorOp(static_cast<GXTevStageID>(tevStage), GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_2, GX_TRUE,
+				                 GX_TEVPREV);
+				_GXSetTevAlphaOp(static_cast<GXTevStageID>(tevStage), GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE,
+				                 GX_TEVPREV);
+				_GXSetTevOrder(static_cast<GXTevStageID>(tevStage), GX_TEXCOORD1, GX_TEXMAP1, GX_COLOR_NULL);
+
+				int tevStageCount = tevStage + 1;
+				if (hasExtraTexture == 0) {
+					GXSetNumTexGens(static_cast<u8>(shadowCount + 2));
+					GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, 0x3C, GX_FALSE, GX_PTIDENTITY);
+					GXSetTexCoordGen2(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX0, 0x1E, GX_FALSE, GX_PTIDENTITY);
+				} else {
+					GXSetTevDirect(static_cast<GXTevStageID>(tevStageCount));
+					_GXSetTevSwapMode(static_cast<GXTevStageID>(tevStageCount), GX_TEV_SWAP0, GX_TEV_SWAP0);
+					if (extraTextureFormat == 5) {
+						_GXSetTevColorIn(static_cast<GXTevStageID>(tevStageCount), GX_CC_ZERO, GX_CC_TEXC, GX_CC_RASC,
+						                 GX_CC_ZERO);
+						_GXSetTevAlphaIn(static_cast<GXTevStageID>(tevStageCount), GX_CA_ZERO, GX_CA_TEXA, GX_CA_APREV,
+						                 GX_CA_ZERO);
+					} else {
+						_GXSetTevColorIn(static_cast<GXTevStageID>(tevStageCount), GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO,
+						                 GX_CC_TEXC);
+						_GXSetTevAlphaIn(static_cast<GXTevStageID>(tevStageCount), GX_CA_ZERO, GX_CA_TEXA, GX_CA_APREV,
+						                 GX_CA_ZERO);
+					}
+					_GXSetTevColorOp(static_cast<GXTevStageID>(tevStageCount), GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE,
+					                 GX_TEVPREV);
+					_GXSetTevAlphaOp(static_cast<GXTevStageID>(tevStageCount), GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE,
+					                 GX_TEVPREV);
+					_GXSetTevOrder(static_cast<GXTevStageID>(tevStageCount), GX_TEXCOORD2, GX_TEXMAP2, GX_COLOR_NULL);
+					tevStageCount++;
+					GXSetNumTexGens(static_cast<u8>(shadowCount + 3));
+					GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, 0x3C, GX_FALSE, GX_PTIDENTITY);
+					GXSetTexCoordGen2(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX0, 0x1E, GX_FALSE, GX_PTIDENTITY);
+					GXSetTexCoordGen2(GX_TEXCOORD2, GX_TG_MTX2x4, GX_TG_TEX0, 0x3C, GX_FALSE, GX_PTIDENTITY);
+				}
+				GXSetNumTevStages(static_cast<u8>(tevStageCount));
+				prevExtraTexture = hasExtraTexture;
+				prevExtraTextureFormat = extraTextureFormat;
 			}
 
 			for (unsigned int layer = 0; layer < 8; layer++) {
 				GXTexObj texObj;
 				void* texData = reinterpret_cast<unsigned char*>(gMogFurTexBuffer) + (layer * 0x4000);
 				GXInitTexObj(&texObj, texData, 0x80, 0x80, GX_TF_RGB5A3, GX_CLAMP, GX_CLAMP, GX_FALSE);
-				GXLoadTexObj(&texObj, GX_TEXMAP0);
+				GXLoadTexObj(&texObj, GX_TEXMAP1);
 
 				const float shellOffset = furLength * (static_cast<float>(layer) * 0.125f);
 				DrawFurDisplayListShell(mesh, displayList, shellOffset, posQuant, normQuant);
@@ -1814,14 +1840,6 @@ void CChara::makeFurTex()
 	s_mogFurRand = 0;
 	s_mogFurMaxY = 0.0f;
 
-	if (gMogFurTexBuffer == 0) {
-		gMogFurTexBuffer = Memory._Alloc(0x20000, 0, const_cast<char*>(s_chara_fur_cpp), 0xE9, 0);
-	}
-	if (gMogFurTexBuffer == 0) {
-		return;
-	}
-
-	unsigned short* tex = reinterpret_cast<unsigned short*>(gMogFurTexBuffer);
 	CHairSet hairSet[0x20];
 	unsigned int rng = s_mogFurRand;
 
@@ -1830,6 +1848,9 @@ void CChara::makeFurTex()
 	}
 
 	FurSetupTextureCopyEnv();
+
+	gMogFurTexBuffer = Memory._Alloc(0x20000, 0, const_cast<char*>(s_chara_fur_cpp), 0xE9, 0);
+	unsigned short* tex = reinterpret_cast<unsigned short*>(gMogFurTexBuffer);
 
 	for (int layer = 0; layer < 8; layer++) {
 		unsigned short* layerTex = tex + (layer * 0x4000 / 2);
@@ -1856,7 +1877,6 @@ void CChara::makeFurTex()
 		}
 	}
 
-	s_mogFurRand = rng;
 	DCFlushRange(gMogFurTexBuffer, 0x20000);
 	GXInvalidateTexAll();
 }
@@ -1903,8 +1923,7 @@ void brush(unsigned short* pixels, int width, int height, float fx, float fy, in
 			distance = (dx < 0 ? -dx : dx) + (dy < 0 ? -dy : dy);
 			unsigned int ux = px;
 			unsigned int uy = py;
-			tileIndex = ((((ux >> 2) & 1) + (((uy >> 2) & 1) * 4) + (ux >> 3) * 0x10 + (uy >> 3) * width * 4) * 2) +
-			            (((ux & 3) + ((uy & 3) * 4)) * 2);
+			tileIndex = ((ux & 3) + ((uy & 3) * 4) + (ux >> 2) * 0x10 + (uy >> 2) * width * 4) * 2;
 			packed = *(unsigned short*)(((char*)pixels) + tileIndex);
 
 			b = packed & 0x0f;

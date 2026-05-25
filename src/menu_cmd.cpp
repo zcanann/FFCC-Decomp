@@ -2843,24 +2843,39 @@ const char* CMenuPcs::GetSkillStr(int index)
 {
 	const int languageId = Game.m_gameWork.m_languageId;
 
-	switch (languageId) {
-	case 2: {
-		const char** names = s_pcts_pctd_item_pctd_m_equip_pct08x_80214D34 + 2;
-		return names[index];
+	if (languageId == 3) {
+		goto language_3;
 	}
-	case 3: {
-		const char** names = s_pcts_pctd_item_pctd_m_equip_pct08x_80214D34 + 7;
-		return names[index];
+	if (languageId >= 3) {
+		goto language_ge_3;
 	}
-	case 4:
-		return PTR_s_Pyro_Frappe[index];
-	case 5:
-		return PTR_s_Efecto_Fuego[index];
-	default: {
-		const char** names = jumptable_80214D24 + 1;
-		return names[index];
+	if (languageId == 1) {
+		goto language_default;
 	}
+	if (languageId >= 1) {
+		goto language_2;
 	}
+	goto language_default;
+
+language_ge_3:
+	if (languageId == 5) {
+		goto language_5;
+	}
+	if (languageId >= 5) {
+		goto language_default;
+	}
+	goto language_4;
+
+language_2:
+	return (&s_pcts_pctd_item_pctd_m_equip_pct08x_80214D34[2])[index];
+language_3:
+	return (&s_pcts_pctd_item_pctd_m_equip_pct08x_80214D34[7])[index];
+language_4:
+	return PTR_s_Pyro_Frappe[index];
+language_5:
+	return PTR_s_Efecto_Fuego[index];
+language_default:
+	return (&jumptable_80214D24[1])[index];
 }
 
 /*

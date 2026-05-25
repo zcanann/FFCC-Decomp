@@ -331,10 +331,11 @@ void CLightPcs::Add(CLightPcs::CLight* light)
     CLight sceneLight;
     sceneLight = *light;
     float attenRadius = sceneLight.m_attenRadius;
-    if (FLOAT_8032fc10 <= sceneLight.m_attenFalloff) {
+    if (sceneLight.m_attenFalloff >= FLOAT_8032fc10) {
         sceneLight.m_attenFalloff = attenRadius;
     }
 
+    sceneLight.m_unkAC = sceneLight.m_attenRadius * sceneLight.m_attenRadius;
     if (attenRadius < FLOAT_8032fc14) {
         attenRadius = -attenRadius;
     }
@@ -354,9 +355,9 @@ void CLightPcs::Add(CLightPcs::CLight* light)
         sceneLight.m_targetEnable[2] = 0;
     }
 
-    sceneLight.m_unkAC = sceneLight.m_attenRadius * sceneLight.m_attenRadius;
-    m_sceneLights[m_sceneLightCount] = sceneLight;
-    m_sceneLightCount += 1;
+    u32 idx = m_sceneLightCount;
+    m_sceneLightCount = idx + 1;
+    m_sceneLights[idx] = sceneLight;
 }
 
 /*
@@ -901,14 +902,14 @@ void CLightPcs::CBumpLight::MakeLightMap()
     }
 
     int copySize = GXGetTexBufferSize(0x40, 0x40, 3, 0, 0);
-    double dScale = (double)FLOAT_8032fc40;
-    double dHalf = (double)FLOAT_8032fc1c;
+    float dScale = FLOAT_8032fc40;
+    float dHalf = FLOAT_8032fc1c;
     static float tParam[4] = {48.0f, 128.0f, 256.0f, 512.0f};
     float* lightScale = tParam;
-    double dFactor = (double)FLOAT_8032fc3c;
-    double dInv = (double)FLOAT_8032fc44;
+    float dFactor = FLOAT_8032fc3c;
+    float dInv = FLOAT_8032fc44;
     int offset = 0;
-    double dW = (double)FLOAT_8032fc60;
+    float dW = FLOAT_8032fc60;
 
     for (int i = 0; i < (int)(unsigned int)m_textureCount; i++) {
         int texBase = (int)m_textureData;
@@ -936,43 +937,43 @@ void CLightPcs::CBumpLight::MakeLightMap()
             unsigned int yBase = y;
             GXBegin((GXPrimitive)0x98, (GXVtxFmt)0, 0x42);
 
-            float x0 = (float)((double)(float)(dFactor * (double)(float)(U32ToDouble(yBase)) * dScale - dHalf));
-            double dx0 = (double)x0;
-            float x1 = (float)((double)(float)(dFactor * (double)(float)(U32ToDouble(yBase + 1)) * dScale - dHalf));
-            double dx1 = (double)x1;
+            float x0 = dFactor * (float)U32ToDouble(yBase) * dScale - dHalf;
+            float dx0 = x0;
+            float x1 = dFactor * (float)U32ToDouble(yBase + 1) * dScale - dHalf;
+            float dx1 = x1;
 
             int inner = 0x21;
             unsigned int x = 0;
             do {
-                float z0 = (float)((double)(float)(dFactor * (double)(float)(U32ToDouble(x)) * dScale - dHalf));
-                double dz0 = (double)z0;
-                double dist0 = (double)(float)(dx0 * dx0 + (double)(float)(dz0 * dz0));
+                float z0 = dFactor * (float)U32ToDouble(x) * dScale - dHalf;
+                float dz0 = z0;
+                float dist0 = dx0 * dx0 + dz0 * dz0;
                 if (dHalf <= dist0) {
-                    dist0 = (double)FLOAT_8032fc14;
+                    dist0 = FLOAT_8032fc14;
                 } else {
-                    dist0 = (double)sqrtf((float)(dHalf - dist0));
+                    dist0 = sqrtf(dHalf - dist0);
                 }
 
                 GXWGFifo.f32 = x0;
-                double dist1 = (double)(float)(dx1 * dx1 + (double)(float)(dz0 * dz0));
+                float dist1 = dx1 * dx1 + dz0 * dz0;
                 GXWGFifo.f32 = z0;
-                GXWGFifo.f32 = (float)dW;
-                GXWGFifo.f32 = (float)(dx0 / dInv);
-                GXWGFifo.f32 = (float)(dz0 / dInv);
-                GXWGFifo.f32 = (float)dist0;
+                GXWGFifo.f32 = dW;
+                GXWGFifo.f32 = dx0 / dInv;
+                GXWGFifo.f32 = dz0 / dInv;
+                GXWGFifo.f32 = dist0;
 
                 if (dHalf <= dist1) {
-                    dist1 = (double)FLOAT_8032fc14;
+                    dist1 = FLOAT_8032fc14;
                 } else {
-                    dist1 = (double)sqrtf((float)(dHalf - dist1));
+                    dist1 = sqrtf(dHalf - dist1);
                 }
 
                 GXWGFifo.f32 = x1;
                 GXWGFifo.f32 = z0;
-                GXWGFifo.f32 = (float)dW;
-                GXWGFifo.f32 = (float)(dx1 / dInv);
-                GXWGFifo.f32 = (float)(dz0 / dInv);
-                GXWGFifo.f32 = (float)dist1;
+                GXWGFifo.f32 = dW;
+                GXWGFifo.f32 = dx1 / dInv;
+                GXWGFifo.f32 = dz0 / dInv;
+                GXWGFifo.f32 = dist1;
 
                 inner--;
                 x++;

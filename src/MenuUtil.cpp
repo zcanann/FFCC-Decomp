@@ -1116,9 +1116,10 @@ void CMenuPcs::DrawOptionMenu()
 	font->SetMargin(kOptionAnimMax);
 	font->SetScaleX(FLOAT_80333578);
 	font->SetScaleY(kOptionAnimMax);
-	DrawFont2(static_cast<int>(-(font->GetWidth(helpText[m_optionIndex]) * kMenuCenteringHalfWidth -
+	char* help = helpText[m_optionIndex];
+	DrawFont2(static_cast<int>(-(font->GetWidth(help) * kMenuCenteringHalfWidth -
 	                            kMenuCenteringOffset)),
-	          static_cast<int>(FLOAT_80333590), color, 7, helpText[m_optionIndex], FLOAT_80333578,
+	          static_cast<int>(FLOAT_80333590), color, 7, help, FLOAT_80333578,
 	          kOptionAnimMax, kOptionAnimMax);
 
 	if (m_optionIndex <= 1) {

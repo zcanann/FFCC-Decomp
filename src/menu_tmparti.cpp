@@ -20,9 +20,9 @@ extern const double DOUBLE_80332f58;
 extern const double DOUBLE_80333418 = 0.0;
 extern const double DOUBLE_80333420 = 216.0;
 
-static inline double TmpArtiIntToDouble(int value)
+static inline float TmpArtiIntToFloat(int value)
 {
-    return (double)value;
+    return (float)value;
 }
 
 STATIC_ASSERT(offsetof(TmpArtiState, initialized) == 0xB);
@@ -124,8 +124,8 @@ void CMenuPcs::TmpArtiDraw()
 	for (int i = 0; i < 4; i++) {
 		short icon = *(short*)(foodPtr + 0x1F6);
 		if (icon >= 0) {
-			int posX = (int)TmpArtiIntToDouble(entry->x + entry->width - 0x10);
-			int posY = (int)((float)TmpArtiIntToDouble(entry->y + 6) - FLOAT_80332f30);
+			int posX = (int)TmpArtiIntToFloat(entry->x + entry->width - 0x10);
+			int posY = (int)(TmpArtiIntToFloat(entry->y + 6) - FLOAT_80332f30);
 			DrawSingleIcon(icon, posX, posY, entry->alpha, 0, FLOAT_80332f2c);
 		}
 		entry++;
@@ -149,12 +149,12 @@ void CMenuPcs::TmpArtiDraw()
 
 			const char* text = flatData->table[0].strings[*(short*)(foodPtr + 0x1F6) * 5 + 4];
 			float width = font->GetWidth(text);
-			float posX = (float)(((TmpArtiIntToDouble(entry->width) - width) * DOUBLE_80332f20) +
-			                       TmpArtiIntToDouble(entry->x));
-			double posY = TmpArtiIntToDouble(entry->y + 11);
+			float posX = (float)(((TmpArtiIntToFloat(entry->width) - width) * DOUBLE_80332f20) +
+			                       TmpArtiIntToFloat(entry->x));
+			float posY = TmpArtiIntToFloat(entry->y + 11);
 
 			font->SetPosX(posX);
-			font->SetPosY((float)posY - FLOAT_80332F38);
+			font->SetPosY(posY - FLOAT_80332F38);
 			font->Draw(text);
 		}
 		entry++;

@@ -1066,6 +1066,11 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			outResult = 0;
 			break;
 		}
+		case -0x29:
+			engineObject->DispCharaParts(static_cast<int>(localBase[0]));
+			PushValue(this, object, 0);
+			outResult = 0;
+			break;
 		case -0x22:
 			engineObject->m_attrFlags = localBase[0];
 			PushValue(this, object, 0);

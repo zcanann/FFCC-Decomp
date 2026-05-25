@@ -1223,8 +1223,9 @@ void CMenuPcs::DrawOptionMenu()
 		char* maxText = g_strMenuUtilMes[languageBase + 17];
 		DrawFont(static_cast<int>(FLOAT_80333614), static_cast<int>(FLOAT_80333618), color, 7,
 		         g_strMenuUtilMes[languageBase + 16], kOptionAnimMax, kOptionAnimMax);
-		DrawFont(static_cast<int>(FLOAT_80333628 - font->GetWidth(maxText)), static_cast<int>(FLOAT_80333618),
-		         color, 7, maxText, kOptionAnimMax, kOptionAnimMax);
+		float maxX = FLOAT_80333628 - font->GetWidth(maxText);
+		DrawFont(static_cast<int>(maxX), static_cast<int>(FLOAT_80333618), color, 7, maxText, kOptionAnimMax,
+		         kOptionAnimMax);
 	} else if (m_optionIndex == 4) {
 		CTextureSet* textureSet = GetMenuTextureSet(this, 0xBC);
 		CTexture* cursorPanel = GetTextureSetTexture(textureSet, 4);

@@ -972,10 +972,11 @@ void CPartMng::setProcSpeed(ProcSpdSt*, int)
 void CPartMng::drawEnd()
 {
     gPppHeapUseRateWords[0] = pppHeapCheckLeak__FPQ27CMemory6CStage2(pppEnvStPtr->m_stagePtr);
-    if ((gPppHeapUseRateWords[2] == 0)
-        || ((gPppHeapUseRateWords[2] = gPppHeapUseRateWords[2] - 1), gPppHeapUseRateWords[1] < gPppHeapUseRateWords[0])) {
-        gPppHeapUseRateWords[2] = *(int*)((char*)this + 0x16C) << 1;
+    int heapCheckCount = gPppHeapUseRateWords[2];
+    gPppHeapUseRateWords[2] = heapCheckCount - 1;
+    if ((heapCheckCount == 0) || (gPppHeapUseRateWords[1] < gPppHeapUseRateWords[0])) {
         gPppHeapUseRateWords[1] = gPppHeapUseRateWords[0];
+        gPppHeapUseRateWords[2] = *(int*)((char*)this + 0x16C) << 1;
     }
 }
 
@@ -3759,13 +3760,17 @@ int CPartMng::pppLoadPdt(const char* baseName, int pdtSlotIndex, int cachePriori
 int CPartMng::pppGetFreeDataMng()
 {
     PppPdtSlot* freeSlot = 0;
-    for (int slotIndex = 8; slotIndex < 0x20; slotIndex++) {
-        PppPdtSlot* slot = &m_pdtSlots[slotIndex];
+    PppPdtSlot* slot = &m_pdtSlots[8];
+    int slotIndex = 8;
+    int count = 0x18;
+    do {
         if (slot->m_pppDataHead == 0) {
-            freeSlot = slot;
+            freeSlot = &m_pdtSlots[slotIndex];
             break;
         }
-    }
+        slot++;
+        slotIndex++;
+    } while (--count != 0);
 
     if (freeSlot == 0) {
         if ((unsigned int)System.m_execParam >= 1) {

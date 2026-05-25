@@ -2094,207 +2094,100 @@ void CGObject::onDraw()
 
 /*
  * --INFO--
- * PAL Address: 0x8007def8
- * PAL Size: 88b
+ * PAL Address: 0x8007d4bc
+ * PAL Size: 172b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGObject::CancelMove(int moveType)
+void CGObject::Detach()
 {
-    *((u8*)&m_weaponNodeFlags + 1) =
-        static_cast<u8>(__rlwimi(*((u8*)&m_weaponNodeFlags + 1), 0, 5, 26, 26));
+    struct WeaponNodeFlagBits {
+        signed char m_unused : 7;
+        signed char m_attached : 1;
+    };
+    WeaponNodeFlagBits* weaponNodeFlags = reinterpret_cast<WeaponNodeFlagBits*>(&m_weaponNodeFlags);
 
-    CFlatRuntime::CStack arg;
-    arg.m_word = static_cast<u32>(moveType);
-    gCFlatRuntime().SystemCall(this, 2, 7, 1, &arg, 0);
-}
+    if (weaponNodeFlags->m_attached != 0) {
+        CChara::CNode* node = &m_attachOwner->m_charaModelHandle->m_model->m_nodes[m_attachNode];
 
-/*
- * --INFO--
- * PAL Address: 0x8007de74
- * PAL Size: 132b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGObject::Move(Vec* moveVec, float moveTimer, int turnFrames, int moveMode, int useFacing, int flagA, int flagB)
-{
-    const signed char moveModeFlag = static_cast<signed char>(moveMode);
-    const signed char useFacingFlag = static_cast<signed char>(useFacing);
-    const signed char flagAValue = static_cast<signed char>(flagA);
-    const signed char flagBValue = static_cast<signed char>(flagB);
-    u8* const weaponFlagsLo = reinterpret_cast<u8*>(&m_weaponNodeFlags);
-    u8* const weaponFlagsHi = weaponFlagsLo + 1;
+        m_worldPosition.x = node->m_mtx[0][3];
+        m_worldPosition.y = node->m_mtx[1][3];
+        m_worldPosition.z = node->m_mtx[2][3];
+        PSVECAdd(&m_worldPosition, &m_attachOwner->m_worldPosition, &m_worldPosition);
 
-    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 5, 26, 26));
-    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 0, 4, 27, 27));
-    m_turnFrames = static_cast<u32>(turnFrames);
-    m_moveTarget = *moveVec;
-    m_moveTimer = moveTimer;
-    *weaponFlagsLo = static_cast<u8>(__rlwimi(*weaponFlagsLo, moveModeFlag, 1, 30, 30));
-    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, useFacingFlag, 3, 28, 28));
-    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, flagAValue, 1, 30, 30));
-    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, flagBValue, 2, 29, 29));
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8007de04
- * PAL Size: 112b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGObject::MoveVector(Vec* moveVec, float moveTimer, int turnFrames, int useFacing, int flagA, int flagB)
-{
-    const signed char useFacingFlag = static_cast<signed char>(useFacing);
-    const signed char flagAValue = static_cast<signed char>(flagA);
-    const signed char flagBValue = static_cast<signed char>(flagB);
-    u8* const weaponFlagsHi = reinterpret_cast<u8*>(&m_weaponNodeFlags) + 1;
-
-    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 5, 26, 26));
-    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 4, 27, 27));
-    m_turnFrames = static_cast<u32>(turnFrames);
-    m_moveTarget = *moveVec;
-    m_moveTimer = moveTimer;
-    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, useFacingFlag, 3, 28, 28));
-    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, flagAValue, 1, 30, 30));
-    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, flagBValue, 2, 29, 29));
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8007dd14
- * PAL Size: 240b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGObject::moveVector(Vec* moveVec, float moveTimer, int turnFrames)
-{
-    Vec unitVec;
-    const float mag = PSVECMag(moveVec);
-    if (sZeroFloat == mag) {
-        unitVec.x = sZeroFloat;
-        unitVec.y = sZeroFloat;
-        unitVec.z = sZeroFloat;
-    } else {
-        PSVECScale(moveVec, &unitVec, sAnimFrameOffset / mag);
+        float rotY = m_rotBaseY + m_attachOwner->m_rotBaseY;
+        m_rotTargetY = rotY;
+        m_rotBaseY = rotY;
     }
 
-    u8* const weaponFlagsHi = reinterpret_cast<u8*>(&m_weaponNodeFlags) + 1;
-    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 5, 26, 26));
-    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 4, 27, 27));
-    m_turnFrames = static_cast<u32>(turnFrames);
-    m_moveTarget = unitVec;
-    m_moveTimer = moveTimer;
-    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 3, 28, 28));
-    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 0, 1, 30, 30));
-    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 2, 29, 29));
+    weaponNodeFlags->m_attached = false;
 }
 
 /*
  * --INFO--
- * PAL Address: 0x8007dc24
- * PAL Size: 240b
+ * PAL Address: 0x8007d568
+ * PAL Size: 224b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGObject::moveVectorH(Vec* moveVec, float moveTimer, int turnFrames)
+void CGObject::Attach(CGObject* owner, char* nodeName, Vec* attachLocal)
 {
-    Vec unitVec;
-    const float mag = PSVECMag(moveVec);
-    if (sZeroFloat == mag) {
-        unitVec.x = sZeroFloat;
-        unitVec.y = sZeroFloat;
-        unitVec.z = sZeroFloat;
-    } else {
-        PSVECScale(moveVec, &unitVec, sAnimFrameOffset / mag);
+    struct WeaponNodeFlagBits {
+        signed char m_unused : 7;
+        signed char m_attached : 1;
+    };
+    bool hasModel = false;
+    CCharaPcs::CHandle* handle = owner->m_charaModelHandle;
+
+    if ((handle != 0) && (handle->m_model != 0)) {
+        hasModel = true;
     }
 
-    u8* const weaponFlagsHi = reinterpret_cast<u8*>(&m_weaponNodeFlags) + 1;
-    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 5, 26, 26));
-    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 4, 27, 27));
-    m_turnFrames = static_cast<u32>(turnFrames);
-    m_moveTarget = unitVec;
-    m_moveTimer = moveTimer;
-    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 0, 3, 28, 28));
-    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 0, 1, 30, 30));
-    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 0, 2, 29, 29));
+    if (hasModel) {
+        int nodeIndex = handle->m_model->SearchNode(nodeName);
+        if (nodeIndex >= 0) {
+            reinterpret_cast<WeaponNodeFlagBits*>(&m_weaponNodeFlags)->m_attached = true;
+
+            m_attachOwner = owner;
+            m_attachNode = nodeIndex;
+            m_attachLocal.x = attachLocal->x;
+            m_attachLocal.y = attachLocal->y;
+            m_attachLocal.z = attachLocal->z;
+
+            if ((m_worldParamA != 0x24) && (m_worldParamB != 0x125)) {
+                float rotY = m_rotBaseY - owner->m_rotBaseY;
+                m_rotTargetY = rotY;
+                m_rotBaseY = rotY;
+            }
+
+            m_moveMode = m_moveModePrevious;
+        }
+    }
 }
 
 /*
  * --INFO--
- * PAL Address: 0x8007dae8
- * PAL Size: 316b
+ * PAL Address: 0x8007d648
+ * PAL Size: 232b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGObject::moveVectorRot(float rotX, float rotY, float moveTimer, int turnFrames)
+void CGObject::CCClassRot(int useBodyRadius, int classMask, float yOffset, float rotY, float distance, float radius)
 {
-    const float cosY0 = static_cast<float>(cos(rotY));
-    const float sinX = static_cast<float>(sin(rotX));
-    const float sinY = static_cast<float>(sin(rotY));
-    const float cosY1 = static_cast<float>(cos(rotY));
-    const float cosX = static_cast<float>(cos(rotX));
+    Vec targetPos;
 
-    u8* const weaponFlagsHi = reinterpret_cast<u8*>(&m_weaponNodeFlags) + 1;
-    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 5, 26, 26));
-    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 4, 27, 27));
-    m_turnFrames = static_cast<u32>(turnFrames);
-    m_moveTarget.x = sinX * cosY0;
-    m_moveTarget.y = sinY;
-    m_moveTarget.z = cosX * cosY1;
-    m_moveTimer = moveTimer;
-    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 3, 28, 28));
-    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 0, 1, 30, 30));
-    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 2, 29, 29));
+    targetPos.x = distance * static_cast<float>(sin(rotY)) + m_worldPosition.x;
+    targetPos.y = m_worldPosition.y + yOffset;
+    targetPos.z = distance * static_cast<float>(cos(rotY)) + m_worldPosition.z;
+    CCClass(useBodyRadius, classMask, yOffset, &targetPos, radius);
 }
 
-/*
- * --INFO--
- * PAL Address: 0x8007d9ac
- * PAL Size: 316b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGObject::moveVectorHRot(float rotX, float rotY, float moveTimer, int turnFrames)
-{
-    const float cosY0 = static_cast<float>(cos(rotY));
-    const float sinX = static_cast<float>(sin(rotX));
-    const float sinY = static_cast<float>(sin(rotY));
-    const float cosY1 = static_cast<float>(cos(rotY));
-    const float cosX = static_cast<float>(cos(rotX));
-
-    u8* const weaponFlagsHi = reinterpret_cast<u8*>(&m_weaponNodeFlags) + 1;
-    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 5, 26, 26));
-    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 4, 27, 27));
-    m_turnFrames = static_cast<u32>(turnFrames);
-    m_moveTarget.x = sinX * cosY0;
-    m_moveTarget.y = sinY;
-    m_moveTarget.z = cosX * cosY1;
-    m_moveTimer = moveTimer;
-    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 0, 3, 28, 28));
-    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 0, 1, 30, 30));
-    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 0, 2, 29, 29));
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
 /*
  * --INFO--
  * PAL Address: 0x8007d730
@@ -2363,99 +2256,202 @@ CGObject* CGObject::CCClass(int useBodyRadius, int classMask, float yOffset, Vec
 
 /*
  * --INFO--
- * PAL Address: 0x8007d648
- * PAL Size: 232b
+ * PAL Address: 0x8007d9ac
+ * PAL Size: 316b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGObject::CCClassRot(int useBodyRadius, int classMask, float yOffset, float rotY, float distance, float radius)
+void CGObject::moveVectorHRot(float rotX, float rotY, float moveTimer, int turnFrames)
 {
-    Vec targetPos;
+    const float cosY0 = static_cast<float>(cos(rotY));
+    const float sinX = static_cast<float>(sin(rotX));
+    const float sinY = static_cast<float>(sin(rotY));
+    const float cosY1 = static_cast<float>(cos(rotY));
+    const float cosX = static_cast<float>(cos(rotX));
 
-    targetPos.x = distance * static_cast<float>(sin(rotY)) + m_worldPosition.x;
-    targetPos.y = m_worldPosition.y + yOffset;
-    targetPos.z = distance * static_cast<float>(cos(rotY)) + m_worldPosition.z;
-    CCClass(useBodyRadius, classMask, yOffset, &targetPos, radius);
+    u8* const weaponFlagsHi = reinterpret_cast<u8*>(&m_weaponNodeFlags) + 1;
+    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 5, 26, 26));
+    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 4, 27, 27));
+    m_turnFrames = static_cast<u32>(turnFrames);
+    m_moveTarget.x = sinX * cosY0;
+    m_moveTarget.y = sinY;
+    m_moveTarget.z = cosX * cosY1;
+    m_moveTimer = moveTimer;
+    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 0, 3, 28, 28));
+    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 0, 1, 30, 30));
+    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 0, 2, 29, 29));
 }
 
 /*
  * --INFO--
- * PAL Address: 0x8007d568
- * PAL Size: 224b
+ * PAL Address: 0x8007dae8
+ * PAL Size: 316b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGObject::Attach(CGObject* owner, char* nodeName, Vec* attachLocal)
+void CGObject::moveVectorRot(float rotX, float rotY, float moveTimer, int turnFrames)
 {
-    struct WeaponNodeFlagBits {
-        signed char m_unused : 7;
-        signed char m_attached : 1;
-    };
-    bool hasModel = false;
-    CCharaPcs::CHandle* handle = owner->m_charaModelHandle;
+    const float cosY0 = static_cast<float>(cos(rotY));
+    const float sinX = static_cast<float>(sin(rotX));
+    const float sinY = static_cast<float>(sin(rotY));
+    const float cosY1 = static_cast<float>(cos(rotY));
+    const float cosX = static_cast<float>(cos(rotX));
 
-    if ((handle != 0) && (handle->m_model != 0)) {
-        hasModel = true;
-    }
-
-    if (hasModel) {
-        int nodeIndex = handle->m_model->SearchNode(nodeName);
-        if (nodeIndex >= 0) {
-            reinterpret_cast<WeaponNodeFlagBits*>(&m_weaponNodeFlags)->m_attached = true;
-
-            m_attachOwner = owner;
-            m_attachNode = nodeIndex;
-            m_attachLocal.x = attachLocal->x;
-            m_attachLocal.y = attachLocal->y;
-            m_attachLocal.z = attachLocal->z;
-
-            if ((m_worldParamA != 0x24) && (m_worldParamB != 0x125)) {
-                float rotY = m_rotBaseY - owner->m_rotBaseY;
-                m_rotTargetY = rotY;
-                m_rotBaseY = rotY;
-            }
-
-            m_moveMode = m_moveModePrevious;
-        }
-    }
+    u8* const weaponFlagsHi = reinterpret_cast<u8*>(&m_weaponNodeFlags) + 1;
+    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 5, 26, 26));
+    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 4, 27, 27));
+    m_turnFrames = static_cast<u32>(turnFrames);
+    m_moveTarget.x = sinX * cosY0;
+    m_moveTarget.y = sinY;
+    m_moveTarget.z = cosX * cosY1;
+    m_moveTimer = moveTimer;
+    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 3, 28, 28));
+    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 0, 1, 30, 30));
+    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 2, 29, 29));
 }
 
 /*
  * --INFO--
- * PAL Address: 0x8007d4bc
- * PAL Size: 172b
+ * PAL Address: 0x8007dc24
+ * PAL Size: 240b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGObject::Detach()
+void CGObject::moveVectorH(Vec* moveVec, float moveTimer, int turnFrames)
 {
-    struct WeaponNodeFlagBits {
-        signed char m_unused : 7;
-        signed char m_attached : 1;
-    };
-    WeaponNodeFlagBits* weaponNodeFlags = reinterpret_cast<WeaponNodeFlagBits*>(&m_weaponNodeFlags);
-
-    if (weaponNodeFlags->m_attached != 0) {
-        CChara::CNode* node = &m_attachOwner->m_charaModelHandle->m_model->m_nodes[m_attachNode];
-
-        m_worldPosition.x = node->m_mtx[0][3];
-        m_worldPosition.y = node->m_mtx[1][3];
-        m_worldPosition.z = node->m_mtx[2][3];
-        PSVECAdd(&m_worldPosition, &m_attachOwner->m_worldPosition, &m_worldPosition);
-
-        float rotY = m_rotBaseY + m_attachOwner->m_rotBaseY;
-        m_rotTargetY = rotY;
-        m_rotBaseY = rotY;
+    Vec unitVec;
+    const float mag = PSVECMag(moveVec);
+    if (sZeroFloat == mag) {
+        unitVec.x = sZeroFloat;
+        unitVec.y = sZeroFloat;
+        unitVec.z = sZeroFloat;
+    } else {
+        PSVECScale(moveVec, &unitVec, sAnimFrameOffset / mag);
     }
 
-    weaponNodeFlags->m_attached = false;
+    u8* const weaponFlagsHi = reinterpret_cast<u8*>(&m_weaponNodeFlags) + 1;
+    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 5, 26, 26));
+    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 4, 27, 27));
+    m_turnFrames = static_cast<u32>(turnFrames);
+    m_moveTarget = unitVec;
+    m_moveTimer = moveTimer;
+    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 0, 3, 28, 28));
+    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 0, 1, 30, 30));
+    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 0, 2, 29, 29));
 }
+
+/*
+ * --INFO--
+ * PAL Address: 0x8007dd14
+ * PAL Size: 240b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGObject::moveVector(Vec* moveVec, float moveTimer, int turnFrames)
+{
+    Vec unitVec;
+    const float mag = PSVECMag(moveVec);
+    if (sZeroFloat == mag) {
+        unitVec.x = sZeroFloat;
+        unitVec.y = sZeroFloat;
+        unitVec.z = sZeroFloat;
+    } else {
+        PSVECScale(moveVec, &unitVec, sAnimFrameOffset / mag);
+    }
+
+    u8* const weaponFlagsHi = reinterpret_cast<u8*>(&m_weaponNodeFlags) + 1;
+    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 5, 26, 26));
+    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 4, 27, 27));
+    m_turnFrames = static_cast<u32>(turnFrames);
+    m_moveTarget = unitVec;
+    m_moveTimer = moveTimer;
+    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 3, 28, 28));
+    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 0, 1, 30, 30));
+    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 2, 29, 29));
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8007de04
+ * PAL Size: 112b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGObject::MoveVector(Vec* moveVec, float moveTimer, int turnFrames, int useFacing, int flagA, int flagB)
+{
+    const signed char useFacingFlag = static_cast<signed char>(useFacing);
+    const signed char flagAValue = static_cast<signed char>(flagA);
+    const signed char flagBValue = static_cast<signed char>(flagB);
+    u8* const weaponFlagsHi = reinterpret_cast<u8*>(&m_weaponNodeFlags) + 1;
+
+    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 5, 26, 26));
+    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 4, 27, 27));
+    m_turnFrames = static_cast<u32>(turnFrames);
+    m_moveTarget = *moveVec;
+    m_moveTimer = moveTimer;
+    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, useFacingFlag, 3, 28, 28));
+    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, flagAValue, 1, 30, 30));
+    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, flagBValue, 2, 29, 29));
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8007de74
+ * PAL Size: 132b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGObject::Move(Vec* moveVec, float moveTimer, int turnFrames, int moveMode, int useFacing, int flagA, int flagB)
+{
+    const signed char moveModeFlag = static_cast<signed char>(moveMode);
+    const signed char useFacingFlag = static_cast<signed char>(useFacing);
+    const signed char flagAValue = static_cast<signed char>(flagA);
+    const signed char flagBValue = static_cast<signed char>(flagB);
+    u8* const weaponFlagsLo = reinterpret_cast<u8*>(&m_weaponNodeFlags);
+    u8* const weaponFlagsHi = weaponFlagsLo + 1;
+
+    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 1, 5, 26, 26));
+    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, 0, 4, 27, 27));
+    m_turnFrames = static_cast<u32>(turnFrames);
+    m_moveTarget = *moveVec;
+    m_moveTimer = moveTimer;
+    *weaponFlagsLo = static_cast<u8>(__rlwimi(*weaponFlagsLo, moveModeFlag, 1, 30, 30));
+    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, useFacingFlag, 3, 28, 28));
+    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, flagAValue, 1, 30, 30));
+    *weaponFlagsHi = static_cast<u8>(__rlwimi(*weaponFlagsHi, flagBValue, 2, 29, 29));
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8007def8
+ * PAL Size: 88b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGObject::CancelMove(int moveType)
+{
+    *((u8*)&m_weaponNodeFlags + 1) =
+        static_cast<u8>(__rlwimi(*((u8*)&m_weaponNodeFlags + 1), 0, 5, 26, 26));
+
+    CFlatRuntime::CStack arg;
+    arg.m_word = static_cast<u32>(moveType);
+    gCFlatRuntime().SystemCall(this, 2, 7, 1, &arg, 0);
+}
+
 
 /*
  * --INFO--

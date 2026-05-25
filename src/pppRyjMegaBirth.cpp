@@ -282,10 +282,15 @@ void pppRyjMegaBirthCon(_pppPObject* pObject, PRyjMegaBirthOffsets* offsets)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 100b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-static inline void init_matrix(_pppPObject* pObject, pppFMATRIX& out, PRyjMegaBirth* params, VRyjMegaBirth* work)
+#pragma exceptions off
+void init_matrix(_pppPObject* pObject, pppFMATRIX& out, PRyjMegaBirth* params, VRyjMegaBirth* work)
 {
 	u8 mode = params->m_spawnMode;
 
@@ -308,10 +313,14 @@ static inline void init_matrix(_pppPObject* pObject, pppFMATRIX& out, PRyjMegaBi
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 536b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-static inline void set_matrix(
+void set_matrix(
 	_pppPObject* pObject, pppFMATRIX& out, PRyjMegaBirth* params, VRyjMegaBirth* work, _PARTICLE_DATA* particle,
 	_PARTICLE_WMAT* particleWorldMat)
 {
@@ -336,6 +345,7 @@ static inline void set_matrix(
 	PSMTXConcat(world.value, local.value, world.value);
 	PSMTXConcat(ppvCameraMatrix0, world.value, out.value);
 }
+#pragma exceptions on
 
 /*
  * --INFO--

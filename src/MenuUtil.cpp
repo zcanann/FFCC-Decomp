@@ -8,9 +8,15 @@
 #include "ffcc/system.h"
 #include "ffcc/RedSound/RedSound.h"
 #include "ffcc/fontman.h"
+#include "ffcc/util.h"
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/ctype.h>
+
+struct Vec2d {
+	float x;
+	float y;
+};
 
 extern "C" char s_MenuUtil_cpp_801e37fc[];
 extern u32 DAT_801e36d0;
@@ -32,7 +38,21 @@ extern "C" const float kOptionOpenAnimStep = 0.04f;
 extern "C" const float kOptionColumnAnimStep = 0.2f;
 extern "C" const float kOptionVolumeScale = 10.583333f;
 extern "C" const float FLOAT_80333654 = 25.0f;
+extern float FLOAT_80333548;
+extern float FLOAT_80333550;
+extern float FLOAT_80333554;
+extern float FLOAT_8033355C;
+extern float FLOAT_80333560;
+extern float FLOAT_80333564;
+extern float FLOAT_80333568;
+extern float FLOAT_80333570;
+extern float FLOAT_80333574;
+extern float FLOAT_80333578;
 extern float FLOAT_8033357c;
+extern float FLOAT_80333580;
+extern float FLOAT_80333584;
+extern float FLOAT_80333588;
+extern float FLOAT_80333590;
 extern float FLOAT_803335a0;
 extern const char sMenuUtilEmptyText[4] = "";
 extern const char sMenuUtilStringFormat[] = "%s";
@@ -199,6 +219,11 @@ static inline int* GetMenuHelpMsgTable()
 static inline CRedSound* GetRedSoundGlobal()
 {
 	return reinterpret_cast<CRedSound*>(reinterpret_cast<unsigned char*>(&Sound) + 8);
+}
+
+static inline CTexture* GetMenuTexture(CMenuPcs* menu, int offset)
+{
+	return *reinterpret_cast<CTexture**>(reinterpret_cast<unsigned char*>(menu) + offset);
 }
 }
 
@@ -967,7 +992,111 @@ void CMenuPcs::CalcOptionMenu()
  */
 void CMenuPcs::DrawOptionMenu()
 {
-	// TODO
+	CFont* font = menuFont;
+	int languageBase = (Game.m_gameWork.m_languageId - 1) * 20;
+	int alpha = static_cast<int>(FLOAT_80333550 * m_optionOpenAnim);
+	_GXColor color = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alpha)};
+	Vec2d uv0;
+	Vec2d uv1;
+
+	char* optionText[5];
+	char* helpText[5];
+	optionText[0] = g_strMenuUtilMes[languageBase + 2];
+	optionText[1] = g_strMenuUtilMes[languageBase + 3];
+	optionText[2] = g_strMenuUtilMes[languageBase + 4];
+	optionText[3] = g_strMenuUtilMes[languageBase + 5];
+	optionText[4] = g_strMenuUtilMes[languageBase + 6];
+	helpText[0] = g_strMenuUtilMes[languageBase + 7];
+	helpText[1] = g_strMenuUtilMes[languageBase + 8];
+	helpText[2] = g_strMenuUtilMes[languageBase + 9];
+	helpText[3] = g_strMenuUtilMes[languageBase + 10];
+	helpText[4] = g_strMenuUtilMes[languageBase + 11];
+
+	font->SetScale(FLOAT_80333548);
+	font->SetMargin(kOptionAnimMin);
+
+	CTexture* banner = GetMenuTexture(this, 0xD4);
+	float bannerHeight = static_cast<float>(banner->m_height);
+	gUtil.CalcUV(uv0.x, uv0.y, 0, 0, banner->m_width, banner->m_height);
+	gUtil.CalcUV(uv1.x, uv1.y, 0x280, banner->m_height, banner->m_width, banner->m_height);
+	gUtil.RenderTextureQuad(kOptionAnimMin,
+	                        -(bannerHeight * kMenuCenteringHalfWidth - FLOAT_80333554) - FLOAT_8033355C,
+	                        FLOAT_80333560, bannerHeight, banner, &uv0, &uv1, &color, GX_BL_SRCALPHA,
+	                        GX_BL_INVSRCALPHA);
+
+	CTexture* panel = GetMenuTexture(this, 0xE8);
+	float panelWidth = static_cast<float>(panel->m_width);
+	float panelHeight = static_cast<float>(panel->m_height);
+	float panelRight = FLOAT_80333564 + panelWidth;
+	float panelBottom = FLOAT_80333568 + panelHeight;
+	gUtil.RenderTextureQuad(FLOAT_80333564, FLOAT_80333568, panelWidth, panelHeight, panel, 0, 0, &color,
+	                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
+	uv0.x = kOptionAnimMin;
+	uv0.y = kOptionAnimMax;
+	uv1.x = kOptionAnimMax;
+	uv1.y = kOptionAnimMin;
+	gUtil.RenderTextureQuad(FLOAT_80333564, panelBottom, panelWidth, panelHeight, panel, &uv0, &uv1, &color,
+	                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
+	uv0.x = kOptionAnimMax;
+	uv0.y = kOptionAnimMin;
+	uv1.x = kOptionAnimMin;
+	uv1.y = kOptionAnimMax;
+	gUtil.RenderTextureQuad(panelRight, FLOAT_80333568, panelWidth, panelHeight, panel, &uv0, &uv1, &color,
+	                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
+	uv0.x = kOptionAnimMax;
+	uv0.y = kOptionAnimMax;
+	uv1.x = kOptionAnimMin;
+	uv1.y = kOptionAnimMin;
+	gUtil.RenderTextureQuad(panelRight, panelBottom, panelWidth, panelHeight, panel, &uv0, &uv1, &color,
+	                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
+
+	CTexture* cursor = GetMenuTexture(this, 0x18C);
+	gUtil.CalcUV(uv0.x, uv0.y, 0, 0, cursor->m_width, cursor->m_height);
+	gUtil.CalcUV(uv1.x, uv1.y, 0x20, 0x20, cursor->m_width, cursor->m_height);
+	gUtil.RenderTextureQuad(static_cast<float>((System.m_frameCounter & 7) + 0x1C),
+	                        static_cast<float>(m_optionIndex * 0x28 + 0x70), FLOAT_80333570,
+	                        FLOAT_80333570, cursor, &uv0, &uv1, &color, GX_BL_SRCALPHA,
+	                        GX_BL_INVSRCALPHA);
+
+	CTexture* marker = GetMenuTexture(this, 0xC8);
+	gUtil.RenderTextureQuad(FLOAT_80333574, static_cast<float>(m_optionIndex * 0x28 + 0x70),
+	                        static_cast<float>(marker->m_width), static_cast<float>(marker->m_height), marker, 0, 0,
+	                        &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
+
+	font->SetScaleX(FLOAT_80333578);
+	for (int i = 0, rowY = 0x70, selectedY = 0x73, normalY = 0x75; i < 5;
+	     i++, rowY += 0x28, selectedY += 0x28, normalY += 0x28) {
+		CTexture* row = GetMenuTexture(this, 0xC0);
+		uv0.x = (i == m_optionIndex) ? kOptionAnimMin : kMenuCenteringHalfWidth;
+		uv0.y = kOptionAnimMin;
+		uv1.x = (i == m_optionIndex) ? kMenuCenteringHalfWidth : kOptionAnimMax;
+		uv1.y = kOptionAnimMax;
+		gUtil.RenderTextureQuad(FLOAT_8033357c, static_cast<float>(rowY - 0x10),
+		                        static_cast<float>(row->m_width) * kMenuCenteringHalfWidth,
+		                        static_cast<float>(row->m_height), row, &uv0, &uv1, &color, GX_BL_SRCALPHA,
+		                        GX_BL_INVSRCALPHA);
+
+		if (i == m_optionIndex) {
+			DrawFont(0x5E, static_cast<int>(FLOAT_80333580 + static_cast<float>(selectedY)), color, 0x16,
+			         optionText[i], kOptionAnimMax, kOptionAnimMax);
+		} else {
+			DrawFont(0x60, static_cast<int>(FLOAT_80333580 + static_cast<float>(normalY)), color, 6,
+			         optionText[i], kOptionAnimMax, kOptionAnimMax);
+		}
+	}
+
+	font->SetScaleX(kOptionAnimMax);
+	gUtil.RenderTextureQuad(kOptionAnimMin, FLOAT_80333584, FLOAT_80333560, FLOAT_80333588,
+	                        GetMenuTexture(this, 0x208), 0, 0, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
+
+	font->SetShadow(1);
+	font->SetMargin(kOptionAnimMax);
+	font->SetScaleX(FLOAT_80333578);
+	font->SetScaleY(kOptionAnimMax);
+	DrawFont2(static_cast<int>(-(font->GetWidth(helpText[m_optionIndex]) * kMenuCenteringHalfWidth -
+	                            kMenuCenteringOffset)),
+	          static_cast<int>(FLOAT_80333590), color, 7, helpText[m_optionIndex], FLOAT_80333578,
+	          kOptionAnimMax, kOptionAnimMax);
 }
 
 /*

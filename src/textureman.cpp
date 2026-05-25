@@ -1,4 +1,5 @@
 #define FFCC_TEXTUREMAN_USE_PTRARRAY_MEMBER
+#define FFCC_TEXTUREMAN_INLINE_CTEXTURE_CTOR
 #include "ffcc/textureman.h"
 #include "ffcc/chunkfile.h"
 #include "ffcc/gxfunc.h"
@@ -770,27 +771,6 @@ CTexture::~CTexture()
             m_tlutData = 0;
         }
     }
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8003B988
- * PAL Size: 100b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-CTexture::CTexture()
-{
-    m_maxLod = 0;
-    m_imageData = 0;
-    m_tlutData = 0;
-    m_isIntensityAlpha = 0;
-    m_isAlphaLut = 0;
-    m_name[0] = 0;
-    m_cacheId = -1;
-    m_usesExternalAddress = 0;
 }
 
 /*

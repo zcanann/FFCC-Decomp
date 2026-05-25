@@ -100,6 +100,12 @@ extern "C" const char s_Blitz_Hieb_801DEAAC[] = "Blitz-Hieb";
 extern "C" const char s_Colpo_Fire_801DEAB8[] = "Colpo Fire";
 extern "C" const char s_Colpo_Blizzard_801DEAC4[] = "Colpo Blizzard";
 
+extern "C" const char* PTR_s_Flamestrike[] = {
+    s_Flamestrike_801DEA6C,
+    s_Icestrike_801DEA78,
+    s_Thunderstrike_801DEA84,
+};
+
 extern "C" const char* PTR_s_Pyro_Frappe[] = {
     s_Pyro_Frappe_801DEAE4,
     s_Cryo_Frappe_801DEAF0,

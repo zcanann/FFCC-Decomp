@@ -3763,18 +3763,17 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         return;
     case -0xC0: {
         const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
-        Vec position = {
+        CVector position(
             localFloats[0],
             localFloats[1],
-            localFloats[2],
-        };
+            localFloats[2]);
         _GXColor color = {
             static_cast<u8>(object->m_localBase[3]),
             static_cast<u8>(object->m_localBase[4]),
             static_cast<u8>(object->m_localBase[5]),
             static_cast<u8>(object->m_localBase[6]),
         };
-        CharaPcs.SetTexShadowPos(&position);
+        CharaPcs.SetTexShadowPos(position);
         CharaPcs.SetTexShadowColor(color);
         CharaPcs.SetTexShadowRadius(localFloats[7]);
         runtime->push(object, 0);

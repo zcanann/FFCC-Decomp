@@ -185,10 +185,10 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 	escapeDir.z = escapeDirSource.z;
 	reinterpret_cast<CVector*>(&escapeDir)->Normalize();
 
-	float behindBestDist = kAStarEscapeInitialBestDist;
+	double behindBestDist = kAStarEscapeInitialBestDist;
 	CAPos* behindBest = (CAPos*)0;
 	CAPos* aheadBest = (CAPos*)0;
-	float aheadBestDist = behindBestDist;
+	double aheadBestDist = behindBestDist;
 	CAPos* portal = m_portals;
 	int i = 0;
 

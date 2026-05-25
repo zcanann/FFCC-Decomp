@@ -3775,7 +3775,7 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         };
         CharaPcs.SetTexShadowPos(&position);
         CharaPcs.SetTexShadowColor(color);
-        CharaPcs.SetTexShadowRadius(static_cast<float>(object->m_localBase[7]));
+        CharaPcs.SetTexShadowRadius(localFloats[7]);
         runtime->push(object, 0);
         outResult = 0;
         return;

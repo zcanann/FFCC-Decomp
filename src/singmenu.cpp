@@ -2319,47 +2319,6 @@ void CMenuPcs::DrawNoShadowFont(CFont* font, char* text, float x, float y, int t
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-int CMenuPcs::GetItemType(int itemId, int useRawItemId)
-{
-    if (useRawItemId == 0) {
-        itemId = static_cast<int>(*reinterpret_cast<s16*>(Game.m_scriptFoodBase[0] + itemId * 2 + 0xB6));
-    }
-
-    if (itemId < 1) {
-        return 0;
-    }
-    if (itemId < 0x9F) {
-        return 1;
-    }
-    if (itemId < 0x100) {
-        return 2;
-    }
-    if (itemId < 0x125) {
-        return 3;
-    }
-    if (itemId == 0x125) {
-        return 4;
-    }
-    if (itemId < 0x12A) {
-        return 5;
-    }
-    if (itemId < 0x17D) {
-        return 6;
-    }
-    if (itemId <= 0x188) {
-        return 7;
-    }
-    if (itemId <= 400) {
-        return 8;
-    }
-    return 9;
-}
-
-/*
- * --INFO--
  * PAL Address: 0x8014744c
  * PAL Size: 164b
  * EN Address: TODO
@@ -3434,4 +3393,47 @@ char* CMenuPcs::GetAttrStr(int index)
 u8 CMenuPcs::GetItemIcon(int index)
 {
     return gSingMenuItemIconByType[index];
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+int CMenuPcs::GetItemType(int itemId, int useRawItemId)
+{
+    int script = Game.m_scriptFoodBase[0];
+
+    if (useRawItemId == 0) {
+        itemId = static_cast<int>(*reinterpret_cast<s16*>(script + itemId * 2 + 0xB6));
+    }
+
+    if (itemId <= 0) {
+        return 0;
+    }
+    if (itemId <= 0x9E) {
+        return 1;
+    }
+    if (itemId <= 0xFF) {
+        return 2;
+    }
+    if (itemId <= 0x124) {
+        return 3;
+    }
+    if (itemId == 0x125) {
+        return 4;
+    }
+    if (itemId <= 0x129) {
+        return 5;
+    }
+    if (itemId <= 0x17C) {
+        return 6;
+    }
+    if (itemId <= 0x188) {
+        return 7;
+    }
+    if (itemId < 0x191) {
+        return 8;
+    }
+    return 9;
 }

@@ -886,10 +886,10 @@ void CCharaPcs::create()
  */
 void CCharaPcs::createLoad()
 {
-    m_loadStreamCursor = 0;
-    Memory.SetDefaultGroup(2);
-    LoadMergeFile(0, 0x10000000, 1);
-    Memory.ResetDefaultGroup();
+    CharaPcs.m_loadStreamCursor = 0;
+    Memory.DefaultGroup() = 2;
+    CharaPcs.LoadMergeFile(0, 0x10000000, 1);
+    Memory.DefaultGroup() = 0;
 }
 
 /*

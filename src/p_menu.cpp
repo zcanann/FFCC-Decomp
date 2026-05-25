@@ -758,102 +758,106 @@ void CMenuPcs::changeMode(CMenuPcs::MENUMODE mode)
     if (*reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x740) != static_cast<int>(mode)) {
         Graphic._WaitDrawDone(const_cast<char*>(s_p_menu_cpp), 0x1B0);
         currentMode = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x740);
-        if (currentMode == 1) {
-            destroyWorld();
-        } else if (currentMode < 1) {
-            if ((currentMode != -1) && (-2 < currentMode)) {
-                refObject = *reinterpret_cast<int**>(reinterpret_cast<u8*>(this) + 0xFC);
-                if (refObject != nullptr) {
-                    refCount = refObject[1] - 1;
-                    refObject[1] = refCount;
-                    if ((refCount == 0) && (refObject != nullptr)) {
-                        reinterpret_cast<void (**)(void*, int)>(refObject[0])[2](refObject, 1);
+        if (currentMode != 1) {
+            if (currentMode < 1) {
+                if ((currentMode != -1) && (-2 < currentMode)) {
+                    refObject = *reinterpret_cast<int**>(reinterpret_cast<u8*>(this) + 0xFC);
+                    if (refObject != nullptr) {
+                        refCount = refObject[1] - 1;
+                        refObject[1] = refCount;
+                        if ((refCount == 0) && (refObject != nullptr)) {
+                            reinterpret_cast<void (**)(void*, int)>(refObject[0])[2](refObject, 1);
+                        }
+                        *reinterpret_cast<void**>(reinterpret_cast<u8*>(this) + 0xFC) = nullptr;
                     }
-                    *reinterpret_cast<void**>(reinterpret_cast<u8*>(this) + 0xFC) = nullptr;
+
+                    i = 0;
+                    slotMenu = this;
+                    do {
+                        refObject = *reinterpret_cast<int**>(reinterpret_cast<u8*>(slotMenu) + 0x1E4);
+                        if (refObject != nullptr) {
+                            refCount = refObject[1] - 1;
+                            refObject[1] = refCount;
+                            if ((refCount == 0) && (refObject != nullptr)) {
+                                reinterpret_cast<void (**)(void*, int)>(refObject[0])[2](refObject, 1);
+                            }
+                            *reinterpret_cast<void**>(reinterpret_cast<u8*>(slotMenu) + 0x1E4) = nullptr;
+                        }
+                        i++;
+                        slotMenu = reinterpret_cast<CMenuPcs*>(reinterpret_cast<u8*>(slotMenu) + 4);
+                    } while (i < 10);
+
+                    i = 0;
+                    slotMenu = this;
+                    do {
+                        refObject = *reinterpret_cast<int**>(reinterpret_cast<u8*>(slotMenu) + 0x154);
+                        if (refObject != nullptr) {
+                            refCount = refObject[1] - 1;
+                            refObject[1] = refCount;
+                            if ((refCount == 0) && (refObject != nullptr)) {
+                                reinterpret_cast<void (**)(void*, int)>(refObject[0])[2](refObject, 1);
+                            }
+                            *reinterpret_cast<void**>(reinterpret_cast<u8*>(slotMenu) + 0x154) = nullptr;
+                        }
+                        i++;
+                        slotMenu = reinterpret_cast<CMenuPcs*>(reinterpret_cast<u8*>(slotMenu) + 4);
+                    } while (i < 2);
+
+                    i = 0;
+                    slotMenu = this;
+                    do {
+                        refObject = *reinterpret_cast<int**>(reinterpret_cast<u8*>(slotMenu) + 0x13C);
+                        if (refObject != nullptr) {
+                            refCount = refObject[1] - 1;
+                            refObject[1] = refCount;
+                            if ((refCount == 0) && (refObject != nullptr)) {
+                                reinterpret_cast<void (**)(void*, int)>(refObject[0])[2](refObject, 1);
+                            }
+                            *reinterpret_cast<void**>(reinterpret_cast<u8*>(slotMenu) + 0x13C) = nullptr;
+                        }
+                        i++;
+                        slotMenu = reinterpret_cast<CMenuPcs*>(reinterpret_cast<u8*>(slotMenu) + 4);
+                    } while (i < 4);
+
+                    i = 0;
+                    slotMenu = this;
+                    do {
+                        refObject = *reinterpret_cast<int**>(reinterpret_cast<u8*>(slotMenu) + 0x10C);
+                        if (refObject != nullptr) {
+                            refCount = refObject[1] - 1;
+                            refObject[1] = refCount;
+                            if ((refCount == 0) && (refObject != nullptr)) {
+                                reinterpret_cast<void (**)(void*, int)>(refObject[0])[2](refObject, 1);
+                            }
+                            *reinterpret_cast<void**>(reinterpret_cast<u8*>(slotMenu) + 0x10C) = nullptr;
+                        }
+                        i++;
+                        slotMenu = reinterpret_cast<CMenuPcs*>(reinterpret_cast<u8*>(slotMenu) + 4);
+                    } while (i < 12);
+
+                    destroySingleMenu();
+                    destroyVillageMenu();
                 }
-
-                i = 0;
-                slotMenu = this;
-                do {
-                    refObject = *reinterpret_cast<int**>(reinterpret_cast<u8*>(slotMenu) + 0x1E4);
-                    if (refObject != nullptr) {
-                        refCount = refObject[1] - 1;
-                        refObject[1] = refCount;
-                        if ((refCount == 0) && (refObject != nullptr)) {
-                            reinterpret_cast<void (**)(void*, int)>(refObject[0])[2](refObject, 1);
-                        }
-                        *reinterpret_cast<void**>(reinterpret_cast<u8*>(slotMenu) + 0x1E4) = nullptr;
-                    }
-                    i++;
-                    slotMenu = reinterpret_cast<CMenuPcs*>(reinterpret_cast<u8*>(slotMenu) + 4);
-                } while (i < 10);
-
-                i = 0;
-                slotMenu = this;
-                do {
-                    refObject = *reinterpret_cast<int**>(reinterpret_cast<u8*>(slotMenu) + 0x154);
-                    if (refObject != nullptr) {
-                        refCount = refObject[1] - 1;
-                        refObject[1] = refCount;
-                        if ((refCount == 0) && (refObject != nullptr)) {
-                            reinterpret_cast<void (**)(void*, int)>(refObject[0])[2](refObject, 1);
-                        }
-                        *reinterpret_cast<void**>(reinterpret_cast<u8*>(slotMenu) + 0x154) = nullptr;
-                    }
-                    i++;
-                    slotMenu = reinterpret_cast<CMenuPcs*>(reinterpret_cast<u8*>(slotMenu) + 4);
-                } while (i < 2);
-
-                i = 0;
-                slotMenu = this;
-                do {
-                    refObject = *reinterpret_cast<int**>(reinterpret_cast<u8*>(slotMenu) + 0x13C);
-                    if (refObject != nullptr) {
-                        refCount = refObject[1] - 1;
-                        refObject[1] = refCount;
-                        if ((refCount == 0) && (refObject != nullptr)) {
-                            reinterpret_cast<void (**)(void*, int)>(refObject[0])[2](refObject, 1);
-                        }
-                        *reinterpret_cast<void**>(reinterpret_cast<u8*>(slotMenu) + 0x13C) = nullptr;
-                    }
-                    i++;
-                    slotMenu = reinterpret_cast<CMenuPcs*>(reinterpret_cast<u8*>(slotMenu) + 4);
-                } while (i < 4);
-
-                i = 0;
-                slotMenu = this;
-                do {
-                    refObject = *reinterpret_cast<int**>(reinterpret_cast<u8*>(slotMenu) + 0x10C);
-                    if (refObject != nullptr) {
-                        refCount = refObject[1] - 1;
-                        refObject[1] = refCount;
-                        if ((refCount == 0) && (refObject != nullptr)) {
-                            reinterpret_cast<void (**)(void*, int)>(refObject[0])[2](refObject, 1);
-                        }
-                        *reinterpret_cast<void**>(reinterpret_cast<u8*>(slotMenu) + 0x10C) = nullptr;
-                    }
-                    i++;
-                    slotMenu = reinterpret_cast<CMenuPcs*>(reinterpret_cast<u8*>(slotMenu) + 4);
-                } while (i < 12);
-
-                destroySingleMenu();
-                destroyVillageMenu();
+            } else if (currentMode < 3) {
+                destroyBonus();
             }
-        } else if (currentMode < 3) {
-            destroyBonus();
+        } else {
+            destroyWorld();
         }
 
         *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x740) = static_cast<int>(mode);
         currentMode = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x740);
-        if (currentMode == 1) {
-            createWorld();
-        } else if (currentMode < 1) {
-            if ((currentMode != -1) && (-2 < currentMode)) {
-                createBattle();
-                createSingleMenu();
+        if (currentMode != 1) {
+            if (currentMode < 1) {
+                if ((currentMode != -1) && (-2 < currentMode)) {
+                    createBattle();
+                    createSingleMenu();
+                }
+            } else if (currentMode < 3) {
+                createBonus();
             }
-        } else if (currentMode < 3) {
-            createBonus();
+        } else {
+            createWorld();
         }
     }
 }
@@ -898,9 +902,10 @@ void CMenuPcs::calc()
             } while (i < 0xc);
 
             int limit = *reinterpret_cast<int*>(self + 0x68);
-            int value = *reinterpret_cast<int*>(self + 0x6c) - 1;
+            int current = *reinterpret_cast<int*>(self + 0x6c);
+            int value = current - 1;
             if (value <= limit) {
-                int alt = *reinterpret_cast<int*>(self + 0x6c) + 1;
+                int alt = current + 1;
                 value = limit;
                 if (alt < limit) {
                     value = alt;

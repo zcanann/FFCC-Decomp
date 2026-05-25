@@ -3230,10 +3230,11 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         outResult = 0;
         return;
     case -0x79: {
+        const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
         Vec position = {
-            static_cast<float>(object->m_localBase[1]),
-            static_cast<float>(object->m_localBase[2]),
-            static_cast<float>(object->m_localBase[3]),
+            localFloats[1],
+            localFloats[2],
+            localFloats[3],
         };
         Sound.Add3DLine(*object->m_localBase, &position);
         runtime->push(object, 0);
@@ -3241,23 +3242,24 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemF
         return;
     }
     case -0x7A: {
+        const float* localFloats = reinterpret_cast<float*>(object->m_localBase);
         Vec position = {
-            static_cast<float>(object->m_localBase[1]),
-            static_cast<float>(object->m_localBase[2]),
-            static_cast<float>(object->m_localBase[3]),
+            localFloats[1],
+            localFloats[2],
+            localFloats[3],
         };
         runtime->push(
             object,
             Sound.PlaySe3D(
-                *object->m_localBase, &position, static_cast<float>(object->m_localBase[4]),
-                static_cast<float>(object->m_localBase[5]), 0));
+                *object->m_localBase, &position, localFloats[4], localFloats[5], 0));
         outResult = 0;
         return;
     }
     case -0x7B:
         runtime->push(
             object, Sound.PlaySe3DLine(*object->m_localBase, static_cast<char>(object->m_localBase[1]),
-                        static_cast<float>(object->m_localBase[2]), static_cast<float>(object->m_localBase[3]), 0));
+                        *reinterpret_cast<float*>(object->m_localBase + 2),
+                        *reinterpret_cast<float*>(object->m_localBase + 3), 0));
         outResult = 0;
         return;
     case -0x7C:

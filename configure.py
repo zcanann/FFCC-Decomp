@@ -560,7 +560,7 @@ config.libs = [
             Object(NonMatching, "monobj_table.cpp"),
             Object(NonMatching, "p_camera.cpp", extra_cflags=["-sdata 8"]),
             Object(NonMatching, "p_chara.cpp", extra_cflags=["-sdata 8"]),
-            Object(NonMatching, "p_chara_viewer.cpp"),
+            Object(NonMatching, "p_chara_viewer.cpp", extra_cflags=["-sdata 8"]),
             Object(NonMatching, "p_dbgmenu.cpp", extra_cflags=["-sdata 8"]),
             Object(NonMatching, "p_FunnyShape.cpp", extra_cflags=["-sdata 8"]),
             Object(NonMatching, "p_game.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly"]),

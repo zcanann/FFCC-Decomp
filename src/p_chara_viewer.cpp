@@ -784,7 +784,7 @@ void CCharaPcs::createViewer()
     }
 
     for (int colorIndex = 0; colorIndex < 5; colorIndex++) {
-        CColor white(0xFF, 0xFF, 0xFF, 0xFF);
+        const CColor& white = CColor(0xFF, 0xFF, 0xFF, 0xFF);
         CColor colorTmp;
         float scale = static_cast<float>(colorIndex) * LoadFloat(kCharaViewerLerpScale);
         colorTmp.color.r = static_cast<unsigned char>(static_cast<int>(static_cast<float>(white.color.r) * scale));

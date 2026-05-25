@@ -447,31 +447,9 @@ CFunnyShapePcs::~CFunnyShapePcs()
 }
 
 template <>
-CPtrArray<_GXTexObj*>::CPtrArray()
-{
-    numItems = 0;
-    size = 0;
-    defaultSize = 0x10;
-    items = 0;
-    stage = 0;
-    growCapacity = 1;
-}
-
-template <>
 CPtrArray<_GXTexObj*>::~CPtrArray()
 {
     RemoveAll();
-}
-
-template <>
-CPtrArray<OSFS_TEXTURE_ST*>::CPtrArray()
-{
-    numItems = 0;
-    size = 0;
-    defaultSize = 0x10;
-    items = 0;
-    stage = 0;
-    growCapacity = 1;
 }
 
 template <>

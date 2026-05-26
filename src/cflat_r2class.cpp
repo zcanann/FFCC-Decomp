@@ -226,7 +226,7 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 					if (systemVal < -0x19B) {
 						StoreU32(stack, reinterpret_cast<unsigned int*>(classData + 0x200), setMode);
 					}
-				} else if (systemVal < -0x191) {
+				} else if (systemVal <= -0x192) {
 					StoreU16(stack, reinterpret_cast<unsigned short*>(classData + (systemVal + 0x199) * 2 + 0x3B8), setMode);
 				}
 			} else if (systemVal < -0x95 && systemVal > -0x176) {
@@ -406,7 +406,7 @@ CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* objec
 					} else if (systemVal == -0x19D) {
 						value = *reinterpret_cast<unsigned short*>(classData + 0x3C8);
 					}
-				} else if (systemVal < -0x191 && systemVal > -0x19A) {
+				} else if (systemVal <= -0x192 && systemVal >= -0x199) {
 					value = *reinterpret_cast<unsigned short*>(classData + (systemVal + 0x199) * 2 + 0x3B8);
 				}
 			} else if (systemVal < -0x95 && systemVal > -0x176) {

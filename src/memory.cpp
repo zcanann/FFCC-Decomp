@@ -509,7 +509,7 @@ void CMemory::HeapWalker()
             stage = *reinterpret_cast<CStage**>(reinterpret_cast<unsigned char*>(listHead) + 4);
             int useTotal = 0;
             int unuseTotal = 0;
-            while (stage != listHead) {
+            do {
                 unsigned int useKB = static_cast<unsigned int>(
                     *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(stage) + 0xC) -
                     *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(stage) + 8))
@@ -524,7 +524,7 @@ void CMemory::HeapWalker()
                 System.Printf(const_cast<char*>(sHeapWalkerUnuseFmt), unuseKB);
                 stage = *reinterpret_cast<CStage**>(reinterpret_cast<unsigned char*>(stage) + 4);
                 unuseTotal += unuseKB;
-            }
+            } while (stage != listHead);
 
             System.Printf(
                 const_cast<char*>(sHeapWalkerTotalFmt), useTotal + unuseTotal, useTotal, unuseTotal);
@@ -1727,10 +1727,7 @@ int CAmemCacheSet::GetData(short index, char* source, int line)
         int data;
 
         if (entry.m_cacheData == 0) {
-            if (!entry.m_dmaCopy) {
-                entry.m_cacheData = entry.m_workData;
-                data = reinterpret_cast<int>(entry.m_cacheData);
-            } else {
+            if (entry.m_dmaCopy != 0) {
                 char* allocSource = source;
                 if (allocSource == 0) {
                     allocSource = sEmptyAllocSourceName;
@@ -1748,19 +1745,22 @@ int CAmemCacheSet::GetData(short index, char* source, int line)
                     float timeout = kMemoryDmaTimeout;
                     while (RedSound(&Sound)->DMACheck(dmaId) != 0) {
                         watch.Stop();
-                        if (watch.Get() < timeout) {
-                            watch.Start();
-                        } else {
+                        if (watch.Get() >= timeout) {
                             if (static_cast<unsigned int>(System.m_execParam) >= 1) {
                                 System.Printf(const_cast<char*>(sGetDataTimeoutBanner));
                             }
                             Sound.CheckDriver(1);
                             watch.Reset();
                             watch.Start();
+                        } else {
+                            watch.Start();
                         }
                     }
                     data = reinterpret_cast<int>(entry.m_cacheData);
                 }
+            } else {
+                entry.m_cacheData = entry.m_workData;
+                data = reinterpret_cast<int>(entry.m_cacheData);
             }
         } else {
             data = 0;

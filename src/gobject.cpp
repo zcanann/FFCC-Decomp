@@ -2703,7 +2703,7 @@ void CGObject::SetTexAnim(char* name)
     if (hasModel) {
         texAnimSet = *reinterpret_cast<CTexAnimSet**>(reinterpret_cast<unsigned char*>(handle->m_model) + 0xD4);
         if (texAnimSet != (CTexAnimSet*)0) {
-            float zero = sZeroFloat;
+            const float& zero = sZeroFloat;
             texAnimSet->Change(name, zero, (CTexAnimSet::ANIM_TYPE)-2);
         }
     }

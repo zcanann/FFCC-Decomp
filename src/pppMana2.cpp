@@ -1010,6 +1010,7 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* para
     CGObject* gObject;
     s32 i;
     s32 setupOffset;
+    u8* setup;
     s32 meshData;
     s32 meshShape;
     s32 dlOffset;
@@ -1021,24 +1022,25 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* para
     }
 
     gObject = (CGObject*)ppvMng->m_lookTarget;
-    setupOffset = *(s32*)((char*)param_3 + 8);
-    work = (u32*)((char*)pppMana2 + 0x80 + *(s32*)((char*)param_3 + 0xC));
+    work = (u32*)((char*)pppMana2 + 0x80 + param_3->m_serializedDataOffsets[2]);
+    setupOffset = param_3->m_serializedDataOffsets[1];
+    setup = (u8*)pppMana2 + 0x80 + setupOffset;
     if (gObject == NULL) {
         return;
     }
 
     handle = GetCharaHandlePtr(gObject, 0);
     model = GetCharaModelPtr(handle);
-    *((u8*)param_2 + 0x24) = 0;
+    *((u8*)param_2 + 0x38) = 0;
     work[0x1C] = (u32)param_2;
     if (Game.m_currentMapId == 0x21) {
-        *((u8*)param_2 + 0x24) = 0;
+        *((u8*)param_2 + 0x38) = 0;
     }
 
     SetMana2ModelCallbacks(model, work, param_2);
 
-    MaterialManRaw()[0x228] = *((u8*)pppMana2 + 0x8B + setupOffset);
-    *((u8*)(work + 0x38)) = MaterialManRaw()[0x228];
+    MaterialManRaw()[0xE4] = setup[0xB];
+    *((u8*)(work + 0x38)) = MaterialManRaw()[0xE4];
 
     if (*(s32*)pppMana2 != 0) {
         return;
@@ -1046,14 +1048,14 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* para
 
     work[0] = (u32)gObject;
     SetMana2ModelCallbacks(model, work, param_2);
-    work[2] = static_cast<u32>(GetTextureFromRSD(*(s32*)((char*)param_2 + 0x8), ppvEnv));
-    work[3] = static_cast<u32>(GetTextureFromRSD(*(s32*)((char*)param_2 + 0xC), ppvEnv));
-    work[4] = static_cast<u32>(GetTextureFromRSD(*(s32*)((char*)param_2 + 0x10), ppvEnv));
-    work[5] = static_cast<u32>(GetTextureFromRSD(*(s32*)((char*)param_2 + 0x14), ppvEnv));
-    work[6] = static_cast<u32>(GetTextureFromRSD(*(s32*)((char*)param_2 + 0x18), ppvEnv));
-    work[7] = static_cast<u32>(GetTextureFromRSD(*(s32*)((char*)param_2 + 0x1C), ppvEnv));
-    work[0x1E] = static_cast<u32>(GetTextureFromRSD(*(s32*)((char*)param_2 + 0x28), ppvEnv));
-    work[0x1F] = static_cast<u32>(GetTextureFromRSD(*(s32*)((char*)param_2 + 0x2C), ppvEnv));
+    work[2] = static_cast<u32>(GetTextureFromRSD(*(s32*)((char*)param_2 + 0x4), ppvEnv));
+    work[3] = static_cast<u32>(GetTextureFromRSD(*(s32*)((char*)param_2 + 0x8), ppvEnv));
+    work[4] = static_cast<u32>(GetTextureFromRSD(*(s32*)((char*)param_2 + 0xC), ppvEnv));
+    work[5] = static_cast<u32>(GetTextureFromRSD(*(s32*)((char*)param_2 + 0x10), ppvEnv));
+    work[6] = static_cast<u32>(GetTextureFromRSD(*(s32*)((char*)param_2 + 0x14), ppvEnv));
+    work[7] = static_cast<u32>(GetTextureFromRSD(*(s32*)((char*)param_2 + 0x18), ppvEnv));
+    work[0x1E] = static_cast<u32>(GetTextureFromRSD(*(s32*)((char*)param_2 + 0x24), ppvEnv));
+    work[0x1F] = static_cast<u32>(GetTextureFromRSD(*(s32*)((char*)param_2 + 0x28), ppvEnv));
 
     if (work[0x1D] == 0) {
         work[0x1D] = (u32)pppMemAlloc(0xC0, ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x1D7);
@@ -1065,7 +1067,7 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* para
         work[11] = (u32)pppMemAlloc(0x20, ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x1E1);
     }
 
-    texBufferSize = GXGetTexBufferSize(0x80, 0x80, GX_TF_RGBA8, GX_FALSE, 0);
+    texBufferSize = GXGetTexBufferSize(0x80, 0x80, GX_TF_RGB565, GX_FALSE, 0);
     if (work[12] == 0) {
         work[12] = (u32)pppMemAlloc(texBufferSize, ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x1E9);
     }
@@ -1073,24 +1075,26 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* para
         work[13] = (u32)pppMemAlloc(texBufferSize, ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x1EB);
     }
 
-    GXInitTexObj((GXTexObj*)work[10], (void*)work[12], 0x80, 0x80, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
-    GXInitTexObj((GXTexObj*)work[11], (void*)work[13], 0x80, 0x80, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
+    GXInitTexObj((GXTexObj*)work[10], (void*)work[12], 0x80, 0x80, GX_TF_RGB565, GX_REPEAT, GX_REPEAT, GX_FALSE);
+    GXInitTexObj((GXTexObj*)work[11], (void*)work[13], 0x80, 0x80, GX_TF_RGB565, GX_REPEAT, GX_REPEAT, GX_FALSE);
 
     if (work[8] == 0) {
         work[8] = (u32)pppMemAlloc(0xC0, ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x1F6);
     }
     dstBuffer = (void*)work[8];
-    texList = &work[2];
+    texList = work;
     for (i = 0; i < 6; i++) {
-        memcpy(dstBuffer, (void*)(texList[0] + 0x28), 0x20);
+        memcpy(dstBuffer, (void*)(texList[2] + 0x28), 0x20);
         dstBuffer = (void*)((char*)dstBuffer + 0x20);
         texList++;
     }
 
-    *(u32*)(work[0x1E] + 0x6C) = 0;
-    reinterpret_cast<CTexture*>(work[0x1E])->InitTexObj();
-    *(u32*)(work[0x1F] + 0x6C) = 0;
-    reinterpret_cast<CTexture*>(work[0x1F])->InitTexObj();
+    CTexture* texture = reinterpret_cast<CTexture*>(work[0x1E]);
+    CTexture* texture2 = reinterpret_cast<CTexture*>(work[0x1F]);
+    *(u32*)((u8*)texture + 0x6C) = 0;
+    texture->InitTexObj();
+    *(u32*)((u8*)texture2 + 0x6C) = 0;
+    texture2->InitTexObj();
 
     if (work[9] == 0) {
         work[9] = (u32)pppMemAlloc(0xA5E8, ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x211);

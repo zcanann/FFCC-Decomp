@@ -25,6 +25,12 @@ struct McListInfo
 class CMenuPcs : public CProcess
 {
 public:
+    static unsigned int m_table_desc0[3];
+    static unsigned int m_table_desc1[3];
+    static unsigned int m_table_desc2[3];
+    static unsigned int m_table_desc3[3];
+    static unsigned int m_table_desc4[3];
+    static unsigned int m_table_desc5[3];
     static unsigned int m_table[0x57];
 
     struct BattleHudState

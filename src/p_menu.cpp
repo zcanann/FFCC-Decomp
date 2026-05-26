@@ -129,24 +129,24 @@ extern "C" const f32 FLOAT_8033086C = 0.125f;
 extern const char __RTTI__8CManager_8032E7A8[];
 extern const char __RTTI__8CProcess_8032E7B0[];
 
-static unsigned int m_table_desc0__8CMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__8CMenuPcsFv)};
-static unsigned int m_table_desc1__8CMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__8CMenuPcsFv)};
-static unsigned int m_table_desc2__8CMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__8CMenuPcsFv)};
-static unsigned int m_table_desc3__8CMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(draw__8CMenuPcsFv)};
-static unsigned int m_table_desc4__8CMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(loadTextureAsync__8CMenuPcsFPPciiPQ28CMenuPcs4CTmpiii)};
-static unsigned int m_table_desc5__8CMenuPcs[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawSingleMenu__8CMenuPcsFv)};
+unsigned int CMenuPcs::m_table_desc0[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__8CMenuPcsFv)};
+unsigned int CMenuPcs::m_table_desc1[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__8CMenuPcsFv)};
+unsigned int CMenuPcs::m_table_desc2[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__8CMenuPcsFv)};
+unsigned int CMenuPcs::m_table_desc3[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(draw__8CMenuPcsFv)};
+unsigned int CMenuPcs::m_table_desc4[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(loadTextureAsync__8CMenuPcsFPPciiPQ28CMenuPcs4CTmpiii)};
+unsigned int CMenuPcs::m_table_desc5[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawSingleMenu__8CMenuPcsFv)};
 
 unsigned int CMenuPcs::m_table[0x57] = {
     reinterpret_cast<unsigned int>(const_cast<char*>(kMenuPcsStageName)),
-    m_table_desc0__8CMenuPcs[0], m_table_desc0__8CMenuPcs[1], m_table_desc0__8CMenuPcs[2],
-    m_table_desc1__8CMenuPcs[0], m_table_desc1__8CMenuPcs[1], m_table_desc1__8CMenuPcs[2],
-    m_table_desc2__8CMenuPcs[0], m_table_desc2__8CMenuPcs[1], m_table_desc2__8CMenuPcs[2],
+    m_table_desc0[0], m_table_desc0[1], m_table_desc0[2],
+    m_table_desc1[0], m_table_desc1[1], m_table_desc1[2],
+    m_table_desc2[0], m_table_desc2[1], m_table_desc2[2],
     0x1A, 0,
-    m_table_desc3__8CMenuPcs[0], m_table_desc3__8CMenuPcs[1], m_table_desc3__8CMenuPcs[2],
+    m_table_desc3[0], m_table_desc3[1], m_table_desc3[2],
     0x49, 0x1,
-    m_table_desc4__8CMenuPcs[0], m_table_desc4__8CMenuPcs[1], m_table_desc4__8CMenuPcs[2],
+    m_table_desc4[0], m_table_desc4[1], m_table_desc4[2],
     0x1A, 0x10,
-    m_table_desc5__8CMenuPcs[0], m_table_desc5__8CMenuPcs[1], m_table_desc5__8CMenuPcs[2],
+    m_table_desc5[0], m_table_desc5[1], m_table_desc5[2],
     0x49, 0x11
 };
 

@@ -2742,10 +2742,8 @@ void CMenuPcs::DrawResultOpenAnim()
 					    0.0f < *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C)) {
 						SetProjection(modelIndex);
 						SetLight(1);
-						unsigned int oldFlags = handle->m_flags;
 						handle->m_flags = 0x300543;
 						handle->Draw(5);
-						handle->m_flags = oldFlags;
 						RestoreProjection();
 					}
 					lastKind = kind;

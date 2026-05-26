@@ -46,6 +46,8 @@ extern const char s_manaShapeObj2[] = "obj2";
 extern const float FLOAT_803318fc = 0.99999f;
 extern const char s_manaShapeObj[] = "obj";
 extern const float FLOAT_80331904 = -1.5707964f;
+extern const float kPppConformBgNormalZero = 0.0f;
+extern const float kPppConformBgNormalOne = 1.0f;
 
 static inline float CameraWorldX()
 {

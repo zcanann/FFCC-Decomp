@@ -90,8 +90,14 @@ public:
         Vec m_localEnd;         // 0x0C-0x18
         Vec m_worldPosition;    // 0x18-0x24
         float m_radius;         // 0x24
-        float m_radius2;        // 0x28
-        unsigned int m_hitMask; // 0x2C
+        union {
+            float m_radius2;    // 0x28
+            int m_nodeIndex;    // 0x28
+        };
+        union {
+            unsigned int m_hitMask; // 0x2C
+            float m_hitRadius;      // 0x2C
+        };
     };
 
     struct DamageCol
@@ -99,9 +105,18 @@ public:
         Vec m_localPosition;    // 0x00-0x0C
         Vec m_worldPosition;    // 0x0C-0x18
         float m_innerRadius;    // 0x18
-        float m_outerRadius;    // 0x1C
-        unsigned int m_hitMask; // 0x20
-        int m_active;           // 0x24
+        union {
+            float m_outerRadius; // 0x1C
+            int m_nodeIndex;     // 0x1C
+        };
+        union {
+            unsigned int m_hitMask; // 0x20
+            float m_hitInnerRadius; // 0x20
+        };
+        union {
+            int m_active;            // 0x24
+            float m_hitOuterRadius;  // 0x24
+        };
     };
 
     union {

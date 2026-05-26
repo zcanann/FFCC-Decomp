@@ -62,9 +62,9 @@ math.cpp:
 	extabindex  start:0x8000B1F4 end:0x8000B2CC
 	.text       start:0x8001A230 end:0x8001C2F0
 	.ctors      start:0x801D53B0 end:0x801D53B4
-	.data       start:0x801E8450 end:0x801E8470
+	.data       start:0x801E8450 end:0x801E846C
 	.bss        start:0x8023C4D8 end:0x8023C884
-	.sdata2     start:0x8032F740 end:0x8032F798
+	.sdata2     start:0x8032F740 end:0x8032F794
 
 memory.cpp:
 	extab       start:0x800059C0 end:0x80005BDC

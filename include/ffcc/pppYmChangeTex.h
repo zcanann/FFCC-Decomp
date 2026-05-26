@@ -24,9 +24,6 @@ struct pppYmChangeTexData {
     s32* m_serializedDataOffsets;
 };
 
-void ChangeTex_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*)[4]);
-void ChangeTex_AfterDrawMeshCallback(CChara::CModel*, void*, void*, int, float (*)[4]);
-
 #ifdef __cplusplus
 extern "C" {
 #endif

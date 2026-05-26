@@ -24,8 +24,11 @@ public:
 	{
 	public:
 		CClass();
-        u8 m_unk0[0x228];
-        u32 m_variableCount;
+		s32 m_index;              // 0x000
+		char m_name[0x20];        // 0x004
+		s32 m_functionTable[0x80]; // 0x024
+		s32 m_localCount;         // 0x224
+		s32 m_variableCount;      // 0x228
 	};
 
 	class CObject
@@ -66,6 +69,22 @@ public:
 	public:
 		CFunc();
 		~CFunc();
+
+		s32 m_index;         // 0x00
+		char m_name[0x20];   // 0x04
+		s32 m_argCount;      // 0x24
+		s32 m_localCount;    // 0x28
+		u8 m_returnType;     // 0x2C
+		u8 m_returnFlags;    // 0x2D
+		u16 m_returnValue;   // 0x2E
+		s32 m_codeSize;      // 0x30
+		u8* m_code;          // 0x34
+		s32 m_codeOffset;    // 0x38
+		s32 m_codePos;       // 0x3C
+		s32 m_systemKind;    // 0x40
+		s32 m_systemIndex;   // 0x44
+		s32 m_reqFlagIndex;  // 0x48
+		s32 m_useCallerArgs; // 0x4C
 	};
 
 	class CVal
@@ -169,7 +188,19 @@ private:
     u8 m_0x1294;                    // 0x1294
     u8 m_pad_1295[3];               // 0x1295
     u8 m_0x1298;                    // 0x1298
-    u8 m_pad_1299[3];               // 0x1299
+	u8 m_pad_1299[3];               // 0x1299
 };
+
+STATIC_ASSERT(sizeof(CFlatRuntime::CClass) == 0x22C);
+STATIC_ASSERT(offsetof(CFlatRuntime::CClass, m_functionTable) == 0x24);
+STATIC_ASSERT(offsetof(CFlatRuntime::CClass, m_localCount) == 0x224);
+STATIC_ASSERT(offsetof(CFlatRuntime::CClass, m_variableCount) == 0x228);
+STATIC_ASSERT(sizeof(CFlatRuntime::CFunc) == 0x50);
+STATIC_ASSERT(offsetof(CFlatRuntime::CFunc, m_argCount) == 0x24);
+STATIC_ASSERT(offsetof(CFlatRuntime::CFunc, m_localCount) == 0x28);
+STATIC_ASSERT(offsetof(CFlatRuntime::CFunc, m_code) == 0x34);
+STATIC_ASSERT(offsetof(CFlatRuntime::CFunc, m_systemKind) == 0x40);
+STATIC_ASSERT(offsetof(CFlatRuntime::CFunc, m_reqFlagIndex) == 0x48);
+STATIC_ASSERT(offsetof(CFlatRuntime::CFunc, m_useCallerArgs) == 0x4C);
 
 #endif // _FFCC_CFLAT_RUNTIME_H_

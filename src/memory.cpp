@@ -76,22 +76,22 @@ int g_alloc_ct;
 static const int kStagePoolFullMsgOffset = 0xC0;
 static const int kStageAllocFailedMsgOffset = 0xF4;
 static const int kStageDestroyingMsgOffset = 0x28;
-static int stageGetAllocationMode(CMemory::CStage* stage)
+static inline int stageGetAllocationMode(CMemory::CStage* stage)
 {
     return stage->m_allocationMode;
 }
 
-static int stageGetHeapHead(CMemory::CStage* stage)
+static inline int stageGetHeapHead(CMemory::CStage* stage)
 {
     return stage->m_heapHead;
 }
 
-static void stageSetHeapHead(CMemory::CStage* stage, int value)
+static inline void stageSetHeapHead(CMemory::CStage* stage, int value)
 {
     stage->m_heapHead = value;
 }
 
-static char* stageGetSourceName(CMemory::CStage* stage)
+static inline char* stageGetSourceName(CMemory::CStage* stage)
 {
     return stage->m_allocationSourceStr;
 }
@@ -121,7 +121,7 @@ static inline CRedSound* RedSound(CSound* sound)
     return reinterpret_cast<CRedSound*>(reinterpret_cast<unsigned char*>(sound) + 8);
 }
 
-static bool stageHasUnfreedBlocks(CMemory::CStage* stage)
+static inline bool stageHasUnfreedBlocks(CMemory::CStage* stage)
 {
     int heapHead = stageGetHeapHead(stage);
     int node = *reinterpret_cast<int*>(heapHead + 8);
@@ -134,7 +134,7 @@ static bool stageHasUnfreedBlocks(CMemory::CStage* stage)
     return false;
 }
 
-static void stageReleaseMode2Buffer(CMemory::CStage* stage)
+static inline void stageReleaseMode2Buffer(CMemory::CStage* stage)
 {
     int ptr = stageGetHeapHead(stage);
     if (ptr != 0) {
@@ -145,7 +145,7 @@ static void stageReleaseMode2Buffer(CMemory::CStage* stage)
     }
 }
 
-static void stageMoveToPoolList(CMemory* memory, CMemory::CStage* stage)
+static inline void stageMoveToPoolList(CMemory* memory, CMemory::CStage* stage)
 {
     unsigned char* stageBytes = reinterpret_cast<unsigned char*>(stage);
     int mode = stageGetAllocationMode(stage);
@@ -157,7 +157,7 @@ static void stageMoveToPoolList(CMemory* memory, CMemory::CStage* stage)
     *reinterpret_cast<int*>(modeListBase + 0x130) = reinterpret_cast<int>(stage);
 }
 
-static void stageDestroyInternal(CMemory::CStage* stage)
+static inline void stageDestroyInternal(CMemory::CStage* stage)
 {
     if (stageGetAllocationMode(stage) == 2) {
         stageReleaseMode2Buffer(stage);
@@ -1722,10 +1722,9 @@ void CAmemCacheSet::GetFree()
  */
 int CAmemCacheSet::GetData(short index, char* source, int line)
 {
-    int data = 0;
-
     while (true) {
         CAmemCache& entry = cacheEntryAt(this, index);
+        int data;
 
         if (entry.m_cacheData == 0) {
             if (!entry.m_dmaCopy) {
@@ -1739,26 +1738,32 @@ int CAmemCacheSet::GetData(short index, char* source, int line)
 
                 entry.m_cacheData =
                     m_rStage->alloc(static_cast<unsigned long>(entry.m_size), allocSource, static_cast<unsigned long>(line), 1);
-                if (entry.m_cacheData != 0) {
+                if (entry.m_cacheData == 0) {
+                    data = 0;
+                } else {
                     int dmaId = RedSound(&Sound)->DMAEntry(0, 1, reinterpret_cast<int>(entry.m_cacheData),
                                                            reinterpret_cast<int>(entry.m_workData), entry.m_size, 0, 0);
-                    CStopWatch watch(sMemoryNoNameStopwatchName);
+                    CStopWatch watch((char*)0);
                     watch.Start();
                     float timeout = kMemoryDmaTimeout;
                     while (RedSound(&Sound)->DMACheck(dmaId) != 0) {
                         watch.Stop();
-                        if (watch.Get() >= timeout) {
+                        if (watch.Get() < timeout) {
+                            watch.Start();
+                        } else {
                             if (static_cast<unsigned int>(System.m_execParam) >= 1) {
                                 System.Printf(const_cast<char*>(sGetDataTimeoutBanner));
                             }
                             Sound.CheckDriver(1);
                             watch.Reset();
+                            watch.Start();
                         }
-                        watch.Start();
                     }
                     data = reinterpret_cast<int>(entry.m_cacheData);
                 }
             }
+        } else {
+            data = 0;
         }
 
         if (data != 0) {
@@ -2115,7 +2120,9 @@ void CAmemCacheSet::CacheClear()
         if ((entry.m_inUse != 0) && (entry.m_refCount == 0) && (entry.m_dmaCopy != 0)) {
             int data = reinterpret_cast<int>(entry.m_cacheData);
             if (data != 0) {
-                freeAmemCacheBlock(static_cast<unsigned long>(data));
+                if (data != 0) {
+                    freeAmemCacheBlock(static_cast<unsigned long>(data));
+                }
                 entry.m_cacheData = 0;
             }
         }
@@ -2216,8 +2223,7 @@ void CAmemCacheSet::AssertCache()
 
     for (int i = 0; i < m_cacheCount; i++) {
         CAmemCache& entry = cacheEntryAt(this, i);
-        if ((entry.m_inUse != 0 || entry.m_cacheData != 0) &&
-            (static_cast<unsigned int>(System.m_execParam) >= 3)) {
+        if ((entry.m_inUse != 0 || entry.m_cacheData != 0) && (static_cast<unsigned int>(System.m_execParam) >= 3)) {
             System.Printf(
                 const_cast<char*>(sAmemCacheEntryFmt), i, cacheStateName(entry),
                 cacheTypeName(entry), entry.m_refCount, entry.m_priority, reinterpret_cast<int>(entry.m_cacheData));

@@ -49,7 +49,7 @@ extern const char sHeapWalkerTitle[];
 extern const char sHeapWalkerUseFmt[];
 extern const char sHeapWalkerUnuseFmt[];
 extern const char sHeapWalkerTotalFmt[];
-extern const char sAmemCacheSeparator[];
+extern const char sAmemCacheSeparator[3];
 extern char sStageFreeCorruptBlockFmt[];
 extern char sStageAllocNoMemoryFmt[];
 extern char sStageQuitBlockUnfreedAllocFmt[];
@@ -58,11 +58,12 @@ extern char sCurrentMemoryStageName[];
 extern char sMainMemoryStageName[];
 extern char sDrawHeapUseUnuseFmt[];
 extern char sDrawHeapAmemAnimFmt[];
+extern char sMemoryNoNameStopwatchName[8];
 extern char sEmptyAllocSourceName[4];
 extern const char sHeapWalkerNewline[];
 extern char sHeapWalkerSlashLine[];
 extern const char* s_amemCacheTypeNames_801E8470[];
-extern const char* s_amemCacheStateNames_8032E410[];
+extern const char* s_amemCacheStateNames_8032E410[2];
 extern const float kMemoryDmaTimeout = 9000.0f;
 extern const float kMemoryDrawZero = 0.0f;
 extern float kMemoryDrawOrthoBottom;
@@ -1736,13 +1737,12 @@ int CAmemCacheSet::GetData(short index, char* source, int line)
                     allocSource = sEmptyAllocSourceName;
                 }
 
-                data = reinterpret_cast<int>(
-                    m_rStage->alloc(static_cast<unsigned long>(entry.m_size), allocSource, static_cast<unsigned long>(line), 1));
-                entry.m_cacheData = reinterpret_cast<void*>(data);
-                if (data != 0) {
+                entry.m_cacheData =
+                    m_rStage->alloc(static_cast<unsigned long>(entry.m_size), allocSource, static_cast<unsigned long>(line), 1);
+                if (entry.m_cacheData != 0) {
                     int dmaId = RedSound(&Sound)->DMAEntry(0, 1, reinterpret_cast<int>(entry.m_cacheData),
                                                            reinterpret_cast<int>(entry.m_workData), entry.m_size, 0, 0);
-                    CStopWatch watch(0);
+                    CStopWatch watch(sMemoryNoNameStopwatchName);
                     watch.Start();
                     float timeout = kMemoryDmaTimeout;
                     while (RedSound(&Sound)->DMACheck(dmaId) != 0) {
@@ -2216,11 +2216,11 @@ void CAmemCacheSet::AssertCache()
 
     for (int i = 0; i < m_cacheCount; i++) {
         CAmemCache& entry = cacheEntryAt(this, i);
-        int data = reinterpret_cast<int>(entry.m_cacheData);
-        if ((entry.m_inUse != 0 || data != 0) && (static_cast<unsigned int>(System.m_execParam) >= 3)) {
+        if ((entry.m_inUse != 0 || entry.m_cacheData != 0) &&
+            (static_cast<unsigned int>(System.m_execParam) >= 3)) {
             System.Printf(
                 const_cast<char*>(sAmemCacheEntryFmt), i, cacheStateName(entry),
-                cacheTypeName(entry), entry.m_refCount, entry.m_priority, data);
+                cacheTypeName(entry), entry.m_refCount, entry.m_priority, reinterpret_cast<int>(entry.m_cacheData));
         }
     }
 

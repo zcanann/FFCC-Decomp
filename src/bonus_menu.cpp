@@ -2138,8 +2138,7 @@ void CMenuPcs::DrawResultCloseAnim()
 					handle = GetBonusDisplayHandleSlots(this)[modelIndex - activePartyCount];
 				}
 
-				if (handle != 0 && handle->m_model != 0 &&
-				    0.0f < *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C)) {
+				if (0.0f < *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C)) {
 					SetProjection(modelIndex);
 					SetLight(1);
 					unsigned int oldFlags = handle->m_flags;

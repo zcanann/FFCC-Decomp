@@ -384,7 +384,7 @@ CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* objec
 					const unsigned int bit = static_cast<unsigned int>(systemVal + 0xBE7);
 					const u8 byteValue = *(classData + (bit >> 3) + 0x8A4);
 					const unsigned int mask = 1U << (bit & 7);
-					value = static_cast<unsigned int>(-((byteValue & mask) != 0));
+					value = static_cast<unsigned int>((byteValue & mask) != 0);
 				} else if (systemVal <= -500 && systemVal >= -0x2F3) {
 					value = static_cast<unsigned int>(*reinterpret_cast<short*>(classData + (systemVal + 0x2F3) * 2 + 0x9A4));
 				} else if (systemVal == -0x1AA) {

@@ -1011,21 +1011,19 @@ int CMenuPcs::EquipOpen()
 	uVar8 = (u32)*GetEquipList(this);
 	psVar7 = GetEquipList(this) + 4;
 	iVar11 = (int)*(s16*)(GetEquipStateBase(this) + 0x22);
-	if (0 < (int)uVar8) {
-		for (int i = 0; i < (int)uVar8; i++) {
-			dVar2 = DOUBLE_80332ed8;
-			if (*(int*)(psVar7 + 0x12) <= iVar11) {
-				if (iVar11 >= *(int*)(psVar7 + 0x12) + *(int*)(psVar7 + 0x14)) {
-					iVar6++;
-					*(float*)(psVar7 + 8) = FLOAT_80332ee0;
-				} else {
-					*(int*)(psVar7 + 0x10) = *(int*)(psVar7 + 0x10) + 1;
-					dVar20 = (double)*(int*)(psVar7 + 0x14);
-					*(float*)(psVar7 + 8) = (float)((DOUBLE_80332ec0 / dVar20) * (double)*(int*)(psVar7 + 0x10));
-				}
+	for (int i = 0; i < (int)uVar8; i++) {
+		dVar2 = DOUBLE_80332ed8;
+		if (*(int*)(psVar7 + 0x12) <= iVar11) {
+			if (*(int*)(psVar7 + 0x12) + *(int*)(psVar7 + 0x14) <= iVar11) {
+				iVar6++;
+				*(float*)(psVar7 + 8) = FLOAT_80332ee0;
+			} else {
+				*(int*)(psVar7 + 0x10) = *(int*)(psVar7 + 0x10) + 1;
+				dVar20 = (double)*(int*)(psVar7 + 0x14);
+				*(float*)(psVar7 + 8) = (float)((DOUBLE_80332ec0 / dVar20) * (double)*(int*)(psVar7 + 0x10));
 			}
-			psVar7 += 0x20;
 		}
+		psVar7 += 0x20;
 	}
 
 	fVar5 = FLOAT_80332ee0;

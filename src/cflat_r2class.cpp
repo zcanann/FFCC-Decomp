@@ -472,7 +472,7 @@ CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* objec
 					break;
 				case -0xA: {
 					u8 bits = *(engineObject + 0x50);
-					LastResult(this) = static_cast<unsigned int>(static_cast<int>((static_cast<unsigned int>(bits) << 0x1C | static_cast<unsigned int>(bits >> 4))) >> 0x1F);
+					LastResult(this) = static_cast<unsigned int>(static_cast<int>(static_cast<unsigned int>(bits) << 0x1C) >> 0x1F);
 					break;
 				}
 				case -0xB:
@@ -480,7 +480,7 @@ CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* objec
 					break;
 				case -0xC: {
 					u8 bits = *(engineObject + 0x50);
-					LastResult(this) = static_cast<unsigned int>(static_cast<int>((static_cast<unsigned int>(bits) << 0x19 | static_cast<unsigned int>(bits >> 7))) >> 0x1F);
+					LastResult(this) = static_cast<unsigned int>(static_cast<int>(static_cast<unsigned int>(bits) << 0x19) >> 0x1F);
 					break;
 				}
 				case -0xD:

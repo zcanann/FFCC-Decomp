@@ -1374,6 +1374,267 @@ void JoyBus::ThreadMain(void* arg)
             break;
         }
 
+        case 0x35:
+        {
+            int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
+            if (res >= 0 && threadParam->m_skipProcessingFlag == 0 && GbaQue.GetSellFlg(threadParam->m_portIndex) != 0)
+            {
+                threadParam->m_state = '6';
+                memset(m_perThreadTemp[port], 0, sizeof(m_perThreadTemp[port]));
+                m_perThreadTemp[port][0] = 6;
+                int cancelRes = SendCancel(threadParam);
+                if (cancelRes != 0)
+                {
+                    threadParam->m_altState = threadParam->m_state;
+                    threadParam->m_recvWriteIdx = localWord;
+                    threadParam->m_state = 0x84;
+                }
+            }
+
+            break;
+        }
+
+        case 0x36:
+        {
+            int dataRes = SendDataFile(threadParam);
+            if (dataRes == -2)
+            {
+                threadParam->m_state = 3;
+            }
+            if (threadParam->m_skipProcessingFlag == 0 && dataRes == 1)
+            {
+                threadParam->m_state = 6;
+            }
+
+            break;
+        }
+
+        case 0x37:
+        {
+            int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
+            if (res >= 0 && threadParam->m_skipProcessingFlag == 0 && GbaQue.GetBuyFlg(threadParam->m_portIndex) != 0)
+            {
+                threadParam->m_state = '8';
+                memset(m_perThreadTemp[port], 0, sizeof(m_perThreadTemp[port]));
+                m_perThreadTemp[port][0] = 7;
+                int cancelRes = SendCancel(threadParam);
+                if (cancelRes != 0)
+                {
+                    threadParam->m_altState = threadParam->m_state;
+                    threadParam->m_recvWriteIdx = localWord;
+                    threadParam->m_state = 0x84;
+                }
+            }
+
+            break;
+        }
+
+        case 0x38:
+        {
+            int dataRes = SendDataFile(threadParam);
+            if (dataRes == -2)
+            {
+                threadParam->m_state = 3;
+            }
+            if (threadParam->m_skipProcessingFlag == 0 && dataRes == 1)
+            {
+                threadParam->m_state = 6;
+            }
+
+            break;
+        }
+
+        case 0x39:
+        {
+            int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
+            if (res >= 0 && threadParam->m_skipProcessingFlag == 0 && GbaQue.GetMkSmithFlg(threadParam->m_portIndex) != 0)
+            {
+                threadParam->m_state = ':';
+                memset(m_perThreadTemp[port], 0, sizeof(m_perThreadTemp[port]));
+                m_perThreadTemp[port][0] = 8;
+                int cancelRes = SendCancel(threadParam);
+                if (cancelRes != 0)
+                {
+                    threadParam->m_altState = threadParam->m_state;
+                    threadParam->m_recvWriteIdx = localWord;
+                    threadParam->m_state = 0x84;
+                }
+            }
+
+            break;
+        }
+
+        case 0x3A:
+        {
+            int dataRes = SendDataFile(threadParam);
+            if (dataRes == -2)
+            {
+                threadParam->m_state = 3;
+            }
+            if (threadParam->m_skipProcessingFlag == 0 && dataRes == 1)
+            {
+                threadParam->m_state = 6;
+                ThreadSleep(OS_BUS_CLOCK / 4000);
+                stateStartTime = OSGetTime();
+            }
+
+            break;
+        }
+
+        case 0x3B:
+        {
+            int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
+            if (res >= 0)
+            {
+                int stopRes = SendGBAStop(threadParam);
+                if (stopRes >= 0 && threadParam->m_skipProcessingFlag == 0 && GbaQue.GetScrFlg() != 0)
+                {
+                    threadParam->m_subState = 0;
+                    int sendRes = SendBonusStr(threadParam);
+                    if (sendRes >= 0)
+                    {
+                        threadParam->m_state = '<';
+                    }
+                }
+            }
+
+            break;
+        }
+
+        case 0x3C:
+        {
+            unsigned int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
+            if ((int)res > 0 && threadParam->m_skipProcessingFlag == 0 && (res & 2) != 0)
+            {
+                if ((res & 1) != 0 && (localBuf[0] & 0x3F) == 7)
+                {
+                    threadParam->m_state = ';';
+                }
+                else
+                {
+                    int sendRes = SendBonusStr(threadParam);
+                    if (sendRes >= 0 && sendRes == 1)
+                    {
+                        threadParam->m_state = '=';
+                    }
+                }
+            }
+
+            break;
+        }
+
+        case 0x3D:
+        {
+            unsigned int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
+            if ((int)res > 0 && threadParam->m_skipProcessingFlag == 0 && (res & 1) != 0)
+            {
+                if ((localBuf[0] & 0x3F) == 7)
+                {
+                    threadParam->m_state = ';';
+                }
+                else
+                {
+                    threadParam->m_state = 0x1A;
+                }
+            }
+
+            break;
+        }
+
+        case 0x3E:
+        {
+            m_stateFlagArr[port] = 0;
+            int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
+            if (res >= 0 && threadParam->m_skipProcessingFlag == 0 && GbaQue.GetScrFlg() != 0)
+            {
+                threadParam->m_subState = 0;
+                int sendRes = SendArtifact(threadParam);
+                if (sendRes >= 0)
+                {
+                    threadParam->m_state = '?';
+                }
+            }
+
+            break;
+        }
+
+        case 0x3F:
+        {
+            unsigned int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
+            if ((int)res > 0 && threadParam->m_skipProcessingFlag == 0 && (res & 2) != 0)
+            {
+                if ((res & 1) != 0 && (localBuf[0] & 0x3F) == 7)
+                {
+                    threadParam->m_state = '>';
+                }
+                else
+                {
+                    int sendRes = SendArtifact(threadParam);
+                    if (sendRes >= 0 && sendRes == 1)
+                    {
+                        threadParam->m_state = '@';
+                    }
+                }
+            }
+
+            break;
+        }
+
+        case 0x40:
+        {
+            unsigned int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
+            if ((int)res > 0 && threadParam->m_skipProcessingFlag == 0 && (res & 1) != 0)
+            {
+                if ((localBuf[0] & 0x3F) == 7)
+                {
+                    threadParam->m_state = '>';
+                }
+                else
+                {
+                    GbaQue.ClrArtifactFlg(threadParam->m_portIndex);
+                    threadParam->m_state = 5;
+                }
+            }
+
+            break;
+        }
+
+        case 0x41:
+        {
+            int res = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));
+            if (res >= 0 && threadParam->m_skipProcessingFlag == 0 && GbaQue.GetArtiDatFlg(threadParam->m_portIndex) != 0)
+            {
+                threadParam->m_state = 'B';
+                memset(m_perThreadTemp[port], 0, sizeof(m_perThreadTemp[port]));
+                m_perThreadTemp[port][0] = 9;
+                int cancelRes = SendCancel(threadParam);
+                if (cancelRes != 0)
+                {
+                    threadParam->m_altState = threadParam->m_state;
+                    threadParam->m_recvWriteIdx = localWord;
+                    threadParam->m_state = 0x84;
+                }
+            }
+
+            break;
+        }
+
+        case 0x42:
+        {
+            int dataRes = SendDataFile(threadParam);
+            if (dataRes == -2)
+            {
+                threadParam->m_state = 3;
+            }
+            if (threadParam->m_skipProcessingFlag == 0 && dataRes == 1)
+            {
+                GbaQue.ClrArtiDatFlg(threadParam->m_portIndex);
+                threadParam->m_state = 5;
+            }
+
+            break;
+        }
+
         case 0x4E:
         {
             unsigned int r = GBARecvSend(threadParam, reinterpret_cast<unsigned int*>(localBuf));

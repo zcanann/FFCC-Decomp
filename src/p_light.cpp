@@ -1219,37 +1219,6 @@ void CLightPcs::SetBumpTexMatirx(float (*mat)[4], CLightPcs::CBumpLight* bump, V
 
 /*
  * --INFO--
- * PAL Address: 0x80047e00
- * PAL Size: 84b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-CLightPcs::CLight::CLight()
-{
-    float radius = FLOAT_8032fc1c;
-    float f2 = FLOAT_8032fc14;
-
-    m_radius = radius;
-    float f1 = FLOAT_8032fc10;
-    m_offsetZ = f2;
-    m_offsetX = f2;
-    m_attenFalloff = f1;
-    m_directionMode = 0;
-    m_spotFn = 0;
-    m_unk4D = 4;
-    m_specularMode = 0;
-    m_partMask = -1;
-    m_part = 0;
-    *(u32*)&m_targetColor[0] = 0;
-    *(u32*)&m_targetColor[1] = 0;
-    *(u32*)&m_targetColor[2] = 0;
-    *(u32*)&m_targetColor[3] = 0;
-}
-
-/*
- * --INFO--
  * PAL Address: 0x80047e84
  * PAL Size: 92b
  * EN Address: TODO
@@ -1278,4 +1247,35 @@ CLightPcs::CBumpLight::CBumpLight()
 void CLightPcs::CBumpLight::SetTexture(_GXTexMapID texMapID, int textureIdx)
 {
     GXLoadTexObj(&m_textures[textureIdx], texMapID);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80047e00
+ * PAL Size: 84b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+CLightPcs::CLight::CLight()
+{
+    float radius = FLOAT_8032fc1c;
+    float f2 = FLOAT_8032fc14;
+
+    m_radius = radius;
+    float f1 = FLOAT_8032fc10;
+    m_offsetZ = f2;
+    m_offsetX = f2;
+    m_attenFalloff = f1;
+    m_directionMode = 0;
+    m_spotFn = 0;
+    m_unk4D = 4;
+    m_specularMode = 0;
+    m_partMask = -1;
+    m_part = 0;
+    *(u32*)&m_targetColor[0] = 0;
+    *(u32*)&m_targetColor[1] = 0;
+    *(u32*)&m_targetColor[2] = 0;
+    *(u32*)&m_targetColor[3] = 0;
 }

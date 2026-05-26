@@ -91,7 +91,8 @@ union UMapHitDrawMode
     unsigned char m_byte;
 };
 
-extern UMapHitDrawMode gMapHitDrawMode;
+extern UMapHitDrawMode s_bitMask;
+#define gMapHitDrawMode s_bitMask
 extern int g_hit_edge_idx_min;
 extern float g_hit_edge_t;
 extern float g_hit_t;

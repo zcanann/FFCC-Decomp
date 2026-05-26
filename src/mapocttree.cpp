@@ -94,7 +94,7 @@ int s_light_no = 0;
 unsigned long s_shadow_no = 0;
 unsigned long InsertShadow_level = 0;
 unsigned long clear_flag_mask = 0;
-UMapHitDrawMode gMapHitDrawMode;
+UMapHitDrawMode s_bitMask;
 unsigned long octtree_draw_node_ct = 0;
 
 extern unsigned long g_pStage;

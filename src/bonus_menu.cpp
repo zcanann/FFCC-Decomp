@@ -1854,7 +1854,7 @@ void CMenuPcs::DrawSelectOpenAnim()
 	int animPtr = GetBonusMenuMembers(this).m_bonusAnimPtr;
 	int statePtr = GetBonusMenuMembers(this).m_bonusStatePtr;
 
-	if (animPtr == 0 || statePtr == 0 || *(unsigned char*)(statePtr + 0xb) == 0) {
+	if (*(unsigned char*)(statePtr + 0xb) == 0) {
 		return;
 	}
 

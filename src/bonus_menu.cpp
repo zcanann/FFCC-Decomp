@@ -121,6 +121,10 @@ struct BonusMenuAuxRaw {
 	unsigned char bytes[0xC];
 };
 
+struct BonusBaseRaw {
+	float values[18];
+};
+
 struct BonusMenuMembers {
 	unsigned char pad_0000[0x8C];
 	unsigned char m_bonusAlpha;
@@ -187,6 +191,7 @@ struct BonusEffectSlotList {
 
 STATIC_ASSERT(sizeof(BonusMenuStateRaw) == 0x48);
 STATIC_ASSERT(sizeof(BonusMenuAuxRaw) == 0xC);
+STATIC_ASSERT(sizeof(BonusBaseRaw) == 0x48);
 STATIC_ASSERT(sizeof(BonusBoardEntryRaw) == 0x44);
 STATIC_ASSERT(sizeof(BonusBoardEntryList) == 0x780);
 STATIC_ASSERT(sizeof(BonusEffectSlotBlock) == 0x2920);
@@ -3157,18 +3162,18 @@ void CMenuPcs::destroyBonus()
 
 	ptr = GetBonusMenuMembers(this).m_bonusStatePtr;
 	if (ptr != 0) {
-		delete[] (unsigned char*)ptr;
+		delete (BonusMenuStateRaw*)ptr;
 		GetBonusMenuMembers(this).m_bonusStatePtr = 0;
 	}
 
 	ptr = GetBonusMenuMembers(this).m_bonusAnimPtr;
 	if (ptr != 0) {
-		delete[] (unsigned char*)ptr;
+		delete (BonusAnimList*)ptr;
 		GetBonusMenuMembers(this).m_bonusAnimPtr = 0;
 	}
 
 	if (s_Base[0] != 0) {
-		delete[] s_Base[0];
+		delete reinterpret_cast<BonusBaseRaw*>(s_Base[0]);
 		s_Base[0] = 0;
 	}
 
@@ -3180,7 +3185,7 @@ void CMenuPcs::destroyBonus()
 
 	ptr = GetBonusMenuMembers(this).m_bonusAuxPtr;
 	if (ptr != 0) {
-		delete[] (unsigned char*)ptr;
+		delete (BonusMenuAuxRaw*)ptr;
 		GetBonusMenuMembers(this).m_bonusAuxPtr = 0;
 	}
 
@@ -3225,7 +3230,7 @@ void CMenuPcs::createBonus()
 		s_Rinfo->m_party[i].m_selectedSlot = -1;
 	}
 
-	statePtr = reinterpret_cast<int>(new unsigned char[sizeof(BonusMenuStateRaw)]);
+	statePtr = reinterpret_cast<int>(new BonusMenuStateRaw);
 	GetBonusMenuMembers(this).m_bonusStatePtr = statePtr;
 	listPtr = reinterpret_cast<int>(new unsigned char[sizeof(BonusEffectSlotList)]);
 	GetBonusMenuMembers(this).m_bonusListPtr = listPtr;
@@ -3236,14 +3241,14 @@ void CMenuPcs::createBonus()
 	for (int i = 0; i < 5; i++) {
 		InitBonusEffectSlotBlock(&effectSlots->slots[i]);
 	}
-	s_Base[0] = new float[18];
+	s_Base[0] = reinterpret_cast<float*>(new BonusBaseRaw);
 	memset(s_Base[0], 0, sizeof(float) * 18);
-	animPtr = reinterpret_cast<int>(new unsigned char[sizeof(BonusAnimList)]);
+	animPtr = reinterpret_cast<int>(new BonusAnimList);
 	GetBonusMenuMembers(this).m_bonusAnimPtr = animPtr;
 	memset((void*)animPtr, 0, sizeof(BonusAnimList));
 	boardPtr = reinterpret_cast<int>(new unsigned char[sizeof(BonusBoardEntryList)]);
 	GetBonusMenuMembers(this).m_bonusBoardPtr = boardPtr;
-	auxPtr = reinterpret_cast<int>(new unsigned char[sizeof(BonusMenuAuxRaw)]);
+	auxPtr = reinterpret_cast<int>(new BonusMenuAuxRaw);
 	GetBonusMenuMembers(this).m_bonusAuxPtr = auxPtr;
 	memset((void*)auxPtr, 0, sizeof(BonusMenuAuxRaw));
 	memset((void*)boardPtr, 0, sizeof(BonusBoardEntryList));

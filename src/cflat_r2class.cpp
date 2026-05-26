@@ -96,7 +96,7 @@ static inline void PushF32(CFlatRuntime2* runtime, CFlatRuntime::CObject* object
 
 static inline void StoreU16(CFlatRuntime::CStack* stack, unsigned short* value, int setMode)
 {
-	stack[-1].m_word = static_cast<unsigned int>(*value);
+	stack[-1].m_word = *value;
 
 	if (setMode == 0) {
 		*value = stack->m_word;
@@ -109,7 +109,7 @@ static inline void StoreU16(CFlatRuntime::CStack* stack, unsigned short* value, 
 
 static inline void StoreS16(CFlatRuntime::CStack* stack, short* value, int setMode)
 {
-	stack[-1].m_word = static_cast<unsigned int>(static_cast<int>(*value));
+	stack[-1].m_word = *value;
 
 	if (setMode == 0) {
 		*value = stack->m_word;
@@ -192,11 +192,9 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 			} else if (systemVal <= -400) {
 				if (systemVal <= -1000 && systemVal >= -0xBE7) {
 					const unsigned int bit = static_cast<unsigned int>(systemVal + 0xBE7);
-					const int sign = static_cast<int>(bit) >> 0x1F;
-					const int rounded = static_cast<int>(bit >> 3) + static_cast<int>((static_cast<int>(bit) < 0) && ((bit & 7) != 0));
-					const unsigned int mask = 1U << (((sign * 8) | ((bit * 0x20000000U + static_cast<unsigned int>(sign)) >> 0x1D)) - sign);
-					u8* const byteRef = classData + rounded + 0x8A4;
-					const unsigned int oldValue = static_cast<unsigned int>(-((*byteRef & static_cast<u8>(mask)) != 0));
+					const u8 mask = static_cast<u8>(1U << (bit & 7));
+					u8* const byteRef = classData + (bit >> 3) + 0x8A4;
+					const unsigned int oldValue = static_cast<unsigned int>(-((*byteRef & mask) != 0));
 
 					stack[-1].m_word = oldValue;
 					unsigned int newValue = oldValue;
@@ -212,7 +210,7 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 					if (newValue == 0) {
 						*byteRef &= static_cast<u8>(~mask);
 					} else {
-						*byteRef |= static_cast<u8>(mask);
+						*byteRef |= mask;
 					}
 				} else if (systemVal <= -500 && systemVal >= -0x2F3) {
 					StoreS16(stack, reinterpret_cast<short*>(classData + (systemVal + 0x2F3) * 2 + 0x9A4), setMode);
@@ -381,9 +379,9 @@ CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* objec
 				}
 			} else if (systemVal <= -400) {
 				if (systemVal <= -1000 && systemVal >= -0xBE7) {
-					const int bit = systemVal + 0xBE7;
-					const u8 byteValue = *(classData + (bit / 8) + 0x8A4);
-					const unsigned int mask = 1U << (bit % 8);
+					const unsigned int bit = static_cast<unsigned int>(systemVal + 0xBE7);
+					const u8 byteValue = *(classData + (bit >> 3) + 0x8A4);
+					const unsigned int mask = 1U << (bit & 7);
 					value = static_cast<unsigned int>(-((byteValue & mask) != 0));
 				} else if (systemVal <= -500 && systemVal >= -0x2F3) {
 					value = static_cast<unsigned int>(*reinterpret_cast<short*>(classData + (systemVal + 0x2F3) * 2 + 0x9A4));

@@ -300,18 +300,19 @@ void CMaterialEditorPcs::SetUSBData()
         break;
     }
     case 0x31: {
+        u32 allocSize = usb.m_sizeBytes;
         u8* dstBuffer = static_cast<u8*>(
-            Memory._Alloc(usb.m_sizeBytes, MaterialEditorStage(), const_cast<char*>(s_ME_USB_process_cpp), 0x31, 0));
+            Memory._Alloc(allocSize, MaterialEditorStage(), const_cast<char*>(s_ME_USB_process_cpp), 0x31, 0));
 
         if (dstBuffer == 0) {
-            System.Printf(const_cast<char*>(sMemAllocErrorSizeFmt), usb.m_sizeBytes);
+            System.Printf(const_cast<char*>(sMemAllocErrorSizeFmt), allocSize);
         }
 
+        u8* src = dstBuffer;
         RSDITEM* rsdItem = this->GetRsdItem()->rsdItem;
         memcpy(dstBuffer, usb.m_data, usb.m_sizeBytes);
 
         u32 offset = 0;
-        u8* src = dstBuffer;
         for (u32 i = 0; i < usb.m_sizeBytes; i++) {
             static_cast<u8*>(rsdItem->ptr18)[offset + 0x1A] = *src;
             offset += 0x70;

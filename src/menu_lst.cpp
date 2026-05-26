@@ -187,45 +187,11 @@ int CMenuPcs::MLstClose()
 	if (this->lstData->count == completedItems) {
 		zero = 0.0f;
 		entry = this->lstData->entries;
-		if ((int)itemCount > 0) {
-			count = itemCount >> 3;
-			for (; count != 0; count--) {
-				entry[0].startFrame = 0;
-				entry[0].duration = 1;
-				entry[0].alpha = zero;
-				entry[1].startFrame = 0;
-				entry[1].duration = 1;
-				entry[1].alpha = zero;
-				entry[2].startFrame = 0;
-				entry[2].duration = 1;
-				entry[2].alpha = zero;
-				entry[3].startFrame = 0;
-				entry[3].duration = 1;
-				entry[3].alpha = zero;
-				entry[4].startFrame = 0;
-				entry[4].duration = 1;
-				entry[4].alpha = zero;
-				entry[5].startFrame = 0;
-				entry[5].duration = 1;
-				entry[5].alpha = zero;
-				entry[6].startFrame = 0;
-				entry[6].duration = 1;
-				entry[6].alpha = zero;
-				entry[7].startFrame = 0;
-				entry[7].duration = 1;
-				entry[7].alpha = zero;
-				entry += 8;
-			}
-			itemCount &= 7;
-			if (itemCount != 0) {
-				do {
-					entry->startFrame = 0;
-					entry->duration = 1;
-					entry->alpha = zero;
-					entry++;
-					itemCount--;
-				} while (itemCount != 0);
-			}
+		for (count = itemCount; count != 0; count--) {
+			entry->startFrame = 0;
+			entry->duration = 1;
+			entry->alpha = zero;
+			entry++;
 		}
 		result = 1;
 	}
@@ -365,19 +331,9 @@ int CMenuPcs::MLstOpen()
 		memset(this->lstData, 0, sizeof(MenuLstList));
 		one = 1.0f;
 		entry = this->lstData->entries;
-		i = 8;
-		do {
-			entry[0].z = one;
-			entry[1].z = one;
-			entry[2].z = one;
-			entry[3].z = one;
-			entry[4].z = one;
-			entry[5].z = one;
-			entry[6].z = one;
-			entry[7].z = one;
-			entry += 8;
-			i--;
-		} while (i != 0);
+		for (i = 0; i < 64; i++, entry++) {
+			entry->z = one;
+		}
 
 		zero = 0.0f;
 		initializedCount = 0;
@@ -424,45 +380,11 @@ int CMenuPcs::MLstOpen()
 	if (this->lstData->count == completedItems) {
 		one = 1.0f;
 		entry = this->lstData->entries;
-		if ((int)itemCount > 0) {
-			count = itemCount >> 3;
-			for (; count != 0; count--) {
-				entry[0].startFrame = 0;
-				entry[0].duration = 1;
-				entry[0].alpha = one;
-				entry[1].startFrame = 0;
-				entry[1].duration = 1;
-				entry[1].alpha = one;
-				entry[2].startFrame = 0;
-				entry[2].duration = 1;
-				entry[2].alpha = one;
-				entry[3].startFrame = 0;
-				entry[3].duration = 1;
-				entry[3].alpha = one;
-				entry[4].startFrame = 0;
-				entry[4].duration = 1;
-				entry[4].alpha = one;
-				entry[5].startFrame = 0;
-				entry[5].duration = 1;
-				entry[5].alpha = one;
-				entry[6].startFrame = 0;
-				entry[6].duration = 1;
-				entry[6].alpha = one;
-				entry[7].startFrame = 0;
-				entry[7].duration = 1;
-				entry[7].alpha = one;
-				entry += 8;
-			}
-			itemCount &= 7;
-			if (itemCount != 0) {
-				do {
-					entry->startFrame = 0;
-					entry->duration = 1;
-					entry->alpha = one;
-					entry++;
-					itemCount--;
-				} while (itemCount != 0);
-			}
+		for (count = itemCount; count != 0; count--) {
+			entry->startFrame = 0;
+			entry->duration = 1;
+			entry->alpha = one;
+			entry++;
 		}
 		result = 1;
 	}

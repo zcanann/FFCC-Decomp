@@ -316,16 +316,15 @@ unsigned int CheckSum(void* data, int size)
             } while (blockCount != 0);
 
             size &= 7;
-            if (size == 0) {
-                return checksum;
-            }
         }
 
-        do {
-            checksum += *bytes;
-            bytes++;
-            size--;
-        } while (size != 0);
+        if (size != 0) {
+            do {
+                checksum += *bytes;
+                bytes++;
+                size--;
+            } while (size != 0);
+        }
     }
 
     return checksum;

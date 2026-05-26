@@ -3028,14 +3028,13 @@ void CMenuPcs::CalcResultOpenAnim()
  */
 void CMenuPcs::drawBonus()
 {
-	int statePtr = GetBonusMenuMembers(this).m_bonusStatePtr;
 	gUtil.ClearZBufferRect(0.0f, 0.0f, 640.0f, 480.0f);
 
 	if (System.m_execParam != 0) {
-		System.Printf(const_cast<char*>(sDrawBonusFmt), (int)*(short*)(statePtr + 0x1c));
+		System.Printf(const_cast<char*>(sDrawBonusFmt), (int)*(short*)(GetBonusMenuMembers(this).m_bonusStatePtr + 0x1c));
 	}
 
-	switch (*(short*)(statePtr + 0x1c)) {
+	switch (*(short*)(GetBonusMenuMembers(this).m_bonusStatePtr + 0x1c)) {
 	case 0:
 		DrawResultOpenAnim();
 		break;

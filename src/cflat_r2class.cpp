@@ -761,8 +761,8 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			        static_cast<int>(localBase[2]),
 			        static_cast<int>(localBase[3]),
 			        static_cast<int>(localBase[4]),
-			        static_cast<int>(localBase[5]),
-			        static_cast<int>(static_cast<signed char>(localBase[6]))));
+			        0,
+			        static_cast<int>(static_cast<signed char>(localBase[5]))));
 			outResult = 0;
 			break;
 		case -0x7F: {

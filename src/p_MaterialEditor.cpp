@@ -80,6 +80,11 @@ static inline float LoadFloat(const float& value)
     return value;
 }
 
+static inline double LoadDouble(const double& value)
+{
+    return value;
+}
+
 static inline double S16ToDouble(s16 value)
 {
     union {
@@ -279,30 +284,30 @@ void CMaterialEditorPcs::drawViewer()
                 case 'H':
                 if (polygon->textureIndex < static_cast<s16>(m_loadedTextureCount)) {
                     s16* textureHeader = m_textureHeader[polygon->textureIndex];
-                    float scaleU = static_cast<float>(DOUBLE_8032FCC0 / S16ToDouble(textureHeader[2]));
-                    float scaleV = static_cast<float>(DOUBLE_8032FCC0 / S16ToDouble(textureHeader[3]));
+                    float scaleU = static_cast<float>(LoadDouble(DOUBLE_8032FCC0) / S16ToDouble(textureHeader[2]));
+                    float scaleV = static_cast<float>(LoadDouble(DOUBLE_8032FCC0) / S16ToDouble(textureHeader[3]));
 
                     if (polygon->u0 < 0) {
                         polygon->texCoord[0][0] =
-                            (scaleU * static_cast<float>(S16ToDouble(polygon->u0))) + FLOAT_8032FCC8;
+                            (scaleU * static_cast<float>(S16ToDouble(polygon->u0))) + LoadFloat(FLOAT_8032FCC8);
                     } else {
                         polygon->texCoord[0][0] = scaleU * static_cast<float>(S16ToDouble(polygon->u0));
                     }
                     if (polygon->u1 < 0) {
                         polygon->texCoord[1][0] =
-                            (scaleU * static_cast<float>(S16ToDouble(polygon->u1))) + FLOAT_8032FCC8;
+                            (scaleU * static_cast<float>(S16ToDouble(polygon->u1))) + LoadFloat(FLOAT_8032FCC8);
                     } else {
                         polygon->texCoord[1][0] = scaleU * static_cast<float>(S16ToDouble(polygon->u1));
                     }
                     if (polygon->u2 < 0) {
                         polygon->texCoord[2][0] =
-                            (scaleU * static_cast<float>(S16ToDouble(polygon->u2))) + FLOAT_8032FCC8;
+                            (scaleU * static_cast<float>(S16ToDouble(polygon->u2))) + LoadFloat(FLOAT_8032FCC8);
                     } else {
                         polygon->texCoord[2][0] = scaleU * static_cast<float>(S16ToDouble(polygon->u2));
                     }
                     if (polygon->u3 < 0) {
                         polygon->texCoord[3][0] =
-                            (scaleU * static_cast<float>(S16ToDouble(polygon->u3))) + FLOAT_8032FCC8;
+                            (scaleU * static_cast<float>(S16ToDouble(polygon->u3))) + LoadFloat(FLOAT_8032FCC8);
                     } else {
                         polygon->texCoord[3][0] = scaleU * static_cast<float>(S16ToDouble(polygon->u3));
                     }
@@ -320,10 +325,10 @@ void CMaterialEditorPcs::drawViewer()
                         polygon->v3 = -polygon->v3;
                     }
 
-                    polygon->texCoord[0][1] = -(scaleV * static_cast<float>(S16ToDouble(polygon->v0)) - FLOAT_8032FCC8);
-                    polygon->texCoord[1][1] = -(scaleV * static_cast<float>(S16ToDouble(polygon->v1)) - FLOAT_8032FCC8);
-                    polygon->texCoord[2][1] = -(scaleV * static_cast<float>(S16ToDouble(polygon->v2)) - FLOAT_8032FCC8);
-                    polygon->texCoord[3][1] = -(scaleV * static_cast<float>(S16ToDouble(polygon->v3)) - FLOAT_8032FCC8);
+                    polygon->texCoord[0][1] = -(scaleV * static_cast<float>(S16ToDouble(polygon->v0)) - LoadFloat(FLOAT_8032FCC8));
+                    polygon->texCoord[1][1] = -(scaleV * static_cast<float>(S16ToDouble(polygon->v1)) - LoadFloat(FLOAT_8032FCC8));
+                    polygon->texCoord[2][1] = -(scaleV * static_cast<float>(S16ToDouble(polygon->v2)) - LoadFloat(FLOAT_8032FCC8));
+                    polygon->texCoord[3][1] = -(scaleV * static_cast<float>(S16ToDouble(polygon->v3)) - LoadFloat(FLOAT_8032FCC8));
                     DCStoreRange(polygon, sizeof(MaterialEditorPolygon));
 
                     if (textureHeader[1] == 0x20) {

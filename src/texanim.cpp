@@ -506,10 +506,9 @@ void CTexAnimSet::AttachMaterialSet(CMaterialSet* materialSet)
 CTexAnimSet* CTexAnimSet::Duplicate(CMemory::CStage* stage)
 {
     CTexAnimSetStorage* self = reinterpret_cast<CTexAnimSetStorage*>(this);
-    CTexAnimSetStorage* dup = reinterpret_cast<CTexAnimSetStorage*>(
-        new (stage, const_cast<char*>(s_texanim_cpp), 0x54) CTexAnimSet);
+    CTexAnimSet* dup = new (stage, const_cast<char*>(s_texanim_cpp), 0x54) CTexAnimSet;
 
-    dup->texAnims.SetStage(stage);
+    dup->m_texAnims.SetStage(stage);
     for (unsigned int i = 0; i < static_cast<unsigned int>(self->texAnims.GetSize()); i++) {
         CTexAnimStorage* src = reinterpret_cast<CTexAnimStorage*>(self->texAnims[i]);
         CTexAnimStorage* copy = reinterpret_cast<CTexAnimStorage*>(
@@ -523,11 +522,11 @@ CTexAnimSet* CTexAnimSet::Duplicate(CMemory::CStage* stage)
         copy->unk18 = src->unk18;
         copy->unk1C = src->unk1C;
         copy->unk20 = src->unk20;
-        dup->texAnims.Add(reinterpret_cast<CTexAnim*>(copy));
+        dup->m_texAnims.Add(reinterpret_cast<CTexAnim*>(copy));
     }
 
-    dup->unk24 = self->unk24;
-    return reinterpret_cast<CTexAnimSet*>(dup);
+    dup->m_chin = self->unk24;
+    return dup;
 }
 
 /*
@@ -544,14 +543,13 @@ void CTexAnimSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
     CChunkFile::CChunk outerChunk;
     CChunkFile::CChunk middleChunk;
     CChunkFile::CChunk innerChunk;
-    CTexAnimSetStorage* self = reinterpret_cast<CTexAnimSetStorage*>(this);
     int tanmTag = 0x54414E4D;
     int seqTag = 0x53455120;
     int nameTag = 0x4E414D45;
     int infoTag = 0x494E464F;
     int keyTag = 0x4B455920;
 
-    self->texAnims.SetStage(stage);
+    m_texAnims.SetStage(stage);
     chunkFile.PushChunk();
     while ((int)chunkFile.GetNextChunk(outerChunk) != 0) {
         if ((int)outerChunk.m_id != tanmTag) {
@@ -615,7 +613,7 @@ void CTexAnimSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
                 ->texAnimSeqs.Add(reinterpret_cast<CTexAnimSeq*>(seq));
         }
         chunkFile.PopChunk();
-        self->texAnims.Add(reinterpret_cast<CTexAnim*>(texAnim));
+        m_texAnims.Add(reinterpret_cast<CTexAnim*>(texAnim));
     }
     chunkFile.PopChunk();
 }

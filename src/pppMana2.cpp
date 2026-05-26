@@ -46,6 +46,8 @@ extern const char s_manaShapeObj2[] = "obj2";
 extern const float FLOAT_803318fc = 0.99999f;
 extern const char s_manaShapeObj[] = "obj";
 extern const float FLOAT_80331904 = -1.5707964f;
+extern const float kPppConformBgNormalZero = 0.0f;
+extern const float kPppConformBgNormalOne = 1.0f;
 
 static inline float CameraWorldX()
 {
@@ -1331,7 +1333,7 @@ void pppDestructMana2(pppMana2* pppMana2, pppMana2UnkC* param_2)
     model->SetDrawMeshDLCallback(0);
     meshEntry = *(s32*)(modelBytes + 0xAC);
     step = work[0x1C];
-    for (i = 0; i < *(u32*)(*(s32*)(modelBytes + 0xA4) + 0xC); i++) {
+    for (i = 0; i < *(u32*)(*(s32*)(modelBytes + 0xA4) + 0xC); i++, meshEntry += 0x14) {
         u8 stepType = *(u8*)(step + 0x1C);
         s32 shape = *(s32*)(meshEntry + 8);
 
@@ -1373,8 +1375,6 @@ void pppDestructMana2(pppMana2* pppMana2, pppMana2UnkC* param_2)
                 work[0x18] = 0;
             }
         }
-
-        meshEntry += 0x14;
     }
 }
 

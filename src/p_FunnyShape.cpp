@@ -427,6 +427,11 @@ inline CUSBStreamDataStorage::~CUSBStreamDataStorage()
     reinterpret_cast<CUSBStreamData*>(this)->~CUSBStreamData();
 }
 
+CUSBStreamDataStorage::CUSBStreamDataStorage()
+{
+    new (this) CUSBStreamData;
+}
+
 template <>
 CPtrArray<_GXTexObj*>::~CPtrArray()
 {

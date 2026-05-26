@@ -311,7 +311,7 @@ static inline CFont* GetCmakeKeyboardFont(CMenuPcs* menu)
     return CmakeFields(menu).m_fonts[CMAKE_FONT_VILLAGE];
 }
 
-static const char* const s_cmakeNameRows[] = {
+extern "C" const char* s_NameEntryStr[] = {
     "ABCDEFGHIJKL",
     "MNOPQRSTUVWX",
     "YZ.-'      ",
@@ -1728,7 +1728,7 @@ int CMenuPcs::CmakeNameCtrl()
                         return 0;
                     }
 
-                    const char* rowText = s_cmakeNameRows[table * 5 + row];
+                    const char* rowText = s_NameEntryStr[table * 5 + row];
                     size_t rowLen = strlen(rowText);
                     if (select < 0 || static_cast<size_t>(select) >= rowLen || rowText[select] == '\0') {
                         Sound.PlaySe(4, 0x40, 0x7F, 0);
@@ -1938,7 +1938,7 @@ void CMenuPcs::CmakeNameDraw()
     font->SetColor(col);
 
     for (int i = 0; i < 5; i++) {
-        const char* rowText = s_cmakeNameRows[table * 5 + i];
+        const char* rowText = s_NameEntryStr[table * 5 + i];
         font->SetPosX(FLOAT_803332c8);
         font->SetPosY((108.0f + i * 32.0f) - FLOAT_803332f4);
         font->Draw(rowText);
@@ -3413,7 +3413,7 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
         return 0;
     }
 
-    const char* rowText = s_cmakeNameRows[table * 5 + row];
+    const char* rowText = s_NameEntryStr[table * 5 + row];
     size_t rowLen = strlen(rowText);
     if (select < 0 || static_cast<size_t>(select) >= rowLen) {
         Sound.PlaySe(4, 0x40, 0x7f, 0);
@@ -3537,7 +3537,7 @@ void CMenuPcs::CmakeVillageDraw()
     font->SetColor(col);
 
     for (int i = 0; i < 5; i++) {
-        const char* rowText = s_cmakeNameRows[table * 5 + i];
+        const char* rowText = s_NameEntryStr[table * 5 + i];
         font->SetPosX(FLOAT_803332c8);
         font->SetPosY(static_cast<float>(0x6C + i * 0x20));
         font->Draw(rowText);

@@ -648,18 +648,18 @@ void CGraphicPcs::drawBar()
     for (int i = 0; i < orderCount; i++) {
         const float width = (100.0f * order->m_lastTime) / 16.666666f;
         const u32 rgb = Math.Hsb2Rgb(hue / orderCount, 100, 100);
-        const float y0 = drawText ? static_cast<float>(y) : ((order->m_priority == 0x26) ? 456.0f : 464.0f);
-        const float y1 = drawText ? static_cast<float>(y + 8) : ((order->m_priority == 0x26) ? 464.0f : 456.0f);
+        const float y0 = drawText ? static_cast<float>(y) : ((order->m_priority == 0x26) ? 448.0f : 464.0f);
+        const float y1 = drawText ? static_cast<float>(y + 8) : 456.0f;
 
         if (order->m_priority == 0x26) {
             GXBegin(GX_QUADS, GX_VTXFMT0, 4);
             GXPosition3f32(x, y0, 0.0f);
             GXColor1u32(rgb);
             GXTexCoord2u16(0, 0);
-            GXPosition3f32(x + width, y0, 0.0f);
+            GXPosition3f32(x + width + 1.0f, y0, 0.0f);
             GXColor1u32(rgb);
             GXTexCoord2u16(2, 0);
-            GXPosition3f32(x + width, y1, 0.0f);
+            GXPosition3f32(x + width + 1.0f, y1, 0.0f);
             GXColor1u32(rgb);
             GXTexCoord2u16(2, 2);
             GXPosition3f32(x, y1, 0.0f);
@@ -671,10 +671,10 @@ void CGraphicPcs::drawBar()
             GXPosition3f32(x, y0, 0.0f);
             GXColor1u32(rgb);
             GXTexCoord2u16(0, 0);
-            GXPosition3f32(x + width, y0, 0.0f);
+            GXPosition3f32(x + width + 1.0f, y0, 0.0f);
             GXColor1u32(rgb);
             GXTexCoord2u16(2, 0);
-            GXPosition3f32(x + width, y1, 0.0f);
+            GXPosition3f32(x + width + 1.0f, y1, 0.0f);
             GXColor1u32(rgb);
             GXTexCoord2u16(2, 2);
             GXPosition3f32(x, y1, 0.0f);
@@ -688,16 +688,16 @@ void CGraphicPcs::drawBar()
             const float soundWidth = (100.0f * Sound.GetPerformance()) / 16.666666f;
 
             GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-            GXPosition3f32(x, drawText ? static_cast<float>(y) : 456.0f, 0.0f);
+            GXPosition3f32(x, drawText ? static_cast<float>(y) : 448.0f, 0.0f);
             GXColor1u32(soundColor);
             GXTexCoord2u16(0, 0);
-            GXPosition3f32(x + soundWidth, drawText ? static_cast<float>(y) : 456.0f, 0.0f);
+            GXPosition3f32(x + soundWidth + 1.0f, drawText ? static_cast<float>(y) : 448.0f, 0.0f);
             GXColor1u32(soundColor);
             GXTexCoord2u16(2, 0);
-            GXPosition3f32(x + soundWidth, drawText ? static_cast<float>(y + 8) : 464.0f, 0.0f);
+            GXPosition3f32(x + soundWidth + 1.0f, drawText ? static_cast<float>(y + 8) : 456.0f, 0.0f);
             GXColor1u32(soundColor);
             GXTexCoord2u16(2, 2);
-            GXPosition3f32(x, drawText ? static_cast<float>(y + 8) : 464.0f, 0.0f);
+            GXPosition3f32(x, drawText ? static_cast<float>(y + 8) : 456.0f, 0.0f);
             GXColor1u32(soundColor);
             GXTexCoord2u16(0, 2);
         }

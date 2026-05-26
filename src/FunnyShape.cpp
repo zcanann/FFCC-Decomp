@@ -654,10 +654,7 @@ void CFunnyShape::Update()
  */
 void CFunnyShape::InitAnmWork()
 {
-    const float zero = 0.0f;
     const bool noSpread = (ShapeFlags(this) & 0x80) == 0;
-    const float angleMul = 3.14f;
-    const float angleDiv = 180.0f;
     CFunnyShapeAnmWork* work = m_anmWork;
 
     for (s32 i = 0; i < 0x200; i++) {
@@ -669,19 +666,19 @@ void CFunnyShape::InitAnmWork()
 
         r = rand();
         work->y = static_cast<float>(r - (r / ShapeRange(this)) * ShapeRange(this));
-        work->z = zero;
+        work->z = kFunnyShapeZero;
 
         r = rand();
         const s16 shapeCount = *reinterpret_cast<s16*>(reinterpret_cast<u8*>(AnimData(this)) + 6);
         const s32 shapeDiv = r / shapeCount;
         work->frame = static_cast<s16>(r - shapeDiv * shapeCount);
         work->delay = 0x200;
-        work->viewportY = zero;
-        work->viewportX = zero;
+        work->viewportY = kFunnyShapeZero;
+        work->viewportX = kFunnyShapeZero;
 
         r = rand();
         work->angle = static_cast<float>(r % 0x168);
-        work->angle = (angleMul * work->angle) / angleDiv;
+        work->angle = (kFunnyShapePi * work->angle) / kFunnyShapeHalfTurnDegrees;
 
         r = rand();
         if ((r % 2) != 0) {
@@ -695,8 +692,8 @@ void CFunnyShape::InitAnmWork()
 
         if (noSpread != 0) {
             work->frame = 0;
-            work->y = zero;
-            work->x = zero;
+            work->y = kFunnyShapeZero;
+            work->x = kFunnyShapeZero;
         }
 
         work++;

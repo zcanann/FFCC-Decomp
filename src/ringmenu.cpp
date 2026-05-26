@@ -73,6 +73,7 @@ extern float FLOAT_80330a40;
 extern float FLOAT_80330a44;
 extern float FLOAT_80330a48;
 extern float FLOAT_80330a4c;
+extern float FLOAT_80330A50;
 extern float FLOAT_80330a58;
 extern float FLOAT_80330aac;
 extern float FLOAT_80330ab0;
@@ -208,7 +209,7 @@ void CRingMenu::DrawIcon()
 		}
 	}
 
-	(void)atan2(static_cast<double>(clampedX), static_cast<double>(clampedY));
+	float angle = static_cast<float>(atan2(static_cast<double>(clampedX), static_cast<double>(clampedY)));
 
 	float posX = FLOAT_803309e4 * clampedX + FLOAT_803309e4;
 	float posY = -(FLOAT_803309e8 * clampedY - FLOAT_803309e8);
@@ -232,13 +233,13 @@ void CRingMenu::DrawIcon()
 	MenuPcs.SetColor(bgColor);
 	MenuPcs.DrawRect(3, FLOAT_803309ec + posX,
 	                                 FLOAT_803309ec + posY, FLOAT_803309f0, FLOAT_803309f0,
-	                                 FLOAT_803309c0, FLOAT_803309c0, FLOAT_803309cc, FLOAT_803309cc, 0.0f);
+	                                 FLOAT_803309c0, FLOAT_803309c0, FLOAT_803309cc, FLOAT_803309cc, angle);
 
 	CColor fgColor(0xFF, 0xFF, 0xFF, 0xFF);
 	MenuPcs.SetColor(fgColor);
 	MenuPcs.DrawRect(3, posX, posY, FLOAT_803309f0, FLOAT_803309f0, FLOAT_803309c0,
 	    static_cast<float>(iconRow * 0x38), FLOAT_803309cc, FLOAT_803309cc,
-	    0.0f);
+	    angle);
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x18));
 	void* tlut = MenuPcs.m_externalFontTlut;
@@ -262,7 +263,7 @@ void CRingMenu::DrawIcon()
 	float u = static_cast<float>((((colSign * 8) | (signedIconCol * 0x20000000 + colSign) >> 29) - colSign) * 0x30);
 	float v = static_cast<float>(((signedIconCol >> 3) + ((signedIconCol < 0) && ((iconCol & 7) != 0))) * 0x30);
 	MenuPcs.DrawRect(3, static_cast<float>(posX), static_cast<float>(posY), FLOAT_803309f4,
-	                                 FLOAT_803309f4, u, v, FLOAT_803309f8, FLOAT_803309f8, 0.0f);
+	                                 FLOAT_803309f4, u, v, FLOAT_803309f8, FLOAT_803309f8, angle);
 }
 
 /*
@@ -382,20 +383,20 @@ void CRingMenu::drawGBA()
 		return;
 	}
 
-	double showScale = static_cast<double>(static_cast<float>(m_displayCounter) * FLOAT_80330a08);
+	float showScale = static_cast<float>(m_displayCounter) * FLOAT_80330a08;
 	if (m_displayDirection != 0) {
-		showScale = static_cast<double>(FLOAT_803309cc) - showScale;
+		showScale = FLOAT_803309cc - showScale;
 	}
-	if (showScale == static_cast<double>(FLOAT_803309c0)) {
+	if (showScale == FLOAT_803309c0) {
 		return;
 	}
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x16));
 
-	double gbaAnim = static_cast<double>(
+	float gbaAnim = static_cast<float>(
 	    sin(static_cast<double>(FLOAT_80330a0c * static_cast<float>(m_gbaAnimCounter)) / static_cast<double>(FLOAT_80330a10)));
 	if (m_gbaConnectedFlag == 1) {
-		gbaAnim = static_cast<double>(FLOAT_803309cc) - gbaAnim;
+		gbaAnim = FLOAT_803309cc - gbaAnim;
 	}
 
 	int posXInt = 0x30;
@@ -412,48 +413,48 @@ void CRingMenu::drawGBA()
 
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-	const double sizePulse = static_cast<double>(FLOAT_80330a14 * static_cast<float>(static_cast<double>(FLOAT_803309cc) - gbaAnim) +
-	                                             FLOAT_803309cc);
+	const float sizePulse = FLOAT_80330a14 * (FLOAT_803309cc - gbaAnim) + FLOAT_803309cc;
 	float cycle = static_cast<float>(fmod(static_cast<double>(FLOAT_80330a18 * static_cast<float>(m_commonFrameCounter)),
 	                                      DOUBLE_80330a20));
 	if (cycle > FLOAT_803309cc) {
 		cycle = FLOAT_80330a28 - cycle;
 	}
 
-	const double angle = static_cast<double>(FLOAT_80330a2c * cycle);
-	const double sinA = static_cast<double>(sin(angle));
-	const double sinB = static_cast<double>(sin(static_cast<double>(FLOAT_80330a30) + angle));
+	const float angle = FLOAT_80330a2c * cycle;
+	const float sinA = static_cast<float>(sin(static_cast<double>(angle)));
+	const float sinB = static_cast<float>(sin(static_cast<double>(FLOAT_80330a30 + angle)));
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
 
-	const double alphaBase = static_cast<double>(FLOAT_80330a34) * gbaAnim;
+	const float alphaBase = FLOAT_80330a34 * gbaAnim;
 	const unsigned int alphaShadow =
-	    static_cast<unsigned int>(static_cast<int>(static_cast<double>(FLOAT_803309c4) * alphaBase * showScale));
+	    static_cast<unsigned int>(static_cast<int>(FLOAT_803309c4 * alphaBase * showScale));
 	CColor shadowColor(0, 0, 0, static_cast<unsigned char>(alphaShadow));
 	MenuPcs.SetColor(shadowColor);
 
-	const double invSize = static_cast<double>(FLOAT_803309cc) - sizePulse;
-	const float drawX = static_cast<float>(static_cast<double>(posX) + static_cast<double>(FLOAT_80330a3c * static_cast<float>(sizePulse * sinB)));
-	const float drawY = static_cast<float>(static_cast<double>(posY) - static_cast<double>(FLOAT_80330a40 * static_cast<float>(sizePulse * sinA)));
+	const float drawAngle = FLOAT_80330A50 * (FLOAT_80330a28 * (cycle - FLOAT_803309c4));
+	const float invSize = FLOAT_803309cc - sizePulse;
+	const float drawX = posX + FLOAT_80330a3c * (sizePulse * sinB);
+	const float drawY = posY - FLOAT_80330a40 * (sizePulse * sinA);
 	const float menuV = static_cast<float>(m_menuIndex * 0x30);
 	MenuPcs.DrawRect(3, FLOAT_80330a38 + drawX, FLOAT_80330a38 + drawY, FLOAT_80330a44, FLOAT_80330a48,
-	                                 FLOAT_803309c0, menuV, FLOAT_80330a4c * static_cast<float>(static_cast<double>(FLOAT_803309cc) + invSize),
-	                                 FLOAT_80330a4c * static_cast<float>(sizePulse + invSize), 0.0f);
+	                                 FLOAT_803309c0, menuV, FLOAT_80330a4c * (FLOAT_803309cc + invSize),
+	                                 FLOAT_80330a4c * (sizePulse + invSize), drawAngle);
 
-	const double alphaLit = alphaBase * showScale;
+	const float alphaLit = alphaBase * showScale;
 	const unsigned int alphaIcon = static_cast<unsigned int>(static_cast<int>(alphaLit));
 	CColor iconColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alphaIcon));
 	MenuPcs.SetColor(iconColor);
 	MenuPcs.DrawRect(3, drawX, drawY, FLOAT_80330a44, FLOAT_80330a48, FLOAT_803309c0, menuV,
-	                                 FLOAT_80330a4c * static_cast<float>(sizePulse), FLOAT_80330a4c * static_cast<float>(sizePulse), 0.0f);
+	                                 FLOAT_80330a4c * static_cast<float>(sizePulse), FLOAT_80330a4c * static_cast<float>(sizePulse), drawAngle);
 
 	const unsigned int flatFlags = CFlatEnabledEventFlags();
 	if (((flatFlags & 8) != 0) && (Joybus.GetGBAStart(m_menuIndex) == 0)) {
 		if (Joybus.IsInitSend(m_menuIndex) == 0) {
 			MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1D));
-			const double blink = static_cast<double>(sin(static_cast<double>(FLOAT_80330a54 * static_cast<float>(m_commonFrameCounter))));
+			const float blink = static_cast<float>(sin(static_cast<double>(FLOAT_80330a54 * static_cast<float>(m_commonFrameCounter))));
 			const unsigned int sendAlpha = static_cast<unsigned int>(
-			    static_cast<int>(static_cast<double>(FLOAT_803309c4) * (alphaLit * static_cast<double>(FLOAT_803309cc + static_cast<float>(blink)))));
+			    static_cast<int>(FLOAT_803309c4 * (alphaLit * (FLOAT_803309cc + blink))));
 			CColor sendColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(sendAlpha));
 			MenuPcs.SetColor(sendColor);
 			MenuPcs.DrawRect(3, drawX, drawY, FLOAT_80330a48, FLOAT_80330a48, FLOAT_803309c0, FLOAT_80330a58,

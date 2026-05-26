@@ -377,10 +377,9 @@ CMapObj::CMapObj()
  */
 CMapObj::~CMapObj()
 {
-    CMapObjAtr* attr = reinterpret_cast<CMapObjAtr*>(PtrAt(this, 0xEC));
-    if (attr != 0) {
-        delete attr;
-        PtrAt(this, 0xEC) = 0;
+    if (m_attribute != 0) {
+        delete m_attribute;
+        m_attribute = 0;
     }
 
     Init();
@@ -397,11 +396,11 @@ CMapObj::~CMapObj()
  */
 void CMapObj::Init()
 {
-    U8At(this, 0x1B) = 1;
-    U8At(this, 0x1C) = 1;
+    m_calcMtxPending = 1;
+    m_localMtxDirty = 1;
     m_parent = 0;
     m_mapData = 0;
-    S32At(this, 0xEC) = 0;
+    m_attribute = 0;
 
     U8At(this, 0x15) = 0x7E;
     U8At(this, 0x14) = 0x7E;
@@ -1264,19 +1263,19 @@ static inline void calcColorKeyFrame(CMapKeyFrame* keyFrame, _GXColor& out, _GXC
  */
 void CMapObj::Calc()
 {
-    if (S16At(this, 0x2C) != 0) {
-        S16At(this, 0x28) = static_cast<short>(S16At(this, 0x28) + S16At(this, 0x2C));
-        if (S16At(this, 0x2C) > 0) {
-            if (S16At(this, 0x28) >= S16At(this, 0x2A)) {
-                S16At(this, 0x28) = S16At(this, 0x2A);
-                U16At(this, 0x2C) = 0;
+    if (m_cameraSemiTransStep != 0) {
+        m_cameraSemiTransAlpha = static_cast<short>(m_cameraSemiTransAlpha + m_cameraSemiTransStep);
+        if (m_cameraSemiTransStep > 0) {
+            if (m_cameraSemiTransAlpha >= m_cameraSemiTransTargetAlpha) {
+                m_cameraSemiTransAlpha = m_cameraSemiTransTargetAlpha;
+                m_cameraSemiTransStep = 0;
             }
-        } else if (S16At(this, 0x28) <= S16At(this, 0x2A)) {
-            S16At(this, 0x28) = S16At(this, 0x2A);
-            U16At(this, 0x2C) = 0;
+        } else if (m_cameraSemiTransAlpha <= m_cameraSemiTransTargetAlpha) {
+            m_cameraSemiTransAlpha = m_cameraSemiTransTargetAlpha;
+            m_cameraSemiTransStep = 0;
         }
 
-        if (S16At(this, 0x28) != 0) {
+        if (m_cameraSemiTransAlpha != 0) {
             U8At(this, 0x15) = 2;
         } else {
             U8At(this, 0x15) = U8At(this, 0x14);
@@ -1312,7 +1311,7 @@ void CMapObj::Calc()
         }
     }
 
-    CMapObjAtr* attr = reinterpret_cast<CMapObjAtr*>(PtrAt(this, 0xEC));
+    CMapObjAtr* attr = m_attribute;
     if (attr != 0) {
         int attrType = reinterpret_cast<MapObjAttrBaseLayout*>(attr)->type;
         switch (attrType) {

@@ -121,6 +121,7 @@ void CMenuPcs::FavoDraw()
 						                 uvScale, FLOAT_80333048, FLOAT_80333040);
 					}
 
+					u += fillW;
 					x += fillW * uvScale;
 				}
 
@@ -228,6 +229,7 @@ void CMenuPcs::FavoDraw()
 	nameFont->SetScale(FLOAT_80333070);
 	nameFont->SetMargin(FLOAT_80333048);
 	nameFont->DrawInit();
+	memset(textBuf, 0, sizeof(textBuf));
 
 	const FavoFlatData* flatData = reinterpret_cast<const FavoFlatData*>(&Game.m_cFlatDataArr[1]);
 	rank = s_rank;

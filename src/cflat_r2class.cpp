@@ -421,16 +421,18 @@ CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* objec
 			} else if (systemVal == -0x45) {
 				value = *reinterpret_cast<unsigned short*>(classData + 0x22);
 			} else if (systemVal < -0x45) {
-				if (systemVal == -0x82) {
-					value = *reinterpret_cast<unsigned short*>(classData + 0x14);
-				} else if (systemVal < -0x82) {
-					if (systemVal == -0x84) {
-						value = *reinterpret_cast<unsigned short*>(classData + 0x18);
-					} else if (systemVal > -0x95) {
-						value = *reinterpret_cast<unsigned short*>(classData + (systemVal + 0x94) * 2 + 0x8C);
+				if (systemVal != -0x82) {
+					if (systemVal < -0x82) {
+						if (systemVal == -0x84) {
+							value = *reinterpret_cast<unsigned short*>(classData + 0x18);
+						} else if (systemVal > -0x95) {
+							value = *reinterpret_cast<unsigned short*>(classData + (systemVal + 0x94) * 2 + 0x8C);
+						}
+					} else if (systemVal < -0x52 && systemVal > -0x7A) {
+						value = *reinterpret_cast<unsigned short*>(classData + (-0x53 - systemVal) * 2 + 0x3E);
 					}
-				} else if (systemVal < -0x52 && systemVal > -0x7A) {
-					value = *reinterpret_cast<unsigned short*>(classData + (-0x53 - systemVal) * 2 + 0x3E);
+				} else {
+					value = *reinterpret_cast<unsigned short*>(classData + 0x14);
 				}
 			} else if (systemVal == -0x41) {
 				value = *reinterpret_cast<unsigned short*>(classData + 0x1C);

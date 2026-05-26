@@ -443,23 +443,54 @@ CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* objec
 			LastResult(this) = value;
 		} else {
 			switch (systemVal) {
-				case -0x1B:
-					LastResult(this) = *reinterpret_cast<unsigned int*>(engineObject + 0x60);
+				case -1:
+					LastResult(this) = *reinterpret_cast<unsigned int*>(engineObject + 0x15C);
 					break;
-				case -0x19:
-					LastResult(this) = *reinterpret_cast<unsigned int*>(engineObject + 0x520);
+				case -2:
+					LastResult(this) = *reinterpret_cast<unsigned int*>(engineObject + 0x160);
 					break;
-				case -0x18:
-					LastResult(this) = *reinterpret_cast<unsigned int*>(engineObject + 0x1BC);
+				case -3:
+					LastResult(this) = *reinterpret_cast<unsigned int*>(engineObject + 0x164);
 					break;
-				case -0x17:
-					LastResult(this) = *reinterpret_cast<unsigned int*>(engineObject + 0x170);
+				case -4:
+					LastResult(this) = *reinterpret_cast<unsigned int*>(engineObject + 0x1B4);
 					break;
-				case -0x16:
-					LastResult(this) = *reinterpret_cast<unsigned int*>(engineObject + 0x16C);
+				case -5:
+					LastResult(this) = *reinterpret_cast<unsigned int*>(engineObject + 0x184);
 					break;
-				case -0x15:
-					LastResult(this) = *reinterpret_cast<unsigned int*>(engineObject + 0x168);
+				case -6:
+					LastResult(this) = static_cast<unsigned int>(*reinterpret_cast<short*>(engineObject + 0x30));
+					break;
+				case -7:
+					LastResult(this) = static_cast<unsigned int>(static_cast<int>(static_cast<unsigned int>(*(engineObject + 0x50)) << 0x18) >> 0x1F);
+					break;
+				case -8:
+					LastResult(this) = (*reinterpret_cast<unsigned int*>(engineObject + 0x4CC) >> 0x17) & 0xF;
+					break;
+				case -9:
+					LastResult(this) = *reinterpret_cast<unsigned int*>(engineObject + 0x94);
+					break;
+				case -0xA: {
+					u8 bits = *(engineObject + 0x50);
+					LastResult(this) = static_cast<unsigned int>(static_cast<int>((static_cast<unsigned int>(bits) << 0x1C | static_cast<unsigned int>(bits >> 4))) >> 0x1F);
+					break;
+				}
+				case -0xB:
+					LastResult(this) = static_cast<unsigned int>(static_cast<int>(*reinterpret_cast<signed char*>(engineObject + 0x53)));
+					break;
+				case -0xC: {
+					u8 bits = *(engineObject + 0x50);
+					LastResult(this) = static_cast<unsigned int>(static_cast<int>((static_cast<unsigned int>(bits) << 0x19 | static_cast<unsigned int>(bits >> 7))) >> 0x1F);
+					break;
+				}
+				case -0xD:
+					LastResult(this) = *reinterpret_cast<unsigned int*>(engineObject + 0x188);
+					break;
+				case -0xF:
+					LastResult(this) = *reinterpret_cast<unsigned int*>(engineObject + 0x500);
+					break;
+				case -0x10:
+					LastResult(this) = *reinterpret_cast<unsigned int*>(engineObject + 0x504);
 					break;
 				case -0x14:
 				case -0x13:
@@ -467,54 +498,23 @@ CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* objec
 				case -0x11:
 					LastResult(this) = static_cast<unsigned int>(*reinterpret_cast<short*>(engineObject + (systemVal + 0x14) * 2 + 0x510));
 					break;
-				case -0x10:
-					LastResult(this) = *reinterpret_cast<unsigned int*>(engineObject + 0x504);
+				case -0x15:
+					LastResult(this) = *reinterpret_cast<unsigned int*>(engineObject + 0x168);
 					break;
-				case -0xF:
-					LastResult(this) = *reinterpret_cast<unsigned int*>(engineObject + 0x500);
+				case -0x16:
+					LastResult(this) = *reinterpret_cast<unsigned int*>(engineObject + 0x16C);
 					break;
-				case -0xD:
-					LastResult(this) = *reinterpret_cast<unsigned int*>(engineObject + 0x188);
+				case -0x17:
+					LastResult(this) = *reinterpret_cast<unsigned int*>(engineObject + 0x170);
 					break;
-				case -0xC: {
-					u8 bits = *(engineObject + 0x50);
-					LastResult(this) = static_cast<unsigned int>(static_cast<int>((static_cast<unsigned int>(bits) << 0x19 | static_cast<unsigned int>(bits >> 7))) >> 0x1F);
+				case -0x18:
+					LastResult(this) = *reinterpret_cast<unsigned int*>(engineObject + 0x1BC);
 					break;
-				}
-				case -0xB:
-					LastResult(this) = static_cast<unsigned int>(static_cast<int>(*reinterpret_cast<signed char*>(engineObject + 0x53)));
+				case -0x19:
+					LastResult(this) = *reinterpret_cast<unsigned int*>(engineObject + 0x520);
 					break;
-				case -0xA: {
-					u8 bits = *(engineObject + 0x50);
-					LastResult(this) = static_cast<unsigned int>(static_cast<int>((static_cast<unsigned int>(bits) << 0x1C | static_cast<unsigned int>(bits >> 4))) >> 0x1F);
-					break;
-				}
-				case -9:
-					LastResult(this) = *reinterpret_cast<unsigned int*>(engineObject + 0x94);
-					break;
-				case -8:
-					LastResult(this) = (*reinterpret_cast<unsigned int*>(engineObject + 0x4CC) >> 0x17) & 0xF;
-					break;
-				case -7:
-					LastResult(this) = static_cast<unsigned int>(static_cast<int>(static_cast<unsigned int>(*(engineObject + 0x50)) << 0x18) >> 0x1F);
-					break;
-				case -6:
-					LastResult(this) = static_cast<unsigned int>(*reinterpret_cast<short*>(engineObject + 0x30));
-					break;
-				case -5:
-					LastResult(this) = *reinterpret_cast<unsigned int*>(engineObject + 0x184);
-					break;
-				case -4:
-					LastResult(this) = *reinterpret_cast<unsigned int*>(engineObject + 0x1B4);
-					break;
-				case -3:
-					LastResult(this) = *reinterpret_cast<unsigned int*>(engineObject + 0x164);
-					break;
-				case -2:
-					LastResult(this) = *reinterpret_cast<unsigned int*>(engineObject + 0x160);
-					break;
-				case -1:
-					LastResult(this) = *reinterpret_cast<unsigned int*>(engineObject + 0x15C);
+				case -0x1B:
+					LastResult(this) = *reinterpret_cast<unsigned int*>(engineObject + 0x60);
 					break;
 				default:
 					break;

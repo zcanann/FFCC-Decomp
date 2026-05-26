@@ -209,9 +209,10 @@ unsigned int CMenuPcs::TmpArtiClose()
 	if (this->m_tmpArtiList->count == completedItems) {
 		zero = FLOAT_80332f2c;
 		entry = this->m_tmpArtiList->entries;
-		if ((int)itemCount > 0) {
-			count = itemCount >> 3;
-			for (; count != 0; count--) {
+		count = itemCount;
+		if ((int)count > 0) {
+			itemCount = count >> 3;
+			for (; itemCount != 0; itemCount--) {
 				entry[0].startFrame = 0;
 				entry[0].duration = 1;
 				entry[0].alpha = zero;
@@ -238,15 +239,15 @@ unsigned int CMenuPcs::TmpArtiClose()
 				entry[7].alpha = zero;
 				entry += 8;
 			}
-			itemCount &= 7;
-			if (itemCount != 0) {
+			count &= 7;
+			if (count != 0) {
 				do {
 					entry->startFrame = 0;
 					entry->duration = 1;
 					entry->alpha = zero;
 					entry++;
-					itemCount--;
-				} while (itemCount != 0);
+					count--;
+				} while (count != 0);
 			}
 		}
 		result = 1;
@@ -469,9 +470,10 @@ unsigned int CMenuPcs::TmpArtiOpen()
 	if (this->m_tmpArtiList->count == completedItems) {
 		one = FLOAT_80332f30;
 		entry = this->m_tmpArtiList->entries;
-		if ((int)itemCount > 0) {
-			count = itemCount >> 3;
-			for (; count != 0; count--) {
+		count = itemCount;
+		if ((int)count > 0) {
+			itemCount = count >> 3;
+			for (; itemCount != 0; itemCount--) {
 				entry[0].startFrame = 0;
 				entry[0].duration = 1;
 				entry[0].alpha = one;
@@ -498,15 +500,15 @@ unsigned int CMenuPcs::TmpArtiOpen()
 				entry[7].alpha = one;
 				entry += 8;
 			}
-			itemCount &= 7;
-			if (itemCount != 0) {
+			count &= 7;
+			if (count != 0) {
 				do {
 					entry->startFrame = 0;
 					entry->duration = 1;
 					entry->alpha = one;
 					entry++;
-					itemCount--;
-				} while (itemCount != 0);
+					count--;
+				} while (count != 0);
 			}
 		}
 		result = 1;

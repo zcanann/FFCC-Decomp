@@ -2901,7 +2901,6 @@ void CMenuPcs::CalcResultOpenAnim()
 		header->unk04 = 0;
 		header->finished = 0;
 
-		*(short*)(statePtr + 0x22) = 0;
 		InitAnimSprite(&sprites[0], 0x16, 0, 0, 0x280, 0x1c0, 0, 8);
 		sprites[0].depth = 0.0f;
 		sprites[0].scale = 0.0f;

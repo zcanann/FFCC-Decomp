@@ -110,7 +110,7 @@ extern unsigned int s_loadedStageNo__7CMapPcs;
 extern unsigned int s_loadedMapNo__7CMapPcs;
 CRelProfile g_mapStage;
 CRelProfile g_mapSection;
-CRelProfile g_hit_prof;
+unsigned char g_hit_prof;
 unsigned char g_map_calc_prof;
 unsigned char g_map_draw_prof;
 extern const float DrawRangeDefault;

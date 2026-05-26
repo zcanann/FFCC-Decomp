@@ -753,202 +753,187 @@ void CMenuPcs::CalcOptionMenu()
 
 	pressRaw = GetMenuPress();
 
-	signed char& menuState = *reinterpret_cast<signed char*>(self + 0x9C);
-	float& openAnim = *reinterpret_cast<float*>(self + 0x98);
-	float& rowAnim = *reinterpret_cast<float*>(self + 0xA0);
-	float& colAnim = *reinterpret_cast<float*>(self + 0xA8);
-	signed char& animPhase = *reinterpret_cast<signed char*>(self + 0xA4);
-	signed char& animCounter = *reinterpret_cast<signed char*>(self + 0xAC);
-	signed char& optionIndex = *reinterpret_cast<signed char*>(self + 0x8E);
-	signed char& gameInitMode = *reinterpret_cast<signed char*>(self + 0x8F);
-	signed char& stereoMode = *reinterpret_cast<signed char*>(self + 0x90);
-	signed char& bgmVolume = *reinterpret_cast<signed char*>(self + 0x91);
-	signed char& seVolume = *reinterpret_cast<signed char*>(self + 0x92);
-	signed char& leftHintTimer = *reinterpret_cast<signed char*>(self + 0x93);
-	signed char& rightHintTimer = *reinterpret_cast<signed char*>(self + 0x94);
-	int& specialModeEdit = *reinterpret_cast<int*>(self + 0xB0);
-	signed char& specialModeCursor = *reinterpret_cast<signed char*>(self + 0xB4);
 	press = static_cast<unsigned short>(pressRaw);
 	bool optionChanged = false;
 
-	if (menuState == 0) {
-		openAnim += kOptionOpenAnimStep;
-		if (!(openAnim >= kOptionAnimMax)) {
+	if (m_optionMenuState == 0) {
+		m_optionOpenAnim += kOptionOpenAnimStep;
+		if (!(m_optionOpenAnim >= kOptionAnimMax)) {
 			return;
 		}
 
-		menuState = 1;
-		openAnim = kOptionAnimMax;
+		m_optionMenuState = 1;
+		m_optionOpenAnim = kOptionAnimMax;
 		return;
 	}
 
-	if (menuState == 2) {
-		openAnim -= kOptionOpenAnimStep;
-		rowAnim -= kOptionRowAnimStep;
-		colAnim -= kOptionColumnAnimStep;
+	if (m_optionMenuState == 2) {
+		m_optionOpenAnim -= kOptionOpenAnimStep;
+		m_optionRowAnim -= kOptionRowAnimStep;
+		m_optionColumnAnim -= kOptionColumnAnimStep;
 
-		if (rowAnim <= kOptionAnimMin) {
-			rowAnim = kOptionAnimMin;
+		if (m_optionRowAnim <= kOptionAnimMin) {
+			m_optionRowAnim = kOptionAnimMin;
 		}
-		if (colAnim <= kOptionAnimMin) {
-			colAnim = kOptionAnimMin;
+		if (m_optionColumnAnim <= kOptionAnimMin) {
+			m_optionColumnAnim = kOptionAnimMin;
 		}
-		if (static_cast<int>(openAnim / kOptionOpenAnimStep) == 5) {
+		if (static_cast<int>(m_optionOpenAnim / kOptionOpenAnimStep) == 5) {
 			Sound.PlaySe(0x32, 0x40, 0x7F, 0);
 		}
-		if (!(openAnim <= kOptionAnimMin)) {
+		if (!(m_optionOpenAnim <= kOptionAnimMin)) {
 			return;
 		}
 
 		*reinterpret_cast<unsigned short*>(*reinterpret_cast<int*>(self + 0x82C) + 0x20) = 1;
-		optionIndex = 0;
-		menuState = 0;
-		openAnim = kOptionAnimMin;
-		rowAnim = kOptionAnimMin;
-		colAnim = kOptionAnimMin;
-		animCounter = 0;
-		animPhase = 0;
+		m_optionIndex = 0;
+		m_optionMenuState = 0;
+		m_optionOpenAnim = kOptionAnimMin;
+		m_optionRowAnim = kOptionAnimMin;
+		m_optionColumnAnim = kOptionAnimMin;
+		m_optionAnimCounter = 0;
+		m_optionAnimPhase = 0;
 		return;
 	}
 
-	if (menuState == 3) {
+	if (m_optionMenuState == 3) {
 		return;
 	}
 
-	if (animPhase == 0) {
-		rowAnim += kOptionRowAnimStep;
-		animCounter++;
-		if (rowAnim >= kOptionAnimMax) {
-			animPhase = 1;
-			rowAnim = kOptionAnimMax;
+	if (m_optionAnimPhase == 0) {
+		m_optionRowAnim += kOptionRowAnimStep;
+		m_optionAnimCounter++;
+		if (m_optionRowAnim >= kOptionAnimMax) {
+			m_optionAnimPhase = 1;
+			m_optionRowAnim = kOptionAnimMax;
 		}
-	} else if (animPhase == 1) {
-		colAnim += kOptionColumnAnimStep;
-		if (colAnim >= kOptionAnimMax) {
-			animPhase = 2;
-			colAnim = kOptionAnimMax;
+	} else if (m_optionAnimPhase == 1) {
+		m_optionColumnAnim += kOptionColumnAnimStep;
+		if (m_optionColumnAnim >= kOptionAnimMax) {
+			m_optionAnimPhase = 2;
+			m_optionColumnAnim = kOptionAnimMax;
 		}
 	}
 
-	if (leftHintTimer > 0) {
-		leftHintTimer--;
+	if (m_leftHintTimer > 0) {
+		m_leftHintTimer--;
 	}
-	if (rightHintTimer > 0) {
-		rightHintTimer--;
+	if (m_rightHintTimer > 0) {
+		m_rightHintTimer--;
 	}
 
-	if ((specialModeEdit == 0) && ((press & 8) != 0)) {
-		leftHintTimer = 0;
-		rightHintTimer = 0;
-		optionIndex--;
-		if (optionIndex < 0) {
-			optionIndex = 4;
+	if ((m_specialModeEdit == 0) && ((press & 8) != 0)) {
+		m_leftHintTimer = 0;
+		m_rightHintTimer = 0;
+		m_optionIndex--;
+		if (m_optionIndex < 0) {
+			m_optionIndex = 4;
 		}
-		rowAnim = kOptionAnimMin;
-		colAnim = kOptionAnimMin;
-		animCounter = 0;
-		animPhase = 0;
+		m_optionRowAnim = kOptionAnimMin;
+		m_optionColumnAnim = kOptionAnimMin;
+		m_optionAnimCounter = 0;
+		m_optionAnimPhase = 0;
 		Sound.PlaySe(1, 0x40, 0x7F, 0);
-	} else if ((specialModeEdit == 0) && ((press & 4) != 0)) {
-		leftHintTimer = 0;
-		rightHintTimer = 0;
-		optionIndex++;
-		if (optionIndex > 4) {
-			optionIndex = 0;
+	} else if ((m_specialModeEdit == 0) && ((press & 4) != 0)) {
+		m_leftHintTimer = 0;
+		m_rightHintTimer = 0;
+		m_optionIndex++;
+		if (m_optionIndex > 4) {
+			m_optionIndex = 0;
 		}
-		rowAnim = kOptionAnimMin;
-		colAnim = kOptionAnimMin;
-		animCounter = 0;
-		animPhase = 0;
+		m_optionRowAnim = kOptionAnimMin;
+		m_optionColumnAnim = kOptionAnimMin;
+		m_optionAnimCounter = 0;
+		m_optionAnimPhase = 0;
 		Sound.PlaySe(1, 0x40, 0x7F, 0);
 	}
 
-	if (specialModeEdit == 0) {
+	if (m_specialModeEdit == 0) {
 		unsigned short press2;
 		press2 = GetMenuPress();
 
 		if ((press2 & 0x200) != 0) {
-			menuState = 2;
+			m_optionMenuState = 2;
 			Sound.PlaySe(3, 0x40, 0x7F, 0);
 			return;
 		}
 	}
 
-	if ((animPhase == 0) || (animPhase == 1)) {
+	if ((m_optionAnimPhase == 0) || (m_optionAnimPhase == 1)) {
 		return;
 	}
 
 	if ((press & 1) != 0) {
-		if (optionIndex == 2) {
-			leftHintTimer = 3;
-			rightHintTimer = 0;
-			bgmVolume--;
-			if (bgmVolume < 0) {
-				bgmVolume = 0;
+		if (m_optionIndex == 2) {
+			m_leftHintTimer = 3;
+			m_rightHintTimer = 0;
+			m_bgmVolume--;
+			if (m_bgmVolume < 0) {
+				m_bgmVolume = 0;
 			}
-		} else if (optionIndex < 2) {
-			if (optionIndex == 0) {
-				gameInitMode--;
-				if (gameInitMode < 0) {
-					gameInitMode = 1;
+		} else if (m_optionIndex < 2) {
+			if (m_optionIndex == 0) {
+				m_gameInitMode--;
+				if (m_gameInitMode < 0) {
+					m_gameInitMode = 1;
 				}
-			} else if (optionIndex == 1) {
-				stereoMode--;
-				if (stereoMode < 0) {
-					stereoMode = 1;
-				}
-			}
-		} else if (optionIndex == 4) {
-			if (specialModeEdit != 0) {
-				m_specialModeFlags[static_cast<signed char>(specialModeCursor)]--;
-				if (m_specialModeFlags[static_cast<signed char>(specialModeCursor)] < 0) {
-					m_specialModeFlags[static_cast<signed char>(specialModeCursor)] = 1;
+			} else if (m_optionIndex == 1) {
+				m_stereoMode--;
+				if (m_stereoMode < 0) {
+					m_stereoMode = 1;
 				}
 			}
-		} else if (optionIndex == 3) {
-			leftHintTimer = 3;
-			rightHintTimer = 0;
-			seVolume--;
-			if (seVolume < 0) {
-				seVolume = 0;
+		} else if (m_optionIndex == 4) {
+			if (m_specialModeEdit != 0) {
+				m_specialModeFlags[static_cast<signed char>(m_specialModeCursor)]--;
+				if (m_specialModeFlags[static_cast<signed char>(m_specialModeCursor)] < 0) {
+					m_specialModeFlags[static_cast<signed char>(m_specialModeCursor)] = 1;
+				}
+			}
+		} else if (m_optionIndex == 3) {
+			m_leftHintTimer = 3;
+			m_rightHintTimer = 0;
+			m_seVolume--;
+			if (m_seVolume < 0) {
+				m_seVolume = 0;
 			}
 		}
 
 		Sound.PlaySe(1, 0x40, 0x7F, 0);
 		optionChanged = true;
 	} else if ((press & 2) != 0) {
-		if (optionIndex == 2) {
-			rightHintTimer = 3;
-			leftHintTimer = 0;
-			bgmVolume++;
-			if (bgmVolume > 0xC) {
-				bgmVolume = 0xC;
+		if (m_optionIndex == 2) {
+			m_rightHintTimer = 3;
+			m_leftHintTimer = 0;
+			m_bgmVolume++;
+			if (m_bgmVolume > 0xC) {
+				m_bgmVolume = 0xC;
 			}
-		} else if (optionIndex < 2) {
-			if (optionIndex == 0) {
-				gameInitMode++;
-				if (gameInitMode > 1) {
-					gameInitMode = 0;
+		} else if (m_optionIndex < 2) {
+			if (m_optionIndex == 0) {
+				m_gameInitMode++;
+				if (m_gameInitMode > 1) {
+					m_gameInitMode = 0;
 				}
-			} else if (optionIndex == 1) {
-				stereoMode++;
-				if (stereoMode > 1) {
-					stereoMode = 0;
-				}
-			}
-		} else if (optionIndex == 4) {
-			if (specialModeEdit != 0) {
-				m_specialModeFlags[static_cast<signed char>(specialModeCursor)]++;
-				if (m_specialModeFlags[static_cast<signed char>(specialModeCursor)] > 1) {
-					m_specialModeFlags[static_cast<signed char>(specialModeCursor)] = 0;
+			} else if (m_optionIndex == 1) {
+				m_stereoMode++;
+				if (m_stereoMode > 1) {
+					m_stereoMode = 0;
 				}
 			}
-		} else if (optionIndex == 3) {
-			rightHintTimer = 3;
-			leftHintTimer = 0;
-			seVolume++;
-			if (seVolume > 0xC) {
-				seVolume = 0xC;
+		} else if (m_optionIndex == 4) {
+			if (m_specialModeEdit != 0) {
+				m_specialModeFlags[static_cast<signed char>(m_specialModeCursor)]++;
+				if (m_specialModeFlags[static_cast<signed char>(m_specialModeCursor)] > 1) {
+					m_specialModeFlags[static_cast<signed char>(m_specialModeCursor)] = 0;
+				}
+			}
+		} else if (m_optionIndex == 3) {
+			m_rightHintTimer = 3;
+			m_leftHintTimer = 0;
+			m_seVolume++;
+			if (m_seVolume > 0xC) {
+				m_seVolume = 0xC;
 			}
 		}
 
@@ -956,23 +941,23 @@ void CMenuPcs::CalcOptionMenu()
 		optionChanged = true;
 	}
 
-	if (optionIndex == 4) {
+	if (m_optionIndex == 4) {
 		unsigned short press3;
 		press3 = GetMenuPress();
 
 		if ((press3 & 0x100) != 0) {
-			if (specialModeEdit == 0) {
-				specialModeCursor = 0;
-				specialModeEdit = 1;
+			if (m_specialModeEdit == 0) {
+				m_specialModeCursor = 0;
+				m_specialModeEdit = 1;
 				Sound.PlaySe(2, 0x40, 0x7F, 0);
 			}
-		} else if (specialModeEdit != 0) {
+		} else if (m_specialModeEdit != 0) {
 			unsigned short press4;
 			press4 = GetMenuPress();
 
 			if ((press4 & 0x200) != 0) {
-				specialModeCursor = 0;
-				specialModeEdit = 0;
+				m_specialModeCursor = 0;
+				m_specialModeEdit = 0;
 				Sound.PlaySe(3, 0x40, 0x7F, 0);
 
 				Game.m_gameWork.m_spModeFlags[0] =
@@ -984,15 +969,15 @@ void CMenuPcs::CalcOptionMenu()
 				Game.m_gameWork.m_spModeFlags[3] =
 				    static_cast<unsigned char>(static_cast<unsigned int>(__cntlzw(1 - m_specialModeFlags[3])) >> 5);
 			} else if ((press & 8) != 0) {
-				specialModeCursor--;
-				if (specialModeCursor < 0) {
-					specialModeCursor = 3;
+				m_specialModeCursor--;
+				if (m_specialModeCursor < 0) {
+					m_specialModeCursor = 3;
 				}
 				Sound.PlaySe(1, 0x40, 0x7F, 0);
 			} else if ((press & 4) != 0) {
-				specialModeCursor++;
-				if (specialModeCursor > 3) {
-					specialModeCursor = 0;
+				m_specialModeCursor++;
+				if (m_specialModeCursor > 3) {
+					m_specialModeCursor = 0;
 				}
 				Sound.PlaySe(1, 0x40, 0x7F, 0);
 			}
@@ -1001,10 +986,10 @@ void CMenuPcs::CalcOptionMenu()
 
 	if (optionChanged) {
 		Game.m_gameWork.m_gameInitFlag =
-		    static_cast<unsigned char>(static_cast<unsigned int>(__cntlzw(static_cast<int>(gameInitMode))) >> 5);
-		Sound.SetStereo(static_cast<unsigned int>(__cntlzw(static_cast<int>(stereoMode))) >> 5);
-		Sound.SetSeMasterVolume(static_cast<int>(kOptionVolumeScale * static_cast<float>(seVolume)));
-		Sound.SetBgmMasterVolume(static_cast<int>(kOptionVolumeScale * static_cast<float>(bgmVolume)));
+		    static_cast<unsigned char>(static_cast<unsigned int>(__cntlzw(static_cast<int>(m_gameInitMode))) >> 5);
+		Sound.SetStereo(static_cast<unsigned int>(__cntlzw(static_cast<int>(m_stereoMode))) >> 5);
+		Sound.SetSeMasterVolume(static_cast<int>(kOptionVolumeScale * static_cast<float>(m_seVolume)));
+		Sound.SetBgmMasterVolume(static_cast<int>(kOptionVolumeScale * static_cast<float>(m_bgmVolume)));
 	}
 }
 

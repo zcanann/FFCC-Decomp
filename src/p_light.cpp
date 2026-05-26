@@ -357,7 +357,8 @@ void CLightPcs::Add(CLightPcs::CLight* light)
 
     u32 idx = m_sceneLightCount;
     m_sceneLightCount = idx + 1;
-    m_sceneLights[idx] = sceneLight;
+    CLight* dst = &m_sceneLights[idx];
+    *dst = sceneLight;
 }
 
 /*

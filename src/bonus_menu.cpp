@@ -3151,7 +3151,7 @@ void CMenuPcs::destroyBonus()
 
 	int ptr = GetBonusMenuMembers(this).m_bonusListPtr;
 	if (ptr != 0) {
-		delete[] (unsigned char*)ptr;
+		delete[] (CMenuPcs::EffectInfo*)ptr;
 		GetBonusMenuMembers(this).m_bonusListPtr = 0;
 	}
 
@@ -3232,11 +3232,10 @@ void CMenuPcs::createBonus()
 
 	statePtr = reinterpret_cast<int>(new BonusMenuStateRaw);
 	GetBonusMenuMembers(this).m_bonusStatePtr = statePtr;
-	listPtr = reinterpret_cast<int>(new unsigned char[sizeof(BonusEffectSlotList)]);
+	listPtr = reinterpret_cast<int>(new CMenuPcs::EffectInfo[0x28]);
 	GetBonusMenuMembers(this).m_bonusListPtr = listPtr;
 
 	memset((void*)statePtr, 0, sizeof(BonusMenuStateRaw));
-	memset((void*)listPtr, 0, sizeof(BonusEffectSlotList));
 	BonusEffectSlotList* effectSlots = reinterpret_cast<BonusEffectSlotList*>(listPtr);
 	for (int i = 0; i < 5; i++) {
 		InitBonusEffectSlotBlock(&effectSlots->slots[i]);

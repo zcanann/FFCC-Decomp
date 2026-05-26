@@ -1549,9 +1549,20 @@ void CGPartyObj::onStatAttack(int chargeType)
 void CGPartyObj::onStatShield()
 {
 	if (m_subState == 1) {
-		unsigned short trig = 0;
-		if ((Pad._452_4_ == 0) && (Pad._448_4_ == -1)) {
-			trig = static_cast<unsigned short>(Pad.GetPadInputs()[0].button[0]);
+		bool suppressInput = false;
+		unsigned short trig;
+		int padSlot = static_cast<signed char>(m_animStateMisc);
+		if ((Pad._452_4_ != 0) || ((padSlot == 0) && (Pad._448_4_ != -1))) {
+			suppressInput = true;
+		}
+		if (suppressInput) {
+			trig = 0;
+		} else {
+			int selectedPort = Pad._448_4_;
+			unsigned int padIndex =
+			    padSlot &
+			    ~((int)~(selectedPort - padSlot | padSlot - selectedPort) >> 31);
+			trig = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Pad) + 4 + padIndex * 0x54);
 		}
 		if ((trig & 0x100) == 0) {
 			changeSubStat(3);

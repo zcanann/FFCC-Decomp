@@ -716,10 +716,10 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirthShpTail3,
             pYmMegaBirthShpTail3->m_colorDeltaAdd[3];
     }
 
-    if (*(s16*)(paramBytes + 0x11) == 0) {
+    if (*(s16*)(paramBytes + 0x14) == 0) {
         *(u16*)((u8*)particleData + 0x22) = 0xFFFF;
     } else {
-        *(s16*)((u8*)particleData + 0x22) = *(s16*)(paramBytes + 0x11);
+        *(s16*)((u8*)particleData + 0x22) = *(s16*)(paramBytes + 0x14);
     }
     particleBytes[0x34] = 0;
 

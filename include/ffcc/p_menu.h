@@ -69,6 +69,7 @@ public:
     };
     struct EffectInfo
     {
+        unsigned char bytes[0x524];
         EffectInfo();
     };
     enum MENUMODE

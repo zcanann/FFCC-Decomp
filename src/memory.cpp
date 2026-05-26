@@ -58,6 +58,7 @@ extern char sCurrentMemoryStageName[];
 extern char sMainMemoryStageName[];
 extern char sDrawHeapUseUnuseFmt[];
 extern char sDrawHeapAmemAnimFmt[];
+extern char sMemoryNoNameStopwatchName[8];
 extern char sEmptyAllocSourceName[4];
 extern const char sHeapWalkerNewline[];
 extern char sHeapWalkerSlashLine[];

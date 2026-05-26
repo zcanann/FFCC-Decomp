@@ -859,7 +859,7 @@ void CFontMan::Init()
 	CMemory::CStage* stage = Memory.CreateStage(0x8000, const_cast<char*>(s_CFontMan), 0);
 	m_stage = stage;
 
-	CFont* font = new (FontMan.m_stage, const_cast<char*>(s_fontman_cpp), 0x3D) CFont;
+	CFont* font = new (stage, const_cast<char*>(s_fontman_cpp), 0x3D) CFont;
 
 	m_font = font;
 	m_font->Create(0, 0);

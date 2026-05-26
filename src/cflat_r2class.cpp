@@ -100,11 +100,9 @@ static inline void StoreU16(CFlatRuntime::CStack* stack, unsigned short* value, 
 
 	if (setMode == 0) {
 		*value = static_cast<unsigned short>(stack->m_word);
-	} else if (setMode < 0) {
-		if (setMode > -2) {
-			*value = static_cast<unsigned short>(*value - static_cast<unsigned short>(stack->m_word));
-		}
-	} else if (setMode < 2) {
+	} else if (setMode == -1) {
+		*value = static_cast<unsigned short>(*value - static_cast<unsigned short>(stack->m_word));
+	} else if (setMode == 1) {
 		*value = static_cast<unsigned short>(*value + static_cast<unsigned short>(stack->m_word));
 	}
 }
@@ -115,11 +113,9 @@ static inline void StoreS16(CFlatRuntime::CStack* stack, short* value, int setMo
 
 	if (setMode == 0) {
 		*value = static_cast<short>(stack->m_word);
-	} else if (setMode < 0) {
-		if (setMode > -2) {
-			*value = static_cast<short>(*value - static_cast<short>(stack->m_word));
-		}
-	} else if (setMode < 2) {
+	} else if (setMode == -1) {
+		*value = static_cast<short>(*value - static_cast<short>(stack->m_word));
+	} else if (setMode == 1) {
 		*value = static_cast<short>(*value + static_cast<short>(stack->m_word));
 	}
 }
@@ -130,11 +126,9 @@ static inline void StoreU32(CFlatRuntime::CStack* stack, unsigned int* value, in
 
 	if (setMode == 0) {
 		*value = stack->m_word;
-	} else if (setMode < 0) {
-		if (setMode > -2) {
-			*value -= stack->m_word;
-		}
-	} else if (setMode < 2) {
+	} else if (setMode == -1) {
+		*value -= stack->m_word;
+	} else if (setMode == 1) {
 		*value += stack->m_word;
 	}
 }
@@ -145,11 +139,9 @@ static inline void StoreF32(CFlatRuntime::CStack* stack, float* value, int setMo
 
 	if (setMode == 0) {
 		*value = *reinterpret_cast<float*>(&stack->m_word);
-	} else if (setMode < 0) {
-		if (setMode > -2) {
-			*value -= *reinterpret_cast<float*>(&stack->m_word);
-		}
-	} else if (setMode < 2) {
+	} else if (setMode == -1) {
+		*value -= *reinterpret_cast<float*>(&stack->m_word);
+	} else if (setMode == 1) {
 		*value += *reinterpret_cast<float*>(&stack->m_word);
 	}
 }
@@ -168,7 +160,7 @@ static inline void StoreF32(CFlatRuntime::CStack* stack, float* value, int setMo
 void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* object, CFlatRuntime::CStack* stack, int setMode)
 {
 	u8* const engineObject = reinterpret_cast<u8*>(object);
-	const unsigned int engineFlags = CallEngineFlags(engineObject);
+	const unsigned short engineFlags = CallEngineFlags(engineObject);
 
 	if ((engineFlags & 5) != 5 && systemVal == -0x1B) {
 		if (static_cast<unsigned int>(System.m_execParam) >= 2) {
@@ -211,10 +203,10 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 
 					if (setMode == 0) {
 						newValue = stack->m_word;
-					} else if (setMode == 1) {
-						newValue += stack->m_word;
 					} else if (setMode == -1) {
 						newValue -= stack->m_word;
+					} else if (setMode == 1) {
+						newValue += stack->m_word;
 					}
 
 					if (newValue == 0) {
@@ -271,10 +263,10 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 					int bitValue = oldBit;
 					if (setMode == 0) {
 						bitValue = static_cast<int>(static_cast<signed char>(stack->m_word));
-					} else if (setMode == 1) {
-						bitValue += static_cast<int>(static_cast<signed char>(stack->m_word));
 					} else if (setMode == -1) {
 						bitValue -= static_cast<int>(static_cast<signed char>(stack->m_word));
+					} else if (setMode == 1) {
+						bitValue += static_cast<int>(static_cast<signed char>(stack->m_word));
 					}
 					*(engineObject + 0x50) =
 					    static_cast<u8>((static_cast<unsigned int>(bitValue) << 3) & 8) | (*(engineObject + 0x50) & 0xF7);
@@ -285,10 +277,10 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 					stack[-1].m_word = static_cast<unsigned int>(static_cast<int>(*value));
 					if (setMode == 0) {
 						*value = static_cast<signed char>(stack->m_word);
-					} else if (setMode == 1) {
-						*value = static_cast<signed char>(*value + static_cast<signed char>(stack->m_word));
 					} else if (setMode == -1) {
 						*value = static_cast<signed char>(*value - static_cast<signed char>(stack->m_word));
+					} else if (setMode == 1) {
+						*value = static_cast<signed char>(*value + static_cast<signed char>(stack->m_word));
 					}
 					break;
 				}
@@ -324,10 +316,10 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 					signed char value = static_cast<signed char>(stack[-1].m_word);
 					if (setMode == 0) {
 						value = static_cast<signed char>(stack->m_word);
-					} else if (setMode == 1) {
-						value = static_cast<signed char>(value + static_cast<signed char>(stack->m_word));
 					} else if (setMode == -1) {
 						value = static_cast<signed char>(value - static_cast<signed char>(stack->m_word));
+					} else if (setMode == 1) {
+						value = static_cast<signed char>(value + static_cast<signed char>(stack->m_word));
 					}
 					*(engineObject + 0x56) = static_cast<u8>(value);
 					break;
@@ -354,8 +346,9 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* object, int systemVal)
 {
 	u8* const engineObject = reinterpret_cast<u8*>(object->m_engineObject);
+	const unsigned short engineFlags = CallEngineFlags(engineObject);
 
-	if (((CallEngineFlags(engineObject) & 5) == 5) || (systemVal != -0x1B)) {
+	if (((engineFlags & 5) == 5) || (systemVal != -0x1B)) {
 		if (systemVal < -0x3F) {
 			u8* const classData = *reinterpret_cast<u8**>(engineObject + 0x58);
 			unsigned int value = 0;

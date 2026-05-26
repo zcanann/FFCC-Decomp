@@ -1826,11 +1826,15 @@ void CMenuPcs::CalcSelectWait()
 		break;
 	}
 
-	for (int i = 0; i < (int)header->count; i++) {
-		float pulse = (float)((frame + i) & 0x1f) / 31.0f;
-		if (sprites[i].kind != 0x20) {
-			sprites[i].alpha = 0.75f + pulse * 0.25f;
-		}
+	if (s_Base[0] != 0) {
+		sprites[2].x = (short)(int)s_Base[0][selection * 2 + 2];
+		sprites[2].y = (short)(int)s_Base[0][selection * 2 + 3];
+	}
+	if (sprites[2].timer < sprites[2].duration) {
+		sprites[2].alpha = (float)sprites[2].timer / (float)sprites[2].duration;
+		sprites[2].timer++;
+	} else {
+		sprites[2].alpha = 1.0f;
 	}
 	UpdateSelectCursorSprite(statePtr, header, sprites, frame);
 

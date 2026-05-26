@@ -42,7 +42,7 @@ void pppFrameConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir, pp
 
             pppMngSt->m_scale.x = kConstrainCameraDirWideAspect * scale;
             pppMngSt->m_scale.y = scale;
-            pppMngSt->m_scale.z = 1.0f;
+            pppMngSt->m_scale.z = kConstrainCameraDirScaleOne;
 
             Mtx scaleMtx;
             PSMTXScale(scaleMtx, pppMngSt->m_scale.x, pppMngSt->m_scale.y, pppMngSt->m_scale.z);

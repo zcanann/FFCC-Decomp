@@ -218,15 +218,15 @@ void CRingMenu::DrawIcon()
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x19));
 	int iconRow;
 	unsigned int iconCol;
-	if ((Game.m_gameWork.m_menuStageMode == 0) || (m_menuIndex < 1)) {
+	if ((Game.m_gameWork.m_menuStageMode != 0) && (m_menuIndex >= 1)) {
+		iconRow = 1;
+		iconCol = 0x65;
+	} else {
 		iconRow = *reinterpret_cast<int*>(scriptFood + 0x3B4);
 		int foodProgress = static_cast<int>(*reinterpret_cast<unsigned short*>(scriptFood + 0x14));
 		int progress = foodProgress - 100;
 		int q = progress / 100 + (progress >> 31);
 		iconCol = foodProgress % 100 + static_cast<unsigned int>((q - (q >> 31)) * 4);
-	} else {
-		iconRow = 1;
-		iconCol = 0x65;
 	}
 
 	CColor bgColor(0, 0, 0, 0x80);
@@ -920,6 +920,9 @@ void CRingMenu::onCalc()
 		m_commonFrameCounter = m_commonFrameCounter + 1;
 		m_timerB = clampDecToZero(m_timerB);
 
+		const float animMin = FLOAT_803309c0;
+		int animCount = 9;
+
 		m_buttonTimers[0] = clampDecToZero(m_buttonTimers[0]);
 		m_buttonTimers[1] = clampDecToZero(m_buttonTimers[1]);
 		m_buttonTimers[2] = clampDecToZero(m_buttonTimers[2]);
@@ -928,12 +931,10 @@ void CRingMenu::onCalc()
 		m_buttonTimers[5] = clampDecToZero(m_buttonTimers[5]);
 
 		const float animStep = FLOAT_80330a54;
-		const float animMin = FLOAT_803309c0;
-
 		m_buttonTimers[6] = clampDecToZero(m_buttonTimers[6]);
 		m_buttonTimers[7] = clampDecToZero(m_buttonTimers[7]);
 		m_buttonTimers[8] = clampDecToZero(m_buttonTimers[8]);
-		for (int i = 0; i < 9; i++) {
+		for (int i = 0; i < animCount; i++) {
 			for (int j = 0; j < 3; j++) {
 				m_animFloat[i][j] = m_animFloat[i][j] - animStep;
 				if (m_animFloat[i][j] < animMin) {
@@ -975,9 +976,8 @@ void CRingMenu::onCalc()
 				currentCmd = caravanWork->GetIdxCmdList();
 			}
 
-			int mogStage = (Game.m_gameWork.m_bossArtifactStageIndex == 0x19);
 			int* trackedCmd = &m_currentCommandIndex;
-			if (mogStage != 0) {
+			if (Game.m_gameWork.m_bossArtifactStageIndex == 0x19) {
 				trackedCmd = reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Chara) + 0x2008);
 			}
 

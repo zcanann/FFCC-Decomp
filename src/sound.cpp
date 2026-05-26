@@ -992,29 +992,27 @@ void CSound::LoadWaveASync(int waveNo, int waveId, int syncMode)
 {
     if (waveNo < 0) {
         System.Printf(const_cast<char*>(s_soundMinusOneFmt));
-    } else if (RedSound(this)->ReentryWaveData(waveNo) == -1) {
-        CSoundLayout& sound = SoundData(this);
-        CFile::CHandle*& waveFile = sound.m_waveFile;
-        if (waveFile != 0) {
-            File.Close(waveFile);
-            waveFile = 0;
+    } else if (m_redSound.ReentryWaveData(waveNo) == -1) {
+        if (m_waveFile != 0) {
+            File.Close(m_waveFile);
+            m_waveFile = 0;
             System.Printf(const_cast<char*>(s_soundLoadWaveErrorFmt));
         }
 
-        RedSound(this)->SetWaveData(-1, nullptr, 0);
+        m_redSound.SetWaveData(-1, nullptr, 0);
 
         char wavePath[244];
         sprintf(wavePath, s_soundWavePathFmt, waveNo);
-        waveFile = File.Open(wavePath, 0, CFile::PRI_LOW);
-        if (waveFile != 0) {
-            sound.m_waveRemain = File.GetLength(waveFile);
-            sound.m_waveOffset = 0;
-            sound.m_waveState = 0;
-            sound.m_waveID = waveId;
-            sound.m_waveSyncMode = syncMode;
+        m_waveFile = File.Open(wavePath, 0, CFile::PRI_LOW);
+        if (m_waveFile != 0) {
+            m_waveRemain = File.GetLength(m_waveFile);
+            m_waveOffset = 0;
+            m_waveState = 0;
+            m_waveID = waveId;
+            m_waveSyncMode = syncMode;
 
             if (syncMode != 0) {
-                while (((u32)__cntlzw((u32)waveFile) >> 5) == 0) {
+                while (((u32)__cntlzw((u32)m_waveFile) >> 5) == 0) {
                     loadWaveFrame();
                 }
             }

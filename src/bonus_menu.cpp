@@ -1691,10 +1691,6 @@ void CMenuPcs::CalcSelectWait()
 	BonusAnimHeader* header;
 	BonusAnimSprite* sprites;
 
-	if (statePtr == 0 || animPtr == 0 || auxPtr == 0) {
-		return;
-	}
-
 	header = (BonusAnimHeader*)animPtr;
 	sprites = (BonusAnimSprite*)(animPtr + 8);
 

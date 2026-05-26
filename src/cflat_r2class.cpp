@@ -444,19 +444,19 @@ CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* objec
 		} else {
 			switch (systemVal) {
 				case -1:
-					LastResult(this) = *reinterpret_cast<unsigned int*>(engineObject + 0x15C);
+					*reinterpret_cast<float*>(&LastResult(this)) = *reinterpret_cast<float*>(engineObject + 0x15C);
 					break;
 				case -2:
-					LastResult(this) = *reinterpret_cast<unsigned int*>(engineObject + 0x160);
+					*reinterpret_cast<float*>(&LastResult(this)) = *reinterpret_cast<float*>(engineObject + 0x160);
 					break;
 				case -3:
-					LastResult(this) = *reinterpret_cast<unsigned int*>(engineObject + 0x164);
+					*reinterpret_cast<float*>(&LastResult(this)) = *reinterpret_cast<float*>(engineObject + 0x164);
 					break;
 				case -4:
-					LastResult(this) = *reinterpret_cast<unsigned int*>(engineObject + 0x1B4);
+					*reinterpret_cast<float*>(&LastResult(this)) = *reinterpret_cast<float*>(engineObject + 0x1B4);
 					break;
 				case -5:
-					LastResult(this) = *reinterpret_cast<unsigned int*>(engineObject + 0x184);
+					*reinterpret_cast<float*>(&LastResult(this)) = *reinterpret_cast<float*>(engineObject + 0x184);
 					break;
 				case -6:
 					LastResult(this) = static_cast<unsigned int>(*reinterpret_cast<short*>(engineObject + 0x30));
@@ -484,7 +484,7 @@ CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* objec
 					break;
 				}
 				case -0xD:
-					LastResult(this) = *reinterpret_cast<unsigned int*>(engineObject + 0x188);
+					*reinterpret_cast<float*>(&LastResult(this)) = *reinterpret_cast<float*>(engineObject + 0x188);
 					break;
 				case -0xF:
 					LastResult(this) = *reinterpret_cast<unsigned int*>(engineObject + 0x500);
@@ -499,16 +499,16 @@ CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* objec
 					LastResult(this) = static_cast<unsigned int>(*reinterpret_cast<short*>(engineObject + (systemVal + 0x14) * 2 + 0x510));
 					break;
 				case -0x15:
-					LastResult(this) = *reinterpret_cast<unsigned int*>(engineObject + 0x168);
+					*reinterpret_cast<float*>(&LastResult(this)) = *reinterpret_cast<float*>(engineObject + 0x168);
 					break;
 				case -0x16:
-					LastResult(this) = *reinterpret_cast<unsigned int*>(engineObject + 0x16C);
+					*reinterpret_cast<float*>(&LastResult(this)) = *reinterpret_cast<float*>(engineObject + 0x16C);
 					break;
 				case -0x17:
-					LastResult(this) = *reinterpret_cast<unsigned int*>(engineObject + 0x170);
+					*reinterpret_cast<float*>(&LastResult(this)) = *reinterpret_cast<float*>(engineObject + 0x170);
 					break;
 				case -0x18:
-					LastResult(this) = *reinterpret_cast<unsigned int*>(engineObject + 0x1BC);
+					*reinterpret_cast<float*>(&LastResult(this)) = *reinterpret_cast<float*>(engineObject + 0x1BC);
 					break;
 				case -0x19:
 					LastResult(this) = *reinterpret_cast<unsigned int*>(engineObject + 0x520);

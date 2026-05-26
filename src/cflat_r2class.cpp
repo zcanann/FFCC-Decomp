@@ -387,29 +387,31 @@ CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* objec
 					value = static_cast<unsigned int>((byteValue & mask) != 0);
 				} else if (systemVal <= -500 && systemVal >= -0x2F3) {
 					value = static_cast<unsigned int>(*reinterpret_cast<short*>(classData + (systemVal + 0x2F3) * 2 + 0x9A4));
-				} else if (systemVal == -0x1AA) {
-					value = *reinterpret_cast<unsigned short*>(classData + 0xB4);
-				} else if (systemVal < -0x1AA) {
-					if (systemVal == -0x1C8) {
-						u8* const p = *reinterpret_cast<u8**>(engineObject + 0x6F0);
-						if (p != 0) {
-							value = static_cast<unsigned int>(*reinterpret_cast<short*>(p + 0x30));
+				} else if (systemVal != -0x1AA) {
+					if (systemVal < -0x1AA) {
+						if (systemVal == -0x1C8) {
+							u8* const p = *reinterpret_cast<u8**>(engineObject + 0x6F0);
+							if (p != 0) {
+								value = static_cast<unsigned int>(*reinterpret_cast<short*>(p + 0x30));
+							}
+						} else if (systemVal > -0x1CA) {
+							value = *reinterpret_cast<unsigned short*>(classData + 0xBC8);
+						} else if (systemVal == -0x1B6) {
+							value = *reinterpret_cast<unsigned short*>(classData + 0x3DE);
 						}
-					} else if (systemVal > -0x1CA) {
-						value = *reinterpret_cast<unsigned short*>(classData + 0xBC8);
-					} else if (systemVal == -0x1B6) {
-						value = *reinterpret_cast<unsigned short*>(classData + 0x3DE);
+					} else if (systemVal == -0x19C) {
+						value = *reinterpret_cast<unsigned int*>(classData + 0x200);
+					} else if (systemVal < -0x19C) {
+						if (systemVal < -0x1A5) {
+							value = static_cast<unsigned int>(*reinterpret_cast<short*>(classData + (systemVal + 0x1A9) * 2 + 0xAC));
+						} else if (systemVal == -0x19D) {
+							value = *reinterpret_cast<unsigned short*>(classData + 0x3C8);
+						}
+					} else if (systemVal <= -0x192 && systemVal >= -0x199) {
+						value = *reinterpret_cast<unsigned short*>(classData + (systemVal + 0x199) * 2 + 0x3B8);
 					}
-				} else if (systemVal == -0x19C) {
-					value = *reinterpret_cast<unsigned int*>(classData + 0x200);
-				} else if (systemVal < -0x19C) {
-					if (systemVal < -0x1A5) {
-						value = static_cast<unsigned int>(*reinterpret_cast<short*>(classData + (systemVal + 0x1A9) * 2 + 0xAC));
-					} else if (systemVal == -0x19D) {
-						value = *reinterpret_cast<unsigned short*>(classData + 0x3C8);
-					}
-				} else if (systemVal <= -0x192 && systemVal >= -0x199) {
-					value = *reinterpret_cast<unsigned short*>(classData + (systemVal + 0x199) * 2 + 0x3B8);
+				} else {
+					value = *reinterpret_cast<unsigned short*>(classData + 0xB4);
 				}
 			} else if (systemVal < -0x95 && systemVal > -0x176) {
 				u8* itemTable = *reinterpret_cast<u8**>(classData + 0x24);

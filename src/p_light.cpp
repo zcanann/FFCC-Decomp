@@ -241,7 +241,8 @@ void CLightPcs::destroy()
  */
 void CLightPcs::DestroyBumpLightAll(CLightPcs::TARGET target)
 {
-    CBumpLight* light = &m_bumpLights[static_cast<int>(target) * 8];
+    CBumpLight* bumpLights = m_bumpLights;
+    CBumpLight* light = &bumpLights[static_cast<int>(target) * 8];
 
     for (u32 i = 0; i < 8; i++) {
         if (light[i].m_textureData != 0) {

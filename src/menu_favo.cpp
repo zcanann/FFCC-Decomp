@@ -12,28 +12,21 @@ typedef signed short s16;
 
 unsigned char s_rank[0x20];
 
-extern float FLOAT_80333040;
-extern float FLOAT_80333044;
-extern float FLOAT_80333048;
-extern double DOUBLE_80333050;
-extern float FLOAT_80333058;
-extern float FLOAT_8033305C;
-extern double DOUBLE_80333060;
-extern const char s_FavoRankFormat_80333068[];
-extern float FLOAT_8033306C;
-extern float FLOAT_80333070;
-extern double DOUBLE_80333078;
-extern float FLOAT_80333080;
-extern float FLOAT_80333084;
-
-extern const char s_Force_803334F0[] = "Force";
-extern const char s_Musique_803334F8[] = "Musique";
-extern const char s_Active_80333500[8] = "Activ\351";
-extern const char s_Stereo_80333508[8] = "St\351r\351o";
-extern const char s_Fuerza_80333510[] = "Fuerza";
-extern const char s_Defensa_80333518[] = "Defensa";
-extern const char s_Musica_80333520[8] = "M\372sica";
-extern const char s_Apagado_80333528[] = "Apagado";
+extern "C" const float FLOAT_80333038 = 0.75f;
+extern "C" const float FLOAT_8033303C = 72.0f;
+extern "C" const float FLOAT_80333040 = 0.0f;
+extern "C" const float FLOAT_80333044 = 32.0f;
+extern "C" const float FLOAT_80333048 = 1.0f;
+extern "C" const double DOUBLE_80333050 = 1.0;
+extern "C" const float FLOAT_80333058 = 255.0f;
+extern "C" const float FLOAT_8033305C = 24.0f;
+extern "C" const double DOUBLE_80333060 = 0.5;
+extern "C" const char s_FavoRankFormat_80333068[] = "%d";
+extern "C" const float FLOAT_8033306C = 4.0f;
+extern "C" const float FLOAT_80333070 = 0.9f;
+extern "C" const double DOUBLE_80333078 = 4503601774854144.0;
+extern "C" const float FLOAT_80333080 = 384.0f;
+extern "C" const float FLOAT_80333084 = 0.75f;
 
 struct FavoFlatTableEntry
 {

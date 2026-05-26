@@ -77,7 +77,7 @@ void CMenuPcs::MLstDraw()
 			}
 			MenuPcs.DrawRect(
 				0,
-				(float)-(40.0f * 0.5 - iconX),
+				iconX - 20.0f,
 				iconY,
 				40.0f,
 				40.0f,

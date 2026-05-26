@@ -99,11 +99,11 @@ static inline void StoreU16(CFlatRuntime::CStack* stack, unsigned short* value, 
 	stack[-1].m_word = static_cast<unsigned int>(*value);
 
 	if (setMode == 0) {
-		*value = static_cast<unsigned short>(stack->m_word);
+		*value = stack->m_word;
 	} else if (setMode == -1) {
-		*value = static_cast<unsigned short>(*value - static_cast<unsigned short>(stack->m_word));
+		*value = *value - stack->m_word;
 	} else if (setMode == 1) {
-		*value = static_cast<unsigned short>(*value + static_cast<unsigned short>(stack->m_word));
+		*value = *value + stack->m_word;
 	}
 }
 
@@ -112,11 +112,11 @@ static inline void StoreS16(CFlatRuntime::CStack* stack, short* value, int setMo
 	stack[-1].m_word = static_cast<unsigned int>(static_cast<int>(*value));
 
 	if (setMode == 0) {
-		*value = static_cast<short>(stack->m_word);
+		*value = stack->m_word;
 	} else if (setMode == -1) {
-		*value = static_cast<short>(*value - static_cast<short>(stack->m_word));
+		*value = *value - stack->m_word;
 	} else if (setMode == 1) {
-		*value = static_cast<short>(*value + static_cast<short>(stack->m_word));
+		*value = *value + stack->m_word;
 	}
 }
 
@@ -170,10 +170,10 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 	}
 
 	{
-		if (systemVal < -0x3F) {
+		if (systemVal <= -0x40) {
 			u8* const classData = *reinterpret_cast<u8**>(engineObject + 0x58);
 
-			if (systemVal < -0xD7F) {
+			if (systemVal <= -0xD80) {
 				if (systemVal == -0xDB8) {
 					StoreU16(stack, reinterpret_cast<unsigned short*>(engineObject + 0x6D4), setMode);
 				} else if (systemVal < -0xDB8) {
@@ -189,8 +189,8 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 						StoreU16(stack, reinterpret_cast<unsigned short*>(classData + (systemVal + 0xDA7) * 2 + 0xD0), setMode);
 					}
 				}
-			} else if (systemVal < -399) {
-				if (systemVal < -999 && systemVal > -0xBE8) {
+			} else if (systemVal <= -400) {
+				if (systemVal <= -1000 && systemVal >= -0xBE7) {
 					const unsigned int bit = static_cast<unsigned int>(systemVal + 0xBE7);
 					const int sign = static_cast<int>(bit) >> 0x1F;
 					const int rounded = static_cast<int>(bit >> 3) + static_cast<int>((static_cast<int>(bit) < 0) && ((bit & 7) != 0));
@@ -214,7 +214,7 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 					} else {
 						*byteRef |= static_cast<u8>(mask);
 					}
-				} else if (systemVal < -499 && systemVal > -0x2F4) {
+				} else if (systemVal <= -500 && systemVal >= -0x2F3) {
 					StoreS16(stack, reinterpret_cast<short*>(classData + (systemVal + 0x2F3) * 2 + 0x9A4), setMode);
 				} else if (systemVal == -0x19D) {
 					StoreU16(stack, reinterpret_cast<unsigned short*>(classData + 0x3C8), setMode);
@@ -349,11 +349,11 @@ CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* objec
 	const unsigned short engineFlags = CallEngineFlags(engineObject);
 
 	if (((engineFlags & 5) == 5) || (systemVal != -0x1B)) {
-		if (systemVal < -0x3F) {
+		if (systemVal <= -0x40) {
 			u8* const classData = *reinterpret_cast<u8**>(engineObject + 0x58);
 			unsigned int value = 0;
 
-			if (systemVal < -0xD7F) {
+			if (systemVal <= -0xD80) {
 				if (systemVal < -0xD97) {
 					if (systemVal < -0xDB7) {
 						if (systemVal == -0xDBA) {
@@ -379,15 +379,15 @@ CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* objec
 				} else {
 					value = *reinterpret_cast<unsigned short*>(classData + (systemVal + 0xD83) * 2 + 0xAC);
 				}
-			} else if (systemVal < -399) {
-				if (systemVal < -999 && systemVal > -0xBE8) {
+			} else if (systemVal <= -400) {
+				if (systemVal <= -1000 && systemVal >= -0xBE7) {
 					const unsigned int bit = static_cast<unsigned int>(systemVal + 0xBE7);
 					const int shiftSign = static_cast<int>(bit) >> 0x1F;
 					const unsigned int rounded = static_cast<unsigned int>((static_cast<int>(bit) < 0) && ((bit & 7) != 0));
 					const u8 byteValue = *(classData + (static_cast<int>(bit) >> 3) + rounded + 0x8A4);
 					const unsigned int mask = 1U << ((shiftSign * 8 | bit * 0x20000000U + shiftSign >> 0x1D) - shiftSign);
 					value = static_cast<unsigned int>(-((byteValue & mask) != 0));
-				} else if (systemVal < -499 && systemVal > -0x2F4) {
+				} else if (systemVal <= -500 && systemVal >= -0x2F3) {
 					value = static_cast<unsigned int>(*reinterpret_cast<short*>(classData + (systemVal + 0x2F3) * 2 + 0x9A4));
 				} else if (systemVal == -0x1AA) {
 					value = *reinterpret_cast<unsigned short*>(classData + 0xB4);
@@ -436,7 +436,7 @@ CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* objec
 				} else if (systemVal < -0x43) {
 					value = *reinterpret_cast<unsigned short*>(classData + 0x20);
 				}
-			} else if (systemVal < -0x3F) {
+			} else if (systemVal <= -0x40) {
 				value = *reinterpret_cast<unsigned short*>(classData + 0x1A);
 			}
 

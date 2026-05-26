@@ -2626,7 +2626,7 @@ void CMenuPcs::CalcResultCountAnim()
 
 		for (int i = 0; i < 0x18; i++) {
 			CCharaPcs::CHandle* handle = GetBonusDisplayHandleSlots(this)[i];
-			if (handle != 0 && handle->m_model != 0) {
+			if (handle != 0) {
 				*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C) = 0.0f;
 			}
 		}

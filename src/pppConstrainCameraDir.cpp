@@ -6,6 +6,11 @@
 #include "ffcc/pppYmEnv.h"
 #include <dolphin/mtx.h>
 
+static const float kPppConstrainCameraDirDistanceBase = 25.0f;
+static const float kPppConstrainCameraDirScaleBase = 1.0f;
+static const float kPppConstrainCameraDirScaleMul = 1.3333f;
+static const float kPppConstrainCameraDirInitScale = 0.0f;
+
 /*
  * --INFO--
  * PAL Address: 80143098
@@ -36,13 +41,14 @@ void pppFrameConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir, pp
             float cameraPosX = CameraPcs.m_positionX;
             float cameraPosY = CameraPcs.m_positionY;
             float cameraPosZ = CameraPcs.m_positionZ;
-            float scale = kConstrainCameraDirScaleOne + ((CameraPcs.m_fov - 25.0f) / 25.0f);
+            float scale = kPppConstrainCameraDirScaleBase +
+                ((CameraPcs.m_fov - kPppConstrainCameraDirDistanceBase) / kPppConstrainCameraDirDistanceBase);
 
             PSMTXIdentity(ppvMng->m_matrix.value);
 
-            pppMngSt->m_scale.x = kConstrainCameraDirWideAspect * scale;
+            pppMngSt->m_scale.x = kPppConstrainCameraDirScaleMul * scale;
             pppMngSt->m_scale.y = scale;
-            pppMngSt->m_scale.z = kConstrainCameraDirScaleOne;
+            pppMngSt->m_scale.z = kPppConstrainCameraDirScaleBase;
 
             Mtx scaleMtx;
             PSMTXScale(scaleMtx, pppMngSt->m_scale.x, pppMngSt->m_scale.y, pppMngSt->m_scale.z);
@@ -92,7 +98,7 @@ void pppDestructConstrainCameraDir(_pppPObjLink*, _pppCtrlTable*)
  */
 void pppConstruct2ConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir, _pppCtrlTable* param_2)
 {
-    float uVar1 = kConstrainCameraDirZero;
+    float uVar1 = kPppConstrainCameraDirInitScale;
     float* puVar2 = (float*)((char*)pppConstrainCameraDir + *param_2->m_serializedDataOffsets + 0x80);
     puVar2[2] = uVar1;
     puVar2[1] = uVar1;
@@ -110,12 +116,9 @@ void pppConstruct2ConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDi
  */
 void pppConstructConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir, _pppCtrlTable* param_2)
 {
-    float uVar1 = kConstrainCameraDirZero;
+    float uVar1 = kPppConstrainCameraDirInitScale;
     float* puVar2 = (float*)((char*)pppConstrainCameraDir + *param_2->m_serializedDataOffsets + 0x80);
     puVar2[2] = uVar1;
     puVar2[1] = uVar1;
     puVar2[0] = uVar1;
 }
-
-extern const float kConstrainCameraDirAspectScale = 1.3333f;
-extern const float kConstrainCameraDirLocalZero = 0.0f;

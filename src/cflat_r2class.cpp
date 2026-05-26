@@ -25,9 +25,9 @@ static inline unsigned int& LastResult(CFlatRuntime2* runtime)
 	return *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(runtime) + 0x96C);
 }
 
-static inline unsigned int CallEngineFlags(void* engineObject)
+static inline unsigned short CallEngineFlags(void* engineObject)
 {
-	typedef unsigned int (*EngineFn)(void*);
+	typedef unsigned short (*EngineFn)(void*);
 	void** vtable = *reinterpret_cast<void***>(reinterpret_cast<u8*>(engineObject) + 0x48);
 	EngineFn fn = reinterpret_cast<EngineFn>(vtable[3]);
 	return fn(engineObject);
@@ -141,16 +141,16 @@ static inline void StoreU32(CFlatRuntime::CStack* stack, unsigned int* value, in
 
 static inline void StoreF32(CFlatRuntime::CStack* stack, float* value, int setMode)
 {
-	stack[-1].m_word = *reinterpret_cast<unsigned int*>(value);
+	*reinterpret_cast<float*>(&stack[-1].m_word) = *value;
 
 	if (setMode == 0) {
-		*reinterpret_cast<unsigned int*>(value) = stack->m_word;
+		*value = *reinterpret_cast<float*>(&stack->m_word);
 	} else if (setMode < 0) {
 		if (setMode > -2) {
-			*value -= static_cast<float>(stack->m_word);
+			*value -= *reinterpret_cast<float*>(&stack->m_word);
 		}
 	} else if (setMode < 2) {
-		*value += static_cast<float>(stack->m_word);
+		*value += *reinterpret_cast<float*>(&stack->m_word);
 	}
 }
 
@@ -259,61 +259,12 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 			LastResult(this) = 0;
 		} else {
 			switch (systemVal) {
-				case -0x1B:
-					StoreU32(stack, reinterpret_cast<unsigned int*>(engineObject + 0x60), setMode);
+				case -5:
+					StoreF32(stack, reinterpret_cast<float*>(engineObject + 0x184), setMode);
 					break;
-				case -0x1A: {
-					stack[-1].m_word = static_cast<unsigned int>(static_cast<signed char>(*(engineObject + 0x56)));
-					signed char value = static_cast<signed char>(stack[-1].m_word);
-					if (setMode == 0) {
-						value = static_cast<signed char>(stack->m_word);
-					} else if (setMode == 1) {
-						value = static_cast<signed char>(value + static_cast<signed char>(stack->m_word));
-					} else if (setMode == -1) {
-						value = static_cast<signed char>(value - static_cast<signed char>(stack->m_word));
-					}
-					*(engineObject + 0x56) = static_cast<u8>(value);
+				case -9:
+					StoreU32(stack, reinterpret_cast<unsigned int*>(engineObject + 0x94), setMode);
 					break;
-				}
-				case -0x18:
-					StoreF32(stack, reinterpret_cast<float*>(engineObject + 0x1BC), setMode);
-					break;
-				case -0x17:
-					StoreF32(stack, reinterpret_cast<float*>(engineObject + 0x170), setMode);
-					break;
-				case -0x16:
-					StoreF32(stack, reinterpret_cast<float*>(engineObject + 0x16C), setMode);
-					break;
-				case -0x15:
-					StoreF32(stack, reinterpret_cast<float*>(engineObject + 0x168), setMode);
-					break;
-				case -0x14:
-				case -0x13:
-				case -0x12:
-				case -0x11:
-					StoreS16(stack, reinterpret_cast<short*>(engineObject + (systemVal + 0x14) * 2 + 0x510), setMode);
-					break;
-				case -0x10:
-					StoreU32(stack, reinterpret_cast<unsigned int*>(engineObject + 0x504), setMode);
-					break;
-				case -0xF:
-					StoreU32(stack, reinterpret_cast<unsigned int*>(engineObject + 0x500), setMode);
-					break;
-				case -0xD:
-					StoreF32(stack, reinterpret_cast<float*>(engineObject + 0x188), setMode);
-					break;
-				case -0xB: {
-					signed char* value = reinterpret_cast<signed char*>(engineObject + 0x53);
-					stack[-1].m_word = static_cast<unsigned int>(static_cast<int>(*value));
-					if (setMode == 0) {
-						*value = static_cast<signed char>(stack->m_word);
-					} else if (setMode == 1) {
-						*value = static_cast<signed char>(*value + static_cast<signed char>(stack->m_word));
-					} else if (setMode == -1) {
-						*value = static_cast<signed char>(*value - static_cast<signed char>(stack->m_word));
-					}
-					break;
-				}
 				case -0xA: {
 					const int oldBit = static_cast<int>((static_cast<unsigned int>(*(engineObject + 0x50)) << 0x1C) >> 0x1F);
 					stack[-1].m_word = static_cast<unsigned int>(oldBit);
@@ -329,11 +280,60 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 					    static_cast<u8>((static_cast<unsigned int>(bitValue) << 3) & 8) | (*(engineObject + 0x50) & 0xF7);
 					break;
 				}
-				case -9:
-					StoreU32(stack, reinterpret_cast<unsigned int*>(engineObject + 0x94), setMode);
+				case -0xB: {
+					signed char* value = reinterpret_cast<signed char*>(engineObject + 0x53);
+					stack[-1].m_word = static_cast<unsigned int>(static_cast<int>(*value));
+					if (setMode == 0) {
+						*value = static_cast<signed char>(stack->m_word);
+					} else if (setMode == 1) {
+						*value = static_cast<signed char>(*value + static_cast<signed char>(stack->m_word));
+					} else if (setMode == -1) {
+						*value = static_cast<signed char>(*value - static_cast<signed char>(stack->m_word));
+					}
 					break;
-				case -5:
-					StoreF32(stack, reinterpret_cast<float*>(engineObject + 0x184), setMode);
+				}
+				case -0xD:
+					StoreF32(stack, reinterpret_cast<float*>(engineObject + 0x188), setMode);
+					break;
+				case -0xF:
+					StoreU32(stack, reinterpret_cast<unsigned int*>(engineObject + 0x500), setMode);
+					break;
+				case -0x10:
+					StoreU32(stack, reinterpret_cast<unsigned int*>(engineObject + 0x504), setMode);
+					break;
+				case -0x14:
+				case -0x13:
+				case -0x12:
+				case -0x11:
+					StoreS16(stack, reinterpret_cast<short*>(engineObject + (systemVal + 0x14) * 2 + 0x510), setMode);
+					break;
+				case -0x15:
+					StoreF32(stack, reinterpret_cast<float*>(engineObject + 0x168), setMode);
+					break;
+				case -0x16:
+					StoreF32(stack, reinterpret_cast<float*>(engineObject + 0x16C), setMode);
+					break;
+				case -0x17:
+					StoreF32(stack, reinterpret_cast<float*>(engineObject + 0x170), setMode);
+					break;
+				case -0x18:
+					StoreF32(stack, reinterpret_cast<float*>(engineObject + 0x1BC), setMode);
+					break;
+				case -0x1A: {
+					stack[-1].m_word = static_cast<unsigned int>(static_cast<signed char>(*(engineObject + 0x56)));
+					signed char value = static_cast<signed char>(stack[-1].m_word);
+					if (setMode == 0) {
+						value = static_cast<signed char>(stack->m_word);
+					} else if (setMode == 1) {
+						value = static_cast<signed char>(value + static_cast<signed char>(stack->m_word));
+					} else if (setMode == -1) {
+						value = static_cast<signed char>(value - static_cast<signed char>(stack->m_word));
+					}
+					*(engineObject + 0x56) = static_cast<u8>(value);
+					break;
+				}
+				case -0x1B:
+					StoreU32(stack, reinterpret_cast<unsigned int*>(engineObject + 0x60), setMode);
 					break;
 				default:
 					break;

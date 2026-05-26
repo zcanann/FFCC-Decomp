@@ -1317,7 +1317,7 @@ void CGObject::hit()
 
     for (int i = 0; i < 8; i++) {
         AttackCol* attack = &m_attackColliders[i];
-        const int node = static_cast<int>(attack->m_radius2);
+        const int node = attack->m_nodeIndex;
         PSMTXMultVec(reinterpret_cast<const float (*)[4]>(modelNodes + node * 0xC0 + 0xC),
                      &attack->m_localStart, &attack->m_worldPosition);
         PSVECAdd(&attack->m_worldPosition, &m_worldPosition, &attack->m_worldPosition);
@@ -1325,7 +1325,7 @@ void CGObject::hit()
 
     for (int i = 0; i < 8; i++) {
         DamageCol* damage = &m_damageColliders[i];
-        const int node = static_cast<int>(damage->m_outerRadius);
+        const int node = damage->m_nodeIndex;
         PSMTXMultVec(reinterpret_cast<const float (*)[4]>(modelNodes + node * 0xC0 + 0xC),
                      &damage->m_localPosition, &damage->m_worldPosition);
         PSVECAdd(&damage->m_worldPosition, &m_worldPosition, &damage->m_worldPosition);
@@ -2480,11 +2480,11 @@ void CGObject::SetAttackCol(int hitIndex, char* nodeName, float hitMask, Vec* po
     }
 
     if (hasModel) {
-        float nodeIndex = static_cast<float>(handle->m_model->SearchNode(nodeName));
+        int nodeIndex = handle->m_model->SearchNode(nodeName);
         AttackCol& attack = m_attackColliders[hitIndex];
 
-        attack.m_radius2 = nodeIndex;
-        attack.m_hitMask = static_cast<unsigned int>(hitMask);
+        attack.m_nodeIndex = nodeIndex;
+        attack.m_hitRadius = hitMask;
         attack.m_localStart.y = position->x;
         attack.m_localStart.z = position->y;
         attack.m_localEnd.x = position->z;
@@ -2506,12 +2506,12 @@ void CGObject::SetDamageCol(int colliderIndex, char* nodeName, float hitMask, fl
     }
 
     if (hasModel) {
-        float nodeIndex = static_cast<float>(handle->m_model->SearchNode(nodeName));
+        int nodeIndex = handle->m_model->SearchNode(nodeName);
         DamageCol& damage = m_damageColliders[colliderIndex];
 
-        damage.m_outerRadius = nodeIndex;
-        damage.m_hitMask = static_cast<unsigned int>(hitMask);
-        damage.m_active = static_cast<int>(active);
+        damage.m_nodeIndex = nodeIndex;
+        damage.m_hitInnerRadius = hitMask;
+        damage.m_hitOuterRadius = active;
         damage.m_localPosition.y = position->x;
         damage.m_localPosition.z = position->y;
         damage.m_worldPosition.x = position->z;

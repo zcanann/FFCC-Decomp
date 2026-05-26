@@ -2123,7 +2123,7 @@ void CMenuPcs::DrawResultCloseAnim()
 	BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
 
 	DrawInit();
-	SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
 	for (int i = 0; i < (int)header->count; i++) {
 		BonusAnimSprite* sprite = &sprites[i];
@@ -2154,9 +2154,9 @@ void CMenuPcs::DrawResultCloseAnim()
 					DrawInit();
 				}
 				if (lastKind != 0x17 && kind == 0x17) {
-					SetAttrFmt(static_cast<CMenuPcs::FMT>(1));
+					MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(1));
 				} else if (lastKind == 0x17 && kind != 0x17) {
-					SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+					MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 				}
 
 				if (kind == 0x17) {
@@ -2168,7 +2168,7 @@ void CMenuPcs::DrawResultCloseAnim()
 					};
 					_GXColor color = {0xFF, 0xFF, 0xFF, 0xFF};
 					GXSetChanMatColor(GX_COLOR0A0, color);
-					SetTexture(static_cast<CMenuPcs::TEX>(kind));
+					MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kind));
 
 					if (sprite->timer < sprite->duration) {
 						float progress = 0.0f;
@@ -2182,24 +2182,24 @@ void CMenuPcs::DrawResultCloseAnim()
 						float x = (float)sprite->x;
 						float y = (float)sprite->y;
 						if (fillWidth > 0.0f) {
-							DrawRect(0, x, y, fillWidth, (float)sprite->h,
+							MenuPcs.DrawRect(0, x, y, fillWidth, (float)sprite->h,
 							    sprite->mulX, sprite->mulY, colors, 1.0f, 1.0f, 0.0f);
 							x += fillWidth;
 						}
 						if (fillWidth < (float)sprite->w) {
 							colors[0].a = 0;
 							colors[3].a = 0;
-							DrawRect(0, x, y, (float)sprite->w / (float)sprite->duration, (float)sprite->h,
+							MenuPcs.DrawRect(0, x, y, (float)sprite->w / (float)sprite->duration, (float)sprite->h,
 							    fillWidth, sprite->mulY, colors, 1.0f, 1.0f, 0.0f);
 						}
 					}
 				} else {
 					_GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(sprite->alpha * 255.0f)};
 					GXSetChanMatColor(GX_COLOR0A0, color);
-					SetTexture(static_cast<CMenuPcs::TEX>(kind));
+					MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kind));
 
 					if (i < s_CntTop || i >= s_CntTop + activePartyCount) {
-						DrawRect(0, (float)sprite->x + sprite->motionX, (float)sprite->y + sprite->motionY,
+						MenuPcs.DrawRect(0, (float)sprite->x + sprite->motionX, (float)sprite->y + sprite->motionY,
 						    (float)sprite->w, (float)sprite->h,
 						    sprite->mulX, sprite->mulY, sprite->depth, sprite->depth, 0.0f);
 					} else {
@@ -2225,7 +2225,7 @@ void CMenuPcs::DrawResultCloseAnim()
 						float digitW = (float)sprite->w;
 						float digitX = ((3.0f * digitW) - ((float)digitCount * digitW)) * 0.5f + (float)sprite->x;
 						for (int digitIndex = 0; digitIndex < digitCount; digitIndex++) {
-							DrawRect(0, digitX, (float)sprite->y, digitW, (float)sprite->h,
+							MenuPcs.DrawRect(0, digitX, (float)sprite->y, digitW, (float)sprite->h,
 							    digitW * (float)digits[digitIndex], sprite->mulY,
 							    sprite->depth, sprite->depth, 0.0f);
 							digitX += digitW;

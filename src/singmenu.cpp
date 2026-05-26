@@ -3292,9 +3292,9 @@ char* CMenuPcs::GetTribeStr(int index)
         case 3:
             return PTR_s_Clavat_80214110[index];
         case 4:
-            return PTR_s_Clavate[index];
-        case 5:
             return PTR_s_Clavat_80214120[index];
+        case 5:
+            return PTR_s_Clavate[index];
         default:
             return PTR_s_Clavat_802140f0[index];
     }

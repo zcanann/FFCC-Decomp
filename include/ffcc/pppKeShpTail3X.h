@@ -13,15 +13,14 @@ struct pppKeShpTail3X
 };
 
 struct pppKeShpTail3XUnkB;
-struct pppKeShpTail3XUnkC;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void pppKeShpTail3X(struct pppKeShpTail3X*, struct pppKeShpTail3XUnkB*, struct pppKeShpTail3XUnkC*);
-void pppKeShpTail3XDraw(struct pppKeShpTail3X*, struct pppKeShpTail3XUnkB*, struct pppKeShpTail3XUnkC*);
-void pppKeShpTail3XCon(struct pppKeShpTail3X*, struct pppKeShpTail3XUnkC*);
+void pppKeShpTail3X(struct pppKeShpTail3X*, struct pppKeShpTail3XUnkB*, struct _pppCtrlTable*);
+void pppKeShpTail3XDraw(struct pppKeShpTail3X*, struct pppKeShpTail3XUnkB*, struct _pppCtrlTable*);
+void pppKeShpTail3XCon(struct pppKeShpTail3X*, struct _pppCtrlTable*);
 void pppKeShpTail3XDes(_pppPObjLink* obj, _pppCtrlTable* ctrlTable);
 
 #ifdef __cplusplus

@@ -354,11 +354,11 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* object, int systemVal)
 {
 	u8* const engineObject = reinterpret_cast<u8*>(object->m_engineObject);
-	unsigned int value = 0;
 
 	if (((CallEngineFlags(engineObject) & 5) == 5) || (systemVal != -0x1B)) {
 		if (systemVal < -0x3F) {
 			u8* const classData = *reinterpret_cast<u8**>(engineObject + 0x58);
+			unsigned int value = 0;
 
 			if (systemVal < -0xD7F) {
 				if (systemVal < -0xD97) {
@@ -443,7 +443,7 @@ CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* objec
 				} else if (systemVal < -0x43) {
 					value = *reinterpret_cast<unsigned short*>(classData + 0x20);
 				}
-			} else {
+			} else if (systemVal < -0x3F) {
 				value = *reinterpret_cast<unsigned short*>(classData + 0x1A);
 			}
 
@@ -545,10 +545,9 @@ CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* objec
  */
 int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int command, int& outResult)
 {
-	CGObject* engineObject = reinterpret_cast<CGObject*>(object->m_engineObject);
-	CGCharaObj* charaObject = reinterpret_cast<CGCharaObj*>(object->m_engineObject);
-	CGPartyObj* partyObject = reinterpret_cast<CGPartyObj*>(object->m_engineObject);
 	unsigned int* localBase = object->m_localBase;
+	CGCharaObj* engineObject = reinterpret_cast<CGCharaObj*>(object->m_engineObject);
+	CGPartyObj* partyObject = reinterpret_cast<CGPartyObj*>(engineObject);
 	int handled = 1;
 
 	switch (command) {
@@ -695,9 +694,9 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			outResult = 0;
 			break;
 		case -0x6F:
+			engineObject->m_moveOffset.z = static_cast<float>(localBase[0]);
 			engineObject->m_moveOffset.x = static_cast<float>(localBase[0]);
 			engineObject->m_moveOffset.y = static_cast<float>(localBase[1]);
-			engineObject->m_moveOffset.z = static_cast<float>(localBase[0]);
 			engineObject->m_bounceFactor = static_cast<float>(localBase[2]);
 			PushValue(this, object, 0);
 			outResult = 0;
@@ -732,7 +731,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			outResult = 0;
 			break;
 		case -0x96:
-			charaObject->addHp(static_cast<int>(localBase[0]), 0);
+			engineObject->addHp(static_cast<int>(localBase[0]), 0);
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;

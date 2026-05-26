@@ -9,6 +9,7 @@
 
 struct CUSBStreamDataStorage
 {
+    CUSBStreamDataStorage();
     ~CUSBStreamDataStorage();
 
     u8 m_storage[0x14];

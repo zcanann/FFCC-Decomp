@@ -2481,13 +2481,12 @@ void CGObject::SetAttackCol(int hitIndex, char* nodeName, float hitMask, Vec* po
 
     if (hasModel) {
         int nodeIndex = handle->m_model->SearchNode(nodeName);
-        AttackCol& attack = m_attackColliders[hitIndex];
 
-        attack.m_nodeIndex = nodeIndex;
-        attack.m_hitRadius = hitMask;
-        attack.m_localStart.y = position->x;
-        attack.m_localStart.z = position->y;
-        attack.m_localEnd.x = position->z;
+        m_attackColliders[hitIndex].m_nodeIndex = nodeIndex;
+        m_attackColliders[hitIndex].m_hitRadius = hitMask;
+        m_attackColliders[hitIndex].m_localStart.y = position->x;
+        m_attackColliders[hitIndex].m_localStart.z = position->y;
+        m_attackColliders[hitIndex].m_localEnd.x = position->z;
     }
 }
 
@@ -2507,14 +2506,13 @@ void CGObject::SetDamageCol(int colliderIndex, char* nodeName, float hitMask, fl
 
     if (hasModel) {
         int nodeIndex = handle->m_model->SearchNode(nodeName);
-        DamageCol& damage = m_damageColliders[colliderIndex];
 
-        damage.m_nodeIndex = nodeIndex;
-        damage.m_hitInnerRadius = hitMask;
-        damage.m_hitOuterRadius = active;
-        damage.m_localPosition.y = position->x;
-        damage.m_localPosition.z = position->y;
-        damage.m_worldPosition.x = position->z;
+        m_damageColliders[colliderIndex].m_nodeIndex = nodeIndex;
+        m_damageColliders[colliderIndex].m_hitInnerRadius = hitMask;
+        m_damageColliders[colliderIndex].m_hitOuterRadius = active;
+        m_damageColliders[colliderIndex].m_localPosition.y = position->x;
+        m_damageColliders[colliderIndex].m_localPosition.z = position->y;
+        m_damageColliders[colliderIndex].m_worldPosition.x = position->z;
     }
 }
 
@@ -2705,7 +2703,7 @@ void CGObject::SetTexAnim(char* name)
     if (hasModel) {
         texAnimSet = *reinterpret_cast<CTexAnimSet**>(reinterpret_cast<unsigned char*>(handle->m_model) + 0xD4);
         if (texAnimSet != (CTexAnimSet*)0) {
-            float zero = sZeroFloat;
+            const float& zero = sZeroFloat;
             texAnimSet->Change(name, zero, (CTexAnimSet::ANIM_TYPE)-2);
         }
     }

@@ -3386,9 +3386,9 @@ void CMenuPcs::createBonus()
 			CMemory::CStage* stage = GetBonusAllocStage(this);
 			CCharaPcs::CHandle** displaySlots = GetBonusDisplayHandleSlots(this);
 
-			for (int i = 0; i < activeCount; i++) {
-				BonusPartySummary& entry = s_Rinfo->m_party[i];
-				unsigned long modelCode = entry.m_tribeId + 0x87;
+			for (int i = 0; i < activeCount * 2 && i < 0x18; i++) {
+				BonusPartySummary& entry = s_Rinfo->m_party[i % activeCount];
+				unsigned long modelCode = entry.m_tribeId + ((i < activeCount) ? 0x87 : 0x83);
 				CCharaPcs::CHandle* handle =
 				    new (stage, const_cast<char*>(s_bonus_menu_cpp), 0x183) CCharaPcs::CHandle;
 				if (handle != 0) {
@@ -3396,18 +3396,6 @@ void CMenuPcs::createBonus()
 					handle->LoadModel(3, modelCode & 0xFFF, (modelCode >> 12) & 0xF, 0, -1, 0, 0);
 					handle->m_flags = 0x300543;
 					displaySlots[i] = handle;
-				}
-
-				if (displaySlots != 0) {
-					unsigned long displayModelCode = entry.m_tribeId + 0x83;
-					CCharaPcs::CHandle* displayHandle =
-					    new (stage, const_cast<char*>(s_bonus_menu_cpp), 0x187) CCharaPcs::CHandle;
-					if (displayHandle != 0) {
-						displayHandle->Add();
-						displayHandle->LoadModel(3, displayModelCode & 0xFFF, (displayModelCode >> 12) & 0xF, 0, -1, 0, 0);
-						displayHandle->m_flags = 0x300543;
-						displaySlots[activeCount + i] = displayHandle;
-					}
 				}
 			}
 

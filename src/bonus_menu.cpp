@@ -2607,10 +2607,6 @@ void CMenuPcs::CalcResultCountAnim()
 	const int activePartyCount = s_Rinfo->m_partyCount;
 
 	if (*(unsigned char*)(statePtr + 0xb) == 0) {
-		*(short*)(statePtr + 0x22) = 0;
-		header->finished = 0;
-		*(short*)(statePtr + 0x10) = 0;
-
 		int countTop = header->count;
 		s_CntTop = (unsigned char)countTop;
 		for (int i = 0; i < activePartyCount; i++) {

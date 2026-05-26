@@ -2586,8 +2586,8 @@ void CCaravanWork::GetCurrentWeaponItem(int& weaponItem, int& weaponRef)
 {
 	short weaponIdx = m_weaponIdx;
 	if (weaponIdx == 0) {
-		int ref = 0;
-		weaponItem = 0;
+		int ref;
+		weaponItem = ref = 0;
 		CCaravanWork* ownerWork = *reinterpret_cast<CCaravanWork**>(reinterpret_cast<unsigned char*>(m_ownerObj) + 0x58);
 		int equippedSlot = ownerWork->m_equipment[0];
 		if (equippedSlot >= 0) {

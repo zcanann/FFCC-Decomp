@@ -1867,7 +1867,7 @@ void CMenuPcs::DrawSelectOpenAnim()
 	int activePartyCount = s_Rinfo->m_partyCount;
 
 	DrawInit();
-	SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
 	for (int i = 0; i < (int)header->count; i++) {
 		BonusAnimSprite* sprite = &sprites[i];
@@ -1929,15 +1929,15 @@ void CMenuPcs::DrawSelectOpenAnim()
 			{
 				if (lastKind < 0) {
 					DrawInit();
-					SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+					MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 				}
 				GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(alpha * 255.0f)};
 				GXSetChanMatColor(GX_COLOR0A0, color);
-				SetTexture(static_cast<CMenuPcs::TEX>(sprite->tex));
+				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(sprite->tex));
 				if (sprite->tex == 0x20) {
 					GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_ONE, GX_LO_CLEAR);
 				}
-				DrawRect(0,
+				MenuPcs.DrawRect(0,
 				    (float)sprite->x + sprite->motionX, (float)sprite->y + sprite->motionY,
 				    (float)sprite->w, (float)sprite->h,
 				    sprite->mulX, sprite->mulY, sprite->depth, sprite->depth, 0.0f);

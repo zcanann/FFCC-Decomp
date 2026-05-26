@@ -353,7 +353,7 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
     MapMeshAllocStage() = stage;
     unsigned char* cursor;
     int offset;
-    int dlOffset;
+    int dlIndex;
     reader.PushChunk();
     while (reader.GetNextChunk(chunk)) {
         switch (chunk.m_id) {
@@ -372,7 +372,9 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
             m_bboxMaxY = FLOAT_8032F934;
             m_bboxMaxX = FLOAT_8032F934;
 
-            for (int i = 0, offset = 0; i < static_cast<int>(m_vertexCount); i++) {
+            int vertexIndex = 0;
+            offset = 0;
+            for (; vertexIndex < static_cast<int>(m_vertexCount); vertexIndex++) {
                 float value = reader.GetF4();
                 *reinterpret_cast<float*>(reinterpret_cast<unsigned int>(m_vertices) + offset) = value;
                 value = reader.GetF4();
@@ -459,14 +461,12 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
                 offset += 0x10;
             }
 
-            dlOffset = 0;
+            dlIndex = 0;
             reader.PushChunk();
             while (reader.GetNextChunk(chunk)) {
                 switch (chunk.m_id) {
                 case 0x444C5354: {
-                    CMapMeshDrawEntry* entry =
-                        reinterpret_cast<CMapMeshDrawEntry*>(reinterpret_cast<unsigned int>(m_drawEntries) + dlOffset);
-                    dlOffset += 0x10;
+                    CMapMeshDrawEntry* entry = m_drawEntries + dlIndex++;
                     entry->m_materialIdx = reader.Get2();
                     entry->m_size = chunk.m_arg0;
 

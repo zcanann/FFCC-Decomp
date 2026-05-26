@@ -145,8 +145,8 @@ void CMaterialEditorPcs::SetUSBData()
         s32 yDiff = static_cast<s32>(maxPos.y - minPos.y);
 
         srt.transX = FLOAT_8032FD00;
-        srt.transY = static_cast<float>(-xDiff / 2);
-        srt.transZ = static_cast<float>(-yDiff * (xDiff / 0x14) - 10);
+        srt.transY = (float)(-xDiff / 2);
+        srt.transZ = (float)(-yDiff * (xDiff / 0x14) - 10);
         srt.rotX = FLOAT_8032FD00;
         srt.rotY = FLOAT_8032FD00;
         srt.rotZ = FLOAT_8032FD00;
@@ -176,7 +176,7 @@ void CMaterialEditorPcs::SetUSBData()
         memset(rsdItem->ptr18, 0, usb.m_sizeBytes * 0x70);
         memcpy(rsdItem->ptr18, usb.m_data, usb.m_sizeBytes * 0x70);
 
-        for (u32 i = 0, offset = 0; i < usb.m_sizeBytes; i++, offset += 0x70) {
+        for (u32 offset = 0, i = 0; i < usb.m_sizeBytes; offset += 0x70, i++) {
             *reinterpret_cast<s16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x00) =
                 LoadSwapS16(*reinterpret_cast<s16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x00));
             *reinterpret_cast<u16*>(reinterpret_cast<u8*>(rsdItem->ptr18) + offset + 0x02) =

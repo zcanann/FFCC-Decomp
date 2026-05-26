@@ -243,8 +243,8 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
         return;
     }
 
-    handle = reinterpret_cast<CGObject*>(ppvMng->m_owner);
     work = (CharaBreakWork*)(charaBreak->m_workArea + data->m_serializedDataOffsets[2]);
+    handle = reinterpret_cast<CGObject*>(ppvMng->m_owner);
     if (work->m_enabled == 0) {
         return;
     }

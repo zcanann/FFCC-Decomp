@@ -38,11 +38,6 @@ struct KeShpTail3XStep {
     float m_envDepth;
 };
 
-struct KeShpTail3XOffsets {
-    u8 _pad0[0xc];
-    s32* m_serializedDataOffsets;
-};
-
 struct KeShpTail3XWork {
     s16 m_values[24];
     Vec m_posHistory[28];
@@ -95,13 +90,13 @@ void pppKeShpTail3XDes(_pppPObjLink* obj, _pppCtrlTable* ctrlTable)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppKeShpTail3XCon(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkC* param_2)
+void pppKeShpTail3XCon(struct pppKeShpTail3X* obj, _pppCtrlTable* param_2)
 {
     KeShpTail3XWork* work;
     int i;
     float scale;
 
-    work = (KeShpTail3XWork*)((u8*)obj + 0x80 + ((KeShpTail3XOffsets*)param_2)->m_serializedDataOffsets[0]);
+    work = (KeShpTail3XWork*)((u8*)obj + 0x80 + param_2->m_serializedDataOffsets[0]);
     work->m_initialized = 0;
     work->m_head = 0;
     work->m_shapeFrame = 0;
@@ -135,10 +130,9 @@ void pppKeShpTail3XCon(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkC* pa
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* param_2, struct pppKeShpTail3XUnkC* param_3)
+void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* param_2, _pppCtrlTable* param_3)
 {
     KeShpTail3XStep* step = (KeShpTail3XStep*)param_2;
-    KeShpTail3XOffsets* offsets = (KeShpTail3XOffsets*)param_3;
     KeShpTail3XWork* work;
     long** shapeTable;
     long* shapeEntry;
@@ -192,7 +186,7 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* p
     const float zero = kPppKeShpTail3XZero;
     s32 dataValIndex;
 
-    work = (KeShpTail3XWork*)((u8*)obj + 0x80 + offsets->m_serializedDataOffsets[0]);
+    work = (KeShpTail3XWork*)((u8*)obj + 0x80 + param_3->m_serializedDataOffsets[0]);
     dataValIndex = step->m_dataValIndex;
     if (dataValIndex == 0xffff) {
         return;
@@ -201,7 +195,7 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* p
     count = step->m_drawCount;
 
     invCountMinusOne = (float)(count - 1);
-    alphaMul = (float)*(s16*)((u8*)obj + 0x86 + offsets->m_serializedDataOffsets[1]) / kPppKeShpTail3XAlphaScale;
+    alphaMul = (float)*(s16*)((u8*)obj + 0x86 + param_3->m_serializedDataOffsets[1]) / kPppKeShpTail3XAlphaScale;
     S4ToF32(&colorStart, &work->m_values[0]);
     S4ToF32(&colorEnd, &work->m_values[4]);
     colorStart.w *= alphaMul;
@@ -403,7 +397,7 @@ advance_segment:
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppKeShpTail3X(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* param_2, struct pppKeShpTail3XUnkC* param_3)
+void pppKeShpTail3X(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* param_2, _pppCtrlTable* param_3)
 {
     KeShpTail3XStep* step;
     KeShpTail3XWork* work;
@@ -417,7 +411,7 @@ void pppKeShpTail3X(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* param
     }
 
     step = (KeShpTail3XStep*)param_2;
-    work = (KeShpTail3XWork*)((u8*)obj + 0x80 + ((KeShpTail3XOffsets*)param_3)->m_serializedDataOffsets[0]);
+    work = (KeShpTail3XWork*)((u8*)obj + 0x80 + param_3->m_serializedDataOffsets[0]);
 
     if ((obj->pppPObject.m_graphId == 0) && (obj->field_0x7d != 0)) {
         work->m_initialized = 1;

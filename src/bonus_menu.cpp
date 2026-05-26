@@ -2446,6 +2446,7 @@ void CMenuPcs::DrawResultCountAnim()
 	int animPtr = GetBonusMenuMembers(this).m_bonusAnimPtr;
 	int statePtr = GetBonusMenuMembers(this).m_bonusStatePtr;
 	int modelIndex = 0;
+	int lastKind = 0;
 
 	if (*(unsigned char*)(statePtr + 0xb) == 0) {
 		return;
@@ -2481,7 +2482,12 @@ void CMenuPcs::DrawResultCountAnim()
 					RestoreProjection();
 				}
 				modelIndex++;
+				lastKind = kind;
 			} else {
+				if (lastKind < 0) {
+					DrawInit();
+					SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+				}
 				_GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(sprite->alpha * 255.0f)};
 				GXSetChanMatColor(GX_COLOR0A0, color);
 				SetTexture(static_cast<CMenuPcs::TEX>(kind));
@@ -2529,6 +2535,7 @@ void CMenuPcs::DrawResultCountAnim()
 						digitX += digitW;
 					}
 				}
+				lastKind = kind;
 			}
 		}
 	}

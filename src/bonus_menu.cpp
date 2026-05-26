@@ -3227,17 +3227,10 @@ void CMenuPcs::createBonus()
 
 	statePtr = reinterpret_cast<int>(new unsigned char[sizeof(BonusMenuStateRaw)]);
 	GetBonusMenuMembers(this).m_bonusStatePtr = statePtr;
-	animPtr = reinterpret_cast<int>(new unsigned char[sizeof(BonusAnimList)]);
-	GetBonusMenuMembers(this).m_bonusAnimPtr = animPtr;
 	listPtr = reinterpret_cast<int>(new unsigned char[sizeof(BonusEffectSlotList)]);
 	GetBonusMenuMembers(this).m_bonusListPtr = listPtr;
-	auxPtr = reinterpret_cast<int>(new unsigned char[sizeof(BonusMenuAuxRaw)]);
-	GetBonusMenuMembers(this).m_bonusAuxPtr = auxPtr;
-	boardPtr = reinterpret_cast<int>(new unsigned char[sizeof(BonusBoardEntryList)]);
-	GetBonusMenuMembers(this).m_bonusBoardPtr = boardPtr;
 
 	memset((void*)statePtr, 0, sizeof(BonusMenuStateRaw));
-	memset((void*)animPtr, 0, sizeof(BonusAnimList));
 	memset((void*)listPtr, 0, sizeof(BonusEffectSlotList));
 	BonusEffectSlotList* effectSlots = reinterpret_cast<BonusEffectSlotList*>(listPtr);
 	for (int i = 0; i < 5; i++) {
@@ -3245,6 +3238,13 @@ void CMenuPcs::createBonus()
 	}
 	s_Base[0] = new float[18];
 	memset(s_Base[0], 0, sizeof(float) * 18);
+	animPtr = reinterpret_cast<int>(new unsigned char[sizeof(BonusAnimList)]);
+	GetBonusMenuMembers(this).m_bonusAnimPtr = animPtr;
+	memset((void*)animPtr, 0, sizeof(BonusAnimList));
+	boardPtr = reinterpret_cast<int>(new unsigned char[sizeof(BonusBoardEntryList)]);
+	GetBonusMenuMembers(this).m_bonusBoardPtr = boardPtr;
+	auxPtr = reinterpret_cast<int>(new unsigned char[sizeof(BonusMenuAuxRaw)]);
+	GetBonusMenuMembers(this).m_bonusAuxPtr = auxPtr;
 	memset((void*)auxPtr, 0, sizeof(BonusMenuAuxRaw));
 	memset((void*)boardPtr, 0, sizeof(BonusBoardEntryList));
 	BonusBoardEntryList* boardEntries = reinterpret_cast<BonusBoardEntryList*>(boardPtr);

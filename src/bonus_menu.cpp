@@ -1699,14 +1699,11 @@ void CMenuPcs::CalcSelectWait()
 	sprites = (BonusAnimSprite*)(animPtr + 8);
 
 	if (*(unsigned char*)(statePtr + 0xb) == 0) {
-		*(short*)(statePtr + 0x22) = 0;
 		*(short*)(statePtr + 0xe) = 0;
 		*(short*)(statePtr + 0x18) = 0;
 		*(short*)(statePtr + 0x1a) = 0;
 		*(short*)(statePtr + 0x26) = 4;
-		*(short*)(statePtr + 0x28) = 1;
 		*(unsigned char*)(statePtr + 8) = 0;
-		*(unsigned char*)(statePtr + 9) = (s_Rinfo != 0) ? s_Rinfo->m_missingArtifactMask : 0;
 		*(short*)(auxPtr + 10) = 3;
 		header->finished = 0;
 		for (int i = 0; i < (int)header->count; i++) {
@@ -1724,7 +1721,6 @@ void CMenuPcs::CalcSelectWait()
 		*(short*)(statePtr + 0x26) = 4;
 		UpdateSelectCursorSprite(statePtr, header, sprites, 0);
 		*(unsigned char*)(statePtr + 0xb) = 1;
-		return;
 	}
 
 	*(short*)(statePtr + 0x22) = *(short*)(statePtr + 0x22) + 1;
@@ -1737,12 +1733,48 @@ void CMenuPcs::CalcSelectWait()
 	int activePartyCount = s_Rinfo->m_partyCount;
 	BonusPartySummary* currentParty = GetBonusPartySummary(currentPartyIndex);
 	int padSlot = (currentParty != 0) ? currentParty->m_partySlot : 0;
+	unsigned short repeat = GetButtonRepeat(padSlot);
 	unsigned short down = GetButtonDown(padSlot);
 	unsigned char unavailableMask = GetBonusUnavailableMask(statePtr, currentParty);
 
 	switch (promptMode) {
 	case 3:
-		if (delay > 0) {
+		if (delay == 0 && currentPartyIndex < activePartyCount && currentParty != 0) {
+			if ((repeat & 9) != 0) {
+				selection = (short)(selection + 1);
+				if (selection > 7) {
+					selection = 0;
+				}
+				Sound.PlaySe(0x4e, 0x40, 0x7f, 0);
+			} else if ((repeat & 6) != 0) {
+				selection = (short)(selection - 1);
+				if (selection < 0) {
+					selection = 7;
+				}
+				Sound.PlaySe(0x4e, 0x40, 0x7f, 0);
+			}
+
+			if ((repeat & 0xf) == 0) {
+				if ((down & 0x100) != 0) {
+					unsigned char bit = (unsigned char)(1 << (selection & 7));
+					if ((unavailableMask & bit) == 0) {
+						*(unsigned char*)(statePtr + 8) = 1;
+						delay = 10;
+						Sound.PlaySe(0x4f, 0x40, 0x7f, 0);
+					} else {
+						Sound.PlaySe(4, 0x40, 0x7f, 0);
+					}
+				} else if ((down & 0x200) != 0) {
+					short winW = 0;
+					short winH = 0;
+					GetWinSize(0x18, &winW, &winH, 1);
+					SetMcWinInfo((int)winW, (int)winH);
+					promptMode = 0;
+					confirmSel = 1;
+					Sound.PlaySe(3, 0x40, 0x7f, 0);
+				}
+			}
+		} else if (currentPartyIndex < activePartyCount) {
 			delay = (short)(delay - 1);
 			if (delay == 0 && *(unsigned char*)(statePtr + 8) != 0) {
 				unsigned char bit = (unsigned char)(1 << (selection & 7));
@@ -1766,50 +1798,12 @@ void CMenuPcs::CalcSelectWait()
 					}
 				}
 			}
-			break;
-		}
-
-		if (currentPartyIndex >= activePartyCount || currentParty == 0) {
-			promptMode = 2;
-			delay = 10;
-			break;
-		}
-
-		if ((down & 9) != 0) {
-			selection = (short)(selection + 1);
-			if (selection > 7) {
-				selection = 0;
-			}
-			Sound.PlaySe(0x4e, 0x40, 0x7f, 0);
-		} else if ((down & 6) != 0) {
-			selection = (short)(selection - 1);
-			if (selection < 0) {
-				selection = 7;
-			}
-			Sound.PlaySe(0x4e, 0x40, 0x7f, 0);
-		}
-
-		if ((down & 0x100) != 0) {
-			unsigned char bit = (unsigned char)(1 << (selection & 7));
-			if ((unavailableMask & bit) == 0) {
-				*(unsigned char*)(statePtr + 8) = 1;
-				delay = 10;
-				Sound.PlaySe(0x4f, 0x40, 0x7f, 0);
-			} else {
-				Sound.PlaySe(4, 0x40, 0x7f, 0);
-			}
-		} else if ((down & 0x200) != 0) {
-			short winW = 0;
-			short winH = 0;
-			GetWinSize(0x18, &winW, &winH, 1);
-			SetMcWinInfo((int)winW, (int)winH);
-			promptMode = 0;
-			confirmSel = 1;
-			Sound.PlaySe(3, 0x40, 0x7f, 0);
+		} else {
+			delay = 0;
 		}
 		break;
 	case 1:
-		if ((down & 3) != 0) {
+		if ((repeat & 3) != 0) {
 			confirmSel = (short)(confirmSel ^ 1);
 			Sound.PlaySe(1, 0x40, 0x7f, 0);
 		} else if ((down & 0x100) != 0) {
@@ -1822,13 +1816,9 @@ void CMenuPcs::CalcSelectWait()
 		}
 		break;
 	case 2:
-		if (delay > 0) {
-			delay = (short)(delay - 1);
-			if (delay == 0) {
-				GrantSelectedBonusArtifacts();
-				header->finished = 1;
-				*(short*)(animPtr + 6) = 1;
-			}
+		if (*(short*)(auxPtr + 8) >= 1 && *(short*)(auxPtr + 8) < 2 && confirmSel == 0) {
+			delay = 10;
+			*(unsigned char*)(statePtr + 8) = 0xff;
 		}
 		break;
 	default:
@@ -1843,6 +1833,16 @@ void CMenuPcs::CalcSelectWait()
 		}
 	}
 	UpdateSelectCursorSprite(statePtr, header, sprites, frame);
+
+	if (currentPartyIndex >= activePartyCount && delay == 0) {
+		if (*(short*)(statePtr + 0x18) < 10) {
+			*(short*)(statePtr + 0x18) = (short)(*(short*)(statePtr + 0x18) + 1);
+		} else {
+			*(short*)(statePtr + 0x18) = 0;
+			GrantSelectedBonusArtifacts();
+			header->finished = 1;
+		}
+	}
 }
 
 /*

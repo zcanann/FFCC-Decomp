@@ -367,11 +367,15 @@ CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* objec
 				} else if (systemVal < -0xD83) {
 					if (systemVal == -0xD92) {
 						u8* p = *reinterpret_cast<u8**>(engineObject + 0xF8);
-						if (p == 0) {
-							value = static_cast<unsigned int>(-1);
-						} else {
+						if (p != 0) {
 							p = *reinterpret_cast<u8**>(p + 0x178);
-							value = (p == 0) ? static_cast<unsigned int>(-1) : *reinterpret_cast<unsigned int*>(p + 0x14);
+							if (p != 0) {
+								value = *reinterpret_cast<unsigned int*>(p + 0x14);
+							} else {
+								value = static_cast<unsigned int>(-1);
+							}
+						} else {
+							value = static_cast<unsigned int>(-1);
 						}
 					} else if (systemVal > -0xD93) {
 						value = *reinterpret_cast<unsigned short*>(classData + (systemVal + 0xD91) * 2 + 0xB4);

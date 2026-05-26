@@ -7,8 +7,33 @@
 #include "ffcc/system.h"
 #include "ffcc/FS_USB_Process.h"
 
+struct _GXTexObj;
+struct OSFS_TEXTURE_ST;
+
+#ifndef _FFCC_PTRARRAY_H_
+template <class T>
+class CPtrArray
+{
+public:
+    virtual ~CPtrArray();
+
+    unsigned long size;
+    unsigned long numItems;
+    unsigned long defaultSize;
+    T* items;
+    CMemory::CStage* stage;
+    int growCapacity;
+
+    CPtrArray();
+
+    void RemoveAll();
+    void DeleteAndRemoveAll();
+};
+#endif
+
 struct CUSBStreamDataStorage
 {
+    CUSBStreamDataStorage();
     ~CUSBStreamDataStorage();
 
     u8 m_storage[0x14];
@@ -44,8 +69,8 @@ public:
     CFunnyShape m_funnyShape;              // 0x50
     FS_DISPLAY_STATUS m_displayPending;    // 0x6178
     u32 m_displayTextureEnabled;           // 0x61B8
-    u8 m_texturePtrArrayStorage[0x1C];     // 0x61BC
-    u8 m_gxTexObjPtrArrayStorage[0x1C];    // 0x61D8
+    CPtrArray<OSFS_TEXTURE_ST*> m_texturePtrArray; // 0x61BC
+    CPtrArray<_GXTexObj*> m_gxTexObjPtrArray;      // 0x61D8
 };
 
 #ifdef FFCC_DEFINE_FUNNYSHAPEPCS_STORAGE

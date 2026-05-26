@@ -56,14 +56,6 @@ struct KeShpTail2XWork {
     Vec m_posHistory[31];
 };
 
-inline void U8ToF32(pppFVECTOR4* dest, u8* src)
-{
-    dest->x = src[0];
-    dest->y = src[1];
-    dest->z = src[2];
-    dest->w = src[3];
-}
-
 /*
  * --INFO--
  * PAL Address: 0x80088698
@@ -172,14 +164,20 @@ void pppKeShpTail2XDraw(struct pppKeShpTail2X* obj, pppKeShpTail2XUnkB* param_2,
     count = step->m_drawCount;
     invCountMinusOne = (float)(count - 1);
     alphaMul = (float)*(s16*)((u8*)obj + 0x86 + param_3->m_serializedDataOffsets[1]) / kPppKeShpTail2XAlphaScale;
-    U8ToF32(&colorStart, &step->m_colorStartR);
-    U8ToF32(&colorEnd, &step->m_colorEndR);
+    colorStart.w = step->m_colorStartA;
+    colorEnd.w = step->m_colorEndA;
+    colorStart.x = step->m_colorStartR;
+    colorStart.y = step->m_colorStartG;
+    colorStart.z = step->m_colorStartB;
+    colorEnd.x = step->m_colorEndR;
+    colorEnd.y = step->m_colorEndG;
+    colorEnd.z = step->m_colorEndB;
     colorStart.w *= alphaMul;
     colorEnd.w *= alphaMul;
+    colorA = colorStart.w;
     colorR = colorStart.x;
     colorG = colorStart.y;
     colorB = colorStart.z;
-    colorA = colorStart.w;
     if (invCountMinusOne != zero) {
         colorStep.x = (colorStart.x - colorEnd.x) / invCountMinusOne;
         colorStep.y = (colorStart.y - colorEnd.y) / invCountMinusOne;

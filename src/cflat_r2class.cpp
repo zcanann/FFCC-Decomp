@@ -554,7 +554,6 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 {
 	unsigned int* localBase = object->m_localBase;
 	CGCharaObj* engineObject = reinterpret_cast<CGCharaObj*>(object->m_engineObject);
-	CGPartyObj* partyObject = reinterpret_cast<CGPartyObj*>(engineObject);
 	int handled = 1;
 
 	switch (command) {
@@ -748,12 +747,13 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			outResult = 0;
 			break;
 		case -0x8E:
-			partyObject->carry(static_cast<int>(localBase[0]), FindRuntimeObject(this, localBase[1]), static_cast<int>(localBase[2]));
+			reinterpret_cast<CGPartyObj*>(engineObject)
+			    ->carry(static_cast<int>(localBase[0]), FindRuntimeObject(this, localBase[1]), static_cast<int>(localBase[2]));
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
 		case -0x8D:
-			partyObject->commandFinished();
+			reinterpret_cast<CGPartyObj*>(engineObject)->commandFinished();
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
@@ -777,7 +777,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			if (Game.m_gameWork.m_wmBackupParams[partyIndex] >= 0) {
 				engineObject->SetClassWork(0, static_cast<int>(partyIndex));
 				ScriptCaravan(engineObject)->m_joybusCaravanId = static_cast<int>(partyIndex);
-				Game.m_partyObjArr[partyIndex] = partyObject;
+				Game.m_partyObjArr[partyIndex] = reinterpret_cast<CGPartyObj*>(engineObject);
 				Joybus.SendAllStat(static_cast<int>(partyIndex));
 			}
 			PushValue(this, object, 0);

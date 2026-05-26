@@ -196,8 +196,7 @@ CMapTexAnimSet::~CMapTexAnimSet()
         CMapTexAnim* entry = m_anims[i];
         if (entry != 0) {
             RefCounted* ref = reinterpret_cast<RefCounted*>(entry);
-            ref->refCount--;
-            if (ref->refCount == 0) {
+            if (--ref->refCount == 0) {
                 delete entry;
             }
             m_anims[i] = 0;

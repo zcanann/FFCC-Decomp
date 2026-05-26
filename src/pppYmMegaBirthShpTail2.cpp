@@ -107,6 +107,7 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirth
                 trailNextIndex = 0;
             }
 
+            pppUnitMatrix(drawMtx);
             drawPos = history[trailReadIndex];
             cameraPos = history[trailNextIndex];
             segVec.x = cameraPos.x - drawPos.x;

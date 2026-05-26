@@ -19,9 +19,6 @@
 #include "ffcc/ppp_linkage.h"
 
 extern Vec kPppCharaBreakUpVector;
-extern const int kCharaBreakInitialVertexFlag0 = 0;
-extern const int kCharaBreakInitialVertexFlag1 = 0;
-extern const int kCharaBreakInitialVertexFlag2 = 0;
 extern "C" const char s_pppCharaBreak_cpp[24] = "pppCharaBreak.cpp";
 extern const float FLOAT_80332048;
 extern const float FLOAT_8033204c;
@@ -46,9 +43,7 @@ struct POLYGON_DATA {
     u16 _pad2;
     S16Vec m_normalA;
     S16Vec m_normalB;
-    S16Vec m_pos0;
-    S16Vec m_pos1;
-    S16Vec m_pos2;
+    S16Vec m_pos[3];
     u16 m_posIndices[3];
     u16 m_nrmIndices[3];
     u16 m_texIndices[3];
@@ -551,10 +546,7 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
                 S16Vec transformed[3];
 
                 if (polygon->m_enabled == 0) {
-                    int flags[3];
-                    flags[0] = kCharaBreakInitialVertexFlag0;
-                    flags[1] = kCharaBreakInitialVertexFlag1;
-                    flags[2] = kCharaBreakInitialVertexFlag2;
+                    int flags[3] = { 0, 0, 0 };
 
                     for (int i = 0; i < 3; i++) {
                         S16Vec* dst = &transformed[i];
@@ -578,7 +570,7 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
                                 if (dst->y < threshold) {
                                     flags[i] = 1;
                                 }
-                            } else if ((&polygon->m_pos0)[i].y < threshold) {
+                            } else if (polygon->m_pos[i].y < threshold) {
                                 flags[i] = 1;
                             }
                         } else if (stepData->m_clipMode == 1) {
@@ -586,7 +578,7 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
                                 if (dst->y > threshold) {
                                     flags[i] = 1;
                                 }
-                            } else if ((&polygon->m_pos0)[i].y > threshold) {
+                            } else if (polygon->m_pos[i].y > threshold) {
                                 flags[i] = 1;
                             }
                         }
@@ -609,17 +601,17 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
                     }
 
                     if (stepData->m_worldSpaceMode == 1 && polygon->m_enabled != 0) {
-                        polygon->m_pos0 = transformed[0];
-                        polygon->m_pos1 = transformed[1];
-                        polygon->m_pos2 = transformed[2];
+                        polygon->m_pos[0] = transformed[0];
+                        polygon->m_pos[1] = transformed[1];
+                        polygon->m_pos[2] = transformed[2];
                     }
                 }
 
                 if (polygon->m_enabled == 0) {
                     if (stepData->m_worldSpaceMode == 1) {
-                        polygon->m_pos0 = transformed[0];
-                        polygon->m_pos1 = transformed[1];
-                        polygon->m_pos2 = transformed[2];
+                        polygon->m_pos[0] = transformed[0];
+                        polygon->m_pos[1] = transformed[1];
+                        polygon->m_pos[2] = transformed[2];
                     }
                 } else {
                     Vec center;
@@ -627,9 +619,9 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
                     center.y = FLOAT_80332048;
                     center.x = FLOAT_80332048;
 
-                    int sumX = (int)polygon->m_pos0.x + (int)polygon->m_pos1.x + (int)polygon->m_pos2.x;
-                    int sumY = (int)polygon->m_pos0.y + (int)polygon->m_pos1.y + (int)polygon->m_pos2.y;
-                    int sumZ = (int)polygon->m_pos0.z + (int)polygon->m_pos1.z + (int)polygon->m_pos2.z;
+                    int sumX = (int)polygon->m_pos[0].x + (int)polygon->m_pos[1].x + (int)polygon->m_pos[2].x;
+                    int sumY = (int)polygon->m_pos[0].y + (int)polygon->m_pos[1].y + (int)polygon->m_pos[2].y;
+                    int sumZ = (int)polygon->m_pos[0].z + (int)polygon->m_pos[1].z + (int)polygon->m_pos[2].z;
                     short avgX = (short)(sumX / 3);
                     short avgY = (short)(sumY / 3);
                     short avgZ = (short)(sumZ / 3);
@@ -647,7 +639,7 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
                         float sinValue;
 
                         for (int i = 0; i < 3; i++) {
-                            S16Vec pos = (&polygon->m_pos0)[i];
+                            S16Vec pos = polygon->m_pos[i];
                             gUtil.ConvI2FVector(verts[i], pos, modelData->m_posQuant);
                             PSVECAdd(&center, &verts[i], &center);
                         }
@@ -716,7 +708,7 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
                             verts[i].y += stepData->m_direction.y * workData->m_value3;
                             verts[i].z += stepData->m_direction.z * workData->m_value3;
 
-                            gUtil.ConvF2IVector((&polygon->m_pos0)[i], verts[i], modelData->m_posQuant);
+                            gUtil.ConvF2IVector(polygon->m_pos[i], verts[i], modelData->m_posQuant);
                         }
                         polygon->_pad2++;
                     }
@@ -824,7 +816,6 @@ void CreatePolygon(POLYGON_DATA* polygonData, void* displayList, unsigned long, 
     CharaBreakMeshData* meshData = MeshData(mesh);
     s32 isRigid = 0;
     S16Vec* workPositions;
-    BOOL transformPositions = FALSE;
     Mtx meshMtx;
 
     if (meshData->m_skinCount == 0) {
@@ -984,10 +975,10 @@ static void CharaBreak_AfterDrawMeshCallback(
             s32 faceIndex = 0;
             u16 zero = 0;
             while (faceIndex < (s32)(u32)(*displayListEntry)->m_polygonCount) {
-                s16 posZ = polygon->m_pos0.z;
-                s16 posY = polygon->m_pos0.y;
+                s16 posZ = polygon->m_pos[0].z;
+                s16 posY = polygon->m_pos[0].y;
                 faceIndex++;
-                s16 posX = polygon->m_pos0.x;
+                s16 posX = polygon->m_pos[0].x;
                 GXWGFifo.u16 = posX;
                 GXWGFifo.u16 = posY;
                 GXWGFifo.u16 = posZ;
@@ -995,9 +986,9 @@ static void CharaBreak_AfterDrawMeshCallback(
                 GXWGFifo.u16 = zero;
                 GXWGFifo.u16 = polygon->m_texIndices[0];
                 GXWGFifo.u16 = polygon->m_texIndices[0];
-                posZ = polygon->m_pos1.z;
-                posY = polygon->m_pos1.y;
-                posX = polygon->m_pos1.x;
+                posZ = polygon->m_pos[1].z;
+                posY = polygon->m_pos[1].y;
+                posX = polygon->m_pos[1].x;
                 GXWGFifo.u16 = posX;
                 GXWGFifo.u16 = posY;
                 GXWGFifo.u16 = posZ;
@@ -1005,9 +996,9 @@ static void CharaBreak_AfterDrawMeshCallback(
                 GXWGFifo.u16 = zero;
                 GXWGFifo.u16 = polygon->m_texIndices[1];
                 GXWGFifo.u16 = polygon->m_texIndices[1];
-                posZ = polygon->m_pos2.z;
-                posY = polygon->m_pos2.y;
-                posX = polygon->m_pos2.x;
+                posZ = polygon->m_pos[2].z;
+                posY = polygon->m_pos[2].y;
+                posX = polygon->m_pos[2].x;
                 GXWGFifo.u16 = posX;
                 GXWGFifo.u16 = posY;
                 GXWGFifo.u16 = posZ;

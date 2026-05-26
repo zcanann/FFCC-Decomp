@@ -11,15 +11,7 @@
 #include <math.h>
 #include <string.h>
 
-extern "C" const char s_Pyro_Frappe_801DEAE4[];
-extern "C" const char s_Cryo_Frappe_801DEAF0[];
-extern "C" const char s_Rheo_Frappe_801DEAFC[];
-extern "C" const char s_Efecto_Fuego_801DEB08[];
-extern "C" const char s_Efecto_Hielo_801DEB18[];
-extern "C" const char s_Efecto_Electro_801DEB28[];
 extern "C" const char s_EmptySkillName_80332A50[];
-extern "C" const char* jumptable_80214D24[];
-extern "C" const char* s_pcts_pctd_item_pctd_m_equip_pct08x_80214D34[];
 
 
 extern "C" const double DOUBLE_80332a58;
@@ -99,29 +91,19 @@ extern "C" const char s_Eis_Hieb_801DEAA0[] = "Eis-Hieb";
 extern "C" const char s_Blitz_Hieb_801DEAAC[] = "Blitz-Hieb";
 extern "C" const char s_Colpo_Fire_801DEAB8[] = "Colpo Fire";
 extern "C" const char s_Colpo_Blizzard_801DEAC4[] = "Colpo Blizzard";
+extern "C" const char s_Colpo_Thunder_801DEAD4[] = "Colpo Thunder";
+extern "C" const char s_Pyro_Frappe_801DEAE4[] = "Pyro Frappe";
+extern "C" const char s_Cryo_Frappe_801DEAF0[] = "Cryo Frappe";
+extern "C" const char s_Rheo_Frappe_801DEAFC[] = "Rheo Frappe";
+extern "C" const char s_Efecto_Fuego_801DEB08[] = "Efecto Fuego";
+extern "C" const char s_Efecto_Hielo_801DEB18[] = "Efecto Hielo";
+extern "C" const char s_Efecto_Electro_801DEB28[] = "Efecto Electro";
 
-extern "C" const char* PTR_s_Flamestrike[] = {
-    s_Flamestrike_801DEA6C,
-    s_Icestrike_801DEA78,
-    s_Thunderstrike_801DEA84,
-};
-
-extern "C" const char* PTR_s_Pyro_Frappe[] = {
-    s_Pyro_Frappe_801DEAE4,
-    s_Cryo_Frappe_801DEAF0,
-    s_Rheo_Frappe_801DEAFC,
-    s_EmptySkillName_80332A50,
-    s_EmptySkillName_80332A50,
-};
-
-extern "C" const char* PTR_s_Efecto_Fuego[] = {
-    s_Efecto_Fuego_801DEB08,
-    s_Efecto_Hielo_801DEB18,
-    s_Efecto_Electro_801DEB28,
-    s_EmptySkillName_80332A50,
-    s_EmptySkillName_80332A50,
-    0,
-};
+extern "C" const char* s_SkillStr_us[];
+extern "C" const char* s_SkillStr_ge[];
+extern "C" const char* s_SkillStr_it[];
+extern "C" const char* s_SkillStr_fr[];
+extern "C" const char* s_SkillStr_sp[];
 
 namespace {
 
@@ -144,19 +126,19 @@ static const char* GetLocalizedStrikeName(int itemId)
 		return 0;
 	}
 
-	const char** names = jumptable_80214D24 + 1;
+	const char** names = s_SkillStr_us;
 	switch (Game.m_gameWork.m_languageId) {
 	case 2:
-		names = s_pcts_pctd_item_pctd_m_equip_pct08x_80214D34 + 2;
+		names = s_SkillStr_ge;
 		break;
 	case 3:
-		names = s_pcts_pctd_item_pctd_m_equip_pct08x_80214D34 + 7;
+		names = s_SkillStr_it;
 		break;
 	case 4:
-		names = PTR_s_Pyro_Frappe;
+		names = s_SkillStr_fr;
 		break;
 	case 5:
-		names = PTR_s_Efecto_Fuego;
+		names = s_SkillStr_sp;
 		break;
 	default:
 		break;
@@ -2873,16 +2855,56 @@ language_ge_3:
 	goto language_4;
 
 language_2:
-	return (&s_pcts_pctd_item_pctd_m_equip_pct08x_80214D34[2])[index];
+	return s_SkillStr_ge[index];
 language_3:
-	return (&s_pcts_pctd_item_pctd_m_equip_pct08x_80214D34[7])[index];
+	return s_SkillStr_it[index];
 language_4:
-	return PTR_s_Pyro_Frappe[index];
+	return s_SkillStr_fr[index];
 language_5:
-	return PTR_s_Efecto_Fuego[index];
+	return s_SkillStr_sp[index];
 language_default:
-	return (&jumptable_80214D24[1])[index];
+	return s_SkillStr_us[index];
 }
+
+extern "C" const char* s_SkillStr_us[] = {
+    s_Flamestrike_801DEA6C,
+    s_Icestrike_801DEA78,
+    s_Thunderstrike_801DEA84,
+    s_EmptySkillName_80332A50,
+    s_EmptySkillName_80332A50,
+};
+
+extern "C" const char* s_SkillStr_ge[] = {
+    s_Feuer_Hieb_801DEA94,
+    s_Eis_Hieb_801DEAA0,
+    s_Blitz_Hieb_801DEAAC,
+    s_EmptySkillName_80332A50,
+    s_EmptySkillName_80332A50,
+};
+
+extern "C" const char* s_SkillStr_it[] = {
+    s_Colpo_Fire_801DEAB8,
+    s_Colpo_Blizzard_801DEAC4,
+    s_Colpo_Thunder_801DEAD4,
+    s_EmptySkillName_80332A50,
+    s_EmptySkillName_80332A50,
+};
+
+extern "C" const char* s_SkillStr_fr[] = {
+    s_Pyro_Frappe_801DEAE4,
+    s_Cryo_Frappe_801DEAF0,
+    s_Rheo_Frappe_801DEAFC,
+    s_EmptySkillName_80332A50,
+    s_EmptySkillName_80332A50,
+};
+
+extern "C" const char* s_SkillStr_sp[] = {
+    s_Efecto_Fuego_801DEB08,
+    s_Efecto_Hielo_801DEB18,
+    s_Efecto_Electro_801DEB28,
+    s_EmptySkillName_80332A50,
+    s_EmptySkillName_80332A50,
+};
 
 /*
  * --INFO--

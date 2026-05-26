@@ -6,8 +6,6 @@
 #include "ffcc/pppYmEnv.h"
 #include <dolphin/mtx.h>
 
-extern const float kConstrainCameraDirLocalScaleOne = 1.0f;
-
 /*
  * --INFO--
  * PAL Address: 80143098

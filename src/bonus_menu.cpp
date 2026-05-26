@@ -3391,12 +3391,10 @@ void CMenuPcs::createBonus()
 				unsigned long modelCode = entry.m_tribeId + ((i < activeCount) ? 0x87 : 0x83);
 				CCharaPcs::CHandle* handle =
 				    new (stage, const_cast<char*>(s_bonus_menu_cpp), 0x183) CCharaPcs::CHandle;
-				if (handle != 0) {
-					handle->Add();
-					handle->LoadModel(3, modelCode & 0xFFF, (modelCode >> 12) & 0xF, 0, -1, 0, 0);
-					handle->m_flags = 0x300543;
-					displaySlots[i] = handle;
-				}
+				displaySlots[i] = handle;
+				handle->Add();
+				handle->LoadModel(3, modelCode & 0xFFF, (modelCode >> 12) & 0xF, 0, -1, 0, 0);
+				handle->m_flags = 0x300543;
 			}
 
 			int handleIndex = activeCount * 2;

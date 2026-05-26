@@ -324,7 +324,7 @@ int CMenuPcs::MLstCtrl()
 	}
 
 	if (result != 0) {
-		one = 1.0f;
+		one = FLOAT_803333F0;
 		MenuLstEntry* entry = this->lstData->entries;
 		for (i = 0; (itemCount = (unsigned int)this->lstData->count), i < (int)itemCount; i++) {
 			entry->alpha = one;
@@ -370,7 +370,7 @@ int CMenuPcs::MLstOpen()
 		short yPos;
 
 		memset(this->lstData, 0, sizeof(MenuLstList));
-		one = 1.0f;
+		one = FLOAT_803333F0;
 		entry = this->lstData->entries;
 		i = 8;
 		do {
@@ -386,7 +386,7 @@ int CMenuPcs::MLstOpen()
 			i--;
 		} while (i != 0);
 
-		zero = 0.0f;
+		zero = FLOAT_803333D0;
 		initializedCount = 0;
 		yPos = 0x18;
 		for (i = 0; i < 9; i++) {
@@ -417,7 +417,7 @@ int CMenuPcs::MLstOpen()
 		if (entry->startFrame <= currentFrame) {
 			if (entry->startFrame + entry->duration <= currentFrame) {
 				completedItems++;
-				entry->alpha = 1.0f;
+				entry->alpha = FLOAT_803333F0;
 			} else {
 				entry->timer = entry->timer + 1;
 				double ratio = DOUBLE_80333410 / (double)entry->duration;
@@ -429,7 +429,7 @@ int CMenuPcs::MLstOpen()
 
 	int result = 0;
 	if (this->lstData->count == completedItems) {
-		one = 1.0f;
+		one = FLOAT_803333F0;
 		entry = this->lstData->entries;
 		if ((int)itemCount > 0) {
 			count = itemCount >> 3;

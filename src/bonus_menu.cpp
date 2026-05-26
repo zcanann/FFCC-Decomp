@@ -3403,6 +3403,8 @@ void CMenuPcs::createBonus()
 				                   ? s_Rinfo->m_tempArtifacts[artifactIndex]
 				                   : s_Rinfo->m_bossArtifacts[artifactIndex - 4];
 				if (itemId <= 0) {
+					displaySlots[handleIndex] = 0;
+					handleIndex++;
 					continue;
 				}
 
@@ -3411,15 +3413,10 @@ void CMenuPcs::createBonus()
 				unsigned short modelNo = itemModelCode & 0x0FFF;
 				CCharaPcs::CHandle* itemHandle =
 				    new (stage, const_cast<char*>(s_bonus_menu_cpp), 0x19C) CCharaPcs::CHandle;
-				if (itemHandle == 0) {
-					handleIndex++;
-					continue;
-				}
-
+				displaySlots[handleIndex] = itemHandle;
 				itemHandle->Add();
 				itemHandle->LoadModel(3, modelNo, itemModelCode >> 12, 0, -1, 0, 0);
 				itemHandle->m_flags = 0x300543;
-				displaySlots[handleIndex] = itemHandle;
 
 				int effectNo = -1;
 				switch (itemId) {

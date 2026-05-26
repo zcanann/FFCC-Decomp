@@ -1245,8 +1245,8 @@ void CMenuPcs::DrawArtiBase(CMenuPcs::Sprt2* sprt, float alpha)
 		GXSetChanMatColor(GX_COLOR0A0, color);
 	}
 
-	SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-	SetTexture(static_cast<CMenuPcs::TEX>(0x1A));
+	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1A));
 
 	int partyIndex = 0;
 	for (int i = 0; i < s_Rinfo->m_partyCount; i++) {
@@ -1270,7 +1270,7 @@ void CMenuPcs::DrawArtiBase(CMenuPcs::Sprt2* sprt, float alpha)
 			};
 			GXSetChanMatColor(GX_COLOR0A0, color);
 		}
-		DrawRect(0, pos[i * 2 + 2], pos[i * 2 + 3], width, height,
+		MenuPcs.DrawRect(0, pos[i * 2 + 2], pos[i * 2 + 3], width, height,
 		    0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 	}
 }

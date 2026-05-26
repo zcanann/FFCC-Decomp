@@ -10,6 +10,7 @@
 #include "ffcc/sound.h"
 #include "ffcc/system.h"
 #include "ffcc/util.h"
+#include "ffcc/wind.h"
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
@@ -1294,13 +1295,13 @@ void CMenuPcs::DrawBonusFrame(float x, float y, float w, float h, float alpha)
 	const float texScale = 0.125f;
 	const float right = (x + w) - corner;
 	const float bottom = (y + h) - corner;
-	const float innerW = w - (corner * 2.0f);
-	const float innerH = h - (corner * 2.0f);
+	const float innerW = w - 16.0f;
+	const float innerH = h - 16.0f;
 
-	SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 	GXSetChanMatColor(GX_COLOR0A0, color);
 
-	SetTexture(static_cast<CMenuPcs::TEX>(0x1B));
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1B));
 	for (int i = 0; i < 4; i++) {
 		float drawX = x;
 		float drawY = y;
@@ -1318,19 +1319,19 @@ void CMenuPcs::DrawBonusFrame(float x, float y, float w, float h, float alpha)
 			texU = corner;
 			texV = corner;
 		}
-		DrawRect(0, drawX, drawY, corner, corner, texU, texV, texScale, texScale, 0.0f);
+		MenuPcs.DrawRect(0, drawX, drawY, corner, corner, texU, texV, texScale, texScale, 0.0f);
 	}
 
-	SetTexture(static_cast<CMenuPcs::TEX>(0x1C));
-	DrawRect(0, x + corner, y, innerW, corner, 0.0f, 0.0f, texScale, texScale, 0.0f);
-	SetTexture(static_cast<CMenuPcs::TEX>(0x22));
-	DrawRect(0, x + corner, bottom, innerW, corner, 0.0f, 0.0f, texScale, texScale, 0.0f);
-	SetTexture(static_cast<CMenuPcs::TEX>(0x1D));
-	DrawRect(0, x, y + corner, corner, innerH, 0.0f, 0.0f, texScale, texScale, 0.0f);
-	SetTexture(static_cast<CMenuPcs::TEX>(0x21));
-	DrawRect(0, right, y + corner, corner, innerH, 0.0f, 0.0f, texScale, texScale, 0.0f);
-	SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
-	DrawRect(0, x + corner, y + corner, innerW, innerH, 0.0f, 0.0f, texScale, texScale, 0.0f);
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1C));
+	MenuPcs.DrawRect(0, x + corner, y, innerW, corner, 0.0f, 0.0f, texScale, texScale, 0.0f);
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x22));
+	MenuPcs.DrawRect(0, x + corner, bottom, innerW, corner, 0.0f, 0.0f, texScale, texScale, 0.0f);
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1D));
+	MenuPcs.DrawRect(0, x, y + corner, corner, innerH, 0.0f, 0.0f, texScale, texScale, 0.0f);
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x21));
+	MenuPcs.DrawRect(0, right, y + corner, corner, innerH, 0.0f, 0.0f, texScale, texScale, 0.0f);
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
+	MenuPcs.DrawRect(0, x + corner, y + corner, innerW, innerH, 0.0f, 0.0f, texScale, texScale, 0.0f);
 }
 
 /*
@@ -3154,6 +3155,11 @@ void CMenuPcs::destroyBonus()
 		GetBonusMenuMembers(this).m_bonusListPtr = 0;
 	}
 
+	if (s_Rinfo != 0) {
+		delete s_Rinfo;
+		s_Rinfo = 0;
+	}
+
 	ptr = GetBonusMenuMembers(this).m_bonusStatePtr;
 	if (ptr != 0) {
 		delete[] (unsigned char*)ptr;
@@ -3166,6 +3172,11 @@ void CMenuPcs::destroyBonus()
 		GetBonusMenuMembers(this).m_bonusAnimPtr = 0;
 	}
 
+	if (s_Base[0] != 0) {
+		delete[] s_Base[0];
+		s_Base[0] = 0;
+	}
+
 	ptr = GetBonusMenuMembers(this).m_bonusBoardPtr;
 	if (ptr != 0) {
 		delete[] (unsigned char*)ptr;
@@ -3176,16 +3187,6 @@ void CMenuPcs::destroyBonus()
 	if (ptr != 0) {
 		delete[] (unsigned char*)ptr;
 		GetBonusMenuMembers(this).m_bonusAuxPtr = 0;
-	}
-
-	if (s_Rinfo != 0) {
-		delete s_Rinfo;
-		s_Rinfo = 0;
-	}
-
-	if (s_Base[0] != 0) {
-		delete[] s_Base[0];
-		s_Base[0] = 0;
 	}
 
 	freeTexture(2, 1, 0x16, 0x12);
@@ -3218,9 +3219,6 @@ void CMenuPcs::createBonus()
 	loadTexture(PTR_s_bonus, 2, 1, s_bonusTextureTable, 0x16, 0x12, 0);
 	sprintf(fontPath, s_menuSubfontPathFmt, Game.GetLangString());
 	loadFont(0, fontPath, 1, -1);
-	s_CntTop = 0;
-	s_ArtiTop = 0;
-	s_PlayerTop = 0;
 
 	s_Rinfo = new BonusSummaryData;
 	s_Base[0] = new float[18];
@@ -3245,9 +3243,6 @@ void CMenuPcs::createBonus()
 	GetBonusMenuMembers(this).m_bonusBoardPtr = boardPtr;
 
 	memset((void*)statePtr, 0, sizeof(BonusMenuStateRaw));
-	*(short*)(statePtr + 0x1c) = 0;
-	*(short*)(statePtr + 0x22) = 0;
-	*(unsigned char*)(statePtr + 0xb) = 0;
 	memset((void*)animPtr, 0, sizeof(BonusAnimList));
 	memset((void*)listPtr, 0, sizeof(BonusEffectSlotList));
 	BonusEffectSlotList* effectSlots = reinterpret_cast<BonusEffectSlotList*>(listPtr);
@@ -3255,7 +3250,6 @@ void CMenuPcs::createBonus()
 		InitBonusEffectSlotBlock(&effectSlots->slots[i]);
 	}
 	memset((void*)auxPtr, 0, sizeof(BonusMenuAuxRaw));
-	*(short*)(auxPtr + 10) = 3;
 	memset((void*)boardPtr, 0, sizeof(BonusBoardEntryList));
 	BonusBoardEntryList* boardEntries = reinterpret_cast<BonusBoardEntryList*>(boardPtr);
 	for (int i = 0; i < 0x18; i++) {
@@ -3476,11 +3470,16 @@ void CMenuPcs::createBonus()
 		}
 	}
 
-	GetBonusMenuMembers(this).m_bonusAlpha = 0;
-	GetBonusMenuMembers(this).m_bonusCursorFlag = 0;
 	GbaQue.SetStartBonusFlg();
 	ClrBattleItem();
-	GetAllPadOn();
+	*(short*)(GetBonusMenuMembers(this).m_bonusAuxPtr + 10) = 3;
+	s_CntTop = 0;
+	s_ArtiTop = 0;
+	s_PlayerTop = 0;
+	*(short*)(GetBonusMenuMembers(this).m_bonusStatePtr + 0x1c) = 0;
+	Wind.ClearAll();
+	GetBonusMenuMembers(this).m_bonusAlpha = 0;
+	GetBonusMenuMembers(this).m_bonusCursorFlag = 0;
 }
 
 /*

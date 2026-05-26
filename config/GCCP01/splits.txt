@@ -38,7 +38,6 @@ game.cpp:
 	.ctors      start:0x801D53A8 end:0x801D53AC
 	.data       start:0x801E8320 end:0x801E83FC
 	.bss        start:0x8021EEB4 end:0x80230E48
-	.sdata      start:0x8032E6B8 end:0x8032E6D0
 	.sbss       start:0x8032EC40 end:0x8032EC45
 	.sdata2     start:0x8032F660 end:0x8032F6A0
 
@@ -375,6 +374,7 @@ partMng.cpp:
 	.rodata     start:0x801D8230 end:0x801D8380
 	.data       start:0x801EADC8 end:0x801EAE98
 	.bss        start:0x80275EE8 end:0x80299F30
+	.sdata      start:0x8032E6B8 end:0x8032E6C0
 	.sbss       start:0x8032ED68 end:0x8032ED84
 
 pppGetRotMatrixXYZ.cpp:
@@ -777,7 +777,8 @@ cflat_runtime.cpp:
 	extabindex  start:0x8000D21C end:0x8000D2F4
 	.text       start:0x80065CAC end:0x80069B08
 	.rodata     start:0x801D8EF8 end:0x801D8F10
-	.data       start:0x801FC9F0 end:0x801FCAE4
+	.data       start:0x801FC9F0 end:0x801FCC08
+	.sdata      start:0x8032E6C0 end:0x8032E6C8
 
 cflat_runtime2.cpp:
 	extab       start:0x80007310 end:0x80007480
@@ -785,8 +786,9 @@ cflat_runtime2.cpp:
 	.text       start:0x80069B08 end:0x8006EB04
 	.ctors      start:0x801D540C end:0x801D5410
 	.rodata     start:0x801D8FA0 end:0x801D8FC4
-	.data       start:0x801FCAE4 end:0x801FCB7C
+	.data       start:0x801FCC08 end:0x801FCCD0
 	.bss        start:0x80299F40 end:0x802E79A0
+	.sdata      start:0x8032E6C8 end:0x8032E6D8
 	.sbss       start:0x8032ED98 end:0x8032EDA0
 
 chara.cpp:

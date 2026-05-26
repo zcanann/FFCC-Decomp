@@ -168,24 +168,24 @@ void CGraphic::Init()
     VIConfigure(reinterpret_cast<GXRenderModeObj*>(PtrAt(this, 0x71E0)));
     GXInit(PtrAt(this, 0x10), 0x60000);
 
-    GXSetViewport(kGraphicZeroF, kGraphicZeroF, static_cast<f32>(U16At(renderMode, 4)), static_cast<f32>(U16At(renderMode, 6)),
-                  kGraphicZeroF, kGraphicOneF);
-    GXSetScissor(0, 0, U16At(renderMode, 4), U16At(renderMode, 6));
-    GXSetDispCopyYScale(GXGetYScaleFactor(U16At(renderMode, 6), U16At(renderMode, 8)));
-    GXSetDispCopySrc(0, 0, U16At(renderMode, 4), U16At(renderMode, 6));
-    GXSetDispCopyDst(U16At(renderMode, 4), U16At(renderMode, 6));
-    GXSetCopyFilter(reinterpret_cast<GXRenderModeObj*>(renderMode)->aa,
-                    reinterpret_cast<GXRenderModeObj*>(renderMode)->sample_pattern, GX_TRUE,
+    GXSetViewport(kGraphicZeroF, kGraphicZeroF, static_cast<f32>(U16At(PtrAt(this, 0x71E0), 4)),
+                  static_cast<f32>(U16At(PtrAt(this, 0x71E0), 6)), kGraphicZeroF, kGraphicOneF);
+    GXSetScissor(0, 0, U16At(PtrAt(this, 0x71E0), 4), U16At(PtrAt(this, 0x71E0), 6));
+    GXSetDispCopyYScale(GXGetYScaleFactor(U16At(PtrAt(this, 0x71E0), 6), U16At(PtrAt(this, 0x71E0), 8)));
+    GXSetDispCopySrc(0, 0, U16At(PtrAt(this, 0x71E0), 4), U16At(PtrAt(this, 0x71E0), 6));
+    GXSetDispCopyDst(U16At(PtrAt(this, 0x71E0), 4), U16At(PtrAt(this, 0x71E0), 6));
+    GXSetCopyFilter(reinterpret_cast<GXRenderModeObj*>(PtrAt(this, 0x71E0))->aa,
+                    reinterpret_cast<GXRenderModeObj*>(PtrAt(this, 0x71E0))->sample_pattern, GX_TRUE,
                     GXNtsc480IntDf.vfilter);
 
-    if (reinterpret_cast<GXRenderModeObj*>(renderMode)->aa == 0) {
+    if (reinterpret_cast<GXRenderModeObj*>(PtrAt(this, 0x71E0))->aa == 0) {
         GXSetPixelFmt(GX_PF_RGB8_Z24, GX_ZC_LINEAR);
     } else {
         GXSetPixelFmt(GX_PF_RGB565_Z16, GX_ZC_LINEAR);
     }
 
-    GXSetDispCopySrc(0, 0, U16At(renderMode, 4), U16At(renderMode, 6));
-    GXSetDispCopyDst(U16At(renderMode, 4), U16At(renderMode, 6));
+    GXSetDispCopySrc(0, 0, U16At(PtrAt(this, 0x71E0), 4), U16At(PtrAt(this, 0x71E0), 6));
+    GXSetDispCopyDst(U16At(PtrAt(this, 0x71E0), 4), U16At(PtrAt(this, 0x71E0), 6));
     GXCopyDisp(PtrAt(this, 0x71E4), GX_TRUE);
     GXSetDispCopyGamma(GX_GM_1_0);
     VISetNextFrameBuffer(PtrAt(this, 0x71E4));

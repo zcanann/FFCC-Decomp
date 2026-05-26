@@ -1627,7 +1627,7 @@ void CShopMenu::DrawShopBase()
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
     GXSetColorUpdate(GX_TRUE);
 
-    int mode = ShopMenuInt(this, 0x0);
+    int mode = ShopMenuInt(this, 0x4);
     int panelY;
     if (mode < 3) {
         panelY = 0xE6;
@@ -1729,7 +1729,7 @@ void CShopMenu::Draw()
 
     DrawInit__8CMenuPcsFv(MenuPcsVoid());
 
-    int mode = ShopMenuInt(this, 0x0);
+    int mode = ShopMenuInt(this, 0x4);
     if ((mode >= 0) && (mode < 3)) {
         DrawShop0();
     } else if (mode < 6) {
@@ -2561,7 +2561,7 @@ void CShopMenu::SelectItemIdx()
 void CShopMenu::Calc()
 {
     unsigned short buttons = GetPadButtons();
-    int mode = ShopMenuInt(this, 0x0);
+    int mode = ShopMenuInt(this, 0x4);
     int& timer = ShopMenuInt(this, 0xC);
     int& subMode = ShopMenuInt(this, 0x10);
     int& shopMode = ShopMenuInt(this, 0x14);
@@ -3072,10 +3072,10 @@ void CShopMenu::SetMode(int mode)
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
 
-    *reinterpret_cast<int*>(self + 0x0) = mode;
+    *reinterpret_cast<int*>(self + 0x4) = mode;
     *reinterpret_cast<int*>(self + 0xC) = 0;
 
-    switch (*reinterpret_cast<int*>(self + 0x0)) {
+    switch (*reinterpret_cast<int*>(self + 0x4)) {
     case 0:
         *reinterpret_cast<float*>(self + 0x1C) = 0.0f;
         *reinterpret_cast<unsigned char*>(self + 0x48) = 0xFF;
@@ -3123,8 +3123,9 @@ mode_3_6_common:
         *reinterpret_cast<int*>(self + 0x154) = -1;
         *reinterpret_cast<int*>(self + 0x4C) = 0;
 
+        CMenuPcs* menuPcs = &MenuPcs;
         for (int i = 0; i < 0x40; i++) {
-            if (MenuPcs.GetItemType(i, 0) == 9) {
+            if (menuPcs->GetItemType(i, 0) == 9) {
                 int count = *reinterpret_cast<int*>(self + 0x4C);
                 *reinterpret_cast<int*>(self + 0x4C) = count + 1;
                 *reinterpret_cast<int*>(self + 0x50 + count * 4) = i;
@@ -3132,9 +3133,7 @@ mode_3_6_common:
         }
 
         if (*reinterpret_cast<int*>(self + 0x4C) == 0) {
-            *reinterpret_cast<int*>(self + 0x4C) = 1;
-            *reinterpret_cast<int*>(self + 0x50) = -1;
-            for (int i = 0; i < 7; i++) {
+            for (int i = 0; i < 8; i++) {
                 int count = *reinterpret_cast<int*>(self + 0x4C);
                 *reinterpret_cast<int*>(self + 0x4C) = count + 1;
                 *reinterpret_cast<int*>(self + 0x50 + count * 4) = -1;
@@ -3147,6 +3146,9 @@ mode_3_6_common:
         break;
     case 12:
         *reinterpret_cast<int*>(self + 0x3C) = 0;
+        break;
+    case 13:
+    case 14:
         break;
     }
 }

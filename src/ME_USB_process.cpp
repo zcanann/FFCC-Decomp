@@ -13,7 +13,6 @@ extern "C" const char s_ME_USB_process_cpp[] = "ME_USB_process.cpp";
 extern "C" const char sMemAllocErrorSizeFmt[] = "MemAlloc Error!!! size=%d\n";
 extern "C" const float FLOAT_8032FD00;
 extern "C" const float FLOAT_8032FD04;
-extern "C" const double DOUBLE_8032FD08;
 
 namespace {
 struct ViewerSRT {
@@ -76,18 +75,6 @@ static inline s16 LoadSwapS16(s16 value)
     return __lhbrx(&value, 0);
 }
 
-static inline f32 S32ToFloat(s32 value)
-{
-    union {
-        u32 words[2];
-        double value;
-    } conv;
-
-    conv.words[0] = 0x43300000;
-    conv.words[1] = static_cast<u32>(value ^ 0x80000000);
-    return static_cast<f32>(conv.value - DOUBLE_8032FD08);
-}
-
 }
 
 /*
@@ -145,7 +132,7 @@ void CMaterialEditorPcs::SetUSBData()
 
         memcpy(rsdItem->ptr10, usb.m_data, usb.m_sizeBytes * 0xC);
 
-        for (u32 i = 0, offset = 0; i < usb.m_sizeBytes; i++, offset += 0xC) {
+        for (u32 offset = 0, i = 0; i < usb.m_sizeBytes; offset += 0xC, i++) {
             StoreSwapFloat(reinterpret_cast<f32*>(reinterpret_cast<u8*>(rsdItem->ptr10) + offset + 0x0));
             StoreSwapNegFloat(reinterpret_cast<f32*>(reinterpret_cast<u8*>(rsdItem->ptr10) + offset + 0x4));
             StoreSwapNegFloat(reinterpret_cast<f32*>(reinterpret_cast<u8*>(rsdItem->ptr10) + offset + 0x8));
@@ -158,8 +145,8 @@ void CMaterialEditorPcs::SetUSBData()
         s32 yDiff = static_cast<s32>(maxPos.y - minPos.y);
 
         srt.transX = FLOAT_8032FD00;
-        srt.transY = S32ToFloat(-xDiff / 2);
-        srt.transZ = S32ToFloat(-yDiff * (xDiff / 0x14) - 10);
+        srt.transY = static_cast<float>(-xDiff / 2);
+        srt.transZ = static_cast<float>(-yDiff * (xDiff / 0x14) - 10);
         srt.rotX = FLOAT_8032FD00;
         srt.rotY = FLOAT_8032FD00;
         srt.rotZ = FLOAT_8032FD00;
@@ -266,7 +253,7 @@ void CMaterialEditorPcs::SetUSBData()
 
         memcpy(rsdItem->ptr14, usb.m_data, usb.m_sizeBytes * 0xC);
 
-        for (u32 i = 0, offset = 0; i < usb.m_sizeBytes; i++, offset += 0xC) {
+        for (u32 offset = 0, i = 0; i < usb.m_sizeBytes; offset += 0xC, i++) {
             StoreSwapFloat(reinterpret_cast<f32*>(reinterpret_cast<u8*>(rsdItem->ptr14) + offset + 0x0));
             StoreSwapNegFloat(reinterpret_cast<f32*>(reinterpret_cast<u8*>(rsdItem->ptr14) + offset + 0x4));
             StoreSwapNegFloat(reinterpret_cast<f32*>(reinterpret_cast<u8*>(rsdItem->ptr14) + offset + 0x8));

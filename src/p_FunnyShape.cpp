@@ -1,6 +1,6 @@
+#define FFCC_P_FUNNYSHAPE_REAL_PTRARRAY
 #include "ffcc/p_FunnyShape.h"
 #include "ffcc/FunnyShape.h"
-#include "ffcc/USBStreamData.h"
 #include "ffcc/graphic.h"
 #include "ffcc/memory.h"
 #include "ffcc/p_usb.h"
@@ -16,27 +16,6 @@ extern const f32 kFunnyShapeViewportHeight;
 #include "dolphin/mtx.h"
 
 #include <string.h>
-
-struct _GXTexObj;
-
-template <class T>
-class CPtrArray
-{
-public:
-    virtual ~CPtrArray();
-
-    unsigned long size;
-    unsigned long numItems;
-    unsigned long defaultSize;
-    T* items;
-    CMemory::CStage* stage;
-    int growCapacity;
-
-    CPtrArray();
-
-    void RemoveAll();
-    void DeleteAndRemoveAll();
-};
 
 extern "C" void createViewer__14CFunnyShapePcsFv(CFunnyShapePcs*);
 extern "C" void destroyViewer__14CFunnyShapePcsFv(CFunnyShapePcs*);
@@ -79,12 +58,12 @@ static inline CFunnyShape* FunnyShape(CFunnyShapePcs* self)
 
 static inline CPtrArray<OSFS_TEXTURE_ST*>* TextureHeaders(CFunnyShapePcs* self)
 {
-    return reinterpret_cast<CPtrArray<OSFS_TEXTURE_ST*>*>(self->m_texturePtrArrayStorage);
+    return &self->m_textureHeaders;
 }
 
 static inline CPtrArray<_GXTexObj*>* TextureObjects(CFunnyShapePcs* self)
 {
-    return reinterpret_cast<CPtrArray<_GXTexObj*>*>(self->m_gxTexObjPtrArrayStorage);
+    return &self->m_textureObjects;
 }
 
 static inline CFunnyShapeViewerState* ViewerState(CFunnyShapePcs* self)
@@ -394,8 +373,15 @@ void CPtrArray<OSFS_TEXTURE_ST*>::RemoveAll()
  */
 inline CFunnyShapePcs::CFunnyShapePcs()
 {
-    new (TextureHeaders(this)) CPtrArray<OSFS_TEXTURE_ST*>;
-    new (TextureObjects(this)) CPtrArray<_GXTexObj*>;
+}
+
+/*
+ * --INFO--
+ * Address: TODO
+ * Size: TODO
+ */
+CFunnyShapePcs::~CFunnyShapePcs()
+{
 }
 
 unsigned int CFunnyShapePcs::m_table_desc0[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(createViewer__14CFunnyShapePcsFv)};
@@ -430,27 +416,6 @@ unsigned int sFunnyShapePcsTablePad1[5] = {
     0,
     0,
 };
-
-/*
- * --INFO--
- * Address: TODO
- * Size: TODO
- */
-CFunnyShapePcs::~CFunnyShapePcs()
-{
-    TextureObjects(this)->CPtrArray<_GXTexObj*>::~CPtrArray();
-    TextureHeaders(this)->CPtrArray<OSFS_TEXTURE_ST*>::~CPtrArray();
-}
-
-CUSBStreamDataStorage::~CUSBStreamDataStorage()
-{
-    reinterpret_cast<CUSBStreamData*>(this)->~CUSBStreamData();
-}
-
-CUSBStreamDataStorage::CUSBStreamDataStorage()
-{
-    new (this) CUSBStreamData;
-}
 
 template <>
 CPtrArray<_GXTexObj*>::~CPtrArray()

@@ -3216,7 +3216,6 @@ void CMenuPcs::createBonus()
 	loadFont(0, fontPath, 1, -1);
 
 	s_Rinfo = new BonusSummaryData;
-	s_Base[0] = new float[18];
 	memset(s_Rinfo, 0, sizeof(*s_Rinfo));
 	for (int i = 0; i < 4; i++) {
 		s_Rinfo->m_tempArtifacts[i] = -1;
@@ -3244,13 +3243,14 @@ void CMenuPcs::createBonus()
 	for (int i = 0; i < 5; i++) {
 		InitBonusEffectSlotBlock(&effectSlots->slots[i]);
 	}
+	s_Base[0] = new float[18];
+	memset(s_Base[0], 0, sizeof(float) * 18);
 	memset((void*)auxPtr, 0, sizeof(BonusMenuAuxRaw));
 	memset((void*)boardPtr, 0, sizeof(BonusBoardEntryList));
 	BonusBoardEntryList* boardEntries = reinterpret_cast<BonusBoardEntryList*>(boardPtr);
 	for (int i = 0; i < 0x18; i++) {
 		InitBonusBoardEntry(&boardEntries->entries[i]);
 	}
-	memset(s_Base[0], 0, sizeof(float) * 18);
 
 	if (s_Rinfo != 0) {
 		int activeCount = 0;

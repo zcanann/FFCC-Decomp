@@ -26,7 +26,7 @@ public:
     ~CRelProfile();
 
 private:
-    unsigned char m_data;
+    unsigned int m_data;
 };
 
 unsigned int CMapPcs::m_table_desc0[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__7CMapPcsFv)};
@@ -111,8 +111,8 @@ extern unsigned int s_loadedMapNo__7CMapPcs;
 CRelProfile g_mapStage;
 CRelProfile g_mapSection;
 CRelProfile g_hit_prof;
-unsigned char g_map_calc_prof;
-unsigned char g_map_draw_prof;
+unsigned char g_map_calc_prof ATTRIBUTE_ALIGN(4);
+unsigned char g_map_draw_prof ATTRIBUTE_ALIGN(4);
 extern const float DrawRangeDefault;
 extern const float kPMapBoundMinInit;
 extern const float kPMapBoundMaxInit;

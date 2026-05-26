@@ -569,8 +569,6 @@ void CMenuPcs::FavoInit()
 		iVar16 = iVar16 - 1;
 	} while (iVar16 != 0);
 
-	fVar4 = 0.0f;
-	fVar5 = FLOAT_80333080;
 	FavoEntry* setupEntry = &favoList->entries[0];
 	setupEntry->tex = 0x33;
 	setupEntry->drawFlags = 4;
@@ -578,6 +576,8 @@ void CMenuPcs::FavoInit()
 	setupEntry->y = 0x28;
 	setupEntry->w = 0x158;
 	setupEntry->h = 0x20;
+	fVar4 = FLOAT_80333040;
+	fVar5 = FLOAT_80333080;
 	setupEntry->u = fVar4;
 	setupEntry->v = fVar4;
 	setupEntry->uvScale = fVar5 / (float)setupEntry->w;

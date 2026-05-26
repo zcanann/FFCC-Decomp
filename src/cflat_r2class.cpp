@@ -495,9 +495,11 @@ CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* objec
 				case -0x14:
 				case -0x13:
 				case -0x12:
-				case -0x11:
-					LastResult(this) = static_cast<unsigned int>(*reinterpret_cast<short*>(engineObject + (systemVal + 0x14) * 2 + 0x510));
+				case -0x11: {
+					short* values = reinterpret_cast<short*>(engineObject + 0x510);
+					LastResult(this) = static_cast<unsigned int>(values[systemVal + 0x14]);
 					break;
+				}
 				case -0x15:
 					*reinterpret_cast<float*>(&LastResult(this)) = *reinterpret_cast<float*>(engineObject + 0x168);
 					break;

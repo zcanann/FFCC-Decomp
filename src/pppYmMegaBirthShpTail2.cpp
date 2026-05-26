@@ -317,8 +317,8 @@ void pppFrameYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, PYmMegaBirthShp
             break;
         }
 
+        spawnCount = 0;
         i = 0;
-        spawnCount = i;
         particleData = (u8*)work->m_particles;
         worldMat = work->m_wmats;
         particleColor = work->m_colors;

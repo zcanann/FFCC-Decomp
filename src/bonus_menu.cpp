@@ -1236,13 +1236,12 @@ void CMenuPcs::DrawArtiBase(CMenuPcs::Sprt2* sprt, float alpha)
 	}
 
 	BonusAnimSprite* sprite = reinterpret_cast<BonusAnimSprite*>(sprt);
-	float* pos = s_Base[0];
 	int statePtr = GetBonusMenuMembers(this).m_bonusStatePtr;
 	float width = (float)sprite->w;
 	float height = (float)sprite->h;
 
 	if (*(short*)(statePtr + 0x1c) != 4) {
-		_GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(alpha * 255.0f)};
+		_GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(alpha * 255.0)};
 		GXSetChanMatColor(GX_COLOR0A0, color);
 	}
 
@@ -1267,11 +1266,11 @@ void CMenuPcs::DrawArtiBase(CMenuPcs::Sprt2* sprt, float alpha)
 			    (unsigned char)(rgb * 255.0f),
 			    (unsigned char)(rgb * 255.0f),
 			    (unsigned char)(rgb * 255.0f),
-			    (unsigned char)(alpha * 255.0f),
+			    (unsigned char)(alpha * 255.0),
 			};
 			GXSetChanMatColor(GX_COLOR0A0, color);
 		}
-		MenuPcs.DrawRect(0, pos[i * 2 + 2], pos[i * 2 + 3], width, height,
+		MenuPcs.DrawRect(0, s_Base[0][i * 2 + 2], s_Base[0][i * 2 + 3], width, height,
 		    0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 	}
 }

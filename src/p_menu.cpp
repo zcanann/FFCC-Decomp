@@ -1667,11 +1667,9 @@ void CMenuPcs::LoadExtraFont(int fontNo, char* fileName)
  */
 void CMenuPcs::SetExtraFontTlut(int fontNo, _GXColor color)
 {
-    CTexture* texture;
-
     for (int i = 0; i < 0x10; i++) {
-        texture = m_fonts[fontNo]->texturePtr;
-        _GXColor out = texture->GetTlutColor(i);
+        _GXColor tlutColor = m_fonts[fontNo + 2]->texturePtr->GetTlutColor(i);
+        _GXColor out = tlutColor;
 
         if (i < 9) {
             out.r = color.r;
@@ -1684,11 +1682,11 @@ void CMenuPcs::SetExtraFontTlut(int fontNo, _GXColor color)
             out.b = static_cast<u8>(-(static_cast<float>(0xF5 - color.b) * blend - FLOAT_8033085C));
         }
 
+        CTexture* texture = m_fonts[fontNo + 2]->texturePtr;
         texture->SetTlutColor(i, out);
     }
 
-    texture = m_fonts[fontNo]->texturePtr;
-    texture->FlushTlut();
+    m_fonts[fontNo + 2]->texturePtr->FlushTlut();
 }
 
 /*
@@ -1984,13 +1982,13 @@ void CMenuPcs::drawBattle()
                 MenuPcs.DrawRect(0, (left + static_cast<float>(totalWidth)) - LoadFloat(FLOAT_80330820), screenY, LoadFloat(FLOAT_80330820), LoadFloat(FLOAT_80330820), LoadFloat(kMenuInitOne), LoadFloat(kMenuInitOne), LoadFloat(FLOAT_80330808), LoadFloat(FLOAT_80330808), LoadFloat(kMenuInitOne));
             }
 
-            const u8 gauge = static_cast<u8>((m_battleHud.m_gaugeCounter * 0xFF) / 16);
+            const int gauge = (m_battleHud.m_gaugeCounter * 0xFF) / 16;
             const CColor fillTop(0xFF, gauge, gauge, static_cast<u8>(alphaF));
             GXSetChanMatColor(GX_COLOR0A0, fillTop.color);
             TextureMan.SetTextureTev(0);
             DrawRect(0, bodyLeft, (screenY + LoadFloat(FLOAT_80330828)) - LoadFloat(FLOAT_80330808), static_cast<float>(fillWidth), LoadFloat(FLOAT_8033082C), LoadFloat(kMenuInitOne), LoadFloat(kMenuInitOne), LoadFloat(FLOAT_80330808), LoadFloat(FLOAT_80330808), LoadFloat(kMenuInitOne));
 
-            const u8 gaugeTop = static_cast<u8>(((m_battleHud.m_gaugeCounter * 0x7F) / 16) + 0x80);
+            const int gaugeTop = ((m_battleHud.m_gaugeCounter * 0x7F) / 16) + 0x80;
             const CColor fillBottom(0xFF, gaugeTop, gauge, static_cast<u8>(alphaF));
             GXSetChanMatColor(GX_COLOR0A0, fillBottom.color);
             DrawRect(0, bodyLeft, screenY + LoadFloat(FLOAT_80330828), static_cast<float>(fillWidth), LoadFloat(FLOAT_80330830), LoadFloat(kMenuInitOne), LoadFloat(kMenuInitOne), LoadFloat(FLOAT_80330808), LoadFloat(FLOAT_80330808), LoadFloat(kMenuInitOne));

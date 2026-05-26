@@ -412,66 +412,59 @@ void CSound::Init()
  */
 void CSound::Quit()
 {
-    CRedSound* redSound = RedSound(this);
-    CSoundLayout& sound = SoundData(this);
-
-    CFile::CHandle*& waveFile = sound.m_waveFile;
-    if (waveFile != 0) {
-        File.Close(waveFile);
-        waveFile = 0;
+    if (m_waveFile != 0) {
+        File.Close(m_waveFile);
+        m_waveFile = 0;
         System.Printf(const_cast<char*>(s_soundLoadWaveErrorFmt));
     }
 
-    redSound->SetWaveData(-1, nullptr, 0);
+    m_redSound.SetWaveData(-1, nullptr, 0);
 
-    int shouldStopStream = 0;
-    if (sound.m_streamPlaying != 0 && redSound->StreamPlayState(sound.m_streamID) != 0) {
-        shouldStopStream = 1;
+    bool shouldStopStream = false;
+    if (m_streamPlaying != 0 && m_redSound.StreamPlayState(m_streamID) != 0) {
+        shouldStopStream = true;
     }
 
-    if (shouldStopStream != 0) {
-        redSound->StreamStop(sound.m_streamID);
+    if (shouldStopStream) {
+        m_redSound.StreamStop(m_streamID);
     }
 
-    CFile::CHandle*& streamFile = sound.m_streamFile;
-    if (streamFile != 0) {
-        File.Close(streamFile);
-        streamFile = 0;
+    if (m_streamFile != 0) {
+        File.Close(m_streamFile);
+        m_streamFile = 0;
     }
 
-    sound.m_streamPlaying = 0;
+    m_streamPlaying = 0;
 
-    redSound->SeStop(-1);
-    redSound->ClearSeSepData(-1);
-    redSound->ClearWaveData(-3);
+    m_redSound.SeStop(-1);
+    m_redSound.ClearSeSepData(-1);
+    m_redSound.ClearWaveData(-3);
 
-    sound.m_seCount = 10000000;
-    memset(sound.m_seWork, 0, sizeof(sound.m_seWork));
-    memset(sound.m_noFreeSeGroups, 0xFF, sizeof(sound.m_noFreeSeGroups));
-    memset(sound.m_noFreeWaves, 0xFF, sizeof(sound.m_noFreeWaves));
+    m_seCount = 10000000;
+    memset(m_seWork, 0, sizeof(m_seWork));
+    memset(m_noFreeSeGroups, 0xFF, sizeof(m_noFreeSeGroups));
+    memset(m_noFreeWaves, 0xFF, sizeof(m_noFreeWaves));
 
-    redSound->ClearWaveBank(500);
-    redSound->ClearWaveBank(0);
+    m_redSound.ClearWaveBank(500);
+    m_redSound.ClearWaveBank(0);
 
     for (int i = 0; i < 4; i++) {
-        redSound->SetSeBlockData(i, nullptr);
+        m_redSound.SetSeBlockData(i, nullptr);
     }
 
-    redSound->End();
+    m_redSound.End();
 
-    u8*& streamBuffer = sound.m_streamBuffer;
-    if (streamBuffer != 0) {
-        delete[] streamBuffer;
-        streamBuffer = 0;
+    if (m_streamBuffer != 0) {
+        delete[] m_streamBuffer;
+        m_streamBuffer = 0;
     }
 
-    u8*& aramBuffer = sound.m_aramBuffer;
-    if (aramBuffer != 0) {
-        delete[] aramBuffer;
-        aramBuffer = 0;
+    if (m_aramBuffer != 0) {
+        delete[] m_aramBuffer;
+        m_aramBuffer = 0;
     }
 
-    Memory.DestroyStage(sound.m_stage);
+    Memory.DestroyStage(m_stage);
 }
 
 /*
@@ -549,127 +542,118 @@ inline void CSound::destroy()
  */
 void CSound::Realloc(int isMinMemoryMode)
 {
-    CRedSound* redSound = RedSound(this);
-    CSoundLayout& sound = SoundData(this);
-
-    CFile::CHandle*& waveFile = sound.m_waveFile;
-    CFile::CHandle*& streamFile = sound.m_streamFile;
-    int& streamPlaying = sound.m_streamPlaying;
-    int& streamID = sound.m_streamID;
-
-    if (waveFile != 0) {
-        File.Close(waveFile);
-        waveFile = 0;
+    if (m_waveFile != 0) {
+        File.Close(m_waveFile);
+        m_waveFile = 0;
         System.Printf(const_cast<char*>(s_soundLoadWaveErrorFmt));
     }
 
-    redSound->SetWaveData(-1, 0, 0);
+    m_redSound.SetWaveData(-1, 0, 0);
 
     bool wasStreaming = false;
-    if (streamPlaying != 0) {
-        if (redSound->StreamPlayState(streamID) != 0) {
+    if (m_streamPlaying != 0) {
+        if (m_redSound.StreamPlayState(m_streamID) != 0) {
             wasStreaming = true;
         }
     }
     if (wasStreaming) {
-        redSound->StreamStop(streamID);
+        m_redSound.StreamStop(m_streamID);
     }
 
-    if (streamFile != 0) {
-        File.Close(streamFile);
-        streamFile = 0;
+    if (m_streamFile != 0) {
+        File.Close(m_streamFile);
+        m_streamFile = 0;
     }
 
-    streamPlaying = 0;
+    m_streamPlaying = 0;
 
-    redSound->SeStop(-1);
-    redSound->ClearSeSepData(-1);
-    redSound->ClearWaveData(-3);
+    m_redSound.SeStop(-1);
+    m_redSound.ClearSeSepData(-1);
+    m_redSound.ClearWaveData(-3);
 
-    sound.m_seCount = 10000000;
-    memset(sound.m_seWork, 0, sizeof(sound.m_seWork));
-    memset(sound.m_noFreeSeGroups, 0xFF, sizeof(sound.m_noFreeSeGroups));
-    memset(sound.m_noFreeWaves, 0xFF, sizeof(sound.m_noFreeWaves));
+    m_seCount = 10000000;
+    memset(m_seWork, 0, sizeof(m_seWork));
+    memset(m_noFreeSeGroups, 0xFF, sizeof(m_noFreeSeGroups));
+    memset(m_noFreeWaves, 0xFF, sizeof(m_noFreeWaves));
 
-    redSound->ClearWaveBank(500);
-    redSound->ClearWaveBank(0);
+    m_redSound.ClearWaveBank(500);
+    m_redSound.ClearWaveBank(0);
 
     for (int i = 0; i < 4; i++) {
-        redSound->SetSeBlockData(i, 0);
+        m_redSound.SetSeBlockData(i, 0);
     }
 
-    redSound->End();
+    m_redSound.End();
 
     int streamHeapSize = (isMinMemoryMode != 0) ? 0x200000 : 0x800000;
     int waveHeapSize = (isMinMemoryMode != 0) ? 0xE00000 : 0x800000;
-    redSound->Init(sound.m_stage, 0x80000, waveHeapSize, streamHeapSize);
+    m_redSound.Init(m_aramBuffer, 0x80000, waveHeapSize, streamHeapSize);
 
-    u32 reportFlag = sound.m_debugPrint;
-    redSound->ReportPrint(((-reportFlag) | reportFlag) >> 31);
+    u32 reportFlag = m_debugPrint;
+    m_redSound.ReportPrint(((-reportFlag) | reportFlag) >> 31);
 
-    u32 soundMode = redSound->GetSoundMode();
-    redSound->SetSoundMode((u32)__cntlzw((u32)__cntlzw(soundMode) >> 5) >> 5);
+    m_redSound.SetSoundMode((u32)__cntlzw((u32)__cntlzw(m_redSound.GetSoundMode()) >> 5) >> 5);
 
-    redSound->MusicMasterVolume(sound.m_bgmMasterVolume);
-    redSound->SeMasterVolume(sound.m_seMasterVolume);
+    m_redSound.MusicMasterVolume(m_bgmMasterVolume);
+    m_redSound.SeMasterVolume(m_seMasterVolume);
 
-    redSound->SetReverb(1, 4);
-    redSound->SetReverbDepth(1, 0x40, 0xF);
+    m_redSound.SetReverb(1, 4);
+    m_redSound.SetReverbDepth(1, 0x40, 0xF);
 
-    waveFile = 0;
-    streamFile = 0;
-    streamPlaying = 0;
-    memset(sound.m_noFreeSeGroups, 0xFF, sizeof(sound.m_noFreeSeGroups));
-    memset(sound.m_noFreeWaves, 0xFF, sizeof(sound.m_noFreeWaves));
-    sound.m_pauseAllSe = 0;
+    m_waveFile = 0;
+    m_streamFile = 0;
+    m_streamPlaying = 0;
+    memset(m_noFreeSeGroups, 0xFF, sizeof(m_noFreeSeGroups));
+    memset(m_noFreeWaves, 0xFF, sizeof(m_noFreeWaves));
+    m_pauseAllSe = 0;
 
     if (isMinMemoryMode != 0) {
         return;
     }
 
-    if (redSound->ReentryWaveData(0) == -1) {
-        if (waveFile != 0) {
-            File.Close(waveFile);
-            waveFile = 0;
+    if (m_redSound.ReentryWaveData(0) == -1) {
+        if (m_waveFile != 0) {
+            File.Close(m_waveFile);
+            m_waveFile = 0;
             System.Printf(const_cast<char*>(s_soundLoadWaveErrorFmt));
         }
 
-        redSound->SetWaveData(-1, 0, 0);
+        m_redSound.SetWaveData(-1, 0, 0);
 
         char wavePath[256];
         sprintf(wavePath, s_soundWavePathFmt, 0);
-        waveFile = File.Open(wavePath, 0, CFile::PRI_LOW);
-        if (waveFile != 0) {
-            sound.m_waveRemain = File.GetLength(waveFile);
-            sound.m_waveOffset = 0;
-            sound.m_waveState = 0;
-            sound.m_waveID = 0;
-            sound.m_waveSyncMode = 1;
-            while (((u32)__cntlzw((u32)waveFile) >> 5) == 0) {
+        m_waveFile = File.Open(wavePath, 0, CFile::PRI_LOW);
+        if (m_waveFile != 0) {
+            m_waveRemain = File.GetLength(m_waveFile);
+            m_waveOffset = 0;
+            m_waveState = 0;
+            m_waveID = 0;
+            m_waveSyncMode = 1;
+            while (((u32)__cntlzw((u32)m_waveFile) >> 5) == 0) {
                 loadWaveFrame();
             }
         }
     }
 
-    if (redSound->ReentryWaveData(500) == -1) {
-        if (waveFile != 0) {
-            File.Close(waveFile);
-            waveFile = 0;
+    if (m_redSound.ReentryWaveData(500) == -1) {
+        if (m_waveFile != 0) {
+            File.Close(m_waveFile);
+            m_waveFile = 0;
             System.Printf(const_cast<char*>(s_soundLoadWaveErrorFmt));
         }
 
-        redSound->SetWaveData(-1, 0, 0);
+        m_redSound.SetWaveData(-1, 0, 0);
 
         char wavePath[256];
         sprintf(wavePath, s_soundWavePathFmt, 500);
-        waveFile = File.Open(wavePath, 0, CFile::PRI_LOW);
-        if (waveFile != 0) {
-            sound.m_waveRemain = File.GetLength(waveFile);
-            sound.m_waveOffset = 0;
-            sound.m_waveState = 0;
-            sound.m_waveID = 1;
-            sound.m_waveSyncMode = 1;
-            while (((u32)__cntlzw((u32)waveFile) >> 5) == 0) {
+        m_waveFile = File.Open(wavePath, 0, CFile::PRI_LOW);
+        if (m_waveFile != 0) {
+            m_waveRemain = File.GetLength(m_waveFile);
+            m_waveOffset = 0;
+            m_waveState = 0;
+            m_waveID = 1;
+            m_waveSyncMode = 1;
+            while (((u32)__cntlzw((u32)m_waveFile) >> 5) == 0) {
                 loadWaveFrame();
             }
         }
@@ -682,7 +666,7 @@ void CSound::Realloc(int isMinMemoryMode)
         if (handle != 0) {
             File.Read(handle);
             File.SyncCompleted(handle);
-            redSound->SetSeBlockData(i, File.m_readBuffer);
+            m_redSound.SetSeBlockData(i, File.m_readBuffer);
             File.Close(handle);
         }
     }
@@ -1008,29 +992,27 @@ void CSound::LoadWaveASync(int waveNo, int waveId, int syncMode)
 {
     if (waveNo < 0) {
         System.Printf(const_cast<char*>(s_soundMinusOneFmt));
-    } else if (RedSound(this)->ReentryWaveData(waveNo) == -1) {
-        CSoundLayout& sound = SoundData(this);
-        CFile::CHandle*& waveFile = sound.m_waveFile;
-        if (waveFile != 0) {
-            File.Close(waveFile);
-            waveFile = 0;
+    } else if (m_redSound.ReentryWaveData(waveNo) == -1) {
+        if (m_waveFile != 0) {
+            File.Close(m_waveFile);
+            m_waveFile = 0;
             System.Printf(const_cast<char*>(s_soundLoadWaveErrorFmt));
         }
 
-        RedSound(this)->SetWaveData(-1, nullptr, 0);
+        m_redSound.SetWaveData(-1, nullptr, 0);
 
         char wavePath[244];
         sprintf(wavePath, s_soundWavePathFmt, waveNo);
-        waveFile = File.Open(wavePath, 0, CFile::PRI_LOW);
-        if (waveFile != 0) {
-            sound.m_waveRemain = File.GetLength(waveFile);
-            sound.m_waveOffset = 0;
-            sound.m_waveState = 0;
-            sound.m_waveID = waveId;
-            sound.m_waveSyncMode = syncMode;
+        m_waveFile = File.Open(wavePath, 0, CFile::PRI_LOW);
+        if (m_waveFile != 0) {
+            m_waveRemain = File.GetLength(m_waveFile);
+            m_waveOffset = 0;
+            m_waveState = 0;
+            m_waveID = waveId;
+            m_waveSyncMode = syncMode;
 
             if (syncMode != 0) {
-                while (((u32)__cntlzw((u32)waveFile) >> 5) == 0) {
+                while (((u32)__cntlzw((u32)m_waveFile) >> 5) == 0) {
                     loadWaveFrame();
                 }
             }

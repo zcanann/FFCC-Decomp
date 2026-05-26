@@ -84,28 +84,6 @@ static const double DOUBLE_803333b8 = 20.0;
 static const double DOUBLE_803333c0 = 8.0;
 extern "C" int gCmakePreviousStep;
 extern "C" char s_menuSubfontPathFmt[];
-extern "C" char* PTR_s_world2[] = {
-    const_cast<char*>("world2"),
-    const_cast<char*>("world27"),
-    const_cast<char*>("world28"),
-    const_cast<char*>("world29"),
-    const_cast<char*>("world44"),
-    const_cast<char*>("world45"),
-    const_cast<char*>("world48"),
-    const_cast<char*>("world49"),
-    const_cast<char*>("world51"),
-};
-extern "C" CMenuPcs::CTmp s_cmakeWorldTextureTable[] = {
-    {8, PTR_s_world2[0]},
-    {8, PTR_s_world2[1]},
-    {8, PTR_s_world2[2]},
-    {8, PTR_s_world2[3]},
-    {8, PTR_s_world2[4]},
-    {8, PTR_s_world2[5]},
-    {8, PTR_s_world2[6]},
-    {8, PTR_s_world2[7]},
-    {8, PTR_s_world2[8]},
-};
 extern "C" {
 extern "C" const char s_cmake_cpp[] = "cmake.cpp";
 }
@@ -134,9 +112,6 @@ struct CmakeMenuFields {
     void* m_villageWork;
 };
 STATIC_ASSERT(sizeof(CmakeMenuFields) == 0x834);
-
-static CmakeInfo s_CmakeInfo;
-static char s_CmakeVillageName[0x10];
 
 static inline CmakeMenuFields& CmakeFields(CMenuPcs* menu)
 {
@@ -311,23 +286,75 @@ static inline CFont* GetCmakeKeyboardFont(CMenuPcs* menu)
     return CmakeFields(menu).m_fonts[CMAKE_FONT_VILLAGE];
 }
 
+extern "C" const char s_ABCDEFGHIJKL_801E2F30[];
+extern "C" const char s_MNOPQRSTUVWX_801E2F40[];
+extern "C" const char lbl_801E2F50[];
+extern "C" const char lbl_801E2F60[];
+extern "C" const char lbl_801E2F70[];
+extern "C" const char s_abcdefghijkl_801E2F80[];
+extern "C" const char s_mnopqrstuvwx_801E2F90[];
+extern "C" const char lbl_801E2FA0[];
+extern "C" const char lbl_801E2FB0[];
+extern "C" const char lbl_801E2FC0[];
+extern "C" const char s_str_0123456789_801E2FD0[];
+extern "C" const char lbl_801E2FE0[];
+extern "C" const char lbl_801E2FF0[];
+extern "C" const char lbl_801E3000[];
+extern "C" const char lbl_801E3010[];
+extern "C" char lbl_803331F0[];
+extern "C" char lbl_803331F8[];
+extern "C" char lbl_80333200[];
+extern "C" char lbl_80333208[];
+extern "C" char lbl_80333210[];
+extern "C" char lbl_80333218[];
+extern "C" char lbl_80333220[];
+extern "C" char lbl_80333228[];
+extern "C" char lbl_80333230[];
+extern "C" char lbl_80333238[];
+
 extern "C" const char* s_NameEntryStr[] = {
-    "ABCDEFGHIJKL",
-    "MNOPQRSTUVWX",
-    "YZ.-'      ",
-    "0123456789!?",
-    " /+*=_:;(), ",
-    "abcdefghijkl",
-    "mnopqrstuvwx",
-    "yz.-'      ",
-    "0123456789!?",
-    " /+*=_:;(), ",
-    "ABCDEFGHIJKL",
-    "MNOPQRSTUVWX",
-    "YZ!?-+*/=<>",
-    "0123456789@#",
-    " .,:;'\"()[] "
+    s_ABCDEFGHIJKL_801E2F30,
+    s_MNOPQRSTUVWX_801E2F40,
+    lbl_801E2F50,
+    lbl_801E2F60,
+    lbl_801E2F70,
+    s_abcdefghijkl_801E2F80,
+    s_mnopqrstuvwx_801E2F90,
+    lbl_801E2FA0,
+    lbl_801E2FB0,
+    lbl_801E2FC0,
+    s_str_0123456789_801E2FD0,
+    lbl_801E2FE0,
+    lbl_801E2FF0,
+    lbl_801E3000,
+    lbl_801E3010
 };
+
+extern "C" char* PTR_s_world2[] = {
+    lbl_803331F0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+};
+extern "C" CMenuPcs::CTmp s_cmakeWorldTextureTable[] = {
+    {8, lbl_803331F8},
+    {8, lbl_80333200},
+    {8, lbl_80333208},
+    {8, lbl_80333210},
+    {8, lbl_80333218},
+    {8, lbl_80333220},
+    {8, lbl_80333228},
+    {8, lbl_80333230},
+    {8, lbl_80333238},
+};
+
+static CmakeInfo s_CmakeInfo;
+static char s_CmakeVillageName[0x10];
 
 struct CmakeFlatTableEntry {
     int count;

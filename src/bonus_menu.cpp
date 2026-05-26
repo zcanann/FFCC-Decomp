@@ -1293,7 +1293,7 @@ void CMenuPcs::DrawBonusFrame(float x, float y, float w, float h, float alpha)
 
 	_GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(255.0 * alpha)};
 	const float corner = 8.0f;
-	const float texScale = 0.125f;
+	const float texScale = 1.0f;
 	const float right = (x + w) - corner;
 	const float bottom = (y + h) - corner;
 

@@ -12,8 +12,6 @@ typedef signed short s16;
 
 unsigned char s_rank[0x20];
 
-extern "C" const float FLOAT_80333038 = 0.75f;
-extern "C" const float FLOAT_8033303C = 72.0f;
 extern "C" const float FLOAT_80333040 = 0.0f;
 extern "C" const float FLOAT_80333044 = 32.0f;
 extern "C" const float FLOAT_80333048 = 1.0f;
@@ -24,9 +22,6 @@ extern "C" const double DOUBLE_80333060 = 0.5;
 extern "C" const char s_FavoRankFormat_80333068[] = "%d";
 extern "C" const float FLOAT_8033306C = 4.0f;
 extern "C" const float FLOAT_80333070 = 0.9f;
-extern "C" const double DOUBLE_80333078 = 4503601774854144.0;
-extern "C" const float FLOAT_80333080 = 384.0f;
-extern "C" const float FLOAT_80333084 = 0.75f;
 
 struct FavoFlatTableEntry
 {
@@ -572,7 +567,7 @@ void CMenuPcs::FavoInit()
 	setupEntry->w = 0x158;
 	setupEntry->h = 0x20;
 	fVar4 = FLOAT_80333040;
-	fVar5 = FLOAT_80333080;
+	fVar5 = 384.0f;
 	setupEntry->u = fVar4;
 	setupEntry->v = fVar4;
 	setupEntry->uvScale = fVar5 / (float)setupEntry->w;
@@ -604,7 +599,7 @@ void CMenuPcs::FavoInit()
 	setupEntry->duration = 5;
 
 	sVar9 = 0;
-	fVar7 = FLOAT_80333084;
+	fVar7 = 0.75f;
 	sVar11 = 6;
 	setupEntry = &favoList->entries[3];
 	setupEntry->tex = 0x45;

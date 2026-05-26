@@ -167,11 +167,10 @@ int CLine<10>::Calc(Vec* outPos, float* outDistance, u32* outIndex, float* outT,
     float bestT = kLineSegmentMinT;
     Vec bestPos;
 
-    for (u32 i = 0; i + 1 < pointCount; i++) {
-        Vec* candidate = &points[i];
-        float distanceSq = PSVECSquareDistance(candidate, queryPos);
+    for (u32 i = 0; i < pointCount - 1; i++) {
+        float distanceSq = PSVECSquareDistance(&points[i], queryPos);
         if (distanceSq < maxDistanceSq || infiniteRange) {
-            Vec candidatePosition = *candidate;
+            Vec candidatePosition = points[i];
             float distance = sqrtf(distanceSq);
             if (distance < bestDistance) {
                 bestDistance = distance;
@@ -182,11 +181,10 @@ int CLine<10>::Calc(Vec* outPos, float* outDistance, u32* outIndex, float* outT,
             }
         }
 
-        if (i + 1 == pointCount - 1) {
-            candidate = &points[i + 1];
-            distanceSq = PSVECSquareDistance(candidate, queryPos);
+        if (i == pointCount - 2) {
+            distanceSq = PSVECSquareDistance(&points[i + 1], queryPos);
             if (distanceSq < maxDistanceSq || infiniteRange) {
-                Vec candidatePosition = *candidate;
+                Vec candidatePosition = points[i + 1];
                 float distance = sqrtf(distanceSq);
                 if (distance < bestDistance) {
                     bestDistance = distance;
@@ -201,10 +199,10 @@ int CLine<10>::Calc(Vec* outPos, float* outDistance, u32* outIndex, float* outT,
         CLineSegment& segment = segments[i];
         const float dotQuery = PSVECDotProduct(queryPos, &segment.delta);
         const float dotStart = PSVECDotProduct(&points[i], &segment.delta);
-        const float t = (dotQuery - dotStart) / (segment.length * segment.length);
-        if (((kLineSegmentMinT <= t) && (t <= kLineSegmentMaxT)) || infiniteRange) {
-            Vec scaled;
+        const float t = (-dotStart + dotQuery) / (segment.length * segment.length);
+        if (((t >= kLineSegmentMinT) && (t <= kLineSegmentMaxT)) || infiniteRange) {
             Vec projected;
+            Vec scaled;
             PSVECScale(&segment.delta, &scaled, t);
             PSVECAdd(&points[i], &scaled, &projected);
             const float distance = PSVECDistance(queryPos, &projected);
@@ -289,9 +287,6 @@ void CLine<10>::Draw()
 
 void CLine<10>::CalcBound()
 {
-    Vec* point = points;
-    CLineSegment* segment = segments;
-
     min.x = kLineBoundsInitMin;
     min.y = kLineBoundsInitMin;
     min.z = kLineBoundsInitMin;
@@ -302,40 +297,37 @@ void CLine<10>::CalcBound()
 
     u32 i = 0;
     while (i < pointCount) {
+        if (points[i].x < min.x) {
+            min.x = points[i].x;
+        }
+        if (points[i].y < min.y) {
+            min.y = points[i].y;
+        }
+        if (points[i].z < min.z) {
+            min.z = points[i].z;
+        }
 
-        if (point->x < min.x) {
-            min.x = point->x;
+        if (points[i].x > max.x) {
+            max.x = points[i].x;
         }
-        if (point->y < min.y) {
-            min.y = point->y;
+        if (points[i].y > max.y) {
+            max.y = points[i].y;
         }
-        if (point->z < min.z) {
-            min.z = point->z;
-        }
-
-        if (point->x > max.x) {
-            max.x = point->x;
-        }
-        if (point->y > max.y) {
-            max.y = point->y;
-        }
-        if (point->z > max.z) {
-            max.z = point->z;
+        if (points[i].z > max.z) {
+            max.z = points[i].z;
         }
 
         if (i != 0) {
-            CLineSegment* prevSegment = segment - 1;
-            PSVECSubtract(point, point - 1, &prevSegment->delta);
-            prevSegment->length = PSVECMag(&prevSegment->delta);
-            prevSegment->startLength = totalLength;
-            totalLength += prevSegment->length;
-            if (prevSegment->length != kLineSegmentMinT) {
-                PSVECNormalize(&prevSegment->delta, &prevSegment->normal);
+            u32 prevIndex = i - 1;
+            PSVECSubtract(&points[i], &points[prevIndex], &segments[prevIndex].delta);
+            segments[prevIndex].length = PSVECMag(&segments[prevIndex].delta);
+            segments[prevIndex].startLength = totalLength;
+            totalLength += segments[prevIndex].length;
+            if (segments[prevIndex].length != kLineSegmentMinT) {
+                PSVECNormalize(&segments[prevIndex].delta, &segments[prevIndex].normal);
             }
         }
 
-        point++;
-        segment++;
         i++;
     }
 }

@@ -2025,6 +2025,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 			y += 0x60;
 		}
 
+		s_PlayerTop = (unsigned char)idx;
 		for (int i = 0; i < activePartyCount; i++) {
 			InitAnimSprite(&sprites[idx], -2, 0, 0, 0, 0, sprites[iconBase + i].startFrame, 8);
 			sprites[idx].tex = 0;
@@ -2035,6 +2036,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 			idx++;
 		}
 
+		s_ArtiTop = (unsigned char)idx;
 		for (int i = 0; i < 8; i++) {
 			int start = (int)((float)(10 + i * 5) * 0.6f);
 			InitAnimSprite(&sprites[idx], -2, 0, 0, 0, 0, start, 0x21);

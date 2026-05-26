@@ -1667,12 +1667,10 @@ void CMenuPcs::LoadExtraFont(int fontNo, char* fileName)
  */
 void CMenuPcs::SetExtraFontTlut(int fontNo, _GXColor color)
 {
-    fontNo *= 4;
-    u8* fontSlot = reinterpret_cast<u8*>(this) + 0x100 + fontNo;
     CTexture* texture;
 
     for (int i = 0; i < 0x10; i++) {
-        texture = *reinterpret_cast<CTexture**>(*reinterpret_cast<u32*>(fontSlot) + 0x34);
+        texture = m_fonts[fontNo]->texturePtr;
         _GXColor out = texture->GetTlutColor(i);
 
         if (i < 9) {
@@ -1689,7 +1687,7 @@ void CMenuPcs::SetExtraFontTlut(int fontNo, _GXColor color)
         texture->SetTlutColor(i, out);
     }
 
-    texture = *reinterpret_cast<CTexture**>(*reinterpret_cast<u32*>(fontSlot) + 0x34);
+    texture = m_fonts[fontNo]->texturePtr;
     texture->FlushTlut();
 }
 

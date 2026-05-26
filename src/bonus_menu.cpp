@@ -3077,10 +3077,6 @@ void CMenuPcs::calcBonus()
 	int animPtr = GetBonusMenuMembers(this).m_bonusAnimPtr;
 	short state;
 
-	if (statePtr == 0 || animPtr == 0) {
-		return;
-	}
-
 	*reinterpret_cast<float*>(statePtr) =
 	    static_cast<float>((double)*reinterpret_cast<float*>(statePtr) - kPppCrystal2RefractionScale);
 

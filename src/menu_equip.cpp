@@ -779,15 +779,14 @@ int CMenuPcs::EquipClose()
 
 	for (int i = 0; i < itemCount; i++) {
 		if (*reinterpret_cast<int*>(item + 0x12) <= timer) {
-			if (timer >= (*reinterpret_cast<int*>(item + 0x12) + *reinterpret_cast<int*>(item + 0x14))) {
+			if (*reinterpret_cast<int*>(item + 0x12) + *reinterpret_cast<int*>(item + 0x14) <= timer) {
 				doneCount++;
 				*reinterpret_cast<float*>(item + 8) = FLOAT_80332eb8;
 			} else {
 				*reinterpret_cast<int*>(item + 0x10) = *reinterpret_cast<int*>(item + 0x10) + 1;
 				*reinterpret_cast<float*>(item + 8) =
-				    (float)-((DOUBLE_80332ec0 /
-				              (static_cast<double>(*reinterpret_cast<int*>(item + 0x14)) - DOUBLE_80332ed8)) *
-				                 (static_cast<double>(*reinterpret_cast<int*>(item + 0x10)) - DOUBLE_80332ed8) -
+				    (float)-((DOUBLE_80332ec0 / static_cast<double>(*reinterpret_cast<int*>(item + 0x14))) *
+				                 static_cast<double>(*reinterpret_cast<int*>(item + 0x10)) -
 				             DOUBLE_80332ec0);
 				if ((double)*reinterpret_cast<float*>(item + 8) < DOUBLE_80332F08) {
 					*reinterpret_cast<float*>(item + 8) = FLOAT_80332eb8;

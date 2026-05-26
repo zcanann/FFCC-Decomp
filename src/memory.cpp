@@ -59,7 +59,7 @@ extern char sMainMemoryStageName[];
 extern char sDrawHeapUseUnuseFmt[];
 extern char sDrawHeapAmemAnimFmt[];
 extern char sEmptyAllocSourceName[4];
-extern char sHeapWalkerNewline[];
+extern const char sHeapWalkerNewline[];
 extern char sHeapWalkerSlashLine[];
 extern const char* s_amemCacheTypeNames_801E8470[];
 extern const char* s_amemCacheStateNames_8032E410[];
@@ -316,16 +316,15 @@ unsigned int CheckSum(void* data, int size)
             } while (blockCount != 0);
 
             size &= 7;
-            if (size == 0) {
-                return checksum;
-            }
         }
 
-        do {
-            checksum += *bytes;
-            bytes++;
-            size--;
-        } while (size != 0);
+        if (size != 0) {
+            do {
+                checksum += *bytes;
+                bytes++;
+                size--;
+            } while (size != 0);
+        }
     }
 
     return checksum;
@@ -1126,10 +1125,11 @@ void CMemory::CStage::free(void*)
 int CMemory::CStage::heapWalker(int flag, void*, unsigned long group)
 {
     int mode = stageGetAllocationMode(this);
-    int node = stageGetHeapHead(this);
-
-    if (mode != 2) {
-        node = *reinterpret_cast<int*>(node + 8);
+    int node;
+    if (mode == 2) {
+        node = stageGetHeapHead(this);
+    } else {
+        node = *reinterpret_cast<int*>(stageGetHeapHead(this) + 8);
     }
 
     if (flag == -1) {
@@ -1146,25 +1146,23 @@ int CMemory::CStage::heapWalker(int flag, void*, unsigned long group)
     int usedSize = 0;
 
     if (mode == 2) {
-        int top = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 8);
-        int tail = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 12);
-        int count = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x120);
+        int top = m_heapTop;
 
-        for (int i = 0; i <= count; i++) {
-            int blockTail = (i == count) ? tail : *reinterpret_cast<int*>(node + 4);
+        for (int i = 0; i <= m_blockCount; i++) {
+            int blockTail = (i == m_blockCount) ? m_heapBottom : *reinterpret_cast<int*>(node + 4);
             int size = blockTail - top;
             if (size != 0) {
                 if ((flag & 1) != 0) {
                     System.Printf(
                         const_cast<char*>(sHeapWalkerEntryFmt), freeCount, "FREE", 0, top - blockTail, totalSize, 0, 0, 0,
-                        "-------", 0);
+                        sEmptyAllocSourceName, 0);
                 }
                 usedSize += size;
                 totalSize += size;
                 freeCount++;
             }
 
-            if (i < count) {
+            if (i < m_blockCount) {
                 int used = *reinterpret_cast<int*>(node + 8) - *reinterpret_cast<int*>(node + 4);
                 if ((flag & 2) != 0) {
                     System.Printf(
@@ -1190,7 +1188,7 @@ int CMemory::CStage::heapWalker(int flag, void*, unsigned long group)
                 if ((isUsed && ((flag & 2) != 0)) || (!isUsed && ((flag & 1) != 0))) {
                     const char* kind = isUsed ? "USED" : "FREE";
                     unsigned char level = isUsed ? *reinterpret_cast<unsigned char*>(node + 3) : 0;
-                    const char* source = isUsed ? reinterpret_cast<char*>(node + 0x1A) : "-------";
+                    const char* source = isUsed ? reinterpret_cast<char*>(node + 0x1A) : sEmptyAllocSourceName;
                     unsigned short line = isUsed ? *reinterpret_cast<unsigned short*>(node + 0x18) : 0;
                     int index = isUsed ? usedCount : freeCount;
                     System.Printf(
@@ -1441,7 +1439,12 @@ void CMemory::CStage::drawHeapTitle(int y)
  */
 int CMemory::CStage::GetHeapUnuse()
 {
-    int node = (m_allocationMode == 2) ? stageGetHeapHead(this) : *reinterpret_cast<int*>(stageGetHeapHead(this) + 8);
+    int node;
+    if (m_allocationMode == 2) {
+        node = stageGetHeapHead(this);
+    } else {
+        node = *reinterpret_cast<int*>(stageGetHeapHead(this) + 8);
+    }
     int total = 0;
 
     while ((*reinterpret_cast<unsigned char*>(node + 2) & 2) == 0) {

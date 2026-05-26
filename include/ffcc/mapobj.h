@@ -157,7 +157,10 @@ public:
     char m_pad19[2];
     unsigned char m_calcMtxPending; // 0x1B
     unsigned char m_localMtxDirty;  // 0x1C
-    char m_pad1D[0x11];
+    char m_pad1D[0x0B];
+    short m_cameraSemiTransAlpha;       // 0x28
+    short m_cameraSemiTransTargetAlpha; // 0x2A
+    short m_cameraSemiTransStep;        // 0x2C
     unsigned short m_objId;         // 0x2E
     char m_pad30[4];
     unsigned short m_meshId;        // 0x34
@@ -165,11 +168,15 @@ public:
     float m_transRateX;             // 0x58
     float m_transRateY;             // 0x5C
     float m_transRateZ;             // 0x60
-    char m_pad64[0x24];
+    char m_pad64[0x0C];
+    float m_worldMapLightX;         // 0x70
+    float m_worldMapLightY;         // 0x74
+    float m_worldMapLightZ;         // 0x78
+    char m_pad7C[0x0C];
     float m_localMtx[3][4];         // 0x88
     float m_worldMtx[3][4];         // 0xB8
     _GXColor m_ambientColor;        // 0xE8
-    char m_padEC[0x04];
+    CMapObjAtr* m_attribute;        // 0xEC
 };
 
 typedef char CMapObj_size_check[(sizeof(CMapObj) == 0xF0) ? 1 : -1];

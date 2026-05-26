@@ -49,8 +49,8 @@ static const char s_p_tina_rodata_801d7ee0[] = {
     (char)0x68, (char)0x72, (char)0x6F, (char)0x6E, (char)0x69, (char)0x63, (char)0x6C, (char)0x65,
     (char)0x73, (char)0x00, (char)0x00, (char)0x00,
 };
-static const char s_CPartPcs_GAME_801D7F2C[] = "CPartPcs_GAME";
-static const char s_CPartPcs_PART_VIEWER_801D7F3C[] = "CPartPcs_PART_VIEWER";
+static const char s_CPartPcs_GAME_801D7F2C[] = "CPartPcs(GAME)";
+static const char s_CPartPcs_PART_VIEWER_801D7F3C[] = "CPartPcs(PART_VIEWER)";
 static const char s_CPartPcs_801d7f54[] = "CPartPcs";
 static const char sPartPcsManagerClassName[] = "CManager";
 static const char sPartPcsProcessClassName[] = "CProcess";
@@ -60,7 +60,7 @@ static const char s_dvd__smenu__s_801d7fb0[] = "dvd/%smenu/%s";
 static const char s_dvd_tina_mon_m_03d_801d7fc0[] = "dvd/tina/mon/m%03d";
 static const char s_dvd_tina_mon_m_03d__c_801d7fd4[] = "dvd/tina/mon/m%03d_%c";
 static const char s_dvd_tina_stage_03d_fp_03d_801d7fec[] = "dvd/tina/stage%03d/fp%03d";
-extern "C" const char s_p_tina_cpp[];
+extern "C" const char s_p_tina_cpp[] = "p_tina.cpp";
 static const char s_tina_title_fmt_801d8014[] = "Tina [%c]";
 static const char s_tina_calc_fmt_801d8020[] = "clc=%.3f%%  max=%.3f%%";
 static const char s_tina_draw_fmt_801d8038[] = "drw=%.3f%%  max=%.3f%%";

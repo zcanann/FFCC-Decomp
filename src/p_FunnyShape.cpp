@@ -394,7 +394,6 @@ void CPtrArray<OSFS_TEXTURE_ST*>::RemoveAll()
  */
 inline CFunnyShapePcs::CFunnyShapePcs()
 {
-    new (UsbStream(this)) CUSBStreamData;
     new (TextureHeaders(this)) CPtrArray<OSFS_TEXTURE_ST*>;
     new (TextureObjects(this)) CPtrArray<_GXTexObj*>;
 }
@@ -446,6 +445,11 @@ CFunnyShapePcs::~CFunnyShapePcs()
 CUSBStreamDataStorage::~CUSBStreamDataStorage()
 {
     reinterpret_cast<CUSBStreamData*>(this)->~CUSBStreamData();
+}
+
+CUSBStreamDataStorage::CUSBStreamDataStorage()
+{
+    new (this) CUSBStreamData;
 }
 
 template <>

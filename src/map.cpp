@@ -3221,11 +3221,11 @@ void CMapMng::SetMeshCameraSemiTransAlpha(unsigned short id, int alpha, int fram
 
     for (int i = 0; i < m_mapObjCount; i++) {
         if (mapObj->m_meshId == id) {
-            *reinterpret_cast<short*>(Ptr(mapObj, 0x2A)) = static_cast<short>(alpha << 7);
+            mapObj->m_cameraSemiTransTargetAlpha = static_cast<short>(alpha << 7);
             found = 1;
-            *reinterpret_cast<short*>(Ptr(mapObj, 0x2C)) = static_cast<short>(
-                (static_cast<int>(*reinterpret_cast<short*>(Ptr(mapObj, 0x2A))) -
-                 static_cast<int>(*reinterpret_cast<short*>(Ptr(mapObj, 0x28)))) /
+            mapObj->m_cameraSemiTransStep = static_cast<short>(
+                (static_cast<int>(mapObj->m_cameraSemiTransTargetAlpha) -
+                 static_cast<int>(mapObj->m_cameraSemiTransAlpha)) /
                 frameCount);
         }
         mapObj++;
@@ -3575,8 +3575,8 @@ found:
     const float posX = position.x;
     const float posY = position.y;
     const float posZ = position.z;
-    unsigned char* mapObj = reinterpret_cast<unsigned char*>(GetMapObjArray() + objIndex);
-    unsigned char* mapObjLight = *reinterpret_cast<unsigned char**>(mapObj + 0xEC);
+    CMapObj* mapObj = GetMapObjArray() + objIndex;
+    unsigned char* mapObjLight = reinterpret_cast<unsigned char*>(mapObj->m_attribute);
 
     if (*reinterpret_cast<int*>(mapObjLight + 4) == CMapObjAtr::SPOT_LIGHT) {
         const unsigned char* colorBytes = reinterpret_cast<const unsigned char*>(&packedColor);
@@ -3584,11 +3584,11 @@ found:
         *reinterpret_cast<unsigned char*>(mapObjLight + 9) = colorBytes[1];
         *reinterpret_cast<unsigned char*>(mapObjLight + 10) = colorBytes[2];
         *reinterpret_cast<unsigned char*>(mapObjLight + 11) = colorBytes[3];
-        *reinterpret_cast<float*>(mapObj + 0x70) = posX;
-        *reinterpret_cast<float*>(mapObj + 0x74) = posY;
-        *reinterpret_cast<float*>(mapObj + 0x78) = posZ;
-        *reinterpret_cast<unsigned char*>(mapObj + 0x1C) = 1;
-        *reinterpret_cast<unsigned char*>(mapObj + 0x1B) = 1;
+        mapObj->m_worldMapLightX = posX;
+        mapObj->m_worldMapLightY = posY;
+        mapObj->m_worldMapLightZ = posZ;
+        mapObj->m_localMtxDirty = 1;
+        mapObj->m_calcMtxPending = 1;
     }
 }
 

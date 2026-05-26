@@ -145,18 +145,21 @@ void CGraphic::Init()
     u32 alignedWidth = (U16At(renderMode, 4) + 0xF) & 0xFFF0;
     u16 efbHeight = U16At(renderMode, 6);
     u16 xfbHeight = U16At(renderMode, 8);
+    u32 efbBufferSize = alignedWidth * efbHeight * 2;
+    u32 xfbBufferSize = alignedWidth * xfbHeight * 2;
 
     PtrAt(this, 0x71E4) = new (reinterpret_cast<CMemory::CStage*>(PtrAt(this, 0x4)), graphicFileName, 0x86)
-        u8[alignedWidth * xfbHeight * 2];
+        u8[xfbBufferSize];
     memset(PtrAt(this, 0x71E4), 0, 4);
 
     PtrAt(this, 0x71EC) = new (reinterpret_cast<CMemory::CStage*>(PtrAt(this, 0x4)), graphicFileName, 0x88)
-        u8[alignedWidth * efbHeight * 2];
+        u8[efbBufferSize];
     memset(PtrAt(this, 0x71EC), 0, 4);
 
+    renderMode = PtrAt(this, 0x71E0);
+    u32 scratchBufferSize = (((U16At(renderMode, 4) + 0xF) & 0xFFF0) * U16At(renderMode, 6) * 2) + 0x46000;
     PtrAt(this, 0x71E8) =
-        Memory._Alloc(alignedWidth * efbHeight * 2 + 0x46000, reinterpret_cast<CMemory::CStage*>(PtrAt(this, 0x8)),
-                      graphicFileName, 0xB53, 0);
+        Memory._Alloc(scratchBufferSize, reinterpret_cast<CMemory::CStage*>(PtrAt(this, 0x8)), graphicFileName, 0xB53, 0);
     memset(PtrAt(this, 0x71E8), 0, 0x46004);
 
     PtrAt(this, 0x10) =
@@ -386,8 +389,8 @@ void CGraphic::BeginFrame()
     const bool useDebugPad = (Pad._452_4_ != 0) || (Pad._448_4_ != -1);
     u16 buttons = 0;
     if (!useDebugPad) {
-        __cntlzw(static_cast<unsigned int>(Pad._448_4_));
-        buttons = Pad.GetPadInputs()[0].button[0];
+        int padIndex = (Pad._448_4_ == 0) ? Pad._448_4_ : 0;
+        buttons = Pad.GetPadInputs()[padIndex].lockedButton[1];
     }
 
     if ((buttons & 2) != 0) {
@@ -1046,12 +1049,13 @@ void CGraphic::DrawSphere(float (*mtx)[4], _GXColor color)
 void CGraphic::makeSphere()
 {
     float vertices[126];
-    int vertexCount = 1;
-    float* vertex = vertices + 3;
 
-    vertices[0] = FLOAT_8032F6D0;
     vertices[1] = kGraphicZeroF;
+    vertices[0] = FLOAT_8032F6D0;
     vertices[2] = kGraphicZeroF;
+
+    float* vertex = vertices + 3;
+    int vertexCount = 1;
 
     for (int ring = 0; ring < 5; ring++) {
         float pitch = (FLOAT_8032F6E0 * (float)(ring + 1)) / FLOAT_8032F700;

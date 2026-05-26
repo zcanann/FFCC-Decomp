@@ -491,12 +491,12 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* work, PYmMegaBirthShpT
         }
 
         pppGetRotMatrixXYZ(rot, (pppIVECTOR4*)angles);
-        PSMTXMultVecSR(rot.value, &baseDir, &particleData->m_velocity);
-        particleData->m_velocity.x *= *(float*)(paramBytes + 0x58);
-        particleData->m_velocity.y *= param->m_speedScale.x;
-        particleData->m_velocity.z *= param->m_speedScale.y;
-        tempVec = particleData->m_velocity;
-        pppNormalize(particleData->m_velocity, tempVec);
+        PSMTXMultVecSR(rot.value, &baseDir, reinterpret_cast<Vec*>(particleData->m_matrix[1]));
+        reinterpret_cast<Vec*>(particleData->m_matrix[1])->x *= *(float*)(paramBytes + 0x58);
+        reinterpret_cast<Vec*>(particleData->m_matrix[1])->y *= param->m_speedScale.x;
+        reinterpret_cast<Vec*>(particleData->m_matrix[1])->z *= param->m_speedScale.y;
+        tempVec = *reinterpret_cast<Vec*>(particleData->m_matrix[1]);
+        pppNormalize(*reinterpret_cast<Vec*>(particleData->m_matrix[1]), tempVec);
     }
 
     if ((mode < 6) && (param->m_speedRandRange != 0.0f)) {
@@ -590,8 +590,8 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* work, PYmMegaBirthShpT
                 particleData->m_matrix[0][2] = vz * param->m_speedScale.y;
 
                 if ((mode == 8) || (mode == 9)) {
-                    Vec velocity = particleData->m_velocity;
-                    pppNormalize(particleData->m_velocity, velocity);
+                    Vec velocity = *reinterpret_cast<Vec*>(particleData->m_matrix[0]);
+                    pppNormalize(*reinterpret_cast<Vec*>(particleData->m_matrix[1]), velocity);
                 }
             }
         }
@@ -613,16 +613,16 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* work, PYmMegaBirthShpT
             scale = -(LoadFloat(FLOAT_80330568) * (Math.RandF() * (speedRandRange * Math.RandF() * Math.RandF())) - speedRandRange);
         }
 
-        Vec velocity = particleData->m_velocity;
-        pppScaleVectorXYZ(particleData->m_velocity, velocity, scale);
+        Vec velocity = *reinterpret_cast<Vec*>(particleData->m_matrix[1]);
+        pppScaleVectorXYZ(*reinterpret_cast<Vec*>(particleData->m_matrix[1]), velocity, scale);
     }
 
     if (paramBytes[0x16] != 0) {
-        particleData->m_directionTail.x = (float)vColor->m_alpha;
-        *(((u8*)&particleData->m_directionTail.y) + 1) = paramBytes[0x16];
+        *(float*)(particleBytes + 0x30) = (float)vColor->m_alpha;
+        particleBytes[0x35] = paramBytes[0x16];
     }
     if (paramBytes[0x17] != 0) {
-        *(((u8*)&particleData->m_directionTail.y) + 2) = paramBytes[0x17];
+        particleBytes[0x36] = paramBytes[0x17];
     }
 
     particleData->m_matrix[2][2] = param->m_colorDeltaAdd[1];

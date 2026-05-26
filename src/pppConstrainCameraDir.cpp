@@ -6,6 +6,8 @@
 #include "ffcc/pppYmEnv.h"
 #include <dolphin/mtx.h>
 
+extern const float kConstrainCameraDirLocalScaleOne = 1.0f;
+
 /*
  * --INFO--
  * PAL Address: 80143098
@@ -36,13 +38,13 @@ void pppFrameConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir, pp
             float cameraPosX = CameraPcs.m_positionX;
             float cameraPosY = CameraPcs.m_positionY;
             float cameraPosZ = CameraPcs.m_positionZ;
-            float scale = kConstrainCameraDirScaleOne + ((CameraPcs.m_fov - 25.0f) / 25.0f);
+            float scale = 1.0f + ((CameraPcs.m_fov - 25.0f) / 25.0f);
 
             PSMTXIdentity(ppvMng->m_matrix.value);
 
             pppMngSt->m_scale.x = kConstrainCameraDirWideAspect * scale;
             pppMngSt->m_scale.y = scale;
-            pppMngSt->m_scale.z = kConstrainCameraDirScaleOne;
+            pppMngSt->m_scale.z = 1.0f;
 
             Mtx scaleMtx;
             PSMTXScale(scaleMtx, pppMngSt->m_scale.x, pppMngSt->m_scale.y, pppMngSt->m_scale.z);

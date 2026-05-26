@@ -326,23 +326,23 @@ void CFlatRuntime::Create(void* filePtr)
 						continue;
 					}
 
-					int* classBase = reinterpret_cast<int*>(*reinterpret_cast<u8**>(self + 0x18) + classOffset);
-					classBase[0] = classIndex;
+					CClass* classBase = reinterpret_cast<CClass*>(*reinterpret_cast<u8**>(self + 0x18) + classOffset);
+					classBase->m_index = classIndex;
 					chunkFile.PushChunk();
 					while (chunkFile.GetNextChunk(chunk)) {
 						switch (chunk.m_id) {
 						case 'VAL ':
-							classBase[0x89] = chunk.m_arg0;
+							classBase->m_localCount = chunk.m_arg0;
 							break;
 						case 'NAME':
-							strcpy(reinterpret_cast<char*>(classBase + 1), chunkFile.GetString());
+							strcpy(classBase->m_name, chunkFile.GetString());
 							break;
 						case 'INFO':
-							classBase[0x8A] = chunkFile.Get4();
+							classBase->m_variableCount = chunkFile.Get4();
 							break;
 						case 'VTBL':
 							for (int i = 0; i < 0x80; i++) {
-								classBase[9 + i] = chunkFile.Get4();
+								classBase->m_functionTable[i] = chunkFile.Get4();
 							}
 							break;
 						default:
@@ -373,42 +373,41 @@ void CFlatRuntime::Create(void* filePtr)
 						continue;
 					}
 
-					int* funcBase = reinterpret_cast<int*>(*reinterpret_cast<u8**>(self + 0x20) + funcOffset);
-					funcBase[0] = funcIndex;
+					CFunc* funcBase = reinterpret_cast<CFunc*>(*reinterpret_cast<u8**>(self + 0x20) + funcOffset);
+					funcBase->m_index = funcIndex;
 					chunkFile.PushChunk();
 					while (chunkFile.GetNextChunk(chunk)) {
 						switch (chunk.m_id) {
 						case 'NAME':
-							strcpy(reinterpret_cast<char*>(funcBase + 1), chunkFile.GetString());
+							strcpy(funcBase->m_name, chunkFile.GetString());
 							break;
 						case 'INFO':
-							funcBase[9] = chunkFile.Get4();
-							funcBase[0x10] = chunkFile.Get4();
-							funcBase[0x11] = chunkFile.Get4();
-							funcBase[0x12] = chunkFile.Get4();
-							funcBase[0x13] = chunkFile.Get4();
+							funcBase->m_argCount = chunkFile.Get4();
+							funcBase->m_systemKind = chunkFile.Get4();
+							funcBase->m_systemIndex = chunkFile.Get4();
+							funcBase->m_reqFlagIndex = chunkFile.Get4();
+							funcBase->m_useCallerArgs = chunkFile.Get4();
 							break;
 						case 'CODE':
-							funcBase[0xC] = chunk.m_size;
-							funcBase[0xF] = 0;
-							funcBase[0xE] = 0;
-							if (funcBase[0xC] == 0) {
-								funcBase[0xD] = 0;
+							funcBase->m_codeSize = chunk.m_size;
+							funcBase->m_codePos = 0;
+							funcBase->m_codeOffset = 0;
+							if (funcBase->m_codeSize == 0) {
+								funcBase->m_code = 0;
 							} else {
-								funcBase[0xD] = reinterpret_cast<int>(
+								funcBase->m_code = reinterpret_cast<u8*>(
 								    new (reinterpret_cast<CMemory::CStage*>(getStage(this)), const_cast<char*>(s_cflat_runtime_cpp), 0x109)
 								        u8[chunk.m_size]);
-								memcpy(reinterpret_cast<void*>(funcBase[0xD]), chunkFile.GetAddress(),
-								       chunk.m_size);
+								memcpy(funcBase->m_code, chunkFile.GetAddress(), chunk.m_size);
 							}
 							break;
 						case 'VAL ':
-							funcBase[10] = chunk.m_arg0;
+							funcBase->m_localCount = chunk.m_arg0;
 							break;
 						case 'RET ':
-							*reinterpret_cast<u8*>(funcBase + 0xB) = chunkFile.Get1();
-							*reinterpret_cast<u8*>(reinterpret_cast<u8*>(funcBase) + 0x2D) = chunkFile.Get1();
-							*reinterpret_cast<u16*>(reinterpret_cast<u8*>(funcBase) + 0x2E) = chunkFile.Get2();
+							funcBase->m_returnType = chunkFile.Get1();
+							funcBase->m_returnFlags = chunkFile.Get1();
+							funcBase->m_returnValue = chunkFile.Get2();
 							break;
 						default:
 							break;
@@ -807,14 +806,14 @@ void CFlatRuntime::deleteObject(CFlatRuntime::CObject* object)
 CFlatRuntime::CObject* CFlatRuntime::createObject(int classIndex)
 {
 	u8* const self = reinterpret_cast<u8*>(this);
-	u8* classBase = 0;
+	CClass* classBase = 0;
 	if (classIndex != -1) {
-		classBase = *reinterpret_cast<u8**>(self + 0x18) + (classIndex * 0x22C);
+		classBase = reinterpret_cast<CClass*>(*reinterpret_cast<u8**>(self + 0x18) + (classIndex * 0x22C));
 	}
 
 	int varCount = 0;
 	if (classBase != 0) {
-		varCount = reinterpret_cast<CClass*>(classBase)->m_variableCount;
+		varCount = classBase->m_variableCount;
 	}
 
 	typedef CObject* (*GetFreeObjectFn)(CFlatRuntime*, int);
@@ -841,7 +840,7 @@ CFlatRuntime::CObject* CFlatRuntime::createObject(int classIndex)
 
 	int classLocalCount = 0;
 	if (classIndex != -1) {
-		classLocalCount = *reinterpret_cast<int*>(classBase + 0x224);
+		classLocalCount = classBase->m_localCount;
 	}
 
 	u8* scanNode = *reinterpret_cast<u8**>(*reinterpret_cast<u8**>(self + 0x984) + 4);
@@ -885,7 +884,7 @@ CFlatRuntime::CObject* CFlatRuntime::createObject(int classIndex)
 	if (classIndex == -1) {
 		varBase = reinterpret_cast<unsigned int*>(object->m_id);
 	} else {
-		varBase = object->m_thisBase + *reinterpret_cast<int*>(classBase + 0x224);
+		varBase = object->m_thisBase + classBase->m_localCount;
 	}
 	object->m_sp = varBase;
 	object->m_localBase = 0;
@@ -904,7 +903,7 @@ CFlatRuntime::CObject* CFlatRuntime::createObject(int classIndex)
 		defs = *reinterpret_cast<u8**>(self + 0x28);
 		clearCount = *reinterpret_cast<int*>(self + 0x24);
 	} else {
-		clearCount = *reinterpret_cast<int*>(classBase + 0x224);
+		clearCount = classBase->m_localCount;
 	}
 
 	unsigned int* write = object->m_thisBase;

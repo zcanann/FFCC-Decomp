@@ -62,9 +62,9 @@ math.cpp:
 	extabindex  start:0x8000B1F4 end:0x8000B2CC
 	.text       start:0x8001A230 end:0x8001C2F0
 	.ctors      start:0x801D53B0 end:0x801D53B4
-	.data       start:0x801E8450 end:0x801E8470
+	.data       start:0x801E8450 end:0x801E846C
 	.bss        start:0x8023C4D8 end:0x8023C884
-	.sdata2     start:0x8032F740 end:0x8032F798
+	.sdata2     start:0x8032F740 end:0x8032F794
 
 memory.cpp:
 	extab       start:0x800059C0 end:0x80005BDC
@@ -354,6 +354,7 @@ p_tina.cpp:
 	extabindex  start:0x8000C910 end:0x8000CA9C
 	.text       start:0x80051F38 end:0x80053D04
 	.ctors      start:0x801D5404 end:0x801D5408
+	.rodata     start:0x801D7EE0 end:0x801D81F8
 	.data       start:0x801EA9B0 end:0x801EADC8
 	.bss        start:0x80273928 end:0x80273A68
 	.sbss       start:0x8032ED38 end:0x8032ED50
@@ -918,7 +919,7 @@ pppYmDeformationShp.cpp:
 	extab       start:0x80007AF8 end:0x80007B10
 	extabindex  start:0x8000DDC8 end:0x8000DDEC
 	.text       start:0x8008EEC8 end:0x800905DC
-	.sdata2     start:0x80330600 end:0x80330634
+	.sdata2     start:0x80330600 end:0x80330644
 
 pppWDrawMatrix.cpp:
 	extab       start:0x80007B10 end:0x80007B18
@@ -954,6 +955,7 @@ fontman.cpp:
 	.rodata     start:0x801D9CB8 end:0x801D9CD0
 	.data       start:0x801FE080 end:0x8020EDF8
 	.bss        start:0x802EA170 end:0x802EA188
+	.sdata2     start:0x803306B8 end:0x803306F0
 
 pppYmTracer.cpp:
 	extab       start:0x80007BF0 end:0x80007C08
@@ -1601,7 +1603,7 @@ singmenu.cpp:
 	extab       start:0x80009C14 end:0x80009D04
 	extabindex  start:0x80010EE8 end:0x80011050
 	.text       start:0x801453F4 end:0x8014A940
-	.data       start:0x802140F0 end:0x80214D58
+	.data       start:0x802140F0 end:0x80214D28
 	.bss        start:0x8030B630 end:0x8030BA48
 	.sbss       start:0x8032EEB8 end:0x8032EEC8
 	.sdata2     start:0x803331F0 end:0x80333278
@@ -1610,8 +1612,8 @@ menu_cmd.cpp:
 	extab       start:0x80009D04 end:0x80009D94
 	extabindex  start:0x80011050 end:0x80011128
 	.text       start:0x8014A940 end:0x801503C8
-	.rodata     start:0x801DE910 end:0x801DEAD4
-	.data       start:0x80214D58 end:0x80214D90
+	.rodata     start:0x801DE910 end:0x801DEB38
+	.data       start:0x80214D28 end:0x80214D90
 	.bss        start:0x8030BA48 end:0x8030BA54
 	.sbss       start:0x8032EEC8 end:0x8032EECC
 	.sdata2     start:0x80333278 end:0x80333338

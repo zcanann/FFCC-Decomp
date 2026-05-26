@@ -390,7 +390,9 @@ CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* objec
 				} else if (systemVal < -0x1AA) {
 					if (systemVal == -0x1C8) {
 						u8* const p = *reinterpret_cast<u8**>(engineObject + 0x6F0);
-						value = (p == 0) ? 0 : static_cast<unsigned int>(*reinterpret_cast<short*>(p + 0x30));
+						if (p != 0) {
+							value = static_cast<unsigned int>(*reinterpret_cast<short*>(p + 0x30));
+						}
 					} else if (systemVal > -0x1CA) {
 						value = *reinterpret_cast<unsigned short*>(classData + 0xBC8);
 					} else if (systemVal == -0x1B6) {

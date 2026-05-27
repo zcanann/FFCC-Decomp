@@ -1500,7 +1500,7 @@ void CMenuPcs::CalcSelectCloseAnim()
 			BonusAnimSprite* sprite = &sprites[i];
 			sprite->alpha = 1.0f;
 			sprite->timer = 0;
-			sprite->motionY = 0.0f;
+			BonusSpriteFlags(sprite) = 0;
 		}
 
 		if (header->count > 0) {
@@ -1517,7 +1517,8 @@ void CMenuPcs::CalcSelectCloseAnim()
 			sprites[2].mulX = 0.0f;
 			sprites[2].mulY = 0.0f;
 			sprites[2].startFrame = 0;
-			sprites[2].duration = 2;
+			sprites[2].duration = 0;
+			BonusSpriteFlags(&sprites[2]) = 2;
 		}
 		if (header->count > 3) {
 			sprites[3].kind = -4;
@@ -1555,6 +1556,8 @@ void CMenuPcs::CalcSelectCloseAnim()
 			for (int i = 0; i < activePartyCount; i++) {
 				BonusAnimSprite* iconSprite = &sprites[iconBase + i];
 				BonusAnimSprite* nameSprite = &sprites[lowerNameBase + i];
+				nameSprite->tex = -1;
+				nameSprite->kind = -1;
 				nameSprite->x = (short)(iconSprite->x + 0x50);
 				nameSprite->y = (short)(iconSprite->y + 0x48);
 				nameSprite->startFrame = iconSprite->startFrame;

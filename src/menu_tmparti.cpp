@@ -128,8 +128,8 @@ void CMenuPcs::TmpArtiDraw()
 			int posY = (int)(TmpArtiIntToFloat(entry->y + 6) - FLOAT_80332f30);
 			DrawSingleIcon(icon, posX, posY, entry->alpha, 0, FLOAT_80332f2c);
 		}
-		entry++;
 		foodPtr += 2;
+		entry++;
 	}
 
 	CFont* font = GetTmpArtiFont(this);

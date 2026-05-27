@@ -830,25 +830,20 @@ static void UpdateSelectCursorSprite(int statePtr, BonusAnimHeader* header, Bonu
 		return;
 	}
 
-	int slot = (*(short*)(statePtr + 0x26)) & 7;
-	float pulse = (float)(frame & 0x1f) / 31.0f;
-	float* markPos = s_Base[0];
-
-	if (markPos != 0) {
-		cursor->x = (short)(markPos[slot * 2 + 0] - 4.0f);
-		cursor->y = (short)(markPos[slot * 2 + 1] - 8.0f);
+	int activePartyCount = s_Rinfo->m_partyCount;
+	int currentPartyIndex = *(short*)(statePtr + 0xe);
+	if (currentPartyIndex < activePartyCount) {
+		BonusAnimSprite* partySprite = cursor - (activePartyCount * 2 - currentPartyIndex);
+		int pulseFrame = frame % 20 - 10;
+		if (pulseFrame < 0) {
+			pulseFrame = -pulseFrame;
+		}
+		cursor->x = (short)(partySprite->x - 3);
+		cursor->y = (short)(partySprite->y - 8);
+		cursor->alpha = (float)pulseFrame / 10.0f;
 	} else {
-		cursor->x = (short)(28 + (slot & 3) * 72);
-		cursor->y = (short)(36 + ((slot >> 2) & 1) * 104);
+		cursor->alpha = 0.0f;
 	}
-
-	cursor->w = 0x40;
-	cursor->h = 0x30;
-	cursor->mulX = 0.0f;
-	cursor->mulY = -2.0f + pulse * 4.0f;
-	cursor->alpha = 0.75f + pulse * 0.25f;
-	cursor->depth = 1.0f;
-	cursor->scale = 0.9f + pulse * 0.15f;
 }
 
 static void TickAnimSprites(int statePtr, int animPtr, int fadeDir)
@@ -1708,7 +1703,6 @@ void CMenuPcs::CalcSelectWait()
 		for (int i = 0; i < (int)header->count; i++) {
 			sprites[i].alpha = 1.0f;
 			sprites[i].depth = 3.0f;
-			sprites[i].scale = (sprites[i].scale <= 0.0f) ? 1.0f : sprites[i].scale;
 		}
 		if (GetSelectCursorSprite(header, sprites) == 0 && header->count < 0x3F) {
 			InitAnimSprite(&sprites[header->count], 0x20, 0, 0, 0x40, 0x30, 0, 8);

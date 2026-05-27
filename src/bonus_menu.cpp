@@ -3067,23 +3067,19 @@ void CMenuPcs::drawBonus()
  */
 void CMenuPcs::calcBonus()
 {
-	int statePtr = GetBonusMenuMembers(this).m_bonusStatePtr;
-	int animPtr = GetBonusMenuMembers(this).m_bonusAnimPtr;
-	short state;
+	*reinterpret_cast<float*>(GetBonusMenuMembers(this).m_bonusStatePtr) =
+	    static_cast<float>((double)*reinterpret_cast<float*>(GetBonusMenuMembers(this).m_bonusStatePtr) - kPppCrystal2RefractionScale);
 
-	*reinterpret_cast<float*>(statePtr) =
-	    static_cast<float>((double)*reinterpret_cast<float*>(statePtr) - kPppCrystal2RefractionScale);
-
-	if (*(short*)(animPtr + 6) != 0) {
-		*(short*)(statePtr + 0x1c) = *(short*)(statePtr + 0x1c) + 1;
-		*(short*)(animPtr + 6) = 0;
-		*(unsigned char*)(statePtr + 0xb) = 0;
-		*(short*)(statePtr + 0x10) = 0;
-		*(short*)(statePtr + 0x22) = 0;
+	if (*(short*)(GetBonusMenuMembers(this).m_bonusAnimPtr + 6) != 0) {
+		*(short*)(GetBonusMenuMembers(this).m_bonusStatePtr + 0x1c) =
+		    *(short*)(GetBonusMenuMembers(this).m_bonusStatePtr + 0x1c) + 1;
+		*(short*)(GetBonusMenuMembers(this).m_bonusAnimPtr + 6) = 0;
+		*(unsigned char*)(GetBonusMenuMembers(this).m_bonusStatePtr + 0xb) = 0;
+		*(short*)(GetBonusMenuMembers(this).m_bonusStatePtr + 0x10) = 0;
+		*(short*)(GetBonusMenuMembers(this).m_bonusStatePtr + 0x22) = 0;
 	}
 
-	state = *(short*)(statePtr + 0x1c);
-	switch (state) {
+	switch (*(short*)(GetBonusMenuMembers(this).m_bonusStatePtr + 0x1c)) {
 	case 0:
 		CalcResultOpenAnim();
 		break;
@@ -3101,7 +3097,7 @@ void CMenuPcs::calcBonus()
 		break;
 	case 5:
 		CalcSelectCloseAnim();
-		if (*(short*)(animPtr + 6) != 0) {
+		if (*(short*)(GetBonusMenuMembers(this).m_bonusAnimPtr + 6) != 0) {
 			CallWorldParam(8, 0, 0);
 		}
 		break;

@@ -1779,17 +1779,6 @@ void CMenuPcs::CalcSelectWait()
 					currentParty->m_selectedSlot = selection & 7;
 				}
 				currentPartyIndex = (short)(currentPartyIndex + 1);
-				currentParty = GetBonusPartySummary(currentPartyIndex);
-				if (currentPartyIndex >= activePartyCount || currentParty == 0) {
-					promptMode = 2;
-					delay = 10;
-				} else {
-					if (selection < 0) {
-						selection = 7;
-					} else if (selection > 7) {
-						selection = 0;
-					}
-				}
 			}
 		} else {
 			delay = 0;

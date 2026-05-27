@@ -3054,16 +3054,15 @@ void CMenuPcs::CalcResultOpenAnim()
 
 		for (int i = 0; i < activePartyCount; i++) {
 			int idx = frameBase + i;
-			InitAnimSprite(&sprites[idx], 0x17, 0x80, (short)(0x38 + i * 0x60), 0x1a0, 0x40, 0x16 + i * 3, 8);
-			sprites[idx].depth = 0.0f;
+			InitAnimSprite(&sprites[idx], 0x17, 0x80, (short)(0x38 + i * 0x60), 0x1a0, 0x40, 0, 8);
+			sprites[idx].depth = 1.0f;
 			sprites[idx].alpha = 0.0f;
-			sprites[idx].mulX = -24.0f;
 		}
 
 		for (int i = 0; i < activePartyCount; i++) {
 			int idx = iconBase + i;
-			InitAnimSprite(&sprites[idx], 0x18, 0x48, (short)(0x28 + i * 0x60), 0x60, 0x58, 0x40 + i * 3, 8);
-			sprites[idx].depth = 0.0f;
+			InitAnimSprite(&sprites[idx], 0x18, 0x48, (short)(0x28 + i * 0x60), 0x60, 0x58, 0x20 + i * 3, 8);
+			sprites[idx].depth = 1.0f;
 			sprites[idx].alpha = 0.0f;
 			sprites[idx].mulX = -48.0f;
 			sprites[idx].mulY = 12.0f;

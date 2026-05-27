@@ -3482,6 +3482,7 @@ void CMenuPcs::createBonus()
 				BonusPartySummary& a = s_Rinfo->m_party[order[i]];
 				BonusPartySummary& b = s_Rinfo->m_party[order[j]];
 				bool swap = false;
+				unsigned int coin = rand();
 				if (a.m_totalValue < b.m_totalValue) {
 					swap = true;
 				} else if (a.m_totalValue == b.m_totalValue && a.m_artifactValue < b.m_artifactValue) {
@@ -3490,7 +3491,7 @@ void CMenuPcs::createBonus()
 				           a.m_foodValue < b.m_foodValue) {
 					swap = true;
 				} else if (a.m_totalValue == b.m_totalValue && a.m_artifactValue == b.m_artifactValue &&
-				           a.m_foodValue == b.m_foodValue && (rand() & 1) != 0) {
+				           a.m_foodValue == b.m_foodValue && (coin & 1) != 0) {
 					swap = true;
 				}
 

@@ -1112,13 +1112,14 @@ void CMenuPcs::ArtiBaseInfoInit(CMenuPcs::Sprt2* a, CMenuPcs::Sprt2* b)
 	short* icon = reinterpret_cast<short*>(b);
 	float* base = s_Base[0];
 
+	base[0] = (float)(board[0] + board[2] * 0.5);
+	base[1] = (float)(board[1] + board[3] * 0.5);
+
 	float iconW = (float)icon[2];
 	float iconH = (float)icon[3];
 	float iconHalfW = (float)(iconW * 0.5);
 	float iconHalfH = (float)(iconH * 0.5);
 
-	base[0] = (float)(board[0] + board[2] * 0.5);
-	base[1] = (float)(board[1] + board[3] * 0.5);
 	base[14] = base[0] - iconHalfW;
 	base[15] = (float)board[1];
 	base[6] = base[14];

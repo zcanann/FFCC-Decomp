@@ -61,10 +61,10 @@ static const char s_dvd_tina_mon_m_03d_801d7fc0[] = "dvd/tina/mon/m%03d";
 static const char s_dvd_tina_mon_m_03d__c_801d7fd4[] = "dvd/tina/mon/m%03d_%c";
 static const char s_dvd_tina_stage_03d_fp_03d_801d7fec[] = "dvd/tina/stage%03d/fp%03d";
 extern "C" const char s_p_tina_cpp[] = "p_tina.cpp";
-static const char s_tina_title_fmt_801d8014[] = "Tina [%c]";
-static const char s_tina_calc_fmt_801d8020[] = "clc=%.3f%%  max=%.3f%%";
-static const char s_tina_draw_fmt_801d8038[] = "drw=%.3f%%  max=%.3f%%";
-static const char s_tina_heap_fmt_801d8050[] = "hpm=%.3f%%  max=%.3f%%";
+static const char s_tina_title_fmt_801d8014[0x0C] = "Tina [%c]";
+static const char s_tina_calc_fmt_801d8020[0x18] = "clc=%.3f%%  max=%.3f%%";
+static const char s_tina_draw_fmt_801d8038[0x18] = "drw=%.3f%%  max=%.3f%%";
+static const char s_tina_heap_fmt_801d8050[0x18] = "hpm=%.3f%%  max=%.3f%%";
 static const char sTinaParticleAMemFreeFmt[] = {
     (char)0x0A, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D,
     (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D,
@@ -88,15 +88,15 @@ static const char sTinaParticleAMemFreeFmt[] = {
     (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D, (char)0x3D,
     (char)0x3D, (char)0x0A, (char)0x0A, (char)0x00,
 };
-static const char s_CPartPcs_dat_801d810c[] = "CPartPcs.dat";
-static const char s_CPartPcs_amem_801d811c[] = "CPartPcs.amem";
+static const char s_CPartPcs_dat_801d810c[0x10] = "CPartPcs.dat";
+static const char s_CPartPcs_amem_801d811c[0x10] = "CPartPcs.amem";
 static const char s_dvd_tina_chobit_801d812c[] = "dvd/tina/chobit";
-static const char s_dvd_tina_chobit_0_801d813c[] = "dvd/tina/chobit_0";
-static const char s_dvd_tina_chobit_1_801d8150[] = "dvd/tina/chobit_1";
-static const char s_dvd_tina_chobit_2_801d8164[] = "dvd/tina/chobit_2";
-static const char s_dvd_tina_chobit_3_801d8178[] = "dvd/tina/chobit_3";
-static const char s_dvd_tina_chobit_4_801d818c[] = "dvd/tina/chobit_4";
-static const char s_tina_prio_time_fmt_801d81a0[] = "  prioTime=%d  prio=%d  pdtID=%2d  fpno=%3d   %s\n";
+static const char s_dvd_tina_chobit_0_801d813c[0x14] = "dvd/tina/chobit_0";
+static const char s_dvd_tina_chobit_1_801d8150[0x14] = "dvd/tina/chobit_1";
+static const char s_dvd_tina_chobit_2_801d8164[0x14] = "dvd/tina/chobit_2";
+static const char s_dvd_tina_chobit_3_801d8178[0x14] = "dvd/tina/chobit_3";
+static const char s_dvd_tina_chobit_4_801d818c[0x14] = "dvd/tina/chobit_4";
+static const char s_tina_prio_time_fmt_801d81a0[0x34] = "  prioTime=%d  prio=%d  pdtID=%2d  fpno=%3d   %s\n";
 static const char sTinaDeleteNoticeMsg[] = {
     (char)0x20, (char)0x20, (char)0x20, (char)0x20, (char)0x20, (char)0x20, (char)0x20, (char)0x20,
     (char)0x20, (char)0x20, (char)0x20, (char)0x20, (char)0x20, (char)0x20, (char)0x20, (char)0x20,

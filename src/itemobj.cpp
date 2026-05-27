@@ -927,7 +927,9 @@ void CGItemObj::onFrameStat()
 		}
 		break;
 	case 0: {
-		if (m_owner == 0 && (m_stateFlags0 & 8) != 0) {
+		if (m_owner == 0 &&
+		    static_cast<signed char>(
+		        static_cast<int>((static_cast<unsigned int>(m_stateFlags0) << 28) & 0xC0000000) >> 31) != 0) {
 			float distance = FLOAT_80331b20;
 
 			if (Game.unk_flat3_0xc7d0 != 0) {
@@ -1051,11 +1053,13 @@ void CGItemObj::onFrameStat()
 
 		if (*(int*)(self + 0x554) <= *(int*)(self + 0x528)) {
 			int worldParamA = *(int*)(self + 0x500);
-			bool isActive = (self[0x50] & 0x80) != 0;
 
-			if ((worldParamA == 0xD || worldParamA == 0xE) && isActive) {
+			if ((worldParamA == 0xD || worldParamA == 0xE) &&
+			    static_cast<signed char>(
+			        static_cast<int>((static_cast<unsigned int>(self[0x50]) << 24) & 0xC0000000) >> 31) != 0) {
 				changeStat(0x1F, 0, 0);
-			} else if (isActive) {
+			} else if (static_cast<signed char>(
+			               static_cast<int>((static_cast<unsigned int>(self[0x50]) << 24) & 0xC0000000) >> 31) != 0) {
 				changeStat(0, 0, 0);
 			}
 		}
@@ -1126,7 +1130,7 @@ void CGItemObj::onFrameStat()
 		}
 		break;
 	case 0x23:
-		if (*(int*)(self + 0x52C) == 1) {
+		if (*(int*)(self + 0x52C) != 0 && *(int*)(self + 0x52C) == 1) {
 			CCharaPcs::CHandle* handle = prgObj->m_charaModelHandle;
 			if (handle != 0 && handle->m_model != 0) {
 				unsigned char* model = reinterpret_cast<unsigned char*>(handle->m_model);

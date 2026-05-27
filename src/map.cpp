@@ -261,10 +261,12 @@ float CMapKeyFrame::Get()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma dont_inline on
 extern "C" unsigned long UnkMaterialSetGetter(void* ptrArray)
 {
     return *reinterpret_cast<unsigned long*>(reinterpret_cast<unsigned char*>(ptrArray) + 4);
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -3266,14 +3268,14 @@ int CMapMng::GetMapObjIdx(unsigned short id)
  */
 CMaterial* CMapMng::GetMaterialID(unsigned char materialId)
 {
-    unsigned long index = 0;
     unsigned char* materialSet = reinterpret_cast<unsigned char*>(m_materialSet);
-    CPtrArray<CMaterial*>* materials = reinterpret_cast<CPtrArray<CMaterial*>*>(materialSet + 8);
+    unsigned long index = 0;
 
-    while (index < UnkMaterialSetGetter(materials)) {
-        CMaterial* material = (*materials)[index];
-        if (material != 0 && reinterpret_cast<unsigned char*>(material)[0xA6] == materialId) {
-            return (*materials)[index];
+    while (index < UnkMaterialSetGetter(materialSet + 8)) {
+        if ((*reinterpret_cast<CPtrArray<CMaterial*>*>(materialSet + 8))[index] != 0
+            && materialId == reinterpret_cast<unsigned char*>(
+                                (*reinterpret_cast<CPtrArray<CMaterial*>*>(materialSet + 8))[index])[0xA6]) {
+            return (*reinterpret_cast<CPtrArray<CMaterial*>*>(materialSet + 8))[index];
         }
         index++;
     }

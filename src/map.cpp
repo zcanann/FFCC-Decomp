@@ -2263,21 +2263,18 @@ void CMapMng::ReadOtm(char* mapName)
             }
 
             if (chunk.m_id == 0x4C495448) {
-                CMapLightHolder* light = reinterpret_cast<CMapLightHolder*>(
-                    Memory._Alloc(0x10, m_stage, const_cast<char*>(s_map_cpp), 0x4D3, 0));
-                if (light != 0) {
-                    unsigned char* lightRaw = reinterpret_cast<unsigned char*>(light);
-                    lightRaw[0] = chunkFile.Get1();
-                    lightRaw[1] = chunkFile.Get1();
-                    lightRaw[2] = chunkFile.Get1();
-                    lightRaw[3] = chunkFile.Get1();
-                    *reinterpret_cast<float*>(lightRaw + 4) = chunkFile.GetF4();
-                    *reinterpret_cast<float*>(lightRaw + 8) = chunkFile.GetF4();
-                    *reinterpret_cast<float*>(lightRaw + 0xC) = chunkFile.GetF4();
+                CMapLightHolder* light = static_cast<CMapLightHolder*>(
+                    operator new(0x10, m_stage, const_cast<char*>(s_map_cpp), 0x4D3));
+                unsigned char* lightRaw = reinterpret_cast<unsigned char*>(light);
+                lightRaw[0] = chunkFile.Get1();
+                lightRaw[1] = chunkFile.Get1();
+                lightRaw[2] = chunkFile.Get1();
+                lightRaw[3] = chunkFile.Get1();
+                *reinterpret_cast<float*>(lightRaw + 4) = chunkFile.GetF4();
+                *reinterpret_cast<float*>(lightRaw + 8) = chunkFile.GetF4();
+                *reinterpret_cast<float*>(lightRaw + 0xC) = chunkFile.GetF4();
 
-                    CPtrArray<CMapLightHolder*>* holderArray = &GetMapLightHolderArray(chunk.m_arg0);
-                    holderArray->Add(light);
-                }
+                GetMapLightHolderArray(chunk.m_arg0).Add(light);
                 continue;
             }
 

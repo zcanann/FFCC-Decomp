@@ -19,6 +19,8 @@ extern char* PTR_s_bonus[];
 extern CMenuPcs::CTmp s_bonusTextureTable[];
 extern char s_menuSubfontPathFmt[];
 extern const double kPppCrystal2RefractionScale;
+extern const float s_BonusModelYPos[];
+extern const float s_BonusModelScale[];
 
 struct BonusPartySummary {
 	int m_partySlot;
@@ -2679,28 +2681,72 @@ void CMenuPcs::CalcResultCountAnim()
 		}
 	}
 
-	for (int i = 0; i < activePartyCount; i++) {
-		CCharaPcs::CHandle* partyHandle = s_Rinfo->m_party[i].m_partyHandle;
-		CCharaPcs::CHandle* displayHandle = GetBonusDisplayHandleSlots(this)[i];
-		if (partyHandle != 0 && partyHandle->m_model != 0) {
-			*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(partyHandle->m_model) + 0x9C) = 1.0f;
+	Mtx scaleMtx;
+	Mtx rotXMtx;
+	Mtx rotYMtx;
+	for (int i = 0; i < activePartyCount * 2; i++) {
+		CCharaPcs::CHandle* handle;
+		int tribeId;
+		if (i < activePartyCount) {
+			handle = s_Rinfo->m_party[i].m_partyHandle;
+			tribeId = s_Rinfo->m_party[i].m_tribeId;
+			float modelScale = s_BonusModelScale[tribeId];
+			PSMTXScale(scaleMtx, modelScale, modelScale, modelScale);
+		} else {
+			handle = GetBonusDisplayHandleSlots(this)[i - activePartyCount];
+			PSMTXScale(scaleMtx, 1.0f, 1.0f, 1.0f);
 		}
-		if (displayHandle != 0 && displayHandle->m_model != 0) {
-			*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(displayHandle->m_model) + 0x9C) = 1.0f;
+
+		if (i / activePartyCount == 1) {
+			PSMTXRotRad(rotXMtx, 'x', 0.2617993950843811f);
+			PSMTXConcat(scaleMtx, rotXMtx, scaleMtx);
+			PSMTXRotRad(rotYMtx, 'y', 0.01745329238474369f * *reinterpret_cast<float*>(statePtr));
+			PSMTXConcat(scaleMtx, rotYMtx, scaleMtx);
 		}
+
+		if (i < activePartyCount) {
+			scaleMtx[0][3] = 0.0f;
+			scaleMtx[2][3] = 0.0f;
+			scaleMtx[1][3] = s_BonusModelYPos[tribeId];
+		} else {
+			scaleMtx[0][3] = 0.0f;
+			scaleMtx[1][3] = 0.0f;
+			scaleMtx[2][3] = 0.0f;
+		}
+
+		CChara::CModel* model = handle->m_model;
+		model->m_flags10C = (model->m_flags10C & 0x7F) | 0x80;
+		model->SetMatrix(scaleMtx);
+		model->CalcMatrix();
+		model->CalcSkin();
+		model->m_lightAlpha = 1.0f;
 	}
 
 	if (*(short*)(statePtr + 0x10) == 0 && frame >= 0 && frame <= s_Rinfo->m_winnerTotalValue) {
 		Sound.PlaySe(0x4a, 0x40, 0x7f, 0);
 	}
 
-	if (*(short*)(statePtr + 0x10) == 0 && frame >= s_Rinfo->m_winnerTotalValue + 10) {
+	if (*(short*)(statePtr + 0x10) == 0 && frame >= 0 &&
+	    (double)s_Rinfo->m_winnerTotalValue + 8.333333134651184 <= (double)frame) {
 		*(short*)(statePtr + 0x10) = 1;
 		return;
 	}
 
 	if (*(short*)(statePtr + 0x10) != 0) {
-		unsigned short buttons = GetBonusAdvanceButtons(this);
+		unsigned short buttons = 0;
+		int padRemap = Pad._448_4_;
+		int padLock = Pad._452_4_;
+		for (int i = 0; i < s_Rinfo->m_partyCount; i++) {
+			unsigned int padIndex = s_Rinfo->m_party[i].m_partySlot;
+			unsigned short down;
+			if (padLock != 0 || (padIndex == 0 && padRemap != -1)) {
+				down = 0;
+			} else {
+				unsigned int resolvedIndex = (padRemap == (int)padIndex) ? 0 : padIndex;
+				down = Pad.m_padInputs[resolvedIndex].buttonDown[0];
+			}
+			buttons = (unsigned short)(buttons | down);
+		}
 		if ((buttons & 0x300) != 0) {
 			Sound.PlaySe(2, 0x40, 0x7f, 0);
 			*(short*)(animPtr + 6) = 1;

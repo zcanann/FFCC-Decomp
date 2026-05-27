@@ -1267,8 +1267,8 @@ void CGraphic::SetFog(int useFog, int useGlobalColor)
 {
     _GXColor* colorPtr;
     GXFogType fogType;
-    float nearZ;
     float farZ;
+    float nearZ;
 
     if (&nearZ != 0) {
         nearZ = CameraNearZ();

@@ -920,7 +920,8 @@ void CMesMenu::onCalc()
 
             int base = (int)this;
             unsigned int value;
-            for (int i = 0; i < 2; i++) {
+            int count = 2;
+            do {
                 value = *(int*)(base + 0x3DB0) - 1;
                 *(unsigned int*)(base + 0x3DB0) = value & ~((int)value >> 0x1F);
 
@@ -946,7 +947,8 @@ void CMesMenu::onCalc()
                 *(unsigned int*)(base + 0x3DDC) = value & ~((int)value >> 0x1F);
 
                 base += 0x10;
-            }
+                count--;
+            } while (count != 0);
 
             value = *(int*)((char*)this + 0x3DF0) - 1;
             *(unsigned int*)((char*)this + 0x3DF0) = value & ~((int)value >> 0x1F);

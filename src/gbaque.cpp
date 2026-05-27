@@ -1527,8 +1527,8 @@ void GbaQueue::LoadPlayerStat()
 
 			if (partyObj != 0) {
 				entry[1] = 1;
-				*reinterpret_cast<short*>(entry + 0x36) = static_cast<short>(partyObj->m_worldPosition.x / 100.0f);
-				*reinterpret_cast<short*>(entry + 0x38) = static_cast<short>(partyObj->m_worldPosition.z / 100.0f);
+				*reinterpret_cast<short*>(entry + 0x36) = static_cast<short>(partyObj->m_worldPosition.x / kGbaQueueMapCoordScale);
+				*reinterpret_cast<short*>(entry + 0x38) = static_cast<short>(partyObj->m_worldPosition.z / kGbaQueueMapCoordScale);
 			}
 
 			entry += 0xDC;
@@ -1723,8 +1723,8 @@ void GbaQueue::LoadMapItemStat()
 				int isDispRader = object->IsDispRader();
 				numMapItems++;
 				mapItemEntry[2] = static_cast<unsigned char>((-isDispRader | isDispRader) >> 31);
-				*reinterpret_cast<short*>(mapItemEntry + 8) = static_cast<short>(object->m_worldPosition.x / 100.0f);
-				*reinterpret_cast<short*>(mapItemEntry + 0xA) = static_cast<short>(object->m_worldPosition.z / 100.0f);
+				*reinterpret_cast<short*>(mapItemEntry + 8) = static_cast<short>(object->m_worldPosition.x / kGbaQueueMapCoordScale);
+				*reinterpret_cast<short*>(mapItemEntry + 0xA) = static_cast<short>(object->m_worldPosition.z / kGbaQueueMapCoordScale);
 				mapItemEntry += 0x14;
 			}
 
@@ -4356,7 +4356,8 @@ unsigned int GbaQueue::GetChgUseItemFlg(int channel)
 	value = static_cast<int>(static_cast<char>(obj[0x2D37])) & (1 << channel);
 	result = static_cast<unsigned int>(-value | value) >> 31;
 	OSSignalSemaphore(accessSemaphores + channel);
-	return static_cast<unsigned int>(-result | result) >> 31;
+	result = static_cast<unsigned int>(-result | result) >> 31;
+	return result;
 }
 
 /*
@@ -4450,7 +4451,8 @@ unsigned int GbaQueue::GetArtiDatFlg(int channel)
 	value = static_cast<int>(static_cast<char>(obj[0x2D3F])) & (1 << channel);
 	result = static_cast<unsigned int>(-value | value) >> 31;
 	OSSignalSemaphore(accessSemaphores + channel);
-	return static_cast<unsigned int>(-result | result) >> 31;
+	result = static_cast<unsigned int>(-result | result) >> 31;
+	return result;
 }
 
 /*

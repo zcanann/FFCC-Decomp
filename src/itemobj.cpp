@@ -55,76 +55,24 @@ extern const float FLOAT_80331BC4 = 1.5f;
 extern const char s_itemDamageBoneHip[] = "hip";
 u32 gItemObjCreateFlags;
 extern char SoundBuffer[];
-static const char sNumFreeItemFmt[] = "num free item = %d\n";
-static const char sItemNoDeletableObjectMsg[] = {
-    (char)0x8F, (char)0xC1, (char)0x82, (char)0xB9, (char)0x82, (char)0xE9, (char)0x83, 0x49,
-    (char)0x83, 0x75, (char)0x83, 0x57, (char)0x83, 0x46, (char)0x83, 0x4E,
-    (char)0x83, 0x67, (char)0x82, (char)0xAA, (char)0x82, (char)0xA0, (char)0x82, (char)0xE8,
-    (char)0x82, (char)0xDC, (char)0x82, (char)0xB9, (char)0x82, (char)0xF1, (char)0x81, 0x42,
-    (char)0x0A, (char)0x00, (char)0x00, (char)0x00,
+extern const char lbl_801DCE20[];
+extern const char sItemNoDeletableObjectMsg[];
+extern const char sItemMemoryCapsuleAsyncEndMsg[];
+
+enum ItemObjStringOffset {
+	kItemObjStrF051Root = 0x94,
+	kItemObjStrNumFreeItemFmt = 0xA0,
+	kItemObjStrNoDeletableObjectMsg = 0xB4,
+	kItemObjStrNumDeleteItemFmt = 0xD8,
+	kItemObjStrCreateFailedMsg = 0xF0,
+	kItemObjStrMemoryCapsuleCreateFmt = 0x114,
+	kItemObjStrItemobjCpp = 0x138,
+	kItemObjStrMemoryCapsuleAsyncStartMsg = 0x144,
+	kItemObjStrExpireByTimeOrDistanceMsg = 0x160,
+	kItemObjStrMemoryCapsuleFailedFmt = 0x184,
+	kItemObjStrMemoryCapsuleSuccessFmt = 0x1A8,
+	kItemObjStrMemoryMagiciteCreateFailedMsg = 0x1CC,
 };
-static const char sNumDeleteItemFmt[] = "num delete item = %d\n";
-static const char sItemCreateFailedMsg[] = {
-    (char)0x83, 0x41, (char)0x83, 0x43, (char)0x83, 0x65, (char)0x83, (char)0x80,
-    (char)0x82, (char)0xF0, (char)0x90, (char)0xB6, (char)0x90, (char)0xAC, (char)0x82, (char)0xC5,
-    (char)0x82, (char)0xAB, (char)0x82, (char)0xDC, (char)0x82, (char)0xB9, (char)0x82, (char)0xF1,
-    (char)0x82, (char)0xC5, (char)0x82, (char)0xB5, (char)0x82, (char)0xBD, (char)0x81, 0x42,
-    (char)0x0A, (char)0x00, (char)0x00, (char)0x00,
-};
-static const char sItemExpireByTimeOrDistanceMsg[] = {
-    (char)0x8E, (char)0x9E, (char)0x8A, (char)0xD4, (char)0x82, (char)0xA9, (char)0x8B, (char)0x97,
-    (char)0x97, (char)0xA3, (char)0x82, (char)0xC5, (char)0x83, 0x41, (char)0x83, 0x43,
-    (char)0x83, 0x65, (char)0x83, (char)0x80, (char)0x82, (char)0xAA, (char)0x8F, (char)0xC1,
-    (char)0x82, (char)0xA6, (char)0x82, (char)0xDC, (char)0x82, (char)0xB7, (char)0x81, 0x42,
-    (char)0x0A, (char)0x00, (char)0x00, (char)0x00,
-};
-static const char sItemMemoryCapsuleCreateFmt[] = {
-    (char)0x8E, 0x76, (char)0x82, (char)0xA2, (char)0x8F, 0x6F, (char)0x83, 0x4A,
-    (char)0x83, 0x76, (char)0x83, 0x5A, (char)0x83, (char)0x8B, (char)0x8D, (char)0xEC,
-    (char)0x90, (char)0xAC, 0x20, 0x69, 0x64, 0x78, 0x50, 0x61,
-    0x72, 0x74, 0x79, 0x20, 0x3D, 0x20, 0x25, 0x64,
-    (char)0x0A, (char)0x00, (char)0x00, (char)0x00,
-};
-static const char s_itemobj_cpp[] = "itemobj.cpp";
-static const char sItemMemoryCapsuleAsyncStartMsg[] = {
-    (char)0x8E, 0x76, (char)0x82, (char)0xA2, (char)0x8F, 0x6F, (char)0x83, 0x4A,
-    (char)0x83, 0x76, (char)0x83, 0x5A, (char)0x83, (char)0x8B, (char)0x94, (char)0xF1,
-    (char)0x93, (char)0xAF, (char)0x8A, (char)0xFA, (char)0x8A, 0x4A, (char)0x8E, 0x6E,
-    (char)0x0A, (char)0x00, (char)0x00, (char)0x00,
-};
-static const char sItemMemoryCapsuleAsyncEndMsg[] = {
-    (char)0x8E, 0x76, (char)0x82, (char)0xA2, (char)0x8F, 0x6F, (char)0x83, 0x4A,
-    (char)0x83, 0x76, (char)0x83, 0x5A, (char)0x83, (char)0x8B, (char)0x94, (char)0xF1,
-    (char)0x93, (char)0xAF, (char)0x8A, (char)0xFA, (char)0x8F, 0x49, (char)0x97, (char)0xB9,
-    (char)0x0A, (char)0x00, (char)0x00, (char)0x00, (char)0x00, (char)0x00, (char)0x00, (char)0x00,
-    0x43, 0x47, 0x50, 0x72, 0x67, 0x4F, 0x62, 0x6A,
-    (char)0x00, (char)0x00, (char)0x00, (char)0x00, 0x43, 0x46, 0x6C, 0x61,
-    0x74, 0x52, 0x75, 0x6E, 0x74, 0x69, 0x6D, 0x65,
-    0x3A, 0x3A, 0x43, 0x4F, 0x62, 0x6A, 0x65, 0x63,
-    0x74, (char)0x00, (char)0x00, (char)0x00,
-};
-static const char sItemMemoryCapsuleFailedFmt[] = {
-    (char)0x8E, 0x76, (char)0x82, (char)0xA2, (char)0x8F, 0x6F, (char)0x83, 0x4A,
-    (char)0x83, 0x76, (char)0x83, 0x5A, (char)0x83, (char)0x8B, (char)0x8E, (char)0xB8,
-    (char)0x94, 0x73, 0x20, 0x69, 0x64, 0x78, 0x50, 0x61,
-    0x72, 0x74, 0x79, 0x20, 0x3D, 0x20, 0x25, 0x64,
-    (char)0x0A, (char)0x00, (char)0x00, (char)0x00,
-};
-static const char sItemMemoryCapsuleSuccessFmt[] = {
-    (char)0x8E, 0x76, (char)0x82, (char)0xA2, (char)0x8F, 0x6F, (char)0x83, 0x4A,
-    (char)0x83, 0x76, (char)0x83, 0x5A, (char)0x83, (char)0x8B, (char)0x90, (char)0xAC,
-    (char)0x8C, (char)0xF7, 0x20, 0x69, 0x64, 0x78, 0x50, 0x61,
-    0x72, 0x74, 0x79, 0x20, 0x3D, 0x20, 0x25, 0x64,
-    (char)0x0A, (char)0x00, (char)0x00, (char)0x00,
-};
-static const char sItemMemoryMagiciteCreateFailedMsg[] = {
-    (char)0x8E, 0x76, (char)0x82, (char)0xA2, (char)0x8F, 0x6F, (char)0x96, (char)0x82,
-    (char)0x90, (char)0xCE, (char)0x82, (char)0xF0, (char)0x90, (char)0xB6, (char)0x90, (char)0xAC,
-    (char)0x82, (char)0xC5, (char)0x82, (char)0xAB, (char)0x82, (char)0xDC, (char)0x82, (char)0xB9,
-    (char)0x82, (char)0xF1, (char)0x82, (char)0xC5, (char)0x82, (char)0xB5, (char)0x82, (char)0xBD,
-    (char)0x81, 0x42, (char)0x0A, (char)0x00,
-};
-static const char sF051Root[] = "f051_root";
 
 struct ItemObjFlatTableEntry {
 	int count;
@@ -712,8 +660,9 @@ void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 CGPrgObj* CGItemObj::CreateFromScript(
     int createMode, int createFlags, int scriptArg, CGObject* owner, float launchAngle, CGItemObj::CCFS* ccfs)
 {
+	char* itemObjStrings = const_cast<char*>(lbl_801DCE20);
 	int freeItemCount = ItemCFlatRuntime()->getNumFreeObject(5);
-	System.Printf(const_cast<char*>(sNumFreeItemFmt), freeItemCount);
+	System.Printf(itemObjStrings + kItemObjStrNumFreeItemFmt, freeItemCount);
 
 	if (freeItemCount == 0) {
 		int deletedCount = 0;
@@ -741,14 +690,14 @@ CGPrgObj* CGItemObj::CreateFromScript(
 			deletedCount = 1;
 		} else {
 			if (2U < (unsigned int)System.m_execParam) {
-				System.Printf(const_cast<char*>(sItemNoDeletableObjectMsg));
+				System.Printf(itemObjStrings + kItemObjStrNoDeletableObjectMsg);
 			}
 		}
 
-		System.Printf(const_cast<char*>(sNumDeleteItemFmt), deletedCount);
+		System.Printf(itemObjStrings + kItemObjStrNumDeleteItemFmt, deletedCount);
 		if (deletedCount == 0) {
 			if (2U < (unsigned int)System.m_execParam) {
-				System.Printf(const_cast<char*>(sItemCreateFailedMsg));
+				System.Printf(itemObjStrings + kItemObjStrCreateFailedMsg);
 			}
 			return 0;
 		}
@@ -812,18 +761,19 @@ CGPrgObj* CGItemObj::CreateFromScript(
 
 			void* ownerScriptSlot = owner->m_scriptHandle[0xED];
 			if ((unsigned int)System.m_execParam >= 3U) {
-				System.Printf(const_cast<char*>(sItemMemoryCapsuleCreateFmt), ownerScriptSlot);
+				System.Printf(itemObjStrings + kItemObjStrMemoryCapsuleCreateFmt, ownerScriptSlot);
 			}
 			*(CGPrgObj**)(m_boss__8CGMonObj + (int)ownerScriptSlot * 4 + 8) = newItem;
 
-			CCharaPcs::CHandle* handle = new (Game.m_mainStage, const_cast<char*>(s_itemobj_cpp), 0x28E) CCharaPcs::CHandle;
+			CCharaPcs::CHandle* handle =
+			    new (Game.m_mainStage, itemObjStrings + kItemObjStrItemobjCpp, 0x28E) CCharaPcs::CHandle;
 			reinterpret_cast<CGItemObj*>(newItem)->m_pendingModelHandle = handle;
 			handle->Add();
 
 			handle->LoadModelASync(2, ccfs->m_modelId, ccfs->m_modelParam);
 
 			if ((unsigned int)System.m_execParam >= 3U) {
-				System.Printf(const_cast<char*>(sItemMemoryCapsuleAsyncStartMsg));
+				System.Printf(itemObjStrings + kItemObjStrMemoryCapsuleAsyncStartMsg);
 			}
 
 			reinterpret_cast<CGItemObj*>(newItem)->m_pendingAnimFlags = ccfs->m_pendingAnimFlags;
@@ -910,6 +860,7 @@ void CGItemObj::onFrameStat()
 	unsigned char* self = (unsigned char*)this;
 	CGPrgObj* prgObj = (CGPrgObj*)this;
 	int stateId = *(int*)(self + 0x520);
+	char* itemObjStrings = const_cast<char*>(lbl_801DCE20);
 	float zero = FLOAT_80331b20;
 
 	switch (stateId) {
@@ -944,7 +895,7 @@ void CGItemObj::onFrameStat()
 			}
 
 			if (*(int*)(self + 0x94) <= 0 || distance > DOUBLE_80331ba0) {
-				System.Printf(const_cast<char*>(sItemExpireByTimeOrDistanceMsg));
+				System.Printf(itemObjStrings + kItemObjStrExpireByTimeOrDistanceMsg);
 				*(float*)(self + 0x4b8) = FLOAT_80331b54;
 				*(float*)(self + 0x4b4) = zero;
 				*(unsigned int*)(self + 0x1c0) = 1;
@@ -1120,7 +1071,7 @@ void CGItemObj::onFrameStat()
 			prgObj->m_bgColMask |= 0x80000;
 
 			CVector damageOffset(zero, zero, zero);
-			SetDamageCol(0, const_cast<char*>(sF051Root), FLOAT_80331B78, FLOAT_80331B78,
+			SetDamageCol(0, itemObjStrings + kItemObjStrF051Root, FLOAT_80331B78, FLOAT_80331B78,
 			             reinterpret_cast<Vec*>(&damageOffset));
 			*reinterpret_cast<int*>(&prgObj->m_damageColliders[1].m_localPosition.x) = 9;
 		}
@@ -1231,14 +1182,14 @@ void CGItemObj::onFrameStat()
 			int ownerSlot = *(int*)(*(unsigned char**)(*(unsigned char**)(self + 0x550) + 0x58) + 0x3B4);
 
 			if ((unsigned int)System.m_execParam >= 3U) {
-				System.Printf(const_cast<char*>(sItemMemoryCapsuleSuccessFmt), ownerSlot);
+				System.Printf(itemObjStrings + kItemObjStrMemoryCapsuleSuccessFmt, ownerSlot);
 			}
 
 			*(int*)(m_boss__8CGMonObj + ownerSlot * 4 + 8) = 0;
 			CGPrgObj* newItem = CreateFromScript(0, 0, 0x103, 0, FLOAT_80331b20, 0);
 			if (newItem == 0) {
 				if ((unsigned int)System.m_execParam > 1U) {
-					System.Printf(const_cast<char*>(sItemMemoryMagiciteCreateFailedMsg));
+					System.Printf(itemObjStrings + kItemObjStrMemoryMagiciteCreateFailedMsg);
 				}
 			} else {
 				unsigned char* newItemSelf = reinterpret_cast<unsigned char*>(newItem);
@@ -1284,7 +1235,7 @@ void CGItemObj::onFrameStat()
 			int ownerSlot = *(int*)(*(unsigned char**)(*(unsigned char**)(self + 0x550) + 0x58) + 0x3B4);
 
 			if ((unsigned int)System.m_execParam >= 3U) {
-				System.Printf(const_cast<char*>(sItemMemoryCapsuleFailedFmt), ownerSlot);
+				System.Printf(itemObjStrings + kItemObjStrMemoryCapsuleFailedFmt, ownerSlot);
 			}
 
 			CFlatRuntime::CStack stack;

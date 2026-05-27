@@ -732,7 +732,7 @@ static void DrawBonusPartyNames(CMenuPcs* menu, BonusAnimHeader* header, BonusAn
 	menu->DrawInit();
 	font->SetMargin(1.0f);
 	font->SetShadow(1);
-	font->SetScale(1.0f);
+	font->SetScale(0.9f);
 	font->SetTlut(7);
 	font->DrawInit();
 
@@ -746,11 +746,9 @@ static void DrawBonusPartyNames(CMenuPcs* menu, BonusAnimHeader* header, BonusAn
 		const char* name = GetBonusPartyNameByActiveIndex(nameIndex % activePartyCount);
 		GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(ClampBonusUnit(sprite->alpha) * 255.0f)};
 		font->SetColor(color);
-		if (name != 0) {
-			font->SetPosX((float)sprite->x + sprite->mulX);
-			font->SetPosY((float)sprite->y + sprite->mulY - 12.0f);
-			font->Draw(const_cast<char*>(name));
-		}
+		font->SetPosX((float)sprite->x + sprite->mulX);
+		font->SetPosY((float)sprite->y + sprite->mulY - 12.0f);
+		font->Draw(const_cast<char*>(name));
 		nameIndex++;
 	}
 }

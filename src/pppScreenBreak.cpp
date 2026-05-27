@@ -399,13 +399,6 @@ void SB_BeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int)
  */
 void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work)
 {
-    s16 sVar2;
-    s16 sVar3;
-    s16 sVar4;
-    s16 sVar7;
-    s16 sVar9;
-    s16* psVar11;
-    s16 sVar12;
     s32 iVar5;
     s32 iVar6;
     s32 iVar14;
@@ -449,91 +442,68 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
         meshMax.x = -0x7FFF;
         meshMax.y = -0x7FFF;
         meshMax.z = -0x7FFF;
-        sVar2 = 0x7FFF;
-        sVar3 = 0x7FFF;
-        s16 minZ = 0x7FFF;
-        sVar12 = 0x7FFF;
-        sVar9 = 0x7FFF;
-        sVar4 = 0x7FFF;
+        S16Vec meshMin;
+        meshMin.x = 0x7FFF;
+        meshMin.y = 0x7FFF;
+        meshMin.z = 0x7FFF;
 
         for (; iVar5 > 0; iVar5--) {
-            s16 sVar1 = *(s16*)(*(s32*)(iVar14 + 0x18) + iVar6);
+            s16 x = *(s16*)(*(s32*)(iVar14 + 0x18) + iVar6);
             s16 globalX = globalMax.x;
-            if (globalX < sVar1) {
-                globalX = sVar1;
+            if (globalX < x) {
+                globalX = x;
             }
             globalMax.x = globalX;
 
-            sVar1 = *(s16*)(*(s32*)(iVar14 + 0x18) + iVar6 + 2);
+            s16 y = *(s16*)(*(s32*)(iVar14 + 0x18) + iVar6 + 2);
             s16 globalY = globalMax.y;
-            if (globalY < sVar1) {
-                globalY = sVar1;
+            if (globalY < y) {
+                globalY = y;
             }
             globalMax.y = globalY;
 
-            sVar1 = *(s16*)(*(s32*)(iVar14 + 0x18) + iVar6 + 4);
+            s16 z = *(s16*)(*(s32*)(iVar14 + 0x18) + iVar6 + 4);
             s16 globalZ = globalMax.z;
-            if (globalZ < sVar1) {
-                globalZ = sVar1;
+            if (globalZ < z) {
+                globalZ = z;
             }
             globalMax.z = globalZ;
 
-            psVar11 = (s16*)(*(s32*)(iVar14 + 0x18) + iVar6);
-            sVar1 = *psVar11;
-            sVar7 = sVar1;
-            s16 sVar8 = sVar1;
-            if (sVar12 < sVar1) {
-                sVar7 = sVar2;
-                sVar8 = sVar12;
+            if (x < meshMin.x) {
+                meshMin.x = x;
+            }
+            if (y < meshMin.y) {
+                meshMin.y = y;
+            }
+            if (z < meshMin.z) {
+                meshMin.z = z;
             }
 
-            sVar12 = psVar11[1];
-            s16 sVar13 = sVar12;
-            if (sVar9 < sVar12) {
-                sVar12 = sVar3;
-                sVar13 = sVar9;
+            if (meshMax.x < x) {
+                meshMax.x = x;
             }
-
-            sVar9 = psVar11[2];
-            s16 sVar10 = sVar9;
-            if (sVar4 < sVar9) {
-                sVar9 = minZ;
-                sVar10 = sVar4;
+            if (meshMax.y < y) {
+                meshMax.y = y;
             }
-
-            if (meshMax.x < sVar1) {
-                meshMax.x = sVar1;
-            }
-            sVar2 = *(s16*)(*(s32*)(iVar14 + 0x18) + iVar6 + 2);
-            if (meshMax.y < sVar2) {
-                meshMax.y = sVar2;
-            }
-            sVar2 = *(s16*)(*(s32*)(iVar14 + 0x18) + iVar6 + 4);
-            if (meshMax.z < sVar2) {
-                meshMax.z = sVar2;
+            if (meshMax.z < z) {
+                meshMax.z = z;
             }
 
             iVar6 += 6;
-            sVar2 = sVar7;
-            sVar3 = sVar12;
-            minZ = sVar9;
-            sVar12 = sVar8;
-            sVar9 = sVar13;
-            sVar4 = sVar10;
         }
 
-        meshMax.x += sVar2;
-        meshMax.y += sVar3;
-        meshMax.z += minZ;
+        meshMax.x += meshMin.x;
+        meshMax.y += meshMin.y;
+        meshMax.z += meshMin.z;
         gUtil.ConvI2FVector(*(inVec + 3), meshMax, *(u32*)(ScreenBreakModelDataRaw(model) + 0x34));
         PSVECScale(inVec + 3, inVec + 3, FLOAT_80331ccc);
 
         dVar17 = inVec[3].x;
-        if (dVar19 < dVar17) {
-            dVar17 = Math.RandF(FLOAT_80331cc8);
+        if (dVar17 > dVar19) {
+            dVar17 = Math.RandF(dVar19);
         }
         if (inVec[3].x < dVar18) {
-            dVar17 = -Math.RandF(FLOAT_80331cc8);
+            dVar17 = -Math.RandF(dVar19);
         }
 
         inVec->x = dVar17;

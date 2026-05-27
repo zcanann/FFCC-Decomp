@@ -12,9 +12,9 @@
 
 extern float FLOAT_80331928;
 extern float FLOAT_8033192c;
-static const float FLOAT_80331930 = -1000.0f;
-static const float FLOAT_80331934 = 1200.0f;
-static const float FLOAT_80331938 = 10.0f;
+extern const float FLOAT_80331930 = -1000.0f;
+extern const float FLOAT_80331934 = 1200.0f;
+extern const float FLOAT_80331938 = 10.0f;
 static const float FLOAT_8033193c = 0.0f;
 static const float FLOAT_80331940 = 1.0f;
 
@@ -81,7 +81,8 @@ static inline void _GXSetTevAlphaOp(int stage, int op, int bias, int scale, int 
 
 static inline float CalcSphereRadius(Vec* vertices, u16 count)
 {
-    float radius = FLOAT_80331930;
+    const float& minRadius = FLOAT_80331930;
+    float radius = minRadius;
 
     for (u16 i = 0; i < count; i++) {
         if (radius < vertices[i].x) {
@@ -279,7 +280,8 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
         cameraPos.x = CameraPcs.m_positionX;
         cameraPos.y = CameraPcs.m_positionY;
         cameraPos.z = CameraPcs.m_positionZ;
-        maxRadius = FLOAT_80331934;
+        const float& defaultRadius = FLOAT_80331934;
+        maxRadius = defaultRadius;
     }
 
     scaledRadius = maxRadius * radiusWork->m_scale;
@@ -287,7 +289,8 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* param_2, _pppCtr
         Game.unkFloat_0xca10 = scaledRadius;
     }
 
-    if ((FLOAT_80331938 + scaledRadius) > PSVECDistance(&cameraPos, &managerPos)) {
+    const float& cameraInsidePadding = FLOAT_80331938;
+    if ((cameraInsidePadding + scaledRadius) > PSVECDistance(&cameraPos, &managerPos)) {
         isCameraInside = 1;
     }
 

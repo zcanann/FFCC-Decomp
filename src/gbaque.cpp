@@ -3134,10 +3134,9 @@ void GbaQueue::ChkCMakeName(int channel, unsigned int value)
 
 		for (int i = 0; i < 8; i++) {
 			CCaravanWork* caravanWork = &Game.m_caravanWorkArr[i];
-			char* caravanObj = reinterpret_cast<char*>(caravanWork);
-			if ((i != localInfo.m_playerSlot) && (*reinterpret_cast<int*>(caravanObj + 0x3A4) != 0) &&
-			    (caravanObj[0xBA6] == '\0') &&
-			    (strcmp(caravanObj + 0x3CA, localInfo.m_name) == 0)) {
+			if ((i != localInfo.m_playerSlot) && (caravanWork->m_shopState != 0) &&
+			    (caravanWork->m_caravanLocalFlags == '\0') &&
+			    (strcmp(reinterpret_cast<char*>(caravanWork->unk_0x3ca_0x3dd), localInfo.m_name) == 0)) {
 				Joybus.SendResult(channel, 1, localInfo.m_resultCode, 0);
 				return;
 			}

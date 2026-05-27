@@ -3083,7 +3083,7 @@ void CMenuPcs::CalcResultOpenAnim()
 		for (int i = 0; i < activePartyCount; i++) {
 			int idx = nameBase + i;
 			InitAnimSprite(&sprites[idx], -1, 0x108, (short)(0x6C + i * 0x60), 0, 0, 0x2E + i * 4, 0x18);
-			sprites[idx].depth = 0.0f;
+			sprites[idx].depth = 1.0f;
 			sprites[idx].alpha = 0.0f;
 			sprites[idx].mulX = 18.0f;
 		}
@@ -3091,7 +3091,7 @@ void CMenuPcs::CalcResultOpenAnim()
 		for (int i = 0; i < activePartyCount; i++) {
 			int idx = labelBase + i;
 			InitAnimSprite(&sprites[idx], -1, 0x108, (short)(0x90 + i * 0x60), 0, 0, 0x3A + i * 4, 0x18);
-			sprites[idx].depth = 0.0f;
+			sprites[idx].depth = 1.0f;
 			sprites[idx].alpha = 0.0f;
 			sprites[idx].mulX = 24.0f;
 		}

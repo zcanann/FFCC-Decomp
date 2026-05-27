@@ -171,23 +171,23 @@ void CGMonObj::damagedFuncGiantCrab()
  */
 void CGMonObj::logicFuncGiantCrab()
 {
+	int nextState = -1;
 	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
 	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
-	int nextState = -1;
 
-	if (*reinterpret_cast<int*>(SoundBuffer + 1260) != 0) {
-		*reinterpret_cast<int*>(SoundBuffer + 1260) = 0;
-		const int branch = *reinterpret_cast<int*>(mon + 0x6B4);
-		const unsigned int roll = Math.Rand(10);
-		if ((branch == 0 && roll == 0) || (branch == 1 && roll < 2) || (branch == 2 && roll < 3)) {
+	if (*reinterpret_cast<int*>(m_boss__8CGMonObj) != 0) {
+		*reinterpret_cast<int*>(m_boss__8CGMonObj) = 0;
+		if ((*reinterpret_cast<int*>(mon + 0x6D0) == 0 && static_cast<unsigned int>(Math.Rand(10)) < 1) ||
+		    (*reinterpret_cast<int*>(mon + 0x6D0) == 1 && static_cast<unsigned int>(Math.Rand(10)) < 2) ||
+		    (*reinterpret_cast<int*>(mon + 0x6D0) == 2 && static_cast<unsigned int>(Math.Rand(10)) < 3)) {
 			nextState = 100;
 		}
 	}
 
-	if (nextState == -1) {
-		logicFuncDefault();
-	} else {
+	if (nextState != -1) {
 		prgObj->changeStat(nextState, 0, 0);
+	} else {
+		logicFuncDefault();
 	}
 }
 

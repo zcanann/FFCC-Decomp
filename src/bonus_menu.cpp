@@ -358,6 +358,11 @@ static void ResetAnimSpriteMotion(BonusAnimSprite* sprite)
 	sprite->scale = 1.0f;
 }
 
+static inline int& BonusSpriteFlags(BonusAnimSprite* sprite)
+{
+	return *reinterpret_cast<int*>(&sprite->scale);
+}
+
 static void FillBonusArtiBasePositions(float* out, const BonusAnimSprite* boardSprite, const BonusAnimSprite* itemSprite)
 {
 	if (out == 0 || boardSprite == 0) {
@@ -431,6 +436,7 @@ static void InitSelectOpenPartyIcon(BonusAnimSprite* sprite, int slotIndex, shor
 	sprite->motionY = 0.0f;
 	sprite->targetX = (float)sprite->x + sprite->motionX;
 	sprite->targetY = (float)sprite->y + sprite->motionY;
+	BonusSpriteFlags(sprite) = 0x10000;
 }
 
 static void InitSelectOpenPartyName(BonusAnimSprite* sprite, const BonusAnimSprite* iconSprite, short xOffset, short yOffset, int startFrame)
@@ -443,6 +449,7 @@ static void InitSelectOpenPartyName(BonusAnimSprite* sprite, const BonusAnimSpri
 	sprite->motionY = 0.0f;
 	sprite->targetX = (float)sprite->x + sprite->motionX;
 	sprite->targetY = (float)sprite->y + sprite->motionY;
+	BonusSpriteFlags(sprite) = 0x10000;
 }
 
 static void ApplySelectOpenSpriteMotion(BonusAnimSprite* sprite, int frame)
@@ -537,11 +544,6 @@ static void ApplySelectCloseSpriteMotion(BonusAnimSprite* sprite, int frame)
 	default:
 		break;
 	}
-}
-
-static inline int& BonusSpriteFlags(BonusAnimSprite* sprite)
-{
-	return *reinterpret_cast<int*>(&sprite->scale);
 }
 
 static void SetupSelectCloseSpriteMotion(BonusAnimSprite* sprite)

@@ -3103,6 +3103,7 @@ void CMenuPcs::CalcResultOpenAnim()
 		}
 
 		*(unsigned char*)(statePtr + 0xb) = 1;
+		header->finished = 0;
 		return;
 	}
 

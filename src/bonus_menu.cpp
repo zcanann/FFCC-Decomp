@@ -1113,37 +1113,38 @@ void CMenuPcs::ArtiBaseInfoInit(CMenuPcs::Sprt2* a, CMenuPcs::Sprt2* b)
 {
 	short* board = reinterpret_cast<short*>(a);
 	short* icon = reinterpret_cast<short*>(b);
+	float* base = s_Base[0];
 
 	float iconW = (float)icon[2];
 	float iconH = (float)icon[3];
 	float iconHalfW = (float)(iconW * 0.5);
 	float iconHalfH = (float)(iconH * 0.5);
 
-	s_Base[0][0] = (float)(board[0] + board[2] * 0.5);
-	s_Base[0][1] = (float)(board[1] + board[3] * 0.5);
-	s_Base[0][14] = s_Base[0][0] - iconHalfW;
-	s_Base[0][15] = (float)board[1];
-	s_Base[0][6] = s_Base[0][14];
-	s_Base[0][7] = (float)(board[1] + board[3] - iconH);
-	s_Base[0][10] = (float)board[0];
-	s_Base[0][11] = s_Base[0][1] - iconHalfH;
-	s_Base[0][2] = (float)(board[0] + board[2] - iconW);
-	s_Base[0][3] = s_Base[0][11];
+	base[0] = (float)(board[0] + board[2] * 0.5);
+	base[1] = (float)(board[1] + board[3] * 0.5);
+	base[14] = base[0] - iconHalfW;
+	base[15] = (float)board[1];
+	base[6] = base[14];
+	base[7] = (float)(board[1] + board[3] - iconH);
+	base[10] = (float)board[0];
+	base[11] = base[1] - iconHalfH;
+	base[2] = (float)(board[0] + board[2] - iconW);
+	base[3] = base[11];
 
 	for (int row = 0; row < 2; row++) {
 		float slotX = (float)(board[0] + board[2] * 0.25 - iconHalfW);
 		float slotY = (float)(board[1] + board[3] * 0.25 - iconHalfH);
 		if (row == 0) {
-			s_Base[0][12] = slotX;
-			s_Base[0][13] = slotY;
-			s_Base[0][16] = (float)(board[2] * 0.5 + slotX);
-			s_Base[0][17] = slotY;
+			base[12] = slotX;
+			base[13] = slotY;
+			base[16] = (float)(board[2] * 0.5 + slotX);
+			base[17] = slotY;
 		} else {
 			slotY = (float)(board[3] * 0.5 + slotY);
-			s_Base[0][8] = slotX;
-			s_Base[0][9] = slotY;
-			s_Base[0][4] = (float)(board[2] * 0.5 + slotX);
-			s_Base[0][5] = slotY;
+			base[8] = slotX;
+			base[9] = slotY;
+			base[4] = (float)(board[2] * 0.5 + slotX);
+			base[5] = slotY;
 		}
 	}
 }

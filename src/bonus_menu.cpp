@@ -720,47 +720,6 @@ static int FindNextBonusSelectableSlot(unsigned char unavailableMask, int startS
 	return startSlot & 7;
 }
 
-static int GetBonusSelectedArtifactId(int slot)
-{
-	if (s_Rinfo == 0 || slot < 0 || slot >= 8) {
-		return -1;
-	}
-
-	if (slot < 4) {
-		return s_Rinfo->m_tempArtifacts[slot];
-	}
-	return s_Rinfo->m_bossArtifacts[slot - 4];
-}
-
-static void GrantSelectedBonusArtifacts()
-{
-	if (s_Rinfo == 0) {
-		return;
-	}
-
-	for (int i = 0; i < s_Rinfo->m_partyCount; i++) {
-		BonusPartySummary& summary = s_Rinfo->m_party[i];
-		int itemId = summary.m_selectedItemId;
-		if (itemId <= 0 || summary.m_partySlot < 0) {
-			continue;
-		}
-
-		CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[summary.m_partySlot]);
-		if (caravanWork == 0) {
-			continue;
-		}
-
-		if (itemId < 0xFF) {
-			int artifactSlot = itemId - 0x9F;
-			if (artifactSlot >= 0 && artifactSlot < 96) {
-				caravanWork->m_artifacts[artifactSlot] = static_cast<unsigned short>(itemId);
-			}
-		} else {
-			caravanWork->AddItem(itemId, 0);
-		}
-	}
-}
-
 static void DrawBonusPartyNames(CMenuPcs* menu, BonusAnimHeader* header, BonusAnimSprite* sprites)
 {
 	CFont* font = GetBonusMenuMembers(menu).m_font;
@@ -773,25 +732,23 @@ static void DrawBonusPartyNames(CMenuPcs* menu, BonusAnimHeader* header, BonusAn
 	menu->DrawInit();
 	font->SetMargin(1.0f);
 	font->SetShadow(1);
-	font->SetScale(1.0f);
+	font->SetScale(0.9f);
 	font->SetTlut(7);
 	font->DrawInit();
 
 	int nameIndex = 0;
-	for (int i = 0; i < (int)header->count; i++) {
+	for (int i = 0; i < (int)header->count && nameIndex < activePartyCount; i++) {
 		BonusAnimSprite* sprite = &sprites[i];
 		if (sprite->kind != -1) {
 			continue;
 		}
 
-		const char* name = GetBonusPartyNameByActiveIndex(nameIndex % activePartyCount);
+		const char* name = GetBonusPartyNameByActiveIndex(nameIndex);
 		GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(ClampBonusUnit(sprite->alpha) * 255.0f)};
 		font->SetColor(color);
-		if (name != 0) {
-			font->SetPosX((float)sprite->x + sprite->mulX);
-			font->SetPosY((float)sprite->y + sprite->mulY - 12.0f);
-			font->Draw(const_cast<char*>(name));
-		}
+		font->SetPosX((float)sprite->x + sprite->mulX);
+		font->SetPosY((float)sprite->y + sprite->mulY - 12.0f);
+		font->Draw(const_cast<char*>(name));
 		nameIndex++;
 	}
 }
@@ -1479,9 +1436,6 @@ void CMenuPcs::CalcSelectCloseAnim()
 {
 	int statePtr = GetBonusMenuMembers(this).m_bonusStatePtr;
 	int animPtr = GetBonusMenuMembers(this).m_bonusAnimPtr;
-	if (statePtr == 0 || animPtr == 0) {
-		return;
-	}
 
 	BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
 	BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
@@ -1615,7 +1569,6 @@ void CMenuPcs::CalcSelectCloseAnim()
 
 	if (doneCount == (int)header->count) {
 		header->finished = 1;
-		*(short*)(animPtr + 6) = 1;
 	}
 }
 
@@ -1777,7 +1730,7 @@ void CMenuPcs::CalcSelectWait()
 			delay = (short)(delay - 1);
 			if (delay == 0 && *(unsigned char*)(statePtr + 8) != 0) {
 				unsigned char bit = (unsigned char)(1 << (selection & 7));
-				int itemId = GetBonusSelectedArtifactId(selection & 7);
+				int itemId = (&s_Rinfo->m_tempArtifacts[0])[selection & 7];
 				*(unsigned char*)(statePtr + 9) = (unsigned char)(*(unsigned char*)(statePtr + 9) | bit);
 				*(unsigned char*)(statePtr + 8) = 0;
 				if (currentParty != 0) {
@@ -1888,7 +1841,18 @@ void CMenuPcs::CalcSelectWait()
 			*(short*)(statePtr + 0x18) = (short)(*(short*)(statePtr + 0x18) + 1);
 		} else {
 			*(short*)(statePtr + 0x18) = 0;
-			GrantSelectedBonusArtifacts();
+			for (int i = 0; i < activePartyCount; i++) {
+				BonusPartySummary& summary = s_Rinfo->m_party[i];
+				int itemId = summary.m_selectedItemId;
+				if (itemId > 0) {
+					CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[summary.m_partySlot]);
+					if (itemId < 0xff) {
+						caravanWork->m_artifacts[itemId - 0x9f] = static_cast<unsigned short>(itemId);
+					} else {
+						caravanWork->AddItem(itemId, 0);
+					}
+				}
+			}
 			header->finished = 1;
 		}
 	}
@@ -2048,7 +2012,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 
 		idx = 0;
 		InitAnimSprite(&sprites[idx++], 0x16, 0, 0, 0x280, 0x1c0, 0, 0);
-		sprites[0].scale = 3.0f;
+		BonusSpriteFlags(&sprites[0]) = 3;
 		sprites[0].alpha = 0.0f;
 
 		InitAnimSprite(&sprites[idx++], -3, 0xf0, 0x38, 0x168, 0x148, 0, 8);
@@ -2124,7 +2088,6 @@ void CMenuPcs::CalcSelectOpenAnim()
 		}
 
 		header->count = (short)idx;
-		header->finished = 0;
 		*(unsigned char*)(statePtr + 0xb) = 1;
 	}
 
@@ -2532,9 +2495,6 @@ void CMenuPcs::CalcResultCloseAnim()
 
 	if (doneCount == (int)header->count) {
 		header->finished = 1;
-	}
-	if (header->finished != 0) {
-		*(short*)(animPtr + 6) = 1;
 	}
 }
 
@@ -3041,7 +3001,6 @@ void CMenuPcs::CalcResultOpenAnim()
 		memset((void*)animPtr, 0, sizeof(BonusAnimList));
 
 		header->count = (short)(1 + activePartyCount * 6);
-		header->finished = 0;
 
 		InitAnimSprite(&sprites[0], 0x16, 0, 0, 0x280, 0x1c0, 0, 8);
 		sprites[0].depth = 0.0f;
@@ -3084,7 +3043,7 @@ void CMenuPcs::CalcResultOpenAnim()
 		for (int i = 0; i < activePartyCount; i++) {
 			int idx = nameBase + i;
 			InitAnimSprite(&sprites[idx], -1, 0x108, (short)(0x6C + i * 0x60), 0, 0, 0x2E + i * 4, 0x18);
-			sprites[idx].depth = 0.0f;
+			sprites[idx].depth = 1.0f;
 			sprites[idx].alpha = 0.0f;
 			sprites[idx].mulX = 18.0f;
 		}
@@ -3092,7 +3051,7 @@ void CMenuPcs::CalcResultOpenAnim()
 		for (int i = 0; i < activePartyCount; i++) {
 			int idx = labelBase + i;
 			InitAnimSprite(&sprites[idx], -1, 0x108, (short)(0x90 + i * 0x60), 0, 0, 0x3A + i * 4, 0x18);
-			sprites[idx].depth = 0.0f;
+			sprites[idx].depth = 1.0f;
 			sprites[idx].alpha = 0.0f;
 			sprites[idx].mulX = 24.0f;
 		}
@@ -3105,6 +3064,7 @@ void CMenuPcs::CalcResultOpenAnim()
 		}
 
 		*(unsigned char*)(statePtr + 0xb) = 1;
+		header->finished = 0;
 		return;
 	}
 
@@ -3364,6 +3324,8 @@ void CMenuPcs::createBonus()
 	memset(s_Rinfo, 0, sizeof(*s_Rinfo));
 	for (int i = 0; i < 4; i++) {
 		s_Rinfo->m_tempArtifacts[i] = -1;
+	}
+	for (int i = 0; i < 4; i++) {
 		s_Rinfo->m_bossArtifacts[i] = -1;
 	}
 
@@ -3372,11 +3334,11 @@ void CMenuPcs::createBonus()
 	listPtr = reinterpret_cast<int>(new CMenuPcs::EffectInfo[0x28]);
 	GetBonusMenuMembers(this).m_bonusListPtr = listPtr;
 
-	memset((void*)statePtr, 0, sizeof(BonusMenuStateRaw));
 	BonusEffectSlotList* effectSlots = reinterpret_cast<BonusEffectSlotList*>(listPtr);
 	for (int i = 0; i < 5; i++) {
 		InitBonusEffectSlotBlock(&effectSlots->slots[i]);
 	}
+	memset((void*)statePtr, 0, sizeof(BonusMenuStateRaw));
 	s_Base[0] = reinterpret_cast<float*>(new BonusBaseRaw);
 	memset(s_Base[0], 0, sizeof(float) * 18);
 	animPtr = reinterpret_cast<int>(new BonusAnimList);
@@ -3387,7 +3349,6 @@ void CMenuPcs::createBonus()
 	auxPtr = reinterpret_cast<int>(new BonusMenuAuxRaw);
 	GetBonusMenuMembers(this).m_bonusAuxPtr = auxPtr;
 	memset((void*)auxPtr, 0, sizeof(BonusMenuAuxRaw));
-	memset((void*)boardPtr, 0, sizeof(BonusBoardEntryList));
 	BonusBoardEntryList* boardEntries = reinterpret_cast<BonusBoardEntryList*>(boardPtr);
 	for (int i = 0; i < 0x18; i++) {
 		InitBonusBoardEntry(&boardEntries->entries[i]);

@@ -2124,7 +2124,6 @@ void CMenuPcs::CalcSelectOpenAnim()
 		}
 
 		header->count = (short)idx;
-		header->finished = 0;
 		*(unsigned char*)(statePtr + 0xb) = 1;
 	}
 

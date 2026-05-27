@@ -2129,12 +2129,12 @@ void CMenuPcs::CalcSelectOpenAnim()
 
 	for (int i = 0; i < (int)header->count; i++) {
 		BonusAnimSprite* sprite = &sprites[i];
-		if (frame < sprite->startFrame) {
-			continue;
-		}
-
 		if (sprite->startFrame + sprite->duration <= frame || sprite->startFrame > 9998) {
 			doneCount++;
+		}
+
+		if (frame < sprite->startFrame) {
+			continue;
 		}
 
 		if (frame < sprite->startFrame + sprite->duration) {

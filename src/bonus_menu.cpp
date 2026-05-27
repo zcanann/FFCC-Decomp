@@ -1612,7 +1612,6 @@ void CMenuPcs::CalcSelectCloseAnim()
 
 	if (doneCount == (int)header->count) {
 		header->finished = 1;
-		*(short*)(animPtr + 6) = 1;
 	}
 }
 
@@ -2528,9 +2527,6 @@ void CMenuPcs::CalcResultCloseAnim()
 
 	if (doneCount == (int)header->count) {
 		header->finished = 1;
-	}
-	if (header->finished != 0) {
-		*(short*)(animPtr + 6) = 1;
 	}
 }
 

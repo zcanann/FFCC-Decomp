@@ -132,9 +132,9 @@ static CGBaseObj* FindNextGBaseObjByCidMask(CFlatRuntime2* runtime, CFlatRuntime
 
 	while (object != root) {
 		if (object->m_classIndex >= 0) {
-			int flags = object->m_flags;
+			u8 flags = object->m_flags;
 			if ((int)(flags << 24) >= 0 && (int)((flags << 25) | (flags >> 7)) >= 0) {
-				if ((reinterpret_cast<CGBaseObj*>(object)->GetCID() & cidMask) == cidMask) {
+				if ((static_cast<u16>(reinterpret_cast<CGBaseObj*>(object)->GetCID()) & cidMask) == cidMask) {
 					return reinterpret_cast<CGBaseObj*>(object);
 				}
 			}
@@ -1112,9 +1112,9 @@ CGObject* CFlatRuntime2::FindGObjFirst()
 
 	while (object != root) {
 		if (object->m_classIndex >= 0) {
-			int flags = object->m_flags;
+			u8 flags = object->m_flags;
 			if ((int)(flags << 24) >= 0 && (int)((flags << 25) | (flags >> 7)) >= 0) {
-				if ((reinterpret_cast<CGBaseObj*>(object)->GetCID() & 5) == 5) {
+				if ((static_cast<u16>(reinterpret_cast<CGBaseObj*>(object)->GetCID()) & 5) == 5) {
 					return reinterpret_cast<CGObject*>(object);
 				}
 			}
@@ -1142,9 +1142,9 @@ CGObject* CFlatRuntime2::FindGObjNext(CGObject* gObject)
 
 	while (object != root) {
 		if (object->m_classIndex >= 0) {
-			int flags = object->m_flags;
+			u8 flags = object->m_flags;
 			if ((int)(flags << 24) >= 0 && (int)((flags << 25) | (flags >> 7)) >= 0) {
-				if ((reinterpret_cast<CGBaseObj*>(object)->GetCID() & 5) == 5) {
+				if ((static_cast<u16>(reinterpret_cast<CGBaseObj*>(object)->GetCID()) & 5) == 5) {
 					return reinterpret_cast<CGObject*>(object);
 				}
 			}
@@ -1192,9 +1192,9 @@ CGQuadObj* CFlatRuntime2::FindGQuadObjFirst()
 
 	while (object != root) {
 		if (object->m_classIndex >= 0) {
-			int flags = object->m_flags;
+			u8 flags = object->m_flags;
 			if ((int)(flags << 24) >= 0 && (int)((flags << 25) | (flags >> 7)) >= 0) {
-				if ((reinterpret_cast<CGBaseObj*>(object)->GetCID() & 3) == 3) {
+				if ((static_cast<u16>(reinterpret_cast<CGBaseObj*>(object)->GetCID()) & 3) == 3) {
 					return reinterpret_cast<CGQuadObj*>(object);
 				}
 			}
@@ -1222,9 +1222,9 @@ CGQuadObj* CFlatRuntime2::FindGQuadObjNext(CGQuadObj* gQuadObj)
 
 	while (object != root) {
 		if (object->m_classIndex >= 0) {
-			int flags = object->m_flags;
+			u8 flags = object->m_flags;
 			if ((int)(flags << 24) >= 0 && (int)((flags << 25) | (flags >> 7)) >= 0) {
-				if ((reinterpret_cast<CGBaseObj*>(object)->GetCID() & 3) == 3) {
+				if ((static_cast<u16>(reinterpret_cast<CGBaseObj*>(object)->GetCID()) & 3) == 3) {
 					return reinterpret_cast<CGQuadObj*>(object);
 				}
 			}
@@ -1252,9 +1252,9 @@ CGMonObj* CFlatRuntime2::FindGMonObjFirst()
 
 	while (object != root) {
 		if (object->m_classIndex >= 0) {
-			int flags = object->m_flags;
+			u8 flags = object->m_flags;
 			if ((int)(flags << 24) >= 0 && (int)((flags << 25) | (flags >> 7)) >= 0) {
-				if ((reinterpret_cast<CGBaseObj*>(object)->GetCID() & 0xAD) == 0xAD) {
+				if ((static_cast<u16>(reinterpret_cast<CGBaseObj*>(object)->GetCID()) & 0xAD) == 0xAD) {
 					return reinterpret_cast<CGMonObj*>(object);
 				}
 			}
@@ -1282,9 +1282,9 @@ CGMonObj* CFlatRuntime2::FindGMonObjNext(CGMonObj* gMonObj)
 
 	while (object != root) {
 		if (object->m_classIndex >= 0) {
-			int flags = object->m_flags;
+			u8 flags = object->m_flags;
 			if ((int)(flags << 24) >= 0 && (int)((flags << 25) | (flags >> 7)) >= 0) {
-				if ((reinterpret_cast<CGBaseObj*>(object)->GetCID() & 0xAD) == 0xAD) {
+				if ((static_cast<u16>(reinterpret_cast<CGBaseObj*>(object)->GetCID()) & 0xAD) == 0xAD) {
 					return reinterpret_cast<CGMonObj*>(object);
 				}
 			}
@@ -1312,9 +1312,9 @@ CGItemObj* CFlatRuntime2::FindGItemObjFirst()
 
 	while (object != root) {
 		if (object->m_classIndex >= 0) {
-			int flags = object->m_flags;
+			u8 flags = object->m_flags;
 			if ((int)(flags << 24) >= 0 && (int)((flags << 25) | (flags >> 7)) >= 0) {
-				if ((reinterpret_cast<CGBaseObj*>(object)->GetCID() & 0x1D) == 0x1D) {
+				if ((static_cast<u16>(reinterpret_cast<CGBaseObj*>(object)->GetCID()) & 0x1D) == 0x1D) {
 					return reinterpret_cast<CGItemObj*>(object);
 				}
 			}
@@ -1342,9 +1342,9 @@ CGItemObj* CFlatRuntime2::FindGItemObjNext(CGItemObj* gItemObj)
 
 	while (object != root) {
 		if (object->m_classIndex >= 0) {
-			int flags = object->m_flags;
+			u8 flags = object->m_flags;
 			if ((int)(flags << 24) >= 0 && (int)((flags << 25) | (flags >> 7)) >= 0) {
-				if ((reinterpret_cast<CGBaseObj*>(object)->GetCID() & 0x1D) == 0x1D) {
+				if ((static_cast<u16>(reinterpret_cast<CGBaseObj*>(object)->GetCID()) & 0x1D) == 0x1D) {
 					return reinterpret_cast<CGItemObj*>(object);
 				}
 			}

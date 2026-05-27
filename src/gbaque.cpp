@@ -4356,7 +4356,8 @@ unsigned int GbaQueue::GetChgUseItemFlg(int channel)
 	value = static_cast<int>(static_cast<char>(obj[0x2D37])) & (1 << channel);
 	result = static_cast<unsigned int>(-value | value) >> 31;
 	OSSignalSemaphore(accessSemaphores + channel);
-	return static_cast<unsigned int>(-result | result) >> 31;
+	result = static_cast<unsigned int>(-result | result) >> 31;
+	return result;
 }
 
 /*
@@ -4450,7 +4451,8 @@ unsigned int GbaQueue::GetArtiDatFlg(int channel)
 	value = static_cast<int>(static_cast<char>(obj[0x2D3F])) & (1 << channel);
 	result = static_cast<unsigned int>(-value | value) >> 31;
 	OSSignalSemaphore(accessSemaphores + channel);
-	return static_cast<unsigned int>(-result | result) >> 31;
+	result = static_cast<unsigned int>(-result | result) >> 31;
+	return result;
 }
 
 /*

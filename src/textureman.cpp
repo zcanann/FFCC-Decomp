@@ -14,11 +14,19 @@ inline void* operator new(unsigned long, void* p)
     return p;
 }
 
+extern const char s_CTextureSet_801D7968[] = "CTextureSet";
 extern "C" const char s_textureman_cpp[] = "textureman.cpp";
 static const char s_Error_width_pctd_height_pctd_801D7984[] = "Error width=%d height=%d\n";
 static const char s_CTexture_texture_801D79A0[] = "CTexture.texture";
-extern const char s_ptrarray_grow_error_801D79D8[];
-extern const char s_collection_ptrarray_h_801D79F4[];
+extern const char s_CTexture_801D79B4[] = "CTexture";
+extern const char s_CTextureMan_801D79C0[] = "CTextureMan";
+extern const char s_CManager_801D79CC[] = "CManager";
+extern const char s_ptrarray_grow_error_801D79D8[] = {
+    0x83, 0x6f, 0x83, 0x62, 0x83, 0x74, 0x83, 0x40, 0x90, 0xac, 0x92, 0xb7, 0x82, 0xaa,
+    0x95, 0x73, 0x8b, 0x96, 0x89, 0xc2, 0x82, 0xc5, 0x82, 0xb7, 0x81, 0x42, 0x0a, 0x00,
+};
+extern const char s_collection_ptrarray_h_801D79F4[] = "collection_ptrarray.h";
+extern const char s_CPtrArray_CTexture_801D7A0C[] = "CPtrArray<CTexture *>";
 extern const char s_CRef_8032FAE8[];
 extern const float FLOAT_8032faf0;
 extern const float FLOAT_8032faf4;

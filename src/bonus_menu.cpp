@@ -3414,8 +3414,9 @@ void CMenuPcs::createBonus()
 			} else if (entry.m_totalValue > 999) {
 				entry.m_totalValue = 999;
 			}
+			entry.m_selectedItemId = -1;
+			entry.m_selectedSlot = -1;
 			entry.m_tribeId = (unsigned int)caravanWork->m_tribeId;
-			entry.m_ownedArtifactMask = 0;
 			if (entry.m_partyHandle != 0 && entry.m_partyHandle->m_model != 0) {
 				*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(entry.m_partyHandle->m_model) + 0x9C) = 0.0f;
 			}

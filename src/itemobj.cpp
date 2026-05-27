@@ -1130,7 +1130,7 @@ void CGItemObj::onFrameStat()
 		}
 		break;
 	case 0x23:
-		if (*(int*)(self + 0x52C) == 1) {
+		if (*(int*)(self + 0x52C) != 0 && *(int*)(self + 0x52C) == 1) {
 			CCharaPcs::CHandle* handle = prgObj->m_charaModelHandle;
 			if (handle != 0 && handle->m_model != 0) {
 				unsigned char* model = reinterpret_cast<unsigned char*>(handle->m_model);

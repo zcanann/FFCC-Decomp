@@ -37,6 +37,7 @@ unsigned int CMaterialEditorPcs::m_table_desc1[3] = {0, 0xFFFFFFFF, reinterpret_
 unsigned int CMaterialEditorPcs::m_table_desc2[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcViewer__18CMaterialEditorPcsFv)};
 unsigned int CMaterialEditorPcs::m_table_desc3[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawViewer__18CMaterialEditorPcsFv)};
 CMaterialEditorPcs MaterialEditorPcs;
+char* q;
 
 unsigned int CMaterialEditorPcs::m_table[0x15C / sizeof(unsigned int)] = {
     reinterpret_cast<unsigned int>(const_cast<char*>(s_CMaterialEditorPcsViewer)),
@@ -174,7 +175,6 @@ struct MaterialEditorPolygon {
 
 void CMaterialEditorPcs::drawViewer()
 {
-    static char* q;
     static int color;
 
     if (*reinterpret_cast<char*>(&color) == 0) {

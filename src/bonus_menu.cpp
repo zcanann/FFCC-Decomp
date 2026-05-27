@@ -720,47 +720,6 @@ static int FindNextBonusSelectableSlot(unsigned char unavailableMask, int startS
 	return startSlot & 7;
 }
 
-static int GetBonusSelectedArtifactId(int slot)
-{
-	if (s_Rinfo == 0 || slot < 0 || slot >= 8) {
-		return -1;
-	}
-
-	if (slot < 4) {
-		return s_Rinfo->m_tempArtifacts[slot];
-	}
-	return s_Rinfo->m_bossArtifacts[slot - 4];
-}
-
-static void GrantSelectedBonusArtifacts()
-{
-	if (s_Rinfo == 0) {
-		return;
-	}
-
-	for (int i = 0; i < s_Rinfo->m_partyCount; i++) {
-		BonusPartySummary& summary = s_Rinfo->m_party[i];
-		int itemId = summary.m_selectedItemId;
-		if (itemId <= 0 || summary.m_partySlot < 0) {
-			continue;
-		}
-
-		CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[summary.m_partySlot]);
-		if (caravanWork == 0) {
-			continue;
-		}
-
-		if (itemId < 0xFF) {
-			int artifactSlot = itemId - 0x9F;
-			if (artifactSlot >= 0 && artifactSlot < 96) {
-				caravanWork->m_artifacts[artifactSlot] = static_cast<unsigned short>(itemId);
-			}
-		} else {
-			caravanWork->AddItem(itemId, 0);
-		}
-	}
-}
-
 static void DrawBonusPartyNames(CMenuPcs* menu, BonusAnimHeader* header, BonusAnimSprite* sprites)
 {
 	CFont* font = GetBonusMenuMembers(menu).m_font;
@@ -1773,7 +1732,7 @@ void CMenuPcs::CalcSelectWait()
 			delay = (short)(delay - 1);
 			if (delay == 0 && *(unsigned char*)(statePtr + 8) != 0) {
 				unsigned char bit = (unsigned char)(1 << (selection & 7));
-				int itemId = GetBonusSelectedArtifactId(selection & 7);
+				int itemId = (&s_Rinfo->m_tempArtifacts[0])[selection & 7];
 				*(unsigned char*)(statePtr + 9) = (unsigned char)(*(unsigned char*)(statePtr + 9) | bit);
 				*(unsigned char*)(statePtr + 8) = 0;
 				if (currentParty != 0) {
@@ -1884,7 +1843,18 @@ void CMenuPcs::CalcSelectWait()
 			*(short*)(statePtr + 0x18) = (short)(*(short*)(statePtr + 0x18) + 1);
 		} else {
 			*(short*)(statePtr + 0x18) = 0;
-			GrantSelectedBonusArtifacts();
+			for (int i = 0; i < activePartyCount; i++) {
+				BonusPartySummary& summary = s_Rinfo->m_party[i];
+				int itemId = summary.m_selectedItemId;
+				if (itemId > 0) {
+					CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[summary.m_partySlot]);
+					if (itemId < 0xff) {
+						caravanWork->m_artifacts[itemId - 0x9f] = static_cast<unsigned short>(itemId);
+					} else {
+						caravanWork->AddItem(itemId, 0);
+					}
+				}
+			}
 			header->finished = 1;
 		}
 	}

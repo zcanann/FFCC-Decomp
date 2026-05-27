@@ -5,6 +5,7 @@
 #include "ffcc/pppPart.h"
 extern "C" {
 extern const float kPppParHitSphZero;
+extern const char s_pppParHitSphWin[] = "win";
 }
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
@@ -60,4 +61,3 @@ void pppParHitSph(struct _pppPObject* param_1, int param_2)
         Graphic.DrawSphere(sphereMtx, local_a8);
     }
 }
-

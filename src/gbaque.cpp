@@ -4973,33 +4973,29 @@ void GbaQueue::SetControllerMode(int controllerMode)
  */
 unsigned int GbaQueue::GetControllerMode()
 {
-	GbaQueue* queue;
 	char mode;
-	int waitIndex;
-	GbaQueue* waitSemaphore;
 	unsigned int result;
-	int signalIndex;
-	GbaQueue* signalSemaphore;
+	int i;
+	GbaQueue* semaphore;
 
-	queue = this;
-	waitIndex = 0;
-	waitSemaphore = queue;
+	i = 0;
+	semaphore = this;
 	do {
-		OSWaitSemaphore(waitSemaphore->accessSemaphores);
-		waitIndex++;
-		waitSemaphore = reinterpret_cast<GbaQueue*>(waitSemaphore->accessSemaphores + 1);
-	} while (waitIndex < 4);
+		OSWaitSemaphore(semaphore->accessSemaphores);
+		i++;
+		semaphore = reinterpret_cast<GbaQueue*>(semaphore->accessSemaphores + 1);
+	} while (i < 4);
 
-	mode = queue->m_controllerMode;
+	mode = m_controllerMode;
 	result = static_cast<unsigned int>(-static_cast<int>(mode) | static_cast<int>(mode)) >> 31;
 
-	signalSemaphore = queue;
-	signalIndex = 0;
+	semaphore = this;
+	i = 0;
 	do {
-		OSSignalSemaphore(signalSemaphore->accessSemaphores);
-		signalIndex++;
-		signalSemaphore = reinterpret_cast<GbaQueue*>(signalSemaphore->accessSemaphores + 1);
-	} while (signalIndex < 4);
+		OSSignalSemaphore(semaphore->accessSemaphores);
+		i++;
+		semaphore = reinterpret_cast<GbaQueue*>(semaphore->accessSemaphores + 1);
+	} while (i < 4);
 
 	return result;
 }
@@ -5145,33 +5141,29 @@ void GbaQueue::SetPauseMode(int mode)
  */
 unsigned int GbaQueue::GetPauseMode()
 {
-	GbaQueue* queue;
 	char mode;
-	int waitIndex;
-	GbaQueue* waitSemaphore;
 	unsigned int result;
-	int signalIndex;
-	GbaQueue* signalSemaphore;
+	int i;
+	GbaQueue* semaphore;
 
-	queue = this;
-	waitIndex = 0;
-	waitSemaphore = queue;
+	i = 0;
+	semaphore = this;
 	do {
-		OSWaitSemaphore(waitSemaphore->accessSemaphores);
-		waitIndex++;
-		waitSemaphore = reinterpret_cast<GbaQueue*>(waitSemaphore->accessSemaphores + 1);
-	} while (waitIndex < 4);
+		OSWaitSemaphore(semaphore->accessSemaphores);
+		i++;
+		semaphore = reinterpret_cast<GbaQueue*>(semaphore->accessSemaphores + 1);
+	} while (i < 4);
 
-	mode = queue->m_pauseMode;
+	mode = m_pauseMode;
 	result = static_cast<unsigned int>(-static_cast<int>(mode) | static_cast<int>(mode)) >> 31;
 
-	signalSemaphore = queue;
-	signalIndex = 0;
+	semaphore = this;
+	i = 0;
 	do {
-		OSSignalSemaphore(signalSemaphore->accessSemaphores);
-		signalIndex++;
-		signalSemaphore = reinterpret_cast<GbaQueue*>(signalSemaphore->accessSemaphores + 1);
-	} while (signalIndex < 4);
+		OSSignalSemaphore(semaphore->accessSemaphores);
+		i++;
+		semaphore = reinterpret_cast<GbaQueue*>(semaphore->accessSemaphores + 1);
+	} while (i < 4);
 
 	return result;
 }

@@ -2438,6 +2438,16 @@ void CMenuPcs::CalcResultCloseAnim()
 			sprite->duration = 8;
 		}
 
+		for (int i = 0; i < (int)header->count; i++) {
+			BonusAnimSprite* sprite = &sprites[i];
+			if (sprite->motionX == 0.0f) {
+				sprite->targetX = (float)sprite->x;
+			}
+			if (sprite->motionY == 0.0f) {
+				sprite->targetY = (float)sprite->y;
+			}
+		}
+
 		Sound.PlaySe(0x4a, 0x40, 0x7f, 0);
 		*(short*)(animPtr + 6) = 0;
 		*(unsigned char*)(statePtr + 0xb) = 1;

@@ -229,7 +229,7 @@ void CMenuPcs::Init()
     self[0x8E] = 0;
     one = LoadFloat(kMenuInitOne);
     i = 1;
-    cardChannel = reinterpret_cast<int*>(self + 0x838);
+    cardChannel = reinterpret_cast<int*>(self + 0x28);
     self[0x8F] = 0;
     self[0x90] = 0;
     self[0x91] = 6;

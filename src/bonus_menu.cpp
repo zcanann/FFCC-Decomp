@@ -3217,9 +3217,6 @@ void CMenuPcs::createBonus()
 	for (int i = 0; i < 4; i++) {
 		s_Rinfo->m_tempArtifacts[i] = -1;
 		s_Rinfo->m_bossArtifacts[i] = -1;
-		s_Rinfo->m_party[i].m_partySlot = -1;
-		s_Rinfo->m_party[i].m_selectedItemId = -1;
-		s_Rinfo->m_party[i].m_selectedSlot = -1;
 	}
 
 	statePtr = reinterpret_cast<int>(new BonusMenuStateRaw);

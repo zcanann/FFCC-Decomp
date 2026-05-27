@@ -3103,6 +3103,13 @@ void CMenuPcs::CalcResultOpenAnim()
 			sprites[idx].mulX = 24.0f;
 		}
 
+		for (int i = 0; i < 0x18; i++) {
+			CCharaPcs::CHandle* handle = GetBonusDisplayHandleSlots(this)[i];
+			if (handle != 0) {
+				handle->m_model->m_lightAlpha = 0.0f;
+			}
+		}
+
 		*(unsigned char*)(statePtr + 0xb) = 1;
 		return;
 	}

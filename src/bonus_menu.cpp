@@ -3360,6 +3360,8 @@ void CMenuPcs::createBonus()
 	memset(s_Rinfo, 0, sizeof(*s_Rinfo));
 	for (int i = 0; i < 4; i++) {
 		s_Rinfo->m_tempArtifacts[i] = -1;
+	}
+	for (int i = 0; i < 4; i++) {
 		s_Rinfo->m_bossArtifacts[i] = -1;
 	}
 
@@ -3368,11 +3370,11 @@ void CMenuPcs::createBonus()
 	listPtr = reinterpret_cast<int>(new CMenuPcs::EffectInfo[0x28]);
 	GetBonusMenuMembers(this).m_bonusListPtr = listPtr;
 
-	memset((void*)statePtr, 0, sizeof(BonusMenuStateRaw));
 	BonusEffectSlotList* effectSlots = reinterpret_cast<BonusEffectSlotList*>(listPtr);
 	for (int i = 0; i < 5; i++) {
 		InitBonusEffectSlotBlock(&effectSlots->slots[i]);
 	}
+	memset((void*)statePtr, 0, sizeof(BonusMenuStateRaw));
 	s_Base[0] = reinterpret_cast<float*>(new BonusBaseRaw);
 	memset(s_Base[0], 0, sizeof(float) * 18);
 	animPtr = reinterpret_cast<int>(new BonusAnimList);
@@ -3383,7 +3385,6 @@ void CMenuPcs::createBonus()
 	auxPtr = reinterpret_cast<int>(new BonusMenuAuxRaw);
 	GetBonusMenuMembers(this).m_bonusAuxPtr = auxPtr;
 	memset((void*)auxPtr, 0, sizeof(BonusMenuAuxRaw));
-	memset((void*)boardPtr, 0, sizeof(BonusBoardEntryList));
 	BonusBoardEntryList* boardEntries = reinterpret_cast<BonusBoardEntryList*>(boardPtr);
 	for (int i = 0; i < 0x18; i++) {
 		InitBonusBoardEntry(&boardEntries->entries[i]);

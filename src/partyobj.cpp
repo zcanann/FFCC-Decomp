@@ -2498,12 +2498,15 @@ int CGPartyObj::canPlayerUseItem()
 		if ((static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(weaponFlags[1]) << 24) & 0xC0000000) >> 31) != 0) &&
 		    (static_cast<signed char>(static_cast<int>((static_cast<unsigned int>(self[0x63C]) << 24) & 0xC0000000) >> 31) != 0)) {
 			if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) {
-				return 1;
+				goto canUse;
 			}
 		}
 	}
 
 	return 0;
+
+canUse:
+	return 1;
 }
 
 /*

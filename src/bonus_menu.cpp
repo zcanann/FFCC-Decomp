@@ -3457,20 +3457,19 @@ void CMenuPcs::createBonus()
 				continue;
 			}
 
+			short* rewardItems = &s_Rinfo->m_tempArtifacts[0];
 			for (int artifactIndex = 0; artifactIndex < 8; artifactIndex++) {
-				short itemId = (artifactIndex < 4)
-				                   ? s_Rinfo->m_tempArtifacts[artifactIndex]
-				                   : s_Rinfo->m_bossArtifacts[artifactIndex - 4];
+				short itemId = rewardItems[artifactIndex];
 				if (itemId <= 0) {
 					continue;
 				}
 
 				if (GetItemType(itemId, 1) == 2) {
 					int artifactSlot = itemId - 0x9F;
-					if (artifactSlot >= 0 && artifactSlot < 96 && caravanWork->m_artifacts[artifactSlot] == itemId) {
+					if (caravanWork->m_artifacts[artifactSlot] == itemId) {
 						s_Rinfo->m_party[i].m_ownedArtifactMask |= (1u << artifactIndex);
 					}
-				} else if (caravanWork->FindItem(itemId) >= 0) {
+				} else if (caravanWork->m_inventoryItemCount + 1 > 0x40) {
 					s_Rinfo->m_party[i].m_ownedArtifactMask |= (1u << artifactIndex);
 				}
 			}
@@ -3529,10 +3528,9 @@ void CMenuPcs::createBonus()
 			}
 
 			int handleIndex = activeCount * 2;
+			short* rewardItems = &s_Rinfo->m_tempArtifacts[0];
 			for (int artifactIndex = 0; artifactIndex < 8 && handleIndex < 0x18; artifactIndex++) {
-				short itemId = (artifactIndex < 4)
-				                   ? s_Rinfo->m_tempArtifacts[artifactIndex]
-				                   : s_Rinfo->m_bossArtifacts[artifactIndex - 4];
+				short itemId = rewardItems[artifactIndex];
 				if (itemId <= 0) {
 					displaySlots[handleIndex] = 0;
 					handleIndex++;

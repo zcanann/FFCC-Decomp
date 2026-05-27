@@ -8,9 +8,6 @@
 #include "ffcc/system.h"
 #include <string.h>
 
-extern const float FLOAT_803333D0;
-extern const double DOUBLE_803333E8;
-extern const float FLOAT_803333F0;
 extern const double DOUBLE_80333410;
 extern const double DOUBLE_80333418;
 extern const double DOUBLE_80333420;
@@ -178,13 +175,13 @@ int CMenuPcs::MLstClose()
 		if (entry->startFrame <= currentFrame) {
 			if (entry->startFrame + entry->duration <= currentFrame) {
 				completedItems++;
-				entry->alpha = FLOAT_803333D0;
+				entry->alpha = 0.0f;
 			} else {
 				entry->timer = entry->timer + 1;
 				double ratio = DOUBLE_80333410 / (double)entry->duration;
 				entry->alpha = (float)(DOUBLE_80333410 - ratio * (double)entry->timer);
 				if ((double)entry->alpha < DOUBLE_80333418) {
-					entry->alpha = FLOAT_803333D0;
+					entry->alpha = 0.0f;
 				}
 			}
 		}
@@ -192,7 +189,7 @@ int CMenuPcs::MLstClose()
 	}
 	result = 0;
 	if (this->lstData->count == completedItems) {
-		zero = FLOAT_803333D0;
+		zero = 0.0f;
 		entry = this->lstData->entries;
 		for (count = itemCount; count != 0; count--) {
 			entry->startFrame = 0;
@@ -290,7 +287,7 @@ int CMenuPcs::MLstCtrl()
 	}
 
 	if (result != 0) {
-		one = FLOAT_803333F0;
+		one = 1.0f;
 		MenuLstEntry* entry = this->lstData->entries;
 		for (i = 0; (itemCount = (unsigned int)this->lstData->count), i < (int)itemCount; i++) {
 			entry->alpha = one;
@@ -336,13 +333,13 @@ int CMenuPcs::MLstOpen()
 		short yPos;
 
 		memset(this->lstData, 0, sizeof(MenuLstList));
-		one = FLOAT_803333F0;
+		one = 1.0f;
 		entry = this->lstData->entries;
 		for (i = 0; i < 64; i++, entry++) {
 			entry->z = one;
 		}
 
-		zero = FLOAT_803333D0;
+		zero = 0.0f;
 		initializedCount = 0;
 		yPos = 0x18;
 		for (i = 0; i < 9; i++) {
@@ -352,7 +349,7 @@ int CMenuPcs::MLstOpen()
 			entry->tex = 0x5B;
 			entry->width = 0xE0;
 			entry->height = 0x28;
-			entry->x = (short)(int)-(((double)entry->width * DOUBLE_803333E8) - DOUBLE_80333420);
+			entry->x = (short)(int)-(((double)entry->width * 0.5) - DOUBLE_80333420);
 			entry->y = yPos;
 			yPos += 0x20;
 			entry->s = zero;
@@ -373,7 +370,7 @@ int CMenuPcs::MLstOpen()
 		if (entry->startFrame <= currentFrame) {
 			if (entry->startFrame + entry->duration <= currentFrame) {
 				completedItems++;
-				entry->alpha = FLOAT_803333F0;
+				entry->alpha = 1.0f;
 			} else {
 				entry->timer = entry->timer + 1;
 				double ratio = DOUBLE_80333410 / (double)entry->duration;
@@ -385,7 +382,7 @@ int CMenuPcs::MLstOpen()
 
 	int result = 0;
 	if (this->lstData->count == completedItems) {
-		one = FLOAT_803333F0;
+		one = 1.0f;
 		entry = this->lstData->entries;
 		for (count = itemCount; count != 0; count--) {
 			entry->startFrame = 0;

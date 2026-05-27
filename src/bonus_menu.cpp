@@ -737,13 +737,13 @@ static void DrawBonusPartyNames(CMenuPcs* menu, BonusAnimHeader* header, BonusAn
 	font->DrawInit();
 
 	int nameIndex = 0;
-	for (int i = 0; i < (int)header->count; i++) {
+	for (int i = 0; i < (int)header->count && nameIndex < activePartyCount; i++) {
 		BonusAnimSprite* sprite = &sprites[i];
 		if (sprite->kind != -1) {
 			continue;
 		}
 
-		const char* name = GetBonusPartyNameByActiveIndex(nameIndex % activePartyCount);
+		const char* name = GetBonusPartyNameByActiveIndex(nameIndex);
 		GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(ClampBonusUnit(sprite->alpha) * 255.0f)};
 		font->SetColor(color);
 		font->SetPosX((float)sprite->x + sprite->mulX);

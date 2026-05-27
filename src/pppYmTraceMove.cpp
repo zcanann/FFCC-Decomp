@@ -29,11 +29,6 @@ struct pppYmTraceMoveMngStRaw {
 	void* m_owner;
 };
 
-static inline pppYmTraceMoveWork* GetYmTraceMoveWork(pppYmTraceMove* traceMove, pppYmTraceMoveCtrl* ctrl)
-{
-	return reinterpret_cast<pppYmTraceMoveWork*>(traceMove->m_object.m_workArea + *ctrl->m_serializedDataOffsets);
-}
-
 /*
  * --INFO--
  * PAL Address: 0x800d4828
@@ -50,15 +45,16 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveStep* par
 	}
 
 	pppYmTraceMoveMngStRaw* pppMngSt = (pppYmTraceMoveMngStRaw*)ppvMng;
-	pppYmTraceMoveWork* work = GetYmTraceMoveWork(pppYmTraceMove, param_3);
+	pppYmTraceMoveWork* work =
+		(pppYmTraceMoveWork*)((u8*)pppYmTraceMove + 0x80 + *param_3->m_serializedDataOffsets);
 	void* owner = pppMngSt->m_owner;
 	Vec local_20;
 	Vec local_2c;
 	Vec local_8c;
 	Vec local_ec;
 	Vec local_f8;
-	Quaternion local_60;
 	Quaternion local_70;
+	Quaternion local_60;
 	Quaternion local_80;
 
 	work->m_velocity = work->m_velocity + work->m_acceleration;
@@ -94,15 +90,15 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveStep* par
 		pppNormalize(local_2c, local_2c);
 	}
 
-	local_60.x = local_20.x;
-	local_60.y = local_20.y;
-	local_60.z = local_20.z;
-	local_60.w = kPppYmTraceMoveOne;
-	local_70.x = local_2c.x;
-	local_70.y = local_2c.y;
-	local_70.z = local_2c.z;
-	local_70.w = local_60.w;
-	C_QUATLerp(&local_70, &local_60, &local_80, param_2->m_dataValIndex);
+	local_70.x = local_20.x;
+	local_70.y = local_20.y;
+	local_70.z = local_20.z;
+	local_70.w = kPppYmTraceMoveOne;
+	local_60.x = local_2c.x;
+	local_60.y = local_2c.y;
+	local_60.z = local_2c.z;
+	local_60.w = local_70.w;
+	C_QUATLerp(&local_60, &local_70, &local_80, param_2->m_dataValIndex);
 	PSQUATNormalize(&local_80, &local_80);
 
 	local_f8.x = local_80.x;
@@ -129,7 +125,7 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveStep* par
  */
 void pppConstructYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveCtrl* param_2)
 {
-	pppYmTraceMoveWork* work = GetYmTraceMoveWork(pppYmTraceMove, param_2);
+	pppYmTraceMoveWork* work = (pppYmTraceMoveWork*)((u8*)pppYmTraceMove + 0x80 + *param_2->m_serializedDataOffsets);
 	pppYmTraceMoveMngStRaw* pppMngSt = (pppYmTraceMoveMngStRaw*)ppvMng;
 	f32 zero;
 

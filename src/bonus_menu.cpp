@@ -2372,7 +2372,6 @@ void CMenuPcs::CalcResultCloseAnim()
 
 	if (*(unsigned char*)(statePtr + 0xb) == 0) {
 		*(short*)(statePtr + 0x22) = 0;
-		header->finished = 0;
 
 		for (int i = 0; i < (int)header->count; i++) {
 			sprites[i].timer = 0;
@@ -2448,7 +2447,6 @@ void CMenuPcs::CalcResultCloseAnim()
 			}
 		}
 
-		Sound.PlaySe(0x4a, 0x40, 0x7f, 0);
 		*(short*)(animPtr + 6) = 0;
 		*(unsigned char*)(statePtr + 0xb) = 1;
 	}

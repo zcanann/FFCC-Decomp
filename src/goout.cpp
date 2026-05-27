@@ -1434,7 +1434,7 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
         break;
     case 0xE:
         MenuPcs.InitSaveLoadMenu();
-        MenuPcs.SetMenuCharaAnim(0, 0);
+        SetMenuCharaAnim__8CMenuPcsFii2(&MenuPcs);
         MenuPcs.CopyNowCaravanDat(menuPcsLayout.m_transferSaveData);
         menuPcsLayout.m_saveLoadMode = 2;
         menuPcsLayout.m_unknown_88A = 1;
@@ -1453,7 +1453,7 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
         if (field_0x1d == 0) {
             MenuPcs.InitSaveLoadMenu();
         }
-        MenuPcs.SetMenuCharaAnim(0, 0);
+        SetMenuCharaAnim__8CMenuPcsFii2(&MenuPcs);
         field_0x1d = 1;
         if (field_0x36 >= 0) {
             MenuMcWinState(menuPcsLayout).m_mode = 2;

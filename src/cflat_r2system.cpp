@@ -1479,9 +1479,12 @@ void CVector::operator=(const CVector& other)
  */
 CVector::CVector(const CVector& other)
 {
-    x = other.x;
-    y = other.y;
-    z = other.z;
+    float x = other.x;
+    float y = other.y;
+    this->x = x;
+    float z = other.z;
+    this->y = y;
+    this->z = z;
 }
 
 /*

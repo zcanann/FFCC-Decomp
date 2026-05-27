@@ -40,7 +40,22 @@ extern float FLOAT_8032fb10;
 extern float FLOAT_8032fb14;
 extern float FLOAT_8032fb20;
 
-extern const char s_materialStageName[] = "material";
+extern const char s_CMaterialSet_801D7A28[] = "CMaterialSet";
+namespace {
+static const char s_materialman_cpp[] = "materialman.cpp";
+}
+extern const char s_materialStageName[] = "CMaterial.material";
+extern const char s_CMaterial_801D7A5C[] = "CMaterial";
+extern const char s_CMaterialMan_801D7A68[] = "CMaterialMan";
+extern const char s_CManager_801D7A78[] = "CManager";
+namespace {
+static const char s_ptrarray_grow_error[] = {
+    0x83, 0x6f, 0x83, 0x62, 0x83, 0x74, 0x83, 0x40, 0x90, 0xac, 0x92, 0xb7, 0x82, 0xaa,
+    0x95, 0x73, 0x8b, 0x96, 0x89, 0xc2, 0x82, 0xc5, 0x82, 0xb7, 0x81, 0x42, 0x0a, 0x00,
+};
+static const char s_collection_ptrarray_h[] = "collection_ptrarray.h";
+}
+extern const char s_CPtrArray_CMaterial_801D7AB8[] = "CPtrArray<CMaterial *>";
 
 static inline void _GXSetTevOrder(int stage, int coord, int map, int channel)
 {
@@ -190,10 +205,6 @@ static void ReleaseRef(void* object)
         reinterpret_cast<VirtualDtorFn>(vtable[2])(object, 1);
     }
 }
-
-static const char s_materialman_cpp[] = "materialman.cpp";
-static const char s_collection_ptrarray_h[] = "collection_ptrarray.h";
-static const char s_ptrarray_grow_error[] = "CPtrArray grow error";
 
 struct RawPtrArray {
     void** vtable;

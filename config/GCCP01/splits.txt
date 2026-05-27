@@ -212,6 +212,7 @@ materialman.cpp:
 	extabindex  start:0x8000C07C end:0x8000C2BC
 	.text       start:0x8003C1B8 end:0x80043D10
 	.ctors      start:0x801D53E8 end:0x801D53EC
+	.rodata     start:0x801D7A28 end:0x801D7AD0
 	.data       start:0x801E9BB0 end:0x801E9C08
 	.bss        start:0x80268C70 end:0x80268E8C
 	.sbss       start:0x8032ECE8 end:0x8032ED00

@@ -18,16 +18,15 @@ class CMapCylinder
 public:
     CMapCylinder()
     {
-        float max = kMapHitBoundsMaxInit;
         float min = kMapHitBoundsMinInit;
 
         m_boundsMin.z = min;
         m_boundsMin.y = min;
         m_boundsMin.x = min;
 
-        m_boundsMax.z = max;
-        m_boundsMax.y = max;
-        m_boundsMax.x = max;
+        m_boundsMax.z = kMapHitBoundsMaxInit;
+        m_boundsMax.y = kMapHitBoundsMaxInit;
+        m_boundsMax.x = kMapHitBoundsMaxInit;
     }
 
     Vec m_bottom;    // 0x00

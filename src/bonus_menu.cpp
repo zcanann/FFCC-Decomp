@@ -3041,7 +3041,6 @@ void CMenuPcs::CalcResultOpenAnim()
 		memset((void*)animPtr, 0, sizeof(BonusAnimList));
 
 		header->count = (short)(1 + activePartyCount * 6);
-		header->finished = 0;
 
 		InitAnimSprite(&sprites[0], 0x16, 0, 0, 0x280, 0x1c0, 0, 8);
 		sprites[0].depth = 0.0f;

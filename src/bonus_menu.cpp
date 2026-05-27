@@ -2048,7 +2048,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 
 		idx = 0;
 		InitAnimSprite(&sprites[idx++], 0x16, 0, 0, 0x280, 0x1c0, 0, 0);
-		sprites[0].scale = 3.0f;
+		BonusSpriteFlags(&sprites[0]) = 3;
 		sprites[0].alpha = 0.0f;
 
 		InitAnimSprite(&sprites[idx++], -3, 0xf0, 0x38, 0x168, 0x148, 0, 8);

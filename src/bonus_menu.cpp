@@ -1921,6 +1921,7 @@ void CMenuPcs::DrawSelectOpenAnim()
 					handle = GetBonusDisplayHandleSlots(this)[projectionIndex];
 					if (handle == 0) {
 						modelIndex++;
+						lastKind = kind;
 						break;
 					}
 				}

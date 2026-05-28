@@ -3083,7 +3083,7 @@ void CGPartyObj::SetBonusCondition(int useRandom, int bonus0, int bonus1, int bo
 
 	System.Printf(const_cast<char*>(s_partyBonusCountFmt), bonusCount);
 
-	int chosenBonus[5] = {};
+	int chosenBonus[5];
 	int chosenCount = 0;
 	int stageBase = Game.m_bossArtifactBase + Game.m_gameWork.m_bossArtifactStageIndex * 0x168;
 

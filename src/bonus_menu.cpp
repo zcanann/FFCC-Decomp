@@ -1809,7 +1809,7 @@ void CMenuPcs::CalcSelectWait()
 		}
 		break;
 	case 2:
-		if (*(short*)(auxPtr + 8) >= 1 && *(short*)(auxPtr + 8) < 2 && confirmSel == 0) {
+		if (*(short*)(auxPtr + 8) == 1 && confirmSel == 0) {
 			delay = 10;
 			*(unsigned char*)(statePtr + 8) = 0xff;
 		}

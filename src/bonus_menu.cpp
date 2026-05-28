@@ -248,15 +248,11 @@ static inline BonusMenuMembers& GetBonusMenuMembers(CMenuPcs* menu)
 
 static inline void ReleaseBonusRefObject(void* object)
 {
-	if (object == 0) {
-		return;
-	}
-
 	int* raw = reinterpret_cast<int*>(object);
 	int refCount = raw[1] - 1;
 	raw[1] = refCount;
-	if (refCount == 0) {
-		(*(void (**)(void*, int))(*raw + 8))(object, 1);
+	if (refCount == 0 && object != 0) {
+		reinterpret_cast<void (**)(void*, int)>(*raw)[2](object, 1);
 	}
 }
 

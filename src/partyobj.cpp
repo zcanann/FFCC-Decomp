@@ -1316,7 +1316,16 @@ void CGPartyObj::onFrameStat()
 		}
 		break;
 	case 0x0B:
-		statCarry();
+		if (m_stateFrame == 0) {
+			reqAnim(0x0D, 0, 0);
+			playSe3D(0x22, 0x32, 0x96, 0, 0);
+		}
+		if (isLoopAnim() != 0) {
+			setIdleMotion();
+			changeStat(0, 0, 0);
+			m_extraMoveVec.x = FLOAT_80331a78;
+			m_extraMoveVec.z = FLOAT_80331a78;
+		}
 		break;
 	case 0x0C:
 		statPickup();

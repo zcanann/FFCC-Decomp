@@ -1313,14 +1313,43 @@ void CGPartyObj::onFrameStat()
 	case 0x0E:
 		statRebound();
 		break;
+	case 0x13:
+		if (m_stateFrame == 0) {
+			damageDelete();
+			reqAnim(0x21, 0, 0);
+		}
+		if (isLoopAnim() != 0) {
+			changeStat(0, 0, 0);
+		}
+		break;
 	case 0x14:
 		statHide();
 		break;
 	case 0x15:
 		statJump();
 		break;
+	case 0x1A:
+		statKorobi();
+		break;
 	case 0x0F:
 		statWeaponChange();
+		break;
+	case 0x20:
+		if (m_stateFrame == 0) {
+			reqAnim(0x31, 0, 0);
+		} else if (isLoopAnim() != 0) {
+			changeStat(0, 0, 0);
+		}
+		break;
+	case 0x22:
+		if (m_stateFrame == 0) {
+			setAlive(0, 0);
+		} else if (isLoopAnim() != 0) {
+			if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) {
+				PartyData(this).flags.flag40 = 1;
+			}
+			changeStat(0, 0, 0);
+		}
 		break;
 	default:
 		break;
@@ -1331,7 +1360,7 @@ void CGPartyObj::onFrameStat()
 		checkTargetParticle();
 	}
 
-	shouki();
+	CGCharaObj::onFrameStat();
 }
 
 /*

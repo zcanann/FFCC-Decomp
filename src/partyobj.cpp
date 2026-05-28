@@ -47,6 +47,7 @@ extern const float FLOAT_80331a54;
 extern float FLOAT_80331A58;
 extern float FLOAT_80331A5C;
 extern float FLOAT_80331a74;
+extern float FLOAT_80331A88;
 extern float FLOAT_80331a9c;
 extern float FLOAT_80331aa0;
 extern float FLOAT_80331A98;
@@ -1653,41 +1654,84 @@ void CGPartyObj::putTargetParticle(int targetSide, int doInit)
 		self[0x6B8] &= 0xEF;
 
 		Vec rayDir = {
-		    sinf(m_rotationY) * FLOAT_80331aa0,
+		    sinf(m_rotationY) * FLOAT_80331A98,
 		    FLOAT_80331a78,
-		    cosf(m_rotationY) * FLOAT_80331aa0,
+		    cosf(m_rotationY) * FLOAT_80331A98,
 		};
+		bool bossStage = false;
+		bool bossCid = false;
+		bool bossTarget = false;
+		if ((Game.m_gameWork.m_menuStageMode != 0) &&
+		    (Game.m_gameWork.m_bossArtifactStageIndex < 0x0F)) {
+			bossStage = true;
+		}
+		if (bossStage && ((GetCID() & 0x6D) == 0x6D)) {
+			bossCid = true;
+		}
+		if (bossCid && (m_scriptHandle[0xED] != 0)) {
+			bossTarget = true;
+		}
+		float radius = FLOAT_80331A88;
+		if (bossTarget) {
+			radius = FLOAT_80331AB0;
+		}
+
 		Vec startPos = m_worldPosition;
 		startPos.y += FLOAT_80331ad0;
 
 		CMapCylinder hitCylinder;
 		hitCylinder.m_bottom = startPos;
-		hitCylinder.m_top = rayDir;
-		hitCylinder.m_axis.x = FLOAT_80331a78;
-		hitCylinder.m_axis.y = FLOAT_80331aa0;
-		hitCylinder.m_axis.z = FLOAT_80331a9c;
-		hitCylinder.m_radius = FLOAT_80331a9c;
+		hitCylinder.m_axis = rayDir;
+		hitCylinder.m_radius = radius;
 		hitCylinder.m_boundsMin.x = FLOAT_80331a9c;
-		hitCylinder.m_boundsMin.y = FLOAT_80331aa0;
-		hitCylinder.m_boundsMin.z = FLOAT_80331aa0;
+		hitCylinder.m_boundsMin.y = FLOAT_80331a9c;
+		hitCylinder.m_boundsMin.z = FLOAT_80331a9c;
 		hitCylinder.m_boundsMax.x = FLOAT_80331aa0;
+		hitCylinder.m_boundsMax.y = FLOAT_80331aa0;
+		hitCylinder.m_boundsMax.z = FLOAT_80331aa0;
 
 		Vec hitPos = startPos;
 		if (MapMng.CheckHitCylinderNear(&hitCylinder, &rayDir, 0x30) != 0) {
 			CMapObj* hitObj = getMapHitObject();
 			hitObj->CalcHitPosition(&hitPos);
-			hitObj->GetHitFaceNormal(reinterpret_cast<Vec*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBB8));
 		} else {
 			PSVECAdd(&startPos, &rayDir, &hitPos);
 		}
 
-		*reinterpret_cast<Vec*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBAC) = hitPos;
 		*reinterpret_cast<Vec*>(self + 0x66C) = hitPos;
-		*reinterpret_cast<Vec*>(self + 0x678) = hitPos;
+		Vec down = {
+		    FLOAT_80331a78,
+		    FLOAT_80331acc,
+		    FLOAT_80331a78,
+		};
+		CMapCylinder floorCylinder;
+		floorCylinder.m_bottom = *reinterpret_cast<Vec*>(self + 0x66C);
+		floorCylinder.m_axis = down;
+		floorCylinder.m_radius = FLOAT_80331a78;
+		floorCylinder.m_boundsMin.x = FLOAT_80331a9c;
+		floorCylinder.m_boundsMin.y = FLOAT_80331a9c;
+		floorCylinder.m_boundsMin.z = FLOAT_80331a9c;
+		floorCylinder.m_boundsMax.x = FLOAT_80331aa0;
+		floorCylinder.m_boundsMax.y = FLOAT_80331aa0;
+		floorCylinder.m_boundsMax.z = FLOAT_80331aa0;
+		if (MapMng.CheckHitCylinderNear(&floorCylinder, &down, 0x30) != 0) {
+			CMapObj* hitObj = getMapHitObject();
+			hitObj->CalcHitPosition(reinterpret_cast<Vec*>(self + 0x66C));
+			*reinterpret_cast<Vec*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBAC) =
+			    *reinterpret_cast<Vec*>(self + 0x66C);
+			hitObj->GetHitFaceNormal(reinterpret_cast<Vec*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBB8));
+		}
+		*reinterpret_cast<Vec*>(self + 0x678) = *reinterpret_cast<Vec*>(self + 0x66C);
 	}
 
 	endPSlotBit(0x10);
-	putParticle(0x147 + ((targetSide != 0) ? 4 : 0), 0, this, 0.0f, 0);
+	gCFlatRuntime2.ResetParticleWork(((targetSide != 0) ? 4 : 0) +
+	                                     *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3B4) +
+	                                     0x147 | 0x100,
+	                                 m_particleSlots[4]);
+	gCFlatRuntime2.SetParticleWorkPos(*reinterpret_cast<Vec*>(self + 0x66C), FLOAT_80331a78);
+	gCFlatRuntime2.SetParticleWorkParam(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3B4), 0);
+	gCFlatRuntime2.PutParticleWork();
 }
 
 /*

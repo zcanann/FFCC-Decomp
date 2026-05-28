@@ -3548,10 +3548,11 @@ void CMenuPcs::createBonus()
 			}
 		}
 
-		memset(GetBonusDisplayHandleSlots(this), 0, sizeof(CCharaPcs::CHandle*) * 0x18);
-
 		CMemory::CStage* stage = GetBonusAllocStage(this);
 		CCharaPcs::CHandle** displaySlots = GetBonusDisplayHandleSlots(this);
+		for (int i = 0; i < 0x18; i++) {
+			displaySlots[i] = 0;
+		}
 
 		for (int i = 0; i < activeCount * 2; i++) {
 			BonusPartySummary& entry = s_Rinfo->m_party[i % activeCount];

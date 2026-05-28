@@ -2236,7 +2236,8 @@ void CGPartyObj::onStatMagic()
 			putTargetParticle(0, 1);
 			*reinterpret_cast<int*>(self + 0x664) = 0;
 		}
-	} else if (m_subState == 1 && m_subFrame == 0) {
+	} else if (m_subState == 2 && m_subFrame == 0) {
+		reqAnim(0x19, 0, 0);
 		endPSlotBit(0x10);
 		endPSlotBit(0x100);
 		*reinterpret_cast<int*>(self + 0x664) = 0;
@@ -2246,7 +2247,7 @@ void CGPartyObj::onStatMagic()
 	checkTargetParticle();
 
 	int magicId = *reinterpret_cast<int*>(self + 0x560);
-	if (m_subState == 1 && m_subFrame == 0) {
+	if (m_subState == 0 && m_subFrame == 0) {
 		if (magicId != 0x103) {
 			putParticleFromItem(magicId, 0, 0, &m_worldPosition);
 			putParticleFromItem(magicId, 1, 0, (Vec*)0);

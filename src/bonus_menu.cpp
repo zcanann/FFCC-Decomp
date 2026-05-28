@@ -1946,9 +1946,7 @@ void CMenuPcs::DrawSelectOpenAnim()
 		switch (kind) {
 		case -4:
 			DrawArtiBase((CMenuPcs::Sprt2*)sprite, alpha);
-			if (artiAlpha < alpha) {
-				artiAlpha = alpha;
-			}
+			artiAlpha = alpha;
 			lastKind = kind;
 			break;
 		case -3:

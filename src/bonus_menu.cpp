@@ -3141,9 +3141,7 @@ void CMenuPcs::CalcResultOpenAnim()
 
 		if (frame < sprite->startFrame + sprite->duration) {
 			sprite->timer++;
-			if (sprite->duration > 0) {
-				sprite->alpha = (float)sprite->timer / (float)sprite->duration;
-			}
+			sprite->alpha = (float)sprite->timer / (float)sprite->duration;
 		} else {
 			sprite->alpha = 1.0f;
 			doneCount++;

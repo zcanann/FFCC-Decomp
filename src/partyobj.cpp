@@ -636,7 +636,13 @@ void CGPartyObj::onFrameAlways()
 		return;
 	}
 
-	if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0 || (m_lastMapIdHit != 1)) {
+	PartyObjOverlay& party = PartyData(this);
+	if (party.target != nullptr && (static_cast<signed char>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(party.target) + 0x38)) < 0)) {
+		party.target = 0;
+	}
+
+	if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0 ||
+	    (*reinterpret_cast<short*>(&m_lastMapIdHit) != 1)) {
 		LoadWeapon(-1, 0);
 		LoadShield(-1);
 	} else {
@@ -650,12 +656,22 @@ void CGPartyObj::onFrameAlways()
 				LoadWeapon(weaponItem & 0xFFF, weaponItem >> 12);
 			}
 			reinterpret_cast<CCaravanWork*>(m_scriptHandle)->SetCurrentWeaponIdx(weaponRef);
-			PartyData(this).commandFlags &= 0xDF;
+			party.commandFlags &= 0xDF;
 		}
 
 		int shieldIndex = reinterpret_cast<short*>(m_scriptHandle)[0x2C];
 		if (shieldIndex <= 0) {
 			LoadShield(-1);
+		} else {
+			int shieldItem = reinterpret_cast<short*>(m_scriptHandle)[0x5B + shieldIndex];
+			if (shieldItem <= 0) {
+				LoadShield(-1);
+			} else {
+				int shieldModel = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + shieldItem * 0x48 + 2) & 0xFFF;
+				if (m_shieldModelHandle == nullptr || m_shieldModelHandle->m_charaNo != shieldModel) {
+					LoadShield(shieldModel);
+				}
+			}
 		}
 	}
 

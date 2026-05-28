@@ -22,6 +22,8 @@
 
 extern "C" int CalcHitSlide__7CMapObjFP3Vecf(void*, Vec*);
 extern const char lbl_801DCA48[];
+extern const char lbl_801DCD78[];
+extern const char lbl_80331B0C[];
 extern const char sBossGhostPartyCountersFmt[];
 extern const char sMissingRingMenuFmt[];
 extern int __float_huge[];
@@ -343,29 +345,71 @@ void CGPartyObj::onChangeStat(int state)
 {
 	PartyObjOverlay& party = PartyData(this);
 	unsigned char* self = reinterpret_cast<unsigned char*>(this);
-	party.partyFlags &= 0xBF;
+	unsigned char* weaponFlags = reinterpret_cast<unsigned char*>(&m_weaponNodeFlags);
+	weaponFlags[1] &= 0xBF;
 
 	switch (state) {
 	case 0:
-		party.partyFlags |= 0x40;
+		weaponFlags[1] |= 0x40;
 		break;
 	case 1: {
-		*reinterpret_cast<int*>(self + 0x550) = (party.attackSel == 0) ? 5 : ((party.attackSel == 1) ? 8 : 9);
+		int attackSel = party.attackSel;
+		*reinterpret_cast<int*>(self + 0x550) = (attackSel == 0) ? 5 : ((attackSel == 1) ? 8 : 9);
+		unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
+		int entry = (*reinterpret_cast<unsigned short*>(script + 0x3E2) +
+		             *reinterpret_cast<unsigned short*>(script + 0x3E0) * 2) * 0x1CA +
+		            attackSel * 0x12;
+		*reinterpret_cast<int*>(self + 0x630) =
+		    *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_30_0xc7e0 + entry);
+		*reinterpret_cast<int*>(self + 0x634) =
+		    *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_30_0xc7e0 + entry + 2);
+		*reinterpret_cast<int*>(self + 0x638) =
+		    *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_30_0xc7e0 + entry + 10);
 		break;
 	}
 	case 2:
 		*reinterpret_cast<int*>(self + 0x550) = 0x0F;
 		*reinterpret_cast<int*>(self + 0x554) = 0x10;
 		*reinterpret_cast<int*>(self + 0x558) = 0x11;
-		*reinterpret_cast<int*>(self + 0x68C) = 0;
+		int castTime;
+		castTime = 0;
 		if (*reinterpret_cast<int*>(self + 0x560) != 0x103) {
-			*reinterpret_cast<int*>(self + 0x68C) = calcCastTime(*reinterpret_cast<int*>(self + 0x560));
+			castTime = calcCastTime(*reinterpret_cast<int*>(self + 0x560));
 		}
+		*reinterpret_cast<int*>(self + 0x68C) = castTime;
 		break;
 	case 6:
+		System.Printf(const_cast<char*>(lbl_801DCD78 + 0x40), *reinterpret_cast<int*>(self + 0x560));
+		*reinterpret_cast<int*>(self + 0x560) =
+		    *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + *reinterpret_cast<int*>(self + 0x560) * 0x48 + 10);
+		System.Printf(const_cast<char*>(lbl_80331B0C), *reinterpret_cast<int*>(self + 0x560));
 		*reinterpret_cast<int*>(self + 0x550) = 0x12;
 		*reinterpret_cast<int*>(self + 0x554) = 0x13;
+		unsigned short itemKind =
+		    *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + *reinterpret_cast<int*>(self + 0x560) * 0x48 + 10);
+		int itemHigh = itemKind >> 8;
+		int itemLow = itemKind & 0xFF;
+		System.Printf(const_cast<char*>(lbl_801DCD78 + 0x60), itemHigh);
+		System.Printf(const_cast<char*>(lbl_801DCD78 + 0x7C), itemLow);
+		*reinterpret_cast<int*>(self + 0x558) = itemHigh + 0x2A;
+		{
+			unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
+			int entry = (*reinterpret_cast<unsigned short*>(script + 0x3E2) +
+			             *reinterpret_cast<unsigned short*>(script + 0x3E0) * 2) * 0x1CA +
+			            itemLow * 0x42;
+			*reinterpret_cast<int*>(self + 0x630) =
+			    *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_30_0xc7e0 + entry + 0x38);
+			*reinterpret_cast<int*>(self + 0x634) =
+			    *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_30_0xc7e0 + entry + 0x3A);
+		}
 		*reinterpret_cast<int*>(self + 0x68C) = calcCastTime(*reinterpret_cast<int*>(self + 0x560));
+		if (Game.m_gameWork.m_menuStageMode != 0) {
+			int cmdListItem =
+			    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->GetCmdListItem(*reinterpret_cast<int*>(self + 0x6DC));
+			if (cmdListItem >= 0) {
+				*reinterpret_cast<int*>(self + 0x684) = cmdListItem;
+			}
+		}
 		break;
 	case 8:
 		*reinterpret_cast<int*>(self + 0x550) = 0x15;

@@ -22,6 +22,7 @@
 
 extern "C" int CalcHitSlide__7CMapObjFP3Vecf(void*, Vec*);
 extern const char lbl_801DCA48[];
+extern const char lbl_801DCCB0[];
 extern const char lbl_801DCD78[];
 extern const char lbl_80331B0C[];
 extern const char sBossGhostPartyCountersFmt[];
@@ -1214,8 +1215,6 @@ void CGPartyObj::shouki()
  */
 void CGPartyObj::onFrameStat()
 {
-	CGCharaObj::onFrameStat();
-
 	if (m_scriptHandle == nullptr) {
 		return;
 	}
@@ -2097,7 +2096,7 @@ void CGPartyObj::onStatDie()
 {
 	if (m_subState == 0) {
 		if (m_subFrame == 0) {
-			reinterpret_cast<CGPrgObj*>(this)->reqAnim(0, 0, 0);
+			enableDamageCol(0);
 		}
 		if (isLoopAnimDirect() != 0) {
 			changeSubStat(1);
@@ -2121,6 +2120,9 @@ void CGPartyObj::onStatDie()
 	}
 
 	if (m_subState == 2 && m_subFrame > 0xBA) {
+		if ((unsigned int)System.m_execParam > 1) {
+			System.Printf(const_cast<char*>(lbl_801DCCB0));
+		}
 		changeStat(0x22, 0, 0);
 	}
 }

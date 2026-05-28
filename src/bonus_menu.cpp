@@ -1704,6 +1704,7 @@ void CMenuPcs::CalcSelectWait()
 
 	header = (BonusAnimHeader*)animPtr;
 	sprites = (BonusAnimSprite*)(animPtr + 8);
+	int activePartyCount = s_Rinfo->m_partyCount;
 
 	if (*(unsigned char*)(statePtr + 0xb) == 0) {
 		*(short*)(statePtr + 0xe) = 0;
@@ -1736,7 +1737,6 @@ void CMenuPcs::CalcSelectWait()
 	short& selection = *(short*)(statePtr + 0x26);
 	short& confirmSel = *(short*)(statePtr + 0x28);
 	short& delay = *(short*)(statePtr + 0x1a);
-	int activePartyCount = s_Rinfo->m_partyCount;
 	BonusPartySummary* currentParty = GetBonusPartySummary(currentPartyIndex);
 	int padSlot = (currentParty != 0) ? currentParty->m_partySlot : 0;
 	unsigned short repeat = GetButtonRepeat(padSlot);

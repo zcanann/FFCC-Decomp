@@ -3828,7 +3828,7 @@ void CGPartyObj::gpmCol()
 	}
 
 	for (int i = 0; i < 5; i++) {
-		Vec* basePos = (i == 0) ? &m_worldPosition : &sGhostPartyWork.trail[i];
+		Vec* basePos = (i == 0) ? &m_worldPosition : reinterpret_cast<Vec*>(CGPartyObj::m_ghostWork + 0x24 + i * sizeof(Vec));
 
 		Vec moveVec;
 		PSVECSubtract(&leader->m_worldPosition, basePos, &moveVec);
@@ -3848,12 +3848,12 @@ void CGPartyObj::gpmCol()
 
 		if (MapMng.CheckHitCylinderNear(&col, &moveVec, m_attrFlags & ~0x10U) == 0) {
 			sGhostPartyWork.activeTrailCount = i + 1;
-			sGhostPartyWork.leaderTrail[i] = leader->m_worldPosition;
+			*reinterpret_cast<Vec*>(CGPartyObj::m_ghostWork + 0x30 + i * sizeof(Vec)) = leader->m_worldPosition;
 			break;
 		}
 
 		int nextCount = i + 1;
-		if (sGhostPartyWork.activeTrailCount == 0 || sGhostPartyWork.activeTrailCount > nextCount) {
+		if (sGhostPartyWork.activeTrailCount > nextCount) {
 			sGhostPartyWork.activeTrailCount = nextCount;
 		}
 	}

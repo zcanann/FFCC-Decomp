@@ -1328,8 +1328,6 @@ void CGPartyObj::onFrameStat()
 		}
 		break;
 	case 0x0C:
-		statPickup();
-		break;
 	case 0x0D:
 	case 0x1B:
 		statPut();

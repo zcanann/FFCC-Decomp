@@ -2676,10 +2676,17 @@ void CMenuPcs::CalcResultCountAnim()
 			short stripX = ((0 < i) && (i < 3)) ? 8 : 0x20;
 			short y = (short)(0x28 + i * 0x60);
 			BonusAnimSprite* sprite = &sprites[countTop + i];
-			InitAnimSprite(sprite, 0x19, stripX, y, 0x38, 0x28, 9999, 4);
+			sprite->x = stripX;
+			sprite->y = y;
+			sprite->w = 0x38;
+			sprite->h = 0x28;
 			sprite->mulX = (float)(s_Rinfo->m_party[i].m_rank * sprite->w);
 			sprite->alpha = 0.0f;
 			sprite->depth = 1.0f;
+			sprite->kind = 0x19;
+			sprite->timer = 0;
+			sprite->startFrame = 9999;
+			sprite->duration = 4;
 			sprite->scale = 1.0f;
 			sprite->motionX = 0.0f;
 			sprite->motionY = 0.0f;

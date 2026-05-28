@@ -1406,9 +1406,6 @@ void CMenuPcs::DrawSelectCloseAnim()
 			break;
 		}
 
-		if (strongest < alpha) {
-			strongest = alpha;
-		}
 	}
 
 	DrawBonusActiveMarks(this, statePtr, artiAlpha);
@@ -1417,7 +1414,6 @@ void CMenuPcs::DrawSelectCloseAnim()
 	if (*(unsigned char*)(statePtr + 8) != 0 && strongest > 0.0f) {
 		DrawBonusChkMark(strongest);
 	}
-	GetBonusMenuMembers(this).m_bonusAlpha = (unsigned char)(strongest * 255.0f);
 }
 
 /*
@@ -1706,12 +1702,12 @@ void CMenuPcs::CalcSelectWait()
 	int activePartyCount = s_Rinfo->m_partyCount;
 
 	if (*(unsigned char*)(statePtr + 0xb) == 0) {
+		*(short*)(auxPtr + 10) = 3;
 		*(short*)(statePtr + 0xe) = 0;
 		*(short*)(statePtr + 0x18) = 0;
 		*(short*)(statePtr + 0x1a) = 0;
 		*(short*)(statePtr + 0x26) = 4;
 		*(unsigned char*)(statePtr + 8) = 0;
-		*(short*)(auxPtr + 10) = 3;
 		for (int i = 0; i < (int)header->count; i++) {
 			sprites[i].alpha = 1.0f;
 			sprites[i].depth = 3.0f;

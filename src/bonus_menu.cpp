@@ -1194,10 +1194,7 @@ void CMenuPcs::DrawArtiBase(CMenuPcs::Sprt2* sprt, float alpha)
 		return;
 	}
 
-	BonusAnimSprite* sprite = reinterpret_cast<BonusAnimSprite*>(sprt);
 	int statePtr = GetBonusMenuMembers(this).m_bonusStatePtr;
-	float width = (float)sprite->w;
-	float height = (float)sprite->h;
 
 	if (*(short*)(statePtr + 0x1c) != 4) {
 		_GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(alpha * 255.0)};
@@ -1206,6 +1203,10 @@ void CMenuPcs::DrawArtiBase(CMenuPcs::Sprt2* sprt, float alpha)
 
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1A));
+
+	BonusAnimSprite* sprite = reinterpret_cast<BonusAnimSprite*>(sprt);
+	float width = (float)sprite->w;
+	float height = (float)sprite->h;
 
 	int partyIndex = 0;
 	for (int i = 0; i < s_Rinfo->m_partyCount; i++) {

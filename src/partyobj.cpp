@@ -7,6 +7,7 @@
 #include "ffcc/joybus.h"
 #include "ffcc/linkage.h"
 #include "ffcc/math.h"
+#include "ffcc/vector.h"
 #include "ffcc/p_game.h"
 #include "ffcc/p_menu.h"
 #include "ffcc/p_camera.h"
@@ -56,6 +57,7 @@ extern float FLOAT_80331ad0;
 extern float FLOAT_80331ad4;
 extern float FLOAT_80331ad8;
 extern float FLOAT_80331ADC;
+extern double DOUBLE_80331AA8;
 extern float FLOAT_80331b00;
 extern float FLOAT_80331b04;
 extern float FLOAT_80331b08;
@@ -3333,52 +3335,68 @@ void calcWeightMax()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGPartyObj::gpmCalcDist(Vec*, float&)
+void CGPartyObj::gpmCalcDist(Vec* outVec, float& outDist)
 {
-	Vec* outVec = &m_targetDelta;
-	float* outDist = &m_targetDist;
+	unsigned char* ghostWork = CGPartyObj::m_ghostWork;
+	int& activeTrailCount = *reinterpret_cast<int*>(ghostWork + 0x40);
+	int& trailIndex = *reinterpret_cast<int*>(ghostWork + 0x44);
 
-	if (sGhostPartyWork.activeTrailCount > 0) {
-		Vec prev = m_worldPosition;
-		float worldLen = 0.0f;
+	if (activeTrailCount != 0) {
+		CVector unused;
 		float flatLen = 0.0f;
 		bool capturedCurrent = false;
 
-		*outDist = 0.0f;
-		for (int i = 0; i < sGhostPartyWork.activeTrailCount && i < 5; i++) {
-			Vec* nextPos = (i == sGhostPartyWork.trailIndex) ? &m_worldPosition : &sGhostPartyWork.trail[i];
-
+		outDist = 0.0f;
+		for (int i = 0; i < activeTrailCount; i++) {
+			if (trailIndex > i) {
+				continue;
+			}
+			Vec* nextPos;
+			if (i == trailIndex) {
+				nextPos = &m_worldPosition;
+			} else {
+				nextPos = reinterpret_cast<Vec*>(ghostWork + 0x24 + i * sizeof(Vec));
+			}
 			Vec delta;
-			PSVECSubtract(nextPos, &prev, &delta);
-			worldLen += PSVECMag(&delta);
+			PSVECSubtract(reinterpret_cast<Vec*>(ghostWork + 0x50 + i * sizeof(Vec)), nextPos, &delta);
+			outDist += PSVECMag(&delta);
 
 			delta.y = 0.0f;
-			flatLen += PSVECMag(&delta);
+			float flatStep = PSVECMag(&delta);
+			flatLen += flatStep;
 
-			if (!capturedCurrent && i == sGhostPartyWork.trailIndex) {
+			if (!capturedCurrent && i == trailIndex) {
 				capturedCurrent = true;
-				*outVec = delta;
-				if (PSVECMag(&delta) < m_moveBaseSpeed) {
-					sGhostPartyWork.trailIndex++;
+				outVec->x = delta.x;
+				outVec->y = delta.y;
+				outVec->z = delta.z;
+				if (flatStep < m_capsuleHalfHeight) {
+					trailIndex++;
 				}
 			}
-
-			prev = *nextPos;
 		}
 
-		*outDist = (flatLen < worldLen) ? flatLen : worldLen;
-		if (*outDist > 0.01f) {
+		if (outDist < flatLen) {
+			flatLen = outDist;
+		}
+		outDist = flatLen;
+		if (outDist <= DOUBLE_80331AA8) {
 			return;
 		}
 	}
 
-	sGhostPartyWork.activeTrailCount = 0;
-	*outVec = m_targetDelta;
+	activeTrailCount = 0;
+	outVec->x = m_targetDelta.x;
+	outVec->y = m_targetDelta.y;
+	outVec->z = m_targetDelta.z;
 	outVec->y = 0.0f;
 
 	float dist = PSVECMag(outVec);
 	float maxDist = m_targetDist;
-	*outDist = (dist < maxDist) ? dist : maxDist;
+	outDist = dist;
+	if (outDist >= maxDist) {
+		outDist = maxDist;
+	}
 }
 
 /*

@@ -797,6 +797,7 @@ void CGPartyObj::onFramePostCalc()
 
 	if (Game.m_gameWork.m_menuStageMode != 0 &&
 	    Game.m_gameWork.m_bossArtifactStageIndex < 0x0F &&
+	    (GetCID() & 0x6D) == 0x6D &&
 	    m_scriptHandle[0xED] != nullptr) {
 		ghostPartyMog();
 	} else {

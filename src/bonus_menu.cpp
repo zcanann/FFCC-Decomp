@@ -3453,11 +3453,17 @@ void CMenuPcs::createBonus()
 			entry.m_tribeId = (unsigned int)caravanWork->m_tribeId;
 			*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(entry.m_partyHandle->m_model) + 0x9C) = 0.0f;
 
-			for (int t = 0; t < 4; t++) {
-				short treasure = caravanWork->m_treasures[t];
-				if (treasure > 0) {
-					s_Rinfo->m_tempArtifacts[tempArtifactCount++] = treasure;
-				}
+			if (caravanWork->m_treasures[0] > 0) {
+				s_Rinfo->m_tempArtifacts[tempArtifactCount++] = caravanWork->m_treasures[0];
+			}
+			if (caravanWork->m_treasures[1] > 0) {
+				s_Rinfo->m_tempArtifacts[tempArtifactCount++] = caravanWork->m_treasures[1];
+			}
+			if (caravanWork->m_treasures[2] > 0) {
+				s_Rinfo->m_tempArtifacts[tempArtifactCount++] = caravanWork->m_treasures[2];
+			}
+			if (caravanWork->m_treasures[3] > 0) {
+				s_Rinfo->m_tempArtifacts[tempArtifactCount++] = caravanWork->m_treasures[3];
 			}
 
 			totalValue += entry.m_totalValue;

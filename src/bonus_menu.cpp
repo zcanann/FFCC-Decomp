@@ -2533,17 +2533,18 @@ void CMenuPcs::DrawResultCountAnim()
 					handle = s_Rinfo->m_party[modelIndex].m_partyHandle;
 				} else if (modelIndex < activePartyCount * 2) {
 					handle = GetBonusDisplayHandleSlots(this)[modelIndex - activePartyCount];
+				} else {
+					lastKind = kind;
+					continue;
 				}
 
-				if (handle != 0) {
-					SetProjection(modelIndex);
-					SetLight(1);
-					unsigned int oldFlags = handle->m_flags;
-					handle->m_flags = 0x300543;
-					handle->Draw(5);
-					handle->m_flags = oldFlags;
-					RestoreProjection();
-				}
+				SetProjection(modelIndex);
+				SetLight(1);
+				unsigned int oldFlags = handle->m_flags;
+				handle->m_flags = 0x300543;
+				handle->Draw(5);
+				handle->m_flags = oldFlags;
+				RestoreProjection();
 				modelIndex++;
 				lastKind = kind;
 			} else {

@@ -244,6 +244,25 @@ static bool isGhostPartyTargetMode(CGPartyObj* self)
 	return *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(self->m_scriptHandle) + 0x3B4) != 0;
 }
 
+static int getCarryAnimNo(CGPartyObj* self, int carryType)
+{
+	if (isGhostPartyTargetMode(self)) {
+		return 5;
+	}
+
+	unsigned char* script = reinterpret_cast<unsigned char*>(self->m_scriptHandle);
+	int offset;
+	if (carryType == 0) {
+		offset = (CFlatItemCarryMode() == 1) ? 0x1C6 : 0x1C2;
+	} else {
+		offset = (CFlatItemCarryMode() == 1) ? 0x1C8 : 0x1C4;
+	}
+
+	int entry = (*reinterpret_cast<unsigned short*>(script + 0x3E2) +
+	             *reinterpret_cast<unsigned short*>(script + 0x3E0) * 2) * 0x1CA;
+	return *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_30_0xc7e0 + entry + offset);
+}
+
 static CMapObj* getMapHitObject()
 {
 	return MapMng.m_hitMapObj;
@@ -2234,10 +2253,10 @@ void CGPartyObj::carry(int carryType, CGObject* object, int forceMode)
 		if (carryObj != nullptr) {
 			rotTarget(reinterpret_cast<CGPrgObj*>(carryObj));
 			changeStat(0x0B, 0, 0);
-			reinterpret_cast<CGItemObj*>(carryObj)->carry(this, 0, (forceMode != 0) ? 0 : 5);
+			reinterpret_cast<CGItemObj*>(carryObj)->carry(this, 0, (forceMode != 0) ? 0 : getCarryAnimNo(this, 0));
 		}
 	} else if ((carryType == 1 || carryType == 2) && carryObj != nullptr) {
-		reinterpret_cast<CGItemObj*>(carryObj)->carry(this, carryType, (forceMode != 0) ? 0 : 5);
+		reinterpret_cast<CGItemObj*>(carryObj)->carry(this, carryType, (forceMode != 0) ? 0 : getCarryAnimNo(this, carryType));
 		carryObj = (CGObject*)0;
 	}
 
@@ -3225,17 +3244,31 @@ void CGPartyObj::changeMotionMode(int mode)
  */
 void CGPartyObj::setIdleMotion()
 {
-	if (PartyData(this).carryObject == 0) {
+	short mapId = *reinterpret_cast<short*>(&m_lastMapIdHit);
+	if (PartyData(this).carryObject != 0) {
+		if (CFlatItemCarryMode() == 0) {
+			if (mapId == 1) {
+				SetAnimSlot(0x0B, 0);
+				SetAnimSlot(0x0C, 1);
+			} else {
+				SetAnimSlot(0x0B, 0);
+				SetAnimSlot(2, 1);
+			}
+		} else {
+			SetAnimSlot(0x0B, 0);
+			SetAnimSlot(0x0C, 1);
+		}
+	} else {
 		if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
 			SetAnimSlot(0x25, 0);
 			SetAnimSlot(0x24, 1);
+		} else if (mapId == 1) {
+			SetAnimSlot(0, 0);
+			SetAnimSlot(1, 1);
 		} else {
 			SetAnimSlot(0x25, 0);
 			SetAnimSlot(0x30, 1);
 		}
-	} else {
-		SetAnimSlot(0x0B, 0);
-		SetAnimSlot(0x0C, 1);
 	}
 }
 

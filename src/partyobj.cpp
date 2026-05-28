@@ -1860,8 +1860,10 @@ void CGPartyObj::putTargetParticle(int targetSide, int doInit)
 			radius = FLOAT_80331AB0;
 		}
 
-		Vec startPos = m_worldPosition;
-		startPos.y += FLOAT_80331ad0;
+		CVector startOffset(FLOAT_80331a78, FLOAT_80331ad0, FLOAT_80331a78);
+		CVector worldPos(m_worldPosition);
+		Vec startPos;
+		PSVECAdd(reinterpret_cast<Vec*>(&worldPos), reinterpret_cast<Vec*>(&startOffset), &startPos);
 
 		CMapCylinder hitCylinder;
 		hitCylinder.m_bottom = startPos;
@@ -1883,11 +1885,7 @@ void CGPartyObj::putTargetParticle(int targetSide, int doInit)
 		}
 
 		*reinterpret_cast<Vec*>(self + 0x66C) = hitPos;
-		Vec down = {
-		    FLOAT_80331a78,
-		    FLOAT_80331acc,
-		    FLOAT_80331a78,
-		};
+		CVector down(FLOAT_80331a78, FLOAT_80331acc, FLOAT_80331a78);
 		CMapCylinder floorCylinder;
 		floorCylinder.m_bottom = *reinterpret_cast<Vec*>(self + 0x66C);
 		floorCylinder.m_axis = down;
@@ -1898,7 +1896,7 @@ void CGPartyObj::putTargetParticle(int targetSide, int doInit)
 		floorCylinder.m_boundsMax.x = FLOAT_80331aa0;
 		floorCylinder.m_boundsMax.y = FLOAT_80331aa0;
 		floorCylinder.m_boundsMax.z = FLOAT_80331aa0;
-		if (MapMng.CheckHitCylinderNear(&floorCylinder, &down, 0x30) != 0) {
+		if (MapMng.CheckHitCylinderNear(&floorCylinder, reinterpret_cast<Vec*>(&down), 0x30) != 0) {
 			CMapObj* hitObj = getMapHitObject();
 			hitObj->CalcHitPosition(reinterpret_cast<Vec*>(self + 0x66C));
 			*reinterpret_cast<Vec*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBAC) =

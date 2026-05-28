@@ -2822,58 +2822,66 @@ int CGPartyObj::useItem(int itemId)
 {
 	unsigned char* self = reinterpret_cast<unsigned char*>(this);
 	unsigned char* weaponFlags = reinterpret_cast<unsigned char*>(&m_weaponNodeFlags);
-	if (!((static_cast<int>(static_cast<unsigned int>(weaponFlags[0]) << 24) < 0) &&
-	      (static_cast<int>(static_cast<unsigned int>(weaponFlags[1]) << 24) < 0) &&
-	      (static_cast<int>(static_cast<unsigned int>(self[0x63C]) << 24) < 0) &&
-	      (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0))) {
-		return 0;
+	bool canUse = false;
+	int result;
+
+	if ((static_cast<int>(static_cast<unsigned int>(weaponFlags[0]) << 24) < 0) &&
+	    (static_cast<int>(static_cast<unsigned int>(weaponFlags[1]) << 24) < 0) &&
+	    (static_cast<int>(static_cast<unsigned int>(self[0x63C]) << 24) < 0) &&
+	    (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0)) {
+		canUse = true;
 	}
 
-	unsigned short itemKind = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48);
-	if (((itemId == 0x17D) || (itemId == 0x186)) &&
-	    (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0)) {
-		return 0;
-	}
-
-	System.Printf(const_cast<char*>(lbl_801DCA48 + 0x170), itemId, itemKind);
-	ClassControl(5, itemId);
-
-	if (itemKind == 0x186) {
-		int heal = 2;
-		if ((itemId == 0x188) &&
-		    (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E0) == 2)) {
-			heal = 4;
-		}
-		addHp(heal, 0);
-		System.Printf(const_cast<char*>(lbl_801DCA48 + 0x1AC), heal);
-	} else if (itemKind == 0x17D) {
-		int heal;
-		int foodIndex = itemId - 0x17D;
-		if ((foodIndex < 0) || (foodIndex >= 8)) {
-			heal = 4;
+	if (canUse) {
+		unsigned short itemKind = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48);
+		if (((itemId == 0x17D) || (itemId == 0x186)) &&
+		    (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0)) {
+			result = 0;
 		} else {
-			unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
-			unsigned int value = *reinterpret_cast<unsigned short*>(script + foodIndex * 2 + 0x3B8) / 10;
-			heal = 1;
-			if (value != 0) {
-				heal = value;
-			}
-			m_scriptHandle[0x2F4] =
-			    reinterpret_cast<void*>(static_cast<unsigned int>(*reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x68)));
-			m_scriptHandle[0x2F5] = reinterpret_cast<void*>(itemId);
-		}
-		addHp(heal, 0);
-		System.Printf(const_cast<char*>(lbl_801DCA48 + 0x194), heal);
-	}
+			System.Printf(const_cast<char*>(lbl_801DCA48 + 0x170), itemId, itemKind);
+			ClassControl(5, itemId);
 
-	CFlatRuntime::CStack stack[2];
-	stack[0].m_word = itemId;
-	stack[1].m_word = 0;
-	if ((Game.m_gameWork.m_menuStageMode != 0) && (Game.m_gameWork.m_gamePaused != 0)) {
-		stack[1].m_word = 1;
+			if (itemKind == 0x186) {
+				int heal = 2;
+				if ((itemId == 0x188) &&
+				    (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E0) == 2)) {
+					heal = 4;
+				}
+				addHp(heal, 0);
+				System.Printf(const_cast<char*>(lbl_801DCA48 + 0x1AC), heal);
+			} else if (itemKind == 0x17D) {
+				int heal;
+				int foodIndex = itemId - 0x17D;
+				if ((foodIndex < 0) || (foodIndex >= 8)) {
+					heal = 4;
+				} else {
+					unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
+					unsigned int value = *reinterpret_cast<unsigned short*>(script + foodIndex * 2 + 0x3B8) / 10;
+					heal = 1;
+					if (value != 0) {
+						heal = value;
+					}
+					m_scriptHandle[0x2F4] =
+					    reinterpret_cast<void*>(static_cast<unsigned int>(*reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x68)));
+					m_scriptHandle[0x2F5] = reinterpret_cast<void*>(itemId);
+				}
+				addHp(heal, 0);
+				System.Printf(const_cast<char*>(lbl_801DCA48 + 0x194), heal);
+			}
+
+			CFlatRuntime::CStack stack[2];
+			stack[1].m_word = 0;
+			if ((Game.m_gameWork.m_menuStageMode != 0) && (Game.m_gameWork.m_gamePaused != 0)) {
+				stack[1].m_word = 1;
+			}
+			stack[0].m_word = itemId;
+			gCFlatRuntime().SystemCall(this, 2, 0x15, 2, stack, 0);
+			result = 1;
+		}
+	} else {
+		result = 0;
 	}
-	gCFlatRuntime().SystemCall(this, 2, 0x15, 2, stack, 0);
-	return 1;
+	return result;
 }
 
 /*

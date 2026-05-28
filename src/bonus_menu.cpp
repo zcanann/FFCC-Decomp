@@ -3585,24 +3585,16 @@ void CMenuPcs::createBonus()
 
 			if (modelNo == 0x79) {
 				int effectNo = -1;
-				switch (itemId) {
-				case 0xDF:
+				if (itemId == 0xDF) {
 					effectNo = 0x75;
-					break;
-				case 0xE0:
+				} else if (itemId == 0xE0) {
 					effectNo = 0x76;
-					break;
-				case 0xE1:
+				} else if (itemId == 0xE1) {
 					effectNo = 0x77;
-					break;
-				case 0xE2:
+				} else if (itemId == 0xE2) {
 					effectNo = 0x78;
-					break;
-				case 0xE3:
+				} else if (itemId == 0xE3) {
 					effectNo = 0x79;
-					break;
-				default:
-					break;
 				}
 				if (effectNo >= 0) {
 					BindEffect(handleIndex, effectNo, -1);

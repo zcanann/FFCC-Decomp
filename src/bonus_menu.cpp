@@ -2152,6 +2152,9 @@ void CMenuPcs::DrawResultCloseAnim()
 					handle = s_Rinfo->m_party[modelIndex].m_partyHandle;
 				} else if (modelIndex / activePartyCount <= 1) {
 					handle = GetBonusDisplayHandleSlots(this)[modelIndex - activePartyCount];
+				} else {
+					modelIndex++;
+					continue;
 				}
 
 				if (0.0f < *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C)) {

@@ -54,6 +54,7 @@ extern float FLOAT_80331aa0;
 extern float FLOAT_80331A98;
 extern float FLOAT_80331AB0;
 extern float FLOAT_80331AB8;
+extern float FLOAT_80331ABC;
 extern float FLOAT_80331AC0;
 extern float FLOAT_80331ac4;
 extern float FLOAT_80331ac8;
@@ -1325,7 +1326,13 @@ void CGPartyObj::onFrameStat()
 		statPut();
 		break;
 	case 0x0E:
-		statRebound();
+		if (m_stateFrame == 0) {
+			reqAnim(9, 0, 0);
+			playSe3D(0x1F, 0x32, 0x96, 0, 0);
+		}
+		if (isLoopAnim() != 0) {
+			changeStat(0, 0, 0);
+		}
 		break;
 	case 0x13:
 		if (m_stateFrame == 0) {
@@ -1337,10 +1344,50 @@ void CGPartyObj::onFrameStat()
 		}
 		break;
 	case 0x14:
-		statHide();
+		if (m_subState == 0) {
+			if (m_subFrame == 0) {
+				playSe3D(0x2F, 0x32, 0x96, 0, 0);
+				reqAnim(0x15, 0, 0);
+			}
+			if (isLoopAnim() != 0) {
+				changeSubStat(1);
+			}
+		} else if (m_subState == 1) {
+			if (m_subFrame == 0) {
+				m_alpha = FLOAT_80331ABC;
+				reqAnim(0x16, 1, 0);
+				enableDamageCol(0);
+			}
+			if ((getPadHeldForSlot(static_cast<unsigned char>(m_animStateMisc)) & 0x100) == 0) {
+				if (m_subFrame > 0x18) {
+					playSe3D(0x30, 0x32, 0x96, 0, 0);
+				}
+				m_alpha = FLOAT_80331a54;
+				changeSubStat(2);
+				enableDamageCol(1);
+			}
+		} else if (m_subState == 2) {
+			if (m_subFrame == 0) {
+				reqAnim(0x17, 0, 0);
+			}
+			if (isLoopAnim() != 0) {
+				changeStat(0, 0, 0);
+			}
+		}
 		break;
 	case 0x15:
-		statJump();
+		if (m_stateFrame == 0) {
+			playSe3D(0x40, 0x32, 0x96, 0, 0);
+			reqAnim(0x15, 0, 0);
+			enableDamageCol(0);
+		}
+		if (m_stateFrame == 3 && Game.m_gameWork.m_bossArtifactStageIndex != 0x17) {
+			moveVectorHRot(FLOAT_80331AB8 + m_rotTargetY, FLOAT_80331a78, FLOAT_80331a54, 10);
+		}
+		if (isLoopAnim() != 0) {
+			changeStat(0, 0, 0);
+			enableDamageCol(1);
+		}
 		break;
 	case 0x1A:
 		statKorobi();

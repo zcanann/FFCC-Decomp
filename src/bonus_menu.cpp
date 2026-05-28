@@ -1072,16 +1072,16 @@ void CMenuPcs::ArtiBaseInfoInit(CMenuPcs::Sprt2* a, CMenuPcs::Sprt2* b)
 
 	float iconW = (float)icon[2];
 	float iconH = (float)icon[3];
-	float iconHalfW = (float)(iconW * 0.5);
-	float iconHalfH = (float)(iconH * 0.5);
+	double iconHalfW = (double)iconW * 0.5;
+	double iconHalfH = (double)iconH * 0.5;
 
-	base[14] = base[0] - iconHalfW;
+	base[14] = (float)((double)base[0] - iconHalfW);
 	base[15] = (float)board[1];
 	base[6] = base[14];
-	base[7] = (float)(board[1] + board[3] - iconH);
+	base[7] = (float)((double)(float)(board[1] + board[3]) - (double)iconH);
 	base[10] = (float)board[0];
-	base[11] = base[1] - iconHalfH;
-	base[2] = (float)(board[0] + board[2] - iconW);
+	base[11] = (float)((double)base[1] - iconHalfH);
+	base[2] = (float)((double)(float)(board[0] + board[2]) - (double)iconW);
 	base[3] = base[11];
 
 	for (int row = 0; row < 2; row++) {

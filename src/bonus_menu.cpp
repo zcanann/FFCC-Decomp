@@ -3443,6 +3443,8 @@ void CMenuPcs::createBonus()
 			entry.m_artifactValue =
 			    (int)caravanWork->m_artifactRelated[0] + (int)caravanWork->m_artifactRelated[1] - (int)caravanWork->m_artifactRelated[4];
 			entry.m_totalValue = entry.m_foodValue + entry.m_artifactValue;
+			entry.m_selectedItemId = -1;
+			entry.m_selectedSlot = -1;
 			int totalValueClamped;
 			if (entry.m_totalValue < 0) {
 				totalValueClamped = 0;
@@ -3453,8 +3455,6 @@ void CMenuPcs::createBonus()
 				}
 			}
 			entry.m_totalValue = totalValueClamped;
-			entry.m_selectedItemId = -1;
-			entry.m_selectedSlot = -1;
 			entry.m_tribeId = (unsigned int)caravanWork->m_tribeId;
 			*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(entry.m_partyHandle->m_model) + 0x9C) = 0.0f;
 

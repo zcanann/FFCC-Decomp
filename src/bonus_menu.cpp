@@ -1723,7 +1723,6 @@ void CMenuPcs::CalcSelectWait()
 			sprites[header->count].depth = 1.0f;
 			header->count = (short)(header->count + 1);
 		}
-		*(short*)(statePtr + 0x26) = 4;
 		UpdateSelectCursorSprite(statePtr, header, sprites, 0);
 		header->finished = 0;
 		*(unsigned char*)(statePtr + 0xb) = 1;

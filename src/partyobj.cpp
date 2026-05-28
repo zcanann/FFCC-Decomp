@@ -144,6 +144,11 @@ static inline int& CharaGhostValue(int offset)
 	return *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Chara) + offset);
 }
 
+static inline int& PartyTraceParticleSlot(int port)
+{
+	return *reinterpret_cast<int*>(CFlat + 0x1041C + port * sizeof(int));
+}
+
 static inline void UpdateGhostPartyDamageCounters(CGPrgObj* attacker)
 {
 	if (((static_cast<unsigned short>(attacker->GetCID()) & 0xAD) == 0xAD) && Game.m_gameWork.m_menuStageMode != 0) {
@@ -677,6 +682,31 @@ void CGPartyObj::onFrameAlways()
 	}
 
 	reinterpret_cast<CCaravanWork*>(m_scriptHandle)->CalcStatus();
+	int port = reinterpret_cast<int>(m_scriptHandle[0xED]);
+	bool showTraceParticle = false;
+	if ((Game.m_gameWork.m_gameInitFlag != 0) &&
+	    ((CFlatGameFlags() & 0x10) != 0) &&
+	    ((CFlatGameFlags() & 0x08) != 0) &&
+	    ((static_cast<int>(static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(&m_weaponNodeFlags)) << 0x18) < 0) &&
+	     (static_cast<int>(static_cast<unsigned int>(static_cast<unsigned char>(m_weaponNodeFlags >> 8)) << 0x18) < 0)) &&
+	    (m_lastStateId != 6 && m_lastStateId != 2)) {
+		if ((Game.m_gameWork.m_menuStageMode == 0) ||
+		    (Game.m_gameWork.m_bossArtifactStageIndex >= 0x0F) ||
+		    ((GetCID() & 0x6D) != 0x6D) ||
+		    (m_scriptHandle[0xED] == nullptr)) {
+			showTraceParticle = true;
+		}
+	}
+
+	int& traceSlot = PartyTraceParticleSlot(port);
+	if (showTraceParticle && traceSlot == 0) {
+		traceSlot = gCFlatRuntime2.GetFreeParticleSlot();
+		putParticleTrace((port + 0x42U) | 0x100, traceSlot, this, FLOAT_80331a54, 0);
+	} else if (!showTraceParticle && traceSlot != 0) {
+		gCFlatRuntime2.EndParticleSlot(traceSlot, 1);
+		traceSlot = 0;
+	}
+
 	CheckMenu();
 }
 

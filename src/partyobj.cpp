@@ -707,6 +707,38 @@ void CGPartyObj::onFrameAlways()
 		traceSlot = 0;
 	}
 
+	if ((MiniGamePcs.m_flags & 0x2000) != 0) {
+		int itemId;
+		unsigned short itemModel;
+		do {
+			itemId = Math.Rand(0x155) + 0x9F;
+			unsigned char* itemData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2] + itemId * 0x48);
+			itemModel = *reinterpret_cast<unsigned short*>(itemData + 2);
+		} while ((*reinterpret_cast<short*>(Game.unkCFlatData0[2] + itemId * 0x48) == 0) ||
+		         ((itemModel & 0x0FFF) == 0) ||
+		         ((itemModel & 0x0FFF) == 0x0FFF) ||
+		         (itemId == 400));
+
+		if (m_scriptHandle[0xED] == nullptr) {
+			CGItemObj::CreateFromScript(0, 4, itemId, this, FLOAT_80331a78, (CGItemObj::CCFS*)0);
+			if (Math.Rand(10) == 0) {
+				CGItemObj::CreateFromScript(2, 4, 0x3039, this, FLOAT_80331a78, (CGItemObj::CCFS*)0);
+			}
+		}
+
+		int modelId = Math.Rand(0x1A) + 1;
+		if (modelId == 0x0F) {
+			modelId = 1;
+		}
+		LoadWeapon(modelId, 0);
+
+		modelId = Math.Rand(0x1A) + 1;
+		if (modelId == 0x0F) {
+			modelId = 1;
+		}
+		LoadShield(modelId);
+	}
+
 	CheckMenu();
 }
 

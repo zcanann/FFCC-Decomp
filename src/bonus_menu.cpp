@@ -3488,9 +3488,6 @@ void CMenuPcs::createBonus()
 		for (int i = 0; i < activeCount; i++) {
 			CCaravanWork* caravanWork =
 			    reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[s_Rinfo->m_party[i].m_partySlot]);
-			if (caravanWork == 0) {
-				continue;
-			}
 
 			short* rewardItems = &s_Rinfo->m_tempArtifacts[0];
 			for (int artifactIndex = 0; artifactIndex < 8; artifactIndex++) {

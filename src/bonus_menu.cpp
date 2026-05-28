@@ -1930,7 +1930,6 @@ void CMenuPcs::DrawSelectOpenAnim()
 
 	BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
 	BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
-	float strongest = 0.0f;
 	float artiAlpha = 0.0f;
 	int modelIndex = 0;
 	int lastKind = 0;
@@ -2015,9 +2014,6 @@ void CMenuPcs::DrawSelectOpenAnim()
 			break;
 		}
 
-		if (strongest < alpha) {
-			strongest = alpha;
-		}
 	}
 
 	DrawBonusActiveMarks(this, statePtr, artiAlpha);

@@ -2023,11 +2023,6 @@ void CMenuPcs::DrawSelectOpenAnim()
 	DrawBonusActiveMarks(this, statePtr, artiAlpha);
 	DrawBonusPartyNames(this, header, sprites);
 	DrawBonusMcWinOverlay(this, statePtr);
-
-	if (*(unsigned char*)(statePtr + 8) != 0) {
-		DrawBonusChkMark(strongest);
-	}
-	GetBonusMenuMembers(this).m_bonusAlpha = (unsigned char)(strongest * 255.0f);
 }
 
 /*

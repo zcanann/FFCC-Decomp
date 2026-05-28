@@ -3138,7 +3138,7 @@ void CMenuPcs::drawBonus()
 {
 	gUtil.ClearZBufferRect(0.0f, 0.0f, 640.0f, 480.0f);
 
-	if (System.m_execParam != 0) {
+	if ((unsigned int)System.m_execParam >= 1) {
 		System.Printf(const_cast<char*>(sDrawBonusFmt), (int)*(short*)(GetBonusMenuMembers(this).m_bonusStatePtr + 0x1c));
 	}
 
@@ -3160,6 +3160,8 @@ void CMenuPcs::drawBonus()
 		break;
 	case 5:
 		DrawSelectOpenAnim();
+		break;
+	case 6:
 		break;
 	}
 }

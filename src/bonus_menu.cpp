@@ -2876,17 +2876,22 @@ void CMenuPcs::DrawResultOpenAnim()
 						MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 					}
 
+					_GXColor colors[4];
 					if (kind == 0x17) {
-						_GXColor colors[4] = {
-						    {0xFF, 0xFF, 0xFF, 0xFF},
-						    {0xFF, 0xFF, 0xFF, 0xFF},
-						    {0xFF, 0xFF, 0xFF, 0xFF},
-						    {0xFF, 0xFF, 0xFF, 0xFF},
-						};
-						_GXColor color = {0xFF, 0xFF, 0xFF, 0xFF};
+						_GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
+						colors[0] = white;
+						colors[1] = white;
+						colors[2] = white;
+						colors[3] = white;
+						_GXColor color = white;
 						GXSetChanMatColor(GX_COLOR0A0, color);
-						MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kind));
+					} else {
+						_GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(sprite->alpha * 255.0f)};
+						GXSetChanMatColor(GX_COLOR0A0, color);
+					}
+					MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kind));
 
+					if (kind == 0x17) {
 						float fillWidth = 1.0f;
 						if (sprite->timer < sprite->duration) {
 							fillWidth = 1.0f - ((float)(sprite->timer - 1) / (float)sprite->duration);
@@ -2910,10 +2915,6 @@ void CMenuPcs::DrawResultOpenAnim()
 							    fillWidth, sprite->mulY, colors, 1.0f, 1.0f, 0.0f);
 						}
 					} else {
-						_GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(sprite->alpha * 255.0f)};
-						GXSetChanMatColor(GX_COLOR0A0, color);
-						MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kind));
-
 						if (i < s_CntTop || i >= s_CntTop + activePartyCount) {
 							MenuPcs.DrawRect(0, (float)sprite->x + sprite->motionX, (float)sprite->y + sprite->motionY,
 							    (float)sprite->w, (float)sprite->h,

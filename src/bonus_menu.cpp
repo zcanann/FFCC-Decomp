@@ -2055,9 +2055,9 @@ void CMenuPcs::CalcSelectOpenAnim()
 
 	BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
 	BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
+	int activePartyCount = s_Rinfo->m_partyCount;
 
 	if (*(unsigned char*)(statePtr + 0xb) == 0) {
-		int activePartyCount = s_Rinfo->m_partyCount;
 		int idx;
 		int iconBase;
 		int detailBase;

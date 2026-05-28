@@ -1653,16 +1653,12 @@ void CGPartyObj::statAttackSel()
  * JP Address: TODO
  * JP Size: TODO
  */
-CGPrgObj* CGPartyObj::getBestAngleObject(float, float)
+CGPrgObj* CGPartyObj::getBestAngleObject(float range, float)
 {
 	CGPrgObj* best = 0;
 	float bestAbsAngle = 0.0f;
 
 	for (CGObject* obj = gCFlatRuntime2.FindGObjFirst(); obj != 0; obj = gCFlatRuntime2.FindGObjNext(obj)) {
-		if (obj == this) {
-			continue;
-		}
-
 		const unsigned int flags = obj->m_attrFlags;
 		if ((flags & 0x18) == 0) {
 			continue;
@@ -1677,22 +1673,36 @@ CGPrgObj* CGPartyObj::getBestAngleObject(float, float)
 			}
 		}
 
-		Vec diff;
-		PSVECSubtract(&obj->m_worldPosition, &m_worldPosition, &diff);
-		diff.y = 0.0f;
-		if (PSVECSquareMag(&diff) <= 0.0f) {
+		if (obj->m_worldPosition.x == m_worldPosition.x) {
+			continue;
+		}
+		if (obj->m_worldPosition.z == m_worldPosition.z) {
 			continue;
 		}
 
-		const float absAngle = fabsf(getTargetRot(reinterpret_cast<CGPrgObj*>(obj)));
-		if (absAngle > bestAbsAngle) {
-			bestAbsAngle = absAngle;
-			best = reinterpret_cast<CGPrgObj*>(obj);
+		float radius = obj->m_bodyEllipsoidRadius + (range + m_bodyEllipsoidRadius);
+		if (obj->m_worldPosition.x < m_worldPosition.x - radius ||
+		    obj->m_worldPosition.z < m_worldPosition.z - radius ||
+		    obj->m_worldPosition.x > m_worldPosition.x + radius ||
+		    obj->m_worldPosition.z > m_worldPosition.z + radius) {
+			continue;
 		}
-	}
 
-	if (best != 0) {
-		dstTargetRot(best);
+		float yRange = FLOAT_80331ad4 * obj->m_bodyEllipsoidRadius;
+		if (obj->m_worldPosition.y <= m_worldPosition.y + yRange &&
+		    m_worldPosition.y - yRange <= obj->m_worldPosition.y) {
+			Vec diff;
+			PSVECSubtract(&obj->m_worldPosition, &m_worldPosition, &diff);
+			diff.y = 0.0f;
+			float distSq = PSVECSquareMag(&diff);
+			if (distSq > 0.0f && distSq < radius * radius) {
+				float absAngle = fabsf(getTargetRot(reinterpret_cast<CGPrgObj*>(obj)));
+				if (absAngle > bestAbsAngle) {
+					bestAbsAngle = absAngle;
+					best = reinterpret_cast<CGPrgObj*>(obj);
+				}
+			}
+		}
 	}
 
 	return best;

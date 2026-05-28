@@ -3184,19 +3184,16 @@ void CGPartyObj::SetBonusCondition(int useRandom, int bonus0, int bonus1, int bo
 
 		CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(party->m_scriptHandle);
 		if (useRandom == 0) {
-			int bonus = bonus0;
-			switch (slot) {
-			case 1:
-				bonus = bonus1;
-				break;
-			case 2:
-				bonus = bonus2;
-				break;
-			case 3:
-				bonus = bonus3;
-				break;
-			default:
-				break;
+			int bonus = bonus2;
+			if (slot != 2) {
+				if (slot < 2) {
+					bonus = bonus0;
+					if (slot != 0) {
+						bonus = bonus1;
+					}
+				} else {
+					bonus = bonus3;
+				}
 			}
 
 			caravanWork->SetBonusCondition(bonus);

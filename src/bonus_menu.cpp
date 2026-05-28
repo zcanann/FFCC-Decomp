@@ -3451,9 +3451,7 @@ void CMenuPcs::createBonus()
 			entry.m_selectedItemId = -1;
 			entry.m_selectedSlot = -1;
 			entry.m_tribeId = (unsigned int)caravanWork->m_tribeId;
-			if (entry.m_partyHandle != 0 && entry.m_partyHandle->m_model != 0) {
-				*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(entry.m_partyHandle->m_model) + 0x9C) = 0.0f;
-			}
+			*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(entry.m_partyHandle->m_model) + 0x9C) = 0.0f;
 
 			for (int t = 0; t < 4 && tempArtifactCount < 4; t++) {
 				short treasure = caravanWork->m_treasures[t];

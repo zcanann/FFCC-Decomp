@@ -1943,11 +1943,6 @@ void CMenuPcs::DrawSelectOpenAnim()
 	for (int i = 0; i < (int)header->count; i++) {
 		BonusAnimSprite* sprite = &sprites[i];
 		float alpha = sprite->alpha;
-		if (alpha < 0.0f) {
-			alpha = 0.0f;
-		} else if (alpha > 1.0f) {
-			alpha = 1.0f;
-		}
 		int kind = sprite->kind;
 		switch (kind) {
 		case -4:

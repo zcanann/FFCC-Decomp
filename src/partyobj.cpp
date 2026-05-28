@@ -1269,8 +1269,7 @@ void CGPartyObj::shouki()
 	const bool cflatBit5 = (cflatFlags & 0x20) != 0;
 	const bool weaponFlag = static_cast<signed char>(m_weaponNodeFlags >> 8) < 0;
 
-	if (*reinterpret_cast<short*>(script + 0x1C) == 0 || ((!cflatBit7 && !cflatBit4) || !weaponFlag) ||
-	    Game.unk_flat3_0xc7d0 == 0) {
+	if (*reinterpret_cast<short*>(script + 0x1C) == 0 || ((!cflatBit7 && !cflatBit4) || !weaponFlag)) {
 		if (m_unk688 != 0) {
 			deletePSlotBit(0x200);
 			m_unk688 = 0;
@@ -1280,7 +1279,7 @@ void CGPartyObj::shouki()
 
 	const Vec* chalicePos = reinterpret_cast<Vec*>(Game.unk_flat3_0xc7d0 + 0x15C);
 	float chaliceDist = PSVECDistance(&m_worldPosition, chalicePos);
-	if (chaliceDist > FLOAT_80331b00 * Game.unkFloat_0xca10 || !cflatBit4) {
+	if (chaliceDist > FLOAT_80331b00 * Game.unkFloat_0xca10 || cflatBit4) {
 		if (m_unk688 != 2) {
 			deletePSlotBit(0x200);
 			gCFlatRuntime2.ResetParticleWork(1, m_particleSlots[9]);

@@ -24,7 +24,9 @@ extern const char sBossGhostPartyCountersFmt[];
 extern const char sMissingRingMenuFmt[];
 extern int __float_huge[];
 
-static const char s_partyObjStateFmt[] = "mode:%d stat:%d sub:%d frame:%d alive:%d tgt:%d ghost:%d";
+static const char s_partyObjGhostFmt[] = "%d/%d %d/%d %d/%d";
+static const char s_partyObjGhostAngleFmt[] = "%d/%d a=%d";
+static const char s_partyObjDebugScriptFmt[] = "%d %d %d %d %d %d";
 static const char s_partyBonusCountFmt[] = "SetBonusCondition num:%d";
 static const char s_partyBonusRandomFmt[] = "SetBonusCondition slot:%d idx:%d bonus:%d";
 static const char s_partyBonusFixedFmt[] = "SetBonusCondition slot:%d bonus:%d";
@@ -36,7 +38,10 @@ static const char s_partyBonusSubFmt[] = "bonus slot:%d sub:%d";
 static const char s_partyBonusUnknownFmt[] = "bonus unknown";
 
 extern float FLOAT_80331a78;
+extern float FLOAT_80331A50;
 extern const float FLOAT_80331a54;
+extern float FLOAT_80331A58;
+extern float FLOAT_80331A5C;
 extern float FLOAT_80331a74;
 extern float FLOAT_80331a9c;
 extern float FLOAT_80331aa0;
@@ -3801,24 +3806,78 @@ void CGPartyObj::sysControl(int controlType, int controlValue)
 void CGPartyObj::onDrawDebug(CFont* font, float x, float& y, float z)
 {
 	CGCharaObj::onDrawDebug(font, x, y, z);
-	if (m_scriptHandle == nullptr) {
+
+	if (((int)((unsigned int)(unsigned char)m_weaponNodeFlags << 24) >= 0) ||
+	    (*reinterpret_cast<int*>(CFlat + 0x12AC) != 0) ||
+	    ((MiniGamePcs.m_flags & 0x80) == 0)) {
 		return;
 	}
 
 	char text[256];
-	const int commandMode = PartyData(this).commandMode;
-	unsigned char* self = reinterpret_cast<unsigned char*>(this);
-	const int targetState = *reinterpret_cast<int*>(self + 0x668);
-	const int alive = *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C);
-	sprintf(text, s_partyObjStateFmt, commandMode, m_lastStateId, m_subState, m_subFrame, alive, targetState,
-	        sGhostPartyWork.mood);
+	if ((Game.m_gameWork.m_menuStageMode == 0) ||
+	    (Game.m_gameWork.m_bossArtifactStageIndex >= 0x0F) ||
+	    (((GetCID() & 0x6D) != 0x6D) || (m_scriptHandle[0xED] == nullptr))) {
+		unsigned char* work = reinterpret_cast<unsigned char*>(m_scriptHandle);
+		sprintf(text, s_partyObjDebugScriptFmt, work[0xBA4], *reinterpret_cast<short*>(work + 0xBC4),
+		        *reinterpret_cast<short*>(work + 0xBC6), *reinterpret_cast<short*>(work + 0xBC8),
+		        *reinterpret_cast<short*>(work + 0xBCA), *reinterpret_cast<short*>(work + 0xBCC));
 
-	float width = static_cast<float>(font->GetWidth(text));
-	font->SetPosX(x - width * 0.5f);
-	font->SetPosY(y);
-	font->SetPosZ(z);
-	font->Draw(text);
-	y -= 12.0f;
+		float width = static_cast<float>(font->GetWidth(text));
+		font->SetPosX(x - width * 0.5f);
+		font->SetPosY(y);
+		font->SetPosZ(z);
+		font->Draw(text);
+	} else {
+		unsigned int bossKind;
+		switch (Game.m_gameWork.m_bossArtifactStageIndex) {
+		case 4:
+		case 8:
+		case 9:
+		case 0x0B:
+		case 0x0C:
+		case 0x0D:
+			bossKind = 2;
+			break;
+		case 6:
+		case 0x0A:
+			bossKind = 1;
+			break;
+		default:
+			bossKind = 0;
+			break;
+		}
+
+		float rate = static_cast<float>(CharaGhostValue(0x2054)) / FLOAT_80331A50;
+		double angleScale;
+		if (bossKind == 2) {
+			angleScale = FLOAT_80331A58 * rate + FLOAT_80331A58;
+		} else if ((bossKind < 2) && (bossKind != 0)) {
+			angleScale = FLOAT_80331A58 * (FLOAT_80331a54 - rate) + FLOAT_80331A58;
+		} else {
+			angleScale = FLOAT_80331a54;
+		}
+
+		sprintf(text, s_partyObjGhostFmt, sGhostPartyWork.mood, CharaGhostValue(0x2048),
+		        sGhostPartyWork.thresholdA, CharaGhostValue(0x204C),
+		        sGhostPartyWork.thresholdB, CharaGhostValue(0x2050));
+
+		float width = static_cast<float>(font->GetWidth(text));
+		font->SetPosX(x - width * 0.5f);
+		font->SetPosY(y);
+		font->SetPosZ(z);
+		font->Draw(text);
+		y -= static_cast<float>(font->m_glyphWidth) * font->scaleY;
+
+		sprintf(text, s_partyObjGhostAngleFmt, sGhostPartyWork.pressure,
+		        static_cast<int>(FLOAT_80331A5C * angleScale), CharaGhostValue(0x2054));
+
+		width = static_cast<float>(font->GetWidth(text));
+		font->SetPosX(x - width * 0.5f);
+		font->SetPosY(y);
+		font->SetPosZ(z);
+		font->Draw(text);
+	}
+	y -= static_cast<float>(font->m_glyphWidth) * font->scaleY;
 }
 
 /*

@@ -156,11 +156,11 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, p
                     uTop = (f32)i * uvStep;
                     uBottom = (f32)(i + 1) * uvStep;
 
-                    if (alphaScale < 0.0f) {
-                        alphaScale = 0.0f;
+                    if (alphaScale < FLOAT_80331840) {
+                        alphaScale = FLOAT_80331840;
                     }
-                    if (alphaScale > 1.0f) {
-                        alphaScale = 1.0f;
+                    if (alphaScale > FLOAT_80331844) {
+                        alphaScale = FLOAT_80331844;
                     }
 
                     colorTop = g_pppYmTracer2_1;

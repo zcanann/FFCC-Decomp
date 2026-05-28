@@ -12,16 +12,29 @@ typedef signed short s16;
 
 unsigned char s_rank[0x20];
 
-extern "C" const float FLOAT_80333040 = 0.0f;
-extern "C" const float FLOAT_80333044 = 32.0f;
-extern "C" const float FLOAT_80333048 = 1.0f;
-extern "C" const double DOUBLE_80333050 = 1.0;
-extern "C" const float FLOAT_80333058 = 255.0f;
-extern "C" const float FLOAT_8033305C = 24.0f;
-extern "C" const double DOUBLE_80333060 = 0.5;
-extern "C" const char s_FavoRankFormat_80333068[] = "%d";
-extern "C" const float FLOAT_8033306C = 4.0f;
-extern "C" const float FLOAT_80333070 = 0.9f;
+extern "C" const float FLOAT_80333040;
+extern "C" const float FLOAT_80333044;
+extern "C" const float FLOAT_80333048;
+extern "C" const double DOUBLE_80333050;
+extern "C" const float FLOAT_80333058;
+extern "C" const float FLOAT_8033305C;
+extern "C" const double DOUBLE_80333060;
+extern "C" const char s_FavoRankFormat_80333068[];
+extern "C" const float FLOAT_8033306C;
+extern "C" const float FLOAT_80333070;
+extern "C" const float FLOAT_80333080;
+extern "C" const float FLOAT_80333084;
+
+extern "C" const char s_Force_803334F0[] = "Force";
+extern "C" const char gap_11_803334F6_sdata2[2] = {};
+extern "C" const char s_Musique_803334F8[8] = "Musique";
+extern "C" const char s_Active_80333500[8] = "Activ\351";
+extern "C" const char s_Stereo_80333508[8] = "St\351r\351o";
+extern "C" const char s_Fuerza_80333510[] = "Fuerza";
+extern "C" const char gap_11_80333517_sdata2[1] = {};
+extern "C" const char s_Defensa_80333518[8] = "Defensa";
+extern "C" const char s_Musica_80333520[8] = "M\372sica";
+extern "C" const char s_Apagado_80333528[8] = "Apagado";
 
 struct FavoFlatTableEntry
 {
@@ -567,7 +580,7 @@ void CMenuPcs::FavoInit()
 	setupEntry->w = 0x158;
 	setupEntry->h = 0x20;
 	fVar4 = FLOAT_80333040;
-	fVar5 = 384.0f;
+	fVar5 = FLOAT_80333080;
 	setupEntry->u = fVar4;
 	setupEntry->v = fVar4;
 	setupEntry->uvScale = fVar5 / (float)setupEntry->w;
@@ -599,7 +612,7 @@ void CMenuPcs::FavoInit()
 	setupEntry->duration = 5;
 
 	sVar9 = 0;
-	fVar7 = 0.75f;
+	fVar7 = FLOAT_80333084;
 	sVar11 = 6;
 	setupEntry = &favoList->entries[3];
 	setupEntry->tex = 0x45;

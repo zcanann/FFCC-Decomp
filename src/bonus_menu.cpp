@@ -1406,6 +1406,9 @@ void CMenuPcs::DrawSelectCloseAnim()
 			break;
 		}
 
+		if (strongest < alpha) {
+			strongest = alpha;
+		}
 	}
 
 	DrawBonusActiveMarks(this, statePtr, artiAlpha);
@@ -1414,6 +1417,7 @@ void CMenuPcs::DrawSelectCloseAnim()
 	if (*(unsigned char*)(statePtr + 8) != 0 && strongest > 0.0f) {
 		DrawBonusChkMark(strongest);
 	}
+	GetBonusMenuMembers(this).m_bonusAlpha = (unsigned char)(strongest * 255.0f);
 }
 
 /*

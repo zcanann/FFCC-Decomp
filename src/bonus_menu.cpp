@@ -3515,21 +3515,14 @@ void CMenuPcs::createBonus()
 			for (int j = i + 1; j < activeCount; j++) {
 				BonusPartySummary& a = s_Rinfo->m_party[order[i]];
 				BonusPartySummary& b = s_Rinfo->m_party[order[j]];
-				bool swap = false;
 				unsigned int coin = rand();
-				if (a.m_totalValue < b.m_totalValue) {
-					swap = true;
-				} else if (a.m_totalValue == b.m_totalValue && a.m_artifactValue < b.m_artifactValue) {
-					swap = true;
-				} else if (a.m_totalValue == b.m_totalValue && a.m_artifactValue == b.m_artifactValue &&
-				           a.m_foodValue < b.m_foodValue) {
-					swap = true;
-				} else if (a.m_totalValue == b.m_totalValue && a.m_artifactValue == b.m_artifactValue &&
-				           a.m_foodValue == b.m_foodValue && (coin & 1) != 0) {
-					swap = true;
-				}
 
-				if (swap) {
+				if (a.m_totalValue < b.m_totalValue ||
+				    (a.m_totalValue == b.m_totalValue && a.m_artifactValue < b.m_artifactValue) ||
+				    (a.m_totalValue == b.m_totalValue && a.m_artifactValue == b.m_artifactValue &&
+				        a.m_foodValue < b.m_foodValue) ||
+				    (a.m_totalValue == b.m_totalValue && a.m_artifactValue == b.m_artifactValue &&
+				        a.m_foodValue == b.m_foodValue && (coin & 1) != 0)) {
 					int temp = order[i];
 					order[i] = order[j];
 					order[j] = temp;

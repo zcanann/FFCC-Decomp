@@ -512,7 +512,7 @@ void CGMonObj::cancelStatFuncArmstrong()
 {
 	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
 	if (prgObj->m_lastStateId == 100) {
-		reinterpret_cast<CGCharaObj*>(this)->enableDamageCol(1);
+		enableDamageCol(1);
 	}
 }
 

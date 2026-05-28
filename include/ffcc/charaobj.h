@@ -53,13 +53,19 @@ public:
 	int onHit(int, CGObject*, int, Vec*);
 	void onHitParticle(int, int, int, int, Vec*, PPPIFPARAM*);
 	int getReplaceStat(int);
+	virtual void onStatDie();
+	virtual void onDamage(CGPrgObj*, int, int, int, Vec*);
+	virtual void onStatMagic();
+	virtual void onStatAttack(int);
+	virtual void onStatShield();
+	virtual void enableAttackCol(int, int, int);
+	virtual void enableDamageCol(int);
 	void putHitParticleFromItem(CGPrgObj*, int);
 	void setSta(int, int);
 	void effective(int, int, CGPrgObj*, int&);
 	void calcSta(int, int, CGObject*);
 	void addHp(int, CGPrgObj*);
 	void calcRegist(int, int, int&, int&, int&, int);
-	void onDamage(CGPrgObj*, int, int, int, Vec*);
 	int getItemPdt(int, int, int&, int&, int&);
 	void putParticleFromItem(int, int, int, Vec*);
 	void statShield();
@@ -67,10 +73,6 @@ public:
 	void statDie();
 	void statMagic();
 	void statKizetsu();
-	void onStatMagic();
-	void onStatShield();
-	void onStatAttack(int);
-	void onStatDie();
 	void statDamage();
 	void statButtobi();
 	void onChangePrg(int);
@@ -84,9 +86,7 @@ public:
 	void scCheckItem(CCombi2Set*, CGCharaObj*, int);
 	void scCheckTime(CCombi2Set*, CGCharaObj*, CGCharaObj*, int);
 	int searchCombi(int, CGPartyObj **, int&);
-	void enableAttackCol(int, int, int);
 	int GetCID();
-	void enableDamageCol(int);
 
 	int m_attackAnimId;
 	int m_unk554;

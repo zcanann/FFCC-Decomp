@@ -3443,11 +3443,16 @@ void CMenuPcs::createBonus()
 			entry.m_artifactValue =
 			    (int)caravanWork->m_artifactRelated[0] + (int)caravanWork->m_artifactRelated[1] - (int)caravanWork->m_artifactRelated[4];
 			entry.m_totalValue = entry.m_foodValue + entry.m_artifactValue;
+			int totalValueClamped;
 			if (entry.m_totalValue < 0) {
-				entry.m_totalValue = 0;
-			} else if (entry.m_totalValue > 999) {
-				entry.m_totalValue = 999;
+				totalValueClamped = 0;
+			} else {
+				totalValueClamped = 999;
+				if (entry.m_totalValue < 1000) {
+					totalValueClamped = entry.m_totalValue;
+				}
 			}
+			entry.m_totalValue = totalValueClamped;
 			entry.m_selectedItemId = -1;
 			entry.m_selectedSlot = -1;
 			entry.m_tribeId = (unsigned int)caravanWork->m_tribeId;

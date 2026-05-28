@@ -1446,7 +1446,6 @@ void CMenuPcs::CalcSelectCloseAnim()
 		int markBase = detailBase + activePartyCount;
 		int lowerNameBase = markBase + activePartyCount;
 
-		header->finished = 0;
 		header->count = (short)(header->count - 1);
 
 		for (int i = 0; i < (int)header->count; i++) {

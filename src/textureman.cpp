@@ -782,27 +782,6 @@ CTexture::~CTexture()
 
 /*
  * --INFO--
- * PAL Address: 0x8003B988
- * PAL Size: 100b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-CTexture::CTexture()
-{
-    m_maxLod = 0;
-    m_imageData = 0;
-    m_tlutData = 0;
-    m_isIntensityAlpha = 0;
-    m_isAlphaLut = 0;
-    m_name[0] = 0;
-    m_cacheId = -1;
-    m_usesExternalAddress = 0;
-}
-
-/*
- * --INFO--
  * PAL Address: 0x8003B9EC
  * PAL Size: 804b
  * EN Address: TODO

@@ -1090,13 +1090,17 @@ void CMenuPcs::ArtiBaseInfoInit(CMenuPcs::Sprt2* a, CMenuPcs::Sprt2* b)
 		if (row == 0) {
 			base[12] = slotX;
 			base[13] = slotY;
-			base[16] = (float)(board[2] * 0.5 + slotX);
-			base[17] = slotY;
 		} else {
 			slotY = (float)(board[3] * 0.5 + slotY);
 			base[8] = slotX;
 			base[9] = slotY;
-			base[4] = (float)(board[2] * 0.5 + slotX);
+		}
+		float nextX = (float)(board[2] * 0.5 + slotX);
+		if (row == 0) {
+			base[16] = nextX;
+			base[17] = slotY;
+		} else {
+			base[4] = nextX;
 			base[5] = slotY;
 		}
 	}

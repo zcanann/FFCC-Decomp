@@ -1940,6 +1940,8 @@ void CMenuPcs::DrawSelectOpenAnim()
 			modelIndex++;
 			lastKind = kind;
 			break;
+		case -1:
+			break;
 		default:
 			{
 				if (lastKind < 0) {

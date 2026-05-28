@@ -1085,8 +1085,8 @@ void CMenuPcs::ArtiBaseInfoInit(CMenuPcs::Sprt2* a, CMenuPcs::Sprt2* b)
 	base[3] = base[11];
 
 	for (int row = 0; row < 2; row++) {
-		float slotX = (float)(board[0] + board[2] * 0.25 - iconHalfW);
-		float slotY = (float)(board[1] + board[3] * 0.25 - iconHalfH);
+		float slotX = (float)((double)(float)(board[0] + board[2] * 0.25) - iconHalfW);
+		float slotY = (float)((double)(float)(board[1] + board[3] * 0.25) - iconHalfH);
 		if (row == 0) {
 			base[12] = slotX;
 			base[13] = slotY;

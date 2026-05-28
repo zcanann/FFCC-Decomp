@@ -740,7 +740,7 @@ static void DrawBonusPartyNames(CMenuPcs* menu, BonusAnimHeader* header, BonusAn
 		}
 
 		const char* name = GetBonusPartyNameByActiveIndex(nameIndex);
-		GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(ClampBonusUnit(sprite->alpha) * 255.0f)};
+		GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(sprite->alpha * 255.0f)};
 		font->SetColor(color);
 		font->SetPosX((float)sprite->x + sprite->mulX);
 		font->SetPosY((float)sprite->y + sprite->mulY - 12.0f);

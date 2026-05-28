@@ -1298,7 +1298,21 @@ void CGPartyObj::onFrameStat()
 		statCharge();
 		break;
 	case 7:
-		statAttackSel();
+		if (m_stateFrame == 0) {
+			PartyData(this).unk6D0 = 0;
+		}
+		if ((getPadHeldForSlot(static_cast<unsigned char>(m_animStateMisc)) & 0x100) == 0) {
+			changeStat(1, 0, 0);
+		} else {
+			PartyData(this).unk6D0++;
+			if (PartyData(this).unk6D0 < 6) {
+				if ((getPadTrigForSlot(static_cast<unsigned char>(m_animStateMisc)) & 0x200) != 0) {
+					changeStat(0, 0, 0);
+				}
+			} else {
+				changeStat(6, 0, 0);
+			}
+		}
 		break;
 	case 0x0B:
 		statCarry();

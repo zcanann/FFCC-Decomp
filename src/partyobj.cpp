@@ -1393,7 +1393,27 @@ void CGPartyObj::onFrameStat()
 		statKorobi();
 		break;
 	case 0x0F:
-		statWeaponChange();
+		if (m_stateFrame == 0) {
+			reqAnim(0x29, 0, 0);
+		}
+		if (m_stateFrame == 4) {
+			unsigned char* self = reinterpret_cast<unsigned char*>(this);
+			int weaponItem = *reinterpret_cast<int*>(self + 0x6DC);
+			int weaponRef = *reinterpret_cast<int*>(self + 0x6E0);
+			if (weaponItem <= 0) {
+				LoadWeapon(-1, 0);
+			} else {
+				unsigned short itemKind = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + weaponItem * 0x48 + 2);
+				LoadWeapon(itemKind & 0xFFF, itemKind >> 12);
+			}
+			*reinterpret_cast<int*>(self + 0x6E0) = weaponRef;
+			*reinterpret_cast<int*>(self + 0x6DC) = weaponItem;
+			reinterpret_cast<CCaravanWork*>(m_scriptHandle)->SetCurrentWeaponIdx(weaponRef);
+			PartyData(this).commandFlags &= 0xDF;
+		}
+		if (isLoopAnim() != 0) {
+			changeStat(0, 0, 0);
+		}
 		break;
 	case 0x20:
 		if (m_stateFrame == 0) {

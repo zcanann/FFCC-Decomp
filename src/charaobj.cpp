@@ -40,6 +40,7 @@ extern const float FLOAT_80331988;
 extern const float FLOAT_8033198C;
 extern const float FLOAT_80331990;
 extern const float FLOAT_80331994;
+extern const float FLOAT_80331998;
 }
 
 static float& CharaObjTargetAngle(CGCharaObj* charaObj)
@@ -2372,13 +2373,16 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 			}
 			emittedCustom = true;
 		} else if (effectId > 0x49C && effectId < 0x4A0 && effectArg0 == 2) {
+			Mtx rotMtx;
+			PSMTXRotRad(rotMtx, 'y', m_rotTargetY);
 			for (int i = 0; i < 2; i++) {
 				float side = (i == 0) ? 76.0f : -76.0f;
-				Vec sidePos;
-				sidePos.x = m_worldPosition.x + cosf(m_rotTargetY) * side;
-				sidePos.y = m_worldPosition.y;
-				sidePos.z = m_worldPosition.z - sinf(m_rotTargetY) * side;
-				gCFlatRuntime2.SetParticleWorkPos(sidePos, m_rotTargetY);
+				Vec sidePos = { side, 0.0f, FLOAT_80331998 };
+				Vec offsetPos;
+				PSMTXMultVec(rotMtx, &sidePos, &offsetPos);
+				*reinterpret_cast<float*>(CFlat + 0x1740) = m_worldPosition.x + offsetPos.x;
+				*reinterpret_cast<float*>(CFlat + 0x1744) = m_worldPosition.y + offsetPos.y;
+				*reinterpret_cast<float*>(CFlat + 0x1748) = m_worldPosition.z + offsetPos.z;
 				gCFlatRuntime2.SetParticleWorkVector(m_rotTargetY, 0.0f);
 				gCFlatRuntime2.PutParticleWork();
 			}

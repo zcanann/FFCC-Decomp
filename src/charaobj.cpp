@@ -1379,7 +1379,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 				break;
 			}
 			case 10:
-				if (isMon && script9 != 0 && (*reinterpret_cast<unsigned short*>(script9 + 0xFE) & 4) != 0) {
+				if (isMon && (*reinterpret_cast<unsigned short*>(script9 + 0xFE) & 4) != 0) {
 					reinterpret_cast<CGMonObj*>(this)->flyDown();
 				}
 				break;
@@ -1392,7 +1392,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 				putParticle(0x11C, slots[10], this, 1.0f, 0x1290D);
 				break;
 			case 0x1C:
-				if (isMon && script9 != 0 && (*reinterpret_cast<unsigned short*>(script9 + 0xFE) & 1) != 0) {
+				if (isMon && (*reinterpret_cast<unsigned short*>(script9 + 0xFE) & 1) != 0) {
 					reinterpret_cast<CGMonObj*>(this)->undeadOff();
 				}
 				break;
@@ -1485,7 +1485,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 				break;
 			}
 			case 10:
-				if (isMon && script9 != 0 && (*reinterpret_cast<unsigned short*>(script9 + 0xFE) & 4) != 0 &&
+				if (isMon && (*reinterpret_cast<unsigned short*>(script9 + 0xFE) & 4) != 0 &&
 					*reinterpret_cast<short*>(script + 0x1C) != 0) {
 					reinterpret_cast<CGMonObj*>(this)->flyUp();
 				}
@@ -1498,7 +1498,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 				}
 				break;
 			case 0x1C:
-				if (isMon && script9 != 0 && (*reinterpret_cast<unsigned short*>(script9 + 0xFE) & 1) != 0) {
+				if (isMon && (*reinterpret_cast<unsigned short*>(script9 + 0xFE) & 1) != 0) {
 					reinterpret_cast<CGMonObj*>(this)->undeadOn();
 				}
 				break;

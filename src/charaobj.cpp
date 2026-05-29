@@ -2996,29 +2996,14 @@ void CGCharaObj::sendCombiToScript(CGCharaObj* target, int scriptArg, int)
 	int linkCount = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6A8);
 	CGPrgObj** links = reinterpret_cast<CGPrgObj**>(reinterpret_cast<unsigned char*>(this) + 0x6AC);
 
-	while (entry < linkCount) {
-		CGPrgObj* obj = links[entry];
-		bool skip = (obj == 0);
-
-		if (!skip) {
-			if (Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0xF &&
-				(obj->GetCID() & 0x6D) == 0x6D &&
-				*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(obj->m_scriptHandle) + 0x3B4) != 0) {
-				skip = true;
-			}
-
-			if (obj->m_lastStateId == 6 || obj->m_lastStateId == 2) {
-				skip = true;
-			}
-		}
-
-		if (!skip) {
-			break;
-		}
-
+	while (entry < linkCount &&
+	       (links[entry] == 0 ||
+	        (Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0xF &&
+	         (links[entry]->GetCID() & 0x6D) == 0x6D &&
+	         *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(links[entry]->m_scriptHandle) + 0x3B4) != 0) ||
+	        links[entry]->m_lastStateId == 6 || links[entry]->m_lastStateId == 2)) {
 		entry++;
 	}
-
 	if (entry == linkCount) {
 		int stackArgs[2];
 		stackArgs[0] = reinterpret_cast<int>(target);

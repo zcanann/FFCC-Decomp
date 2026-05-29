@@ -474,18 +474,30 @@ void CGCharaObj::ClearAllSta()
  */
 void CGCharaObj::onChangeStat(int state)
 {
-	if (state == 2 || state == 6) {
+	if (state != 6) {
+		if (state < 6) {
+			if (state != 2) {
+				goto clear_ignore;
+			}
+		} else if (state == 9) {
+			for (int i = 0; i < 0x27; i++) {
+				setSta(i, 0);
+			}
+			m_displayFlags |= 2;
+			goto clear_ignore;
+		} else {
+			goto clear_ignore;
+		}
+	}
+
+	{
 		m_castTimeTick = 0;
 		m_stateResetCounter = 0;
 		m_stateResetLimit = -1;
-	} else if (state == 9) {
-		for (int i = 0; i < 0x27; i++) {
-			setSta(i, 0);
-		}
-		m_displayFlags |= 2;
 	}
 
-	m_ignoreHit[0].m_flag &= 0x7F;
+clear_ignore:
+	reinterpret_cast<unsigned char*>(this)[0x63C] &= 0x7F;
 }
 
 /*

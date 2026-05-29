@@ -13,6 +13,7 @@
 #include "ffcc/p_minigame.h"
 #include "ffcc/pad.h"
 #include "ffcc/sound.h"
+#include "ffcc/vector.h"
 #include <math.h>
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
@@ -21,6 +22,9 @@ extern char SoundBuffer[];
 
 extern "C" char sCharaObjDebugStatFormat[];
 extern "C" char lbl_801DC590[];
+extern "C" char lbl_801DC8CC[];
+extern "C" char lbl_801DC8D8[];
+extern "C" char lbl_801DC8EC[];
 extern "C" char lbl_801DC940[];
 
 extern "C" {
@@ -33,6 +37,10 @@ extern "C" {
 extern const float kOneF32;
 extern const float kHalfF32;
 extern const float FLOAT_80331988;
+extern const float FLOAT_8033198C;
+extern const float FLOAT_80331990;
+extern const float FLOAT_80331994;
+extern const float FLOAT_80331998;
 }
 
 static float& CharaObjTargetAngle(CGCharaObj* charaObj)
@@ -94,14 +102,14 @@ static void CharaObjEndSlots(CGCharaObj* charaObj, unsigned int slotMask)
 {
 	for (int i = 0; i < 0x16; i++) {
 		if ((slotMask & (1U << i)) != 0) {
-			gCFlatRuntime2.EndParticleSlot(charaObj->m_particleSlots[i], 1);
+			CFlatRuntime2Storage().EndParticleSlot(charaObj->m_particleSlots[i], 1);
 		}
 	}
 }
 
 static int CharaObjGetModelPdtNo(CGCharaObj* charaObj)
 {
-	if (charaObj->m_charaModelHandle == 0 || charaObj->m_charaModelHandle->m_pdtLoadRef == 0) {
+	if (charaObj->m_charaModelHandle->m_pdtLoadRef == 0) {
 		return -1;
 	}
 	return reinterpret_cast<int*>(charaObj->m_charaModelHandle->m_pdtLoadRef)[2];
@@ -264,15 +272,7 @@ static bool CharaObjCanFrontGuard(CGCharaObj* self, CGPrgObj* sourceObj)
 static unsigned int CharaObjResolveHitParticleBank(CGPrgObj* sourceObj, unsigned int particleBank)
 {
 	if (particleBank == 0xFE) {
-		if (sourceObj == 0) {
-			return 0xFFFFFFFF;
-		}
-
 		int sourceData = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(sourceObj) + 0xF8);
-		if (sourceData == 0) {
-			return 0xFFFFFFFF;
-		}
-
 		int effectData = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(sourceData) + 0x178);
 		return effectData != 0 ? *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(effectData) + 0x14)
 		                       : 0xFFFFFFFF;
@@ -298,14 +298,14 @@ static int CharaObjDecodeSe(unsigned short encodedSe)
 	return (encodedSe & 0xFF) + ((encodedSe >> 8) * 1000);
 }
 
-static int CharaObjResolveParticleBank(CGCharaObj* charaObj, unsigned short particleClass)
+static unsigned int CharaObjResolveParticleBank(CGCharaObj* charaObj, unsigned short particleClass)
 {
 	if (particleClass == 0xFE) {
 		int pdtNo = CharaObjGetModelPdtNo(charaObj);
-		return (pdtNo >= 0) ? pdtNo : -1;
+		return (pdtNo >= 0) ? static_cast<unsigned int>(pdtNo) : 0xFFFFFFFF;
 	}
 	if (particleClass >= 0xFD && particleClass <= 0xFF) {
-		return -1;
+		return 0xFFFFFFFF;
 	}
 	return particleClass;
 }
@@ -438,7 +438,7 @@ void CGCharaObj::onCreate()
 	memset(m_unk6AC, 0, sizeof(m_unk6AC));
 
 	for (int i = 0; i < 0x16; i++) {
-		m_particleSlots[i] = gCFlatRuntime2.GetFreeParticleSlot();
+		m_particleSlots[i] = CFlatRuntime2Storage().GetFreeParticleSlot();
 	}
 }
 
@@ -579,16 +579,31 @@ void CGCharaObj::onFramePostCalc()
 		}
 	}
 
-	for (int i = 0; i < 0x27; i++) {
-		int statusValue = static_cast<int>(*reinterpret_cast<unsigned short*>(script + 0x3E + i * 2)) - 1;
+	for (int i = 0, statusOffset = 0; i < 0x27; i++, statusOffset += 2) {
+		int statusValue = static_cast<int>(*reinterpret_cast<unsigned short*>(script + 0x3E + statusOffset)) - 1;
 		if (statusValue != 0 && i == 2) {
 			m_stateTick += 1;
 		}
 
-		if (CharaObjIsPlayerCid(GetCID()) &&
-		    (i == 0 || i == 3 || i == 4 || i == 9) &&
+		if ((GetCID() & 0x6D) == 0x6D &&
+		    (i == 0 || i == 4 || i == 9 || i == 3) &&
 		    statusValue > 0) {
-			unsigned short padMask = CharaObjGetPadStatusReduceMask(m_animStateMisc);
+			char slot = m_animStateMisc;
+			unsigned short padMask = 0;
+			bool useDebugPad = (Pad._452_4_ != 0) || ((slot == 0) && (Pad._448_4_ != -1));
+			if (!useDebugPad) {
+				int idx = slot & ~((~(Pad._448_4_ - static_cast<int>(slot) | static_cast<int>(slot) - Pad._448_4_)) >> 31);
+				padMask = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Pad) + 0x8 + idx * 0x54);
+			}
+			if ((MiniGamePcs.m_flags & 0x100) != 0) {
+				useDebugPad = (Pad._452_4_ != 0) || ((slot == 0) && (Pad._448_4_ != -1));
+				unsigned short heldMask = 0;
+				if (!useDebugPad) {
+					int idx = slot & ~((~(Pad._448_4_ - static_cast<int>(slot) | static_cast<int>(slot) - Pad._448_4_)) >> 31);
+					heldMask = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Pad) + 0x10 + idx * 0x54);
+				}
+				padMask |= heldMask;
+			}
 			if ((padMask & 0xF) != 0) {
 				statusValue -= *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x3C);
 				System.Printf(const_cast<char*>(lbl_801DC940));
@@ -598,6 +613,7 @@ void CGCharaObj::onFramePostCalc()
 		setSta(i, statusValue);
 	}
 
+	script = reinterpret_cast<unsigned char*>(m_scriptHandle);
 	if (*reinterpret_cast<short*>(script + 0x3E) == 0 &&
 	    *reinterpret_cast<short*>(script + 0x14) == 0 &&
 	    *reinterpret_cast<short*>(script + 0x11) == 0) {
@@ -609,13 +625,28 @@ void CGCharaObj::onFramePostCalc()
 
 	*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x38) += 1;
 
-	for (int i = 0; i < 4; i++) {
-		IgnoreHitSlot& slot = m_ignoreHit[i];
-		if ((static_cast<signed char>(slot.m_flag) < 0) && slot.m_timer != 0) {
-			slot.m_timer = static_cast<unsigned short>(slot.m_timer - 1);
-			if (slot.m_timer == 0) {
-				slot.m_flag &= 0x7F;
-			}
+	if ((static_cast<signed char>(m_ignoreHit[0].m_flag) < 0) && m_ignoreHit[0].m_timer != 0) {
+		m_ignoreHit[0].m_timer = static_cast<unsigned short>(m_ignoreHit[0].m_timer - 1);
+		if (m_ignoreHit[0].m_timer == 0) {
+			m_ignoreHit[0].m_flag &= 0x7F;
+		}
+	}
+	if ((static_cast<signed char>(m_ignoreHit[1].m_flag) < 0) && m_ignoreHit[1].m_timer != 0) {
+		m_ignoreHit[1].m_timer = static_cast<unsigned short>(m_ignoreHit[1].m_timer - 1);
+		if (m_ignoreHit[1].m_timer == 0) {
+			m_ignoreHit[1].m_flag &= 0x7F;
+		}
+	}
+	if ((static_cast<signed char>(m_ignoreHit[2].m_flag) < 0) && m_ignoreHit[2].m_timer != 0) {
+		m_ignoreHit[2].m_timer = static_cast<unsigned short>(m_ignoreHit[2].m_timer - 1);
+		if (m_ignoreHit[2].m_timer == 0) {
+			m_ignoreHit[2].m_flag &= 0x7F;
+		}
+	}
+	if ((static_cast<signed char>(m_ignoreHit[3].m_flag) < 0) && m_ignoreHit[3].m_timer != 0) {
+		m_ignoreHit[3].m_timer = static_cast<unsigned short>(m_ignoreHit[3].m_timer - 1);
+		if (m_ignoreHit[3].m_timer == 0) {
+			m_ignoreHit[3].m_flag &= 0x7F;
 		}
 	}
 }
@@ -635,7 +666,7 @@ void CGCharaObj::onFramePreCalc()
 		PSVECSubtract(reinterpret_cast<Vec*>(Game.unk_flat3_0xc7d0 + 0x15C), &m_worldPosition,
 			&m_targetDelta);
 		m_targetDist = PSVECMag(&m_targetDelta);
-		CharaObjTargetAngle(this) = CharaObjGetRotateY(m_targetDelta);
+		CharaObjTargetAngle(this) = reinterpret_cast<CVector*>(&m_targetDelta)->GetRotateY();
 	}
 
 	for (int i = 0; i < 4; i++) {
@@ -649,7 +680,7 @@ void CGCharaObj::onFramePreCalc()
 		} else {
 			PSVECSubtract(&partyObj->m_worldPosition, &m_worldPosition, &m_partyDelta[i]);
 			m_partyDistance[i] = PSVECMag(&m_partyDelta[i]);
-			m_partyAngle[i] = CharaObjGetRotateY(m_partyDelta[i]);
+			m_partyAngle[i] = reinterpret_cast<CVector*>(&m_partyDelta[i])->GetRotateY();
 		}
 
 		m_partyRank[i] = 0;
@@ -704,7 +735,14 @@ void CGCharaObj::onFramePreCalc()
 		if (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6F0) != 0) {
 			push += 10;
 		}
-		if (CharaObjGetPadHeld(m_animStateMisc) != 0) {
+		unsigned char slot = m_animStateMisc;
+		int padHeld = 0;
+		bool useDebugPad = (Pad._452_4_ != 0) || ((slot == 0) && (Pad._448_4_ != -1));
+		if (!useDebugPad) {
+			int idx = slot & ~((~(Pad._448_4_ - static_cast<int>(slot) | static_cast<int>(slot) - Pad._448_4_)) >> 31);
+			padHeld = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Pad) + 0x54 + idx * 0x54);
+		}
+		if (padHeld != 0) {
 			push += 0x19;
 		}
 		if (static_cast<signed char>(reinterpret_cast<unsigned char*>(this)[0x9B]) >= 0) {
@@ -834,7 +872,7 @@ void CGCharaObj::onFrameStat()
 				if (m_subFrame == 0) {
 					for (int i = 0; i < 0x16; i++) {
 						if ((8U & (1U << i)) != 0) {
-							gCFlatRuntime2.EndParticleSlot(m_particleSlots[i], 1);
+							CFlatRuntime2Storage().EndParticleSlot(m_particleSlots[i], 1);
 						}
 					}
 					reqAnim(m_unk558, 0, 0);
@@ -843,7 +881,7 @@ void CGCharaObj::onFrameStat()
 				if (m_itemId != 0 && m_subFrame == 10) {
 					for (int i = 0; i < 0x16; i++) {
 						if ((2U & (1U << i)) != 0) {
-							gCFlatRuntime2.EndParticleSlot(m_particleSlots[i], 1);
+							CFlatRuntime2Storage().EndParticleSlot(m_particleSlots[i], 1);
 						}
 					}
 					putParticleFromItem(m_itemId, 2, m_particleSlots[1], &CharaObjComboCenter(this));
@@ -1058,7 +1096,7 @@ void CGCharaObj::damageDelete()
 	Sound.StopSe3DGroup(m_particleId);
 	for (int i = 0; i < 0x16; i++) {
 		if (((1U << i) & 0x3bU) != 0) {
-			gCFlatRuntime2.DeleteParticleSlot(m_particleSlots[i], 1);
+			CFlatRuntime2Storage().DeleteParticleSlot(m_particleSlots[i], 1);
 		}
 	}
 }
@@ -1074,20 +1112,18 @@ void CGCharaObj::damageDelete()
  */
 int CGCharaObj::onHit(int hitArg, CGObject* sourceObj, int hitType, Vec* hitPos)
 {
-	typedef unsigned int (*VCall0C)(void*);
 	typedef int (*VCall80)(void*, void*, int, int, int, Vec*);
 
-	VCall0C cidFn = *reinterpret_cast<VCall0C*>(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(sourceObj) + 0x48) + 0x0C);
-	unsigned short sourceCid = cidFn(sourceObj);
+	unsigned short sourceCid = sourceObj->GetCID();
 	if ((sourceCid & 0x6D) == 0x6D && Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
-		sourceCid = cidFn(sourceObj);
+		sourceCid = sourceObj->GetCID();
 		if ((sourceCid & 0x6D) == 0x6D && sourceObj->m_scriptHandle[0xED] != 0) {
 			return 0;
 		}
 	}
 
 	unsigned char* self = reinterpret_cast<unsigned char*>(this);
-	int slot = -1;
+	int slot = 4;
 	for (int i = 0; i < 4; i++) {
 		IgnoreHitSlot& slotData = m_ignoreHit[i];
 		if ((slotData.m_flag & 0x80) == 0) {
@@ -1098,7 +1134,7 @@ int CGCharaObj::onHit(int hitArg, CGObject* sourceObj, int hitType, Vec* hitPos)
 			unsigned int particleIndex = static_cast<unsigned int>(m_itemId);
 			unsigned short particleLife =
 				*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + (particleIndex * 0x48) + 0xE);
-			slotData.m_timer = (particleLife >= 3) ? 0x1E : 0;
+			slotData.m_timer = (particleLife == 3) ? 0x1E : 0;
 			break;
 		}
 		if (slotData.m_source == sourceObj) {
@@ -1106,7 +1142,7 @@ int CGCharaObj::onHit(int hitArg, CGObject* sourceObj, int hitType, Vec* hitPos)
 		}
 	}
 
-	if (slot < 0) {
+	if (slot == 4) {
 		return 2;
 	}
 
@@ -1114,7 +1150,7 @@ int CGCharaObj::onHit(int hitArg, CGObject* sourceObj, int hitType, Vec* hitPos)
 		changeStat(3, 0, 0);
 	}
 
-	sourceCid = cidFn(sourceObj);
+	sourceCid = sourceObj->GetCID();
 	if ((sourceCid & 0x2D) == 0x2D) {
 		VCall80 onHitVCall = *reinterpret_cast<VCall80*>(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(sourceObj) + 0x48) + 0x80);
 		onHitVCall(sourceObj, this, m_itemId, hitArg, hitType, hitPos);
@@ -1134,15 +1170,13 @@ int CGCharaObj::onHit(int hitArg, CGObject* sourceObj, int hitType, Vec* hitPos)
  */
 void CGCharaObj::onHitParticle(int effectIndex, int, int, int colliderIndex, Vec* hitPos, PPPIFPARAM* hitParam)
 {
-	typedef unsigned int (*VCall0C)(void*);
 	typedef void (*VCall80)(void*, void*, int, int, int, Vec*);
 
 	unsigned char* self = reinterpret_cast<unsigned char*>(this);
-	VCall0C cidFn = *reinterpret_cast<VCall0C*>(*reinterpret_cast<int*>(self + 0x48) + 0x0C);
-	unsigned short cid = cidFn(this);
+	unsigned short cid = GetCID();
 
 	if ((cid & 0x6D) == 0x6D && Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
-		cid = cidFn(this);
+		cid = GetCID();
 		if ((cid & 0x6D) == 0x6D && *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3B4) != 0) {
 			return;
 		}
@@ -1154,7 +1188,7 @@ void CGCharaObj::onHitParticle(int effectIndex, int, int, int colliderIndex, Vec
 		sourceObj = reinterpret_cast<CGPrgObj*>(CFlatRuntime2Storage().intToClass(static_cast<int>(hitParam->m_classId)));
 	}
 
-	unsigned int sourceCid = cidFn(sourceObj);
+	unsigned int sourceCid = sourceObj->GetCID();
 	if ((sourceCid & 0xD) == 0xD) {
 		VCall80 hitFn = *reinterpret_cast<VCall80*>(*reinterpret_cast<int*>(self + 0x48) + 0x80);
 		hitFn(this, sourceObj, particleIndex, -1, colliderIndex, hitPos);
@@ -1204,7 +1238,15 @@ void CGCharaObj::putHitParticleFromItem(CGPrgObj* sourceObj, int itemId)
 	unsigned char* itemData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + itemId * 0x48;
 	particleBank = static_cast<unsigned int>(*reinterpret_cast<unsigned short*>(itemData + 0x12));
 	if (particleBank != 0xFFFF && particleBank != 0xFF) {
-		particleBank = CharaObjResolveHitParticleBank(sourceObj, particleBank);
+		if (particleBank == 0xFE) {
+			int sourceData = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(sourceObj) + 0xF8);
+			int effectData = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(sourceData) + 0x178);
+			particleBank = effectData != 0 ? *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(effectData) + 0x14)
+			                               : 0xFFFFFFFF;
+		}
+		if (particleBank == 0xFD) {
+			particleBank = 0xFFFFFFFF;
+		}
 		particleSpec = *reinterpret_cast<unsigned short*>(itemData + 0x1C);
 		if (particleSpec != 0xFFFF) {
 			if ((particleSpec & 0x1000) != 0) {
@@ -1220,7 +1262,7 @@ void CGCharaObj::putHitParticleFromItem(CGPrgObj* sourceObj, int itemId)
 			if ((particleFlags & 0x200) == 0) {
 				CFlatRuntime2Storage().SetParticleWorkPos(*l_pHitCross, 1.0f);
 			} else {
-				CFlatRuntime2Storage().SetParticleWorkBind(this);
+				CFlatRuntime2Storage().SetParticleWorkBind(sourceObj);
 			}
 			CFlatRuntime2Storage().PutParticleWork();
 		}
@@ -1251,16 +1293,12 @@ void CGCharaObj::setSta(int staIndex, int value)
 
 	unsigned int cid = GetCID();
 	bool isMon = (cid & 0xAD) == 0xAD;
-	unsigned char* script9 = (m_scriptHandle[9] != 0) ? reinterpret_cast<unsigned char*>(m_scriptHandle[9]) : 0;
-	bool isIceJ = isMon && script9 != 0 && *reinterpret_cast<short*>(script9 + 0xFC) == 0xB;
+	unsigned char* script9 = reinterpret_cast<unsigned char*>(m_scriptHandle[9]);
+	bool isIceJ = isMon && *reinterpret_cast<short*>(script9 + 0xFC) == 0xB;
 	int* slots = m_particleSlots;
-	int modelPdtNo = -1;
 	float monsterScale = 1.0f;
 
-	if (m_charaModelHandle != 0 && m_charaModelHandle->m_pdtLoadRef != 0) {
-		modelPdtNo = reinterpret_cast<int*>(m_charaModelHandle->m_pdtLoadRef)[2];
-	}
-	if (isMon && script9 != 0) {
+	if (isMon) {
 		monsterScale = static_cast<float>(*reinterpret_cast<unsigned short*>(script9 + 0x1B4)) * 0.01f;
 	}
 
@@ -1272,10 +1310,11 @@ void CGCharaObj::setSta(int staIndex, int value)
 			case 0:
 				for (int i = 0; i < 0x16; i++) {
 					if (((1U << i) & 0x4U) != 0) {
-						gCFlatRuntime2.EndParticleSlot(slots[i], 1);
+						CFlatRuntime2Storage().EndParticleSlot(slots[i], 1);
 					}
 				}
 				if (isIceJ) {
+					int modelPdtNo = CharaObjGetModelPdtNo(this);
 					putParticleBindTrace((modelPdtNo << 8) | 0x15, slots[2], this, 1.0f, 0);
 				} else {
 					putParticle(0x10A, slots[2], this, 20.0f * m_attackColRadius, 0);
@@ -1287,10 +1326,11 @@ void CGCharaObj::setSta(int staIndex, int value)
 			case 1:
 				for (int i = 0; i < 0x16; i++) {
 					if (((1U << i) & 0x40U) != 0) {
-						gCFlatRuntime2.EndParticleSlot(slots[i], 1);
+						CFlatRuntime2Storage().EndParticleSlot(slots[i], 1);
 					}
 				}
 				if (isIceJ) {
+					int modelPdtNo = CharaObjGetModelPdtNo(this);
 					putParticle((modelPdtNo << 8) | 0x14, slots[6], this, 1.0f, 0);
 				} else {
 					putParticle(0x12A, slots[6], this, 20.0f * m_attackColRadius, 0);
@@ -1300,7 +1340,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 				m_castTimeTick = 0;
 				for (int i = 0; i < 0x16; i++) {
 					if (((1U << i) & 0x80000U) != 0) {
-						gCFlatRuntime2.EndParticleSlot(slots[i], 1);
+						CFlatRuntime2Storage().EndParticleSlot(slots[i], 1);
 					}
 				}
 				putParticleBindTrace(0x10C, slots[19], this, 20.0f * m_attackColRadius, 0);
@@ -1308,7 +1348,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 			case 3:
 				for (int i = 0; i < 0x16; i++) {
 					if (((1U << i) & 0x40000U) != 0) {
-						gCFlatRuntime2.EndParticleSlot(slots[i], 1);
+						CFlatRuntime2Storage().EndParticleSlot(slots[i], 1);
 					}
 				}
 				putParticleBindTrace(0x10D, slots[18], this, 20.0f * m_attackColRadius, 0);
@@ -1316,10 +1356,11 @@ void CGCharaObj::setSta(int staIndex, int value)
 			case 4:
 				for (int i = 0; i < 0x16; i++) {
 					if (((1U << i) & 0x80U) != 0) {
-						gCFlatRuntime2.EndParticleSlot(slots[i], 1);
+						CFlatRuntime2Storage().EndParticleSlot(slots[i], 1);
 					}
 				}
 				if (isIceJ) {
+					int modelPdtNo = CharaObjGetModelPdtNo(this);
 					putParticle((modelPdtNo << 8) | 0x17, slots[7], this, 1.0f, 0);
 				} else {
 					putParticle(0x130, slots[7], this, 20.0f * m_attackColRadius, 0);
@@ -1328,7 +1369,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 			case 6:
 				for (int i = 0; i < 0x16; i++) {
 					if (((1U << i) & 0x100000U) != 0) {
-						gCFlatRuntime2.EndParticleSlot(slots[i], 1);
+						CFlatRuntime2Storage().EndParticleSlot(slots[i], 1);
 					}
 				}
 				putParticleBindTrace(0x107, slots[20], this, 20.0f * m_attackColRadius, 0);
@@ -1336,48 +1377,48 @@ void CGCharaObj::setSta(int staIndex, int value)
 			case 7: {
 				for (int i = 0; i < 0x16; i++) {
 					if (((1U << i) & 0x8000U) != 0) {
-						gCFlatRuntime2.EndParticleSlot(slots[i], 1);
+						CFlatRuntime2Storage().EndParticleSlot(slots[i], 1);
 					}
 				}
-				int particleNo = isMon ? 0x170 : 0x114;
-				putParticle(particleNo, slots[15], this, 20.0f * m_attackColRadius, 0);
+				int particleNo = isMon ? 0x70 : 0x14;
+				putParticle(particleNo | 0x100, slots[15], this, 20.0f * m_attackColRadius, 0);
 				break;
 			}
 			case 8: {
 				for (int i = 0; i < 0x16; i++) {
 					if (((1U << i) & 0x2000U) != 0) {
-						gCFlatRuntime2.EndParticleSlot(slots[i], 1);
+						CFlatRuntime2Storage().EndParticleSlot(slots[i], 1);
 					}
 				}
-				int particleNo = (isMon ? 0x16E : 0x112) | 0x100;
-				putParticle(particleNo, slots[13], this, 20.0f * m_attackColRadius * monsterScale, 0);
+				int particleNo = isMon ? 0x6E : 0x12;
+				putParticle(particleNo | 0x100, slots[13], this, 20.0f * m_attackColRadius * monsterScale, 0);
 				break;
 			}
 			case 9: {
 				for (int i = 0; i < 0x16; i++) {
 					if (((1U << i) & 0x4000U) != 0) {
-						gCFlatRuntime2.EndParticleSlot(slots[i], 1);
+						CFlatRuntime2Storage().EndParticleSlot(slots[i], 1);
 					}
 				}
-				int particleNo = (isMon ? 0x16C : 0x110) | 0x100;
-				putParticle(particleNo, slots[14], this, 20.0f * m_attackColRadius * monsterScale, 0);
+				int particleNo = isMon ? 0x6C : 0x10;
+				putParticle(particleNo | 0x100, slots[14], this, 20.0f * m_attackColRadius * monsterScale, 0);
 				break;
 			}
 			case 10:
-				if (isMon && script9 != 0 && (*reinterpret_cast<unsigned short*>(script9 + 0xFE) & 4) != 0) {
+				if (isMon && (*reinterpret_cast<unsigned short*>(script9 + 0xFE) & 4) != 0) {
 					reinterpret_cast<CGMonObj*>(this)->flyDown();
 				}
 				break;
 			case 0x1B:
 				for (int i = 0; i < 0x16; i++) {
 					if (((1U << i) & 0x400U) != 0) {
-						gCFlatRuntime2.EndParticleSlot(slots[i], 1);
+						CFlatRuntime2Storage().EndParticleSlot(slots[i], 1);
 					}
 				}
 				putParticle(0x11C, slots[10], this, 1.0f, 0x1290D);
 				break;
 			case 0x1C:
-				if (isMon && script9 != 0 && (*reinterpret_cast<unsigned short*>(script9 + 0xFE) & 1) != 0) {
+				if (isMon && (*reinterpret_cast<unsigned short*>(script9 + 0xFE) & 1) != 0) {
 					reinterpret_cast<CGMonObj*>(this)->undeadOff();
 				}
 				break;
@@ -1389,10 +1430,11 @@ void CGCharaObj::setSta(int staIndex, int value)
 			case 0:
 				for (int i = 0; i < 0x16; i++) {
 					if (((1U << i) & 0x4U) != 0) {
-						gCFlatRuntime2.EndParticleSlot(slots[i], 1);
+						CFlatRuntime2Storage().EndParticleSlot(slots[i], 1);
 					}
 				}
 				if (isIceJ) {
+					int modelPdtNo = CharaObjGetModelPdtNo(this);
 					putParticle((modelPdtNo << 8) | 0x16, 0, this, 1.0f, 0);
 				} else {
 					putParticle(0x10B, 0, this, 20.0f * m_attackColRadius, 0);
@@ -1405,21 +1447,21 @@ void CGCharaObj::setSta(int staIndex, int value)
 			case 1:
 				for (int i = 0; i < 0x16; i++) {
 					if (((1U << i) & 0x40U) != 0) {
-						gCFlatRuntime2.EndParticleSlot(slots[i], 1);
+						CFlatRuntime2Storage().EndParticleSlot(slots[i], 1);
 					}
 				}
 				break;
 			case 2:
 				for (int i = 0; i < 0x16; i++) {
 					if (((1U << i) & 0x80000U) != 0) {
-						gCFlatRuntime2.EndParticleSlot(slots[i], 1);
+						CFlatRuntime2Storage().EndParticleSlot(slots[i], 1);
 					}
 				}
 				break;
 			case 3:
 				for (int i = 0; i < 0x16; i++) {
 					if (((1U << i) & 0x40000U) != 0) {
-						gCFlatRuntime2.EndParticleSlot(slots[i], 1);
+						CFlatRuntime2Storage().EndParticleSlot(slots[i], 1);
 					}
 				}
 				putParticle(0x10E, 0, this, 20.0f * m_attackColRadius, 0);
@@ -1428,49 +1470,49 @@ void CGCharaObj::setSta(int staIndex, int value)
 			case 4:
 				for (int i = 0; i < 0x16; i++) {
 					if (((1U << i) & 0x80U) != 0) {
-						gCFlatRuntime2.EndParticleSlot(slots[i], 1);
+						CFlatRuntime2Storage().EndParticleSlot(slots[i], 1);
 					}
 				}
 				break;
 			case 6:
 				for (int i = 0; i < 0x16; i++) {
 					if (((1U << i) & 0x100000U) != 0) {
-						gCFlatRuntime2.EndParticleSlot(slots[i], 1);
+						CFlatRuntime2Storage().EndParticleSlot(slots[i], 1);
 					}
 				}
 				break;
 			case 7: {
 				for (int i = 0; i < 0x16; i++) {
 					if (((1U << i) & 0x8000U) != 0) {
-						gCFlatRuntime2.EndParticleSlot(slots[i], 1);
+						CFlatRuntime2Storage().EndParticleSlot(slots[i], 1);
 					}
 				}
-				int particleNo = (isMon ? 0x171 : 0x115) | 0x100;
-				putParticle(particleNo, 0, this, 20.0f * m_attackColRadius, 0);
+				int particleNo = isMon ? 0x71 : 0x15;
+				putParticle(particleNo | 0x100, 0, this, 20.0f * m_attackColRadius, 0);
 				break;
 			}
 			case 8: {
 				for (int i = 0; i < 0x16; i++) {
 					if (((1U << i) & 0x2000U) != 0) {
-						gCFlatRuntime2.EndParticleSlot(slots[i], 1);
+						CFlatRuntime2Storage().EndParticleSlot(slots[i], 1);
 					}
 				}
-				int particleNo = (isMon ? 0x16F : 0x113) | 0x100;
-				putParticle(particleNo, 0, this, 20.0f * m_attackColRadius * monsterScale, 0);
+				int particleNo = isMon ? 0x6F : 0x13;
+				putParticle(particleNo | 0x100, 0, this, 20.0f * m_attackColRadius * monsterScale, 0);
 				break;
 			}
 			case 9: {
 				for (int i = 0; i < 0x16; i++) {
 					if (((1U << i) & 0x4000U) != 0) {
-						gCFlatRuntime2.EndParticleSlot(slots[i], 1);
+						CFlatRuntime2Storage().EndParticleSlot(slots[i], 1);
 					}
 				}
-				int particleNo = (isMon ? 0x16D : 0x111) | 0x100;
-				putParticle(particleNo, 0, this, 20.0f * m_attackColRadius * monsterScale, 0);
+				int particleNo = isMon ? 0x6D : 0x11;
+				putParticle(particleNo | 0x100, 0, this, 20.0f * m_attackColRadius * monsterScale, 0);
 				break;
 			}
 			case 10:
-				if (isMon && script9 != 0 && (*reinterpret_cast<unsigned short*>(script9 + 0xFE) & 4) != 0 &&
+				if (isMon && (*reinterpret_cast<unsigned short*>(script9 + 0xFE) & 4) != 0 &&
 					*reinterpret_cast<short*>(script + 0x1C) != 0) {
 					reinterpret_cast<CGMonObj*>(this)->flyUp();
 				}
@@ -1478,12 +1520,12 @@ void CGCharaObj::setSta(int staIndex, int value)
 			case 0x1B:
 				for (int i = 0; i < 0x16; i++) {
 					if (((1U << i) & 0x400U) != 0) {
-						gCFlatRuntime2.EndParticleSlot(slots[i], 1);
+						CFlatRuntime2Storage().EndParticleSlot(slots[i], 1);
 					}
 				}
 				break;
 			case 0x1C:
-				if (isMon && script9 != 0 && (*reinterpret_cast<unsigned short*>(script9 + 0xFE) & 1) != 0) {
+				if (isMon && (*reinterpret_cast<unsigned short*>(script9 + 0xFE) & 1) != 0) {
 					reinterpret_cast<CGMonObj*>(this)->undeadOn();
 				}
 				break;
@@ -1518,7 +1560,7 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
 	switch (staIndex) {
 		case 0:
 			if (*reinterpret_cast<short*>(script + 0x10) == 0) {
-				calcSta(0, amount, source);
+				setSta(0, calcSta(0, amount, source));
 				setSta(4, 0);
 				Sound.StopSe3DGroup(m_particleId);
 				damageDelete();
@@ -1531,7 +1573,7 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
 			break;
 		case 1:
 			if (*reinterpret_cast<short*>(script + 0x3E) == 0) {
-				calcSta(1, amount, source);
+				setSta(1, calcSta(1, amount, source));
 				setSta(4, 0);
 			} else {
 				setSta(0, 0);
@@ -1540,7 +1582,7 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
 			}
 			break;
 		case 2:
-			calcSta(2, amount, source);
+			setSta(2, calcSta(2, amount, source));
 			break;
 		case 3:
 			setSta(1, 0);
@@ -1549,7 +1591,7 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
 			setSta(9, 0);
 			setSta(7, 0);
 			setSta(8, 0);
-			calcSta(3, amount, source);
+			setSta(3, calcSta(3, amount, source));
 			putHitParticleFromItem(sourceObj, amount);
 			Sound.StopSe3DGroup(m_particleId);
 			damageDelete();
@@ -1557,19 +1599,19 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
 			next = 0;
 			break;
 		case 4:
-			calcSta(4, amount, source);
+			setSta(4, calcSta(4, amount, source));
 			setSta(0, 0);
 			setSta(1, 0);
 			changeStat(10, 0, 0);
 			break;
 		case 6:
-			calcSta(6, amount, source);
+			setSta(6, calcSta(6, amount, source));
 			putHitParticleFromItem(sourceObj, amount);
 			next = 0;
 			break;
 		case 7:
 			if (*reinterpret_cast<short*>(script + 0x4E) == 0) {
-				calcSta(7, amount, source);
+				setSta(7, calcSta(7, amount, source));
 				putHitParticleFromItem(sourceObj, amount);
 			} else {
 				setSta(7, 0);
@@ -1579,7 +1621,7 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
 			break;
 		case 8:
 			if (*reinterpret_cast<short*>(script + 0x13) == 0) {
-				calcSta(8, amount, source);
+				setSta(8, calcSta(8, amount, source));
 				putHitParticleFromItem(sourceObj, amount);
 			} else {
 				setSta(7, 0);
@@ -1590,7 +1632,7 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
 		case 9:
 			setSta(7, 0);
 			setSta(8, 0);
-			calcSta(9, amount, source);
+			setSta(9, calcSta(9, amount, source));
 			putHitParticleFromItem(sourceObj, amount);
 			Sound.StopSe3DGroup(m_particleId);
 			damageDelete();
@@ -1598,7 +1640,7 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
 			next = 0;
 			break;
 		case 0x1C:
-			calcSta(0x1C, amount, source);
+			setSta(0x1C, calcSta(0x1C, amount, source));
 			break;
 		case 0x25:
 			if (*reinterpret_cast<short*>(script + 0x3E) != 0) {
@@ -1664,7 +1706,7 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
 			putHitParticleFromItem(sourceObj, amount);
 			break;
 		case 0x6A:
-			calcSta(4, amount, source);
+			setSta(4, calcSta(4, amount, source));
 			setSta(0, 0);
 			setSta(1, 0);
 			changeStat(10, 0, 0);
@@ -1698,15 +1740,12 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
+int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 {
-	if (m_scriptHandle == 0 || source == 0) {
-		return;
-	}
-
 	short* staPtr = reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E + (staIndex * 2));
 	if ((staIndex == 0 || staIndex == 4) && *staPtr != 0) {
-		return;
+		System.Printf(const_cast<char*>(lbl_801DC8D8));
+		return static_cast<int>(*staPtr);
 	}
 
 	unsigned int base = 0;
@@ -1774,7 +1813,7 @@ void CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 				usePartySource = true;
 			}
 		}
-		if (usePartySource && sourceObj->m_scriptHandle != 0 && sourceObj->m_scriptHandle[0xED] != 0) {
+		if (usePartySource && sourceObj->m_scriptHandle[0xED] != 0) {
 			usePartyLeader = true;
 		}
 
@@ -1816,7 +1855,8 @@ void CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 
 	unsigned int next = affinity + (base * power);
 	next &= ~((static_cast<int>(next)) >> 31);
-	setSta(staIndex, static_cast<int>(next));
+	System.Printf(const_cast<char*>(lbl_801DC8EC), base, power, affinity, next);
+	return static_cast<int>(next);
 }
 
 /*
@@ -1848,7 +1888,7 @@ void CGCharaObj::addHp(int delta, CGPrgObj* sourceObj)
 			next = maxHp;
 		}
 		*hp = static_cast<unsigned short>(next);
-	} else if (hpValue != 0) {
+	} else if (delta < 0 && hpValue != 0) {
 		if ((cid & 0x6D) == 0x6D && (CFlatGameFlags() & CFlatGameFlag_Bit0) != 0 &&
 		    static_cast<int>(hpValue + delta) < 1) {
 			delta = -(static_cast<int>(hpValue) - 1);
@@ -1943,7 +1983,7 @@ void CGCharaObj::calcRegist(int staIndex, int itemId, int& outA, int& outB, int&
 		case 6: outA = *reinterpret_cast<unsigned short*>(script + 0x3A); break;
 		case 8: outA = *reinterpret_cast<unsigned short*>(script + 0x30); break;
 		case 9: outA = *reinterpret_cast<unsigned short*>(script + 0x32); break;
-		case 0x0B: outA = *reinterpret_cast<unsigned short*>(script + 0x34); break;
+		case 10: outA = *reinterpret_cast<unsigned short*>(script + 0x34); break;
 		case 0x1C: outA = *reinterpret_cast<unsigned short*>(script + 0x36); break;
 		case 0x24:
 		case 0x25:
@@ -1958,16 +1998,23 @@ void CGCharaObj::calcRegist(int staIndex, int itemId, int& outA, int& outB, int&
 			break;
 	}
 
-	if ((GetCID() & 0xAD) == 0xAD && m_scriptHandle != 0 && m_scriptHandle[9] != 0) {
-		unsigned char* monData = reinterpret_cast<unsigned char*>(m_scriptHandle[9]);
-		if (*reinterpret_cast<short*>(script + 0x76) == 0 && (*reinterpret_cast<unsigned short*>(monData + 0xFE) & 1) != 0 &&
-			staIndex != 0x1C && outA < 2) {
-			outA = 2;
+	if (*reinterpret_cast<short*>(script + 0x76) == 0 && (GetCID() & 0xAD) == 0xAD &&
+		(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0xFE) & 1) != 0 &&
+		staIndex != 0x1C) {
+		int clamped = 2;
+		if (outA > 1) {
+			clamped = outA;
 		}
-		if ((*reinterpret_cast<unsigned short*>(monData + 0xFE) & 4) != 0 && *reinterpret_cast<short*>(script + 0x52) == 0 &&
-			outA < 2) {
-			outA = 2;
+		outA = clamped;
+	}
+	if ((GetCID() & 0xAD) == 0xAD &&
+		(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0xFE) & 4) != 0 &&
+		*reinterpret_cast<short*>(script + 0x52) == 0) {
+		int clamped = 2;
+		if (outA > 1) {
+			clamped = outA;
 		}
+		outA = clamped;
 	}
 
 	if ((GetCID() & 0xAD) == 0xAD && *reinterpret_cast<int*>(script + 0x10) == 0x7F &&
@@ -1979,14 +2026,16 @@ void CGCharaObj::calcRegist(int staIndex, int itemId, int& outA, int& outB, int&
 		outA = 3;
 	}
 
+	System.Printf(const_cast<char*>(lbl_801DC8CC), outA);
+
 	if (outA == 1) {
-		outB = (isNormal == 0) ? 1 : 0;
+		outB = (isNormal != 0) ? 1 : 0;
 	} else if (outA == 0) {
 		outB = 1;
 	} else {
 		outB = 0;
 	}
-	outC = ((outA ^ 3) >> 1);
+	outC = (outA ^ 3) / 2;
 }
 
 /*
@@ -1998,8 +2047,11 @@ void CGCharaObj::calcRegist(int staIndex, int itemId, int& outA, int& outB, int&
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int, int, Vec* hitPos)
+void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, int, Vec* hitPos)
 {
+	l_pHitCross = hitPos;
+	l_idxAttackCol = attackColIndex;
+
 	unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
 	unsigned int cid = GetCID();
 	int resolvedItemId = itemId;
@@ -2204,14 +2256,15 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 {
 	unsigned char* itemData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + effectId * 0x48;
 	unsigned short particleClass = *reinterpret_cast<unsigned short*>(itemData + 0x12);
-	int particleBank = CharaObjResolveParticleBank(this, particleClass);
+	unsigned int particleBank = CharaObjResolveParticleBank(this, particleClass);
 	unsigned short particleEntry = 0xFFFF;
 	unsigned short particleFlags = 0;
-	int particleNo = -1;
+	unsigned int particleNo = effectId;
 	int seNo = 0;
 	bool emittedCustom = false;
+	bool hasParticle = false;
 
-	if (particleBank >= 0) {
+	if (particleBank != 0xFFFFFFFF) {
 		particleEntry = *reinterpret_cast<unsigned short*>(itemData + 0x14 + effectArg0 * 2);
 		if (particleEntry != 0xFFFF) {
 			particleFlags = particleEntry;
@@ -2230,34 +2283,35 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 			if ((particleFlags & 0x800) != 0 && m_scriptHandle != 0) {
 				particleNo += *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2);
 			}
+			hasParticle = true;
 		}
 	}
 
-	if (particleNo >= 0) {
-		gCFlatRuntime2.ResetParticleWork((particleBank << 8) | particleNo, effectArg1);
-		gCFlatRuntime2.SetParticleWorkScale(*reinterpret_cast<unsigned short*>(itemData + 0x10) * 0.01f);
-		gCFlatRuntime2.SetParticleWorkParam(effectId, this);
-		gCFlatRuntime2.SetParticleWorkSpeed(*reinterpret_cast<unsigned short*>(itemData + 0x26) * 0.01f);
+	if (hasParticle) {
+		CFlatRuntime2Storage().ResetParticleWork((particleBank << 8) | particleNo, effectArg1);
+		CFlatRuntime2Storage().SetParticleWorkScale(*reinterpret_cast<unsigned short*>(itemData + 0x10) * 0.01f);
+		CFlatRuntime2Storage().SetParticleWorkParam(effectId, this);
+		CFlatRuntime2Storage().SetParticleWorkSpeed(*reinterpret_cast<unsigned short*>(itemData + 0x26) * 0.01f);
 
 		switch (effectArg0) {
 		case 0:
 			seNo = CharaObjDecodeSe(*reinterpret_cast<unsigned short*>(itemData + 0x38));
 			if (seNo != 0 && (*reinterpret_cast<unsigned short*>(itemData + 0x3A) & 0x8000) != 0) {
-				gCFlatRuntime2.SetParticleWorkSe(seNo, 2, *reinterpret_cast<unsigned short*>(itemData + 0x3A) & 0xFF);
+				CFlatRuntime2Storage().SetParticleWorkSe(seNo, 2, *reinterpret_cast<unsigned short*>(itemData + 0x3A) & 0xFF);
 				seNo = 0;
 			}
 			break;
 		case 1:
 			seNo = CharaObjDecodeSe(*reinterpret_cast<unsigned short*>(itemData + 0x3C));
 			if (seNo != 0 && (*reinterpret_cast<unsigned short*>(itemData + 0x3E) & 0x8000) != 0) {
-				gCFlatRuntime2.SetParticleWorkSe(seNo, 2, *reinterpret_cast<unsigned short*>(itemData + 0x3E) & 0xFF);
+				CFlatRuntime2Storage().SetParticleWorkSe(seNo, 2, *reinterpret_cast<unsigned short*>(itemData + 0x3E) & 0xFF);
 				seNo = 0;
 			}
 			break;
 		case 2:
 			seNo = CharaObjDecodeSe(*reinterpret_cast<unsigned short*>(itemData + 0x40));
 			if (seNo != 0 && (*reinterpret_cast<unsigned short*>(itemData + 0x0C) & 0x400) != 0) {
-				gCFlatRuntime2.SetParticleWorkSe(seNo, 2, 0);
+				CFlatRuntime2Storage().SetParticleWorkSe(seNo, 2, 0);
 				seNo = 0;
 			}
 			break;
@@ -2267,90 +2321,120 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 
 		if (effectId > 500) {
 			unsigned short itemType = *reinterpret_cast<unsigned short*>(itemData + 2);
-			int colType = -1;
-			if (itemType == 1 || itemType == 4 || itemType == 8 || itemType == 9) {
-				colType = itemType;
+			int colType;
+			if (itemType == 4) {
+				colType = 4;
+			} else if (itemType < 4) {
+				if (itemType == 1) {
+					colType = 1;
+				}
+			} else if (itemType == 9) {
+				colType = 9;
+			} else if (itemType < 9 && itemType > 7) {
+				colType = 8;
 			}
-			if (colType >= 0) {
-				gCFlatRuntime2.SetParticleWorkCol(colType, -1, *reinterpret_cast<unsigned short*>(itemData + 4) * 0.01f);
-			}
+			CFlatRuntime2Storage().SetParticleWorkCol(colType, -1, *reinterpret_cast<unsigned short*>(itemData + 4) * 0.01f);
 		}
 
 		if ((particleFlags & 0x100) != 0) {
-			gCFlatRuntime2.SetParticleWorkBind(this);
+			CFlatRuntime2Storage().SetParticleWorkBind(this);
 		} else if ((particleFlags & 0x200) != 0) {
 			float distance = *reinterpret_cast<unsigned short*>(itemData + 0x2A) * 1.0f;
 			Vec offsetPos;
 			offsetPos.x = m_worldPosition.x + sinf(m_rotTargetY) * distance;
 			offsetPos.y = m_worldPosition.y;
 			offsetPos.z = m_worldPosition.z + cosf(m_rotTargetY) * distance;
-			gCFlatRuntime2.SetParticleWorkPos(offsetPos, m_rotTargetY);
-			gCFlatRuntime2.SetParticleWorkVector(m_rotTargetY, 0.0f);
+			CFlatRuntime2Storage().SetParticleWorkPos(offsetPos, m_rotTargetY);
+			CFlatRuntime2Storage().SetParticleWorkVector(m_rotTargetY, 0.0f);
 			if ((*reinterpret_cast<unsigned short*>(itemData + 0x0C) & 0x2000) != 0) {
 				int partyIndex = static_cast<int>(m_rotationX);
 				if (partyIndex >= 0 && partyIndex < 4) {
-					gCFlatRuntime2.SetParticleWorkTrace(Game.m_partyObjArr[partyIndex]);
+					CFlatRuntime2Storage().SetParticleWorkTrace(Game.m_partyObjArr[partyIndex]);
 				}
 			}
 			if ((*reinterpret_cast<unsigned short*>(itemData + 0x0C) & 0x4000) != 0) {
-				gCFlatRuntime2.SetParticleWorkPos(m_worldPosition, m_rotTargetY);
-				gCFlatRuntime2.SetParticleWorkTarget(m_jumpOffset);
-				gCFlatRuntime2.SetParticleWorkTrace(this);
+				CFlatRuntime2Storage().SetParticleWorkPos(m_worldPosition, m_rotTargetY);
+				CFlatRuntime2Storage().SetParticleWorkTarget(m_jumpOffset);
+				CFlatRuntime2Storage().SetParticleWorkTrace(this);
 			}
 		} else if (pos != 0) {
-			gCFlatRuntime2.SetParticleWorkPos(*pos, m_rotTargetY);
+			CFlatRuntime2Storage().SetParticleWorkPos(*pos, m_rotTargetY);
 		} else if ((particleFlags & 0x400) != 0) {
-			gCFlatRuntime2.SetParticleWorkPos(m_jumpOffset, 0.0f);
+			CFlatRuntime2Storage().SetParticleWorkPos(m_jumpOffset, 0.0f);
 		} else {
-			gCFlatRuntime2.SetParticleWorkPos(m_worldPosition, m_rotTargetY);
+			CFlatRuntime2Storage().SetParticleWorkPos(m_worldPosition, m_rotTargetY);
 		}
 
-		if (effectId == 0x3B4 && effectArg0 == 3) {
-			if (pos == 0) {
-				return;
-			}
-			gCFlatRuntime2.SetParticleWorkPos(*pos, m_rotTargetY);
-			gCFlatRuntime2.PutParticleWork();
-			emittedCustom = true;
-		} else if (effectId == 0x409 && effectArg0 == 3) {
-			for (int i = 3; i < 9; i++) {
-				gCFlatRuntime2.SetParticleWorkNo((particleBank << 8) | i);
-				gCFlatRuntime2.PutParticleWork();
-			}
-			emittedCustom = true;
-		} else if (effectId > 0x46C && effectId < 0x46F) {
-			if (effectArg0 == 2 && m_stateFrame > 0xF) {
-				Vec randomPos;
-				randomPos.x = m_worldPosition.x + Math.RandFPM(20.0f);
-				randomPos.y = m_worldPosition.y + 1.0f;
-				randomPos.z = m_worldPosition.z + Math.RandFPM(20.0f);
-				gCFlatRuntime2.SetParticleWorkNo((particleBank << 8) | 0x1D);
-				gCFlatRuntime2.SetParticleWorkPos(randomPos, m_rotTargetY);
-				gCFlatRuntime2.PutParticleWork();
+		if (effectId == 0x410) {
+			if (effectArg0 == 2 || effectArg0 == 3) {
+				float angleOffset = FLOAT_80331990;
+				if (effectArg0 == 2) {
+					angleOffset = FLOAT_8033198C;
+				}
+				float angle = m_rotTargetY + angleOffset;
+				*reinterpret_cast<float*>(CFlat + 0x1740) = FLOAT_80331994 * sinf(angle) + m_worldPosition.x;
+				*reinterpret_cast<float*>(CFlat + 0x1748) = FLOAT_80331994 * cosf(angle) + m_worldPosition.z;
+				CFlatRuntime2Storage().SetParticleWorkVector(m_rotTargetY, 0.0f);
+				CFlatRuntime2Storage().PutParticleWork();
 				emittedCustom = true;
-			} else if (effectArg0 == 3) {
-				for (int i = 0x0D; i < 0x1D; i++) {
-					gCFlatRuntime2.SetParticleWorkNo((particleBank << 8) | i);
-					gCFlatRuntime2.PutParticleWork();
+			}
+		} else if (effectId < 0x410) {
+			if (effectId == 0x3B4) {
+				if (effectArg0 == 3) {
+					if (pos == 0) {
+						return;
+					}
+					CFlatRuntime2Storage().SetParticleWorkPos(*pos, m_rotTargetY);
+					CFlatRuntime2Storage().PutParticleWork();
+					emittedCustom = true;
+				}
+			} else if (effectId == 0x409 && effectArg0 == 3) {
+				for (int i = 3; i < 9; i++) {
+					CFlatRuntime2Storage().SetParticleWorkNo((particleBank << 8) | i);
+					CFlatRuntime2Storage().PutParticleWork();
 				}
 				emittedCustom = true;
 			}
-		} else if (effectId > 0x472 && effectId < 0x479 && effectArg0 == 3) {
-			for (int i = 7; i < 0x0C; i++) {
-				gCFlatRuntime2.SetParticleWorkNo((particleBank << 8) | i);
-				gCFlatRuntime2.PutParticleWork();
+		} else if (effectId < 0x479) {
+			if (effectId < 0x46F) {
+				if (effectId > 0x46C) {
+					if (effectArg0 == 2 && m_stateFrame > 0xF) {
+						Vec randomPos;
+						randomPos.x = m_worldPosition.x + Math.RandFPM(20.0f);
+						randomPos.y = m_worldPosition.y + 1.0f;
+						randomPos.z = m_worldPosition.z + Math.RandFPM(20.0f);
+						CFlatRuntime2Storage().SetParticleWorkNo((particleBank << 8) | 0x1D);
+						CFlatRuntime2Storage().SetParticleWorkPos(randomPos, m_rotTargetY);
+						CFlatRuntime2Storage().PutParticleWork();
+						emittedCustom = true;
+					} else if (effectArg0 == 3) {
+						for (int i = 0x0D; i < 0x1D; i++) {
+							CFlatRuntime2Storage().SetParticleWorkNo((particleBank << 8) | i);
+							CFlatRuntime2Storage().PutParticleWork();
+						}
+						emittedCustom = true;
+					}
+				}
+			} else if (effectId > 0x472 && effectArg0 == 3) {
+				for (int i = 7; i < 0x0C; i++) {
+					CFlatRuntime2Storage().SetParticleWorkNo((particleBank << 8) | i);
+					CFlatRuntime2Storage().PutParticleWork();
+				}
+				emittedCustom = true;
 			}
-			emittedCustom = true;
 		} else if (effectId > 0x49C && effectId < 0x4A0 && effectArg0 == 2) {
+			Mtx rotMtx;
+			PSMTXRotRad(rotMtx, 'y', m_rotTargetY);
 			for (int i = 0; i < 2; i++) {
 				float side = (i == 0) ? 76.0f : -76.0f;
-				Vec sidePos;
-				sidePos.x = m_worldPosition.x + cosf(m_rotTargetY) * side;
-				sidePos.y = m_worldPosition.y;
-				sidePos.z = m_worldPosition.z - sinf(m_rotTargetY) * side;
-				gCFlatRuntime2.SetParticleWorkPos(sidePos, m_rotTargetY);
-				gCFlatRuntime2.SetParticleWorkVector(m_rotTargetY, 0.0f);
-				gCFlatRuntime2.PutParticleWork();
+				Vec sidePos = { side, 0.0f, FLOAT_80331998 };
+				Vec offsetPos;
+				PSMTXMultVec(rotMtx, &sidePos, &offsetPos);
+				*reinterpret_cast<float*>(CFlat + 0x1740) = m_worldPosition.x + offsetPos.x;
+				*reinterpret_cast<float*>(CFlat + 0x1744) = m_worldPosition.y + offsetPos.y;
+				*reinterpret_cast<float*>(CFlat + 0x1748) = m_worldPosition.z + offsetPos.z;
+				CFlatRuntime2Storage().SetParticleWorkVector(m_rotTargetY, 0.0f);
+				CFlatRuntime2Storage().PutParticleWork();
 			}
 			emittedCustom = true;
 		}
@@ -2362,15 +2446,15 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 		}
 
 		if (!emittedCustom) {
-			unsigned short fanCount = *reinterpret_cast<unsigned short*>(itemData + 0x24);
+			unsigned int fanCount = *reinterpret_cast<unsigned short*>(itemData + 0x24);
 			if (effectArg0 == 3 && fanCount > 1) {
-				for (int i = 0; i < fanCount; i++) {
+				for (unsigned int i = 0; i < fanCount; i++) {
 					float t = (float)i / (float)fanCount;
-					gCFlatRuntime2.SetParticleWorkVector(t * 0.75f, 0.0f);
-					gCFlatRuntime2.PutParticleWork();
+					CFlatRuntime2Storage().SetParticleWorkVector(t * 0.75f, 0.0f);
+					CFlatRuntime2Storage().PutParticleWork();
 				}
 			} else {
-				gCFlatRuntime2.PutParticleWork();
+				CFlatRuntime2Storage().PutParticleWork();
 			}
 		}
 	} else if (effectArg0 == 2) {
@@ -2420,13 +2504,11 @@ void la(CGObject*)
  */
 void CGCharaObj::statAttack()
 {
-	typedef unsigned int (*VCall0C)(void*);
 	typedef void (*VCall88)(void*, int);
 	typedef void (*VCall90)(void*, int, int, int);
 
 	unsigned char* self = reinterpret_cast<unsigned char*>(this);
-	VCall0C cidFn = *reinterpret_cast<VCall0C*>(*reinterpret_cast<int*>(self + 0x48) + 0x0C);
-	unsigned int cid = cidFn(this);
+	unsigned int cid = GetCID();
 
 	if ((cid & 0xAD) == 0xAD && m_subState == 0) {
 		void* animPoint = m_scriptHandle[4];
@@ -2475,6 +2557,7 @@ void CGCharaObj::statAttack()
 		}
 	}
 
+	itemData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + m_itemId * 0x48;
 	seFrame = *reinterpret_cast<unsigned short*>(itemData + 0x3E);
 	if ((seFrame & 0x8000) == 0 && m_stateFrame == seFrame) {
 		unsigned short seSpec = *reinterpret_cast<unsigned short*>(itemData + 0x3C);
@@ -2603,7 +2686,6 @@ void CGCharaObj::onChangePrg(int arg)
  */
 int CGCharaObj::calcCastTime(int itemId)
 {
-	char* debugFormat = sCharaObjDebugStatFormat;
 	unsigned short cid = GetCID();
 
 	if ((cid & 0x6D) == 0x6D &&
@@ -2616,7 +2698,6 @@ int CGCharaObj::calcCastTime(int itemId)
 
 	int itemOffset = itemId * 0x48;
 	unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
-	unsigned char* script9 = reinterpret_cast<unsigned char*>(m_scriptHandle[9]);
 	unsigned char* itemData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + itemOffset;
 	unsigned short itemNo = *reinterpret_cast<unsigned short*>(itemData + 0x0);
 	unsigned int baseCast = *reinterpret_cast<unsigned short*>(itemData + 0x2E);
@@ -2630,43 +2711,42 @@ int CGCharaObj::calcCastTime(int itemId)
 	}
 
 	if (itemNo != 0x1F8 && itemType == 2) {
-		unsigned int castBonus = *reinterpret_cast<unsigned short*>(script9 + 0x194);
+		unsigned int castBonus = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0x194);
 		if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD && Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
 			int stage = Game.m_gameWork.m_bossArtifactStageTable[Game.m_gameWork.m_bossArtifactStageIndex];
-			if (stage > 2) {
-				stage = 2;
+			int stageLevel = 2;
+			if (stage < 2) {
+				stageLevel = stage;
 			}
-			if (stage > 0) {
-				castBonus -= *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x58 + (stage * 2));
+			if (stageLevel > 0) {
+				castBonus -= *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x58 + (stageLevel * 2));
 				castBonus &= ~((int)castBonus >> 31);
 			}
 		}
 
-		unsigned int castReduction = (static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D
-		                                 ? static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(script + 0xBD8))
-		                                 : 0;
+		unsigned int playerCid = (static_cast<unsigned int>(__cntlzw(0x6D - static_cast<int>(static_cast<unsigned short>(GetCID()) & 0x6D))) >> 5) & 0xFFU;
+		unsigned int castReduction = playerCid != 0 ? static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(script + 0xBD8)) : 0;
 		int totalCast = static_cast<int>(baseCast + castBonus) - static_cast<int>(castReduction);
 		int cast = static_cast<int>(castScale * static_cast<float>(totalCast));
-		System.Printf(debugFormat + 0x10, baseCast, castBonus, castScale);
+		System.Printf(sCharaObjDebugStatFormat + 0x10, baseCast, castBonus, castScale);
 		return cast & ~(cast >> 31);
 	}
 
 	if (itemType == 3) {
-		System.Printf(debugFormat + 0x38, baseCast);
+		System.Printf(sCharaObjDebugStatFormat + 0x38, baseCast);
 		return static_cast<int>(baseCast);
 	}
 	if (itemType == 4) {
-		System.Printf(debugFormat + 0x4C, baseCast);
+		System.Printf(sCharaObjDebugStatFormat + 0x4C, baseCast);
 		return static_cast<int>(baseCast);
 	}
 	if (itemNo == 0x1F8) {
-		unsigned int castBonus = *reinterpret_cast<unsigned short*>(script9 + 0x196);
-		unsigned int castReduction = (static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D
-		                                 ? static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(script + 0xBD9))
-		                                 : 0;
+		unsigned int castBonus = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0x196);
+		unsigned int playerCid = (static_cast<unsigned int>(__cntlzw(0x6D - static_cast<int>(static_cast<unsigned short>(GetCID()) & 0x6D))) >> 5) & 0xFFU;
+		unsigned int castReduction = playerCid != 0 ? static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(script + 0xBD9)) : 0;
 		int totalCast = static_cast<int>(baseCast + castBonus) - static_cast<int>(castReduction);
 		int cast = static_cast<int>(castScale * static_cast<float>(totalCast));
-		System.Printf(debugFormat + 0x60, baseCast, castBonus, castScale);
+		System.Printf(sCharaObjDebugStatFormat + 0x60, baseCast, castBonus, castScale);
 		return cast & ~(cast >> 31);
 	}
 
@@ -2791,6 +2871,7 @@ void CGCharaObj::combi2()
 {
 	CGPartyObj* candidates[5];
 	int candidateCount = 0;
+	CVector comboCenter;
 
 	for (int i = 0; i < 4; i++) {
 		CGPartyObj* party = Game.m_partyObjArr[i];
@@ -2897,12 +2978,12 @@ void CGCharaObj::combi2()
 
 	const unsigned short comboCmd = comboData[0xC];
 	const bool isSharedResult = comboData[participantCount * 3 - 3] != 0x1F8;
-	Vec comboCenter = {0.0f, 0.0f, 0.0f};
 	if (isSharedResult) {
+		comboCenter.Identity();
 		for (int i = 0; i < participantCount; i++) {
-			PSVECAdd(&comboCenter, &CharaObjComboCenter(candidates[i]), &comboCenter);
+			PSVECAdd(reinterpret_cast<Vec*>(&comboCenter), &CharaObjComboCenter(candidates[i]), reinterpret_cast<Vec*>(&comboCenter));
 		}
-		PSVECScale(&comboCenter, &comboCenter, 1.0f / static_cast<float>(participantCount));
+		PSVECScale(reinterpret_cast<Vec*>(&comboCenter), reinterpret_cast<Vec*>(&comboCenter), 1.0f / static_cast<float>(participantCount));
 	}
 
 	System.Printf(const_cast<char*>(lbl_801DC590), System.m_frameCounter, comboCmd);
@@ -2979,29 +3060,14 @@ void CGCharaObj::sendCombiToScript(CGCharaObj* target, int scriptArg, int)
 	int linkCount = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6A8);
 	CGPrgObj** links = reinterpret_cast<CGPrgObj**>(reinterpret_cast<unsigned char*>(this) + 0x6AC);
 
-	while (entry < linkCount) {
-		CGPrgObj* obj = links[entry];
-		bool skip = (obj == 0);
-
-		if (!skip) {
-			if (Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0xF &&
-				(obj->GetCID() & 0x6D) == 0x6D &&
-				*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(obj->m_scriptHandle) + 0x3B4) != 0) {
-				skip = true;
-			}
-
-			if (obj->m_lastStateId == 6 || obj->m_lastStateId == 2) {
-				skip = true;
-			}
-		}
-
-		if (!skip) {
-			break;
-		}
-
+	while (entry < linkCount &&
+	       (links[entry] == 0 ||
+	        (Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0xF &&
+	         (links[entry]->GetCID() & 0x6D) == 0x6D &&
+	         *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(links[entry]->m_scriptHandle) + 0x3B4) != 0) ||
+	        links[entry]->m_lastStateId == 6 || links[entry]->m_lastStateId == 2)) {
 		entry++;
 	}
-
 	if (entry == linkCount) {
 		int stackArgs[2];
 		stackArgs[0] = reinterpret_cast<int>(target);

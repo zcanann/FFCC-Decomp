@@ -63,7 +63,7 @@ public:
 	void putHitParticleFromItem(CGPrgObj*, int);
 	void setSta(int, int);
 	void effective(int, int, CGPrgObj*, int&);
-	void calcSta(int, int, CGObject*);
+	int calcSta(int, int, CGObject*);
 	void addHp(int, CGPrgObj*);
 	void calcRegist(int, int, int&, int&, int&, int);
 	int getItemPdt(int, int, int&, int&, int&);
@@ -81,11 +81,11 @@ public:
 	void addSe(int);
 	void seDamageDelete();
 	void StaticFrame();
-	void combi2();
+	static void combi2();
 	void sendCombiToScript(CGCharaObj*, int, int);
 	void scCheckItem(CCombi2Set*, CGCharaObj*, int);
 	void scCheckTime(CCombi2Set*, CGCharaObj*, CGCharaObj*, int);
-	int searchCombi(int, CGPartyObj **, int&);
+	static int searchCombi(int, CGPartyObj **, int&);
 	int GetCID();
 
 	int m_attackAnimId;

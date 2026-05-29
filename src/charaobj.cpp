@@ -105,27 +105,35 @@ static int CharaObjGetModelPdtNo(CGCharaObj* charaObj)
 	return reinterpret_cast<int*>(charaObj->m_charaModelHandle->m_pdtLoadRef)[2];
 }
 
+struct CharaObjModelAnimState
+{
+	unsigned char m_padB4[0xB4];
+	float m_time;
+	unsigned char m_padBC[4];
+	float m_animStart;
+	float m_animEnd;
+	unsigned char m_padC8[0xC];
+	CChara::CAnim* m_anim;
+};
+
 static bool CharaObjIsAttackAnimBoundary(CGCharaObj* charaObj)
 {
 	if (charaObj->m_charaModelHandle == 0 || charaObj->m_charaModelHandle->m_model == 0) {
 		return true;
 	}
 
-	CChara::CModel* model = charaObj->m_charaModelHandle->m_model;
-	unsigned char* modelBytes = reinterpret_cast<unsigned char*>(model);
-	if (*reinterpret_cast<void**>(modelBytes + 0xB8) == 0) {
+	CharaObjModelAnimState* model = reinterpret_cast<CharaObjModelAnimState*>(charaObj->m_charaModelHandle->m_model);
+	if (model->m_anim == 0) {
 		return true;
 	}
 
-	float animStart = *reinterpret_cast<float*>(modelBytes + 0xC0);
-	float animEnd = *reinterpret_cast<float*>(modelBytes + 0xC4);
-	int span = static_cast<int>(1.0f + (animEnd - animStart));
+	int span = static_cast<int>(kOneF32 + (model->m_animEnd - model->m_animStart));
 	if (span == 1) {
 		return true;
 	}
 
 	int frame = static_cast<int>(charaObj->m_turnSpeed);
-	if (charaObj->m_lastBgAttr >= 0.05f) {
+	if (FLOAT_80331988 <= charaObj->m_lastBgAttr) {
 		return span <= frame;
 	}
 

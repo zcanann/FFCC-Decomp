@@ -2993,9 +2993,6 @@ void CMenuPcs::CmakeResultDraw()
     float labelWidths[4];
     for (int i = 0; i < 4; i++) {
         const char* label = GetMenuStr(i + 0x2A);
-        if (label == 0) {
-            label = "";
-        }
 
         labelWidths[i] = FLOAT_803332f0 + labelFont->GetWidth(label);
         labelFont->SetPosX(FLOAT_803332f0);
@@ -3020,9 +3017,6 @@ void CMenuPcs::CmakeResultDraw()
             value = GetMenuStr(static_cast<int>(s_CmakeInfo.m_gender) + 0x11);
         } else if (i == 2) {
             value = GetTribeStr(static_cast<int>(s_CmakeInfo.m_tribe));
-            if (value == 0) {
-                value = "";
-            }
 
             strcpy(tribeWithSlash, value);
             size_t tribeLen = strlen(tribeWithSlash);
@@ -3033,10 +3027,6 @@ void CMenuPcs::CmakeResultDraw()
             value = tribeWithSlash;
         } else {
             value = GetJobStr(static_cast<int>(s_CmakeInfo.m_job));
-        }
-
-        if (value == 0) {
-            value = "";
         }
 
         float x = FLOAT_803332fc + labelWidths[i];
@@ -3053,9 +3043,6 @@ void CMenuPcs::CmakeResultDraw()
             }
 
             const char* hair = GetHairStr(hairIndex + static_cast<int>(s_CmakeInfo.m_hair));
-            if (hair == 0) {
-                hair = "";
-            }
 
             valueFont->SetPosX(FLOAT_80333300 + x + valueWidth);
             valueFont->SetPosY(y);

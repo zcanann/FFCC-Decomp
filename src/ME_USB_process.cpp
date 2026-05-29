@@ -141,8 +141,8 @@ void CMaterialEditorPcs::SetUSBData()
 
         CreateBoundaryBox(minPos, maxPos, rsdItem->countA, reinterpret_cast<const Vec*>(rsdItem->ptr10));
 
-        s32 xDiff = static_cast<s32>(maxPos.x - minPos.x);
-        s32 yDiff = static_cast<s32>(maxPos.y - minPos.y);
+        s32 xDiff = static_cast<s32>(maxPos.y - minPos.y);
+        s32 yDiff = static_cast<s32>(maxPos.z - minPos.z);
 
         srt.transX = FLOAT_8032FD00;
         srt.transY = (float)(-xDiff / 2);
@@ -325,11 +325,12 @@ void CMaterialEditorPcs::SetUSBData()
         break;
     }
     case 0x20: {
+        u32 allocSize = usb.m_sizeBytes;
         s16* headerBuffer = static_cast<s16*>(
-            Memory._Alloc(usb.m_sizeBytes, MaterialEditorStage(), const_cast<char*>(s_ME_USB_process_cpp), 0x31, 0));
+            Memory._Alloc(allocSize, MaterialEditorStage(), const_cast<char*>(s_ME_USB_process_cpp), 0x31, 0));
 
         if (headerBuffer == 0) {
-            System.Printf(const_cast<char*>(sMemAllocErrorSizeFmt), usb.m_sizeBytes);
+            System.Printf(const_cast<char*>(sMemAllocErrorSizeFmt), allocSize);
         }
 
         void* headerDst =
@@ -381,8 +382,13 @@ void CMaterialEditorPcs::SetUSBData()
             }
             this->m_tlutData[this->m_loadedTextureCount] = tlutData;
 
-            int tlutOffset = headerBuffer[1] == 4 ? (headerBuffer[2] * headerBuffer[3]) / 2 : headerBuffer[2] * headerBuffer[3];
-            memcpy(this->m_tlutData[this->m_loadedTextureCount], reinterpret_cast<u8*>(headerBuffer) + tlutOffset + 0x10, tlutDataSize);
+            u8* tlutSrc;
+            if (headerBuffer[1] == 4) {
+                tlutSrc = reinterpret_cast<u8*>(headerBuffer) + (headerBuffer[2] * headerBuffer[3]) / 2;
+            } else {
+                tlutSrc = reinterpret_cast<u8*>(headerBuffer) + headerBuffer[2] * headerBuffer[3];
+            }
+            memcpy(this->m_tlutData[this->m_loadedTextureCount], tlutSrc + 0x10, tlutDataSize);
             DCFlushRange(this->m_tlutData[this->m_loadedTextureCount], tlutDataSize);
         }
 

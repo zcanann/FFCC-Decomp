@@ -1003,7 +1003,7 @@ bool CMenuPcs::LetterClose()
 
 	if (panelCount == finished && SingGetLetterAttachflg() >= 0) {
 		s_BackUpCur[0] = *reinterpret_cast<s16*>(state + 0x26);
-		s_BackUpTopPos = static_cast<s16>(s_SelLetter - s_BackUpCur[0]);
+		s_BackUpTopPos = s_SelLetter - s_BackUpCur[0];
 		s_BackUpCur[1] = *reinterpret_cast<s16*>(state + 0x28);
 	}
 

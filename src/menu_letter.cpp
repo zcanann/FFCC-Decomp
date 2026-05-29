@@ -2400,7 +2400,7 @@ void CMenuPcs::LetterLstBaseDraw(float param_1)
 	double x1 = static_cast<double>(static_cast<float>(x0 + w - static_cast<double>(FLOAT_803330f4)));
 	double y1 = static_cast<double>(static_cast<float>(y0 + h - static_cast<double>(FLOAT_803330f4)));
 
-	for (unsigned int i = 0; i < 4; ++i) {
+	for (int i = 0; i < 4; ++i) {
 		int tex;
 		int flip = 0;
 		if (i == 0) {

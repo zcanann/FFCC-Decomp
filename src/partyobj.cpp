@@ -20,6 +20,13 @@
 #include "ffcc/fontman.h"
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
+class CAStar {
+public:
+	void addRealTime(CGPartyObj*);
+};
+class CDbgMenuPcs;
+extern CDbgMenuPcs DbgMenuPcs;
+
 extern "C" int CalcHitSlide__7CMapObjFP3Vecf(void*, Vec*);
 extern const char lbl_801DCA48[];
 extern const char lbl_801DCCB0[];
@@ -705,6 +712,10 @@ void CGPartyObj::onFrameAlways()
 	} else if (!showTraceParticle && traceSlot != 0) {
 		gCFlatRuntime2.EndParticleSlot(traceSlot, 1);
 		traceSlot = 0;
+	}
+
+	if (m_scriptHandle[0xED] == nullptr && (MiniGamePcs.m_flags & 0x400) != 0) {
+		reinterpret_cast<CAStar*>(reinterpret_cast<unsigned char*>(&DbgMenuPcs) + 0x2A5C)->addRealTime(this);
 	}
 
 	if ((MiniGamePcs.m_flags & 0x2000) != 0) {

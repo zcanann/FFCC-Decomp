@@ -2468,7 +2468,7 @@ void CMenuPcs::LetterLstBaseDraw(float param_1)
 	double decoY0 = y0 - DOUBLE_80333100;
 	double decoX1 = static_cast<double>(static_cast<float>(decoX0 + DOUBLE_80333100));
 	double decoY1 = DOUBLE_80333100 + static_cast<double>(static_cast<float>(y0 + h - static_cast<double>(FLOAT_8033310c)));
-	for (unsigned int i = 0; i < 4; ++i) {
+	for (int i = 0; i < 4; ++i) {
 		double x = ((i & 1) == 0) ? static_cast<double>(static_cast<float>(x0 - static_cast<double>(FLOAT_80333110))) : decoX1;
 		double y = ((i & 2) == 0) ? decoY0 : decoY1;
 		int flip = ((i & 2) == 0) ? 0 : 4;

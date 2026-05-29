@@ -1388,7 +1388,7 @@ void CMenuPcs::DrawCmakeName(int x, int y, char* text, float alpha)
 
     int baseY = 300;
     unsigned int nameX = static_cast<unsigned int>(
-        -((static_cast<double>(FLOAT_80333364) * 0.5) - 0x80000000) + 0x43300000);
+        -((static_cast<double>(FLOAT_80333364) * DOUBLE_80333298) - DOUBLE_80333288));
 
     if (x != 0) {
         baseY = 0x130;

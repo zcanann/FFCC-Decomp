@@ -2495,6 +2495,7 @@ void CGCharaObj::statAttack()
 		}
 	}
 
+	itemData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + m_itemId * 0x48;
 	seFrame = *reinterpret_cast<unsigned short*>(itemData + 0x3E);
 	if ((seFrame & 0x8000) == 0 && m_stateFrame == seFrame) {
 		unsigned short seSpec = *reinterpret_cast<unsigned short*>(itemData + 0x3C);

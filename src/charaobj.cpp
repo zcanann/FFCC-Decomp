@@ -102,7 +102,7 @@ static void CharaObjEndSlots(CGCharaObj* charaObj, unsigned int slotMask)
 {
 	for (int i = 0; i < 0x16; i++) {
 		if ((slotMask & (1U << i)) != 0) {
-			gCFlatRuntime2.EndParticleSlot(charaObj->m_particleSlots[i], 1);
+			CFlatRuntime2Storage().EndParticleSlot(charaObj->m_particleSlots[i], 1);
 		}
 	}
 }
@@ -856,7 +856,7 @@ void CGCharaObj::onFrameStat()
 				if (m_subFrame == 0) {
 					for (int i = 0; i < 0x16; i++) {
 						if ((8U & (1U << i)) != 0) {
-							gCFlatRuntime2.EndParticleSlot(m_particleSlots[i], 1);
+							CFlatRuntime2Storage().EndParticleSlot(m_particleSlots[i], 1);
 						}
 					}
 					reqAnim(m_unk558, 0, 0);
@@ -865,7 +865,7 @@ void CGCharaObj::onFrameStat()
 				if (m_itemId != 0 && m_subFrame == 10) {
 					for (int i = 0; i < 0x16; i++) {
 						if ((2U & (1U << i)) != 0) {
-							gCFlatRuntime2.EndParticleSlot(m_particleSlots[i], 1);
+							CFlatRuntime2Storage().EndParticleSlot(m_particleSlots[i], 1);
 						}
 					}
 					putParticleFromItem(m_itemId, 2, m_particleSlots[1], &CharaObjComboCenter(this));
@@ -1294,7 +1294,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 			case 0:
 				for (int i = 0; i < 0x16; i++) {
 					if (((1U << i) & 0x4U) != 0) {
-						gCFlatRuntime2.EndParticleSlot(slots[i], 1);
+						CFlatRuntime2Storage().EndParticleSlot(slots[i], 1);
 					}
 				}
 				if (isIceJ) {
@@ -1310,7 +1310,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 			case 1:
 				for (int i = 0; i < 0x16; i++) {
 					if (((1U << i) & 0x40U) != 0) {
-						gCFlatRuntime2.EndParticleSlot(slots[i], 1);
+						CFlatRuntime2Storage().EndParticleSlot(slots[i], 1);
 					}
 				}
 				if (isIceJ) {
@@ -1324,7 +1324,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 				m_castTimeTick = 0;
 				for (int i = 0; i < 0x16; i++) {
 					if (((1U << i) & 0x80000U) != 0) {
-						gCFlatRuntime2.EndParticleSlot(slots[i], 1);
+						CFlatRuntime2Storage().EndParticleSlot(slots[i], 1);
 					}
 				}
 				putParticleBindTrace(0x10C, slots[19], this, 20.0f * m_attackColRadius, 0);
@@ -1332,7 +1332,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 			case 3:
 				for (int i = 0; i < 0x16; i++) {
 					if (((1U << i) & 0x40000U) != 0) {
-						gCFlatRuntime2.EndParticleSlot(slots[i], 1);
+						CFlatRuntime2Storage().EndParticleSlot(slots[i], 1);
 					}
 				}
 				putParticleBindTrace(0x10D, slots[18], this, 20.0f * m_attackColRadius, 0);
@@ -1340,7 +1340,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 			case 4:
 				for (int i = 0; i < 0x16; i++) {
 					if (((1U << i) & 0x80U) != 0) {
-						gCFlatRuntime2.EndParticleSlot(slots[i], 1);
+						CFlatRuntime2Storage().EndParticleSlot(slots[i], 1);
 					}
 				}
 				if (isIceJ) {
@@ -1353,7 +1353,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 			case 6:
 				for (int i = 0; i < 0x16; i++) {
 					if (((1U << i) & 0x100000U) != 0) {
-						gCFlatRuntime2.EndParticleSlot(slots[i], 1);
+						CFlatRuntime2Storage().EndParticleSlot(slots[i], 1);
 					}
 				}
 				putParticleBindTrace(0x107, slots[20], this, 20.0f * m_attackColRadius, 0);
@@ -1361,7 +1361,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 			case 7: {
 				for (int i = 0; i < 0x16; i++) {
 					if (((1U << i) & 0x8000U) != 0) {
-						gCFlatRuntime2.EndParticleSlot(slots[i], 1);
+						CFlatRuntime2Storage().EndParticleSlot(slots[i], 1);
 					}
 				}
 				int particleNo = isMon ? 0x70 : 0x14;
@@ -1371,7 +1371,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 			case 8: {
 				for (int i = 0; i < 0x16; i++) {
 					if (((1U << i) & 0x2000U) != 0) {
-						gCFlatRuntime2.EndParticleSlot(slots[i], 1);
+						CFlatRuntime2Storage().EndParticleSlot(slots[i], 1);
 					}
 				}
 				int particleNo = isMon ? 0x6E : 0x12;
@@ -1381,7 +1381,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 			case 9: {
 				for (int i = 0; i < 0x16; i++) {
 					if (((1U << i) & 0x4000U) != 0) {
-						gCFlatRuntime2.EndParticleSlot(slots[i], 1);
+						CFlatRuntime2Storage().EndParticleSlot(slots[i], 1);
 					}
 				}
 				int particleNo = isMon ? 0x6C : 0x10;
@@ -1396,7 +1396,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 			case 0x1B:
 				for (int i = 0; i < 0x16; i++) {
 					if (((1U << i) & 0x400U) != 0) {
-						gCFlatRuntime2.EndParticleSlot(slots[i], 1);
+						CFlatRuntime2Storage().EndParticleSlot(slots[i], 1);
 					}
 				}
 				putParticle(0x11C, slots[10], this, 1.0f, 0x1290D);
@@ -1414,7 +1414,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 			case 0:
 				for (int i = 0; i < 0x16; i++) {
 					if (((1U << i) & 0x4U) != 0) {
-						gCFlatRuntime2.EndParticleSlot(slots[i], 1);
+						CFlatRuntime2Storage().EndParticleSlot(slots[i], 1);
 					}
 				}
 				if (isIceJ) {
@@ -1431,21 +1431,21 @@ void CGCharaObj::setSta(int staIndex, int value)
 			case 1:
 				for (int i = 0; i < 0x16; i++) {
 					if (((1U << i) & 0x40U) != 0) {
-						gCFlatRuntime2.EndParticleSlot(slots[i], 1);
+						CFlatRuntime2Storage().EndParticleSlot(slots[i], 1);
 					}
 				}
 				break;
 			case 2:
 				for (int i = 0; i < 0x16; i++) {
 					if (((1U << i) & 0x80000U) != 0) {
-						gCFlatRuntime2.EndParticleSlot(slots[i], 1);
+						CFlatRuntime2Storage().EndParticleSlot(slots[i], 1);
 					}
 				}
 				break;
 			case 3:
 				for (int i = 0; i < 0x16; i++) {
 					if (((1U << i) & 0x40000U) != 0) {
-						gCFlatRuntime2.EndParticleSlot(slots[i], 1);
+						CFlatRuntime2Storage().EndParticleSlot(slots[i], 1);
 					}
 				}
 				putParticle(0x10E, 0, this, 20.0f * m_attackColRadius, 0);
@@ -1454,21 +1454,21 @@ void CGCharaObj::setSta(int staIndex, int value)
 			case 4:
 				for (int i = 0; i < 0x16; i++) {
 					if (((1U << i) & 0x80U) != 0) {
-						gCFlatRuntime2.EndParticleSlot(slots[i], 1);
+						CFlatRuntime2Storage().EndParticleSlot(slots[i], 1);
 					}
 				}
 				break;
 			case 6:
 				for (int i = 0; i < 0x16; i++) {
 					if (((1U << i) & 0x100000U) != 0) {
-						gCFlatRuntime2.EndParticleSlot(slots[i], 1);
+						CFlatRuntime2Storage().EndParticleSlot(slots[i], 1);
 					}
 				}
 				break;
 			case 7: {
 				for (int i = 0; i < 0x16; i++) {
 					if (((1U << i) & 0x8000U) != 0) {
-						gCFlatRuntime2.EndParticleSlot(slots[i], 1);
+						CFlatRuntime2Storage().EndParticleSlot(slots[i], 1);
 					}
 				}
 				int particleNo = isMon ? 0x71 : 0x15;
@@ -1478,7 +1478,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 			case 8: {
 				for (int i = 0; i < 0x16; i++) {
 					if (((1U << i) & 0x2000U) != 0) {
-						gCFlatRuntime2.EndParticleSlot(slots[i], 1);
+						CFlatRuntime2Storage().EndParticleSlot(slots[i], 1);
 					}
 				}
 				int particleNo = isMon ? 0x6F : 0x13;
@@ -1488,7 +1488,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 			case 9: {
 				for (int i = 0; i < 0x16; i++) {
 					if (((1U << i) & 0x4000U) != 0) {
-						gCFlatRuntime2.EndParticleSlot(slots[i], 1);
+						CFlatRuntime2Storage().EndParticleSlot(slots[i], 1);
 					}
 				}
 				int particleNo = isMon ? 0x6D : 0x11;
@@ -1504,7 +1504,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 			case 0x1B:
 				for (int i = 0; i < 0x16; i++) {
 					if (((1U << i) & 0x400U) != 0) {
-						gCFlatRuntime2.EndParticleSlot(slots[i], 1);
+						CFlatRuntime2Storage().EndParticleSlot(slots[i], 1);
 					}
 				}
 				break;

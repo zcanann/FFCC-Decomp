@@ -21,6 +21,7 @@ extern char SoundBuffer[];
 
 extern "C" char sCharaObjDebugStatFormat[];
 extern "C" char lbl_801DC590[];
+extern "C" char lbl_801DC8CC[];
 extern "C" char lbl_801DC8D8[];
 extern "C" char lbl_801DC8EC[];
 extern "C" char lbl_801DC940[];
@@ -1943,7 +1944,7 @@ void CGCharaObj::calcRegist(int staIndex, int itemId, int& outA, int& outB, int&
 		case 6: outA = *reinterpret_cast<unsigned short*>(script + 0x3A); break;
 		case 8: outA = *reinterpret_cast<unsigned short*>(script + 0x30); break;
 		case 9: outA = *reinterpret_cast<unsigned short*>(script + 0x32); break;
-		case 0x0B: outA = *reinterpret_cast<unsigned short*>(script + 0x34); break;
+		case 10: outA = *reinterpret_cast<unsigned short*>(script + 0x34); break;
 		case 0x1C: outA = *reinterpret_cast<unsigned short*>(script + 0x36); break;
 		case 0x24:
 		case 0x25:
@@ -1979,8 +1980,10 @@ void CGCharaObj::calcRegist(int staIndex, int itemId, int& outA, int& outB, int&
 		outA = 3;
 	}
 
+	System.Printf(const_cast<char*>(lbl_801DC8CC), outA);
+
 	if (outA == 1) {
-		outB = (isNormal == 0) ? 1 : 0;
+		outB = (isNormal != 0) ? 1 : 0;
 	} else if (outA == 0) {
 		outB = 1;
 	} else {

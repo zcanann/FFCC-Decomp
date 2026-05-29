@@ -654,7 +654,7 @@ void CGCharaObj::onFramePreCalc()
 		PSVECSubtract(reinterpret_cast<Vec*>(Game.unk_flat3_0xc7d0 + 0x15C), &m_worldPosition,
 			&m_targetDelta);
 		m_targetDist = PSVECMag(&m_targetDelta);
-		CharaObjTargetAngle(this) = CharaObjGetRotateY(m_targetDelta);
+		CharaObjTargetAngle(this) = reinterpret_cast<CVector*>(&m_targetDelta)->GetRotateY();
 	}
 
 	for (int i = 0; i < 4; i++) {
@@ -668,7 +668,7 @@ void CGCharaObj::onFramePreCalc()
 		} else {
 			PSVECSubtract(&partyObj->m_worldPosition, &m_worldPosition, &m_partyDelta[i]);
 			m_partyDistance[i] = PSVECMag(&m_partyDelta[i]);
-			m_partyAngle[i] = CharaObjGetRotateY(m_partyDelta[i]);
+			m_partyAngle[i] = reinterpret_cast<CVector*>(&m_partyDelta[i])->GetRotateY();
 		}
 
 		m_partyRank[i] = 0;

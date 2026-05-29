@@ -581,7 +581,7 @@ void CGCharaObj::onFramePostCalc()
 			m_stateTick += 1;
 		}
 
-		if (CharaObjIsPlayerCid(GetCID()) &&
+		if ((GetCID() & 0x6D) == 0x6D &&
 		    (i == 0 || i == 3 || i == 4 || i == 9) &&
 		    statusValue > 0) {
 			unsigned char slot = m_animStateMisc;

@@ -1222,7 +1222,15 @@ void CGCharaObj::putHitParticleFromItem(CGPrgObj* sourceObj, int itemId)
 	unsigned char* itemData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + itemId * 0x48;
 	particleBank = static_cast<unsigned int>(*reinterpret_cast<unsigned short*>(itemData + 0x12));
 	if (particleBank != 0xFFFF && particleBank != 0xFF) {
-		particleBank = CharaObjResolveHitParticleBank(sourceObj, particleBank);
+		if (particleBank == 0xFE) {
+			int sourceData = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(sourceObj) + 0xF8);
+			int effectData = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(sourceData) + 0x178);
+			particleBank = effectData != 0 ? *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(effectData) + 0x14)
+			                               : 0xFFFFFFFF;
+		}
+		if (particleBank == 0xFD) {
+			particleBank = 0xFFFFFFFF;
+		}
 		particleSpec = *reinterpret_cast<unsigned short*>(itemData + 0x1C);
 		if (particleSpec != 0xFFFF) {
 			if ((particleSpec & 0x1000) != 0) {

@@ -3908,9 +3908,6 @@ void CGPartyObj::gpmCalcDist(Vec* outVec, float& outDist)
 void CGPartyObj::gpmCol()
 {
 	CGPartyObj* leader = Game.m_partyObjArr[0];
-	if (leader == nullptr) {
-		return;
-	}
 
 	for (int i = 0; i < 5; i++) {
 		Vec* basePos = (i == 0) ? &m_worldPosition : reinterpret_cast<Vec*>(CGPartyObj::m_ghostWork + 0x24 + i * sizeof(Vec));
@@ -3962,9 +3959,6 @@ void CGPartyObj::gpmCol()
 void CGPartyObj::ghostPartyMog()
 {
 	CGPartyObj* leader = Game.m_partyObjArr[0];
-	if (leader == nullptr) {
-		return;
-	}
 
 	gpmCol();
 	gpmMove();

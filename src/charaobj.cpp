@@ -1074,13 +1074,11 @@ void CGCharaObj::damageDelete()
  */
 int CGCharaObj::onHit(int hitArg, CGObject* sourceObj, int hitType, Vec* hitPos)
 {
-	typedef unsigned int (*VCall0C)(void*);
 	typedef int (*VCall80)(void*, void*, int, int, int, Vec*);
 
-	VCall0C cidFn = *reinterpret_cast<VCall0C*>(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(sourceObj) + 0x48) + 0x0C);
-	unsigned short sourceCid = cidFn(sourceObj);
+	unsigned short sourceCid = sourceObj->GetCID();
 	if ((sourceCid & 0x6D) == 0x6D && Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
-		sourceCid = cidFn(sourceObj);
+		sourceCid = sourceObj->GetCID();
 		if ((sourceCid & 0x6D) == 0x6D && sourceObj->m_scriptHandle[0xED] != 0) {
 			return 0;
 		}
@@ -1114,7 +1112,7 @@ int CGCharaObj::onHit(int hitArg, CGObject* sourceObj, int hitType, Vec* hitPos)
 		changeStat(3, 0, 0);
 	}
 
-	sourceCid = cidFn(sourceObj);
+	sourceCid = sourceObj->GetCID();
 	if ((sourceCid & 0x2D) == 0x2D) {
 		VCall80 onHitVCall = *reinterpret_cast<VCall80*>(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(sourceObj) + 0x48) + 0x80);
 		onHitVCall(sourceObj, this, m_itemId, hitArg, hitType, hitPos);

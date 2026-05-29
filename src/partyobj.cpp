@@ -1832,9 +1832,8 @@ void CGPartyObj::statCharge()
 
 	if (m_subState == 2) {
 		if (m_subFrame == 0) {
-			endPSlotBit(0x10);
-			endPSlotBit(0x100);
-			reqAnim(0x12, 0, 0);
+			endPSlotBit(8);
+			reqAnim(0x18, 0, 0);
 		}
 
 		moveCenterTargetParticle();

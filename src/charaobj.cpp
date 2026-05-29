@@ -1096,7 +1096,7 @@ void CGCharaObj::damageDelete()
 	Sound.StopSe3DGroup(m_particleId);
 	for (int i = 0; i < 0x16; i++) {
 		if (((1U << i) & 0x3bU) != 0) {
-			gCFlatRuntime2.DeleteParticleSlot(m_particleSlots[i], 1);
+			CFlatRuntime2Storage().DeleteParticleSlot(m_particleSlots[i], 1);
 		}
 	}
 }

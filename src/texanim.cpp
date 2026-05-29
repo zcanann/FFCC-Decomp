@@ -543,77 +543,73 @@ void CTexAnimSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
     CChunkFile::CChunk outerChunk;
     CChunkFile::CChunk middleChunk;
     CChunkFile::CChunk innerChunk;
-    int tanmTag = 0x54414E4D;
-    int seqTag = 0x53455120;
-    int nameTag = 0x4E414D45;
-    int infoTag = 0x494E464F;
-    int keyTag = 0x4B455920;
-
     m_texAnims.SetStage(stage);
     chunkFile.PushChunk();
     while ((int)chunkFile.GetNextChunk(outerChunk) != 0) {
-        if ((int)outerChunk.m_id != tanmTag) {
+        switch (outerChunk.m_id) {
+        case 'TANM':
+            break;
+        default:
             continue;
         }
 
-        CTexAnimStorage* texAnim = reinterpret_cast<CTexAnimStorage*>(
-            new (stage, const_cast<char*>(s_texanim_cpp), 0x3F) CTexAnim);
-        int* ref = reinterpret_cast<int*>(texAnim->refData);
+        CTexAnim* texAnim = new (stage, const_cast<char*>(s_texanim_cpp), 0x3F) CTexAnim;
+        int* ref = reinterpret_cast<int*>(texAnim->m_refData);
         if (ref != 0) {
             int nextRefCount = ref[1] - 1;
             ref[1] = nextRefCount;
             if ((nextRefCount == 0) && (ref != 0)) {
                 reinterpret_cast<void (**)(int*, int)>(*ref)[2](ref, 1);
             }
-            texAnim->refData = 0;
+            texAnim->m_refData = 0;
         }
-        CTexAnimRefDataStorage* refData = reinterpret_cast<CTexAnimRefDataStorage*>(
-            new (stage, const_cast<char*>(s_texanim_cpp), 0xD3) CTexAnim::CRefData);
-        texAnim->refData = refData;
-        reinterpret_cast<CTexAnimRefDataStorage*>(texAnim->refData)->texAnimSeqs.SetStage(stage);
+        CTexAnim::CRefData* refData = new (stage, const_cast<char*>(s_texanim_cpp), 0xD3) CTexAnim::CRefData;
+        texAnim->m_refData = refData;
+        texAnim->m_refData->m_texAnimSeqs.SetStage(stage);
 
         chunkFile.PushChunk();
         while ((int)chunkFile.GetNextChunk(middleChunk) != 0) {
-            if ((int)middleChunk.m_id != seqTag) {
-                if (((int)middleChunk.m_id < seqTag) && ((int)middleChunk.m_id == nameTag)) {
-                    reinterpret_cast<CTexAnimRefDataStorage*>(texAnim->refData)->texSrtIndex = middleChunk.m_arg0;
-                    strcpy(reinterpret_cast<CTexAnimRefDataStorage*>(texAnim->refData)->name,
-                           chunkFile.GetString());
-                }
+            switch (middleChunk.m_id) {
+            case 'SEQ ':
+                break;
+            case 'NAME':
+                texAnim->m_refData->m_texSrtIndex = middleChunk.m_arg0;
+                strcpy(texAnim->m_refData->m_name, chunkFile.GetString());
+                continue;
+            default:
                 continue;
             }
 
-            CTexAnimSeqStorage* seq = reinterpret_cast<CTexAnimSeqStorage*>(
-                new (stage, const_cast<char*>(s_texanim_cpp), 0xE2) CTexAnimSeq);
+            CTexAnimSeq* seq = new (stage, const_cast<char*>(s_texanim_cpp), 0xE2) CTexAnimSeq;
             chunkFile.PushChunk();
-            char* seqName = seq->name;
+            char* seqName = seq->m_name;
             while ((int)chunkFile.GetNextChunk(innerChunk) != 0) {
-                if ((int)innerChunk.m_id != keyTag) {
-                    if ((int)innerChunk.m_id == infoTag) {
-                        seq->totalFrames = chunkFile.Get4();
-                        chunkFile.Get4();
-                        char b7 = (char)chunkFile.Get4();
-                        seq->flags = (unsigned char)(((int)b7 << 7) | (seq->flags & 0x7F));
-                        char b6 = (char)chunkFile.Get4();
-                        seq->flags = (unsigned char)((((int)b6 << 6) & 0x40) | (seq->flags & 0xBF));
-                        unsigned int eq = (unsigned int)__cntlzw((unsigned int)strcmp(seqName, s_texAnimSeqE1));
-                        seq->flags = (unsigned char)(((unsigned char)((int)(char)(eq >> 5) << 5) & 0x20) | (seq->flags & 0xDF));
-                    } else if (((int)innerChunk.m_id >= keyTag) && ((int)innerChunk.m_id == nameTag)) {
-                        strcpy(seqName, chunkFile.GetString());
-                    }
-                } else {
-                    seq->keyCount = innerChunk.m_size / 0x30;
-                    seq->keys = reinterpret_cast<unsigned int*>(
+                if (innerChunk.m_id == 'KEY ') {
+                    seq->m_keyCount = innerChunk.m_size / 0x30;
+                    seq->m_keys = reinterpret_cast<unsigned int*>(
                         Memory._Alloc(innerChunk.m_size, stage, const_cast<char*>(s_texanim_cpp), 0x1D4, 0));
-                    memcpy(seq->keys, chunkFile.GetAddress(), innerChunk.m_size);
+                    memcpy(seq->m_keys, chunkFile.GetAddress(), innerChunk.m_size);
+                    continue;
+                } else if (innerChunk.m_id == 'INFO') {
+                    seq->m_totalFrames = chunkFile.Get4();
+                    chunkFile.Get4();
+                    char b7 = (char)chunkFile.Get4();
+                    seq->m_flags = (unsigned char)(((int)b7 << 7) | (seq->m_flags & 0x7F));
+                    char b6 = (char)chunkFile.Get4();
+                    seq->m_flags = (unsigned char)((((int)b6 << 6) & 0x40) | (seq->m_flags & 0xBF));
+                    unsigned int eq = (unsigned int)__cntlzw((unsigned int)strcmp(seqName, s_texAnimSeqE1));
+                    seq->m_flags = (unsigned char)(((unsigned char)((int)(char)(eq >> 5) << 5) & 0x20) | (seq->m_flags & 0xDF));
+                    continue;
+                } else if (innerChunk.m_id == 'NAME') {
+                    strcpy(seqName, chunkFile.GetString());
+                    continue;
                 }
             }
             chunkFile.PopChunk();
-            reinterpret_cast<CTexAnimRefDataStorage*>(texAnim->refData)
-                ->texAnimSeqs.Add(reinterpret_cast<CTexAnimSeq*>(seq));
+            texAnim->m_refData->m_texAnimSeqs.Add(seq);
         }
         chunkFile.PopChunk();
-        m_texAnims.Add(reinterpret_cast<CTexAnim*>(texAnim));
+        m_texAnims.Add(texAnim);
     }
     chunkFile.PopChunk();
 }

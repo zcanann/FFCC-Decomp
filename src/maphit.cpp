@@ -883,7 +883,7 @@ int FindIntersection(const Vec& start, const Vec& direction, const CMapCylinder&
     const f32 axisLen = PSVECMag(&axis);
     PSVECScale(&axis, &axis, 1.0f / axisLen);
 
-    if (fabsf(axis.x) >= fabsf(axis.y) && fabsf(axis.x) >= fabsf(axis.z)) {
+    if (fabs(axis.x) >= fabs(axis.y) && fabs(axis.x) >= fabs(axis.z)) {
         orthogonal.x = -axis.y;
         orthogonal.y = axis.x;
         orthogonal.z = 0.0f;
@@ -918,7 +918,7 @@ int FindIntersection(const Vec& start, const Vec& direction, const CMapCylinder&
     const f32 radius = cyl.m_radius;
     const f32 radiusSq = radius * radius;
 
-    if (fabsf(vz) < 1.0f) {
+    if (fabs(vz) < 1.0f) {
         const f32 radialC = (px * px + py * py) - radiusSq;
         const f32 radialB = px * vx + py * vy;
         const f32 radialA = vx * vx + vy * vy;

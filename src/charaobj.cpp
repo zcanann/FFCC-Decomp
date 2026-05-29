@@ -1271,7 +1271,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 	int modelPdtNo = -1;
 	float monsterScale = 1.0f;
 
-	if (m_charaModelHandle != 0 && m_charaModelHandle->m_pdtLoadRef != 0) {
+	if (m_charaModelHandle->m_pdtLoadRef != 0) {
 		modelPdtNo = reinterpret_cast<int*>(m_charaModelHandle->m_pdtLoadRef)[2];
 	}
 	if (isMon) {

@@ -1,26 +1,5 @@
 #include "ffcc/monobj_table.h"
 
-typedef void (CGMonObj::*MonVoidFunc)();
-typedef void (CGMonObj::*MonStateFunc)(int);
-typedef int (CGMonObj::*MonTargetFunc)(int);
-typedef int (CGMonObj::*MonCalcFunc)(int);
-
-struct MonAiFuncTable {
-    MonVoidFunc initFinished;
-    MonVoidFunc moveFrame;
-    MonVoidFunc moveCancel;
-    MonStateFunc changeStat;
-    MonVoidFunc cancelStat;
-    MonVoidFunc frameStat;
-    MonVoidFunc logic;
-    MonTargetFunc target;
-    MonCalcFunc calcBranch;
-    MonVoidFunc damaged;
-    MonVoidFunc attacked;
-    MonCalcFunc attackCheck;
-    MonVoidFunc always;
-};
-
 extern "C" {
 MonAiFuncTable funcsDefault = {
     &CGMonObj::initFinishedFuncDefault,

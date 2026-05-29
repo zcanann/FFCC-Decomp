@@ -119,12 +119,12 @@ static bool CharaObjIsAttackAnimBoundary(CGCharaObj* charaObj)
 
 	float animStart = *reinterpret_cast<float*>(modelBytes + 0xC0);
 	float animEnd = *reinterpret_cast<float*>(modelBytes + 0xC4);
-	unsigned int span = static_cast<unsigned int>(1.0f + (animEnd - animStart));
+	int span = static_cast<int>(1.0f + (animEnd - animStart));
 	if (span == 1) {
 		return true;
 	}
 
-	unsigned int frame = static_cast<unsigned int>(charaObj->m_turnSpeed);
+	int frame = static_cast<int>(charaObj->m_turnSpeed);
 	if (charaObj->m_lastBgAttr >= 0.05f) {
 		return span <= frame;
 	}
@@ -2409,7 +2409,7 @@ void CGCharaObj::statAttack()
 	unsigned int cid = cidFn(this);
 
 	if ((cid & 0xAD) == 0xAD && m_subState == 0) {
-		void* animPoint = m_scriptHandle != 0 ? m_scriptHandle[4] : 0;
+		void* animPoint = m_scriptHandle[4];
 		if (animPoint == reinterpret_cast<void*>(0x88) || animPoint == reinterpret_cast<void*>(0x87)) {
 			if (!CharaObjIsAttackAnimBoundary(this)) {
 				return;

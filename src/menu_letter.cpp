@@ -1412,12 +1412,10 @@ bool CMenuPcs::LetterReplyWinOpen()
 				*newline = '\0';
 			}
 
-			const char* right = GetMenuStr(0x24);
-			const char* left = GetMenuStr(0x23);
 			if (languageId == 2) {
-				sprintf(lines[i], "%s%s%s", left, curLine, right);
+				sprintf(lines[i], "%s%s%s", GetMenuStr(0x23), curLine, GetMenuStr(0x24));
 			} else {
-				sprintf(lines[i], "%s%s%s", left, curLine, right);
+				sprintf(lines[i], "%s%s%s", GetMenuStr(0x23), curLine, GetMenuStr(0x24));
 			}
 
 			s_ReplyMax = static_cast<unsigned char>(s_ReplyMax + 1);

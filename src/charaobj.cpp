@@ -1707,10 +1707,6 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
  */
 int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 {
-	if (m_scriptHandle == 0 || source == 0) {
-		return 0;
-	}
-
 	short* staPtr = reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E + (staIndex * 2));
 	if ((staIndex == 0 || staIndex == 4) && *staPtr != 0) {
 		System.Printf(const_cast<char*>(lbl_801DC8D8));

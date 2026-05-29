@@ -918,6 +918,7 @@ int CMenuPcs::LetterCtrl()
 				} else {
 					s_Attach = 2;
 					*reinterpret_cast<s16*>(state + 0x30) = 1;
+					float resetAlpha = FLOAT_803330f8;
 					*reinterpret_cast<s16*>(state + 0x12) = 2;
 					*reinterpret_cast<unsigned char*>(state + 8) = 0xFF;
 					int anim = GetLetterAnimBase(this);
@@ -925,7 +926,13 @@ int CMenuPcs::LetterCtrl()
 					*reinterpret_cast<int*>(anim + 0x30) = 10;
 					*reinterpret_cast<int*>(anim + 0x6C) = 0;
 					*reinterpret_cast<int*>(anim + 0x70) = 10;
-					ResetLetterPanelProgress(this);
+					int panelCount = static_cast<int>(**reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850));
+					s16* panel = *reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850) + 4;
+					for (int i = 0; i < panelCount; ++i, panel += 0x20) {
+						panel[0x10] = 0;
+						panel[0x11] = 0;
+						*reinterpret_cast<float*>(panel + 8) = resetAlpha;
+					}
 					*reinterpret_cast<s16*>(state + 0x22) = 0;
 					*reinterpret_cast<char*>(state + 0xC) = 0;
 				}

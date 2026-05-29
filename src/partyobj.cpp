@@ -4334,7 +4334,7 @@ void CGPartyObj::gpmMove()
 				*reinterpret_cast<int*>(self + 0x550) = 0x20F;
 			} else if (sGhostPartyWork.slotSel == 0) {
 				*reinterpret_cast<int*>(self + 0x550) = 0x207;
-			} else if (sGhostPartyWork.slotSel < 3) {
+			} else if ((unsigned int)sGhostPartyWork.slotSel < 3) {
 				*reinterpret_cast<int*>(self + 0x550) = 0x20B;
 			}
 			changeStat(2, 0, 0);

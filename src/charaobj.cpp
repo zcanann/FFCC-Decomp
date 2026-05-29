@@ -591,7 +591,22 @@ void CGCharaObj::onFramePostCalc()
 		if (CharaObjIsPlayerCid(GetCID()) &&
 		    (i == 0 || i == 3 || i == 4 || i == 9) &&
 		    statusValue > 0) {
-			unsigned short padMask = CharaObjGetPadStatusReduceMask(m_animStateMisc);
+			unsigned char slot = m_animStateMisc;
+			unsigned short padMask = 0;
+			bool useDebugPad = (Pad._452_4_ != 0) || ((slot == 0) && (Pad._448_4_ != -1));
+			if (!useDebugPad) {
+				int idx = slot & ~((~(Pad._448_4_ - static_cast<int>(slot) | static_cast<int>(slot) - Pad._448_4_)) >> 31);
+				padMask = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Pad) + 0x8 + idx * 0x54);
+			}
+			if ((MiniGamePcs.m_flags & 0x100) != 0) {
+				useDebugPad = (Pad._452_4_ != 0) || ((slot == 0) && (Pad._448_4_ != -1));
+				unsigned short heldMask = 0;
+				if (!useDebugPad) {
+					int idx = slot & ~((~(Pad._448_4_ - static_cast<int>(slot) | static_cast<int>(slot) - Pad._448_4_)) >> 31);
+					heldMask = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Pad) + 0x10 + idx * 0x54);
+				}
+				padMask |= heldMask;
+			}
 			if ((padMask & 0xF) != 0) {
 				statusValue -= *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x3C);
 				System.Printf(const_cast<char*>(lbl_801DC940));

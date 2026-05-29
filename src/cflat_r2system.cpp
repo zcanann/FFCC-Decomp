@@ -1834,14 +1834,13 @@ int CLine<64>::Calc(Vec* nearestPosition, float* nearestDistance, unsigned long*
 
 int CLine<64>::IsInner(Vec* position, float margin)
 {
-    float* values = (float*)this;
-    if (values[6] == 0.0f) {
+    if (m_numPoints == 0) {
         return 0;
     }
 
-    if ((values[0] - margin) <= position->x && (values[1] - margin) <= position->y &&
-        (values[2] - margin) <= position->z && position->x <= (values[3] + margin) &&
-        position->y <= (values[4] + margin) && position->z <= (values[5] + margin)) {
+    if ((m_min.x - margin) <= position->x && (m_min.y - margin) <= position->y &&
+        (m_min.z - margin) <= position->z && (m_max.x + margin) >= position->x &&
+        (m_max.y + margin) >= position->y && (m_max.z + margin) >= position->z) {
         return 1;
     }
 

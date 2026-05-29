@@ -9,6 +9,7 @@
 #include "ffcc/game.h"
 #include "ffcc/map.h"
 #include "ffcc/maphit.h"
+#include "ffcc/monobj_table.h"
 #include "ffcc/p_dbgmenu.h"
 #include "ffcc/partyobj.h"
 #include "ffcc/sound.h"
@@ -42,30 +43,6 @@ extern float FLOAT_80331A40;
 extern double DOUBLE_803319E0;
 extern double DOUBLE_80331A10;
 extern double DOUBLE_80331A18;
-struct MonAiFuncTable;
-extern "C" MonAiFuncTable funcsDefault;
-extern "C" MonAiFuncTable funcsGiantCrab;
-extern "C" MonAiFuncTable funcsOrcKing;
-extern "C" MonAiFuncTable funcsGolem;
-extern "C" MonAiFuncTable funcsArmstrong;
-extern "C" MonAiFuncTable funcsGoblinKing;
-extern "C" MonAiFuncTable funcsMolbol;
-extern "C" MonAiFuncTable funcsLizardmanKing;
-extern "C" MonAiFuncTable funcsCaveWorm;
-extern "C" MonAiFuncTable funcsGigasLoad;
-extern "C" MonAiFuncTable funcsWifeLamia;
-extern "C" MonAiFuncTable funcsMeteoParasite;
-extern "C" MonAiFuncTable funcsMeteoParasiteC;
-extern "C" MonAiFuncTable funcsDuct;
-extern "C" MonAiFuncTable funcsDragonZombie;
-extern "C" MonAiFuncTable funcsAntrion;
-extern "C" MonAiFuncTable funcsTetsukyojin;
-extern "C" MonAiFuncTable funcsLich;
-extern "C" MonAiFuncTable funcsSaw;
-extern "C" MonAiFuncTable funcsRamoe;
-extern "C" MonAiFuncTable funcsLastBoss;
-extern "C" MonAiFuncTable funcsLKShooter;
-
 static const char s_monObjAiStateFmt[] = "%d:%c %d:%c";
 static const char s_monObjDistanceFmt[] = "%d %d %d";
 

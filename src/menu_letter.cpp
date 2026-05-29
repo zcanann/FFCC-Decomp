@@ -538,15 +538,7 @@ bool CMenuPcs::LetterOpen()
 		*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x22) = 0;
 		*reinterpret_cast<char*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0xB) = 1;
 		iVar4 = SingGetLetterAttachflg();
-		if (iVar4 < 0) {
-			*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x26) = 0;
-			*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x28) = 0;
-			*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x34) = 0;
-			s_AttachItem = 0;
-			s_AttachMode = 0;
-			s_Attach = 2;
-			s_SelLetter = 0;
-		} else {
+		if (iVar4 >= 0) {
 			memset(GetLetterAnimStorage(this), 0, sizeof(*GetLetterAnimStorage(this)));
 			fVar1 = FLOAT_803330f8;
 			iVar4 = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + 8;
@@ -573,6 +565,14 @@ bool CMenuPcs::LetterOpen()
 			*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x28) = static_cast<s16>(s_BackUpCur[1]);
 			*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x34) = static_cast<s16>(s_BackUpTopPos);
 			s_SelLetter = static_cast<s16>(s_BackUpCur[0] + s_BackUpTopPos);
+		} else {
+			*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x26) = 0;
+			*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x28) = 0;
+			*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x34) = 0;
+			s_AttachItem = 0;
+			s_AttachMode = 0;
+			s_Attach = 2;
+			s_SelLetter = 0;
 		}
 		s_BackUpCur[0] = 0;
 		s_BackUpCur[1] = 0;

@@ -1268,12 +1268,8 @@ void CGCharaObj::setSta(int staIndex, int value)
 	unsigned char* script9 = reinterpret_cast<unsigned char*>(m_scriptHandle[9]);
 	bool isIceJ = isMon && *reinterpret_cast<short*>(script9 + 0xFC) == 0xB;
 	int* slots = m_particleSlots;
-	int modelPdtNo = -1;
 	float monsterScale = 1.0f;
 
-	if (m_charaModelHandle->m_pdtLoadRef != 0) {
-		modelPdtNo = reinterpret_cast<int*>(m_charaModelHandle->m_pdtLoadRef)[2];
-	}
 	if (isMon) {
 		monsterScale = static_cast<float>(*reinterpret_cast<unsigned short*>(script9 + 0x1B4)) * 0.01f;
 	}
@@ -1290,6 +1286,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 					}
 				}
 				if (isIceJ) {
+					int modelPdtNo = CharaObjGetModelPdtNo(this);
 					putParticleBindTrace((modelPdtNo << 8) | 0x15, slots[2], this, 1.0f, 0);
 				} else {
 					putParticle(0x10A, slots[2], this, 20.0f * m_attackColRadius, 0);
@@ -1305,6 +1302,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 					}
 				}
 				if (isIceJ) {
+					int modelPdtNo = CharaObjGetModelPdtNo(this);
 					putParticle((modelPdtNo << 8) | 0x14, slots[6], this, 1.0f, 0);
 				} else {
 					putParticle(0x12A, slots[6], this, 20.0f * m_attackColRadius, 0);
@@ -1334,6 +1332,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 					}
 				}
 				if (isIceJ) {
+					int modelPdtNo = CharaObjGetModelPdtNo(this);
 					putParticle((modelPdtNo << 8) | 0x17, slots[7], this, 1.0f, 0);
 				} else {
 					putParticle(0x130, slots[7], this, 20.0f * m_attackColRadius, 0);
@@ -1407,6 +1406,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 					}
 				}
 				if (isIceJ) {
+					int modelPdtNo = CharaObjGetModelPdtNo(this);
 					putParticle((modelPdtNo << 8) | 0x16, 0, this, 1.0f, 0);
 				} else {
 					putParticle(0x10B, 0, this, 20.0f * m_attackColRadius, 0);

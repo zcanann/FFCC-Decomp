@@ -13,6 +13,7 @@
 #include "ffcc/p_minigame.h"
 #include "ffcc/pad.h"
 #include "ffcc/sound.h"
+#include "ffcc/vector.h"
 #include <math.h>
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
@@ -2809,6 +2810,7 @@ void CGCharaObj::StaticFrame()
 void CGCharaObj::combi2()
 {
 	CGPartyObj* candidates[5];
+	CVector comboCenter;
 	int candidateCount = 0;
 
 	for (int i = 0; i < 4; i++) {
@@ -2916,12 +2918,12 @@ void CGCharaObj::combi2()
 
 	const unsigned short comboCmd = comboData[0xC];
 	const bool isSharedResult = comboData[participantCount * 3 - 3] != 0x1F8;
-	Vec comboCenter = {0.0f, 0.0f, 0.0f};
 	if (isSharedResult) {
+		comboCenter.Identity();
 		for (int i = 0; i < participantCount; i++) {
-			PSVECAdd(&comboCenter, &CharaObjComboCenter(candidates[i]), &comboCenter);
+			PSVECAdd(reinterpret_cast<Vec*>(&comboCenter), &CharaObjComboCenter(candidates[i]), reinterpret_cast<Vec*>(&comboCenter));
 		}
-		PSVECScale(&comboCenter, &comboCenter, 1.0f / static_cast<float>(participantCount));
+		PSVECScale(reinterpret_cast<Vec*>(&comboCenter), reinterpret_cast<Vec*>(&comboCenter), 1.0f / static_cast<float>(participantCount));
 	}
 
 	System.Printf(const_cast<char*>(lbl_801DC590), System.m_frameCounter, comboCmd);

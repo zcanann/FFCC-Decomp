@@ -4330,10 +4330,8 @@ CFlatRuntime::CVal* CFlatRuntime2::onSystemVal(CFlatRuntime::CObject*, int syste
         int bitIndex = systemValue + 0x9F3;
         int byteIndex = bitIndex / 8 + 8;
         unsigned int mask = 1U << (bitIndex % 8);
-        FlatLastResult(this) =
-            ((static_cast<unsigned int>(static_cast<unsigned char>(gameWork.m_eventFlags[byteIndex])) & mask) != 0)
-                ? 1U
-                : 0U;
+        unsigned int flag = static_cast<unsigned int>(static_cast<unsigned char>(gameWork.m_eventFlags[byteIndex])) & mask;
+        FlatLastResult(this) = (flag | -flag) >> 31;
     } else if (systemValue <= -200) {
         FlatLastResult(this) = static_cast<unsigned int>(
             static_cast<int>(static_cast<short>(Game.m_caravanWorkArr[0].m_artifacts[systemValue + 0x1E])));
@@ -4466,7 +4464,8 @@ void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack,
             int bitIndex = systemValue + 0x9F3;
             unsigned char* flagByte = reinterpret_cast<unsigned char*>(gameWork.m_eventFlags) + bitIndex / 8;
             unsigned int mask = 1U << (bitIndex % 8);
-            unsigned int value = (*flagByte & mask) != 0;
+            unsigned int flag = *flagByte & mask;
+            unsigned int value = (flag | -flag) >> 31;
             stack[-1].m_word = value;
 
             if (setMode == 0) {

@@ -2344,6 +2344,11 @@ void CGPartyObj::onStatMagic()
 		changeStat(0, 0, 0);
 		return;
 	}
+	unsigned short trig = getPadTrigForSlot(static_cast<unsigned char>(m_animStateMisc));
+	if ((trig & 0x200) != 0 && m_subState < 2 && magicId != 0x103) {
+		changeStat(0, 0, 0);
+		return;
+	}
 
 	if (isLoopAnim() != 0) {
 		changeStat(0, 0, 0);

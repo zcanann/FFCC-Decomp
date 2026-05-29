@@ -3631,7 +3631,7 @@ void CGPartyObj::changeMotionMode(int mode)
 			*reinterpret_cast<float*>(self + 0x694) = FLOAT_80331A7C;
 			m_bgColMask &= 0xFFFEFFF1;
 		} else {
-			*reinterpret_cast<float*>(self + 0x694) = 0.5f;
+			*reinterpret_cast<float*>(self + 0x694) = FLOAT_80331a54;
 			m_bgColMask |= 0x1000E;
 		}
 	}

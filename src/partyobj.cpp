@@ -4160,15 +4160,15 @@ void CGPartyObj::gpmMove()
 		break;
 	}
 
-	float frameScale = static_cast<float>(Game.m_gameWork.m_frameCounter % 100) / 100.0f;
-	float pressureScale = 1.0f;
+	float frameScale = static_cast<float>(CharaGhostValue(0x2054)) / FLOAT_80331A50;
+	float pressureScale = FLOAT_80331a54;
 	if (stageMode == 2) {
-		pressureScale = 0.5f + frameScale * 0.5f;
+		pressureScale = FLOAT_80331A58 * frameScale + FLOAT_80331A58;
 	} else if (stageMode == 1) {
-		pressureScale = 0.5f + (1.0f - frameScale) * 0.5f;
+		pressureScale = FLOAT_80331A58 * (FLOAT_80331a54 - frameScale) + FLOAT_80331A58;
 	}
 
-	int pressureLimit = static_cast<int>(100.0f * pressureScale);
+	int pressureLimit = static_cast<int>(FLOAT_80331A5C * pressureScale);
 	if (sGhostPartyWork.carrySpeed <= 0.5f) {
 		if (*reinterpret_cast<float*>(self + 0x6F0) == 0.0f) {
 			sGhostPartyWork.pressure -= 4;

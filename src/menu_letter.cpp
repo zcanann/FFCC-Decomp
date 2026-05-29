@@ -2163,7 +2163,8 @@ int CMenuPcs::LetterCtrlCur()
 				CMes::MakeAgbString(workText, srcText, *reinterpret_cast<u16*>(caravanWork + 0x3E2), 0);
 
 				char* line = workText;
-				for (int i = 0; i < 8; ++i) {
+				int i = 0;
+				do {
 					char* newline = strchr(line, '\n');
 					if (newline != 0) {
 						*newline = '\0';
@@ -2174,8 +2175,9 @@ int CMenuPcs::LetterCtrlCur()
 					if (newline == 0) {
 						break;
 					}
+					++i;
 					line = newline + 1;
-				}
+				} while (i < 7);
 
 				delete[] srcText;
 				delete[] workText;

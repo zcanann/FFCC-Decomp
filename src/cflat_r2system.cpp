@@ -121,6 +121,12 @@ static const char s_cflatAddNoFreeWaveFmt[] =
 static const char s_cflatLoadCompleted[] = "\212\256\227\271";
 static const char s_cflatLoadNotCompleted[] = "\226\242\212\256\227\271";
 
+static inline int RemapPadSlot(CPad* pad, unsigned int padIndex)
+{
+    int activePad = pad->_448_4_;
+    return static_cast<int>(padIndex & ~(static_cast<int>(~((activePad - padIndex) | (padIndex - activePad))) >> 31));
+}
+
 static inline void StoreSetU32(CFlatRuntime::CStack* stack, int setMode, unsigned int* value)
 {
     stack[-1].m_word = *value;
@@ -721,7 +727,7 @@ done_check:
     if (isInvalidPad) {
         result = 0;
     } else {
-        int slot = (_448_4_ == padIndex) ? 0 : static_cast<int>(padIndex);
+        int slot = RemapPadSlot(this, padIndex);
         result = GetPadInputs()[slot].buttonDown[1];
     }
 
@@ -756,7 +762,7 @@ done_check:
         return FLOAT_80330B30;
     }
 
-    int slot = (_448_4_ == padIndex) ? 0 : static_cast<int>(padIndex);
+    int slot = RemapPadSlot(this, padIndex);
     return GetPadInputs()[slot].substickYF;
 }
 
@@ -788,7 +794,7 @@ done_check:
         return FLOAT_80330B30;
     }
 
-    int slot = (_448_4_ == padIndex) ? 0 : static_cast<int>(padIndex);
+    int slot = RemapPadSlot(this, padIndex);
     return GetPadInputs()[slot].substickXF;
 }
 
@@ -820,7 +826,7 @@ done_check:
         return FLOAT_80330B30;
     }
 
-    int slot = (_448_4_ == padIndex) ? 0 : static_cast<int>(padIndex);
+    int slot = RemapPadSlot(this, padIndex);
     return GetPadInputs()[slot].stickYF;
 }
 
@@ -852,7 +858,7 @@ done_check:
         return FLOAT_80330B30;
     }
 
-    int slot = (_448_4_ == padIndex) ? 0 : static_cast<int>(padIndex);
+    int slot = RemapPadSlot(this, padIndex);
     return GetPadInputs()[slot].stickXF;
 }
 
@@ -884,7 +890,7 @@ done_check:
     if (isInvalidPad) {
         result = 0;
     } else {
-        int slot = (_448_4_ == padIndex) ? 0 : static_cast<int>(padIndex);
+        int slot = RemapPadSlot(this, padIndex);
         result = GetPadInputs()[slot].repeatButton;
     }
 
@@ -919,7 +925,7 @@ done_check:
     if (isInvalidPad) {
         result = 0;
     } else {
-        int slot = (_448_4_ == padIndex) ? 0 : static_cast<int>(padIndex);
+        int slot = RemapPadSlot(this, padIndex);
         result = GetPadInputs()[slot].button[0];
     }
 

@@ -3486,13 +3486,14 @@ void CGPartyObj::InitFinished()
  */
 unsigned int CGPartyObj::IsDispRader()
 {
+	int result = 0;
 	if (CGObject::IsDispRader()) {
 		if (((int)((unsigned int)(unsigned char)m_weaponNodeFlags << 24) < 0) &&
 		    ((int)((unsigned int)(unsigned char)(m_weaponNodeFlags >> 8) << 24) < 0)) {
-			return 1;
+			result = 1;
 		}
 	}
-	return 0;
+	return result;
 }
 
 /*

@@ -3628,7 +3628,7 @@ void CGPartyObj::changeMotionMode(int mode)
 	if (m_scriptHandle != nullptr) {
 		endPSlotBit(0x10000);
 		if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
-			*reinterpret_cast<float*>(self + 0x694) = 1.0f;
+			*reinterpret_cast<float*>(self + 0x694) = FLOAT_80331A7C;
 			m_bgColMask &= 0xFFFEFFF1;
 		} else {
 			*reinterpret_cast<float*>(self + 0x694) = 0.5f;

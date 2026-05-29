@@ -1860,7 +1860,7 @@ void CGCharaObj::addHp(int delta, CGPrgObj* sourceObj)
 			next = maxHp;
 		}
 		*hp = static_cast<unsigned short>(next);
-	} else if (hpValue != 0) {
+	} else if (delta < 0 && hpValue != 0) {
 		if ((cid & 0x6D) == 0x6D && (CFlatGameFlags() & CFlatGameFlag_Bit0) != 0 &&
 		    static_cast<int>(hpValue + delta) < 1) {
 			delta = -(static_cast<int>(hpValue) - 1);

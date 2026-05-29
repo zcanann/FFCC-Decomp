@@ -12,6 +12,7 @@ extern const float FLOAT_80330570 = 127.0f;
 extern const float FLOAT_80330588;
 extern const float FLOAT_8033058C;
 extern const float FLOAT_80330590;
+extern const double DOUBLE_80330598;
 }
 #include <dolphin/mtx.h>
 #include <string.h>
@@ -523,10 +524,18 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* work, PYmMegaBirthShpT
                 -(LoadFloat(FLOAT_80330568) * (Math.RandF() * (speedRandRange * Math.RandF() * Math.RandF())) - speedRandRange) - speedRandHalf;
             particleData->m_matrix[0][2] =
                 -(LoadFloat(FLOAT_80330568) * (Math.RandF() * (speedRandRange * Math.RandF() * Math.RandF())) - speedRandRange) - speedRandHalf;
-        } else {
+        } else if (randType == 2) {
             particleData->m_matrix[0][0] = Math.RandF() * (speedRandRange * Math.RandF()) - speedRandHalf;
             particleData->m_matrix[0][1] = Math.RandF() * (speedRandRange * Math.RandF()) - speedRandHalf;
             particleData->m_matrix[0][2] = Math.RandF() * (speedRandRange * Math.RandF()) - speedRandHalf;
+        } else if (randType == 4) {
+            particleData->m_matrix[0][0] = Math.RandF() * (Math.RandF() * (speedRandRange * Math.RandF() * Math.RandF())) - speedRandHalf;
+            particleData->m_matrix[0][1] = Math.RandF() * (Math.RandF() * (speedRandRange * Math.RandF() * Math.RandF())) - speedRandHalf;
+            particleData->m_matrix[0][2] = Math.RandF() * (Math.RandF() * (speedRandRange * Math.RandF() * Math.RandF())) - speedRandHalf;
+        } else {
+            particleData->m_matrix[0][0] = speedRandRange * Math.RandF() - speedRandHalf;
+            particleData->m_matrix[0][1] = speedRandRange * Math.RandF() - speedRandHalf;
+            particleData->m_matrix[0][2] = speedRandRange * Math.RandF() - speedRandHalf;
         }
 
         particleData->m_matrix[0][0] *= *(float*)(paramBytes + 0x58);
@@ -547,7 +556,7 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* work, PYmMegaBirthShpT
                 float vy;
                 float vz;
 
-                if (param->m_randType == 0) {
+                if (param->m_randType == 0 || param->m_randType > 5) {
                     if ((u16)work->m_pathIndex >= (u16)pathInfo[1]) {
                         work->m_pathIndex = 0;
                     }
@@ -566,13 +575,13 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* work, PYmMegaBirthShpT
                         Math.RandF();
                         sampleT = Math.RandF();
                     } else if (param->m_randType == 3) {
-                        sampleT = FLOAT_8033058C - (Math.RandF() * Math.RandF() * Math.RandF());
+                        sampleT = static_cast<float>(DOUBLE_80330598 - (Math.RandF() * Math.RandF() * Math.RandF()));
                     } else if (param->m_randType == 5) {
-                        sampleT = FLOAT_8033058C - (Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF());
-                    } else if (param->m_randType < 5) {
-                        sampleT = Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF();
-                    } else {
+                        sampleT = static_cast<float>(DOUBLE_80330598 - (Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF()));
+                    } else if (param->m_randType == 2) {
                         sampleT = Math.RandF() * Math.RandF() * Math.RandF();
+                    } else {
+                        sampleT = Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF();
                     }
 
                     if ((u16)work->m_pathIndex >= (u16)pathInfo[1]) {
@@ -609,7 +618,7 @@ void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* work, PYmMegaBirthShpT
         } else if (randType == 2) {
             scale = Math.RandF() * (speedRandRange * Math.RandF());
         } else if (randType == 4) {
-            scale = Math.RandF() * (Math.RandF() * (speedRandRange * Math.RandF()));
+            scale = Math.RandF() * (Math.RandF() * (speedRandRange * Math.RandF() * Math.RandF()));
         } else if (randType == 5) {
             scale = -(LoadFloat(FLOAT_80330568) * (Math.RandF() * (speedRandRange * Math.RandF() * Math.RandF())) - speedRandRange);
         }

@@ -1298,6 +1298,11 @@ void CGPartyObj::command()
 		changeStat(0x0E, 0, 0);
 		*reinterpret_cast<CGPartyObj**>(reinterpret_cast<unsigned char*>(party.target) + 0x550) = this;
 		reinterpret_cast<CGPrgObj*>(party.target)->changeStat(0x0E, 0, 0);
+		party.commandFlags |= 0x80;
+		CFlatRuntime::CStack stack[2];
+		stack[0].m_word = secondaryCommand;
+		stack[1].m_word = party.target != nullptr ? *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(party.target) + 0x30) : 0;
+		gCFlatRuntime().SystemCall(this, 2, 0x14, 2, stack, 0);
 		commandFinished();
 		return;
 	}

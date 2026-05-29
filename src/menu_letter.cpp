@@ -1559,7 +1559,7 @@ bool CMenuPcs::LetterConfirmOpen()
 
 		const char* left = GetMenuStr(0x23);
 		const char* right = GetMenuStr(0x24);
-		const char* reply = "Reply";
+		const char* reply = s_ReplyStr;
 		if (languageId == 2) {
 			sprintf(lines[1], "%s%s%s", left, reply, right);
 		} else {
@@ -1570,10 +1570,9 @@ bool CMenuPcs::LetterConfirmOpen()
 		if (s_Attach != 2) {
 			if (languageId == 2) {
 				if (s_Attach == 0) {
-					int itemValue = flatData->m_tabl[0].m_numEntries > s_AttachItem * 5 + 4
-									 ? s_AttachItem * 5 + 4
-									 : 0;
-					sprintf(lines[2], "%s%d%s", left, itemValue, right);
+					sprintf(lines[2], "%s%d%s", left,
+					        reinterpret_cast<int*>(flatData->m_tabl[0].m_strings)[s_AttachItem * 5 + 4],
+					        right);
 				} else if (s_Attach == 1) {
 					sprintf(lines[2], "%d%s", s_AttachItem, GetMenuStr(4));
 				}

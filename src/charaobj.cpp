@@ -105,7 +105,7 @@ static void CharaObjEndSlots(CGCharaObj* charaObj, unsigned int slotMask)
 
 static int CharaObjGetModelPdtNo(CGCharaObj* charaObj)
 {
-	if (charaObj->m_charaModelHandle == 0 || charaObj->m_charaModelHandle->m_pdtLoadRef == 0) {
+	if (charaObj->m_charaModelHandle->m_pdtLoadRef == 0) {
 		return -1;
 	}
 	return reinterpret_cast<int*>(charaObj->m_charaModelHandle->m_pdtLoadRef)[2];

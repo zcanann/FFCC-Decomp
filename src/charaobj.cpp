@@ -625,17 +625,10 @@ void CGCharaObj::onFramePreCalc()
 			&m_targetDelta);
 		m_targetDist = PSVECMag(&m_targetDelta);
 		CharaObjTargetAngle(this) = CharaObjGetRotateY(m_targetDelta);
-	} else {
-		m_targetDelta.x = 0.0f;
-		m_targetDelta.y = 0.0f;
-		m_targetDelta.z = 0.0f;
-		m_targetDist = 0.0f;
-		CharaObjTargetAngle(this) = 0.0f;
 	}
 
 	for (int i = 0; i < 4; i++) {
 		CGPartyObj* partyObj = Game.m_partyObjArr[i];
-		m_partyRank[i] = 0;
 		if (partyObj == 0) {
 			m_partyDistance[i] = 0.0f;
 			m_partyDelta[i].x = 0.0f;
@@ -648,6 +641,7 @@ void CGCharaObj::onFramePreCalc()
 			m_partyAngle[i] = CharaObjGetRotateY(m_partyDelta[i]);
 		}
 
+		m_partyRank[i] = 0;
 		for (int j = 0; j < i; j++) {
 			if (m_partyDistance[i] == 0.0f) {
 				m_partyRank[i] += 1;
@@ -662,17 +656,15 @@ void CGCharaObj::onFramePreCalc()
 	}
 
 	m_pushScale = 1.0f;
-	if (m_scriptHandle != 0) {
-		unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
-		if (*reinterpret_cast<short*>(script + 0x4E) != 0) {
-			m_pushScale *= CharaObjGetStatusMultiplier(0x34);
-		}
-		if (*reinterpret_cast<short*>(script + 0x4C) != 0) {
-			m_pushScale *= CharaObjGetStatusMultiplier(0x36);
-		}
-		if (*reinterpret_cast<short*>(script + 0x40) != 0) {
-			m_pushScale *= CharaObjGetStatusMultiplier(0x40);
-		}
+	unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
+	if (*reinterpret_cast<short*>(script + 0x4E) != 0) {
+		m_pushScale *= CharaObjGetStatusMultiplier(0x34);
+	}
+	if (*reinterpret_cast<short*>(script + 0x4C) != 0) {
+		m_pushScale *= CharaObjGetStatusMultiplier(0x36);
+	}
+	if (*reinterpret_cast<short*>(script + 0x40) != 0) {
+		m_pushScale *= CharaObjGetStatusMultiplier(0x40);
 	}
 	if (m_pushScale > 1.5f) {
 		m_pushScale = 1.5f;
@@ -690,7 +682,13 @@ void CGCharaObj::onFramePreCalc()
 			break;
 	}
 
-	unsigned int cid = GetCID();
+	if (*reinterpret_cast<short*>(script + 0x3E) != 0 ||
+	    *reinterpret_cast<short*>(script + 0x50) != 0 ||
+	    *reinterpret_cast<short*>(script + 0x44) != 0) {
+		push += 0x19;
+	}
+
+	unsigned short cid = GetCID();
 	if (CharaObjIsPlayerCid(cid)) {
 		if (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6F0) != 0) {
 			push += 10;
@@ -704,7 +702,7 @@ void CGCharaObj::onFramePreCalc()
 	}
 
 	m_pushParamB = static_cast<unsigned char>(push < 0x19 ? push : 0x19);
-	if ((cid & 0xAD) == 0xAD && *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6D8) == 4) {
+	if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD && *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6D8) == 4) {
 		m_pushParamB = 100;
 	}
 

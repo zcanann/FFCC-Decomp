@@ -715,7 +715,14 @@ void CGCharaObj::onFramePreCalc()
 		if (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6F0) != 0) {
 			push += 10;
 		}
-		if (CharaObjGetPadHeld(m_animStateMisc) != 0) {
+		unsigned char slot = m_animStateMisc;
+		int padHeld = 0;
+		bool useDebugPad = (Pad._452_4_ != 0) || ((slot == 0) && (Pad._448_4_ != -1));
+		if (!useDebugPad) {
+			int idx = slot & ~((~(Pad._448_4_ - static_cast<int>(slot) | static_cast<int>(slot) - Pad._448_4_)) >> 31);
+			padHeld = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Pad) + 0x54 + idx * 0x54);
+		}
+		if (padHeld != 0) {
 			push += 0x19;
 		}
 		if (static_cast<signed char>(reinterpret_cast<unsigned char*>(this)[0x9B]) >= 0) {

@@ -558,48 +558,45 @@ void CGCharaObj::onCancelStat(int)
 void CGCharaObj::onFramePostCalc()
 {
 	unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
-	if (script != 0) {
-		if (*reinterpret_cast<short*>(script + 0x42) != 0) {
-			unsigned short tickDiv = *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x3A);
-			if (m_stateTick != 0 && tickDiv != 0 && (m_stateTick % static_cast<int>(tickDiv)) == 0) {
-				if (*reinterpret_cast<unsigned short*>(script + 0x1C) > 1 &&
-				    (CFlatGameFlags() & CFlatGameFlag_Bit5) == 0) {
-					playSe3D(0x19, 0x32, 0x96, 0, 0);
-					addHp(-1, 0);
-				}
+	if (*reinterpret_cast<short*>(script + 0x42) != 0) {
+		unsigned short tickDiv = *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x3A);
+		if (m_stateTick != 0 && (m_stateTick % static_cast<int>(tickDiv)) == 0) {
+			if (*reinterpret_cast<unsigned short*>(script + 0x1C) > 1 &&
+			    (CFlatGameFlags() & CFlatGameFlag_Bit5) == 0) {
+				playSe3D(0x19, 0x32, 0x96, 0, 0);
+				addHp(-1, 0);
 			}
-		}
-
-		unsigned int cid = GetCID();
-		for (int i = 0; i < 0x27; i++) {
-			int statusValue = static_cast<int>(*reinterpret_cast<short*>(script + 0x3E + i * 2)) - 1;
-			if (statusValue != 0 && i == 2) {
-				m_stateTick += 1;
-			}
-
-			if (CharaObjIsPlayerCid(cid) &&
-			    (i == 0 || i == 3 || i == 4 || i == 9) &&
-			    statusValue > 0) {
-				unsigned short padMask = CharaObjGetPadStatusReduceMask(m_animStateMisc);
-				if ((padMask & 0xF) != 0) {
-					statusValue -= *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x3C);
-				}
-			}
-
-			setSta(i, statusValue);
-		}
-
-		if (*reinterpret_cast<short*>(script + 0x3E) == 0 &&
-		    *reinterpret_cast<short*>(script + 0x14) == 0 &&
-		    *reinterpret_cast<short*>(script + 0x11) == 0) {
-			m_displayFlags |= 2;
-		} else {
-			m_displayFlags &= ~2;
-			m_ignoreHit[0].m_flag &= 0x7F;
 		}
 	}
 
-	m_flags = static_cast<unsigned char>(m_flags + 1);
+	for (int i = 0; i < 0x27; i++) {
+		int statusValue = static_cast<int>(*reinterpret_cast<unsigned short*>(script + 0x3E + i * 2)) - 1;
+		if (statusValue != 0 && i == 2) {
+			m_stateTick += 1;
+		}
+
+		if (CharaObjIsPlayerCid(GetCID()) &&
+		    (i == 0 || i == 3 || i == 4 || i == 9) &&
+		    statusValue > 0) {
+			unsigned short padMask = CharaObjGetPadStatusReduceMask(m_animStateMisc);
+			if ((padMask & 0xF) != 0) {
+				statusValue -= *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x3C);
+			}
+		}
+
+		setSta(i, statusValue);
+	}
+
+	if (*reinterpret_cast<short*>(script + 0x3E) == 0 &&
+	    *reinterpret_cast<short*>(script + 0x14) == 0 &&
+	    *reinterpret_cast<short*>(script + 0x11) == 0) {
+		m_displayFlags |= 2;
+	} else {
+		m_displayFlags &= ~2;
+		reinterpret_cast<unsigned char*>(this)[0x63C] &= 0x7F;
+	}
+
+	*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x38) += 1;
 
 	for (int i = 0; i < 4; i++) {
 		IgnoreHitSlot& slot = m_ignoreHit[i];

@@ -56,6 +56,7 @@ extern float FLOAT_80331A58;
 extern float FLOAT_80331A5C;
 extern float FLOAT_80331a70;
 extern float FLOAT_80331a74;
+extern float FLOAT_80331A7C;
 extern float FLOAT_80331A88;
 extern float FLOAT_80331a9c;
 extern float FLOAT_80331aa0;
@@ -4282,7 +4283,7 @@ void CGPartyObj::gpmMove()
 			return;
 		}
 
-		float limit = (sGhostPartyWork.activeTrailCount != 0) ? 0.75f : 0.8f;
+		float limit = (sGhostPartyWork.activeTrailCount != 0) ? FLOAT_80331A7C : 0.8f;
 		if (Game.unkFloat_0xca10 * limit > pathDist) {
 			if ((leader->m_lastStateId != 2 && leader->m_lastStateId != 6) ||
 			    leader->m_subState != 1 ||

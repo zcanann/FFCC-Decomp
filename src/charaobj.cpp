@@ -506,21 +506,21 @@ void CGCharaObj::onCancelStat(int)
 			if (state == 2) {
 				for (int i = 0; i < 0x16; i++) {
 					if (((1U << i) & 0x18U) != 0) {
-						gCFlatRuntime2.EndParticleSlot(m_particleSlots[i], 1);
+						CFlatRuntime2Storage().EndParticleSlot(m_particleSlots[i], 1);
 					}
 				}
 			}
 		} else if (state == 0x12) {
 			for (int i = 0; i < 0x16; i++) {
 				if (((1U << i) & 1U) != 0) {
-					gCFlatRuntime2.EndParticleSlot(m_particleSlots[i], 1);
+					CFlatRuntime2Storage().EndParticleSlot(m_particleSlots[i], 1);
 				}
 			}
 		}
 	} else {
 		for (int i = 0; i < 0x16; i++) {
 			if (((1U << i) & 0x138U) != 0) {
-				gCFlatRuntime2.EndParticleSlot(m_particleSlots[i], 1);
+				CFlatRuntime2Storage().EndParticleSlot(m_particleSlots[i], 1);
 			}
 		}
 		m_damageParticle = -1;

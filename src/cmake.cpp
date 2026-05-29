@@ -2436,9 +2436,6 @@ void CMenuPcs::CmakeTribeDraw()
 
     for (int i = 0; i < 4; i++) {
         const char* txt = GetTribeStr(i);
-        if (txt == 0) {
-            txt = "";
-        }
         tribeFont->SetPosX(FLOAT_80333284);
         tribeFont->SetPosY(0x88 + i * 0x1C - FLOAT_803332f4);
         tribeFont->Draw(txt);
@@ -2459,9 +2456,6 @@ void CMenuPcs::CmakeTribeDraw()
 
     for (int i = 0; i < 4; i++) {
         const char* txt = GetHairStr(hairBase + i);
-        if (txt == 0) {
-            txt = "";
-        }
         hairFont->SetPosX(FLOAT_8033331c);
         hairFont->SetPosY(0x88 + i * 0x1C - FLOAT_803332f4);
         hairFont->Draw(txt);

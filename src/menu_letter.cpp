@@ -1582,22 +1582,19 @@ bool CMenuPcs::LetterConfirmOpen()
 			}
 		}
 
-		const char* left = GetMenuStr(0x23);
-		const char* right = GetMenuStr(0x24);
-		const char* reply = s_ReplyStr;
 		if (languageId == 2) {
-			sprintf(lines[1], "%s%s%s", left, reply, right);
+			sprintf(lines[1], "%s%s%s", GetMenuStr(0x23), s_ReplyStr, GetMenuStr(0x24));
 		} else {
-			sprintf(lines[1], "%s%s%s", left, reply, right);
+			sprintf(lines[1], "%s%s%s", GetMenuStr(0x23), s_ReplyStr, GetMenuStr(0x24));
 		}
 
 		int lineCount = 2;
 		if (s_Attach != 2) {
 			if (languageId == 2) {
 				if (s_Attach == 0) {
-					sprintf(lines[2], "%s%d%s", left,
+					sprintf(lines[2], "%s%d%s", GetMenuStr(0x23),
 					        reinterpret_cast<int*>(flatData->m_tabl[0].m_strings)[s_AttachItem * 5 + 4],
-					        right);
+					        GetMenuStr(0x24));
 				} else if (s_Attach == 1) {
 					sprintf(lines[2], "%d%s", s_AttachItem, GetMenuStr(4));
 				}

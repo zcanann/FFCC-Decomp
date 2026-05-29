@@ -106,16 +106,17 @@ void CMenuPcs::FavoDraw()
 				float fillW = alpha * w;
 				if (fillW > FLOAT_80333040) {
 					if (tex == 0x32) {
-						float yStep = y;
+						int yStep = static_cast<int>(y);
 						float end = y + h;
-						while (yStep < end) {
-							float tileH = end - yStep;
-							if (tileH > FLOAT_80333044) {
-								tileH = FLOAT_80333044;
+						while (static_cast<float>(yStep) < end) {
+							int tileH = static_cast<int>(end - static_cast<float>(yStep));
+							if (static_cast<float>(tileH) > FLOAT_80333044) {
+								tileH = 0x20;
 							}
-							MenuPcs.DrawRect(static_cast<unsigned long>(entry->drawFlags), x, yStep, fillW, tileH, u,
-							                 v, colors, uvScale, FLOAT_80333048, FLOAT_80333040);
-							yStep += FLOAT_80333044;
+							MenuPcs.DrawRect(static_cast<unsigned long>(entry->drawFlags), x, static_cast<float>(yStep),
+							                 fillW, static_cast<float>(tileH), u, v, colors, uvScale, FLOAT_80333048,
+							                 FLOAT_80333040);
+							yStep += 0x20;
 						}
 					} else {
 						MenuPcs.DrawRect(static_cast<unsigned long>(entry->drawFlags), x, y, fillW, h, u, v, colors,
@@ -137,16 +138,17 @@ void CMenuPcs::FavoDraw()
 					colors[3].a = 0;
 					float remainW = (static_cast<float>(DOUBLE_80333050) / static_cast<float>(entry->duration)) * w;
 					if (tex == 0x32) {
-						float yStep = y;
+						int yStep = static_cast<int>(y);
 						float end = y + h;
-						while (yStep < end) {
-							float tileH = end - yStep;
-							if (tileH > FLOAT_80333044) {
-								tileH = FLOAT_80333044;
+						while (static_cast<float>(yStep) < end) {
+							int tileH = static_cast<int>(end - static_cast<float>(yStep));
+							if (static_cast<float>(tileH) > FLOAT_80333044) {
+								tileH = 0x20;
 							}
-							MenuPcs.DrawRect(static_cast<unsigned long>(entry->drawFlags), x, yStep, remainW, tileH,
-							                 u, v, colors, uvScale, FLOAT_80333048, FLOAT_80333040);
-							yStep += FLOAT_80333044;
+							MenuPcs.DrawRect(static_cast<unsigned long>(entry->drawFlags), x, static_cast<float>(yStep),
+							                 remainW, static_cast<float>(tileH), u, v, colors, uvScale, FLOAT_80333048,
+							                 FLOAT_80333040);
+							yStep += 0x20;
 						}
 					} else {
 						MenuPcs.DrawRect(static_cast<unsigned long>(entry->drawFlags), x, y, remainW, h, u, v,

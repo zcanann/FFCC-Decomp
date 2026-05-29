@@ -2392,7 +2392,9 @@ void CGPartyObj::onStatMagic()
 	}
 
 	moveCenterTargetParticle();
-	checkTargetParticle();
+	if (*reinterpret_cast<int*>(self + 0x664) != 0) {
+		checkTargetParticle();
+	}
 
 	int magicId = *reinterpret_cast<int*>(self + 0x560);
 	if (m_subState == 0 && m_subFrame == 0) {

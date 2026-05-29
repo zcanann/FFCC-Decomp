@@ -2709,8 +2709,6 @@ void CMenuPcs::CmakeJobDraw()
             FLOAT_80333254, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, 0.0f);
     }
 
-    DrawInit();
-
     int slot = static_cast<int>(MenuS16(this, 0x86A));
     int modelBlock = MenuS32(this, 0x814);
     if (*reinterpret_cast<int*>(modelBlock + (slot + 0x20) * 0x50) != 0) {

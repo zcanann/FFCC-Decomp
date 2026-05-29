@@ -1449,6 +1449,23 @@ void CGPartyObj::onFrameStat()
 			    (*(reinterpret_cast<unsigned char*>(&m_weaponNodeFlags) + 1) & 0xBF) | 0x40;
 			m_unk63C = (m_unk63C & 0x7F) | 0x80;
 		}
+		if (((MiniGamePcs.m_flags & 8) != 0) ||
+		    ((Game.unk_flat3_0xc7d0 != 0) &&
+		     (Joybus.GetCtrlMode(static_cast<char>(m_animStateMisc)) == 1) &&
+		     (static_cast<signed char>(m_unk63C) < 0) &&
+		     (static_cast<signed char>(m_weaponNodeFlags >> 8) < 0) &&
+		     ((*(reinterpret_cast<unsigned char*>(&m_weaponNodeFlags) + 1) & 0x40) != 0) &&
+		     (static_cast<signed char>(PartyData(this).partyFlags) >= 0))) {
+			if ((m_targetDist > FLOAT_80331a74 * Game.unkFloat_0xca10) &&
+			    (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E) == 0) &&
+			    (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x50) == 0) &&
+			    (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x44) == 0) &&
+			    (Game.m_gameWork.m_bossArtifactStageIndex != 0x17)) {
+				Vec moveVec;
+				PSVECSubtract(reinterpret_cast<Vec*>(Game.unk_flat3_0xc7d0 + 0x15C), &m_worldPosition, &moveVec);
+				moveVector(&moveVec, m_moveBaseSpeed, 0x0F);
+			}
+		}
 		break;
 	case 2:
 		onStatMagic();

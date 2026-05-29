@@ -809,7 +809,7 @@ int CMenuPcs::LetterCtrl()
 			int panelCount = static_cast<int>(**reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850));
 			s16* panel = GetLetterPanelBase(this);
 			int frame = static_cast<int>(*reinterpret_cast<s16*>(state + 0x22));
-			int closeDone = 0;
+			done = 0;
 			for (int i = 0; i < panelCount; ++i, panel += 0x20) {
 				float f = FLOAT_803330bc;
 				if (*reinterpret_cast<int*>(panel + 0x12) <= frame) {
@@ -829,14 +829,14 @@ int CMenuPcs::LetterCtrl()
 							    (*reinterpret_cast<float*>(panel + 0x1E) - static_cast<float>(panel[1])) * f;
 						}
 					} else {
-						++closeDone;
+						++done;
 						*reinterpret_cast<float*>(panel + 8) = FLOAT_803330bc;
 						*reinterpret_cast<float*>(panel + 0x18) = f;
 						*reinterpret_cast<float*>(panel + 0x1A) = f;
 					}
 				}
 			}
-			if (panelCount == closeDone) {
+			if (panelCount == done) {
 				LetterInit1();
 				*reinterpret_cast<s16*>(state + 0x30) = 1;
 				*reinterpret_cast<s16*>(state + 0x12) = 0;

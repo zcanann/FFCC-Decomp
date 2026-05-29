@@ -2570,35 +2570,26 @@ unsigned short CMenuPcs::CmakeJobCtrl()
                 unsigned char* group = reinterpret_cast<unsigned char*>(&Game);
                 int slot = 0;
                 for (int groupCount = 2; groupCount != 0; groupCount--) {
-                    if ((slot != static_cast<int>(MenuS16(this, 0x86A))) &&
-                        (*reinterpret_cast<int*>(group + 0x1794) != 0) &&
-                        (*(group + 0x1F96) != 1) &&
-                        (*reinterpret_cast<int*>(group + 0x179C) == static_cast<int>(job))) {
-                        duplicateSlot = slot;
-                        break;
-                    }
-
-                    if (((slot + 1) != static_cast<int>(MenuS16(this, 0x86A))) &&
-                        (*reinterpret_cast<int*>(group + 0x23C4) != 0) &&
-                        (*(group + 0x2BC6) != 1) &&
-                        (*reinterpret_cast<int*>(group + 0x23CC) == static_cast<int>(job))) {
-                        duplicateSlot = slot + 1;
-                        break;
-                    }
-
-                    if (((slot + 2) != static_cast<int>(MenuS16(this, 0x86A))) &&
-                        (*reinterpret_cast<int*>(group + 0x2FF4) != 0) &&
-                        (*(group + 0x37F6) != 1) &&
-                        (*reinterpret_cast<int*>(group + 0x2FFC) == static_cast<int>(job))) {
-                        duplicateSlot = slot + 2;
-                        break;
-                    }
-
-                    if (((slot + 3) != static_cast<int>(MenuS16(this, 0x86A))) &&
-                        (*reinterpret_cast<int*>(group + 0x3C24) != 0) &&
-                        (*(group + 0x4426) != 1) &&
-                        (*reinterpret_cast<int*>(group + 0x3C2C) == static_cast<int>(job))) {
-                        duplicateSlot = slot + 3;
+                    if (((slot != static_cast<int>(MenuS16(this, 0x86A))) &&
+                         (*reinterpret_cast<int*>(group + 0x1794) != 0) &&
+                         (*(group + 0x1F96) != 1) &&
+                         (duplicateSlot = slot,
+                          *reinterpret_cast<int*>(group + 0x179C) == static_cast<int>(job))) ||
+                        (((slot + 1) != static_cast<int>(MenuS16(this, 0x86A))) &&
+                         (*reinterpret_cast<int*>(group + 0x23C4) != 0) &&
+                         (*(group + 0x2BC6) != 1) &&
+                         (duplicateSlot = slot + 1,
+                          *reinterpret_cast<int*>(group + 0x23CC) == static_cast<int>(job))) ||
+                        (((slot + 2) != static_cast<int>(MenuS16(this, 0x86A))) &&
+                         (*reinterpret_cast<int*>(group + 0x2FF4) != 0) &&
+                         (*(group + 0x37F6) != 1) &&
+                         (duplicateSlot = slot + 2,
+                          *reinterpret_cast<int*>(group + 0x2FFC) == static_cast<int>(job))) ||
+                        (((slot + 3) != static_cast<int>(MenuS16(this, 0x86A))) &&
+                         (*reinterpret_cast<int*>(group + 0x3C24) != 0) &&
+                         (*(group + 0x4426) != 1) &&
+                         (duplicateSlot = slot + 3,
+                          *reinterpret_cast<int*>(group + 0x3C2C) == static_cast<int>(job)))) {
                         break;
                     }
 

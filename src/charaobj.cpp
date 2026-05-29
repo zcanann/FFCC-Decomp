@@ -1998,8 +1998,11 @@ void CGCharaObj::calcRegist(int staIndex, int itemId, int& outA, int& outB, int&
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int, int, Vec* hitPos)
+void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, int, Vec* hitPos)
 {
+	l_pHitCross = hitPos;
+	l_idxAttackCol = attackColIndex;
+
 	unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
 	unsigned int cid = GetCID();
 	int resolvedItemId = itemId;

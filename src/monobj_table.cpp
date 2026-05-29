@@ -21,7 +21,8 @@ struct MonAiFuncTable {
     MonVoidFunc always;
 };
 
-extern "C" MonAiFuncTable funcsDefault = {
+extern "C" {
+MonAiFuncTable funcsDefault = {
     &CGMonObj::initFinishedFuncDefault,
     &CGMonObj::moveFrameFuncDefault,
     &CGMonObj::moveCancelFuncDefault,
@@ -37,7 +38,7 @@ extern "C" MonAiFuncTable funcsDefault = {
     &CGMonObj::alwaysFuncDefault,
 };
 
-extern "C" MonAiFuncTable funcsGiantCrab = {
+MonAiFuncTable funcsGiantCrab = {
     &CGMonObj::initFinishedFuncDefault,
     &CGMonObj::moveFrameFuncGiantCrab,
     &CGMonObj::moveCancelFuncGiantCrab,
@@ -53,7 +54,7 @@ extern "C" MonAiFuncTable funcsGiantCrab = {
     &CGMonObj::alwaysFuncDefault,
 };
 
-extern "C" MonAiFuncTable funcsOrcKing = {
+MonAiFuncTable funcsOrcKing = {
     &CGMonObj::initFinishedFuncDefault,
     &CGMonObj::moveFrameFuncOrcKing,
     &CGMonObj::moveCancelFuncOrcKing,
@@ -69,7 +70,7 @@ extern "C" MonAiFuncTable funcsOrcKing = {
     &CGMonObj::alwaysFuncOrcKing,
 };
 
-extern "C" MonAiFuncTable funcsGolem = {
+MonAiFuncTable funcsGolem = {
     &CGMonObj::initFinishedFuncDefault,
     &CGMonObj::moveFrameFuncGolem,
     &CGMonObj::moveCancelFuncGolem,
@@ -85,7 +86,7 @@ extern "C" MonAiFuncTable funcsGolem = {
     &CGMonObj::alwaysFuncDefault,
 };
 
-extern "C" MonAiFuncTable funcsArmstrong = {
+MonAiFuncTable funcsArmstrong = {
     &CGMonObj::initFinishedFuncDefault,
     &CGMonObj::moveFrameFuncArmstrong,
     &CGMonObj::moveCancelFuncArmstrong,
@@ -101,7 +102,7 @@ extern "C" MonAiFuncTable funcsArmstrong = {
     &CGMonObj::alwaysFuncDefault,
 };
 
-extern "C" MonAiFuncTable funcsGoblinKing = {
+MonAiFuncTable funcsGoblinKing = {
     &CGMonObj::initFinishedFuncDefault,
     &CGMonObj::moveFrameFuncGoblinKing,
     &CGMonObj::moveCancelFuncGoblinKing,
@@ -117,7 +118,7 @@ extern "C" MonAiFuncTable funcsGoblinKing = {
     &CGMonObj::alwaysFuncDefault,
 };
 
-extern "C" MonAiFuncTable funcsMolbol = {
+MonAiFuncTable funcsMolbol = {
     &CGMonObj::initFinishedFuncDefault,
     &CGMonObj::moveFrameFuncMolbol,
     &CGMonObj::moveCancelFuncMolbol,
@@ -133,7 +134,7 @@ extern "C" MonAiFuncTable funcsMolbol = {
     &CGMonObj::alwaysFuncDefault,
 };
 
-extern "C" MonAiFuncTable funcsLizardmanKing = {
+MonAiFuncTable funcsLizardmanKing = {
     &CGMonObj::initFinishedFuncDefault,
     &CGMonObj::moveFrameFuncLizardmanKing,
     &CGMonObj::moveCancelFuncLizardmanKing,
@@ -149,7 +150,7 @@ extern "C" MonAiFuncTable funcsLizardmanKing = {
     &CGMonObj::alwaysFuncDefault,
 };
 
-extern "C" MonAiFuncTable funcsCaveWorm = {
+MonAiFuncTable funcsCaveWorm = {
     &CGMonObj::initFinishedFuncDefault,
     &CGMonObj::moveFrameFuncCaveWorm,
     &CGMonObj::moveCancelFuncCaveWorm,
@@ -165,7 +166,7 @@ extern "C" MonAiFuncTable funcsCaveWorm = {
     &CGMonObj::alwaysFuncDefault,
 };
 
-extern "C" MonAiFuncTable funcsGigasLoad = {
+MonAiFuncTable funcsGigasLoad = {
     &CGMonObj::initFinishedFuncDefault,
     &CGMonObj::moveFrameFuncGigasLoad,
     &CGMonObj::moveCancelFuncGigasLoad,
@@ -181,7 +182,7 @@ extern "C" MonAiFuncTable funcsGigasLoad = {
     &CGMonObj::alwaysFuncDefault,
 };
 
-extern "C" MonAiFuncTable funcsWifeLamia = {
+MonAiFuncTable funcsWifeLamia = {
     &CGMonObj::initFinishedFuncDefault,
     &CGMonObj::moveFrameFuncDefault,
     &CGMonObj::moveCancelFuncDefault,
@@ -197,7 +198,7 @@ extern "C" MonAiFuncTable funcsWifeLamia = {
     &CGMonObj::alwaysFuncDefault,
 };
 
-extern "C" MonAiFuncTable funcsMeteoParasite = {
+MonAiFuncTable funcsMeteoParasite = {
     &CGMonObj::initFinishedFuncMeteoParasite,
     &CGMonObj::moveFrameFuncMeteoParasite,
     &CGMonObj::moveCancelFuncMeteoParasite,
@@ -213,7 +214,7 @@ extern "C" MonAiFuncTable funcsMeteoParasite = {
     &CGMonObj::alwaysFuncMeteoParasite,
 };
 
-extern "C" MonAiFuncTable funcsMeteoParasiteC = {
+MonAiFuncTable funcsMeteoParasiteC = {
     &CGMonObj::initFinishedFuncMeteoParasiteC,
     &CGMonObj::moveFrameFuncMeteoParasiteC,
     &CGMonObj::moveCancelFuncMeteoParasiteC,
@@ -229,7 +230,7 @@ extern "C" MonAiFuncTable funcsMeteoParasiteC = {
     &CGMonObj::alwaysFuncDefault,
 };
 
-extern "C" MonAiFuncTable funcsDuct = {
+MonAiFuncTable funcsDuct = {
     &CGMonObj::initFinishedFuncDuct,
     &CGMonObj::moveFrameFuncDuct,
     &CGMonObj::moveCancelFuncDuct,
@@ -245,7 +246,7 @@ extern "C" MonAiFuncTable funcsDuct = {
     &CGMonObj::alwaysFuncDefault,
 };
 
-extern "C" MonAiFuncTable funcsDragonZombie = {
+MonAiFuncTable funcsDragonZombie = {
     &CGMonObj::initFinishedFuncDefault,
     &CGMonObj::moveFrameFuncDragonZombie,
     &CGMonObj::moveCancelFuncDragonZombie,
@@ -261,7 +262,7 @@ extern "C" MonAiFuncTable funcsDragonZombie = {
     &CGMonObj::alwaysFuncDefault,
 };
 
-extern "C" MonAiFuncTable funcsAntrion = {
+MonAiFuncTable funcsAntrion = {
     &CGMonObj::initFinishedFuncDefault,
     &CGMonObj::moveFrameFuncAntrion,
     &CGMonObj::moveCancelFuncAntrion,
@@ -277,7 +278,7 @@ extern "C" MonAiFuncTable funcsAntrion = {
     &CGMonObj::alwaysFuncDefault,
 };
 
-extern "C" MonAiFuncTable funcsTetsukyojin = {
+MonAiFuncTable funcsTetsukyojin = {
     &CGMonObj::initFinishedFuncDefault,
     &CGMonObj::moveFrameFuncTetsukyojin,
     &CGMonObj::moveCancelFuncTetsukyojin,
@@ -293,7 +294,7 @@ extern "C" MonAiFuncTable funcsTetsukyojin = {
     &CGMonObj::alwaysFuncDefault,
 };
 
-extern "C" MonAiFuncTable funcsLich = {
+MonAiFuncTable funcsLich = {
     &CGMonObj::initFinishedFuncDefault,
     &CGMonObj::moveFrameFuncLich,
     &CGMonObj::moveCancelFuncLich,
@@ -309,7 +310,7 @@ extern "C" MonAiFuncTable funcsLich = {
     &CGMonObj::alwaysFuncDefault,
 };
 
-extern "C" MonAiFuncTable funcsSaw = {
+MonAiFuncTable funcsSaw = {
     &CGMonObj::initFinishedFuncDefault,
     &CGMonObj::moveFrameFuncSaw,
     &CGMonObj::moveCancelFuncDefault,
@@ -325,7 +326,7 @@ extern "C" MonAiFuncTable funcsSaw = {
     &CGMonObj::alwaysFuncDefault,
 };
 
-extern "C" MonAiFuncTable funcsRamoe = {
+MonAiFuncTable funcsRamoe = {
     &CGMonObj::initFinishedFuncDefault,
     &CGMonObj::moveFrameFuncRamoe,
     &CGMonObj::moveCancelFuncRamoe,
@@ -341,7 +342,7 @@ extern "C" MonAiFuncTable funcsRamoe = {
     &CGMonObj::alwaysFuncDefault,
 };
 
-extern "C" MonAiFuncTable funcsLastBoss = {
+MonAiFuncTable funcsLastBoss = {
     &CGMonObj::initFinishedFuncLastBoss,
     &CGMonObj::moveFrameFuncLastBoss,
     &CGMonObj::moveCancelFuncLastBoss,
@@ -357,7 +358,7 @@ extern "C" MonAiFuncTable funcsLastBoss = {
     &CGMonObj::alwaysFuncDefault,
 };
 
-extern "C" MonAiFuncTable funcsLKShooter = {
+MonAiFuncTable funcsLKShooter = {
     &CGMonObj::initFinishedFuncDefault,
     &CGMonObj::moveFrameFuncDefault,
     &CGMonObj::moveCancelFuncDefault,
@@ -372,6 +373,7 @@ extern "C" MonAiFuncTable funcsLKShooter = {
     &CGMonObj::attackCheckFuncLKShooter,
     &CGMonObj::alwaysFuncDefault,
 };
+}
 
 /*
  * --INFO--

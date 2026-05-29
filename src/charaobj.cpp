@@ -20,6 +20,7 @@
 extern char SoundBuffer[];
 
 extern "C" char sCharaObjDebugStatFormat[];
+extern "C" char lbl_801DC590[];
 extern "C" char lbl_801DC940[];
 
 extern "C" {
@@ -2903,6 +2904,8 @@ void CGCharaObj::combi2()
 		}
 		PSVECScale(&comboCenter, &comboCenter, 1.0f / static_cast<float>(participantCount));
 	}
+
+	System.Printf(const_cast<char*>(lbl_801DC590), System.m_frameCounter, comboCmd);
 
 	CGPartyObj* leadParty = candidates[participantCount - 1];
 	bool playedComboSe = false;

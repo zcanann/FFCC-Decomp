@@ -2967,12 +2967,11 @@ void CGCharaObj::combi2()
 void CGCharaObj::sendCombiToScript(CGCharaObj* target, int scriptArg, int)
 {
 	int entry = 0;
-	CGame* linkCursor = &Game;
-	int linkCount = *reinterpret_cast<int*>(&Game.m_gameWork.m_linkTable[3][0][0]);
+	int linkCount = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6A8);
+	CGPrgObj** links = reinterpret_cast<CGPrgObj**>(reinterpret_cast<unsigned char*>(this) + 0x6AC);
 
 	while (entry < linkCount) {
-		int linkHead = *reinterpret_cast<int*>(&linkCursor->m_gameWork.m_linkTable[3][0][0]);
-		CGPrgObj* obj = *reinterpret_cast<CGPrgObj**>(linkHead + 4);
+		CGPrgObj* obj = links[entry];
 		bool skip = (obj == 0);
 
 		if (!skip) {
@@ -2991,7 +2990,6 @@ void CGCharaObj::sendCombiToScript(CGCharaObj* target, int scriptArg, int)
 			break;
 		}
 
-		linkCursor = reinterpret_cast<CGame*>(reinterpret_cast<unsigned char*>(linkCursor) + 4);
 		entry++;
 	}
 

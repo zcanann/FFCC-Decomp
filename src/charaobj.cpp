@@ -2236,17 +2236,6 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 		gCFlatRuntime2.SetParticleWorkParam(effectId, this);
 		gCFlatRuntime2.SetParticleWorkSpeed(*reinterpret_cast<unsigned short*>(itemData + 0x26) * 0.01f);
 
-		if (effectId > 500) {
-			unsigned short itemType = *reinterpret_cast<unsigned short*>(itemData + 2);
-			int colType = -1;
-			if (itemType == 1 || itemType == 4 || itemType == 8 || itemType == 9) {
-				colType = itemType;
-			}
-			if (colType >= 0) {
-				gCFlatRuntime2.SetParticleWorkCol(colType, -1, *reinterpret_cast<unsigned short*>(itemData + 4) * 0.01f);
-			}
-		}
-
 		switch (effectArg0) {
 		case 0:
 			seNo = CharaObjDecodeSe(*reinterpret_cast<unsigned short*>(itemData + 0x38));
@@ -2271,6 +2260,17 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 			break;
 		default:
 			break;
+		}
+
+		if (effectId > 500) {
+			unsigned short itemType = *reinterpret_cast<unsigned short*>(itemData + 2);
+			int colType = -1;
+			if (itemType == 1 || itemType == 4 || itemType == 8 || itemType == 9) {
+				colType = itemType;
+			}
+			if (colType >= 0) {
+				gCFlatRuntime2.SetParticleWorkCol(colType, -1, *reinterpret_cast<unsigned short*>(itemData + 4) * 0.01f);
+			}
 		}
 
 		if ((particleFlags & 0x100) != 0) {

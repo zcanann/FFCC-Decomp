@@ -1154,7 +1154,7 @@ void CGCharaObj::onHitParticle(int effectIndex, int, int, int colliderIndex, Vec
 		sourceObj = reinterpret_cast<CGPrgObj*>(CFlatRuntime2Storage().intToClass(static_cast<int>(hitParam->m_classId)));
 	}
 
-	unsigned int sourceCid = cidFn(sourceObj);
+	unsigned int sourceCid = sourceObj->GetCID();
 	if ((sourceCid & 0xD) == 0xD) {
 		VCall80 hitFn = *reinterpret_cast<VCall80*>(*reinterpret_cast<int*>(self + 0x48) + 0x80);
 		hitFn(this, sourceObj, particleIndex, -1, colliderIndex, hitPos);

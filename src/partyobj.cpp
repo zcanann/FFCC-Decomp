@@ -4359,9 +4359,10 @@ void CGPartyObj::gpmMove()
 	float speedLimit = speedScale * m_moveBaseSpeed * *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(leader) + 0x690);
 	sGhostPartyWork.carrySpeed = (nextSpeed >= 0.0f && speedLimit < nextSpeed) ? speedLimit : nextSpeed;
 
-	PartyData(this).unk6C0++;
 	sGhostPartyWork.carryDir = moveDir;
-	if (PartyData(this).unk6C0 >= 4) {
+	if (PartyData(this).unk6C0 + 1 != 4) {
+		PartyData(this).unk6C0++;
+	} else {
 		PartyData(this).unk6C0 = 0;
 	}
 }

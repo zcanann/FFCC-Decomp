@@ -287,13 +287,13 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
     PARTICLE_WMAT* matrixList;
     PARTICLE_COLOR* particleColor;
     YmBreathParticleGroup* groupData;
+    int i;
     int groupCount;
     long** shape;
-    unsigned char colorR;
-    unsigned char colorG;
-    unsigned char colorB;
-    unsigned char colorA;
-    int i;
+    int colorR;
+    int colorG;
+    int colorB;
+    int colorA;
     _GXColor drawColor;
     _GXColor debugColor;
     Vec debugPos;

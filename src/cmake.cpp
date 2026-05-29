@@ -2171,7 +2171,6 @@ void CMenuPcs::CmakeSexDraw()
         DrawCursor(cursorX, cursorY, alpha);
     }
 
-    DrawCmakeMcOverlay(this, 0x15);
 }
 
 /*

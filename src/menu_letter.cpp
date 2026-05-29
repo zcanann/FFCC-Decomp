@@ -676,7 +676,56 @@ int CMenuPcs::LetterCtrl()
 				*reinterpret_cast<s16*>(state + 0x12) = 1;
 			}
 		} else if (mode == 1) {
-			LetterMessOpen();
+			int letterOffs = s_SelLetter * 0xC + 0x3EC;
+			signed char letterFlags = *reinterpret_cast<signed char*>(Game.m_scriptFoodBase[0] + letterOffs);
+			if (letterFlags >= 0) {
+				*reinterpret_cast<unsigned char*>(Game.m_scriptFoodBase[0] + letterOffs) =
+				    (static_cast<unsigned char>(letterFlags) & 0x7F) | 0x80;
+			}
+
+			*reinterpret_cast<s16*>(state + 0x22) = *reinterpret_cast<s16*>(state + 0x22) + 1;
+			int panelCount = static_cast<int>(**reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850));
+			s16* panel = GetLetterPanelBase(this);
+			int frame = static_cast<int>(*reinterpret_cast<s16*>(state + 0x22));
+			int messOpenDone = 0;
+			for (int i = 0; i < panelCount; ++i, panel += 0x20) {
+				float f = FLOAT_803330bc;
+				if (*reinterpret_cast<int*>(panel + 0x12) <= frame) {
+					if (frame < *reinterpret_cast<int*>(panel + 0x12) + *reinterpret_cast<int*>(panel + 0x14)) {
+						*reinterpret_cast<int*>(panel + 0x10) = *reinterpret_cast<int*>(panel + 0x10) + 1;
+						*reinterpret_cast<float*>(panel + 8) =
+						    static_cast<float>(*reinterpret_cast<int*>(panel + 0x10)) / static_cast<float>(*reinterpret_cast<int*>(panel + 0x14));
+						if ((*reinterpret_cast<unsigned int*>(panel + 0x16) & 2) == 0) {
+							f = static_cast<float>(*reinterpret_cast<int*>(panel + 0x10)) / static_cast<float>(*reinterpret_cast<int*>(panel + 0x14));
+							*reinterpret_cast<float*>(panel + 0x18) =
+							    (*reinterpret_cast<float*>(panel + 0x1C) - static_cast<float>(panel[0])) * f;
+							*reinterpret_cast<float*>(panel + 0x1A) =
+							    (*reinterpret_cast<float*>(panel + 0x1E) - static_cast<float>(panel[1])) * f;
+						}
+					} else {
+						++messOpenDone;
+						*reinterpret_cast<float*>(panel + 8) = FLOAT_803330f8;
+						*reinterpret_cast<float*>(panel + 0x18) = f;
+						*reinterpret_cast<float*>(panel + 0x1A) = f;
+					}
+				}
+			}
+			if (panelCount == messOpenDone) {
+				if (SingGetLetterAttachflg() < 0) {
+					*reinterpret_cast<s16*>(state + 0x12) = 1;
+				} else {
+					if (s_AttachMode < 1) {
+						s_Attach = 2;
+						*reinterpret_cast<s16*>(state + 0x30) = 3;
+						*reinterpret_cast<s16*>(state + 0x28) = static_cast<s16>(s_ReplyPos);
+					} else {
+						*reinterpret_cast<s16*>(state + 0x30) = 5;
+					}
+					*reinterpret_cast<s16*>(state + 0x12) = 0;
+					*reinterpret_cast<char*>(state + 0xC) = 0;
+					SingSetLetterAttachflg(-1);
+				}
+			}
 		} else if (mode == 2) {
 			LetterItemWinOpen();
 		} else if (mode == 3) {

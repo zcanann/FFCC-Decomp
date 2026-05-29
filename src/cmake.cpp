@@ -3188,7 +3188,7 @@ void CMenuPcs::CmakeResultDraw1()
     DrawCmakePopupPanel(this, popupAlpha, FLOAT_80333278, FLOAT_8033327c, FLOAT_80333280, FLOAT_80333284,
         FLOAT_80333258, FLOAT_80333258);
     DrawCmakeTitle(7, FLOAT_80333258, alpha);
-    DrawCmakeCrest(MenuS16(this, 0x862), 0, 0, textAlpha);
+    DrawCmakeCrest(static_cast<int>(s_CmakeInfo.m_tribe), 0, 0, textAlpha);
 
     CFont* labelFont = CmakeFields(this).m_fonts[CMAKE_FONT_LABEL];
     labelFont->SetMargin(FLOAT_80333258);

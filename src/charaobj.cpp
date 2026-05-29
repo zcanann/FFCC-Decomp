@@ -20,6 +20,7 @@
 extern char SoundBuffer[];
 
 extern "C" char sCharaObjDebugStatFormat[];
+extern "C" char lbl_801DC940[];
 
 extern "C" {
 Vec* l_pHitCross = 0;
@@ -589,6 +590,7 @@ void CGCharaObj::onFramePostCalc()
 			unsigned short padMask = CharaObjGetPadStatusReduceMask(m_animStateMisc);
 			if ((padMask & 0xF) != 0) {
 				statusValue -= *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x3C);
+				System.Printf(const_cast<char*>(lbl_801DC940));
 			}
 		}
 
@@ -2362,7 +2364,7 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 			unsigned short fanCount = *reinterpret_cast<unsigned short*>(itemData + 0x24);
 			if (effectArg0 == 3 && fanCount > 1) {
 				for (int i = 0; i < fanCount; i++) {
-					float t = (fanCount > 1) ? ((float)i / (float)(fanCount - 1)) : 0.0f;
+					float t = (float)i / (float)fanCount;
 					gCFlatRuntime2.SetParticleWorkVector(t * 0.75f, 0.0f);
 					gCFlatRuntime2.PutParticleWork();
 				}

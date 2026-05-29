@@ -2283,13 +2283,11 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 
 		if (effectId > 500) {
 			unsigned short itemType = *reinterpret_cast<unsigned short*>(itemData + 2);
-			int colType = -1;
+			int colType;
 			if (itemType == 1 || itemType == 4 || itemType == 8 || itemType == 9) {
 				colType = itemType;
 			}
-			if (colType >= 0) {
-				gCFlatRuntime2.SetParticleWorkCol(colType, -1, *reinterpret_cast<unsigned short*>(itemData + 4) * 0.01f);
-			}
+			gCFlatRuntime2.SetParticleWorkCol(colType, -1, *reinterpret_cast<unsigned short*>(itemData + 4) * 0.01f);
 		}
 
 		if ((particleFlags & 0x100) != 0) {

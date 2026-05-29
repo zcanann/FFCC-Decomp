@@ -750,7 +750,7 @@ int CMenuPcs::LetterCtrl()
 						sprintf(info, "%s%d", GetMenuStr(0x22), value);
 					}
 				} else {
-					int gil = static_cast<int>(*reinterpret_cast<u16*>(letter + 0x3EE) & 0x1FF) * 100;
+					s16 gil = static_cast<int>(*reinterpret_cast<u16*>(letter + 0x3EE) & 0x1FF) * 100;
 					if (Game.m_gameWork.m_languageId == 2) {
 						sprintf(info, "%d%s%s",
 						        gil,

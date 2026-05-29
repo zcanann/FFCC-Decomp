@@ -4420,24 +4420,26 @@ CFlatRuntime::CVal* CFlatRuntime2::onSystemVal(CFlatRuntime::CObject*, int syste
         case -0x78:
             FlatLastResult(this) = gameWork.m_gameOverFlag;
             break;
-        case -0x7A:
-            FlatLastResult(this) = 1;
+        case -0x7A: {
+            unsigned int languageValue = 1;
             if (gameWork.m_languageId == 3) {
-                FlatLastResult(this) = 6;
+                languageValue = 6;
             } else if (gameWork.m_languageId < 3) {
                 if (gameWork.m_languageId == 1) {
-                    FlatLastResult(this) = 3;
+                    languageValue = 3;
                 } else if (gameWork.m_languageId == 0) {
-                    FlatLastResult(this) = 1;
+                    languageValue = 1;
                 } else {
-                    FlatLastResult(this) = 5;
+                    languageValue = 5;
                 }
             } else if (gameWork.m_languageId == 5) {
-                FlatLastResult(this) = 7;
+                languageValue = 7;
             } else if (gameWork.m_languageId < 5) {
-                FlatLastResult(this) = 4;
+                languageValue = 4;
             }
+            FlatLastResult(this) = languageValue;
             break;
+        }
         default:
             break;
         }

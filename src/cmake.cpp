@@ -3389,7 +3389,15 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
     }
 
     if (row > 4) {
-        if (IsCmakeVillageNameBlank(s_CmakeInfo.m_name)) {
+        bool blankName = true;
+        for (const char* it = s_CmakeInfo.m_name; *it != '\0'; ++it) {
+            if (*it != ' ') {
+                blankName = false;
+                break;
+            }
+        }
+
+        if (blankName) {
             Sound.PlaySe(4, 0x40, 0x7f, 0);
             return 0;
         }

@@ -62,6 +62,7 @@ extern "C" float FLOAT_80333390;
 extern "C" float FLOAT_80333394;
 extern "C" float FLOAT_80333398;
 extern "C" float FLOAT_80333300;
+extern "C" float FLOAT_80333308;
 extern "C" float FLOAT_80333318;
 extern "C" float FLOAT_8033331c;
 extern "C" float FLOAT_80333320;
@@ -2762,7 +2763,8 @@ void CMenuPcs::CmakeJobDraw()
         int cursorX = (sel < 4) ? 0x110 : 0x1A8;
         int cursorY = 0x70 + ((sel < 4) ? sel : (sel - 4)) * 0x28;
         int cursorFrame = System.m_frameCounter & 7;
-        DrawCursor(cursorX - 0x18 + cursorFrame, cursorY, alpha);
+        DrawCursor(static_cast<int>((static_cast<float>(cursorX) - FLOAT_80333308) + static_cast<float>(cursorFrame)),
+            cursorY, alpha);
     }
 
     short mcState = *reinterpret_cast<short*>(MenuS32(this, 0x848) + 10);

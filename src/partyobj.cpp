@@ -3355,14 +3355,14 @@ void CGPartyObj::CheckGameOver()
 		if ((Game.m_gameWork.m_menuStageMode != 0) && (Game.m_gameWork.m_bossArtifactStageIndex < 0x0F)) {
 			unsigned int status = party->GetCID();
 			if (((status & 0x6D) == 0x6D) &&
-			    (*(int*)(*(unsigned char**)((unsigned char*)party + 0x58) + 0x3B4) != 0)) {
+			    (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party->m_scriptHandle) + 0x3B4) != 0)) {
 				keepGameOver = 1;
 			}
 		}
 
 		if ((keepGameOver != 0) ||
 		    ((*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(party->m_scriptHandle) + 0x1C) == 0) &&
-		     ((*(reinterpret_cast<unsigned char*>(party) + 0x6B8) & 0x04) == 0))) {
+		     ((PartyData(party).partyFlags & 0x04) == 0))) {
 			continue;
 		}
 

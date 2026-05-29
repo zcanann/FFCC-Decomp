@@ -54,6 +54,7 @@ extern float FLOAT_80331A50;
 extern const float FLOAT_80331a54;
 extern float FLOAT_80331A58;
 extern float FLOAT_80331A5C;
+extern float FLOAT_80331a70;
 extern float FLOAT_80331a74;
 extern float FLOAT_80331A88;
 extern float FLOAT_80331a9c;
@@ -4133,7 +4134,7 @@ void CGPartyObj::gpmMove()
 		sGhostPartyWork.settleTimer = 0;
 	}
 
-	if (sGhostPartyWork.carrySpeed > 0.05f) {
+	if (sGhostPartyWork.carrySpeed > FLOAT_80331a70) {
 		moveVector(&sGhostPartyWork.carryDir, sGhostPartyWork.carrySpeed, 1);
 	}
 	sGhostPartyWork.carrySpeed *= 0.85f;
@@ -4354,7 +4355,7 @@ void CGPartyObj::gpmMove()
 		moveDir = toLeader;
 	}
 
-	float nextSpeed = sGhostPartyWork.carrySpeed + 0.05f;
+	float nextSpeed = sGhostPartyWork.carrySpeed + FLOAT_80331a70;
 	float speedScale = (pressureLimit <= sGhostPartyWork.pressure) ? 1.0f : 0.9f;
 	float speedLimit = speedScale * m_moveBaseSpeed * *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(leader) + 0x690);
 	sGhostPartyWork.carrySpeed = (nextSpeed >= 0.0f && speedLimit < nextSpeed) ? speedLimit : nextSpeed;

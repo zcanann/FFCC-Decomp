@@ -1850,7 +1850,7 @@ void CMenuPcs::LetterMessDraw()
 		    this, 0);
 	}
 
-	CFont* font = *reinterpret_cast<CFont**>(reinterpret_cast<char*>(this) + 0x108);
+	CFont* font = *reinterpret_cast<CFont**>(reinterpret_cast<char*>(this) + 0xF8);
 	font->SetShadow(0);
 	font->SetMargin(FLOAT_8033313c);
 	font->SetScale(FLOAT_80333140);

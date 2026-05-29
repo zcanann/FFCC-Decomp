@@ -2241,7 +2241,7 @@ void CGPartyObj::checkTargetParticle()
 			PSVECSubtract(reinterpret_cast<Vec*>(self + 0x66C),
 			              reinterpret_cast<Vec*>(reinterpret_cast<unsigned char*>(leader) + 0x66C), &toLeaderTarget);
 			toLeaderTarget.y = 0.0f;
-			if (PSVECMag(&toLeaderTarget) > 0.001f) {
+			if (PSVECMag(&toLeaderTarget) > FLOAT_80331A98) {
 				input.x = toLeaderTarget.x;
 				input.z = toLeaderTarget.z;
 			}

@@ -2003,7 +2003,7 @@ void CGCharaObj::calcRegist(int staIndex, int itemId, int& outA, int& outB, int&
 	} else {
 		outB = 0;
 	}
-	outC = ((outA ^ 3) >> 1);
+	outC = (outA ^ 3) / 2;
 }
 
 /*

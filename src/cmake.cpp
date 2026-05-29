@@ -67,6 +67,7 @@ extern "C" float FLOAT_80333318;
 extern "C" float FLOAT_8033331c;
 extern "C" float FLOAT_80333320;
 extern "C" float FLOAT_80333324;
+extern "C" float FLOAT_80333334;
 static const float FLOAT_803333a8 = 40.0f;
 static const float FLOAT_803333ac = 278.0f;
 static const float FLOAT_803333b0 = 248.0f;
@@ -2171,7 +2172,7 @@ void CMenuPcs::CmakeSexDraw()
             static_cast<double>(static_cast<float>(DOUBLE_80333288 - static_cast<double>(maxWidth) * DOUBLE_80333298) +
                                 static_cast<float>(frame)) -
             static_cast<double>(maxWidth) * DOUBLE_80333298);
-        int cursorY = 0xA4 + sel * 0x28;
+        int cursorY = static_cast<int>(FLOAT_80333334 + static_cast<float>(sel * 0x28));
         DrawCursor(cursorX, cursorY, alpha);
     }
 

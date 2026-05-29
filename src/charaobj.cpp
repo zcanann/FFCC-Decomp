@@ -719,9 +719,17 @@ float CGCharaObj::onAlphaUpdate()
 {
 	unsigned char* self = reinterpret_cast<unsigned char*>(this);
 	float alpha = m_alpha;
+	unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
 
-	if (m_scriptHandle != 0 && *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) {
-		alpha += sinf(static_cast<float>(m_flags) * 0.1f) * 0.05f;
+	if (*reinterpret_cast<unsigned short*>(script + 0x1C) != 0) {
+		if (((static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D &&
+		     *reinterpret_cast<unsigned short*>(script + 0x1C) == 0) ||
+		    ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD &&
+		     (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0xFE) & 1) != 0 &&
+		     self[0x6BA] == 0)) {
+			int createSerial = *reinterpret_cast<int*>(self + 0x54C);
+			alpha += static_cast<float>(sin(static_cast<double>(0.1f * static_cast<float>(createSerial)))) * 0.05f;
+		}
 	}
 
 	if (alpha < 0.0f) {
@@ -730,8 +738,7 @@ float CGCharaObj::onAlphaUpdate()
 		alpha = 1.0f;
 	}
 
-	m_alpha = alpha;
-	return alpha;
+	return m_stepSlopeLimit * alpha;
 }
 
 /*

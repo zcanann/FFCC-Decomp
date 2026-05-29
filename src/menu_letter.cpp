@@ -593,9 +593,11 @@ bool CMenuPcs::LetterOpen()
 				if (iVar8 < *reinterpret_cast<int*>(psVar7 + 0x12) + *reinterpret_cast<int*>(psVar7 + 0x14)) {
 					*reinterpret_cast<int*>(psVar7 + 0x10) = *reinterpret_cast<int*>(psVar7 + 0x10) + 1;
 					*reinterpret_cast<float*>(psVar7 + 8) =
-						static_cast<float>(*reinterpret_cast<int*>(psVar7 + 0x10)) / static_cast<float>(*reinterpret_cast<int*>(psVar7 + 0x14));
+						static_cast<float>((DOUBLE_803330e8 / static_cast<double>(static_cast<float>(*reinterpret_cast<int*>(psVar7 + 0x14)))) *
+						                   static_cast<double>(static_cast<float>(*reinterpret_cast<int*>(psVar7 + 0x10))));
 					if ((*reinterpret_cast<unsigned int*>(psVar7 + 0x16) & 2) == 0) {
-						fVar1 = static_cast<float>(*reinterpret_cast<int*>(psVar7 + 0x10)) / static_cast<float>(*reinterpret_cast<int*>(psVar7 + 0x14));
+						fVar1 = static_cast<float>((DOUBLE_803330e8 / static_cast<double>(static_cast<float>(*reinterpret_cast<int*>(psVar7 + 0x14)))) *
+						                           static_cast<double>(static_cast<float>(*reinterpret_cast<int*>(psVar7 + 0x10))));
 						*reinterpret_cast<float*>(psVar7 + 0x18) =
 							(*reinterpret_cast<float*>(psVar7 + 0x1C) - static_cast<float>(psVar7[0])) * fVar1;
 						*reinterpret_cast<float*>(psVar7 + 0x1A) =

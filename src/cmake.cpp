@@ -401,21 +401,6 @@ static bool IsCmakeNameBlank(const char* name)
     return true;
 }
 
-static bool IsCmakeVillageNameBlank(const char* name)
-{
-    if (name[0] == '\0') {
-        return true;
-    }
-
-    for (const char* it = name; *it != '\0'; ++it) {
-        if (*it != ' ') {
-            return false;
-        }
-    }
-
-    return true;
-}
-
 static bool IsDuplicateCmakeName(CMenuPcs* menu, const char* name)
 {
     if (name == nullptr || name[0] == '\0') {

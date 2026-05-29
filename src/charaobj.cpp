@@ -1071,15 +1071,11 @@ int CGCharaObj::onHit(int hitArg, CGObject* sourceObj, int hitType, Vec* hitPos)
 	typedef unsigned int (*VCall0C)(void*);
 	typedef int (*VCall80)(void*, void*, int, int, int, Vec*);
 
-	if (sourceObj == 0) {
-		return 0;
-	}
-
 	VCall0C cidFn = *reinterpret_cast<VCall0C*>(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(sourceObj) + 0x48) + 0x0C);
-	unsigned int sourceCid = cidFn(sourceObj);
+	unsigned short sourceCid = cidFn(sourceObj);
 	if ((sourceCid & 0x6D) == 0x6D && Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
 		sourceCid = cidFn(sourceObj);
-		if ((sourceCid & 0x6D) == 0x6D && sourceObj->m_scriptHandle != 0 && sourceObj->m_scriptHandle[0xED] != 0) {
+		if ((sourceCid & 0x6D) == 0x6D && sourceObj->m_scriptHandle[0xED] != 0) {
 			return 0;
 		}
 	}

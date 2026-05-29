@@ -390,7 +390,7 @@ void CGPartyObj::onChangeStat(int state)
 		break;
 	case 1: {
 		int attackSel = party.attackSel;
-		*reinterpret_cast<int*>(self + 0x550) = (attackSel == 0) ? 5 : ((attackSel == 1) ? 8 : 9);
+		*reinterpret_cast<int*>(self + 0x550) = (attackSel == 0) ? 5 : ((attackSel == 1) ? 7 : 8);
 		unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
 		int entry = (*reinterpret_cast<unsigned short*>(script + 0x3E2) +
 		             *reinterpret_cast<unsigned short*>(script + 0x3E0) * 2) * 0x1CA +

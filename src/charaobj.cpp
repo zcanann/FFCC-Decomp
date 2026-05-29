@@ -2683,7 +2683,6 @@ int CGCharaObj::calcCastTime(int itemId)
 
 	int itemOffset = itemId * 0x48;
 	unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
-	unsigned char* script9 = reinterpret_cast<unsigned char*>(m_scriptHandle[9]);
 	unsigned char* itemData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + itemOffset;
 	unsigned short itemNo = *reinterpret_cast<unsigned short*>(itemData + 0x0);
 	unsigned int baseCast = *reinterpret_cast<unsigned short*>(itemData + 0x2E);
@@ -2697,7 +2696,7 @@ int CGCharaObj::calcCastTime(int itemId)
 	}
 
 	if (itemNo != 0x1F8 && itemType == 2) {
-		unsigned int castBonus = *reinterpret_cast<unsigned short*>(script9 + 0x194);
+		unsigned int castBonus = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0x194);
 		if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD && Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
 			int stage = Game.m_gameWork.m_bossArtifactStageTable[Game.m_gameWork.m_bossArtifactStageIndex];
 			if (stage > 2) {
@@ -2726,7 +2725,7 @@ int CGCharaObj::calcCastTime(int itemId)
 		return static_cast<int>(baseCast);
 	}
 	if (itemNo == 0x1F8) {
-		unsigned int castBonus = *reinterpret_cast<unsigned short*>(script9 + 0x196);
+		unsigned int castBonus = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0x196);
 		unsigned int playerCid = (static_cast<unsigned int>(__cntlzw(0x6D - static_cast<int>(static_cast<unsigned short>(GetCID()) & 0x6D))) >> 5) & 0xFFU;
 		unsigned int castReduction = playerCid != 0 ? static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(script + 0xBD9)) : 0;
 		int totalCast = static_cast<int>(baseCast + castBonus) - static_cast<int>(castReduction);

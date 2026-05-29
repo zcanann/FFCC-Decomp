@@ -1,27 +1,7 @@
 #include "ffcc/monobj_table.h"
 
-typedef void (CGMonObj::*MonVoidFunc)();
-typedef void (CGMonObj::*MonStateFunc)(int);
-typedef int (CGMonObj::*MonTargetFunc)(int);
-typedef int (CGMonObj::*MonCalcFunc)(int);
-
-struct MonAiFuncTable {
-    MonVoidFunc initFinished;
-    MonVoidFunc moveFrame;
-    MonVoidFunc moveCancel;
-    MonStateFunc changeStat;
-    MonVoidFunc cancelStat;
-    MonVoidFunc frameStat;
-    MonVoidFunc logic;
-    MonTargetFunc target;
-    MonCalcFunc calcBranch;
-    MonVoidFunc damaged;
-    MonVoidFunc attacked;
-    MonCalcFunc attackCheck;
-    MonVoidFunc always;
-};
-
-extern "C" MonAiFuncTable funcsDefault = {
+extern "C" {
+MonAiFuncTable funcsDefault = {
     &CGMonObj::initFinishedFuncDefault,
     &CGMonObj::moveFrameFuncDefault,
     &CGMonObj::moveCancelFuncDefault,
@@ -37,7 +17,7 @@ extern "C" MonAiFuncTable funcsDefault = {
     &CGMonObj::alwaysFuncDefault,
 };
 
-extern "C" MonAiFuncTable funcsGiantCrab = {
+MonAiFuncTable funcsGiantCrab = {
     &CGMonObj::initFinishedFuncDefault,
     &CGMonObj::moveFrameFuncGiantCrab,
     &CGMonObj::moveCancelFuncGiantCrab,
@@ -53,7 +33,7 @@ extern "C" MonAiFuncTable funcsGiantCrab = {
     &CGMonObj::alwaysFuncDefault,
 };
 
-extern "C" MonAiFuncTable funcsOrcKing = {
+MonAiFuncTable funcsOrcKing = {
     &CGMonObj::initFinishedFuncDefault,
     &CGMonObj::moveFrameFuncOrcKing,
     &CGMonObj::moveCancelFuncOrcKing,
@@ -69,7 +49,7 @@ extern "C" MonAiFuncTable funcsOrcKing = {
     &CGMonObj::alwaysFuncOrcKing,
 };
 
-extern "C" MonAiFuncTable funcsGolem = {
+MonAiFuncTable funcsGolem = {
     &CGMonObj::initFinishedFuncDefault,
     &CGMonObj::moveFrameFuncGolem,
     &CGMonObj::moveCancelFuncGolem,
@@ -85,7 +65,7 @@ extern "C" MonAiFuncTable funcsGolem = {
     &CGMonObj::alwaysFuncDefault,
 };
 
-extern "C" MonAiFuncTable funcsArmstrong = {
+MonAiFuncTable funcsArmstrong = {
     &CGMonObj::initFinishedFuncDefault,
     &CGMonObj::moveFrameFuncArmstrong,
     &CGMonObj::moveCancelFuncArmstrong,
@@ -101,7 +81,7 @@ extern "C" MonAiFuncTable funcsArmstrong = {
     &CGMonObj::alwaysFuncDefault,
 };
 
-extern "C" MonAiFuncTable funcsGoblinKing = {
+MonAiFuncTable funcsGoblinKing = {
     &CGMonObj::initFinishedFuncDefault,
     &CGMonObj::moveFrameFuncGoblinKing,
     &CGMonObj::moveCancelFuncGoblinKing,
@@ -117,7 +97,7 @@ extern "C" MonAiFuncTable funcsGoblinKing = {
     &CGMonObj::alwaysFuncDefault,
 };
 
-extern "C" MonAiFuncTable funcsMolbol = {
+MonAiFuncTable funcsMolbol = {
     &CGMonObj::initFinishedFuncDefault,
     &CGMonObj::moveFrameFuncMolbol,
     &CGMonObj::moveCancelFuncMolbol,
@@ -133,7 +113,7 @@ extern "C" MonAiFuncTable funcsMolbol = {
     &CGMonObj::alwaysFuncDefault,
 };
 
-extern "C" MonAiFuncTable funcsLizardmanKing = {
+MonAiFuncTable funcsLizardmanKing = {
     &CGMonObj::initFinishedFuncDefault,
     &CGMonObj::moveFrameFuncLizardmanKing,
     &CGMonObj::moveCancelFuncLizardmanKing,
@@ -149,7 +129,7 @@ extern "C" MonAiFuncTable funcsLizardmanKing = {
     &CGMonObj::alwaysFuncDefault,
 };
 
-extern "C" MonAiFuncTable funcsCaveWorm = {
+MonAiFuncTable funcsCaveWorm = {
     &CGMonObj::initFinishedFuncDefault,
     &CGMonObj::moveFrameFuncCaveWorm,
     &CGMonObj::moveCancelFuncCaveWorm,
@@ -165,7 +145,7 @@ extern "C" MonAiFuncTable funcsCaveWorm = {
     &CGMonObj::alwaysFuncDefault,
 };
 
-extern "C" MonAiFuncTable funcsGigasLoad = {
+MonAiFuncTable funcsGigasLoad = {
     &CGMonObj::initFinishedFuncDefault,
     &CGMonObj::moveFrameFuncGigasLoad,
     &CGMonObj::moveCancelFuncGigasLoad,
@@ -181,7 +161,7 @@ extern "C" MonAiFuncTable funcsGigasLoad = {
     &CGMonObj::alwaysFuncDefault,
 };
 
-extern "C" MonAiFuncTable funcsWifeLamia = {
+MonAiFuncTable funcsWifeLamia = {
     &CGMonObj::initFinishedFuncDefault,
     &CGMonObj::moveFrameFuncDefault,
     &CGMonObj::moveCancelFuncDefault,
@@ -197,7 +177,7 @@ extern "C" MonAiFuncTable funcsWifeLamia = {
     &CGMonObj::alwaysFuncDefault,
 };
 
-extern "C" MonAiFuncTable funcsMeteoParasite = {
+MonAiFuncTable funcsMeteoParasite = {
     &CGMonObj::initFinishedFuncMeteoParasite,
     &CGMonObj::moveFrameFuncMeteoParasite,
     &CGMonObj::moveCancelFuncMeteoParasite,
@@ -213,7 +193,7 @@ extern "C" MonAiFuncTable funcsMeteoParasite = {
     &CGMonObj::alwaysFuncMeteoParasite,
 };
 
-extern "C" MonAiFuncTable funcsMeteoParasiteC = {
+MonAiFuncTable funcsMeteoParasiteC = {
     &CGMonObj::initFinishedFuncMeteoParasiteC,
     &CGMonObj::moveFrameFuncMeteoParasiteC,
     &CGMonObj::moveCancelFuncMeteoParasiteC,
@@ -229,7 +209,7 @@ extern "C" MonAiFuncTable funcsMeteoParasiteC = {
     &CGMonObj::alwaysFuncDefault,
 };
 
-extern "C" MonAiFuncTable funcsDuct = {
+MonAiFuncTable funcsDuct = {
     &CGMonObj::initFinishedFuncDuct,
     &CGMonObj::moveFrameFuncDuct,
     &CGMonObj::moveCancelFuncDuct,
@@ -245,7 +225,7 @@ extern "C" MonAiFuncTable funcsDuct = {
     &CGMonObj::alwaysFuncDefault,
 };
 
-extern "C" MonAiFuncTable funcsDragonZombie = {
+MonAiFuncTable funcsDragonZombie = {
     &CGMonObj::initFinishedFuncDefault,
     &CGMonObj::moveFrameFuncDragonZombie,
     &CGMonObj::moveCancelFuncDragonZombie,
@@ -261,7 +241,7 @@ extern "C" MonAiFuncTable funcsDragonZombie = {
     &CGMonObj::alwaysFuncDefault,
 };
 
-extern "C" MonAiFuncTable funcsAntrion = {
+MonAiFuncTable funcsAntrion = {
     &CGMonObj::initFinishedFuncDefault,
     &CGMonObj::moveFrameFuncAntrion,
     &CGMonObj::moveCancelFuncAntrion,
@@ -277,7 +257,7 @@ extern "C" MonAiFuncTable funcsAntrion = {
     &CGMonObj::alwaysFuncDefault,
 };
 
-extern "C" MonAiFuncTable funcsTetsukyojin = {
+MonAiFuncTable funcsTetsukyojin = {
     &CGMonObj::initFinishedFuncDefault,
     &CGMonObj::moveFrameFuncTetsukyojin,
     &CGMonObj::moveCancelFuncTetsukyojin,
@@ -293,7 +273,7 @@ extern "C" MonAiFuncTable funcsTetsukyojin = {
     &CGMonObj::alwaysFuncDefault,
 };
 
-extern "C" MonAiFuncTable funcsLich = {
+MonAiFuncTable funcsLich = {
     &CGMonObj::initFinishedFuncDefault,
     &CGMonObj::moveFrameFuncLich,
     &CGMonObj::moveCancelFuncLich,
@@ -309,7 +289,7 @@ extern "C" MonAiFuncTable funcsLich = {
     &CGMonObj::alwaysFuncDefault,
 };
 
-extern "C" MonAiFuncTable funcsSaw = {
+MonAiFuncTable funcsSaw = {
     &CGMonObj::initFinishedFuncDefault,
     &CGMonObj::moveFrameFuncSaw,
     &CGMonObj::moveCancelFuncDefault,
@@ -325,7 +305,7 @@ extern "C" MonAiFuncTable funcsSaw = {
     &CGMonObj::alwaysFuncDefault,
 };
 
-extern "C" MonAiFuncTable funcsRamoe = {
+MonAiFuncTable funcsRamoe = {
     &CGMonObj::initFinishedFuncDefault,
     &CGMonObj::moveFrameFuncRamoe,
     &CGMonObj::moveCancelFuncRamoe,
@@ -341,7 +321,7 @@ extern "C" MonAiFuncTable funcsRamoe = {
     &CGMonObj::alwaysFuncDefault,
 };
 
-extern "C" MonAiFuncTable funcsLastBoss = {
+MonAiFuncTable funcsLastBoss = {
     &CGMonObj::initFinishedFuncLastBoss,
     &CGMonObj::moveFrameFuncLastBoss,
     &CGMonObj::moveCancelFuncLastBoss,
@@ -357,7 +337,7 @@ extern "C" MonAiFuncTable funcsLastBoss = {
     &CGMonObj::alwaysFuncDefault,
 };
 
-extern "C" MonAiFuncTable funcsLKShooter = {
+MonAiFuncTable funcsLKShooter = {
     &CGMonObj::initFinishedFuncDefault,
     &CGMonObj::moveFrameFuncDefault,
     &CGMonObj::moveCancelFuncDefault,
@@ -372,614 +352,784 @@ extern "C" MonAiFuncTable funcsLKShooter = {
     &CGMonObj::attackCheckFuncLKShooter,
     &CGMonObj::alwaysFuncDefault,
 };
+}
 
 /*
  * --INFO--
- * PAL Address: 0x801434a8
- * PAL Size: 8012b
+ * PAL Address: 0x8015B23C
+ * PAL Size: 4b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void __sinit_monobj_table_cpp(void);
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
 void CGMonObj::moveCancelFuncLastBoss()
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015B240
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::moveFrameFuncLastBoss()
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015B244
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::moveCancelFuncRamoe()
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015B248
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::moveFrameFuncRamoe()
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015B24C
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::moveCancelFuncLich()
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015B250
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::moveFrameFuncLich()
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015B254
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::moveCancelFuncTetsukyojin()
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015B258
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::moveFrameFuncTetsukyojin()
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015B25C
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::frameStatFuncAntrion()
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015B260
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::cancelStatFuncAntrion()
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015B264
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::changeStatFuncAntrion(int)
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015B268
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::moveCancelFuncAntrion()
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015B26C
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::moveFrameFuncAntrion()
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015B270
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::moveCancelFuncDragonZombie()
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015B274
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::moveFrameFuncDragonZombie()
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015B278
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::frameStatFuncDuct()
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015B27C
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::cancelStatFuncDuct()
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015B280
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::changeStatFuncDuct(int)
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015B284
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::moveCancelFuncDuct()
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015B288
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::moveFrameFuncDuct()
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015B28C
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::cancelStatFuncMeteoParasiteC()
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015B290
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::changeStatFuncMeteoParasiteC(int)
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015B294
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::moveCancelFuncMeteoParasiteC()
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015B298
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::moveFrameFuncMeteoParasiteC()
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015B29C
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::cancelStatFuncMeteoParasite()
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015B2A0
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::moveCancelFuncMeteoParasite()
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015B2A4
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::moveFrameFuncMeteoParasite()
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015B2A8
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::frameStatFuncGigasLoad()
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015B2AC
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::cancelStatFuncGigasLoad()
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015B2B0
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::changeStatFuncGigasLoad(int)
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015B2B4
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::moveCancelFuncGigasLoad()
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015B2B8
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::moveFrameFuncGigasLoad()
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015B2BC
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::moveCancelFuncCaveWorm()
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015B2C0
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::moveFrameFuncCaveWorm()
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015B2C4
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::frameStatFuncLizardmanKing()
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015B2C8
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::cancelStatFuncLizardmanKing()
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015B2CC
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::changeStatFuncLizardmanKing(int)
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015B2D0
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::moveCancelFuncLizardmanKing()
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015B2D4
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::moveFrameFuncLizardmanKing()
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015B2D8
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::moveCancelFuncMolbol()
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015B2DC
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::moveFrameFuncMolbol()
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015B2E0
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::changeStatFuncGoblinKing(int)
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015B2E4
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::moveCancelFuncGoblinKing()
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015B2E8
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::moveFrameFuncGoblinKing()
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015B2EC
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::moveCancelFuncArmstrong()
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015B2F0
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::moveFrameFuncArmstrong()
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015B2F4
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::cancelStatFuncGolem()
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015B2F8
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::moveCancelFuncGolem()
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015B2FC
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::moveFrameFuncGolem()
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015B300
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::changeStatFuncOrcKing(int)
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015B304
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::cancelStatFuncGiantCrab()
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015B308
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::changeStatFuncGiantCrab(int)
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015B30C
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::moveCancelFuncGiantCrab()
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015B310
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::moveFrameFuncGiantCrab()
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015B314
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::alwaysFuncDefault()
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015B318
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::frameStatFuncDefault()
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015B31C
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::cancelStatFuncDefault()
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015B320
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::changeStatFuncDefault(int)
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015B324
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::moveCancelFuncDefault()
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015B328
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::moveFrameFuncDefault()
 {
-	// TODO
 }

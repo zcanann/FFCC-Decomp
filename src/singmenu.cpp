@@ -208,8 +208,8 @@ extern char s_Lobezna_803326F8[];
 extern char s_Regen_80332700[];
 extern char s_Regena_80332708[];
 extern char s_Recup_80332710[];
-extern char s_solo2_80332718[];
-extern char s_solo1_80332720[];
+extern const char s_solo2_80332718[] = "world2";
+extern const char s_solo1_80332720[] = "crystal";
 extern char s_solo4_80332728[];
 extern char s_solo5_80332730[];
 extern char s_solo8_80332738[];
@@ -222,14 +222,26 @@ extern char s_solo49_80332768[];
 extern char s_solo50_80332770[];
 extern char s_solo51_80332778[];
 extern char s_solo63_80332780[];
-extern char s_solo3_80332788[];
-extern char s_solo6_80332790[];
-extern char s_solo7_80332798[];
-extern char s_solo10_803327A0[];
-extern char s_solo11_803327A8[];
-extern char s_solo12_803327B0[];
-extern char s_solo13_803327B8[];
-extern char s_solo14_803327C0[];
+extern const char s_solo3_80332788[] = "world27";
+extern const char s_solo6_80332790[] = "world28";
+extern const char s_solo7_80332798[] = "world29";
+extern const char s_solo10_803327A0[] = "world44";
+extern const char s_solo11_803327A8[] = "world45";
+extern const char s_solo12_803327B0[] = "world48";
+extern const char s_solo13_803327B8[] = "world49";
+extern const char s_solo14_803327C0[] = "world51";
+extern const float FLOAT_80333240 = 255.0f;
+extern const float FLOAT_80333244 = 33.0f;
+extern const float FLOAT_80333248 = 132.0f;
+extern const float FLOAT_8033324c = 128.0f;
+extern const float FLOAT_80333250 = 104.0f;
+extern const float FLOAT_80333254 = 0.0f;
+extern const float FLOAT_80333258 = 1.0f;
+extern const float FLOAT_8033325c = 0.2617994f;
+extern const float FLOAT_80333260 = -6.0f;
+extern const float FLOAT_80333264 = 0.83f;
+extern const double DOUBLE_80333268 = 0.1;
+extern const double DOUBLE_80333270 = 1.0;
 extern char s_solo15_803327C8[];
 extern char s_solo16_803327D0[];
 extern char s_solo17_803327D8[];
@@ -738,11 +750,11 @@ extern "C" SingMenuStaticMessageInfo s_singleMenuStaticMessages[] = {
 };
 
 extern "C" SingMenuSoloNameTable PTR_s_solo2 = {
-    {s_solo2_80332718, 0, 0, 0, 0, 0, 0, 0, 0},
+    {(char*)s_solo2_80332718, 0, 0, 0, 0, 0, 0, 0, 0},
 };
 
 extern "C" CMenuPcs::CTmp s_singleMenuTextureTable[] = {
-    {4, s_solo1_80332720},
+    {4, (char*)s_solo1_80332720},
     {4, s_solo4_80332728},
     {4, s_solo5_80332730},
     {4, s_solo8_80332738},
@@ -758,12 +770,12 @@ extern "C" CMenuPcs::CTmp s_singleMenuTextureTable[] = {
 };
 
 extern "C" SingMenuSoloNameTable PTR_s_solo1 = {
-    {s_solo1_80332720, s_sololetter_801DE8A4, 0, 0, 0, 0, 0, 0, 0},
+    {(char*)s_solo1_80332720, s_sololetter_801DE8A4, 0, 0, 0, 0, 0, 0, 0},
 };
 
 extern "C" SingMenuTextureRef s_singleMenuModelTextureTable[] = {
-    {5, s_solo2_80332718}, {5, s_solo3_80332788}, {5, s_solo6_80332790}, {5, s_solo7_80332798}, {5, s_solo10_803327A0},
-    {5, s_solo11_803327A8}, {5, s_solo12_803327B0}, {5, s_solo13_803327B8}, {5, s_solo14_803327C0}, {5, s_solo15_803327C8},
+    {5, (char*)s_solo2_80332718}, {5, (char*)s_solo3_80332788}, {5, (char*)s_solo6_80332790}, {5, (char*)s_solo7_80332798}, {5, (char*)s_solo10_803327A0},
+    {5, (char*)s_solo11_803327A8}, {5, (char*)s_solo12_803327B0}, {5, (char*)s_solo13_803327B8}, {5, (char*)s_solo14_803327C0}, {5, s_solo15_803327C8},
     {5, s_solo16_803327D0}, {5, s_solo17_803327D8}, {5, s_solo18_803327E0}, {5, s_solo19_803327E8}, {5, s_solo20_803327F0},
     {5, s_solo21_803327F8}, {5, s_solo22_80332800}, {5, s_solo24_80332808}, {5, s_solo25_80332810}, {5, s_solo26_80332818},
     {5, s_solo27_80332820}, {5, s_solo28_80332828}, {5, s_solo29_80332830}, {5, s_solo31_80332838}, {5, s_solo32_80332840},

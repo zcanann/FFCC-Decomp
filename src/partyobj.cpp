@@ -483,11 +483,7 @@ void CGPartyObj::onCancelStat(int state)
 		*reinterpret_cast<float*>(self + 0x4FC) = FLOAT_80331a78;
 		break;
 	case 9:
-	case 0x0B:
-	case 0x0C:
-	case 0x0D:
-	case 0x22:
-		if (m_lastStateId == 9 && state == 0x22) {
+		if (state == 0x22) {
 			break;
 		}
 		if (((party.partyFlags & 0x04) != 0) && (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0)) {
@@ -530,6 +526,36 @@ void CGPartyObj::onCancelStat(int state)
 			m_bgColMask |= 0x1000E;
 		}
 		break;
+	case 0x0B:
+	case 0x0C:
+	case 0x0D:
+		{
+			short mapId = *reinterpret_cast<short*>(&m_lastMapIdHit);
+			if (party.carryObject != 0) {
+				if (CFlatItemCarryMode() == 0) {
+					if (mapId == 1) {
+						SetAnimSlot(0x0B, 0);
+						SetAnimSlot(0x0C, 1);
+					} else {
+						SetAnimSlot(0x0B, 0);
+						SetAnimSlot(2, 1);
+					}
+				} else {
+					SetAnimSlot(0x0B, 0);
+					SetAnimSlot(0x0C, 1);
+				}
+			} else if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
+				SetAnimSlot(0x25, 0);
+				SetAnimSlot(0x24, 1);
+			} else if (mapId == 1) {
+				SetAnimSlot(0, 0);
+				SetAnimSlot(1, 1);
+			} else {
+				SetAnimSlot(0x25, 0);
+				SetAnimSlot(0x30, 1);
+			}
+		}
+		break;
 	case 0x0F:
 		if ((party.commandFlags & 0x20) != 0) {
 			checkAndSetWeapon();
@@ -541,6 +567,47 @@ void CGPartyObj::onCancelStat(int state)
 		break;
 	case 0x15:
 		enableDamageCol(1);
+		break;
+	case 0x22:
+		if (((party.partyFlags & 0x04) != 0) && (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0)) {
+			addHp(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1A), static_cast<CGPrgObj*>(0));
+			party.partyFlags &= 0xFB;
+		}
+		enableDamageCol(1);
+		{
+			short mapId = *reinterpret_cast<short*>(&m_lastMapIdHit);
+			if (party.carryObject != 0) {
+				if (CFlatItemCarryMode() == 0) {
+					if (mapId == 1) {
+						SetAnimSlot(0x0B, 0);
+						SetAnimSlot(0x0C, 1);
+					} else {
+						SetAnimSlot(0x0B, 0);
+						SetAnimSlot(2, 1);
+					}
+				} else {
+					SetAnimSlot(0x0B, 0);
+					SetAnimSlot(0x0C, 1);
+				}
+			} else if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
+				SetAnimSlot(0x25, 0);
+				SetAnimSlot(0x24, 1);
+			} else if (mapId == 1) {
+				SetAnimSlot(0, 0);
+				SetAnimSlot(1, 1);
+			} else {
+				SetAnimSlot(0x25, 0);
+				SetAnimSlot(0x30, 1);
+			}
+		}
+		if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
+			m_alpha = 1.0f;
+			m_bgColMask &= 0xFFFEFFF1;
+		} else {
+			endPSlotBit(0x10000);
+			m_alpha = 0.5f;
+			m_bgColMask |= 0x1000E;
+		}
 		break;
 	default:
 		break;

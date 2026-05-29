@@ -3063,7 +3063,29 @@ int CGCharaObj::searchCombi(int count, CGPartyObj** partyList, int& outFallback)
 		for (int slot = 0; slot < reqCount; slot++) {
 			CGPartyObj* obj = partyList[slot];
 			CGCharaObj* partyObj = reinterpret_cast<CGCharaObj*>(obj);
-			if (obj == 0 || partyObj->m_comboFrame == 0) {
+			if (partyObj->m_comboFrame == 0) {
+				unsigned short* fallbackCursor = combiCursor + slot * 3;
+				int scanSlot = slot;
+				for (int remaining = reqCount - slot; remaining != 0; remaining--, scanSlot++, fallbackCursor += 3) {
+					unsigned int objParticle = static_cast<unsigned int>(partyObj->m_itemId);
+					bool itemMatch = false;
+					if (scanSlot == count - 1) {
+						unsigned short itemCode =
+							*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + (objParticle * 0x48));
+						if (itemCode == 0x1F8 && fallbackCursor[0] == 0x1F8) {
+							itemMatch = true;
+						}
+					}
+					if (itemMatch || objParticle == fallbackCursor[0]) {
+						if (partyList[0] == obj || baseParty->m_comboFrame <= static_cast<int>(combiCursor[slot * 3 + 2])) {
+							break;
+						}
+					}
+				}
+				if (scanSlot < count) {
+					outFallback = 1;
+					return found;
+				}
 				matched = false;
 				break;
 			}

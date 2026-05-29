@@ -613,6 +613,7 @@ void CGCharaObj::onFramePostCalc()
 		setSta(i, statusValue);
 	}
 
+	script = reinterpret_cast<unsigned char*>(m_scriptHandle);
 	if (*reinterpret_cast<short*>(script + 0x3E) == 0 &&
 	    *reinterpret_cast<short*>(script + 0x14) == 0 &&
 	    *reinterpret_cast<short*>(script + 0x11) == 0) {

@@ -2238,8 +2238,8 @@ void CGPartyObj::checkTargetParticle()
 		    (leader->m_lastStateId == 2 || leader->m_lastStateId == 6) &&
 		    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(leader) + 0x668) != 0) {
 			Vec toLeaderTarget;
-			PSVECSubtract(reinterpret_cast<Vec*>(reinterpret_cast<unsigned char*>(leader) + 0x66C),
-			              reinterpret_cast<Vec*>(self + 0x66C), &toLeaderTarget);
+			PSVECSubtract(reinterpret_cast<Vec*>(self + 0x66C),
+			              reinterpret_cast<Vec*>(reinterpret_cast<unsigned char*>(leader) + 0x66C), &toLeaderTarget);
 			toLeaderTarget.y = 0.0f;
 			if (PSVECMag(&toLeaderTarget) > 0.001f) {
 				input.x = toLeaderTarget.x;

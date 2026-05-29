@@ -1338,8 +1338,8 @@ void CGCharaObj::setSta(int staIndex, int value)
 						gCFlatRuntime2.EndParticleSlot(slots[i], 1);
 					}
 				}
-				int particleNo = isMon ? 0x170 : 0x114;
-				putParticle(particleNo, slots[15], this, 20.0f * m_attackColRadius, 0);
+				int particleNo = isMon ? 0x70 : 0x14;
+				putParticle(particleNo | 0x100, slots[15], this, 20.0f * m_attackColRadius, 0);
 				break;
 			}
 			case 8: {
@@ -1348,8 +1348,8 @@ void CGCharaObj::setSta(int staIndex, int value)
 						gCFlatRuntime2.EndParticleSlot(slots[i], 1);
 					}
 				}
-				int particleNo = (isMon ? 0x16E : 0x112) | 0x100;
-				putParticle(particleNo, slots[13], this, 20.0f * m_attackColRadius * monsterScale, 0);
+				int particleNo = isMon ? 0x6E : 0x12;
+				putParticle(particleNo | 0x100, slots[13], this, 20.0f * m_attackColRadius * monsterScale, 0);
 				break;
 			}
 			case 9: {
@@ -1358,8 +1358,8 @@ void CGCharaObj::setSta(int staIndex, int value)
 						gCFlatRuntime2.EndParticleSlot(slots[i], 1);
 					}
 				}
-				int particleNo = (isMon ? 0x16C : 0x110) | 0x100;
-				putParticle(particleNo, slots[14], this, 20.0f * m_attackColRadius * monsterScale, 0);
+				int particleNo = isMon ? 0x6C : 0x10;
+				putParticle(particleNo | 0x100, slots[14], this, 20.0f * m_attackColRadius * monsterScale, 0);
 				break;
 			}
 			case 10:
@@ -1444,8 +1444,8 @@ void CGCharaObj::setSta(int staIndex, int value)
 						gCFlatRuntime2.EndParticleSlot(slots[i], 1);
 					}
 				}
-				int particleNo = (isMon ? 0x171 : 0x115) | 0x100;
-				putParticle(particleNo, 0, this, 20.0f * m_attackColRadius, 0);
+				int particleNo = isMon ? 0x71 : 0x15;
+				putParticle(particleNo | 0x100, 0, this, 20.0f * m_attackColRadius, 0);
 				break;
 			}
 			case 8: {
@@ -1454,8 +1454,8 @@ void CGCharaObj::setSta(int staIndex, int value)
 						gCFlatRuntime2.EndParticleSlot(slots[i], 1);
 					}
 				}
-				int particleNo = (isMon ? 0x16F : 0x113) | 0x100;
-				putParticle(particleNo, 0, this, 20.0f * m_attackColRadius * monsterScale, 0);
+				int particleNo = isMon ? 0x6F : 0x13;
+				putParticle(particleNo | 0x100, 0, this, 20.0f * m_attackColRadius * monsterScale, 0);
 				break;
 			}
 			case 9: {
@@ -1464,8 +1464,8 @@ void CGCharaObj::setSta(int staIndex, int value)
 						gCFlatRuntime2.EndParticleSlot(slots[i], 1);
 					}
 				}
-				int particleNo = (isMon ? 0x16D : 0x111) | 0x100;
-				putParticle(particleNo, 0, this, 20.0f * m_attackColRadius * monsterScale, 0);
+				int particleNo = isMon ? 0x6D : 0x11;
+				putParticle(particleNo | 0x100, 0, this, 20.0f * m_attackColRadius * monsterScale, 0);
 				break;
 			}
 			case 10:

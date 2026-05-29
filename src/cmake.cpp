@@ -2473,14 +2473,14 @@ void CMenuPcs::CmakeTribeDraw()
         int tribeCursorY = 0x88 + select * 0x1C;
 
         if (*reinterpret_cast<short*>(state + 0x30) == 0) {
-            DrawCursor(static_cast<int>(FLOAT_80333320) + frame, tribeCursorY, alpha);
+            DrawCursor(static_cast<int>(FLOAT_80333320 + static_cast<float>(frame)), tribeCursorY, alpha);
         } else {
             if ((System.m_frameCounter & 1) != 0) {
                 DrawCursor(static_cast<int>(FLOAT_80333320), tribeCursorY, alpha);
             }
 
             int hairCursorY = 0x88 + *reinterpret_cast<short*>(state + 0x28) * 0x1C;
-            DrawCursor(static_cast<int>(FLOAT_80333324) + frame, hairCursorY, alpha);
+            DrawCursor(static_cast<int>(FLOAT_80333324 + static_cast<float>(frame)), hairCursorY, alpha);
         }
     }
 

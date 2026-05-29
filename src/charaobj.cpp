@@ -2302,7 +2302,10 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 			gCFlatRuntime2.SetParticleWorkPos(m_worldPosition, m_rotTargetY);
 		}
 
-		if (effectId == 0x3B4 && effectArg0 == 3 && pos != 0) {
+		if (effectId == 0x3B4 && effectArg0 == 3) {
+			if (pos == 0) {
+				return;
+			}
 			gCFlatRuntime2.SetParticleWorkPos(*pos, m_rotTargetY);
 			gCFlatRuntime2.PutParticleWork();
 			emittedCustom = true;

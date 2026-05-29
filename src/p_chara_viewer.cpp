@@ -218,7 +218,6 @@ void CCharaPcs::drawViewer()
     CCharaPcs* self = this;
     register const char* viewerStrings = s_no_texture____801da7e8;
     Mtx cameraMtx;
-    Mtx scratchMtx;
     Mtx44 projMtx;
     Mtx texMtx;
 
@@ -325,6 +324,7 @@ void CCharaPcs::drawViewer()
                                         (__cntlzw(2 - lightIndex) >> 5) & 0xFF);
                 }
 
+                Mtx scratchMtx;
                 Vec lightPos;
                 PSMTXCopy((const float(*)[4])(reinterpret_cast<unsigned char*>(model) + 8), scratchMtx);
                 lightPos.x = scratchMtx[0][3];

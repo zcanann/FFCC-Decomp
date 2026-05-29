@@ -21,6 +21,8 @@ extern char SoundBuffer[];
 
 extern "C" char sCharaObjDebugStatFormat[];
 extern "C" char lbl_801DC590[];
+extern "C" char lbl_801DC8D8[];
+extern "C" char lbl_801DC8EC[];
 extern "C" char lbl_801DC940[];
 
 extern "C" {
@@ -1514,7 +1516,7 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
 	switch (staIndex) {
 		case 0:
 			if (*reinterpret_cast<short*>(script + 0x10) == 0) {
-				calcSta(0, amount, source);
+				setSta(0, calcSta(0, amount, source));
 				setSta(4, 0);
 				Sound.StopSe3DGroup(m_particleId);
 				damageDelete();
@@ -1527,7 +1529,7 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
 			break;
 		case 1:
 			if (*reinterpret_cast<short*>(script + 0x3E) == 0) {
-				calcSta(1, amount, source);
+				setSta(1, calcSta(1, amount, source));
 				setSta(4, 0);
 			} else {
 				setSta(0, 0);
@@ -1536,7 +1538,7 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
 			}
 			break;
 		case 2:
-			calcSta(2, amount, source);
+			setSta(2, calcSta(2, amount, source));
 			break;
 		case 3:
 			setSta(1, 0);
@@ -1545,7 +1547,7 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
 			setSta(9, 0);
 			setSta(7, 0);
 			setSta(8, 0);
-			calcSta(3, amount, source);
+			setSta(3, calcSta(3, amount, source));
 			putHitParticleFromItem(sourceObj, amount);
 			Sound.StopSe3DGroup(m_particleId);
 			damageDelete();
@@ -1553,19 +1555,19 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
 			next = 0;
 			break;
 		case 4:
-			calcSta(4, amount, source);
+			setSta(4, calcSta(4, amount, source));
 			setSta(0, 0);
 			setSta(1, 0);
 			changeStat(10, 0, 0);
 			break;
 		case 6:
-			calcSta(6, amount, source);
+			setSta(6, calcSta(6, amount, source));
 			putHitParticleFromItem(sourceObj, amount);
 			next = 0;
 			break;
 		case 7:
 			if (*reinterpret_cast<short*>(script + 0x4E) == 0) {
-				calcSta(7, amount, source);
+				setSta(7, calcSta(7, amount, source));
 				putHitParticleFromItem(sourceObj, amount);
 			} else {
 				setSta(7, 0);
@@ -1575,7 +1577,7 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
 			break;
 		case 8:
 			if (*reinterpret_cast<short*>(script + 0x13) == 0) {
-				calcSta(8, amount, source);
+				setSta(8, calcSta(8, amount, source));
 				putHitParticleFromItem(sourceObj, amount);
 			} else {
 				setSta(7, 0);
@@ -1586,7 +1588,7 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
 		case 9:
 			setSta(7, 0);
 			setSta(8, 0);
-			calcSta(9, amount, source);
+			setSta(9, calcSta(9, amount, source));
 			putHitParticleFromItem(sourceObj, amount);
 			Sound.StopSe3DGroup(m_particleId);
 			damageDelete();
@@ -1594,7 +1596,7 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
 			next = 0;
 			break;
 		case 0x1C:
-			calcSta(0x1C, amount, source);
+			setSta(0x1C, calcSta(0x1C, amount, source));
 			break;
 		case 0x25:
 			if (*reinterpret_cast<short*>(script + 0x3E) != 0) {
@@ -1660,7 +1662,7 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
 			putHitParticleFromItem(sourceObj, amount);
 			break;
 		case 0x6A:
-			calcSta(4, amount, source);
+			setSta(4, calcSta(4, amount, source));
 			setSta(0, 0);
 			setSta(1, 0);
 			changeStat(10, 0, 0);
@@ -1694,15 +1696,16 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj* sourceObj, int& o
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
+int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 {
 	if (m_scriptHandle == 0 || source == 0) {
-		return;
+		return 0;
 	}
 
 	short* staPtr = reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E + (staIndex * 2));
 	if ((staIndex == 0 || staIndex == 4) && *staPtr != 0) {
-		return;
+		System.Printf(const_cast<char*>(lbl_801DC8D8));
+		return static_cast<int>(*staPtr);
 	}
 
 	unsigned int base = 0;
@@ -1812,7 +1815,8 @@ void CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 
 	unsigned int next = affinity + (base * power);
 	next &= ~((static_cast<int>(next)) >> 31);
-	setSta(staIndex, static_cast<int>(next));
+	System.Printf(const_cast<char*>(lbl_801DC8EC), base, power, affinity, next);
+	return static_cast<int>(next);
 }
 
 /*

@@ -63,7 +63,7 @@ public:
 	void putHitParticleFromItem(CGPrgObj*, int);
 	void setSta(int, int);
 	void effective(int, int, CGPrgObj*, int&);
-	void calcSta(int, int, CGObject*);
+	int calcSta(int, int, CGObject*);
 	void addHp(int, CGPrgObj*);
 	void calcRegist(int, int, int&, int&, int&, int);
 	int getItemPdt(int, int, int&, int&, int&);

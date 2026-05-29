@@ -375,17 +375,6 @@ extern "C" MonAiFuncTable funcsLKShooter = {
 
 /*
  * --INFO--
- * PAL Address: 0x801434a8
- * PAL Size: 8012b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" void __sinit_monobj_table_cpp(void);
-
-/*
- * --INFO--
  * Address:	TODO
  * Size:	TODO
  */

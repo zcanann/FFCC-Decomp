@@ -2149,14 +2149,14 @@ void CMenuPcs::CmakeSexDraw()
     CColor rgba(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a));
     font->SetColor(rgba);
 
-    float maxWidth = 0.0f;
+    float maxWidth = FLOAT_80333254;
     for (int i = 0; i < 2; ++i) {
         const char* txt = GetMenuStr(0x11 + i);
         float width = static_cast<float>(font->GetWidth(txt));
         if (maxWidth < width) {
             maxWidth = width;
         }
-        float x = FLOAT_80333288 - width * FLOAT_80333298;
+        float x = static_cast<float>(-(static_cast<double>(width) * DOUBLE_80333298 - DOUBLE_80333288));
         font->SetPosX(x);
         font->SetPosY(0x9C + i * 0x28 - FLOAT_803332f4);
         font->Draw(txt);
@@ -2166,7 +2166,10 @@ void CMenuPcs::CmakeSexDraw()
     if (*reinterpret_cast<short*>(MenuS32(this, 0x82C) + 0x10) == 1) {
         int sel = *reinterpret_cast<short*>(MenuS32(this, 0x82C) + 0x26);
         int frame = System.m_frameCounter & 7;
-        int cursorX = static_cast<int>(FLOAT_80333288 - maxWidth * (FLOAT_80333298 + FLOAT_80333298)) + frame;
+        int cursorX = static_cast<int>(
+            static_cast<double>(static_cast<float>(DOUBLE_80333288 - static_cast<double>(maxWidth) * DOUBLE_80333298) +
+                                static_cast<float>(frame)) -
+            static_cast<double>(maxWidth) * DOUBLE_80333298);
         int cursorY = 0xA4 + sel * 0x28;
         DrawCursor(cursorX, cursorY, alpha);
     }

@@ -780,7 +780,19 @@ int CMenuPcs::LetterCtrl()
 				*reinterpret_cast<s16*>(state + 0x12) = 1;
 			}
 		} else if (mode == 4) {
-			LetterAttachWinOpen();
+			if (*reinterpret_cast<char*>(state + 0xC) == '\0') {
+				s16 winW;
+				s16 winH;
+				GetSingWinSize(2, &winW, &winH, 0);
+				SetMcWinInfo(static_cast<int>(winW), static_cast<int>(winH));
+				*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x848) + 0xA) = 0;
+				*reinterpret_cast<s16*>(state + 0x28) = 0;
+				*reinterpret_cast<unsigned char*>(state + 9) = 0xFF;
+				*reinterpret_cast<char*>(state + 0xC) = 1;
+			}
+			if (*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x848) + 0xA) == 1) {
+				*reinterpret_cast<s16*>(state + 0x12) = 1;
+			}
 		} else if (mode == 5) {
 			if (LetterConfirmOpen()) {
 				*reinterpret_cast<s16*>(state + 0x12) = 1;

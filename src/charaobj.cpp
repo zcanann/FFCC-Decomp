@@ -438,7 +438,7 @@ void CGCharaObj::onCreate()
 	memset(m_unk6AC, 0, sizeof(m_unk6AC));
 
 	for (int i = 0; i < 0x16; i++) {
-		m_particleSlots[i] = gCFlatRuntime2.GetFreeParticleSlot();
+		m_particleSlots[i] = CFlatRuntime2Storage().GetFreeParticleSlot();
 	}
 }
 

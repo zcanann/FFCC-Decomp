@@ -3008,11 +3008,7 @@ void CMenuPcs::CmakeResultDraw()
             value = GetTribeStr(static_cast<int>(s_CmakeInfo.m_tribe));
 
             strcpy(tribeWithSlash, value);
-            size_t tribeLen = strlen(tribeWithSlash);
-            if (tribeLen + 1 < sizeof(tribeWithSlash)) {
-                tribeWithSlash[tribeLen] = '/';
-                tribeWithSlash[tribeLen + 1] = '\0';
-            }
+            strcat(tribeWithSlash, "/", sizeof(tribeWithSlash));
             value = tribeWithSlash;
         } else {
             value = GetJobStr(static_cast<int>(s_CmakeInfo.m_job));

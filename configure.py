@@ -498,7 +498,11 @@ config.libs = [
             Object(NonMatching, "bonus_menu.cpp"),
             Object(NonMatching, "cflat_data.cpp"),
             Object(NonMatching, "cflat_r2class.cpp"),
-            Object(NonMatching, "cflat_r2system.cpp"),
+            Object(
+                NonMatching,
+                "cflat_r2system.cpp",
+                extra_cflags=["-opt space", "-inline auto,deferred", "-str reuse,pool,readonly"],
+            ),
             Object(NonMatching, "cflat_runtime.cpp"),
             Object(NonMatching, "cflat_runtime2.cpp", extra_cflags=["-inline auto,deferred"]),
             Object(NonMatching, "chara_anim.cpp", extra_cflags=["-inline auto,deferred", "-RTTI on"]),

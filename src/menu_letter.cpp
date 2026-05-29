@@ -926,6 +926,7 @@ int CMenuPcs::LetterCtrl()
 		}
 	}
 
+	float f = FLOAT_803330f8;
 	if (ret == 0) {
 		return 0;
 	}
@@ -949,7 +950,7 @@ int CMenuPcs::LetterCtrl()
 	for (int i = 0; i < panelCount; ++i, panel += 0x20) {
 		panel[0x10] = 0;
 		panel[0x11] = 0;
-		*reinterpret_cast<float*>(panel + 8) = FLOAT_803330f8;
+		*reinterpret_cast<float*>(panel + 8) = f;
 	}
 	*reinterpret_cast<s16*>(state + 0x22) = 0;
 	return ret;

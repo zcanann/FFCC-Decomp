@@ -3130,13 +3130,12 @@ int CGPartyObj::canPlayerPutItem()
  * JP Address: TODO
  * JP Size: TODO
  */
-int CGPartyObj::putItem(int)
+int CGPartyObj::putItem(int itemId)
 {
 	if (canPlayerPutItem() == 0) {
 		return 0;
 	}
 
-	int itemId = PartyData(this).weaponItem;
 	CGPrgObj* created = CGItemObj::CreateFromScript(
 	    0, 9, itemId, this, FLOAT_80331a78, (CGItemObj::CCFS*)0);
 	if (created == nullptr) {

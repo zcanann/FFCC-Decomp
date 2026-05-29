@@ -2709,9 +2709,8 @@ int CGCharaObj::calcCastTime(int itemId)
 			}
 		}
 
-		unsigned int castReduction = (static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D
-		                                 ? static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(script + 0xBD8))
-		                                 : 0;
+		unsigned int playerCid = (static_cast<unsigned int>(__cntlzw(0x6D - static_cast<int>(static_cast<unsigned short>(GetCID()) & 0x6D))) >> 5) & 0xFFU;
+		unsigned int castReduction = playerCid != 0 ? static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(script + 0xBD8)) : 0;
 		int totalCast = static_cast<int>(baseCast + castBonus) - static_cast<int>(castReduction);
 		int cast = static_cast<int>(castScale * static_cast<float>(totalCast));
 		System.Printf(debugFormat + 0x10, baseCast, castBonus, castScale);
@@ -2728,9 +2727,8 @@ int CGCharaObj::calcCastTime(int itemId)
 	}
 	if (itemNo == 0x1F8) {
 		unsigned int castBonus = *reinterpret_cast<unsigned short*>(script9 + 0x196);
-		unsigned int castReduction = (static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D
-		                                 ? static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(script + 0xBD9))
-		                                 : 0;
+		unsigned int playerCid = (static_cast<unsigned int>(__cntlzw(0x6D - static_cast<int>(static_cast<unsigned short>(GetCID()) & 0x6D))) >> 5) & 0xFFU;
+		unsigned int castReduction = playerCid != 0 ? static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(script + 0xBD9)) : 0;
 		int totalCast = static_cast<int>(baseCast + castBonus) - static_cast<int>(castReduction);
 		int cast = static_cast<int>(castScale * static_cast<float>(totalCast));
 		System.Printf(debugFormat + 0x60, baseCast, castBonus, castScale);

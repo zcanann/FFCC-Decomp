@@ -4137,7 +4137,7 @@ void CGPartyObj::gpmMove()
 	if (sGhostPartyWork.carrySpeed > FLOAT_80331a70) {
 		moveVector(&sGhostPartyWork.carryDir, sGhostPartyWork.carrySpeed, 1);
 	}
-	sGhostPartyWork.carrySpeed *= 0.85f;
+	sGhostPartyWork.carrySpeed *= FLOAT_80331a74;
 
 	int stageMode;
 	switch (Game.m_gameWork.m_bossArtifactStageIndex) {

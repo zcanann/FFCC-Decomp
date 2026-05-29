@@ -1859,8 +1859,8 @@ void CMenuPcs::LetterMessDraw()
 
 	{
 		u8 alpha = static_cast<u8>(FLOAT_803330a0 * *reinterpret_cast<float*>(animBase + 0xC));
-		GXColor color = {0xFF, 0xFF, 0xFF, alpha};
-		font->SetColor(color);
+		CColor color(0xFF, 0xFF, 0xFF, alpha);
+		font->SetColor(color.color);
 	}
 
 	CMemory::CStage* stage = *reinterpret_cast<CMemory::CStage**>(

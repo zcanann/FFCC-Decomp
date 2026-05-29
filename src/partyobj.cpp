@@ -3969,10 +3969,10 @@ void CGPartyObj::gpmCalcDist(Vec* outVec, float& outDist)
 
 	float dist = PSVECMag(outVec);
 	float maxDist = m_targetDist;
-	outDist = dist;
-	if (outDist >= maxDist) {
-		outDist = maxDist;
+	if (dist < maxDist) {
+		maxDist = dist;
 	}
+	outDist = maxDist;
 }
 
 /*

@@ -1964,7 +1964,7 @@ void CMenuPcs::LetterMessDraw()
 			}
 			cursorX = static_cast<float>(singWin[0] + 0x14);
 			cursorY = static_cast<float>(singWin[1] + itemSel * SingWinMessHeight() + 0x20);
-		} else {
+		} else if ((mode == 3) || (mode == 4)) {
 			cursorX = static_cast<float>(singWin[0] - 8);
 			if (mode == 4) {
 				cursorX += FLOAT_80333110;

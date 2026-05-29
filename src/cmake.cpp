@@ -2265,31 +2265,29 @@ unsigned short CMenuPcs::CmakeTribeCtrl()
                 return 0;
             }
 
-            bool duplicate = false;
-
-            for (int slot = 0; slot < 8; ++slot) {
-                unsigned char* entry = GetCmakeRosterEntry(this, slot);
-                if (*reinterpret_cast<int*>(entry + 0x1794) == 0) {
-                    continue;
+            int duplicateSlot = 8;
+            unsigned char* entry = GetCmakeRosterEntry(this, 0);
+            for (int slot = 0; slot < 8; slot += 2, entry += 0x1860) {
+                if ((*reinterpret_cast<int*>(entry + 0x1794) != 0) &&
+                    (*(entry + 0x1F96) != 1) &&
+                    (*reinterpret_cast<unsigned short*>(entry + 0x17D0) == static_cast<unsigned short>(tribe)) &&
+                    (*reinterpret_cast<unsigned short*>(entry + 0x17D4) == static_cast<unsigned short>(crest)) &&
+                    (*reinterpret_cast<unsigned short*>(entry + 0x17D2) == static_cast<unsigned short>(s_CmakeInfo.m_gender))) {
+                    duplicateSlot = slot;
+                    break;
                 }
-                if (*(entry + 0x1F96) == 1) {
-                    continue;
+                if ((*reinterpret_cast<int*>(entry + 0x23C4) != 0) &&
+                    (*(entry + 0x2BC6) != 1) &&
+                    (*reinterpret_cast<unsigned short*>(entry + 0x2400) == static_cast<unsigned short>(tribe)) &&
+                    (*reinterpret_cast<unsigned short*>(entry + 0x2404) == static_cast<unsigned short>(crest)) &&
+                    (*reinterpret_cast<unsigned short*>(entry + 0x2402) == static_cast<unsigned short>(s_CmakeInfo.m_gender))) {
+                    duplicateSlot = slot + 1;
+                    break;
                 }
-                if (*reinterpret_cast<unsigned short*>(entry + 0x17D0) != static_cast<unsigned short>(tribe)) {
-                    continue;
-                }
-                if (*reinterpret_cast<unsigned short*>(entry + 0x17D4) != static_cast<unsigned short>(crest)) {
-                    continue;
-                }
-                if (*reinterpret_cast<unsigned short*>(entry + 0x17D2) != static_cast<unsigned short>(s_CmakeInfo.m_gender)) {
-                    continue;
-                }
-
-                duplicate = true;
-                break;
+                duplicateSlot = slot + 2;
             }
 
-            if (!duplicate) {
+            if (duplicateSlot > 7) {
                 s_CmakeInfo.m_tribe = static_cast<signed char>(tribe);
                 s_CmakeInfo.m_hair = static_cast<signed char>(crest);
                 ChgModel(static_cast<int>(MenuS16(this, 0x86A)),

@@ -2326,7 +2326,7 @@ void CGPartyObj::checkTargetParticle()
 
 		PSVECSubtract(targetPos, &m_worldPosition, &fromCenter);
 		float dist = PSVECMag(&fromCenter);
-		if (dist > maxRange && dist > 0.001f) {
+			if (dist > maxRange) {
 			PSVECScale(&fromCenter, &fromCenter, maxRange / dist);
 			PSVECAdd(&m_worldPosition, &fromCenter, targetPos);
 		}

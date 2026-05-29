@@ -557,7 +557,7 @@ config.libs = [
             Object(NonMatching, "mesmenu.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
             Object(NonMatching, "monobj.cpp"),
             Object(NonMatching, "monobj_boss.cpp"),
-            Object(NonMatching, "monobj_table.cpp"),
+            Object(NonMatching, "monobj_table.cpp", extra_cflags=["-pooldata off"]),
             Object(NonMatching, "p_camera.cpp", extra_cflags=["-sdata 8"]),
             Object(NonMatching, "p_chara.cpp", extra_cflags=["-sdata 8"]),
             Object(NonMatching, "p_chara_viewer.cpp", extra_cflags=["-sdata 8"]),

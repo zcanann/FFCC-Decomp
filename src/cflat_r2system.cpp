@@ -1559,17 +1559,15 @@ void CGame::SetNextScript(CGame::CNextScript* nextScript)
 {
     unsigned int* dst = (unsigned int*)((char*)&m_nextScript - 4);
     unsigned int* src = (unsigned int*)((char*)nextScript - 4);
-    int count = 0x20;
 
-    do {
+    for (int i = 0; i < 0x20; i++) {
         unsigned int a = src[1];
         src += 2;
         unsigned int b = src[0];
         dst[1] = a;
         dst += 2;
         dst[0] = b;
-        count--;
-    } while (count != 0);
+    }
 
     m_newGameFlag = 1;
 }

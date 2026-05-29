@@ -365,7 +365,6 @@ MonAiFuncTable funcsLKShooter = {
  */
 void CGMonObj::moveCancelFuncLastBoss()
 {
-	// TODO
 }
 
 /*
@@ -379,7 +378,6 @@ void CGMonObj::moveCancelFuncLastBoss()
  */
 void CGMonObj::moveFrameFuncLastBoss()
 {
-	// TODO
 }
 
 /*
@@ -393,7 +391,6 @@ void CGMonObj::moveFrameFuncLastBoss()
  */
 void CGMonObj::moveCancelFuncRamoe()
 {
-	// TODO
 }
 
 /*
@@ -407,7 +404,6 @@ void CGMonObj::moveCancelFuncRamoe()
  */
 void CGMonObj::moveFrameFuncRamoe()
 {
-	// TODO
 }
 
 /*
@@ -421,7 +417,6 @@ void CGMonObj::moveFrameFuncRamoe()
  */
 void CGMonObj::moveCancelFuncLich()
 {
-	// TODO
 }
 
 /*
@@ -435,7 +430,6 @@ void CGMonObj::moveCancelFuncLich()
  */
 void CGMonObj::moveFrameFuncLich()
 {
-	// TODO
 }
 
 /*
@@ -449,7 +443,6 @@ void CGMonObj::moveFrameFuncLich()
  */
 void CGMonObj::moveCancelFuncTetsukyojin()
 {
-	// TODO
 }
 
 /*
@@ -463,7 +456,6 @@ void CGMonObj::moveCancelFuncTetsukyojin()
  */
 void CGMonObj::moveFrameFuncTetsukyojin()
 {
-	// TODO
 }
 
 /*
@@ -477,7 +469,6 @@ void CGMonObj::moveFrameFuncTetsukyojin()
  */
 void CGMonObj::frameStatFuncAntrion()
 {
-	// TODO
 }
 
 /*
@@ -491,7 +482,6 @@ void CGMonObj::frameStatFuncAntrion()
  */
 void CGMonObj::cancelStatFuncAntrion()
 {
-	// TODO
 }
 
 /*
@@ -505,7 +495,6 @@ void CGMonObj::cancelStatFuncAntrion()
  */
 void CGMonObj::changeStatFuncAntrion(int)
 {
-	// TODO
 }
 
 /*
@@ -519,7 +508,6 @@ void CGMonObj::changeStatFuncAntrion(int)
  */
 void CGMonObj::moveCancelFuncAntrion()
 {
-	// TODO
 }
 
 /*
@@ -533,7 +521,6 @@ void CGMonObj::moveCancelFuncAntrion()
  */
 void CGMonObj::moveFrameFuncAntrion()
 {
-	// TODO
 }
 
 /*
@@ -547,7 +534,6 @@ void CGMonObj::moveFrameFuncAntrion()
  */
 void CGMonObj::moveCancelFuncDragonZombie()
 {
-	// TODO
 }
 
 /*
@@ -561,7 +547,6 @@ void CGMonObj::moveCancelFuncDragonZombie()
  */
 void CGMonObj::moveFrameFuncDragonZombie()
 {
-	// TODO
 }
 
 /*
@@ -575,7 +560,6 @@ void CGMonObj::moveFrameFuncDragonZombie()
  */
 void CGMonObj::frameStatFuncDuct()
 {
-	// TODO
 }
 
 /*
@@ -589,7 +573,6 @@ void CGMonObj::frameStatFuncDuct()
  */
 void CGMonObj::cancelStatFuncDuct()
 {
-	// TODO
 }
 
 /*
@@ -603,7 +586,6 @@ void CGMonObj::cancelStatFuncDuct()
  */
 void CGMonObj::changeStatFuncDuct(int)
 {
-	// TODO
 }
 
 /*
@@ -617,7 +599,6 @@ void CGMonObj::changeStatFuncDuct(int)
  */
 void CGMonObj::moveCancelFuncDuct()
 {
-	// TODO
 }
 
 /*
@@ -631,7 +612,6 @@ void CGMonObj::moveCancelFuncDuct()
  */
 void CGMonObj::moveFrameFuncDuct()
 {
-	// TODO
 }
 
 /*
@@ -645,7 +625,6 @@ void CGMonObj::moveFrameFuncDuct()
  */
 void CGMonObj::cancelStatFuncMeteoParasiteC()
 {
-	// TODO
 }
 
 /*
@@ -659,7 +638,6 @@ void CGMonObj::cancelStatFuncMeteoParasiteC()
  */
 void CGMonObj::changeStatFuncMeteoParasiteC(int)
 {
-	// TODO
 }
 
 /*
@@ -673,7 +651,6 @@ void CGMonObj::changeStatFuncMeteoParasiteC(int)
  */
 void CGMonObj::moveCancelFuncMeteoParasiteC()
 {
-	// TODO
 }
 
 /*
@@ -687,7 +664,6 @@ void CGMonObj::moveCancelFuncMeteoParasiteC()
  */
 void CGMonObj::moveFrameFuncMeteoParasiteC()
 {
-	// TODO
 }
 
 /*
@@ -701,7 +677,6 @@ void CGMonObj::moveFrameFuncMeteoParasiteC()
  */
 void CGMonObj::cancelStatFuncMeteoParasite()
 {
-	// TODO
 }
 
 /*
@@ -715,7 +690,6 @@ void CGMonObj::cancelStatFuncMeteoParasite()
  */
 void CGMonObj::moveCancelFuncMeteoParasite()
 {
-	// TODO
 }
 
 /*
@@ -729,7 +703,6 @@ void CGMonObj::moveCancelFuncMeteoParasite()
  */
 void CGMonObj::moveFrameFuncMeteoParasite()
 {
-	// TODO
 }
 
 /*
@@ -743,7 +716,6 @@ void CGMonObj::moveFrameFuncMeteoParasite()
  */
 void CGMonObj::frameStatFuncGigasLoad()
 {
-	// TODO
 }
 
 /*
@@ -757,7 +729,6 @@ void CGMonObj::frameStatFuncGigasLoad()
  */
 void CGMonObj::cancelStatFuncGigasLoad()
 {
-	// TODO
 }
 
 /*
@@ -771,7 +742,6 @@ void CGMonObj::cancelStatFuncGigasLoad()
  */
 void CGMonObj::changeStatFuncGigasLoad(int)
 {
-	// TODO
 }
 
 /*
@@ -785,7 +755,6 @@ void CGMonObj::changeStatFuncGigasLoad(int)
  */
 void CGMonObj::moveCancelFuncGigasLoad()
 {
-	// TODO
 }
 
 /*
@@ -799,7 +768,6 @@ void CGMonObj::moveCancelFuncGigasLoad()
  */
 void CGMonObj::moveFrameFuncGigasLoad()
 {
-	// TODO
 }
 
 /*
@@ -813,7 +781,6 @@ void CGMonObj::moveFrameFuncGigasLoad()
  */
 void CGMonObj::moveCancelFuncCaveWorm()
 {
-	// TODO
 }
 
 /*
@@ -827,7 +794,6 @@ void CGMonObj::moveCancelFuncCaveWorm()
  */
 void CGMonObj::moveFrameFuncCaveWorm()
 {
-	// TODO
 }
 
 /*
@@ -841,7 +807,6 @@ void CGMonObj::moveFrameFuncCaveWorm()
  */
 void CGMonObj::frameStatFuncLizardmanKing()
 {
-	// TODO
 }
 
 /*
@@ -855,7 +820,6 @@ void CGMonObj::frameStatFuncLizardmanKing()
  */
 void CGMonObj::cancelStatFuncLizardmanKing()
 {
-	// TODO
 }
 
 /*
@@ -869,7 +833,6 @@ void CGMonObj::cancelStatFuncLizardmanKing()
  */
 void CGMonObj::changeStatFuncLizardmanKing(int)
 {
-	// TODO
 }
 
 /*
@@ -883,7 +846,6 @@ void CGMonObj::changeStatFuncLizardmanKing(int)
  */
 void CGMonObj::moveCancelFuncLizardmanKing()
 {
-	// TODO
 }
 
 /*
@@ -897,7 +859,6 @@ void CGMonObj::moveCancelFuncLizardmanKing()
  */
 void CGMonObj::moveFrameFuncLizardmanKing()
 {
-	// TODO
 }
 
 /*
@@ -911,7 +872,6 @@ void CGMonObj::moveFrameFuncLizardmanKing()
  */
 void CGMonObj::moveCancelFuncMolbol()
 {
-	// TODO
 }
 
 /*
@@ -925,7 +885,6 @@ void CGMonObj::moveCancelFuncMolbol()
  */
 void CGMonObj::moveFrameFuncMolbol()
 {
-	// TODO
 }
 
 /*
@@ -939,7 +898,6 @@ void CGMonObj::moveFrameFuncMolbol()
  */
 void CGMonObj::changeStatFuncGoblinKing(int)
 {
-	// TODO
 }
 
 /*
@@ -953,7 +911,6 @@ void CGMonObj::changeStatFuncGoblinKing(int)
  */
 void CGMonObj::moveCancelFuncGoblinKing()
 {
-	// TODO
 }
 
 /*
@@ -967,7 +924,6 @@ void CGMonObj::moveCancelFuncGoblinKing()
  */
 void CGMonObj::moveFrameFuncGoblinKing()
 {
-	// TODO
 }
 
 /*
@@ -981,7 +937,6 @@ void CGMonObj::moveFrameFuncGoblinKing()
  */
 void CGMonObj::moveCancelFuncArmstrong()
 {
-	// TODO
 }
 
 /*
@@ -995,7 +950,6 @@ void CGMonObj::moveCancelFuncArmstrong()
  */
 void CGMonObj::moveFrameFuncArmstrong()
 {
-	// TODO
 }
 
 /*
@@ -1009,7 +963,6 @@ void CGMonObj::moveFrameFuncArmstrong()
  */
 void CGMonObj::cancelStatFuncGolem()
 {
-	// TODO
 }
 
 /*
@@ -1023,7 +976,6 @@ void CGMonObj::cancelStatFuncGolem()
  */
 void CGMonObj::moveCancelFuncGolem()
 {
-	// TODO
 }
 
 /*
@@ -1037,7 +989,6 @@ void CGMonObj::moveCancelFuncGolem()
  */
 void CGMonObj::moveFrameFuncGolem()
 {
-	// TODO
 }
 
 /*
@@ -1051,7 +1002,6 @@ void CGMonObj::moveFrameFuncGolem()
  */
 void CGMonObj::changeStatFuncOrcKing(int)
 {
-	// TODO
 }
 
 /*
@@ -1065,7 +1015,6 @@ void CGMonObj::changeStatFuncOrcKing(int)
  */
 void CGMonObj::cancelStatFuncGiantCrab()
 {
-	// TODO
 }
 
 /*
@@ -1079,7 +1028,6 @@ void CGMonObj::cancelStatFuncGiantCrab()
  */
 void CGMonObj::changeStatFuncGiantCrab(int)
 {
-	// TODO
 }
 
 /*
@@ -1093,7 +1041,6 @@ void CGMonObj::changeStatFuncGiantCrab(int)
  */
 void CGMonObj::moveCancelFuncGiantCrab()
 {
-	// TODO
 }
 
 /*
@@ -1107,7 +1054,6 @@ void CGMonObj::moveCancelFuncGiantCrab()
  */
 void CGMonObj::moveFrameFuncGiantCrab()
 {
-	// TODO
 }
 
 /*
@@ -1121,7 +1067,6 @@ void CGMonObj::moveFrameFuncGiantCrab()
  */
 void CGMonObj::alwaysFuncDefault()
 {
-	// TODO
 }
 
 /*
@@ -1135,7 +1080,6 @@ void CGMonObj::alwaysFuncDefault()
  */
 void CGMonObj::frameStatFuncDefault()
 {
-	// TODO
 }
 
 /*
@@ -1149,7 +1093,6 @@ void CGMonObj::frameStatFuncDefault()
  */
 void CGMonObj::cancelStatFuncDefault()
 {
-	// TODO
 }
 
 /*
@@ -1163,7 +1106,6 @@ void CGMonObj::cancelStatFuncDefault()
  */
 void CGMonObj::changeStatFuncDefault(int)
 {
-	// TODO
 }
 
 /*
@@ -1177,7 +1119,6 @@ void CGMonObj::changeStatFuncDefault(int)
  */
 void CGMonObj::moveCancelFuncDefault()
 {
-	// TODO
 }
 
 /*
@@ -1191,5 +1132,4 @@ void CGMonObj::moveCancelFuncDefault()
  */
 void CGMonObj::moveFrameFuncDefault()
 {
-	// TODO
 }

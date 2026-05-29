@@ -3050,9 +3050,6 @@ void CMenuPcs::CmakeResultDraw()
 
     DrawInit();
 
-    if (mode == 2 && resultDir < 0) {
-        DrawCmakeDecision(-1, 1.0f);
-    }
 }
 
 /*

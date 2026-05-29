@@ -1582,8 +1582,18 @@ bool CMenuPcs::LetterConfirmOpen()
 			}
 		}
 
-		if (languageId == 2) {
-			sprintf(lines[1], "%s%s%s", GetMenuStr(0x23), s_ReplyStr, GetMenuStr(0x24));
+		if (languageId == 3) {
+			sprintf(lines[1], "%s%s%s%s",
+			        GetMenuStr(0x25),
+			        GetMenuStr(0x23),
+			        s_ReplyStr,
+			        GetMenuStr(0x24));
+		} else if (((languageId < 3) && (languageId != 1)) && (languageId != 0)) {
+			sprintf(lines[1], "%s%s%s%s",
+			        GetMenuStr(0x23),
+			        s_ReplyStr,
+			        GetMenuStr(0x24),
+			        GetMenuStr(0x27));
 		} else {
 			sprintf(lines[1], "%s%s%s", GetMenuStr(0x23), s_ReplyStr, GetMenuStr(0x24));
 		}

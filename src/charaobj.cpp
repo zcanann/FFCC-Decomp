@@ -2825,8 +2825,8 @@ void CGCharaObj::StaticFrame()
 void CGCharaObj::combi2()
 {
 	CGPartyObj* candidates[5];
-	CVector comboCenter;
 	int candidateCount = 0;
+	CVector comboCenter;
 
 	for (int i = 0; i < 4; i++) {
 		CGPartyObj* party = Game.m_partyObjArr[i];

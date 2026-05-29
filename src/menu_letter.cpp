@@ -695,7 +695,42 @@ int CMenuPcs::LetterCtrl()
 	} else if (phase == 2) {
 		s16 mode = *reinterpret_cast<s16*>(state + 0x30);
 		if (mode == 0) {
-			LetterLstClose();
+			*reinterpret_cast<s16*>(state + 0x22) = *reinterpret_cast<s16*>(state + 0x22) + 1;
+			int panelCount = static_cast<int>(**reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850));
+			s16* panel = GetLetterPanelBase(this);
+			int frame = static_cast<int>(*reinterpret_cast<s16*>(state + 0x22));
+			int closeDone = 0;
+			for (int i = 0; i < panelCount; ++i, panel += 0x20) {
+				float f = FLOAT_803330bc;
+				if (*reinterpret_cast<int*>(panel + 0x12) <= frame) {
+					if (frame < *reinterpret_cast<int*>(panel + 0x12) + *reinterpret_cast<int*>(panel + 0x14)) {
+						*reinterpret_cast<int*>(panel + 0x10) = *reinterpret_cast<int*>(panel + 0x10) + 1;
+						*reinterpret_cast<float*>(panel + 8) =
+						    static_cast<float>(DOUBLE_803330e8 -
+						                       (DOUBLE_803330e8 / static_cast<double>(static_cast<float>(*reinterpret_cast<int*>(panel + 0x14)))) *
+						                           static_cast<double>(static_cast<float>(*reinterpret_cast<int*>(panel + 0x10))));
+						if ((*reinterpret_cast<unsigned int*>(panel + 0x16) & 2) == 0) {
+							f = static_cast<float>(DOUBLE_803330e8 -
+							                       (DOUBLE_803330e8 / static_cast<double>(static_cast<float>(*reinterpret_cast<int*>(panel + 0x14)))) *
+							                           static_cast<double>(static_cast<float>(*reinterpret_cast<int*>(panel + 0x10))));
+							*reinterpret_cast<float*>(panel + 0x18) =
+							    (*reinterpret_cast<float*>(panel + 0x1C) - static_cast<float>(panel[0])) * f;
+							*reinterpret_cast<float*>(panel + 0x1A) =
+							    (*reinterpret_cast<float*>(panel + 0x1E) - static_cast<float>(panel[1])) * f;
+						}
+					} else {
+						++closeDone;
+						*reinterpret_cast<float*>(panel + 8) = FLOAT_803330bc;
+						*reinterpret_cast<float*>(panel + 0x18) = f;
+						*reinterpret_cast<float*>(panel + 0x1A) = f;
+					}
+				}
+			}
+			if (panelCount == closeDone) {
+				LetterInit1();
+				*reinterpret_cast<s16*>(state + 0x30) = 1;
+				*reinterpret_cast<s16*>(state + 0x12) = 0;
+			}
 		} else if (mode == 1) {
 			ret = LetterMessClose();
 		} else if (mode == 2) {

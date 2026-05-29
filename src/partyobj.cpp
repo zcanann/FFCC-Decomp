@@ -1430,7 +1430,25 @@ void CGPartyObj::onFrameStat()
 
 	switch (m_lastStateId) {
 	case 0:
-		statAlive();
+		if (m_stateFrame == 0) {
+			if ((PartyData(this).partyFlags & 0x02) != 0) {
+				reqAnim(0x27, 0, 0);
+				PartyData(this).partyFlags &= 0xFD;
+			} else {
+				reqAnim(-1, 0, 0);
+			}
+		}
+		if ((static_cast<signed char>(PartyData(this).partyFlags) < 0) ||
+		    (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E) != 0) ||
+		    (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x50) != 0) ||
+		    (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x44) != 0)) {
+			*(reinterpret_cast<unsigned char*>(&m_weaponNodeFlags) + 1) &= 0xBF;
+			m_unk63C &= 0x7F;
+		} else {
+			*(reinterpret_cast<unsigned char*>(&m_weaponNodeFlags) + 1) =
+			    (*(reinterpret_cast<unsigned char*>(&m_weaponNodeFlags) + 1) & 0xBF) | 0x40;
+			m_unk63C = (m_unk63C & 0x7F) | 0x80;
+		}
 		break;
 	case 2:
 		onStatMagic();

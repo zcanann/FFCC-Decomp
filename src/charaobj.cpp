@@ -2322,8 +2322,16 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 		if (effectId > 500) {
 			unsigned short itemType = *reinterpret_cast<unsigned short*>(itemData + 2);
 			int colType;
-			if (itemType == 1 || itemType == 4 || itemType == 8 || itemType == 9) {
-				colType = itemType;
+			if (itemType == 4) {
+				colType = 4;
+			} else if (itemType < 4) {
+				if (itemType == 1) {
+					colType = 1;
+				}
+			} else if (itemType == 9) {
+				colType = 9;
+			} else if (itemType < 9 && itemType > 7) {
+				colType = 8;
 			}
 			CFlatRuntime2Storage().SetParticleWorkCol(colType, -1, *reinterpret_cast<unsigned short*>(itemData + 4) * 0.01f);
 		}

@@ -3133,9 +3133,6 @@ int CGCharaObj::searchCombi(int count, CGPartyObj** partyList, int& outFallback)
 		}
 	}
 
-	if (found < 0 && count > 0) {
-		outFallback = 1;
-	}
 	return found;
 }
 

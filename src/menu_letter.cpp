@@ -1405,7 +1405,8 @@ bool CMenuPcs::LetterReplyWinOpen()
 
 		s_ReplyMax = 0;
 		char* curLine = workText;
-		for (int i = 0; i < 8; ++i) {
+		int i = 0;
+		do {
 			char* newline = strchr(curLine, '\n');
 			if (newline != 0) {
 				*newline = '\0';
@@ -1423,8 +1424,9 @@ bool CMenuPcs::LetterReplyWinOpen()
 			if (newline == 0) {
 				break;
 			}
+			++i;
 			curLine = newline + 1;
-		}
+		} while (i < 7);
 
 		delete[] srcText;
 		delete[] workText;

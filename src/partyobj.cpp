@@ -2056,7 +2056,7 @@ void CGPartyObj::putTargetParticle(int targetSide, int doInit)
 		if (bossStage && ((GetCID() & 0x6D) == 0x6D)) {
 			bossCid = true;
 		}
-		if (bossCid && (m_scriptHandle[0xED] != 0)) {
+		if (bossCid && (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3B4) != 0)) {
 			bossTarget = true;
 		}
 		float radius = FLOAT_80331A88;

@@ -2357,14 +2357,7 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 			CFlatRuntime2Storage().SetParticleWorkPos(m_worldPosition, m_rotTargetY);
 		}
 
-		if (effectId == 0x3B4 && effectArg0 == 3) {
-			if (pos == 0) {
-				return;
-			}
-			CFlatRuntime2Storage().SetParticleWorkPos(*pos, m_rotTargetY);
-			CFlatRuntime2Storage().PutParticleWork();
-			emittedCustom = true;
-		} else if (effectId == 0x410) {
+		if (effectId == 0x410) {
 			if (effectArg0 == 2 || effectArg0 == 3) {
 				float angleOffset = FLOAT_80331990;
 				if (effectArg0 == 2) {
@@ -2377,6 +2370,13 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 				CFlatRuntime2Storage().PutParticleWork();
 				emittedCustom = true;
 			}
+		} else if (effectId == 0x3B4 && effectArg0 == 3) {
+			if (pos == 0) {
+				return;
+			}
+			CFlatRuntime2Storage().SetParticleWorkPos(*pos, m_rotTargetY);
+			CFlatRuntime2Storage().PutParticleWork();
+			emittedCustom = true;
 		} else if (effectId == 0x409 && effectArg0 == 3) {
 			for (int i = 3; i < 9; i++) {
 				CFlatRuntime2Storage().SetParticleWorkNo((particleBank << 8) | i);

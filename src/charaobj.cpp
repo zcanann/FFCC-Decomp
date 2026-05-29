@@ -2396,9 +2396,9 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 		}
 
 		if (!emittedCustom) {
-			unsigned short fanCount = *reinterpret_cast<unsigned short*>(itemData + 0x24);
+			unsigned int fanCount = *reinterpret_cast<unsigned short*>(itemData + 0x24);
 			if (effectArg0 == 3 && fanCount > 1) {
-				for (int i = 0; i < fanCount; i++) {
+				for (unsigned int i = 0; i < fanCount; i++) {
 					float t = (float)i / (float)fanCount;
 					gCFlatRuntime2.SetParticleWorkVector(t * 0.75f, 0.0f);
 					gCFlatRuntime2.PutParticleWork();

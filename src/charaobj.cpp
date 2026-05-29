@@ -1115,7 +1115,7 @@ int CGCharaObj::onHit(int hitArg, CGObject* sourceObj, int hitType, Vec* hitPos)
 			unsigned int particleIndex = static_cast<unsigned int>(m_itemId);
 			unsigned short particleLife =
 				*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + (particleIndex * 0x48) + 0xE);
-			slotData.m_timer = (particleLife >= 3) ? 0x1E : 0;
+			slotData.m_timer = (particleLife == 3) ? 0x1E : 0;
 			break;
 		}
 		if (slotData.m_source == sourceObj) {

@@ -2249,8 +2249,8 @@ void CGPartyObj::checkTargetParticle()
 			input.z += getPadAxisForSlot(static_cast<unsigned char>(m_animStateMisc), 0x28);
 		}
 
-		if (input.x == 0.0f && input.z == 0.0f) {
-			unsigned short held = getPadHeldForSlot(static_cast<unsigned char>(m_animStateMisc));
+			if (input.x == 0.0f && input.z == 0.0f) {
+				unsigned short held = getPadHeldForSlot(static_cast<unsigned char>(m_animStateMisc));
 			if ((held & 1) != 0) {
 				input.x += FLOAT_80331a54;
 			}
@@ -2272,7 +2272,7 @@ void CGPartyObj::checkTargetParticle()
 			Vec toLeaderTarget;
 			PSVECSubtract(reinterpret_cast<Vec*>(self + 0x66C),
 			              reinterpret_cast<Vec*>(reinterpret_cast<unsigned char*>(leader) + 0x66C), &toLeaderTarget);
-			toLeaderTarget.y = 0.0f;
+				toLeaderTarget.y = 0.0f;
 			if (PSVECMag(&toLeaderTarget) > FLOAT_80331A98) {
 				input.x = toLeaderTarget.x;
 				input.z = toLeaderTarget.z;
@@ -2326,7 +2326,7 @@ void CGPartyObj::checkTargetParticle()
 
 		PSVECSubtract(targetPos, &m_worldPosition, &fromCenter);
 		float dist = PSVECMag(&fromCenter);
-			if (dist > maxRange) {
+		if (dist > maxRange) {
 			PSVECScale(&fromCenter, &fromCenter, maxRange / dist);
 			PSVECAdd(&m_worldPosition, &fromCenter, targetPos);
 		}
@@ -2390,7 +2390,7 @@ void CGPartyObj::checkTargetParticle()
 
 	Vec delta;
 	PSVECSubtract(reinterpret_cast<Vec*>(self + 0x66C), &m_worldPosition, &delta);
-	if (PSVECMag(&delta) > 0.0f) {
+	if (PSVECMag(&delta) > FLOAT_80331a78) {
 		m_rotationY = atan2(delta.x, delta.z);
 	}
 }

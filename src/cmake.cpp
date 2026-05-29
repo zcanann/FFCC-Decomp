@@ -2738,12 +2738,6 @@ void CMenuPcs::CmakeJobDraw()
     }
 
     int panelAlpha = static_cast<int>(static_cast<double>(FLOAT_80333240) * alpha);
-    if (panelAlpha < 0) {
-        panelAlpha = 0;
-    } else if (panelAlpha > 0xFF) {
-        panelAlpha = 0xFF;
-    }
-
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 

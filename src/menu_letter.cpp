@@ -2087,7 +2087,7 @@ int CMenuPcs::LetterCtrlCur()
 					int entry = caravanWork + s_SelLetter * 0xC;
 					unsigned int value = *reinterpret_cast<u16*>(entry + 0x3EE) & 0x1FF;
 					if (((*reinterpret_cast<u8*>(entry + 0x3EC) >> 3) & 1) == 0) {
-						reinterpret_cast<CCaravanWork*>(caravanWork)->AddItem(static_cast<int>(value), 0);
+						reinterpret_cast<CCaravanWork*>(caravanWork)->AddItem(static_cast<short>(value), 0);
 					} else {
 						reinterpret_cast<CCaravanWork*>(caravanWork)->AddGil(static_cast<int>(value * 100));
 					}

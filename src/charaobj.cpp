@@ -1266,7 +1266,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 
 	unsigned int cid = GetCID();
 	bool isMon = (cid & 0xAD) == 0xAD;
-	unsigned char* script9 = (m_scriptHandle[9] != 0) ? reinterpret_cast<unsigned char*>(m_scriptHandle[9]) : 0;
+	unsigned char* script9 = reinterpret_cast<unsigned char*>(m_scriptHandle[9]);
 	bool isIceJ = isMon && *reinterpret_cast<short*>(script9 + 0xFC) == 0xB;
 	int* slots = m_particleSlots;
 	int modelPdtNo = -1;

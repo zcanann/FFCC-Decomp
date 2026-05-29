@@ -4124,9 +4124,6 @@ void CGPartyObj::gpmMove()
 	unsigned char* self = reinterpret_cast<unsigned char*>(this);
 	CGPartyObj* leader = Game.m_partyObjArr[0];
 	CGObject* chalice = reinterpret_cast<CGObject*>(Game.unk_flat3_0xc7d0);
-	if (leader == nullptr || leader == this || m_scriptHandle == nullptr) {
-		return;
-	}
 
 	if (leader->m_lastStateId == 0 &&
 	    leader->m_animSlotSel == 0x0C &&

@@ -899,7 +899,28 @@ int CMenuPcs::LetterCtrl()
 				}
 			}
 		} else if (mode == 5) {
-			LetterConfirmClose();
+			if (*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x848) + 0xA) == 3) {
+				*reinterpret_cast<char*>(state + 0xC) = 0;
+				if (*reinterpret_cast<signed char*>(state + 8) < 1) {
+					*reinterpret_cast<s16*>(state + 0x30) = 3;
+					*reinterpret_cast<s16*>(state + 0x12) = 0;
+					*reinterpret_cast<char*>(state + 0xC) = 0;
+					*reinterpret_cast<s16*>(state + 0x28) = static_cast<s16>(s_ReplyPos);
+				} else {
+					s_Attach = 2;
+					*reinterpret_cast<s16*>(state + 0x30) = 1;
+					*reinterpret_cast<s16*>(state + 0x12) = 2;
+					*reinterpret_cast<unsigned char*>(state + 8) = 0xFF;
+					int anim = GetLetterAnimBase(this);
+					*reinterpret_cast<int*>(anim + 0x2C) = 0;
+					*reinterpret_cast<int*>(anim + 0x30) = 10;
+					*reinterpret_cast<int*>(anim + 0x6C) = 0;
+					*reinterpret_cast<int*>(anim + 0x70) = 10;
+					ResetLetterPanelProgress(this);
+					*reinterpret_cast<s16*>(state + 0x22) = 0;
+					*reinterpret_cast<char*>(state + 0xC) = 0;
+				}
+			}
 		}
 	}
 

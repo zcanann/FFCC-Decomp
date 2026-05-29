@@ -268,15 +268,7 @@ static bool CharaObjCanFrontGuard(CGCharaObj* self, CGPrgObj* sourceObj)
 static unsigned int CharaObjResolveHitParticleBank(CGPrgObj* sourceObj, unsigned int particleBank)
 {
 	if (particleBank == 0xFE) {
-		if (sourceObj == 0) {
-			return 0xFFFFFFFF;
-		}
-
 		int sourceData = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(sourceObj) + 0xF8);
-		if (sourceData == 0) {
-			return 0xFFFFFFFF;
-		}
-
 		int effectData = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(sourceData) + 0x178);
 		return effectData != 0 ? *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(effectData) + 0x14)
 		                       : 0xFFFFFFFF;

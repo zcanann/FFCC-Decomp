@@ -4168,7 +4168,7 @@ void CGPartyObj::gpmMove()
 	}
 
 	int pressureLimit = static_cast<int>(FLOAT_80331A5C * pressureScale);
-	if (sGhostPartyWork.carrySpeed <= 0.5f) {
+	if (sGhostPartyWork.carrySpeed <= FLOAT_80331A58) {
 		if (*reinterpret_cast<float*>(self + 0x6F0) == 0.0f) {
 			sGhostPartyWork.pressure -= 4;
 		} else {
@@ -4265,7 +4265,7 @@ void CGPartyObj::gpmMove()
 		}
 
 		if (moveKind == 0) {
-			float limit = (sGhostPartyWork.activeTrailCount != 0) ? 0.75f : 0.5f;
+			float limit = (sGhostPartyWork.activeTrailCount != 0) ? 0.75f : FLOAT_80331A58;
 			if (pathDist < Game.unkFloat_0xca10 * limit) {
 				return;
 			}

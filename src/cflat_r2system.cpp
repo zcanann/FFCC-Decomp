@@ -4683,9 +4683,7 @@ void CFlatRuntime2::onSetSystemVal(int systemValue, CFlatRuntime::CStack* stack,
                 } else if (setMode < 2) {
                     value = value + stack->m_word;
                 }
-                MenuPcs.ChgPlayModeFromScript(static_cast<bool>((static_cast<unsigned char>(-value >> 24) |
-                                                                static_cast<unsigned char>(value >> 24)) >>
-                                                               7));
+                MenuPcs.ChgPlayModeFromScript(static_cast<bool>((value | -value) >> 31));
                 break;
             }
             case -0x77:

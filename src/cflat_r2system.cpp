@@ -683,7 +683,7 @@ int CCaravanWork::GetEvtFlag(int evtFlagIndex)
     int mask = 1 << (evtFlagIndex % 8);
     unsigned int flag = value & mask;
 
-    return (flag | -flag) >> 31;
+    return (-flag | flag) >> 31;
 }
 
 /*

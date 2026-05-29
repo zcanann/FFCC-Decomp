@@ -1821,23 +1821,19 @@ void CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
  */
 void CGCharaObj::addHp(int delta, CGPrgObj* sourceObj)
 {
-	unsigned int cid = GetCID();
+	unsigned short cid = GetCID();
 	if ((cid & 0x6D) == 0x6D &&
 	    (MiniGamePcs.m_flags & 4) != 0) {
 		return;
 	}
 
-	if (m_scriptHandle == 0) {
-		return;
-	}
-
 	unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
 	unsigned short* hp = reinterpret_cast<unsigned short*>(script + 0x1C);
-	unsigned short maxHp = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1A);
 	unsigned int hpValue = *hp;
 	unsigned int next = hpValue;
 
 	if (delta > 0) {
+		unsigned short maxHp = *reinterpret_cast<unsigned short*>(script + 0x1A);
 		next = hpValue + delta;
 		if (static_cast<int>(next) > static_cast<int>(maxHp)) {
 			next = maxHp;
@@ -1849,14 +1845,14 @@ void CGCharaObj::addHp(int delta, CGPrgObj* sourceObj)
 			delta = -(static_cast<int>(hpValue) - 1);
 		}
 
-		if ((cid & 0xAD) == 0xAD) {
+		if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD) {
 			if (m_scriptHandle[4] == reinterpret_cast<void*>(0x9A) &&
 			    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6D0) == 0) {
-				*reinterpret_cast<int*>(m_boss__8CGMonObj + 4) -= delta;
+				*reinterpret_cast<int*>(m_boss__8CGMonObj + 0x24) -= delta;
 				delta = 0;
 			}
 			if (m_scriptHandle[4] == reinterpret_cast<void*>(0x88)) {
-				*reinterpret_cast<int*>(m_boss__8CGMonObj + 0x68) -= delta;
+				*reinterpret_cast<int*>(m_boss__8CGMonObj + 0x88) -= delta;
 			}
 			if (m_scriptHandle[4] == reinterpret_cast<void*>(0x70) &&
 			    static_cast<int>(hpValue + delta) < 1) {
@@ -1896,7 +1892,7 @@ void CGCharaObj::addHp(int delta, CGPrgObj* sourceObj)
 	m_displayFlags |= 2;
 	changeStat(9, 0, 0);
 
-	if ((cid & 0x6D) == 0x6D) {
+	if ((static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D) {
 		CCaravanWork* caravan = reinterpret_cast<CCaravanWork*>(m_scriptHandle);
 		for (int i = 2; i < *reinterpret_cast<short*>(script + 0xBAA); i++) {
 			if (caravan->DelCmdListAndItem(i) == 0x125) {

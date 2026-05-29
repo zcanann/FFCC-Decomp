@@ -4336,72 +4336,23 @@ CFlatRuntime::CVal* CFlatRuntime2::onSystemVal(CFlatRuntime::CObject*, int syste
         FlatLastResult(this) = static_cast<unsigned int>(static_cast<int>(*artifact));
     } else {
         switch (systemValue) {
-        case -0x7A:
-            FlatLastResult(this) = 1;
-            if (gameWork.m_languageId == 3) {
-                FlatLastResult(this) = 6;
-            } else if (gameWork.m_languageId < 3) {
-                if (gameWork.m_languageId == 1) {
-                    FlatLastResult(this) = 3;
-                } else if (gameWork.m_languageId == 0) {
-                    FlatLastResult(this) = 1;
-                } else {
-                    FlatLastResult(this) = 5;
-                }
-            } else if (gameWork.m_languageId == 5) {
-                FlatLastResult(this) = 7;
-            } else if (gameWork.m_languageId < 5) {
-                FlatLastResult(this) = 4;
-            }
+        case -0x40:
+            FlatLastResult(this) = gameWork.m_scriptSysVal0;
             break;
-        case -0x78:
-            FlatLastResult(this) = gameWork.m_gameOverFlag;
+        case -0x41:
+            FlatLastResult(this) = gameWork.m_timerA;
             break;
-        case -0x76:
-            FlatLastResult(this) = gameWork.m_menuStageMode;
+        case -0x42:
+            FlatLastResult(this) = gameWork.m_scriptGlobalTime;
             break;
-        case -0x73:
-        case -0x72:
-        case -0x71:
-        case -0x70:
-        case -0x6F:
-        case -0x6E:
-        case -0x6D:
-        case -0x6C: {
-            u8* usbEdit = game + (systemValue + 0x73) * 0xC30;
-            if (*(int*)(usbEdit + 0x1794) == 0) {
-                FlatLastResult(this) = 0;
-            } else {
-                FlatLastResult(this) = *(unsigned short*)(usbEdit + 0x1404);
-            }
+        case -0x43:
+            FlatLastResult(this) = gameWork.m_frameCounter;
             break;
-        }
-        case -0x6B:
-        case -0x6A:
-        case -0x69:
-        case -0x68:
-        case -0x67:
-            FlatLastResult(this) = *reinterpret_cast<unsigned int*>(gameWork.m_eventWork + systemValue * 2 + 0x50);
-            break;
-        case -0x66:
-            FlatLastResult(this) = gameWork.m_chaliceElement;
-            break;
-        case -0x65:
-        case -100:
-        case -99:
-        case -0x62:
-        case -0x61:
-        case -0x60:
-        case -0x5F:
-        case -0x5E:
-        case -0x5D:
-        case -0x5C:
-        case -0x5B:
-        case -0x5A:
-        case -0x59:
-        case -0x58:
-        case -0x57:
-            FlatLastResult(this) = *reinterpret_cast<unsigned int*>(gameWork.m_linkTable[0][5][3] + systemValue * 4);
+        case -0x47:
+        case -0x46:
+        case -0x45:
+        case -0x44:
+            FlatLastResult(this) = *reinterpret_cast<unsigned int*>(gameWork.m_linkTable[0][2][2] + systemValue * 4 + 4);
             break;
         case -0x56:
         case -0x55:
@@ -4420,23 +4371,72 @@ CFlatRuntime::CVal* CFlatRuntime2::onSystemVal(CFlatRuntime::CObject*, int syste
         case -0x48:
             FlatLastResult(this) = *reinterpret_cast<unsigned int*>(gameWork.m_linkTable[0][3][4] + systemValue * 4);
             break;
-        case -0x47:
-        case -0x46:
-        case -0x45:
-        case -0x44:
-            FlatLastResult(this) = *reinterpret_cast<unsigned int*>(gameWork.m_linkTable[0][2][2] + systemValue * 4 + 4);
+        case -0x65:
+        case -100:
+        case -99:
+        case -0x62:
+        case -0x61:
+        case -0x60:
+        case -0x5F:
+        case -0x5E:
+        case -0x5D:
+        case -0x5C:
+        case -0x5B:
+        case -0x5A:
+        case -0x59:
+        case -0x58:
+        case -0x57:
+            FlatLastResult(this) = *reinterpret_cast<unsigned int*>(gameWork.m_linkTable[0][5][3] + systemValue * 4);
             break;
-        case -0x43:
-            FlatLastResult(this) = gameWork.m_frameCounter;
+        case -0x66:
+            FlatLastResult(this) = gameWork.m_chaliceElement;
             break;
-        case -0x42:
-            FlatLastResult(this) = gameWork.m_scriptGlobalTime;
+        case -0x6B:
+        case -0x6A:
+        case -0x69:
+        case -0x68:
+        case -0x67:
+            FlatLastResult(this) = *reinterpret_cast<unsigned int*>(gameWork.m_eventWork + systemValue * 2 + 0x50);
             break;
-        case -0x41:
-            FlatLastResult(this) = gameWork.m_timerA;
+        case -0x73:
+        case -0x72:
+        case -0x71:
+        case -0x70:
+        case -0x6F:
+        case -0x6E:
+        case -0x6D:
+        case -0x6C: {
+            u8* usbEdit = game + (systemValue + 0x73) * 0xC30;
+            if (*(int*)(usbEdit + 0x1794) == 0) {
+                FlatLastResult(this) = 0;
+            } else {
+                FlatLastResult(this) = *(unsigned short*)(usbEdit + 0x1404);
+            }
             break;
-        case -0x40:
-            FlatLastResult(this) = gameWork.m_scriptSysVal0;
+        }
+        case -0x76:
+            FlatLastResult(this) = gameWork.m_menuStageMode;
+            break;
+        case -0x78:
+            FlatLastResult(this) = gameWork.m_gameOverFlag;
+            break;
+        case -0x7A:
+            FlatLastResult(this) = 1;
+            if (gameWork.m_languageId == 3) {
+                FlatLastResult(this) = 6;
+            } else if (gameWork.m_languageId < 3) {
+                if (gameWork.m_languageId == 1) {
+                    FlatLastResult(this) = 3;
+                } else if (gameWork.m_languageId == 0) {
+                    FlatLastResult(this) = 1;
+                } else {
+                    FlatLastResult(this) = 5;
+                }
+            } else if (gameWork.m_languageId == 5) {
+                FlatLastResult(this) = 7;
+            } else if (gameWork.m_languageId < 5) {
+                FlatLastResult(this) = 4;
+            }
             break;
         default:
             break;

@@ -1232,7 +1232,7 @@ void CGPartyObj::command()
 			return;
 		}
 		if (itemKind == 0x17D || itemKind == 0x186) {
-			if (useItem(itemId), canPlayerUseItem() != 0) {
+			if (useItem(itemId) != 0) {
 				caravan->GetNumCombi(party.unk6EC, 1);
 			}
 			return;

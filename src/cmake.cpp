@@ -3251,9 +3251,7 @@ void CMenuPcs::CmakeResultDraw1()
 
             char tribeWithSep[0x40];
             strcpy(tribeWithSep, txt);
-            size_t tribeLen = strlen(tribeWithSep);
-            tribeWithSep[tribeLen] = '/';
-            tribeWithSep[tribeLen + 1] = '\0';
+            strcat(tribeWithSep, "/", sizeof(tribeWithSep));
 
             const char* hairTxt = GetHairStr(hairIndex + s_CmakeInfo.m_hair);
             if (hairTxt == 0) {

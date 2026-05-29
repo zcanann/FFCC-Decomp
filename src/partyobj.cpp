@@ -74,6 +74,8 @@ extern double DOUBLE_80331AA8;
 extern float FLOAT_80331b00;
 extern float FLOAT_80331b04;
 extern float FLOAT_80331b08;
+extern float FLOAT_8032EE78;
+extern float FLOAT_8032EE7C;
 extern float FLOAT_8032EE80;
 extern float FLOAT_8032EE84;
 
@@ -1491,6 +1493,23 @@ void CGPartyObj::onFrameStat()
 		}
 		break;
 	case 0x0B:
+		if (Game.m_gameWork.m_menuStageMode != 0 &&
+		    Game.m_gameWork.m_bossArtifactStageIndex < 0x0F &&
+		    (GetCID() & 0x6D) == 0x6D &&
+		    m_scriptHandle[0xED] != nullptr) {
+			if (m_stateFrame == 0) {
+				CancelMove(1);
+				FLOAT_8032EE78 = m_targetDist - FLOAT_80331ac4;
+				FLOAT_8032EE7C = *reinterpret_cast<float*>(Game.unk_flat3_0xc7d0 + 0x160) - m_worldPosition.y;
+			}
+
+			if (m_stateFrame < 0x0C) {
+				const float phase = sinf((FLOAT_80331AB8 * static_cast<float>(m_stateFrame)) / FLOAT_80331AC0);
+				m_extraMoveVec.x = FLOAT_8032EE78 * phase * sinf(m_rotBaseY);
+				m_extraMoveVec.z = FLOAT_8032EE78 * phase * cosf(m_rotBaseY);
+				m_extraMoveVec.y = FLOAT_8032EE7C * phase + FLOAT_80331A98;
+			}
+		}
 		if (m_stateFrame == 0) {
 			reqAnim(0x0D, 0, 0);
 			playSe3D(0x22, 0x32, 0x96, 0, 0);

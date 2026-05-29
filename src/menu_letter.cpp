@@ -727,7 +727,54 @@ int CMenuPcs::LetterCtrl()
 				}
 			}
 		} else if (mode == 2) {
-			LetterItemWinOpen();
+			if (*reinterpret_cast<char*>(state + 0xC) == '\0') {
+				char info[0x80];
+				char left[0x10];
+				char right[0x10];
+				s16 winW;
+				s16 winH;
+				int letter = Game.m_scriptFoodBase[0] + s_SelLetter * 0xC;
+				if (((*reinterpret_cast<unsigned char*>(letter + 0x3EC) >> 3) & 1) == 0) {
+					FlatDataView* flatData = reinterpret_cast<FlatDataView*>(&Game.m_cFlatDataArr[1]);
+					int itemId = (*reinterpret_cast<u16*>(letter + 0x3EE) & 0x1FF) * 5 + 4;
+					int value = reinterpret_cast<int*>(flatData->m_tabl[0].m_strings)[itemId];
+					if (Game.m_gameWork.m_languageId == 2) {
+						sprintf(info, s_letterItemInfoFmt,
+						        GetMenuStr(0x23),
+						        value,
+						        GetMenuStr(0x24),
+						        GetMenuStr(0x22));
+					} else {
+						sprintf(info, "%s%d", GetMenuStr(0x22), value);
+					}
+				} else {
+					int gil = static_cast<int>(*reinterpret_cast<u16*>(letter + 0x3EE) & 0x1FF) * 100;
+					if (Game.m_gameWork.m_languageId == 2) {
+						sprintf(info, "%d%s%s",
+						        gil,
+						        GetMenuStr(4),
+						        GetMenuStr(0x22));
+					} else {
+						sprintf(info, "%s%d%s",
+						        GetMenuStr(0x22),
+						        gil,
+						        GetMenuStr(4));
+					}
+				}
+				strcpy(left, "");
+				strcat(left, GetMenuStr(1), 0x10);
+				strcpy(right, "");
+				strcat(right, GetMenuStr(2), 0x10);
+				SetSingDynamicWinMessInfo(3, info, left, right, 0, 0, 0, 0, 0);
+				GetSingWinSize(0, &winW, &winH, 1);
+				SetMcWinInfo(static_cast<int>(winW), static_cast<int>(winH));
+				*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x848) + 0xA) = 0;
+				*reinterpret_cast<s16*>(state + 0x28) = 0;
+				*reinterpret_cast<char*>(state + 0xC) = 1;
+			}
+			if (*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x848) + 0xA) == 1) {
+				*reinterpret_cast<s16*>(state + 0x12) = 1;
+			}
 		} else if (mode == 3) {
 			if (LetterReplyWinOpen()) {
 				*reinterpret_cast<s16*>(state + 0x12) = 1;

@@ -141,8 +141,8 @@ void CMaterialEditorPcs::SetUSBData()
 
         CreateBoundaryBox(minPos, maxPos, rsdItem->countA, reinterpret_cast<const Vec*>(rsdItem->ptr10));
 
-        s32 xDiff = static_cast<s32>(maxPos.x - minPos.x);
-        s32 yDiff = static_cast<s32>(maxPos.y - minPos.y);
+        s32 xDiff = static_cast<s32>(maxPos.y - minPos.y);
+        s32 yDiff = static_cast<s32>(maxPos.z - minPos.z);
 
         srt.transX = FLOAT_8032FD00;
         srt.transY = (float)(-xDiff / 2);

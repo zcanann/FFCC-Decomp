@@ -298,14 +298,14 @@ static int CharaObjDecodeSe(unsigned short encodedSe)
 	return (encodedSe & 0xFF) + ((encodedSe >> 8) * 1000);
 }
 
-static int CharaObjResolveParticleBank(CGCharaObj* charaObj, unsigned short particleClass)
+static unsigned int CharaObjResolveParticleBank(CGCharaObj* charaObj, unsigned short particleClass)
 {
 	if (particleClass == 0xFE) {
 		int pdtNo = CharaObjGetModelPdtNo(charaObj);
-		return (pdtNo >= 0) ? pdtNo : -1;
+		return (pdtNo >= 0) ? static_cast<unsigned int>(pdtNo) : 0xFFFFFFFF;
 	}
 	if (particleClass >= 0xFD && particleClass <= 0xFF) {
-		return -1;
+		return 0xFFFFFFFF;
 	}
 	return particleClass;
 }
@@ -2224,14 +2224,15 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 {
 	unsigned char* itemData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + effectId * 0x48;
 	unsigned short particleClass = *reinterpret_cast<unsigned short*>(itemData + 0x12);
-	int particleBank = CharaObjResolveParticleBank(this, particleClass);
+	unsigned int particleBank = CharaObjResolveParticleBank(this, particleClass);
 	unsigned short particleEntry = 0xFFFF;
 	unsigned short particleFlags = 0;
-	int particleNo = -1;
+	unsigned int particleNo = effectId;
 	int seNo = 0;
 	bool emittedCustom = false;
+	bool hasParticle = false;
 
-	if (particleBank >= 0) {
+	if (particleBank != 0xFFFFFFFF) {
 		particleEntry = *reinterpret_cast<unsigned short*>(itemData + 0x14 + effectArg0 * 2);
 		if (particleEntry != 0xFFFF) {
 			particleFlags = particleEntry;
@@ -2250,10 +2251,11 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 			if ((particleFlags & 0x800) != 0 && m_scriptHandle != 0) {
 				particleNo += *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2);
 			}
+			hasParticle = true;
 		}
 	}
 
-	if (particleNo >= 0) {
+	if (hasParticle) {
 		gCFlatRuntime2.ResetParticleWork((particleBank << 8) | particleNo, effectArg1);
 		gCFlatRuntime2.SetParticleWorkScale(*reinterpret_cast<unsigned short*>(itemData + 0x10) * 0.01f);
 		gCFlatRuntime2.SetParticleWorkParam(effectId, this);

@@ -2340,7 +2340,7 @@ void CGPartyObj::onStatMagic()
 	}
 
 	unsigned short held = getPadHeldForSlot(static_cast<unsigned char>(m_animStateMisc));
-	if ((held & 0x100) == 0 && m_subState < 2) {
+	if ((held & 0x100) == 0 && m_subState < 2 && magicId != 0x103) {
 		changeStat(0, 0, 0);
 		return;
 	}

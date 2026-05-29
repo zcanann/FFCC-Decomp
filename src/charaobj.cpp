@@ -1984,13 +1984,21 @@ void CGCharaObj::calcRegist(int staIndex, int itemId, int& outA, int& outB, int&
 
 	if (*reinterpret_cast<short*>(script + 0x76) == 0 && (GetCID() & 0xAD) == 0xAD &&
 		(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0xFE) & 1) != 0 &&
-		staIndex != 0x1C && outA < 2) {
-		outA = 2;
+		staIndex != 0x1C) {
+		int clamped = 2;
+		if (outA > 1) {
+			clamped = outA;
+		}
+		outA = clamped;
 	}
 	if ((GetCID() & 0xAD) == 0xAD &&
 		(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle[9]) + 0xFE) & 4) != 0 &&
-		*reinterpret_cast<short*>(script + 0x52) == 0 && outA < 2) {
-		outA = 2;
+		*reinterpret_cast<short*>(script + 0x52) == 0) {
+		int clamped = 2;
+		if (outA > 1) {
+			clamped = outA;
+		}
+		outA = clamped;
 	}
 
 	if ((GetCID() & 0xAD) == 0xAD && *reinterpret_cast<int*>(script + 0x10) == 0x7F &&

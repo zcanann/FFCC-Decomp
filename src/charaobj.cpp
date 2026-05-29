@@ -586,7 +586,7 @@ void CGCharaObj::onFramePostCalc()
 		}
 
 		if ((GetCID() & 0x6D) == 0x6D &&
-		    (i == 0 || i == 3 || i == 4 || i == 9) &&
+		    (i == 0 || i == 4 || i == 9 || i == 3) &&
 		    statusValue > 0) {
 			char slot = m_animStateMisc;
 			unsigned short padMask = 0;

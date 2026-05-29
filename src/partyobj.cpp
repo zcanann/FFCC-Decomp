@@ -1131,11 +1131,9 @@ void CGPartyObj::command()
 	}
 
 	CRingMenu* ring = getBattleRingMenuForPort(getPartyJoybusPort(this));
-	if (ring != nullptr) {
-		ring->SetBattleCommand(0, primaryCommand, -1);
-		ring->SetBattleCommand(1, secondaryCommand, -1);
-		ring->SetBattleCommand(2, ringCommand, ringCommandArg);
-	}
+	ring->SetBattleCommand(0, primaryCommand, -1);
+	ring->SetBattleCommand(1, secondaryCommand, -1);
+	ring->SetBattleCommand(2, ringCommand, ringCommandArg);
 
 	if (Game.m_gameWork.m_menuStageMode != 0 &&
 	    Game.m_gameWork.m_singleShopOrSmithMenuActiveFlag != 0) {

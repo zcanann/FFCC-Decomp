@@ -681,8 +681,9 @@ int CCaravanWork::GetEvtFlag(int evtFlagIndex)
     int byteIndex = evtFlagIndex / 8;
     unsigned char value = evtFlags[byteIndex];
     int mask = 1 << (evtFlagIndex % 8);
+    unsigned int flag = value & mask;
 
-    return (value & mask) != 0;
+    return (flag | -flag) >> 31;
 }
 
 /*

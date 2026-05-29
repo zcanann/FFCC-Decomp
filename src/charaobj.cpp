@@ -2742,9 +2742,6 @@ void CGCharaObj::seDamageDelete()
  */
 void CGCharaObj::StaticFrame()
 {
-	onAlphaUpdate();
-	onFramePreCalc();
-
 	for (int i = 0; i < 4; i++) {
 		CGPartyObj* partyObj = Game.m_partyObjArr[i];
 		if (partyObj == 0) {
@@ -2755,15 +2752,13 @@ void CGCharaObj::StaticFrame()
 		if (static_cast<signed char>(partyRaw[0x9A]) < 0 &&
 		    static_cast<signed char>(partyRaw[0x9B]) < 0) {
 			unsigned char* script = reinterpret_cast<unsigned char*>(partyObj->m_scriptHandle);
-			if (script != 0) {
-				unsigned short hp = *reinterpret_cast<unsigned short*>(script + 0x1C);
-				unsigned short maxHp = *reinterpret_cast<unsigned short*>(script + 0x1A);
-				if (hp != 0 && hp <= (maxHp >> 2)) {
-					if ((System.m_frameCounter % 0x1E) == 0) {
-						Sound.PlaySe(0x53, 0x40, 0x7F, 0);
-					}
-					break;
+			unsigned short hp = *reinterpret_cast<unsigned short*>(script + 0x1C);
+			unsigned short maxHp = *reinterpret_cast<unsigned short*>(script + 0x1A);
+			if (hp != 0 && hp <= (maxHp >> 2)) {
+				if ((System.m_frameCounter % 0x1E) == 0) {
+					Sound.PlaySe(0x53, 0x40, 0x7F, 0);
 				}
+				break;
 			}
 		}
 	}

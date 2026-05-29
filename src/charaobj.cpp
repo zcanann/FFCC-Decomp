@@ -1132,15 +1132,13 @@ int CGCharaObj::onHit(int hitArg, CGObject* sourceObj, int hitType, Vec* hitPos)
  */
 void CGCharaObj::onHitParticle(int effectIndex, int, int, int colliderIndex, Vec* hitPos, PPPIFPARAM* hitParam)
 {
-	typedef unsigned int (*VCall0C)(void*);
 	typedef void (*VCall80)(void*, void*, int, int, int, Vec*);
 
 	unsigned char* self = reinterpret_cast<unsigned char*>(this);
-	VCall0C cidFn = *reinterpret_cast<VCall0C*>(*reinterpret_cast<int*>(self + 0x48) + 0x0C);
-	unsigned short cid = cidFn(this);
+	unsigned short cid = GetCID();
 
 	if ((cid & 0x6D) == 0x6D && Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
-		cid = cidFn(this);
+		cid = GetCID();
 		if ((cid & 0x6D) == 0x6D && *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3B4) != 0) {
 			return;
 		}
@@ -2418,13 +2416,11 @@ void la(CGObject*)
  */
 void CGCharaObj::statAttack()
 {
-	typedef unsigned int (*VCall0C)(void*);
 	typedef void (*VCall88)(void*, int);
 	typedef void (*VCall90)(void*, int, int, int);
 
 	unsigned char* self = reinterpret_cast<unsigned char*>(this);
-	VCall0C cidFn = *reinterpret_cast<VCall0C*>(*reinterpret_cast<int*>(self + 0x48) + 0x0C);
-	unsigned int cid = cidFn(this);
+	unsigned int cid = GetCID();
 
 	if ((cid & 0xAD) == 0xAD && m_subState == 0) {
 		void* animPoint = m_scriptHandle[4];

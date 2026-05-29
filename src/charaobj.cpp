@@ -1137,35 +1137,28 @@ void CGCharaObj::onHitParticle(int effectIndex, int, int, int colliderIndex, Vec
 
 	unsigned char* self = reinterpret_cast<unsigned char*>(this);
 	VCall0C cidFn = *reinterpret_cast<VCall0C*>(*reinterpret_cast<int*>(self + 0x48) + 0x0C);
-	unsigned int cid = cidFn(this);
+	unsigned short cid = cidFn(this);
 
-	bool skip = false;
-	if ((cid & 0x6D) == 0x6D && Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex <= 0xE) {
+	if ((cid & 0x6D) == 0x6D && Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
 		cid = cidFn(this);
 		if ((cid & 0x6D) == 0x6D && *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3B4) != 0) {
-			skip = true;
+			return;
 		}
-	}
-
-	if (skip) {
-		return;
 	}
 
 	int particleIndex = hitParam->m_particleIndex;
 	CGPrgObj* sourceObj = 0;
 	if (hitParam->m_classId != 0) {
-		sourceObj = reinterpret_cast<CGPrgObj*>(gCFlatRuntime2.intToClass(static_cast<int>(hitParam->m_classId)));
+		sourceObj = reinterpret_cast<CGPrgObj*>(CFlatRuntime2Storage().intToClass(static_cast<int>(hitParam->m_classId)));
 	}
 
-	if (sourceObj != 0) {
-		unsigned int sourceCid = cidFn(sourceObj);
-		if ((sourceCid & 0xD) == 0xD) {
-			VCall80 hitFn = *reinterpret_cast<VCall80*>(*reinterpret_cast<int*>(self + 0x48) + 0x80);
-			hitFn(this, sourceObj, particleIndex, -1, colliderIndex, hitPos);
-		}
+	unsigned int sourceCid = cidFn(sourceObj);
+	if ((sourceCid & 0xD) == 0xD) {
+		VCall80 hitFn = *reinterpret_cast<VCall80*>(*reinterpret_cast<int*>(self + 0x48) + 0x80);
+		hitFn(this, sourceObj, particleIndex, -1, colliderIndex, hitPos);
 	}
 
-	gCFlatRuntime2.IgnoreParticle(static_cast<short>(effectIndex), this);
+	CFlatRuntime2Storage().IgnoreParticle(effectIndex, this);
 	if ((*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + (particleIndex * 0x48) + 0xC) & 0x100) != 0) {
 		PartMng.pppEndPart(effectIndex);
 	}

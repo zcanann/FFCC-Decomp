@@ -1566,14 +1566,20 @@ bool CMenuPcs::LetterConfirmOpen()
 		const char* title = subjectTable[(letterWord >> 7) & 0x1FF];
 		if (languageId == 3) {
 			sprintf(lines[0], "%s%s", GetMenuStr(0x26), title);
-		} else if (languageId == 2) {
-			sprintf(lines[0], "%s%s", title, GetMenuStr(0x26));
+		} else if (languageId < 3) {
+			if ((languageId == 1) || (languageId == 0)) {
+				sprintf(lines[0], "%s%s%s", GetMenuStr(0x25), title, GetMenuStr(0x26));
+			} else {
+				sprintf(lines[0], "%s%s", title, GetMenuStr(0x26));
+			}
 		} else if (languageId == 5) {
 			sprintf(lines[0], "%s%s", GetMenuStr(0x26), title);
-		} else if (languageId == 4) {
-			sprintf(lines[0], "%s%s%s", GetMenuStr(0x26), title, GetMenuStr(0x25));
 		} else {
-			sprintf(lines[0], "%s%s%s", GetMenuStr(0x25), title, GetMenuStr(0x26));
+			if (4 < languageId) {
+				sprintf(lines[0], "%s%s%s", GetMenuStr(0x25), title, GetMenuStr(0x26));
+			} else {
+				sprintf(lines[0], "%s%s%s", GetMenuStr(0x26), title, GetMenuStr(0x25));
+			}
 		}
 
 		const char* left = GetMenuStr(0x23);

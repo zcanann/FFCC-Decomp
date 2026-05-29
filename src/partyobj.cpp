@@ -4199,7 +4199,7 @@ void CGPartyObj::gpmMove()
 	gpmCalcDist(&pathVec, pathDist);
 
 	Vec toLeader;
-	PSVECSubtract(&leader->m_worldPosition, &m_worldPosition, &toLeader);
+	toLeader = m_targetDelta;
 	toLeader.y = 0.0f;
 	float dist = PSVECMag(&toLeader);
 	float nearDist = m_nearColRadius + leader->m_nearColRadius;

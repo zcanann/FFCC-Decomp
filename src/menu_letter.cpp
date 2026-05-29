@@ -2403,7 +2403,9 @@ void CMenuPcs::LetterLstBaseDraw(float param_1)
 	for (unsigned int i = 0; i < 4; ++i) {
 		int tex;
 		int flip = 0;
-		if (i < 2) {
+		if (i == 0) {
+			tex = 0x3C;
+		} else if (i == 1) {
 			tex = 0x3C;
 		} else if (i == 2) {
 			tex = 0x4B;

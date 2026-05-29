@@ -24,6 +24,8 @@ struct MonAiFuncTable {
     MonVoidFunc always;
 };
 
+typedef char MonAiFuncTableSizeCheck[sizeof(MonAiFuncTable) == 0x9C ? 1 : -1];
+
 extern "C" {
 extern MonAiFuncTable funcsDefault;
 extern MonAiFuncTable funcsGiantCrab;

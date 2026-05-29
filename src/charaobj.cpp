@@ -2283,6 +2283,12 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 			offsetPos.z = m_worldPosition.z + cosf(m_rotTargetY) * distance;
 			gCFlatRuntime2.SetParticleWorkPos(offsetPos, m_rotTargetY);
 			gCFlatRuntime2.SetParticleWorkVector(m_rotTargetY, 0.0f);
+			if ((*reinterpret_cast<unsigned short*>(itemData + 0x0C) & 0x2000) != 0) {
+				int partyIndex = static_cast<int>(m_rotationX);
+				if (partyIndex >= 0 && partyIndex < 4) {
+					gCFlatRuntime2.SetParticleWorkTrace(Game.m_partyObjArr[partyIndex]);
+				}
+			}
 			if ((*reinterpret_cast<unsigned short*>(itemData + 0x0C) & 0x4000) != 0) {
 				gCFlatRuntime2.SetParticleWorkPos(m_worldPosition, m_rotTargetY);
 				gCFlatRuntime2.SetParticleWorkTarget(m_jumpOffset);

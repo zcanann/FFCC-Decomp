@@ -1275,7 +1275,7 @@ void CGCharaObj::setSta(int staIndex, int value)
 	if (m_charaModelHandle != 0 && m_charaModelHandle->m_pdtLoadRef != 0) {
 		modelPdtNo = reinterpret_cast<int*>(m_charaModelHandle->m_pdtLoadRef)[2];
 	}
-	if (isMon && script9 != 0) {
+	if (isMon) {
 		monsterScale = static_cast<float>(*reinterpret_cast<unsigned short*>(script9 + 0x1B4)) * 0.01f;
 	}
 

@@ -507,17 +507,18 @@ bool CMenuPcs::LetterOpen()
 	s_OpenClose = 1;
 	if (*reinterpret_cast<char*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0xB) == '\0') {
 		memset(GetLetterAnimStorage(this), 0, sizeof(*GetLetterAnimStorage(this)));
+		fVar1 = FLOAT_803330f8;
 		iVar4 = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + 8;
 		iVar8 = 8;
 		do {
-			*reinterpret_cast<float*>(iVar4 + 0x14) = FLOAT_803330f8;
-			*reinterpret_cast<float*>(iVar4 + 0x54) = FLOAT_803330f8;
-			*reinterpret_cast<float*>(iVar4 + 0x94) = FLOAT_803330f8;
-			*reinterpret_cast<float*>(iVar4 + 0xD4) = FLOAT_803330f8;
-			*reinterpret_cast<float*>(iVar4 + 0x114) = FLOAT_803330f8;
-			*reinterpret_cast<float*>(iVar4 + 0x154) = FLOAT_803330f8;
-			*reinterpret_cast<float*>(iVar4 + 0x194) = FLOAT_803330f8;
-			*reinterpret_cast<float*>(iVar4 + 0x1D4) = FLOAT_803330f8;
+			*reinterpret_cast<float*>(iVar4 + 0x14) = fVar1;
+			*reinterpret_cast<float*>(iVar4 + 0x54) = fVar1;
+			*reinterpret_cast<float*>(iVar4 + 0x94) = fVar1;
+			*reinterpret_cast<float*>(iVar4 + 0xD4) = fVar1;
+			*reinterpret_cast<float*>(iVar4 + 0x114) = fVar1;
+			*reinterpret_cast<float*>(iVar4 + 0x154) = fVar1;
+			*reinterpret_cast<float*>(iVar4 + 0x194) = fVar1;
+			*reinterpret_cast<float*>(iVar4 + 0x1D4) = fVar1;
 			iVar4 += 0x200;
 			--iVar8;
 		} while (iVar8 != 0);
@@ -547,17 +548,18 @@ bool CMenuPcs::LetterOpen()
 			s_SelLetter = 0;
 		} else {
 			memset(GetLetterAnimStorage(this), 0, sizeof(*GetLetterAnimStorage(this)));
+			fVar1 = FLOAT_803330f8;
 			iVar4 = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + 8;
 			iVar8 = 8;
 			do {
-				*reinterpret_cast<float*>(iVar4 + 0x14) = FLOAT_803330f8;
-				*reinterpret_cast<float*>(iVar4 + 0x54) = FLOAT_803330f8;
-				*reinterpret_cast<float*>(iVar4 + 0x94) = FLOAT_803330f8;
-				*reinterpret_cast<float*>(iVar4 + 0xD4) = FLOAT_803330f8;
-				*reinterpret_cast<float*>(iVar4 + 0x114) = FLOAT_803330f8;
-				*reinterpret_cast<float*>(iVar4 + 0x154) = FLOAT_803330f8;
-				*reinterpret_cast<float*>(iVar4 + 0x194) = FLOAT_803330f8;
-				*reinterpret_cast<float*>(iVar4 + 0x1D4) = FLOAT_803330f8;
+				*reinterpret_cast<float*>(iVar4 + 0x14) = fVar1;
+				*reinterpret_cast<float*>(iVar4 + 0x54) = fVar1;
+				*reinterpret_cast<float*>(iVar4 + 0x94) = fVar1;
+				*reinterpret_cast<float*>(iVar4 + 0xD4) = fVar1;
+				*reinterpret_cast<float*>(iVar4 + 0x114) = fVar1;
+				*reinterpret_cast<float*>(iVar4 + 0x154) = fVar1;
+				*reinterpret_cast<float*>(iVar4 + 0x194) = fVar1;
+				*reinterpret_cast<float*>(iVar4 + 0x1D4) = fVar1;
 				iVar4 += 0x200;
 				--iVar8;
 			} while (iVar8 != 0);

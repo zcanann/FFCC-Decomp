@@ -855,7 +855,17 @@ int CMenuPcs::LetterCtrl()
 				*reinterpret_cast<s16*>(state + 0x28) = 0;
 			}
 		} else if (mode == 3) {
-			LetterReplyWinClose();
+			if (*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x848) + 0xA) == 3) {
+				*reinterpret_cast<char*>(state + 0xC) = 0;
+				if (*reinterpret_cast<signed char*>(state + 8) < 1) {
+					*reinterpret_cast<s16*>(state + 0x30) = 1;
+					*reinterpret_cast<s16*>(state + 0x12) = 1;
+				} else {
+					*reinterpret_cast<s16*>(state + 0x30) = 4;
+					*reinterpret_cast<s16*>(state + 0x12) = 0;
+				}
+				*reinterpret_cast<char*>(state + 0xC) = 0;
+			}
 		} else if (mode == 4) {
 			LetterAttachWinClose();
 		} else if (mode == 5) {

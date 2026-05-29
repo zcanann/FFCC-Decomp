@@ -37,6 +37,9 @@ extern "C" {
 extern const float kOneF32;
 extern const float kHalfF32;
 extern const float FLOAT_80331988;
+extern const float FLOAT_8033198C;
+extern const float FLOAT_80331990;
+extern const float FLOAT_80331994;
 }
 
 static float& CharaObjTargetAngle(CGCharaObj* charaObj)
@@ -2326,6 +2329,19 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 			gCFlatRuntime2.SetParticleWorkPos(*pos, m_rotTargetY);
 			gCFlatRuntime2.PutParticleWork();
 			emittedCustom = true;
+		} else if (effectId == 0x410) {
+			if (effectArg0 == 2 || effectArg0 == 3) {
+				float angleOffset = FLOAT_80331990;
+				if (effectArg0 == 2) {
+					angleOffset = FLOAT_8033198C;
+				}
+				float angle = m_rotTargetY + angleOffset;
+				*reinterpret_cast<float*>(CFlat + 0x1740) = FLOAT_80331994 * sinf(angle) + m_worldPosition.x;
+				*reinterpret_cast<float*>(CFlat + 0x1748) = FLOAT_80331994 * cosf(angle) + m_worldPosition.z;
+				gCFlatRuntime2.SetParticleWorkVector(m_rotTargetY, 0.0f);
+				gCFlatRuntime2.PutParticleWork();
+				emittedCustom = true;
+			}
 		} else if (effectId == 0x409 && effectArg0 == 3) {
 			for (int i = 3; i < 9; i++) {
 				gCFlatRuntime2.SetParticleWorkNo((particleBank << 8) | i);

@@ -21,6 +21,10 @@ extern char SoundBuffer[];
 
 extern "C" char sCharaObjDebugStatFormat[];
 
+extern "C" {
+Vec* l_pHitCross = 0;
+int l_idxAttackCol = 0;
+}
 int gCGCharaObjCreateSerial = 0;
 char gCGCharaObjCreateSerialInit = 0;
 extern "C" {
@@ -1174,17 +1178,16 @@ int CGCharaObj::getReplaceStat(int state)
 void CGCharaObj::putHitParticleFromItem(CGPrgObj* sourceObj, int itemId)
 {
 	int particleOffset = 0;
-	int itemData;
 	unsigned int particleBank;
 	unsigned short particleSpec;
 	unsigned short particleFlags;
 	unsigned short seSpec;
 
 	if (itemId == 0x1FA || itemId == 0x237) {
-		particleOffset = 0;
+		particleOffset = l_idxAttackCol;
 	}
 
-	itemData = Game.unkCFlatData0[2] + itemId * 0x48;
+	unsigned char* itemData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + itemId * 0x48;
 	particleBank = static_cast<unsigned int>(*reinterpret_cast<unsigned short*>(itemData + 0x12));
 	if (particleBank != 0xFFFF && particleBank != 0xFF) {
 		particleBank = CharaObjResolveHitParticleBank(sourceObj, particleBank);
@@ -1198,27 +1201,21 @@ void CGCharaObj::putHitParticleFromItem(CGPrgObj* sourceObj, int itemId)
 				particleBank = 3;
 			}
 
-			gCFlatRuntime2.ResetParticleWork((particleBank << 8) | ((particleSpec & 0xFF) + particleOffset), 0);
+			CFlatRuntime2Storage().ResetParticleWork((particleBank << 8) | ((particleSpec & 0xFF) + particleOffset), 0);
 			particleFlags = *reinterpret_cast<unsigned short*>(itemData + 0x0C);
 			if ((particleFlags & 0x200) == 0) {
-				Vec origin;
-				origin.x = 0.0f;
-				origin.y = 0.0f;
-				origin.z = 0.0f;
-				gCFlatRuntime2.SetParticleWorkPos(origin, 1.0f);
-			} else if (sourceObj != 0) {
-				gCFlatRuntime2.SetParticleWorkBind(sourceObj);
+				CFlatRuntime2Storage().SetParticleWorkPos(*l_pHitCross, 1.0f);
+			} else {
+				CFlatRuntime2Storage().SetParticleWorkBind(this);
 			}
-			gCFlatRuntime2.PutParticleWork();
+			CFlatRuntime2Storage().PutParticleWork();
 		}
 	}
 
 	seSpec = *reinterpret_cast<unsigned short*>(itemData + 0x42);
-	if (sourceObj != 0) {
-		int seNo = CharaObjDecodeHitParticleSe(seSpec);
-		if (seNo != 0) {
-			sourceObj->playSe3D(seNo + particleOffset, 0x32, 0x96, 0, 0);
-		}
+	int seNo = CharaObjDecodeHitParticleSe(seSpec);
+	if (seNo != 0) {
+		playSe3D(seNo + particleOffset, 0x32, 0x96, 0, 0);
 	}
 }
 

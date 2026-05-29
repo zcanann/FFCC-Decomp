@@ -2361,12 +2361,13 @@ int CMenuPcs::LetterCtrlCur()
 	*reinterpret_cast<int*>(openAnim + 0x6C) = 0;
 	*reinterpret_cast<int*>(openAnim + 0x70) = 10;
 
+	float f = FLOAT_803330f8;
 	int panelCount = static_cast<int>(**reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850));
 	s16* panel = *reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850) + 4;
 	for (int i = 0; i < panelCount; ++i, panel += 0x20) {
 		panel[0x10] = 0;
 		panel[0x11] = 0;
-		*reinterpret_cast<float*>(panel + 8) = FLOAT_803330f8;
+		*reinterpret_cast<float*>(panel + 8) = f;
 	}
 
 	*reinterpret_cast<s16*>(state + 0x22) = 0;

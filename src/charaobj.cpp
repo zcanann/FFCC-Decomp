@@ -1778,7 +1778,7 @@ int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 				usePartySource = true;
 			}
 		}
-		if (usePartySource && sourceObj->m_scriptHandle != 0 && sourceObj->m_scriptHandle[0xED] != 0) {
+		if (usePartySource && sourceObj->m_scriptHandle[0xED] != 0) {
 			usePartyLeader = true;
 		}
 

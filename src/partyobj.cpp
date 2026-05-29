@@ -4420,9 +4420,9 @@ void CGPartyObj::onDrawDebug(CFont* font, float x, float& y, float z)
 			angleScale = FLOAT_80331a54;
 		}
 
-		sprintf(text, s_partyObjGhostFmt, sGhostPartyWork.mood, CharaGhostValue(0x2048),
-		        sGhostPartyWork.thresholdA, CharaGhostValue(0x204C),
-		        sGhostPartyWork.thresholdB, CharaGhostValue(0x2050));
+		sprintf(text, s_partyObjGhostFmt, sGhostPartyWork.thresholdA, CharaGhostValue(0x2048),
+		        sGhostPartyWork.thresholdB, CharaGhostValue(0x204C),
+		        sGhostPartyWork.thresholdC, CharaGhostValue(0x2050));
 
 		float width = static_cast<float>(font->GetWidth(text));
 		font->SetPosX(x - width * 0.5f);

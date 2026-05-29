@@ -2477,9 +2477,11 @@ void CGPartyObj::onStatMagic()
 		*reinterpret_cast<int*>(self + 0x664) = 0;
 	}
 
-	moveCenterTargetParticle();
-	if (*reinterpret_cast<int*>(self + 0x664) != 0) {
-		checkTargetParticle();
+	if (m_subState != 0) {
+		moveCenterTargetParticle();
+		if (*reinterpret_cast<int*>(self + 0x664) != 0) {
+			checkTargetParticle();
+		}
 	}
 
 	int magicId = *reinterpret_cast<int*>(self + 0x560);

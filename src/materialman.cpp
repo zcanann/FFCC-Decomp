@@ -1240,7 +1240,7 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
 void CMaterialMan::SetMaterialCharaShadow(CMaterial* material)
 {
     unsigned int tevBit = *reinterpret_cast<unsigned int*>(Ptr(material, 0x24));
-    int bumpLight = *reinterpret_cast<int*>(Ptr(material, 0x28));
+    CLightPcs::CBumpLight* bumpLight = *reinterpret_cast<CLightPcs::CBumpLight**>(Ptr(material, 0x28));
     unsigned char materialType = *reinterpret_cast<unsigned char*>(Ptr(material, 0xA2));
 
     if ((bumpLight != 0) && (materialType != 3) && (materialType != 2)) {

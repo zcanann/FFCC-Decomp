@@ -1527,7 +1527,10 @@ void CMenuPcs::DrawCmakeYesNo(int yesNoSel, float alpha)
 
     DrawInit();
     if (yesNoSel != 0) {
-        unsigned int cursorBase = (yesNoSel == 1) ? yesX : noX;
+        unsigned int cursorBase = noX;
+        if (yesNoSel == 1) {
+            cursorBase = yesX;
+        }
         int frame = System.m_frameCounter & 7;
         DrawCursor(static_cast<int>(cursorBase) - 0x24 + frame, 0x175, alpha);
     }

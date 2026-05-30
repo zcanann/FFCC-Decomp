@@ -143,7 +143,9 @@ public:
     double CalcListPos(int, int, int);
     void DrawListPosMark(float, float, float);
     float CalcCenteringPos(char*, CFont*);
+    float CalcCenteringPos2(char*, float, float);
     void DrawFont(int, int, _GXColor, int, char*, float, float);
+    void DrawFont2(int, int, _GXColor, int, char*, float, float, float);
     void DrawHelpMessage(int, CFont*, int, int, _GXColor, int, float, float);
     char* GetMenuStr(int);
 

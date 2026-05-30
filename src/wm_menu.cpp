@@ -60,6 +60,7 @@ extern "C" char lbl_80331380[];
 extern "C" char lbl_80331400[];
 extern "C" const char* lbl_80210D54[];
 extern "C" const char* lbl_80210D68[];
+extern "C" char* lbl_80210750[];
 
 float FLOAT_8032ee18;
 int DAT_8032ee1c;
@@ -185,6 +186,7 @@ extern float FLOAT_803317c0;
 extern float FLOAT_803317c4;
 extern float FLOAT_803317c8;
 extern float FLOAT_803317cc;
+extern float FLOAT_803317D0;
 extern float FLOAT_803314a4;
 extern float FLOAT_8033166C;
 extern float FLOAT_80331680;
@@ -4051,6 +4053,37 @@ void CMenuPcs::DrawCMakeMenu()
 		SetTexture(static_cast<CMenuPcs::TEX>(0x1F));
 		DrawRect(0xFFFFFFFF, FLOAT_803313dc, static_cast<float>(DOUBLE_803314d0 - static_cast<double>(FLOAT_80331440)),
 		         FLOAT_803313e0, FLOAT_80331440, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, 0.0f);
+
+		unsigned int textAlpha;
+		if (contentAlpha <= FLOAT_803313e8) {
+			textAlpha = static_cast<unsigned int>(FLOAT_80331458 * contentAlpha);
+		} else {
+			textAlpha = 0xFF;
+		}
+		_GXColor textColor = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textAlpha & 0xFF)};
+		char* text = 0;
+		const int languageIndex = (Game.m_gameWork.m_languageId - 1) * 0x0B;
+		if (worldState[0x1C / sizeof(short)] == 3) {
+			const int textIndex = static_cast<int>(*reinterpret_cast<short*>(bytes + 0x74) / 0x4B);
+			text = lbl_80210750[languageIndex + 5 + textIndex];
+		} else if (worldState[0x1C / sizeof(short)] == 8) {
+			if (*reinterpret_cast<char*>(DAT_8032ef08 + 0x2C) == 3) {
+				if (*reinterpret_cast<char*>(DAT_8032ef08 + 0x24) == 2) {
+					text = lbl_80210750[languageIndex + 10];
+				}
+			} else if (*reinterpret_cast<char*>(DAT_8032ef08 + 0x2C) == 2) {
+				if (*reinterpret_cast<char*>(DAT_8032ef08 + 0x18) == 0x0F) {
+					text = lbl_80210750[languageIndex + 9];
+				} else if (*reinterpret_cast<char*>(DAT_8032ef08 + 0x18) == 0x0E) {
+					text = lbl_80210750[languageIndex + 8];
+				}
+			}
+		}
+		if (text != 0) {
+			const int x = static_cast<int>(CalcCenteringPos2(text, FLOAT_80331594, FLOAT_803313e8));
+			DrawFont2(x, static_cast<int>(FLOAT_803317D0), textColor, 7, text,
+			          FLOAT_80331594, FLOAT_803313e8, FLOAT_803313e8);
+		}
 	}
 
 	if (worldState[0x10 / sizeof(short)] == 2) {

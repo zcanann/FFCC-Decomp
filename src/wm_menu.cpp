@@ -1394,7 +1394,7 @@ void CMenuPcs::CalcDiaryMenu()
 		CalcTitleMenu();
 		break;
 	case 7:
-		CalcMoveMenu();
+		CalcOptionMenu();
 		break;
 	case 8:
 		CalcGoOutMenu();

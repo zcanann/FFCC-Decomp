@@ -216,6 +216,7 @@ public:
     void InitSaveLoadMenu();
     void CalcLoadMenu();
     void CalcTitleMenu();
+    void CalcOptionMenu();
     void CalcGoOutCharaSelect(unsigned char);
     int CalcGoOutSelChar(unsigned char, unsigned char);
     void CalcGoOutSelCharInit();

@@ -909,11 +909,6 @@ void CMes::addString(char** text, int branchMode)
 		font = *reinterpret_cast<CFont**>(menuPcs + 0x100);
 	}
 
-	if (font == 0)
-	{
-		return;
-	}
-
 	font->SetShadow(*(int*)((char*)this + 0x3D38));
 	font->SetMargin(FLOAT_8033089c);
 	font->SetScaleX(*(float*)((char*)this + 0x3D44));

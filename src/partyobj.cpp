@@ -1772,7 +1772,7 @@ int CGPartyObj::getReplaceStat(int state)
 		if (state < 7 && state == -20) {
 			state = -1;
 		} else {
-			state = CGCharaObj::getReplaceStat(state);
+			return CGCharaObj::getReplaceStat(state);
 		}
 	}
 
@@ -3519,10 +3519,13 @@ void CGPartyObj::InitFinished()
  */
 unsigned int CGPartyObj::IsDispRader()
 {
-	int result = 0;
-	if (CGObject::IsDispRader()) {
-		if (((int)((unsigned int)(unsigned char)m_weaponNodeFlags << 24) < 0) &&
-		    ((int)((unsigned int)(unsigned char)(m_weaponNodeFlags >> 8) << 24) < 0)) {
+	unsigned char result = 0;
+	if (static_cast<int>(CGObject::IsDispRader()) != 0) {
+		unsigned char* weaponFlags = reinterpret_cast<unsigned char*>(&m_weaponNodeFlags);
+		if ((static_cast<signed char>(
+		         static_cast<int>((static_cast<unsigned int>(weaponFlags[0]) << 24) & 0xC0000000) >> 31) != 0) &&
+		    (static_cast<signed char>(
+		         static_cast<int>((static_cast<unsigned int>(weaponFlags[1]) << 24) & 0xC0000000) >> 31) != 0)) {
 			result = 1;
 		}
 	}

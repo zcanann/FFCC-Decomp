@@ -1963,7 +1963,7 @@ void brush(unsigned short* pixels, int width, int height, float fx, float fy, in
 	int centerY = (int)((float)height * fy);
 	int dy;
 
-	_GXColor defaultColor = {0x0f, 0x0f, 0x0f, 0};
+	static const _GXColor defaultColor = {0x0f, 0x0f, 0x0f, 0};
 	*centerAfter = defaultColor;
 	*centerBefore = *centerAfter;
 

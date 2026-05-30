@@ -49,8 +49,8 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveStep* par
 		return;
 	}
 
-	pppYmTraceMoveMngStRaw* pppMngSt = (pppYmTraceMoveMngStRaw*)ppvMng;
-	pppYmTraceMoveWork* work = GetYmTraceMoveWork(pppYmTraceMove, param_3);
+	pppYmTraceMoveMngStRaw* const pppMngSt = (pppYmTraceMoveMngStRaw*)ppvMng;
+	pppYmTraceMoveWork* const work = GetYmTraceMoveWork(pppYmTraceMove, param_3);
 	void* owner = pppMngSt->m_owner;
 	Vec local_20;
 	Vec local_2c;

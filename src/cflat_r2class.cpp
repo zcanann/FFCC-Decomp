@@ -369,7 +369,9 @@ CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* objec
 	u8* const engineObject = reinterpret_cast<u8*>(object->m_engineObject);
 	const unsigned short engineFlags = CallEngineFlags(engineObject);
 
-	if (((engineFlags & 5) == 5) || (systemVal != -0x1B)) {
+	if (((engineFlags & 5) != 5) && (systemVal == -0x1B)) {
+		LastResult(this) = 0;
+	} else {
 		if (systemVal <= -0x40) {
 			u8* const classData = *reinterpret_cast<u8**>(engineObject + 0x58);
 			unsigned int value = 0;
@@ -553,8 +555,6 @@ CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* objec
 					break;
 			}
 		}
-	} else {
-		LastResult(this) = 0;
 	}
 
 	return reinterpret_cast<CFlatRuntime::CVal*>(&LastResult(this));

@@ -3306,7 +3306,7 @@ int CMaterial::Set(_GXTexMapID texMapId)
 
             float scrollU = scroll->m_u0;
             float scrollV = scroll->m_v0;
-            if ((FLOAT_8032faf4 != scrollU) || ((FLOAT_8032faf4 != scrollV) || hasDualScroll)) {
+            if ((scrollU != FLOAT_8032faf4) || ((scrollV != FLOAT_8032faf4) || hasDualScroll)) {
                 texMtx[0][3] = scrollU;
                 texMtx[1][3] = scrollV;
 

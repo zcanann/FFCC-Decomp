@@ -2753,17 +2753,22 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
 
                     chunkFile.PushChunk();
                     while (chunkFile.GetNextChunk(chunk) != 0) {
-                        if (chunk.m_id == CHUNK_UFRM) {
+                        switch (chunk.m_id) {
+                        case CHUNK_UFRM:
                             keyFrameU = AllocMapKeyFrame(0xDD3);
                             keyFrameU->ReadFrame(chunkFile, 0);
-                        } else if (chunk.m_id == CHUNK_VFRM) {
+                            break;
+                        case CHUNK_VFRM:
                             keyFrameV = AllocMapKeyFrame(0xDDD);
                             keyFrameV->ReadFrame(chunkFile, 0);
-                        } else if (chunk.m_id == CHUNK_UKEY) {
+                            break;
+                        case CHUNK_UKEY:
                             keyFrameU->ReadKey(chunkFile, static_cast<char>(chunk.m_arg0));
-                        } else if (chunk.m_id == CHUNK_VKEY) {
+                            break;
+                        case CHUNK_VKEY:
                             keyFrameV->ReadKey(chunkFile, static_cast<char>(chunk.m_arg0));
-                        } else if (chunk.m_id == CHUNK_TSDT) {
+                            break;
+                        case CHUNK_TSDT: {
                             unsigned int slot = chunkFile.Get2() & 0xFFFF;
                             chunkFile.Get2();
                             CTexScroll* texScroll = material->GetTexScroll(slot);
@@ -2787,6 +2792,7 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                                 *reinterpret_cast<CMapKeyFrame**>(&texScroll->m_v1) = keyFrameV;
                                 texScroll->m_type1 = 2;
                             }
+                        } break;
                         }
                     }
                     chunkFile.PopChunk();

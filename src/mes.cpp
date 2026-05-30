@@ -608,9 +608,7 @@ void CMes::Draw()
 						if (specialPad)
 						{
 							int padType = Joybus.GetPadType(0);
-							mode = (unsigned int)(((0x40000U - (unsigned int)padType) |
-							                       ((unsigned int)padType - 0x40000U)) >>
-							                      31);
+							mode = (unsigned int)(((0x40000 - padType) | (padType - 0x40000)) >> 31);
 						}
 						else
 						{
@@ -630,9 +628,7 @@ void CMes::Draw()
 						if (specialPad)
 						{
 							int padType = Joybus.GetPadType(0);
-							mode = (unsigned int)(((0x40000U - (unsigned int)padType) |
-							                       ((unsigned int)padType - 0x40000U)) >>
-							                      31);
+							mode = (unsigned int)(((0x40000 - padType) | (padType - 0x40000)) >> 31);
 						}
 						else
 						{
@@ -652,9 +648,7 @@ void CMes::Draw()
 						if (specialPad)
 						{
 							int padType = Joybus.GetPadType(0);
-							mode = (unsigned int)(((0x40000U - (unsigned int)padType) |
-							                       ((unsigned int)padType - 0x40000U)) >>
-							                      31);
+							mode = (unsigned int)(((0x40000 - padType) | (padType - 0x40000)) >> 31);
 						}
 						else
 						{
@@ -674,9 +668,7 @@ void CMes::Draw()
 						if (specialPad)
 						{
 							int padType = Joybus.GetPadType(0);
-							mode = (unsigned int)(((0x40000U - (unsigned int)padType) |
-							                       ((unsigned int)padType - 0x40000U)) >>
-							                      31);
+							mode = (unsigned int)(((0x40000 - padType) | (padType - 0x40000)) >> 31);
 						}
 						else
 						{

@@ -774,6 +774,11 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 				outResult = 0;
 				break;
 			case -0x9B:
+				engineObject->m_charaModelHandle->m_model->m_attachMode = static_cast<unsigned char>(localBase[0]);
+				PushValue(this, object, 0);
+				outResult = 0;
+				break;
+			case -0x95:
 				reinterpret_cast<CGPartyObj*>(engineObject)->PutMemoryCapsule(
 				    static_cast<int>(localBase[0]), static_cast<int>(localBase[1]), static_cast<int>(localBase[2]),
 				    static_cast<int>(localBase[3]), RuntimeString(this, localBase[4]));

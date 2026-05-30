@@ -2510,7 +2510,7 @@ void CMenuPcs::CalcResultOpenAnim()
 			int screenYOffset = entryOffset + 0x44;
 			int widthOffset = entryOffset + 0x48;
 			int heightOffset = entryOffset + 0x4C;
-			int centerX = (int)((double)(float)(24.0 + (double)sprite->w * 0.5 + (double)sprite->x) - 320.0);
+			int centerX = (int)((double)(float)((double)sprite->w * 0.5 + (double)((float)sprite->x + 24.0f)) - 320.0);
 			int centerY = (int)((double)(float)((double)sprite->h * 0.5 + (double)sprite->y) - 240.0);
 			entryOffset += 0x50;
 			*reinterpret_cast<short*>(boardPtr + centerXOffset) = (short)centerX;

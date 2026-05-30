@@ -9471,6 +9471,21 @@ LAB_draw:
 			}
 		}
 	}
+	if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x16) == 0x11) {
+		short mode = *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x1C);
+		int msgId = -1;
+		if (mode == 5) {
+			msgId = 2;
+		} else if (mode == 2) {
+			msgId = 3;
+		}
+		if (msgId >= 0) {
+			_GXColor color = {0xFF, 0xFF, 0xFF, 0xFF};
+			char* text = const_cast<char*>(GetMcStr(msgId));
+			const int x = static_cast<int>(CalcCenteringPos2(text, FLOAT_80331594, FLOAT_803313e8));
+			DrawFont2(x, 0x187, color, 7, text, FLOAT_80331594, FLOAT_803313e8, FLOAT_803313e8);
+		}
+	}
 	DrawInit();
 }
 

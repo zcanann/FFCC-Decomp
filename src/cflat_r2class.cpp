@@ -1025,7 +1025,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			outResult = 0;
 			break;
 		case -0x41:
-			engineObject->m_bgDownDist = 0.5f / *reinterpret_cast<float*>(localBase);
+			engineObject->m_bgDownDist = 0.5f / static_cast<float>(localBase[0]);
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;

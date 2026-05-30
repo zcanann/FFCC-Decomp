@@ -1760,7 +1760,7 @@ void CMenuPcs::GetCmdItem()
 	for (s32 i = 0; i < 0x49; i++) {
 		s32 arti = i + 0x9f;
 		if (*reinterpret_cast<s16*>(artifactPtr + 0x136) == arti) {
-			if ((arti > 0xde) && (arti < 0xe4)) {
+			if (IsMagicArti(arti)) {
 				count++;
 				write2++;
 				*write2 = static_cast<s16>(i + 0x40);
@@ -1770,22 +1770,22 @@ void CMenuPcs::GetCmdItem()
 	}
 
 	s16* write3 = list + count;
-	if ((*reinterpret_cast<s16*>(scriptFood + 0x1f6) > 0xde) && (*reinterpret_cast<s16*>(scriptFood + 0x1f6) < 0xe4)) {
+	if (IsMagicArti(*reinterpret_cast<s16*>(scriptFood + 0x1f6))) {
 		count++;
 		write3++;
 		*write3 = 0xa0;
 	}
-	if ((*reinterpret_cast<s16*>(scriptFood + 0x1f8) > 0xde) && (*reinterpret_cast<s16*>(scriptFood + 0x1f8) < 0xe4)) {
+	if (IsMagicArti(*reinterpret_cast<s16*>(scriptFood + 0x1f8))) {
 		count++;
 		write3++;
 		*write3 = 0xa1;
 	}
-	if ((*reinterpret_cast<s16*>(scriptFood + 0x1fa) > 0xde) && (*reinterpret_cast<s16*>(scriptFood + 0x1fa) < 0xe4)) {
+	if (IsMagicArti(*reinterpret_cast<s16*>(scriptFood + 0x1fa))) {
 		count++;
 		write3++;
 		*write3 = 0xa2;
 	}
-	if ((*reinterpret_cast<s16*>(scriptFood + 0x1fc) > 0xde) && (*reinterpret_cast<s16*>(scriptFood + 0x1fc) < 0xe4)) {
+	if (IsMagicArti(*reinterpret_cast<s16*>(scriptFood + 0x1fc))) {
 		count++;
 		write3[1] = 0xa3;
 	}

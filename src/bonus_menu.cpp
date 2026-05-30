@@ -218,27 +218,27 @@ static inline void InitBonusEffectSlotBlock(BonusEffectSlotBlock* slot)
 	}
 }
 
-static inline void InitBonusBoardEntry(BonusBoardEntryRaw* entry)
+static inline void InitBonusBoardEntry(unsigned char* entry)
 {
-	entry->m_modelHandle = 0;
-	entry->m_effectHandle = 0;
-	entry->m_kind = 0;
-	entry->m_state = 0;
-	entry->m_width = 0x280;
-	entry->m_height = 0x1C0;
-	entry->m_posX = 0.0f;
-	entry->m_posY = 0.0f;
-	entry->m_depth = 1000.0f;
-	entry->m_rotX = 0.0f;
-	entry->m_rotY = 0.0f;
-	entry->m_rotZ = 0.0f;
-	entry->m_scaleX = 1.0f;
-	entry->m_scaleY = 1.0f;
-	entry->m_scaleZ = 1.0f;
-	entry->m_drawFlags = 0;
-	entry->m_drawState = 0;
-	entry->m_screenWidth = 0x280;
-	entry->m_screenHeight = 0x1C0;
+	*reinterpret_cast<int*>(entry) = 0;
+	*reinterpret_cast<int*>(entry + 4) = 0;
+	*reinterpret_cast<short*>(entry + 8) = 0;
+	*reinterpret_cast<short*>(entry + 10) = 0;
+	*reinterpret_cast<short*>(entry + 12) = 0x280;
+	*reinterpret_cast<short*>(entry + 14) = 0x1C0;
+	*reinterpret_cast<float*>(entry + 0x10) = 0.0f;
+	*reinterpret_cast<float*>(entry + 0x14) = 0.0f;
+	*reinterpret_cast<float*>(entry + 0x18) = 1000.0f;
+	*reinterpret_cast<float*>(entry + 0x1C) = 0.0f;
+	*reinterpret_cast<float*>(entry + 0x20) = 0.0f;
+	*reinterpret_cast<float*>(entry + 0x24) = 0.0f;
+	*reinterpret_cast<float*>(entry + 0x28) = 1.0f;
+	*reinterpret_cast<float*>(entry + 0x2C) = 1.0f;
+	*reinterpret_cast<float*>(entry + 0x30) = 1.0f;
+	*reinterpret_cast<int*>(entry + 0x40) = 0;
+	*reinterpret_cast<int*>(entry + 0x44) = 0;
+	*reinterpret_cast<int*>(entry + 0x48) = 0x280;
+	*reinterpret_cast<int*>(entry + 0x4C) = 0x1C0;
 }
 
 static inline BonusMenuMembers& GetBonusMenuMembers(CMenuPcs* menu)
@@ -2758,9 +2758,9 @@ void CMenuPcs::createBonus()
 	auxPtr = reinterpret_cast<int>(new BonusMenuAuxRaw);
 	GetBonusMenuMembers(this).m_bonusAuxPtr = auxPtr;
 	memset((void*)auxPtr, 0, sizeof(BonusMenuAuxRaw));
-	BonusBoardEntryList* boardEntries = reinterpret_cast<BonusBoardEntryList*>(boardPtr);
+	unsigned char* boardEntries = reinterpret_cast<unsigned char*>(boardPtr);
 	for (int i = 0; i < 0x18; i++) {
-		InitBonusBoardEntry(&boardEntries->entries[i]);
+		InitBonusBoardEntry(boardEntries + i * 0x50);
 	}
 
 	if (s_Rinfo != 0) {
@@ -2951,7 +2951,12 @@ void CMenuPcs::createBonus()
 	}
 
 	GbaQue.SetStartBonusFlg();
-	ClrBattleItem();
+	for (int i = 0; i < 4; i++) {
+		if (Game.m_scriptFoodBase[i] != 0) {
+			reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->SafeDeleteTempItem();
+			reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[i])->SortBeforeReturnWorldMap();
+		}
+	}
 	*(short*)(GetBonusMenuMembers(this).m_bonusAuxPtr + 10) = 3;
 	s_CntTop = 0;
 	s_ArtiTop = 0;

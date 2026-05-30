@@ -1623,41 +1623,35 @@ unsigned int CMenuPcs::CmdOpen0()
 	iVar7 = 0;
 	iVar8 = static_cast<s32>(psVar5[1]) - static_cast<s32>(psVar5[0]);
 	psVar5 = psVar5 + psVar5[0] * 0x20 + 4;
-	iVar6 = iVar8;
-	if (iVar8 > 0) {
-		do {
-			float fVar1 = FLOAT_80332ab0;
-			if (*reinterpret_cast<s32*>(psVar5 + 0x12) <= iVar4) {
-				if (iVar4 < *reinterpret_cast<s32*>(psVar5 + 0x12) + *reinterpret_cast<s32*>(psVar5 + 0x14)) {
-					*reinterpret_cast<s32*>(psVar5 + 0x10) = *reinterpret_cast<s32*>(psVar5 + 0x10) + 1;
-					const double dVar2 = DOUBLE_80332a58;
-					*reinterpret_cast<float*>(psVar5 + 8) = static_cast<float>(
-						(dVar2 / static_cast<double>(*reinterpret_cast<s32*>(psVar5 + 0x14))) *
-						static_cast<double>(*reinterpret_cast<s32*>(psVar5 + 0x10)));
-					if ((*reinterpret_cast<u32*>(psVar5 + 0x16) & 2) == 0) {
-						fVar1 = static_cast<float>(
-							(dVar2 / static_cast<double>(*reinterpret_cast<s32*>(psVar5 + 0x14))) *
-							static_cast<double>(*reinterpret_cast<s32*>(psVar5 + 0x10)));
-						*reinterpret_cast<float*>(psVar5 + 0x18) =
-							(*reinterpret_cast<float*>(psVar5 + 0x1c) -
-							 static_cast<float>(*psVar5)) *
-							fVar1;
-						*reinterpret_cast<float*>(psVar5 + 0x1a) =
-							(*reinterpret_cast<float*>(psVar5 + 0x1e) -
-							 static_cast<float>(psVar5[1])) *
-							fVar1;
-					}
-				} else {
-					iVar7 = iVar7 + 1;
-					*reinterpret_cast<float*>(psVar5 + 8) = FLOAT_80332a70;
-					*reinterpret_cast<float*>(psVar5 + 0x18) = fVar1;
-					*reinterpret_cast<float*>(psVar5 + 0x1a) = fVar1;
-				}
-			}
+	const float fVar1 = FLOAT_80332ab0;
 
+	for (iVar6 = 0; iVar6 < iVar8; iVar6++) {
+		if (*reinterpret_cast<s32*>(psVar5 + 0x12) > iVar4) {
 			psVar5 = psVar5 + 0x20;
-			iVar6 = iVar6 - 1;
-		} while (iVar6 != 0);
+			continue;
+		}
+		if (iVar4 >= *reinterpret_cast<s32*>(psVar5 + 0x12) + *reinterpret_cast<s32*>(psVar5 + 0x14)) {
+			iVar7 = iVar7 + 1;
+			*reinterpret_cast<float*>(psVar5 + 8) = FLOAT_80332a70;
+			*reinterpret_cast<float*>(psVar5 + 0x18) = fVar1;
+			*reinterpret_cast<float*>(psVar5 + 0x1a) = fVar1;
+			psVar5 = psVar5 + 0x20;
+			continue;
+		}
+
+		*reinterpret_cast<s32*>(psVar5 + 0x10) = *reinterpret_cast<s32*>(psVar5 + 0x10) + 1;
+		const float t = static_cast<float>(
+			(DOUBLE_80332a58 / static_cast<double>(*reinterpret_cast<s32*>(psVar5 + 0x14))) *
+			static_cast<double>(*reinterpret_cast<s32*>(psVar5 + 0x10)));
+		*reinterpret_cast<float*>(psVar5 + 8) = t;
+		if ((*reinterpret_cast<u32*>(psVar5 + 0x16) & 2) == 0) {
+			*reinterpret_cast<float*>(psVar5 + 0x18) =
+				t * (*reinterpret_cast<float*>(psVar5 + 0x1c) - static_cast<float>(*psVar5));
+			*reinterpret_cast<float*>(psVar5 + 0x1a) =
+				t * (*reinterpret_cast<float*>(psVar5 + 0x1e) - static_cast<float>(psVar5[1]));
+		}
+
+		psVar5 = psVar5 + 0x20;
 	}
 
 	return static_cast<unsigned int>(iVar8 == iVar7);

@@ -1107,9 +1107,10 @@ void CMenuPcs::CalcSelectWait()
 		break;
 	}
 
-	if (s_Base[0] != 0) {
-		sprites[2].x = (short)(int)s_Base[0][selection * 2 + 2];
-		sprites[2].y = (short)(int)s_Base[0][selection * 2 + 3];
+	float* base = s_Base[0];
+	if (base != 0) {
+		sprites[2].x = (short)(int)base[selection * 2 + 2];
+		sprites[2].y = (short)(int)base[selection * 2 + 3];
 	}
 	if (sprites[2].timer < sprites[2].duration) {
 		sprites[2].alpha = (float)sprites[2].timer / (float)sprites[2].duration;

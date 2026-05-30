@@ -3166,7 +3166,7 @@ void CMenuPcs::CmakeResultDraw1()
 
     DrawInit();
 
-    if (mode == 1) {
+    if (*reinterpret_cast<short*>(state + 0x10) == 1) {
         int cursorX = static_cast<int>(FLOAT_80333304 + static_cast<float>(System.m_frameCounter & 7));
         int cursorY = 0x70 + *reinterpret_cast<short*>(state + 0x26) * 0x28;
         DrawCursor(cursorX, cursorY, alpha);

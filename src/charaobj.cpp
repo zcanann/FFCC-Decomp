@@ -3060,13 +3060,15 @@ void CGCharaObj::sendCombiToScript(CGCharaObj* target, int scriptArg, int)
 	int linkCount = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6A8);
 	CGPrgObj** links = reinterpret_cast<CGPrgObj**>(reinterpret_cast<unsigned char*>(this) + 0x6AC);
 
-	while (entry < linkCount &&
-	       (links[entry] == 0 ||
-	        (Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0xF &&
-	         (links[entry]->GetCID() & 0x6D) == 0x6D &&
-	         *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(links[entry]->m_scriptHandle) + 0x3B4) != 0) ||
-	        links[entry]->m_lastStateId == 6 || links[entry]->m_lastStateId == 2)) {
-		entry++;
+	for (; entry < linkCount; entry++, links++) {
+		CGPrgObj* link = *links;
+		if (link != 0 &&
+		    !(Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0xF &&
+		      (link->GetCID() & 0x6D) == 0x6D &&
+		      *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(link->m_scriptHandle) + 0x3B4) != 0) &&
+		    link->m_lastStateId != 6 && link->m_lastStateId != 2) {
+			break;
+		}
 	}
 	if (entry == linkCount) {
 		int stackArgs[2];

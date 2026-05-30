@@ -399,6 +399,9 @@ static inline unsigned char GetBonusUnavailableMask(int statePtr, BonusPartySumm
 	if (statePtr != 0) {
 		mask = *(unsigned char*)(statePtr + 9);
 	}
+	if (s_Rinfo != 0) {
+		mask = (unsigned char)(mask | s_Rinfo->m_missingArtifactMask);
+	}
 	if (summary != 0) {
 		mask = (unsigned char)(mask | (unsigned char)summary->m_ownedArtifactMask);
 	}

@@ -43,12 +43,28 @@ static inline unsigned int CallEngineFunc48Arg(void* engineObject, unsigned int 
 	return fn(engineObject, arg0);
 }
 
+static inline void CallEngineFunc44Arg2(void* engineObject, unsigned int arg0, unsigned int arg1)
+{
+	typedef void (*EngineFn)(void*, unsigned int, unsigned int);
+	void** vtable = *reinterpret_cast<void***>(reinterpret_cast<u8*>(engineObject) + 0x48);
+	EngineFn fn = reinterpret_cast<EngineFn>(vtable[1]);
+	fn(engineObject, arg0, arg1);
+}
+
 static inline CGObject* FindRuntimeObject(CFlatRuntime2* runtime, unsigned int objectId)
 {
 	typedef CGObject* (*RuntimeFn)(CFlatRuntime2*, unsigned int);
 	void** vtable = *reinterpret_cast<void***>(runtime);
 	RuntimeFn fn = reinterpret_cast<RuntimeFn>(vtable[15]);
 	return fn(runtime, objectId);
+}
+
+static inline char* RuntimeString(CFlatRuntime2* runtime, unsigned int index)
+{
+	u8* const bytes = reinterpret_cast<u8*>(runtime);
+	char* const blob = *reinterpret_cast<char**>(bytes + 0x28);
+	unsigned short* const offsets = *reinterpret_cast<unsigned short**>(bytes + 0x2C);
+	return blob + offsets[index];
 }
 
 static inline unsigned int& RuntimeWorkAssignIndex(CFlatRuntime2* runtime)
@@ -751,17 +767,24 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
-		case -0x99:
-			engineObject->PlayAnim(
-			    static_cast<int>(localBase[0]), 0, 1, static_cast<short>(localBase[1]), static_cast<short>(localBase[2]), 0);
-			PushValue(this, object, 0);
-			outResult = 0;
-			break;
-		case -0x97:
-			GbaQue.OpenMenu(ScriptPlayerIndex(engineObject), static_cast<int>(localBase[0]), 1);
-			PushValue(this, object, 0);
-			outResult = 0;
-			break;
+			case -0x99:
+				engineObject->PlayAnim(
+				    static_cast<int>(localBase[0]), 0, 1, static_cast<short>(localBase[1]), static_cast<short>(localBase[2]), 0);
+				PushValue(this, object, 0);
+				outResult = 0;
+				break;
+			case -0x9B:
+				reinterpret_cast<CGPartyObj*>(engineObject)->PutMemoryCapsule(
+				    static_cast<int>(localBase[0]), static_cast<int>(localBase[1]), static_cast<int>(localBase[2]),
+				    static_cast<int>(localBase[3]), RuntimeString(this, localBase[4]));
+				PushValue(this, object, 0);
+				outResult = 0;
+				break;
+			case -0x97:
+				GbaQue.OpenMenu(ScriptPlayerIndex(engineObject), static_cast<int>(localBase[0]), 1);
+				PushValue(this, object, 0);
+				outResult = 0;
+				break;
 		case -0x96:
 			engineObject->addHp(static_cast<int>(localBase[0]), 0);
 			PushValue(this, object, 0);
@@ -772,17 +795,32 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
-		case -0x8E:
-			reinterpret_cast<CGPartyObj*>(engineObject)
-			    ->carry(static_cast<int>(localBase[0]), FindRuntimeObject(this, localBase[1]), static_cast<int>(localBase[2]));
-			PushValue(this, object, 0);
-			outResult = 0;
-			break;
-		case -0x8D:
-			reinterpret_cast<CGPartyObj*>(engineObject)->commandFinished();
-			PushValue(this, object, 0);
-			outResult = 0;
-			break;
+			case -0x8E:
+				reinterpret_cast<CGPartyObj*>(engineObject)
+				    ->carry(static_cast<int>(localBase[0]), FindRuntimeObject(this, localBase[1]), static_cast<int>(localBase[2]));
+				PushValue(this, object, 0);
+				outResult = 0;
+				break;
+			case -0x8F:
+				CallEngineFunc44Arg2(engineObject, localBase[0], localBase[1]);
+				PushValue(this, object, 0);
+				outResult = 0;
+				break;
+			case -0x8D:
+				reinterpret_cast<CGPartyObj*>(engineObject)->commandFinished();
+				PushValue(this, object, 0);
+				outResult = 0;
+				break;
+			case -0x8C: {
+				CGObject* target = 0;
+				if (localBase[0] != 0) {
+					target = FindRuntimeObject(this, localBase[0]);
+				}
+				engineObject->LookAt(target, RuntimeString(this, localBase[1]));
+				PushValue(this, object, 0);
+				outResult = 0;
+				break;
+			}
 		case -0x85:
 			PushValue(
 			    this,

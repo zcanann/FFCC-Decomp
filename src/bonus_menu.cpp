@@ -262,7 +262,6 @@ static const char* GetBonusPartyNameByActiveIndex(int activeIndex);
 static CCaravanWork* GetBonusActiveCaravanByActiveIndex(int activeIndex);
 static int GetBonusResultValueByActiveIndex(int activeIndex);
 static const char* GetBonusResultLabelByActiveIndex(int activeIndex);
-static void SetBonusPartyModelAlpha(CMenuPcs* menu, int modelIndex, float alpha);
 
 static inline BonusSummaryData* GetBonusSummaryData()
 {
@@ -554,100 +553,6 @@ static void SetupSelectCloseSpriteMotion(BonusAnimSprite* sprite)
 	sprite->motionY = 0.0f;
 	sprite->targetX = (float)sprite->x + sprite->motionX;
 	sprite->targetY = (float)sprite->y + sprite->motionY;
-}
-
-static void DrawBonusTexturedSprite(CMenuPcs* menu, const BonusAnimSprite* sprite, float alpha)
-{
-	GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(alpha * 255.0f)};
-	GXSetChanMatColor(GX_COLOR0A0, color);
-	menu->SetTexture(static_cast<CMenuPcs::TEX>(sprite->tex));
-	if (sprite->tex == 0x20) {
-		GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_ONE, GX_LO_CLEAR);
-	}
-	menu->DrawRect(0, (float)sprite->x + sprite->mulX, (float)sprite->y + sprite->mulY, (float)sprite->w,
-	               (float)sprite->h, sprite->depth, sprite->depth, sprite->scale, sprite->scale, 0.0f);
-	if (sprite->tex == 0x20) {
-		GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
-	}
-}
-
-static void DrawBonusSweepSprite(CMenuPcs* menu, const BonusAnimSprite* sprite, float alpha, bool opening)
-{
-	if (menu == 0 || sprite == 0 || alpha <= 0.0f) {
-		return;
-	}
-
-	float width = (float)sprite->w;
-	float height = (float)sprite->h;
-	int duration = (sprite->duration > 0) ? sprite->duration : 1;
-	float timer = (sprite->timer > 0) ? (float)(sprite->timer - 1) : 0.0f;
-	float progress = ClampBonusUnit(timer / (float)duration);
-	float fillWidth = (opening ? progress : (1.0f - progress)) * width;
-	float fadeWidth = width / (float)duration;
-	float x = (float)sprite->x + sprite->mulX;
-	float y = (float)sprite->y + sprite->mulY;
-	unsigned int solidColor = 0xFFFFFF00 | (unsigned char)(alpha * 255.0f);
-	GXColor solidColors[4];
-	reinterpret_cast<unsigned int*>(solidColors)[0] = solidColor;
-	reinterpret_cast<unsigned int*>(solidColors)[1] = solidColor;
-	reinterpret_cast<unsigned int*>(solidColors)[2] = solidColor;
-	reinterpret_cast<unsigned int*>(solidColors)[3] = solidColor;
-
-	menu->SetTexture(static_cast<CMenuPcs::TEX>(sprite->tex));
-	GXSetChanMatColor(GX_COLOR0A0, solidColors[0]);
-
-	if (fillWidth > 0.0f) {
-		menu->DrawRect(0, x, y, fillWidth, height, sprite->depth, sprite->depth, solidColors, 1.0f, 1.0f, 0.0f);
-		x += fillWidth;
-	}
-
-	if (fillWidth > 0.0f && fillWidth < width) {
-		GXColor fadeColors[4];
-		reinterpret_cast<unsigned int*>(fadeColors)[0] = 0xFFFFFF00;
-		reinterpret_cast<unsigned int*>(fadeColors)[1] = 0xFFFFFF00;
-		reinterpret_cast<unsigned int*>(fadeColors)[2] = 0xFFFFFF00;
-		reinterpret_cast<unsigned int*>(fadeColors)[3] = 0xFFFFFF00;
-		menu->DrawRect(0, x, y, fadeWidth, height, sprite->depth, sprite->depth, fadeColors, 1.0f, 1.0f, 0.0f);
-	}
-}
-
-static void DrawBonusPartyModel(CMenuPcs* menu, int modelIndex, float alpha)
-{
-	BonusPartySummary* summary = GetBonusPartySummary(modelIndex);
-	if (summary == 0) {
-		return;
-	}
-
-	CCharaPcs::CHandle* handle = summary->m_partyHandle;
-	if (handle == 0) {
-		return;
-	}
-
-	SetBonusPartyModelAlpha(menu, modelIndex, ClampBonusUnit(alpha));
-	menu->SetProjection(modelIndex);
-	menu->SetLight(1);
-	unsigned int oldFlags = handle->m_flags;
-	handle->m_flags = 0x300543;
-	handle->Draw(5);
-	handle->m_flags = oldFlags;
-	menu->RestoreProjection();
-}
-
-static void SetBonusPartyModelAlpha(CMenuPcs* menu, int modelIndex, float alpha)
-{
-	BonusPartySummary* summary = GetBonusPartySummary(modelIndex);
-	if (summary == 0) {
-		return;
-	}
-
-	CCharaPcs::CHandle* handle = summary->m_partyHandle;
-	if (handle == 0) {
-		return;
-	}
-
-	if (handle->m_model != 0) {
-		*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C) = ClampBonusUnit(alpha);
-	}
 }
 
 static void DrawBonusActiveMarks(CMenuPcs* menu, int statePtr, float alpha)

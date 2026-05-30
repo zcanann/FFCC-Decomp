@@ -756,12 +756,7 @@ void CMenuPcs::GetOptionData()
 void CMenuPcs::CalcOptionMenu()
 {
 	unsigned char* const self = reinterpret_cast<unsigned char*>(this);
-	unsigned short press;
-	unsigned int pressRaw;
-
-	pressRaw = GetMenuPress();
-
-	press = static_cast<unsigned short>(pressRaw);
+	unsigned short press = static_cast<unsigned short>(GetMenuPress());
 	bool optionChanged = false;
 
 	if (m_optionMenuState == 0) {

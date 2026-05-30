@@ -899,8 +899,8 @@ void CShopMenu::Init(int mode)
 void CShopMenu::Destroy()
 {
     PartPcs.ReleasePdt(ShopMenuInt(this, 0x18));
-    if (*reinterpret_cast<void**>(MenuPcsRaw() + 0x878) == this) {
-        *reinterpret_cast<void**>(MenuPcsRaw() + 0x878) = nullptr;
+    if (MenuPcs.m_shopMenu == this) {
+        MenuPcs.m_shopMenu = nullptr;
     }
 }
 
@@ -1466,7 +1466,7 @@ void CShopMenu::DrawItemList()
         }
 
         if (itemNo > 0) {
-            CFont* font = *reinterpret_cast<CFont**>(MenuPcsRaw() + 0x264);
+            CFont* font = MenuPcs.m_labelFont;
             SetMargin__5CFontFf(FLOAT_80332d28, font);
             SetShadow__5CFontFi(font, 0);
             SetScale__5CFontFf(FLOAT_80332d28, font);
@@ -1685,7 +1685,7 @@ void CShopMenu::DrawShopBase()
         Graphic.SetDrawDoneDebugData(0xE);
         drawShapeSeq(8, 0, 0x2E, 0x170, 0xFF, 0, 0, FLOAT_80332d9c, 0);
         Graphic.SetDrawDoneDebugData(0xF);
-        CFont* font = *reinterpret_cast<CFont**>(MenuPcsRaw() + 0x264);
+        CFont* font = MenuPcs.m_labelFont;
         SetMargin__5CFontFf(FLOAT_80332d28, font);
         SetShadow__5CFontFi(font, 0);
         SetScaleX__5CFontFf(FLOAT_80332d2c, font);
@@ -1841,7 +1841,7 @@ void CShopMenu::DrawSoubi()
     drawShapeSeq(1, 1, barX, 0x17C, 0xFF, 0, 0, FLOAT_80332d9c, 0);
 
     int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
-    CFont* labelFont = *reinterpret_cast<CFont**>(MenuPcsRaw() + 0x264);
+    CFont* labelFont = MenuPcs.m_labelFont;
     SetMargin__5CFontFf(FLOAT_80332d28, labelFont);
     SetShadow__5CFontFi(labelFont, 0);
     SetScaleX__5CFontFf(FLOAT_80332d2c, labelFont);
@@ -1966,7 +1966,7 @@ void CShopMenu::DrawMake()
     DrawShopMenuAmount(
         font, currentMoney, FLOAT_80332e1c - gilUnitWidth - FLOAT_80332d5c, FLOAT_80332e18, (makeGil <= currentMoney) ? 0x14 : 2);
 
-    CFont* labelFont = *reinterpret_cast<CFont**>(MenuPcsRaw() + 0x264);
+    CFont* labelFont = MenuPcs.m_labelFont;
     SetupShopMenuLabelFont(labelFont, &white);
     DrawShopMenuCenteredText(labelFont, ShopMenuMes(languageId, SHOP_MENU_TEXT_PRICE), FLOAT_80332e28, FLOAT_80332e24);
     DrawShopMenuCenteredText(labelFont, ShopMenuMes(languageId, SHOP_MENU_TEXT_MONEY), FLOAT_80332d68, FLOAT_80332e2c);
@@ -2611,8 +2611,8 @@ void CShopMenu::Calc()
                 PartPcs.ReleasePdt(ShopMenuInt(this, 0x18));
                 reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0])->CallShop(0, 0, 0, 0, 0);
                 *reinterpret_cast<unsigned short*>(MenuPcsRaw() + 0x850 + 6) = 1;
-                operator delete(*reinterpret_cast<void**>(MenuPcsRaw() + 0x878));
-                *reinterpret_cast<void**>(MenuPcsRaw() + 0x878) = nullptr;
+                operator delete(MenuPcs.m_shopMenu);
+                MenuPcs.m_shopMenu = nullptr;
                 return;
             }
         }
@@ -2702,8 +2702,8 @@ void CShopMenu::Calc()
                 PartPcs.ReleasePdt(ShopMenuInt(this, 0x18));
                 reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0])->CallShop(0, 0, 0, 0, 0);
                 *reinterpret_cast<unsigned short*>(MenuPcsRaw() + 0x850 + 6) = 1;
-                operator delete(*reinterpret_cast<void**>(MenuPcsRaw() + 0x878));
-                *reinterpret_cast<void**>(MenuPcsRaw() + 0x878) = nullptr;
+                operator delete(MenuPcs.m_shopMenu);
+                MenuPcs.m_shopMenu = nullptr;
                 return;
             }
             this->SetMode(ShopMenuInt(this, 0x8));

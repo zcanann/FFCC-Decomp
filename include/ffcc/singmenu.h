@@ -141,6 +141,10 @@ public:
 
     unsigned char _pad0[0x248];
     CFont* m_infoPanelFont;
+    unsigned char _pad1[0x264 - 0x24C];
+    CFont* m_labelFont;
+    unsigned char _pad2[0x878 - 0x268];
+    void* m_shopMenu;
 };
 
 extern CMenuPcs MenuPcs;

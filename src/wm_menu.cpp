@@ -47,6 +47,7 @@ extern "C" unsigned char DAT_8032E8A8[];
 extern int DAT_8032ef08;
 extern int DAT_80238028;
 extern char cRam8032ee21;
+extern "C" char lbl_80331380[];
 
 float FLOAT_8032ee18;
 int DAT_8032ee1c;
@@ -4712,9 +4713,6 @@ void CMenuPcs::CalcPitcher()
 	unsigned char* const worldState = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x82C)[0]);
 	unsigned char* const worldObj = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x814)[0]);
 	unsigned char* const handle = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x788)[0]);
-	if (worldState == 0 || worldObj == 0 || handle == 0) {
-		return;
-	}
 
 	const short state = reinterpret_cast<short*>(worldState + 0x10)[0];
 	if (state <= 0 || state >= 3) {
@@ -4728,7 +4726,7 @@ void CMenuPcs::CalcPitcher()
 	reinterpret_cast<short*>(worldObj + 0x19E)[0] = 0xE0;
 	reinterpret_cast<float*>(worldObj + 0x1A0)[0] = FLOAT_803313dc;
 	reinterpret_cast<float*>(worldObj + 0x1A4)[0] = FLOAT_803313dc;
-	reinterpret_cast<float*>(worldObj + 0x1A8)[0] = FLOAT_803314bc;
+	reinterpret_cast<float*>(worldObj + 0x1A8)[0] = FLOAT_803314a4;
 	reinterpret_cast<float*>(worldObj + 0x1AC)[0] = FLOAT_80331748;
 	reinterpret_cast<float*>(worldObj + 0x1B0)[0] = FLOAT_8033174c;
 	reinterpret_cast<float*>(worldObj + 0x1B4)[0] = FLOAT_80331750;
@@ -4748,20 +4746,18 @@ void CMenuPcs::CalcPitcher()
 	PSMTXConcat(rotXMtx, scaleMtx, scaleMtx);
 
 	CChara::CModel* const model = reinterpret_cast<CChara::CModel*>(reinterpret_cast<unsigned int*>(handle + 0x168)[0]);
-	if (model == 0) {
-		return;
-	}
 
 	const unsigned int step = static_cast<unsigned int>(reinterpret_cast<short*>(worldState + 0x22)[0]);
 	float blend = FLOAT_803313e8;
 	if (state == 1 && step < 10) {
-		blend = static_cast<float>(step) * 0.1f;
+		blend = static_cast<float>(DOUBLE_803314e8 * static_cast<double>(static_cast<int>(step)));
 	} else if (state == 2 && bytes[0x13] != 0) {
-		blend = 1.0f - static_cast<float>(step) * 0.1f;
+		blend = static_cast<float>(DOUBLE_80331420 - DOUBLE_803314e8 * static_cast<double>(static_cast<int>(step)));
 	}
 	reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(model) + 0x9C)[0] = blend;
 
 	model->SetMatrix(scaleMtx);
+	reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(model) + 0x98)[0] = static_cast<char>(lbl_80331380[Game.m_gameWork.m_timerA]);
 	model->CalcMatrix();
 	model->CalcSkin();
 }

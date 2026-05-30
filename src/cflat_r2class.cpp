@@ -698,19 +698,23 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			float* params = reinterpret_cast<float*>(localBase);
 			float radius = params[1];
 			float offset = params[4];
-			if (mode == 2) {
-				engineObject->m_bodyColRadius = radius;
-			} else if (static_cast<int>(mode) < 2) {
-				if (mode == 0) {
-					engineObject->m_capsuleHalfHeight = radius;
-				} else if (static_cast<int>(mode) > -1) {
-					engineObject->m_bodyEllipsoidRadius = radius;
-					engineObject->m_bodyEllipsoidOffset = offset;
+			if (mode != 2) {
+				if (static_cast<int>(mode) < 2) {
+					if (static_cast<int>(mode) >= 0) {
+						if (mode == 0) {
+							engineObject->m_capsuleHalfHeight = radius;
+						} else {
+							engineObject->m_bodyEllipsoidRadius = radius;
+							engineObject->m_bodyEllipsoidOffset = offset;
+						}
+					}
+				} else if (mode == 4) {
+					engineObject->m_nearColRadius = radius;
+				} else if (static_cast<int>(mode) < 4) {
+					engineObject->m_attackColRadius = radius;
 				}
-			} else if (mode == 4) {
-				engineObject->m_nearColRadius = radius;
-			} else if (static_cast<int>(mode) < 4) {
-				engineObject->m_attackColRadius = radius;
+			} else {
+				engineObject->m_bodyColRadius = radius;
 			}
 			PushValue(this, object, 0);
 			outResult = 0;

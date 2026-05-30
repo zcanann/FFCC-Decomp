@@ -1080,8 +1080,9 @@ void CMenuPcs::DrawOptionMenu()
 	                        &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
 	font->SetScaleX(FLOAT_80333578);
+	char** option = optionText;
 	for (int i = 0, rowY = 0x70, selectedY = 0x73, normalY = 0x75; i < 5;
-	     i++, rowY += 0x28, selectedY += 0x28, normalY += 0x28) {
+	     i++, rowY += 0x28, selectedY += 0x28, normalY += 0x28, option++) {
 		CTexture* row = GetMenuTexture(this, 0xC0);
 		uv0.x = (i == m_optionIndex) ? kOptionAnimMin : kMenuCenteringHalfWidth;
 		uv0.y = kOptionAnimMin;
@@ -1094,10 +1095,10 @@ void CMenuPcs::DrawOptionMenu()
 
 		if (i == m_optionIndex) {
 			DrawFont(0x5E, static_cast<int>(FLOAT_80333580 + static_cast<float>(selectedY)), color, 0x16,
-			         optionText[i], kOptionAnimMax, kOptionAnimMax);
+			         *option, kOptionAnimMax, kOptionAnimMax);
 		} else {
 			DrawFont(0x60, static_cast<int>(FLOAT_80333580 + static_cast<float>(normalY)), color, 6,
-			         optionText[i], kOptionAnimMax, kOptionAnimMax);
+			         *option, kOptionAnimMax, kOptionAnimMax);
 		}
 	}
 

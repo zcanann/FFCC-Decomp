@@ -2619,6 +2619,7 @@ unsigned short CMenuPcs::CmakeJobCtrl()
 
                     group += 0x30C0;
                     slot += 4;
+                    duplicateSlot = slot;
                 }
 
                 if (duplicateSlot > 7) {

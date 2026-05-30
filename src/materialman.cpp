@@ -19,6 +19,7 @@
 #include <PowerPC_EABI_Support/Runtime/New.h>
 
 CMaterialMan MaterialMan;
+CMaterial* g_drawMaterial;
 
 inline void* operator new(unsigned long, void* p)
 {
@@ -609,8 +610,8 @@ void CMaterialMan::addtev_bump_st(int mode, _GXTevScale tevScale)
     GXSetNumIndStages(1);
     GXSetIndTexOrder((GXIndTexStageID)0, *reinterpret_cast<GXTexCoordID*>(Ptr(this, 0x1E8)),
                      *reinterpret_cast<GXTexMapID*>(Ptr(this, 0x1C4)));
-    GXSetIndTexCoordScale((GXIndTexStageID)0, *reinterpret_cast<GXIndTexScale*>(Ptr(this, 0x34)),
-                          *reinterpret_cast<GXIndTexScale*>(Ptr(this, 0x35)));
+    GXSetIndTexCoordScale((GXIndTexStageID)0, *reinterpret_cast<GXIndTexScale*>(Ptr(g_drawMaterial, 0x34)),
+                          *reinterpret_cast<GXIndTexScale*>(Ptr(g_drawMaterial, 0x35)));
 
     GXSetTevDirect(static_cast<GXTevStageID>(tevStage));
     _GXSetTevOrder(
@@ -651,7 +652,7 @@ void CMaterialMan::addtev_bump_st(int mode, _GXTevScale tevScale)
     IncNumTevStage();
 
     tevStage = m_numTevStage;
-    if (*reinterpret_cast<char*>(Ptr(this, 0xA3)) == 0) {
+    if (*reinterpret_cast<char*>(Ptr(g_drawMaterial, 0xA3)) == 0) {
         _GXSetTevOrder(
             tevStage, *reinterpret_cast<int*>(Ptr(this, 0x1F4)), *reinterpret_cast<int*>(Ptr(this, 0x1C8)), 0xFF);
         _GXSetTevColorIn(tevStage,
@@ -1211,6 +1212,7 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
 
     CPtrArray<CMaterial*>* materials = reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(materialSet, 8));
     CMaterial* material = (*materials)[materialIndex];
+    g_drawMaterial = material;
     int bumpLight = *reinterpret_cast<int*>(Ptr(material, 0x28));
     unsigned char materialType = *reinterpret_cast<unsigned char*>(Ptr(material, 0xA2));
 

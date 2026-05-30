@@ -999,12 +999,9 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			break;
 		}
 		case -0x36: {
-			Vec moveVector;
 			float* params = reinterpret_cast<float*>(object->m_localBase);
-			moveVector.x = params[0];
-			moveVector.y = params[1];
-			moveVector.z = params[2];
-			engineObject->moveVectorH(&moveVector, params[3], static_cast<int>(object->m_localBase[4]));
+			CVector moveVector(params[0], params[1], params[2]);
+			engineObject->moveVectorH(moveVector, params[3], static_cast<int>(object->m_localBase[4]));
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;

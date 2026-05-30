@@ -903,8 +903,8 @@ void CMenuPcs::CalcSelectCloseAnim()
 	int entryOffset = 0;
 	for (int i = 0; i < activePartyCount; i++) {
 		BonusAnimSprite* sprite = &sprites[4 + i];
-		int centerX = (int)((float)((double)sprite->x + (double)sprite->motionX + (double)sprite->w * 0.5) - 320.0);
-		int centerY = (int)((float)((double)sprite->y + (double)sprite->motionY + (double)sprite->h * 0.5) - 240.0);
+		int centerX = (int)((double)(float)((double)sprite->w * 0.5 + (double)((float)sprite->x + sprite->motionX)) - 320.0);
+		int centerY = (int)((double)(float)((double)sprite->h * 0.5 + (double)((float)sprite->y + sprite->motionY)) - 240.0);
 		*reinterpret_cast<short*>(boardPtr + entryOffset + 8) = (short)centerX;
 		*reinterpret_cast<short*>(boardPtr + entryOffset + 10) = (short)centerY;
 

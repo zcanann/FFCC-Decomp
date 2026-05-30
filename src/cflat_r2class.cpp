@@ -981,6 +981,28 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
+		case -0x35: {
+			Vec moveTarget;
+			float* params = reinterpret_cast<float*>(localBase);
+			moveTarget.x = params[0];
+			moveTarget.y = params[1];
+			moveTarget.z = params[2];
+			engineObject->Move(&moveTarget, params[3], static_cast<int>(localBase[4]), 0, 0, 0, 0);
+			PushValue(this, object, 0);
+			outResult = 0;
+			break;
+		}
+		case -0x36: {
+			Vec moveVector;
+			float* params = reinterpret_cast<float*>(localBase);
+			moveVector.x = params[0];
+			moveVector.y = params[1];
+			moveVector.z = params[2];
+			engineObject->moveVectorH(&moveVector, params[3], static_cast<int>(localBase[4]));
+			PushValue(this, object, 0);
+			outResult = 0;
+			break;
+		}
 		case -0x38:
 			engineObject->PlayAnim(static_cast<int>(localBase[0]), 1, 0, -1, -1, 0);
 			PushValue(this, object, 0);

@@ -1725,7 +1725,7 @@ int CMenuPcs::CmakeNameCtrl()
     }
 
     if (mcState == 3) {
-        int maxRow = (select < 10) ? 4 : 5;
+        int maxRow = (static_cast<int>(select) >> 31) + (static_cast<unsigned int>(select) > 9) + 4;
         if ((repeat & 0x8) != 0) {
             row = (row > 0) ? static_cast<short>(row - 1) : static_cast<short>(maxRow);
             Sound.PlaySe(1, 0x40, 0x7F, 0);
@@ -2611,7 +2611,6 @@ unsigned short CMenuPcs::CmakeJobCtrl()
         Sound.PlaySe(2, 0x40, 0x7F, 0);
         mcState = 2;
     }
-
     return 0;
 }
 

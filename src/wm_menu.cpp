@@ -20,6 +20,7 @@
 #include "ffcc/joybus.h"
 #include "ffcc/color.h"
 #include "ffcc/cflat_runtime2.h"
+#include "ffcc/textureman.h"
 
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
@@ -9797,6 +9798,27 @@ LAB_draw:
 							playX += static_cast<float>(digitWidth);
 						}
 					}
+
+					const int mapInfoIndex = *reinterpret_cast<int*>(slotData + 0x10) * 4;
+					unsigned char* const mapInfo = lbl_801DC294 + 0x40 + mapInfoIndex;
+					CMaterial* material = MapMng.GetMaterialID(mapInfo[0]);
+					CTexture* texture = *reinterpret_cast<CTexture**>(reinterpret_cast<unsigned char*>(material) + 0x3C);
+					TextureMan.SetTexture(static_cast<_GXTexMapID>(0), texture);
+					Mtx texMtx;
+					PSMTXScale(texMtx, FLOAT_803313e8 / static_cast<float>(texture->m_width),
+					           FLOAT_803313e8 / static_cast<float>(texture->m_height), FLOAT_803313e8);
+					GXLoadTexMtxImm(texMtx, 0x1E, GX_MTX2x4);
+					GXSetNumTexGens(1);
+					GXSetTexCoordGen2(static_cast<GXTexCoordID>(0), static_cast<GXTexGenType>(1),
+					                  static_cast<GXTexGenSrc>(4), 0x1E, GX_FALSE, 0x7D);
+					TextureMan.SetTextureTev(texture);
+					DrawRect(0xFFFFFFFF,
+					         static_cast<float>(static_cast<double>(FLOAT_80331518) + DOUBLE_80331510),
+					         static_cast<float>(static_cast<double>(slotY) + DOUBLE_80331510),
+					         FLOAT_80331578, FLOAT_80331578,
+					         static_cast<float>(static_cast<int>(static_cast<char>(mapInfo[1])) << 7),
+					         static_cast<float>(static_cast<int>(static_cast<char>(mapInfo[2])) << 7),
+					         FLOAT_80331434, FLOAT_80331434, 0.0f);
 				}
 			}
 		}

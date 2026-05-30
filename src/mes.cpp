@@ -1278,7 +1278,7 @@ void CMes::Next()
 	float* curr;
 	char tempFlags[0x50];
 
-	if (*(int*)((char*)this + 4) != 0)
+	if (*(unsigned int*)((char*)this + 4) != 0)
 	{
 		entryCount = *(int*)((char*)this + 0x3c0c);
 		flagEntry = (unsigned char*)((char*)this + *(int*)((char*)this + 0x3c10) * 6 + 0x3c14);

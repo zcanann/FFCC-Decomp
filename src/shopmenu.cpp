@@ -981,8 +981,8 @@ void CShopMenu::DrawItemInfo(int itemNo, int x, int y, int unused0, int attrY, i
     SetShadow__5CFontFi(font, 1);
     SetScaleX__5CFontFf(FLOAT_80332d2c, font);
     SetScaleY__5CFontFf(FLOAT_80332d28, font);
-    _GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
-    font->SetColor(white);
+    CColor white(0xFF, 0xFF, 0xFF, 0xFF);
+    font->SetColor(white.color);
     DrawInit__5CFontFv(font);
 
     int languageId = static_cast<unsigned int>(Game.m_gameWork.m_languageId);
@@ -1049,7 +1049,7 @@ void CShopMenu::DrawItemInfo(int itemNo, int x, int y, int unused0, int attrY, i
     int valueRightX = x + 0x108;
     SetShadow__5CFontFi(font, 1);
     SetScale__5CFontFf(FLOAT_80332d28, font);
-    font->SetColor(white);
+    font->SetColor(white.color);
     DrawInit__5CFontFv(font);
     reinterpret_cast<unsigned char*>(font)[0x24] = (reinterpret_cast<unsigned char*>(font)[0x24] & 0xEF) | 0x10;
     SetMargin__5CFontFf(FLOAT_80332d34, font);

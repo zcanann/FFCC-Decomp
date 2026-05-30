@@ -1269,7 +1269,7 @@ void CMes::Next()
 		while ((halfVal = FLOAT_8033089c, *(int*)((char*)this + 0x3c10) < entryCount))
 		{
 			type = *flagEntry;
-			if (type < 3)
+			if ((type != 3) && (type < 3))
 			{
 				if (type != 1)
 				{

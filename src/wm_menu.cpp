@@ -8399,8 +8399,6 @@ void CMenuPcs::CalcMainMenuSub()
 			}
 		}
 	}
-
-	WMChgMenu();
 }
 
 /*

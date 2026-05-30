@@ -671,16 +671,16 @@ void CGCharaObj::onFramePreCalc()
 
 	for (int i = 0; i < 4; i++) {
 		CGPartyObj* partyObj = Game.m_partyObjArr[i];
-		if (partyObj == 0) {
-			m_partyDistance[i] = 0.0f;
-			m_partyDelta[i].x = 0.0f;
-			m_partyDelta[i].y = 0.0f;
-			m_partyDelta[i].z = 0.0f;
-			m_partyAngle[i] = 0.0f;
-		} else {
+		if (partyObj != 0) {
 			PSVECSubtract(&partyObj->m_worldPosition, &m_worldPosition, &m_partyDelta[i]);
 			m_partyDistance[i] = PSVECMag(&m_partyDelta[i]);
 			m_partyAngle[i] = reinterpret_cast<CVector*>(&m_partyDelta[i])->GetRotateY();
+		} else {
+			m_partyDistance[i] = FLOAT_80331988;
+			m_partyDelta[i].x = FLOAT_80331988;
+			m_partyDelta[i].y = FLOAT_80331988;
+			m_partyDelta[i].z = FLOAT_80331988;
+			m_partyAngle[i] = FLOAT_80331988;
 		}
 
 		m_partyRank[i] = 0;
@@ -1126,9 +1126,14 @@ int CGCharaObj::onHit(int hitArg, CGObject* sourceObj, int hitType, Vec* hitPos)
 	int slot = 4;
 	for (int i = 0; i < 4; i++) {
 		IgnoreHitSlot& slotData = m_ignoreHit[i];
-		if ((slotData.m_flag & 0x80) == 0) {
+		unsigned char flag = slotData.m_flag;
+		if ((flag & 0x80) != 0) {
+			if (slotData.m_source == sourceObj) {
+				return 2;
+			}
+		} else {
 			slot = i;
-			slotData.m_flag = static_cast<unsigned char>((slotData.m_flag & 0x7F) | 0x80);
+			slotData.m_flag = static_cast<unsigned char>((flag & 0x7F) | 0x80);
 			slotData.m_source = sourceObj;
 
 			unsigned int particleIndex = static_cast<unsigned int>(m_itemId);
@@ -1136,9 +1141,6 @@ int CGCharaObj::onHit(int hitArg, CGObject* sourceObj, int hitType, Vec* hitPos)
 				*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + (particleIndex * 0x48) + 0xE);
 			slotData.m_timer = (particleLife == 3) ? 0x1E : 0;
 			break;
-		}
-		if (slotData.m_source == sourceObj) {
-			return 2;
 		}
 	}
 
@@ -1275,6 +1277,167 @@ void CGCharaObj::putHitParticleFromItem(CGPrgObj* sourceObj, int itemId)
 	}
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x8010D700
+ * PAL Size: 6984b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, int, Vec* hitPos)
+{
+	l_pHitCross = hitPos;
+	l_idxAttackCol = attackColIndex;
+
+	unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
+	unsigned int cid = GetCID();
+	int resolvedItemId = itemId;
+	unsigned int staType;
+	int resistType = 0;
+	int allowEffect = 0;
+	int severity = 0;
+	int effectResult = 0;
+
+	if (m_scriptHandle == 0) {
+		damageDelete();
+		changeStat(6, 0, 0);
+		return;
+	}
+
+	if (resolvedItemId < 0) {
+		resolvedItemId = m_itemId;
+	}
+	if (resolvedItemId < 0) {
+		return;
+	}
+
+	if (CharaObjIsPlayerCid(cid) && *reinterpret_cast<short*>(script + 0x12) != 0) {
+		return;
+	}
+	if (CharaObjIsPlayerCid(cid) &&
+	    (MiniGamePcs.m_flags & 4) != 0) {
+		return;
+	}
+	if (CharaObjIsPlayerCid(cid) && static_cast<unsigned short>((m_lastMapIdExtra << 8) | m_lastMapIdHit) != 1) {
+		return;
+	}
+	if ((m_weaponNodeFlags & 0x80) == 0) {
+		return;
+	}
+
+	unsigned char* itemData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + resolvedItemId * 0x48;
+	unsigned short itemEffect = *reinterpret_cast<unsigned short*>(itemData);
+	staType = *reinterpret_cast<unsigned short*>(itemData + 8);
+	if (staType != 0x65 && staType != 0x66 && staType != 0x67 && (CFlatGameFlags() & CFlatGameFlag_Bit5) != 0) {
+		return;
+	}
+
+	calcRegist(static_cast<int>(staType), resolvedItemId, resistType, allowEffect, severity, 0);
+
+	if (resistType == 3) {
+		if (CharaObjIsElementalStatus(staType)) {
+			putParticle(0x201, 0, hitPos, m_attackColRadius, 0x65);
+		} else if (CharaObjIsBreakStatus(staType)) {
+			putParticle(0x200, 0, hitPos, m_attackColRadius, 0x1D);
+		}
+	} else if ((resistType > 1 || (resistType == 1 &&
+	           ((*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + resolvedItemId * 0x48 + 0x32) & 1) == 0))) &&
+	           CharaObjIsElementalStatus(staType)) {
+		putParticle(0x201, 0, hitPos, m_attackColRadius, 0x65);
+	}
+
+	if (m_lastStateId == 8 && m_subState == 1 &&
+	    ((*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + resolvedItemId * 0x48 + 0x2C) & 8) == 0) &&
+	    CharaObjCanFrontGuard(this, sourceObj)) {
+		playSe3D(0x1D, 0x32, 0x96, 0, 0);
+		putParticle(0x200, 0, hitPos, m_attackColRadius, 0);
+		if (sourceObj != 0 && CharaObjIsPlayerCid(sourceObj->GetCID())) {
+			sourceObj->changeStat(0x13, 0, 0);
+		}
+		if (CharaObjIsPlayerCid(cid)) {
+			changeSubStat(2);
+		}
+		allowEffect = 0;
+		effectResult = 0;
+	}
+
+	if (sourceObj != 0 && m_lastStateId == 6 && (m_weaponNodeFlags & 0x20) != 0) {
+		unsigned int currentKind =
+			*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + m_itemId * 0x48 + 0x0A) & 0xFF;
+		if (currentKind == 2) {
+			if (staType != 0x66 && staType != 0x67 && staType != 7) {
+				Vec delta;
+				delta.x = m_worldPosition.x - sourceObj->m_worldPosition.x;
+				delta.y = m_worldPosition.y - sourceObj->m_worldPosition.y;
+				delta.z = m_worldPosition.z - sourceObj->m_worldPosition.z;
+				moveVectorH(&delta, 10.0f, 10);
+				m_rotTargetY = static_cast<float>(atan2(-static_cast<double>(delta.x), -static_cast<double>(delta.z)));
+				changeStat(0x1A, 0, 0);
+			}
+		} else if (currentKind == 3) {
+			allowEffect = 0;
+			effectResult = 0;
+		}
+	}
+
+	if (sourceObj != 0 && itemEffect == 0x1F8 && (sourceObj->m_weaponNodeFlags & 0x20) != 0 &&
+	    ((*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + m_itemId * 0x48 + 0x0A) & 0xFF) == 3)) {
+		Vec delta;
+		delta.x = m_worldPosition.x - sourceObj->m_worldPosition.x;
+		delta.y = m_worldPosition.y - sourceObj->m_worldPosition.y;
+		delta.z = m_worldPosition.z - sourceObj->m_worldPosition.z;
+		moveVectorH(&delta, 10.0f, 10);
+		m_rotTargetY = static_cast<float>(atan2(-static_cast<double>(delta.x), -static_cast<double>(delta.z)));
+		changeStat(0x19, 0, 0);
+	}
+
+	if (*reinterpret_cast<short*>(script + 0x1D) != 0) {
+		allowEffect = 0;
+		effectResult = 0;
+	}
+	if (*reinterpret_cast<short*>(script + 0x11) != 0) {
+		allowEffect = 0;
+	}
+	if (*reinterpret_cast<short*>(script + 0x14) != 0 && (staType == 7 || staType == 8)) {
+		allowEffect = 0;
+		effectResult = 0;
+	}
+	if (*reinterpret_cast<short*>(script + 7) == 0) {
+		if (staType == 0x65) {
+			allowEffect = 1;
+			effectResult = 0;
+		} else {
+			allowEffect = 0;
+			effectResult = 0;
+		}
+	} else if (staType == 0x65) {
+		allowEffect = 0;
+		effectResult = 0;
+	} else if (staType == 0x66 || staType == 0x67 || staType == 7) {
+		allowEffect = 1;
+		effectResult = 0;
+	}
+
+	if (allowEffect != 0) {
+		effective(static_cast<int>(staType), resolvedItemId, sourceObj, effectResult);
+	}
+
+	if (effectResult == 0) {
+		damageDelete();
+		changeStat(6, 0, 0);
+		return;
+	}
+
+	if (staType == 0x1C || staType == 4 || staType < 2) {
+		changeStat(6, 0, 0);
+	} else if (staType == 0x25 || staType == 0x68 || staType == 0x6A) {
+		changeStat(0x19, 0, 0);
+	} else if (staType == 0x6B) {
+		changeStat(0x1A, 0, 0);
+	}
+}
 /*
  * --INFO--
  * PAL Address: 0x801105D0
@@ -2038,167 +2201,6 @@ void CGCharaObj::calcRegist(int staIndex, int itemId, int& outA, int& outB, int&
 	outC = (outA ^ 3) / 2;
 }
 
-/*
- * --INFO--
- * PAL Address: 0x8010D700
- * PAL Size: 6984b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, int, Vec* hitPos)
-{
-	l_pHitCross = hitPos;
-	l_idxAttackCol = attackColIndex;
-
-	unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
-	unsigned int cid = GetCID();
-	int resolvedItemId = itemId;
-	unsigned int staType;
-	int resistType = 0;
-	int allowEffect = 0;
-	int severity = 0;
-	int effectResult = 0;
-
-	if (m_scriptHandle == 0) {
-		damageDelete();
-		changeStat(6, 0, 0);
-		return;
-	}
-
-	if (resolvedItemId < 0) {
-		resolvedItemId = m_itemId;
-	}
-	if (resolvedItemId < 0) {
-		return;
-	}
-
-	if (CharaObjIsPlayerCid(cid) && *reinterpret_cast<short*>(script + 0x12) != 0) {
-		return;
-	}
-	if (CharaObjIsPlayerCid(cid) &&
-	    (MiniGamePcs.m_flags & 4) != 0) {
-		return;
-	}
-	if (CharaObjIsPlayerCid(cid) && static_cast<unsigned short>((m_lastMapIdExtra << 8) | m_lastMapIdHit) != 1) {
-		return;
-	}
-	if ((m_weaponNodeFlags & 0x80) == 0) {
-		return;
-	}
-
-	unsigned char* itemData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2]) + resolvedItemId * 0x48;
-	unsigned short itemEffect = *reinterpret_cast<unsigned short*>(itemData);
-	staType = *reinterpret_cast<unsigned short*>(itemData + 8);
-	if (staType != 0x65 && staType != 0x66 && staType != 0x67 && (CFlatGameFlags() & CFlatGameFlag_Bit5) != 0) {
-		return;
-	}
-
-	calcRegist(static_cast<int>(staType), resolvedItemId, resistType, allowEffect, severity, 0);
-
-	if (resistType == 3) {
-		if (CharaObjIsElementalStatus(staType)) {
-			putParticle(0x201, 0, hitPos, m_attackColRadius, 0x65);
-		} else if (CharaObjIsBreakStatus(staType)) {
-			putParticle(0x200, 0, hitPos, m_attackColRadius, 0x1D);
-		}
-	} else if ((resistType > 1 || (resistType == 1 &&
-	           ((*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + resolvedItemId * 0x48 + 0x32) & 1) == 0))) &&
-	           CharaObjIsElementalStatus(staType)) {
-		putParticle(0x201, 0, hitPos, m_attackColRadius, 0x65);
-	}
-
-	if (m_lastStateId == 8 && m_subState == 1 &&
-	    ((*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + resolvedItemId * 0x48 + 0x2C) & 8) == 0) &&
-	    CharaObjCanFrontGuard(this, sourceObj)) {
-		playSe3D(0x1D, 0x32, 0x96, 0, 0);
-		putParticle(0x200, 0, hitPos, m_attackColRadius, 0);
-		if (sourceObj != 0 && CharaObjIsPlayerCid(sourceObj->GetCID())) {
-			sourceObj->changeStat(0x13, 0, 0);
-		}
-		if (CharaObjIsPlayerCid(cid)) {
-			changeSubStat(2);
-		}
-		allowEffect = 0;
-		effectResult = 0;
-	}
-
-	if (sourceObj != 0 && m_lastStateId == 6 && (m_weaponNodeFlags & 0x20) != 0) {
-		unsigned int currentKind =
-			*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + m_itemId * 0x48 + 0x0A) & 0xFF;
-		if (currentKind == 2) {
-			if (staType != 0x66 && staType != 0x67 && staType != 7) {
-				Vec delta;
-				delta.x = m_worldPosition.x - sourceObj->m_worldPosition.x;
-				delta.y = m_worldPosition.y - sourceObj->m_worldPosition.y;
-				delta.z = m_worldPosition.z - sourceObj->m_worldPosition.z;
-				moveVectorH(&delta, 10.0f, 10);
-				m_rotTargetY = static_cast<float>(atan2(-static_cast<double>(delta.x), -static_cast<double>(delta.z)));
-				changeStat(0x1A, 0, 0);
-			}
-		} else if (currentKind == 3) {
-			allowEffect = 0;
-			effectResult = 0;
-		}
-	}
-
-	if (sourceObj != 0 && itemEffect == 0x1F8 && (sourceObj->m_weaponNodeFlags & 0x20) != 0 &&
-	    ((*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + m_itemId * 0x48 + 0x0A) & 0xFF) == 3)) {
-		Vec delta;
-		delta.x = m_worldPosition.x - sourceObj->m_worldPosition.x;
-		delta.y = m_worldPosition.y - sourceObj->m_worldPosition.y;
-		delta.z = m_worldPosition.z - sourceObj->m_worldPosition.z;
-		moveVectorH(&delta, 10.0f, 10);
-		m_rotTargetY = static_cast<float>(atan2(-static_cast<double>(delta.x), -static_cast<double>(delta.z)));
-		changeStat(0x19, 0, 0);
-	}
-
-	if (*reinterpret_cast<short*>(script + 0x1D) != 0) {
-		allowEffect = 0;
-		effectResult = 0;
-	}
-	if (*reinterpret_cast<short*>(script + 0x11) != 0) {
-		allowEffect = 0;
-	}
-	if (*reinterpret_cast<short*>(script + 0x14) != 0 && (staType == 7 || staType == 8)) {
-		allowEffect = 0;
-		effectResult = 0;
-	}
-	if (*reinterpret_cast<short*>(script + 7) == 0) {
-		if (staType == 0x65) {
-			allowEffect = 1;
-			effectResult = 0;
-		} else {
-			allowEffect = 0;
-			effectResult = 0;
-		}
-	} else if (staType == 0x65) {
-		allowEffect = 0;
-		effectResult = 0;
-	} else if (staType == 0x66 || staType == 0x67 || staType == 7) {
-		allowEffect = 1;
-		effectResult = 0;
-	}
-
-	if (allowEffect != 0) {
-		effective(static_cast<int>(staType), resolvedItemId, sourceObj, effectResult);
-	}
-
-	if (effectResult == 0) {
-		damageDelete();
-		changeStat(6, 0, 0);
-		return;
-	}
-
-	if (staType == 0x1C || staType == 4 || staType < 2) {
-		changeStat(6, 0, 0);
-	} else if (staType == 0x25 || staType == 0x68 || staType == 0x6A) {
-		changeStat(0x19, 0, 0);
-	} else if (staType == 0x6B) {
-		changeStat(0x1A, 0, 0);
-	}
-}
 
 /*
  * --INFO--
@@ -3060,13 +3062,15 @@ void CGCharaObj::sendCombiToScript(CGCharaObj* target, int scriptArg, int)
 	int linkCount = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6A8);
 	CGPrgObj** links = reinterpret_cast<CGPrgObj**>(reinterpret_cast<unsigned char*>(this) + 0x6AC);
 
-	while (entry < linkCount &&
-	       (links[entry] == 0 ||
-	        (Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0xF &&
-	         (links[entry]->GetCID() & 0x6D) == 0x6D &&
-	         *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(links[entry]->m_scriptHandle) + 0x3B4) != 0) ||
-	        links[entry]->m_lastStateId == 6 || links[entry]->m_lastStateId == 2)) {
-		entry++;
+	for (; entry < linkCount; entry++, links++) {
+		CGPrgObj* link = *links;
+		if (link != 0 &&
+		    !(Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0xF &&
+		      (link->GetCID() & 0x6D) == 0x6D &&
+		      *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(link->m_scriptHandle) + 0x3B4) != 0) &&
+		    link->m_lastStateId != 6 && link->m_lastStateId != 2) {
+			break;
+		}
 	}
 	if (entry == linkCount) {
 		int stackArgs[2];

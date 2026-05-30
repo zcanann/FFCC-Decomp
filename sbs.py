@@ -14,7 +14,7 @@ def fmt(sym):
         out.append((i.get('diff_kind',''), ins['formatted'] if ins else ''))
     return out
 lf=fmt(L); rf=fmt(R)
-print('%-42s | %-42s'%('=== MINE (build) ===','=== ORIG (target) ==='))
+print('%-42s | %-42s'%('=== ORIG (target/L) ===','=== MINE (base/R) ==='))
 for i in range(max(len(lf),len(rf))):
     l=lf[i] if i<len(lf) else ('','')
     r=rf[i] if i<len(rf) else ('','')

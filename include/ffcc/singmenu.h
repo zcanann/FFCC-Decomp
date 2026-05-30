@@ -139,11 +139,11 @@ public:
     int GetModelNo(int, int, int);
     unsigned char GetItemIcon(int);
 
-    unsigned char _pad0[0x248];
+    unsigned char _pad0[0xF8];
     CFont* m_infoPanelFont;
-    unsigned char _pad1[0x264 - 0x24C];
+    unsigned char _pad1[0x108 - 0xFC];
     CFont* m_labelFont;
-    unsigned char _pad2[0x878 - 0x268];
+    unsigned char _pad2[0x878 - 0x10C];
     void* m_shopMenu;
 };
 

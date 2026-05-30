@@ -3069,6 +3069,16 @@ void CMenuPcs::CalcTitleMenu()
 			worldState[8] = 1;
 			worldState[9] = 1;
 			bytes[0x858] = 0;
+			if (DAT_8032ee1c == 1) {
+				CFlatRuntime::CStack flatArgs[3];
+				flatArgs[0].m_word = 9;
+				flatArgs[1].m_word = 0;
+				flatArgs[2].m_word = 0;
+				gCFlatRuntime().SystemCall(0, 1, 4, 3, flatArgs, 0);
+				*reinterpret_cast<short*>(worldState + 0x26) = 0;
+				DAT_8032ee1c = 0;
+				return;
+			}
 		}
 
 		if (*reinterpret_cast<short*>(worldState + 0x10) == 0) {

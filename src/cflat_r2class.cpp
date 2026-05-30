@@ -394,6 +394,7 @@ CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* objec
 			System.Printf(const_cast<char*>(sCFlatRuntime2SetClassSystemValWarn));
 		}
 		LastResult(this) = 0;
+		return reinterpret_cast<CFlatRuntime::CVal*>(&LastResult(this));
 	} else {
 		if (systemVal <= -0x40) {
 			u8* const classData = *reinterpret_cast<u8**>(engineObject + 0x58);

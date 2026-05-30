@@ -1,4 +1,5 @@
 #include "ffcc/shopmenu.h"
+#include "ffcc/color.h"
 #include "ffcc/fontman.h"
 #include "ffcc/graphic.h"
 #include "ffcc/gxfunc.h"
@@ -2086,8 +2087,8 @@ void CShopMenu::DrawSmith0()
     SetShadow__5CFontFi(font, 1);
     SetScale__5CFontFf(FLOAT_80332d8c, font);
 
-    _GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
-    font->SetColor(white);
+    CColor white(0xFF, 0xFF, 0xFF, 0xFF);
+    font->SetColor(white.color);
     DrawInit__5CFontFv(font);
 
     int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;

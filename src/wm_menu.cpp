@@ -1322,7 +1322,7 @@ void CMenuPcs::CalcDiaryMenu()
 
 	switch (*reinterpret_cast<short*>(worldState + 0x1C)) {
 	case 0:
-		if (*reinterpret_cast<short*>(worldState + 0x10) < 5) {
+		if (*reinterpret_cast<short*>(worldState + 0x10) <= 4) {
 			const short state = *reinterpret_cast<short*>(worldState + 0x10);
 			int frameStep = 0;
 			if (state == 0) {
@@ -1354,7 +1354,7 @@ void CMenuPcs::CalcDiaryMenu()
 				selectData[0x178] = 1;
 				worldState[0x0C] = 1;
 			}
-			if (*reinterpret_cast<short*>(worldState + 0x10) < 5) {
+			if (*reinterpret_cast<short*>(worldState + 0x10) <= 4) {
 				CalcCharaSelect();
 				const short state = *reinterpret_cast<short*>(worldState + 0x10);
 				int frameStep = 0;

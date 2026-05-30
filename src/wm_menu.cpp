@@ -9328,6 +9328,22 @@ LAB_draw:
 	         FLOAT_803313e8, FLOAT_803313e8,
 	         static_cast<float>(*reinterpret_cast<unsigned int*>(frameEntry + 0x18)));
 
+	SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+	GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
+	GXSetChanMatColor(static_cast<GXChannelID>(4), white);
+	if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x16) > 1 &&
+	    *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x10) == 2) {
+		for (int slot = 0; slot < kMcListCount; slot++) {
+			SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
+			DrawRect(0xFFFFFFFF, FLOAT_803314d8,
+			         static_cast<float>(static_cast<double>(FLOAT_80331498 * static_cast<float>(slot) + FLOAT_80331490) -
+			                            DOUBLE_80331510),
+			         FLOAT_803314d8, FLOAT_803314d8,
+			         FLOAT_80331490 * static_cast<float>(slot), FLOAT_803313e0,
+			         FLOAT_803313e8, FLOAT_803313e8, 0.0f);
+		}
+	}
+
 	// Draw text info for each save slot
 	if ((state == 2 || state == 3) && *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x16) != 0) {
 		unsigned int* mcData = *reinterpret_cast<unsigned int**>(bytes + 0x838);

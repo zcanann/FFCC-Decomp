@@ -732,12 +732,12 @@ void CMaterialMan::addtev_bump_water(_GXTevScale tevScale)
     float warpMtx3 = FLOAT_8032faf4;
     float warpMtx4 = FLOAT_8032fb20;
     float warpMtx5 = FLOAT_8032faf4;
-    int tevStage = m_numTevStage;
 
     GXSetIndTexMtx((GXIndTexMtxID)1, LightPcs.GetBumpIndTexMtx(), 0);
     GXSetIndTexMtx((GXIndTexMtxID)2, reinterpret_cast<const float(*)[3]>(&warpMtx0), 1);
     GXSetNumIndStages(2);
 
+    int tevStage = m_numTevStage;
     GXSetTevDirect((GXTevStageID)tevStage);
     _GXSetTevOrder(
         tevStage, m_texCoordIdCurShadow, m_texMapIdCurShadow, 4);
@@ -812,12 +812,12 @@ void CMaterialMan::addtev_bump_spec_col_water(_GXTevScale tevScale)
     float warpMtx3 = FLOAT_8032faf4;
     float warpMtx4 = FLOAT_8032fb20;
     float warpMtx5 = FLOAT_8032faf4;
-    int tevStage = m_numTevStage;
 
     GXSetIndTexMtx((GXIndTexMtxID)1, LightPcs.GetBumpIndTexMtx(), 0);
     GXSetIndTexMtx((GXIndTexMtxID)2, reinterpret_cast<const float(*)[3]>(&warpMtx0), 1);
     GXSetNumIndStages(2);
 
+    int tevStage = m_numTevStage;
     GXSetTevDirect((GXTevStageID)tevStage);
     _GXSetTevOrder(
         tevStage, m_texCoordIdCurShadow, m_texMapIdCurShadow, 4);

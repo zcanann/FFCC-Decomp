@@ -910,10 +910,10 @@ void CMenuPcs::CalcSelectCloseAnim()
 
 		int screenX = (int)(24.0f + (float)sprite->x + sprite->motionX);
 		int screenY = (int)(((float)sprite->y + sprite->motionY) - 28.0f);
-		if (screenX < 0) {
+		if ((double)screenX < 0.0) {
 			screenX = 0;
 		}
-		if (screenY < 0) {
+		if ((double)screenY < 0.0) {
 			screenY = 0;
 		}
 		*reinterpret_cast<int*>(entry + 0x40) = screenX;

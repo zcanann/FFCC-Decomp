@@ -3237,14 +3237,22 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
     char picked[8];
     size_t len = strlen(s_CmakeInfo.m_name);
 
+    bool padBusy = false;
     if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+        padBusy = true;
+    }
+    if (padBusy) {
         down = 0;
     } else {
         __cntlzw(static_cast<unsigned int>(Pad._448_4_));
         down = static_cast<unsigned short>(Pad.GetPadInputs()[0].buttonDown[0]);
     }
 
+    padBusy = false;
     if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+        padBusy = true;
+    }
+    if (padBusy) {
         repeat = 0;
     } else {
         __cntlzw(static_cast<unsigned int>(Pad._448_4_));

@@ -24,7 +24,6 @@ public:
 
 extern "C" {
 extern "C" const char s_maptexanim_cpp[] = "maptexanim.cpp";
-extern const char s_CMapTexAnim[] = "CMapTexAnim";
 char s_SetMapTexAnim_MaterialIdNotFound[];
 }
 extern "C" float FLOAT_8032fd38;

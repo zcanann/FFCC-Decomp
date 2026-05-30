@@ -3281,22 +3281,24 @@ int CMaterial::Set(_GXTexMapID texMapId)
 {
     Mtx texMtx;
     PSMTXIdentity(texMtx);
+
+    int textureCount = static_cast<int>(*reinterpret_cast<unsigned short*>(Ptr(this, 0x18)));
+    CTexScroll* scroll = GetTexScroll(0);
     MaterialManTexState* texState = GetMaterialManTexState(&MaterialMan);
     MaterialManTevState* tevState = GetMaterialManTevState(&MaterialMan);
+    unsigned char* textureSlot = Ptr(this, 0x3C);
+    int i = 0;
 
     bool hasDualScroll = false;
-    if ((*reinterpret_cast<unsigned short*>(Ptr(this, 0x18)) == 2) &&
-        (FLOAT_8032faf4 == GetTexScroll(0)->m_u0) &&
-        (FLOAT_8032faf4 == GetTexScroll(0)->m_v0) &&
-        ((FLOAT_8032faf4 != GetTexScroll(1)->m_u0) ||
-         (FLOAT_8032faf4 != GetTexScroll(1)->m_v0))) {
+    if ((textureCount == 2) &&
+        (FLOAT_8032faf4 == scroll[0].m_u0) &&
+        (FLOAT_8032faf4 == scroll[0].m_v0) &&
+        ((FLOAT_8032faf4 != scroll[1].m_u0) ||
+         (FLOAT_8032faf4 != scroll[1].m_v0))) {
         hasDualScroll = true;
     }
 
-    unsigned char* textureSlot = Ptr(this, 0x3C);
-    CTexScroll* scroll = GetTexScroll(0);
-    int textureCount = static_cast<int>(*reinterpret_cast<unsigned short*>(Ptr(this, 0x18)));
-    for (int i = 0; i < textureCount; i++) {
+    for (; i < textureCount; i++) {
         CTexture* texture = *reinterpret_cast<CTexture**>(textureSlot);
         if ((texture != 0) && ((*Ptr(this, 0xA7) == 0) || (i < 1))) {
             TextureMan.SetTexture(texMapId, texture);

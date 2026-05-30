@@ -2118,7 +2118,16 @@ void CMenuPcs::CmakeSexDraw()
 
     DrawCmakePreviewChara(this);
 
-    DrawCmakePopupPanel(this, alpha, FLOAT_80333278, FLOAT_8033327c, FLOAT_80333280, FLOAT_80333284, 0.85f, 0.85f);
+    int panelAlpha = static_cast<int>(static_cast<double>(FLOAT_80333240) * alpha);
+    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
+    MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+
+    GXColor panelColor = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(panelAlpha)};
+    GXSetChanMatColor(GX_COLOR0A0, panelColor);
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((MenuS16(this, 0x86C) != 0) ? 0x61 : 0x3A));
+    MenuPcs.DrawRect(
+        0, FLOAT_80333278, FLOAT_8033327c, FLOAT_80333280, FLOAT_80333284,
+        FLOAT_80333254, FLOAT_80333254, 0.85f, 0.85f, 0.0f);
     DrawCmakeTitle(2, FLOAT_80333258, alpha);
 
     CFont* font = CmakeFields(this).m_fonts[CMAKE_FONT_LABEL];

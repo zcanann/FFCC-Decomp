@@ -655,7 +655,7 @@ void CGMonObj::onCancelStat(int state)
 	CGObject* object = reinterpret_cast<CGObject*>(this);
 	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
 
-	__ptmf_scall(this, mon + 0x708);
+	(this->*m_funcs->cancelStat)();
 
 	switch (*reinterpret_cast<int*>(mon + 0x520)) {
 	case 0x16:
@@ -2749,7 +2749,7 @@ void CGMonObj::moveFrame()
 		return;
 	}
 
-	__ptmf_scall(this, mon + 0x708);
+	(this->*m_funcs->moveFrame)();
 
 	if ((moveFlags & 1) != 0) {
 		unsigned char* target = reinterpret_cast<unsigned char*>(*reinterpret_cast<void**>(mon + 0x714));

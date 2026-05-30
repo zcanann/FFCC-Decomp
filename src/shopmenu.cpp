@@ -1132,8 +1132,8 @@ void CShopMenu::DrawItemInfo0()
     SetShadow__5CFontFi(font, 1);
     SetScaleX__5CFontFf(FLOAT_80332d2c, font);
     SetScaleY__5CFontFf(FLOAT_80332d28, font);
-    _GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
-    font->SetColor(white);
+    CColor white(0xFF, 0xFF, 0xFF, 0xFF);
+    font->SetColor(white.color);
     DrawInit__5CFontFv(font);
 
     if (itemNo > 0) {
@@ -1196,7 +1196,7 @@ void CShopMenu::DrawItemInfo0()
             totalGil = -1;
         }
 
-        SetupShopMenuAmountFont(font, &white);
+        SetupShopMenuAmountFont(font, &white.color);
         DrawShopMenuAmount(font, totalGil, amountRightX, FLOAT_80332d68, 0x1B);
 
         SetupShopMenuUnitFont(font);
@@ -1219,7 +1219,7 @@ void CShopMenu::DrawItemInfo0()
         int amount = ShopMenuInt(this, 0x44);
         SetShadow__5CFontFi(font, 1);
         SetScale__5CFontFf(FLOAT_80332d28, font);
-        font->SetColor(white);
+        font->SetColor(white.color);
         DrawInit__5CFontFv(font);
         reinterpret_cast<unsigned char*>(font)[0x24] = (reinterpret_cast<unsigned char*>(font)[0x24] & 0xEF) | 0x10;
         SetMargin__5CFontFf(FLOAT_80332d34, font);
@@ -1229,7 +1229,7 @@ void CShopMenu::DrawItemInfo0()
         DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(MenuPcsVoid(), font, countBuffer, countRightX, FLOAT_80332d6c, 4, 0x12);
         DrawInit__8CMenuPcsFv(MenuPcsVoid());
 
-        SetupShopMenuInfoFont(font, &white);
+        SetupShopMenuInfoFont(font, &white.color);
         const char* quantityText = ShopMenuMes(languageId, SHOP_MENU_TEXT_QUANTITY);
         DrawInit__5CFontFv(font);
         DrawShopMenuRightAlignedText(font, quantityText, countRightX - FLOAT_80332d5c, FLOAT_80332d6c, 0x18);

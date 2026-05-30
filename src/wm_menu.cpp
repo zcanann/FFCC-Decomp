@@ -3268,6 +3268,28 @@ void CMenuPcs::DrawMainMenu()
 	DrawWMFrame();
 	DrawChara();
 	DrawFukidashi();
+
+	short* const worldState = reinterpret_cast<short*>(reinterpret_cast<unsigned int*>(bytes + 0x82C)[0]);
+	if (worldState[8] == 2) {
+		if (worldState[0x18 / sizeof(short)] != 0) {
+			worldState[0x18 / sizeof(short)]--;
+			if (worldState[0x18 / sizeof(short)] < 1) {
+				worldState[8]++;
+				worldState[0x22 / sizeof(short)] = 0;
+				Sound.PlaySe(0x31, 0x40, 0x7F, 0);
+			}
+		}
+	} else {
+		worldState[0x22 / sizeof(short)]++;
+		if (worldState[0x22 / sizeof(short)] > 9) {
+			worldState[8]++;
+			worldState[0x22 / sizeof(short)] = 0;
+			if (worldState[8] > 4) {
+				worldState[0x20 / sizeof(short)] = worldState[0x1E / sizeof(short)];
+				worldState[0x1E / sizeof(short)] = 0;
+			}
+		}
+	}
 }
 
 /*

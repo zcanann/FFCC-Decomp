@@ -545,6 +545,29 @@ void CChara::TimeMogFur()
 	CalcMogScore();
 }
 
+static int FurColorMatch(CColor src, CColor ref)
+{
+	int dr = static_cast<int>(src.color.r) - static_cast<int>(ref.color.r);
+	if (dr < 0) {
+		dr = -dr;
+	}
+	dr += 7 - static_cast<int>(src.color.a);
+
+	int dg = static_cast<int>(src.color.g) - static_cast<int>(ref.color.g);
+	if (dg < 0) {
+		dg = -dg;
+	}
+	dg += 7 - static_cast<int>(src.color.a);
+
+	int db = static_cast<int>(src.color.b) - static_cast<int>(ref.color.b);
+	if (db < 0) {
+		db = -db;
+	}
+	db += 7 - static_cast<int>(src.color.a);
+
+	return (dr < 6 && dg < 6 && db < 6) ? 1 : 0;
+}
+
 /*
  * --INFO--
  * PAL Address: 0x800df7f8
@@ -587,66 +610,9 @@ void CChara::CalcMogScore()
 			*reinterpret_cast<int*>(self + 0x2054) += a;
 
 			int colorHit[3];
-			{
-				CColor refColor(0xF, 4, 4, 2);
-				CColor tmp(srcColor);
-				const int d0 =
-				    ((static_cast<int>(tmp.color.r) - static_cast<int>(refColor.color.r)) < 0
-				         ? -(static_cast<int>(tmp.color.r) - static_cast<int>(refColor.color.r))
-				         : (static_cast<int>(tmp.color.r) - static_cast<int>(refColor.color.r))) +
-				    (7 - static_cast<int>(tmp.color.a));
-				const int d1 =
-				    ((static_cast<int>(tmp.color.g) - static_cast<int>(refColor.color.g)) < 0
-				         ? -(static_cast<int>(tmp.color.g) - static_cast<int>(refColor.color.g))
-				         : (static_cast<int>(tmp.color.g) - static_cast<int>(refColor.color.g))) +
-				    (7 - static_cast<int>(tmp.color.a));
-				const int d2 =
-				    ((static_cast<int>(tmp.color.b) - static_cast<int>(refColor.color.b)) < 0
-				         ? -(static_cast<int>(tmp.color.b) - static_cast<int>(refColor.color.b))
-				         : (static_cast<int>(tmp.color.b) - static_cast<int>(refColor.color.b))) +
-				    (7 - static_cast<int>(tmp.color.a));
-				colorHit[0] = (d0 < 6 && d1 < 6 && d2 < 6) ? 1 : 0;
-			}
-			{
-				CColor refColor(4, 0xF, 4, 2);
-				CColor tmp(srcColor);
-				const int d0 =
-				    ((static_cast<int>(tmp.color.r) - static_cast<int>(refColor.color.r)) < 0
-				         ? -(static_cast<int>(tmp.color.r) - static_cast<int>(refColor.color.r))
-				         : (static_cast<int>(tmp.color.r) - static_cast<int>(refColor.color.r))) +
-				    (7 - static_cast<int>(tmp.color.a));
-				const int d1 =
-				    ((static_cast<int>(tmp.color.g) - static_cast<int>(refColor.color.g)) < 0
-				         ? -(static_cast<int>(tmp.color.g) - static_cast<int>(refColor.color.g))
-				         : (static_cast<int>(tmp.color.g) - static_cast<int>(refColor.color.g))) +
-				    (7 - static_cast<int>(tmp.color.a));
-				const int d2 =
-				    ((static_cast<int>(tmp.color.b) - static_cast<int>(refColor.color.b)) < 0
-				         ? -(static_cast<int>(tmp.color.b) - static_cast<int>(refColor.color.b))
-				         : (static_cast<int>(tmp.color.b) - static_cast<int>(refColor.color.b))) +
-				    (7 - static_cast<int>(tmp.color.a));
-				colorHit[1] = (d0 < 6 && d1 < 6 && d2 < 6) ? 1 : 0;
-			}
-			{
-				CColor refColor(4, 8, 0xF, 2);
-				CColor tmp(srcColor);
-				const int d0 =
-				    ((static_cast<int>(tmp.color.r) - static_cast<int>(refColor.color.r)) < 0
-				         ? -(static_cast<int>(tmp.color.r) - static_cast<int>(refColor.color.r))
-				         : (static_cast<int>(tmp.color.r) - static_cast<int>(refColor.color.r))) +
-				    (7 - static_cast<int>(tmp.color.a));
-				const int d1 =
-				    ((static_cast<int>(tmp.color.g) - static_cast<int>(refColor.color.g)) < 0
-				         ? -(static_cast<int>(tmp.color.g) - static_cast<int>(refColor.color.g))
-				         : (static_cast<int>(tmp.color.g) - static_cast<int>(refColor.color.g))) +
-				    (7 - static_cast<int>(tmp.color.a));
-				const int d2 =
-				    ((static_cast<int>(tmp.color.b) - static_cast<int>(refColor.color.b)) < 0
-				         ? -(static_cast<int>(tmp.color.b) - static_cast<int>(refColor.color.b))
-				         : (static_cast<int>(tmp.color.b) - static_cast<int>(refColor.color.b))) +
-				    (7 - static_cast<int>(tmp.color.a));
-				colorHit[2] = (d0 < 6 && d1 < 6 && d2 < 6) ? 1 : 0;
-			}
+			colorHit[0] = FurColorMatch(srcColor, CColor(0xF, 4, 4, 2));
+			colorHit[1] = FurColorMatch(srcColor, CColor(4, 0xF, 4, 2));
+			colorHit[2] = FurColorMatch(srcColor, CColor(4, 8, 0xF, 2));
 
 			const int ring = dist % 12;
 			int angle = static_cast<int>(57.29577951308232 * atan2(static_cast<double>(dx), static_cast<double>(dy))) + 0x168;

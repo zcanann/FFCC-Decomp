@@ -2695,10 +2695,9 @@ void CMenuPcs::CmakeJobDraw()
             cursorY, alpha);
     }
 
-    short mcState = *reinterpret_cast<short*>(MenuS32(this, 0x848) + 10);
-    if (mcState != 3) {
+    if (*reinterpret_cast<short*>(MenuS32(this, 0x848) + 10) != 3) {
         DrawMcWin(-1, 0);
-        if (mcState == 1) {
+        if (*reinterpret_cast<short*>(MenuS32(this, 0x848) + 10) == 1) {
             DrawMcWinMess(0x16, 0);
         }
     }

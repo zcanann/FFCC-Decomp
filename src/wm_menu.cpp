@@ -9101,17 +9101,6 @@ void CMenuPcs::DrawMainMenuSub()
 			           FLOAT_80331554 * static_cast<float>(handleIndex) + FLOAT_80331528, FLOAT_803315C8, FLOAT_803315C8);
 		}
 	}
-
-	PSMTXCopy(savedCamera, CameraPcs.m_cameraMatrix);
-	Graphic.SetViewport();
-	GXSetScissor(0, 0, 0x280, 0x1C0);
-	DrawInit();
-
-	DrawPageMark();
-	DrawWMFrame0(3, 1.0f);
-	if (gWmMenuWorkA > 0) {
-		DrawCursor(gWmMenuCursorX[0], gWmMenuCursorX[1], 1.0f);
-	}
 }
 
 /*

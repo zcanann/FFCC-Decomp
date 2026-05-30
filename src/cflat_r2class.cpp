@@ -835,6 +835,47 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
+		case -0x25: {
+			Vec position;
+			float* params = reinterpret_cast<float*>(localBase);
+			position.x = params[0];
+			position.y = params[1];
+			position.z = params[2];
+			engineObject->SetPosBG(&position, 0);
+			PushValue(this, object, 0);
+			outResult = 0;
+			break;
+		}
+		case -0x26: {
+			Vec moveTarget;
+			float* params = reinterpret_cast<float*>(localBase);
+			moveTarget.x = params[0];
+			moveTarget.y = params[1];
+			moveTarget.z = params[2];
+			engineObject->Move(&moveTarget, params[3], static_cast<int>(localBase[4]), 1, 1, 0, 1);
+			PushValue(this, object, 0);
+			outResult = 0;
+			break;
+		}
+		case -0x27: {
+			CGObject* target = FindRuntimeObject(this, localBase[0]);
+			if (target != 0) {
+				Vec attachPos;
+				float* params = reinterpret_cast<float*>(localBase);
+				attachPos.x = params[2];
+				attachPos.y = params[3];
+				attachPos.z = params[4];
+				engineObject->Attach(target, RuntimeString(this, localBase[1]), &attachPos);
+			}
+			PushValue(this, object, 0);
+			outResult = 0;
+			break;
+		}
+		case -0x28:
+			engineObject->Detach();
+			PushValue(this, object, 0);
+			outResult = 0;
+			break;
 		case -0x29:
 			engineObject->DispCharaParts(static_cast<int>(localBase[0]));
 			PushValue(this, object, 0);

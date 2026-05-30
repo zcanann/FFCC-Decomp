@@ -234,48 +234,26 @@ static int ResolveShopMenuItemCount(CShopMenu* shopMenu)
 
 static int ResolveShopMenuItemNo(CShopMenu* shopMenu, int index)
 {
-    int caravan = ShopMenuCaravan(shopMenu);
-    if (index < 0) {
-        return -1;
+    int listType = ShopMenuInt(shopMenu, 0x14);
+    if (listType == 0) {
+        return *reinterpret_cast<short*>(ShopMenuCaravan(shopMenu) + (index * 2 + 0xBE6));
     }
-
-    switch (ShopMenuInt(shopMenu, 0x14)) {
-    case 0:
-        return *reinterpret_cast<short*>(caravan + (index * 2 + 0xBE6));
-    case 1:
-        return *reinterpret_cast<short*>(caravan + (index * 2 + 0xB6));
-    case 2: {
+    if (listType == 1) {
+        return *reinterpret_cast<short*>(ShopMenuCaravan(shopMenu) + (index * 2 + 0xB6));
+    }
+    if (listType == 2) {
         int mapped = ShopMenuInt(shopMenu, 0x50 + index * 4);
         if (mapped == -1) {
             return -1;
         }
-        return *reinterpret_cast<short*>(caravan + (mapped * 2 + 0xB6));
+        return *reinterpret_cast<short*>(ShopMenuCaravan(shopMenu) + (mapped * 2 + 0xB6));
     }
-    default:
-        return -1;
-    }
+    return -1;
 }
 
 static int ResolveShopMenuSelectedItemId(CShopMenu* shopMenu)
 {
-    int selected = ShopMenuInt(shopMenu, 0x28);
-    int caravan = ShopMenuCaravan(shopMenu);
-
-    switch (ShopMenuInt(shopMenu, 0x14)) {
-    case 0:
-        return *reinterpret_cast<short*>(caravan + (selected * 2 + 0xBE6));
-    case 1:
-        return *reinterpret_cast<short*>(caravan + (selected * 2 + 0xB6));
-    case 2: {
-        int mapped = ShopMenuInt(shopMenu, 0x50 + selected * 4);
-        if (mapped == -1) {
-            return -1;
-        }
-        return *reinterpret_cast<short*>(caravan + (mapped * 2 + 0xB6));
-    }
-    default:
-        return -1;
-    }
+    return ResolveShopMenuItemNo(shopMenu, ShopMenuInt(shopMenu, 0x28));
 }
 
 static int CalcShopMenuMakeGil(CShopMenu* shopMenu, int itemId)

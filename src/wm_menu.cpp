@@ -43,6 +43,7 @@ extern int DAT_8032e8c0;
 extern float* DAT_8032e8cc;
 extern int DAT_8032e8c8;
 extern int DAT_8032e8ac;
+extern "C" unsigned char DAT_8032E8A8[];
 extern int DAT_8032ef08;
 extern int DAT_80238028;
 extern char cRam8032ee21;
@@ -9689,13 +9690,8 @@ int McCtrl::LoadMcList()
  * JP Address: TODO
  * JP Size: TODO
  */
-void McCtrl::SetListDat(int slot, int)
+void McCtrl::SetListDat(int slot, int clearPlayTime)
 {
-	if (slot < 0 || slot >= kMcListCount) {
-		return;
-	}
-	m_saveIndex = slot;
-
 	unsigned char entry[kMcListEntrySize];
 	memset(entry, 0, sizeof(entry));
 
@@ -9703,12 +9699,12 @@ void McCtrl::SetListDat(int slot, int)
 	unsigned char hasData = 0;
 	unsigned char hasError = 0;
 
-	if (save == 0 || save[0x10C0] == 0) {
+	if (save[0x10C0] == 0) {
 		hasData = 0;
 		hasError = 0;
 	} else {
-		if (MemoryCardMan.ChkCrc(reinterpret_cast<Mc::SaveDat*>(save)) != 0) {
-			unsigned int playTime = *reinterpret_cast<unsigned int*>(save + 0x20);
+		if (MemoryCardMan.ChkCrc(0) == 1 && memcmp(save + 0x0C, DAT_8032E8A8, 4) == 0) {
+			unsigned int playTime = clearPlayTime == 0 ? *reinterpret_cast<unsigned int*>(save + 0x20) : 0;
 			memcpy(entry + 0x00, save + 0x8AD0, 8);
 			memcpy(entry + 0x0C, save + 0x24, 0x0C);
 
@@ -9717,19 +9713,19 @@ void McCtrl::SetListDat(int slot, int)
 			int party2 = *reinterpret_cast<int*>(save + 0x38);
 			int party3 = *reinterpret_cast<int*>(save + 0x3C);
 
-			if (party0 < 0 || party0 >= 8 || *reinterpret_cast<int*>(save + party0 * 0x9C0 + 0x1A84) == 0 || save[party0 * 0x9C0 + 0x1D90] != 0) {
+			if (*reinterpret_cast<int*>(save + party0 * 0x9C0 + 0x1A84) == 0 || save[party0 * 0x9C0 + 0x1D90] != 0) {
 				*reinterpret_cast<int*>(save + 0x30) = -1;
 				party0 = -1;
 			}
-			if (party1 < 0 || party1 >= 8 || *reinterpret_cast<int*>(save + party1 * 0x9C0 + 0x1A84) == 0 || save[party1 * 0x9C0 + 0x1D90] != 0) {
+			if (*reinterpret_cast<int*>(save + party1 * 0x9C0 + 0x1A84) == 0 || save[party1 * 0x9C0 + 0x1D90] != 0) {
 				*reinterpret_cast<int*>(save + 0x34) = -1;
 				party1 = -1;
 			}
-			if (party2 < 0 || party2 >= 8 || *reinterpret_cast<int*>(save + party2 * 0x9C0 + 0x1A84) == 0 || save[party2 * 0x9C0 + 0x1D90] != 0) {
+			if (*reinterpret_cast<int*>(save + party2 * 0x9C0 + 0x1A84) == 0 || save[party2 * 0x9C0 + 0x1D90] != 0) {
 				*reinterpret_cast<int*>(save + 0x38) = -1;
 				party2 = -1;
 			}
-			if (party3 < 0 || party3 >= 8 || *reinterpret_cast<int*>(save + party3 * 0x9C0 + 0x1A84) == 0 || save[party3 * 0x9C0 + 0x1D90] != 0) {
+			if (*reinterpret_cast<int*>(save + party3 * 0x9C0 + 0x1A84) == 0 || save[party3 * 0x9C0 + 0x1D90] != 0) {
 				*reinterpret_cast<int*>(save + 0x3C) = -1;
 				party3 = -1;
 			}
@@ -9742,7 +9738,7 @@ void McCtrl::SetListDat(int slot, int)
 			*reinterpret_cast<unsigned int*>(entry + 0x20) = (party2 < 0) ? 0xFFFFFFFFu : *reinterpret_cast<unsigned short*>(save + party2 * 0x9C0 + 0x14D0);
 			*reinterpret_cast<unsigned int*>(entry + 0x24) = (party3 < 0) ? 0xFFFFFFFFu : *reinterpret_cast<unsigned short*>(save + party3 * 0x9C0 + 0x14D0);
 			*reinterpret_cast<unsigned int*>(entry + 0x28) = *reinterpret_cast<unsigned int*>(save + 0xB8);
-			memcpy(entry + 0x2C, save + 0x10C0, 0x15);
+			memcpy(entry + 0x2C, save + 0x10C0, 0x10);
 			hasData = 1;
 		} else {
 			hasError = 1;
@@ -9752,7 +9748,10 @@ void McCtrl::SetListDat(int slot, int)
 	entry[0x41] = hasData;
 	entry[0x42] = hasError;
 	entry[0x43] = 0;
-	MenuPcs.SetMcList(slot, reinterpret_cast<McListInfo*>(entry));
+	unsigned char* const menuBytes = reinterpret_cast<unsigned char*>(&MenuPcs);
+	unsigned char* const dst = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(menuBytes + 0x854)[0]) + slot * kMcListEntrySize;
+	memcpy(dst, entry, kMcListEntrySize);
+	dst[0x43] = 0;
 }
 
 /*

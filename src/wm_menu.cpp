@@ -9508,8 +9508,14 @@ LAB_draw:
 					// Draw slot content area
 					SetAttrFmt((FMT)1);
 					float contentX = yPos + FLOAT_80331468 + FLOAT_803314fc;
+					GXColor contentColors[4] = {
+					    {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(slotAlpha)},
+					    {0xFF, 0xFF, 0xFF, 0},
+					    {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(slotAlpha)},
+					    {0xFF, 0xFF, 0xFF, 0},
+					};
 					DrawRect(0xFFFFFFFF, contentX, slotY, FLOAT_80331500, FLOAT_803314f8,
-					         FLOAT_803313dc, FLOAT_803313dc,
+					         FLOAT_803313dc, FLOAT_803313dc, contentColors,
 					         FLOAT_803313e8, FLOAT_803313e8, 0);
 				}
 			}

@@ -671,16 +671,16 @@ void CGCharaObj::onFramePreCalc()
 
 	for (int i = 0; i < 4; i++) {
 		CGPartyObj* partyObj = Game.m_partyObjArr[i];
-		if (partyObj == 0) {
-			m_partyDistance[i] = 0.0f;
-			m_partyDelta[i].x = 0.0f;
-			m_partyDelta[i].y = 0.0f;
-			m_partyDelta[i].z = 0.0f;
-			m_partyAngle[i] = 0.0f;
-		} else {
+		if (partyObj != 0) {
 			PSVECSubtract(&partyObj->m_worldPosition, &m_worldPosition, &m_partyDelta[i]);
 			m_partyDistance[i] = PSVECMag(&m_partyDelta[i]);
 			m_partyAngle[i] = reinterpret_cast<CVector*>(&m_partyDelta[i])->GetRotateY();
+		} else {
+			m_partyDistance[i] = FLOAT_80331988;
+			m_partyDelta[i].x = FLOAT_80331988;
+			m_partyDelta[i].y = FLOAT_80331988;
+			m_partyDelta[i].z = FLOAT_80331988;
+			m_partyAngle[i] = FLOAT_80331988;
 		}
 
 		m_partyRank[i] = 0;

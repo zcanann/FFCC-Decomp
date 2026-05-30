@@ -207,6 +207,7 @@ extern double DOUBLE_80331460;
 extern double DOUBLE_803314E8;
 extern double DOUBLE_80331498;
 extern double DOUBLE_80331510;
+extern double DOUBLE_80331580;
 extern double DOUBLE_803315C0;
 extern double DOUBLE_803315D8;
 extern double DOUBLE_803315F0;
@@ -9428,21 +9429,9 @@ LAB_draw:
 
 			if (alpha2 <= FLOAT_803314f0) continue;
 
-			// Check if slot has data
 			unsigned char* slotData = reinterpret_cast<unsigned char*>(mcData) + slot * 0x48;
-			if (*reinterpret_cast<char*>(slotData + 0x42) == 0) {
-				// Empty slot - "No Data"
-				fontF8->SetMargin(FLOAT_803313e8);
-				fontF8->SetShadow(0);
-				fontF8->SetScale(FLOAT_803313e8);
-				fontF8->DrawInit();
-				unsigned int noDataColor = 0xFFFFFFFF;
-				fontF8->SetColor(*(_GXColor*)&noDataColor);
-				fontF8->SetPosX(FLOAT_803314d8);
-				fontF8->SetPosY((float)(slot) * FLOAT_80331498 + FLOAT_80331490);
-				fontF8->Draw("No Data");
-			} else {
-				// Slot has save data - draw character names, levels, play time
+			const float slotY = static_cast<float>(slot) * FLOAT_80331498 + FLOAT_80331490;
+			if (*reinterpret_cast<char*>(slotData + 0x42) == 0 && *reinterpret_cast<int*>(slotData + 8) > 0) {
 				fontF8->SetMargin(FLOAT_803313e8);
 				fontF8->SetShadow(0);
 				fontF8->SetScale(FLOAT_803313e8);
@@ -9450,7 +9439,7 @@ LAB_draw:
 				unsigned int nameColor = 0xFFFFFFFF;
 				fontF8->SetColor(*(_GXColor*)&nameColor);
 				fontF8->SetPosX(FLOAT_803314d8);
-				fontF8->SetPosY((float)(slot) * FLOAT_80331498 + FLOAT_80331490);
+				fontF8->SetPosY(slotY);
 
 				// Draw character name
 				char nameStr[64];
@@ -9468,6 +9457,21 @@ LAB_draw:
 				timeStr[0] = 0;
 				fontF8->SetPosX(FLOAT_803314d8 + FLOAT_80331500 + FLOAT_803314fc);
 				fontF8->Draw(timeStr);
+			} else {
+				fontF8->SetMargin(FLOAT_803313e8);
+				fontF8->SetShadow(1);
+				fontF8->SetScale(FLOAT_803313e8);
+				fontF8->DrawInit();
+				unsigned int noDataColor = 0xFFFFFFFF;
+				fontF8->SetColor(*(_GXColor*)&noDataColor);
+				fontF8->SetTlut(0x19);
+				const unsigned int msgId = static_cast<unsigned int>(
+					__cntlzw(static_cast<unsigned int>(static_cast<int>(*reinterpret_cast<char*>(slotData + 0x42))))) >> 5;
+				char* text = const_cast<char*>(GetMcStr(msgId));
+				const int width = static_cast<int>(fontF8->GetWidth(text));
+				fontF8->SetPosX(static_cast<float>((0x238 - width) * DOUBLE_803313f8 + static_cast<double>(FLOAT_803314d8)));
+				fontF8->SetPosY(static_cast<float>(static_cast<double>(slotY) + DOUBLE_80331580));
+				fontF8->Draw(text);
 			}
 		}
 	}

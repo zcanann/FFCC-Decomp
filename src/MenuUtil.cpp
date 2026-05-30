@@ -537,43 +537,45 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 			int menuState = *reinterpret_cast<int*>(self + 0x82C);
 			u16 effectFlags = *reinterpret_cast<u16*>(itemBase + 4);
 
-			if ((effectFlags & 0x100) != 0) {
-				currentItem = 0;
-			} else if ((effectFlags & 0x400) != 0) {
-				currentItem = 1;
-			} else if ((effectFlags & 0x800) != 0) {
-				currentItem = 2;
-			} else if ((effectFlags & 0x200) != 0) {
-				currentItem = 2;
-			} else if ((effectFlags & 0x1000) != 0) {
-				currentItem = 3;
-			} else if ((effectFlags & 0x2000) != 0) {
-				currentItem = 3;
-			}
-
-			currentItem = static_cast<int>(*reinterpret_cast<short*>(
-			    Game.m_scriptFoodBase[0] +
-			    static_cast<int>(*reinterpret_cast<short*>(Game.m_scriptFoodBase[0] + currentItem * 2 + 0xAC)) * 2 +
-			    0xB6));
-
-			if (ChkEquipActive(static_cast<int>(*reinterpret_cast<short*>(menuState + 0x28)) +
-			                   static_cast<int>(*reinterpret_cast<short*>(menuState + 0x34))) != 0) {
-				u16 currentValue = 0;
-				if (currentItem != -1) {
-					currentValue = *reinterpret_cast<u16*>(Game.unkCFlatData0[2] + currentItem * 0x48 + 6);
+			if ((effectFlags & 0x1000) == 0) {
+				if ((effectFlags & 0x100) != 0) {
+					currentItem = 0;
+				} else if ((effectFlags & 0x400) != 0) {
+					currentItem = 1;
+				} else if ((effectFlags & 0x800) != 0) {
+					currentItem = 2;
+				} else if ((effectFlags & 0x200) != 0) {
+					currentItem = 2;
+				} else if ((effectFlags & 0x1000) != 0) {
+					currentItem = 3;
+				} else if ((effectFlags & 0x2000) != 0) {
+					currentItem = 3;
 				}
 
-				int delta = static_cast<int>(*reinterpret_cast<u16*>(itemBase + 6)) - static_cast<int>(currentValue);
-				int deltaX = static_cast<int>(static_cast<float>(valueX) + font->GetWidth(scratch) + FLOAT_803335a0);
-				font->SetPosX(static_cast<float>(deltaX));
-				if (delta < 0) {
-					font->SetTlut(3);
-				} else {
-					font->SetTlut(9);
-				}
-				sprintf(scratch, sMenuUtilSignedDeltaFormat, delta);
-				if (delta != 0) {
-					font->Draw(scratch);
+				currentItem = static_cast<int>(*reinterpret_cast<short*>(
+				    Game.m_scriptFoodBase[0] +
+				    static_cast<int>(*reinterpret_cast<short*>(Game.m_scriptFoodBase[0] + currentItem * 2 + 0xAC)) * 2 +
+				    0xB6));
+
+				if (ChkEquipActive(static_cast<int>(*reinterpret_cast<short*>(menuState + 0x28)) +
+				                   static_cast<int>(*reinterpret_cast<short*>(menuState + 0x34))) != 0) {
+					u16 currentValue = 0;
+					if (currentItem != -1) {
+						currentValue = *reinterpret_cast<u16*>(Game.unkCFlatData0[2] + currentItem * 0x48 + 6);
+					}
+
+					int delta = static_cast<int>(*reinterpret_cast<u16*>(itemBase + 6)) - static_cast<int>(currentValue);
+					int deltaX = static_cast<int>(static_cast<float>(valueX) + font->GetWidth(scratch) + FLOAT_803335a0);
+					font->SetPosX(static_cast<float>(deltaX));
+					if (delta < 0) {
+						font->SetTlut(3);
+					} else {
+						font->SetTlut(9);
+					}
+					sprintf(scratch, sMenuUtilSignedDeltaFormat, delta);
+					if (delta != 0) {
+						font->Draw(scratch);
+					}
 				}
 			}
 		}

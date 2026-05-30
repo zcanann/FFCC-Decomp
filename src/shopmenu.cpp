@@ -2035,30 +2035,8 @@ void CShopMenu::DrawMake()
         DrawInit__8CMenuPcsFv(MenuPcsVoid());
 
         int ownedCount = 0;
-        for (int slotGroup = 0; slotGroup < 8; slotGroup++) {
-            int slotBase = caravan + slotGroup * 0x10;
-            if (*reinterpret_cast<short*>(slotBase + 0xB6) == materialItem) {
-                ++ownedCount;
-            }
-            if (*reinterpret_cast<short*>(slotBase + 0xB8) == materialItem) {
-                ++ownedCount;
-            }
-            if (*reinterpret_cast<short*>(slotBase + 0xBA) == materialItem) {
-                ++ownedCount;
-            }
-            if (*reinterpret_cast<short*>(slotBase + 0xBC) == materialItem) {
-                ++ownedCount;
-            }
-            if (*reinterpret_cast<short*>(slotBase + 0xBE) == materialItem) {
-                ++ownedCount;
-            }
-            if (*reinterpret_cast<short*>(slotBase + 0xC0) == materialItem) {
-                ++ownedCount;
-            }
-            if (*reinterpret_cast<short*>(slotBase + 0xC2) == materialItem) {
-                ++ownedCount;
-            }
-            if (*reinterpret_cast<short*>(slotBase + 0xC4) == materialItem) {
+        for (int slot = 0; slot < 0x40; slot++) {
+            if (*reinterpret_cast<short*>(caravan + slot * 2 + 0xB6) == materialItem) {
                 ++ownedCount;
             }
         }

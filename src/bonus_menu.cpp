@@ -2495,7 +2495,7 @@ void CMenuPcs::DrawResultOpenAnim()
 		CFont* font = GetBonusMenuMembers(this).m_font;
 		font->SetMargin(1.0f);
 		font->SetShadow(1);
-		font->SetScale(0.9f);
+		font->SetScale(0.7300000190734863f);
 		font->SetTlut(7);
 		font->DrawInit();
 
@@ -2504,8 +2504,8 @@ void CMenuPcs::DrawResultOpenAnim()
 		for (int i = 0; i < (int)header->count; i++) {
 			BonusAnimSprite* sprite = &sprites[i];
 			if (sprite->kind == -1) {
-				_GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(sprite->alpha * 255.0f)};
-				font->SetColor(color);
+				CColor color(0xFF, 0xFF, 0xFF, (unsigned char)(sprite->alpha * 255.0f));
+				font->SetColor(color.color);
 
 				int partyIndex = textIndex % activePartyCount;
 				CCaravanWork* caravanWork =

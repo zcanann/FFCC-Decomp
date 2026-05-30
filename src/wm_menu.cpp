@@ -824,7 +824,6 @@ void CMenuPcs::Sprt::operator= (const CMenuPcs::Sprt& src)
 void CMenuPcs::InitCharaInfo()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* const worldObj = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x814)[0]);
 
 	int row = 0;
 	int baseSlot = 0x20;
@@ -838,26 +837,26 @@ void CMenuPcs::InitCharaInfo()
 				y = static_cast<short>(baseY + 8);
 			}
 
-			*reinterpret_cast<short*>(worldObj + slotOffset + 8) = static_cast<short>(baseX - 0xA0);
-			*reinterpret_cast<short*>(worldObj + slotOffset + 0xA) = static_cast<short>(y - 0x70);
-			*reinterpret_cast<unsigned short*>(worldObj + slotOffset + 0xC) = 0x140;
-			*reinterpret_cast<unsigned short*>(worldObj + slotOffset + 0xE) = 0xE0;
-			*reinterpret_cast<float*>(worldObj + slotOffset + 0x10) = FLOAT_803313dc;
-			*reinterpret_cast<float*>(worldObj + slotOffset + 0x14) = FLOAT_803313dc;
-			*reinterpret_cast<float*>(worldObj + slotOffset + 0x18) = FLOAT_803314a4;
+			*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x814)[0]) + slotOffset + 8) = static_cast<short>(baseX - 0xA0);
+			*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x814)[0]) + slotOffset + 0xA) = static_cast<short>(y - 0x70);
+			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x814)[0]) + slotOffset + 0xC) = 0x140;
+			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x814)[0]) + slotOffset + 0xE) = 0xE0;
+			*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x814)[0]) + slotOffset + 0x10) = FLOAT_803313dc;
+			*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x814)[0]) + slotOffset + 0x14) = FLOAT_803313dc;
+			*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x814)[0]) + slotOffset + 0x18) = FLOAT_803314a4;
 
 			short y2 = baseY;
 			if (row != 0) {
 				y2 = static_cast<short>(baseY + 8);
 			}
 
-			*reinterpret_cast<short*>(worldObj + slotOffset + 0x58) = static_cast<short>(baseX - 0x10);
-			*reinterpret_cast<short*>(worldObj + slotOffset + 0x5A) = static_cast<short>(y2 - 0x70);
-			*reinterpret_cast<unsigned short*>(worldObj + slotOffset + 0x5C) = 0x140;
-			*reinterpret_cast<unsigned short*>(worldObj + slotOffset + 0x5E) = 0xE0;
-			*reinterpret_cast<float*>(worldObj + slotOffset + 0x60) = FLOAT_803313dc;
-			*reinterpret_cast<float*>(worldObj + slotOffset + 0x64) = FLOAT_803313dc;
-			*reinterpret_cast<float*>(worldObj + slotOffset + 0x68) = FLOAT_803314a4;
+			*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x814)[0]) + slotOffset + 0x58) = static_cast<short>(baseX - 0x10);
+			*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x814)[0]) + slotOffset + 0x5A) = static_cast<short>(y2 - 0x70);
+			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x814)[0]) + slotOffset + 0x5C) = 0x140;
+			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x814)[0]) + slotOffset + 0x5E) = 0xE0;
+			*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x814)[0]) + slotOffset + 0x60) = FLOAT_803313dc;
+			*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x814)[0]) + slotOffset + 0x64) = FLOAT_803313dc;
+			*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x814)[0]) + slotOffset + 0x68) = FLOAT_803314a4;
 
 			slotOffset += 0xA0;
 			baseX = static_cast<short>(baseX + 0x120);

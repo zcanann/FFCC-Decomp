@@ -7822,11 +7822,15 @@ void CMenuPcs::CalcCharaSelect()
 									entry.m_confirmed = 1;
 									Sound.PlaySe(0x33, 0x40, 0x7F, 0);
 									QueueWmCharaAnimState(this, currentSlot, 3);
-								} else if (Game.m_gameWork.m_menuStageMode == 0 && connectedCount > locallyConfirmedCount + 1) {
-									entry.m_confirmed = 1;
-									locallyConfirmedCount++;
-									Sound.PlaySe(0x33, 0x40, 0x7F, 0);
-									QueueWmCharaAnimState(this, currentSlot, 3);
+								} else if (Game.m_gameWork.m_menuStageMode == 0) {
+									if (connectedCount == locallyConfirmedCount + 1) {
+										Sound.PlaySe(4, 0x40, 0x7F, 0);
+									} else {
+										entry.m_confirmed = 1;
+										locallyConfirmedCount++;
+										Sound.PlaySe(0x33, 0x40, 0x7F, 0);
+										QueueWmCharaAnimState(this, currentSlot, 3);
+									}
 								} else {
 									Sound.PlaySe(4, 0x40, 0x7F, 0);
 								}

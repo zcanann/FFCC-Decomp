@@ -7635,6 +7635,18 @@ void CMenuPcs::CalcCharaSelect()
 			}
 		}
 
+		for (int slot = 0; slot < 8; slot++) {
+			if (((confirmedSlotMask & (1u << static_cast<unsigned int>(slot))) == 0) &&
+			    ((pendingMask & (1u << static_cast<unsigned int>(slot))) == 0) &&
+			    Game.m_caravanWorkArr[slot].m_shopState == 0) {
+				CCharaPcs::CHandle* const handle = GetWmCharaHandles(this)[slot];
+				if (handle->IsModelLoaded(1) && handle->m_charaKind != 3) {
+					modelData[slot * 0x34 + 0x0C] = 0;
+					handle->LoadModelASync(3, 0x43, 0);
+				}
+			}
+		}
+
 		int connectedCount = 0;
 		int locallyConfirmedCount = 0;
 		for (int i = 0; i < 4; i++) {

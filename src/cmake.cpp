@@ -2121,32 +2121,7 @@ void CMenuPcs::CmakeSexDraw()
             FLOAT_80333254, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, 0.0f);
     }
 
-    int slot = static_cast<int>(MenuS16(this, 0x86A));
-    int modelBlock = MenuS32(this, 0x814);
-    if (*reinterpret_cast<int*>(modelBlock + (slot + 0x20) * 0x50) != 0) {
-        *reinterpret_cast<unsigned short*>(modelBlock + 0x6E8) = 0xFF24;
-        *reinterpret_cast<unsigned short*>(modelBlock + 0x6EA) = 4;
-        DrawInit();
-
-        CCharaPcs::CHandle* handle = GetCmakeCharaHandle(this, slot);
-        if (handle->m_charaKind == 3) {
-            MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x32));
-            MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-            GXColor previewColor = {0xFF, 0xFF, 0xFF, 0xFF};
-            GXSetChanMatColor(GX_COLOR0A0, previewColor);
-            MenuPcs.DrawRect(
-                0, FLOAT_80333244, FLOAT_80333248, FLOAT_8033324c, FLOAT_80333250,
-                FLOAT_80333254, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, 0.0f);
-        } else {
-            SetProjection(0x16);
-            SetLight(2);
-            *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C) = FLOAT_80333258;
-            handle->Draw(5);
-            RestoreProjection();
-        }
-
-        DrawInit();
-    }
+    DrawCmakePreviewChara(this);
 
     DrawCmakePopupPanel(this, alpha, FLOAT_80333278, FLOAT_8033327c, FLOAT_80333280, FLOAT_80333284, 0.85f, 0.85f);
     DrawCmakeTitle(2, FLOAT_80333258, alpha);

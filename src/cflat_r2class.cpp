@@ -269,7 +269,7 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 					} else {
 						*byteRef |= mask;
 					}
-				} else if (systemVal < -499 && systemVal > -0x2F4) {
+				} else if (systemVal <= -0x1F4 && systemVal >= -0x2F3) {
 					StoreS16(stack, classData, (systemVal + 0x2F3) * 2 + 0x9A4, setMode);
 				} else if (systemVal != -0x19D) {
 					if (systemVal < -0x19D) {

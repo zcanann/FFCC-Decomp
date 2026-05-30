@@ -81,6 +81,8 @@ extern "C" double DOUBLE_80333270;
 extern "C" double DOUBLE_80333268;
 extern "C" double DOUBLE_80333288;
 extern "C" double DOUBLE_80333298;
+extern "C" double DOUBLE_80333378;
+extern "C" double DOUBLE_80333388;
 extern "C" double DOUBLE_803333a0;
 static const double DOUBLE_803333b8 = 20.0;
 static const double DOUBLE_803333c0 = 8.0;
@@ -1210,15 +1212,19 @@ void CMenuPcs::DrawCmakeDecision(int yesNoSel, float alpha)
 
     const char* txt = GetMenuStr(0x29);
     float w = static_cast<float>(font->GetWidth(txt));
-    float tx = (FLOAT_80333380 - w) * 0.5f + 0x178;
-    font->SetPosX(tx);
-    font->SetPosY(0x184);
+    unsigned int tx = static_cast<unsigned int>(
+        static_cast<double>(static_cast<float>(static_cast<double>(FLOAT_80333380) - static_cast<double>(w))) *
+            DOUBLE_80333298 +
+        DOUBLE_80333378);
+    int cursorY = static_cast<int>(DOUBLE_80333388);
+    font->SetPosX(static_cast<float>(static_cast<int>(tx)));
+    font->SetPosY(static_cast<float>(cursorY - 4));
     font->Draw(txt);
     DrawInit();
 
     if (yesNoSel != 0) {
         int frame = System.m_frameCounter & 7;
-        DrawCursor(static_cast<int>(tx) - 0x20 + frame, 0x188, alpha);
+        DrawCursor(static_cast<int>(tx) - 0x20 + frame, cursorY, alpha);
     }
 }
 

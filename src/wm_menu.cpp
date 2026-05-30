@@ -9574,7 +9574,8 @@ LAB_draw:
 	SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 	GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
 	GXSetChanMatColor(static_cast<GXChannelID>(4), white);
-	if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x16) > 1 &&
+	short separatorSub = *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x16);
+	if (separatorSub != 0 && separatorSub > 1 &&
 	    *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x10) == 2) {
 		for (int slot = 0; slot < kMcListCount; slot++) {
 			SetTexture(static_cast<CMenuPcs::TEX>(0x1E));

@@ -9284,7 +9284,48 @@ void CMenuPcs::BindMcObj()
 		const int slot = i + 0x11;
 
 		if (modelNo != 0) {
-			BindEffect(slot, modelNo + 0x16, i);
+			unsigned char createParam[0x88];
+			*reinterpret_cast<unsigned int*>(createParam + 0x48) = 0xFFFFFFFF;
+			*reinterpret_cast<unsigned int*>(createParam + 0x58) = 0xFFFFFFFF;
+			createParam[0x54] = 0;
+			createParam[0x53] = 1;
+			*reinterpret_cast<unsigned int*>(createParam + 0x50) = 0;
+			createParam[0x52] = 0;
+			*reinterpret_cast<unsigned int*>(createParam + 0x4C) = 0x1E;
+			*reinterpret_cast<unsigned int*>(createParam + 0x44) = 0;
+			*reinterpret_cast<unsigned short*>(createParam + 0x40) = 0;
+			createParam[0x3E] = 0;
+			createParam[0x3D] = 0;
+			*reinterpret_cast<unsigned int*>(createParam + 0x0) = 0;
+			*reinterpret_cast<unsigned int*>(createParam + 0x4) = 0;
+			*reinterpret_cast<unsigned int*>(createParam + 0x8) = 0;
+			*reinterpret_cast<unsigned int*>(createParam + 0xC) = 0;
+			*reinterpret_cast<unsigned int*>(createParam + 0x10) = 0;
+			*reinterpret_cast<void**>(createParam + 0x14) = 0;
+			*reinterpret_cast<void**>(createParam + 0x18) = 0;
+			*reinterpret_cast<unsigned int*>(createParam + 0x1C) = 0;
+			*reinterpret_cast<unsigned int*>(createParam + 0x20) = 0;
+			*reinterpret_cast<float*>(createParam + 0x24) = FLOAT_803313e8;
+			*reinterpret_cast<float*>(createParam + 0x28) = FLOAT_803313e8;
+			createParam[0x2C] = 0;
+
+			const unsigned int effectNo = static_cast<unsigned int>(modelNo + 0x16);
+			unsigned int* effect = reinterpret_cast<unsigned int*>(effectBase + slot * 0x524);
+			if (slot == 5 && static_cast<int>(effectNo) < 0x13) {
+				effect += 0x149;
+			} else if (slot > 0x10 && slot < 0x15 && static_cast<int>(effectNo) > 0x19) {
+				effect += 0x524;
+			}
+
+			effect[0] = effectNo;
+			CGBaseObj* const baseObj = reinterpret_cast<CGBaseObj*>(effect + 3);
+			effect[2] = static_cast<unsigned int>(slot);
+			baseObj->Create();
+			effect[0x41] = *reinterpret_cast<unsigned int*>(bytes + 0x4A8 + i * 4);
+			*reinterpret_cast<void**>(createParam + 0x74) = baseObj;
+			*reinterpret_cast<void**>(createParam + 0x70) = baseObj;
+			const int group = (((static_cast<int>(effectNo) ^ 100) >> 1) - ((static_cast<int>(effectNo) ^ 100) & static_cast<int>(effectNo))) >> 31;
+			effect[1] = PartMng.pppCreate(group, static_cast<int>(effectNo), reinterpret_cast<PPPCREATEPARAM*>(createParam), 1);
 		}
 
 		const unsigned int flags = charaState[i * 0x12 + 0xA];
@@ -9301,7 +9342,48 @@ void CMenuPcs::BindMcObj()
 			weaponModel = 4;
 		}
 
-		BindEffect(slot, weaponModel + 0x1A, i);
+		unsigned char createParam[0x88];
+		*reinterpret_cast<unsigned int*>(createParam + 0x48) = 0xFFFFFFFF;
+		*reinterpret_cast<unsigned int*>(createParam + 0x58) = 0xFFFFFFFF;
+		createParam[0x54] = 0;
+		createParam[0x53] = 1;
+		*reinterpret_cast<unsigned int*>(createParam + 0x50) = 0;
+		createParam[0x52] = 0;
+		*reinterpret_cast<unsigned int*>(createParam + 0x4C) = 0x1E;
+		*reinterpret_cast<unsigned int*>(createParam + 0x44) = 0;
+		*reinterpret_cast<unsigned short*>(createParam + 0x40) = 0;
+		createParam[0x3E] = 0;
+		createParam[0x3D] = 0;
+		*reinterpret_cast<unsigned int*>(createParam + 0x0) = 0;
+		*reinterpret_cast<unsigned int*>(createParam + 0x4) = 0;
+		*reinterpret_cast<unsigned int*>(createParam + 0x8) = 0;
+		*reinterpret_cast<unsigned int*>(createParam + 0xC) = 0;
+		*reinterpret_cast<unsigned int*>(createParam + 0x10) = 0;
+		*reinterpret_cast<void**>(createParam + 0x14) = 0;
+		*reinterpret_cast<void**>(createParam + 0x18) = 0;
+		*reinterpret_cast<unsigned int*>(createParam + 0x1C) = 0;
+		*reinterpret_cast<unsigned int*>(createParam + 0x20) = 0;
+		*reinterpret_cast<float*>(createParam + 0x24) = FLOAT_803313e8;
+		*reinterpret_cast<float*>(createParam + 0x28) = FLOAT_803313e8;
+		createParam[0x2C] = 0;
+
+		const unsigned int effectNo = static_cast<unsigned int>(weaponModel + 0x1A);
+		unsigned int* effect = reinterpret_cast<unsigned int*>(effectBase + slot * 0x524);
+		if (slot == 5 && static_cast<int>(effectNo) < 0x13) {
+			effect += 0x149;
+		} else if (slot > 0x10 && slot < 0x15 && static_cast<int>(effectNo) > 0x19) {
+			effect += 0x524;
+		}
+
+		effect[0] = effectNo;
+		CGBaseObj* const baseObj = reinterpret_cast<CGBaseObj*>(effect + 3);
+		effect[2] = static_cast<unsigned int>(slot);
+		baseObj->Create();
+		effect[0x41] = *reinterpret_cast<unsigned int*>(bytes + 0x4A8 + i * 4);
+		*reinterpret_cast<void**>(createParam + 0x74) = baseObj;
+		*reinterpret_cast<void**>(createParam + 0x70) = baseObj;
+		const int group = (((static_cast<int>(effectNo) ^ 100) >> 1) - ((static_cast<int>(effectNo) ^ 100) & static_cast<int>(effectNo))) >> 31;
+		effect[1] = PartMng.pppCreate(group, static_cast<int>(effectNo), reinterpret_cast<PPPCREATEPARAM*>(createParam), 1);
 	}
 }
 

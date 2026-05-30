@@ -599,7 +599,7 @@ void CMes::Draw()
 					{
 					case 0x4F:
 					{
-						unsigned int mode;
+						int mode;
 						bool specialPad = false;
 						if ((Game.m_currentMapId == 0x21) && (Joybus.GetPadType(0) != 0x40))
 						{
@@ -619,7 +619,7 @@ void CMes::Draw()
 					}
 					case 0x50:
 					{
-						unsigned int mode;
+						int mode;
 						bool specialPad = false;
 						if ((Game.m_currentMapId == 0x21) && (Joybus.GetPadType(0) != 0x40))
 						{
@@ -639,7 +639,7 @@ void CMes::Draw()
 					}
 					case 0x52:
 					{
-						unsigned int mode;
+						int mode;
 						bool specialPad = false;
 						if ((Game.m_currentMapId == 0x21) && (Joybus.GetPadType(0) != 0x40))
 						{
@@ -659,7 +659,7 @@ void CMes::Draw()
 					}
 					case 0x53:
 					{
-						unsigned int mode;
+						int mode;
 						bool specialPad = false;
 						if ((Game.m_currentMapId == 0x21) && (Joybus.GetPadType(0) != 0x40))
 						{

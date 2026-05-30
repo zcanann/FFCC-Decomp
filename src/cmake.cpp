@@ -2168,6 +2168,7 @@ void CMenuPcs::CmakeSexDraw()
     font->SetColor(rgba);
 
     float maxWidth = FLOAT_80333254;
+    int y = 0x9C;
     for (int i = 0; i < 2; ++i) {
         const char* txt = GetMenuStr(0x11 + i);
         float width = static_cast<float>(font->GetWidth(txt));
@@ -2176,8 +2177,9 @@ void CMenuPcs::CmakeSexDraw()
         }
         float x = static_cast<float>(-(static_cast<double>(width) * DOUBLE_80333298 - DOUBLE_80333288));
         font->SetPosX(x);
-        font->SetPosY(0x9C + i * 0x28 - FLOAT_803332f4);
+        font->SetPosY(static_cast<float>(y) - FLOAT_803332f4);
         font->Draw(txt);
+        y += 0x28;
     }
     DrawInit();
 

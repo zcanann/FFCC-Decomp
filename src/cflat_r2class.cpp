@@ -1204,8 +1204,11 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			outResult = 0;
 			break;
 		case -0x6F:
-			engineObject->m_moveOffset.z = static_cast<float>(localBase[0]);
-			engineObject->m_moveOffset.x = static_cast<float>(localBase[0]);
+			{
+				float horizontal = static_cast<float>(localBase[0]);
+				engineObject->m_moveOffset.z = horizontal;
+				engineObject->m_moveOffset.x = horizontal;
+			}
 			engineObject->m_moveOffset.y = static_cast<float>(localBase[1]);
 			engineObject->m_bounceFactor = static_cast<float>(localBase[2]);
 			PushValue(this, object, 0);

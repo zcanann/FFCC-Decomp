@@ -1270,8 +1270,8 @@ void CMes::addString(char** text, int branchMode)
 			case 0x35:
 			{
 				float scale = FLOAT_803308a0 * (float)ReadTagS16(text);
-				*(float*)((char*)this + 0x3D44) = scale;
 				*(float*)((char*)this + 0x3D48) = scale;
+				*(float*)((char*)this + 0x3D44) = scale;
 				font->SetScaleX(*(float*)((char*)this + 0x3D44));
 				font->SetScaleY(*(float*)((char*)this + 0x3D48));
 				break;
@@ -1357,12 +1357,6 @@ render_char:
 		{
 			continue;
 		}
-
-		char tmpCharBuf[2];
-		tmpCharBuf[0] = (char)ch;
-		tmpCharBuf[1] = '\0';
-		ApplyCaseMode(tmpCharBuf, caseMode);
-		ch = (unsigned char)tmpCharBuf[0];
 
 		float* glyph = (float*)((char*)this + *(int*)((char*)this + 8) * 0x14 + 0x0C);
 		*(unsigned char*)((char*)glyph + 0x12) = (unsigned char)*(int*)((char*)this + 0x3D28);

@@ -209,6 +209,7 @@ public:
     void CalcDiaryMenu();
     void CalcMCardMenu();
     void CalcCMakeMenu();
+    void CalcSingCMake();
     void CalcMoveMenu();
     void InitSaveLoadMenu();
     void CalcLoadMenu();

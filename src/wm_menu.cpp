@@ -1241,6 +1241,8 @@ void CMenuPcs::CalcDiaryMenu()
 					CalcChara();
 				}
 			}
+		} else {
+			CalcSingCMake();
 		}
 		break;
 	case 4:

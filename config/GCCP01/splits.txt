@@ -147,6 +147,7 @@ maphit.cpp:
 	.rodata     start:0x801D7088 end:0x801D7094
 	.bss        start:0x80245640 end:0x802456F0
 	.sbss       start:0x8032EC78 end:0x8032EC9C
+	.sdata2     start:0x8032F888 end:0x8032F8B4
 
 mapmesh.cpp:
 	extab       start:0x80005E60 end:0x80005EC8
@@ -239,6 +240,7 @@ p_graphic.cpp:
 	.ctors      start:0x801D53EC end:0x801D53F0
 	.data       start:0x801E9C90 end:0x801E9EC0
 	.bss        start:0x80268E90 end:0x80268F84
+	.sdata2     start:0x8032FBFC end:0x8032FC64
 
 p_game.cpp:
 	extab       start:0x800068A8 end:0x80006918
@@ -267,6 +269,7 @@ p_light.cpp:
 	.data       start:0x801EA298 end:0x801EA484
 	.bss        start:0x80268F88 end:0x8026D338
 	.sbss       start:0x8032ED10 end:0x8032ED18
+	.sdata2     start:0x8032FC68 end:0x8032FC88
 
 mapanim.cpp:
 	extab       start:0x800069C8 end:0x80006A44

@@ -14,6 +14,7 @@
 #include "ffcc/ringmenu.h"
 #include "ffcc/system.h"
 
+#include <dolphin/mtx.h>
 #include <math.h>
 
 extern const char sCFlatRuntime2SetClassSystemValWarn[];
@@ -828,6 +829,27 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			moveVector.z = params[2];
 			engineObject->moveVector(&moveVector, params[3], static_cast<int>(localBase[4]));
 			PushValue(this, object, 0);
+			outResult = 0;
+			break;
+		}
+		case -0x21: {
+			Vec hitStart;
+			Vec hitTarget;
+			Vec hitMove;
+			float* params = reinterpret_cast<float*>(localBase);
+			hitStart.x = engineObject->m_worldPosition.x;
+			hitStart.y = engineObject->m_worldPosition.y + params[1];
+			hitStart.z = engineObject->m_worldPosition.z;
+			hitTarget.x = params[2];
+			hitTarget.y = params[3];
+			hitTarget.z = params[4];
+			PSVECSubtract(&hitTarget, &hitStart, &hitMove);
+			int hit = MapPcs.CheckHitCylinderNear(&hitStart, &hitMove, params[5], localBase[0]);
+			AddDebugDrawCC(&hitStart, &hitMove, params[5], 1, 0);
+			if (hit != 0) {
+				*reinterpret_cast<int*>(localBase[6]) = 0;
+			}
+			PushValue(this, object, hit);
 			outResult = 0;
 			break;
 		}

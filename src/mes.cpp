@@ -991,9 +991,8 @@ void CMes::addString(char** text, int branchMode)
 				break;
 			case 8:
 			{
-				int colorCond = ReadTagU8(text);
 				int oldColor = *(int*)((char*)this + 0x3D28);
-				if (colorCond != 0)
+				if (ReadTagU8(text) != 0)
 				{
 					*(int*)((char*)this + 0x3D28) = 6;
 				}
@@ -1011,9 +1010,8 @@ void CMes::addString(char** text, int branchMode)
 			case 0x3D:
 			case 0x3F:
 			{
-				int colorCond = ReadTagU8(text);
 				int oldColor = *(int*)((char*)this + 0x3D28);
-				if (colorCond != 0)
+				if (ReadTagU8(text) != 0)
 				{
 					*(int*)((char*)this + 0x3D28) = 5;
 				}
@@ -1059,9 +1057,8 @@ void CMes::addString(char** text, int branchMode)
 			case 0x3E:
 			case 0x40:
 			{
-				int colorCond = ReadTagU8(text);
 				int oldColor = *(int*)((char*)this + 0x3D28);
-				if (colorCond != 0)
+				if (ReadTagU8(text) != 0)
 				{
 					*(int*)((char*)this + 0x3D28) = 0;
 				}
@@ -1100,9 +1097,8 @@ void CMes::addString(char** text, int branchMode)
 			}
 			case 0x2B:
 			{
-				int colorCond = ReadTagU8(text);
 				int oldColor = *(int*)((char*)this + 0x3D28);
-				if (colorCond != 0)
+				if (ReadTagU8(text) != 0)
 				{
 					*(int*)((char*)this + 0x3D28) = 6;
 				}
@@ -1116,9 +1112,8 @@ void CMes::addString(char** text, int branchMode)
 			}
 			case 0x2C:
 			{
-				int colorCond = ReadTagU8(text);
 				int oldColor = *(int*)((char*)this + 0x3D28);
-				if (colorCond != 0)
+				if (ReadTagU8(text) != 0)
 				{
 					*(int*)((char*)this + 0x3D28) = 4;
 				}
@@ -1132,9 +1127,8 @@ void CMes::addString(char** text, int branchMode)
 			}
 			case 0x2D:
 			{
-				int colorCond = ReadTagU8(text);
 				int oldColor = *(int*)((char*)this + 0x3D28);
-				if (colorCond != 0)
+				if (ReadTagU8(text) != 0)
 				{
 					*(int*)((char*)this + 0x3D28) = 3;
 				}

@@ -908,8 +908,8 @@ void CMenuPcs::CalcSelectCloseAnim()
 		*reinterpret_cast<short*>(entry + 8) = (short)centerX;
 		*reinterpret_cast<short*>(entry + 10) = (short)centerY;
 
-		int screenX = (int)((float)sprite->x + sprite->motionX + 24.0f);
-		int screenY = (int)((float)sprite->y + sprite->motionY - 28.0f);
+		int screenX = (int)(24.0f + (float)sprite->x + sprite->motionX);
+		int screenY = (int)(((float)sprite->y + sprite->motionY) - 28.0f);
 		if (screenX < 0) {
 			screenX = 0;
 		}

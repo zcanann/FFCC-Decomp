@@ -797,8 +797,8 @@ void CMes::Calc()
 	{
 		if ((int)(unsigned int)*(unsigned short*)(textEntry + 0xC) <= *(int*)((char*)this + 0x3C80))
 		{
-			unsigned char fadeMax = *(unsigned char*)(textEntry + 0xF) >> 4;
-			unsigned char fadeCurr = (*(unsigned char*)(textEntry + 0xF) & 0xF) + 1;
+			int fadeMax = *(unsigned char*)(textEntry + 0xF) >> 4;
+			int fadeCurr = (*(unsigned char*)(textEntry + 0xF) & 0xF) + 1;
 			if (fadeCurr < fadeMax)
 			{
 				fadeMax = fadeCurr;
@@ -819,7 +819,7 @@ void CMes::Calc()
 			break;
 		}
 
-		unsigned char type = *flagEntry;
+		int type = *flagEntry;
 		if (type != 3)
 		{
 			if (type < 3)
@@ -848,11 +848,12 @@ void CMes::Calc()
 
 	{
 		int next = *(int*)((char*)this + 0x3C80) + 1;
-		if (next > 0x7FFE)
+		int max = 0x7FFF;
+		if (next < 0x7FFF)
 		{
-			next = 0x7FFF;
+			max = next;
 		}
-		*(int*)((char*)this + 0x3C80) = next;
+		*(int*)((char*)this + 0x3C80) = max;
 	}
 
 doneAdvance:

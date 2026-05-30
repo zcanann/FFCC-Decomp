@@ -3159,10 +3159,6 @@ void CMenuPcs::CmakeResultDraw1()
             break;
         }
 
-        if (txt == 0) {
-            txt = "";
-        }
-
         valueFont->SetPosX(FLOAT_803332fc + labelWidths[i]);
         valueFont->SetPosY(0x70 + i * 0x28 - FLOAT_803332f4);
         valueFont->Draw(txt);
@@ -3178,9 +3174,6 @@ void CMenuPcs::CmakeResultDraw1()
             strcat(tribeWithSep, "/", sizeof(tribeWithSep));
 
             const char* hairTxt = GetHairStr(hairIndex + s_CmakeInfo.m_hair);
-            if (hairTxt == 0) {
-                hairTxt = "";
-            }
 
             valueFont->SetPosX(
                 FLOAT_80333300 +

@@ -19,6 +19,7 @@
 #include <PowerPC_EABI_Support/Runtime/New.h>
 
 CMaterialMan MaterialMan;
+CMaterial* g_drawMaterial;
 
 inline void* operator new(unsigned long, void* p)
 {
@@ -609,8 +610,8 @@ void CMaterialMan::addtev_bump_st(int mode, _GXTevScale tevScale)
     GXSetNumIndStages(1);
     GXSetIndTexOrder((GXIndTexStageID)0, *reinterpret_cast<GXTexCoordID*>(Ptr(this, 0x1E8)),
                      *reinterpret_cast<GXTexMapID*>(Ptr(this, 0x1C4)));
-    GXSetIndTexCoordScale((GXIndTexStageID)0, *reinterpret_cast<GXIndTexScale*>(Ptr(this, 0x34)),
-                          *reinterpret_cast<GXIndTexScale*>(Ptr(this, 0x35)));
+    GXSetIndTexCoordScale((GXIndTexStageID)0, *reinterpret_cast<GXIndTexScale*>(Ptr(g_drawMaterial, 0x34)),
+                          *reinterpret_cast<GXIndTexScale*>(Ptr(g_drawMaterial, 0x35)));
 
     GXSetTevDirect(static_cast<GXTevStageID>(tevStage));
     _GXSetTevOrder(
@@ -651,7 +652,7 @@ void CMaterialMan::addtev_bump_st(int mode, _GXTevScale tevScale)
     IncNumTevStage();
 
     tevStage = m_numTevStage;
-    if (*reinterpret_cast<char*>(Ptr(this, 0xA3)) == 0) {
+    if (*reinterpret_cast<char*>(Ptr(g_drawMaterial, 0xA3)) == 0) {
         _GXSetTevOrder(
             tevStage, *reinterpret_cast<int*>(Ptr(this, 0x1F4)), *reinterpret_cast<int*>(Ptr(this, 0x1C8)), 0xFF);
         _GXSetTevColorIn(tevStage,
@@ -732,12 +733,12 @@ void CMaterialMan::addtev_bump_water(_GXTevScale tevScale)
     float warpMtx3 = FLOAT_8032faf4;
     float warpMtx4 = FLOAT_8032fb20;
     float warpMtx5 = FLOAT_8032faf4;
-    int tevStage = m_numTevStage;
 
     GXSetIndTexMtx((GXIndTexMtxID)1, LightPcs.GetBumpIndTexMtx(), 0);
     GXSetIndTexMtx((GXIndTexMtxID)2, reinterpret_cast<const float(*)[3]>(&warpMtx0), 1);
     GXSetNumIndStages(2);
 
+    int tevStage = m_numTevStage;
     GXSetTevDirect((GXTevStageID)tevStage);
     _GXSetTevOrder(
         tevStage, m_texCoordIdCurShadow, m_texMapIdCurShadow, 4);
@@ -812,12 +813,12 @@ void CMaterialMan::addtev_bump_spec_col_water(_GXTevScale tevScale)
     float warpMtx3 = FLOAT_8032faf4;
     float warpMtx4 = FLOAT_8032fb20;
     float warpMtx5 = FLOAT_8032faf4;
-    int tevStage = m_numTevStage;
 
     GXSetIndTexMtx((GXIndTexMtxID)1, LightPcs.GetBumpIndTexMtx(), 0);
     GXSetIndTexMtx((GXIndTexMtxID)2, reinterpret_cast<const float(*)[3]>(&warpMtx0), 1);
     GXSetNumIndStages(2);
 
+    int tevStage = m_numTevStage;
     GXSetTevDirect((GXTevStageID)tevStage);
     _GXSetTevOrder(
         tevStage, m_texCoordIdCurShadow, m_texMapIdCurShadow, 4);
@@ -874,14 +875,14 @@ void CMaterialMan::addtev_bump_spec_col_water(_GXTevScale tevScale)
  */
 void CMaterialMan::addtev_bump_jimen(_GXTevScale)
 {
-    int tevStage = m_numTevStage;
-
     GXSetIndTexMtx((GXIndTexMtxID)1, LightPcs.GetBumpIndTexMtx(), 0);
     GXSetNumIndStages(1);
     GXSetIndTexOrder((GXIndTexStageID)0,
                      *reinterpret_cast<GXTexCoordID*>(Ptr(this, 0x1E8)),
                      *reinterpret_cast<GXTexMapID*>(Ptr(this, 0x1C4)));
     GXSetIndTexCoordScale((GXIndTexStageID)0, (GXIndTexScale)0, (GXIndTexScale)0);
+
+    int tevStage = m_numTevStage;
     GXSetTevIndBumpXYZ((GXTevStageID)tevStage, (GXIndTexStageID)0, (GXIndTexMtxID)1);
     _GXSetTevOrder(
         tevStage, *reinterpret_cast<int*>(Ptr(this, 0x1F8)), *reinterpret_cast<int*>(Ptr(this, 0x1C8)), 0xFF);
@@ -909,7 +910,51 @@ void CMaterialMan::addtev_lightmap(long index)
     unsigned int stage = m_numTevStage;
     unsigned char indexByte = static_cast<unsigned char>(index);
 
-    if ((m_shadowKColorMask & (1 << indexByte)) == 0) {
+    if ((m_shadowKColorMask & (1 << indexByte)) != 0) {
+        GXColor kcolor;
+        *reinterpret_cast<unsigned int*>(&kcolor) = static_cast<unsigned int>(indexByte);
+        GXSetTevKColor(static_cast<GXTevKColorID>(index), kcolor);
+
+        GXSetTevDirect(static_cast<GXTevStageID>(stage));
+        _GXSetTevOrder(
+            stage, m_shadowTexCoordIds[index],
+            m_shadowTexMapIds[index], 0xFF);
+        _GXSetTevColorIn(stage, 0xF,
+                                                                                                              8, 9, 0);
+        _GXSetTevColorOp(stage, 0, 0, 0, 1, 2);
+        _GXSetTevAlphaIn(stage, 7, 7,
+                                                                                                              7, 0);
+        _GXSetTevAlphaOp(stage, 0, 0, 0, 1, 0);
+        _GXSetTevSwapMode(stage, 0, 0);
+        IncNumTevStage();
+
+        stage = m_numTevStage;
+        GXSetTevDirect(static_cast<GXTevStageID>(stage));
+        _GXSetTevOrder(
+            stage, m_shadowTexCoordIds[index],
+            m_shadowTexMapIds[index] + 1, 0xFF);
+        _GXSetTevColorIn(stage, 0xF,
+                                                                                                              8, 9, 0);
+        _GXSetTevColorOp(stage, 0, 0, 0, 1, 0);
+        _GXSetTevAlphaIn(stage, 7, 7,
+                                                                                                              7, 0);
+        _GXSetTevAlphaOp(stage, 0, 0, 0, 1, 0);
+        _GXSetTevSwapMode(stage, 0, 0);
+        IncNumTevStage();
+
+        stage = m_numTevStage;
+        GXSetTevDirect(static_cast<GXTevStageID>(stage));
+        GXSetTevKColorSel(static_cast<GXTevStageID>(stage), static_cast<GXTevKColorSel>(index + 0x1C));
+        _GXSetTevOrder(stage, 0xFF, 0xFF, 0xFF);
+        _GXSetTevColorIn(stage, 4, 0,
+                                                                                                              0xE, 0xF);
+        _GXSetTevColorOp(stage, 0, 0, 0, 1, 0);
+        _GXSetTevAlphaIn(stage, 7, 7,
+                                                                                                              7, 0);
+        _GXSetTevAlphaOp(stage, 0, 0, 0, 1, 0);
+        _GXSetTevSwapMode(stage, 0, 0);
+        IncNumTevStage();
+    } else {
         GXSetTevDirect(static_cast<GXTevStageID>(stage));
         _GXSetTevOrder(
             stage, m_shadowTexCoordIds[index],
@@ -924,52 +969,7 @@ void CMaterialMan::addtev_lightmap(long index)
         _GXSetTevAlphaOp(stage, 0, 0, 0, 1, 0);
         _GXSetTevSwapMode(stage, 0, 0);
         IncNumTevStage();
-        return;
     }
-
-    GXColor kcolor;
-    *reinterpret_cast<unsigned int*>(&kcolor) = static_cast<unsigned int>(indexByte);
-    GXSetTevKColor(static_cast<GXTevKColorID>(index), kcolor);
-
-    GXSetTevDirect(static_cast<GXTevStageID>(stage));
-    _GXSetTevOrder(
-        stage, m_shadowTexCoordIds[index],
-        m_shadowTexMapIds[index], 0xFF);
-    _GXSetTevColorIn(stage, 0xF,
-                                                                                                          8, 9, 0);
-    _GXSetTevColorOp(stage, 0, 0, 0, 1, 2);
-    _GXSetTevAlphaIn(stage, 7, 7,
-                                                                                                          7, 0);
-    _GXSetTevAlphaOp(stage, 0, 0, 0, 1, 0);
-    _GXSetTevSwapMode(stage, 0, 0);
-    IncNumTevStage();
-
-    stage = m_numTevStage;
-    GXSetTevDirect(static_cast<GXTevStageID>(stage));
-    _GXSetTevOrder(
-        stage, m_shadowTexCoordIds[index],
-        m_shadowTexMapIds[index] + 1, 0xFF);
-    _GXSetTevColorIn(stage, 0xF,
-                                                                                                          8, 9, 0);
-    _GXSetTevColorOp(stage, 0, 0, 0, 1, 0);
-    _GXSetTevAlphaIn(stage, 7, 7,
-                                                                                                          7, 0);
-    _GXSetTevAlphaOp(stage, 0, 0, 0, 1, 0);
-    _GXSetTevSwapMode(stage, 0, 0);
-    IncNumTevStage();
-
-    stage = m_numTevStage;
-    GXSetTevDirect(static_cast<GXTevStageID>(stage));
-    GXSetTevKColorSel(static_cast<GXTevStageID>(stage), static_cast<GXTevKColorSel>(index + 0x1C));
-    _GXSetTevOrder(stage, 0xFF, 0xFF, 0xFF);
-    _GXSetTevColorIn(stage, 4, 0,
-                                                                                                          0xE, 0xF);
-    _GXSetTevColorOp(stage, 0, 0, 0, 1, 0);
-    _GXSetTevAlphaIn(stage, 7, 7,
-                                                                                                          7, 0);
-    _GXSetTevAlphaOp(stage, 0, 0, 0, 1, 0);
-    _GXSetTevSwapMode(stage, 0, 0);
-    IncNumTevStage();
 }
 
 /*
@@ -986,7 +986,52 @@ void CMaterialMan::addtev_shadow(long index)
     unsigned int stage = m_numTevStage;
     unsigned char indexByte = static_cast<unsigned char>(index);
 
-    if ((m_shadowKColorMask & (1 << indexByte)) == 0) {
+    if ((m_shadowKColorMask & (1 << indexByte)) != 0) {
+        GXColor kcolor;
+        *reinterpret_cast<unsigned int*>(&kcolor) = static_cast<unsigned int>(indexByte);
+        GXSetTevKColor(static_cast<GXTevKColorID>(index), kcolor);
+
+        GXSetTevDirect(static_cast<GXTevStageID>(stage));
+        _GXSetTevOrder(
+            stage, m_shadowTexCoordIds[index],
+            m_shadowTexMapIds[index], 0xFF);
+        _GXSetTevColorIn(stage, 0,
+                                                                                                              8, 9,
+                                                                                                              0xF);
+        _GXSetTevColorOp(stage, 0, 0, 0, 1, 2);
+        _GXSetTevAlphaIn(stage, 7, 7,
+                                                                                                              7, 0);
+        _GXSetTevAlphaOp(stage, 0, 0, 0, 1, 0);
+        _GXSetTevSwapMode(stage, 0, 0);
+        IncNumTevStage();
+
+        stage = m_numTevStage;
+        GXSetTevDirect(static_cast<GXTevStageID>(stage));
+        _GXSetTevOrder(
+            stage, m_shadowTexCoordIds[index],
+            m_shadowTexMapIds[index] + 1, 0xFF);
+        _GXSetTevColorIn(stage, 0, 8,
+                                                                                                              9, 0xF);
+        _GXSetTevColorOp(stage, 0, 0, 0, 1, 0);
+        _GXSetTevAlphaIn(stage, 7, 7,
+                                                                                                              7, 0);
+        _GXSetTevAlphaOp(stage, 0, 0, 0, 1, 0);
+        _GXSetTevSwapMode(stage, 0, 0);
+        IncNumTevStage();
+
+        stage = m_numTevStage;
+        GXSetTevDirect(static_cast<GXTevStageID>(stage));
+        GXSetTevKColorSel(static_cast<GXTevStageID>(stage), static_cast<GXTevKColorSel>(index + 0x1C));
+        _GXSetTevOrder(stage, 0xFF, 0xFF, 0xFF);
+        _GXSetTevColorIn(stage, 4, 0,
+                                                                                                              0xE, 0xF);
+        _GXSetTevColorOp(stage, 0, 0, 0, 1, 0);
+        _GXSetTevAlphaIn(stage, 7, 7,
+                                                                                                              7, 0);
+        _GXSetTevAlphaOp(stage, 0, 0, 0, 1, 0);
+        _GXSetTevSwapMode(stage, 0, 0);
+        IncNumTevStage();
+    } else {
         GXSetTevDirect(static_cast<GXTevStageID>(stage));
         _GXSetTevOrder(
             stage, m_shadowTexCoordIds[index],
@@ -1001,53 +1046,7 @@ void CMaterialMan::addtev_shadow(long index)
         _GXSetTevAlphaOp(stage, 0, 0, 0, 1, 0);
         _GXSetTevSwapMode(stage, 0, 0);
         IncNumTevStage();
-        return;
     }
-
-    GXColor kcolor;
-    *reinterpret_cast<unsigned int*>(&kcolor) = static_cast<unsigned int>(indexByte);
-    GXSetTevKColor(static_cast<GXTevKColorID>(index), kcolor);
-
-    GXSetTevDirect(static_cast<GXTevStageID>(stage));
-    _GXSetTevOrder(
-        stage, m_shadowTexCoordIds[index],
-        m_shadowTexMapIds[index], 0xFF);
-    _GXSetTevColorIn(stage, 0,
-                                                                                                          8, 9,
-                                                                                                          0xF);
-    _GXSetTevColorOp(stage, 0, 0, 0, 1, 2);
-    _GXSetTevAlphaIn(stage, 7, 7,
-                                                                                                          7, 0);
-    _GXSetTevAlphaOp(stage, 0, 0, 0, 1, 0);
-    _GXSetTevSwapMode(stage, 0, 0);
-    IncNumTevStage();
-
-    stage = m_numTevStage;
-    GXSetTevDirect(static_cast<GXTevStageID>(stage));
-    _GXSetTevOrder(
-        stage, m_shadowTexCoordIds[index],
-        m_shadowTexMapIds[index] + 1, 0xFF);
-    _GXSetTevColorIn(stage, 0, 8,
-                                                                                                          9, 0xF);
-    _GXSetTevColorOp(stage, 0, 0, 0, 1, 0);
-    _GXSetTevAlphaIn(stage, 7, 7,
-                                                                                                          7, 0);
-    _GXSetTevAlphaOp(stage, 0, 0, 0, 1, 0);
-    _GXSetTevSwapMode(stage, 0, 0);
-    IncNumTevStage();
-
-    stage = m_numTevStage;
-    GXSetTevDirect(static_cast<GXTevStageID>(stage));
-    GXSetTevKColorSel(static_cast<GXTevStageID>(stage), static_cast<GXTevKColorSel>(index + 0x1C));
-    _GXSetTevOrder(stage, 0xFF, 0xFF, 0xFF);
-    _GXSetTevColorIn(stage, 4, 0,
-                                                                                                          0xE, 0xF);
-    _GXSetTevColorOp(stage, 0, 0, 0, 1, 0);
-    _GXSetTevAlphaIn(stage, 7, 7,
-                                                                                                          7, 0);
-    _GXSetTevAlphaOp(stage, 0, 0, 0, 1, 0);
-    _GXSetTevSwapMode(stage, 0, 0);
-    IncNumTevStage();
 }
 
 /*
@@ -1065,12 +1064,11 @@ void CMaterialMan::addtev_stdShadow(unsigned long materialFlag)
         return;
     }
 
-    int materialNum = m_shadowMaterialCount;
-    for (int i = 0; i < materialNum; i++) {
-        if (m_shadowMaterialType[i] == 0) {
-            addtev_shadow(i);
-        } else {
+    for (int i = 0; i < m_shadowMaterialCount; i++) {
+        if (m_shadowMaterialType[i] != 0) {
             addtev_lightmap(i);
+        } else {
+            addtev_shadow(i);
         }
     }
 }
@@ -1090,28 +1088,31 @@ void CMaterialMan::addtev_full_shadow(long index)
 
     GXLoadTexMtxImm(reinterpret_cast<MtxPtr>(Ptr(this, 0x64)),
                     *reinterpret_cast<u32*>(Ptr(this, 0x19C)),
-                    GX_MTX2x4);
+                    GX_MTX3x4);
     GXLoadTexObj(reinterpret_cast<GXTexObj*>(Ptr(this, 0xC4)), *reinterpret_cast<GXTexMapID*>(Ptr(this, 0x194)));
     GXSetTexCoordGen2(*reinterpret_cast<GXTexCoordID*>(Ptr(this, 0x1A4)),
-                      GX_TG_MTX2x4,
-                      GX_TG_TEX0,
+                      GX_TG_MTX3x4,
+                      GX_TG_POS,
                       *reinterpret_cast<u32*>(Ptr(this, 0x19C)),
                       GX_FALSE,
                       0x7D);
 
     GXLoadTexMtxImm(reinterpret_cast<MtxPtr>(Ptr(this, 0x94)),
                     *reinterpret_cast<u32*>(Ptr(this, 0x1B4)),
-                    GX_MTX2x4);
+                    GX_MTX3x4);
     GXLoadTexObj(reinterpret_cast<GXTexObj*>(Ptr(this, 0xC8)), *reinterpret_cast<GXTexMapID*>(Ptr(this, 0x1AC)));
     GXSetTexCoordGen2(*reinterpret_cast<GXTexCoordID*>(Ptr(this, 0x1BC)),
-                      GX_TG_MTX2x4,
-                      GX_TG_TEX0,
+                      GX_TG_MTX3x4,
+                      GX_TG_POS,
                       *reinterpret_cast<u32*>(Ptr(this, 0x1B4)),
                       GX_FALSE,
                       0x7D);
 
     GXColor tevColor;
-    *reinterpret_cast<unsigned int*>(&tevColor) = static_cast<unsigned int>(m_fullShadowTevColor);
+    tevColor.r = 0;
+    tevColor.g = 0;
+    tevColor.b = 0;
+    tevColor.a = static_cast<unsigned char>(m_fullShadowTevColor);
     GXSetTevColor(static_cast<GXTevRegID>(1), tevColor);
 
     unsigned int stage = m_numTevStage;
@@ -1181,7 +1182,7 @@ void CMaterialMan::SetUnderWaterTex()
     Mtx44 screenMtx;
     PSMTXIdentity(matrixA);
     unsigned char* cameraPcs = reinterpret_cast<unsigned char*>(&CameraPcs);
-    PSMTX44Copy(*reinterpret_cast<Mtx44*>(cameraPcs + 0x48), screenMtx);
+    PSMTX44Copy(*reinterpret_cast<Mtx44*>(cameraPcs + 0x94), screenMtx);
     PSMTXCopy(*reinterpret_cast<Mtx*>(cameraPcs + 0x4), matrixB);
 
     matrixA[0][0] = screenMtx[0][0] * (FLOAT_8032fb08 / static_cast<float>(width));
@@ -1212,6 +1213,7 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
 
     CPtrArray<CMaterial*>* materials = reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(materialSet, 8));
     CMaterial* material = (*materials)[materialIndex];
+    g_drawMaterial = material;
     int bumpLight = *reinterpret_cast<int*>(Ptr(material, 0x28));
     unsigned char materialType = *reinterpret_cast<unsigned char*>(Ptr(material, 0xA2));
 
@@ -1238,7 +1240,7 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
 void CMaterialMan::SetMaterialCharaShadow(CMaterial* material)
 {
     unsigned int tevBit = *reinterpret_cast<unsigned int*>(Ptr(material, 0x24));
-    int bumpLight = *reinterpret_cast<int*>(Ptr(material, 0x28));
+    CLightPcs::CBumpLight* bumpLight = *reinterpret_cast<CLightPcs::CBumpLight**>(Ptr(material, 0x28));
     unsigned char materialType = *reinterpret_cast<unsigned char*>(Ptr(material, 0xA2));
 
     if ((bumpLight != 0) && (materialType != 3) && (materialType != 2)) {
@@ -1821,11 +1823,11 @@ void CMaterialMan::SetShadow(CMapShadow& shadow, float (*viewMtx) [4], int shado
     CMaterial* material = (*materials)[*reinterpret_cast<unsigned short*>(Ptr(&shadow, 4))];
 
     unsigned long useShadowBit32 = materialFlag & *reinterpret_cast<unsigned long*>(Ptr(material, 0x24)) & 0x8000;
-    if (useShadowBit32 == 0) {
-        if (m_shadowTextureCount > 4) {
+    if (useShadowBit32 != 0) {
+        if (m_shadowTextureCount > 3) {
             return;
         }
-    } else if (m_shadowTextureCount > 3) {
+    } else if (m_shadowTextureCount > 4) {
         return;
     }
 
@@ -2542,7 +2544,8 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
 
         chunkFile.PushChunk();
         while (chunkFile.GetNextChunk(chunk) != 0) {
-            if (chunk.m_id == CHUNK_TIDX) {
+            switch (chunk.m_id) {
+            case CHUNK_TIDX: {
                 unsigned long materialIndex = 0;
                 while (materialIndex < static_cast<unsigned long>(UnkMaterialSetGetter(materials))) {
                     if ((*materials)[materialIndex] == 0) {
@@ -2581,13 +2584,15 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                 } else {
                     materials->Add(material);
                 }
-            } else if (chunk.m_id == CHUNK_NAME) {
+            } break;
+            case CHUNK_NAME: {
                 if (material != 0) {
                     strncpy(reinterpret_cast<char*>(Ptr(material, 8)), chunkFile.GetString(), 0x10);
                 } else {
                     chunkFile.GetString();
                 }
-            } else if (chunk.m_id == CHUNK_ATTR) {
+            } break;
+            case CHUNK_ATTR: {
                 unsigned int flags = chunkFile.Get4();
                 if (material == 0) {
                     chunkFile.Get1();
@@ -2620,13 +2625,15 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                 *Ptr(material, 0xA6) = static_cast<unsigned char>(chunkFile.Get2());
                 chunkFile.Get2();
                 chunkFile.GetF4();
-            } else if (chunk.m_id == CHUNK_FUR) {
+            } break;
+            case CHUNK_FUR: {
                 unsigned short textureIndex = chunkFile.Get2();
                 if (material != 0) {
                     AddTextureIndex(material, textureIndex);
                     *Ptr(material, 0xA7) = 1;
                 }
-            } else if (chunk.m_id == CHUNK_BUMP) {
+            } break;
+            case CHUNK_BUMP: {
                 unsigned char bumpLightDirect = 0;
                 if (chunk.m_version == 1) {
                     bumpLightDirect = chunkFile.Get1();
@@ -2670,7 +2677,8 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                     *Ptr(bumpLight, 0xB1) = *Ptr(material, 0xA2);
                     *reinterpret_cast<unsigned long*>(Ptr(material, 0x24)) |= 4;
                 }
-            } else if (chunk.m_id == CHUNK_JIME) {
+            } break;
+            case CHUNK_JIME: {
                 unsigned short texture0 = chunkFile.Get2();
                 unsigned short texture1 = chunkFile.Get2();
                 unsigned short bumpIndex = chunkFile.Get2();
@@ -2700,7 +2708,8 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                     SetMaterialColor(material, rgba);
                     *Ptr(material, 0xA3) = 1;
                 }
-            } else if (chunk.m_id == CHUNK_WATR) {
+            } break;
+            case CHUNK_WATR: {
                 unsigned short texture0 = chunkFile.Get2();
                 unsigned short texture1 = chunkFile.Get2();
                 unsigned short bumpIndex = chunkFile.Get2();
@@ -2732,7 +2741,8 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                         *reinterpret_cast<unsigned long*>(Ptr(material, 0x24)) |= 0x80000;
                     }
                 }
-            } else if (chunk.m_id == CHUNK_TSCL) {
+            } break;
+            case CHUNK_TSCL: {
                 if (material == 0) {
                     continue;
                 }
@@ -2743,17 +2753,22 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
 
                     chunkFile.PushChunk();
                     while (chunkFile.GetNextChunk(chunk) != 0) {
-                        if (chunk.m_id == CHUNK_UFRM) {
+                        switch (chunk.m_id) {
+                        case CHUNK_UFRM:
                             keyFrameU = AllocMapKeyFrame(0xDD3);
                             keyFrameU->ReadFrame(chunkFile, 0);
-                        } else if (chunk.m_id == CHUNK_VFRM) {
+                            break;
+                        case CHUNK_VFRM:
                             keyFrameV = AllocMapKeyFrame(0xDDD);
                             keyFrameV->ReadFrame(chunkFile, 0);
-                        } else if (chunk.m_id == CHUNK_UKEY) {
+                            break;
+                        case CHUNK_UKEY:
                             keyFrameU->ReadKey(chunkFile, static_cast<char>(chunk.m_arg0));
-                        } else if (chunk.m_id == CHUNK_VKEY) {
+                            break;
+                        case CHUNK_VKEY:
                             keyFrameV->ReadKey(chunkFile, static_cast<char>(chunk.m_arg0));
-                        } else if (chunk.m_id == CHUNK_TSDT) {
+                            break;
+                        case CHUNK_TSDT: {
                             unsigned int slot = chunkFile.Get2() & 0xFFFF;
                             chunkFile.Get2();
                             CTexScroll* texScroll = material->GetTexScroll(slot);
@@ -2777,6 +2792,7 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                                 *reinterpret_cast<CMapKeyFrame**>(&texScroll->m_v1) = keyFrameV;
                                 texScroll->m_type1 = 2;
                             }
+                        } break;
                         }
                     }
                     chunkFile.PopChunk();
@@ -2796,6 +2812,7 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                         texScroll->m_type1 = 1;
                     }
                 }
+            } break;
             }
         }
         chunkFile.PopChunk();
@@ -3281,22 +3298,24 @@ int CMaterial::Set(_GXTexMapID texMapId)
 {
     Mtx texMtx;
     PSMTXIdentity(texMtx);
+
+    int textureCount = static_cast<int>(*reinterpret_cast<unsigned short*>(Ptr(this, 0x18)));
+    CTexScroll* scroll = GetTexScroll(0);
     MaterialManTexState* texState = GetMaterialManTexState(&MaterialMan);
     MaterialManTevState* tevState = GetMaterialManTevState(&MaterialMan);
+    unsigned char* textureSlot = Ptr(this, 0x3C);
+    int i = 0;
 
     bool hasDualScroll = false;
-    if ((*reinterpret_cast<unsigned short*>(Ptr(this, 0x18)) == 2) &&
-        (FLOAT_8032faf4 == GetTexScroll(0)->m_u0) &&
-        (FLOAT_8032faf4 == GetTexScroll(0)->m_v0) &&
-        ((FLOAT_8032faf4 != GetTexScroll(1)->m_u0) ||
-         (FLOAT_8032faf4 != GetTexScroll(1)->m_v0))) {
+    if ((textureCount == 2) &&
+        (FLOAT_8032faf4 == scroll[0].m_u0) &&
+        (FLOAT_8032faf4 == scroll[0].m_v0) &&
+        ((FLOAT_8032faf4 != scroll[1].m_u0) ||
+         (FLOAT_8032faf4 != scroll[1].m_v0))) {
         hasDualScroll = true;
     }
 
-    unsigned char* textureSlot = Ptr(this, 0x3C);
-    CTexScroll* scroll = GetTexScroll(0);
-    int textureCount = static_cast<int>(*reinterpret_cast<unsigned short*>(Ptr(this, 0x18)));
-    for (int i = 0; i < textureCount; i++) {
+    for (; i < textureCount; i++) {
         CTexture* texture = *reinterpret_cast<CTexture**>(textureSlot);
         if ((texture != 0) && ((*Ptr(this, 0xA7) == 0) || (i < 1))) {
             TextureMan.SetTexture(texMapId, texture);
@@ -3304,7 +3323,7 @@ int CMaterial::Set(_GXTexMapID texMapId)
 
             float scrollU = scroll->m_u0;
             float scrollV = scroll->m_v0;
-            if ((FLOAT_8032faf4 != scrollU) || ((FLOAT_8032faf4 != scrollV) || hasDualScroll)) {
+            if ((scrollU != FLOAT_8032faf4) || ((scrollV != FLOAT_8032faf4) || hasDualScroll)) {
                 texMtx[0][3] = scrollU;
                 texMtx[1][3] = scrollV;
 

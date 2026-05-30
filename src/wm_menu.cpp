@@ -9821,10 +9821,11 @@ LAB_draw:
 					         FLOAT_80331434, FLOAT_80331434, 0.0f);
 				}
 			}
-		}
+	}
 
 	// Draw text info for each save slot
-	if ((state == 2 || state == 3) && *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x16) != 0) {
+	if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x16) > 0x10 &&
+	    *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x10) < 3) {
 		unsigned int* mcData = *reinterpret_cast<unsigned int**>(bytes + 0x838);
 		for (int slot = 0; slot < 4; slot++) {
 			int ws2 = *reinterpret_cast<int*>(bytes + 0x82C);

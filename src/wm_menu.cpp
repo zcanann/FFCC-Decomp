@@ -89,6 +89,7 @@ extern float FLOAT_803314c8;
 extern float FLOAT_803314cc;
 extern float FLOAT_80331430;
 extern float FLOAT_8033151c;
+extern float FLOAT_80331520;
 extern float FLOAT_80331528;
 extern float FLOAT_803315cc;
 extern float FLOAT_803315d0;
@@ -114,6 +115,9 @@ extern float FLOAT_80331614;
 extern float FLOAT_80331618;
 extern float FLOAT_8033161C;
 extern float FLOAT_80331620;
+extern float FLOAT_8033168C;
+extern float FLOAT_80331690;
+extern float FLOAT_80331694;
 extern float FLOAT_80331410;
 extern float FLOAT_80331458;
 extern float FLOAT_803316d4;
@@ -157,6 +161,7 @@ extern float FLOAT_80331550;
 extern float FLOAT_80331558;
 extern float FLOAT_8033155C;
 extern float FLOAT_80331568;
+extern float FLOAT_80331578;
 extern float FLOAT_80331594;
 extern float FLOAT_803315b4;
 extern float FLOAT_803315B8;
@@ -6943,6 +6948,8 @@ void CMenuPcs::DrawChara()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	unsigned char* const worldObj = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x814)[0]);
+	WmCharaSelectEntry* const selectEntries = GetWmCharaSelectEntries(this);
+	short* const worldState = GetWmWorldState(this);
 	bool drewModel = false;
 
 	for (int i = 0; i < kWmMenuPlayerCount; i++) {
@@ -6959,8 +6966,53 @@ void CMenuPcs::DrawChara()
 			continue;
 		}
 
+		unsigned int selectedMask = 0;
+		for (int chan = 0; chan < 4; chan++) {
+			WmCharaSelectEntry& entry = selectEntries[chan];
+			if (entry.m_connected == 1 && entry.m_currentSlot >= 0 && entry.m_currentSlot == i) {
+				selectedMask |= 1u << chan;
+			}
+		}
+
 		SetProjection(i + 0x20);
-		handle->Draw(5);
+		if (handle->m_charaKind == 3) {
+			DrawInit();
+			GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
+			SetTexture(static_cast<CMenuPcs::TEX>(0x32));
+			SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+			float alpha = FLOAT_803313e8;
+			if (worldState[8] != 2 && handle->m_model != 0) {
+				alpha = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C);
+			}
+			const float colorScale = static_cast<float>(selectedMask != 0 ? DOUBLE_80331420 : DOUBLE_80331448);
+			const unsigned char rgb = static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * colorScale));
+			GXColor color = {
+			    rgb,
+			    rgb,
+			    rgb,
+			    static_cast<unsigned char>(static_cast<int>(DOUBLE_80331508 * static_cast<double>(alpha)))};
+			GXSetChanMatColor(static_cast<GXChannelID>(4), color);
+			float x = FLOAT_8033161C - FLOAT_8033168C;
+			float y = FLOAT_803314cc;
+			float scale = FLOAT_80331690;
+			if (selectedMask != 0) {
+				x *= FLOAT_803315d4;
+				y *= FLOAT_803315d4;
+				scale *= FLOAT_803315d4;
+			}
+			DrawRect3d(0, x, y, FLOAT_80331694, FLOAT_80331578, FLOAT_80331520,
+			           FLOAT_803313dc, FLOAT_803313dc, scale, scale);
+			GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
+		} else {
+			handle->Draw(5);
+		}
+		if (worldState[8] == 2 && selectedMask != 0) {
+			for (int chan = 3; chan >= 0; chan--) {
+				if ((selectedMask & (1u << chan)) != 0) {
+					PartPcs.DrawMenuIdx(*reinterpret_cast<int*>(*reinterpret_cast<int*>(bytes + 0x840) + 0xA484 + chan * 0x524));
+				}
+			}
+		}
 		drewModel = true;
 	}
 

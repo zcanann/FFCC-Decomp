@@ -287,7 +287,7 @@ static inline CCharaPcs::CHandle** GetBonusDisplayHandleSlots(CMenuPcs* menu)
 	return reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(menu) + 0x774);
 }
 
-static void InitAnimSprite(BonusAnimSprite* sprite, int kind, short x, short y, short w, short h, int startFrame, int duration)
+static inline void InitAnimSprite(BonusAnimSprite* sprite, int kind, short x, short y, short w, short h, int startFrame, int duration)
 {
 	sprite->x = x;
 	sprite->y = y;
@@ -305,7 +305,7 @@ static void InitAnimSprite(BonusAnimSprite* sprite, int kind, short x, short y, 
 	sprite->scale = 1.0f;
 }
 
-static void ResetAnimSpriteMotion(BonusAnimSprite* sprite)
+static inline void ResetAnimSpriteMotion(BonusAnimSprite* sprite)
 {
 	sprite->mulX = 0.0f;
 	sprite->mulY = 0.0f;

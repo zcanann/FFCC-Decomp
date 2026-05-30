@@ -276,6 +276,12 @@ static const char s_FALSE_803317F4[] = "FALSE";
 
 static const int kMcListEntrySize = 0x48;
 static const int kMcListCount = 4;
+static const unsigned short s_wmLoadCharaModels[] = {
+    0x006E, 0x0034, 0x007F, 0x0043, 0x0042, 0x0049, 0x002A, 0x0025,
+    0x0055, 0x0057, 0x0056, 0x0058, 0x0059, 0x0024, 0x005A, 0x005C,
+    0x005D, 0x0064, 0x0064, 0x0064, 0x0064, 0x0043, 0x0012, 0x0013,
+    0x0014, 0x0015, 0x0016, 0x0017, 0x0018, 0x0019, 0x001A, 0x0064,
+};
 static const float s_MainMenuSubFrameWidths[5] = {264.0f, 264.0f, 264.0f, 264.0f, 264.0f};
 static Vec s_RingOrgPos;
 static Vec s_MMenuPos[5];
@@ -675,6 +681,40 @@ void CMenuPcs::loadData()
 	reinterpret_cast<void**>(bytes + 0x808)[0] = 0;
 	reinterpret_cast<void**>(bytes + 0x80C)[0] = 0;
 	reinterpret_cast<void**>(bytes + 0x810)[0] = 0;
+
+	for (int i = 0; i < 0x28; i++) {
+		CCharaPcs::CHandle* handle = new (m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x1F4) CCharaPcs::CHandle;
+		reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x774)[i] = handle;
+		handle->Add();
+
+		int charaKind;
+		unsigned long charaNo;
+		if (i < 0x20) {
+			CharaPcs.m_charaAllocStage = 1;
+			charaKind = 3;
+			charaNo = s_wmLoadCharaModels[i];
+		} else {
+			CCaravanWork& caravan = Game.m_caravanWorkArr[i - 0x20];
+			CharaPcs.m_charaAllocStage = 0;
+			if (caravan.m_shopState != 0) {
+				charaKind = 0;
+				charaNo = caravan.m_tribeId * 200 + 100;
+				if (caravan.m_genderFlag != 0) {
+					charaNo += 100;
+				}
+				charaNo += caravan.m_appearanceVariant;
+			} else {
+				charaKind = 3;
+				charaNo = s_wmLoadCharaModels[21];
+			}
+		}
+
+		handle->LoadModel(charaKind, charaNo, 0, 0, -1, 0, 0);
+		handle->m_flags |= 0x141;
+	}
+	CharaPcs.m_charaAllocStage = 0;
+	*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x774)[6]->m_model) + 0x9C) =
+	    FLOAT_803314B0;
 
 	reinterpret_cast<void**>(bytes + 0x814)[0] = new unsigned char[0xC80];
 	memset(reinterpret_cast<void**>(bytes + 0x814)[0], 0, 0xC80);

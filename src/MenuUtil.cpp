@@ -485,7 +485,8 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 		return;
 	}
 
-	u32 y = lineBaseY[drawPrefix + 2];
+	u32 baseY = lineBaseY[drawPrefix + 2];
+	u32 y = baseY;
 	if (drawPrefix != 0) {
 		font->SetPosX(FLOAT_8033357c);
 		font->SetPosY(static_cast<float>(static_cast<int>(y)));
@@ -519,6 +520,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 	}
 
 	font->SetPosX(FLOAT_8033357c);
+	y = static_cast<u32>(static_cast<float>(static_cast<int>(baseY)) + lineStep);
 	font->SetPosY(static_cast<float>(static_cast<int>(y)));
 
 	if ((flags & 0x1000) == 0) {

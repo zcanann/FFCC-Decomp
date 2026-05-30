@@ -1772,7 +1772,7 @@ int CGPartyObj::getReplaceStat(int state)
 		if (state < 7 && state == -20) {
 			state = -1;
 		} else {
-			state = CGCharaObj::getReplaceStat(state);
+			return CGCharaObj::getReplaceStat(state);
 		}
 	}
 

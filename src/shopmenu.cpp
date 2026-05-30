@@ -1472,8 +1472,8 @@ void CShopMenu::DrawItemList()
             SetShadow__5CFontFi(font, 0);
             SetScale__5CFontFf(FLOAT_80332d28, font);
 
-            _GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
-            font->SetColor(white);
+            CColor white(0xFF, 0xFF, 0xFF, 0xFF);
+            font->SetColor(white.color);
             DrawInit__5CFontFv(font);
             SetPosX__5CFontFf(static_cast<float>(frameX - 0x54), font);
             SetPosY__5CFontFf(static_cast<float>(y - 0x14), font);
@@ -1818,8 +1818,8 @@ void CShopMenu::DrawSoubi()
     SetShadow__5CFontFi(font, 1);
     SetScale__5CFontFf(FLOAT_80332d28, font);
 
-    _GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
-    font->SetColor(white);
+    CColor white(0xFF, 0xFF, 0xFF, 0xFF);
+    font->SetColor(white.color);
     DrawInit__5CFontFv(font);
 
     char* itemName = 0;
@@ -1847,7 +1847,7 @@ void CShopMenu::DrawSoubi()
     SetShadow__5CFontFi(labelFont, 0);
     SetScaleX__5CFontFf(FLOAT_80332d2c, labelFont);
     SetScaleY__5CFontFf(FLOAT_80332d28, labelFont);
-    labelFont->SetColor(white);
+    labelFont->SetColor(white.color);
 
     char* equipText = ShopMenuMes(languageId, SHOP_MENU_TEXT_EQUIP);
     float equipTextX = CalcCenteredShopMenuX(labelFont, equipText);
@@ -2123,8 +2123,8 @@ void CShopMenu::DrawShop0()
     SetShadow__5CFontFi(font, 1);
     SetScale__5CFontFf(FLOAT_80332d8c, font);
 
-    _GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
-    font->SetColor(white);
+    CColor white(0xFF, 0xFF, 0xFF, 0xFF);
+    font->SetColor(white.color);
 
     for (int i = 0; i < 3; i++) {
         int x = 0x88;

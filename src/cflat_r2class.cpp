@@ -699,8 +699,12 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			break;
 		}
 		case -0x90:
-			engineObject->m_lookAtAccumYaw = static_cast<float>(localBase[0]);
-			engineObject->m_lookAtAccumPitch = static_cast<float>(localBase[1]);
+			{
+				float yaw = static_cast<float>(localBase[0]);
+				float pitch = static_cast<float>(localBase[1]);
+				engineObject->m_lookAtAccumYaw = yaw;
+				engineObject->m_lookAtAccumPitch = pitch;
+			}
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;

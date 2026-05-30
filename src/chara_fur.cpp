@@ -1141,19 +1141,17 @@ void CChara::InitFurTexBuffer()
 	int row = 0;
 	do {
 		int inner = 0;
-		int idx0 = row << 1;
 		for (int count = 8; count != 0; count--) {
 			int idxBase = inner + row;
-			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Chara) + idx0 + 4) = 0x7FFF;
-			idx0 += 0x10;
+			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Chara) + (idxBase << 1) + 4) = 0x7FFF;
 			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Chara) + ((idxBase + 1) << 1) + 4) = 0x7FFF;
-			inner += 8;
 			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Chara) + ((idxBase + 2) << 1) + 4) = 0x7FFF;
 			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Chara) + ((idxBase + 3) << 1) + 4) = 0x7FFF;
 			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Chara) + ((idxBase + 4) << 1) + 4) = 0x7FFF;
 			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Chara) + ((idxBase + 5) << 1) + 4) = 0x7FFF;
 			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Chara) + ((idxBase + 6) << 1) + 4) = 0x7FFF;
 			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Chara) + ((idxBase + 7) << 1) + 4) = 0x7FFF;
+			inner += 8;
 		}
 		i++;
 		row += 0x40;

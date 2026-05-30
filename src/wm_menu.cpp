@@ -4873,10 +4873,10 @@ void CMenuPcs::DrawTitleMenu()
 	int worldState = *reinterpret_cast<int*>(bytes + 0x82C);
 	short state = *reinterpret_cast<short*>(worldState + 0x10);
 
-	if (state == 0 && *reinterpret_cast<char*>(worldState + 8) != 0) {
-		if (bytes[0x858] != 0) {
-			THPSimpleDrawCurrentFrame((_GXRenderModeObj*)DAT_80238028, 0, 0, 0x280, 0x1C0);
-		}
+		if (state == 0 && *reinterpret_cast<char*>(worldState + 8) != 0) {
+			if (bytes[0x858] != 0) {
+				THPSimpleDrawCurrentFrame((_GXRenderModeObj*)DAT_80238028, 0, 0, 0x280, 0x1C0);
+			}
 		short sVarE = *reinterpret_cast<short*>(worldState + 0x0E);
 		if (sVarE != 0 || *reinterpret_cast<short*>(worldState + 0x22) > 0xB42) {
 			if (sVarE != -1) {
@@ -4946,6 +4946,12 @@ void CMenuPcs::DrawTitleMenu()
 			fadeColor = fadeColor | (fadeColor << 8) | (fadeColor << 16) | (fadeColor << 24);
 			GXSetChanMatColor(GX_COLOR0A0, *(_GXColor*)&fadeColor);
 			SetTexture((TEX)0xFFFFFFFF);
+			GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_SET);
+			GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+			GXPosition3f32(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc);
+			GXPosition3f32(FLOAT_803313e0, FLOAT_803313dc, FLOAT_803313dc);
+			GXPosition3f32(FLOAT_803313e0, FLOAT_803313e4, FLOAT_803313dc);
+			GXPosition3f32(FLOAT_803313dc, FLOAT_803313e4, FLOAT_803313dc);
 		}
 
 		// Menu items

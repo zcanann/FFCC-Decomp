@@ -171,7 +171,7 @@ unsigned long CMes::drawTagString(CFont* font, char* text, int drawChars, int br
 		}
 		else if (ch == 0xFF)
 		{
-			unsigned int tag = ((unsigned int)*src++ - 0xA0U) & 0xFFFF;
+			int tag = ((int)*src++ - 0xA0) & 0xFFFF;
 			if (tag == 1)
 			{
 				continueDraw = false;

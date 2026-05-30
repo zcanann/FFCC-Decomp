@@ -1769,8 +1769,10 @@ int CMenuPcs::CmakeNameCtrl()
                         return 0;
                     }
 
-                    name[len] = rowText[select];
-                    name[len + 1] = '\0';
+                    char picked[2];
+                    picked[0] = rowText[select];
+                    picked[1] = '\0';
+                    strcat(name, picked, 0x12);
                     if (strlen(name) > 6) {
                         select = 0xB;
                         row = 5;

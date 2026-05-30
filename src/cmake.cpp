@@ -3347,8 +3347,8 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
     }
 
     const char* rowText = s_NameEntryStr[table * 5 + row];
-    size_t rowLen = strlen(rowText);
-    if (select < 0 || static_cast<size_t>(select) >= rowLen) {
+    int rowLen = strlen(rowText);
+    if (select < 0 || select >= rowLen) {
         Sound.PlaySe(4, 0x40, 0x7f, 0);
         return 0;
     }

@@ -3,6 +3,7 @@
 #include "ffcc/fontman.h"
 #include "ffcc/game.h"
 #include "ffcc/p_menu.h"
+#include "ffcc/mesmenu.h"
 #include "ffcc/joybus.h"
 #include "ffcc/strcase.h"
 #include "ffcc/system.h"
@@ -27,7 +28,7 @@ static const char s_mesNumFmt[] = "%d";
 static const char s_mesFallback[] = "---";
 static const char s_mesEmpty[] = "";
 static char* sTag54Source;
-static unsigned char sTag54Init;
+static char sTag54Init;
 
 struct CMesFlatTableView
 {
@@ -102,19 +103,7 @@ static void ApplyCaseMode(char* text, int& caseMode)
 	caseMode = 0;
 }
 
-static char* GetFlatName(int tableIdx, int entryIdx)
-{
-	CMesFlatDataView* flat = (CMesFlatDataView*)&Game.m_cFlatDataArr[1];
-	if ((unsigned int)tableIdx >= 8U)
-	{
-		return (char*)s_mesEmpty;
-	}
-	if ((unsigned int)entryIdx >= (unsigned int)flat->m_tabl[tableIdx].m_numEntries)
-	{
-		return (char*)s_mesEmpty;
-	}
-	return flat->m_tabl[tableIdx].m_strings[entryIdx];
-}
+#define FLAT_NAME_DIRECT(tableIdx, entryIdx) (((CMesFlatDataView*)&Game.m_cFlatDataArr[1])->m_tabl[(tableIdx)].m_strings[(entryIdx)])
 
 static void AdvanceMesLine(CMes* mes, CFont* font)
 {
@@ -153,34 +142,33 @@ static void AddMesFlag(CMes* mes, unsigned char type, unsigned char index, short
  */
 unsigned long CMes::drawTagString(CFont* font, char* text, int drawChars, int breakOnLineTag, int lineBaseY)
 {
-	unsigned int width = 0;
+	int width = 0;
 	unsigned char* src = (unsigned char*)text;
 	bool continueDraw = true;
 	float lineStartX = font->posX;
-	int lineStartXInt = (int)lineStartX;
 
 	while (continueDraw)
 	{
-		unsigned char ch = *src;
-		unsigned char* next = src + 1;
+		unsigned short ch = *src++;
 
 		if (ch == 0)
 		{
 			continueDraw = false;
-			src = next;
 		}
 		else if (ch == 0xFF)
 		{
-			unsigned char tag = *next;
-			src += 2;
-			if (tag == 0xA1)
+			int tag = ((int)*src++ - 0xA0) & 0xFFFF;
+			if (tag != 1)
+			{
+				if ((tag == 0) && (breakOnLineTag != 0))
+				{
+					font->SetPosX((float)(int)lineStartX);
+					font->SetPosY((float)lineBaseY + font->posY + (float)font->m_glyphHeight * font->scaleY);
+				}
+			}
+			else
 			{
 				continueDraw = false;
-			}
-			else if ((tag == 0xA0) && (breakOnLineTag != 0))
-			{
-				font->SetPosX((float)lineStartXInt);
-				font->SetPosY((float)lineBaseY + font->posY + (float)font->m_glyphHeight * font->scaleY);
 			}
 		}
 		else
@@ -189,8 +177,7 @@ unsigned long CMes::drawTagString(CFont* font, char* text, int drawChars, int br
 			{
 				font->Draw(ch);
 			}
-			width = (unsigned int)((double)(float)width + (double)font->GetWidth(ch));
-			src = next;
+			width = (int)((float)width + font->GetWidth(ch));
 		}
 	}
 
@@ -207,6 +194,9 @@ unsigned long CMes::drawTagString(CFont* font, char* text, int drawChars, int br
  */
 void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOnLineBreak)
 {
+	const unsigned char* in = (const unsigned char*)src;
+	char* dst = out;
+
 	if (sTag54Init == 0)
 	{
 		sTag54Source = (char*)s_mesEmpty;
@@ -215,8 +205,6 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 
 	int caseMode = 0;
 	int branchMode = 0;
-	const unsigned char* in = (const unsigned char*)src;
-	char* dst = out;
 
 	while (true)
 	{
@@ -265,7 +253,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		case 8:
 		{
 			signed char varIndex = (signed char)GetMesNibbleValue((const char*)in + 4);
-			const char* text = GetFlatName(5, CMes::m_tempVar[varIndex]);
+			const char* text = FLAT_NAME_DIRECT(5, CMes::m_tempVar[varIndex]);
 			strcpy(dst, text);
 			dst += strlen(dst);
 			next = in + 6;
@@ -283,15 +271,15 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 			int value = CMes::m_tempVar[varIndex];
 			if ((tag == 9) || (tag == 0x37))
 			{
-				strcpy(dst, GetFlatName(0, value * 5 + 1));
+				strcpy(dst, FLAT_NAME_DIRECT(0, value * 5 + 1));
 			}
 			else if (tag == 0x1D)
 			{
-				strcpy(dst, GetFlatName(0, value * 5));
+				strcpy(dst, FLAT_NAME_DIRECT(0, value * 5));
 			}
 			else if (tag == 0x39)
 			{
-				strcpy(dst, GetFlatName(0, value * 5 + 3));
+				strcpy(dst, FLAT_NAME_DIRECT(0, value * 5 + 3));
 			}
 			else if (tag == 0x3B)
 			{
@@ -326,15 +314,15 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 			int value = CMes::m_tempVar[varIndex];
 			if ((tag == 0x2A) || (tag == 0x38))
 			{
-				strcpy(dst, GetFlatName(1, value * 5 + 1));
+				strcpy(dst, FLAT_NAME_DIRECT(1, value * 5 + 1));
 			}
 			else if (tag == 0x1E)
 			{
-				strcpy(dst, GetFlatName(1, value * 5));
+				strcpy(dst, FLAT_NAME_DIRECT(1, value * 5));
 			}
 			else if (tag == 0x3A)
 			{
-				strcpy(dst, GetFlatName(1, value * 5 + 3));
+				strcpy(dst, FLAT_NAME_DIRECT(1, value * 5 + 3));
 			}
 			else if (tag == 0x3C)
 			{
@@ -360,7 +348,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		case 0x2B:
 		{
 			signed char varIndex = (signed char)GetMesNibbleValue((const char*)in + 4);
-			strcpy(dst, GetFlatName(2, CMes::m_tempVar[varIndex]));
+			strcpy(dst, FLAT_NAME_DIRECT(2, CMes::m_tempVar[varIndex]));
 			dst += strlen(dst);
 			next = in + 6;
 			break;
@@ -368,7 +356,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		case 0x2C:
 		{
 			signed char varIndex = (signed char)GetMesNibbleValue((const char*)in + 4);
-			strcpy(dst, GetFlatName(3, CMes::m_tempVar[varIndex]));
+			strcpy(dst, FLAT_NAME_DIRECT(3, CMes::m_tempVar[varIndex]));
 			dst += strlen(dst);
 			next = in + 6;
 			break;
@@ -376,7 +364,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		case 0x2D:
 		{
 			signed char varIndex = (signed char)GetMesNibbleValue((const char*)in + 4);
-			strcpy(dst, GetFlatName(3, CMes::m_tempVar[varIndex] + 0x3C));
+			strcpy(dst, FLAT_NAME_DIRECT(3, CMes::m_tempVar[varIndex] + 0x3C));
 			dst += strlen(dst);
 			next = in + 6;
 			break;
@@ -384,7 +372,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		case 0x2E:
 		{
 			signed char varIndex = (signed char)GetMesNibbleValue((const char*)in + 2);
-			strcpy(dst, GetFlatName(5, CMes::m_tempVar[varIndex]));
+			strcpy(dst, FLAT_NAME_DIRECT(5, CMes::m_tempVar[varIndex]));
 			dst += strlen(dst);
 			next = in + 4;
 			break;
@@ -518,14 +506,18 @@ int CMes::useFlag(int maxCount, int stopOnClear)
 		{
 			if (type < 3)
 			{
-				if (type == 1)
+				if (type != 1)
+				{
+					if (type != 0)
+					{
+						*(int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3cc0) =
+						    (int)*(short*)(flagEntry + 4);
+					}
+				}
+				else
 				{
 					int idx = (unsigned int)flagEntry[2] * 4 + 0x3cc0;
 					*(int*)((char*)this + idx) = *(int*)((char*)this + idx) + 1;
-				}
-				else if (type != 0)
-				{
-					*(int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3cc0) = (int)*(short*)(flagEntry + 4);
 				}
 			}
 			else if ((type < 5) &&
@@ -602,12 +594,12 @@ void CMes::Draw()
 					}
 					MenuPcs.DrawInit();
 
-					unsigned int iconId = ch;
+					int iconId = ch;
 					switch (ch + 0x48)
 					{
 					case 0x4F:
 					{
-						unsigned int mode;
+						int mode;
 						bool specialPad = false;
 						if ((Game.m_currentMapId == 0x21) && (Joybus.GetPadType(0) != 0x40))
 						{
@@ -616,9 +608,7 @@ void CMes::Draw()
 						if (specialPad)
 						{
 							int padType = Joybus.GetPadType(0);
-							mode = (unsigned int)(((0x40000U - (unsigned int)padType) |
-							                       ((unsigned int)padType - 0x40000U)) >>
-							                      31);
+							mode = (unsigned int)(((0x40000 - padType) | (padType - 0x40000)) >> 31);
 						}
 						else
 						{
@@ -629,7 +619,7 @@ void CMes::Draw()
 					}
 					case 0x50:
 					{
-						unsigned int mode;
+						int mode;
 						bool specialPad = false;
 						if ((Game.m_currentMapId == 0x21) && (Joybus.GetPadType(0) != 0x40))
 						{
@@ -638,9 +628,7 @@ void CMes::Draw()
 						if (specialPad)
 						{
 							int padType = Joybus.GetPadType(0);
-							mode = (unsigned int)(((0x40000U - (unsigned int)padType) |
-							                       ((unsigned int)padType - 0x40000U)) >>
-							                      31);
+							mode = (unsigned int)(((0x40000 - padType) | (padType - 0x40000)) >> 31);
 						}
 						else
 						{
@@ -651,7 +639,7 @@ void CMes::Draw()
 					}
 					case 0x52:
 					{
-						unsigned int mode;
+						int mode;
 						bool specialPad = false;
 						if ((Game.m_currentMapId == 0x21) && (Joybus.GetPadType(0) != 0x40))
 						{
@@ -660,9 +648,7 @@ void CMes::Draw()
 						if (specialPad)
 						{
 							int padType = Joybus.GetPadType(0);
-							mode = (unsigned int)(((0x40000U - (unsigned int)padType) |
-							                       ((unsigned int)padType - 0x40000U)) >>
-							                      31);
+							mode = (unsigned int)(((0x40000 - padType) | (padType - 0x40000)) >> 31);
 						}
 						else
 						{
@@ -673,7 +659,7 @@ void CMes::Draw()
 					}
 					case 0x53:
 					{
-						unsigned int mode;
+						int mode;
 						bool specialPad = false;
 						if ((Game.m_currentMapId == 0x21) && (Joybus.GetPadType(0) != 0x40))
 						{
@@ -682,9 +668,7 @@ void CMes::Draw()
 						if (specialPad)
 						{
 							int padType = Joybus.GetPadType(0);
-							mode = (unsigned int)(((0x40000U - (unsigned int)padType) |
-							                       ((unsigned int)padType - 0x40000U)) >>
-							                      31);
+							mode = (unsigned int)(((0x40000 - padType) | (padType - 0x40000)) >> 31);
 						}
 						else
 						{
@@ -716,19 +700,31 @@ void CMes::Draw()
 					if (activeFontId != fontId)
 					{
 						nextFont = *reinterpret_cast<CFont**>(menuPcs + 0x100);
-						if (fontId == 0)
+						if (fontId != 2)
 						{
-							nextFont = *reinterpret_cast<CFont**>(menuPcs + 0x0F8);
-						}
-						else if ((fontId == 1) || (fontId >= 4))
-						{
-							nextFont = font;
+							if (fontId < 2)
+							{
+								nextFont = *reinterpret_cast<CFont**>(menuPcs + 0x0F8);
+								if (fontId != 0)
+								{
+									nextFont = font;
+								}
+							}
+							else
+							{
+								nextFont = font;
+								if (fontId < 4)
+								{
+									nextFont = *reinterpret_cast<CFont**>(menuPcs + 0x100);
+								}
+							}
 						}
 
 						nextFont->SetShadow(*(int*)((char*)this + 0x3D38));
 						nextFont->SetMargin(FLOAT_8033089c);
+						float fontScaleY = *(float*)((char*)this + 0x3D48);
 						nextFont->SetScaleX(*(float*)((char*)this + 0x3D44));
-						nextFont->SetScaleY(*(float*)((char*)this + 0x3D48));
+						nextFont->SetScaleY(fontScaleY);
 						nextFont->DrawInit();
 						activeFontId = fontId;
 						font = nextFont;
@@ -759,8 +755,9 @@ void CMes::Draw()
 
 					font->SetPosX(*(float*)((char*)this + 0x3C9C) + *glyph);
 					font->SetPosY(*(float*)((char*)this + 0x3CA0) + (float)*(short*)(glyph + 2));
+					float glyphScaleY = FLOAT_803308a0 * (float)*(unsigned char*)((char*)glyph + 0x11);
 					font->SetScaleX(FLOAT_803308a0 * (float)*(unsigned char*)((char*)glyph + 0x0A));
-					font->SetScaleY(FLOAT_803308a0 * (float)*(unsigned char*)((char*)glyph + 0x11));
+					font->SetScaleY(glyphScaleY);
 					font->renderFlags = font->renderFlags & 0xF7 | 8;
 					font->Draw((unsigned short)ch);
 					font->renderFlags &= 0xF7;
@@ -797,8 +794,8 @@ void CMes::Calc()
 	{
 		if ((int)(unsigned int)*(unsigned short*)(textEntry + 0xC) <= *(int*)((char*)this + 0x3C80))
 		{
-			unsigned char fadeMax = *(unsigned char*)(textEntry + 0xF) >> 4;
-			unsigned char fadeCurr = (*(unsigned char*)(textEntry + 0xF) & 0xF) + 1;
+			int fadeMax = *(unsigned char*)(textEntry + 0xF) >> 4;
+			int fadeCurr = (*(unsigned char*)(textEntry + 0xF) & 0xF) + 1;
 			if (fadeCurr < fadeMax)
 			{
 				fadeMax = fadeCurr;
@@ -819,20 +816,23 @@ void CMes::Calc()
 			break;
 		}
 
-		unsigned char type = *flagEntry;
+		int type = *flagEntry;
 		if (type != 3)
 		{
 			if (type < 3)
 			{
-				if (type == 1)
+				if (type != 1)
+				{
+					if (type != 0)
+					{
+						*(int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3CC0) =
+						    (int)*(short*)(flagEntry + 4);
+					}
+				}
+				else
 				{
 					int idx = (unsigned int)flagEntry[2] * 4 + 0x3CC0;
 					*(int*)((char*)this + idx) = *(int*)((char*)this + idx) + 1;
-				}
-				else if (type != 0)
-				{
-					*(int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3CC0) =
-					    (int)*(short*)(flagEntry + 4);
 				}
 			}
 			else if ((type < 5) &&
@@ -848,11 +848,12 @@ void CMes::Calc()
 
 	{
 		int next = *(int*)((char*)this + 0x3C80) + 1;
-		if (next > 0x7FFE)
+		int max = 0x7FFF;
+		if (next < 0x7FFF)
 		{
-			next = 0x7FFF;
+			max = next;
 		}
-		*(int*)((char*)this + 0x3C80) = next;
+		*(int*)((char*)this + 0x3C80) = max;
 	}
 
 doneAdvance:
@@ -915,11 +916,6 @@ void CMes::addString(char** text, int branchMode)
 		font = *reinterpret_cast<CFont**>(menuPcs + 0x100);
 	}
 
-	if (font == 0)
-	{
-		return;
-	}
-
 	font->SetShadow(*(int*)((char*)this + 0x3D38));
 	font->SetMargin(FLOAT_8033089c);
 	font->SetScaleX(*(float*)((char*)this + 0x3D44));
@@ -937,7 +933,7 @@ void CMes::addString(char** text, int branchMode)
 
 		if (ch == 0xFF)
 		{
-			unsigned int tag = ((unsigned int)(unsigned char)**text - 0xA0U) & 0xFFU;
+			unsigned int tag = ((unsigned int)(unsigned char)**text - 0xA0U) & 0xFFFFU;
 			*text = *text + 1;
 
 			switch (tag)
@@ -998,6 +994,177 @@ void CMes::addString(char** text, int branchMode)
 				*(float*)((char*)this + 0x3C84) =
 				    *(float*)((char*)this + 0x3C84) + FLOAT_803308A8 + *(float*)((char*)this + 0x3D3C);
 				break;
+			case 8:
+			{
+				int oldColor = *(int*)((char*)this + 0x3D28);
+				if (ReadTagU8(text) != 0)
+				{
+					*(int*)((char*)this + 0x3D28) = 6;
+				}
+				char* flatText = FLAT_NAME_DIRECT(5, CMes::m_tempVar[(signed char)ReadTagU8(text)] & 0xFFFF);
+				addString(&flatText, branchMode);
+				*(int*)((char*)this + 0x3D28) = oldColor;
+				break;
+			}
+			case 9:
+			case 0x19:
+			case 0x1D:
+			case 0x37:
+			case 0x39:
+			case 0x3B:
+			case 0x3D:
+			case 0x3F:
+			{
+				int oldColor = *(int*)((char*)this + 0x3D28);
+				if (ReadTagU8(text) != 0)
+				{
+					*(int*)((char*)this + 0x3D28) = 5;
+				}
+				char name[32];
+				char* namePtr = name;
+				int value = CMes::m_tempVar[(signed char)ReadTagU8(text)] & 0xFFFF;
+				switch (tag)
+				{
+				case 9:
+				case 0x37:
+					strcpy(namePtr, FLAT_NAME_DIRECT(0, value * 5 + 1));
+					break;
+				case 0x1D:
+					strcpy(namePtr, FLAT_NAME_DIRECT(0, value * 5));
+					break;
+				case 0x3B:
+					Game.MakeArtItemName(namePtr, value, 1);
+					break;
+				case 0x19:
+					Game.MakeArtsItemNames(namePtr, value);
+					break;
+				case 0x3D:
+					Game.MakeArtItemName(namePtr, value, CMes::m_tempVar[(signed char)ReadTagU8(text)] & 0xFFFF);
+					break;
+				case 0x3F:
+					Game.MakeNumItemName(namePtr, value, CMes::m_tempVar[(signed char)ReadTagU8(text)] & 0xFFFF);
+					break;
+				case 0x39:
+					strcpy(namePtr, FLAT_NAME_DIRECT(0, value * 5 + 3));
+					break;
+				}
+				ApplyCaseMode(namePtr, caseMode);
+				addString(&namePtr, branchMode);
+				*(int*)((char*)this + 0x3D28) = oldColor;
+				break;
+			}
+			case 0x1E:
+			case 0x1F:
+			case 0x2A:
+			case 0x38:
+			case 0x3A:
+			case 0x3C:
+			case 0x3E:
+			case 0x40:
+			{
+				int oldColor = *(int*)((char*)this + 0x3D28);
+				if (ReadTagU8(text) != 0)
+				{
+					*(int*)((char*)this + 0x3D28) = 0;
+				}
+				char name[32];
+				char* namePtr = name;
+				int value = CMes::m_tempVar[(signed char)ReadTagU8(text)] & 0xFFFF;
+				switch (tag)
+				{
+				case 0x1E:
+					strcpy(namePtr, FLAT_NAME_DIRECT(1, value * 5));
+					break;
+				case 0x2A:
+				case 0x38:
+					strcpy(namePtr, FLAT_NAME_DIRECT(1, value * 5 + 1));
+					break;
+				case 0x3C:
+					Game.MakeArtMonName(namePtr, value, 1);
+					break;
+				case 0x1F:
+					Game.MakeArtsMonNames(namePtr, value);
+					break;
+				case 0x3E:
+					Game.MakeArtMonName(namePtr, value, CMes::m_tempVar[(signed char)ReadTagU8(text)] & 0xFFFF);
+					break;
+				case 0x40:
+					Game.MakeNumMonName(namePtr, value, CMes::m_tempVar[(signed char)ReadTagU8(text)] & 0xFFFF);
+					break;
+				case 0x3A:
+					strcpy(namePtr, FLAT_NAME_DIRECT(1, value * 5 + 3));
+					break;
+				}
+				ApplyCaseMode(namePtr, caseMode);
+				addString(&namePtr, branchMode);
+				*(int*)((char*)this + 0x3D28) = oldColor;
+				break;
+			}
+			case 0x2B:
+			{
+				int oldColor = *(int*)((char*)this + 0x3D28);
+				if (ReadTagU8(text) != 0)
+				{
+					*(int*)((char*)this + 0x3D28) = 6;
+				}
+				char name[32];
+				char* namePtr = name;
+				strcpy(namePtr, FLAT_NAME_DIRECT(2, CMes::m_tempVar[(signed char)ReadTagU8(text)] & 0xFFFF));
+				ApplyCaseMode(namePtr, caseMode);
+				addString(&namePtr, branchMode);
+				*(int*)((char*)this + 0x3D28) = oldColor;
+				break;
+			}
+			case 0x2C:
+			{
+				int oldColor = *(int*)((char*)this + 0x3D28);
+				if (ReadTagU8(text) != 0)
+				{
+					*(int*)((char*)this + 0x3D28) = 4;
+				}
+				char name[32];
+				char* namePtr = name;
+				strcpy(namePtr, FLAT_NAME_DIRECT(3, CMes::m_tempVar[(signed char)ReadTagU8(text)] & 0xFFFF));
+				ApplyCaseMode(namePtr, caseMode);
+				addString(&namePtr, branchMode);
+				*(int*)((char*)this + 0x3D28) = oldColor;
+				break;
+			}
+			case 0x2D:
+			{
+				int oldColor = *(int*)((char*)this + 0x3D28);
+				if (ReadTagU8(text) != 0)
+				{
+					*(int*)((char*)this + 0x3D28) = 3;
+				}
+				char name[32];
+				char* namePtr = name;
+				strcpy(namePtr, FLAT_NAME_DIRECT(3, (CMes::m_tempVar[(signed char)ReadTagU8(text)] & 0xFFFF) + 0x3C));
+				ApplyCaseMode(namePtr, caseMode);
+				addString(&namePtr, branchMode);
+				*(int*)((char*)this + 0x3D28) = oldColor;
+				break;
+			}
+			case 0x2E:
+			{
+				char* flatText = FLAT_NAME_DIRECT(5, CMes::m_tempVar[(signed char)ReadTagU8(text)] & 0xFFFF);
+				addString(&flatText, branchMode);
+				break;
+			}
+			case 0x2F:
+			{
+				char* fallback = (char*)s_mesFallback;
+				addString(&fallback, branchMode);
+				break;
+			}
+			case 0x30:
+			{
+				char number[256];
+				char* numberPtr = number;
+				sprintf(numberPtr, s_mesNumFmt, CMes::m_tempVar[(signed char)ReadTagU8(text)]);
+				addString(&numberPtr, branchMode);
+				break;
+			}
 			case 0x0A:
 			{
 				unsigned char idx = (unsigned char)ReadTagU8(text);
@@ -1065,6 +1232,10 @@ void CMes::addString(char** text, int branchMode)
 						*(int*)((char*)this + 0x3CB0) = value;
 					}
 				}
+				else if (System.m_execParam != 0)
+				{
+					System.Printf(const_cast<char*>(s_mesTagUnknown), tag + 0xA0);
+				}
 				break;
 			}
 			case 0x26:
@@ -1074,14 +1245,14 @@ void CMes::addString(char** text, int branchMode)
 				*(int*)((char*)this + 0x3CB8) = ReadTagS8(text);
 				break;
 			case 0x31:
-				*(int*)((char*)this + 0x3C84) = ReadTagS16(text);
-				*(int*)((char*)this + 0x3C88) = ReadTagS16(text);
+				*(float*)((char*)this + 0x3C84) = (float)ReadTagS16(text);
+				*(float*)((char*)this + 0x3C88) = (float)ReadTagS16(text);
 				break;
 			case 0x32:
 				*(int*)((char*)this + 0x3D28) = 9;
 				break;
 			case 0x33:
-				*(int*)((char*)this + 0x3D3C) = ReadTagS8(text);
+				*(float*)((char*)this + 0x3D3C) = (float)ReadTagS8(text);
 				break;
 			case 0x34:
 			{
@@ -1104,8 +1275,8 @@ void CMes::addString(char** text, int branchMode)
 			case 0x35:
 			{
 				float scale = FLOAT_803308a0 * (float)ReadTagS16(text);
-				*(float*)((char*)this + 0x3D44) = scale;
 				*(float*)((char*)this + 0x3D48) = scale;
+				*(float*)((char*)this + 0x3D44) = scale;
 				font->SetScaleX(*(float*)((char*)this + 0x3D44));
 				font->SetScaleY(*(float*)((char*)this + 0x3D48));
 				break;
@@ -1192,12 +1363,6 @@ render_char:
 			continue;
 		}
 
-		char tmpCharBuf[2];
-		tmpCharBuf[0] = (char)ch;
-		tmpCharBuf[1] = '\0';
-		ApplyCaseMode(tmpCharBuf, caseMode);
-		ch = (unsigned char)tmpCharBuf[0];
-
 		float* glyph = (float*)((char*)this + *(int*)((char*)this + 8) * 0x14 + 0x0C);
 		*(unsigned char*)((char*)glyph + 0x12) = (unsigned char)*(int*)((char*)this + 0x3D28);
 		*(unsigned char*)((char*)glyph + 0x10) = ch;
@@ -1272,23 +1437,27 @@ void CMes::Next()
 	float* curr;
 	char tempFlags[0x50];
 
-	if (*(int*)((char*)this + 4) != 0)
+	if (*(unsigned int*)((char*)this + 4) != 0)
 	{
 		entryCount = *(int*)((char*)this + 0x3c0c);
 		flagEntry = (unsigned char*)((char*)this + *(int*)((char*)this + 0x3c10) * 6 + 0x3c14);
 		while ((halfVal = FLOAT_8033089c, *(int*)((char*)this + 0x3c10) < entryCount))
 		{
 			type = *flagEntry;
-			if (type < 3)
+			if ((type != 3) && (type < 3))
 			{
-				if (type == 1)
+				if (type != 1)
+				{
+					if (type != 0)
+					{
+						*(int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3cc0) =
+						    (int)*(short*)(flagEntry + 4);
+					}
+				}
+				else
 				{
 					remaining = (unsigned int)flagEntry[2] * 4 + 0x3cc0;
 					*(int*)((char*)this + remaining) = *(int*)((char*)this + remaining) + 1;
-				}
-				else if (type != 0)
-				{
-					*(int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3cc0) = (int)*(short*)(flagEntry + 4);
 				}
 			}
 			flagEntry += 6;
@@ -1359,62 +1528,71 @@ void CMes::Next()
  */
 void CMes::Set(char* text, int param)
 {
+	float zero = FLOAT_8033089c;
+	float one = FLOAT_80330898;
 	*(int*)((char*)this + 4) = (int)text;
 	*(int*)((char*)this + 0x3c74) = 0;
-	*(float*)((char*)this + 0x3ca8) = FLOAT_8033089c;
-	*(float*)((char*)this + 0x3ca4) = FLOAT_8033089c;
+	*(float*)((char*)this + 0x3ca8) = zero;
+	*(float*)((char*)this + 0x3ca4) = zero;
 	*(int*)((char*)this + 8) = 0;
 	*(int*)((char*)this + 0x3c10) = 0;
 	*(int*)((char*)this + 0x3c0c) = 0;
 	*(int*)((char*)this + 0x3d10) = 0;
 	*(int*)((char*)this + 0x3d30) = param;
-	*(float*)((char*)this + 0x3d3c) = FLOAT_8033089c;
+	*(float*)((char*)this + 0x3d3c) = zero;
 	*(int*)((char*)this + 0x3d40) = 0;
-	*(float*)((char*)this + 0x3d44) = FLOAT_80330898;
-	*(float*)((char*)this + 0x3d48) = FLOAT_80330898;
+	*(float*)((char*)this + 0x3d44) = one;
+	*(float*)((char*)this + 0x3d48) = one;
 	*(int*)((char*)this + 0x3d4c) = 1;
 
 	if (text != 0) {
 		unsigned char flagBackup[0x50];
 		memcpy(flagBackup, (char*)this + 0x3cc0, sizeof(flagBackup));
+		float lineZero = FLOAT_8033089c;
 
 		while (*(int*)((char*)this + 0x3c74) == 0) {
 			*(int*)((char*)this + 8) = 0;
 			*(int*)((char*)this + 0x3c10) = 0;
 			*(int*)((char*)this + 0x3c0c) = 0;
-			*(float*)((char*)this + 0x3c88) = FLOAT_8033089c;
-			*(float*)((char*)this + 0x3c84) = FLOAT_8033089c;
-			*(float*)((char*)this + 0x3c90) = FLOAT_8033089c;
-			*(float*)((char*)this + 0x3c8c) = FLOAT_8033089c;
+			*(float*)((char*)this + 0x3c88) = lineZero;
+			*(float*)((char*)this + 0x3c84) = lineZero;
+			*(float*)((char*)this + 0x3c90) = lineZero;
+			*(float*)((char*)this + 0x3c8c) = lineZero;
 
 			addString((char**)((char*)this + 4), 1);
 
 			float width = *(float*)((char*)this + 0x3c8c);
-			if (width > *(float*)((char*)this + 0x3ca4)) {
-				*(float*)((char*)this + 0x3ca4) = width;
+			if (width < *(float*)((char*)this + 0x3ca4)) {
+				width = *(float*)((char*)this + 0x3ca4);
 			}
+			*(float*)((char*)this + 0x3ca4) = width;
+
 			float height = *(float*)((char*)this + 0x3c90);
-			if (height > *(float*)((char*)this + 0x3ca8)) {
-				*(float*)((char*)this + 0x3ca8) = height;
+			if (height < *(float*)((char*)this + 0x3ca8)) {
+				height = *(float*)((char*)this + 0x3ca8);
 			}
+			*(float*)((char*)this + 0x3ca8) = height;
 		}
 
 		memcpy((char*)this + 0x3cc0, flagBackup, sizeof(flagBackup));
+		float lineSkip = FLOAT_803308a4;
+		zero = FLOAT_8033089c;
+		one = FLOAT_80330898;
 		*(float*)((char*)this + 0x3ca4) = *(float*)((char*)this + 0x3ca4) - *(float*)((char*)this + 0x3d3c);
-		*(float*)((char*)this + 0x3ca8) = *(float*)((char*)this + 0x3ca8) - FLOAT_803308a4;
+		*(float*)((char*)this + 0x3ca8) = *(float*)((char*)this + 0x3ca8) - lineSkip;
 
 		*(int*)((char*)this + 4) = (int)text;
 		*(int*)((char*)this + 0x3c74) = 0;
-		*(int*)((char*)this + 0x3cb0) = (param == 0);
+		*(int*)((char*)this + 0x3cb0) = (unsigned int)__cntlzw((unsigned int)param) >> 5;
 		*(int*)((char*)this + 0x3cb4) = 3;
 		*(int*)((char*)this + 0x3cb8) = 0;
 		*(int*)((char*)this + 0x3d10) = 0;
 		*(int*)((char*)this + 0x3d2c) = 0;
 		*(int*)((char*)this + 0x3d28) = 7;
-		*(float*)((char*)this + 0x3d3c) = FLOAT_8033089c;
+		*(float*)((char*)this + 0x3d3c) = zero;
 		*(int*)((char*)this + 0x3d40) = 0;
-		*(float*)((char*)this + 0x3d44) = FLOAT_80330898;
-		*(float*)((char*)this + 0x3d48) = FLOAT_80330898;
+		*(float*)((char*)this + 0x3d44) = one;
+		*(float*)((char*)this + 0x3d48) = one;
 		*(int*)((char*)this + 0x3d4c) = 1;
 		Next();
 	}

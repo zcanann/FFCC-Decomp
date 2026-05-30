@@ -2213,7 +2213,7 @@ unsigned short CMenuPcs::CmakeTribeCtrl()
     short& resultDir = *reinterpret_cast<short*>(state + 0x1E);
     short& tribe = *reinterpret_cast<short*>(state + 0x26);
     short& crest = *reinterpret_cast<short*>(state + 0x28);
-    short& selectField = *reinterpret_cast<short*>(state + 0x30);
+    short selectField = *reinterpret_cast<short*>(state + 0x30);
     short& mcState = *reinterpret_cast<short*>(mcWork + 10);
     unsigned short down;
     unsigned short repeat;
@@ -2266,14 +2266,14 @@ unsigned short CMenuPcs::CmakeTribeCtrl()
                 return 1;
             }
 
-            selectField = static_cast<short>(selectField - 1);
+            *reinterpret_cast<short*>(state + 0x30) = static_cast<short>(selectField - 1);
             return 0;
         }
 
         if ((down & 0x100) != 0) {
             Sound.PlaySe(2, 0x40, 0x7F, 0);
             if (selectField == 0) {
-                selectField = static_cast<short>(selectField + 1);
+                *reinterpret_cast<short*>(state + 0x30) = static_cast<short>(selectField + 1);
                 return 0;
             }
 

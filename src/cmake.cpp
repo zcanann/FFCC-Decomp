@@ -1744,7 +1744,8 @@ int CMenuPcs::CmakeNameCtrl()
     if (padBusy) {
         down = 0;
     } else {
-        down = Pad.GetPadInputs()[0].buttonDown[0];
+        __cntlzw(static_cast<unsigned int>(Pad._448_4_));
+        down = static_cast<unsigned short>(Pad.GetPadInputs()[0].buttonDown[0]);
     }
 
     padBusy = false;
@@ -1754,6 +1755,7 @@ int CMenuPcs::CmakeNameCtrl()
     if (padBusy) {
         repeat = 0;
     } else {
+        __cntlzw(static_cast<unsigned int>(Pad._448_4_));
         repeat = Pad.GetPadInputs()[0].repeatButton;
     }
 
@@ -2277,7 +2279,8 @@ unsigned short CMenuPcs::CmakeTribeCtrl()
     if (padBusy) {
         down = 0;
     } else {
-        down = Pad.GetPadInputs()[0].buttonDown[0];
+        __cntlzw(static_cast<unsigned int>(Pad._448_4_));
+        down = static_cast<unsigned short>(Pad.GetPadInputs()[0].buttonDown[0]);
     }
 
     padBusy = false;
@@ -2287,6 +2290,7 @@ unsigned short CMenuPcs::CmakeTribeCtrl()
     if (padBusy) {
         repeat = 0;
     } else {
+        __cntlzw(static_cast<unsigned int>(Pad._448_4_));
         repeat = Pad.GetPadInputs()[0].repeatButton;
     }
 

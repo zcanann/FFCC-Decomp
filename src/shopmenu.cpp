@@ -1284,15 +1284,15 @@ void CShopMenu::DrawBuySellInfo()
     if (selected != -1) {
         int caravan = ShopMenuCaravan(this);
         if (listType == 0) {
-            itemNo = static_cast<int>(*reinterpret_cast<short*>(caravan + selected * 2 + 0xBE6));
+            itemNo = static_cast<int>(*reinterpret_cast<short*>(caravan + (selected * 2 + 0xBE6)));
         } else if (listType == 1) {
-            itemNo = static_cast<int>(*reinterpret_cast<short*>(caravan + selected * 2 + 0xB6));
+            itemNo = static_cast<int>(*reinterpret_cast<short*>(caravan + (selected * 2 + 0xB6)));
         } else if (listType == 2) {
             int smithIndex = ShopMenuInt(this, 0x50 + selected * 4);
             if (smithIndex == -1) {
                 itemNo = -1;
             } else {
-                itemNo = static_cast<int>(*reinterpret_cast<short*>(caravan + smithIndex * 2 + 0xB6));
+                itemNo = static_cast<int>(*reinterpret_cast<short*>(caravan + (smithIndex * 2 + 0xB6)));
             }
         }
 

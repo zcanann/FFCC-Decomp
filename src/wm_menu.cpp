@@ -6063,7 +6063,9 @@ LAB_calc:
 	    (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x10) != 2 || bytes[0x13] == 0)) {
 		unsigned int uVar = (unsigned int)*reinterpret_cast<int*>(wmFrame + 8);
 		float t = (float)(uVar) / FLOAT_803314c0;
-		if (t < DAT_8032e8c4[DAT_8032e8c0 * 4 - 4]) {
+		if (static_cast<float>(static_cast<int>(uVar - 5)) <
+		    static_cast<float>(DOUBLE_803314a8 * static_cast<double>(DAT_8032e8c4[DAT_8032e8c0 * 4 - 4])) &&
+		    t < DAT_8032e8c4[DAT_8032e8c0 * 4 - 4]) {
 			int idx = 0;
 			float* pf = DAT_8032e8c4;
 			int cnt = DAT_8032e8c0;
@@ -6091,10 +6093,14 @@ LAB_calc:
 					cnt--;
 				} while (cnt != 0);
 			}
-			*reinterpret_cast<short*>(wmFrame + 0xD2) = (short)(int)result;
-			*reinterpret_cast<short*>(wmFrame + 0xE0) = (short)(int)result;
+			*reinterpret_cast<short*>(wmFrame + 0xD2) =
+			    static_cast<short>(*reinterpret_cast<short*>(wmFrame + 0xD2) + static_cast<short>(static_cast<int>(result)));
+			*reinterpret_cast<float*>(wmFrame + 0xE0) = result;
 		}
 
+		if (uVar14 == 2) {
+			uVar -= 5;
+		}
 		t = (float)(uVar) / FLOAT_803314c0;
 		if (t < DAT_8032e8cc[DAT_8032e8c8 * 4 - 4]) {
 			int idx = 0;
@@ -6124,8 +6130,9 @@ LAB_calc:
 					cnt--;
 				} while (cnt != 0);
 			}
-			*reinterpret_cast<short*>(wmFrame + 0xB6) = (short)(int)result;
-			*reinterpret_cast<short*>(wmFrame + 0xC4) = (short)(int)result;
+			*reinterpret_cast<short*>(wmFrame + 0xB6) =
+			    static_cast<short>(*reinterpret_cast<short*>(wmFrame + 0xB6) + static_cast<short>(static_cast<int>(result)));
+			*reinterpret_cast<float*>(wmFrame + 0xC4) = result;
 		}
 
 		*reinterpret_cast<int*>(wmFrame + 8) = *reinterpret_cast<int*>(wmFrame + 8) + 1;

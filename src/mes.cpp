@@ -27,7 +27,7 @@ static const char s_mesNumFmt[] = "%d";
 static const char s_mesFallback[] = "---";
 static const char s_mesEmpty[] = "";
 static char* sTag54Source;
-static unsigned char sTag54Init;
+static char sTag54Init;
 
 struct CMesFlatTableView
 {

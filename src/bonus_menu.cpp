@@ -984,43 +984,6 @@ void CMenuPcs::ClrBattleItem()
 
 /*
  * --INFO--
- * Address: TODO
- * Size: TODO
- */
-#pragma dont_inline on
-void CMenuPcs::GetAllPadOn()
-{
-	int statePtr = GetBonusMenuMembers(this).m_bonusStatePtr;
-	unsigned char connectedMask = 0;
-	int activePartyCount = 0;
-	int anyReady = 0;
-	int allReady = 1;
-
-	if (statePtr == 0) {
-		return;
-	}
-
-	for (int i = 0; i < 4; i++) {
-		if (Game.m_scriptFoodBase[i] != 0) {
-			connectedMask = (unsigned char)(connectedMask | (1 << i));
-			activePartyCount++;
-			anyReady = 1;
-		} else {
-			allReady = 0;
-		}
-	}
-
-	*(unsigned char*)(statePtr + 8) = 0;
-	*(unsigned char*)(statePtr + 9) = (s_Rinfo != 0) ? s_Rinfo->m_missingArtifactMask : 0;
-	*(unsigned char*)(statePtr + 0xa) = (unsigned char)((allReady != 0 && activePartyCount >= 4) ? 1 : 0);
-	if (anyReady == 0) {
-		*(unsigned char*)(statePtr + 9) = connectedMask;
-	}
-}
-#pragma dont_inline reset
-
-/*
- * --INFO--
  * PAL Address: 0x80133170
  * PAL Size: 924b
  * EN Address: TODO

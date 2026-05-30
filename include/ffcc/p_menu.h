@@ -181,7 +181,6 @@ public:
     void DrawArtiBase(CMenuPcs::Sprt2*, float);
     void ArtiBaseInfoInit(CMenuPcs::Sprt2*, CMenuPcs::Sprt2*);
 
-    void GetAllPadOn();
     void ClrBattleItem();
 
     void ChgPlayModeFromScript(bool);

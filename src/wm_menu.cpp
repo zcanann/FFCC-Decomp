@@ -93,12 +93,14 @@ extern float FLOAT_803314c8;
 extern float FLOAT_803314cc;
 extern float FLOAT_80331430;
 extern float FLOAT_8033151c;
+extern float FLOAT_80331518;
 extern float FLOAT_80331520;
 extern float FLOAT_80331528;
 extern float FLOAT_803315cc;
 extern float FLOAT_803315d0;
 extern float FLOAT_80331598;
 extern float FLOAT_80331588;
+extern float FLOAT_80331590;
 extern float FLOAT_803315d4;
 extern float FLOAT_80331698;
 extern float FLOAT_8033169C;
@@ -275,6 +277,21 @@ static const int kMcListCount = 4;
 static const float s_MainMenuSubFrameWidths[5] = {264.0f, 264.0f, 264.0f, 264.0f, 264.0f};
 static Vec s_RingOrgPos;
 static Vec s_MMenuPos[5];
+
+struct WmMenuFlatTableView
+{
+	int count;
+	char** index;
+	char* buffer;
+};
+
+struct WmMenuFlatDataView
+{
+	int dataCount;
+	unsigned char pad[0x68 - 4];
+	int tableCount;
+	WmMenuFlatTableView table[8];
+};
 
 struct Vec4d
 {
@@ -9448,6 +9465,30 @@ LAB_draw:
 					nameStr[0] = static_cast<char>(toupperLatin1(static_cast<unsigned char>(nameStr[0])));
 				}
 				fontF8->Draw(nameStr);
+
+				fontF8->SetMargin(FLOAT_803313e8);
+				fontF8->SetShadow(1);
+				fontF8->SetScale(FLOAT_8033158C);
+				fontF8->DrawInit();
+				unsigned int locationColor = 0xFFFFFFFF;
+				fontF8->SetColor(*(_GXColor*)&locationColor);
+				fontF8->SetTlut(7);
+				char locationStr[64];
+				const int locationIndex = *reinterpret_cast<int*>(slotData + 0x10);
+				if (locationIndex == 0x0F || locationIndex == 0x16) {
+					strcpy(locationStr, reinterpret_cast<char*>(slotData + 0x2C));
+				} else {
+					WmMenuFlatDataView* flatData = reinterpret_cast<WmMenuFlatDataView*>(&Game.m_cFlatDataArr[1]);
+					strcpy(locationStr, flatData->table[3].index[locationIndex]);
+				}
+				if (locationStr[0] != 0) {
+					locationStr[0] = static_cast<char>(toupperLatin1(static_cast<unsigned char>(locationStr[0])));
+				}
+				const float locationY = static_cast<float>(static_cast<double>(slotY) + static_cast<double>(FLOAT_80331558));
+				const int locationWidth = static_cast<int>(fontF8->GetWidth(locationStr));
+				fontF8->SetPosX(static_cast<float>(static_cast<double>(FLOAT_80331518) - static_cast<double>(locationWidth)));
+				fontF8->SetPosY(locationY);
+				fontF8->Draw(locationStr);
 			} else {
 				fontF8->SetMargin(FLOAT_803313e8);
 				fontF8->SetShadow(1);

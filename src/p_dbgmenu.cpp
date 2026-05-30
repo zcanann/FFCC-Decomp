@@ -211,14 +211,15 @@ void CDbgMenuPcs::calc()
 		case 0x65:
 			stackData[0].m_word = 0;
 			stackData[2].m_word = 0;
-			flags = (unsigned int)__cntlzw((int)((signed char)CFlatGameFlags() >> 7));
-			flags = ((int)(char)(flags >> 5) & 1U) << 7 | (CFlatGameFlags() & ~CFlatGameFlag_Shouki);
-			CFlatGameFlags() = (unsigned char)flags;
-			stackData[1].m_word = (int)(flags << 0x18) >> 0x1f;
+			unsigned char gameFlags = CFlatGameFlags();
+			flags = (unsigned int)__cntlzw((int)(s8)((s32)(((u32)gameFlags << 0x18) & 0xC0000000) >> 0x1f));
+			gameFlags = ((int)(char)(flags >> 5) & 1U) << 7 | (gameFlags & ~CFlatGameFlag_Shouki);
+			CFlatGameFlags() = gameFlags;
+			stackData[1].m_word = (s32)(((u32)gameFlags << 0x18) & 0xC0000000) >> 0x1f;
 			gCFlatRuntime().SystemCall(0, 1, 9, 3, stackData, 0);
 			break;
 		case 0x66:
-			flags = (unsigned int)__cntlzw((int)(char)((int)((unsigned int)(unsigned char)CFlatGameFlags() << 0x1d) >> 0x1f));
+			flags = (unsigned int)__cntlzw((int)(s8)((s32)(((u32)(u8)CFlatGameFlags() << 0x1d) & 0xC0000000) >> 0x1f));
 			CFlatGameFlags() = (unsigned char)((((int)(char)(flags >> 5) << 2) & CFlatGameFlag_Mark) |
 			                                   (CFlatGameFlags() & ~CFlatGameFlag_Mark));
 			break;

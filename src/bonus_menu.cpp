@@ -1201,7 +1201,7 @@ void CMenuPcs::DrawArtiBase(CMenuPcs::Sprt2* sprt, float alpha)
 	int statePtr = GetBonusMenuMembers(this).m_bonusStatePtr;
 
 	if (*(short*)(statePtr + 0x1c) != 4) {
-		_GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(alpha * 255.0)};
+		_GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(alpha * 255.0f)};
 		GXSetChanMatColor(GX_COLOR0A0, color);
 	}
 
@@ -1230,7 +1230,7 @@ void CMenuPcs::DrawArtiBase(CMenuPcs::Sprt2* sprt, float alpha)
 			    (unsigned char)(rgb * 255.0f),
 			    (unsigned char)(rgb * 255.0f),
 			    (unsigned char)(rgb * 255.0f),
-			    (unsigned char)(alpha * 255.0),
+			    (unsigned char)(alpha * 255.0f),
 			};
 			GXSetChanMatColor(GX_COLOR0A0, color);
 		}

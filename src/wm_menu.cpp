@@ -7387,10 +7387,7 @@ void CMenuPcs::CalcCharaSelect()
 				}
 				modelNo += appearance;
 
-				modelData[caravanSlot * 0x34 + 8] = static_cast<unsigned char>(modelNo);
-				modelData[caravanSlot * 0x34 + 9] = static_cast<unsigned char>(modelNo >> 8);
-				modelData[caravanSlot * 0x34 + 10] = static_cast<unsigned char>(modelNo >> 16);
-				modelData[caravanSlot * 0x34 + 11] = static_cast<unsigned char>(modelNo >> 24);
+				*reinterpret_cast<int*>(modelData + caravanSlot * 0x34 + 8) = modelNo;
 
 				CCaravanWork& caravanWork = Game.m_caravanWorkArr[caravanSlot];
 				caravanWork.LoadInit();

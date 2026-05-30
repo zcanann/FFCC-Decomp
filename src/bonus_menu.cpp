@@ -2499,6 +2499,8 @@ void CMenuPcs::CalcResultOpenAnim()
 			sprites[idx].alpha = 0.0f;
 			sprites[idx].mulX = 24.0f;
 		}
+		int countBase = labelBase + activePartyCount;
+		InitAnimSprite(&sprites[countBase], 0x19, (short)((0x280 - 0x140) >> 1), 0x10, 0x140, 0x28, sprites[1].startFrame, 10);
 		s_CntTop = (unsigned char)(labelBase + activePartyCount + 1);
 
 		int boardPtr = GetBonusMenuMembers(this).m_bonusBoardPtr;

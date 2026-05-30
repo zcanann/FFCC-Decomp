@@ -187,6 +187,8 @@ extern double DOUBLE_80331490;
 extern double DOUBLE_80331508;
 extern double DOUBLE_80331538;
 extern double DOUBLE_80331540;
+extern double DOUBLE_803316d8;
+extern double DOUBLE_803316e0;
 extern double DOUBLE_803316e8;
 extern double DOUBLE_80331720;
 extern double DOUBLE_80331730;
@@ -6128,35 +6130,46 @@ void CMenuPcs::DrawWMFrame()
 	short sVar = *reinterpret_cast<short*>(worldState + 0x10);
 	float alpha;
 	if (sVar == 0) {
-		alpha = (float)(int)*reinterpret_cast<short*>(worldState + 0x22) * FLOAT_803314e8;
-	} else if (sVar >= 3) {
-		alpha = FLOAT_803313e8 - (float)(int)*reinterpret_cast<short*>(worldState + 0x22) * FLOAT_803314e8;
+		*reinterpret_cast<float*>(worldState) -= FLOAT_80331550;
+		if (static_cast<double>(*reinterpret_cast<float*>(worldState)) <= DOUBLE_803314f0) {
+			*reinterpret_cast<float*>(worldState) = FLOAT_803313dc;
+		}
+		alpha = static_cast<float>(DOUBLE_803316d8 *
+		                           (static_cast<double>(*reinterpret_cast<short*>(worldState + 0x22)) - DOUBLE_80331408));
+	} else if (sVar == 3) {
+		*reinterpret_cast<float*>(worldState) += FLOAT_80331550;
+		if (DOUBLE_803316e0 <= static_cast<double>(*reinterpret_cast<float*>(worldState))) {
+			*reinterpret_cast<float*>(worldState) = FLOAT_80331440;
+		}
+		alpha = static_cast<float>(-(DOUBLE_803316d8 *
+		                             (static_cast<double>(*reinterpret_cast<short*>(worldState + 0x22)) - DOUBLE_80331408) -
+		                             DOUBLE_80331508));
 	} else {
-		alpha = FLOAT_803313e8;
+		alpha = FLOAT_80331458;
 	}
-	if (alpha < FLOAT_803313dc) alpha = FLOAT_803313dc;
-	if (alpha > FLOAT_803313e8) alpha = FLOAT_803313e8;
 
-	unsigned int uAlpha = (unsigned int)(FLOAT_80331458 * alpha);
+	SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+	GXColor frameColor = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(static_cast<int>(alpha))};
+	GXSetChanMatColor(static_cast<GXChannelID>(4), frameColor);
+	SetTexture(static_cast<CMenuPcs::TEX>(0x16));
 
 	for (int i = 0; i < 5; i++) {
 		int off = wmFrame + 0x0C + i * 0x1C;
-		SetAttrFmt((FMT)0);
-		SetTexture((TEX)(0x16 + i));
 		DrawRect2(
-			uAlpha,
-			(float)*reinterpret_cast<short*>(off),
-			(float)*reinterpret_cast<short*>(off + 2),
+			0,
+			static_cast<float>(*reinterpret_cast<short*>(off)) - FLOAT_803315b0,
+			static_cast<float>(*reinterpret_cast<short*>(off + 2)) - FLOAT_803315b4,
 			(float)*reinterpret_cast<short*>(off + 4),
 			(float)*reinterpret_cast<short*>(off + 6),
 			*reinterpret_cast<float*>(off + 8),
 			*reinterpret_cast<float*>(off + 0xC),
-			*reinterpret_cast<float*>(off + 0x10),
-			*reinterpret_cast<float*>(off + 0x14),
+			FLOAT_803313e8,
+			FLOAT_803313e8,
 			rotMtx);
 	}
 
-	if (sVar == 1 || sVar == 2) {
+	unsigned int uAlpha = static_cast<unsigned int>(alpha);
+	if (sVar != 0 && sVar < 4) {
 		SetAttrFmt((FMT)0);
 		SetTexture((TEX)0x17);
 		int gaugeAlpha = *reinterpret_cast<int*>(wmFrame + 4);

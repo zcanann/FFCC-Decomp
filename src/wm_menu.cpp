@@ -165,6 +165,7 @@ extern float FLOAT_80331688;
 extern double DOUBLE_803316C0;
 extern float FLOAT_803316C8;
 extern float FLOAT_803316CC;
+extern float FLOAT_803316d0;
 extern double DOUBLE_80331418;
 extern double DOUBLE_80331488;
 extern double DOUBLE_80331438;
@@ -3273,17 +3274,92 @@ void CMenuPcs::drawWorld()
 void CMenuPcs::DrawMainMenu()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	if (reinterpret_cast<unsigned int*>(bytes + 0x82C)[0] == 0) {
+	short* const worldState = reinterpret_cast<short*>(reinterpret_cast<unsigned int*>(bytes + 0x82C)[0]);
+	if (worldState == 0) {
 		return;
 	}
 
-	DrawMainMenuSub();
-	DrawMainMenuBase(1.0f);
-	DrawWMFrame();
-	DrawChara();
-	DrawFukidashi();
+	const short state = worldState[0x10 / sizeof(short)];
+	const short step = worldState[0x22 / sizeof(short)];
+	float frameAlpha;
+	if (state == 0) {
+		frameAlpha = static_cast<float>(DOUBLE_803314e8 * (static_cast<double>(step) - DOUBLE_80331408));
+	} else if (state < 1 || state > 3) {
+		frameAlpha = static_cast<float>(-(DOUBLE_803314e8 * (static_cast<double>(step) - DOUBLE_80331408) - DOUBLE_80331420));
+	} else {
+		frameAlpha = FLOAT_803313e8;
+	}
 
-	short* const worldState = reinterpret_cast<short*>(reinterpret_cast<unsigned int*>(bytes + 0x82C)[0]);
+	SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+	GXColor frameColor = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(static_cast<int>(DOUBLE_80331508 * static_cast<double>(frameAlpha)))};
+	GXSetChanMatColor(static_cast<GXChannelID>(4), frameColor);
+	SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
+	unsigned char* const frame = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x820)[0]);
+	if (frame != 0) {
+		unsigned char* const entry = frame + 4;
+		DrawRect(0xFFFFFFFF, static_cast<float>(*reinterpret_cast<short*>(entry + 0)),
+		         static_cast<float>(*reinterpret_cast<short*>(entry + 2)), static_cast<float>(*reinterpret_cast<short*>(entry + 4)),
+		         static_cast<float>(*reinterpret_cast<short*>(entry + 6)), *reinterpret_cast<float*>(entry + 8),
+		         *reinterpret_cast<float*>(entry + 0x0C), FLOAT_803313e8, FLOAT_803313e8,
+		         static_cast<float>(*reinterpret_cast<unsigned int*>(entry + 0x18)));
+	}
+
+	if (state > 0 && state < 4) {
+		float tileAlpha;
+		if (state == 1) {
+			tileAlpha = static_cast<float>(DOUBLE_803314e8 * (static_cast<double>(step) - DOUBLE_80331408));
+		} else if (state == 2) {
+			tileAlpha = FLOAT_803313e8;
+		} else {
+			tileAlpha = static_cast<float>(-(DOUBLE_803314e8 * (static_cast<double>(step) - DOUBLE_80331408) - DOUBLE_80331420));
+		}
+		tileAlpha = static_cast<float>(static_cast<double>(tileAlpha) * DOUBLE_803313f8);
+		SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+		GXColor tileColor = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(static_cast<int>(DOUBLE_80331508 * static_cast<double>(tileAlpha)))};
+		GXSetChanMatColor(static_cast<GXChannelID>(4), tileColor);
+		SetTexture(static_cast<CMenuPcs::TEX>(0x33));
+		const float x = FLOAT_80331410;
+		float y = static_cast<float>(static_cast<double>(FLOAT_80331440) - static_cast<double>(x));
+		DrawRect(0xFFFFFFFF, x, y, FLOAT_803316d0, FLOAT_80331500, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8,
+		         FLOAT_803313e8, 0.0f);
+		DrawRect(0xFFFFFFFF, static_cast<float>(static_cast<double>(x) + static_cast<double>(FLOAT_803316d0)), y,
+		         FLOAT_803316d0, FLOAT_80331500, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, 8.0f);
+		y = static_cast<float>(static_cast<double>(y) + static_cast<double>(FLOAT_80331500));
+		DrawRect(0xFFFFFFFF, x, y, FLOAT_803316d0, FLOAT_80331500, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8,
+		         FLOAT_803313e8, 4.0f);
+		DrawRect(0xFFFFFFFF, static_cast<float>(static_cast<double>(x) + static_cast<double>(FLOAT_803316d0)), y,
+		         FLOAT_803316d0, FLOAT_80331500, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, 12.0f);
+	}
+
+	DrawMainMenuSub();
+	unsigned int clearColor = 0;
+	GXSetCopyClear(*reinterpret_cast<GXColor*>(&clearColor), 0xFFFFFF);
+	Mtx44 projectionMtx;
+	PSMTX44Copy(CameraPcs.m_screenMatrix, projectionMtx);
+	GXSetProjection(projectionMtx, GX_PERSPECTIVE);
+	Graphic.SetViewport();
+	GXSetScissor(0, 0, 0x280, 0x1C0);
+	DrawInit();
+
+	if (state > 0 && state < 4) {
+		float helpAlpha;
+		if (state == 1) {
+			helpAlpha = static_cast<float>(DOUBLE_803314e8 * (static_cast<double>(step) - DOUBLE_80331408));
+		} else if (state == 2) {
+			helpAlpha = FLOAT_803313e8;
+		} else {
+			helpAlpha = static_cast<float>(-(DOUBLE_803314e8 * (static_cast<double>(step) - DOUBLE_80331408) - DOUBLE_80331420));
+		}
+		if (static_cast<double>(helpAlpha) > DOUBLE_803314f0) {
+			SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+			GXColor helpColor = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * helpAlpha))};
+			GXSetChanMatColor(static_cast<GXChannelID>(4), helpColor);
+			SetTexture(static_cast<CMenuPcs::TEX>(0x1F));
+			DrawRect(0xFFFFFFFF, FLOAT_803313dc, static_cast<float>(DOUBLE_803314d0 - static_cast<double>(FLOAT_80331440)),
+			         FLOAT_803313e0, FLOAT_80331440, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, 0.0f);
+		}
+	}
+
 	if (worldState[8] == 2) {
 		if (worldState[0x18 / sizeof(short)] != 0) {
 			worldState[0x18 / sizeof(short)]--;

@@ -9,6 +9,7 @@
 #include "ffcc/pad.h"
 #include "ffcc/partMng.h"
 #include "ffcc/partyobj.h"
+#include "ffcc/quadobj.h"
 #include "ffcc/ringmenu.h"
 #include "ffcc/system.h"
 
@@ -790,16 +791,37 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
+		case -0x19: {
+			CGQuadObj* quad = reinterpret_cast<CGQuadObj*>(engineObject);
+			if (localBase[0] == 1) {
+				quad->Reset(static_cast<float>(localBase[1]), static_cast<float>(localBase[2]));
+			}
+			quad->Add(static_cast<float>(localBase[3]), static_cast<float>(localBase[4]));
+			PushValue(this, object, 0);
+			outResult = 0;
+			break;
+		}
 		case -0x1A:
 			engineObject->Turn(static_cast<float>(localBase[0]), static_cast<int>(localBase[1]));
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
-		case -0x1D:
+		case -0x1C:
 			engineObject->CancelMove(1);
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
+		case -0x1D: {
+			Vec moveVector;
+			float* params = reinterpret_cast<float*>(localBase);
+			moveVector.x = params[0];
+			moveVector.y = params[1];
+			moveVector.z = params[2];
+			engineObject->moveVector(&moveVector, params[3], static_cast<int>(localBase[4]));
+			PushValue(this, object, 0);
+			outResult = 0;
+			break;
+		}
 		case -0x22:
 			engineObject->m_attrFlags = localBase[0];
 			PushValue(this, object, 0);

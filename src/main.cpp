@@ -6,12 +6,12 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h>
 
 static const char kDefaultScriptName[] = "ffcc_0";
-static const char kLanguageArgUs[] = "us";
-static const char kLanguageArgUk[] = "uk";
-static const char kLanguageArgGr[] = "gr";
-static const char kLanguageArgIt[] = "it";
-static const char kLanguageArgFr[] = "fr";
-static const char kLanguageArgSp[] = "sp";
+static const char kLanguageArgUs[4] = "us";
+static const char kLanguageArgUk[4] = "uk";
+static const char kLanguageArgGr[4] = "gr";
+static const char kLanguageArgIt[4] = "it";
+static const char kLanguageArgFr[4] = "fr";
+static const char kLanguageArgSp[4] = "sp";
 
 void game(int argc, char** argv);
 

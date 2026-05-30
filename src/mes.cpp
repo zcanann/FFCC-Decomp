@@ -102,20 +102,6 @@ static void ApplyCaseMode(char* text, int& caseMode)
 	caseMode = 0;
 }
 
-static char* GetFlatName(int tableIdx, int entryIdx)
-{
-	CMesFlatDataView* flat = (CMesFlatDataView*)&Game.m_cFlatDataArr[1];
-	if ((unsigned int)tableIdx >= 8U)
-	{
-		return (char*)s_mesEmpty;
-	}
-	if ((unsigned int)entryIdx >= (unsigned int)flat->m_tabl[tableIdx].m_numEntries)
-	{
-		return (char*)s_mesEmpty;
-	}
-	return flat->m_tabl[tableIdx].m_strings[entryIdx];
-}
-
 #define FLAT_NAME_DIRECT(tableIdx, entryIdx) (((CMesFlatDataView*)&Game.m_cFlatDataArr[1])->m_tabl[(tableIdx)].m_strings[(entryIdx)])
 
 static void AdvanceMesLine(CMes* mes, CFont* font)

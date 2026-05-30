@@ -247,6 +247,9 @@ extern double DOUBLE_80331720;
 extern double DOUBLE_80331730;
 extern double DOUBLE_80331738;
 extern double DOUBLE_80331770;
+extern double DOUBLE_80331788;
+extern double DOUBLE_80331790;
+extern double DOUBLE_80331798;
 extern float FLOAT_803317e0;
 extern float FLOAT_803317e4;
 extern float FLOAT_803317e8;
@@ -4965,6 +4968,7 @@ void CMenuPcs::DrawTitleMenu()
 		worldState = *reinterpret_cast<int*>(bytes + 0x82C);
 		state = *reinterpret_cast<short*>(worldState + 0x10);
 		if (state > 1) {
+			float fX = FLOAT_80331778 - FLOAT_80331414;
 			float fY = FLOAT_8033177c;
 			if (*reinterpret_cast<short*>(worldState + 0x26) != 0) {
 				fY = FLOAT_8033177c + (float)(*reinterpret_cast<short*>(worldState + 0x26) * 0x28 - 8);
@@ -4972,17 +4976,26 @@ void CMenuPcs::DrawTitleMenu()
 			float alpha = FLOAT_803313e8;
 			if (state == 2 && *reinterpret_cast<short*>(worldState + 0x12) == 0) {
 				int timer = (int)*reinterpret_cast<short*>(worldState + 0x24);
-				alpha = (float)(timer);
+				fX = static_cast<float>(-(DOUBLE_80331790 *
+				                           (static_cast<double>(5 - timer) / DOUBLE_80331798) -
+				                           static_cast<double>(fX)));
+				alpha = static_cast<float>(DOUBLE_80331788 * static_cast<double>(timer) + DOUBLE_803314e8);
 			}
 			unsigned int itemColor = (unsigned int)(FLOAT_80331458 * alpha) & 0xFF;
 			itemColor = itemColor | 0xFFFFFF00;
 			GXSetChanMatColor(GX_COLOR0A0, *(_GXColor*)&itemColor);
-			DrawRect(0xFFFFFFFF, FLOAT_80331778 - FLOAT_80331414, fY - FLOAT_80331780,
+			DrawRect(0xFFFFFFFF, fX, fY - FLOAT_80331780,
 			         FLOAT_80331568, FLOAT_80331554,
 			         FLOAT_803313dc, FLOAT_803313dc,
 			         FLOAT_803313e8, FLOAT_803313e8, 0);
 			GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_SRCALPHA, GX_LO_SET);
-			DrawRect(0xFFFFFFFF, FLOAT_80331778 - FLOAT_80331414, fY - FLOAT_80331780,
+			if (state == 2 && *reinterpret_cast<short*>(worldState + 0x12) == 0) {
+				int timer = (int)*reinterpret_cast<short*>(worldState + 0x24);
+				fX = static_cast<float>(DOUBLE_80331790 *
+				                         (static_cast<double>(5 - timer) / DOUBLE_80331798) +
+				                         static_cast<double>(FLOAT_80331778 - FLOAT_80331414));
+			}
+			DrawRect(0xFFFFFFFF, fX, fY - FLOAT_80331780,
 			         FLOAT_80331568, FLOAT_80331554,
 			         FLOAT_803313dc, FLOAT_80331554,
 			         FLOAT_803313e8, FLOAT_803313e8, 0);

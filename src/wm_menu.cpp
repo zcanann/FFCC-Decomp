@@ -9713,6 +9713,17 @@ LAB_draw:
 						}
 					}
 
+					float dateLabelY;
+					if (language == 5) {
+						dateLabelY = FLOAT_803314c8 + (slotY + FLOAT_803314d8);
+					} else {
+						dateLabelY = slotY + FLOAT_80331554;
+					}
+					SetTexture(static_cast<CMenuPcs::TEX>(0x21));
+					DrawRect(0xFFFFFFFF, FLOAT_80331520 - FLOAT_80331550, dateLabelY,
+					         FLOAT_80331440, FLOAT_80331558, FLOAT_803313dc, FLOAT_803313dc,
+					         FLOAT_803313e8, FLOAT_803313e8, 0.0f);
+
 					SetTexture(static_cast<CMenuPcs::TEX>(0x37));
 					float iconX = FLOAT_8033155C;
 				for (int member = 0; member < 4; member++) {

@@ -899,6 +899,29 @@ void CMenuPcs::CalcSelectCloseAnim()
 		}
 	}
 
+	unsigned char* boardEntries = reinterpret_cast<unsigned char*>(GetBonusMenuMembers(this).m_bonusBoardPtr);
+	for (int i = 0; i < activePartyCount; i++) {
+		BonusAnimSprite* sprite = &sprites[4 + i];
+		unsigned char* entry = boardEntries + i * 0x50;
+		int centerX = (int)((float)sprite->x + sprite->motionX + (float)sprite->w * 0.5f - 320.0f);
+		int centerY = (int)((float)sprite->y + sprite->motionY + (float)sprite->h * 0.5f - 240.0f);
+		*reinterpret_cast<short*>(entry + 8) = (short)centerX;
+		*reinterpret_cast<short*>(entry + 10) = (short)centerY;
+
+		int screenX = (int)((float)sprite->x + sprite->motionX + 24.0f);
+		int screenY = (int)((float)sprite->y + sprite->motionY - 28.0f);
+		if (screenX < 0) {
+			screenX = 0;
+		}
+		if (screenY < 0) {
+			screenY = 0;
+		}
+		*reinterpret_cast<int*>(entry + 0x40) = screenX;
+		*reinterpret_cast<int*>(entry + 0x44) = screenY;
+		*reinterpret_cast<int*>(entry + 0x48) = 0x48;
+		*reinterpret_cast<int*>(entry + 0x4C) = 0x58;
+	}
+
 	Mtx scaleMtx;
 	Mtx rotMtx;
 	Mtx tempMtx;

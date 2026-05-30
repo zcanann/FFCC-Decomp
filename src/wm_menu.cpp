@@ -2870,16 +2870,26 @@ void CMenuPcs::CalcTitleMenu()
 
 		if (*reinterpret_cast<short*>(worldState + 0x10) == 2 && *reinterpret_cast<short*>(worldState + 0x18) == 0) {
 			const unsigned short repeat = GetButtonRepeat(0);
+			const unsigned short down = GetButtonDown(0);
 			if ((repeat & 0xC) != 0) {
 				*reinterpret_cast<unsigned short*>(worldState + 0x26) ^= 1;
 				*reinterpret_cast<short*>(worldState + 0x24) = 0;
 				*reinterpret_cast<short*>(worldState + 0x12) = 0;
 				worldState[9] = 0;
 				Sound.PlaySe(1, 0x40, 0x7F, 0);
-			} else if ((repeat & 0x100) != 0) {
+			} else if ((down & 0x100) != 0) {
+				if (*reinterpret_cast<short*>(worldState + 0x26) == 0) {
+					DAT_8032ee2c = 0xFFFFFFFF;
+					DAT_8032ee28 = 0xFFFFFFFF;
+					DAT_8032ee20 = 0xFF;
+					uRam8032ee21 = 0xFF;
+					Game.InitNewGame();
+				}
 				*reinterpret_cast<short*>(worldState + 0x18) = 0x14;
 				*reinterpret_cast<short*>(worldState + 0x0E) = 1;
 				Sound.PlaySe(0x0B, 0x40, 0x7F, 0);
+			} else if ((down & 0x200) != 0) {
+				Sound.PlaySe(4, 0x40, 0x7F, 0);
 			}
 
 			if (repeat == 0) {
@@ -2887,11 +2897,16 @@ void CMenuPcs::CalcTitleMenu()
 			} else {
 				*reinterpret_cast<short*>(worldState + 0x22) = 0;
 			}
+		} else if (*reinterpret_cast<short*>(worldState + 0x10) < 2) {
+			if (MemoryCardMan.McChkConnect(0) == 0) {
+				*reinterpret_cast<short*>(worldState + 0x26) = 1;
+			} else if (MemoryCardMan.McChkConnect(1) == 0) {
+				*reinterpret_cast<short*>(worldState + 0x26) = 1;
+			} else {
+				*reinterpret_cast<short*>(worldState + 0x26) = 0;
+			}
 		}
 	}
-
-	CalcWMFrame();
-	CalcChara();
 }
 
 /*

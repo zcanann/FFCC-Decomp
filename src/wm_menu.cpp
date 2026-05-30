@@ -2906,25 +2906,121 @@ void CMenuPcs::CalcTitleMenu()
 void CMenuPcs::CalcGoOutCharaSelect(unsigned char state)
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* const worldState = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x82C)[0]);
-	unsigned char* const selectState = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x828)[0]);
-	unsigned char* const animState = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x844)[0]);
+	short* const worldState = reinterpret_cast<short*>(reinterpret_cast<unsigned int*>(bytes + 0x82C)[0]);
+	WmCharaSelectEntry* const selectState = reinterpret_cast<WmCharaSelectEntry*>(reinterpret_cast<unsigned int*>(bytes + 0x828)[0]);
 
-	if (worldState != 0 && selectState != 0 && *reinterpret_cast<short*>(worldState + 0x10) == 2) {
-		short& cursor = *reinterpret_cast<short*>(selectState + 4);
-		if (cursor < 0) {
-			cursor = 0;
+	if (worldState[8] != 2) {
+		return;
+	}
+
+	unsigned int validCount;
+	unsigned char* const cmakeWork = GetWmCmakeWork(this);
+	if (cmakeWork != 0) {
+		validCount = 0;
+		for (int i = 0; i < 8; i++) {
+			if (*reinterpret_cast<int*>(cmakeWork + i * 0x9C0 + 0x1A84) != 0) {
+				validCount++;
+			}
 		}
-		if (cursor > 7) {
-			cursor = 7;
-		}
-		if (state != 0 && animState != 0) {
-			*reinterpret_cast<int*>(animState + cursor * 0x14 + 4) = 3;
-			selectState[0x0A] = 1;
+	} else {
+		validCount = 0;
+		for (int i = 0; i < 8; i++) {
+			if (Game.m_caravanWorkArr[i].m_shopState != 0) {
+				validCount++;
+			}
 		}
 	}
 
-	CalcWMFrame();
+	unsigned int loadedCount = 0;
+	for (int i = 0; i < 8; i++) {
+		CCharaPcs::CHandle* const handle = GetWmCharaHandles(this)[i];
+		if (handle->m_charaKind != 3 && handle->IsLoadModelASyncCompleted() != 0) {
+			loadedCount++;
+		}
+	}
+
+	WmCharaSelectEntry& entry = selectState[0];
+	if (loadedCount != validCount || entry.m_confirmed != 0) {
+		return;
+	}
+
+	entry.m_padType = Joybus.GetPadType(0);
+	if (entry.m_padType == 0x09000000 || entry.m_padType == -0x74F00000 || entry.m_padType == -0x78000000) {
+		entry.m_connected = 1;
+	} else if (Game.m_gameWork.m_menuStageMode == 0) {
+		entry.m_connected = Joybus.GetGBAConnect(0);
+	} else {
+		entry.m_connected = 0;
+	}
+
+	unsigned short repeat = 0;
+	unsigned short down = 0;
+	if (entry.m_connected != 0 && entry.m_cmakePending == 0) {
+		repeat = GetButtonRepeat(0);
+		down = GetButtonDown(0);
+	}
+
+	if (worldState[8] != 2 || worldState[0x1E / sizeof(short)] != 0) {
+		return;
+	}
+
+	int cursor = static_cast<int>(entry.m_currentSlot);
+	if ((repeat & 0x0C) != 0) {
+		if (cursor < 4) {
+			cursor += 4;
+		} else {
+			cursor -= 4;
+		}
+		Sound.PlaySe(1, 0x40, 0x7F, 0);
+	}
+
+	const unsigned int row = static_cast<unsigned int>(cursor) >> 2;
+	if ((repeat & 1) != 0) {
+		if (static_cast<int>(((-static_cast<int>(row) | static_cast<int>(row)) >> 31) & 4U) < cursor) {
+			cursor--;
+		} else {
+			cursor += 3;
+		}
+		Sound.PlaySe(1, 0x40, 0x7F, 0);
+	} else if ((repeat & 2) != 0) {
+		int rowEnd = 3;
+		if (row != 0) {
+			rowEnd = 7;
+		}
+		if (cursor < rowEnd) {
+			cursor++;
+		} else {
+			cursor -= 3;
+		}
+		Sound.PlaySe(1, 0x40, 0x7F, 0);
+	}
+
+	entry.m_currentSlot = static_cast<short>(cursor);
+	if ((repeat & 0x6F) != 0) {
+		return;
+	}
+
+	if ((down & 0x200) != 0) {
+		entry._pad0E = 1;
+		Sound.PlaySe(0x34, 0x40, 0x7F, 0);
+	} else if ((down & 0x100) != 0) {
+		int shopState;
+		if (cmakeWork != 0) {
+			shopState = *reinterpret_cast<int*>(cmakeWork + entry.m_currentSlot * 0x9C0 + 0x1A84);
+		} else {
+			shopState = Game.m_caravanWorkArr[entry.m_currentSlot].m_shopState;
+		}
+
+		if (shopState == 0) {
+			Sound.PlaySe(4, 0x40, 0x7F, 0);
+		} else {
+			entry.m_confirmed = 1;
+			Sound.PlaySe(0x33, 0x40, 0x7F, 0);
+			if (state != 0) {
+				GetWmCharaAnimState(this)[entry.m_currentSlot * 5 + 1] = 3;
+			}
+		}
+	}
 }
 
 /*

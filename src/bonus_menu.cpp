@@ -501,9 +501,9 @@ static inline void DrawBonusSelectedArtifactHelp(CMenuPcs* menu, int statePtr, B
 	font->SetPosY(centerY - 44.0f - 4.0f);
 	font->Draw(title);
 
-	char* source = new char[0x200];
+	char* source = new (menu->m_menuStage, const_cast<char*>(s_bonus_menu_cpp), 0xA9C) char[0x200];
 	memset(source, 0, 0x200);
-	char* converted = new char[0x200];
+	char* converted = new (menu->m_menuStage, const_cast<char*>(s_bonus_menu_cpp), 0xAA5) char[0x200];
 	memset(converted, 0, 0x200);
 	strcpy(source, flat->m_table[6].m_strings[itemId]);
 	CMes::MakeAgbString(converted, source, 0, 0);

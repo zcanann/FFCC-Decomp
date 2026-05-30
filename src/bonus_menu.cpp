@@ -319,7 +319,7 @@ static inline int& BonusSpriteFlags(BonusAnimSprite* sprite)
 	return *reinterpret_cast<int*>(&sprite->scale);
 }
 
-static void InitSelectOpenPartyIcon(BonusAnimSprite* sprite, int slotIndex, short y)
+static inline void InitSelectOpenPartyIcon(BonusAnimSprite* sprite, int slotIndex, short y)
 {
 	short x = ((0 < slotIndex) && (slotIndex < 3)) ? 0x30 : 0x48;
 
@@ -335,7 +335,7 @@ static void InitSelectOpenPartyIcon(BonusAnimSprite* sprite, int slotIndex, shor
 	BonusSpriteFlags(sprite) = 0x10000;
 }
 
-static void InitSelectOpenPartyName(BonusAnimSprite* sprite, const BonusAnimSprite* iconSprite, short xOffset, short yOffset, int startFrame)
+static inline void InitSelectOpenPartyName(BonusAnimSprite* sprite, const BonusAnimSprite* iconSprite, short xOffset, short yOffset, int startFrame)
 {
 	InitAnimSprite(sprite, -1, (short)(iconSprite->x + xOffset), (short)(iconSprite->y + yOffset), 0, 0, startFrame, 8);
 	ResetAnimSpriteMotion(sprite);

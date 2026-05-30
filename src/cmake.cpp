@@ -2564,7 +2564,11 @@ unsigned short CMenuPcs::CmakeJobCtrl()
         }
 
         if ((repeat & 0x3) != 0) {
-            job = (job < 4) ? static_cast<short>(job + 4) : static_cast<short>(job - 4);
+            if (job < 4) {
+                job = static_cast<short>(job + 4);
+            } else {
+                job = static_cast<short>(job - 4);
+            }
             Sound.PlaySe(1, 0x40, 0x7F, 0);
         }
 

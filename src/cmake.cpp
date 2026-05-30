@@ -1287,6 +1287,7 @@ void CMenuPcs::DrawCmakeCharaText(int page, float alpha)
     valueFont->SetColor(rgba);
     valueFont->SetTlut(6);
 
+    char tribeWithSep[0x40];
     for (int i = 0; i < 4; i++) {
         const char* txt = "";
 
@@ -1299,6 +1300,9 @@ void CMenuPcs::DrawCmakeCharaText(int page, float alpha)
             break;
         case 2:
             txt = GetTribeStr(s_CmakeInfo.m_tribe);
+            strcpy(tribeWithSep, txt);
+            strcat(tribeWithSep, "/", sizeof(tribeWithSep));
+            txt = tribeWithSep;
             break;
         default:
             txt = GetJobStr(s_CmakeInfo.m_job);
@@ -3169,15 +3173,11 @@ void CMenuPcs::CmakeResultDraw1()
                 hairIndex += 4;
             }
 
-            char tribeWithSep[0x40];
-            strcpy(tribeWithSep, txt);
-            strcat(tribeWithSep, "/", sizeof(tribeWithSep));
-
             const char* hairTxt = GetHairStr(hairIndex + s_CmakeInfo.m_hair);
 
             valueFont->SetPosX(
                 FLOAT_80333300 +
-                (FLOAT_803332fc + labelWidths[i] + static_cast<float>(valueFont->GetWidth(tribeWithSep))));
+                (FLOAT_803332fc + labelWidths[i] + static_cast<float>(valueFont->GetWidth(txt))));
             valueFont->SetPosY(0x70 + i * 0x28 - FLOAT_803332f4);
             valueFont->Draw(hairTxt);
         }

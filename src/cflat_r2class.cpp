@@ -13,6 +13,7 @@
 #include "ffcc/quadobj.h"
 #include "ffcc/ringmenu.h"
 #include "ffcc/system.h"
+#include "ffcc/vector.h"
 
 #include <dolphin/mtx.h>
 #include <math.h>
@@ -653,12 +654,9 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			outResult = 0;
 			break;
 		case -6: {
-			Vec position;
 			float* params = reinterpret_cast<float*>(object->m_localBase);
-			position.x = params[0];
-			position.y = params[1];
-			position.z = params[2];
-			engineObject->SetPosBG(&position, 1);
+			CVector position(params[0], params[1], params[2]);
+			engineObject->SetPosBG(position, 1);
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;

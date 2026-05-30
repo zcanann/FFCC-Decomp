@@ -116,6 +116,8 @@ static char* GetFlatName(int tableIdx, int entryIdx)
 	return flat->m_tabl[tableIdx].m_strings[entryIdx];
 }
 
+#define FLAT_NAME_DIRECT(tableIdx, entryIdx) (((CMesFlatDataView*)&Game.m_cFlatDataArr[1])->m_tabl[(tableIdx)].m_strings[(entryIdx)])
+
 static void AdvanceMesLine(CMes* mes, CFont* font)
 {
 	*(float*)((char*)mes + 0x3C84) = FLOAT_8033089c;
@@ -263,7 +265,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		case 8:
 		{
 			signed char varIndex = (signed char)GetMesNibbleValue((const char*)in + 4);
-			const char* text = GetFlatName(5, CMes::m_tempVar[varIndex]);
+			const char* text = FLAT_NAME_DIRECT(5, CMes::m_tempVar[varIndex]);
 			strcpy(dst, text);
 			dst += strlen(dst);
 			next = in + 6;
@@ -281,15 +283,15 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 			int value = CMes::m_tempVar[varIndex];
 			if ((tag == 9) || (tag == 0x37))
 			{
-				strcpy(dst, GetFlatName(0, value * 5 + 1));
+				strcpy(dst, FLAT_NAME_DIRECT(0, value * 5 + 1));
 			}
 			else if (tag == 0x1D)
 			{
-				strcpy(dst, GetFlatName(0, value * 5));
+				strcpy(dst, FLAT_NAME_DIRECT(0, value * 5));
 			}
 			else if (tag == 0x39)
 			{
-				strcpy(dst, GetFlatName(0, value * 5 + 3));
+				strcpy(dst, FLAT_NAME_DIRECT(0, value * 5 + 3));
 			}
 			else if (tag == 0x3B)
 			{
@@ -324,15 +326,15 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 			int value = CMes::m_tempVar[varIndex];
 			if ((tag == 0x2A) || (tag == 0x38))
 			{
-				strcpy(dst, GetFlatName(1, value * 5 + 1));
+				strcpy(dst, FLAT_NAME_DIRECT(1, value * 5 + 1));
 			}
 			else if (tag == 0x1E)
 			{
-				strcpy(dst, GetFlatName(1, value * 5));
+				strcpy(dst, FLAT_NAME_DIRECT(1, value * 5));
 			}
 			else if (tag == 0x3A)
 			{
-				strcpy(dst, GetFlatName(1, value * 5 + 3));
+				strcpy(dst, FLAT_NAME_DIRECT(1, value * 5 + 3));
 			}
 			else if (tag == 0x3C)
 			{
@@ -358,7 +360,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		case 0x2B:
 		{
 			signed char varIndex = (signed char)GetMesNibbleValue((const char*)in + 4);
-			strcpy(dst, GetFlatName(2, CMes::m_tempVar[varIndex]));
+			strcpy(dst, FLAT_NAME_DIRECT(2, CMes::m_tempVar[varIndex]));
 			dst += strlen(dst);
 			next = in + 6;
 			break;
@@ -366,7 +368,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		case 0x2C:
 		{
 			signed char varIndex = (signed char)GetMesNibbleValue((const char*)in + 4);
-			strcpy(dst, GetFlatName(3, CMes::m_tempVar[varIndex]));
+			strcpy(dst, FLAT_NAME_DIRECT(3, CMes::m_tempVar[varIndex]));
 			dst += strlen(dst);
 			next = in + 6;
 			break;
@@ -374,7 +376,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		case 0x2D:
 		{
 			signed char varIndex = (signed char)GetMesNibbleValue((const char*)in + 4);
-			strcpy(dst, GetFlatName(3, CMes::m_tempVar[varIndex] + 0x3C));
+			strcpy(dst, FLAT_NAME_DIRECT(3, CMes::m_tempVar[varIndex] + 0x3C));
 			dst += strlen(dst);
 			next = in + 6;
 			break;
@@ -382,7 +384,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		case 0x2E:
 		{
 			signed char varIndex = (signed char)GetMesNibbleValue((const char*)in + 2);
-			strcpy(dst, GetFlatName(5, CMes::m_tempVar[varIndex]));
+			strcpy(dst, FLAT_NAME_DIRECT(5, CMes::m_tempVar[varIndex]));
 			dst += strlen(dst);
 			next = in + 4;
 			break;

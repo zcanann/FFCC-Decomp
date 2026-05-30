@@ -489,8 +489,8 @@ static inline void DrawBonusSelectedArtifactHelp(CMenuPcs* menu, int statePtr, B
 	font->SetScaleX(0.7200000286102295f);
 	font->SetScaleY(0.8999999761581421f);
 	font->DrawInit();
-	GXColor color = {0xFF, 0xFF, 0xFF, 0xFF};
-	font->SetColor(color);
+	CColor color(0xFF, 0xFF, 0xFF, 0xFF);
+	font->SetColor(color.color);
 
 	BonusFlatDataRaw* flat = reinterpret_cast<BonusFlatDataRaw*>(&Game.m_cFlatDataArr[1]);
 	int itemId = (int)rewardItems[selection];

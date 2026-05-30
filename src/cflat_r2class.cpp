@@ -688,9 +688,10 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			break;
 		case -0x91: {
 			float furTarget = static_cast<float>(localBase[0]);
+			float furSetCur = static_cast<float>(localBase[1]);
 			CChara::CModel* model = engineObject->m_charaModelHandle->m_model;
 			model->m_furTarget = furTarget;
-			if (static_cast<float>(localBase[1]) != 0.0f) {
+			if (furSetCur != 0.0f) {
 				model->m_furCur = furTarget;
 			}
 			PushValue(this, object, 0);

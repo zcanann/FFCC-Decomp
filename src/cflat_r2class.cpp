@@ -923,6 +923,25 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
+		case -0x2C: {
+			Vec hitStart;
+			Vec hitMove;
+			float* params = reinterpret_cast<float*>(localBase);
+			hitStart.x = engineObject->m_worldPosition.x + static_cast<float>(sin(params[2]) * params[3]);
+			hitStart.y = engineObject->m_worldPosition.y + params[1];
+			hitStart.z = engineObject->m_worldPosition.z + static_cast<float>(cos(params[2]) * params[3]);
+			hitMove.x = FLOAT_80330BC8;
+			hitMove.y = -params[4];
+			hitMove.z = FLOAT_80330BC8;
+			int hit = MapPcs.CheckHitCylinderNear(&hitStart, &hitMove, params[5], localBase[0]);
+			AddDebugDrawCC(&hitStart, &hitMove, params[5], 1, 0);
+			if (hit != 0) {
+				*reinterpret_cast<int*>(localBase[6]) = 0;
+			}
+			PushValue(this, object, hit);
+			outResult = 0;
+			break;
+		}
 		case -0x33: {
 			float rotY = static_cast<float>(localBase[0]);
 			engineObject->m_rotTargetY = rotY;

@@ -9299,6 +9299,35 @@ LAB_draw:
 		} while ((int)slotIdx < 4);
 	}
 
+	float frameAlpha;
+	state = *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x10);
+	if (state == 0) {
+		frameAlpha = static_cast<float>(DOUBLE_803314e8 *
+		                                (static_cast<double>(*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x22)) -
+		                                 DOUBLE_80331408));
+	} else if (state > 0 && state < 4) {
+		frameAlpha = FLOAT_803313e8;
+	} else {
+		frameAlpha = static_cast<float>(-(DOUBLE_803314e8 *
+		                                  (static_cast<double>(*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x22)) -
+		                                   DOUBLE_80331408) -
+		                                  DOUBLE_80331420));
+	}
+	SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+	GXColor frameColor = {0xFF, 0xFF, 0xFF,
+	                      static_cast<unsigned char>(static_cast<int>(DOUBLE_80331508 * static_cast<double>(frameAlpha)))};
+	GXSetChanMatColor(static_cast<GXChannelID>(4), frameColor);
+	SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
+	unsigned char* const frame = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x820)[0]);
+	unsigned char* const frameEntry = frame + 0x20;
+	DrawRect(0xFFFFFFFF, static_cast<float>(*reinterpret_cast<short*>(frameEntry)),
+	         static_cast<float>(*reinterpret_cast<short*>(frameEntry + 2)),
+	         static_cast<float>(*reinterpret_cast<short*>(frameEntry + 4)),
+	         static_cast<float>(*reinterpret_cast<short*>(frameEntry + 6)),
+	         *reinterpret_cast<float*>(frameEntry + 8), *reinterpret_cast<float*>(frameEntry + 0x0C),
+	         FLOAT_803313e8, FLOAT_803313e8,
+	         static_cast<float>(*reinterpret_cast<unsigned int*>(frameEntry + 0x18)));
+
 	// Draw text info for each save slot
 	if ((state == 2 || state == 3) && *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x16) != 0) {
 		unsigned int* mcData = *reinterpret_cast<unsigned int**>(bytes + 0x838);

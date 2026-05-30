@@ -690,6 +690,39 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
+		case -0xD: {
+			unsigned int mode = localBase[0];
+			float* params = reinterpret_cast<float*>(localBase);
+			float radius = params[1];
+			float offset = params[4];
+			if (mode == 2) {
+				engineObject->m_bodyColRadius = radius;
+			} else if (static_cast<int>(mode) < 2) {
+				if (mode == 0) {
+					engineObject->m_capsuleHalfHeight = radius;
+				} else if (static_cast<int>(mode) > -1) {
+					engineObject->m_bodyEllipsoidRadius = radius;
+					engineObject->m_bodyEllipsoidOffset = offset;
+				}
+			} else if (mode == 4) {
+				engineObject->m_nearColRadius = radius;
+			} else if (static_cast<int>(mode) < 4) {
+				engineObject->m_attackColRadius = radius;
+			}
+			PushValue(this, object, 0);
+			outResult = 0;
+			break;
+		}
+		case -0xE:
+			engineObject->LoadAnim(
+			    RuntimeString(this, localBase[0]),
+			    static_cast<int>(localBase[1]),
+			    static_cast<int>(localBase[2]),
+			    static_cast<int>(localBase[3]),
+			    localBase[4]);
+			PushValue(this, object, 0);
+			outResult = 0;
+			break;
 		case -0xF:
 			engineObject->SetAnimSlot(static_cast<int>(localBase[0]), static_cast<int>(localBase[1]));
 			PushValue(this, object, 0);
@@ -704,6 +737,12 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			engineObject->CancelAnim(1);
 			PushValue(this, object, 0);
 			outResult = 0;
+			break;
+		case -0x11:
+			if (engineObject->IsAnimFinished(0) != 0) {
+				PushValue(this, object, 0);
+				outResult = 0;
+			}
 			break;
 		case -0x13:
 			engineObject->m_bgColMask = localBase[0];

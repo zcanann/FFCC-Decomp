@@ -2500,6 +2500,21 @@ void CMenuPcs::CalcResultOpenAnim()
 			sprites[idx].mulX = 24.0f;
 		}
 
+		int boardPtr = GetBonusMenuMembers(this).m_bonusBoardPtr;
+		int entryOffset = 0;
+		for (int i = 0; i < activePartyCount; i++) {
+			BonusAnimSprite* sprite = &sprites[iconBase + i];
+			int centerX = (int)((double)(float)(24.0 + (double)sprite->w * 0.5 + (double)sprite->x) - 320.0);
+			int centerY = (int)((double)(float)((double)sprite->h * 0.5 + (double)sprite->y) - 240.0);
+			*reinterpret_cast<short*>(boardPtr + entryOffset + 8) = (short)centerX;
+			*reinterpret_cast<short*>(boardPtr + entryOffset + 10) = (short)centerY;
+			*reinterpret_cast<int*>(boardPtr + entryOffset + 0x40) = sprite->x + 0xC;
+			*reinterpret_cast<int*>(boardPtr + entryOffset + 0x44) = sprite->y - 8;
+			*reinterpret_cast<int*>(boardPtr + entryOffset + 0x48) = 0x48;
+			*reinterpret_cast<int*>(boardPtr + entryOffset + 0x4C) = 0x58;
+			entryOffset += 0x50;
+		}
+
 		for (int i = 0; i < 0x18; i++) {
 			CCharaPcs::CHandle* handle = GetBonusDisplayHandleSlots(this)[i];
 			if (handle != 0) {

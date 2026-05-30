@@ -69,6 +69,8 @@ unsigned char DAT_8032ee24;
 unsigned char uRam8032ee25;
 int DAT_8032ee28;
 int DAT_8032ee2c;
+unsigned char s_wmMenuLastMountState;
+unsigned char s_wmMenuMountStateInitialized;
 extern float FLOAT_803313dc;
 extern float FLOAT_803313e0;
 extern float FLOAT_803313e4;
@@ -257,6 +259,10 @@ static const char s_SetCMakeEnd___chan____d_cur____d_801dc3b4[] = "SetCMakeEnd :
 static const char s_ClrCMakeFlg___chan____d_cur____d_801dc390[] = "ClrCMakeFlg : chan = %d  cur = %d\n";
 static const char s__s__d___Error_WM_menu_no_error___801dc424[] = "%s(%d): Error:WM menu no error(%d)\n";
 static const char s__s__d___Error_function_code_not_f_801dc3ec[] = "%s(%d): Error:function code not found(%d)\n";
+static const char s_dvd_movie_ffcc_op_thp_801dc448[] = "dvd_movie/ffcc_op.thp";
+static const char s_mount____s_801dc460[] = "mount : %s";
+static const char s_TRUE_803317EC[] = "TRUE";
+static const char s_FALSE_803317F4[] = "FALSE";
 
 static const int kMcListEntrySize = 0x48;
 static const int kMcListCount = 4;
@@ -1260,6 +1266,26 @@ void CMenuPcs::CalcDiaryMenu()
 	unsigned char* const worldState = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x82C)[0]);
 	if (worldState == 0) {
 		return;
+	}
+
+	if (s_wmMenuMountStateInitialized == 0) {
+		s_wmMenuLastMountState = 0;
+		s_wmMenuMountStateInitialized = 1;
+	}
+
+	const unsigned int slotState =
+	    static_cast<unsigned int>(-static_cast<int>(MemoryCardMan.m_currentSlot) - 1) |
+	    static_cast<unsigned int>(static_cast<int>(MemoryCardMan.m_currentSlot) + 1);
+	const unsigned int mounted = -static_cast<int>(static_cast<int>(slotState) >> 31);
+	if (mounted != s_wmMenuLastMountState) {
+		if (System.m_execParam > 2) {
+			const char* text = s_FALSE_803317F4;
+			if (mounted != 0) {
+				text = s_TRUE_803317EC;
+			}
+			System.Printf(const_cast<char*>(s_mount____s_801dc460), text);
+		}
+		s_wmMenuLastMountState = static_cast<unsigned char>(slotState >> 31);
 	}
 
 	WMChgMenu();

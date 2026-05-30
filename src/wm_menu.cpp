@@ -6288,10 +6288,9 @@ void CMenuPcs::PCAnimCtrl()
 	int* animState = reinterpret_cast<int*>(reinterpret_cast<unsigned int*>(bytes + 0x844)[0]);
 	for (int i = 0; i < kWmMenuPlayerCount; i++, animState += 5) {
 		CCharaPcs::CHandle* const handle = GetWmCharaHandles(this)[i];
-		if (handle == 0) {
-			continue;
-		}
 		unsigned char* const handleBytes = reinterpret_cast<unsigned char*>(handle);
+		const int currentAnimIndex = reinterpret_cast<int*>(handleBytes + 0x16C)[0];
+		const int blendMode = -1 - (currentAnimIndex >> 31);
 
 		CChara::CModel* const modelObj = handle->m_model;
 		unsigned char* const model = reinterpret_cast<unsigned char*>(modelObj);
@@ -6302,8 +6301,6 @@ void CMenuPcs::PCAnimCtrl()
 		const unsigned int isSelected = selectedMask & (1u << static_cast<unsigned int>(i));
 		animState[3] = reinterpret_cast<int*>(model + 0xB4)[0];
 		const int baseAnim = (static_cast<int>(handle->m_charaNo / 100) - 1) * 6;
-		const int currentAnimIndex = reinterpret_cast<int*>(handleBytes + 0x16C)[0];
-		const int blendMode = -1 - (currentAnimIndex >> 31);
 
 		if (animState[1] >= 0) {
 			animState[0] = animState[1];

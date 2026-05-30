@@ -7058,20 +7058,19 @@ void CMenuPcs::PCAnimCtrl()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	unsigned char* const charaSelect = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x828)[0]);
-	unsigned char* const worldState = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x82C)[0]);
 	unsigned int selectedMask = 0;
 
 	if (charaSelect[0x0D] != 0 && charaSelect[0x0A] != 0) {
-		selectedMask |= 1u << static_cast<unsigned int>(reinterpret_cast<unsigned short*>(charaSelect + 4)[0]);
+		selectedMask |= 1 << reinterpret_cast<short*>(charaSelect + 4)[0];
 	}
 	if (charaSelect[0x1D] != 0 && charaSelect[0x1A] != 0) {
-		selectedMask |= 1u << static_cast<unsigned int>(reinterpret_cast<unsigned short*>(charaSelect + 0x14)[0]);
+		selectedMask |= 1 << reinterpret_cast<short*>(charaSelect + 0x14)[0];
 	}
 	if (charaSelect[0x2D] != 0 && charaSelect[0x2A] != 0) {
-		selectedMask |= 1u << static_cast<unsigned int>(reinterpret_cast<unsigned short*>(charaSelect + 0x24)[0]);
+		selectedMask |= 1 << reinterpret_cast<short*>(charaSelect + 0x24)[0];
 	}
 	if (charaSelect[0x3D] != 0 && charaSelect[0x3A] != 0) {
-		selectedMask |= 1u << static_cast<unsigned int>(reinterpret_cast<unsigned short*>(charaSelect + 0x34)[0]);
+		selectedMask |= 1 << reinterpret_cast<short*>(charaSelect + 0x34)[0];
 	}
 
 	int* animState = reinterpret_cast<int*>(reinterpret_cast<unsigned int*>(bytes + 0x844)[0]);
@@ -7101,13 +7100,16 @@ void CMenuPcs::PCAnimCtrl()
 
 		const float frame = reinterpret_cast<float*>(model + 0xB4)[0];
 		const float frameEnd = reinterpret_cast<float*>(model + 0xC0)[0];
-		if (isSelected == 0 && reinterpret_cast<short*>(worldState + 0x1C)[0] != 8 && animState[0] == 0 && animState[2] > 2999) {
+		if (isSelected == 0 &&
+		    reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x82C)[0]) + 0x1C)[0] != 8 &&
+		    animState[0] == 0 && animState[2] > 2999) {
 			animState[0] = 4;
 			handle->SetAnim(baseAnim + animState[0], -1, -1, blendMode, 0);
 			animState[3] = reinterpret_cast<int*>(model + 0xB4)[0];
 			animState[4] = reinterpret_cast<int*>(model + 0xC0)[0];
 			animState[2] = 0;
-		} else if (isSelected != 0 && reinterpret_cast<short*>(worldState + 0x1C)[0] != 8) {
+		} else if (isSelected != 0 &&
+		           reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x82C)[0]) + 0x1C)[0] != 8) {
 			if (animState[0] == 1 && animState[2] > 11999) {
 				animState[0] = 0;
 				animState[2] = 0;

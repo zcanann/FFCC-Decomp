@@ -167,6 +167,7 @@ extern float FLOAT_80331550;
 extern float FLOAT_80331558;
 extern float FLOAT_8033155C;
 extern float FLOAT_80331560;
+extern float FLOAT_80331564;
 extern float FLOAT_80331568;
 extern float FLOAT_80331578;
 extern float FLOAT_80331594;
@@ -9396,6 +9397,10 @@ LAB_draw:
 						iconX += FLOAT_80331468;
 					}
 				}
+				SetTexture(static_cast<CMenuPcs::TEX>(0x20));
+				DrawRect(0xFFFFFFFF, FLOAT_80331564, slotY + FLOAT_80331468,
+				         FLOAT_80331554, FLOAT_803314d8, FLOAT_803313dc, FLOAT_803313dc,
+				         FLOAT_803313e8, FLOAT_803313e8, 0.0f);
 			}
 		}
 	}

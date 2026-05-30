@@ -722,8 +722,9 @@ void CMes::Draw()
 
 						nextFont->SetShadow(*(int*)((char*)this + 0x3D38));
 						nextFont->SetMargin(FLOAT_8033089c);
+						float fontScaleY = *(float*)((char*)this + 0x3D48);
 						nextFont->SetScaleX(*(float*)((char*)this + 0x3D44));
-						nextFont->SetScaleY(*(float*)((char*)this + 0x3D48));
+						nextFont->SetScaleY(fontScaleY);
 						nextFont->DrawInit();
 						activeFontId = fontId;
 						font = nextFont;

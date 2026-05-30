@@ -4091,8 +4091,12 @@ void CMenuPcs::DrawCMakeMenu()
 		char* text = 0;
 		const int languageIndex = (Game.m_gameWork.m_languageId - 1) * 0x0B;
 		if (worldState[0x1C / sizeof(short)] == 3) {
+			char* textList[3];
 			const int textIndex = static_cast<int>(*reinterpret_cast<short*>(bytes + 0x74) / 0x4B);
-			text = lbl_80210750[languageIndex + 5 + textIndex];
+			textList[0] = lbl_80210750[languageIndex + 5];
+			textList[1] = lbl_80210750[languageIndex + 6];
+			textList[2] = lbl_80210750[languageIndex + 7];
+			text = textList[textIndex - (textIndex >> 31)];
 		} else if (worldState[0x1C / sizeof(short)] == 8) {
 			if (*reinterpret_cast<char*>(DAT_8032ef08 + 0x2C) == 3) {
 				if (*reinterpret_cast<char*>(DAT_8032ef08 + 0x24) == 2) {
@@ -6291,10 +6295,10 @@ LAB_calc:
 
 	fVar1 = FLOAT_803313e8;
 	char cVar2;
-	if ((bytes[0x0A] & 2) == 0) {
-		cVar2 = (char)bytes[0x0C];
-	} else {
+	if ((bytes[0x0A] & 2) != 0) {
 		cVar2 = (char)bytes[0x0B];
+	} else {
+		cVar2 = (char)bytes[0x0C];
 	}
 	unsigned int uVar13 = *reinterpret_cast<int*>(reinterpret_cast<char*>(&Game.m_gameWork) + 8) + (int)cVar2;
 	gWmMenuScriptValueCache = (unsigned char)uVar13;
@@ -6323,11 +6327,11 @@ LAB_calc:
 		int digits[4];
 		iVar16 = (int)uVar13 / 10 + ((int)uVar13 >> 0x1F);
 		digits[0] = uVar13 + (iVar16 - (iVar16 >> 0x1F)) * -10;
-		if (uVar14 > 1) {
+		if (1 < uVar14) {
 			digits[1] = iVar16 - (iVar16 >> 0x1F);
 		}
 		iVar16 = DAT_801dc118[digits[0]];
-		if (uVar14 > 1) {
+		if (1 < uVar14) {
 			int iVar15 = (int)uVar13 / 10 + ((int)uVar13 >> 0x1F);
 			iVar16 = iVar16 + DAT_801dc118[iVar15 - (iVar15 >> 0x1F)];
 		}

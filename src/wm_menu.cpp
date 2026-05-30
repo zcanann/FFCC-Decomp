@@ -61,6 +61,7 @@ extern char cRam8032ee21;
 extern "C" char lbl_80331380[];
 extern "C" char lbl_80331400[];
 extern "C" unsigned char lbl_801DC294[];
+extern "C" const char* lbl_80210D10[];
 extern "C" const char* lbl_80210D54[];
 extern "C" const char* lbl_80210D68[];
 extern "C" char* lbl_80210750[];
@@ -9872,14 +9873,22 @@ LAB_draw:
 				fontF8->DrawInit();
 				unsigned int locationColor = 0xFFFFFFFF;
 				fontF8->SetColor(*(_GXColor*)&locationColor);
-				fontF8->SetTlut(7);
-				char locationStr[64];
-				const int locationIndex = *reinterpret_cast<int*>(slotData + 0x10);
-				if (locationIndex == 0x0F || locationIndex == 0x16) {
-					strcpy(locationStr, reinterpret_cast<char*>(slotData + 0x2C));
-				} else {
-					WmMenuFlatDataView* flatData = reinterpret_cast<WmMenuFlatDataView*>(&Game.m_cFlatDataArr[1]);
-					strcpy(locationStr, flatData->table[3].index[locationIndex]);
+					fontF8->SetTlut(7);
+					char locationStr[64];
+					const int locationIndex = *reinterpret_cast<int*>(slotData + 0x10);
+					if (locationIndex == 0x0F) {
+						strcpy(locationStr, reinterpret_cast<char*>(slotData + 0x2C));
+					} else if (locationIndex == 0x16) {
+						if (Game.m_gameWork.m_languageId == 2) {
+							strcpy(locationStr, reinterpret_cast<char*>(slotData + 0x2C));
+							strcat(locationStr, lbl_80210D10[1], sizeof(locationStr));
+						} else {
+							strcpy(locationStr, lbl_80210D10[Game.m_gameWork.m_languageId - 1]);
+							strcat(locationStr, reinterpret_cast<char*>(slotData + 0x2C), sizeof(locationStr));
+						}
+					} else {
+						WmMenuFlatDataView* flatData = reinterpret_cast<WmMenuFlatDataView*>(&Game.m_cFlatDataArr[1]);
+						strcpy(locationStr, flatData->table[3].index[locationIndex]);
 				}
 				if (locationStr[0] != 0) {
 					locationStr[0] = static_cast<char>(toupperLatin1(static_cast<unsigned char>(locationStr[0])));

@@ -826,8 +826,8 @@ void CMes::Calc()
 				}
 				else
 				{
-					int idx = (unsigned int)flagEntry[2] * 4 + 0x3CC0;
-					*(int*)((char*)this + idx) = *(int*)((char*)this + idx) + 1;
+					int* slot = (int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3CC0);
+					*slot = *slot + 1;
 				}
 			}
 			else if ((type < 5) &&

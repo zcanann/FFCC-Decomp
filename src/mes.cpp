@@ -143,9 +143,9 @@ static void AddMesFlag(CMes* mes, unsigned char type, unsigned char index, short
 unsigned long CMes::drawTagString(CFont* font, char* text, int drawChars, int breakOnLineTag, int lineBaseY)
 {
 	int width = 0;
-	unsigned char* src = (unsigned char*)text;
 	bool continueDraw = true;
 	float lineStartX = font->posX;
+	unsigned char* src = (unsigned char*)text;
 
 	while (continueDraw)
 	{
@@ -809,13 +809,8 @@ void CMes::Calc()
 
 	unsigned char* flagEntry =
 	    (unsigned char*)((char*)this + *(int*)((char*)this + 0x3C10) * 6 + 0x3C14);
-	while (true)
+	while ((int)maxAdvance > *(int*)((char*)this + 0x3C10))
 	{
-		if ((int)maxAdvance <= *(int*)((char*)this + 0x3C10))
-		{
-			break;
-		}
-
 		int type = *flagEntry;
 		if (type != 3)
 		{

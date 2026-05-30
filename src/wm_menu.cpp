@@ -7097,7 +7097,6 @@ void CMenuPcs::DrawChara()
 	unsigned char* const worldObj = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x814)[0]);
 	WmCharaSelectEntry* const selectEntries = GetWmCharaSelectEntries(this);
 	short* const worldState = GetWmWorldState(this);
-	bool drewModel = false;
 
 	for (int i = 0; i < kWmMenuPlayerCount; i++) {
 		unsigned char* const view = worldObj + 0xA00 + i * 0x50;
@@ -7160,15 +7159,9 @@ void CMenuPcs::DrawChara()
 				}
 			}
 		}
-		drewModel = true;
 	}
 
-	if (drewModel) {
-		RestoreProjection();
-	}
-
-	DrawCharaName();
-	DrawCMLife();
+	DrawInit();
 }
 
 /*

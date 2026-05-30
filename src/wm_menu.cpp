@@ -720,7 +720,8 @@ void CMenuPcs::loadData()
 	*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(reinterpret_cast<CCharaPcs::CHandle**>(bytes + 0x774)[6]->m_model) + 0x9C) =
 	    FLOAT_803314B0;
 
-	reinterpret_cast<void**>(bytes + 0x814)[0] = new unsigned char[0xC80];
+	reinterpret_cast<void**>(bytes + 0x814)[0] =
+	    operator new[](0xC80, m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x214);
 	memset(reinterpret_cast<void**>(bytes + 0x814)[0], 0, 0xC80);
 	for (int i = 0; i < 0x28; i++) {
 		unsigned char* const entry = reinterpret_cast<unsigned char*>(reinterpret_cast<void**>(bytes + 0x814)[0]) + i * 0x50;
@@ -737,13 +738,16 @@ void CMenuPcs::loadData()
 		*reinterpret_cast<unsigned int*>(entry + 0x4C) = 0x1C0;
 	}
 
-	reinterpret_cast<void**>(bytes + 0x818)[0] = new unsigned char[0x8C];
+	reinterpret_cast<void**>(bytes + 0x818)[0] =
+	    operator new(0x8C, m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x227);
 	memset(reinterpret_cast<void**>(bytes + 0x818)[0], 0, 0x8C);
 
-	reinterpret_cast<void**>(bytes + 0x81C)[0] = new unsigned char[0xEC];
+	reinterpret_cast<void**>(bytes + 0x81C)[0] =
+	    operator new(0xEC, m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x22B);
 	memset(reinterpret_cast<void**>(bytes + 0x81C)[0], 0, 0xEC);
 
-	reinterpret_cast<void**>(bytes + 0x820)[0] = new unsigned char[kWmFrameInfoBytes];
+	reinterpret_cast<void**>(bytes + 0x820)[0] =
+	    operator new(kWmFrameInfoBytes, m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x231);
 	memset(reinterpret_cast<void**>(bytes + 0x820)[0], 0, kWmFrameInfoBytes);
 
 	reinterpret_cast<void**>(bytes + 0x824)[0] = new unsigned char[0x1A0];

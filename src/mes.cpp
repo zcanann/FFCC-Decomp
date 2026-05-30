@@ -518,14 +518,18 @@ int CMes::useFlag(int maxCount, int stopOnClear)
 		{
 			if (type < 3)
 			{
-				if (type == 1)
+				if (type != 1)
+				{
+					if (type != 0)
+					{
+						*(int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3cc0) =
+						    (int)*(short*)(flagEntry + 4);
+					}
+				}
+				else
 				{
 					int idx = (unsigned int)flagEntry[2] * 4 + 0x3cc0;
 					*(int*)((char*)this + idx) = *(int*)((char*)this + idx) + 1;
-				}
-				else if (type != 0)
-				{
-					*(int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3cc0) = (int)*(short*)(flagEntry + 4);
 				}
 			}
 			else if ((type < 5) &&
@@ -824,15 +828,18 @@ void CMes::Calc()
 		{
 			if (type < 3)
 			{
-				if (type == 1)
+				if (type != 1)
+				{
+					if (type != 0)
+					{
+						*(int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3CC0) =
+						    (int)*(short*)(flagEntry + 4);
+					}
+				}
+				else
 				{
 					int idx = (unsigned int)flagEntry[2] * 4 + 0x3CC0;
 					*(int*)((char*)this + idx) = *(int*)((char*)this + idx) + 1;
-				}
-				else if (type != 0)
-				{
-					*(int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3CC0) =
-					    (int)*(short*)(flagEntry + 4);
 				}
 			}
 			else if ((type < 5) &&
@@ -1282,14 +1289,18 @@ void CMes::Next()
 			type = *flagEntry;
 			if (type < 3)
 			{
-				if (type == 1)
+				if (type != 1)
+				{
+					if (type != 0)
+					{
+						*(int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3cc0) =
+						    (int)*(short*)(flagEntry + 4);
+					}
+				}
+				else
 				{
 					remaining = (unsigned int)flagEntry[2] * 4 + 0x3cc0;
 					*(int*)((char*)this + remaining) = *(int*)((char*)this + remaining) + 1;
-				}
-				else if (type != 0)
-				{
-					*(int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3cc0) = (int)*(short*)(flagEntry + 4);
 				}
 			}
 			flagEntry += 6;

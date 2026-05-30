@@ -1010,25 +1010,23 @@ void CMenuPcs::DrawOptionMenu()
 {
 	CFont* font = menuFont;
 	int languageBase = (Game.m_gameWork.m_languageId - 1) * 20;
-	int alpha = static_cast<int>(FLOAT_80333550 * m_optionOpenAnim);
 	_GXColor color = {0xFF, 0xFF, 0xFF, 0xFF};
 	Vec2d uv0;
 	Vec2d uv1;
 
-	char** menuText = &g_strMenuUtilMes[languageBase];
 	char* optionText[5];
 	char* helpText[5];
-	optionText[0] = menuText[2];
-	optionText[1] = menuText[3];
-	optionText[2] = menuText[4];
-	optionText[3] = menuText[5];
-	optionText[4] = menuText[6];
-	helpText[0] = menuText[7];
-	helpText[1] = menuText[8];
-	helpText[2] = menuText[9];
-	helpText[3] = menuText[10];
-	helpText[4] = menuText[11];
-	color.a = static_cast<unsigned char>(alpha);
+	optionText[0] = g_strMenuUtilMes[languageBase + 2];
+	optionText[1] = g_strMenuUtilMes[languageBase + 3];
+	optionText[2] = g_strMenuUtilMes[languageBase + 4];
+	optionText[3] = g_strMenuUtilMes[languageBase + 5];
+	optionText[4] = g_strMenuUtilMes[languageBase + 6];
+	helpText[0] = g_strMenuUtilMes[languageBase + 7];
+	helpText[1] = g_strMenuUtilMes[languageBase + 8];
+	helpText[2] = g_strMenuUtilMes[languageBase + 9];
+	helpText[3] = g_strMenuUtilMes[languageBase + 10];
+	helpText[4] = g_strMenuUtilMes[languageBase + 11];
+	color.a = static_cast<unsigned char>(static_cast<int>(FLOAT_80333550 * m_optionOpenAnim));
 
 	font->SetScale(FLOAT_80333548);
 	font->SetMargin(kOptionAnimMin);

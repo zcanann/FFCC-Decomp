@@ -1201,7 +1201,7 @@ void CMenuPcs::DrawArtiBase(CMenuPcs::Sprt2* sprt, float alpha)
 	int statePtr = GetBonusMenuMembers(this).m_bonusStatePtr;
 
 	if (*(short*)(statePtr + 0x1c) != 4) {
-		_GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(alpha * 255.0)};
+		_GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(alpha * 255.0f)};
 		GXSetChanMatColor(GX_COLOR0A0, color);
 	}
 
@@ -1223,14 +1223,15 @@ void CMenuPcs::DrawArtiBase(CMenuPcs::Sprt2* sprt, float alpha)
 	for (int i = 0; i < 8; i++) {
 		if (*(short*)(statePtr + 0x1c) == 4) {
 			float rgb = 1.0f;
-			if ((((int)s_Rinfo->pad_0008 | (int)s_Rinfo->m_missingArtifactMask | (int)s_Rinfo->m_party[partyIndex].m_ownedArtifactMask) & (1 << i)) != 0) {
+			unsigned int mask = s_Rinfo->pad_0008 | s_Rinfo->m_party[partyIndex].m_ownedArtifactMask | s_Rinfo->m_missingArtifactMask;
+			if ((mask & (1 << i)) != 0) {
 				rgb = 0.5f;
 			}
 			_GXColor color = {
 			    (unsigned char)(rgb * 255.0f),
 			    (unsigned char)(rgb * 255.0f),
 			    (unsigned char)(rgb * 255.0f),
-			    (unsigned char)(alpha * 255.0),
+			    (unsigned char)(alpha * 255.0f),
 			};
 			GXSetChanMatColor(GX_COLOR0A0, color);
 		}
@@ -2885,6 +2886,7 @@ void CMenuPcs::DrawResultOpenAnim()
 		int activePartyCount = s_Rinfo->m_partyCount;
 		BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
 		BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
+		CCharaPcs::CHandle** displaySlots = GetBonusDisplayHandleSlots(this);
 		int lastKind = 0;
 
 		DrawInit();
@@ -2900,7 +2902,7 @@ void CMenuPcs::DrawResultOpenAnim()
 					if (modelIndex < activePartyCount) {
 						handle = s_Rinfo->m_party[modelIndex].m_partyHandle;
 					} else {
-						handle = GetBonusDisplayHandleSlots(this)[modelIndex - activePartyCount];
+						handle = displaySlots[modelIndex - activePartyCount];
 					}
 
 					if (0.0f < *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C)) {

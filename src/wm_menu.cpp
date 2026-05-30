@@ -1226,9 +1226,18 @@ void CMenuPcs::CalcDiaryMenu()
 		}
 		break;
 	case 4:
-		CalcFukidashi();
-		CalcPitcher();
-		CalcWMFrame();
+		if (((*reinterpret_cast<short*>(worldState + 0x10) != 0) || bytes[0x12] != 0) &&
+		    *reinterpret_cast<short*>(worldState + 0x10) < 4) {
+			if (Game.m_gameWork.m_chaliceElement != *reinterpret_cast<int*>(bytes + 0x84)) {
+				SetCrystalCageAttr();
+			}
+			if (Game.m_gameWork.m_timerA != *reinterpret_cast<int*>(bytes + 0x70)) {
+				SetManaWaterEffect();
+			}
+			CalcFukidashi();
+			CalcPitcher();
+			CalcWMFrame();
+		}
 		break;
 	case 5:
 		CalcLoadMenu();

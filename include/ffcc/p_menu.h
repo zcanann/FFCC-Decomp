@@ -240,6 +240,8 @@ public:
     void DrawObj(int);
     void CalcPitcher();
     void CalcFukidashi();
+    void SetCrystalCageAttr();
+    void SetManaWaterEffect();
     void DrawFukidashi();
     void ChkPlaceLength(char*);
     void SplitPlace(const char*, char*, char*);

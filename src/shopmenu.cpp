@@ -175,7 +175,6 @@ static inline unsigned short GetPadButtons()
     if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
         return 0;
     }
-    __cntlzw(static_cast<unsigned int>(Pad._448_4_));
     return static_cast<unsigned short>(Pad.GetPadInputs()[0].buttonDown[0]);
 }
 
@@ -470,7 +469,7 @@ static void SetupShopMenuLabelFont(CFont* font, _GXColor* color)
 
 static inline CFont* GetShopMenuInfoPanelFont()
 {
-    return *reinterpret_cast<CFont**>(MenuPcsRaw() + 0x248);
+    return MenuPcs.m_infoPanelFont;
 }
 
 static void DrawShopMenuCenteredText(CFont* font, const char* text, float centerX, float y)
@@ -935,7 +934,7 @@ void CShopMenu::DrawItemHelp(int index, int centerX, int y)
     memset(helpText, 0, 0x200);
     MakeAgbString__4CMesFPcPcii(helpText, const_cast<char*>(sourceText), 0, 1);
 
-    CFont* font = *reinterpret_cast<CFont**>(MenuPcsRaw() + 0x248);
+    CFont* font = MenuPcs.m_infoPanelFont;
     SetMargin__5CFontFf(FLOAT_80332d28, font);
     SetShadow__5CFontFi(font, 1);
     SetScaleX__5CFontFf(FLOAT_80332d2c, font);
@@ -1249,7 +1248,7 @@ void CShopMenu::DrawItemInfo0()
  */
 void CShopMenu::DrawBuySellInfo()
 {
-    CFont* font = *reinterpret_cast<CFont**>(MenuPcsRaw() + 0x248);
+    CFont* font = MenuPcs.m_infoPanelFont;
     int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
     int selected = ShopMenuInt(this, 0x28);
     int listType = ShopMenuInt(this, 0x14);
@@ -1813,7 +1812,7 @@ void CShopMenu::DrawSoubi()
     DrawInit__8CMenuPcsFv(MenuPcsVoid());
     DrawSingleIcon__8CMenuPcsFiiifif(MenuPcsVoid(), resultItem, 0x40, 0x42, 0.0f, FLOAT_80332d28, FLOAT_80332d28);
 
-    CFont* font = *reinterpret_cast<CFont**>(MenuPcsRaw() + 0x248);
+    CFont* font = MenuPcs.m_infoPanelFont;
     SetMargin__5CFontFf(FLOAT_80332d28, font);
     SetShadow__5CFontFi(font, 1);
     SetScale__5CFontFf(FLOAT_80332d28, font);
@@ -1909,7 +1908,7 @@ void CShopMenu::DrawMake()
     DrawInit__8CMenuPcsFv(MenuPcsVoid());
     DrawSingleIcon__8CMenuPcsFiiifif(MenuPcsVoid(), resultItem, 0x40, 0x32, 0.0f, FLOAT_80332d28, FLOAT_80332d28);
 
-    CFont* font = *reinterpret_cast<CFont**>(MenuPcsRaw() + 0x248);
+    CFont* font = MenuPcs.m_infoPanelFont;
     SetMargin__5CFontFf(FLOAT_80332d28, font);
     SetShadow__5CFontFi(font, 1);
     SetScale__5CFontFf(FLOAT_80332d28, font);
@@ -2104,7 +2103,7 @@ void CShopMenu::DrawSmith0()
     DrawItemList();
     DrawItemHelp(ShopMenuInt(this, 0x28), 0x140, 0x172);
 
-    CFont* font = *reinterpret_cast<CFont**>(MenuPcsRaw() + 0x248);
+    CFont* font = MenuPcs.m_infoPanelFont;
     SetMargin__5CFontFf(FLOAT_80332d28, font);
     SetShadow__5CFontFi(font, 1);
     SetScale__5CFontFf(FLOAT_80332d8c, font);
@@ -2140,7 +2139,7 @@ void CShopMenu::DrawShop0()
     int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
     int selected = ShopMenuInt(this, 0x48);
 
-    CFont* font = *reinterpret_cast<CFont**>(MenuPcsRaw() + 0x248);
+    CFont* font = MenuPcs.m_infoPanelFont;
     SetMargin__5CFontFf(FLOAT_80332d28, font);
     SetShadow__5CFontFi(font, 1);
     SetScale__5CFontFf(FLOAT_80332d8c, font);

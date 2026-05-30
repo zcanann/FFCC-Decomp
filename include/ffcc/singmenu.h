@@ -138,6 +138,9 @@ public:
     char* GetAttrStr(int);
     int GetModelNo(int, int, int);
     unsigned char GetItemIcon(int);
+
+    unsigned char _pad0[0x248];
+    CFont* m_infoPanelFont;
 };
 
 extern CMenuPcs MenuPcs;

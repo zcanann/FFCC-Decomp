@@ -179,7 +179,6 @@ public:
     void CalcSelectCloseAnim();
     void DrawSelectCloseAnim();
 
-    void DrawBonusCnt(CMenuPcs::Sprt2*, int);
     void DrawBonusFrame(float, float, float, float, float);
     void DrawArtiBase(CMenuPcs::Sprt2*, float);
     void DrawBonusChkMark(float);

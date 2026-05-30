@@ -768,39 +768,6 @@ static void DrawBonusMcWinOverlay(CMenuPcs* menu, int statePtr)
 	}
 }
 
-static BonusAnimSprite* GetSelectCursorSprite(BonusAnimHeader* header, BonusAnimSprite* sprites)
-{
-	if (header == 0 || sprites == 0 || header->count <= 0) {
-		return 0;
-	}
-
-	BonusAnimSprite* cursor = &sprites[header->count - 1];
-	return (cursor->kind == 0x20) ? cursor : 0;
-}
-
-static void UpdateSelectCursorSprite(int statePtr, BonusAnimHeader* header, BonusAnimSprite* sprites, int frame)
-{
-	BonusAnimSprite* cursor = GetSelectCursorSprite(header, sprites);
-	if (statePtr == 0 || cursor == 0) {
-		return;
-	}
-
-	int activePartyCount = s_Rinfo->m_partyCount;
-	int currentPartyIndex = *(short*)(statePtr + 0xe);
-	if (currentPartyIndex < activePartyCount) {
-		BonusAnimSprite* partySprite = cursor - (activePartyCount * 2 - currentPartyIndex);
-		int pulseFrame = frame % 20 - 10;
-		if (pulseFrame < 0) {
-			pulseFrame = -pulseFrame;
-		}
-		cursor->x = (short)(partySprite->x - 3);
-		cursor->y = (short)(partySprite->y - 8);
-		cursor->alpha = (float)pulseFrame / 10.0f;
-	} else {
-		cursor->alpha = 0.0f;
-	}
-}
-
 static void TickAnimSprites(int statePtr, int animPtr, int fadeDir)
 {
 	BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
@@ -1297,73 +1264,6 @@ void CMenuPcs::DrawBonusFrame(float x, float y, float w, float h, float alpha)
 	MenuPcs.DrawRect(0, right, y + corner, corner, h, 0.0f, 0.0f, texScale, texScale, 0.0f);
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
 	MenuPcs.DrawRect(0, x + corner, y + corner, w, h, 0.0f, 0.0f, texScale, texScale, 0.0f);
-}
-
-/*
- * --INFO--
- * Address: TODO
- * Size: TODO
- */
-void CMenuPcs::DrawBonusCnt(CMenuPcs::Sprt2* sprt, int value)
-{
-	BonusAnimSprite* sprite = (BonusAnimSprite*)sprt;
-	int digitValue;
-	int digits[3];
-	int digitCount;
-	float alpha;
-	float baseX;
-	float baseY;
-	float digitW;
-	float digitH;
-	float scale;
-
-	if (sprite == 0) {
-		return;
-	}
-
-	digitValue = value;
-	if (digitValue < 0) {
-		digitValue = -digitValue;
-	}
-	digitValue = digitValue % 1000;
-
-	alpha = ClampBonusUnit(sprite->alpha);
-	if (sprite->kind == 0x19) {
-		baseX = (float)sprite->x + sprite->motionX;
-		baseY = (float)sprite->y + sprite->motionY;
-	} else {
-		baseX = (float)sprite->x + sprite->mulX;
-		baseY = (float)sprite->y + sprite->mulY;
-	}
-	digitW = (sprite->w > 0) ? (float)sprite->w : 24.0f;
-	digitH = (sprite->h > 0) ? (float)sprite->h : 24.0f;
-	scale = (sprite->scale > 0.0f) ? sprite->scale : 1.0f;
-
-	if (digitValue >= 100) {
-		digitCount = 3;
-		digits[0] = digitValue / 100;
-		digits[1] = (digitValue / 10) % 10;
-		digits[2] = digitValue % 10;
-	} else if (digitValue >= 10) {
-		digitCount = 2;
-		digits[0] = digitValue / 10;
-		digits[1] = digitValue % 10;
-	} else {
-		digitCount = 1;
-		digits[0] = digitValue;
-	}
-
-	baseX += ((3.0f * digitW) - ((float)digitCount * digitW)) * 0.5f;
-
-	SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-	SetTexture(static_cast<CMenuPcs::TEX>(0x19));
-	_GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(alpha * 255.0f)};
-	GXSetChanMatColor(GX_COLOR0A0, color);
-
-	for (int i = 0; i < digitCount; i++) {
-		DrawRect(0, baseX + digitW * (float)i, baseY, digitW, digitH,
-		    digitW * (float)digits[i], 0.0f, scale, scale, 0.0f);
-	}
 }
 
 /*

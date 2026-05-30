@@ -2665,18 +2665,8 @@ void CMenuPcs::CmakeJobClose()
 void CMenuPcs::CmakeJobDraw()
 {
     int state = MenuS32(this, 0x82C);
-    int frame = static_cast<int>(*reinterpret_cast<short*>(state + 0x22)) - 1;
-    if (frame < 0) {
-        frame = 0;
-    }
-
     short mode = *reinterpret_cast<short*>(state + 0x10);
-    float alpha = FLOAT_80333258;
-    if (mode == 0) {
-        alpha = static_cast<float>(DOUBLE_80333268 * static_cast<double>(frame));
-    } else if (mode == 2) {
-        alpha = static_cast<float>(DOUBLE_80333270 - DOUBLE_80333268 * static_cast<double>(frame));
-    }
+    float alpha = CalcCmakeFadeAlpha(this);
 
     DrawWMFrame0(1, FLOAT_80333258);
 

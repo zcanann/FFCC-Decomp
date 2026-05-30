@@ -1759,10 +1759,18 @@ int CMenuPcs::CmakeNameCtrl()
 
         if ((repeat & 0xF) == 0) {
             if ((down & 0x40) != 0) {
-                table = (table > 0) ? static_cast<short>(table - 1) : 2;
+                if (table > 0) {
+                    table = static_cast<short>(table - 1);
+                } else {
+                    table = 2;
+                }
                 Sound.PlaySe(0x5A, 0x40, 0x7F, 0);
             } else if ((down & 0x20) != 0) {
-                table = (table < 2) ? static_cast<short>(table + 1) : 0;
+                if (table < 2) {
+                    table = static_cast<short>(table + 1);
+                } else {
+                    table = 0;
+                }
                 Sound.PlaySe(0x5A, 0x40, 0x7F, 0);
             } else if ((down & 0x1000) != 0) {
                 select = 0xB;

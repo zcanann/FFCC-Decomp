@@ -1078,12 +1078,13 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			break;
 		case -0x54: {
 			Vec moveVector;
-			float rotX = static_cast<float>(localBase[0]);
-			float rotY = static_cast<float>(localBase[1]);
+			float* params = reinterpret_cast<float*>(localBase);
+			float rotX = params[0];
+			float rotY = params[1];
 			moveVector.x = static_cast<float>(sin(rotX) * cos(rotY));
 			moveVector.y = static_cast<float>(sin(rotY));
 			moveVector.z = static_cast<float>(cos(rotX) * cos(rotY));
-			engineObject->MoveVector(&moveVector, static_cast<float>(localBase[2]), static_cast<int>(localBase[3]), 0, 0, 1);
+			engineObject->MoveVector(&moveVector, params[2], static_cast<int>(localBase[3]), 0, 0, 1);
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;

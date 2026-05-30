@@ -916,6 +916,7 @@ void CMenuPcs::CalcSelectCloseAnim()
 	Mtx tempMtx;
 	Vec srcVec;
 	Vec dstVec;
+	CCharaPcs::CHandle** displaySlots = GetBonusDisplayHandleSlots(this);
 	for (int i = 0; i < activePartyCount + 8; i++) {
 		CCharaPcs::CHandle* handle;
 		int tribeId;
@@ -929,7 +930,7 @@ void CMenuPcs::CalcSelectCloseAnim()
 			scaleMtx[0][3] = 0.0f;
 		} else {
 			int artifactIndex = i - activePartyCount;
-			handle = GetBonusDisplayHandleSlots(this)[activePartyCount * 2 + artifactIndex];
+			handle = displaySlots[activePartyCount * 2 + artifactIndex];
 			if (handle == 0) {
 				continue;
 			}

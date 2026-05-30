@@ -1510,21 +1510,25 @@ void CMenuPcs::DrawCmakeYesNo(int yesNoSel, float alpha)
 
     const char* yesStr = GetMenuStr(1);
     float yesW = static_cast<float>(font->GetWidth(yesStr));
-    float yesX = (FLOAT_803332b0 - yesW) * FLOAT_8033335c + 0x1D0;
-    font->SetPosX(yesX);
+    unsigned int yesX = static_cast<unsigned int>(
+        (static_cast<float>(static_cast<double>(FLOAT_803332b0) - static_cast<double>(yesW)) * FLOAT_8033335c) +
+        0x1D0);
+    font->SetPosX(static_cast<float>(static_cast<int>(yesX)));
     font->SetPosY(FLOAT_80333360);
     font->Draw(yesStr);
 
     const char* noStr = GetMenuStr(2);
     float noW = static_cast<float>(font->GetWidth(noStr));
-    float noX = (FLOAT_803332b0 - noW) * FLOAT_8033335c + 0x218;
-    font->SetPosX(noX);
+    unsigned int noX = static_cast<unsigned int>(
+        (static_cast<float>(static_cast<double>(FLOAT_803332b0) - static_cast<double>(noW)) * FLOAT_8033335c) +
+        0x218);
+    font->SetPosX(static_cast<float>(static_cast<int>(noX)));
     font->SetPosY(FLOAT_80333360);
     font->Draw(noStr);
 
     DrawInit();
     if (yesNoSel != 0) {
-        float cursorBase = (yesNoSel == 1) ? yesX : noX;
+        unsigned int cursorBase = (yesNoSel == 1) ? yesX : noX;
         int frame = System.m_frameCounter & 7;
         DrawCursor(static_cast<int>(cursorBase) - 0x24 + frame, 0x175, alpha);
     }

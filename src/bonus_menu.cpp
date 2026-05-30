@@ -416,7 +416,7 @@ static inline void DrawBonusPartyNames(CMenuPcs* menu, BonusAnimHeader* header, 
 	menu->DrawInit();
 	font->SetMargin(1.0f);
 	font->SetShadow(1);
-	font->SetScale(0.9f);
+	font->SetScale(0.7300000190734863f);
 	font->SetTlut(7);
 	font->DrawInit();
 

@@ -688,27 +688,26 @@ void CMenuPcs::CmdOpen()
 	u32 count = static_cast<u32>(list[0]);
 	s16* entry = list + 4;
 	const s32 timer = static_cast<s32>(cmd[0x11]);
-	s32 remaining = static_cast<s32>(count);
+	const s32 entryCount = static_cast<s32>(count);
 
-	if (remaining > 0) {
-		do {
-			if (*reinterpret_cast<s32*>(entry + 0x12) <= timer) {
-				const s32 start = *reinterpret_cast<s32*>(entry + 0x12);
-				const s32 length = *reinterpret_cast<s32*>(entry + 0x14);
-				if ((start + length) > timer) {
-					s32 value = *reinterpret_cast<s32*>(entry + 0x10);
-					value += 1;
-					*reinterpret_cast<s32*>(entry + 0x10) = value;
-					*reinterpret_cast<float*>(entry + 8) = static_cast<float>(
-					    (DOUBLE_80332a58 / static_cast<double>(length)) * static_cast<double>(value));
-				} else {
-					finishedCount += 1;
-					*reinterpret_cast<float*>(entry + 8) = FLOAT_80332a70;
-				}
+	for (s32 i = 0; i < entryCount; i++) {
+			if (*reinterpret_cast<s32*>(entry + 0x12) > timer) {
+				entry += 0x20;
+				continue;
 			}
+			if ((*reinterpret_cast<s32*>(entry + 0x12) + *reinterpret_cast<s32*>(entry + 0x14)) <= timer) {
+				finishedCount += 1;
+				*reinterpret_cast<float*>(entry + 8) = FLOAT_80332a70;
+				entry += 0x20;
+				continue;
+			}
+			s32 value = *reinterpret_cast<s32*>(entry + 0x10);
+			value += 1;
+			*reinterpret_cast<s32*>(entry + 0x10) = value;
+			*reinterpret_cast<float*>(entry + 8) = static_cast<float>(
+			    (DOUBLE_80332a58 / static_cast<double>(*reinterpret_cast<s32*>(entry + 0x14))) *
+			    static_cast<double>(value));
 			entry += 0x20;
-			remaining -= 1;
-		} while (remaining != 0);
 	}
 
 	bool done = false;
@@ -793,7 +792,7 @@ void CMenuPcs::CmdCtrl()
 	s16 mode = *reinterpret_cast<s16*>(cmd + 0x30);
 	s16 state = *reinterpret_cast<s16*>(cmd + 0x12);
 
-	if ((mode == 0) || ((mode != 0) && (state == 1))) {
+	if ((mode == 0) || (state == 1)) {
 		actionHandled = CmdCtrlCur();
 	} else if ((mode == 1) && (state == 0)) {
 		actionHandled = CmdOpen0();
@@ -940,29 +939,26 @@ int CMenuPcs::CmdClose()
 	u32 count = static_cast<u32>(list[0]);
 	s16* entry = list + 4;
 	s32 closeTimer = static_cast<s32>(*reinterpret_cast<s16*>(cmd + 0x22));
-	u32 remaining = count;
+	const s32 entryCount = static_cast<s32>(count);
 
-	if (remaining != 0) {
-		do {
-			if (*reinterpret_cast<s32*>(entry + 0x12) <= closeTimer) {
-				if (closeTimer < (*reinterpret_cast<s32*>(entry + 0x12) + *reinterpret_cast<s32*>(entry + 0x14))) {
-					*reinterpret_cast<s32*>(entry + 0x10) = *reinterpret_cast<s32*>(entry + 0x10) + 1;
-					*reinterpret_cast<float*>(entry + 8) =
-					    static_cast<float>(
-					        -((1.0 / static_cast<double>(*reinterpret_cast<s32*>(entry + 0x14))) *
-					              static_cast<double>(*reinterpret_cast<s32*>(entry + 0x10)) -
-					          1.0));
-					if (static_cast<double>(*reinterpret_cast<float*>(entry + 8)) < 0.0) {
-						*reinterpret_cast<float*>(entry + 8) = 0.0f;
-					}
-				} else {
-					doneCount = doneCount + 1;
+	for (s32 i = 0; i < entryCount; i++) {
+		if (*reinterpret_cast<s32*>(entry + 0x12) <= closeTimer) {
+			if (closeTimer >= (*reinterpret_cast<s32*>(entry + 0x12) + *reinterpret_cast<s32*>(entry + 0x14))) {
+				doneCount = doneCount + 1;
+				*reinterpret_cast<float*>(entry + 8) = 0.0f;
+			} else {
+				*reinterpret_cast<s32*>(entry + 0x10) = *reinterpret_cast<s32*>(entry + 0x10) + 1;
+				*reinterpret_cast<float*>(entry + 8) =
+				    static_cast<float>(
+				        -((1.0 / static_cast<double>(*reinterpret_cast<s32*>(entry + 0x14))) *
+				              static_cast<double>(*reinterpret_cast<s32*>(entry + 0x10)) -
+				          1.0));
+				if (static_cast<double>(*reinterpret_cast<float*>(entry + 8)) < 0.0) {
 					*reinterpret_cast<float*>(entry + 8) = 0.0f;
 				}
 			}
-			entry = entry + 0x20;
-			remaining = remaining - 1;
-		} while (remaining != 0);
+		}
+		entry = entry + 0x20;
 	}
 
 	if (list[0] == doneCount) {
@@ -1619,42 +1615,31 @@ unsigned int CMenuPcs::CmdOpen0()
 	iVar7 = 0;
 	iVar8 = static_cast<s32>(psVar5[1]) - static_cast<s32>(psVar5[0]);
 	psVar5 = psVar5 + psVar5[0] * 0x20 + 4;
-	iVar6 = iVar8;
-	if (iVar8 > 0) {
-		do {
-			float fVar1 = FLOAT_80332ab0;
-			const double dVar3 = DOUBLE_80332a80;
-			if (*reinterpret_cast<s32*>(psVar5 + 0x12) <= iVar4) {
-				if (iVar4 < *reinterpret_cast<s32*>(psVar5 + 0x12) + *reinterpret_cast<s32*>(psVar5 + 0x14)) {
-					*reinterpret_cast<s32*>(psVar5 + 0x10) = *reinterpret_cast<s32*>(psVar5 + 0x10) + 1;
-					const double dVar2 = DOUBLE_80332a58;
-					*reinterpret_cast<float*>(psVar5 + 8) = static_cast<float>(
-						(dVar2 / (static_cast<double>(*reinterpret_cast<u32*>(psVar5 + 0x14)) - dVar3)) *
-						(static_cast<double>(*reinterpret_cast<u32*>(psVar5 + 0x10)) - dVar3));
-					if ((*reinterpret_cast<u32*>(psVar5 + 0x16) & 2) == 0) {
-						fVar1 = static_cast<float>(
-							(dVar2 / (static_cast<double>(*reinterpret_cast<u32*>(psVar5 + 0x14)) - dVar3)) *
-							(static_cast<double>(*reinterpret_cast<u32*>(psVar5 + 0x10)) - dVar3));
-						*reinterpret_cast<float*>(psVar5 + 0x18) =
-							(*reinterpret_cast<float*>(psVar5 + 0x1c) -
-							 static_cast<float>(static_cast<double>(*psVar5) - dVar3)) *
-							fVar1;
-						*reinterpret_cast<float*>(psVar5 + 0x1a) =
-							(*reinterpret_cast<float*>(psVar5 + 0x1e) -
-							 static_cast<float>(static_cast<double>(psVar5[1]) - dVar3)) *
-							fVar1;
-					}
-				} else {
-					iVar7 = iVar7 + 1;
-					*reinterpret_cast<float*>(psVar5 + 8) = FLOAT_80332a70;
-					*reinterpret_cast<float*>(psVar5 + 0x18) = fVar1;
-					*reinterpret_cast<float*>(psVar5 + 0x1a) = fVar1;
+	const float fVar1 = FLOAT_80332ab0;
+
+	for (iVar6 = 0; iVar6 < iVar8; iVar6++) {
+		if (*reinterpret_cast<s32*>(psVar5 + 0x12) <= iVar4) {
+			if (iVar4 >= *reinterpret_cast<s32*>(psVar5 + 0x12) + *reinterpret_cast<s32*>(psVar5 + 0x14)) {
+				iVar7 = iVar7 + 1;
+				*reinterpret_cast<float*>(psVar5 + 8) = FLOAT_80332a70;
+				*reinterpret_cast<float*>(psVar5 + 0x18) = fVar1;
+				*reinterpret_cast<float*>(psVar5 + 0x1a) = fVar1;
+			} else {
+				*reinterpret_cast<s32*>(psVar5 + 0x10) = *reinterpret_cast<s32*>(psVar5 + 0x10) + 1;
+				const float t = static_cast<float>(
+					(DOUBLE_80332a58 / static_cast<double>(*reinterpret_cast<s32*>(psVar5 + 0x14))) *
+					static_cast<double>(*reinterpret_cast<s32*>(psVar5 + 0x10)));
+				*reinterpret_cast<float*>(psVar5 + 8) = t;
+				if ((*reinterpret_cast<u32*>(psVar5 + 0x16) & 2) == 0) {
+					*reinterpret_cast<float*>(psVar5 + 0x18) =
+						t * (*reinterpret_cast<float*>(psVar5 + 0x1c) - static_cast<float>(*psVar5));
+					*reinterpret_cast<float*>(psVar5 + 0x1a) =
+						t * (*reinterpret_cast<float*>(psVar5 + 0x1e) - static_cast<float>(psVar5[1]));
 				}
 			}
+		}
 
-			psVar5 = psVar5 + 0x20;
-			iVar6 = iVar6 - 1;
-		} while (iVar6 != 0);
+		psVar5 = psVar5 + 0x20;
 	}
 
 	return static_cast<unsigned int>(iVar8 == iVar7);
@@ -1690,24 +1675,24 @@ unsigned int CMenuPcs::CmdClose0()
 
 	for (s32 i = 0; i < entryCount; i++) {
 		if (*reinterpret_cast<s32*>(entry + 0x12) <= time) {
-			if (time < (*reinterpret_cast<s32*>(entry + 0x12) + *reinterpret_cast<s32*>(entry + 0x14))) {
-				*reinterpret_cast<s32*>(entry + 0x10) = *reinterpret_cast<s32*>(entry + 0x10) + 1;
-				const f64 denom = static_cast<f64>(*reinterpret_cast<s32*>(entry + 0x14));
-				const f64 numer = static_cast<f64>(*reinterpret_cast<s32*>(entry + 0x10));
-
-				*reinterpret_cast<f32*>(entry + 8) = static_cast<f32>(1.0 - (numer / denom));
-				if ((*reinterpret_cast<u32*>(entry + 0x16) & 2) == 0) {
-					const f32 t = static_cast<f32>(1.0 - (numer / denom));
-					*reinterpret_cast<f32*>(entry + 0x18) =
-					    (*reinterpret_cast<f32*>(entry + 0x1c) - static_cast<f32>(entry[0])) * t;
-					*reinterpret_cast<f32*>(entry + 0x1a) =
-					    (*reinterpret_cast<f32*>(entry + 0x1e) - static_cast<f32>(entry[1])) * t;
-				}
-			} else {
+			if (time >= (*reinterpret_cast<s32*>(entry + 0x12) + *reinterpret_cast<s32*>(entry + 0x14))) {
 				doneCount++;
 				*reinterpret_cast<f32*>(entry + 8) = 0.0f;
 				*reinterpret_cast<f32*>(entry + 0x18) = 0.0f;
 				*reinterpret_cast<f32*>(entry + 0x1a) = 0.0f;
+			} else {
+				*reinterpret_cast<s32*>(entry + 0x10) = *reinterpret_cast<s32*>(entry + 0x10) + 1;
+				const f32 t = static_cast<f32>(
+				    1.0 - (static_cast<f64>(*reinterpret_cast<s32*>(entry + 0x10)) /
+				           static_cast<f64>(*reinterpret_cast<s32*>(entry + 0x14))));
+
+				*reinterpret_cast<f32*>(entry + 8) = t;
+				if ((*reinterpret_cast<u32*>(entry + 0x16) & 2) == 0) {
+					*reinterpret_cast<f32*>(entry + 0x18) =
+					    t * (*reinterpret_cast<f32*>(entry + 0x1c) - static_cast<f32>(entry[0]));
+					*reinterpret_cast<f32*>(entry + 0x1a) =
+					    t * (*reinterpret_cast<f32*>(entry + 0x1e) - static_cast<f32>(entry[1]));
+				}
 			}
 		}
 		entry += 0x20;
@@ -1742,7 +1727,7 @@ void CMenuPcs::GetCmdItem()
 		s32 itemType = GetItemType(i, 0);
 		if ((itemType != 0) && (itemType != 5) && (itemType != 6) && (itemType != 8) && (itemType != 9)) {
 			if ((itemType != 1) ||
-			    (static_cast<u32>(GetItemIcon(*reinterpret_cast<s16*>(itemIndexPtr))) ==
+			    (GetItemIcon(*reinterpret_cast<s16*>(itemIndexPtr)) ==
 			     (*reinterpret_cast<u16*>(scriptFood + 0x3e0) & 3))) {
 				write++;
 				*write = static_cast<s16>(i);
@@ -1757,7 +1742,7 @@ void CMenuPcs::GetCmdItem()
 	for (s32 i = 0; i < 0x49; i++) {
 		s32 arti = i + 0x9f;
 		if (*reinterpret_cast<s16*>(artifactPtr + 0x136) == arti) {
-			if ((arti > 0xde) && (arti < 0xe4)) {
+			if (IsMagicArti(arti)) {
 				count++;
 				write2++;
 				*write2 = static_cast<s16>(i + 0x40);
@@ -1767,22 +1752,22 @@ void CMenuPcs::GetCmdItem()
 	}
 
 	s16* write3 = list + count;
-	if ((*reinterpret_cast<s16*>(scriptFood + 0x1f6) > 0xde) && (*reinterpret_cast<s16*>(scriptFood + 0x1f6) < 0xe4)) {
+	if (IsMagicArti(*reinterpret_cast<s16*>(scriptFood + 0x1f6))) {
 		count++;
 		write3++;
 		*write3 = 0xa0;
 	}
-	if ((*reinterpret_cast<s16*>(scriptFood + 0x1f8) > 0xde) && (*reinterpret_cast<s16*>(scriptFood + 0x1f8) < 0xe4)) {
+	if (IsMagicArti(*reinterpret_cast<s16*>(scriptFood + 0x1f8))) {
 		count++;
 		write3++;
 		*write3 = 0xa1;
 	}
-	if ((*reinterpret_cast<s16*>(scriptFood + 0x1fa) > 0xde) && (*reinterpret_cast<s16*>(scriptFood + 0x1fa) < 0xe4)) {
+	if (IsMagicArti(*reinterpret_cast<s16*>(scriptFood + 0x1fa))) {
 		count++;
 		write3++;
 		*write3 = 0xa2;
 	}
-	if ((*reinterpret_cast<s16*>(scriptFood + 0x1fc) > 0xde) && (*reinterpret_cast<s16*>(scriptFood + 0x1fc) < 0xe4)) {
+	if (IsMagicArti(*reinterpret_cast<s16*>(scriptFood + 0x1fc))) {
 		count++;
 		write3[1] = 0xa3;
 	}

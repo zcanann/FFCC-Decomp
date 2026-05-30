@@ -1820,11 +1820,11 @@ void CMaterialMan::SetShadow(CMapShadow& shadow, float (*viewMtx) [4], int shado
     CMaterial* material = (*materials)[*reinterpret_cast<unsigned short*>(Ptr(&shadow, 4))];
 
     unsigned long useShadowBit32 = materialFlag & *reinterpret_cast<unsigned long*>(Ptr(material, 0x24)) & 0x8000;
-    if (useShadowBit32 == 0) {
-        if (m_shadowTextureCount > 4) {
+    if (useShadowBit32 != 0) {
+        if (m_shadowTextureCount > 3) {
             return;
         }
-    } else if (m_shadowTextureCount > 3) {
+    } else if (m_shadowTextureCount > 4) {
         return;
     }
 

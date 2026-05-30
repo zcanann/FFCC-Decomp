@@ -62,6 +62,8 @@ extern "C" char lbl_80331400[];
 extern "C" const char* lbl_80210D54[];
 extern "C" const char* lbl_80210D68[];
 extern "C" char* lbl_80210750[];
+extern "C" char* lbl_80210B74[];
+extern "C" CMenuPcs::CTmp lbl_80210B98[];
 
 float FLOAT_8032ee18;
 int DAT_8032ee1c;
@@ -640,6 +642,8 @@ void CMenuPcs::loadData()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	*reinterpret_cast<unsigned short*>(bytes + 0x86C) = 0;
+	GbaQue.SetControllerMode(1);
+	loadTexture(lbl_80210B74, 2, 3, lbl_80210B98, 0x16, 0x2F, 0);
 
 	reinterpret_cast<void**>(bytes + 0x774)[0] = 0;
 	reinterpret_cast<void**>(bytes + 0x778)[0] = 0;

@@ -3210,7 +3210,7 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
     short& table = *reinterpret_cast<short*>(villageWork + 0x2A);
     unsigned short down;
     unsigned short repeat;
-    char picked[2] = {'\0', '\0'};
+    char picked[8];
     size_t len = strlen(s_CmakeInfo.m_name);
 
     if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
@@ -3321,6 +3321,7 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
         return 0;
     }
 
+    memset(picked, 0, 3);
     picked[0] = rowText[select];
     if (picked[0] == '\0') {
         Sound.PlaySe(4, 0x40, 0x7f, 0);

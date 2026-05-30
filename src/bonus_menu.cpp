@@ -1490,58 +1490,33 @@ void CMenuPcs::CalcSelectOpenAnim()
 
 	for (int i = 0; i < (int)header->count; i++) {
 		BonusAnimSprite* sprite = &sprites[i];
+		int flags = BonusSpriteFlags(sprite);
+
+		if ((flags & 1) == 0) {
+			if (frame < sprite->startFrame) {
+				sprite->alpha = 0.0f;
+			}
+			if (frame < sprite->startFrame + sprite->duration) {
+				sprite->alpha = (float)sprite->timer / (float)sprite->duration;
+			} else {
+				sprite->alpha = 1.0f;
+			}
+		} else {
+			sprite->alpha = 1.0f;
+		}
+
 		if (sprite->startFrame + sprite->duration <= frame || sprite->startFrame > 9998) {
 			doneCount++;
 		}
 
-		if (frame < sprite->startFrame) {
-			continue;
+		if ((flags & 2) == 0 && (sprite->motionX != 0.0f || sprite->motionY != 0.0f)) {
+			float progress = 1.0f - ((float)sprite->timer / (float)sprite->duration);
+			sprite->motionX = (sprite->targetX - (float)sprite->x) * progress;
+			sprite->motionY = (sprite->targetY - (float)sprite->y) * progress;
 		}
 
-		if (frame < sprite->startFrame + sprite->duration) {
+		if (sprite->startFrame < frame && frame <= sprite->startFrame + sprite->duration) {
 			sprite->timer++;
-		}
-
-		float progress = CalcBonusSpriteProgress(sprite, frame);
-
-		if (progress < 0.0f) {
-			sprite->alpha = 0.0f;
-			continue;
-		}
-
-		sprite->alpha = progress;
-		switch (sprite->kind) {
-		case 0x16:
-			sprite->scale = 3.0f;
-			break;
-		case -3:
-			sprite->mulY = (1.0f - progress) * 24.0f;
-			break;
-		case 0x1f:
-			sprite->mulX = -150.0f * (1.0f - progress);
-			sprite->mulY = -150.0f * (1.0f - progress);
-			sprite->scale = 1.0f + (1.0f - progress);
-			break;
-		case -4:
-			sprite->mulY = (1.0f - progress) * 20.0f;
-			break;
-		case 0:
-			sprite->mulX = (1.0f - progress) * sprite->w;
-			sprite->mulY = (1.0f - progress) * sprite->h;
-			break;
-		case 0x19:
-			sprite->mulX = (1.0f - progress) * 20.0f;
-			sprite->scale = 0.85f + progress * 0.15f;
-			break;
-		case -1:
-			sprite->mulX = (1.0f - progress) * 24.0f;
-			sprite->mulY = (1.0f - progress) * 6.0f;
-			break;
-		case -2:
-			sprite->scale = 0.75f + progress * 0.25f;
-			break;
-		default:
-			break;
 		}
 	}
 

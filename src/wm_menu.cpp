@@ -9488,14 +9488,18 @@ void CMenuPcs::DrawMCList()
 					animFrames = (int)*reinterpret_cast<short*>(ws + 0x22) - iVar16;
 				} else {
 					animFrames = 10 - ((int)*reinterpret_cast<short*>(ws + 0x22) + (3 - (int)slotIdx) * -3);
-				}
-				if (animFrames >= 0) {
-					if (animFrames < 11) {
-						alpha = (float)animFrames;
-						yPos = (float)animFrames * FLOAT_803314e0 + FLOAT_803314dc;
 					}
-					goto LAB_draw;
-				}
+					if (animFrames >= 0) {
+						if (animFrames < 11) {
+							alpha = static_cast<float>(DOUBLE_803314e8 *
+							                           (static_cast<double>(animFrames) - DOUBLE_80331408));
+							yPos = static_cast<float>(static_cast<float>(static_cast<double>(animFrames) -
+							                                             DOUBLE_80331408) *
+							                          FLOAT_803314e0 +
+							                          FLOAT_803314dc);
+						}
+						goto LAB_draw;
+					}
 			} else {
 LAB_draw:
 				if (alpha > FLOAT_803314f0) {

@@ -926,6 +926,11 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
+		case -0x2B:
+		case -0x2A:
+			PushValue(this, object, 0);
+			outResult = 0;
+			break;
 		case -0x2C: {
 			Vec hitStart;
 			Vec hitMove;

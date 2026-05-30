@@ -1239,9 +1239,10 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 		}
 		case -0x74: {
 			Vec moveVector;
-			moveVector.x = static_cast<float>(localBase[0]);
-			moveVector.y = static_cast<float>(localBase[1]);
-			moveVector.z = static_cast<float>(localBase[2]);
+			float* params = reinterpret_cast<float*>(localBase);
+			moveVector.x = params[0];
+			moveVector.y = params[1];
+			moveVector.z = params[2];
 			float magnitude = PSVECMag(&moveVector);
 			if (magnitude == 0.0f) {
 				moveVector.x = 0.0f;

@@ -466,7 +466,7 @@ CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* objec
 				} else {
 					value = LoadU16(classData, 0xB4);
 				}
-			} else if (systemVal < -0x95 && systemVal > -0x176) {
+			} else if (systemVal <= -0x96 && systemVal >= -0x175) {
 				u8* itemTable = *reinterpret_cast<u8**>(classData + 0x24);
 				value = LoadU16(itemTable, (systemVal + 0x175) * 2);
 			} else if (systemVal == -0x45) {

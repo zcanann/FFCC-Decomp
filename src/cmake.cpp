@@ -3451,9 +3451,16 @@ void CMenuPcs::CmakeVillageDraw()
             row * 0x20 + 0x70, FLOAT_80333258);
     }
 
-    int showNameCursor = (mode == 1 && row < 5 && strlen(s_CmakeInfo.m_name) <= 6) ? 1 : 0;
+    int showNameCursor = __cntlzw(static_cast<unsigned int>(1 - mode)) >> 5;
+    if (row > 4) {
+        showNameCursor = 0;
+    }
+    if (strlen(s_CmakeInfo.m_name) > 6) {
+        showNameCursor = 0;
+    }
     DrawCmakeName(1, showNameCursor, s_CmakeInfo.m_name, alpha);
-    DrawCmakeDecision((row > 4) ? 1 : 0, alpha);
+    DrawCmakeDecision((static_cast<int>(row) >> 31) +
+        (static_cast<unsigned int>(static_cast<int>(row)) > 4), alpha);
 }
 
 /*

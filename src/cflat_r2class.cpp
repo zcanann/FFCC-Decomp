@@ -1231,7 +1231,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			if (!useDebugPad) {
 				unsigned int slot = static_cast<unsigned int>(playerIndex)
 				    & ~((static_cast<int>(~(Pad._448_4_ - playerIndex | playerIndex - Pad._448_4_)) >> 31));
-				buttons = *reinterpret_cast<unsigned short*>(reinterpret_cast<u8*>(&Pad) + 4 + slot * 0x54);
+				buttons = *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(&Pad) + 4 + slot * 0x54);
 			}
 			PushValue(this, object, static_cast<int>(buttons));
 			outResult = 0;

@@ -941,8 +941,8 @@ void CShopMenu::DrawItemHelp(int index, int centerX, int y)
     SetScaleX__5CFontFf(FLOAT_80332d2c, font);
     SetScaleY__5CFontFf(FLOAT_80332d28, font);
 
-    _GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
-    font->SetColor(white);
+    CColor white(0xFF, 0xFF, 0xFF, 0xFF);
+    font->SetColor(white.color);
     float width = GetWidth__5CFontFPc(font, helpText);
     float x = static_cast<float>(centerX) - width * 0.5f;
     DrawInit__5CFontFv(font);

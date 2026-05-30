@@ -149,6 +149,9 @@ extern float FLOAT_8033166C;
 extern float FLOAT_80331680;
 extern float FLOAT_80331684;
 extern float FLOAT_80331688;
+extern double DOUBLE_803316C0;
+extern float FLOAT_803316C8;
+extern float FLOAT_803316CC;
 extern double DOUBLE_80331418;
 extern double DOUBLE_80331460;
 extern double DOUBLE_803314E8;
@@ -161,6 +164,7 @@ extern double DOUBLE_803314a8;
 extern double DOUBLE_803314d0;
 extern double DOUBLE_803314f0;
 extern double DOUBLE_80331490;
+extern double DOUBLE_80331508;
 extern double DOUBLE_80331538;
 extern double DOUBLE_80331540;
 extern double DOUBLE_803316e8;
@@ -6027,29 +6031,23 @@ void CMenuPcs::DrawCharaBase()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	unsigned char* const worldState = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x82C)[0]);
-	if (worldState == 0) {
-		return;
-	}
 
 	const short state = *reinterpret_cast<short*>(worldState + 0x10);
 	if (state <= 0) {
 		return;
 	}
 
-	float alpha = 1.0f;
+	float alpha;
 	if (state == 1) {
-		alpha = static_cast<float>(*reinterpret_cast<short*>(worldState + 0x22)) * 0.1f;
-	} else if (state >= 3) {
-		alpha = 1.0f - static_cast<float>(*reinterpret_cast<short*>(worldState + 0x22)) * 0.1f;
-	}
-	if (alpha < 0.0f) {
-		alpha = 0.0f;
-	} else if (alpha > 1.0f) {
-		alpha = 1.0f;
+		alpha = static_cast<float>(DOUBLE_803316C0 * static_cast<double>(*reinterpret_cast<short*>(worldState + 0x22)));
+	} else if (state == 2) {
+		alpha = FLOAT_80331668;
+	} else {
+		alpha = static_cast<float>(1.0 - DOUBLE_803316C0 * static_cast<double>(*reinterpret_cast<short*>(worldState + 0x22)));
 	}
 
 	SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-	GXColor color = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha)};
+	GXColor color = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(static_cast<int>(DOUBLE_80331508 * static_cast<double>(alpha)))};
 	GXSetChanMatColor(static_cast<GXChannelID>(4), color);
 	SetTexture(static_cast<CMenuPcs::TEX>(0x29));
 
@@ -6057,7 +6055,7 @@ void CMenuPcs::DrawCharaBase()
 		for (int col = 0; col < 4; col++) {
 			const float x = static_cast<float>(0x1C + col * 0x90);
 			const float y = static_cast<float>((row == 0 ? 0x22 : 0xCA) + (row != 0 ? 8 : 0));
-			DrawRect(0xFFFFFFFF, x, y, 0x140, 0xE0, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+			DrawRect(0, x, y, FLOAT_803316C8, FLOAT_803316CC, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 		}
 	}
 }

@@ -7733,7 +7733,16 @@ void CMenuPcs::DrawCMLife()
 	WmCharaSelectEntry* const selectEntries = GetWmCharaSelectEntries(this);
 	unsigned char* const cmakeWork = GetWmCmakeWork(this);
 
-	const int alpha = GetWmMenuFade(worldState[0x10 / 2], worldState[0x22 / 2]);
+	float fade;
+	if (worldState[0x10 / 2] == 1) {
+		fade = static_cast<float>(DOUBLE_803314e8 * (static_cast<double>(worldState[0x22 / 2]) - DOUBLE_80331408));
+	} else if (worldState[0x10 / 2] == 2) {
+		fade = FLOAT_803313e8;
+	} else {
+		fade = static_cast<float>(-(DOUBLE_803314e8 * (static_cast<double>(worldState[0x22 / 2]) - DOUBLE_80331408) -
+		                            DOUBLE_80331420));
+	}
+	const int alpha = static_cast<int>(FLOAT_80331458 * fade);
 	unsigned int readyMask = 0;
 	for (int i = 0; i < kWmCharaSelectCount; i++) {
 		const WmCharaSelectEntry& entry = selectEntries[i];

@@ -152,7 +152,7 @@ void CGMonObj::onFramePreCalc()
 		(*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + 0x50) == 0) &&
 		(*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + 0x44) == 0) &&
 		(*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + 0x46) == 0) &&
-		(static_cast<int>(static_cast<signed char>(mon[0x63C])) < 0) &&
+		(static_cast<signed char>(mon[0x63C]) < 0) &&
 		(mon[0x6B9] == 0) &&
 		(mon[0x6C1] == 0)) {
 		*reinterpret_cast<int*>(mon + 0x6D8) =

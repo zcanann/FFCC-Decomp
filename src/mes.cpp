@@ -700,13 +700,24 @@ void CMes::Draw()
 					if (activeFontId != fontId)
 					{
 						nextFont = *reinterpret_cast<CFont**>(menuPcs + 0x100);
-						if (fontId == 0)
+						if (fontId != 2)
 						{
-							nextFont = *reinterpret_cast<CFont**>(menuPcs + 0x0F8);
-						}
-						else if ((fontId == 1) || (fontId >= 4))
-						{
-							nextFont = font;
+							if (fontId < 2)
+							{
+								nextFont = *reinterpret_cast<CFont**>(menuPcs + 0x0F8);
+								if (fontId != 0)
+								{
+									nextFont = font;
+								}
+							}
+							else
+							{
+								nextFont = font;
+								if (fontId < 4)
+								{
+									nextFont = *reinterpret_cast<CFont**>(menuPcs + 0x100);
+								}
+							}
 						}
 
 						nextFont->SetShadow(*(int*)((char*)this + 0x3D38));

@@ -1183,6 +1183,15 @@ void CMenuPcs::CalcDiaryMenu()
 		return;
 	}
 
+	WMChgMenu();
+	if (bytes[0xD] == 0) {
+		for (int i = 4; i < 6; i++) {
+			CMenu* const menu = *reinterpret_cast<CMenu**>(bytes + 0x10 + (i - 4) * 4 + 0x10C);
+			menu->Calc();
+		}
+		return;
+	}
+
 	switch (*reinterpret_cast<short*>(worldState + 0x1C)) {
 	case 0:
 		CalcMainMenuSub();

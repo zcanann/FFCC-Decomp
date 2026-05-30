@@ -3319,12 +3319,12 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
         return 0;
     }
 
-    int maxRow = (select < 10) ? 4 : 5;
-    if ((repeat & 0x4) != 0) {
-        row = (row < maxRow) ? static_cast<short>(row + 1) : 0;
-        Sound.PlaySe(1, 0x40, 0x7f, 0);
-    } else if ((repeat & 0x8) != 0) {
+    int maxRow = (static_cast<int>(select) >> 31) + (static_cast<unsigned int>(select) > 9) + 4;
+    if ((repeat & 0x8) != 0) {
         row = (row > 0) ? static_cast<short>(row - 1) : static_cast<short>(maxRow);
+        Sound.PlaySe(1, 0x40, 0x7f, 0);
+    } else if ((repeat & 0x4) != 0) {
+        row = (row < maxRow) ? static_cast<short>(row + 1) : 0;
         Sound.PlaySe(1, 0x40, 0x7f, 0);
     }
 

@@ -39,7 +39,7 @@ static inline unsigned int CallEngineFunc48Arg(void* engineObject, unsigned int 
 {
 	typedef unsigned int (*EngineFn)(void*, unsigned int);
 	void** vtable = *reinterpret_cast<void***>(reinterpret_cast<u8*>(engineObject) + 0x48);
-	EngineFn fn = reinterpret_cast<EngineFn>(vtable[2]);
+	EngineFn fn = reinterpret_cast<EngineFn>(vtable[0x12]);
 	return fn(engineObject, arg0);
 }
 
@@ -47,7 +47,7 @@ static inline void CallEngineFunc44Arg2(void* engineObject, unsigned int arg0, u
 {
 	typedef void (*EngineFn)(void*, unsigned int, unsigned int);
 	void** vtable = *reinterpret_cast<void***>(reinterpret_cast<u8*>(engineObject) + 0x48);
-	EngineFn fn = reinterpret_cast<EngineFn>(vtable[1]);
+	EngineFn fn = reinterpret_cast<EngineFn>(vtable[0x11]);
 	fn(engineObject, arg0, arg1);
 }
 
@@ -663,7 +663,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			break;
 		case -0x9D:
 			PushValue(
-			    this, object, static_cast<int>(CallEngineFunc48Arg(engineObject, localBase[0])));
+			    this, object, CallEngineFunc48Arg(engineObject, localBase[0]));
 			outResult = 0;
 			break;
 		case -0x9C:

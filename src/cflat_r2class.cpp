@@ -645,7 +645,6 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 {
 	unsigned int* localBase = object->m_localBase;
 	CGCharaObj* engineObject = reinterpret_cast<CGCharaObj*>(object->m_engineObject);
-	int handled = 1;
 
 	switch (command) {
 		case -5:
@@ -1553,11 +1552,10 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			break;
 		}
 		default:
-			handled = 0;
-			break;
+			return 0;
 	}
 
-	return handled;
+	return 1;
 }
 
 /*

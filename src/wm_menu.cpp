@@ -73,6 +73,8 @@ int DAT_8032ee28;
 int DAT_8032ee2c;
 unsigned char s_wmMenuLastMountState;
 unsigned char s_wmMenuMountStateInitialized;
+char* DAT_8032EE34;
+unsigned char lbl_8032EE38[8];
 extern float FLOAT_803313dc;
 extern float FLOAT_803313e0;
 extern float FLOAT_803313e4;
@@ -3039,6 +3041,24 @@ void CMenuPcs::CalcTitleMenu()
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	unsigned char* const worldState = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x82C)[0]);
 
+	if (lbl_8032EE38[0] == 0) {
+		lbl_8032EE38[0] = 1;
+		DAT_8032EE34 = const_cast<char*>(s_dvd_movie_ffcc_op_thp_801dc448);
+	}
+
+	bool bVar1 = false;
+	if (Pad._452_4_ != 0 || Pad._448_4_ != -1) {
+		bVar1 = true;
+	}
+	unsigned short down;
+	if (bVar1) {
+		down = 0;
+	} else {
+		__cntlzw(static_cast<unsigned int>(Pad._448_4_));
+		down = Pad.GetPadInputs()[0].buttonDown[0];
+	}
+	const unsigned short repeat = GetButtonRepeat(0);
+
 	if (worldState != 0) {
 		if (worldState[8] == 0) {
 			*reinterpret_cast<short*>(worldState + 0x18) = 0;
@@ -3052,8 +3072,6 @@ void CMenuPcs::CalcTitleMenu()
 		}
 
 		if (*reinterpret_cast<short*>(worldState + 0x10) == 2 && *reinterpret_cast<short*>(worldState + 0x18) == 0) {
-			const unsigned short repeat = GetButtonRepeat(0);
-			const unsigned short down = GetButtonDown(0);
 			if ((repeat & 0xC) != 0) {
 				*reinterpret_cast<unsigned short*>(worldState + 0x26) ^= 1;
 				*reinterpret_cast<short*>(worldState + 0x24) = 0;

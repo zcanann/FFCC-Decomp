@@ -2255,10 +2255,18 @@ unsigned short CMenuPcs::CmakeTribeCtrl()
         short& currentValue = *reinterpret_cast<short*>(state + 0x26 + selectField * 2);
 
         if ((repeat & 0x8) != 0) {
-            currentValue = (currentValue == 0) ? 3 : static_cast<short>(currentValue - 1);
+            if (currentValue == 0) {
+                currentValue = 3;
+            } else {
+                currentValue = static_cast<short>(currentValue - 1);
+            }
             Sound.PlaySe(1, 0x40, 0x7F, 0);
         } else if ((repeat & 0x4) != 0) {
-            currentValue = (currentValue < 3) ? static_cast<short>(currentValue + 1) : 0;
+            if (currentValue < 3) {
+                currentValue = static_cast<short>(currentValue + 1);
+            } else {
+                currentValue = 0;
+            }
             Sound.PlaySe(1, 0x40, 0x7F, 0);
         }
 

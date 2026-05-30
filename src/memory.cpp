@@ -764,7 +764,7 @@ CMemory::CStage* CMemory::CreateStage(unsigned long size, char* source, int mode
 void CMemory::DestroyStage(CMemory::CStage* stage)
 {
     int mode = stageGetAllocationMode(stage);
-    int modeListOffset = mode * 0x27D8;
+    unsigned char* modeListBase = reinterpret_cast<unsigned char*>(this) + 4 + mode * 0x27D8;
 
     if (mode != 2) {
         if (stageHasUnfreedBlocks(stage)) {
@@ -782,12 +782,12 @@ void CMemory::DestroyStage(CMemory::CStage* stage)
     }
 
     unsigned char* stageBytes = reinterpret_cast<unsigned char*>(stage);
-    int modeListNode = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x134 + modeListOffset);
+    int modeListNode = *reinterpret_cast<int*>(modeListBase + 0x130);
 
     *reinterpret_cast<int*>(*reinterpret_cast<int*>(stageBytes) + 4) = *reinterpret_cast<int*>(stageBytes + 4);
     **reinterpret_cast<int**>(stageBytes + 4) = *reinterpret_cast<int*>(stageBytes);
     *reinterpret_cast<int*>(stageBytes + 4) = modeListNode;
-    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x134 + modeListOffset) = reinterpret_cast<int>(stage);
+    *reinterpret_cast<int*>(modeListBase + 0x130) = reinterpret_cast<int>(stage);
 }
 
 /*

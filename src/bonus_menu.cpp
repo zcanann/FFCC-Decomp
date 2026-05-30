@@ -1721,14 +1721,13 @@ void CMenuPcs::CalcSelectWait()
 			sprites[i].alpha = 1.0f;
 			sprites[i].depth = 3.0f;
 		}
-		if (GetSelectCursorSprite(header, sprites) == 0 && header->count < 0x3F) {
-			InitAnimSprite(&sprites[header->count], 0x20, 0, 0, 0x40, 0x30, 0, 8);
-			ResetAnimSpriteMotion(&sprites[header->count]);
-			sprites[header->count].alpha = 1.0f;
-			sprites[header->count].depth = 1.0f;
-			header->count = (short)(header->count + 1);
-		}
-		UpdateSelectCursorSprite(statePtr, header, sprites, 0);
+		BonusAnimSprite* cursor = &sprites[header->count];
+		BonusAnimSprite* partySprite = cursor - activePartyCount * 2;
+		InitAnimSprite(cursor, 0x20, (short)(partySprite->x - 3), (short)(partySprite->y - 8), 0x40, 0x30, 0, 8);
+		ResetAnimSpriteMotion(cursor);
+		cursor->alpha = 1.0f;
+		cursor->depth = 1.0f;
+		header->count = (short)(header->count + 1);
 		header->finished = 0;
 		*(unsigned char*)(statePtr + 0xb) = 1;
 	}

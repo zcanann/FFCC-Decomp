@@ -594,7 +594,7 @@ void CMes::Draw()
 					}
 					MenuPcs.DrawInit();
 
-					unsigned int iconId = ch;
+					int iconId = ch;
 					switch (ch + 0x48)
 					{
 					case 0x4F:

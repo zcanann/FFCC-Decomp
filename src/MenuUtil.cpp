@@ -879,31 +879,31 @@ void CMenuPcs::CalcOptionMenu()
 			if (m_bgmVolume < 0) {
 				m_bgmVolume = 0;
 			}
-		} else if (m_optionIndex < 2) {
-			if (m_optionIndex == 0) {
-				m_gameInitMode--;
-				if (m_gameInitMode < 0) {
-					m_gameInitMode = 1;
+		} else if (m_optionIndex > 2) {
+			if (m_optionIndex == 4) {
+				if (m_specialModeEdit != 0) {
+					m_specialModeFlags[static_cast<signed char>(m_specialModeCursor)]--;
+					if (m_specialModeFlags[static_cast<signed char>(m_specialModeCursor)] < 0) {
+						m_specialModeFlags[static_cast<signed char>(m_specialModeCursor)] = 1;
+					}
 				}
-			} else if (m_optionIndex == 1) {
-				m_stereoMode--;
-				if (m_stereoMode < 0) {
-					m_stereoMode = 1;
-				}
-			}
-		} else if (m_optionIndex == 4) {
-			if (m_specialModeEdit != 0) {
-				m_specialModeFlags[static_cast<signed char>(m_specialModeCursor)]--;
-				if (m_specialModeFlags[static_cast<signed char>(m_specialModeCursor)] < 0) {
-					m_specialModeFlags[static_cast<signed char>(m_specialModeCursor)] = 1;
+			} else if (m_optionIndex == 3) {
+				m_leftHintTimer = 3;
+				m_rightHintTimer = 0;
+				m_seVolume--;
+				if (m_seVolume < 0) {
+					m_seVolume = 0;
 				}
 			}
-		} else if (m_optionIndex == 3) {
-			m_leftHintTimer = 3;
-			m_rightHintTimer = 0;
-			m_seVolume--;
-			if (m_seVolume < 0) {
-				m_seVolume = 0;
+		} else if (m_optionIndex == 0) {
+			m_gameInitMode--;
+			if (m_gameInitMode < 0) {
+				m_gameInitMode = 1;
+			}
+		} else if (m_optionIndex == 1) {
+			m_stereoMode--;
+			if (m_stereoMode < 0) {
+				m_stereoMode = 1;
 			}
 		}
 
@@ -917,31 +917,31 @@ void CMenuPcs::CalcOptionMenu()
 			if (m_bgmVolume > 0xC) {
 				m_bgmVolume = 0xC;
 			}
-		} else if (m_optionIndex < 2) {
-			if (m_optionIndex == 0) {
-				m_gameInitMode++;
-				if (m_gameInitMode > 1) {
-					m_gameInitMode = 0;
+		} else if (m_optionIndex > 2) {
+			if (m_optionIndex == 4) {
+				if (m_specialModeEdit != 0) {
+					m_specialModeFlags[static_cast<signed char>(m_specialModeCursor)]++;
+					if (m_specialModeFlags[static_cast<signed char>(m_specialModeCursor)] > 1) {
+						m_specialModeFlags[static_cast<signed char>(m_specialModeCursor)] = 0;
+					}
 				}
-			} else if (m_optionIndex == 1) {
-				m_stereoMode++;
-				if (m_stereoMode > 1) {
-					m_stereoMode = 0;
-				}
-			}
-		} else if (m_optionIndex == 4) {
-			if (m_specialModeEdit != 0) {
-				m_specialModeFlags[static_cast<signed char>(m_specialModeCursor)]++;
-				if (m_specialModeFlags[static_cast<signed char>(m_specialModeCursor)] > 1) {
-					m_specialModeFlags[static_cast<signed char>(m_specialModeCursor)] = 0;
+			} else if (m_optionIndex == 3) {
+				m_rightHintTimer = 3;
+				m_leftHintTimer = 0;
+				m_seVolume++;
+				if (m_seVolume > 0xC) {
+					m_seVolume = 0xC;
 				}
 			}
-		} else if (m_optionIndex == 3) {
-			m_rightHintTimer = 3;
-			m_leftHintTimer = 0;
-			m_seVolume++;
-			if (m_seVolume > 0xC) {
-				m_seVolume = 0xC;
+		} else if (m_optionIndex == 0) {
+			m_gameInitMode++;
+			if (m_gameInitMode > 1) {
+				m_gameInitMode = 0;
+			}
+		} else if (m_optionIndex == 1) {
+			m_stereoMode++;
+			if (m_stereoMode > 1) {
+				m_stereoMode = 0;
 			}
 		}
 

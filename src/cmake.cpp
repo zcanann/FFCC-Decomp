@@ -2703,7 +2703,7 @@ void CMenuPcs::CmakeJobDraw()
         FLOAT_80333254, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, 0.0f);
 
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x40));
-    for (int x = 0x20; x < 0x260; x += 0x20) {
+    for (int x = 0x20; x < 0x260;) {
         int span = 0x20;
         if ((0x260 - x) < span) {
             span = 0x260 - x;
@@ -2713,6 +2713,7 @@ void CMenuPcs::CmakeJobDraw()
             0,
             static_cast<float>(x), FLOAT_803332d8, static_cast<float>(span), FLOAT_803332e0,
             FLOAT_80333254, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, 0.0f);
+        x += span;
     }
 
     DrawCmakePreviewChara(this);

@@ -59,6 +59,7 @@ extern int DAT_80238028;
 extern char cRam8032ee21;
 extern "C" char lbl_80331380[];
 extern "C" char lbl_80331400[];
+extern "C" unsigned char lbl_801DC294[];
 extern "C" const char* lbl_80210D54[];
 extern "C" const char* lbl_80210D68[];
 extern "C" char* lbl_80210750[];
@@ -236,6 +237,7 @@ extern double DOUBLE_80331490;
 extern double DOUBLE_80331508;
 extern double DOUBLE_80331538;
 extern double DOUBLE_80331540;
+extern double DOUBLE_80331570;
 extern double DOUBLE_803316d8;
 extern double DOUBLE_803316e0;
 extern double DOUBLE_803316e8;
@@ -9744,13 +9746,60 @@ LAB_draw:
 						iconX += FLOAT_80331468;
 					}
 				}
-				SetTexture(static_cast<CMenuPcs::TEX>(0x20));
-				DrawRect(0xFFFFFFFF, FLOAT_80331564, slotY + FLOAT_80331468,
-				         FLOAT_80331554, FLOAT_803314d8, FLOAT_803313dc, FLOAT_803313dc,
-				         FLOAT_803313e8, FLOAT_803313e8, 0.0f);
+					SetTexture(static_cast<CMenuPcs::TEX>(0x20));
+					DrawRect(0xFFFFFFFF, FLOAT_80331564, slotY + FLOAT_80331468,
+					         FLOAT_80331554, FLOAT_803314d8, FLOAT_803313dc, FLOAT_803313dc,
+					         FLOAT_803313e8, FLOAT_803313e8, 0.0f);
+
+					int playHours;
+					int playMinutes;
+					MemoryCardMan.CnvPlayTime(*reinterpret_cast<unsigned int*>(slotData + 0x14), &playHours, &playMinutes);
+					const int* const playDigitWidths = reinterpret_cast<int*>(lbl_801DC294 + 0x14);
+					const int playColonWidth = *reinterpret_cast<int*>(lbl_801DC294 + 0x3C);
+					int playDigits[5];
+					float playWidth = FLOAT_803313dc;
+					int hundreds = playHours / 100 + (playHours >> 0x1F);
+					playDigits[0] = hundreds - (hundreds >> 0x1F);
+					if (playDigits[0] == 0) {
+						playDigits[0] = -1;
+					} else {
+						playWidth += static_cast<float>(playDigitWidths[playDigits[0]]);
+					}
+					int hourRemainder = playHours + (hundreds - (hundreds >> 0x1F)) * -100;
+					int tens = hourRemainder / 10 + (hourRemainder >> 0x1F);
+					playDigits[1] = tens - (tens >> 0x1F);
+					if (playDigits[1] == 0 && playDigits[0] < 1) {
+						playDigits[1] = -1;
+					} else {
+						playWidth += static_cast<float>(playDigitWidths[playDigits[1]]);
+					}
+					int ones = hourRemainder / 10 + (hourRemainder >> 0x1F);
+					playDigits[2] = hourRemainder + (ones - (ones >> 0x1F)) * -10;
+					int minuteTens = playMinutes / 10 + (playMinutes >> 0x1F);
+					playDigits[3] = minuteTens - (minuteTens >> 0x1F);
+					playDigits[4] = playMinutes + (minuteTens - (minuteTens >> 0x1F)) * -10;
+					playWidth += static_cast<float>(playDigitWidths[playDigits[2]] + playColonWidth +
+					                                playDigitWidths[playDigits[3]] + playDigitWidths[playDigits[4]]);
+					float playX = FLOAT_80331518 - playWidth;
+					const float playY = slotY + FLOAT_80331468;
+					for (int digitIdx = 0; digitIdx < 5; digitIdx++) {
+						if (playDigits[digitIdx] >= 0) {
+							if (digitIdx == 3) {
+								DrawRect(0xFFFFFFFF, playX, playY, static_cast<float>(playColonWidth), FLOAT_803314d8,
+								         FLOAT_80331568, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, 0.0f);
+								playX += static_cast<float>(playColonWidth);
+							}
+							const int digit = playDigits[digitIdx];
+							const int digitWidth = playDigitWidths[digit];
+							DrawRect(0xFFFFFFFF, playX, playY, static_cast<float>(digitWidth), FLOAT_803314d8,
+							         static_cast<float>(DOUBLE_80331490 * static_cast<double>(digit) + DOUBLE_80331570),
+							         FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, 0.0f);
+							playX += static_cast<float>(digitWidth);
+						}
+					}
+				}
 			}
 		}
-	}
 
 	// Draw text info for each save slot
 	if ((state == 2 || state == 3) && *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x16) != 0) {

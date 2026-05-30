@@ -712,7 +712,7 @@ void CMenuPcs::InitCharaInfo()
 			*reinterpret_cast<unsigned short*>(worldObj + slotOffset + 0xE) = 0xE0;
 			*reinterpret_cast<float*>(worldObj + slotOffset + 0x10) = FLOAT_803313dc;
 			*reinterpret_cast<float*>(worldObj + slotOffset + 0x14) = FLOAT_803313dc;
-			*reinterpret_cast<float*>(worldObj + slotOffset + 0x18) = FLOAT_803313e8;
+			*reinterpret_cast<float*>(worldObj + slotOffset + 0x18) = FLOAT_803314a4;
 
 			short y2 = baseY;
 			if (row != 0) {
@@ -725,7 +725,7 @@ void CMenuPcs::InitCharaInfo()
 			*reinterpret_cast<unsigned short*>(worldObj + slotOffset + 0x5E) = 0xE0;
 			*reinterpret_cast<float*>(worldObj + slotOffset + 0x60) = FLOAT_803313dc;
 			*reinterpret_cast<float*>(worldObj + slotOffset + 0x64) = FLOAT_803313dc;
-			*reinterpret_cast<float*>(worldObj + slotOffset + 0x68) = FLOAT_803313e8;
+			*reinterpret_cast<float*>(worldObj + slotOffset + 0x68) = FLOAT_803314a4;
 
 			slotOffset += 0xA0;
 			baseX = static_cast<short>(baseX + 0x120);
@@ -735,8 +735,34 @@ void CMenuPcs::InitCharaInfo()
 		baseSlot += 4;
 	}
 
-	for (int i = 0; i < 4; i++) {
-		reinterpret_cast<unsigned int*>(bytes + 0x7F4)[i] = 0;
+	unsigned char* modelData = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x824)[0]);
+	unsigned char* caravan = reinterpret_cast<unsigned char*>(&Game.m_caravanWorkArr[0]);
+	int modelOffset = 0;
+	for (int i = 4; i != 0; i--) {
+		unsigned char* entry0 = modelData + modelOffset;
+		if (*reinterpret_cast<int*>(caravan + 0x3A4) == 0) {
+			*reinterpret_cast<unsigned int*>(entry0 + 8) = 0xFFFFFFFF;
+		} else {
+			int modelNo = *reinterpret_cast<unsigned short*>(caravan + 0x3E0) * 200 + 100;
+			if (*reinterpret_cast<unsigned short*>(caravan + 0x3E2) != 0) {
+				modelNo = *reinterpret_cast<unsigned short*>(caravan + 0x3E0) * 200 + 200;
+			}
+			*reinterpret_cast<unsigned int*>(entry0 + 8) = modelNo + *reinterpret_cast<unsigned short*>(caravan + 0x3E4);
+		}
+
+		unsigned char* entry1 = entry0 + 0x34;
+		if (*reinterpret_cast<int*>(caravan + 0xFD4) == 0) {
+			*reinterpret_cast<unsigned int*>(entry1 + 8) = 0xFFFFFFFF;
+		} else {
+			int modelNo = *reinterpret_cast<unsigned short*>(caravan + 0x1010) * 200 + 100;
+			if (*reinterpret_cast<unsigned short*>(caravan + 0x1012) != 0) {
+				modelNo = *reinterpret_cast<unsigned short*>(caravan + 0x1010) * 200 + 200;
+			}
+			*reinterpret_cast<unsigned int*>(entry1 + 8) = modelNo + *reinterpret_cast<unsigned short*>(caravan + 0x1014);
+		}
+
+		caravan += 0x1860;
+		modelOffset += 0x68;
 	}
 }
 

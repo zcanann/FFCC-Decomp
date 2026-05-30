@@ -952,7 +952,7 @@ void CShopMenu::DrawItemInfo(int itemNo, int x, int y, int unused0, int attrY, i
     (void)unused2;
     (void)unused3;
 
-    if ((itemNo <= 0) || (itemNo >= 0x9F)) {
+    if ((itemNo <= 0) || (itemNo > 0x9E)) {
         return;
     }
 
@@ -996,7 +996,7 @@ void CShopMenu::DrawItemInfo(int itemNo, int x, int y, int unused0, int attrY, i
         DrawInit__8CMenuPcsFv(MenuPcsVoid());
 
         int fontColor = 9;
-        if ((attr == 0) || (attr > 8)) {
+        if ((attr == 0) || (attr >= 9)) {
             if ((attr == 0xB) || (attr == 0x11) || (attr == 0x12)) {
                 sprintf(textBuffer, s_StringDecimalFormat_80332d44, s_Plus_80332d4c, statValue);
             } else {

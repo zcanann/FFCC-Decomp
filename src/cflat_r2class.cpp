@@ -957,6 +957,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			outResult = 0;
 			break;
 		}
+		case -0x31:
 		case -0x2F:
 			engineObject->m_bgHitMask = localBase[0];
 			PushValue(this, object, 0);

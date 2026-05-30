@@ -4006,9 +4006,6 @@ void CMenuPcs::DrawCMakeMenu()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	short* const worldState = reinterpret_cast<short*>(reinterpret_cast<unsigned int*>(bytes + 0x82C)[0]);
-	if (worldState == 0) {
-		return;
-	}
 
 	const short state = worldState[0x10 / sizeof(short)];
 	const short step = worldState[0x22 / sizeof(short)];

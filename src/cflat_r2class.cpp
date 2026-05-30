@@ -240,11 +240,9 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 					stack[-1].m_word = *value;
 					if (setMode == 0) {
 						*value = stack->m_word;
-					} else if (setMode < 0) {
-						if (setMode > -2) {
-							*value = *value - stack->m_word;
-						}
-					} else if (setMode < 2) {
+					} else if (setMode == -1) {
+						*value = *value - stack->m_word;
+					} else if (setMode == 1) {
 						*value = *value + stack->m_word;
 					}
 				}

@@ -47,9 +47,9 @@ struct CMesFlatDataView
 
 static inline int GetMesNibbleValue(const char* data)
 {
-	unsigned char high = (unsigned char)data[0];
-	unsigned char low = (unsigned char)data[1];
-	return (int)((unsigned int)(high << 4) | ((unsigned int)low & 0x0F));
+	int low = (unsigned char)data[1] & 0x0F;
+	int high = (unsigned char)data[0];
+	return low | (high << 4);
 }
 
 static int ReadTagU8(char** text)
@@ -516,8 +516,8 @@ int CMes::useFlag(int maxCount, int stopOnClear)
 				}
 				else
 				{
-					int idx = (unsigned int)flagEntry[2] * 4 + 0x3cc0;
-					*(int*)((char*)this + idx) = *(int*)((char*)this + idx) + 1;
+					int* slot = (int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3cc0);
+					*slot = *slot + 1;
 				}
 			}
 			else if ((type < 5) &&
@@ -826,8 +826,8 @@ void CMes::Calc()
 				}
 				else
 				{
-					int idx = (unsigned int)flagEntry[2] * 4 + 0x3CC0;
-					*(int*)((char*)this + idx) = *(int*)((char*)this + idx) + 1;
+					int* slot = (int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3CC0);
+					*slot = *slot + 1;
 				}
 			}
 			else if ((type < 5) &&
@@ -1420,7 +1420,7 @@ render_char:
  */
 void CMes::Next()
 {
-	unsigned char type;
+	unsigned int type;
 	float groupWidth;
 	float halfVal;
 	int remaining;
@@ -1430,9 +1430,11 @@ void CMes::Next()
 	float* start;
 	int entryCount;
 	float* curr;
+	char* mesFlags = (char*)this + 0x3cc0;
+	char** mesText = (char**)((char*)this + 4);
 	char tempFlags[0x50];
 
-	if (*(unsigned int*)((char*)this + 4) != 0)
+	if (*mesText != 0)
 	{
 		entryCount = *(int*)((char*)this + 0x3c0c);
 		flagEntry = (unsigned char*)((char*)this + *(int*)((char*)this + 0x3c10) * 6 + 0x3c14);
@@ -1445,14 +1447,14 @@ void CMes::Next()
 				{
 					if (type != 0)
 					{
-						*(int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3cc0) =
+						*(int*)(mesFlags + (unsigned int)flagEntry[2] * 4) =
 						    (int)*(short*)(flagEntry + 4);
 					}
 				}
 				else
 				{
-					remaining = (unsigned int)flagEntry[2] * 4 + 0x3cc0;
-					*(int*)((char*)this + remaining) = *(int*)((char*)this + remaining) + 1;
+					int* slot = (int*)(mesFlags + (unsigned int)flagEntry[2] * 4);
+					*slot = *slot + 1;
 				}
 			}
 			flagEntry += 6;
@@ -1468,9 +1470,9 @@ void CMes::Next()
 		*(int*)((char*)this + 0x3c80) = 0;
 		*(int*)((char*)this + 0x3c7c) = 0;
 		*(int*)((char*)this + 0x3cac) = 0;
-		memcpy(tempFlags, (char*)this + 0x3cc0, sizeof(tempFlags));
-		addString((char**)((char*)this + 4), 0);
-		memcpy((char*)this + 0x3cc0, tempFlags, sizeof(tempFlags));
+		memcpy(tempFlags, mesFlags, sizeof(tempFlags));
+		addString(mesText, 0);
+		memcpy(mesFlags, tempFlags, sizeof(tempFlags));
 		halfVal = FLOAT_803308b0;
 		i = 0;
 		curr = (float*)((char*)this + 0xc);
@@ -1499,7 +1501,7 @@ void CMes::Next()
 			{
 				do
 				{
-					type = *(unsigned char*)((char*)start + 0xe) >> 4;
+					type = (unsigned int)*(unsigned char*)((char*)start + 0xe) >> 4;
 					if (type == 1)
 					{
 						*start = halfVal * (*(float*)((char*)this + 0x3ca4) - groupWidth) + *start;

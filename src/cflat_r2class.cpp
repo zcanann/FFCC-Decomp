@@ -948,16 +948,13 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			break;
 		}
 		case -0x2D: {
-			Vec position;
 			float* params = reinterpret_cast<float*>(object->m_localBase);
-			position.x = params[3];
-			position.y = params[4];
-			position.z = params[5];
+			CVector position(params[3], params[4], params[5]);
 			engineObject->SetAttackCol(
 			    static_cast<int>(object->m_localBase[0]),
 			    RuntimeString(this, object->m_localBase[1]),
 			    params[2],
-			    &position);
+			    position);
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;

@@ -395,8 +395,8 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 	if ((temp == nullptr) && (System.m_execParam != 0)) {
 		System.Printf(s_MenuUtil_cpp_801e37fc + 0x10, s_MenuUtil_cpp_801e37fc, 0x8E);
 	}
-	for (int i = 0; i < 3; i++) {
-		int msgId = GetMenuHelpMsgTable()[firstLine + i];
+	for (int line = firstLine; line < firstLine + 3; line++) {
+		int msgId = GetMenuHelpMsgTable()[line];
 		memset(temp, 0, 0x200);
 		CMes::MakeAgbString(temp, reinterpret_cast<char*>(msgId), 0, 1);
 		if (strlen(temp) != 0) {

@@ -95,7 +95,7 @@ private:
     unsigned int m_activeEnvTevBit;      // 0x44
     unsigned int m_curEnvTevBit;         // 0x48
     unsigned char m_vtxDescMode;         // 0x4C
-    signed char m_shadowMaterialType[0x0B]; // 0x4D
+    unsigned char m_shadowMaterialType[0x0B]; // 0x4D
     int m_shadowMaterialCount;           // 0x58
     int m_shadowTextureCount;            // 0x5C
     unsigned int m_numTevStage;          // 0x60

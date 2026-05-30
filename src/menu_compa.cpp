@@ -224,9 +224,7 @@ void CMenuPcs::CompaDraw()
 			}
 		}
 
-		const u8* compatibility =
-			reinterpret_cast<const u8*>(&Game) + caravanWork->m_saveSlot * 0x208 + drawIndex + 0xA9;
-		u8 food = *compatibility;
+		u8 food = Game.m_gameWork.m_linkTable[caravanWork->m_saveSlot][0][caravanWork->m_saveSlot][drawIndex + 1];
 		if (food == 0 && System.m_execParam >= 1) {
 			System.Printf(const_cast<char*>(s_pcts_pctd_family_cnt_error_pctd_801DEDC8), s_menu_compa_cpp, 0x1E0,
 			              shown);

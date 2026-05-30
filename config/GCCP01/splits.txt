@@ -83,6 +83,7 @@ p_sample.cpp:
 	.ctors      start:0x801D53B8 end:0x801D53BC
 	.rodata     start:0x801D6CC8 end:0x801D6CEC
 	.data       start:0x801E8498 end:0x801E868C
+	.sdata      start:0x8032E428 end:0x8032E440
 	.sbss       start:0x8032EC60 end:0x8032EC64
 
 p_usb.cpp:

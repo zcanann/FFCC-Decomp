@@ -1623,25 +1623,24 @@ unsigned int CMenuPcs::CmdOpen0()
 	if (iVar8 > 0) {
 		do {
 			float fVar1 = FLOAT_80332ab0;
-			const double dVar3 = DOUBLE_80332a80;
 			if (*reinterpret_cast<s32*>(psVar5 + 0x12) <= iVar4) {
 				if (iVar4 < *reinterpret_cast<s32*>(psVar5 + 0x12) + *reinterpret_cast<s32*>(psVar5 + 0x14)) {
 					*reinterpret_cast<s32*>(psVar5 + 0x10) = *reinterpret_cast<s32*>(psVar5 + 0x10) + 1;
 					const double dVar2 = DOUBLE_80332a58;
 					*reinterpret_cast<float*>(psVar5 + 8) = static_cast<float>(
-						(dVar2 / (static_cast<double>(*reinterpret_cast<u32*>(psVar5 + 0x14)) - dVar3)) *
-						(static_cast<double>(*reinterpret_cast<u32*>(psVar5 + 0x10)) - dVar3));
+						(dVar2 / static_cast<double>(*reinterpret_cast<s32*>(psVar5 + 0x14))) *
+						static_cast<double>(*reinterpret_cast<s32*>(psVar5 + 0x10)));
 					if ((*reinterpret_cast<u32*>(psVar5 + 0x16) & 2) == 0) {
 						fVar1 = static_cast<float>(
-							(dVar2 / (static_cast<double>(*reinterpret_cast<u32*>(psVar5 + 0x14)) - dVar3)) *
-							(static_cast<double>(*reinterpret_cast<u32*>(psVar5 + 0x10)) - dVar3));
+							(dVar2 / static_cast<double>(*reinterpret_cast<s32*>(psVar5 + 0x14))) *
+							static_cast<double>(*reinterpret_cast<s32*>(psVar5 + 0x10)));
 						*reinterpret_cast<float*>(psVar5 + 0x18) =
 							(*reinterpret_cast<float*>(psVar5 + 0x1c) -
-							 static_cast<float>(static_cast<double>(*psVar5) - dVar3)) *
+							 static_cast<float>(*psVar5)) *
 							fVar1;
 						*reinterpret_cast<float*>(psVar5 + 0x1a) =
 							(*reinterpret_cast<float*>(psVar5 + 0x1e) -
-							 static_cast<float>(static_cast<double>(psVar5[1]) - dVar3)) *
+							 static_cast<float>(psVar5[1])) *
 							fVar1;
 					}
 				} else {

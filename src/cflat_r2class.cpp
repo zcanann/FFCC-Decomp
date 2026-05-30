@@ -673,9 +673,9 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			outResult = 0;
 			break;
 		case -8:
-			engineObject->m_weaponNodeFlags =
-			    static_cast<unsigned short>((static_cast<signed char>(localBase[0]) << 7) & 0x80) |
-			    (engineObject->m_weaponNodeFlags & 0xFF7F);
+			*(reinterpret_cast<u8*>(&engineObject->m_weaponNodeFlags) + 1) =
+			    static_cast<u8>((static_cast<signed char>(localBase[0]) << 7) & 0x80) |
+			    (*(reinterpret_cast<u8*>(&engineObject->m_weaponNodeFlags) + 1) & 0x7F);
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;

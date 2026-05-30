@@ -290,7 +290,17 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 						StoreU16(stack, classData, (systemVal + 0x199) * 2 + 0x3B8, setMode);
 					}
 				} else {
-					StoreU16(stack, classData, 0x3C8, setMode);
+					unsigned short* value = reinterpret_cast<unsigned short*>(classData + 0x3C8);
+					stack[-1].m_word = *value;
+					if (setMode == 0) {
+						*value = stack->m_word;
+					} else if (setMode < 0) {
+						if (setMode > -2) {
+							*value = *value - stack->m_word;
+						}
+					} else if (setMode < 2) {
+						*value = *value + stack->m_word;
+					}
 				}
 			} else if (systemVal < -0x95 && systemVal > -0x176) {
 				u8* const itemTable = *reinterpret_cast<u8**>(classData + 0x24);

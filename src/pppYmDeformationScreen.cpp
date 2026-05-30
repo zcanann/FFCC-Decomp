@@ -102,7 +102,6 @@ void pppRenderYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, 
 	float one;
 	float quadRight;
 	float zero;
-	float quadBottom;
 	pppCVECTOR color;
 	int textureBase;
 
@@ -213,27 +212,30 @@ void pppRenderYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, 
 	GXLoadTexObj(&backTexObj, GX_TEXMAP0);
 	depth = work->m_depth;
 	GXBegin(GX_QUADS, GX_VTXFMT7, 4);
-	zero = kYmDeformationScreenZero;
-	quadMiddleY = kYmDeformationScreenQuadMiddleY;
-	quadRight = kYmDeformationScreenQuadRight;
-	one = kYmDeformationScreenOne;
-	quadBottom = kYmDeformationScreenQuadBottom;
-	GXPosition3f32(zero, quadMiddleY, depth);
-	GXColor1u32(*(u32*)color.rgba);
-	GXTexCoord2f32(zero, zero);
-	GXTexCoord2f32(zero, zero);
-	GXPosition3f32(quadRight, quadMiddleY, depth);
-	GXColor1u32(*(u32*)color.rgba);
-	GXTexCoord2f32(one, zero);
-	GXTexCoord2f32(texU, zero);
-	GXPosition3f32(quadRight, quadBottom, depth);
-	GXColor1u32(*(u32*)color.rgba);
-	GXTexCoord2f32(one, one);
-	GXTexCoord2f32(texU, texV);
-	GXPosition3f32(zero, quadBottom, depth);
-	GXColor1u32(*(u32*)color.rgba);
-	GXTexCoord2f32(zero, one);
-	GXTexCoord2f32(zero, texV);
+	{
+		float bottomQuadBottom = kYmDeformationScreenQuadBottom;
+		float bottomOne = kYmDeformationScreenOne;
+		float bottomRight = kYmDeformationScreenQuadRight;
+		float bottomMiddleY = kYmDeformationScreenQuadMiddleY;
+		float bottomZero = kYmDeformationScreenZero;
+
+		GXPosition3f32(bottomZero, bottomMiddleY, depth);
+		GXColor1u32(*(u32*)color.rgba);
+		GXTexCoord2f32(bottomZero, bottomZero);
+		GXTexCoord2f32(bottomZero, bottomZero);
+		GXPosition3f32(bottomRight, bottomMiddleY, depth);
+		GXColor1u32(*(u32*)color.rgba);
+		GXTexCoord2f32(bottomOne, bottomZero);
+		GXTexCoord2f32(texU, bottomZero);
+		GXPosition3f32(bottomRight, bottomQuadBottom, depth);
+		GXColor1u32(*(u32*)color.rgba);
+		GXTexCoord2f32(bottomOne, bottomOne);
+		GXTexCoord2f32(texU, texV);
+		GXPosition3f32(bottomZero, bottomQuadBottom, depth);
+		GXColor1u32(*(u32*)color.rgba);
+		GXTexCoord2f32(bottomZero, bottomOne);
+		GXTexCoord2f32(bottomZero, texV);
+	}
 
 	gUtil.EndQuadEnv();
 	DisableIndWarp(GX_TEVSTAGE1, GX_INDTEXSTAGE0);

@@ -62,10 +62,12 @@ extern "C" float FLOAT_80333390;
 extern "C" float FLOAT_80333394;
 extern "C" float FLOAT_80333398;
 extern "C" float FLOAT_80333300;
+extern "C" float FLOAT_80333308;
 extern "C" float FLOAT_80333318;
 extern "C" float FLOAT_8033331c;
 extern "C" float FLOAT_80333320;
 extern "C" float FLOAT_80333324;
+extern "C" float FLOAT_80333334;
 static const float FLOAT_803333a8 = 40.0f;
 static const float FLOAT_803333ac = 278.0f;
 static const float FLOAT_803333b0 = 248.0f;
@@ -79,6 +81,8 @@ extern "C" double DOUBLE_80333270;
 extern "C" double DOUBLE_80333268;
 extern "C" double DOUBLE_80333288;
 extern "C" double DOUBLE_80333298;
+extern "C" double DOUBLE_80333378;
+extern "C" double DOUBLE_80333388;
 extern "C" double DOUBLE_803333a0;
 static const double DOUBLE_803333b8 = 20.0;
 static const double DOUBLE_803333c0 = 8.0;
@@ -873,11 +877,6 @@ void CMenuPcs::DrawSingCMake()
         MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
         int a = static_cast<int>(static_cast<double>(FLOAT_80333240) * static_cast<double>(alpha));
-        if (a < 0) {
-            a = 0;
-        } else if (a > 0xFF) {
-            a = 0xFF;
-        }
         GXColor col = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a)};
         GXSetChanMatColor(GX_COLOR0A0, col);
 
@@ -1208,15 +1207,19 @@ void CMenuPcs::DrawCmakeDecision(int yesNoSel, float alpha)
 
     const char* txt = GetMenuStr(0x29);
     float w = static_cast<float>(font->GetWidth(txt));
-    float tx = (FLOAT_80333380 - w) * 0.5f + 0x178;
-    font->SetPosX(tx);
-    font->SetPosY(0x184);
+    unsigned int tx = static_cast<unsigned int>(
+        static_cast<double>(static_cast<float>(static_cast<double>(FLOAT_80333380) - static_cast<double>(w))) *
+            DOUBLE_80333298 +
+        DOUBLE_80333378);
+    int cursorY = static_cast<int>(DOUBLE_80333388);
+    font->SetPosX(static_cast<float>(static_cast<int>(tx)));
+    font->SetPosY(static_cast<float>(cursorY - 4));
     font->Draw(txt);
     DrawInit();
 
     if (yesNoSel != 0) {
         int frame = System.m_frameCounter & 7;
-        DrawCursor(static_cast<int>(tx) - 0x20 + frame, 0x188, alpha);
+        DrawCursor(static_cast<int>(tx) - 0x20 + frame, cursorY, alpha);
     }
 }
 
@@ -1284,6 +1287,7 @@ void CMenuPcs::DrawCmakeCharaText(int page, float alpha)
     valueFont->SetColor(rgba);
     valueFont->SetTlut(6);
 
+    char tribeWithSep[0x40];
     for (int i = 0; i < 4; i++) {
         const char* txt = "";
 
@@ -1296,6 +1300,9 @@ void CMenuPcs::DrawCmakeCharaText(int page, float alpha)
             break;
         case 2:
             txt = GetTribeStr(s_CmakeInfo.m_tribe);
+            strcpy(tribeWithSep, txt);
+            strcat(tribeWithSep, "/", sizeof(tribeWithSep));
+            txt = tribeWithSep;
             break;
         default:
             txt = GetJobStr(s_CmakeInfo.m_job);
@@ -1388,7 +1395,7 @@ void CMenuPcs::DrawCmakeName(int x, int y, char* text, float alpha)
 
     int baseY = 300;
     unsigned int nameX = static_cast<unsigned int>(
-        -((static_cast<double>(FLOAT_80333364) * 0.5) - 0x80000000) + 0x43300000);
+        -((static_cast<double>(FLOAT_80333364) * DOUBLE_80333298) - DOUBLE_80333288));
 
     if (x != 0) {
         baseY = 0x130;
@@ -1497,26 +1504,33 @@ void CMenuPcs::DrawCmakeYesNo(int yesNoSel, float alpha)
     font->DrawInit();
     font->SetTlut(7);
 
-    CColor rgba(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a));
+    GXColor rgba = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a)};
     font->SetColor(rgba);
 
     const char* yesStr = GetMenuStr(1);
     float yesW = static_cast<float>(font->GetWidth(yesStr));
-    float yesX = (FLOAT_803332b0 - yesW) * FLOAT_8033335c + 0x1D0;
-    font->SetPosX(yesX);
+    unsigned int yesX = static_cast<unsigned int>(
+        (static_cast<float>(static_cast<double>(FLOAT_803332b0) - static_cast<double>(yesW)) * FLOAT_8033335c) +
+        0x1D0);
+    font->SetPosX(static_cast<float>(static_cast<int>(yesX)));
     font->SetPosY(FLOAT_80333360);
     font->Draw(yesStr);
 
     const char* noStr = GetMenuStr(2);
     float noW = static_cast<float>(font->GetWidth(noStr));
-    float noX = (FLOAT_803332b0 - noW) * FLOAT_8033335c + 0x218;
-    font->SetPosX(noX);
+    unsigned int noX = static_cast<unsigned int>(
+        (static_cast<float>(static_cast<double>(FLOAT_803332b0) - static_cast<double>(noW)) * FLOAT_8033335c) +
+        0x218);
+    font->SetPosX(static_cast<float>(static_cast<int>(noX)));
     font->SetPosY(FLOAT_80333360);
     font->Draw(noStr);
 
     DrawInit();
     if (yesNoSel != 0) {
-        float cursorBase = (yesNoSel == 1) ? yesX : noX;
+        unsigned int cursorBase = noX;
+        if (yesNoSel == 1) {
+            cursorBase = yesX;
+        }
         int frame = System.m_frameCounter & 7;
         DrawCursor(static_cast<int>(cursorBase) - 0x24 + frame, 0x175, alpha);
     }
@@ -1691,14 +1705,22 @@ int CMenuPcs::CmakeNameCtrl()
     short& mcState = *reinterpret_cast<short*>(mcWork + 10);
     char* name = GetCmakeNameBuffer();
 
+    bool padBusy = false;
     if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+        padBusy = true;
+    }
+    if (padBusy) {
         down = 0;
     } else {
         __cntlzw(static_cast<unsigned int>(Pad._448_4_));
         down = static_cast<unsigned short>(Pad.GetPadInputs()[0].buttonDown[0]);
     }
 
+    padBusy = false;
     if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+        padBusy = true;
+    }
+    if (padBusy) {
         repeat = 0;
     } else {
         __cntlzw(static_cast<unsigned int>(Pad._448_4_));
@@ -1710,7 +1732,7 @@ int CMenuPcs::CmakeNameCtrl()
     }
 
     if (mcState == 3) {
-        int maxRow = (select < 10) ? 4 : 5;
+        int maxRow = (static_cast<int>(select) >> 31) + (static_cast<unsigned int>(select) > 9) + 4;
         if ((repeat & 0x8) != 0) {
             row = (row > 0) ? static_cast<short>(row - 1) : static_cast<short>(maxRow);
             Sound.PlaySe(1, 0x40, 0x7F, 0);
@@ -1737,10 +1759,18 @@ int CMenuPcs::CmakeNameCtrl()
 
         if ((repeat & 0xF) == 0) {
             if ((down & 0x40) != 0) {
-                table = (table > 0) ? static_cast<short>(table - 1) : 2;
+                if (table > 0) {
+                    table = static_cast<short>(table - 1);
+                } else {
+                    table = 2;
+                }
                 Sound.PlaySe(0x5A, 0x40, 0x7F, 0);
             } else if ((down & 0x20) != 0) {
-                table = (table < 2) ? static_cast<short>(table + 1) : 0;
+                if (table < 2) {
+                    table = static_cast<short>(table + 1);
+                } else {
+                    table = 0;
+                }
                 Sound.PlaySe(0x5A, 0x40, 0x7F, 0);
             } else if ((down & 0x1000) != 0) {
                 select = 0xB;
@@ -1762,8 +1792,11 @@ int CMenuPcs::CmakeNameCtrl()
                         return 0;
                     }
 
-                    name[len] = rowText[select];
-                    name[len + 1] = '\0';
+                    char picked[12];
+                    memset(picked, 0, 3);
+                    picked[0] = rowText[select];
+                    picked[1] = '\0';
+                    strcat(name, picked, 0x12);
                     if (strlen(name) > 6) {
                         select = 0xB;
                         row = 5;
@@ -1798,7 +1831,7 @@ int CMenuPcs::CmakeNameCtrl()
                     Sound.PlaySe(0x34, 0x40, 0x7F, 0);
                     return -1;
                 } else {
-                    name[len - 1] = '\0';
+                    name[strlen(name) - 1] = '\0';
                     Sound.PlaySe(3, 0x40, 0x7F, 0);
                 }
                 return 0;
@@ -2099,7 +2132,7 @@ void CMenuPcs::CmakeSexDraw()
         8, FLOAT_803332e4, FLOAT_803332d8, FLOAT_803332dc, FLOAT_803332e0,
         FLOAT_80333254, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, 0.0f);
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x40));
-    for (int x = 0x20; x < 0x260; x += 0x20) {
+    for (int x = 0x20; x < 0x260;) {
         int span = 0x20;
         if ((0x260 - x) < span) {
             span = 0x260 - x;
@@ -2107,36 +2140,21 @@ void CMenuPcs::CmakeSexDraw()
         MenuPcs.DrawRect(
             0, static_cast<float>(x), FLOAT_803332d8, static_cast<float>(span), FLOAT_803332e0,
             FLOAT_80333254, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, 0.0f);
+        x += span;
     }
 
-    int slot = static_cast<int>(MenuS16(this, 0x86A));
-    int modelBlock = MenuS32(this, 0x814);
-    if (*reinterpret_cast<int*>(modelBlock + (slot + 0x20) * 0x50) != 0) {
-        *reinterpret_cast<unsigned short*>(modelBlock + 0x6E8) = 0xFF24;
-        *reinterpret_cast<unsigned short*>(modelBlock + 0x6EA) = 4;
-        DrawInit();
+    DrawCmakePreviewChara(this);
 
-        CCharaPcs::CHandle* handle = GetCmakeCharaHandle(this, slot);
-        if (handle->m_charaKind == 3) {
-            MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x32));
-            MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-            GXColor previewColor = {0xFF, 0xFF, 0xFF, 0xFF};
-            GXSetChanMatColor(GX_COLOR0A0, previewColor);
-            MenuPcs.DrawRect(
-                0, FLOAT_80333244, FLOAT_80333248, FLOAT_8033324c, FLOAT_80333250,
-                FLOAT_80333254, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, 0.0f);
-        } else {
-            SetProjection(0x16);
-            SetLight(2);
-            *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C) = FLOAT_80333258;
-            handle->Draw(5);
-            RestoreProjection();
-        }
+    int panelAlpha = static_cast<int>(static_cast<double>(FLOAT_80333240) * alpha);
+    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
+    MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-        DrawInit();
-    }
-
-    DrawCmakePopupPanel(this, alpha, FLOAT_80333278, FLOAT_8033327c, FLOAT_80333280, FLOAT_80333284, 0.85f, 0.85f);
+    GXColor panelColor = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(panelAlpha)};
+    GXSetChanMatColor(GX_COLOR0A0, panelColor);
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((MenuS16(this, 0x86C) != 0) ? 0x61 : 0x3A));
+    MenuPcs.DrawRect(
+        0, FLOAT_80333278, FLOAT_8033327c, FLOAT_80333280, FLOAT_80333284,
+        FLOAT_80333254, FLOAT_80333254, 0.85f, 0.85f, 0.0f);
     DrawCmakeTitle(2, FLOAT_80333258, alpha);
 
     CFont* font = CmakeFields(this).m_fonts[CMAKE_FONT_LABEL];
@@ -2149,29 +2167,33 @@ void CMenuPcs::CmakeSexDraw()
     CColor rgba(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a));
     font->SetColor(rgba);
 
-    float maxWidth = 0.0f;
+    float maxWidth = FLOAT_80333254;
+    int y = 0x9C;
     for (int i = 0; i < 2; ++i) {
         const char* txt = GetMenuStr(0x11 + i);
         float width = static_cast<float>(font->GetWidth(txt));
         if (maxWidth < width) {
             maxWidth = width;
         }
-        float x = FLOAT_80333288 - width * FLOAT_80333298;
+        float x = static_cast<float>(-(static_cast<double>(width) * DOUBLE_80333298 - DOUBLE_80333288));
         font->SetPosX(x);
-        font->SetPosY(0x9C + i * 0x28 - FLOAT_803332f4);
+        font->SetPosY(static_cast<float>(y) - FLOAT_803332f4);
         font->Draw(txt);
+        y += 0x28;
     }
     DrawInit();
 
     if (*reinterpret_cast<short*>(MenuS32(this, 0x82C) + 0x10) == 1) {
         int sel = *reinterpret_cast<short*>(MenuS32(this, 0x82C) + 0x26);
         int frame = System.m_frameCounter & 7;
-        int cursorX = static_cast<int>(FLOAT_80333288 - maxWidth * (FLOAT_80333298 + FLOAT_80333298)) + frame;
-        int cursorY = 0xA4 + sel * 0x28;
+        int cursorX = static_cast<int>(
+            static_cast<double>(static_cast<float>(DOUBLE_80333288 - static_cast<double>(maxWidth) * DOUBLE_80333298) +
+                                static_cast<float>(frame)) -
+            static_cast<double>(maxWidth) * DOUBLE_80333298);
+        int cursorY = static_cast<int>(FLOAT_80333334 + static_cast<float>(sel * 0x28));
         DrawCursor(cursorX, cursorY, alpha);
     }
 
-    DrawCmakeMcOverlay(this, 0x15);
 }
 
 /*
@@ -2209,19 +2231,27 @@ unsigned short CMenuPcs::CmakeTribeCtrl()
     short& resultDir = *reinterpret_cast<short*>(state + 0x1E);
     short& tribe = *reinterpret_cast<short*>(state + 0x26);
     short& crest = *reinterpret_cast<short*>(state + 0x28);
-    short& selectField = *reinterpret_cast<short*>(state + 0x30);
+    short selectField = *reinterpret_cast<short*>(state + 0x30);
     short& mcState = *reinterpret_cast<short*>(mcWork + 10);
     unsigned short down;
     unsigned short repeat;
 
+    bool padBusy = false;
     if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+        padBusy = true;
+    }
+    if (padBusy) {
         down = 0;
     } else {
         __cntlzw(static_cast<unsigned int>(Pad._448_4_));
         down = static_cast<unsigned short>(Pad.GetPadInputs()[0].buttonDown[0]);
     }
 
+    padBusy = false;
     if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+        padBusy = true;
+    }
+    if (padBusy) {
         repeat = 0;
     } else {
         __cntlzw(static_cast<unsigned int>(Pad._448_4_));
@@ -2236,10 +2266,18 @@ unsigned short CMenuPcs::CmakeTribeCtrl()
         short& currentValue = *reinterpret_cast<short*>(state + 0x26 + selectField * 2);
 
         if ((repeat & 0x8) != 0) {
-            currentValue = (currentValue == 0) ? 3 : static_cast<short>(currentValue - 1);
+            if (currentValue == 0) {
+                currentValue = 3;
+            } else {
+                currentValue = static_cast<short>(currentValue - 1);
+            }
             Sound.PlaySe(1, 0x40, 0x7F, 0);
         } else if ((repeat & 0x4) != 0) {
-            currentValue = (currentValue < 3) ? static_cast<short>(currentValue + 1) : 0;
+            if (currentValue < 3) {
+                currentValue = static_cast<short>(currentValue + 1);
+            } else {
+                currentValue = 0;
+            }
             Sound.PlaySe(1, 0x40, 0x7F, 0);
         }
 
@@ -2254,42 +2292,38 @@ unsigned short CMenuPcs::CmakeTribeCtrl()
                 return 1;
             }
 
-            selectField = static_cast<short>(selectField - 1);
+            *reinterpret_cast<short*>(state + 0x30) = static_cast<short>(selectField - 1);
             return 0;
         }
 
         if ((down & 0x100) != 0) {
             Sound.PlaySe(2, 0x40, 0x7F, 0);
             if (selectField == 0) {
-                selectField = static_cast<short>(selectField + 1);
+                *reinterpret_cast<short*>(state + 0x30) = static_cast<short>(selectField + 1);
                 return 0;
             }
 
-            bool duplicate = false;
-
-            for (int slot = 0; slot < 8; ++slot) {
-                unsigned char* entry = GetCmakeRosterEntry(this, slot);
-                if (*reinterpret_cast<int*>(entry + 0x1794) == 0) {
-                    continue;
+            int duplicateSlot = 8;
+            unsigned char* entry = reinterpret_cast<unsigned char*>(&Game);
+            for (int slot = 0; slot < 8; slot += 2, entry += 0x1860) {
+                if (((*reinterpret_cast<int*>(entry + 0x1794) != 0) &&
+                     (*(entry + 0x1F96) != 1) &&
+                     (*reinterpret_cast<unsigned short*>(entry + 0x17D0) == tribe) &&
+                     (*reinterpret_cast<unsigned short*>(entry + 0x17D4) == crest) &&
+                     (duplicateSlot = slot,
+                      *reinterpret_cast<unsigned short*>(entry + 0x17D2) == s_CmakeInfo.m_gender)) ||
+                    ((*reinterpret_cast<int*>(entry + 0x23C4) != 0) &&
+                     (*(entry + 0x2BC6) != 1) &&
+                     (*reinterpret_cast<unsigned short*>(entry + 0x2400) == tribe) &&
+                     (*reinterpret_cast<unsigned short*>(entry + 0x2404) == crest) &&
+                     (duplicateSlot = slot + 1,
+                      *reinterpret_cast<unsigned short*>(entry + 0x2402) == s_CmakeInfo.m_gender))) {
+                    break;
                 }
-                if (*(entry + 0x1F96) == 1) {
-                    continue;
-                }
-                if (*reinterpret_cast<unsigned short*>(entry + 0x17D0) != static_cast<unsigned short>(tribe)) {
-                    continue;
-                }
-                if (*reinterpret_cast<unsigned short*>(entry + 0x17D4) != static_cast<unsigned short>(crest)) {
-                    continue;
-                }
-                if (*reinterpret_cast<unsigned short*>(entry + 0x17D2) != static_cast<unsigned short>(s_CmakeInfo.m_gender)) {
-                    continue;
-                }
-
-                duplicate = true;
-                break;
+                duplicateSlot = slot + 2;
             }
 
-            if (!duplicate) {
+            if (duplicateSlot > 7) {
                 s_CmakeInfo.m_tribe = static_cast<signed char>(tribe);
                 s_CmakeInfo.m_hair = static_cast<signed char>(crest);
                 ChgModel(static_cast<int>(MenuS16(this, 0x86A)),
@@ -2383,33 +2417,7 @@ void CMenuPcs::CmakeTribeDraw()
         tileX += tileW;
     }
 
-    int slot = static_cast<int>(MenuS16(this, 0x86A));
-    int modelBlock = MenuS32(this, 0x814);
-    if (*reinterpret_cast<int*>(modelBlock + (slot + 0x20) * 0x50) != 0) {
-        *reinterpret_cast<unsigned short*>(modelBlock + 0x6E8) = 0xFF24;
-        *reinterpret_cast<unsigned short*>(modelBlock + 0x6EA) = 4;
-        DrawInit();
-
-        CCharaPcs::CHandle* handle = GetCmakeCharaHandle(this, slot);
-        if (handle->m_charaKind == 3) {
-            MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x32));
-            MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-            GXColor charaColor = {0xFF, 0xFF, 0xFF, 0xFF};
-            GXSetChanMatColor(GX_COLOR0A0, charaColor);
-            MenuPcs.DrawRect(
-                0,
-                FLOAT_80333244, FLOAT_80333248, FLOAT_8033324c, FLOAT_80333250,
-                FLOAT_80333254, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, 0.0f);
-        } else {
-            SetProjection(0x16);
-            SetLight(2);
-            *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C) = FLOAT_80333258;
-            handle->Draw(5);
-            RestoreProjection();
-        }
-
-        DrawInit();
-    }
+    DrawCmakePreviewChara(this);
 
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
@@ -2441,9 +2449,6 @@ void CMenuPcs::CmakeTribeDraw()
 
     for (int i = 0; i < 4; i++) {
         const char* txt = GetTribeStr(i);
-        if (txt == 0) {
-            txt = "";
-        }
         tribeFont->SetPosX(FLOAT_80333284);
         tribeFont->SetPosY(0x88 + i * 0x1C - FLOAT_803332f4);
         tribeFont->Draw(txt);
@@ -2464,9 +2469,6 @@ void CMenuPcs::CmakeTribeDraw()
 
     for (int i = 0; i < 4; i++) {
         const char* txt = GetHairStr(hairBase + i);
-        if (txt == 0) {
-            txt = "";
-        }
         hairFont->SetPosX(FLOAT_8033331c);
         hairFont->SetPosY(0x88 + i * 0x1C - FLOAT_803332f4);
         hairFont->Draw(txt);
@@ -2480,14 +2482,14 @@ void CMenuPcs::CmakeTribeDraw()
         int tribeCursorY = 0x88 + select * 0x1C;
 
         if (*reinterpret_cast<short*>(state + 0x30) == 0) {
-            DrawCursor(static_cast<int>(FLOAT_80333320) + frame, tribeCursorY, alpha);
+            DrawCursor(static_cast<int>(FLOAT_80333320 + static_cast<float>(frame)), tribeCursorY, alpha);
         } else {
             if ((System.m_frameCounter & 1) != 0) {
                 DrawCursor(static_cast<int>(FLOAT_80333320), tribeCursorY, alpha);
             }
 
             int hairCursorY = 0x88 + *reinterpret_cast<short*>(state + 0x28) * 0x1C;
-            DrawCursor(static_cast<int>(FLOAT_80333324) + frame, hairCursorY, alpha);
+            DrawCursor(static_cast<int>(FLOAT_80333324 + static_cast<float>(frame)), hairCursorY, alpha);
         }
     }
 
@@ -2537,14 +2539,22 @@ unsigned short CMenuPcs::CmakeJobCtrl()
     short& resultDir = *reinterpret_cast<short*>(state + 0x1E);
     short& mcState = *reinterpret_cast<short*>(mcWork + 10);
 
+    bool padBusy = false;
     if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+        padBusy = true;
+    }
+    if (padBusy) {
         down = 0;
     } else {
         __cntlzw(static_cast<unsigned int>(Pad._448_4_));
         down = static_cast<unsigned short>(Pad.GetPadInputs()[0].buttonDown[0]);
     }
 
+    padBusy = false;
     if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+        padBusy = true;
+    }
+    if (padBusy) {
         repeat = 0;
     } else {
         __cntlzw(static_cast<unsigned int>(Pad._448_4_));
@@ -2557,15 +2567,27 @@ unsigned short CMenuPcs::CmakeJobCtrl()
 
     if (mcState == 3) {
         if ((repeat & 0x8) != 0) {
-            job = (job < 3) ? static_cast<short>(job + 3) : static_cast<short>(job - 1);
+            if ((job % 4) == 0) {
+                job = static_cast<short>(job + 3);
+            } else {
+                job = static_cast<short>(job - 1);
+            }
             Sound.PlaySe(1, 0x40, 0x7F, 0);
         } else if ((repeat & 0x4) != 0) {
-            job = (((job & 3) < 3)) ? static_cast<short>(job + 1) : static_cast<short>(job - 3);
+            if ((job % 4) < 3) {
+                job = static_cast<short>(job + 1);
+            } else {
+                job = static_cast<short>(job - 3);
+            }
             Sound.PlaySe(1, 0x40, 0x7F, 0);
         }
 
         if ((repeat & 0x3) != 0) {
-            job = (job < 4) ? static_cast<short>(job + 4) : static_cast<short>(job - 4);
+            if (job < 4) {
+                job = static_cast<short>(job + 4);
+            } else {
+                job = static_cast<short>(job - 4);
+            }
             Sound.PlaySe(1, 0x40, 0x7F, 0);
         }
 
@@ -2575,40 +2597,32 @@ unsigned short CMenuPcs::CmakeJobCtrl()
                 unsigned char* group = reinterpret_cast<unsigned char*>(&Game);
                 int slot = 0;
                 for (int groupCount = 2; groupCount != 0; groupCount--) {
-                    if ((slot != static_cast<int>(MenuS16(this, 0x86A))) &&
-                        (*reinterpret_cast<int*>(group + 0x1794) != 0) &&
-                        (*(group + 0x1F96) != 1) &&
-                        (*reinterpret_cast<int*>(group + 0x179C) == static_cast<int>(job))) {
-                        duplicateSlot = slot;
-                        break;
-                    }
-
-                    if (((slot + 1) != static_cast<int>(MenuS16(this, 0x86A))) &&
-                        (*reinterpret_cast<int*>(group + 0x23C4) != 0) &&
-                        (*(group + 0x2BC6) != 1) &&
-                        (*reinterpret_cast<int*>(group + 0x23CC) == static_cast<int>(job))) {
-                        duplicateSlot = slot + 1;
-                        break;
-                    }
-
-                    if (((slot + 2) != static_cast<int>(MenuS16(this, 0x86A))) &&
-                        (*reinterpret_cast<int*>(group + 0x2FF4) != 0) &&
-                        (*(group + 0x37F6) != 1) &&
-                        (*reinterpret_cast<int*>(group + 0x2FFC) == static_cast<int>(job))) {
-                        duplicateSlot = slot + 2;
-                        break;
-                    }
-
-                    if (((slot + 3) != static_cast<int>(MenuS16(this, 0x86A))) &&
-                        (*reinterpret_cast<int*>(group + 0x3C24) != 0) &&
-                        (*(group + 0x4426) != 1) &&
-                        (*reinterpret_cast<int*>(group + 0x3C2C) == static_cast<int>(job))) {
-                        duplicateSlot = slot + 3;
+                    if (((slot != static_cast<int>(MenuS16(this, 0x86A))) &&
+                         (*reinterpret_cast<int*>(group + 0x1794) != 0) &&
+                         (*(group + 0x1F96) != 1) &&
+                         (duplicateSlot = slot,
+                          *reinterpret_cast<int*>(group + 0x179C) == static_cast<int>(job))) ||
+                        (((slot + 1) != static_cast<int>(MenuS16(this, 0x86A))) &&
+                         (*reinterpret_cast<int*>(group + 0x23C4) != 0) &&
+                         (*(group + 0x2BC6) != 1) &&
+                         (duplicateSlot = slot + 1,
+                          *reinterpret_cast<int*>(group + 0x23CC) == static_cast<int>(job))) ||
+                        (((slot + 2) != static_cast<int>(MenuS16(this, 0x86A))) &&
+                         (*reinterpret_cast<int*>(group + 0x2FF4) != 0) &&
+                         (*(group + 0x37F6) != 1) &&
+                         (duplicateSlot = slot + 2,
+                          *reinterpret_cast<int*>(group + 0x2FFC) == static_cast<int>(job))) ||
+                        (((slot + 3) != static_cast<int>(MenuS16(this, 0x86A))) &&
+                         (*reinterpret_cast<int*>(group + 0x3C24) != 0) &&
+                         (*(group + 0x4426) != 1) &&
+                         (duplicateSlot = slot + 3,
+                          *reinterpret_cast<int*>(group + 0x3C2C) == static_cast<int>(job)))) {
                         break;
                     }
 
                     group += 0x30C0;
                     slot += 4;
+                    duplicateSlot = slot;
                 }
 
                 if (duplicateSlot > 7) {
@@ -2636,7 +2650,6 @@ unsigned short CMenuPcs::CmakeJobCtrl()
         Sound.PlaySe(2, 0x40, 0x7F, 0);
         mcState = 2;
     }
-
     return 0;
 }
 
@@ -2670,18 +2683,8 @@ void CMenuPcs::CmakeJobClose()
 void CMenuPcs::CmakeJobDraw()
 {
     int state = MenuS32(this, 0x82C);
-    int frame = static_cast<int>(*reinterpret_cast<short*>(state + 0x22)) - 1;
-    if (frame < 0) {
-        frame = 0;
-    }
-
     short mode = *reinterpret_cast<short*>(state + 0x10);
-    float alpha = FLOAT_80333258;
-    if (mode == 0) {
-        alpha = static_cast<float>(DOUBLE_80333268 * static_cast<double>(frame));
-    } else if (mode == 2) {
-        alpha = static_cast<float>(DOUBLE_80333270 - DOUBLE_80333268 * static_cast<double>(frame));
-    }
+    float alpha = CalcCmakeFadeAlpha(this);
 
     DrawWMFrame0(1, FLOAT_80333258);
 
@@ -2702,7 +2705,7 @@ void CMenuPcs::CmakeJobDraw()
         FLOAT_80333254, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, 0.0f);
 
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x40));
-    for (int x = 0x20; x < 0x260; x += 0x20) {
+    for (int x = 0x20; x < 0x260;) {
         int span = 0x20;
         if ((0x260 - x) < span) {
             span = 0x260 - x;
@@ -2712,45 +2715,12 @@ void CMenuPcs::CmakeJobDraw()
             0,
             static_cast<float>(x), FLOAT_803332d8, static_cast<float>(span), FLOAT_803332e0,
             FLOAT_80333254, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, 0.0f);
+        x += span;
     }
 
-    DrawInit();
-
-    int slot = static_cast<int>(MenuS16(this, 0x86A));
-    int modelBlock = MenuS32(this, 0x814);
-    if (*reinterpret_cast<int*>(modelBlock + (slot + 0x20) * 0x50) != 0) {
-        *reinterpret_cast<unsigned short*>(modelBlock + 0x6E8) = 0xFF24;
-        *reinterpret_cast<unsigned short*>(modelBlock + 0x6EA) = 4;
-        DrawInit();
-
-        CCharaPcs::CHandle* handle = GetCmakeCharaHandle(this, slot);
-        if (handle->m_charaKind == 3) {
-            MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x32));
-            MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-            GXColor charaColor = {0xFF, 0xFF, 0xFF, 0xFF};
-            GXSetChanMatColor(GX_COLOR0A0, charaColor);
-            MenuPcs.DrawRect(
-                0,
-                FLOAT_80333244, FLOAT_80333248, FLOAT_8033324c, FLOAT_80333250,
-                FLOAT_80333254, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, 0.0f);
-        } else {
-            SetProjection(0x16);
-            SetLight(2);
-            *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C) = FLOAT_80333258;
-            handle->Draw(5);
-            RestoreProjection();
-        }
-
-        DrawInit();
-    }
+    DrawCmakePreviewChara(this);
 
     int panelAlpha = static_cast<int>(static_cast<double>(FLOAT_80333240) * alpha);
-    if (panelAlpha < 0) {
-        panelAlpha = 0;
-    } else if (panelAlpha > 0xFF) {
-        panelAlpha = 0xFF;
-    }
-
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
@@ -2776,24 +2746,24 @@ void CMenuPcs::CmakeJobDraw()
     for (int i = 0; i < 8; ++i) {
         const char* txt = GetJobStr(i);
         int x = (i < 4) ? 0x110 : 0x1A8;
-        int row = (i < 4) ? i : (i - 4);
+        int row = i % 4;
         font->SetPosX(x);
         font->SetPosY(static_cast<float>(0x70 + row * 0x28) - FLOAT_803332f4);
         font->Draw(txt);
     }
 
-    if (mode == 1) {
+    if (*reinterpret_cast<short*>(state + 0x10) == 1) {
         int sel = *reinterpret_cast<short*>(state + 0x26);
         int cursorX = (sel < 4) ? 0x110 : 0x1A8;
         int cursorY = 0x70 + ((sel < 4) ? sel : (sel - 4)) * 0x28;
         int cursorFrame = System.m_frameCounter & 7;
-        DrawCursor(cursorX - 0x18 + cursorFrame, cursorY, alpha);
+        DrawCursor(static_cast<int>((static_cast<float>(cursorX) - FLOAT_80333308) + static_cast<float>(cursorFrame)),
+            cursorY, alpha);
     }
 
-    short mcState = *reinterpret_cast<short*>(MenuS32(this, 0x848) + 10);
-    if (mcState != 3) {
+    if (*reinterpret_cast<short*>(MenuS32(this, 0x848) + 10) != 3) {
         DrawMcWin(-1, 0);
-        if (mcState == 1) {
+        if (*reinterpret_cast<short*>(MenuS32(this, 0x848) + 10) == 1) {
             DrawMcWinMess(0x16, 0);
         }
     }
@@ -2955,13 +2925,20 @@ void CMenuPcs::CmakeResultDraw()
         DrawInit();
     }
 
+    float panelAlphaValue = alpha;
     if ((mode == 2) && (resultDir < 0)) {
-        DrawCmakePopupPanel(this, FLOAT_80333258, FLOAT_80333278, FLOAT_8033327c, FLOAT_80333280, FLOAT_80333284,
-            FLOAT_80333258, FLOAT_80333258);
-    } else {
-        DrawCmakePopupPanel(this, alpha, FLOAT_80333278, FLOAT_8033327c, FLOAT_80333280, FLOAT_80333284,
-            FLOAT_80333258, FLOAT_80333258);
+        panelAlphaValue = FLOAT_80333258;
     }
+    int panelAlpha = static_cast<int>(static_cast<double>(FLOAT_80333240) * panelAlphaValue);
+    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
+    MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+
+    GXColor panelColor = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(panelAlpha)};
+    GXSetChanMatColor(GX_COLOR0A0, panelColor);
+    MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((MenuS16(this, 0x86C) != 0) ? 0x61 : 0x3A));
+    MenuPcs.DrawRect(
+        0, FLOAT_80333278, FLOAT_8033327c, FLOAT_80333280, FLOAT_80333284,
+        FLOAT_80333254, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, 0.0f);
 
     if ((mode == 2) && (resultDir > 0)) {
         DrawCmakeTitle(6, FLOAT_80333258, alpha);
@@ -2970,13 +2947,13 @@ void CMenuPcs::CmakeResultDraw()
     }
 
     float textAlpha = alpha;
-    if ((mode == 2) && (resultDir < 0)) {
+    if ((*reinterpret_cast<short*>(state + 0x10) == 2) && (*reinterpret_cast<short*>(state + 0x1E) < 0)) {
         textAlpha = FLOAT_80333258;
     }
 
     DrawCmakeCrest(static_cast<int>(s_CmakeInfo.m_tribe), 0, 0, textAlpha);
 
-    if (mode == 1) {
+    if (*reinterpret_cast<short*>(state + 0x10) == 1) {
         DrawCmakeYesNo(*reinterpret_cast<short*>(state + 0x26) + 1, alpha);
     } else {
         DrawCmakeYesNo(0, alpha);
@@ -2995,9 +2972,6 @@ void CMenuPcs::CmakeResultDraw()
     float labelWidths[4];
     for (int i = 0; i < 4; i++) {
         const char* label = GetMenuStr(i + 0x2A);
-        if (label == 0) {
-            label = "";
-        }
 
         labelWidths[i] = FLOAT_803332f0 + labelFont->GetWidth(label);
         labelFont->SetPosX(FLOAT_803332f0);
@@ -3022,23 +2996,12 @@ void CMenuPcs::CmakeResultDraw()
             value = GetMenuStr(static_cast<int>(s_CmakeInfo.m_gender) + 0x11);
         } else if (i == 2) {
             value = GetTribeStr(static_cast<int>(s_CmakeInfo.m_tribe));
-            if (value == 0) {
-                value = "";
-            }
 
             strcpy(tribeWithSlash, value);
-            size_t tribeLen = strlen(tribeWithSlash);
-            if (tribeLen + 1 < sizeof(tribeWithSlash)) {
-                tribeWithSlash[tribeLen] = '/';
-                tribeWithSlash[tribeLen + 1] = '\0';
-            }
+            strcat(tribeWithSlash, "/", sizeof(tribeWithSlash));
             value = tribeWithSlash;
         } else {
             value = GetJobStr(static_cast<int>(s_CmakeInfo.m_job));
-        }
-
-        if (value == 0) {
-            value = "";
         }
 
         float x = FLOAT_803332fc + labelWidths[i];
@@ -3055,9 +3018,6 @@ void CMenuPcs::CmakeResultDraw()
             }
 
             const char* hair = GetHairStr(hairIndex + static_cast<int>(s_CmakeInfo.m_hair));
-            if (hair == 0) {
-                hair = "";
-            }
 
             valueFont->SetPosX(FLOAT_80333300 + x + valueWidth);
             valueFont->SetPosY(y);
@@ -3067,9 +3027,6 @@ void CMenuPcs::CmakeResultDraw()
 
     DrawInit();
 
-    if (mode == 2 && resultDir < 0) {
-        DrawCmakeDecision(-1, 1.0f);
-    }
 }
 
 /*
@@ -3186,38 +3143,12 @@ void CMenuPcs::CmakeResultDraw1()
         tileX += tileW;
     }
 
-    int slot = static_cast<int>(MenuS16(this, 0x86A));
-    int modelBlock = MenuS32(this, 0x814);
-    if (*reinterpret_cast<int*>(modelBlock + (slot + 0x20) * 0x50) != 0) {
-        *reinterpret_cast<unsigned short*>(modelBlock + 0x6E8) = 0xFF24;
-        *reinterpret_cast<unsigned short*>(modelBlock + 0x6EA) = 4;
-        DrawInit();
-
-        CCharaPcs::CHandle* handle = GetCmakeCharaHandle(this, slot);
-        if (handle->m_charaKind == 3) {
-            MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x32));
-            MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-            GXColor charaColor = {0xFF, 0xFF, 0xFF, 0xFF};
-            GXSetChanMatColor(GX_COLOR0A0, charaColor);
-            MenuPcs.DrawRect(
-                0,
-                FLOAT_80333244, FLOAT_80333248, FLOAT_8033324c, FLOAT_80333250,
-                FLOAT_80333254, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, 0.0f);
-        } else {
-            SetProjection(0x16);
-            SetLight(2);
-            *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C) = FLOAT_80333258;
-            handle->Draw(5);
-            RestoreProjection();
-        }
-
-        DrawInit();
-    }
+    DrawCmakePreviewChara(this);
 
     DrawCmakePopupPanel(this, popupAlpha, FLOAT_80333278, FLOAT_8033327c, FLOAT_80333280, FLOAT_80333284,
         FLOAT_80333258, FLOAT_80333258);
     DrawCmakeTitle(7, FLOAT_80333258, alpha);
-    DrawCmakeCrest(MenuS16(this, 0x862), 0, 0, textAlpha);
+    DrawCmakeCrest(static_cast<int>(s_CmakeInfo.m_tribe), 0, 0, textAlpha);
 
     CFont* labelFont = CmakeFields(this).m_fonts[CMAKE_FONT_LABEL];
     labelFont->SetMargin(FLOAT_80333258);
@@ -3226,7 +3157,7 @@ void CMenuPcs::CmakeResultDraw1()
     labelFont->DrawInit();
 
     int textColor = static_cast<int>(static_cast<double>(FLOAT_80333240) * textAlpha);
-    CColor color(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textColor));
+    GXColor color = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textColor)};
     labelFont->SetColor(color);
 
     float labelWidths[4];
@@ -3268,10 +3199,6 @@ void CMenuPcs::CmakeResultDraw1()
             break;
         }
 
-        if (txt == 0) {
-            txt = "";
-        }
-
         valueFont->SetPosX(FLOAT_803332fc + labelWidths[i]);
         valueFont->SetPosY(0x70 + i * 0x28 - FLOAT_803332f4);
         valueFont->Draw(txt);
@@ -3282,20 +3209,11 @@ void CMenuPcs::CmakeResultDraw1()
                 hairIndex += 4;
             }
 
-            char tribeWithSep[0x40];
-            strcpy(tribeWithSep, txt);
-            size_t tribeLen = strlen(tribeWithSep);
-            tribeWithSep[tribeLen] = '/';
-            tribeWithSep[tribeLen + 1] = '\0';
-
             const char* hairTxt = GetHairStr(hairIndex + s_CmakeInfo.m_hair);
-            if (hairTxt == 0) {
-                hairTxt = "";
-            }
 
             valueFont->SetPosX(
                 FLOAT_80333300 +
-                (FLOAT_803332fc + labelWidths[i] + static_cast<float>(valueFont->GetWidth(tribeWithSep))));
+                (FLOAT_803332fc + labelWidths[i] + static_cast<float>(valueFont->GetWidth(txt))));
             valueFont->SetPosY(0x70 + i * 0x28 - FLOAT_803332f4);
             valueFont->Draw(hairTxt);
         }
@@ -3303,8 +3221,8 @@ void CMenuPcs::CmakeResultDraw1()
 
     DrawInit();
 
-    if (mode == 1) {
-        int cursorX = static_cast<int>(FLOAT_80333304) + (System.m_frameCounter & 7);
+    if (*reinterpret_cast<short*>(state + 0x10) == 1) {
+        int cursorX = static_cast<int>(FLOAT_80333304 + static_cast<float>(System.m_frameCounter & 7));
         int cursorY = 0x70 + *reinterpret_cast<short*>(state + 0x26) * 0x28;
         DrawCursor(cursorX, cursorY, alpha);
     }
@@ -3344,17 +3262,25 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
     short& table = *reinterpret_cast<short*>(villageWork + 0x2A);
     unsigned short down;
     unsigned short repeat;
-    char picked[2] = {'\0', '\0'};
-    size_t len = strlen(s_CmakeInfo.m_name);
+    char picked[8];
+    int len = strlen(s_CmakeInfo.m_name);
 
+    bool padBusy = false;
     if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+        padBusy = true;
+    }
+    if (padBusy) {
         down = 0;
     } else {
         __cntlzw(static_cast<unsigned int>(Pad._448_4_));
         down = static_cast<unsigned short>(Pad.GetPadInputs()[0].buttonDown[0]);
     }
 
+    padBusy = false;
     if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+        padBusy = true;
+    }
+    if (padBusy) {
         repeat = 0;
     } else {
         __cntlzw(static_cast<unsigned int>(Pad._448_4_));
@@ -3376,14 +3302,22 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
 
     if ((repeat & 0x1) != 0) {
         if (row < 5) {
-            select = (select > 0) ? static_cast<short>(select - 1) : 0xB;
+            if (select > 0) {
+                select = static_cast<short>(select - 1);
+            } else {
+                select = 0xB;
+            }
             Sound.PlaySe(1, 0x40, 0x7f, 0);
         } else {
             Sound.PlaySe(4, 0x40, 0x7f, 0);
         }
     } else if ((repeat & 0x2) != 0) {
         if (row < 5) {
-            select = (select < 0xB) ? static_cast<short>(select + 1) : 0;
+            if (select < 0xB) {
+                select = static_cast<short>(select + 1);
+            } else {
+                select = 0;
+            }
             Sound.PlaySe(1, 0x40, 0x7f, 0);
         } else {
             Sound.PlaySe(4, 0x40, 0x7f, 0);
@@ -3395,10 +3329,18 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
     }
 
     if ((down & 0x40) != 0) {
-        table = (table > 0) ? static_cast<short>(table - 1) : 2;
+        if (table > 0) {
+            table = static_cast<short>(table - 1);
+        } else {
+            table = 2;
+        }
         Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
     } else if ((down & 0x20) != 0) {
-        table = (table < 2) ? static_cast<short>(table + 1) : 0;
+        if (table < 2) {
+            table = static_cast<short>(table + 1);
+        } else {
+            table = 0;
+        }
         Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
     }
 
@@ -3424,7 +3366,15 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
     }
 
     if (row > 4) {
-        if (IsCmakeNameBlank(s_CmakeInfo.m_name)) {
+        bool blankName = true;
+        for (const char* it = s_CmakeInfo.m_name; *it != '\0'; ++it) {
+            if (*it != ' ') {
+                blankName = false;
+                break;
+            }
+        }
+
+        if (blankName) {
             Sound.PlaySe(4, 0x40, 0x7f, 0);
             return 0;
         }
@@ -3441,20 +3391,22 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
     }
 
     const char* rowText = s_NameEntryStr[table * 5 + row];
-    size_t rowLen = strlen(rowText);
-    if (select < 0 || static_cast<size_t>(select) >= rowLen) {
+    int rowLen = strlen(rowText);
+    if (select < 0 || select >= rowLen) {
         Sound.PlaySe(4, 0x40, 0x7f, 0);
         return 0;
     }
 
+    memset(picked, 0, 3);
+    picked[0] = '\0';
     picked[0] = rowText[select];
+    picked[1] = '\0';
     if (picked[0] == '\0') {
         Sound.PlaySe(4, 0x40, 0x7f, 0);
         return 0;
     }
 
-    s_CmakeInfo.m_name[len] = picked[0];
-    s_CmakeInfo.m_name[len + 1] = '\0';
+    strcat(s_CmakeInfo.m_name, picked, 0x11);
     if (strlen(s_CmakeInfo.m_name) > 6) {
         select = 0xB;
         row = 5;
@@ -3495,9 +3447,6 @@ void CMenuPcs::CmakeVillageDraw()
     unsigned char* villageWork = static_cast<unsigned char*>(CmakeFields(this).m_villageWork);
     short mode = *reinterpret_cast<short*>(villageWork + 0x10);
     int frame = static_cast<int>(*reinterpret_cast<short*>(villageWork + 0x22)) - 1;
-    short select = *reinterpret_cast<short*>(villageWork + 0x26);
-    short row = *reinterpret_cast<short*>(villageWork + 0x28);
-    short table = *reinterpret_cast<short*>(villageWork + 0x2A);
     float alpha;
 
     if (frame < 0) {
@@ -3545,13 +3494,16 @@ void CMenuPcs::CmakeVillageDraw()
         0, static_cast<float>(DOUBLE_803333b8), FLOAT_803332ac, FLOAT_803332b0, FLOAT_803332b0,
         FLOAT_803332b0, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, 0.0f);
 
-    if (mode == 1 && row < 5) {
+    if (mode == 1 && *reinterpret_cast<short*>(villageWork + 0x28) < 5) {
+        short row = *reinterpret_cast<short*>(villageWork + 0x28);
+        unsigned int cursorX = static_cast<unsigned int>(
+            FLOAT_803332c0 * static_cast<float>(*reinterpret_cast<short*>(villageWork + 0x26)) + 0xE5);
         GXColor cursorColor = {0xFF, 0xFF, 0xFF, 0xFF};
         GXSetChanMatColor(GX_COLOR0A0, cursorColor);
         MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((MenuS16(this, 0x86C) != 0) ? 100 : 0x3D));
         MenuPcs.DrawRect(
             0,
-            0xE5 + select * 20.0f, 99.0f + row * 32.0f, FLOAT_803332b0, FLOAT_803332b0,
+            static_cast<float>(static_cast<int>(cursorX)), 99.0f + row * 32.0f, FLOAT_803332b0, FLOAT_803332b0,
             FLOAT_8033324c, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, 0.0f);
     }
 
@@ -3564,7 +3516,7 @@ void CMenuPcs::CmakeVillageDraw()
     font->SetColor(col);
 
     for (int i = 0; i < 5; i++) {
-        const char* rowText = s_NameEntryStr[table * 5 + i];
+        const char* rowText = s_NameEntryStr[*reinterpret_cast<short*>(villageWork + 0x2A) * 5 + i];
         font->SetPosX(FLOAT_803332c8);
         font->SetPosY(static_cast<float>(0x6C + i * 0x20));
         font->Draw(rowText);
@@ -3573,15 +3525,23 @@ void CMenuPcs::CmakeVillageDraw()
     reinterpret_cast<unsigned char*>(font)[0x24] &= 0xEF;
 
     DrawInit();
-    if (mode == 1 && row < 5) {
+    if (mode == 1 && *reinterpret_cast<short*>(villageWork + 0x28) < 5) {
         int wobble = System.m_frameCounter & 7;
-        DrawCursor(static_cast<int>(FLOAT_803332c8 + select * FLOAT_803332c0) + wobble,
-            row * 0x20 + 0x70, FLOAT_80333258);
+        DrawCursor(
+            static_cast<int>(FLOAT_803332c8 + *reinterpret_cast<short*>(villageWork + 0x26) * FLOAT_803332c0) + wobble,
+            *reinterpret_cast<short*>(villageWork + 0x28) * 0x20 + 0x70, FLOAT_80333258);
     }
 
-    int showNameCursor = (mode == 1 && row < 5 && strlen(s_CmakeInfo.m_name) <= 6) ? 1 : 0;
+    int showNameCursor = __cntlzw(static_cast<unsigned int>(1 - *reinterpret_cast<short*>(villageWork + 0x10))) >> 5;
+    if (*reinterpret_cast<short*>(villageWork + 0x28) > 4) {
+        showNameCursor = 0;
+    }
+    if (strlen(s_CmakeInfo.m_name) > 6) {
+        showNameCursor = 0;
+    }
     DrawCmakeName(1, showNameCursor, s_CmakeInfo.m_name, alpha);
-    DrawCmakeDecision((row > 4) ? 1 : 0, alpha);
+    DrawCmakeDecision((static_cast<int>(*reinterpret_cast<short*>(villageWork + 0x28)) >> 31) +
+        (static_cast<unsigned int>(static_cast<int>(*reinterpret_cast<short*>(villageWork + 0x28))) > 4), alpha);
 }
 
 /*

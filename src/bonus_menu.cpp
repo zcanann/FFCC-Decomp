@@ -426,11 +426,11 @@ static inline void DrawBonusPartyNames(CMenuPcs* menu, BonusAnimHeader* header, 
 			continue;
 		}
 
-		const char* name = 0;
+		char name[0x20];
 		for (int j = 0; j < activePartyCount; j++) {
 			if (s_Rinfo->m_party[j].m_rank == nameIndex) {
 				CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[s_Rinfo->m_party[j].m_partySlot]);
-				name = reinterpret_cast<const char*>(caravanWork->unk_0x3ca_0x3dd);
+				strcpy(name, reinterpret_cast<const char*>(caravanWork->unk_0x3ca_0x3dd));
 				break;
 			}
 		}
@@ -438,7 +438,7 @@ static inline void DrawBonusPartyNames(CMenuPcs* menu, BonusAnimHeader* header, 
 		font->SetColor(color);
 		font->SetPosX((float)sprite->x + sprite->mulX);
 		font->SetPosY((float)sprite->y + sprite->mulY - 12.0f);
-		font->Draw(const_cast<char*>(name));
+		font->Draw(name);
 		nameIndex++;
 	}
 }

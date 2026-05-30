@@ -2459,12 +2459,6 @@ void CMenuPcs::CmakeTribeDraw()
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
     int a = static_cast<int>(static_cast<double>(FLOAT_80333240) * alpha);
-    if (a < 0) {
-        a = 0;
-    } else if (a > 0xFF) {
-        a = 0xFF;
-    }
-
     GXColor col = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a)};
     GXSetChanMatColor(GX_COLOR0A0, col);
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((MenuS16(this, 0x86C) != 0) ? 0x61 : 0x3A));

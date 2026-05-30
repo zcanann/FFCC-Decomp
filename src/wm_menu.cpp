@@ -250,6 +250,7 @@ extern double DOUBLE_80331770;
 extern double DOUBLE_80331788;
 extern double DOUBLE_80331790;
 extern double DOUBLE_80331798;
+extern double DOUBLE_803317A0;
 extern float FLOAT_803317e0;
 extern float FLOAT_803317e4;
 extern float FLOAT_803317e8;
@@ -4989,12 +4990,24 @@ void CMenuPcs::DrawTitleMenu()
 			         FLOAT_803313dc, FLOAT_803313dc,
 			         FLOAT_803313e8, FLOAT_803313e8, 0);
 			GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_SRCALPHA, GX_LO_SET);
+			float secondAlpha = alpha;
 			if (state == 2 && *reinterpret_cast<short*>(worldState + 0x12) == 0) {
 				int timer = (int)*reinterpret_cast<short*>(worldState + 0x24);
 				fX = static_cast<float>(DOUBLE_80331790 *
 				                         (static_cast<double>(5 - timer) / DOUBLE_80331798) +
 				                         static_cast<double>(FLOAT_80331778 - FLOAT_80331414));
+			} else if ((state == 2 && *reinterpret_cast<short*>(worldState + 0x18) == 0) ||
+			           (state == 3 && *reinterpret_cast<short*>(worldState + 0x0E) == 0)) {
+				int pulse = (int)*reinterpret_cast<short*>(worldState + 0x24) % 0x28 - 0x14;
+				if (pulse < 0) {
+					pulse = -pulse;
+				}
+				secondAlpha = static_cast<float>(-(DOUBLE_803317A0 * static_cast<double>(pulse) -
+				                                  DOUBLE_80331420));
 			}
+			itemColor = (unsigned int)(FLOAT_80331458 * secondAlpha) & 0xFF;
+			itemColor = itemColor | 0xFFFFFF00;
+			GXSetChanMatColor(GX_COLOR0A0, *(_GXColor*)&itemColor);
 			DrawRect(0xFFFFFFFF, fX, fY - FLOAT_80331780,
 			         FLOAT_80331568, FLOAT_80331554,
 			         FLOAT_803313dc, FLOAT_80331554,

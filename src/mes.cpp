@@ -1024,23 +1024,23 @@ void CMes::addString(char** text, int branchMode)
 				case 0x37:
 					strcpy(namePtr, FLAT_NAME_DIRECT(0, value * 5 + 1));
 					break;
-				case 0x19:
-					Game.MakeArtsItemNames(namePtr, value);
-					break;
 				case 0x1D:
 					strcpy(namePtr, FLAT_NAME_DIRECT(0, value * 5));
 					break;
-				case 0x39:
-					strcpy(namePtr, FLAT_NAME_DIRECT(0, value * 5 + 3));
-					break;
 				case 0x3B:
 					Game.MakeArtItemName(namePtr, value, 1);
+					break;
+				case 0x19:
+					Game.MakeArtsItemNames(namePtr, value);
 					break;
 				case 0x3D:
 					Game.MakeArtItemName(namePtr, value, CMes::m_tempVar[(signed char)ReadTagU8(text)] & 0xFFFF);
 					break;
 				case 0x3F:
 					Game.MakeNumItemName(namePtr, value, CMes::m_tempVar[(signed char)ReadTagU8(text)] & 0xFFFF);
+					break;
+				case 0x39:
+					strcpy(namePtr, FLAT_NAME_DIRECT(0, value * 5 + 3));
 					break;
 				}
 				ApplyCaseMode(namePtr, caseMode);
@@ -1070,24 +1070,24 @@ void CMes::addString(char** text, int branchMode)
 				case 0x1E:
 					strcpy(namePtr, FLAT_NAME_DIRECT(1, value * 5));
 					break;
-				case 0x1F:
-					Game.MakeArtsMonNames(namePtr, value);
-					break;
 				case 0x2A:
 				case 0x38:
 					strcpy(namePtr, FLAT_NAME_DIRECT(1, value * 5 + 1));
 					break;
-				case 0x3A:
-					strcpy(namePtr, FLAT_NAME_DIRECT(1, value * 5 + 3));
-					break;
 				case 0x3C:
 					Game.MakeArtMonName(namePtr, value, 1);
+					break;
+				case 0x1F:
+					Game.MakeArtsMonNames(namePtr, value);
 					break;
 				case 0x3E:
 					Game.MakeArtMonName(namePtr, value, CMes::m_tempVar[(signed char)ReadTagU8(text)] & 0xFFFF);
 					break;
 				case 0x40:
 					Game.MakeNumMonName(namePtr, value, CMes::m_tempVar[(signed char)ReadTagU8(text)] & 0xFFFF);
+					break;
+				case 0x3A:
+					strcpy(namePtr, FLAT_NAME_DIRECT(1, value * 5 + 3));
 					break;
 				}
 				ApplyCaseMode(namePtr, caseMode);
@@ -1226,6 +1226,10 @@ void CMes::addString(char** text, int branchMode)
 					{
 						*(int*)((char*)this + 0x3CB0) = value;
 					}
+				}
+				else if (System.m_execParam != 0)
+				{
+					System.Printf(const_cast<char*>(s_mesTagUnknown), tag + 0xA0);
 				}
 				break;
 			}

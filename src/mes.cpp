@@ -1240,14 +1240,14 @@ void CMes::addString(char** text, int branchMode)
 				*(int*)((char*)this + 0x3CB8) = ReadTagS8(text);
 				break;
 			case 0x31:
-				*(int*)((char*)this + 0x3C84) = ReadTagS16(text);
-				*(int*)((char*)this + 0x3C88) = ReadTagS16(text);
+				*(float*)((char*)this + 0x3C84) = (float)ReadTagS16(text);
+				*(float*)((char*)this + 0x3C88) = (float)ReadTagS16(text);
 				break;
 			case 0x32:
 				*(int*)((char*)this + 0x3D28) = 9;
 				break;
 			case 0x33:
-				*(int*)((char*)this + 0x3D3C) = ReadTagS8(text);
+				*(float*)((char*)this + 0x3D3C) = (float)ReadTagS8(text);
 				break;
 			case 0x34:
 			{

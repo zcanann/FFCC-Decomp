@@ -441,10 +441,12 @@ CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* objec
 				} else if (systemVal != -0x1AA) {
 					if (systemVal < -0x1AA) {
 						if (systemVal != -0x1C8) {
-							if (systemVal > -0x1CA) {
+							if (systemVal > -0x1C8) {
+								if (systemVal == -0x1B6) {
+									value = LoadU16(classData, 0x3DE);
+								}
+							} else if (systemVal >= -0x1C9) {
 								value = LoadU16(classData, 0xBC8);
-							} else if (systemVal == -0x1B6) {
-								value = LoadU16(classData, 0x3DE);
 							}
 						} else {
 							u8* const p = *reinterpret_cast<u8**>(engineObject + 0x6F0);

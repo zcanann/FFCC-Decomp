@@ -175,13 +175,10 @@ public:
     void CalcSelectOpenAnim();
     void DrawSelectOpenAnim();
     void CalcSelectWait();
-    void DrawSelectWait();
     void CalcSelectCloseAnim();
-    void DrawSelectCloseAnim();
 
     void DrawBonusFrame(float, float, float, float, float);
     void DrawArtiBase(CMenuPcs::Sprt2*, float);
-    void DrawBonusChkMark(float);
     void ArtiBaseInfoInit(CMenuPcs::Sprt2*, CMenuPcs::Sprt2*);
 
     void GetAllPadOn();

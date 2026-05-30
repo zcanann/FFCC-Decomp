@@ -8738,20 +8738,19 @@ void CMenuPcs::DrawPageMark()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::DrawRect2(unsigned long, float x, float y, float w, float h, float tx, float ty, float scale, float flags, float (*mtx)[4])
+void CMenuPcs::DrawRect2(unsigned long flags, float x, float y, float w, float h, float tx, float ty, float scaleX, float scaleY, float (*mtx)[4])
 {
 	if (w <= 0.0f || h <= 0.0f) {
 		return;
 	}
 
-	const unsigned int drawFlags = static_cast<unsigned int>(flags);
-	const float halfTexel = FLOAT_803314bc;
+	const float halfTexel = FLOAT_80331434;
 	float u0;
 	float u1;
 	float v0;
 	float v1;
 
-	if ((drawFlags & 8) == 0) {
+	if ((flags & 8) == 0) {
 		u0 = tx + halfTexel;
 		u1 = (tx + w) - halfTexel;
 	} else {
@@ -8759,7 +8758,7 @@ void CMenuPcs::DrawRect2(unsigned long, float x, float y, float w, float h, floa
 		u0 = (tx + w) - halfTexel;
 	}
 
-	if ((drawFlags & 4) == 0) {
+	if ((flags & 4) == 0) {
 		v0 = ty + halfTexel;
 		v1 = (ty + h) - halfTexel;
 	} else {
@@ -8767,11 +8766,11 @@ void CMenuPcs::DrawRect2(unsigned long, float x, float y, float w, float h, floa
 		v0 = (ty + h) - halfTexel;
 	}
 
-	if ((drawFlags & 1) != 0) {
-		x = x - halfTexel * (w * scale);
+	if ((flags & 1) != 0) {
+		x = x - halfTexel * (w * scaleX);
 	}
-	if ((drawFlags & 2) != 0) {
-		y = y - halfTexel * (h * scale);
+	if ((flags & 2) != 0) {
+		y = y - halfTexel * (h * scaleY);
 	}
 
 	Vec in[4];
@@ -8781,39 +8780,26 @@ void CMenuPcs::DrawRect2(unsigned long, float x, float y, float w, float h, floa
 	in[0].y = y;
 	in[0].z = 0.0f;
 
-	in[1].x = x + (w * scale);
+	in[1].x = x + (w * scaleX);
 	in[1].y = y;
 	in[1].z = 0.0f;
 
 	in[2].x = x;
-	in[2].y = y + (h * scale);
+	in[2].y = y + (h * scaleY);
 	in[2].z = 0.0f;
 
-	in[3].x = x + (w * scale);
-	in[3].y = y + (h * scale);
+	in[3].x = x + (w * scaleX);
+	in[3].y = y + (h * scaleY);
 	in[3].z = 0.0f;
 
-	if (mtx != 0) {
-		PSMTXMultVecArray(reinterpret_cast<MtxPtr>(mtx), in, out, 4);
-	} else {
-		for (int i = 0; i < 4; i++) {
-			out[i] = in[i];
-		}
-	}
+	PSMTXMultVecArray(reinterpret_cast<MtxPtr>(mtx), in, out, 4);
 
 	GXBegin(static_cast<GXPrimitive>(0x98), static_cast<GXVtxFmt>(0), 4);
 
-	GXPosition3f32(out[0].x, out[0].y, out[0].z);
-	GXTexCoord2f32(u0, v0);
-
-	GXPosition3f32(out[1].x, out[1].y, out[1].z);
-	GXTexCoord2f32(u1, v0);
-
-	GXPosition3f32(out[2].x, out[2].y, out[2].z);
-	GXTexCoord2f32(u0, v1);
-
-	GXPosition3f32(out[3].x, out[3].y, out[3].z);
-	GXTexCoord2f32(u1, v1);
+	for (int i = 0; i < 4; i++) {
+		GXPosition3f32(out[i].x, out[i].y, out[i].z);
+		GXTexCoord2f32((i & 1) != 0 ? u1 : u0, i >= 2 ? v1 : v0);
+	}
 }
 
 /*
@@ -8825,20 +8811,19 @@ void CMenuPcs::DrawRect2(unsigned long, float x, float y, float w, float h, floa
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::DrawRect3d(unsigned long, float x, float y, float z, float w, float h, float tx, float ty, float scale, float flags)
+void CMenuPcs::DrawRect3d(unsigned long flags, float x, float y, float z, float w, float h, float tx, float ty, float scaleX, float scaleY)
 {
 	if (w <= 0.0f || h <= 0.0f) {
 		return;
 	}
 
-	const unsigned int drawFlags = static_cast<unsigned int>(flags);
-	const float halfTexel = FLOAT_803314bc;
+	const float halfTexel = FLOAT_80331434;
 	float u0;
 	float u1;
 	float v0;
 	float v1;
 
-	if ((drawFlags & 8) == 0) {
+	if ((flags & 8) == 0) {
 		u0 = tx + halfTexel;
 		u1 = (tx + w) - halfTexel;
 	} else {
@@ -8846,7 +8831,7 @@ void CMenuPcs::DrawRect3d(unsigned long, float x, float y, float z, float w, flo
 		u0 = (tx + w) - halfTexel;
 	}
 
-	if ((drawFlags & 4) == 0) {
+	if ((flags & 4) == 0) {
 		v0 = ty + halfTexel;
 		v1 = (ty + h) - halfTexel;
 	} else {
@@ -8854,29 +8839,37 @@ void CMenuPcs::DrawRect3d(unsigned long, float x, float y, float z, float w, flo
 		v0 = (ty + h) - halfTexel;
 	}
 
-	if ((drawFlags & 1) != 0) {
-		x = x - halfTexel * (w * scale);
+	if ((flags & 1) != 0) {
+		x = x - halfTexel * (w * scaleX);
 	}
-	if ((drawFlags & 2) != 0) {
-		y = y - halfTexel * (h * scale);
+	if ((flags & 2) != 0) {
+		y = y - halfTexel * (h * scaleY);
 	}
 
-	const float x1 = x + (w * scale);
-	const float y1 = y + (h * scale);
+	Vec out[4];
+
+	out[0].x = x;
+	out[0].y = y;
+	out[0].z = z;
+
+	out[1].x = x + (w * scaleX);
+	out[1].y = y;
+	out[1].z = z;
+
+	out[2].x = x;
+	out[2].y = y + (h * scaleY);
+	out[2].z = z;
+
+	out[3].x = x + (w * scaleX);
+	out[3].y = y + (h * scaleY);
+	out[3].z = z;
 
 	GXBegin(static_cast<GXPrimitive>(0x98), static_cast<GXVtxFmt>(0), 4);
 
-	GXPosition3f32(x, y, z);
-	GXTexCoord2f32(u0, v0);
-
-	GXPosition3f32(x1, y, z);
-	GXTexCoord2f32(u1, v0);
-
-	GXPosition3f32(x, y1, z);
-	GXTexCoord2f32(u0, v1);
-
-	GXPosition3f32(x1, y1, z);
-	GXTexCoord2f32(u1, v1);
+	for (int i = 0; i < 4; i++) {
+		GXPosition3f32(out[i].x, out[i].y, out[i].z);
+		GXTexCoord2f32((i & 1) != 0 ? u1 : u0, i >= 2 ? v1 : v0);
+	}
 }
 
 /*

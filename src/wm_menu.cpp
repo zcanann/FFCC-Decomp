@@ -4045,6 +4045,8 @@ void CMenuPcs::DrawCMakeMenu()
 
 		DrawCharaBase();
 		DrawChara();
+		PSMTXCopy(reinterpret_cast<MtxPtr>(bytes + 0x744), CameraPcs.m_cameraMatrix);
+		GXSetCopyClear(Graphic.m_defaultCopyClearColor, 0xFFFFFF);
 		Mtx44 projectionMtx;
 		PSMTX44Copy(CameraPcs.m_screenMatrix, projectionMtx);
 		GXSetProjection(projectionMtx, GX_PERSPECTIVE);

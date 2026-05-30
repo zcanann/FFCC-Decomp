@@ -792,7 +792,7 @@ void CMenuPcs::CmdCtrl()
 	s16 mode = *reinterpret_cast<s16*>(cmd + 0x30);
 	s16 state = *reinterpret_cast<s16*>(cmd + 0x12);
 
-	if ((mode == 0) || ((mode != 0) && (state == 1))) {
+	if ((mode == 0) || (state == 1)) {
 		actionHandled = CmdCtrlCur();
 	} else if ((mode == 1) && (state == 0)) {
 		actionHandled = CmdOpen0();

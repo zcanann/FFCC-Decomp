@@ -3480,7 +3480,7 @@ void CMenuPcs::CmakeVillageDraw()
             *reinterpret_cast<short*>(villageWork + 0x28) * 0x20 + 0x70, FLOAT_80333258);
     }
 
-    int showNameCursor = __cntlzw(static_cast<unsigned int>(1 - mode)) >> 5;
+    int showNameCursor = __cntlzw(static_cast<unsigned int>(1 - *reinterpret_cast<short*>(villageWork + 0x10))) >> 5;
     if (*reinterpret_cast<short*>(villageWork + 0x28) > 4) {
         showNameCursor = 0;
     }

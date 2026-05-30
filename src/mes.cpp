@@ -988,6 +988,183 @@ void CMes::addString(char** text, int branchMode)
 				*(float*)((char*)this + 0x3C84) =
 				    *(float*)((char*)this + 0x3C84) + FLOAT_803308A8 + *(float*)((char*)this + 0x3D3C);
 				break;
+			case 8:
+			{
+				(void)ReadTagU8(text);
+				int oldColor = *(int*)((char*)this + 0x3D28);
+				if (ReadTagU8(text) != 0)
+				{
+					*(int*)((char*)this + 0x3D28) = 6;
+				}
+				char* flatText = FLAT_NAME_DIRECT(5, CMes::m_tempVar[(signed char)ReadTagU8(text)] & 0xFFFF);
+				addString(&flatText, branchMode);
+				*(int*)((char*)this + 0x3D28) = oldColor;
+				break;
+			}
+			case 9:
+			case 0x19:
+			case 0x1D:
+			case 0x37:
+			case 0x39:
+			case 0x3B:
+			case 0x3D:
+			case 0x3F:
+			{
+				(void)ReadTagU8(text);
+				int oldColor = *(int*)((char*)this + 0x3D28);
+				if (ReadTagU8(text) != 0)
+				{
+					*(int*)((char*)this + 0x3D28) = 5;
+				}
+				char name[32];
+				char* namePtr = name;
+				int value = CMes::m_tempVar[(signed char)ReadTagU8(text)] & 0xFFFF;
+				switch (tag)
+				{
+				case 9:
+				case 0x37:
+					strcpy(namePtr, FLAT_NAME_DIRECT(0, value * 5 + 1));
+					break;
+				case 0x19:
+					Game.MakeArtsItemNames(namePtr, value);
+					break;
+				case 0x1D:
+					strcpy(namePtr, FLAT_NAME_DIRECT(0, value * 5));
+					break;
+				case 0x39:
+					strcpy(namePtr, FLAT_NAME_DIRECT(0, value * 5 + 3));
+					break;
+				case 0x3B:
+					Game.MakeArtItemName(namePtr, value, 1);
+					break;
+				case 0x3D:
+					Game.MakeArtItemName(namePtr, value, CMes::m_tempVar[(signed char)ReadTagU8(text)] & 0xFFFF);
+					break;
+				case 0x3F:
+					Game.MakeNumItemName(namePtr, value, CMes::m_tempVar[(signed char)ReadTagU8(text)] & 0xFFFF);
+					break;
+				}
+				ApplyCaseMode(namePtr, caseMode);
+				addString(&namePtr, branchMode);
+				*(int*)((char*)this + 0x3D28) = oldColor;
+				break;
+			}
+			case 0x1E:
+			case 0x1F:
+			case 0x2A:
+			case 0x38:
+			case 0x3A:
+			case 0x3C:
+			case 0x3E:
+			case 0x40:
+			{
+				(void)ReadTagU8(text);
+				int oldColor = *(int*)((char*)this + 0x3D28);
+				if (ReadTagU8(text) != 0)
+				{
+					*(int*)((char*)this + 0x3D28) = 0;
+				}
+				char name[32];
+				char* namePtr = name;
+				int value = CMes::m_tempVar[(signed char)ReadTagU8(text)] & 0xFFFF;
+				switch (tag)
+				{
+				case 0x1E:
+					strcpy(namePtr, FLAT_NAME_DIRECT(1, value * 5));
+					break;
+				case 0x1F:
+					Game.MakeArtsMonNames(namePtr, value);
+					break;
+				case 0x2A:
+				case 0x38:
+					strcpy(namePtr, FLAT_NAME_DIRECT(1, value * 5 + 1));
+					break;
+				case 0x3A:
+					strcpy(namePtr, FLAT_NAME_DIRECT(1, value * 5 + 3));
+					break;
+				case 0x3C:
+					Game.MakeArtMonName(namePtr, value, 1);
+					break;
+				case 0x3E:
+					Game.MakeArtMonName(namePtr, value, CMes::m_tempVar[(signed char)ReadTagU8(text)] & 0xFFFF);
+					break;
+				case 0x40:
+					Game.MakeNumMonName(namePtr, value, CMes::m_tempVar[(signed char)ReadTagU8(text)] & 0xFFFF);
+					break;
+				}
+				ApplyCaseMode(namePtr, caseMode);
+				addString(&namePtr, branchMode);
+				*(int*)((char*)this + 0x3D28) = oldColor;
+				break;
+			}
+			case 0x2B:
+			{
+				(void)ReadTagU8(text);
+				int oldColor = *(int*)((char*)this + 0x3D28);
+				if (ReadTagU8(text) != 0)
+				{
+					*(int*)((char*)this + 0x3D28) = 6;
+				}
+				char name[32];
+				char* namePtr = name;
+				strcpy(namePtr, FLAT_NAME_DIRECT(2, CMes::m_tempVar[(signed char)ReadTagU8(text)] & 0xFFFF));
+				ApplyCaseMode(namePtr, caseMode);
+				addString(&namePtr, branchMode);
+				*(int*)((char*)this + 0x3D28) = oldColor;
+				break;
+			}
+			case 0x2C:
+			{
+				(void)ReadTagU8(text);
+				int oldColor = *(int*)((char*)this + 0x3D28);
+				if (ReadTagU8(text) != 0)
+				{
+					*(int*)((char*)this + 0x3D28) = 4;
+				}
+				char name[32];
+				char* namePtr = name;
+				strcpy(namePtr, FLAT_NAME_DIRECT(3, CMes::m_tempVar[(signed char)ReadTagU8(text)] & 0xFFFF));
+				ApplyCaseMode(namePtr, caseMode);
+				addString(&namePtr, branchMode);
+				*(int*)((char*)this + 0x3D28) = oldColor;
+				break;
+			}
+			case 0x2D:
+			{
+				(void)ReadTagU8(text);
+				int oldColor = *(int*)((char*)this + 0x3D28);
+				if (ReadTagU8(text) != 0)
+				{
+					*(int*)((char*)this + 0x3D28) = 3;
+				}
+				char name[32];
+				char* namePtr = name;
+				strcpy(namePtr, FLAT_NAME_DIRECT(3, (CMes::m_tempVar[(signed char)ReadTagU8(text)] & 0xFFFF) + 0x3C));
+				ApplyCaseMode(namePtr, caseMode);
+				addString(&namePtr, branchMode);
+				*(int*)((char*)this + 0x3D28) = oldColor;
+				break;
+			}
+			case 0x2E:
+			{
+				char* flatText = FLAT_NAME_DIRECT(5, CMes::m_tempVar[(signed char)ReadTagU8(text)] & 0xFFFF);
+				addString(&flatText, branchMode);
+				break;
+			}
+			case 0x2F:
+			{
+				char* fallback = (char*)s_mesFallback;
+				addString(&fallback, branchMode);
+				break;
+			}
+			case 0x30:
+			{
+				char number[256];
+				char* numberPtr = number;
+				sprintf(numberPtr, s_mesNumFmt, CMes::m_tempVar[(signed char)ReadTagU8(text)]);
+				addString(&numberPtr, branchMode);
+				break;
+			}
 			case 0x0A:
 			{
 				unsigned char idx = (unsigned char)ReadTagU8(text);

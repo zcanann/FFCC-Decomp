@@ -2278,7 +2278,7 @@ unsigned short CMenuPcs::CmakeTribeCtrl()
             }
 
             int duplicateSlot = 8;
-            unsigned char* entry = GetCmakeRosterEntry(this, 0);
+            unsigned char* entry = reinterpret_cast<unsigned char*>(&Game);
             for (int slot = 0; slot < 8; slot += 2, entry += 0x1860) {
                 if (((*reinterpret_cast<int*>(entry + 0x1794) != 0) &&
                      (*(entry + 0x1F96) != 1) &&

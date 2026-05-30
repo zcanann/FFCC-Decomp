@@ -5076,6 +5076,12 @@ void CMenuPcs::DrawTitleMenu()
 			fadeColor2 = fadeColor2 | (fadeColor2 << 8) | (fadeColor2 << 16) | (fadeColor2 << 24);
 			GXSetChanMatColor(GX_COLOR0A0, *(_GXColor*)&fadeColor2);
 			SetTexture((TEX)0xFFFFFFFF);
+			GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_SET);
+			GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+			GXPosition3f32(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc);
+			GXPosition3f32(FLOAT_803313e0, FLOAT_803313dc, FLOAT_803313dc);
+			GXPosition3f32(FLOAT_803313e0, FLOAT_803313e4, FLOAT_803313dc);
+			GXPosition3f32(FLOAT_803313dc, FLOAT_803313e4, FLOAT_803313dc);
 		}
 
 		// End state handling

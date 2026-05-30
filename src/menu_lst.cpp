@@ -14,6 +14,9 @@ extern const double DOUBLE_803333E8;
 extern const double DOUBLE_80333410;
 extern const double DOUBLE_80333418;
 extern const double DOUBLE_80333420;
+extern const float FLOAT_803333D0;
+extern const double DOUBLE_803333E8;
+extern const float FLOAT_803333F0;
 
 STATIC_ASSERT(offsetof(CMenuPcs, listFont) == 0x108);
 STATIC_ASSERT(offsetof(CMenuPcs, helpFont) == 0xF8);
@@ -98,9 +101,9 @@ void CMenuPcs::MLstDraw()
 	}
 
 	CFont* font = this->listFont;
-	font->SetMargin(1.0f);
+	font->SetMargin(FLOAT_803333F0);
 	font->SetShadow(0);
-	font->SetScale(1.0f);
+	font->SetScale(FLOAT_803333F0);
 	font->DrawInit();
 
 	item = this->lstData->entries;
@@ -130,7 +133,7 @@ void CMenuPcs::MLstDraw()
 		float cursorYOffset = (float)((double)(float)(curItem->height - 0x20) * 0.5);
 		int cursorY = (int)((float)curItem->y + cursorYOffset);
 		int cursorX = (int)((float)(curItem->x - 0x38) + (float)(System.m_frameCounter % 8));
-		DrawCursor(cursorX, cursorY, 1.0f);
+		DrawCursor(cursorX, cursorY, FLOAT_803333F0);
 	}
 
 	DrawInit();
@@ -146,7 +149,7 @@ void CMenuPcs::MLstDraw()
 		(int)helpY,
 		helpColor.color,
 		0x0a,
-		1.0f,
+		FLOAT_803333F0,
 		3.0f);
 }
 
@@ -336,7 +339,7 @@ int CMenuPcs::MLstOpen()
 		short yPos;
 
 		memset(this->lstData, 0, sizeof(MenuLstList));
-		one = 1.0f;
+		one = FLOAT_803333F0;
 		entry = this->lstData->entries;
 		for (i = 0; i < 64; i++, entry++) {
 			entry->z = one;

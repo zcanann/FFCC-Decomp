@@ -582,7 +582,7 @@ void CMenuPcs::CalcSingCMake()
                 *reinterpret_cast<short*>(state + 0x2A) = 0;
                 *reinterpret_cast<short*>(state + 0x2C) = 0;
             }
-            result = (frame >= 10) ? 1 : 0;
+            result = static_cast<unsigned short>(frame >= 10);
         } else if (openMode == 1) {
             result = 0;
         } else {
@@ -590,7 +590,7 @@ void CMenuPcs::CalcSingCMake()
             if (frame < 10) {
                 frame = frame + 1;
             }
-            result = (frame >= 10) ? 1 : 0;
+            result = static_cast<unsigned short>(frame >= 10);
         }
         break;
     case 1:
@@ -598,7 +598,7 @@ void CMenuPcs::CalcSingCMake()
             if (frame < 10) {
                 frame = frame + 1;
             }
-            result = (frame >= 10) ? 1 : 0;
+            result = static_cast<unsigned short>(frame >= 10);
         } else if (openMode == 1) {
             result = static_cast<unsigned short>(CmakeNameCtrl());
         } else if (frame < 10) {
@@ -619,7 +619,7 @@ void CMenuPcs::CalcSingCMake()
             if (frame < 10) {
                 frame = frame + 1;
             }
-            result = (frame >= 10) ? 1 : 0;
+            result = static_cast<unsigned short>(frame >= 10);
         } else if (openMode == 1) {
             unsigned short down;
             unsigned short repeat;
@@ -679,7 +679,7 @@ void CMenuPcs::CalcSingCMake()
             if (frame < 10) {
                 frame = frame + 1;
             }
-            result = (frame >= 10) ? 1 : 0;
+            result = static_cast<unsigned short>(frame >= 10);
         } else if (openMode == 1) {
             result = CmakeTribeCtrl();
         } else if (frame < 10) {
@@ -697,7 +697,7 @@ void CMenuPcs::CalcSingCMake()
             if (frame < 10) {
                 frame = frame + 1;
             }
-            result = (frame >= 10) ? 1 : 0;
+            result = static_cast<unsigned short>(frame >= 10);
         } else if (openMode == 1) {
             result = CmakeJobCtrl();
         } else if (frame < 10) {
@@ -715,7 +715,7 @@ void CMenuPcs::CalcSingCMake()
             if (frame < 10) {
                 frame = frame + 1;
             }
-            result = (frame >= 10) ? 1 : 0;
+            result = static_cast<unsigned short>(frame >= 10);
         } else if (openMode == 1) {
             unsigned short down;
             unsigned short repeat;
@@ -813,7 +813,7 @@ void CMenuPcs::CalcSingCMake()
             if (frame < 10) {
                 frame = frame + 1;
             }
-            result = (frame >= 10) ? 1 : 0;
+            result = static_cast<unsigned short>(frame >= 10);
         } else if (openMode == 1) {
             unsigned short down;
             unsigned short repeat;

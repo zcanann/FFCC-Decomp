@@ -875,14 +875,14 @@ void CMaterialMan::addtev_bump_spec_col_water(_GXTevScale tevScale)
  */
 void CMaterialMan::addtev_bump_jimen(_GXTevScale)
 {
-    int tevStage = m_numTevStage;
-
     GXSetIndTexMtx((GXIndTexMtxID)1, LightPcs.GetBumpIndTexMtx(), 0);
     GXSetNumIndStages(1);
     GXSetIndTexOrder((GXIndTexStageID)0,
                      *reinterpret_cast<GXTexCoordID*>(Ptr(this, 0x1E8)),
                      *reinterpret_cast<GXTexMapID*>(Ptr(this, 0x1C4)));
     GXSetIndTexCoordScale((GXIndTexStageID)0, (GXIndTexScale)0, (GXIndTexScale)0);
+
+    int tevStage = m_numTevStage;
     GXSetTevIndBumpXYZ((GXTevStageID)tevStage, (GXIndTexStageID)0, (GXIndTexMtxID)1);
     _GXSetTevOrder(
         tevStage, *reinterpret_cast<int*>(Ptr(this, 0x1F8)), *reinterpret_cast<int*>(Ptr(this, 0x1C8)), 0xFF);
@@ -1182,7 +1182,7 @@ void CMaterialMan::SetUnderWaterTex()
     Mtx44 screenMtx;
     PSMTXIdentity(matrixA);
     unsigned char* cameraPcs = reinterpret_cast<unsigned char*>(&CameraPcs);
-    PSMTX44Copy(*reinterpret_cast<Mtx44*>(cameraPcs + 0x48), screenMtx);
+    PSMTX44Copy(*reinterpret_cast<Mtx44*>(cameraPcs + 0x94), screenMtx);
     PSMTXCopy(*reinterpret_cast<Mtx*>(cameraPcs + 0x4), matrixB);
 
     matrixA[0][0] = screenMtx[0][0] * (FLOAT_8032fb08 / static_cast<float>(width));

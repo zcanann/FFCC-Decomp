@@ -49,7 +49,7 @@ extern const f32 FLOAT_8033086C;
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
 CMenuPcs MenuPcs ATTRIBUTE_ALIGN(32);
-static const char kMenuPcsStageName[] = "CMenuPcs";
+static const char s_CMenuPcs_801d9d3c[] = "CMenuPcs";
 extern "C" const char s_p_menu_cpp[];
 
 struct Vec4d
@@ -137,7 +137,7 @@ unsigned int CMenuPcs::m_table_desc4[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsig
 unsigned int CMenuPcs::m_table_desc5[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(drawSingleMenu__8CMenuPcsFv)};
 
 unsigned int CMenuPcs::m_table[0x57] = {
-    reinterpret_cast<unsigned int>(const_cast<char*>(kMenuPcsStageName)),
+    reinterpret_cast<unsigned int>(const_cast<char*>(s_CMenuPcs_801d9d3c)),
     m_table_desc0[0], m_table_desc0[1], m_table_desc0[2],
     m_table_desc1[0], m_table_desc1[1], m_table_desc1[2],
     m_table_desc2[0], m_table_desc2[1], m_table_desc2[2],
@@ -347,7 +347,7 @@ void CMenuPcs::create()
         menuHeapSize -= FontMan.GetInternal22Size();
     }
 
-    m_menuStage = Memory.CreateStage(menuHeapSize, const_cast<char*>(kMenuPcsStageName), 0);
+    m_menuStage = Memory.CreateStage(menuHeapSize, const_cast<char*>(s_CMenuPcs_801d9d3c), 0);
     *reinterpret_cast<int*>(self + 0x740) = -1;
 
     memset(m_textureSets, 0, sizeof(m_textureSets));

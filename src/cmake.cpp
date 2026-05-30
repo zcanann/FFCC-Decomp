@@ -3418,12 +3418,13 @@ void CMenuPcs::CmakeVillageDraw()
         FLOAT_803332b0, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, 0.0f);
 
     if (mode == 1 && row < 5) {
+        unsigned int cursorX = static_cast<unsigned int>(FLOAT_803332c0 * static_cast<float>(select) + 0xE5);
         GXColor cursorColor = {0xFF, 0xFF, 0xFF, 0xFF};
         GXSetChanMatColor(GX_COLOR0A0, cursorColor);
         MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((MenuS16(this, 0x86C) != 0) ? 100 : 0x3D));
         MenuPcs.DrawRect(
             0,
-            0xE5 + select * 20.0f, 99.0f + row * 32.0f, FLOAT_803332b0, FLOAT_803332b0,
+            static_cast<float>(static_cast<int>(cursorX)), 99.0f + row * 32.0f, FLOAT_803332b0, FLOAT_803332b0,
             FLOAT_8033324c, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, 0.0f);
     }
 

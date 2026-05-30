@@ -939,29 +939,29 @@ int CMenuPcs::CmdClose()
 	u32 count = static_cast<u32>(list[0]);
 	s16* entry = list + 4;
 	s32 closeTimer = static_cast<s32>(*reinterpret_cast<s16*>(cmd + 0x22));
-	u32 remaining = count;
+	const s32 entryCount = static_cast<s32>(count);
 
-	if (remaining != 0) {
-		do {
-			if (*reinterpret_cast<s32*>(entry + 0x12) <= closeTimer) {
-				if (closeTimer < (*reinterpret_cast<s32*>(entry + 0x12) + *reinterpret_cast<s32*>(entry + 0x14))) {
-					*reinterpret_cast<s32*>(entry + 0x10) = *reinterpret_cast<s32*>(entry + 0x10) + 1;
-					*reinterpret_cast<float*>(entry + 8) =
-					    static_cast<float>(
-					        -((1.0 / static_cast<double>(*reinterpret_cast<s32*>(entry + 0x14))) *
-					              static_cast<double>(*reinterpret_cast<s32*>(entry + 0x10)) -
-					          1.0));
-					if (static_cast<double>(*reinterpret_cast<float*>(entry + 8)) < 0.0) {
-						*reinterpret_cast<float*>(entry + 8) = 0.0f;
-					}
-				} else {
-					doneCount = doneCount + 1;
-					*reinterpret_cast<float*>(entry + 8) = 0.0f;
-				}
-			}
+	for (s32 i = 0; i < entryCount; i++) {
+		if (*reinterpret_cast<s32*>(entry + 0x12) > closeTimer) {
 			entry = entry + 0x20;
-			remaining = remaining - 1;
-		} while (remaining != 0);
+			continue;
+		}
+		if (closeTimer >= (*reinterpret_cast<s32*>(entry + 0x12) + *reinterpret_cast<s32*>(entry + 0x14))) {
+			doneCount = doneCount + 1;
+			*reinterpret_cast<float*>(entry + 8) = 0.0f;
+			entry = entry + 0x20;
+			continue;
+		}
+		*reinterpret_cast<s32*>(entry + 0x10) = *reinterpret_cast<s32*>(entry + 0x10) + 1;
+		*reinterpret_cast<float*>(entry + 8) =
+		    static_cast<float>(
+		        -((1.0 / static_cast<double>(*reinterpret_cast<s32*>(entry + 0x14))) *
+		              static_cast<double>(*reinterpret_cast<s32*>(entry + 0x10)) -
+		          1.0));
+		if (static_cast<double>(*reinterpret_cast<float*>(entry + 8)) < 0.0) {
+			*reinterpret_cast<float*>(entry + 8) = 0.0f;
+		}
+		entry = entry + 0x20;
 	}
 
 	if (list[0] == doneCount) {

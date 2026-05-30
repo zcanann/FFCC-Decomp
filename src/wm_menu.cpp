@@ -7784,24 +7784,29 @@ void CMenuPcs::CalcCharaSelect()
 					} else if (entry.m_confirmed == 0) {
 						const int charaId = *reinterpret_cast<int*>(modelData + currentSlot * 0x34 + 8);
 						if (charaId < 0) {
-							bool duplicatePending = false;
-							for (int other = 0; other < 4; other++) {
-								if (other != i && selectEntries[other].m_cmakePending != 0 &&
-								    selectEntries[other].m_currentSlot == currentSlot) {
-									duplicatePending = true;
-									break;
-								}
-							}
-							if (!duplicatePending) {
-								if (Game.m_gameWork.m_menuStageMode == 0) {
-									GbaQue.InitCmakeInfo(i, currentSlot);
-									entry.m_cmakePending = 1;
-								} else {
-									*reinterpret_cast<short*>(bytes + 0x86A) = static_cast<short>(currentSlot);
-								}
-								Sound.PlaySe(2, 0x40, 0x7F, 0);
-							} else {
+							if (Game.m_gameWork.m_menuStageMode == 0 &&
+							    (entry.m_padType == 0x09000000 || entry.m_padType == -0x74F00000)) {
 								Sound.PlaySe(4, 0x40, 0x7F, 0);
+							} else {
+								bool duplicatePending = false;
+								for (int other = 0; other < 4; other++) {
+									if (other != i && selectEntries[other].m_cmakePending != 0 &&
+									    selectEntries[other].m_currentSlot == currentSlot) {
+										duplicatePending = true;
+										break;
+									}
+								}
+								if (!duplicatePending) {
+									if (Game.m_gameWork.m_menuStageMode == 0) {
+										GbaQue.InitCmakeInfo(i, currentSlot);
+										entry.m_cmakePending = 1;
+									} else {
+										*reinterpret_cast<short*>(bytes + 0x86A) = static_cast<short>(currentSlot);
+									}
+									Sound.PlaySe(2, 0x40, 0x7F, 0);
+								} else {
+									Sound.PlaySe(4, 0x40, 0x7F, 0);
+								}
 							}
 						} else {
 							bool duplicateConfirmed = false;

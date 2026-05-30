@@ -210,7 +210,7 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 		if (systemVal <= -0x40) {
 			u8* const classData = *reinterpret_cast<u8**>(engineObject + 0x58);
 
-			if (systemVal < -0xD7F) {
+			if (systemVal <= -0xD80) {
 				if (systemVal != -0xDB8) {
 					if (systemVal < -0xDB8) {
 						if (systemVal == -0xDBA) {

@@ -2928,10 +2928,8 @@ int CMenuPcs::CalcGoOutSelChar(unsigned char state, unsigned char slot)
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	unsigned char* const worldState = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x82C)[0]);
 	unsigned char* const frameState = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x820)[0]);
-	bytes[0x16] = slot;
-	bytes[0x17] = state;
 
-	if (worldState == 0 || frameState == 0 || *reinterpret_cast<short*>(worldState + 0x10) >= 5) {
+	if (*reinterpret_cast<short*>(worldState + 0x10) >= 5) {
 		return -1;
 	}
 
@@ -2949,20 +2947,18 @@ int CMenuPcs::CalcGoOutSelChar(unsigned char state, unsigned char slot)
 
 	*reinterpret_cast<short*>(frameState + 4) = 0x10;
 	*reinterpret_cast<short*>(frameState + 0x20) =
-	    static_cast<short>(0x280 - (*reinterpret_cast<short*>(frameState + 8) + *reinterpret_cast<short*>(frameState + 4)));
+	    static_cast<short>(static_cast<int>(FLOAT_803313e0 - static_cast<float>(*reinterpret_cast<short*>(frameState + 8) + *reinterpret_cast<short*>(frameState + 4))));
 
 	if (offset < 0) {
-		float shift = 0.0f;
+		float shift = static_cast<float>(*reinterpret_cast<short*>(frameState + 8) + *reinterpret_cast<short*>(frameState + 4));
 		if (offset > -11) {
 			int absOffset = offset < 0 ? -offset : offset;
+			shift = shift * static_cast<float>(DOUBLE_803314e8 * static_cast<double>(absOffset));
 			if (absOffset > 10) {
 				absOffset = 10;
 			}
 			const float t = static_cast<float>(absOffset);
-			const float baseWidth =
-			    static_cast<float>(*reinterpret_cast<short*>(frameState + 8) + *reinterpret_cast<short*>(frameState + 4));
-			shift = baseWidth * FLOAT_8033151c * t;
-			shift *= static_cast<float>(sin(FLOAT_803314bc * t * FLOAT_80331698));
+			shift *= static_cast<float>(sin(FLOAT_803314bc * t * FLOAT_803316d4));
 		}
 
 		*reinterpret_cast<short*>(frameState + 4) =

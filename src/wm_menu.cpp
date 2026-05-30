@@ -147,6 +147,9 @@ extern float FLOAT_8033155C;
 extern float FLOAT_80331568;
 extern float FLOAT_80331594;
 extern float FLOAT_803315b4;
+extern float FLOAT_803315B8;
+extern float FLOAT_803315BC;
+extern float FLOAT_803315C8;
 extern float FLOAT_8033158C;
 extern float FLOAT_80331778;
 extern float FLOAT_8033177c;
@@ -227,6 +230,7 @@ static const char s__s__d___Error_function_code_not_f_801dc3ec[] = "%s(%d): Erro
 
 static const int kMcListEntrySize = 0x48;
 static const int kMcListCount = 4;
+static const float s_MainMenuSubFrameWidths[5] = {264.0f, 264.0f, 264.0f, 264.0f, 264.0f};
 static Vec s_RingOrgPos;
 static Vec s_MMenuPos[5];
 
@@ -8680,8 +8684,11 @@ void CMenuPcs::DrawMainMenuSub()
 			SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
 			SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 			GXSetChanMatColor(static_cast<GXChannelID>(4), white);
-			DrawRect3d(0xFFFFFFFF, FLOAT_803313dc, FLOAT_803313dc, s_MMenuPos[handleIndex].z, depthValues[orderIndex], FLOAT_80331554,
-			           FLOAT_803313dc, FLOAT_80331554 * static_cast<float>(handleIndex) + FLOAT_80331528, FLOAT_803313e8, FLOAT_803313dc);
+			const float frameWidth = s_MainMenuSubFrameWidths[handleIndex];
+			DrawRect3d(0, -(FLOAT_80331414 * (frameWidth / FLOAT_803315B8) - FLOAT_803313dc), FLOAT_803315BC,
+			           static_cast<float>(static_cast<double>(s_MMenuPos[handleIndex].z) + DOUBLE_80331418 - DOUBLE_803315C0),
+			           frameWidth, FLOAT_80331554, FLOAT_803313dc,
+			           FLOAT_80331554 * static_cast<float>(handleIndex) + FLOAT_80331528, FLOAT_803315C8, FLOAT_803315C8);
 		}
 	}
 

@@ -2887,7 +2887,7 @@ void CMenuPcs::CmakeResultDraw()
 
     DrawCmakeCrest(static_cast<int>(s_CmakeInfo.m_tribe), 0, 0, textAlpha);
 
-    if (mode == 1) {
+    if (*reinterpret_cast<short*>(state + 0x10) == 1) {
         DrawCmakeYesNo(*reinterpret_cast<short*>(state + 0x26) + 1, alpha);
     } else {
         DrawCmakeYesNo(0, alpha);

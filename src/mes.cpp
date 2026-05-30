@@ -3,6 +3,7 @@
 #include "ffcc/fontman.h"
 #include "ffcc/game.h"
 #include "ffcc/p_menu.h"
+#include "ffcc/mesmenu.h"
 #include "ffcc/joybus.h"
 #include "ffcc/strcase.h"
 #include "ffcc/system.h"
@@ -990,9 +991,9 @@ void CMes::addString(char** text, int branchMode)
 				break;
 			case 8:
 			{
-				(void)ReadTagU8(text);
+				int colorCond = ReadTagU8(text);
 				int oldColor = *(int*)((char*)this + 0x3D28);
-				if (ReadTagU8(text) != 0)
+				if (colorCond != 0)
 				{
 					*(int*)((char*)this + 0x3D28) = 6;
 				}
@@ -1010,9 +1011,9 @@ void CMes::addString(char** text, int branchMode)
 			case 0x3D:
 			case 0x3F:
 			{
-				(void)ReadTagU8(text);
+				int colorCond = ReadTagU8(text);
 				int oldColor = *(int*)((char*)this + 0x3D28);
-				if (ReadTagU8(text) != 0)
+				if (colorCond != 0)
 				{
 					*(int*)((char*)this + 0x3D28) = 5;
 				}
@@ -1058,9 +1059,9 @@ void CMes::addString(char** text, int branchMode)
 			case 0x3E:
 			case 0x40:
 			{
-				(void)ReadTagU8(text);
+				int colorCond = ReadTagU8(text);
 				int oldColor = *(int*)((char*)this + 0x3D28);
-				if (ReadTagU8(text) != 0)
+				if (colorCond != 0)
 				{
 					*(int*)((char*)this + 0x3D28) = 0;
 				}
@@ -1099,9 +1100,9 @@ void CMes::addString(char** text, int branchMode)
 			}
 			case 0x2B:
 			{
-				(void)ReadTagU8(text);
+				int colorCond = ReadTagU8(text);
 				int oldColor = *(int*)((char*)this + 0x3D28);
-				if (ReadTagU8(text) != 0)
+				if (colorCond != 0)
 				{
 					*(int*)((char*)this + 0x3D28) = 6;
 				}
@@ -1115,9 +1116,9 @@ void CMes::addString(char** text, int branchMode)
 			}
 			case 0x2C:
 			{
-				(void)ReadTagU8(text);
+				int colorCond = ReadTagU8(text);
 				int oldColor = *(int*)((char*)this + 0x3D28);
-				if (ReadTagU8(text) != 0)
+				if (colorCond != 0)
 				{
 					*(int*)((char*)this + 0x3D28) = 4;
 				}
@@ -1131,9 +1132,9 @@ void CMes::addString(char** text, int branchMode)
 			}
 			case 0x2D:
 			{
-				(void)ReadTagU8(text);
+				int colorCond = ReadTagU8(text);
 				int oldColor = *(int*)((char*)this + 0x3D28);
-				if (ReadTagU8(text) != 0)
+				if (colorCond != 0)
 				{
 					*(int*)((char*)this + 0x3D28) = 3;
 				}

@@ -7399,9 +7399,6 @@ void CMenuPcs::DrawChara()
 		}
 
 		CCharaPcs::CHandle* const handle = GetWmCharaHandles(this)[i];
-		if (handle == 0) {
-			continue;
-		}
 		if (handle->m_charaKind != 3 && handle->m_currentAnimIndex < 0) {
 			continue;
 		}
@@ -9892,13 +9889,13 @@ LAB_draw:
 				}
 				if (locationStr[0] != 0) {
 					locationStr[0] = static_cast<char>(toupperLatin1(static_cast<unsigned char>(locationStr[0])));
-				}
-				const float locationY = static_cast<float>(static_cast<double>(slotY) + static_cast<double>(FLOAT_80331558));
-				const int locationWidth = static_cast<int>(fontF8->GetWidth(locationStr));
-				fontF8->SetPosX(static_cast<float>(static_cast<double>(FLOAT_80331518) - static_cast<double>(locationWidth)));
-				fontF8->SetPosY(locationY);
-				fontF8->Draw(locationStr);
-			} else {
+					}
+					const float locationY = static_cast<float>(static_cast<double>(slotY) + static_cast<double>(FLOAT_80331558));
+					const int locationWidth = static_cast<int>(fontF8->GetWidth(locationStr));
+					fontF8->SetPosX(static_cast<float>(static_cast<double>(FLOAT_80331518) - static_cast<double>(locationWidth)));
+					fontF8->SetPosY(locationY);
+					fontF8->Draw(locationStr);
+				} else {
 				fontF8->SetMargin(FLOAT_803313e8);
 				fontF8->SetShadow(1);
 				fontF8->SetScale(FLOAT_803313e8);

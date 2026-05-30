@@ -383,9 +383,9 @@ static inline void DrawBonusActiveMarks(CMenuPcs* menu, int statePtr, float alph
 		if ((activeMask & (1 << i)) == 0) {
 			continue;
 		}
-		float x = s_Base[0][i * 2 + 2] + 4.0f;
-		float y = s_Base[0][i * 2 + 3] + 4.0f;
-		menu->DrawRect(0, x, y, 24.0f, 24.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+		float x = s_Base[0][i * 2 + 2] + 28.0f;
+		float y = s_Base[0][i * 2 + 3] + 20.0f;
+		menu->DrawRect(0, x, y, 56.0f, 64.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 	}
 }
 

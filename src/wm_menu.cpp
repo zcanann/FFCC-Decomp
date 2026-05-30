@@ -6229,7 +6229,10 @@ void CMenuPcs::CalcWMFrame()
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	int worldState = *reinterpret_cast<int*>(bytes + 0x82C);
 	short sVar3 = *reinterpret_cast<short*>(worldState + 0x10);
-	if (sVar3 == 0 || sVar3 > 2) {
+	if (sVar3 == 0) {
+		return;
+	}
+	if (sVar3 > 2) {
 		return;
 	}
 
@@ -6259,24 +6262,25 @@ void CMenuPcs::CalcWMFrame()
 		}
 	}
 LAB_calc:
-	wmFrame = *reinterpret_cast<int*>(bytes + 0x81C);
-	*reinterpret_cast<short*>(wmFrame + 0x98) = 0x68;
+	*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x81C) + 0x98) = 0x68;
 	float fVar1 = FLOAT_803313dc;
-	*reinterpret_cast<short*>(wmFrame + 0x9A) = 0x14;
-	*reinterpret_cast<short*>(wmFrame + 0x9C) = 200;
-	*reinterpret_cast<short*>(wmFrame + 0x9E) = 0x28;
-	*reinterpret_cast<float*>(wmFrame + 0xA0) = fVar1;
+	*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x81C) + 0x9A) = 0x14;
+	*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x81C) + 0x9C) = 200;
+	*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x81C) + 0x9E) = 0x28;
+	*reinterpret_cast<float*>(*reinterpret_cast<int*>(bytes + 0x81C) + 0xA0) = fVar1;
 
 	if ((bytes[0x0A] & 1) == 0) {
+		wmFrame = *reinterpret_cast<int*>(bytes + 0x81C);
 		int yOff = (int)*reinterpret_cast<short*>(wmFrame + 0x9E) * (int)(char)bytes[0x04];
 		*reinterpret_cast<float*>(wmFrame + 0xA4) = (float)yOff;
 	} else {
+		wmFrame = *reinterpret_cast<int*>(bytes + 0x81C);
 		int yOff = (int)*reinterpret_cast<short*>(wmFrame + 0x9E) * (int)(char)bytes[0x05];
 		*reinterpret_cast<float*>(wmFrame + 0xA4) = (float)yOff;
 	}
 
-	wmFrame = *reinterpret_cast<int*>(bytes + 0x81C);
-	*reinterpret_cast<short*>(wmFrame + 0x98) = (short)(10 - *reinterpret_cast<int*>(wmFrame + 4)) * 2 + 0x68;
+	*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x81C) + 0x98) =
+	    (short)(10 - *reinterpret_cast<int*>(*reinterpret_cast<int*>(bytes + 0x81C) + 4)) * 2 + 0x68;
 
 	if (((bytes[0x0A] & 2) != 0 ||
 	     (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x10) == 2 && bytes[0x13] != 0))

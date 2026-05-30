@@ -1297,7 +1297,7 @@ void CMenuPcs::CalcDiaryMenu()
 	    static_cast<unsigned int>(static_cast<int>(MemoryCardMan.m_currentSlot) + 1);
 	const unsigned int mounted = slotState >> 31;
 	if (mounted != s_wmMenuLastMountState) {
-		if (System.m_execParam > 2) {
+		if (static_cast<unsigned int>(System.m_execParam) >= 3) {
 			const char* text = s_FALSE_803317F4;
 			if (mounted != 0) {
 				text = s_TRUE_803317EC;
@@ -1308,11 +1308,15 @@ void CMenuPcs::CalcDiaryMenu()
 	}
 
 	WMChgMenu();
-	if (bytes[0xD] == 0) {
-		for (int i = 4; i < 6; i++) {
-			CMenu* const menu = *reinterpret_cast<CMenu**>(bytes + 0x10 + (i - 4) * 4 + 0x10C);
+	if (static_cast<char>(bytes[0xD]) == 0) {
+		int menuIndex = 4;
+		unsigned char* menuPtr = bytes + 0x10;
+		do {
+			CMenu* const menu = *reinterpret_cast<CMenu**>(menuPtr + 0x10C);
 			menu->Calc();
-		}
+			menuIndex++;
+			menuPtr += 4;
+		} while (menuIndex < 6);
 		return;
 	}
 
@@ -1402,10 +1406,14 @@ void CMenuPcs::CalcDiaryMenu()
 		break;
 	}
 
-	for (int i = 4; i < 6; i++) {
-		CMenu* const menu = *reinterpret_cast<CMenu**>(bytes + 0x10 + (i - 4) * 4 + 0x10C);
+	int menuIndex = 4;
+	unsigned char* menuPtr = bytes + 0x10;
+	do {
+		CMenu* const menu = *reinterpret_cast<CMenu**>(menuPtr + 0x10C);
 		menu->Calc();
-	}
+		menuIndex++;
+		menuPtr += 4;
+	} while (menuIndex < 6);
 }
 
 /*

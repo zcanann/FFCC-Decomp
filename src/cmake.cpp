@@ -3328,8 +3328,7 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
         return 0;
     }
 
-    s_CmakeInfo.m_name[len] = picked[0];
-    s_CmakeInfo.m_name[len + 1] = '\0';
+    strcat(s_CmakeInfo.m_name, picked, 0x11);
     if (strlen(s_CmakeInfo.m_name) > 6) {
         select = 0xB;
         row = 5;

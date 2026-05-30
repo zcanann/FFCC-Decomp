@@ -5,6 +5,7 @@
 #include "ffcc/p_chara.h"
 #include "ffcc/game.h"
 #include "ffcc/linkage.h"
+#include "ffcc/mes.h"
 #include "ffcc/pad.h"
 #include "ffcc/p_tina.h"
 #include "ffcc/sound.h"
@@ -465,6 +466,70 @@ static inline void DrawBonusMcWinOverlay(CMenuPcs* menu, int statePtr)
 		float cursorY = (float)(*(short*)(auxPtr + 2) + *(short*)(auxPtr + 6) - 0x3e);
 		menu->DrawCursor(cursorX, (int)cursorY, 1.0f);
 	}
+}
+
+static inline void DrawBonusSelectedArtifactHelp(CMenuPcs* menu, int statePtr, BonusAnimHeader* header, BonusAnimSprite* sprites)
+{
+	if (*(short*)(statePtr + 0x1c) != 4) {
+		return;
+	}
+
+	int selection = (int)*(short*)(statePtr + 0x26);
+	short* rewardItems = &s_Rinfo->m_tempArtifacts[0];
+	if (rewardItems[selection] <= 0) {
+		return;
+	}
+
+	BonusAnimSprite* frame = 0;
+	for (int i = 0; i < (int)header->count; i++) {
+		if (sprites[i].kind == -3) {
+			frame = &sprites[i];
+			break;
+		}
+	}
+	if (frame == 0) {
+		return;
+	}
+
+	CFont* font = GetBonusMenuMembers(menu).m_fontWide;
+	font->SetMargin(1.0f);
+	font->SetShadow(0);
+	font->SetScaleX(0.7f);
+	font->SetScaleY(1.0f);
+	font->DrawInit();
+	GXColor color = {0xFF, 0xFF, 0xFF, 0xFF};
+	font->SetColor(color);
+
+	BonusFlatDataRaw* flat = reinterpret_cast<BonusFlatDataRaw*>(&Game.m_cFlatDataArr[1]);
+	int itemId = (int)rewardItems[selection];
+	char* title = flat->m_table[0].m_strings[itemId * 5 + 4];
+	float centerX = (float)frame->x + (float)frame->w * 0.5f;
+	float centerY = (float)frame->y + (float)frame->h * 0.5f;
+	font->SetPosX(centerX - font->GetWidth(title) * 0.5f);
+	font->SetPosY(centerY - 34.0f);
+	font->Draw(title);
+
+	char* source = new char[0x200];
+	char* converted = new char[0x200];
+	memset(source, 0, 0x200);
+	memset(converted, 0, 0x200);
+	strcpy(source, flat->m_table[6].m_strings[itemId]);
+	CMes::MakeAgbString(converted, source, 0, 0);
+
+	float lineY = centerY - 58.0f;
+	for (int line = 0;; line++) {
+		char* text = (line == 0) ? strtok(converted, "\n") : strtok(0, "\n");
+		if (text == 0) {
+			break;
+		}
+		font->SetPosX(centerX - font->GetWidth(text) * 0.5f);
+		font->SetPosY(lineY - 6.0f);
+		font->Draw(text);
+		lineY += 16.0f;
+	}
+
+	delete[] source;
+	delete[] converted;
 }
 
 static inline float ClampBonusUnit(float value)
@@ -1344,6 +1409,7 @@ void CMenuPcs::DrawSelectOpenAnim()
 
 	DrawBonusActiveMarks(this, statePtr, artiAlpha);
 	DrawBonusPartyNames(this, header, sprites);
+	DrawBonusSelectedArtifactHelp(this, statePtr, header, sprites);
 	DrawBonusMcWinOverlay(this, statePtr);
 }
 

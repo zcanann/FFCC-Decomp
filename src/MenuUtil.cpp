@@ -8,10 +8,10 @@
 #include "ffcc/system.h"
 #include "ffcc/RedSound/RedSound.h"
 #include "ffcc/fontman.h"
+#include "ffcc/strcase.h"
 #include "ffcc/util.h"
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h>
-#include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/ctype.h>
 
 struct Vec2d {
 	float x;
@@ -364,7 +364,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 	lineBaseY[2] = DAT_801e36d8;
 	lineBaseY[3] = DAT_801e36dc;
 
-	int languageIndex = (Game.m_gameWork.m_languageId - 1) * 20;
+	int languageIndex = Game.m_gameWork.m_languageId - 1;
 	int drawPrefix = 1;
 	int firstLine = 500;
 	int maxWidth = -1;
@@ -424,7 +424,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 		} else {
 			Game.MakeArtItemName(itemName, msgNo, 1);
 			if ((strlen(itemName) != 0) && (itemName[0] != '\0')) {
-				itemName[0] = static_cast<char>(toupper(static_cast<unsigned char>(itemName[0])));
+				itemName[0] = static_cast<char>(toupperLatin1(static_cast<unsigned char>(itemName[0])));
 			}
 		}
 		lineStep = FLOAT_80333620;
@@ -505,13 +505,13 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 	int itemBase = Game.unkCFlatData0[2] + msgNo * 0x48;
 	u16 flags = *reinterpret_cast<u16*>(itemBase + 4);
 	if ((flags & 0x100) != 0) {
-		strcpy(scratch, PTR_s_Strength__80215a48[languageIndex]);
+		strcpy(scratch, PTR_s_Strength__80215a48[languageIndex * 20]);
 	} else if ((flags & 0x200) != 0) {
-		strcpy(scratch, PTR_s_Defence__80215a4c[languageIndex]);
+		strcpy(scratch, PTR_s_Defence__80215a4c[languageIndex * 20]);
 	} else if ((flags & 0x400) != 0) {
-		strcpy(scratch, PTR_s_Defence__80215a4c[languageIndex]);
+		strcpy(scratch, PTR_s_Defence__80215a4c[languageIndex * 20]);
 	} else if ((flags & 0x800) != 0) {
-		strcpy(scratch, PTR_s_Defence__80215a4c[languageIndex]);
+		strcpy(scratch, PTR_s_Defence__80215a4c[languageIndex * 20]);
 	} else if ((flags & 0x1000) != 0) {
 		strcpy(scratch, sMenuUtilEmptyText);
 	} else if ((flags & 0x2000) != 0) {

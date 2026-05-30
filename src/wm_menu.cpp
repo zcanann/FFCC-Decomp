@@ -4733,9 +4733,9 @@ void CMenuPcs::DrawTitleMenu()
 		GXSetViewport(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e0, FLOAT_803313e4,
 		              FLOAT_803313dc, FLOAT_803313e8);
 
-		// Draw background part
-		// DrawMenuIdx - *reinterpret_cast<int*>(*reinterpret_cast<int*>(bytes + 0x840) + 0x7640));
+		PartPcs.DrawMenuIdx(*reinterpret_cast<int*>(*reinterpret_cast<int*>(bytes + 0x840) + 0x7640));
 		PSMTXCopy(m_cameraMatrix, CameraPcs.m_cameraMatrix);
+		GXSetCopyClear(Graphic.m_defaultCopyClearColor, 0xFFFFFF);
 
 		Mtx44 projMtx2;
 		PSMTX44Copy(CameraPcs.m_screenMatrix, projMtx2);

@@ -362,7 +362,7 @@ static void SetupSelectCloseSpriteMotion(BonusAnimSprite* sprite)
 	sprite->targetY = (float)sprite->y + sprite->motionY;
 }
 
-static void DrawBonusActiveMarks(CMenuPcs* menu, int statePtr, float alpha)
+static inline void DrawBonusActiveMarks(CMenuPcs* menu, int statePtr, float alpha)
 {
 	if (statePtr == 0 || alpha <= 0.0f) {
 		return;
@@ -405,7 +405,7 @@ static inline unsigned char GetBonusUnavailableMask(int statePtr, BonusPartySumm
 	return mask;
 }
 
-static void DrawBonusPartyNames(CMenuPcs* menu, BonusAnimHeader* header, BonusAnimSprite* sprites)
+static inline void DrawBonusPartyNames(CMenuPcs* menu, BonusAnimHeader* header, BonusAnimSprite* sprites)
 {
 	CFont* font = GetBonusMenuMembers(menu).m_font;
 	int activePartyCount = s_Rinfo->m_partyCount;
@@ -438,7 +438,7 @@ static void DrawBonusPartyNames(CMenuPcs* menu, BonusAnimHeader* header, BonusAn
 	}
 }
 
-static void DrawBonusMcWinOverlay(CMenuPcs* menu, int statePtr)
+static inline void DrawBonusMcWinOverlay(CMenuPcs* menu, int statePtr)
 {
 	int auxPtr = GetBonusMenuMembers(menu).m_bonusAuxPtr;
 

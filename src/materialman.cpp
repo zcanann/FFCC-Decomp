@@ -1088,28 +1088,31 @@ void CMaterialMan::addtev_full_shadow(long index)
 
     GXLoadTexMtxImm(reinterpret_cast<MtxPtr>(Ptr(this, 0x64)),
                     *reinterpret_cast<u32*>(Ptr(this, 0x19C)),
-                    GX_MTX2x4);
+                    GX_MTX3x4);
     GXLoadTexObj(reinterpret_cast<GXTexObj*>(Ptr(this, 0xC4)), *reinterpret_cast<GXTexMapID*>(Ptr(this, 0x194)));
     GXSetTexCoordGen2(*reinterpret_cast<GXTexCoordID*>(Ptr(this, 0x1A4)),
-                      GX_TG_MTX2x4,
-                      GX_TG_TEX0,
+                      GX_TG_MTX3x4,
+                      GX_TG_POS,
                       *reinterpret_cast<u32*>(Ptr(this, 0x19C)),
                       GX_FALSE,
                       0x7D);
 
     GXLoadTexMtxImm(reinterpret_cast<MtxPtr>(Ptr(this, 0x94)),
                     *reinterpret_cast<u32*>(Ptr(this, 0x1B4)),
-                    GX_MTX2x4);
+                    GX_MTX3x4);
     GXLoadTexObj(reinterpret_cast<GXTexObj*>(Ptr(this, 0xC8)), *reinterpret_cast<GXTexMapID*>(Ptr(this, 0x1AC)));
     GXSetTexCoordGen2(*reinterpret_cast<GXTexCoordID*>(Ptr(this, 0x1BC)),
-                      GX_TG_MTX2x4,
-                      GX_TG_TEX0,
+                      GX_TG_MTX3x4,
+                      GX_TG_POS,
                       *reinterpret_cast<u32*>(Ptr(this, 0x1B4)),
                       GX_FALSE,
                       0x7D);
 
     GXColor tevColor;
-    *reinterpret_cast<unsigned int*>(&tevColor) = static_cast<unsigned int>(m_fullShadowTevColor);
+    tevColor.r = 0;
+    tevColor.g = 0;
+    tevColor.b = 0;
+    tevColor.a = static_cast<unsigned char>(m_fullShadowTevColor);
     GXSetTevColor(static_cast<GXTevRegID>(1), tevColor);
 
     unsigned int stage = m_numTevStage;

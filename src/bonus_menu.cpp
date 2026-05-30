@@ -2504,15 +2504,21 @@ void CMenuPcs::CalcResultOpenAnim()
 		int entryOffset = 0;
 		for (int i = 0; i < activePartyCount; i++) {
 			BonusAnimSprite* sprite = &sprites[iconBase + i];
+			int centerXOffset = entryOffset + 8;
+			int centerYOffset = entryOffset + 10;
+			int screenXOffset = entryOffset + 0x40;
+			int screenYOffset = entryOffset + 0x44;
+			int widthOffset = entryOffset + 0x48;
+			int heightOffset = entryOffset + 0x4C;
 			int centerX = (int)((double)(float)(24.0 + (double)sprite->w * 0.5 + (double)sprite->x) - 320.0);
 			int centerY = (int)((double)(float)((double)sprite->h * 0.5 + (double)sprite->y) - 240.0);
-			*reinterpret_cast<short*>(boardPtr + entryOffset + 8) = (short)centerX;
-			*reinterpret_cast<short*>(boardPtr + entryOffset + 10) = (short)centerY;
-			*reinterpret_cast<int*>(boardPtr + entryOffset + 0x40) = sprite->x + 0xC;
-			*reinterpret_cast<int*>(boardPtr + entryOffset + 0x44) = sprite->y - 8;
-			*reinterpret_cast<int*>(boardPtr + entryOffset + 0x48) = 0x48;
-			*reinterpret_cast<int*>(boardPtr + entryOffset + 0x4C) = 0x58;
 			entryOffset += 0x50;
+			*reinterpret_cast<short*>(boardPtr + centerXOffset) = (short)centerX;
+			*reinterpret_cast<short*>(boardPtr + centerYOffset) = (short)centerY;
+			*reinterpret_cast<int*>(boardPtr + screenXOffset) = sprite->x + 0xC;
+			*reinterpret_cast<int*>(boardPtr + screenYOffset) = sprite->y - 8;
+			*reinterpret_cast<int*>(boardPtr + widthOffset) = 0x48;
+			*reinterpret_cast<int*>(boardPtr + heightOffset) = 0x58;
 		}
 
 		for (int i = 0; i < 0x18; i++) {

@@ -1359,49 +1359,58 @@ void CMes::Next()
  */
 void CMes::Set(char* text, int param)
 {
+	float zero = FLOAT_8033089c;
+	float one = FLOAT_80330898;
 	*(int*)((char*)this + 4) = (int)text;
 	*(int*)((char*)this + 0x3c74) = 0;
-	*(float*)((char*)this + 0x3ca8) = FLOAT_8033089c;
-	*(float*)((char*)this + 0x3ca4) = FLOAT_8033089c;
+	*(float*)((char*)this + 0x3ca8) = zero;
+	*(float*)((char*)this + 0x3ca4) = zero;
 	*(int*)((char*)this + 8) = 0;
 	*(int*)((char*)this + 0x3c10) = 0;
 	*(int*)((char*)this + 0x3c0c) = 0;
 	*(int*)((char*)this + 0x3d10) = 0;
 	*(int*)((char*)this + 0x3d30) = param;
-	*(float*)((char*)this + 0x3d3c) = FLOAT_8033089c;
+	*(float*)((char*)this + 0x3d3c) = zero;
 	*(int*)((char*)this + 0x3d40) = 0;
-	*(float*)((char*)this + 0x3d44) = FLOAT_80330898;
-	*(float*)((char*)this + 0x3d48) = FLOAT_80330898;
+	*(float*)((char*)this + 0x3d44) = one;
+	*(float*)((char*)this + 0x3d48) = one;
 	*(int*)((char*)this + 0x3d4c) = 1;
 
 	if (text != 0) {
 		unsigned char flagBackup[0x50];
 		memcpy(flagBackup, (char*)this + 0x3cc0, sizeof(flagBackup));
+		float lineZero = FLOAT_8033089c;
 
 		while (*(int*)((char*)this + 0x3c74) == 0) {
 			*(int*)((char*)this + 8) = 0;
 			*(int*)((char*)this + 0x3c10) = 0;
 			*(int*)((char*)this + 0x3c0c) = 0;
-			*(float*)((char*)this + 0x3c88) = FLOAT_8033089c;
-			*(float*)((char*)this + 0x3c84) = FLOAT_8033089c;
-			*(float*)((char*)this + 0x3c90) = FLOAT_8033089c;
-			*(float*)((char*)this + 0x3c8c) = FLOAT_8033089c;
+			*(float*)((char*)this + 0x3c88) = lineZero;
+			*(float*)((char*)this + 0x3c84) = lineZero;
+			*(float*)((char*)this + 0x3c90) = lineZero;
+			*(float*)((char*)this + 0x3c8c) = lineZero;
 
 			addString((char**)((char*)this + 4), 1);
 
 			float width = *(float*)((char*)this + 0x3c8c);
-			if (width > *(float*)((char*)this + 0x3ca4)) {
-				*(float*)((char*)this + 0x3ca4) = width;
+			if (width < *(float*)((char*)this + 0x3ca4)) {
+				width = *(float*)((char*)this + 0x3ca4);
 			}
+			*(float*)((char*)this + 0x3ca4) = width;
+
 			float height = *(float*)((char*)this + 0x3c90);
-			if (height > *(float*)((char*)this + 0x3ca8)) {
-				*(float*)((char*)this + 0x3ca8) = height;
+			if (height < *(float*)((char*)this + 0x3ca8)) {
+				height = *(float*)((char*)this + 0x3ca8);
 			}
+			*(float*)((char*)this + 0x3ca8) = height;
 		}
 
 		memcpy((char*)this + 0x3cc0, flagBackup, sizeof(flagBackup));
+		float lineSkip = FLOAT_803308a4;
+		zero = FLOAT_8033089c;
+		one = FLOAT_80330898;
 		*(float*)((char*)this + 0x3ca4) = *(float*)((char*)this + 0x3ca4) - *(float*)((char*)this + 0x3d3c);
-		*(float*)((char*)this + 0x3ca8) = *(float*)((char*)this + 0x3ca8) - FLOAT_803308a4;
+		*(float*)((char*)this + 0x3ca8) = *(float*)((char*)this + 0x3ca8) - lineSkip;
 
 		*(int*)((char*)this + 4) = (int)text;
 		*(int*)((char*)this + 0x3c74) = 0;
@@ -1411,10 +1420,10 @@ void CMes::Set(char* text, int param)
 		*(int*)((char*)this + 0x3d10) = 0;
 		*(int*)((char*)this + 0x3d2c) = 0;
 		*(int*)((char*)this + 0x3d28) = 7;
-		*(float*)((char*)this + 0x3d3c) = FLOAT_8033089c;
+		*(float*)((char*)this + 0x3d3c) = zero;
 		*(int*)((char*)this + 0x3d40) = 0;
-		*(float*)((char*)this + 0x3d44) = FLOAT_80330898;
-		*(float*)((char*)this + 0x3d48) = FLOAT_80330898;
+		*(float*)((char*)this + 0x3d44) = one;
+		*(float*)((char*)this + 0x3d48) = one;
 		*(int*)((char*)this + 0x3d4c) = 1;
 		Next();
 	}

@@ -653,9 +653,12 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			break;
 		}
 		case -0x9E:
-			engineObject->m_groundHitOffset.x += static_cast<float>(localBase[0]);
-			engineObject->m_groundHitOffset.y += static_cast<float>(localBase[1]);
-			engineObject->m_groundHitOffset.z += static_cast<float>(localBase[2]);
+			{
+				float* params = reinterpret_cast<float*>(localBase);
+				engineObject->m_groundHitOffset.x += params[0];
+				engineObject->m_groundHitOffset.y += params[1];
+				engineObject->m_groundHitOffset.z += params[2];
+			}
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;

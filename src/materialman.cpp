@@ -2541,7 +2541,8 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
 
         chunkFile.PushChunk();
         while (chunkFile.GetNextChunk(chunk) != 0) {
-            if (chunk.m_id == CHUNK_TIDX) {
+            switch (chunk.m_id) {
+            case CHUNK_TIDX: {
                 unsigned long materialIndex = 0;
                 while (materialIndex < static_cast<unsigned long>(UnkMaterialSetGetter(materials))) {
                     if ((*materials)[materialIndex] == 0) {
@@ -2580,13 +2581,15 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                 } else {
                     materials->Add(material);
                 }
-            } else if (chunk.m_id == CHUNK_NAME) {
+            } break;
+            case CHUNK_NAME: {
                 if (material != 0) {
                     strncpy(reinterpret_cast<char*>(Ptr(material, 8)), chunkFile.GetString(), 0x10);
                 } else {
                     chunkFile.GetString();
                 }
-            } else if (chunk.m_id == CHUNK_ATTR) {
+            } break;
+            case CHUNK_ATTR: {
                 unsigned int flags = chunkFile.Get4();
                 if (material == 0) {
                     chunkFile.Get1();
@@ -2619,13 +2622,15 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                 *Ptr(material, 0xA6) = static_cast<unsigned char>(chunkFile.Get2());
                 chunkFile.Get2();
                 chunkFile.GetF4();
-            } else if (chunk.m_id == CHUNK_FUR) {
+            } break;
+            case CHUNK_FUR: {
                 unsigned short textureIndex = chunkFile.Get2();
                 if (material != 0) {
                     AddTextureIndex(material, textureIndex);
                     *Ptr(material, 0xA7) = 1;
                 }
-            } else if (chunk.m_id == CHUNK_BUMP) {
+            } break;
+            case CHUNK_BUMP: {
                 unsigned char bumpLightDirect = 0;
                 if (chunk.m_version == 1) {
                     bumpLightDirect = chunkFile.Get1();
@@ -2669,7 +2674,8 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                     *Ptr(bumpLight, 0xB1) = *Ptr(material, 0xA2);
                     *reinterpret_cast<unsigned long*>(Ptr(material, 0x24)) |= 4;
                 }
-            } else if (chunk.m_id == CHUNK_JIME) {
+            } break;
+            case CHUNK_JIME: {
                 unsigned short texture0 = chunkFile.Get2();
                 unsigned short texture1 = chunkFile.Get2();
                 unsigned short bumpIndex = chunkFile.Get2();
@@ -2699,7 +2705,8 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                     SetMaterialColor(material, rgba);
                     *Ptr(material, 0xA3) = 1;
                 }
-            } else if (chunk.m_id == CHUNK_WATR) {
+            } break;
+            case CHUNK_WATR: {
                 unsigned short texture0 = chunkFile.Get2();
                 unsigned short texture1 = chunkFile.Get2();
                 unsigned short bumpIndex = chunkFile.Get2();
@@ -2731,7 +2738,8 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                         *reinterpret_cast<unsigned long*>(Ptr(material, 0x24)) |= 0x80000;
                     }
                 }
-            } else if (chunk.m_id == CHUNK_TSCL) {
+            } break;
+            case CHUNK_TSCL: {
                 if (material == 0) {
                     continue;
                 }
@@ -2795,6 +2803,7 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                         texScroll->m_type1 = 1;
                     }
                 }
+            } break;
             }
         }
         chunkFile.PopChunk();

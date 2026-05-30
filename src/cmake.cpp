@@ -3367,9 +3367,6 @@ void CMenuPcs::CmakeVillageDraw()
     unsigned char* villageWork = static_cast<unsigned char*>(CmakeFields(this).m_villageWork);
     short mode = *reinterpret_cast<short*>(villageWork + 0x10);
     int frame = static_cast<int>(*reinterpret_cast<short*>(villageWork + 0x22)) - 1;
-    short select = *reinterpret_cast<short*>(villageWork + 0x26);
-    short row = *reinterpret_cast<short*>(villageWork + 0x28);
-    short table = *reinterpret_cast<short*>(villageWork + 0x2A);
     float alpha;
 
     if (frame < 0) {
@@ -3417,8 +3414,10 @@ void CMenuPcs::CmakeVillageDraw()
         0, static_cast<float>(DOUBLE_803333b8), FLOAT_803332ac, FLOAT_803332b0, FLOAT_803332b0,
         FLOAT_803332b0, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, 0.0f);
 
-    if (mode == 1 && row < 5) {
-        unsigned int cursorX = static_cast<unsigned int>(FLOAT_803332c0 * static_cast<float>(select) + 0xE5);
+    if (mode == 1 && *reinterpret_cast<short*>(villageWork + 0x28) < 5) {
+        short row = *reinterpret_cast<short*>(villageWork + 0x28);
+        unsigned int cursorX = static_cast<unsigned int>(
+            FLOAT_803332c0 * static_cast<float>(*reinterpret_cast<short*>(villageWork + 0x26)) + 0xE5);
         GXColor cursorColor = {0xFF, 0xFF, 0xFF, 0xFF};
         GXSetChanMatColor(GX_COLOR0A0, cursorColor);
         MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((MenuS16(this, 0x86C) != 0) ? 100 : 0x3D));
@@ -3437,7 +3436,7 @@ void CMenuPcs::CmakeVillageDraw()
     font->SetColor(col);
 
     for (int i = 0; i < 5; i++) {
-        const char* rowText = s_NameEntryStr[table * 5 + i];
+        const char* rowText = s_NameEntryStr[*reinterpret_cast<short*>(villageWork + 0x2A) * 5 + i];
         font->SetPosX(FLOAT_803332c8);
         font->SetPosY(static_cast<float>(0x6C + i * 0x20));
         font->Draw(rowText);
@@ -3446,22 +3445,23 @@ void CMenuPcs::CmakeVillageDraw()
     reinterpret_cast<unsigned char*>(font)[0x24] &= 0xEF;
 
     DrawInit();
-    if (mode == 1 && row < 5) {
+    if (mode == 1 && *reinterpret_cast<short*>(villageWork + 0x28) < 5) {
         int wobble = System.m_frameCounter & 7;
-        DrawCursor(static_cast<int>(FLOAT_803332c8 + select * FLOAT_803332c0) + wobble,
-            row * 0x20 + 0x70, FLOAT_80333258);
+        DrawCursor(
+            static_cast<int>(FLOAT_803332c8 + *reinterpret_cast<short*>(villageWork + 0x26) * FLOAT_803332c0) + wobble,
+            *reinterpret_cast<short*>(villageWork + 0x28) * 0x20 + 0x70, FLOAT_80333258);
     }
 
     int showNameCursor = __cntlzw(static_cast<unsigned int>(1 - mode)) >> 5;
-    if (row > 4) {
+    if (*reinterpret_cast<short*>(villageWork + 0x28) > 4) {
         showNameCursor = 0;
     }
     if (strlen(s_CmakeInfo.m_name) > 6) {
         showNameCursor = 0;
     }
     DrawCmakeName(1, showNameCursor, s_CmakeInfo.m_name, alpha);
-    DrawCmakeDecision((static_cast<int>(row) >> 31) +
-        (static_cast<unsigned int>(static_cast<int>(row)) > 4), alpha);
+    DrawCmakeDecision((static_cast<int>(*reinterpret_cast<short*>(villageWork + 0x28)) >> 31) +
+        (static_cast<unsigned int>(static_cast<int>(*reinterpret_cast<short*>(villageWork + 0x28))) > 4), alpha);
 }
 
 /*

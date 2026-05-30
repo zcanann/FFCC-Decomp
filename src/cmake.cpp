@@ -3316,10 +3316,18 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
     }
 
     if ((down & 0x40) != 0) {
-        table = (table > 0) ? static_cast<short>(table - 1) : 2;
+        if (table > 0) {
+            table = static_cast<short>(table - 1);
+        } else {
+            table = 2;
+        }
         Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
     } else if ((down & 0x20) != 0) {
-        table = (table < 2) ? static_cast<short>(table + 1) : 0;
+        if (table < 2) {
+            table = static_cast<short>(table + 1);
+        } else {
+            table = 0;
+        }
         Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
     }
 

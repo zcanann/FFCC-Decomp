@@ -688,20 +688,17 @@ void CMenuPcs::CmdOpen()
 	u32 count = static_cast<u32>(list[0]);
 	s16* entry = list + 4;
 	const s32 timer = static_cast<s32>(cmd[0x11]);
-	s32 remaining = static_cast<s32>(count);
+	const s32 entryCount = static_cast<s32>(count);
 
-	if (remaining > 0) {
-		do {
+	for (s32 i = 0; i < entryCount; i++) {
 			if (*reinterpret_cast<s32*>(entry + 0x12) > timer) {
 				entry += 0x20;
-				remaining -= 1;
 				continue;
 			}
 			if ((*reinterpret_cast<s32*>(entry + 0x12) + *reinterpret_cast<s32*>(entry + 0x14)) <= timer) {
 				finishedCount += 1;
 				*reinterpret_cast<float*>(entry + 8) = FLOAT_80332a70;
 				entry += 0x20;
-				remaining -= 1;
 				continue;
 			}
 			s32 value = *reinterpret_cast<s32*>(entry + 0x10);
@@ -711,8 +708,6 @@ void CMenuPcs::CmdOpen()
 			    (DOUBLE_80332a58 / static_cast<double>(*reinterpret_cast<s32*>(entry + 0x14))) *
 			    static_cast<double>(value));
 			entry += 0x20;
-			remaining -= 1;
-		} while (remaining != 0);
 	}
 
 	bool done = false;

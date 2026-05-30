@@ -393,7 +393,7 @@ static void DrawBonusActiveMarks(CMenuPcs* menu, int statePtr, float alpha)
 	}
 }
 
-static unsigned char GetBonusUnavailableMask(int statePtr, BonusPartySummary* summary)
+static inline unsigned char GetBonusUnavailableMask(int statePtr, BonusPartySummary* summary)
 {
 	unsigned char mask = 0;
 	if (statePtr != 0) {

@@ -1028,7 +1028,8 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			break;
 		case -0x62: {
 			unsigned int changed = static_cast<unsigned int>(Joybus.ChgCtrlMode(ScriptPlayerIndex(engineObject)));
-			PushValue(this, object, (__cntlzw(changed) >> 5) & 0xFF);
+			unsigned int topBit = __cntlzw(changed);
+			PushValue(this, object, (topBit >> 5) & 0xFF);
 			outResult = 0;
 			break;
 		}

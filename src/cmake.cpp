@@ -2282,16 +2282,16 @@ unsigned short CMenuPcs::CmakeTribeCtrl()
             for (int slot = 0; slot < 8; slot += 2, entry += 0x1860) {
                 if (((*reinterpret_cast<int*>(entry + 0x1794) != 0) &&
                      (*(entry + 0x1F96) != 1) &&
-                     (*reinterpret_cast<unsigned short*>(entry + 0x17D0) == static_cast<unsigned short>(tribe)) &&
-                     (*reinterpret_cast<unsigned short*>(entry + 0x17D4) == static_cast<unsigned short>(crest)) &&
+                     (*reinterpret_cast<unsigned short*>(entry + 0x17D0) == tribe) &&
+                     (*reinterpret_cast<unsigned short*>(entry + 0x17D4) == crest) &&
                      (duplicateSlot = slot,
-                      *reinterpret_cast<unsigned short*>(entry + 0x17D2) == static_cast<unsigned short>(s_CmakeInfo.m_gender))) ||
+                      *reinterpret_cast<unsigned short*>(entry + 0x17D2) == s_CmakeInfo.m_gender)) ||
                     ((*reinterpret_cast<int*>(entry + 0x23C4) != 0) &&
                      (*(entry + 0x2BC6) != 1) &&
-                     (*reinterpret_cast<unsigned short*>(entry + 0x2400) == static_cast<unsigned short>(tribe)) &&
-                     (*reinterpret_cast<unsigned short*>(entry + 0x2404) == static_cast<unsigned short>(crest)) &&
+                     (*reinterpret_cast<unsigned short*>(entry + 0x2400) == tribe) &&
+                     (*reinterpret_cast<unsigned short*>(entry + 0x2404) == crest) &&
                      (duplicateSlot = slot + 1,
-                      *reinterpret_cast<unsigned short*>(entry + 0x2402) == static_cast<unsigned short>(s_CmakeInfo.m_gender)))) {
+                      *reinterpret_cast<unsigned short*>(entry + 0x2402) == s_CmakeInfo.m_gender))) {
                     break;
                 }
                 duplicateSlot = slot + 2;

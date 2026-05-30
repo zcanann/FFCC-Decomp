@@ -487,9 +487,6 @@ static inline void DrawBonusSelectedArtifactHelp(CMenuPcs* menu, int statePtr, B
 			break;
 		}
 	}
-	if (frame == 0) {
-		return;
-	}
 
 	CFont* font = GetBonusMenuMembers(menu).m_fontWide;
 	font->SetMargin(1.0f);

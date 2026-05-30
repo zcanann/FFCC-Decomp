@@ -480,7 +480,7 @@ static inline float CalcBonusSpriteProgress(const BonusAnimSprite* sprite, int f
 	return ClampBonusUnit((float)(frame - sprite->startFrame + 1) / (float)sprite->duration);
 }
 
-static int GetBonusPartySlotByActiveIndex(int activeIndex)
+static inline int GetBonusPartySlotByActiveIndex(int activeIndex)
 {
 	unsigned int* scriptFoodBase = Game.m_scriptFoodBase;
 	int activeCount = 0;
@@ -498,7 +498,7 @@ static int GetBonusPartySlotByActiveIndex(int activeIndex)
 	return -1;
 }
 
-static CCaravanWork* GetBonusActiveCaravanByActiveIndex(int activeIndex)
+static inline CCaravanWork* GetBonusActiveCaravanByActiveIndex(int activeIndex)
 {
 	BonusPartySummary* summary = GetBonusPartySummary(activeIndex);
 	if (summary != 0 && summary->m_partySlot >= 0 && summary->m_partySlot < 4) {
@@ -513,7 +513,7 @@ static CCaravanWork* GetBonusActiveCaravanByActiveIndex(int activeIndex)
 	return reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[slot]);
 }
 
-static const char* GetBonusPartyNameByActiveIndex(int activeIndex)
+static inline const char* GetBonusPartyNameByActiveIndex(int activeIndex)
 {
 	CCaravanWork* caravanWork = GetBonusActiveCaravanByActiveIndex(activeIndex);
 	if (caravanWork == 0) {
@@ -523,7 +523,7 @@ static const char* GetBonusPartyNameByActiveIndex(int activeIndex)
 	return reinterpret_cast<const char*>(caravanWork->unk_0x3ca_0x3dd);
 }
 
-static int GetBonusResultValueByActiveIndex(int activeIndex)
+static inline int GetBonusResultValueByActiveIndex(int activeIndex)
 {
 	BonusPartySummary* summary = GetBonusPartySummary(activeIndex);
 	if (summary != 0) {
@@ -551,7 +551,7 @@ static int GetBonusResultValueByActiveIndex(int activeIndex)
 	return value;
 }
 
-static const char* GetBonusResultLabelByActiveIndex(int activeIndex)
+static inline const char* GetBonusResultLabelByActiveIndex(int activeIndex)
 {
 	int labelIndex = -1;
 	BonusPartySummary* summary = GetBonusPartySummary(activeIndex);

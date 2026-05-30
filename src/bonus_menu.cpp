@@ -373,12 +373,6 @@ static void FillBonusArtiBasePositions(float* out, const BonusAnimSprite* boardS
 	}
 }
 
-static float* GetBonusArtiBasePositions(const BonusAnimSprite* sprite)
-{
-	FillBonusArtiBasePositions(s_Base[0], sprite, sprite);
-	return s_Base[0];
-}
-
 static void InitSelectOpenPartyIcon(BonusAnimSprite* sprite, int slotIndex, short y)
 {
 	short x = ((0 < slotIndex) && (slotIndex < 3)) ? 0x30 : 0x48;
@@ -406,55 +400,6 @@ static void InitSelectOpenPartyName(BonusAnimSprite* sprite, const BonusAnimSpri
 	sprite->targetX = (float)sprite->x + sprite->motionX;
 	sprite->targetY = (float)sprite->y + sprite->motionY;
 	BonusSpriteFlags(sprite) = 0x10000;
-}
-
-static void ApplySelectCloseSpriteMotion(BonusAnimSprite* sprite, int frame)
-{
-	float progress = CalcBonusSpriteProgress(sprite, frame);
-
-	if (progress < 0.0f) {
-		sprite->alpha = 1.0f;
-		return;
-	}
-
-	sprite->alpha = 1.0f - progress;
-	switch (sprite->kind) {
-	case 0x16:
-		sprite->scale = 3.0f + progress * 0.5f;
-		break;
-	case -3:
-		sprite->mulY = progress * 24.0f;
-		break;
-	case 0x1f:
-		sprite->mulX = -150.0f * progress;
-		sprite->mulY = -150.0f * progress;
-		sprite->scale = 1.0f + progress;
-		break;
-	case -4:
-		sprite->mulY = progress * 20.0f;
-		break;
-	case 0:
-		sprite->mulX = progress * sprite->w;
-		sprite->mulY = progress * sprite->h;
-		break;
-	case 0x19:
-		sprite->mulX = progress * 20.0f;
-		sprite->scale = 1.0f - progress * 0.15f;
-		break;
-	case -1:
-		sprite->mulX = progress * 24.0f;
-		sprite->mulY = progress * 6.0f;
-		break;
-	case -2:
-		sprite->scale = 1.0f - progress * 0.25f;
-		break;
-	case 0x20:
-		sprite->mulY = progress * 16.0f;
-		sprite->scale = 1.0f + progress * 0.2f;
-		break;
-	default:
-		break;
-	}
 }
 
 static void SetupSelectCloseSpriteMotion(BonusAnimSprite* sprite)
@@ -728,35 +673,6 @@ static const char* GetBonusResultLabelByActiveIndex(int activeIndex)
 	}
 
 	return flat->m_table[7].m_strings[labelIndex];
-}
-
-static int GetBonusDisplayValueForFrame(int statePtr, int activeIndex)
-{
-	int target = GetBonusResultValueByActiveIndex(activeIndex);
-	if (statePtr == 0 || *(short*)(statePtr + 0x10) != 0) {
-		return target;
-	}
-
-	int reveal = (int)*(short*)(statePtr + 0x22) - 8;
-	if (reveal < 0) {
-		return 0;
-	}
-	if (reveal > target) {
-		return target;
-	}
-	return reveal;
-}
-
-static unsigned short GetBonusAdvanceButtons(CMenuPcs* menu)
-{
-	unsigned short buttons = 0;
-	for (int i = 0; i < 4; i++) {
-		if (Game.m_scriptFoodBase[i] == 0) {
-			continue;
-		}
-		buttons = (unsigned short)(buttons | menu->GetButtonDown(i));
-	}
-	return buttons;
 }
 
 } // namespace

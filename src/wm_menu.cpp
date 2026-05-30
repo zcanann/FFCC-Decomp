@@ -29,6 +29,7 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
 #include "ffcc/fontman.h"
 
+extern "C" char* strstr(const char*, const char*);
 extern "C" void* __vt__Q212CFlatRuntime7CObject[];
 extern "C" void* __vt__9CGBaseObj[];
 extern "C" void* __vt__8CGObject[];
@@ -48,6 +49,9 @@ extern int DAT_8032ef08;
 extern int DAT_80238028;
 extern char cRam8032ee21;
 extern "C" char lbl_80331380[];
+extern "C" char lbl_80331400[];
+extern "C" const char* lbl_80210D54[];
+extern "C" const char* lbl_80210D68[];
 
 float FLOAT_8032ee18;
 int DAT_8032ee1c;
@@ -117,6 +121,7 @@ extern float FLOAT_80331744;
 extern float FLOAT_80331768;
 extern float FLOAT_80331414;
 extern float FLOAT_80331468;
+extern float FLOAT_80331404;
 extern float FLOAT_80331490;
 extern float FLOAT_80331498;
 extern float FLOAT_803314d8;
@@ -9022,9 +9027,6 @@ void CMenuPcs::DrawMcWinMess(int winType, int messType)
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	CFont* const font = reinterpret_cast<CFont**>(bytes + 0xF8)[0];
 	short* const win = reinterpret_cast<short*>(reinterpret_cast<unsigned int*>(bytes + 0x848)[0]);
-	if (font == 0 || win == 0) {
-		return;
-	}
 
 	font->SetMargin(FLOAT_803313e8);
 	font->SetShadow(0);
@@ -9037,39 +9039,77 @@ void CMenuPcs::DrawMcWinMess(int winType, int messType)
 
 	const char* const* msgTable = GetMcWinMessBuff(messType);
 	const unsigned char* const winMess = reinterpret_cast<unsigned char*>(GetWinMess(winType));
-	if (msgTable == 0 || winMess == 0) {
-		DrawInit();
-		return;
-	}
+	const int languageIndex = Game.m_gameWork.m_languageId - 1;
 
 	const int count = *reinterpret_cast<const int*>(winMess);
-	float centerX = static_cast<float>(win[0] + win[2] / 2);
+	float posX;
+	if (winType != 0) {
+		int maxWidth = 0;
+		const unsigned char* entry = winMess;
+		for (int i = 0; i < count; i++) {
+			const short msgId = *reinterpret_cast<const short*>(entry + 4);
+			const char* text = msgTable[msgId];
+			if (text != 0) {
+				if (text[0] == '$') {
+					text++;
+				}
+				const int width = font->GetWidth(const_cast<char*>(text));
+				if (maxWidth < width) {
+					maxWidth = width;
+				}
+			}
+			entry += 2;
+		}
+		posX = static_cast<float>(win[0]) + static_cast<float>(win[2] - maxWidth) * static_cast<float>(DOUBLE_803313f8);
+	}
+
 	float y = static_cast<float>(win[1] + 0x20);
 
 	char textBuf[128];
 	const unsigned char* entry = winMess + 4;
 	for (int i = 0; i < count; i++) {
-		const short msgId = *reinterpret_cast<const short*>(entry + 4);
+		const short msgId = *reinterpret_cast<const short*>(entry);
 		const char* text = msgTable[msgId];
-		if (text != 0 && text[0] != '\0') {
-			if (text[0] == '$') {
-				text++;
+		if (strlen(text) != 0) {
+			const bool noMarker = text[0] != '$';
+			if (noMarker) {
+				strcpy(textBuf, text);
+			} else {
+				strcpy(textBuf, text + 1);
 			}
 
-			strncpy(textBuf, text, sizeof(textBuf) - 1);
-			textBuf[sizeof(textBuf) - 1] = '\0';
-
-			const int textWidth = font->GetWidth(textBuf);
-			float posX = static_cast<float>(win[0] + 0x20);
-			if (winType != 0) {
-				posX = centerX - static_cast<float>(textWidth) * 0.5f;
+			if (winType == 0 || !noMarker) {
+				const int textWidth = font->GetWidth(textBuf);
+				posX = static_cast<float>(win[0]) + static_cast<float>(win[2] - textWidth) * static_cast<float>(DOUBLE_803313f8);
 			}
 			font->SetPosX(posX);
 			font->SetPosY(y);
+			if (messType == 0) {
+				char* slotText = 0;
+				if (winType != 0) {
+					slotText = strstr(textBuf, lbl_80210D54[languageIndex]);
+				}
+				if (winType == 0 || slotText == 0) {
+					char* marker = strstr(textBuf, lbl_80331400);
+					if (marker != 0) {
+						marker[0] += 2;
+						marker[1] += 2;
+					}
+				} else {
+					int len = strlen(lbl_80210D54[languageIndex]);
+					slotText[len - 1] += reinterpret_cast<McCtrl*>(bytes + 0x20)->m_cardChannel;
+				}
+			} else {
+				char* dataText = strstr(textBuf, lbl_80210D68[languageIndex]);
+				if (dataText != 0) {
+					int len = strlen(lbl_80210D68[languageIndex]);
+					dataText[len - 1] += reinterpret_cast<McCtrl*>(bytes + 0x20)->m_saveIndex;
+				}
+			}
 			font->Draw(textBuf);
 		}
-		y += 30.0f;
-		entry += 8;
+		y += FLOAT_80331404;
+		entry += 2;
 	}
 
 	DrawInit();

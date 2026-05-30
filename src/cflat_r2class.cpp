@@ -370,6 +370,9 @@ CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* objec
 	const unsigned short engineFlags = CallEngineFlags(engineObject);
 
 	if (((engineFlags & 5) != 5) && (systemVal == -0x1B)) {
+		if (static_cast<unsigned int>(System.m_execParam) >= 2) {
+			System.Printf(const_cast<char*>(sCFlatRuntime2SetClassSystemValWarn));
+		}
 		LastResult(this) = 0;
 	} else {
 		if (systemVal <= -0x40) {

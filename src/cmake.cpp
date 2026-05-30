@@ -2213,7 +2213,7 @@ unsigned short CMenuPcs::CmakeTribeCtrl()
     short& resultDir = *reinterpret_cast<short*>(state + 0x1E);
     short& tribe = *reinterpret_cast<short*>(state + 0x26);
     short& crest = *reinterpret_cast<short*>(state + 0x28);
-    short selectField = *reinterpret_cast<short*>(state + 0x30);
+    int selectField = *reinterpret_cast<short*>(state + 0x30);
     short& mcState = *reinterpret_cast<short*>(mcWork + 10);
     unsigned short down;
     unsigned short repeat;

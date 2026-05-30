@@ -431,7 +431,14 @@ static inline void DrawBonusPartyNames(CMenuPcs* menu, BonusAnimHeader* header, 
 			continue;
 		}
 
-		const char* name = GetBonusPartyNameByActiveIndex(nameIndex);
+		const char* name = 0;
+		for (int j = 0; j < activePartyCount; j++) {
+			if (s_Rinfo->m_party[j].m_rank == nameIndex) {
+				CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[s_Rinfo->m_party[j].m_partySlot]);
+				name = reinterpret_cast<const char*>(caravanWork->unk_0x3ca_0x3dd);
+				break;
+			}
+		}
 		GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(sprite->alpha * 255.0f)};
 		font->SetColor(color);
 		font->SetPosX((float)sprite->x + sprite->mulX);

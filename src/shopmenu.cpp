@@ -2096,7 +2096,7 @@ void CShopMenu::DrawShop0()
     DrawShopBase();
 
     int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
-    int selected = ShopMenuInt(this, 0x48);
+    int selected = *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(this) + 0x48);
 
     CFont* font = MenuPcs.m_infoPanelFont;
     SetMargin__5CFontFf(FLOAT_80332d28, font);
@@ -2523,7 +2523,7 @@ void CShopMenu::Calc()
     int& timer = ShopMenuInt(this, 0xC);
     int& subMode = ShopMenuInt(this, 0x10);
     int& shopMode = ShopMenuInt(this, 0x14);
-    int& choice = ShopMenuInt(this, 0x48);
+    unsigned char& choice = *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(this) + 0x48);
 
     switch (mode) {
     case 0:

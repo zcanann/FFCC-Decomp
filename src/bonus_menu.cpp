@@ -319,60 +319,6 @@ static inline int& BonusSpriteFlags(BonusAnimSprite* sprite)
 	return *reinterpret_cast<int*>(&sprite->scale);
 }
 
-static void FillBonusArtiBasePositions(float* out, const BonusAnimSprite* boardSprite, const BonusAnimSprite* itemSprite)
-{
-	if (out == 0 || boardSprite == 0) {
-		return;
-	}
-
-	const float x = (float)boardSprite->x + boardSprite->mulX;
-	const float y = (float)boardSprite->y + boardSprite->mulY;
-	const float w = (float)boardSprite->w;
-	const float h = (float)boardSprite->h;
-	const float itemW = (itemSprite != 0) ? (float)itemSprite->w : w;
-	const float itemH = (itemSprite != 0) ? (float)itemSprite->h : h;
-	const float halfW = w * 0.5f;
-	const float halfH = h * 0.5f;
-	const float itemHalfW = itemW * 0.5f;
-	const float itemHalfH = itemH * 0.5f;
-	const float insetW = w * 0.25f;
-	const float insetH = h * 0.25f;
-
-	memset(out, 0, sizeof(float) * 18);
-
-	out[0] = x + halfW;
-	out[1] = y + halfH;
-
-	out[2] = x + w - itemW;
-	out[3] = y + halfH - itemHalfH;
-
-	out[6] = x + halfW - itemHalfW;
-	out[7] = y + h - itemH;
-
-	out[10] = x;
-	out[11] = y + halfH - itemHalfH;
-
-	out[14] = x + halfW - itemHalfW;
-	out[15] = y;
-
-	float baseX = x + insetW - itemHalfW;
-	float baseY = y + insetH - itemHalfH;
-	for (int row = 0; row < 2; row++) {
-		if (row == 0) {
-			out[12] = baseX;
-			out[13] = baseY;
-			out[16] = baseX + halfW;
-			out[17] = baseY;
-		} else {
-			out[8] = baseX;
-			out[9] = baseY;
-			out[4] = baseX + halfW;
-			out[5] = baseY;
-		}
-		baseY += halfH;
-	}
-}
-
 static void InitSelectOpenPartyIcon(BonusAnimSprite* sprite, int slotIndex, short y)
 {
 	short x = ((0 < slotIndex) && (slotIndex < 3)) ? 0x30 : 0x48;
@@ -508,50 +454,6 @@ static void DrawBonusMcWinOverlay(CMenuPcs* menu, int statePtr)
 		int cursorX = menu->GetYesNoXPos((int)*(short*)(statePtr + 0x28));
 		float cursorY = (float)(*(short*)(auxPtr + 2) + *(short*)(auxPtr + 6) - 0x3e);
 		menu->DrawCursor(cursorX, (int)cursorY, 1.0f);
-	}
-}
-
-static void TickAnimSprites(int statePtr, int animPtr, int fadeDir)
-{
-	BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
-	BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
-	int doneCount = 0;
-	int frame;
-
-	if (header->count <= 0) {
-		header->finished = 1;
-		return;
-	}
-
-	*(short*)(statePtr + 0x22) = *(short*)(statePtr + 0x22) + 1;
-	frame = (int)*(short*)(statePtr + 0x22);
-
-	for (int i = 0; i < (int)header->count; i++) {
-		BonusAnimSprite* sprite = &sprites[i];
-		if (frame < sprite->startFrame) {
-			continue;
-		}
-
-		if (frame < (sprite->startFrame + sprite->duration)) {
-			float t;
-			sprite->timer++;
-			t = (sprite->duration > 0) ? ((float)sprite->timer / (float)sprite->duration) : 1.0f;
-			sprite->alpha = (fadeDir >= 0) ? t : (1.0f - t);
-		} else {
-			sprite->alpha = (fadeDir >= 0) ? 1.0f : 0.0f;
-			doneCount++;
-		}
-
-		if (sprite->alpha < 0.0f) {
-			sprite->alpha = 0.0f;
-		}
-		if (sprite->alpha > 1.0f) {
-			sprite->alpha = 1.0f;
-		}
-	}
-
-	if (doneCount == (int)header->count) {
-		header->finished = 1;
 	}
 }
 

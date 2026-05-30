@@ -11070,7 +11070,9 @@ void McCtrl::SetListDat(int slot, int clearPlayTime)
 		if (MemoryCardMan.ChkCrc(0) == 1 && memcmp(save + 0x0C, DAT_8032E8A8, 4) == 0) {
 			unsigned int playTime = clearPlayTime == 0 ? *reinterpret_cast<unsigned int*>(save + 0x20) : 0;
 			memcpy(entry + 0x00, save + 0x8AD0, 8);
-			memcpy(entry + 0x0C, save + 0x24, 0x0C);
+			*reinterpret_cast<unsigned int*>(entry + 0x0C) = *reinterpret_cast<unsigned int*>(save + 0x24);
+			*reinterpret_cast<unsigned int*>(entry + 0x10) = *reinterpret_cast<unsigned int*>(save + 0x28);
+			*reinterpret_cast<unsigned int*>(entry + 0x14) = *reinterpret_cast<unsigned int*>(save + 0x2C);
 
 			int party0 = *reinterpret_cast<int*>(save + 0x30);
 			int party1 = *reinterpret_cast<int*>(save + 0x34);

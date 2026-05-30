@@ -749,6 +749,35 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
+		case -0x14: {
+			Vec moveTarget;
+			float* params = reinterpret_cast<float*>(localBase);
+			moveTarget.x = params[0];
+			moveTarget.y = params[1];
+			moveTarget.z = params[2];
+			engineObject->Move(&moveTarget, params[3], static_cast<int>(localBase[4]), 0, 1, 0, 1);
+			PushValue(this, object, 0);
+			outResult = 0;
+			break;
+		}
+		case -0x15:
+			*reinterpret_cast<u8*>(&engineObject->m_weaponNodeFlags) =
+			    static_cast<u8>((static_cast<signed char>(localBase[0]) << 4) & 0x10) |
+			    (*reinterpret_cast<u8*>(&engineObject->m_weaponNodeFlags) & 0xEF);
+			engineObject->m_groundHitOffset.z = FLOAT_80330BC8;
+			engineObject->m_groundHitOffset.y = FLOAT_80330BC8;
+			engineObject->m_groundHitOffset.x = FLOAT_80330BC8;
+			PushValue(this, object, 0);
+			outResult = 0;
+			break;
+		case -0x16:
+			engineObject->m_objectFlags = localBase[0];
+			if ((engineObject->m_objectFlags & 0x10) != 0) {
+				Game.unk_flat3_0xc7d0 = reinterpret_cast<unsigned int>(engineObject);
+			}
+			PushValue(this, object, 0);
+			outResult = 0;
+			break;
 		case -0x17:
 			engineObject->m_displayFlags = localBase[0];
 			PushValue(this, object, 0);

@@ -44,6 +44,8 @@ extern "C" void __ct__9CGItemObjFv(CGItemObj*);
 extern "C" void __ct__8CGObjectFv(CGObject*);
 extern "C" void __ct__9CGQuadObjFv(CGQuadObj*);
 extern "C" void __ct__9CGBaseObjFv(CGBaseObj*);
+extern const float FLOAT_80330138;
+extern const float FLOAT_8033013C;
 
 // Linkage definitions from config/GCCP01/symbols.txt.
 // Keeping these as raw byte buffers matches current decomp access patterns.
@@ -1450,7 +1452,7 @@ void CFlatRuntime2::Calc()
 		saveData[4] = SwapF32(CameraPcs.m_targetY);
 		saveData[5] = SwapF32(CameraPcs.m_targetZ);
 		saveData[6] = SwapF32(CameraPcs.m_fov);
-		saveData[7] = SwapF32((180.0f * *reinterpret_cast<float*>(CameraPcsRaw() + 0x108)) / 3.1415927f);
+		saveData[7] = SwapF32((FLOAT_80330138 * *reinterpret_cast<float*>(CameraPcsRaw() + 0x108)) / FLOAT_8033013C);
 
 		u32 lastX = 0;
 		u32 lastY = 0;
@@ -2164,7 +2166,7 @@ void CFlatRuntime2::SetParticleWorkPos(Vec& vec, float angle)
 	ParticleWorkPosX(this) = vec.x;
 	ParticleWorkPosY(this) = vec.y;
 	ParticleWorkPosZ(this) = vec.z;
-	ParticleWorkPosAngle(this) = 180.0f * angle / 3.1415927f;
+	ParticleWorkPosAngle(this) = FLOAT_80330138 * angle / FLOAT_8033013C;
 	ParticleWorkPosPtr(this) = &ParticleWorkPosX(this);
 	ParticleWorkPosVecPtr(this) = &ParticleWorkPosVecBase(this);
 }

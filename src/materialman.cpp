@@ -1837,7 +1837,7 @@ void CMaterialMan::SetShadow(CMapShadow& shadow, float (*viewMtx) [4], int shado
         int materialNum = m_shadowMaterialCount;
 
         m_curEnvTevBit |= 0x10;
-        m_shadowMaterialType[materialNum] = static_cast<signed char>(*Ptr(&shadow, 8));
+        m_shadowMaterialType[materialNum] = *Ptr(&shadow, 8);
         m_shadowIndices[materialNum] = static_cast<unsigned char>(shadowIndex);
         m_shadowTexMapIds[materialNum] = m_texMapIdCur;
         m_shadowTexMtxIds[materialNum] = m_texMtxCur;

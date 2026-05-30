@@ -103,6 +103,20 @@ extern char s_Plus_80332d4c[];
 extern char s_Minus_80332d50[];
 extern "C" char* g_strShopMenuMes[];
 
+struct ShopMenuTopMenuEntry {
+    int x;
+    int y;
+    char* text;
+};
+
+ShopMenuTopMenuEntry s_shopMenuTopMenuEntries[] = {
+    {0x1AE, 0x78, 0},
+    {0x186, 0xDC, 0},
+    {0x1AE, 0x140, 0},
+};
+ShopMenuTopMenuEntry* s_currentShopMenuTopMenuEntry;
+unsigned char s_shopMenuTopMenuTextInitialized;
+
 enum ShopMenuTextIndex {
     SHOP_MENU_TEXT_BUY = 0,
     SHOP_MENU_TEXT_SELL = 1,
@@ -2088,50 +2102,79 @@ void CShopMenu::DrawSmith0()
 }
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80155058
+ * PAL Size: 848b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CShopMenu::DrawShop0()
 {
+    int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
     DrawShopBase();
 
-    int languageId = static_cast<int>(Game.m_gameWork.m_languageId) - 1;
+    if (s_shopMenuTopMenuTextInitialized == 0) {
+        s_shopMenuTopMenuEntries[0].text = ShopMenuMes(languageId, SHOP_MENU_TEXT_BUY);
+        s_shopMenuTopMenuEntries[1].text = ShopMenuMes(languageId, SHOP_MENU_TEXT_SELL);
+        s_shopMenuTopMenuEntries[2].text = ShopMenuMes(languageId, SHOP_MENU_TEXT_CANCEL);
+        s_shopMenuTopMenuTextInitialized = 1;
+    }
+
     int selected = *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(this) + 0x48);
 
-    CFont* font = MenuPcs.m_infoPanelFont;
+    CFont* font;
+    ShopMenuTopMenuEntry* entry = s_shopMenuTopMenuEntries;
+    for (int i = 0; i < 3; i++, entry++) {
+        int highlight = (i == selected) ? 1 : 0;
+        s_currentShopMenuTopMenuEntry = entry;
+
+        Graphic.SetDrawDoneDebugData(0x1E);
+        int x = s_currentShopMenuTopMenuEntry->x;
+        if (highlight != 0) {
+            x += 8;
+        }
+        drawShapeSeq(0, highlight, x, s_currentShopMenuTopMenuEntry->y, 0xFF, 0, 0, FLOAT_80332d9c, 0);
+        Graphic.SetDrawDoneDebugData(0x1F);
+        drawShapeSeq(
+            8, highlight, s_currentShopMenuTopMenuEntry->x - 0x30, s_currentShopMenuTopMenuEntry->y, 0xFF, 0, 0,
+            FLOAT_80332d9c, 0);
+        Graphic.SetDrawDoneDebugData(0x20);
+        font = MenuPcs.m_infoPanelFont;
+    }
+
     SetMargin__5CFontFf(FLOAT_80332d28, font);
     SetShadow__5CFontFi(font, 1);
     SetScale__5CFontFf(FLOAT_80332d8c, font);
-
     CColor white(0xFF, 0xFF, 0xFF, 0xFF);
     font->SetColor(white.color);
+    DrawInit__5CFontFv(font);
 
-    for (int i = 0; i < 3; i++) {
-        int x = 0x88;
-        int y = i * 0x24 + 0x92;
-        int highlight = (i == selected) ? 1 : 0;
-
-        Graphic.SetDrawDoneDebugData(static_cast<signed char>(0x1E + i));
-        drawShapeSeq(0, highlight, x, y, 0xFF, 0, 0, 0.0f, 0);
-        Graphic.SetDrawDoneDebugData(static_cast<signed char>(0x21 + i));
-        drawShapeSeq(8, highlight, x - 0x30, y, 0xFF, 0, 0, 0.0f, 0);
-
-        DrawInit__5CFontFv(font);
-        DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(
-            MenuPcsVoid(), font, ShopMenuMes(languageId, i),
-            static_cast<float>(x + 0x48), static_cast<float>(y - 0x0B),
-            highlight != 0 ? 0x18 : 9, 0x12);
-        DrawInit__8CMenuPcsFv(MenuPcsVoid());
-    }
-
-    Graphic.SetDrawDoneDebugData(0x24);
+    Graphic.SetDrawDoneDebugData(0x21);
     DrawInit__5CFontFv(font);
     DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(
-        MenuPcsVoid(), font, ShopMenuMes(languageId, SHOP_MENU_TEXT_TITLE), FLOAT_80332d54, 88.0f, 9, 0x12);
+        MenuPcsVoid(), font, ShopMenuMes(languageId, SHOP_MENU_TEXT_TITLE), FLOAT_80332d54, FLOAT_80332e30, 9, 0x12);
     DrawInit__8CMenuPcsFv(MenuPcsVoid());
 
+    Graphic.SetDrawDoneDebugData(0x22);
+    SetMargin__5CFontFf(FLOAT_80332d28, font);
+    SetScale__5CFontFf(FLOAT_80332d28, font);
+
+    entry = s_shopMenuTopMenuEntries;
+    for (int i = 0; i < 3; i++, entry++) {
+        s_currentShopMenuTopMenuEntry = entry;
+        Graphic.SetDrawDoneDebugData(0x23);
+        DrawInit__5CFontFv(font);
+        DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(
+            MenuPcsVoid(), font, s_currentShopMenuTopMenuEntry->text,
+            static_cast<float>(s_currentShopMenuTopMenuEntry->x - 0x10),
+            static_cast<float>(s_currentShopMenuTopMenuEntry->y - 0x0B), 0x18, 0x12);
+        DrawInit__8CMenuPcsFv(MenuPcsVoid());
+        Graphic.SetDrawDoneDebugData(0x24);
+    }
+
+    DrawInit__8CMenuPcsFv(MenuPcsVoid());
     Graphic.SetDrawDoneDebugData(0x28);
-    MenuPcs.DrawCursor(0xA8, 0x9C + selected * 0x24, 1.0f);
 }
 /*
  * --INFO--

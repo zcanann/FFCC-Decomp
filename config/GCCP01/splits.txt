@@ -83,6 +83,7 @@ p_sample.cpp:
 	.ctors      start:0x801D53B8 end:0x801D53BC
 	.rodata     start:0x801D6CC8 end:0x801D6CEC
 	.data       start:0x801E8498 end:0x801E868C
+	.sdata      start:0x8032E428 end:0x8032E440
 	.sbss       start:0x8032EC60 end:0x8032EC64
 
 p_usb.cpp:
@@ -146,6 +147,7 @@ maphit.cpp:
 	.rodata     start:0x801D7088 end:0x801D7094
 	.bss        start:0x80245640 end:0x802456F0
 	.sbss       start:0x8032EC78 end:0x8032EC9C
+	.sdata2     start:0x8032F888 end:0x8032F8B4
 
 mapmesh.cpp:
 	extab       start:0x80005E60 end:0x80005EC8
@@ -238,6 +240,7 @@ p_graphic.cpp:
 	.ctors      start:0x801D53EC end:0x801D53F0
 	.data       start:0x801E9C90 end:0x801E9EC0
 	.bss        start:0x80268E90 end:0x80268F84
+	.sdata2     start:0x8032FBFC end:0x8032FC64
 
 p_game.cpp:
 	extab       start:0x800068A8 end:0x80006918
@@ -266,6 +269,7 @@ p_light.cpp:
 	.data       start:0x801EA298 end:0x801EA484
 	.bss        start:0x80268F88 end:0x8026D338
 	.sbss       start:0x8032ED10 end:0x8032ED18
+	.sdata2     start:0x8032FC68 end:0x8032FC88
 
 mapanim.cpp:
 	extab       start:0x800069C8 end:0x80006A44
@@ -1627,7 +1631,7 @@ shopmenu.cpp:
 	extabindex  start:0x80011128 end:0x80011248
 	.text       start:0x801503C8 end:0x80159654
 	.data       start:0x80214D90 end:0x80214FE0
-	.sbss       start:0x8032EED0 end:0x8032EED4
+	.sbss       start:0x8032EED0 end:0x8032EED9
 	.sdata2     start:0x80333338 end:0x80333388
 	.sbss2      start:0x80333E00 end:0x80333E04
 

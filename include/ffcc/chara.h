@@ -19,8 +19,13 @@ struct Vec;
 
 struct CCharaModelData
 {
-    u8 _pad0[0x24];
+    u8 _pad0[0xC];
+    u32 m_meshCount;
+    u8 _pad10[0x14];
     CMaterialSet* m_materialSet;
+    u8 _pad28[0xC];
+    u32 m_posQuant;
+    u32 m_normQuant;
 };
 
 void D3DXMatrixMultiplyRotate(float (*)[4], float (*)[4], float (*)[4]);
@@ -180,7 +185,9 @@ public:
 		Mtx m_matrix;
 		u32 m_meshVisibleMask;
 		float m_lightAlpha;
-		u8 _padA0[0x4];
+		u8 m_flagsA0;
+		u8 m_attachMode;
+		u8 _padA2[0x2];
 		CCharaModelData* m_data;
 		CNode* m_nodes;
 		CMesh* m_meshes;

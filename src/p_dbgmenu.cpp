@@ -211,14 +211,15 @@ void CDbgMenuPcs::calc()
 		case 0x65:
 			stackData[0].m_word = 0;
 			stackData[2].m_word = 0;
-			flags = (unsigned int)__cntlzw((int)((signed char)CFlatGameFlags() >> 7));
-			flags = ((int)(char)(flags >> 5) & 1U) << 7 | (CFlatGameFlags() & ~CFlatGameFlag_Shouki);
-			CFlatGameFlags() = (unsigned char)flags;
-			stackData[1].m_word = (int)(flags << 0x18) >> 0x1f;
+			unsigned char gameFlags = CFlatGameFlags();
+			flags = (unsigned int)__cntlzw((int)(s8)((s32)(((u32)gameFlags << 0x18) & 0xC0000000) >> 0x1f));
+			gameFlags = ((int)(char)(flags >> 5) & 1U) << 7 | (gameFlags & ~CFlatGameFlag_Shouki);
+			CFlatGameFlags() = gameFlags;
+			stackData[1].m_word = (s32)(((u32)gameFlags << 0x18) & 0xC0000000) >> 0x1f;
 			gCFlatRuntime().SystemCall(0, 1, 9, 3, stackData, 0);
 			break;
 		case 0x66:
-			flags = (unsigned int)__cntlzw((int)(char)((int)((unsigned int)(unsigned char)CFlatGameFlags() << 0x1d) >> 0x1f));
+			flags = (unsigned int)__cntlzw((int)(s8)((s32)(((u32)(u8)CFlatGameFlags() << 0x1d) & 0xC0000000) >> 0x1f));
 			CFlatGameFlags() = (unsigned char)((((int)(char)(flags >> 5) << 2) & CFlatGameFlag_Mark) |
 			                                   (CFlatGameFlags() & ~CFlatGameFlag_Mark));
 			break;
@@ -478,19 +479,14 @@ void CDbgMenuPcs::drawMenu(CDbgMenuPcs::CDM* menu)
 		GXSetViewport((f32)current->m_drawX, (f32)current->m_drawY, kDbgMenuViewportWidth, kDbgMenuViewportHeight,
 		              kDbgMenuViewportNear, kDbgMenuViewportFar);
 
-		int type = current->m_type;
-		if (type != 2) {
-			if (type < 2) {
-				if (type < 0) {
-				} else if (type == 0) {
-					drawWindow(current->m_y, 0, 0, current->m_unk18, current->m_unk1C, current->m_text);
-				} else {
-					drawFont(current->m_y, 0, 0, current->m_text);
-				}
-			} else if (type < 4) {
-				drawWindow((current->m_state != 0) ? 2 : 0, 1, 1, 0x1E, 0xE, 0);
-			}
-		} else {
+		switch (current->m_type) {
+		case 0:
+			drawWindow(current->m_y, 0, 0, current->m_unk18, current->m_unk1C, current->m_text);
+			break;
+		case 1:
+			drawFont(current->m_y, 0, 0, current->m_text);
+			break;
+		case 2: {
 			drawWindow((current->m_state != 0) ? 2 : 0, 1, 1, 0x1E, 0xE, 0);
 
 			const char* stateText;
@@ -504,6 +500,11 @@ void CDbgMenuPcs::drawMenu(CDbgMenuPcs::CDM* menu)
 			}
 
 			drawFont(9, 0x10, 8, const_cast<char*>(stateText));
+			break;
+		}
+		case 3:
+			drawWindow((current->m_state != 0) ? 2 : 0, 1, 1, 0x1E, 0xE, 0);
+			break;
 		}
 
 		current = current->m_next;

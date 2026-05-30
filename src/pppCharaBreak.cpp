@@ -117,19 +117,9 @@ struct CharaBreakMeshRef {
     S16Vec* m_workNormals;
 };
 
-struct CharaBreakModelData {
-    u8 _pad0[0xC];
-    u32 m_meshCount;
-    u8 _pad10[0x14];
-    void* m_materialSet;
-    u8 _pad28[0xC];
-    u32 m_posQuant;
-    u32 m_normQuant;
-};
-
 struct CharaBreakModelView {
     u8 _pad0[0xA4];
-    CharaBreakModelData* m_data;
+    CCharaModelData* m_data;
     void* m_nodes;
     CharaBreakMeshRef* m_meshes;
 };
@@ -140,10 +130,10 @@ STATIC_ASSERT(offsetof(CharaBreakMeshRef, m_workNormals) == 0x10);
 STATIC_ASSERT(offsetof(CharaBreakModelView, m_data) == 0xA4);
 STATIC_ASSERT(offsetof(CharaBreakModelView, m_nodes) == 0xA8);
 STATIC_ASSERT(offsetof(CharaBreakModelView, m_meshes) == 0xAC);
-STATIC_ASSERT(offsetof(CharaBreakModelData, m_meshCount) == 0xC);
-STATIC_ASSERT(offsetof(CharaBreakModelData, m_materialSet) == 0x24);
-STATIC_ASSERT(offsetof(CharaBreakModelData, m_posQuant) == 0x34);
-STATIC_ASSERT(offsetof(CharaBreakModelData, m_normQuant) == 0x38);
+STATIC_ASSERT(offsetof(CCharaModelData, m_meshCount) == 0xC);
+STATIC_ASSERT(offsetof(CCharaModelData, m_materialSet) == 0x24);
+STATIC_ASSERT(offsetof(CCharaModelData, m_posQuant) == 0x34);
+STATIC_ASSERT(offsetof(CCharaModelData, m_normQuant) == 0x38);
 STATIC_ASSERT(offsetof(CharaBreakMeshData, m_displayListCount) == 0x4C);
 STATIC_ASSERT(offsetof(CharaBreakMeshData, m_displayLists) == 0x50);
 STATIC_ASSERT(offsetof(CharaBreakMeshData, m_skinCount) == 0x54);
@@ -154,9 +144,9 @@ static inline MtxPtr ModelDrawMtx(CChara::CModel* model)
     return reinterpret_cast<MtxPtr>(reinterpret_cast<u8*>(model) + 0x8);
 }
 
-static inline CharaBreakModelData* ModelData(CChara::CModel* model)
+static inline CCharaModelData* ModelData(CChara::CModel* model)
 {
-    return *reinterpret_cast<CharaBreakModelData**>(reinterpret_cast<u8*>(model) + 0xA4);
+    return model->m_data;
 }
 
 static inline void* ModelNodes(CChara::CModel* model)
@@ -515,7 +505,7 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
 {
     CharaBreakStep* stepData = (CharaBreakStep*)step;
     CharaBreakWork* workData = (CharaBreakWork*)work;
-    CharaBreakModelData* modelData = reinterpret_cast<CharaBreakModelData*>(model->m_data);
+    CCharaModelData* modelData = model->m_data;
     CChara::CMesh* mesh = model->m_meshes;
     u32 meshIndex;
     s16 threshold;

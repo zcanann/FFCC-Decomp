@@ -15,6 +15,8 @@
 #include <math.h>
 
 extern const char sCFlatRuntime2SetClassSystemValWarn[];
+extern const float FLOAT_80330BC8;
+extern const float FLOAT_80330BCC;
 
 namespace {
 
@@ -332,19 +334,21 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 				case -0x18:
 					StoreF32(stack, engineObject, 0x1BC, setMode);
 					break;
-				case -0x1A: {
-					stack[-1].m_word = static_cast<unsigned int>(static_cast<signed char>(*(engineObject + 0x56)));
-					signed char value = static_cast<signed char>(stack[-1].m_word);
-					if (setMode == 0) {
-						value = static_cast<signed char>(stack->m_word);
-					} else if (setMode == -1) {
-						value = static_cast<signed char>(value - static_cast<signed char>(stack->m_word));
-					} else if (setMode == 1) {
-						value = static_cast<signed char>(value + static_cast<signed char>(stack->m_word));
+					case -0x1A: {
+						int value = 0;
+						*reinterpret_cast<float*>(&stack[-1].m_word) = FLOAT_80330BC8;
+						if (setMode == 0) {
+							value = static_cast<int>(*reinterpret_cast<float*>(&stack->m_word));
+						} else if (setMode < 0) {
+							if (setMode > -2) {
+								value = static_cast<int>(FLOAT_80330BC8 - *reinterpret_cast<float*>(&stack->m_word));
+							}
+						} else if (setMode < 2) {
+							value = static_cast<int>(FLOAT_80330BC8 + *reinterpret_cast<float*>(&stack->m_word));
+						}
+						*(engineObject + 0x56) = static_cast<u8>(static_cast<int>(FLOAT_80330BCC * static_cast<float>(value)));
+						break;
 					}
-					*(engineObject + 0x56) = static_cast<u8>(value);
-					break;
-				}
 				case -0x1B:
 					StoreU32(stack, engineObject, 0x60, setMode);
 					break;

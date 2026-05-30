@@ -143,9 +143,9 @@ static void AddMesFlag(CMes* mes, unsigned char type, unsigned char index, short
 unsigned long CMes::drawTagString(CFont* font, char* text, int drawChars, int breakOnLineTag, int lineBaseY)
 {
 	int width = 0;
-	unsigned char* src = (unsigned char*)text;
 	bool continueDraw = true;
 	float lineStartX = font->posX;
+	unsigned char* src = (unsigned char*)text;
 
 	while (continueDraw)
 	{

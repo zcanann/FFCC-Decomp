@@ -2008,7 +2008,7 @@ void brush(unsigned short* pixels, int width, int height, float fx, float fy, in
 					a = 0;
 				}
 			} else {
-				float k = (float)(distance / 4) + (float)(7 - targetColor.a) / 8.0f;
+				float k = (float)(7 - targetColor.a) * 0.125f + (float)(distance / 4);
 				if (k > 1.0f) {
 					k = 1.0f;
 				}

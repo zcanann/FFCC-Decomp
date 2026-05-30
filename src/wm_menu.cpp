@@ -6624,6 +6624,33 @@ void CMenuPcs::GetAnimNo(int animNo, int)
  */
 void CMenuPcs::DrawChara()
 {
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	unsigned char* const worldObj = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x814)[0]);
+	bool drewModel = false;
+
+	for (int i = 0; i < kWmMenuPlayerCount; i++) {
+		unsigned char* const view = worldObj + 0xA00 + i * 0x50;
+		if (*reinterpret_cast<int*>(view) == 0) {
+			continue;
+		}
+
+		CCharaPcs::CHandle* const handle = GetWmCharaHandles(this)[i];
+		if (handle == 0) {
+			continue;
+		}
+		if (handle->m_charaKind != 3 && handle->m_currentAnimIndex < 0) {
+			continue;
+		}
+
+		SetProjection(i + 0x20);
+		handle->Draw(5);
+		drewModel = true;
+	}
+
+	if (drewModel) {
+		RestoreProjection();
+	}
+
 	DrawCharaName();
 	DrawCMLife();
 }

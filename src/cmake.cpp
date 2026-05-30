@@ -3124,7 +3124,7 @@ void CMenuPcs::CmakeResultDraw1()
     labelFont->DrawInit();
 
     int textColor = static_cast<int>(static_cast<double>(FLOAT_80333240) * textAlpha);
-    CColor color(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textColor));
+    GXColor color = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(textColor)};
     labelFont->SetColor(color);
 
     float labelWidths[4];

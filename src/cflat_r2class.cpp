@@ -1432,16 +1432,11 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
-		case -0x8C: {
-			CGObject* target = 0;
-			if (localBase[0] != 0) {
-				target = FindRuntimeObject(this, localBase[0]);
-			}
-			engineObject->LookAt(target, RuntimeString(this, localBase[1]));
+		case -0x8C:
+			engineObject->LookAt(localBase[0] != 0 ? FindRuntimeObject(this, localBase[0]) : 0, RuntimeString(this, localBase[1]));
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
-		}
 		case -0x8D:
 			reinterpret_cast<CGPartyObj*>(engineObject)->commandFinished();
 			PushValue(this, object, 0);

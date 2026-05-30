@@ -337,23 +337,22 @@ update_step:
         return;
     }
 
-    trailLen = trailStep - trailStepDelta;
     colorR -= colorStepR;
     colorG -= colorStepG;
     colorB -= colorStepB;
     colorA -= colorStepA;
     shapeScale -= shapeScaleStep;
-    trailStep = trailLen;
-    if (trailLen <= 0.0f) {
+    trailStep -= trailStepDelta;
+    if (trailStep <= zero) {
         return;
     }
 
-    if (segRemain >= trailLen) {
+    if (segRemain >= trailStep) {
         pos.x = segDx * (segCursor / segLen) + segBaseX;
         pos.y = segDy * (segCursor / segLen) + segBaseY;
         pos.z = segDz * (segCursor / segLen) + segBaseZ;
-        segCursor += trailLen;
-        segRemain -= trailLen;
+        segCursor += trailStep;
+        segRemain -= trailStep;
         segBaseX = pos.x;
         segBaseY = pos.y;
         segBaseZ = pos.z;

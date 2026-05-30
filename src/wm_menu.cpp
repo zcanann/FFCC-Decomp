@@ -1343,11 +1343,14 @@ void CMenuPcs::CalcDiaryMenu()
 		if (*reinterpret_cast<short*>(bytes + 0x868) == 0) {
 			if (worldState[0x0C] == 0) {
 				unsigned char* const selectData = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x824)[0]);
-				if (selectData != 0) {
-					for (int i = 0; i < kWmMenuPlayerCount; i++) {
-						selectData[i * 0x34 + 0x0C] = 1;
-					}
-				}
+				selectData[0x0C] = 1;
+				selectData[0x40] = 1;
+				selectData[0x74] = 1;
+				selectData[0xA8] = 1;
+				selectData[0xDC] = 1;
+				selectData[0x110] = 1;
+				selectData[0x144] = 1;
+				selectData[0x178] = 1;
 				worldState[0x0C] = 1;
 			}
 			if (*reinterpret_cast<short*>(worldState + 0x10) < 5) {

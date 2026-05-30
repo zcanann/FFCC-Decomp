@@ -3711,14 +3711,51 @@ void CMenuPcs::DrawCMakeMenu()
 void CMenuPcs::DrawMoveMenu()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	if (reinterpret_cast<unsigned int*>(bytes + 0x82C)[0] == 0) {
+	short* const worldState = reinterpret_cast<short*>(reinterpret_cast<unsigned int*>(bytes + 0x82C)[0]);
+	if (worldState == 0) {
 		return;
 	}
 
-	DrawMainMenuSub();
-	DrawWMFrame();
+	const short state = worldState[0x10 / sizeof(short)];
+	if (((state == 0) && bytes[0x12] == 0) || state >= 4) {
+		return;
+	}
+
 	DrawFukidashi();
-	DrawCharaBase();
+	DrawWMFrame();
+
+	if (worldState[0x10 / sizeof(short)] != 2 || bytes[0x13] != 0) {
+		worldState[0x22 / sizeof(short)]++;
+	}
+
+	if (worldState[0x10 / sizeof(short)] == 0 ||
+	    (worldState[0x10 / sizeof(short)] == 2 && bytes[0x13] != 0)) {
+		if (static_cast<double>(*reinterpret_cast<float*>(worldState)) <= DOUBLE_803314f0) {
+			worldState[0x10 / sizeof(short)]++;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned int*>(bytes + 0x81C)[0] + 4) = 0;
+			*reinterpret_cast<int*>(reinterpret_cast<unsigned int*>(bytes + 0x81C)[0] + 8) = 0;
+			worldState[0x22 / sizeof(short)] = 0;
+		}
+	} else if (worldState[0x10 / sizeof(short)] == 1 && worldState[0x22 / sizeof(short)] > 9) {
+		worldState[0x10 / sizeof(short)]++;
+		worldState[0x22 / sizeof(short)] = 0;
+		CFlatRuntime::CStack stackData[3];
+		stackData[0].m_word = 3;
+		stackData[1].m_word = 0;
+		stackData[2].m_word = 0;
+		gCFlatRuntime().SystemCall(0, 1, 4, 3, stackData, 0);
+	} else if (worldState[0x10 / sizeof(short)] == 2 && worldState[0x22 / sizeof(short)] > 9) {
+		worldState[0x10 / sizeof(short)]++;
+		worldState[0x22 / sizeof(short)] = 0;
+	} else if (worldState[0x10 / sizeof(short)] == 3 && worldState[0x22 / sizeof(short)] > 9) {
+		worldState[0x10 / sizeof(short)]++;
+		worldState[0x22 / sizeof(short)] = 0;
+		CFlatRuntime::CStack stackData[3];
+		stackData[0].m_word = 4;
+		stackData[1].m_word = 0;
+		stackData[2].m_word = 0;
+		gCFlatRuntime().SystemCall(0, 1, 4, 3, stackData, 0);
+	}
 }
 
 /*

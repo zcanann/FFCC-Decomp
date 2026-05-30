@@ -44,6 +44,14 @@ extern int DAT_8032e8c0;
 extern float* DAT_8032e8cc;
 extern int DAT_8032e8c8;
 extern int DAT_8032e8ac;
+extern int DAT_8032E8D0;
+extern float* DAT_8032E8D4;
+extern int DAT_8032E8D8;
+extern float* DAT_8032E8DC;
+extern int DAT_8032E8E0;
+extern float* DAT_8032E8E4;
+extern int DAT_8032E8E8;
+extern float* DAT_8032E8EC;
 extern "C" unsigned char DAT_8032E8A8[];
 extern int DAT_8032ef08;
 extern int DAT_80238028;
@@ -101,7 +109,11 @@ extern float FLOAT_80331748;
 extern float FLOAT_8033174c;
 extern float FLOAT_80331750;
 extern float FLOAT_80331754;
+extern float FLOAT_80331610;
+extern float FLOAT_80331614;
 extern float FLOAT_80331618;
+extern float FLOAT_8033161C;
+extern float FLOAT_80331620;
 extern float FLOAT_80331410;
 extern float FLOAT_80331458;
 extern float FLOAT_803316d4;
@@ -151,6 +163,9 @@ extern float FLOAT_803315B8;
 extern float FLOAT_803315BC;
 extern float FLOAT_803315C8;
 extern float FLOAT_8033158C;
+extern float FLOAT_803315E0;
+extern float FLOAT_803315E4;
+extern float FLOAT_803315E8;
 extern float FLOAT_80331778;
 extern float FLOAT_8033177c;
 extern float FLOAT_80331780;
@@ -179,6 +194,13 @@ extern double DOUBLE_803314E8;
 extern double DOUBLE_80331498;
 extern double DOUBLE_80331510;
 extern double DOUBLE_803315C0;
+extern double DOUBLE_803315D8;
+extern double DOUBLE_803315F0;
+extern double DOUBLE_803315F8;
+extern double DOUBLE_80331600;
+extern double DOUBLE_80331608;
+extern double DOUBLE_80331628;
+extern double DOUBLE_80331630;
 extern double DOUBLE_80331670;
 extern double DOUBLE_80331678;
 extern double DOUBLE_80331420;
@@ -251,6 +273,48 @@ struct WmMenuLightTable
 };
 
 extern "C" WmMenuLightTable gWmMenuLightTables[];
+
+#define WM_MENU_EVAL_SPLINE(result, table, count, time)                                      \
+	do {                                                                                       \
+		float* wmSplineTable = (table);                                                        \
+		int wmSplineCount = (count);                                                           \
+		result = FLOAT_803313dc;                                                               \
+		if ((time) < wmSplineTable[wmSplineCount * 4 - 4]) {                                   \
+			int wmSplineIndex = 0;                                                             \
+			while (wmSplineCount != 0) {                                                       \
+				if ((time) <= *wmSplineTable) {                                                \
+					if (wmSplineIndex == 0) {                                                  \
+						result = (table)[1];                                                    \
+					} else {                                                                   \
+						float* wmSplineCur = (table) + wmSplineIndex * 4;                       \
+						float* wmSplinePrev = (table) + (wmSplineIndex - 1) * 4;                \
+						float wmSplineDt = *wmSplineCur - *wmSplinePrev;                       \
+						float wmSplineU = ((time) - *wmSplinePrev) / wmSplineDt;               \
+						float wmSplineU2 = wmSplineU * wmSplineU;                              \
+						float wmSplineU3 = wmSplineU2 * wmSplineU;                             \
+						result = wmSplineDt *                                                   \
+						             (wmSplinePrev[3] *                                       \
+						                  (wmSplineU - (FLOAT_803314c8 * wmSplineU2 -          \
+						                                wmSplineU3)) +                         \
+						              wmSplineCur[2] * (wmSplineU3 - wmSplineU2)) +            \
+						         wmSplinePrev[1] *                                             \
+						             (FLOAT_803313e8 +                                        \
+						              (FLOAT_803314c8 * wmSplineU3 - FLOAT_803314c4 *          \
+						                                                wmSplineU2)) +          \
+						         wmSplineCur[1] *                                              \
+						             (FLOAT_803314cc * wmSplineU3 + FLOAT_803314c4 *           \
+						                                                wmSplineU2);            \
+					}                                                                          \
+					break;                                                                     \
+				}                                                                              \
+				wmSplineTable += 4;                                                            \
+				wmSplineIndex++;                                                               \
+				wmSplineCount--;                                                               \
+			}                                                                                  \
+		} else {                                                                               \
+			result = (table)[(count) * 4 - 3];                                                  \
+		}                                                                                      \
+	} while (0)
 
 struct WmCharaSelectEntry
 {
@@ -8474,6 +8538,151 @@ void CMenuPcs::CalcMainMenuSub()
 						Sound.PlaySe(3, 0x40, 0x7F, 0);
 					}
 				}
+			}
+		}
+
+		unsigned char* const worldObj = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x814)[0]);
+		Mtx baseMtx;
+		Mtx rotMtx;
+		Mtx workMtx;
+		Mtx modelMtx;
+		Mtx scaleMtx;
+		Vec basePos;
+		Vec modelPos;
+
+		PSMTXRotRad(baseMtx, 'x', FLOAT_803315d0);
+		PSMTXRotRad(rotMtx, 'y', FLOAT_803314bc * -*reinterpret_cast<float*>(bytes + 0x7C));
+		PSMTXConcat(baseMtx, rotMtx, baseMtx);
+
+		float t = static_cast<float>(*reinterpret_cast<short*>(world + 0x24)) / FLOAT_803314c0;
+		float selectedRotY;
+		float selectedRotZ;
+		float selectedYOffset;
+		WM_MENU_EVAL_SPLINE(selectedRotY, DAT_8032E8D4, DAT_8032E8D0, t);
+		WM_MENU_EVAL_SPLINE(selectedRotZ, DAT_8032E8DC, DAT_8032E8D8, t);
+		WM_MENU_EVAL_SPLINE(selectedYOffset, DAT_8032E8E4, DAT_8032E8E0, t);
+
+		float openScale = FLOAT_803313dc;
+		if (*reinterpret_cast<short*>(world + 0x1E) != -1) {
+			t = static_cast<float>(0x14 - *reinterpret_cast<short*>(world + 0x18)) / FLOAT_803314c0;
+			WM_MENU_EVAL_SPLINE(openScale, DAT_8032E8EC, DAT_8032E8E8, t);
+		}
+
+		if (state == 2 && *reinterpret_cast<short*>(world + 0x18) == 0) {
+			(*reinterpret_cast<short*>(world + 0x24))++;
+			if (*reinterpret_cast<short*>(world + 0x24) > 99) {
+				*reinterpret_cast<short*>(world + 0x24) = 0;
+			}
+		} else {
+			*reinterpret_cast<short*>(world + 0x24) = 0;
+		}
+
+		for (int i = 0; i < 5; i++) {
+			const short curState = *reinterpret_cast<short*>(world + 0x10);
+			if (!(((curState > 0) && (curState < 4)) || i == 1)) {
+				continue;
+			}
+
+			unsigned char* const panel = worldObj + i * 0x50;
+			panel[0] = 1;
+			float modelScale = FLOAT_803315d4;
+			if (i == 0) {
+				modelScale = static_cast<float>(static_cast<double>(modelScale) * DOUBLE_803315D8);
+			}
+
+			*reinterpret_cast<float*>(panel + 0x1C) = FLOAT_803313dc;
+			*reinterpret_cast<float*>(panel + 0x20) = FLOAT_803313dc;
+			*reinterpret_cast<float*>(panel + 0x24) = FLOAT_803315E0;
+			*reinterpret_cast<float*>(panel + 0x28) = FLOAT_803313dc;
+			*reinterpret_cast<float*>(panel + 0x2C) = FLOAT_803315E4 * static_cast<float>(i);
+			*reinterpret_cast<float*>(panel + 0x30) = FLOAT_803313dc;
+			*reinterpret_cast<float*>(panel + 0x34) = modelScale;
+			*reinterpret_cast<float*>(panel + 0x38) = modelScale;
+			*reinterpret_cast<float*>(panel + 0x3C) = modelScale;
+
+			PSMTXRotRad(workMtx, 'y', FLOAT_803314bc * *reinterpret_cast<float*>(panel + 0x2C));
+			PSMTXMultVecSR(workMtx, reinterpret_cast<Vec*>(panel + 0x1C), &basePos);
+			PSMTXTransApply(workMtx, rotMtx, basePos.x, basePos.y, basePos.z);
+			PSMTXConcat(baseMtx, rotMtx, workMtx);
+			modelPos.x = workMtx[0][3];
+			modelPos.y = workMtx[1][3];
+			modelPos.z = workMtx[2][3];
+			PSMTXIdentity(modelMtx);
+
+			if (i == 0) {
+				PSMTXRotRad(rotMtx, 'y', FLOAT_803315E8);
+				PSMTXRotRad(scaleMtx, 'x', FLOAT_803315d0);
+				PSMTXConcat(rotMtx, scaleMtx, modelMtx);
+			} else if (i == 1) {
+				if (*reinterpret_cast<short*>(world + 0x1E) == -1 || *reinterpret_cast<short*>(world + 0x26) != 1 ||
+				    *reinterpret_cast<short*>(world + 0x10) == 2) {
+					PSMTXRotRad(modelMtx, 'x', FLOAT_80331610);
+				} else {
+					unsigned int frame = 0x13 - (*reinterpret_cast<short*>(world + 0x22) +
+					                              *reinterpret_cast<short*>(world + 0x10) * 10);
+					if (static_cast<int>(frame) < 0) {
+						frame = 0;
+					}
+					float rot = static_cast<float>(
+					    DOUBLE_803315F0 *
+					    (DOUBLE_803315F8 + DOUBLE_80331600 *
+					                           (static_cast<double>(static_cast<float>(frame)) / DOUBLE_80331608)));
+					PSMTXRotRad(modelMtx, 'x', rot);
+				}
+			} else {
+				PSMTXRotRad(modelMtx, 'x', FLOAT_80331614);
+			}
+
+			if (*reinterpret_cast<short*>(world + 0x26) == i) {
+				PSMTXRotRad(rotMtx, 'z', FLOAT_803314bc * selectedRotZ);
+				PSMTXRotRad(scaleMtx, 'y', FLOAT_803314bc * selectedRotY);
+				PSMTXConcat(rotMtx, scaleMtx, rotMtx);
+				PSMTXConcat(rotMtx, modelMtx, modelMtx);
+			}
+
+			s_MMenuPos[i].x = modelPos.x;
+			s_MMenuPos[i].y = static_cast<float>(static_cast<double>(modelPos.y) + DOUBLE_80331418);
+			s_MMenuPos[i].z = modelPos.z;
+			PSMTXTransApply(modelMtx, workMtx, FLOAT_803313dc, FLOAT_803313dc, modelPos.z);
+			PSMTXScaleApply(workMtx, modelMtx, *reinterpret_cast<float*>(panel + 0x34),
+			                *reinterpret_cast<float*>(panel + 0x38), *reinterpret_cast<float*>(panel + 0x3C));
+			if (i == 0) {
+				PSMTXTransApply(modelMtx, modelMtx, FLOAT_80331618, FLOAT_8033161C, FLOAT_803313dc);
+			} else if (i == 1) {
+				PSMTXTransApply(modelMtx, modelMtx, FLOAT_80331620, FLOAT_803313dc, FLOAT_803313dc);
+			}
+			if (*reinterpret_cast<short*>(world + 0x26) == i) {
+				modelMtx[1][3] = static_cast<float>(static_cast<double>(modelMtx[1][3]) +
+				                                    static_cast<double>(selectedYOffset));
+			}
+
+			if (*reinterpret_cast<short*>(world + 0x1E) != -1 && *reinterpret_cast<short*>(world + 0x26) == i &&
+			    *reinterpret_cast<short*>(world + 0x18) != 0) {
+				PSMTXScale(scaleMtx, openScale, openScale, openScale);
+				PSMTXConcat(scaleMtx, modelMtx, modelMtx);
+			}
+
+			CCharaPcs::CHandle* const handle = GetWmWorldHandles(this)[i];
+			if (handle != 0 && handle->m_model != 0) {
+				if (curState == 1) {
+					*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C) =
+					    static_cast<float>(DOUBLE_803314e8 * static_cast<double>(*reinterpret_cast<short*>(world + 0x22)));
+				} else if (curState == 2) {
+					*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C) = FLOAT_803313e8;
+				} else if (curState == 3) {
+					*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C) =
+					    static_cast<float>(-(DOUBLE_803314e8 * static_cast<double>(*reinterpret_cast<short*>(world + 0x22)) -
+					                         DOUBLE_80331420));
+				} else {
+					*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C) = FLOAT_803313dc;
+				}
+				if (*reinterpret_cast<short*>(world + 0x1E) != -1 && *reinterpret_cast<short*>(world + 0x26) == 1 &&
+				    i == 1) {
+					*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C) = FLOAT_803313e8;
+				}
+				handle->m_model->SetMatrix(modelMtx);
+				handle->m_model->CalcMatrix();
+				handle->m_model->CalcSkin();
 			}
 		}
 	}

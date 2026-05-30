@@ -246,6 +246,7 @@ extern double DOUBLE_803316e8;
 extern double DOUBLE_80331720;
 extern double DOUBLE_80331730;
 extern double DOUBLE_80331738;
+extern double DOUBLE_80331770;
 extern float FLOAT_803317e0;
 extern float FLOAT_803317e4;
 extern float FLOAT_803317e8;
@@ -4937,11 +4938,14 @@ void CMenuPcs::DrawTitleMenu()
 		DrawInit();
 
 		// Fade-in overlay (state 1)
-		worldState = *reinterpret_cast<int*>(bytes + 0x82C);
-		state = *reinterpret_cast<short*>(worldState + 0x10);
-		if (state == 1 && DAT_8032e8ac == 0) {
-			float fadeAlpha = (float)*reinterpret_cast<short*>(worldState + 0x22);
-			SetAttrFmt((FMT)2);
+			worldState = *reinterpret_cast<int*>(bytes + 0x82C);
+			state = *reinterpret_cast<short*>(worldState + 0x10);
+			if (state == 1 && DAT_8032e8ac == 0) {
+				float fadeAlpha = static_cast<float>(-(DOUBLE_80331770 *
+				                                        (static_cast<double>(*reinterpret_cast<short*>(worldState + 0x22)) -
+				                                         DOUBLE_80331408) -
+				                                        DOUBLE_80331420));
+				SetAttrFmt((FMT)2);
 			unsigned int fadeColor = (unsigned int)(FLOAT_80331458 * fadeAlpha) & 0xFF;
 			fadeColor = fadeColor | (fadeColor << 8) | (fadeColor << 16) | (fadeColor << 24);
 			GXSetChanMatColor(GX_COLOR0A0, *(_GXColor*)&fadeColor);

@@ -180,7 +180,9 @@ public:
 		Mtx m_matrix;
 		u32 m_meshVisibleMask;
 		float m_lightAlpha;
-		u8 _padA0[0x4];
+		u8 m_flagsA0;
+		u8 m_attachMode;
+		u8 _padA2[0x2];
 		CCharaModelData* m_data;
 		CNode* m_nodes;
 		CMesh* m_meshes;

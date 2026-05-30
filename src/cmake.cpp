@@ -1393,12 +1393,6 @@ void CMenuPcs::DrawCmakeCrest(int tribe, int x, int y, float alpha)
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
     int a = static_cast<int>(static_cast<double>(FLOAT_80333240) * alpha);
-    if (a < 0) {
-        a = 0;
-    } else if (a > 0xFF) {
-        a = 0xFF;
-    }
-
     GXColor col = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a)};
     GXSetChanMatColor(GX_COLOR0A0, col);
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x31));
@@ -1744,7 +1738,8 @@ int CMenuPcs::CmakeNameCtrl()
     if (padBusy) {
         down = 0;
     } else {
-        down = Pad.GetPadInputs()[0].buttonDown[0];
+        __cntlzw(static_cast<unsigned int>(Pad._448_4_));
+        down = static_cast<unsigned short>(Pad.GetPadInputs()[0].buttonDown[0]);
     }
 
     padBusy = false;
@@ -1754,6 +1749,7 @@ int CMenuPcs::CmakeNameCtrl()
     if (padBusy) {
         repeat = 0;
     } else {
+        __cntlzw(static_cast<unsigned int>(Pad._448_4_));
         repeat = Pad.GetPadInputs()[0].repeatButton;
     }
 
@@ -2277,7 +2273,8 @@ unsigned short CMenuPcs::CmakeTribeCtrl()
     if (padBusy) {
         down = 0;
     } else {
-        down = Pad.GetPadInputs()[0].buttonDown[0];
+        __cntlzw(static_cast<unsigned int>(Pad._448_4_));
+        down = static_cast<unsigned short>(Pad.GetPadInputs()[0].buttonDown[0]);
     }
 
     padBusy = false;
@@ -2287,6 +2284,7 @@ unsigned short CMenuPcs::CmakeTribeCtrl()
     if (padBusy) {
         repeat = 0;
     } else {
+        __cntlzw(static_cast<unsigned int>(Pad._448_4_));
         repeat = Pad.GetPadInputs()[0].repeatButton;
     }
 
@@ -2455,12 +2453,6 @@ void CMenuPcs::CmakeTribeDraw()
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
     int a = static_cast<int>(static_cast<double>(FLOAT_80333240) * alpha);
-    if (a < 0) {
-        a = 0;
-    } else if (a > 0xFF) {
-        a = 0xFF;
-    }
-
     GXColor col = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a)};
     GXSetChanMatColor(GX_COLOR0A0, col);
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((MenuS16(this, 0x86C) != 0) ? 0x61 : 0x3A));
@@ -2983,11 +2975,11 @@ void CMenuPcs::CmakeResultDraw()
 
     DrawCmakeCrest(static_cast<int>(s_CmakeInfo.m_tribe), 0, 0, textAlpha);
 
+    int yesNoSel = 0;
     if (*reinterpret_cast<short*>(state + 0x10) == 1) {
-        DrawCmakeYesNo(*reinterpret_cast<short*>(state + 0x26) + 1, alpha);
-    } else {
-        DrawCmakeYesNo(0, alpha);
+        yesNoSel = *reinterpret_cast<short*>(state + 0x26) + 1;
     }
+    DrawCmakeYesNo(yesNoSel, alpha);
 
     CFont* labelFont = CmakeFields(this).m_fonts[CMAKE_FONT_LABEL];
     labelFont->SetMargin(FLOAT_80333258);

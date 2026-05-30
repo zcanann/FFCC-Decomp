@@ -2548,10 +2548,18 @@ unsigned short CMenuPcs::CmakeJobCtrl()
 
     if (mcState == 3) {
         if ((repeat & 0x8) != 0) {
-            job = ((job % 4) == 0) ? static_cast<short>(job + 3) : static_cast<short>(job - 1);
+            if ((job % 4) == 0) {
+                job = static_cast<short>(job + 3);
+            } else {
+                job = static_cast<short>(job - 1);
+            }
             Sound.PlaySe(1, 0x40, 0x7F, 0);
         } else if ((repeat & 0x4) != 0) {
-            job = ((job % 4) < 3) ? static_cast<short>(job + 1) : static_cast<short>(job - 3);
+            if ((job % 4) < 3) {
+                job = static_cast<short>(job + 1);
+            } else {
+                job = static_cast<short>(job - 3);
+            }
             Sound.PlaySe(1, 0x40, 0x7F, 0);
         }
 

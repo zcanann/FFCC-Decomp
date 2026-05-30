@@ -1197,6 +1197,16 @@ void CMenuPcs::CalcDiaryMenu()
 
 	switch (*reinterpret_cast<short*>(worldState + 0x1C)) {
 	case 0:
+		if (*reinterpret_cast<short*>(worldState + 0x10) < 5) {
+			const short state = *reinterpret_cast<short*>(worldState + 0x10);
+			int frameStep = 0;
+			if (state == 0) {
+				frameStep = *reinterpret_cast<short*>(worldState + 0x22) - 10;
+			} else if (state < 1 || state > 3) {
+				frameStep = -*reinterpret_cast<short*>(worldState + 0x22);
+			}
+			CalcWMFrame0(frameStep);
+		}
 		CalcMainMenuSub();
 		break;
 	case 1:
@@ -1218,6 +1228,14 @@ void CMenuPcs::CalcDiaryMenu()
 			}
 			if (*reinterpret_cast<short*>(worldState + 0x10) < 5) {
 				CalcCharaSelect();
+				const short state = *reinterpret_cast<short*>(worldState + 0x10);
+				int frameStep = 0;
+				if (state == 0) {
+					frameStep = *reinterpret_cast<short*>(worldState + 0x22) - 10;
+				} else if (state < 1 || state > 3) {
+					frameStep = -*reinterpret_cast<short*>(worldState + 0x22);
+				}
+				CalcWMFrame0(frameStep);
 				const short animState = *reinterpret_cast<short*>(worldState + 0x10);
 				if (animState > 0 && animState < 4) {
 					CalcChara();

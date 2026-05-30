@@ -348,7 +348,7 @@ static inline void InitSelectOpenPartyName(BonusAnimSprite* sprite, const BonusA
 	BonusSpriteFlags(sprite) = 0x10000;
 }
 
-static void SetupSelectCloseSpriteMotion(BonusAnimSprite* sprite)
+static inline void SetupSelectCloseSpriteMotion(BonusAnimSprite* sprite)
 {
 	sprite->timer = 0;
 	sprite->startFrame = 0;

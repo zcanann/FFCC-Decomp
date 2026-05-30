@@ -162,9 +162,7 @@ unsigned long CMes::drawTagString(CFont* font, char* text, int drawChars, int br
 				if ((tag == 0) && (breakOnLineTag != 0))
 				{
 					font->SetPosX((float)(int)lineStartX);
-					float y = (float)lineBaseY + font->posY;
-					y += (float)font->m_glyphHeight * font->scaleY;
-					font->SetPosY(y);
+					font->SetPosY((float)lineBaseY + font->posY + (float)font->m_glyphHeight * font->scaleY);
 				}
 			}
 			else
@@ -182,7 +180,7 @@ unsigned long CMes::drawTagString(CFont* font, char* text, int drawChars, int br
 		}
 	}
 
-	return (unsigned long)width;
+	return width;
 }
 /*
  * --INFO--

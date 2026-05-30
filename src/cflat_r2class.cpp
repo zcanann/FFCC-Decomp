@@ -664,10 +664,11 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 		}
 		case -7:
 			engineObject->m_animStateMisc = static_cast<unsigned char>(localBase[0]);
-			if (((static_cast<signed char>(engineObject->m_animStateMisc) < 0) ||
-			        (static_cast<signed char>(engineObject->m_animStateMisc) > 3)) &&
-			    static_cast<unsigned int>(System.m_execParam) >= 2) {
-				System.Printf(const_cast<char*>(sCFlatRuntime2AnimStateWarn));
+			{
+				signed char animState = static_cast<signed char>(engineObject->m_animStateMisc);
+				if (((animState < 0) || (animState >= 4)) && static_cast<unsigned int>(System.m_execParam) >= 2) {
+					System.Printf(const_cast<char*>(sCFlatRuntime2AnimStateWarn));
+				}
 			}
 			PushValue(this, object, 0);
 			outResult = 0;

@@ -121,6 +121,9 @@ extern float FLOAT_80331694;
 extern float FLOAT_80331410;
 extern float FLOAT_80331458;
 extern float FLOAT_803316d4;
+extern float FLOAT_803316F0;
+extern float FLOAT_803316F4;
+extern float FLOAT_803316F8;
 extern float FLOAT_80331760;
 extern float FLOAT_80331764;
 extern float FLOAT_803315b0;
@@ -6351,60 +6354,105 @@ void CMenuPcs::DrawWMFrame()
 			gaugeAlpha);
 
 		if (sVar < 3) {
+			const unsigned int language = Game.m_gameWork.m_languageId;
 			SetAttrFmt((FMT)0);
+			GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
+			GXSetChanMatColor(static_cast<GXChannelID>(4), white);
 			SetTexture((TEX)0x21);
+			float yearY = FLOAT_803316F4;
+			if (language == 5) {
+				yearY = FLOAT_803316F8;
+			}
 			DrawRect(0xFFFFFFFF, 
-				FLOAT_803313dc, FLOAT_803313dc,
-				FLOAT_803313dc, FLOAT_803313dc,
+				FLOAT_803316F0, yearY,
+				FLOAT_80331440, FLOAT_80331558,
 				FLOAT_803313dc, FLOAT_803313dc,
 				FLOAT_803313e8, FLOAT_803313e8,
-				uAlpha);
+				0);
 
 			int digitCnt = 1;
 			unsigned int lvl = (unsigned int)gWmMenuScriptValueCache;
 			if (lvl > 99) digitCnt = 3;
 			else if (lvl > 9) digitCnt = 2;
+			const int languageYOffset = language == 5 ? 0xE : 0;
 
 			if (digitCnt == 3) {
 				int off = wmFrame + 0xB4;
+				unsigned char alphaU8 =
+				    static_cast<unsigned char>(static_cast<int>(DOUBLE_80331508 * static_cast<double>(*reinterpret_cast<float*>(off + 0x10))));
+				GXColor color = {0xFF, 0xFF, 0xFF, alphaU8};
+				GXSetChanMatColor(static_cast<GXChannelID>(4), color);
 				SetAttrFmt((FMT)0);
 				SetTexture((TEX)0x20);
 				DrawRect(0xFFFFFFFF, 
 					(float)*reinterpret_cast<short*>(off),
-					(float)*reinterpret_cast<short*>(off + 2),
+					(float)(*reinterpret_cast<short*>(off + 2) + languageYOffset),
 					(float)*reinterpret_cast<short*>(off + 4),
 					(float)*reinterpret_cast<short*>(off + 6),
 					*reinterpret_cast<float*>(off + 8),
 					*reinterpret_cast<float*>(off + 0xC),
-					FLOAT_803313e8,
-					FLOAT_803313e8,
-					uAlpha);
+					*reinterpret_cast<float*>(off + 0x14),
+					*reinterpret_cast<float*>(off + 0x14),
+					0);
 			} else {
 				for (int i = 0; i < (int)digitCnt; i++) {
 					int off = wmFrame + 0xB4 + i * 0x1C;
+					unsigned char alphaU8 =
+					    static_cast<unsigned char>(static_cast<int>(DOUBLE_80331508 * static_cast<double>(*reinterpret_cast<float*>(off + 0x10))));
+					GXColor color = {0xFF, 0xFF, 0xFF, alphaU8};
+					GXSetChanMatColor(static_cast<GXChannelID>(4), color);
 					SetAttrFmt((FMT)0);
 					SetTexture((TEX)0x1F);
 					DrawRect(0xFFFFFFFF, 
 						(float)*reinterpret_cast<short*>(off),
-						(float)*reinterpret_cast<short*>(off + 2),
+						(float)(*reinterpret_cast<short*>(off + 2) + languageYOffset),
 						(float)*reinterpret_cast<short*>(off + 4),
 						(float)*reinterpret_cast<short*>(off + 6),
 						*reinterpret_cast<float*>(off + 8),
 						*reinterpret_cast<float*>(off + 0xC),
-						FLOAT_803313e8,
-						FLOAT_803313e8,
-						uAlpha);
+						*reinterpret_cast<float*>(off + 0x14),
+						*reinterpret_cast<float*>(off + 0x14),
+						0);
 				}
 			}
 
-			SetAttrFmt((FMT)0);
-			SetTexture((TEX)0x34);
-			DrawRect(0xFFFFFFFF, 
-				FLOAT_803313dc, FLOAT_803313dc,
-				FLOAT_803313dc, FLOAT_803313dc,
-				FLOAT_803313dc, FLOAT_803313dc,
-				FLOAT_803313e8, FLOAT_803313e8,
-				uAlpha);
+			if (digitCnt != 3 && language != 5) {
+				int off = wmFrame + 0xB4;
+				float suffixU = FLOAT_803313dc;
+				float suffixY = static_cast<float>(*reinterpret_cast<short*>(off + 2));
+				if (language == 1) {
+					if (gWmMenuScriptValueCache / 10 == 1) {
+						suffixU = FLOAT_8033151c;
+					} else {
+						unsigned int digit = gWmMenuScriptValueCache % 10;
+						if (digit == 0 || digit > 3) {
+							suffixU = FLOAT_8033151c;
+						} else {
+							suffixU = FLOAT_803314d8 * static_cast<float>(digit - 1);
+						}
+					}
+				} else if (language == 4) {
+					if (gWmMenuScriptValueCache != 1) {
+						suffixU = FLOAT_803314d8;
+					}
+				} else if (language == 2) {
+					suffixY += FLOAT_80331550;
+				}
+				unsigned char alphaU8 =
+				    static_cast<unsigned char>(static_cast<int>(DOUBLE_80331508 * static_cast<double>(*reinterpret_cast<float*>(off + 0x10))));
+				GXColor color = {0xFF, 0xFF, 0xFF, alphaU8};
+				GXSetChanMatColor(static_cast<GXChannelID>(4), color);
+				SetAttrFmt((FMT)0);
+				SetTexture((TEX)0x34);
+				DrawRect(0xFFFFFFFF,
+				         (float)*reinterpret_cast<short*>(off) +
+				             (float)*reinterpret_cast<short*>(off + 4) * *reinterpret_cast<float*>(off + 0x14),
+				         suffixY,
+				         FLOAT_80331410, FLOAT_803314d8,
+				         suffixU, FLOAT_803313dc,
+				         *reinterpret_cast<float*>(off + 0x14), *reinterpret_cast<float*>(off + 0x14),
+				         0);
+			}
 		}
 	}
 }

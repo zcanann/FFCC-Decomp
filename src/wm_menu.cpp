@@ -166,6 +166,7 @@ extern double DOUBLE_803315C0;
 extern double DOUBLE_80331670;
 extern double DOUBLE_80331678;
 extern double DOUBLE_80331420;
+extern double DOUBLE_80331428;
 extern double DOUBLE_803314a8;
 extern double DOUBLE_803314d0;
 extern double DOUBLE_803314f0;
@@ -8928,11 +8929,8 @@ void CMenuPcs::DrawMcWin(short state, short kind)
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	short* const win = reinterpret_cast<short*>(reinterpret_cast<unsigned int*>(bytes + 0x848)[0]);
-	if (win == 0) {
-		return;
-	}
 
-	if (state >= 0 && win[5] != 3) {
+	if (state >= 0 && win[5] != state) {
 		win[5] = state;
 	}
 
@@ -8940,32 +8938,31 @@ void CMenuPcs::DrawMcWin(short state, short kind)
 		return;
 	}
 
-	const float x = static_cast<float>(win[0]);
-	const float y = static_cast<float>(win[1]);
-	const float w = static_cast<float>(win[2]);
-	const float h = static_cast<float>(win[3]);
-	const float step = static_cast<float>(win[4]) / 6.0f;
+	const float centerX = static_cast<float>(win[0]) + static_cast<float>(static_cast<double>(win[2]) * DOUBLE_803313f8);
+	const float centerY = static_cast<float>(win[1]) + static_cast<float>(static_cast<double>(win[3]) * DOUBLE_803313f8);
 
-	float sx = x;
-	float sy = y;
-	float sw = w;
-	float sh = h;
-
-	if (win[5] == 0) {
-		sx += (w * 0.5f) * (1.0f - step);
-		sy += (h * 0.5f) * (1.0f - step);
-		sw *= step;
-		sh *= step;
-	} else if (win[5] == 2) {
-		sx += (w * 0.5f) * step;
-		sy += (h * 0.5f) * step;
-		sw *= (1.0f - step);
-		sh *= (1.0f - step);
+	float sx;
+	float sy;
+	float sw;
+	float sh;
+	if (win[5] == 1) {
+		sx = static_cast<float>(win[0]);
+		sy = static_cast<float>(win[1]);
+		sw = static_cast<float>(win[2]);
+		sh = static_cast<float>(win[3]);
+	} else {
+		const float xAdd = (((centerX - static_cast<float>(win[0])) - FLOAT_80331410) / FLOAT_80331414) * static_cast<float>(win[4]);
+		const float yAdd = (((centerY - static_cast<float>(win[1])) - FLOAT_80331410) / FLOAT_80331414) * static_cast<float>(win[4]);
+		sx = (centerX - FLOAT_80331410) - xAdd;
+		sy = (centerY - FLOAT_80331410) - yAdd;
+		sw = static_cast<float>(DOUBLE_80331418 * static_cast<double>(FLOAT_80331410 + xAdd));
+		sh = static_cast<float>(DOUBLE_80331418 * static_cast<double>(FLOAT_80331410 + yAdd));
 	}
 
-	if (sw <= 1.0f || sh <= 1.0f) {
-		return;
-	}
+	sx = static_cast<float>(static_cast<int>(static_cast<double>(sx) - DOUBLE_803313f8));
+	sy = static_cast<float>(static_cast<int>(static_cast<double>(sy) - DOUBLE_803313f8));
+	sw = static_cast<float>(static_cast<int>(static_cast<double>(sw) - DOUBLE_80331420));
+	sh = static_cast<float>(static_cast<int>(static_cast<double>(sh) - DOUBLE_80331420));
 
 	SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 	GXColor color = {0xFF, 0xFF, 0xFF, 0xFF};
@@ -8975,38 +8972,69 @@ void CMenuPcs::DrawMcWin(short state, short kind)
 	const int edgeHTex = (kind == 0) ? 0x2D : 0x26;
 	const int edgeVTex = (kind == 0) ? 0x2E : 0x25;
 	const int fillTex = (kind == 0) ? 0x2F : 0x27;
-	const float border = 16.0f;
+	const float border = FLOAT_80331410;
+	const float right = (sx + sw) - border;
+	const float bottom = (sy + sh) - border;
 
 	SetTexture(static_cast<CMenuPcs::TEX>(cornerTex));
-	DrawRect(0xFFFFFFFF, sx, sy, border, border, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-	DrawRect(0xFFFFFFFF, (sx + sw) - border, sy, border, border, 0.0f, 0.0f, 1.0f, 1.0f, 8.0f);
-	DrawRect(0xFFFFFFFF, sx, (sy + sh) - border, border, border, 0.0f, 0.0f, 1.0f, 1.0f, 4.0f);
-	DrawRect(0xFFFFFFFF, (sx + sw) - border, (sy + sh) - border, border, border, 0.0f, 0.0f, 1.0f, 1.0f, 12.0f);
+	for (int i = 0; i < 4; i++) {
+		float x = sx;
+		float y = sy;
+		float flags = FLOAT_803313dc;
+		if (i & 1) {
+			x = right;
+			flags = 8.0f;
+		}
+		if (i & 2) {
+			y = bottom;
+			flags += 4.0f;
+		}
+		DrawRect(0xFFFFFFFF, x, y, border, border, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, flags);
+	}
 
 	SetTexture(static_cast<CMenuPcs::TEX>(edgeHTex));
-	DrawRect(0xFFFFFFFF, sx + border, sy, sw - border * 2.0f, border, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-	DrawRect(0xFFFFFFFF, sx + border, (sy + sh) - border, sw - border * 2.0f, border, 0.0f, 0.0f, 1.0f, 1.0f, 4.0f);
+	const float innerWidth = static_cast<float>(static_cast<double>(sw) - DOUBLE_80331428);
+	const float innerX = static_cast<float>(static_cast<double>(sx) + static_cast<double>(border));
+	for (int i = 0; i < 2; i++) {
+		float y = sy;
+		float flags = FLOAT_803313dc;
+		if (i != 0) {
+			y = bottom;
+			flags = 4.0f;
+		}
+		DrawRect(0xFFFFFFFF, innerX, y, innerWidth, border, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, flags);
+	}
 
 	SetTexture(static_cast<CMenuPcs::TEX>(edgeVTex));
-	DrawRect(0xFFFFFFFF, sx, sy + border, border, sh - border * 2.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-	DrawRect(0xFFFFFFFF, (sx + sw) - border, sy + border, border, sh - border * 2.0f, 0.0f, 0.0f, 1.0f, 1.0f, 8.0f);
+	const float innerHeight = static_cast<float>(static_cast<double>(sh) - DOUBLE_80331428);
+	const float innerY = static_cast<float>(static_cast<double>(sy) + static_cast<double>(border));
+	float lastFlags = FLOAT_803313dc;
+	for (int i = 0; i < 2; i++) {
+		float x = sx;
+		lastFlags = FLOAT_803313dc;
+		if (i != 0) {
+			x = right;
+			lastFlags = 8.0f;
+		}
+		DrawRect(0xFFFFFFFF, x, innerY, border, innerHeight, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, lastFlags);
+	}
 
 	SetTexture(static_cast<CMenuPcs::TEX>(fillTex));
-	DrawRect(0xFFFFFFFF, sx + border, sy + border, sw - border * 2.0f, sh - border * 2.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-
-	DrawMcWinMess(win[5], kind);
+	DrawRect(0xFFFFFFFF, innerX, innerY, innerWidth, innerHeight, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, lastFlags);
 
 	if (win[5] == 0) {
 		win[4]++;
-		if (win[4] >= 6) {
+		if (win[4] > 5) {
 			win[4] = 6;
 			win[5] = 1;
 		}
 	} else if (win[5] == 1) {
-		win[4] = 6;
+		if (win[4] != 6) {
+			win[4] = 6;
+		}
 	} else if (win[5] == 2) {
 		win[4]--;
-		if (win[4] <= 0) {
+		if (win[4] < 1) {
 			win[4] = 0;
 			win[5] = 3;
 		}

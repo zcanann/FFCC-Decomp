@@ -199,7 +199,7 @@ STATIC_ASSERT(sizeof(BonusBoardEntryList) == 0x780);
 STATIC_ASSERT(sizeof(BonusEffectSlotBlock) == 0x2920);
 STATIC_ASSERT(sizeof(BonusEffectSlotList) == 0xCDB0);
 
-static void InitBonusEffectSlotBlock(BonusEffectSlotBlock* slot)
+static inline void InitBonusEffectSlotBlock(BonusEffectSlotBlock* slot)
 {
 	unsigned char* slotBase = slot->bytes;
 	static const int s_sentinelOffsets[] = {
@@ -218,7 +218,7 @@ static void InitBonusEffectSlotBlock(BonusEffectSlotBlock* slot)
 	}
 }
 
-static void InitBonusBoardEntry(BonusBoardEntryRaw* entry)
+static inline void InitBonusBoardEntry(BonusBoardEntryRaw* entry)
 {
 	entry->m_modelHandle = 0;
 	entry->m_effectHandle = 0;

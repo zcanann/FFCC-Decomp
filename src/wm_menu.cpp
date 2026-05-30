@@ -11122,8 +11122,23 @@ void McCtrl::SetListDat(int slot, int clearPlayTime)
 	entry[0x43] = 0;
 	unsigned char* const menuBytes = reinterpret_cast<unsigned char*>(&MenuPcs);
 	unsigned char* const dst = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(menuBytes + 0x854)[0]) + slot * kMcListEntrySize;
-	memcpy(dst, entry, kMcListEntrySize);
-	dst[0x43] = 0;
+	unsigned int* const dstWords = reinterpret_cast<unsigned int*>(dst);
+	unsigned int* const entryWords = reinterpret_cast<unsigned int*>(entry);
+	dstWords[0] = entryWords[0];
+	dstWords[1] = entryWords[1];
+	dstWords[2] = entryWords[2];
+	dstWords[3] = entryWords[3];
+	dstWords[4] = entryWords[4];
+	dstWords[5] = entryWords[5];
+	dstWords[6] = entryWords[6];
+	dstWords[7] = entryWords[7];
+	dstWords[8] = entryWords[8];
+	dstWords[9] = entryWords[9];
+	dstWords[10] = entryWords[10];
+	memcpy(dst + 0x2C, entry + 0x2C, 0x15);
+	dst[0x41] = entry[0x41];
+	dst[0x42] = entry[0x42];
+	dst[0x43] = entry[0x43];
 }
 
 /*

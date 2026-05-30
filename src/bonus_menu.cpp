@@ -2918,7 +2918,7 @@ void CMenuPcs::createBonus()
 					if (caravanWork->m_artifacts[artifactSlot] == itemId) {
 						s_Rinfo->m_party[i].m_ownedArtifactMask |= (1u << artifactIndex);
 					}
-				} else if (caravanWork->m_inventoryItemCount + 1 > 0x40) {
+				} else if ((unsigned short)(caravanWork->m_inventoryItemCount + 1) > 0x40) {
 					s_Rinfo->m_party[i].m_ownedArtifactMask |= (1u << artifactIndex);
 				}
 			}

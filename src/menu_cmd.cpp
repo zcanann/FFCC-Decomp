@@ -1741,7 +1741,7 @@ void CMenuPcs::GetCmdItem()
 		s32 itemType = GetItemType(i, 0);
 		if ((itemType != 0) && (itemType != 5) && (itemType != 6) && (itemType != 8) && (itemType != 9)) {
 			if ((itemType != 1) ||
-			    (static_cast<u32>(GetItemIcon(*reinterpret_cast<s16*>(itemIndexPtr))) ==
+			    (GetItemIcon(*reinterpret_cast<s16*>(itemIndexPtr)) ==
 			     (*reinterpret_cast<u16*>(scriptFood + 0x3e0) & 3))) {
 				write++;
 				*write = static_cast<s16>(i);

@@ -6370,19 +6370,19 @@ LAB_calc:
 			uVar -= 5;
 		}
 		t = (float)(uVar) / FLOAT_803314c0;
-		if (t < DAT_8032e8cc[DAT_8032e8c8 * 4 - 4]) {
+		if (t < DAT_8032e8c4[DAT_8032e8c0 * 4 - 4]) {
 			int idx = 0;
-			float* pf = DAT_8032e8cc;
-			int cnt = DAT_8032e8c8;
+			float* pf = DAT_8032e8c4;
+			int cnt = DAT_8032e8c0;
 			float result = FLOAT_803313dc;
 			if (cnt > 0) {
 				do {
 					if (t <= *pf) {
 						if (idx == 0) {
-							result = DAT_8032e8cc[1];
+							result = DAT_8032e8c4[1];
 						} else {
-							float* cur = DAT_8032e8cc + idx * 4;
-							float* prev = DAT_8032e8cc + (idx - 1) * 4;
+							float* cur = DAT_8032e8c4 + idx * 4;
+							float* prev = DAT_8032e8c4 + (idx - 1) * 4;
 							float dt = *cur - *prev;
 							float u = (t - *prev) / dt;
 							float u2 = u * u;
@@ -6400,8 +6400,44 @@ LAB_calc:
 			}
 			*reinterpret_cast<short*>(wmFrame + 0xB6) =
 			    static_cast<short>(*reinterpret_cast<short*>(wmFrame + 0xB6) + static_cast<short>(static_cast<int>(result)));
-			*reinterpret_cast<float*>(wmFrame + 0xC4) = result;
+		} else {
+			*reinterpret_cast<short*>(wmFrame + 0xB6) =
+			    static_cast<short>(*reinterpret_cast<short*>(wmFrame + 0xB6) +
+			                       static_cast<short>(static_cast<int>(DAT_8032e8c4[DAT_8032e8c0 * 4 - 3])));
 		}
+
+		float alphaResult = FLOAT_803313dc;
+		if (t < DAT_8032e8cc[DAT_8032e8c8 * 4 - 4]) {
+			int idx = 0;
+			float* pf = DAT_8032e8cc;
+			int cnt = DAT_8032e8c8;
+			if (cnt > 0) {
+				do {
+					if (t <= *pf) {
+						if (idx == 0) {
+							alphaResult = DAT_8032e8cc[1];
+						} else {
+							float* cur = DAT_8032e8cc + idx * 4;
+							float* prev = DAT_8032e8cc + (idx - 1) * 4;
+							float dt = *cur - *prev;
+							float u = (t - *prev) / dt;
+							float u2 = u * u;
+							float u3 = u2 * u;
+							alphaResult = dt * (prev[3] * (u - FLOAT_803314c8 * u2 + u3) + cur[2] * (u3 - u2)) +
+							              prev[1] * (FLOAT_803313e8 + FLOAT_803314c8 * u3 - FLOAT_803314c4 * u2) +
+							              cur[1] * (FLOAT_803314cc * u3 + FLOAT_803314c4 * u2);
+						}
+						break;
+					}
+					pf += 4;
+					idx++;
+					cnt--;
+				} while (cnt != 0);
+			}
+		} else {
+			alphaResult = DAT_8032e8cc[DAT_8032e8c8 * 4 - 3];
+		}
+		*reinterpret_cast<float*>(wmFrame + 0xC4) = alphaResult;
 
 		*reinterpret_cast<int*>(wmFrame + 8) = *reinterpret_cast<int*>(wmFrame + 8) + 1;
 	} else {

@@ -3079,6 +3079,16 @@ void CMenuPcs::CalcTitleMenu()
 				DAT_8032ee1c = 0;
 				return;
 			}
+			DAT_8032e8ac = 0;
+			THPSimpleInit(1);
+			THPSimpleOpen(DAT_8032EE34);
+			int thpMemory = THPSimpleCalcNeedMemory();
+			*reinterpret_cast<void**>(bytes + 0x854) =
+			    Memory._Alloc(thpMemory, CharaPcs.m_viewerAnimStage, const_cast<char*>(s_wm_menu_cpp), 0xABA, 0);
+			THPSimpleSetBuffer(*reinterpret_cast<unsigned char**>(bytes + 0x854));
+			THPSimplePreLoad(0);
+			THPSimpleAudioStart();
+			bytes[0x858] = 1;
 		}
 
 		if (*reinterpret_cast<short*>(worldState + 0x10) == 0) {

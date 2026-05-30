@@ -692,20 +692,24 @@ void CMenuPcs::CmdOpen()
 
 	if (remaining > 0) {
 		do {
-			if (*reinterpret_cast<s32*>(entry + 0x12) <= timer) {
-				const s32 start = *reinterpret_cast<s32*>(entry + 0x12);
-				const s32 length = *reinterpret_cast<s32*>(entry + 0x14);
-				if ((start + length) > timer) {
-					s32 value = *reinterpret_cast<s32*>(entry + 0x10);
-					value += 1;
-					*reinterpret_cast<s32*>(entry + 0x10) = value;
-					*reinterpret_cast<float*>(entry + 8) = static_cast<float>(
-					    (DOUBLE_80332a58 / static_cast<double>(length)) * static_cast<double>(value));
-				} else {
-					finishedCount += 1;
-					*reinterpret_cast<float*>(entry + 8) = FLOAT_80332a70;
-				}
+			if (*reinterpret_cast<s32*>(entry + 0x12) > timer) {
+				entry += 0x20;
+				remaining -= 1;
+				continue;
 			}
+			if ((*reinterpret_cast<s32*>(entry + 0x12) + *reinterpret_cast<s32*>(entry + 0x14)) <= timer) {
+				finishedCount += 1;
+				*reinterpret_cast<float*>(entry + 8) = FLOAT_80332a70;
+				entry += 0x20;
+				remaining -= 1;
+				continue;
+			}
+			s32 value = *reinterpret_cast<s32*>(entry + 0x10);
+			value += 1;
+			*reinterpret_cast<s32*>(entry + 0x10) = value;
+			*reinterpret_cast<float*>(entry + 8) = static_cast<float>(
+			    (DOUBLE_80332a58 / static_cast<double>(*reinterpret_cast<s32*>(entry + 0x14))) *
+			    static_cast<double>(value));
 			entry += 0x20;
 			remaining -= 1;
 		} while (remaining != 0);

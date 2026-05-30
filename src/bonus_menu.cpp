@@ -491,8 +491,8 @@ static inline void DrawBonusSelectedArtifactHelp(CMenuPcs* menu, int statePtr, B
 	CFont* font = GetBonusMenuMembers(menu).m_fontWide;
 	font->SetMargin(1.0f);
 	font->SetShadow(0);
-	font->SetScaleX(0.7f);
-	font->SetScaleY(1.0f);
+	font->SetScaleX(0.7200000286102295f);
+	font->SetScaleY(0.8999999761581421f);
 	font->DrawInit();
 	GXColor color = {0xFF, 0xFF, 0xFF, 0xFF};
 	font->SetColor(color);
@@ -500,9 +500,9 @@ static inline void DrawBonusSelectedArtifactHelp(CMenuPcs* menu, int statePtr, B
 	BonusFlatDataRaw* flat = reinterpret_cast<BonusFlatDataRaw*>(&Game.m_cFlatDataArr[1]);
 	int itemId = (int)rewardItems[selection];
 	char* title = flat->m_table[0].m_strings[itemId * 5 + 4];
-	float centerX = (float)frame->x + (float)frame->w * 0.5f;
-	float centerY = (float)frame->y + (float)frame->h * 0.5f;
-	font->SetPosX(centerX - font->GetWidth(title) * 0.5f);
+	float centerX = (float)((double)frame->x + (double)(float)frame->w * 0.5);
+	float centerY = (float)((double)frame->y + (double)(float)frame->h * 0.5);
+	font->SetPosX((float)-((double)font->GetWidth(title) * 0.5 - (double)centerX));
 	font->SetPosY(centerY - 44.0f - 4.0f);
 	font->Draw(title);
 
@@ -520,7 +520,7 @@ static inline void DrawBonusSelectedArtifactHelp(CMenuPcs* menu, int statePtr, B
 		if (text == 0) {
 			break;
 		}
-		font->SetPosX(centerX - font->GetWidth(text) * 0.5f);
+		font->SetPosX((float)-((double)font->GetWidth(text) * 0.5 - (double)centerX));
 		font->SetPosY(lineY - 4.0f);
 		font->Draw(text);
 		lineY += 22.0f;

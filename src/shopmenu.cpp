@@ -220,16 +220,17 @@ static float CalcCenteredShopMenuX(CFont* font, const char* text)
 
 static int ResolveShopMenuItemCount(CShopMenu* shopMenu)
 {
-    switch (ShopMenuInt(shopMenu, 0x14)) {
-    case 0:
+    int listType = ShopMenuInt(shopMenu, 0x14);
+    if (listType == 0) {
         return *reinterpret_cast<short*>(ShopMenuCaravan(shopMenu) + 0xBE4);
-    case 1:
-        return 0x40;
-    case 2:
-        return ShopMenuInt(shopMenu, 0x4C);
-    default:
-        return 0;
     }
+    if (listType == 1) {
+        return 0x40;
+    }
+    if (listType == 2) {
+        return ShopMenuInt(shopMenu, 0x4C);
+    }
+    return 0;
 }
 
 static int ResolveShopMenuItemNo(CShopMenu* shopMenu, int index)
@@ -615,16 +616,17 @@ int CShopMenu::getMakeGil(int itemNo)
  */
 int CShopMenu::getBuySellGil(int itemNo)
 {
-    switch (ShopMenuInt(this, 0x14)) {
-    case 0:
+    int listType = ShopMenuInt(this, 0x14);
+    if (listType == 0) {
         return getBuyGil(itemNo);
-    case 1:
-        return getSellGil(itemNo);
-    case 2:
-        return getMakeGil(itemNo);
-    default:
-        return -1;
     }
+    if (listType == 1) {
+        return getSellGil(itemNo);
+    }
+    if (listType == 2) {
+        return getMakeGil(itemNo);
+    }
+    return -1;
 }
 
 /*
@@ -654,8 +656,8 @@ int CShopMenu::GetMaxExchange()
     }
 
     int caravan = ShopMenuCaravan(this);
-    switch (ShopMenuInt(this, 0x14)) {
-    case 0: {
+    int listType = ShopMenuInt(this, 0x14);
+    if (listType == 0) {
         int maxCount = 0x40 - *reinterpret_cast<unsigned short*>(caravan + 0x94);
         int unitGil = getBuyGil(itemNo);
         if (unitGil > 0) {
@@ -666,13 +668,13 @@ int CShopMenu::GetMaxExchange()
         }
         return maxCount;
     }
-    case 1:
+    if (listType == 1) {
         return getItemHaveCnt(itemNo);
-    case 2:
-        return 1;
-    default:
-        return 0;
     }
+    if (listType == 2) {
+        return 1;
+    }
+    return 0;
 }
 
 /*

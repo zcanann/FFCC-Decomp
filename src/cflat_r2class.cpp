@@ -394,13 +394,13 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 						int value = 0;
 						*reinterpret_cast<float*>(&stack[-1].m_word) = FLOAT_80330BC8;
 						if (setMode == 0) {
-							value = static_cast<int>(*reinterpret_cast<float*>(&stack->m_word));
+							value = static_cast<int>(static_cast<float>(stack->m_word));
 						} else if (setMode < 0) {
 							if (setMode > -2) {
-								value = static_cast<int>(FLOAT_80330BC8 - *reinterpret_cast<float*>(&stack->m_word));
+								value = static_cast<int>(FLOAT_80330BC8 - static_cast<float>(stack->m_word));
 							}
 						} else if (setMode < 2) {
-							value = static_cast<int>(FLOAT_80330BC8 + *reinterpret_cast<float*>(&stack->m_word));
+							value = static_cast<int>(FLOAT_80330BC8 + static_cast<float>(stack->m_word));
 						}
 						*(engineObject + 0x56) = static_cast<u8>(static_cast<int>(FLOAT_80330BCC * static_cast<float>(value)));
 						break;

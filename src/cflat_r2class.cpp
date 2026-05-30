@@ -876,9 +876,9 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			hitStart.x = engineObject->m_worldPosition.x;
 			hitStart.y = engineObject->m_worldPosition.y + params[1];
 			hitStart.z = engineObject->m_worldPosition.z;
-			hitMove.x = static_cast<float>(sin(params[2]) * params[3]);
+			hitMove.x = static_cast<float>(sin(params[2])) * params[3];
 			hitMove.y = FLOAT_80330BC8;
-			hitMove.z = static_cast<float>(cos(params[2]) * params[3]);
+			hitMove.z = static_cast<float>(cos(params[2])) * params[3];
 			int hit = MapPcs.CheckHitCylinderNear(&hitStart, &hitMove, params[4], localBase[0]);
 			AddDebugDrawCC(&hitStart, &hitMove, params[4], 1, 0);
 			if (hit != 0) {
@@ -927,9 +927,9 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			Vec hitStart;
 			Vec hitMove;
 			float* params = reinterpret_cast<float*>(localBase);
-			hitStart.x = engineObject->m_worldPosition.x + static_cast<float>(sin(params[2]) * params[3]);
+			hitStart.x = engineObject->m_worldPosition.x + static_cast<float>(sin(params[2])) * params[3];
 			hitStart.y = engineObject->m_worldPosition.y + params[1];
-			hitStart.z = engineObject->m_worldPosition.z + static_cast<float>(cos(params[2]) * params[3]);
+			hitStart.z = engineObject->m_worldPosition.z + static_cast<float>(cos(params[2])) * params[3];
 			hitMove.x = FLOAT_80330BC8;
 			hitMove.y = -params[4];
 			hitMove.z = FLOAT_80330BC8;
@@ -1103,9 +1103,9 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			float* params = reinterpret_cast<float*>(localBase);
 			float rotX = params[0];
 			float rotY = params[1];
-			moveVector.x = static_cast<float>(sin(rotX) * cos(rotY));
+			moveVector.x = static_cast<float>(sin(rotX)) * static_cast<float>(cos(rotY));
 			moveVector.y = static_cast<float>(sin(rotY));
-			moveVector.z = static_cast<float>(cos(rotX) * cos(rotY));
+			moveVector.z = static_cast<float>(cos(rotX)) * static_cast<float>(cos(rotY));
 			engineObject->MoveVector(&moveVector, params[2], static_cast<int>(localBase[3]), 0, 0, 1);
 			PushValue(this, object, 0);
 			outResult = 0;

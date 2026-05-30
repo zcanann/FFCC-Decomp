@@ -287,45 +287,6 @@ static inline CCharaPcs::CHandle** GetBonusDisplayHandleSlots(CMenuPcs* menu)
 	return reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(menu) + 0x774);
 }
 
-static CCharaPcs::CHandle* GetBonusResultOpenHandle(CMenuPcs* menu, int modelIndex)
-{
-	const int activePartyCount = s_Rinfo->m_partyCount;
-	if (modelIndex < 0) {
-		return 0;
-	}
-
-	if (modelIndex < activePartyCount) {
-		BonusPartySummary* summary = GetBonusPartySummary(modelIndex);
-		return (summary != 0) ? summary->m_partyHandle : 0;
-	}
-
-	CCharaPcs::CHandle** displaySlots = GetBonusDisplayHandleSlots(menu);
-	if (displaySlots == 0) {
-		return 0;
-	}
-
-	int extraIndex = activePartyCount * 2 + (modelIndex - activePartyCount);
-	if (extraIndex < 0 || extraIndex >= 0x18) {
-		return 0;
-	}
-
-	return displaySlots[extraIndex];
-}
-
-static const char* GetBonusResultOpenText(int textIndex)
-{
-	const int activePartyCount = s_Rinfo->m_partyCount;
-	if (textIndex < 0) {
-		return 0;
-	}
-
-	if (textIndex < activePartyCount) {
-		return GetBonusPartyNameByActiveIndex(textIndex);
-	}
-
-	return GetBonusResultLabelByActiveIndex(textIndex - activePartyCount);
-}
-
 static void InitAnimSprite(BonusAnimSprite* sprite, int kind, short x, short y, short w, short h, int startFrame, int duration)
 {
 	sprite->x = x;
@@ -586,17 +547,6 @@ static void DrawBonusActiveMarks(CMenuPcs* menu, int statePtr, float alpha)
 	}
 }
 
-static int FindFirstBonusActiveSlot(unsigned char activeMask)
-{
-	for (int i = 0; i < 8; i++) {
-		if ((activeMask & (1 << i)) != 0) {
-			return i;
-		}
-	}
-
-	return -1;
-}
-
 static unsigned char GetBonusUnavailableMask(int statePtr, BonusPartySummary* summary)
 {
 	unsigned char mask = 0;
@@ -607,18 +557,6 @@ static unsigned char GetBonusUnavailableMask(int statePtr, BonusPartySummary* su
 		mask = (unsigned char)(mask | (unsigned char)summary->m_ownedArtifactMask);
 	}
 	return mask;
-}
-
-static int FindNextBonusSelectableSlot(unsigned char unavailableMask, int startSlot, int direction)
-{
-	int slot = startSlot & 7;
-	for (int i = 0; i < 8; i++) {
-		slot = (slot + direction) & 7;
-		if ((unavailableMask & (1 << slot)) == 0) {
-			return slot;
-		}
-	}
-	return startSlot & 7;
 }
 
 static void DrawBonusPartyNames(CMenuPcs* menu, BonusAnimHeader* header, BonusAnimSprite* sprites)

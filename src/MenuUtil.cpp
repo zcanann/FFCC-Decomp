@@ -598,7 +598,8 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 			strcpy(scratch, GetAttrStr(attr));
 			font->SetTlut(4);
 			font->Draw(scratch);
-			font->SetPosX(FLOAT_803335a0 + font->GetWidth(scratch));
+			int valueX = static_cast<int>(FLOAT_803335a0 + font->GetWidth(scratch));
+			font->SetPosX(static_cast<float>(valueX));
 			font->SetTlut(9);
 
 			if ((attr == 0) || (8 < attr)) {

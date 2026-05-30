@@ -153,7 +153,7 @@ static void AddMesFlag(CMes* mes, unsigned char type, unsigned char index, short
  */
 unsigned long CMes::drawTagString(CFont* font, char* text, int drawChars, int breakOnLineTag, int lineBaseY)
 {
-	unsigned int width = 0;
+	int width = 0;
 	unsigned char* src = (unsigned char*)text;
 	bool continueDraw = true;
 	float lineStartX = font->posX;
@@ -161,26 +161,25 @@ unsigned long CMes::drawTagString(CFont* font, char* text, int drawChars, int br
 
 	while (continueDraw)
 	{
-		unsigned char ch = *src;
-		unsigned char* next = src + 1;
+		unsigned short ch = *src++;
 
 		if (ch == 0)
 		{
 			continueDraw = false;
-			src = next;
 		}
 		else if (ch == 0xFF)
 		{
-			unsigned char tag = *next;
-			src += 2;
-			if (tag == 0xA1)
+			unsigned int tag = ((unsigned int)*src++ - 0xA0U) & 0xFFFF;
+			if (tag == 1)
 			{
 				continueDraw = false;
 			}
-			else if ((tag == 0xA0) && (breakOnLineTag != 0))
+			else if ((tag == 0) && (breakOnLineTag != 0))
 			{
 				font->SetPosX((float)lineStartXInt);
-				font->SetPosY((float)lineBaseY + font->posY + (float)font->m_glyphHeight * font->scaleY);
+				float y = (float)lineBaseY + font->posY;
+				y += (float)font->m_glyphHeight * font->scaleY;
+				font->SetPosY(y);
 			}
 		}
 		else
@@ -189,12 +188,11 @@ unsigned long CMes::drawTagString(CFont* font, char* text, int drawChars, int br
 			{
 				font->Draw(ch);
 			}
-			width = (unsigned int)((double)(float)width + (double)font->GetWidth(ch));
-			src = next;
+			width = (int)((float)width + font->GetWidth(ch));
 		}
 	}
 
-	return width;
+	return (unsigned long)width;
 }
 /*
  * --INFO--

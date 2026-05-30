@@ -1442,7 +1442,40 @@ void CMenuPcs::CalcSelectOpenAnim()
 			idx++;
 		}
 
+		ArtiBaseInfoInit(reinterpret_cast<CMenuPcs::Sprt2*>(&sprites[1]), reinterpret_cast<CMenuPcs::Sprt2*>(&sprites[3]));
+		int boardPtr = GetBonusMenuMembers(this).m_bonusBoardPtr;
+		int entryOffset = activePartyCount * 0xA0;
+		for (int i = 0; i < 8; i++) {
+			BonusAnimSprite* boardSprite = &sprites[1];
+			*reinterpret_cast<int*>(boardPtr + entryOffset) = 0;
+			*reinterpret_cast<int*>(boardPtr + entryOffset + 4) = 0;
+			int centerX = (int)((double)(float)((double)boardSprite->w * 0.5 + (double)boardSprite->x) - 320.0);
+			int centerY = (int)((double)(float)((double)boardSprite->h * 0.5 + (double)boardSprite->y) - 240.0);
+			*reinterpret_cast<short*>(boardPtr + entryOffset + 8) = (short)centerX;
+			*reinterpret_cast<short*>(boardPtr + entryOffset + 10) = (short)centerY;
+			*reinterpret_cast<short*>(boardPtr + entryOffset + 12) = 0x280;
+			*reinterpret_cast<short*>(boardPtr + entryOffset + 14) = 0x1C0;
+			*reinterpret_cast<float*>(boardPtr + entryOffset + 0x10) = 0.0f;
+			*reinterpret_cast<float*>(boardPtr + entryOffset + 0x14) = 0.0f;
+			*reinterpret_cast<float*>(boardPtr + entryOffset + 0x18) = 1000.0f;
+			*reinterpret_cast<float*>(boardPtr + entryOffset + 0x1C) = 0.0f;
+			*reinterpret_cast<float*>(boardPtr + entryOffset + 0x20) = 0.0f;
+			*reinterpret_cast<float*>(boardPtr + entryOffset + 0x24) = 0.0f;
+			*reinterpret_cast<float*>(boardPtr + entryOffset + 0x28) = 0.0f;
+			*reinterpret_cast<float*>(boardPtr + entryOffset + 0x2C) = 0.0f;
+			*reinterpret_cast<float*>(boardPtr + entryOffset + 0x30) = 0.0f;
+			*reinterpret_cast<float*>(boardPtr + entryOffset + 0x34) = 1.0f;
+			*reinterpret_cast<float*>(boardPtr + entryOffset + 0x38) = 1.0f;
+			*reinterpret_cast<float*>(boardPtr + entryOffset + 0x3C) = 1.0f;
+			*reinterpret_cast<int*>(boardPtr + entryOffset + 0x40) = 0;
+			*reinterpret_cast<int*>(boardPtr + entryOffset + 0x44) = 0;
+			*reinterpret_cast<int*>(boardPtr + entryOffset + 0x48) = 0x280;
+			*reinterpret_cast<int*>(boardPtr + entryOffset + 0x4C) = 0x1C0;
+			entryOffset += 0x50;
+		}
+
 		header->count = (short)idx;
+		header->finished = 0;
 		*(unsigned char*)(statePtr + 0xb) = 1;
 	}
 

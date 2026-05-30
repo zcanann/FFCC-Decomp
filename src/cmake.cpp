@@ -2742,7 +2742,7 @@ void CMenuPcs::CmakeJobDraw()
     for (int i = 0; i < 8; ++i) {
         const char* txt = GetJobStr(i);
         int x = (i < 4) ? 0x110 : 0x1A8;
-        int row = (i < 4) ? i : (i - 4);
+        int row = i % 4;
         font->SetPosX(x);
         font->SetPosY(static_cast<float>(0x70 + row * 0x28) - FLOAT_803332f4);
         font->Draw(txt);

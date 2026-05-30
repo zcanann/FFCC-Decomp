@@ -1688,26 +1688,30 @@ unsigned int CMenuPcs::CmdClose0()
 	s16* entry = base + base[0] * 0x20 + 4;
 
 	for (s32 i = 0; i < entryCount; i++) {
-		if (*reinterpret_cast<s32*>(entry + 0x12) <= time) {
-			if (time < (*reinterpret_cast<s32*>(entry + 0x12) + *reinterpret_cast<s32*>(entry + 0x14))) {
-				*reinterpret_cast<s32*>(entry + 0x10) = *reinterpret_cast<s32*>(entry + 0x10) + 1;
-				const f64 denom = static_cast<f64>(*reinterpret_cast<s32*>(entry + 0x14));
-				const f64 numer = static_cast<f64>(*reinterpret_cast<s32*>(entry + 0x10));
+		if (*reinterpret_cast<s32*>(entry + 0x12) > time) {
+			entry += 0x20;
+			continue;
+		}
+		if (time >= (*reinterpret_cast<s32*>(entry + 0x12) + *reinterpret_cast<s32*>(entry + 0x14))) {
+			doneCount++;
+			*reinterpret_cast<f32*>(entry + 8) = 0.0f;
+			*reinterpret_cast<f32*>(entry + 0x18) = 0.0f;
+			*reinterpret_cast<f32*>(entry + 0x1a) = 0.0f;
+			entry += 0x20;
+			continue;
+		}
 
-				*reinterpret_cast<f32*>(entry + 8) = static_cast<f32>(1.0 - (numer / denom));
-				if ((*reinterpret_cast<u32*>(entry + 0x16) & 2) == 0) {
-					const f32 t = static_cast<f32>(1.0 - (numer / denom));
-					*reinterpret_cast<f32*>(entry + 0x18) =
-					    (*reinterpret_cast<f32*>(entry + 0x1c) - static_cast<f32>(entry[0])) * t;
-					*reinterpret_cast<f32*>(entry + 0x1a) =
-					    (*reinterpret_cast<f32*>(entry + 0x1e) - static_cast<f32>(entry[1])) * t;
-				}
-			} else {
-				doneCount++;
-				*reinterpret_cast<f32*>(entry + 8) = 0.0f;
-				*reinterpret_cast<f32*>(entry + 0x18) = 0.0f;
-				*reinterpret_cast<f32*>(entry + 0x1a) = 0.0f;
-			}
+		*reinterpret_cast<s32*>(entry + 0x10) = *reinterpret_cast<s32*>(entry + 0x10) + 1;
+		const f32 t = static_cast<f32>(
+		    1.0 - (static_cast<f64>(*reinterpret_cast<s32*>(entry + 0x10)) /
+		           static_cast<f64>(*reinterpret_cast<s32*>(entry + 0x14))));
+
+		*reinterpret_cast<f32*>(entry + 8) = t;
+		if ((*reinterpret_cast<u32*>(entry + 0x16) & 2) == 0) {
+			*reinterpret_cast<f32*>(entry + 0x18) =
+			    t * (*reinterpret_cast<f32*>(entry + 0x1c) - static_cast<f32>(entry[0]));
+			*reinterpret_cast<f32*>(entry + 0x1a) =
+			    t * (*reinterpret_cast<f32*>(entry + 0x1e) - static_cast<f32>(entry[1]));
 		}
 		entry += 0x20;
 	}

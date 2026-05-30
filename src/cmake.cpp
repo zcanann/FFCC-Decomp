@@ -1769,7 +1769,8 @@ int CMenuPcs::CmakeNameCtrl()
                         return 0;
                     }
 
-                    char picked[2];
+                    char picked[12];
+                    memset(picked, 0, 3);
                     picked[0] = rowText[select];
                     picked[1] = '\0';
                     strcat(name, picked, 0x12);

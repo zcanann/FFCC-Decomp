@@ -58,7 +58,7 @@ extern float FLOAT_80330B30;
 extern float FLOAT_80330b74;
 extern float FLOAT_80330b54;
 extern float FLOAT_80330b64;
-extern float FLOAT_80330B34;
+extern const float FLOAT_80330B34;
 extern float FLOAT_80330B3C;
 extern float FLOAT_80330B50;
 extern float FLOAT_80330B54;
@@ -1222,8 +1222,8 @@ PPPCREATEPARAM::PPPCREATEPARAM()
     m_lookTargetPtr = 0;
     m_objectHitMask = 0;
     m_cylinderAttribute = 0;
-    m_paramC = 1.0f;
-    m_paramD = 1.0f;
+    m_paramC = FLOAT_80330B34;
+    m_paramD = FLOAT_80330B34;
     *reinterpret_cast<unsigned char*>(&m_owner) = 0;
 }
 

@@ -255,9 +255,11 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 					StoreS16(stack, classData, (systemVal + 0x2F3) * 2 + 0x9A4, setMode);
 				} else if (systemVal != -0x19D) {
 					if (systemVal < -0x19D) {
-						if (systemVal == -0x1B6) {
-							StoreU16(stack, classData, 0x3DE, setMode);
-						} else if (systemVal < -0x1A5 && systemVal >= -0x1A9) {
+						if (systemVal < -0x1A9) {
+							if (systemVal == -0x1B6) {
+								StoreU16(stack, classData, 0x3DE, setMode);
+							}
+						} else if (systemVal < -0x1A5) {
 							StoreS16(stack, classData, (systemVal + 0x1A9) * 2 + 0xAC, setMode);
 						}
 					} else if (systemVal < -0x199) {

@@ -3071,6 +3071,25 @@ void CMenuPcs::CalcTitleMenu()
 			bytes[0x858] = 0;
 		}
 
+		if (*reinterpret_cast<short*>(worldState + 0x10) == 0) {
+			if ((down & 0x1000) != 0) {
+				THPSimpleAudioStop();
+				THPSimpleLoadStop();
+				THPSimpleClose();
+				THPSimpleQuit();
+				if (*reinterpret_cast<int*>(bytes + 0x854) != 0) {
+					Memory.Free(reinterpret_cast<void*>(*reinterpret_cast<int*>(bytes + 0x854)));
+					*reinterpret_cast<int*>(bytes + 0x854) = 0;
+				}
+				bytes[0x858] = 0;
+				*reinterpret_cast<short*>(worldState + 0x24) = 0;
+				*reinterpret_cast<short*>(worldState + 0x0E) = -1;
+			} else if (THPSimpleDecode(0) == 0) {
+				*reinterpret_cast<short*>(worldState + 0x22) =
+				    static_cast<short>(*reinterpret_cast<short*>(worldState + 0x22) + 1);
+			}
+		}
+
 		if (*reinterpret_cast<short*>(worldState + 0x10) == 2 && *reinterpret_cast<short*>(worldState + 0x18) == 0) {
 			if ((repeat & 0xC) != 0) {
 				*reinterpret_cast<unsigned short*>(worldState + 0x26) ^= 1;

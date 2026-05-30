@@ -10,6 +10,7 @@ class CGObject;
 struct Vec;
 class CVector;
 class CMapPcs;
+struct MonAiFuncTable;
 
 extern "C" u8 m_aiWork__8CGMonObj[0xC];
 extern "C" u8 m_boss__8CGMonObj[0x8C];
@@ -243,6 +244,9 @@ public:
     void suikomiSub(CGObject*, float);
     void suikomi(int, float);
     int tgtFuncGigasLoad(int);
+
+    unsigned char m_unk6B8[0x50]; // 0x6B8
+    MonAiFuncTable* m_funcs;      // 0x708
 };
 
 #endif // _FFCC_MONOBJ_H_

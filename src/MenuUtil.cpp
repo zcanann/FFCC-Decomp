@@ -578,8 +578,8 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 			}
 		}
 
-		float attrX = font->posX + font->GetWidth(sMenuUtilSpaceText);
-		font->SetPosX(attrX);
+		int attrX = static_cast<int>(font->posX + font->GetWidth(sMenuUtilSpaceText));
+		font->SetPosX(static_cast<float>(attrX));
 
 		u16 attr = *reinterpret_cast<u16*>(itemBase + 8);
 		if (((flags & 0x1000) == 0) && (attr != 0) && (attr < 0x14)) {

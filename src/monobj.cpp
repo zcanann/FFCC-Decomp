@@ -140,9 +140,7 @@ void CGMonObj::onFramePreCalc()
 					reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x100)) * 0x1D0 + 0x10;
 		}
 
-		typedef int (*PtmfScallRet)(CGMonObj*, int, void*);
-		aiState = reinterpret_cast<PtmfScallRet>(__ptmf_scall)(
-			this, *reinterpret_cast<unsigned short*>(aiData + 0x102) & 3, mon + 0x708);
+		aiState = (this->*m_funcs->calcBranch)(*reinterpret_cast<unsigned short*>(aiData + 0x102) & 3);
 
 		if (aiState != aiStatePrev) {
 			aiStatePrev = aiState;
@@ -167,7 +165,7 @@ void CGMonObj::onFramePreCalc()
 			int aiLocal = 0;
 			aiAddDuct(aiLocal);
 		} else {
-			__ptmf_scall(this, mon + 0x708);
+			(this->*m_funcs->logic)();
 		}
 
 		int nextState = *reinterpret_cast<int*>(mon + 0x6D8);
@@ -690,7 +688,7 @@ void CGMonObj::onCancelStat(int state)
 		*reinterpret_cast<int*>(SoundBuffer_1248_ + 4) = 0;
 		memset(mon + 0x70C, 0, 0x34);
 		if ((*reinterpret_cast<unsigned int*>(mon + 0x710) & 2) == 0) {
-			__ptmf_scall(this, mon + 0x708);
+			(this->*m_funcs->moveCancel)();
 		}
 		break;
 	}
@@ -2165,7 +2163,7 @@ void CGMonObj::onFrameAlways()
 		}
 
 		reinterpret_cast<CMonWork*>(object->m_scriptHandle)->CalcStatus();
-		__ptmf_scall(this, mon + 0x708);
+		(this->*m_funcs->always)();
 
 		unsigned short stepSeRaw = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1BE);
 		int stepSeId = 0;
@@ -2291,7 +2289,7 @@ void CGMonObj::InitFinished()
 		break;
 	}
 
-	__ptmf_scall(this, mon + 0x708);
+	(this->*m_funcs->initFinished)();
 }
 
 /*
@@ -2786,7 +2784,7 @@ void CGMonObj::moveFrame()
 
 	if (((moveFlags & 0x20) != 0) && (moveRange <= in_f29)) {
 		moveStateFlags |= 1;
-		__ptmf_scall(this, mon + 0x708);
+		(this->*m_funcs->moveCancel)();
 		moveStateFlags |= 2;
 		if ((moveFlags & 0x100) != 0) {
 			reinterpret_cast<CGPrgObj*>(this)->changeStat(moveChangeStat, 0, 0);
@@ -2795,7 +2793,7 @@ void CGMonObj::moveFrame()
 	}
 	if (((moveFlags & 0x40) != 0) && (in_f29 < moveRange)) {
 		moveStateFlags |= 1;
-		__ptmf_scall(this, mon + 0x708);
+		(this->*m_funcs->moveCancel)();
 		moveStateFlags |= 2;
 		if ((moveFlags & 0x100) != 0) {
 			reinterpret_cast<CGPrgObj*>(this)->changeStat(moveChangeStat, 0, 0);
@@ -2825,7 +2823,7 @@ void CGMonObj::moveFrame()
 
 	if (((moveFlags & 0x80) != 0) && (((int)((unsigned int)object->m_stateFlags0 << 0x19) | ((unsigned int)object->m_stateFlags0 >> 7)) < 0)) {
 		moveStateFlags |= 1;
-		__ptmf_scall(this, mon + 0x708);
+		(this->*m_funcs->moveCancel)();
 		moveStateFlags |= 2;
 		if ((moveFlags & 0x100) != 0) {
 			reinterpret_cast<CGPrgObj*>(this)->changeStat(moveChangeStat, 0, 0);
@@ -2883,7 +2881,7 @@ void CGMonObj::moveFrame()
 	}
 
 	moveStateFlags |= 1;
-	__ptmf_scall(this, mon + 0x708);
+	(this->*m_funcs->moveCancel)();
 	moveStateFlags |= 2;
 	if ((moveFlags & 0x100) != 0) {
 		reinterpret_cast<CGPrgObj*>(this)->changeStat(moveChangeStat, 0, 0);

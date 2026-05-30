@@ -1451,8 +1451,8 @@ void CMes::Next()
 				}
 				else
 				{
-					remaining = (unsigned int)flagEntry[2] * 4 + 0x3cc0;
-					*(int*)((char*)this + remaining) = *(int*)((char*)this + remaining) + 1;
+					int* slot = (int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3cc0);
+					*slot = *slot + 1;
 				}
 			}
 			flagEntry += 6;

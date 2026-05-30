@@ -166,6 +166,7 @@ extern float FLOAT_80331548;
 extern float FLOAT_80331550;
 extern float FLOAT_80331558;
 extern float FLOAT_8033155C;
+extern float FLOAT_80331560;
 extern float FLOAT_80331568;
 extern float FLOAT_80331578;
 extern float FLOAT_80331594;
@@ -9374,6 +9375,27 @@ LAB_draw:
 				SetTexture(static_cast<CMenuPcs::TEX>(0x2A));
 				DrawRect(0xFFFFFFFF, FLOAT_8033151c, rowY, static_cast<float>(panelWidth), FLOAT_80331440,
 				         FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, 0.0f);
+
+				SetTexture(static_cast<CMenuPcs::TEX>(0x37));
+				float iconX = FLOAT_8033155C;
+				for (int member = 0; member < 4; member++) {
+					const int modelNo = *reinterpret_cast<int*>(slotData + 0x18 + member * 4);
+					if (modelNo >= 0) {
+						const int faceNo = modelNo - 100;
+						const int tribe = faceNo / 100 + (faceNo >> 31);
+						const unsigned int tribeIndex = static_cast<unsigned int>(tribe - (tribe >> 31));
+						float texU = FLOAT_803314f0;
+						if ((tribeIndex & 1) != 0) {
+							texU = FLOAT_80331560;
+						}
+						const int variant = faceNo + (tribe - (tribe >> 31)) * -100;
+						DrawRect(0xFFFFFFFF, iconX, slotY + FLOAT_803314d8, FLOAT_80331468, FLOAT_80331468,
+						         texU + FLOAT_80331468 * static_cast<float>(variant),
+						         FLOAT_80331468 * static_cast<float>(static_cast<int>(tribeIndex / 2)),
+						         FLOAT_803313e8, FLOAT_803313e8, 0.0f);
+						iconX += FLOAT_80331468;
+					}
+				}
 			}
 		}
 	}

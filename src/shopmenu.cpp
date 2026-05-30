@@ -2861,14 +2861,56 @@ void CMenuPcs::CreateShopMenu()
 void drawShapeSeqGrouad(int shapeNo, int groupNo, int x, int y, float scaleX, float scaleY, _GXColor colorA,
                         _GXColor colorB, _GXColor colorC, _GXColor colorD)
 {
-    long* animData = GetShopMenuShapeAnimData(shapeNo);
-    tagOAN3_SHAPE* shape = GetShopMenuFrameShape(animData, groupNo);
+    Mtx screenMtx;
+    Mtx44 projectionMtx;
+
+    long* animData = 0;
+    int shapeTableBase = *reinterpret_cast<int*>(&ppvEnv->m_particleColors[0]);
+    if (shapeTableBase != 0) {
+        pppShapeSt* shapeSt = *reinterpret_cast<pppShapeSt**>(shapeTableBase + shapeNo * 4);
+        if ((shapeSt != 0) && (shapeSt->m_animData != 0)) {
+            animData = reinterpret_cast<long*>(shapeSt->m_animData);
+        }
+    }
+
+    tagOAN3_SHAPE* shape = 0;
+    if ((animData != 0) && (groupNo >= 0)) {
+        unsigned char* animBytes = reinterpret_cast<unsigned char*>(animData);
+        if (groupNo < *reinterpret_cast<short*>(animBytes + 6)) {
+            shape = reinterpret_cast<tagOAN3_SHAPE*>(
+                animBytes + *reinterpret_cast<short*>(animBytes + groupNo * 8 + 0x10));
+        }
+    }
     if (shape == 0) {
         return;
     }
 
-    setOrtho(x, y, scaleX, scaleY, 0.0f);
-    SetupShopMenuShapeDrawColor(0xFF);
+    PSMTXIdentity(screenMtx);
+    screenMtx[0][0] = scaleX;
+    screenMtx[1][1] = -scaleY;
+    screenMtx[0][3] = static_cast<float>(x);
+    screenMtx[1][3] = static_cast<float>(y);
+    screenMtx[2][2] = FLOAT_80332d78;
+    GXLoadPosMtxImm(screenMtx, 0);
+    GXSetCurrentMtx(0);
+
+    C_MTXOrtho(projectionMtx, 0.0f, 480.0f, 0.0f, 640.0f, 0.0f, FLOAT_80332d28);
+    projectionMtx[2][3] += 0.0f;
+    GXSetProjection(projectionMtx, GX_ORTHOGRAPHIC);
+    GXSetCullMode(GX_CULL_NONE);
+    GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
+    GXSetColorUpdate(GX_TRUE);
+
+    _GXColor drawColor = {0xFF, 0xFF, 0xFF, 0xFF};
+    GXSetChanAmbColor(GX_COLOR0A0, drawColor);
+    GXSetChanMatColor(GX_COLOR0A0, drawColor);
+    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_NOOP);
+    _GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0xFF);
+    GXSetZCompLoc(GX_TRUE);
+    GXSetNumChans(1);
+    GXSetChanCtrl(GX_COLOR0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
+    GXSetChanCtrl(GX_ALPHA0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
+
     MaterialMan.SetMaterialMenu(
         ppvEnv->m_materialSetPtr,
         static_cast<int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(shape) + 10)), 0);

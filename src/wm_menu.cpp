@@ -11097,10 +11097,14 @@ void McCtrl::SetListDat(int slot, int clearPlayTime)
 			*reinterpret_cast<unsigned int*>(save + 0x1C) = MemoryCardMan.CalcCrc(reinterpret_cast<Mc::SaveDat*>(save));
 
 			*reinterpret_cast<unsigned int*>(entry + 0x08) = playTime;
-			*reinterpret_cast<unsigned int*>(entry + 0x18) = (party0 < 0) ? 0xFFFFFFFFu : *reinterpret_cast<unsigned short*>(save + party0 * 0x9C0 + 0x14D0);
-			*reinterpret_cast<unsigned int*>(entry + 0x1C) = (party1 < 0) ? 0xFFFFFFFFu : *reinterpret_cast<unsigned short*>(save + party1 * 0x9C0 + 0x14D0);
-			*reinterpret_cast<unsigned int*>(entry + 0x20) = (party2 < 0) ? 0xFFFFFFFFu : *reinterpret_cast<unsigned short*>(save + party2 * 0x9C0 + 0x14D0);
-			*reinterpret_cast<unsigned int*>(entry + 0x24) = (party3 < 0) ? 0xFFFFFFFFu : *reinterpret_cast<unsigned short*>(save + party3 * 0x9C0 + 0x14D0);
+			const int saveParty0 = *reinterpret_cast<int*>(save + 0x30);
+			const int saveParty1 = *reinterpret_cast<int*>(save + 0x34);
+			const int saveParty2 = *reinterpret_cast<int*>(save + 0x38);
+			const int saveParty3 = *reinterpret_cast<int*>(save + 0x3C);
+			*reinterpret_cast<unsigned int*>(entry + 0x18) = (saveParty0 < 0) ? 0xFFFFFFFFu : *reinterpret_cast<unsigned short*>(save + saveParty0 * 0x9C0 + 0x14D0);
+			*reinterpret_cast<unsigned int*>(entry + 0x1C) = (saveParty1 < 0) ? 0xFFFFFFFFu : *reinterpret_cast<unsigned short*>(save + saveParty1 * 0x9C0 + 0x14D0);
+			*reinterpret_cast<unsigned int*>(entry + 0x20) = (saveParty2 < 0) ? 0xFFFFFFFFu : *reinterpret_cast<unsigned short*>(save + saveParty2 * 0x9C0 + 0x14D0);
+			*reinterpret_cast<unsigned int*>(entry + 0x24) = (saveParty3 < 0) ? 0xFFFFFFFFu : *reinterpret_cast<unsigned short*>(save + saveParty3 * 0x9C0 + 0x14D0);
 			*reinterpret_cast<unsigned int*>(entry + 0x28) = *reinterpret_cast<unsigned int*>(save + 0xB8);
 			memcpy(entry + 0x2C, save + 0x10C0, 0x10);
 			hasData = 1;

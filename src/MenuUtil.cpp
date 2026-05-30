@@ -32,11 +32,11 @@ extern "C" const float FLOAT_80333628 = 564.0f;
 extern "C" const float FLOAT_8033362C = 0.07692308f;
 extern "C" const float FLOAT_80333630 = 6.923077f;
 extern "C" const float FLOAT_80333634 = 4.0f;
+extern "C" const unsigned int DOUBLE_80333638[2] = {0x43300000, 0x00000000};
+extern "C" const unsigned int DOUBLE_80333640[2] = {0x43300000, 0x80000000};
 extern "C" const float FLOAT_80333608 = 190.0f;
 extern "C" const float FLOAT_8033360C = 587.0f;
 extern "C" const float FLOAT_80333610 = 372.0f;
-extern "C" const unsigned int DOUBLE_80333638[2] = {0x43300000, 0x00000000};
-extern "C" const unsigned int DOUBLE_80333640[2] = {0x43300000, 0x80000000};
 extern "C" const float kOptionOpenAnimStep = 0.04f;
 extern "C" const float kOptionColumnAnimStep = 0.2f;
 extern "C" const float kOptionVolumeScale = 10.583333f;
@@ -469,18 +469,18 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 		u32 y = lineBaseY[lineCount + drawPrefix - 1];
 		if (drawPrefix != 0) {
 			font->SetPosX(FLOAT_8033357c);
-			font->SetPosY(static_cast<float>(y));
+			font->SetPosY(static_cast<float>(static_cast<int>(y)));
 			font->Draw(itemName);
 			font->Draw(suffix);
-			y = static_cast<u32>(static_cast<float>(y) + lineStep);
+			y = static_cast<u32>(static_cast<float>(static_cast<int>(y)) + lineStep);
 		}
 
 		for (int i = 0; i < lineCount; i++) {
 			int msgId = GetMenuHelpMsgTable()[firstNonEmptyLine + i];
 			font->SetPosX(static_cast<float>(0x140 - maxWidth / 2));
-			font->SetPosY(static_cast<float>(y));
+			font->SetPosY(static_cast<float>(static_cast<int>(y)));
 			CMes::drawTagString(font, reinterpret_cast<char*>(msgId), 1, 0, 0);
-			y = static_cast<u32>(static_cast<float>(y) + lineStep);
+			y = static_cast<u32>(static_cast<float>(static_cast<int>(y)) + lineStep);
 		}
 		return;
 	}
@@ -488,18 +488,18 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 	u32 y = lineBaseY[drawPrefix + 2];
 	if (drawPrefix != 0) {
 		font->SetPosX(FLOAT_8033357c);
-		font->SetPosY(static_cast<float>(y));
+		font->SetPosY(static_cast<float>(static_cast<int>(y)));
 		font->Draw(itemName);
 		font->Draw(suffix);
-		y = static_cast<u32>(static_cast<float>(y) + lineStep);
+		y = static_cast<u32>(static_cast<float>(static_cast<int>(y)) + lineStep);
 	}
 
 	for (int i = 0; i < 3; i++) {
 		int msgId = GetMenuHelpMsgTable()[firstLine + i];
 		font->SetPosX(static_cast<float>(0x140 - maxWidth / 2));
-		font->SetPosY(static_cast<float>(y));
+		font->SetPosY(static_cast<float>(static_cast<int>(y)));
 		CMes::drawTagString(font, reinterpret_cast<char*>(msgId), 1, 0, 0);
-		y = static_cast<u32>(static_cast<float>(y) + lineStep);
+		y = static_cast<u32>(static_cast<float>(static_cast<int>(y)) + lineStep);
 	}
 
 	int itemBase = Game.unkCFlatData0[2] + msgNo * 0x48;
@@ -519,7 +519,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 	}
 
 	font->SetPosX(FLOAT_8033357c);
-	font->SetPosY(static_cast<float>(y));
+	font->SetPosY(static_cast<float>(static_cast<int>(y)));
 
 	if ((flags & 0x1000) == 0) {
 		strcat(scratch, sMenuUtilSpaceText);

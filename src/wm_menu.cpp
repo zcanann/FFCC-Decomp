@@ -109,6 +109,8 @@ extern float FLOAT_80331760;
 extern float FLOAT_80331764;
 extern float FLOAT_803315b0;
 extern float FLOAT_80331440;
+extern float FLOAT_80331444;
+extern float FLOAT_8033146c;
 extern float FLOAT_80331664;
 extern float FLOAT_80331434;
 extern float FLOAT_80331524;
@@ -165,6 +167,9 @@ extern float FLOAT_803316C8;
 extern float FLOAT_803316CC;
 extern double DOUBLE_80331418;
 extern double DOUBLE_80331488;
+extern double DOUBLE_80331438;
+extern double DOUBLE_80331448;
+extern double DOUBLE_80331450;
 extern double DOUBLE_80331460;
 extern double DOUBLE_803314E8;
 extern double DOUBLE_80331498;
@@ -3304,14 +3309,58 @@ void CMenuPcs::DrawMainMenu()
 void CMenuPcs::DrawDiaryMenu()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	if (reinterpret_cast<unsigned int*>(bytes + 0x82C)[0] == 0) {
-		return;
+	unsigned char* const worldState = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x82C)[0]);
+
+	CCharaPcs::CHandle* const handle = GetWmWorldHandles(this)[1];
+	if (handle != 0 && handle->m_model != 0) {
+		handle->m_model->m_lightAlpha = FLOAT_803313e8;
 	}
 
-	DrawMainMenuSub();
-	DrawWMFrame();
-	DrawFukidashi();
-	DrawCharaBase();
+	const short state = *reinterpret_cast<short*>(worldState + 0x10);
+	if (state > 0 && state < 4) {
+		float alpha;
+		if (state == 1) {
+			alpha = static_cast<float>(DOUBLE_803314e8 *
+			                           (static_cast<double>(*reinterpret_cast<short*>(worldState + 0x22)) - DOUBLE_80331408));
+		} else if (state == 2) {
+			alpha = FLOAT_803313e8;
+		} else {
+			alpha = static_cast<float>(-(DOUBLE_803314e8 *
+			                             (static_cast<double>(*reinterpret_cast<short*>(worldState + 0x22)) - DOUBLE_80331408) -
+			                             DOUBLE_80331420));
+		}
+		DrawDiaryBase(0, alpha);
+	}
+
+	DrawInit();
+
+	const int frame = static_cast<int>(System.m_frameCounter);
+	const int base = frame / 0x14 + (frame >> 31);
+	unsigned int phase = static_cast<unsigned int>((frame + (base - (base >> 31)) * -0x14) - 10);
+	const unsigned int sign = static_cast<int>(phase) >> 31;
+	phase = (phase ^ sign) - sign;
+	const float scale = static_cast<float>(DOUBLE_80331450 * (static_cast<double>(phase) - DOUBLE_80331408) + DOUBLE_80331448);
+	float x = static_cast<float>(DOUBLE_80331438 - static_cast<double>(FLOAT_80331440));
+	float y = FLOAT_80331444;
+	const unsigned int alpha =
+	    static_cast<unsigned int>(FLOAT_80331458 *
+	                              static_cast<float>(DOUBLE_80331460 * (static_cast<double>(phase) - DOUBLE_80331408) +
+	                                                 DOUBLE_803313f8));
+	GXColor color = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alpha)};
+	SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+	GXSetChanMatColor(static_cast<GXChannelID>(4), color);
+	SetTexture(static_cast<CMenuPcs::TEX>(0x2B));
+	x = static_cast<float>(-(static_cast<double>(FLOAT_80331468) * scale - static_cast<double>(FLOAT_80331468)) *
+	                       DOUBLE_803313f8 + static_cast<double>(x));
+	y = static_cast<float>(-(static_cast<double>(FLOAT_80331440) * scale - static_cast<double>(FLOAT_80331440)) *
+	                       DOUBLE_803313f8 + static_cast<double>(y));
+	if ((bytes[0xF] & 2) != 0) {
+		DrawRect(0xFFFFFFFF, x, y, FLOAT_80331468, FLOAT_80331440, FLOAT_803313dc, FLOAT_803313dc, scale, scale, 8.0f);
+	}
+	if ((bytes[0xF] & 1) != 0) {
+		DrawRect(0xFFFFFFFF, static_cast<float>(static_cast<double>(x) + static_cast<double>(FLOAT_8033146c)), y,
+		         FLOAT_80331468, FLOAT_80331440, FLOAT_803313dc, FLOAT_803313dc, scale, scale, FLOAT_803313dc);
+	}
 }
 
 /*

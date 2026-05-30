@@ -222,6 +222,7 @@ public:
     void drawVillageMenu();
     void DrawMainMenu();
     void DrawDiaryMenu();
+    void DrawDiaryBase(int, float);
     void DrawMCardMenu();
     void DrawCMakeMenu();
     void DrawSingCMake();

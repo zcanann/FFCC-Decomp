@@ -1389,9 +1389,7 @@ void CGMonObj::onStatDie()
 
 		reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x231000);
 		*reinterpret_cast<float*>(mon + 0x694) = 0.0f;
-		typedef void (*Virtual90)(CGMonObj*, int, int, int);
-		void** vtable = *reinterpret_cast<void***>(this);
-		reinterpret_cast<Virtual90>(vtable[0x90 / 4])(this, 0, 0, 0);
+		enableAttackCol(0, 0, 0);
 		object->m_bgColMask &= 0xFFF6FFFD;
 		reinterpret_cast<CGPrgObj*>(this)->playSe3D(0x17, 0x32, 0x96, 0, (Vec*)0);
 		reinterpret_cast<CGPrgObj*>(this)->putParticle(0x116, 0, object, 20.0f * object->m_attackColRadius, 0);
@@ -2505,11 +2503,8 @@ void CGMonObj::setRepop(int mode)
 		memset(mon + 0x70C, 0, 0x34);
 	}
 
-	typedef void (*Virtual90)(CGMonObj*, int, int, int);
-	typedef void (*Virtual94)(CGMonObj*, int);
-	void** vtable = *reinterpret_cast<void***>(this);
-	reinterpret_cast<Virtual90>(vtable[0x90 / 4])(this, 0, 0, 0);
-	reinterpret_cast<Virtual94>(vtable[0x94 / 4])(this, 1);
+	enableAttackCol(0, 0, 0);
+	enableDamageCol(1);
 	prgObj->changeStat(0, 0, 0);
 
 	unsigned char* monsterScript = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
@@ -2520,7 +2515,7 @@ void CGMonObj::setRepop(int mode)
 			*reinterpret_cast<unsigned int*>(mon + 0x6D8) = 4;
 			*reinterpret_cast<unsigned int*>(mon + 0x6DC) = 0;
 			mon[0x6BB] = 1;
-			reinterpret_cast<Virtual94>(vtable[0x94 / 4])(this, 0);
+			enableDamageCol(0);
 			if ((scriptFlags & 0x40) != 0) {
 				object->SetAnimSlot(10, 0);
 			}
@@ -2543,7 +2538,7 @@ void CGMonObj::setRepop(int mode)
 		*reinterpret_cast<unsigned int*>(mon + 0x6D8) = 4;
 		*reinterpret_cast<unsigned int*>(mon + 0x6DC) = 0;
 		mon[0x6BB] = 1;
-		reinterpret_cast<Virtual94>(vtable[0x94 / 4])(this, 0);
+		enableDamageCol(0);
 	}
 
 	if (classId == reinterpret_cast<void*>(0x55)) {

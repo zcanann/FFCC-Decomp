@@ -7511,8 +7511,18 @@ void CMenuPcs::CalcCharaSelect()
 			}
 
 			if (entry.m_connected != 0 && entry.m_cmakePending == 0) {
-				padTrig[i] = GetButtonDown(i);
-				padRepeat[i] = GetButtonRepeat(i);
+				bool noInput = false;
+				if (Pad._452_4_ != 0 || (i == 0 && Pad._448_4_ != -1)) {
+					noInput = true;
+				}
+				if (noInput) {
+					padRepeat[i] = 0;
+					padTrig[i] = 0;
+				} else {
+					const unsigned int padIndex = (Pad._448_4_ == i) ? 0 : static_cast<unsigned int>(i);
+					padRepeat[i] = Pad.GetPadInputs()[padIndex].repeatButton;
+					padTrig[i] = Pad.GetPadInputs()[padIndex].buttonDown[0];
+				}
 			}
 		} else {
 			entry.m_connected = 0;

@@ -47,9 +47,9 @@ struct CMesFlatDataView
 
 static inline int GetMesNibbleValue(const char* data)
 {
-	unsigned char high = (unsigned char)data[0];
-	unsigned char low = (unsigned char)data[1];
-	return (int)((unsigned int)(high << 4) | ((unsigned int)low & 0x0F));
+	int low = (unsigned char)data[1] & 0x0F;
+	int high = (unsigned char)data[0];
+	return low | (high << 4);
 }
 
 static int ReadTagU8(char** text)

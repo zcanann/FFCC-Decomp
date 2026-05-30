@@ -803,28 +803,20 @@ void CMenuPcs::CalcSelectCloseAnim()
 			BonusSpriteFlags(sprite) = 0;
 		}
 
-		if (header->count > 0) {
-			sprites[0].kind = 0x16;
-			sprites[0].startFrame = 0;
-			sprites[0].duration = 8;
-		}
-		if (header->count > 1) {
-			sprites[1].startFrame = 0;
-			sprites[1].duration = 8;
-		}
-		if (header->count > 2) {
-			sprites[2].kind = 0x1f;
-			sprites[2].mulX = 0.0f;
-			sprites[2].mulY = 0.0f;
-			sprites[2].startFrame = 0;
-			sprites[2].duration = 0;
-			BonusSpriteFlags(&sprites[2]) = 2;
-		}
-		if (header->count > 3) {
-			sprites[3].kind = -4;
-			sprites[3].startFrame = 0;
-			sprites[3].duration = 8;
-		}
+		sprites[0].kind = 0x16;
+		sprites[0].startFrame = 0;
+		sprites[0].duration = 8;
+		sprites[1].startFrame = 0;
+		sprites[1].duration = 8;
+		sprites[2].kind = 0x1f;
+		sprites[2].mulX = 0.0f;
+		sprites[2].mulY = 0.0f;
+		sprites[2].startFrame = 0;
+		sprites[2].duration = 0;
+		BonusSpriteFlags(&sprites[2]) = 2;
+		sprites[3].kind = -4;
+		sprites[3].startFrame = 0;
+		sprites[3].duration = 8;
 
 		if (activePartyCount > 0) {
 			for (int i = 0; i < activePartyCount; i++) {

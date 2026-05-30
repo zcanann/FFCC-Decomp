@@ -1083,8 +1083,10 @@ void CMenuPcs::DrawOptionMenu()
 
 	font->SetScaleX(FLOAT_80333578);
 	char** option = optionText;
-	for (int i = 0, rowY = 0x70, selectedY = 0x73, normalY = 0x75; i < 5;
-	     i++, rowY += 0x28, selectedY += 0x28, normalY += 0x28, option++) {
+	int rowY = 0x70;
+	unsigned int selectedY = 0x73;
+	unsigned int normalY = 0x75;
+	for (int i = 0; i < 5; i++, rowY += 0x28, selectedY += 0x28, normalY += 0x28, option++) {
 		CTexture* row = GetMenuTexture(this, 0xC0);
 		uv0.x = (i == m_optionIndex) ? kOptionAnimMin : kMenuCenteringHalfWidth;
 		uv0.y = kOptionAnimMin;

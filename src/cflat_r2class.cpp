@@ -971,6 +971,25 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			outResult = 0;
 			break;
 		}
+		case -0x2E: {
+			unsigned int index = object->m_localBase[0];
+			float x = static_cast<float>(object->m_localBase[1]);
+			if (index == static_cast<unsigned int>(-1)) {
+				engineObject->m_attackColliders[1].m_localStart.x = x;
+				engineObject->m_attackColliders[2].m_localStart.x = x;
+				engineObject->m_attackColliders[3].m_localStart.x = x;
+				engineObject->m_attackColliders[4].m_localStart.x = x;
+				engineObject->m_attackColliders[5].m_localStart.x = x;
+				engineObject->m_attackColliders[6].m_localStart.x = x;
+				engineObject->m_attackColliders[7].m_localStart.x = x;
+				engineObject->m_damageColliders[0].m_localPosition.x = x;
+			} else {
+				engineObject->m_attackColliders[index + 1].m_localStart.x = x;
+			}
+			PushValue(this, object, 0);
+			outResult = 0;
+			break;
+		}
 		case -0x33: {
 			float rotY = static_cast<float>(object->m_localBase[0]);
 			engineObject->m_rotTargetY = rotY;

@@ -942,6 +942,21 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			outResult = 0;
 			break;
 		}
+		case -0x2D: {
+			Vec position;
+			float* params = reinterpret_cast<float*>(localBase);
+			position.x = params[3];
+			position.y = params[4];
+			position.z = params[5];
+			engineObject->SetAttackCol(
+			    static_cast<int>(localBase[0]),
+			    RuntimeString(this, localBase[1]),
+			    params[2],
+			    &position);
+			PushValue(this, object, 0);
+			outResult = 0;
+			break;
+		}
 		case -0x33: {
 			float rotY = static_cast<float>(localBase[0]);
 			engineObject->m_rotTargetY = rotY;

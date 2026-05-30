@@ -2686,7 +2686,7 @@ void CMenuPcs::CmakeJobDraw()
         font->Draw(txt);
     }
 
-    if (mode == 1) {
+    if (*reinterpret_cast<short*>(state + 0x10) == 1) {
         int sel = *reinterpret_cast<short*>(state + 0x26);
         int cursorX = (sel < 4) ? 0x110 : 0x1A8;
         int cursorY = 0x70 + ((sel < 4) ? sel : (sel - 4)) * 0x28;

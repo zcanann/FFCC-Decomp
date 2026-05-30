@@ -246,8 +246,8 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 						*value = *value + stack->m_word;
 					}
 				}
-			} else if (systemVal < -399) {
-				if (systemVal < -999 && systemVal > -0xBE8) {
+			} else if (systemVal <= -400) {
+				if (systemVal <= -1000 && systemVal >= -0xBE7) {
 					const unsigned int bit = static_cast<unsigned int>(systemVal + 0xBE7);
 					const u8 mask = static_cast<u8>(1U << (bit & 7));
 					u8* const byteRef = classData + (bit >> 3) + 0x8A4;

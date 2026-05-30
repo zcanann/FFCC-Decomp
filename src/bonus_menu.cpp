@@ -256,8 +256,8 @@ static inline void ReleaseBonusRefObject(void* object)
 	}
 }
 
-static float CalcBonusSpriteProgress(const BonusAnimSprite* sprite, int frame);
-static float ClampBonusUnit(float value);
+static inline float CalcBonusSpriteProgress(const BonusAnimSprite* sprite, int frame);
+static inline float ClampBonusUnit(float value);
 static const char* GetBonusPartyNameByActiveIndex(int activeIndex);
 static CCaravanWork* GetBonusActiveCaravanByActiveIndex(int activeIndex);
 static int GetBonusResultValueByActiveIndex(int activeIndex);
@@ -457,7 +457,7 @@ static void DrawBonusMcWinOverlay(CMenuPcs* menu, int statePtr)
 	}
 }
 
-static float ClampBonusUnit(float value)
+static inline float ClampBonusUnit(float value)
 {
 	if (value < 0.0f) {
 		return 0.0f;
@@ -468,7 +468,7 @@ static float ClampBonusUnit(float value)
 	return value;
 }
 
-static float CalcBonusSpriteProgress(const BonusAnimSprite* sprite, int frame)
+static inline float CalcBonusSpriteProgress(const BonusAnimSprite* sprite, int frame)
 {
 	if (frame < sprite->startFrame) {
 		return -1.0f;

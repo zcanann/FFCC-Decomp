@@ -750,19 +750,24 @@ void CMenuPcs::loadData()
 	    operator new(kWmFrameInfoBytes, m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x231);
 	memset(reinterpret_cast<void**>(bytes + 0x820)[0], 0, kWmFrameInfoBytes);
 
-	reinterpret_cast<void**>(bytes + 0x824)[0] = new unsigned char[0x1A0];
+	reinterpret_cast<void**>(bytes + 0x824)[0] =
+	    operator new[](0x1A0, m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x237);
 	memset(reinterpret_cast<void**>(bytes + 0x824)[0], 0, 0x1A0);
 
-	reinterpret_cast<void**>(bytes + 0x828)[0] = new unsigned char[kWmCharaSelectBytes];
+	reinterpret_cast<void**>(bytes + 0x828)[0] =
+	    operator new[](kWmCharaSelectBytes, m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x243);
 	memset(reinterpret_cast<void**>(bytes + 0x828)[0], 0, kWmCharaSelectBytes);
 
-	reinterpret_cast<void**>(bytes + 0x82C)[0] = new unsigned char[0x48];
+	reinterpret_cast<void**>(bytes + 0x82C)[0] =
+	    operator new(0x48, m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x246);
 	memset(reinterpret_cast<void**>(bytes + 0x82C)[0], 0, 0x48);
 
-	reinterpret_cast<void**>(bytes + 0x838)[0] = new unsigned char[kWmMenuCharaStateBytes];
+	reinterpret_cast<void**>(bytes + 0x838)[0] =
+	    operator new[](kWmMenuCharaStateBytes, m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x24A);
 	memset(reinterpret_cast<void**>(bytes + 0x838)[0], 0, kWmMenuCharaStateBytes);
 
-	reinterpret_cast<void**>(bytes + 0x83C)[0] = new unsigned char[0x10];
+	reinterpret_cast<void**>(bytes + 0x83C)[0] =
+	    operator new(0x10, m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x24E);
 	memset(reinterpret_cast<void**>(bytes + 0x83C)[0], 0, 0x10);
 
 	unsigned char* const effectRaw = new unsigned char[0xCDB0 + 0x10];
@@ -775,10 +780,12 @@ void CMenuPcs::loadData()
 		*reinterpret_cast<int*>(effect + 0x8) = -1;
 	}
 
-	reinterpret_cast<void**>(bytes + 0x844)[0] = new unsigned char[0xA0];
+	reinterpret_cast<void**>(bytes + 0x844)[0] =
+	    operator new[](0xA0, m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x25A);
 	memset(reinterpret_cast<void**>(bytes + 0x844)[0], 0, 0xA0);
 
-	reinterpret_cast<void**>(bytes + 0x848)[0] = new unsigned char[sizeof(WmMenuWindowState)];
+	reinterpret_cast<void**>(bytes + 0x848)[0] =
+	    operator new(sizeof(WmMenuWindowState), m_menuStage, const_cast<char*>(s_wm_menu_cpp), 0x25E);
 	memset(reinterpret_cast<void**>(bytes + 0x848)[0], 0, sizeof(WmMenuWindowState));
 
 	InitFrameInfo();

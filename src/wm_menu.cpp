@@ -7660,6 +7660,50 @@ void CMenuPcs::CalcCharaSelect()
 			}
 		}
 
+		if (connectedCount != 0 && connectedCount == locallyConfirmedCount) {
+			CFont* const font = GetWmFont(this);
+			font->SetMargin(FLOAT_803313e8);
+			font->SetShadow(0);
+			font->SetScale(FLOAT_803313e8);
+			const char* const* msgBuf = GetMcWinMessBuff(1);
+			int maxWidth = 0;
+			int* winMess = reinterpret_cast<int*>(GetWinMess(0x17));
+			int* msgIter = winMess;
+			for (int i = 0; i < *winMess; i++) {
+				const char* text = msgBuf[*reinterpret_cast<short*>(reinterpret_cast<int>(msgIter) + 4)];
+				if (text != 0) {
+					if (*text == '$') {
+						text++;
+					}
+					const int width = static_cast<int>(static_cast<double>(font->GetWidth(text)));
+					if (maxWidth < width) {
+						maxWidth = width;
+					}
+				}
+				msgIter = reinterpret_cast<int*>(reinterpret_cast<int>(msgIter) + 2);
+			}
+
+			int widthCells = maxWidth / 0x16 + (maxWidth >> 0x1F);
+			short winWidth = static_cast<short>(widthCells) - static_cast<short>(widthCells >> 0x1F);
+			if (maxWidth != (widthCells - (widthCells >> 0x1F)) * 0x16) {
+				winWidth++;
+			}
+			winWidth = static_cast<short>((winWidth + 2) * 0x16 + 0x40);
+			const short winHeight = static_cast<short>(*winMess) * 0x1E + 0x40;
+			WmMenuWindowState* const win = reinterpret_cast<WmMenuWindowState*>(*reinterpret_cast<int*>(bytes + 0x848));
+			win->x = static_cast<short>(static_cast<int>(static_cast<float>(0x280 - winWidth) *
+			                                             static_cast<float>(DOUBLE_803313f8)));
+			win->y = static_cast<short>(static_cast<int>((static_cast<double>(FLOAT_80331430 -
+			                                                                  static_cast<float>(winHeight))) *
+			                                             DOUBLE_803313f8));
+			win->w = winWidth;
+			win->h = winHeight;
+			win->frame = 0;
+			win->state = 3;
+			win->state = 0;
+			return;
+		}
+
 		bool requestCancel = false;
 		bool requestFinalize = false;
 		for (int i = 3; i >= 0; i--) {

@@ -1816,7 +1816,7 @@ int CMenuPcs::CmakeNameCtrl()
                     Sound.PlaySe(0x34, 0x40, 0x7F, 0);
                     return -1;
                 } else {
-                    name[len - 1] = '\0';
+                    name[strlen(name) - 1] = '\0';
                     Sound.PlaySe(3, 0x40, 0x7F, 0);
                 }
                 return 0;

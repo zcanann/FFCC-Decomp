@@ -240,15 +240,15 @@ static int ResolveShopMenuItemNo(CShopMenu* shopMenu, int index)
 
     switch (ShopMenuInt(shopMenu, 0x14)) {
     case 0:
-        return *reinterpret_cast<short*>(caravan + index * 2 + 0xBE6);
+        return *reinterpret_cast<short*>(caravan + (index * 2 + 0xBE6));
     case 1:
-        return *reinterpret_cast<short*>(caravan + index * 2 + 0xB6);
+        return *reinterpret_cast<short*>(caravan + (index * 2 + 0xB6));
     case 2: {
         int mapped = ShopMenuInt(shopMenu, 0x50 + index * 4);
         if (mapped == -1) {
             return -1;
         }
-        return *reinterpret_cast<short*>(caravan + mapped * 2 + 0xB6);
+        return *reinterpret_cast<short*>(caravan + (mapped * 2 + 0xB6));
     }
     default:
         return -1;
@@ -262,15 +262,15 @@ static int ResolveShopMenuSelectedItemId(CShopMenu* shopMenu)
 
     switch (ShopMenuInt(shopMenu, 0x14)) {
     case 0:
-        return *reinterpret_cast<short*>(caravan + selected * 2 + 0xBE6);
+        return *reinterpret_cast<short*>(caravan + (selected * 2 + 0xBE6));
     case 1:
-        return *reinterpret_cast<short*>(caravan + selected * 2 + 0xB6);
+        return *reinterpret_cast<short*>(caravan + (selected * 2 + 0xB6));
     case 2: {
         int mapped = ShopMenuInt(shopMenu, 0x50 + selected * 4);
         if (mapped == -1) {
             return -1;
         }
-        return *reinterpret_cast<short*>(caravan + mapped * 2 + 0xB6);
+        return *reinterpret_cast<short*>(caravan + (mapped * 2 + 0xB6));
     }
     default:
         return -1;
@@ -1106,15 +1106,15 @@ void CShopMenu::DrawItemInfo0()
     int caravan = ShopMenuCaravan(this);
     int itemNo;
     if (listType == 0) {
-        itemNo = static_cast<int>(*reinterpret_cast<short*>(caravan + itemIndex * 2 + 0xBE6));
+        itemNo = static_cast<int>(*reinterpret_cast<short*>(caravan + (itemIndex * 2 + 0xBE6)));
     } else if (listType == 1) {
-        itemNo = static_cast<int>(*reinterpret_cast<short*>(caravan + itemIndex * 2 + 0xB6));
+        itemNo = static_cast<int>(*reinterpret_cast<short*>(caravan + (itemIndex * 2 + 0xB6)));
     } else if (listType == 2) {
         int smithIndex = ShopMenuInt(this, 0x50 + itemIndex * 4);
         if (smithIndex == -1) {
             itemNo = -1;
         } else {
-            itemNo = static_cast<int>(*reinterpret_cast<short*>(caravan + smithIndex * 2 + 0xB6));
+            itemNo = static_cast<int>(*reinterpret_cast<short*>(caravan + (smithIndex * 2 + 0xB6)));
         }
     } else {
         itemNo = -1;
@@ -1880,15 +1880,15 @@ void CShopMenu::DrawMake()
     int caravan = ShopMenuCaravan(this);
     int selectedItem;
     if (listType == 0) {
-        selectedItem = *reinterpret_cast<short*>(caravan + selectedIndex * 2 + 0xBE6);
+        selectedItem = *reinterpret_cast<short*>(caravan + (selectedIndex * 2 + 0xBE6));
     } else if (listType == 1) {
-        selectedItem = *reinterpret_cast<short*>(caravan + selectedIndex * 2 + 0xB6);
+        selectedItem = *reinterpret_cast<short*>(caravan + (selectedIndex * 2 + 0xB6));
     } else if (listType == 2) {
         int mappedIndex = ShopMenuInt(this, 0x50 + selectedIndex * 4);
         if (mappedIndex == -1) {
             selectedItem = -1;
         } else {
-            selectedItem = *reinterpret_cast<short*>(caravan + mappedIndex * 2 + 0xB6);
+            selectedItem = *reinterpret_cast<short*>(caravan + (mappedIndex * 2 + 0xB6));
         }
     } else {
         selectedItem = -1;

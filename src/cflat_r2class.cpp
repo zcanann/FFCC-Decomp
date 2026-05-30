@@ -1411,9 +1411,10 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 		}
 		case -0x89: {
 			Vec moveTarget;
-			moveTarget.x = static_cast<float>(localBase[0]);
-			moveTarget.y = static_cast<float>(localBase[1]);
-			moveTarget.z = static_cast<float>(localBase[2]);
+			float* params = reinterpret_cast<float*>(localBase);
+			moveTarget.x = params[0];
+			moveTarget.y = params[1];
+			moveTarget.z = params[2];
 			engineObject->Move(&moveTarget, static_cast<float>(localBase[3]), static_cast<int>(localBase[4]), 1, 1, 1, 1);
 			PushValue(this, object, 0);
 			outResult = 0;
@@ -1479,9 +1480,10 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			break;
 		case -0x93: {
 			Vec moveTarget;
-			moveTarget.x = static_cast<float>(localBase[0]);
-			moveTarget.y = static_cast<float>(localBase[1]);
-			moveTarget.z = static_cast<float>(localBase[2]);
+			float* params = reinterpret_cast<float*>(localBase);
+			moveTarget.x = params[0];
+			moveTarget.y = params[1];
+			moveTarget.z = params[2];
 			engineObject->Move(&moveTarget, static_cast<float>(localBase[3]), static_cast<int>(localBase[4]), 1, 0, 1, 0);
 			PushValue(this, object, 0);
 			outResult = 0;

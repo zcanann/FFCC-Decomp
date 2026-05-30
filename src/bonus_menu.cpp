@@ -506,7 +506,7 @@ static inline void DrawBonusSelectedArtifactHelp(CMenuPcs* menu, int statePtr, B
 	float centerX = (float)frame->x + (float)frame->w * 0.5f;
 	float centerY = (float)frame->y + (float)frame->h * 0.5f;
 	font->SetPosX(centerX - font->GetWidth(title) * 0.5f);
-	font->SetPosY(centerY - 34.0f);
+	font->SetPosY(centerY - 44.0f - 4.0f);
 	font->Draw(title);
 
 	char* source = new char[0x200];
@@ -517,16 +517,16 @@ static inline void DrawBonusSelectedArtifactHelp(CMenuPcs* menu, int statePtr, B
 	CMes::MakeAgbString(converted, source, 0, 0);
 	strlen(converted);
 
-	float lineY = centerY - 58.0f;
+	float lineY = centerY - 11.0f - 7.0f;
 	for (int line = 0;; line++) {
 		char* text = (line == 0) ? strtok(converted, "\n") : strtok(0, "\n");
 		if (text == 0) {
 			break;
 		}
 		font->SetPosX(centerX - font->GetWidth(text) * 0.5f);
-		font->SetPosY(lineY - 6.0f);
+		font->SetPosY(lineY - 4.0f);
 		font->Draw(text);
-		lineY += 16.0f;
+		lineY += 22.0f;
 	}
 
 	delete[] source;

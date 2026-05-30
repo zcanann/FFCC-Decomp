@@ -143,7 +143,9 @@ public:
     double CalcListPos(int, int, int);
     void DrawListPosMark(float, float, float);
     float CalcCenteringPos(char*, CFont*);
+    float CalcCenteringPos2(char*, float, float);
     void DrawFont(int, int, _GXColor, int, char*, float, float);
+    void DrawFont2(int, int, _GXColor, int, char*, float, float, float);
     void DrawHelpMessage(int, CFont*, int, int, _GXColor, int, float, float);
     char* GetMenuStr(int);
 
@@ -209,10 +211,12 @@ public:
     void CalcDiaryMenu();
     void CalcMCardMenu();
     void CalcCMakeMenu();
+    void CalcSingCMake();
     void CalcMoveMenu();
     void InitSaveLoadMenu();
     void CalcLoadMenu();
     void CalcTitleMenu();
+    void CalcOptionMenu();
     void CalcGoOutCharaSelect(unsigned char);
     int CalcGoOutSelChar(unsigned char, unsigned char);
     void CalcGoOutSelCharInit();
@@ -222,6 +226,7 @@ public:
     void drawVillageMenu();
     void DrawMainMenu();
     void DrawDiaryMenu();
+    void DrawDiaryBase(int, float);
     void DrawMCardMenu();
     void DrawCMakeMenu();
     void DrawSingCMake();
@@ -239,6 +244,8 @@ public:
     void DrawObj(int);
     void CalcPitcher();
     void CalcFukidashi();
+    void SetCrystalCageAttr();
+    void SetManaWaterEffect();
     void DrawFukidashi();
     void ChkPlaceLength(char*);
     void SplitPlace(const char*, char*, char*);
@@ -301,6 +308,7 @@ public:
     void DrawMcWin(short, short);
     void DrawMcWinMess(int, int);
     void GetWinSize(int, short*, short*, int);
+    const char* GetMcStr(int);
     const char* const* GetMcWinMessBuff(int);
     int GetWinMess(int);
     int GetYesNoXPos(int);

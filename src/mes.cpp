@@ -193,6 +193,9 @@ unsigned long CMes::drawTagString(CFont* font, char* text, int drawChars, int br
  */
 void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOnLineBreak)
 {
+	const unsigned char* in = (const unsigned char*)src;
+	char* dst = out;
+
 	if (sTag54Init == 0)
 	{
 		sTag54Source = (char*)s_mesEmpty;
@@ -201,8 +204,6 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 
 	int caseMode = 0;
 	int branchMode = 0;
-	const unsigned char* in = (const unsigned char*)src;
-	char* dst = out;
 
 	while (true)
 	{

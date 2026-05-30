@@ -3353,6 +3353,7 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
     }
 
     memset(picked, 0, 3);
+    picked[0] = '\0';
     picked[0] = rowText[select];
     if (picked[0] == '\0') {
         Sound.PlaySe(4, 0x40, 0x7f, 0);

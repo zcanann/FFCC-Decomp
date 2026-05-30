@@ -2975,11 +2975,11 @@ void CMenuPcs::CmakeResultDraw()
 
     DrawCmakeCrest(static_cast<int>(s_CmakeInfo.m_tribe), 0, 0, textAlpha);
 
+    int yesNoSel = 0;
     if (*reinterpret_cast<short*>(state + 0x10) == 1) {
-        DrawCmakeYesNo(*reinterpret_cast<short*>(state + 0x26) + 1, alpha);
-    } else {
-        DrawCmakeYesNo(0, alpha);
+        yesNoSel = *reinterpret_cast<short*>(state + 0x26) + 1;
     }
+    DrawCmakeYesNo(yesNoSel, alpha);
 
     CFont* labelFont = CmakeFields(this).m_fonts[CMAKE_FONT_LABEL];
     labelFont->SetMargin(FLOAT_80333258);

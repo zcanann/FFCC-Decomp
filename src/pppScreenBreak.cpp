@@ -64,20 +64,11 @@ struct ScreenBreakMeshRef {
     u8 _padC[0x8];
 };
 
-struct ScreenBreakModelData {
-    u8 _pad0[0xC];
-    u32 m_meshCount;
-    u8 _pad10[0x14];
-    CMaterialSet* m_materialSet;
-    u8 _pad28[0xC];
-    u32 m_posQuant;
-};
-
 struct ScreenBreakModelView {
     u8 _pad0[0x68];
     Mtx m_drawMtx;
     u8 _pad98[0xC];
-    ScreenBreakModelData* m_data;
+    CCharaModelData* m_data;
     u8* m_nodes;
     ScreenBreakMeshRef* m_meshes;
 };

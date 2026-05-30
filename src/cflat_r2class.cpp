@@ -94,8 +94,9 @@ static inline void PushF32(CFlatRuntime2* runtime, CFlatRuntime::CObject* object
 	PushValue(runtime, object, *reinterpret_cast<int*>(&value));
 }
 
-static inline void StoreU16(CFlatRuntime::CStack* stack, unsigned short* value, int setMode)
+static inline void StoreU16(CFlatRuntime::CStack* stack, u8* base, int offset, int setMode)
 {
+	unsigned short* value = reinterpret_cast<unsigned short*>(base + offset);
 	stack[-1].m_word = *value;
 
 	if (setMode == 0) {
@@ -107,8 +108,9 @@ static inline void StoreU16(CFlatRuntime::CStack* stack, unsigned short* value, 
 	}
 }
 
-static inline void StoreS16(CFlatRuntime::CStack* stack, short* value, int setMode)
+static inline void StoreS16(CFlatRuntime::CStack* stack, u8* base, int offset, int setMode)
 {
+	short* value = reinterpret_cast<short*>(base + offset);
 	stack[-1].m_word = *value;
 
 	if (setMode == 0) {
@@ -120,8 +122,9 @@ static inline void StoreS16(CFlatRuntime::CStack* stack, short* value, int setMo
 	}
 }
 
-static inline void StoreU32(CFlatRuntime::CStack* stack, unsigned int* value, int setMode)
+static inline void StoreU32(CFlatRuntime::CStack* stack, u8* base, int offset, int setMode)
 {
+	unsigned int* value = reinterpret_cast<unsigned int*>(base + offset);
 	stack[-1].m_word = *value;
 
 	if (setMode == 0) {
@@ -133,8 +136,9 @@ static inline void StoreU32(CFlatRuntime::CStack* stack, unsigned int* value, in
 	}
 }
 
-static inline void StoreF32(CFlatRuntime::CStack* stack, float* value, int setMode)
+static inline void StoreF32(CFlatRuntime::CStack* stack, u8* base, int offset, int setMode)
 {
+	float* value = reinterpret_cast<float*>(base + offset);
 	*reinterpret_cast<float*>(&stack[-1].m_word) = *value;
 
 	if (setMode == 0) {
@@ -144,6 +148,21 @@ static inline void StoreF32(CFlatRuntime::CStack* stack, float* value, int setMo
 	} else if (setMode == 1) {
 		*value += *reinterpret_cast<float*>(&stack->m_word);
 	}
+}
+
+static inline unsigned int LoadU16(u8* base, int offset)
+{
+	return *reinterpret_cast<unsigned short*>(base + offset);
+}
+
+static inline unsigned int LoadS16(u8* base, int offset)
+{
+	return static_cast<unsigned int>(*reinterpret_cast<short*>(base + offset));
+}
+
+static inline unsigned int LoadU32(u8* base, int offset)
+{
+	return *reinterpret_cast<unsigned int*>(base + offset);
 }
 
 } // namespace
@@ -177,19 +196,19 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 				if (systemVal != -0xDB8) {
 					if (systemVal < -0xDB8) {
 						if (systemVal == -0xDBA) {
-							StoreU32(stack, reinterpret_cast<unsigned int*>(engineObject + 0x6EC), setMode);
+							StoreU32(stack, engineObject, 0x6EC, setMode);
 						} else if (systemVal > -0xDBB) {
-							StoreU16(stack, reinterpret_cast<unsigned short*>(engineObject + 0x6D6), setMode);
+							StoreU16(stack, engineObject, 0x6D6, setMode);
 						}
 					} else if (systemVal < -0xD97) {
 						if (systemVal < -0xDA7) {
-							StoreU16(stack, reinterpret_cast<unsigned short*>(classData + (systemVal + 0xDB7) * 2 + 0xF0), setMode);
+							StoreU16(stack, classData, (systemVal + 0xDB7) * 2 + 0xF0, setMode);
 						} else {
-							StoreU16(stack, reinterpret_cast<unsigned short*>(classData + (systemVal + 0xDA7) * 2 + 0xD0), setMode);
+							StoreU16(stack, classData, (systemVal + 0xDA7) * 2 + 0xD0, setMode);
 						}
 					}
 				} else {
-					StoreU16(stack, reinterpret_cast<unsigned short*>(engineObject + 0x6D4), setMode);
+					StoreU16(stack, engineObject, 0x6D4, setMode);
 				}
 			} else if (systemVal <= -400) {
 				if (systemVal <= -1000 && systemVal >= -0xBE7) {
@@ -215,49 +234,49 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 						*byteRef |= mask;
 					}
 				} else if (systemVal <= -500 && systemVal >= -0x2F3) {
-					StoreS16(stack, reinterpret_cast<short*>(classData + (systemVal + 0x2F3) * 2 + 0x9A4), setMode);
+					StoreS16(stack, classData, (systemVal + 0x2F3) * 2 + 0x9A4, setMode);
 				} else if (systemVal != -0x19D) {
 					if (systemVal < -0x19D) {
 						if (systemVal == -0x1B6) {
-							StoreU16(stack, reinterpret_cast<unsigned short*>(classData + 0x3DE), setMode);
+							StoreU16(stack, classData, 0x3DE, setMode);
 						} else if (systemVal < -0x1A5 && systemVal >= -0x1A9) {
-							StoreS16(stack, reinterpret_cast<short*>(classData + (systemVal + 0x1A9) * 2 + 0xAC), setMode);
+							StoreS16(stack, classData, (systemVal + 0x1A9) * 2 + 0xAC, setMode);
 						}
 					} else if (systemVal < -0x199) {
 						if (systemVal < -0x19B) {
-							StoreU32(stack, reinterpret_cast<unsigned int*>(classData + 0x200), setMode);
+							StoreU32(stack, classData, 0x200, setMode);
 						}
 					} else if (systemVal <= -0x192) {
-						StoreU16(stack, reinterpret_cast<unsigned short*>(classData + (systemVal + 0x199) * 2 + 0x3B8), setMode);
+						StoreU16(stack, classData, (systemVal + 0x199) * 2 + 0x3B8, setMode);
 					}
 				} else {
-					StoreU16(stack, reinterpret_cast<unsigned short*>(classData + 0x3C8), setMode);
+					StoreU16(stack, classData, 0x3C8, setMode);
 				}
 			} else if (systemVal <= -0x96 && systemVal >= -0x175) {
 				u8* const itemTable = *reinterpret_cast<u8**>(classData + 0x24);
-				StoreU16(stack, reinterpret_cast<unsigned short*>(itemTable + (systemVal + 0x175) * 2), setMode);
+				StoreU16(stack, itemTable, (systemVal + 0x175) * 2, setMode);
 			} else if (systemVal < -0x52) {
 				if (systemVal < -0x84) {
 					if (systemVal >= -0x94) {
-						StoreU16(stack, reinterpret_cast<unsigned short*>(classData + (systemVal + 0x94) * 2 + 0x8C), setMode);
+						StoreU16(stack, classData, (systemVal + 0x94) * 2 + 0x8C, setMode);
 					}
 				} else if (systemVal > -0x7A) {
-					StoreU16(stack, reinterpret_cast<unsigned short*>(classData + (-0x53 - systemVal) * 2 + 0x3E), setMode);
+					StoreU16(stack, classData, (-0x53 - systemVal) * 2 + 0x3E, setMode);
 				}
 			} else if (systemVal == -0x40) {
-				StoreU16(stack, reinterpret_cast<unsigned short*>(classData + 0x1A), setMode);
+				StoreU16(stack, classData, 0x1A, setMode);
 			} else if (systemVal == -0x41) {
-				StoreU16(stack, reinterpret_cast<unsigned short*>(classData + 0x1C), setMode);
+				StoreU16(stack, classData, 0x1C, setMode);
 			}
 
 			LastResult(this) = 0;
 		} else {
 			switch (systemVal) {
 				case -5:
-					StoreF32(stack, reinterpret_cast<float*>(engineObject + 0x184), setMode);
+					StoreF32(stack, engineObject, 0x184, setMode);
 					break;
 				case -9:
-					StoreU32(stack, reinterpret_cast<unsigned int*>(engineObject + 0x94), setMode);
+					StoreU32(stack, engineObject, 0x94, setMode);
 					break;
 				case -0xA: {
 					const int oldBit = static_cast<int>((static_cast<unsigned int>(*(engineObject + 0x50)) << 0x1C) >> 0x1F);
@@ -287,31 +306,31 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 					break;
 				}
 				case -0xD:
-					StoreF32(stack, reinterpret_cast<float*>(engineObject + 0x188), setMode);
+					StoreF32(stack, engineObject, 0x188, setMode);
 					break;
 				case -0xF:
-					StoreU32(stack, reinterpret_cast<unsigned int*>(engineObject + 0x500), setMode);
+					StoreU32(stack, engineObject, 0x500, setMode);
 					break;
 				case -0x10:
-					StoreU32(stack, reinterpret_cast<unsigned int*>(engineObject + 0x504), setMode);
+					StoreU32(stack, engineObject, 0x504, setMode);
 					break;
 				case -0x14:
 				case -0x13:
 				case -0x12:
 				case -0x11:
-					StoreS16(stack, reinterpret_cast<short*>(engineObject + (systemVal + 0x14) * 2 + 0x510), setMode);
+					StoreS16(stack, engineObject, (systemVal + 0x14) * 2 + 0x510, setMode);
 					break;
 				case -0x15:
-					StoreF32(stack, reinterpret_cast<float*>(engineObject + 0x168), setMode);
+					StoreF32(stack, engineObject, 0x168, setMode);
 					break;
 				case -0x16:
-					StoreF32(stack, reinterpret_cast<float*>(engineObject + 0x16C), setMode);
+					StoreF32(stack, engineObject, 0x16C, setMode);
 					break;
 				case -0x17:
-					StoreF32(stack, reinterpret_cast<float*>(engineObject + 0x170), setMode);
+					StoreF32(stack, engineObject, 0x170, setMode);
 					break;
 				case -0x18:
-					StoreF32(stack, reinterpret_cast<float*>(engineObject + 0x1BC), setMode);
+					StoreF32(stack, engineObject, 0x1BC, setMode);
 					break;
 				case -0x1A: {
 					stack[-1].m_word = static_cast<unsigned int>(static_cast<signed char>(*(engineObject + 0x56)));
@@ -327,7 +346,7 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 					break;
 				}
 				case -0x1B:
-					StoreU32(stack, reinterpret_cast<unsigned int*>(engineObject + 0x60), setMode);
+					StoreU32(stack, engineObject, 0x60, setMode);
 					break;
 				default:
 					break;
@@ -350,7 +369,12 @@ CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* objec
 	u8* const engineObject = reinterpret_cast<u8*>(object->m_engineObject);
 	const unsigned short engineFlags = CallEngineFlags(engineObject);
 
-	if (((engineFlags & 5) == 5) || (systemVal != -0x1B)) {
+	if (((engineFlags & 5) != 5) && (systemVal == -0x1B)) {
+		if (static_cast<unsigned int>(System.m_execParam) >= 2) {
+			System.Printf(const_cast<char*>(sCFlatRuntime2SetClassSystemValWarn));
+		}
+		LastResult(this) = 0;
+	} else {
 		if (systemVal <= -0x40) {
 			u8* const classData = *reinterpret_cast<u8**>(engineObject + 0x58);
 			unsigned int value = 0;
@@ -359,12 +383,12 @@ CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* objec
 				if (systemVal < -0xD97) {
 					if (systemVal < -0xDB7) {
 						if (systemVal == -0xDBA) {
-							value = *reinterpret_cast<unsigned int*>(engineObject + 0x6EC);
+							value = LoadU32(engineObject, 0x6EC);
 						}
 					} else if (systemVal < -0xDA7) {
-						value = *reinterpret_cast<unsigned short*>(classData + (systemVal + 0xDB7) * 2 + 0xF0);
+						value = LoadU16(classData, (systemVal + 0xDB7) * 2 + 0xF0);
 					} else {
-						value = *reinterpret_cast<unsigned short*>(classData + (systemVal + 0xDA7) * 2 + 0xD0);
+						value = LoadU16(classData, (systemVal + 0xDA7) * 2 + 0xD0);
 					}
 				} else if (systemVal < -0xD83) {
 					if (systemVal == -0xD92) {
@@ -380,10 +404,10 @@ CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* objec
 							value = static_cast<unsigned int>(-1);
 						}
 					} else if (systemVal > -0xD93) {
-						value = *reinterpret_cast<unsigned short*>(classData + (systemVal + 0xD91) * 2 + 0xB4);
+						value = LoadU16(classData, (systemVal + 0xD91) * 2 + 0xB4);
 					}
 				} else {
-					value = *reinterpret_cast<unsigned short*>(classData + (systemVal + 0xD83) * 2 + 0xAC);
+					value = LoadU16(classData, (systemVal + 0xD83) * 2 + 0xAC);
 				}
 			} else if (systemVal <= -400) {
 				if (systemVal <= -1000 && systemVal >= -0xBE7) {
@@ -392,14 +416,14 @@ CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* objec
 					const unsigned int mask = 1U << (bit & 7);
 					value = static_cast<unsigned int>((byteValue & mask) != 0);
 				} else if (systemVal <= -500 && systemVal >= -0x2F3) {
-					value = static_cast<unsigned int>(*reinterpret_cast<short*>(classData + (systemVal + 0x2F3) * 2 + 0x9A4));
+					value = LoadS16(classData, (systemVal + 0x2F3) * 2 + 0x9A4);
 				} else if (systemVal != -0x1AA) {
 					if (systemVal < -0x1AA) {
 						if (systemVal != -0x1C8) {
 							if (systemVal > -0x1CA) {
-								value = *reinterpret_cast<unsigned short*>(classData + 0xBC8);
+								value = LoadU16(classData, 0xBC8);
 							} else if (systemVal == -0x1B6) {
-								value = *reinterpret_cast<unsigned short*>(classData + 0x3DE);
+								value = LoadU16(classData, 0x3DE);
 							}
 						} else {
 							u8* const p = *reinterpret_cast<u8**>(engineObject + 0x6F0);
@@ -408,48 +432,48 @@ CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* objec
 							}
 						}
 					} else if (systemVal == -0x19C) {
-						value = *reinterpret_cast<unsigned int*>(classData + 0x200);
+						value = LoadU32(classData, 0x200);
 					} else if (systemVal < -0x19C) {
 						if (systemVal < -0x1A5) {
-							value = static_cast<unsigned int>(*reinterpret_cast<short*>(classData + (systemVal + 0x1A9) * 2 + 0xAC));
+							value = LoadS16(classData, (systemVal + 0x1A9) * 2 + 0xAC);
 						} else if (systemVal == -0x19D) {
-							value = *reinterpret_cast<unsigned short*>(classData + 0x3C8);
+							value = LoadU16(classData, 0x3C8);
 						}
 					} else if (systemVal <= -0x192 && systemVal >= -0x199) {
-						value = *reinterpret_cast<unsigned short*>(classData + (systemVal + 0x199) * 2 + 0x3B8);
+						value = LoadU16(classData, (systemVal + 0x199) * 2 + 0x3B8);
 					}
 				} else {
-					value = *reinterpret_cast<unsigned short*>(classData + 0xB4);
+					value = LoadU16(classData, 0xB4);
 				}
 			} else if (systemVal < -0x95 && systemVal > -0x176) {
 				u8* itemTable = *reinterpret_cast<u8**>(classData + 0x24);
-				value = *reinterpret_cast<unsigned short*>(itemTable + (systemVal + 0x175) * 2);
+				value = LoadU16(itemTable, (systemVal + 0x175) * 2);
 			} else if (systemVal == -0x45) {
-				value = *reinterpret_cast<unsigned short*>(classData + 0x22);
+				value = LoadU16(classData, 0x22);
 			} else if (systemVal < -0x45) {
 				if (systemVal != -0x82) {
 					if (systemVal < -0x82) {
 						if (systemVal == -0x84) {
-							value = *reinterpret_cast<unsigned short*>(classData + 0x18);
+							value = LoadU16(classData, 0x18);
 						} else if (systemVal > -0x95) {
-							value = *reinterpret_cast<unsigned short*>(classData + (systemVal + 0x94) * 2 + 0x8C);
+							value = LoadU16(classData, (systemVal + 0x94) * 2 + 0x8C);
 						}
 					} else if (systemVal < -0x52 && systemVal > -0x7A) {
-						value = *reinterpret_cast<unsigned short*>(classData + (-0x53 - systemVal) * 2 + 0x3E);
+						value = LoadU16(classData, (-0x53 - systemVal) * 2 + 0x3E);
 					}
 				} else {
-					value = *reinterpret_cast<unsigned short*>(classData + 0x14);
+					value = LoadU16(classData, 0x14);
 				}
 			} else if (systemVal == -0x41) {
-				value = *reinterpret_cast<unsigned short*>(classData + 0x1C);
+				value = LoadU16(classData, 0x1C);
 			} else if (systemVal < -0x41) {
 				if (systemVal == -0x43) {
-					value = *reinterpret_cast<unsigned short*>(classData + 0x1E);
+					value = LoadU16(classData, 0x1E);
 				} else if (systemVal < -0x43) {
-					value = *reinterpret_cast<unsigned short*>(classData + 0x20);
+					value = LoadU16(classData, 0x20);
 				}
 			} else if (systemVal <= -0x40) {
-				value = *reinterpret_cast<unsigned short*>(classData + 0x1A);
+				value = LoadU16(classData, 0x1A);
 			}
 
 			LastResult(this) = value;
@@ -534,8 +558,6 @@ CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* objec
 					break;
 			}
 		}
-	} else {
-		LastResult(this) = 0;
 	}
 
 	return reinterpret_cast<CFlatRuntime::CVal*>(&LastResult(this));

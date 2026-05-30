@@ -1012,18 +1012,20 @@ void CMenuPcs::DrawOptionMenu()
 	Vec2d uv0;
 	Vec2d uv1;
 
-	char* optionText[5];
-	char* helpText[5];
-	optionText[0] = g_strMenuUtilMes[languageBase + 2];
-	optionText[1] = g_strMenuUtilMes[languageBase + 3];
-	optionText[2] = g_strMenuUtilMes[languageBase + 4];
-	optionText[3] = g_strMenuUtilMes[languageBase + 5];
-	optionText[4] = g_strMenuUtilMes[languageBase + 6];
-	helpText[0] = g_strMenuUtilMes[languageBase + 7];
-	helpText[1] = g_strMenuUtilMes[languageBase + 8];
-	helpText[2] = g_strMenuUtilMes[languageBase + 9];
-	helpText[3] = g_strMenuUtilMes[languageBase + 10];
-	helpText[4] = g_strMenuUtilMes[languageBase + 11];
+	char* optionText[5] = {
+	    g_strMenuUtilMes[languageBase + 2],
+	    g_strMenuUtilMes[languageBase + 3],
+	    g_strMenuUtilMes[languageBase + 4],
+	    g_strMenuUtilMes[languageBase + 5],
+	    g_strMenuUtilMes[languageBase + 6],
+	};
+	char* helpText[5] = {
+	    g_strMenuUtilMes[languageBase + 7],
+	    g_strMenuUtilMes[languageBase + 8],
+	    g_strMenuUtilMes[languageBase + 9],
+	    g_strMenuUtilMes[languageBase + 10],
+	    g_strMenuUtilMes[languageBase + 11],
+	};
 	color.a = static_cast<unsigned char>(static_cast<int>(FLOAT_80333550 * m_optionOpenAnim));
 
 	font->SetScale(FLOAT_80333548);

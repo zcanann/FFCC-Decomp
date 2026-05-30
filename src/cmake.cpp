@@ -3235,7 +3235,7 @@ unsigned short CMenuPcs::CmakeVillageCtrl()
     unsigned short down;
     unsigned short repeat;
     char picked[8];
-    size_t len = strlen(s_CmakeInfo.m_name);
+    int len = strlen(s_CmakeInfo.m_name);
 
     bool padBusy = false;
     if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {

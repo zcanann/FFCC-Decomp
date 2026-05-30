@@ -751,8 +751,9 @@ void CMes::Draw()
 
 					font->SetPosX(*(float*)((char*)this + 0x3C9C) + *glyph);
 					font->SetPosY(*(float*)((char*)this + 0x3CA0) + (float)*(short*)(glyph + 2));
+					float glyphScaleY = FLOAT_803308a0 * (float)*(unsigned char*)((char*)glyph + 0x11);
 					font->SetScaleX(FLOAT_803308a0 * (float)*(unsigned char*)((char*)glyph + 0x0A));
-					font->SetScaleY(FLOAT_803308a0 * (float)*(unsigned char*)((char*)glyph + 0x11));
+					font->SetScaleY(glyphScaleY);
 					font->renderFlags = font->renderFlags & 0xF7 | 8;
 					font->Draw((unsigned short)ch);
 					font->renderFlags &= 0xF7;

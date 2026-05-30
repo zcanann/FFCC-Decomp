@@ -100,6 +100,7 @@ extern float FLOAT_8033151c;
 extern float FLOAT_80331518;
 extern float FLOAT_80331520;
 extern float FLOAT_80331528;
+extern double DOUBLE_80331530;
 extern float FLOAT_803315cc;
 extern float FLOAT_803315d0;
 extern float FLOAT_80331598;
@@ -170,6 +171,7 @@ extern float FLOAT_803314fc;
 extern float FLOAT_80331500;
 extern float FLOAT_80331554;
 extern float FLOAT_80331548;
+extern float FLOAT_8033154C;
 extern float FLOAT_80331550;
 extern float FLOAT_80331558;
 extern float FLOAT_8033155C;
@@ -9615,12 +9617,104 @@ LAB_draw:
 				         FLOAT_80331468 + FLOAT_803314d8 + static_cast<float>(static_cast<int>(panelWidth)),
 				         rowY, FLOAT_803314d8, FLOAT_80331440, FLOAT_803313dc, FLOAT_803313dc,
 				         FLOAT_803313e8, FLOAT_803313e8, 8.0f);
-				SetTexture(static_cast<CMenuPcs::TEX>(0x2A));
-				DrawRect(0xFFFFFFFF, FLOAT_8033151c, rowY, static_cast<float>(panelWidth), FLOAT_80331440,
-				         FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, 0.0f);
+					SetTexture(static_cast<CMenuPcs::TEX>(0x2A));
+					DrawRect(0xFFFFFFFF, FLOAT_8033151c, rowY, static_cast<float>(panelWidth), FLOAT_80331440,
+					         FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, 0.0f);
 
-				SetTexture(static_cast<CMenuPcs::TEX>(0x37));
-				float iconX = FLOAT_8033155C;
+					const unsigned int language = Game.m_gameWork.m_languageId;
+					float dateY = rowY;
+					if (language != 5) {
+						dateY = slotY + FLOAT_803314d8;
+					}
+					SetTexture(static_cast<CMenuPcs::TEX>(0x17));
+					const unsigned int saveYear = *reinterpret_cast<unsigned int*>(slotData + 8);
+					int digitCount = 1;
+					if (saveYear > 99) {
+						digitCount = 3;
+					} else if (saveYear > 9) {
+						digitCount = 2;
+					}
+					if (digitCount == 3) {
+						DrawRect(0xFFFFFFFF, FLOAT_80331520, dateY, static_cast<float>(DAT_801dc140), FLOAT_80331410,
+						         FLOAT_80331524, FLOAT_80331528, FLOAT_803313e8, FLOAT_803313e8, 0.0f);
+					} else {
+						int digits[2];
+						int totalWidth;
+						if (digitCount == 1) {
+							const int tens = static_cast<int>(saveYear) / 10 + (static_cast<int>(saveYear) >> 0x1F);
+							digits[0] = static_cast<int>(saveYear) + (tens - (tens >> 0x1F)) * -10;
+							totalWidth = DAT_801dc118[digits[0]];
+						} else {
+							const int tens = static_cast<int>(saveYear) / 10 + (static_cast<int>(saveYear) >> 0x1F);
+							digits[0] = tens - (tens >> 0x1F);
+							digits[1] = static_cast<int>(saveYear) + digits[0] * -10;
+							totalWidth = DAT_801dc118[digits[0]] + DAT_801dc118[digits[1]];
+						}
+						float digitScale = static_cast<float>(DOUBLE_80331420);
+						if (language != 5) {
+							digitScale = static_cast<float>(DOUBLE_80331530);
+						}
+						int adjustedWidth = totalWidth;
+						if (language == 2) {
+							adjustedWidth += 8;
+						} else if (language == 3) {
+							adjustedWidth += 0xB;
+						} else if (language != 5) {
+							adjustedWidth += 0x20;
+						}
+						float digitX = FLOAT_80331520 +
+						               static_cast<float>((0x20 - static_cast<int>(static_cast<float>(adjustedWidth) * digitScale)) / 2);
+						for (int digitIdx = 0; digitIdx < digitCount; digitIdx++) {
+							const int digit = digits[digitIdx];
+							const int digitWidth = DAT_801dc118[digit];
+							const int row = digit / 5 + (digit >> 0x1F);
+							const int rowIndex = row - (row >> 0x1F);
+							const int col = digit + rowIndex * -5;
+							DrawRect(0xFFFFFFFF, digitX, dateY, static_cast<float>(digitWidth), FLOAT_80331410,
+							         static_cast<float>(DOUBLE_80331490 * static_cast<double>(col)),
+							         static_cast<float>(DOUBLE_80331540 * static_cast<double>(rowIndex) + DOUBLE_80331538),
+							         digitScale, FLOAT_803313e8, 0.0f);
+							digitX += static_cast<float>(digitWidth) * digitScale;
+						}
+						if (language != 5) {
+							float suffixWidth = FLOAT_80331410;
+							if (language == 2) {
+								suffixWidth = FLOAT_80331548;
+							} else if (language == 3) {
+								suffixWidth = FLOAT_8033154C;
+							}
+							float suffixU = FLOAT_803313dc;
+							float suffixScale = static_cast<float>(DOUBLE_80331420);
+							if (language == 1 || language == 4) {
+								suffixScale = static_cast<float>(DOUBLE_80331530);
+							}
+							if (language == 1) {
+								const int tens = static_cast<int>(saveYear) / 10 + (static_cast<int>(saveYear) >> 0x1F);
+								if (tens - (tens >> 0x1F) == 1) {
+									suffixU = FLOAT_8033151c;
+								} else {
+									const int ones = static_cast<int>(saveYear) + (tens - (tens >> 0x1F)) * -10;
+									if (ones < 1 || ones > 3) {
+										suffixU = FLOAT_8033151c;
+									} else {
+										suffixU = FLOAT_803314d8 * static_cast<float>(ones - 1);
+									}
+								}
+							} else if (language == 4) {
+								if (saveYear != 1) {
+									suffixU = FLOAT_803314d8;
+								}
+							} else if (language == 2) {
+								dateY += FLOAT_80331550;
+							}
+							SetTexture(static_cast<CMenuPcs::TEX>(0x34));
+							DrawRect(0xFFFFFFFF, digitX, dateY, suffixWidth, FLOAT_803314d8,
+							         suffixU, FLOAT_803313dc, suffixScale, FLOAT_803313e8, 0.0f);
+						}
+					}
+
+					SetTexture(static_cast<CMenuPcs::TEX>(0x37));
+					float iconX = FLOAT_8033155C;
 				for (int member = 0; member < 4; member++) {
 					const int modelNo = *reinterpret_cast<int*>(slotData + 0x18 + member * 4);
 					if (modelNo >= 0) {

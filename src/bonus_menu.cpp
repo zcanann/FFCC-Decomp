@@ -1833,7 +1833,21 @@ void CMenuPcs::CalcSelectWait()
 	} else {
 		sprites[2].alpha = 1.0f;
 	}
-	UpdateSelectCursorSprite(statePtr, header, sprites, frame);
+	{
+		BonusAnimSprite* cursor = &sprites[header->count - 1];
+		if (currentPartyIndex < activePartyCount) {
+			BonusAnimSprite* partySprite = cursor - (activePartyCount * 2 - currentPartyIndex);
+			int pulseFrame = frame % 20 - 10;
+			if (pulseFrame < 0) {
+				pulseFrame = -pulseFrame;
+			}
+			cursor->x = (short)(partySprite->x - 3);
+			cursor->y = (short)(partySprite->y - 8);
+			cursor->alpha = (float)pulseFrame / 10.0f;
+		} else {
+			cursor->alpha = 0.0f;
+		}
+	}
 
 	Mtx scaleMtx;
 	Mtx rotMtx;

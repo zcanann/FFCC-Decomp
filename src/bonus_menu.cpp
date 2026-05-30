@@ -2886,6 +2886,7 @@ void CMenuPcs::DrawResultOpenAnim()
 		int activePartyCount = s_Rinfo->m_partyCount;
 		BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
 		BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
+		CCharaPcs::CHandle** displaySlots = GetBonusDisplayHandleSlots(this);
 		int lastKind = 0;
 
 		DrawInit();
@@ -2901,7 +2902,7 @@ void CMenuPcs::DrawResultOpenAnim()
 					if (modelIndex < activePartyCount) {
 						handle = s_Rinfo->m_party[modelIndex].m_partyHandle;
 					} else {
-						handle = GetBonusDisplayHandleSlots(this)[modelIndex - activePartyCount];
+						handle = displaySlots[modelIndex - activePartyCount];
 					}
 
 					if (0.0f < *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(handle->m_model) + 0x9C)) {

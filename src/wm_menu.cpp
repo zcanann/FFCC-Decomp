@@ -1298,7 +1298,7 @@ void CMenuPcs::CalcDiaryMenu()
 	const unsigned int slotState =
 	    static_cast<unsigned int>(-static_cast<int>(MemoryCardMan.m_currentSlot) - 1) |
 	    static_cast<unsigned int>(static_cast<int>(MemoryCardMan.m_currentSlot) + 1);
-	const unsigned int mounted = -static_cast<int>(static_cast<int>(slotState) >> 31);
+	const unsigned int mounted = slotState >> 31;
 	if (mounted != s_wmMenuLastMountState) {
 		if (System.m_execParam > 2) {
 			const char* text = s_FALSE_803317F4;
@@ -1307,7 +1307,7 @@ void CMenuPcs::CalcDiaryMenu()
 			}
 			System.Printf(const_cast<char*>(s_mount____s_801dc460), text);
 		}
-		s_wmMenuLastMountState = static_cast<unsigned char>(slotState >> 31);
+		s_wmMenuLastMountState = static_cast<unsigned char>(mounted);
 	}
 
 	WMChgMenu();

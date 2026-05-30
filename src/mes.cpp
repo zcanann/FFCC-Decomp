@@ -1408,7 +1408,7 @@ void CMes::Set(char* text, int param)
 
 		*(int*)((char*)this + 4) = (int)text;
 		*(int*)((char*)this + 0x3c74) = 0;
-		*(int*)((char*)this + 0x3cb0) = (param == 0);
+		*(int*)((char*)this + 0x3cb0) = (unsigned int)__cntlzw((unsigned int)param) >> 5;
 		*(int*)((char*)this + 0x3cb4) = 3;
 		*(int*)((char*)this + 0x3cb8) = 0;
 		*(int*)((char*)this + 0x3d10) = 0;

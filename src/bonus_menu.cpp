@@ -66,6 +66,7 @@ extern "C" const char sDrawBonusFmt[16] = {
     'd', 'r', 'a', 'w', ' ', 'B', 'o', 'n', 'u', 's', ' ', '(', '%', 'd', ')', '\n',
 };
 extern "C" const char s_bonus_menu_cpp[] = "bonus_menu.cpp";
+extern "C" const char s_bonusAllocErrorFmt[] = "%s(%d): Error: memory allocation error\n";
 
 namespace {
 
@@ -502,8 +503,14 @@ static inline void DrawBonusSelectedArtifactHelp(CMenuPcs* menu, int statePtr, B
 	font->Draw(title);
 
 	char* source = new (menu->m_menuStage, const_cast<char*>(s_bonus_menu_cpp), 0xA9C) char[0x200];
+	if ((source == 0) && (System.m_execParam != 0)) {
+		System.Printf(const_cast<char*>(s_bonusAllocErrorFmt), const_cast<char*>(s_bonus_menu_cpp), 0xA9F);
+	}
 	memset(source, 0, 0x200);
 	char* converted = new (menu->m_menuStage, const_cast<char*>(s_bonus_menu_cpp), 0xAA5) char[0x200];
+	if ((converted == 0) && (System.m_execParam != 0)) {
+		System.Printf(const_cast<char*>(s_bonusAllocErrorFmt), const_cast<char*>(s_bonus_menu_cpp), 0xAA8);
+	}
 	memset(converted, 0, 0x200);
 	strcpy(source, flat->m_table[6].m_strings[itemId]);
 	CMes::MakeAgbString(converted, source, 0, 0);

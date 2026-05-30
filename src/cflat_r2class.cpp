@@ -210,7 +210,7 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 		if (systemVal <= -0x40) {
 			u8* const classData = *reinterpret_cast<u8**>(engineObject + 0x58);
 
-			if (systemVal <= -0xD80) {
+			if (systemVal < -0xD7F) {
 				if (systemVal != -0xDB8) {
 					if (systemVal < -0xDB8) {
 						if (systemVal == -0xDBA) {
@@ -228,8 +228,8 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 				} else {
 					StoreU16(stack, engineObject, 0x6D4, setMode);
 				}
-			} else if (systemVal <= -400) {
-				if (systemVal <= -1000 && systemVal >= -0xBE7) {
+			} else if (systemVal < -399) {
+				if (systemVal < -999 && systemVal > -0xBE8) {
 					const unsigned int bit = static_cast<unsigned int>(systemVal + 0xBE7);
 					const u8 mask = static_cast<u8>(1U << (bit & 7));
 					u8* const byteRef = classData + (bit >> 3) + 0x8A4;
@@ -251,7 +251,7 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 					} else {
 						*byteRef |= mask;
 					}
-				} else if (systemVal <= -500 && systemVal >= -0x2F3) {
+				} else if (systemVal < -499 && systemVal > -0x2F4) {
 					StoreS16(stack, classData, (systemVal + 0x2F3) * 2 + 0x9A4, setMode);
 				} else if (systemVal != -0x19D) {
 					if (systemVal < -0x19D) {
@@ -264,13 +264,13 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 						if (systemVal < -0x19B) {
 							StoreU32(stack, classData, 0x200, setMode);
 						}
-					} else if (systemVal <= -0x192) {
+					} else if (systemVal < -0x191) {
 						StoreU16(stack, classData, (systemVal + 0x199) * 2 + 0x3B8, setMode);
 					}
 				} else {
 					StoreU16(stack, classData, 0x3C8, setMode);
 				}
-			} else if (systemVal <= -0x96 && systemVal >= -0x175) {
+			} else if (systemVal < -0x95 && systemVal > -0x176) {
 				u8* const itemTable = *reinterpret_cast<u8**>(classData + 0x24);
 				StoreU16(stack, itemTable, (systemVal + 0x175) * 2, setMode);
 			} else if (systemVal < -0x52) {
@@ -283,7 +283,7 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 				}
 			} else if (systemVal == -0x40) {
 				StoreU16(stack, classData, 0x1A, setMode);
-			} else if (systemVal == -0x41) {
+			} else if (systemVal < -0x40 && systemVal > -0x42) {
 				StoreU16(stack, classData, 0x1C, setMode);
 			}
 
@@ -464,7 +464,7 @@ CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* objec
 						} else if (systemVal == -0x19D) {
 							value = LoadU16(classData, 0x3C8);
 						}
-					} else if (systemVal <= -0x192 && systemVal >= -0x199) {
+					} else if (systemVal < -0x191 && systemVal >= -0x199) {
 						value = LoadU16(classData, (systemVal + 0x199) * 2 + 0x3B8);
 					}
 				} else {
@@ -480,10 +480,10 @@ CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* objec
 					if (systemVal < -0x82) {
 						if (systemVal == -0x84) {
 							value = LoadU16(classData, 0x18);
-						} else if (systemVal > -0x95) {
+						} else if (systemVal >= -0x94) {
 							value = LoadU16(classData, (systemVal + 0x94) * 2 + 0x8C);
 						}
-					} else if (systemVal < -0x52 && systemVal > -0x7A) {
+					} else if (systemVal < -0x52 && systemVal >= -0x79) {
 						value = LoadU16(classData, (-0x53 - systemVal) * 2 + 0x3E);
 					}
 				} else {

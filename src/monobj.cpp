@@ -565,8 +565,7 @@ void CGMonObj::onChangeStat(int state)
 {
 	CGObject* object = reinterpret_cast<CGObject*>(this);
 	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
-	typedef void (*PtMFSCallFn)(CGMonObj*, int, unsigned char*);
-	((PtMFSCallFn)__ptmf_scall)(this, state, mon + 0x708);
+	(this->*m_funcs->changeStat)(state);
 
 	if ((state <= 2) && (state >= -14) && (state <= -5)) {
 		int scriptOffset = (state + 0xE) * 2;

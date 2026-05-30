@@ -1286,9 +1286,6 @@ void CMenuPcs::CalcDiaryMenu()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	unsigned char* const worldState = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x82C)[0]);
-	if (worldState == 0) {
-		return;
-	}
 
 	if (s_wmMenuMountStateInitialized == 0) {
 		s_wmMenuLastMountState = 0;

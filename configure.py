@@ -539,7 +539,7 @@ config.libs = [
             Object(NonMatching, "mapocttree.cpp", extra_cflags=["-sdata 8"]),
             Object(NonMatching, "mapshadow.cpp"),
             Object(NonMatching, "maptexanim.cpp", extra_cflags=["-RTTI on", "-str reuse,pool,readonly"]),
-            Object(NonMatching, "materialman.cpp"),
+            Object(NonMatching, "materialman.cpp", extra_cflags=["-inline auto,deferred"]),
             Object(NonMatching, "math.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
             Object(NonMatching, "ME_AppRequest.cpp"),
             Object(NonMatching, "ME_USB_process.cpp", cflags=[*cflags_game_cpp_exceptions, "-sdata 0"]),

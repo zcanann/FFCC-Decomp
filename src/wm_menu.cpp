@@ -15,6 +15,7 @@
 #include "ffcc/p_light.h"
 #include "ffcc/partMng.h"
 #include "ffcc/p_tina.h"
+#include "ffcc/strcase.h"
 #include "ffcc/THPSimple.h"
 #include "ffcc/joybus.h"
 #include "ffcc/color.h"
@@ -9434,29 +9435,19 @@ LAB_draw:
 			if (*reinterpret_cast<char*>(slotData + 0x42) == 0 && *reinterpret_cast<int*>(slotData + 8) > 0) {
 				fontF8->SetMargin(FLOAT_803313e8);
 				fontF8->SetShadow(0);
-				fontF8->SetScale(FLOAT_803313e8);
+				fontF8->SetScale(FLOAT_80331588);
 				fontF8->DrawInit();
 				unsigned int nameColor = 0xFFFFFFFF;
 				fontF8->SetColor(*(_GXColor*)&nameColor);
-				fontF8->SetPosX(FLOAT_803314d8);
-				fontF8->SetPosY(slotY);
-
-				// Draw character name
+				fontF8->SetTlut(0x2C);
+				fontF8->SetPosX(FLOAT_80331520);
+				fontF8->SetPosY(static_cast<float>(static_cast<double>(slotY) - DOUBLE_80331510));
 				char nameStr[64];
-				nameStr[0] = 0;
+				strcpy(nameStr, reinterpret_cast<char*>(slotData + 0x2C));
+				if (nameStr[0] != 0) {
+					nameStr[0] = static_cast<char>(toupperLatin1(static_cast<unsigned char>(nameStr[0])));
+				}
 				fontF8->Draw(nameStr);
-
-				// Level number
-				fontF8->SetPosX(FLOAT_803314d8 + FLOAT_80331500);
-				char levelStr[16];
-				levelStr[0] = 0;
-				fontF8->Draw(levelStr);
-
-				// Play time
-				char timeStr[32];
-				timeStr[0] = 0;
-				fontF8->SetPosX(FLOAT_803314d8 + FLOAT_80331500 + FLOAT_803314fc);
-				fontF8->Draw(timeStr);
 			} else {
 				fontF8->SetMargin(FLOAT_803313e8);
 				fontF8->SetShadow(1);

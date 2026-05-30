@@ -818,15 +818,13 @@ void CMenuPcs::CalcSelectCloseAnim()
 		sprites[3].startFrame = 0;
 		sprites[3].duration = 8;
 
-		if (activePartyCount > 0) {
-			for (int i = 0; i < activePartyCount; i++) {
-				SetupSelectCloseSpriteMotion(&sprites[iconBase + i]);
-			}
+		for (int i = 0; i < activePartyCount; i++) {
+			SetupSelectCloseSpriteMotion(&sprites[iconBase + i]);
+		}
 
-			s_PlayerTop = (unsigned char)nameBase;
-			for (int i = 0; i < activePartyCount; i++) {
-				SetupSelectCloseSpriteMotion(&sprites[nameBase + i]);
-			}
+		s_PlayerTop = (unsigned char)nameBase;
+		for (int i = 0; i < activePartyCount; i++) {
+			SetupSelectCloseSpriteMotion(&sprites[nameBase + i]);
 		}
 
 		s_ArtiTop = (unsigned char)slotBase;
@@ -836,31 +834,29 @@ void CMenuPcs::CalcSelectCloseAnim()
 			sprites[slotBase + i].duration = 8;
 		}
 
-		if (activePartyCount > 0) {
-			for (int i = 0; i < activePartyCount; i++) {
-				SetupSelectCloseSpriteMotion(&sprites[detailBase + i]);
-			}
+		for (int i = 0; i < activePartyCount; i++) {
+			SetupSelectCloseSpriteMotion(&sprites[detailBase + i]);
+		}
 
-			for (int i = 0; i < activePartyCount; i++) {
-				SetupSelectCloseSpriteMotion(&sprites[markBase + i]);
-			}
+		for (int i = 0; i < activePartyCount; i++) {
+			SetupSelectCloseSpriteMotion(&sprites[markBase + i]);
+		}
 
-			for (int i = 0; i < activePartyCount; i++) {
-				BonusAnimSprite* iconSprite = &sprites[iconBase + i];
-				BonusAnimSprite* nameSprite = &sprites[lowerNameBase + i];
-				nameSprite->tex = -1;
-				nameSprite->kind = -1;
-				nameSprite->x = (short)(iconSprite->x + 0x50);
-				nameSprite->y = (short)(iconSprite->y + 0x48);
-				nameSprite->startFrame = iconSprite->startFrame;
-				nameSprite->timer = 0;
-				nameSprite->duration = 8;
-				nameSprite->depth = 1.0f;
-				nameSprite->motionX = 100.0f;
-				nameSprite->motionY = 0.0f;
-				nameSprite->targetX = (float)nameSprite->x + nameSprite->motionX;
-				nameSprite->targetY = (float)nameSprite->y + nameSprite->motionY;
-			}
+		for (int i = 0; i < activePartyCount; i++) {
+			BonusAnimSprite* iconSprite = &sprites[iconBase + i];
+			BonusAnimSprite* nameSprite = &sprites[lowerNameBase + i];
+			nameSprite->tex = -1;
+			nameSprite->kind = -1;
+			nameSprite->x = (short)(iconSprite->x + 0x50);
+			nameSprite->y = (short)(iconSprite->y + 0x48);
+			nameSprite->startFrame = iconSprite->startFrame;
+			nameSprite->timer = 0;
+			nameSprite->duration = 8;
+			nameSprite->depth = 1.0f;
+			nameSprite->motionX = 100.0f;
+			nameSprite->motionY = 0.0f;
+			nameSprite->targetX = (float)nameSprite->x + nameSprite->motionX;
+			nameSprite->targetY = (float)nameSprite->y + nameSprite->motionY;
 		}
 
 		*(short*)(animPtr + 6) = 0;

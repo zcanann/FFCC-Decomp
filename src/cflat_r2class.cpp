@@ -954,11 +954,23 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			break;
 		}
 		case -0x31:
-		case -0x2F:
 			engineObject->m_bgHitMask = object->m_localBase[0];
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
+		case -0x2F: {
+			float* params = reinterpret_cast<float*>(object->m_localBase);
+			CVector position(params[4], params[5], params[6]);
+			engineObject->SetDamageCol(
+			    static_cast<int>(object->m_localBase[0]),
+			    RuntimeString(this, object->m_localBase[1]),
+			    params[2],
+			    params[3],
+			    position);
+			PushValue(this, object, 0);
+			outResult = 0;
+			break;
+		}
 		case -0x33: {
 			float rotY = static_cast<float>(object->m_localBase[0]);
 			engineObject->m_rotTargetY = rotY;

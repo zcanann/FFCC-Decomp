@@ -929,7 +929,7 @@ void CMes::addString(char** text, int branchMode)
 
 		if (ch == 0xFF)
 		{
-			unsigned int tag = ((unsigned int)(unsigned char)**text - 0xA0U) & 0xFFU;
+			unsigned int tag = ((unsigned int)(unsigned char)**text - 0xA0U) & 0xFFFFU;
 			*text = *text + 1;
 
 			switch (tag)

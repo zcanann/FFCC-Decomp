@@ -923,7 +923,7 @@ void CGMonObj::onFrameStat()
 		}
 	}
 
-	__ptmf_scall(this, mon + 0x708);
+	(this->*m_funcs->frameStat)();
 
 	switch (state) {
 	case 0:

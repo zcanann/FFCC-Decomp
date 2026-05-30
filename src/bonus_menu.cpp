@@ -365,31 +365,25 @@ static inline void SetupSelectCloseSpriteMotion(BonusAnimSprite* sprite)
 
 static inline void DrawBonusActiveMarks(CMenuPcs* menu, int statePtr, float alpha)
 {
-	if (statePtr == 0 || alpha <= 0.0f) {
-		return;
+	unsigned int activeMask = 0;
+	for (int i = 0; i < s_Rinfo->m_partyCount; i++) {
+		int selection = s_Rinfo->m_party[i].m_selectedSlot;
+		if (selection >= 0) {
+			activeMask |= 1 << selection;
+		}
 	}
 
-	unsigned char activeMask = *(unsigned char*)(statePtr + 9);
-	if (activeMask == 0) {
-		return;
-	}
-
-	menu->SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-	menu->SetTexture(static_cast<CMenuPcs::TEX>(0x23));
 	GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(alpha * 255.0f)};
 	GXSetChanMatColor(GX_COLOR0A0, color);
-
-	float* markPos = s_Base[0];
-	if (markPos == 0) {
-		return;
-	}
+	menu->SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+	menu->SetTexture(static_cast<CMenuPcs::TEX>(0x23));
 
 	for (int i = 0; i < 8; i++) {
 		if ((activeMask & (1 << i)) == 0) {
 			continue;
 		}
-		float x = markPos[i * 2 + 2] + 4.0f;
-		float y = markPos[i * 2 + 3] + 4.0f;
+		float x = s_Base[0][i * 2 + 2] + 4.0f;
+		float y = s_Base[0][i * 2 + 3] + 4.0f;
 		menu->DrawRect(0, x, y, 24.0f, 24.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 	}
 }

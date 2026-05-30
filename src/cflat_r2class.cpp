@@ -1256,6 +1256,9 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			PushValue(this, object, 0);
 			outResult = 0;
 			break;
+		case -7:
+		case -6:
+		case -5:
 		default:
 			handled = 0;
 			break;

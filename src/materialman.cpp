@@ -1065,12 +1065,11 @@ void CMaterialMan::addtev_stdShadow(unsigned long materialFlag)
         return;
     }
 
-    int materialNum = m_shadowMaterialCount;
-    for (int i = 0; i < materialNum; i++) {
-        if (m_shadowMaterialType[i] == 0) {
-            addtev_shadow(i);
-        } else {
+    for (int i = 0; i < m_shadowMaterialCount; i++) {
+        if (m_shadowMaterialType[i] != 0) {
             addtev_lightmap(i);
+        } else {
+            addtev_shadow(i);
         }
     }
 }

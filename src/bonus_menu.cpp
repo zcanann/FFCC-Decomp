@@ -515,6 +515,7 @@ static inline void DrawBonusSelectedArtifactHelp(CMenuPcs* menu, int statePtr, B
 	memset(converted, 0, 0x200);
 	strcpy(source, flat->m_table[6].m_strings[itemId]);
 	CMes::MakeAgbString(converted, source, 0, 0);
+	strlen(converted);
 
 	float lineY = centerY - 58.0f;
 	for (int line = 0;; line++) {

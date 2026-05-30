@@ -7869,13 +7869,19 @@ void CMenuPcs::CalcCharaSelect()
 		}
 
 		if (requestFinalize) {
-			unsigned int activeMask = 0;
+			unsigned int activeCount = 0;
 			for (int i = 0; i < 4; i++) {
 				if (selectEntries[i].m_confirmed != 0) {
-					activeMask++;
+					activeCount++;
 				}
 			}
-			if (activeMask <= static_cast<unsigned int>(locallyConfirmedCount)) {
+			for (int i = 0; i < 4; i++) {
+				if (selectEntries[i].m_cmakePending != 0) {
+					activeCount = 0;
+					break;
+				}
+			}
+			if (activeCount <= static_cast<unsigned int>(locallyConfirmedCount)) {
 				Sound.PlaySe(4, 0x40, 0x7F, 0);
 			} else {
 				Sound.PlaySe(2, 0x40, 0x7F, 0);

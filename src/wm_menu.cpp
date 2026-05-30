@@ -9344,6 +9344,40 @@ LAB_draw:
 		}
 	}
 
+	if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x16) > 0x10 &&
+	    *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x10) < 3) {
+		unsigned char* const mcData = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x838)[0]);
+		for (int slot = 0; slot < kMcListCount; slot++) {
+			unsigned char* const slotData = mcData + slot * kMcListEntrySize;
+			const float slotY = FLOAT_80331498 * static_cast<float>(slot) + FLOAT_80331490;
+			if (slotData[0x42] == 0 && slotData[0x41] != 0) {
+				const float rowY = slotY + FLOAT_80331440;
+				SetTexture(static_cast<CMenuPcs::TEX>(0x26));
+				DrawRect(0xFFFFFFFF, FLOAT_80331468, rowY, FLOAT_803314d8, FLOAT_80331440,
+				         FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, 0.0f);
+
+				unsigned int memberCount = static_cast<unsigned int>(*reinterpret_cast<int*>(slotData + 0x18) >= 0);
+				if (*reinterpret_cast<int*>(slotData + 0x1C) >= 0) {
+					memberCount++;
+				}
+				if (*reinterpret_cast<int*>(slotData + 0x20) >= 0) {
+					memberCount++;
+				}
+				if (*reinterpret_cast<int*>(slotData + 0x24) >= 0) {
+					memberCount++;
+				}
+				const unsigned int panelWidth = memberCount * 0x30 + 0x40;
+				DrawRect(0xFFFFFFFF,
+				         FLOAT_80331468 + FLOAT_803314d8 + static_cast<float>(static_cast<int>(panelWidth)),
+				         rowY, FLOAT_803314d8, FLOAT_80331440, FLOAT_803313dc, FLOAT_803313dc,
+				         FLOAT_803313e8, FLOAT_803313e8, 8.0f);
+				SetTexture(static_cast<CMenuPcs::TEX>(0x2A));
+				DrawRect(0xFFFFFFFF, FLOAT_8033151c, rowY, static_cast<float>(panelWidth), FLOAT_80331440,
+				         FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, 0.0f);
+			}
+		}
+	}
+
 	// Draw text info for each save slot
 	if ((state == 2 || state == 3) && *reinterpret_cast<short*>(*reinterpret_cast<int*>(bytes + 0x82C) + 0x16) != 0) {
 		unsigned int* mcData = *reinterpret_cast<unsigned int**>(bytes + 0x838);

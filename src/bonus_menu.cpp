@@ -1545,6 +1545,88 @@ void CMenuPcs::CalcSelectOpenAnim()
 		}
 	}
 
+	int boardPtr = GetBonusMenuMembers(this).m_bonusBoardPtr;
+	int entryOffset = 0;
+	for (int i = 0; i < activePartyCount; i++) {
+		BonusAnimSprite* sprite = &sprites[4 + i];
+		int centerX = (int)((double)(float)((double)sprite->w * 0.5 + (double)((float)sprite->x + sprite->motionX)) - 320.0);
+		int centerY = (int)((double)(float)((double)sprite->h * 0.5 + (double)((float)sprite->y + sprite->motionY)) - 240.0);
+		*reinterpret_cast<short*>(boardPtr + entryOffset + 8) = (short)centerX;
+		*reinterpret_cast<short*>(boardPtr + entryOffset + 10) = (short)centerY;
+
+		int screenX = (int)(24.0f + (float)sprite->x + sprite->motionX);
+		int screenY = (int)(((float)sprite->y + sprite->motionY) - 28.0f);
+		if ((double)screenX < 0.0) {
+			screenX = 0;
+		}
+		if ((double)screenY < 0.0) {
+			screenY = 0;
+		}
+		*reinterpret_cast<int*>(boardPtr + entryOffset + 0x40) = screenX;
+		*reinterpret_cast<int*>(boardPtr + entryOffset + 0x44) = screenY;
+		*reinterpret_cast<int*>(boardPtr + entryOffset + 0x48) = 0x48;
+		*reinterpret_cast<int*>(boardPtr + entryOffset + 0x4C) = 0x58;
+		entryOffset += 0x50;
+	}
+
+	Mtx scaleMtx;
+	Mtx rotMtx;
+	Mtx tempMtx;
+	Vec srcVec;
+	Vec dstVec;
+	CCharaPcs::CHandle** displaySlots = GetBonusDisplayHandleSlots(this);
+	for (int i = 0; i < activePartyCount + 8; i++) {
+		CCharaPcs::CHandle* handle;
+		int tribeId;
+		if (i < activePartyCount) {
+			handle = s_Rinfo->m_party[i].m_partyHandle;
+			tribeId = s_Rinfo->m_party[i].m_tribeId;
+			float modelScale = s_BonusModelScale[tribeId];
+			PSMTXScale(scaleMtx, modelScale, modelScale, modelScale);
+
+			scaleMtx[1][3] = s_BonusModelYPos[tribeId];
+			scaleMtx[0][3] = 0.0f;
+		} else {
+			int artifactIndex = i - activePartyCount;
+			handle = displaySlots[activePartyCount * 2 + artifactIndex];
+			if (handle == 0) {
+				continue;
+			}
+
+			PSMTXScale(scaleMtx, 0.5799999833106995f, 0.5799999833106995f, 0.5799999833106995f);
+			srcVec.x = s_BonusModelScale[4];
+			srcVec.y = 0.0f;
+			srcVec.z = 0.0f;
+			PSMTXRotRad(rotMtx, 'z', 0.01745329238474369f * (float)(-45.0 * (double)artifactIndex));
+			PSMTXMultVecSR(rotMtx, &srcVec, &dstVec);
+
+			int charaNo = handle->m_charaNo;
+			if (charaNo == 0x44) {
+				PSMTXRotRad(tempMtx, 'y', 3.1415927410125732f);
+				PSMTXConcat(scaleMtx, tempMtx, scaleMtx);
+				PSMTXRotRad(tempMtx, 'x', -1.1693705320358276f);
+				PSMTXConcat(scaleMtx, tempMtx, scaleMtx);
+			}
+
+			scaleMtx[0][3] = dstVec.x;
+			float modelY = (float)((double)(0.9670329689979553f * dstVec.y) - 5.0);
+			if (charaNo == 0x41 || charaNo == 0x37) {
+				modelY += 3.4000000953674316f;
+			} else if (charaNo == 0x44) {
+				modelY += 5.0f;
+			}
+			scaleMtx[1][3] = modelY;
+		}
+		scaleMtx[2][3] = 0.0f;
+
+		CChara::CModel* model = handle->m_model;
+		model->m_flags10C = (model->m_flags10C & 0x7F) | 0x80;
+		model->SetMatrix(scaleMtx);
+		model->CalcMatrix();
+		model->CalcSkin();
+		model->m_lightAlpha = sprites[(int)(signed char)s_PlayerTop + i].alpha;
+	}
+
 	if (doneCount == (int)header->count) {
 		header->finished = 1;
 	}

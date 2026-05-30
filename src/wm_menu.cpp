@@ -3927,6 +3927,23 @@ void CMenuPcs::DrawMoveMenu()
 	}
 
 	DrawFukidashi();
+	const short step = worldState[0x22 / sizeof(short)];
+	float moveAlpha;
+	if (state == 1) {
+		moveAlpha = static_cast<float>((static_cast<double>(step) - DOUBLE_80331408) / DOUBLE_803316e8);
+	} else if (state == 2 && bytes[0x13] != 0) {
+		moveAlpha = static_cast<float>(DOUBLE_80331420 - (static_cast<double>(step) - DOUBLE_80331408) / DOUBLE_803316e8);
+	} else {
+		moveAlpha = FLOAT_803313e8;
+	}
+	if (state > 0 && state < 3) {
+		SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+		GXColor helpColor = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * moveAlpha))};
+		GXSetChanMatColor(static_cast<GXChannelID>(4), helpColor);
+		SetTexture(static_cast<CMenuPcs::TEX>(0x23));
+		DrawRect(0xFFFFFFFF, FLOAT_803313dc, static_cast<float>(DOUBLE_803314d0 - static_cast<double>(FLOAT_80331440)),
+		         FLOAT_803313e0, FLOAT_80331440, FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313e8, FLOAT_803313e8, 0.0f);
+	}
 	DrawWMFrame();
 
 	if (worldState[0x10 / sizeof(short)] != 2 || bytes[0x13] != 0) {

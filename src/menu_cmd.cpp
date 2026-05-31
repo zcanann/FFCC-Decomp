@@ -2621,7 +2621,6 @@ unsigned int CMenuPcs::CmdClose1()
 	u8* self = reinterpret_cast<u8*>(this);
 	s32 caravanWork = Game.m_scriptFoodBase[0];
 	s32 cmd = GetCmdStateBase(this);
-	s16* list = GetCmdList(this);
 
 	*reinterpret_cast<s16*>(cmd + 0x22) = static_cast<s16>(*reinterpret_cast<s16*>(cmd + 0x22) + 1);
 	const s16 timer = *reinterpret_cast<s16*>(cmd + 0x22);
@@ -2630,6 +2629,7 @@ unsigned int CMenuPcs::CmdClose1()
 	u32 done = 0;
 
 	if (state == 0) {
+		s16* list = GetCmdList(this);
 		const float t = static_cast<float>(DOUBLE_80332a90 * static_cast<f64>(timer));
 		*reinterpret_cast<float*>(list + selected * 0x20 + 0x0c) = t;
 

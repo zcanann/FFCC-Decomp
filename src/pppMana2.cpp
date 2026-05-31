@@ -244,10 +244,10 @@ static void CalculateNormal(VMana2* mana2)
     }
 
     s32 indicesOffset = 0;
-    for (s32 i = 0; i < 0x200; i++, indicesOffset += 3) {
-        u16 i0 = indices[indicesOffset];
-        u16 i1 = indices[indicesOffset + 1];
-        u16 i2 = indices[indicesOffset + 2];
+    for (s32 i = 0; i < 0x200; i++) {
+        u16 i0 = indices[indicesOffset++];
+        u16 i1 = indices[indicesOffset++];
+        u16 i2 = indices[indicesOffset++];
 
         edgeA.x = positions[i1].x - positions[i0].x;
         edgeA.y = positions[i1].y - positions[i0].y;

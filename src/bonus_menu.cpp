@@ -1469,8 +1469,17 @@ void CMenuPcs::CalcSelectOpenAnim()
 		BonusSpriteFlags(&sprites[0]) = 3;
 		sprites[0].alpha = 0.0f;
 
-		InitAnimSprite(&sprites[idx++], -3, 0xf0, 0x38, 0x168, 0x148, 0, 8);
-		ResetAnimSpriteMotion(&sprites[1]);
+		sprites[idx].kind = -3;
+		sprites[idx].x = 0xf0;
+		sprites[idx].y = 0x38;
+		sprites[idx].w = 0x168;
+		sprites[idx].h = 0x148;
+		sprites[idx].mulX = 0.0f;
+		sprites[idx].mulY = 0.0f;
+		sprites[idx].startFrame = 0;
+		sprites[idx].duration = 8;
+		sprites[idx].depth = 1.0f;
+		idx++;
 		InitAnimSprite(&sprites[idx++], 0x1f, 0, 0, 0x80, 0x78, 9999, 8);
 		sprites[2].mulX = -150.0f;
 		sprites[2].mulY = -150.0f;

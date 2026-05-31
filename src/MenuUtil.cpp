@@ -485,80 +485,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 	int detailY = static_cast<int>(lineStep + static_cast<float>(static_cast<int>(baseY)));
 	font->SetPosY(static_cast<float>(detailY));
 
-	if ((*reinterpret_cast<u16*>(itemBase + 4) & 0x1000) == 0) {
-		strcat(scratch, sMenuUtilSpaceText);
-		font->Draw(scratch);
-
-		int valueX = static_cast<int>(FLOAT_8033357c + (FLOAT_803335a0 + font->GetWidth(scratch)));
-		font->SetTlut(1);
-		font->SetPosX(static_cast<float>(valueX));
-		sprintf(scratch, sMenuUtilValueSuffixFormat, *reinterpret_cast<u16*>(itemBase + 6));
-		font->Draw(scratch);
-
-		if ((*reinterpret_cast<short*>(self + 0x864) == 2) &&
-		    (*reinterpret_cast<short*>(*reinterpret_cast<int*>(self + 0x82C) + 0x30) == 1)) {
-			int menuState = *reinterpret_cast<int*>(self + 0x82C);
-			u16 effectFlags = *reinterpret_cast<u16*>(itemBase + 4);
-
-			if ((effectFlags & 0x1000) == 0) {
-				int currentItem = -1;
-				if ((effectFlags & 0x100) != 0) {
-					currentItem = 0;
-				} else if ((effectFlags & 0x400) != 0) {
-					currentItem = 1;
-				} else if ((effectFlags & 0x800) != 0) {
-					currentItem = 2;
-				} else if ((effectFlags & 0x200) != 0) {
-					currentItem = 2;
-				} else if ((effectFlags & 0x1000) != 0) {
-					currentItem = 3;
-				} else if ((effectFlags & 0x2000) != 0) {
-					currentItem = 3;
-				}
-
-				currentItem = *reinterpret_cast<short*>(
-				    foodBase +
-				    static_cast<int>(*reinterpret_cast<short*>(foodBase + currentItem * 2 + 0xAC)) * 2 +
-				    0xB6);
-
-				if (ChkEquipActive(static_cast<int>(*reinterpret_cast<short*>(menuState + 0x28)) +
-				                   static_cast<int>(*reinterpret_cast<short*>(menuState + 0x34))) != 0) {
-					unsigned int currentValue = 0;
-					if (currentItem != -1) {
-						currentValue = *reinterpret_cast<u16*>(Game.unkCFlatData0[2] + currentItem * 0x48 + 6);
-					}
-
-					int delta = static_cast<int>(*reinterpret_cast<u16*>(itemBase + 6)) - static_cast<int>(currentValue);
-					int deltaX = static_cast<int>(static_cast<float>(valueX) + (FLOAT_803335a0 + font->GetWidth(scratch)));
-					font->SetPosX(static_cast<float>(deltaX));
-					if (delta < 0) {
-						font->SetTlut(3);
-					} else {
-						font->SetTlut(9);
-					}
-					sprintf(scratch, sMenuUtilSignedDeltaFormat, delta);
-					if (delta != 0) {
-						font->Draw(scratch);
-					}
-				}
-			}
-		}
-
-		int attrX = static_cast<int>(font->posX + font->GetWidth(sMenuUtilSpaceText));
-		font->SetPosX(static_cast<float>(attrX));
-
-		unsigned int attr = *reinterpret_cast<u16*>(itemBase + 8);
-		if ((attr != 0) && (attr < 0x14)) {
-			font->SetTlut(4);
-			strcpy(scratch, GetAttrStr(attr));
-			font->Draw(scratch);
-			font->SetTlut(9);
-			if (attr <= 8) {
-				sprintf(scratch, sMenuUtilAttrBonusFormat, sMenuUtilPlusOneText);
-				font->Draw(scratch);
-			}
-		}
-		} else {
+		if ((*reinterpret_cast<u16*>(itemBase + 4) & 0x1000) != 0) {
 			unsigned int attr = *reinterpret_cast<u16*>(itemBase + 8);
 			if ((attr != 0) && (attr < 0x14)) {
 				strcpy(scratch, GetAttrStr(attr));
@@ -584,8 +511,81 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 
 				font->Draw(scratch);
 			}
+		} else {
+			strcat(scratch, sMenuUtilSpaceText);
+			font->Draw(scratch);
+
+			int valueX = static_cast<int>(FLOAT_8033357c + (FLOAT_803335a0 + font->GetWidth(scratch)));
+			font->SetTlut(1);
+			font->SetPosX(static_cast<float>(valueX));
+			sprintf(scratch, sMenuUtilValueSuffixFormat, *reinterpret_cast<u16*>(itemBase + 6));
+			font->Draw(scratch);
+
+			if ((*reinterpret_cast<short*>(self + 0x864) == 2) &&
+			    (*reinterpret_cast<short*>(*reinterpret_cast<int*>(self + 0x82C) + 0x30) == 1)) {
+				int menuState = *reinterpret_cast<int*>(self + 0x82C);
+				u16 effectFlags = *reinterpret_cast<u16*>(itemBase + 4);
+
+				if ((effectFlags & 0x1000) == 0) {
+					int currentItem = -1;
+					if ((effectFlags & 0x100) != 0) {
+						currentItem = 0;
+					} else if ((effectFlags & 0x400) != 0) {
+						currentItem = 1;
+					} else if ((effectFlags & 0x800) != 0) {
+						currentItem = 2;
+					} else if ((effectFlags & 0x200) != 0) {
+						currentItem = 2;
+					} else if ((effectFlags & 0x1000) != 0) {
+						currentItem = 3;
+					} else if ((effectFlags & 0x2000) != 0) {
+						currentItem = 3;
+					}
+
+					currentItem = *reinterpret_cast<short*>(
+					    foodBase +
+					    static_cast<int>(*reinterpret_cast<short*>(foodBase + currentItem * 2 + 0xAC)) * 2 +
+					    0xB6);
+
+					if (ChkEquipActive(static_cast<int>(*reinterpret_cast<short*>(menuState + 0x28)) +
+					                   static_cast<int>(*reinterpret_cast<short*>(menuState + 0x34))) != 0) {
+						unsigned int currentValue = 0;
+						if (currentItem != -1) {
+							currentValue = *reinterpret_cast<u16*>(Game.unkCFlatData0[2] + currentItem * 0x48 + 6);
+						}
+
+						int delta = static_cast<int>(*reinterpret_cast<u16*>(itemBase + 6)) - static_cast<int>(currentValue);
+						int deltaX = static_cast<int>(static_cast<float>(valueX) + (FLOAT_803335a0 + font->GetWidth(scratch)));
+						font->SetPosX(static_cast<float>(deltaX));
+						if (delta < 0) {
+							font->SetTlut(3);
+						} else {
+							font->SetTlut(9);
+						}
+						sprintf(scratch, sMenuUtilSignedDeltaFormat, delta);
+						if (delta != 0) {
+							font->Draw(scratch);
+						}
+					}
+				}
+			}
+
+			int attrX = static_cast<int>(font->posX + font->GetWidth(sMenuUtilSpaceText));
+			font->SetPosX(static_cast<float>(attrX));
+
+			unsigned int attr = *reinterpret_cast<u16*>(itemBase + 8);
+			if ((attr != 0) && (attr < 0x14)) {
+				font->SetTlut(4);
+				strcpy(scratch, GetAttrStr(attr));
+				font->Draw(scratch);
+				font->SetTlut(9);
+				if (attr <= 8) {
+					sprintf(scratch, sMenuUtilAttrBonusFormat, sMenuUtilPlusOneText);
+					font->Draw(scratch);
+				}
+			}
 		}
-	} else {
+		} else {
 		int lineCount = 3;
 		int firstNonEmptyLine = firstLine;
 		stage = *reinterpret_cast<CMemory::CStage**>(menuPcsGlobal + 0xEC);

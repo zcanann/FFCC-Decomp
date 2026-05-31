@@ -1082,7 +1082,7 @@ void CMenuPcs::CalcSelectWait()
 	sprites = (BonusAnimSprite*)(animPtr + 8);
 	int activePartyCount = s_Rinfo->m_partyCount;
 
-	if (*(unsigned char*)(statePtr + 0xb) == 0) {
+	if (*(signed char*)(statePtr + 0xb) == 0) {
 		*(short*)(auxPtr + 10) = 3;
 		for (int i = 0; i < (int)header->count; i++) {
 			sprites[i].alpha = 1.0f;

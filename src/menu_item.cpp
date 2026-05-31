@@ -318,7 +318,8 @@ int CMenuPcs::ItemCtrlCur()
  */
 void CMenuPcs::ItemDraw()
 {
-    int selectedItemId = -1;
+    bool foundSelected = false;
+    int selectedItemId;
 
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
@@ -346,7 +347,6 @@ void CMenuPcs::ItemDraw()
         float u = entry->u;
         float v = entry->v;
         float alpha = entry->alpha;
-        float uvScale = entry->uvScale;
 
         if (i == 0) {
             MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(1));
@@ -371,15 +371,15 @@ void CMenuPcs::ItemDraw()
             colors[3].a = 0xFF;
 
             GXSetChanMatColor(GX_COLOR0A0, colors[0]);
-            float fillW = alpha * w;
-            if (fillW > FLOAT_80332e60) {
+            w = alpha * w;
+            if (w > FLOAT_80332e60) {
                 MenuPcs.DrawRect(
-                    0, x, y, fillW, h, u, v, colors, FLOAT_80332e64, FLOAT_80332e64, FLOAT_80332e60);
-                x += fillW;
-                u += fillW;
+                    0, x, y, w, h, u, v, colors, FLOAT_80332e64, FLOAT_80332e64, FLOAT_80332e60);
+                x += w;
+                u += w;
             }
 
-            if (fillW > FLOAT_80332e60 && fillW < w) {
+            if (w > FLOAT_80332e60 && w < entry->w) {
                 colors[0].r = 0xFF;
                 colors[0].g = 0xFF;
                 colors[0].b = 0xFF;
@@ -397,7 +397,7 @@ void CMenuPcs::ItemDraw()
                 colors[3].b = 0xFF;
                 colors[3].a = 0;
 
-                float remainW = (float)((double)(DOUBLE_80332e68 / (double)entry->duration) * (double)w);
+                float remainW = (float)((double)(DOUBLE_80332e68 / (double)entry->duration) * (double)entry->w);
                 MenuPcs.DrawRect(
                     0, x, y, remainW, h, u, v, colors, FLOAT_80332e64, FLOAT_80332e64, FLOAT_80332e60);
             }
@@ -436,7 +436,7 @@ void CMenuPcs::ItemDraw()
             color.b = 0xFF;
             color.a = (u8)(FLOAT_80332e80 * itemAlpha);
             GXSetChanMatColor(GX_COLOR0A0, color);
-            MenuPcs.DrawRect(0, x, y, w, h, u, v, uvScale, uvScale, FLOAT_80332e60);
+            MenuPcs.DrawRect(0, x, y, w, h, u, v, entry->uvScale, entry->uvScale, FLOAT_80332e60);
         }
     }
 
@@ -473,6 +473,7 @@ void CMenuPcs::ItemDraw()
                 selectedIndex -= 0x40;
             }
             if (menuIndex == selectedIndex) {
+                foundSelected = true;
                 selectedItemId = itemId;
             }
 
@@ -540,6 +541,9 @@ void CMenuPcs::ItemDraw()
 
     CFont* helpFont = this->helpFont;
     CColor helpColor(0xFF, 0xFF, 0xFF, (u8)(FLOAT_80332e80 * *(float*)(cursorEntry + 8)));
+    if (!foundSelected) {
+        selectedItemId = -1;
+    }
     DrawHelpMessage(
         selectedItemId,
         helpFont,

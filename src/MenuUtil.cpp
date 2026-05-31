@@ -1210,7 +1210,7 @@ void CMenuPcs::DrawOptionMenu()
 			float barX = FLOAT_80333610 + static_cast<float>(x);
 			gUtil.RenderTextureQuad(barX, FLOAT_80333614, FLOAT_80333624, FLOAT_80333624, meterTexture, &uv0,
 			                        &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
-			if ((m_optionMenuState != 2) && (i < volume)) {
+			if ((m_optionMenuState != 2) && (i + 1 <= volume)) {
 				gUtil.RenderTextureQuad(barX, FLOAT_80333614, FLOAT_80333624, FLOAT_80333624, meterTexture, &uv0,
 				                        &uv1, &color, GX_BL_ONE, GX_BL_ONE);
 			}
@@ -1316,7 +1316,7 @@ void CMenuPcs::DrawOptionMenu()
 			float barX = FLOAT_80333610 + static_cast<float>(x);
 			gUtil.RenderTextureQuad(barX, FLOAT_80333614, FLOAT_80333624, FLOAT_80333624, meterTexture, &uv0,
 			                        &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
-			if ((m_optionMenuState != 2) && (i < volume)) {
+			if ((m_optionMenuState != 2) && (i + 1 <= volume)) {
 				gUtil.RenderTextureQuad(barX, FLOAT_80333614, FLOAT_80333624, FLOAT_80333624, meterTexture, &uv0,
 				                        &uv1, &color, GX_BL_ONE, GX_BL_ONE);
 			}

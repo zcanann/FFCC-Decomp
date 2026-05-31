@@ -1084,11 +1084,6 @@ void CMenuPcs::CalcSelectWait()
 
 	if (*(unsigned char*)(statePtr + 0xb) == 0) {
 		*(short*)(auxPtr + 10) = 3;
-		*(short*)(statePtr + 0xe) = 0;
-		*(short*)(statePtr + 0x18) = 0;
-		*(short*)(statePtr + 0x1a) = 0;
-		*(short*)(statePtr + 0x26) = 4;
-		*(unsigned char*)(statePtr + 8) = 0;
 		for (int i = 0; i < (int)header->count; i++) {
 			sprites[i].alpha = 1.0f;
 			sprites[i].depth = 3.0f;
@@ -1107,7 +1102,12 @@ void CMenuPcs::CalcSelectWait()
 		cursor->depth = 1.0f;
 		header->count = (short)(header->count + 1);
 		header->finished = 0;
+		*(short*)(statePtr + 0xe) = 0;
+		*(short*)(statePtr + 0x26) = 4;
+		*(short*)(statePtr + 0x18) = 0;
 		*(unsigned char*)(statePtr + 0xb) = 1;
+		*(short*)(statePtr + 0x1a) = 0;
+		*(unsigned char*)(statePtr + 8) = 0;
 	}
 
 	*(short*)(statePtr + 0x22) = *(short*)(statePtr + 0x22) + 1;

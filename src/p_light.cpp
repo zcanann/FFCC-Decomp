@@ -43,7 +43,6 @@ extern float FLOAT_8032fc88;
 extern float FLOAT_8032fc8c;
 extern float FLOAT_8032fc94;
 float FLOAT_8032ed10;
-extern _GXColor s_mapLightAlphaColor;
 
 static inline float CameraPosX() { return CameraPcs.m_positionX; }
 static inline float CameraPosY() { return CameraPcs.m_positionY; }
@@ -450,6 +449,8 @@ CLightPcs::CBumpLight* CLightPcs::AddBump(CLightPcs::CLight* srcLight, CLightPcs
 void CLightPcs::SetMapColorAlpha(float (*) [4], _GXColor mapColor, _GXColor ambColor, unsigned char enable, float atten,
                                  float dist, float spot, unsigned char alpha)
 {
+    static _GXColor mcol = {0xFF, 0xFF, 0xFF, 0};
+
     GXSetChanMatColor((GXChannelID)4, mapColor);
     GXSetChanAmbColor((GXChannelID)4, ambColor);
 
@@ -477,8 +478,8 @@ void CLightPcs::SetMapColorAlpha(float (*) [4], _GXColor mapColor, _GXColor ambC
         GXInitLightSpot(&m_mapLightObj, spot, (GXSpotFn)4);
         GXInitLightAttnK(&m_mapLightObj, FLOAT_8032fc84 / dist, FLOAT_8032fc88 / atten, FLOAT_8032fc8c / atten);
 
-        s_mapLightAlphaColor.a = alpha;
-        GXInitLightColor(&m_mapLightObj, s_mapLightAlphaColor);
+        mcol.a = alpha;
+        GXInitLightColor(&m_mapLightObj, mcol);
 
         if (m_loadedLightCount >= 8) {
             m_loadedLightCount = 7;

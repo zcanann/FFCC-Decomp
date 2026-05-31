@@ -19,6 +19,7 @@ extern const float kPppHeapUseRateDivisor;
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
 extern "C" const char s_no_name_8032fdcc[];
+extern "C" unsigned char g_IsDrawHeapSize = 1;
 
 extern "C" void create__8CPartPcsFv(CPartPcs*);
 extern "C" void destroy__8CPartPcsFv(CPartPcs*);

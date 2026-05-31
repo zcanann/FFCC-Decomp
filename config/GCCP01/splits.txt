@@ -273,6 +273,7 @@ p_light.cpp:
 	.rodata     start:0x801D7C70 end:0x801D7CB8
 	.data       start:0x801EA298 end:0x801EA484
 	.bss        start:0x80268F88 end:0x8026D338
+	.sdata      start:0x8032E620 end:0x8032E63C
 	.sbss       start:0x8032ED10 end:0x8032ED18
 	.sdata2     start:0x8032FC68 end:0x8032FC88
 
@@ -368,6 +369,7 @@ p_tina.cpp:
 	.rodata     start:0x801D7EE0 end:0x801D81F8
 	.data       start:0x801EA9B0 end:0x801EADC8
 	.bss        start:0x80273928 end:0x80273A68
+	.sdata      start:0x8032E698 end:0x8032E6B4
 	.sbss       start:0x8032ED38 end:0x8032ED50
 	.sdata2     start:0x8032FDC0 end:0x8032FDD8
 

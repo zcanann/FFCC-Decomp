@@ -15,7 +15,7 @@
 
 CDbgMenuPcs DbgMenuPcs;
 
-extern unsigned char gDbgMenuPartHeapDumpEnabled;
+extern unsigned char g_IsDrawHeapSize;
 extern unsigned char g_map_draw_prof;
 extern const char __RTTI__8CManager_8032EA50[];
 extern const char __RTTI__8CProcess_8032EA58[];
@@ -282,7 +282,7 @@ void CDbgMenuPcs::calc()
 			g_map_draw_prof = 1 - g_map_draw_prof;
 			break;
 		case 0x76:
-			gDbgMenuPartHeapDumpEnabled = 1 - gDbgMenuPartHeapDumpEnabled;
+			g_IsDrawHeapSize = 1 - g_IsDrawHeapSize;
 			PartMng.pppDumpMngSt();
 			break;
 		case 0x77:
@@ -447,7 +447,7 @@ void CDbgMenuPcs::calcMenu(CDbgMenuPcs::CDM* menu)
 			menu->m_state = g_map_draw_prof != 0;
 			break;
 		case 0x76:
-			menu->m_state = gDbgMenuPartHeapDumpEnabled != 0;
+			menu->m_state = g_IsDrawHeapSize != 0;
 			break;
 		case 0x78:
 			menu->m_state = (m_dbgFlags >> 13) & 1;

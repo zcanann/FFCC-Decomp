@@ -15,16 +15,12 @@ extern const f32 kPppYmLaserOne;
 #include <string.h>
 
 extern const f32 FLOAT_80330df0[2];
-extern const f32 FLOAT_80330de0 = -1.0f;
+extern const f32 FLOAT_80330de0;
 extern const f32 FLOAT_80330de4;
 extern const f32 FLOAT_80330de8;
 extern const f32 FLOAT_80330dec;
 extern const f32 FLOAT_80330DC4;
 extern const f32 FLOAT_80330DC8;
-extern const f32 FLOAT_80330de0;
-extern const f32 FLOAT_80330de4;
-extern const f32 FLOAT_80330de8;
-extern const f32 FLOAT_80330dec;
 
 static inline float YmLaserConst(const float& value) { return *reinterpret_cast<const float*>(&value); }
 
@@ -86,7 +82,7 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 	int colorOffset = serializedDataOffsets[1];
 	pppYmLaserColorData* colorData = (pppYmLaserColorData*)((u8*)laser + 0x80 + colorOffset);
 	s32 dataValIndex = step->m_dataValIndex;
-	u32 count;
+	s32 count;
 	s32 i;
 	s32 alphaStep;
 	char alphaMax;
@@ -330,6 +326,7 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 	}
 }
 
+extern const f32 FLOAT_80330de0 = -1.0f;
 extern const f32 FLOAT_80330de4 = 1.2f;
 extern const f32 FLOAT_80330de8 = 10000000000.0f;
 extern const f32 FLOAT_80330dec = -10000000000.0f;

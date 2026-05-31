@@ -825,6 +825,7 @@ p_chara.cpp:
 	.ctors      start:0x801D5414 end:0x801D5418
 	.data       start:0x801FCD38 end:0x801FD340
 	.bss        start:0x802E9958 end:0x802EA080
+	.sdata      start:0x8032E708 end:0x8032E768
 	.sdata2     start:0x80330140 end:0x80330148
 
 pppDrawMng.cpp:

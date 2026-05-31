@@ -1187,6 +1187,7 @@ void CMenuPcs::CmdDraw()
 		float cursorX = FLOAT_80332a70;
 		float cursorY = FLOAT_80332a70;
 		s16* cursorEntry = drawList + 4;
+		bool cursorOnUnite = false;
 
 		if ((cmdMode == 0) || (cmdMode == 3)) {
 			s32 index = *reinterpret_cast<s16*>(reinterpret_cast<u8*>(cmdState) + cmdMode * 2 + 0x26);
@@ -1200,11 +1201,17 @@ void CMenuPcs::CmdDraw()
 				cursorEntry = reinterpret_cast<s16*>(
 				    GetCmdListBase(this) +
 				    (*reinterpret_cast<s16*>(GetCmdListBase(this) + 2) + uniteIdx) * 0x40 + 8);
+				cursorOnUnite = true;
 			}
 			cursorX = static_cast<float>(cursorEntry[0] - 0x14);
-			cursorY = static_cast<float>(cursorEntry[1]);
-			if (cmdMode != 0) {
-				cursorY += FLOAT_80332ad0;
+			if (cursorOnUnite) {
+				cursorY = static_cast<float>(cursorEntry[1]) +
+				          (static_cast<float>(cursorEntry[3] - 0x20) * static_cast<float>(DOUBLE_80332a60));
+			} else {
+				cursorY = static_cast<float>(cursorEntry[1]);
+				if (cmdMode != 0) {
+					cursorY += FLOAT_80332ad0;
+				}
 			}
 		} else if (cmdMode == 1) {
 			const s16* letter = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));

@@ -2674,7 +2674,7 @@ void CGObject::SetClassWork(int ownerType, int workIndex)
         m_scriptHandle[3] = this;
         m_scriptHandle[2] = reinterpret_cast<void*>(workIndex);
         Game.m_scriptWork[0][0][workIndex] = reinterpret_cast<u32>(this);
-        Game.m_scriptWork[2][0][workIndex] = reinterpret_cast<u32>(m_scriptHandle);
+        Game.m_scriptWork[4][0][workIndex] = reinterpret_cast<u32>(m_scriptHandle);
         return;
 
     default:

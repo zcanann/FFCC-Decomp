@@ -2096,6 +2096,7 @@ axfx/reverb_hi.c:
 
 axfx/reverb_std.c:
 	.text       start:0x80194F34 end:0x80195B30
+	.data       start:0x8021B780 end:0x8021B790
 	.sdata2     start:0x80333798 end:0x803337C0
 
 axfx/chorus.c:
@@ -2130,6 +2131,7 @@ axart/axart3d.c:
 
 dsp/dsp.c:
 	.text       start:0x80197A1C end:0x80197CAC
+	.data       start:0x8021BFB8 end:0x8021C038
 	.sdata      start:0x8032EB68 end:0x8032EB6C
 	.sbss       start:0x8032F2C0 end:0x8032F2C4
 
@@ -2143,7 +2145,7 @@ dsp/dsp_task.c:
 
 card/CARDBios.c:
 	.text       start:0x80198580 end:0x801998E8
-	.data       start:0x8021C1C0 end:0x8021C1D0
+	.data       start:0x8021C178 end:0x8021C1D0
 	.bss        start:0x80327540 end:0x80327780
 	.sdata      start:0x8032EB70 end:0x8032EB78
 	.sbss       start:0x8032F2E0 end:0x8032F2E2

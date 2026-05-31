@@ -14,9 +14,10 @@ typedef struct DSPStrings {
     char _pad1[2];
     char buildDate[0xC];
     char buildTime[0x9];
+    char _pad2[3];
 } DSPStrings;
 
-extern const DSPStrings sDSPStrings;
+extern DSPStrings sDSPStrings;
 extern DSPTaskInfo* __DSP_first_task;
 extern DSPTaskInfo* __DSP_last_task;
 extern DSPTaskInfo* __DSP_curr_task;

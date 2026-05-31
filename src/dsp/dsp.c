@@ -10,6 +10,15 @@
 const char* __DSPVersion = "<< Dolphin SDK - DSP\tdebug build: Apr  5 2004 03:56:49 (0x2301) >>";
 #define DSP_INIT_BUILD_DATE_MSG "DSPInit(): Build Date: %s %s\n"
 #else
+DSPStrings sDSPStrings = {
+    "<< Dolphin SDK - DSP\trelease build: Sep  5 2002 05:35:13 (0x2301) >>",
+    {0},
+    "DSPInit(): Build Date: %s %s\n",
+    {0},
+    "Sep  5 2002",
+    "05:35:13",
+    {0},
+};
 const char* __DSPVersion = sDSPStrings.version;
 #define BUILD_DATE sDSPStrings.buildDate
 #define BUILD_TIME sDSPStrings.buildTime

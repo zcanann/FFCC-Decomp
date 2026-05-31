@@ -1,6 +1,7 @@
 #ifndef _FFCC_PPP_UTIL_H_
 #define _FFCC_PPP_UTIL_H_
 
+#include "ffcc/manager.h"
 #include "ffcc/math.h"
 
 #include <dolphin/gx.h>
@@ -10,7 +11,7 @@ class CTexture;
 struct Vec;
 struct Vec2d;
 
-class CUtil
+class CUtil : public CManager
 {
 public:
     CUtil() {}

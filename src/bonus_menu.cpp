@@ -2287,7 +2287,7 @@ void CMenuPcs::CalcResultCountAnim()
 	BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
 	const int activePartyCount = s_Rinfo->m_partyCount;
 
-	if (*(unsigned char*)(statePtr + 0xb) == 0) {
+	if (*(signed char*)(statePtr + 0xb) == 0) {
 		int countTop = header->count;
 		s_CntTop = (unsigned char)countTop;
 		for (int i = 0; i < activePartyCount; i++) {

@@ -14,7 +14,7 @@ extern const float FLOAT_80332f2c;
 extern const float FLOAT_80332f30;
 extern const float FLOAT_80332F34;
 extern const float FLOAT_80332F38;
-extern const double DOUBLE_80332f40 = 4503601774854144.0;
+extern const double DOUBLE_80332f40;
 extern const double DOUBLE_80332f48;
 extern const double DOUBLE_80332f50;
 extern const double DOUBLE_80332f58;

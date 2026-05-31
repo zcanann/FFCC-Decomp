@@ -1012,6 +1012,7 @@ p_menu.cpp:
 	.ctors      start:0x801D541C end:0x801D5420
 	.data       start:0x8020EDF8 end:0x8020F2F8
 	.bss        start:0x802EA1A0 end:0x802EAA60
+	.sdata      start:0x8032E7A0 end:0x8032E7C0
 	.sdata2     start:0x80330714 end:0x80330870
 
 p_gba.cpp:
@@ -1058,6 +1059,7 @@ gobjwork.cpp:
 	.text       start:0x8009E1C0 end:0x800A2DD4
 	.rodata     start:0x801D9F64 end:0x801DA000
 	.data       start:0x8020FA00 end:0x8020FAC8
+	.sdata      start:0x8032E800 end:0x8032E818
 	.sdata2     start:0x803309A8 end:0x803309B8
 
 ringmenu.cpp:

@@ -2759,7 +2759,7 @@ void CMenuPcs::CalcResultOpenAnim()
 			}
 		}
 
-		header->count = (short)(1 + activePartyCount * 6);
+		header->count = (short)(labelBase + activePartyCount);
 		*(unsigned char*)(statePtr + 0xb) = 1;
 		header->finished = 0;
 		return;

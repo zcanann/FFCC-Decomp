@@ -36,7 +36,7 @@ public:
 	public:
 		CObject() {}
 		~CObject() {}
-		void onNewFinished();
+		virtual void onNewFinished();
 
 		unsigned int m_id;         // 0x0
 		void** m_freeListNode;     // 0x4

@@ -9,10 +9,10 @@ class CGObject;
 class CGPrgObj : public CGObject
 {
 public:
+    virtual int GetCID();
     void onCreate();
     void onDestroy();
     void onFrame();
-    virtual int GetCID();
     virtual void ClassControl(int, int);
     virtual int GetClassControl(int);
     virtual void bonus(int, int, CGPrgObj*);

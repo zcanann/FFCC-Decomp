@@ -933,6 +933,7 @@ void pppRenderYmMana(PYmMana*, pppYmManaUnkB*, pppYmManaUnkC*)
 void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (*)[4], int pass)
 {
     u32* work = (u32*)workPtr;
+    Mtx identityMtx;
     Mtx savedCameraMtx;
     Mtx lookAtMtx;
     Mtx44 savedScreenMtx;
@@ -952,7 +953,12 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
     s32 i;
     f32 savedViewport[6];
 
-    if (pass != 0 || *(u8*)((u8*)step + 0x1C) == 0) {
+    if (pass != 0) {
+        return;
+    }
+
+    sourceTexObjs = work[8];
+    if (*(u8*)((u8*)step + 0x1C) == 0) {
         return;
     }
 
@@ -961,7 +967,7 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
     }
 
     Graphic.SetViewport();
-    PSMTXIdentity(projectionMtx);
+    PSMTXIdentity(identityMtx);
     PSMTXCopy(CameraMatrix(), savedCameraMtx);
     PSMTX44Copy(CameraScreenMatrix(), savedScreenMtx);
     Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, &sceneTexObj, 0, 0, 0x80, 0x80, 0, GX_NEAR, GX_TF_RGBA8, 0);
@@ -985,7 +991,6 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
 
     depthTexSize = GXGetTexBufferSize(0x80, 0x80, GX_TF_RGBA8, GX_FALSE, 0);
     texBufferStride = GXGetTexBufferSize(0x80, 0x80, GX_TF_RGB565, GX_FALSE, 0);
-    sourceTexObjs = work[8];
     captureTexObjs = work[0x1E];
 
     if (*(u8*)((u8*)step + 0x38) != 0) {
@@ -999,24 +1004,20 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
             cameraUp.y = FLOAT_80330e58;
             cameraUp.z = FLOAT_80330e4c;
 
-            bool useDefaultCamera = true;
-            if (strcmp(s_ymManaRuin2Name, compareName) == 0) {
+            s32 nameCompare = strcmp(s_ymManaRuin2Name, compareName);
+            if (nameCompare == 0) {
                 if (i == 0) {
                     cameraPos.z -= FLOAT_80330e58;
-                    useDefaultCamera = false;
                 } else if (i == 1) {
                     cameraPos.x += FLOAT_80330e58;
-                    useDefaultCamera = false;
                 } else if (i == 2) {
                     cameraPos.z += FLOAT_80330e58;
-                    useDefaultCamera = false;
                 } else if (i == 3) {
                     cameraPos.x -= FLOAT_80330e58;
-                    useDefaultCamera = false;
                 }
             }
 
-            if (useDefaultCamera) {
+            if (nameCompare != 0 || i == 4 || i == 5) {
                 if (i == 3) {
                     cameraPos.z -= FLOAT_80330e58;
                 } else if (i < 3) {
@@ -1066,8 +1067,8 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
                 owner->m_model->m_drawShadowMeshDLCallback = 0;
             }
 
-            Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, (_GXTexObj*)captureTexObjs, 0, 0, 0x80, 0x80, depthTexSize,
-                                       GX_LINEAR, GX_TF_RGB565, 0);
+            Graphic.GetBackBufferRect2(gRenderScratchTextureBuffer, (_GXTexObj*)captureTexObjs, 0, 0, 0x80, 0x80,
+                                       depthTexSize, GX_LINEAR, GX_TF_RGB565, 0);
             depthTexSize += texBufferStride;
             sourceTexObjs += 0x20;
             captureTexObjs += 0x20;
@@ -1085,19 +1086,7 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
     }
 
     targetTexObjs = work[0x1F];
-    if (*(u8*)((u8*)step + 0x38) == 0) {
-        if (*((u8*)work + 0xF4) == 0) {
-            GXInitTexObj((GXTexObj*)work[10], (void*)work[12], 0x80, 0x80, GX_TF_RGB565, GX_CLAMP, GX_CLAMP, GX_FALSE);
-            GXInitTexObj((GXTexObj*)work[11], (void*)work[13], 0x80, 0x80, GX_TF_RGB565, GX_CLAMP, GX_CLAMP, GX_FALSE);
-            drawParaboloidMap((GXTexObj*)work[8], (GXTexObj*)work[11], (void*)work[9], work[0x3B],
-                              (GXTexObj*)(targetTexObjs + 0x28), 1);
-            drawParaboloidMap((GXTexObj*)work[8], (GXTexObj*)work[10], (void*)work[9], work[0x3B],
-                              (GXTexObj*)(targetTexObjs + 0x28), 0);
-            gUtil.RenderTextureQuad(FLOAT_80330e4c, FLOAT_80330e4c, FLOAT_80330E84, FLOAT_80330E84, &sceneTexObj,
-                                    0, 0, 0, (_GXBlendFactor)4, (_GXBlendFactor)5);
-            *((u8*)work + 0xF4) = 1;
-        }
-    } else {
+    if (*(u8*)((u8*)step + 0x38) != 0) {
         GXInitTexObj((GXTexObj*)work[10], (void*)work[12], 0x80, 0x80, GX_TF_RGB565, GX_CLAMP, GX_CLAMP, GX_FALSE);
         GXInitTexObjLOD((GXTexObj*)work[10], GX_LINEAR, GX_LINEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
         GXInitTexObj((GXTexObj*)work[11], (void*)work[13], 0x80, 0x80, GX_TF_RGB565, GX_CLAMP, GX_CLAMP, GX_FALSE);
@@ -1111,6 +1100,18 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
         PSMTXCopy(savedCameraMtx, CameraMatrix());
         gUtil.RenderTextureQuad(FLOAT_80330e4c, FLOAT_80330e4c, FLOAT_80330E84, FLOAT_80330E84, &sceneTexObj,
                                 0, 0, 0, (_GXBlendFactor)4, (_GXBlendFactor)5);
+    } else {
+        if (*((u8*)work + 0xF4) == 0) {
+            GXInitTexObj((GXTexObj*)work[10], (void*)work[12], 0x80, 0x80, GX_TF_RGB565, GX_CLAMP, GX_CLAMP, GX_FALSE);
+            GXInitTexObj((GXTexObj*)work[11], (void*)work[13], 0x80, 0x80, GX_TF_RGB565, GX_CLAMP, GX_CLAMP, GX_FALSE);
+            drawParaboloidMap((GXTexObj*)work[8], (GXTexObj*)work[11], (void*)work[9], work[0x3B],
+                              (GXTexObj*)(targetTexObjs + 0x28), 1);
+            drawParaboloidMap((GXTexObj*)work[8], (GXTexObj*)work[10], (void*)work[9], work[0x3B],
+                              (GXTexObj*)(targetTexObjs + 0x28), 0);
+            gUtil.RenderTextureQuad(FLOAT_80330e4c, FLOAT_80330e4c, FLOAT_80330E84, FLOAT_80330E84, &sceneTexObj,
+                                    0, 0, 0, (_GXBlendFactor)4, (_GXBlendFactor)5);
+            *((u8*)work + 0xF4) = 1;
+        }
     }
 
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);

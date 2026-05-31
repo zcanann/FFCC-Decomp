@@ -3769,8 +3769,7 @@ int CPartMng::pppLoadPdt(const char* baseName, int pdtSlotIndex, int cachePriori
         return 0;
     }
 
-    // Async file mode can return sentinel 1 before data is available.
-    if (pdtData == reinterpret_cast<void*>(1)) {
+    if (m_partLoadMode == 2 || m_partLoadMode == 3) {
         stageLoad->resDefaultParam();
         return 1;
     }

@@ -3213,7 +3213,7 @@ void CMenuPcs::createBonus()
 		short* rewardItems = &s_Rinfo->m_tempArtifacts[0];
 		for (int artifactIndex = 0; artifactIndex < 8; artifactIndex++) {
 			short itemId = rewardItems[artifactIndex];
-			if (itemId <= 0) {
+			if (itemId < 1) {
 				displaySlots[handleIndex] = 0;
 			} else {
 				CCharaPcs::CHandle* itemHandle =

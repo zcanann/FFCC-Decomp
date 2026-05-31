@@ -430,7 +430,7 @@ static inline void DrawBonusPartyNames(CMenuPcs* menu, BonusAnimHeader* header, 
 			continue;
 		}
 
-		char name[0x20];
+		char name[260];
 		for (int j = 0; j < activePartyCount; j++) {
 			if (s_Rinfo->m_party[j].m_rank == nameIndex) {
 				CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[s_Rinfo->m_party[j].m_partySlot]);

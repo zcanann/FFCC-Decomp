@@ -2302,7 +2302,6 @@ void CMenuPcs::CalcResultCountAnim()
 			sprite->alpha = 0.0f;
 			sprite->depth = 1.0f;
 			sprite->kind = 0x19;
-			sprite->timer = 0;
 			sprite->startFrame = 9999;
 			sprite->duration = 4;
 			sprite->scale = 1.0f;
@@ -2310,6 +2309,7 @@ void CMenuPcs::CalcResultCountAnim()
 			sprite->motionY = 0.0f;
 			sprite->targetX = (float)(sprite->x - 0x60);
 			sprite->targetY = (float)(sprite->y - 0x40);
+			sprite->timer = 0;
 		}
 
 		for (int i = 0; i < 0x18; i++) {

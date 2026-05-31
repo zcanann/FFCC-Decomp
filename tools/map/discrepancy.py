@@ -234,9 +234,9 @@ def _section_diff(
             elif not _is_anon(o) and not _is_anon(p) and o.symbol != p.symbol:
                 flag = "  ~ rename"  # cosmetic, both named, names differ
 
-        pieces = [f"  {_fmt_entry(o):<{col_w}}", f"{_fmt_entry(p):<{col_w}}"]
+        pieces = [f"  {_fmt_entry(o):<{col_w}}", f" | {_fmt_entry(p):<{col_w}}"]
         if en is not None:
-            pieces.append(f"{_fmt_entry(e):<{col_w}}")
+            pieces.append(f" | {_fmt_entry(e):<{col_w}}")
         lines.append("".join(pieces).rstrip() + flag)
 
     # If pairing showed no real diffs, drop the per-row block; just keep header.

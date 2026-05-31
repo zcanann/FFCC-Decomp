@@ -1520,7 +1520,8 @@ void CMenuPcs::CalcSelectOpenAnim()
 
 		s_ArtiTop = (unsigned char)idx;
 		for (int i = 0; i < 8; i++) {
-			int start = (int)((float)(10 + i * 5) * 0.6f);
+			int start = 10 + i * 5;
+			start = (int)(0.6f * (float)start);
 			InitAnimSprite(&sprites[idx], -2, 0, 0, 0, 0, start, 0x21);
 			sprites[idx].tex = 0;
 			BonusSpriteFlags(&sprites[idx]) = 1;

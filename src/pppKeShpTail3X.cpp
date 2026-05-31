@@ -154,7 +154,6 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* p
     pppFMATRIX localBase;
     pppFMATRIX drawMtx;
     pppFMATRIX rotMtx;
-    pppFMATRIX tmpMtx;
     Vec zeroVec ATTRIBUTE_ALIGN(8);
     Vec pos ATTRIBUTE_ALIGN(8);
     Vec seg ATTRIBUTE_ALIGN(8);
@@ -290,8 +289,7 @@ draw_loop:
                         localBase.value[2][2] * (drawScale * ppvMng->m_scale.z));
         if ((step->m_rotateEnabled != 0) && (count != 0)) {
             PSMTXRotRad(rotMtx.value, 'z', kPppKeShpTail3XDegToRad * (float)work->m_angles[count]);
-            tmpMtx = obj->field_0x40;
-            pppMulMatrix(obj->field_0x40, rotMtx, tmpMtx);
+            pppMulMatrix(obj->field_0x40, rotMtx, obj->field_0x40);
         }
         PSMTXMultVec(ppvWorldMatrix, &pos, &pos);
         PSMTXCopy(obj->field_0x40.value, drawMtx.value);
@@ -302,8 +300,7 @@ draw_loop:
         drawMtx.value[2][2] = drawScale * (localBase.value[2][2] * ppvMng->m_scale.z);
         if ((step->m_rotateEnabled != 0) && (count != 0)) {
             PSMTXRotRad(rotMtx.value, 'z', kPppKeShpTail3XDegToRad * (float)work->m_angles[count]);
-            tmpMtx = drawMtx;
-            pppMulMatrix(drawMtx, rotMtx, tmpMtx);
+            pppMulMatrix(drawMtx, rotMtx, drawMtx);
         }
         PSMTXMultVec(ppvCameraMatrix, &pos, &pos);
     }

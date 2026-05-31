@@ -65,22 +65,18 @@ void CMenuPcs::FavoDraw()
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
 	FavoEntry* entry = favoList->entries;
-	int count = favoList->count;
-	for (int i = 0; i < count; i++) {
-		int tex = entry->tex;
-		if (tex >= 0) {
+	for (int i = 0; i < favoList->count; i++) {
+		if (entry->tex >= 0) {
 			float x = static_cast<float>(entry->x);
 			float y = static_cast<float>(entry->y);
 			float w = static_cast<float>(entry->w);
 			float h = static_cast<float>(entry->h);
 			float u = entry->u;
 			float v = entry->v;
-			float alpha = entry->alpha;
-			float uvScale = entry->uvScale;
 
 			if (i < 3) {
 				MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(1));
-				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));
+				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(entry->tex));
 
 				GXColor colors[4];
 				colors[0].r = 0xFF;
@@ -101,9 +97,9 @@ void CMenuPcs::FavoDraw()
 				colors[3].a = 0xFF;
 				GXSetChanMatColor(GX_COLOR0A0, colors[0]);
 
-				float fillW = alpha * w;
+				float fillW = entry->alpha * w;
 				if (fillW > FLOAT_80333040) {
-					if (tex == 0x32) {
+					if (entry->tex == 0x32) {
 						int yStep = static_cast<int>(y);
 						float end = y + h;
 						while (static_cast<float>(yStep) < end) {
@@ -112,17 +108,17 @@ void CMenuPcs::FavoDraw()
 								tileH = 0x20;
 							}
 							MenuPcs.DrawRect(static_cast<unsigned long>(entry->drawFlags), x, static_cast<float>(yStep),
-							                 fillW, static_cast<float>(tileH), u, v, colors, uvScale, FLOAT_80333048,
+							                 fillW, static_cast<float>(tileH), u, v, colors, entry->uvScale, FLOAT_80333048,
 							                 FLOAT_80333040);
 							yStep += 0x20;
 						}
 					} else {
 						MenuPcs.DrawRect(static_cast<unsigned long>(entry->drawFlags), x, y, fillW, h, u, v, colors,
-						                 uvScale, FLOAT_80333048, FLOAT_80333040);
+						                 entry->uvScale, FLOAT_80333048, FLOAT_80333040);
 					}
 
 					u += fillW;
-					x += fillW * uvScale;
+					x += fillW * entry->uvScale;
 				}
 
 				if (fillW > FLOAT_80333040 && fillW < w) {
@@ -135,7 +131,7 @@ void CMenuPcs::FavoDraw()
 					colors[3].b = 0xFF;
 					colors[3].a = 0;
 					float remainW = (static_cast<float>(DOUBLE_80333050) / static_cast<float>(entry->duration)) * w;
-					if (tex == 0x32) {
+					if (entry->tex == 0x32) {
 						int yStep = static_cast<int>(y);
 						float end = y + h;
 						while (static_cast<float>(yStep) < end) {
@@ -144,26 +140,26 @@ void CMenuPcs::FavoDraw()
 								tileH = 0x20;
 							}
 							MenuPcs.DrawRect(static_cast<unsigned long>(entry->drawFlags), x, static_cast<float>(yStep),
-							                 remainW, static_cast<float>(tileH), u, v, colors, uvScale, FLOAT_80333048,
+							                 remainW, static_cast<float>(tileH), u, v, colors, entry->uvScale, FLOAT_80333048,
 							                 FLOAT_80333040);
 							yStep += 0x20;
 						}
 					} else {
 						MenuPcs.DrawRect(static_cast<unsigned long>(entry->drawFlags), x, y, remainW, h, u, v,
-						                 colors, uvScale, FLOAT_80333048, FLOAT_80333040);
+						                 colors, entry->uvScale, FLOAT_80333048, FLOAT_80333040);
 					}
 				}
 
 				MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 			} else {
-				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));
+				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(entry->tex));
 				GXColor color;
 				color.r = 0xFF;
 				color.g = 0xFF;
 				color.b = 0xFF;
-				color.a = static_cast<unsigned char>(alpha * FLOAT_80333058);
+				color.a = static_cast<unsigned char>(entry->alpha * FLOAT_80333058);
 				GXSetChanMatColor(GX_COLOR0A0, color);
-				MenuPcs.DrawRect(0, x, y, w, h, u, v, uvScale, uvScale, FLOAT_80333040);
+				MenuPcs.DrawRect(0, x, y, w, h, u, v, entry->uvScale, entry->uvScale, FLOAT_80333040);
 			}
 		}
 
@@ -171,6 +167,7 @@ void CMenuPcs::FavoDraw()
 	}
 
 	FavoEntry* rankEntry = favoList->entries;
+	int count = favoList->count;
 	int remaining = count;
 	while (0 < remaining) {
 		if (rankEntry->tex == 0x37) {

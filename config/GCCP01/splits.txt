@@ -162,6 +162,7 @@ mapobj.cpp:
 	extabindex  start:0x8000B860 end:0x8000B9BC
 	.text       start:0x800287D0 end:0x8002C704
 	.data       start:0x801E88D8 end:0x801E8960
+	.sdata      start:0x8032E498 end:0x8032E4CC
 
 mapocttree.cpp:
 	extab       start:0x80005FB0 end:0x80006068
@@ -227,6 +228,7 @@ ref.cpp:
 	extabindex  start:0x8000C2BC end:0x8000C2C8
 	.text       start:0x80043D10 end:0x80043D70
 	.data       start:0x801E9C08 end:0x801E9C14
+	.sdata      start:0x8032E598 end:0x8032E5A0
 
 texanim.cpp:
 	extab       start:0x8000675C end:0x80006850
@@ -251,6 +253,7 @@ p_game.cpp:
 	.ctors      start:0x801D53F0 end:0x801D53F4
 	.rodata     start:0x801D7C20 end:0x801D7C48
 	.data       start:0x801E9EC0 end:0x801EA0D0
+	.sdata      start:0x8032E5F0 end:0x8032E608
 	.sbss       start:0x8032ED00 end:0x8032ED04
 
 p_system.cpp:
@@ -279,6 +282,7 @@ mapanim.cpp:
 	.text       start:0x8004A4A0 end:0x8004B1D0
 	.rodata     start:0x801D7CB8 end:0x801D7D18
 	.data       start:0x801EA488 end:0x801EA494
+	.sdata      start:0x8032E640 end:0x8032E648
 	.sdata2     start:0x8032FC98 end:0x8032FCA8
 
 maplight.cpp:
@@ -1022,6 +1026,7 @@ mesmenu.cpp:
 	.text       start:0x8009B4E4 end:0x8009E1C0
 	.rodata     start:0x801D9E90 end:0x801D9EC8
 	.data       start:0x8020F998 end:0x8020FA00
+	.sdata      start:0x8032E7E8 end:0x8032E800
 
 gobjwork.cpp:
 	extab       start:0x80007E04 end:0x80007F78
@@ -1473,6 +1478,7 @@ prgobj.cpp:
 	extabindex  start:0x8001069C end:0x8001075C
 	.text       start:0x80127008 end:0x80127B54
 	.data       start:0x802120D0 end:0x802121A8
+	.sdata      start:0x8032EA10 end:0x8032EA30
 	.sdata2     start:0x80331BD0 end:0x80331BF0
 
 pppBindOnlyPos.cpp:

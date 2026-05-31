@@ -577,7 +577,7 @@ void CGame::clearWork()
     int i;
     int j;
 
-    gCFlatRuntime2.Destroy();
+    CFlatRuntime2Storage().Destroy();
 
     for (i = 0; i < 4; i++) {
         m_cFlatDataArr[i].Destroy();
@@ -733,7 +733,7 @@ void CGame::CheckScriptChange()
 
     if (strcmp(m_nextScript.m_name, s_defaultScriptName) != 0) {
         if (m_cfdLoadedFlag == 0) {
-            gCFlatRuntime2.Destroy();
+            CFlatRuntime2Storage().Destroy();
             loadCfd();
             m_cfdLoadedFlag = 1;
 
@@ -754,7 +754,7 @@ void CGame::CheckScriptChange()
         }
     }
 
-    int scriptResult = gCFlatRuntime2.Load(m_nextScript.m_name);
+    int scriptResult = CFlatRuntime2Storage().Load(m_nextScript.m_name);
     strcpy(m_currentScriptName, m_nextScript.m_name);
 
     if (m_nextScript.m_flags != 0) {

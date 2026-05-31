@@ -1262,10 +1262,14 @@ void CMenuPcs::DrawOptionMenu()
 		int firstTlut = secondValue ? 6 : 0x17;
 		int secondTlut = secondValue ? 0x17 : 6;
 
+		font->SetMargin(kOptionAnimMax);
+		font->SetShadow(1);
 		font->SetScale(firstScale);
 		DrawFont2(static_cast<int>(selectorX + (FLOAT_803335B0 - font->GetWidth(firstText)) * kMenuCenteringHalfWidth),
 		          static_cast<int>(firstY), color, firstTlut, firstText, firstScale, kOptionAnimMax,
 		          kOptionAnimMax);
+		font->SetMargin(kOptionAnimMax);
+		font->SetShadow(1);
 		font->SetScale(secondScale);
 		DrawFont2(static_cast<int>(selectorX + secondOffset + (FLOAT_803335B0 - font->GetWidth(secondText)) *
 		                                                  kMenuCenteringHalfWidth),

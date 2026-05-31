@@ -195,14 +195,14 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
             vtx2.y += worldY;
 
             if (FLOAT_80330af4 != work->m_phase) {
-                vtx0.x = phaseLerp * (worldX - vtx0.x) + vtx0.x;
-                vtx0.z = phaseLerp * (worldZ - vtx0.z) + vtx0.z;
-                vtx1.x = phaseLerp * (worldX - vtx1.x) + vtx1.x;
-                vtx1.z = phaseLerp * (worldZ - vtx1.z) + vtx1.z;
-                vtx3.x = phaseLerp * (worldX - vtx3.x) + vtx3.x;
-                vtx3.z = phaseLerp * (worldZ - vtx3.z) + vtx3.z;
-                vtx2.x = phaseLerp * (worldX - vtx2.x) + vtx2.x;
-                vtx2.z = phaseLerp * (worldZ - vtx2.z) + vtx2.z;
+                vtx0.x += (worldX - vtx0.x) * phaseLerp;
+                vtx0.z += (worldZ - vtx0.z) * phaseLerp;
+                vtx1.x += (worldX - vtx1.x) * phaseLerp;
+                vtx1.z += (worldZ - vtx1.z) * phaseLerp;
+                vtx3.x += (worldX - vtx3.x) * phaseLerp;
+                vtx3.z += (worldZ - vtx3.z) * phaseLerp;
+                vtx2.x += (worldX - vtx2.x) * phaseLerp;
+                vtx2.z += (worldZ - vtx2.z) * phaseLerp;
             }
 
             GXPosition3f32(vtx0.x, vtx0.y, vtx0.z);

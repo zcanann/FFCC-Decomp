@@ -104,8 +104,8 @@ unsigned int CMapPcs::m_table[3][0x414 / 3 / sizeof(unsigned int)] = {
     },
 };
 
-extern unsigned int s_loadedStageNo__7CMapPcs;
-extern unsigned int s_loadedMapNo__7CMapPcs;
+unsigned int s_loadedStageNo__7CMapPcs;
+unsigned int s_loadedMapNo__7CMapPcs;
 CRelProfile g_mapStage;
 CRelProfile g_mapSection;
 CRelProfile g_hit_prof;

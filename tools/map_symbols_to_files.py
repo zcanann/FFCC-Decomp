@@ -20,6 +20,7 @@ MAP_FILE = str(default_game_map_path(Path(REPO), "GCCP01"))
 SPLITS = os.path.join(REPO, "config/GCCP01/splits.txt")
 
 DATA_SECTIONS = {'.data', '.rodata', '.bss', '.sbss', '.sdata', '.sdata2'}
+LOCAL_GENERATED_NAME_RE = re.compile(r'@|lbl_|gap_|pad_|jumptable_|FLOAT_|DOUBLE_|DAT_')
 
 def parse_symbols():
     """Parse symbols.txt -> list of (name, section, addr, size, line_info)"""
@@ -82,6 +83,14 @@ def extract_map_symbols():
     }
     return exact, unique_by_name
 
+def can_use_unique_name_fallback(name):
+    """Avoid attributing compiler-local/generated names by name alone.
+
+    MAP files contain many unrelated local symbols named like @234 or lbl_....
+    Those are only trustworthy when the section/address also matches.
+    """
+    return LOCAL_GENERATED_NAME_RE.match(name) is None
+
 def main():
     syms = parse_symbols()
     splits = parse_splits()
@@ -122,7 +131,7 @@ def main():
     for section, sym_list in unclaimed.items():
         for addr, size, name, info in sym_list:
             obj = exact_map.get((section, addr, name))
-            if obj is None:
+            if obj is None and can_use_unique_name_fallback(name):
                 obj = unique_name_map.get(name)
             if obj:
                 by_obj[obj][section].append((addr, size, name))

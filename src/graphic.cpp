@@ -297,9 +297,11 @@ void CGraphic::ChangeProgressive(int mode)
  */
 void CGraphic::SetCopyClear(_GXColor color, int)
 {
-    _GXColor* clearColor = reinterpret_cast<_GXColor*>(reinterpret_cast<u8*>(this) + 0x735F);
-    *clearColor = color;
-    GXSetCopyClear(*clearColor, 0xFFFFFF);
+    m_defaultCopyClearColor.r = color.r;
+    m_defaultCopyClearColor.g = color.g;
+    m_defaultCopyClearColor.b = color.b;
+    m_defaultCopyClearColor.a = color.a;
+    GXSetCopyClear(m_defaultCopyClearColor, 0xFFFFFF);
 }
 
 /*

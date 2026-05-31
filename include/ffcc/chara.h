@@ -36,6 +36,7 @@ class CChara : public CManager
 public:
 	class CModel;
 	class CMesh;
+	class CAnimNode;
 
 	class CSkin
 	{
@@ -63,8 +64,22 @@ public:
         void SetInterp(int);
         void InitQuantize();
 
-		u8 _pad8[0x8];
-		u16 m_frameCount;
+		u8 m_flags;                     // 0x08
+		char m_interp;                  // 0x09
+		u8 m_quantizeX;                 // 0x0A
+		u8 m_quantizeY;                 // 0x0B
+		u8 m_quantizeZ;                 // 0x0C
+		u8 _pad0D;                      // 0x0D
+		u16 m_nodeCount;                // 0x0E
+		u16 m_frameCount;               // 0x10
+		u8 _pad12[0x2];                 // 0x12
+		CAnimNode* m_nodes;             // 0x14
+		u32 m_interpOffset;             // 0x18
+		u32 m_bankSize;                 // 0x1C
+		void* m_bank;                   // 0x20
+		int m_lastFrame;                // 0x24
+		int m_bankAddress;              // 0x28
+		CMemory::CStage* m_stage;       // 0x2C
 	};
 
 	class CAnimNode
@@ -181,8 +196,11 @@ public:
 		}
 
 	public:
-		u8 _pad0[0x68];
+		u8 _pad0[0x8];
 		Mtx m_matrix;
+		u8 _pad38[0xC];
+		Mtx m_worldBaseMtx;
+		u8 _pad74[0x24];
 		u32 m_meshVisibleMask;
 		float m_lightAlpha;
 		u8 m_flagsA0;
@@ -193,11 +211,16 @@ public:
 		CMesh* m_meshes;
 		CTextureSet* m_texSet;
 		float m_curFrame;
-		CAnim* m_anim;
 		float m_time;
 		float m_animStart;
 		float m_animEnd;
-		u8 _padC8[0x1C];
+		CVector m_dynJitter;
+		CAnim* m_anim;
+		CTexAnimSet* m_texAnimSet;
+		u16 m_blendCur;
+		u16 m_blendMax;
+		float m_chestTilt;
+		float m_chestAmp;
 		void* m_callbackContext;
 		void* m_callbackParam;
 		BeforeCalcMatrixCallback m_beforeCalcMatrixCallback;

@@ -2602,11 +2602,12 @@ unsigned int CMenuPcs::CmdOpen1()
 
 	*reinterpret_cast<f32*>(animEntry + 8) =
 		static_cast<f32>(DOUBLE_80332a90 * static_cast<f64>(*reinterpret_cast<s16*>(cmd + 0x22)));
-	if (static_cast<f64>(*reinterpret_cast<s16*>(cmd + 0x22)) >= DOUBLE_80332a78) {
+	u32 done = static_cast<u32>(static_cast<f64>(*reinterpret_cast<s16*>(cmd + 0x22)) >= DOUBLE_80332a78);
+	if (done != 0) {
 		*reinterpret_cast<s16*>(cmd + 0x2a) = 0;
 	}
 
-	return 0;
+	return done;
 }
 
 /*

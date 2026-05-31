@@ -171,11 +171,18 @@ def _parse_layout_line(line: str, current_section: str) -> Optional[LayoutRecord
     columns = prefix.split(maxsplit=5)
     if columns and columns[0] != "UNUSED" and _parse_hex(columns[0]) is None:
         columns = columns[1:]
-    if len(columns) < 5:
-        return None
 
-    offset_text, size_text, virtual_text, kind = columns[:4]
-    symbol_name = " ".join(columns[4:]).strip()
+    if columns and columns[0] == "UNUSED":
+        if len(columns) < 4:
+            return None
+        offset_text, size_text, virtual_text = columns[:3]
+        kind = None
+        symbol_name = " ".join(columns[3:]).strip()
+    else:
+        if len(columns) < 5:
+            return None
+        offset_text, size_text, virtual_text, kind = columns[:4]
+        symbol_name = " ".join(columns[4:]).strip()
     archive_split = symbol_name.rsplit(maxsplit=1)
     if len(archive_split) == 2 and archive_split[1].lower().endswith(".a"):
         symbol_name = archive_split[0].strip()

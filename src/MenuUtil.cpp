@@ -270,7 +270,7 @@ static inline unsigned short GetMenuPress()
 		return 0;
 	}
 
-	int padIndex = activeInput;
+	int padIndex = 0;
 	padIndex &= ~-((__cntlzw(static_cast<unsigned int>(Pad._448_4_)) & 0x20) >> 5);
 	return *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Pad) + padIndex * 0x54 + 8);
 }

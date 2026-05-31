@@ -1086,7 +1086,7 @@ void CMenuPcs::CalcSelectWait()
 		*(short*)(auxPtr + 10) = 3;
 		for (int i = 0; i < (int)header->count; i++) {
 			sprites[i].alpha = 1.0f;
-			sprites[i].depth = 3.0f;
+			BonusSpriteFlags(&sprites[i]) = 3;
 		}
 		BonusAnimSprite* cursor = &sprites[header->count];
 		BonusAnimSprite* partySprite = cursor - activePartyCount * 2;

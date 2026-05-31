@@ -884,6 +884,7 @@ void CMenuPcs::CalcSelectCloseAnim()
 		sprites[0].duration = 8;
 		sprites[1].startFrame = 0;
 		sprites[1].duration = 8;
+		BonusSpriteFlags(&sprites[1]) = 2;
 		sprites[2].kind = 0x1f;
 		sprites[2].startFrame = 0;
 		sprites[2].duration = 0;

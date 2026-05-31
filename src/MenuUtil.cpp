@@ -554,7 +554,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 			strcpy(scratch, GetAttrStr(attr));
 			font->Draw(scratch);
 			font->SetTlut(9);
-			if (attr < 9) {
+			if (attr <= 8) {
 				sprintf(scratch, sMenuUtilAttrBonusFormat, sMenuUtilPlusOneText);
 				font->Draw(scratch);
 			}

@@ -503,7 +503,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 			u16 effectFlags = *reinterpret_cast<u16*>(itemBase + 4);
 
 			if ((effectFlags & 0x1000) == 0) {
-				short currentItem = -1;
+				int currentItem = -1;
 				if ((effectFlags & 0x100) != 0) {
 					currentItem = 0;
 				} else if ((effectFlags & 0x400) != 0) {

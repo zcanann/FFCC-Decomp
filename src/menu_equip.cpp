@@ -820,75 +820,80 @@ int CMenuPcs::EquipClose()
  */
 void CMenuPcs::EquipCtrl()
 {
-	int state = 0;
+	int mode;
+	u32 caravanWork;
+	float scale;
+	int state;
 	int menuState;
 	int item;
 	int index;
-	int offset;
 	u32 equipCount;
 	u32 blockCount;
-	u32 caravanWork;
-	float defaultScale;
-	s16 mode;
+	int offset;
 
-	*reinterpret_cast<s16*>(GetEquipStateBase(this) + 0x32) = *reinterpret_cast<s16*>(GetEquipStateBase(this) + 0x30);
-	menuState = GetEquipStateBase(this);
-	mode = *reinterpret_cast<s16*>(menuState + 0x30);
+	state = 0;
+	*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82c) + 0x32) =
+	    *reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82c) + 0x30);
+	menuState = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82c);
+	mode = static_cast<int>(*reinterpret_cast<s16*>(menuState + 0x30));
 	if ((mode == 0) || ((mode != 0) && (*reinterpret_cast<s16*>(menuState + 0x12) == 1))) {
 		state = EquipCtrlCur();
 	} else if ((mode == 1) && (*reinterpret_cast<s16*>(menuState + 0x12) == 0)) {
 		state = EquipOpen0();
 		if (state != 0) {
 			state = 0;
-			*reinterpret_cast<s16*>(menuState + 0x12) = *reinterpret_cast<s16*>(menuState + 0x12) + 1;
+			*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82c) + 0x12) =
+			    *reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82c) + 0x12) + 1;
 		}
-	} else if (((mode == 1) && (*reinterpret_cast<s16*>(menuState + 0x12) == 2)) && EquipClose0()) {
-		*reinterpret_cast<s16*>(menuState + 0x12) = 0;
-		*reinterpret_cast<s16*>(GetEquipStateBase(this) + 0x30) = 0;
-		*reinterpret_cast<s16*>(GetEquipStateBase(this) + 0x22) = 0;
+	} else if ((mode == 1) && ((*reinterpret_cast<s16*>(menuState + 0x12) == 2) && (state = EquipClose0(), state != 0))) {
+		*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82c) + 0x12) = 0;
+		*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82c) + 0x30) = 0;
+		*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82c) + 0x22) = 0;
 		CmdInit1();
 		state = 0;
 	}
-	defaultScale = FLOAT_80332ee0;
+
+	scale = FLOAT_80332ee0;
 	caravanWork = Game.m_scriptFoodBase[0];
 	if (state != 0) {
-		item = GetEquipListBase(this) + 8;
-		for (index = 0; index < *GetEquipList(this); index++) {
-			*reinterpret_cast<float*>(item + 0x10) = defaultScale;
-			*reinterpret_cast<float*>(item + 0x14) = defaultScale;
+		item = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + 8;
+		for (index = 0; index < **reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850); index++) {
+			*reinterpret_cast<float*>(item + 0x10) = scale;
+			*reinterpret_cast<float*>(item + 0x14) = scale;
 			item += 0x40;
 		}
-		equipCount = (u32)*(s16*)(caravanWork + 0xbaa);
+
+		equipCount = static_cast<u32>(*reinterpret_cast<s16*>(caravanWork + 0xbaa));
 		index = 0;
 		offset = (equipCount - 1) * 0x40;
-		if (-1 < (int)(equipCount - 1)) {
+		if (-1 < static_cast<int>(equipCount - 1)) {
 			blockCount = equipCount >> 3;
 			if (blockCount != 0) {
 				do {
-					item = GetEquipListBase(this) + offset + 8;
+					item = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + offset + 8;
 					*reinterpret_cast<int*>(item + 0x24) = index;
 					*reinterpret_cast<int*>(item + 0x28) = 3;
-					item = GetEquipListBase(this) + offset + -0x38;
+					item = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + offset + -0x38;
 					*reinterpret_cast<int*>(item + 0x24) = index + 1;
 					*reinterpret_cast<int*>(item + 0x28) = 3;
-					item = GetEquipListBase(this) + offset + -0x78;
+					item = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + offset + -0x78;
 					*reinterpret_cast<int*>(item + 0x24) = index + 2;
 					*reinterpret_cast<int*>(item + 0x28) = 3;
-					item = GetEquipListBase(this) + offset + -0xb8;
+					item = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + offset + -0xb8;
 					*reinterpret_cast<int*>(item + 0x24) = index + 3;
 					*reinterpret_cast<int*>(item + 0x28) = 3;
-					item = GetEquipListBase(this) + offset + -0xf8;
+					item = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + offset + -0xf8;
 					*reinterpret_cast<int*>(item + 0x24) = index + 4;
 					*reinterpret_cast<int*>(item + 0x28) = 3;
-					item = GetEquipListBase(this) + offset + -0x138;
+					item = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + offset + -0x138;
 					*reinterpret_cast<int*>(item + 0x24) = index + 5;
 					*reinterpret_cast<int*>(item + 0x28) = 3;
-					item = GetEquipListBase(this) + offset + -0x178;
+					item = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + offset + -0x178;
 					*reinterpret_cast<int*>(item + 0x24) = index + 6;
 					*reinterpret_cast<int*>(item + 0x28) = 3;
 					item = offset + -0x1b8;
 					offset = offset + -0x200;
-					item = GetEquipListBase(this) + item;
+					item = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + item;
 					*reinterpret_cast<int*>(item + 0x24) = index + 7;
 					index = index + 8;
 					*reinterpret_cast<int*>(item + 0x28) = 3;
@@ -902,7 +907,7 @@ void CMenuPcs::EquipCtrl()
 			do {
 				item = offset + 8;
 				offset = offset + -0x40;
-				item = GetEquipListBase(this) + item;
+				item = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + item;
 				*reinterpret_cast<int*>(item + 0x24) = index;
 				index = index + 1;
 				*reinterpret_cast<int*>(item + 0x28) = 3;

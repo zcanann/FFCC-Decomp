@@ -370,7 +370,7 @@ void CMiniGamePcs::MiniGameGo(char* managerFilePath, char* managerSpFilePath)
 
     int offset = 0xA0;
     int managerBase = *reinterpret_cast<int*>(self + 0x1354);
-    int checksum = -0x19;
+    int checksum = 0xE7;
 
     *reinterpret_cast<unsigned char*>(managerBase + 0xAC) = self[0x1344];
     *reinterpret_cast<unsigned char*>(managerBase + 0xAD) = self[0x1345];
@@ -378,26 +378,30 @@ void CMiniGamePcs::MiniGameGo(char* managerFilePath, char* managerSpFilePath)
     *reinterpret_cast<unsigned char*>(managerBase + 0xAF) = self[0x1347];
 
     int checksumBlockCount = 2;
-    while (checksumBlockCount-- != 0)
-    {
-        signed char* bytes = reinterpret_cast<signed char*>(managerBase + offset);
-        signed char* bytes2 = reinterpret_cast<signed char*>(managerBase + offset + 7);
+    if (offset < 0xBD) {
+        while (checksumBlockCount-- != 0)
+        {
+            signed char* bytes = reinterpret_cast<signed char*>(managerBase + offset);
 
-        checksum -= bytes[0];
-        checksum -= bytes[1];
-        checksum -= bytes[2];
-        checksum -= bytes[3];
-        checksum -= bytes[4];
-        checksum -= bytes[5];
-        checksum -= bytes[6];
-        checksum -= bytes2[0];
-        checksum -= bytes2[1];
-        checksum -= bytes2[2];
-        checksum -= bytes2[3];
-        checksum -= bytes2[4];
-        checksum -= bytes2[5];
-        checksum -= bytes2[6];
-        offset += 0xE;
+            checksum -= bytes[0];
+            checksum -= bytes[1];
+            checksum -= bytes[2];
+            checksum -= bytes[3];
+            checksum -= bytes[4];
+            checksum -= bytes[5];
+            checksum -= bytes[6];
+            offset += 7;
+
+            bytes = reinterpret_cast<signed char*>(managerBase + offset);
+            checksum -= bytes[0];
+            checksum -= bytes[1];
+            checksum -= bytes[2];
+            checksum -= bytes[3];
+            checksum -= bytes[4];
+            checksum -= bytes[5];
+            checksum -= bytes[6];
+            offset += 7;
+        }
     }
 
     int remaining = 0xBD - offset;
@@ -429,7 +433,7 @@ void CMiniGamePcs::MiniGameGo(char* managerFilePath, char* managerSpFilePath)
 
     offset = 0xA0;
     managerBase = *reinterpret_cast<int*>(self + 0x135C);
-    checksum = -0x19;
+    checksum = 0xE7;
 
     *reinterpret_cast<unsigned char*>(managerBase + 0xAC) = self[0x1344];
     *reinterpret_cast<unsigned char*>(managerBase + 0xAD) = self[0x1345];
@@ -437,26 +441,30 @@ void CMiniGamePcs::MiniGameGo(char* managerFilePath, char* managerSpFilePath)
     *reinterpret_cast<unsigned char*>(managerBase + 0xAF) = self[0x1347];
 
     checksumBlockCount = 2;
-    while (checksumBlockCount-- != 0)
-    {
-        signed char* bytes = reinterpret_cast<signed char*>(managerBase + offset);
-        signed char* bytes2 = reinterpret_cast<signed char*>(managerBase + offset + 7);
+    if (offset < 0xBD) {
+        while (checksumBlockCount-- != 0)
+        {
+            signed char* bytes = reinterpret_cast<signed char*>(managerBase + offset);
 
-        checksum -= bytes[0];
-        checksum -= bytes[1];
-        checksum -= bytes[2];
-        checksum -= bytes[3];
-        checksum -= bytes[4];
-        checksum -= bytes[5];
-        checksum -= bytes[6];
-        checksum -= bytes2[0];
-        checksum -= bytes2[1];
-        checksum -= bytes2[2];
-        checksum -= bytes2[3];
-        checksum -= bytes2[4];
-        checksum -= bytes2[5];
-        checksum -= bytes2[6];
-        offset += 0xE;
+            checksum -= bytes[0];
+            checksum -= bytes[1];
+            checksum -= bytes[2];
+            checksum -= bytes[3];
+            checksum -= bytes[4];
+            checksum -= bytes[5];
+            checksum -= bytes[6];
+            offset += 7;
+
+            bytes = reinterpret_cast<signed char*>(managerBase + offset);
+            checksum -= bytes[0];
+            checksum -= bytes[1];
+            checksum -= bytes[2];
+            checksum -= bytes[3];
+            checksum -= bytes[4];
+            checksum -= bytes[5];
+            checksum -= bytes[6];
+            offset += 7;
+        }
     }
 
     remaining = 0xBD - offset;
@@ -1784,48 +1792,48 @@ void CMiniGamePcs::MngThreadMain(void*)
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
     int managerStackOffset = 0x1000;
-    unsigned char* threadParam = self + 0x138C;
-    unsigned char* threadState = self + 0x1830;
-    unsigned char* spMode = Game.m_gameWork.m_spModeFlags;
+    unsigned char* threadParam = self;
+    unsigned char* threadState = self;
+    char* spMode = reinterpret_cast<char*>(Game.m_gameWork.m_spModeFlags);
 
     int i = 0;
     do
     {
         unsigned int imageSize;
         void* imageBase;
-        if (*spMode != 0)
-        {
-            imageSize = *reinterpret_cast<unsigned int*>(self + 0x1360);
-            imageBase = *reinterpret_cast<void**>(self + 0x135C);
-        }
-        else
+        if (*spMode == 0)
         {
             imageSize = *reinterpret_cast<unsigned int*>(self + 0x1358);
             imageBase = *reinterpret_cast<void**>(self + 0x1354);
         }
+        else
+        {
+            imageSize = *reinterpret_cast<unsigned int*>(self + 0x1360);
+            imageBase = *reinterpret_cast<void**>(self + 0x135C);
+        }
 
-        memset(threadParam, 0, 200);
-        threadParam[0xBC] = static_cast<unsigned char>(i);
-        *reinterpret_cast<void (**)(MgGbaThreadParam*, void*)>(threadParam + 0x24) = _OpenCallback;
-        *reinterpret_cast<void**>(threadParam + 0x8C) = imageBase;
-        *reinterpret_cast<unsigned int*>(threadParam + 0x90) = imageSize;
+        memset(threadParam + 0x138C, 0, 200);
+        threadParam[0x1448] = static_cast<unsigned char>(i);
+        *reinterpret_cast<void (**)(MgGbaThreadParam*, void*)>(threadParam + 0x13B0) = _OpenCallback;
+        *reinterpret_cast<void**>(threadParam + 0x1418) = imageBase;
+        *reinterpret_cast<unsigned int*>(threadParam + 0x141C) = imageSize;
 
-        memset(threadState, 0, sizeof(OSThread));
-        OSInitMessageQueue(reinterpret_cast<OSMessageQueue*>(threadParam),
-                           reinterpret_cast<OSMessage*>(threadParam + 0x20), 1);
-        OSCreateThread(reinterpret_cast<OSThread*>(threadState),
+        memset(threadState + 0x1830, 0, sizeof(OSThread));
+        OSInitMessageQueue(reinterpret_cast<OSMessageQueue*>(threadParam + 0x138C),
+                           reinterpret_cast<OSMessage*>(threadParam + 0x13AC), 1);
+        OSCreateThread(reinterpret_cast<OSThread*>(threadState + 0x1830),
                        reinterpret_cast<void* (*)(void*)>(_GbaThreadMain),
-                       reinterpret_cast<void*>(threadParam),
+                       reinterpret_cast<void*>(threadParam + 0x138C),
                        reinterpret_cast<void*>(self + 0x2490 + managerStackOffset),
                        0x1000, 7, 1);
-        OSResumeThread(reinterpret_cast<OSThread*>(threadState));
+        OSResumeThread(reinterpret_cast<OSThread*>(threadState + 0x1830));
 
         managerStackOffset += 0x1000;
         threadParam += 200;
         threadState += sizeof(OSThread);
         spMode++;
         i++;
-    } while (i < 4);
+    } while (i <= 3);
 
     OSTime startTime = OSGetTime();
     unsigned int loopCounter = 0;

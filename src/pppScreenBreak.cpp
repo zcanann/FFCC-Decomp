@@ -50,7 +50,7 @@ struct ScreenBreakMeshData {
     char m_name[0x10];
     u8 m_flags;
     u8 _pad11[3];
-    s32 m_vertexCount;
+    u32 m_vertexCount;
     S16Vec* m_vertices;
     u8 _pad1C[0x34];
     ScreenBreakDisplayList* m_displayLists;
@@ -93,6 +93,13 @@ struct pppScreenBreakUnkC {
     u8 _pad0[0xC];
     s32* m_serializedDataOffsets;
 };
+
+STATIC_ASSERT(offsetof(ScreenBreakModelView, m_data) == 0xA4);
+STATIC_ASSERT(offsetof(ScreenBreakModelView, m_nodes) == 0xA8);
+STATIC_ASSERT(offsetof(ScreenBreakModelView, m_meshes) == 0xAC);
+STATIC_ASSERT(offsetof(ScreenBreakMeshRef, m_data) == 0x8);
+STATIC_ASSERT(offsetof(ScreenBreakMeshData, m_vertexCount) == 0x14);
+STATIC_ASSERT(offsetof(ScreenBreakMeshData, m_nodeIndex) == 0x5C);
 
 template <class T>
 class CPtrArray
@@ -409,7 +416,7 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
 
     memset(*(void**)((u8*)work + 0xC), 0, *(s32*)(ScreenBreakModelDataRaw(model) + 0xC) * 0x3C);
     dVar19 = FLOAT_80331cc8;
-    iVar16 = *(s32*)((u8*)model + 0xAC);
+    CChara::CMesh* mesh = model->m_meshes;
     dVar18 = -dVar19;
     inVec = *(Vec**)((u8*)work + 0xC);
     dVar20 = FLOAT_80331cd0;
@@ -422,8 +429,9 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
     dVar25 = FLOAT_80331cd8;
 
     for (uVar15 = 0; uVar15 < *(u32*)(ScreenBreakModelDataRaw(model) + 0xC);) {
-        iVar14 = *(s32*)(iVar16 + 8);
-        iVar5 = *(s32*)((u8*)model + 0xA8) + (*(s32*)(iVar14 + 0x5C) * 0xC0);
+        ScreenBreakMeshData* meshData = reinterpret_cast<ScreenBreakMeshData*>(mesh->m_data);
+        iVar14 = reinterpret_cast<s32>(meshData);
+        iVar5 = reinterpret_cast<s32>(model->m_nodes) + (meshData->m_nodeIndex * 0xC0);
         ((ScreenBreakNode*)iVar5)->m_disabled = 0;
         PSMTXIdentity((float(*)[4])(iVar5 + 0x14));
 
@@ -526,7 +534,7 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
 
         uStack_b4 = (u32)*(u8*)((u8*)step + 0x34);
         dVar17 = Math.RandF((float)uStack_b4);
-        iVar16 += 0x14;
+        mesh++;
         uVar15++;
         inVec[4].y = dVar25 * (dVar24 + dVar17);
         *(u8*)&inVec[4].z = 0;
@@ -708,13 +716,13 @@ int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void* para
     for (u32 i = 0; i < modelView->m_data->m_meshCount; i++) {
         ScreenBreakMeshData* meshData = mesh->m_data;
         if (*(u8*)((u8*)pieceData + 0x38) != 0) {
-            u8* nodeMtx = modelView->m_nodes + (meshData->m_nodeIndex * 0xC0) + 0x14;
+            MtxPtr nodeMtx = model->m_nodes[meshData->m_nodeIndex].m_localRuntimeMtx;
 
-            *(float*)(nodeMtx + 0xC) = zero;
-            *(float*)(nodeMtx + 0x1C) = zero;
-            *(float*)(nodeMtx + 0x2C) = zero;
+            nodeMtx[0][3] = zero;
+            nodeMtx[1][3] = zero;
+            nodeMtx[2][3] = zero;
 
-            PSMTXCopy((float(*)[4])nodeMtx, meshMtx);
+            PSMTXCopy(nodeMtx, meshMtx);
             PSMTXIdentity(transMtx);
             transMtx[0][3] = pieceData[9];
             transMtx[1][3] = pieceData[10];
@@ -729,7 +737,7 @@ int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void* para
             C_QUATMtx(&meshQuat, meshMtx);
             PSQUATMultiply(&axisQuat, &meshQuat, &resultQuat);
             PSMTXQuat(quatMtx, &resultQuat);
-            PSMTXConcat(quatMtx, transMtx, (float(*)[4])nodeMtx);
+            PSMTXConcat(quatMtx, transMtx, nodeMtx);
 
             pieceData[3] -= pieceData[0];
             float gravityTerm = 0.5f * *(float*)((u8*)param_3 + 0x18) * pieceData[0xC];
@@ -750,7 +758,7 @@ int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void* para
             invTransMtx[0][3] = invTransOffset.x;
             invTransMtx[1][3] = invTransOffset.y;
             invTransMtx[2][3] = invTransOffset.z;
-            PSMTXConcat(invTransMtx, (float(*)[4])nodeMtx, (float(*)[4])nodeMtx);
+            PSMTXConcat(invTransMtx, nodeMtx, nodeMtx);
         }
 
         mesh++;

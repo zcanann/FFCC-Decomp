@@ -679,12 +679,14 @@ void CMaterialEditorPcs::Init()
     self[0x9] = 0x7f;
     self[0xa] = 0x7f;
     int levelMask = 0x3f;
-    unsigned char level = static_cast<unsigned char>(-((__cntlzw(0) >> 5) & 1) & levelMask);
+    int level0 = __cntlzw(0);
+    int level1 = __cntlzw(1);
+    int level = -((level0 >> 5) & 1) & levelMask;
     self[0xb] = 0xff;
     self[0xc] = level;
     self[0xd] = level;
     self[0xe] = level;
-    level = static_cast<unsigned char>(-((__cntlzw(1) >> 5) & 1) & levelMask);
+    level = -((level1 >> 5) & 1) & levelMask;
     self[0xf] = 0xff;
     float minusOne = FLOAT_8032FCDC;
     float zero = FLOAT_8032FCD8;
@@ -696,7 +698,7 @@ void CMaterialEditorPcs::Init()
     self[0x10] = level;
     self[0x11] = level;
     self[0x12] = level;
-    level = static_cast<unsigned char>(-((__cntlzw(2) >> 5) & 1) & levelMask);
+    level = -((__cntlzw(2) >> 5) & 1) & levelMask;
     self[0x13] = 0xff;
     *reinterpret_cast<float*>(self + 0x24) = zero;
     *reinterpret_cast<float*>(self + 0x28) = zero;

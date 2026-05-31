@@ -130,7 +130,7 @@ void CMenuPcs::FavoDraw()
 					colors[3].g = 0xFF;
 					colors[3].b = 0xFF;
 					colors[3].a = 0;
-					float remainW = (static_cast<float>(DOUBLE_80333050) / static_cast<float>(entry->duration)) * w;
+					float remainW = static_cast<float>(DOUBLE_80333050 / static_cast<double>(entry->duration)) * w;
 					if (entry->tex == 0x32) {
 						int yStep = static_cast<int>(y);
 						float end = y + h;
@@ -181,7 +181,7 @@ void CMenuPcs::FavoDraw()
 	FavoEntry* drawEntry = rankEntry;
 	for (int i = 0; i < 8; i++) {
 		int barX = drawEntry->x + drawEntry->w + 0x18;
-		int barY = static_cast<int>((static_cast<float>(drawEntry->h) - FLOAT_8033305C) * static_cast<float>(DOUBLE_80333060) +
+		int barY = static_cast<int>((static_cast<float>(drawEntry->h) - FLOAT_8033305C) * DOUBLE_80333060 +
 		                            static_cast<float>(drawEntry->y));
 		DrawSingBar(barX, barY, *reinterpret_cast<short*>(rank + 2), drawEntry->alpha);
 		rank += 4;
@@ -192,7 +192,7 @@ void CMenuPcs::FavoDraw()
 	drawEntry = rankEntry;
 	for (int i = 0; i < 8; i++) {
 		int iconX = drawEntry->x + drawEntry->w - 0x10;
-		int iconY = static_cast<int>((static_cast<float>(drawEntry->h) - FLOAT_80333044) * static_cast<float>(DOUBLE_80333060) +
+		int iconY = static_cast<int>((static_cast<float>(drawEntry->h) - FLOAT_80333044) * DOUBLE_80333060 +
 		                             static_cast<float>(drawEntry->y));
 		DrawSingleIcon(static_cast<char>(rank[1]) + 0x14, iconX, iconY, drawEntry->alpha, 1, FLOAT_80333048);
 		rank += 4;

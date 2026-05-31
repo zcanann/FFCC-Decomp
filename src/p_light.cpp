@@ -84,6 +84,11 @@ static inline double U32ToDouble(unsigned int value)
     return conv.d - DOUBLE_8032fc68;
 }
 
+static inline float LoadFloat(const float& value)
+{
+    return value;
+}
+
 /*
  * --INFO--
  * PAL Address: 0x8004a294
@@ -302,12 +307,13 @@ void CLightPcs::draw()
             if (static_cast<int>(light->m_type) == 1) {
                 cutoff = FLOAT_8032fc94 * light->m_spotScale;
             } else {
-                cutoff = FLOAT_8032fc74;
+                cutoff = LoadFloat(FLOAT_8032fc74);
             }
 
             GXInitLightSpot(&light->m_gxLightObj, cutoff, (GXSpotFn)light->m_unk4D);
-            GXInitLightAttnK(&light->m_gxLightObj, FLOAT_8032fc84 / light->m_attenFalloff,
-                             FLOAT_8032fc84 / light->m_attenRadius, FLOAT_8032fc84 / light->m_attenRadius);
+            float attnK = LoadFloat(FLOAT_8032fc84);
+            GXInitLightAttnK(&light->m_gxLightObj, attnK / light->m_attenFalloff,
+                             attnK / light->m_attenRadius, attnK / light->m_attenRadius);
         } else {
             PSMTXMultVecSR(mtx, reinterpret_cast<Vec*>(&light->m_direction), &vec);
             GXInitSpecularDir(&light->m_gxLightObj, vec.x, vec.y, vec.z);
@@ -453,7 +459,7 @@ void CLightPcs::SetMapColorAlpha(float (*) [4], _GXColor mapColor, _GXColor ambC
     GXSetChanMatColor((GXChannelID)4, mapColor);
     GXSetChanAmbColor((GXChannelID)4, ambColor);
 
-    if ((enable != 0) && (alpha != 0) && (atten < FLOAT_8032fc80)) {
+    if ((enable != 0) && (alpha != 0) && (atten < LoadFloat(FLOAT_8032fc80))) {
         Mtx cam;
         Vec eyePos;
         Vec eyeDir;
@@ -475,7 +481,8 @@ void CLightPcs::SetMapColorAlpha(float (*) [4], _GXColor mapColor, _GXColor ambC
         PSMTXMultVecSR(cam, &eyeDir, &transformedDir);
         GXInitLightDir(&m_mapLightObj, transformedDir.x, transformedDir.y, transformedDir.z);
         GXInitLightSpot(&m_mapLightObj, spot, (GXSpotFn)4);
-        GXInitLightAttnK(&m_mapLightObj, FLOAT_8032fc84 / dist, FLOAT_8032fc88 / atten, FLOAT_8032fc8c / atten);
+        float attnK = LoadFloat(FLOAT_8032fc84);
+        GXInitLightAttnK(&m_mapLightObj, attnK / dist, FLOAT_8032fc88 / atten, FLOAT_8032fc8c / atten);
 
         s_mapLightAlphaColor.a = alpha;
         GXInitLightColor(&m_mapLightObj, s_mapLightAlphaColor);
@@ -528,7 +535,8 @@ void CLightPcs::SetAmbient(_GXColor color)
  */
 void CLightPcs::SetAmbientAlpha(float alpha)
 {
-    float scaled = FLOAT_8032fc7c * alpha;
+    float scale = LoadFloat(FLOAT_8032fc7c);
+    float scaled = scale * alpha;
     s_ambientAlphaColor.a = (u8)(int)scaled;
     GXSetChanAmbColor((GXChannelID)2, s_ambientAlphaColor);
 }
@@ -619,9 +627,10 @@ void CLightPcs::SetDiffuse(unsigned long idx, _GXColor color, Vec* dir, int mode
     GXInitLightColor(&light->m_gxLightObj, color);
     PSMTXCopy(CameraMatrix(), cam);
 
-    lightDir.x = FLOAT_8032fc70 * -dirX;
-    lightDir.y = FLOAT_8032fc70 * -dirY;
-    lightDir.z = FLOAT_8032fc70 * -dirZ;
+    float scale = LoadFloat(FLOAT_8032fc70);
+    lightDir.x = scale * -dirX;
+    lightDir.y = scale * -dirY;
+    lightDir.z = scale * -dirZ;
     PSMTXMultVec(cam, &lightDir, &lightDir);
     GXInitLightPos(&light->m_gxLightObj, lightDir.x, lightDir.y, lightDir.z);
 
@@ -631,8 +640,8 @@ void CLightPcs::SetDiffuse(unsigned long idx, _GXColor color, Vec* dir, int mode
     PSMTXMultVecSR(cam, &lightDir, &lightDir);
     GXInitLightDir(&light->m_gxLightObj, lightDir.x, lightDir.y, lightDir.z);
 
-    GXInitLightSpot(&light->m_gxLightObj, FLOAT_8032fc74, (GXSpotFn)4);
-    GXInitLightAttnK(&light->m_gxLightObj, FLOAT_8032fc14, FLOAT_8032fc78, FLOAT_8032fc14);
+    GXInitLightSpot(&light->m_gxLightObj, LoadFloat(FLOAT_8032fc74), (GXSpotFn)4);
+    GXInitLightAttnK(&light->m_gxLightObj, FLOAT_8032fc14, LoadFloat(FLOAT_8032fc78), FLOAT_8032fc14);
 }
 
 /*

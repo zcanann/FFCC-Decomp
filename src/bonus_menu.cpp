@@ -336,7 +336,7 @@ static inline void InitSelectOpenPartyIcon(BonusAnimSprite* sprite, int slotInde
 	sprite->motionY = 0.0f;
 	sprite->targetX = (float)sprite->x + sprite->motionX;
 	sprite->targetY = (float)sprite->y + sprite->motionY;
-	BonusSpriteFlags(sprite) = 0x10000;
+	BonusSpriteFlags(sprite) = 1;
 }
 
 static inline void InitSelectOpenPartyName(BonusAnimSprite* sprite, const BonusAnimSprite* iconSprite, short xOffset, short yOffset, int startFrame)
@@ -349,7 +349,7 @@ static inline void InitSelectOpenPartyName(BonusAnimSprite* sprite, const BonusA
 	sprite->motionY = 0.0f;
 	sprite->targetX = (float)sprite->x + sprite->motionX;
 	sprite->targetY = (float)sprite->y + sprite->motionY;
-	BonusSpriteFlags(sprite) = 0x10000;
+	BonusSpriteFlags(sprite) = 1;
 }
 
 static inline void SetupSelectCloseSpriteMotion(BonusAnimSprite* sprite)

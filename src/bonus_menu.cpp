@@ -2086,7 +2086,7 @@ void CMenuPcs::DrawResultCountAnim()
 	BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
 
 	DrawInit();
-	SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
 	for (int i = 0; i < (int)header->count; i++) {
 		BonusAnimSprite* sprite = &sprites[i];
@@ -2116,14 +2116,14 @@ void CMenuPcs::DrawResultCountAnim()
 			} else {
 				if (lastKind < 0) {
 					DrawInit();
-					SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+					MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 				}
 				_GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(sprite->alpha * 255.0f)};
 				GXSetChanMatColor(GX_COLOR0A0, color);
-				SetTexture(static_cast<CMenuPcs::TEX>(kind));
+				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kind));
 
 				if (i < s_CntTop || i >= s_CntTop + activePartyCount) {
-					DrawRect(0, (float)sprite->x + sprite->motionX, (float)sprite->y + sprite->motionY,
+					MenuPcs.DrawRect(0, (float)sprite->x + sprite->motionX, (float)sprite->y + sprite->motionY,
 					    (float)sprite->w, (float)sprite->h,
 					    sprite->mulX, sprite->mulY, sprite->depth, sprite->depth, 0.0f);
 				} else {
@@ -2159,7 +2159,7 @@ void CMenuPcs::DrawResultCountAnim()
 					float digitW = (float)sprite->w;
 					float digitX = ((3.0f * digitW) - ((float)digitCount * digitW)) * 0.5f + (float)sprite->x;
 					for (int digitIndex = 0; digitIndex < digitCount; digitIndex++) {
-						DrawRect(0, digitX, (float)sprite->y, digitW, (float)sprite->h,
+						MenuPcs.DrawRect(0, digitX, (float)sprite->y, digitW, (float)sprite->h,
 						    digitW * (float)digits[digitIndex], sprite->mulY,
 						    sprite->depth, sprite->depth, 0.0f);
 						digitX += digitW;

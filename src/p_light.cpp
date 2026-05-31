@@ -1228,9 +1228,6 @@ void CLightPcs::SetBumpTexMatirx(float (*mat)[4], CLightPcs::CBumpLight* bump, V
 CLightPcs::CBumpLight::CBumpLight()
     : CLight()
 {
-    float radius = FLOAT_8032fc1c;
-
-    m_radius = radius;
     m_hasTexture = 0;
 }
 

@@ -14,8 +14,10 @@ from pathlib import Path, PurePosixPath, PureWindowsPath
 
 try:
     from . import extract_symbols
+    from .map.map_index import default_game_map_path
 except ImportError:
     import extract_symbols
+    from map.map_index import default_game_map_path
 
 # NOTE: MAP-derived addresses/sizes may not match your current build.
 WARNING_BUILD_MISMATCH = (
@@ -426,8 +428,8 @@ def print_bucket(name, targets, pal_map, en_map):
 def main():
     repo_root = Path(__file__).resolve().parent.parent
     report_path = repo_root / "build/GCCP01/report.json"
-    pal_map = repo_root / "orig/GCCP01/game.MAP"
-    en_map = repo_root / "orig/GCCE01/game.MAP"
+    pal_map = default_game_map_path(repo_root, "GCCP01")
+    en_map = default_game_map_path(repo_root, "GCCE01")
 
     if not report_path.exists():
         print(f"ERROR: {report_path} not found. Run 'ninja' first.")

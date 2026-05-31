@@ -12,9 +12,9 @@ from typing import Optional
 
 if __package__ in {None, ""}:
     sys.path.append(str(Path(__file__).resolve().parents[2]))
-    from tools.map.map_index import MapIndex, load_map_index, normalize_object_file
+    from tools.map.map_index import MapIndex, default_game_map_path, load_map_index, normalize_object_file
 else:
-    from .map_index import MapIndex, load_map_index, normalize_object_file
+    from .map_index import MapIndex, default_game_map_path, load_map_index, normalize_object_file
 
 
 SECTION_ORDER = (".bss", ".data", ".rodata", ".sdata", ".sbss", ".sdata2", ".sbss2")
@@ -348,8 +348,8 @@ def collect_diagnoses(
     splits = parse_splits(config_root / "splits.txt")
     unclaimed_symbols = collect_unclaimed_symbols(symbols, splits)
 
-    pal_path = repo_root / "orig" / "GCCP01" / "game.MAP"
-    en_path = repo_root / "orig" / "GCCE01" / "game.MAP"
+    pal_path = default_game_map_path(repo_root, "GCCP01")
+    en_path = default_game_map_path(repo_root, "GCCE01")
     pal_index = load_map_index(pal_path, label="PAL") if pal_path.exists() else None
     en_index = load_map_index(en_path, label="EN") if en_path.exists() else None
 

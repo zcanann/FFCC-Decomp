@@ -29,6 +29,18 @@ SOURCE_EXTENSIONS = (
 )
 
 
+def default_game_map_path(repo_root: Path, version: str) -> Path:
+    primary = repo_root / "orig" / version / "game.MAP"
+    if primary.exists():
+        return primary
+
+    linked = repo_root / "orig.assets.link" / version / "game.MAP"
+    if linked.exists():
+        return linked
+
+    return primary
+
+
 def _basename(path_str: str) -> str:
     if not isinstance(path_str, str) or not path_str:
         return ""

@@ -8,6 +8,11 @@ import re
 import sys
 from pathlib import Path
 
+try:
+    from .map.map_index import default_game_map_path
+except ImportError:
+    from map.map_index import default_game_map_path
+
 EN_FOUND_IN_RE = re.compile(r"^\s*\d+\]\s*(.+?)\s*\(([^)]+)\)\s+found in\s+(.+)$")
 
 # NOTE: MAP-derived addresses/sizes may not match your current build.
@@ -375,8 +380,8 @@ def main():
     context = sys.argv[2] if len(sys.argv) > 2 else None
 
     repo_root = Path(__file__).resolve().parent.parent
-    pal_map = repo_root / "orig/GCCP01/game.MAP"
-    en_map = repo_root / "orig/GCCE01/game.MAP"
+    pal_map = default_game_map_path(repo_root, "GCCP01")
+    en_map = default_game_map_path(repo_root, "GCCE01")
 
     # Determine search mode
     is_section_search = context == "--section"

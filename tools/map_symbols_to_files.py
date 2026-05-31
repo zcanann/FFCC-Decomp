@@ -8,10 +8,15 @@ import re
 import os
 import sys
 from collections import defaultdict
+from pathlib import Path
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, REPO)
+
+from tools.map.map_index import default_game_map_path
+
 SYMBOLS = os.path.join(REPO, "config/GCCP01/symbols.txt")
-MAP_FILE = os.path.join(REPO, "orig/GCCP01/game.MAP")
+MAP_FILE = str(default_game_map_path(Path(REPO), "GCCP01"))
 SPLITS = os.path.join(REPO, "config/GCCP01/splits.txt")
 
 DATA_SECTIONS = {'.data', '.rodata', '.bss', '.sbss', '.sdata', '.sdata2'}

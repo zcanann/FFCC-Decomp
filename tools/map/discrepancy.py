@@ -28,12 +28,10 @@ from pathlib import Path
 from typing import Iterable, Optional
 
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
-DEFAULT_OURS = REPO_ROOT / "build" / "GCCP01" / "main.elf.MAP"
-DEFAULT_PAL = REPO_ROOT / "orig" / "GCCP01" / "game.MAP"
-DEFAULT_EN = REPO_ROOT / "orig" / "GCCE01" / "game.MAP"
 
 try:
     from .map_index import (  # type: ignore
+        default_game_map_path,
         LayoutRecord,
         MapIndex,
         load_map_index,
@@ -42,11 +40,16 @@ try:
 except ImportError:  # script invocation (no package context)
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
     from map.map_index import (  # type: ignore
+        default_game_map_path,
         LayoutRecord,
         MapIndex,
         load_map_index,
         normalize_object_file,
     )
+
+DEFAULT_OURS = REPO_ROOT / "build" / "GCCP01" / "main.elf.MAP"
+DEFAULT_PAL = default_game_map_path(REPO_ROOT, "GCCP01")
+DEFAULT_EN = default_game_map_path(REPO_ROOT, "GCCE01")
 
 
 # Sections we report on, in display order.

@@ -13,6 +13,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from map.map_index import default_game_map_path
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_TIMEOUT_SECONDS = 30
@@ -303,7 +304,7 @@ def source_path_for_unit(unit: str) -> Path:
 
 
 def map_hits(symbol: str, map_name: str, limit: int) -> list[tuple[int, str]]:
-    path = ROOT / "orig" / map_name / "game.MAP"
+    path = default_game_map_path(ROOT, map_name)
     if not path.exists():
         return []
     hits: list[tuple[int, str]] = []

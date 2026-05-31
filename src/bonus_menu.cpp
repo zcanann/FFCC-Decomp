@@ -2619,7 +2619,7 @@ void CMenuPcs::CalcResultOpenAnim()
 	const int nameBase = itemModelBase + activePartyCount;
 	const int labelBase = nameBase + activePartyCount;
 
-	if (*(unsigned char*)(statePtr + 0xb) == 0) {
+	if (*(signed char*)(statePtr + 0xb) == 0) {
 		GetBonusMenuMembers(this).m_bonusAlpha = 0;
 		Sound.PlaySe(0x46, 0x40, 0x7f, 0);
 		memset((void*)animPtr, 0, sizeof(BonusAnimList));

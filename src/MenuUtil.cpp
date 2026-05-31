@@ -491,7 +491,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 				strcpy(scratch, GetAttrStr(attr));
 				font->SetTlut(4);
 				font->Draw(scratch);
-				int valueX = static_cast<int>(FLOAT_803335a0 + font->GetWidth(scratch));
+				int valueX = static_cast<int>(FLOAT_8033357c + (FLOAT_803335a0 + font->GetWidth(scratch)));
 				font->SetPosX(static_cast<float>(valueX));
 				font->SetTlut(9);
 

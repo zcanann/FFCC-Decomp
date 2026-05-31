@@ -796,7 +796,7 @@ void CMenuPcs::DrawArtiBase(CMenuPcs::Sprt2* sprt, float alpha)
  */
 void CMenuPcs::DrawBonusFrame(float x, float y, float w, float h, float alpha)
 {
-	if (alpha <= 0.0f) {
+	if (alpha <= 0.0) {
 		return;
 	}
 

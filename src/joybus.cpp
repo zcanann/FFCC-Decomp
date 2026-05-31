@@ -13,6 +13,8 @@
 
 #include "string.h"
 
+extern "C" char* strcat(char*, const char*);
+
 JoyBus Joybus;
 
 int gJoyBusThreadExitValue = 0;
@@ -165,7 +167,7 @@ unsigned int CSystem::GetCounter()
  * Address:	TODO
  * Size:	TODO
  */
-JoyBus::JoyBus()
+inline JoyBus::JoyBus()
 {
     m_threadRunningMask = 0;
     m_binLoaded = false;
@@ -182,7 +184,7 @@ JoyBus::JoyBus()
     }
 
     strcpy(m_pathBuf, JoyBusConst::DVD_DIR);
-    strcat(m_pathBuf, JoyBusConst::CLIENT_FILE, 128UL);
+    strcat(m_pathBuf, JoyBusConst::CLIENT_FILE);
 
     memset(m_sendBuffer, 0, sizeof(m_sendBuffer));
     memset(m_stageFlags, 0, sizeof(m_stageFlags));
@@ -5366,12 +5368,7 @@ int JoyBus::SendEquip(ThreadParam* threadParam)
 int JoyBus::SendCmd(ThreadParam* threadParam)
 {
     const int port = threadParam->m_portIndex;
-    int result = 0;
-
-    if (threadParam->m_subState != 0 && threadParam->m_subState != 1)
-    {
-        return 0;
-    }
+    int result = reinterpret_cast<int>(this);
 
     if (threadParam->m_subState == 1)
     {
@@ -5401,7 +5398,7 @@ int JoyBus::SendCmd(ThreadParam* threadParam)
             }
         }
     }
-    else
+    else if (threadParam->m_subState == 0)
     {
         m_txWordIndex[port] = 0;
 

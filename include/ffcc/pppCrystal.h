@@ -6,8 +6,6 @@
 #include <dolphin/gx.h>
 #include <dolphin/types.h>
 
-struct HSD_ImageBuffer;
-
 struct CrystalRefractionMap {
     u8* m_imageData;
     GXTexFmt m_format;
@@ -39,8 +37,6 @@ struct pppCrystalUnkB {
 extern "C" {
 #endif
 
-void ImageBufferSetPixel_IA8(struct HSD_ImageBuffer*, unsigned long, unsigned long, unsigned long, unsigned long, unsigned long, unsigned long);
-void MakeRefractionMap(struct HSD_ImageBuffer*);
 void pppConstructCrystal(struct pppCrystal*, struct _pppCtrlTable*);
 void pppDestructCrystal(struct pppCrystal*, struct _pppCtrlTable*);
 void pppFrameCrystal(struct pppCrystal*, struct pppCrystalUnkB*, struct _pppCtrlTable*);

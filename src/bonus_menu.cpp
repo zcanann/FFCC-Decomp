@@ -1095,8 +1095,21 @@ void CMenuPcs::CalcSelectWait()
 		}
 		BonusAnimSprite* cursor = &sprites[header->count];
 		BonusAnimSprite* partySprite = cursor - activePartyCount * 2;
-		InitAnimSprite(cursor, 0x20, (short)(partySprite->x - 3), (short)(partySprite->y - 8), 0x40, 0x30, 0, 8);
-		ResetAnimSpriteMotion(cursor);
+		cursor->kind = 0x20;
+		cursor->x = (short)(partySprite->x - 3);
+		cursor->y = (short)(partySprite->y - 8);
+		cursor->w = 0x40;
+		cursor->h = 0x30;
+		cursor->mulX = 0.0f;
+		cursor->mulY = 0.0f;
+		cursor->timer = 0;
+		cursor->startFrame = 0;
+		cursor->duration = 8;
+		cursor->scale = 1.0f;
+		cursor->motionX = 0.0f;
+		cursor->motionY = 0.0f;
+		cursor->targetX = 0.0f;
+		cursor->targetY = 0.0f;
 		cursor->alpha = 1.0f;
 		cursor->depth = 1.0f;
 		header->count = (short)(header->count + 1);

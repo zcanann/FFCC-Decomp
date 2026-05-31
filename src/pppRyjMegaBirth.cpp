@@ -496,10 +496,14 @@ void pppRyjDrawMegaBirth(_pppPObject* obj, void* stepData, _pppCtrlTable* ctrlTa
 				alpha += (int)colorData->m_color[3];
 			}
 
-			drawColor.rgba[0] = clamp_u8_int(red);
-			drawColor.rgba[1] = clamp_u8_int(green);
-			drawColor.rgba[2] = clamp_u8_int(blue);
-			drawColor.rgba[3] = clamp_alpha_7f(alpha);
+			unsigned char clampedRed = clamp_u8_int(red);
+			unsigned char clampedGreen = clamp_u8_int(green);
+			unsigned char clampedBlue = clamp_u8_int(blue);
+			unsigned char clampedAlpha = clamp_alpha_7f(alpha);
+			drawColor.rgba[0] = clampedRed;
+			drawColor.rgba[1] = clampedGreen;
+			drawColor.rgba[2] = clampedBlue;
+			drawColor.rgba[3] = clampedAlpha;
 
 			GXSetChanAmbColor(GX_COLOR0A0, *(_GXColor*)drawColor.rgba);
 			pppSetBlendMode(params->m_blendMode);

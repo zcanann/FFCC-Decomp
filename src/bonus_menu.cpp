@@ -1459,6 +1459,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 		sprites[2].mulY = -150.0f;
 		sprites[2].scale = 2.0f;
 		sprites[2].alpha = 0.0f;
+		sprites[2].depth = 1.0f;
 		InitAnimSprite(&sprites[idx++], -4, 0, 0, 0x70, 0x68, 0, 8);
 		ResetAnimSpriteMotion(&sprites[3]);
 		sprites[3].depth = 1.0f;

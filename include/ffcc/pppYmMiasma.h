@@ -1,11 +1,10 @@
 #ifndef _FFCC_PPP_YMMIASMA_H_
 #define _FFCC_PPP_YMMIASMA_H_
 
-#include <dolphin/types.h>
+#include "ffcc/partMng.h"
 
 struct pppYmMiasma {
-    u8 m_pad0[0xc];
-    s32 m_graphId;
+    _pppPObject m_object;
 };
 struct pppYmMiasmaUnkB;
 struct pppYmMiasmaUnkC {

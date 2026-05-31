@@ -505,20 +505,18 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
 {
     CharaBreakStep* stepData = (CharaBreakStep*)step;
     CharaBreakWork* workData = (CharaBreakWork*)work;
-    CCharaModelData* modelData = model->m_data;
     CChara::CMesh* mesh = model->m_meshes;
     u32 meshIndex;
     s16 threshold;
 
     threshold = (s32)((workData->m_value0 * (workData->m_bboxMax.y - workData->m_bboxMin.y)) *
-                      (float)(1 << modelData->m_posQuant));
+                      (float)(1 << ModelData(model)->m_posQuant));
 
-    for (meshIndex = 0; meshIndex < modelData->m_meshCount; meshIndex++) {
+    for (meshIndex = 0; meshIndex < ModelData(model)->m_meshCount; meshIndex++) {
         s32 needsMtxUpdate = 0;
         Mtx meshToWorld;
-        CChara::CMesh* meshRef = mesh;
-        CharaBreakMeshData* meshData = MeshData(meshRef);
-        S16Vec* workPositions = meshRef->m_workPositions;
+        CharaBreakMeshData* meshData = MeshData(mesh);
+        S16Vec* workPositions = mesh->m_workPositions;
 
         if (meshData->m_skinCount == 0 && stepData->m_worldSpaceMode == 1) {
             needsMtxUpdate = 1;
@@ -548,9 +546,9 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
                             worldPos.x = srcPos->x;
                             worldPos.y = srcPos->y;
                             worldPos.z = srcPos->z;
-                            gUtil.ConvI2FVector(transformedPos, worldPos, modelData->m_posQuant);
+                            gUtil.ConvI2FVector(transformedPos, worldPos, ModelData(model)->m_posQuant);
                             PSMTXMultVec(meshToWorld, &transformedPos, &transformedPos);
-                            gUtil.ConvF2IVector(*dst, transformedPos, modelData->m_posQuant);
+                            gUtil.ConvF2IVector(*dst, transformedPos, ModelData(model)->m_posQuant);
                         } else {
                             *dst = *srcPos;
                         }
@@ -630,17 +628,17 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
 
                         for (int i = 0; i < 3; i++) {
                             S16Vec pos = polygon->m_pos[i];
-                            gUtil.ConvI2FVector(verts[i], pos, modelData->m_posQuant);
+                            gUtil.ConvI2FVector(verts[i], pos, ModelData(model)->m_posQuant);
                             PSVECAdd(&center, &verts[i], &center);
                         }
 
                         PSVECScale(&center, &center, FLOAT_80332058);
 
                         normalB = polygon->m_normalB;
-                        gUtil.ConvI2FVector(axis, normalB, modelData->m_normQuant);
+                        gUtil.ConvI2FVector(axis, normalB, ModelData(model)->m_normQuant);
 
                         normalA = polygon->m_normalA;
-                        gUtil.ConvI2FVector(velocity, normalA, modelData->m_normQuant);
+                        gUtil.ConvI2FVector(velocity, normalA, ModelData(model)->m_normQuant);
                         PSVECScale(&velocity, &velocity, stepData->m_velocityBase + Math.RandF(stepData->m_velocityRange));
 
                         C_QUATRotAxisRad(&rotQuat, &axis, FLOAT_8033205c * (float)polygon->m_alpha);
@@ -698,7 +696,7 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
                             verts[i].y += stepData->m_direction.y * workData->m_value3;
                             verts[i].z += stepData->m_direction.z * workData->m_value3;
 
-                            gUtil.ConvF2IVector(polygon->m_pos[i], verts[i], modelData->m_posQuant);
+                            gUtil.ConvF2IVector(polygon->m_pos[i], verts[i], ModelData(model)->m_posQuant);
                         }
                         polygon->_pad2++;
                     }

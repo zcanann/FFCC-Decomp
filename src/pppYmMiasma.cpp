@@ -161,7 +161,7 @@ static inline T* PppWorkArea(_pppPObject* object, pppYmMiasmaUnkC* ctrl, int ind
  */
 void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, YmMiasmaRenderStep* step, pppYmMiasmaUnkC* param_3)
 {
-    VYmMiasma* work = PppWorkArea<VYmMiasma>(reinterpret_cast<_pppPObject*>(pppYmMiasma_), param_3, 2);
+    VYmMiasma* work = PppWorkArea<VYmMiasma>(&pppYmMiasma_->m_object, param_3, 2);
     PARTICLE_DATA* particleData = work->m_particles;
     int i;
 
@@ -239,9 +239,9 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, YmMiasmaFrameStep* step, pppYmM
         return;
     }
 
-    work = PppWorkArea<VYmMiasma>(reinterpret_cast<_pppPObject*>(pppYmMiasma_), param_3, 2);
+    work = PppWorkArea<VYmMiasma>(&pppYmMiasma_->m_object, param_3, 2);
 
-    if (step->m_graphId == pppYmMiasma_->m_graphId) {
+    if (step->m_graphId == pppYmMiasma_->m_object.m_graphId) {
         work->m_radius = work->m_radius + step->m_radiusDelta;
         work->m_radiusVelocity = work->m_radiusVelocity + step->m_radiusVelocity;
         work->m_radiusAcceleration = work->m_radiusAcceleration + step->m_radiusAcceleration;
@@ -254,7 +254,7 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, YmMiasmaFrameStep* step, pppYmM
             0x18d);
         particle = work->m_particles;
         for (i = 0; i < step->m_particleCount; i++) {
-            InitParticleData(work, (_pppPObject*)pppYmMiasma_, step, particle);
+            InitParticleData(work, &pppYmMiasma_->m_object, step, particle);
             particle++;
         }
     }
@@ -303,10 +303,8 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, YmMiasmaFrameStep* step, pppYmM
     work->m_radiusVelocity = work->m_radiusVelocity + work->m_radiusAcceleration;
     work->m_radius = work->m_radius + work->m_radiusVelocity;
 
-    particle = work->m_particles;
-    for (i = 0; i < step->m_particleCount; i++) {
-        UpdateParticleData((_pppPObject*)pppYmMiasma_, (_pppCtrlTable*)param_3, step, particle);
-        particle++;
+    for (i = 0, particle = work->m_particles; i < step->m_particleCount; i++, particle++) {
+        UpdateParticleData(&pppYmMiasma_->m_object, (_pppCtrlTable*)param_3, step, particle);
     }
 
     matrixPos.x = ppvMng->m_matrix.value[0][3];
@@ -335,7 +333,7 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, YmMiasmaFrameStep* step, pppYmM
  */
 void pppDestructYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkC* param_2)
 {
-    VYmMiasma* work = PppWorkArea<VYmMiasma>(reinterpret_cast<_pppPObject*>(pppYmMiasma_), param_2, 2);
+    VYmMiasma* work = PppWorkArea<VYmMiasma>(&pppYmMiasma_->m_object, param_2, 2);
     void* heap = work->m_particles;
 
     if (heap != 0) {
@@ -354,7 +352,7 @@ void pppDestructYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkC* param_2)
  */
 void pppConstruct2YmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkC* param_2)
 {
-    VYmMiasma* work = PppWorkArea<VYmMiasma>(reinterpret_cast<_pppPObject*>(pppYmMiasma_), param_2, 2);
+    VYmMiasma* work = PppWorkArea<VYmMiasma>(&pppYmMiasma_->m_object, param_2, 2);
     float fVar1 = FLOAT_80330644;
 
     work->m_radius = FLOAT_80330644;
@@ -373,7 +371,7 @@ void pppConstruct2YmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkC* param_2)
  */
 void pppConstructYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkC* param_2)
 {
-    VYmMiasma* work = PppWorkArea<VYmMiasma>(reinterpret_cast<_pppPObject*>(pppYmMiasma_), param_2, 2);
+    VYmMiasma* work = PppWorkArea<VYmMiasma>(&pppYmMiasma_->m_object, param_2, 2);
     float fVar1;
     float fVar2 = FLOAT_80330644;
 

@@ -140,12 +140,12 @@ static inline float& ViewerModelTime(CChara::CModel* model)
 
 static inline CChara::CAnim*& ViewerModelAnim(CChara::CModel* model)
 {
-    return ViewerModel(model)->anim;
+    return model->m_anim;
 }
 
 static inline CTexAnimSet*& ViewerModelTexAnimSet(CChara::CModel* model)
 {
-    return ViewerModel(model)->texAnimSet;
+    return model->m_texAnimSet;
 }
 
 static inline CTextureSet*& ViewerModelTextureSet(CChara::CModel* model)
@@ -218,6 +218,7 @@ void CCharaPcs::drawViewer()
     CCharaPcs* self = this;
     register const char* viewerStrings = s_no_texture____801da7e8;
     Mtx cameraMtx;
+    Mtx backCameraMtx;
     Mtx44 projMtx;
     Mtx texMtx;
 
@@ -226,8 +227,8 @@ void CCharaPcs::drawViewer()
         C_MTXOrtho(projMtx, kCharaViewerZero, kCharaViewerBackOrthoRight, kCharaViewerZero,
                    kCharaViewerBackOrthoBottom, kCharaViewerZero, kCharaViewerGridMax);
         GXSetProjection(projMtx, GX_ORTHOGRAPHIC);
-        PSMTXIdentity(cameraMtx);
-        GXLoadPosMtxImm(cameraMtx, 0);
+        PSMTXIdentity(backCameraMtx);
+        GXLoadPosMtxImm(backCameraMtx, 0);
         GXSetCurrentMtx(0);
         _GXSetBlendMode(GX_BM_BLEND, GX_BL_ONE, GX_BL_ZERO, GX_LO_CLEAR);
         GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
@@ -235,8 +236,8 @@ void CCharaPcs::drawViewer()
         GXSetNumTevStages(1);
         _GXSetTevOp(GX_TEVSTAGE0, GX_REPLACE);
         _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
-        PSMTXIdentity(cameraMtx);
-        GXLoadPosMtxImm(cameraMtx, 0);
+        PSMTXIdentity(backCameraMtx);
+        GXLoadPosMtxImm(backCameraMtx, 0);
         GXSetCullMode(GX_CULL_NONE);
         CTexture* texture =
             (*reinterpret_cast<CPtrArray<CTexture*>*>(reinterpret_cast<unsigned char*>(self->m_viewerBackTextureSet) + 8))[0];
@@ -326,7 +327,7 @@ void CCharaPcs::drawViewer()
 
                 Mtx scratchMtx;
                 Vec lightPos;
-                PSMTXCopy((const float(*)[4])(reinterpret_cast<unsigned char*>(model) + 8), scratchMtx);
+                PSMTXCopy(model->m_matrix, scratchMtx);
                 lightPos.x = scratchMtx[0][3];
                 lightPos.y = scratchMtx[1][3];
                 lightPos.z = scratchMtx[2][3];
@@ -395,7 +396,8 @@ void CCharaPcs::calcViewer()
                     new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_viewer_cpp), 0xEA) CChara::CModel;
                 self->m_viewerModel[0] = model;
                 self->m_viewerModel[0]->Create(File.m_readBuffer, self->m_viewerModelStage);
-                self->m_viewerModel[0]->m_flags10C = (self->m_viewerModel[0]->m_flags10C & 0xBF) | 0x40;
+                self->m_viewerModel[0]->m_flags10C =
+                    static_cast<unsigned char>(__rlwimi(self->m_viewerModel[0]->m_flags10C, 1, 6, 25, 25));
                 File.Close(fileHandle);
             }
             self->m_viewerLoadModel = 0;
@@ -437,20 +439,20 @@ void CCharaPcs::calcViewer()
                 self->m_viewerLoadAnim = 0;
             } else {
                 for (i = 0; i < static_cast<unsigned int>(self->m_viewerAnimRequestedCount); i++) {
-                    unsigned int idx = static_cast<unsigned int>(self->m_viewerAnimLoadedCount);
-                    sprintf(pathBuf, s_anim_path_fmt, self->m_viewerAnimPath, idx);
+                    sprintf(pathBuf, s_anim_path_fmt, self->m_viewerAnimPath, self->m_viewerAnimLoadedCount);
                     System.Printf(const_cast<char*>(s_calc_viewer_fmt), pathBuf);
                     fileHandle = File.Open(pathBuf, 0, CFile::PRI_LOW);
                     if (fileHandle != 0) {
-                        ReleaseShared(self->m_viewerAnimBank[idx]);
+                        ReleaseShared(self->m_viewerAnimBank[self->m_viewerAnimLoadedCount]);
                         File.Read(fileHandle);
                         File.SyncCompleted(fileHandle);
                         CChara::CAnim* anim =
                             new (CharaPcs.m_stage, const_cast<char*>(s_p_chara_viewer_cpp), 0x124) CChara::CAnim;
-                        self->m_viewerAnimBank[idx] = anim;
-                        self->m_viewerAnimBank[idx]->Create(File.m_readBuffer, self->m_viewerAnimStage);
+                        self->m_viewerAnimBank[self->m_viewerAnimLoadedCount] = anim;
+                        self->m_viewerAnimBank[self->m_viewerAnimLoadedCount]->Create(File.m_readBuffer,
+                                                                                      self->m_viewerAnimStage);
                         File.Close(fileHandle);
-                        if (idx == 0) {
+                        if (self->m_viewerAnimLoadedCount == 0) {
                             self->m_viewerAnim[0] = self->m_viewerAnimBank[0];
                             AddSharedRef(self->m_viewerAnim[0]);
                         }
@@ -682,13 +684,13 @@ void CCharaPcs::calcViewer()
                 Graphic.Printf(const_cast<char*>(s_frame_speed_fmt), frame, frameAdvance);
             }
             if (self->m_viewerSavedAnim != 0) {
-                const char* iframeMode = kCharaViewerOff;
-                if (self->m_viewerIFrameEnabled != 0) {
-                    iframeMode = kCharaViewerOn;
-                }
                 const char* iframeState = kCharaViewerKeep;
                 if (self->m_viewerSavedAnimState == 0) {
                     iframeState = kCharaViewerOrg;
+                }
+                const char* iframeMode = kCharaViewerOff;
+                if (self->m_viewerIFrameEnabled != 0) {
+                    iframeMode = kCharaViewerOn;
                 }
                 Graphic.Printf(const_cast<char*>(s_iframe_fmt), iframeMode, self->m_viewerSavedFrame, iframeState);
             }

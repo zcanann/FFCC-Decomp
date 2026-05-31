@@ -756,7 +756,7 @@ config.libs = [
             Object(NonMatching, "stopwatch.cpp"),
             Object(NonMatching, "system.cpp", extra_cflags=["-RTTI on"]),
             Object(NonMatching, "texanim.cpp"),
-            Object(NonMatching, "textureman.cpp", extra_cflags=["-RTTI on", "-str reuse,pool,readonly"]),
+            Object(NonMatching, "textureman.cpp", extra_cflags=["-str reuse,pool,readonly"]),
             Object(
                 NonMatching,
                 "THPDraw.cpp",

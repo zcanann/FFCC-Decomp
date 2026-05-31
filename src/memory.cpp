@@ -764,7 +764,7 @@ CMemory::CStage* CMemory::CreateStage(unsigned long size, char* source, int mode
 void CMemory::DestroyStage(CMemory::CStage* stage)
 {
     int mode = stageGetAllocationMode(stage);
-    int modeListOffset = mode * 0x27D8;
+    unsigned char* modeListBase = reinterpret_cast<unsigned char*>(this) + 4 + mode * 0x27D8;
 
     if (mode != 2) {
         if (stageHasUnfreedBlocks(stage)) {
@@ -782,12 +782,12 @@ void CMemory::DestroyStage(CMemory::CStage* stage)
     }
 
     unsigned char* stageBytes = reinterpret_cast<unsigned char*>(stage);
-    int modeListNode = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x134 + modeListOffset);
+    int modeListNode = *reinterpret_cast<int*>(modeListBase + 0x130);
 
     *reinterpret_cast<int*>(*reinterpret_cast<int*>(stageBytes) + 4) = *reinterpret_cast<int*>(stageBytes + 4);
     **reinterpret_cast<int**>(stageBytes + 4) = *reinterpret_cast<int*>(stageBytes);
     *reinterpret_cast<int*>(stageBytes + 4) = modeListNode;
-    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x134 + modeListOffset) = reinterpret_cast<int>(stage);
+    *reinterpret_cast<int*>(modeListBase + 0x130) = reinterpret_cast<int>(stage);
 }
 
 /*
@@ -909,7 +909,7 @@ void CMemory::CopyToAMemorySync(void* source, void* dest, unsigned long size)
 {
     int dmaId = RedSound(&Sound)->DMAEntry(0, 0, reinterpret_cast<int>(source), reinterpret_cast<int>(dest),
                                            static_cast<int>(size), 0, 0);
-    CStopWatch watch((char*)0);
+    CStopWatch watch(sMemoryNoNameStopwatchName);
     watch.Start();
     while (RedSound(&Sound)->DMACheck(dmaId) != 0) {
         watch.Stop();
@@ -929,21 +929,21 @@ void CMemory::CopyToAMemorySync(void* source, void* dest, unsigned long size)
  */
 void CMemory::CopyFromAMemorySync(void* source, void* dest, unsigned long size)
 {
-    CStopWatch watch((char*)0);
     int dmaId = RedSound(&Sound)->DMAEntry(0, 1, reinterpret_cast<int>(source), reinterpret_cast<int>(dest),
                                            static_cast<int>(size), 0, 0);
+    CStopWatch watch(sMemoryNoNameStopwatchName);
     watch.Start();
     float timeout = kMemoryDmaTimeout;
     while (RedSound(&Sound)->DMACheck(dmaId) != 0) {
         watch.Stop();
-        if (watch.Get() < timeout) {
-            watch.Start();
-        } else {
+        if (watch.Get() >= timeout) {
             if (static_cast<unsigned int>(System.m_execParam) >= 1) {
                 System.Printf(const_cast<char*>(sCopyFromAMemorySyncTimeoutMsg));
             }
             Sound.CheckDriver(1);
             watch.Reset();
+            watch.Start();
+        } else {
             watch.Start();
         }
     }
@@ -1740,7 +1740,7 @@ int CAmemCacheSet::GetData(short index, char* source, int line)
                 } else {
                     int dmaId = RedSound(&Sound)->DMAEntry(0, 1, reinterpret_cast<int>(entry.m_cacheData),
                                                            reinterpret_cast<int>(entry.m_workData), entry.m_size, 0, 0);
-                    CStopWatch watch((char*)0);
+                    CStopWatch watch(sMemoryNoNameStopwatchName);
                     watch.Start();
                     float timeout = kMemoryDmaTimeout;
                     while (RedSound(&Sound)->DMACheck(dmaId) != 0) {
@@ -1850,7 +1850,7 @@ int CAmemCacheSet::SetData(void* src, int size, CAmemCache::TYPE type, int dmaCo
         } else {
             int dmaId = RedSound(&Sound)->DMAEntry(0, 0, reinterpret_cast<int>(src),
                                                    reinterpret_cast<int>(entry.m_workData), entry.m_size, 0, 0);
-            CStopWatch watch((char*)0);
+            CStopWatch watch(sMemoryNoNameStopwatchName);
             watch.Start();
             while (RedSound(&Sound)->DMACheck(dmaId) != 0) {
                 watch.Stop();
@@ -1906,7 +1906,7 @@ checksum_done_copy:
     } else {
         int dmaId = RedSound(&Sound)->DMAEntry(0, 0, reinterpret_cast<int>(src),
                                                reinterpret_cast<int>(entry.m_workData), entry.m_size, 0, 0);
-        CStopWatch watch((char*)0);
+        CStopWatch watch(sMemoryNoNameStopwatchName);
         watch.Start();
         while (RedSound(&Sound)->DMACheck(dmaId) != 0) {
             watch.Stop();

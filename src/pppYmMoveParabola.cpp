@@ -20,8 +20,7 @@ struct pppYmMoveParabolaWork {
 
 static inline pppYmMoveParabolaWork* ParabolaWork(pppYmMoveParabola* object, pppYmMoveParabolaUnkC* ctrl)
 {
-    return reinterpret_cast<pppYmMoveParabolaWork*>(
-        reinterpret_cast<_pppPObject*>(object)->m_workArea + *ctrl->m_serializedDataOffsets);
+    return reinterpret_cast<pppYmMoveParabolaWork*>(object->m_object.m_workArea + *ctrl->m_serializedDataOffsets);
 }
 
 /*
@@ -44,7 +43,7 @@ extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct
 
     work->m_velocity = work->m_velocity + work->m_acceleration;
     work->m_distance = work->m_distance + work->m_velocity;
-    if (stepData->m_graphId == basePtr->m_graphId) {
+    if (stepData->m_graphId == basePtr->m_object.m_graphId) {
         work->m_distance = work->m_distance + stepData->m_stepValue;
         work->m_velocity = work->m_velocity + stepData->m_arg3;
         work->m_acceleration = work->m_acceleration + stepData->m_payload;

@@ -357,7 +357,6 @@ static inline void SetupSelectCloseSpriteMotion(BonusAnimSprite* sprite)
 	sprite->timer = 0;
 	sprite->startFrame = 0;
 	sprite->duration = 8;
-	sprite->depth = 1.0f;
 	sprite->x = (short)(int)sprite->targetX;
 	sprite->y = (short)(int)sprite->targetY;
 	sprite->motionX = 100.0f;
@@ -897,6 +896,7 @@ void CMenuPcs::CalcSelectCloseAnim()
 
 		for (int i = 0; i < activePartyCount; i++) {
 			SetupSelectCloseSpriteMotion(&sprites[iconBase + i]);
+			sprites[iconBase + i].depth = 1.0f;
 		}
 
 		s_PlayerTop = (unsigned char)nameBase;
@@ -929,7 +929,6 @@ void CMenuPcs::CalcSelectCloseAnim()
 			nameSprite->startFrame = iconSprite->startFrame;
 			nameSprite->timer = 0;
 			nameSprite->duration = 8;
-			nameSprite->depth = 1.0f;
 			nameSprite->motionX = 100.0f;
 			nameSprite->motionY = 0.0f;
 			nameSprite->targetX = (float)nameSprite->x + nameSprite->motionX;

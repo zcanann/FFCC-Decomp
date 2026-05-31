@@ -3219,13 +3219,13 @@ void CMenuPcs::createBonus()
 				continue;
 			}
 
-			unsigned short itemModelCode =
-			    *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48 + 2);
-			unsigned short modelNo = itemModelCode & 0x0FFF;
 			CCharaPcs::CHandle* itemHandle =
 			    new (stage, const_cast<char*>(s_bonus_menu_cpp), 0x19C) CCharaPcs::CHandle;
 			displaySlots[handleIndex] = itemHandle;
 			itemHandle->Add();
+			unsigned short itemModelCode =
+			    *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48 + 2);
+			unsigned short modelNo = itemModelCode & 0x0FFF;
 			itemHandle->LoadModel(3, modelNo, itemModelCode >> 12, 0, -1, 0, 0);
 			itemHandle->m_flags = 0x300543;
 

@@ -44,6 +44,16 @@ static inline float RyjZero()
 	return *reinterpret_cast<const float*>(&kPppRyjMegaBirthZero);
 }
 
+static inline float RyjLoadFloat(const float& value)
+{
+	return value;
+}
+
+static inline double RyjLoadDouble(const double& value)
+{
+	return value;
+}
+
 static inline float* f32_at(void* base, s32 off)
 {
 	return (float*)((u8*)base + off);
@@ -107,11 +117,12 @@ static inline float calc_mesh_sample_t(u8 mode)
 	case 2:
 		return Math.RandF() * Math.RandF();
 	case 3:
-		return (float)(DOUBLE_80330480 - (double)(Math.RandF() * Math.RandF() * Math.RandF()));
+		return (float)(RyjLoadDouble(DOUBLE_80330480) - (double)(Math.RandF() * Math.RandF() * Math.RandF()));
 	case 4:
 		return Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF();
 	case 5:
-		return (float)(DOUBLE_80330480 - (double)(Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF()));
+		return (float)(RyjLoadDouble(DOUBLE_80330480) -
+			(double)(Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF()));
 	default:
 		return Math.RandF();
 	}
@@ -119,7 +130,7 @@ static inline float calc_mesh_sample_t(u8 mode)
 
 static inline float calc_spawn_speed(float speed, u8 mode)
 {
-	float halfSpeed = FLOAT_80330478 * speed;
+	float halfSpeed = RyjLoadFloat(FLOAT_80330478) * speed;
 
 	switch (mode) {
 	case 1:
@@ -128,11 +139,11 @@ static inline float calc_spawn_speed(float speed, u8 mode)
 	case 2:
 		return speed * Math.RandF() * Math.RandF() - halfSpeed;
 	case 3:
-		return -(FLOAT_80330474 * (speed * Math.RandF() * Math.RandF()) - speed) - halfSpeed;
+		return -(RyjLoadFloat(FLOAT_80330474) * (speed * Math.RandF() * Math.RandF()) - speed) - halfSpeed;
 	case 4:
 		return Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF() * speed - halfSpeed;
 	case 5:
-		return -(FLOAT_80330478 * (Math.RandF() * (speed * Math.RandF() * Math.RandF())) - speed) - halfSpeed;
+		return -(RyjLoadFloat(FLOAT_80330478) * (Math.RandF() * (speed * Math.RandF() * Math.RandF())) - speed) - halfSpeed;
 	default:
 		return speed * Math.RandF() - halfSpeed;
 	}
@@ -147,11 +158,11 @@ static inline float calc_direction_speed(float speed, u8 mode)
 	case 2:
 		return speed * Math.RandF() * Math.RandF();
 	case 3:
-		return -(FLOAT_80330474 * (speed * Math.RandF() * Math.RandF()) - speed);
+		return -(RyjLoadFloat(FLOAT_80330474) * (speed * Math.RandF() * Math.RandF()) - speed);
 	case 4:
 		return Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF() * speed;
 	case 5:
-		return -(FLOAT_80330478 * (Math.RandF() * (speed * Math.RandF() * Math.RandF())) - speed);
+		return -(RyjLoadFloat(FLOAT_80330478) * (Math.RandF() * (speed * Math.RandF() * Math.RandF())) - speed);
 	default:
 		return speed;
 	}
@@ -159,7 +170,7 @@ static inline float calc_direction_speed(float speed, u8 mode)
 
 static inline void calc_spawn_position(Vec* out, float speed, u8 mode)
 {
-	float halfSpeed = FLOAT_80330478 * speed;
+	float halfSpeed = RyjLoadFloat(FLOAT_80330478) * speed;
 
 	switch (mode) {
 	case 1:
@@ -174,9 +185,9 @@ static inline void calc_spawn_position(Vec* out, float speed, u8 mode)
 		out->z = speed * Math.RandF() * Math.RandF() - halfSpeed;
 		break;
 	case 3:
-		out->x = -(FLOAT_80330474 * (speed * Math.RandF() * Math.RandF()) - speed) - halfSpeed;
-		out->y = -(FLOAT_80330474 * (speed * Math.RandF() * Math.RandF()) - speed) - halfSpeed;
-		out->z = -(FLOAT_80330474 * (speed * Math.RandF() * Math.RandF()) - speed) - halfSpeed;
+		out->x = -(RyjLoadFloat(FLOAT_80330474) * (speed * Math.RandF() * Math.RandF()) - speed) - halfSpeed;
+		out->y = -(RyjLoadFloat(FLOAT_80330474) * (speed * Math.RandF() * Math.RandF()) - speed) - halfSpeed;
+		out->z = -(RyjLoadFloat(FLOAT_80330474) * (speed * Math.RandF() * Math.RandF()) - speed) - halfSpeed;
 		break;
 	case 4:
 		out->x = Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF() * speed - halfSpeed;
@@ -184,9 +195,9 @@ static inline void calc_spawn_position(Vec* out, float speed, u8 mode)
 		out->z = Math.RandF() * Math.RandF() * Math.RandF() * Math.RandF() * speed - halfSpeed;
 		break;
 	case 5:
-		out->x = -(FLOAT_80330478 * (Math.RandF() * (speed * Math.RandF() * Math.RandF())) - speed) - halfSpeed;
-		out->y = -(FLOAT_80330478 * (Math.RandF() * (speed * Math.RandF() * Math.RandF())) - speed) - halfSpeed;
-		out->z = -(FLOAT_80330478 * (Math.RandF() * (speed * Math.RandF() * Math.RandF())) - speed) - halfSpeed;
+		out->x = -(RyjLoadFloat(FLOAT_80330478) * (Math.RandF() * (speed * Math.RandF() * Math.RandF())) - speed) - halfSpeed;
+		out->y = -(RyjLoadFloat(FLOAT_80330478) * (Math.RandF() * (speed * Math.RandF() * Math.RandF())) - speed) - halfSpeed;
+		out->z = -(RyjLoadFloat(FLOAT_80330478) * (Math.RandF() * (speed * Math.RandF() * Math.RandF())) - speed) - halfSpeed;
 		break;
 	default:
 		out->x = speed * Math.RandF() - halfSpeed;
@@ -204,10 +215,10 @@ static inline signed char random_signed_byte_span(u8 span)
 static inline void apply_signed_randomization_2(u8* particle, s32 offset, u8 flags)
 {
 	if (((flags & 1) != 0) && ((flags & 2) != 0)) {
-		if (DOUBLE_80330488 < (double)Math.RandF()) {
+		if (RyjLoadDouble(DOUBLE_80330488) < (double)Math.RandF()) {
 			*f32_at(particle, offset) = *f32_at(particle, offset) * FLOAT_80330490[0];
 		}
-		if (DOUBLE_80330488 < (double)Math.RandF()) {
+		if (RyjLoadDouble(DOUBLE_80330488) < (double)Math.RandF()) {
 			*f32_at(particle, offset + 4) = *f32_at(particle, offset + 4) * FLOAT_80330490[0];
 		}
 	} else if ((flags & 2) != 0) {
@@ -880,7 +891,7 @@ void birth(
 	payload = (u8*)param;
 	particlePayload = (u8*)particle;
 	float spread = (float)payload[0x2B];
-	float range = FLOAT_80330470 * spread;
+	float range = RyjLoadFloat(FLOAT_80330470) * spread;
 
 	memset(particle, 0, 0x60);
 	if (worldMat != NULL) {
@@ -900,9 +911,9 @@ void birth(
 		baseDirection.y = *f32_at(payload, 0xA4);
 		baseDirection.z = *f32_at(payload, 0xA8);
 
-		angle[0] = (s32)((float)((s32)(range * Math.RandF() - spread) << 15) / FLOAT_8033045c);
-		angle[1] = (s32)((float)((s32)(range * Math.RandF() - spread) << 15) / FLOAT_8033045c);
-		angle[2] = (s32)((float)((s32)(range * Math.RandF() - spread) << 15) / FLOAT_8033045c);
+		angle[0] = (s32)((float)((s32)(range * Math.RandF() - spread) << 15) / RyjLoadFloat(FLOAT_8033045c));
+		angle[1] = (s32)((float)((s32)(range * Math.RandF() - spread) << 15) / RyjLoadFloat(FLOAT_8033045c));
+		angle[2] = (s32)((float)((s32)(range * Math.RandF() - spread) << 15) / RyjLoadFloat(FLOAT_8033045c));
 		angle[3] = 0;
 
 		if ((payload[0x2A] == 2) || (payload[0x2A] == 3)) {
@@ -993,7 +1004,7 @@ void birth(
 	if (payload[0xEB] != 0) {
 		*f32_at(particlePayload, 0x30) = *f32_at(payload, 0x9C) * Math.RandF();
 		if (((payload[0xEB] & 1) != 0) && ((payload[0xEB] & 2) != 0)) {
-			if (DOUBLE_80330488 < (double)Math.RandF()) {
+			if (RyjLoadDouble(DOUBLE_80330488) < (double)Math.RandF()) {
 				*f32_at(particlePayload, 0x30) = *f32_at(particlePayload, 0x30) * FLOAT_80330490[0];
 			}
 		} else if ((payload[0xEB] & 2) != 0) {
@@ -1007,15 +1018,15 @@ void birth(
 		*f32_at(particlePayload, 0x2C) = *f32_at(particlePayload, 0x2C) + *f32_at(particlePayload, 0x30);
 	}
 	{
-		float angleWrap = FLOAT_80330458;
-		float angleMax = FLOAT_8033045c;
+		const float& angleWrap = FLOAT_80330458;
+		const float& angleMax = FLOAT_8033045c;
 		while (angleMax <= *f32_at(particlePayload, 0x28)) {
 			*f32_at(particlePayload, 0x28) = *f32_at(particlePayload, 0x28) - angleWrap;
 		}
 	}
 	{
-		float angleWrap = FLOAT_80330458;
-		float angleMin = FLOAT_80330460;
+		const float& angleWrap = FLOAT_80330458;
+		const float& angleMin = FLOAT_80330460;
 		while (*f32_at(particlePayload, 0x28) < angleMin) {
 			*f32_at(particlePayload, 0x28) = *f32_at(particlePayload, 0x28) + angleWrap;
 		}
@@ -1050,7 +1061,7 @@ void birth(
 	*f32_at(particlePayload, 0x50) = *f32_at(payload, 0xCC);
 	if (*f32_at(payload, 0xC8) != kPppRyjMegaBirthZero) {
 		*f32_at(particlePayload, 0x4C) =
-			*f32_at(particlePayload, 0x4C) + FLOAT_80330470 * *f32_at(payload, 0xC8) * Math.RandF() -
+			*f32_at(particlePayload, 0x4C) + RyjLoadFloat(FLOAT_80330470) * *f32_at(payload, 0xC8) * Math.RandF() -
 			*f32_at(payload, 0xC8);
 	}
 

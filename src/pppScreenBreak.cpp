@@ -460,15 +460,23 @@ void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBreak* work
             }
             globalMax.z = globalZ;
 
-            if (x < meshMin.x) {
-                meshMin.x = x;
+            s16 minCandidateX = x;
+            if (meshMin.x < x) {
+                minCandidateX = meshMin.x;
             }
-            if (y < meshMin.y) {
-                meshMin.y = y;
+            meshMin.x = minCandidateX;
+
+            s16 minCandidateY = y;
+            if (meshMin.y < y) {
+                minCandidateY = meshMin.y;
             }
-            if (z < meshMin.z) {
-                meshMin.z = z;
+            meshMin.y = minCandidateY;
+
+            s16 minCandidateZ = z;
+            if (meshMin.z < z) {
+                minCandidateZ = meshMin.z;
             }
+            meshMin.z = minCandidateZ;
 
             if (meshMax.x < x) {
                 meshMax.x = x;

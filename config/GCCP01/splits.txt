@@ -332,6 +332,7 @@ p_FunnyShape.cpp:
 	.rodata     start:0x801D7DD0 end:0x801D7E80
 	.data       start:0x801EA778 end:0x801EA960
 	.bss        start:0x8026D728 end:0x80273928
+	.sdata      start:0x8032E660 end:0x8032E688
 	.sbss       start:0x8032ED28 end:0x8032ED35
 
 FS_USB_Process.cpp:

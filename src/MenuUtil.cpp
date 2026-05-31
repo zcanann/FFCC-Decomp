@@ -401,9 +401,10 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 		CMes::MakeAgbString(temp, reinterpret_cast<char*>(msgId), 0, 1);
 		if (strlen(temp) != 0) {
 			int width = static_cast<int>(CMes::drawTagString(font, reinterpret_cast<char*>(msgId), 0, 0, 0));
-			if (maxWidth < width) {
-				maxWidth = width;
+			if (width < maxWidth) {
+				width = maxWidth;
 			}
+			maxWidth = width;
 		}
 	}
 	delete[] temp;

@@ -2625,8 +2625,6 @@ void CMenuPcs::CalcResultOpenAnim()
 		Sound.PlaySe(0x46, 0x40, 0x7f, 0);
 		memset((void*)animPtr, 0, sizeof(BonusAnimList));
 
-		header->count = (short)(1 + activePartyCount * 6);
-
 		sprites[0].kind = 0x16;
 		sprites[0].x = 0;
 		sprites[0].y = 0;
@@ -2761,6 +2759,7 @@ void CMenuPcs::CalcResultOpenAnim()
 			}
 		}
 
+		header->count = (short)(1 + activePartyCount * 6);
 		*(unsigned char*)(statePtr + 0xb) = 1;
 		header->finished = 0;
 		return;

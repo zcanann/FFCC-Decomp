@@ -15,6 +15,12 @@ extern const float kUtilHermiteCoeffNeg2;
 extern Vec gUtilUpVector;
 extern const char __RTTI__8CManager_8032E488[];
 
+struct UtilHermiteBasis {
+	float m_value[4];
+};
+
+extern const UtilHermiteBasis kUtilHermiteBasis;
+
 unsigned int s_CUtilTablePad0[3] = {reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CManager_8032E488)), 0, 0};
 
 static inline MtxPtr GetCameraMatrix()
@@ -1332,7 +1338,7 @@ void CUtil::GetSplinePos(Vec& out, Vec p0, Vec p1, Vec p2, Vec p3, float t, floa
 	PSVECSubtract(&p3, &p1, &tan1);
 	PSVECScale(&tan1, &tan1, scale);
 
-	float hermite[4] = {0.0f, 1.0f, 0.0f, 0.0f};
+	UtilHermiteBasis hermite = kUtilHermiteBasis;
 	float t3;
 	float t2;
 
@@ -1340,30 +1346,30 @@ void CUtil::GetSplinePos(Vec& out, Vec p0, Vec p1, Vec p2, Vec p3, float t, floa
 	t3 = t2 * t;
 
 	float coeff3 = kUtilHermiteCoeff3;
-	float coeffNeg2 = kUtilHermiteCoeffNeg2;
 	float coeff2 = kUtilHermiteCoeff2;
+	float coeffNeg2 = kUtilHermiteCoeffNeg2;
 	float k3t2 = coeff3 * t2;
-	hermite[1] = k3t2 + (coeffNeg2 * t3);
-	hermite[0] = kUtilOne + ((coeff2 * t3) - k3t2);
-	hermite[2] = t + (t3 - (coeff2 * t2));
-	hermite[3] = t3 - t2;
+	hermite.m_value[1] = k3t2 + (coeffNeg2 * t3);
+	hermite.m_value[0] = kUtilOne + ((coeff2 * t3) - k3t2);
+	hermite.m_value[2] = t + (t3 - (coeff2 * t2));
+	hermite.m_value[3] = t3 - t2;
 
-	float pos = hermite[1] * p2.x;
-	pos += hermite[0] * p1.x;
-	pos += hermite[2] * tan0.x;
-	pos += hermite[3] * tan1.x;
+	float pos = hermite.m_value[1] * p2.x;
+	pos += hermite.m_value[0] * p1.x;
+	pos += hermite.m_value[2] * tan0.x;
+	pos += hermite.m_value[3] * tan1.x;
 	out.x = pos;
 
-	pos = hermite[1] * p2.y;
-	pos += hermite[0] * p1.y;
-	pos += hermite[2] * tan0.y;
-	pos += hermite[3] * tan1.y;
+	pos = hermite.m_value[1] * p2.y;
+	pos += hermite.m_value[0] * p1.y;
+	pos += hermite.m_value[2] * tan0.y;
+	pos += hermite.m_value[3] * tan1.y;
 	out.y = pos;
 
-	pos = hermite[1] * p2.z;
-	pos += hermite[0] * p1.z;
-	pos += hermite[2] * tan0.z;
-	pos += hermite[3] * tan1.z;
+	pos = hermite.m_value[1] * p2.z;
+	pos += hermite.m_value[0] * p1.z;
+	pos += hermite.m_value[2] * tan0.z;
+	pos += hermite.m_value[3] * tan1.z;
 	out.z = pos;
 }
 

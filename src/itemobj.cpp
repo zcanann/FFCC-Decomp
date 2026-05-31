@@ -673,14 +673,11 @@ CGPrgObj* CGItemObj::CreateFromScript(
 			 itemObj != 0;
 		     itemObj = reinterpret_cast<unsigned char*>(
 		         ItemCFlatRuntime()->FindGItemObjNext(reinterpret_cast<CGItemObj*>(itemObj)))) {
-			int canDelete = (itemObj[0x53] & 1) != 0;
-			int scriptObjectPos = *(int*)(itemObj + 0x94);
-
 			if (*(void**)(itemObj + 0x550) == 0 &&
 			    static_cast<signed char>(
 			        static_cast<int>((static_cast<unsigned int>(itemObj[0x50]) << 28) & 0xC0000000) >> 31) != 0 &&
-			    canDelete != 0 && scriptObjectPos < bestScriptObjectPos) {
-				bestScriptObjectPos = scriptObjectPos;
+			    (itemObj[0x53] & 1) != 0 && *(int*)(itemObj + 0x94) < bestScriptObjectPos) {
+				bestScriptObjectPos = *(int*)(itemObj + 0x94);
 				bestItemObj = itemObj;
 			}
 		}
@@ -913,7 +910,6 @@ void CGItemObj::onFrameStat()
 			bool useBossAttachName = false;
 
 			if (Game.m_gameWork.m_menuStageMode != 0) {
-				CGPartyObj* carryObj = *(CGPartyObj**)(self + 0x550);
 				bool condA = false;
 				bool condB = false;
 				bool condC = false;
@@ -923,14 +919,14 @@ void CGItemObj::onFrameStat()
 					condC = true;
 				}
 				if (condC) {
-					unsigned int cid = static_cast<unsigned short>(carryObj->GetCID());
+					unsigned int cid = static_cast<unsigned short>(m_owner->GetCID());
 					unsigned int stageCarry = (unsigned int)__cntlzw(0x6D - (cid & 0x6D));
 					if (((stageCarry >> 5) & 0xFF) != 0) {
 						condB = true;
 					}
 				}
 				if (condB &&
-				    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(carryObj->m_scriptHandle) + 0x3B4) != 0) {
+				    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_owner->m_scriptHandle) + 0x3B4) != 0) {
 					condA = true;
 				}
 				if (condA) {
@@ -951,25 +947,27 @@ void CGItemObj::onFrameStat()
 	case 0xC:
 	case 0xD:
 		if (*(int*)(self + 0x528) == *(int*)(self + 0x554)) {
-			CGPartyObj* carryObj = *(CGPartyObj**)(self + 0x550);
 			Vec safePos;
 			float launchSpeed;
 			bool useMenuLaunchSpeed = false;
 
-			if (Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
-				unsigned int carryCid = static_cast<unsigned short>(carryObj->GetCID());
-				if ((carryCid & 0x6D) == 0x6D &&
-				    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(carryObj->m_scriptHandle) + 0x3B4) != 0) {
-					useMenuLaunchSpeed = true;
+			if (Game.m_gameWork.m_menuStageMode != 0) {
+				if (Game.m_gameWork.m_menuStageMode != 0 &&
+				    Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
+					unsigned int carryCid = static_cast<unsigned short>(m_owner->GetCID());
+					if ((carryCid & 0x6D) == 0x6D &&
+					    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_owner->m_scriptHandle) + 0x3B4) != 0) {
+						useMenuLaunchSpeed = true;
+					}
 				}
 			}
 
 			if (useMenuLaunchSpeed) {
 				launchSpeed = FLOAT_80331b18;
 			} else if (static_cast<int>(CFlatCenterState()) == 1) {
-				unsigned int carryCid = static_cast<unsigned short>(carryObj->GetCID());
+				unsigned int carryCid = static_cast<unsigned short>(m_owner->GetCID());
 				if ((carryCid & 0x6D) == 0x6D &&
-				    1 < *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(carryObj->m_scriptHandle) + 0x3E0)) {
+				    1 < *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_owner->m_scriptHandle) + 0x3E0)) {
 					launchSpeed = FLOAT_80331b18;
 				} else {
 					launchSpeed = FLOAT_80331BA8;
@@ -978,10 +976,10 @@ void CGItemObj::onFrameStat()
 				launchSpeed = FLOAT_80331b90;
 			}
 
-			float safeDist = CalcSafePos(0x41, carryObj, &safePos);
+			float safeDist = CalcSafePos(0x41, m_owner, &safePos);
 
 			if (FLOAT_80331b20 < safeDist) {
-				carryObj->moveVectorHRot(FLOAT_80331b8c + *(float*)((unsigned char*)carryObj + 0x1A8), FLOAT_80331b20,
+				m_owner->moveVectorHRot(FLOAT_80331b8c + *(float*)((unsigned char*)m_owner + 0x1A8), FLOAT_80331b20,
 				                          safeDist / FLOAT_80331b90, 3);
 			}
 
@@ -992,8 +990,8 @@ void CGItemObj::onFrameStat()
 				launchSpeed = FLOAT_80331b40;
 			}
 
-			float ownerCos = (float)cos((double)*(float*)((unsigned char*)carryObj + 0x1B4));
-			float ownerSin = (float)sin((double)*(float*)((unsigned char*)carryObj + 0x1B4));
+			float ownerCos = (float)cos((double)*(float*)((unsigned char*)m_owner + 0x1B4));
+			float ownerSin = (float)sin((double)*(float*)((unsigned char*)m_owner + 0x1B4));
 			CVector moveVec(ownerSin, FLOAT_80331b54, ownerCos);
 			MoveVector(reinterpret_cast<Vec*>(&moveVec), launchSpeed, 1, 0, 1, 0);
 

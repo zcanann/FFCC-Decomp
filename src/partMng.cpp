@@ -69,12 +69,12 @@ extern "C" void __ct__10pppModelStFv(pppModelSt* modelSt);
 extern "C" void __dt__10pppModelStFv(pppModelSt* modelSt, int);
 PPPCREATEPARAM g_dcp;
 extern "C" {
-int ppvSysStopPartF = 0;
-int ppvSysGoPartF = 0;
-int ppvUserStopPartF = 0;
+extern int ppvSysStopPartF;
+extern int ppvSysGoPartF;
+extern int ppvUserStopPartF;
 unsigned char gPppInConstructor = 0;
 unsigned char gPppInSubFrameCalc = 0;
-int ppvEmptyLoop = 0;
+extern int ppvEmptyLoop;
 unsigned char gPppEditorAnimIndex = 0;
 unsigned char gPppEditorAnimIndexInitialized = 0;
 int gPppCalcDisabled = 0;

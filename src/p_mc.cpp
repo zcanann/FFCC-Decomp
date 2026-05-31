@@ -7,20 +7,8 @@ extern const char s_CMcPcs_80331B10[] = "CMcPcs";
 extern const float FLOAT_80331b18 = 1.0f;
 extern const float FLOAT_80331b1c = 10.0f;
 
-extern const char __RTTI__8CManager_8032E9D0[];
-extern const char __RTTI__8CProcess_8032E9D8[];
-
 unsigned int CMcPcs::m_table[0x15C / sizeof(unsigned int)] = {
     reinterpret_cast<unsigned int>(const_cast<char*>(s_CMcPcs_80331B10)), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x1B
-};
-
-unsigned int s_CMcPcsTablePad0[3] = {reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CManager_8032E9D0)), 0, 0};
-unsigned int s_CMcPcsTablePad1[5] = {
-    reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CManager_8032E9D0)),
-    0,
-    reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CProcess_8032E9D8)),
-    0,
-    0,
 };
 
 CMcPcs McPcs;

@@ -1003,6 +1003,7 @@ p_gba.cpp:
 	.ctors      start:0x801D5420 end:0x801D5424
 	.rodata     start:0x801D9DE0 end:0x801D9E00
 	.data       start:0x8020F2F8 end:0x8020F4C8
+	.sdata      start:0x8032E7C0 end:0x8032E7D8
 	.sbss       start:0x8032EDA8 end:0x8032EDB0
 	.sdata2     start:0x80330870 end:0x80330878
 

@@ -377,8 +377,8 @@ static inline void DrawBonusActiveMarks(CMenuPcs* menu, int statePtr, float alph
 
 	GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(alpha * 255.0f)};
 	GXSetChanMatColor(GX_COLOR0A0, color);
-	menu->SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-	menu->SetTexture(static_cast<CMenuPcs::TEX>(0x23));
+	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x23));
 
 	for (int i = 0; i < 8; i++) {
 		if ((activeMask & (1 << i)) == 0) {
@@ -386,7 +386,7 @@ static inline void DrawBonusActiveMarks(CMenuPcs* menu, int statePtr, float alph
 		}
 		float x = s_Base[0][i * 2 + 2] + 28.0f;
 		float y = s_Base[0][i * 2 + 3] + 20.0f;
-		menu->DrawRect(0, x, y, 56.0f, 64.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+		MenuPcs.DrawRect(0, x, y, 56.0f, 64.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 	}
 }
 

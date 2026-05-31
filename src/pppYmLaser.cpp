@@ -86,7 +86,7 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 	int colorOffset = serializedDataOffsets[1];
 	pppYmLaserColorData* colorData = (pppYmLaserColorData*)((u8*)laser + 0x80 + colorOffset);
 	s32 dataValIndex = step->m_dataValIndex;
-	s32 count;
+	u32 count;
 	s32 i;
 	s32 alphaStep;
 	char alphaMax;
@@ -307,7 +307,7 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 			color.g = 0xFF;
 			color.b = 0xFF;
 			color.a = 0xFF;
-			for (i = 0; (int)i < (int)step->m_laser.m_pointCount; i++) {
+			for (i = 0; (int)i < (int)(u32)step->m_laser.m_pointCount; i++) {
 				if ((work->m_points[i].x == kPppYmLaserOne) && (work->m_points[i].y == kPppYmLaserOne) &&
 					(work->m_points[i].z == kPppYmLaserOne)) {
 					continue;

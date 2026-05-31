@@ -3,10 +3,10 @@
 #include "ffcc/math.h"
 #include "ffcc/wm_menu.h"
 
+extern const char s_CMcPcs_80331B10[] = "CMcPcs";
 extern const float FLOAT_80331b18 = 1.0f;
 extern const float FLOAT_80331b1c = 10.0f;
 
-extern const char s_CMcPcs_80331B10[];
 extern const char __RTTI__8CManager_8032E9D0[];
 extern const char __RTTI__8CProcess_8032E9D8[];
 

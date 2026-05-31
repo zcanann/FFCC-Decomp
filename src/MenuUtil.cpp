@@ -1328,7 +1328,6 @@ void CMenuPcs::DrawOptionMenu()
 		         kOptionAnimMax);
 	} else {
 		CTextureSet* textureSet = GetMenuTextureSet(this, 0xBC);
-		CTexture* cursorPanel = GetTextureSetTexture(textureSet, 4);
 		CTexture* modePanel = GetTextureSetTexture(textureSet, 7);
 		color.a = static_cast<unsigned char>(static_cast<int>(FLOAT_80333550 * m_optionColumnAnim));
 
@@ -1337,6 +1336,7 @@ void CMenuPcs::DrawOptionMenu()
 		unsigned int modeU = 0x280;
 		for (int i = 0; i < 4; i++, y += 0x28, uvY += 0x20, modeU += 0x40) {
 			if ((m_specialModeEdit != 0) && (m_specialModeCursor == i)) {
+				CTexture* cursorPanel = GetTextureSetTexture(textureSet, 4);
 				gUtil.CalcUV(uv0.x, uv0.y, cursorPanel->m_width - 0x30, 0, cursorPanel->m_width,
 				             cursorPanel->m_height);
 				gUtil.CalcUV(uv1.x, uv1.y, cursorPanel->m_width, 0x28, cursorPanel->m_width,

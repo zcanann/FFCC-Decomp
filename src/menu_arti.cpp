@@ -500,15 +500,16 @@ void CMenuPcs::ArtiDraw()
  */
 int CMenuPcs::ArtiClose()
 {
+	ArtiOpenAnim* anim;
 	int count;
-	int finished;
 	int frame;
+	int finished;
 
 	GetArtiState(this)[0x11]++;
 	finished = 0;
 
 	count = GetArtiList(this)[0];
-	ArtiOpenAnim* anim = (ArtiOpenAnim*)((u8*)GetArtiList(this) + 8);
+	anim = (ArtiOpenAnim*)((u8*)GetArtiList(this) + 8);
 	frame = GetArtiState(this)[0x11];
 
 	for (int i = 0; i < count; i++, anim++) {

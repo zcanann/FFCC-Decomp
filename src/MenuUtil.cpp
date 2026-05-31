@@ -986,13 +986,13 @@ void CMenuPcs::CalcOptionMenu()
 				    static_cast<unsigned char>(static_cast<unsigned int>(__cntlzw(1 - m_specialModeFlags[2])) >> 5);
 				Game.m_gameWork.m_spModeFlags[3] =
 				    static_cast<unsigned char>(static_cast<unsigned int>(__cntlzw(1 - m_specialModeFlags[3])) >> 5);
-			} else if ((press & 8) != 0) {
+			} else if ((m_specialModeEdit != 0) && ((press & 8) != 0)) {
 				m_specialModeCursor--;
 				if (m_specialModeCursor < 0) {
 					m_specialModeCursor = 3;
 				}
 				Sound.PlaySe(1, 0x40, 0x7F, 0);
-			} else if ((press & 4) != 0) {
+			} else if ((m_specialModeEdit != 0) && ((press & 4) != 0)) {
 				m_specialModeCursor++;
 				if (m_specialModeCursor > 3) {
 					m_specialModeCursor = 0;

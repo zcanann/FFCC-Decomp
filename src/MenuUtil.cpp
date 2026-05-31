@@ -1164,7 +1164,6 @@ void CMenuPcs::DrawOptionMenu()
 
 	if (m_optionIndex == 2) {
 		CTexture* meterTexture = GetTextureSetTexture(GetMenuTextureSet(this, 0xBC), 3);
-		signed char volume = m_bgmVolume;
 		float iconWave = FLOAT_80333620 * rowSin;
 		float leftIconX =
 		    static_cast<float>(static_cast<int>((FLOAT_803335A8 - FLOAT_803335F8) * rowCos + FLOAT_803335F8));
@@ -1210,7 +1209,7 @@ void CMenuPcs::DrawOptionMenu()
 			float barX = FLOAT_80333610 + static_cast<float>(x);
 			gUtil.RenderTextureQuad(barX, FLOAT_80333614, FLOAT_80333624, FLOAT_80333624, meterTexture, &uv0,
 			                        &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
-			if ((m_optionMenuState != 2) && (i + 1 <= volume)) {
+			if ((m_optionMenuState != 2) && (i + 1 <= m_bgmVolume)) {
 				gUtil.RenderTextureQuad(barX, FLOAT_80333614, FLOAT_80333624, FLOAT_80333624, meterTexture, &uv0,
 				                        &uv1, &color, GX_BL_ONE, GX_BL_ONE);
 			}
@@ -1270,7 +1269,6 @@ void CMenuPcs::DrawOptionMenu()
 		          kOptionAnimMax);
 	} else if (m_optionIndex < 4) {
 		CTexture* meterTexture = GetTextureSetTexture(GetMenuTextureSet(this, 0xBC), 3);
-		signed char volume = m_seVolume;
 		float iconWave = FLOAT_80333620 * rowSin;
 		float leftIconX =
 		    static_cast<float>(static_cast<int>((FLOAT_803335A8 - FLOAT_803335F8) * rowCos + FLOAT_803335F8));
@@ -1316,7 +1314,7 @@ void CMenuPcs::DrawOptionMenu()
 			float barX = FLOAT_80333610 + static_cast<float>(x);
 			gUtil.RenderTextureQuad(barX, FLOAT_80333614, FLOAT_80333624, FLOAT_80333624, meterTexture, &uv0,
 			                        &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
-			if ((m_optionMenuState != 2) && (i + 1 <= volume)) {
+			if ((m_optionMenuState != 2) && (i + 1 <= m_seVolume)) {
 				gUtil.RenderTextureQuad(barX, FLOAT_80333614, FLOAT_80333624, FLOAT_80333624, meterTexture, &uv0,
 				                        &uv1, &color, GX_BL_ONE, GX_BL_ONE);
 			}

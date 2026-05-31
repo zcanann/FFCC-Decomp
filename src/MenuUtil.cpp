@@ -1377,6 +1377,12 @@ void CMenuPcs::DrawOptionMenu()
 				gUtil.RenderTextureQuad(300.0f, 160.0f + static_cast<float>(y),
 				                        static_cast<float>(cursorWidth), FLOAT_80333624, cursorPanel,
 				                        &uv0, &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
+
+				gUtil.CalcUV(uv0.x, uv0.y, cursorWidth, 0x30, cursorWidth, cursorHeight);
+				gUtil.CalcUV(uv1.x, uv1.y, 0, cursorHeight, cursorWidth, cursorHeight);
+				gUtil.RenderTextureQuad(300.0f + static_cast<float>(cursorWidth), 160.0f + static_cast<float>(y),
+				                        static_cast<float>(cursorWidth), FLOAT_80333624, cursorPanel,
+				                        &uv0, &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 			}
 
 			CTexture* modePanel = GetTextureSetTexture(textureSet, 7);

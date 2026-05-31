@@ -614,7 +614,8 @@ void CCharaPcs::calcViewer()
                     self->m_viewerModel[0]->AttachAnim(self->m_viewerAnimBank[self->m_viewerAnimLoopIndex], -1, -1, 0);
                     ReleaseShared(self->m_viewerAnim[0]);
                     self->m_viewerAnim[0] = self->m_viewerAnimBank[self->m_viewerAnimLoopIndex];
-                    AddSharedRef(self->m_viewerAnim[0]);
+                    int* ref = reinterpret_cast<int*>(self->m_viewerAnim[0]);
+                    ref[1] = ref[1] + 1;
                 }
             } else if ((i == 0) && (self->m_viewerIFrameEnabled != 0)) {
                 float animFrames = static_cast<float>(self->m_viewerAnim[0]->m_frameCount);

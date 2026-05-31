@@ -512,7 +512,7 @@ config.libs = [
             Object(NonMatching, "chunkfile.cpp"),
             Object(NonMatching, "cmake.cpp"),
             Object(Matching, "color.cpp"),
-            Object(NonMatching, "file.cpp"),
+            Object(NonMatching, "file.cpp", extra_cflags=["-RTTI on"]),
             Object(Matching, "strcase.c"),
             Object(NonMatching, "fontman.cpp", extra_cflags=["-RTTI on"]),
             Object(NonMatching, "FS_USB_Process.cpp"),

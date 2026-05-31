@@ -60,8 +60,8 @@ public:
 		unsigned int m_currentOffset;
 	};
 
-	void Init();
-	void Quit();
+	virtual void Init();
+	virtual void Quit();
 	void Frame();
 	DVDDiskID* GetCurrentDiskID();
 	CHandle* Open(char* path, unsigned long userParam, PRI pri);

@@ -712,21 +712,21 @@ void CMenuPcs::FavoInit()
 	iVar8 = 0;
 	puVar13 = s_rank;
 	s_rank[1] = 0;
-	*(short*)&s_rank[2] = *(short*)(uVar3 + 0x3b8);
+	*(unsigned short*)&s_rank[2] = *(unsigned short*)(uVar3 + 0x3b8);
 	s_rank[5] = 1;
-	*(short*)&s_rank[6] = *(short*)(uVar3 + 0x3ba);
+	*(unsigned short*)&s_rank[6] = *(unsigned short*)(uVar3 + 0x3ba);
 	s_rank[9] = 2;
-	*(short*)&s_rank[10] = *(short*)(uVar3 + 0x3bc);
+	*(unsigned short*)&s_rank[10] = *(unsigned short*)(uVar3 + 0x3bc);
 	s_rank[0xd] = 3;
-	*(short*)&s_rank[14] = *(short*)(uVar3 + 0x3be);
+	*(unsigned short*)&s_rank[14] = *(unsigned short*)(uVar3 + 0x3be);
 	s_rank[0x11] = 4;
-	*(short*)&s_rank[18] = *(short*)(uVar3 + 0x3c0);
+	*(unsigned short*)&s_rank[18] = *(unsigned short*)(uVar3 + 0x3c0);
 	s_rank[0x15] = 5;
-	*(short*)&s_rank[22] = *(short*)(uVar3 + 0x3c2);
+	*(unsigned short*)&s_rank[22] = *(unsigned short*)(uVar3 + 0x3c2);
 	s_rank[0x19] = 6;
-	*(short*)&s_rank[26] = *(short*)(uVar3 + 0x3c4);
+	*(unsigned short*)&s_rank[26] = *(unsigned short*)(uVar3 + 0x3c4);
 	s_rank[0x1d] = 7;
-	*(short*)&s_rank[30] = *(short*)(uVar3 + 0x3c6);
+	*(unsigned short*)&s_rank[30] = *(unsigned short*)(uVar3 + 0x3c6);
 
 	do {
 		iVar17 = iVar8 + 1;
@@ -762,7 +762,7 @@ void CMenuPcs::FavoInit()
 			iVar8 = iVar17;
 		}
 		iVar17 = iVar17 + 1;
-		*puVar13 = (char)iVar8 + 1;
+		*puVar13 = iVar8 + 1;
 		puVar13 = puVar13 + 4;
 		iVar16 = iVar16 - 1;
 	} while (iVar16 != 0);

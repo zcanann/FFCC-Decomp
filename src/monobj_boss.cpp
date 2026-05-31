@@ -59,8 +59,19 @@ extern char SoundBuffer[];
 extern char SoundBuffer_1260_[];
 extern "C" float MG_GBA_THREAD_MSG_SETPORT_ct;
 extern "C" char g_errCt;
-extern "C" Vec gGoblinKingTeleportPoints;
-extern "C" Vec gLichTeleportPoints[];
+extern "C" Vec gGoblinKingTeleportPoints[] = {
+    {-1.5f, -5.989999771118164f, -44.279998779296875f},
+    {-85.16000366210938f, -5.949999809265137f, 41.400001525878906f},
+    {83.87999725341797f, -5.739999771118164f, 43.209999084472656f},
+    {-1.6399999856948853f, 13.739999771118164f, -141.4499969482422f},
+};
+
+extern "C" Vec gLichTeleportPoints[] = {
+    {0.0f, 25.360000610351562f, -137.0f},
+    {0.0f, 0.0f, -38.0f},
+    {-132.0f, 0.0f, -38.0f},
+    {132.0f, 0.0f, -38.0f},
+};
 
 static const char s_to_a_obj_801dd4e8[] = "to_a_obj";
 static const char s_to_b_obj_801dd4f4[] = "to_b_obj";
@@ -765,7 +776,7 @@ void CGMonObj::frameStatFuncGoblinKing()
 	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
 	switch (prgObj->m_lastStateId) {
 	case 100:
-		teleport(0, 0xd, 8, 0x42, 0xa03e, 0xa03f, 3, 4, 5, &gGoblinKingTeleportPoints,
+		teleport(0, 0xd, 8, 0x42, 0xa03e, 0xa03f, 3, 4, 5, gGoblinKingTeleportPoints,
 		         *reinterpret_cast<int*>(SoundBuffer_1260_), *reinterpret_cast<Vec*>(SoundBuffer_1260_ + 4));
 		break;
 	}

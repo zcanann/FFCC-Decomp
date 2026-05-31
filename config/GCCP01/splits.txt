@@ -1572,6 +1572,7 @@ monobj_boss.cpp:
 	extab       start:0x80009834 end:0x80009A34
 	extabindex  start:0x80010918 end:0x80010C18
 	.text       start:0x8012E5DC end:0x80133108
+	.data       start:0x802127C0 end:0x80212820
 	.sdata2     start:0x80331CF8 end:0x80331D10
 
 bonus_menu.cpp:

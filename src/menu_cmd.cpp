@@ -2575,14 +2575,15 @@ unsigned int CMenuPcs::CmdOpen1()
 		const s32 endX = static_cast<s32>(static_cast<f64>(baseEntry[0] + baseEntry[2]) - DOUBLE_80332a98);
 		animEntry[0] = static_cast<s16>(endX);
 
-		s32 uniteCount = 0;
 		if (chainCount == 2) {
 			int combo[5][2];
-			uniteCount = ChkUnite(static_cast<int>(*reinterpret_cast<s16*>(cmd + 0x26)), combo);
+			chainCount = ChkUnite(static_cast<int>(*reinterpret_cast<s16*>(cmd + 0x26)), combo);
+		} else {
+			chainCount = 0;
 		}
 
 		*reinterpret_cast<f32*>(animEntry + 0x0A) = 1.0f;
-		if (uniteCount != 0) {
+		if (chainCount != 0) {
 			*reinterpret_cast<f32*>(animEntry + 0x0A) = static_cast<f32>(DOUBLE_80332aa0);
 		}
 		animEntry[2] = 0xC0;

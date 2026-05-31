@@ -2618,13 +2618,22 @@ void CMenuPcs::CalcResultOpenAnim()
 		}
 
 		for (int i = 0; i < activePartyCount; i++) {
-			int idx = iconBase + i;
-			InitAnimSprite(&sprites[idx], 0x18, 0x48, (short)(0x28 + i * 0x60), 0x60, 0x58, 0x20 + i * 3, 8);
-			sprites[idx].depth = 1.0f;
-			sprites[idx].alpha = 0.0f;
-			sprites[idx].mulX = -48.0f;
-			sprites[idx].mulY = 12.0f;
-			sprites[idx].scale = 0.8f;
+			BonusAnimSprite* sprite = &sprites[iconBase + i];
+			unsigned int partySlot = s_Rinfo->m_party[i].m_partySlot;
+			sprite->kind = 0x18;
+			sprite->x = ((0 < i) && (i < 3)) ? 0x30 : 0x48;
+			sprite->y = (short)(0x28 + i * 0x60);
+			sprite->w = 0x60;
+			sprite->h = 0x58;
+			sprite->mulX = (partySlot & 1) ? (float)sprite->w : 0.0f;
+			sprite->mulY = ((int)partySlot >> 1) ? (float)sprite->h : 0.0f;
+			if (i == 0) {
+				sprite->startFrame = sprites[frameBase].startFrame + sprites[frameBase].duration + 0x18;
+			} else {
+				sprite->startFrame = sprites[iconBase + i - 1].startFrame + 3;
+			}
+			sprite->duration = 8;
+			sprite->depth = 1.0f;
 		}
 
 		for (int i = 0; i < activePartyCount; i++) {

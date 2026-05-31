@@ -1164,7 +1164,7 @@ void CMenuPcs::CalcSelectWait()
 			}
 		} else if (currentPartyIndex < activePartyCount) {
 			delay = (short)(delay - 1);
-			if (delay == 0 && *(unsigned char*)(statePtr + 8) != 0) {
+			if (delay == 0 && *(signed char*)(statePtr + 8) > 0) {
 				unsigned char bit = (unsigned char)(1 << (selection & 7));
 				int itemId = (&s_Rinfo->m_tempArtifacts[0])[selection & 7];
 				s_Rinfo->pad_0008 = (unsigned char)(s_Rinfo->pad_0008 | bit);

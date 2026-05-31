@@ -33,13 +33,6 @@ extern float ppvScreenMatrixZbuff;
 extern "C" int CrossCheckSphereVector__5CMathFP3VecPfP3VecP3VecP3Vecf(
     CMath*, Vec*, float*, Vec*, Vec*, Vec*, float, float, float);
 
-static int CrossCheckSphereVectorRaw(Vec* outPos, float* outT, Vec* origin, Vec* vector, Vec* ellipseScale,
-                                     float scale, float innerRadius, float outerRadius)
-{
-    return CrossCheckSphereVector__5CMathFP3VecPfP3VecP3VecP3Vecf(&Math, outPos, outT, origin, vector, ellipseScale,
-                                                                  scale, innerRadius, outerRadius);
-}
-
 static inline CChara::CModel* GetPppOwnerModel(_pppMngSt* pppMngSt)
 {
 	return reinterpret_cast<CGObject*>(pppMngSt->m_owner)->m_charaModelHandle->m_model;
@@ -647,16 +640,6 @@ extern "C" unsigned long pppHeapCheckLeak__FPQ27CMemory6CStage2(CMemory::CStage*
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void pppMngStHeapCheck(CMemory::CStage* stage)
-{
-	// TODO
-}
-
-/*
- * --INFO--
  * PAL Address: 80056b0c
  * PAL Size: 360b
  * EN Address: TODO
@@ -729,16 +712,6 @@ void callCon2Prog(_pppPObject* pObject)
 	}
 
 	gPppInConstructor = 0;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void callConProg(_pppPObject*)
-{
-	// TODO
 }
 
 /*
@@ -928,16 +901,6 @@ _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
 	}
 
 	return (_pppPObject*)newObj;
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void pppDeletePObject(_pppPObject*)
-{
-	// TODO
 }
 
 /*
@@ -1480,35 +1443,6 @@ void pppSetFpMatrix(_pppMngSt* pppMngSt)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void pppCacheLoadModel(short* modelList, _pppDataHead*)
-{
-	short* modelIndices = modelList + 1;
-	short modelCount = *modelList;
-	u32 pppResSet = *reinterpret_cast<u32*>(ppvMng->m_pppResSet);
-
-	for (short i = 0; i < modelCount; i++)
-	{
-		CMapMesh* mapMesh = *(CMapMesh**)(*(u32*)(pppResSet + 0x14) + modelIndices[i] * 4);
-		short cacheIndex = *reinterpret_cast<short*>(reinterpret_cast<u8*>(mapMesh) + 0x46);
-
-		if (ppvAmemCacheSet.IsEnable(cacheIndex) == 0)
-		{
-			mapMesh->Ptr2Off();
-			*reinterpret_cast<int*>(reinterpret_cast<u8*>(mapMesh) + 0x24) =
-			    ppvAmemCacheSet.GetData(cacheIndex, (char*)s_pppPart_cpp, 0x4E5);
-			mapMesh->Off2Ptr();
-		}
-
-		ppvAmemCacheSet.AddRef(cacheIndex);
-		mapMesh->pppCacheLoadModelTexture(ppvEnv->m_materialSetPtr, &ppvAmemCacheSet);
-	}
-}
-
-/*
- * --INFO--
  * PAL Address: 80055868
  * PAL Size: 108b
  * EN Address: TODO
@@ -1526,99 +1460,6 @@ void pppCacheLoadShape(short* shapeList, _pppDataHead* pppDataHead)
 		short shapeIndex = *shapeList;
 		shapeList = shapeList + 1;
 		pppCacheLoadShapeTexture(
-		    *(pppShapeSt**)(pppDataHead->m_shapeNames + shapeIndex * 4),
-		    PartMng.m_materialSet);
-		++i;
-	}
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void pppCacheUnLoadModel(short*, _pppDataHead*)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void pppCacheUnLoadShape(short*, _pppDataHead*)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void pppCacheRefCnt0UpModel(short*, _pppDataHead*)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void pppCacheRefCnt0UpShape(short*, _pppDataHead*)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * PAL Address: 8005a280
- * PAL Size: 172b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppCacheDumpModel(short* modelList, _pppDataHead*)
-{
-	short modelCount = *modelList;
-	short i = 0;
-	modelList = modelList + 1;
-	u32 pppResSet = *reinterpret_cast<u32*>(ppvMng->m_pppResSet);
-
-	while (i < modelCount) {
-		short modelIndex = *modelList;
-		modelList = modelList + 1;
-		CMapMesh* mapMesh = *(CMapMesh**)(*(u32*)(pppResSet + 0x14) + modelIndex * 4);
-		short cacheIndex = *reinterpret_cast<short*>(reinterpret_cast<u8*>(mapMesh) + 0x46);
-
-		ppvAmemCacheSet.Release(cacheIndex);
-		mapMesh->pppCacheDumpModelTexture(ppvEnv->m_materialSetPtr, &ppvAmemCacheSet);
-		++i;
-	}
-}
-
-/*
- * --INFO--
- * PAL Address: 8005a214
- * PAL Size: 108b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppCacheDumpShape(short* shapeList, _pppDataHead* pppDataHead)
-{
-	short shapeCount = *shapeList;
-	short i = 0;
-	shapeList = shapeList + 1;
-
-	while (i < shapeCount) {
-		short shapeIndex = *shapeList;
-		shapeList = shapeList + 1;
-		pppCacheDumpShapeTexture(
 		    *(pppShapeSt**)(pppDataHead->m_shapeNames + shapeIndex * 4),
 		    PartMng.m_materialSet);
 		++i;
@@ -2374,16 +2215,6 @@ void _pppInitPart(_pppMngSt* pppMngSt)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void apeaPObject(_pppMngSt*)
-{
-	// TODO
-}
-
-/*
- * --INFO--
  * PAL Address: 80054698
  * PAL Size: 340b
  * EN Address: TODO
@@ -2822,8 +2653,9 @@ void pppHitCylinderSendSystem(_pppMngSt* pppMngSt, Vec* origin, Vec* vector, flo
 					}
 
 					Vec hitPos;
-					if (CrossCheckSphereVectorRaw(&hitPos, 0, origin, vector, (Vec*)&damageCol->m_worldPosition.y,
-												radius, damageCol->m_innerRadius, damageCol->m_outerRadius) == 0)
+					if (CrossCheckSphereVector__5CMathFP3VecPfP3VecP3VecP3Vecf(
+					        &Math, &hitPos, 0, origin, vector, (Vec*)&damageCol->m_worldPosition.y,
+					        radius, damageCol->m_innerRadius, damageCol->m_outerRadius) == 0)
 					{
 						continue;
 					}

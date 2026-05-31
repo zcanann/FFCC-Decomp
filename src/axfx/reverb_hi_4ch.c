@@ -604,3 +604,4 @@ void AXFXReverbHiCallbackDpl2(AXFX_BUFFERUPDATE_DPL2* bufferUpdate, AXFX_REVERBH
 const f32 reverb_hi_4ch_value100_0 = 100.0f;
 const f32 reverb_hi_4ch_value0_3 = 0.3f;
 const f32 reverb_hi_4ch_value0_6 = 0.6f;
+const double reverb_hi_4ch_handle_i2fMagic = 4503601774854144.0;

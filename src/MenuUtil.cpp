@@ -547,8 +547,8 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 					    static_cast<int>(*reinterpret_cast<short*>(foodBase + currentItem * 2 + 0xAC)) * 2 +
 					    0xB6);
 
-					if (ChkEquipActive(static_cast<int>(*reinterpret_cast<short*>(menuState + 0x28)) +
-					                   static_cast<int>(*reinterpret_cast<short*>(menuState + 0x34))) != 0) {
+					if (static_cast<unsigned char>(ChkEquipActive(static_cast<int>(*reinterpret_cast<short*>(menuState + 0x28)) +
+					                                              static_cast<int>(*reinterpret_cast<short*>(menuState + 0x34)))) != 0) {
 						unsigned int currentValue = 0;
 						if (currentItem != -1) {
 							currentValue = *reinterpret_cast<u16*>(Game.unkCFlatData0[2] + currentItem * 0x48 + 6);

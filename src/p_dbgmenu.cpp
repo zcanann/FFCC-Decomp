@@ -17,8 +17,6 @@ CDbgMenuPcs DbgMenuPcs;
 
 extern unsigned char g_IsDrawHeapSize;
 extern unsigned char g_map_draw_prof;
-extern const char __RTTI__8CManager_8032EA50[];
-extern const char __RTTI__8CProcess_8032EA58[];
 
 struct DbgMenuDef {
     const char* text;
@@ -86,15 +84,6 @@ DbgMenuDef tWork[] = {
     { sDbgMenuChara, 122, 2, 1 },
 };
 u32 gDbgMenuWindowBorderColors[4] = {0x0000FFC0, 0x4040FFC0, 0x4040FFC0, 0x8080FFC0};
-u32 s_CDbgMenuPcsTablePad0[3] = {
-    reinterpret_cast<u32>(const_cast<char*>(__RTTI__8CManager_8032EA50)), 0, 0};
-u32 s_CDbgMenuPcsTablePad1[5] = {
-    reinterpret_cast<u32>(const_cast<char*>(__RTTI__8CManager_8032EA50)),
-    0,
-    reinterpret_cast<u32>(const_cast<char*>(__RTTI__8CProcess_8032EA58)),
-    0,
-    0,
-};
 GXColor gDbgMenuWindowFillColors[2] = {{0xFF, 0xFF, 0xFF, 0x80}, {0, 0, 0, 0x80}};
 
 /*

@@ -21,8 +21,6 @@
 
 CGraphicPcs GraphicPcs;
 extern const char s_CGraphicPcs[];
-extern const char __RTTI__8CManager_8032E5D8[];
-extern const char __RTTI__8CProcess_8032E5E0[];
 
 u32 CGraphicPcs::m_table_desc0[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(create__11CGraphicPcsFv)};
 u32 CGraphicPcs::m_table_desc1[3] = {0, 0xFFFFFFFF, reinterpret_cast<u32>(destroy__11CGraphicPcsFv)};
@@ -65,16 +63,6 @@ static const char* s_scenegraph_step_labels[] = {
     s_scenegraph_step_x1_4,
     s_scenegraph_step_x1_2,
 };
-static u32 s_CGraphicPcsRttiBase0[3] = {
-    reinterpret_cast<u32>(const_cast<char*>(__RTTI__8CManager_8032E5D8)), 0, 0};
-static u32 s_CGraphicPcsRttiBase1[5] = {
-    reinterpret_cast<u32>(const_cast<char*>(__RTTI__8CManager_8032E5D8)),
-    0,
-    reinterpret_cast<u32>(const_cast<char*>(__RTTI__8CProcess_8032E5E0)),
-    0,
-    0,
-};
-
 static inline unsigned char* MaterialManRaw() { return reinterpret_cast<unsigned char*>(&MaterialMan); }
 
 /*

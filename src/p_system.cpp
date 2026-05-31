@@ -2,8 +2,6 @@
 #include "ffcc/pad.h"
 #include "ffcc/p_dbgmenu.h"
 
-extern const char __RTTI__8CManager_8032E608[];
-extern const char __RTTI__8CProcess_8032E610[];
 CSystemPcs SystemPcs;
 unsigned int CSystemPcs::m_table[0x15C / sizeof(unsigned int)] = {
     reinterpret_cast<unsigned int>("CSystemPcs"),
@@ -21,16 +19,6 @@ unsigned int CSystemPcs::m_table[0x15C / sizeof(unsigned int)] = {
 };
 const char sSystemPcsManagerClassName[] = "CManager";
 const char sSystemPcsProcessClassName[] = "CProcess";
-unsigned int s_CSystemPcsTablePad0_801EA250[3] = {
-    reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CManager_8032E608)), 0, 0};
-unsigned int s_CSystemPcsTablePad1_801EA25C[5] = {
-    reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CManager_8032E608)),
-    0,
-    reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CProcess_8032E610)),
-    0,
-    0,
-};
-
 /*
  * --INFO--
  * PAL Address: 0x80047c9c

@@ -407,16 +407,6 @@ unsigned int CFunnyShapePcs::m_table[0x15C / sizeof(unsigned int)] = {
     m_table_desc3[2],
     0x42, 1
 };
-unsigned int sFunnyShapePcsTablePad0[3] = {
-    reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CManager_8032E660)), 0, 0};
-unsigned int sFunnyShapePcsTablePad1[5] = {
-    reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CManager_8032E660)),
-    0,
-    reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CProcess_8032E668)),
-    0,
-    0,
-};
-
 template <>
 CPtrArray<_GXTexObj*>::~CPtrArray()
 {

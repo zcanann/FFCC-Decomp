@@ -374,9 +374,9 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 	char scratch[0x100];
 	itemName[0] = '\0';
 
-	font->SetMargin(margin);
+	font->SetMargin(FLOAT_803335a0);
 	font->SetShadow(1);
-	font->SetScale(scale);
+	font->SetScale(margin);
 	font->DrawInit();
 	font->SetTlut(tlut);
 	font->SetColor(color);

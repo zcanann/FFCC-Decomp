@@ -407,7 +407,9 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 	}
 	delete[] temp;
 
-	if ((msgNo < 0x259) || (0x268 < msgNo)) {
+	if ((msgNo >= 0x259) && (msgNo <= 0x268)) {
+		drawPrefix = 0;
+	} else {
 		if (msgNo == 0x209) {
 			suffix = GetSkillStr(0);
 		} else if (msgNo == 0x20D) {
@@ -426,8 +428,6 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 				itemName[0] = static_cast<char>(toupperLatin1(static_cast<unsigned char>(itemName[0])));
 			}
 		}
-	} else {
-		drawPrefix = 0;
 	}
 	if (drawPrefix == 1) {
 		lineStep = FLOAT_80333620;

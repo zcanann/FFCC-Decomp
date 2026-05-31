@@ -3163,14 +3163,18 @@ void CMenuPcs::createBonus()
 			for (int j = i + 1; j < activeCount; j++) {
 				BonusPartySummary& a = s_Rinfo->m_party[leftIndex];
 				BonusPartySummary& b = s_Rinfo->m_party[order[j]];
+				int aTotal = a.m_totalValue;
+				int aArtifact = a.m_artifactValue;
+				int bTotal = b.m_totalValue;
+				int bArtifact = b.m_artifactValue;
+				int aFood = a.m_foodValue;
+				int bFood = b.m_foodValue;
 				unsigned int coin = rand();
 
-				if (a.m_totalValue < b.m_totalValue ||
-				    (a.m_totalValue == b.m_totalValue && a.m_artifactValue < b.m_artifactValue) ||
-				    (a.m_totalValue == b.m_totalValue && a.m_artifactValue == b.m_artifactValue &&
-				        a.m_foodValue < b.m_foodValue) ||
-				    (a.m_totalValue == b.m_totalValue && a.m_artifactValue == b.m_artifactValue &&
-				        a.m_foodValue == b.m_foodValue && (coin & 1) != 0)) {
+				if (aTotal < bTotal ||
+				    (aTotal == bTotal && aArtifact < bArtifact) ||
+				    (aTotal == bTotal && aArtifact == bArtifact && aFood < bFood) ||
+				    (aTotal == bTotal && aArtifact == bArtifact && aFood == bFood && (coin & 1) != 0)) {
 					int temp = leftIndex;
 					order[i] = order[j];
 					order[j] = temp;

@@ -3097,15 +3097,14 @@ void CMapMng::GetAnimRunID(int)
 void CMapMng::SetViewMtx(float (*viewMtx)[4], float (*projMtx)[4])
 {
     float* proj = reinterpret_cast<float*>(projMtx);
+
+    PSMTXCopy(viewMtx, m_viewMtx);
     float scaleY = kMapViewScaleY * proj[5];
     float scaleX = proj[0];
-    Mtx* viewCopy = &m_viewMtx;
-
-    PSMTXCopy(viewMtx, *viewCopy);
     PSMTXScaleApply(
-        *viewCopy, m_scaledViewMtxPrimary, kMapViewScaleXPrimary * scaleX, scaleY, kMapViewScaleZ);
+        m_viewMtx, m_scaledViewMtxPrimary, kMapViewScaleXPrimary * scaleX, scaleY, kMapViewScaleZ);
     PSMTXScaleApply(
-        *viewCopy, m_scaledViewMtxSecondary, kMapViewScaleXSecondary * scaleX, scaleY, kMapViewScaleZ);
+        m_viewMtx, m_scaledViewMtxSecondary, kMapViewScaleXSecondary * scaleX, scaleY, kMapViewScaleZ);
 }
 
 /*

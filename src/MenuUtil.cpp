@@ -1380,11 +1380,17 @@ void CMenuPcs::DrawOptionMenu()
 				gUtil.CalcUV(uv1.x, uv1.y, 0x78, uvY + 0x20, modePanel->m_width, modePanel->m_height);
 				gUtil.RenderTextureQuad(textPanelX, textY + static_cast<float>(y), textPanelWidth, FLOAT_80333570,
 				                        modePanel, &uv0, &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
+				font->SetMargin(kOptionAnimMax);
+				font->SetShadow(1);
+				font->SetScale(kOptionAnimMax);
 				DrawFont(static_cast<int>(textPanelX + (textPanelWidth - font->GetWidth(modeText)) *
 				                                         kMenuCenteringHalfWidth),
 				         static_cast<int>(textY + FLOAT_80333580 + FLOAT_80333634 + static_cast<float>(y)), color, 7,
 				         modeText, kOptionAnimMax, kOptionAnimMax);
 			} else {
+				font->SetMargin(kOptionAnimMax);
+				font->SetShadow(1);
+				font->SetScale(kOptionAnimMax);
 				DrawFont(static_cast<int>(textPanelX + (textPanelWidth - font->GetWidth(modeText)) *
 				                                         kMenuCenteringHalfWidth),
 				         static_cast<int>(textY + FLOAT_80333580 + FLOAT_80333634 + static_cast<float>(y)), color, 7,

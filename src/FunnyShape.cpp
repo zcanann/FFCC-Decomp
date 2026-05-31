@@ -324,6 +324,19 @@ void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE* shape, Vec2d offset, float angle
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CFunnyShape::ClearShapeData()
+{
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x80051020
  * PAL Size: 144b
  * EN Address: TODO

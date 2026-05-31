@@ -2599,9 +2599,16 @@ void CMenuPcs::CalcResultOpenAnim()
 
 		header->count = (short)(1 + activePartyCount * 6);
 
-		InitAnimSprite(&sprites[0], 0x16, 0, 0, 0x280, 0x1c0, 0, 8);
-		sprites[0].depth = 0.0f;
-		sprites[0].scale = 0.0f;
+		sprites[0].kind = 0x16;
+		sprites[0].x = 0;
+		sprites[0].y = 0;
+		sprites[0].w = 0x280;
+		sprites[0].h = 0x1c0;
+		sprites[0].mulX = 0.0f;
+		sprites[0].mulY = 0.0f;
+		sprites[0].startFrame = 0;
+		sprites[0].duration = 8;
+		sprites[0].depth = 1.0f;
 		sprites[0].alpha = 0.0f;
 
 		for (int i = 0; i < activePartyCount; i++) {

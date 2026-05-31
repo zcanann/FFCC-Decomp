@@ -57,6 +57,7 @@ extern float FLOAT_80333590;
 extern float FLOAT_80333594;
 extern float FLOAT_8033359C;
 extern float FLOAT_803335a0;
+extern float FLOAT_803335A4;
 extern float FLOAT_803335A8;
 extern float FLOAT_803335B0;
 extern float FLOAT_803335B4;
@@ -1189,8 +1190,8 @@ void CMenuPcs::DrawOptionMenu()
 
 		float firstScale = secondValue ? 0.8f : 1.46f;
 		float secondScale = secondValue ? 1.46f : 0.8f;
-		float firstY = secondValue ? 185.0f : 183.0f;
-		float secondY = secondValue ? 183.0f : 185.0f;
+		float firstY = secondValue ? FLOAT_803335A4 : FLOAT_803335A4 - FLOAT_803335a0;
+		float secondY = secondValue ? FLOAT_803335A4 - FLOAT_803335a0 : FLOAT_803335A4;
 		int firstTlut = secondValue ? 6 : 0x17;
 		int secondTlut = secondValue ? 0x17 : 6;
 

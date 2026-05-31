@@ -34,6 +34,9 @@ extern "C" const char s_CCameraPcs_FUNNYSHAPE_801D78B4[] = "CCameraPcs(FUNNYSHAP
 extern "C" const char s_CCameraPcs_PART_801D78CC[] = "CCameraPcs(PART)";
 extern "C" const char s_CCameraPcs_SHADOW_801D78E0[] = "CCameraPcs(SHADOW)";
 
+extern const char __RTTI__8CManager_8032E520[];
+extern const char __RTTI__8CProcess_8032E528[];
+
 extern float FLOAT_8032fa30;
 extern float FLOAT_8032fa34;
 extern float FLOAT_8032fa38;
@@ -229,6 +232,15 @@ unsigned int CCameraPcs::m_table[7][0x15C / sizeof(unsigned int)] = {
         0x43,
         0x1,
     }
+};
+unsigned int s_CCameraPcsTablePad0[3] = {
+    reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CManager_8032E520)), 0, 0};
+unsigned int s_CCameraPcsTablePad1[5] = {
+    reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CManager_8032E520)),
+    0,
+    reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CProcess_8032E528)),
+    0,
+    0,
 };
 Vec g_shadow_pos;
 Vec g_shadow_refpos;

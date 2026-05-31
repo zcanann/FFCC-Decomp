@@ -59,8 +59,17 @@ extern float FLOAT_8033359C;
 extern float FLOAT_803335a0;
 extern float FLOAT_803335A4;
 extern float FLOAT_803335A8;
+extern float FLOAT_803335AC;
 extern float FLOAT_803335B0;
 extern float FLOAT_803335B4;
+extern const double DOUBLE_803335B8;
+extern const double DOUBLE_803335C0;
+extern const double DOUBLE_803335C8;
+extern const double DOUBLE_803335D0;
+extern const double DOUBLE_803335D8;
+extern float FLOAT_803335E0;
+extern const double DOUBLE_803335E8;
+extern const double DOUBLE_803335F0;
 extern float FLOAT_803335F8;
 extern float FLOAT_803335FC;
 extern float FLOAT_80333600;
@@ -1241,7 +1250,7 @@ void CMenuPcs::DrawOptionMenu()
 		float leftX = 328.0f;
 		float rightX = (m_optionIndex == 0) ? 544.0f : 552.0f;
 		float selectorX = (m_optionIndex == 0) ? 368.0f : 360.0f;
-		float secondOffset = (m_optionIndex == 0) ? 96.0f : 112.0f;
+		float secondOffset = (m_optionIndex == 0) ? FLOAT_803335AC : FLOAT_803335E0;
 
 		SetUv(uv0, kOptionAnimMin, kOptionAnimMin);
 		SetUv(uv1, kMenuCenteringHalfWidth, kOptionAnimMax);
@@ -1261,8 +1270,10 @@ void CMenuPcs::DrawOptionMenu()
 		                        FLOAT_803335B0, FLOAT_803335B4, selectorTexture, &uv0, &uv1, &color,
 		                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
-		float firstScale = secondValue ? 0.8f : 1.46f;
-		float secondScale = secondValue ? 1.46f : 0.8f;
+		const double optionScale = ((Game.m_gameWork.m_languageId == 4) || (Game.m_gameWork.m_languageId == 5)) ?
+		                           DOUBLE_803335B8 : DOUBLE_803335C0;
+		float firstScale = static_cast<float>(optionScale);
+		float secondScale = static_cast<float>(optionScale);
 		float firstY = secondValue ? FLOAT_803335A4 : FLOAT_803335A4 - FLOAT_803335a0;
 		float secondY = secondValue ? FLOAT_803335A4 - FLOAT_803335a0 : FLOAT_803335A4;
 		int firstTlut = secondValue ? 6 : 0x17;

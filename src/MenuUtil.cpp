@@ -764,7 +764,7 @@ void CMenuPcs::CalcOptionMenu()
 {
 	unsigned char* const self = reinterpret_cast<unsigned char*>(this);
 	unsigned short press = static_cast<unsigned short>(GetMenuPress());
-	bool optionChanged = false;
+	int optionChanged = 0;
 
 	if (m_optionMenuState == 0) {
 		m_optionOpenAnim += kOptionOpenAnimStep;
@@ -914,7 +914,7 @@ void CMenuPcs::CalcOptionMenu()
 		}
 
 		Sound.PlaySe(1, 0x40, 0x7F, 0);
-		optionChanged = true;
+		optionChanged = 1;
 	} else if ((press & 2) != 0) {
 		switch (m_optionIndex) {
 		case 0:
@@ -956,7 +956,7 @@ void CMenuPcs::CalcOptionMenu()
 		}
 
 		Sound.PlaySe(1, 0x40, 0x7F, 0);
-		optionChanged = true;
+		optionChanged = 1;
 	}
 
 	if (m_optionIndex == 4) {

@@ -31,6 +31,7 @@ extern float FLOAT_8032fc3c;
 extern float FLOAT_8032fc40;
 extern float FLOAT_8032fc44;
 extern float FLOAT_8032fc60;
+extern const double DOUBLE_8032fc68 = 4503599627370496.0;
 extern const float FLOAT_8032fc70 = 100000.0f;
 extern const float FLOAT_8032fc74 = 360.0f;
 extern const float FLOAT_8032fc78 = 4.999999873689376e-06f;
@@ -42,7 +43,6 @@ extern float FLOAT_8032fc88;
 extern float FLOAT_8032fc8c;
 extern float FLOAT_8032fc94;
 float FLOAT_8032ed10;
-extern const double DOUBLE_8032fc68 = 4503599627370496.0;
 extern _GXColor s_mapLightAlphaColor;
 
 static inline float CameraPosX() { return CameraPcs.m_positionX; }
@@ -646,12 +646,11 @@ void CLightPcs::SetDiffuse(unsigned long idx, _GXColor color, Vec* dir, int mode
  */
 void CLightPcs::SetPosition(CLightPcs::TARGET target, Vec* pos, unsigned long mask)
 {
-    char* lightPcs = (char*)this;
-    *(u32*)(lightPcs + 0xb0) = *(u32*)(lightPcs + 0xac);
-    *(u32*)(lightPcs + 0xb4) = 0;
+    m_loadedLightCount = m_numDiffuse;
+    m_loadedLightMask = 0;
 
     if (mask == 0) {
-        unsigned long chanMask = *(u32*)(lightPcs + 0xb4);
+        unsigned long chanMask = m_loadedLightMask;
         GXSetNumChans((u8)1);
         if ((int)target != 1) {
             GXSetChanCtrl((GXChannelID)0, (u8)1, (GXColorSrc)0, (GXColorSrc)1, chanMask, (GXDiffuseFn)2, (GXAttnFn)1);
@@ -662,31 +661,31 @@ void CLightPcs::SetPosition(CLightPcs::TARGET target, Vec* pos, unsigned long ma
         return;
     }
 
-    char* lightSlot = lightPcs + 0xbc;
-    *(u32*)(lightPcs + 0xb4) = (1 << *(u32*)(lightPcs + 0xb0)) - 1;
+    m_loadedLightMask = (1 << m_loadedLightCount) - 1;
 
-    for (u32 i = 0; i < *(u32*)(lightPcs + 0xac); i++, lightSlot += 0xb0) {
-        GXLoadLightObjImm((GXLightObj*)(lightSlot + 0x6c), (GXLightID)(1 << i));
+    CLight* diffuseLight = m_diffuseLights;
+    for (u32 i = 0; i < m_numDiffuse; i++, diffuseLight++) {
+        GXLoadLightObjImm(&diffuseLight->m_gxLightObj, (GXLightID)(1 << i));
     }
 
     if (pos != nullptr) {
-        char* bumpSlot = lightPcs + 0x63c;
-        for (u32 i = 0; i < *(u32*)(lightPcs + 0xb8); i++, bumpSlot += 0xb0) {
-            if ((*(u8*)((int)target + (int)bumpSlot + 0x60) != 0) && ((*(u32*)(bumpSlot + 0x34) & mask) != 0) &&
-                ((double)PSVECSquareDistance(pos, (Vec*)(bumpSlot + 4)) < (double)*(float*)(bumpSlot + 0xac))) {
-                CLight* light = reinterpret_cast<CLight*>(bumpSlot);
-                GXInitLightColor(&light->m_gxLightObj, light->m_targetColor[target]);
-                GXLoadLightObjImm((GXLightObj*)(bumpSlot + 0x6c), (GXLightID)(1 << *(u32*)(lightPcs + 0xb0)));
-                *(u32*)(lightPcs + 0xb4) |= 1 << *(u32*)(lightPcs + 0xb0);
-                *(u32*)(lightPcs + 0xb0) += 1;
-                if (*(u32*)(lightPcs + 0xb0) >= 8) {
+        CLight* sceneLight = m_sceneLights;
+        for (u32 i = 0; i < m_sceneLightCount; i++, sceneLight++) {
+            if ((sceneLight->m_targetEnable[target] != 0) && ((sceneLight->m_partMask & mask) != 0) &&
+                ((double)PSVECSquareDistance(pos, reinterpret_cast<Vec*>(&sceneLight->m_position)) <
+                 (double)sceneLight->m_unkAC)) {
+                GXInitLightColor(&sceneLight->m_gxLightObj, sceneLight->m_targetColor[target]);
+                GXLoadLightObjImm(&sceneLight->m_gxLightObj, (GXLightID)(1 << m_loadedLightCount));
+                m_loadedLightMask |= 1 << m_loadedLightCount;
+                m_loadedLightCount += 1;
+                if (m_loadedLightCount >= 8) {
                     break;
                 }
             }
         }
     }
 
-    unsigned long chanMask = *(u32*)(lightPcs + 0xb4);
+    unsigned long chanMask = m_loadedLightMask;
     GXSetNumChans((u8)1);
     if ((int)target != 1) {
         GXSetChanCtrl((GXChannelID)0, (u8)1, (GXColorSrc)0, (GXColorSrc)1, chanMask, (GXDiffuseFn)2, (GXAttnFn)1);

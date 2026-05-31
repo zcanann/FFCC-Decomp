@@ -451,11 +451,11 @@ static inline void DrawBonusMcWinOverlay(CMenuPcs* menu, int statePtr)
 {
 	int auxPtr = GetBonusMenuMembers(menu).m_bonusAuxPtr;
 
+	menu->DrawInit();
 	if (*(short*)(auxPtr + 10) == 3) {
 		return;
 	}
 
-	menu->DrawInit();
 	menu->DrawMcWin(-1, 1);
 	if (*(short*)(auxPtr + 10) == 1) {
 		menu->DrawMcWinMess(0x18, 1);

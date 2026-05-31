@@ -2258,9 +2258,24 @@ void CCameraPcs::SetIsAbsolute(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CCameraPcs::SetWorldMapMatrix(float (*) [4])
+void CCameraPcs::SetWorldMapMatrix(float (*mtx) [4])
 {
-	// TODO
+	PSMTXCopy(mtx, m_worldMapMatrix);
+	PSMTXInverse(mtx, m_cameraWorldMtx);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B95FC
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CCameraPcs::GetWorldMapMatrix(float (*mtx) [4])
+{
+	PSMTXCopy(m_worldMapMatrix, mtx);
 }
 
 /*

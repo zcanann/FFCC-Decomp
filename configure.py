@@ -749,7 +749,7 @@ config.libs = [
             Object(NonMatching, "prgobj.cpp", extra_cflags=["-RTTI on", "-str reuse,pool,readonly"]),
             Object(NonMatching, "quadobj.cpp"),
             Object(NonMatching, "ref.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
-            Object(NonMatching, "ringmenu.cpp"),
+            Object(NonMatching, "ringmenu.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
             Object(NonMatching, "shopmenu.cpp"),
             Object(NonMatching, "singmenu.cpp"),
             Object(NonMatching, "sound.cpp", extra_cflags=["-RTTI on"]),

@@ -1052,6 +1052,7 @@ ringmenu.cpp:
 	.text       start:0x800A2DD4 end:0x800A538C
 	.rodata     start:0x801DA01C end:0x801DA048
 	.data       start:0x8020FAE8 end:0x8020FB0C
+	.sdata      start:0x8032E818 end:0x8032E830
 
 pppYmMelt.cpp:
 	extab       start:0x80007FC8 end:0x80007FE8

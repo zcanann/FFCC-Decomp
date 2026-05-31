@@ -382,7 +382,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 	font->SetColor(color);
 	font->SetScale(kOptionAnimMax);
 
-	if ((0 <= msgNo) && (msgNo < 0x269)) {
+	if ((0 <= msgNo) && (msgNo <= 0x268)) {
 		firstLine = msgNo * 3 + 0x1F5;
 	}
 

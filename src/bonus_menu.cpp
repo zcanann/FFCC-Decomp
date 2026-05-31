@@ -2208,7 +2208,7 @@ void CMenuPcs::DrawResultCountAnim()
 					}
 
 					float digitW = (float)sprite->w;
-					float digitX = ((3.0f * digitW) - ((float)digitCount * digitW)) * 0.5f + (float)sprite->x;
+					float digitX = ((3.0f * digitW) - (float)(digitCount * sprite->w)) * 0.5f + (float)sprite->x;
 					for (int digitIndex = 0; digitIndex < digitCount; digitIndex++) {
 						MenuPcs.DrawRect(0, digitX, (float)sprite->y, digitW, (float)sprite->h,
 						    digitW * (float)digits[digitIndex], sprite->mulY,

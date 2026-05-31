@@ -2633,9 +2633,9 @@ unsigned int CMenuPcs::CmdClose1()
 		const float t = static_cast<float>(timer) * 0.125f;
 		*reinterpret_cast<float*>(list + selected * 0x20 + 0x0c) = t;
 
-		if (*reinterpret_cast<s16*>(caravanWork + (selected + 1) * 2 + 0x214) < 0) {
+		if (*reinterpret_cast<s16*>(caravanWork + (selected + 1) * 2 + 0x214) == -1) {
 			*reinterpret_cast<float*>(list + (selected + 1) * 0x20 + 0x0c) = t;
-			if (*reinterpret_cast<s16*>(caravanWork + (selected + 2) * 2 + 0x214) < 0) {
+			if (*reinterpret_cast<s16*>(caravanWork + (selected + 2) * 2 + 0x214) == -1) {
 				*reinterpret_cast<float*>(list + (selected + 2) * 0x20 + 0x0c) = t;
 			}
 		}
@@ -2664,7 +2664,7 @@ unsigned int CMenuPcs::CmdClose1()
 		}
 	} else if (state == 1) {
 		s32 uniteIdx = 0;
-		s32 topCount = static_cast<s32>(list[0]);
+		s32 topCount = s_unitePanelCount;
 		for (; uniteIdx < topCount; uniteIdx++) {
 			if (list[uniteIdx * 0x20 + 2] == selected) {
 				break;
@@ -2674,9 +2674,9 @@ unsigned int CMenuPcs::CmdClose1()
 		done = static_cast<u32>(UniteCloseAnim(uniteIdx) != 0);
 		if (done != 0) {
 			s32 ununiteCount = 1;
-			if (*reinterpret_cast<s16*>(caravanWork + (selected + 1) * 2 + 0x214) < 0) {
+			if (*reinterpret_cast<s16*>(caravanWork + (selected + 1) * 2 + 0x214) == -1) {
 				ununiteCount = 2;
-				if (*reinterpret_cast<s16*>(caravanWork + (selected + 2) * 2 + 0x214) < 0) {
+				if (*reinterpret_cast<s16*>(caravanWork + (selected + 2) * 2 + 0x214) == -1) {
 					ununiteCount = 3;
 				}
 			}
@@ -2694,7 +2694,7 @@ unsigned int CMenuPcs::CmdClose1()
 		}
 	} else if (state == 3) {
 		s32 uniteIdx = 0;
-		s32 topCount = static_cast<s32>(list[0]);
+		s32 topCount = s_unitePanelCount;
 		for (; uniteIdx < topCount; uniteIdx++) {
 			if (list[uniteIdx * 0x20 + 2] == selected) {
 				break;
@@ -2707,9 +2707,9 @@ unsigned int CMenuPcs::CmdClose1()
 			ChkUnite(static_cast<int>(selected), combo);
 
 			s32 ununiteCount = 1;
-			if (*reinterpret_cast<s16*>(caravanWork + (selected + 1) * 2 + 0x214) < 0) {
+			if (*reinterpret_cast<s16*>(caravanWork + (selected + 1) * 2 + 0x214) == -1) {
 				ununiteCount = 2;
-				if (*reinterpret_cast<s16*>(caravanWork + (selected + 2) * 2 + 0x214) < 0) {
+				if (*reinterpret_cast<s16*>(caravanWork + (selected + 2) * 2 + 0x214) == -1) {
 					ununiteCount = 3;
 				}
 			}

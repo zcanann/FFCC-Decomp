@@ -245,8 +245,9 @@ void CCharaPcs::drawViewer()
         TextureMan.SetTexture(GX_TEXMAP0, texture);
         unsigned int width = texture->m_width;
         unsigned int height = texture->m_height;
-        PSMTXScale(texMtx, kCharaViewerUnitStep / static_cast<float>(width),
-                   kCharaViewerUnitStep / static_cast<float>(height), kCharaViewerUnitStep);
+        PSMTXScale(texMtx, LoadFloat(kCharaViewerUnitStep) / static_cast<float>(width),
+                   LoadFloat(kCharaViewerUnitStep) / static_cast<float>(height),
+                   LoadFloat(kCharaViewerUnitStep));
         GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX2x4);
         GXSetNumTexGens(1);
         GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
@@ -293,19 +294,19 @@ void CCharaPcs::drawViewer()
         color.b = 0x80;
         color.a = 0x20;
         GXLoadPosMtxImm(cameraMtx, 0);
-        float gridSpacing = kCharaViewerGridSpacing;
-        float gridMin = kCharaViewerGridMin;
-        float gridMax = kCharaViewerGridMax;
+        float gridSpacing = LoadFloat(kCharaViewerGridSpacing);
+        float gridMin = LoadFloat(kCharaViewerGridMin);
+        float gridMax = LoadFloat(kCharaViewerGridMax);
 
         for (int i = -10; i <= 10; i++) {
             color.a = (i == 0) ? 0x60 : 0x20;
             GXSetChanMatColor(GX_COLOR0A0, color);
             GXBegin((GXPrimitive)0xA8, GX_VTXFMT0, 4);
             float x = (float)i * gridSpacing;
-            GXPosition3f32(x, kCharaViewerZero, gridMin);
-            GXPosition3f32(x, kCharaViewerZero, gridMax);
-            GXPosition3f32(gridMax, kCharaViewerZero, x);
-            GXPosition3f32(gridMin, kCharaViewerZero, x);
+            GXPosition3f32(x, LoadFloat(kCharaViewerZero), gridMin);
+            GXPosition3f32(x, LoadFloat(kCharaViewerZero), gridMax);
+            GXPosition3f32(gridMax, LoadFloat(kCharaViewerZero), x);
+            GXPosition3f32(gridMin, LoadFloat(kCharaViewerZero), x);
         }
     }
 
@@ -553,23 +554,23 @@ void CCharaPcs::calcViewer()
 
     float frameAdvance;
     if (self->m_viewerStepMode != 0) {
-        float offsetA = kCharaViewerZero;
+        float offsetA = LoadFloat(kCharaViewerZero);
         if ((triggerButtons & 0x100) != 0) {
-            offsetA = kCharaViewerUnitStep;
+            offsetA = LoadFloat(kCharaViewerUnitStep);
         }
-        float offsetB = kCharaViewerZero;
+        float offsetB = LoadFloat(kCharaViewerZero);
         if ((triggerButtons & 0x200) != 0) {
-            offsetB = kCharaViewerFineStep;
+            offsetB = LoadFloat(kCharaViewerFineStep);
         }
-        frameAdvance = kCharaViewerZero + offsetA + offsetB;
+        frameAdvance = LoadFloat(kCharaViewerZero) + offsetA + offsetB;
     } else {
-        float deltaY = kCharaViewerUnitStep;
+        float deltaY = LoadFloat(kCharaViewerUnitStep);
         if ((heldButtons & 0x200) != 0) {
-            deltaY = kCharaViewerFineStep;
+            deltaY = LoadFloat(kCharaViewerFineStep);
         }
-        float speedScale = kCharaViewerUnitStep;
+        float speedScale = LoadFloat(kCharaViewerUnitStep);
         if ((heldButtons & 0x100) != 0) {
-            speedScale = kCharaViewerLerpScale;
+            speedScale = LoadFloat(kCharaViewerLerpScale);
         }
         frameAdvance = deltaY * speedScale;
     }
@@ -580,7 +581,7 @@ void CCharaPcs::calcViewer()
             continue;
         }
 
-        float translateX = kCharaViewerZero;
+        float translateX = LoadFloat(kCharaViewerZero);
         if ((i != 0) && (self->m_viewerModel[0] != 0)) {
             int frameShift = ViewerModelFrameShift(self->m_viewerModel[0]);
             translateX = static_cast<float>((1 << (15 - frameShift)) / 8);
@@ -642,18 +643,18 @@ void CCharaPcs::calcViewer()
             init = 1;
         }
         if (bFirst != 0) {
-            srt.transZ = kCharaViewerZero;
-            srt.transY = kCharaViewerZero;
-            srt.rotZ = kCharaViewerZero;
-            srt.rotY = kCharaViewerZero;
-            srt.rotX = kCharaViewerZero;
-            srt.scaleZ = kCharaViewerUnitStep;
-            srt.scaleY = kCharaViewerUnitStep;
-            srt.scaleX = kCharaViewerUnitStep;
+            srt.transZ = LoadFloat(kCharaViewerZero);
+            srt.transY = LoadFloat(kCharaViewerZero);
+            srt.rotZ = LoadFloat(kCharaViewerZero);
+            srt.rotY = LoadFloat(kCharaViewerZero);
+            srt.rotX = LoadFloat(kCharaViewerZero);
+            srt.scaleZ = LoadFloat(kCharaViewerUnitStep);
+            srt.scaleY = LoadFloat(kCharaViewerUnitStep);
+            srt.scaleX = LoadFloat(kCharaViewerUnitStep);
             bFirst = 0;
         }
 
-        float rotY = kCharaViewerZero;
+        float rotY = LoadFloat(kCharaViewerZero);
         if (Pad._452_4_ == 0) {
             unsigned int padIndex = (~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 31) & 4U);
             rotY = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x2C + padIndex * 0x54);

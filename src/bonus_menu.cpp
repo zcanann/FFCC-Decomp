@@ -2796,6 +2796,47 @@ void CMenuPcs::CalcResultOpenAnim()
 		}
 	}
 
+	Mtx scaleMtx;
+	Mtx rotXMtx;
+	Mtx rotYMtx;
+	for (int i = 0; i < activePartyCount * 2; i++) {
+		CCharaPcs::CHandle* handle;
+		int tribeId;
+		if (i < activePartyCount) {
+			handle = s_Rinfo->m_party[i].m_partyHandle;
+			tribeId = s_Rinfo->m_party[i].m_tribeId;
+			float modelScale = s_BonusModelScale[tribeId];
+			PSMTXScale(scaleMtx, modelScale, modelScale, modelScale);
+		} else {
+			handle = GetBonusDisplayHandleSlots(this)[i - activePartyCount];
+			PSMTXScale(scaleMtx, 1.0f, 1.0f, 1.0f);
+		}
+
+		if (i / activePartyCount == 1) {
+			PSMTXRotRad(rotXMtx, 'x', 0.2617993950843811f);
+			PSMTXConcat(scaleMtx, rotXMtx, scaleMtx);
+			PSMTXRotRad(rotYMtx, 'y', 0.01745329238474369f * *reinterpret_cast<float*>(statePtr));
+			PSMTXConcat(scaleMtx, rotYMtx, scaleMtx);
+		}
+
+		if (i < activePartyCount) {
+			scaleMtx[0][3] = 0.0f;
+			scaleMtx[2][3] = 0.0f;
+			scaleMtx[1][3] = s_BonusModelYPos[tribeId];
+		} else {
+			scaleMtx[0][3] = 0.0f;
+			scaleMtx[1][3] = 0.0f;
+			scaleMtx[2][3] = 0.0f;
+		}
+
+		CChara::CModel* model = handle->m_model;
+		model->m_flags10C = (model->m_flags10C & 0x7F) | 0x80;
+		model->SetMatrix(scaleMtx);
+		model->CalcMatrix();
+		model->CalcSkin();
+		model->m_lightAlpha = sprites[modelBase + i].alpha;
+	}
+
 	if (doneCount == (int)header->count) {
 		header->finished = 1;
 	}

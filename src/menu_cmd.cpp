@@ -2663,7 +2663,7 @@ unsigned int CMenuPcs::CmdClose1()
 		s32 uniteIdx = 0;
 		s32 topCount = s_unitePanelCount;
 		for (; uniteIdx < topCount; uniteIdx++) {
-			if (list[uniteIdx * 0x20 + 2] == selected) {
+			if (s_UniteTop[uniteIdx] == selected) {
 				break;
 			}
 		}
@@ -2693,7 +2693,7 @@ unsigned int CMenuPcs::CmdClose1()
 		s32 uniteIdx = 0;
 		s32 topCount = s_unitePanelCount;
 		for (; uniteIdx < topCount; uniteIdx++) {
-			if (list[uniteIdx * 0x20 + 2] == selected) {
+			if (s_UniteTop[uniteIdx] == selected) {
 				break;
 			}
 		}

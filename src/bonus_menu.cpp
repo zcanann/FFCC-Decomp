@@ -739,7 +739,7 @@ void CMenuPcs::ArtiBaseInfoInit(CMenuPcs::Sprt2* a, CMenuPcs::Sprt2* b)
  */
 void CMenuPcs::DrawArtiBase(CMenuPcs::Sprt2* sprt, float alpha)
 {
-	if (alpha <= 0.0f) {
+	if (alpha <= 0.0) {
 		return;
 	}
 

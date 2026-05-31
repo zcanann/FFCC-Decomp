@@ -1,11 +1,10 @@
 #ifndef _FFCC_PPP_YMMOVEPARABOLA_H_
 #define _FFCC_PPP_YMMOVEPARABOLA_H_
 
-#include "types.h"
+#include "ffcc/partMng.h"
 
 struct pppYmMoveParabola {
-    u8 _pad0x00[0xC];
-    s32 m_graphId;
+    _pppPObject m_object;
 };
 
 struct pppYmMoveParabolaUnkB {

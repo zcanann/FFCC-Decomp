@@ -117,6 +117,21 @@ static inline void PushF32(CFlatRuntime2* runtime, CFlatRuntime::CObject* object
 	PushValue(runtime, object, *reinterpret_cast<int*>(&value));
 }
 
+#define CallEngineFunc48Arg(engineObject, arg0) \
+	reinterpret_cast<unsigned int (*)(void*, unsigned int)>((*reinterpret_cast<void***>(reinterpret_cast<u8*>(engineObject) + 0x48))[0x12])((engineObject), (arg0))
+#define CallEngineFunc44Arg2(engineObject, arg0, arg1) \
+	reinterpret_cast<void (*)(void*, unsigned int, unsigned int)>((*reinterpret_cast<void***>(reinterpret_cast<u8*>(engineObject) + 0x48))[0x11])((engineObject), (arg0), (arg1))
+#define FindRuntimeObject(runtime, objectId) \
+	reinterpret_cast<CGObject* (*)(CFlatRuntime2*, unsigned int)>((*reinterpret_cast<void***>(runtime))[15])((runtime), (objectId))
+#define RuntimeString(runtime, index) \
+	(*reinterpret_cast<char**>(reinterpret_cast<u8*>(runtime) + 0x28) + (*reinterpret_cast<unsigned short**>(reinterpret_cast<u8*>(runtime) + 0x2C))[(index)])
+#define ScriptPlayerIndex(engineObject) \
+	(ScriptCaravan(engineObject)->m_joybusCaravanId)
+#define BattleRingMenu(playerIndex) \
+	(*reinterpret_cast<CRingMenu**>(reinterpret_cast<u8*>(&MenuPcs) + 0x13C + (playerIndex) * 4))
+#define PushValue(runtime, object, value) \
+	reinterpret_cast<CFlatRuntime*>(runtime)->push((object), (value))
+
 static inline void StoreU16(CFlatRuntime::CStack* stack, u8* base, int offset, int setMode)
 {
 	unsigned short* value = reinterpret_cast<unsigned short*>(base + offset);

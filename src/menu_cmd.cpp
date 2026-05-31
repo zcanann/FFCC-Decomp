@@ -1173,6 +1173,56 @@ void CMenuPcs::CmdDraw()
 		entry += 0x20;
 	}
 
+	if (cmdMode == 2) {
+		s16* panel = reinterpret_cast<s16*>(
+		    GetCmdListBase(this) +
+		    (*reinterpret_cast<s16*>(GetCmdListBase(this) + 2) + 3) * 0x40 + 8);
+		SetTexture(static_cast<CMenuPcs::TEX>(*reinterpret_cast<s32*>(panel + 0xE)));
+
+		GXColor panelColor;
+		panelColor.r = 0xFF;
+		panelColor.g = 0xFF;
+		panelColor.b = 0xFF;
+		panelColor.a = static_cast<u8>(FLOAT_80332acc * *reinterpret_cast<float*>(panel + 8));
+		GXSetChanMatColor(GX_COLOR0A0, panelColor);
+		DrawRect(
+		    0, static_cast<float>(panel[0]), static_cast<float>(panel[1]),
+		    static_cast<float>(panel[2]), static_cast<float>(panel[3]),
+		    *reinterpret_cast<float*>(panel + 4), *reinterpret_cast<float*>(panel + 6),
+		    FLOAT_80332a70, *reinterpret_cast<float*>(panel + 10), 0.0f);
+
+		CFont* choiceFont = GetMenuCmdMembers(this).m_helpFont;
+		choiceFont->SetMargin(FLOAT_80332a70);
+		choiceFont->SetShadow(1);
+		choiceFont->SetScale(FLOAT_80332ad8);
+		choiceFont->DrawInit();
+		choiceFont->SetTlut(7);
+		choiceFont->SetColor(panelColor);
+
+		const s32 choices = (DOUBLE_80332a58 == static_cast<double>(*reinterpret_cast<float*>(panel + 10))) ? 2 : 3;
+		const float pitch = static_cast<float>(
+		    ((static_cast<float>(panel[3]) * *reinterpret_cast<float*>(panel + 10)) - DOUBLE_80332b20) /
+		    static_cast<float>(choices));
+		for (s32 choice = 0; choice < choices; choice++) {
+			const char* text;
+			if (choice == 0) {
+				text = GetMenuStr(0x0D);
+			} else if ((choice == 1) && (choices == 3)) {
+				text = GetMenuStr(0x0C);
+			} else {
+				text = GetMenuStr(0x37);
+			}
+			choiceFont->GetWidth(text);
+			choiceFont->SetPosX(static_cast<float>(panel[0] + 0x18));
+			choiceFont->SetPosY(
+			    ((pitch - static_cast<float>(DOUBLE_80332af8)) * static_cast<float>(DOUBLE_80332a60)) +
+			    ((pitch * static_cast<float>(choice)) + static_cast<float>(panel[1] + 8)) -
+			    FLOAT_80332ae8);
+			choiceFont->Draw(text);
+		}
+		DrawInit();
+	}
+
 	if ((cmdMode == 1) && (*reinterpret_cast<s16*>(reinterpret_cast<u8*>(cmdState) + 0x12) == 1)) {
 		const s16* letter = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
 		const float mark = CalcListPos(cmdState[0x1A], letter[0], 1);

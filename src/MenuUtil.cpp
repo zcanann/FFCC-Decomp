@@ -384,7 +384,6 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 	const char* suffix = 0;
 	char itemName[260];
 	char scratch[0x100];
-	itemName[0] = '\0';
 
 	font->SetMargin(FLOAT_803335a0);
 	font->SetShadow(1);

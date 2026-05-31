@@ -487,7 +487,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 	int detailY = static_cast<int>(lineStep + static_cast<float>(static_cast<int>(baseY)));
 	font->SetPosY(static_cast<float>(detailY));
 
-	if ((flags & 0x1000) == 0) {
+	if ((*reinterpret_cast<u16*>(itemBase + 4) & 0x1000) == 0) {
 		strcat(scratch, sMenuUtilSpaceText);
 		font->Draw(scratch);
 

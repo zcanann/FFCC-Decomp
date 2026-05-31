@@ -768,7 +768,8 @@ void CMenuPcs::DrawArtiBase(CMenuPcs::Sprt2* sprt, float alpha)
 	for (int i = 0; i < 8; i++) {
 		if (*(short*)(statePtr + 0x1c) == 4) {
 			float rgb = 1.0f;
-			unsigned int mask = s_Rinfo->pad_0008 | s_Rinfo->m_party[partyIndex].m_ownedArtifactMask | s_Rinfo->m_missingArtifactMask;
+			unsigned int mask = (int)(signed char)s_Rinfo->pad_0008 | s_Rinfo->m_party[partyIndex].m_ownedArtifactMask |
+			    (int)(signed char)s_Rinfo->m_missingArtifactMask;
 			if ((mask & (1 << i)) != 0) {
 				rgb = 0.5f;
 			}

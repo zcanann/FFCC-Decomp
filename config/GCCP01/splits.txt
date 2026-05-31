@@ -1486,7 +1486,7 @@ partyobj.cpp:
 	extab       start:0x8000944C end:0x800095FC
 	extabindex  start:0x8001033C end:0x800105C4
 	.text       start:0x8011A574 end:0x80124998
-	.data       start:0x802116A4 end:0x80211848
+	.data       start:0x802116A4 end:0x80211D88
 	.bss        start:0x803001D8 end:0x80300268
 	.sdata      start:0x8032E9A0 end:0x8032E9D0
 	.sdata2     start:0x80331A58 end:0x80331B18

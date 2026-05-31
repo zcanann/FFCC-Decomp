@@ -96,6 +96,7 @@ p_usb.cpp:
 	.rodata     start:0x801D6D08 end:0x801D6D24
 	.data       start:0x801E8690 end:0x801E8814
 	.bss        start:0x80244028 end:0x8024413C
+	.sdata      start:0x8032E440 end:0x8032E458
 	.sbss       start:0x8032EC68 end:0x8032EC70
 	.sdata2     start:0x8032F810 end:0x8032F818
 
@@ -106,6 +107,7 @@ pad.cpp:
 	.ctors      start:0x801D53C0 end:0x801D53C4
 	.data       start:0x801E8818 end:0x801E8838
 	.bss        start:0x80244140 end:0x8024433C
+	.sdata      start:0x8032E458 end:0x8032E468
 	.sdata2     start:0x8032F818 end:0x8032F840
 
 stopwatch.cpp:
@@ -122,6 +124,7 @@ system.cpp:
 	.rodata     start:0x801D6D80 end:0x801D6F90
 	.data       start:0x801E8838 end:0x801E8898
 	.bss        start:0x80244340 end:0x802455BC
+	.sdata      start:0x8032E468 end:0x8032E478
 	.sdata2     start:0x8032F868 end:0x8032F874
 
 usb.cpp:

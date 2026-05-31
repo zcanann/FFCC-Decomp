@@ -486,15 +486,15 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 	font->SetPosY(static_cast<float>(detailY));
 
 		if ((*reinterpret_cast<u16*>(itemBase + 4) & 0x1000) != 0) {
-			unsigned int attr = *reinterpret_cast<u16*>(itemBase + 8);
-			if ((attr >= 1) && (attr <= 0x13)) {
-				strcpy(scratch, GetAttrStr(attr));
+			if ((*reinterpret_cast<u16*>(itemBase + 8) >= 1) && (*reinterpret_cast<u16*>(itemBase + 8) <= 0x13)) {
+				strcpy(scratch, GetAttrStr(*reinterpret_cast<u16*>(itemBase + 8)));
 				font->SetTlut(4);
 				font->Draw(scratch);
 				int valueX = static_cast<int>(FLOAT_8033357c + (FLOAT_803335a0 + font->GetWidth(scratch)));
 				font->SetPosX(static_cast<float>(valueX));
 				font->SetTlut(9);
 
+				unsigned int attr = *reinterpret_cast<u16*>(itemBase + 8);
 				if ((attr >= 1) && (attr <= 8)) {
 					sprintf(scratch, sMenuUtilStringFormat, sMenuUtilPlusOneText);
 				} else {

@@ -1,10 +1,5 @@
 #include "ffcc/menu.h"
 
-#include <PowerPC_EABI_Support/Runtime/New.h>
-
-extern "C" void* __vt__5CMenu[];
-extern "C" CRef* __dt__4CRefFv(CRef*, short);
-
 /*
  * --INFO--
  * PAL Address: 0x8009b3b4
@@ -108,17 +103,8 @@ void CMenu::Create()
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" CMenu* __dt__5CMenuFv(CMenu* menu, short shouldDelete)
+CMenu::~CMenu()
 {
-	if (menu != 0) {
-		*(void***)menu = __vt__5CMenu;
-		__dt__4CRefFv(menu, 0);
-		if (0 < shouldDelete) {
-			operator delete(menu);
-		}
-	}
-
-	return menu;
 }
 
 /*

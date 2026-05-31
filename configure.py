@@ -545,7 +545,7 @@ config.libs = [
             Object(NonMatching, "ME_USB_process.cpp", cflags=[*cflags_game_cpp_exceptions, "-sdata 0"]),
             Object(NonMatching, "memory.cpp"),
             Object(NonMatching, "memorycard.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse"]),
-            Object(Matching, "menu.cpp"),
+            Object(NonMatching, "menu.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
             Object(NonMatching, "menu_arti.cpp"),
             Object(NonMatching, "menu_cmd.cpp", extra_cflags=["-str reuse,pool,readonly"]),
             Object(NonMatching, "menu_compa.cpp"),

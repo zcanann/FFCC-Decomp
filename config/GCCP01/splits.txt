@@ -1020,13 +1020,15 @@ mes.cpp:
 	extab       start:0x80007D38 end:0x80007D78
 	extabindex  start:0x8000E128 end:0x8000E188
 	.text       start:0x800981F0 end:0x8009B3B4
-	.data       start:0x8020F758 end:0x8020F998
+	.data       start:0x8020F758 end:0x8020F968
 	.bss        start:0x802EAA60 end:0x802EAAB0
 
 menu.cpp:
 	extab       start:0x80007D78 end:0x80007DA0
 	extabindex  start:0x8000E188 end:0x8000E1C4
 	.text       start:0x8009B3B4 end:0x8009B4E4
+	.data       start:0x8020F968 end:0x8020F998
+	.sdata      start:0x8032E7D8 end:0x8032E7E8
 
 mesmenu.cpp:
 	extab       start:0x80007DA0 end:0x80007E04

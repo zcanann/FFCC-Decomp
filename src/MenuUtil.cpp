@@ -59,8 +59,17 @@ extern float FLOAT_8033359C;
 extern float FLOAT_803335a0;
 extern float FLOAT_803335A4;
 extern float FLOAT_803335A8;
+extern float FLOAT_803335AC;
 extern float FLOAT_803335B0;
 extern float FLOAT_803335B4;
+extern const double DOUBLE_803335B8;
+extern const double DOUBLE_803335C0;
+extern const double DOUBLE_803335C8;
+extern const double DOUBLE_803335D0;
+extern const double DOUBLE_803335D8;
+extern float FLOAT_803335E0;
+extern const double DOUBLE_803335E8;
+extern const double DOUBLE_803335F0;
 extern float FLOAT_803335F8;
 extern float FLOAT_803335FC;
 extern float FLOAT_80333600;
@@ -1241,7 +1250,7 @@ void CMenuPcs::DrawOptionMenu()
 		float leftX = 328.0f;
 		float rightX = (m_optionIndex == 0) ? 544.0f : 552.0f;
 		float selectorX = (m_optionIndex == 0) ? 368.0f : 360.0f;
-		float secondOffset = (m_optionIndex == 0) ? 96.0f : 112.0f;
+		float secondOffset = (m_optionIndex == 0) ? FLOAT_803335AC : FLOAT_803335E0;
 
 		SetUv(uv0, kOptionAnimMin, kOptionAnimMin);
 		SetUv(uv1, kMenuCenteringHalfWidth, kOptionAnimMax);
@@ -1261,8 +1270,10 @@ void CMenuPcs::DrawOptionMenu()
 		                        FLOAT_803335B0, FLOAT_803335B4, selectorTexture, &uv0, &uv1, &color,
 		                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
-		float firstScale = secondValue ? 0.8f : 1.46f;
-		float secondScale = secondValue ? 1.46f : 0.8f;
+		const double optionScale = ((Game.m_gameWork.m_languageId == 4) || (Game.m_gameWork.m_languageId == 5)) ?
+		                           DOUBLE_803335B8 : DOUBLE_803335C0;
+		float firstScale = static_cast<float>(optionScale);
+		float secondScale = static_cast<float>(optionScale);
 		float firstY = secondValue ? FLOAT_803335A4 : FLOAT_803335A4 - FLOAT_803335a0;
 		float secondY = secondValue ? FLOAT_803335A4 - FLOAT_803335a0 : FLOAT_803335A4;
 		int firstTlut = secondValue ? 6 : 0x17;
@@ -1347,6 +1358,14 @@ void CMenuPcs::DrawOptionMenu()
 	} else {
 		CTextureSet* textureSet = GetMenuTextureSet(this, 0xBC);
 		color.a = static_cast<unsigned char>(static_cast<int>(FLOAT_80333550 * m_optionColumnAnim));
+		unsigned int rowAnimFrame;
+		if (static_cast<double>(m_optionRowAnim) >= DOUBLE_803335C0) {
+			rowAnimFrame = 0xD;
+		} else {
+			rowAnimFrame = static_cast<unsigned int>(static_cast<double>(m_optionRowAnim) / FLOAT_8033362C);
+		}
+		const float specialRowCos = static_cast<float>(
+			cos(static_cast<double>(FLOAT_80333594 * static_cast<float>(rowAnimFrame) * FLOAT_80333630)));
 
 		int y = 0;
 		unsigned int uvY = 0;
@@ -1366,6 +1385,12 @@ void CMenuPcs::DrawOptionMenu()
 				gUtil.RenderTextureQuad(300.0f, 160.0f + static_cast<float>(y),
 				                        static_cast<float>(cursorWidth), FLOAT_80333624, cursorPanel,
 				                        &uv0, &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
+
+				gUtil.CalcUV(uv0.x, uv0.y, cursorWidth, 0x30, cursorWidth, cursorHeight);
+				gUtil.CalcUV(uv1.x, uv1.y, 0, cursorHeight, cursorWidth, cursorHeight);
+				gUtil.RenderTextureQuad(300.0f + static_cast<float>(cursorWidth), 160.0f + static_cast<float>(y),
+				                        static_cast<float>(cursorWidth), FLOAT_80333624, cursorPanel,
+				                        &uv0, &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 			}
 
 			CTexture* modePanel = GetTextureSetTexture(textureSet, 7);
@@ -1373,7 +1398,9 @@ void CMenuPcs::DrawOptionMenu()
 			unsigned int modeHeight = modePanel->m_height;
 			gUtil.CalcUV(uv0.x, uv0.y, modeWidth - 0x30, uvY, modeWidth, modeHeight);
 			gUtil.CalcUV(uv1.x, uv1.y, modeWidth, uvY + 0x18, modeWidth, modeHeight);
-			gUtil.RenderTextureQuad(330.0f, 138.0f + static_cast<float>(y), FLOAT_80333588, FLOAT_8033361C,
+			const float modeX = static_cast<float>(
+				static_cast<int>((static_cast<float>(modeU) - 330.0f) * specialRowCos + 330.0f));
+			gUtil.RenderTextureQuad(modeX, 138.0f + static_cast<float>(y), FLOAT_80333588, FLOAT_8033361C,
 			                        modePanel, &uv0, &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
 			char* modeText = g_strMenuUtilMes[languageBase + 19];

@@ -2624,12 +2624,12 @@ unsigned int CMenuPcs::CmdClose1()
 
 	*reinterpret_cast<s16*>(cmd + 0x22) = static_cast<s16>(*reinterpret_cast<s16*>(cmd + 0x22) + 1);
 	const s16 timer = *reinterpret_cast<s16*>(cmd + 0x22);
-	const s16 selected = *reinterpret_cast<s16*>(cmd + 0x26);
 	s32 state = *reinterpret_cast<s16*>(cmd + 0x14);
 	u32 done = 0;
 
 	if (state == 0) {
 		s16* list = GetCmdList(this);
+		const s16 selected = *reinterpret_cast<s16*>(cmd + 0x26);
 		const float t = static_cast<float>(DOUBLE_80332a90 * static_cast<f64>(timer));
 		*reinterpret_cast<float*>(list + selected * 0x20 + 0x0c) = t;
 
@@ -2660,6 +2660,7 @@ unsigned int CMenuPcs::CmdClose1()
 			*reinterpret_cast<u8*>(cmd + 8) = 0;
 		}
 	} else if (state == 1) {
+		const s16 selected = *reinterpret_cast<s16*>(cmd + 0x26);
 		s32 uniteIdx = 0;
 		s32 topCount = s_unitePanelCount;
 		for (; uniteIdx < topCount; uniteIdx++) {
@@ -2680,6 +2681,7 @@ unsigned int CMenuPcs::CmdClose1()
 			reinterpret_cast<CCaravanWork*>(caravanWork)->UnuniteComList(selected, ununiteCount);
 		}
 	} else if (state == 2) {
+		const s16 selected = *reinterpret_cast<s16*>(cmd + 0x26);
 		int combo[2][2];
 		const s32 count = ChkUnite(static_cast<int>(selected), combo);
 		if (count == 1) {
@@ -2690,6 +2692,7 @@ unsigned int CMenuPcs::CmdClose1()
 			*reinterpret_cast<u8*>(cmd + 8) = 1;
 		}
 	} else if (state == 3) {
+		const s16 selected = *reinterpret_cast<s16*>(cmd + 0x26);
 		s32 uniteIdx = 0;
 		s32 topCount = s_unitePanelCount;
 		for (; uniteIdx < topCount; uniteIdx++) {

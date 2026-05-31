@@ -3189,7 +3189,10 @@ void CMenuPcs::createBonus()
 
 		for (int i = 0; i < activeCount * 2; i++) {
 			BonusPartySummary& entry = s_Rinfo->m_party[i % activeCount];
-			unsigned long modelCode = entry.m_partySlot + ((i < activeCount) ? 0x87 : 0x83);
+			unsigned long modelCode = entry.m_partySlot + 0x83;
+			if (i < activeCount) {
+				modelCode = entry.m_partySlot + 0x87;
+			}
 			CCharaPcs::CHandle* handle =
 			    new (stage, const_cast<char*>(s_bonus_menu_cpp), 0x183) CCharaPcs::CHandle;
 			displaySlots[i] = handle;

@@ -2512,79 +2512,152 @@ void CPartMng::pppEditDraw()
 void CPartMng::pppEditPartDrawAfter()
 {
     static const int kPppMngCount = 0x180;
-    static const int kPppMngStride = 0x158;
     static const int kEditDrawModeOffset = 0x23570;
     static const int kHeapCheckIntervalOffset = 0x170;
-    static const int kBaseTimeOffset = 0x14;
-    static const int kMatrixOffset = 0x78;
-    static const int kEndRequestedOffset = 0xe4;
-    static const int kDrawPassOffset = 0xed;
-    static const int kSlotVisibleOffset = 0xe9;
-    static const int kOwnerVisibleOffset = 0xf0;
-    static const int kCullRadiusSqOffset = 0x108;
-    static const int kCullRadiusOffset = 0x10c;
-    static const int kCullYOffsetOffset = 0x110;
-    static const int kSortDepthOffset = 0x114;
 
     if (ppvSysStopPartF == 0) {
         m_pppEnvSt.m_debugCounter = 0;
         if (m_pdtSlots[0].m_pppDataHead != 0
             && *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + kEditDrawModeOffset) < 4) {
-            Mtx invCamera;
-            Vec cameraPos;
-            Vec partPos;
-            Vec cameraDelta;
-            Vec viewPos;
-
-            for (int passIndex = 0; passIndex < 3; passIndex++) {
-                unsigned char drawPass = static_cast<unsigned char>(passIndex + 5);
-
+            {
+                Mtx invCamera;
+                Vec cameraPos;
+                Vec partPos;
+                Vec cameraDelta;
+                Vec viewPos;
                 PSMTXInverse(ppvCameraMatrix0, invCamera);
                 cameraPos.x = invCamera[0][3];
                 cameraPos.y = invCamera[1][3];
                 cameraPos.z = invCamera[2][3];
 
-                char* mng = reinterpret_cast<char*>(m_pppMng);
+                _pppMngSt* mng = m_pppMng;
                 for (int i = 0; i < kPppMngCount; i++) {
-                    int baseTime = *reinterpret_cast<int*>(mng + kBaseTimeOffset);
-                    unsigned char endRequested = *reinterpret_cast<unsigned char*>(mng + kEndRequestedOffset);
-                    unsigned char partDrawPass = *reinterpret_cast<unsigned char*>(mng + kDrawPassOffset);
-                    unsigned char slotVisible = *reinterpret_cast<unsigned char*>(mng + kSlotVisibleOffset);
-                    unsigned char ownerVisible = *reinterpret_cast<unsigned char*>(mng + kOwnerVisibleOffset);
+                    int baseTime = mng->m_baseTime;
+                    if (mng->m_mode == 0 && baseTime != -0x1000 && mng->m_drawPass == 5 && baseTime < 0
+                        && mng->m_slotVisible != 0 && mng->m_ownerFlagsInitialized != 0) {
+                        partPos.x = mng->m_matrix.value[0][3];
+                        partPos.y = mng->m_matrix.value[1][3];
+                        partPos.z = mng->m_matrix.value[2][3];
 
-                    if (endRequested == 0 && baseTime != -0x1000 && partDrawPass == drawPass && baseTime < 0
-                        && slotVisible != 0 && ownerVisible != 0) {
-                        partPos.x = *reinterpret_cast<float*>(mng + kMatrixOffset + 0xc);
-                        partPos.y = *reinterpret_cast<float*>(mng + kMatrixOffset + 0x1c);
-                        partPos.z = *reinterpret_cast<float*>(mng + kMatrixOffset + 0x2c);
-
-                        float cullRadiusSq = *reinterpret_cast<float*>(mng + kCullRadiusSqOffset);
-                        bool shouldDraw = (cullRadiusSq == 0.0f);
+                        ppvMng = mng;
+                        bool shouldDraw = ((double)mng->m_cullRadiusSq == 0.0);
                         if (!shouldDraw) {
                             PSVECSubtract(&cameraPos, &partPos, &cameraDelta);
-                            if (PSVECSquareMag(&cameraDelta) < cullRadiusSq) {
+                            if ((double)PSVECSquareMag(&cameraDelta) < (double)mng->m_cullRadiusSq) {
                                 CBound bound;
-                                float cullRadius = *reinterpret_cast<float*>(mng + kCullRadiusOffset);
-                                float cullYOffset = *reinterpret_cast<float*>(mng + kCullYOffsetOffset);
                                 Vec min;
-                                min.x = partPos.x - cullRadius;
+                                min.x = partPos.x - mng->m_cullRadius;
                                 min.y = partPos.y;
-                                min.z = partPos.z - cullRadius;
-                                shouldDraw = (bound.CheckFrustum(min, ppvCameraMatrix0, partPos.y + cullYOffset) != 0);
+                                min.z = partPos.z - mng->m_cullRadius;
+                                shouldDraw = (bound.CheckFrustum(min, ppvCameraMatrix0,
+                                                                 partPos.y + mng->m_cullYOffset) != 0);
                             }
                         }
 
                         if (shouldDraw) {
                             PSMTXMultVec(ppvCameraMatrix0, &partPos, &viewPos);
-                            *reinterpret_cast<float*>(mng + kSortDepthOffset) = viewPos.z;
-
-                            ppvMng = reinterpret_cast<_pppMngSt*>(mng);
-                            ppvEnv = reinterpret_cast<_pppEnvSt*>(*reinterpret_cast<char**>(mng) + 4);
+                            mng->m_sortDepth = viewPos.z;
+                            ppvEnv = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<char*>(mng->m_pppResSet) + 4);
+                            ppvMng = mng;
                             pppSetFpMatrix(ppvMng);
                             _pppDrawPart(ppvMng);
                         }
                     }
-                    mng += kPppMngStride;
+                    mng++;
+                }
+            }
+            {
+                Mtx invCamera;
+                Vec cameraPos;
+                Vec partPos;
+                Vec cameraDelta;
+                Vec viewPos;
+                PSMTXInverse(ppvCameraMatrix0, invCamera);
+                cameraPos.x = invCamera[0][3];
+                cameraPos.y = invCamera[1][3];
+                cameraPos.z = invCamera[2][3];
+
+                _pppMngSt* mng = m_pppMng;
+                for (int i = 0; i < kPppMngCount; i++) {
+                    int baseTime = mng->m_baseTime;
+                    if (mng->m_mode == 0 && baseTime != -0x1000 && mng->m_drawPass == 6 && baseTime < 0
+                        && mng->m_slotVisible != 0 && mng->m_ownerFlagsInitialized != 0) {
+                        partPos.x = mng->m_matrix.value[0][3];
+                        partPos.y = mng->m_matrix.value[1][3];
+                        partPos.z = mng->m_matrix.value[2][3];
+
+                        ppvMng = mng;
+                        bool shouldDraw = ((double)mng->m_cullRadiusSq == 0.0);
+                        if (!shouldDraw) {
+                            PSVECSubtract(&cameraPos, &partPos, &cameraDelta);
+                            if ((double)PSVECSquareMag(&cameraDelta) < (double)mng->m_cullRadiusSq) {
+                                CBound bound;
+                                Vec min;
+                                min.x = partPos.x - mng->m_cullRadius;
+                                min.y = partPos.y;
+                                min.z = partPos.z - mng->m_cullRadius;
+                                shouldDraw = (bound.CheckFrustum(min, ppvCameraMatrix0,
+                                                                 partPos.y + mng->m_cullYOffset) != 0);
+                            }
+                        }
+
+                        if (shouldDraw) {
+                            PSMTXMultVec(ppvCameraMatrix0, &partPos, &viewPos);
+                            mng->m_sortDepth = viewPos.z;
+                            ppvEnv = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<char*>(mng->m_pppResSet) + 4);
+                            ppvMng = mng;
+                            pppSetFpMatrix(ppvMng);
+                            _pppDrawPart(ppvMng);
+                        }
+                    }
+                    mng++;
+                }
+            }
+            {
+                Mtx invCamera;
+                Vec cameraPos;
+                Vec partPos;
+                Vec cameraDelta;
+                Vec viewPos;
+                PSMTXInverse(ppvCameraMatrix0, invCamera);
+                cameraPos.x = invCamera[0][3];
+                cameraPos.y = invCamera[1][3];
+                cameraPos.z = invCamera[2][3];
+
+                _pppMngSt* mng = m_pppMng;
+                for (int i = 0; i < kPppMngCount; i++) {
+                    int baseTime = mng->m_baseTime;
+                    if (mng->m_mode == 0 && baseTime != -0x1000 && mng->m_drawPass == 7 && baseTime < 0
+                        && mng->m_slotVisible != 0 && mng->m_ownerFlagsInitialized != 0) {
+                        partPos.x = mng->m_matrix.value[0][3];
+                        partPos.y = mng->m_matrix.value[1][3];
+                        partPos.z = mng->m_matrix.value[2][3];
+
+                        ppvMng = mng;
+                        bool shouldDraw = ((double)mng->m_cullRadiusSq == 0.0);
+                        if (!shouldDraw) {
+                            PSVECSubtract(&cameraPos, &partPos, &cameraDelta);
+                            if ((double)PSVECSquareMag(&cameraDelta) < (double)mng->m_cullRadiusSq) {
+                                CBound bound;
+                                Vec min;
+                                min.x = partPos.x - mng->m_cullRadius;
+                                min.y = partPos.y;
+                                min.z = partPos.z - mng->m_cullRadius;
+                                shouldDraw = (bound.CheckFrustum(min, ppvCameraMatrix0,
+                                                                 partPos.y + mng->m_cullYOffset) != 0);
+                            }
+                        }
+
+                        if (shouldDraw) {
+                            PSMTXMultVec(ppvCameraMatrix0, &partPos, &viewPos);
+                            mng->m_sortDepth = viewPos.z;
+                            ppvEnv = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<char*>(mng->m_pppResSet) + 4);
+                            ppvMng = mng;
+                            pppSetFpMatrix(ppvMng);
+                            _pppDrawPart(ppvMng);
+                        }
+                    }
+                    mng++;
                 }
             }
         }

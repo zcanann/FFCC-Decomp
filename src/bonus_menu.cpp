@@ -3177,7 +3177,6 @@ void CMenuPcs::createBonus()
 			}
 		}
 
-		s_Rinfo->m_winnerTotalValue = 0;
 		for (int i = 0; i < activeCount; i++) {
 			BonusPartySummary& ranked = s_Rinfo->m_party[order[i]];
 			ranked.m_rank = i;

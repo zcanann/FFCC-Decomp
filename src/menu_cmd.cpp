@@ -2542,7 +2542,6 @@ unsigned int CMenuPcs::CmdOpen1()
 	u8* self = reinterpret_cast<u8*>(this);
 	const s32 caravanWork = Game.m_scriptFoodBase[0];
 	const s32 cmd = GetCmdStateBase(this);
-	const s32 list = GetCmdListBase(this);
 
 	*reinterpret_cast<s16*>(cmd + 0x22) = static_cast<s16>(*reinterpret_cast<s16*>(cmd + 0x22) + 1);
 
@@ -2550,18 +2549,19 @@ unsigned int CMenuPcs::CmdOpen1()
 	const f32 t = static_cast<f32>(
 		-((DOUBLE_80332a90 * static_cast<f64>(*reinterpret_cast<s16*>(cmd + 0x22))) - DOUBLE_80332a58)
 	);
-	*reinterpret_cast<f32*>(list + selected * 0x40 + 0x18) = t;
+	*reinterpret_cast<f32*>(GetCmdListBase(this) + selected * 0x40 + 0x18) = t;
 
 	s32 chainCount = 1;
 	if (*reinterpret_cast<s16*>(caravanWork + (selected + 1) * 2 + 0x214) == -1) {
 		chainCount = 2;
-		*reinterpret_cast<f32*>(list + (selected + 1) * 0x40 + 0x18) = t;
+		*reinterpret_cast<f32*>(GetCmdListBase(this) + (selected + 1) * 0x40 + 0x18) = t;
 		if (*reinterpret_cast<s16*>(caravanWork + (selected + 2) * 2 + 0x214) == -1) {
 			chainCount = 3;
-			*reinterpret_cast<f32*>(list + (selected + 2) * 0x40 + 0x18) = t;
+			*reinterpret_cast<f32*>(GetCmdListBase(this) + (selected + 2) * 0x40 + 0x18) = t;
 		}
 	}
 
+	const s32 list = GetCmdListBase(this);
 	s32 slot = 0;
 	if ((selected != s_UniteTop[0]) && ((slot = 1), selected != s_UniteTop[1]) &&
 	    ((slot = 2), selected != s_UniteTop[2])) {

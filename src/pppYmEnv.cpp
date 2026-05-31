@@ -119,9 +119,10 @@ extern const char sMogFurTextureName[] = "n915m_2";
 void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displayList, unsigned long displayListSize,
                        _GXTexObj* blendTexObj, unsigned char mode)
 {
-    const unsigned char s_texObjIndices[] = {5, 2, 1, 0, 4, 5, 0, 0, 0, 0};
-    const unsigned char s_xAxisRotIndices[] = {0, 0, 0, 0, 1, 1, 0, 0, 2, 0};
-    const unsigned char s_yAxisRotIndices[] = {1, 3, 4, 2, 1, 0, 4, 3, 0, 0};
+    const unsigned char s_texObjIndices[] = {2, 0, 3, 5, 4, 0, 1, 2, 4, 5};
+    const unsigned char s_xAxisRotIndices[] = {2, 0, 3, 4, 5, 2, 1, 0, 4, 5};
+    const unsigned char s_yAxisRotIndices[] = {0, 0, 0, 0, 0, 0, 0, 0, 1, 1};
+    static const unsigned char s_unusedRotIndices[] = {2, 0, 1, 3, 4, 2, 1, 0, 4, 3};
     const float s_xAxisAngles[] = {90.0f, 180.0f, 270.0f, 180.0f, -90.0f, 90.0f};
     YmEnvPackedXAxisIds s_xAxisIds;
     YmEnvPackedYAxisAngles s_yAxisAngles;

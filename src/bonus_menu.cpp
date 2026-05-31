@@ -1102,15 +1102,8 @@ void CMenuPcs::CalcSelectWait()
 		cursor->h = 0x30;
 		cursor->mulX = 0.0f;
 		cursor->mulY = 0.0f;
-		cursor->timer = 0;
 		cursor->startFrame = 0;
 		cursor->duration = 8;
-		cursor->scale = 1.0f;
-		cursor->motionX = 0.0f;
-		cursor->motionY = 0.0f;
-		cursor->targetX = 0.0f;
-		cursor->targetY = 0.0f;
-		cursor->alpha = 1.0f;
 		cursor->depth = 1.0f;
 		header->count = (short)(header->count + 1);
 		header->finished = 0;

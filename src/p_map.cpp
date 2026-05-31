@@ -29,6 +29,15 @@ private:
     unsigned int m_data;
 };
 
+class CRelStopWatch
+{
+public:
+    ~CRelStopWatch();
+
+private:
+    unsigned char m_data;
+};
+
 unsigned int CMapPcs::m_table_desc0[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__7CMapPcsFv)};
 unsigned int CMapPcs::m_table_desc1[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__7CMapPcsFv)};
 unsigned int CMapPcs::m_table_desc2[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calcInit__7CMapPcsFv)};
@@ -110,8 +119,14 @@ extern unsigned int s_loadedStageNo__7CMapPcs;
 extern unsigned int s_loadedMapNo__7CMapPcs;
 CRelProfile g_mapStage;
 CRelProfile g_mapSection;
-CRelProfile g_hit_prof;
+CRelStopWatch g_hit_prof;
+static unsigned char g_hit_prof_padding0;
+static unsigned char g_hit_prof_padding1;
+static unsigned char g_hit_prof_padding2;
 unsigned char g_map_calc_prof;
+static unsigned char g_map_calc_prof_padding0;
+static unsigned char g_map_calc_prof_padding1;
+static unsigned char g_map_calc_prof_padding2;
 unsigned char g_map_draw_prof;
 extern const float DrawRangeDefault;
 extern const float kPMapBoundMinInit;
@@ -243,6 +258,19 @@ CMapPcs::CMapPcs()
  * JP Size: TODO
  */
 CRelProfile::~CRelProfile()
+{
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 60b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+CRelStopWatch::~CRelStopWatch()
 {
 }
 

@@ -1358,6 +1358,14 @@ void CMenuPcs::DrawOptionMenu()
 	} else {
 		CTextureSet* textureSet = GetMenuTextureSet(this, 0xBC);
 		color.a = static_cast<unsigned char>(static_cast<int>(FLOAT_80333550 * m_optionColumnAnim));
+		unsigned int rowAnimFrame;
+		if (static_cast<double>(m_optionRowAnim) >= DOUBLE_803335C0) {
+			rowAnimFrame = 0xD;
+		} else {
+			rowAnimFrame = static_cast<unsigned int>(static_cast<double>(m_optionRowAnim) / FLOAT_8033362C);
+		}
+		const float specialRowCos = static_cast<float>(
+			cos(static_cast<double>(FLOAT_80333594 * static_cast<float>(rowAnimFrame) * FLOAT_80333630)));
 
 		int y = 0;
 		unsigned int uvY = 0;
@@ -1390,7 +1398,9 @@ void CMenuPcs::DrawOptionMenu()
 			unsigned int modeHeight = modePanel->m_height;
 			gUtil.CalcUV(uv0.x, uv0.y, modeWidth - 0x30, uvY, modeWidth, modeHeight);
 			gUtil.CalcUV(uv1.x, uv1.y, modeWidth, uvY + 0x18, modeWidth, modeHeight);
-			gUtil.RenderTextureQuad(330.0f, 138.0f + static_cast<float>(y), FLOAT_80333588, FLOAT_8033361C,
+			const float modeX = static_cast<float>(
+				static_cast<int>((static_cast<float>(modeU) - 330.0f) * specialRowCos + 330.0f));
+			gUtil.RenderTextureQuad(modeX, 138.0f + static_cast<float>(y), FLOAT_80333588, FLOAT_8033361C,
 			                        modePanel, &uv0, &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
 			char* modeText = g_strMenuUtilMes[languageBase + 19];

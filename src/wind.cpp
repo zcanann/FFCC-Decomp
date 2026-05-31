@@ -598,14 +598,9 @@ void CWind::Frame()
                 obj->maxZ = obj->centerZ + obj->radius;
             }
 
-            f0 = obj->targetPower;
-            f1 = obj->curPower;
-            f2 = kWindLerpRate;
-            obj->curPower = f2 * (f0 - f1) + f1;
-            f0 = Math.RandF();
-            f1 = obj->targetDir;
-            f2 = obj->curDir;
-            obj->curDir = f2 + (kWindDirPositiveJitter * f0 + (kWindLerpRate * (f1 - f2) - kWindPowerLowThreshold));
+            obj->curPower += kWindLerpRate * (obj->targetPower - obj->curPower);
+            obj->curDir += kWindDirPositiveJitter * Math.RandF() +
+                (kWindLerpRate * (obj->targetDir - obj->curDir) - kWindPowerLowThreshold);
 
             if ((obj->type == 0) || (obj->type == 1)) {
                 obj->force.x = obj->curPower * (float)sin((double)obj->curDir);

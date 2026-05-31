@@ -499,11 +499,11 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 
 		if ((*reinterpret_cast<short*>(self + 0x864) == 2) &&
 		    (*reinterpret_cast<short*>(*reinterpret_cast<int*>(self + 0x82C) + 0x30) == 1)) {
-			short currentItem = -1;
 			int menuState = *reinterpret_cast<int*>(self + 0x82C);
 			u16 effectFlags = *reinterpret_cast<u16*>(itemBase + 4);
 
 			if ((effectFlags & 0x1000) == 0) {
+				short currentItem = -1;
 				if ((effectFlags & 0x100) != 0) {
 					currentItem = 0;
 				} else if ((effectFlags & 0x400) != 0) {

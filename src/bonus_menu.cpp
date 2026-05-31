@@ -2535,7 +2535,7 @@ void CMenuPcs::DrawResultOpenAnim()
 							    sprite->mulX, sprite->mulY, sprite->depth, sprite->depth, 0.0f);
 						} else {
 							MenuPcs.DrawRect(0,
-							    (float)sprite->x + ((3.0f * (float)sprite->w - (float)sprite->w) * 0.5f),
+							    (float)sprite->x + ((float)(3 * sprite->w - sprite->w) * 0.5f),
 							    (float)sprite->y, (float)sprite->w, (float)sprite->h,
 							    0.0f, sprite->mulY, sprite->depth, sprite->depth, 0.0f);
 						}

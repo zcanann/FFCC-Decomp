@@ -2437,6 +2437,7 @@ Runtime.PPCEABI.H/NMWException.cp:
 
 Runtime.PPCEABI.H/ptmf.c:
 	.text       start:0x801AFEEC end:0x801AFF44
+	.rodata     start:0x801E6E88 end:0x801E6E98
 
 Runtime.PPCEABI.H/runtime.c:
 	.text       start:0x801AFF44 end:0x801B063C

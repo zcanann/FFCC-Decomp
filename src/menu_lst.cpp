@@ -132,7 +132,7 @@ void CMenuPcs::MLstDraw()
 		MenuLstEntry* curItem = &this->lstData->entries[this->lstState->cursor];
 		float cursorYOffset = (float)((double)(float)(curItem->height - 0x20) * 0.5);
 		int cursorY = (int)((float)curItem->y + cursorYOffset);
-		int cursorX = (int)((float)(curItem->x - 0x38) + (float)(System.m_frameCounter % 8));
+		int cursorX = (int)((float)(curItem->x - 0x38) + (float)((int)System.m_frameCounter % 8));
 		DrawCursor(cursorX, cursorY, FLOAT_803333F0);
 	}
 

@@ -215,7 +215,7 @@ typedef struct AX_AUX_DATA_DPL2 {
 
 typedef void (*AXCallback)();
 
-#define AX_DSP_SLAVE_LENGTH 0xF80
+#define AX_DSP_SLAVE_LENGTH 0xF90
 #define AX_MAX_VOICES 64
 
 #define AX_SRC_TYPE_NONE     0

@@ -2080,6 +2080,10 @@ ax/AXVPB.c:
 ax/AXComp.c:
 	.data       start:0x80217E00 end:0x80219840
 
+ax/DSPCode.c:
+	.data       start:0x80219840 end:0x8021B760
+	.sdata      start:0x8032EB58 end:0x8032EB60
+
 ax/AXProf.c:
 	.text       start:0x80193E28 end:0x80193E70
 	.sbss       start:0x8032F2A0 end:0x8032F2B0

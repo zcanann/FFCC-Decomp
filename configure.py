@@ -913,6 +913,7 @@ config.libs = [
             Object(Matching, "ax/AXSPB.c"),
             Object(Matching, "ax/AXVPB.c"),
             Object(Matching, "ax/AXComp.c"),
+            Object(Matching, "ax/DSPCode.c"),
         ],
     ),
     DolphinLib(

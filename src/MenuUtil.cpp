@@ -1402,10 +1402,11 @@ void CMenuPcs::DrawOptionMenu()
 void CMenuPcs::BindMcObj(int slotNo)
 {
 	unsigned char* const self = reinterpret_cast<unsigned char*>(this);
+	int* obj;
 
 	for (int slot = 0; slot < 4; slot++) {
 		if (slotNo == slot) {
-			int* obj = reinterpret_cast<int*>(
+			obj = reinterpret_cast<int*>(
 				*reinterpret_cast<unsigned char**>(self + 0x840) + (slot + 0x11) * 0x524);
 
 			if (obj[1] >= 0) {

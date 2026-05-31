@@ -26,12 +26,10 @@ extern "C" const float FLOAT_80333080;
 extern "C" const float FLOAT_80333084;
 
 extern "C" const char s_Force_803334F0[] = "Force";
-extern "C" const char gap_11_803334F6_sdata2[2] = {};
 extern "C" const char s_Musique_803334F8[8] = "Musique";
 extern "C" const char s_Active_80333500[8] = "Activ\351";
 extern "C" const char s_Stereo_80333508[8] = "St\351r\351o";
 extern "C" const char s_Fuerza_80333510[] = "Fuerza";
-extern "C" const char gap_11_80333517_sdata2[1] = {};
 extern "C" const char s_Defensa_80333518[8] = "Defensa";
 extern "C" const char s_Musica_80333520[8] = "M\372sica";
 extern "C" const char s_Apagado_80333528[8] = "Apagado";

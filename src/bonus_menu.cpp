@@ -3159,8 +3159,9 @@ void CMenuPcs::createBonus()
 		order[2] = 2;
 		order[3] = 3;
 		for (int i = 0; i < activeCount; i++) {
+			int leftIndex = order[i];
 			for (int j = i + 1; j < activeCount; j++) {
-				BonusPartySummary& a = s_Rinfo->m_party[order[i]];
+				BonusPartySummary& a = s_Rinfo->m_party[leftIndex];
 				BonusPartySummary& b = s_Rinfo->m_party[order[j]];
 				unsigned int coin = rand();
 
@@ -3170,9 +3171,10 @@ void CMenuPcs::createBonus()
 				        a.m_foodValue < b.m_foodValue) ||
 				    (a.m_totalValue == b.m_totalValue && a.m_artifactValue == b.m_artifactValue &&
 				        a.m_foodValue == b.m_foodValue && (coin & 1) != 0)) {
-					int temp = order[i];
+					int temp = leftIndex;
 					order[i] = order[j];
 					order[j] = temp;
+					leftIndex = order[i];
 				}
 			}
 		}

@@ -495,7 +495,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 
 		if ((*reinterpret_cast<short*>(self + 0x864) == 2) &&
 		    (*reinterpret_cast<short*>(*reinterpret_cast<int*>(self + 0x82C) + 0x30) == 1)) {
-			int currentItem = -1;
+			short currentItem = -1;
 			int menuState = *reinterpret_cast<int*>(self + 0x82C);
 			u16 effectFlags = *reinterpret_cast<u16*>(itemBase + 4);
 
@@ -514,10 +514,10 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 					currentItem = 3;
 				}
 
-				currentItem = static_cast<int>(*reinterpret_cast<short*>(
+				currentItem = *reinterpret_cast<short*>(
 				    Game.m_scriptFoodBase[0] +
 				    static_cast<int>(*reinterpret_cast<short*>(Game.m_scriptFoodBase[0] + currentItem * 2 + 0xAC)) * 2 +
-				    0xB6));
+				    0xB6);
 
 				if (ChkEquipActive(static_cast<int>(*reinterpret_cast<short*>(menuState + 0x28)) +
 				                   static_cast<int>(*reinterpret_cast<short*>(menuState + 0x34))) != 0) {

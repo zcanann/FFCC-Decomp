@@ -2134,45 +2134,44 @@ void CSound::ChangeSe3DPitch(int se3dHandle, int pitch, int frames)
         System.Printf(const_cast<char*>(s_soundMinusOneFmt));
     } else {
         char* se = reinterpret_cast<char*>(this) + 0x2C;
-        char* found;
         int count;
 
         for (count = 0x20; count != 0; count--) {
-            found = se;
-            if (((static_cast<u8>(*found) >> 7) & 1) != 0) {
-                if (*reinterpret_cast<int*>(found + 4) == se3dHandle) {
-                    goto found_entry;
+            if (((static_cast<u8>(*se) >> 7) & 1) != 0) {
+                if (*reinterpret_cast<int*>(se + 4) == se3dHandle) {
+                    break;
                 }
             }
 
-            found += 0x28;
-            if (((static_cast<u8>(*found) >> 7) & 1) != 0) {
-                if (*reinterpret_cast<int*>(found + 4) == se3dHandle) {
-                    goto found_entry;
+            se += 0x28;
+            if (((static_cast<u8>(*se) >> 7) & 1) != 0) {
+                if (*reinterpret_cast<int*>(se + 4) == se3dHandle) {
+                    break;
                 }
             }
 
-            found += 0x28;
-            if (((static_cast<u8>(*found) >> 7) & 1) != 0) {
-                if (*reinterpret_cast<int*>(found + 4) == se3dHandle) {
-                    goto found_entry;
+            se += 0x28;
+            if (((static_cast<u8>(*se) >> 7) & 1) != 0) {
+                if (*reinterpret_cast<int*>(se + 4) == se3dHandle) {
+                    break;
                 }
             }
 
-            found += 0x28;
-            if (((static_cast<u8>(*found) >> 7) & 1) != 0) {
-                if (*reinterpret_cast<int*>(found + 4) == se3dHandle) {
-                    goto found_entry;
+            se += 0x28;
+            if (((static_cast<u8>(*se) >> 7) & 1) != 0) {
+                if (*reinterpret_cast<int*>(se + 4) == se3dHandle) {
+                    break;
                 }
             }
 
-            se = found + 0x28;
+            se += 0x28;
         }
-        found = 0;
+        if (count == 0) {
+            se = 0;
+        }
 
-found_entry:
-        if (found != 0) {
-            RedSound(this)->SePitch(*reinterpret_cast<int*>(found + 8), pitch << 8, frames);
+        if (se != 0) {
+            RedSound(this)->SePitch(*reinterpret_cast<int*>(se + 8), pitch << 8, frames);
         }
     }
 }

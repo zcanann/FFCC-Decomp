@@ -8,13 +8,19 @@ import re
 import os
 import sys
 from collections import defaultdict
+from pathlib import Path
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, REPO)
+
+from tools.map.map_index import default_game_map_path, load_map_index
+
 SYMBOLS = os.path.join(REPO, "config/GCCP01/symbols.txt")
-MAP_FILE = os.path.join(REPO, "orig/GCCP01/game.MAP")
+MAP_FILE = str(default_game_map_path(Path(REPO), "GCCP01"))
 SPLITS = os.path.join(REPO, "config/GCCP01/splits.txt")
 
 DATA_SECTIONS = {'.data', '.rodata', '.bss', '.sbss', '.sdata', '.sdata2'}
+LOCAL_GENERATED_NAME_RE = re.compile(r'@|lbl_|gap_|pad_|jumptable_|FLOAT_|DOUBLE_|DAT_')
 
 def parse_symbols():
     """Parse symbols.txt -> list of (name, section, addr, size, line_info)"""
@@ -56,40 +62,34 @@ def parse_splits():
 
 def extract_map_symbols():
     """Extract symbol -> object file mappings from MAP file"""
-    sym_to_obj = {}
+    exact = {}
+    by_name = defaultdict(set)
     if not os.path.exists(MAP_FILE):
-        return sym_to_obj
-    
-    current_section = None
-    with open(MAP_FILE, errors='replace') as f:
-        for line in f:
-            line = line.rstrip()
-            # Section headers like ".bss section layout"
-            m = re.match(r'\s*(\.\w+)\s+section layout', line)
-            if m:
-                current_section = m.group(1)
+        return exact, {}
+
+    index = load_map_index(MAP_FILE)
+    for records in index.layout_by_symbol.values():
+        for record in records:
+            if record.virtual_address is None or record.symbol_name == record.section:
                 continue
-            
-            if not current_section:
-                continue
-            
-            # Symbol lines: "  00000000 000010  4 .bss     someSymbol  someObj.o SomeLib.a"
-            # or: "  DEADBEEF 000010  4 .bss     someSymbol  someObj.o"
-            parts = line.split()
-            if len(parts) >= 6:
-                try:
-                    addr_str = parts[0]
-                    size_str = parts[1]
-                    if all(c in '0123456789abcdef' for c in addr_str.lower()) and \
-                       all(c in '0123456789abcdef' for c in size_str.lower()):
-                        sym_name = parts[4] if len(parts) > 4 else ''
-                        obj_name = parts[5] if len(parts) > 5 else ''
-                        if obj_name.endswith('.o'):
-                            sym_to_obj[sym_name] = obj_name
-                except:
-                    pass
-    
-    return sym_to_obj
+            key = (record.section, record.virtual_address, record.symbol_name)
+            exact[key] = record.object_file
+            by_name[record.symbol_name].add(record.object_file)
+
+    unique_by_name = {
+        name: next(iter(objects))
+        for name, objects in by_name.items()
+        if len(objects) == 1
+    }
+    return exact, unique_by_name
+
+def can_use_unique_name_fallback(name):
+    """Avoid attributing compiler-local/generated names by name alone.
+
+    MAP files contain many unrelated local symbols named like @234 or lbl_....
+    Those are only trustworthy when the section/address also matches.
+    """
+    return LOCAL_GENERATED_NAME_RE.match(name) is None
 
 def main():
     syms = parse_symbols()
@@ -120,8 +120,9 @@ def main():
     
     # Try to map to object files using MAP
     print("Loading MAP file for symbol->object mapping...")
-    sym_to_obj = extract_map_symbols()
-    print(f"  Found {len(sym_to_obj)} symbol->object mappings\n")
+    exact_map, unique_name_map = extract_map_symbols()
+    print(f"  Found {len(exact_map)} address-qualified symbol mappings")
+    print(f"  Found {len(unique_name_map)} unique-name fallback mappings\n")
     
     # Group unclaimed symbols by potential object file
     by_obj = defaultdict(lambda: defaultdict(list))  # obj_file -> section -> [(addr, size, name)]
@@ -129,7 +130,9 @@ def main():
     
     for section, sym_list in unclaimed.items():
         for addr, size, name, info in sym_list:
-            obj = sym_to_obj.get(name)
+            obj = exact_map.get((section, addr, name))
+            if obj is None and can_use_unique_name_fallback(name):
+                obj = unique_name_map.get(name)
             if obj:
                 by_obj[obj][section].append((addr, size, name))
             else:

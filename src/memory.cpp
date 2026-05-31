@@ -58,17 +58,31 @@ extern char sCurrentMemoryStageName[];
 extern char sMainMemoryStageName[];
 extern char sDrawHeapUseUnuseFmt[];
 extern char sDrawHeapAmemAnimFmt[];
-extern char sMemoryNoNameStopwatchName[8];
-extern char sEmptyAllocSourceName[4];
-extern const char sHeapWalkerNewline[];
-extern char sHeapWalkerSlashLine[];
-extern const char* s_amemCacheTypeNames_801E8470[];
-extern const char* s_amemCacheStateNames_8032E410[2];
+extern const char sAmemCacheTypeTexture[] = "TEXTURE";
+extern const char sAmemCacheTypeModel[] = "MODEL  ";
+extern const char sAmemCacheTypePdt[] = "PDT    ";
+extern const char sAmemCacheStateUse[] = "USE  ";
+extern const char sAmemCacheStateNoUse[] = "NOUSE";
+extern const char sMemoryClassName[] = "CMemory";
+extern const char sAmemCacheSeparator[3] = "\n\n";
+extern char sMemoryNoNameStopwatchName[8] = "no name";
+extern char sEmptyAllocSourceName[4] = "";
+extern const char sHeapWalkerNewline[] = "\n";
+extern char sHeapWalkerSlashLine[] = "//\n";
+extern const char* s_amemCacheTypeNames_801E8470[] = {
+    sAmemCacheTypeTexture,
+    sAmemCacheTypeModel,
+    sAmemCacheTypePdt,
+};
+extern const char* s_amemCacheStateNames_8032E410[2] = {
+    sAmemCacheStateUse,
+    sAmemCacheStateNoUse,
+};
 extern const float kMemoryDmaTimeout = 9000.0f;
 extern const float kMemoryDrawZero = 0.0f;
-extern float kMemoryDrawOrthoBottom;
-extern float kMemoryDrawOrthoRight;
-extern float kMemoryDrawOrthoFar;
+extern const float kMemoryDrawOrthoBottom = 448.0f;
+extern const float kMemoryDrawOrthoRight = 640.0f;
+extern const float kMemoryDrawOrthoFar = -100.0f;
 extern const double kMemorySignedDoubleMagic = 4503601774854144.0;
 extern unsigned int sHeapBarColors[];
 int g_alloc_ct;

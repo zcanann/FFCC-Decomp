@@ -87,10 +87,6 @@ extern const char s_compilerMapLoaded[] =
     "\201\102\012";
 extern const char s_systemTemplateDebug[28] = "systemTemplateDebug\n";
 extern const char s_systemStopwatchName[8];
-extern const char __RTTI__8CManager_8032E468[];
-
-unsigned int s_CSystemTablePad0[3] = {
-    reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CManager_8032E468)), 0, 0};
 
 /*
  * --INFO--

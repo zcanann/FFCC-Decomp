@@ -2,11 +2,6 @@
 
 #include "ffcc/system.h"
 
-extern const char __RTTI__8CManager_8032E478[];
-
-unsigned int s_CUSBTablePad0[3] = {
-    reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CManager_8032E478)), 0, 0};
-
 CUSB USB;
 
 static const char s_usbCallbackMissingFmt[64] = "CUSB.AddMessageCallback: イベント関数は登録されていません。\n";

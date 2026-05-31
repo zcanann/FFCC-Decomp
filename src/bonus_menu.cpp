@@ -18,12 +18,82 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
 
-extern char* PTR_s_bonus[];
-extern CMenuPcs::CTmp s_bonusTextureTable[];
 extern char s_menuSubfontPathFmt[];
 extern const double kPppCrystal2RefractionScale;
 extern const float s_BonusModelYPos[];
 extern const float s_BonusModelScale[];
+
+float s_BallTrnsXspl[] = {
+    0.03333299979567528f, 27.700000762939453f, 0.0f, 0.0f,
+    0.23524600267410278f, 12.29898452758789f, -55.570411682128906f, -55.570411682128906f,
+    0.3703629970550537f, 6.334517955780029f, -25.889270782470703f, -25.889270782470703f,
+    1.0f, -14.300000190734863f, 0.0f, 0.0f,
+};
+
+float s_BallTrnsYspl[] = {
+    0.03333299979567528f, 8.5f, 0.0f, 0.0f,
+    0.241907000541687f, -1.2000000476837158f, 0.0f, 0.0f,
+    0.3153750002384186f, 1.6390860080718994f, 0.0f, 0.0f,
+    0.3817799985408783f, -1.2000000476837158f, 0.0f, 0.0f,
+    1.0f, -1.2000000476837158f, 0.0f, 0.0f,
+    1.3333330154418945f, 0.30000001192092896f, 0.0f, 0.0f,
+};
+
+CMenuPcs::FCV s_BallTrnsX = {4, s_BallTrnsXspl};
+CMenuPcs::FCV s_BallTrnsY = {6, s_BallTrnsYspl};
+
+extern const char s_bonus_80331DE0[] = "bonus";
+extern const char s_bonus1_80331DE8[] = "bonus1";
+extern const char s_bonus2_80331DF0[] = "bonus2";
+extern const char s_bonus3_80331DF8[] = "bonus3";
+extern const char s_bonus4_80331E00[] = "bonus4";
+extern const char s_bonus5_80331E08[] = "bonus5";
+extern const char s_bonus6_80331E10[] = "bonus6";
+extern const char s_bonus7_80331E18[] = "bonus7";
+extern const char s_bonus8_80331E20[] = "bonus8";
+extern const char s_bonus9_80331E28[] = "bonus9";
+extern const char s_bonus10_80331E30[] = "bonus10";
+extern const char s_bonus11_80331E38[] = "bonus11";
+extern const char s_bonus12_80331E40[] = "bonus12";
+extern const char s_bonus13_80331E48[] = "bonus13";
+extern const char s_bonus14_80331E50[] = "bonus14";
+extern const char s_bonus15_80331E58[] = "bonus15";
+extern const char s_bonus16_80331E60[] = "bonus16";
+extern const char s_bonus17_80331E68[] = "bonus17";
+extern const char s_bonus18_80331E70[] = "bonus18";
+
+extern "C" char* PTR_s_bonus[] = {
+    const_cast<char*>(s_bonus_80331DE0),
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+};
+
+extern "C" CMenuPcs::CTmp s_bonusTextureTable[] = {
+    {2, const_cast<char*>(s_bonus1_80331DE8)},
+    {2, const_cast<char*>(s_bonus2_80331DF0)},
+    {2, const_cast<char*>(s_bonus3_80331DF8)},
+    {2, const_cast<char*>(s_bonus4_80331E00)},
+    {2, const_cast<char*>(s_bonus5_80331E08)},
+    {2, const_cast<char*>(s_bonus6_80331E10)},
+    {2, const_cast<char*>(s_bonus7_80331E18)},
+    {2, const_cast<char*>(s_bonus8_80331E20)},
+    {2, const_cast<char*>(s_bonus9_80331E28)},
+    {2, const_cast<char*>(s_bonus10_80331E30)},
+    {2, const_cast<char*>(s_bonus11_80331E38)},
+    {2, const_cast<char*>(s_bonus12_80331E40)},
+    {2, const_cast<char*>(s_bonus13_80331E48)},
+    {2, const_cast<char*>(s_bonus14_80331E50)},
+    {2, const_cast<char*>(s_bonus15_80331E58)},
+    {2, const_cast<char*>(s_bonus16_80331E60)},
+    {2, const_cast<char*>(s_bonus17_80331E68)},
+    {2, const_cast<char*>(s_bonus18_80331E70)},
+};
 
 struct BonusPartySummary {
 	int m_partySlot;
@@ -2823,8 +2893,13 @@ void CMenuPcs::CalcResultOpenAnim()
 			scaleMtx[2][3] = 0.0f;
 			scaleMtx[1][3] = s_BonusModelYPos[tribeId];
 		} else {
-			scaleMtx[0][3] = 0.0f;
-			scaleMtx[1][3] = 0.0f;
+			BonusAnimSprite* sprite = &sprites[modelBase + i];
+			int itemIndex = i - activePartyCount;
+			scaleMtx[0][3] = (float)GetFcvValue(s_BallTrnsX, (float)(sprite->timer - 1));
+			scaleMtx[1][3] = (float)GetFcvValue(s_BallTrnsY, (float)(sprite->timer - 1));
+			if (itemIndex >= 1 && itemIndex <= 2) {
+				scaleMtx[1][3] -= 0.5f;
+			}
 			scaleMtx[2][3] = 0.0f;
 		}
 

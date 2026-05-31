@@ -8,6 +8,11 @@ import re
 import sys
 from pathlib import Path
 
+try:
+    from .map.map_index import default_game_map_path, load_map_index, normalize_object_file
+except ImportError:
+    from map.map_index import default_game_map_path, load_map_index, normalize_object_file
+
 EN_FOUND_IN_RE = re.compile(r"^\s*\d+\]\s*(.+?)\s*\(([^)]+)\)\s+found in\s+(.+)$")
 
 # NOTE: MAP-derived addresses/sizes may not match your current build.
@@ -296,21 +301,38 @@ def extract_all_for_object(map_file, object_file):
     sections = []
 
     try:
-        with open(map_file, 'r', encoding='utf-8', errors='ignore') as f:
-            for line_num, line in enumerate(f, 1):
-                line_stripped = line.strip()
+        target = normalize_object_file(object_file)
+        index = load_map_index(map_file)
+        for records in index.layout_by_symbol.values():
+            for record in records:
+                if record.object_file != target:
+                    continue
+                if "(entry of " in record.symbol_name or record.symbol_name.startswith("gap_"):
+                    continue
 
-                if (line_stripped.endswith(f"\t{object_file}") or
-                    line_stripped.endswith(f" {object_file}") or
-                    f"found in {object_file}" in line_stripped):
-                    if "found in" in line_stripped:
-                        parsed = _parse_en_found_in(line_stripped)
-                    else:
-                        parsed = _parse_pal_line(line_stripped)
-                    _categorize_entry(parsed, functions, globals_data, sections)
+                parsed = {
+                    'flag': '',
+                    'offset': 'UNUSED' if record.is_unused else (
+                        f"0x{record.offset:x}" if record.offset is not None else 'unknown'
+                    ),
+                    'size': f"0x{record.size:x}",
+                    'virtual_addr': 'UNUSED' if record.virtual_address is None else f"0x{record.virtual_address:x}",
+                    'type_flag': record.section,
+                    'symbol': record.symbol_name,
+                    'object_file': record.object_file,
+                }
+
+                if record.symbol_name == record.section:
+                    sections.append({'parsed': parsed})
+                elif record.section == '.text':
+                    functions.append({'parsed': parsed})
+                else:
+                    globals_data.append({'parsed': parsed})
 
                 if len(functions) + len(globals_data) + len(sections) >= 200:
                     break
+            if len(functions) + len(globals_data) + len(sections) >= 200:
+                break
 
     except Exception as e:
         return {'error': f"Failed to read {map_file}: {e}"}
@@ -323,6 +345,9 @@ def extract_all_for_object(map_file, object_file):
 
 def extract_all_for_module(map_file, object_file=None, source_file=None):
     """Extract comprehensive information for a module using object and/or source identifiers."""
+    if object_file:
+        return extract_all_for_object(map_file, object_file)
+
     identifiers = [v for v in [object_file, source_file] if v]
     if not identifiers:
         return {'functions': [], 'globals': [], 'sections': []}
@@ -375,8 +400,8 @@ def main():
     context = sys.argv[2] if len(sys.argv) > 2 else None
 
     repo_root = Path(__file__).resolve().parent.parent
-    pal_map = repo_root / "orig/GCCP01/game.MAP"
-    en_map = repo_root / "orig/GCCE01/game.MAP"
+    pal_map = default_game_map_path(repo_root, "GCCP01")
+    en_map = default_game_map_path(repo_root, "GCCE01")
 
     # Determine search mode
     is_section_search = context == "--section"

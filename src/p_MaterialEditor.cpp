@@ -19,8 +19,6 @@ extern "C" void createViewer__18CMaterialEditorPcsFv(CMaterialEditorPcs*);
 extern "C" void destroyViewer__18CMaterialEditorPcsFv(CMaterialEditorPcs*);
 extern "C" void calcViewer__18CMaterialEditorPcsFv(CMaterialEditorPcs*);
 extern "C" void drawViewer__18CMaterialEditorPcsFv(CMaterialEditorPcs*);
-extern const char __RTTI__8CManager_8032E648[];
-extern const char __RTTI__8CProcess_8032E650[];
 extern "C" const char s_CMaterialEditorPcsViewer[] = "CMaterialEditorPcs(VIEWER)";
 extern "C" const char s_CMaterialEditorPcs[] = "CMaterialEditorPcs";
 extern "C" const char sMaterialEditorCManagerName[] = "CManager";
@@ -58,10 +56,6 @@ unsigned int CMaterialEditorPcs::m_table[0x15C / sizeof(unsigned int)] = {
     0x41,
     1
 };
-unsigned int s_CMaterialEditorPcsTablePad0[3] = {reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CManager_8032E648)), 0, 0};
-unsigned int s_CMaterialEditorPcsTablePad1[5] = {reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CManager_8032E648)), 0, reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CProcess_8032E650)), 0, 0};
-
-
 extern "C" const double DOUBLE_8032FCC0 = 1.0;
 extern "C" const double DOUBLE_8032FCD0;
 extern "C" const float FLOAT_8032FCC8 = 1.0f;

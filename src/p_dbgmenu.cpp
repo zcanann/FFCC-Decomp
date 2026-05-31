@@ -15,10 +15,8 @@
 
 CDbgMenuPcs DbgMenuPcs;
 
-extern unsigned char gDbgMenuPartHeapDumpEnabled;
+extern unsigned char g_IsDrawHeapSize;
 extern unsigned char g_map_draw_prof;
-extern const char __RTTI__8CManager_8032EA50[];
-extern const char __RTTI__8CProcess_8032EA58[];
 
 struct DbgMenuDef {
     const char* text;
@@ -86,15 +84,6 @@ DbgMenuDef tWork[] = {
     { sDbgMenuChara, 122, 2, 1 },
 };
 u32 gDbgMenuWindowBorderColors[4] = {0x0000FFC0, 0x4040FFC0, 0x4040FFC0, 0x8080FFC0};
-u32 s_CDbgMenuPcsTablePad0[3] = {
-    reinterpret_cast<u32>(const_cast<char*>(__RTTI__8CManager_8032EA50)), 0, 0};
-u32 s_CDbgMenuPcsTablePad1[5] = {
-    reinterpret_cast<u32>(const_cast<char*>(__RTTI__8CManager_8032EA50)),
-    0,
-    reinterpret_cast<u32>(const_cast<char*>(__RTTI__8CProcess_8032EA58)),
-    0,
-    0,
-};
 GXColor gDbgMenuWindowFillColors[2] = {{0xFF, 0xFF, 0xFF, 0x80}, {0, 0, 0, 0x80}};
 
 /*
@@ -282,7 +271,7 @@ void CDbgMenuPcs::calc()
 			g_map_draw_prof = 1 - g_map_draw_prof;
 			break;
 		case 0x76:
-			gDbgMenuPartHeapDumpEnabled = 1 - gDbgMenuPartHeapDumpEnabled;
+			g_IsDrawHeapSize = 1 - g_IsDrawHeapSize;
 			PartMng.pppDumpMngSt();
 			break;
 		case 0x77:
@@ -447,7 +436,7 @@ void CDbgMenuPcs::calcMenu(CDbgMenuPcs::CDM* menu)
 			menu->m_state = g_map_draw_prof != 0;
 			break;
 		case 0x76:
-			menu->m_state = gDbgMenuPartHeapDumpEnabled != 0;
+			menu->m_state = g_IsDrawHeapSize != 0;
 			break;
 		case 0x78:
 			menu->m_state = (m_dbgFlags >> 13) & 1;

@@ -41,8 +41,6 @@ unsigned int CUSBPcs::m_table[0x11C / sizeof(unsigned int)] = {
     0,
     0x12,
 };
-unsigned int s_CUSBPcsTablePad0[3] = {0, 0, 0};
-unsigned int s_CUSBPcsTablePad1[5] = {0, 0, 0, 0, 0};
 extern const char s_p_usb_cpp[] = "p_usb.cpp";
 extern const char s_usbRootPath[16] = "plot/kmitsuru/";
 

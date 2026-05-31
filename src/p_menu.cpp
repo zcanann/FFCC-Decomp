@@ -126,9 +126,6 @@ extern "C" const f32 kMenuOrthoRight = 640.0f;
 extern "C" const f32 kMenuOrthoFar = -100.0f;
 extern "C" const f32 FLOAT_8033086C = 0.125f;
 
-extern const char __RTTI__8CManager_8032E7A8[];
-extern const char __RTTI__8CProcess_8032E7B0[];
-
 unsigned int CMenuPcs::m_table_desc0[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(create__8CMenuPcsFv)};
 unsigned int CMenuPcs::m_table_desc1[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(destroy__8CMenuPcsFv)};
 unsigned int CMenuPcs::m_table_desc2[3] = {0, 0xFFFFFFFF, reinterpret_cast<unsigned int>(calc__8CMenuPcsFv)};
@@ -620,16 +617,6 @@ int sMenuTextureInfoTable[] = {
     2, reinterpret_cast<int>(const_cast<char*>(s_MenuTexSuna_803307F0)),
     2, reinterpret_cast<int>(const_cast<char*>(s_MenuTexGba_803307F8)),
     2, reinterpret_cast<int>(const_cast<char*>(s_MenuTexBattle2_803307FC))
-};
-
-unsigned int s_CMenuPcsTablePad0[3] = {
-    reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CManager_8032E7A8)), 0, 0};
-unsigned int s_CMenuPcsTablePad1[5] = {
-    reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CManager_8032E7A8)),
-    0,
-    reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CProcess_8032E7B0)),
-    0,
-    0,
 };
 
 /*

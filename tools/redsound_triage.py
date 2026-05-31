@@ -26,7 +26,7 @@ from objdiff_experiment import (
     source_path_for_unit,
     symbol_by_name,
 )
-from map.map_index import LayoutRecord, MapIndex, load_map_index, normalize_object_file
+from map.map_index import LayoutRecord, MapIndex, default_game_map_path, load_map_index, normalize_object_file
 
 
 REDSOUND_UNITS = [
@@ -60,8 +60,8 @@ CONTEXT_ATTEMPT_NOTE_PREFIXES = (
 )
 
 MAP_PATHS = (
-    ("PAL", ROOT / "orig" / "GCCP01" / "game.MAP"),
-    ("EN", ROOT / "orig" / "GCCE01" / "game.MAP"),
+    ("PAL", default_game_map_path(ROOT, "GCCP01")),
+    ("EN", default_game_map_path(ROOT, "GCCE01")),
 )
 
 

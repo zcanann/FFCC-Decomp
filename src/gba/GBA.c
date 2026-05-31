@@ -1,6 +1,6 @@
 #include "dolphin/gba/GBAPriv.h"
 
-extern GBASecParam SecParams[4];
+static GBASecParam SecParams[4];
 GBAControl __GBA[4];
 BOOL __GBAReset = FALSE;
 

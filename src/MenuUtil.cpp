@@ -315,6 +315,7 @@ float CMenuPcs::CalcCenteringPos(char* text, CFont* font)
  * Address:	TODO
  * Size:	TODO
  */
+#pragma dont_inline on
 void CMenuPcs::DrawFont(int posX, int posY, _GXColor color, int tlut, char* text, float scale, float margin)
 {
 	CFont* font = menuFont;
@@ -329,6 +330,7 @@ void CMenuPcs::DrawFont(int posX, int posY, _GXColor color, int tlut, char* text
 	font->SetPosY((float)posY);
 	font->Draw(text);
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -339,6 +341,7 @@ void CMenuPcs::DrawFont(int posX, int posY, _GXColor color, int tlut, char* text
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma dont_inline on
 void CMenuPcs::DrawFont2(int posX, int posY, _GXColor color, int tlut, char* text, float scaleX, float scaleY, float margin)
 {
 	CFont* font = menuFont;
@@ -354,6 +357,7 @@ void CMenuPcs::DrawFont2(int posX, int posY, _GXColor color, int tlut, char* tex
 	font->SetPosY((float)posY);
 	font->Draw(text);
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--

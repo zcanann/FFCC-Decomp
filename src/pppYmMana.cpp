@@ -18,10 +18,11 @@
 
 
 
-extern const float FLOAT_80330e48 = -1.5707964f;
+extern const float FLOAT_80330e48;
 extern const float FLOAT_80330e4c = 0.0f;
 extern const char s_ymManaRuin2Name[] = "ruin_2";
-extern const float FLOAT_80330e58 = 1.0f;
+extern const float FLOAT_80330e58;
+static const float LOCAL_FLOAT_80330e58 = 1.0f;
 extern const float FLOAT_80330e5c = 0.5f;
 
 extern const float FLOAT_80330e60 = 2.0f;
@@ -1652,7 +1653,7 @@ void CalcReflectionVector2(
     u16* dl = (u16*)displayList;
     u16* dlEnd = (u16*)((u8*)displayList + displayListSize);
     const float zero = FLOAT_80330e4c;
-    const float denomBias = FLOAT_80330e58;
+    const float denomBias = LOCAL_FLOAT_80330e58;
     const float half = FLOAT_80330e5c;
     const float warp = FLOAT_80330e60;
     const float scale = FLOAT_80330e64;

@@ -2153,6 +2153,15 @@ void CMemoryCardMan::DecodeData()
     }
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x800c17b8
+ * PAL Size: 324b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 void CMemoryCardMan::CalcSaveDatHpMax(Mc::SaveDat* saveDat)
 {
     u8* save = reinterpret_cast<u8*>(saveDat);
@@ -2164,29 +2173,25 @@ void CMemoryCardMan::CalcSaveDatHpMax(Mc::SaveDat* saveDat)
         if (*reinterpret_cast<int*>(charData + 0x5B4) != 0)
         {
             short equippedItems[4];
-            short* equippedItem = equippedItems;
 
-            int itemSlot = 0;
-            int itemCount = 0x49;
-            do
+            for (int itemSlot = 0; itemSlot < 0x49; itemSlot++)
             {
                 if (itemSlot >= 0x45)
                 {
+                    int equippedSlot = itemSlot - 0x45;
                     const int word = itemSlot >> 5;
                     const int bit = itemSlot % 32;
                     if ((*reinterpret_cast<u32*>(charData + 0xBC + word * 4) & (1 << bit)) != 0)
                     {
-                        *equippedItem++ = static_cast<short>(itemSlot) + 0x9F;
+                        equippedItems[equippedSlot] = static_cast<short>(itemSlot) + 0x9F;
                     }
                     else
                     {
-                        *equippedItem++ = -1;
+                        equippedItems[equippedSlot] = -1;
                     }
                 }
 
-                itemSlot++;
             }
-            while (--itemCount != 0);
 
             int totalHpBonus = 0;
             int itemData = Game.unkCFlatData0[2];

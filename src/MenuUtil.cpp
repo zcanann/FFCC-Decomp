@@ -1367,12 +1367,12 @@ void CMenuPcs::DrawOptionMenu()
 			gUtil.RenderTextureQuad(330.0f, 138.0f + static_cast<float>(y), FLOAT_80333588, FLOAT_8033361C,
 			                        modePanel, &uv0, &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
-			char* modeText = g_strMenuUtilMes[languageBase + 18];
+			char* modeText = g_strMenuUtilMes[languageBase + 19];
 			float textPanelX = 492.0f;
 			float textY = 132.0f;
 			float textPanelWidth = 112.0f;
 			if (m_specialModeFlags[i] == 0) {
-				modeText = g_strMenuUtilMes[languageBase + 19];
+				modeText = g_strMenuUtilMes[languageBase + 18];
 				textPanelX = 372.0f;
 				textY = 136.0f;
 				textPanelWidth = 120.0f;

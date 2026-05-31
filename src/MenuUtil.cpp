@@ -377,11 +377,11 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 
 	font->SetMargin(FLOAT_803335a0);
 	font->SetShadow(1);
-	font->SetScale(scale);
+	font->SetScale(margin);
 	font->DrawInit();
 	font->SetTlut(tlut);
 	font->SetColor(color);
-	font->SetScale(kOptionAnimMax);
+	font->SetScale(FLOAT_80333548);
 
 	if ((0 <= msgNo) && (msgNo <= 0x268)) {
 		firstLine = msgNo * 3 + 0x1F5;

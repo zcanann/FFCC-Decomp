@@ -299,7 +299,7 @@ void CMesMenu::DrawHeart(float x, float y, float z, float alpha)
 {
     (void)z;
 
-    unsigned int scriptFood = Game.m_scriptFoodBase[*(int*)((char*)this + 0x18)];
+    unsigned int scriptFood = Game.m_scriptFoodBase[m_menuIndex];
     if (scriptFood == 0) {
         return;
     }
@@ -313,7 +313,7 @@ void CMesMenu::DrawHeart(float x, float y, float z, float alpha)
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(0x17));
 
     int offset = 0x4C;
-    if ((*(int*)((char*)this + 0x18) & 1) != 0) {
+    if ((m_menuIndex & 1) != 0) {
         offset = 0x30;
     }
 
@@ -325,14 +325,13 @@ void CMesMenu::DrawHeart(float x, float y, float z, float alpha)
     float one = FLOAT_80330914;
     float pulseScale = FLOAT_8033091c;
     float pulseMul = FLOAT_80330920;
-    int timerOffset = (int)this;
 
     for (unsigned int i = 0; i < (*(unsigned short*)(scriptFood + 0x1A) >> 1); i++) {
-        int heartValue = *(int*)((char*)this + 0x3DA8) - valueOffset;
-        float timer = (float)*(unsigned int*)(timerOffset + 0x3DB0);
+        int heartValue = m_heartValue - valueOffset;
+        float timer = (float)(unsigned int)m_heartGrowTimers[i];
         float pulse = (pulseScale * (float)sin(stepScale * -(timer * timerScale - one)) + one) * pulseMul;
 
-        unsigned int subTimer = *(unsigned int*)(timerOffset + 0x3DD0);
+        unsigned int subTimer = m_heartDropTimers[i];
         int shakeX;
         if (subTimer == 0) {
             shakeX = 0;
@@ -367,9 +366,8 @@ void CMesMenu::DrawHeart(float x, float y, float z, float alpha)
                 FLOAT_803308d8);
         }
 
-        baseX += ((*(int*)((char*)this + 0x18) & 1) != 0) ? FLOAT_80330924 : FLOAT_80330928;
+        baseX += ((m_menuIndex & 1) != 0) ? FLOAT_80330924 : FLOAT_80330928;
         valueOffset += 0x0C;
-        timerOffset += 4;
     }
 }
 

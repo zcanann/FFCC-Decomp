@@ -1097,13 +1097,14 @@ void CGame::LoadInit()
 void CGame::LoadScript(char* scriptData)
 {
     u8* flat = CFlat;
+    int scriptOffset = 0;
     int i = 0;
     int entryOffset = 0;
 
     while (i < *(int*)(flat + 4)) {
         if ((*(u8*)(*(int*)(flat + 8) + entryOffset + 1) & 0x20) != 0) {
-            u32* src = reinterpret_cast<u32*>(scriptData);
-            scriptData += 4;
+            u32* src = reinterpret_cast<u32*>(scriptData + scriptOffset);
+            scriptOffset += 4;
             *(u32*)(*(int*)(flat + 12) + entryOffset) = *src;
         }
 
@@ -1125,13 +1126,14 @@ void CGame::SaveScript(char* scriptData)
 {
     memset(scriptData, 0, kGameScriptSaveDataSize);
 
+    u8* flat = CFlat;
     int scriptOffset = 0;
     int entryOffset = 0;
     int i = 0;
 
-    while (i < CFlatPermanentVarCount()) {
-        if ((CFlatPermanentVarDefs()[entryOffset + 1] & 0x20) != 0) {
-            *(u32*)(scriptData + scriptOffset) = *reinterpret_cast<u32*>(CFlatPermanentVarValues() + entryOffset);
+    while (i < *(int*)(flat + 4)) {
+        if ((*(u8*)(*(int*)(flat + 8) + entryOffset + 1) & 0x20) != 0) {
+            *(u32*)(scriptData + scriptOffset) = *reinterpret_cast<u32*>(*(int*)(flat + 12) + entryOffset);
             scriptOffset += 4;
         }
 

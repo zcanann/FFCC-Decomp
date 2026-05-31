@@ -580,7 +580,7 @@ config.libs = [
             Object(NonMatching, "p_sound.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly"]),
             Object(NonMatching, "p_system.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly"]),
             Object(NonMatching, "p_tina.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
-            Object(NonMatching, "p_usb.cpp", extra_cflags=["-sdata 8"]),
+            Object(NonMatching, "p_usb.cpp", extra_cflags=["-RTTI on", "-sdata 8"]),
             Object(NonMatching, "pad.cpp", extra_cflags=["-RTTI on"]),
             Object(NonMatching, "partMng.cpp"),
             Object(NonMatching, "partyobj.cpp"),

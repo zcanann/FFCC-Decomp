@@ -19,10 +19,6 @@ struct Vec2d {
 };
 
 extern "C" char s_MenuUtil_cpp_801e37fc[];
-extern u32 DAT_801e36d0;
-extern u32 DAT_801e36d4;
-extern u32 DAT_801e36d8;
-extern u32 DAT_801e36dc;
 extern "C" const float FLOAT_80333614 = 196.0f;
 extern "C" const float FLOAT_80333618 = 168.0f;
 extern "C" const float FLOAT_8033361C = 24.0f;
@@ -360,10 +356,11 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 	unsigned char* const menuPcsGlobal = reinterpret_cast<unsigned char*>(&MenuPcs);
 	u32 foodBase = Game.m_scriptFoodBase[0];
 	u32 lineBaseY[4];
-	lineBaseY[0] = DAT_801e36d0;
-	lineBaseY[1] = DAT_801e36d4;
-	lineBaseY[2] = DAT_801e36d8;
-	lineBaseY[3] = DAT_801e36dc;
+	const u32* lineBaseData = reinterpret_cast<const u32*>(s_MenuOptionEstandar_801E36C4 + 0xC);
+	lineBaseY[0] = lineBaseData[0];
+	lineBaseY[1] = lineBaseData[1];
+	lineBaseY[2] = lineBaseData[2];
+	lineBaseY[3] = lineBaseData[3];
 
 	int languageIndex = Game.m_gameWork.m_languageId - 1;
 	int drawPrefix = 1;

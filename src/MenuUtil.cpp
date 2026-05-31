@@ -1354,24 +1354,25 @@ void CMenuPcs::DrawOptionMenu()
 		for (int i = 0; i < 4; i++, y += 0x28, uvY += 0x20, modeU += 0x40) {
 			if ((m_specialModeEdit != 0) && (m_specialModeCursor == i)) {
 				CTexture* cursorPanel = GetTextureSetTexture(textureSet, 4);
-				gUtil.CalcUV(uv0.x, uv0.y, cursorPanel->m_width - 0x30, 0, cursorPanel->m_width,
-				             cursorPanel->m_height);
-				gUtil.CalcUV(uv1.x, uv1.y, cursorPanel->m_width, 0x28, cursorPanel->m_width,
-				             cursorPanel->m_height);
+				unsigned int cursorWidth = cursorPanel->m_width;
+				unsigned int cursorHeight = cursorPanel->m_height;
+				gUtil.CalcUV(uv0.x, uv0.y, cursorWidth - 0x30, 0, cursorWidth, cursorHeight);
+				gUtil.CalcUV(uv1.x, uv1.y, cursorWidth, 0x28, cursorWidth, cursorHeight);
 				gUtil.RenderTextureQuad(326.0f, 128.0f + static_cast<float>(y), 48.0f, FLOAT_80333588,
 				                        cursorPanel, &uv0, &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
-				gUtil.CalcUV(uv0.x, uv0.y, 0, 0x30, cursorPanel->m_width, cursorPanel->m_height);
-				gUtil.CalcUV(uv1.x, uv1.y, cursorPanel->m_width, cursorPanel->m_height, cursorPanel->m_width,
-				             cursorPanel->m_height);
+				gUtil.CalcUV(uv0.x, uv0.y, 0, 0x30, cursorWidth, cursorHeight);
+				gUtil.CalcUV(uv1.x, uv1.y, cursorWidth, cursorHeight, cursorWidth, cursorHeight);
 				gUtil.RenderTextureQuad(300.0f, 160.0f + static_cast<float>(y),
-				                        static_cast<float>(cursorPanel->m_width), FLOAT_80333624, cursorPanel,
+				                        static_cast<float>(cursorWidth), FLOAT_80333624, cursorPanel,
 				                        &uv0, &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 			}
 
 			CTexture* modePanel = GetTextureSetTexture(textureSet, 7);
-			gUtil.CalcUV(uv0.x, uv0.y, modePanel->m_width - 0x30, uvY, modePanel->m_width, modePanel->m_height);
-			gUtil.CalcUV(uv1.x, uv1.y, modePanel->m_width, uvY + 0x18, modePanel->m_width, modePanel->m_height);
+			unsigned int modeWidth = modePanel->m_width;
+			unsigned int modeHeight = modePanel->m_height;
+			gUtil.CalcUV(uv0.x, uv0.y, modeWidth - 0x30, uvY, modeWidth, modeHeight);
+			gUtil.CalcUV(uv1.x, uv1.y, modeWidth, uvY + 0x18, modeWidth, modeHeight);
 			gUtil.RenderTextureQuad(330.0f, 138.0f + static_cast<float>(y), FLOAT_80333588, FLOAT_8033361C,
 			                        modePanel, &uv0, &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
@@ -1384,8 +1385,8 @@ void CMenuPcs::DrawOptionMenu()
 				textPanelX = 372.0f;
 				textY = 136.0f;
 				textPanelWidth = 120.0f;
-				gUtil.CalcUV(uv0.x, uv0.y, 0, uvY, modePanel->m_width, modePanel->m_height);
-				gUtil.CalcUV(uv1.x, uv1.y, 0x78, uvY + 0x20, modePanel->m_width, modePanel->m_height);
+				gUtil.CalcUV(uv0.x, uv0.y, 0, uvY, modeWidth, modeHeight);
+				gUtil.CalcUV(uv1.x, uv1.y, 0x78, uvY + 0x20, modeWidth, modeHeight);
 				gUtil.RenderTextureQuad(textPanelX, textY + static_cast<float>(y), textPanelWidth, FLOAT_80333570,
 				                        modePanel, &uv0, &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 				font->SetMargin(kOptionAnimMax);
@@ -1403,8 +1404,8 @@ void CMenuPcs::DrawOptionMenu()
 				                                         kMenuCenteringHalfWidth),
 				         static_cast<int>(textY + FLOAT_80333580 + FLOAT_80333634 + static_cast<float>(y)), color, 7,
 				         modeText, kOptionAnimMax, kOptionAnimMax);
-				gUtil.CalcUV(uv0.x, uv0.y, 0x78, uvY, modePanel->m_width, modePanel->m_height);
-				gUtil.CalcUV(uv1.x, uv1.y, 0xE0, uvY + 0x20, modePanel->m_width, modePanel->m_height);
+				gUtil.CalcUV(uv0.x, uv0.y, 0x78, uvY, modeWidth, modeHeight);
+				gUtil.CalcUV(uv1.x, uv1.y, 0xE0, uvY + 0x20, modeWidth, modeHeight);
 				gUtil.RenderTextureQuad(textPanelX, textY + static_cast<float>(y), textPanelWidth, FLOAT_80333570,
 				                        modePanel, &uv0, &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 			}

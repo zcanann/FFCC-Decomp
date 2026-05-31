@@ -28,7 +28,7 @@ inline CUSBPcs::CUSBPcs()
     table[9] = desc2[2];
 }
 
-unsigned int CUSBPcs::m_table[0x15C / sizeof(unsigned int)] = {
+unsigned int CUSBPcs::m_table[CUSBPcs::TableStorageSize / sizeof(unsigned int)] = {
     reinterpret_cast<unsigned int>(const_cast<char*>(sUsbPcsClassName)),
     0,
     0,
@@ -235,7 +235,7 @@ void CUSBPcs::IsBigAlloc(int param_2)
  */
 int CUSBPcs::GetTable(unsigned long param)
 {
-    return reinterpret_cast<int>(reinterpret_cast<char*>(m_table) + (param * 0x15c));
+    return reinterpret_cast<int>(reinterpret_cast<char*>(m_table) + (param * CUSBPcs::TableStride));
 }
 
 /*

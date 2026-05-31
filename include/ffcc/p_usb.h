@@ -9,7 +9,13 @@ class CUSBPcs : public CProcess
 {
 public:
     class CDataHeader;
-    static unsigned int m_table[0x15C / sizeof(unsigned int)];
+    // PAL emits a shorter table symbol here; GetTable still uses the normal process table stride.
+    enum {
+        TableStorageSize = 0x11C,
+        TableStride = 0x15C,
+    };
+
+    static unsigned int m_table[TableStorageSize / sizeof(unsigned int)];
 
     CUSBPcs();
 

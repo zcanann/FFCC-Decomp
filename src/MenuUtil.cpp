@@ -1326,7 +1326,7 @@ void CMenuPcs::DrawOptionMenu()
 		float maxX = FLOAT_80333628 - font->GetWidth(maxText);
 		DrawFont(static_cast<int>(maxX), static_cast<int>(FLOAT_80333618), color, 7, maxText, kOptionAnimMax,
 		         kOptionAnimMax);
-	} else if (m_optionIndex == 4) {
+	} else {
 		CTextureSet* textureSet = GetMenuTextureSet(this, 0xBC);
 		CTexture* cursorPanel = GetTextureSetTexture(textureSet, 4);
 		CTexture* modePanel = GetTextureSetTexture(textureSet, 7);

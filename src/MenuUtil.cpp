@@ -1268,7 +1268,7 @@ void CMenuPcs::DrawOptionMenu()
 		                                                  kMenuCenteringHalfWidth),
 		          static_cast<int>(secondY), color, secondTlut, secondText, secondScale, kOptionAnimMax,
 		          kOptionAnimMax);
-	} else if (m_optionIndex == 3) {
+	} else if (m_optionIndex < 4) {
 		CTexture* meterTexture = GetTextureSetTexture(GetMenuTextureSet(this, 0xBC), 3);
 		signed char volume = m_seVolume;
 		float iconWave = FLOAT_80333620 * rowSin;

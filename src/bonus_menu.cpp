@@ -440,8 +440,8 @@ static inline void DrawBonusPartyNames(CMenuPcs* menu, BonusAnimHeader* header, 
 		}
 		CColor color(0xFF, 0xFF, 0xFF, (unsigned char)(sprite->alpha * 255.0f));
 		font->SetColor(color.color);
-		font->SetPosX((float)sprite->x + sprite->mulX);
-		font->SetPosY((float)sprite->y + sprite->mulY - 8.0f);
+		font->SetPosX((float)sprite->x + sprite->motionX);
+		font->SetPosY((float)sprite->y + sprite->motionY - 12.0f);
 		font->Draw(name);
 		nameIndex++;
 	}

@@ -557,10 +557,10 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 						int delta = static_cast<int>(*reinterpret_cast<u16*>(itemBase + 6)) - static_cast<int>(currentValue);
 						int deltaX = static_cast<int>(static_cast<float>(valueX) + (FLOAT_803335a0 + font->GetWidth(scratch)));
 						font->SetPosX(static_cast<float>(deltaX));
-						if (delta < 0) {
-							font->SetTlut(3);
-						} else {
+						if (delta >= 0) {
 							font->SetTlut(9);
+						} else {
+							font->SetTlut(3);
 						}
 						sprintf(scratch, sMenuUtilSignedDeltaFormat, delta);
 						if (delta != 0) {

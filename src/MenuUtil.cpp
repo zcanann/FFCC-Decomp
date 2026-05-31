@@ -12,6 +12,7 @@
 #include "ffcc/util.h"
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h>
+#include <math.h>
 
 struct Vec2d {
 	float x;
@@ -53,9 +54,16 @@ extern float FLOAT_80333580;
 extern float FLOAT_80333584;
 extern float FLOAT_80333588;
 extern float FLOAT_80333590;
+extern float FLOAT_80333594;
+extern float FLOAT_8033359C;
 extern float FLOAT_803335a0;
+extern float FLOAT_803335A8;
 extern float FLOAT_803335B0;
 extern float FLOAT_803335B4;
+extern float FLOAT_803335F8;
+extern float FLOAT_803335FC;
+extern float FLOAT_80333600;
+extern float FLOAT_80333604;
 extern const char sMenuUtilEmptyText[4] = "";
 extern const char sMenuUtilStringFormat[] = "%s";
 extern const char sMenuUtilPlusOneText[] = "+1";
@@ -1143,6 +1151,12 @@ void CMenuPcs::DrawOptionMenu()
 	          static_cast<int>(FLOAT_80333590), color, 7, help, FLOAT_80333578,
 	          kOptionAnimMax, kOptionAnimMax);
 
+	int rowAnimStep = static_cast<int>(m_optionRowAnim / kOptionRowAnimStep);
+	color.a = static_cast<unsigned char>(static_cast<int>(FLOAT_80333550 * m_optionRowAnim));
+	float rowAngle = static_cast<float>(rowAnimStep) * FLOAT_8033359C;
+	float rowSin = static_cast<float>(sin(static_cast<double>(FLOAT_80333594 * FLOAT_803335a0 * rowAngle)));
+	float rowCos = static_cast<float>(cos(static_cast<double>(FLOAT_80333594 * rowAngle)));
+
 	if (m_optionIndex <= 1) {
 		CTextureSet* textureSet = GetMenuTextureSet(this, 0xBC);
 		CTexture* sideTexture = GetTextureSetTexture(textureSet, 1);
@@ -1197,15 +1211,22 @@ void CMenuPcs::DrawOptionMenu()
 		unsigned long leftArrowY = (m_optionIndex <= 2) ? 0x58 : 0x40;
 		unsigned long rightArrowY = (m_optionIndex <= 2) ? 0x5C : 0x3C;
 		unsigned long barU = (m_optionIndex <= 2) ? 0x40 : 0x30;
+		float iconWave = FLOAT_80333620 * rowSin;
+		float leftIconX =
+		    static_cast<float>(static_cast<int>((FLOAT_803335A8 - FLOAT_803335F8) * rowCos + FLOAT_803335F8));
+		float rightIconX = static_cast<float>(static_cast<int>(
+		    -(((FLOAT_8033361C + FLOAT_80333600) - FLOAT_803335A8) * rowCos - FLOAT_80333600)));
+		float leftIconY = FLOAT_803335FC + ((m_optionIndex <= 2) ? -iconWave : iconWave);
+		float rightIconY = FLOAT_80333604 + ((m_optionIndex <= 2) ? iconWave : -iconWave);
 
 		gUtil.CalcUV(uv0.x, uv0.y, iconLeftU, 0x28, meterTexture->m_width, meterTexture->m_height);
 		gUtil.CalcUV(uv1.x, uv1.y, iconLeftU + 0x18, 0x40, meterTexture->m_width, meterTexture->m_height);
-		gUtil.RenderTextureQuad(348.0f, 192.0f, FLOAT_8033361C, FLOAT_8033361C, meterTexture, &uv0, &uv1,
+		gUtil.RenderTextureQuad(leftIconX, leftIconY, FLOAT_8033361C, FLOAT_8033361C, meterTexture, &uv0, &uv1,
 		                        &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
 		gUtil.CalcUV(uv0.x, uv0.y, iconRightU, 0, meterTexture->m_width, meterTexture->m_height);
 		gUtil.CalcUV(uv1.x, uv1.y, iconRightU + 0x28, 0x28, meterTexture->m_width, meterTexture->m_height);
-		gUtil.RenderTextureQuad(556.0f, 184.0f, FLOAT_80333588, FLOAT_80333588, meterTexture, &uv0, &uv1,
+		gUtil.RenderTextureQuad(rightIconX, rightIconY, FLOAT_80333588, FLOAT_80333588, meterTexture, &uv0, &uv1,
 		                        &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
 		color.a = static_cast<unsigned char>(static_cast<int>(FLOAT_80333550 * m_optionColumnAnim));

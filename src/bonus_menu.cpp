@@ -1137,8 +1137,7 @@ void CMenuPcs::CalcSelectWait()
 	}
 	unsigned char unavailableMask = GetBonusUnavailableMask(statePtr, currentParty);
 
-	switch (promptMode) {
-	case 3:
+	if (promptMode == 3) {
 		if (delay == 0 && currentPartyIndex < activePartyCount && currentParty != 0) {
 			if ((repeat & 9) != 0) {
 				selection = (short)(selection + 1);
@@ -1188,8 +1187,7 @@ void CMenuPcs::CalcSelectWait()
 		} else {
 			delay = 0;
 		}
-		break;
-	case 1:
+	} else if (promptMode == 1) {
 		if ((repeat & 3) != 0) {
 			confirmSel = (short)(confirmSel ^ 1);
 			Sound.PlaySe(1, 0x40, 0x7f, 0);
@@ -1201,16 +1199,13 @@ void CMenuPcs::CalcSelectWait()
 			confirmSel = 1;
 			Sound.PlaySe(3, 0x40, 0x7f, 0);
 		}
-		break;
-	case 2:
+	} else if (promptMode == 2) {
 		if (*(short*)(auxPtr + 8) == 1 && confirmSel == 0) {
 			delay = 10;
 			*(unsigned char*)(statePtr + 8) = 0xff;
 		}
-		break;
-	default:
+	} else {
 		promptMode = 3;
-		break;
 	}
 
 	float* base = s_Base[0];

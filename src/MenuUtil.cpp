@@ -443,32 +443,9 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 		rangeKind = 0x7F;
 	}
 
-	if (rangeKind == 0) {
-		int lineCount = 3;
-		int firstNonEmptyLine = firstLine;
-		stage = *reinterpret_cast<CMemory::CStage**>(menuPcsGlobal + 0xEC);
-		if (Game.m_gameWork.m_menuStageMode != 0) {
-			stage = *reinterpret_cast<CMemory::CStage**>(menuPcsGlobal + 0xF4);
-		}
-
-		temp = new (stage, s_MenuUtil_cpp_801e37fc, 0x23D) char[0x200];
-		if ((temp == nullptr) && (System.m_execParam != 0)) {
-			System.Printf(s_MenuUtil_cpp_801e37fc + 0x10, s_MenuUtil_cpp_801e37fc, 0x23F);
-		}
-		for (int i = 0; i < 3; i++) {
-			int msgId = GetMenuHelpMsgTable()[firstLine + i];
-			memset(temp, 0, 0x200);
-			CMes::MakeAgbString(temp, reinterpret_cast<char*>(msgId), 0, 1);
-			if (strlen(temp) == 0) {
-				lineCount--;
-				if (firstNonEmptyLine == firstLine + i) {
-					firstNonEmptyLine++;
-				}
-			}
-		}
-		delete[] temp;
-
-		u32 y = lineBaseY[lineCount + drawPrefix - 1];
+	if (rangeKind != 0) {
+		u32 baseY = lineBaseY[drawPrefix + 2];
+		u32 y = baseY;
 		if (drawPrefix != 0) {
 			font->SetPosX(FLOAT_8033357c);
 			font->SetPosY(static_cast<float>(static_cast<int>(y)));
@@ -477,33 +454,13 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 			y = static_cast<u32>(static_cast<float>(static_cast<int>(y)) + lineStep);
 		}
 
-		for (int i = 0; i < lineCount; i++) {
-			int msgId = GetMenuHelpMsgTable()[firstNonEmptyLine + i];
+		for (int i = 0; i < 3; i++) {
+			int msgId = GetMenuHelpMsgTable()[firstLine + i];
 			font->SetPosX(static_cast<float>(0x140 - maxWidth / 2));
 			font->SetPosY(static_cast<float>(static_cast<int>(y)));
 			CMes::drawTagString(font, reinterpret_cast<char*>(msgId), 1, 0, 0);
 			y = static_cast<u32>(static_cast<float>(static_cast<int>(y)) + lineStep);
 		}
-		return;
-	}
-
-	u32 baseY = lineBaseY[drawPrefix + 2];
-	u32 y = baseY;
-	if (drawPrefix != 0) {
-		font->SetPosX(FLOAT_8033357c);
-		font->SetPosY(static_cast<float>(static_cast<int>(y)));
-		font->Draw(itemName);
-		font->Draw(suffix);
-		y = static_cast<u32>(static_cast<float>(static_cast<int>(y)) + lineStep);
-	}
-
-	for (int i = 0; i < 3; i++) {
-		int msgId = GetMenuHelpMsgTable()[firstLine + i];
-		font->SetPosX(static_cast<float>(0x140 - maxWidth / 2));
-		font->SetPosY(static_cast<float>(static_cast<int>(y)));
-		CMes::drawTagString(font, reinterpret_cast<char*>(msgId), 1, 0, 0);
-		y = static_cast<u32>(static_cast<float>(static_cast<int>(y)) + lineStep);
-	}
 
 	int itemBase = Game.unkCFlatData0[2] + msgNo * 0x48;
 	u16 flags = *reinterpret_cast<u16*>(itemBase + 4);
@@ -598,31 +555,73 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 				font->Draw(scratch);
 			}
 		}
-	} else {
-		u16 attr = *reinterpret_cast<u16*>(itemBase + 8);
-		if ((attr != 0) && (attr < 0x14)) {
-			strcpy(scratch, GetAttrStr(attr));
-			font->SetTlut(4);
-			font->Draw(scratch);
-			int valueX = static_cast<int>(FLOAT_803335a0 + font->GetWidth(scratch));
-			font->SetPosX(static_cast<float>(valueX));
-			font->SetTlut(9);
+		} else {
+			u16 attr = *reinterpret_cast<u16*>(itemBase + 8);
+			if ((attr != 0) && (attr < 0x14)) {
+				strcpy(scratch, GetAttrStr(attr));
+				font->SetTlut(4);
+				font->Draw(scratch);
+				int valueX = static_cast<int>(FLOAT_803335a0 + font->GetWidth(scratch));
+				font->SetPosX(static_cast<float>(valueX));
+				font->SetTlut(9);
 
-			if ((attr == 0) || (8 < attr)) {
-				if ((attr == 0xB) || (attr == 0x11) || (attr == 0x12)) {
-					sprintf(scratch, sMenuUtilSignedValueFormat, 0x2B, *reinterpret_cast<u16*>(itemBase + 6));
-				} else {
-					if (((attr - 9) > 1) && (attr != 0xC)) {
-						return;
+				if ((attr == 0) || (8 < attr)) {
+					if ((attr == 0xB) || (attr == 0x11) || (attr == 0x12)) {
+						sprintf(scratch, sMenuUtilSignedValueFormat, 0x2B, *reinterpret_cast<u16*>(itemBase + 6));
+					} else {
+						if (((attr - 9) > 1) && (attr != 0xC)) {
+							return;
+						}
+						sprintf(scratch, sMenuUtilSignedValueFormat, 0x2D, *reinterpret_cast<u16*>(itemBase + 6));
+						font->SetTlut(3);
 					}
-					sprintf(scratch, sMenuUtilSignedValueFormat, 0x2D, *reinterpret_cast<u16*>(itemBase + 6));
-					font->SetTlut(3);
+				} else {
+					sprintf(scratch, sMenuUtilStringFormat, sMenuUtilPlusOneText);
 				}
-			} else {
-				sprintf(scratch, sMenuUtilStringFormat, sMenuUtilPlusOneText);
-			}
 
-			font->Draw(scratch);
+				font->Draw(scratch);
+			}
+		}
+	} else {
+		int lineCount = 3;
+		int firstNonEmptyLine = firstLine;
+		stage = *reinterpret_cast<CMemory::CStage**>(menuPcsGlobal + 0xEC);
+		if (Game.m_gameWork.m_menuStageMode != 0) {
+			stage = *reinterpret_cast<CMemory::CStage**>(menuPcsGlobal + 0xF4);
+		}
+
+		temp = new (stage, s_MenuUtil_cpp_801e37fc, 0x23D) char[0x200];
+		if ((temp == nullptr) && (System.m_execParam != 0)) {
+			System.Printf(s_MenuUtil_cpp_801e37fc + 0x10, s_MenuUtil_cpp_801e37fc, 0x23F);
+		}
+		for (int i = 0; i < 3; i++) {
+			int msgId = GetMenuHelpMsgTable()[firstLine + i];
+			memset(temp, 0, 0x200);
+			CMes::MakeAgbString(temp, reinterpret_cast<char*>(msgId), 0, 1);
+			if (strlen(temp) == 0) {
+				lineCount--;
+				if (firstNonEmptyLine == firstLine + i) {
+					firstNonEmptyLine++;
+				}
+			}
+		}
+		delete[] temp;
+
+		u32 y = lineBaseY[lineCount + drawPrefix - 1];
+		if (drawPrefix != 0) {
+			font->SetPosX(FLOAT_8033357c);
+			font->SetPosY(static_cast<float>(static_cast<int>(y)));
+			font->Draw(itemName);
+			font->Draw(suffix);
+			y = static_cast<u32>(static_cast<float>(static_cast<int>(y)) + lineStep);
+		}
+
+		for (int i = 0; i < lineCount; i++) {
+			int msgId = GetMenuHelpMsgTable()[firstNonEmptyLine + i];
+			font->SetPosX(static_cast<float>(0x140 - maxWidth / 2));
+			font->SetPosY(static_cast<float>(static_cast<int>(y)));
+			CMes::drawTagString(font, reinterpret_cast<char*>(msgId), 1, 0, 0);
+			y = static_cast<u32>(static_cast<float>(static_cast<int>(y)) + lineStep);
 		}
 	}
 }

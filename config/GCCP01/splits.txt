@@ -2238,6 +2238,7 @@ gx/GXTexture.c:
 
 gx/GXBump.c:
 	.text       start:0x801A4B44 end:0x801A51D8
+	.sdata2     start:0x803338D0 end:0x803338D8
 
 gx/GXTev.c:
 	.text       start:0x801A51D8 end:0x801A59BC

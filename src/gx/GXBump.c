@@ -243,3 +243,5 @@ void __GXFlushTextureState(void) {
     GX_WRITE_SOME_REG5(GX_LOAD_BP_REG, gx->bpMask);
     gx->bpSentNot = 0;
 }
+
+const f32 GXIndTexMtxScale1024 = 1024.0f;

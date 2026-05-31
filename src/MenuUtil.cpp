@@ -1231,6 +1231,10 @@ void CMenuPcs::DrawOptionMenu()
 		CTextureSet* textureSet = GetMenuTextureSet(this, 0xBC);
 		CTexture* sideTexture = GetTextureSetTexture(textureSet, 1);
 		CTexture* selectorTexture = GetTextureSetTexture(textureSet, 4);
+		unsigned int sideWidth = sideTexture->m_width;
+		unsigned int sideHeight = sideTexture->m_height;
+		unsigned int selectorWidth = selectorTexture->m_width;
+		unsigned int selectorHeight = selectorTexture->m_height;
 		bool secondValue = (m_optionIndex == 0) ? (m_gameInitMode != 0) : (m_stereoMode != 0);
 		char* firstText = g_strMenuUtilMes[languageBase + ((m_optionIndex == 0) ? 12 : 14)];
 		char* secondText = g_strMenuUtilMes[languageBase + ((m_optionIndex == 0) ? 13 : 15)];
@@ -1241,18 +1245,18 @@ void CMenuPcs::DrawOptionMenu()
 
 		SetUv(uv0, kOptionAnimMin, kOptionAnimMin);
 		SetUv(uv1, kMenuCenteringHalfWidth, kOptionAnimMax);
-		gUtil.RenderTextureQuad(leftX, 172.0f, static_cast<float>(sideTexture->m_width) * kMenuCenteringHalfWidth,
-		                        static_cast<float>(sideTexture->m_height), sideTexture, &uv0, &uv1, &color,
+		gUtil.RenderTextureQuad(leftX, 172.0f, static_cast<float>(sideWidth) * kMenuCenteringHalfWidth,
+		                        static_cast<float>(sideHeight), sideTexture, &uv0, &uv1, &color,
 		                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 		SetUv(uv0, kMenuCenteringHalfWidth, kOptionAnimMin);
 		SetUv(uv1, kOptionAnimMax, kOptionAnimMax);
-		gUtil.RenderTextureQuad(rightX, 186.0f, static_cast<float>(sideTexture->m_width) * kMenuCenteringHalfWidth,
-		                        static_cast<float>(sideTexture->m_height), sideTexture, &uv0, &uv1, &color,
+		gUtil.RenderTextureQuad(rightX, 186.0f, static_cast<float>(sideWidth) * kMenuCenteringHalfWidth,
+		                        static_cast<float>(sideHeight), sideTexture, &uv0, &uv1, &color,
 		                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
 		color.a = static_cast<unsigned char>(static_cast<int>(FLOAT_80333550 * m_optionColumnAnim));
-		gUtil.CalcUV(uv0.x, uv0.y, 0, 0, selectorTexture->m_width, selectorTexture->m_height);
-		gUtil.CalcUV(uv1.x, uv1.y, 0x78, 0x30, selectorTexture->m_width, selectorTexture->m_height);
+		gUtil.CalcUV(uv0.x, uv0.y, 0, 0, selectorWidth, selectorHeight);
+		gUtil.CalcUV(uv1.x, uv1.y, 0x78, 0x30, selectorWidth, selectorHeight);
 		gUtil.RenderTextureQuad(selectorX + (secondValue ? secondOffset : kOptionAnimMin), 176.0f,
 		                        FLOAT_803335B0, FLOAT_803335B4, selectorTexture, &uv0, &uv1, &color,
 		                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);

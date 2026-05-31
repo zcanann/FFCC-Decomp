@@ -196,9 +196,9 @@ void CPtrArray<T>::ReleaseAndRemoveAll()
     for (unsigned int i = 0; i < (unsigned int)m_numItems; i++) {
         int* item = *(int**)((int)m_items + offset);
         if (item != 0) {
-            int refCount = item[1];
-            item[1] = refCount - 1;
-            if (refCount - 1 == 0 && item != 0) {
+            int nextRefCount = item[1] - 1;
+            item[1] = nextRefCount;
+            if (nextRefCount == 0 && item != 0) {
                 (*(void (**)(int*, int))(*item + 8))(item, 1);
             }
             *(unsigned int*)((int)m_items + offset) = 0;

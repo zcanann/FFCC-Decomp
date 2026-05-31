@@ -150,7 +150,7 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, p
                 TRACE_POLYGON* current = poly;
 
                 i = 0;
-                do {
+                while (i < (s32)(work->visibleCount - 1)) {
                     TRACE_POLYGON* next = current + 1;
 
                     uTop = (f32)i * uvStep;
@@ -191,7 +191,7 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, p
                     GXTexCoord2f32(uBottom, FLOAT_80331840);
                     i++;
                     current++;
-                } while (i < (s32)(work->visibleCount - 1));
+                }
             }
         }
     }

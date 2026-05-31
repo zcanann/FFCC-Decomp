@@ -3810,6 +3810,101 @@ int CPartMng::pppLoadPdt(const char* baseName, int pdtSlotIndex, int cachePriori
                         pdtSlot->m_envFields[3] = copiedHead->m_shapeNames;
                         pdtSlot->m_envFields[4] = copiedHead->m_shapeGroups;
                     }
+                } else if (childChunk.m_id == kChunkRSET) {
+                    pppModelSt* modelArray = m_pppModelStArr;
+                    pppModelSt* targetModel = 0;
+
+                    CChunkFile::CChunk resourceChunk;
+                    while (pdtFile.GetNextChunk(resourceChunk)) {
+                        if (resourceChunk.m_id == kChunkRSDM) {
+                            if (targetModel != 0) {
+                                CChunkFile rsdFile;
+                                rsdFile.SetBuf(pdtFile.GetAddress());
+                                unsigned int meshSize = pppReadRsd(rsdFile, targetModel);
+                                targetModel->Ptr2Off();
+
+                                void** meshDataPtr =
+                                    reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(targetModel) + 0x24);
+                                targetModel->m_cacheId = static_cast<short>(ppvAmemCacheSet.SetData(
+                                    *meshDataPtr, meshSize, static_cast<CAmemCache::TYPE>(1), cachePriority));
+
+                                if (*meshDataPtr != 0) {
+                                    operator delete(*meshDataPtr);
+                                    *meshDataPtr = 0;
+                                }
+                                targetModel = 0;
+                            }
+                        } else if (resourceChunk.m_id == kChunkNAME) {
+                            char* name = pdtFile.GetString();
+
+                            targetModel = 0;
+                            for (unsigned int i = 0; i < 0x100; i++) {
+                                if (modelArray[i].m_isUsed != 0 && strcmp(modelArray[i].m_name, name) == 0) {
+                                    targetModel = &modelArray[i];
+                                    break;
+                                }
+                            }
+
+                            if (targetModel == 0) {
+                                for (int i = 0; i < 0x100; i++) {
+                                    if (modelArray[i].m_isUsed == 0) {
+                                        targetModel = &modelArray[i];
+                                        break;
+                                    }
+                                }
+
+                                if (targetModel != 0) {
+                                    targetModel->m_refCount = 0;
+                                    targetModel->m_isUsed = 1;
+                                    strcpy(targetModel->m_name, name);
+                                }
+                            } else {
+                                targetModel = 0;
+                            }
+                        }
+                    }
+                } else if (childChunk.m_id == kChunkSSET) {
+                    pppShapeSt* shapeArray = m_pppShapeStArr;
+                    pppShapeSt* targetShape = 0;
+
+                    CChunkFile::CChunk shapeChunk;
+                    while (pdtFile.GetNextChunk(shapeChunk)) {
+                        if (shapeChunk.m_id == kChunkSHPM) {
+                            if (targetShape != 0) {
+                                CChunkFile shpFile;
+                                shpFile.SetBuf(pdtFile.GetAddress());
+                                pppReadShp(shpFile, targetShape);
+                                targetShape = 0;
+                            }
+                        } else if (shapeChunk.m_id == kChunkNAME) {
+                            char* name = pdtFile.GetString();
+
+                            targetShape = 0;
+                            for (unsigned int i = 0; i < 0x100; i++) {
+                                if (shapeArray[i].m_inUse != 0 && strcmp(shapeArray[i].m_name, name) == 0) {
+                                    targetShape = &shapeArray[i];
+                                    break;
+                                }
+                            }
+
+                            if (targetShape == 0) {
+                                for (int i = 0; i < 0x100; i++) {
+                                    if (shapeArray[i].m_inUse == 0) {
+                                        targetShape = &shapeArray[i];
+                                        break;
+                                    }
+                                }
+
+                                if (targetShape != 0) {
+                                    targetShape->m_refCount = 0;
+                                    targetShape->m_inUse = 1;
+                                    strcpy(targetShape->m_name, name);
+                                }
+                            } else {
+                                targetShape = 0;
+                            }
+                        }
+                    }
                 }
                 pdtFile.PopChunk();
             }

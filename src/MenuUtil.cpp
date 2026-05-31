@@ -1278,28 +1278,33 @@ void CMenuPcs::DrawOptionMenu()
 			gUtil.RenderTextureQuad(330.0f, 138.0f + static_cast<float>(y), FLOAT_80333588, FLOAT_8033361C,
 			                        modePanel, &uv0, &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
-			char* modeText = g_strMenuUtilMes[languageBase + 18];
+			char* modeText = g_strMenuUtilMes[languageBase + 19];
 			float textPanelX = 492.0f;
 			float textY = 132.0f;
 			float textPanelWidth = 112.0f;
 			if (m_specialModeFlags[i] == 0) {
-				modeText = g_strMenuUtilMes[languageBase + 19];
+				modeText = g_strMenuUtilMes[languageBase + 18];
 				textPanelX = 372.0f;
 				textY = 136.0f;
 				textPanelWidth = 120.0f;
 				gUtil.CalcUV(uv0.x, uv0.y, 0, uvY, modePanel->m_width, modePanel->m_height);
 				gUtil.CalcUV(uv1.x, uv1.y, 0x78, uvY + 0x20, modePanel->m_width, modePanel->m_height);
+				gUtil.RenderTextureQuad(textPanelX, textY + static_cast<float>(y), textPanelWidth, FLOAT_80333570,
+				                        modePanel, &uv0, &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
+				DrawFont(static_cast<int>(textPanelX + (textPanelWidth - font->GetWidth(modeText)) *
+				                                         kMenuCenteringHalfWidth),
+				         static_cast<int>(textY + FLOAT_80333580 + FLOAT_80333634 + static_cast<float>(y)), color, 7,
+				         modeText, kOptionAnimMax, kOptionAnimMax);
 			} else {
+				DrawFont(static_cast<int>(textPanelX + (textPanelWidth - font->GetWidth(modeText)) *
+				                                         kMenuCenteringHalfWidth),
+				         static_cast<int>(textY + FLOAT_80333580 + FLOAT_80333634 + static_cast<float>(y)), color, 7,
+				         modeText, kOptionAnimMax, kOptionAnimMax);
 				gUtil.CalcUV(uv0.x, uv0.y, 0x78, uvY, modePanel->m_width, modePanel->m_height);
 				gUtil.CalcUV(uv1.x, uv1.y, 0xE0, uvY + 0x20, modePanel->m_width, modePanel->m_height);
+				gUtil.RenderTextureQuad(textPanelX, textY + static_cast<float>(y), textPanelWidth, FLOAT_80333570,
+				                        modePanel, &uv0, &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 			}
-
-			gUtil.RenderTextureQuad(textPanelX, textY + static_cast<float>(y), textPanelWidth, FLOAT_80333570,
-			                        modePanel, &uv0, &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
-			DrawFont(static_cast<int>(textPanelX + (textPanelWidth - font->GetWidth(modeText)) *
-			                                         kMenuCenteringHalfWidth),
-			         static_cast<int>(textY + FLOAT_80333580 + FLOAT_80333634 + static_cast<float>(y)), color, 7,
-			         modeText, kOptionAnimMax, kOptionAnimMax);
 		}
 	}
 }

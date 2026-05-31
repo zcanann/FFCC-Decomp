@@ -3072,6 +3072,7 @@ void CMenuPcs::createBonus()
 			entry.m_partySlot = i;
 			entry.m_partyHandle =
 			    (Game.m_partyObjArr[i] != 0) ? *reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<unsigned char*>(Game.m_partyObjArr[i]) + 0xF8) : 0;
+			*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(entry.m_partyHandle->m_model) + 0x9C) = 0.0f;
 			entry.m_bonusCondition = (int)caravanWork->m_bonusCondition;
 			entry.m_foodValue = (int)caravanWork->m_artifactRelated[2] + (int)caravanWork->m_artifactRelated[3];
 			if (entry.m_foodValue > 100) {
@@ -3093,7 +3094,6 @@ void CMenuPcs::createBonus()
 			}
 			entry.m_totalValue = totalValueClamped;
 			entry.m_tribeId = (unsigned int)caravanWork->m_tribeId;
-			*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(entry.m_partyHandle->m_model) + 0x9C) = 0.0f;
 
 			if (caravanWork->m_treasures[0] > 0) {
 				s_Rinfo->m_tempArtifacts[tempArtifactCount++] = caravanWork->m_treasures[0];

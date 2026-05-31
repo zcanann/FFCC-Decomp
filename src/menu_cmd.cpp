@@ -2582,10 +2582,11 @@ unsigned int CMenuPcs::CmdOpen1()
 			chainCount = 0;
 		}
 
-		*reinterpret_cast<f32*>(animEntry + 0x0A) = 1.0f;
+		f32 panelScale = 1.0f;
 		if (chainCount != 0) {
-			*reinterpret_cast<f32*>(animEntry + 0x0A) = static_cast<f32>(DOUBLE_80332aa0);
+			panelScale = static_cast<f32>(DOUBLE_80332aa0);
 		}
+		*reinterpret_cast<f32*>(animEntry + 0x0A) = panelScale;
 		animEntry[2] = 0xC0;
 		animEntry[3] = 0x40;
 		animEntry[1] = static_cast<s16>(((-((static_cast<f64>(animEntry[3]) * *reinterpret_cast<f32*>(animEntry + 0x0A)) -

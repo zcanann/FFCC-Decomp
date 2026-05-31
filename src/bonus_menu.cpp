@@ -2784,26 +2784,6 @@ void CMenuPcs::CalcResultOpenAnim()
 			doneCount++;
 		}
 
-		if (i == 0) {
-			sprite->scale = sprite->alpha * 3.0f;
-		} else if (i >= frameBase && i < iconBase) {
-			sprite->mulX = (1.0f - sprite->alpha) * -24.0f;
-		} else if (i >= iconBase && i < modelBase) {
-			sprite->mulX = (1.0f - sprite->alpha) * -48.0f;
-			sprite->mulY = (1.0f - sprite->alpha) * 12.0f;
-			sprite->scale = 0.8f + sprite->alpha * 0.2f;
-		} else if (i >= modelBase && i < itemModelBase) {
-			sprite->scale = 0.85f + sprite->alpha * 0.15f;
-		} else if (i >= itemModelBase && i < nameBase) {
-			sprite->mulY = (1.0f - sprite->alpha) * 10.0f;
-			sprite->scale = 0.8f + sprite->alpha * 0.15f;
-		} else if (i >= nameBase && i < labelBase) {
-			sprite->mulX = (1.0f - sprite->alpha) * 18.0f;
-		} else if (i >= labelBase) {
-			sprite->mulX = (1.0f - sprite->alpha) * 24.0f;
-			sprite->mulY = (1.0f - sprite->alpha) * 4.0f;
-		}
-
 		if (sprite->kind == 0x17 && sprite->timer == 1) {
 			Sound.PlaySe(0x49, 0x40, 0x7f, 0);
 		}

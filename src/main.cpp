@@ -11,7 +11,7 @@ static const char kLanguageArgUk[] = "uk";
 static const char kLanguageArgGr[] = "gr";
 static const char kLanguageArgIt[] = "it";
 static const char kLanguageArgFr[] = "fr";
-static const char kLanguageArgSp[4] = "sp";
+static const char kLanguageArgSp[] = "sp";
 
 void game(int argc, char** argv);
 

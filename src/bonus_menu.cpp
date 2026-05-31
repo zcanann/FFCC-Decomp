@@ -1501,7 +1501,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 			sprites[idx].alpha = 0.0f;
 			sprites[idx].mulX = 0.0f;
 			sprites[idx].mulY = 56.0f;
-			sprites[idx].scale = 1.0f;
+			BonusSpriteFlags(&sprites[idx]) = 1;
 			sprites[idx].depth = 1.0f;
 			sprites[idx].motionX = 100.0f;
 			sprites[idx].motionY = 0.0f;

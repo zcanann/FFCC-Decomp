@@ -1420,7 +1420,7 @@ render_char:
  */
 void CMes::Next()
 {
-	unsigned int type;
+	int type;
 	float groupWidth;
 	float halfVal;
 	int remaining;
@@ -1430,11 +1430,9 @@ void CMes::Next()
 	float* start;
 	int entryCount;
 	float* curr;
-	char* mesFlags = (char*)this + 0x3cc0;
-	char** mesText = (char**)((char*)this + 4);
 	char tempFlags[0x50];
 
-	if (*mesText != 0)
+	if (*(char**)((char*)this + 4) != 0)
 	{
 		entryCount = *(int*)((char*)this + 0x3c0c);
 		flagEntry = (unsigned char*)((char*)this + *(int*)((char*)this + 0x3c10) * 6 + 0x3c14);
@@ -1447,13 +1445,13 @@ void CMes::Next()
 				{
 					if (type != 0)
 					{
-						*(int*)(mesFlags + (unsigned int)flagEntry[2] * 4) =
+						*(int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3cc0) =
 						    (int)*(short*)(flagEntry + 4);
 					}
 				}
 				else
 				{
-					int* slot = (int*)(mesFlags + (unsigned int)flagEntry[2] * 4);
+					int* slot = (int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3cc0);
 					*slot = *slot + 1;
 				}
 			}
@@ -1470,9 +1468,9 @@ void CMes::Next()
 		*(int*)((char*)this + 0x3c80) = 0;
 		*(int*)((char*)this + 0x3c7c) = 0;
 		*(int*)((char*)this + 0x3cac) = 0;
-		memcpy(tempFlags, mesFlags, sizeof(tempFlags));
-		addString(mesText, 0);
-		memcpy(mesFlags, tempFlags, sizeof(tempFlags));
+		memcpy(tempFlags, (char*)this + 0x3cc0, sizeof(tempFlags));
+		addString((char**)((char*)this + 4), 0);
+		memcpy((char*)this + 0x3cc0, tempFlags, sizeof(tempFlags));
 		halfVal = FLOAT_803308b0;
 		i = 0;
 		curr = (float*)((char*)this + 0xc);
@@ -1501,7 +1499,7 @@ void CMes::Next()
 			{
 				do
 				{
-					type = (unsigned int)*(unsigned char*)((char*)start + 0xe) >> 4;
+					type = (int)((unsigned int)*(unsigned char*)((char*)start + 0xe) >> 4);
 					if (type == 1)
 					{
 						*start = halfVal * (*(float*)((char*)this + 0x3ca4) - groupWidth) + *start;

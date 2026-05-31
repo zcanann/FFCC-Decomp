@@ -2630,7 +2630,7 @@ unsigned int CMenuPcs::CmdClose1()
 	u32 done = 0;
 
 	if (state == 0) {
-		const float t = static_cast<float>(timer) * 0.125f;
+		const float t = static_cast<float>(DOUBLE_80332a90 * static_cast<f64>(timer));
 		*reinterpret_cast<float*>(list + selected * 0x20 + 0x0c) = t;
 
 		if (*reinterpret_cast<s16*>(caravanWork + (selected + 1) * 2 + 0x214) == -1) {
@@ -2640,13 +2640,10 @@ unsigned int CMenuPcs::CmdClose1()
 			}
 		}
 
-		float pos = 1.0f - t;
-		if (pos < 0.0f) {
-			pos = 0.0f;
-		}
-		*reinterpret_cast<float*>(list + (static_cast<s32>(list[1]) + 3) * 0x20 + 0x0c) = pos;
+		*reinterpret_cast<float*>(list + (static_cast<s32>(list[1]) + 3) * 0x20 + 0x0c) =
+		    static_cast<float>(-(DOUBLE_80332a90 * static_cast<f64>(timer) - DOUBLE_80332a58));
 
-		done = static_cast<u32>(static_cast<float>(timer) >= 8.0f);
+		done = static_cast<u32>(static_cast<f64>(timer) >= DOUBLE_80332a78);
 		if ((done != 0) && (*reinterpret_cast<u8*>(cmd + 8) != 0)) {
 			*reinterpret_cast<u8*>(cmd + 8) = 0;
 			if (*reinterpret_cast<s16*>(cmd + 0x2a) == 0) {

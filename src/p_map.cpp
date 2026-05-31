@@ -119,7 +119,7 @@ extern unsigned int s_loadedStageNo__7CMapPcs;
 extern unsigned int s_loadedMapNo__7CMapPcs;
 CRelProfile g_mapStage;
 CRelProfile g_mapSection;
-CRelStopWatch g_hit_prof;
+CRelProfile g_hit_prof;
 static unsigned char g_hit_prof_padding0;
 static unsigned char g_hit_prof_padding1;
 static unsigned char g_hit_prof_padding2;

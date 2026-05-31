@@ -529,7 +529,7 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
                 PSVECSubtract(&edgeEnd, &edgeStart, &edge);
                 PSVECSubtract(&point, &edgeEnd, &toPoint);
                 PSVECCrossProduct(&edge, &toPoint, &cross);
-                if (cross.z < kMapHitZero) {
+                if (cross.z <= kMapHitZero) {
                     sideMask &= 2;
                 } else {
                     sideMask &= 1;
@@ -558,7 +558,7 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
                 PSVECSubtract(&edgeEnd, &edgeStart, &edge);
                 PSVECSubtract(&point, &edgeEnd, &toPoint);
                 PSVECCrossProduct(&edge, &toPoint, &cross);
-                if (cross.z < kMapHitZero) {
+                if (cross.z <= kMapHitZero) {
                     sideMask &= 2;
                 } else {
                     sideMask &= 1;
@@ -587,7 +587,7 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
                 PSVECSubtract(&edgeEnd, &edgeStart, &edge);
                 PSVECSubtract(&point, &edgeEnd, &toPoint);
                 PSVECCrossProduct(&edge, &toPoint, &cross);
-                if (cross.z < kMapHitZero) {
+                if (cross.z <= kMapHitZero) {
                     sideMask &= 2;
                 } else {
                     sideMask &= 1;

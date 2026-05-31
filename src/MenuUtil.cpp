@@ -487,7 +487,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 		strcat(scratch, sMenuUtilSpaceText);
 		font->Draw(scratch);
 
-		int valueX = static_cast<int>(FLOAT_8033357c + font->GetWidth(scratch) + FLOAT_803335a0);
+		int valueX = static_cast<int>(FLOAT_8033357c + (FLOAT_803335a0 + font->GetWidth(scratch)));
 		font->SetTlut(1);
 		font->SetPosX(static_cast<float>(valueX));
 		sprintf(scratch, sMenuUtilValueSuffixFormat, *reinterpret_cast<u16*>(itemBase + 6));
@@ -527,7 +527,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 					}
 
 					int delta = static_cast<int>(*reinterpret_cast<u16*>(itemBase + 6)) - static_cast<int>(currentValue);
-					int deltaX = static_cast<int>(static_cast<float>(valueX) + font->GetWidth(scratch) + FLOAT_803335a0);
+					int deltaX = static_cast<int>(static_cast<float>(valueX) + (FLOAT_803335a0 + font->GetWidth(scratch)));
 					font->SetPosX(static_cast<float>(deltaX));
 					if (delta < 0) {
 						font->SetTlut(3);

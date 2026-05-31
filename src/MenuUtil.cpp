@@ -1069,9 +1069,11 @@ void CMenuPcs::DrawOptionMenu()
 	font->SetMargin(kOptionAnimMin);
 
 	CTexture* banner = GetMenuTexture(this, 0xD4);
+	float bannerWidth = static_cast<float>(banner->m_width);
 	float bannerHeight = static_cast<float>(banner->m_height);
-	gUtil.CalcUV(uv0.x, uv0.y, 0, 0, banner->m_width, banner->m_height);
-	gUtil.CalcUV(uv1.x, uv1.y, 0x280, banner->m_height, banner->m_width, banner->m_height);
+	gUtil.CalcUV(uv0.x, uv0.y, 0, 0, static_cast<unsigned int>(bannerWidth), static_cast<unsigned int>(bannerHeight));
+	gUtil.CalcUV(uv1.x, uv1.y, 0x280, static_cast<unsigned int>(bannerHeight),
+	             static_cast<unsigned int>(bannerWidth), static_cast<unsigned int>(bannerHeight));
 	gUtil.RenderTextureQuad(kOptionAnimMin,
 	                        -(bannerHeight * kMenuCenteringHalfWidth - FLOAT_80333554) - FLOAT_8033355C,
 	                        FLOAT_80333560, bannerHeight, banner, &uv0, &uv1, &color, GX_BL_SRCALPHA,

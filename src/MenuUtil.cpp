@@ -1328,7 +1328,6 @@ void CMenuPcs::DrawOptionMenu()
 		         kOptionAnimMax);
 	} else {
 		CTextureSet* textureSet = GetMenuTextureSet(this, 0xBC);
-		CTexture* modePanel = GetTextureSetTexture(textureSet, 7);
 		color.a = static_cast<unsigned char>(static_cast<int>(FLOAT_80333550 * m_optionColumnAnim));
 
 		int y = 0;
@@ -1352,6 +1351,7 @@ void CMenuPcs::DrawOptionMenu()
 				                        &uv0, &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 			}
 
+			CTexture* modePanel = GetTextureSetTexture(textureSet, 7);
 			gUtil.CalcUV(uv0.x, uv0.y, modePanel->m_width - 0x30, uvY, modePanel->m_width, modePanel->m_height);
 			gUtil.CalcUV(uv1.x, uv1.y, modePanel->m_width, uvY + 0x18, modePanel->m_width, modePanel->m_height);
 			gUtil.RenderTextureQuad(330.0f, 138.0f + static_cast<float>(y), FLOAT_80333588, FLOAT_8033361C,

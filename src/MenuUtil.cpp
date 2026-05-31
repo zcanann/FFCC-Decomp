@@ -433,11 +433,11 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 	}
 
 	int rangeKind = 0;
-	if ((1 <= msgNo) && (msgNo <= 0x44)) {
+	if ((1 <= msgNo) && (msgNo < 0x45)) {
 		rangeKind = 1;
-	} else if ((0x45 <= msgNo) && (msgNo <= 0x7E)) {
+	} else if ((0x45 <= msgNo) && (msgNo < 0x7F)) {
 		rangeKind = 0x45;
-	} else if ((0x7F <= msgNo) && (msgNo <= 0x9E)) {
+	} else if ((0x7F <= msgNo) && (msgNo < 0x9F)) {
 		rangeKind = 0x7F;
 	}
 

@@ -444,14 +444,14 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 	}
 
 	if (rangeKind != 0) {
-		u32 baseY = lineBaseY[drawPrefix + 2];
-		u32 y = baseY;
+		int baseY = lineBaseY[drawPrefix + 2];
+		int y = baseY;
 		if (drawPrefix != 0) {
 			font->SetPosX(FLOAT_8033357c);
 			font->SetPosY(static_cast<float>(static_cast<int>(y)));
 			font->Draw(itemName);
 			font->Draw(suffix);
-			y = static_cast<u32>(static_cast<float>(static_cast<int>(y)) + lineStep);
+			y = static_cast<int>(static_cast<float>(static_cast<int>(y)) + lineStep);
 		}
 
 		for (int i = 0; i < 3; i++) {
@@ -459,7 +459,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 			font->SetPosX(static_cast<float>(0x140 - maxWidth / 2));
 			font->SetPosY(static_cast<float>(static_cast<int>(y)));
 			CMes::drawTagString(font, reinterpret_cast<char*>(msgId), 1, 0, 0);
-			y = static_cast<u32>(static_cast<float>(static_cast<int>(y)) + lineStep);
+			y = static_cast<int>(static_cast<float>(static_cast<int>(y)) + lineStep);
 		}
 
 	int itemBase = Game.unkCFlatData0[2] + msgNo * 0x48;
@@ -607,13 +607,13 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 		}
 		delete[] temp;
 
-		u32 y = lineBaseY[lineCount + drawPrefix - 1];
+		int y = lineBaseY[lineCount + drawPrefix - 1];
 		if (drawPrefix != 0) {
 			font->SetPosX(FLOAT_8033357c);
 			font->SetPosY(static_cast<float>(static_cast<int>(y)));
 			font->Draw(itemName);
 			font->Draw(suffix);
-			y = static_cast<u32>(static_cast<float>(static_cast<int>(y)) + lineStep);
+			y = static_cast<int>(static_cast<float>(static_cast<int>(y)) + lineStep);
 		}
 
 		for (int i = 0; i < lineCount; i++) {
@@ -621,7 +621,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 			font->SetPosX(static_cast<float>(0x140 - maxWidth / 2));
 			font->SetPosY(static_cast<float>(static_cast<int>(y)));
 			CMes::drawTagString(font, reinterpret_cast<char*>(msgId), 1, 0, 0);
-			y = static_cast<u32>(static_cast<float>(static_cast<int>(y)) + lineStep);
+			y = static_cast<int>(static_cast<float>(static_cast<int>(y)) + lineStep);
 		}
 	}
 }

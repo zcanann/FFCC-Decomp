@@ -217,13 +217,14 @@ void CCharaPcs::drawViewer()
 {
     CCharaPcs* self = this;
     register const char* viewerStrings = s_no_texture____801da7e8;
-    Mtx cameraMtx;
-    Mtx backCameraMtx;
     Mtx44 projMtx;
     Mtx texMtx;
+    Mtx backCameraMtx;
+    Mtx cameraMtx;
 
     if ((self->m_viewerBackTextureSet != 0) &&
-        (reinterpret_cast<CPtrArray<CTexture*>*>(reinterpret_cast<unsigned char*>(self->m_viewerBackTextureSet) + 8)->GetSize() != 0)) {
+        (static_cast<unsigned int>(reinterpret_cast<CPtrArray<CTexture*>*>(
+             reinterpret_cast<unsigned char*>(self->m_viewerBackTextureSet) + 8)->GetSize()) != 0)) {
         C_MTXOrtho(projMtx, kCharaViewerZero, kCharaViewerBackOrthoRight, kCharaViewerZero,
                    kCharaViewerBackOrthoBottom, kCharaViewerZero, kCharaViewerGridMax);
         GXSetProjection(projMtx, GX_ORTHOGRAPHIC);
@@ -292,6 +293,7 @@ void CCharaPcs::drawViewer()
         color.b = 0x80;
         color.a = 0x20;
         GXLoadPosMtxImm(cameraMtx, 0);
+        float gridSpacing = kCharaViewerGridSpacing;
         float gridMin = kCharaViewerGridMin;
         float gridMax = kCharaViewerGridMax;
 
@@ -299,7 +301,7 @@ void CCharaPcs::drawViewer()
             color.a = (i == 0) ? 0x60 : 0x20;
             GXSetChanMatColor(GX_COLOR0A0, color);
             GXBegin((GXPrimitive)0xA8, GX_VTXFMT0, 4);
-            float x = (float)i * kCharaViewerGridSpacing;
+            float x = (float)i * gridSpacing;
             GXPosition3f32(x, kCharaViewerZero, gridMin);
             GXPosition3f32(x, kCharaViewerZero, gridMax);
             GXPosition3f32(gridMax, kCharaViewerZero, x);

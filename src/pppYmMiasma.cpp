@@ -303,10 +303,8 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, YmMiasmaFrameStep* step, pppYmM
     work->m_radiusVelocity = work->m_radiusVelocity + work->m_radiusAcceleration;
     work->m_radius = work->m_radius + work->m_radiusVelocity;
 
-    particle = work->m_particles;
-    for (i = 0; i < step->m_particleCount; i++) {
+    for (i = 0, particle = work->m_particles; i < step->m_particleCount; i++, particle++) {
         UpdateParticleData((_pppPObject*)pppYmMiasma_, (_pppCtrlTable*)param_3, step, particle);
-        particle++;
     }
 
     matrixPos.x = ppvMng->m_matrix.value[0][3];

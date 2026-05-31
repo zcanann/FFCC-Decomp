@@ -8778,7 +8778,7 @@ void CMenuPcs::SetCMakeEnd(int channel)
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	unsigned char* const selectData = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x828)[0]);
 	selectData[channel * 0x10 + 0xC] = 1;
-	if ((unsigned int)System.m_execParam > 2) {
+	if ((unsigned int)System.m_execParam >= 3) {
 		System.Printf(const_cast<char*>(s_SetCMakeEnd___chan____d_cur____d_801dc3b4), channel,
 		              (int)*reinterpret_cast<short*>(selectData + channel * 0x10 + 4));
 	}

@@ -2510,13 +2510,13 @@ unsigned int CMenuPcs::CmdOpen1()
 			uniteCount = ChkUnite(static_cast<int>(*reinterpret_cast<s16*>(cmd + 0x26)), combo);
 		}
 
-		animEntry[0x0A] = 1.0f;
+		*reinterpret_cast<f32*>(animEntry + 0x0A) = 1.0f;
 		if (uniteCount != 0) {
-			animEntry[0x0A] = static_cast<f32>(DOUBLE_80332aa0);
+			*reinterpret_cast<f32*>(animEntry + 0x0A) = static_cast<f32>(DOUBLE_80332aa0);
 		}
 		animEntry[2] = 0xC0;
 		animEntry[3] = 0x40;
-		animEntry[1] = static_cast<s16>(((-((static_cast<f64>(animEntry[3]) * animEntry[0x0A]) -
+		animEntry[1] = static_cast<s16>(((-((static_cast<f64>(animEntry[3]) * *reinterpret_cast<f32*>(animEntry + 0x0A)) -
 		                                    static_cast<f64>(baseEntry[3])) *
 		                                   DOUBLE_80332a60) +
 		                                  static_cast<f64>(baseEntry[1])) -

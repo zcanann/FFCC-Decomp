@@ -26,6 +26,7 @@ file.cpp:
 	.rodata     start:0x801D5480 end:0x801D5FC0
 	.data       start:0x801E81A0 end:0x801E8320
 	.bss        start:0x8021ED40 end:0x8021EEB0
+	.sdata      start:0x8032E3C0 end:0x8032E3D0
 	.sdata2     start:0x8032F600 end:0x8032F638
 
 strcase.c:
@@ -38,6 +39,7 @@ game.cpp:
 	.ctors      start:0x801D53A8 end:0x801D53AC
 	.data       start:0x801E8320 end:0x801E83FC
 	.bss        start:0x8021EEB4 end:0x80230E48
+	.sdata      start:0x8032E3D0 end:0x8032E3E8
 	.sbss       start:0x8032EC40 end:0x8032EC45
 	.sdata2     start:0x8032F660 end:0x8032F6A0
 
@@ -75,6 +77,7 @@ memory.cpp:
 	.rodata     start:0x801D6690 end:0x801D68D0
 	.data       start:0x801E8488 end:0x801E8498
 	.bss        start:0x8023C888 end:0x80244028
+	.sdata      start:0x8032E410 end:0x8032E428
 	.sbss       start:0x8032EC58 end:0x8032EC60
 	.sdata2     start:0x8032F7D8 end:0x8032F7E8
 

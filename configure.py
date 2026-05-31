@@ -514,7 +514,7 @@ config.libs = [
             Object(Matching, "color.cpp"),
             Object(NonMatching, "file.cpp", extra_cflags=["-RTTI on"]),
             Object(Matching, "strcase.c"),
-            Object(NonMatching, "fontman.cpp", extra_cflags=["-RTTI on"]),
+            Object(NonMatching, "fontman.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
             Object(NonMatching, "FS_USB_Process.cpp"),
             Object(NonMatching, "FunnyShape.cpp"),
             Object(NonMatching, "game.cpp"),

@@ -189,7 +189,7 @@ p_map.cpp:
 	.ctors      start:0x801D53DC end:0x801D53E0
 	.data       start:0x801E89B8 end:0x801E9030
 	.bss        start:0x802685E0 end:0x8026878C
-	.sbss       start:0x8032ECC8 end:0x8032ECD8
+	.sbss       start:0x8032ECC8 end:0x8032ECD9
 
 p_camera.cpp:
 	extab       start:0x80006374 end:0x80006414

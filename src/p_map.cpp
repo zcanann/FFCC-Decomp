@@ -127,7 +127,7 @@ unsigned char g_map_calc_prof;
 static unsigned char g_map_calc_prof_padding0;
 static unsigned char g_map_calc_prof_padding1;
 static unsigned char g_map_calc_prof_padding2;
-unsigned char g_map_draw_prof;
+unsigned char g_map_draw_prof ATTRIBUTE_ALIGN(4);
 extern const float DrawRangeDefault;
 extern const float kPMapBoundMinInit;
 extern const float kPMapBoundMaxInit;

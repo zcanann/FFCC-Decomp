@@ -1125,14 +1125,15 @@ void CMenuPcs::DrawOptionMenu()
 	unsigned int normalY = 0x75;
 	for (int i = 0; i < 5; i++, rowY += 0x28, selectedY += 0x28, normalY += 0x28, option++) {
 		CTexture* row = GetMenuTexture(this, 0xC0);
+		float rowWidth = static_cast<float>(row->m_width);
+		float rowHeight = static_cast<float>(row->m_height);
 		uv0.x = (i == m_optionIndex) ? kOptionAnimMin : kMenuCenteringHalfWidth;
 		uv0.y = kOptionAnimMin;
 		uv1.x = (i == m_optionIndex) ? kMenuCenteringHalfWidth : kOptionAnimMax;
 		uv1.y = kOptionAnimMax;
 		gUtil.RenderTextureQuad(FLOAT_8033357c, static_cast<float>(rowY),
-		                        static_cast<float>(row->m_width) * kMenuCenteringHalfWidth,
-		                        static_cast<float>(row->m_height), row, &uv0, &uv1, &color, GX_BL_SRCALPHA,
-		                        GX_BL_INVSRCALPHA);
+		                        rowWidth * kMenuCenteringHalfWidth, rowHeight, row, &uv0, &uv1, &color,
+		                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
 		if (i == m_optionIndex) {
 			DrawFont(0x5E, static_cast<int>(FLOAT_80333580 + static_cast<float>(selectedY)), color, 0x16,

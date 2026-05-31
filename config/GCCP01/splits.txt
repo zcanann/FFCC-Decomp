@@ -2083,7 +2083,7 @@ ax/AXComp.c:
 
 ax/DSPCode.c:
 	.data       start:0x80219840 end:0x8021B760
-	.sdata      start:0x8032EB58 end:0x8032EB60
+	.sdata      start:0x8032EB58 end:0x8032EB5A
 
 ax/AXProf.c:
 	.text       start:0x80193E28 end:0x80193E70

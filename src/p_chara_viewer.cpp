@@ -456,7 +456,8 @@ void CCharaPcs::calcViewer()
                         File.Close(fileHandle);
                         if (self->m_viewerAnimLoadedCount == 0) {
                             self->m_viewerAnim[0] = self->m_viewerAnimBank[0];
-                            AddSharedRef(self->m_viewerAnim[0]);
+                            int* ref = reinterpret_cast<int*>(self->m_viewerAnim[0]);
+                            ref[1] = ref[1] + 1;
                         }
                         self->m_viewerAnimLoadedCount = self->m_viewerAnimLoadedCount + 1;
                     }

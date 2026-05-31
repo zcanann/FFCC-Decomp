@@ -218,6 +218,7 @@ void CCharaPcs::drawViewer()
     CCharaPcs* self = this;
     register const char* viewerStrings = s_no_texture____801da7e8;
     Mtx cameraMtx;
+    Mtx backCameraMtx;
     Mtx44 projMtx;
     Mtx texMtx;
 
@@ -226,8 +227,8 @@ void CCharaPcs::drawViewer()
         C_MTXOrtho(projMtx, kCharaViewerZero, kCharaViewerBackOrthoRight, kCharaViewerZero,
                    kCharaViewerBackOrthoBottom, kCharaViewerZero, kCharaViewerGridMax);
         GXSetProjection(projMtx, GX_ORTHOGRAPHIC);
-        PSMTXIdentity(cameraMtx);
-        GXLoadPosMtxImm(cameraMtx, 0);
+        PSMTXIdentity(backCameraMtx);
+        GXLoadPosMtxImm(backCameraMtx, 0);
         GXSetCurrentMtx(0);
         _GXSetBlendMode(GX_BM_BLEND, GX_BL_ONE, GX_BL_ZERO, GX_LO_CLEAR);
         GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
@@ -235,8 +236,8 @@ void CCharaPcs::drawViewer()
         GXSetNumTevStages(1);
         _GXSetTevOp(GX_TEVSTAGE0, GX_REPLACE);
         _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
-        PSMTXIdentity(cameraMtx);
-        GXLoadPosMtxImm(cameraMtx, 0);
+        PSMTXIdentity(backCameraMtx);
+        GXLoadPosMtxImm(backCameraMtx, 0);
         GXSetCullMode(GX_CULL_NONE);
         CTexture* texture =
             (*reinterpret_cast<CPtrArray<CTexture*>*>(reinterpret_cast<unsigned char*>(self->m_viewerBackTextureSet) + 8))[0];

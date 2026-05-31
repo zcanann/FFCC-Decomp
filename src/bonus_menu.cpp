@@ -1113,7 +1113,13 @@ void CMenuPcs::CalcSelectWait()
 	short& selection = *(short*)(statePtr + 0x26);
 	short& confirmSel = *(short*)(statePtr + 0x28);
 	short& delay = *(short*)(statePtr + 0x1a);
-	BonusPartySummary* currentParty = GetBonusPartySummary(currentPartyIndex);
+	BonusPartySummary* currentParty = 0;
+	for (int i = 0; i < activePartyCount; i++) {
+		if (s_Rinfo->m_party[i].m_rank == currentPartyIndex) {
+			currentParty = &s_Rinfo->m_party[i];
+			break;
+		}
+	}
 	int padSlot = (currentParty != 0) ? currentParty->m_partySlot : 0;
 	unsigned short repeat = GetButtonRepeat(padSlot);
 	unsigned short down = GetButtonDown(padSlot);

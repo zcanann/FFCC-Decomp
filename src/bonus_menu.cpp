@@ -3230,6 +3230,7 @@ void CMenuPcs::createBonus()
 			itemHandle->m_flags = 0x300543;
 
 			if (modelNo == 0x79) {
+				itemId = rewardItems[artifactIndex];
 				int effectNo = -1;
 				if (itemId == 0xDF) {
 					effectNo = 0x75;

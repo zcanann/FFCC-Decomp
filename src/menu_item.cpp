@@ -13,23 +13,23 @@ typedef signed short s16;
 typedef unsigned char u8;
 typedef unsigned short u16;
 
-extern const float FLOAT_80332e60 = 0.0f;
-extern const float FLOAT_80332e64 = 1.0f;
-extern const double DOUBLE_80332e68 = 1.0;
-extern const float FLOAT_80332e70 = 12.0f;
-extern const float FLOAT_80332e74 = 24.0f;
-extern const double DOUBLE_80332e78 = 0.5;
-extern const float FLOAT_80332e80 = 255.0f;
-extern const float FLOAT_80332e84 = 0.9f;
-extern const float FLOAT_80332e88 = 4.0f;
-extern const float FLOAT_80332e8c = 320.0f;
-extern const float FLOAT_80332e90 = 0.5f;
-extern const float FLOAT_80332e94 = 352.0f;
-extern const float FLOAT_80332E98 = 3.0f;
-extern const double DOUBLE_80332ea0 = 4503601774854144.0;
-extern const float FLOAT_80332EA8 = 128.0f;
-extern const float FLOAT_80332EAC = 8.0f;
-extern const float FLOAT_80332EB0 = 0.75f;
+extern const float FLOAT_80332e60;
+extern const float FLOAT_80332e64;
+extern const double DOUBLE_80332e68;
+extern const float FLOAT_80332e70;
+extern const float FLOAT_80332e74;
+extern const double DOUBLE_80332e78;
+extern const float FLOAT_80332e80;
+extern const float FLOAT_80332e84;
+extern const float FLOAT_80332e88;
+extern const float FLOAT_80332e8c;
+extern const float FLOAT_80332e90;
+extern const float FLOAT_80332e94;
+extern const float FLOAT_80332E98;
+extern const double DOUBLE_80332ea0;
+extern const float FLOAT_80332EA8;
+extern const float FLOAT_80332EAC;
+extern const float FLOAT_80332EB0;
 extern const double DOUBLE_80333388 = 373.0;
 extern const float FLOAT_80333390 = 214.0f;
 extern const float FLOAT_80333394 = 112.0f;
@@ -441,7 +441,7 @@ void CMenuPcs::ItemDraw()
             color.b = 0xFF;
             color.a = (u8)(FLOAT_80332e80 * itemAlpha);
             GXSetChanMatColor(GX_COLOR0A0, color);
-            MenuPcs.DrawRect(0, x, y, w, h, u, v, uvScale, uvScale, 0.0f);
+            MenuPcs.DrawRect(0, x, y, w, h, u, v, uvScale, uvScale, FLOAT_80332e60);
         }
     }
 
@@ -678,13 +678,13 @@ bool CMenuPcs::ItemOpen()
         if (frame >= anim->startFrame) {
             if (anim->startFrame + anim->duration <= frame) {
                 finished++;
-                anim->progress = 1.0f;
-                anim->dx = 0.0f;
-                anim->dy = 0.0f;
+                anim->progress = FLOAT_80332e64;
+                anim->dx = FLOAT_80332e60;
+                anim->dy = FLOAT_80332e60;
             } else {
                 anim->frame++;
-                double one = 1.0;
-                anim->progress = (float)((1.0 / (double)anim->duration) * (double)anim->frame);
+                double one = DOUBLE_80332e68;
+                anim->progress = (float)((one / (double)anim->duration) * (double)anim->frame);
                 if ((anim->flags & 2) == 0) {
                     float ratio = (float)((one / (double)anim->duration) * (double)anim->frame);
                     float dx = anim->targetX - (float)anim->x;

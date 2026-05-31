@@ -443,7 +443,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 			}
 		}
 	}
-	if (drawPrefix == 1) {
+	if (drawPrefix + 3 == 4) {
 		lineStep = FLOAT_80333620;
 	}
 

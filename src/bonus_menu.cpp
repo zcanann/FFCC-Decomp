@@ -2927,7 +2927,8 @@ void CMenuPcs::createBonus()
 	sprintf(fontPath, s_menuSubfontPathFmt, Game.GetLangString());
 	loadFont(0, fontPath, 1, -1);
 
-	s_Rinfo = new BonusSummaryData;
+	CMemory::CStage* stage = MenuPcs.m_menuStage;
+	s_Rinfo = new (stage, const_cast<char*>(s_bonus_menu_cpp), 0xDD) BonusSummaryData;
 	memset(s_Rinfo, 0, sizeof(*s_Rinfo));
 	for (int i = 0; i < 4; i++) {
 		s_Rinfo->m_tempArtifacts[i] = -1;
@@ -2936,9 +2937,9 @@ void CMenuPcs::createBonus()
 		s_Rinfo->m_bossArtifacts[i] = -1;
 	}
 
-	statePtr = reinterpret_cast<int>(new BonusMenuStateRaw);
+	statePtr = reinterpret_cast<int>(new (stage, const_cast<char*>(s_bonus_menu_cpp), 0xE5) BonusMenuStateRaw);
 	GetBonusMenuMembers(this).m_bonusStatePtr = statePtr;
-	listPtr = reinterpret_cast<int>(new CMenuPcs::EffectInfo[0x28]);
+	listPtr = reinterpret_cast<int>(new (stage, const_cast<char*>(s_bonus_menu_cpp), 0xE6) CMenuPcs::EffectInfo[0x28]);
 	GetBonusMenuMembers(this).m_bonusListPtr = listPtr;
 
 	BonusEffectSlotList* effectSlots = reinterpret_cast<BonusEffectSlotList*>(listPtr);
@@ -2946,14 +2947,14 @@ void CMenuPcs::createBonus()
 		InitBonusEffectSlotBlock(&effectSlots->slots[i]);
 	}
 	memset((void*)statePtr, 0, sizeof(BonusMenuStateRaw));
-	s_Base[0] = reinterpret_cast<float*>(new BonusBaseRaw);
+	s_Base[0] = reinterpret_cast<float*>(new (stage, const_cast<char*>(s_bonus_menu_cpp), 0xF1) BonusBaseRaw);
 	memset(s_Base[0], 0, sizeof(float) * 18);
-	animPtr = reinterpret_cast<int>(new BonusAnimList);
+	animPtr = reinterpret_cast<int>(new (stage, const_cast<char*>(s_bonus_menu_cpp), 0xF5) BonusAnimList);
 	GetBonusMenuMembers(this).m_bonusAnimPtr = animPtr;
 	memset((void*)animPtr, 0, sizeof(BonusAnimList));
-	boardPtr = reinterpret_cast<int>(new unsigned char[sizeof(BonusBoardEntryList)]);
+	boardPtr = reinterpret_cast<int>(new (stage, const_cast<char*>(s_bonus_menu_cpp), 0xF8) unsigned char[sizeof(BonusBoardEntryList)]);
 	GetBonusMenuMembers(this).m_bonusBoardPtr = boardPtr;
-	auxPtr = reinterpret_cast<int>(new BonusMenuAuxRaw);
+	auxPtr = reinterpret_cast<int>(new (stage, const_cast<char*>(s_bonus_menu_cpp), 0xFA) BonusMenuAuxRaw);
 	GetBonusMenuMembers(this).m_bonusAuxPtr = auxPtr;
 	memset((void*)auxPtr, 0, sizeof(BonusMenuAuxRaw));
 	unsigned char* boardEntries = reinterpret_cast<unsigned char*>(boardPtr);
@@ -3089,7 +3090,6 @@ void CMenuPcs::createBonus()
 			}
 		}
 
-		CMemory::CStage* stage = GetBonusAllocStage(this);
 		CCharaPcs::CHandle** displaySlots = GetBonusDisplayHandleSlots(this);
 		for (int i = 0; i < 0x18; i++) {
 			displaySlots[i] = 0;

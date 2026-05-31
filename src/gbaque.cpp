@@ -1623,7 +1623,7 @@ void GbaQueue::LoadEnemyStat()
 	if (reinterpret_cast<unsigned int*>(&CFlat)[0x1041] != 0) {
 		unsigned char* enemyEntry = localEnemyData;
 		enemyObjPtrs = &Game.m_scriptWork[0][0][0];
-		enemyWorkPtrs = &Game.m_scriptWork[2][0][0];
+		enemyWorkPtrs = &Game.m_scriptWork[4][0][0];
 
 		for (i = 0; i < 0x40; i++) {
 			if (enemyObjPtrs[i] == 0) {
@@ -4660,7 +4660,7 @@ void GbaQueue::ClrChgRadarMode(int channel)
 int GbaQueue::GetScouterInfo(int channel, unsigned char* outData)
 {
 	unsigned char localScouterInfo[0x200];
-	unsigned int* enemyWorkPtrs = &Game.m_scriptWork[2][0][0];
+	unsigned int* enemyWorkPtrs = &Game.m_scriptWork[4][0][0];
 
 	memset(localScouterInfo, 0xFF, sizeof(localScouterInfo));
 
@@ -4861,7 +4861,7 @@ void GbaQueue::SetHitEnemy(int channel, int enemyIdx)
 
 	if (enemyIdx >= 0) {
 		enemyId = static_cast<short>(enemyIdx);
-		enemyType = static_cast<short>(*reinterpret_cast<unsigned short*>(Game.m_scriptWork[2][0][enemyIdx] + 0x1C));
+		enemyType = static_cast<short>(*reinterpret_cast<unsigned short*>(Game.m_scriptWork[4][0][enemyIdx] + 0x1C));
 	} else {
 		enemyType = enemyId = -1;
 	}

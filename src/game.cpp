@@ -559,7 +559,7 @@ void CGame::InitNewGame()
     *reinterpret_cast<unsigned int*>(&game->m_gameWork.m_scriptSysVal0) = 1;
     game->m_gameWork.m_chaliceElement = 1;
     strcpy(game->m_gameWork.m_townName, game->m_gameWork.m_languageId == 3 ? s_townNameTepa : s_townNameTipa);
-    gCFlatRuntime2.ResetNewGame();
+    CFlatRuntime2Storage().ResetNewGame();
     Chara.InitFurTexBuffer();
 }
 
@@ -577,7 +577,7 @@ void CGame::clearWork()
     int i;
     int j;
 
-    gCFlatRuntime2.Destroy();
+    CFlatRuntime2Storage().Destroy();
 
     for (i = 0; i < 4; i++) {
         m_cFlatDataArr[i].Destroy();
@@ -733,7 +733,7 @@ void CGame::CheckScriptChange()
 
     if (strcmp(m_nextScript.m_name, s_defaultScriptName) != 0) {
         if (m_cfdLoadedFlag == 0) {
-            gCFlatRuntime2.Destroy();
+            CFlatRuntime2Storage().Destroy();
             loadCfd();
             m_cfdLoadedFlag = 1;
 
@@ -754,7 +754,7 @@ void CGame::CheckScriptChange()
         }
     }
 
-    int scriptResult = gCFlatRuntime2.Load(m_nextScript.m_name);
+    int scriptResult = CFlatRuntime2Storage().Load(m_nextScript.m_name);
     strcpy(m_currentScriptName, m_nextScript.m_name);
 
     if (m_nextScript.m_flags != 0) {
@@ -770,7 +770,7 @@ void CGame::CheckScriptChange()
         *reinterpret_cast<unsigned int*>(&game->m_gameWork.m_scriptSysVal0) = 1;
         game->m_gameWork.m_chaliceElement = 1;
         strcpy(game->m_gameWork.m_townName, game->m_gameWork.m_languageId == 3 ? s_townNameTepa : s_townNameTipa);
-        gCFlatRuntime2.ResetNewGame();
+        CFlatRuntime2Storage().ResetNewGame();
         Chara.InitFurTexBuffer();
         m_nextScript.m_flags = 0;
     }

@@ -524,7 +524,6 @@ static int CreateWaterMesh(Vec* param_1, Vec* param_2, Vec2d* param_3, unsigned 
     float uvStep;
     float x;
     float z;
-    float rowUv;
     int indexOffset;
     int quadIndex;
     int rowBase;
@@ -542,7 +541,6 @@ static int CreateWaterMesh(Vec* param_1, Vec* param_2, Vec2d* param_3, unsigned 
     radius = param_5 * LoadFloat(FLOAT_803318a4);
     for (z = radius; -radius <= z; z -= param_5 * uvStep) {
         colCount = 0;
-        rowUv = static_cast<float>(rowCount) * uvStep;
         positions = reinterpret_cast<float*>(param_1);
         normals = reinterpret_cast<float*>(param_2);
         uvs = reinterpret_cast<float*>(param_3);
@@ -559,7 +557,7 @@ static int CreateWaterMesh(Vec* param_1, Vec* param_2, Vec2d* param_3, unsigned 
             normals[2] = zero;
             normals = normals + 3;
             *uvs = static_cast<float>(colCount) * uvStep;
-            uvs[1] = rowUv;
+            uvs[1] = static_cast<float>(rowCount) * uvStep;
             uvs = uvs + 2;
             colCount = colCount + 1;
         }
@@ -628,6 +626,7 @@ void CalcReflectionVector2(
 {
     Vec cameraPos;
     Vec nodeOffset;
+    Vec matrixPos;
     Vec worldPos;
     Vec cameraVector;
     Vec objSpacePos;
@@ -649,10 +648,10 @@ void CalcReflectionVector2(
     nodeOffset.y = node->m_mtx[1][3];
     nodeOffset.z = node->m_mtx[2][3];
 
-    worldPos.x = nodeMtx[0][3];
-    worldPos.y = nodeMtx[1][3];
-    worldPos.z = nodeMtx[2][3];
-    PSVECAdd(&nodeOffset, &worldPos, &worldPos);
+    matrixPos.x = nodeMtx[0][3];
+    matrixPos.y = nodeMtx[1][3];
+    matrixPos.z = nodeMtx[2][3];
+    PSVECAdd(&nodeOffset, &matrixPos, &worldPos);
 
     PSMTXCopy(node->m_mtx, matrix);
     matrix[0][3] = worldPos.x;
@@ -683,15 +682,15 @@ void CalcReflectionVector2(
         for (i = 0; i < itemCount; i++) {
             u16 posIndex = dl[0];
             u16 normalIndex = dl[1];
-            u16* next = dl + 4;
             int axis = 0;
             float maxAxis;
             float invAxis;
             Vec* outVec;
             u8* clr;
 
+            dl += 4;
             if ((drawFmt & 7) == 2) {
-                next = dl + 5;
+                dl++;
             }
 
             gUtil.ConvI2FVector(objSpacePos, positions[posIndex], posScale);
@@ -708,9 +707,8 @@ void CalcReflectionVector2(
             float absX = fabsf(outVec->x);
             float absZ = fabsf(outVec->z);
 
-            axis = absX < absY;
             maxAxis = absX;
-            if (axis != 0) {
+            if (absY > maxAxis) {
                 axis = 1;
                 maxAxis = absY;
             }
@@ -728,53 +726,56 @@ void CalcReflectionVector2(
             uv.x = (float)half;
             uv.y = (float)half;
 
-            if (axis == 1) {
-                invAxis = LoadFloat(FLOAT_803318b8) * reflected.y;
-                if (outVec->y < LoadFloat(FLOAT_80331898)) {
-                    clr[1] = (u8)(clr[1] - 0x7F);
-                    uv.x = (float)((half - (double)(reflected.x / invAxis)) * (double)LoadFloat(FLOAT_803318bc) +
-                                   (double)LoadFloat(FLOAT_803318bc));
-                    uv.y =
-                        (float)((double)((float)(half + (double)(reflected.z / invAxis)) * LoadFloat(FLOAT_803318bc)) + half);
-                } else {
-                    clr[1] = (u8)(clr[1] + 0x7F);
-                    uv.y = (float)((half + (double)(reflected.z / invAxis)) * (double)LoadFloat(FLOAT_803318bc));
-                    uv.x =
-                        (float)((double)((float)(half + (double)(reflected.x / invAxis)) * LoadFloat(FLOAT_803318bc)) + half);
-                }
-            } else if (axis == 0) {
+            switch (axis) {
+            case 0:
                 invAxis = LoadFloat(FLOAT_803318b8) * reflected.x;
-                if (outVec->x < LoadFloat(FLOAT_80331898)) {
-                    clr[0] = (u8)(clr[0] - 0x7F);
-                    uv.x = (float)((half - (double)(reflected.z / invAxis)) * (double)LoadFloat(FLOAT_803318bc) +
-                                   (double)LoadFloat(FLOAT_803318c0));
-                    uv.y = (float)((half + (double)(reflected.y / invAxis)) * (double)LoadFloat(FLOAT_803318bc) +
-                                   (double)LoadFloat(FLOAT_803318bc));
-                } else {
+                if (outVec->x >= LoadFloat(FLOAT_80331898)) {
                     clr[0] = (u8)(clr[0] + 0x7F);
                     uv.x = (float)((half - (double)(reflected.z / invAxis)) * (double)LoadFloat(FLOAT_803318bc) +
                                    (double)LoadFloat(FLOAT_803318bc));
                     uv.y = (float)((half - (double)(reflected.y / invAxis)) * (double)LoadFloat(FLOAT_803318bc) +
                                    (double)LoadFloat(FLOAT_803318bc));
+                } else {
+                    clr[0] = (u8)(clr[0] - 0x7F);
+                    uv.x = (float)((half - (double)(reflected.z / invAxis)) * (double)LoadFloat(FLOAT_803318bc) +
+                                   (double)LoadFloat(FLOAT_803318c0));
+                    uv.y = (float)((half + (double)(reflected.y / invAxis)) * (double)LoadFloat(FLOAT_803318bc) +
+                                   (double)LoadFloat(FLOAT_803318bc));
                 }
-            } else {
+                break;
+            case 1:
+                invAxis = LoadFloat(FLOAT_803318b8) * reflected.y;
+                if (outVec->y >= LoadFloat(FLOAT_80331898)) {
+                    clr[1] = (u8)(clr[1] + 0x7F);
+                    uv.y = (float)((half + (double)(reflected.z / invAxis)) * (double)LoadFloat(FLOAT_803318bc));
+                    uv.x =
+                        (float)((double)((float)(half + (double)(reflected.x / invAxis)) * LoadFloat(FLOAT_803318bc)) + half);
+                } else {
+                    clr[1] = (u8)(clr[1] - 0x7F);
+                    uv.x = (float)((half - (double)(reflected.x / invAxis)) * (double)LoadFloat(FLOAT_803318bc) +
+                                   (double)LoadFloat(FLOAT_803318bc));
+                    uv.y =
+                        (float)((double)((float)(half + (double)(reflected.z / invAxis)) * LoadFloat(FLOAT_803318bc)) + half);
+                }
+                break;
+            case 2:
                 invAxis = LoadFloat(FLOAT_803318b8) * reflected.z;
-                if (outVec->z < LoadFloat(FLOAT_80331898)) {
+                if (outVec->z >= LoadFloat(FLOAT_80331898)) {
+                    clr[2] = (u8)(clr[2] + 0x7F);
+                    uv.x = (float)((half + (double)(reflected.x / invAxis)) * (double)LoadFloat(FLOAT_803318bc));
+                    uv.y = (float)((half - (double)(reflected.y / invAxis)) * (double)LoadFloat(FLOAT_803318bc) +
+                                   (double)LoadFloat(FLOAT_803318bc));
+                } else {
                     clr[2] = (u8)(clr[2] - 0x7F);
                     uv.x =
                         (float)((double)((float)(half + (double)(reflected.x / invAxis)) * LoadFloat(FLOAT_803318bc)) + half);
                     uv.y = (float)((half + (double)(reflected.y / invAxis)) * (double)LoadFloat(FLOAT_803318bc) +
                                    (double)LoadFloat(FLOAT_803318bc));
-                } else {
-                    clr[2] = (u8)(clr[2] + 0x7F);
-                    uv.x = (float)((half + (double)(reflected.x / invAxis)) * (double)LoadFloat(FLOAT_803318bc));
-                    uv.y = (float)((half - (double)(reflected.y / invAxis)) * (double)LoadFloat(FLOAT_803318bc) +
-                                   (double)LoadFloat(FLOAT_803318bc));
                 }
+                break;
             }
 
             gUtil.ConvF2IVector2d(texCoord[normalIndex], uv, 12);
-            dl = next;
         }
     }
 

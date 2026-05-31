@@ -33,19 +33,19 @@ extern const float FLOAT_80330d00 = 100.0f;
 extern const double DOUBLE_80330d08 = 4503599627370496.0;
 extern const float kLineBoundsInitMin = 10000000.0f;
 extern const double DOUBLE_80330d18 = 0.5;
-extern const char s_soundNoFreeWaveWarn_801DB0BC[40] =
+extern const char s_soundNoFreeWaveWarn_801DB0BC[] =
     "\x82\xb1\x82\xea\x88\xc8\x8f\xe3noFreeWaev\x82\xf0\x92\xc7\x89\xc1\x82\xc5"
     "\x82\xab\x82\xdc\x82\xb9\x82\xf1\x81\x42\n";
-extern const char s_soundNoFreeSeGroupWarn_801DB0E4[44] =
+extern const char s_soundNoFreeSeGroupWarn_801DB0E4[] =
     "\x82\xb1\x82\xea\x88\xc8\x8f\xe3noFreeSeGroup\x82\xf0\x92\xc7\x89\xc1\x82\xc5"
     "\x82\xab\x82\xdc\x82\xb9\x82\xf1\x81\x42\n";
 extern const char s_dvd_sound_stream_strpct04d_str_801DB110[] = "dvd/sound/stream/str%04d.str";
-extern const char s_soundMinusOneFmt[28] =
+extern const char s_soundMinusOneFmt[] =
     "Sound: -1\x82\xaa\x93\x6E\x82\xb3\x82\xea\x82\xdc\x82\xb5\x82\xbd\x81\x42\n";
 extern const char s_soundLineTableFullFmt[] =
     "CSound: \x83\x89\x83\x43\x83\x93\x82\xcc\x92\xb8\x93\x5F\x82\xaa\x91\xbd\x82\xb7"
     "\x82\xac\x82\xdc\x82\xb7\x81\x42\n";
-extern const char s_soundLineOutOfRangeFmt[32] =
+extern const char s_soundLineOutOfRangeFmt[] =
     "CSound: \x83\x89\x83\x43\x83\x93\x82\xaa\x91\xbd\x82\xb7\x82\xac\x82\xdc\x82\xb7"
     "\x81\x42\n";
 static const char s_soundLoadWaveErrorFmt[] =

@@ -154,7 +154,7 @@ maphit.cpp:
 	extabindex  start:0x8000B734 end:0x8000B7C4
 	.text       start:0x80024E60 end:0x80027774
 	.ctors      start:0x801D53D0 end:0x801D53D4
-	.rodata     start:0x801D7088 end:0x801D7094
+	.rodata     start:0x801D7088 end:0x801D70B0
 	.bss        start:0x80245640 end:0x802456F0
 	.sbss       start:0x8032EC78 end:0x8032EC9C
 	.sdata2     start:0x8032F888 end:0x8032F8B4
@@ -1372,7 +1372,7 @@ pppYmEnv.cpp:
 	extab       start:0x80008D84 end:0x80008DB4
 	extabindex  start:0x8000F910 end:0x8000F958
 	.text       start:0x800E46DC end:0x800E6060
-	.rodata     start:0x801DB750 end:0x801DB7E8
+	.rodata     start:0x801DB740 end:0x801DB7E8
 	.sdata2     start:0x803310C0 end:0x8033111C
 
 pppEmission.cpp:

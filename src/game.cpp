@@ -559,7 +559,7 @@ void CGame::InitNewGame()
     *reinterpret_cast<unsigned int*>(&game->m_gameWork.m_scriptSysVal0) = 1;
     game->m_gameWork.m_chaliceElement = 1;
     strcpy(game->m_gameWork.m_townName, game->m_gameWork.m_languageId == 3 ? s_townNameTepa : s_townNameTipa);
-    gCFlatRuntime2.ResetNewGame();
+    CFlatRuntime2Storage().ResetNewGame();
     Chara.InitFurTexBuffer();
 }
 
@@ -770,7 +770,7 @@ void CGame::CheckScriptChange()
         *reinterpret_cast<unsigned int*>(&game->m_gameWork.m_scriptSysVal0) = 1;
         game->m_gameWork.m_chaliceElement = 1;
         strcpy(game->m_gameWork.m_townName, game->m_gameWork.m_languageId == 3 ? s_townNameTepa : s_townNameTipa);
-        gCFlatRuntime2.ResetNewGame();
+        CFlatRuntime2Storage().ResetNewGame();
         Chara.InitFurTexBuffer();
         m_nextScript.m_flags = 0;
     }

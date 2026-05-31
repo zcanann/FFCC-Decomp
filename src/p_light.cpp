@@ -330,16 +330,16 @@ void CLightPcs::Add(CLightPcs::CLight* light)
 {
     CLight sceneLight;
     sceneLight = *light;
-    float attenRadius = sceneLight.m_attenRadius;
     if (sceneLight.m_attenFalloff >= FLOAT_8032fc10) {
-        sceneLight.m_attenFalloff = attenRadius;
+        sceneLight.m_attenFalloff = sceneLight.m_attenRadius;
     }
 
     sceneLight.m_unkAC = sceneLight.m_attenRadius * sceneLight.m_attenRadius;
-    if (attenRadius < FLOAT_8032fc14) {
-        attenRadius = -attenRadius;
+    sceneLight.m_range = sceneLight.m_attenRadius;
+    if (sceneLight.m_range < FLOAT_8032fc14) {
+        sceneLight.m_range = -sceneLight.m_range;
     }
-    sceneLight.m_range = attenRadius * FLOAT_8032fc18 * sceneLight.m_radius;
+    sceneLight.m_range = sceneLight.m_range * FLOAT_8032fc18 * sceneLight.m_radius;
 
     sceneLight.m_targetEnable[3] = 1;
     sceneLight.m_targetEnable[2] = 1;

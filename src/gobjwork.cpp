@@ -46,9 +46,6 @@ static inline float GetStatusMultiplier(int offset)
 }
 }
 
-extern "C" void* __vt__8CMonWork[];
-extern "C" void* __vt__12CCaravanWork[];
-extern "C" void* __vt__9CGObjWork[];
 extern char s_WorldMapSortFmts_801D9EC8[];
 static const char s_NoWorldReturnItem_801D9F64[] = {
 	(char)0x83, (char)0x8F, (char)0x81, (char)0x5B, (char)0x83, (char)0x8B, (char)0x83, (char)0x68,
@@ -91,40 +88,6 @@ CGObjWork::CGObjWork()
 	m_objType = -1;
 	m_saveSlot = -1;
 	m_ownerObj = 0;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800a2db8
- * PAL Size: 28b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-CGObjWork::~CGObjWork()
-{
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800a2d8c
- * PAL Size: 72b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" CGObjWork* dtor_800A2D8C(CGObjWork* gObjWork, short shouldDelete)
-{
-	if (gObjWork != 0) {
-		*(void**)gObjWork = __vt__9CGObjWork;
-		if (0 < shouldDelete) {
-			operator delete(gObjWork);
-		}
-	}
-
-	return gObjWork;
 }
 
 /*
@@ -173,6 +136,19 @@ void CGObjWork::Init(int baseDataIndex, CRomWork* romWork, int idOffset)
 
 /*
  * --INFO--
+ * PAL Address: 0x800a2d8c
+ * PAL Size: 72b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+CGObjWork::~CGObjWork()
+{
+}
+
+/*
+ * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
@@ -211,19 +187,6 @@ CCaravanWork::CCaravanWork()
 
 /*
  * --INFO--
- * PAL Address: 0x800a2bf0
- * PAL Size: 8b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-CCaravanWork::~CCaravanWork()
-{
-}
-
-/*
- * --INFO--
  * PAL Address: 0x800a2b9c
  * PAL Size: 92b
  * EN Address: TODO
@@ -231,19 +194,8 @@ CCaravanWork::~CCaravanWork()
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" CCaravanWork* dtor_800A2B9C(CCaravanWork* caravanWork, short shouldDelete)
+CCaravanWork::~CCaravanWork()
 {
-	if (caravanWork != 0) {
-		*(void**)caravanWork = __vt__12CCaravanWork;
-		if (caravanWork != 0) {
-			*(void**)caravanWork = __vt__9CGObjWork;
-		}
-		if (0 < shouldDelete) {
-			operator delete(caravanWork);
-		}
-	}
-
-	return caravanWork;
 }
 
 /*

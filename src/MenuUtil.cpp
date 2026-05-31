@@ -573,15 +573,17 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 			int attrX = static_cast<int>(font->posX + font->GetWidth(sMenuUtilSpaceText));
 			font->SetPosX(static_cast<float>(attrX));
 
-			unsigned int attr = *reinterpret_cast<u16*>(itemBase + 8);
-			if ((attr >= 1) && (attr <= 0x13)) {
-				font->SetTlut(4);
-				strcpy(scratch, GetAttrStr(attr));
-				font->Draw(scratch);
-				font->SetTlut(9);
-				if ((attr >= 1) && (attr <= 8)) {
-					sprintf(scratch, sMenuUtilAttrBonusFormat, sMenuUtilPlusOneText);
+			if ((*reinterpret_cast<u16*>(itemBase + 4) & 0x1000) == 0) {
+				unsigned int attr = *reinterpret_cast<u16*>(itemBase + 8);
+				if ((attr >= 1) && (attr <= 0x13)) {
+					font->SetTlut(4);
+					strcpy(scratch, GetAttrStr(attr));
 					font->Draw(scratch);
+					font->SetTlut(9);
+					if ((attr >= 1) && (attr <= 8)) {
+						sprintf(scratch, sMenuUtilAttrBonusFormat, sMenuUtilPlusOneText);
+						font->Draw(scratch);
+					}
 				}
 			}
 		}

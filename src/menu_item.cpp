@@ -36,9 +36,9 @@ struct MenuItemOpenAnim {
     s16 y;
     s16 w;
     s16 h;
+    float u;
+    float v;
     float alpha;
-    float scale;
-    float progress;
     float uvScale;
     int unk18;
     int tex;
@@ -87,9 +87,9 @@ STATIC_ASSERT(offsetof(ItemMenuState, subMenuIndex) == 0x28);
 STATIC_ASSERT(offsetof(ItemMenuState, mode) == 0x30);
 STATIC_ASSERT(offsetof(ItemMenuState, prevMode) == 0x32);
 STATIC_ASSERT(offsetof(ItemMenuState, scroll) == 0x34);
-STATIC_ASSERT(offsetof(MenuItemOpenAnim, alpha) == 0x8);
-STATIC_ASSERT(offsetof(MenuItemOpenAnim, scale) == 0xC);
-STATIC_ASSERT(offsetof(MenuItemOpenAnim, progress) == 0x10);
+STATIC_ASSERT(offsetof(MenuItemOpenAnim, u) == 0x8);
+STATIC_ASSERT(offsetof(MenuItemOpenAnim, v) == 0xC);
+STATIC_ASSERT(offsetof(MenuItemOpenAnim, alpha) == 0x10);
 STATIC_ASSERT(offsetof(MenuItemOpenAnim, uvScale) == 0x14);
 STATIC_ASSERT(offsetof(MenuItemOpenAnim, unk18) == 0x18);
 STATIC_ASSERT(offsetof(MenuItemOpenAnim, tex) == 0x1C);
@@ -129,7 +129,7 @@ int CMenuPcs::ItemCtrlCur()
     bool blocked = false;
     unsigned int press;
     unsigned int hold;
-    int caravanWork = Game.m_scriptFoodBase[0];
+    CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
 
     if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
         blocked = true;
@@ -177,15 +177,17 @@ int CMenuPcs::ItemCtrlCur()
         } else if ((hold & 4) != 0) {
             if (this->itemMenuState->selectedIndex < 7) {
                 this->itemMenuState->selectedIndex = this->itemMenuState->selectedIndex + 1;
+                Sound.PlaySe(1, 0x40, 0x7F, 0);
             } else {
                 s16 scroll = this->itemMenuState->scroll;
                 if (scroll > 0x3E) {
                     this->itemMenuState->scroll = 0;
+                    Sound.PlaySe(1, 0x40, 0x7F, 0);
                 } else {
                     this->itemMenuState->scroll = scroll + 1;
+                    Sound.PlaySe(1, 0x40, 0x7F, 0);
                 }
             }
-            Sound.PlaySe(1, 0x40, 0x7F, 0);
         }
 
         if ((hold & 0xC) == 0) {
@@ -209,8 +211,7 @@ int CMenuPcs::ItemCtrlCur()
                     idx -= 0x40;
                 }
 
-                int itemEntry = caravanWork + idx * 2;
-                s16 itemId = *(s16*)(itemEntry + 0xB6);
+                s16 itemId = caravanWork->m_inventoryItems[idx];
 
                 if ((itemId < 1) || (EquipChk(idx) != 0) ||
                     ((letterAttachFlg >= 0) && (itemId < 0x125))) {
@@ -223,10 +224,10 @@ int CMenuPcs::ItemCtrlCur()
                     this->itemMenuState->optionFlags = 0xC;
                     int itemType = GetItemType(idx, 0);
 
-                    if ((itemType == 7) && (reinterpret_cast<CCaravanWork*>(caravanWork)->CanPlayerUseItem() != 0)) {
+                    if ((itemType == 7) && (caravanWork->CanPlayerUseItem() != 0)) {
                         this->itemMenuState->optionFlags = this->itemMenuState->optionFlags | 1;
                     }
-                    if ((itemType != 1) && (reinterpret_cast<CCaravanWork*>(caravanWork)->CanPlayerPutItem() != 0)) {
+                    if ((itemType != 1) && (caravanWork->CanPlayerPutItem() != 0)) {
                         this->itemMenuState->optionFlags = this->itemMenuState->optionFlags | 2;
                     }
 
@@ -282,13 +283,13 @@ int CMenuPcs::ItemCtrlCur()
                     }
 
                     if (option == 0) {
-                        reinterpret_cast<CCaravanWork*>(caravanWork)->FGUseItem(idx, 0);
+                        caravanWork->FGUseItem(idx, 0);
                         SingLifeInit(0);
-                        reinterpret_cast<CCaravanWork*>(caravanWork)->CalcStatus();
+                        caravanWork->CalcStatus();
                     } else if (option == 1) {
-                        reinterpret_cast<CCaravanWork*>(caravanWork)->FGPutItem(idx, 0);
+                        caravanWork->FGPutItem(idx, 0);
                     } else if (option == 2) {
-                        reinterpret_cast<CCaravanWork*>(caravanWork)->DeleteItemIdx(idx, 0);
+                        caravanWork->DeleteItemIdx(idx, 0);
                     }
 
                     this->singWindowInfo[5] = 2;
@@ -322,84 +323,83 @@ void CMenuPcs::ItemDraw()
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
-    int caravanWork = Game.m_scriptFoodBase[0];
+    CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0]);
     ItemMenuState* itemState = this->itemMenuState;
     ItemMenuAnimList* itemList = this->itemList;
     s16 listState = itemState->listState;
     s16 mode = itemState->mode;
-    int letterAttachFlg = SingGetLetterAttachflg();
+    bool hasLetterAttach = SingGetLetterAttachflg() >= 0;
     int drawIndex = 0;
     int count = itemList->count;
-    s16* entry = reinterpret_cast<s16*>(itemList->anims);
+    MenuItemOpenAnim* entry = itemList->anims;
 
-    for (int i = 0; i < count; i++, entry += 0x20) {
-        int tex = *(int*)(entry + 0xE);
+    for (int i = 0; i < count; i++, entry++) {
+        int tex = entry->tex;
         if (tex < 0) {
             continue;
         }
 
-        float x = (float)entry[0];
-        float y = (float)entry[1];
-        float w = (float)entry[2];
-        float h = (float)entry[3];
-        float u = *(float*)(entry + 4);
-        float v = *(float*)(entry + 6);
-        float alpha = *(float*)(entry + 8);
-        float uvScale = *(float*)(entry + 10);
+        float x = (float)entry->x;
+        float y = (float)entry->y;
+        float w = (float)entry->w;
+        float h = (float)entry->h;
+        float u = entry->u;
+        float v = entry->v;
+        float alpha = entry->alpha;
+        float uvScale = entry->uvScale;
 
         if (i == 0) {
             MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(1));
             MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));
 
-            GXColor barColors[4];
-            barColors[0].r = 0xFF;
-            barColors[0].g = 0xFF;
-            barColors[0].b = 0xFF;
-            barColors[0].a = 0xFF;
-            barColors[1].r = 0xFF;
-            barColors[1].g = 0xFF;
-            barColors[1].b = 0xFF;
-            barColors[1].a = 0xFF;
-            barColors[2].r = 0xFF;
-            barColors[2].g = 0xFF;
-            barColors[2].b = 0xFF;
-            barColors[2].a = 0xFF;
-            barColors[3].r = 0xFF;
-            barColors[3].g = 0xFF;
-            barColors[3].b = 0xFF;
-            barColors[3].a = 0xFF;
+            GXColor colors[4];
+            colors[0].r = 0xFF;
+            colors[0].g = 0xFF;
+            colors[0].b = 0xFF;
+            colors[0].a = 0xFF;
+            colors[1].r = 0xFF;
+            colors[1].g = 0xFF;
+            colors[1].b = 0xFF;
+            colors[1].a = 0xFF;
+            colors[2].r = 0xFF;
+            colors[2].g = 0xFF;
+            colors[2].b = 0xFF;
+            colors[2].a = 0xFF;
+            colors[3].r = 0xFF;
+            colors[3].g = 0xFF;
+            colors[3].b = 0xFF;
+            colors[3].a = 0xFF;
 
-            GXSetChanMatColor(GX_COLOR0A0, barColors[0]);
+            GXSetChanMatColor(GX_COLOR0A0, colors[0]);
             float fillW = alpha * w;
             if (fillW > FLOAT_80332e60) {
                 MenuPcs.DrawRect(
-                    0, x, y, fillW, h, u, v, barColors, FLOAT_80332e64, FLOAT_80332e64, FLOAT_80332e60);
+                    0, x, y, fillW, h, u, v, colors, FLOAT_80332e64, FLOAT_80332e64, FLOAT_80332e60);
                 x += fillW;
                 u += fillW;
             }
 
             if (fillW > FLOAT_80332e60 && fillW < w) {
-                GXColor fadeColors[4];
-                fadeColors[0].r = 0xFF;
-                fadeColors[0].g = 0xFF;
-                fadeColors[0].b = 0xFF;
-                fadeColors[0].a = 0;
-                fadeColors[1].r = 0xFF;
-                fadeColors[1].g = 0xFF;
-                fadeColors[1].b = 0xFF;
-                fadeColors[1].a = 0;
-                fadeColors[2].r = 0xFF;
-                fadeColors[2].g = 0xFF;
-                fadeColors[2].b = 0xFF;
-                fadeColors[2].a = 0;
-                fadeColors[3].r = 0xFF;
-                fadeColors[3].g = 0xFF;
-                fadeColors[3].b = 0xFF;
-                fadeColors[3].a = 0;
+                colors[0].r = 0xFF;
+                colors[0].g = 0xFF;
+                colors[0].b = 0xFF;
+                colors[0].a = 0;
+                colors[1].r = 0xFF;
+                colors[1].g = 0xFF;
+                colors[1].b = 0xFF;
+                colors[1].a = 0;
+                colors[2].r = 0xFF;
+                colors[2].g = 0xFF;
+                colors[2].b = 0xFF;
+                colors[2].a = 0;
+                colors[3].r = 0xFF;
+                colors[3].g = 0xFF;
+                colors[3].b = 0xFF;
+                colors[3].a = 0;
 
-                float remainW = (float)((double)(DOUBLE_80332e68 / (double)*(int*)(entry + 0x14)) * (double)w);
+                float remainW = (float)((double)(DOUBLE_80332e68 / (double)entry->duration) * (double)w);
                 MenuPcs.DrawRect(
-                    0, x, y, remainW, h, u, v, fadeColors, FLOAT_80332e64, FLOAT_80332e64, FLOAT_80332e60);
+                    0, x, y, remainW, h, u, v, colors, FLOAT_80332e64, FLOAT_80332e64, FLOAT_80332e60);
             }
 
             MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
@@ -411,9 +411,9 @@ void CMenuPcs::ItemDraw()
                     menuIndex -= 0x40;
                 }
 
-                s16 itemId = *(s16*)(caravanWork + menuIndex * 2 + 0xB6);
+                s16 itemId = caravanWork->m_inventoryItems[menuIndex];
                 if ((itemId < 1) || (EquipChk(menuIndex) != 0) ||
-                    ((letterAttachFlg >= 0) && (itemId < 0x125))) {
+                    (hasLetterAttach && (itemId < 0x125))) {
                     if (EquipChk(menuIndex) != 0) {
                         int markX = (int)(x - FLOAT_80332e70);
                         int markY = (int)((float)((h - FLOAT_80332e74) * (float)DOUBLE_80332e78) + y);
@@ -465,7 +465,7 @@ void CMenuPcs::ItemDraw()
         CColor textColor(0xFF, 0xFF, 0xFF, (u8)(FLOAT_80332e80 * *(float*)(listStart + 8)));
         listFont->SetColor(textColor.color);
 
-        s16 itemId = *(s16*)(caravanWork + menuIndex * 2 + 0xB6);
+        s16 itemId = caravanWork->m_inventoryItems[menuIndex];
         if (itemId > 0) {
             const char* text = flatData->table[0].index[itemId * 5 + 4];
             int selectedIndex = itemState->selectedIndex + itemState->scroll;
@@ -492,7 +492,7 @@ void CMenuPcs::ItemDraw()
             menuIndex -= 0x40;
         }
 
-        s16 itemId = *(s16*)(caravanWork + menuIndex * 2 + 0xB6);
+        s16 itemId = caravanWork->m_inventoryItems[menuIndex];
         if (itemId > 0) {
             int iconY = (int)((float)(iconEntry[1] + 6) - FLOAT_80332e64);
             int iconX = (int)(float)(iconEntry[0] + iconEntry[2] - 0x10);
@@ -578,13 +578,13 @@ bool CMenuPcs::ItemClose()
         if (anim->startFrame + anim->duration <= frame) {
             float zero = FLOAT_80332e60;
             finished++;
-            anim->progress = zero;
+            anim->alpha = zero;
             anim->dx = zero;
             anim->dy = zero;
         } else {
             anim->frame++;
             double one = DOUBLE_80332e68;
-            anim->progress =
+            anim->alpha =
                 (float)-((DOUBLE_80332e68 / (double)anim->duration) * (double)anim->frame - DOUBLE_80332e68);
             if ((anim->flags & 2) == 0) {
                 float ratio = (float)-((one / (double)anim->duration) * (double)anim->frame - one);
@@ -673,13 +673,13 @@ bool CMenuPcs::ItemOpen()
         if (frame >= anim->startFrame) {
             if (anim->startFrame + anim->duration <= frame) {
                 finished++;
-                anim->progress = FLOAT_80332e64;
+                anim->alpha = FLOAT_80332e64;
                 anim->dx = FLOAT_80332e60;
                 anim->dy = FLOAT_80332e60;
             } else {
                 anim->frame++;
                 double one = DOUBLE_80332e68;
-                anim->progress = (float)((one / (double)anim->duration) * (double)anim->frame);
+                anim->alpha = (float)((one / (double)anim->duration) * (double)anim->frame);
                 if ((anim->flags & 2) == 0) {
                     float ratio = (float)((one / (double)anim->duration) * (double)anim->frame);
                     float dx = anim->targetX - (float)anim->x;
@@ -783,21 +783,21 @@ void CMenuPcs::ItemInit1()
         if (blocks != 0) {
             do {
                 entry[0].frame = 0;
-                entry[0].progress = progress;
+                entry[0].alpha = progress;
                 entry[1].frame = 0;
-                entry[1].progress = progress;
+                entry[1].alpha = progress;
                 entry[2].frame = 0;
-                entry[2].progress = progress;
+                entry[2].alpha = progress;
                 entry[3].frame = 0;
-                entry[3].progress = progress;
+                entry[3].alpha = progress;
                 entry[4].frame = 0;
-                entry[4].progress = progress;
+                entry[4].alpha = progress;
                 entry[5].frame = 0;
-                entry[5].progress = progress;
+                entry[5].alpha = progress;
                 entry[6].frame = 0;
-                entry[6].progress = progress;
+                entry[6].alpha = progress;
                 entry[7].frame = 0;
-                entry[7].progress = progress;
+                entry[7].alpha = progress;
                 entry += 8;
                 blocks--;
             } while (blocks != 0);
@@ -806,7 +806,7 @@ void CMenuPcs::ItemInit1()
         if (count != 0) {
             do {
                 entry->frame = 0;
-                entry->progress = progress;
+                entry->alpha = progress;
                 entry++;
                 count--;
             } while (count != 0);
@@ -858,8 +858,8 @@ void CMenuPcs::ItemInit()
     float titleAlpha = FLOAT_80332EA8;
     float titleScale = FLOAT_80332EAC;
     float zero = FLOAT_80332e60;
-    entry->alpha = titleAlpha;
-    entry->scale = titleScale;
+    entry->u = titleAlpha;
+    entry->v = titleScale;
     entry->uvScale = one;
     count = 4;
     entry->startFrame = 5;
@@ -871,8 +871,8 @@ void CMenuPcs::ItemInit()
     entry->y = 0xE;
     entry->w = 0x30;
     entry->h = 0x30;
-    entry->alpha = zero;
-    entry->scale = zero;
+    entry->u = zero;
+    entry->v = zero;
     entry->uvScale = one;
     entry->startFrame = 0;
     entry->duration = 5;
@@ -884,8 +884,8 @@ void CMenuPcs::ItemInit()
     entry->h = 0x30;
     entry->y = 0x150 - entry->h;
     float rightUvScale = FLOAT_80332EB0;
-    entry->alpha = zero;
-    entry->scale = zero;
+    entry->u = zero;
+    entry->v = zero;
     entry->uvScale = rightUvScale;
     entry->startFrame = 0;
     entry->duration = 5;
@@ -897,8 +897,8 @@ void CMenuPcs::ItemInit()
     entry->y = 8;
     entry->w = 0x48;
     entry->h = 0x140;
-    entry->alpha = zero;
-    entry->scale = zero;
+    entry->u = zero;
+    entry->v = zero;
     entry->startFrame = 0;
     entry->duration = 5;
 
@@ -916,8 +916,8 @@ void CMenuPcs::ItemInit()
         entry->y = itemList->anims[0].y + yOffset;
         entry->w = 200;
         entry->h = 0x28;
-        entry->alpha = zero;
-        entry->scale = zero;
+        entry->u = zero;
+        entry->v = zero;
         entry->startFrame = 7;
         entry->duration = 5;
 
@@ -931,8 +931,8 @@ void CMenuPcs::ItemInit()
         entry->y = itemList->anims[0].y + nextY;
         entry->w = 200;
         entry->h = 0x28;
-        entry->alpha = zero;
-        entry->scale = zero;
+        entry->u = zero;
+        entry->v = zero;
         entry->startFrame = 7;
         entry->duration = 5;
         loopCount--;

@@ -344,7 +344,7 @@ void CMenuPcs::ArtiDraw()
 
 				float fillW = *(float*)(entry + 8) * w;
 				if (fillW > 0.0f) {
-					MenuPcs.DrawRect(0, x, y, fillW, h, u, v, colors, 1.0f, 1.0f, 0.0f);
+					MenuPcs.DrawRect(0, x, y, fillW, h, u, v, colors, FLOAT_80332fac, FLOAT_80332fac, 0.0f);
 					x += fillW;
 					u += fillW;
 				}
@@ -355,7 +355,7 @@ void CMenuPcs::ArtiDraw()
 					colors[2].a = 0;
 					colors[3].a = 0;
 					float remainW = (float)(DOUBLE_80332fb0 / (double)*(int*)(entry + 0x14)) * (float)entry[2];
-					MenuPcs.DrawRect(0, x, y, remainW, h, u, v, colors, 1.0f, 1.0f, 0.0f);
+					MenuPcs.DrawRect(0, x, y, remainW, h, u, v, colors, FLOAT_80332fac, FLOAT_80332fac, 0.0f);
 				}
 
 				MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
@@ -389,7 +389,7 @@ void CMenuPcs::ArtiDraw()
 	}
 
 	CFont* listFont = GetArtiListFont(this);
-	listFont->SetMargin(1.0f);
+	listFont->SetMargin(FLOAT_80332fac);
 	listFont->SetShadow(0);
 	listFont->SetScale(FLOAT_80332fc4);
 	listFont->DrawInit();
@@ -406,7 +406,7 @@ void CMenuPcs::ArtiDraw()
 	short* textEntry = listStart;
 	const ArtiFlatData* flatData = reinterpret_cast<const ArtiFlatData*>(&Game.m_cFlatDataArr[1]);
 	for (int i = 0; i < 8; i++) {
-		u8 alpha = (u8)(255.0f * *(float*)(textEntry + 8));
+		u8 alpha = (u8)(FLOAT_80332fc0 * *(float*)(textEntry + 8));
 		CColor color(0xFF, 0xFF, 0xFF, alpha);
 		listFont->SetColor(color.color);
 

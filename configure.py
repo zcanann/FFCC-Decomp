@@ -494,7 +494,7 @@ config.libs = [
         "progress_category": "game",
         "objects": [
             Object(NonMatching, "astar.cpp"),
-            Object(NonMatching, "baseobj.cpp"),
+            Object(NonMatching, "baseobj.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
             Object(NonMatching, "bonus_menu.cpp"),
             Object(NonMatching, "cflat_data.cpp"),
             Object(NonMatching, "cflat_r2class.cpp"),
@@ -747,7 +747,7 @@ config.libs = [
             Object(NonMatching, "pppYmTracer.cpp"),
             Object(NonMatching, "pppYmTracer2.cpp"),
             Object(NonMatching, "prgobj.cpp", extra_cflags=["-RTTI on", "-str reuse,pool,readonly"]),
-            Object(NonMatching, "quadobj.cpp"),
+            Object(NonMatching, "quadobj.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
             Object(NonMatching, "ref.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
             Object(NonMatching, "ringmenu.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
             Object(NonMatching, "shopmenu.cpp"),

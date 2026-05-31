@@ -1436,11 +1436,13 @@ baseobj.cpp:
 	extab       start:0x800091B4 end:0x800091E4
 	extabindex  start:0x8000FF58 end:0x8000FFA0
 	.text       start:0x8010B150 end:0x8010B2A4
+	.sdata      start:0x8032E928 end:0x8032E930
 
 quadobj.cpp:
 	extab       start:0x800091E4 end:0x800091EC
 	extabindex  start:0x8000FFA0 end:0x8000FFAC
 	.text       start:0x8010B2A4 end:0x8010B660
+	.sdata      start:0x8032E938 end:0x8032E948
 	.sdata2     start:0x80331958 end:0x80331968
 
 charaobj.cpp:

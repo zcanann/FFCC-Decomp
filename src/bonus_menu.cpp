@@ -3,6 +3,7 @@
 #include "ffcc/fontman.h"
 #include "ffcc/gbaque.h"
 #include "ffcc/gobjwork.h"
+#include "ffcc/gxfunc.h"
 #include "ffcc/p_chara.h"
 #include "ffcc/game.h"
 #include "ffcc/linkage.h"
@@ -371,7 +372,7 @@ static inline void DrawBonusActiveMarks(CMenuPcs* menu, int statePtr, float alph
 		return;
 	}
 
-	GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
+	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 	GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(alpha * 255.0f)};
 	GXSetChanMatColor(GX_COLOR0A0, color);
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
@@ -1392,14 +1393,14 @@ void CMenuPcs::DrawSelectOpenAnim()
 				GXSetChanMatColor(GX_COLOR0A0, color);
 				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(sprite->tex));
 				if (sprite->tex == 0x20) {
-					GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_ONE, GX_LO_NOOP);
+					_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_ONE, GX_LO_NOOP);
 				}
 				MenuPcs.DrawRect(0,
 				    (float)sprite->x + sprite->motionX, (float)sprite->y + sprite->motionY,
 				    (float)sprite->w, (float)sprite->h,
 				    sprite->mulX, sprite->mulY, sprite->depth, sprite->depth, 0.0f);
 				if (sprite->tex == 0x20) {
-					GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
+					_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 				}
 				lastKind = kind;
 			}

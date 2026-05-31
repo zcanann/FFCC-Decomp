@@ -58,7 +58,7 @@ extern "C" char* sMogRadarTypeLabels[];
 extern "C" char sMogRadarDebugFormatBlock[];
 extern "C" char sMogFurTextureName[];
 extern "C" {
-extern unsigned char m_mogWork[0x30];
+extern unsigned char m_mogWork[0x2C];
 void* DAT_8032EDEC;
 void* gMogFurTexBuffer;
 }
@@ -182,7 +182,6 @@ struct MogWorkRaw
     int m_prevScoreC;
     int m_loopSeHandle;
     int m_started;
-    int m_pad2C;
 };
 
 static inline MogWorkRaw& MogWork()
@@ -733,7 +732,7 @@ void CChara::CalcMogScore()
 void CChara::ChangeMogMode(int mogMode)
 {
 	if (mogMode != 0) {
-		memset(m_mogWork, 0, offsetof(MogWorkRaw, m_pad2C));
+		memset(m_mogWork, 0, sizeof(MogWorkRaw));
 		*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(this) + 0x200c) = 0x140;
 		*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(this) + 0x2010) = 0xE0;
 		*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(this) + 0x2004) = 0;
@@ -764,7 +763,7 @@ static Vec s_mogFurVelocityRand;
 static Vec s_mogFurAccel;
 static Vec s_mogFurAccelRand;
 extern "C" {
-unsigned char m_mogWork[0x30];
+unsigned char m_mogWork[0x2C];
 }
 static unsigned int s_mogFurRand;
 static float s_mogFurMaxY;
@@ -2049,12 +2048,34 @@ void brush(unsigned short* pixels, int width, int height, float fx, float fy, in
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 176b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void nearColor(CColor, CColor)
+int nearColor(CColor src, CColor ref)
 {
-	// Decompiled helper currently side-effect free in this unit.
+	int dr = static_cast<int>(src.color.r) - static_cast<int>(ref.color.r);
+	if (dr < 0) {
+		dr = -dr;
+	}
+	dr += 7 - static_cast<int>(src.color.a);
+
+	int dg = static_cast<int>(src.color.g) - static_cast<int>(ref.color.g);
+	if (dg < 0) {
+		dg = -dg;
+	}
+	dg += 7 - static_cast<int>(src.color.a);
+
+	int db = static_cast<int>(src.color.b) - static_cast<int>(ref.color.b);
+	if (db < 0) {
+		db = -db;
+	}
+	db += 7 - static_cast<int>(src.color.a);
+
+	return (dr < 6 && dg < 6 && db < 6) ? 1 : 0;
 }
 
 /*

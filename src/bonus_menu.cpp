@@ -367,6 +367,10 @@ static inline void SetupSelectCloseSpriteMotion(BonusAnimSprite* sprite)
 
 static inline void DrawBonusActiveMarks(CMenuPcs* menu, int statePtr, float alpha)
 {
+	if (alpha <= 0.0f) {
+		return;
+	}
+
 	unsigned int activeMask = 0;
 	for (int i = 0; i < s_Rinfo->m_partyCount; i++) {
 		int selection = s_Rinfo->m_party[i].m_selectedSlot;

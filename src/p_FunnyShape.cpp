@@ -31,8 +31,6 @@ extern "C" const char sFunnyShapePcsProcessClassName[] = "CProcess";
 extern "C" const char s_funnyShapeFmt[] = "FunnyShape [%c]";
 extern "C" const char s_CPtrArray_OSFS_TEXTURE_ST_801D7E44[] = "CPtrArray<OSFS_TEXTURE_ST *>";
 extern "C" const char s_CPtrArray_GXTexObj[] = "CPtrArray<_GXTexObj *>";
-extern const char __RTTI__8CManager_8032E660[];
-extern const char __RTTI__8CProcess_8032E668[];
 extern "C" const char s_funnyShapeSpinner[5];
 
 inline void* operator new(unsigned long, void* ptr)

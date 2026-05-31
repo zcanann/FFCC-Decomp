@@ -13,15 +13,12 @@ extern const float kUtilHermiteCoeff2;
 extern const float kUtilHermiteCoeff3;
 extern const float kUtilHermiteCoeffNeg2;
 extern Vec gUtilUpVector;
-extern const char __RTTI__8CManager_8032E488[];
 
 struct UtilHermiteBasis {
 	float m_value[4];
 };
 
 extern const UtilHermiteBasis kUtilHermiteBasis;
-
-unsigned int s_CUtilTablePad0[3] = {reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CManager_8032E488)), 0, 0};
 
 static inline MtxPtr GetCameraMatrix()
 {

@@ -330,23 +330,21 @@ void CCharaPcs::drawViewer()
 
                 Mtx scratchMtx;
                 Vec lightPos;
-                PSMTXCopy(model->m_matrix, scratchMtx);
+                PSMTXCopy(self->m_viewerModel[i]->m_matrix, scratchMtx);
                 lightPos.x = scratchMtx[0][3];
                 lightPos.y = scratchMtx[1][3];
                 lightPos.z = scratchMtx[2][3];
                 LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(0), &lightPos, 0xFFFFFFFF);
 
-                model->Draw(cameraMtx, 0, 0);
-                model->DrawFur(cameraMtx, 0);
+                self->m_viewerModel[i]->Draw(cameraMtx, 0, 0);
+                self->m_viewerModel[i]->DrawFur(cameraMtx, 0);
                 watch.Stop();
                 float cpuTime = watch.Get();
                 watch.Start();
                 Graphic._WaitDrawDone(const_cast<char*>(s_p_chara_viewer_cpp), 0x2A7);
                 watch.Stop();
                 if (i == 0) {
-                    float totalTime = watch.Get();
-                    float gpuTime = totalTime - cpuTime;
-                    Graphic.Printf(const_cast<char*>(s_gpu_profile_fmt), totalTime, cpuTime, gpuTime);
+                    Graphic.Printf(const_cast<char*>(s_gpu_profile_fmt), watch.Get(), cpuTime, watch.Get() - cpuTime);
                 }
             }
         }

@@ -862,7 +862,8 @@ void CMenuPcs::CalcOptionMenu()
 		Sound.PlaySe(1, 0x40, 0x7F, 0);
 	}
 
-	if (m_specialModeEdit == 0) {
+	int specialModeEdit = m_specialModeEdit;
+	if (specialModeEdit == 0) {
 		unsigned short press2;
 		press2 = GetMenuPress();
 
@@ -911,7 +912,7 @@ void CMenuPcs::CalcOptionMenu()
 			}
 			break;
 		case 4:
-			if (m_specialModeEdit != 0) {
+			if (specialModeEdit != 0) {
 				m_specialModeFlags[static_cast<signed char>(m_specialModeCursor)]--;
 				if (m_specialModeFlags[static_cast<signed char>(m_specialModeCursor)] < 0) {
 					m_specialModeFlags[static_cast<signed char>(m_specialModeCursor)] = 1;
@@ -953,7 +954,7 @@ void CMenuPcs::CalcOptionMenu()
 			}
 			break;
 		case 4:
-			if (m_specialModeEdit != 0) {
+			if (specialModeEdit != 0) {
 				m_specialModeFlags[static_cast<signed char>(m_specialModeCursor)]++;
 				if (m_specialModeFlags[static_cast<signed char>(m_specialModeCursor)] > 1) {
 					m_specialModeFlags[static_cast<signed char>(m_specialModeCursor)] = 0;

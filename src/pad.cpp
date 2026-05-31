@@ -18,7 +18,7 @@ CPad Pad;
 
 void* operator new[](unsigned long, CMemory::CStage*, char*, int);
 
-extern const char __RTTI__8CManager_8032E458[];
+extern const char __RTTI__8CManager_8032E440[];
 extern const char s_CPad[] = "CPad";
 static const float FLOAT_8032f820 = 0.0f;
 static const float FLOAT_8032f824 = 0.0078125f;
@@ -33,7 +33,7 @@ PADStatus g_pad[4];
 }
 
 unsigned int s_CPadTablePad0[3] = {
-	reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CManager_8032E458)), 0, 0};
+	0, reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CManager_8032E440)), 0};
 
 namespace {
 struct ReplayFrame

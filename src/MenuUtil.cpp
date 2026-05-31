@@ -1217,11 +1217,13 @@ void CMenuPcs::DrawOptionMenu()
 			}
 		}
 
+		float minTextX = FLOAT_80333614;
+		float volumeTextY = FLOAT_80333618;
 		char* maxText = g_strMenuUtilMes[languageBase + 17];
-		DrawFont(static_cast<int>(FLOAT_80333614), static_cast<int>(FLOAT_80333618), color, 7,
+		DrawFont(static_cast<int>(minTextX), static_cast<int>(volumeTextY), color, 7,
 		         g_strMenuUtilMes[languageBase + 16], kOptionAnimMax, kOptionAnimMax);
 		float maxX = FLOAT_80333628 - font->GetWidth(maxText);
-		DrawFont(static_cast<int>(maxX), static_cast<int>(FLOAT_80333618), color, 7, maxText, kOptionAnimMax,
+		DrawFont(static_cast<int>(maxX), static_cast<int>(volumeTextY), color, 7, maxText, kOptionAnimMax,
 		         kOptionAnimMax);
 	} else if (m_optionIndex <= 1) {
 		CTextureSet* textureSet = GetMenuTextureSet(this, 0xBC);
@@ -1322,11 +1324,13 @@ void CMenuPcs::DrawOptionMenu()
 			}
 		}
 
+		float minTextX = FLOAT_80333614;
+		float volumeTextY = FLOAT_80333618;
 		char* maxText = g_strMenuUtilMes[languageBase + 17];
-		DrawFont(static_cast<int>(FLOAT_80333614), static_cast<int>(FLOAT_80333618), color, 7,
+		DrawFont(static_cast<int>(minTextX), static_cast<int>(volumeTextY), color, 7,
 		         g_strMenuUtilMes[languageBase + 16], kOptionAnimMax, kOptionAnimMax);
 		float maxX = FLOAT_80333628 - font->GetWidth(maxText);
-		DrawFont(static_cast<int>(maxX), static_cast<int>(FLOAT_80333618), color, 7, maxText, kOptionAnimMax,
+		DrawFont(static_cast<int>(maxX), static_cast<int>(volumeTextY), color, 7, maxText, kOptionAnimMax,
 		         kOptionAnimMax);
 	} else {
 		CTextureSet* textureSet = GetMenuTextureSet(this, 0xBC);

@@ -17,8 +17,6 @@
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 CMapPcs MapPcs;
-extern const char __RTTI__8CManager_8032E508[];
-extern const char __RTTI__8CProcess_8032E510[];
 
 class CRelProfile
 {
@@ -117,14 +115,6 @@ extern const float DrawRangeDefault;
 extern const float kPMapBoundMinInit;
 extern const float kPMapBoundMaxInit;
 char s_lastLoadedMapPath__7CMapPcs[0x100] = "";
-unsigned int s_CMapPcsRttiBase0[3] = {reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CManager_8032E508)), 0, 0};
-unsigned int s_CMapPcsRttiBase1[5] = {
-    reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CManager_8032E508)),
-    0,
-    reinterpret_cast<unsigned int>(const_cast<char*>(__RTTI__8CProcess_8032E510)),
-    0,
-    0,
-};
 extern const char s_p_map_cpp[];
 extern const char s_map_load_ok_fmt[];
 extern const char s_dvd_map_stage_map_fmt[];

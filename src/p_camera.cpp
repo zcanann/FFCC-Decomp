@@ -1415,8 +1415,8 @@ int CCameraPcs::GetShadowRect(CBound& shadowRectBound)
                     FLOAT_8032fa1c);
     CBound::SetFrustum(eyePos, frustumMtx);
 
-    for (CGObject* gObject = gCFlatRuntime2.FindGObjFirst(); gObject != 0;
-         gObject = gCFlatRuntime2.FindGObjNext(gObject))
+    for (CGObject* gObject = CFlatRuntime2Storage().FindGObjFirst(); gObject != 0;
+         gObject = CFlatRuntime2Storage().FindGObjNext(gObject))
     {
         bool include = false;
         if (gObject->m_charaModelHandle != 0) {

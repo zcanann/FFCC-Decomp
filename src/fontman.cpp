@@ -239,7 +239,7 @@ found_glyph:
 		unsigned short* glyphBucket = m_glyphBuckets[63];
 		glyph = glyphBucket + 1;
 		for (count = static_cast<int>(*glyphBucket); count > 0; count--) {
-			if (*reinterpret_cast<unsigned char*>(glyph + 1) != '\0') {
+			if (static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(glyph + 1)) != 0) {
 				glyph += 4;
 			} else {
 				goto found_fallback;

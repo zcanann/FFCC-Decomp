@@ -3794,21 +3794,17 @@ int CPartMng::pppLoadPdt(const char* baseName, int pdtSlotIndex, int cachePriori
                             copySize, stageLoad, const_cast<char*>(s_partMng_cpp), 0xd56));
                     pdtSlot->m_pppDataHead = copiedHead;
 
-                    if (copiedHead != 0) {
-                        memcpy(copiedHead, sourceHead, copySize);
-                    }
+                    memcpy(copiedHead, sourceHead, copySize);
 
                     ppvEnv = reinterpret_cast<_pppEnvSt*>(pdtSlot->m_envFields);
-                    pdtSlot->m_envFields[0] = reinterpret_cast<unsigned int>(stageLoad);
-                    pdtSlot->m_envFields[1] = ppvEnv != 0
-                                                  ? reinterpret_cast<unsigned int>(ppvEnv->m_materialSetPtr)
-                                                  : 0;
+                    pdtSlot->m_envFields[1] = reinterpret_cast<unsigned int>(m_materialSet);
 
                     if (copiedHead != 0) {
                         pdtSlot->m_envFields[2] = copiedHead->m_modelNames;
                         pdtSlot->m_envFields[3] = copiedHead->m_shapeNames;
                         pdtSlot->m_envFields[4] = copiedHead->m_shapeGroups;
                     }
+                    pdtSlot->m_envFields[0] = reinterpret_cast<unsigned int>(m_pppEnvSt.m_stagePtr);
                 } else if (childChunk.m_id == kChunkRSET) {
                     pppModelSt* modelArray = m_pppModelStArr;
                     pppModelSt* targetModel = 0;

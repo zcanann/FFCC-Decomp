@@ -449,7 +449,7 @@ static inline void DrawBonusMcWinOverlay(CMenuPcs* menu, int statePtr)
 {
 	int auxPtr = GetBonusMenuMembers(menu).m_bonusAuxPtr;
 
-	if (statePtr == 0 || auxPtr == 0 || *(short*)(auxPtr + 10) == 3) {
+	if (*(short*)(auxPtr + 10) == 3) {
 		return;
 	}
 

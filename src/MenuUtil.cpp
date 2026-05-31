@@ -548,7 +548,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 		int attrX = static_cast<int>(font->posX + font->GetWidth(sMenuUtilSpaceText));
 		font->SetPosX(static_cast<float>(attrX));
 
-		u16 attr = *reinterpret_cast<u16*>(itemBase + 8);
+		unsigned int attr = *reinterpret_cast<u16*>(itemBase + 8);
 		if ((attr != 0) && (attr < 0x14)) {
 			font->SetTlut(4);
 			strcpy(scratch, GetAttrStr(attr));
@@ -560,7 +560,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 			}
 		}
 		} else {
-			u16 attr = *reinterpret_cast<u16*>(itemBase + 8);
+			unsigned int attr = *reinterpret_cast<u16*>(itemBase + 8);
 			if ((attr != 0) && (attr < 0x14)) {
 				strcpy(scratch, GetAttrStr(attr));
 				font->SetTlut(4);

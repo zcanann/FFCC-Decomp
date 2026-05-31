@@ -2533,6 +2533,7 @@ MSL_C/PPCEABI/bare/H/printf.c:
 	.rodata     start:0x801E70B8 end:0x801E70E0
 	.data       start:0x8021D5C0 end:0x8021D7EC
 	.sdata      start:0x8032EC08 end:0x8032EC10
+	.sdata2     start:0x80333940 end:0x80333948
 
 MSL_C/PPCEABI/bare/H/rand.c:
 	.text       start:0x801B8B10 end:0x801B8B30

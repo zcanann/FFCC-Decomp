@@ -1271,3 +1271,5 @@ int sprintf(char* s, const char* format, ...)
     va_start(args, format);
     return vsnprintf(s, 0xFFFFFFFF, format, args);
 }
+
+const double printf_double_zero = 0.0;

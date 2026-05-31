@@ -1895,12 +1895,12 @@ void CMenuPcs::DrawResultCloseAnim()
 				strcpy(text, flat->m_table[7].m_strings[(int)caravanWork->m_bonusCondition * 2 + 1]);
 			}
 
-			float y = (float)sprite->y + sprite->motionY - 6.0f;
+			float y = (float)sprite->y + sprite->motionY;
 			if (textIndex < activePartyCount) {
 				y -= 6.0f;
 			}
 			font->SetPosX((float)sprite->x + sprite->motionX);
-			font->SetPosY(y);
+			font->SetPosY(y - 6.0f);
 			font->Draw(text);
 
 			textIndex++;
@@ -2247,12 +2247,12 @@ void CMenuPcs::DrawResultCountAnim()
 				strcpy(text, flat->m_table[7].m_strings[(int)caravanWork->m_bonusCondition * 2 + 1]);
 			}
 
-			float y = (float)sprite->y + sprite->motionY - 6.0f;
+			float y = (float)sprite->y + sprite->motionY;
 			if (textIndex < activePartyCount) {
 				y -= 6.0f;
 			}
 			font->SetPosX((float)sprite->x + sprite->motionX);
-			font->SetPosY(y);
+			font->SetPosY(y - 6.0f);
 			font->Draw(text);
 
 			textIndex++;

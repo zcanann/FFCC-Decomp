@@ -676,10 +676,10 @@ CCharaPcs::CCharaPcs()
  */
 CCharaPcs::~CCharaPcs()
 {
-    LoadPdtArray(this)->~CPtrArray<CLoadPdt*>();
-    LoadTextureArray(this)->~CPtrArray<CLoadTexture*>();
-    LoadAnimArray(this)->~CPtrArray<CLoadAnim*>();
-    LoadModelArray(this)->~CPtrArray<CLoadModel*>();
+    LoadPdtArray(this)->CPtrArray<CLoadPdt*>::~CPtrArray();
+    LoadTextureArray(this)->CPtrArray<CLoadTexture*>::~CPtrArray();
+    LoadAnimArray(this)->CPtrArray<CLoadAnim*>::~CPtrArray();
+    LoadModelArray(this)->CPtrArray<CLoadModel*>::~CPtrArray();
 }
 
 /*

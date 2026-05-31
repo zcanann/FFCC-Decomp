@@ -2019,7 +2019,7 @@ pad/Padclamp.c:
 
 pad/Pad.c:
 	.text       start:0x8018D4DC end:0x8018EE04
-	.data       start:0x80217BF8 end:0x80217C08
+	.data       start:0x80217BB0 end:0x80217C08
 	.bss        start:0x8030CC90 end:0x8030CCE0
 	.sdata      start:0x8032EB18 end:0x8032EB38
 	.sbss       start:0x8032F138 end:0x8032F160

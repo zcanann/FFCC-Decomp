@@ -6,11 +6,7 @@
 
 #include "dolphin/si/__si.h"
 
-#if DEBUG
-static const char s___PADVersion[] = "<< Dolphin SDK - PAD\tdebug build: Apr  5 2004 03:56:05 (0x2301) >>";
-#else
-extern const char s___PADVersion[];
-#endif
+static char s___PADVersion[] = "<< Dolphin SDK - PAD\trelease build: Sep  5 2002 05:34:02 (0x2301) >>";
 const char* __PADVersion = s___PADVersion;
 
 
@@ -817,4 +813,3 @@ BOOL __PADDisableRecalibration(BOOL disable) {
     OSRestoreInterrupts(enabled);
     return prev;
 }
-

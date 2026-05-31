@@ -358,6 +358,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 {
 	unsigned char* const self = reinterpret_cast<unsigned char*>(this);
 	unsigned char* const menuPcsGlobal = reinterpret_cast<unsigned char*>(&MenuPcs);
+	u32 foodBase = Game.m_scriptFoodBase[0];
 	u32 lineBaseY[4];
 	lineBaseY[0] = DAT_801e36d0;
 	lineBaseY[1] = DAT_801e36d4;
@@ -518,8 +519,8 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 				}
 
 				currentItem = *reinterpret_cast<short*>(
-				    Game.m_scriptFoodBase[0] +
-				    static_cast<int>(*reinterpret_cast<short*>(Game.m_scriptFoodBase[0] + currentItem * 2 + 0xAC)) * 2 +
+				    foodBase +
+				    static_cast<int>(*reinterpret_cast<short*>(foodBase + currentItem * 2 + 0xAC)) * 2 +
 				    0xB6);
 
 				if (ChkEquipActive(static_cast<int>(*reinterpret_cast<short*>(menuState + 0x28)) +

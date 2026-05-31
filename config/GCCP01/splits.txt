@@ -1456,12 +1456,14 @@ baseobj.cpp:
 	extab       start:0x800091B4 end:0x800091E4
 	extabindex  start:0x8000FF58 end:0x8000FFA0
 	.text       start:0x8010B150 end:0x8010B2A4
+	.data       start:0x802112E8 end:0x80211320
 	.sdata      start:0x8032E920 end:0x8032E930
 
 quadobj.cpp:
 	extab       start:0x800091E4 end:0x800091EC
 	extabindex  start:0x8000FFA0 end:0x8000FFAC
 	.text       start:0x8010B2A4 end:0x8010B660
+	.data       start:0x80211320 end:0x80211370
 	.sdata      start:0x8032E930 end:0x8032E948
 	.sdata2     start:0x80331958 end:0x80331968
 
@@ -1469,7 +1471,7 @@ charaobj.cpp:
 	extab       start:0x800091EC end:0x800092E4
 	extabindex  start:0x8000FFAC end:0x80010120
 	.text       start:0x8010B660 end:0x80112D54
-	.data       start:0x802112E8 end:0x80211498
+	.data       start:0x80211370 end:0x80211498
 	.sdata      start:0x8032E948 end:0x8032E970
 	.sbss       start:0x8032EE60 end:0x8032EE70
 	.sdata2     start:0x80331968 end:0x803319C8

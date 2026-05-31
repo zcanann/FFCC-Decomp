@@ -61,8 +61,6 @@ public:
     void preDrawEnvInit();
     void stdDrawEnvInit();
 
-    void calcScreenFade();
-    void drawSFRect(float, float, float, float, _GXColor, _GXColor);
     void drawSFCircle(int, int, int, int, _GXColor, _GXColor);
     unsigned int GetScreenFadeExecutingBit();
     void drawScreenFade();

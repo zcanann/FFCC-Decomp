@@ -397,26 +397,6 @@ unsigned int CGraphicPcs::GetScreenFadeExecutingBit()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGraphicPcs::calcScreenFade()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGraphicPcs::drawSFRect(float, float, float, float, _GXColor, _GXColor)
-{
-	// TODO
-}
-
-/*
- * --INFO--
  * PAL Address: 0x800462b8
  * PAL Size: 596b
  * EN Address: TODO

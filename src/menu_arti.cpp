@@ -465,7 +465,7 @@ void CMenuPcs::ArtiDraw()
 
 		cursorBase += *(short*)(GetArtiStateBase(this) + 0x26) * 0x20;
 		int cursorY = (int)(float)((double)(cursorBase[3] - 0x20) * DOUBLE_80332fb8 + (double)cursorBase[1]);
-		int cursorX = (int)((float)(cursorBase[0] - 0x14) + (float)(System.m_frameCounter % 8));
+		int cursorX = (int)((float)(cursorBase[0] - 0x14) + (float)((int)System.m_frameCounter % 8));
 		DrawCursor(cursorX, cursorY, FLOAT_80332fac);
 	}
 

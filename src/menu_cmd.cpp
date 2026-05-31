@@ -227,6 +227,16 @@ static inline s16 GetCmdLayoutFlag(CMenuPcs* menu)
 	return GetMenuCmdMembers(menu).m_cmdLayoutFlag;
 }
 
+static inline s16 GetUniteRecipeCmd(int recipe)
+{
+	return s_uniteRecipePatterns[recipe * 6 + 1];
+}
+
+static inline s16 GetUniteRecipeCount(int recipe)
+{
+	return s_uniteRecipePatterns[recipe * 6 + 2];
+}
+
 } // namespace
 
 /*
@@ -1469,7 +1479,9 @@ unsigned int CMenuPcs::CmdCtrlCur()
 						int comboChoice[2][2];
 						int comboCount = ChkUnite(menuState[0x13], comboChoice);
 						if (comboCount == 1) {
-							reinterpret_cast<CCaravanWork*>(caravanWork)->UniteComList(comboChoice[0][1], 0, 0);
+							const int recipe = comboChoice[0][0];
+							reinterpret_cast<CCaravanWork*>(caravanWork)->UniteComList(
+								comboChoice[0][1], GetUniteRecipeCount(recipe), GetUniteRecipeCmd(recipe));
 						} else if (comboCount > 1) {
 							*reinterpret_cast<u8*>(menuState + 4) = 1;
 						}
@@ -2018,7 +2030,9 @@ void CMenuPcs::CmdUnite(int selected, int comboIndex)
 		return;
 	}
 
-	reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0])->UniteComList(combo[comboIndex][1], 0, 0);
+	const int recipe = combo[comboIndex][0];
+	reinterpret_cast<CCaravanWork*>(Game.m_scriptFoodBase[0])->UniteComList(
+		combo[comboIndex][1], GetUniteRecipeCount(recipe), GetUniteRecipeCmd(recipe));
 	*reinterpret_cast<s16*>(GetCmdStateBase(this) + 0x26) = static_cast<s16>(combo[comboIndex][1]);
 }
 
@@ -2580,7 +2594,7 @@ unsigned int CMenuPcs::CmdClose1()
 			if (*reinterpret_cast<s16*>(cmd + 0x2a) == 0) {
 				*reinterpret_cast<s16*>(cmd + 0x14) = 1;
 				done = 0;
-			} else if ((static_cast<double>(*reinterpret_cast<float*>(list + (static_cast<s32>(list[1]) + 3) * 0x20 + 0x0d)) ==
+			} else if ((static_cast<double>(*reinterpret_cast<float*>(list + (static_cast<s32>(list[1]) + 3) * 0x20 + 0x0e)) ==
 			            DOUBLE_80332a58) &&
 			           (*reinterpret_cast<s16*>(cmd + 0x2a) == 1)) {
 				*reinterpret_cast<s16*>(cmd + 0x14) = 2;
@@ -2643,7 +2657,8 @@ unsigned int CMenuPcs::CmdClose1()
 			}
 
 			reinterpret_cast<CCaravanWork*>(caravanWork)->UnuniteComList(selected, ununiteCount);
-			reinterpret_cast<CCaravanWork*>(caravanWork)->UniteComList(combo[0][1], 0, 0);
+			reinterpret_cast<CCaravanWork*>(caravanWork)->UniteComList(
+				combo[0][1], GetUniteRecipeCount(combo[0][0]), GetUniteRecipeCmd(combo[0][0]));
 
 			done = 0;
 			*reinterpret_cast<s16*>(cmd + 0x26) = static_cast<s16>(combo[0][1]);
@@ -2763,7 +2778,8 @@ unsigned int CMenuPcs::CmdClose2()
 			}
 
 			reinterpret_cast<CCaravanWork*>(caravanWork)->UnuniteComList(selected, ununiteCount);
-			reinterpret_cast<CCaravanWork*>(caravanWork)->UniteComList(combo[comboIdx][1], 0, 0);
+			reinterpret_cast<CCaravanWork*>(caravanWork)->UniteComList(
+				combo[comboIdx][1], GetUniteRecipeCount(combo[comboIdx][0]), GetUniteRecipeCmd(combo[comboIdx][0]));
 			cmd[0x13] = static_cast<s16>(combo[comboIdx][1]);
 			cmd[0x0A] = 2;
 		}
@@ -2781,7 +2797,8 @@ unsigned int CMenuPcs::CmdClose2()
 				comboIdx = (combo[1][1] == modeSel) ? 1 : 0;
 			}
 
-			reinterpret_cast<CCaravanWork*>(caravanWork)->UniteComList(combo[comboIdx][1], 0, 0);
+			reinterpret_cast<CCaravanWork*>(caravanWork)->UniteComList(
+				combo[comboIdx][1], GetUniteRecipeCount(combo[comboIdx][0]), GetUniteRecipeCmd(combo[comboIdx][0]));
 			cmd[0x13] = static_cast<s16>(combo[comboIdx][1]);
 		} else if (UniteOpenAnim(-1) != 0) {
 			cmd[0x0A] = 3;

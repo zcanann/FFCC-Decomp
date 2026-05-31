@@ -15,7 +15,7 @@ struct SRandDownCVParams {
     u8 _pad[3];
 };
 
-static inline float randf(unsigned char flag)
+static float randf(unsigned char flag)
 {
     float value = -Math.RandF();
     if (flag != 0) {

@@ -22,7 +22,7 @@ struct RandDownCVParams {
  * JP Address: TODO
  * JP Size: TODO
  */
-static inline char randchar(char value, float scale)
+static char randchar(char value, float scale)
 {
     return (char)((f32)value * scale);
 }

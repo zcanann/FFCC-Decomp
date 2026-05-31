@@ -2541,7 +2541,8 @@ unsigned int CMenuPcs::CmdOpen1()
 		*reinterpret_cast<u8*>(cmd + 0xc) = 1;
 	}
 
-	animEntry[8] = static_cast<f32>(DOUBLE_80332a90 * static_cast<f64>(*reinterpret_cast<s16*>(cmd + 0x22)));
+	*reinterpret_cast<f32*>(animEntry + 8) =
+		static_cast<f32>(DOUBLE_80332a90 * static_cast<f64>(*reinterpret_cast<s16*>(cmd + 0x22)));
 	if (static_cast<f64>(*reinterpret_cast<s16*>(cmd + 0x22)) >= DOUBLE_80332a78) {
 		*reinterpret_cast<s16*>(cmd + 0x2a) = 0;
 	}
